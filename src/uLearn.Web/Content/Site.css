@@ -4,6 +4,10 @@
 	font-family: "Segoe UI", Arial, sans-serif;
 }
 
+body.without-topbar {
+    padding-top: 0;
+}
+
 /* Set padding to keep content from hitting the edges */
 .body-content {
     padding-left: 15px;
@@ -278,4 +282,10 @@ footer:hover {
 	}
 }
 
-/*@media (max-height: )*/
+/* awesome checkboxes */
+.checkbox input[type="checkbox"]:disabled + label,
+.checkbox input[type="radio"]:disabled + label,
+.checkbox input[type="checkbox"]:disabled + input[type=hidden] + label,
+.checkbox input[type="radio"]:disabled + input[type=hidden] + label {
+	opacity: 0.75;
+}

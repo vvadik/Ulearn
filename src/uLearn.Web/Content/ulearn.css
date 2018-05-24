@@ -455,11 +455,11 @@ p + .revealed {
 }
 
 .navbar-label-success {
-	color: lightgreen;
+	color: #7dec7d;
 }
 
 .navbar-label-danger {
-	color: lightcoral;
+	color: #f15151;
 }
 
 .navbar-label-link {
@@ -617,7 +617,7 @@ p + .revealed {
 .quiz-mistakes-explanation {
 	margin-left: -20px;
 	margin-top: 10px;
-	color: #070;
+	color: black;
 }
 /* ReSharper restore Html.CssClassElementsNotFound */
 
@@ -1405,6 +1405,14 @@ hr.without-top-margin {
 .quiz .quiz__explanation {
 	margin-left: 5px;
 	margin-top: 0;
+}
+
+.quiz__explanation__correct {
+	color: green;
+}
+
+.quiz__explanation__incorrect {
+	color: red;
 }
 
 /* Ordering quizes */

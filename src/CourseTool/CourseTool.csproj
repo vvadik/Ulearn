@@ -358,32 +358,18 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
-    <None Include="renderer\fonts\fontawesome-webfont.eot">
+    <None Include="renderer\fonts\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="renderer\fonts\fontawesome-webfont.ttf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="renderer\fonts\fontawesome-webfont.woff">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="renderer\fonts\fontawesome-webfont.woff2">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="renderer\fonts\FontAwesome.otf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="renderer\fonts\glyphicons-halflings-regular.eot">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="renderer\fonts\glyphicons-halflings-regular.woff">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="static\flexslider-icon.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <Content Include="..\uLearn.Web\Content\ulearn.css">
       <Link>renderer\styles\ulearn.css</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\uLearn.Web\Content\Site.css">
+      <Link>renderer\styles\site.css</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\uLearn.Web\Scripts\slide-*.js">
@@ -396,6 +382,12 @@
     <Content Include="Hunspellx86.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="renderer\fonts\fontawesome-webfont.svg" />
+    <Content Include="renderer\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="renderer\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="renderer\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="renderer\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="renderer\fonts\glyphicons-halflings-regular.woff2" />
     <Content Include="renderer\scripts\slide-*.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -406,9 +398,6 @@
   <ItemGroup>
     <Content Include="renderer\favicon.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\fonts\fontawesome-webfont.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="renderer\scripts\active-line.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

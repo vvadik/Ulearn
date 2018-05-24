@@ -18,7 +18,7 @@
 			<link href='@cssFile' rel='stylesheet'/>
 		}
 	</head>
-	<body>
+	<body class="without-topbar">
 		<div class='side-bar navbar-collapse collapse navbar-nav container'>
 			@TableOfContents.Toc(toc)
 		</div>
@@ -35,21 +35,17 @@
 				                    {
 					                    AnswersToQuizes = slide.Blocks.OfType<AbstractQuestionBlock>().ToDictionary(x => x.Id, x => new List<UserQuiz>()),
 					                    Slide = (QuizSlide)slide
-				                    }, i, QuizState.Total)
+				                    }, i, QuizState.Total, debugView: true)
 				                    : (dynamic)null
 		                    ).ToArray(),
 	                    isGuest: false,
 	                    revealHidden: true
 	                    ),
 	                    null)
-                    <ul>
-						<li>
-							<a href="/@(slide.Index.ToString("000")).html?query=addLesson">Добавить слайд</a>
-						</li>
-						<li>
-							<a href="/@(slide.Index.ToString("000")).html?query=addQuiz">Добавить quiz</a>
-						</li>
-					</ul>
+					<div style="margin-bottom: 40px;">
+						<a href="/@(slide.Index.ToString("000")).html?query=addLesson" class="btn btn-default">Добавить слайд</a>
+						<a href="/@(slide.Index.ToString("000")).html?query=addQuiz" class="btn btn-default">Добавить тест</a>
+					</div>
 				</div>
 			</div>
 		</div>

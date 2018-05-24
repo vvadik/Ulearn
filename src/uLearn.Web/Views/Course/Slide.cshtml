@@ -38,7 +38,7 @@
                             @Model.Slide.Title
                         }
                     </span>
-                    <span class="score">@GetScore(Model.Score)</span>
+                    <span class="score">@ShowScore(Model.Score)</span>
                 </h1>
 				@if (!string.IsNullOrEmpty(Model.Error))
 				{
@@ -146,5 +146,5 @@
 	<script src="~/Scripts/jquery.color-2.1.0.min.js"></script>
 }
 
-@helper GetScore(Tuple<int, int> score)
+@helper ShowScore(Tuple<int, int> score)
 { @(score.Item2 == 0 ? "" : string.Format("{0} из {1}", score.Item1.PluralizeInRussian(RussianPluralizationOptions.Score), score.Item2)) }

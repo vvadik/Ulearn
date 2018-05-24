@@ -58,13 +58,13 @@ WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t<a");
 
 WriteLiteralTo(__razor_helper_writer, " data-score=\"");
 
-WriteTo(__razor_helper_writer, SlideHtml.Score(toc.Score, toc.MaxScore));
+WriteTo(__razor_helper_writer, SlideHtml.ShowScore(toc.Score, toc.MaxScore));
 
 WriteLiteralTo(__razor_helper_writer, "\"");
 
 WriteLiteralTo(__razor_helper_writer, ">");
 
-                                        WriteTo(__razor_helper_writer, toc.Course.Title);
+                                            WriteTo(__razor_helper_writer, toc.Course.Title);
 
 WriteLiteralTo(__razor_helper_writer, "</a>\r\n\t\t</li>\r\n");
 
@@ -78,9 +78,9 @@ WriteLiteralTo(__razor_helper_writer, " class=\"full-width group-statistics-link
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t\t<a");
 
-WriteAttributeTo(__razor_helper_writer, "href", Tuple.Create(" href=\"", 846), Tuple.Create("\"", 873)
-, Tuple.Create(Tuple.Create("", 853), Tuple.Create<System.Object, System.Int32>(group.StatisticsUrl
-, 853), false)
+WriteAttributeTo(__razor_helper_writer, "href", Tuple.Create(" href=\"", 850), Tuple.Create("\"", 877)
+, Tuple.Create(Tuple.Create("", 857), Tuple.Create<System.Object, System.Int32>(group.StatisticsUrl
+, 857), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, "><span");
@@ -137,34 +137,34 @@ WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t<a");
 
 WriteLiteralTo(__razor_helper_writer, " data-toggle=\"collapse\"");
 
-WriteAttributeTo(__razor_helper_writer, "href", Tuple.Create(" href=", 1283), Tuple.Create("", 1305)
-, Tuple.Create(Tuple.Create("", 1289), Tuple.Create<System.Object, System.Int32>( "#N" + index
-, 1289), false)
+WriteAttributeTo(__razor_helper_writer, "href", Tuple.Create(" href=", 1287), Tuple.Create("", 1309)
+, Tuple.Create(Tuple.Create("", 1293), Tuple.Create<System.Object, System.Int32>( "#N" + index
+, 1293), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, " class=\"units-list-item-text no-smooth-scrolling\"");
 
 WriteLiteralTo(__razor_helper_writer, " data-score=\"");
 
-                                                                                       WriteTo(__razor_helper_writer, SlideHtml.Score(unit.Score, unit.MaxScore));
+                                                                                       WriteTo(__razor_helper_writer, SlideHtml.ShowScore(unit.Score, unit.MaxScore));
 
 WriteLiteralTo(__razor_helper_writer, "\"");
 
 WriteLiteralTo(__razor_helper_writer, ">");
 
-                                                                                                                                    WriteTo(__razor_helper_writer, unit.UnitName);
+                                                                                                                                        WriteTo(__razor_helper_writer, unit.UnitName);
 
 WriteLiteralTo(__razor_helper_writer, "</a>\r\n\t\t<ul");
 
-WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=", 1437), Tuple.Create("", 1456)
-, Tuple.Create(Tuple.Create("", 1441), Tuple.Create<System.Object, System.Int32>( "N" + index
-, 1441), false)
+WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=", 1445), Tuple.Create("", 1464)
+, Tuple.Create(Tuple.Create("", 1449), Tuple.Create<System.Object, System.Int32>( "N" + index
+, 1449), false)
 );
 
-WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 1456), Tuple.Create("\"", 1491)
-, Tuple.Create(Tuple.Create("", 1464), Tuple.Create("slides-list", 1464), true)
-, Tuple.Create(Tuple.Create(" ", 1475), Tuple.Create<System.Object, System.Int32>(collapseOption
-, 1476), false)
+WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 1464), Tuple.Create("\"", 1499)
+, Tuple.Create(Tuple.Create("", 1472), Tuple.Create("slides-list", 1472), true)
+, Tuple.Create(Tuple.Create(" ", 1483), Tuple.Create<System.Object, System.Int32>(collapseOption
+, 1484), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n");
@@ -212,14 +212,14 @@ return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
 
 WriteLiteralTo(__razor_helper_writer, "\t<a");
 
-WriteAttributeTo(__razor_helper_writer, "href", Tuple.Create(" href=\"", 1792), Tuple.Create("\"", 1808)
-, Tuple.Create(Tuple.Create("", 1799), Tuple.Create<System.Object, System.Int32>(page.Url
-, 1799), false)
+WriteAttributeTo(__razor_helper_writer, "href", Tuple.Create(" href=\"", 1800), Tuple.Create("\"", 1816)
+, Tuple.Create(Tuple.Create("", 1807), Tuple.Create<System.Object, System.Int32>(page.Url
+, 1807), false)
 );
 
-WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 1809), Tuple.Create("\"", 1852)
-, Tuple.Create(Tuple.Create("", 1817), Tuple.Create<System.Object, System.Int32>(page.IsCurrent ? "selected" : ""
-, 1817), false)
+WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 1817), Tuple.Create("\"", 1860)
+, Tuple.Create(Tuple.Create("", 1825), Tuple.Create<System.Object, System.Int32>(page.IsCurrent ? "selected" : ""
+, 1825), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n        <span");
@@ -234,15 +234,15 @@ WriteLiteralTo(__razor_helper_writer, "\"");
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n            <i");
 
-WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 1960), Tuple.Create("\"", 2004)
-, Tuple.Create(Tuple.Create("", 1968), Tuple.Create<System.Object, System.Int32>(GetPageIconClass(page)
-, 1968), false)
-, Tuple.Create(Tuple.Create(" ", 1991), Tuple.Create("navbar-label", 1992), true)
+WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 1968), Tuple.Create("\"", 2012)
+, Tuple.Create(Tuple.Create("", 1976), Tuple.Create<System.Object, System.Int32>(GetPageIconClass(page)
+, 1976), false)
+, Tuple.Create(Tuple.Create(" ", 1999), Tuple.Create("navbar-label", 2000), true)
 );
 
-WriteAttributeTo(__razor_helper_writer, "title", Tuple.Create(" title=\"", 2005), Tuple.Create("\"", 2044)
-, Tuple.Create(Tuple.Create("", 2013), Tuple.Create<System.Object, System.Int32>(GetTocPageTytle(page.PageType)
-, 2013), false)
+WriteAttributeTo(__razor_helper_writer, "title", Tuple.Create(" title=\"", 2013), Tuple.Create("\"", 2052)
+, Tuple.Create(Tuple.Create("", 2021), Tuple.Create<System.Object, System.Int32>(GetTocPageTytle(page.PageType)
+, 2021), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, "></i>\r\n            <span");
@@ -261,7 +261,7 @@ WriteLiteralTo(__razor_helper_writer, " class=\"score right\"");
 
 WriteLiteralTo(__razor_helper_writer, ">");
 
-        WriteTo(__razor_helper_writer, SlideHtml.Score(page.Score, page.MaxScore));
+        WriteTo(__razor_helper_writer, SlideHtml.ShowScore(page.Score, page.MaxScore));
 
 WriteLiteralTo(__razor_helper_writer, "</span>\r\n        </span>\r\n    </a>\r\n");
 
@@ -307,7 +307,7 @@ WriteLiteralTo(__razor_helper_writer, " class=\"score right\"");
 
 WriteLiteralTo(__razor_helper_writer, ">");
 
-    WriteTo(__razor_helper_writer, SlideHtml.Score(score, group.MaxAdditionalScore));
+    WriteTo(__razor_helper_writer, SlideHtml.ShowScore(score, group.MaxAdditionalScore));
 
 WriteLiteralTo(__razor_helper_writer, "</span>\r\n\t</li>\r\n");
 

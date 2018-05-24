@@ -5,14 +5,16 @@
 		public QuizModel QuizModel { get; private set; }
 		public int BlockIndex { get; private set; }
 		public QuizState QuizState { get; private set; }
-		public readonly bool IsInstructor;		
+		public readonly bool IsInstructor;
+		public readonly bool DebugView;
 
-		public QuizBlockData(QuizModel model, int index, QuizState quizState, bool isInstructor=false)
+		public QuizBlockData(QuizModel model, int index, QuizState quizState, bool isInstructor=false, bool debugView=false)
 		{
 			QuizModel = model;
 			BlockIndex = index;
 			QuizState = quizState;
-			IsInstructor = isInstructor;			
+			IsInstructor = isInstructor;
+			DebugView = debugView;
 		}
 
 		private bool TriesFinished => QuizModel.TryNumber + 1 > QuizModel.MaxTriesCount; 

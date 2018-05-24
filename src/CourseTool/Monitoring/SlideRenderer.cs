@@ -114,7 +114,17 @@ namespace uLearn.CourseTool.Monitoring
 
 		private IEnumerable<string> GetCssFiles()
 		{
-			return Directory.EnumerateFiles(htmlDirectory.FullName + "/styles").Select(x => "styles/" + new FileInfo(x).Name);
+			yield return "styles/bootstrap.css";
+			yield return "styles/awesome-bootstrap-checkbox.css";
+			yield return "styles/codemirror.css"; 
+			yield return "styles/cobalt.css"; 
+			yield return "styles/flexslider.css"; 
+			yield return "styles/font-awesome.css"; 
+			yield return "styles/jsdifflib.css"; 
+			yield return "styles/katex.min.css"; 
+			yield return "styles/show-hint.css";
+			yield return "styles/site.css";
+			yield return "styles/ulearn.css";
 		}
 
 		private IEnumerable<string> GetJsFiles()
