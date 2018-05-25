@@ -96,7 +96,6 @@ $(document).ready(function () {
         var originalTokensByLines = getTokensByLines($originalSubmission.text(), antiplagiarismData.tokens_positions);
         var plagiarismTokensByLines = getTokensByLines($plagiarismSubmission.text(), plagiarismData.tokens_positions);
         var bestMatchedLines = findBestMatchedLines(originalTokensByLines, plagiarismTokensByLines, plagiarismData.matched_snippets);
-        console.log(bestMatchedLines);
         
         var originalSubmissionLines = $originalSubmission.text().split('\n');
         var plagiarismSubmissionLines = $plagiarismSubmission.text().split('\n');
@@ -105,6 +104,16 @@ $(document).ready(function () {
                 highlightBestMatchedLines(originalCodeMirror, plagiarismCodeMirror, bestMatchedLines, originalSubmissionLines, plagiarismSubmissionLines);    
             });             
         });
+        
+        /* Align author's labels by height, because sometimes one of them is more than other and codemirror aligning works bad */
+        var $authorLabels = $(originalCodeMirror.getWrapperElement()).closest('.antiplagiarism').find('.antiplagiarism__author');
+        var maxHeight = 0;
+        $authorLabels.each(function (_, label) {
+            var labelHeight = $(label).height();
+            if (maxHeight < labelHeight)
+                maxHeight = labelHeight;
+        });
+        $authorLabels.height(maxHeight);
         
         /* Setup click handlers */
         $(originalCodeMirror.getWrapperElement()).on('click', function (e) {

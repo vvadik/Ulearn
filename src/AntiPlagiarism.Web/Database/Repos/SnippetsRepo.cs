@@ -25,6 +25,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 		Task<List<SnippetOccurence>> GetSnippetsOccurencesAsync(int snippetId, Expression<Func<SnippetOccurence, bool>> filterFunction);
 		Task<List<SnippetOccurence>> GetSnippetsOccurencesAsync(IEnumerable<int> snippetIds, Expression<Func<SnippetOccurence, bool>> filterFunction);
 		List<SnippetOccurence> GetSnippetsOccurences(IEnumerable<int> snippetIds, Expression<Func<SnippetOccurence, bool>> filterFunction);
+		List<int> GetSubmissionIdsWithSamesnippets(IEnumerable<int> snippetIds, Expression<Func<SnippetOccurence, bool>> filterFunction, int maxSubmissionsCount);
 		Task RemoveSnippetsOccurencesForTaskAsync(Guid taskId);
 		Task<Snippet> GetOrAddSnippetAsync(Snippet snippet);
 	}
@@ -264,6 +265,18 @@ namespace AntiPlagiarism.Web.Database.Repos
 		public List<SnippetOccurence> GetSnippetsOccurences(IEnumerable<int> snippetIds, Expression<Func<SnippetOccurence, bool>> filterFunction)
 		{
 			return InternalGetSnippetsOccurences(snippetIds, filterFunction).ToList();
+		}
+
+		public List<int> GetSubmissionIdsWithSamesnippets(IEnumerable<int> snippetIds, Expression<Func<SnippetOccurence, bool>> filterFunction, int maxSubmissionsCount)
+		{
+			var submissionsWithSnippetsCount = db.SnippetsOccurences
+				.Where(o => snippetIds.Contains(o.SnippetId))
+				.Where(filterFunction)
+				.GroupBy(o => o.SubmissionId)
+				.ToDictionary(kvp => kvp.Key, kvp => kvp.Count())
+				.ToList();
+			submissionsWithSnippetsCount.Sort((first, second) => second.Value.CompareTo(first.Value));
+			return submissionsWithSnippetsCount.Take(maxSubmissionsCount).Select(kvp => kvp.Key).ToList();
 		}
 
 		private IQueryable<SnippetOccurence> InternalGetSnippetsOccurences(IEnumerable<int> snippetIds, Expression<Func<SnippetOccurence, bool>> filterFunction)

@@ -97,7 +97,7 @@ namespace AntiPlagiarism.Web.Controllers
 		/* Определяет, пора ли пересчитывать параметры Mean и Deviation для заданной задачи.
 		   В конфигурации для этого есть специальный параметр configuration.StatisticsAnalyzing.RecalculateStatisticsAfterSubmisionsCount.
 		   Если он равен, например, 1000, то параметры будут пересчитываться после каждого тысячного решения по этой задаче.
-		   Но если решений пока меньше 1000, то параметры будут пересчитываться после 1-го, 2-го, 4-го, 8-го, 16-го, 32-го решения и так далее.
+		   Если решений пока меньше 1000, то параметры будут пересчитываться после 1-го, 2-го, 4-го, 8-го, 16-го, 32-го решения и так далее.
 		 */
 		private async Task<bool> NeedToRecalculateTaskStatistics(int clientId, Guid taskId)
 		{
