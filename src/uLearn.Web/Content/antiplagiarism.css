@@ -132,16 +132,6 @@
     background-color: #47f342;    
 }
 
-.antiplagiarism__not-matched .cm-tab {
-    background-color: #a7f3a2;
-}
-
-.antiplagiarism__not-matched .cm-tab:before {
-    content: ' →';
-    color: #468c2a;
-    position: absolute;
-}
-
 .antiplagiarism__not-matched.CodeMirror-selectedtext {
     background-color: #479042;
 }

@@ -282,6 +282,12 @@ $(document).ready(function () {
     function isDigit(c) {
         return c >= '0' && c <= '9';
     }
+    function hasOnlySpaces(s) {
+        for (var i = 0; i < s.length; i++) 
+            if (s[i] !== ' ' && s[i] !== '\n' && s[i] !== '\r' && s[i] !== '\t')
+                return false;
+        return true;
+    }
     
     function highlightBestMatchedLines(originalCodeMirror, plagiarismCodeMirror, bestMatchedLines, originalSubmissionLines, plagiarismSubmissionLines)
     {
@@ -317,38 +323,64 @@ $(document).ready(function () {
                    Also full-matched blocks should have length at least 4 chars.
                    Bad full-matched blocks are marked with special value of diffType: -100. It means that it should be marked in both texts, but as not-matched */
                 var BAD_FULL_MATCHED = -100;
+                var badFullMatchedLength = 0;
                 if (diffType === 0) {
                     var firstChar = diffString[0];
                     var previousChar = originalCharIndex > 0 ? originalLine[originalCharIndex - 1] : '';
                     if (isLatinChar(firstChar)) {
-                        var isFirstLetter = previousChar === '' || isLatinUppercase(firstChar) || !isLatinChar(previousChar)
-                        if (! isFirstLetter)
-                            diffType = BAD_FULL_MATCHED;                                                    
+                        var isFirstLetter = previousChar === '' || isLatinUppercase(firstChar) || !isLatinChar(previousChar);
+                        if (! isFirstLetter) {
+                            diffType = BAD_FULL_MATCHED;
+                            /* Looking for the end of latin word */
+                            badFullMatchedLength = 1;
+                            while (originalCharIndex + badFullMatchedLength < originalLine.length && isLatinChar(originalLine[originalCharIndex + badFullMatchedLength]))
+                                badFullMatchedLength++;
+                        }
                     }
                     else if (isDigit(firstChar))
                     {
-                        if (isDigit(previousChar))
+                        if (isDigit(previousChar)) {
                             diffType = BAD_FULL_MATCHED;
+                            /* Looking for the end of latin number */
+                            badFullMatchedLength = 1;
+                            while (originalCharIndex + badFullMatchedLength < originalLine.length && isDigit(originalLine[originalCharIndex + badFullMatchedLength]))
+                                badFullMatchedLength++;
+                        }
                     }
                     
                     if (diffString.length < 4)
                         diffType = BAD_FULL_MATCHED;
-                } 
-                
+                }
+
+                if (diffType === BAD_FULL_MATCHED) {
+                    originalCodeMirror.markText({line: lineId, ch: originalCharIndex}, {line: lineId, ch: originalCharIndex + badFullMatchedLength}, notMatchedTextMarkerOptions);
+                    originalCharIndex += badFullMatchedLength;
+                    plagiarismCodeMirror.markText({line: bestMatchedLine, ch: plagiarismCharIndex}, {line: bestMatchedLine,ch: plagiarismCharIndex + badFullMatchedLength}, notMatchedTextMarkerOptions);
+                    plagiarismCharIndex += badFullMatchedLength;
+                    
+                    diffString = diffString.substring(badFullMatchedLength);
+                    /* All other stuff from diffString should be marked as fully matched string */
+                    diffType = 0;
+                }
+
                 if (diffType === 0) {
                     originalCodeMirror.markText({line: lineId, ch: originalCharIndex}, {line: lineId, ch: originalCharIndex + diffString.length}, fullMatchedTextMarkerOptions);
                     plagiarismCodeMirror.markText({line: bestMatchedLine, ch: plagiarismCharIndex}, {line: bestMatchedLine, ch: plagiarismCharIndex + diffString.length}, fullMatchedTextMarkerOptions);
                     originalCharIndex += diffString.length;
                     plagiarismCharIndex += diffString.length;
                 }
-                if (diffType === -1 || diffType === BAD_FULL_MATCHED) {
-                    originalCodeMirror.markText({line: lineId, ch: originalCharIndex}, {line: lineId, ch: originalCharIndex + diffString.length}, notMatchedTextMarkerOptions);
+                var markerOptions;
+                if (diffType === -1) {
+                    /* If diff contains only space chars (' ', '\t', '\n', ...) then hightlight is as fully matched (red color) */
+                    markerOptions = hasOnlySpaces(diffString) ? fullMatchedTextMarkerOptions : notMatchedTextMarkerOptions;
+                    originalCodeMirror.markText({line: lineId, ch: originalCharIndex}, {line: lineId, ch: originalCharIndex + diffString.length}, markerOptions);
                     originalCharIndex += diffString.length;
                 }
-                if (diffType === 1 || diffType === BAD_FULL_MATCHED) {
-                    plagiarismCodeMirror.markText({line: bestMatchedLine, ch: plagiarismCharIndex}, {line: bestMatchedLine,ch: plagiarismCharIndex + diffString.length}, notMatchedTextMarkerOptions);
+                if (diffType === 1) {
+                    markerOptions = hasOnlySpaces(diffString) ? fullMatchedTextMarkerOptions : notMatchedTextMarkerOptions;
+                    plagiarismCodeMirror.markText({line: bestMatchedLine, ch: plagiarismCharIndex}, {line: bestMatchedLine,ch: plagiarismCharIndex + diffString.length}, markerOptions);
                     plagiarismCharIndex += diffString.length;
-                }
+                }                
             });
 
             /* See next line and try to concat it to matched block */
