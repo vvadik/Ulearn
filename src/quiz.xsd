@@ -102,6 +102,7 @@
 	<xs:complexType name="ChoiceBlock">
 		<xs:sequence minOccurs="1" maxOccurs="1">
 			<xs:element name="text" minOccurs="1" maxOccurs="1" type="notEmptyString"/>
+			<xs:element name="allowedMistakes" minOccurs="0" maxOccurs="1" type="AllowedMistakes"/>
 			<xs:element name="item" minOccurs="0" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:simpleContent>
@@ -120,8 +121,7 @@
 						</xs:extension>
 					</xs:simpleContent>
 				</xs:complexType>
-			</xs:element>
-			<xs:element name="allowedMistakes" minOccurs="0" maxOccurs="1" type="AllowedMistakes"/>
+			</xs:element>			
 		</xs:sequence>
 		<xs:attribute name="id" type="notEmptyString" use="required" />
 		<xs:attribute name="multiple" type="xs:boolean" use="optional" />
