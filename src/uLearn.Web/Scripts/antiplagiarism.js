@@ -324,10 +324,11 @@ $(document).ready(function () {
                    Bad full-matched blocks are marked with special value of diffType: -100. It means that it should be marked in both texts, but as not-matched */
                 var BAD_FULL_MATCHED = -100;
                 var badFullMatchedLength = 0;
+                console.log('Diff is', diffItem);
                 if (diffType === 0) {
                     var firstChar = diffString[0];
                     var previousChar = originalCharIndex > 0 ? originalLine[originalCharIndex - 1] : '';
-                    console.log('Checking full-matched substring for badness. First char is', firstChar, 'previous char is', previousChar);                    
+                    console.log('Checking full-matched substring "' + diffString + '" for badness. First char is', firstChar, 'previous char is', previousChar);                    
                     if (isLatinChar(firstChar)) {
                         var isFirstLetter = previousChar === '' || isLatinUppercase(firstChar) || !isLatinChar(previousChar);
                         if (! isFirstLetter) {
@@ -354,8 +355,10 @@ $(document).ready(function () {
 
                 if (diffType === BAD_FULL_MATCHED) {
                     originalCodeMirror.markText({line: lineId, ch: originalCharIndex}, {line: lineId, ch: originalCharIndex + badFullMatchedLength}, notMatchedTextMarkerOptions);
+                    console.log('originalCharIndex:', originalCharIndex, '+', badFullMatchedLength, '=', originalCharIndex + badFullMatchedLength);
                     originalCharIndex += badFullMatchedLength;
                     plagiarismCodeMirror.markText({line: bestMatchedLine, ch: plagiarismCharIndex}, {line: bestMatchedLine,ch: plagiarismCharIndex + badFullMatchedLength}, notMatchedTextMarkerOptions);
+                    console.log('plagiarismCharIndex:', plagiarismCharIndex, '+', badFullMatchedLength, '=', plagiarismCharIndex + badFullMatchedLength);
                     plagiarismCharIndex += badFullMatchedLength;
                     
                     diffString = diffString.substring(badFullMatchedLength);
@@ -365,8 +368,10 @@ $(document).ready(function () {
 
                 if (diffType === 0) {
                     originalCodeMirror.markText({line: lineId, ch: originalCharIndex}, {line: lineId, ch: originalCharIndex + diffString.length}, fullMatchedTextMarkerOptions);
+                    console.log('originalCharIndex:', originalCharIndex, '+', diffString.length, '=', originalCharIndex + diffString.length);
                     originalCharIndex += diffString.length;
-                    plagiarismCodeMirror.markText({line: bestMatchedLine, ch: plagiarismCharIndex}, {line: bestMatchedLine, ch: plagiarismCharIndex + diffString.length}, fullMatchedTextMarkerOptions);                    
+                    plagiarismCodeMirror.markText({line: bestMatchedLine, ch: plagiarismCharIndex}, {line: bestMatchedLine, ch: plagiarismCharIndex + diffString.length}, fullMatchedTextMarkerOptions);
+                    console.log('plagiarismCharIndex:', plagiarismCharIndex, '+', diffString.length, '=', plagiarismCharIndex + diffString.length);
                     plagiarismCharIndex += diffString.length;
                 }
                 var markerOptions;
@@ -374,11 +379,13 @@ $(document).ready(function () {
                     /* If diff contains only space chars (' ', '\t', '\n', ...) then hightlight is as fully matched (red color) */
                     markerOptions = hasOnlySpaces(diffString) ? fullMatchedTextMarkerOptions : notMatchedTextMarkerOptions;
                     originalCodeMirror.markText({line: lineId, ch: originalCharIndex}, {line: lineId, ch: originalCharIndex + diffString.length}, markerOptions);
+                    console.log('originalCharIndex:', originalCharIndex, '+', diffString.length, '=', originalCharIndex + diffString.length);
                     originalCharIndex += diffString.length;
                 }
                 if (diffType === 1) {
                     markerOptions = hasOnlySpaces(diffString) ? fullMatchedTextMarkerOptions : notMatchedTextMarkerOptions;
                     plagiarismCodeMirror.markText({line: bestMatchedLine, ch: plagiarismCharIndex}, {line: bestMatchedLine,ch: plagiarismCharIndex + diffString.length}, markerOptions);
+                    console.log('plagiarismCharIndex:', plagiarismCharIndex, '+', diffString.length, '=', plagiarismCharIndex + diffString.length);
                     plagiarismCharIndex += diffString.length;
                 }                
             });
