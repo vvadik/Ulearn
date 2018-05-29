@@ -335,7 +335,9 @@ $(document).ready(function () {
                             diffType = BAD_FULL_MATCHED;
                             /* Looking for the end of latin word */
                             badFullMatchedLength = 1;
-                            while (originalCharIndex + badFullMatchedLength < originalLine.length && isLatinChar(originalLine[originalCharIndex + badFullMatchedLength]))
+                            while (badFullMatchedLength < diffString.length &&
+                                   originalCharIndex + badFullMatchedLength < originalLine.length &&
+                                   isLatinChar(originalLine[originalCharIndex + badFullMatchedLength]))
                                 badFullMatchedLength++;
                         }
                     }
@@ -344,7 +346,9 @@ $(document).ready(function () {
                             diffType = BAD_FULL_MATCHED;
                             /* Looking for the end of number */
                             badFullMatchedLength = 1;
-                            while (originalCharIndex + badFullMatchedLength < originalLine.length && isDigit(originalLine[originalCharIndex + badFullMatchedLength]))
+                            while (badFullMatchedLength < diffString.length && 
+                                   originalCharIndex + badFullMatchedLength < originalLine.length &&
+                                   isDigit(originalLine[originalCharIndex + badFullMatchedLength]))
                                 badFullMatchedLength++;
                         }
                     }
