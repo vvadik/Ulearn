@@ -4,12 +4,15 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
+using log4net;
 using Z.EntityFramework.Plus;
 
 namespace Database.DataContexts
 {
 	public class VisitsRepo
 	{
+		private static readonly ILog log = LogManager.GetLogger(typeof(VisitsRepo));
+		
 		private readonly ULearnDb db;
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
 
@@ -68,6 +71,8 @@ namespace Database.DataContexts
 			var newScore = slideCheckingsRepo.GetManualScoreForSlide(courseId, slideId, userId) +
 							slideCheckingsRepo.GetAutomaticScoreForSlide(courseId, slideId, userId);
 			var isPassed = slideCheckingsRepo.IsSlidePassed(courseId, slideId, userId);
+			log.Info($"Обновляю количество баллов пользователя {userId} за слайд {slideId} в курсе \"{courseId}\". " +
+					 $"Новое количество баллов: {newScore}, слайд пройден?: {isPassed}");
 			await UpdateAttempts(slideId, userId, visit =>
 			{
 				visit.Score = newScore;

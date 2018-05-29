@@ -327,6 +327,7 @@ $(document).ready(function () {
                 if (diffType === 0) {
                     var firstChar = diffString[0];
                     var previousChar = originalCharIndex > 0 ? originalLine[originalCharIndex - 1] : '';
+                    console.log('Checking full-matched substring for badness. First char is', firstChar, 'previous char is', previousChar);                    
                     if (isLatinChar(firstChar)) {
                         var isFirstLetter = previousChar === '' || isLatinUppercase(firstChar) || !isLatinChar(previousChar);
                         if (! isFirstLetter) {
@@ -337,11 +338,10 @@ $(document).ready(function () {
                                 badFullMatchedLength++;
                         }
                     }
-                    else if (isDigit(firstChar))
-                    {
+                    else if (isDigit(firstChar)) {
                         if (isDigit(previousChar)) {
                             diffType = BAD_FULL_MATCHED;
-                            /* Looking for the end of latin number */
+                            /* Looking for the end of number */
                             badFullMatchedLength = 1;
                             while (originalCharIndex + badFullMatchedLength < originalLine.length && isDigit(originalLine[originalCharIndex + badFullMatchedLength]))
                                 badFullMatchedLength++;
@@ -365,8 +365,8 @@ $(document).ready(function () {
 
                 if (diffType === 0) {
                     originalCodeMirror.markText({line: lineId, ch: originalCharIndex}, {line: lineId, ch: originalCharIndex + diffString.length}, fullMatchedTextMarkerOptions);
-                    plagiarismCodeMirror.markText({line: bestMatchedLine, ch: plagiarismCharIndex}, {line: bestMatchedLine, ch: plagiarismCharIndex + diffString.length}, fullMatchedTextMarkerOptions);
                     originalCharIndex += diffString.length;
+                    plagiarismCodeMirror.markText({line: bestMatchedLine, ch: plagiarismCharIndex}, {line: bestMatchedLine, ch: plagiarismCharIndex + diffString.length}, fullMatchedTextMarkerOptions);                    
                     plagiarismCharIndex += diffString.length;
                 }
                 var markerOptions;
