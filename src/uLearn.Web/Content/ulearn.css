@@ -2539,7 +2539,7 @@ ol.certificates {
 }
 
 .course-statistics thead th.slide-title.sorted .slide-title__content {
-	top: 8px;
+	top: 18px;
 }
 
 .course-statistics thead th.sorted.sorted-desc:after {
@@ -2599,9 +2599,8 @@ ol.certificates {
 	-o-transform: rotate(-90deg);
 	transform: rotate(-90deg);
 	white-space: nowrap;
-	width: 20px;
 	position: relative;
-	top: 15px;
+	top: 25px;
 	letter-spacing: 0px;
 	font-weight: 500;
 }
@@ -2609,7 +2608,7 @@ ol.certificates {
 .course-statistics .slide-title,
 .course-statistics .slide-max-score,
 .course-statistics .slide-score {
-	display: none;
+	display: none;	
 }
 
 .course-statistics .slide-max-score,

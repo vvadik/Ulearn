@@ -12,6 +12,7 @@
 			var $thsCopy = $rowCopy.find('th');
 			$(tr).find('th').each(function (cellId, th) {
 				var width = th.offsetWidth;
+				width = Math.max(width, 20); // min width is 20px
 
 				/* Put equals randomId to cell and it's copy to easy find pair
 				   We use .attr() instead of .data() here because in other case '[data-random-id=1]' will not work */
@@ -378,11 +379,11 @@
 		$self.attr('disabled', 'disabled');
 		setTimeout(function() {
 			$courseStatistics.toggleClass('only-full-scores', $self.is(':checked'));
-			$courseStatistics.find('[data-only-full-value]').each(function() {
+			$courseStatistics.find('[data-not-only-full-value]').each(function() {
 				var $self = $(this);
 				var text = $self.text();
-				$self.text($self.data('onlyFullValue'));
-				$self.data('onlyFullValue', text);
+				$self.text($self.data('notOnlyFullValue'));
+				$self.data('notOnlyFullValue', text);
 			});
 			$self.removeAttr('disabled');
 			$loadingIcon.hide();

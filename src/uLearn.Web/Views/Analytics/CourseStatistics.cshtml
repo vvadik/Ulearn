@@ -129,9 +129,9 @@
 			<h3>Показывать</h3>
 		}
 		<div class="checkbox checkbox-default">
-			@Html.CheckBox("only-full-scores")
+			@Html.CheckBox("only-full-scores", true)
 			<label for="only-full-scores">
-				@(Model.IsInstructor ? "Показывать только полные баллы" : "Только полные баллы")
+				@(Model.IsInstructor ? "Засчитывать только полные баллы за код-ревью" : "Только полные баллы за код-ревью")
 			</label>
 			<span class="glyphicon glyphicon-refresh glyphicon-refresh-animate loading-icon" style="display: none"></span>
 		</div>
@@ -333,8 +333,8 @@
 				var scoringGroupOnlyFullScore = Model.Course.Units.Sum(unit => Model.GetTotalOnlyFullScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup));
 				<td class="score scoring-group-score scoring-group-sum-score"
 					data-unit-id="sum" data-scoring-group="@scoringGroup.Id"
-					data-only-full-value="@scoringGroupOnlyFullScore">
-					@scoringGroupScore
+					data-not-only-full-value="@scoringGroupScore">
+                    @scoringGroupOnlyFullScore
 				</td>
 			}
 
@@ -347,9 +347,9 @@
 					var onlyFullScore = Model.GetTotalOnlyFullScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup);
 					var maxScore = Model.GetMaxScoreForUnitByScoringGroup(unit, scoringGroup);
 					<td class="score scoring-group-score @GradeCssClass(scoringGroupScore, maxScore) @OnlyFullGradeCssClass(onlyFullScore, maxScore)"
-						data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id"
-						data-only-full-value="@onlyFullScore">
-						@scoringGroupScore
+                        data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id"
+						data-not-only-full-value="@scoringGroupScore">
+						@onlyFullScore
 					</td>
 
 					foreach (var slide in shouldBeSolvedSlides)
@@ -357,8 +357,8 @@
 						var slideScore = Model.ScoreByUserAndSlide[Tuple.Create(user.UserId, slide.Id)];
 						<td class="score slide-score @GradeCssClass(slideScore, slide.MaxScore) @OnlyFullGradeCssClass(Model.GetOnlyFullScore(slideScore, slide.MaxScore), slide.MaxScore)"
 							data-slide-id="@slide.Id" data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id"
-							data-only-full-value="@Model.GetOnlyFullScore(slideScore, slide.MaxScore)">
-							@slideScore
+							data-not-only-full-value="@slideScore">
+                            @Model.GetOnlyFullScore(slideScore, slide.MaxScore)
 						</td>
 					}
 					if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)
