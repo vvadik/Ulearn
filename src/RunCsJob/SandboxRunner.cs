@@ -25,8 +25,8 @@ namespace RunCsJob
 			WorkingDirectory = new DirectoryInfo(Path.Combine(baseDirectory, "submissions"));
 		}
 
-		private const int timeLimitInSeconds = 10;
 		public TimeSpan CompilationTimeLimit = TimeSpan.FromSeconds(10);
+		private const int timeLimitInSeconds = 10;		
 		public TimeSpan TimeLimit = TimeSpan.FromSeconds(timeLimitInSeconds);
 		public TimeSpan IdleTimeLimit = TimeSpan.FromSeconds(2 * timeLimitInSeconds);
 		public int MemoryLimit = 64 * 1024 * 1024;
