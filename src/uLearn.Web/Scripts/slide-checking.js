@@ -130,10 +130,15 @@
 		}
 	});
 
-	$exerciseScoreForm.find('input[type=submit]').click(function() {
+	$exerciseScoreForm.find('input[type=submit]').click(function() {		
 		if ($otherScoreInput.is(':invalid')) {
 			$otherScoreInput.show();
 			$otherScoreLink.addClass('active');
+		} else {
+			$(this).prop('disabled', true);
+			
+            // Prevent Chrome bug. See https://productforums.google.com/forum/#!topic/chrome/M7y2gZDvXAk for details
+			this.form.submit();			
 		}
 	});
 

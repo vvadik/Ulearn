@@ -108,7 +108,7 @@
 				if (Model.ManualCheckingsLeft == 0)
 				{
 					<div class="text-muted no-manual-checkings-left">
-                        Это последняя работа по&nbsp;задаче «@Model.Slide.Title.TruncateWithEllipsis(30)»
+                        Это последняя работа по&nbsp;задаче «@Model.Slide.Title.MakeNestedQuotes().TruncateWithEllipsis(50)»
                     </div>
 				}
 				else
