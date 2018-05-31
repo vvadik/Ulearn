@@ -353,8 +353,10 @@ $(document).ready(function () {
                         }
                     }
                     
-                    if (diffString.length < 4)
+                    if (diffString.length < 4) {
                         diffType = BAD_FULL_MATCHED;
+                        badFullMatchedLength = diffString.length;
+                    }
                 }
 
                 if (diffType === BAD_FULL_MATCHED) {

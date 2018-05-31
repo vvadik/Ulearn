@@ -94,7 +94,7 @@ namespace uLearn.Web.Controllers
 						strongSuspicionAuthorsIds.Add(plagiarism.SubmissionInfo.AuthorId);
 						model.SuspicionLevel = SuspicionLevel.Strong;
 					}
-					else if (plagiarism.Weight >= antiPlagiarismsResult.SuspicionLevels.FaintSuspicion && model.SuspicionLevel == SuspicionLevel.None)
+					else if (plagiarism.Weight >= antiPlagiarismsResult.SuspicionLevels.FaintSuspicion && model.SuspicionLevel != SuspicionLevel.Strong)
 					{
 						faintSuspicionAuthorsIds.Add(plagiarism.SubmissionInfo.AuthorId);
 						model.SuspicionLevel = SuspicionLevel.Faint;

@@ -114,7 +114,6 @@
 }
 
 .antiplagiarism__full-matched {
-    /*background-color: rgba(255, 117, 117, 0.3);*/
     background-color: #f34742;
     color: white !important;
 }
@@ -128,8 +127,8 @@
 }
 
 .antiplagiarism__not-matched {
-    /*background-color: rgba(74, 255, 74, 0.3);*/
-    background-color: #47f342;    
+    background-color: #47f342;
+    color: black !important;
 }
 
 .antiplagiarism__not-matched.CodeMirror-selectedtext {
