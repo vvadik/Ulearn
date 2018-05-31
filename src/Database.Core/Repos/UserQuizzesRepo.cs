@@ -129,7 +129,7 @@ namespace Database.Repos
 			await db.SaveChangesAsync();
 		}
 
-		public async Task DropQuiz(string userId, Guid slideId)
+		public async Task DropQuizAsync(string userId, Guid slideId)
 		{
 			var quizzes = db.UserQuizzes.Where(q => q.UserId == userId && q.SlideId == slideId).ToList();
 			foreach (var q in quizzes)
@@ -137,6 +137,16 @@ namespace Database.Repos
 				q.isDropped = true;
 			}
 			await db.SaveChangesAsync();
+		}
+		
+		public void DropQuiz(string userId, Guid slideId)
+		{
+			var quizzes = db.UserQuizzes.Where(q => q.UserId == userId && q.SlideId == slideId).ToList();
+			foreach (var q in quizzes)
+			{
+				q.isDropped = true;
+			}
+			db.SaveChanges();
 		}
 
 		public Dictionary<string, int> GetQuizBlocksTruth(string courseId, string userId, Guid slideId)

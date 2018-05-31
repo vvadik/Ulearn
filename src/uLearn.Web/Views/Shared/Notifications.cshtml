@@ -127,7 +127,7 @@
 			@UserAvatar.Avatar(notification.InitiatedBy)
 		</div>
 		<div class="media-body">
-			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) проверил@( notification.InitiatedBy.Gender.ChooseEnding()) ваше решение<br/>по&nbsp;«@slide.Title.MakeNestedQuotes()»
+			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) @(notification.IsRecheck ? "пере" : "")проверил@( notification.InitiatedBy.Gender.ChooseEnding()) ваше решение<br/>по&nbsp;«@slide.Title.MakeNestedQuotes()»
 			</div>
 			<div class="notifications__notification__score">Вы получили @notification.Checking.Score из @slide.Exercise.MaxReviewScore.PluralizeInRussian(RussianPluralizationOptions.Score)</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>

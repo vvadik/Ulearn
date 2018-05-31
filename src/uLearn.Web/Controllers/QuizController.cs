@@ -89,7 +89,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[AllowAnonymous]
-		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isGuest, bool isLti = false, ManualQuizChecking manualQuizCheckQueueItem = null)
+		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isGuest, bool isLti = false, ManualQuizChecking manualQuizCheckQueueItem = null, int? send = null)
 		{
 			metricSender.SendCount("quiz.show");
 			if (isLti)
@@ -126,6 +126,21 @@ namespace uLearn.Web.Controllers
 			/* Restore quiz slide from version stored in the database */
 			var quiz = quizVersion.GetRestoredQuiz(course, course.FindUnitBySlideId(slide.Id));
 			slide = new QuizSlide(slide.Info, quiz);
+			
+			if (quizState == QuizState.Subtotal)
+			{
+				var score = resultsForQuizes?.AsEnumerable().Sum(res => res.Value) ?? 0;
+				/* QuizState.Subtotal is partially obsolete. If user fully solved quiz, then show answers. Else show empty quiz for the new try... */
+				if (score == quiz.MaxScore)
+					quizState = QuizState.Total;
+				/* ... and show last try's answers only if argument `send` has been passed in query */
+				else if (!send.HasValue)
+				{
+					quizState = QuizState.NotPassed;
+					/* ... if we will show answers from last try then drop quiz */
+					userQuizzesRepo.DropQuiz(userId, slideId);
+				}
+			}			
 
 			var userAnswers = userQuizzesRepo.GetAnswersForShowOnSlide(courseId, slide, userId);
 			var canUserFillQuiz = CanUserFillQuiz(quizState);
@@ -144,9 +159,6 @@ namespace uLearn.Web.Controllers
 				CanUserFillQuiz = canUserFillQuiz,
 				GroupsIds = Request.GetMultipleValuesFromQueryString("group"),
 			};
-
-			if (model.QuizState == QuizState.Subtotal && model.Score == quiz.MaxScore)
-				model.QuizState = QuizState.Total;
 
 			return PartialView(model);
 		}
@@ -243,7 +255,10 @@ namespace uLearn.Web.Controllers
 					LtiUtils.SubmitScore(slide, userId);
 			}
 
-			return new HttpStatusCodeResult(HttpStatusCode.OK);
+			return Json(new
+			{
+				url = Url.RouteUrl("Course.SlideById", new { courseId = courseId, slideId = slide.Url, send = 1}) 
+			});
 		}
 
 		private async Task NotifyAboutManualQuizChecking(ManualQuizChecking checking)
@@ -712,7 +727,7 @@ namespace uLearn.Web.Controllers
 				var isQuizScoredMaximum = userQuizzesRepo.IsQuizScoredMaximum(courseId, userId, slideId);
 				if (userQuizDrops + 1 < maxTriesCount && !isQuizScoredMaximum)
 				{
-					await userQuizzesRepo.DropQuiz(userId, slideId);
+					await userQuizzesRepo.DropQuizAsync(userId, slideId);
 					await visitsRepo.UpdateScoreForVisit(courseId, slideId, userId);
 					if (isLti)
 						LtiUtils.SubmitScore(slide, userId);
@@ -720,7 +735,7 @@ namespace uLearn.Web.Controllers
 				else if ((userQuizDrops + 1 >= maxTriesCount || isQuizScoredMaximum) && !(slide as QuizSlide).ManualChecking)
 				{
 					/* Allow user to drop quiz after all tries are exceeded, but don't update score */
-					await userQuizzesRepo.DropQuiz(userId, slideId);
+					await userQuizzesRepo.DropQuizAsync(userId, slideId);
 				}
 				
 			}
