@@ -98,7 +98,6 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			
 			/* We make two quieries for find suspicion submissions: first query is more limited by snippets count (`maxSnippetsCountFirstSearch` from configuration).
 			   For the first query we look for all submissions who are similar to our submission and filter only top-`maxSubmissionsAfterFirstSearch` by matched snippets count */
-			
 			var snippetsOccurencesFirstSearch = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(
 				submission,
 				maxSnippetsCountFirstSearch,
@@ -106,7 +105,8 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 				authorsCountMaxThreshold: authorsCountThreshold
 			);
 			var snippetsIdsFirstSearch = new HashSet<int>(snippetsOccurencesFirstSearch.Select(o => o.SnippetId));
-			var suspicionSubmissionIds = snippetsRepo.GetSubmissionIdsWithSamesnippets(
+			logger.Information($"Found following snippets after first search: {string.Join(", ", snippetsIdsFirstSearch)}");
+			var suspicionSubmissionIds = snippetsRepo.GetSubmissionIdsWithSameSnippets(
 				snippetsIdsFirstSearch,
 				/* Filter only  submissions BY THIS client, THIS task, THIS language and NOT BY THIS author */
 				o => o.Submission.ClientId == submission.ClientId &&
@@ -115,6 +115,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 					o.Submission.AuthorId != submission.AuthorId,
 				maxSubmissionsAfterFirstSearch
 			);
+			logger.Information($"Found following submissions after first search: {string.Join(", ", suspicionSubmissionIds)}");
 
 			var snippetsOccurences = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(submission, maxSnippetsCountSecondSearch, 0, authorsCountThreshold);
 			var snippetsIds = new HashSet<int>(snippetsOccurences.Select(o => o.SnippetId));

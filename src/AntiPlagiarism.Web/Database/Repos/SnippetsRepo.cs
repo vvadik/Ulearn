@@ -25,7 +25,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 		Task<List<SnippetOccurence>> GetSnippetsOccurencesAsync(int snippetId, Expression<Func<SnippetOccurence, bool>> filterFunction);
 		Task<List<SnippetOccurence>> GetSnippetsOccurencesAsync(IEnumerable<int> snippetIds, Expression<Func<SnippetOccurence, bool>> filterFunction);
 		List<SnippetOccurence> GetSnippetsOccurences(IEnumerable<int> snippetIds, Expression<Func<SnippetOccurence, bool>> filterFunction);
-		List<int> GetSubmissionIdsWithSamesnippets(IEnumerable<int> snippetIds, Expression<Func<SnippetOccurence, bool>> filterFunction, int maxSubmissionsCount);
+		List<int> GetSubmissionIdsWithSameSnippets(IEnumerable<int> snippetIds, Expression<Func<SnippetOccurence, bool>> filterFunction, int maxSubmissionsCount);
 		Task RemoveSnippetsOccurencesForTaskAsync(Guid taskId);
 		Task<Snippet> GetOrAddSnippetAsync(Snippet snippet);
 	}
@@ -267,7 +267,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 			return InternalGetSnippetsOccurences(snippetIds, filterFunction).ToList();
 		}
 
-		public List<int> GetSubmissionIdsWithSamesnippets(IEnumerable<int> snippetIds, Expression<Func<SnippetOccurence, bool>> filterFunction, int maxSubmissionsCount)
+		public List<int> GetSubmissionIdsWithSameSnippets(IEnumerable<int> snippetIds, Expression<Func<SnippetOccurence, bool>> filterFunction, int maxSubmissionsCount)
 		{
 			var submissionsWithSnippetsCount = db.SnippetsOccurences
 				.Where(o => snippetIds.Contains(o.SnippetId))
