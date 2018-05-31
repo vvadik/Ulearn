@@ -80,15 +80,33 @@
 	}
 
 	var remains = Model.MaxTriesCount - Model.TryNumber;
+	var isInstructor = User.HasAccessFor(Model.Course.Id, CourseRole.Instructor);
+	var isCourseAdmin = User.HasAccessFor(Model.Course.Id, CourseRole.CourseAdmin);
+	var blockData = new dynamic[Model.Slide.Blocks.Length];
+	for (var blockIndex = 0; blockIndex < Model.Slide.Blocks.Length; blockIndex++)
+	{
+		var block = quizSlide.Blocks[blockIndex];
+		if (block is AbstractQuestionBlock)
+		{
+			blockData[blockIndex] = new QuizBlockData(
+				Model,
+				blockIndex,
+				Model.QuizState,
+				questionAnswersFrequency: Model.QuestionAnswersFrequency[(block as AbstractQuestionBlock).Id],
+				isInstructor: isInstructor,
+				isCourseAdmin: isCourseAdmin
+			);
+		}
+		else
+		{
+			blockData[blockIndex] = null;
+		}
+	}
 	var context = new BlockRenderContext(
 		Model.Course,
 		Model.Slide,
 		quizSlide.Info.DirectoryRelativePath,
-		Enumerable.Range(0, Model.Slide.Blocks.Length)
-			.Select(x => quizSlide.Blocks[x] is AbstractQuestionBlock
-				? new QuizBlockData(Model, x, Model.QuizState, User.HasAccessFor(Model.Course.Id, CourseRole.Instructor))
-				: null)
-			.ToArray<dynamic>(),
+		blockData,
 		isGuest: Model.IsGuest,
 		revealHidden: true,
 		manualChecking: Model.ManualQuizCheckQueueItem,

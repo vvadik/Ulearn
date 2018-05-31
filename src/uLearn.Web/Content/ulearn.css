@@ -1407,18 +1407,46 @@ hr.without-top-margin {
 	margin-top: 0;
 }
 
-.quiz__explanation__correct {
+.quiz__explanation__correct,
+.quiz__statistics__correct {
 	color: green;
 }
 
-.quiz__explanation__incorrect {
+.quiz__explanation__incorrect,
+.quiz__statistics__incorrect {
 	color: red;
 }
 
+.quiz__statistics {
+	position: absolute;
+	left: -47px;
+	text-align: right;
+	width: 40px;
+	font-size: 11px;
+	line-height: 21px;
+	font-weight: 600;
+	display: none;
+}
+
+.quiz-block__is-question:hover .quiz__statistics {
+	display: initial;
+}
+
+@media (max-width: 1300px) {
+	.quiz__statistics {
+		left: auto;
+		right: 20px;
+		text-align: left;
+		line-height: 26px;
+	}
+
+	.quiz .quiz__statistics + input + label {
+		margin-right: 60px;
+	}
+}
 /* Ordering quizes */
 .quiz-block-ordering ul {
-	list-style: none;
-	padding-left: 0;
+	list-style: none; padding-left: 0;
 }
 
 .quiz-block-ordering .quiz-block-ordering__item {

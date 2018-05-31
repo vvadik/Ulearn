@@ -2,6 +2,7 @@
 using System.Linq;
 using Database.Models;
 using uLearn.Quizes;
+using Ulearn.Common;
 
 namespace uLearn.Web.Models
 {
@@ -13,6 +14,10 @@ namespace uLearn.Web.Models
 		public QuizState QuizState { get; set; }
 		public Dictionary<string, List<UserQuiz>> AnswersToQuizes { get; set; }
 		public Dictionary<string, int> ResultsForQuizes { get; set; }
+
+		/* (quizId -> (itemId -> frequency%)) */
+		public DefaultDictionary<string, DefaultDictionary<string, int>> QuestionAnswersFrequency { get; set; }
+
 		public int TryNumber { get; set; }
 		public int MaxTriesCount { get; set; }
 		public bool IsLti { get; set; }

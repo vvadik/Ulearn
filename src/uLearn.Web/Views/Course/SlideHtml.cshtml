@@ -278,6 +278,11 @@
 				title = (isItemCorrect ? "Правильный" : "Неправильный") + " вариант";
 			}
 			<div class="quiz">
+				@if (model.ShowQuestionStatistics)
+				{
+					var className = item.IsCorrect.IsTrueOrMaybe() ? "quiz__statistics__correct" : "quiz__statistics__incorrect";
+					<div class="quiz__statistics @className" title="Этот вариант выбирают в @(model.QuestionAnswersFrequency[item.Id])% случаев">@(model.QuestionAnswersFrequency[item.Id])%</div>
+				}
 				<input @ans autocomplete="off" id='@( block.Id + "quizBlock" + item.Id)' name=@( "group" + id) type="@inputType" @GetGuestDisable(context.IsGuest) @readonlyAttr>
 				<label class="@itemClass" title="@title" for="@( block.Id + "quizBlock" + item.Id)" @GetGuestOnclick(context.IsGuest)>
 					@item.Description.Trim().RenderTex().ToLegacyHtmlString()

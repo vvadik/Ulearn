@@ -114,24 +114,24 @@ WriteLiteralTo(__razor_helper_writer, " class=\"row\"");
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n");
 
-WriteLiteralTo(__razor_helper_writer, "                    ");
+WriteLiteralTo(__razor_helper_writer, "\t\t\t\t\t");
 
 WriteTo(__razor_helper_writer, SlideHtml.Slide(new BlockRenderContext(course, slide, "/static/",
-	                    slide.Blocks.Select(
-		                    (b, i) => b is ExerciseBlock
-			                    ? new ExerciseBlockData(course.Id, (ExerciseSlide)slide) { RunSolutionUrl = "/" + slide.Index.ToString("000") + ".html?query=submit", DebugView = true, IsGuest = false }
-			                    : b is AbstractQuestionBlock
-				                    ? new QuizBlockData(new QuizModel
-				                    {
-					                    AnswersToQuizes = slide.Blocks.OfType<AbstractQuestionBlock>().ToDictionary(x => x.Id, x => new List<UserQuiz>()),
-					                    Slide = (QuizSlide)slide
-				                    }, i, QuizState.Total, debugView: true)
-				                    : (dynamic)null
-		                    ).ToArray(),
-	                    isGuest: false,
-	                    revealHidden: true
-	                    ),
-	                    null));
+						slide.Blocks.Select(
+							(b, i) => b is ExerciseBlock
+								? new ExerciseBlockData(course.Id, (ExerciseSlide)slide) { RunSolutionUrl = "/" + slide.Index.ToString("000") + ".html?query=submit", DebugView = true, IsGuest = false }
+								: b is AbstractQuestionBlock
+									? new QuizBlockData(new QuizModel
+									{
+										AnswersToQuizes = slide.Blocks.OfType<AbstractQuestionBlock>().ToDictionary(x => x.Id, x => new List<UserQuiz>()),
+										Slide = (QuizSlide)slide
+									}, i, QuizState.Total, debugView: true)
+									: (dynamic)null
+							).ToArray(),
+						isGuest: false,
+						revealHidden: true
+						),
+						null));
 
 WriteLiteralTo(__razor_helper_writer, "\r\n\t\t\t\t\t<div");
 
@@ -139,22 +139,22 @@ WriteLiteralTo(__razor_helper_writer, " style=\"margin-bottom: 40px;\"");
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t\t\t\t<a");
 
-WriteAttributeTo(__razor_helper_writer, "href", Tuple.Create(" href=\"", 1892), Tuple.Create("\"", 1951)
-, Tuple.Create(Tuple.Create("", 1899), Tuple.Create("/", 1899), true)
-, Tuple.Create(Tuple.Create("", 1900), Tuple.Create<System.Object, System.Int32>(slide.Index.ToString("000")
-, 1900), false)
-, Tuple.Create(Tuple.Create("", 1930), Tuple.Create(".html?query=addLesson", 1930), true)
+WriteAttributeTo(__razor_helper_writer, "href", Tuple.Create(" href=\"", 1652), Tuple.Create("\"", 1711)
+, Tuple.Create(Tuple.Create("", 1659), Tuple.Create("/", 1659), true)
+, Tuple.Create(Tuple.Create("", 1660), Tuple.Create<System.Object, System.Int32>(slide.Index.ToString("000")
+, 1660), false)
+, Tuple.Create(Tuple.Create("", 1690), Tuple.Create(".html?query=addLesson", 1690), true)
 );
 
 WriteLiteralTo(__razor_helper_writer, " class=\"btn btn-default\"");
 
 WriteLiteralTo(__razor_helper_writer, ">Добавить слайд</a>\r\n\t\t\t\t\t\t<a");
 
-WriteAttributeTo(__razor_helper_writer, "href", Tuple.Create(" href=\"", 2005), Tuple.Create("\"", 2062)
-, Tuple.Create(Tuple.Create("", 2012), Tuple.Create("/", 2012), true)
-, Tuple.Create(Tuple.Create("", 2013), Tuple.Create<System.Object, System.Int32>(slide.Index.ToString("000")
-, 2013), false)
-, Tuple.Create(Tuple.Create("", 2043), Tuple.Create(".html?query=addQuiz", 2043), true)
+WriteAttributeTo(__razor_helper_writer, "href", Tuple.Create(" href=\"", 1765), Tuple.Create("\"", 1822)
+, Tuple.Create(Tuple.Create("", 1772), Tuple.Create("/", 1772), true)
+, Tuple.Create(Tuple.Create("", 1773), Tuple.Create<System.Object, System.Int32>(slide.Index.ToString("000")
+, 1773), false)
+, Tuple.Create(Tuple.Create("", 1803), Tuple.Create(".html?query=addQuiz", 1803), true)
 );
 
 WriteLiteralTo(__razor_helper_writer, " class=\"btn btn-default\"");
@@ -167,9 +167,9 @@ WriteLiteralTo(__razor_helper_writer, ">Добавить тест</a>\r\n\t\t\t\
 
 WriteLiteralTo(__razor_helper_writer, "\t\t\t<script");
 
-WriteAttributeTo(__razor_helper_writer, "src", Tuple.Create(" src=\'", 2208), Tuple.Create("\'", 2221)
-, Tuple.Create(Tuple.Create("", 2214), Tuple.Create<System.Object, System.Int32>(jsFile
-, 2214), false)
+WriteAttributeTo(__razor_helper_writer, "src", Tuple.Create(" src=\'", 1968), Tuple.Create("\'", 1981)
+, Tuple.Create(Tuple.Create("", 1974), Tuple.Create<System.Object, System.Int32>(jsFile
+, 1974), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, "></script>\r\n");
