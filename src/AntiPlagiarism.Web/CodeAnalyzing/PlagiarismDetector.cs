@@ -181,6 +181,9 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 					
 					unionLength += tokensMatchedInThisSubmission[submissionIdWithSnippetType].Count;
 					unionLength += tokensMatchedInOtherSubmissions[submissionIdWithSnippetType].Count;
+					logger.Information($"Link weight between submision {submission.Id} and {plagiarismSubmission.Id}: " +
+									   $"union length += {tokensMatchedInThisSubmission[submissionIdWithSnippetType].Count} + " +
+									   $"{tokensMatchedInOtherSubmissions[submissionIdWithSnippetType].Count}");
 				}
 
 				var plagiateSubmissionLength = plagiarismSubmission.TokensCount;
@@ -188,6 +191,8 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 				var weight = ((double)unionLength) / totalLength;
 				/* Normalize weight */
 				weight /= allSnippetTypes.Count;
+				
+				logger.Information($"Link weight between submision {submission.Id} and {plagiarismSubmission.Id} is {weight}. Union length is {unionLength}.");
 
 				if (weight < suspicionLevels.FaintSuspicion)
 					continue;
