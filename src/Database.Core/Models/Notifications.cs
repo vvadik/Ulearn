@@ -672,6 +672,9 @@ namespace Database.Models
 
 		public virtual ManualExerciseChecking Checking { get; set; }
 
+		[Required]
+		public bool IsRecheck { get; set; } = false;
+
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
 			var slide = course.FindSlideById(Checking.SlideId);

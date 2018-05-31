@@ -270,9 +270,11 @@ namespace uLearn.Web.Controllers
 
 		private async Task NotifyAboutManualExerciseChecking(ManualExerciseChecking checking)
 		{
+			var isRecheck = notificationsRepo.FindNotifications<PassedManualExerciseCheckingNotification>(n => n.CheckingId == checking.Id).Any();
 			var notification = new PassedManualExerciseCheckingNotification
 			{
 				Checking = checking,
+				IsRecheck = isRecheck,
 			};
 			await notificationsRepo.AddNotification(checking.CourseId, notification, User.Identity.GetUserId());
 		}

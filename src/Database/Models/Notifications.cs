@@ -695,6 +695,9 @@ namespace Database.Models
 
 		public virtual ManualExerciseChecking Checking { get; set; }
 
+		[Required]
+		public bool IsRecheck { get; set; } = false;
+
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
 			var slide = course.FindSlideById(Checking.SlideId);
@@ -703,7 +706,7 @@ namespace Database.Models
 
 			var commentsText = GetReviewsText(Checking, html: true);
 
-			return $"{InitiatedBy.VisibleName.EscapeHtml()} проверил{InitiatedBy.Gender.ChooseEnding()} ваше решение в «{GetSlideTitle(course, slide).EscapeHtml()}»<br/><br/>" +
+			return $"{InitiatedBy.VisibleName.EscapeHtml()} {(IsRecheck ? "пере" : "")}проверил{InitiatedBy.Gender.ChooseEnding()} ваше решение в «{GetSlideTitle(course, slide).EscapeHtml()}»<br/><br/>" +
 					$"<b>Вы получили {Checking.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}</b><br/><br/>" +
 					commentsText;
 		}
@@ -716,7 +719,7 @@ namespace Database.Models
 
 			var commentsText = GetReviewsText(Checking, html: false);
 
-			return $"{InitiatedBy.VisibleName} проверил{InitiatedBy.Gender.ChooseEnding()} ваше решение в «{GetSlideTitle(course, slide)}»\n" +
+			return $"{InitiatedBy.VisibleName} {(IsRecheck ? "пере" : "")}проверил{InitiatedBy.Gender.ChooseEnding()} ваше решение в «{GetSlideTitle(course, slide)}»\n" +
 					$"Вы получили {Checking.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}\n\n" +
 					commentsText;
 		}

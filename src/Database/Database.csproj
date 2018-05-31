@@ -668,6 +668,10 @@
     <Compile Include="Migrations\201805242057533_AddIpAddressToVisit.Designer.cs">
       <DependentUpon>201805242057533_AddIpAddressToVisit.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201805310442437_AddRecheckToPassedManualCheckingNotification.cs" />
+    <Compile Include="Migrations\201805310442437_AddRecheckToPassedManualCheckingNotification.Designer.cs">
+      <DependentUpon>201805310442437_AddRecheckToPassedManualCheckingNotification.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -1036,6 +1040,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201805242057533_AddIpAddressToVisit.resx">
       <DependentUpon>201805242057533_AddIpAddressToVisit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201805310442437_AddRecheckToPassedManualCheckingNotification.resx">
+      <DependentUpon>201805310442437_AddRecheckToPassedManualCheckingNotification.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
