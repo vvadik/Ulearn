@@ -20,6 +20,7 @@ using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.LTI;
 using uLearn.Web.Models;
+using Ulearn.Common;
 using Ulearn.Common.Extensions;
 
 namespace uLearn.Web.Controllers
@@ -146,10 +147,14 @@ namespace uLearn.Web.Controllers
 			var userAnswers = userQuizzesRepo.GetAnswersForShowOnSlide(courseId, slide, userId);
 			var canUserFillQuiz = CanUserFillQuiz(quizState);
 
-			var questionAnswersFrequency = quiz.Blocks.OfType<ChoiceBlock>().ToDictionary(
-				block => block.Id,
-				block => userQuizzesRepo.GetAnswersFrequencyForChoiceBlock(courseId, slide.Id, block.Id).ToDefaultDictionary()
-			).ToDefaultDictionary();
+			var questionAnswersFrequency = new DefaultDictionary<string, DefaultDictionary<string, int>>();
+			if (User.HasAccessFor(courseId, CourseRole.CourseAdmin))
+			{
+				questionAnswersFrequency = quiz.Blocks.OfType<ChoiceBlock>().ToDictionary(
+					block => block.Id,
+					block => userQuizzesRepo.GetAnswersFrequencyForChoiceBlock(courseId, slide.Id, block.Id).ToDefaultDictionary()
+				).ToDefaultDictionary();
+			}
 
 			var model = new QuizModel
 			{

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
 using uLearn.Quizes;
+using Ulearn.Common.Extensions;
 
 namespace Database.Repos
 {
@@ -196,6 +197,13 @@ namespace Database.Repos
 				)
 			);
 			await db.SaveChangesAsync();
+		}
+
+		public Dictionary<string, int> GetAnswersFrequencyForChoiceBlock(string courseId, Guid slideId, string quizId)
+		{
+			var answers = db.UserQuizzes.Where(q => q.CourseId == courseId && q.SlideId == slideId && q.QuizId == quizId);
+			var totalTries = answers.Select(q => new { q.UserId, q.Timestamp }).Distinct().Count();
+			return answers.GroupBy(q => q.ItemId).ToDictionary(g => g.Key, g => g.Count().PercentsOf(totalTries));
 		}
 	}
 }
