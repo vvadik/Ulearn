@@ -275,8 +275,16 @@ namespace AntiPlagiarism.Web.Database.Repos
 				.GroupBy(o => o.SubmissionId)
 				.ToDictionary(kvp => kvp.Key, kvp => kvp.Count())
 				.ToList();
+			
+			if (!submissionsWithSnippetsCount.Any())
+				return new List<int>();
+			
+			/* Sort by occurences count descendants */
 			submissionsWithSnippetsCount.Sort((first, second) => second.Value.CompareTo(first.Value));
-			return submissionsWithSnippetsCount.Take(maxSubmissionsCount).Select(kvp => kvp.Key).ToList();
+			var maxOccurencesCount = submissionsWithSnippetsCount[0].Value;
+			
+			/* Take at least maxSubmissionsCount submissions, but also take submissions while it's occurencesCount is greater than 0.9 * maxOccurencesCount */
+			return submissionsWithSnippetsCount.TakeWhile((kvp, index) => index < maxSubmissionsCount || kvp.Value >= 0.9 * maxOccurencesCount).Select(kvp => kvp.Key).ToList();
 		}
 
 		private IQueryable<SnippetOccurence> InternalGetSnippetsOccurences(IEnumerable<int> snippetIds, Expression<Func<SnippetOccurence, bool>> filterFunction)
