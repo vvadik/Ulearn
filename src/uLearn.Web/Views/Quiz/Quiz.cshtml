@@ -59,7 +59,7 @@
 		status = string.Format("{0}, попытка {1} из {2}",
 			Model.ManualQuizCheckQueueItem.User.VisibleName,
 			Model.TryNumber,
-			Model.MaxTriesCount);
+			triesCountMessage);
 	}
 	else if (Model.QuizState == QuizState.WaitForCheck)
 	{

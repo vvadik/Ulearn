@@ -26,6 +26,14 @@
 		<item id="5">Пятый</item>
 	</ordering>
 
+    <choice id="choiceQuestionMultiple" multiple="true" shuffle="true" maxScore="3">
+		<text>Выберите варианты</text>
+		<item id="1">Первый вариант</item>
+		<item id="2">Второй вариант</item>
+		<item id="3">Третий вариант</item>
+		<item id="4">Четвёртый вариант</item>
+	</choice>
+
 	<matching id="345" shuffleFixed="true">
 		<text>Поставьте в соответствие</text>
 		<explanation>Объяснение правильного ответа</explanation>

@@ -6,4 +6,9 @@
 	
 	<md>###Весь файл</md>
 	<include-code />
+
+    <md>###Класс Main</md>
+	<include-code>
+        <display>Main</display>
+    </include-code>
 </Lesson>
