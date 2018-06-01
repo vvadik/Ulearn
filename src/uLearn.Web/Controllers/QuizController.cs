@@ -764,7 +764,7 @@ namespace uLearn.Web.Controllers
 				Course = course,
 				Slide = slide,
 				IsGuest = true,
-				QuizState = QuizState.NotPassed
+				QuizState = QuizState.NotPassed,
 			};
 		}
 

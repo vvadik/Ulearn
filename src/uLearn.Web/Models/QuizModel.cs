@@ -16,7 +16,7 @@ namespace uLearn.Web.Models
 		public Dictionary<string, int> ResultsForQuizes { get; set; }
 
 		/* (quizId -> (itemId -> frequency%)) */
-		public DefaultDictionary<string, DefaultDictionary<string, int>> QuestionAnswersFrequency { get; set; }
+		public DefaultDictionary<string, DefaultDictionary<string, int>> QuestionAnswersFrequency { get; set; } = new DefaultDictionary<string, DefaultDictionary<string, int>>();
 
 		public int TryNumber { get; set; }
 		public int MaxTriesCount { get; set; }
