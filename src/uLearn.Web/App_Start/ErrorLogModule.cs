@@ -17,7 +17,6 @@ namespace uLearn.Web
 		{
 			"The provided anti-forgery token was meant for user",
 			"The required anti-forgery cookie \"__RequestVerificationToken\" is not present.",
-			"Error executing child request for handler 'System.Web.Mvc.HttpHandlerUtil+ServerExecuteHttpHandlerAsyncWrapper'.",
 			"A potentially dangerous Request.Path value was detected from the client"
 		};
 
