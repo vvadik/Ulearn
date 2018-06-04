@@ -12,11 +12,13 @@ namespace Database.Models
 
 		[Required]
 		[StringLength(64)]
+		[Index("IDX_UserQuiz_ByCourseSlideAndQuiz", 1)]
 		public string CourseId { get; set; }
 
 		[Required]
 		[Index("FullIndex", 2)]
 		[Index("StatisticsIndex", 1)]
+		[Index("IDX_UserQuiz_ByCourseSlideAndQuiz", 2)]
 		public Guid SlideId { get; set; }
 
 		public virtual QuizVersion QuizVersion { get; set; }
@@ -32,10 +34,12 @@ namespace Database.Models
 
 		[StringLength(64)]
 		[Index("FullIndex", 4)]
+		[Index("IDX_UserQuiz_ByCourseSlideAndQuiz", 3)]
 		public string QuizId { get; set; }
 
 		[StringLength(64)]
 		[Index("FullIndex", 5)]
+		[Index("IDX_UserQuiz_ByItem")]
 		public string ItemId { get; set; }
 
 		[StringLength(1024)]

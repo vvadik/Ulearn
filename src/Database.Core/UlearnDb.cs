@@ -296,6 +296,8 @@ namespace Database
 
 			AddIndex<UserQuiz>(modelBuilder, c => new { c.SlideId, c.Timestamp });
 			AddIndex<UserQuiz>(modelBuilder, c => new { c.UserId, c.SlideId, c.isDropped, c.QuizId, c.ItemId });
+			AddIndex<UserQuiz>(modelBuilder, c => new { c.CourseId, c.SlideId, c.QuizId });
+			AddIndex<UserQuiz>(modelBuilder, c => c.ItemId );
 			
 			AddIndex<Visit>(modelBuilder, c => new { c.SlideId, c.UserId });
 			AddIndex<Visit>(modelBuilder, c => new { c.CourseId, c.SlideId, c.UserId });

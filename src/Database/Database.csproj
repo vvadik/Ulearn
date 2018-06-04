@@ -672,6 +672,10 @@
     <Compile Include="Migrations\201805310442437_AddRecheckToPassedManualCheckingNotification.Designer.cs">
       <DependentUpon>201805310442437_AddRecheckToPassedManualCheckingNotification.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201806041803400_AddIndiciesToUserQuizzes.cs" />
+    <Compile Include="Migrations\201806041803400_AddIndiciesToUserQuizzes.Designer.cs">
+      <DependentUpon>201806041803400_AddIndiciesToUserQuizzes.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -1043,6 +1047,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201805310442437_AddRecheckToPassedManualCheckingNotification.resx">
       <DependentUpon>201805310442437_AddRecheckToPassedManualCheckingNotification.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201806041803400_AddIndiciesToUserQuizzes.resx">
+      <DependentUpon>201806041803400_AddIndiciesToUserQuizzes.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
