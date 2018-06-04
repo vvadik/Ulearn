@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using ApprovalUtilities.Utilities;
@@ -205,7 +206,12 @@ namespace Database.DataContexts
 		{
 			var answers = db.UserQuizzes.Where(q => q.CourseId == courseId && q.SlideId == slideId && q.QuizId == quizId);
 			var totalTries = answers.Select(q => new { q.UserId, q.Timestamp }).Distinct().Count();
-			return answers.GroupBy(q => q.ItemId).ToDictionary(g => g.Key, g => g.Count().PercentsOf(totalTries));
+			/* Don't call GroupBy().ToDictionary() because of perfomance issues.
+			   See http://code-ninja.org/blog/2014/07/24/entity-framework-never-call-groupby-todictionary/ for details */
+			return answers
+				.GroupBy(q => q.ItemId)
+				.Select(g => new { g.Key, Count = g.Count() })
+				.ToDictionary(p => p.Key, p => p.Count.PercentsOf(totalTries));
 		}
 	}
 }
