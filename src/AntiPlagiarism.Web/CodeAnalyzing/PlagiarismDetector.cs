@@ -83,10 +83,11 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			
 			var totalLength = firstSubmission.TokensCount + secondSubmission.TokensCount;
 			var weight = totalLength == 0 ? 0 : ((double)unionLength) / totalLength;
-			logger.Information($"Совпавших токенов {unionLength}, всего токенов {totalLength}, итоговый коэффициент {weight}");
-			
+
 			/* Normalize weight */
 			weight /= allSnippetTypes.Count;
+			
+			logger.Information($"Совпавших токенов {unionLength}, всего токенов {totalLength}, итоговый коэффициент {weight}");
 			return weight;
 		}
 
