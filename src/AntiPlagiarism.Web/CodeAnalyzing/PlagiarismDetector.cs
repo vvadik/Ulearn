@@ -47,12 +47,18 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			var snippetsOccurencesOfSecondSubmission = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(secondSubmission, maxSnippetsCount, 0, authorsCountThreshold);
 			logger.Debug($"Сниппеты второго решения: [{string.Join(", ", snippetsOccurencesOfSecondSubmission)}]");
 
+			/* Group by snippets from the second submissions by snippetId for fast searching */
+			var snippetsOccurencesOfSecondSubmissionBySnippet = snippetsOccurencesOfSecondSubmission
+				.GroupBy(o => o.SnippetId)
+				.ToDictionary(g => g.Key, g => g.ToList())
+				.ToDefaultDictionary();
+			
 			var tokensMatchedInFirstSubmission = new DefaultDictionary<SnippetType, HashSet<int>>();
 			var tokensMatchedInSecondSubmission = new DefaultDictionary<SnippetType, HashSet<int>>();
 			foreach (var snippetOccurence in snippetsOccurencesOfFirstSubmission)
 			{
 				var snippet = snippetOccurence.Snippet;
-				foreach (var otherOccurence in snippetsOccurencesOfSecondSubmission.Where(o => o.SnippetId == snippet.Id))
+				foreach (var otherOccurence in snippetsOccurencesOfSecondSubmissionBySnippet[snippet.Id])
 				{
 					logger.Debug($"Нашёл совпадающий сниппет в обоих решениях: {snippet}");
 					for (var i = 0; i < snippet.TokensCount; i++)
@@ -77,7 +83,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			
 			var totalLength = firstSubmission.TokensCount + secondSubmission.TokensCount;
 			var weight = totalLength == 0 ? 0 : ((double)unionLength) / totalLength;
-			logger.Information($"Совпавших токенов {unionLength}, всего токенов {totalLength}, итоговый коэфициент {weight}");
+			logger.Information($"Совпавших токенов {unionLength}, всего токенов {totalLength}, итоговый коэффициент {weight}");
 			
 			/* Normalize weight */
 			weight /= allSnippetTypes.Count;

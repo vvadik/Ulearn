@@ -139,8 +139,8 @@ namespace AntiPlagiarism.Web.Controllers
 			});
 		}
 
-		[HttpPost(Api.Urls.RecalculateSnippetStatistics)]
-		public async Task<IActionResult> RecalculateSnippetStatistics(RecalculateSnippetStatisticsParameters parameters)
+		[HttpPost(Api.Urls.RecalculateTaskStatistics)]
+		public async Task<IActionResult> RecalculateTaskStatistics(RecalculateTaskStatisticsParameters parameters)
 		{
 			var taskIds = await tasksRepo.GetTaskIds();
 			
@@ -153,7 +153,7 @@ namespace AntiPlagiarism.Web.Controllers
 				GC.Collect();
 			}
 
-			return Json(new RecalculateSnippetStatisticsResult
+			return Json(new RecalculateTaskStatisticsResult
 			{
 				TaskIds = taskIds
 			});
