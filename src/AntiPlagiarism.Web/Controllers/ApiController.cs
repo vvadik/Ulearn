@@ -142,10 +142,17 @@ namespace AntiPlagiarism.Web.Controllers
 		[HttpPost(Api.Urls.RecalculateTaskStatistics)]
 		public async Task<IActionResult> RecalculateTaskStatistics(RecalculateTaskStatisticsParameters parameters)
 		{
-			var taskIds = await tasksRepo.GetTaskIds();
+			if (!ModelState.IsValid)
+				return BadRequest(ModelState);
 			
+			var taskIds = await tasksRepo.GetTaskIds();
+
+			if (parameters.FromTaskId.HasValue && parameters.TaskId.HasValue)
+				return Json(ApiError.Create("You should pass from_task_id or task_id, not both"));
 			if (parameters.FromTaskId.HasValue)
 				taskIds = taskIds.Skip(taskIds.FindIndex(taskId => taskId == parameters.FromTaskId)).ToList();
+			if (parameters.TaskId.HasValue)
+				taskIds = taskIds.Where(t => t == parameters.TaskId.Value).ToList();
 
 			foreach (var taskId in taskIds)
 			{

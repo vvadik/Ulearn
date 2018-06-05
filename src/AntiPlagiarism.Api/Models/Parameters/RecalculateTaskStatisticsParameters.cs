@@ -7,5 +7,8 @@ namespace AntiPlagiarism.Api.Models.Parameters
 	{
 		[FromQuery(Name = "from_task")]
 		public Guid? FromTaskId { get; set; }
+
+		[FromQuery(Name = "task_id")]
+		public Guid? TaskId { get; set; }
 	}
 }
