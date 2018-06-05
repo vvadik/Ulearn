@@ -104,11 +104,13 @@ namespace uLearn.Web.Controllers
 			/* Dictionary<SlideId, count (distinct by user)> */
 			var exercisesSolutionsCount = userSolutionsRepo.GetAllSubmissions(courseId, slidesIds, periodStart, realPeriodFinish)
 				.GroupBy(s => s.SlideId)
-				.ToDictionary(g => g.Key, g => g.DistinctBy(s => s.UserId).Count());
+				.Select(g => new { g.Key, Count = g.DistinctBy(s => s.UserId).Count() })
+				.ToDictionary(g => g.Key, g => g.Count);
 
 			var exercisesAcceptedSolutionsCount = userSolutionsRepo.GetAllAcceptedSubmissions(courseId, slidesIds, periodStart, realPeriodFinish)
 				.GroupBy(s => s.SlideId)
-				.ToDictionary(g => g.Key, g => g.DistinctBy(s => s.UserId).Count());
+				.Select(g => new { g.Key, Count = g.DistinctBy(s => s.UserId).Count() })
+				.ToDictionary(g => g.Key, g => g.Count);
 
 			var usersIds = visitsRepo.GetVisitsInPeriod(filterOptions).DistinctBy(v => v.UserId).Select(v => v.UserId);
 			/* If we filtered out users from one or several groups show them all */
@@ -120,10 +122,12 @@ namespace uLearn.Web.Controllers
 
 			var visitedSlidesCountByUser = visitsRepo.GetVisitsInPeriod(filterOptions)
 				.GroupBy(v => v.UserId)
-				.ToDictionary(g => g.Key, g => g.Count());
+				.Select(g => new { g.Key, Count = g.Count() })
+				.ToDictionary(g => g.Key, g => g.Count);
 			var visitedSlidesCountByUserAllTime = visitsRepo.GetVisitsInPeriod(filterOptions.WithPeriodStart(DateTime.MinValue).WithPeriodFinish(DateTime.MaxValue))
 				.GroupBy(v => v.UserId)
-				.ToDictionary(g => g.Key, g => g.Count());
+				.Select(g => new { g.Key, Count = g.Count() })
+				.ToDictionary(g => g.Key, g => g.Count);
 
 			/* Get `usersLimit` best by slides count and order them by name */
 			visitedUsers = visitedUsers
@@ -402,7 +406,8 @@ namespace uLearn.Web.Controllers
 
 			var totalScoreByUserAllTime = visitsRepo.GetVisitsInPeriod(filterOptions.WithPeriodStart(DateTime.MinValue).WithPeriodFinish(DateTime.MaxValue))
 				.GroupBy(v => v.UserId)
-				.ToDictionary(g => g.Key, g => g.Sum(v => v.Score))
+				.Select(g => new { g.Key, Sum = g.Sum(v => v.Score)})
+				.ToDictionary(g => g.Key, g => g.Sum)
 				.ToDefaultDictionary();
 
 			/* Get `usersLimit` best by slides count */
