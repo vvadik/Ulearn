@@ -45,9 +45,11 @@ namespace AntiPlagiarism.UpdateDb
 					firstSubmissionId = 0;
 			}
 
+			var updateOnlyTokensCount = args.Contains("--update-tokens-count");
+
 			var provider = GetServiceProvider();
 			var updater = provider.GetService<AntiPlagiarismSnippetsUpdater>();
-			await updater.UpdateAsync(firstSubmissionId).ConfigureAwait(false);
+			await updater.UpdateAsync(firstSubmissionId, updateOnlyTokensCount).ConfigureAwait(false);
 		}
 
 		private ServiceProvider GetServiceProvider()

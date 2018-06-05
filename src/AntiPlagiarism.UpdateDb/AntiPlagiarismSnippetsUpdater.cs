@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AntiPlagiarism.Web.CodeAnalyzing;
+using AntiPlagiarism.Web.CodeAnalyzing.CSharp;
 using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Database.Repos;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,20 +14,23 @@ namespace AntiPlagiarism.UpdateDb
 	public class AntiPlagiarismSnippetsUpdater
 	{
 		private readonly SubmissionSnippetsExtractor submissionSnippetsExtractor;
+		private readonly CodeUnitsExtractor codeUnitsExtractor;
 		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly ILogger logger;
 
 		public AntiPlagiarismSnippetsUpdater(
 			SubmissionSnippetsExtractor submissionSnippetsExtractor,
+			CodeUnitsExtractor codeUnitsExtractor,
 			IServiceScopeFactory serviceScopeFactory,
 			ILogger logger)
 		{
 			this.submissionSnippetsExtractor = submissionSnippetsExtractor;
+			this.codeUnitsExtractor = codeUnitsExtractor;
 			this.serviceScopeFactory = serviceScopeFactory;
 			this.logger = logger;
 		}
 
-		public async Task UpdateAsync(int startFromIndex=0)
+		public async Task UpdateAsync(int startFromIndex=0, bool updateOnlyTokensCount=false)
 		{
 			logger.Information("Начинаю обновлять информацию о сниппетах в базе данных");
 
@@ -51,6 +55,10 @@ namespace AntiPlagiarism.UpdateDb
 
 					foreach (var submission in submissions)
 					{
+						await submissionsRepo.UpdateSubmissionTokensCountAsync(submission, GetTokensCount(submission.ProgramText));
+						if (updateOnlyTokensCount)
+							continue;
+						
 						try
 						{
 							await UpdateSnippetsFromSubmissionAsync(snippetsRepo, submission);
@@ -79,6 +87,7 @@ namespace AntiPlagiarism.UpdateDb
 				(await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(submission))
 				.Select(o => Tuple.Create(o.SnippetId, o.FirstTokenIndex))
 			);
+			
 			foreach (var (firstTokenIndex, snippet) in submissionSnippetsExtractor.ExtractSnippetsFromSubmission(submission))
 			{
 				var foundSnippet = await snippetsRepo.GetOrAddSnippetAsync(snippet);
@@ -95,6 +104,12 @@ namespace AntiPlagiarism.UpdateDb
 					}
 				}
 			}
+		}
+		
+		private int GetTokensCount(string code)
+		{
+			var codeUnits = codeUnitsExtractor.Extract(code);
+			return codeUnits.Select(u => u.Tokens.Count).Sum();
 		}
 	}
 }
