@@ -104,15 +104,15 @@ namespace uLearn.Web.Controllers
 			/* Dictionary<SlideId, count (distinct by user)> */
 			var exercisesSolutionsCount = userSolutionsRepo.GetAllSubmissions(courseId, slidesIds, periodStart, realPeriodFinish)
 				.GroupBy(s => s.SlideId)
-				.Select(g => new { g.Key, Count = g.DistinctBy(s => s.UserId).Count() })
+				.Select(g => new { g.Key, Count = g.Select(s => s.UserId).Distinct().Count() })
 				.ToDictionary(g => g.Key, g => g.Count);
 
 			var exercisesAcceptedSolutionsCount = userSolutionsRepo.GetAllAcceptedSubmissions(courseId, slidesIds, periodStart, realPeriodFinish)
 				.GroupBy(s => s.SlideId)
-				.Select(g => new { g.Key, Count = g.DistinctBy(s => s.UserId).Count() })
+				.Select(g => new { g.Key, Count = g.Select(s => s.UserId).Distinct().Count() })
 				.ToDictionary(g => g.Key, g => g.Count);
 
-			var usersIds = visitsRepo.GetVisitsInPeriod(filterOptions).DistinctBy(v => v.UserId).Select(v => v.UserId);
+			var usersIds = visitsRepo.GetVisitsInPeriod(filterOptions).Select(v => v.UserId).Distinct().ToList();
 			/* If we filtered out users from one or several groups show them all */
 			if (filterOptions.UsersIds != null && !filterOptions.IsUserIdsSupplement)
 				usersIds = filterOptions.UsersIds;
