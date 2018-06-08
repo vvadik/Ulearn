@@ -285,11 +285,11 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.GetCourse(courseId);
 
 			var filterOptions = GetManualCheckingFilterOptionsByGroup(courseId, groupsIds);
-			if (filterOptions.UsersIds == null)
+			if (filterOptions.UserIds == null)
 				groupsIds = new List<string> { "all" };
 
 			if (!string.IsNullOrEmpty(userId))
-				filterOptions.UsersIds = new List<string> { userId };
+				filterOptions.UserIds = new List<string> { userId };
 			if (slideId.HasValue)
 				filterOptions.SlidesIds = new List<Guid> { slideId.Value };
 
@@ -420,7 +420,7 @@ namespace uLearn.Web.Controllers
 			using (var transaction = db.Database.BeginTransaction())
 			{
 				var filterOptions = GetManualCheckingFilterOptionsByGroup(courseId, groupsIds);
-				if (filterOptions.UsersIds == null)
+				if (filterOptions.UserIds == null)
 					groupsIds = new List<string> { "all" };
 				filterOptions.SlidesIds = new List<Guid> { slideId };
 				var checkings = slideCheckingsRepo.GetManualCheckingQueue<T>(filterOptions).ToList();

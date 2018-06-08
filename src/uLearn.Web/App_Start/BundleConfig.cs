@@ -99,7 +99,8 @@ namespace uLearn.Web
 				"~/Scripts/modals.js",
 				"~/Scripts/connect-checkboxes.js",
 				"~/Scripts/antiplagiarism.js",
-				"~/Scripts/style-errors-settings.js"
+				"~/Scripts/style-errors-settings.js",
+				"~/Scripts/exercise/student-submissions.js",
 			};
 		}
 
@@ -130,7 +131,8 @@ namespace uLearn.Web
 				"~/Content/notifications.css",
 				"~/Content/stepik.css",
 				"~/Content/modals.css",
-				"~/Content/antiplagiarism.css"
+				"~/Content/antiplagiarism.css",
+				"~/Content/exercise/student-submissions.css"
 			);
 		}
 	}

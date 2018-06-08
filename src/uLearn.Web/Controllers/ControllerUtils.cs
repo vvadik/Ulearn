@@ -79,12 +79,12 @@ namespace uLearn.Web.Controllers
 			if (groupsIds.Contains("not-in-group") && User.HasAccessFor(courseId, CourseRole.CourseAdmin))
 			{
 				var usersInGroups = groupsRepo.GetUsersIdsForAllGroups(courseId);
-				result.UsersIds = usersInGroups.ToList();
+				result.UserIds = usersInGroups.ToList();
 				result.IsUserIdsSupplement = true;
 				return result;
 			}
 
-			result.UsersIds = new List<string>();
+			result.UserIds = new List<string>();
 			var usersIds = new HashSet<string>();
 
 			/* if groupsIds is empty, get members of all groups user has access to. Available for instructors */
@@ -96,7 +96,7 @@ namespace uLearn.Web.Controllers
 					var groupUsersIds = groupsRepo.GetGroupMembersAsUsers(accessableGroupId).Select(u => u.Id);
 					usersIds.AddAll(groupUsersIds);
 				}
-				result.UsersIds = usersIds.ToList();
+				result.UserIds = usersIds.ToList();
 				return result;
 			}
 
@@ -117,7 +117,7 @@ namespace uLearn.Web.Controllers
 						usersIds.AddAll(groupMembersIds);
 				}
 			}
-			result.UsersIds = usersIds.ToList();
+			result.UserIds = usersIds.ToList();
 			return result;
 		}
 

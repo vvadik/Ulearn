@@ -217,6 +217,16 @@ namespace Database.DataContexts
 		{
 			return GetAllSubmissions(courseId, new List<Guid> { slideId }).Where(s => s.UserId == userId);
 		}
+		
+		public IQueryable<UserExerciseSubmission> GetAllSubmissionsByUsers(SubmissionsFilterOptions filterOptions)
+		{
+			var submissions = GetAllSubmissions(filterOptions.CourseId, filterOptions.SlideIds);
+			if (filterOptions.IsUserIdsSupplement)
+				submissions = submissions.Where(s => ! filterOptions.UserIds.Contains(s.UserId));
+			else
+				submissions = submissions.Where(s => filterOptions.UserIds.Contains(s.UserId));
+			return submissions;
+		}
 
 		public List<AcceptedSolutionInfo> GetBestTrendingAndNewAcceptedSolutions(string courseId, List<Guid> slidesIds)
 		{

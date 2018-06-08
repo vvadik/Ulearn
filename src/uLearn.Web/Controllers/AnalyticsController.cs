@@ -112,10 +112,10 @@ namespace uLearn.Web.Controllers
 				.Select(g => new { g.Key, Count = g.Select(s => s.UserId).Distinct().Count() })
 				.ToDictionary(g => g.Key, g => g.Count);
 
-			var usersIds = visitsRepo.GetVisitsInPeriod(filterOptions).Select(v => v.UserId).Distinct().ToList();
+			var usersIds = visitsRepo.GetVisitsInPeriod(filterOptions).Select(v => v.UserId).Distinct().AsEnumerable();
 			/* If we filtered out users from one or several groups show them all */
-			if (filterOptions.UsersIds != null && !filterOptions.IsUserIdsSupplement)
-				usersIds = filterOptions.UsersIds;
+			if (filterOptions.UserIds != null && !filterOptions.IsUserIdsSupplement)
+				usersIds = filterOptions.UserIds;
 
 			var visitedUsers = usersRepo.GetUsersByIds(usersIds).Select(u => new UnitStatisticUserInfo(u)).ToList();
 			var isMore = visitedUsers.Count > usersLimit;
@@ -395,8 +395,8 @@ namespace uLearn.Web.Controllers
 
 			var usersIds = visitsRepo.GetVisitsInPeriod(filterOptions).DistinctBy(v => v.UserId).Select(v => v.UserId);
 			/* If we filtered out users from one or several groups show them all */
-			if (filterOptions.UsersIds != null && !filterOptions.IsUserIdsSupplement)
-				usersIds = filterOptions.UsersIds;
+			if (filterOptions.UserIds != null && !filterOptions.IsUserIdsSupplement)
+				usersIds = filterOptions.UserIds;
 
 			var visitedUsers = usersRepo.GetUsersByIds(usersIds).Select(u => new UnitStatisticUserInfo(u)).ToList();
 			var isMore = visitedUsers.Count > usersLimit;
@@ -420,7 +420,7 @@ namespace uLearn.Web.Controllers
 			var visitedUsersGroups = groupsRepo.GetUsersGroupsIds(new List<string> { courseId }, visitedUsersIds, User, 10).ToDefaultDictionary();
 
 			/* From now fetch only filtered users' statistics */
-			filterOptions.UsersIds = visitedUsersIds;
+			filterOptions.UserIds = visitedUsersIds;
 			filterOptions.IsUserIdsSupplement = false;
 			var scoreByUserUnitScoringGroup = ((IEnumerable<Visit>)visitsRepo.GetVisitsInPeriod(filterOptions))
 				.GroupBy(v => Tuple.Create(v.UserId, unitBySlide[v.SlideId], course.FindSlideById(v.SlideId)?.ScoringGroup))
@@ -718,10 +718,12 @@ namespace uLearn.Web.Controllers
 			var user = db.Users.Find(userId);
 			if (user == null || user.IsDeleted)
 				return HttpNotFound();
+			
 			var course = courseManager.GetCourse(courseId);
 			var slide = course.FindSlideById(slideId) as ExerciseSlide;
 			if (slide == null)
 				return RedirectToAction("CourseInfo", "Account", new { userId = userId, courseId });
+			
 			var model = new UserSolutionsViewModel
 			{
 				User = user,

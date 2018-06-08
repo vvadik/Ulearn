@@ -107,7 +107,7 @@ namespace Database.DataContexts
 		{
 			if (string.IsNullOrEmpty(name))
 				return db.Users.Where(u => !u.IsDeleted).Select(u => new UserIdWrapper(u.Id));
-			;
+			
 			var splittedName = name.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
 			var nameQuery = string.Join(" & ", splittedName.Select(s => "\"" + s.Trim().Replace("\"", "\\\"") + "*\""));
 			var nameParameter = new ObjectParameter("name", nameQuery);

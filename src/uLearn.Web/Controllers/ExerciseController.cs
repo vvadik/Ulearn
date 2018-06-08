@@ -4,25 +4,22 @@ using System.Linq;
 using System.Net;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using System.Web.Configuration;
 using System.Web.Http;
 using System.Web.Mvc;
-using AntiPlagiarism.Api;
+using Database;
 using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using Elmah;
 using JetBrains.Annotations;
 using Microsoft.AspNet.Identity;
-using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
-using Serilog;
-using Serilog.Events;
 using uLearn.Helpers;
 using uLearn.Model.Blocks;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.LTI;
 using uLearn.Web.Models;
+using Ulearn.Common;
 using Ulearn.Common.Extensions;
 
 namespace uLearn.Web.Controllers
@@ -31,12 +28,12 @@ namespace uLearn.Web.Controllers
 	public class ExerciseController : BaseExerciseController
 	{
 		private readonly ExerciseStudentZipsCache exerciseStudentZipsCache;
-		private readonly UsersRepo usersRepo;
-		
+		private readonly ULearnUserManager userManager;
+
 		public ExerciseController()
 		{
 			exerciseStudentZipsCache = new ExerciseStudentZipsCache();
-			usersRepo = new UsersRepo(db);
+			userManager = new ULearnUserManager(db);
 		}
 		
 		[System.Web.Mvc.HttpPost]
@@ -470,6 +467,87 @@ namespace uLearn.Web.Controllers
 
 			return PartialView(model);
 		}
+		
+		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
+		[ChildActionOnly]
+		public ActionResult StudentSubmissions(string courseId, Guid slideId)
+		{
+			return PartialView(GetStudentSubmissionsModel(courseId, slideId, ""));
+		}
+
+		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
+		public ActionResult StudentSubmissionsTable(string courseId, Guid slideId, string name)
+		{
+			return PartialView(GetStudentSubmissionsModel(courseId, slideId, name));
+		}
+		
+		private StudentSubmissionsModel GetStudentSubmissionsModel(string courseId, Guid slideId, string name)
+		{
+			const int maxUsersCount = 30;
+
+			var course = courseManager.GetCourse(courseId);
+			var slide = course.GetSlideById(slideId) as ExerciseSlide;
+
+			if (slide == null)
+				throw new HttpResponseException(HttpStatusCode.NotFound);
+
+			var canViewAllSubmissions = User.HasAccessFor(courseId, CourseRole.CourseAdmin) || User.HasCourseAccess(courseId, CourseAccessType.ViewAllStudentsSubmissions);
+			var hasFilterByName = !string.IsNullOrEmpty(name);
+			/* By default show members of `my` groups, but if filter is enabled course admin's and users with special access can view any student's submissions */
+
+			SubmissionsFilterOptions filterOptions;
+			var slideIdInList = new List<Guid> { slideId };
+			var visitedUserIds = visitsRepo.GetVisitsInPeriod(new VisitsFilterOptions { CourseId = courseId, SlidesIds = slideIdInList, PeriodStart = DateTime.MinValue, PeriodFinish = DateTime.MaxValue })
+				.Select(v => v.UserId)
+				.ToList();
+			if (hasFilterByName && canViewAllSubmissions)
+			{
+				/* Get all members who has visits to this slide */
+				filterOptions = new SubmissionsFilterOptions
+				{
+					CourseId = courseId,
+					UserIds = visitedUserIds,
+					SlideIds = slideIdInList,
+				};
+			}
+			else
+			{
+				/* Get members of `my` groups */
+				filterOptions = ControllerUtils.GetFilterOptionsByGroup<SubmissionsFilterOptions>(groupsRepo, User, courseId, groupsIds: new List<string>());
+				filterOptions.SlideIds = slideIdInList;
+				/* Filter out only users with visits to this slide */
+				filterOptions.UserIds = filterOptions.UserIds.Intersect(visitedUserIds).ToList();
+			}
+
+			if (hasFilterByName)
+			{
+				var userQueryModel = new UserSearchQueryModel { NamePrefix = name, OnlyPrivileged = false };
+				var filteredUsers = usersRepo.FilterUsers(userQueryModel, userManager, 0);
+				filterOptions.UserIds = filterOptions.UserIds.Intersect(filteredUsers.Select(u => u.UserId)).ToList();
+			}
+			
+			filterOptions.UserIds = filterOptions.UserIds.Take(maxUsersCount).ToList();
+
+			var submissions = userSolutionsRepo.GetAllSubmissionsByUsers(filterOptions);
+			var submissionsByUser = submissions.GroupBy(s => s.UserId).ToDictionary(g => g.Key, g => g.ToList()).ToDefaultDictionary();
+
+			var automaticCheckingScores = slideCheckingsRepo.GetAutomaticScoresForSlide(courseId, slideId, filterOptions.UserIds);
+			var manualCheckingScores = slideCheckingsRepo.GetManualScoresForSlide(courseId, slideId, filterOptions.UserIds);
+
+			var userGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, filterOptions.UserIds, User).ToDefaultDictionary();
+
+			return new StudentSubmissionsModel
+			{
+				CourseId = courseId,
+				Slide = slide,
+				Users = usersRepo.GetUsersByIds(filterOptions.UserIds).ToDictionary(u => u.Id),
+				SubmissionsByUser = submissionsByUser,
+				AutomaticCheckingScores = automaticCheckingScores,
+				ManualCheckingScores = manualCheckingScores,
+				HasFilterByName = hasFilterByName,
+				UserGroups = userGroups,
+			};
+		}
 
         [System.Web.Mvc.AllowAnonymous]
 		public ActionResult StudentZip(string courseId, Guid? slideId)
@@ -614,5 +692,22 @@ namespace uLearn.Web.Controllers
 		public bool IsCurrentSubmissionChecking { get; set; }
 		public bool DefaultProhibitFutherReview { get; set; }
 		public int ManualCheckingsLeft { get; set; }
+	}
+
+	public class StudentSubmissionsModel
+	{
+		public string CourseId { get; set; }
+		public ExerciseSlide Slide { get; set; }
+		
+		public Dictionary<string, ApplicationUser> Users { get; set; }
+		
+		public DefaultDictionary<string, List<UserExerciseSubmission>> SubmissionsByUser { get; set; }
+		
+		public Dictionary<string, int> AutomaticCheckingScores { get; set; }
+		public Dictionary<string, int> ManualCheckingScores { get; set; }
+		
+		public bool HasFilterByName { get; set; }
+		
+		public DefaultDictionary<string, string> UserGroups { get; set; }
 	}
 }

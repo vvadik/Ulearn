@@ -991,6 +991,7 @@
     <Content Include="Content\bootstrap.ulearn.css" />
     <Content Include="Content\bounce.css" />
     <Content Include="Content\buttons.css" />
+    <Content Include="Content\exercise\student-submissions.css" />
     <Content Include="Content\font-awesome.css" />
     <Content Include="Content\fonts\fontawesome-webfont.svg" />
     <Content Include="Content\jquery-ui.min.css" />
@@ -1089,6 +1090,7 @@
     <Content Include="Scripts\connect-checkboxes.js" />
     <Content Include="Scripts\course-statistics.js" />
     <Content Include="Scripts\diagnostics.js" />
+    <Content Include="Scripts\exercise\student-submissions.js" />
     <Content Include="Scripts\forms.replace-action.js" />
     <Content Include="Scripts\grader.js" />
     <Content Include="Scripts\groups-editor.js" />
@@ -1247,6 +1249,8 @@
     <Content Include="Views\AntiPlagiarism\Details.cshtml" />
     <Content Include="Views\Errors\404.cshtml" />
     <Content Include="Views\Errors\Error.cshtml" />
+    <Content Include="Views\Exercise\StudentSubmissions.cshtml" />
+    <Content Include="Views\Exercise\StudentSubmissionsTable.cshtml" />
     <Content Include="Views\Exercise\_ExerciseReviewComment.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Retargeting.cshtml" />

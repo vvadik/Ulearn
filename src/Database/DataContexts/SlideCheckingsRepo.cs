@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Database.Extensions;
 using Database.Models;
 using JetBrains.Annotations;
+using Ulearn.Common.Extensions;
 
 namespace Database.DataContexts
 {
@@ -90,12 +91,17 @@ namespace Database.DataContexts
 			}
 		}
 
-		private IEnumerable<T> GetSlideCheckingsByUser<T>(string courseId, Guid slideId, string userId, bool noTracking = true) where T : AbstractSlideChecking
+		private IQueryable<T> GetSlideCheckingsByUser<T>(string courseId, Guid slideId, string userId, bool noTracking=true) where T : AbstractSlideChecking
+		{
+			return GetSlideCheckingsByUsers<T>(courseId, slideId, new List<string> { userId }, noTracking);
+		}
+
+		private IQueryable<T> GetSlideCheckingsByUsers<T>(string courseId, Guid slideId, IEnumerable<string> userIds, bool noTracking=true) where T : AbstractSlideChecking
 		{
 			IQueryable<T> dbRef = db.Set<T>();
 			if (noTracking)
 				dbRef = dbRef.AsNoTracking();
-			var items = dbRef.Where(c => c.CourseId == courseId && c.SlideId == slideId && c.UserId == userId).ToList();
+			var items = dbRef.Where(c => c.CourseId == courseId && c.SlideId == slideId && userIds.Contains(c.UserId));
 			return items;
 		}
 
@@ -117,9 +123,20 @@ namespace Database.DataContexts
 					GetSlideCheckingsByUser<AutomaticExerciseChecking>(courseId, slideId, userId).Any(c => c.Score > 0);
 		}
 
+		
+		#region Slide Score Calculating
+		
 		private int GetUserScoreForSlide<T>(string courseId, Guid slideId, string userId) where T : AbstractSlideChecking
 		{
 			return GetSlideCheckingsByUser<T>(courseId, slideId, userId).Select(c => c.Score).DefaultIfEmpty(0).Max();
+		}
+
+		private Dictionary<string, int> GetUserScoresForSlide<T>(string courseId, Guid slideId, IEnumerable<string> userIds) where T : AbstractSlideChecking
+		{
+			return GetSlideCheckingsByUsers<T>(courseId, slideId, userIds)
+				.GroupBy(c => c.UserId)
+				.Select(g => new { UserId = g.Key, Score = g.Select(c => c.Score).DefaultIfEmpty(0).Max() })
+				.ToDictionary(g => g.UserId, g => g.Score);
 		}
 
 		public int GetManualScoreForSlide(string courseId, Guid slideId, string userId)
@@ -129,6 +146,17 @@ namespace Database.DataContexts
 
 			return Math.Max(quizScore, exerciseScore);
 		}
+		
+		public Dictionary<string, int> GetManualScoresForSlide(string courseId, Guid slideId, List<string> userIds)
+		{
+			var quizScore = GetUserScoresForSlide<ManualQuizChecking>(courseId, slideId, userIds);
+			var exerciseScore = GetUserScoresForSlide<ManualExerciseChecking>(courseId, slideId, userIds);
+
+			return userIds.ToDictionary(
+				userId => userId,
+				userId => Math.Max(quizScore.GetOrDefault(userId, 0), exerciseScore.GetOrDefault(userId, 0))
+			);
+		}
 
 		public int GetAutomaticScoreForSlide(string courseId, Guid slideId, string userId)
 		{
@@ -137,6 +165,20 @@ namespace Database.DataContexts
 
 			return Math.Max(quizScore, exerciseScore);
 		}
+		
+		public Dictionary<string, int> GetAutomaticScoresForSlide(string courseId, Guid slideId, List<string> userIds)
+		{
+			var quizScore = GetUserScoresForSlide<AutomaticQuizChecking>(courseId, slideId, userIds);
+			var exerciseScore = GetUserScoresForSlide<AutomaticExerciseChecking>(courseId, slideId, userIds);
+
+			return userIds.ToDictionary(
+				userId => userId,
+				userId => Math.Max(quizScore.GetOrDefault(userId, 0), exerciseScore.GetOrDefault(userId, 0))
+			);
+		}
+		
+		#endregion
+		
 
 		public IEnumerable<T> GetManualCheckingQueue<T>(ManualCheckingQueueFilterOptions options) where T : AbstractManualSlideChecking
 		{
@@ -145,12 +187,12 @@ namespace Database.DataContexts
 				query = options.OnlyChecked.Value ? query.Where(c => c.IsChecked) : query.Where(c => !c.IsChecked);
 			if (options.SlidesIds != null)
 				query = query.Where(c => options.SlidesIds.Contains(c.SlideId));
-			if (options.UsersIds != null)
+			if (options.UserIds != null)
 			{
 				if (options.IsUserIdsSupplement)
-					query = query.Where(c => !options.UsersIds.Contains(c.UserId));
+					query = query.Where(c => !options.UserIds.Contains(c.UserId));
 				else
-					query = query.Where(c => options.UsersIds.Contains(c.UserId));
+					query = query.Where(c => options.UserIds.Contains(c.UserId));
 			}
 			query = query.OrderByDescending(c => c.Timestamp);
 			if (options.Count > 0)

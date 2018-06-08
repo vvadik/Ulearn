@@ -222,6 +222,11 @@
 	@Html.Partial("_TopUserReviewComments", Model)
 }
 
+@if (User.IsSystemAdministrator() && User.HasAccessFor(Model.CourseId, CourseRole.Instructor) && ! Model.InstructorView)
+{
+	@Html.Action("StudentSubmissions", "Exercise", new { courseId = Model.CourseId, slideId = Model.Slide.Id })
+}
+
 @if (Model.ManualChecking == null && User.HasAccessFor(Model.CourseId, CourseRole.CourseAdmin))
 {
 	@Html.Action("SlideCodeReviewComments", "Exercise", new { courseId = Model.CourseId, slideId = Model.Slide.Id })

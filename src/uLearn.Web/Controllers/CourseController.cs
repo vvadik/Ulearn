@@ -313,7 +313,7 @@ namespace uLearn.Web.Controllers
 		private int GetManualCheckingsCountInQueue(string courseId, Slide slide, List<string> groupsIds)
 		{
 			var filterOptions = GetManualCheckingFilterOptionsByGroup(courseId, groupsIds);
-			if (filterOptions.UsersIds == null)
+			if (filterOptions.UserIds == null)
 				groupsIds = new List<string> { "all" };
 			filterOptions.SlidesIds = new List<Guid> { slide.Id };
 			

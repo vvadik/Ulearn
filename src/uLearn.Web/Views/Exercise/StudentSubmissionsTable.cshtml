@@ -1,0 +1,100 @@
+﻿@using Database.Models
+@using uLearn.Web.Extensions
+@using Ulearn.Common
+@model uLearn.Web.Controllers.StudentSubmissionsModel
+
+@{
+	var requireReview = Model.Slide.Exercise.RequireReview;	
+}
+
+<table>
+    <thead>
+    <tr>
+        <th>Студент</th>
+        <th>Результат</th>
+        @if (requireReview)
+        {
+	        <th>Код-ревью</th>
+        }
+        <th>Последняя попытка</th>
+    </tr>
+    </thead>
+    
+    @if (!Model.Users.Any())
+    {
+	    <tr>
+            <td colspan="4">
+                @(Model.HasFilterByName ? "Никого не найдено" : "Никто из ваших групп ещё не решал это задание")
+            </td>
+        </tr>
+    }
+     
+    @foreach (var user in Model.Users.Values.OrderBy(u => u.VisibleNameWithLastNameFirst, StringComparer.InvariantCultureIgnoreCase))
+    {
+	    var userSubmissions = Model.SubmissionsByUser[user.Id];
+	    var hasAccepted = userSubmissions.Any(s => s.AutomaticCheckingIsRightAnswer);
+
+	    <tr class="@(userSubmissions.Any() ? "has-submissions" : "")" data-url="">
+            <td class="student-submissions__name-column">
+                @user.VisibleNameWithLastNameFirst
+                <div class="student-submissions__group-names">@Model.UserGroups[user.Id]</div>
+            </td>
+            @if (hasAccepted)
+            {
+	            <td class="text-success">Accepted</td>
+            }
+            else if (userSubmissions.Any())
+            {
+	            var lastSubmissionVerdict = userSubmissions.Last().AutomaticChecking.GetVerdict();
+	            <td class="text-danger">@lastSubmissionVerdict</td>
+            }
+            else
+            {
+	            <td class="text-muted">Не решал@(user.Gender.ChooseEnding())</td>
+            }
+            
+            @if (requireReview)
+            {
+	            if (userSubmissions.Any(s => s.ManualCheckings.Any()))
+	            {
+		            <td>+@Model.ManualCheckingScores[user.Id]</td>
+	            }
+	            else
+	            {
+		            <td>&nbsp;</td>
+	            }
+            }
+            
+            @{
+	            UserExerciseSubmission lastSubmission = null;
+	            if (hasAccepted)
+	            {
+		            lastSubmission = userSubmissions.Last(s => s.AutomaticCheckingIsRightAnswer);
+	            }
+	            else if (userSubmissions.Any())
+	            {
+		            lastSubmission = userSubmissions.Last();
+	            }
+            }
+            @if (lastSubmission != null)
+            {
+	            <td>
+                    <a href="@Url.Action("UserSolutions", "Analytics", new { courseId = Model.CourseId, slideId = Model.Slide.Id, userId = user.Id, version = lastSubmission.Id })">
+                        @lastSubmission.Timestamp.ToPrettyString(withoutYearIfItsCurrent: true)
+                    </a>
+                </td>
+            }
+            else
+            {
+	            <td></td>
+            }
+        </tr>
+    }
+    
+    @if (Model.Users.Any())
+    {
+	    <tr class="student-submissions__comment-row">
+            <td colspan="4">Показываются только студенты, открывавшие это задание</td>
+        </tr>
+    }
+</table>
