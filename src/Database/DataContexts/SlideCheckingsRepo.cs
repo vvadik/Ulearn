@@ -75,7 +75,10 @@ namespace Database.DataContexts
 		{
 			using (var transaction = db.Database.BeginTransaction())
 			{
-				var checkings = GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId, noTracking: false).Where(c => !c.IsChecked && !c.IsLocked).ToList();
+				var checkings = GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId, noTracking: false)
+					.AsEnumerable()
+					.Where(c => !c.IsChecked && !c.IsLocked)
+					.ToList();
 				foreach (var checking in checkings)
 				{
 					// Use EntityState.Deleted because EF could don't know abount these checkings (they have been retrieved via AsNoTracking())
