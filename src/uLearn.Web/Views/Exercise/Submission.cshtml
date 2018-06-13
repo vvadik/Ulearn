@@ -222,7 +222,7 @@
 	@Html.Partial("_TopUserReviewComments", Model)
 }
 
-@if (User.IsSystemAdministrator() && User.HasAccessFor(Model.CourseId, CourseRole.Instructor) && ! Model.InstructorView)
+@if (User.HasAccessFor(Model.CourseId, CourseRole.Instructor) && ! Model.InstructorView)
 {
 	@Html.Action("StudentSubmissions", "Exercise", new { courseId = Model.CourseId, slideId = Model.Slide.Id })
 }
