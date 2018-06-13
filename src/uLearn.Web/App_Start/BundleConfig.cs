@@ -63,6 +63,7 @@ namespace uLearn.Web
 				"~/codemirror/addon/selection/mark-selection.js",
 				"~/codemirror/addon/fold/foldcode.js",
 				"~/codemirror/addon/merge/merge.js",
+				"~/codemirror/addon/display/autorefresh.js",
 				"~/Scripts/bootstrap.js",
 				"~/Scripts/bootstrap.file-input.js",
 				"~/Scripts/bootstrap-select.min.js",

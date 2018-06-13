@@ -182,6 +182,7 @@ function initCodeEditor($parent) {
                 styleActiveLine: editable,
                 matchBrackets: true,
                 styleSelectedText: true,
+                autoRefresh: true, // See https://stackoverflow.com/questions/8349571/codemirror-editor-is-not-loading-content-until-clicked
             });
 
             if (review) {
@@ -398,10 +399,29 @@ function initCodeEditor($parent) {
                 placeCodeReviews();
             } else {
                 console.log(data);
-                alert('Не могу удалить комментарий: произошла ошибка');
+                alert('Не могу удалить комментарий. Попробуйте ещё раз');
             }
         });
-    });    
+    }); 
+    
+    /* Ecpanding code */
+    $('.expandable-code__button').click(function (e) {
+        e.preventDefault();
+        
+        var $self = $(this);
+
+        var $expandableCode = $self.closest('.expandable-code');
+        var fullCode = $expandableCode.find('> .code').data('code');
+        var codeMirrorEditor = $expandableCode.find('.CodeMirror')[0].CodeMirror;
+        codeMirrorEditor.getDoc().setValue(fullCode);
+        /* Refresh codemirror editor. See https://stackoverflow.com/questions/8349571/codemirror-editor-is-not-loading-content-until-clicked */
+        setTimeout(function () {
+             codeMirrorEditor.refresh();
+        });
+
+        $self.closest('.expandable-code__button-wrapper').hide();
+        $expandableCode.removeClass('collapsed').addClass('expanded');
+    });
 }
 
 function createMarkTextForReview($review) {

@@ -126,7 +126,30 @@
 
 @helper Block(CodeBlock block, BlockRenderContext context, HtmlHelper Html)
 {
-	<textarea class="code code-sample" data-lang="@block.LangId" data-ver="@block.LangVer">@block.Code</textarea>
+	if (block.Hide)
+	{
+		@ExpandableCodeBlock(block, context, Html)
+	}
+	else
+	{
+		<textarea class="code code-sample" data-lang="@block.LangId" data-ver="@block.LangVer">@block.Code</textarea>
+	}
+}
+
+@helper ExpandableCodeBlock(CodeBlock block, BlockRenderContext context, HtmlHelper Html)
+{
+	var linesCount = block.Code.SplitToLines().Length;
+	var linesCountToShow = linesCount <= 20 ? linesCount : 5;
+	var visibleLines = block.Code.SplitToLinesWithEoln().Take(linesCountToShow).Join("");
+	<div class="expandable-code @(linesCount > linesCountToShow ? "collapsed" : "expanded")">
+        <textarea class="code code-sample" data-lang="@block.LangId" data-ver="@block.LangVer" data-code="@block.Code">@visibleLines</textarea>
+        @if (linesCount > linesCountToShow)
+        {
+	        <div class="expandable-code__button-wrapper">
+                <button class="expandable-code__button">Показать код полностью</button>
+            </div>    
+        }
+    </div>
 }
 
 @helper Block(TexBlock block, BlockRenderContext context, HtmlHelper Html)
