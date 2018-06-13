@@ -493,6 +493,7 @@ namespace uLearn.Web.Controllers
 
 			var canViewAllSubmissions = User.HasAccessFor(courseId, CourseRole.CourseAdmin) || User.HasCourseAccess(courseId, CourseAccessType.ViewAllStudentsSubmissions);
 			var hasFilterByName = !string.IsNullOrEmpty(name);
+			
 			/* By default show members of `my` groups, but if filter is enabled course admin's and users with special access can view any student's submissions */
 
 			SubmissionsFilterOptions filterOptions;
@@ -521,9 +522,8 @@ namespace uLearn.Web.Controllers
 
 			if (hasFilterByName)
 			{
-				var userQueryModel = new UserSearchQueryModel { NamePrefix = name, OnlyPrivileged = false };
-				var filteredUsers = usersRepo.FilterUsers(userQueryModel, userManager, 0);
-				filterOptions.UserIds = filterOptions.UserIds.Intersect(filteredUsers.Select(u => u.UserId)).ToList();
+				var filteredUserIds = usersRepo.FilterUsersByNamePrefix(name);
+				filterOptions.UserIds = filterOptions.UserIds.Intersect(filteredUserIds).ToList();
 			}
 			
 			filterOptions.UserIds = filterOptions.UserIds.Take(maxUsersCount).ToList();

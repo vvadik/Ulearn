@@ -51,6 +51,12 @@ namespace Database.DataContexts
 				.GetUserRolesInfo(limit, userManager);
 		}
 
+		public List<string> FilterUsersByNamePrefix(string namePrefix)
+		{
+			var deletedUserIds = db.Users.Where(u => u.IsDeleted).Select(u => u.Id).ToList();
+			return GetUsersByNamePrefix(namePrefix).Where(u => !deletedUserIds.Contains(u.Id)).Select(u => u.Id).ToList();
+		}
+
 		/* Pass limit=0 to disable limiting */
 		public List<UserRolesInfo> GetCourseInstructors(string courseId, UserManager<ApplicationUser> userManager, int limit = 50)
 		{

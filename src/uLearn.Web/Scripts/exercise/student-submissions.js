@@ -3,27 +3,34 @@ $(document).ready(function () {
     var $input = $filter.find('.student-submissions__filter__input');
     var $loadingIcon = $filter.find('.loading-icon');
     var urlTemplate = $filter.data('url');
-    var hasActiveRequest = false;
+    var activeRequest = false;
     $input.keyup(function () {
         var $table = $('.student-submissions table');
         var filterContent = $input.val();
         var url = urlTemplate.replace('NAME', filterContent);
         
-        hasActiveRequest = true;
         setTimeout(function () {
-            if (hasActiveRequest) 
-                $loadingIcon.show();
+            if (activeRequest !== false) {
+                $loadingIcon.show();                
+            }
         }, 1000);        
         
-        $.get(url).done(function (data) {
+        if (activeRequest !== false) 
+            activeRequest.abort();
+        
+        activeRequest = $.get(url).done(function (data) {
             $table.replaceWith($(data));
-        }).fail(function (e) {
+        }).fail(function (jqh, textStatus, e) {
+            if (textStatus === 'abort')
+                return;
             console.log('Не удалось загрузить решения студентов');
-            console.error(e);
+            console.error(e, textStatus);
             alert('Не удалось загрузить решения студентов. Попробуйте ещё раз');            
-        }).always(function () {
-            hasActiveRequest = false;
-            $loadingIcon.hide();
+        }).always(function (_, textStatus) {
+            if (textStatus !== 'abort') {
+                activeRequest = false;
+                $loadingIcon.hide();
+            }
         });
     });
     
