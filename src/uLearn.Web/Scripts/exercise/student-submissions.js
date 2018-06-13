@@ -25,7 +25,6 @@ $(document).ready(function () {
                 return;
             console.log('Не удалось загрузить решения студентов');
             console.error(e, textStatus);
-            alert('Не удалось загрузить решения студентов. Попробуйте ещё раз');            
         }).always(function (_, textStatus) {
             if (textStatus !== 'abort') {
                 activeRequest = false;
@@ -33,10 +32,22 @@ $(document).ready(function () {
             }
         });
     });
+
+    var $studentSubmissions = $('.student-submissions');
     
-    $('.student-submissions').on('click', 'table tr.has-submissions', function (e) {
+    $studentSubmissions.on('click', 'table tr.has-submissions', function (e) {
         var $link = $(e.target).closest('tr').find('a');
         if ($link.length > 0) 
             window.location = $link.attr('href');
+    });
+    
+    $studentSubmissions.on('click', '.student-submissions__show-all', function (e) {
+        e.preventDefault();
+        
+        var $row = $(e.target).closest('tr');
+        $row.hide();
+
+        var $table = $('.student-submissions table');
+        $table.find('tr.no-display').show(); 
     });
 });

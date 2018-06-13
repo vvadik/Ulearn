@@ -1,16 +1,19 @@
 ﻿@using Database.Models
 @using uLearn.Web.Extensions
 @using Ulearn.Common
+@using Ulearn.Common.Extensions
 @model uLearn.Web.Controllers.StudentSubmissionsModel
 
 @{
-	var requireReview = Model.Slide.Exercise.RequireReview;	
+	var requireReview = Model.Slide.Exercise.RequireReview;
+	var studentsCount = Model.Users.Count;
+	var rowsCountToShow = Model.ShowAll ? studentsCount : 2;
 }
 
 <table>
     <thead>
     <tr>
-        <th>Студент</th>
+        <th class="student-submissions__name-column">Студент</th>
         <th>Результат</th>
         @if (requireReview)
         {
@@ -20,7 +23,7 @@
     </tr>
     </thead>
     
-    @if (!Model.Users.Any())
+    @if (studentsCount == 0)
     {
 	    <tr>
             <td colspan="4">
@@ -29,12 +32,17 @@
         </tr>
     }
      
+    @{
+	    var rowIndex = 0;
+	    var isFirstReviewScore = true;
+    }
     @foreach (var user in Model.Users.Values.OrderBy(u => u.VisibleNameWithLastNameFirst, StringComparer.InvariantCultureIgnoreCase))
     {
 	    var userSubmissions = Model.SubmissionsByUser[user.Id];
 	    var hasAccepted = userSubmissions.Any(s => s.AutomaticCheckingIsRightAnswer);
+	    var isVisible = rowIndex < rowsCountToShow;
 
-	    <tr class="@(userSubmissions.Any() ? "has-submissions" : "")" data-url="">
+	    <tr class="@(userSubmissions.Any() ? "has-submissions" : "") @(isVisible ? "" : "no-display")" data-url="">
             <td class="student-submissions__name-column">
                 @user.VisibleNameWithLastNameFirst
                 <div class="student-submissions__group-names">@Model.UserGroups[user.Id]</div>
@@ -57,7 +65,17 @@
             {
 	            if (userSubmissions.Any(s => s.ManualCheckings.Any()))
 	            {
-		            <td>+@Model.ManualCheckingScores[user.Id]</td>
+		            <td>
+                        @if (isFirstReviewScore)
+                        {
+	                        <text>+</text>@Model.ManualCheckingScores[user.Id].PluralizeInRussian(RussianPluralizationOptions.Score)
+	                        isFirstReviewScore = false;
+                        }
+                        else
+                        {
+	                        <text>+</text>@Model.ManualCheckingScores[user.Id]
+                        }
+                    </td>
 	            }
 	            else
 	            {
@@ -89,11 +107,22 @@
 	            <td></td>
             }
         </tr>
+
+	    rowIndex++;
     }
     
-    @if (Model.Users.Any())
+    @if (studentsCount > 0)
     {
-	    <tr class="student-submissions__comment-row">
+	    if (studentsCount > rowsCountToShow)
+	    {
+		    <tr class="student-submissions__show-all">
+                <td colspan="4">
+                    <a href="#" class="internal-page-link">Показать всех студентов</a>
+                </td>
+            </tr>
+	    }
+	    
+        <tr class="student-submissions__comment-row @(studentsCount > rowsCountToShow ? "no-display" : "")">
             <td colspan="4">Показываются только студенты, открывавшие это задание</td>
         </tr>
     }

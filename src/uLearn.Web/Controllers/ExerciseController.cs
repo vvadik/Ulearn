@@ -478,7 +478,9 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult StudentSubmissionsTable(string courseId, Guid slideId, string name)
 		{
-			return PartialView(GetStudentSubmissionsModel(courseId, slideId, name));
+			var model = GetStudentSubmissionsModel(courseId, slideId, name);
+			model.ShowAll = true;
+			return PartialView(model);
 		}
 		
 		private StudentSubmissionsModel GetStudentSubmissionsModel(string courseId, Guid slideId, string name)
@@ -709,5 +711,7 @@ namespace uLearn.Web.Controllers
 		public bool HasFilterByName { get; set; }
 		
 		public DefaultDictionary<string, string> UserGroups { get; set; }
+		
+		public bool ShowAll { get; set; }
 	}
 }
