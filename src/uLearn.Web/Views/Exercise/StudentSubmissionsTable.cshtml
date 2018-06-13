@@ -66,7 +66,11 @@
 	            if (userSubmissions.Any(s => s.ManualCheckings.Any()))
 	            {
 		            <td>
-                        @if (isFirstReviewScore)
+                        @if (userSubmissions.All(s => s.ManualCheckings.All(c => !c.IsChecked)))
+                        {
+	                        <span class="text-muted">Ожидает</span>    
+                        }
+                        else if (isFirstReviewScore)
                         {
 	                        <text>+</text>@Model.ManualCheckingScores[user.Id].PluralizeInRussian(RussianPluralizationOptions.Score)
 	                        isFirstReviewScore = false;
