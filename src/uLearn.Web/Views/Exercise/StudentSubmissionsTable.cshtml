@@ -43,7 +43,7 @@
 	    var isVisible = rowIndex < rowsCountToShow;
 
 	    <tr class="@(userSubmissions.Any() ? "has-submissions" : "") @(isVisible ? "" : "no-display")" data-url="">
-            <td class="student-submissions__name-column">
+            <td class="student-submissions__name-column" title="@user.UserName">
                 @user.VisibleNameWithLastNameFirst
                 <div class="student-submissions__group-names">@Model.UserGroups[user.Id]</div>
             </td>
