@@ -44,8 +44,9 @@
     font-size: 14px;
 }
 
-.student-submissions__show-all td {
+.student-submissions table tbody .student-submissions__show-all td {
     text-align: center;
+    padding-top: 0;    
 }
 
 .student-submissions table tbody td {
