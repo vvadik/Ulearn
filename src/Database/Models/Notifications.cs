@@ -748,6 +748,7 @@ namespace Database.Models
 	public class PassedManualQuizCheckingNotification : Notification
 	{
 		[Required]
+		[Column("PassedManualQuizCheckingNotification_CheckingId")]
 		public int CheckingId { get; set; }
 
 		public virtual ManualQuizChecking Checking { get; set; }
@@ -1010,6 +1011,7 @@ namespace Database.Models
 	public class JoinedToYourGroupNotification : Notification
 	{
 		[Required]
+		[Column("JoinedToYourGroupNotification_GroupId")]
 		public int GroupId { get; set; }
 
 		public virtual Group Group { get; set; }
@@ -1084,6 +1086,7 @@ namespace Database.Models
 	public class RevokedAccessToGroupNotification : Notification
 	{
 		[Required]
+		[Column("RevokedAccessToGroupNotification_AccessId")]
 		public int AccessId { get; set; }
 
 		public virtual GroupAccess Access { get; set; }
@@ -1122,6 +1125,7 @@ namespace Database.Models
 		public virtual ApplicationUser User { get; set; }
 
 		[Required]
+		[Column("GroupMemberHasBeenRemovedNotification_GroupId")]
 		public int GroupId { get; set; }
 
 		public virtual Group Group { get; set; }
@@ -1383,6 +1387,7 @@ namespace Database.Models
 	public class UploadedPackageNotification : AbstractPackageNotification
 	{
 		[Required]
+		[Column("UploadedPackageNotification_CourseVersionId")]
 		public Guid CourseVersionId { get; set; }
 
 		public virtual CourseVersion CourseVersion { get; set; }

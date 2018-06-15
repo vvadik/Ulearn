@@ -54,7 +54,7 @@ namespace Database.DataContexts
 				.WillCascadeOnDelete(false);
 			
 			modelBuilder.Entity<UserRole>().HasRequired(r => r.User).WithMany().HasForeignKey(r => r.UserId).WillCascadeOnDelete();
-
+			
 			CancelCascaseDeleting<ExerciseCodeReview, ApplicationUser, string>(modelBuilder, c => c.Author, c => c.AuthorId);
 
 			CancelCascaseDeleting<UserExerciseSubmission, ApplicationUser, string>(modelBuilder, c => c.User, c => c.UserId);

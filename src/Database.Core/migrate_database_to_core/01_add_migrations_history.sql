@@ -16,4 +16,5 @@ VALUES
 ('20180427013632_RemoveRequiredAutomaticChecking', '2.0.1-rtm-125'),
 ('20180524205443_AddIpAddressToVisit', '2.0.1-rtm-125'),
 ('20180531022959_AddRecheckToPassedManualCheckingNotification', '2.0.1-rtm-125'),
-('20180604180608_AddIndiciesToUserQuizzes', '2.0.1-rtm-125')
+('20180604180608_AddIndiciesToUserQuizzes', '2.0.1-rtm-125'),
+('20180615024057_RenameColumnsForEfBackCompatibility', '2.0.1-rtm-125')

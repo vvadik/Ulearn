@@ -209,6 +209,11 @@ namespace Database.Models
 		[MinCourseRole(CourseRole.Instructor)]
 		[IsEnabledByDefault(true)]
 		GroupMembersHaveBeenAdded = 106,
+		
+		[Display(Name = @"Новый комментарий для преподавателей", GroupName = @"Новые комментарии для преподавателей")]
+		[MinCourseRole(CourseRole.Instructor)]
+		[IsEnabledByDefault(true)]
+		NewCommentForInstructorsOnly = 107,
 
 		// Course admins
 		[Display(Name = @"Добавлен новый преподаватель", GroupName = @"Добавлены новые преподаватели")]
@@ -357,7 +362,13 @@ namespace Database.Models
 
 		public static NotificationType GetNotificationType(this Notification notification)
 		{
-			return GetNotificationType(((dynamic) notification).GetType());
+			var notificationType = ((dynamic)notification).GetType();
+			
+			/* `notification` can be an instance of Castle.Proxies.* (Lazy-Loading proxy on EF Core), so we should to find real instance class */
+			if (notification.GetType().FullName.EndsWith("Proxy"))
+				notificationType = notification.GetType().BaseType;
+			
+			return GetNotificationType(notificationType);
 		}
 	}
 
@@ -503,7 +514,8 @@ namespace Database.Models
 
 		public override List<Notification> GetBlockerNotifications(UlearnDb db)
 		{
-			return new NotificationsRepo(db).FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId).Cast<Notification>().ToList();
+			// TODO (andgein): Remove usage of globally-shared logger 
+			return new NotificationsRepo(db, Serilog.Log.Logger).FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId).Cast<Notification>().ToList();
 		}
 	}
 
@@ -957,7 +969,7 @@ namespace Database.Models
 		public override List<Notification> GetBlockerNotifications(UlearnDb db)
 		{
 			var reviewId = Comment.ReviewId;
-			return new NotificationsRepo(db)
+			return new NotificationsRepo(db, Serilog.Log.Logger) // TODO (andgein): Remove usage of globally-shared logger 
 				.FindNotifications<ReceivedCommentToCodeReviewNotification>(n => n.Comment.ReviewId == reviewId, n => n.Comment)
 				.Cast<Notification>()
 				.Where(n => n.CreateTime < CreateTime && n.CreateTime >= CreateTime - NotificationsRepo.sendNotificationsDelayAfterCreating)
@@ -1237,6 +1249,40 @@ namespace Database.Models
 					$"{UsersCount.PluralizeInRussian(RussianPluralizationOptions.StudentsDative)} в группу «{Group.Name}» (курс «{course.Title}»): {UserDescriptions}.";
 		}
 	}
+	
+	[NotificationType(NotificationType.NewCommentForInstructorsOnly)]
+	public class NewCommentForInstructorsOnlyNotification : AbstractCommentNotification
+	{
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
+		{
+			var slide = course.FindSlideById(Comment.SlideId);
+			if (slide == null)
+				return null;
+
+			return $"<b>{Comment.Author.VisibleName.EscapeHtml()}</b> оставил{Comment.Author.Gender.ChooseEnding()} комментарий для преподавателей в «{GetSlideTitle(course, slide).EscapeHtml()}»:<br/><br/>" +
+					$"{GetHtmlCommentText()}";
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
+		{
+			var slide = course.FindSlideById(Comment.SlideId);
+			if (slide == null)
+				return null;
+
+			return $"{Comment.Author.VisibleName} оставил{Comment.Author.Gender.ChooseEnding()} комментарий для преподавателей в «{GetSlideTitle(course, slide)}»:\n\n{Comment.Text.Trim()}";
+		}
+
+		public override List<string> GetRecipientsIds(UlearnDb db)
+		{
+			return new UserRolesRepo(db).GetListOfUsersWithCourseRole(CourseRole.Instructor, CourseId);
+		}
+
+		public override List<Notification> GetBlockerNotifications(UlearnDb db)
+		{
+			// TODO (andgein): Remove usage of globally-shared logger
+			return new NotificationsRepo(db, Serilog.Log.Logger).FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId).Cast<Notification>().ToList();
+		}
+	}
 
 	[NotificationType(NotificationType.AddedInstructor)]
 	public class AddedInstructorNotification : Notification
@@ -1385,6 +1431,7 @@ namespace Database.Models
 	{
 		[Required]
 		public int ProcessId { get; set; }
+		
 		public virtual StepikExportProcess Process { get; set; }
 
 		/* TODO (andgein): Process.UlearnCourseId should be safely urlized */

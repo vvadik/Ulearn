@@ -49,7 +49,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 				SnippetType = type,
 				Hash = hash
 			};
-			await db.Snippets.AddAsync(snippet);
+			db.Snippets.Add(snippet);
 			await db.SaveChangesAsync();
 			return snippet;
 		}

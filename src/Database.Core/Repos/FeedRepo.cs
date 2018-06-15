@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using log4net;
+using Microsoft.EntityFrameworkCore;
 
 namespace Database.Repos
 {
@@ -15,25 +16,25 @@ namespace Database.Repos
 		private readonly NotificationsRepo notificationsRepo;
 		private readonly VisitsRepo visitsRepo;
 
-		public FeedRepo(UlearnDb db)
+		public FeedRepo(UlearnDb db, NotificationsRepo notificationsRepo, VisitsRepo visitsRepo)
 		{
-			this.db = db;
-			notificationsRepo = new NotificationsRepo(db);
-			visitsRepo = new VisitsRepo(db);
+			this.db = db ?? throw new ArgumentNullException(nameof(db));
+			this.notificationsRepo = notificationsRepo ?? throw new ArgumentNullException(nameof(notificationsRepo));
+			this.visitsRepo = visitsRepo ?? throw new ArgumentNullException(nameof(visitsRepo));
 		}
 
-		public DateTime? GetFeedViewTimestamp(string userId, int transportId)
+		public async Task<DateTime?> GetFeedViewTimestampAsync(string userId, int transportId)
 		{
-			var updateTimestamp = db.FeedViewTimestamps
+			var updateTimestamp = await db.FeedViewTimestamps
 				.Where(t => t.UserId == userId && (t.TransportId == null || t.TransportId == transportId))
 				.OrderByDescending(t => t.Timestamp)
-				.FirstOrDefault();
+				.FirstOrDefaultAsync();
 			return updateTimestamp?.Timestamp;
 		}
 
-		public async Task UpdateFeedViewTimestamp(string userId, int transportId, DateTime timestamp)
+		public async Task UpdateFeedViewTimestampAsync(string userId, int transportId, DateTime timestamp)
 		{
-			var currentTimestamp = db.FeedViewTimestamps.FirstOrDefault(t => t.UserId == userId && t.TransportId == transportId);
+			var currentTimestamp = await db.FeedViewTimestamps.FirstOrDefaultAsync(t => t.UserId == userId && t.TransportId == transportId);
 			if (currentTimestamp == null)
 			{
 				currentTimestamp = new FeedViewTimestamp
@@ -48,38 +49,50 @@ namespace Database.Repos
 			await db.SaveChangesAsync();
 		}
 
-		public async Task AddFeedNotificationTransportIfNeeded(string userId)
+		public async Task AddFeedNotificationTransportIfNeededAsync(string userId)
 		{
-			if (notificationsRepo.FindUsersNotificationTransport<FeedNotificationTransport>(userId, includeDisabled: true) != null)
+			if (await notificationsRepo.FindUsersNotificationTransportAsync<FeedNotificationTransport>(userId, includeDisabled: true) != null)
 				return;
 
-			await notificationsRepo.AddNotificationTransport(new FeedNotificationTransport
+			await notificationsRepo.AddNotificationTransportAsync(new FeedNotificationTransport
 			{
 				UserId = userId,
 				IsEnabled = true,
-			}).ConfigureAwait(false);
+			});
 		}
 
-		public FeedNotificationTransport GetUsersFeedNotificationTransport(string userId)
+		public Task<FeedNotificationTransport> GetUsersFeedNotificationTransportAsync(string userId)
 		{
-			return notificationsRepo.FindUsersNotificationTransport<FeedNotificationTransport>(userId);
+			return notificationsRepo.FindUsersNotificationTransportAsync<FeedNotificationTransport>(userId);
 		}
 
-		public FeedNotificationTransport GetCommonFeedNotificationTransport()
+		public async Task<FeedNotificationTransport> GetCommentsFeedNotificationTransportAsync()
+		{
+			var transport = await notificationsRepo.FindUsersNotificationTransportAsync<FeedNotificationTransport>(null);
+			if (transport == null)
+			{
+				log.Error("Can't find common (comments) feed notification transport. You should create FeedNotificationTransport with userId = NULL");
+				throw new Exception("Can't find common (comments) feed notification transport");
+			}
+
+			return transport;
+		}
+		
+		public FeedNotificationTransport GetCommentsFeedNotificationTransport()
 		{
 			var transport = notificationsRepo.FindUsersNotificationTransport<FeedNotificationTransport>(null);
 			if (transport == null)
 			{
-				log.Error("Can't find common feed notification transport. You should create FeedNotificationTransport with userId = NULL");
-				throw new Exception("Can't find common feed notification transport");
+				log.Error("Can't find common (comments) feed notification transport. You should create FeedNotificationTransport with userId = NULL");
+				throw new Exception("Can't find common (comments) feed notification transport");
 			}
 
 			return transport;
 		}
 
-		public DateTime? GetLastDeliveryTimestamp(FeedNotificationTransport notificationTransport)
+		public async Task<DateTime?> GetLastDeliveryTimestampAsync(FeedNotificationTransport notificationTransport)
 		{
-			return notificationsRepo.GetLastDeliveryTimestamp(notificationTransport);
+			return await notificationsRepo.GetLastDeliveryTimestampAsync(notificationTransport);
 		}
 
 		public int GetNotificationsCount(string userId, DateTime from, params FeedNotificationTransport[] transports)
@@ -91,19 +104,19 @@ namespace Database.Repos
 			return totalCount;
 		}
 
-		public List<NotificationDelivery> GetFeedNotificationDeliveries(string userId, params FeedNotificationTransport[] transports)
+		public Task<List<NotificationDelivery>> GetFeedNotificationDeliveriesAsync(string userId, params FeedNotificationTransport[] transports)
 		{
 			return GetFeedNotificationDeliveriesQueryable(userId, transports)
 				.OrderByDescending(d => d.CreateTime)
 				.Take(99)
-				.ToList();
+				.ToListAsync();
 		}
 
 		private IQueryable<NotificationDelivery> GetFeedNotificationDeliveriesQueryable(string userId, params FeedNotificationTransport[] transports)
 		{
 			var transportsIds = new List<FeedNotificationTransport>(transports).Select(t => t.Id).ToList();
 			var userCourses = visitsRepo.GetUserCourses(userId);
-			return notificationsRepo.GetTransportsDeliveries(transportsIds, DateTime.MinValue)
+			return notificationsRepo.GetTransportsDeliveriesQueryable(transportsIds, DateTime.MinValue)
 				.Where(d => userCourses.Contains(d.Notification.CourseId))
 				.Where(d => d.Notification.InitiatedById != userId);
 		}

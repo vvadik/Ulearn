@@ -147,6 +147,10 @@ p {
 	background: linear-gradient(180deg, hsla(0, 0%, 100%, 0), rgb(231, 241, 255));
 }
 
+.revealed .expandable-code.collapsed .CodeMirror {
+	margin-bottom: 0;
+}
+
 .expandable-code__button-wrapper {
 	position: absolute;
 	width: 100%;

@@ -8,7 +8,7 @@ namespace Ulearn.Web.Api.Models.Common
 		[DataMember(Name = "id")]
 		public string Id { get; set; }
 		
-		[DataMember(Name = "login")]
+		[DataMember(Name = "login", EmitDefaultValue = false)]
 		public string Login { get; set; }
 		
 		[DataMember(Name = "first_name")]	
@@ -19,5 +19,8 @@ namespace Ulearn.Web.Api.Models.Common
 		
 		[DataMember(Name = "visible_name")]
 		public string VisibleName { get; set; }
+
+		[DataMember(Name = "avatar_url")]
+		public string AvatarUrl { get; set; }
 	}
 }

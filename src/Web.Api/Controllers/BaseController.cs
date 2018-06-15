@@ -6,6 +6,7 @@ using Serilog;
 using uLearn;
 using uLearn.Quizes;
 using Ulearn.Web.Api.Models.Common;
+using Ulearn.Web.Api.Models.Results.Notifications;
 using SlideInfo = Ulearn.Web.Api.Models.Common.SlideInfo;
 
 namespace Ulearn.Web.Api.Controllers
@@ -57,15 +58,29 @@ namespace Ulearn.Web.Api.Controllers
 			}
 		}
 
-		protected ShortUserInfo BuildShortUserInfo(ApplicationUser user)
+		protected ShortUserInfo BuildShortUserInfo(ApplicationUser user, bool discloseLogin=false)
 		{
 			return new ShortUserInfo
 			{
 				Id = user.Id,
-				Login = user.UserName,
+				Login = discloseLogin ? user.UserName : null,
 				FirstName = user.FirstName ?? "",
 				LastName = user.LastName ?? "",
 				VisibleName = user.VisibleName,
+				AvatarUrl = user.AvatarUrl
+			};
+		}		
+
+		protected CommentInfo BuildCommentInfo(Comment comment)
+		{
+			return new CommentInfo
+			{
+				Id = comment.Id,
+				CourseId = comment.CourseId,
+				SlideId = comment.SlideId,
+				PublishTime = comment.PublishTime,
+				Author = BuildShortUserInfo(comment.Author),
+				Text = comment.Text,
 			};
 		}
 	}

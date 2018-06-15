@@ -79,8 +79,10 @@ namespace Ulearn.Web.Api
 		private void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment, Logger logger)
 		{
 			services.AddDbContextPool<UlearnDb>(
-				options => options.UseSqlServer(hostingEnvironment.Configuration["database"])
-			);
+				options => options
+					.UseLazyLoadingProxies()
+					.UseSqlServer(hostingEnvironment.Configuration["database"])
+			);			
 			
 			var configuration = ApplicationConfiguration.Read<WebApiConfiguration>();
 			
@@ -104,6 +106,8 @@ namespace Ulearn.Web.Api
 			services.AddScoped<UserQuizzesRepo>();
 			services.AddScoped<VisitsRepo>();
 			services.AddScoped<TextsRepo>();
+			services.AddScoped<NotificationsRepo>();
+			services.AddScoped<FeedRepo>();
 			
 			/* Asp.NET Core MVC */
 			services.AddMvc(options =>

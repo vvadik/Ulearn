@@ -68,6 +68,13 @@ namespace Database
 			modelBuilder.Entity<TelegramNotificationTransport>();
 			modelBuilder.Entity<FeedNotificationTransport>();
 			
+			/* For backward compatibility with EF 6.0 */
+			modelBuilder.Entity<ReceivedCommentToCodeReviewNotification>().Property(n => n.CommentId).HasColumnName("CommentId");
+			modelBuilder.Entity<NewCommentNotification>().Property(n => n.CommentId).HasColumnName("CommentId1");
+			modelBuilder.Entity<NewCommentForInstructorsOnlyNotification>().Property(n => n.CommentId).HasColumnName("CommentId1");
+			modelBuilder.Entity<RepliedToYourCommentNotification>().Property(n => n.CommentId).HasColumnName("CommentId1");
+			modelBuilder.Entity<LikedYourCommentNotification>().Property(n => n.CommentId).HasColumnName("CommentId1");
+			
 			
 			modelBuilder.Entity<CommentLike>()
 				.HasOne(x => x.Comment)

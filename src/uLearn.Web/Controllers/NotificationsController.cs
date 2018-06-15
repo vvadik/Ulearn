@@ -28,7 +28,7 @@ namespace uLearn.Web.Controllers
 		private readonly string telegramBotName;
 		private readonly string secretForHashes;
 
-		private TimeSpan notificationEnablingLinkExpiration = TimeSpan.FromDays(7);
+		private readonly TimeSpan notificationEnablingLinkExpiration = TimeSpan.FromDays(7);
 
 		public NotificationsController(ULearnDb db, CourseManager courseManager)
 		{

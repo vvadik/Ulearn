@@ -78,7 +78,7 @@ namespace Ulearn.Web.Api.Controllers
 				var comments = checkingsCheckedByInstructor.SelectMany(c => c.NotDeletedReviews).ToList();
 				var instructorStatistics = new CodeReviewInstructorStatistics
 				{
-					Instructor = BuildShortUserInfo(instructor),
+					Instructor = BuildShortUserInfo(instructor, discloseLogin: true),
 					Exercises = exerciseSlides.Select(
 						slide => new CodeReviewExerciseStatistics
 						{

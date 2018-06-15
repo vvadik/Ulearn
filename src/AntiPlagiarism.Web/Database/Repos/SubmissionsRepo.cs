@@ -68,7 +68,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 				AddingTime = DateTime.Now,
 			};
 
-			await db.Submissions.AddAsync(submission);
+			db.Submissions.Add(submission);
 			await db.SaveChangesAsync();
 
 			return submission;

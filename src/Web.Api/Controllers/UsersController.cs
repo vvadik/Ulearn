@@ -35,7 +35,7 @@ namespace Ulearn.Web.Api.Controllers
 			var instructors = usersRepo.GetUsersByIds(instructorIds);
 			return Json(new InstructorsListResult
 			{
-				Instructors = instructors.Select(BuildShortUserInfo).ToList()
+				Instructors = instructors.Select(i => BuildShortUserInfo(i, discloseLogin: true)).ToList()
 			});
 		}
 	}
