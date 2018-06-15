@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Database.Models;
 using log4net;
@@ -104,12 +105,20 @@ namespace Database.Repos
 			return totalCount;
 		}
 
-		public Task<List<NotificationDelivery>> GetFeedNotificationDeliveriesAsync(string userId, params FeedNotificationTransport[] transports)
+		public Task<List<NotificationDelivery>> GetFeedNotificationDeliveriesAsync<TProperty>(string userId, Expression<Func<NotificationDelivery, TProperty>> includePath, params FeedNotificationTransport[] transports)
 		{
-			return GetFeedNotificationDeliveriesQueryable(userId, transports)
+			var queryable = GetFeedNotificationDeliveriesQueryable(userId, transports);
+			if (includePath != null)
+				queryable = queryable.Include(includePath);
+			return queryable
 				.OrderByDescending(d => d.CreateTime)
 				.Take(99)
 				.ToListAsync();
+		}
+		
+		public Task<List<NotificationDelivery>> GetFeedNotificationDeliveriesAsync(string userId, params FeedNotificationTransport[] transports)
+		{
+			return GetFeedNotificationDeliveriesAsync<object>(userId, null, transports);
 		}
 
 		private IQueryable<NotificationDelivery> GetFeedNotificationDeliveriesQueryable(string userId, params FeedNotificationTransport[] transports)

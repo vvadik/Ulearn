@@ -56,8 +56,8 @@ namespace Ulearn.Web.Api.Controllers
 			var commentsNotifications = new List<Notification>();
 			if (notificationTransport != null)
 			{
-				importantNotifications = (await feedRepo.GetFeedNotificationDeliveriesAsync(userId, notificationTransport)).Select(d => d.Notification).ToList();
-				commentsNotifications = (await feedRepo.GetFeedNotificationDeliveriesAsync(userId, commentsFeedNotificationTransport)).Select(d => d.Notification).ToList();
+				importantNotifications = (await feedRepo.GetFeedNotificationDeliveriesAsync(userId, n => n.Notification.InitiatedBy, notificationTransport)).Select(d => d.Notification).ToList();
+				commentsNotifications = (await feedRepo.GetFeedNotificationDeliveriesAsync(userId, n => n.Notification.InitiatedBy, commentsFeedNotificationTransport)).Select(d => d.Notification).ToList();
 			}
 
 			importantNotifications = RemoveBlockedNotifications(importantNotifications).ToList();
