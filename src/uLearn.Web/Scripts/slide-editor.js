@@ -501,7 +501,12 @@ function refreshPreviousDraft(id) {
         saveExerciseCodeDraft(id);
     }
     if (localStorage[id] != undefined && $('.code-exercise').length > 0) {
-        $('.code-exercise')[0].codeMirrorEditor.setValue(localStorage[id]);
+        let codeMirrorEditor = $('.code-exercise')[0].codeMirrorEditor;
+        codeMirrorEditor.setValue(localStorage[id]);
+        /* Refresh codemirror editor. See https://stackoverflow.com/questions/8349571/codemirror-editor-is-not-loading-content-until-clicked */
+        setTimeout(function () {
+            codeMirrorEditor.refresh();
+        });
     }
 }
 
