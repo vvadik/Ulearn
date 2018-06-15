@@ -56,22 +56,31 @@ namespace Ulearn.Web.Api.Controllers
 			var commentsNotifications = new List<Notification>();
 			if (notificationTransport != null)
 			{
-				importantNotifications = (await feedRepo.GetFeedNotificationDeliveriesAsync(userId, n => n.Notification.InitiatedBy, notificationTransport)).Select(d => d.Notification).ToList();
-				commentsNotifications = (await feedRepo.GetFeedNotificationDeliveriesAsync(userId, n => n.Notification.InitiatedBy, commentsFeedNotificationTransport)).Select(d => d.Notification).ToList();
+				importantNotifications = (await feedRepo.GetFeedNotificationDeliveriesAsync(userId, n => n.Notification.InitiatedBy, notificationTransport))
+					.Select(d => d.Notification)
+					.ToList();
+				commentsNotifications = (await feedRepo.GetFeedNotificationDeliveriesAsync(userId, n => n.Notification.InitiatedBy, commentsFeedNotificationTransport))
+					.Select(d => d.Notification)
+					.ToList();
 			}
+			
+			logger.Debug($"[GetNotificationList] Step 1 done: found {importantNotifications.Count} important notifications and {commentsNotifications.Count} comment notifications");
 
 			importantNotifications = RemoveBlockedNotifications(importantNotifications).ToList();
 			commentsNotifications = RemoveBlockedNotifications(commentsNotifications, importantNotifications).ToList();
+			
+			logger.Debug($"[GetNotificationList] Step 2 done, removed blocked notifications: left {importantNotifications.Count} important notifications and {commentsNotifications.Count} comment notifications");
 
 			importantNotifications = RemoveNotActualNotifications(importantNotifications).ToList();
 			commentsNotifications = RemoveNotActualNotifications(commentsNotifications).ToList();
+			
+			logger.Debug($"[GetNotificationList] Step 3 done, removed not actual notifications: left {importantNotifications.Count} important notifications and {commentsNotifications.Count} comment notifications");
 
 			var importantLastViewTimestamp = await feedRepo.GetFeedViewTimestampAsync(userId, notificationTransport?.Id ?? -1);
 			var commentsLastViewTimestamp = await feedRepo.GetFeedViewTimestampAsync(userId, commentsFeedNotificationTransport.Id);
 
-			if (notificationTransport != null)
-				await feedRepo.UpdateFeedViewTimestampAsync(userId, notificationTransport.Id, DateTime.Now);
-
+			logger.Debug("[GetNotificationList] Step 4, building models");
+			
 			var importantNotificationList = new NotificationList
 			{
 				LastViewTimestamp = importantLastViewTimestamp,
