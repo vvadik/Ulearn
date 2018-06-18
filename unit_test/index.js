@@ -1,13 +1,14 @@
-import util from 'util'
-import fs from 'fs'
-import path from 'path'
-import Mocha from 'mocha'
+const util = require('util')
+const fs = require('fs')
+const path = require('path')
+const Mocha = require('mocha')
 
 const readDirAsync = util.promisify(fs.readdir)
 const writeFileAsync = util.promisify(fs.writeFile)
 
+const testDir = path.resolve(__dirname, '..', 'dist', 'unit_test')
+
 const runTests = async () => {
-  const testDir = __dirname
   const files = await readDirAsync(testDir)
 
   const mocha = new Mocha({
@@ -20,23 +21,20 @@ const runTests = async () => {
     .forEach(f => mocha.addFile(path.join(testDir, f)))
 
   const write = process.stdout.write
-  const outputBuffer = []
-  process.stdout.write = str => {
-    outputBuffer.push(str)
-  }
+  process.stdout.write = () => {}
 
-  return new Promise(resolve =>
-    mocha.run(() => {
+  return new Promise(resolve => {
+    const runner = mocha.run(() => {
       process.stdout.write = write
-      resolve(outputBuffer.join())
+      resolve(JSON.stringify(runner.testResults, null, 2))
     })
-  )
+  })
 }
 
 runTests()
   .then(async res => {
     console.log('unit test completed')
-    await writeFileAsync(path.join(__dirname, 'unit-test-result.json'), res)
+    await writeFileAsync(path.join(testDir, 'unit-test-result.json'), res)
   })
   .catch(err => {
     console.error('unit test failed')

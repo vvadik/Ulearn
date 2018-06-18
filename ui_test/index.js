@@ -1,15 +1,15 @@
-import '@babel/polyfill'
-import util from 'util'
-import fs from 'fs'
-import path from 'path'
-import Mocha from 'mocha'
-import puppeteer from 'puppeteer'
+const util = require('util')
+const fs = require('fs')
+const path = require('path')
+const Mocha = require('mocha')
+const puppeteer = require('puppeteer')
 
 const readDirAsync = util.promisify(fs.readdir)
 const writeFileAsync = util.promisify(fs.writeFile)
 
+const testDir = path.resolve(__dirname, '..', 'dist', 'ui_test')
+
 const runTests = async () => {
-  const testDir = __dirname
   const files = await readDirAsync(testDir)
 
   global.browser = await puppeteer.launch({
@@ -28,23 +28,20 @@ const runTests = async () => {
     .forEach(f => mocha.addFile(path.join(testDir, f)))
 
   const write = process.stdout.write
-  const outputBuffer = []
-  process.stdout.write = str => {
-    outputBuffer.push(str)
-  }
+  process.stdout.write = () => {}
 
-  return new Promise(resolve =>
-    mocha.run(() => {
+  return new Promise(resolve => {
+    const runner = mocha.run(() => {
       process.stdout.write = write
-      resolve(outputBuffer.join())
+      resolve(JSON.stringify(runner.testResults, null, 2))
     })
-  )
+  })
 }
 
 runTests()
   .then(async res => {
     console.log('ui test completed')
-    await writeFileAsync(path.join(__dirname, 'ui-test-result.json'), res)
+    await writeFileAsync(path.join(testDir, 'ui-test-result.json'), res)
   })
   .catch(err => {
     console.error('ui test failed')
