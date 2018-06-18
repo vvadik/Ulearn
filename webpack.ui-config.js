@@ -21,7 +21,7 @@ module.exports = {
               [
                 '@babel/preset-env',
                 {
-                  targets: { browsers: 'chrome 63' },
+                  targets: { browsers: 'chrome 64' },
                 },
               ],
               ['@babel/preset-stage-0', { decoratorsLegacy: true }],
