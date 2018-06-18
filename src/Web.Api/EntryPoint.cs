@@ -27,7 +27,7 @@ namespace Ulearn.Web.Api
                 })
                 .ConfigureHost((context, hostConfigurator) =>
                 {
-                    var loggerConfiguration = new LoggerConfiguration().MinimumLevel.Debug();
+                    var loggerConfiguration = new LoggerConfiguration().MinimumLevel.Information();
                     if (context.Configuration.GetSection("hostLog").GetValue<bool>("console"))
                     {
                         loggerConfiguration = loggerConfiguration

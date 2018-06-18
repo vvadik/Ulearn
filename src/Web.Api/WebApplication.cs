@@ -30,6 +30,7 @@ using Vostok.Logging.Serilog;
 using Vostok.Logging.Serilog.Enrichers;
 using Vostok.Metrics;
 using Web.Api.Configuration;
+using ILogger = Serilog.ILogger;
 
 namespace Ulearn.Web.Api
 {
@@ -78,6 +79,7 @@ namespace Ulearn.Web.Api
 
 		private void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment, Logger logger)
 		{
+			/* TODO (andgein): use UlearnDbFactory here */
 			services.AddDbContextPool<UlearnDb>(
 				options => options
 					.UseLazyLoadingProxies()
