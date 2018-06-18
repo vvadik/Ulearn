@@ -8,8 +8,8 @@
     "build-ui": "webpack --config webpack.ui-config.js",
     "build-ui-test": "webpack --config webpack.ui-test-config.js",
     "build-unit-test": "webpack --config webpack.unit-test-config.js",
-    "run-ui-test": "yarn build-ui-test && node dist/ui_test/index.js",
-    "run-unit-test": "yarn build-unit-test && node dist/unit_test/index.js",
+    "run-ui-test": "yarn build-ui-test && node ui_test/index.js",
+    "run-unit-test": "yarn build-unit-test && node unit_test/index.js",
     "precommit": "pretty-quick --staged"
   },
   "dependencies": {
