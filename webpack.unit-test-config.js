@@ -30,7 +30,7 @@ module.exports = {
                   targets: { node: 'current' },
                 },
               ],
-              '@babel/preset-stage-0',
+              ['@babel/preset-stage-0', { decoratorsLegacy: true }],
             ],
           },
         },

@@ -24,7 +24,7 @@ module.exports = {
                   targets: { browsers: 'chrome 63' },
                 },
               ],
-              '@babel/preset-stage-0',
+              ['@babel/preset-stage-0', { decoratorsLegacy: true }],
               '@babel/preset-react',
             ],
           },
