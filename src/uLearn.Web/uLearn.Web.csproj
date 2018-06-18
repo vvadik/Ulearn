@@ -774,6 +774,11 @@
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <!-- Hack to copy Microsoft.Win32.Registry.dll. Without this Content item dll is not copying. I think it's bug
+         in Framework + netstadard compatibility -->
+    <Content Include="..\packages\Microsoft.Win32.Registry.4.4.0\lib\net461\Microsoft.Win32.Registry.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="codemirror\addon\comment\comment.js" />
     <Content Include="codemirror\addon\comment\continuecomment.js" />
     <Content Include="codemirror\addon\dialog\dialog.css" />
