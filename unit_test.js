@@ -6,7 +6,7 @@ const Mocha = require('mocha')
 const readDirAsync = util.promisify(fs.readdir)
 const writeFileAsync = util.promisify(fs.writeFile)
 
-const testDir = path.resolve(__dirname, '..', 'dist', 'unit_test')
+const testDir = path.resolve(__dirname, 'dist', 'unit_test')
 
 const runTests = async () => {
   const files = await readDirAsync(testDir)
