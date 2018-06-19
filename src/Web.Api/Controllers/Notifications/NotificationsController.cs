@@ -55,33 +55,32 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 			var notificationTransport = await feedRepo.GetUsersFeedNotificationTransportAsync(userId);
 
 			var importantNotifications = new List<Notification>();
-			var commentsNotifications = new List<Notification>();
 			if (notificationTransport != null)
 			{
 				importantNotifications = (await feedRepo.GetFeedNotificationDeliveriesAsync(userId, n => n.Notification.InitiatedBy, notificationTransport))
 					.Select(d => d.Notification)
 					.ToList();
-				commentsNotifications = (await feedRepo.GetFeedNotificationDeliveriesAsync(userId, n => n.Notification.InitiatedBy, commentsFeedNotificationTransport))
-					.Select(d => d.Notification)
-					.ToList();
 			}
+			var commentsNotifications = (await feedRepo.GetFeedNotificationDeliveriesAsync(userId, n => n.Notification.InitiatedBy, commentsFeedNotificationTransport))
+				.Select(d => d.Notification)
+				.ToList();
 			
-			logger.Debug($"[GetNotificationList] Step 1 done: found {importantNotifications.Count} important notifications and {commentsNotifications.Count} comment notifications");
+			logger.Information($"[GetNotificationList] Step 1 done: found {importantNotifications.Count} important notifications and {commentsNotifications.Count} comment notifications");
 
 			importantNotifications = RemoveBlockedNotifications(importantNotifications).ToList();
 			commentsNotifications = RemoveBlockedNotifications(commentsNotifications, importantNotifications).ToList();
 			
-			logger.Debug($"[GetNotificationList] Step 2 done, removed blocked notifications: left {importantNotifications.Count} important notifications and {commentsNotifications.Count} comment notifications");
+			logger.Information($"[GetNotificationList] Step 2 done, removed blocked notifications: left {importantNotifications.Count} important notifications and {commentsNotifications.Count} comment notifications");
 
 			importantNotifications = RemoveNotActualNotifications(importantNotifications).ToList();
 			commentsNotifications = RemoveNotActualNotifications(commentsNotifications).ToList();
 			
-			logger.Debug($"[GetNotificationList] Step 3 done, removed not actual notifications: left {importantNotifications.Count} important notifications and {commentsNotifications.Count} comment notifications");
+			logger.Information($"[GetNotificationList] Step 3 done, removed not actual notifications: left {importantNotifications.Count} important notifications and {commentsNotifications.Count} comment notifications");
 
 			var importantLastViewTimestamp = await feedRepo.GetFeedViewTimestampAsync(userId, notificationTransport?.Id ?? -1);
 			var commentsLastViewTimestamp = await feedRepo.GetFeedViewTimestampAsync(userId, commentsFeedNotificationTransport.Id);
 
-			logger.Debug("[GetNotificationList] Step 4, building models");
+			logger.Information("[GetNotificationList] Step 4, building models");
 
 			var allNotifications = importantNotifications.Concat(commentsNotifications).ToList();
 			var notificationsData = await notificationDataPreloader.LoadAsync(allNotifications);
