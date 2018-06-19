@@ -8,6 +8,7 @@ using Database.Repos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
+using Serilog.Core;
 using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Models.Results.Notifications;
 
@@ -113,9 +114,13 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 			}
 		}
 		
-		private static IEnumerable<Notification> RemoveNotActualNotifications(IEnumerable<Notification> notifications)
+		private IEnumerable<Notification> RemoveNotActualNotifications(IEnumerable<Notification> notifications)
 		{
-			return notifications.Where(notification => notification.IsActual());
+			return notifications.Where(notification =>
+			{
+				logger.Information($"Checking actuality of notification #{notification.Id}: {notification} ({notification.GetNotificationType().ToString()})");
+				return notification.IsActual();
+			});
 		}		
 		
 		private NotificationInfo BuildNotificationInfo(Notification notification, NotificationDataStorage notificationsData)
