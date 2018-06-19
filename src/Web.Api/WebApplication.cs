@@ -47,7 +47,7 @@ namespace Ulearn.Web.Api
             var loggerConfiguration = new LoggerConfiguration()
                 .Enrich.With<ThreadEnricher>()
                 .Enrich.With<FlowContextEnricher>()
-                .MinimumLevel.Debug()
+                .MinimumLevel.Information()
                 .WriteTo.Airlock(LogEventLevel.Information);
 			
             if (hostingEnvironment.Log != null)
