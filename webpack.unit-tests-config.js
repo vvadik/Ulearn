@@ -1,20 +1,14 @@
 const path = require('path')
-const nodeExternals = require('webpack-node-externals')
 const glob = require('webpack-glob-entries')
 
 module.exports = {
   mode: 'development',
-  entry: glob(path.resolve(__dirname, 'ui_test', '*.test.js')),
+  entry: glob(path.resolve(__dirname, 'unit-tests', '*.test.js')),
   output: {
-    path: path.resolve(__dirname, 'dist', 'ui_test'),
+    path: path.resolve(__dirname, 'dist', 'unit-tests'),
     filename: '[name].js',
   },
-  target: 'node',
-  node: {
-    __dirname: false,
-    __filename: false,
-  },
-  externals: [nodeExternals()],
+  node: false,
   module: {
     rules: [
       {

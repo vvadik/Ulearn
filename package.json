@@ -6,10 +6,10 @@
   "license": "MIT",
   "scripts": {
     "build-ui": "webpack --config webpack.ui-config.js",
-    "build-ui-test": "webpack --config webpack.ui-test-config.js",
-    "build-unit-test": "webpack --config webpack.unit-test-config.js",
-    "run-ui-test": "yarn build-ui-test && node ui_test.js",
-    "run-unit-test": "yarn build-unit-test && node unit_test.js",
+    "build-ui-tests": "webpack --config webpack.ui-tests-config.js",
+    "build-unit-tests": "webpack --config webpack.unit-tests-config.js",
+    "run-ui-tests": "yarn build-ui-tests && node ui-tests.js",
+    "run-unit-tests": "yarn build-unit-tests && node unit-tests.js",
     "precommit": "pretty-quick --staged"
   },
   "dependencies": {

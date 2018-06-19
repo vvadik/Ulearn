@@ -9,17 +9,17 @@ const writeFileAsync = util.promisify(fs.writeFile)
 
 const runTests = () =>
   Promise.all([
-    execAsync('yarn build-ui && yarn run-ui-test'),
-    execAsync('yarn run-unit-test'),
+    execAsync('yarn build-ui && yarn run-ui-tests'),
+    execAsync('yarn run-unit-tests'),
   ])
 
 const report = async () => {
-  const uiPath = path.join(__dirname, 'dist', 'ui_test', 'ui-test-result.json')
+  const uiPath = path.join(__dirname, 'dist', 'ui-tests', 'ui-tests-result.json')
   const unitPath = path.join(
     __dirname,
     'dist',
-    'unit_test',
-    'unit-test-result.json'
+    'unit-tests',
+    'unit-tests-result.json'
   )
 
   const [ui, unit] = (await Promise.all([

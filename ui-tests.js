@@ -2,18 +2,25 @@ const util = require('util')
 const fs = require('fs')
 const path = require('path')
 const Mocha = require('mocha')
+const puppeteer = require('puppeteer')
 
 const readDirAsync = util.promisify(fs.readdir)
 const writeFileAsync = util.promisify(fs.writeFile)
 
-const testDir = path.resolve(__dirname, 'dist', 'unit_test')
+const testDir = path.resolve(__dirname, 'dist', 'ui-tests')
 
 const runTests = async () => {
   const files = await readDirAsync(testDir)
 
+  global.browser = await puppeteer.launch({
+    executablePath: '/usr/bin/chromium-browser',
+    args: ['--disable-dev-shm-usage', '--headless', '--disable-gpu', '--no-sandbox'], // TODO: remove on Chrome 65+
+  })
+
   const mocha = new Mocha({
     ui: 'bdd',
     reporter: 'json',
+    globals: ['browser'],
   })
 
   files
@@ -33,11 +40,12 @@ const runTests = async () => {
 
 runTests()
   .then(async res => {
-    console.log('unit test completed')
-    await writeFileAsync(path.join(testDir, 'unit-test-result.json'), res)
+    console.log('ui tests completed')
+    await writeFileAsync(path.join(testDir, 'ui-tests-result.json'), res)
   })
   .catch(err => {
-    console.error('unit test failed')
+    console.error('ui tests failed')
     console.error(err)
     process.exit(1)
   })
+  .then(() => global.browser.close(), () => global.browser.close())
