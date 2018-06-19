@@ -47,6 +47,8 @@ const runTests = async () => {
   })
 }
 
+const cleanup = () => global.browser && global.browser.close()
+
 runTests()
   .then(async res => {
     console.log('ui tests completed')
@@ -57,7 +59,4 @@ runTests()
     console.error(err)
     process.exit(1)
   })
-  .then(
-    () => global.browser && global.browser.close(),
-    () => global.browser && global.browser.close()
-  )
+  .then(cleanup, cleanup)

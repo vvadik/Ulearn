@@ -48,10 +48,7 @@ const runUiTests = async () => {
   testFiles.forEach(f => mocha.addFile(path.join(testDir, f)))
 
   return new Promise(resolve => {
-    mocha.run(() => {
-      global.browser.close()
-      resolve()
-    })
+    mocha.run(resolve)
   })
 }
 
@@ -84,6 +81,9 @@ const runTests = async () => {
   }
 }
 
+const cleanup = () => global.browser && global.browser.close()
+
 buildTests()
   .then(runTests)
   .catch(console.error)
+  .then(cleanup, cleanup)
