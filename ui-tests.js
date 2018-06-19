@@ -10,11 +10,22 @@ const writeFileAsync = util.promisify(fs.writeFile)
 const testDir = path.resolve(__dirname, 'dist', 'ui-tests')
 
 const runTests = async () => {
-  const files = await readDirAsync(testDir)
+  const testFiles = (await readDirAsync(testDir)).filter(f =>
+    f.endsWith('.test.js')
+  )
+
+  if (testFiles.length === 0) {
+    return JSON.stringify({})
+  }
 
   global.browser = await puppeteer.launch({
     executablePath: '/usr/bin/chromium-browser',
-    args: ['--disable-dev-shm-usage', '--headless', '--disable-gpu', '--no-sandbox'], // TODO: remove on Chrome 65+
+    args: [
+      '--disable-dev-shm-usage',
+      '--headless',
+      '--disable-gpu',
+      '--no-sandbox',
+    ], // TODO: remove on Chrome 65+
   })
 
   const mocha = new Mocha({
@@ -23,9 +34,7 @@ const runTests = async () => {
     globals: ['browser'],
   })
 
-  files
-    .filter(f => f.endsWith('.test.js'))
-    .forEach(f => mocha.addFile(path.join(testDir, f)))
+  testFiles.forEach(f => mocha.addFile(path.join(testDir, f)))
 
   const write = process.stdout.write
   process.stdout.write = () => {}
@@ -48,4 +57,7 @@ runTests()
     console.error(err)
     process.exit(1)
   })
-  .then(() => global.browser.close(), () => global.browser.close())
+  .then(
+    () => global.browser && global.browser.close(),
+    () => global.browser && global.browser.close()
+  )

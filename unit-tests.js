@@ -9,16 +9,20 @@ const writeFileAsync = util.promisify(fs.writeFile)
 const testDir = path.resolve(__dirname, 'dist', 'unit-tests')
 
 const runTests = async () => {
-  const files = await readDirAsync(testDir)
+  const testFiles = (await readDirAsync(testDir)).filter(f =>
+    f.endsWith('.test.js')
+  )
+
+  if (testFiles.length === 0) {
+    return JSON.stringify({})
+  }
 
   const mocha = new Mocha({
     ui: 'bdd',
     reporter: 'json',
   })
 
-  files
-    .filter(f => f.endsWith('.test.js'))
-    .forEach(f => mocha.addFile(path.join(testDir, f)))
+  testFiles.forEach(f => mocha.addFile(path.join(testDir, f)))
 
   const write = process.stdout.write
   process.stdout.write = () => {}
