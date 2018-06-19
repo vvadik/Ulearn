@@ -1,15 +1,8 @@
 {
-  "name": "sample",
-  "version": "1.0.0",
-  "main": "index.js",
-  "author": "r.nevolin <r.nevolin@skbkontur.ru>",
-  "license": "MIT",
   "scripts": {
     "build-ui": "webpack --config webpack.ui-config.js",
     "build-ui-tests": "webpack --config webpack.ui-tests-config.js",
     "build-unit-tests": "webpack --config webpack.unit-tests-config.js",
-    "run-ui-tests": "yarn build-ui-tests && node ui-tests.js",
-    "run-unit-tests": "yarn build-unit-tests && node unit-tests.js",
     "precommit": "pretty-quick --staged"
   },
   "dependencies": {
