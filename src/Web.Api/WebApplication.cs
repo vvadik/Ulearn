@@ -22,6 +22,7 @@ using uLearn;
 using uLearn.Configuration;
 using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Authorization;
+using Ulearn.Web.Api.Controllers.Notifications;
 using Ulearn.Web.Api.Models.Binders;
 using Vostok.Commons.Extensions.UnitConvertions;
 using Vostok.Hosting;
@@ -96,6 +97,7 @@ namespace Ulearn.Web.Api
 			services.AddSingleton(configuration);
 			services.AddScoped<IAuthorizationHandler, CourseRoleAuthorizationHandler>();
 			services.AddScoped<IAuthorizationHandler, CourseAccessAuthorizationHandler>();
+			services.AddScoped<NotificationDataPreloader>();
 			
 			/* DI for database repos */
 			services.AddScoped<UsersRepo>();

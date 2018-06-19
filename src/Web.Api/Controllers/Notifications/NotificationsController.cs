@@ -11,7 +11,7 @@ using Serilog;
 using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Models.Results.Notifications;
 
-namespace Ulearn.Web.Api.Controllers
+namespace Ulearn.Web.Api.Controllers.Notifications
 {
 	[Route("/notifications")]
 	public class NotificationsController : BaseController
@@ -19,16 +19,18 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly UlearnDb db;
 		private readonly NotificationsRepo notificationsRepo;
 		private readonly FeedRepo feedRepo;
-		
+		private readonly NotificationDataPreloader notificationDataPreloader;
+
 		private static FeedNotificationTransport commentsFeedNotificationTransport;
 
-		public NotificationsController(ILogger logger, WebCourseManager courseManager, UlearnDb db, NotificationsRepo notificationsRepo, FeedRepo feedRepo)
+		public NotificationsController(ILogger logger, WebCourseManager courseManager, UlearnDb db, NotificationsRepo notificationsRepo, FeedRepo feedRepo, NotificationDataPreloader notificationDataPreloader)
 			: base(logger, courseManager)
 		{
 			this.db = db ?? throw new ArgumentNullException(nameof(db));
 			this.notificationsRepo = notificationsRepo ?? throw new ArgumentNullException(nameof(notificationsRepo));
 			this.feedRepo = feedRepo ?? throw new ArgumentNullException(nameof(feedRepo));
-			
+			this.notificationDataPreloader = notificationDataPreloader;
+
 			if (commentsFeedNotificationTransport == null)
 				commentsFeedNotificationTransport = feedRepo.GetCommentsFeedNotificationTransport();
 		}
@@ -80,21 +82,24 @@ namespace Ulearn.Web.Api.Controllers
 			var commentsLastViewTimestamp = await feedRepo.GetFeedViewTimestampAsync(userId, commentsFeedNotificationTransport.Id);
 
 			logger.Debug("[GetNotificationList] Step 4, building models");
+
+			var allNotifications = importantNotifications.Concat(commentsNotifications).ToList();
+			var notificationsData = await notificationDataPreloader.LoadAsync(allNotifications);
 			
 			var importantNotificationList = new NotificationList
 			{
 				LastViewTimestamp = importantLastViewTimestamp,
-				Notifications = importantNotifications.Select(BuildNotificationInfo).ToList(),
+				Notifications = importantNotifications.Select(notification => BuildNotificationInfo(notification, notificationsData)).ToList(),
 			};
 			var commentsNotificationList = new NotificationList
 			{
 				LastViewTimestamp = commentsLastViewTimestamp,
-				Notifications = commentsNotifications.Select(BuildNotificationInfo).ToList(),
+				Notifications = commentsNotifications.Select(notification => BuildNotificationInfo(notification, notificationsData)).ToList(),
 			};
 			
 			return (importantNotificationList, commentsNotificationList);
 		}
-		
+
 		private IEnumerable<Notification> RemoveBlockedNotifications(IReadOnlyCollection<Notification> notifications, IReadOnlyCollection<Notification> searchBlockersAlsoIn=null)
 		{
 			var notificationsIds = notifications.Select(n => n.Id).ToList();
@@ -113,9 +118,9 @@ namespace Ulearn.Web.Api.Controllers
 		private static IEnumerable<Notification> RemoveNotActualNotifications(IEnumerable<Notification> notifications)
 		{
 			return notifications.Where(notification => notification.IsActual());
-		}
-
-		private NotificationInfo BuildNotificationInfo(Notification notification)
+		}		
+		
+		private NotificationInfo BuildNotificationInfo(Notification notification, NotificationDataStorage notificationsData)
 		{
 			return new NotificationInfo
 			{
@@ -124,15 +129,15 @@ namespace Ulearn.Web.Api.Controllers
 				Type = notification.GetNotificationType().ToString(),
 				CreateTime = notification.CreateTime,
 				CourseId = notification.CourseId,
-				Data = BuildNotificationData(notification),
+				Data = BuildNotificationData(notification, notificationsData),
 			};
 		}
 
-		private NotificationData BuildNotificationData(Notification notification)
+		private NotificationData BuildNotificationData(Notification notification, NotificationDataStorage notificationsData)
 		{
 			var data = new NotificationData();
 			if (notification is AbstractCommentNotification commentNotification)
-				data.Comment = BuildCommentInfo(commentNotification.Comment);
+				data.Comment = BuildCommentInfo(notificationsData.CommentsByIds.GetOrDefault(commentNotification.CommentId));
 			return data;
 		}
 	}

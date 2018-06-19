@@ -73,6 +73,9 @@ namespace Ulearn.Web.Api.Controllers
 
 		protected CommentInfo BuildCommentInfo(Comment comment)
 		{
+			if (comment == null)
+				return null;
+			
 			return new CommentInfo
 			{
 				Id = comment.Id,
