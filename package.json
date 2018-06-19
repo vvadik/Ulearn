@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "test": "node ulearn-test-runner.js",
     "build-ui": "webpack --config webpack.ui-config.js",
     "build-ui-tests": "webpack --config webpack.ui-tests-config.js",
     "build-unit-tests": "webpack --config webpack.unit-tests-config.js",
