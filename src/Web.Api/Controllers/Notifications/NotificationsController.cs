@@ -102,14 +102,13 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 
 		private IEnumerable<Notification> RemoveBlockedNotifications(IReadOnlyCollection<Notification> notifications, IReadOnlyCollection<Notification> searchBlockersAlsoIn=null)
 		{
-			var notificationsIds = notifications.Select(n => n.Id).ToList();
-			var searchBlockersAlsoInIds = searchBlockersAlsoIn?.Select(n => n.Id).ToList();
+			var allNotifications = notifications.ToList();
+			if (searchBlockersAlsoIn != null)
+				allNotifications = allNotifications.Concat(searchBlockersAlsoIn).ToList();
+			
 			foreach (var notification in notifications)
 			{
-				var blockers = notification.GetBlockerNotifications(db);
-				if (blockers.Select(b => b.Id).Intersect(notificationsIds).Any())
-					continue;
-				if (searchBlockersAlsoInIds != null && blockers.Select(b => b.Id).Intersect(searchBlockersAlsoInIds).Any())
+				if (notification.IsBlockedByAnyNotificationFrom(db, allNotifications))
 					continue;
 				yield return notification;
 			}

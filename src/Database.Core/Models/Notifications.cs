@@ -318,9 +318,16 @@ namespace Database.Models
 		public abstract bool IsActual();
 
 		/* Returns list of notifications, which blocks this notification from sending to specific user. I.e. NewComment is blocked by ReplyToYourComment */
+		/* Override this method together with IsBlockedByAnyNotificationFrom() */
 		public virtual List<Notification> GetBlockerNotifications(UlearnDb db)
 		{
 			return new List<Notification>();
+		}
+		
+		/* Override this method together with GetBlockerNotifications() */
+		public virtual bool IsBlockedByAnyNotificationFrom(UlearnDb db, List<Notification> notifications)
+		{
+			return false;
 		}
 
 		protected string GetSlideTitle(Course course, Slide slide)
@@ -516,6 +523,11 @@ namespace Database.Models
 		{
 			// TODO (andgein): Remove usage of globally-shared logger 
 			return new NotificationsRepo(db, Serilog.Log.Logger).FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId).Cast<Notification>().ToList();
+		}
+		
+		public override bool IsBlockedByAnyNotificationFrom(UlearnDb db, List<Notification> notifications)
+		{
+			return notifications.OfType<RepliedToYourCommentNotification>().Any(n => n.CommentId == CommentId);
 		}
 	}
 
@@ -976,6 +988,15 @@ namespace Database.Models
 				.ToList();
 		}
 		
+		public override bool IsBlockedByAnyNotificationFrom(UlearnDb db, List<Notification> notifications)
+		{
+			var reviewId = Comment.ReviewId;
+			return notifications.OfType<ReceivedCommentToCodeReviewNotification>().Any(
+				n => n.Comment.ReviewId == reviewId
+					&& n.CreateTime < CreateTime && n.CreateTime >= CreateTime - NotificationsRepo.sendNotificationsDelayAfterCreating
+			);
+		}
+		
 		public string GetUrl(Course course, string baseUrl, string currentUserId)
 		{
 			var slide = course.FindSlideById(Comment?.Review?.ExerciseChecking?.SlideId ?? Guid.Empty);
@@ -1281,6 +1302,11 @@ namespace Database.Models
 		{
 			// TODO (andgein): Remove usage of globally-shared logger
 			return new NotificationsRepo(db, Serilog.Log.Logger).FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId).Cast<Notification>().ToList();
+		}
+
+		public override bool IsBlockedByAnyNotificationFrom(UlearnDb db, List<Notification> notifications)
+		{
+			return notifications.OfType<RepliedToYourCommentNotification>().Any(n => n.CommentId == CommentId);
 		}
 	}
 
