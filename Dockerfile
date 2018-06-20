@@ -31,5 +31,4 @@ RUN addgroup -S pptruser && adduser -S -g pptruser pptruser \
 # Run user as non privileged.
 USER pptruser
 
-# ENTRYPOINT ["dumb-init", "--"]
-CMD ["node", "runner.js"]
+CMD ["node", "docker-test-runner.js"]
