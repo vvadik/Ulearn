@@ -11,7 +11,7 @@ describe('sample', () => {
   })
 
   it('should look cool on screenshots', async () => {
-    const output = path.resolve('dist', 'ui_test', 'test.jpg')
+    const output = path.resolve('dist', 'ui-tests', 'test.jpg')
     await page.screenshot({ path: output })
   })
 
