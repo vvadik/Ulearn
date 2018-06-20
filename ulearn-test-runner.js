@@ -8,8 +8,8 @@ const puppeteer = require('puppeteer')
 const execAsync = util.promisify(exec)
 const readDirAsync = util.promisify(fs.readdir)
 
-const hasUiTests = fs.existsSync(path.resolve(__dirname, 'ui-tests'))
-const hasUnitTests = fs.existsSync(path.resolve(__dirname, 'unit-tests'))
+const hasUiTests = fs.existsSync(path.resolve(__dirname, 'tests', 'ui'))
+const hasUnitTests = fs.existsSync(path.resolve(__dirname, 'tests', 'unit'))
 
 const buildTests = () => {
   const commands = []
@@ -29,7 +29,7 @@ const pickTestFiles = async testDir =>
   (await readDirAsync(testDir)).filter(f => f.endsWith('.test.js'))
 
 const runUiTests = async () => {
-  const testDir = path.resolve(__dirname, 'dist', 'ui-tests')
+  const testDir = path.resolve(__dirname, 'dist', 'tests', 'ui')
   const testFiles = await pickTestFiles(testDir)
 
   if (testFiles.length === 0) {
@@ -53,7 +53,7 @@ const runUiTests = async () => {
 }
 
 const runUnitTests = async () => {
-  const testDir = path.resolve(__dirname, 'dist', 'unit-tests')
+  const testDir = path.resolve(__dirname, 'dist', 'tests', 'unit')
   const testFiles = await pickTestFiles(testDir)
 
   if (testFiles.length === 0) {

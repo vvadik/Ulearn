@@ -7,8 +7,8 @@ const execAsync = util.promisify(exec)
 const readFileAsync = util.promisify(fs.readFile)
 const writeFileAsync = util.promisify(fs.writeFile)
 
-const hasUiTests = fs.existsSync(path.resolve(__dirname, 'ui-tests'))
-const hasUnitTests = fs.existsSync(path.resolve(__dirname, 'unit-tests'))
+const hasUiTests = fs.existsSync(path.resolve(__dirname, 'tests', 'ui'))
+const hasUnitTests = fs.existsSync(path.resolve(__dirname, 'tests', 'unit'))
 
 const runTests = () => {
   const commands = []
@@ -35,11 +35,11 @@ const parse = buffer => JSON.parse(buffer.toString())
 
 const report = async () => {
   const uiCommand = hasUiTests
-    ? read(path.join(__dirname, 'dist', 'ui-tests', 'ui-tests-result.json'))
+    ? read(path.join(__dirname, 'dist', 'tests', 'ui', 'ui-tests-result.json'))
     : null
 
   const unitCommand = hasUnitTests
-    ? read(path.join(__dirname, 'dist', 'unit-tests', 'unit-tests-result.json'))
+    ? read(path.join(__dirname, 'dist', 'tests', 'unit', 'unit-tests-result.json'))
     : null
 
   const result = {
