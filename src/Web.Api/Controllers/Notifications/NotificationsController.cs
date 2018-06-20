@@ -8,7 +8,6 @@ using Database.Repos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
-using Serilog.Core;
 using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Models.Results.Notifications;
 
@@ -25,7 +24,7 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 		private static FeedNotificationTransport commentsFeedNotificationTransport;
 
 		public NotificationsController(ILogger logger, WebCourseManager courseManager, UlearnDb db, NotificationsRepo notificationsRepo, FeedRepo feedRepo, NotificationDataPreloader notificationDataPreloader)
-			: base(logger, courseManager)
+			: base(logger, courseManager, db)
 		{
 			this.db = db ?? throw new ArgumentNullException(nameof(db));
 			this.notificationsRepo = notificationsRepo ?? throw new ArgumentNullException(nameof(notificationsRepo));
@@ -58,11 +57,11 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 			var importantNotifications = new List<Notification>();
 			if (notificationTransport != null)
 			{
-				importantNotifications = (await feedRepo.GetFeedNotificationDeliveriesAsync(userId, n => n.Notification.InitiatedBy, notificationTransport))
+				importantNotifications = (await feedRepo.GetFeedNotificationDeliveriesAsync(userId, n => n.Notification.InitiatedBy, transports: notificationTransport))
 					.Select(d => d.Notification)
 					.ToList();
 			}
-			var commentsNotifications = (await feedRepo.GetFeedNotificationDeliveriesAsync(userId, n => n.Notification.InitiatedBy, commentsFeedNotificationTransport))
+			var commentsNotifications = (await feedRepo.GetFeedNotificationDeliveriesAsync(userId, n => n.Notification.InitiatedBy, transports: commentsFeedNotificationTransport))
 				.Select(d => d.Notification)
 				.ToList();
 			

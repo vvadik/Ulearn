@@ -118,7 +118,7 @@ namespace Database.Repos
 		
 		public Task<List<NotificationDelivery>> GetFeedNotificationDeliveriesAsync(string userId, params FeedNotificationTransport[] transports)
 		{
-			return GetFeedNotificationDeliveriesAsync<object>(userId, null, transports);
+			return GetFeedNotificationDeliveriesAsync<object>(userId, null, transports: transports);
 		}
 
 		private IQueryable<NotificationDelivery> GetFeedNotificationDeliveriesQueryable(string userId, params FeedNotificationTransport[] transports)

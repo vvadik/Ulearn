@@ -65,6 +65,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web.Api", "Web.Api\Web.Api.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntiPlagiarism.UpdateDb", "AntiPlagiarism.UpdateDb\AntiPlagiarism.UpdateDb.csproj", "{31DA132F-A396-4D83-BD88-63345DB01D94}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Database.Core.Tests", "Database.Core.Tests\Database.Core.Tests.csproj", "{92846B6B-7D03-421B-A640-1DB92B858631}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -163,6 +165,10 @@ Global
 		{31DA132F-A396-4D83-BD88-63345DB01D94}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31DA132F-A396-4D83-BD88-63345DB01D94}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31DA132F-A396-4D83-BD88-63345DB01D94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92846B6B-7D03-421B-A640-1DB92B858631}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92846B6B-7D03-421B-A640-1DB92B858631}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92846B6B-7D03-421B-A640-1DB92B858631}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92846B6B-7D03-421B-A640-1DB92B858631}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
