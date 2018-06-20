@@ -34,33 +34,17 @@ const read = resultPath =>
 const parse = buffer => JSON.parse(buffer.toString())
 
 const report = async () => {
-  const commands = {}
+  const uiCommand = hasUiTests
+    ? read(path.join(__dirname, 'dist', 'ui-tests', 'ui-tests-result.json'))
+    : null
 
-  if (hasUiTests) {
-    const uiPath = path.join(
-      __dirname,
-      'dist',
-      'ui-tests',
-      'ui-tests-result.json'
-    )
-    commands.ui = read(uiPath)
-  }
-
-  if (hasUnitTests) {
-    const unitPath = path.join(
-      __dirname,
-      'dist',
-      'unit-tests',
-      'unit-tests-result.json'
-    )
-    commands.unit = read(unitPath)
-  }
-
-  await Promise.all(Object.values(commands))
+  const unitCommand = hasUnitTests
+    ? read(path.join(__dirname, 'dist', 'unit-tests', 'unit-tests-result.json'))
+    : null
 
   const result = {
-    ui: (await commands.ui) || {},
-    unit: (await commands.unit) || {},
+    ui: (await uiCommand) || {},
+    unit: (await unitCommand) || {},
   }
 
   const output = path.join(__dirname, 'output', 'result.json')
