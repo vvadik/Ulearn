@@ -31,7 +31,7 @@ namespace Ulearn.Web.Api.Controllers
 			
 			/* Disable change tracking in EF Core for GET requests due to perfomance issues */
 			/* TODO (andgein): we need a way to enable change tracking for some GET requests in future */
-			var isRequestSafe = context.HttpContext.Request.Method == "GET";
+			var isRequestSafe = context.HttpContext.Request.Method == "GET"; // Maybe for HEAD and OPTION requests too?
 			db.ChangeTracker.AutoDetectChangesEnabled = !isRequestSafe;
 		}
 

@@ -46,6 +46,12 @@ namespace uLearn.Web
 				url: "Certificate/{certificateId}/{*path}",
 				defaults: new { controller = "Certificates", action = "CertificateFile" }
 			);
+			/* For react application which can not proxy root url in devserver mode */
+			routes.MapRoute(
+				name: "CourseList",
+				url: "CourseList",
+				defaults: new { controller = "Home", action = "Index" }
+			);
 			routes.MapRoute(
 				name: "Default",
 				url: "{controller}/{action}",

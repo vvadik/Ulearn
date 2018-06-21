@@ -14,5 +14,6 @@ namespace Web.Api.Configuration
 		public string CookieKeyRingDirectory { get; set; }
 		public string CookieName { get; set; }
 		public string CookieDomain { get; set; }
+		public bool CookieSecure { get; set; }
 	}
 }

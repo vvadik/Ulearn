@@ -36,6 +36,7 @@ namespace uLearn.Web
 				AuthenticationType = "Identity.Application",
 				CookieName = configuration.Web.CookieName,
 				CookieDomain = configuration.Web.CookieDomain,
+				CookieSecure = configuration.Web.CookieSecure ? CookieSecureOption.Always : CookieSecureOption.Never,
 				
 				LoginPath = new PathString("/Login"),
 				Provider = new CookieAuthenticationProvider

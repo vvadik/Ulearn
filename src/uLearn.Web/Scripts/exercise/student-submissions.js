@@ -55,7 +55,7 @@ $(document).ready(function () {
         });
     }
 
-    if ($input.val() !== '') {
+    if ($input.length > 0 && $input.val() !== '') {
         updateTable();
     }
 });

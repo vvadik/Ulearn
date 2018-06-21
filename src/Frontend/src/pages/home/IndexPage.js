@@ -3,9 +3,7 @@
 class IndexPage extends Component {
     render() {
         return (
-            <div>
-                Index page
-            </div>
+            <div>Index page</div>
         )
     }
 }
