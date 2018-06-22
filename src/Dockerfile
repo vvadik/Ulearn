@@ -16,19 +16,19 @@ COPY . /app/
 
 WORKDIR app
 
+# Add new user for sandbox
+RUN addgroup -S pptruser && adduser -S -g pptruser pptruser \
+   && mkdir -p /home/pptruser/Downloads \
+   && chown -R pptruser:pptruser /home/pptruser \
+   && chown -R pptruser:pptruser /app
+
+# Run user as non privileged.
+USER pptruser
+
 # Install deps for tests.
 RUN yarn
 
 # Use Puppeteer 0.13.0 b/c it bundles Chromium 64.
 RUN yarn add --dev puppeteer@0.13.0
-
-# Add new user for sandbox
-RUN addgroup -S pptruser && adduser -S -g pptruser pptruser \
-    && mkdir -p /home/pptruser/Downloads \
-    && chown -R pptruser:pptruser /home/pptruser \
-    && chown -R pptruser:pptruser /app
-
-# Run user as non privileged.
-USER pptruser
 
 CMD ["node", "docker-test-runner.js"]
