@@ -16,11 +16,11 @@ namespace Database.Repos
 	public class GradersRepo
 	{
 		private readonly UlearnDb db;
-		private readonly ULearnUserManager userManager;
+		private readonly UlearnUserManager userManager;
 
 		private static readonly ILog log = LogManager.GetLogger(typeof(GradersRepo));
 
-		public GradersRepo(UlearnDb db, ULearnUserManager userManager)
+		public GradersRepo(UlearnDb db, UlearnUserManager userManager)
 		{
 			this.db = db;
 			this.userManager = userManager;

@@ -13,10 +13,10 @@ namespace Database.Repos
 	public class XQueueRepo
 	{
 		private readonly UlearnDb db;
-		private readonly ULearnUserManager userManager;
+		private readonly UlearnUserManager userManager;
 		private readonly UserSolutionsRepo userSolutionsRepo;
 
-		public XQueueRepo(UlearnDb db, ULearnUserManager userManager, UserSolutionsRepo userSolutionsRepo)
+		public XQueueRepo(UlearnDb db, UlearnUserManager userManager, UserSolutionsRepo userSolutionsRepo)
 		{
 			this.db = db;
 			this.userManager = userManager;

@@ -15,14 +15,14 @@ namespace Database.Repos
 	public class UsersRepo
 	{
 		private readonly UlearnDb db;
-		private readonly ULearnUserManager userManager;
+		private readonly UlearnUserManager userManager;
 		private readonly UserRolesRepo userRolesRepo;
 
 		public const string UlearnBotUsername = "ulearn-bot";
 
 		public UsersRepo(
 			UlearnDb db,
-			ULearnUserManager userManager,
+			UlearnUserManager userManager,
 			UserRolesRepo userRolesRepo
 		)
 		{

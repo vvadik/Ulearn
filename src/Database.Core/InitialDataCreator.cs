@@ -11,13 +11,13 @@ namespace Database
 	{
 		private readonly UlearnDb db;
 		private readonly RoleManager<IdentityRole> roleManager;
-		private readonly ULearnUserManager userManager;
+		private readonly UlearnUserManager userManager;
 		private readonly UsersRepo usersRepo;
 
 		public InitialDataCreator(
 			UlearnDb db,
 			RoleManager<IdentityRole> roleManager,
-			ULearnUserManager userManager,
+			UlearnUserManager userManager,
 			UsersRepo usersRepo
 		)
 		{

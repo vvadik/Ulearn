@@ -91,7 +91,7 @@ namespace Ulearn.Web.Api
 			
 			/* DI */
 			services.AddSingleton<ILogger>(logger);
-			services.AddSingleton<ULearnUserManager>();
+			services.AddSingleton<UlearnUserManager>();
 			services.AddSingleton<InitialDataCreator>();
 			services.AddSingleton<WebCourseManager>();
 			services.AddSingleton(configuration);
