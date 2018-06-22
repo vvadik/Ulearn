@@ -96,12 +96,12 @@ namespace Database.Repos
 			return await notificationsRepo.GetLastDeliveryTimestampAsync(notificationTransport);
 		}
 
-		public int GetNotificationsCount(string userId, DateTime from, params FeedNotificationTransport[] transports)
+		public async Task<int> GetNotificationsCountAsync(string userId, DateTime from, params FeedNotificationTransport[] transports)
 		{
 			var nextSecond = from.AddSeconds(1);
 			var deliveriesQueryable = GetFeedNotificationDeliveriesQueryable(userId, transports);
 
-			var totalCount = deliveriesQueryable.Count(d => d.CreateTime >= nextSecond);
+			var totalCount = await deliveriesQueryable.CountAsync(d => d.CreateTime >= nextSecond);
 			return totalCount;
 		}
 
