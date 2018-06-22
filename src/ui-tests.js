@@ -21,11 +21,10 @@ const runTests = async () => {
   global.browser = await puppeteer.launch({
     executablePath: '/usr/bin/chromium-browser',
     args: [
-      '--disable-dev-shm-usage',
+      '--disable-dev-shm-usage', // TODO: should work for Chrome 65+
       '--headless',
       '--disable-gpu',
-      '--no-sandbox',
-    ], // TODO: remove on Chrome 65+
+    ],
   })
 
   const mocha = new Mocha({
