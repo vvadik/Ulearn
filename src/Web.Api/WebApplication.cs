@@ -40,6 +40,11 @@ namespace Ulearn.Web.Api
         protected override void OnStarted(IVostokHostingEnvironment hostingEnvironment)
         {
             hostingEnvironment.MetricScope.SystemMetrics(1.Minutes());
+			
+#if DEBUG
+			/* Initialize EntityFramework Profiler. See https://www.hibernatingrhinos.com/products/efprof/learn for details */
+			HibernatingRhinos.Profiler.Appender.EntityFramework.EntityFrameworkProfiler.Initialize();
+#endif
         }
 
         protected override IWebHost BuildWebHost(IVostokHostingEnvironment hostingEnvironment)

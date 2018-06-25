@@ -7,7 +7,6 @@
 *.sln.docstates
 /src/.vs
 /src/cookie_protection_keys/
-.idea/
 
 
 # Build results
@@ -196,5 +195,5 @@ private.settings
 *.exercise.zip
 /src/uLearn.Web/App_Data/error*.xml
 
-# Rider files
-/src/.idea/
+# Rider and WebStorm files
+.idea/

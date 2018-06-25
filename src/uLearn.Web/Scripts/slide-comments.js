@@ -333,7 +333,6 @@ function autoEnlargeTextarea() {
 
     var $comments = $('.comments');	
 	
-   
     /* Set up handlers */
     $comments.on('click', '.reply-form input[name=commentText]', expandReplyForm);
 	$comments.on('click', '.comment .comment__likes-count', likeComment);
