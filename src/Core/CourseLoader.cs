@@ -65,20 +65,22 @@ namespace uLearn
 		{
 			var unitsDirectories = dir.GetDirectories().OrderBy(d => d.Name);
 
-			var unitsIds = new HashSet<Guid>();
-			var unitsUrls = new HashSet<string>();
+			var unitIds = new HashSet<Guid>();
+			var unitUrls = new HashSet<string>();
 			var slideIndex = 0;
 			foreach (var unitDirectory in unitsDirectories)
 			{
 				var unit = UnitLoader.LoadUnit(unitDirectory, settings, courseId, slideIndex);
 
-				if (unitsIds.Contains(unit.Id))
-					throw new CourseLoadingException($"Ошибка в курсе \"{settings.Title}\". Повторяющийся идентификатор модуля: {unit.Id}. Идентификаторы модулей должны быть уникальными");
-				unitsIds.Add(unit.Id);
+				if (unitIds.Contains(unit.Id))
+					throw new CourseLoadingException($"Ошибка в курсе \"{settings.Title}\" при загрузке модуля \"{unit.Title}\" из {unitDirectory.FullName}. " +
+													 $"Повторяющийся идентификатор модуля: {unit.Id}. Идентификаторы модулей должны быть уникальными. " +
+													 $"К этому времени загружены модули {string.Join(", ", unitIds)}");
+				unitIds.Add(unit.Id);
 
-				if (unitsUrls.Contains(unit.Url))
-					throw new CourseLoadingException($"Ошибка в курсе \"{settings.Title}\". Повторяющийся url-адрес модуля: {unit.Url}. Url-адреса модулей должны быть уникальными");
-				unitsUrls.Add(unit.Url);
+				if (unitUrls.Contains(unit.Url))
+					throw new CourseLoadingException($"Ошибка в курсе \"{settings.Title}\" при загрузке модуля \"{unit.Title}\" из {unitDirectory.FullName}. Повторяющийся url-адрес модуля: {unit.Url}. Url-адреса модулей должны быть уникальными");
+				unitUrls.Add(unit.Url);
 
 				yield return unit;
 
