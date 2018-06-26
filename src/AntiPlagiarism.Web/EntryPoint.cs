@@ -53,7 +53,7 @@ namespace AntiPlagiarism.Web
                 })
                 .ConfigureAirlock((context, configurator) =>
                 {
-                    configurator.SetLog(context.HostingEnvironment.Log.FilterByLevel(LogLevel.Error));
+                    configurator.SetLog(context.HostingEnvironment.Log.FilterByLevel(LogLevel.Warn));
                 })
                 .Build();
         }

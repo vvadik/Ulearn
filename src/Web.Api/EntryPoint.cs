@@ -52,7 +52,7 @@ namespace Ulearn.Web.Api
                 })
                 .ConfigureAirlock((context, configurator) =>
                 {
-                    configurator.SetLog(context.HostingEnvironment.Log.FilterByLevel(LogLevel.Error));
+                    configurator.SetLog(context.HostingEnvironment.Log.FilterByLevel(LogLevel.Warn));
                 })
                 .Build();
         }
