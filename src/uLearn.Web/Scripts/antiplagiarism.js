@@ -75,7 +75,9 @@ function getDiff(a, b, ignoreWhitespace) {
 }
 /* End of extracted from merge addon for codemirror */
 
-$(document).ready(function () {
+window.documentReadyFunctions = window.documentReadyFunctions || [];
+
+window.documentReadyFunctions.push(function () {
     $('.antiplagiarism__data').each(function () {
         var $self = $(this);
         var originalSubmissionId = $self.data('originalSubmissionId');

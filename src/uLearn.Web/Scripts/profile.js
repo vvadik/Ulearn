@@ -1,4 +1,6 @@
-﻿$(document).ready(function() {
+﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
+
+window.documentReadyFunctions.push(function() {
 	$('.profile__change-email__link').click(function (e) {
 		e.preventDefault();
 

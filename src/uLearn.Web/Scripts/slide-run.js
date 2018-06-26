@@ -57,31 +57,33 @@ function setResults(ans) {
 		setWA(ans.ExpectedOutput, ans.ActualOutput);
 }
 
-$('.exercise__submission').on('click', '.run-solution-button', function () {
-	var $runButton = $(this);
-	initErrorsBlocks();
-	var code = $(".code-exercise")[0].codeMirrorEditor.getValue();
-	if (code.length === 0)
-		code = " ";
-	$runButton.text("Выполняется...").addClass("active");
-	$runResults.hide();
+window.documentReadyFunctions = window.documentReadyFunctions || [];
 
-	$.ajax(
-	{
-		type: "POST",
-		contentType:"text/plain",
-		url: $runButton.data("url"),
-		data: code
-	}).done(setResults)
-	.fail(function (req) {
-		setSimpleResult($serviceError, req.status + " " + req.statusText);
-		console.log(req.responseText);
-	})
-	.always(function () {
-		$runButton.text("Отправить").removeClass("active");
-	});
-});
+window.documentReadyFunctions.push(function () {
+    $('.exercise__submission').on('click', '.run-solution-button', function () {
+        var $runButton = $(this);
+        initErrorsBlocks();
+        var code = $(".code-exercise")[0].codeMirrorEditor.getValue();
+        if (code.length === 0)
+            code = " ";
+        $runButton.text("Выполняется...").addClass("active");
+        $runResults.hide();
 
-$(document).ready(function() {
-	initErrorsBlocks();
+        $.ajax(
+            {
+                type: "POST",
+                contentType: "text/plain",
+                url: $runButton.data("url"),
+                data: code
+            }).done(setResults)
+            .fail(function (req) {
+                setSimpleResult($serviceError, req.status + " " + req.statusText);
+                console.log(req.responseText);
+            })
+            .always(function () {
+                $runButton.text("Отправить").removeClass("active");
+            });
+    });
+
+    initErrorsBlocks();    
 });

@@ -1,4 +1,6 @@
-﻿$(document).ready(function () {
+﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
+
+window.documentReadyFunctions.push(function () {
 	$('.selectpicker').on('rendered.bs.select', function() {
 		$(this).removeClass('form-control');
 	});

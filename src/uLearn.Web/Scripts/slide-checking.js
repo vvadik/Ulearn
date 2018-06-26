@@ -1,4 +1,6 @@
-﻿$(document).ready(function () {
+﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
+
+window.documentReadyFunctions.push(function () {
 	var $exerciseScoreForm = $('.exercise__score-form');
 	var $exerciseSimpleScoreForm = $('.exercise__simple-score-form');
 	var isSimpleScoreForm = $exerciseSimpleScoreForm.length > 0;

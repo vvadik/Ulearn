@@ -1,4 +1,6 @@
-﻿$(document).ready(function () {
+﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
+
+window.documentReadyFunctions.push(function () {
 	var addUserToGroupUrl = "/Admin/AddUserToGroup";
 	var token = $('input[name="__RequestVerificationToken"]').val();
 

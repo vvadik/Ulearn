@@ -3,16 +3,18 @@ import './App.css';
 import { Switch, Route } from 'react-router-dom';
 
 import AnyPage from "./pages/AnyPage";
+import ErrorBoundary from "./components/common/ErrorBoundary";
+import YandexMetrika from "./components/common/YandexMetrika";
 
 class UlearnApp extends Component {
   render() {
     return (
-      // <div className="App">
-      //   <Header />
-        <Switch>
-            <Route component={AnyPage} />
-        </Switch>
-      // </div>
+        <ErrorBoundary>
+            <Switch>
+                <Route component={AnyPage} />
+            </Switch>
+            <YandexMetrika/>
+        </ErrorBoundary>
     );
   }
 }

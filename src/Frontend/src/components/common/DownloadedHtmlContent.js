@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {Helmet} from "react-helmet";
 
+/*
 function loadScripts(sources){
     let loadScriptAsync = function (src) {
         let script = document.createElement("script");
@@ -13,6 +14,7 @@ function loadScripts(sources){
 
     sources.map(s => loadScriptAsync(s));
 }
+*/
 
 class DownloadedHtmlContent extends Component {
     BASE_URL = '';
@@ -27,7 +29,15 @@ class DownloadedHtmlContent extends Component {
     }
 
     componentDidMount() {
-        fetch(this.BASE_URL + this.props.url, { credentials: 'include' })
+        this.fetchContentFromServer(this.props.url);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.fetchContentFromServer(nextProps.url)
+    }
+
+    fetchContentFromServer(url) {
+        fetch(this.BASE_URL + url, {credentials: 'include'})
             .then(response => response.text())
             .then(data => {
                 let el = document.createElement('html');
@@ -36,24 +46,32 @@ class DownloadedHtmlContent extends Component {
                 let body = el.getElementsByTagName('body')[0];
                 console.log(head);
                 console.log(body);
-                // let scripts = Array.from(body.getElementsByTagName('script')).map(s => s.src);
-                // console.log(scripts);
 
                 this.setState({
                     head: head.innerHTML,
                     body: body.innerHTML
                 });
 
-                // loadScripts(scripts);
-                loadScripts([
-                    "/scripts.bundle.js",
-                    "https://cdnjs.cloudflare.com/ajax/libs/diff_match_patch/20121119/diff_match_patch.js"
-                ]);
+                /* Run scripts */
+                (window.documentReadyFunctions || []).forEach(f => f());
+
+                let embeddedScripts = Array.from(body.getElementsByTagName('script')).filter(s => !s.src).map(s => s.innerHTML);
+                embeddedScripts.forEach(s => {
+                    try {
+                        console.log('Eval ', s);
+// eslint-disable-next-line
+                        eval(s)
+                    } catch (e) {
+                        console.error(e);
+                    }
+                });
+
+                /* Scroll to top */
+                window.scrollTo(0, 0);
             });
     }
 
     render() {
-
         return (
             <div>
                 <Helmet>
