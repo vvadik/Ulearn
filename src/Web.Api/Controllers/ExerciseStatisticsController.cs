@@ -22,7 +22,7 @@ namespace Ulearn.Web.Api.Controllers
 			this.userSolutionsRepo = userSolutionsRepo;
 		}
 
-		[Route("{courseId}")]
+		[HttpGet("{courseId}")]
 		public async Task<IActionResult> CourseStatistics(Course course, int count=10000, DateTime? from=null, DateTime? to=null)
 		{
 			if (course == null)

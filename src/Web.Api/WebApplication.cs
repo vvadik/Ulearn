@@ -18,6 +18,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
+using Swashbuckle.AspNetCore.Swagger;
 using uLearn;
 using uLearn.Configuration;
 using Ulearn.Common.Extensions;
@@ -75,6 +76,20 @@ namespace Ulearn.Web.Api
 					app.UseAuthentication();
 					app.UseMvc();
 					
+					/* Configure swagger documentation. Now it's available at /swagger/v1/swagger.json.
+					 * See https://github.com/domaindrivendev/Swashbuckle.AspNetCore for details */
+					app.UseSwagger(c =>
+					{
+						c.RouteTemplate = "documentation/{documentName}/swagger.json";
+					});
+					/* And add swagger UI, available at /swagger */
+					app.UseSwaggerUI(c =>
+					{
+						c.SwaggerEndpoint("/documentation/v1/swagger.json", "Ulearn API");
+						c.DocumentTitle = "UlearnApi";
+						c.RoutePrefix = "documentation";
+					});
+					
 					var database = app.ApplicationServices.GetService<UlearnDb>();
 					database.MigrateToLatestVersion();
 					var initialDataCreator = app.ApplicationServices.GetService<InitialDataCreator>();
@@ -130,6 +145,12 @@ namespace Ulearn.Web.Api
 					options.ModelMetadataDetailsProviders.Add(new SuppressChildValidationMetadataProvider(typeof(Course)));
 				}
 			);
+			
+			/* Swagger API documentation generator. See https://github.com/domaindrivendev/Swashbuckle.AspNetCore for details */
+			services.AddSwaggerGen(c =>
+			{
+				c.SwaggerDoc("v1", new Info { Title = "Ulearn API", Version = "v1" });
+			});
 
 			ConfigureAuthServices(services, configuration, logger);
 		}

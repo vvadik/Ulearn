@@ -36,7 +36,7 @@ namespace Ulearn.Web.Api.Controllers
 			this.groupsRepo = groupsRepo;
 		}
 		
-		[Route("{courseId}/instructors")]
+		[HttpGet("{courseId}/instructors")]
 		[CourseAccessAuthorize(CourseAccessType.ApiViewCodeReviewStatistics)]
 		public async Task<IActionResult> InstructorsStatistics(Course course, int count=10000, DateTime? from=null, DateTime? to=null)
 		{
