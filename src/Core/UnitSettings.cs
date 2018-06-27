@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Xml.Serialization;
 using Ulearn.Common.Extensions;
 
@@ -70,7 +71,9 @@ namespace uLearn
 		{
 			var unitSettings = new UnitSettings
 			{
-				Id = title.ToDeterministicGuid(),
+				/* We use Win1251 only for back compatibility.
+				   In future all units will have Unit.xml with Id specified, so we will be able to switch to Encoding.UTF8 here or remove this function. */
+				Id = title.ToDeterministicGuid(Encoding.GetEncoding(1251)),
 				Url = title.ToLatin(),
 				Title = title,
 			};

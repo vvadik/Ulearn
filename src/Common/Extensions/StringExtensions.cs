@@ -123,12 +123,12 @@ namespace Ulearn.Common.Extensions
 			}
 			return result;
 		}
-
-		public static Guid ToDeterministicGuid(this string arg)
+		
+		public static Guid ToDeterministicGuid(this string arg, Encoding encoding=Encoding.UTF8)
 		{
 			using (var md5 = MD5.Create())
 			{
-				var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(arg));
+				var hash = md5.ComputeHash(encoding.GetBytes(arg));
 				return new Guid(hash);
 			}
 		}
