@@ -128,7 +128,7 @@ namespace Ulearn.Common.Extensions
 		{
 			using (var md5 = MD5.Create())
 			{
-				var hash = md5.ComputeHash(Encoding.Default.GetBytes(arg));
+				var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(arg));
 				return new Guid(hash);
 			}
 		}
@@ -137,7 +137,7 @@ namespace Ulearn.Common.Extensions
 		{
 			byte[] hash;
 			using (var md5 = MD5.Create())
-				hash = md5.ComputeHash(Encoding.Default.GetBytes(arg));
+				hash = md5.ComputeHash(Encoding.UTF8.GetBytes(arg));
 
 			var sb = new StringBuilder();
 			foreach (var b in hash)
