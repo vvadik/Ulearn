@@ -1557,9 +1557,9 @@
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="CompileFrontend" BeforeTargets="Build">
     <Exec Command="npm run build" WorkingDirectory="..\Frontend"/>
-    <Exec Command="if not exist static mkdir static"/>
+    <Exec Command="if not exist static mkdir static" WorkingDirectory="$(MSBuildProjectDirectory)"/>
     <!-- Robocopy always exits with code 1: https://social.msdn.microsoft.com/Forums/en-US/d599833c-dcea-46f5-85e9-b1f028a0fefe/robocopy-exits-with-error-code-1?forum=tfsbuild -->
-    <Exec Command="robocopy /s ..\Frontend\build\static\ static\ || exit 0"/>
+    <Exec Command="robocopy /s ..\Frontend\build\static\ static\ || exit 0" WorkingDirectory="$(MSBuildProjectDirectory)"/>
   </Target>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
