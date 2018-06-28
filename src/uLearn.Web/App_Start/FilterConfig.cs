@@ -21,9 +21,11 @@ namespace uLearn.Web
 		{
 			filters.Add(new HandleErrorAttribute());
 			
-			/* Next two filters serve frontend files from ../Frontend/build/. Before running this code build Frontend project via `yarn build` or `npm run build` */
-			var frontendDirectory = new DirectoryInfo(Utils.GetAppPath() + "../Frontend/build/");			
-			filters.Add(new ServeStaticFileForEveryNonAjaxRequest(frontendDirectory.GetFile("index.html")));
+			/* Next filter serves built index.html from ../Frontend/build/ (appSettings/ulearn.react.index.html).
+			   Before running this code build Frontend project via `yarn build` or `npm run build` */
+			var indexHtmlPath = WebConfigurationManager.AppSettings["ulearn.react.index.html"];
+			var appDirectory = new DirectoryInfo(Utils.GetAppPath());			
+			filters.Add(new ServeStaticFileForEveryNonAjaxRequest(appDirectory.GetFile(indexHtmlPath)));
 			
 			var requireHttps = Convert.ToBoolean(WebConfigurationManager.AppSettings["ulearn.requireHttps"] ?? "true");
 			if (requireHttps)
