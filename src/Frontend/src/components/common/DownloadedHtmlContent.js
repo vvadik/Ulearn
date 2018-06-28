@@ -1,20 +1,7 @@
 import React, { Component } from 'react';
-import {Helmet} from "react-helmet";
+import { Helmet } from "react-helmet";
+import Loader from "@skbkontur/react-ui/Loader"
 
-/*
-function loadScripts(sources){
-    let loadScriptAsync = function (src) {
-        let script = document.createElement("script");
-        script.src = src;
-        script.async = true;
-
-        let head = document.getElementsByTagName("head")[0];
-        (head || document.body).appendChild(script);
-    };
-
-    sources.map(s => loadScriptAsync(s));
-}
-*/
 
 class DownloadedHtmlContent extends Component {
     BASE_URL = '';
@@ -23,8 +10,9 @@ class DownloadedHtmlContent extends Component {
         super(props);
 
         this.state = {
-            head: '',
+            loading: true,
             body: '',
+            meta: {}
         };
     }
 
@@ -33,22 +21,29 @@ class DownloadedHtmlContent extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        this.fetchContentFromServer(nextProps.url)
+        this.fetchContentFromServer(nextProps.url);
+
+        /* Remove bootstrap's modal backdrop */
+        let body = document.getElementsByTagName('body')[0];
+        body.classList.remove('modal-open');
+        let backdrop = body.getElementsByClassName('modal-backdrop')[0];
+        if (backdrop)
+            backdrop.remove();
     }
 
     fetchContentFromServer(url) {
+        this.setState(s => {
+            s.loading = true;
+        });
         fetch(this.BASE_URL + url, {credentials: 'include'})
             .then(response => response.text())
             .then(data => {
                 let el = document.createElement('html');
                 el.innerHTML = data;
-                let head = el.getElementsByTagName('head')[0];
                 let body = el.getElementsByTagName('body')[0];
-                console.log(head);
-                console.log(body);
 
                 this.setState({
-                    head: head.innerHTML,
+                    loading: false,
                     body: body.innerHTML
                 });
 
@@ -58,7 +53,6 @@ class DownloadedHtmlContent extends Component {
                 let embeddedScripts = Array.from(body.getElementsByTagName('script')).filter(s => !s.src).map(s => s.innerHTML);
                 embeddedScripts.forEach(s => {
                     try {
-                        console.log('Eval ', s);
 // eslint-disable-next-line
                         eval(s)
                     } catch (e) {
@@ -68,18 +62,60 @@ class DownloadedHtmlContent extends Component {
 
                 /* Scroll to top */
                 window.scrollTo(0, 0);
+
+                let meta = window.meta || {
+                    title : 'Ulearn',
+                    description: 'Интерактивные учебные онлайн-курсы по программированию',
+                    keywords: '',
+                    imageUrl: '',
+                };
+                this.setState(s => {
+                    s.loading = false;
+                    s.meta = meta
+                });
             });
     }
 
     render() {
+        if (this.state.loading) {
+            return (
+                <Loader type="big" active>
+                    { this.getContent() }
+                </Loader>
+            )
+        }
+
+        return this.getContent();
+    }
+
+    getContent() {
+        let meta = this.state.meta;
         return (
             <div>
-                <Helmet>
-                    <meta charSet="utf-8" />
-                    <title>Ulearn</title>
-                </Helmet>
+                <Meta meta={meta} />
                 <div dangerouslySetInnerHTML={{__html: this.state.body}}/>
             </div>
+        )
+    }
+}
+
+class Meta extends Component {
+    render() {
+        let meta = this.props.meta;
+        return (
+            <Helmet>
+                <title>{ meta.title }</title>
+                <meta name="title" content={ meta.title }/>
+                <meta property="og:title" content={ meta.title }/>
+                <meta property="og:image" content={ meta.imageUrl }/>
+                <meta property="og:image:alt" content={ meta.description }/>
+                <meta property="og:description" content={ meta.description }/>
+                <meta property="og:locale" content="ru_RU"/>
+                <meta property="og:site_name" content="Ulearn"/>
+                <meta name="description" content={ meta.description }/>
+                <meta name="keywords" content={ meta.keywords }/>
+                <link rel="image_src" href={ meta.imageUrl }/>
+            </Helmet>
         )
     }
 }

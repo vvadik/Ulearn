@@ -30,6 +30,8 @@ const isSameDomain = (anchor) =>
 
 const fileRegex = /\.[a-zA-Z0-9]{2,4}$/;
 
+const isAnchorLink = (anchor) => anchor && anchor.href.indexOf("#") !== -1;
+
 const isProbablyFile = (anchor) => anchor && anchor.pathname && fileRegex.test(anchor.pathname);
 
 const isClientRoutable = (anchor) =>
@@ -52,17 +54,18 @@ class LinkClickCapturer extends Component {
 
     onClick = e => {
         // Ignore canceled events, modified clicks, and right clicks.
-        if (e.defaultPrevented || e.button !== 0 || isModifiedEvent(e)) {
+        if (e.defaultPrevented || e.button !== 0 || isModifiedEvent(e))
             return;
-        }
 
         const anchor = getNearest(e.target, e.currentTarget, 'A');
 
-        if (!isClientRoutable(anchor)) {
+        if (!isClientRoutable(anchor))
             return;
-        }
 
         e.preventDefault();
+
+        if (isAnchorLink(anchor))
+            return;
 
         this.context.router.history.push({
             pathname: anchor.pathname,

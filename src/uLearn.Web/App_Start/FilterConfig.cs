@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -19,6 +20,11 @@ namespace uLearn.Web
 		public static void RegisterGlobalFilters(GlobalFilterCollection filters)
 		{
 			filters.Add(new HandleErrorAttribute());
+			
+			/* Next two filters serve frontend files from ../Frontend/build/. Before running this code build Frontend project via `yarn build` or `npm run build` */
+			var frontendDirectory = new DirectoryInfo(Utils.GetAppPath() + "../Frontend/build/");			
+			filters.Add(new ServeStaticFileForEveryNonAjaxRequest(frontendDirectory.GetFile("index.html")));
+			
 			var requireHttps = Convert.ToBoolean(WebConfigurationManager.AppSettings["ulearn.requireHttps"] ?? "true");
 			if (requireHttps)
 				filters.Add(new RequireHttpsForCloudFlareAttribute());
@@ -77,9 +83,29 @@ namespace uLearn.Web
 		}
 	}
 
+	public class ServeStaticFileForEveryNonAjaxRequest : ActionFilterAttribute
+	{
+		private readonly byte[] content;
+		
+		public ServeStaticFileForEveryNonAjaxRequest(FileInfo file)
+		{
+			content = File.ReadAllBytes(file.FullName);
+		}
+		
+		public override void OnActionExecuting(ActionExecutingContext filterContext)
+		{
+			var httpContext = filterContext.RequestContext.HttpContext;
+			var acceptHeader = httpContext.Request.Headers["Accept"];
+			if (acceptHeader.Contains("text/html") && httpContext.Request.HttpMethod == "GET")
+			{
+				filterContext.Result = new FileContentResult(content, "text/html");
+			}
+		}
+	}
+
 	public class KonturPassportRequiredFilter : ActionFilterAttribute
 	{
-		/* If query string contains &konturPassport=true then we need to check kontur.passport login */
+		/* If query string contains &kontur=true then we need to check kontur.passport login */
 		private const string queryStringParameterName = "kontur";
 
 		private readonly ULearnUserManager userManager;
