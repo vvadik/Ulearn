@@ -60,10 +60,10 @@ class DownloadedHtmlContent extends Component {
     }
 
     fetchContentFromServer(url) {
-        let body = document.getElementsByTagName('body')[0];
+        // let body = document.getElementsByTagName('body')[0];
         this.setState(s => {
             s.loading = true;
-            s.body = body.innerHTML;
+            // s.body = body.innerHTML;
             return s;
         });
         const self = this;
