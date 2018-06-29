@@ -34,7 +34,7 @@ namespace Ulearn.Web.Api.Controllers
 		}
 		
 		[HttpGet("{courseId}")]
-		public IActionResult CourseInfo([FromRoute(Name = "courseId")]Course course)
+		public IActionResult CourseInfo(Course course)
 		{
 			if (course == null)
 				return Json(new { status = "error", message = "Course not found" });
