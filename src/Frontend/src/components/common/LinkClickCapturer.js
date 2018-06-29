@@ -42,16 +42,6 @@ const isClientRoutable = (anchor) =>
 
 
 class LinkClickCapturer extends Component {
-    static contextTypes = {
-        router: PropTypes.shape({
-            history: PropTypes.shape({
-                push: PropTypes.func.isRequired,
-                replace: PropTypes.func.isRequired,
-                createHref: PropTypes.func.isRequired
-            }).isRequired
-        }).isRequired
-    };
-
     onClick = e => {
         // Ignore canceled events, modified clicks, and right clicks.
         if (e.defaultPrevented || e.button !== 0 || isModifiedEvent(e))
@@ -80,6 +70,16 @@ class LinkClickCapturer extends Component {
             </div>
         );
     }
+
+    static contextTypes = {
+        router: PropTypes.shape({
+            history: PropTypes.shape({
+                push: PropTypes.func.isRequired,
+                replace: PropTypes.func.isRequired,
+                createHref: PropTypes.func.isRequired
+            }).isRequired
+        }).isRequired
+    };
 }
 
 export default LinkClickCapturer;

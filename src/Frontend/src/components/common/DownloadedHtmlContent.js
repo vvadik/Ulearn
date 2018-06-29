@@ -1,7 +1,24 @@
 import React, { Component } from 'react';
 import { Helmet } from "react-helmet";
 import Loader from "@skbkontur/react-ui/Loader"
+import * as PropTypes from "prop-types";
 
+
+function getUrlParts(url) {
+    let a = document.createElement('a');
+    a.href = url;
+
+    return {
+        href: a.href,
+        host: a.host,
+        hostname: a.hostname,
+        port: a.port,
+        pathname: a.pathname,
+        protocol: a.protocol,
+        hash: a.hash,
+        search: a.search
+    };
+}
 
 class DownloadedHtmlContent extends Component {
     BASE_URL = '';
@@ -32,11 +49,20 @@ class DownloadedHtmlContent extends Component {
     }
 
     fetchContentFromServer(url) {
-        this.setState(s => {
-            s.loading = true;
+        let body = document.getElementsByTagName('body')[0];
+        this.setState({
+            loading: true,
+            body: body.innerHTML
         });
+        const self = this;
         fetch(this.BASE_URL + url, {credentials: 'include'})
-            .then(response => response.text())
+            .then(response => {
+                if (response.redirected) {
+                    let url = getUrlParts(response.url);
+                    this.context.router.history.replace(url.pathname);
+                }
+                return response.text();
+            })
             .then(data => {
                 let el = document.createElement('html');
                 el.innerHTML = data;
@@ -73,6 +99,9 @@ class DownloadedHtmlContent extends Component {
                     s.loading = false;
                     s.meta = meta
                 });
+            }).catch(function(error) {
+                /* Retry after timeout */
+                setTimeout(() => self.fetchContentFromServer(url), 5000);
             });
     }
 
@@ -97,6 +126,16 @@ class DownloadedHtmlContent extends Component {
             </div>
         )
     }
+
+    static contextTypes = {
+        router: PropTypes.shape({
+            history: PropTypes.shape({
+                push: PropTypes.func.isRequired,
+                replace: PropTypes.func.isRequired,
+                createHref: PropTypes.func.isRequired
+            }).isRequired
+        }).isRequired
+    };
 }
 
 class Meta extends Component {
