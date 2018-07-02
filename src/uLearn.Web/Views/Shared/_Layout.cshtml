@@ -135,14 +135,6 @@
 
 @RenderSection("scripts", required: false)
 
-<script>
-    $(function() {
-        $(".load-content").each(function() {
-            $(this).load($(this).data("url"));
-        });
-    });
-</script>
-
 @if (AccountController.IsHijacked(HttpContext.Current.Request))
 {
 	@Html.Partial("_ReturnHijack")

@@ -1,7 +1,8 @@
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 import { Helmet } from "react-helmet";
 import Loader from "@skbkontur/react-ui/Loader"
 import * as PropTypes from "prop-types";
+import { saveAs } from "file-saver";
 
 
 function getUrlParts(url) {
@@ -22,7 +23,6 @@ function getUrlParts(url) {
 
 function safeEval(code) {
     try {
-        console.log('Eval', code);
 // eslint-disable-next-line
         eval(code)
     } catch (e) {
@@ -40,7 +40,7 @@ class DownloadedHtmlContent extends Component {
             loading: true,
             body: '',
             meta: {},
-            links: []
+            links: this.addUlearnBundleCssIfNeeded('', [])
         };
     }
 
@@ -59,13 +59,23 @@ class DownloadedHtmlContent extends Component {
             backdrop.remove();
     }
 
-    fetchContentFromServer(url) {
-        // let body = document.getElementsByTagName('body')[0];
-        this.setState(s => {
-            s.loading = true;
-            // s.body = body.innerHTML;
-            return s;
+    getCurrentBodyContent() {
+        let body = document.getElementsByTagName('body')[0];
+        return body.innerHTML;
+    }
+
+    addUlearnBundleCssIfNeeded(url, links) {
+        if (url.startsWith('/Certificate/') || url.startsWith('/elmah'))
+            return links;
+        links.push({
+            rel: 'stylesheet',
+            type: '',
+            href: '/ulearn.bundle.css'
         });
+        return links;
+    }
+
+    fetchContentFromServer(url) {
         const self = this;
         fetch(this.BASE_URL + url, {credentials: 'include'})
             .then(response => {
@@ -73,15 +83,38 @@ class DownloadedHtmlContent extends Component {
                     let url = getUrlParts(response.url);
                     this.context.router.history.replace(url.pathname);
                 }
+                if (response.headers.has('Content-Disposition')) {
+                    let contentDisposition = response.headers.get('Content-Disposition');
+                    if (contentDisposition.indexOf('attachment') !== -1) {
+                        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                        let matches = filenameRegex.exec(contentDisposition);
+                        if (matches != null && matches[1]) {
+                            let filename = matches[1].replace(/['"]/g, '');
+                            response.blob().then(b => saveAs(b, filename, false));
+                            return Promise.resolve(undefined)
+                        }
+                    }
+                }
+                this.setState(s => {
+                    s.loading = true;
+                    return s;
+                });
                 return response.text();
             })
             .then(data => {
+                if (data === undefined) {
+                    return;
+                }
+
                 let el = document.createElement('html');
                 el.innerHTML = data;
                 let head = el.getElementsByTagName('head')[0];
                 let body = el.getElementsByTagName('body')[0];
-                let links = head.getElementsByTagName('link');
+
+                let links = Array.from(head.getElementsByTagName('link'));
                 let titles = head.getElementsByTagName('title');
+
+                links = this.addUlearnBundleCssIfNeeded(url, links);
 
                 this.setState({
                     loading: false,
@@ -105,6 +138,8 @@ class DownloadedHtmlContent extends Component {
                 /* Scroll to top */
                 window.scrollTo(0, 0);
 
+                this.loadContentByClass();
+
                 let meta = window.meta || {
                     title : titles ? titles[0].innerText : 'Ulearn',
                     description: 'Интерактивные учебные онлайн-курсы по программированию',
@@ -117,6 +152,7 @@ class DownloadedHtmlContent extends Component {
                     return s;
                 });
             }).catch(function(error) {
+                console.error(error);
                 /* Retry after timeout */
                 setTimeout(() => self.fetchContentFromServer(url), 5000);
             });
@@ -136,13 +172,22 @@ class DownloadedHtmlContent extends Component {
 
     getContent() {
         let meta = Object.assign({}, this.state.meta);
-        let links = Object.assign({}, this.state.links);
+        let links = this.state.links;
         return (
             <div>
                 <Meta meta={meta} links={links}/>
-                <div dangerouslySetInnerHTML={{__html: this.state.body}}/>
+                <Content body={this.state.body} />
             </div>
         )
+    }
+
+    loadContentByClass() {
+        const className = 'load-content';
+        let elements = Array.from(document.body.getElementsByClassName(className));
+        elements.forEach(e => {
+            let url = e.dataset.url;
+            fetch(url, {credentials: 'include'}).then(r => r.text()).then(data => e.innerHTML = data);
+        });
     }
 
     static contextTypes = {
@@ -154,6 +199,12 @@ class DownloadedHtmlContent extends Component {
             }).isRequired
         }).isRequired
     };
+}
+
+class Content extends PureComponent {
+    render() {
+        return (<div dangerouslySetInnerHTML={{__html: this.props.body}}/>)
+    }
 }
 
 class Meta extends Component {

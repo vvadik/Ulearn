@@ -1,29 +1,30 @@
 window.documentReadyFunctions = window.documentReadyFunctions || [];
 
 window.documentReadyFunctions.push(function () {
-    window.slideNavigation = window.slideNavigation || {
-        $prev: $("#prev_slide_button"),
-        $next: $("#next_slide_button"),
-        $nextSolutions: $("#next_solutions_button"),
-        $nextButtons: $(".next_button"),
-        update: function (hasNext, hasPrev, isAccepted) {
-            this.$next.toggle(hasNext);
+    var $prev = $("#prev_slide_button");
+    var $next = $("#next_slide_button");
+    var $nextSolutions = $("#next_solutions_button");
+    var $nextButtons = $(".next_button");
+    
+    window.slideNavigation = {        
+        update: function (hasNext, hasPrev, isAccepted) {            
+            $next.toggle(hasNext);
             if (!hasNext) {
-                this.$nextButtons.toggle(false);
+                $nextButtons.toggle(false);
             }
-            this.$prev.toggle(hasPrev);
+            $prev.toggle(hasPrev);
             if (!hasPrev) {
-                this.$prev.toggle(false);
+                $prev.toggle(false);
             }
-            this.$nextSolutions.toggle(false);
+            $nextSolutions.toggle(false);
             if (isAccepted) {
-                this.$nextSolutions.toggle(true);
-                this.$next.toggle(false);
+                $nextSolutions.toggle(true);
+                $next.toggle(false);
             }
         },
         makeShowSolutionsNext: function () {
-            this.$next.toggle(false);
-            this.$nextSolutions.toggle(true);
+            $next.toggle(false);
+            $nextSolutions.toggle(true);
         }
     };    
     
