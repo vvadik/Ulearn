@@ -60,6 +60,11 @@ class DownloadedHtmlContent extends Component {
             backdrop.remove();
     }
 
+    static removeStickyHeaderAndColumn() {
+        Array.from(document.getElementsByClassName('sticky-header')).forEach(r => r.remove());
+        Array.from(document.getElementsByClassName('sticky-column')).forEach(r => r.remove());
+    }
+
     static getCurrentBodyContent() {
         let body = document.getElementsByTagName('body')[0];
         return body.innerHTML;
@@ -129,6 +134,8 @@ class DownloadedHtmlContent extends Component {
                     body: body.innerHTML,
                     links: links
                 });
+
+                DownloadedHtmlContent.removeStickyHeaderAndColumn();
 
                 /* Run scripts */
                 (window.documentReadyFunctions || []).forEach(f => f());
