@@ -40,7 +40,7 @@ class DownloadedHtmlContent extends Component {
             loading: true,
             body: '',
             meta: {},
-            links: this.addUlearnBundleCssIfNeeded('', [])
+            links: DownloadedHtmlContent.addUlearnBundleCssIfNeeded('', [])
         };
     }
 
@@ -50,8 +50,9 @@ class DownloadedHtmlContent extends Component {
 
     componentWillReceiveProps(nextProps) {
         this.fetchContentFromServer(nextProps.url);
+    }
 
-        /* Remove bootstrap's modal backdrop */
+    static removeBootstrapModalBackdrop() {
         let body = document.getElementsByTagName('body')[0];
         body.classList.remove('modal-open');
         let backdrop = body.getElementsByClassName('modal-backdrop')[0];
@@ -59,15 +60,15 @@ class DownloadedHtmlContent extends Component {
             backdrop.remove();
     }
 
-    getCurrentBodyContent() {
+    static getCurrentBodyContent() {
         let body = document.getElementsByTagName('body')[0];
         return body.innerHTML;
     }
 
-    addUlearnBundleCssIfNeeded(url, links) {
+    static addUlearnBundleCssIfNeeded(url, links) {
         if (url.startsWith('/Certificate/') || url.startsWith('/elmah'))
             return links;
-        links.push({
+        links.unshift({
             rel: 'stylesheet',
             type: '',
             href: '/ulearn.bundle.css'
@@ -82,7 +83,9 @@ class DownloadedHtmlContent extends Component {
                 if (response.redirected) {
                     let url = getUrlParts(response.url);
                     this.context.router.history.replace(url.pathname);
+                    return Promise.resolve(undefined);
                 }
+                /* Process attaches: download them and return url back */
                 if (response.headers.has('Content-Disposition')) {
                     let contentDisposition = response.headers.get('Content-Disposition');
                     if (contentDisposition.indexOf('attachment') !== -1) {
@@ -90,10 +93,15 @@ class DownloadedHtmlContent extends Component {
                         let matches = filenameRegex.exec(contentDisposition);
                         if (matches != null && matches[1]) {
                             let filename = matches[1].replace(/['"]/g, '');
-                            response.blob().then(b => saveAs(b, filename, false));
-                            return Promise.resolve(undefined)
+                            response.blob().then(blob => this.downloadFile(blob, filename));
+                            return Promise.resolve(undefined);
                         }
                     }
+                }
+                /* Process content files: also download them and return url back */
+                if (url.startsWith('/Content/') || url.startsWith('/Certificates/')) {
+                    response.blob().then(blob => this.downloadFile(blob, url));
+                    return Promise.resolve(undefined);
                 }
                 this.setState(s => {
                     s.loading = true;
@@ -114,7 +122,7 @@ class DownloadedHtmlContent extends Component {
                 let links = Array.from(head.getElementsByTagName('link'));
                 let titles = head.getElementsByTagName('title');
 
-                links = this.addUlearnBundleCssIfNeeded(url, links);
+                links = DownloadedHtmlContent.addUlearnBundleCssIfNeeded(url, links);
 
                 this.setState({
                     loading: false,
@@ -151,11 +159,20 @@ class DownloadedHtmlContent extends Component {
                     s.meta = meta;
                     return s;
                 });
+
+                this.lastRenderedUrl = url;
+                DownloadedHtmlContent.removeBootstrapModalBackdrop();
             }).catch(function(error) {
                 console.error(error);
                 /* Retry after timeout */
                 setTimeout(() => self.fetchContentFromServer(url), 5000);
             });
+    }
+
+    downloadFile(blob, filename) {
+        saveAs(blob, filename, false);
+        if (this.lastRenderedUrl)
+            window.history.replaceState({}, '', this.lastRenderedUrl);
     }
 
     render() {
