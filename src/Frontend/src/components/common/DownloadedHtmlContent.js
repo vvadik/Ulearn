@@ -210,7 +210,11 @@ class DownloadedHtmlContent extends Component {
         let elements = Array.from(document.body.getElementsByClassName(className));
         elements.forEach(e => {
             let url = e.dataset.url;
-            fetch(url, {credentials: 'include'}).then(r => r.text()).then(data => e.innerHTML = data);
+            fetch(url, {credentials: 'include'}).then(r => r.text()).then(data => {
+                e.innerHTML = data;
+                let scripts = Array.from(e.getElementsByTagName('script'));
+                scripts.filter(s => ! s.src).forEach(s => safeEval(s.innerHTML));
+            });
         });
     }
 
