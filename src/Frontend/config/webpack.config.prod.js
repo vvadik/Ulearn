@@ -56,7 +56,10 @@ module.exports = {
   // You can exclude the *.map files from the build during deployment.
   devtool: shouldUseSourceMap ? 'source-map' : false,
   // In production, we only want to load the polyfills and the app code.
-  entry: [require.resolve('./polyfills'), paths.appIndexJs],
+  entry: {
+    main: [require.resolve('./polyfills'), paths.appIndexJs],
+    oldBrowser: [paths.oldBrowserJs]
+  },
   output: {
     // The build folder.
     path: paths.appBuild,
@@ -255,6 +258,13 @@ module.exports = {
         minifyJS: true,
         minifyCSS: true,
         minifyURLs: true,
+      },
+      chunksSortMode: (chunk1, chunk2) => {
+        /* oldBrowser.js should be the first bundle. For more complex cases see solution
+           at https://github.com/jantimon/html-webpack-plugin/issues/481#issuecomment-287370259*/
+        if (chunk1.names[0] === 'oldBrowser') return -1;
+        if (chunk2.names[0] === 'oldBrowser') return 1;
+        return 0;
       },
     }),
     // Makes some environment variables available to the JS code, for example:
