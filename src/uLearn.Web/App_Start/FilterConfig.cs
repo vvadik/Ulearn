@@ -110,6 +110,19 @@ namespace uLearn.Web
 				filterContext.Result = new FileContentResult(content, "text/html");
 			}
 		}
+
+		public override void OnResultExecuting(ResultExecutingContext filterContext)
+		{
+			/* Add no-cache headers for correct working of react application (otherwise clicking on `back` button in browsers loads cached not-reacted version) */			
+			var cache = filterContext.HttpContext.Response.Cache;
+			cache.SetExpires(DateTime.UtcNow.AddDays(-1));
+			cache.SetValidUntilExpires(false);
+			cache.SetRevalidation(HttpCacheRevalidation.AllCaches);
+			cache.SetCacheability(HttpCacheability.NoCache);
+			cache.SetNoStore();
+			
+			base.OnResultExecuting(filterContext);
+		}
 	}
 
 	public class KonturPassportRequiredFilter : ActionFilterAttribute
