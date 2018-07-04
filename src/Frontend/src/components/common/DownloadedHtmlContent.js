@@ -30,6 +30,26 @@ function safeEval(code) {
     }
 }
 
+let decodeHtmlEntities = (function () {
+    // this prevents any overhead from creating the object each time
+    let element = document.createElement('div');
+
+    function decodeEntities(str) {
+        if (str && typeof str === 'string') {
+            // strip script/html tags
+            str = str.replace(/<script[^>]*>([\S\s]*?)<\/script>/gmi, '');
+            str = str.replace(/<\/?\w(?:[^"'>]|"[^"]*"|'[^']*')*>/gmi, '');
+            element.innerHTML = str;
+            str = element.textContent;
+            element.textContent = '';
+        }
+
+        return str;
+    }
+
+    return decodeEntities;
+})();
+
 class DownloadedHtmlContent extends Component {
     BASE_URL = '';
 
@@ -231,6 +251,9 @@ class Meta extends Component {
             let link = links[i];
             renderedLinks.push(<link rel={link.rel} type={link.type} href={link.href} key={i}/>);
         }
+        meta.title = decodeHtmlEntities(meta.title);
+        meta.description = decodeHtmlEntities(meta.description);
+        meta.keywords = decodeHtmlEntities(meta.keywords);
         return (
             <Helmet>
                 <title>{ meta.title }</title>
