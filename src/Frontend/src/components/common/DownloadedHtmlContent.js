@@ -40,7 +40,7 @@ class DownloadedHtmlContent extends Component {
             loading: true,
             body: '',
             meta: {},
-            links: DownloadedHtmlContent.addUlearnBundleCssIfNeeded('', [])
+            links: []
         };
     }
 
@@ -68,17 +68,6 @@ class DownloadedHtmlContent extends Component {
     static getCurrentBodyContent() {
         let body = document.getElementsByTagName('body')[0];
         return body.innerHTML;
-    }
-
-    static addUlearnBundleCssIfNeeded(url, links) {
-        if (url.startsWith('/Certificate/') || url.startsWith('/elmah'))
-            return links;
-        links.unshift({
-            rel: 'stylesheet',
-            type: '',
-            href: '/ulearn.bundle.css'
-        });
-        return links;
     }
 
     fetchContentFromServer(url) {
@@ -126,8 +115,6 @@ class DownloadedHtmlContent extends Component {
 
                 let links = Array.from(head.getElementsByTagName('link'));
                 let titles = head.getElementsByTagName('title');
-
-                links = DownloadedHtmlContent.addUlearnBundleCssIfNeeded(url, links);
 
                 this.setState({
                     loading: false,

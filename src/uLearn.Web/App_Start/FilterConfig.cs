@@ -25,7 +25,7 @@ namespace uLearn.Web
 			   Before running this code build Frontend project via `yarn build` or `npm run build` */
 			var indexHtmlPath = WebConfigurationManager.AppSettings["ulearn.react.index.html"];
 			var appDirectory = new DirectoryInfo(Utils.GetAppPath());			
-			filters.Add(new ServeStaticFileForEveryNonAjaxRequest(appDirectory.GetFile(indexHtmlPath)));
+			filters.Add(new ServeStaticFileForEveryNonAjaxRequest(appDirectory.GetFile(indexHtmlPath), new List<string> { "/elmah", "/Certificate/" }));
 			
 			var requireHttps = Convert.ToBoolean(WebConfigurationManager.AppSettings["ulearn.requireHttps"] ?? "true");
 			if (requireHttps)
@@ -87,16 +87,23 @@ namespace uLearn.Web
 
 	public class ServeStaticFileForEveryNonAjaxRequest : ActionFilterAttribute
 	{
+		private readonly List<string> excludedPrefixes;
 		private readonly byte[] content;
 		
-		public ServeStaticFileForEveryNonAjaxRequest(FileInfo file)
+		public ServeStaticFileForEveryNonAjaxRequest(FileInfo file, List<string> excludedPrefixes)
 		{
+			this.excludedPrefixes = excludedPrefixes;
 			content = File.ReadAllBytes(file.FullName);
 		}
 		
 		public override void OnActionExecuting(ActionExecutingContext filterContext)
 		{
 			var httpContext = filterContext.RequestContext.HttpContext;
+			
+			foreach (var prefix in excludedPrefixes)
+				if (httpContext.Request.Url != null && httpContext.Request.Url.LocalPath.StartsWith(prefix))
+					return;
+			
 			var acceptHeader = httpContext.Request.Headers["Accept"];
 			if (acceptHeader.Contains("text/html") && httpContext.Request.HttpMethod == "GET")
 			{
