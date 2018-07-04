@@ -42,6 +42,11 @@ const isClientRoutable = (anchor) =>
 
 
 class LinkClickCapturer extends Component {
+    constructor(props) {
+        super();
+        this.exclude = props.exclude || [];
+    }
+
     onClick = e => {
         // Ignore canceled events, modified clicks, and right clicks.
         if (e.defaultPrevented || e.button !== 0 || isModifiedEvent(e))
@@ -50,6 +55,9 @@ class LinkClickCapturer extends Component {
         const anchor = getNearest(e.target, e.currentTarget, 'A');
 
         if (!isClientRoutable(anchor))
+            return;
+
+        if (this.exclude.some(prefix => anchor.pathname.startsWith(prefix)))
             return;
 
         e.preventDefault();
