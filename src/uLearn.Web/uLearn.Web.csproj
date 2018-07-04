@@ -1165,6 +1165,7 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\js.cookie.js" />
     <Content Include="Scripts\likely.js" />
+    <Content Include="Scripts\likely.README.txt" />
     <Content Include="Scripts\modals.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Scripts\notifications-settings.js" />
@@ -1556,10 +1557,10 @@
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="CompileFrontend" BeforeTargets="Build;OctoPack">
-    <Exec Command="npm run build" WorkingDirectory="..\Frontend"/>
-    <Exec Command="if not exist static mkdir static" WorkingDirectory="$(MSBuildProjectDirectory)"/>
+    <Exec Command="npm run build" WorkingDirectory="..\Frontend" />
+    <Exec Command="if not exist static mkdir static" WorkingDirectory="$(MSBuildProjectDirectory)" />
     <!-- Robocopy always exits with code 1: https://social.msdn.microsoft.com/Forums/en-US/d599833c-dcea-46f5-85e9-b1f028a0fefe/robocopy-exits-with-error-code-1?forum=tfsbuild -->
-    <Exec Command="robocopy /s ..\Frontend\build\static\ static\ || exit 0" WorkingDirectory="$(MSBuildProjectDirectory)"/>
+    <Exec Command="robocopy /s ..\Frontend\build\static\ static\ || exit 0" WorkingDirectory="$(MSBuildProjectDirectory)" />
   </Target>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
