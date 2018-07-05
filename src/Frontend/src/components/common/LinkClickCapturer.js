@@ -88,6 +88,10 @@ class LinkClickCapturer extends Component {
             }).isRequired
         }).isRequired
     };
+
+    static propTypes = {
+        exclude: PropTypes.arrayOf(PropTypes.string).isRequired()
+    }
 }
 
 export default LinkClickCapturer;

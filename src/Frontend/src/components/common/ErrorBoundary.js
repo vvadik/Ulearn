@@ -19,7 +19,7 @@ class ErrorBoundary extends Component {
 
     render() {
         if (this.state.error) {
-            //render fallback UI
+            /* render fallback UI */
             return (
                 <div
                     className="error"
@@ -29,7 +29,7 @@ class ErrorBoundary extends Component {
                 </div>
             );
         } else {
-            //when there's not an error, render children untouched
+            /* when there's not an error, render children untouched */
             return this.props.children;
         }
     }
