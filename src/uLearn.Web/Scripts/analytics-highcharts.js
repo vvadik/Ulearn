@@ -1,4 +1,6 @@
-﻿$(function () {
+﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
+
+window.documentReadyFunctions.push(function () {
 	var $chart = $('#usersByCountVisitedSlidesChart');
 
 	function showChartByDataFrom(id) {

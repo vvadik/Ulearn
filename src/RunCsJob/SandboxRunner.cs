@@ -92,7 +92,7 @@ namespace RunCsJob
 			}
 			catch (Exception ex)
 			{
-				log.Error(ex);
+				log.Error(ex.Message, ex);
 				return new RunningResults(submission.Id, Verdict.SandboxError, error: ex.ToString());
 			}
 			finally

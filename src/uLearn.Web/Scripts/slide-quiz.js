@@ -89,7 +89,9 @@ function QuizAnswer(type, quizId, itemId, text) {
 	this.Text = text;
 }
 
-$(document).ready(function() {
+window.documentReadyFunctions = window.documentReadyFunctions || [];
+
+window.documentReadyFunctions.push(function() {
 	$.fn.moveUp = function() {
 		$.each(this, function() {
 			$(this).after($(this).prev());

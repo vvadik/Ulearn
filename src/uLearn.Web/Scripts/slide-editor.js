@@ -1,4 +1,6 @@
-﻿$(document).ready(function () {
+﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
+
+window.documentReadyFunctions.push(function () {
     initCodeEditor();
 
     $('.exercise__add-review').each(function () {
@@ -160,6 +162,13 @@ function initCodeEditor($parent) {
             var langInfo = getLangInfo(langId);
             var mac = CodeMirror.keyMap.default === CodeMirror.keyMap.macDefault;
             var ctrlSpace = (mac ? "Cmd" : "Ctrl") + "-Space";
+            let extraKeys = {
+                ".": function(cm) {
+                    setTimeout(function() { cm.execCommand("autocomplete"); }, 100);
+                    return CodeMirror.Pass;
+                }
+            };
+            extraKeys[ctrlSpace] = "autocomplete";
             var editor = CodeMirror.fromTextArea(element,
             {
                 mode: langInfo.mode,
@@ -170,13 +179,7 @@ function initCodeEditor($parent) {
                 tabSize: 4,
                 indentUnit: 4,
                 lineWrapping: true,
-                extraKeys: {
-                    ctrlSpace: "autocomplete",
-                    ".": function(cm) {
-                        setTimeout(function() { cm.execCommand("autocomplete"); }, 100);
-                        return CodeMirror.Pass;
-                    }
-                },
+                extraKeys: extraKeys,
                 readOnly: !editable,
                 //autoCloseBrackets: true, // workaround: autoCloseBracket breakes indentation after for|while|...
                 styleActiveLine: editable,

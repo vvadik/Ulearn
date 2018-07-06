@@ -1,18 +1,54 @@
-import React, { Component } from 'react';
-import {Helmet} from "react-helmet";
+import React, { Component, PureComponent } from 'react';
+import { Helmet } from "react-helmet";
+import Loader from "@skbkontur/react-ui/Loader"
+import * as PropTypes from "prop-types";
+import { saveAs } from "file-saver";
 
-function loadScripts(sources){
-    let loadScriptAsync = function (src) {
-        let script = document.createElement("script");
-        script.src = src;
-        script.async = true;
 
-        let head = document.getElementsByTagName("head")[0];
-        (head || document.body).appendChild(script);
+function getUrlParts(url) {
+    let a = document.createElement('a');
+    a.href = url;
+
+    return {
+        href: a.href,
+        host: a.host,
+        hostname: a.hostname,
+        port: a.port,
+        pathname: a.pathname,
+        protocol: a.protocol,
+        hash: a.hash,
+        search: a.search
     };
-
-    sources.map(s => loadScriptAsync(s));
 }
+
+function safeEval(code) {
+    try {
+// eslint-disable-next-line
+        eval(code)
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+let decodeHtmlEntities = (function () {
+    // this prevents any overhead from creating the object each time
+    let element = document.createElement('div');
+
+    function decodeEntities(str) {
+        if (str && typeof str === 'string') {
+            // strip script/html tags
+            str = str.replace(/<script[^>]*>([\S\s]*?)<\/script>/gmi, '');
+            str = str.replace(/<\/?\w(?:[^"'>]|"[^"]*"|'[^']*')*>/gmi, '');
+            element.innerHTML = str;
+            str = element.textContent;
+            element.textContent = '';
+        }
+
+        return str;
+    }
+
+    return decodeEntities;
+})();
 
 class DownloadedHtmlContent extends Component {
     BASE_URL = '';
@@ -21,47 +57,218 @@ class DownloadedHtmlContent extends Component {
         super(props);
 
         this.state = {
-            head: '',
+            loading: true,
             body: '',
+            meta: {},
+            links: []
         };
     }
 
     componentDidMount() {
-        fetch(this.BASE_URL + this.props.url, { credentials: 'include' })
-            .then(response => response.text())
+        this.fetchContentFromServer(this.props.url);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.fetchContentFromServer(nextProps.url);
+    }
+
+    static removeBootstrapModalBackdrop() {
+        let body = document.getElementsByTagName('body')[0];
+        body.classList.remove('modal-open');
+        let backdrop = body.getElementsByClassName('modal-backdrop')[0];
+        if (backdrop)
+            backdrop.remove();
+    }
+
+    static removeStickyHeaderAndColumn() {
+        Array.from(document.getElementsByClassName('sticky-header')).forEach(r => r.remove());
+        Array.from(document.getElementsByClassName('sticky-column')).forEach(r => r.remove());
+    }
+
+    static getCurrentBodyContent() {
+        let body = document.getElementsByTagName('body')[0];
+        return body.innerHTML;
+    }
+
+    fetchContentFromServer(url) {
+        const self = this;
+        fetch(this.BASE_URL + url, {credentials: 'include'})
+            .then(response => {
+                if (response.redirected) {
+                    let url = getUrlParts(response.url);
+                    this.context.router.history.replace(url.pathname);
+                    return Promise.resolve(undefined);
+                }
+                /* Process attaches: download them and return url back */
+                if (response.headers.has('Content-Disposition')) {
+                    let contentDisposition = response.headers.get('Content-Disposition');
+                    if (contentDisposition.indexOf('attachment') !== -1) {
+                        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                        let matches = filenameRegex.exec(contentDisposition);
+                        if (matches != null && matches[1]) {
+                            let filename = matches[1].replace(/['"]/g, '');
+                            response.blob().then(blob => this.downloadFile(blob, filename));
+                            return Promise.resolve(undefined);
+                        }
+                    }
+                }
+                /* Process content files: also download them and return url back */
+                if (url.startsWith('/Content/') || url.startsWith('/Certificates/')) {
+                    response.blob().then(blob => this.downloadFile(blob, url));
+                    return Promise.resolve(undefined);
+                }
+                this.setState(s => {
+                    s.loading = true;
+                    return s;
+                });
+                return response.text();
+            })
             .then(data => {
+                if (data === undefined) {
+                    return;
+                }
+
                 let el = document.createElement('html');
                 el.innerHTML = data;
                 let head = el.getElementsByTagName('head')[0];
                 let body = el.getElementsByTagName('body')[0];
-                console.log(head);
-                console.log(body);
-                // let scripts = Array.from(body.getElementsByTagName('script')).map(s => s.src);
-                // console.log(scripts);
+
+                let links = Array.from(head.getElementsByTagName('link'));
+                let titles = head.getElementsByTagName('title');
 
                 this.setState({
-                    head: head.innerHTML,
-                    body: body.innerHTML
+                    loading: false,
+                    body: body.innerHTML,
+                    links: links
                 });
 
-                // loadScripts(scripts);
-                loadScripts([
-                    "/scripts.bundle.js",
-                    "https://cdnjs.cloudflare.com/ajax/libs/diff_match_patch/20121119/diff_match_patch.js"
-                ]);
+                DownloadedHtmlContent.removeStickyHeaderAndColumn();
+
+                /* Run scripts */
+                (window.documentReadyFunctions || []).forEach(f => f());
+
+                window.meta = undefined;
+                let allScriptTags = Array.from(body.getElementsByTagName('script'));
+                /* Eval embedded scripts */
+                let embeddedScripts = allScriptTags.filter(s => !s.src).map(s => s.innerHTML);
+                embeddedScripts.forEach(safeEval);
+                /* Eval remote scripts */
+                allScriptTags.filter(s => s.src).map(s => s.src).forEach(url => {
+                    fetch(url).then(r => r.text()).then(safeEval);
+                });
+
+                /* Scroll to top */
+                window.scrollTo(0, 0);
+
+                this.loadContentByClass();
+
+                let meta = window.meta || {
+                    title : titles ? titles[0].innerText : 'Ulearn',
+                    description: 'Интерактивные учебные онлайн-курсы по программированию',
+                    keywords: '',
+                    imageUrl: '',
+                };
+                this.setState(s => {
+                    s.loading = false;
+                    s.meta = meta;
+                    return s;
+                });
+
+                this.lastRenderedUrl = url;
+                DownloadedHtmlContent.removeBootstrapModalBackdrop();
+            }).catch(function(error) {
+                console.error(error);
+                /* Retry after timeout */
+                setTimeout(() => self.fetchContentFromServer(url), 5000);
             });
     }
 
-    render() {
+    downloadFile(blob, filename) {
+        saveAs(blob, filename, false);
+        if (this.lastRenderedUrl)
+            window.history.replaceState({}, '', this.lastRenderedUrl);
+    }
 
+    render() {
+        if (this.state.loading) {
+            return (
+                <Loader type="big" active>
+                    { this.getContent() }
+                </Loader>
+            )
+        }
+
+        return this.getContent();
+    }
+
+    getContent() {
+        let meta = Object.assign({}, this.state.meta);
+        let links = this.state.links;
         return (
             <div>
-                <Helmet>
-                    <meta charSet="utf-8" />
-                    <title>Ulearn</title>
-                </Helmet>
-                <div dangerouslySetInnerHTML={{__html: this.state.body}}/>
+                <Meta meta={meta} links={links}/>
+                <Content body={this.state.body} />
             </div>
+        )
+    }
+
+    loadContentByClass() {
+        const className = 'load-content';
+        let elements = Array.from(document.body.getElementsByClassName(className));
+        elements.forEach(e => {
+            let url = e.dataset.url;
+            fetch(url, {credentials: 'include'}).then(r => r.text()).then(data => {
+                e.innerHTML = data;
+                let scripts = Array.from(e.getElementsByTagName('script'));
+                scripts.filter(s => ! s.src).forEach(s => safeEval(s.innerHTML));
+            });
+        });
+    }
+
+    static contextTypes = {
+        router: PropTypes.shape({
+            history: PropTypes.shape({
+                push: PropTypes.func.isRequired,
+                replace: PropTypes.func.isRequired,
+                createHref: PropTypes.func.isRequired
+            }).isRequired
+        }).isRequired
+    };
+}
+
+class Content extends PureComponent {
+    render() {
+        return (<div dangerouslySetInnerHTML={{__html: this.props.body}}/>)
+    }
+}
+
+class Meta extends Component {
+    render() {
+        let meta = this.props.meta;
+        let links = this.props.links;
+        let renderedLinks = [];
+        for (let i = 0; i < links.length; i++) {
+            let link = links[i];
+            renderedLinks.push(<link rel={link.rel} type={link.type} href={link.href} key={i}/>);
+        }
+        meta.title = decodeHtmlEntities(meta.title);
+        meta.description = decodeHtmlEntities(meta.description);
+        meta.keywords = decodeHtmlEntities(meta.keywords);
+        return (
+            <Helmet>
+                <title>{ meta.title }</title>
+                <meta name="title" content={ meta.title }/>
+                <meta property="og:title" content={ meta.title }/>
+                <meta property="og:image" content={ meta.imageUrl }/>
+                <meta property="og:image:alt" content={ meta.description }/>
+                <meta property="og:description" content={ meta.description }/>
+                <meta property="og:locale" content="ru_RU"/>
+                <meta property="og:site_name" content="Ulearn"/>
+                <meta name="description" content={ meta.description }/>
+                <meta name="keywords" content={ meta.keywords }/>
+                <link rel="image_src" href={ meta.imageUrl }/>
+                {renderedLinks}
+            </Helmet>
         )
     }
 }

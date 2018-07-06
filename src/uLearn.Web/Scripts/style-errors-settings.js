@@ -1,4 +1,6 @@
-$(document).ready(function () {
+window.documentReadyFunctions = window.documentReadyFunctions || [];
+
+window.documentReadyFunctions.push(function () {
     $('.style-errors__settings input[type="checkbox"]').change(function () {
         var $self = $(this);
         var isChecked = $self.is(':checked');

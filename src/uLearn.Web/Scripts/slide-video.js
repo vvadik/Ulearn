@@ -38,8 +38,12 @@
 	});
 }
 
-$(document).ready(function () {
+window.documentReadyFunctions = window.documentReadyFunctions || [];
+
+window.documentReadyFunctions.push(function () {
 	var enableYoutubeIframeApi = function() {
+		window['YT'] = undefined;
+		
 		var tag = document.createElement('script');
 		tag.src = "https://www.youtube.com/iframe_api";
 		var firstScriptTag = document.getElementsByTagName('script')[0];

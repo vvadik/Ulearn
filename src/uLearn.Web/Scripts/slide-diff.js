@@ -5,15 +5,15 @@
 	this.getEoln = function (s) {
 		var good = ["\r\n", "\n", "\r"].filter(function(eoln) { return s.indexOf(eoln) >= 0 });
 		return good.length > 0 ? good[0] : "\n";
-	}
+	};
 
 	this.split = function (s) {
 		return s.split(this.getEoln(s));
-	}
+	};
 
 	this.toString = function(s) {
 		return s === undefined ? "" : $('<div/>').text(s).html();
-	}
+	};
 
 	var actualList = this.split(actual);
 	var expectedList = this.split(expected);

@@ -8,152 +8,129 @@
 <!DOCTYPE html>
 <html>
 <head>
-    @{
-	    var metaImageUrl = "/Content/logo.png";
-	    var metaTitle = ViewBag.Title + " на ulearn.me";
-	    var metaDescription = "Интерактивные учебные онлайн-курсы по программированию";
-	    var metaKeywords = "";
-
-	    if (ViewBag.Meta != null)
-	    {
-		    if (!string.IsNullOrEmpty(ViewBag.Meta.Image)) { metaImageUrl = ViewBag.Meta.Image; }
-		    if (!string.IsNullOrEmpty(ViewBag.Meta.Description)) { metaDescription = ViewBag.Meta.Description; }
-		    if (!string.IsNullOrEmpty(ViewBag.Meta.Keywords)) { metaKeywords = ViewBag.Meta.Keywords; }
-	    }
-    }
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title &bull; ulearn</title>
-    <meta name="title" content="@metaTitle"/>
-    <meta property="og:title" content="@metaTitle"/>
-    <meta property="og:image" content="@metaImageUrl"/>
-    <meta property="og:image:alt" content="@metaDescription"/>
-    <meta property="og:description" content="@metaDescription"/>
-    <meta property="og:locale" content="ru_RU"/>
-    <meta property="og:site_name" content="Ulearn"/>
-    <meta name="description" content="@metaDescription"/>
-    <meta name="keywords" content="@metaKeywords"/>
-    <link rel="image_src" href="@metaImageUrl">
-    <link rel="shortcut icon" href="~/favicon.ico?v=4"/>
-    @Styles.Render("~/ulearn.bundle.css")
-    @Styles.Render("~/katex/katex.min.css")
     @Scripts.Render("~/modernizr.bundle.js")
     @Html.Partial("_Retargeting")
 </head>
 <body>
+
+@{
+	var metaImageUrl = "/Content/logo.png";
+	var metaTitle = ViewBag.Title + " на ulearn.me";
+	var metaDescription = "Интерактивные учебные онлайн-курсы по программированию";
+	var metaKeywords = "";
+
+	if (ViewBag.Meta != null)
+	{
+		if (!string.IsNullOrEmpty(ViewBag.Meta.Image)) { metaImageUrl = ViewBag.Meta.Image; }
+		if (!string.IsNullOrEmpty(ViewBag.Meta.Description)) { metaDescription = ViewBag.Meta.Description; }
+		if (!string.IsNullOrEmpty(ViewBag.Meta.Keywords)) { metaKeywords = ViewBag.Meta.Keywords; }
+	}
+}
+    
+<script>
+    window.meta = {
+        title: "@(metaTitle)",
+        description: "@(metaDescription)",
+        keywords: "@(metaKeywords)",
+        imageUrl: "@(metaImageUrl)"
+    }
+</script>
+
 <div id="header" class="navbar navbar-inverse navbar-fixed-top">
-	<button type="button" class="navbar-toggle hide-side-bar-button" data-toggle="collapse" data-target=".side-bar">
-		<span class="icon-bar"></span>
-		<span class="icon-bar"></span>
-		<span class="icon-bar"></span>
-	</button>
-	<div class="container">
-		<div class="navbar-header">
+    <button type="button" class="navbar-toggle hide-side-bar-button" data-toggle="collapse" data-target=".side-bar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+    </button>
+    <div class="container">
+        <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".greeting-collapse-class">
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
             <a class="navbar-brand" href="/">Ulearn</a>
-			<ul class="notifications__mobile-nav nav navbar-nav pull-right visible-xs">
-				@if (User.Identity.IsAuthenticated)
-				{
-					<li class="dropdown">
-						@Html.Action("NotificationsTopbarPartial", "Feed", new { isMobile = true })
-					</li>
-				}
-			</ul>
-		</div>
-		<ul class="notifications__mobile-dropdown notifications__dropdown navbar-collapse collapse visible-xs">
+            <ul class="notifications__mobile-nav nav navbar-nav pull-right visible-xs">
+                @if (User.Identity.IsAuthenticated)
+                {
+	                <li class="dropdown">
+                        @Html.Action("NotificationsTopbarPartial", "Feed", new { isMobile = true })
+                    </li>
+                }
+            </ul>
+        </div>
+        <ul class="notifications__mobile-dropdown notifications__dropdown navbar-collapse collapse visible-xs">
 
-		</ul>
-		<div class="greeting-collapse-class navbar-collapse collapse">
-			<ul class="top-navigation nav navbar-nav">
-				@{
-					var courseManager = WebCourseManager.Instance;
-					var coursesIds = new HashSet<string>(User.GetControllableCoursesId().Select(c => c.ToLower()));
-					var courses = courseManager.GetCourses().Where(course => coursesIds.Contains(course.Id.ToLower())).OrderBy(c => c.Title).ToList();
-				}
-				@if (User.IsSystemAdministrator())
-				{
-					<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Администрирование <span class="caret"></span></a>
-						<ul class="dropdown-menu">
-							<li>@Html.ActionLink("Пользователи", "List", "Account", new { role = LmsRoles.SysAdmin }, null)</li>
-							<li>@Html.ActionLink("Статистика", "SystemStatistics", "Analytics")</li>
+        </ul>
+        <div class="greeting-collapse-class navbar-collapse collapse">
+            <ul class="top-navigation nav navbar-nav">
+                @{
+	                var courseManager = WebCourseManager.Instance;
+	                var coursesIds = new HashSet<string>(User.GetControllableCoursesId().Select(c => c.ToLower()));
+	                var courses = courseManager.GetCourses().Where(course => coursesIds.Contains(course.Id.ToLower())).OrderBy(c => c.Title).ToList();
+                }
+                @if (User.IsSystemAdministrator())
+                {
+	                <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Администрирование <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li>@Html.ActionLink("Пользователи", "List", "Account", new { role = LmsRoles.SysAdmin }, null)</li>
+                            <li>@Html.ActionLink("Статистика", "SystemStatistics", "Analytics")</li>
                             <li>@Html.ActionLink("Песочница", "Index", "Sandbox")</li>
                             <li>@Html.ActionLink("Стилевые ошибки в C#", "StyleValidations", "Admin")</li>
-							<li class="divider"></li>
-							<li class="dropdown-header">Курсы <a href="@Url.Action("CourseList", "Admin")">создать<span class="glyphicon glyphicon-plus"></span></a></li>
-							@CoursesDropdown(courses)
-						</ul>
-					</li>
-				}
-				else if (User.HasAccess(CourseRole.Instructor))
-				{
-					<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Мои курсы <span class="caret"></span></a>
-						<ul class="dropdown-menu">
-							@CoursesDropdown(courses)
-						</ul>
-					</li>
-				}
+                            <li class="divider"></li>
+                            <li class="dropdown-header">Курсы <a href="@Url.Action("CourseList", "Admin")">создать<span class="glyphicon glyphicon-plus"></span></a></li>
+                            @CoursesDropdown(courses)
+                        </ul>
+                    </li>
+                }
+                else if (User.HasAccess(CourseRole.Instructor))
+                {
+	                <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Мои курсы <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            @CoursesDropdown(courses)
+                        </ul>
+                    </li>
+                }
 
-				@if (User.HasAccess(CourseRole.Instructor))
-				{
-					string courseId = null;
-					try
-					{
-						courseId = Html.ViewContext.RouteData.Values["courseId"].ToString();
-					}
-					catch (Exception)
-					{
-						/* RouteData has no attribute 'courseId' */
-						var controller = Html.ViewContext.RouteData.Values["controller"].ToString();
-						if ((controller == "Admin" || controller == "Analytics" || controller == "Grader" || controller == "Notifications" || controller == "Stepik" || controller == "AntiPlagiarism") &&
+                @if (User.HasAccess(CourseRole.Instructor))
+                {
+	                string courseId = null;
+	                try
+	                {
+		                courseId = Html.ViewContext.RouteData.Values["courseId"].ToString();
+	                }
+	                catch (Exception)
+	                {
+		                /* RouteData has no attribute 'courseId' */
+		                var controller = Html.ViewContext.RouteData.Values["controller"].ToString();
+		                if ((controller == "Admin" || controller == "Analytics" || controller == "Grader" || controller == "Notifications" || controller == "Stepik" || controller == "AntiPlagiarism") &&
 							Request.Params["courseId"] != null)
-						{
-							courseId = Request.Params["courseId"];
-						}
-					}
-					@Html.Action("CourseInstructorNavbar", "Course", new { courseId })
-				}
-			</ul>
-			<ul class="nav navbar-nav navbar-right">
-				@if (User.Identity.IsAuthenticated)
-				{
-					<li class="dropdown hidden-xs">
-						@Html.Action("NotificationsTopbarPartial", "Feed")
-					</li>
-				}
-				@Html.Action("UserMenuPartial", "Account")
-			</ul>
-		</div>
-	</div>
+		                {
+			                courseId = Request.Params["courseId"];
+		                }
+	                }
+	                @Html.Action("CourseInstructorNavbar", "Course", new { courseId })
+                }
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                @if (User.Identity.IsAuthenticated)
+                {
+	                <li class="dropdown hidden-xs">
+                        @Html.Action("NotificationsTopbarPartial", "Feed")
+                    </li>
+                }
+                @Html.Action("UserMenuPartial", "Account")
+            </ul>
+        </div>
+    </div>
 </div>
 @RenderBody()
 
 @Html.Action("CheckIsEmailConfirmed", "Account")
 
-@Scripts.Render("~/scripts.bundle.js")
-@* Add Sentry (https://sentry.io) script for error logging *@
-<script src="https://cdn.ravenjs.com/3.23.2/raven.min.js" crossorigin="anonymous"></script>
-<script>
-    Raven.config('https://992e1a5327ad4e48af004ae709b51aba@sentry.io/181214').install()
-</script>
-@* See https://codemirror.net/demo/merge.html for details *@ 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/diff_match_patch/20121119/diff_match_patch.js"></script>
 @RenderSection("scripts", required: false)
-
-<script>
-	$(function() {
-		$(".load-content").each(function() {
-			$(this).load($(this).data("url"));
-		});
-	});
-</script>
-
-@Html.Partial("_YandexMetrika")
 
 @if (AccountController.IsHijacked(HttpContext.Current.Request))
 {

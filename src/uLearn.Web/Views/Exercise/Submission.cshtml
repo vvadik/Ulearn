@@ -165,7 +165,7 @@
 			<img src="/Content/loading.gif"/>
 		</div>
 		<script type="text/javascript">
-			function cleanUserCode() {
+			window.cleanUserCode = function() {
 				var $secretCodeExercise = $('#secretCodeExercise');
 				$('.code-exercise')[0].codeMirrorEditor.setValue($secretCodeExercise.text());
 			}

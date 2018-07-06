@@ -67,7 +67,9 @@ function setSimpleResult($block, details) {
 	$block.show();
 }
 
-$(document).ready(function () {
+window.documentReadyFunctions = window.documentReadyFunctions || [];
+
+window.documentReadyFunctions.push(function () {
 	$('.exercise__submission').on('click', '.exercise-version-link', function (e) {
 		e.preventDefault();
 

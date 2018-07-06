@@ -25,6 +25,7 @@ using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Authorization;
 using Ulearn.Web.Api.Controllers.Notifications;
 using Ulearn.Web.Api.Models.Binders;
+using Ulearn.Web.Api.Swagger;
 using Vostok.Commons.Extensions.UnitConvertions;
 using Vostok.Hosting;
 using Vostok.Instrumentation.AspNetCore;
@@ -140,8 +141,7 @@ namespace Ulearn.Web.Api
 					options.ModelBinderProviders.Insert(0, new CourseBinderProvider());
 						
 					/* Disable model checking because in other case stack overflow raised on course model binding.
-					   See https://github.com/aspnet/Mvc/issues/7357 for details
-					*/
+					   See https://github.com/aspnet/Mvc/issues/7357 for details */
 					options.ModelMetadataDetailsProviders.Add(new SuppressChildValidationMetadataProvider(typeof(Course)));
 				}
 			);
@@ -149,7 +149,19 @@ namespace Ulearn.Web.Api
 			/* Swagger API documentation generator. See https://github.com/domaindrivendev/Swashbuckle.AspNetCore for details */
 			services.AddSwaggerGen(c =>
 			{
-				c.SwaggerDoc("v1", new Info { Title = "Ulearn API", Version = "v1" });
+				c.SwaggerDoc("v1", new Info
+				{
+					Title = "Ulearn API",
+					Version = "v1",
+					Description = "An API for ulearn.me",
+					Contact = new Contact
+					{
+						Name = "Ulearn support",
+						Email = "support@ulearn.me"
+					}
+				});
+				// c.MapType<Course>(() => new Schema {  });
+				c.OperationFilter<AuthResponsesOperationFilter>();
 			});
 
 			ConfigureAuthServices(services, configuration, logger);

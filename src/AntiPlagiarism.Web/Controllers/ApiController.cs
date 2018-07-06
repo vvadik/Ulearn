@@ -11,7 +11,6 @@ using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Database.Repos;
 using AntiPlagiarism.Web.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.Operations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Serilog;
@@ -120,7 +119,7 @@ namespace AntiPlagiarism.Web.Controllers
 		}
 
 		[HttpPost(Api.Urls.RebuildSnippetsForTask)]
-		public async Task<IActionResult> RebuildSnippetsForTask(RebuildSnippetsForTaskParameters parameters)
+		public async Task<IActionResult> RebuildSnippetsForTask([FromQuery] RebuildSnippetsForTaskParameters parameters)
 		{
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
@@ -140,7 +139,7 @@ namespace AntiPlagiarism.Web.Controllers
 		}
 
 		[HttpPost(Api.Urls.RecalculateTaskStatistics)]
-		public async Task<IActionResult> RecalculateTaskStatistics(RecalculateTaskStatisticsParameters parameters)
+		public async Task<IActionResult> RecalculateTaskStatistics([FromQuery] RecalculateTaskStatisticsParameters parameters)
 		{
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
@@ -167,7 +166,7 @@ namespace AntiPlagiarism.Web.Controllers
 		}
 
 		[HttpGet(Api.Urls.GetSubmissionPlagiarisms)]
-		public async Task<IActionResult> GetSubmissionPlagiarisms(GetSubmissionPlagiarismsParameters parameters)
+		public async Task<IActionResult> GetSubmissionPlagiarisms([FromQuery] GetSubmissionPlagiarismsParameters parameters)
 		{
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
@@ -193,7 +192,7 @@ namespace AntiPlagiarism.Web.Controllers
 		}
 
 		[HttpGet(Api.Urls.GetAuthorPlagiarisms)]
-		public async Task<IActionResult> GetAuthorPlagiarisms(GetAuthorPlagiarismsParameters parameters)
+		public async Task<IActionResult> GetAuthorPlagiarisms([FromQuery] GetAuthorPlagiarismsParameters parameters)
 		{
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);

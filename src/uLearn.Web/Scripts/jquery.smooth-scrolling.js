@@ -1,4 +1,6 @@
-﻿$(function() {
+﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
+
+window.documentReadyFunctions.push(function() {
 	$.fn.smoothScroll = function (callback, $link) {
 		var $object = this;
 		var needScroll =  $link.data('scroll') !== false;

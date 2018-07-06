@@ -10,7 +10,7 @@ namespace Ulearn.Web.Api.Models.Binders
 	/*
 	 * This class allows to pass courses to actions like
 	 * public void IActionResult GetCourseInfo(Course course) {}
-	 * and call them i.e. as /GetCourseInfo?courseId=BasicProgramming
+	 * and call them i.e. as /GetCourseInfo?courseId=BasicProgramming or /courses/BasicProgramming
 	 *
 	 * So it converts 'courseId' parameter (name can be overriden) to Course instance loaded from courseManager.
 	 * See https://docs.microsoft.com/ru-ru/aspnet/core/mvc/advanced/custom-model-binding for details

@@ -5,13 +5,13 @@ using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Database.Repos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
 
 namespace AntiPlagiarism.Web.Controllers
 {
+	[ApiController]
 	public abstract class BaseController : Controller
 	{
 		protected readonly ILogger logger;

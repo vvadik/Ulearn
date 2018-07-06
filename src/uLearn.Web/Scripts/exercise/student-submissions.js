@@ -1,4 +1,6 @@
-$(document).ready(function () {
+window.documentReadyFunctions = window.documentReadyFunctions || [];
+
+window.documentReadyFunctions.push(function () {
     var $filter = $('.student-submissions__filter');
     var $input = $filter.find('.student-submissions__filter__input');
     var $loadingIcon = $filter.find('.loading-icon');

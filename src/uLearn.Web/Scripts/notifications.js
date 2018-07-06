@@ -1,4 +1,6 @@
-﻿$(document).ready(function () {
+﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
+
+window.documentReadyFunctions.push(function () {
 	var $notificaticationsIconLink = $('.notifications__icon-link');
 	var $counter = $('.notifications__counter');
 	var $dropdownContent = $('.notifications__dropdown');

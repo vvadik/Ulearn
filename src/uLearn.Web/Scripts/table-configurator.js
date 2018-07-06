@@ -1,4 +1,6 @@
-﻿$(document).ready(function() {
+﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
+
+window.documentReadyFunctions.push(function() {
 	$('.tablesorter[data-autoload="true"]').each(function() {
 		var $self = $(this);
 		$self.tablesorter({

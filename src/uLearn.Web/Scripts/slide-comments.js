@@ -331,27 +331,29 @@ function autoEnlargeTextarea() {
         }
 	};
 
-    var $comments = $('.comments');	
+    window.documentReadyFunctions = window.documentReadyFunctions || [];
 	
-    /* Set up handlers */
-    $comments.on('click', '.reply-form input[name=commentText]', expandReplyForm);
-	$comments.on('click', '.comment .comment__likes-count', likeComment);
-	$comments.on('keyup', 'textarea[name=commentText]', onTextareaKeyUp);
-	$comments.on('blur', '.comment textarea[name=commentText]', hideCommentsRules);
-	$comments.on('blur', '.reply-form textarea[name=commentText]', hideCommentsRules);
-	$comments.on('blur', '.reply-form.is-reply textarea[name=commentText]', collapseReplyForm);
-	$comments.on('click', '.reply-form .reply-form__send-button', sendComment);
-	$comments.on('click', '.comment .comment__inline-reply', createReplyForm);
-	$comments.on('click', '.comment .comment__not-approved.label-switcher', approveComment);
-	$comments.on('click', '.comment .comment__hide-link', approveComment);
-	$comments.on('click', '.comment .comment__edit-link', editComment);
-	$comments.on('click', '.comment .comment__delete-link', deleteComment);
-	$comments.on('click', '.comment .comment__pinned.label-switcher', pinOrUnpinComment);
-	$comments.on('click', '.comment .comment__correct-answer.label-switcher', markCommentAsCorrect);
-	$comments.on('input', 'textarea[name=commentText]', autoEnlargeTextarea);
-	$comments.on('focus', 'textarea[name=commentText]', onTextareaFocus);
+    window.documentReadyFunctions.push(function () {
+        var $comments = $('.comments');
 
-	$(document).ready(function() {
-		scrollToCommentFromHash();
-	});
+        /* Set up handlers */
+        $comments.on('click', '.reply-form input[name=commentText]', expandReplyForm);
+        $comments.on('click', '.comment .comment__likes-count', likeComment);
+        $comments.on('keyup', 'textarea[name=commentText]', onTextareaKeyUp);
+        $comments.on('blur', '.comment textarea[name=commentText]', hideCommentsRules);
+        $comments.on('blur', '.reply-form textarea[name=commentText]', hideCommentsRules);
+        $comments.on('blur', '.reply-form.is-reply textarea[name=commentText]', collapseReplyForm);
+        $comments.on('click', '.reply-form .reply-form__send-button', sendComment);
+        $comments.on('click', '.comment .comment__inline-reply', createReplyForm);
+        $comments.on('click', '.comment .comment__not-approved.label-switcher', approveComment);
+        $comments.on('click', '.comment .comment__hide-link', approveComment);
+        $comments.on('click', '.comment .comment__edit-link', editComment);
+        $comments.on('click', '.comment .comment__delete-link', deleteComment);
+        $comments.on('click', '.comment .comment__pinned.label-switcher', pinOrUnpinComment);
+        $comments.on('click', '.comment .comment__correct-answer.label-switcher', markCommentAsCorrect);
+        $comments.on('input', 'textarea[name=commentText]', autoEnlargeTextarea);
+        $comments.on('focus', 'textarea[name=commentText]', onTextareaFocus);
+
+        scrollToCommentFromHash();        
+    });
 })(jQuery);

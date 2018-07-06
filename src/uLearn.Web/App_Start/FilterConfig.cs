@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -19,6 +20,13 @@ namespace uLearn.Web
 		public static void RegisterGlobalFilters(GlobalFilterCollection filters)
 		{
 			filters.Add(new HandleErrorAttribute());
+			
+			/* Next filter serves built index.html from ../Frontend/build/ (appSettings/ulearn.react.index.html).
+			   Before running this code build Frontend project via `yarn build` or `npm run build` */
+			var indexHtmlPath = WebConfigurationManager.AppSettings["ulearn.react.index.html"];
+			var appDirectory = new DirectoryInfo(Utils.GetAppPath());			
+			filters.Add(new ServeStaticFileForEveryNonAjaxRequest(appDirectory.GetFile(indexHtmlPath), new List<string> { "/elmah/", "/Certificate/" }));
+			
 			var requireHttps = Convert.ToBoolean(WebConfigurationManager.AppSettings["ulearn.requireHttps"] ?? "true");
 			if (requireHttps)
 				filters.Add(new RequireHttpsForCloudFlareAttribute());
@@ -77,9 +85,49 @@ namespace uLearn.Web
 		}
 	}
 
+	public class ServeStaticFileForEveryNonAjaxRequest : ActionFilterAttribute
+	{
+		private readonly List<string> excludedPrefixes;
+		private readonly byte[] content;
+		
+		public ServeStaticFileForEveryNonAjaxRequest(FileInfo file, List<string> excludedPrefixes)
+		{
+			this.excludedPrefixes = excludedPrefixes;
+			content = File.ReadAllBytes(file.FullName);
+		}
+		
+		public override void OnActionExecuting(ActionExecutingContext filterContext)
+		{
+			var httpContext = filterContext.RequestContext.HttpContext;
+			
+			foreach (var prefix in excludedPrefixes)
+				if (httpContext.Request.Url != null && httpContext.Request.Url.LocalPath.StartsWith(prefix))
+					return;
+			
+			var acceptHeader = httpContext.Request.Headers["Accept"];
+			if (acceptHeader.Contains("text/html") && httpContext.Request.HttpMethod == "GET")
+			{
+				filterContext.Result = new FileContentResult(content, "text/html");
+			}
+		}
+
+		public override void OnResultExecuting(ResultExecutingContext filterContext)
+		{
+			/* Add no-cache headers for correct working of react application (otherwise clicking on `back` button in browsers loads cached not-reacted version) */			
+			var cache = filterContext.HttpContext.Response.Cache;
+			cache.SetExpires(DateTime.UtcNow.AddDays(-1));
+			cache.SetValidUntilExpires(false);
+			cache.SetRevalidation(HttpCacheRevalidation.AllCaches);
+			cache.SetCacheability(HttpCacheability.NoCache);
+			cache.SetNoStore();
+			
+			base.OnResultExecuting(filterContext);
+		}
+	}
+
 	public class KonturPassportRequiredFilter : ActionFilterAttribute
 	{
-		/* If query string contains &konturPassport=true then we need to check kontur.passport login */
+		/* If query string contains &kontur=true then we need to check kontur.passport login */
 		private const string queryStringParameterName = "kontur";
 
 		private readonly ULearnUserManager userManager;
