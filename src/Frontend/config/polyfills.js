@@ -20,3 +20,8 @@ Object.assign = require('object-assign');
 if (process.env.NODE_ENV === 'test') {
   require('raf').polyfill(global);
 }
+
+// All previous code are from create-react-app. Following code adds another polyfills needed for ulearn
+Array.from = require('array-from');
+
+require('url-polyfill');
