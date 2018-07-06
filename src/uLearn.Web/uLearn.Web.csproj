@@ -608,8 +608,9 @@
     <Reference Include="System.Xml.XPath.XDocument, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Xml.XPath.XDocument.4.3.0\lib\net46\System.Xml.XPath.XDocument.dll</HintPath>
     </Reference>
-    <Reference Include="Telegram.Bot, Version=13.2.1.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Telegram.Bot.13.2.1\lib\netstandard1.1\Telegram.Bot.dll</HintPath>
+    <Reference Include="Telegram.Bot, Version=14.6.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Telegram.Bot.14.6.0\lib\net45\Telegram.Bot.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="UnidecodeSharpCore, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\packages\UnidecodeSharpCore.1.0.0\lib\netstandard1.4\UnidecodeSharpCore.dll</HintPath>
@@ -778,7 +779,7 @@
     <!-- Hack to copy Microsoft.Win32.Registry.dll. Without this Content item dll is not copying. I think it's bug
          in Framework + netstandard compatibility. Maybe it's related to https://github.com/dotnet/corefx/issues/24483 -->
     <!--<Content Include="..\packages\Microsoft.Win32.Registry.4.5.0\lib\net461\Microsoft.Win32.Registry.dll">-->
-      <!--<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>-->
+    <!--<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>-->
     <!--</Content>-->
     <Content Include="codemirror\addon\comment\comment.js" />
     <Content Include="codemirror\addon\comment\continuecomment.js" />
