@@ -90,7 +90,7 @@ class LinkClickCapturer extends Component {
     };
 
     static propTypes = {
-        exclude: PropTypes.arrayOf(PropTypes.string).isRequired()
+        exclude: PropTypes.arrayOf(PropTypes.string).isRequired
     }
 }
 
