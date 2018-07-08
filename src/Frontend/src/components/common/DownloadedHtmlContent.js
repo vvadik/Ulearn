@@ -96,7 +96,7 @@ class DownloadedHtmlContent extends Component {
             .then(response => {
                 if (response.redirected) {
                     let url = getUrlParts(response.url);
-                    this.context.router.history.replace(url.pathname);
+                    this.context.router.history.replace(url.pathname + url.search);
                     return Promise.resolve(undefined);
                 }
                 /* Process attaches: download them and return url back */
