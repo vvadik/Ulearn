@@ -104,7 +104,7 @@ namespace uLearn.Web
 				if (httpContext.Request.Url != null && httpContext.Request.Url.LocalPath.StartsWith(prefix))
 					return;
 			
-			var acceptHeader = httpContext.Request.Headers["Accept"];
+			var acceptHeader = httpContext.Request.Headers["Accept"] ?? "";
 			if (acceptHeader.Contains("text/html") && httpContext.Request.HttpMethod == "GET")
 			{
 				filterContext.Result = new FileContentResult(content, "text/html");
