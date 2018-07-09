@@ -10,12 +10,10 @@ outdatedBrowserRework({
         'Firefox': 47,
         'Opera': 45,
         'Vivaldi': 1,
-        // You could specify a version here if you still support IE in 2017.
-        // You could also instead seriously consider what you're doing with your time and budget
         'IE': 11
     },
     requireChromeOnAndroid: false,
-    isUnknownBrowserOK: false,
+    isUnknownBrowserOK: true,
     messages: {
         en: {
             outOfDate: "Your browser is out of date!",
