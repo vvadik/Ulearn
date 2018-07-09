@@ -25,9 +25,9 @@ namespace uLearn.Web.Controllers
 
 		protected readonly string secretForHashes;
 
-		protected string spamChannelId;
-		protected SpamClient spamClient;
-		protected string spamTemplateId;
+		protected readonly string spamChannelId;
+		protected readonly SpamClient spamClient;
+		protected readonly string spamTemplateId;
 
 		protected BaseUserController(ULearnDb db)
 		{

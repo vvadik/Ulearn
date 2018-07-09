@@ -87,12 +87,6 @@ namespace uLearn.Web.Controllers
 					continue;
 				}
 
-				if (!user.EmailConfirmed)
-				{
-					answer.Messages.Add(new Message($"У пользователя {user.UserName} не подтверждена электронная почта"));
-					continue;
-				}
-
 				var requestId = await requestRepo.CreateRequest(user.Id);
 
 				if (requestId == null)
