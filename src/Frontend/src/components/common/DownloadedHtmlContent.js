@@ -128,59 +128,64 @@ class DownloadedHtmlContent extends Component {
                     return;
                 }
 
-                let el = document.createElement('html');
-                el.innerHTML = data;
-                let head = el.getElementsByTagName('head')[0];
-                let body = el.getElementsByTagName('body')[0];
-
-                let links = Array.from(head.getElementsByTagName('link'));
-                let titles = head.getElementsByTagName('title');
-
-                this.setState({
-                    loading: false,
-                    body: body.innerHTML,
-                    links: links
-                });
-
-                DownloadedHtmlContent.removeStickyHeaderAndColumn();
-
-                /* Run scripts */
-                (window.documentReadyFunctions || []).forEach(f => f());
-
-                window.meta = undefined;
-                let allScriptTags = Array.from(body.getElementsByTagName('script'));
-                /* Eval embedded scripts */
-                let embeddedScripts = allScriptTags.filter(s => !s.src).map(s => s.innerHTML);
-                embeddedScripts.forEach(safeEval);
-                /* Eval remote scripts */
-                allScriptTags.filter(s => s.src).map(s => s.src).forEach(url => {
-                    fetch(url).then(r => r.text()).then(safeEval);
-                });
-
-                /* Scroll to top */
-                window.scrollTo(0, 0);
-
-                this.loadContentByClass();
-
-                let meta = window.meta || {
-                    title : titles ? titles[0].innerText : 'Ulearn',
-                    description: 'Интерактивные учебные онлайн-курсы по программированию',
-                    keywords: '',
-                    imageUrl: '',
-                };
-                this.setState(s => {
-                    s.loading = false;
-                    s.meta = meta;
-                    return s;
-                });
-
-                this.lastRenderedUrl = url;
-                DownloadedHtmlContent.removeBootstrapModalBackdrop();
+                this.processNewHtmlContent(url, data);
             }).catch(function(error) {
                 console.error(error);
                 /* Retry after timeout */
                 setTimeout(() => self.fetchContentFromServer(url), 5000);
             });
+    }
+
+    processNewHtmlContent(url, data) {
+        let el = document.createElement('html');
+        el.innerHTML = data;
+        let head = el.getElementsByTagName('head')[0];
+        let body = el.getElementsByTagName('body')[0];
+
+        let links = Array.from(head.getElementsByTagName('link'));
+        let titles = head.getElementsByTagName('title');
+
+        this.setState({
+            loading: false,
+            body: body.innerHTML,
+            links: links
+        });
+
+        DownloadedHtmlContent.removeStickyHeaderAndColumn();
+
+        /* Run scripts */
+        (window.documentReadyFunctions || []).forEach(f => f());
+
+        window.meta = undefined;
+        let allScriptTags = Array.from(body.getElementsByTagName('script'));
+        /* Eval embedded scripts */
+        let embeddedScripts = allScriptTags.filter(s => !s.src).map(s => s.innerHTML);
+        embeddedScripts.forEach(safeEval);
+        /* Eval remote scripts */
+        allScriptTags.filter(s => s.src).map(s => s.src).forEach(url => {
+            fetch(url).then(r => r.text()).then(safeEval);
+        });
+
+        /* Scroll to top */
+        window.scrollTo(0, 0);
+
+        this.loadContentByClass();
+        this.setPostFormSubmitHandler();
+
+        let meta = window.meta || {
+            title: titles ? titles[0].innerText : 'Ulearn',
+            description: 'Интерактивные учебные онлайн-курсы по программированию',
+            keywords: '',
+            imageUrl: '',
+        };
+        this.setState(s => {
+            s.loading = false;
+            s.meta = meta;
+            return s;
+        });
+
+        this.lastRenderedUrl = url;
+        DownloadedHtmlContent.removeBootstrapModalBackdrop();
     }
 
     downloadFile(blob, filename) {
@@ -221,6 +226,48 @@ class DownloadedHtmlContent extends Component {
                 e.innerHTML = data;
                 let scripts = Array.from(e.getElementsByTagName('script'));
                 scripts.filter(s => ! s.src).forEach(s => safeEval(s.innerHTML));
+            });
+        });
+    }
+
+    setPostFormSubmitHandler() {
+        let exceptions = ["/Login/ExternalLogin"];
+
+        let forms = Array.from(document.body.getElementsByTagName('form'));
+        let postForms = forms.filter(f => f.method.toLowerCase() === 'post' && ! f.onsubmit && f.action);
+        console.log('Found forms with method="POST" ad without onsubmit:', postForms);
+        postForms.forEach(f => {
+            let url = f.action;
+            if (exceptions.some(e => getUrlParts(url).pathname.startsWith(e)))
+                return;
+
+            f.addEventListener('submit', e => {
+                e.preventDefault();
+                console.log('Catched submit event', e);
+
+                /* Add button's data to form data */
+
+                let formData = new FormData(f);
+                let button = document.activeElement;
+                if (button && button.name && button.value)
+                    formData.append(button.name, button.value);
+
+                fetch(url, {
+                    method: 'POST',
+                    credentials: 'include',
+                    body: formData
+                }).then(response => {
+                    if (response.redirected) {
+                        let url = getUrlParts(response.url);
+                        this.context.router.history.replace(url.pathname + url.search);
+                        return Promise.resolve(undefined);
+                    }
+                    return response.text()
+                }).then(data => {
+                    if (typeof data === 'undefined')
+                        return;
+                    this.processNewHtmlContent(url, data)
+                })
             });
         });
     }
