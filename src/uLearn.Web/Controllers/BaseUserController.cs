@@ -68,7 +68,7 @@ namespace uLearn.Web.Controllers
 		protected async Task<bool> SendConfirmationEmail(ApplicationUser user)
 		{
 			metricSender.SendCount("email_confirmation.send_confirmation_email.try");
-			var confirmationUrl = Url.Action("ConfirmEmail", "Account", new { email = user.Email, signature = GetEmailConfirmationSignature(user.Email) }, "https");
+			var confirmationUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, email = user.Email, signature = GetEmailConfirmationSignature(user.Email) }, "https");
 			var subject = "Подтверждение адреса";
 
 			var messageInfo = new MessageSentInfo

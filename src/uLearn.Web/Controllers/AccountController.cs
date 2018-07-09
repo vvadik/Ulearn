@@ -623,12 +623,16 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Manage", new { Message = ManageMessageId.TelegramAdded });
 		}
 
-		public async Task<ActionResult> ConfirmEmail(string email, string signature)
+		[AllowAnonymous]
+		public async Task<ActionResult> ConfirmEmail(string email, string signature, string userId="")
 		{
 			metricSender.SendCount("email_confirmation.go_by_link_from_email");
 
-			var userId = User.Identity.GetUserId();
-			var user = await userManager.FindByIdAsync(userId);
+			var realUserId = string.IsNullOrEmpty(userId) ? User.Identity.GetUserId() : userId;
+			if (string.IsNullOrEmpty(realUserId))
+				return HttpNotFound();
+			
+			var user = await userManager.FindByIdAsync(realUserId);
 			if (user.Email != email || user.EmailConfirmed)
 				return RedirectToAction("Manage", new { Message = ManageMessageId.EmailAlreadyConfirmed });
 
@@ -639,11 +643,11 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("Manage", new { Message = ManageMessageId.ErrorOccured });
 			}
 
-			await usersRepo.ConfirmEmail(userId);
+			await usersRepo.ConfirmEmail(realUserId);
 			metricSender.SendCount("email_confirmation.confirmed");
 
 			/* Enable notification transport if it exists or create auto-enabled mail notification transport */
-			var mailNotificationTransport = notificationsRepo.FindUsersNotificationTransport<MailNotificationTransport>(userId, includeDisabled: true);
+			var mailNotificationTransport = notificationsRepo.FindUsersNotificationTransport<MailNotificationTransport>(realUserId, includeDisabled: true);
 			if (mailNotificationTransport != null)
 				await notificationsRepo.EnableNotificationTransport(mailNotificationTransport.Id);
 			else
