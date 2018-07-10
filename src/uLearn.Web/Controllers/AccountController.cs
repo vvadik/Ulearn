@@ -13,6 +13,7 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using Microsoft.AspNet.Identity;
+using Microsoft.Owin.Security.Cookies;
 using uLearn.Configuration;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
@@ -36,12 +37,13 @@ namespace uLearn.Web.Controllers
 		private readonly SystemAccessesRepo systemAccessesRepo;
 
 		private readonly string telegramSecret;
+		private static readonly WebApiConfiguration configuration;		
 
 		private static readonly List<string> hijackCookies = new List<string>();
 
 		static AccountController()
 		{
-			var configuration = ApplicationConfiguration.Read<WebApiConfiguration>();
+			configuration = ApplicationConfiguration.Read<WebApiConfiguration>();
 			hijackCookies.Add(configuration.Web.CookieName);
 		}
 
@@ -758,10 +760,21 @@ namespace uLearn.Web.Controllers
 				if (cookie == null)
 					continue;
 
-				response.Cookies.Add(new HttpCookie(newCookie(cookieName), cookie.Value) { HttpOnly = true });
+				response.Cookies.Add(new HttpCookie(newCookie(cookieName), cookie.Value)
+				{
+					HttpOnly = true,
+					Domain = configuration.Web.CookieDomain,
+					Secure = configuration.Web.CookieSecure 
+				});
 				
 				if (removeOld)
-					response.Cookies.Add(new HttpCookie(actualCookie(cookieName), "") { HttpOnly = true, Expires = DateTime.Now.AddDays(-1)});
+					response.Cookies.Add(new HttpCookie(actualCookie(cookieName), "")
+					{
+						HttpOnly = true,
+						Expires = DateTime.Now.AddDays(-1),
+						Domain = configuration.Web.CookieDomain,
+						Secure = configuration.Web.CookieSecure
+					});
 			}
 		}
 
