@@ -645,8 +645,13 @@ namespace uLearn.Web.Controllers
 			var realUserId = string.IsNullOrEmpty(userId) ? User.Identity.GetUserId() : userId;
 			if (string.IsNullOrEmpty(realUserId))
 				return HttpNotFound();
-			
+
 			var user = await userManager.FindByIdAsync(realUserId);
+			if (!User.Identity.IsAuthenticated || User.Identity.GetUserId() != realUserId)
+			{
+				await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: false);
+			}
+			
 			if (user.Email != email || user.EmailConfirmed)
 				return RedirectToAction("Manage", new { Message = ManageMessageId.EmailAlreadyConfirmed });
 
