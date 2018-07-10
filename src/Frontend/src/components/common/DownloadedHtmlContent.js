@@ -231,7 +231,7 @@ class DownloadedHtmlContent extends Component {
     }
 
     setPostFormSubmitHandler() {
-        let exceptions = ["/Login/ExternalLogin"];
+        let exceptions = ["/Login/ExternalLogin", "/Login/DoLinkLogin"];
 
         let forms = Array.from(document.body.getElementsByTagName('form'));
         let postForms = forms.filter(f => f.method.toLowerCase() === 'post' && ! f.onsubmit && f.action);
