@@ -395,15 +395,16 @@ namespace uLearn.Web.Controllers
 					}
 					this.AddErrors(result);
 				}
+				else
+				{
+					ModelState.AddModelError("", "Есть ошибки, давай поправим");
+				}
 			}
 			else
 			{
 				// User does not have a password so remove any validation errors caused by a missing OldPassword field
 				var state = ModelState["OldPassword"];
-				if (state != null)
-				{
-					state.Errors.Clear();
-				}
+				state?.Errors.Clear();
 
 				if (ModelState.IsValid)
 				{
@@ -413,6 +414,10 @@ namespace uLearn.Web.Controllers
 						return RedirectToAction("Manage", new { Message = ManageMessageId.PasswordSet });
 					}
 					this.AddErrors(result);
+				}
+				else
+				{
+					ModelState.AddModelError("", "Есть ошибки, давай поправим");
 				}
 			}
 
@@ -471,7 +476,7 @@ namespace uLearn.Web.Controllers
 
 		public enum ManageMessageId
 		{
-			[Display(Name = "Пароль был изменен")]
+			[Display(Name = "Пароль изменён")]
 			PasswordChanged,
 
 			[Display(Name = "Пароль установлен")]
@@ -538,6 +543,13 @@ namespace uLearn.Web.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<ActionResult> ChangeDetailsPartial(UserViewModel userModel)
 		{
+			if (userModel.Render)
+			{
+				ModelState.Clear();
+				
+				return ChangeDetailsPartial();
+			}
+			
 			if (string.IsNullOrEmpty(userModel.Name))
 			{
 				return RedirectToAction("Manage", new { Message = ManageMessageId.NotAllFieldsFilled });

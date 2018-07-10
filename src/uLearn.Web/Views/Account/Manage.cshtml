@@ -18,7 +18,7 @@
 				</div>
 			</div>
 
-			@Html.Action("ChangeDetailsPartial")
+			@Html.Action("ChangeDetailsPartial", new UserViewModel { Render = true })
 			@if (ViewBag.HasLocalPassword)
 			{
 				@Html.Partial("_ChangePasswordPartial")

@@ -158,6 +158,9 @@ namespace uLearn.Web.Models
 		[Required(ErrorMessage = "Укажите адрес электронной почты")]
 		[EmailAddress(ErrorMessage = "Не похоже на электронную почту")]
 		public string Email { get; set; }
+
+		/* Field for prevent error handling in AccountController.ChangeDetailsPassword() */
+		public bool Render { get; set; } = false;
 	}
 
 	public class LtiUserViewModel
