@@ -1,3 +1,176 @@
+@headerHeight: 50px;
+
 .header {
-    background-color: red;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background-color: white;
+    margin-bottom: 10px;
+    font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+    font-size: 14px;
+    color: #333;
+    height: @headerHeight;
+    box-shadow: 0 0 7px 4px #ccc;
+
+    > * {
+        display: inline-block;
+        vertical-align: top;
+        height: @headerHeight;
+    }
+
+    .header__logo {
+        color: #3072C4;
+        font-size: 18px;        
+        
+        a {
+            display: inline-block;
+            padding: 11px 20px 15px 30px;
+            
+            &:hover, &:active, &:focus {
+                text-decoration: none;
+            }
+        }        
+    }
+
+    .header__course-menu,
+    .header__sysadmin-menu,
+    .header__my-courses-menu {
+        > * {
+            display: inline-block;
+            vertical-align: top;
+            height: @headerHeight;
+        }
+
+        .caption {
+            display: inline-block;
+            color: #666;
+            border-color: #666;
+            height: @headerHeight;
+            padding: 14px 10px;
+
+            &:hover, &:focus, &:active {
+                text-decoration: none;
+            }
+
+            &:hover {
+                background-color: #f2f2f2;
+                cursor: pointer;
+            }
+        }
+    }
+
+    .header__menu {
+        position: fixed;
+        right: 0;
+        color: #666;
+
+        > * {
+            display: inline-block;
+            vertical-align: top;
+            height: @headerHeight;
+        }
+
+        a {
+            color: #666;
+            border-color: #666;
+            height: @headerHeight;
+
+            &:hover, &:focus, &:active {
+                text-decoration: none;
+            }
+
+            &:hover {
+                background-color: #f2f2f2;
+            }
+        }
+
+        .header__notifications-icon {
+            padding: 11px 0 11px 18px;
+
+            .icon {
+                font-size: 20px;
+            }
+
+            .counter {
+                background-color: #F69C00;
+                color: white;
+                width: 18px;
+                height: 18px;
+                display: inline-block;
+                text-align: center;
+                border-radius: 9px;
+                font-size: 11px;
+                position: relative;
+                top: -10px;
+                left: -11px;
+                padding-top: 1px;
+            }
+
+            &.without-counter {
+                padding-right: 18px;
+            }
+
+            &:hover {
+                background-color: #f2f2f2;
+                cursor: pointer;
+            }
+        }
+
+        .opened > .header__notifications-icon {
+            background-color: #f2f2f2;
+            cursor: pointer;
+        }
+
+        .header__profile-link {
+            .icon {
+                margin-right: 6px;
+                font-size: 20px;
+            }
+
+            > a {
+                display: inline-block;
+                padding: 11px 15px;
+
+                > * {
+                    vertical-align: middle;
+                }
+            }
+        }
+
+        .header__logout-link,
+        .header__login-link,
+        .header__registration-link {
+            > a {
+                display: inline-block;
+                padding: 15px 30px 13px 15px;
+            }
+        }
+
+        .header__registration-link > a {
+            padding-right: 15px;
+        }
+    }
+
+    .header__separator {
+        @margin: 10px;
+        width: 0;
+        height: (@headerHeight - 2 * @margin);
+        border-left: 2px solid #eee;
+        margin-top: @margin;
+        margin-bottom: @margin;
+    }
+}
+
+.dropdown-container {
+    background-color: white;
+    border: 1px solid #d5d5d5;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    min-width: 400px;
+    min-height: 90px;
+}
+
+.notifications__dropdown {
+    list-style: none;
 }

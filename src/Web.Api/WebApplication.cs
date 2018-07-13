@@ -74,6 +74,14 @@ namespace Ulearn.Web.Api
                     if (env.IsDevelopment())
                         app.UseDeveloperExceptionPage();
 					
+					/* Add CORS. Should be before app.UseMvc() */
+					app.UseCors(builder =>
+					{
+						builder
+							.WithOrigins("http://localhost:3000", "https://localhost:44300")
+							.AllowCredentials();
+					});
+					
 					app.UseAuthentication();
 					app.UseMvc();
 					
@@ -163,6 +171,9 @@ namespace Ulearn.Web.Api
 				// c.MapType<Course>(() => new Schema {  });
 				c.OperationFilter<AuthResponsesOperationFilter>();
 			});
+			
+			/* Add CORS */
+			services.AddCors();
 
 			ConfigureAuthServices(services, configuration, logger);
 		}

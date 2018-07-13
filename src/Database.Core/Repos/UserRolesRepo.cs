@@ -15,15 +15,15 @@ namespace Database.Repos
 			this.db = db;
 		}
 			
-		public Dictionary<string, CourseRole> GetRoles(string userId)
+		public Task<Dictionary<string, CourseRole>> GetRolesAsync(string userId)
 		{
 			return db.UserRoles
 				.Where(role => role.UserId == userId)
 				.GroupBy(role => role.CourseId)
-				.ToDictionary(g => g.Key, g => g.Select(role => role.Role).Min());
+				.ToDictionaryAsync(g => g.Key, g => g.Select(role => role.Role).Min());
 		}
 
-		public async Task<bool> ToggleRole(string courseId, string userId, CourseRole role)
+		public async Task<bool> ToggleRoleAsync(string courseId, string userId, CourseRole role)
 		{
 			var userRole = db.UserRoles.FirstOrDefault(u => u.UserId == userId && u.Role == role && u.CourseId == courseId);
 			if (userRole == null)
