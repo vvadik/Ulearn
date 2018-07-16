@@ -60,7 +60,7 @@ class AbstractMyCoursesMenu extends Component {
         const courseById = this.props.courses.courseById;
         courseIds.sort((a, b) => courseById[a].title.localeCompare(courseById[b].title));
         let visibleCourseIds = courseIds.slice(0, this.VISIBLE_COURSES_COUNT);
-        let items = visibleCourseIds.map(courseId =>
+        let items = visibleCourseIds.filter(courseId => courseById.hasOwnProperty(courseId)).map(courseId =>
             <MenuItem href={"/Course/" + courseId } key={courseId}>{ courseById[courseId].title }</MenuItem>
         );
         if (courseById.length > visibleCourseIds.length)
