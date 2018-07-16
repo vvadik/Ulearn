@@ -4,6 +4,7 @@ import Loader from "@skbkontur/react-ui/Loader"
 import * as PropTypes from "prop-types";
 import { saveAs } from "file-saver";
 import { connect } from "react-redux"
+import api from "../../api"
 
 
 function getUrlParts(url) {
@@ -296,8 +297,13 @@ class DownloadedHtmlContent extends Component {
                     body: formData
                 }).then(response => {
                     if (response.redirected) {
-                        let url = getUrlParts(response.url);
-                        this.context.router.history.replace(url.pathname + url.search);
+                        /* If it was the login form, then update user information in header */
+                        let oldUrlPathname = getUrlParts(url).pathname;
+                        if (oldUrlPathname.startsWith('/Login') || oldUrlPathname.startsWith('/Account/Register'))
+                            this.props.updateUserInformation();
+
+                        let newUrl = getUrlParts(response.url);
+                        this.context.router.history.replace(newUrl.pathname + newUrl.search);
                         return Promise.resolve(undefined);
                     }
                     return response.text()
@@ -319,7 +325,8 @@ class DownloadedHtmlContent extends Component {
             enterToCourse: (courseId) => dispatch({
                 type: 'COURSES__COURSE_ENTERED',
                 courseId: courseId
-            })
+            }),
+            updateUserInformation: () => dispatch(api.account.getCurrentUser())
         }
     }
 

@@ -23,6 +23,13 @@ function account(state = initialAccountState, action) {
                 isSystemAdministrator: action.isSystemAdministrator,
                 roleByCourse: action.roleByCourse
             };
+        case 'ACCOUNT__USER_LOGOUTED':
+            return {
+                ...state,
+                isAuthenticated: false,
+                isSystemAdministrator: false,
+                roleByCourse: {}
+            }
         default:
             return state;
     }

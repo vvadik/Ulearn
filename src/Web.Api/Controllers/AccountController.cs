@@ -5,6 +5,7 @@ using Database.Extensions;
 using Database.Models;
 using Database.Repos;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Ulearn.Common.Extensions;
@@ -16,12 +17,14 @@ namespace Ulearn.Web.Api.Controllers
 	public class AccountController : BaseController
 	{
 		private readonly UlearnUserManager userManager;
+		private readonly SignInManager<ApplicationUser> signInManager;
 		private readonly UserRolesRepo userRolesRepo;
 
-		public AccountController(ILogger logger, WebCourseManager courseManager, UlearnDb db, UlearnUserManager userManager, UserRolesRepo userRolesRepo)
+		public AccountController(ILogger logger, WebCourseManager courseManager, UlearnDb db, UlearnUserManager userManager, SignInManager<ApplicationUser> signInManager, UserRolesRepo userRolesRepo)
 			: base(logger, courseManager, db)
 		{
 			this.userManager = userManager;
+			this.signInManager = signInManager;
 			this.userRolesRepo = userRolesRepo;
 		}
 
@@ -54,6 +57,17 @@ namespace Ulearn.Web.Api.Controllers
 					CourseId = kvp.Key,
 					Role = kvp.Value,
 				}).ToList(),
+			});
+		}
+
+		[HttpPost("logout")]
+		[Authorize]
+		public async Task<IActionResult> Logout()
+		{
+			await signInManager.SignOutAsync().ConfigureAwait(false);
+			return Json(new LogoutResponse
+			{
+				Logout = true
 			});
 		}
 	}

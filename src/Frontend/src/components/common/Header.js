@@ -8,6 +8,7 @@ import DropdownContainer from "@skbkontur/react-ui/components/DropdownContainer/
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import { findDOMNode } from "react-dom"
+import api from "../../api"
 
 import './Header.less'
 
@@ -343,10 +344,31 @@ class Separator extends Component {
 }
 
 class LogoutLink extends Component {
+    constructor(props) {
+        super(props);
+        this.onClick = this.onClick.bind(this);
+    }
+
+    onClick() {
+        this.props.logout();
+    }
+
     render() {
-        return <div className="header__logout-link"><a href="#">Выйти</a></div>
+        return <div className="header__logout-link"><a href="#" onClick={ this.onClick }>Выйти</a></div>
+    }
+
+    static mapStateToProps(state) {
+        return {};
+    }
+
+    static mapDispatchToProps(dispatch) {
+        return {
+            logout: () => dispatch(api.account.logout())
+        };
     }
 }
+
+LogoutLink = connect(LogoutLink.mapStateToProps, LogoutLink.mapDispatchToProps)(LogoutLink);
 
 class RegistrationLink extends Component {
     render() {

@@ -41,3 +41,16 @@ export function getRoles() {
             })
     }
 }
+
+export function logout() {
+    return dispatch => {
+        return fetch(config.api.endpoint + 'account/logout', { credentials: 'include', method: 'POST' })
+            .then(response => response.json())
+            .then(json => {
+                if (json.logout)
+                    dispatch({
+                        type: 'ACCOUNT__USER_LOGOUTED',
+                    });
+            })
+    }
+}
