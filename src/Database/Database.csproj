@@ -691,6 +691,10 @@
     <Compile Include="Migrations\201806150221500_RenameColumnsForEfCoreCompatibility.Designer.cs">
       <DependentUpon>201806150221500_RenameColumnsForEfCoreCompatibility.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201807161240491_AddIndexToVisitsWithIncludeUser.cs" />
+    <Compile Include="Migrations\201807161240491_AddIndexToVisitsWithIncludeUser.Designer.cs">
+      <DependentUpon>201807161240491_AddIndexToVisitsWithIncludeUser.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -1068,6 +1072,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201806150221500_RenameColumnsForEfCoreCompatibility.resx">
       <DependentUpon>201806150221500_RenameColumnsForEfCoreCompatibility.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201807161240491_AddIndexToVisitsWithIncludeUser.resx">
+      <DependentUpon>201807161240491_AddIndexToVisitsWithIncludeUser.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

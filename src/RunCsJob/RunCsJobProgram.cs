@@ -19,7 +19,6 @@ namespace RunCsJob
 		private readonly string address;
 		private readonly string token;
 		private readonly TimeSpan sleep;
-		private readonly int jobsToRequest;
 		private readonly string agentName; 
 
 		private readonly ManualResetEvent shutdownEvent = new ManualResetEvent(false);
@@ -38,7 +37,6 @@ namespace RunCsJob
 				address = ConfigurationManager.AppSettings["submissionsUrl"];
 				token = ConfigurationManager.AppSettings["runnerToken"];
 				sleep = TimeSpan.FromSeconds(int.Parse(ConfigurationManager.AppSettings["sleepSeconds"] ?? "1"));
-				jobsToRequest = int.Parse(ConfigurationManager.AppSettings["jobsToRequest"] ?? "5");
 				var deleteSubmissions = bool.Parse(ConfigurationManager.AppSettings["ulearn.runcsjob.deleteSubmissions"] ?? "true");
 				Settings = new SandboxRunnerSettings
 				{
@@ -159,7 +157,7 @@ namespace RunCsJob
 				List<RunnerSubmission> newUnhandled;
 				try
 				{
-					newUnhandled = client.TryGetSubmissions(jobsToRequest).Result;
+					newUnhandled = client.TryGetSubmission().Result;
 				}
 				catch (Exception e)
 				{

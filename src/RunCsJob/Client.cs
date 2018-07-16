@@ -44,19 +44,19 @@ namespace RunCsJob
 			this.agentName = agentName;
 		}
 
-		public async Task<List<RunnerSubmission>> TryGetSubmissions(int threadsCount)
+		public async Task<List<RunnerSubmission>> TryGetSubmission()
 		{
-			var uri = GetUri("GetSubmissions", new [] {"language", SubmissionLanguage.CSharp.ToString("g")}, new [] {"count", threadsCount.ToString(CultureInfo.InvariantCulture)});
+			var uri = GetUri("GetSubmissions", new [] {"language", SubmissionLanguage.CSharp.ToString("g")});
 			try
 			{
 				log.Info($"Отправляю запрос на {uri}");
-				var response = await httpClient.GetAsync(uri);
+				var response = await httpClient.GetAsync(uri).ConfigureAwait(false);
 				log.Info($"Получил ответ, код {(int) response.StatusCode} {response.StatusCode}, читаю содержимое");
 				if (response.IsSuccessStatusCode)
-					return await response.Content.ReadAsJsonAsync<List<RunnerSubmission>>(JsonConfig.GetSettings());
+					return await response.Content.ReadAsJsonAsync<List<RunnerSubmission>>(JsonConfig.GetSettings()).ConfigureAwait(false);
 				else
 				{
-					var text = await response.Content.ReadAsStringAsync();
+					var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 					log.Error($"StatusCode {response.StatusCode}\n{text}");
 				}
 			}
