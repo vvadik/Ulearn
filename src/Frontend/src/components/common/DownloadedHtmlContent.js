@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet";
 import Loader from "@skbkontur/react-ui/Loader"
 import * as PropTypes from "prop-types";
 import { saveAs } from "file-saver";
+import { connect } from "react-redux"
 
 
 function getUrlParts(url) {
@@ -92,6 +93,10 @@ class DownloadedHtmlContent extends Component {
 
     fetchContentFromServer(url) {
         const self = this;
+
+        let courseId = this._getCourseIdFromUrl();
+        this.props.enterToCourse(courseId);
+
         fetch(this.BASE_URL + url, {credentials: 'include'})
             .then(response => {
                 if (response.redirected) {
@@ -137,6 +142,10 @@ class DownloadedHtmlContent extends Component {
     }
 
     processNewHtmlContent(url, data) {
+        /* In case if we haven't do it yet, get courseId from URL now */
+        let courseId = this._getCourseIdFromUrl();
+        this.props.enterToCourse(courseId);
+
         let el = document.createElement('html');
         el.innerHTML = data;
         let head = el.getElementsByTagName('head')[0];
@@ -186,6 +195,35 @@ class DownloadedHtmlContent extends Component {
 
         this.lastRenderedUrl = url;
         DownloadedHtmlContent.removeBootstrapModalBackdrop();
+    }
+
+    _getQueryStringParameter(name, url) {
+        if (!url)
+            url = window.location.href;
+        name = name.replace(/[\[\]]/g, '\\$&');
+        const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+        const results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    }
+
+    _getCourseIdFromUrl() {
+        /* 1. Extract courseId from urls like /Course/<courseId/... */
+        const pathname = window.location.pathname;
+        if (pathname.startsWith('/Course/')) {
+            const regex = new RegExp('/Course/([^/]+)(/|$)');
+            const results = regex.exec(pathname);
+            return results[1];
+        }
+
+        /* 2. Extract courseId from query string: ?courseId=BasicProgramming */
+        const courseIdFromQueryString = this._getQueryStringParameter("courseId");
+        if (courseIdFromQueryString)
+            return courseIdFromQueryString;
+
+        /* 3. Return undefined if courseId is not found */
+        return undefined;
     }
 
     downloadFile(blob, filename) {
@@ -272,6 +310,19 @@ class DownloadedHtmlContent extends Component {
         });
     }
 
+    static mapStateToProps(state) {
+        return {};
+    }
+
+    static mapDispatchToProps(dispatch) {
+        return {
+            enterToCourse: (courseId) => dispatch({
+                type: 'COURSES__COURSE_ENTERED',
+                courseId: courseId
+            })
+        }
+    }
+
     static contextTypes = {
         router: PropTypes.shape({
             history: PropTypes.shape({
@@ -320,4 +371,4 @@ class Meta extends Component {
     }
 }
 
-export default DownloadedHtmlContent;
+export default connect(DownloadedHtmlContent.mapStateToProps, DownloadedHtmlContent.mapDispatchToProps)(DownloadedHtmlContent);

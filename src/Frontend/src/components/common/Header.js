@@ -30,10 +30,17 @@ class Header extends Component {
                 <Logo>Ulearn.me</Logo>
                 { this.props.account.isSystemAdministrator && <SysAdminMenu controllableCourseIds={controllableCourseIds}/> }
                 { ! this.props.account.isSystemAdministrator && controllableCourseIds.length > 0 && <MyCoursesMenu controllableCourseIds={controllableCourseIds}/>}
-                <CourseMenu courseId="BasicProgramming"/>
+                { this.props.courses && this.props.courses.currentCourseId && <CourseMenu courseId={ this.props.courses.currentCourseId }/> }
                 <Menu account={this.props.account}/>
             </div>
         )
+    }
+
+    static mapStateToProps(state) {
+        return {
+            account: state.account,
+            courses: state.courses,
+        }
     }
 
     static propTypes = {
@@ -150,7 +157,7 @@ class CourseMenu extends Component {
 
     static propTypes = {
         courseId: PropTypes.string.isRequired,
-        courses: PropTypes.shape().isRequired
+        courses: PropTypes.shape()
     };
 
     static mapStateToProps(state) {
@@ -359,10 +366,4 @@ class LoginLink extends Component {
     }
 }
 
-function mapStateToProps(state) {
-    return {
-        account: state.account,
-    }
-}
-
-export default connect(mapStateToProps)(Header);
+export default connect(Header.mapStateToProps)(Header);

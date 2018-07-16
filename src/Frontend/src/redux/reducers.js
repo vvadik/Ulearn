@@ -29,7 +29,8 @@ function account(state = initialAccountState, action) {
 }
 
 const initialCoursesState = {
-    courseById: {}
+    courseById: {},
+    currentCourseId: undefined,
 };
 
 function courses(state = initialCoursesState, action) {
@@ -38,6 +39,11 @@ function courses(state = initialCoursesState, action) {
             return {
                 ...state,
                 courseById: action.courseById
+            };
+        case 'COURSES__COURSE_ENTERED':
+            return {
+                ...state,
+                currentCourseId: action.courseId
             };
         default:
             return state;
