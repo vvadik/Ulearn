@@ -60,7 +60,7 @@ namespace uLearn.Web.Controllers
 
 		[System.Web.Http.HttpGet]
 		[System.Web.Http.Route("GetSubmissions")]
-		public async Task<List<RunnerSubmission>> GetSubmissions([FromUri] string token, [FromUri] int count, [FromUri] string language, [FromUri] string agent = "")
+		public async Task<List<RunnerSubmission>> GetSubmissions([FromUri] string token, [FromUri] string language, [FromUri] string agent = "")
 		{
 			CheckRunner(token);			
 			
@@ -71,17 +71,16 @@ namespace uLearn.Web.Controllers
 			while (true)
 			{
 				var repo = new UserSolutionsRepo(new ULearnDb(), courseManager);
-				var submissions = await repo.GetUnhandledSubmissions(count, agent, submissionLanguage);
-				if (submissions.Any() || sw.Elapsed > TimeSpan.FromSeconds(15))
+				var submission = await repo.GetUnhandledSubmission(agent, submissionLanguage);
+				if (submission != null || sw.Elapsed > TimeSpan.FromSeconds(15))
 				{
-					var submissionIds = string.Join(",", submissions.Select(c => c.Id));
-					if (submissions.Any())
-						log.Info($"Отдаю на проверку решения: [{submissionIds}], агент {agent}, только сначала соберу их");
+					if (submission != null)
+						log.Info($"Отдаю на проверку решение: [{submission.Id}], агент {agent}, только сначала соберу их");
+					else
+						return new List<RunnerSubmission>();
 
-
-					var builtSubmissions = submissions.Select(ToRunnerSubmission).ToList();
-					if (submissions.Any())
-						log.Info($"Собрал решения: [{submissionIds}], отдаю их агенту {agent}");
+					var builtSubmissions = new List<RunnerSubmission> { ToRunnerSubmission(submission) };
+					log.Info($"Собрал решения: [{submission.Id}], отдаю их агенту {agent}");
 					return builtSubmissions;
 				}
 

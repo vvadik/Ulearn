@@ -314,68 +314,71 @@ namespace Database.DataContexts
 			return submission;
 		}
 
-		private static volatile SemaphoreSlim getSubmissionsSemaphore = new SemaphoreSlim(1);
+		private static volatile SemaphoreSlim getSubmissionSemaphore = new SemaphoreSlim(1);
 
-		public async Task<List<UserExerciseSubmission>> GetUnhandledSubmissions(int count, string agentName, SubmissionLanguage language)
+		public async Task<UserExerciseSubmission> GetUnhandledSubmission(string agentName, SubmissionLanguage language)
 		{
-			log.Info("GetUnhandledSubmissions(): trying to acquire semaphore");
-			var semaphoreLocked = await getSubmissionsSemaphore.WaitAsync(TimeSpan.FromSeconds(2));
+			log.Info("GetUnhandledSubmission(): trying to acquire semaphore");
+			var semaphoreLocked = await getSubmissionSemaphore.WaitAsync(TimeSpan.FromSeconds(2));
 			if (!semaphoreLocked)
 			{
-				log.Error("GetUnhandledSubmissions(): Can't lock semaphore for 2 seconds");
-				return new List<UserExerciseSubmission>();
+				log.Error("GetUnhandledSubmission(): Can't lock semaphore for 2 seconds");
+				return null;
 			}
-			log.Info("GetUnhandledSubmissions(): semaphore acquired!");
+			log.Info("GetUnhandledSubmission(): semaphore acquired!");
 
 			try
 			{
-				return await TryGetExerciseSubmissions(count, agentName, language);
+				return await TryGetExerciseSubmission(agentName, language);
 			}
 			catch (Exception e)
 			{
-				log.Error("GetUnhandledSubmissions() error", e);
-				return new List<UserExerciseSubmission>();
+				log.Error("GetUnhandledSubmission() error", e);
+				return null;
 			}
 			finally
 			{
-				log.Info("GetUnhandledSubmissions(): trying to release semaphore");
-				getSubmissionsSemaphore.Release();
-				log.Info("GetUnhandledSubmissions(): semaphore released");
+				log.Info("GetUnhandledSubmission(): trying to release semaphore");
+				getSubmissionSemaphore.Release();
+				log.Info("GetUnhandledSubmission(): semaphore released");
 			}
 		}
 
-		private async Task<List<UserExerciseSubmission>> TryGetExerciseSubmissions(int count, string agentName, SubmissionLanguage language)
+		private async Task<UserExerciseSubmission> TryGetExerciseSubmission(string agentName, SubmissionLanguage language)
 		{
 			var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
-			List<UserExerciseSubmission> submissions;
+			UserExerciseSubmission submission;
 			using (var transaction = db.Database.BeginTransaction(IsolationLevel.Serializable))
 			{
-				submissions = db.UserExerciseSubmissions
+				var submissionsQueryable = db.UserExerciseSubmissions
 					.AsNoTracking()
 					.Where(s =>
 						s.Timestamp > notSoLongAgo
 						&& s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting
-						&& s.Language == language)
-					.OrderByDescending(s => s.Timestamp)
-					.Take(count)
-					.ToList();
-				foreach (var submission in submissions)
-				{
-					submission.AutomaticChecking.Status = AutomaticExerciseCheckingStatus.Running;
-					submission.AutomaticChecking.CheckingAgentName = agentName;
-				}
+						&& s.Language == language);
+				
+				if (!submissionsQueryable.Any())
+					return null;
+				
+				var maxId = submissionsQueryable.Select(s => s.Id).DefaultIfEmpty(-1).Max();
+				submission = submissionsQueryable.FirstOrDefault(s => s.Id == maxId);
+				if (submission == null)
+					return null;
+				
+				/* Mark submission as "running" */
+				submission.AutomaticChecking.Status = AutomaticExerciseCheckingStatus.Running;
+				submission.AutomaticChecking.CheckingAgentName = agentName;
 
-				await SaveAll(submissions.Select(s => s.AutomaticChecking));
+				await SaveAll(new List<AutomaticExerciseChecking> { submission.AutomaticChecking });
 
 				transaction.Commit();
 
 				db.ObjectContext().AcceptAllChanges();
 			}
 
-			foreach (var submission in submissions)
-				unhandledSubmissions.TryRemove(submission.Id, out _);
+			unhandledSubmissions.TryRemove(submission.Id, out _);
 
-			return submissions;
+			return submission;
 		}
 
 		public UserExerciseSubmission FindSubmissionById(int id)
