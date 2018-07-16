@@ -9,7 +9,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Ulearn.Common.Extensions;
-using Ulearn.Web.Api.Models.Results.Notifications;
+using Ulearn.Web.Api.Models.Parameters.Notifications;
+using Ulearn.Web.Api.Models.Responses.Notifications;
 
 namespace Ulearn.Web.Api.Controllers.Notifications
 {
@@ -43,7 +44,7 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 			var (importantNotificationList, commentsNotificationList) = await GetNotificationListsAsync(userId);
 			// await feedRepo.UpdateFeedViewTimestampAsync(userId, commentsFeedNotificationTransport.Id, DateTime.Now);
 
-			return Json(new NotificationListResult
+			return Json(new NotificationListResponse
 			{
 				Important = importantNotificationList,
 				Comments = commentsNotificationList,
@@ -52,13 +53,13 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 
 		[HttpGet("count")]
 		[Authorize]
-		public async Task<IActionResult> NotificationsCount(DateTime lastTimestamp)
+		public async Task<IActionResult> NotificationsCount([FromQuery] NotificationsCountParameters parameters)
 		{
 			var userId = User.GetUserId();
 			var userNotificationTransport = await feedRepo.GetUsersFeedNotificationTransportAsync(userId);
-			var unreadCountAndLastTimestamp = await GetUnreadNotificationsCountAndLastTimestampAsync(userId, userNotificationTransport, lastTimestamp);
+			var unreadCountAndLastTimestamp = await GetUnreadNotificationsCountAndLastTimestampAsync(userId, userNotificationTransport, parameters.LastTimestamp);
 
-			return Json(new NotificationsCountResult
+			return Json(new NotificationsCountResponse
 			{
 				Count = unreadCountAndLastTimestamp.Item1,
 				LastTimestamp = unreadCountAndLastTimestamp.Item2,

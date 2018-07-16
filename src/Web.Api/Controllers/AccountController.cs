@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Database;
 using Database.Extensions;
@@ -9,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Ulearn.Common.Extensions;
-using Ulearn.Web.Api.Models.Results.Account;
+using Ulearn.Web.Api.Models.Responses.Account;
 
 namespace Ulearn.Web.Api.Controllers
 {

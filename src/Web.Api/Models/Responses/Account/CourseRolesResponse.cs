@@ -2,10 +2,10 @@
 using System.Runtime.Serialization;
 using Database.Models;
 
-namespace Ulearn.Web.Api.Models.Results.Account
+namespace Ulearn.Web.Api.Models.Responses.Account
 {
 	[DataContract]
-	public class CourseRolesResponse
+	public class CourseRolesResponse : ApiResponse
 	{
 		[DataMember(Name = "is_system_administrator")]
 		public bool IsSystemAdministrator { get; set; }

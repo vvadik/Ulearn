@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using uLearn;
 using Ulearn.Web.Api.Models.Common;
-using Ulearn.Web.Api.Models.Results.Courses;
+using Ulearn.Web.Api.Models.Responses.Courses;
 
 namespace Ulearn.Web.Api.Controllers
 {
@@ -20,7 +20,7 @@ namespace Ulearn.Web.Api.Controllers
 		public IActionResult CoursesList()
 		{
 			var courses = courseManager.GetCourses();
-			return Json(new CoursesListResult
+			return Json(new CoursesListResponse
 			{
 				Courses = courses.Select(
 					c => new ShortCourseInfo

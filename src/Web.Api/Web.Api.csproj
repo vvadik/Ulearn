@@ -35,6 +35,5 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Configuration" />
-    <Folder Include="Models\Parameters" />
   </ItemGroup>
 </Project>

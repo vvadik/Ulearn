@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using uLearn;
-using Ulearn.Web.Api.Models.Results.ExerciseStatistics;
+using Ulearn.Web.Api.Models.Responses.ExerciseStatistics;
 
 namespace Ulearn.Web.Api.Controllers
 {
@@ -47,7 +47,7 @@ namespace Ulearn.Web.Api.Controllers
 				.ToListAsync();
 
 			const int daysLimit = 30;
-			var result = new CourseExercisesStatisticsResult
+			var result = new CourseExercisesStatisticsResponse
 			{
 				AnalyzedSubmissionsCount = submissions.Count,
 				Exercises = exerciseSlides.Select(

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Ulearn.Web.Api.Models.Results.Notifications
+namespace Ulearn.Web.Api.Models.Responses.Notifications
 {
 	[DataContract]
-	public class NotificationsCountResult
+	public class NotificationsCountResponse : ApiResponse
 	{
 		[DataMember(Name = "count")]
 		public int Count { get; set; }

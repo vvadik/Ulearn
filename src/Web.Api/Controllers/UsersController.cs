@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using uLearn;
-using Ulearn.Web.Api.Models.Results.Users;
+using Ulearn.Web.Api.Models.Responses.Users;
 
 namespace Ulearn.Web.Api.Controllers
 {
@@ -33,7 +33,7 @@ namespace Ulearn.Web.Api.Controllers
 					
 			var instructorIds = userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.Instructor, course.Id);
 			var instructors = usersRepo.GetUsersByIds(instructorIds);
-			return Json(new InstructorsListResult
+			return Json(new InstructorsListResponse
 			{
 				Instructors = instructors.Select(i => BuildShortUserInfo(i, discloseLogin: true)).ToList()
 			});

@@ -2,10 +2,10 @@
 using System.Runtime.Serialization;
 using Ulearn.Web.Api.Models.Common;
 
-namespace Ulearn.Web.Api.Models.Results.Users
+namespace Ulearn.Web.Api.Models.Responses.Users
 {
 	[DataContract]
-	public class InstructorsListResult
+	public class InstructorsListResponse : ApiResponse
 	{
 		[DataMember(Name = "instructors")]
 		public List<ShortUserInfo> Instructors { get; set; }
