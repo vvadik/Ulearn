@@ -37,11 +37,15 @@ let store = configureStore({
     },
     notifications: {
         count: 0,
+        lastTimestamp: undefined
     }
 });
 store.dispatch(api.account.getCurrentUser());
 store.dispatch(api.courses.getCourses());
 store.dispatch(api.notifications.getNotificationsCount());
+
+// Update notifications count each minute
+setInterval(() => store.dispatch(api.notifications.getNotificationsCount(store.getState().notifications.lastTimestamp)), 60 * 1000);
 
 class UlearnApp extends Component {
   render() {

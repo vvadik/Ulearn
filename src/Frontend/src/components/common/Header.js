@@ -226,6 +226,7 @@ class NotificationsMenu extends Component {
             });
             NotificationsMenu._loadNotifications().then(
                 notifications => {
+                    this.props.resetNotificationsCount();
                     this.setState({
                         isLoading: false,
                         notificationsHtml: notifications
@@ -255,9 +256,17 @@ class NotificationsMenu extends Component {
             notifications: state.notifications
         }
     }
+
+    static mapDispatchToProps(dispatch) {
+        return {
+            resetNotificationsCount: () => dispatch({
+                type: 'NOTIFICATIONS__COUNT_RESETED'
+            })
+        };
+    }
 }
 
-NotificationsMenu = connect(NotificationsMenu.mapStateToProps)(NotificationsMenu);
+NotificationsMenu = connect(NotificationsMenu.mapStateToProps, NotificationsMenu.mapDispatchToProps)(NotificationsMenu);
 
 class NotificationsIcon extends Component {
     render() {
@@ -269,7 +278,7 @@ class NotificationsIcon extends Component {
                 {
                     this.props.counter > 0 &&
                     <span className="counter">
-                        {this.props.counter}
+                        { this.props.counter > 99 ? "99+" : this.props.counter}
                     </span>
                 }
             </div>

@@ -54,8 +54,13 @@ function notifications(state = initialNotificationsState, action) {
         case 'NOTIFICATIONS__COUNT_UPDATED':
             return {
                 ...state,
-                count: action.count,
+                count: state.count + action.count,
                 lastTimestamp: action.lastTimestamp
+            };
+        case 'NOTIFICATIONS__COUNT_RESETED':
+            return {
+                ...state,
+                count: 0
             };
         default:
             return state;
