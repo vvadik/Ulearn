@@ -30,7 +30,7 @@ function account(state = initialAccountState, action) {
                 isAuthenticated: false,
                 isSystemAdministrator: false,
                 roleByCourse: {}
-            }
+            };
         default:
             return state;
     }

@@ -26,6 +26,8 @@ class Header extends Component {
     render() {
         let roleByCourse = this.props.account.roleByCourse;
         let controllableCourseIds = Object.keys(roleByCourse).filter(courseId => roleByCourse[courseId] !== 'tester');
+        if (this.props.account.isSystemAdministrator)
+            controllableCourseIds = Object.keys(this.props.courses.courseById);
         return (
             <div className="header">
                 <Logo>Ulearn.me</Logo>
@@ -71,7 +73,7 @@ class AbstractMyCoursesMenu extends Component {
         let items = visibleCourseIds.filter(courseId => courseById.hasOwnProperty(courseId)).map(courseId =>
             <MenuItem href={"/Course/" + courseId } key={courseId}>{ courseById[courseId].title }</MenuItem>
         );
-        if (courseById.length > visibleCourseIds.length)
+        if (Object.keys(courseById).length > visibleCourseIds.length)
             items.push(<MenuItem href="/Admin/CourseList" key="-course-list"><strong>Все курсы</strong></MenuItem>);
         return items;
     }
