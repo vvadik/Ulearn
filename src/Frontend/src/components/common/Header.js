@@ -207,7 +207,7 @@ class Menu extends Component {
 
     static propTypes = {
         account: accountPropTypes,
-        location: PropTypes.object.isRequired,
+        location: PropTypes.object,
     }
 }
 
