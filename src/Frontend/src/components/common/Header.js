@@ -5,12 +5,13 @@ import Icon from "@skbkontur/react-ui/Icon"
 import MenuHeader from "@skbkontur/react-ui/MenuHeader"
 import DropdownMenu from "@skbkontur/react-ui/DropdownMenu"
 import DropdownContainer from "@skbkontur/react-ui/components/DropdownContainer/DropdownContainer"
-import { Link } from "react-router-dom";
+import {Link, withRouter} from "react-router-dom";
 import { connect } from "react-redux";
 import { findDOMNode } from "react-dom"
 import api from "../../api"
 
 import './Header.less'
+import {getQueryStringParameter} from "../../utils";
 
 
 let accountPropTypes = PropTypes.shape({
@@ -174,6 +175,11 @@ CourseMenu = connect(CourseMenu.mapStateToProps)(CourseMenu);
 
 class Menu extends Component {
     render() {
+        let returnUrl = this.props.location.pathname + this.props.location.search;
+        if (returnUrl.startsWith("/Login") || returnUrl.startsWith("/Account/Register")) {
+            returnUrl = getQueryStringParameter("returnUrl");
+        }
+
         if (this.props.account.isAuthenticated) {
             return (
                 <div className="header__menu">
@@ -186,18 +192,21 @@ class Menu extends Component {
         } else {
             return (
                 <div className="header__menu">
-                    <RegistrationLink/>
+                    <RegistrationLink returnUrl={returnUrl }/>
                     <Separator/>
-                    <LoginLink/>
+                    <LoginLink returnUrl={returnUrl }/>
                 </div>
             )
         }
     }
 
     static propTypes = {
-        account: accountPropTypes
+        account: accountPropTypes,
+        location: PropTypes.object.isRequired,
     }
 }
+
+Menu = withRouter(Menu);
 
 class NotificationsMenu extends Component {
     constructor(props) {
@@ -376,17 +385,25 @@ class RegistrationLink extends Component {
     render() {
         return (
             <div className="header__registration-link">
-                <Link to="/Account/Register">Зарегистрироваться</Link>
+                <Link to={ "/Account/Register?returnUrl=" + (this.props.returnUrl || "/")}>Зарегистрироваться</Link>
             </div>
         )
+    }
+
+    static propTypes = {
+        returnUrl: PropTypes.string
     }
 }
 
 class LoginLink extends Component {
     render() {
         return (<div className="header__login-link">
-            <Link to="/Login">Войти</Link>
+            <Link to={ "/Login?returnUrl=" + (this.props.returnUrl || "/") }>Войти</Link>
         </div>)
+    }
+
+    static propTypes = {
+        returnUrl: PropTypes.string
     }
 }
 

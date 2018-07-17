@@ -5,6 +5,7 @@ import * as PropTypes from "prop-types";
 import { saveAs } from "file-saver";
 import { connect } from "react-redux"
 import api from "../../api"
+import {getQueryStringParameter} from "../../utils";
 
 
 function getUrlParts(url) {
@@ -198,17 +199,6 @@ class DownloadedHtmlContent extends Component {
         DownloadedHtmlContent.removeBootstrapModalBackdrop();
     }
 
-    _getQueryStringParameter(name, url) {
-        if (!url)
-            url = window.location.href;
-        name = name.replace(/[\[\]]/g, '\\$&');
-        const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
-        const results = regex.exec(url);
-        if (!results) return null;
-        if (!results[2]) return '';
-        return decodeURIComponent(results[2].replace(/\+/g, ' '));
-    }
-
     _getCourseIdFromUrl() {
         /* 1. Extract courseId from urls like /Course/<courseId/... */
         const pathname = window.location.pathname;
@@ -219,7 +209,7 @@ class DownloadedHtmlContent extends Component {
         }
 
         /* 2. Extract courseId from query string: ?courseId=BasicProgramming */
-        const courseIdFromQueryString = this._getQueryStringParameter("courseId");
+        const courseIdFromQueryString = getQueryStringParameter("courseId");
         if (courseIdFromQueryString)
             return courseIdFromQueryString;
 

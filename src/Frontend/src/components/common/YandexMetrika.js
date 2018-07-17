@@ -6,10 +6,10 @@ import withRouter from "react-router-dom/es/withRouter";
 
 class YandexMetrika extends Component {
     constructor(props) {
-        super();
+        super(props);
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps, nextContext) {
         ym('hit', nextProps.location.pathname + nextProps.location.search);
     }
 
