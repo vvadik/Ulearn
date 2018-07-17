@@ -29,12 +29,17 @@ class Header extends Component {
         let controllableCourseIds = Object.keys(roleByCourse).filter(courseId => roleByCourse[courseId] !== 'tester');
         if (this.props.account.isSystemAdministrator)
             controllableCourseIds = Object.keys(this.props.courses.courseById);
+        let isCourseMenuVisible = (
+            this.props.courses &&
+            this.props.courses.currentCourseId &&
+            controllableCourseIds.indexOf(this.props.courses.currentCourseId) !== -1
+        );
         return (
             <div className="header">
                 <Logo>Ulearn.me</Logo>
                 { this.props.account.isSystemAdministrator && <SysAdminMenu controllableCourseIds={controllableCourseIds}/> }
                 { ! this.props.account.isSystemAdministrator && controllableCourseIds.length > 0 && <MyCoursesMenu controllableCourseIds={controllableCourseIds}/>}
-                { this.props.courses && this.props.courses.currentCourseId && <CourseMenu courseId={ this.props.courses.currentCourseId }/> }
+                { isCourseMenuVisible && <CourseMenu courseId={ this.props.courses.currentCourseId }/> }
                 <Menu account={this.props.account}/>
             </div>
         )
