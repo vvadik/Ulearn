@@ -102,8 +102,13 @@ class DownloadedHtmlContent extends Component {
         fetch(this.BASE_URL + url, {credentials: 'include'})
             .then(response => {
                 if (response.redirected) {
-                    let url = getUrlParts(response.url);
-                    this.context.router.history.replace(url.pathname + url.search);
+                    /* If it was a redirect from external login callback, then update user information */
+                    const oldUrlPathname = getUrlParts(url).pathname;
+                    if (oldUrlPathname.startsWith("/ExternalLoginCallback"))
+                        this.props.updateUserInformation();
+
+                    let newUrl = getUrlParts(response.url);
+                    this.context.router.history.replace(newUrl.pathname + newUrl.search);
                     return Promise.resolve(undefined);
                 }
                 /* Process attaches: download them and return url back */
