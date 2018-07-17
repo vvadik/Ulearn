@@ -15,6 +15,7 @@ function account(state = initialAccountState, action) {
                 newState.login = action.login;
                 newState.firstName = action.firstName;
                 newState.lastName = action.lastName;
+                newState.visibleName = action.visibleName;
             }
             return newState;
         case 'ACCOUNT__USER_ROLES_UPDATED':

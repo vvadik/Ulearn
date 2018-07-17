@@ -326,7 +326,7 @@ class ProfileLink extends Component {
                     <Icon name="User"/>
                 </span>
                 <span className="username">
-                    { this.props.account.firstName + " " + this.props.account.lastName }
+                    { this.props.account.visibleName || 'Профиль' }
                 </span>
             </Link>
         </div>)

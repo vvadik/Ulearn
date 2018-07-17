@@ -17,7 +17,8 @@ export function getCurrentUser() {
                         isAuthenticated: true,
                         login: user.login,
                         firstName: user.first_name,
-                        lastName: user.last_name
+                        lastName: user.last_name,
+                        visibleName: user.visible_name
                     });
                     dispatch(api.account.getRoles());
                 }
