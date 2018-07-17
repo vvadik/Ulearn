@@ -1,7 +1,3 @@
-const config = {
-    api: {
-        endpoint: 'http://localhost:8000/'
-    }
-};
+const config = require("./settings.json");
 
 export default config;

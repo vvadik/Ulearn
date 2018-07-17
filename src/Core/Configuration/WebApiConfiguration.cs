@@ -1,4 +1,5 @@
-﻿using uLearn.Configuration;
+﻿using System.Collections.Generic;
+using uLearn.Configuration;
 
 /* Move it to Web.Api.Configuration after disabling Ulearn.Web. Now it's here because Ulearn.Web should know about CookieKeyRingDirectory */
 
@@ -15,5 +16,12 @@ namespace Web.Api.Configuration
 		public string CookieName { get; set; }
 		public string CookieDomain { get; set; }
 		public bool CookieSecure { get; set; }
+		
+		public CorsConfiguration Cors { get; set; }
+	}
+
+	public class CorsConfiguration
+	{
+		public string[] AllowOrigins { get; set; }
 	}
 }

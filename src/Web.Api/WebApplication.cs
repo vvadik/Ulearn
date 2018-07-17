@@ -61,11 +61,13 @@ namespace Ulearn.Web.Api
                 loggerConfiguration = loggerConfiguration.WriteTo.VostokLog(hostingEnvironment.Log);
             var logger = loggerConfiguration.CreateLogger();
 			
+			var configuration = ApplicationConfiguration.Read<WebApiConfiguration>();
+			
             return new WebHostBuilder()
                 .UseKestrel()
                 .UseUrls($"http://*:{hostingEnvironment.Configuration["port"]}/")
                 .AddVostokServices()
-				.ConfigureServices(s => ConfigureServices(s, hostingEnvironment, logger))
+				.ConfigureServices(s => ConfigureServices(s, hostingEnvironment, logger, configuration))
                 .UseSerilog(logger)
                 .Configure(app =>
                 {
@@ -78,7 +80,7 @@ namespace Ulearn.Web.Api
 					app.UseCors(builder =>
 					{
 						builder
-							.WithOrigins("http://localhost:3000", "https://localhost:44300")
+							.WithOrigins(configuration.Web.Cors.AllowOrigins)
 							.AllowCredentials();
 					});
 					
@@ -107,16 +109,14 @@ namespace Ulearn.Web.Api
                 .Build();
         }
 
-		private void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment, Logger logger)
+		private void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment, Logger logger, WebApiConfiguration configuration)
 		{
 			/* TODO (andgein): use UlearnDbFactory here */
 			services.AddDbContextPool<UlearnDb>(
 				options => options
 					.UseLazyLoadingProxies()
 					.UseSqlServer(hostingEnvironment.Configuration["database"])
-			);			
-			
-			var configuration = ApplicationConfiguration.Read<WebApiConfiguration>();
+			);
 			
 			/* DI */
 			services.AddSingleton<ILogger>(logger);
