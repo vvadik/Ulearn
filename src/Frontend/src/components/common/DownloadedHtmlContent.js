@@ -294,7 +294,7 @@ class DownloadedHtmlContent extends Component {
                     if (response.redirected) {
                         /* If it was the login form, then update user information in header */
                         let oldUrlPathname = getUrlParts(url).pathname;
-                        if (oldUrlPathname.startsWith('/Login') || oldUrlPathname.startsWith('/Account/Register'))
+                        if (oldUrlPathname.startsWith('/Login/') || oldUrlPathname.startsWith('/Account/') || oldUrlPathname.startsWith('/RestorePassword/'))
                             this.props.updateUserInformation();
 
                         let newUrl = getUrlParts(response.url);

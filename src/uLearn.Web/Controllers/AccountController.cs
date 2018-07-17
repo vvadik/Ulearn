@@ -595,6 +595,7 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		[ULearnAuthorize(ShouldBeSysAdmin = true)]
 		[ValidateAntiForgeryToken]
+		[ValidateInput(false)]
 		public async Task<ActionResult> ResetPassword(string newPassword, string userId)
 		{
 			var user = await userManager.FindByIdAsync(userId);
