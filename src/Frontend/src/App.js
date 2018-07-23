@@ -5,7 +5,7 @@ import AnyPage from "./pages/AnyPage";
 import ErrorBoundary from "./components/common/ErrorBoundary";
 import YandexMetrika from "./components/common/YandexMetrika";
 import Header from "./components/common/Header";
-import { Provider } from "react-redux";
+import { Provider, connect } from "react-redux";
 import thunkMiddleware from "redux-thunk"
 import { createLogger } from "redux-logger"
 import { applyMiddleware, createStore } from "redux";
@@ -40,17 +40,38 @@ let store = configureStore({
         lastTimestamp: undefined
     }
 });
-store.dispatch(api.account.getCurrentUser());
-store.dispatch(api.courses.getCourses());
-store.dispatch(api.notifications.getNotificationsCount());
 
 // Update notifications count each minute
-setInterval(() => store.dispatch(api.notifications.getNotificationsCount(store.getState().notifications.lastTimestamp)), 60 * 1000);
+setInterval(() => {
+    if (store.getState().account.isAuthenticated)
+        store.dispatch(api.notifications.getNotificationsCount(store.getState().notifications.lastTimestamp))
+}, 60 * 1000);
+
 
 class UlearnApp extends Component {
-  render() {
-    return (
-        <Provider store={store}>
+    render() {
+        return (
+            <Provider store={store}>
+                <InternalUlearnApp />
+            </Provider>
+        )
+    }
+}
+
+class InternalUlearnApp extends Component {
+    componentDidMount() {
+        this.props.getCurrentUser();
+        this.props.getCourses();
+    }
+
+    componentWillReceiveProps(nextProps, nextState) {
+        if (! this.props.account.isAuthenticated && nextProps.account.isAuthenticated) {
+            this.props.getNotificationsCount();
+        }
+    }
+
+    render() {
+        return (
             <BrowserRouter>
                 <ErrorBoundary>
                     <Header/>
@@ -61,9 +82,24 @@ class UlearnApp extends Component {
                     <YandexMetrika/>
                 </ErrorBoundary>
             </BrowserRouter>
-        </Provider>
-    );
-  }
+        );
+    }
+
+    static mapStateToProps(state) {
+        return {
+            account: state.account,
+        }
+    }
+
+    static mapDispatchToProps(dispatch) {
+        return {
+            getCurrentUser: () => dispatch(api.account.getCurrentUser()),
+            getCourses: () => dispatch(api.courses.getCourses()),
+            getNotificationsCount: () => dispatch(api.notifications.getNotificationsCount())
+        }
+    }
 }
+
+InternalUlearnApp = connect(InternalUlearnApp.mapStateToProps, InternalUlearnApp.mapDispatchToProps)(InternalUlearnApp);
 
 export default UlearnApp;
