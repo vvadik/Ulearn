@@ -142,7 +142,7 @@ class CourseMenu extends Component {
         return (
             <div className="header__course-menu">
                 <DropdownMenu
-                    caption={<span className="caption">{ course.title } <span className="caret"/></span>}
+                    caption={<span className="caption" title={ course.title }><span className="courseName">{ course.title }</span> <span className="caret"/></span>}
                 >
                     <MenuItem href={"/Course/" + courseId}>Просмотр курса</MenuItem>
                     <MenuSeparator />
