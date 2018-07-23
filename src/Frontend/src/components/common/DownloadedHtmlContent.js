@@ -312,7 +312,10 @@ class DownloadedHtmlContent extends Component {
     }
 
     static mapStateToProps(state) {
-        return {};
+        return {
+            // To reload page after logging out of changing current user information
+            account: state.account
+        };
     }
 
     static mapDispatchToProps(dispatch) {
