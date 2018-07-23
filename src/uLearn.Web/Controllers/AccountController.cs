@@ -365,6 +365,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> Manage(ManageMessageId? message, string provider="", string otherUserId="")
 		{
 			ViewBag.StatusMessage = message?.GetAttribute<DisplayAttribute>().GetName();
+			ViewBag.IsStatusMessageAboutSocialLogins = message == ManageMessageId.LoginAdded || message == ManageMessageId.LoginRemoved;
 			if (message == ManageMessageId.AlreadyLinkedToOtherUser)
 			{
 				var otherUser = await userManager.FindByIdAsync(otherUserId);

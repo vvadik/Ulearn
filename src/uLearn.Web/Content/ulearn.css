@@ -1390,12 +1390,8 @@ hr.without-top-margin {
 
 #externalLogins table td {
 	border-top-width: 0;
-	padding: 10px 0 0 0;
+	padding: 0 0 10px 0;
 	vertical-align: middle;
-}
-
-#externalLogins table tr:first-child td {
-	border-top-width: 1px;
 }
 
 /* Strike line */
