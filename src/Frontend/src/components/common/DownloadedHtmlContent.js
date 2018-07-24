@@ -211,13 +211,13 @@ class DownloadedHtmlContent extends Component {
         if (pathname.startsWith('/Course/')) {
             const regex = new RegExp('/Course/([^/]+)(/|$)');
             const results = regex.exec(pathname);
-            return results[1];
+            return results[1].toLowerCase();
         }
 
         /* 2. Extract courseId from query string: ?courseId=BasicProgramming */
         const courseIdFromQueryString = getQueryStringParameter("courseId");
         if (courseIdFromQueryString)
-            return courseIdFromQueryString;
+            return courseIdFromQueryString.toLowerCase();
 
         /* 3. Return undefined if courseId is not found */
         return undefined;

@@ -6,7 +6,7 @@ export function getCourses() {
             .then(response => response.json())
             .then(json => {
                 let courseById = {};
-                json.courses.forEach(c => courseById[c.id] = c);
+                json.courses.forEach(c => courseById[c.id.toLowerCase()] = c);
                 dispatch({
                     type: 'COURSES__UPDATED',
                     courseById: courseById
