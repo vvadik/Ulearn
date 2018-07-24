@@ -234,7 +234,7 @@ namespace uLearn.Web.Controllers
 				if (quizState.Item1 != QuizState.WaitForCheck)
 				{
 					await slideCheckingsRepo.AddQuizAttemptForManualChecking(courseId, slideId, userId);
-					await visitsRepo.MarkVisitsAsWithManualChecking(slideId, userId);
+					await visitsRepo.MarkVisitsAsWithManualChecking(courseId, slideId, userId);
 				}
 			}
 			/* Recalculate score for quiz if this attempt is allowed. Don't recalculate score if this attempt is more then maxTriesCount */
@@ -264,7 +264,7 @@ namespace uLearn.Web.Controllers
 				await slideCheckingsRepo.AddQuizAttemptWithAutomaticChecking(courseId, slideId, userId, score);
 				await visitsRepo.UpdateScoreForVisit(courseId, slideId, userId);
 				if (isLti)
-					LtiUtils.SubmitScore(slide, userId);
+					LtiUtils.SubmitScore(courseId, slide, userId);
 			}
 
 			return Json(new
@@ -742,7 +742,7 @@ namespace uLearn.Web.Controllers
 					await userQuizzesRepo.DropQuizAsync(userId, slideId);
 					await visitsRepo.UpdateScoreForVisit(courseId, slideId, userId);
 					if (isLti)
-						LtiUtils.SubmitScore(slide, userId);
+						LtiUtils.SubmitScore(courseId, slide, userId);
 				}
 				else if ((userQuizDrops + 1 >= maxTriesCount || isQuizScoredMaximum) && !(slide as QuizSlide).ManualChecking)
 				{

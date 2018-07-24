@@ -71,7 +71,7 @@ namespace uLearn.Web.Controllers
 			if (isLti)
 				try
 				{
-					LtiUtils.SubmitScore(exerciseSlide, User.Identity.GetUserId());
+					LtiUtils.SubmitScore(courseId, exerciseSlide, User.Identity.GetUserId());
 				}
 				catch (Exception e)
 				{
@@ -340,7 +340,7 @@ namespace uLearn.Web.Controllers
 				{
 					Status = "ok",
 					Score = exerciseScore.PluralizeInRussian(RussianPluralizationOptions.Score),
-					TotalScore = visitsRepo.GetScore(slideId, userId),
+					TotalScore = visitsRepo.GetScore(courseId, slideId, userId),
 					CheckingId = checking.Id,
 				});
 		}

@@ -556,7 +556,7 @@ namespace uLearn.Web.Controllers
 			if (unit == null)
 				return HttpNotFound();
 			var slides = unit.Slides.ToArray();
-			var users = GetUserInfos(slides, periodStart).OrderByDescending(GetRating).ToArray();
+			var users = GetUserInfos(courseId, slides, periodStart).OrderByDescending(GetRating).ToArray();
 			return PartialView(new UserProgressViewModel
 			{
 				Slides = slides,
@@ -666,14 +666,14 @@ namespace uLearn.Web.Controllers
 						+ (s.IsQuizPassed ? s.QuizPercentage / 100.0 : 0));
 		}
 
-		private IEnumerable<UserInfo> GetUserInfos(Slide[] slides, DateTime periodStart, DateTime? periodFinish = null)
+		private IEnumerable<UserInfo> GetUserInfos(string courseId, Slide[] slides, DateTime periodStart, DateTime? periodFinish = null)
 		{
 			if (!periodFinish.HasValue)
 				periodFinish = DateTime.Now;
 
 			var slidesIds = slides.Select(s => s.Id).ToImmutableHashSet();
 
-			var dq = visitsRepo.GetVisitsInPeriod(slidesIds, periodStart, periodFinish.Value)
+			var dq = visitsRepo.GetVisitsInPeriod(courseId, slidesIds, periodStart, periodFinish.Value)
 				.Select(v => v.UserId)
 				.Distinct()
 				.Join(db.Visits, s => s, v => v.UserId, (s, visiters) => visiters)

@@ -174,7 +174,7 @@ namespace uLearn.Web.Controllers
 				var ltiRequest = await owinRequest.ParseLtiRequestAsync();
 				log.Info($"Нашёл LTI request в запросе: {ltiRequest.JsonSerialize()}");
 				userId = Request.GetOwinContext().Authentication.AuthenticationResponseGrant.Identity.GetUserId();
-				await ltiRequestsRepo.Update(userId, slide.Id, ltiRequest.JsonSerialize());
+				await ltiRequestsRepo.Update(courseId, userId, slide.Id, ltiRequest.JsonSerialize());
 
 				/* Substitute http(s) scheme with real scheme from header */
 				var uriBuilder = new UriBuilder(ltiRequest.Url)
@@ -196,7 +196,7 @@ namespace uLearn.Web.Controllers
 			try
 			{
 				if (visit.IsPassed)
-					LtiUtils.SubmitScore(slide, userId, visit);
+					LtiUtils.SubmitScore(courseId, slide, userId, visit);
 			}
 			catch (Exception e)
 			{
@@ -386,7 +386,7 @@ namespace uLearn.Web.Controllers
 		private async Task<AcceptedSolutionsPageModel> CreateAcceptedSolutionsModel(Course course, ExerciseSlide slide, bool isLti)
 		{
 			var userId = User.Identity.GetUserId();
-			var isPassed = visitsRepo.IsPassed(slide.Id, userId);
+			var isPassed = visitsRepo.IsPassed(course.Id, slide.Id, userId);
 			if (!isPassed)
 				await visitsRepo.SkipSlide(course.Id, slide.Id, userId);
 			var submissions = solutionsRepo.GetBestTrendingAndNewAcceptedSolutions(course.Id, slide.Id);
@@ -439,7 +439,7 @@ namespace uLearn.Web.Controllers
 		private ExerciseBlockData CreateAcceptedAlertModel(ExerciseSlide slide, Course course)
 		{
 			var userId = User.Identity.GetUserId();
-			var isSkippedOrPassed = visitsRepo.IsSkippedOrPassed(slide.Id, userId);
+			var isSkippedOrPassed = visitsRepo.IsSkippedOrPassed(course.Id, slide.Id, userId);
 			/* TODO: It's not nesessary create ExerciseBlockData here */
 			var model = new ExerciseBlockData(course.Id, slide)
 			{

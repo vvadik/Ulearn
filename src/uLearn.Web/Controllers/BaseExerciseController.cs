@@ -135,7 +135,7 @@ namespace uLearn.Web.Controllers
 			{
 				await slideCheckingsRepo.RemoveWaitingManualExerciseCheckings(courseId, exerciseSlide.Id, userId);
 				await slideCheckingsRepo.AddManualExerciseChecking(courseId, exerciseSlide.Id, userId, submission);
-				await visitsRepo.MarkVisitsAsWithManualChecking(exerciseSlide.Id, userId);
+				await visitsRepo.MarkVisitsAsWithManualChecking(courseId, exerciseSlide.Id, userId);
 				metricSender.SendCount($"exercise.{exerciseMetricId}.sent_to_review");
 				metricSender.SendCount("exercise.sent_to_review");
 			}

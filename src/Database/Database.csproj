@@ -695,6 +695,10 @@
     <Compile Include="Migrations\201807161240491_AddIndexToVisitsWithIncludeUser.Designer.cs">
       <DependentUpon>201807161240491_AddIndexToVisitsWithIncludeUser.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201807242023469_AddCourseIdToLtiRequests.cs" />
+    <Compile Include="Migrations\201807242023469_AddCourseIdToLtiRequests.Designer.cs">
+      <DependentUpon>201807242023469_AddCourseIdToLtiRequests.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -1075,6 +1079,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201807161240491_AddIndexToVisitsWithIncludeUser.resx">
       <DependentUpon>201807161240491_AddIndexToVisitsWithIncludeUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201807242023469_AddCourseIdToLtiRequests.resx">
+      <DependentUpon>201807242023469_AddCourseIdToLtiRequests.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

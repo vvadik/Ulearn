@@ -230,7 +230,7 @@ namespace Database
 
 			AddIndex<LtiConsumer>(modelBuilder, c => c.Key);
 
-			AddIndex<LtiSlideRequest>(modelBuilder, c => new { c.SlideId, c.UserId });
+			AddIndex<LtiSlideRequest>(modelBuilder, c => new { c.CourseId, c.SlideId, c.UserId });
 
 			AddIndex<NotificationTransport>(modelBuilder, c => c.UserId);
 			AddIndex<NotificationTransport>(modelBuilder, c => new { c.UserId, c.IsDeleted });
