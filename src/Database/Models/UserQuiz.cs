@@ -12,6 +12,7 @@ namespace Database.Models
 
 		[Required]
 		[StringLength(64)]
+		[Index("FullIndex", 1)]
 		[Index("IDX_UserQuiz_ByCourseSlideAndQuiz", 1)]
 		public string CourseId { get; set; }
 
@@ -29,16 +30,16 @@ namespace Database.Models
 
 		[StringLength(64)]
 		[Required]
-		[Index("FullIndex", 1)]
+		[Index("FullIndex", 3)]
 		public string UserId { get; set; }
 
 		[StringLength(64)]
-		[Index("FullIndex", 4)]
+		[Index("FullIndex", 5)]
 		[Index("IDX_UserQuiz_ByCourseSlideAndQuiz", 3)]
 		public string QuizId { get; set; }
 
 		[StringLength(64)]
-		[Index("FullIndex", 5)]
+		[Index("FullIndex", 6)]
 		[Index("IDX_UserQuiz_ByItem")]
 		public string ItemId { get; set; }
 
@@ -50,7 +51,7 @@ namespace Database.Models
 		public DateTime Timestamp { get; set; }
 
 		[Required]
-		[Index("FullIndex", 3)]
+		[Index("FullIndex", 4)]
 		public bool isDropped { get; set; }
 
 
