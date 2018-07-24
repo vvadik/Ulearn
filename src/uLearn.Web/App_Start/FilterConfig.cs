@@ -4,14 +4,19 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Database.DataContexts;
+using LtiLibrary.Core.Extensions;
 using Microsoft.AspNet.Identity;
+using uLearn.Configuration;
 using uLearn.Web.Kontur.Passport;
 using Ulearn.Common.Extensions;
+using Web.Api.Configuration;
 
 namespace uLearn.Web
 {
@@ -92,14 +97,26 @@ namespace uLearn.Web
 	public class ServeStaticFileForEveryNonAjaxRequest : ActionFilterAttribute
 	{
 		private readonly List<string> excludedPrefixes;
-		private readonly byte[] content;
+		private byte[] content;
 		
 		public ServeStaticFileForEveryNonAjaxRequest(FileInfo file, List<string> excludedPrefixes)
 		{
 			this.excludedPrefixes = excludedPrefixes;
 			content = File.ReadAllBytes(file.FullName);
+			content = InsertFrontendConfiguration(content);
 		}
-		
+
+		private static byte[] InsertFrontendConfiguration(byte[] content)
+		{
+			var configuration = ApplicationConfiguration.Read<WebApiConfiguration>();
+			var frontendConfigJson = configuration.Frontend.ToJsonString();
+			var decodedContent = Encoding.UTF8.GetString(content);
+			var regex = new Regex(@"(window.config\s*=\s*)(\{\})");
+			var contentWithConfig = regex.Replace(decodedContent, "$1" + frontendConfigJson);
+
+			return Encoding.UTF8.GetBytes(contentWithConfig);
+		}
+
 		public override void OnActionExecuting(ActionExecutingContext filterContext)
 		{
 			var httpContext = filterContext.RequestContext.HttpContext;
