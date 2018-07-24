@@ -273,7 +273,7 @@ namespace Database
 			AddIndex<ExerciseCodeReviewComment>(modelBuilder, c => new { c.ReviewId, c.IsDeleted });
 			AddIndex<ExerciseCodeReviewComment>(modelBuilder, c => c.AddingTime);
 
-			AddIndex<SlideHint>(modelBuilder, c => new { c.SlideId, c.HintId, c.UserId, c.IsHintHelped });
+			AddIndex<SlideHint>(modelBuilder, c => new { c.CourseId, c.SlideId, c.HintId, c.UserId, c.IsHintHelped });
 
 			AddIndex<SlideRate>(modelBuilder, c => new { c.SlideId, c.UserId });
 

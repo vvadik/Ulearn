@@ -512,14 +512,14 @@ namespace uLearn.Web.Controllers
 			var userId = User.Identity.GetUserId();
 			db.SolutionLikes.RemoveRange(db.SolutionLikes.Where(q => q.UserId == userId && q.Submission.SlideId == slideId));
 
-			db.UserExerciseSubmissions.RemoveSlideAction(slideId, userId);
-			db.UserQuizzes.RemoveSlideAction(slideId, userId);
-			db.Visits.RemoveSlideAction(slideId, userId);
+			db.UserExerciseSubmissions.RemoveSlideAction(courseId, slideId, userId);
+			db.UserQuizzes.RemoveSlideAction(courseId, slideId, userId);
+			db.Visits.RemoveSlideAction(courseId, slideId, userId);
 			await slideCheckingsRepo.RemoveAttempts(courseId, slideId, userId, false);
 
-			db.UserQuestions.RemoveSlideAction(slideId, userId);
-			db.SlideRates.RemoveSlideAction(slideId, userId);
-			db.Hints.RemoveSlideAction(slideId, userId);
+			db.UserQuestions.RemoveSlideAction(courseId, slideId, userId);
+			db.SlideRates.RemoveSlideAction(courseId, slideId, userId);
+			db.Hints.RemoveSlideAction(courseId, slideId, userId);
 			await db.SaveChangesAsync();
 
 			return RedirectToAction("SlideById", new { courseId, slideId = slide.Id });

@@ -19,4 +19,5 @@ VALUES
 ('20180604180608_AddIndiciesToUserQuizzes', '2.0.1-rtm-125'),
 ('20180615024057_RenameColumnsForEfBackCompatibility', '2.0.1-rtm-125'),
 ('20180716124559_AddIndexToVisitsWithIncludeUser', '2.0.1-rtm-125'),
-('20180724202211_AddCourseIdToLtiRequests', '2.0.1-rtm-125')
+('20180724202211_AddCourseIdToLtiRequests', '2.0.1-rtm-125'),
+('20180724204642_AddCourseIdToSlideHintIndex', '2.0.1-rtm-125')

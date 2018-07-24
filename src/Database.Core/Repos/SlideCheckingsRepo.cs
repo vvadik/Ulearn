@@ -109,10 +109,10 @@ namespace Database.Repos
 
 		public async Task RemoveAttempts(string courseId, Guid slideId, string userId, bool saveChanges = true)
 		{
-			db.ManualQuizCheckings.RemoveSlideAction(slideId, userId);
-			db.AutomaticQuizCheckings.RemoveSlideAction(slideId, userId);
-			db.ManualExerciseCheckings.RemoveSlideAction(slideId, userId);
-			db.AutomaticExerciseCheckings.RemoveSlideAction(slideId, userId);
+			db.ManualQuizCheckings.RemoveSlideAction(courseId, slideId, userId);
+			db.AutomaticQuizCheckings.RemoveSlideAction(courseId, slideId, userId);
+			db.ManualExerciseCheckings.RemoveSlideAction(courseId, slideId, userId);
+			db.AutomaticExerciseCheckings.RemoveSlideAction(courseId, slideId, userId);
 			if (saveChanges)
 				await db.SaveChangesAsync();
 		}

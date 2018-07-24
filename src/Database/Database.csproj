@@ -699,6 +699,10 @@
     <Compile Include="Migrations\201807242023469_AddCourseIdToLtiRequests.Designer.cs">
       <DependentUpon>201807242023469_AddCourseIdToLtiRequests.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201807242045133_AddCourseIdToSlideHintIndex.cs" />
+    <Compile Include="Migrations\201807242045133_AddCourseIdToSlideHintIndex.Designer.cs">
+      <DependentUpon>201807242045133_AddCourseIdToSlideHintIndex.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -1082,6 +1086,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201807242023469_AddCourseIdToLtiRequests.resx">
       <DependentUpon>201807242023469_AddCourseIdToLtiRequests.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201807242045133_AddCourseIdToSlideHintIndex.resx">
+      <DependentUpon>201807242045133_AddCourseIdToSlideHintIndex.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
