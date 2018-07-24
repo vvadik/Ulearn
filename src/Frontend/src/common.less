@@ -1,3 +1,5 @@
+@import "variables.less";
+
 .caret {
     display: inline-block;
     width: 0;
@@ -9,3 +11,22 @@
     border-right: 4px solid transparent;
     border-left: 4px solid transparent;
 }
+
+.visible-only-phone {
+    display: none;
+
+    @media (max-width: @maxPhoneWidth) {
+        & {
+            display: initial;
+        }
+    }
+}
+
+.visible-at-least-tablet {
+    @media (max-width: @maxPhoneWidth) {
+        & {
+            display: none;
+        }
+    }
+}
+

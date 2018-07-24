@@ -1,3 +1,5 @@
+@import "../../variables.less";
+
 @headerHeight: 50px;
 
 .header {
@@ -30,6 +32,11 @@
             
             &:hover, &:active, &:focus {
                 text-decoration: none;
+            }
+
+            @media (max-width: @maxPhoneWidth) {
+                padding-left: 15px;
+                padding-right: 15px;
             }
         }        
     }
@@ -147,6 +154,22 @@
                 > * {
                     vertical-align: middle;
                 }
+
+                @media (max-width: @maxTabletWidth) {
+                    .username {
+                        display: inline-block;
+                        max-width: 100px;
+                        overflow: hidden;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
+                    }
+                }
+
+                @media (max-width: @maxPhoneWidth) {
+                    .username {
+                        display: none;
+                    }
+                }
             }
         }
 
@@ -156,6 +179,12 @@
             > a {
                 display: inline-block;
                 padding: 15px 30px 13px 15px;
+
+                @media (max-width: @maxLaptopWidth) {
+                    & {
+                        padding-right: 15px;
+                    }
+                }
             }
         }
 

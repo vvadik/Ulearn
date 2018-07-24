@@ -36,7 +36,11 @@ class Header extends Component {
         );
         return (
             <div className="header">
-                <Logo>Ulearn.me</Logo>
+                <Logo>
+                    <span className="visible-only-phone"><Icon name="Home"/></span>
+                    <span className="visible-at-least-tablet">Ulearn.me</span>
+                </Logo>
+
                 { this.props.account.isSystemAdministrator && <SysAdminMenu controllableCourseIds={controllableCourseIds}/> }
                 { ! this.props.account.isSystemAdministrator && controllableCourseIds.length > 0 && <MyCoursesMenu controllableCourseIds={controllableCourseIds}/>}
                 { isCourseMenuVisible && <CourseMenu courseId={ this.props.courses.currentCourseId }/> }
