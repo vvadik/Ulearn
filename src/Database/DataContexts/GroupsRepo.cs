@@ -255,7 +255,7 @@ namespace Database.DataContexts
 
 					log.Info($"Создаю ручную проверку для решения {lastSubmission.Id}, слайд {slideId}");
 					await slideCheckingsRepo.AddManualExerciseChecking(courseId, slideId, userId, lastSubmission);
-					await visitsRepo.MarkVisitsAsWithManualChecking(slideId, userId);
+					await visitsRepo.MarkVisitsAsWithManualChecking(courseId, slideId, userId);
 				}
 
 			/* For quizzes */
@@ -269,7 +269,7 @@ namespace Database.DataContexts
 				{
 					log.Info($"Создаю ручную проверку для теста {slide.Id}");
 					await slideCheckingsRepo.AddQuizAttemptForManualChecking(courseId, quizSlideId, userId);
-					await visitsRepo.MarkVisitsAsWithManualChecking(quizSlideId, userId);
+					await visitsRepo.MarkVisitsAsWithManualChecking(courseId, quizSlideId, userId);
 				}
 			}
 		}

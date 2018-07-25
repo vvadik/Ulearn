@@ -140,7 +140,7 @@ namespace uLearn.Web.Controllers
 				{
 					quizState = QuizState.NotPassed;
 					/* ... if we will show answers from last try then drop quiz */
-					userQuizzesRepo.DropQuiz(userId, slideId);
+					userQuizzesRepo.DropQuiz(courseId, userId, slideId);
 				}
 			}			
 
@@ -234,7 +234,7 @@ namespace uLearn.Web.Controllers
 				if (quizState.Item1 != QuizState.WaitForCheck)
 				{
 					await slideCheckingsRepo.AddQuizAttemptForManualChecking(courseId, slideId, userId);
-					await visitsRepo.MarkVisitsAsWithManualChecking(slideId, userId);
+					await visitsRepo.MarkVisitsAsWithManualChecking(courseId, slideId, userId);
 				}
 			}
 			/* Recalculate score for quiz if this attempt is allowed. Don't recalculate score if this attempt is more then maxTriesCount */
@@ -264,7 +264,7 @@ namespace uLearn.Web.Controllers
 				await slideCheckingsRepo.AddQuizAttemptWithAutomaticChecking(courseId, slideId, userId, score);
 				await visitsRepo.UpdateScoreForVisit(courseId, slideId, userId);
 				if (isLti)
-					LtiUtils.SubmitScore(slide, userId);
+					LtiUtils.SubmitScore(courseId, slide, userId);
 			}
 
 			return Json(new
@@ -307,7 +307,7 @@ namespace uLearn.Web.Controllers
 				metricSender.SendCount($"quiz.manual_score.{checking.CourseId}");
 				metricSender.SendCount($"quiz.manual_score.{checking.CourseId}.{checking.SlideId}");
 
-				var answers = userQuizzesRepo.GetAnswersForUser(checking.SlideId, checking.UserId);
+				var answers = userQuizzesRepo.GetAnswersForUser(checking.CourseId, checking.SlideId, checking.UserId);
 
 				QuizVersion quizVersion;
 				/* If there is no user's answers for quiz, get the latest quiz version */
@@ -335,7 +335,7 @@ namespace uLearn.Web.Controllers
 					if (score < 0 || score > question.MaxScore)
 						return Redirect(errorUrl + $"Неверное количество баллов в задании «{question.QuestionIndex}. {question.Text.TruncateWithEllipsis(50)}»: {score}");
 
-					await userQuizzesRepo.SetScoreForQuizBlock(checking.UserId, checking.SlideId, question.Id, score);
+					await userQuizzesRepo.SetScoreForQuizBlock(checking.CourseId, checking.UserId, checking.SlideId, question.Id, score);
 					totalScore += score;
 				}
 
@@ -739,15 +739,15 @@ namespace uLearn.Web.Controllers
 				var isQuizScoredMaximum = userQuizzesRepo.IsQuizScoredMaximum(courseId, userId, slideId);
 				if (userQuizDrops + 1 < maxTriesCount && !isQuizScoredMaximum)
 				{
-					await userQuizzesRepo.DropQuizAsync(userId, slideId);
+					await userQuizzesRepo.DropQuizAsync(courseId, userId, slideId);
 					await visitsRepo.UpdateScoreForVisit(courseId, slideId, userId);
 					if (isLti)
-						LtiUtils.SubmitScore(slide, userId);
+						LtiUtils.SubmitScore(courseId, slide, userId);
 				}
 				else if ((userQuizDrops + 1 >= maxTriesCount || isQuizScoredMaximum) && !(slide as QuizSlide).ManualChecking)
 				{
 					/* Allow user to drop quiz after all tries are exceeded, but don't update score */
-					await userQuizzesRepo.DropQuizAsync(userId, slideId);
+					await userQuizzesRepo.DropQuizAsync(courseId, userId, slideId);
 				}
 				
 			}

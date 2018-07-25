@@ -48,13 +48,13 @@ namespace Database.Repos
 
 		public bool IsQuizSlidePassed(string courseId, string userId, Guid slideId)
 		{
-			return db.UserQuizzes.Any(x => x.UserId == userId && x.SlideId == slideId && !x.isDropped);
+			return db.UserQuizzes.Any(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId && !x.isDropped);
 		}
 
 		public IEnumerable<bool> GetQuizDropStates(string courseId, string userId, Guid slideId)
 		{
 			return db.UserQuizzes
-				.Where(x => x.UserId == userId && x.SlideId == slideId)
+				.Where(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId)
 				.DistinctBy(q => q.Timestamp)
 				.Select(q => q.isDropped);
 		}
@@ -80,7 +80,9 @@ namespace Database.Repos
 			foreach (var block in slide.Blocks.OfType<AbstractQuestionBlock>())
 			{
 				var ans = db.UserQuizzes
-					.Where(x => x.UserId == userId && x.SlideId == slide.Id && x.QuizId == block.Id && !x.isDropped).ToList();
+					.Where(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slide.Id && x.QuizId == block.Id && !x.isDropped)
+					.OrderBy(x => x.Id)
+					.ToList();
 				answer[block.Id] = ans;
 			}
 			return answer;
@@ -88,7 +90,7 @@ namespace Database.Repos
 
 		public QuizVersion FindQuizVersionFromUsersAnswer(string courseId, Guid slideId, string userId)
 		{
-			var firstUserAnswer = db.UserQuizzes.FirstOrDefault(x => x.UserId == userId && x.SlideId == slideId && !x.isDropped);
+			var firstUserAnswer = db.UserQuizzes.FirstOrDefault(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId && !x.isDropped);
 
 			if (firstUserAnswer == null)
 				return null;
@@ -105,7 +107,7 @@ namespace Database.Repos
 		public int GetAverageStatistics(Guid slideId, string courseId)
 		{
 			var newA = db.UserQuizzes
-							.Where(x => x.SlideId == slideId)
+							.Where(x => x.CourseId == courseId && x.SlideId == slideId)
 							.GroupBy(x => x.UserId)
 							.Select(x => x
 								.GroupBy(y => y.QuizId)
@@ -120,19 +122,19 @@ namespace Database.Repos
 
 		public int GetSubmitQuizCount(Guid slideId, string courseId)
 		{
-			return db.UserQuizzes.Where(x => x.SlideId == slideId).Select(x => x.User).Distinct().Count();
+			return db.UserQuizzes.Where(x => x.CourseId == courseId && x.SlideId == slideId).Select(x => x.User).Distinct().Count();
 		}
 
-		public async Task RemoveAnswers(string userId, Guid slideId)
+		public async Task RemoveAnswers(string courseId, string userId, Guid slideId)
 		{
-			var answersToRemove = db.UserQuizzes.Where(q => q.UserId == userId && q.SlideId == slideId).ToList();
+			var answersToRemove = db.UserQuizzes.Where(q => q.CourseId == courseId && q.UserId == userId && q.SlideId == slideId).ToList();
 			db.UserQuizzes.RemoveRange(answersToRemove);
 			await db.SaveChangesAsync();
 		}
 
-		public async Task DropQuizAsync(string userId, Guid slideId)
+		public async Task DropQuizAsync(string courseId, string userId, Guid slideId)
 		{
-			var quizzes = db.UserQuizzes.Where(q => q.UserId == userId && q.SlideId == slideId).ToList();
+			var quizzes = db.UserQuizzes.Where(q => q.CourseId == courseId && q.UserId == userId && q.SlideId == slideId).ToList();
 			foreach (var q in quizzes)
 			{
 				q.isDropped = true;
@@ -140,9 +142,9 @@ namespace Database.Repos
 			await db.SaveChangesAsync();
 		}
 		
-		public void DropQuiz(string userId, Guid slideId)
+		public void DropQuiz(string courseId, string userId, Guid slideId)
 		{
-			var quizzes = db.UserQuizzes.Where(q => q.UserId == userId && q.SlideId == slideId).ToList();
+			var quizzes = db.UserQuizzes.Where(q => q.CourseId == courseId && q.UserId == userId && q.SlideId == slideId).ToList();
 			foreach (var q in quizzes)
 			{
 				q.isDropped = true;
@@ -153,7 +155,7 @@ namespace Database.Repos
 		public Dictionary<string, int> GetQuizBlocksTruth(string courseId, string userId, Guid slideId)
 		{
 			return db.UserQuizzes
-				.Where(q => q.UserId == userId && q.SlideId == slideId && !q.isDropped)
+				.Where(q => q.CourseId == courseId && q.UserId == userId && q.SlideId == slideId && !q.isDropped)
 				.DistinctBy(q => q.QuizId)
 				.ToDictionary(q => q.QuizId, q => q.QuizBlockScore);
 		}
@@ -161,14 +163,14 @@ namespace Database.Repos
 		public bool IsQuizScoredMaximum(string courseId, string userId, Guid slideId)
 		{
 			return db.UserQuizzes
-				.Where(q => q.UserId == userId && q.SlideId == slideId && !q.isDropped)
+				.Where(q => q.CourseId == courseId && q.UserId == userId && q.SlideId == slideId && !q.isDropped)
 				.All(q => q.QuizBlockScore == q.QuizBlockMaxScore);
 		}
 
-		public Dictionary<string, List<UserQuiz>> GetAnswersForUser(Guid slideId, string userId)
+		public Dictionary<string, List<UserQuiz>> GetAnswersForUser(string courseId, Guid slideId, string userId)
 		{
 			return db.UserQuizzes
-				.Where(ans => ans.UserId == userId && ans.SlideId == slideId && !ans.isDropped)
+				.Where(ans => ans.CourseId == courseId && ans.UserId == userId && ans.SlideId == slideId && !ans.isDropped)
 				.ToLookup(ans => ans.QuizId)
 				.ToDictionary(g => g.Key, g => g.ToList());
 		}
@@ -181,10 +183,10 @@ namespace Database.Repos
 				.FirstOrDefault();
 		}
 
-		public async Task SetScoreForQuizBlock(string userId, Guid slideId, string blockId, int score)
+		public async Task SetScoreForQuizBlock(string courseId, string userId, Guid slideId, string blockId, int score)
 		{
 			await db.UserQuizzes
-				.Where(q => q.UserId == userId && q.SlideId == slideId && q.QuizId == blockId)
+				.Where(q => q.CourseId == courseId && q.UserId == userId && q.SlideId == slideId && q.QuizId == blockId)
 				.ForEachAsync(q => q.QuizBlockScore = score);
 			await db.SaveChangesAsync();
 		}
@@ -203,7 +205,12 @@ namespace Database.Repos
 		{
 			var answers = db.UserQuizzes.Where(q => q.CourseId == courseId && q.SlideId == slideId && q.QuizId == quizId);
 			var totalTries = answers.Select(q => new { q.UserId, q.Timestamp }).Distinct().Count();
-			return answers.GroupBy(q => q.ItemId).ToDictionary(g => g.Key, g => g.Count().PercentsOf(totalTries));
+			/* Don't call GroupBy().ToDictionary() because of perfomance issues.
+			   See http://code-ninja.org/blog/2014/07/24/entity-framework-never-call-groupby-todictionary/ for details */
+			return answers
+				.GroupBy(q => q.ItemId)
+				.Select(g => new { g.Key, Count = g.Count() })
+				.ToDictionary(p => p.Key, p => p.Count.PercentsOf(totalTries));
 		}
 	}
 }

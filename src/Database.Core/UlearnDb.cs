@@ -230,7 +230,7 @@ namespace Database
 
 			AddIndex<LtiConsumer>(modelBuilder, c => c.Key);
 
-			AddIndex<LtiSlideRequest>(modelBuilder, c => new { c.SlideId, c.UserId });
+			AddIndex<LtiSlideRequest>(modelBuilder, c => new { c.CourseId, c.SlideId, c.UserId });
 
 			AddIndex<NotificationTransport>(modelBuilder, c => c.UserId);
 			AddIndex<NotificationTransport>(modelBuilder, c => new { c.UserId, c.IsDeleted });
@@ -273,7 +273,7 @@ namespace Database
 			AddIndex<ExerciseCodeReviewComment>(modelBuilder, c => new { c.ReviewId, c.IsDeleted });
 			AddIndex<ExerciseCodeReviewComment>(modelBuilder, c => c.AddingTime);
 
-			AddIndex<SlideHint>(modelBuilder, c => new { c.SlideId, c.HintId, c.UserId, c.IsHintHelped });
+			AddIndex<SlideHint>(modelBuilder, c => new { c.CourseId, c.SlideId, c.HintId, c.UserId, c.IsHintHelped });
 
 			AddIndex<SlideRate>(modelBuilder, c => new { c.SlideId, c.UserId });
 
@@ -302,7 +302,7 @@ namespace Database
 			AddIndex<UserExerciseSubmission>(modelBuilder, c => c.Language);
 
 			AddIndex<UserQuiz>(modelBuilder, c => new { c.SlideId, c.Timestamp });
-			AddIndex<UserQuiz>(modelBuilder, c => new { c.UserId, c.SlideId, c.isDropped, c.QuizId, c.ItemId });
+			AddIndex<UserQuiz>(modelBuilder, c => new { c.CourseId, c.UserId, c.SlideId, c.isDropped, c.QuizId, c.ItemId });
 			AddIndex<UserQuiz>(modelBuilder, c => new { c.CourseId, c.SlideId, c.QuizId });
 			AddIndex<UserQuiz>(modelBuilder, c => c.ItemId );
 			

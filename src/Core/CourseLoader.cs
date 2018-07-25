@@ -19,8 +19,18 @@ namespace uLearn
 				dir = dir.HasSubdirectory("Slides") ? dir.GetSubdirectory("Slides") : dir;
 
 			var settings = CourseSettings.Load(dir);
-			if (string.IsNullOrEmpty(settings.Title))
-				settings.Title = GetCourseTitleFromFile(dir);
+			if (string.IsNullOrEmpty(settings.Title)) {
+				try
+				{
+					settings.Title = GetCourseTitleFromFile(dir);
+				}
+				catch (Exception e)
+				{
+					throw new CourseLoadingException(
+						"Не удалось прочитать настройки курса. Скорее всего, отсутствует или неправильно заполнен файл course.xml."
+					);
+				}
+			}
 
 			var units = LoadUnits(dir, settings, courseId).ToList();
 			var slides = units.SelectMany(u => u.Slides).ToList();

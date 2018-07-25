@@ -4,14 +4,16 @@ using Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Database.Migrations
 {
     [DbContext(typeof(UlearnDb))]
-    partial class UlearnDbModelSnapshot : ModelSnapshot
+    [Migration("20180724202211_AddCourseIdToLtiRequests")]
+    partial class AddCourseIdToLtiRequests
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -827,7 +829,7 @@ namespace Database.Migrations
 
                     b.Property<string>("CourseId")
                         .IsRequired()
-                        .HasMaxLength(100);
+						.HasMaxLength(64);
 
                     b.Property<string>("Request")
                         .IsRequired();
@@ -1129,7 +1131,7 @@ namespace Database.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.HasIndex("CourseId", "SlideId", "HintId", "UserId", "IsHintHelped");
+                    b.HasIndex("SlideId", "HintId", "UserId", "IsHintHelped");
 
                     b.ToTable("SlideHints");
                 });
@@ -1468,13 +1470,11 @@ namespace Database.Migrations
 
                     b.HasIndex("QuizVersionId");
 
-                    b.HasIndex("UserId");
-
                     b.HasIndex("SlideId", "Timestamp");
 
                     b.HasIndex("CourseId", "SlideId", "QuizId");
 
-                    b.HasIndex("CourseId", "UserId", "SlideId", "isDropped", "QuizId", "ItemId");
+                    b.HasIndex("UserId", "SlideId", "isDropped", "QuizId", "ItemId");
 
                     b.ToTable("UserQuizs");
                 });

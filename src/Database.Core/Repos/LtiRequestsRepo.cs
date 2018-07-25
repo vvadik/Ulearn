@@ -20,22 +20,23 @@ namespace Database.Repos
 			this.db = db;
 			serializer = new JsonSerializer();
 		}
-
-		public async Task Update(string userId, Guid slideId, string ltiRequestJson)
+		
+		public async Task Update(string courseId, string userId, Guid slideId, string ltiRequestJson)
 		{
-			await FuncUtils.TrySeveralTimesAsync(() => TryUpdate(userId, slideId, ltiRequestJson), 3);
+			await FuncUtils.TrySeveralTimesAsync(() => TryUpdate(courseId, slideId, userId, ltiRequestJson), 3);
 		}
 
-		private async Task TryUpdate(string userId, Guid slideId, string ltiRequestJson)
+		private async Task TryUpdate(string courseId, Guid slideId, string userId, string ltiRequestJson)
 		{
-			var ltiRequestModel = FindElement(userId, slideId);
+			var ltiRequestModel = FindElement(courseId, slideId, userId);
 
 			if (ltiRequestModel == null)
 			{
 				ltiRequestModel = new LtiSlideRequest
 				{
-					UserId = userId,
+					CourseId = courseId,
 					SlideId = slideId,
+					UserId = userId,
 					Request = ltiRequestJson
 				};
 			}
@@ -46,18 +47,20 @@ namespace Database.Repos
 			await db.SaveChangesAsync();
 		}
 
-		public LtiRequest Find(string userId, Guid slideId)
+		public LtiRequest Find(string courseId, string userId, Guid slideId)
 		{
-			var ltiRequestModel = FindElement(userId, slideId);
+			var ltiRequestModel = FindElement(courseId, slideId, userId);
 			if (ltiRequestModel == null)
 				return null;
 
 			return serializer.Deserialize<LtiRequest>(new JsonTextReader(new StringReader(ltiRequestModel.Request)));
 		}
 
-		private LtiSlideRequest FindElement(string userId, Guid slideId)
+		private LtiSlideRequest FindElement(string courseId, Guid slideId, string userId)
 		{
-			return db.LtiRequests.FirstOrDefault(request => request.UserId == userId && request.SlideId == slideId);
+			return db.LtiRequests.FirstOrDefault(
+				request => request.CourseId == courseId && request.UserId == userId && request.SlideId == slideId
+			);
 		}
 	}
 }
