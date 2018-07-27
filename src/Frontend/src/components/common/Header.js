@@ -26,6 +26,8 @@ let accountPropTypes = PropTypes.shape({
     accountProblems: PropTypes.arrayOf(PropTypes.shape)
 }).isRequired;
 
+const LinkComponent = ({ href, ...rest }) => (<Link to={href} {...rest} />);
+
 class Header extends Component {
     render() {
         let roleByCourse = this.props.account.roleByCourse;
@@ -98,10 +100,10 @@ class AbstractMyCoursesMenu extends Component {
         courseIds.sort((a, b) => courseById[a].title.localeCompare(courseById[b].title));
         let visibleCourseIds = courseIds.slice(0, this.VISIBLE_COURSES_COUNT);
         let items = visibleCourseIds.filter(courseId => courseById.hasOwnProperty(courseId)).map(courseId =>
-            <MenuItem href={"/Course/" + courseId } key={courseId}>{ courseById[courseId].title }</MenuItem>
+            <MenuItem href={"/Course/" + courseId } key={courseId} component={ LinkComponent }>{ courseById[courseId].title }</MenuItem>
         );
-        if (Object.keys(courseById).length > visibleCourseIds.length)
-            items.push(<MenuItem href="/Admin/CourseList" key="-course-list"><strong>Все курсы</strong></MenuItem>);
+        if (courseIds.length > visibleCourseIds.length)
+            items.push(<MenuItem href="/Admin/CourseList" key="-course-list" component={ LinkComponent }><strong>Все курсы</strong></MenuItem>);
         return items;
     }
 
@@ -128,10 +130,10 @@ class SysAdminMenu extends AbstractMyCoursesMenu {
                         </div>
                     }
                 >
-                    <MenuItem href="/Account/List?role=sysAdmin">Пользователи</MenuItem>
-                    <MenuItem href="/Analytics/SystemStatistics">Статистика</MenuItem>
-                    <MenuItem href="/Sandbox">Песочница C#</MenuItem>
-                    <MenuItem href="/Admin/StyleValidations">Стилевые ошибки C#</MenuItem>
+                    <MenuItem href="/Account/List?role=sysAdmin" component={ LinkComponent }>Пользователи</MenuItem>
+                    <MenuItem href="/Analytics/SystemStatistics" component={ LinkComponent }>Статистика</MenuItem>
+                    <MenuItem href="/Sandbox" component={ LinkComponent }>Песочница C#</MenuItem>
+                    <MenuItem href="/Admin/StyleValidations" component={ LinkComponent }>Стилевые ошибки C#</MenuItem>
                     <MenuSeparator />
                     <MenuHeader>Курсы</MenuHeader>
                     { this._getCourseMenuItems(this.props.controllableCourseIds) }
@@ -173,13 +175,13 @@ class CourseMenu extends Component {
 
         let usersMenuItem = [];
         if (role === 'CourseAdmin' || accesses.indexOf('addAndRemoveInstructors') !== -1)
-            usersMenuItem = [<MenuItem href={"/Admin/Users?courseId=" + courseId} key="Users">Пользователи</MenuItem>];
+            usersMenuItem = [<MenuItem href={"/Admin/Users?courseId=" + courseId} key="Users" component={ LinkComponent }>Пользователи</MenuItem>];
         let courseAdminMenuItems = [];
         if (role === 'CourseAdmin')
             courseAdminMenuItems = [
-                <MenuItem href={"/Admin/Packages?courseId=" + courseId} key="Packages">Загрузить пакет</MenuItem>,
-                <MenuItem href={"/Admin/Units?courseId=" + courseId} key="Units">Модули</MenuItem>,
-                <MenuItem href={"/Grader/Clients?courseId=" + courseId} key="GraderClients">Клиенты грейдера</MenuItem>
+                <MenuItem href={"/Admin/Packages?courseId=" + courseId} key="Packages" component={ LinkComponent }>Загрузить пакет</MenuItem>,
+                <MenuItem href={"/Admin/Units?courseId=" + courseId} key="Units" component={ LinkComponent }>Модули</MenuItem>,
+                <MenuItem href={"/Grader/Clients?courseId=" + courseId} key="GraderClients" component={ LinkComponent }>Клиенты грейдера</MenuItem>
             ];
 
         return (
@@ -191,19 +193,19 @@ class CourseMenu extends Component {
                     </div>}
                     menuWidth={300}
                 >
-                    <MenuItem href={"/Course/" + courseId}>Просмотр курса</MenuItem>
+                    <MenuItem href={"/Course/" + courseId} component={ LinkComponent }>Просмотр курса</MenuItem>
                     <MenuSeparator />
-                    <MenuItem href={"/Admin/Groups?courseId=" + courseId}>Группы</MenuItem>
-                    <MenuItem href={"/Analytics/CourseStatistics?courseId=" + courseId}>Ведомость курса</MenuItem>
-                    <MenuItem href={"/Analytics/UnitStatistics?courseId=" + courseId}>Ведомость модуля</MenuItem>
-                    <MenuItem href={"/Admin/Certificates?courseId=" + courseId}>Сертификаты</MenuItem>
-                    { (usersMenuItem.length > 0 || courseAdminMenuItems.length > 0) ? <MenuSeparator/> : ''}
+                    <MenuItem href={"/Admin/Groups?courseId=" + courseId} component={ LinkComponent }>Группы</MenuItem>
+                    <MenuItem href={"/Analytics/CourseStatistics?courseId=" + courseId} component={ LinkComponent }>Ведомость курса</MenuItem>
+                    <MenuItem href={"/Analytics/UnitStatistics?courseId=" + courseId} component={ LinkComponent }>Ведомость модуля</MenuItem>
+                    <MenuItem href={"/Admin/Certificates?courseId=" + courseId} component={ LinkComponent }>Сертификаты</MenuItem>
+                    { (usersMenuItem.length > 0 || courseAdminMenuItems.length > 0) && <MenuSeparator/>}
                     { usersMenuItem }
                     { courseAdminMenuItems }
                     <MenuSeparator />
-                    <MenuItem href={"/Admin/Comments?courseId=" + courseId}>Комментарии</MenuItem>
-                    <MenuItem href={"/Admin/ManualQuizCheckingQueue?courseId=" + courseId}>Проверка тестов</MenuItem>
-                    <MenuItem href={"/Admin/ManualExerciseCheckingQueue?courseId=" + courseId}>Код-ревью</MenuItem>
+                    <MenuItem href={"/Admin/Comments?courseId=" + courseId} component={ LinkComponent }>Комментарии</MenuItem>
+                    <MenuItem href={"/Admin/ManualQuizCheckingQueue?courseId=" + courseId} component={ LinkComponent }>Проверка тестов</MenuItem>
+                    <MenuItem href={"/Admin/ManualExerciseCheckingQueue?courseId=" + courseId} component={ LinkComponent }>Код-ревью</MenuItem>
                 </DropdownMenu>
             </div>
         )
