@@ -1,6 +1,6 @@
 ﻿import React, { Component } from 'react'
 import * as PropTypes from 'prop-types'
-import {Loader, MenuItem, MenuSeparator} from "@skbkontur/react-ui/components/all";
+import {Loader, MenuItem, MenuSeparator, Tooltip} from "@skbkontur/react-ui/components/all";
 import Icon from "@skbkontur/react-ui/Icon"
 import MenuHeader from "@skbkontur/react-ui/MenuHeader"
 import DropdownMenu from "@skbkontur/react-ui/DropdownMenu"
@@ -8,10 +8,11 @@ import DropdownContainer from "@skbkontur/react-ui/components/DropdownContainer/
 import {Link, withRouter} from "react-router-dom";
 import { connect } from "react-redux";
 import { findDOMNode } from "react-dom"
-import api from "../../api"
 
 import './Header.less'
 import {getQueryStringParameter} from "../../utils";
+
+import api from "../../api"
 
 
 let accountPropTypes = PropTypes.shape({
@@ -20,7 +21,8 @@ let accountPropTypes = PropTypes.shape({
     firstName: PropTypes.string,
     lastName: PropTypes.string,
     isSystemAdministrator: PropTypes.bool.isRequired,
-    roleByCourse: PropTypes.shape().isRequired
+    roleByCourse: PropTypes.shape().isRequired,
+    accountProblems: PropTypes.arrayOf(PropTypes.shape)
 }).isRequired;
 
 class Header extends Component {
@@ -104,7 +106,12 @@ class SysAdminMenu extends AbstractMyCoursesMenu {
         return (
             <div className="header__sysadmin-menu">
                 <DropdownMenu
-                    caption={<span className="caption">Администрирование <span className="caret"/></span>}
+                    caption={
+                        <div>
+                            <span className="visible-only-phone"><span className="icon"><Icon name="DocumentGroup"/></span></span>
+                            <span className="caption visible-at-least-tablet">Администрирование <span className="caret"/></span>
+                        </div>
+                    }
                 >
                     <MenuItem href="/Account/List?role=sysAdmin">Пользователи</MenuItem>
                     <MenuItem href="/Analytics/SystemStatistics">Статистика</MenuItem>
@@ -126,7 +133,12 @@ class MyCoursesMenu extends AbstractMyCoursesMenu {
         return (
             <div className="header__my-courses-menu">
                 <DropdownMenu
-                    caption={<span className="caption">Мои курсы <span className="caret"/></span>}
+                    caption={
+                        <div>
+                            <span className="visible-only-phone"><span className="icon"><Icon name="DocumentGroup"/></span></span>
+                            <span className="caption visible-at-least-tablet">Мои курсы <span className="caret"/></span>
+                        </div>
+                    }
                 >
                     { this._getCourseMenuItems(this.props.controllableCourseIds) }
                 </DropdownMenu>
@@ -146,7 +158,10 @@ class CourseMenu extends Component {
         return (
             <div className="header__course-menu">
                 <DropdownMenu
-                    caption={<span className="caption" title={ course.title }><span className="courseName">{ course.title }</span> <span className="caret"/></span>}
+                    caption={<div>
+                        <span className="visible-only-phone"><span className="icon"><Icon name="DocumentSolid"/></span></span>
+                        <span className="caption visible-at-least-tablet" title={ course.title }><span className="courseName">{ course.title }</span> <span className="caret"/></span>
+                    </div>}
                     menuWidth={300}
                 >
                     <MenuItem href={"/Course/" + courseId}>Просмотр курса</MenuItem>
@@ -340,11 +355,49 @@ class Notifications extends Component {
 }
 
 class ProfileLink extends Component {
+    constructor(props) {
+        super(props);
+        this.openTooltip = this.openTooltip.bind(this);
+        this.closeTooltip = this.closeTooltip.bind(this);
+        this.state = {
+            tooltipTrigger: 'opened',
+        }
+    }
+
+    openTooltip() {
+        this.setState({
+            tooltipTrigger: 'opened'
+        })
+    }
+
+    closeTooltip() {
+        this.setState({
+            tooltipTrigger: 'closed'
+        })
+    }
+
     render() {
+        let icon = <Icon name="User"/>;
+        let isProblem = this.props.account.accountProblems.length > 0;
+        if (isProblem) {
+            let firstProblem = this.props.account.accountProblems[0];
+            icon = (
+                <Tooltip trigger={ this.state.tooltipTrigger } pos="bottom center" render={() => (
+                    <div style={{width: '250px'}}>
+                        {firstProblem.description}
+                    </div>
+                )} onCloseClick={ this.closeTooltip }>
+                    <span onMouseOver={ this.openTooltip }>
+                        <Icon name="Warning" color="#f77"/>
+                    </span>
+                </Tooltip>
+            )
+        }
+
         return (<div className="header__profile-link">
             <Link to="/Account/Manage">
                 <span className="icon">
-                    <Icon name="User"/>
+                    { icon }
                 </span>
                 <span className="username">
                     { this.props.account.visibleName || 'Профиль' }

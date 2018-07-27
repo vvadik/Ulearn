@@ -3,7 +3,8 @@ import { combineReducers } from "redux"
 const initialAccountState = {
     isAuthenticated: false,
     isSystemAdministrator: false,
-    roleByCourse: {}
+    roleByCourse: {},
+    accountProblems: []
 };
 
 function account(state = initialAccountState, action) {
@@ -16,6 +17,7 @@ function account(state = initialAccountState, action) {
                 newState.firstName = action.firstName;
                 newState.lastName = action.lastName;
                 newState.visibleName = action.visibleName;
+                newState.accountProblems = action.accountProblems;
             }
             return newState;
         case 'ACCOUNT__USER_ROLES_UPDATED':

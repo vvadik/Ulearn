@@ -3,18 +3,24 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -81,6 +87,8 @@ namespace Ulearn.Web.Api
 					{
 						builder
 							.WithOrigins(configuration.Web.Cors.AllowOrigins)
+							.AllowAnyMethod()
+							.WithHeaders(new string[] { "Authorization" })
 							.AllowCredentials();
 					});
 					
@@ -118,12 +126,13 @@ namespace Ulearn.Web.Api
 					.UseSqlServer(hostingEnvironment.Configuration["database"])
 			);
 			
+			services.Configure<WebApiConfiguration>(options => hostingEnvironment.Configuration.Bind(options));
+			
 			/* DI */
 			services.AddSingleton<ILogger>(logger);
-			services.AddSingleton<UlearnUserManager>();
 			services.AddSingleton<InitialDataCreator>();
 			services.AddSingleton<WebCourseManager>();
-			services.AddSingleton(configuration);
+			services.AddScoped<UlearnUserManager>();
 			services.AddScoped<IAuthorizationHandler, CourseRoleAuthorizationHandler>();
 			services.AddScoped<IAuthorizationHandler, CourseAccessAuthorizationHandler>();
 			services.AddScoped<NotificationDataPreloader>();
@@ -200,14 +209,37 @@ namespace Ulearn.Web.Api
 				options.Events.OnRedirectToLogin = context =>
 				{
 					/* Replace standart redirecting to LoginPath */
-					context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+					context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
 					return Task.CompletedTask;
 				};
 				options.Events.OnRedirectToAccessDenied = context =>
 				{
 					/* Replace standart redirecting to AccessDenied */
-					context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+					context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 					return Task.CompletedTask;
+				};
+			});
+
+			services.AddAuthentication(options =>
+			{
+				/*options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+				options.DefaultScheme = IdentityConstants.ApplicationScheme;
+				options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;*/
+				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+				options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+				options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+			}).AddJwtBearer(options =>
+			{
+				options.TokenValidationParameters = new TokenValidationParameters
+				{
+					ValidateIssuer = true,
+					ValidateAudience = true,
+					ValidateLifetime = true,
+					ValidateIssuerSigningKey = true,
+					
+					ValidIssuer = configuration.Web.Authentication.Jwt.Issuer,
+					ValidAudience = configuration.Web.Authentication.Jwt.Audience,
+					IssuerSigningKey = JwtBearerHelpers.CreateSymmetricSecurityKey(configuration.Web.Authentication.Jwt.IssuerSigningKey)
 				};
 			});
 

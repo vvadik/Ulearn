@@ -22,6 +22,8 @@ namespace Web.Api.Configuration
 		public bool CookieSecure { get; set; }
 		
 		public CorsConfiguration Cors { get; set; }
+		
+		public AuthenticationConfiguration Authentication { get; set; }
 	}
 
 	public class CorsConfiguration
@@ -29,7 +31,20 @@ namespace Web.Api.Configuration
 		public string[] AllowOrigins { get; set; }
 	}
 
-	
+	public class AuthenticationConfiguration
+	{
+		public JwtConfiguration Jwt { get; set; }
+	}
+
+	public class JwtConfiguration
+	{
+		public string Issuer { get; set; }
+		public string Audience { get; set; }
+		public string IssuerSigningKey { get; set; }
+		public int LifeTimeHours { get; set; }
+	}
+
+
 	/*
 	  DataContract and DataMembers is needed only for FrontendConfiguration, because backend
 	  should serializer JSON with this config for frontend's index.html

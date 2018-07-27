@@ -1330,7 +1330,7 @@ li.li-success {
 	padding-bottom: 5px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
 	.login-and-registration-form .control-label {
 		display: none;
 	}

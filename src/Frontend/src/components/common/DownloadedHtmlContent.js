@@ -72,7 +72,7 @@ class DownloadedHtmlContent extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.props.url !== nextProps.url)
+        if (this.props.url !== nextProps.url || this.props.account.isAuthenticated !== nextProps.account.isAuthenticated)
             this.fetchContentFromServer(nextProps.url);
     }
 
@@ -270,7 +270,7 @@ class DownloadedHtmlContent extends Component {
 
         let forms = Array.from(document.body.getElementsByTagName('form'));
         let postForms = forms.filter(f => f.method.toLowerCase() === 'post' && ! f.onsubmit && f.action);
-        console.log('Found forms with method="POST" ad without onsubmit:', postForms);
+        console.log('Found forms with method="POST" and without onsubmit:', postForms);
         postForms.forEach(f => {
             let url = f.action;
             if (exceptions.some(e => getUrlParts(url).pathname.startsWith(e)))

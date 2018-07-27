@@ -1,8 +1,8 @@
-import config from "../config"
+import api from "../api"
 
 export function getCourses() {
     return dispatch => {
-        return fetch(config.api.endpoint + "courses", {credentials: 'include'})
+        return api.get("courses")
             .then(response => response.json())
             .then(json => {
                 let courseById = {};

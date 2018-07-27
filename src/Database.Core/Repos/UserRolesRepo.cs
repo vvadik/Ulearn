@@ -66,9 +66,14 @@ namespace Database.Repos
 			return usersQuery.Select(userRole => userRole.UserId).Distinct().ToList();
 		}
 
-		public async Task<bool> HasUserAccessToCourseAsync(string userId, string courseId, CourseRole minCourseRole)
+		public Task<bool> HasUserAccessToCourseAsync(string userId, string courseId, CourseRole minCourseRole)
 		{
-			return await db.UserRoles.Where(r => r.UserId == userId && r.CourseId == courseId && r.Role <= minCourseRole).AnyAsync();
+			return db.UserRoles.Where(r => r.UserId == userId && r.CourseId == courseId && r.Role <= minCourseRole).AnyAsync();
+		}
+
+		public Task<bool> HasUserAccessToAnyCourseAsync(string userId, CourseRole minCourseRole)
+		{
+			return db.UserRoles.Where(r => r.UserId == userId && r.Role <= minCourseRole).AnyAsync();
 		}
 	}
 }

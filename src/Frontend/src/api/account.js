@@ -1,10 +1,15 @@
-import config from "../config"
 import api from "../api"
 
 export function getCurrentUser() {
     return dispatch => {
-        // dispatch({ type: 'ACCOUNT_USER_INFO_STARTED' })
-        return fetch(config.api.endpoint + 'account', { credentials: 'include' })
+        return api.get('account')
+            .then(response => {
+                if (response.status === 401) { // Unauthorized
+                    dispatch({ type: 'ACCOUNT__USER_INFO_UPDATED', isAuthenticated: false });
+                    return;
+                }
+                return Promise.resolve(response);
+            })
             .then(response => response.json())
             .then(json => {
                 let isAuthenticated = json.is_authenticated;
@@ -18,7 +23,8 @@ export function getCurrentUser() {
                         login: user.login,
                         firstName: user.first_name,
                         lastName: user.last_name,
-                        visibleName: user.visible_name
+                        visibleName: user.visible_name,
+                        accountProblems: json.account_problems
                     });
                     dispatch(api.account.getRoles());
                 }
@@ -28,7 +34,7 @@ export function getCurrentUser() {
 
 export function getRoles() {
     return dispatch => {
-        return fetch(config.api.endpoint + 'account/roles', { credentials: 'include' })
+        return api.get('account/roles')
             .then(response => response.json())
             .then(json => {
                 let courseRoles = json.course_roles;
@@ -45,7 +51,7 @@ export function getRoles() {
 
 export function logout() {
     return dispatch => {
-        return fetch(config.api.endpoint + 'account/logout', { credentials: 'include', method: 'POST' })
+        return api.post('account/logout')
             .then(response => response.json())
             .then(json => {
                 if (json.logout)

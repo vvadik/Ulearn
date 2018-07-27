@@ -57,6 +57,7 @@ namespace uLearn.Web.Controllers
 			});
 		}
 		
+		[Authorize]
 		public ActionResult Partial()
 		{
 			var userId = User.Identity.GetUserId();
