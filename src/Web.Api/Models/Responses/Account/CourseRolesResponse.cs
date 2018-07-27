@@ -12,6 +12,9 @@ namespace Ulearn.Web.Api.Models.Responses.Account
 		
 		[DataMember(Name = "course_roles")]
 		public List<CourseRoleResponse> Roles { get; set; }
+
+		[DataMember(Name = "course_accesses")]
+		public List<CourseAccessResponse> Accesses { get; set; }
 	}
 
 	[DataContract]
@@ -22,5 +25,15 @@ namespace Ulearn.Web.Api.Models.Responses.Account
 		
 		[DataMember(Name = "role")]
 		public CourseRole Role { get; set; }
+	}
+
+	[DataContract]
+	public class CourseAccessResponse
+	{
+		[DataMember(Name = "course_id")]
+		public string CourseId { get; set; }
+		
+		[DataMember(Name = "accesses")]
+		public List<CourseAccessType> Accesses { get; set; }
 	}
 }

@@ -3,8 +3,9 @@ import { combineReducers } from "redux"
 const initialAccountState = {
     isAuthenticated: false,
     isSystemAdministrator: false,
+    accountProblems: [],
     roleByCourse: {},
-    accountProblems: []
+    accessesByCourse: {}
 };
 
 function account(state = initialAccountState, action) {
@@ -24,7 +25,8 @@ function account(state = initialAccountState, action) {
             return {
                 ...state,
                 isSystemAdministrator: action.isSystemAdministrator,
-                roleByCourse: action.roleByCourse
+                roleByCourse: action.roleByCourse,
+                accessesByCourse: action.accessesByCourse
             };
         case 'ACCOUNT__USER_LOGOUTED':
             return {

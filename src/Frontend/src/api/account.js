@@ -39,11 +39,17 @@ export function getRoles() {
             .then(json => {
                 let courseRoles = json.course_roles;
                 let courseRolesObject = {};
-                courseRoles.forEach(c => courseRolesObject[c.course_id] = c.role);
+                courseRoles.forEach(c => courseRolesObject[c.course_id.toLowerCase()] = c.role);
+
+                let courseAccesses = json.course_accesses;
+                let courseAccessesObject = {};
+                courseAccesses.forEach(c => courseAccessesObject[c.course_id.toLowerCase()] = c.accesses);
+
                 dispatch({
                     type: 'ACCOUNT__USER_ROLES_UPDATED',
                     isSystemAdministrator: json.is_system_administrator,
-                    roleByCourse: courseRolesObject
+                    roleByCourse: courseRolesObject,
+                    accessesByCourse: courseAccessesObject
                 })
             })
     }

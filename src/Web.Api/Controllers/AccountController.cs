@@ -30,14 +30,19 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly UlearnUserManager userManager;
 		private readonly SignInManager<ApplicationUser> signInManager;
 		private readonly UserRolesRepo userRolesRepo;
+		private readonly CoursesRepo coursesRepo;
 		private readonly WebApiConfiguration configuration;
 
-		public AccountController(ILogger logger, IOptions<WebApiConfiguration> options, WebCourseManager courseManager, UlearnDb db, UlearnUserManager userManager, SignInManager<ApplicationUser> signInManager, UserRolesRepo userRolesRepo)
+		public AccountController(
+			ILogger logger, IOptions<WebApiConfiguration> options, WebCourseManager courseManager, UlearnDb db, UlearnUserManager userManager, SignInManager<ApplicationUser> signInManager,
+			UserRolesRepo userRolesRepo, CoursesRepo coursesRepo
+		)
 			: base(logger, courseManager, db)
 		{
 			this.userManager = userManager;
 			this.signInManager = signInManager;
 			this.userRolesRepo = userRolesRepo;
+			this.coursesRepo = coursesRepo;
 			this.configuration = options.Value;
 		}
 
@@ -45,10 +50,6 @@ namespace Ulearn.Web.Api.Controllers
 		[Authorize]
 		public async Task<IActionResult> Me()
 		{
-			var isAuthenticated = User.Identity.IsAuthenticated;
-			if (!isAuthenticated)
-				return Json(new GetMeResponse { IsAuthenticated = false });
-			
 			var userId = User.GetUserId();
 			var user = await userManager.FindByIdAsync(userId);
 			return Json(new GetMeResponse
@@ -111,8 +112,19 @@ namespace Ulearn.Web.Api.Controllers
 		[Authorize]
 		public async Task<IActionResult> CourseRoles()
 		{
-			var rolesByCourse = await userRolesRepo.GetRolesAsync(User.GetUserId()).ConfigureAwait(false);
+			var userId = User.GetUserId();	
 			var isSystemAdministrator = User.IsSystemAdministrator();
+			
+			var rolesByCourse = await userRolesRepo.GetRolesAsync(userId).ConfigureAwait(false);
+			var courseAccesses = await coursesRepo.GetUserAccessesAsync(userId).ConfigureAwait(false);
+			var courseAccessesByCourseId = courseAccesses.GroupBy(a => a.CourseId).Select(
+				g => new CourseAccessResponse
+				{
+					CourseId = g.Key,
+					Accesses = g.Select(a => a.AccessType).ToList()
+				}
+			).ToList();
+			
 			return Json(new CourseRolesResponse
 			{
 				IsSystemAdministrator = isSystemAdministrator,
@@ -121,6 +133,7 @@ namespace Ulearn.Web.Api.Controllers
 					CourseId = kvp.Key,
 					Role = kvp.Value,
 				}).ToList(),
+				Accesses = courseAccessesByCourseId,
 			});
 		}
 

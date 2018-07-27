@@ -22,12 +22,15 @@ let accountPropTypes = PropTypes.shape({
     lastName: PropTypes.string,
     isSystemAdministrator: PropTypes.bool.isRequired,
     roleByCourse: PropTypes.shape().isRequired,
+    accessesByCourse: PropTypes.shape().isRequired,
     accountProblems: PropTypes.arrayOf(PropTypes.shape)
 }).isRequired;
 
 class Header extends Component {
     render() {
         let roleByCourse = this.props.account.roleByCourse;
+        let accessesByCourse = this.props.account.accessesByCourse;
+
         let controllableCourseIds = Object.keys(roleByCourse).filter(courseId => roleByCourse[courseId] !== 'tester');
         if (this.props.account.isSystemAdministrator)
             controllableCourseIds = Object.keys(this.props.courses.courseById);
@@ -36,6 +39,18 @@ class Header extends Component {
             this.props.courses.currentCourseId &&
             controllableCourseIds.indexOf(this.props.courses.currentCourseId) !== -1
         );
+
+        let courseRole = "";
+        let courseAccesses = [];
+        if (isCourseMenuVisible) {
+            let courseId = this.props.courses.currentCourseId;
+            if (this.props.account.isSystemAdministrator)
+                courseRole = 'CourseAdmin';
+            else
+                courseRole = roleByCourse[courseId];
+            courseAccesses = accessesByCourse[courseId] || [];
+        }
+
         return (
             <div className="header">
                 <Logo>
@@ -45,7 +60,7 @@ class Header extends Component {
 
                 { this.props.account.isSystemAdministrator && <SysAdminMenu controllableCourseIds={controllableCourseIds}/> }
                 { ! this.props.account.isSystemAdministrator && controllableCourseIds.length > 0 && <MyCoursesMenu controllableCourseIds={controllableCourseIds}/>}
-                { isCourseMenuVisible && <CourseMenu courseId={ this.props.courses.currentCourseId }/> }
+                { isCourseMenuVisible && <CourseMenu courseId={ this.props.courses.currentCourseId } role={ courseRole } accesses={ courseAccesses }/> }
                 <Menu account={this.props.account}/>
             </div>
         )
@@ -151,10 +166,22 @@ MyCoursesMenu = connect(MyCoursesMenu.mapStateToProps)(MyCoursesMenu);
 
 class CourseMenu extends Component {
     render() {
-        let courseId = this.props.courseId;
+        let { courseId, role, accesses } = this.props;
         let course = this.props.courses.courseById[courseId];
         if (typeof course === 'undefined')
             return null;
+
+        let usersMenuItem = [];
+        if (role === 'CourseAdmin' || accesses.indexOf('addAndRemoveInstructors') !== -1)
+            usersMenuItem = [<MenuItem href={"/Admin/Users?courseId=" + courseId} key="Users">Пользователи</MenuItem>];
+        let courseAdminMenuItems = [];
+        if (role === 'CourseAdmin')
+            courseAdminMenuItems = [
+                <MenuItem href={"/Admin/Packages?courseId=" + courseId} key="Packages">Загрузить пакет</MenuItem>,
+                <MenuItem href={"/Admin/Units?courseId=" + courseId} key="Units">Модули</MenuItem>,
+                <MenuItem href={"/Grader/Clients?courseId=" + courseId} key="GraderClients">Клиенты грейдера</MenuItem>
+            ];
+
         return (
             <div className="header__course-menu">
                 <DropdownMenu
@@ -170,11 +197,9 @@ class CourseMenu extends Component {
                     <MenuItem href={"/Analytics/CourseStatistics?courseId=" + courseId}>Ведомость курса</MenuItem>
                     <MenuItem href={"/Analytics/UnitStatistics?courseId=" + courseId}>Ведомость модуля</MenuItem>
                     <MenuItem href={"/Admin/Certificates?courseId=" + courseId}>Сертификаты</MenuItem>
-                    <MenuSeparator />
-                    <MenuItem href={"/Admin/Users?courseId=" + courseId}>Пользователи</MenuItem>
-                    <MenuItem href={"/Admin/Packages?courseId=" + courseId}>Загрузить пакет</MenuItem>
-                    <MenuItem href={"/Admin/Units?courseId=" + courseId}>Модули</MenuItem>
-                    <MenuItem href={"/Grader/Clients?courseId=" + courseId}>Клиенты грейдера</MenuItem>
+                    { (usersMenuItem.length > 0 || courseAdminMenuItems.length > 0) ? <MenuSeparator/> : ''}
+                    { usersMenuItem }
+                    { courseAdminMenuItems }
                     <MenuSeparator />
                     <MenuItem href={"/Admin/Comments?courseId=" + courseId}>Комментарии</MenuItem>
                     <MenuItem href={"/Admin/ManualQuizCheckingQueue?courseId=" + courseId}>Проверка тестов</MenuItem>
@@ -186,7 +211,9 @@ class CourseMenu extends Component {
 
     static propTypes = {
         courseId: PropTypes.string.isRequired,
-        courses: PropTypes.shape()
+        courses: PropTypes.shape(),
+        role: PropTypes.string.isRequired,
+        accesses: PropTypes.arrayOf(PropTypes.string).isRequired
     };
 
     static mapStateToProps(state) {

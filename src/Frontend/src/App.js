@@ -33,7 +33,8 @@ let store = configureStore({
     account: {
         isAuthenticated: false,
         isSystemAdministrator: false,
-        roleByCourse: {}
+        roleByCourse: {},
+        accessesByCourse: {},
     },
     notifications: {
         count: 0,
