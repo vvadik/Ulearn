@@ -140,10 +140,10 @@ class TocMenu extends Component {
     render() {
         const isInsideCourse = this.isInsideCourse();
         return (
-            <div className="header__toc-menu">
+            <div className="visible-only-phone">
                 {
                     isInsideCourse &&
-                    <div className="visible-only-phone">
+                    <div className="header__toc-menu">
                         <span className="icon" onClick={this.onClick}>
                             <Icon name="StructureTree"/>
                         </span>
