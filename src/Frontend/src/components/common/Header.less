@@ -223,6 +223,16 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     min-width: 400px;
     min-height: 90px;
+
+
+    @media (max-width: @maxPhoneWidth) {
+        min-width: 300px;
+        width: 100%;
+
+        .notifications__dropdown {
+            width: 100%;
+        }
+    }
 }
 
 .notifications__dropdown {

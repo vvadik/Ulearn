@@ -304,7 +304,8 @@ class NotificationsMenu extends Component {
             isOpened: false,
             isLoading: false,
             notificationsHtml: "",
-            counter: props.notifications.count
+            counter: props.notifications.count,
+            windowWidth: window.innerWidth
         }
     }
 
@@ -313,6 +314,18 @@ class NotificationsMenu extends Component {
             counter: nextProps.notifications.count
         });
     }
+
+    componentWillMount() {
+        window.addEventListener('resize', this._handleWindowSizeChange);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('resize', this._handleWindowSizeChange);
+    }
+
+    _handleWindowSizeChange = () => {
+        this.setState({ windowWidth: window.innerWidth });
+    };
 
     static _loadNotifications() {
         return fetch("/Feed/NotificationsPartial", { credentials: "include" }).then(
@@ -342,14 +355,16 @@ class NotificationsMenu extends Component {
     }
 
     render() {
+        const { windowWidth, isOpened, counter, isLoading, notificationsHtml } = this.state;
+        const isMobile = windowWidth <= 767;
         return (
-            <div className={this.state.isOpened ? "opened" : ""}>
-                <NotificationsIcon counter={this.state.counter} onClick={this.onClick}/>
+            <div className={isOpened ? "opened" : ""}>
+                <NotificationsIcon counter={counter} onClick={this.onClick}/>
                 {
-                    this.state.isOpened &&
-                    <DropdownContainer getParent={() => findDOMNode(this)} offsetY={0} align="right">
+                    isOpened &&
+                    <DropdownContainer getParent={() => findDOMNode(this)} offsetY={0} align="right" offsetX={isMobile ? -128 : 0}>
                         <div className="dropdown-container">
-                            <Notifications isLoading={this.state.isLoading} notifications={this.state.notificationsHtml}/>
+                            <Notifications isLoading={isLoading} notifications={notificationsHtml}/>
                         </div>
                     </DropdownContainer>
                 }
@@ -405,7 +420,11 @@ class Notifications extends Component {
     render() {
         const {isLoading, notifications} = this.props;
         if (isLoading)
-            return <Loader type="normal" active/>;
+            return (
+                <div className="notifications__dropdown">
+                    <Loader type="normal" active/>
+                </div>
+            );
         else
             return <div className="notifications__dropdown" dangerouslySetInnerHTML={{ __html: notifications }} />;
     }
