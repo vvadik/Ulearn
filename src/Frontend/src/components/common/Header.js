@@ -412,7 +412,7 @@ class NotificationsMenu extends Component {
     };
 
     _handleClickOutside = (event) => {
-        if (this.ref && !this.ref.contains(event.target)) {
+        if (this.ref && !this.ref.contains(event.target) && !this.dropdownContainerRef.contains(event.target)) {
             this.setState({
                 isOpened: false,
             });
@@ -455,7 +455,7 @@ class NotificationsMenu extends Component {
                 {
                     isOpened &&
                     <DropdownContainer getParent={() => findDOMNode(this)} offsetY={0} align="right" offsetX={isMobile ? -112 : 0}>
-                        <div className="dropdown-container">
+                        <div className="dropdown-container" ref={node => this.dropdownContainerRef = node}>
                             <Notifications isLoading={isLoading} notifications={notificationsHtml}/>
                         </div>
                     </DropdownContainer>
