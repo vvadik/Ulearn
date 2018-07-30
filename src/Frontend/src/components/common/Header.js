@@ -1,16 +1,18 @@
 ﻿import React, { Component } from 'react'
 import * as PropTypes from 'prop-types'
-import {Loader, MenuItem, MenuSeparator, Tooltip} from "@skbkontur/react-ui/components/all";
+import { MenuItem, MenuSeparator } from "@skbkontur/react-ui/components/all";
 import Icon from "@skbkontur/react-ui/Icon"
 import MenuHeader from "@skbkontur/react-ui/MenuHeader"
+import Tooltip from "@skbkontur/react-ui/Tooltip"
+import Loader from "@skbkontur/react-ui/Loader"
 import DropdownMenu from "@skbkontur/react-ui/DropdownMenu"
 import DropdownContainer from "@skbkontur/react-ui/components/DropdownContainer/DropdownContainer"
-import {Link, withRouter} from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { findDOMNode } from "react-dom"
 
 import './Header.less'
-import {getQueryStringParameter} from "../../utils";
+import { getQueryStringParameter } from "../../utils";
 
 import api from "../../api"
 
@@ -60,6 +62,8 @@ class Header extends Component {
                     <span className="visible-at-least-tablet">Ulearn.me</span>
                 </Logo>
 
+                <TocMenu />
+
                 { this.props.account.isSystemAdministrator && <SysAdminMenu controllableCourseIds={controllableCourseIds}/> }
                 { ! this.props.account.isSystemAdministrator && controllableCourseIds.length > 0 && <MyCoursesMenu controllableCourseIds={controllableCourseIds}/>}
                 { isCourseMenuVisible && <CourseMenu courseId={ this.props.courses.currentCourseId } role={ courseRole } accesses={ courseAccesses }/> }
@@ -87,6 +91,35 @@ class Logo extends Component {
                 <Link to="/">
                     { this.props.children }
                 </Link>
+            </div>
+        )
+    }
+}
+
+class TocMenu extends Component {
+    onClick() {
+        const $ = window.jQuery;
+        $('.side-bar').collapse('toggle');
+    }
+
+    isInsideCourse() {
+        /* Is current url is like /Course/<courseId/... */
+        const pathname = window.location.pathname;
+        return pathname.startsWith('/Course/');
+    }
+
+    render() {
+        const isInsideCourse = this.isInsideCourse();
+        return (
+            <div className="header__toc-menu">
+                {
+                    isInsideCourse &&
+                    <div className="visible-only-phone">
+                        <span className="icon" onClick={this.onClick}>
+                            <Icon name="StructureTree"/>
+                        </span>
+                    </div>
+                }
             </div>
         )
     }
@@ -489,9 +522,11 @@ class RegistrationLink extends Component {
 
 class LoginLink extends Component {
     render() {
-        return (<div className="header__login-link">
-            <Link to={ "/Login?returnUrl=" + (this.props.returnUrl || "/") }>Войти</Link>
-        </div>)
+        return (
+            <div className="header__login-link">
+                <Link to={ "/Login?returnUrl=" + (this.props.returnUrl || "/") }>Войти</Link>
+            </div>
+        )
     }
 
     static propTypes = {
