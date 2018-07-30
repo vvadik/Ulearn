@@ -60,12 +60,22 @@ class UlearnApp extends Component {
 }
 
 class InternalUlearnApp extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            initializing: true
+        }
+    }
+
     componentDidMount() {
         this.props.getCurrentUser();
         this.props.getCourses();
     }
 
     componentWillReceiveProps(nextProps, nextState) {
+        this.setState({
+            initializing: false
+        })
         if (! this.props.account.isAuthenticated && nextProps.account.isAuthenticated) {
             this.props.getNotificationsCount();
         }
@@ -75,7 +85,7 @@ class InternalUlearnApp extends Component {
         return (
             <BrowserRouter>
                 <ErrorBoundary>
-                    <Header/>
+                    <Header initializing={this.state.initializing}/>
                     <div className="header-content-divider" />
                     <Switch>
                         <Route component={AnyPage} />

@@ -32,6 +32,20 @@ const LinkComponent = ({ href, ...rest }) => (<Link to={href} {...rest} />);
 
 class Header extends Component {
     render() {
+        console.log(this.props.initializing);
+        if (this.props.initializing) {
+            return (
+                <div className="header">
+                    <Logo>
+                        <span className="visible-only-phone"><Icon name="Home"/></span>
+                        <span className="visible-at-least-tablet">Ulearn.me</span>
+                    </Logo>
+
+                    <TocMenu />
+                </div>
+            )
+        }
+
         let roleByCourse = this.props.account.roleByCourse;
         let accessesByCourse = this.props.account.accessesByCourse;
 
@@ -80,9 +94,12 @@ class Header extends Component {
     }
 
     static propTypes = {
-        account: accountPropTypes
+        account: accountPropTypes,
+        initializing: PropTypes.bool.isRequired
     }
 }
+
+export default connect(Header.mapStateToProps)(Header);
 
 class Logo extends Component {
     render() {
@@ -562,5 +579,3 @@ class LoginLink extends Component {
         returnUrl: PropTypes.string
     }
 }
-
-export default connect(Header.mapStateToProps)(Header);
