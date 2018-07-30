@@ -52,8 +52,8 @@ class Header extends Component {
         if (this.props.account.isSystemAdministrator)
             controllableCourseIds = Object.keys(this.props.courses.courseById);
         let isCourseMenuVisible = (
-            this.props.courses &&
-            this.props.courses.currentCourseId &&
+            this.props.courses !== undefined &&
+            this.props.courses.currentCourseId !== undefined &&
             controllableCourseIds.indexOf(this.props.courses.currentCourseId) !== -1
         );
 
@@ -87,7 +87,7 @@ class Header extends Component {
                         isSystemAdministrator={ this.props.account.isSystemAdministrator }
                         controllableCourseIds={ controllableCourseIds }
                         isCourseMenuVisible={ isCourseMenuVisible }
-                        courseId={ this.props.courses.currentCourseId }
+                        courseId={ isCourseMenuVisible ? this.props.courses.currentCourseId : "" }
                         role={ courseRole }
                         accesses={ courseAccesses }
                     />

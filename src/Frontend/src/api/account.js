@@ -3,13 +3,6 @@ import api from "../api"
 export function getCurrentUser() {
     return dispatch => {
         return api.get('account')
-            .then(response => {
-                if (response.status === 401) { // Unauthorized
-                    dispatch({ type: 'ACCOUNT__USER_INFO_UPDATED', isAuthenticated: false });
-                    return;
-                }
-                return Promise.resolve(response);
-            })
             .then(response => response.json())
             .then(json => {
                 let isAuthenticated = json.is_authenticated;
@@ -27,6 +20,11 @@ export function getCurrentUser() {
                         accountProblems: json.account_problems
                     });
                     dispatch(api.account.getRoles());
+                }
+            })
+            .catch(error => {
+                if (error.response.status === 401) { // Unauthorized
+                    dispatch({ type: 'ACCOUNT__USER_INFO_UPDATED', isAuthenticated: false });
                 }
             })
     }
