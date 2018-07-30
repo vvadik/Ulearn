@@ -75,7 +75,7 @@ class InternalUlearnApp extends Component {
     componentWillReceiveProps(nextProps, nextState) {
         this.setState({
             initializing: false
-        })
+        });
         if (! this.props.account.isAuthenticated && nextProps.account.isAuthenticated) {
             this.props.getNotificationsCount();
         }
