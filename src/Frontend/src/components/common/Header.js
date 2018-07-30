@@ -315,16 +315,26 @@ class NotificationsMenu extends Component {
         });
     }
 
-    componentWillMount() {
+    componentDidMount() {
         window.addEventListener('resize', this._handleWindowSizeChange);
+        document.addEventListener('mousedown', this._handleClickOutside);
     }
 
     componentWillUnmount() {
         window.removeEventListener('resize', this._handleWindowSizeChange);
+        document.removeEventListener('mousedown', this._handleClickOutside);
     }
 
     _handleWindowSizeChange = () => {
         this.setState({ windowWidth: window.innerWidth });
+    };
+
+    _handleClickOutside = (event) => {
+        if (this.ref && !this.ref.contains(event.target)) {
+            this.setState({
+                isOpened: false,
+            });
+        }
     };
 
     static _loadNotifications() {
@@ -358,11 +368,11 @@ class NotificationsMenu extends Component {
         const { windowWidth, isOpened, counter, isLoading, notificationsHtml } = this.state;
         const isMobile = windowWidth <= 767;
         return (
-            <div className={isOpened ? "opened" : ""}>
+            <div className={isOpened ? "opened" : ""} ref={node => this.ref = node}>
                 <NotificationsIcon counter={counter} onClick={this.onClick}/>
                 {
                     isOpened &&
-                    <DropdownContainer getParent={() => findDOMNode(this)} offsetY={0} align="right" offsetX={isMobile ? -128 : 0}>
+                    <DropdownContainer getParent={() => findDOMNode(this)} offsetY={0} align="right" offsetX={isMobile ? -112 : 0}>
                         <div className="dropdown-container">
                             <Notifications isLoading={isLoading} notifications={notificationsHtml}/>
                         </div>

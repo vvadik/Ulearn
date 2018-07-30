@@ -142,6 +142,11 @@
 
             &.without-counter {
                 padding-right: 18px;
+
+                @media (max-width: @maxPhoneWidth) {
+                    padding-left: 10px;
+                    padding-right: 10px;
+                }
             }
 
             &:hover {
@@ -183,6 +188,9 @@
                     .username {
                         display: none;
                     }
+
+                    padding-left: 7px;
+                    padding-right: 7px;
                 }
             }
         }
