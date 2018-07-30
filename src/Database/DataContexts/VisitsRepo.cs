@@ -249,12 +249,32 @@ namespace Database.DataContexts
 			return db.Visits.Where(v => v.CourseId == courseId).Select(v => v.UserId).Distinct().ToList();
 		}
 		
-		public List<RatingEntry> GetCourseRating(string courseId, int minScore)
+		public List<RatingEntry> GetCourseRating(string courseId, int minScore, List<Guid> requiredSlides)
 		{
-			return db.Visits.Where(v => v.CourseId == courseId)
+			var grouppedVisits = db.Visits.Where(v => v.CourseId == courseId)
 				.GroupBy(v => v.UserId)
 				.Where(g => g.Sum(v => v.Score) >= minScore)
-				.ToList()
+				.ToList();
+			var userIds = grouppedVisits.Select(g => g.Key).ToList();
+
+			List<string> usersWithAllRequiredSlides;
+			if (requiredSlides.Count > 0)
+			{
+				usersWithAllRequiredSlides = db.Visits
+					.Where(v => v.CourseId == courseId && requiredSlides.Contains(v.SlideId) && userIds.Contains(v.UserId))
+					.GroupBy(v => v.UserId)
+					.ToList()
+					.Where(g => g.DistinctBy(v => v.SlideId).Count() >= requiredSlides.Count)
+					.Select(g => g.Key)
+					.ToList();
+			}
+			else
+			{
+				usersWithAllRequiredSlides = userIds;
+			}
+
+			return grouppedVisits
+				.Where(g => usersWithAllRequiredSlides.Contains(g.Key))
 				.Select(g => new RatingEntry(g.First().User, g.Sum(v => v.Score), g.Max(v => v.Timestamp)))
 				.OrderByDescending(r => r.Score)
 				.ToList();
