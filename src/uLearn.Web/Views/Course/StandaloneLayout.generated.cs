@@ -176,7 +176,9 @@ WriteLiteralTo(__razor_helper_writer, "></script>\r\n");
 
 		}
 
-WriteLiteralTo(__razor_helper_writer, "\t</body>\r\n\t</html>\r\n");
+WriteLiteralTo(__razor_helper_writer, "        <script>\r\n            for (var i = 0; i < window.documentReadyFunctions.l" +
+"ength; i++) {\r\n                var f = window.documentReadyFunctions[i];\r\n      " +
+"          f();\r\n            }\r\n        </script>\r\n\t</body>\r\n\t</html>\r\n");
 
 
 });

@@ -55,6 +55,12 @@
 		{
 			<script src='@jsFile'></script>
 		}
+        <script>
+            for (var i = 0; i < window.documentReadyFunctions.length; i++) {
+                var f = window.documentReadyFunctions[i];
+                f();
+            }
+        </script>
 	</body>
 	</html>
 }
