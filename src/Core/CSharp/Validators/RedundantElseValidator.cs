@@ -7,7 +7,7 @@ namespace uLearn.CSharp.Validators
 {
 	public class RedundantElseValidator: BaseStyleValidator
 	{
-		public override List<SolutionStyleError>  FindErrors(SyntaxTree userSolution, SemanticModel semanticModel)
+		public override List<SolutionStyleError> FindErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
 			return InspectAll<IfStatementSyntax>(userSolution, InspectIfStatement).ToList();
 		}
@@ -26,13 +26,15 @@ namespace uLearn.CSharp.Validators
 			switch (statementUnderIf)
 			{
 				case ReturnStatementSyntax _:
+				case ThrowStatementSyntax _:
 					yield return new SolutionStyleError(StyleErrorType.RedundantElse01, correspondindElseClause);
 					break;
 				case BlockSyntax blockSyntax:
 					var lastStatementInBlock = blockSyntax
 						.ChildNodes()
 						.LastOrDefault();
-					if (lastStatementInBlock is ReturnStatementSyntax)
+					if (lastStatementInBlock is ReturnStatementSyntax
+						|| lastStatementInBlock is ThrowStatementSyntax)
 						yield return new SolutionStyleError(StyleErrorType.RedundantElse01, correspondindElseClause);
 					break;
 			}
