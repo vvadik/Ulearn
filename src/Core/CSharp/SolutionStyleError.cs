@@ -216,6 +216,10 @@ namespace uLearn.CSharp
 		
 		[MessageTemplate("Используйте `var` при инициализации локальной переменной.")]
 		VarInVariableDeclaration01,
+		
+		
+		[MessageTemplate("Тело else никогда не будет выполнено, его можно убрать")]
+		RedundantElse01,
 	}
 
 	[AttributeUsage(AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
