@@ -2399,6 +2399,7 @@ h1 .copy-group-link {
 
 #exercise__submission__output {
 	margin-top: 10px;
+	white-space:pre;
 	font-family: monospace;
 	border-left: 4px solid #8c8c8c;
 	padding-left:  10px;

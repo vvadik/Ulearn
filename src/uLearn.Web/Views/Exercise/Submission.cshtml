@@ -205,9 +205,7 @@
 			{
 				var style = Model.ShowOutputImmediately ? "" : "display: none";
 				var isEmpty = string.IsNullOrEmpty(Model.SubmissionSelectedByUser.AutomaticChecking.Output.Text);
-				<div id="exercise__submission__output" class="@(isEmpty ? "empty" : "")" style="@style">
-					@Html.Raw(Html.EncodeMultiLineText(Model.SubmissionSelectedByUser.AutomaticChecking.Output.Text))
-				</div>
+				<div id="exercise__submission__output" class="@(isEmpty ? "empty" : "")" style="@style">@Html.Raw(Html.EncodeMultiLineText(Model.SubmissionSelectedByUser.AutomaticChecking.Output.Text))</div>
 			}
 		}
 	}
