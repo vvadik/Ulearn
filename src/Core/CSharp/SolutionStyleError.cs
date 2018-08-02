@@ -206,7 +206,7 @@ namespace uLearn.CSharp
 		Recursion02,
 		
 		
-		[MessageTemplate("Используйте return вместо if")]
+		[MessageTemplate("Используйте return вместо if. Конструкцию `if (expr) return true; else return false;` можно записать проще: `return expr`.")]
 		RedundantIf01,
 
 
