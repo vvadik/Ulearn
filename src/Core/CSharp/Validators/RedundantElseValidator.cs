@@ -30,11 +30,12 @@ namespace uLearn.CSharp.Validators
 					yield return new SolutionStyleError(StyleErrorType.RedundantElse01, correspondindElseClause);
 					break;
 				case BlockSyntax blockSyntax:
-					var lastStatementInBlock = blockSyntax
-						.ChildNodes()
-						.LastOrDefault();
-					if (lastStatementInBlock is ReturnStatementSyntax
-						|| lastStatementInBlock is ThrowStatementSyntax)
+					var statementsInBlock = blockSyntax.ChildNodes();
+					var returnStatementsInBlock = statementsInBlock.OfType<ReturnStatementSyntax>();
+					if (returnStatementsInBlock.Any())
+						yield return new SolutionStyleError(StyleErrorType.RedundantElse01, correspondindElseClause);
+					var throwStatementsInBlock = statementsInBlock.OfType<ThrowStatementSyntax>();
+					if (throwStatementsInBlock.Any())
 						yield return new SolutionStyleError(StyleErrorType.RedundantElse01, correspondindElseClause);
 					break;
 			}

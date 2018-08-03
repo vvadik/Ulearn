@@ -39,20 +39,6 @@ namespace uLearn.CSharp.RedundantElseValidation
 			}
 		}
 
-		[Test]
-		public void Test()
-		{
-			var code = @"
-void A()
-{
-	if (true)
-		throw new Exception();
-	else
-		bool f = false;
-}
-";
-			validator.FindErrors(code);
-		}
 
 		[TestCaseSource(nameof(correctFilenames))]
 		public void NotFindErrors(string filename)
