@@ -43,7 +43,7 @@ const isClientRoutable = (anchor) =>
 
 class LinkClickCapturer extends Component {
     constructor(props) {
-        super();
+        super(props);
         this.exclude = props.exclude || [];
     }
 

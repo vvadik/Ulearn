@@ -10,7 +10,7 @@ namespace AntiPlagiarism.Api.Models.Parameters
 	{
 		public NameValueCollection ToNameValueCollection(string iEnumerableValuesSeparator = ",")
 		{
-			/* Get all properties on the object */
+			/* Get all properties of the object */
 			var properties = GetType().GetProperties()
 				.Where(p => p.CanRead)
 				.Where(p => p.GetValue(this, null) != null)

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using uLearn;
 using Ulearn.Web.Api.Authorization;
-using Ulearn.Web.Api.Models.Results.CodeReviewStatistics;
+using Ulearn.Web.Api.Models.Responses.CodeReviewStatistics;
 
 namespace Ulearn.Web.Api.Controllers
 {
@@ -64,7 +64,7 @@ namespace Ulearn.Web.Api.Controllers
 				To = to.Value,
 			}).Include(c => c.Reviews).ToListAsync();
 
-			var result = new CodeReviewInstructorsStatisticsResult
+			var result = new CodeReviewInstructorsStatisticsResponse
 			{
 				AnalyzedCodeReviewsCount = allSlideCheckings.Count,
 				Instructors = new List<CodeReviewInstructorStatistics>()

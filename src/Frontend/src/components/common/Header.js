@@ -1,49 +1,646 @@
 ﻿import React, { Component } from 'react'
-import { Navbar, Nav, NavDropdown } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
+import * as PropTypes from 'prop-types'
+import { MenuItem, MenuSeparator } from "@skbkontur/react-ui/components/all";
+import Icon from "@skbkontur/react-ui/Icon"
+import MenuHeader from "@skbkontur/react-ui/MenuHeader"
+import Tooltip from "@skbkontur/react-ui/Tooltip"
+import Loader from "@skbkontur/react-ui/Loader"
+import DropdownMenu from "@skbkontur/react-ui/DropdownMenu"
+import DropdownContainer from "@skbkontur/react-ui/components/DropdownContainer/DropdownContainer"
+import { Link, withRouter } from "react-router-dom";
+import { connect } from "react-redux";
+import { findDOMNode } from "react-dom"
 
-import './Header.css'
+import './Header.less'
+import { getQueryStringParameter } from "../../utils";
 
-class NavbarIcons extends Component {
-    render() {
-        return (
-            <button type="button" className="navbar-toggle hide-side-bar-button" data-toggle="collapse" data-target={this.props.target}>
-                <span className="icon-bar"/>
-                <span className="icon-bar"/>
-                <span className="icon-bar"/>
-            </button>
-        )
-    }
-}
- 
+import api from "../../api"
+
+
+let accountPropTypes = PropTypes.shape({
+    isAuthenticated: PropTypes.bool.isRequired,
+    login: PropTypes.string,
+    firstName: PropTypes.string,
+    lastName: PropTypes.string,
+    isSystemAdministrator: PropTypes.bool.isRequired,
+    roleByCourse: PropTypes.object.isRequired,
+    accessesByCourse: PropTypes.object.isRequired,
+    accountProblems: PropTypes.arrayOf(PropTypes.object)
+}).isRequired;
+
+const LinkComponent = ({ href, ...rest }) => (<Link to={href} {...rest} />);
+
 class Header extends Component {
     render() {
-        return (
-            <Navbar fixedTop inverse>
-                <NavbarIcons target=".side-bar"/>
-                <div className="container">
-                    <Navbar.Header>
-                        <NavbarIcons target=".greeting-collapse-class"/>
-                        <Navbar.Brand>
-                            <Link to="/">Ulearn</Link>                            
-                        </Navbar.Brand>
-                        <Nav className="notifications__mobile-nav pull-right visible-xs">
-                            <NavDropdown title="Dropdown">
-                                <a href="Feed/NotificationsTopbarPartial?isMobile=true" />
-                            </NavDropdown>
-                        </Nav>
-                    </Navbar.Header>
-                    <ul className="notifications__mobile-dropdown notifications__dropdown navbar-collapse collapse visible-xs">
+        if (this.props.initializing) {
+            return (
+                <div className="header">
+                    <Logo>
+                        <span className="visible-only-phone"><Icon name="Home"/></span>
+                        <span className="visible-at-least-tablet">Ulearn.me</span>
+                    </Logo>
 
-                    </ul>
-                    <div className="greeting-collapse-class navbar-collapse collapse">
-                        <ul className="top-navigation nav navbar-nav">
-                        </ul>
-                    </div>
+                    <TocMenu />
                 </div>
-            </Navbar>            
+            )
+        }
+
+        let roleByCourse = this.props.account.roleByCourse;
+        let accessesByCourse = this.props.account.accessesByCourse;
+
+        let controllableCourseIds = Object.keys(roleByCourse).filter(courseId => roleByCourse[courseId] !== 'tester');
+        if (this.props.account.isSystemAdministrator)
+            controllableCourseIds = Object.keys(this.props.courses.courseById);
+        let isCourseMenuVisible = (
+            this.props.courses !== undefined &&
+            this.props.courses.currentCourseId !== undefined &&
+            controllableCourseIds.indexOf(this.props.courses.currentCourseId) !== -1
+        );
+
+        let courseRole = "";
+        let courseAccesses = [];
+        if (isCourseMenuVisible) {
+            let courseId = this.props.courses.currentCourseId;
+            if (this.props.account.isSystemAdministrator)
+                courseRole = 'CourseAdmin';
+            else
+                courseRole = roleByCourse[courseId];
+            courseAccesses = accessesByCourse[courseId] || [];
+        }
+
+        return (
+            <div className="header">
+                <Logo>
+                    <span className="visible-only-phone"><Icon name="Home"/></span>
+                    <span className="visible-at-least-tablet">Ulearn.me</span>
+                </Logo>
+
+                <TocMenu />
+
+                <div className="visible-at-least-tablet">
+                    { this.props.account.isSystemAdministrator && <SysAdminMenu controllableCourseIds={controllableCourseIds}/> }
+                    { ! this.props.account.isSystemAdministrator && controllableCourseIds.length > 0 && <MyCoursesMenu controllableCourseIds={controllableCourseIds}/>}
+                    { isCourseMenuVisible && <CourseMenu courseId={ this.props.courses.currentCourseId } role={ courseRole } accesses={ courseAccesses }/> }
+                </div>
+                <div className="visible-only-phone">
+                    <MobileCourseMenu
+                        isSystemAdministrator={ this.props.account.isSystemAdministrator }
+                        controllableCourseIds={ controllableCourseIds }
+                        isCourseMenuVisible={ isCourseMenuVisible }
+                        courseId={ isCourseMenuVisible ? this.props.courses.currentCourseId : "" }
+                        role={ courseRole }
+                        accesses={ courseAccesses }
+                    />
+                </div>
+
+                <Menu account={this.props.account}/>
+            </div>
+        )
+    }
+
+    static mapStateToProps(state) {
+        return {
+            account: state.account,
+            courses: state.courses,
+        }
+    }
+
+    static propTypes = {
+        account: accountPropTypes,
+        initializing: PropTypes.bool.isRequired
+    }
+}
+
+export default connect(Header.mapStateToProps)(Header);
+
+class Logo extends Component {
+    render() {
+        return (
+            <div className="header__logo">
+                <Link to="/">
+                    { this.props.children }
+                </Link>
+            </div>
         )
     }
 }
 
-export default Header;
+class TocMenu extends Component {
+    onClick() {
+        const $ = window.jQuery;
+        $('.side-bar').collapse('toggle');
+    }
+
+    isInsideCourse() {
+        /* Is current url is like /Course/<courseId/... */
+        const pathname = window.location.pathname;
+        return pathname.startsWith('/Course/');
+    }
+
+    render() {
+        const isInsideCourse = this.isInsideCourse();
+        return (
+            <div className="visible-only-phone">
+                {
+                    isInsideCourse &&
+                    <div className="header__toc-menu">
+                        <span className="icon" onClick={this.onClick}>
+                            <Icon name="StructureTree"/>
+                        </span>
+                    </div>
+                }
+            </div>
+        )
+    }
+}
+
+class AbstractMyCoursesMenu extends Component {
+    static VISIBLE_COURSES_COUNT = 10;
+
+    static _getCourseMenuItems(courseIds, courseById) {
+        courseIds.sort((a, b) => courseById[a].title.localeCompare(courseById[b].title));
+        let visibleCourseIds = courseIds.slice(0, AbstractMyCoursesMenu.VISIBLE_COURSES_COUNT);
+        let items = visibleCourseIds.filter(courseId => courseById.hasOwnProperty(courseId)).map(courseId =>
+            <MenuItem href={"/Course/" + courseId } key={courseId} component={ LinkComponent }>{ courseById[courseId].title }</MenuItem>
+        );
+        if (courseIds.length > visibleCourseIds.length)
+            items.push(<MenuItem href="/Admin/CourseList" key="-course-list" component={ LinkComponent }><strong>Все курсы</strong></MenuItem>);
+        return items;
+    }
+
+    static propTypes = {
+        controllableCourseIds: PropTypes.arrayOf(PropTypes.string).isRequired,
+    };
+
+    static mapStateToProps(state) {
+        return {
+            courses: state.courses
+        }
+    }
+}
+
+class SysAdminMenu extends AbstractMyCoursesMenu {
+    static menuItems(courseIds, courseById) {
+        return [
+            <MenuItem href="/Account/List?role=sysAdmin" component={ LinkComponent } key="Users">Пользователи</MenuItem>,
+            <MenuItem href="/Analytics/SystemStatistics" component={ LinkComponent } key="Statistics">Статистика</MenuItem>,
+            <MenuItem href="/Sandbox" component={ LinkComponent } key="Sandbox">Песочница C#</MenuItem>,
+            <MenuItem href="/Admin/StyleValidations" component={ LinkComponent } key="StyleValidations">Стилевые ошибки C#</MenuItem>,
+            <MenuSeparator key="SysAdminMenuSeparator"/>,
+            <MenuHeader key="Courses">Курсы</MenuHeader>
+        ].concat(AbstractMyCoursesMenu._getCourseMenuItems(courseIds, courseById));
+    }
+
+    render() {
+        return (
+            <div className="header__sysadmin-menu">
+                <DropdownMenu
+                    caption={
+                        <div>
+                            <span className="visible-only-phone"><span className="icon"><Icon name="DocumentGroup"/></span></span>
+                            <span className="caption visible-at-least-tablet">Администрирование <span className="caret"/></span>
+                        </div>
+                    }
+                >
+                    { SysAdminMenu.menuItems(this.props.controllableCourseIds, this.props.courses.courseById) }
+                </DropdownMenu>
+            </div>
+        )
+    }
+}
+
+SysAdminMenu = connect(SysAdminMenu.mapStateToProps)(SysAdminMenu);
+
+class MyCoursesMenu extends AbstractMyCoursesMenu {
+    static menuItems(courseIds, courseById) {
+        AbstractMyCoursesMenu._getCourseMenuItems(courseIds, courseById)
+    }
+
+    render() {
+        return (
+            <div className="header__my-courses-menu">
+                <DropdownMenu
+                    caption={
+                        <div>
+                            <span className="visible-only-phone"><span className="icon"><Icon name="DocumentGroup"/></span></span>
+                            <span className="caption visible-at-least-tablet">Мои курсы <span className="caret"/></span>
+                        </div>
+                    }
+                >
+                    { MyCoursesMenu.menuItems(this.props.controllableCourseIds, this.props.courses.courseById) }
+                </DropdownMenu>
+            </div>
+        )
+    }
+}
+
+MyCoursesMenu = connect(MyCoursesMenu.mapStateToProps)(MyCoursesMenu);
+
+class CourseMenu extends Component {
+    static menuItems(courseId, role, accesses) {
+        let items = [
+            <MenuItem href={"/Course/" + courseId} key="Course" component={ LinkComponent }>Просмотр курса</MenuItem>,
+            <MenuSeparator key="CourseMenuSeparator1"/>,
+            <MenuItem href={"/Admin/Groups?courseId=" + courseId} key="Groups" component={ LinkComponent }>Группы</MenuItem>,
+            <MenuItem href={"/Analytics/CourseStatistics?courseId=" + courseId} key="CourseStatistics" component={ LinkComponent }>Ведомость курса</MenuItem>,
+            <MenuItem href={"/Analytics/UnitStatistics?courseId=" + courseId} key="UnitStatistics" component={ LinkComponent }>Ведомость модуля</MenuItem>,
+            <MenuItem href={"/Admin/Certificates?courseId=" + courseId} key="Certificates" component={ LinkComponent }>Сертификаты</MenuItem>,
+        ];
+
+        let hasUsersMenuItem = role === 'CourseAdmin' || accesses.indexOf('addAndRemoveInstructors') !== -1;
+        let hasCourseAdminMenuItems = role === 'CourseAdmin';
+
+        if (hasUsersMenuItem || hasCourseAdminMenuItems)
+            items.push(<MenuSeparator key="CourseMenuSeparator2"/>);
+        if (hasUsersMenuItem)
+            items.push(<MenuItem href={"/Admin/Users?courseId=" + courseId} key="Users" component={ LinkComponent }>Пользователи</MenuItem>);
+        if (hasCourseAdminMenuItems)
+            items = items.concat([
+                <MenuItem href={"/Admin/Packages?courseId=" + courseId} key="Packages" component={ LinkComponent }>Загрузить пакет</MenuItem>,
+                <MenuItem href={"/Admin/Units?courseId=" + courseId} key="Units" component={ LinkComponent }>Модули</MenuItem>,
+                <MenuItem href={"/Grader/Clients?courseId=" + courseId} key="GraderClients" component={ LinkComponent }>Клиенты грейдера</MenuItem>
+            ]);
+
+        items = items.concat([
+            <MenuSeparator key="CourseMenuSeparator3" />,
+            <MenuItem href={"/Admin/Comments?courseId=" + courseId} key="Comments" component={ LinkComponent }>Комментарии</MenuItem>,
+            <MenuItem href={"/Admin/ManualQuizCheckingQueue?courseId=" + courseId} key="ManualQuizCheckingQueue" component={ LinkComponent }>Проверка тестов</MenuItem>,
+            <MenuItem href={"/Admin/ManualExerciseCheckingQueue?courseId=" + courseId} key="ManualExerciseCheckingQueue" component={ LinkComponent }>Код-ревью</MenuItem>,
+        ]);
+
+        return items;
+    }
+
+    render() {
+        const { courseId, role, accesses } = this.props;
+        const courseById = this.props.courses.courseById;
+        const course = courseById[courseId];
+        if (typeof course === 'undefined')
+            return null;
+
+        return (
+            <div className="header__course-menu">
+                <DropdownMenu
+                    caption={<div>
+                        <span className="visible-only-phone"><span className="icon"><Icon name="DocumentSolid"/></span></span>
+                        <span className="caption visible-at-least-tablet" title={ course.title }><span className="courseName">{ course.title }</span> <span className="caret"/></span>
+                    </div>}
+                    menuWidth={300}
+                >
+                    { CourseMenu.menuItems(courseId, role, accesses) }
+                </DropdownMenu>
+            </div>
+        )
+    }
+
+    static propTypes = {
+        courseId: PropTypes.string.isRequired,
+        courses: PropTypes.object,
+        role: PropTypes.string.isRequired,
+        accesses: PropTypes.arrayOf(PropTypes.string).isRequired
+    };
+
+    static mapStateToProps(state) {
+        return {
+            courses: state.courses
+        }
+    }
+}
+
+CourseMenu = connect(CourseMenu.mapStateToProps)(CourseMenu);
+
+class MobileCourseMenu extends AbstractMyCoursesMenu {
+    render() {
+        return (
+            <div className="header__course-menu">
+                <DropdownMenu
+                    caption={ <span className="icon"><Icon name="DocumentSolid"/></span> }
+                    menuWidth={250}
+                >
+                    { this.props.isCourseMenuVisible ? CourseMenu.menuItems(this.props.courseId, this.props.role, this.props.accesses) : null}
+                    { this.props.isCourseMenuVisible ? <MenuSeparator/> : null }
+                    {
+                        this.props.isSystemAdministrator
+                            ? SysAdminMenu.menuItems(this.props.controllableCourseIds, this.props.courses.courseById)
+                            : MyCoursesMenu.menuItems(this.props.controllableCourseIds, this.props.courses.courseById)
+                    }
+                </DropdownMenu>
+            </div>
+        )
+    }
+
+    static propTypes = {
+        isCourseMenuVisible: PropTypes.bool.isRequired,
+        courseId: PropTypes.string.isRequired,
+        role: PropTypes.string.isRequired,
+        accesses: PropTypes.arrayOf(PropTypes.string).isRequired,
+        isSystemAdministrator: PropTypes.bool.isRequired,
+        controllableCourseIds: PropTypes.arrayOf(PropTypes.string).isRequired,
+        courses: PropTypes.object
+    }
+}
+
+MobileCourseMenu = connect(MobileCourseMenu.mapStateToProps)(MobileCourseMenu);
+
+class Menu extends Component {
+    render() {
+        let returnUrl = this.props.location.pathname + this.props.location.search;
+        if (returnUrl.startsWith("/Login") || returnUrl.startsWith("/Account/Register")) {
+            returnUrl = getQueryStringParameter("returnUrl");
+        }
+
+        if (this.props.account.isAuthenticated) {
+            return (
+                <div className="header__menu">
+                    <NotificationsMenu/>
+                    <ProfileLink account={this.props.account}/>
+                    <Separator/>
+                    <LogoutLink/>
+                </div>
+            )
+        } else {
+            return (
+                <div className="header__menu">
+                    <RegistrationLink returnUrl={returnUrl }/>
+                    <Separator/>
+                    <LoginLink returnUrl={returnUrl }/>
+                </div>
+            )
+        }
+    }
+
+    static propTypes = {
+        account: accountPropTypes,
+        location: PropTypes.object,
+    }
+}
+
+Menu = withRouter(Menu);
+
+class NotificationsMenu extends Component {
+    constructor(props) {
+        super(props);
+        this.onClick = this.onClick.bind(this);
+
+        this.state = {
+            isOpened: false,
+            isLoading: false,
+            notificationsHtml: "",
+            counter: props.notifications.count,
+            windowWidth: window.innerWidth
+        }
+    }
+
+    componentWillReceiveProps(nextProps, nextContext) {
+        this.setState({
+            counter: nextProps.notifications.count
+        });
+    }
+
+    componentDidMount() {
+        window.addEventListener('resize', this._handleWindowSizeChange);
+        document.addEventListener('mousedown', this._handleClickOutside);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('resize', this._handleWindowSizeChange);
+        document.removeEventListener('mousedown', this._handleClickOutside);
+    }
+
+    _handleWindowSizeChange = () => {
+        this.setState({ windowWidth: window.innerWidth });
+    };
+
+    _handleClickOutside = (event) => {
+        if (this.ref && !this.ref.contains(event.target) && !this.dropdownContainerRef.contains(event.target)) {
+            this.setState({
+                isOpened: false,
+            });
+        }
+    };
+
+    static _loadNotifications() {
+        return fetch("/Feed/NotificationsPartial", { credentials: "include" }).then(
+            response => response.text()
+        )
+    }
+
+    onClick() {
+        if (this.state.isOpened) {
+            this.setState({
+                isOpened: false,
+            });
+        } else {
+            this.setState({
+                isOpened: true,
+                isLoading: true,
+            });
+            NotificationsMenu._loadNotifications().then(
+                notifications => {
+                    this.props.resetNotificationsCount();
+                    this.setState({
+                        isLoading: false,
+                        notificationsHtml: notifications
+                    })
+                });
+        }
+    }
+
+    render() {
+        const { windowWidth, isOpened, counter, isLoading, notificationsHtml } = this.state;
+        const isMobile = windowWidth <= 767;
+        return (
+            <div className={isOpened ? "opened" : ""} ref={node => this.ref = node}>
+                <NotificationsIcon counter={counter} onClick={this.onClick}/>
+                {
+                    isOpened &&
+                    <DropdownContainer getParent={() => findDOMNode(this)} offsetY={0} align="right" offsetX={isMobile ? -112 : 0}>
+                        <div className="dropdown-container" ref={node => this.dropdownContainerRef = node}>
+                            <Notifications isLoading={isLoading} notifications={notificationsHtml}/>
+                        </div>
+                    </DropdownContainer>
+                }
+            </div>
+        )
+    }
+
+    static mapStateToProps(state) {
+        return {
+            notifications: state.notifications
+        }
+    }
+
+    static mapDispatchToProps(dispatch) {
+        return {
+            resetNotificationsCount: () => dispatch({
+                type: 'NOTIFICATIONS__COUNT_RESETED'
+            })
+        };
+    }
+}
+
+NotificationsMenu = connect(NotificationsMenu.mapStateToProps, NotificationsMenu.mapDispatchToProps)(NotificationsMenu);
+
+class NotificationsIcon extends Component {
+    render() {
+        return (
+            <div className={"header__notifications-icon " + (this.props.counter === 0 ? "without-counter" : "")} onClick={ this.props.onClick }>
+                <span className="icon">
+                    <Icon name="NotificationBell"/>
+                </span>
+                {
+                    this.props.counter > 0 &&
+                    <span className="counter">
+                        { this.props.counter > 99 ? "99+" : this.props.counter}
+                    </span>
+                }
+            </div>
+        )
+    }
+
+    static propTypes = {
+        counter: PropTypes.number.isRequired,
+        onClick: PropTypes.func
+    };
+
+    static defaultProps = {
+        onClick: () => 1
+    };
+}
+
+class Notifications extends Component {
+    render() {
+        const {isLoading, notifications} = this.props;
+        if (isLoading)
+            return (
+                <div className="notifications__dropdown">
+                    <Loader type="normal" active/>
+                </div>
+            );
+        else
+            return <div className="notifications__dropdown" dangerouslySetInnerHTML={{ __html: notifications }} />;
+    }
+
+    static propTypes = {
+        isLoading: PropTypes.bool.isRequired,
+        notifications: PropTypes.string.isRequired
+    }
+}
+
+class ProfileLink extends Component {
+    constructor(props) {
+        super(props);
+        this.openTooltip = this.openTooltip.bind(this);
+        this.closeTooltip = this.closeTooltip.bind(this);
+        this.state = {
+            tooltipTrigger: 'opened',
+        }
+    }
+
+    openTooltip() {
+        this.setState({
+            tooltipTrigger: 'opened'
+        })
+    }
+
+    closeTooltip() {
+        this.setState({
+            tooltipTrigger: 'closed'
+        })
+    }
+
+    render() {
+        let icon = <Icon name="User"/>;
+        let isProblem = this.props.account.accountProblems.length > 0;
+        if (isProblem) {
+            let firstProblem = this.props.account.accountProblems[0];
+            icon = (
+                <Tooltip trigger={ this.state.tooltipTrigger } pos="bottom center" render={() => (
+                    <div style={{width: '250px'}}>
+                        {firstProblem.description}
+                    </div>
+                )} onCloseClick={ this.closeTooltip }>
+                    <span onMouseOver={ this.openTooltip }>
+                        <Icon name="Warning" color="#f77"/>
+                    </span>
+                </Tooltip>
+            )
+        }
+
+        return (<div className="header__profile-link">
+            <Link to="/Account/Manage">
+                <span className="icon">
+                    { icon }
+                </span>
+                <span className="username">
+                    { this.props.account.visibleName || 'Профиль' }
+                </span>
+            </Link>
+        </div>)
+    }
+
+    static propTypes = {
+        account: accountPropTypes
+    }
+}
+
+class Separator extends Component {
+    render() {
+        return <div className="header__separator"/>
+    }
+}
+
+class LogoutLink extends Component {
+    constructor(props) {
+        super(props);
+        this.onClick = this.onClick.bind(this);
+    }
+
+    onClick() {
+        this.props.logout();
+    }
+
+    render() {
+        return <div className="header__logout-link"><a href="#" onClick={ this.onClick }>Выйти</a></div>
+    }
+
+    static mapStateToProps(state) {
+        return {};
+    }
+
+    static mapDispatchToProps(dispatch) {
+        return {
+            logout: () => dispatch(api.account.logout())
+        };
+    }
+}
+
+LogoutLink = connect(LogoutLink.mapStateToProps, LogoutLink.mapDispatchToProps)(LogoutLink);
+
+class RegistrationLink extends Component {
+    render() {
+        return (
+            <div className="header__registration-link">
+                <Link to={ "/Account/Register?returnUrl=" + (this.props.returnUrl || "/")}>Зарегистрироваться</Link>
+            </div>
+        )
+    }
+
+    static propTypes = {
+        returnUrl: PropTypes.string
+    }
+}
+
+class LoginLink extends Component {
+    render() {
+        return (
+            <div className="header__login-link">
+                <Link to={ "/Login?returnUrl=" + (this.props.returnUrl || "/") }>Войти</Link>
+            </div>
+        )
+    }
+
+    static propTypes = {
+        returnUrl: PropTypes.string
+    }
+}

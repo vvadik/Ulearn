@@ -3,6 +3,9 @@ import { Helmet } from "react-helmet";
 import Loader from "@skbkontur/react-ui/Loader"
 import * as PropTypes from "prop-types";
 import { saveAs } from "file-saver";
+import { connect } from "react-redux"
+import api from "../../api"
+import {getQueryStringParameter} from "../../utils";
 
 
 function getUrlParts(url) {
@@ -69,7 +72,8 @@ class DownloadedHtmlContent extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        this.fetchContentFromServer(nextProps.url);
+        if (this.props.url !== nextProps.url || this.props.account.isAuthenticated !== nextProps.account.isAuthenticated)
+            this.fetchContentFromServer(nextProps.url);
     }
 
     static removeBootstrapModalBackdrop() {
@@ -92,11 +96,20 @@ class DownloadedHtmlContent extends Component {
 
     fetchContentFromServer(url) {
         const self = this;
+
+        let courseId = this._getCourseIdFromUrl();
+        this.props.enterToCourse(courseId);
+
         fetch(this.BASE_URL + url, {credentials: 'include'})
             .then(response => {
                 if (response.redirected) {
-                    let url = getUrlParts(response.url);
-                    this.context.router.history.replace(url.pathname + url.search);
+                    /* If it was a redirect from external login callback, then update user information */
+                    const oldUrlPathname = getUrlParts(url).pathname;
+                    if (oldUrlPathname.startsWith("/Login/ExternalLoginCallback"))
+                        this.props.updateUserInformation();
+
+                    let newUrl = getUrlParts(response.url);
+                    this.context.router.history.replace(newUrl.pathname + newUrl.search);
                     return Promise.resolve(undefined);
                 }
                 /* Process attaches: download them and return url back */
@@ -137,6 +150,10 @@ class DownloadedHtmlContent extends Component {
     }
 
     processNewHtmlContent(url, data) {
+        /* In case if we haven't do it yet, get courseId from URL now */
+        let courseId = this._getCourseIdFromUrl();
+        this.props.enterToCourse(courseId);
+
         let el = document.createElement('html');
         el.innerHTML = data;
         let head = el.getElementsByTagName('head')[0];
@@ -188,6 +205,24 @@ class DownloadedHtmlContent extends Component {
         DownloadedHtmlContent.removeBootstrapModalBackdrop();
     }
 
+    _getCourseIdFromUrl() {
+        /* 1. Extract courseId from urls like /Course/<courseId/... */
+        const pathname = window.location.pathname;
+        if (pathname.startsWith('/Course/')) {
+            const regex = new RegExp('/Course/([^/]+)(/|$)');
+            const results = regex.exec(pathname);
+            return results[1].toLowerCase();
+        }
+
+        /* 2. Extract courseId from query string: ?courseId=BasicProgramming */
+        const courseIdFromQueryString = getQueryStringParameter("courseId");
+        if (courseIdFromQueryString)
+            return courseIdFromQueryString.toLowerCase();
+
+        /* 3. Return undefined if courseId is not found */
+        return undefined;
+    }
+
     downloadFile(blob, filename) {
         saveAs(blob, filename, false);
         if (this.lastRenderedUrl)
@@ -235,7 +270,7 @@ class DownloadedHtmlContent extends Component {
 
         let forms = Array.from(document.body.getElementsByTagName('form'));
         let postForms = forms.filter(f => f.method.toLowerCase() === 'post' && ! f.onsubmit && f.action);
-        console.log('Found forms with method="POST" ad without onsubmit:', postForms);
+        console.log('Found forms with method="POST" and without onsubmit:', postForms);
         postForms.forEach(f => {
             let url = f.action;
             if (exceptions.some(e => getUrlParts(url).pathname.startsWith(e)))
@@ -258,8 +293,13 @@ class DownloadedHtmlContent extends Component {
                     body: formData
                 }).then(response => {
                     if (response.redirected) {
-                        let url = getUrlParts(response.url);
-                        this.context.router.history.replace(url.pathname + url.search);
+                        /* If it was the login form, then update user information in header */
+                        let oldUrlPathname = getUrlParts(url).pathname;
+                        if (oldUrlPathname.startsWith('/Login') || oldUrlPathname.startsWith('/Account/') || oldUrlPathname.startsWith('/RestorePassword/'))
+                            this.props.updateUserInformation();
+
+                        let newUrl = getUrlParts(response.url);
+                        this.context.router.history.replace(newUrl.pathname + newUrl.search);
                         return Promise.resolve(undefined);
                     }
                     return response.text()
@@ -270,6 +310,23 @@ class DownloadedHtmlContent extends Component {
                 })
             });
         });
+    }
+
+    static mapStateToProps(state) {
+        return {
+            // To reload page after logging out of changing current user information
+            account: state.account
+        };
+    }
+
+    static mapDispatchToProps(dispatch) {
+        return {
+            enterToCourse: (courseId) => dispatch({
+                type: 'COURSES__COURSE_ENTERED',
+                courseId: courseId
+            }),
+            updateUserInformation: () => dispatch(api.account.getCurrentUser())
+        }
     }
 
     static contextTypes = {
@@ -320,4 +377,4 @@ class Meta extends Component {
     }
 }
 
-export default DownloadedHtmlContent;
+export default connect(DownloadedHtmlContent.mapStateToProps, DownloadedHtmlContent.mapDispatchToProps)(DownloadedHtmlContent);

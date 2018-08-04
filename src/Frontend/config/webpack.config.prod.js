@@ -152,9 +152,34 @@ module.exports = {
             include: paths.appSrc,
             loader: require.resolve('babel-loader'),
             options: {
-              
               compact: true,
             },
+          },
+          // Process Less with less-loader
+          {
+            test: /\.less$/,
+            loader: ExtractTextPlugin.extract(
+              Object.assign({
+                fallback: {
+                    loader: require.resolve('style-loader'),
+                    options: {
+                        hmr: false,
+                    },
+                },
+                use: [
+                    {
+                        loader: require.resolve('css-loader'),
+                        options: {
+                            importLoaders: 1,
+                            minimize: true,
+                            sourceMap: shouldUseSourceMap,
+                        },
+                    },
+                    require.resolve('less-loader'),
+                ]
+              },
+              extractTextPluginOptions)
+            ),
           },
           // The notation here is somewhat confusing.
           // "postcss" loader applies autoprefixer to our CSS.

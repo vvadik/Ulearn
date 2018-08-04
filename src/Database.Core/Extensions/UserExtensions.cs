@@ -12,6 +12,7 @@ namespace Database.Extensions
 	{
 		private const string courseRoleClaimType = "CourseRole";
 		
+		/* TODO (andgein): Replace to working with UserRolesRepo */
 		public static bool HasAccessFor(this IPrincipal principal, string courseId, CourseRole minAccessLevel)
 		{
 			if (principal.IsSystemAdministrator())

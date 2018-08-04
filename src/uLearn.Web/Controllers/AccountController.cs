@@ -365,6 +365,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> Manage(ManageMessageId? message, string provider="", string otherUserId="")
 		{
 			ViewBag.StatusMessage = message?.GetAttribute<DisplayAttribute>().GetName();
+			ViewBag.IsStatusMessageAboutSocialLogins = message == ManageMessageId.LoginAdded || message == ManageMessageId.LoginRemoved;
 			if (message == ManageMessageId.AlreadyLinkedToOtherUser)
 			{
 				var otherUser = await userManager.FindByIdAsync(otherUserId);
@@ -595,6 +596,7 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		[ULearnAuthorize(ShouldBeSysAdmin = true)]
 		[ValidateAntiForgeryToken]
+		[ValidateInput(false)]
 		public async Task<ActionResult> ResetPassword(string newPassword, string userId)
 		{
 			var user = await userManager.FindByIdAsync(userId);

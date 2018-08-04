@@ -259,6 +259,10 @@ p + .revealed {
 /* ReSharper restore DeclarationIsEmpty */
 /*#endregion */
 
+.container .jumbotron {
+	margin-top: 40px;
+}
+
 .jumbotron-logo {
 	float: left;
     margin: -20px 30px 0;
@@ -1326,7 +1330,7 @@ li.li-success {
 	padding-bottom: 5px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
 	.login-and-registration-form .control-label {
 		display: none;
 	}
@@ -1386,12 +1390,8 @@ hr.without-top-margin {
 
 #externalLogins table td {
 	border-top-width: 0;
-	padding: 10px 0 0 0;
+	padding: 0 0 10px 0;
 	vertical-align: middle;
-}
-
-#externalLogins table tr:first-child td {
-	border-top-width: 1px;
 }
 
 /* Strike line */
