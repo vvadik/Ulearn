@@ -412,7 +412,7 @@ class NotificationsMenu extends Component {
     };
 
     _handleClickOutside = (event) => {
-        if (this.ref && !this.ref.contains(event.target) && !this.dropdownContainerRef.contains(event.target)) {
+        if (this.ref && !this.ref.contains(event.target) && this.dropdownContainerRef && !this.dropdownContainerRef.contains(event.target)) {
             this.setState({
                 isOpened: false,
             });
