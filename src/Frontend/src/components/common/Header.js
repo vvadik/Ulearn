@@ -62,7 +62,7 @@ class Header extends Component {
         if (isCourseMenuVisible) {
             let courseId = this.props.courses.currentCourseId;
             if (this.props.account.isSystemAdministrator)
-                courseRole = 'CourseAdmin';
+                courseRole = 'courseAdmin';
             else
                 courseRole = roleByCourse[courseId];
             courseAccesses = accessesByCourse[courseId] || [];
@@ -213,7 +213,7 @@ SysAdminMenu = connect(SysAdminMenu.mapStateToProps)(SysAdminMenu);
 
 class MyCoursesMenu extends AbstractMyCoursesMenu {
     static menuItems(courseIds, courseById) {
-        AbstractMyCoursesMenu._getCourseMenuItems(courseIds, courseById)
+        return AbstractMyCoursesMenu._getCourseMenuItems(courseIds, courseById)
     }
 
     render() {
@@ -247,8 +247,8 @@ class CourseMenu extends Component {
             <MenuItem href={"/Admin/Certificates?courseId=" + courseId} key="Certificates" component={ LinkComponent }>Сертификаты</MenuItem>,
         ];
 
-        let hasUsersMenuItem = role === 'CourseAdmin' || accesses.indexOf('addAndRemoveInstructors') !== -1;
-        let hasCourseAdminMenuItems = role === 'CourseAdmin';
+        let hasUsersMenuItem = role === 'courseAdmin' || accesses.indexOf('addAndRemoveInstructors') !== -1;
+        let hasCourseAdminMenuItems = role === 'courseAdmin';
 
         if (hasUsersMenuItem || hasCourseAdminMenuItems)
             items.push(<MenuSeparator key="CourseMenuSeparator2"/>);
