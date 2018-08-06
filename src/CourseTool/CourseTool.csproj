@@ -431,6 +431,9 @@
     <Content Include="renderer\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="renderer\fonts\glyphicons-halflings-regular.woff" />
     <Content Include="renderer\fonts\glyphicons-halflings-regular.woff2" />
+    <Content Include="renderer\scripts\javascript.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="renderer\scripts\slide-*.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -512,6 +515,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="renderer\styles\show-hint.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="static\javascript.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="templates\code.html">

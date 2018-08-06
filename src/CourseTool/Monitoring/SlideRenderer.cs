@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,7 +10,7 @@ using uLearn.Web.Views.Course;
 namespace uLearn.CourseTool.Monitoring
 {
 	/* RazorGenerator uses HelperPage which need a HelperPage.PageContext to be defined. 
-	   We create a fake web page for it. It's not used never but is passed to PageContext constructor. */
+	We create a fake web page for it. It's not used never but is passed to PageContext constructor. */
 	public class FakeWebPage : WebPage
 	{
 		public override void Execute()
@@ -22,8 +22,8 @@ namespace uLearn.CourseTool.Monitoring
 
 	public class SlideRenderer
 	{
-		private readonly DirectoryInfo htmlDirectory;
 		private readonly Course course;
+		private readonly DirectoryInfo htmlDirectory;
 
 		public SlideRenderer(DirectoryInfo htmlDirectory, Course course)
 		{
@@ -82,7 +82,7 @@ namespace uLearn.CourseTool.Monitoring
 			var slide = new Slide(
 				new[] { new MdBlock(note.Markdown) },
 				new SlideInfo(unit, similarSlide.Info.SlideFile, -1), "Заметки преподавателю", Guid.NewGuid(),
-				meta: null
+				null
 			);
 			var page = StandaloneLayout.Page(course, slide, CreateToc(slide), GetCssFiles(), GetJsFiles());
 
@@ -116,12 +116,12 @@ namespace uLearn.CourseTool.Monitoring
 		{
 			yield return "styles/bootstrap.css";
 			yield return "styles/awesome-bootstrap-checkbox.css";
-			yield return "styles/codemirror.css"; 
-			yield return "styles/cobalt.css"; 
-			yield return "styles/flexslider.css"; 
-			yield return "styles/font-awesome.css"; 
-			yield return "styles/jsdifflib.css"; 
-			yield return "styles/katex.min.css"; 
+			yield return "styles/codemirror.css";
+			yield return "styles/cobalt.css";
+			yield return "styles/flexslider.css";
+			yield return "styles/font-awesome.css";
+			yield return "styles/jsdifflib.css";
+			yield return "styles/katex.min.css";
 			yield return "styles/show-hint.css";
 			yield return "styles/site.css";
 			yield return "styles/ulearn.css";
@@ -137,6 +137,7 @@ namespace uLearn.CourseTool.Monitoring
 			yield return "scripts/jquery.flexslider-min.js";
 			yield return "scripts/codemirror.js";
 			yield return "scripts/clike.js";
+			yield return "scripts/javascript.js";
 			yield return "scripts/python.js";
 			yield return "scripts/show-hint.js";
 			yield return "scripts/cscompleter.js";
