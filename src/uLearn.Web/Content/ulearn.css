@@ -273,6 +273,10 @@ p + .revealed {
 	padding-bottom: 10px;
 }
 
+.slide h1 {
+	margin-bottom: 20px;
+}
+
 .slide .slide__title {
     margin-right: 20px;
 }
@@ -2506,6 +2510,10 @@ h1 .copy-group-link {
 .loading-spinner img {
 	height: 60px;
 	width: auto;
+}
+
+.exercise {
+	margin-top: 30px;
 }
 
 .exercise__submission .loading-spinner {
