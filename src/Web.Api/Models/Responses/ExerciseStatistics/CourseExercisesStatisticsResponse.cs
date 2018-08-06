@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Ulearn.Web.Api.Models.Common;
 
-namespace Ulearn.Web.Api.Models.Results.ExerciseStatistics
+namespace Ulearn.Web.Api.Models.Responses.ExerciseStatistics
 {
 	[DataContract]
-	public class CourseExercisesStatisticsResult
+	public class CourseExercisesStatisticsResponse : ApiResponse
 	{
 		[DataMember(Name = "exercises")]
 		public List<OneExerciseStatistics> Exercises { get; set; }

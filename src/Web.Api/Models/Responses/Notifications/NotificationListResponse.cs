@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Database.Models;
-using Telegram.Bot.Types;
 using Ulearn.Web.Api.Models.Common;
 
-namespace Ulearn.Web.Api.Models.Results.Notifications
+namespace Ulearn.Web.Api.Models.Responses.Notifications
 {
 	[DataContract]
-	public class NotificationListResult
+	public class NotificationListResponse : ApiResponse
 	{
 		[DataMember(Name = "important")]
 		public NotificationList Important { get; set; }

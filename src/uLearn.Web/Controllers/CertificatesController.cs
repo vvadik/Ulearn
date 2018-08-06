@@ -56,6 +56,25 @@ namespace uLearn.Web.Controllers
 				CoursesTitles = coursesTitles,
 			});
 		}
+		
+		[Authorize]
+		public ActionResult Partial()
+		{
+			var userId = User.Identity.GetUserId();
+			var user = userManager.FindById(userId);
+			if (user == null)
+				return HttpNotFound();
+
+			var certificates = certificatesRepo.GetUserCertificates(userId);
+			var coursesTitles = courseManager.GetCourses().ToDictionary(c => c.Id.ToLower(), c => c.Title);
+
+			return PartialView("ListPartial", new UserCertificatesViewModel
+			{
+				User = user,
+				Certificates = certificates,
+				CoursesTitles = coursesTitles,
+			});
+		}
 
 		public ActionResult CertificateById(Guid certificateId)
 		{

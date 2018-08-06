@@ -251,7 +251,7 @@ namespace Database.Repos
 
 		public int GetAcceptedSolutionsCount(string courseId, Guid slideId)
 		{
-			return GetAllAcceptedSubmissions(courseId, new List<Guid> { slideId }).DistinctBy(x => x.UserId).Count();
+			return GetAllAcceptedSubmissions(courseId, new List<Guid> { slideId }).Select(x => x.UserId).Distinct().Count();
 		}
 
 		public bool IsCheckingSubmissionByUser(string courseId, Guid slideId, string userId, DateTime periodStart, DateTime periodFinish)

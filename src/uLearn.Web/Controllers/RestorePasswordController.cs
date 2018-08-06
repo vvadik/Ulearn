@@ -156,6 +156,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
+		[ValidateInput(false)]
 		public async Task<ActionResult> SetNewPassword(SetNewPasswordModel model)
 		{
 			var answer = new SetNewPasswordModel

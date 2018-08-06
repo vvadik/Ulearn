@@ -43,6 +43,7 @@ namespace uLearn.Web.Controllers
 			}
 
 			// If we got this far, something failed, redisplay form
+			ViewBag.ReturnUrl = returnUrl;
 			return View(model);
 		}
 

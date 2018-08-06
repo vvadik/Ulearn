@@ -8,7 +8,7 @@ import LinkClickCapturer from "../components/common/LinkClickCapturer";
 
 class AnyPage extends Component {
     constructor(props) {
-        super();
+        super(props);
         this.state = {
             href: props.location.pathname + props.location.search,
         };

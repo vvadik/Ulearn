@@ -1302,6 +1302,7 @@
     <Content Include="tablesorter-master\test.html" />
     <Content Include="Views\Admin\StyleValidations.cshtml" />
     <Content Include="Views\AntiPlagiarism\Details.cshtml" />
+    <Content Include="Views\Certificates\ListPartial.cshtml" />
     <Content Include="Views\Errors\404.cshtml" />
     <Content Include="Views\Errors\Error.cshtml" />
     <Content Include="Views\Exercise\StudentSubmissions.cshtml" />

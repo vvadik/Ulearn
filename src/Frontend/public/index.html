@@ -20,7 +20,7 @@
           Learn how to configure a non-root public URL by running `npm run build`.
         -->
 
-        <link rel="stylesheet" href="/ulearn.bundle.css" />
+        <link rel="stylesheet" href="/ulearn.bundle.css?v=20180805" />
         <link rel="stylesheet" href="/katex/katex.min.css" />
 
         <!-- Add Sentry (https://sentry.io) script for error logging -->
@@ -35,6 +35,11 @@
         </noscript>
         <div id="outdated"></div>
         <div id="root"></div>
+
+        <script>
+            /* Don't change following line. Backend inserts configuration in this line looking for pattern */
+            window.config = {};
+        </script>
 
         <script src="/scripts.bundle.js"></script>
         <script src="/modernizr.bundle.js"></script>

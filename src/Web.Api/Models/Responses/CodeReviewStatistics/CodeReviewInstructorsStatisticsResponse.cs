@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Ulearn.Web.Api.Models.Common;
 
-namespace Ulearn.Web.Api.Models.Results.CodeReviewStatistics
+namespace Ulearn.Web.Api.Models.Responses.CodeReviewStatistics
 {
 	[DataContract]
-	public class CodeReviewInstructorsStatisticsResult
+	public class CodeReviewInstructorsStatisticsResponse : ApiResponse
 	{
 		[DataMember(Name = "instructors")]
 		public List<CodeReviewInstructorStatistics> Instructors { get; set; }
