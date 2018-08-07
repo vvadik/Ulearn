@@ -72,7 +72,7 @@ namespace uLearn.CSharp.RedundantElseValidation
 						"..", "CSharp", "ExampleFiles", "submissions_errors", $"{file.Name}_errors.txt"),
 					$@"{fileContent}
 
-{errors}");
+{errors.Join(Environment.NewLine)}");
 
 				Assert.Fail();
 			}
