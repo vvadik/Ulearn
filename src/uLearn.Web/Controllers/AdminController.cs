@@ -333,7 +333,8 @@ namespace uLearn.Web.Controllers
 			return View(viewName, new ManualCheckingQueueViewModel
 			{
 				CourseId = courseId,
-				Checkings = checkings.Take(MaxShownQueueSize).Select(c =>
+                /* TODO (andgein): Merge FindSlideById and GetSlideById */
+				Checkings = checkings.Take(MaxShownQueueSize).Where(c => course.FindSlideById(c.SlideId) != null).Select(c =>
 				{
 					var slide = course.GetSlideById(c.SlideId);
 					return new ManualCheckingQueueItemViewModel
