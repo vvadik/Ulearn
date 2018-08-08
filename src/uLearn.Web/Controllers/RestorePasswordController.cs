@@ -116,7 +116,7 @@ namespace uLearn.Web.Controllers
 
 			var subject = "Восстановление пароля от ulearn.me";
 			var textBody = "Чтобы изменить пароль к аккаунту " + user.UserName + ", перейдите по ссылке: " + url + ".";
-			var htmlBody = "Чтобы изменить пароль к аккаунту " + user.UserName + ", перейдите по ссылке: <a href=\"" + url + "\">" + url + "</a>.";
+			var htmlBody = "Чтобы изменить пароль к аккаунту " + user.UserName.EscapeHtml() + ", перейдите по ссылке: <a href=\"" + url + "\">" + url + "</a>.";
 			var messageInfo = new MessageSentInfo
 			{
 				RecipientAddress = user.Email,
