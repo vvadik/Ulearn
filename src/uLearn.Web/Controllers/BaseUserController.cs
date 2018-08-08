@@ -80,7 +80,7 @@ namespace uLearn.Web.Controllers
 				Variables = new Dictionary<string, object>
 				{
 					{ "title", subject },
-					{ "content", $"<h2>Привет, {user.VisibleName}!</h2><p>Подтверди адрес электронной почты, нажав на кнопку:</p>" },
+					{ "content", $"<h2>Привет, {user.VisibleName.EscapeHtml()}!</h2><p>Подтверди адрес электронной почты, нажав на кнопку:</p>" },
 					{ "text_content", $"Привет, {user.VisibleName}!\nПодтверди адрес электронной почты, нажав на кнопку:" },
 					{ "button", true },
 					{ "button_link", confirmationUrl },
