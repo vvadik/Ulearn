@@ -25,6 +25,16 @@ namespace uLearn.CSharp.RedundantElseValidation
 
 		private static string[] correctFilenames => CorrectTestDataDir.GetFiles().Select(f => f.Name).ToArray();
 		private static string[] incorrectFilenames => IncorrectTestDataDir.GetFiles().Select(f => f.Name).ToArray();
+		
+		private static DirectoryInfo BasicProgrammingDirectory =>
+        			new DirectoryInfo(TestPaths.BasicProgrammingDirectoryPath);
+        
+        		private static IEnumerable<FileInfo> BasicProgrammingFiles =>
+        			BasicProgrammingDirectory
+        				.EnumerateFiles("*.cs", SearchOption.AllDirectories)
+        				.Where(f => !f.Name.Equals("Settings.Designer.cs") &&
+        							!f.Name.Equals("Resources.Designer.cs") &&
+        							!f.Name.Equals("AssemblyInfo.cs"));
 
 		private static DirectoryInfo ULearnSubmissionsDirectory =>
 			new DirectoryInfo(TestPaths.ULearnSubmissionsDirectoryPath);
@@ -60,6 +70,26 @@ namespace uLearn.CSharp.RedundantElseValidation
 		}
 		
 		[Explicit]
+		[TestCaseSource(nameof(BasicProgrammingFiles))]
+		public void NotFindErrors_InBasicProgramming(FileInfo file)
+		{
+			var fileContent = file.ContentAsUtf8();
+
+			var errors = validator.FindErrors(fileContent);
+
+			if (errors != null && errors.Count != 0)
+			{
+				File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
+						"..", "CSharp", "ExampleFiles", "errors", $"{file.Name}_errors.txt"),
+					$@"{fileContent}
+
+{errors.Join(Environment.NewLine)}");
+
+				Assert.Fail();
+			}
+		}
+
+        [Explicit]
 		[TestCaseSource(nameof(SubmissionsFiles))]
 		public void NotFindErrors_InCheckAcceptedFiles(FileInfo file)
 		{

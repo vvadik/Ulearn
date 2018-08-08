@@ -29,6 +29,7 @@ namespace uLearn.CSharp.Validators
 			new RefArgumentsValidator(),
 			new VarInVariableDeclarationValidator(),
             new BracketValidator(),
+            new RedundantElseValidator(),
 			new IndentsValidator()
 		};
 
