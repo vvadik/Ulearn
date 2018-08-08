@@ -23,7 +23,7 @@ export function getCurrentUser() {
                 }
             })
             .catch(error => {
-                if (error.response.status === 401) { // Unauthorized
+                if (error.response && error.response.status === 401) { // Unauthorized
                     dispatch({ type: 'ACCOUNT__USER_INFO_UPDATED', isAuthenticated: false });
                 }
             })
