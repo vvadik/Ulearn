@@ -20,23 +20,23 @@ namespace uLearn.CSharp.Validators
 			if (!DoesIfStatementContainsElseClause(childNodes))
 				yield break;
 
-			var correspondindElseClause = childNodes[2];
+			var correspondingElseClause = childNodes[2];
 			var statementUnderIf = childNodes[1];
 			
 			switch (statementUnderIf)
 			{
 				case ReturnStatementSyntax _:
 				case ThrowStatementSyntax _:
-					yield return new SolutionStyleError(StyleErrorType.RedundantElse01, correspondindElseClause);
+					yield return new SolutionStyleError(StyleErrorType.RedundantElse01, correspondingElseClause);
 					break;
 				case BlockSyntax blockSyntax:
 					var statementsInBlock = blockSyntax.ChildNodes();
 					var returnStatementsInBlock = statementsInBlock.OfType<ReturnStatementSyntax>();
 					if (returnStatementsInBlock.Any())
-						yield return new SolutionStyleError(StyleErrorType.RedundantElse01, correspondindElseClause);
+						yield return new SolutionStyleError(StyleErrorType.RedundantElse01, correspondingElseClause);
 					var throwStatementsInBlock = statementsInBlock.OfType<ThrowStatementSyntax>();
 					if (throwStatementsInBlock.Any())
-						yield return new SolutionStyleError(StyleErrorType.RedundantElse01, correspondindElseClause);
+						yield return new SolutionStyleError(StyleErrorType.RedundantElse01, correspondingElseClause);
 					break;
 			}
 		}

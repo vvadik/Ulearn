@@ -218,7 +218,7 @@ namespace uLearn.CSharp
 		VarInVariableDeclaration01,
 		
 		
-		[MessageTemplate("Тело else никогда не будет выполнено, его можно убрать")]
+		[MessageTemplate("Тело `else` никогда не будет выполнено, его можно убрать.")]
 		RedundantElse01,
 	}
 
