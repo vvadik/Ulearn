@@ -80,11 +80,13 @@ namespace uLearn.CourseTool.Validating
 			var submission = ex.CreateSubmission(ex.CsprojFileName, solutionCode);
 			var result = SandboxRunner.Run(submission, new SandboxRunnerSettings());
 
-			if (VerdictIsNotOk(result))
+			if (!IsCompiledAndExecuted(result))
 				ReportSlideError(slide, $"Correct solution file {ex.CorrectSolutionFileName} verdict is not OK. RunResult = {result}");
 
-			if (!IsSolution(result))
-				ReportSlideError(slide, $"Correct solution file {ex.CorrectSolutionFileName} is not solution. RunResult = {result}");
+			if (!ex.IsCorrectRunResult(result))
+				ReportSlideError(slide, $"Correct solution file {ex.CorrectSolutionFileName} is not solution. RunResult = {result}. " +
+										$"ExpectedOutput = {ex.ExpectedOutput.NormalizeEoln()} " +
+										$"RealOutput = {result.GetOutput().NormalizeEoln()}");
 			var buildResult = ex.BuildSolution(solutionCode);
 
 			if (buildResult.HasStyleErrors)
@@ -111,13 +113,13 @@ namespace uLearn.CourseTool.Validating
 
 		private void ReportWarningIfWrongAnswerVerdictIsNotOk(string waFileName, RunningResults waResult)
 		{
-			if (VerdictIsNotOk(waResult))
+			if (!IsCompiledAndExecuted(waResult))
 				ReportSlideWarning(slide, $"Code verdict of file with wrong answer ({waFileName}) is not OK. RunResult = " + waResult);
 		}
 
 		private void ReportWarningIfWrongAnswerIsSolution(string waFileName, RunningResults waResult)
 		{
-			if (IsSolution(waResult))
+			if (ex.IsCorrectRunResult(waResult))
 				ReportSlideWarning(slide, $"Code of file with wrong answer ({waFileName}) is solution!");
 		}
 
@@ -135,13 +137,13 @@ namespace uLearn.CourseTool.Validating
 
 		private void ReportErrorIfInitialCodeVerdictIsNotOk(RunningResults result)
 		{
-			if (VerdictIsNotOk(result))
+			if (!IsCompiledAndExecuted(result))
 				ReportSlideError(slide, "Exercise initial code verdict is not OK. RunResult = " + result);
 		}
 
 		private void ReportErrorIfInitialCodeIsSolution(RunningResults result)
 		{
-			if (IsSolution(result))
+			if (ex.IsCorrectRunResult(result))
 				ReportSlideError(slide, "Exercise initial code (available to students) is solution!");
 		}
 

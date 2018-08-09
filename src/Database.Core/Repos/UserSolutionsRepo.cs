@@ -433,7 +433,7 @@ namespace Database.Repos
 			var isWebRunner = checking.CourseId == "web" && checking.SlideId == Guid.Empty;
 			var exerciseSlide = isWebRunner ? null : (ExerciseSlide)courseManager.GetCourse(checking.CourseId).GetSlideById(checking.SlideId);
 
-			var isRightAnswer = IsRightAnswer(result, output, exerciseSlide?.Exercise);
+			var isRightAnswer = exerciseSlide?.Exercise?.IsCorrectRunResult(result) ?? false;
 			var score = exerciseSlide != null && isRightAnswer ? exerciseSlide.Exercise.CorrectnessScore : 0;
 
 			/* For skipped slides score is always 0 */
@@ -461,27 +461,6 @@ namespace Database.Repos
 			return newChecking;
 		}
 		
-		private bool IsRightAnswer(RunningResults result, string output, ExerciseBlock exerciseBlock)
-		{
-			if (result.Verdict != Verdict.Ok )
-				return false;
-			
-			/* For sandbox runner */
-			if (exerciseBlock == null)
-				return false;
-
-			if (exerciseBlock.ExerciseType == ExerciseType.CheckExitCode)
-				return true;
-
-			if (exerciseBlock.ExerciseType == ExerciseType.CheckOutput)
-			{
-				var expectedOutput = exerciseBlock?.ExpectedOutput.NormalizeEoln();
-				return output.Equals(expectedOutput);
-			}
-
-			throw new InvalidOperationException($"Unknown exercise type for checking: {exerciseBlock.ExerciseType}");
-		}
-
 		public async Task RunAutomaticChecking(UserExerciseSubmission submission, TimeSpan timeout, bool waitUntilChecked)
 		{
 			log.Info($"Запускаю проверку решения. ID посылки: {submission.Id}");

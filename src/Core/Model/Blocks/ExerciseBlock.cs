@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -157,6 +157,23 @@ namespace uLearn.Model.Blocks
 
 			if (string.IsNullOrEmpty(ScoringGroup))
 				ScoringGroup = scoring.DefaultScoringGroupForExercise;
+		}
+
+		public bool IsCorrectRunResult(RunningResults result)
+		{
+			if (result.Verdict != Verdict.Ok)
+				return false;
+
+			if (ExerciseType == ExerciseType.CheckExitCode)
+				return true;
+
+			if (ExerciseType == ExerciseType.CheckOutput)
+			{
+				var expectedOutput = ExpectedOutput.NormalizeEoln();
+				return result.Output.NormalizeEoln().Equals(expectedOutput);
+			}
+
+			throw new InvalidOperationException($"Unknown exercise type for checking: {ExerciseType}");
 		}
 	}
 
