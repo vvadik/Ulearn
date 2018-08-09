@@ -37,6 +37,8 @@ namespace uLearn.CourseTool.CmdLineOptions
 		public Config Config => config.Value;
 		private readonly Lazy<Config> config;
 
+		public DirectoryInfo CoursePackageRoot => new DirectoryInfo(Path.Combine(Dir, Config.ULearnCoursePackageRoot));
+
 		public void InitializeDirectoryIfNotYet()
 		{
 			if (!Directory.Exists(Dir))

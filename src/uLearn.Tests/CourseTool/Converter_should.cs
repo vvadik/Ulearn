@@ -1,8 +1,9 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using NUnit.Framework.Internal;
 using uLearn.Model.Blocks;
 using uLearn.Model.Edx;
 using uLearn.Model.Edx.EdxComponents;
@@ -20,8 +21,8 @@ namespace uLearn.CourseTool
 		private const string youtubeIdFromCourse = "GZS36w_fxdg";
 		private static readonly Guid slideIdFromCourse = Guid.Parse("108C89D9-36F0-45E3-BBEE-B93AC971063F");
 		private CourseManager courseManager;
-		private const string slideUrl = "https://192.168.33.1:44300/Course/{0}/LtiSlide/{1}";
-		private const string solutionsUrl = "https://192.168.33.1:44300/Course/{0}/AcceptedAlert/{1}";
+		private readonly DirectoryInfo testCourseDirectory = new DirectoryInfo(@"..\..\..\..\courses\ForTests\Slides");
+		private const string ulearnBaseUrl = "https://192.168.33.1:44300";
 		private const string ltiId = "edx";
 		private const string testFolderName = "test";
 
@@ -32,7 +33,7 @@ namespace uLearn.CourseTool
 			if (!Directory.Exists(testFolderName))
 				Directory.CreateDirectory(testFolderName);
 			courseManager = new CourseManager(new DirectoryInfo("."));
-			course = courseManager.LoadCourseFromDirectory(new DirectoryInfo(@"..\..\..\..\courses\ForTests\Slides"));
+			course = courseManager.LoadCourseFromDirectory(testCourseDirectory);
 		}
 
 		[TearDown]
@@ -48,8 +49,8 @@ namespace uLearn.CourseTool
 				Organization = "org",
 				LtiId = ""
 			};
-			return Converter.ToEdxCourse(course, config, slideUrl, solutionsUrl,
-				youtubeId2UlearnVideoIds ?? new Dictionary<string, string>());
+			return Converter.ToEdxCourse(course, config, ulearnBaseUrl,
+				youtubeId2UlearnVideoIds ?? new Dictionary<string, string>(), testCourseDirectory.Parent);
 		}
 
 		private IEnumerable<VideoComponent> GetVideoComponentFromDictionary(Dictionary<string, Tuple<string, string>> dict)
@@ -158,10 +159,10 @@ namespace uLearn.CourseTool
 			new OlxPatcher(olxPath).PatchVerticals(edxCourse, course.Slides
 				.Select(x => x.ToVerticals(
 					course.Id,
-					slideUrl,
-					solutionsUrl,
+					ulearnBaseUrl,
 					new Dictionary<string, string>(),
-					ltiId
+					ltiId,
+					testCourseDirectory.Parent
 				).ToArray()));
 
 			var edxCourse2 = EdxCourse.Load(olxPath);
@@ -178,10 +179,10 @@ namespace uLearn.CourseTool
 			new OlxPatcher(olxPath).PatchVerticals(edxCourse, new[] { aTextSlide }
 				.Select(x => x.ToVerticals(
 					course.Id,
-					slideUrl,
-					solutionsUrl,
+					ulearnBaseUrl,
 					new Dictionary<string, string>(),
-					ltiId
+					ltiId,
+					testCourseDirectory.Parent
 				).ToArray()));
 
 			var edxCourse2 = EdxCourse.Load(olxPath);
@@ -200,10 +201,10 @@ namespace uLearn.CourseTool
 			new OlxPatcher(olxPath).PatchVerticals(edxCourse, new[] { exerciseSlide }
 				.Select(x => x.ToVerticals(
 					course.Id,
-					slideUrl,
-					solutionsUrl,
+					ulearnBaseUrl,
 					new Dictionary<string, string>(),
-					ltiId
+					ltiId,
+					testCourseDirectory.Parent
 				).ToArray()));
 
 			var edxCourse2 = EdxCourse.Load(olxPath);

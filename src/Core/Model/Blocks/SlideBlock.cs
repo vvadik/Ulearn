@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel;
+using System.IO;
 using System.Xml.Serialization;
 using Component = uLearn.Model.Edx.EdxComponents.Component;
 
@@ -21,7 +22,7 @@ namespace uLearn.Model.Blocks
 			yield return this;
 		}
 
-		public abstract Component ToEdxComponent(string displayName, Slide slide, int componentIndex);
+		public abstract Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot);
 
 		public virtual string TryGetText()
 		{

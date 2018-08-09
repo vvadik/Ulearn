@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Xml.Serialization;
 using uLearn.Model.Edx.EdxComponents;
 using Ulearn.Common.Extensions;
@@ -47,7 +48,7 @@ namespace uLearn.Model.Blocks
 			yield return this;
 		}
 
-		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot)
 		{
 			var urlName = slide.NormalizedGuid + componentIndex;
 			return new CodeComponent(urlName, displayName, urlName, LangId, Code);

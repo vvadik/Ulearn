@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -57,11 +57,14 @@ namespace uLearn.Model.Blocks
 			return $"Markdown {Markdown}";
 		}
 
-		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot)
 		{
+			var slideDirectory = slide.Info.SlideFile.Directory;
+			var directoryRelativePath = "/Courses/" + courseId + "/" + slideDirectory.GetRelativePath(coursePackageRoot.FullName);
+			var baseUrl = ulearnBaseUrl + directoryRelativePath.Replace('\\', '/');
+			var html = RenderMd(courseId, slide.Id, baseUrl);
 			var urlName = slide.NormalizedGuid + componentIndex;
-			var htmlWithUrls = Markdown.GetHtmlWithUrls("/static/" + urlName + "_");
-			return new HtmlComponent(urlName, displayName, urlName, htmlWithUrls.Item1, slide.Info.SlideFile.Directory.FullName, htmlWithUrls.Item2);
+			return new HtmlComponent(urlName, displayName, urlName, html);
 		}
 
 		public Component ToEdxComponent(string urlName, string displayName, string directoryName)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using CommandLine;
@@ -52,10 +52,8 @@ namespace uLearn.CourseTool.CmdLineOptions
 			Converter.ToEdxCourse(
 				course,
 				Config,
-				profile.UlearnUrl + SlideUrlFormat,
-				profile.UlearnUrl + SolutionsUrlFormat,
-				video.Records.ToDictionary(x => x.Data.Id, x => x.Guid.GetNormalizedGuid())
-			).Save(Dir + "/olx");
+				profile.UlearnUrl,
+				video.Records.ToDictionary(x => x.Data.Id, x => x.Guid.GetNormalizedGuid()), CoursePackageRoot).Save(Dir + "/olx");
 
 			EdxInteraction.CreateEdxCourseArchive(Dir, course.Id);
 

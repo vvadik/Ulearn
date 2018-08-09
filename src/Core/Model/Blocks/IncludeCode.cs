@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Xml.Serialization;
 using uLearn.Model.Edx.EdxComponents;
@@ -32,7 +32,7 @@ namespace uLearn.Model.Blocks
 			LangVer = LangVer ?? context.CourseSettings.GetLanguageVersion(LangId);
 		}
 
-		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot)
 		{
 			if (!string.IsNullOrEmpty(CodeFile))
 				throw new Exception("IncludeCode.cs: File string is not empty.");

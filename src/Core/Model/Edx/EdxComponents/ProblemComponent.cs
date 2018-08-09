@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Xml;
 using System.Xml.Serialization;
 using Ulearn.Common.Extensions;
@@ -31,8 +31,8 @@ namespace uLearn.Model.Edx.EdxComponents
 		[XmlIgnore]
 		public Component[] Subcomponents;
 
-		[XmlElement("p")]
-		public XmlElement[] XmlSubcomponents;
+//		[XmlElement("p")]
+//		public XmlElement[] XmlSubcomponents;
 
 		[XmlIgnore]
 		public override string SubfolderName

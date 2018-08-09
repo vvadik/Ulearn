@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using CommandLine;
@@ -36,10 +36,10 @@ namespace uLearn.CourseTool.CmdLineOptions
 					.Where(s => guids == null || guids.Contains(s.NormalizedGuid))
 					.Select(s => s.ToVerticals(
 						ulearnCourse.Id,
-						profile.UlearnUrl + SlideUrlFormat,
-						profile.UlearnUrl + SolutionsUrlFormat,
+						profile.UlearnUrl,
 						videoGuids,
-						config.LtiId
+						config.LtiId,
+						CoursePackageRoot
 					).ToArray()),
 				guids != null || !SkipExistingGuids
 			);
@@ -73,6 +73,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 					sequentials.Add(sequentialNote);
 					new Chapter(chapter.UrlName, chapter.DisplayName, chapter.Start, sequentials.ToArray()).Save(olxPath);
 				}
+
 				sequentialNote.Save(olxPath);
 			}
 		}

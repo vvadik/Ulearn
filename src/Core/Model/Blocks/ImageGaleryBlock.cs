@@ -1,3 +1,4 @@
+using System.IO;
 using System.Xml.Serialization;
 using uLearn.Model.Edx.EdxComponents;
 
@@ -23,7 +24,7 @@ namespace uLearn.Model.Blocks
 			return string.Format("Images {0}", string.Join("\n", ImageUrls));
 		}
 
-		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot)
 		{
 			var urlName = slide.NormalizedGuid + componentIndex;
 			return new GalleryComponent(urlName, displayName, urlName, slide.Info.SlideFile.Directory.FullName, ImageUrls);

@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
 using uLearn.Model;
@@ -72,7 +73,7 @@ namespace uLearn
 
 		public string Url => LatinTitle + "_" + NormalizedGuid;
 
-		private static IEnumerable<Vertical> OrdinarySlideToVerticals(string courseId, Slide slide, string slideUrl, string solutionsUrl, Dictionary<string, string> videoGuids, string ltiId)
+		private static IEnumerable<Vertical> OrdinarySlideToVerticals(string courseId, Slide slide, string ulearnBaseUrl, Dictionary<string, string> videoGuids, string ltiId, DirectoryInfo coursePackageRoot)
 		{
 			var componentIndex = 0;
 			var components = new List<Component>();
@@ -86,7 +87,7 @@ namespace uLearn
 					{
 						if (!block.Hide)
 						{
-							var component = block.ToEdxComponent("", slide, componentIndex);
+							var component = block.ToEdxComponent("", courseId, slide, componentIndex, ulearnBaseUrl, coursePackageRoot);
 							innerComponents.Add(component);
 						}
 						componentIndex++;
@@ -112,7 +113,7 @@ namespace uLearn
 
 				var exerciseBlock = slide.Blocks[componentIndex] as ExerciseBlock;
 				var otherComponent = exerciseBlock != null
-					? exerciseBlock.GetExerciseComponent(componentIndex == 0 ? slide.Title : "Упражнение", slide, componentIndex, string.Format(slideUrl, courseId, slide.Id), ltiId)
+					? exerciseBlock.GetExerciseComponent(componentIndex == 0 ? slide.Title : "Упражнение", slide, componentIndex, string.Format(ulearnBaseUrl + SlideUrlFormat, courseId, slide.Id), ltiId)
 					: ((YoutubeBlock)slide.Blocks[componentIndex]).GetVideoComponent(componentIndex == 0 ? slide.Title : "", slide, componentIndex, videoGuids);
 
 				components.Add(otherComponent);
@@ -125,7 +126,7 @@ namespace uLearn
 				var comp = exerciseWithSolutionsToShow.GetSolutionsComponent(
 					"Решения",
 					slide, componentIndex,
-					string.Format(solutionsUrl, courseId, slide.Id), ltiId);
+					string.Format(ulearnBaseUrl + SolutionsUrlFormat, courseId, slide.Id), ltiId);
 				components.Add(comp);
 				//yield return new Vertical(slide.NormalizedGuid + "0", "Решения", new[] { comp });
 			}
@@ -143,14 +144,20 @@ namespace uLearn
 			yield return new Vertical(slide.NormalizedGuid, slide.Title, new Component[] { ltiComponent }, EdxScoringGroupsHack.ToEdxName(slide.ScoringGroup), slide.MaxScore);
 		}
 
-		public IEnumerable<Vertical> ToVerticals(string courseId, string slideUrl, string solutionsUrl, Dictionary<string, string> videoGuids, string ltiId)
+		protected const string SlideUrlFormat = "/Course/{0}/LtiSlide?slideId={1}";
+		protected const string SolutionsUrlFormat = "/Course/{0}/AcceptedAlert?slideId={1}";
+
+		public IEnumerable<Vertical> ToVerticals(string courseId, string ulearnBaseUrl, Dictionary<string, string> videoGuids, string ltiId, DirectoryInfo coursePackageRoot)
 		{
+			var slideUrl = ulearnBaseUrl + SlideUrlFormat;
+			var solutionsUrl = ulearnBaseUrl + SolutionsUrlFormat;
 			try
 			{
-				var quizSlide = this as QuizSlide;
-				if (quizSlide != null)
+				if (this is QuizSlide quizSlide)
+				{
 					return QuizToVerticals(courseId, quizSlide, slideUrl, ltiId).ToList();
-				return OrdinarySlideToVerticals(courseId, this, slideUrl, solutionsUrl, videoGuids, ltiId).ToList();
+				}
+				return OrdinarySlideToVerticals(courseId, this, ulearnBaseUrl, videoGuids, ltiId, coursePackageRoot).ToList();
 			}
 			catch (Exception e)
 			{

@@ -365,7 +365,7 @@
     <Compile Include="Validating\BaseValidator.cs" />
     <Compile Include="CmdLineOptions\OlxDesquashChaptersOptions.cs" />
     <Compile Include="CmdLineOptions\OlxGcOptions.cs" />
-    <Compile Include="CmdLineOptions\OlxPackOptions.cs" />
+    <Compile Include="CmdLineOptions\OlxPackTarGzOptions.cs" />
     <Compile Include="CmdLineOptions\OlxSetChapterStartDatesOptions.cs" />
     <Compile Include="CmdLineOptions\OlxSquashChaptersOptions.cs" />
     <Compile Include="Validating\CourseValidator.cs" />
@@ -389,7 +389,7 @@
     <Compile Include="CmdLineOptions\OlxAbstractPatchOptions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="CmdLineOptions\OlxUnpackOptions.cs" />
+    <Compile Include="CmdLineOptions\OlxUnpackTarGzOptions.cs" />
     <Compile Include="CmdLineOptions\TestCourseOptions.cs" />
     <Compile Include="ULearnInteractor.cs" />
     <Compile Include="CmdLineOptions\ULearnOptions.cs" />

@@ -320,6 +320,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CourseTool\Olx_Test.cs" />
     <Compile Include="CSharp\ArrayGetLengthValidation\ArrayLengthStylePrimitives_should.cs" />
     <Compile Include="CSharp\ArrayGetLengthValidation\ArrayLengthStyleValidator_should.cs" />
     <Compile Include="CSharp\ArrayGetLengthValidation\TestData\Correct\ArrayAssignedInCycleOrInnerCycle.cs" />

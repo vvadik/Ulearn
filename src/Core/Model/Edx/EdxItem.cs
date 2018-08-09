@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.IO;
+using System.Xml.Linq;
 using System.Xml.Serialization;
 using Ulearn.Common.Extensions;
 
@@ -31,7 +32,20 @@ namespace uLearn.Model.Edx
 			var path = Path.Combine(folderName, SubfolderName);
 			if (!Directory.Exists(path))
 				Directory.CreateDirectory(path);
-			File.WriteAllText(Path.Combine(path, UrlName + ".xml"), this.XmlSerialize());
+			var filename = Path.Combine(path, UrlName + ".xml");
+			var converted = this.XmlSerialize();
+			var originalXDoc = File.Exists(filename) ? XDocument.Load(filename) : null;
+			if (originalXDoc != null)
+			{
+				var convertedXDoc = XDocument.Load(new StringReader(converted));
+				foreach (var attribute in originalXDoc.Root.Attributes())
+				{
+					if (convertedXDoc.Root.Attribute(attribute.Name) == null)
+						convertedXDoc.Root.SetAttributeValue(attribute.Name, attribute.Value);
+					converted = convertedXDoc.ToString();
+				}
+			}
+			File.WriteAllText(filename, converted);
 			if (withAdditionals)
 				SaveAdditional(folderName);
 		}

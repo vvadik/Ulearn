@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Xml.Serialization;
 using uLearn.Model.Edx.EdxComponents;
 
@@ -32,7 +33,7 @@ namespace uLearn.Model.Blocks
 			return new VideoComponent(slide.NormalizedGuid + componentIndex, displayName, VideoId);
 		}
 
-		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot)
 		{
 			throw new NotSupportedException();
 		}

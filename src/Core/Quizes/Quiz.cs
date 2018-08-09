@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
@@ -167,7 +168,7 @@ namespace uLearn.Quizes
 				throw new FormatException("'Maybe' items are not allowed for for non-multiple choice. BlockId=" + Id);
 		}
 
-		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot)
 		{
 			var items = Items.Select(x => new Choice
 			{
@@ -229,7 +230,7 @@ namespace uLearn.Quizes
 		{
 		}
 
-		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot)
 		{
 			var items = new[]
 			{
@@ -284,7 +285,7 @@ namespace uLearn.Quizes
 				throw new FormatException("Sample should match at least one regex. BlockId=" + Id);
 		}
 
-		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot)
 		{
 			return new TextInputComponent
 			{
@@ -319,7 +320,7 @@ namespace uLearn.Quizes
 		[XmlElement("explanation")]
 		public string Explanation;
 
-		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot)
 		{
 			throw new NotSupportedException();
 		}
@@ -359,7 +360,7 @@ namespace uLearn.Quizes
 			return Matches.ToList();
 		}
 
-		public override Component ToEdxComponent(string displayName, Slide slide, int componentIndex)
+		public override Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot)
 		{
 			throw new NotSupportedException();
 		}
