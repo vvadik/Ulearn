@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -18,6 +18,9 @@ namespace uLearn
 
 		[XmlElement("language")]
 		public Language[] DefaultLanguageVersions { get; set; }
+
+		[XmlElement("video-annotations-google-doc")]
+		public string VideoAnnotationsGoogleDoc { get; set; }
 
 		[XmlElement("manual-checking")]
 		public bool IsManualCheckingEnabled { get; set; }

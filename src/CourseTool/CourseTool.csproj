@@ -362,6 +362,7 @@
   <ItemGroup>
     <Compile Include="CmdLineOptions\AbstractOptions.cs" />
     <Compile Include="ArchiveManager.cs" />
+    <Compile Include="CmdLineOptions\PatchSlidesWithVideoAnnotations.cs" />
     <Compile Include="Validating\BaseValidator.cs" />
     <Compile Include="CmdLineOptions\OlxDesquashChaptersOptions.cs" />
     <Compile Include="CmdLineOptions\OlxGcOptions.cs" />

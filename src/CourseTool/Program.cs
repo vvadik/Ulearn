@@ -20,7 +20,8 @@ namespace uLearn.CourseTool
 					OlxPatchVideoOptions, 
 					MonitorOptions, 
 					ULearnOptions, 
-					TestCourseOptions
+					TestCourseOptions,
+					PatchSlidesWithVideoAnnotations
 				>(args)
 				.MapResult(
 					(AbstractOptions options) => ExecuteOption(options),

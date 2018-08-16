@@ -18,6 +18,30 @@
 		<xs:sequence>
 			<xs:element name="title" type="types:notEmptyString" />
 			<xs:element name="language" type="types:Language" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="video-annotations-google-doc" type="types:notEmptyString" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						Идентификатор GoogleDocs документа, в котором находятся транскрибция видео. Нужно для импорта транскрибции в слайды курса.
+
+						К документу должен быть доступ на чтение по ссылке. 
+						
+						Документ должен быть в строгом машиночитаемом формате:
+
+						# Заголовок слайда (для редакторов)
+						guid слайда
+						описание всего видео-эпизода
+						* 00:01 О чем рассказывает лектор
+						* 01:01 О чем сейчас рассказывает лектор
+
+						# Заголовок следующего слайда
+						guid второго слайда
+						описание всего видео-эпизода
+						* 00:01 О чем рассказывает лектор
+						
+						...
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element name="prelude" type="types:Prelude" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="manual-checking" type="xs:boolean" minOccurs="0" maxOccurs="1" />
 			<xs:element name="scoring" type="types:Scoring" minOccurs="0" maxOccurs="1" />

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Xml.Serialization;
 using uLearn.Model.Blocks;
@@ -43,6 +43,9 @@ namespace uLearn.Model
 
 		[XmlEnum("proj-exercise")]
 		ProjectExerciseBlock,
+
+		[XmlEnum("annotation")]
+		VideoAnnotationBlock,
 	}
 
 	[XmlRoot("Lesson", IsNullable = false, Namespace = "https://ulearn.azurewebsites.net/lesson")]
@@ -77,6 +80,7 @@ namespace uLearn.Model
 		[XmlElement(typeof(IncludeImageGalleryBlock))]
 		[XmlElement(typeof(ProjectExerciseBlock))]
 		[XmlElement(typeof(SingleFileExerciseBlock))]
+		[XmlElement(typeof(VideoAnnotationBlock))]
 		[XmlElement("exercise", typeof(SingleFileExerciseBlock))]
 		[XmlElement("execirse", typeof(SingleFileExerciseBlock))]
 		[XmlChoiceIdentifier("DefineBlockType")]
@@ -111,6 +115,7 @@ namespace uLearn.Model
 				case ProjectExerciseBlock _: return BlockType.ProjectExerciseBlock;
 				case SingleFileExerciseBlock _: return BlockType.SingleFileExerciseBlock;
 				case TexBlock _: return BlockType.Tex; 
+				case VideoAnnotationBlock _: return BlockType.VideoAnnotationBlock; 
 				default: throw new Exception("Unknown slide block " + b);
 			}
 		}
