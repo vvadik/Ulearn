@@ -53,7 +53,7 @@ namespace uLearn.CSharp.RedundantElseValidation
 			var errorMessages = errors.Select(e => e.GetMessageWithPositions());
 			using (ApprovalResults.ForScenario(filename))
 			{
-				Approvals.Verify(string.Join("\n", errorMessages));
+				Approvals.Verify(string.Join(Environment.NewLine, errorMessages));
 			}
 		}
 
