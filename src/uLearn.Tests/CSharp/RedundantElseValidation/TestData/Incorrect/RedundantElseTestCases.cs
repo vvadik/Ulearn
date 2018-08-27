@@ -61,5 +61,27 @@ namespace uLearn.CSharp.RedundantElseValidation.TestData.Incorrect
 			else
 				return false;
 		}
+
+		public int MultipleReturns()
+		{
+			if (true)
+			{
+				return 5;
+			}
+			else if (false)
+			{
+				return 6;
+			}
+		}
+
+		public int ReturnAfterIfElseBlock()
+		{
+			int result = 1;
+			if (true)
+				return result;
+			else
+				result++;
+			return result;
+		}
 	}
 }
