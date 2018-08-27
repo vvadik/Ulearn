@@ -17,7 +17,7 @@ namespace uLearn.CSharp.Validators
 			var childNodes = ifStatementSyntax
 				.ChildNodes()
 				.ToList();
-			if (!DoesIfStatementContainsElseClause(childNodes))
+			if (childNodes.Count <= 2)
 				yield break;
 
 			var correspondingElseClause = childNodes[2];
@@ -39,11 +39,6 @@ namespace uLearn.CSharp.Validators
 						yield return new SolutionStyleError(StyleErrorType.RedundantElse01, correspondingElseClause);
 					break;
 			}
-		}
-
-		private static bool DoesIfStatementContainsElseClause(List<SyntaxNode> childNodes)
-		{
-			return childNodes.Count > 2;
 		}
 	}
 }
