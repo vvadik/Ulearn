@@ -62,6 +62,7 @@ class DownloadedHtmlContent extends Component {
         this.state = {
             loading: true,
             body: '',
+			bodyClassName: '',
             meta: {},
             links: []
         };
@@ -165,6 +166,7 @@ class DownloadedHtmlContent extends Component {
         this.setState({
             loading: false,
             body: body.innerHTML,
+			bodyClassName: body.className,
             links: links
         });
 
@@ -244,9 +246,10 @@ class DownloadedHtmlContent extends Component {
     getContent() {
         let meta = Object.assign({}, this.state.meta);
         let links = this.state.links;
+        let bodyClassName = this.state.bodyClassName;
         return (
             <div>
-                <Meta meta={meta} links={links}/>
+                <Meta meta={meta} links={links} bodyClassName={bodyClassName}/>
                 <Content body={this.state.body} />
             </div>
         )
@@ -350,6 +353,7 @@ class Meta extends Component {
     render() {
         let meta = this.props.meta;
         let links = this.props.links;
+        let bodyClassName = this.props.bodyClassName;
         let renderedLinks = [];
         for (let i = 0; i < links.length; i++) {
             let link = links[i];
@@ -371,6 +375,7 @@ class Meta extends Component {
                 <meta name="description" content={ meta.description }/>
                 <meta name="keywords" content={ meta.keywords }/>
                 <link rel="image_src" href={ meta.imageUrl }/>
+				<body className={ bodyClassName }/>
                 {renderedLinks}
             </Helmet>
         )

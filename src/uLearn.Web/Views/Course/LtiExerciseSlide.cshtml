@@ -10,7 +10,6 @@
 <html>
 <head>
 	<title>Exercise</title>
-	@Styles.Render("~/ulearn.bundle.css")
 	@Styles.Render("~/katex/katex.min.css")
 </head>
 <body class="lti-component">
@@ -18,13 +17,11 @@
 {
 	@SlideHtml.Block(Model.ExerciseBlock, Model.Context, Html)
 
-	@Scripts.Render("~/scripts.bundle.js")
-	<script> getHints("@Model.CourseId", "@Model.SlideId.GetNormalizedGuid()", '@Model.ExerciseBlock.HintsMd.Count') </script>
 	<script>
-	refreshPreviousDraft('@Model.SlideId')
+		getHints("@Model.CourseId", "@Model.SlideId.GetNormalizedGuid()", '@Model.ExerciseBlock.HintsMd.Count');
+		refreshPreviousDraft('@Model.SlideId');
 	</script>
 }
 
-@Html.Partial("_YandexMetrika")
 </body>
 </html>

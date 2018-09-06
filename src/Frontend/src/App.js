@@ -51,9 +51,11 @@ setInterval(() => {
 
 class UlearnApp extends Component {
     render() {
+    	const isLti = window.location.pathname.toLowerCase().endsWith('/ltislide');
+
         return (
             <Provider store={store}>
-                <InternalUlearnApp />
+                <InternalUlearnApp isLti={isLti}/>
             </Provider>
         )
     }
@@ -82,11 +84,12 @@ class InternalUlearnApp extends Component {
     }
 
     render() {
+    	const isHeaderVisible = ! this.props.isLti;
         return (
             <BrowserRouter>
                 <ErrorBoundary>
-                    <Header initializing={this.state.initializing}/>
-                    <div className="header-content-divider" />
+					{ isHeaderVisible && <Header initializing={this.state.initializing}/> }
+					{ isHeaderVisible && <div className="header-content-divider" /> }
                     <Switch>
                         <Route component={AnyPage} />
                     </Switch>
