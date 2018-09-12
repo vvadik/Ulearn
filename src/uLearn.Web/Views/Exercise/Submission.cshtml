@@ -109,7 +109,7 @@
 			
 		}
 
-		var showAntiplagiarismStatus = Model.InstructorView && (User.HasCourseAccess(Model.CourseId, CourseAccessType.FeatureUseAntiPlagiarism) || User.IsSystemAdministrator());
+		var showAntiplagiarismStatus = Model.InstructorView;
 		
 		if (showAntiplagiarismStatus)
 		{

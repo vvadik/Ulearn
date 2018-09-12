@@ -56,8 +56,12 @@ namespace Database.Models
 		[Display(Name = "Получать в АПИ статистику по код-ревью (/codereveiew/statistics)")]
 		ApiViewCodeReviewStatistics = 101,
 		
+		
+		/*
+		// Antiplagiarism service is enabled for everyone now. But don't use value 1001 for another features to avoid collissions.		
 		[Display(Name = "Фича: антиплагиат")]
-		FeatureAntiPlagiarism = 1001,
+		FeatureUseAntiPlagiarism = 1001,
+		*/
 	}
 
 	public static class CourseAccessTypeExtensions
