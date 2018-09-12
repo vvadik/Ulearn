@@ -90,9 +90,13 @@ class InternalUlearnApp extends Component {
                 <ErrorBoundary>
 					{ isHeaderVisible && <Header initializing={this.state.initializing}/> }
 					{ isHeaderVisible && <div className="header-content-divider" /> }
-                    <Switch>
-                        <Route component={AnyPage} />
-                    </Switch>
+					{ ! this.state.initializing && // Avoiding bug: don't show page while initializing.
+												   // Otherwise we make two GET requests sequentially.
+												   // Unfortunately some our GET handlers are not idempotent (i.e. /Admin/CheckNextExerciseForSlide)
+						<Switch>
+							<Route component={AnyPage} />
+						</Switch>
+					}
                     <YandexMetrika/>
                 </ErrorBoundary>
             </BrowserRouter>
