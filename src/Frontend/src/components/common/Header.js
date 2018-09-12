@@ -256,7 +256,7 @@ class CourseMenu extends Component {
             items.push(<MenuItem href={"/Admin/Users?courseId=" + courseId} key="Users" component={ LinkComponent }>Пользователи</MenuItem>);
         if (hasCourseAdminMenuItems)
             items = items.concat([
-                <MenuItem href={"/Admin/Packages?courseId=" + courseId} key="Packages" component={ LinkComponent }>Загрузить пакет</MenuItem>,
+                <MenuItem href={"/Admin/Packages?courseId=" + courseId} key="Packages" component={ LinkComponent }>Экспорт и импорт курса</MenuItem>,
                 <MenuItem href={"/Admin/Units?courseId=" + courseId} key="Units" component={ LinkComponent }>Модули</MenuItem>,
                 <MenuItem href={"/Grader/Clients?courseId=" + courseId} key="GraderClients" component={ LinkComponent }>Клиенты грейдера</MenuItem>
             ]);
