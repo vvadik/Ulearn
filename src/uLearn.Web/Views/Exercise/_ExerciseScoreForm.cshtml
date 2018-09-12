@@ -92,7 +92,7 @@
             <div class="checkbox checkbox-default">
 				<input data-val="true" id="prohibitFurtherReview" name="prohibitFurtherReview" type="checkbox" value="true" @(prohibitFutherReview ? "checked" : "")/>
 				<label for="prohibitFurtherReview">
-					Не принимать больше код-ревью у этого студента
+					Не принимать больше код-ревью у&nbsp;этого студента по&nbsp;задаче «@Model.Slide.Title.MakeNestedQuotes().TruncateWithEllipsis(50)»
 				</label>
 			</div>
 
@@ -108,7 +108,7 @@
 				if (Model.ManualCheckingsLeft == 0)
 				{
 					<div class="text-muted no-manual-checkings-left">
-                        Это последняя работа по&nbsp;задаче «@Model.Slide.Title.MakeNestedQuotes().TruncateWithEllipsis(50)»
+                        Это последняя работа по&nbsp;задаче
                     </div>
 				}
 				else

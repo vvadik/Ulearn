@@ -52,7 +52,7 @@ namespace Database.Models
 		public bool CanUsersSeeGroupProgress { get; set; }
 		
 		[Required]
-		/* Значение по умолчанию для галочки «Не принимать больше код-ревью у этого студента» */
+		/* Значение по умолчанию для галочки «Не принимать больше код-ревью у этого студента по этой задаче» */
 		public bool DefaultProhibitFutherReview { get; set; }
 
 		public DateTime? CreateTime { get; set; }
