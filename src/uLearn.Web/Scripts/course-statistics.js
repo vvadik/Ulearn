@@ -85,7 +85,7 @@ window.documentReadyFunctions.push(function () {
 		return $tableAround;
 	};
 
-	var documentHeaderHeight = $('#header').outerHeight();
+	var documentHeaderHeight = $('.header').outerHeight();
 	var $stickyHeader;
 	var $stickyColumn;
 
@@ -104,6 +104,9 @@ window.documentReadyFunctions.push(function () {
 		$stickyColumn.toggle(isStickyColumnVisible);
 
 		$stickyHeader.css('left', $table.position().left - scrollLeft);
+		console.log('$tbody.position().top', $tbody.position().top);
+		console.log('scrollTop', scrollTop);
+		console.log('minTopOffset', minTopOffset);
 		$stickyColumn.css('top', $tbody.position().top - scrollTop + minTopOffset);
 	};
 

@@ -20,7 +20,7 @@ window.documentReadyFunctions.push(function() {
 
 			widgetOptions: {
 				columns: ["primary", "secondary", "tertiary"],
-				stickyHeaders_offset: "#header",
+				stickyHeaders_offset: ".header",
 			},
 
 			textAttribute: 'data-sort-value'
