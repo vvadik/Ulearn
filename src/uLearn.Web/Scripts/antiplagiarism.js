@@ -36,7 +36,7 @@ function fetchAntiPlagiarismStatus($plagiarismStatus) {
     });
     
     var plagiarismStatusOffset = $plagiarismStatus.offset().top;
-    var headerHeight = $('#header').outerHeight();    
+    var headerHeight = $('.header').outerHeight();    
     var codeMirrorBottom = $codeMirror.offset().top + $codeMirror.outerHeight();
     $(window).scroll(function () {
         var scrollTop = $(window).scrollTop();
