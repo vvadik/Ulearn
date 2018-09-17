@@ -7,6 +7,7 @@ using Database.Models;
 using Database.Repos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Serilog;
 using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Models.Parameters.Notifications;
@@ -34,6 +35,14 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 
 			if (commentsFeedNotificationTransport == null)
 				commentsFeedNotificationTransport = feedRepo.GetCommentsFeedNotificationTransport();
+		}
+
+		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+		{
+			await base.OnActionExecutionAsync(context, next);
+			
+			var userId = User.GetUserId();
+			await feedRepo.AddFeedNotificationTransportIfNeededAsync(userId);
 		}
 
 		[HttpGet]
