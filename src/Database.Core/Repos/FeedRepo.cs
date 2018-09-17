@@ -54,6 +54,8 @@ namespace Database.Repos
 		{
 			if (await notificationsRepo.FindUsersNotificationTransportAsync<FeedNotificationTransport>(userId, includeDisabled: true) != null)
 				return;
+			
+			log.Info($"Create feed notification transport for user {userId} because there is no actual one");
 
 			await notificationsRepo.AddNotificationTransportAsync(new FeedNotificationTransport
 			{
