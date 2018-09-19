@@ -35,11 +35,11 @@ function fetchAntiPlagiarismStatus($plagiarismStatus) {
         $plagiarismStatusFixedCopy.html($plagiarismStatus.html());
     });
     
-    var plagiarismStatusOffset = $plagiarismStatus.offset().top;
     var headerHeight = $('.header').outerHeight();    
     var codeMirrorBottom = $codeMirror.offset().top + $codeMirror.outerHeight();
     $(window).scroll(function () {
         var scrollTop = $(window).scrollTop();
+		var plagiarismStatusOffset = $plagiarismStatus.offset().top;
 
         var isVisible = $plagiarismStatusFixedCopy.is(':visible');
         if (scrollTop >= plagiarismStatusOffset - headerHeight && scrollTop < codeMirrorBottom - 2 * headerHeight) {
