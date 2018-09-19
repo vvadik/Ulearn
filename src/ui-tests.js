@@ -23,6 +23,8 @@ const runTests = async () => {
     args: [
       '--headless',
       '--disable-gpu',
+      '--disable-translate',
+      '--disable-extensions',
     ],
   })
 

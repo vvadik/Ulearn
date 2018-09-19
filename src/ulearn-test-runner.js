@@ -37,7 +37,13 @@ const runUiTests = async () => {
   }
 
   global.browser = await puppeteer.launch({
-    args: ['--headless', '--disable-gpu', '--no-sandbox'],
+    args: [
+      '--headless',
+      '--disable-gpu',
+      '--disable-translate',
+      '--disable-extensions',
+      '--no-sandbox',
+    ],
   })
 
   const mocha = new Mocha({
