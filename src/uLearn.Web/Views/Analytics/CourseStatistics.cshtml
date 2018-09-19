@@ -355,10 +355,10 @@
 					foreach (var slide in shouldBeSolvedSlides)
 					{
 						var slideScore = Model.ScoreByUserAndSlide[Tuple.Create(user.UserId, slide.Id)];
-						<td class="score slide-score @GradeCssClass(slideScore, slide.MaxScore) @OnlyFullGradeCssClass(Model.GetOnlyFullScore(slideScore, slide.MaxScore), slide.MaxScore)"
+						<td class="score slide-score @GradeCssClass(slideScore, slide.MaxScore) @OnlyFullGradeCssClass(Model.GetOnlyFullScore(slideScore, slide), slide.MaxScore)"
 							data-slide-id="@slide.Id" data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id"
 							data-not-only-full-value="@slideScore">
-                            @Model.GetOnlyFullScore(slideScore, slide.MaxScore)
+                            @Model.GetOnlyFullScore(slideScore, slide)
 						</td>
 					}
 					if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)

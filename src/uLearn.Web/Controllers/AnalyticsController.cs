@@ -341,7 +341,7 @@ namespace uLearn.Web.Controllers
 						foreach (var slide in shouldBeSolvedSlides)
 						{
 							var slideScore = model.ScoreByUserAndSlide[Tuple.Create(user.UserId, slide.Id)];
-							builder.AddCell(onlyFullScores ? model.GetOnlyFullScore(slideScore, slide.MaxScore) : slideScore);
+							builder.AddCell(onlyFullScores ? model.GetOnlyFullScore(slideScore, slide) : slideScore);
 						}
 						if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)
 							builder.AddCell(model.AdditionalScores[Tuple.Create(user.UserId, unit.Id, scoringGroup.Id)]);
