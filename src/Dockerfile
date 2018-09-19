@@ -1,6 +1,6 @@
 FROM node:10-alpine
 
-# Installs latest Chromium (64) package.
+# Installs latest Chromium (68) package.
 RUN apk update && apk upgrade && \
     echo @edge http://nl.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories && \
     echo @edge http://nl.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories && \
@@ -28,7 +28,7 @@ USER pptruser
 # Install deps for tests.
 RUN yarn
 
-# Use Puppeteer 0.13.0 b/c it bundles Chromium 64.
-RUN yarn add --dev puppeteer@0.13.0
+# Puppeteer v1.4.0 works with Chromium 68.
+RUN yarn add --dev puppeteer@1.4.0
 
 CMD ["node", "docker-test-runner.js"]
