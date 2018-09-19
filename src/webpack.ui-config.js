@@ -21,12 +21,12 @@ module.exports = {
               [
                 '@babel/preset-env',
                 {
-                  targets: { browsers: 'chrome 64' },
+                  targets: { browsers: 'chrome 68' },
                 },
               ],
-              ['@babel/preset-stage-0', { decoratorsLegacy: true }],
               '@babel/preset-react',
             ],
+            plugins: ['@babel/plugin-proposal-class-properties'],
           },
         },
       },
