@@ -380,7 +380,7 @@
 		<label @GetGuestOnclick(context.IsGuest)>
 			@if (block.Multiline)
 			{
-				<textarea class="form-control @quizRes" id='@( block.Id + "quizBlock")' maxlength="@QuizController.MaxFillinblockSize" @GetGuestDisable(context.IsGuest) @readonlyAttr cols="70" rows="5">@value</textarea>
+				<textarea class="form-control @quizRes" id='@( block.Id + "quizBlock")' maxlength="@QuizController.MaxFillinBlockSize" @GetGuestDisable(context.IsGuest) @readonlyAttr cols="110" rows="5">@value</textarea>
 			}
 			else
 			{
@@ -388,7 +388,7 @@
 					autocomplete="off"
 					class="form-control @quizRes"
 					value="@value" id='@( block.Id + "quizBlock")'
-					maxlength="@QuizController.MaxFillinblockSize"
+					maxlength="@QuizController.MaxFillinBlockSize"
 					size="68"
 					@GetGuestDisable(context.IsGuest)
 					@readonlyAttr/>

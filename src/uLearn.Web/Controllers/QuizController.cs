@@ -32,7 +32,7 @@ namespace uLearn.Web.Controllers
 
 		private const int defaultMaxTriesCount = 2;
 		public const int InfinityTriesCount = int.MaxValue - 1;
-		public const int MaxFillinblockSize = 1024;
+		public const int MaxFillinBlockSize = 8 * 1024;
 
 		private readonly ULearnDb db = new ULearnDb();
 		private readonly CourseManager courseManager = WebCourseManager.Instance;
@@ -496,8 +496,8 @@ namespace uLearn.Web.Controllers
 
 		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(FillInBlock fillInBlock, string data)
 		{
-			if (data.Length > MaxFillinblockSize)
-				data = data.Substring(0, MaxFillinblockSize);
+			if (data.Length > MaxFillinBlockSize)
+				data = data.Substring(0, MaxFillinBlockSize);
 			var isRightAnswer = true;
 			if (fillInBlock.Regexes != null)
 				isRightAnswer = fillInBlock.Regexes.Any(regex => regex.Regex.IsMatch(data));

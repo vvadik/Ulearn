@@ -1151,7 +1151,7 @@ WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\'", 14020), Tup
 );
 
 WriteAttributeTo(__razor_helper_writer, "maxlength", Tuple.Create(" maxlength=\"", 14052), Tuple.Create("\"", 14098)
-                  , Tuple.Create(Tuple.Create("", 14064), Tuple.Create<System.Object, System.Int32>(QuizController.MaxFillinblockSize
+                  , Tuple.Create(Tuple.Create("", 14064), Tuple.Create<System.Object, System.Int32>(QuizController.MaxFillinBlockSize
 , 14064), false)
 );
 
@@ -1163,7 +1163,7 @@ WriteLiteralTo(__razor_helper_writer, " ");
 
                                                                                                                                            WriteTo(__razor_helper_writer, readonlyAttr);
 
-WriteLiteralTo(__razor_helper_writer, " cols=\"70\" rows=\"5\">");
+WriteLiteralTo(__razor_helper_writer, " cols=\"110\" rows=\"5\">");
 
                                                                                                                                                                             WriteTo(__razor_helper_writer, value);
 
@@ -1187,7 +1187,7 @@ WriteLiteralTo(__razor_helper_writer, "\" id=\'");
 
 WriteLiteralTo(__razor_helper_writer, "\'\r\n\t\t\t\t\tmaxlength=\"");
 
- WriteTo(__razor_helper_writer, QuizController.MaxFillinblockSize);
+ WriteTo(__razor_helper_writer, QuizController.MaxFillinBlockSize);
 
 WriteLiteralTo(__razor_helper_writer, "\"\r\n\t\t\t\t\tsize=\"68\"\r\n");
 

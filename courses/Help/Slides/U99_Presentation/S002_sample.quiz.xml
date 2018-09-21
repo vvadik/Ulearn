@@ -15,6 +15,12 @@ __Markdown__ разметку `текста`.
 Изображения:
 ![logo](img/markdown.png)
 
+Список:
+
+* элемент раз
+* элемент два
+* элемент три
+
 [Markdown Extra](https://michelf.ca/projects/php-markdown/extra) фичи. В частности, простые таблицы:
 
 Header 1				| h2
@@ -24,7 +30,7 @@ Header 1				| h2
 	</p>
 	
 	
-	<fillIn id="fillInQuestion" explanation="Описание правильного ответа" maxScore="2">
+	<fillIn id="fillInQuestion" explanation="Описание правильного ответа" maxScore="2" multiline="true">
 		<text>Введите корректное число</text>
 		<sample>42</sample>
 		<regex>\d+</regex>
