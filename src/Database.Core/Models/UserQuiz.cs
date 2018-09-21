@@ -36,7 +36,7 @@ namespace Database.Models
 		[StringLength(64)]
 		public string ItemId { get; set; }
 
-		[StringLength(1024)]
+		[StringLength(8192)]
 		public string Text { get; set; }
 
 		[Required]

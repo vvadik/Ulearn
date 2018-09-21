@@ -707,6 +707,10 @@
     <Compile Include="Migrations\201807242056303_AddCourseIdToUserQuzzesIndex.Designer.cs">
       <DependentUpon>201807242056303_AddCourseIdToUserQuzzesIndex.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201809211948326_IncreaseQuizAnswerSize.cs" />
+    <Compile Include="Migrations\201809211948326_IncreaseQuizAnswerSize.Designer.cs">
+      <DependentUpon>201809211948326_IncreaseQuizAnswerSize.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -1096,6 +1100,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201807242056303_AddCourseIdToUserQuzzesIndex.resx">
       <DependentUpon>201807242056303_AddCourseIdToUserQuzzesIndex.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809211948326_IncreaseQuizAnswerSize.resx">
+      <DependentUpon>201809211948326_IncreaseQuizAnswerSize.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

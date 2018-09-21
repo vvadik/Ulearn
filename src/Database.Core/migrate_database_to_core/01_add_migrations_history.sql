@@ -21,4 +21,5 @@ VALUES
 ('20180716124559_AddIndexToVisitsWithIncludeUser', '2.0.1-rtm-125'),
 ('20180724202211_AddCourseIdToLtiRequests', '2.0.1-rtm-125'),
 ('20180724204642_AddCourseIdToSlideHintIndex', '2.0.1-rtm-125'),
-('20180724205919_AddCourseIdToUserQuizzesIndex', '2.0.1-rtm-125')
+('20180724205919_AddCourseIdToUserQuizzesIndex', '2.0.1-rtm-125'),
+('20180921194528_IncreaseQuizAnswerSize', '2.0.1-rtm-125')
