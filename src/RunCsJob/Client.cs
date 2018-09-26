@@ -11,6 +11,7 @@ using log4net;
 using RunCsJob.Api;
 using uLearn;
 using uLearn.Extensions;
+using Ulearn.Common;
 using Ulearn.Common.Extensions;
 
 namespace RunCsJob
@@ -72,16 +73,29 @@ namespace RunCsJob
 		public async void SendResults(List<RunningResults> results)
 		{
 			var uri = GetUri("PostResults");
-			var response = await httpClient.PostAsJsonAsync(uri, results);
+			try
+			{
+				var response = await TrySendResults(results, uri).ConfigureAwait(false);
 
-			if (response.IsSuccessStatusCode)
-				return;
+				if (response.IsSuccessStatusCode)
+					return;
 
-			log.Error($"Не могу отправить результаты проверки (они ниже) на сервер: {response}\n{response.Content.ReadAsStringAsync().Result}");
+				log.Error($"Не могу отправить результаты проверки (они ниже) на сервер: {response}\n{await response.Content.ReadAsStringAsync().ConfigureAwait(false)}");
+			}
+			catch (Exception e)
+			{
+				log.Error($"Не могу отправить результаты проверки (они ниже) на сервер. Произошла ошибка {e.Message}");
+			}
+			
 			foreach (var result in results)
 			{
 				log.Info($"Результат: {result}");
 			}
+		}
+
+		private Task<HttpResponseMessage> TrySendResults(List<RunningResults> results, string uri)
+		{
+			return FuncUtils.TrySeveralTimesAsync(async () => await httpClient.PostAsJsonAsync(uri, results).ConfigureAwait(false), 3);
 		}
 
 		private string GetUri(string path, params string[][] parameters)
