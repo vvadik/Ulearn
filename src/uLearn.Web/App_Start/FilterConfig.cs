@@ -36,6 +36,7 @@ namespace uLearn.Web
 				"/Certificate/",
 				"/Analytics/ExportCourseStatisticsAs",
 				"/Exercise/StudentZip",
+				"/Content/"
 			}));
 			
 			var requireHttps = Convert.ToBoolean(WebConfigurationManager.AppSettings["ulearn.requireHttps"] ?? "true");
