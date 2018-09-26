@@ -255,6 +255,7 @@ window.documentReadyFunctions.push(function () {
             $modal.find('[name="manualChecking"]').prop('checked', data.group.isManualCheckingEnabled);
             $modal.find('[name="manualCheckingForOldSolutions"]').prop('checked', data.group.isManualCheckingEnabledForOldSolutions).closest('.checkbox').toggle(data.group.isManualCheckingEnabled);
             $modal.find('[name="defaultProhibitFutherReview"]').prop('checked', data.group.defaultProhibitFutherReview);
+			$modal.find('[name="canUsersSeeGroupProgress"]').prop('checked', data.group.canUsersSeeGroupProgress);
 
             $modal.find('.scoring-group-checkbox input').prop('checked', false);
             data.enabledScoringGroups.forEach(function (scoringGroupId) {

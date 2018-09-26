@@ -899,7 +899,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> UpdateGroupApi(string courseId, int groupId, bool manualChecking, bool manualCheckingForOldSolutions, bool defaultProhibitFutherReview, string name=null)
+		public async Task<ActionResult> UpdateGroupApi(string courseId, int groupId, bool manualChecking, bool manualCheckingForOldSolutions, bool defaultProhibitFutherReview, bool canUsersSeeGroupProgress, string name=null)
 		{
 			var group = groupsRepo.FindGroupById(groupId);
 			if (!CanModifyGroup(group) || ! group.CourseId.EqualsIgnoreCase(courseId))
@@ -912,7 +912,7 @@ namespace uLearn.Web.Controllers
 
 			log.Info($"Обновляю группу «{group.Name}» → «{name}» (Id = {group.Id}) для курса {courseId}");
 
-			await groupsRepo.ModifyGroup(groupId, name, manualChecking, manualCheckingForOldSolutions, defaultProhibitFutherReview);
+			await groupsRepo.ModifyGroup(groupId, name, manualChecking, manualCheckingForOldSolutions, defaultProhibitFutherReview, canUsersSeeGroupProgress);
 
 			var course = courseManager.GetCourse(group.CourseId);
 			await UpdateEnabledScoringGroupsForGroup(course, groupId);
@@ -1101,6 +1101,7 @@ namespace uLearn.Web.Controllers
 					isManualCheckingEnabledForOldSolutions = group.IsManualCheckingEnabledForOldSolutions,
 					isInviteLinkEnabled = group.IsInviteLinkEnabled,
 					defaultProhibitFutherReview = group.DefaultProhibitFutherReview,
+					canUsersSeeGroupProgress = group.CanUsersSeeGroupProgress
 				},
 				members = members.Select(model => this.RenderPartialViewToString("_GroupMember", model)).ToList(),
 				enabledScoringGroups = enabledScoringGroups.Select(g => g.ScoringGroupId).ToList(),

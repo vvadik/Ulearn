@@ -149,7 +149,7 @@ namespace Database.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public async Task<Group> ModifyGroup(int groupId, string newName, bool newIsManualCheckingEnabled, bool newIsManualCheckingEnabledForOldSolutions, bool defaultProhibitFutherReview)
+		public async Task<Group> ModifyGroup(int groupId, string newName, bool newIsManualCheckingEnabled, bool newIsManualCheckingEnabledForOldSolutions, bool defaultProhibitFutherReview, bool canUsersSeeGroupProgress)
 		{
 			var group = FindGroupById(groupId);
 			group.Name = newName;
@@ -160,6 +160,7 @@ namespace Database.DataContexts
 
 			group.IsManualCheckingEnabledForOldSolutions = newIsManualCheckingEnabledForOldSolutions;
 			group.DefaultProhibitFutherReview = defaultProhibitFutherReview;
+			group.CanUsersSeeGroupProgress = canUsersSeeGroupProgress; 
 			await db.SaveChangesAsync();
 
 			return group;

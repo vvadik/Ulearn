@@ -102,7 +102,7 @@ namespace uLearn.Web.Controllers
 			};
 
 			var userGroups = groupsRepo.GetUserGroups(course.Id, User.Identity.GetUserId());
-			var tocGroupsForStatistics = userGroups.Select(g => new TocGroupForStatistics
+			var tocGroupsForStatistics = userGroups.Where(g => g.CanUsersSeeGroupProgress).Select(g => new TocGroupForStatistics
 			{
 				GroupName = g.Name,
 				StatisticsUrl = Url.Action("CourseStatistics", "Analytics", new { courseId = course.Id, group = g.Id })
