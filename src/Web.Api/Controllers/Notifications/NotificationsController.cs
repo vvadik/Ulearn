@@ -39,10 +39,10 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 
 		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
 		{
-			await base.OnActionExecutionAsync(context, next);
-			
 			var userId = User.GetUserId();
 			await feedRepo.AddFeedNotificationTransportIfNeededAsync(userId);
+
+			await next();
 		}
 
 		[HttpGet]
