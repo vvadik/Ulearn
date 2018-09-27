@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
@@ -326,6 +326,9 @@ namespace uLearn.Web.Controllers
 		{
 			if (ModelState.IsValid)
 			{
+				/* Some users enter email with trailing whitespaces. Remove them (not users, but spaces!) */
+				model.Email = model.Email.Trim(); 
+					
 				var user = new ApplicationUser { UserName = model.UserName, Email = model.Email, Gender = model.Gender };
 				var result = await userManager.CreateAsync(user, model.Password);
 				if (result.Succeeded)
@@ -447,7 +450,7 @@ namespace uLearn.Web.Controllers
 			var user = await userManager.FindByIdAsync(userId);
 			user.FirstName = userInfo.FirstName;
 			user.LastName = userInfo.LastName;
-			user.Email = userInfo.Email;
+			user.Email = userInfo.Email.Trim();
 			user.LastEdit = DateTime.Now;
 			await userManager.UpdateAsync(user);
 			return RedirectToAction("StudentInfo");
@@ -565,9 +568,12 @@ namespace uLearn.Web.Controllers
 			var nameChanged = user.UserName != userModel.Name;
 			if (nameChanged && await userManager.FindByNameAsync(userModel.Name) != null)
 			{
-				log.Warn("ChangeDetailsPartial(): this name is already taken");
+				log.Warn($"ChangeDetailsPartial(): name {userModel.Name} is already taken");
 				return RedirectToAction("Manage", new { Message = ManageMessageId.NameAlreadyTaken });
 			}
+
+			/* Some users enter email with trailing whitespaces. Remove them (not users, but spaces!) */
+			userModel.Email = userModel.Email.Trim();
 			var emailChanged = string.Compare(user.Email, userModel.Email, StringComparison.OrdinalIgnoreCase) != 0;
 
 			user.UserName = userModel.Name;

@@ -121,6 +121,9 @@ namespace uLearn.Web.Controllers
 				var userAvatarUrl = info.ExternalIdentity.FindFirstValue("AvatarUrl");
 				var firstName = info.ExternalIdentity.FindFirstValue(ClaimTypes.GivenName);
 				var lastName = info.ExternalIdentity.FindFirstValue(ClaimTypes.Surname);
+				
+				/* Some users enter email with trailing whitespaces. Remove them (not users, but spaces!) */
+				model.Email = model.Email.Trim();
 
 				var user = new ApplicationUser
 				{
