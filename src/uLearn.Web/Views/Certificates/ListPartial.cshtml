@@ -3,18 +3,10 @@
 
 @model uLearn.Web.Controllers.UserCertificatesViewModel
 
-@* <h1 class="breathing-page-header">Сертификаты</h1> *@
-
-@if (!Model.Certificates.Any())
+@if (Model.Certificates.Any())
 {
-    <div class="certificates-list__info">
-        <p>
-            Вы пока не&nbsp;получили ни&nbsp;одного сертификата за&nbsp;прохождение курсов.
-        </p>
-        <p>
-            Преподаватели выдают сертификаты отличившимся студентам.
-        </p>
-    </div>
+	<h2>Сертификаты</h2>
+	<hr class="without-top-margin"/>
 }
 
 @{ var certificateIndex = 1; }
