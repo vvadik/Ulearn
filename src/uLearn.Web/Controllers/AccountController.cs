@@ -327,7 +327,7 @@ namespace uLearn.Web.Controllers
 			if (ModelState.IsValid)
 			{
 				/* Some users enter email with trailing whitespaces. Remove them (not users, but spaces!) */
-				model.Email = model.Email.Trim(); 
+				model.Email = (model.Email ?? "").Trim(); 
 					
 				var user = new ApplicationUser { UserName = model.UserName, Email = model.Email, Gender = model.Gender };
 				var result = await userManager.CreateAsync(user, model.Password);
@@ -450,7 +450,7 @@ namespace uLearn.Web.Controllers
 			var user = await userManager.FindByIdAsync(userId);
 			user.FirstName = userInfo.FirstName;
 			user.LastName = userInfo.LastName;
-			user.Email = userInfo.Email.Trim();
+			user.Email = (userInfo.Email ?? "").Trim();
 			user.LastEdit = DateTime.Now;
 			await userManager.UpdateAsync(user);
 			return RedirectToAction("StudentInfo");
@@ -573,7 +573,7 @@ namespace uLearn.Web.Controllers
 			}
 
 			/* Some users enter email with trailing whitespaces. Remove them (not users, but spaces!) */
-			userModel.Email = userModel.Email.Trim();
+			userModel.Email = (userModel.Email ?? "").Trim();
 			var emailChanged = string.Compare(user.Email, userModel.Email, StringComparison.OrdinalIgnoreCase) != 0;
 
 			user.UserName = userModel.Name;

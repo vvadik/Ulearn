@@ -123,7 +123,7 @@ namespace uLearn.Web.Controllers
 				var lastName = info.ExternalIdentity.FindFirstValue(ClaimTypes.Surname);
 				
 				/* Some users enter email with trailing whitespaces. Remove them (not users, but spaces!) */
-				model.Email = model.Email.Trim();
+				model.Email = (model.Email ?? "").Trim();
 
 				var user = new ApplicationUser
 				{
