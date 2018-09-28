@@ -143,3 +143,18 @@ namespace MyNamespace1
 		private int Pr { get; set; } = 0;
 	}
 }
+
+namespace MyNamespace1
+{
+	public class IfDefClass
+	{
+		
+#if true
+		public void SomeMethod()
+		{
+		}
+#endif
+
+		private int field;
+	}	
+}
