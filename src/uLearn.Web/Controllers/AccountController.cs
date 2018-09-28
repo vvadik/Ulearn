@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
@@ -187,10 +187,13 @@ namespace uLearn.Web.Controllers
 
 			if (Request.HttpMethod == "POST")
 			{
-				await groupsRepo.AddUserToGroup(group.Id, User.Identity.GetUserId());
-				await NotifyAbountUserJoinedToGroup(group, User.Identity.GetUserId());
+				var alreadyInGroup = await groupsRepo.AddUserToGroup(group.Id, User.Identity.GetUserId()) == null;
+				if (! alreadyInGroup)
+					await NotifyAbountUserJoinedToGroup(group, User.Identity.GetUserId());
 
-				return Redirect("/");
+				var courseId = group.CourseId;
+
+				return View("JoinedToGroup", group);
 			}
 
 			return View(group);

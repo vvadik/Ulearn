@@ -1303,6 +1303,7 @@
     <Content Include="tablesorter-master\README.md" />
     <Content Include="tablesorter-master\tablesorter.jquery.json" />
     <Content Include="tablesorter-master\test.html" />
+    <Content Include="Views\Account\JoinedToGroup.cshtml" />
     <Content Include="Views\Admin\StyleValidations.cshtml" />
     <Content Include="Views\AntiPlagiarism\Details.cshtml" />
     <Content Include="Views\Certificates\ListPartial.cshtml" />
