@@ -68,14 +68,14 @@ namespace Database.Repos
 			return group;
 		}
 
-		/* Copy group from one course to another. Replaces owner only if newOwnerId is not empty */
+		/* Copy group from one course to another. Replace owner only if newOwnerId is not empty */
 		public async Task<Group> CopyGroup(Group group, string courseId, string newOwnerId = "")
 		{
 			var newGroup = await CopyGroupWithoutMembers(group, courseId, newOwnerId);
 			await CopyGroupMembers(group, newGroup);
 			await CopyGroupAccesses(group, newGroup);
 
-			/* We can also copy group's scoring-group settings if their are in one course */
+			/* We can also copy group's scoring-group settings if they are in one course */
 			if (courseId == group.CourseId)
 			{
 				await CopyEnabledAdditionalScoringGroups(group, newGroup);
