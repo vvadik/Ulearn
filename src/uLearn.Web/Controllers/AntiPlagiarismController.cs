@@ -211,7 +211,7 @@ namespace uLearn.Web.Controllers
 				{
 					/* Remove cached value if it is too old */
 					if (DateTime.Now.Subtract(cachedValue.Item1) > cacheLifeTime)
-						plagiarismsCache.TryRemove(key, out var _);
+						plagiarismsCache.TryRemove(key, out _);
 				}
 			}
 		}

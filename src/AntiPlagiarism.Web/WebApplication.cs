@@ -1,8 +1,6 @@
-using System;
 using AntiPlagiarism.Web.CodeAnalyzing;
 using AntiPlagiarism.Web.CodeAnalyzing.CSharp;
 using AntiPlagiarism.Web.Configuration;
-using AntiPlagiarism.Web.Controllers;
 using AntiPlagiarism.Web.Database;
 using AntiPlagiarism.Web.Database.Repos;
 using Microsoft.AspNetCore.Builder;
@@ -10,9 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Serilog;
-using Serilog.Core;
 using Serilog.Events;
 using Vostok.Commons.Extensions.UnitConvertions;
 using Vostok.Hosting;
