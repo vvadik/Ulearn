@@ -67,7 +67,6 @@ namespace Database.DataContexts
 		}
 
 		/* Copy group from one course to another. Replaces owner only if newOwnerId is not empty */
-
 		public async Task<Group> CopyGroup(Group group, string courseId, string newOwnerId = "")
 		{
 			var newGroup = await CopyGroupWithoutMembers(group, courseId, newOwnerId);
@@ -96,7 +95,10 @@ namespace Database.DataContexts
 				CanUsersSeeGroupProgress = group.CanUsersSeeGroupProgress,
 				IsManualCheckingEnabled = group.IsManualCheckingEnabled,
 				IsInviteLinkEnabled = group.IsInviteLinkEnabled,
+				DefaultProhibitFutherReview = group.DefaultProhibitFutherReview,
+				IsManualCheckingEnabledForOldSolutions = group.IsManualCheckingEnabledForOldSolutions,
 				InviteHash = Guid.NewGuid(),
+				CreateTime = DateTime.Now,
 			};
 			db.Groups.Add(newGroup);
 			await db.SaveChangesAsync();
@@ -109,6 +111,7 @@ namespace Database.DataContexts
 			{
 				UserId = m.UserId,
 				GroupId = newGroup.Id,
+				AddingTime = DateTime.Now,
 			});
 			db.GroupMembers.AddRange(members);
 			await db.SaveChangesAsync();
