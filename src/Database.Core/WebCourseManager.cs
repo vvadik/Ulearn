@@ -72,7 +72,7 @@ namespace Database
 		{
 			lock (@lock)
 			{
-				loadedCourseVersions[courseId] = versionId;
+				loadedCourseVersions[courseId.ToLower()] = versionId;
 			}
 		}
 		
@@ -80,14 +80,14 @@ namespace Database
 		{
 			lock (@lock)
 			{
-				var isCourseLoaded = loadedCourseVersions.TryGetValue(courseId, out var loadedVersionId);
+				var isCourseLoaded = loadedCourseVersions.TryGetValue(courseId.ToLower(), out var loadedVersionId);
 				if ((isCourseLoaded && loadedVersionId != publishedVersion.Id) || !isCourseLoaded)
 				{
-					logger.Information($"Загруженная версия курса {courseId} отличается от актуальной. Обновляю курс.");
+					logger.Information($"Загруженная версия курса {courseId} отличается от актуальной ({loadedVersionId.ToString() ?? "<none>"} != {publishedVersion}). Обновляю курс.");
 					ReloadCourse(courseId);
 				}
 
-				loadedCourseVersions[courseId] = publishedVersion.Id;
+				loadedCourseVersions[courseId.ToLower()] = publishedVersion.Id;
 			}
 		}
 	}
