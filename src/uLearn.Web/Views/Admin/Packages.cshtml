@@ -2,19 +2,19 @@
 @model uLearn.Web.Controllers.PackagesViewModel
 
 @{
-	ViewBag.Title = "Пакеты";
+	ViewBag.Title = "Экспорт и импорт курса";
 }
 
 <div class="container">
-	<h1>Пакеты</h1>
+	<h1>Экспорт и импорт курса</h1>
 
 	@if (Model.HasPackage)
 	{
 		<div style="margin-bottom: 10px">
 			Текущая версия загружена <b title="@Model.LastUpdate.ToPrettyString()">@Model.LastUpdate.ToAgoPrettyString()</b>
 
-			@Html.ActionLink("Скачать опубликованный пакет", "DownloadPackage", new { Model.CourseId }, new { @class = "btn btn-xs btn-primary", style = "margin-left: 10px" })
-			@Html.ActionLink("Скопировать на Степик", "ExportCourse", "Stepik", new { courseId = Model.CourseId }, new { @class = "btn btn-xs btn-warning" })
+			@Html.ActionLink("Скачать опубликованную версию", "DownloadPackage", new { Model.CourseId }, new { @class = "btn btn-xs btn-primary", style = "margin-left: 10px" })
+			@Html.ActionLink("Скопировать курс на Степик", "ExportCourse", "Stepik", new { courseId = Model.CourseId }, new { @class = "btn btn-xs btn-warning" })
 		</div>
 	}
 
@@ -31,8 +31,8 @@
     }
     @using (Html.BeginForm("UploadCourse", "Admin", new { Model.CourseId }, FormMethod.Post, new { enctype = "multipart/form-data", style = "margin-bottom: 10px" }))
 	{
-		<input type="file" data-filename-placement="inside" class="btn" name="file"/>
-		<input type="submit" class="btn btn-success" value="Загрузить пакет"/>
+		<input type="file" data-filename-placement="inside" class="btn" name="file" title="Выбрать архив с курсом" />
+		<input type="submit" class="btn btn-success" value="Загрузить"/>
 	}
 
 	@if (Model.Versions.Count > 0)

@@ -58,7 +58,7 @@ namespace uLearn
 			this.coursesVersionsDirectory = coursesVersionsDirectory;
 		}
 
-		public IEnumerable<Course> GetCourses()
+		public virtual IEnumerable<Course> GetCourses()
 		{
 			LoadCoursesIfNotYet();
 			return courses.Values;

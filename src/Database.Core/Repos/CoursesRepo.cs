@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Database.Extensions;
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
+using uLearn.Extensions;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 
@@ -75,8 +76,15 @@ namespace Database.Repos
 			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
-		/* Course accesses */
+		public Task<List<CourseVersion>> GetPublishedCourseVersionsAsync()
+		{
+			return db.CourseVersions.AsNoTracking()
+				.GroupBy(v => v.CourseId)
+				.Select(g => g.MaxBy(v => v.PublishTime))
+				.ToListAsync();
+		}
 
+		/* Course accesses */
 		public async Task<CourseAccess> GrantAccessAsync(string courseId, string userId, CourseAccessType accessType, string grantedById)
 		{
 			var currentAccess = await db.CourseAccesses.FirstOrDefaultAsync(a => a.CourseId == courseId && a.UserId == userId && a.AccessType == accessType).ConfigureAwait(false);

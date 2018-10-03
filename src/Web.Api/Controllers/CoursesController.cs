@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using Database;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
@@ -17,9 +18,9 @@ namespace Ulearn.Web.Api.Controllers
 		}
 
 		[HttpGet("")]
-		public IActionResult CoursesList()
+		public async Task<IActionResult> CoursesList()
 		{
-			var courses = courseManager.GetCourses();
+			var courses = await courseManager.GetCoursesAsync().ConfigureAwait(false);
 			return Json(new CoursesListResponse
 			{
 				Courses = courses.Select(

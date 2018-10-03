@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Database.Models;
 using Database.Repos;
 using log4net;
+using Serilog;
 using uLearn;
 
 namespace Database
@@ -10,16 +13,18 @@ namespace Database
 	public class WebCourseManager : CourseManager
 	{
 		private readonly CoursesRepo coursesRepo;
-		private static readonly ILog log = LogManager.GetLogger(typeof(WebCourseManager));
+		private readonly ILogger logger;
 
 		private readonly Dictionary<string, Guid> loadedCourseVersions = new Dictionary<string, Guid>();
 		private readonly ConcurrentDictionary<string, DateTime> courseVersionFetchTime = new ConcurrentDictionary<string, DateTime>();
-		private readonly TimeSpan fetchCourseVersionEvery = TimeSpan.FromMinutes(1);
+		private DateTime lastCoursesListFetchTime = DateTime.MinValue;
+		private readonly TimeSpan fetchCourseVersionEvery = TimeSpan.FromSeconds(10);
 
-		public WebCourseManager(CoursesRepo coursesRepo)
+		public WebCourseManager(CoursesRepo coursesRepo, ILogger logger)
 			: base(GetCoursesDirectory())
 		{
 			this.coursesRepo = coursesRepo;
+			this.logger = logger;
 		}
 
 		private readonly object @lock = new object();
@@ -37,17 +42,23 @@ namespace Database
 			if (publishedVersion == null)
 				return course;
 
-			lock (@lock)
+			ReloadCourseIfLoadedAndPublishedVersionsAreDifferent(courseId, publishedVersion);
+			return base.GetCourse(courseId);
+		}
+
+		public async Task<IEnumerable<Course>> GetCoursesAsync()
+		{
+			if (lastCoursesListFetchTime > DateTime.Now.Subtract(fetchCourseVersionEvery))
+				return base.GetCourses();
+				
+			var publishedCourseVersions = await coursesRepo.GetPublishedCourseVersionsAsync().ConfigureAwait(false);
+			lastCoursesListFetchTime = DateTime.Now;
+			foreach (var courseVersion in publishedCourseVersions)
 			{
-				if (loadedCourseVersions.TryGetValue(courseId, out var loadedVersionId)
-					&& loadedVersionId != publishedVersion.Id)
-				{
-					log.Info($"Загруженная версия курса {courseId} отличается от актуальной. Обновляю курс.");
-					course = ReloadCourse(courseId);
-				}
-				loadedCourseVersions[courseId] = publishedVersion.Id;
+				ReloadCourseIfLoadedAndPublishedVersionsAreDifferent(courseVersion.CourseId, courseVersion);
 			}
-			return course;
+
+			return base.GetCourses();
 		}
 
 		private bool IsCourseVersionWasUpdatedRecent(string courseId)
@@ -64,7 +75,20 @@ namespace Database
 				loadedCourseVersions[courseId] = versionId;
 			}
 		}
+		
+		private void ReloadCourseIfLoadedAndPublishedVersionsAreDifferent(string courseId, CourseVersion publishedVersion)
+		{
+			lock (@lock)
+			{
+				var isCourseLoaded = loadedCourseVersions.TryGetValue(courseId, out var loadedVersionId);
+				if ((isCourseLoaded && loadedVersionId != publishedVersion.Id) || !isCourseLoaded)
+				{
+					logger.Information($"Загруженная версия курса {courseId} отличается от актуальной. Обновляю курс.");
+					ReloadCourse(courseId);
+				}
 
-		// public static readonly WebCourseManager Instance = new WebCourseManager(TODO);
+				loadedCourseVersions[courseId] = publishedVersion.Id;
+			}
+		}
 	}
 }
