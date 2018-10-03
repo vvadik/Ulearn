@@ -76,12 +76,13 @@ namespace Database.Repos
 			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
-		public Task<List<CourseVersion>> GetPublishedCourseVersionsAsync()
+		public async Task<List<CourseVersion>> GetPublishedCourseVersionsAsync()
 		{
-			return db.CourseVersions.AsNoTracking()
-				.GroupBy(v => v.CourseId)
+			var courseVersions = await db.CourseVersions.AsNoTracking().ToListAsync().ConfigureAwait(false);
+			return courseVersions
+				.GroupBy(v => v.CourseId.ToLower())
 				.Select(g => g.MaxBy(v => v.PublishTime))
-				.ToListAsync();
+				.ToList();
 		}
 
 		/* Course accesses */

@@ -37,13 +37,13 @@ namespace Database
 
 			lock (@lock)
 			{
-				if (loadedCourseVersions.TryGetValue(courseId, out var loadedVersionId)
+				if (loadedCourseVersions.TryGetValue(courseId.ToLower(), out var loadedVersionId)
 					&& loadedVersionId != publishedVersion.Id)
 				{
-					log.Info($"Загруженная версия курса {courseId} отличается от актуальной. Обновляю курс.");
+					log.Info($"Загруженная версия курса {courseId} отличается от актуальной ({loadedVersionId.ToString()} != {publishedVersion.Id}). Обновляю курс.");
 					course = ReloadCourse(courseId);
 				}
-				loadedCourseVersions[courseId] = publishedVersion.Id;
+				loadedCourseVersions[courseId.ToLower()] = publishedVersion.Id;
 			}
 			return course;
 		}
@@ -59,7 +59,7 @@ namespace Database
 		{
 			lock (@lock)
 			{
-				loadedCourseVersions[courseId] = versionId;
+				loadedCourseVersions[courseId.ToLower()] = versionId;
 			}
 		}
 
