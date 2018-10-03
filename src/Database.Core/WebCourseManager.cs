@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Database.Models;
 using Database.Repos;
@@ -55,7 +56,15 @@ namespace Database
 			lastCoursesListFetchTime = DateTime.Now;
 			foreach (var courseVersion in publishedCourseVersions)
 			{
-				ReloadCourseIfLoadedAndPublishedVersionsAreDifferent(courseVersion.CourseId, courseVersion);
+				try
+				{
+					ReloadCourseIfLoadedAndPublishedVersionsAreDifferent(courseVersion.CourseId, courseVersion);
+				}
+				catch (FileNotFoundException)
+				{
+					/* Sometimes zip-archive with course has been deleted already. It's strange but ok */
+					logger.Warning("Это странно, что я не смог загрузить с диска курс, который, если верить базе данных, был опубликован. Но ничего, просто проигнорирую");
+				}
 			}
 
 			return base.GetCourses();
