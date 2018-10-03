@@ -2,20 +2,16 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
 using Database;
 using Database.Extensions;
 using Database.Models;
 using Database.Repos;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using NUnit.Framework;
 using Serilog;
 using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Authorization;
@@ -51,7 +47,7 @@ namespace Ulearn.Web.Api.Controllers
 		public async Task<IActionResult> Me()
 		{
 			var userId = User.GetUserId();
-			var user = await userManager.FindByIdAsync(userId);
+			var user = await userManager.FindByIdAsync(userId).ConfigureAwait(false);
 			return Json(new GetMeResponse
 			{
 				IsAuthenticated = true,

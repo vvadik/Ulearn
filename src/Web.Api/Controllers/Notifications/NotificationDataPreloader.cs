@@ -19,7 +19,7 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 		{
 			return new NotificationDataStorage
 			{
-				CommentsByIds = await LoadCommentsAsync(notifications)
+				CommentsByIds = await LoadCommentsAsync(notifications).ConfigureAwait(false)
 			};
 		}
 		
@@ -28,7 +28,7 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 			/* Preload comments */
 			var commentNotifications = notifications.OfType<AbstractCommentNotification>();
 			var commentIds = commentNotifications.Select(n => n.CommentId);
-			return (await commentsRepo.GetCommentsByIdsAsync(commentIds)).ToDictionary(c => c.Id);
+			return (await commentsRepo.GetCommentsByIdsAsync(commentIds).ConfigureAwait(false)).ToDictionary(c => c.Id);
 		}
 	}
 }

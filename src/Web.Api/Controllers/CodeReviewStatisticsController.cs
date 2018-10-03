@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -60,9 +59,9 @@ namespace Ulearn.Web.Api.Controllers
 				CourseId = course.Id,
 				Count = count,
 				OnlyChecked = null,
-				From = from.Value,
+				From = @from.Value,
 				To = to.Value,
-			}).Include(c => c.Reviews).ToListAsync();
+			}).Include(c => c.Reviews).ToListAsync().ConfigureAwait(false);
 
 			var result = new CodeReviewInstructorsStatisticsResponse
 			{
@@ -72,8 +71,8 @@ namespace Ulearn.Web.Api.Controllers
 			foreach (var instructor in instructors)
 			{
 				var checkingsCheckedByInstructor = allSlideCheckings.Where(c => c.IsChecked && (c.LockedById == instructor.Id || c.Reviews.Any(r => r.AuthorId == instructor.Id))).ToList();
-				var instructorGroups = await groupsRepo.GetMyGroupsFilterAccessibleToUserAsync(course.Id, instructor.Id);
-				var instructorGroupMemberIds = (await groupsRepo.GetGroupsMembersAsync(instructorGroups.Select(g => g.Id))).Select(m => m.UserId);
+				var instructorGroups = await groupsRepo.GetMyGroupsFilterAccessibleToUserAsync(course.Id, instructor.Id).ConfigureAwait(false);
+				var instructorGroupMemberIds = (await groupsRepo.GetGroupsMembersAsync(instructorGroups.Select(g => g.Id)).ConfigureAwait(false)).Select(m => m.UserId);
 				var checkingQueue = allSlideCheckings.Where(c => !c.IsChecked && instructorGroupMemberIds.Contains(c.UserId)).ToList();
 				var comments = checkingsCheckedByInstructor.SelectMany(c => c.NotDeletedReviews).ToList();
 				var instructorStatistics = new CodeReviewInstructorStatistics

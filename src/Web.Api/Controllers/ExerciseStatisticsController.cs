@@ -40,11 +40,11 @@ namespace Ulearn.Web.Api.Controllers
 			   We should remove this column after EF Core 2.1 release (and remove tuples here)
 			*/
 			var submissions = await userSolutionsRepo.GetAllSubmissions(course.Id, includeManualCheckings: false)
-				.Where(s => s.Timestamp >= from && s.Timestamp <= to)
+				.Where(s => s.Timestamp >= @from && s.Timestamp <= to)
 				.OrderByDescending(s => s.Timestamp)
 				.Take(count)
 				.Select(s => Tuple.Create(s.SlideId, s.AutomaticCheckingIsRightAnswer, s.Timestamp))
-				.ToListAsync();
+				.ToListAsync().ConfigureAwait(false);
 
 			const int daysLimit = 30;
 			var result = new CourseExercisesStatisticsResponse
