@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Serialization;
+using Ulearn.Common;
 
 namespace Ulearn.Web.Api.Models.Common
 {
@@ -22,5 +23,8 @@ namespace Ulearn.Web.Api.Models.Common
 
 		[DataMember(Name = "avatar_url")]
 		public string AvatarUrl { get; set; }
+
+		[DataMember(Name = "gender")]
+		public Gender? Gender { get; set; }
 	}
 }

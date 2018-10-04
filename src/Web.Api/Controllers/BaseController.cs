@@ -89,7 +89,8 @@ namespace Ulearn.Web.Api.Controllers
 				FirstName = user.FirstName ?? "",
 				LastName = user.LastName ?? "",
 				VisibleName = user.VisibleName,
-				AvatarUrl = user.AvatarUrl
+				AvatarUrl = user.AvatarUrl,
+				Gender = user.Gender,
 			};
 		}		
 

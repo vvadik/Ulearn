@@ -192,6 +192,7 @@ namespace Ulearn.Web.Api
 			services.AddScoped<GroupsCreatorAndCopier>();
 			services.AddScoped<GroupAccessesRepo>();
 			services.AddScoped<GroupLabelsRepo>();
+			services.AddScoped<UsersGroupsGetter>();
 			services.AddScoped<UserSolutionsRepo>();
 			services.AddScoped<UserQuizzesRepo>();
 			services.AddScoped<VisitsRepo>();

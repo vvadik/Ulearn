@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Database.Models
 {
@@ -34,11 +36,12 @@ namespace Database.Models
 		public bool IsEnabled { get; set; }
 	}
 
+	[JsonConverter(typeof(StringEnumConverter), true)]
 	public enum GroupAccessType : short
 	{
 		FullAccess = 1,
 
-		/* Can't be stored in database. Only for internal needs */
+		/* Can't be stored in database. Only for internal usage */
 		Owner = 100,
 	}
 }
