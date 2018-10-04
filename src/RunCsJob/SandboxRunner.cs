@@ -313,7 +313,9 @@ namespace RunCsJob
 			{
 				log.Warn($"Песочница не ответила «Ready», а вышла с кодом {sandbox.ExitCode}");
 				var stderrReader = new AsyncReader(sandbox.StandardError, settings.OutputLimit + 1);
-				var result = GetResultForNonZeroExitCode(stderrReader.GetData(), sandbox.ExitCode);
+				var stderrData = stderrReader.GetData();
+				log.Warn($"Вывод песочницы в stderr:\n{stderrData}");
+				var result = GetResultForNonZeroExitCode(stderrData, sandbox.ExitCode);
 				throw new SandboxErrorException(result.Error);
 			}
 
