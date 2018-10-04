@@ -74,7 +74,7 @@ namespace Database.DataContexts
 			await CopyGroupAccesses(group, newGroup);
 
 			/* We can also copy group's scoring-group settings if they are in one course */
-			if (courseId == group.CourseId)
+			if (group.CourseId.EqualsIgnoreCase(courseId))
 			{
 				await CopyEnabledAdditionalScoringGroups(group, newGroup);
 			}

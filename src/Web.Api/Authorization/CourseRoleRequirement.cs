@@ -56,7 +56,7 @@ namespace Ulearn.Web.Api.Authorization
 
 			var userId = context.User.GetUserId();
 
-			if (await userRolesRepo.HasUserAccessToCourseAsync(userId, courseId, requirement.MinCourseRole))
+			if (await userRolesRepo.HasUserAccessToCourseAsync(userId, courseId, requirement.MinCourseRole).ConfigureAwait(false))
 				context.Succeed(requirement);
 			else
 				context.Fail();

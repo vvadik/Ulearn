@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Database;
 using Database.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -19,13 +20,13 @@ namespace Ulearn.Web.Api.Controllers
 	{
 		protected readonly ILogger logger;
 		protected readonly WebCourseManager courseManager;
-		private readonly UlearnDb db;
+		protected readonly UlearnDb db;
 
 		public BaseController(ILogger logger, WebCourseManager courseManager, UlearnDb db)
 		{
-			this.logger = logger;
-			this.courseManager = courseManager;
-			this.db = db; 
+			this.logger = logger ?? throw new ArgumentException(nameof(logger));
+			this.courseManager = courseManager ?? throw new ArgumentException(nameof(courseManager));
+			this.db = db ?? throw new ArgumentException(nameof(db)); 
 		}
 
 		public override void OnActionExecuted(ActionExecutedContext context)

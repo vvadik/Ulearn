@@ -18,7 +18,6 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 	[Route("/notifications")]
 	public class NotificationsController : BaseController
 	{
-		private readonly UlearnDb db;
 		private readonly NotificationsRepo notificationsRepo;
 		private readonly FeedRepo feedRepo;
 		private readonly NotificationDataPreloader notificationDataPreloader;
@@ -28,7 +27,6 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 		public NotificationsController(ILogger logger, WebCourseManager courseManager, UlearnDb db, NotificationsRepo notificationsRepo, FeedRepo feedRepo, NotificationDataPreloader notificationDataPreloader)
 			: base(logger, courseManager, db)
 		{
-			this.db = db ?? throw new ArgumentNullException(nameof(db));
 			this.notificationsRepo = notificationsRepo ?? throw new ArgumentNullException(nameof(notificationsRepo));
 			this.feedRepo = feedRepo ?? throw new ArgumentNullException(nameof(feedRepo));
 			this.notificationDataPreloader = notificationDataPreloader;

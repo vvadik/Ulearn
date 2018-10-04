@@ -121,7 +121,7 @@ namespace Database.Repos
 			foreach (var access in accesses)
 				access.IsEnabled = false;
 
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 			return accesses;
 		}
 

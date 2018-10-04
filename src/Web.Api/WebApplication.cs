@@ -3,18 +3,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Database.Repos.Groups;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
@@ -128,41 +126,33 @@ namespace Ulearn.Web.Api
 			
 			services.Configure<WebApiConfiguration>(options => hostingEnvironment.Configuration.Bind(options));
 			
-			/* DI */
-			services.AddSingleton<ILogger>(logger);
-			services.AddSingleton<InitialDataCreator>();
-			services.AddSingleton<WebCourseManager>();
-			services.AddScoped<UlearnUserManager>();
-			services.AddScoped<IAuthorizationHandler, CourseRoleAuthorizationHandler>();
-			services.AddScoped<IAuthorizationHandler, CourseAccessAuthorizationHandler>();
-			services.AddScoped<NotificationDataPreloader>();
-			
-			/* DI for database repos */
-			services.AddScoped<UsersRepo>();
-			services.AddScoped<CommentsRepo>();
-			services.AddScoped<UserRolesRepo>();
-			services.AddScoped<CoursesRepo>();
-			services.AddScoped<SlideCheckingsRepo>();
-			services.AddScoped<GroupsRepo>();
-			services.AddScoped<UserSolutionsRepo>();
-			services.AddScoped<UserQuizzesRepo>();
-			services.AddScoped<VisitsRepo>();
-			services.AddScoped<TextsRepo>();
-			services.AddScoped<NotificationsRepo>();
-			services.AddScoped<FeedRepo>();
-			
+			ConfigureDi(services, logger);
+			ConfigureMvc(services);
+			ConfigureSwaggerDocumentation(services);
+
+			/* Add CORS */
+			services.AddCors();
+
+			ConfigureAuthServices(services, configuration, logger);
+		}
+
+		private static void ConfigureMvc(IServiceCollection services)
+		{
 			/* Asp.NET Core MVC */
 			services.AddMvc(options =>
 				{
 					/* Add binder for passing Course object to actions */
 					options.ModelBinderProviders.Insert(0, new CourseBinderProvider());
-						
+
 					/* Disable model checking because in other case stack overflow raised on course model binding.
 					   See https://github.com/aspnet/Mvc/issues/7357 for details */
 					options.ModelMetadataDetailsProviders.Add(new SuppressChildValidationMetadataProvider(typeof(Course)));
 				}
 			);
-			
+		}
+
+		private static void ConfigureSwaggerDocumentation(IServiceCollection services)
+		{
 			/* Swagger API documentation generator. See https://github.com/domaindrivendev/Swashbuckle.AspNetCore for details */
 			services.AddSwaggerGen(c =>
 			{
@@ -180,11 +170,35 @@ namespace Ulearn.Web.Api
 				// c.MapType<Course>(() => new Schema {  });
 				c.OperationFilter<AuthResponsesOperationFilter>();
 			});
-			
-			/* Add CORS */
-			services.AddCors();
+		}
 
-			ConfigureAuthServices(services, configuration, logger);
+		private static void ConfigureDi(IServiceCollection services, Logger logger)
+		{
+			services.AddSingleton<ILogger>(logger);
+			services.AddSingleton<InitialDataCreator>();
+			services.AddSingleton<WebCourseManager>();
+			services.AddScoped<UlearnUserManager>();
+			services.AddScoped<IAuthorizationHandler, CourseRoleAuthorizationHandler>();
+			services.AddScoped<IAuthorizationHandler, CourseAccessAuthorizationHandler>();
+			services.AddScoped<NotificationDataPreloader>();
+
+			/* DI for database repos */
+			services.AddScoped<UsersRepo>();
+			services.AddScoped<CommentsRepo>();
+			services.AddScoped<UserRolesRepo>();
+			services.AddScoped<CoursesRepo>();
+			services.AddScoped<SlideCheckingsRepo>();
+			services.AddScoped<GroupsRepo>();
+			services.AddScoped<GroupsCreatorAndCopier>();
+			services.AddScoped<GroupAccessesRepo>();
+			services.AddScoped<GroupLabelsRepo>();
+			services.AddScoped<UserSolutionsRepo>();
+			services.AddScoped<UserQuizzesRepo>();
+			services.AddScoped<VisitsRepo>();
+			services.AddScoped<TextsRepo>();
+			services.AddScoped<NotificationsRepo>();
+			services.AddScoped<FeedRepo>();
+			services.AddScoped<SystemAccessesRepo>();
 		}
 
 		private void ConfigureAuthServices(IServiceCollection services, WebApiConfiguration configuration, Logger logger)
@@ -208,13 +222,13 @@ namespace Ulearn.Web.Api
 				options.LogoutPath = "/users/logout";
 				options.Events.OnRedirectToLogin = context =>
 				{
-					/* Replace standart redirecting to LoginPath */
+					/* Replace standard redirecting to LoginPath */
 					context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
 					return Task.CompletedTask;
 				};
 				options.Events.OnRedirectToAccessDenied = context =>
 				{
-					/* Replace standart redirecting to AccessDenied */
+					/* Replace standard redirecting to AccessDenied */
 					context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 					return Task.CompletedTask;
 				};
@@ -222,9 +236,6 @@ namespace Ulearn.Web.Api
 
 			services.AddAuthentication(options =>
 			{
-				/*options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
-				options.DefaultScheme = IdentityConstants.ApplicationScheme;
-				options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;*/
 				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
 				options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 				options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;

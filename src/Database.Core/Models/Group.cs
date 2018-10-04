@@ -60,12 +60,7 @@ namespace Database.Models
 		public virtual ICollection<GroupMember> Members { get; set; }
 
 		[NotMapped]
+		/* TODO (andgein): Use ToListAsync()? */
 		public List<GroupMember> NotDeletedMembers => Members.Where(m => !m.User.IsDeleted).ToList();
-
-		public Group()
-		{
-			InviteHash = Guid.NewGuid();
-			IsInviteLinkEnabled = true;
-		}
 	}
 }
