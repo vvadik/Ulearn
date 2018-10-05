@@ -8,7 +8,7 @@ namespace Ulearn.Web.Api.Models.Responses.Groups
 	[DataContract]
 	public class GroupStudentsResponse
 	{
-		[DataMember(Name = "members")]
+		[DataMember(Name = "students")]
 		public List<GroupStudentInfo> Students { get; set; }
 	}
 

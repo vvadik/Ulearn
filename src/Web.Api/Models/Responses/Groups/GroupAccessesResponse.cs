@@ -7,14 +7,14 @@ using Ulearn.Web.Api.Models.Common;
 namespace Ulearn.Web.Api.Models.Responses.Groups
 {
 	[DataContract]
-	public class GroupInstructorsResponse
+	public class GroupAccessesResponse
 	{
-		[DataMember(Name = "instructors")]
-		public List<GroupInstructorInfo> Instructors { get; set; } 
+		[DataMember(Name = "accesses")]
+		public List<GroupAccessesInfo> Accesses { get; set; } 
 	}
 
 	[DataContract]
-	public class GroupInstructorInfo
+	public class GroupAccessesInfo
 	{
 		[DataMember(Name = "user")]
 		public ShortUserInfo User { get; set; }

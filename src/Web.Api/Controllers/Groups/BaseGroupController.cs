@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Database;
 using Database.Models;
 using Serilog;
@@ -13,7 +15,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		{
 		}
 		
-		protected GroupInfo BuildGroupInfo(Group group)
+		protected GroupInfo BuildGroupInfo(Group group, int? membersCount=null, IEnumerable<GroupAccess> accesses=null)
 		{
 			if (group == null)
 				throw new ArgumentNullException(nameof(group));
@@ -32,6 +34,23 @@ namespace Ulearn.Web.Api.Controllers.Groups
 				IsManualCheckingEnabledForOldSolutions = group.IsManualCheckingEnabledForOldSolutions,
 				DefaultProhibitFurtherReview = group.DefaultProhibitFutherReview,
 				CanUsersSeeGroupProgress = group.CanUsersSeeGroupProgress,
+				
+				StudentsCount = membersCount,
+				Accesses = accesses?.Select(BuildGroupAccessesInfo).ToList(),
+			};
+		}
+		
+		protected GroupAccessesInfo BuildGroupAccessesInfo(GroupAccess access)
+		{
+			if (access == null)
+				throw new ArgumentNullException(nameof(access));
+			
+			return new GroupAccessesInfo
+			{
+				User = BuildShortUserInfo(access.User),
+				AccessType = access.AccessType,
+				GrantedBy = BuildShortUserInfo(access.GrantedBy),
+				GrantTime = access.GrantTime
 			};
 		}
 	}

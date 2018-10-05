@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Ulearn.Web.Api.Models.Common;
 
@@ -40,5 +41,12 @@ namespace Ulearn.Web.Api.Models.Responses.Groups
 		
 		[DataMember(Name = "can_users_see_group_progress")]
 		public bool CanUsersSeeGroupProgress { get; set; }
+		
+		
+		[DataMember(Name = "students_count", EmitDefaultValue = false)]
+		public int? StudentsCount { get; set; }
+		
+		[DataMember(Name = "accesses", EmitDefaultValue = false)]
+		public List<GroupAccessesInfo> Accesses { get; set; }
 	}
 }

@@ -82,6 +82,7 @@ namespace Database.Repos.Groups
 		{
 			var groupAccesses = await db.GroupAccesses
 				.Include(a => a.User)
+				.Include(a => a.GrantedBy)
 				.Where(a => groupsIds.Contains(a.GroupId) && a.IsEnabled && !a.User.IsDeleted)
 				.GroupBy(a => a.GroupId)
 				.ToDictionaryAsync(g => g.Key, g => g.ToList())

@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Database;
-using Database.Models;
 using Database.Repos.Groups;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -50,7 +49,9 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		public async Task<IActionResult> Group(int groupId)
 		{
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
-			return Json(BuildGroupInfo(group));
+			var members = await groupsRepo.GetGroupMembersAsync(groupId).ConfigureAwait(false);
+			var accesses = await groupAccessesRepo.GetGroupAccessesAsync(groupId).ConfigureAwait(false);
+			return Json(BuildGroupInfo(group, members.Count, accesses));
 		}
 
 		[HttpGet("students")]
@@ -67,21 +68,14 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			});
 		}
 
-		[HttpGet("instructors")]
-		public async Task<IActionResult> GroupInstructors(int groupId)
+		[HttpGet("accesses")]
+		public async Task<IActionResult> GroupAccesses(int groupId)
 		{
 			var accesses = await groupAccessesRepo.GetGroupAccessesAsync(groupId).ConfigureAwait(false);
-			return Json(new GroupInstructorsResponse
+			return Json(new GroupAccessesResponse
 			{
-				Instructors = accesses.Select(a => new GroupInstructorInfo
-				{
-					User = BuildShortUserInfo(a.User),
-					AccessType = a.AccessType,
-					GrantedBy = BuildShortUserInfo(a.GrantedBy),
-					GrantTime = a.GrantTime
-				}).ToList()
+				Accesses = accesses.Select(BuildGroupAccessesInfo).ToList()
 			});
 		}
-
 	}
 }

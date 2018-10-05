@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using uLearn;
+using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Models.Responses.Groups;
 
 namespace Ulearn.Web.Api.Controllers.Groups
@@ -28,22 +29,34 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		[Authorize(Policy = "Instructors")]
 		public async Task<IActionResult> GroupsList(Course course)
 		{
-			var groups = await groupAccessesRepo.GetAvailableForUserGroupsAsync(course.Id, User).ConfigureAwait(false);
-			return Json(new GroupsListResponse
-			{
-				Groups = groups.Select(BuildGroupInfo).ToList()
-			});
+			return Json(await GetGroupsListResponseAsync(course).ConfigureAwait(false));
 		}
-		
+
 		[HttpGet("in/{courseId}/archived")]
 		[Authorize(Policy = "Instructors")]
 		public async Task<IActionResult> ArchivedGroupsList(Course course)
 		{
-			var groups = await groupAccessesRepo.GetAvailableForUserGroupsAsync(course.Id, User, onlyArchived: true).ConfigureAwait(false);
-			return Json(new GroupsListResponse
+			return Json(await GetGroupsListResponseAsync(course, onlyArchived: true).ConfigureAwait(false));
+		}
+		
+		private async Task<GroupsListResponse> GetGroupsListResponseAsync(Course course, bool onlyArchived=false)
+		{
+			var groups = await groupAccessesRepo.GetAvailableForUserGroupsAsync(course.Id, User, onlyArchived).ConfigureAwait(false);
+			var groupIds = groups.Select(g => g.Id).ToList();
+
+			var groupMembers = await groupsRepo.GetGroupsMembersAsync(groupIds).ConfigureAwait(false);
+			var membersCountByGroup = groupMembers.GroupBy(m => m.GroupId).ToDictionary(g => g.Key, g => g.Count()).ToDefaultDictionary();
+
+			var groupAccessesByGroup = await groupAccessesRepo.GetGroupAccessesAsync(groupIds).ConfigureAwait(false);
+
+			return new GroupsListResponse
 			{
-				Groups = groups.Select(BuildGroupInfo).ToList()
-			});
+				Groups = groups.Select(g => BuildGroupInfo(
+					g,
+					membersCountByGroup[g.Id],
+					groupAccessesByGroup[g.Id]
+				)).ToList()
+			};
 		}
 	}
 }
