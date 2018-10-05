@@ -46,7 +46,7 @@ namespace uLearn.Web.Models
 			{
 				if (!string.IsNullOrEmpty(runSolutionUrl) || Url == null)
 					return runSolutionUrl ?? "";
-				return Url.Action("RunSolution", "Exercise", new { CourseId, slideId = Slide.Id, IsLti });
+				return Url.Action("RunSolution", "Exercise", new { courseId = CourseId, slideId = Slide.Id, IsLti });
 			}
 			set { runSolutionUrl = value; }
 		}
