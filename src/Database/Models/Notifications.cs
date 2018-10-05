@@ -1058,12 +1058,12 @@ namespace Database.Models
 
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			return $"<b>{Access.GrantedBy.VisibleName.EscapeHtml()}</b> назначил вас преподавателем группы <b>«{Access.Group.Name.EscapeHtml()}»</b> в курсе «{course.Title.EscapeHtml()}».";
+			return $"<b>{Access.GrantedBy.VisibleName.EscapeHtml()}</b> назначил{Access.GrantedBy.Gender.ChooseEnding()} вас преподавателем группы <b>«{Access.Group.Name.EscapeHtml()}»</b> в курсе «{course.Title.EscapeHtml()}».";
 		}
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
-			return $"{Access.GrantedBy.VisibleName} назначил вас преподавателем группы <b>«{Access.Group.Name}»</b> в курсе «{course.Title}».";
+			return $"{Access.GrantedBy.VisibleName} назначил{Access.GrantedBy.Gender.ChooseEnding()} вас преподавателем группы <b>«{Access.Group.Name}»</b> в курсе «{course.Title}».";
 		}
 
 		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)

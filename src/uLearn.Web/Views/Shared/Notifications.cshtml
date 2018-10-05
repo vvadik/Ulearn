@@ -92,7 +92,7 @@
 		</div>
 		<div class="media-body">
 			<div class="notifications__notification__header">
-				@UserName(notification.Comment.Author) ответил@( notification.Comment.Author.Gender.ChooseEnding()) на&nbsp;ваш комментарий
+				@UserName(notification.Comment.Author) ответил@(notification.Comment.Author.Gender.ChooseEnding()) на&nbsp;ваш комментарий
 				<span title="@notification.ParentComment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__cite">@CollapseIfNeed(collapse, Html, notification.ParentComment.Text, 50, renderSimpleMarkdown: true)</span>
 			</div>
 			<div title="@notification.Comment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__text">@CollapseIfNeed(collapse, Html, notification.Comment.Text, 100, renderSimpleMarkdown: true)</div>
@@ -112,7 +112,7 @@
 			@UserAvatar.Avatar(notification.LikedUser)
 		</div>
 		<div class="media-body">
-			<div class="notifications__notification__header">@UserName(notification.LikedUser) лайкнул@( notification.LikedUser.Gender.ChooseEnding()) ваш комментарий</div>
+			<div class="notifications__notification__header">@UserName(notification.LikedUser) лайкнул@(notification.LikedUser.Gender.ChooseEnding()) ваш комментарий</div>
 			<div title="@notification.Comment.Text.TruncateWithEllipsis(200)" class="notifications__comment-notification__text">@CollapseIfNeed(collapse, Html, notification.Comment.Text, 100, renderSimpleMarkdown: true)</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
@@ -127,7 +127,7 @@
 			@UserAvatar.Avatar(notification.InitiatedBy)
 		</div>
 		<div class="media-body">
-			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) @(notification.IsRecheck ? "пере" : "")проверил@( notification.InitiatedBy.Gender.ChooseEnding()) ваше решение<br/>по&nbsp;«@slide.Title.MakeNestedQuotes()»
+			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) @(notification.IsRecheck ? "пере" : "")проверил@(notification.InitiatedBy.Gender.ChooseEnding()) ваше решение<br/>по&nbsp;«@slide.Title.MakeNestedQuotes()»
 			</div>
 			<div class="notifications__notification__score">Вы получили @notification.Checking.Score из @slide.Exercise.MaxReviewScore.PluralizeInRussian(RussianPluralizationOptions.Score)</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
@@ -143,7 +143,7 @@
 			@UserAvatar.Avatar(notification.InitiatedBy)
 		</div>
 		<div class="media-body">
-			<div class="notifications__notification__header">@UserName(notification.InitiatedBy)проверил@( notification.InitiatedBy.Gender.ChooseEnding()) ваш тест<br/>«@slide.Title.MakeNestedQuotes()»
+			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) проверил@( notification.InitiatedBy.Gender.ChooseEnding()) ваш тест<br/>«@slide.Title.MakeNestedQuotes()»
 			</div>
 			<div class="notifications__notification__score">Вы получили @notification.Checking.Score из @slide.MaxScore.PluralizeInRussian(RussianPluralizationOptions.ScoreDative)</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
@@ -204,7 +204,7 @@
 			@UserAvatar.Avatar(notification.JoinedUser)
 		</div>
 		<div class="media-body">
-			<div class="notifications__notification__header">@UserName(notification.JoinedUser) присоедини@( notification.InitiatedBy.Gender.ChooseEnding("лся", "лась")) к&nbsp;вашей группе <b>«@notification.Group.Name»</b>
+			<div class="notifications__notification__header">@UserName(notification.JoinedUser) присоедини@( notification.JoinedUser.Gender.ChooseEnding("лся", "лась")) к&nbsp;вашей группе <b>«@notification.Group.Name»</b>
 			</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
@@ -314,7 +314,7 @@
 			@UserAvatar.Avatar(notification.AddedUser)
 		</div>
 		<div class="media-body">
-			<div class="notifications__notification__header">@UserName(notification.AddedUser) стал@(notification.InitiatedBy.Gender.ChooseEnding()) преподавателем курса «@course.Title.MakeNestedQuotes()»</div>
+			<div class="notifications__notification__header">@UserName(notification.AddedUser) стал@(notification.AddedUser.Gender.ChooseEnding()) преподавателем курса «@course.Title.MakeNestedQuotes()»</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
 	</div>
