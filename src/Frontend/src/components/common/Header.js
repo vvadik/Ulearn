@@ -159,10 +159,11 @@ class AbstractMyCoursesMenu extends Component {
     static VISIBLE_COURSES_COUNT = 10;
 
     static _getCourseMenuItems(courseIds, courseById) {
+    	courseIds = courseIds.filter(id => courseById.hasOwnProperty(id));
         courseIds.sort((a, b) => courseById[a].title.localeCompare(courseById[b].title));
         let visibleCourseIds = courseIds.slice(0, AbstractMyCoursesMenu.VISIBLE_COURSES_COUNT);
         let items = visibleCourseIds.filter(courseId => courseById.hasOwnProperty(courseId)).map(courseId =>
-            <MenuItem href={"/Course/" + courseId } key={courseId} component={ LinkComponent }>{ courseById[courseId].title }</MenuItem>
+            <MenuItem href={ "/Course/" + courseId } key={ courseId } component={ LinkComponent }>{ courseById[courseId].title }</MenuItem>
         );
         if (courseIds.length > visibleCourseIds.length)
             items.push(<MenuItem href="/Admin/CourseList" key="-course-list" component={ LinkComponent }><strong>Все курсы</strong></MenuItem>);
