@@ -49,6 +49,7 @@ class Header extends Component {
         let accessesByCourse = this.props.account.accessesByCourse;
 
         let controllableCourseIds = Object.keys(roleByCourse).filter(courseId => roleByCourse[courseId] !== 'tester');
+		controllableCourseIds = controllableCourseIds.map(s => s.toLowerCase());
         if (this.props.account.isSystemAdministrator)
             controllableCourseIds = Object.keys(this.props.courses.courseById);
         let isCourseMenuVisible = (
