@@ -39,8 +39,8 @@ namespace Ulearn.Web.Api.Models.Responses.Groups
 		[DataMember(Name = "default_prohibit_further_review")]
 		public bool DefaultProhibitFurtherReview { get; set; }
 		
-		[DataMember(Name = "can_users_see_group_progress")]
-		public bool CanUsersSeeGroupProgress { get; set; }
+		[DataMember(Name = "can_students_see_group_progress")]
+		public bool CanStudentsSeeGroupProgress { get; set; }
 		
 		
 		[DataMember(Name = "students_count", EmitDefaultValue = false)]

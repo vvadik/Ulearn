@@ -33,7 +33,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 				IsManualCheckingEnabled = group.IsManualCheckingEnabled,
 				IsManualCheckingEnabledForOldSolutions = group.IsManualCheckingEnabledForOldSolutions,
 				DefaultProhibitFurtherReview = group.DefaultProhibitFutherReview,
-				CanUsersSeeGroupProgress = group.CanUsersSeeGroupProgress,
+				CanStudentsSeeGroupProgress = group.CanUsersSeeGroupProgress,
 				
 				StudentsCount = membersCount,
 				Accesses = accesses?.Select(BuildGroupAccessesInfo).ToList(),
