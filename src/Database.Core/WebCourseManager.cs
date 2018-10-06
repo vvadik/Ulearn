@@ -5,7 +5,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Database.Models;
 using Database.Repos;
-using log4net;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using uLearn;
 
@@ -13,19 +13,19 @@ namespace Database
 {
 	public class WebCourseManager : CourseManager
 	{
-		private readonly CoursesRepo coursesRepo;
 		private readonly ILogger logger;
+		private readonly IServiceProvider serviceProvider;
 
 		private readonly Dictionary<string, Guid> loadedCourseVersions = new Dictionary<string, Guid>();
 		private readonly ConcurrentDictionary<string, DateTime> courseVersionFetchTime = new ConcurrentDictionary<string, DateTime>();
 		private DateTime lastCoursesListFetchTime = DateTime.MinValue;
 		private readonly TimeSpan fetchCourseVersionEvery = TimeSpan.FromSeconds(10);
 
-		public WebCourseManager(CoursesRepo coursesRepo, ILogger logger)
+		public WebCourseManager(ILogger logger, IServiceProvider serviceProvider)
 			: base(GetCoursesDirectory())
 		{
-			this.coursesRepo = coursesRepo;
 			this.logger = logger;
+			this.serviceProvider = serviceProvider;
 		}
 
 		private readonly object @lock = new object();
@@ -37,7 +37,9 @@ namespace Database
 				return course;
 
 			courseVersionFetchTime[courseId] = DateTime.Now;
-			
+
+			/* WebCourseManager is registered as Singleton in ASP.NET DI container, but CoursesRepo should be created for each request */
+			var coursesRepo = serviceProvider.GetService<CoursesRepo>();
 			var publishedVersion = coursesRepo.GetPublishedCourseVersion(courseId);
 
 			if (publishedVersion == null)
@@ -51,8 +53,11 @@ namespace Database
 		{
 			if (lastCoursesListFetchTime > DateTime.Now.Subtract(fetchCourseVersionEvery))
 				return base.GetCourses();
-				
+
+			/* WebCourseManager is registered as Singleton in ASP.NET DI container, but CoursesRepo should be created for each request */
+			var coursesRepo = serviceProvider.GetService<CoursesRepo>();
 			var publishedCourseVersions = await coursesRepo.GetPublishedCourseVersionsAsync().ConfigureAwait(false);
+
 			lastCoursesListFetchTime = DateTime.Now;
 			foreach (var courseVersion in publishedCourseVersions)
 			{
