@@ -36,6 +36,7 @@ if (env.stringified['process.env'].NODE_ENV !== '"production"') {
 
 // Note: defined here because it will be used more than once.
 const cssFilename = 'static/css/[name].[contenthash:8].css';
+const chunkCssFilename = 'static/css/[id].[contenthash:8].css';
 
 // ExtractTextPlugin expects the build output to be flat.
 // (See https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/27)
@@ -175,14 +176,20 @@ module.exports = {
 					  }
 				  },
 				  {
+				  	  loader: 'less-loader',
+					  options: {
+				  	  	  sourceMap: shouldUseSourceMap,
+					  }
+				  },
+				  {
 					  loader: "postcss-loader",
 					  options: {
 						  autoprefixer: {
 							  browsers: [
-							  	'>1%',
-								'last 4 versions',
-								'Firefox ESR',
-								'not ie < 9' // React doesn't support IE8 anyway
+								  '>1%',
+								  'last 4 versions',
+								  'Firefox ESR',
+								  'not ie < 9' // React doesn't support IE8 anyway
 							  ],
 							  flexbox: 'no-2009'
 						  },
@@ -191,7 +198,6 @@ module.exports = {
 						  ]
 					  },
 				  },
-				  'less-loader',
 			  ],
           },
           // "file" loader makes sure assets end up in the `build` folder.
@@ -255,8 +261,8 @@ module.exports = {
 	new MiniCssExtractPlugin({
 	  // Options similar to the same options in webpackOptions.output
 	  // both options are optional
-	  filename: "[name].[hash].css",
-	  chunkFilename: "[id].[hash].css"
+	  filename: cssFilename,
+	  chunkFilename: chunkCssFilename
 	}),
     // Generate a manifest file which contains a mapping of all asset filenames
     // to their corresponding output file so that tools can pick it up without
