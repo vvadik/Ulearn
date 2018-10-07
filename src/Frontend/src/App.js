@@ -1,3 +1,9 @@
+/*
+TODO (andgein): Maybe it will be better to use babel/preset-env with useBuiltIns: 'usage'.
+See https://babeljs.io/docs/en/babel-polyfill#usage-in-node-browserify-webpack
+*/
+import "@babel/polyfill"
+
 import React, { Component } from 'react';
 import { Switch, Route, BrowserRouter } from 'react-router-dom';
 

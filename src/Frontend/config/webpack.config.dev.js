@@ -26,6 +26,7 @@ const env = getClientEnvironment(publicUrl);
 // It is focused on developer experience and fast rebuilds.
 // The production configuration is different and lives in a separate file.
 module.exports = {
+  mode: 'development',
   // You may want 'eval' instead if you prefer to see the compiled output in DevTools.
   // See the discussion in https://github.com/facebookincubator/create-react-app/issues/343.
   devtool: 'cheap-module-source-map',
@@ -236,7 +237,7 @@ module.exports = {
     // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
     // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
     // In development, this will be an empty string.
-    new InterpolateHtmlPlugin(env.raw),
+    new InterpolateHtmlPlugin(HtmlWebpackPlugin, env.raw),
     // Generates an `index.html` file with the <script> injected.
     new HtmlWebpackPlugin({
       inject: true,
@@ -244,16 +245,20 @@ module.exports = {
       chunksSortMode: (chunk1, chunk2) => {
         /* oldBrowser.js should be the first bundle. For more complex cases see solution
            at https://github.com/jantimon/html-webpack-plugin/issues/481#issuecomment-287370259*/
-        if (chunk1.names[0] === 'oldBrowser') return -1;
-        if (chunk2.names[0] === 'oldBrowser') return 1;
+        if (chunk1 === 'oldBrowser') return -1;
+        if (chunk2 === 'oldBrowser') return 1;
         return 0;
       },
     }),
     // Add module names to factory functions so they appear in browser profiler.
-    new webpack.NamedModulesPlugin(),
+	// andgein: mode=development enabled this by default (https://webpack.js.org/concepts/mode/)
+    // new webpack.NamedModulesPlugin(),
+
     // Makes some environment variables available to the JS code, for example:
     // if (process.env.NODE_ENV === 'development') { ... }. See `./env.js`.
-    new webpack.DefinePlugin(env.stringified),
+	// andgein: mode=development enabled this by default (https://webpack.js.org/concepts/mode/)
+    // new webpack.DefinePlugin(env.stringified),
+
     // This is necessary to emit hot updates (currently CSS only):
     new webpack.HotModuleReplacementPlugin(),
     // Watcher doesn't work well if you mistype casing in a path so we use

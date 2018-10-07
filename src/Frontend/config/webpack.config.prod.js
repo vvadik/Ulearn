@@ -50,6 +50,7 @@ const extractTextPluginOptions = shouldUseRelativeAssetPaths
 // It compiles slowly and is focused on producing a fast and minimal bundle.
 // The development configuration is different and lives in a separate file.
 module.exports = {
+  mode: 'production',
   // Don't attempt to continue if there are any errors.
   bail: true,
   // We generate sourcemaps in production. This is slow but gives good results.
@@ -267,7 +268,7 @@ module.exports = {
     // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
     // In production, it will be an empty string unless you specify "homepage"
     // in `package.json`, in which case it will be the pathname of that URL.
-    new InterpolateHtmlPlugin(env.raw),
+    new InterpolateHtmlPlugin(HtmlWebpackPlugin, env.raw),
     // Generates an `index.html` file with the <script> injected.
     new HtmlWebpackPlugin({
       inject: true,
@@ -287,8 +288,8 @@ module.exports = {
       chunksSortMode: (chunk1, chunk2) => {
         /* oldBrowser.js should be the first bundle. For more complex cases see solution
            at https://github.com/jantimon/html-webpack-plugin/issues/481#issuecomment-287370259*/
-        if (chunk1.names[0] === 'oldBrowser') return -1;
-        if (chunk2.names[0] === 'oldBrowser') return 1;
+        if (chunk1 === 'oldBrowser') return -1;
+        if (chunk2 === 'oldBrowser') return 1;
         return 0;
       },
     }),
