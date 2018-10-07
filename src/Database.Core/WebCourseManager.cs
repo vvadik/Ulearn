@@ -38,9 +38,13 @@ namespace Database
 
 			courseVersionFetchTime[courseId] = DateTime.Now;
 
-			/* WebCourseManager is registered as Singleton in ASP.NET DI container, but CoursesRepo should be created for each request */
-			var coursesRepo = serviceProvider.GetService<CoursesRepo>();
-			var publishedVersion = coursesRepo.GetPublishedCourseVersion(courseId);
+			CourseVersion publishedVersion;
+			using (serviceProvider.CreateScope())
+			{
+				/* WebCourseManager is registered as Singleton in ASP.NET DI container, but CoursesRepo should be created for each request */
+				var coursesRepo = serviceProvider.GetService<CoursesRepo>();
+				publishedVersion = coursesRepo.GetPublishedCourseVersion(courseId);
+			}
 
 			if (publishedVersion == null)
 				return course;
@@ -54,9 +58,13 @@ namespace Database
 			if (lastCoursesListFetchTime > DateTime.Now.Subtract(fetchCourseVersionEvery))
 				return base.GetCourses();
 
-			/* WebCourseManager is registered as Singleton in ASP.NET DI container, but CoursesRepo should be created for each request */
-			var coursesRepo = serviceProvider.GetService<CoursesRepo>();
-			var publishedCourseVersions = await coursesRepo.GetPublishedCourseVersionsAsync().ConfigureAwait(false);
+			List<CourseVersion> publishedCourseVersions;
+			using (serviceProvider.CreateScope())
+			{
+				/* WebCourseManager is registered as Singleton in ASP.NET DI container, but CoursesRepo should be created for each request */
+				var coursesRepo = serviceProvider.GetService<CoursesRepo>();
+				publishedCourseVersions = await coursesRepo.GetPublishedCourseVersionsAsync().ConfigureAwait(false);
+			}
 
 			lastCoursesListFetchTime = DateTime.Now;
 			foreach (var courseVersion in publishedCourseVersions)
