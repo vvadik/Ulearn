@@ -53,7 +53,7 @@ namespace uLearn.Web.Models
 
 		private TocUnitModel CreateUnit(Unit unit)
 		{
-			var pages = unit.Slides.Select(CreatePage).ToList();
+			var pages = unit.Slides.Where(s => !IsSlideHidden(s)).Select(CreatePage).ToList();
 			if (IsInstructor)
 			{
 				if (unit.InstructorNote != null)
