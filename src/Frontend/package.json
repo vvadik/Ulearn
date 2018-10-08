@@ -11,6 +11,7 @@
     "babel-eslint": "10.0.1",
     "babel-jest": "23.6.0",
     "babel-loader": "8.0.4",
+    "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-preset-react-app": "^5.0.3",
     "babel-runtime": "6.26.0",
     "case-sensitive-paths-webpack-plugin": "2.1.2",
@@ -100,7 +101,23 @@
   },
   "babel": {
     "presets": [
+      [
+        "@babel/preset-env",
+        {
+          "targets": {
+            "browsers": [
+              "last 4 versions",
+              ">0.25%"
+            ]
+          },
+          "modules": false,
+          "useBuiltIns": "usage"
+        }
+      ],
       "react-app"
+    ],
+    "plugins": [
+      "transform-class-properties"
     ]
   },
   "eslintConfig": {
