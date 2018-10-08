@@ -1,0 +1,17 @@
+using Microsoft.AspNetCore.Mvc;
+using Ulearn.Web.Api.Models.Validations;
+
+namespace Ulearn.Web.Api.Models.Parameters.Groups
+{
+	public class GroupsListParameters : IPaginationParameters
+	{
+		[FromQuery(Name = "offset")]
+		[MinValue(0, ErrorMessage = "Offset should be non-negative")]
+		public int Offset { get; set; } = 0;
+
+		[FromQuery(Name = "count")]
+		[MinValue(0, ErrorMessage = "Count should be non-negative")]
+		[MaxValue(200, ErrorMessage = "Count should be at most 200")]
+		public int Count { get; set; } = 50;
+	}
+}
