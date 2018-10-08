@@ -18,8 +18,19 @@ namespace uLearn.Quizes
 			var scoringGroupsIds = settings.Scoring.Groups.Keys;
 			if (!string.IsNullOrEmpty(quiz.ScoringGroup) && !scoringGroupsIds.Contains(quiz.ScoringGroup))
 				throw new CourseLoadingException(
-					$"Неизвестная группа оценки у теста {quiz.Title}: {quiz.ScoringGroup}\n" +
+					$"Неизвестная группа оценки у теста «{quiz.Title}»: {quiz.ScoringGroup}\n" +
 					"Возможные значения: " + string.Join(", ", scoringGroupsIds));
+			
+			var questionBlocks = quiz.Blocks.OfType<AbstractQuestionBlock>().ToList();
+			var questionIds = questionBlocks.Select(b => b.Id).ToImmutableHashSet();
+			var questionIdsCount = questionIds.ToDictionary(id => id, id => questionBlocks.Count(b => b.Id == id));
+			if (questionIdsCount.Values.Any(count => count > 1))
+			{
+				var repeatedQuestionId = questionIdsCount.First(kvp => kvp.Value > 1).Key;
+				throw new CourseLoadingException(
+					$"Идентификатор «{repeatedQuestionId}» в тесте «{quiz.Title}» принадлежит как минимум двум различным вопросам. " +
+					"Идентификаторы вопросов (параметры id) должны быть уникальны.");
+			}
 
 			if (string.IsNullOrEmpty(quiz.ScoringGroup))
 				quiz.ScoringGroup = settings.Scoring.DefaultScoringGroupForQuiz;

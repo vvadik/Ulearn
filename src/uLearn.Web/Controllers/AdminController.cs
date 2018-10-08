@@ -194,7 +194,7 @@ namespace uLearn.Web.Controllers
 			{
 				var errorMessage = e.Message.ToLowerFirstLetter();
 				if (e.InnerException != null)
-					errorMessage += $" ({e.InnerException.Message})";
+					errorMessage += $"\n\n{e.InnerException.Message}";
 				return RedirectToAction("Packages", new { courseId, error=errorMessage });
 			}
 			
