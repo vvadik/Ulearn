@@ -21,7 +21,7 @@ function refreshApiJwtToken() {
         .then(json => {
             let token = json.token;
             if (! token)
-                return Promise.reject(new Error('Can\'t get token from API: /account/token returned bad json: ' + JSON.stringify(json)))
+                return Promise.reject(new Error('Can\'t get token from API: /account/token returned bad json: ' + JSON.stringify(json)));
             apiJwtToken = token;
             return Promise.resolve(API_JWT_TOKEN_UPDATED);
         })

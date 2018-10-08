@@ -33,6 +33,7 @@
     "jest": "23.6.0",
     "object-assign": "4.1.1",
     "outdated-browser-rework": "^2.5.4",
+    "polyfill-array-includes": "^1.0.0",
     "postcss-flexbugs-fixes": "4.1.0",
     "postcss-loader": "3.0.0",
     "promise": "8.0.2",
