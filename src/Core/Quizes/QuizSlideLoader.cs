@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using uLearn.Model;
 using Ulearn.Common.Extensions;
 
@@ -9,6 +10,8 @@ namespace uLearn.Quizes
 	public class QuizSlideLoader : ISlideLoader
 	{
 		public string Extension => ".quiz.xml";
+
+		private static readonly Regex QuestionIdRegex = new Regex("^[0-9a-z_]+$", RegexOptions.IgnoreCase);
 
 		public Slide Load(FileInfo file, Unit unit, int slideIndex, string courseId, CourseSettings settings)
 		{
@@ -30,6 +33,15 @@ namespace uLearn.Quizes
 				throw new CourseLoadingException(
 					$"Идентификатор «{repeatedQuestionId}» в тесте «{quiz.Title}» принадлежит как минимум двум различным вопросам. " +
 					"Идентификаторы вопросов (параметры id) должны быть уникальны.");
+			}
+
+
+			if (!questionIds.All(id => QuestionIdRegex.IsMatch(id)))
+			{
+				var badQuestionId = questionIds.First(id => !QuestionIdRegex.IsMatch(id));
+				throw new CourseLoadingException(
+					$"Идентификатор «{badQuestionId}» в тесте «{quiz.Title}» не удовлетворяет формату. " +
+					"Идентификаторы вопросов (параметры id) должны состоять из латинских букв, цифр и символа подчёркивания. Идентификатор не может быть пустым.");
 			}
 
 			if (string.IsNullOrEmpty(quiz.ScoringGroup))

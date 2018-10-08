@@ -5,7 +5,6 @@ using System.IO;
 using System.Threading.Tasks;
 using Database.Models;
 using Database.Repos;
-using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using uLearn;
 
@@ -14,18 +13,16 @@ namespace Database
 	public class WebCourseManager : CourseManager
 	{
 		private readonly ILogger logger;
-		private readonly IServiceProvider serviceProvider;
 
 		private readonly Dictionary<string, Guid> loadedCourseVersions = new Dictionary<string, Guid>();
 		private readonly ConcurrentDictionary<string, DateTime> courseVersionFetchTime = new ConcurrentDictionary<string, DateTime>();
 		private DateTime lastCoursesListFetchTime = DateTime.MinValue;
 		private readonly TimeSpan fetchCourseVersionEvery = TimeSpan.FromSeconds(10);
 
-		public WebCourseManager(ILogger logger, IServiceProvider serviceProvider)
+		public WebCourseManager(ILogger logger)
 			: base(GetCoursesDirectory())
 		{
 			this.logger = logger;
-			this.serviceProvider = serviceProvider;
 		}
 
 		private readonly object @lock = new object();
