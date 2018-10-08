@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Database;
+using Database.Repos;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using uLearn;
@@ -12,15 +13,18 @@ namespace Ulearn.Web.Api.Controllers
 	[Route("/courses")]
 	public class CoursesController : BaseController
 	{
-		public CoursesController(ILogger logger, WebCourseManager courseManager, UlearnDb db)
+		private readonly CoursesRepo coursesRepo;
+
+		public CoursesController(ILogger logger, WebCourseManager courseManager, UlearnDb db, CoursesRepo coursesRepo)
 			: base(logger, courseManager, db)
 		{
+			this.coursesRepo = coursesRepo;
 		}
 
 		[HttpGet("")]
 		public async Task<IActionResult> CoursesList()
 		{
-			var courses = await courseManager.GetCoursesAsync().ConfigureAwait(false);
+			var courses = await courseManager.GetCoursesAsync(coursesRepo).ConfigureAwait(false);
 			return Json(new CoursesListResponse
 			{
 				Courses = courses.Select(

@@ -30,7 +30,7 @@ namespace Database
 
 		private readonly object @lock = new object();
 
-		public override Course GetCourse(string courseId)
+		public async Task<Course> GetCourseAsync(CoursesRepo coursesRepo, string courseId)
 		{
 			var course = base.GetCourse(courseId);
 			if (IsCourseVersionWasUpdatedRecent(courseId))
@@ -38,13 +38,7 @@ namespace Database
 
 			courseVersionFetchTime[courseId] = DateTime.Now;
 
-			CourseVersion publishedVersion;
-			using (serviceProvider.CreateScope())
-			{
-				/* WebCourseManager is registered as Singleton in ASP.NET DI container, but CoursesRepo should be created for each request */
-				var coursesRepo = serviceProvider.GetService<CoursesRepo>();
-				publishedVersion = coursesRepo.GetPublishedCourseVersion(courseId);
-			}
+			var publishedVersion = await coursesRepo.GetPublishedCourseVersionAsync(courseId).ConfigureAwait(false);
 
 			if (publishedVersion == null)
 				return course;
@@ -53,18 +47,12 @@ namespace Database
 			return base.GetCourse(courseId);
 		}
 
-		public async Task<IEnumerable<Course>> GetCoursesAsync()
+		public async Task<IEnumerable<Course>> GetCoursesAsync(CoursesRepo coursesRepo)
 		{
 			if (lastCoursesListFetchTime > DateTime.Now.Subtract(fetchCourseVersionEvery))
 				return base.GetCourses();
 
-			List<CourseVersion> publishedCourseVersions;
-			using (serviceProvider.CreateScope())
-			{
-				/* WebCourseManager is registered as Singleton in ASP.NET DI container, but CoursesRepo should be created for each request */
-				var coursesRepo = serviceProvider.GetService<CoursesRepo>();
-				publishedCourseVersions = await coursesRepo.GetPublishedCourseVersionsAsync().ConfigureAwait(false);
-			}
+			var publishedCourseVersions = await coursesRepo.GetPublishedCourseVersionsAsync().ConfigureAwait(false);
 
 			lastCoursesListFetchTime = DateTime.Now;
 			foreach (var courseVersion in publishedCourseVersions)

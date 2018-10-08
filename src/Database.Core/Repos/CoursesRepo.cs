@@ -21,12 +21,12 @@ namespace Database.Repos
 			this.db = db;
 		}
 
-		public CourseVersion GetPublishedCourseVersion(string courseId)
+		public Task<CourseVersion> GetPublishedCourseVersionAsync(string courseId)
 		{
 			return db.CourseVersions.AsNoTracking()
 				.Where(v => v.CourseId == courseId && v.PublishTime != null)
 				.OrderByDescending(v => v.PublishTime)
-				.FirstOrDefault();
+				.FirstOrDefaultAsync();
 		}
 
 		public Task<List<CourseVersion>> GetCourseVersionsAsync(string courseId)
