@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Database;
 using Database.Models;
-using LtiLibrary.NetCore.Extensions;
 using Serilog;
 using Ulearn.Web.Api.Models.Responses.Groups;
 
@@ -21,12 +20,6 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			if (group == null)
 				throw new ArgumentNullException(nameof(group));
 
-			var accessesList = accesses?.ToList();
-
-			logger.Information($"Собираю информацию для ответа о группе {group.Id} ({group.Name})");
-			logger.Information($"Владелец: {BuildShortUserInfo(group.Owner).ToJsonString()}");
-			logger.Information($"Доступы: [{string.Join(", ", accessesList?.Select(BuildGroupAccessesInfo).Select(a => a.ToJsonString()))}]");
-			
 			return new GroupInfo
 			{
 				Id = group.Id,
@@ -43,7 +36,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 				CanStudentsSeeGroupProgress = group.CanUsersSeeGroupProgress,
 				
 				StudentsCount = membersCount,
-				Accesses = accessesList?.Select(BuildGroupAccessesInfo).ToList(),
+				Accesses = accesses?.Select(BuildGroupAccessesInfo).ToList(),
 			};
 		}
 		

@@ -42,7 +42,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 
 			context.ActionArguments["group"] = group;
 
-			await next().ConfigureAwait(false);
+			await base.OnActionExecutionAsync(context, next).ConfigureAwait(false);
 		}
 
 		[HttpGet]

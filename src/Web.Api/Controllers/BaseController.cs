@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -29,19 +30,24 @@ namespace Ulearn.Web.Api.Controllers
 			this.db = db ?? throw new ArgumentException(nameof(db)); 
 		}
 
-		public override void OnActionExecuted(ActionExecutedContext context)
+		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
 		{
-			base.OnActionExecuted(context);
-
 			DisableEfChangesTrackingForGetRequests(context);
+			
+			await next().ConfigureAwait(false);
 		}
 
-		private void DisableEfChangesTrackingForGetRequests(ActionExecutedContext context)
+		private void DisableEfChangesTrackingForGetRequests(ActionContext context)
 		{
 			/* Disable change tracking in EF Core for GET requests due to performance issues */
 			/* TODO (andgein): we need a way to enable change tracking for some GET requests in future */
 			var isRequestSafe = context.HttpContext.Request.Method == "GET"; // Maybe for HEAD and OPTION requests too?
 			db.ChangeTracker.AutoDetectChangesEnabled = !isRequestSafe;
+
+			if (isRequestSafe)
+			{
+				logger.Information("Выключаю автоматическое отслеживание изменений в EF Core: db.ChangeTracker.AutoDetectChangesEnabled = false");
+			}
 		}
 
 		protected UnitInfo BuildUnitInfo(string courseId, Unit unit)

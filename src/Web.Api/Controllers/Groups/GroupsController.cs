@@ -4,8 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database;
 using Database.Repos.Groups;
-using log4net.Core;
-using LtiLibrary.NetCore.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using uLearn;
@@ -61,15 +59,11 @@ namespace Ulearn.Web.Api.Controllers.Groups
 
 			var groupAccessesByGroup = await groupAccessesRepo.GetGroupAccessesAsync(groupIds).ConfigureAwait(false);
 
-			logger.Information($"Собираю информацию для ответа GroupsListResponse... [Stage 1]");
-
 			var groupInfos = filteredGroups.Select(g => BuildGroupInfo(
 				g,
 				membersCountByGroup[g.Id],
 				groupAccessesByGroup[g.Id]
 			)).ToList();
-			
-			logger.Information($"Собираю информацию для ответа GroupsListResponse... [Stage 2]");
 			
 			var response = new GroupsListResponse
 			{
@@ -81,8 +75,6 @@ namespace Ulearn.Web.Api.Controllers.Groups
 					TotalCount = groups.Count,
 				}
 			};
-			
-			logger.Information($"Собрал информацию для ответа: {response.ToJsonString()}");
 			
 			return response;
 		}
