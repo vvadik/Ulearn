@@ -82,7 +82,7 @@ namespace Database.Repos.Groups
 		{
 			var groupAccesses = await db.GroupAccesses
 				.Include(a => a.User)
-				.Include(a => a.GrantedBy)
+				// .Include(a => a.GrantedBy)
 				.Where(a => groupsIds.Contains(a.GroupId) && a.IsEnabled && !a.User.IsDeleted)
 				.ToListAsync()
 				.ConfigureAwait(false);

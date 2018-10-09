@@ -18,7 +18,7 @@ namespace Ulearn.Web.Api.Models.Responses
 		[DataMember(Name = "count")]
 		public int Count { get; set; }
 		
-		[DataMember(Name = "total_count", EmitDefaultValue = true, Order = 1)]
+		[DataMember(Name = "total_count", EmitDefaultValue = false, Order = 1)]
 		public int? TotalCount { get; set; }
 	}
 }

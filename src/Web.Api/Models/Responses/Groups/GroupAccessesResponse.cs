@@ -22,7 +22,7 @@ namespace Ulearn.Web.Api.Models.Responses.Groups
 		[DataMember(Name = "access_type")]
 		public GroupAccessType AccessType { get; set; }
 		
-		[DataMember(Name = "granted_by")]
+		[DataMember(Name = "granted_by", EmitDefaultValue = false)]
 		public ShortUserInfo GrantedBy { get; set; }
 		
 		[DataMember(Name = "grant_time")]
