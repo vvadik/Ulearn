@@ -4,14 +4,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database;
 using Database.Repos.Groups;
+using log4net.Core;
+using LtiLibrary.NetCore.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 using uLearn;
 using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Models.Parameters.Groups;
 using Ulearn.Web.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Responses.Groups;
+using ILogger = Serilog.ILogger;
 
 namespace Ulearn.Web.Api.Controllers.Groups
 {
@@ -59,13 +61,19 @@ namespace Ulearn.Web.Api.Controllers.Groups
 
 			var groupAccessesByGroup = await groupAccessesRepo.GetGroupAccessesAsync(groupIds).ConfigureAwait(false);
 
-			return new GroupsListResponse
+			logger.Information($"Собираю информацию для ответа GroupsListResponse... [Stage 1]");
+
+			var groupInfos = filteredGroups.Select(g => BuildGroupInfo(
+				g,
+				membersCountByGroup[g.Id],
+				groupAccessesByGroup[g.Id]
+			)).ToList();
+			
+			logger.Information($"Собираю информацию для ответа GroupsListResponse... [Stage 2]");
+			
+			var response = new GroupsListResponse
 			{
-				Groups = filteredGroups.Select(g => BuildGroupInfo(
-					g,
-					membersCountByGroup[g.Id],
-					groupAccessesByGroup[g.Id]
-				)).ToList(),
+				Groups = groupInfos,
 				PaginationResponse = new PaginationResponse
 				{
 					Offset = parameters.Offset,
@@ -73,6 +81,10 @@ namespace Ulearn.Web.Api.Controllers.Groups
 					TotalCount = groups.Count,
 				}
 			};
+			
+			logger.Information($"Собрал информацию для ответа: {response.ToJsonString()}");
+			
+			return response;
 		}
 	}
 }
