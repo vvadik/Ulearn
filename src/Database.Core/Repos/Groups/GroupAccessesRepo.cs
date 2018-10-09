@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Database.Extensions;
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 
@@ -18,11 +19,13 @@ namespace Database.Repos.Groups
 		private readonly SystemAccessesRepo systemAccessesRepo;
 		private readonly CoursesRepo coursesRepo;
 		private readonly WebCourseManager courseManager;
+		private readonly ILogger logger;
 
 		public GroupAccessesRepo(
 			UlearnDb db,
 			GroupsRepo groupsRepo, SystemAccessesRepo systemAccessesRepo, CoursesRepo coursesRepo,
-			WebCourseManager courseManager
+			WebCourseManager courseManager,
+			ILogger logger
 		)
 		{
 			this.db = db;
@@ -30,6 +33,7 @@ namespace Database.Repos.Groups
 			this.systemAccessesRepo = systemAccessesRepo;
 			this.coursesRepo = coursesRepo;
 			this.courseManager = courseManager;
+			this.logger = logger;
 		}
 
 		public async Task<GroupAccess> GrantAccessAsync(int groupId, string userId, GroupAccessType accessType, string grantedById)
@@ -80,12 +84,16 @@ namespace Database.Repos.Groups
 
 		public async Task<DefaultDictionary<int, List<GroupAccess>>> GetGroupAccessesAsync(IEnumerable<int> groupsIds)
 		{
+			var groupIdsList = groupsIds.ToList();
+			logger.Information($"Получаю список доступов в группам [{string.Join(", ", groupIdsList)}]");
 			var groupAccesses = await db.GroupAccesses
 				.Include(a => a.User)
-				// .Include(a => a.GrantedBy)
-				.Where(a => groupsIds.Contains(a.GroupId) && a.IsEnabled && !a.User.IsDeleted)
+				.Include(a => a.GrantedBy)
+				.Where(a => groupIdsList.Contains(a.GroupId) && a.IsEnabled && !a.User.IsDeleted)
 				.ToListAsync()
 				.ConfigureAwait(false);
+			
+			logger.Information($"Получил список доступов в группам [{string.Join(", ", groupIdsList)}], группирую их");
 
 			return groupAccesses
 				.GroupBy(a => a.GroupId)

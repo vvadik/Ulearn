@@ -49,7 +49,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			{
 				User = BuildShortUserInfo(access.User),
 				AccessType = access.AccessType,
-				// GrantedBy = BuildShortUserInfo(access.GrantedBy),
+				GrantedBy = BuildShortUserInfo(access.GrantedBy),
 				GrantTime = access.GrantTime
 			};
 		}
