@@ -14,7 +14,7 @@
 	</md>
 
 	<include-code>
-		<display>GetNewLettersIds_ClassicWay</display>
+		<display>GetNewLetterIds_ClassicWay</display>
 	</include-code>
 
 	<md>
@@ -24,7 +24,7 @@
 	</md>
 
 	<include-code>
-		<display>GetNewLettersIds_LinqWay</display>
+		<display>GetNewLetterIds_LinqWay</display>
 	</include-code>
 
 	<md>
