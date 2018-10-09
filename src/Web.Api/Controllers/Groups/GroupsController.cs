@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
@@ -45,7 +46,12 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		private async Task<GroupsListResponse> GetGroupsListResponseAsync(Course course, GroupsListParameters parameters, bool onlyArchived=false)
 		{
 			var groups = await groupAccessesRepo.GetAvailableForUserGroupsAsync(course.Id, User, onlyArchived).ConfigureAwait(false);
-			var groupIds = groups.Select(g => g.Id).Skip(parameters.Offset).Take(parameters.Count).ToImmutableHashSet();
+			/* Order groups by (name, createTime) and get one page of data (offset...offset+count) */
+			var groupIds = groups.OrderBy(g => g.Name, StringComparer.InvariantCultureIgnoreCase).ThenBy(g => g.CreateTime)
+				.Skip(parameters.Offset)
+				.Take(parameters.Count)
+				.Select(g => g.Id)
+				.ToImmutableHashSet();
 			var filteredGroups = groups.Where(g => groupIds.Contains(g.Id)).ToList();
 
 			var groupMembers = await groupsRepo.GetGroupsMembersAsync(groupIds).ConfigureAwait(false);

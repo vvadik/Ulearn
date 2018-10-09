@@ -84,11 +84,13 @@ namespace Database.Repos.Groups
 				.Include(a => a.User)
 				.Include(a => a.GrantedBy)
 				.Where(a => groupsIds.Contains(a.GroupId) && a.IsEnabled && !a.User.IsDeleted)
-				.GroupBy(a => a.GroupId)
-				.ToDictionaryAsync(g => g.Key, g => g.ToList())
+				.ToListAsync()
 				.ConfigureAwait(false);
-			
-			return groupAccesses.ToDefaultDictionary();
+
+			return groupAccesses
+				.GroupBy(a => a.GroupId)
+				.ToDictionary(g => g.Key, g => g.ToList())
+				.ToDefaultDictionary();
 		}
 		
 		public async Task<bool> IsGroupAvailableForUserAsync(int groupId, ClaimsPrincipal user)
