@@ -94,6 +94,12 @@ namespace Database.Repos.Groups
 				.ConfigureAwait(false);
 			
 			logger.Information($"Получил список доступов в группам [{string.Join(", ", groupIdsList)}], группирую их");
+			foreach (var groupAccess in groupAccesses)
+			{
+				GroupAccess realGroupAccess = groupAccess;
+				logger.Information($"RealGroupAccess#{realGroupAccess.Id}: Type = {realGroupAccess.GetType()}, User = {realGroupAccess.User.VisibleName}, GrantedBy = {realGroupAccess.GrantedBy.VisibleName}");
+				logger.Information($"GroupAccess#{groupAccess.Id}: Type = {groupAccess.GetType()}, User = {groupAccess.User.VisibleName}, GrantedBy = {groupAccess.GrantedBy.VisibleName}");
+			}
 
 			return groupAccesses
 				.GroupBy(a => a.GroupId)
