@@ -85,21 +85,12 @@ namespace Database.Repos.Groups
 		public async Task<DefaultDictionary<int, List<GroupAccess>>> GetGroupAccessesAsync(IEnumerable<int> groupsIds)
 		{
 			var groupIdsList = groupsIds.ToList();
-			logger.Information($"Получаю список доступов в группам [{string.Join(", ", groupIdsList)}]");
 			var groupAccesses = await db.GroupAccesses
 				.Include(a => a.User)
 				.Include(a => a.GrantedBy)
 				.Where(a => groupIdsList.Contains(a.GroupId) && a.IsEnabled && !a.User.IsDeleted)
 				.ToListAsync()
 				.ConfigureAwait(false);
-			
-			logger.Information($"Получил список доступов в группам [{string.Join(", ", groupIdsList)}], группирую их");
-			foreach (var groupAccess in groupAccesses)
-			{
-				GroupAccess realGroupAccess = groupAccess;
-				logger.Information($"RealGroupAccess#{realGroupAccess.Id}: Type = {realGroupAccess.GetType()}, User = {realGroupAccess.User.VisibleName}, GrantedBy = {realGroupAccess.GrantedBy.VisibleName}");
-				logger.Information($"GroupAccess#{groupAccess.Id}: Type = {groupAccess.GetType()}, User = {groupAccess.User.VisibleName}, GrantedBy = {groupAccess.GrantedBy.VisibleName}");
-			}
 
 			return groupAccesses
 				.GroupBy(a => a.GroupId)
@@ -144,20 +135,23 @@ namespace Database.Repos.Groups
 
 			var userId = user.GetUserId();
 			var groupsWithAccess = new HashSet<int>(db.GroupAccesses.Where(a => a.UserId == userId && a.IsEnabled).Select(a => a.GroupId));
-			var groups = db.Groups.Where(g => !g.IsDeleted && (onlyArchived ? g.IsArchived : !g.IsArchived) &&
-											(
-												/* Course admins can see all groups */
-												coursesWhereUserCanSeeAllGroups.Contains(g.CourseId) ||
-												/* Other instructor can see only own groups */
-												(otherCourses.Contains(g.CourseId) && (g.OwnerId == userId || groupsWithAccess.Contains(g.Id)))
-											)
+			var groups = db.Groups
+				.Include(g => g.Owner)
+				.Where(g => !g.IsDeleted && (onlyArchived ? g.IsArchived : !g.IsArchived) &&
+							(
+								/* Course admins can see all groups */
+								coursesWhereUserCanSeeAllGroups.Contains(g.CourseId) ||
+								/* Other instructor can see only own groups */
+								(otherCourses.Contains(g.CourseId) && (g.OwnerId == userId || groupsWithAccess.Contains(g.Id)))
+							)
 			);
 
 			return await groups
 				.OrderBy(g => g.IsArchived)
 				.ThenBy(g => g.OwnerId != userId)
 				.ThenBy(g => g.Name)
-				.ToListAsync().ConfigureAwait(false);
+				.ToListAsync()
+				.ConfigureAwait(false);
 		}
 		
 		/* Instructor can view student if he is a course admin or if student is member of one of accessible for instructor group */

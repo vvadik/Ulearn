@@ -58,8 +58,6 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			var membersCountByGroup = groupMembers.GroupBy(m => m.GroupId).ToDictionary(g => g.Key, g => g.Count()).ToDefaultDictionary();
 
 			var groupAccessesByGroup = await groupAccessesRepo.GetGroupAccessesAsync(groupIds).ConfigureAwait(false);
-			
-			logger.Information("Создаю GroupsListResponse...");
 
 			return new GroupsListResponse
 			{
