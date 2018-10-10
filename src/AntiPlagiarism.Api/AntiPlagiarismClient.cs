@@ -39,9 +39,9 @@ namespace AntiPlagiarism.Api
 			try
 			{
 				if (method == HttpMethod.Get)
-					response = await httpClient.GetAsync(BuildUrl(httpClient.BaseAddress + url, token, parameters.ToNameValueCollection()));
+					response = await httpClient.GetAsync(BuildUrl(httpClient.BaseAddress + url, token, parameters.ToNameValueCollection())).ConfigureAwait(false);
 				else if (method == HttpMethod.Post)
-					response = await httpClient.PostAsJsonAsync(BuildUrl(httpClient.BaseAddress + url, token), parameters);
+					response = await httpClient.PostAsJsonAsync(BuildUrl(httpClient.BaseAddress + url, token), parameters).ConfigureAwait(false);
 				else
 					throw new AntiPlagiarismClientException($"Internal error: unsupported method for request: {method.Method}");
 			}
@@ -60,7 +60,7 @@ namespace AntiPlagiarism.Api
 			TResult result;
 			try
 			{
-				result = await response.Content.ReadAsJsonAsync<TResult>();
+				result = await response.Content.ReadAsJsonAsync<TResult>().ConfigureAwait(false);
 			}
 			catch (Exception e)
 			{
