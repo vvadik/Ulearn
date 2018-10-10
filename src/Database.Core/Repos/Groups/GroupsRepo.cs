@@ -5,9 +5,7 @@ using System.Threading.Tasks;
 using Database.Models;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 using uLearn;
-using Ulearn.Common.Extensions;
 
 namespace Database.Repos.Groups
 {
@@ -18,17 +16,13 @@ namespace Database.Repos.Groups
 		private readonly IGroupsCreatorAndCopier groupsCreatorAndCopier;
 		private readonly IManualCheckingsForOldSolutionsAdder manualCheckingsForOldSolutionsAdder;
 
-		private readonly ILogger logger;
-
 		public GroupsRepo(
 			UlearnDb db,
-			IGroupsCreatorAndCopier groupsCreatorAndCopier, IManualCheckingsForOldSolutionsAdder manualCheckingsForOldSolutionsAdder,
-			ILogger logger)
+			IGroupsCreatorAndCopier groupsCreatorAndCopier, IManualCheckingsForOldSolutionsAdder manualCheckingsForOldSolutionsAdder)
 		{
 			this.db = db;
 			this.groupsCreatorAndCopier = groupsCreatorAndCopier;
 			this.manualCheckingsForOldSolutionsAdder = manualCheckingsForOldSolutionsAdder;
-			this.logger = logger;
 		}
 
 		public Task<Group> CreateGroupAsync(
@@ -103,6 +97,14 @@ namespace Database.Repos.Groups
 			await db.SaveChangesAsync().ConfigureAwait(false);
 			return group;
 		}
+		
+		public async Task EnableInviteLinkAsync(int groupId, bool isEnabled)
+		{
+			var group = await FindGroupByIdAsync(groupId).ConfigureAwait(false) ?? throw new ArgumentNullException($"Can't find group with id={groupId}");
+			group.IsInviteLinkEnabled = isEnabled;
+			
+			await db.SaveChangesAsync().ConfigureAwait(false);
+		}
 
 		public async Task DeleteGroupAsync(int groupId)
 		{
@@ -116,8 +118,6 @@ namespace Database.Repos.Groups
 			
 			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
-
-		
 
 		[ItemCanBeNull]
 		public Task<Group> FindGroupByIdAsync(int groupId, bool noTracking=false)
@@ -137,7 +137,7 @@ namespace Database.Repos.Groups
 			return groups.FirstOrDefaultAsync(g => g.InviteHash == hash && !g.IsDeleted && g.IsInviteLinkEnabled);
 		}
 
-		private IQueryable<Group> GetCourseGroupsQueryable(string courseId, bool includeArchived=false)
+		public IQueryable<Group> GetCourseGroupsQueryable(string courseId, bool includeArchived=false)
 		{
 			var groups = db.Groups.Where(g => g.CourseId == courseId && !g.IsDeleted);
 			if (!includeArchived)
@@ -158,42 +158,6 @@ namespace Database.Repos.Groups
 			if (!includeArchived)
 				groups = groups.Where(g => !g.IsArchived);
 			return groups.ToListAsync();
-		}
-
-		public async Task EnableInviteLinkAsync(int groupId, bool isEnabled)
-		{
-			var group = await FindGroupByIdAsync(groupId).ConfigureAwait(false) ?? throw new ArgumentNullException($"Can't find group with id={groupId}");
-			group.IsInviteLinkEnabled = isEnabled;
-			
-			await db.SaveChangesAsync().ConfigureAwait(false);
-		}
-
-		public Task<List<string>> GetUsersIdsForAllCourseGroupsAsync(string courseId)
-		{
-			var groupsIds = GetCourseGroupsQueryable(courseId).Select(g => g.Id);
-			return db.GroupMembers.Where(m => groupsIds.Contains(m.GroupId)).Select(m => m.UserId).ToListAsync();
-		}
-
-		/* Return Dictionary<userId, List<groupId>> */
-		public Task<Dictionary<string, List<int>>> GetUsersGroupsIdsAsync(string courseId, IEnumerable<string> usersIds)
-		{
-			var groupsIds = GetCourseGroupsQueryable(courseId).Select(g => g.Id);
-			return db.GroupMembers
-				.Where(m => groupsIds.Contains(m.GroupId) && usersIds.Contains(m.UserId))
-				.GroupBy(m => m.UserId)
-				.ToDictionaryAsync(g => g.Key, g => g.Select(m => m.GroupId).ToList());
-		}
-
-		public async Task<List<int>> GetUserGroupsIdsAsync(string courseId, string userId)
-		{
-			return (await GetUsersGroupsIdsAsync(courseId, new List<string> { userId }).ConfigureAwait(false))
-				.GetOrDefault(userId, new List<int>());
-		}
-
-		public async Task<List<Group>> GetUserGroupsAsync(string courseId, string userId)
-		{
-			var userGroupsIds = await GetUserGroupsIdsAsync(courseId, userId).ConfigureAwait(false);
-			return GetCourseGroupsQueryable(courseId).Where(g => userGroupsIds.Contains(g.Id)).ToList();
 		}
 
 		public async Task<bool> IsManualCheckingEnabledForUserAsync(Course course, string userId)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Database.Models;
@@ -37,14 +38,11 @@ namespace Database.Repos.Groups
 		Task<List<Group>> GetCourseGroupsAsync(string courseId, bool includeArchived=false);
 		Task<List<Group>> GetMyGroupsFilterAccessibleToUserAsync(string courseId, string userId, bool includeArchived = false);
 		Task EnableInviteLinkAsync(int groupId, bool isEnabled);
-		Task<List<string>> GetUsersIdsForAllCourseGroupsAsync(string courseId);
-		Task<Dictionary<string, List<int>>> GetUsersGroupsIdsAsync(string courseId, IEnumerable<string> usersIds);
-		Task<List<int>> GetUserGroupsIdsAsync(string courseId, string userId);
-		Task<List<Group>> GetUserGroupsAsync(string courseId, string userId);
 		Task<bool> IsManualCheckingEnabledForUserAsync(Course course, string userId);
 		Task<bool> GetDefaultProhibitFurtherReviewForUserAsync(string courseId, string userId, string instructorId);
 		Task EnableAdditionalScoringGroupsForGroupAsync(int groupId, IEnumerable<string> scoringGroupsIds);
 		Task<List<EnabledAdditionalScoringGroup>> GetEnabledAdditionalScoringGroupsAsync(string courseId);
 		Task<List<EnabledAdditionalScoringGroup>> GetEnabledAdditionalScoringGroupsForGroupAsync(int groupId);
+		IQueryable<Group> GetCourseGroupsQueryable(string courseId, bool includeArchived=false);
 	}
 }

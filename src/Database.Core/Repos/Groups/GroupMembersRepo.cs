@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
+using Ulearn.Common.Extensions;
 
 namespace Database.Repos.Groups
 {
@@ -93,6 +94,34 @@ namespace Database.Repos.Groups
 				newMembers.Add(await AddUserToGroupAsync(toGroupId, memberUserId).ConfigureAwait(false));
 			
 			return newMembers;
+		}
+		
+		public Task<List<string>> GetUsersIdsForAllCourseGroupsAsync(string courseId)
+		{
+			var groupsIds = groupsRepo.GetCourseGroupsQueryable(courseId).Select(g => g.Id);
+			return db.GroupMembers.Where(m => groupsIds.Contains(m.GroupId)).Select(m => m.UserId).ToListAsync();
+		}
+
+		/* Return Dictionary<userId, List<groupId>> */
+		public Task<Dictionary<string, List<int>>> GetUsersGroupsIdsAsync(string courseId, IEnumerable<string> usersIds)
+		{
+			var groupsIds = groupsRepo.GetCourseGroupsQueryable(courseId).Select(g => g.Id);
+			return db.GroupMembers
+				.Where(m => groupsIds.Contains(m.GroupId) && usersIds.Contains(m.UserId))
+				.GroupBy(m => m.UserId)
+				.ToDictionaryAsync(g => g.Key, g => g.Select(m => m.GroupId).ToList());
+		}
+
+		public async Task<List<int>> GetUserGroupsIdsAsync(string courseId, string userId)
+		{
+			return (await GetUsersGroupsIdsAsync(courseId, new List<string> { userId }).ConfigureAwait(false))
+				.GetOrDefault(userId, new List<int>());
+		}
+
+		public async Task<List<Group>> GetUserGroupsAsync(string courseId, string userId)
+		{
+			var userGroupsIds = await GetUserGroupsIdsAsync(courseId, userId).ConfigureAwait(false);
+			return groupsRepo.GetCourseGroupsQueryable(courseId).Where(g => userGroupsIds.Contains(g.Id)).ToList();
 		}
 	}
 }

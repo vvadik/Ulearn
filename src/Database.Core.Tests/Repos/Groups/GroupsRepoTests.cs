@@ -26,8 +26,7 @@ namespace Database.Core.Tests.Repos.Groups
 			var manualCheckingsForOldSolutionsAdder = new Mock<IManualCheckingsForOldSolutionsAdder>();
 
 			groupsRepo = new GroupsRepo(
-				db, groupsCreatorAndCopier, manualCheckingsForOldSolutionsAdder.Object,
-				logger
+				db, groupsCreatorAndCopier, manualCheckingsForOldSolutionsAdder.Object
 			);
 		}
 
