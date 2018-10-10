@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Database;
 using Database.Repos.Groups;
@@ -11,6 +12,8 @@ using Ulearn.Web.Api.Models.Responses.Groups;
 namespace Ulearn.Web.Api.Controllers.Groups
 {
 	[Route("/groups/{groupId:int:min(0)}")]
+	[ProducesResponseType((int) HttpStatusCode.NotFound)]
+	[ProducesResponseType((int) HttpStatusCode.Forbidden)]
 	public class GroupController : BaseGroupController
 	{
 		private readonly IGroupsRepo groupsRepo;
@@ -78,6 +81,13 @@ namespace Ulearn.Web.Api.Controllers.Groups
 				await groupsRepo.ArchiveGroupAsync(groupId, parameters.IsArchived.Value).ConfigureAwait(false);
 
 			return BuildGroupInfo(await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false));
+		}
+
+		[HttpDelete]
+		public async Task<IActionResult> DeleteGroup(int groupId)
+		{
+			await groupsRepo.DeleteGroupAsync(groupId).ConfigureAwait(false);
+			return Ok();
 		}
 
 		[HttpGet("students")]
