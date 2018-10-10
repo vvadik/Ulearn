@@ -5,6 +5,7 @@ using Database.Repos.Groups;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Serilog;
+using Ulearn.Web.Api.Models.Parameters.Groups;
 using Ulearn.Web.Api.Models.Responses.Groups;
 
 namespace Ulearn.Web.Api.Controllers.Groups
@@ -52,6 +53,31 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			var members = await groupsRepo.GetGroupMembersAsync(groupId).ConfigureAwait(false);
 			var accesses = await groupAccessesRepo.GetGroupAccessesAsync(groupId).ConfigureAwait(false);
 			return BuildGroupInfo(group, members.Count, accesses);
+		}
+
+		[HttpPatch]
+		public async Task<ActionResult<GroupInfo>> UpdateGroup(int groupId, [FromBody] UpdateGroupParameters parameters)
+		{
+			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
+			
+			var newName = parameters.Name ?? group.Name;
+			var newIsManualCheckingEnabled = parameters.IsManualCheckingEnabled ?? group.IsManualCheckingEnabled;
+			var newIsManualCheckingEnabledForOldSolutions = parameters.IsManualCheckingEnabledForOldSolutions ?? group.IsManualCheckingEnabledForOldSolutions;
+			var newDefaultProhibitFurtherReview = parameters.DefaultProhibitFurtherReview ?? group.DefaultProhibitFutherReview;
+			var newCanUsersSeeGroupProgress = parameters.CanStudentsSeeGroupProgress ?? group.CanUsersSeeGroupProgress;
+			await groupsRepo.ModifyGroupAsync(
+				groupId,
+				newName,
+				newIsManualCheckingEnabled,
+				newIsManualCheckingEnabledForOldSolutions,
+				newDefaultProhibitFurtherReview,
+				newCanUsersSeeGroupProgress
+			).ConfigureAwait(false);
+
+			if (parameters.IsArchived.HasValue)
+				await groupsRepo.ArchiveGroupAsync(groupId, parameters.IsArchived.Value).ConfigureAwait(false);
+
+			return BuildGroupInfo(await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false));
 		}
 
 		[HttpGet("students")]

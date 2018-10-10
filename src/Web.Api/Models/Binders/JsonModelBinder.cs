@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
 using Serilog;
+using StackExchange.Redis;
 
 namespace Ulearn.Web.Api.Models.Binders
 {
@@ -30,7 +31,7 @@ namespace Ulearn.Web.Api.Models.Binders
 			}
 
 			var reader = new StreamReader(request.Body);
-			var incomingData = await reader.ReadToEndAsync();
+			var incomingData = await reader.ReadToEndAsync().ConfigureAwait(false);
 			if (string.IsNullOrEmpty(incomingData))
 			{
 				/* If no JSON data */
@@ -43,7 +44,7 @@ namespace Ulearn.Web.Api.Models.Binders
 			{
 				model = JsonConvert.DeserializeObject(incomingData, bindingContext.ModelType);
 			}
-			catch (JsonSerializationException e)
+			catch (Exception e) when (e is JsonSerializationException || e is JsonReaderException) 
 			{
 				logger.Warning($"Can't deserialize json request: {e.Message}");
 				bindingContext.ModelState.TryAddModelError(bindingContext.ModelName, e.Message);

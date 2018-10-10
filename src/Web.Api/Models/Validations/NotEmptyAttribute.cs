@@ -4,9 +4,13 @@ namespace Ulearn.Web.Api.Models.Validations
 {
 	public class NotEmptyAttribute : ValidationAttribute
 	{
+		public bool CanBeNull { get; set; } = false; 
+			
 		public override bool IsValid(object value)
 		{
 			var stringValue = value as string;
+			if (CanBeNull && value == null)
+				return true;
 			return !string.IsNullOrEmpty(stringValue);
 		}
 	}
