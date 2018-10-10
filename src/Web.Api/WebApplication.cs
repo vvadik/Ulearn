@@ -167,8 +167,20 @@ namespace Ulearn.Web.Api
 						Email = "support@ulearn.me"
 					}
 				});
-				// c.MapType<Course>(() => new Schema {  });
+				c.AddSecurityDefinition("Bearer", new ApiKeyScheme
+				{
+					In = "header",
+					Description = "Please insert JWT with Bearer into field. Example: \"Bearer {token}\"",
+					Name = "Authorization",
+					Type = "apiKey"
+				});
+				c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
+				{
+					{ "Bearer", new string [] {} }
+				});
+				c.OperationFilter<BadRequestResponseOperationFilter>();
 				c.OperationFilter<AuthResponsesOperationFilter>();
+				c.OperationFilter<RemoveCourseParameterOperationFilter>();
 			});
 		}
 

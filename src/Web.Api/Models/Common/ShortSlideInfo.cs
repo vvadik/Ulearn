@@ -6,7 +6,7 @@ using Newtonsoft.Json.Converters;
 namespace Ulearn.Web.Api.Models.Common
 {
 	[DataContract]
-	public class SlideInfo
+	public class ShortSlideInfo
 	{
 		[DataMember(Name = "id")]
 		public Guid Id { get; set; }

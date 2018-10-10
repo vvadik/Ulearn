@@ -3,7 +3,7 @@ using Database;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using uLearn;
-using SlideInfo = Ulearn.Web.Api.Models.Common.SlideInfo;
+using Ulearn.Web.Api.Models.Common;
 
 namespace Ulearn.Web.Api.Controllers
 {
@@ -16,7 +16,7 @@ namespace Ulearn.Web.Api.Controllers
 		}
 
 		[HttpGet("{courseId}/{slideId}")]
-		public ActionResult<SlideInfo> SlideInfo(Course course, Guid slideId)
+		public ActionResult<ShortSlideInfo> SlideInfo(Course course, Guid slideId)
 		{
 			var slide = course?.FindSlideById(slideId);
 			if (slide == null)

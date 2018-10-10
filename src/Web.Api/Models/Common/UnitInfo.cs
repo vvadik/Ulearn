@@ -14,6 +14,6 @@ namespace Ulearn.Web.Api.Models.Common
 		public string Title { get; set; }
 		
 		[DataMember(Name = "slides")]
-		public List<SlideInfo> Slides { get; set; }
+		public List<ShortSlideInfo> Slides { get; set; }
 	}
 }

@@ -19,7 +19,7 @@ namespace Ulearn.Web.Api.Models.Responses.ExerciseStatistics
 	public class OneExerciseStatistics
 	{
 		[DataMember(Name = "exercise")]
-		public SlideInfo Exercise { get; set; }
+		public ShortSlideInfo Exercise { get; set; }
 
 		[DataMember(Name = "submissions_count")]
 		public int SubmissionsCount { get; set; }

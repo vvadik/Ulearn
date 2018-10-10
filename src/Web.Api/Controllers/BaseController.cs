@@ -10,7 +10,6 @@ using uLearn;
 using uLearn.Quizes;
 using Ulearn.Web.Api.Models.Common;
 using Ulearn.Web.Api.Models.Responses.Notifications;
-using SlideInfo = Ulearn.Web.Api.Models.Common.SlideInfo;
 
 namespace Ulearn.Web.Api.Controllers
 {
@@ -60,9 +59,9 @@ namespace Ulearn.Web.Api.Controllers
 			};
 		}
 
-		protected SlideInfo BuildSlideInfo(string courseId, Slide slide)
+		protected ShortSlideInfo BuildSlideInfo(string courseId, Slide slide)
 		{
-			return new SlideInfo
+			return new ShortSlideInfo
 			{
 				Id = slide.Id,
 				Title = slide.Title,

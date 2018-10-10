@@ -15,7 +15,7 @@ namespace Ulearn.Web.Api.Swagger
 				.OfType<AuthorizeAttribute>();
 
 			if (authAttributes.Any())
-				operation.Responses.Add("401", new Response { Description = "Unauthorized" });
+				operation.Responses.Add("401", new Response { Description = "Unauthorized. Authorization header is not set or JWT bearer token is invalid" });
 		}
 	}
 }
