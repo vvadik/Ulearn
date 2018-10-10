@@ -12,10 +12,10 @@ namespace Ulearn.Web.Api.Controllers.Groups
 	[Route("/groups/{groupId:int:min(0)}")]
 	public class GroupController : BaseGroupController
 	{
-		private readonly GroupsRepo groupsRepo;
-		private readonly GroupAccessesRepo groupAccessesRepo;
+		private readonly IGroupsRepo groupsRepo;
+		private readonly IGroupAccessesRepo groupAccessesRepo;
 
-		public GroupController(ILogger logger, WebCourseManager courseManager, UlearnDb db, GroupsRepo groupsRepo, GroupAccessesRepo groupAccessesRepo)
+		public GroupController(ILogger logger, WebCourseManager courseManager, UlearnDb db, IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo)
 			: base(logger, courseManager, db)
 		{
 			this.groupsRepo = groupsRepo;

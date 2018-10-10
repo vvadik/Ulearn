@@ -9,18 +9,20 @@ using Ulearn.Common.Extensions;
 
 namespace Database.Repos
 {
-	public class UserQuizzesRepo
+	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
+	public class UserQuizzesRepo : IUserQuizzesRepo
 	{
 		private readonly UlearnDb db;
+		private readonly IQuizzesRepo quizzesRepo;
 
-		public UserQuizzesRepo(UlearnDb db)
+		public UserQuizzesRepo(UlearnDb db, IQuizzesRepo quizzesRepo)
 		{
 			this.db = db;
+			this.quizzesRepo = quizzesRepo;
 		}
 
 		public async Task<UserQuiz> AddUserQuiz(string courseId, bool isRightAnswer, string itemId, string quizId, Guid slideId, string text, string userId, DateTime time, int quizBlockScore, int quizBlockMaxScore)
 		{
-			var quizzesRepo = new QuizzesRepo(db);
 			var currentQuizVersion = quizzesRepo.GetLastQuizVersion(courseId, slideId);
 			var userQuiz = new UserQuiz
 			{

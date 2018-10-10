@@ -6,11 +6,11 @@ using Database.Repos;
 
 namespace Ulearn.Web.Api.Controllers.Notifications
 {
-	public class NotificationDataPreloader
+	public class NotificationDataPreloader : INotificationDataPreloader
 	{
-		private readonly CommentsRepo commentsRepo;
+		private readonly ICommentsRepo commentsRepo;
 
-		public NotificationDataPreloader(CommentsRepo commentsRepo)
+		public NotificationDataPreloader(ICommentsRepo commentsRepo)
 		{
 			this.commentsRepo = commentsRepo;
 		}

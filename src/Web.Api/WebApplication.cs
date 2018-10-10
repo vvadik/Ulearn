@@ -180,26 +180,26 @@ namespace Ulearn.Web.Api
 			services.AddScoped<UlearnUserManager>();
 			services.AddScoped<IAuthorizationHandler, CourseRoleAuthorizationHandler>();
 			services.AddScoped<IAuthorizationHandler, CourseAccessAuthorizationHandler>();
-			services.AddScoped<NotificationDataPreloader>();
+			services.AddScoped<INotificationDataPreloader, NotificationDataPreloader>();
 
 			/* DI for database repos */
-			services.AddScoped<UsersRepo>();
-			services.AddScoped<CommentsRepo>();
-			services.AddScoped<UserRolesRepo>();
-			services.AddScoped<CoursesRepo>();
-			services.AddScoped<SlideCheckingsRepo>();
-			services.AddScoped<GroupsRepo>();
-			services.AddScoped<GroupsCreatorAndCopier>();
-			services.AddScoped<GroupAccessesRepo>();
-			services.AddScoped<GroupLabelsRepo>();
-			services.AddScoped<UsersGroupsGetter>();
-			services.AddScoped<UserSolutionsRepo>();
-			services.AddScoped<UserQuizzesRepo>();
-			services.AddScoped<VisitsRepo>();
-			services.AddScoped<TextsRepo>();
-			services.AddScoped<NotificationsRepo>();
-			services.AddScoped<FeedRepo>();
-			services.AddScoped<SystemAccessesRepo>();
+			services.AddScoped<IUsersRepo, UsersRepo>();
+			services.AddScoped<ICommentsRepo, CommentsRepo>();
+			services.AddScoped<IUserRolesRepo, UserRolesRepo>();
+			services.AddScoped<ICoursesRepo, CoursesRepo>();
+			services.AddScoped<ISlideCheckingsRepo, SlideCheckingsRepo>();
+			services.AddScoped<IGroupsRepo, GroupsRepo>();
+			services.AddScoped<IGroupsCreatorAndCopier, GroupsCreatorAndCopier>();
+			services.AddScoped<IGroupAccessesRepo, GroupAccessesRepo>();
+			services.AddScoped<IUsersGroupsGetter, UsersGroupsGetter>();
+			services.AddScoped<IUserSolutionsRepo, UserSolutionsRepo>();
+			services.AddScoped<IUserQuizzesRepo, UserQuizzesRepo>();
+			services.AddScoped<IVisitsRepo, VisitsRepo>();
+			services.AddScoped<ITextsRepo, TextsRepo>();
+			services.AddScoped<INotificationsRepo, NotificationsRepo>();
+			services.AddScoped<IFeedRepo, FeedRepo>();
+			services.AddScoped<ISystemAccessesRepo, SystemAccessesRepo>();
+			services.AddScoped<IQuizzesRepo, QuizzesRepo>();
 		}
 
 		private void ConfigureAuthServices(IServiceCollection services, WebApiConfiguration configuration, Logger logger)

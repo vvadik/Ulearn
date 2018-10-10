@@ -44,7 +44,7 @@ namespace Database
 			return base.GetCourse(courseId);
 		}
 
-		public async Task<IEnumerable<Course>> GetCoursesAsync(CoursesRepo coursesRepo)
+		public async Task<IEnumerable<Course>> GetCoursesAsync(ICoursesRepo coursesRepo)
 		{
 			if (lastCoursesListFetchTime > DateTime.Now.Subtract(fetchCourseVersionEvery))
 				return base.GetCourses();

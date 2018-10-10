@@ -11,12 +11,12 @@ namespace Database.Repos.Groups
 	/* It's helper class for building lists of groups with this student.
 	   I.e. if student is a member of group A, B, C, D and E, but current instructor has access only to groups A, B, D, E, then
 	   he will see "A, B, D, ..." as a groups list for this student. */
-	public class UsersGroupsGetter
+	public class UsersGroupsGetter : IUsersGroupsGetter
 	{
 		private readonly UlearnDb db;
-		private readonly GroupAccessesRepo groupAccessesRepo;
+		private readonly IGroupAccessesRepo groupAccessesRepo;
 
-		public UsersGroupsGetter(UlearnDb db, GroupAccessesRepo groupAccessesRepo)
+		public UsersGroupsGetter(UlearnDb db, IGroupAccessesRepo groupAccessesRepo)
 		{
 			this.db = db;
 			this.groupAccessesRepo = groupAccessesRepo;

@@ -18,18 +18,23 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 	[Route("/notifications")]
 	public class NotificationsController : BaseController
 	{
-		private readonly NotificationsRepo notificationsRepo;
-		private readonly FeedRepo feedRepo;
-		private readonly NotificationDataPreloader notificationDataPreloader;
+		private readonly INotificationsRepo notificationsRepo;
+		private readonly IFeedRepo feedRepo;
+		private readonly IServiceProvider serviceProvider;
+		private readonly INotificationDataPreloader notificationDataPreloader;
 
 		private static FeedNotificationTransport commentsFeedNotificationTransport;
 
-		public NotificationsController(ILogger logger, WebCourseManager courseManager, UlearnDb db, NotificationsRepo notificationsRepo, FeedRepo feedRepo, NotificationDataPreloader notificationDataPreloader)
+		public NotificationsController(ILogger logger, WebCourseManager courseManager, UlearnDb db,
+			INotificationsRepo notificationsRepo, IFeedRepo feedRepo,
+			IServiceProvider serviceProvider,
+			INotificationDataPreloader notificationDataPreloader)
 			: base(logger, courseManager, db)
 		{
 			this.notificationsRepo = notificationsRepo ?? throw new ArgumentNullException(nameof(notificationsRepo));
 			this.feedRepo = feedRepo ?? throw new ArgumentNullException(nameof(feedRepo));
-			this.notificationDataPreloader = notificationDataPreloader;
+			this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+			this.notificationDataPreloader = notificationDataPreloader ?? throw new ArgumentNullException(nameof(notificationDataPreloader));
 
 			if (commentsFeedNotificationTransport == null)
 				commentsFeedNotificationTransport = feedRepo.GetCommentsFeedNotificationTransport();
@@ -141,7 +146,7 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 			
 			foreach (var notification in notifications)
 			{
-				if (notification.IsBlockedByAnyNotificationFrom(db, allNotifications))
+				if (notification.IsBlockedByAnyNotificationFrom(serviceProvider, allNotifications))
 					continue;
 				yield return notification;
 			}

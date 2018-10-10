@@ -591,5 +591,6 @@ public void SetUp()&#xD;
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F215A33823F30E4AA50E54C6D36897F6/Text/@EntryValue">throw new InvalidOperationException("$TODO$");</s:String>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=checkings/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Preloader/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Stepik/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Ulearn/@EntryIndexedValue">True</s:Boolean>
 </wpf:ResourceDictionary>

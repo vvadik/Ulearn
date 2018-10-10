@@ -25,13 +25,13 @@ namespace Ulearn.Web.Api.Controllers
 	{
 		private readonly UlearnUserManager userManager;
 		private readonly SignInManager<ApplicationUser> signInManager;
-		private readonly UserRolesRepo userRolesRepo;
-		private readonly CoursesRepo coursesRepo;
+		private readonly IUserRolesRepo userRolesRepo;
+		private readonly ICoursesRepo coursesRepo;
 		private readonly WebApiConfiguration configuration;
 
 		public AccountController(
 			ILogger logger, IOptions<WebApiConfiguration> options, WebCourseManager courseManager, UlearnDb db, UlearnUserManager userManager, SignInManager<ApplicationUser> signInManager,
-			UserRolesRepo userRolesRepo, CoursesRepo coursesRepo
+			IUserRolesRepo userRolesRepo, ICoursesRepo coursesRepo
 		)
 			: base(logger, courseManager, db)
 		{

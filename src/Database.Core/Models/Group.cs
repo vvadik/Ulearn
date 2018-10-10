@@ -61,6 +61,6 @@ namespace Database.Models
 
 		[NotMapped]
 		/* TODO (andgein): Use ToListAsync()? */
-		public List<GroupMember> NotDeletedMembers => Members.Where(m => !m.User.IsDeleted).ToList();
+		public List<GroupMember> NotDeletedMembers => Members?.Where(m => !m.User.IsDeleted).ToList() ?? new List<GroupMember>();
 	}
 }

@@ -7,15 +7,16 @@ using Database.Models;
 
 namespace Database.Repos
 {
-	public class VisitsRepo
+	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
+	public class VisitsRepo : IVisitsRepo
 	{
 		private readonly UlearnDb db;
-		private readonly SlideCheckingsRepo slideCheckingsRepo;
+		private readonly ISlideCheckingsRepo slideCheckingsRepo;
 
-		public VisitsRepo(UlearnDb db)
+		public VisitsRepo(UlearnDb db, ISlideCheckingsRepo slideCheckingsRepo)
 		{
 			this.db = db;
-			slideCheckingsRepo = new SlideCheckingsRepo(db);
+			this.slideCheckingsRepo = slideCheckingsRepo;
 		}
 
 		public async Task AddVisit(string courseId, Guid slideId, string userId, string ipAddress)

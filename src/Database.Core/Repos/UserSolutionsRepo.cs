@@ -17,12 +17,14 @@ using Ulearn.Common.Extensions;
 
 namespace Database.Repos
 {
-	public class UserSolutionsRepo
+	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
+	
+	public class UserSolutionsRepo : IUserSolutionsRepo
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(UserSolutionsRepo));
 		private readonly UlearnDb db;
-		private readonly TextsRepo textsRepo;
-		private readonly VisitsRepo visitsRepo;
+		private readonly ITextsRepo textsRepo;
+		private readonly IVisitsRepo visitsRepo;
 		private readonly WebCourseManager courseManager;
 
 		private static volatile ConcurrentDictionary<int, DateTime> unhandledSubmissions = new ConcurrentDictionary<int, DateTime>();
@@ -31,7 +33,7 @@ namespace Database.Repos
 
 		public UserSolutionsRepo(
 			UlearnDb db,
-			TextsRepo textsRepo, VisitsRepo visitsRepo, 
+			ITextsRepo textsRepo, IVisitsRepo visitsRepo, 
 			WebCourseManager courseManager)
 		{
 			this.db = db;

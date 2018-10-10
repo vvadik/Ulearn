@@ -12,18 +12,19 @@ using Ulearn.Common.Extensions;
 
 namespace Database.Repos.Groups
 {
-	public class GroupAccessesRepo
+	/* This class is fully migrated to .NET Core and EF Core */
+	public class GroupAccessesRepo : IGroupAccessesRepo
 	{
 		private readonly UlearnDb db;
-		private readonly GroupsRepo groupsRepo;
-		private readonly SystemAccessesRepo systemAccessesRepo;
-		private readonly CoursesRepo coursesRepo;
+		private readonly IGroupsRepo groupsRepo;
+		private readonly ISystemAccessesRepo systemAccessesRepo;
+		private readonly ICoursesRepo coursesRepo;
 		private readonly WebCourseManager courseManager;
 		private readonly ILogger logger;
 
 		public GroupAccessesRepo(
 			UlearnDb db,
-			GroupsRepo groupsRepo, SystemAccessesRepo systemAccessesRepo, CoursesRepo coursesRepo,
+			IGroupsRepo groupsRepo, ISystemAccessesRepo systemAccessesRepo, ICoursesRepo coursesRepo,
 			WebCourseManager courseManager,
 			ILogger logger
 		)

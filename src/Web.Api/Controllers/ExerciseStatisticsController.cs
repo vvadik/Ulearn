@@ -14,9 +14,9 @@ namespace Ulearn.Web.Api.Controllers
 	[Route("/exercise/statistics")]
 	public class ExerciseStatisticsController : BaseController
 	{
-		private readonly UserSolutionsRepo userSolutionsRepo;
+		private readonly IUserSolutionsRepo userSolutionsRepo;
 
-		public ExerciseStatisticsController(ILogger logger, WebCourseManager courseManager, UserSolutionsRepo userSolutionsRepo, UlearnDb db)
+		public ExerciseStatisticsController(ILogger logger, WebCourseManager courseManager, IUserSolutionsRepo userSolutionsRepo, UlearnDb db)
 			: base(logger, courseManager, db)
 		{
 			this.userSolutionsRepo = userSolutionsRepo;

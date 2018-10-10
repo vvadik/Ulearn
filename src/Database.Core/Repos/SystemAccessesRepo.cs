@@ -9,7 +9,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Database.Repos
 {
-	public class SystemAccessesRepo
+	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
+	public class SystemAccessesRepo : ISystemAccessesRepo
 	{
 		private readonly UlearnDb db;
 

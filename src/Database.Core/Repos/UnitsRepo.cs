@@ -8,7 +8,8 @@ using uLearn;
 
 namespace Database.Repos
 {
-	public class UnitsRepo
+	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
+	public class UnitsRepo : IUnitsRepo
 	{
 		private readonly UlearnDb db;
 

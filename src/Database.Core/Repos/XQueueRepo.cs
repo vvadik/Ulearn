@@ -10,13 +10,14 @@ using Ulearn.Common;
 
 namespace Database.Repos
 {
-	public class XQueueRepo
+	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
+	public class XQueueRepo : IXQueueRepo
 	{
 		private readonly UlearnDb db;
 		private readonly UlearnUserManager userManager;
-		private readonly UserSolutionsRepo userSolutionsRepo;
+		private readonly IUserSolutionsRepo userSolutionsRepo;
 
-		public XQueueRepo(UlearnDb db, UlearnUserManager userManager, UserSolutionsRepo userSolutionsRepo)
+		public XQueueRepo(UlearnDb db, UlearnUserManager userManager, IUserSolutionsRepo userSolutionsRepo)
 		{
 			this.db = db;
 			this.userManager = userManager;

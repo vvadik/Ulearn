@@ -6,7 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Database.Repos
 {
-	public class UserRolesRepo
+	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
+	
+	public class UserRolesRepo : IUserRolesRepo
 	{
 		private readonly UlearnDb db;
 
@@ -35,7 +37,7 @@ namespace Database.Repos
 				});
 			else
 				db.UserRoles.Remove(userRole);
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 
 			return userRole == null;
 		}

@@ -12,7 +12,8 @@ using Ulearn.Common.Extensions;
 
 namespace Database.Repos
 {
-	public class CoursesRepo
+	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
+	public class CoursesRepo : ICoursesRepo
 	{
 		private readonly UlearnDb db;
 

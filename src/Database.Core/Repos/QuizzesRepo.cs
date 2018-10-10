@@ -6,7 +6,8 @@ using uLearn.Quizes;
 
 namespace Database.Repos
 {
-	public class QuizzesRepo
+	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
+	public class QuizzesRepo : IQuizzesRepo
 	{
 		private readonly UlearnDb db;
 

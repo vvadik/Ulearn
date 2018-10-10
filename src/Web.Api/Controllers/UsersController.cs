@@ -14,10 +14,10 @@ namespace Ulearn.Web.Api.Controllers
 	[Route("/users")]
 	public class UsersController : BaseController
 	{
-		private readonly UsersRepo usersRepo;
-		private readonly UserRolesRepo userRolesRepo;
+		private readonly IUsersRepo usersRepo;
+		private readonly IUserRolesRepo userRolesRepo;
 
-		public UsersController(ILogger logger, WebCourseManager courseManager, UsersRepo usersRepo, UserRolesRepo userRolesRepo, UlearnDb db)
+		public UsersController(ILogger logger, WebCourseManager courseManager, IUsersRepo usersRepo, IUserRolesRepo userRolesRepo, UlearnDb db)
 			: base(logger, courseManager, db)
 		{
 			this.usersRepo = usersRepo ?? throw new ArgumentNullException(nameof(usersRepo));

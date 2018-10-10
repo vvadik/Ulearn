@@ -21,10 +21,10 @@ namespace Ulearn.Web.Api.Authorization
 	
 	public class CourseRoleAuthorizationHandler : AuthorizationHandler<CourseRoleRequirement>
 	{
-		private readonly UserRolesRepo userRolesRepo;
+		private readonly IUserRolesRepo userRolesRepo;
 		private readonly ILogger logger;
 
-		public CourseRoleAuthorizationHandler(UserRolesRepo userRolesRepo, ILogger logger)
+		public CourseRoleAuthorizationHandler(IUserRolesRepo userRolesRepo, ILogger logger)
 		{
 			this.userRolesRepo = userRolesRepo;
 			this.logger = logger;

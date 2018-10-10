@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
 using Database.Repos;
+using Microsoft.Extensions.DependencyInjection;
 using uLearn;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
@@ -312,20 +313,20 @@ namespace Database.Models
 		public abstract string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl);
 		public abstract NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl);
 
-		public abstract List<string> GetRecipientsIds(UlearnDb db);
+		public abstract List<string> GetRecipientsIds(IServiceProvider serviceProvider);
 		public virtual bool IsNotificationForEveryone => false;
 
 		public abstract bool IsActual();
 
 		/* Returns list of notifications, which blocks this notification from sending to specific user. I.e. NewComment is blocked by ReplyToYourComment */
 		/* Override this method together with IsBlockedByAnyNotificationFrom() */
-		public virtual List<Notification> GetBlockerNotifications(UlearnDb db)
+		public virtual List<Notification> GetBlockerNotifications(IServiceProvider serviceProvider)
 		{
 			return new List<Notification>();
 		}
 		
 		/* Override this method together with GetBlockerNotifications() */
-		public virtual bool IsBlockedByAnyNotificationFrom(UlearnDb db, List<Notification> notifications)
+		public virtual bool IsBlockedByAnyNotificationFrom(IServiceProvider serviceProvider, List<Notification> notifications)
 		{
 			return false;
 		}
@@ -400,7 +401,7 @@ namespace Database.Models
 			return null;
 		}
 
-		public override List<string> GetRecipientsIds(UlearnDb db)
+		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
 		{
 			/* If you want to send system message you should create NotificationDelivery yourself. By default nobody receives it */
 			return new List<string>();
@@ -433,7 +434,7 @@ namespace Database.Models
 			return null;
 		}
 
-		public override List<string> GetRecipientsIds(UlearnDb db)
+		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
 		{
 			/* If you want to send message you should create NotificationDelivery yourself. By default nobody receives it */
 			return new List<string>();
@@ -512,20 +513,21 @@ namespace Database.Models
 			return $"{Comment.Author.VisibleName} прокомментировал{Comment.Author.Gender.ChooseEnding()} «{GetSlideTitle(course, slide)}»\n\n{Comment.Text.Trim()}";
 		}
 
-		public override List<string> GetRecipientsIds(UlearnDb db)
+		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
 		{
-			return new VisitsRepo(db).GetCourseUsers(CourseId);
+			var visitsRepo = serviceProvider.GetService<IVisitsRepo>();
+			return visitsRepo.GetCourseUsers(CourseId);
 		}
 
 		public override bool IsNotificationForEveryone => true;
 
-		public override List<Notification> GetBlockerNotifications(UlearnDb db)
+		public override List<Notification> GetBlockerNotifications(IServiceProvider serviceProvider)
 		{
-			// TODO (andgein): Remove usage of globally-shared logger 
-			return new NotificationsRepo(db, Serilog.Log.Logger).FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId).Cast<Notification>().ToList();
+			var notificationsRepo = serviceProvider.GetService<INotificationsRepo>(); 
+			return notificationsRepo.FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId).Cast<Notification>().ToList();
 		}
 		
-		public override bool IsBlockedByAnyNotificationFrom(UlearnDb db, List<Notification> notifications)
+		public override bool IsBlockedByAnyNotificationFrom(IServiceProvider serviceProvider, List<Notification> notifications)
 		{
 			return notifications.OfType<RepliedToYourCommentNotification>().Any(n => n.CommentId == CommentId);
 		}
@@ -561,7 +563,7 @@ namespace Database.Models
 					$"{Comment.Text.Trim()}";
 		}
 
-		public override List<string> GetRecipientsIds(UlearnDb db)
+		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
 		{
 			return new List<string> { ParentComment.AuthorId };
 		}
@@ -596,7 +598,7 @@ namespace Database.Models
 					$"> {Comment.Text.Trim().Replace("\n", "\n >")}";
 		}
 
-		public override List<string> GetRecipientsIds(UlearnDb db)
+		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
 		{
 			return new List<string> { Comment.AuthorId };
 		}
@@ -734,7 +736,7 @@ namespace Database.Models
 			return new NotificationButton("Перейти к странице с заданием", GetSlideUrl(course, slide, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(UlearnDb db)
+		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
 		{
 			return new List<string> { Checking.UserId };
 		}
@@ -782,7 +784,7 @@ namespace Database.Models
 			return new NotificationButton("Перейти к странице с тестом", GetSlideUrl(course, slide, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(UlearnDb db)
+		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
 		{
 			return new List<string> { Checking.UserId };
 		}
@@ -825,7 +827,7 @@ namespace Database.Models
 			return new NotificationButton("Смотреть сертификат", GetCertificateUrl(Certificate, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(UlearnDb db)
+		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
 		{
 			return new List<string> { Certificate.UserId };
 		}
@@ -872,7 +874,7 @@ namespace Database.Models
 			return null;
 		}
 
-		public override List<string> GetRecipientsIds(UlearnDb db)
+		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
 		{
 			return new List<string> { Score.UserId };
 		}
@@ -960,7 +962,7 @@ namespace Database.Models
 		}
 
 
-		public override List<string> GetRecipientsIds(UlearnDb db)
+		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
 		{
 			var review = Comment.Review;
 			if (review == null)
@@ -978,17 +980,18 @@ namespace Database.Models
 			return CommentId != null && Comment != null;
 		}
 		
-		public override List<Notification> GetBlockerNotifications(UlearnDb db)
+		public override List<Notification> GetBlockerNotifications(IServiceProvider serviceProvider)
 		{
+			var notificationsRepo = serviceProvider.GetService<INotificationsRepo>();
 			var reviewId = Comment.ReviewId;
-			return new NotificationsRepo(db, Serilog.Log.Logger) // TODO (andgein): Remove usage of globally-shared logger 
+			return notificationsRepo 
 				.FindNotifications<ReceivedCommentToCodeReviewNotification>(n => n.Comment.ReviewId == reviewId, n => n.Comment)
 				.Cast<Notification>()
 				.Where(n => n.CreateTime < CreateTime && n.CreateTime >= CreateTime - NotificationsRepo.sendNotificationsDelayAfterCreating)
 				.ToList();
 		}
 		
-		public override bool IsBlockedByAnyNotificationFrom(UlearnDb db, List<Notification> notifications)
+		public override bool IsBlockedByAnyNotificationFrom(IServiceProvider serviceProvider, List<Notification> notifications)
 		{
 			var reviewId = Comment.ReviewId;
 			return notifications.OfType<ReceivedCommentToCodeReviewNotification>().Any(
@@ -1040,7 +1043,7 @@ namespace Database.Models
 			return new NotificationButton("Перейти к группам", GetGroupsUrl(course, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(UlearnDb db)
+		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
 		{
 			return new List<string> { Group.OwnerId };
 		}
@@ -1074,7 +1077,7 @@ namespace Database.Models
 			return new NotificationButton("Перейти к группам", GetGroupsUrl(course, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(UlearnDb db)
+		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
 		{
 			return new List<string> { Access.UserId };
 		}
@@ -1108,7 +1111,7 @@ namespace Database.Models
 			return new NotificationButton("Перейти к группам", GetGroupsUrl(course, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(UlearnDb db)
+		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
 		{
 			return new List<string> { Access.UserId };
 		}
@@ -1146,7 +1149,7 @@ namespace Database.Models
 			return new NotificationButton("Перейти к группам", GetGroupsUrl(course, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(UlearnDb db)
+		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
 		{
 			// var groupsRepo = new GroupsRepo(db, WebCourseManager.Instance);
 			// var accesses = groupsRepo.GetGroupAccesses(GroupId);
@@ -1204,7 +1207,7 @@ namespace Database.Models
 			return new NotificationButton("Перейти к группам", GetGroupsUrl(course, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(UlearnDb db)
+		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
 		{
 //			var groupsRepo = new GroupsRepo(db, WebCourseManager.Instance);
 //			var accesses = groupsRepo.GetGroupAccesses(GroupId);
@@ -1293,18 +1296,19 @@ namespace Database.Models
 			return $"{Comment.Author.VisibleName} оставил{Comment.Author.Gender.ChooseEnding()} комментарий для преподавателей в «{GetSlideTitle(course, slide)}»:\n\n{Comment.Text.Trim()}";
 		}
 
-		public override List<string> GetRecipientsIds(UlearnDb db)
+		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
 		{
-			return new UserRolesRepo(db).GetListOfUsersWithCourseRole(CourseRole.Instructor, CourseId);
+			var userRolesRepo = serviceProvider.GetService<IUserRolesRepo>();
+			return userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.Instructor, CourseId);
 		}
 
-		public override List<Notification> GetBlockerNotifications(UlearnDb db)
+		public override List<Notification> GetBlockerNotifications(IServiceProvider serviceProvider)
 		{
-			// TODO (andgein): Remove usage of globally-shared logger
-			return new NotificationsRepo(db, Serilog.Log.Logger).FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId).Cast<Notification>().ToList();
+			var notificationsRepo = serviceProvider.GetService<INotificationsRepo>();
+			return notificationsRepo.FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId).Cast<Notification>().ToList();
 		}
 
-		public override bool IsBlockedByAnyNotificationFrom(UlearnDb db, List<Notification> notifications)
+		public override bool IsBlockedByAnyNotificationFrom(IServiceProvider serviceProvider, List<Notification> notifications)
 		{
 			return notifications.OfType<RepliedToYourCommentNotification>().Any(n => n.CommentId == CommentId);
 		}
@@ -1329,9 +1333,10 @@ namespace Database.Models
 			return $"{AddedUser.VisibleName} стал{AddedUser.Gender.ChooseEnding()} преподавателем курса «{course.Title}».";
 		}
 
-		public override List<string> GetRecipientsIds(UlearnDb db)
+		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
 		{
-			return new UserRolesRepo(db).GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, CourseId);
+			var userRolesRepo = serviceProvider.GetService<IUserRolesRepo>();
+			return userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, CourseId);
 		}
 
 		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
@@ -1368,9 +1373,10 @@ namespace Database.Models
 			return new NotificationButton("Перейти к группам", GetGroupsUrl(course, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(UlearnDb db)
+		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
 		{
-			return new UserRolesRepo(db).GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, CourseId);
+			var userRolesRepo = serviceProvider.GetService<IUserRolesRepo>();
+			return userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, CourseId);
 		}
 
 		public override bool IsActual()
@@ -1410,9 +1416,10 @@ namespace Database.Models
 			return $"Загружена новая версия курса «{course.Title.EscapeHtml()}». Теперь её можно опубликовать.";
 		}
 
-		public override List<string> GetRecipientsIds(UlearnDb db)
+		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
 		{
-			return new UserRolesRepo(db).GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, CourseId);
+			var userRolesRepo = serviceProvider.GetService<IUserRolesRepo>();
+			return userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, CourseId);
 		}
 
 		public override bool IsActual()
@@ -1436,9 +1443,10 @@ namespace Database.Models
 					GetCourseUrl(course, baseUrl);
 		}
 
-		public override List<string> GetRecipientsIds(UlearnDb db)
+		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
 		{
-			return new UserRolesRepo(db).GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, CourseId);
+			var userRolesRepo = serviceProvider.GetService<IUserRolesRepo>();
+			return userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, CourseId);
 		}
 
 		public override bool IsActual()
@@ -1492,7 +1500,7 @@ namespace Database.Models
 			return new NotificationButton("Смотреть детали переноса курса", GetStepikExportProcessUrl(baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(UlearnDb db)
+		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
 		{
 			return new List<string> { Process.OwnerId };
 		}

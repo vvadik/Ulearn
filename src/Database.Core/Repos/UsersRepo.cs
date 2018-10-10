@@ -12,19 +12,16 @@ using Ulearn.Common;
 
 namespace Database.Repos
 {
-	public class UsersRepo
+	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
+	public class UsersRepo : IUsersRepo
 	{
 		private readonly UlearnDb db;
 		private readonly UlearnUserManager userManager;
-		private readonly UserRolesRepo userRolesRepo;
+		private readonly IUserRolesRepo userRolesRepo;
 
 		public const string UlearnBotUsername = "ulearn-bot";
 
-		public UsersRepo(
-			UlearnDb db,
-			UlearnUserManager userManager,
-			UserRolesRepo userRolesRepo
-		)
+		public UsersRepo(UlearnDb db, UlearnUserManager userManager, IUserRolesRepo userRolesRepo)
 		{
 			this.db = db;
 			this.userManager = userManager;

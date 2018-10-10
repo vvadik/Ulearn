@@ -8,13 +8,14 @@ using Ulearn.Common.Extensions;
 
 namespace Database.Repos.Groups
 {
-	public class GroupsCreatorAndCopier
+	/* This class is fully migrated to .NET Core and EF Core */
+	public class GroupsCreatorAndCopier : IGroupsCreatorAndCopier
 	{
 		private readonly UlearnDb db;
 		private readonly ILogger logger;
-		private readonly UserRolesRepo userRolesRepo;
+		private readonly IUserRolesRepo userRolesRepo;
 
-		public GroupsCreatorAndCopier(UlearnDb db, ILogger logger, UserRolesRepo userRolesRepo)
+		public GroupsCreatorAndCopier(UlearnDb db, ILogger logger, IUserRolesRepo userRolesRepo)
 		{
 			this.db = db;
 			this.logger = logger;

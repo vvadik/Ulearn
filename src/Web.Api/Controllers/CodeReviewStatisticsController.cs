@@ -18,16 +18,16 @@ namespace Ulearn.Web.Api.Controllers
 	[Route("/codereview/statistics")]
 	public class CodeReviewStatisticsController : BaseController
 	{
-		private readonly SlideCheckingsRepo slideCheckingsRepo;
-		private readonly UserRolesRepo userRolesRepo;
-		private readonly UsersRepo usersRepo;
-		private readonly GroupsRepo groupsRepo;
+		private readonly ISlideCheckingsRepo slideCheckingsRepo;
+		private readonly IUserRolesRepo userRolesRepo;
+		private readonly IUsersRepo usersRepo;
+		private readonly IGroupsRepo groupsRepo;
 
 		public CodeReviewStatisticsController(ILogger logger, WebCourseManager courseManager,
-			SlideCheckingsRepo slideCheckingsRepo,
-			UserRolesRepo userRolesRepo,
-			UsersRepo usersRepo,
-			GroupsRepo groupsRepo, UlearnDb db)
+			ISlideCheckingsRepo slideCheckingsRepo,
+			IUserRolesRepo userRolesRepo,
+			IUsersRepo usersRepo,
+			IGroupsRepo groupsRepo, UlearnDb db)
 			: base(logger, courseManager, db)
 		{
 			this.slideCheckingsRepo = slideCheckingsRepo;

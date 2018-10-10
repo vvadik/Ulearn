@@ -13,14 +13,15 @@ using Ulearn.Common.Extensions;
 
 namespace Database.Repos.Groups
 {
-	public class GroupsRepo
+	/* This repo is fully migrated to .NET Core and EF Core */
+	public class GroupsRepo : IGroupsRepo
 	{
 		private readonly UlearnDb db;
-		private readonly SlideCheckingsRepo slideCheckingsRepo;
-		private readonly UserSolutionsRepo userSolutionsRepo;
-		private readonly UserQuizzesRepo userQuizzesRepo;
-		private readonly VisitsRepo visitsRepo;
-		private readonly GroupsCreatorAndCopier groupsCreatorAndCopier;
+		private readonly ISlideCheckingsRepo slideCheckingsRepo;
+		private readonly IUserSolutionsRepo userSolutionsRepo;
+		private readonly IUserQuizzesRepo userQuizzesRepo;
+		private readonly IVisitsRepo visitsRepo;
+		private readonly IGroupsCreatorAndCopier groupsCreatorAndCopier;
 
 		private readonly WebCourseManager courseManager;
 		
@@ -28,8 +29,8 @@ namespace Database.Repos.Groups
 
 		public GroupsRepo(
 			UlearnDb db,
-			SlideCheckingsRepo slideCheckingsRepo, UserSolutionsRepo userSolutionsRepo, UserQuizzesRepo userQuizzesRepo, VisitsRepo visitsRepo,
-			GroupsCreatorAndCopier groupsCreatorAndCopier,
+			ISlideCheckingsRepo slideCheckingsRepo, IUserSolutionsRepo userSolutionsRepo, IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo,
+			IGroupsCreatorAndCopier groupsCreatorAndCopier,
 			WebCourseManager courseManager,
 			ILogger logger)
 		{
@@ -244,15 +245,21 @@ namespace Database.Repos.Groups
 		}
 
 		[ItemCanBeNull]
-		public Task<Group> FindGroupByIdAsync(int groupId)
+		public Task<Group> FindGroupByIdAsync(int groupId, bool noTracking=false)
 		{
-			return db.Groups.FirstOrDefaultAsync(g => g.Id == groupId && !g.IsDeleted);
+			var groups = db.Groups.AsQueryable();
+			if (noTracking)
+				groups = groups.AsNoTracking();
+			return groups.FirstOrDefaultAsync(g => g.Id == groupId && !g.IsDeleted);
 		}
 
 		[ItemCanBeNull]
-		public Task<Group> FindGroupByInviteHashAsync(Guid hash)
+		public Task<Group> FindGroupByInviteHashAsync(Guid hash, bool noTracking=false)
 		{
-			return db.Groups.FirstOrDefaultAsync(g => g.InviteHash == hash && !g.IsDeleted && g.IsInviteLinkEnabled);
+			var groups = db.Groups.AsQueryable();
+			if (noTracking)
+				groups = groups.AsNoTracking();
+			return groups.FirstOrDefaultAsync(g => g.InviteHash == hash && !g.IsDeleted && g.IsInviteLinkEnabled);
 		}
 
 		private IQueryable<Group> GetCourseGroupsQueryable(string courseId, bool includeArchived=false)
@@ -267,8 +274,6 @@ namespace Database.Repos.Groups
 		{
 			return GetCourseGroupsQueryable(courseId, includeArchived).ToListAsync();
 		}
-
-	
 
 		public Task<List<Group>> GetMyGroupsFilterAccessibleToUserAsync(string courseId, ClaimsPrincipal user, bool includeArchived = false)
 		{

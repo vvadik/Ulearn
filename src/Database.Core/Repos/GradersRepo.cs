@@ -13,7 +13,8 @@ using Ulearn.Common.Extensions;
 
 namespace Database.Repos
 {
-	public class GradersRepo
+	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
+	public class GradersRepo : IGradersRepo
 	{
 		private readonly UlearnDb db;
 		private readonly UlearnUserManager userManager;

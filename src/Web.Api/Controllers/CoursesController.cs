@@ -13,9 +13,9 @@ namespace Ulearn.Web.Api.Controllers
 	[Route("/courses")]
 	public class CoursesController : BaseController
 	{
-		private readonly CoursesRepo coursesRepo;
+		private readonly ICoursesRepo coursesRepo;
 
-		public CoursesController(ILogger logger, WebCourseManager courseManager, UlearnDb db, CoursesRepo coursesRepo)
+		public CoursesController(ILogger logger, WebCourseManager courseManager, UlearnDb db, ICoursesRepo coursesRepo)
 			: base(logger, courseManager, db)
 		{
 			this.coursesRepo = coursesRepo;

@@ -13,7 +13,8 @@ using Ulearn.Common.Extensions;
 
 namespace Database.Repos
 {
-	public class CommentsRepo
+	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
+	public class CommentsRepo : ICommentsRepo
 	{
 		private readonly UlearnDb db;
 

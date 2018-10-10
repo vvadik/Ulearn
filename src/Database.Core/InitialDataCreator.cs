@@ -12,13 +12,13 @@ namespace Database
 		private readonly UlearnDb db;
 		private readonly RoleManager<IdentityRole> roleManager;
 		private readonly UlearnUserManager userManager;
-		private readonly UsersRepo usersRepo;
+		private readonly IUsersRepo usersRepo;
 
 		public InitialDataCreator(
 			UlearnDb db,
 			RoleManager<IdentityRole> roleManager,
 			UlearnUserManager userManager,
-			UsersRepo usersRepo
+			IUsersRepo usersRepo
 		)
 		{
 			this.db = db;
@@ -30,26 +30,26 @@ namespace Database
 		public async Task CreateInitialDataAsync()
 		{
 			var sysAdminRole = LmsRoles.SysAdmin.ToString();
-			if (! await db.Roles.AnyAsync(r => r.Name == sysAdminRole))
+			if (! await db.Roles.AnyAsync(r => r.Name == sysAdminRole).ConfigureAwait(false))
 			{
-				await roleManager.CreateAsync(new IdentityRole(sysAdminRole));
+				await roleManager.CreateAsync(new IdentityRole(sysAdminRole)).ConfigureAwait(false);
 			}
 
-			if (! await db.Users.AnyAsync(u => u.UserName == "user"))
+			if (! await db.Users.AnyAsync(u => u.UserName == "user").ConfigureAwait(false))
 			{
 				var user = new ApplicationUser { UserName = "user", FirstName = "User", LastName = "" };
-				await userManager.CreateAsync(user, "asdasd");
+				await userManager.CreateAsync(user, "asdasd").ConfigureAwait(false);
 			}
-			if (! await db.Users.AnyAsync(u => u.UserName == "admin"))
+			if (! await db.Users.AnyAsync(u => u.UserName == "admin").ConfigureAwait(false))
 			{
 				var user = new ApplicationUser { UserName = "admin", FirstName = "System Administrator", LastName = "" };
-				await userManager.CreateAsync(user, "fullcontrol");
-				await userManager.AddToRoleAsync(user, sysAdminRole);
+				await userManager.CreateAsync(user, "fullcontrol").ConfigureAwait(false);
+				await userManager.AddToRoleAsync(user, sysAdminRole).ConfigureAwait(false);
 			}
 
-			await usersRepo.CreateUlearnBotUserIfNotExists();
+			await usersRepo.CreateUlearnBotUserIfNotExists().ConfigureAwait(false);
 
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 	}
 }

@@ -1,9 +1,12 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using Database.Models;
+using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace Database.Repos
 {
-	public class ConsumersRepo
+	public class ConsumersRepo : IConsumersRepo
 	{
 		private readonly UlearnDb db;
 
@@ -12,9 +15,10 @@ namespace Database.Repos
 			this.db = db;
 		}
 
-		public LtiConsumer Find(string consumerKey)
+		[CanBeNull]
+		public Task<LtiConsumer> FindAsync(string consumerKey)
 		{
-			return db.Consumers.SingleOrDefault(consumer => consumer.Key == consumerKey);
+			return db.Consumers.SingleOrDefaultAsync(consumer => consumer.Key == consumerKey);
 		}
 	}
 }
