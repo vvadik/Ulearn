@@ -16,6 +16,7 @@ namespace Ulearn.Web.Api.Controllers
 	/* See https://docs.microsoft.com/en-us/aspnet/core/web-api/index?view=aspnetcore-2.1#annotate-class-with-apicontrollerattribute
 	   for detailed description of ApiControllerAttribute */
 	[ApiController]
+	[Produces("application/json")]
 	public class BaseController : Controller
 	{
 		protected readonly ILogger logger;

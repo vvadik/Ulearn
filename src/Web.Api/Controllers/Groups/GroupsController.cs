@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Database;
 using Database.Repos.Groups;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using uLearn;
 using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Models.Parameters.Groups;
@@ -79,12 +81,13 @@ namespace Ulearn.Web.Api.Controllers.Groups
 
 		[HttpPost("in/{courseId}")]
 		[Authorize(Policy = "Instructors")]
-		public async Task<IActionResult> CreateGroup([FromRoute] Course course, CreateGroupParameters parameters)
+		[ProducesResponseType((int) HttpStatusCode.Created)]
+		public async Task<ActionResult> CreateGroup([FromRoute] Course course, CreateGroupParameters parameters)
 		{
 			var ownerId = User.GetUserId();
 			var group = await groupsRepo.CreateGroupAsync(course.Id, parameters.Name, ownerId).ConfigureAwait(false);
-			//return CreatedAtAction(nameof(GroupController.Group), nameof(GroupController), new { courseId = course.Id, groupId = group.Id });
-			return Ok();
+
+			return Created($"/groups/{group.Id}", null);
 		}
 	}
 }
