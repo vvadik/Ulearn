@@ -195,15 +195,20 @@ namespace Ulearn.Web.Api
 			services.AddScoped<INotificationDataPreloader, NotificationDataPreloader>();
 
 			/* DI for database repos */
+			
+			/* Groups */
+			services.AddScoped<IGroupsRepo, GroupsRepo>();
+			services.AddScoped<IGroupMembersRepo, GroupMembersRepo>();
+			services.AddScoped<IGroupAccessesRepo, GroupAccessesRepo>();
+			services.AddScoped<IManualCheckingsForOldSolutionsAdder, ManualCheckingsForOldSolutionsAdder>();
+			services.AddScoped<IGroupsCreatorAndCopier, GroupsCreatorAndCopier>();
+			services.AddScoped<IUsersGroupsGetter, UsersGroupsGetter>();
+			/* Others */
 			services.AddScoped<IUsersRepo, UsersRepo>();
 			services.AddScoped<ICommentsRepo, CommentsRepo>();
 			services.AddScoped<IUserRolesRepo, UserRolesRepo>();
 			services.AddScoped<ICoursesRepo, CoursesRepo>();
 			services.AddScoped<ISlideCheckingsRepo, SlideCheckingsRepo>();
-			services.AddScoped<IGroupsRepo, GroupsRepo>();
-			services.AddScoped<IGroupsCreatorAndCopier, GroupsCreatorAndCopier>();
-			services.AddScoped<IGroupAccessesRepo, GroupAccessesRepo>();
-			services.AddScoped<IUsersGroupsGetter, UsersGroupsGetter>();
 			services.AddScoped<IUserSolutionsRepo, UserSolutionsRepo>();
 			services.AddScoped<IUserQuizzesRepo, UserQuizzesRepo>();
 			services.AddScoped<IVisitsRepo, VisitsRepo>();

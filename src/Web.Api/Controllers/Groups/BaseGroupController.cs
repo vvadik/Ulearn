@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Database;
 using Database.Models;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Serilog;
 using Ulearn.Web.Api.Models.Responses.Groups;
 
@@ -15,7 +16,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		{
 		}
 		
-		protected GroupInfo BuildGroupInfo(Group group, int? membersCount=null, IEnumerable<GroupAccess> accesses=null)
+		protected GroupInfo BuildGroupInfo(Group group, int? membersCount=null, IEnumerable<GroupAccess> accesses=null, bool addGroupApiUrl=false)
 		{
 			if (group == null)
 				throw new ArgumentNullException(nameof(group));
@@ -37,6 +38,8 @@ namespace Ulearn.Web.Api.Controllers.Groups
 				
 				StudentsCount = membersCount,
 				Accesses = accesses?.Select(BuildGroupAccessesInfo).ToList(),
+				
+				ApiUrl = addGroupApiUrl ? Url.Action(new UrlActionContext { Action = nameof(GroupController.Group), Controller = "Group", Values = new { groupId = group.Id }}) : null, 
 			};
 		}
 		

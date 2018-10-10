@@ -48,5 +48,9 @@ namespace Ulearn.Web.Api.Models.Responses.Groups
 		
 		[DataMember(Name = "accesses", EmitDefaultValue = false)]
 		public List<GroupAccessesInfo> Accesses { get; set; }
+		
+		
+		[DataMember(Name = "api_url", EmitDefaultValue = false)]
+		public string ApiUrl { get; set; }
 	}
 }

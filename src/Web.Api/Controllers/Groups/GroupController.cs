@@ -18,12 +18,14 @@ namespace Ulearn.Web.Api.Controllers.Groups
 	{
 		private readonly IGroupsRepo groupsRepo;
 		private readonly IGroupAccessesRepo groupAccessesRepo;
+		private readonly IGroupMembersRepo groupMembersRepo;
 
-		public GroupController(ILogger logger, WebCourseManager courseManager, UlearnDb db, IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo)
+		public GroupController(ILogger logger, WebCourseManager courseManager, UlearnDb db, IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo)
 			: base(logger, courseManager, db)
 		{
 			this.groupsRepo = groupsRepo;
 			this.groupAccessesRepo = groupAccessesRepo;
+			this.groupMembersRepo = groupMembersRepo;
 		}
 
 		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -53,7 +55,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		public async Task<ActionResult<GroupInfo>> Group(int groupId)
 		{
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
-			var members = await groupsRepo.GetGroupMembersAsync(groupId).ConfigureAwait(false);
+			var members = await groupMembersRepo.GetGroupMembersAsync(groupId).ConfigureAwait(false);
 			var accesses = await groupAccessesRepo.GetGroupAccessesAsync(groupId).ConfigureAwait(false);
 			return BuildGroupInfo(group, members.Count, accesses);
 		}
@@ -80,6 +82,9 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			if (parameters.IsArchived.HasValue)
 				await groupsRepo.ArchiveGroupAsync(groupId, parameters.IsArchived.Value).ConfigureAwait(false);
 
+			if (parameters.IsInviteLinkEnabled.HasValue)
+				await groupsRepo.EnableInviteLinkAsync(groupId, parameters.IsInviteLinkEnabled.Value).ConfigureAwait(false);
+
 			return BuildGroupInfo(await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false));
 		}
 
@@ -93,7 +98,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		[HttpGet("students")]
 		public async Task<ActionResult<GroupStudentsResponse>> GroupStudents(int groupId)
 		{
-			var members = await groupsRepo.GetGroupMembersAsync(groupId).ConfigureAwait(false);
+			var members = await groupMembersRepo.GetGroupMembersAsync(groupId).ConfigureAwait(false);
 			return new GroupStudentsResponse
 			{
 				Students = members.Select(m => new GroupStudentInfo

@@ -19,12 +19,13 @@ namespace Database.Repos.Groups
 		private readonly IGroupsRepo groupsRepo;
 		private readonly ISystemAccessesRepo systemAccessesRepo;
 		private readonly ICoursesRepo coursesRepo;
+		private readonly IGroupMembersRepo groupMembersRepo;
 		private readonly WebCourseManager courseManager;
 		private readonly ILogger logger;
 
 		public GroupAccessesRepo(
 			UlearnDb db,
-			IGroupsRepo groupsRepo, ISystemAccessesRepo systemAccessesRepo, ICoursesRepo coursesRepo,
+			IGroupsRepo groupsRepo, ISystemAccessesRepo systemAccessesRepo, ICoursesRepo coursesRepo, IGroupMembersRepo groupMembersRepo,
 			WebCourseManager courseManager,
 			ILogger logger
 		)
@@ -33,6 +34,7 @@ namespace Database.Repos.Groups
 			this.groupsRepo = groupsRepo;
 			this.systemAccessesRepo = systemAccessesRepo;
 			this.coursesRepo = coursesRepo;
+			this.groupMembersRepo = groupMembersRepo;
 			this.courseManager = courseManager;
 			this.logger = logger;
 		}
@@ -163,7 +165,7 @@ namespace Database.Repos.Groups
 
 			var coursesIds = courseManager.GetCourses().Select(c => c.Id).ToList();
 			var groups = await GetAvailableForUserGroupsAsync(coursesIds, instructor).ConfigureAwait(false);
-			var members = await groupsRepo.GetGroupsMembersAsync(groups.Select(g => g.Id).ToList()).ConfigureAwait(false);
+			var members = await groupMembersRepo.GetGroupsMembersAsync(groups.Select(g => g.Id).ToList()).ConfigureAwait(false);
 			return members.Select(m => m.UserId).Contains(studentId);
 		}
 

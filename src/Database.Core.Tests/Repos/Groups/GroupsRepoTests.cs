@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using Database.Models;
 using Database.Repos;
 using Database.Repos.Groups;
@@ -22,15 +23,10 @@ namespace Database.Core.Tests.Repos.Groups
 
 			var userRolesRepo = new Mock<IUserRolesRepo>();
 			var groupsCreatorAndCopier = new GroupsCreatorAndCopier(db, logger, userRolesRepo.Object);
+			var manualCheckingsForOldSolutionsAdder = new Mock<IManualCheckingsForOldSolutionsAdder>();
 
 			groupsRepo = new GroupsRepo(
-				db,
-				new Mock<ISlideCheckingsRepo>().Object,
-				new Mock<IUserSolutionsRepo>().Object,
-				new Mock<IUserQuizzesRepo>().Object,
-				new Mock<IVisitsRepo>().Object,
-				groupsCreatorAndCopier,
-				new Mock<WebCourseManager>(logger).Object,
+				db, groupsCreatorAndCopier, manualCheckingsForOldSolutionsAdder.Object,
 				logger
 			);
 		}
@@ -89,6 +85,53 @@ namespace Database.Core.Tests.Repos.Groups
 			Assert.AreEqual(true, group.IsManualCheckingEnabledForOldSolutions);
 			Assert.AreEqual(false, group.DefaultProhibitFutherReview);
 			Assert.AreEqual(false, group.CanUsersSeeGroupProgress);
+		}
+
+		[Test]
+		public async Task DeleteGroup()
+		{
+			var group = await groupsRepo.CreateGroupAsync("CourseId", "GroupName", Guid.NewGuid().ToString()).ConfigureAwait(false);
+			Assert.IsNotNull(await groupsRepo.FindGroupByIdAsync(group.Id).ConfigureAwait(false));
+			
+			await groupsRepo.DeleteGroupAsync(group.Id).ConfigureAwait(false);
+			Assert.IsNull(await groupsRepo.FindGroupByIdAsync(group.Id).ConfigureAwait(false));
+		}
+
+		[Test]
+		public async Task ChangeGroupOwner()
+		{
+			var oldOwnerId = Guid.NewGuid().ToString();
+			var group = await groupsRepo.CreateGroupAsync("CourseId", "GroupName", oldOwnerId).ConfigureAwait(false);
+			Assert.AreEqual(oldOwnerId, group.OwnerId);
+
+			var newOwnerId = Guid.NewGuid().ToString();
+			await groupsRepo.ChangeGroupOwnerAsync(group.Id, newOwnerId).ConfigureAwait(false);
+			group = await groupsRepo.FindGroupByIdAsync(group.Id).ConfigureAwait(false);
+			Assert.IsNotNull(group);
+			Assert.AreEqual(newOwnerId, group.OwnerId);
+		}
+
+		[Test]
+		public async Task ArchiveGroup()
+		{
+			var group = await groupsRepo.CreateGroupAsync("CourseId", "GroupName", Guid.NewGuid().ToString()).ConfigureAwait(false);
+			Assert.IsFalse(group.IsArchived);
+
+			for (var i = 0; i < 3; i++)
+			{
+				await groupsRepo.ArchiveGroupAsync(group.Id, true).ConfigureAwait(false);
+				group = await groupsRepo.FindGroupByIdAsync(group.Id).ConfigureAwait(false);
+				Assert.IsNotNull(group);
+				Assert.IsTrue(group.IsArchived);
+			}
+			
+			for (var i = 0; i < 3; i++)
+			{
+				await groupsRepo.ArchiveGroupAsync(group.Id, false).ConfigureAwait(false);
+				group = await groupsRepo.FindGroupByIdAsync(group.Id).ConfigureAwait(false);
+				Assert.IsNotNull(group);
+				Assert.IsFalse(group.IsArchived);
+			}
 		}
 
 		[Test]

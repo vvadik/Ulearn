@@ -7,6 +7,7 @@ using Database;
 using Database.Repos.Groups;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using uLearn;
 using Ulearn.Common.Extensions;
@@ -22,13 +23,15 @@ namespace Ulearn.Web.Api.Controllers.Groups
 	{
 		private readonly IGroupsRepo groupsRepo;
 		private readonly IGroupAccessesRepo groupAccessesRepo;
+		private readonly IGroupMembersRepo groupMembersRepo;
 
 		public GroupsController(ILogger logger, WebCourseManager courseManager, UlearnDb db,
-			IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo)
+			IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo)
 			: base(logger, courseManager, db)
 		{
 			this.groupsRepo = groupsRepo;
 			this.groupAccessesRepo = groupAccessesRepo;
+			this.groupMembersRepo = groupMembersRepo;
 		}
 
 		[HttpGet("in/{courseId}")]
@@ -56,7 +59,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 				.ToImmutableHashSet();
 			var filteredGroups = groups.Where(g => groupIds.Contains(g.Id)).ToList();
 
-			var groupMembers = await groupsRepo.GetGroupsMembersAsync(groupIds).ConfigureAwait(false);
+			var groupMembers = await groupMembersRepo.GetGroupsMembersAsync(groupIds).ConfigureAwait(false);
 			var membersCountByGroup = groupMembers.GroupBy(m => m.GroupId).ToDictionary(g => g.Key, g => g.Count()).ToDefaultDictionary();
 
 			var groupAccessesByGroup = await groupAccessesRepo.GetGroupAccessesAsync(groupIds).ConfigureAwait(false);
@@ -64,7 +67,8 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			var groupInfos = filteredGroups.Select(g => BuildGroupInfo(
 				g,
 				membersCountByGroup[g.Id],
-				groupAccessesByGroup[g.Id]
+				groupAccessesByGroup[g.Id],
+				addGroupApiUrl: true
 			)).ToList();
 			
 			return new GroupsListResponse
@@ -87,7 +91,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			var ownerId = User.GetUserId();
 			var group = await groupsRepo.CreateGroupAsync(course.Id, parameters.Name, ownerId).ConfigureAwait(false);
 
-			return Created($"/groups/{group.Id}", null);
+			return Created(Url.Action(new UrlActionContext { Action = nameof(GroupController.Group), Controller = "Group", Values = new { groupId = group.Id }}), null);
 		}
 	}
 }

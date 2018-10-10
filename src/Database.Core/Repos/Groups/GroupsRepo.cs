@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Database.Models;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using uLearn;
-using uLearn.Quizes;
 using Ulearn.Common.Extensions;
 
 namespace Database.Repos.Groups
@@ -17,30 +15,19 @@ namespace Database.Repos.Groups
 	public class GroupsRepo : IGroupsRepo
 	{
 		private readonly UlearnDb db;
-		private readonly ISlideCheckingsRepo slideCheckingsRepo;
-		private readonly IUserSolutionsRepo userSolutionsRepo;
-		private readonly IUserQuizzesRepo userQuizzesRepo;
-		private readonly IVisitsRepo visitsRepo;
 		private readonly IGroupsCreatorAndCopier groupsCreatorAndCopier;
+		private readonly IManualCheckingsForOldSolutionsAdder manualCheckingsForOldSolutionsAdder;
 
-		private readonly WebCourseManager courseManager;
-		
 		private readonly ILogger logger;
 
 		public GroupsRepo(
 			UlearnDb db,
-			ISlideCheckingsRepo slideCheckingsRepo, IUserSolutionsRepo userSolutionsRepo, IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo,
-			IGroupsCreatorAndCopier groupsCreatorAndCopier,
-			WebCourseManager courseManager,
+			IGroupsCreatorAndCopier groupsCreatorAndCopier, IManualCheckingsForOldSolutionsAdder manualCheckingsForOldSolutionsAdder,
 			ILogger logger)
 		{
 			this.db = db;
-			this.slideCheckingsRepo = slideCheckingsRepo;
-			this.userSolutionsRepo = userSolutionsRepo;
-			this.userQuizzesRepo = userQuizzesRepo;
-			this.visitsRepo = visitsRepo;
 			this.groupsCreatorAndCopier = groupsCreatorAndCopier;
-			this.courseManager = courseManager;
+			this.manualCheckingsForOldSolutionsAdder = manualCheckingsForOldSolutionsAdder;
 			this.logger = logger;
 		}
 
@@ -88,7 +75,7 @@ namespace Database.Repos.Groups
 			if (!group.IsManualCheckingEnabledForOldSolutions && newIsManualCheckingEnabledForOldSolutions)
 			{
 				var groupMembers = group.NotDeletedMembers.Select(m => m.UserId).ToList();
-				await AddManualCheckingsForOldSolutionsAsync(group.CourseId, groupMembers).ConfigureAwait(false);
+				await manualCheckingsForOldSolutionsAdder.AddManualCheckingsForOldSolutionsAsync(group.CourseId, groupMembers).ConfigureAwait(false);
 			}
 
 			group.IsManualCheckingEnabledForOldSolutions = newIsManualCheckingEnabledForOldSolutions;
@@ -130,119 +117,7 @@ namespace Database.Repos.Groups
 			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
-		public async Task<GroupMember> AddUserToGroupAsync(int groupId, string userId)
-		{
-			var group = await FindGroupByIdAsync(groupId).ConfigureAwait(false) ?? throw new ArgumentNullException($"Can't find group with id={groupId}");
-			
-			var groupMember = new GroupMember
-			{
-				GroupId = groupId,
-				UserId = userId,
-				AddingTime = DateTime.Now,
-			};
-			using (var transaction = db.Database.BeginTransaction())
-			{
-				/* Don't add member if it's already exists */
-				var existsMember = db.GroupMembers.FirstOrDefault(m => m.GroupId == groupId && m.UserId == userId);
-				if (existsMember != null)
-					return null;
-
-				db.GroupMembers.Add(groupMember);
-				await db.SaveChangesAsync().ConfigureAwait(false);
-
-				transaction.Commit();
-			}
-			
-			if (group.IsManualCheckingEnabledForOldSolutions)
-				await AddManualCheckingsForOldSolutionsAsync(group.CourseId, userId).ConfigureAwait(false);
-
-			return groupMember;
-		}
-
-		public Task<GroupMember> AddUserToGroupAsync(int groupId, ApplicationUser user)
-		{
-			return AddUserToGroupAsync(groupId, user.Id);
-		}
-
-		private async Task AddManualCheckingsForOldSolutionsAsync(string courseId, IEnumerable<string> usersIds)
-		{
-			foreach (var userId in usersIds)
-				await AddManualCheckingsForOldSolutionsAsync(courseId, userId).ConfigureAwait(false);
-		}
-
-		private async Task AddManualCheckingsForOldSolutionsAsync(string courseId, string userId)
-		{
-			logger.Information($"Создаю ручные проверки для всех решения пользователя {userId} в курсе {courseId}");
-
-			var course = courseManager.GetCourse(courseId);
-
-			/* For exercises */
-			var acceptedSubmissionsBySlide = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, userId)
-				.GroupBy(s => s.SlideId)
-				.ToDictionary(g => g.Key, g => g.ToList());
-			foreach (var acceptedSubmissionsForSlide in acceptedSubmissionsBySlide.Values)
-				/* If exists at least one manual checking for at least one submissions on slide, then ignore this slide */
-				if (!acceptedSubmissionsForSlide.Any(s => s.ManualCheckings.Any()))
-				{
-					/* Otherwise found the latest accepted submission */
-					var lastSubmission = acceptedSubmissionsForSlide.OrderByDescending(s => s.Timestamp).First();
-
-					var slideId = lastSubmission.SlideId;
-					var slide = course.FindSlideById(slideId) as ExerciseSlide;
-					if (slide == null || !slide.Exercise.RequireReview)
-						continue;
-
-					logger.Information($"Создаю ручную проверку для решения {lastSubmission.Id}, слайд {slideId}");
-					await slideCheckingsRepo.AddManualExerciseChecking(courseId, slideId, userId, lastSubmission).ConfigureAwait(false);
-					await visitsRepo.MarkVisitsAsWithManualChecking(slideId, userId).ConfigureAwait(false);
-				}
-
-			/* For quizzes */
-			var passedQuizzesIds = userQuizzesRepo.GetIdOfQuizPassedSlides(courseId, userId);
-			foreach (var quizSlideId in passedQuizzesIds)
-			{
-				var slide = course.FindSlideById(quizSlideId) as QuizSlide;
-				if (slide == null || !slide.ManualChecking)
-					continue;
-				if (!userQuizzesRepo.IsWaitingForManualCheck(courseId, quizSlideId, userId))
-				{
-					logger.Information($"Создаю ручную проверку для теста {slide.Id}");
-					await slideCheckingsRepo.AddQuizAttemptForManualChecking(courseId, quizSlideId, userId).ConfigureAwait(false);
-					await visitsRepo.MarkVisitsAsWithManualChecking(quizSlideId, userId).ConfigureAwait(false);
-				}
-			}
-		}
-
-		public async Task<GroupMember> RemoveUserFromGroupAsync(int groupId, string userId)
-		{
-			var member = db.GroupMembers.FirstOrDefault(m => m.GroupId == groupId && m.UserId == userId);
-			if (member != null)
-				db.GroupMembers.Remove(member);
-
-			await db.SaveChangesAsync().ConfigureAwait(false);
-			
-			return member;
-		}
 		
-		public async Task<List<GroupMember>> RemoveUsersFromGroupAsync(int groupId, List<string> userIds)
-		{
-			var members = db.GroupMembers.Where(m => m.GroupId == groupId && userIds.Contains(m.UserId)).ToList();
-			db.GroupMembers.RemoveRange(members);
-
-			await db.SaveChangesAsync().ConfigureAwait(false);
-			
-			return members;
-		}
-		
-		public async Task<List<GroupMember>> CopyUsersFromOneGroupToAnotherAsync(int fromGroupId, int toGroupId, List<string> userIds)
-		{
-			var membersUserIds = db.GroupMembers.Where(m => m.GroupId == fromGroupId && userIds.Contains(m.UserId)).Select(m => m.UserId).ToList();
-			var newMembers = new List<GroupMember>();
-			foreach (var memberUserId in membersUserIds)
-				newMembers.Add(await AddUserToGroupAsync(toGroupId, memberUserId).ConfigureAwait(false));
-			
-			return newMembers;
-		}
 
 		[ItemCanBeNull]
 		public Task<Group> FindGroupByIdAsync(int groupId, bool noTracking=false)
@@ -275,11 +150,6 @@ namespace Database.Repos.Groups
 			return GetCourseGroupsQueryable(courseId, includeArchived).ToListAsync();
 		}
 
-		public Task<List<Group>> GetMyGroupsFilterAccessibleToUserAsync(string courseId, ClaimsPrincipal user, bool includeArchived = false)
-		{
-			return GetMyGroupsFilterAccessibleToUserAsync(courseId, user.GetUserId(), includeArchived);
-		}
-
 		public Task<List<Group>> GetMyGroupsFilterAccessibleToUserAsync(string courseId, string userId, bool includeArchived = false)
 		{
 			var accessibleGroupsIds = db.GroupAccesses.Where(a => a.Group.CourseId == courseId && a.UserId == userId && a.IsEnabled).Select(a => a.GroupId);
@@ -290,24 +160,9 @@ namespace Database.Repos.Groups
 			return groups.ToListAsync();
 		}
 
-		public Task<List<ApplicationUser>> GetGroupMembersAsUsersAsync(int groupId)
-		{
-			return db.GroupMembers.Include(m => m.User).Where(m => m.GroupId == groupId && !m.User.IsDeleted).Select(m => m.User).ToListAsync();
-		}
-
-		public Task<List<GroupMember>> GetGroupMembersAsync(int groupId)
-		{
-			return db.GroupMembers.Include(m => m.User).Where(m => m.GroupId == groupId && !m.User.IsDeleted).ToListAsync();
-		}
-		
-		public Task<List<GroupMember>> GetGroupsMembersAsync(IEnumerable<int> groupsIds)
-		{
-			return db.GroupMembers.Include(m => m.User).Where(m => groupsIds.Contains(m.GroupId) && !m.User.IsDeleted).ToListAsync();
-		}
-
 		public async Task EnableInviteLinkAsync(int groupId, bool isEnabled)
 		{
-			var group = db.Groups.Find(groupId) ?? throw new ArgumentNullException($"Can't find group with id={groupId}");
+			var group = await FindGroupByIdAsync(groupId).ConfigureAwait(false) ?? throw new ArgumentNullException($"Can't find group with id={groupId}");
 			group.IsInviteLinkEnabled = isEnabled;
 			
 			await db.SaveChangesAsync().ConfigureAwait(false);
@@ -356,9 +211,9 @@ namespace Database.Repos.Groups
 			return await db.Groups.AnyAsync(g => userGroupsIds.Contains(g.Id) && g.IsManualCheckingEnabled).ConfigureAwait(false);
 		}
 
-		public async Task<bool> GetDefaultProhibitFurtherReviewForUserAsync(string courseId, string userId, ClaimsPrincipal instructor)
+		public async Task<bool> GetDefaultProhibitFurtherReviewForUserAsync(string courseId, string userId, string instructorId)
 		{
-			var accessibleGroups = await GetMyGroupsFilterAccessibleToUserAsync(courseId, instructor).ConfigureAwait(false);
+			var accessibleGroups = await GetMyGroupsFilterAccessibleToUserAsync(courseId, instructorId).ConfigureAwait(false);
 			var userGroupsIds = await db.GroupMembers
 				.Where(m => m.Group.CourseId == courseId && m.UserId == userId && !m.Group.IsDeleted)
 				.Select(m => m.GroupId)
