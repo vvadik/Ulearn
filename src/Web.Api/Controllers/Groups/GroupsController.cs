@@ -31,16 +31,16 @@ namespace Ulearn.Web.Api.Controllers.Groups
 
 		[HttpGet("in/{courseId}")]
 		[Authorize(Policy = "Instructors")]
-		public async Task<IActionResult> GroupsList(Course course, [FromQuery] GroupsListParameters parameters)
+		public async Task<ActionResult<GroupsListResponse>> GroupsList(Course course, [FromQuery] GroupsListParameters parameters)
 		{
-			return Json(await GetGroupsListResponseAsync(course, parameters).ConfigureAwait(false));
+			return await GetGroupsListResponseAsync(course, parameters).ConfigureAwait(false);
 		}
 
 		[HttpGet("in/{courseId}/archived")]
 		[Authorize(Policy = "Instructors")]
-		public async Task<IActionResult> ArchivedGroupsList(Course course, [FromQuery] GroupsListParameters parameters)
+		public async Task<ActionResult<GroupsListResponse>> ArchivedGroupsList(Course course, [FromQuery] GroupsListParameters parameters)
 		{
-			return Json(await GetGroupsListResponseAsync(course, parameters, onlyArchived: true).ConfigureAwait(false));
+			return await GetGroupsListResponseAsync(course, parameters, onlyArchived: true).ConfigureAwait(false);
 		}
 		
 		private async Task<GroupsListResponse> GetGroupsListResponseAsync(Course course, GroupsListParameters parameters, bool onlyArchived=false)
@@ -65,7 +65,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 				groupAccessesByGroup[g.Id]
 			)).ToList();
 			
-			var response = new GroupsListResponse
+			return new GroupsListResponse
 			{
 				Groups = groupInfos,
 				PaginationResponse = new PaginationResponse
@@ -75,8 +75,16 @@ namespace Ulearn.Web.Api.Controllers.Groups
 					TotalCount = groups.Count,
 				}
 			};
-			
-			return response;
+		}
+
+		[HttpPost("in/{courseId}")]
+		[Authorize(Policy = "Instructors")]
+		public async Task<IActionResult> CreateGroup([FromRoute] Course course, CreateGroupParameters parameters)
+		{
+			var ownerId = User.GetUserId();
+			var group = await groupsRepo.CreateGroupAsync(course.Id, parameters.Name, ownerId).ConfigureAwait(false);
+			//return CreatedAtAction(nameof(GroupController.Group), nameof(GroupController), new { courseId = course.Id, groupId = group.Id });
+			return Ok();
 		}
 	}
 }

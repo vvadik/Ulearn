@@ -50,31 +50,31 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 
 		[HttpGet]
 		[Authorize]
-		public async Task<IActionResult> NotificationList()
+		public async Task<ActionResult<NotificationListResponse>> NotificationList()
 		{
 			var userId = User.GetUserId();
 			var (importantNotificationList, commentsNotificationList) = await GetNotificationListsAsync(userId).ConfigureAwait(false);
 
-			return Json(new NotificationListResponse
+			return new NotificationListResponse
 			{
 				Important = importantNotificationList,
 				Comments = commentsNotificationList,
-			});
+			};
 		}
 
 		[HttpGet("count")]
 		[Authorize]
-		public async Task<IActionResult> NotificationsCount([FromQuery] NotificationsCountParameters parameters)
+		public async Task<ActionResult<NotificationsCountResponse>> NotificationsCount([FromQuery] NotificationsCountParameters parameters)
 		{
 			var userId = User.GetUserId();
 			var userNotificationTransport = await feedRepo.GetUsersFeedNotificationTransportAsync(userId).ConfigureAwait(false);
 			var unreadCountAndLastTimestamp = await GetUnreadNotificationsCountAndLastTimestampAsync(userId, userNotificationTransport, parameters.LastTimestamp).ConfigureAwait(false);
 
-			return Json(new NotificationsCountResponse
+			return new NotificationsCountResponse
 			{
 				Count = unreadCountAndLastTimestamp.Item1,
 				LastTimestamp = unreadCountAndLastTimestamp.Item2,
-			});
+			};
 		}
 		
 		private async Task<Tuple<int, DateTime?>> GetUnreadNotificationsCountAndLastTimestampAsync(string userId, FeedNotificationTransport transport, DateTime? from = null)

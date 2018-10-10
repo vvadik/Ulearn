@@ -38,7 +38,7 @@ namespace Ulearn.Web.Api.Controllers
 		
 		[HttpGet("{courseId}/instructors")]
 		[CourseAccessAuthorize(CourseAccessType.ApiViewCodeReviewStatistics)]
-		public async Task<IActionResult> InstructorsStatistics(Course course, int count=10000, DateTime? from=null, DateTime? to=null)
+		public async Task<ActionResult<CodeReviewInstructorsStatisticsResponse>> InstructorsStatistics(Course course, int count=10000, DateTime? from=null, DateTime? to=null)
 		{
 			if (course == null)
 				return NotFound();
@@ -94,7 +94,7 @@ namespace Ulearn.Web.Api.Controllers
 				result.Instructors.Add(instructorStatistics);
 			}
 
-			return Json(result);
+			return result;
 		}
 	}
 }

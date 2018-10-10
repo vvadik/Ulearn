@@ -44,16 +44,16 @@ namespace Ulearn.Web.Api.Controllers
 
 		[HttpGet]
 		[Authorize]
-		public async Task<IActionResult> Me()
+		public async Task<ActionResult<GetMeResponse>> Me()
 		{
 			var userId = User.GetUserId();
 			var user = await userManager.FindByIdAsync(userId).ConfigureAwait(false);
-			return Json(new GetMeResponse
+			return new GetMeResponse
 			{
 				IsAuthenticated = true,
 				User = BuildShortUserInfo(user, discloseLogin: true),
 				AccountProblems = await GetAccountProblems(user).ConfigureAwait(false),
-			});
+			};
 		}
 
 		private async Task<List<AccountProblem>> GetAccountProblems(ApplicationUser user)
@@ -82,7 +82,7 @@ namespace Ulearn.Web.Api.Controllers
 
 		[HttpPost("token")]
 		[Authorize(AuthenticationSchemes = "Identity.Application" /* = IdentityConstants.ApplicationScheme */)]
-		public IActionResult Token()
+		public ActionResult<TokenResponse> Token()
 		{
 			var claims = User.Claims;
 			
@@ -98,15 +98,15 @@ namespace Ulearn.Web.Api.Controllers
 				signingCredentials: signingCredentials
 			);
 			var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-			return Json(new TokenResponse
+			return new TokenResponse
 			{
 				Token = tokenString,
-			});
+			};
 		}
 
 		[HttpGet("roles")]
 		[Authorize]
-		public async Task<IActionResult> CourseRoles()
+		public async Task<ActionResult<CourseRolesResponse>> CourseRoles()
 		{
 			var userId = User.GetUserId();	
 			var isSystemAdministrator = User.IsSystemAdministrator();
@@ -121,7 +121,7 @@ namespace Ulearn.Web.Api.Controllers
 				}
 			).ToList();
 			
-			return Json(new CourseRolesResponse
+			return new CourseRolesResponse
 			{
 				IsSystemAdministrator = isSystemAdministrator,
 				Roles = rolesByCourse.Where(kvp => kvp.Value != CourseRole.Student).Select(kvp => new CourseRoleResponse
@@ -130,19 +130,19 @@ namespace Ulearn.Web.Api.Controllers
 					Role = kvp.Value,
 				}).ToList(),
 				Accesses = courseAccessesByCourseId,
-			});
+			};
 		}
 
 		[HttpPost("logout")]
 		[Authorize]
-		public async Task<IActionResult> Logout()
+		public async Task<ActionResult<LogoutResponse>> Logout()
 		{
 			await signInManager.SignOutAsync().ConfigureAwait(false);
 			
-			return Json(new LogoutResponse
+			return new LogoutResponse
 			{
 				Logout = true
-			});
+			};
 		}
 	}
 }

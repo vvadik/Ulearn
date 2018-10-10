@@ -86,7 +86,7 @@ namespace Ulearn.Web.Api
 						builder
 							.WithOrigins(configuration.Web.Cors.AllowOrigins)
 							.AllowAnyMethod()
-							.WithHeaders(new string[] { "Authorization" })
+							.WithHeaders("Authorization")
 							.AllowCredentials();
 					});
 					

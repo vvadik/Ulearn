@@ -23,7 +23,7 @@ namespace Ulearn.Web.Api.Controllers
 		}
 
 		[HttpGet("{courseId}")]
-		public async Task<IActionResult> CourseStatistics(Course course, int count=10000, DateTime? from=null, DateTime? to=null)
+		public async Task<ActionResult<CourseExercisesStatisticsResponse>> CourseStatistics(Course course, int count=10000, DateTime? from=null, DateTime? to=null)
 		{
 			if (course == null)
 				return NotFound();
@@ -75,7 +75,7 @@ namespace Ulearn.Web.Api.Controllers
 					}).ToList()
 			};
 
-			return Json(result);
+			return result;
 		}
 	}
 }

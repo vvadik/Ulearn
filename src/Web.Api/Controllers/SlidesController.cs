@@ -3,6 +3,7 @@ using Database;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using uLearn;
+using SlideInfo = Ulearn.Web.Api.Models.Common.SlideInfo;
 
 namespace Ulearn.Web.Api.Controllers
 {
@@ -15,13 +16,13 @@ namespace Ulearn.Web.Api.Controllers
 		}
 
 		[HttpGet("{courseId}/{slideId}")]
-		public IActionResult SlideInfo(Course course, Guid slideId)
+		public ActionResult<SlideInfo> SlideInfo(Course course, Guid slideId)
 		{
 			var slide = course?.FindSlideById(slideId);
 			if (slide == null)
-				return Json(new { status = "error", message = "Course or slide not found" });
+				return NotFound(new { status = "error", message = "Course or slide not found" });
 
-			return Json(BuildSlideInfo(course.Id, slide));
+			return BuildSlideInfo(course.Id, slide);
 		}
 	}
 }

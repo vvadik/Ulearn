@@ -22,10 +22,10 @@ namespace Ulearn.Web.Api.Controllers
 		}
 
 		[HttpGet("")]
-		public async Task<IActionResult> CoursesList()
+		public async Task<ActionResult<CoursesListResponse>> CoursesList()
 		{
 			var courses = await courseManager.GetCoursesAsync(coursesRepo).ConfigureAwait(false);
-			return Json(new CoursesListResponse
+			return new CoursesListResponse
 			{
 				Courses = courses.Select(
 					c => new ShortCourseInfo
@@ -35,21 +35,21 @@ namespace Ulearn.Web.Api.Controllers
 						ApiUrl = Url.Action(nameof(CourseInfo), "Courses", new { courseId = c.Id })
 					}
 				).ToList()
-			});
+			};
 		}
 		
 		[HttpGet("{courseId}")]
-		public IActionResult CourseInfo(Course course)
+		public ActionResult<CourseInfo> CourseInfo(Course course)
 		{
 			if (course == null)
 				return Json(new { status = "error", message = "Course not found" });
 			
-			return Json(new CourseInfo
+			return new CourseInfo
 			{
 				Id = course.Id,
 				Title = course.Title,
 				Units = course.Units.Select(unit => BuildUnitInfo(course.Id, unit)).ToList()
-			});
+			};
 		}
 	}
 }

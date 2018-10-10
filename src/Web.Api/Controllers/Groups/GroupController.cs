@@ -46,36 +46,36 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> Group(int groupId)
+		public async Task<ActionResult<GroupInfo>> Group(int groupId)
 		{
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
 			var members = await groupsRepo.GetGroupMembersAsync(groupId).ConfigureAwait(false);
 			var accesses = await groupAccessesRepo.GetGroupAccessesAsync(groupId).ConfigureAwait(false);
-			return Json(BuildGroupInfo(group, members.Count, accesses));
+			return BuildGroupInfo(group, members.Count, accesses);
 		}
 
 		[HttpGet("students")]
-		public async Task<IActionResult> GroupStudents(int groupId)
+		public async Task<ActionResult<GroupStudentsResponse>> GroupStudents(int groupId)
 		{
 			var members = await groupsRepo.GetGroupMembersAsync(groupId).ConfigureAwait(false);
-			return Json(new GroupStudentsResponse
+			return new GroupStudentsResponse
 			{
 				Students = members.Select(m => new GroupStudentInfo
 				{
 					User = BuildShortUserInfo(m.User, discloseLogin: true),
 					AddingTime = m.AddingTime
 				}).ToList()
-			});
+			};
 		}
 
 		[HttpGet("accesses")]
-		public async Task<IActionResult> GroupAccesses(int groupId)
+		public async Task<ActionResult<GroupAccessesResponse>> GroupAccesses(int groupId)
 		{
 			var accesses = await groupAccessesRepo.GetGroupAccessesAsync(groupId).ConfigureAwait(false);
-			return Json(new GroupAccessesResponse
+			return new GroupAccessesResponse
 			{
 				Accesses = accesses.Select(BuildGroupAccessesInfo).ToList()
-			});
+			};
 		}
 	}
 }

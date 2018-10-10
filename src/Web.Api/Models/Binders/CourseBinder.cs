@@ -47,9 +47,8 @@ namespace Ulearn.Web.Api.Models.Binders
 			if (string.IsNullOrEmpty(value))
 				return Task.CompletedTask;
 			
-			// Model will be null if not found
 			var model = courseManager.FindCourse(value);
-			bindingContext.Result = ModelBindingResult.Success(model);
+			bindingContext.Result = model == null ? ModelBindingResult.Failed() : ModelBindingResult.Success(model);
 			return Task.CompletedTask;
 		}
 	}

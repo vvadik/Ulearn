@@ -5,7 +5,7 @@ namespace Ulearn.Web.Api.Models.Responses
 	[DataContract]
 	public class PaginatedResponse : ApiResponse
 	{
-		[DataMember(Name = "$pagination")]
+		[DataMember(Name = "pagination", Order=100)]
 		public PaginationResponse PaginationResponse { get; set; }
 	}
 

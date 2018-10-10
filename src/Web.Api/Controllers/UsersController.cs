@@ -26,17 +26,17 @@ namespace Ulearn.Web.Api.Controllers
 
 		[HttpGet("{courseId}/instructors")]
 		[Authorize(Policy = "Instructors")]
-		public IActionResult InstructorsList(Course course)
+		public ActionResult<InstructorsListResponse> InstructorsList(Course course)
 		{
 			if (course == null)
 				return NotFound();
 					
 			var instructorIds = userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.Instructor, course.Id);
 			var instructors = usersRepo.GetUsersByIds(instructorIds);
-			return Json(new InstructorsListResponse
+			return new InstructorsListResponse
 			{
 				Instructors = instructors.Select(i => BuildShortUserInfo(i, discloseLogin: true)).ToList()
-			});
+			};
 		}
 	}
 }
