@@ -711,6 +711,10 @@
     <Compile Include="Migrations\201809211948326_IncreaseQuizAnswerSize.Designer.cs">
       <DependentUpon>201809211948326_IncreaseQuizAnswerSize.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201810111816271_RemoveUserExerciseSubmissionsApplicationUserField.cs" />
+    <Compile Include="Migrations\201810111816271_RemoveUserExerciseSubmissionsApplicationUserField.Designer.cs">
+      <DependentUpon>201810111816271_RemoveUserExerciseSubmissionsApplicationUserField.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -1103,6 +1107,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201809211948326_IncreaseQuizAnswerSize.resx">
       <DependentUpon>201809211948326_IncreaseQuizAnswerSize.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201810111816271_RemoveUserExerciseSubmissionsApplicationUserField.resx">
+      <DependentUpon>201810111816271_RemoveUserExerciseSubmissionsApplicationUserField.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

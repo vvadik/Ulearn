@@ -28,14 +28,14 @@ namespace Database.Repos
 			this.userRolesRepo = userRolesRepo;
 		}
 
-		public ApplicationUser FindUserById(string id)
+		public async Task<ApplicationUser> FindUserByIdAsync(string userId)
 		{
-			var user = db.Users.Find(id);
+			var user = await db.Users.FindAsync(userId).ConfigureAwait(false);
 			return user == null || user.IsDeleted ? null : user;
 		}
 
 		/* Pass limit=0 to disable limiting */
-		public Task<List<UserRolesInfo>> FilterUsers(UserSearchQueryModel query, UserManager<ApplicationUser> userManager, int limit=100)
+		public Task<List<UserRolesInfo>> FindUsers(UserSearchQuery query, int limit=100)
 		{
 			var role = db.Roles.FirstOrDefault(r => r.Name == query.Role);
 			var users = db.Users.Where(u => !u.IsDeleted);
@@ -60,7 +60,7 @@ namespace Database.Repos
 		}
 
 		/* Pass limit=0 to disable limiting */
-		public Task<List<UserRolesInfo>> GetCourseInstructors(string courseId, UserManager<ApplicationUser> userManager, int limit = 50)
+		public Task<List<UserRolesInfo>> GetCourseInstructors(string courseId, int limit = 50)
 		{
 			return db.Users
 				.Where(u => !u.IsDeleted)
@@ -69,7 +69,7 @@ namespace Database.Repos
 		}
 
 		/* Pass limit=0 to disable limiting */
-		public Task<List<UserRolesInfo>> GetCourseAdmins(string courseId, UserManager<ApplicationUser> userManager, int limit = 50)
+		public Task<List<UserRolesInfo>> GetCourseAdmins(string courseId, int limit = 50)
 		{
 			return db.Users
 				.Where(u => !u.IsDeleted)	
@@ -77,9 +77,9 @@ namespace Database.Repos
 				.GetUserRolesInfo(limit, userManager);
 		}
 
-		public List<string> GetSysAdminsIds(UserManager<ApplicationUser> userManager)
+		public async Task<List<string>> GetSysAdminsIdsAsync()
 		{
-			var role = db.Roles.FirstOrDefault(r => r.Name == LmsRoles.SysAdmin.ToString());
+			var role = await db.Roles.FirstOrDefaultAsync(r => r.Name == LmsRoles.SysAdmin.ToString()).ConfigureAwait(false);
 			if (role == null)
 				return new List<string>();
 			return db.Users.Where(u => ! u.IsDeleted).FilterByRole(role, userManager).Select(u => u.Id).ToList();
@@ -87,23 +87,23 @@ namespace Database.Repos
 
 		public async Task ChangeTelegram(string userId, long chatId, string chatTitle)
 		{
-			var user = FindUserById(userId);
+			var user = await FindUserByIdAsync(userId).ConfigureAwait(false);
 			if (user == null)
 				return;
 
 			user.TelegramChatId = chatId;
 			user.TelegramChatTitle = chatTitle;
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
 		public async Task ConfirmEmail(string userId, bool isConfirmed = true)
 		{
-			var user = FindUserById(userId);
+			var user = await FindUserByIdAsync(userId).ConfigureAwait(false);
 			if (user == null)
 				return;
 
 			user.EmailConfirmed = isConfirmed;
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
 		private IQueryable<UserIdWrapper> GetUsersByNamePrefix(string name)
@@ -118,17 +118,17 @@ namespace Database.Repos
 				.Select(u => new UserIdWrapper(u.Id));
 		}
 
-		public async Task UpdateLastConfirmationEmailTime(ApplicationUser user)
+		public Task UpdateLastConfirmationEmailTime(ApplicationUser user)
 		{
 			user.LastConfirmationEmailTime = DateTime.Now;
-			await db.SaveChangesAsync();
+			return db.SaveChangesAsync();
 		}
 
-		public async Task ChangeEmail(ApplicationUser user, string email)
+		public Task ChangeEmail(ApplicationUser user, string email)
 		{
 			user.Email = email;
 			user.EmailConfirmed = false;
-			await db.SaveChangesAsync();
+			return db.SaveChangesAsync();
 		}
 
 		[NotNull]
@@ -146,7 +146,7 @@ namespace Database.Repos
 			return user.Id;
 		}
 
-		public async Task CreateUlearnBotUserIfNotExists()
+		public async Task CreateUlearnBotUserIfNotExistsAsync()
 		{
 			var ulearnBotFound = await db.Users.AnyAsync(u => u.UserName == UlearnBotUsername).ConfigureAwait(false);
 			if (! ulearnBotFound)
@@ -174,12 +174,12 @@ namespace Database.Repos
 			return db.Users.Where(u => usersIds.Contains(u.Id) && ! u.IsDeleted);
 		}
 		
-		public async Task DeleteUserAsync(ApplicationUser user)
+		public Task DeleteUserAsync(ApplicationUser user)
 		{
 			user.IsDeleted = true;
 			/* Change name to make creating new user with same name possible */
 			user.UserName = user.UserName + "__deleted__" + (new Random().Next(100000));
-			await db.SaveChangesAsync();
+			return db.SaveChangesAsync();
 		}
 	}
 

@@ -2,7 +2,7 @@ using Database.Models;
 
 namespace Database
 {
-	public class UserSearchQueryModel
+	public class UserSearchQuery
 	{
 		public string NamePrefix { get; set; }
 		public string Role { get; set; }

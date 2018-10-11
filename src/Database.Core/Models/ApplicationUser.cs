@@ -35,9 +35,6 @@ namespace Database.Models
 		/// </summary>
 		public virtual ICollection<IdentityUserLogin<string>> Logins { get; } = new List<IdentityUserLogin<string>>();
 
-		public virtual ICollection<UserExerciseSubmission> Solutions { get; set; }
-		public virtual ICollection<UserQuestion> Questions { get; set; }
-
 		public string FirstName { get; set; }
 		public string LastName { get; set; }
 		public DateTime Registered { get; set; }

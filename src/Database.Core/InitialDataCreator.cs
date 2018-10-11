@@ -47,7 +47,7 @@ namespace Database
 				await userManager.AddToRoleAsync(user, sysAdminRole).ConfigureAwait(false);
 			}
 
-			await usersRepo.CreateUlearnBotUserIfNotExists().ConfigureAwait(false);
+			await usersRepo.CreateUlearnBotUserIfNotExistsAsync().ConfigureAwait(false);
 
 			await db.SaveChangesAsync().ConfigureAwait(false);
 		}

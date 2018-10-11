@@ -6,9 +6,11 @@ using Database.Extensions;
 using Database.Models;
 using Database.Repos;
 using Database.Repos.Groups;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Serilog;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Models.Parameters.Groups;
 using Ulearn.Web.Api.Models.Responses;
@@ -19,6 +21,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 	[Route("/groups/{groupId:int:min(0)}")]
 	[ProducesResponseType((int) HttpStatusCode.NotFound)]
 	[ProducesResponseType((int) HttpStatusCode.Forbidden)]
+	[Authorize]
 	public class GroupController : BaseGroupController
 	{
 		private readonly IGroupsRepo groupsRepo;
@@ -26,7 +29,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		private readonly IGroupMembersRepo groupMembersRepo;
 		private readonly IUsersRepo usersRepo;
 		private readonly IUserRolesRepo userRolesRepo;
-
+		
 		public GroupController(ILogger logger, WebCourseManager courseManager, UlearnDb db,
 			IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo, IUsersRepo usersRepo, IUserRolesRepo userRolesRepo)
 			: base(logger, courseManager, db)
@@ -106,6 +109,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		}
 
 		[HttpPut("owner")]
+		[SwaggerResponse((int) HttpStatusCode.NotFound, Description = "Can't find user or user is not an instructor")]
 		public async Task<IActionResult> ChangeOwner(int groupId, [FromBody] ChangeOwnerParameters parameters)
 		{
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
@@ -115,12 +119,12 @@ namespace Ulearn.Web.Api.Controllers.Groups
 				return StatusCode((int) HttpStatusCode.Forbidden, new ErrorResponse("You can't change the owner of this group. Only current owner and course admin can change the owner."));
 
 			/* New owner should exist and be a course instructor */
-			var user = usersRepo.FindUserById(parameters.OwnerId);
+			var user = await usersRepo.FindUserByIdAsync(parameters.OwnerId).ConfigureAwait(false);
 			if (user == null)
-				return BadRequest(new ErrorResponse($"Can't find user with id {parameters.OwnerId}"));
+				return NotFound(new ErrorResponse($"Can't find user with id {parameters.OwnerId}"));
 			var isInstructor = await userRolesRepo.HasUserAccessToCourseAsync(parameters.OwnerId, group.CourseId, CourseRole.Instructor).ConfigureAwait(false);
 			if (!isInstructor)
-				return BadRequest(new ErrorResponse($"User {parameters.OwnerId} is not an instructor of course {group.CourseId}"));
+				return NotFound(new ErrorResponse($"User {parameters.OwnerId} is not an instructor of course {group.CourseId}"));
 			
 			/* Grant full access to previous owner */
 			await groupAccessesRepo.GrantAccessAsync(groupId, group.OwnerId, GroupAccessType.FullAccess, UserId).ConfigureAwait(false);
@@ -144,6 +148,26 @@ namespace Ulearn.Web.Api.Controllers.Groups
 					AddingTime = m.AddingTime
 				}).ToList()
 			};
+		}
+
+		[HttpPost("students/{studentId:guid}")]
+		[SwaggerResponse((int) HttpStatusCode.NotFound, Description = "Can't find user")]
+		[ProducesResponseType((int) HttpStatusCode.Conflict)]
+		[SwaggerResponse((int) HttpStatusCode.Conflict, Description = "User is already a student of this group")]
+		public async Task<IActionResult> AddStudent(int groupId, string studentId)
+		{
+			if (!User.IsSystemAdministrator())
+				return StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse("Only system administrator can add students to group directly"));
+			
+			var user = await usersRepo.FindUserByIdAsync(studentId).ConfigureAwait(false);
+			if (user == null)
+				return NotFound(new ErrorResponse($"Can't find user with id {studentId}"));
+			
+			var groupMember = await groupMembersRepo.AddUserToGroupAsync(groupId, studentId).ConfigureAwait(false);
+			if (groupMember == null)
+				return StatusCode((int)HttpStatusCode.Conflict, new ErrorResponse($"User {studentId} is already a member of group {groupId}"));
+
+			return Ok(new SuccessResponse($"Student {studentId} is added to group {groupId}"));
 		}
 
 		[HttpGet("accesses")]

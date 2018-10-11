@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Database.Repos
 {
-	public static class AppUserQueryExtentions
+	public static class AppUserQueryExtensions
 	{
 		public static IQueryable<ApplicationUser> FilterByRole(this IQueryable<ApplicationUser> applicationUsers, IdentityRole role, UserManager<ApplicationUser> userManager)
 		{
@@ -46,7 +46,7 @@ namespace Database.Repos
 					UserId = user.Id,
 					UserName = user.UserName,
 					UserVisibleName = user.VisibleName,
-					Roles = (await userManager.GetRolesAsync(user)).ToList()
+					Roles = (await userManager.GetRolesAsync(user).ConfigureAwait(false)).ToList()
 				});
 			}
 

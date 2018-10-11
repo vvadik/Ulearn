@@ -40,8 +40,6 @@ namespace Database.Repos.Groups
 
 			var course = courseManager.GetCourse(courseId);
 			
-			/* TODO (andgein): don't use GroupBy().ToDictionary() due to perfomance issues
-			   See http://code-ninja.org/blog/2014/07/24/entity-framework-never-call-groupby-todictionary/ */
 			/* For exercises */
 			var acceptedSubmissionsBySlide = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, userId)
 				.GroupBy(s => s.SlideId)
