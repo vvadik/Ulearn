@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -11,7 +12,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Models.Parameters.Groups;
 using Ulearn.Web.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Responses.Groups;
@@ -29,9 +29,10 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		private readonly IGroupMembersRepo groupMembersRepo;
 		private readonly IUsersRepo usersRepo;
 		private readonly IUserRolesRepo userRolesRepo;
-		
+		private readonly INotificationsRepo notificationsRepo;
+
 		public GroupController(ILogger logger, WebCourseManager courseManager, UlearnDb db,
-			IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo, IUsersRepo usersRepo, IUserRolesRepo userRolesRepo)
+			IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo, IUsersRepo usersRepo, IUserRolesRepo userRolesRepo, INotificationsRepo notificationsRepo)
 			: base(logger, courseManager, db)
 		{
 			this.groupsRepo = groupsRepo;
@@ -39,6 +40,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			this.groupMembersRepo = groupMembersRepo;
 			this.usersRepo = usersRepo;
 			this.userRolesRepo = userRolesRepo;
+			this.notificationsRepo = notificationsRepo;
 		}
 
 		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -168,6 +170,25 @@ namespace Ulearn.Web.Api.Controllers.Groups
 				return StatusCode((int)HttpStatusCode.Conflict, new ErrorResponse($"User {studentId} is already a member of group {groupId}"));
 
 			return Ok(new SuccessResponse($"Student {studentId} is added to group {groupId}"));
+		}
+
+		[HttpDelete("students/{studentId:guid}")]
+		[SwaggerResponse((int) HttpStatusCode.NotFound, Description = "Can't find user or user is not a student of this group")]
+		public async Task<IActionResult> RemoveStudent(int groupId, string studentId)
+		{
+			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
+			
+			var user = await usersRepo.FindUserByIdAsync(studentId).ConfigureAwait(false);
+			if (user == null)
+				return NotFound(new ErrorResponse($"Can't find user with id {studentId}"));
+
+			var groupMember = await groupMembersRepo.RemoveUserFromGroupAsync(groupId, studentId).ConfigureAwait(false);
+			if (groupMember == null)
+				return NotFound(new ErrorResponse($"User {studentId} is not a student of group {groupId}"));
+			
+			await notificationsRepo.AddNotificationAsync(group.CourseId, new GroupMembersHaveBeenRemovedNotification(groupId, new List<string> { studentId }, usersRepo), UserId).ConfigureAwait(false);
+
+			return Ok(new SuccessResponse($"Student {studentId} is removed from group {groupId}"));
 		}
 
 		[HttpGet("accesses")]

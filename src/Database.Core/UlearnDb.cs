@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
@@ -67,13 +68,21 @@ namespace Database
 			modelBuilder.Entity<MailNotificationTransport>();
 			modelBuilder.Entity<TelegramNotificationTransport>();
 			modelBuilder.Entity<FeedNotificationTransport>();
-			
+
+			var notificationClasses = GetNonAbstractSubclasses(typeof(Notification));
+			foreach (var notificationClass in notificationClasses)
+				modelBuilder.Entity(notificationClass);
+
 			/* For backward compatibility with EF 6.0 */
 			modelBuilder.Entity<ReceivedCommentToCodeReviewNotification>().Property(n => n.CommentId).HasColumnName("CommentId");
 			modelBuilder.Entity<NewCommentNotification>().Property(n => n.CommentId).HasColumnName("CommentId1");
 			modelBuilder.Entity<NewCommentForInstructorsOnlyNotification>().Property(n => n.CommentId).HasColumnName("CommentId1");
 			modelBuilder.Entity<RepliedToYourCommentNotification>().Property(n => n.CommentId).HasColumnName("CommentId1");
 			modelBuilder.Entity<LikedYourCommentNotification>().Property(n => n.CommentId).HasColumnName("CommentId1");
+
+			modelBuilder.Entity<GroupMembersHaveBeenRemovedNotification>().Property(n => n.GroupId).HasColumnName("GroupId");
+			modelBuilder.Entity<GroupMembersHaveBeenRemovedNotification>().Property(n => n.UserDescriptions).HasColumnName("UserDescriptions");
+			modelBuilder.Entity<GroupMembersHaveBeenRemovedNotification>().Property(n => n.UserIds).HasColumnName("UserIds");
 			
 			
 			modelBuilder.Entity<CommentLike>()
@@ -315,6 +324,11 @@ namespace Database
 		{
 			modelBuilder.Entity<TEntity>().HasIndex(indexFunction).IsUnique(isUnique);
 		}
+
+		private static List<Type> GetNonAbstractSubclasses(Type type)
+		{
+			return type.Assembly.GetTypes().Where(t => t.IsSubclassOf(type) && !t.IsAbstract && t != type).ToList();
+		}		
 
 		/* Construct easy understandable message on DbEntityValidationException */
 		public override int SaveChanges()

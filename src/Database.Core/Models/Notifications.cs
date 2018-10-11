@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
 using Database.Repos;
+using Database.Repos.Groups;
 using Microsoft.Extensions.DependencyInjection;
 using uLearn;
 using Ulearn.Common;
@@ -1151,10 +1152,10 @@ namespace Database.Models
 
 		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
 		{
-			// var groupsRepo = new GroupsRepo(db, WebCourseManager.Instance);
-			// var accesses = groupsRepo.GetGroupAccesses(GroupId);
-			// return accesses.Select(a => a.UserId).Concat(new [] { Group.OwnerId }).ToList();
-			throw new NotImplementedException();
+			var groupAccessesRepo = serviceProvider.GetService<IGroupAccessesRepo>();
+			// TODO (andgein): make method GetRecipientsIds() asynced
+			var accesses = groupAccessesRepo.GetGroupAccessesAsync(GroupId).GetAwaiter().GetResult();
+			return accesses.Select(a => a.UserId).Concat(new [] { Group.OwnerId }).ToList();
 		}
 
 		public override bool IsActual()
@@ -1169,7 +1170,7 @@ namespace Database.Models
 		{
 		}
 		
-		protected AbstractMassGroupOperationNotification(int groupId, List<string> userIds, UsersRepo usersRepo)
+		protected AbstractMassGroupOperationNotification(int groupId, List<string> userIds, IUsersRepo usersRepo)
 		{
 			GroupId = groupId;
 			UserIds = string.Join(",", userIds);
@@ -1209,10 +1210,10 @@ namespace Database.Models
 
 		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
 		{
-//			var groupsRepo = new GroupsRepo(db, WebCourseManager.Instance);
-//			var accesses = groupsRepo.GetGroupAccesses(GroupId);
-//			return accesses.Select(a => a.UserId).Concat(new [] { Group.OwnerId }).ToList();
-			throw new NotImplementedException();
+			var groupAccessesRepo = serviceProvider.GetService<IGroupAccessesRepo>();
+			// TODO (andgein): make method GetRecipientsIds() asynced
+			var accesses = groupAccessesRepo.GetGroupAccessesAsync(GroupId).GetAwaiter().GetResult();
+			return accesses.Select(a => a.UserId).Concat(new [] { Group.OwnerId }).ToList();
 		}
 
 		public override bool IsActual()
@@ -1229,7 +1230,7 @@ namespace Database.Models
 		{
 		}
 		
-		public GroupMembersHaveBeenRemovedNotification(int groupId, List<string> userIds, UsersRepo usersRepo)
+		public GroupMembersHaveBeenRemovedNotification(int groupId, List<string> userIds, IUsersRepo usersRepo)
 			: base(groupId, userIds, usersRepo)
 		{
 		}
@@ -1256,7 +1257,7 @@ namespace Database.Models
 		{
 		}
 		
-		public GroupMembersHaveBeenAddedNotification(int groupId, List<string> userIds, UsersRepo usersRepo)
+		public GroupMembersHaveBeenAddedNotification(int groupId, List<string> userIds, IUsersRepo usersRepo)
 			: base(groupId, userIds, usersRepo)
 		{
 		}

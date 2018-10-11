@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using Ulearn.Common.Extensions;
 
 namespace Database.Repos.Groups
@@ -13,12 +14,14 @@ namespace Database.Repos.Groups
 		private readonly UlearnDb db;
 		private readonly IManualCheckingsForOldSolutionsAdder manualCheckingsForOldSolutionsAdder;
 		private readonly IGroupsRepo groupsRepo;
+		private readonly ILogger logger;
 
-		public GroupMembersRepo(UlearnDb db, IManualCheckingsForOldSolutionsAdder manualCheckingsForOldSolutionsAdder, IGroupsRepo groupsRepo)
+		public GroupMembersRepo(UlearnDb db, IManualCheckingsForOldSolutionsAdder manualCheckingsForOldSolutionsAdder, IGroupsRepo groupsRepo, ILogger logger)
 		{
 			this.db = db;
 			this.manualCheckingsForOldSolutionsAdder = manualCheckingsForOldSolutionsAdder;
 			this.groupsRepo = groupsRepo;
+			this.logger = logger;
 		}
 		
 		public Task<List<ApplicationUser>> GetGroupMembersAsUsersAsync(int groupId)
@@ -38,6 +41,7 @@ namespace Database.Repos.Groups
 		
 		public async Task<GroupMember> AddUserToGroupAsync(int groupId, string userId)
 		{
+			logger.Information($"Пытаюсь добавить пользователя {userId} в группу {groupId}");
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false) ?? throw new ArgumentNullException($"Can't find group with id={groupId}");
 			
 			var groupMember = new GroupMember
@@ -51,12 +55,17 @@ namespace Database.Repos.Groups
 				/* Don't add member if it's already exists */
 				var existsMember = db.GroupMembers.FirstOrDefault(m => m.GroupId == groupId && m.UserId == userId);
 				if (existsMember != null)
+				{
+					logger.Information($"Пользователь {userId} уже находится в группе {groupId}, повторно добавлять не буду");
 					return null;
+				}
 
 				db.GroupMembers.Add(groupMember);
 				await db.SaveChangesAsync().ConfigureAwait(false);
 
 				transaction.Commit();
+				
+				logger.Information($"Пользователь {userId} добавлен в группу {groupId}");
 			}
 			
 			if (group.IsManualCheckingEnabledForOldSolutions)
