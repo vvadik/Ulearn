@@ -9,7 +9,7 @@ namespace Ulearn.Web.Api.Models.Parameters.Groups
 	[ModelBinder(typeof(JsonModelBinder), Name="parameters")]
 	public class CreateGroupParameters
 	{
-		[DataMember(Name = "name")]
+		[DataMember(Name = "name", IsRequired = true)]
 		[NotEmpty(ErrorMessage = "Group name can not be empty")]
 		public string Name { get; set; }
 	}

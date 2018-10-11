@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Serilog;
 using uLearn;
 using uLearn.Quizes;
+using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Models.Common;
 using Ulearn.Web.Api.Models.Responses.Notifications;
 
@@ -22,6 +23,8 @@ namespace Ulearn.Web.Api.Controllers
 		protected readonly ILogger logger;
 		protected readonly WebCourseManager courseManager;
 		protected readonly UlearnDb db;
+
+		protected string UserId => User.GetUserId();
 
 		public BaseController(ILogger logger, WebCourseManager courseManager, UlearnDb db)
 		{

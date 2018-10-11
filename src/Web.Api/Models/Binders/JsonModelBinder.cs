@@ -23,7 +23,8 @@ namespace Ulearn.Web.Api.Models.Binders
 				throw new ArgumentNullException(nameof(bindingContext));
 			
 			var request = bindingContext.HttpContext.Request;
-			if (!request.ContentType.StartsWith("application/json", StringComparison.OrdinalIgnoreCase))
+			var requestContentType = request.ContentType;
+			if (string.IsNullOrEmpty(requestContentType) || !requestContentType.StartsWith("application/json", StringComparison.OrdinalIgnoreCase))
 			{
 				/* If not JSON request */
 				bindingContext.ModelState.TryAddModelError(bindingContext.ModelName, "Content-Type should be application/json");
