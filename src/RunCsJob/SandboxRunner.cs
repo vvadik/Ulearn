@@ -148,7 +148,7 @@ namespace RunCsJob
 
 			try
 			{
-				metricSender.SendCount("exercise.compilation.csc.elapsed", (int) res.Elapsed.TotalMilliseconds);
+				metricSender.SendTiming("exercise.compilation.csc.elapsed", (int) res.Elapsed.TotalMilliseconds);
 				var diagnostics = res.EmitResult.Diagnostics;
 				var compilationOutput = diagnostics.DumpCompilationOutput();
 
