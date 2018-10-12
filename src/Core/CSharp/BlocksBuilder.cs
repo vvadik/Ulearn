@@ -119,14 +119,12 @@ namespace uLearn.CSharp
 		private void EmbedPara(string filename)
 		{
 			Blocks.Add(new MdBlock(di.GetContent(filename)));
-			//			Blocks.Add(new IncludeMdBlock(filename));
 		}
 
 		private void EmbedGallery(string folderName)
 		{
-			string[] images = di.GetFilenames(folderName);
-			Blocks.Add(new ImageGaleryBlock(images));
-			//			Blocks.Add(new IncludeImageGalleryBlock(folderName));
+			var images = di.GetFilenames(folderName);
+			Blocks.Add(new ImageGalleryBlock(images));
 		}
 
 		///<summary>Is child _inside_ Type or Method parent</summary>

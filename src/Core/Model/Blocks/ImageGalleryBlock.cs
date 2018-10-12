@@ -5,23 +5,23 @@ using uLearn.Model.Edx.EdxComponents;
 namespace uLearn.Model.Blocks
 {
 	[XmlType("gallery-images")]
-	public class ImageGaleryBlock : SlideBlock
+	public class ImageGalleryBlock : SlideBlock
 	{
 		[XmlElement("image")]
 		public string[] ImageUrls { get; set; }
 
-		public ImageGaleryBlock(string[] images)
+		public ImageGalleryBlock(string[] images)
 		{
 			ImageUrls = images;
 		}
 
-		public ImageGaleryBlock()
+		public ImageGalleryBlock()
 		{
 		}
 
 		public override string ToString()
 		{
-			return string.Format("Images {0}", string.Join("\n", ImageUrls));
+			return $"Gallery with images:\n{string.Join("\n", ImageUrls)}";
 		}
 
 		public override Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot)

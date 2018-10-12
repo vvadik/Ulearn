@@ -74,7 +74,7 @@ namespace uLearn.Model
 		[XmlElement("md", typeof(MdBlock))]
 		[XmlElement(typeof(CodeBlock))]
 		[XmlElement(typeof(TexBlock))]
-		[XmlElement(typeof(ImageGaleryBlock))]
+		[XmlElement(typeof(ImageGalleryBlock))]
 		[XmlElement(typeof(IncludeCodeBlock))]
 		[XmlElement(typeof(IncludeMdBlock))]
 		[XmlElement(typeof(IncludeImageGalleryBlock))]
@@ -107,7 +107,7 @@ namespace uLearn.Model
 			{
 				case YoutubeBlock _: return BlockType.YouTube;
 				case CodeBlock _: return BlockType.Code;
-				case ImageGaleryBlock _: return BlockType.GalleryImages;
+				case ImageGalleryBlock _: return BlockType.GalleryImages;
 				case IncludeCodeBlock _: return BlockType.IncludeCode;
 				case IncludeImageGalleryBlock _: return BlockType.IncludeImageGalleryBlock;
 				case IncludeMdBlock _: return BlockType.IncludeMd;

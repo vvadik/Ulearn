@@ -606,7 +606,7 @@ WriteLiteralTo(__razor_helper_writer, "></span>\r\n\t\t\tУскорить вид
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Block(ImageGaleryBlock block, BlockRenderContext context, HtmlHelper Html)
+public static System.Web.WebPages.HelperResult Block(ImageGalleryBlock block, BlockRenderContext context, HtmlHelper Html)
 {
 #line default
 #line hidden

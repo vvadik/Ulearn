@@ -38,7 +38,7 @@ namespace uLearn
 		[XmlElement("matching", Type = typeof(MatchingBlock))]
 		[XmlElement(typeof(SingleFileExerciseBlock))]
 		[XmlElement(typeof(ProjectExerciseBlock))]
-		[XmlElement(typeof(ImageGaleryBlock))]
+		[XmlElement(typeof(ImageGalleryBlock))]
 		[XmlElement(typeof(YoutubeBlock))]
 		[XmlElement(typeof(IncludeMdBlock))]
 		[XmlElement(typeof(IncludeImageGalleryBlock))]

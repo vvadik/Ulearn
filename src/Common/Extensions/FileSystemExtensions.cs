@@ -63,7 +63,7 @@ namespace Ulearn.Common.Extensions
 			var dir = di.GetSubdirectory(dirPath);
 			if (!dir.Exists)
 				throw new Exception("No " + dirPath + " in " + di.Name);
-			return dir.GetFiles().Select(f => Path.Combine(dirPath, f.Name)).ToArray();
+			return dir.GetFiles().Select(f => Path.Combine(dirPath, f.Name)).OrderBy(f => f).ToArray();
 		}
 	}
 }
