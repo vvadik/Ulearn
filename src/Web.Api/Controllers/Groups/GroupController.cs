@@ -186,7 +186,11 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			if (groupMember == null)
 				return NotFound(new ErrorResponse($"User {studentId} is not a student of group {groupId}"));
 			
-			await notificationsRepo.AddNotificationAsync(group.CourseId, new GroupMembersHaveBeenRemovedNotification(groupId, new List<string> { studentId }, usersRepo), UserId).ConfigureAwait(false);
+			await notificationsRepo.AddNotificationAsync(
+				group.CourseId,
+				new GroupMembersHaveBeenRemovedNotification(groupId, new List<string> { studentId }, usersRepo),
+				UserId
+			).ConfigureAwait(false);
 
 			return Ok(new SuccessResponse($"Student {studentId} is removed from group {groupId}"));
 		}

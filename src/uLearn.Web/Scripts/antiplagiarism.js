@@ -225,12 +225,18 @@ window.documentReadyFunctions.push(function () {
         
         $.each(matchedSnippets, function (idx, matchedSnippet) {
             for (var tokenIndex = 0; tokenIndex < matchedSnippet.snippet_tokens_count; ++tokenIndex) {
-                var originalTokenIndex = matchedSnippet.original_submission_first_token_index + tokenIndex;
-                var plagiarismTokenIndex = matchedSnippet.plagiarism_submission_first_token_index + tokenIndex;
-                var originalLine = originalLineByTokens[originalTokenIndex][0];
-                var plagiarismLine = plagiarismLineByTokens[plagiarismTokenIndex][0];
-                
-                lineWeights[originalLine][plagiarismLine]++;
+            	try {
+					var originalTokenIndex = matchedSnippet.original_submission_first_token_index + tokenIndex;
+					var plagiarismTokenIndex = matchedSnippet.plagiarism_submission_first_token_index + tokenIndex;
+					var originalLine = originalLineByTokens[originalTokenIndex][0];
+					var plagiarismLine = plagiarismLineByTokens[plagiarismTokenIndex][0];
+
+					lineWeights[originalLine][plagiarismLine]++;
+				} catch (e) {
+					console.error(e);
+					console.log(idx, matchedSnippet);
+					console.log(matchedSnippets);
+				}
             }                
         });
         
