@@ -235,7 +235,8 @@ window.documentReadyFunctions.push(function () {
 				} catch (e) {
 					console.error(e);
 					console.log(idx, matchedSnippet);
-					console.log(matchedSnippets);
+					console.log(originalLineByTokens);
+					console.log(plagiarismLineByTokens);
 				}
             }                
         });
