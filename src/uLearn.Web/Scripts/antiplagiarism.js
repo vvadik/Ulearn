@@ -178,7 +178,7 @@ window.documentReadyFunctions.push(function () {
         $('html').animate({scrollTop: $('html').scrollTop() - marginTopDiff}, 500, 'linear');        
     }
     
-    /* Returns array result, result[i] contains token indecies which contains in i-th line of input */
+    /* Returns array result, result[i] contains token indexes which contains in i-th line of input */
     function getTokensByLines(text, tokens) {
         var currentTokenIndex = 0;
         var lineIndex = 0;
@@ -234,9 +234,6 @@ window.documentReadyFunctions.push(function () {
 					lineWeights[originalLine][plagiarismLine]++;
 				} catch (e) {
 					console.error(e);
-					console.log(idx, matchedSnippet);
-					console.log(originalLineByTokens);
-					console.log(plagiarismLineByTokens);
 				}
             }                
         });

@@ -29,7 +29,7 @@ namespace uLearn.Quizes
 		[XmlAttribute("id")]
 		public string Id;
 		
-		/* Deprecated. Use tries insted of maxDropCount */
+		/* Deprecated. Use tries instead of maxDropCount */
 		[XmlAttribute("maxDropCount")]
 		public int MaxDropCount;
 

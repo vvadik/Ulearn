@@ -224,7 +224,9 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 
 		private Plagiarism BuildPlagiarismInfo(Submission submission, double weight, List<MatchedSnippet> matchedSnippets)
 		{
-			var codeUnits = codeUnitsExtractor.Extract(submission.ProgramText);
+			/* We do TrimStart() because of issue in way of passing code ot codemirror on ulearn's frontend. We insert data into <textarea> which loses first spaces.
+			   We can remove it after migrating to new, React-based frontend. */
+			var codeUnits = codeUnitsExtractor.Extract(submission.ProgramText.TrimStart());
 			return new Plagiarism
 			{
 				SubmissionInfo = submission.GetSubmissionInfoForApi(),
