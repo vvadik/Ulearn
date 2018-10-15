@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Threading.Tasks;
 using Database;
 using Database.Models;
@@ -190,6 +191,11 @@ namespace Ulearn.Web.Api
 				{
 					{ "Bearer", new string [] {} }
 				});
+				
+				/* Se https://docs.microsoft.com/ru-ru/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-2.1&tabs=visual-studio%2Cvisual-studio-xml for details */ 
+				var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+				var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+				c.IncludeXmlComments(xmlPath);
 			});
 			
 			services.AddSwaggerExamplesFromAssemblyOf<ApiResponse>();

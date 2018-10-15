@@ -44,6 +44,11 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			await base.OnActionExecutionAsync(context, next).ConfigureAwait(false);
 		}
 		
+		/// <summary>
+		/// Найти группу по инвайт-хешу.
+		/// Группа должна быть не удалена, а инвайт-ссылка в ней — включена.
+		/// </summary>
+		/// <param name="inviteHash">Инвайт-хеш группы</param>
 		[HttpGet]
 		public async Task<ActionResult<GroupInfo>> Group(Guid inviteHash)
 		{
@@ -52,6 +57,11 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			return BuildGroupInfo(group, isUserMemberOfGroup: isMember);
 		}
 
+		/// <summary>
+		/// Вступить в группу по инвайт-хешу.
+		/// Группа должна быть не удалена, а инвайт-ссылка в ней — включена.
+		/// </summary>
+		/// <param name="inviteHash">Инвайт-хеш группы</param>
 		[HttpPost("join")]
 		[ProducesResponseType((int) HttpStatusCode.Conflict)]
 		[SwaggerResponse((int) HttpStatusCode.Conflict, Description = "User is already a student of this group")]

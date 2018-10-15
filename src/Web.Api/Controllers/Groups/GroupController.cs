@@ -66,6 +66,9 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			await base.OnActionExecutionAsync(context, next).ConfigureAwait(false);
 		}
 
+		/// <summary>
+		/// Информация о группе
+		/// </summary>
 		[HttpGet]
 		public async Task<ActionResult<GroupInfo>> Group(int groupId)
 		{
@@ -75,6 +78,9 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			return BuildGroupInfo(group, members.Count, accesses);
 		}
 
+		/// <summary>
+		/// Изменить группу
+		/// </summary>
 		[HttpPatch]
 		public async Task<ActionResult<GroupInfo>> UpdateGroup(int groupId, [FromBody] UpdateGroupParameters parameters)
 		{
@@ -103,6 +109,9 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			return BuildGroupInfo(await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false));
 		}
 
+		/// <summary>
+		/// Удалить группу
+		/// </summary>
 		[HttpDelete]
 		public async Task<IActionResult> DeleteGroup(int groupId)
 		{
@@ -110,6 +119,9 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			return Ok(new SuccessResponse("Group has been deleted"));
 		}
 
+		/// <summary>
+		/// Сменить владельца группы
+		/// </summary>
 		[HttpPut("owner")]
 		[SwaggerResponse((int) HttpStatusCode.NotFound, Description = "Can't find user or user is not an instructor")]
 		public async Task<IActionResult> ChangeOwner(int groupId, [FromBody] ChangeOwnerParameters parameters)
@@ -138,6 +150,9 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			return Ok(new SuccessResponse($"New group's owner is {parameters.OwnerId}"));
 		}
 
+		/// <summary>
+		/// Список студентов группы
+		/// </summary>
 		[HttpGet("students")]
 		public async Task<ActionResult<GroupStudentsResponse>> GroupStudents(int groupId)
 		{
@@ -152,6 +167,9 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			};
 		}
 
+		/// <summary>
+		/// Добавить студента в группу
+		/// </summary>
 		[HttpPost("students/{studentId:guid}")]
 		[SwaggerResponse((int) HttpStatusCode.NotFound, Description = "Can't find user")]
 		[ProducesResponseType((int) HttpStatusCode.Conflict)]
@@ -171,7 +189,10 @@ namespace Ulearn.Web.Api.Controllers.Groups
 
 			return Ok(new SuccessResponse($"Student {studentId} is added to group {groupId}"));
 		}
-
+		
+		/// <summary>
+		/// Удалить студента из группы 
+		/// </summary>
 		[HttpDelete("students/{studentId:guid}")]
 		[SwaggerResponse((int) HttpStatusCode.NotFound, Description = "Can't find user or user is not a student of this group")]
 		public async Task<IActionResult> RemoveStudent(int groupId, string studentId)
@@ -195,6 +216,9 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			return Ok(new SuccessResponse($"Student {studentId} is removed from group {groupId}"));
 		}
 
+		/// <summary>
+		/// Список доступов к группе
+		/// </summary>
 		[HttpGet("accesses")]
 		public async Task<ActionResult<GroupAccessesResponse>> GroupAccesses(int groupId)
 		{

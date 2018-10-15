@@ -22,6 +22,9 @@ namespace Ulearn.Web.Api.Controllers
 			this.coursesRepo = coursesRepo;
 		}
 
+		/// <summary>
+		/// Список курсов
+		/// </summary>
 		[HttpGet("")]
 		public async Task<ActionResult<CoursesListResponse>> CoursesList()
 		{
@@ -39,6 +42,9 @@ namespace Ulearn.Web.Api.Controllers
 			};
 		}
 		
+		/// <summary>
+		/// Информация о курсе
+		/// </summary>
 		[HttpGet("{courseId}")]
 		public ActionResult<CourseInfo> CourseInfo(Course course)
 		{

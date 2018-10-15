@@ -42,6 +42,9 @@ namespace Ulearn.Web.Api.Controllers
 			this.configuration = options.Value;
 		}
 
+		/// <summary>
+		/// Информация о текущем пользователе 
+		/// </summary>
 		[HttpGet]
 		[Authorize]
 		public async Task<ActionResult<GetMeResponse>> Me()
@@ -80,6 +83,9 @@ namespace Ulearn.Web.Api.Controllers
 			return problems;
 		}
 
+		/// <summary>
+		/// Получить JWT-токен по кукам 
+		/// </summary>
 		[HttpPost("token")]
 		[Authorize(AuthenticationSchemes = "Identity.Application" /* = IdentityConstants.ApplicationScheme */)]
 		public ActionResult<TokenResponse> Token()
@@ -104,6 +110,9 @@ namespace Ulearn.Web.Api.Controllers
 			};
 		}
 
+		/// <summary>
+		/// Список ролей («курс-админ», «преподаватель», «тестер») текущего пользователя
+		/// </summary>
 		[HttpGet("roles")]
 		[Authorize]
 		public async Task<ActionResult<CourseRolesResponse>> CourseRoles()
@@ -133,6 +142,9 @@ namespace Ulearn.Web.Api.Controllers
 			};
 		}
 
+		/// <summary>
+		/// Выход
+		/// </summary>
 		[HttpPost("logout")]
 		[Authorize]
 		public async Task<ActionResult<LogoutResponse>> Logout()

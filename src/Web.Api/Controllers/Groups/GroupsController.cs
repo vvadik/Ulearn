@@ -34,6 +34,9 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			this.groupMembersRepo = groupMembersRepo;
 		}
 
+		/// <summary>
+		/// Список неархивных групп в курсе
+		/// </summary>
 		[HttpGet("in/{courseId}")]
 		[Authorize(Policy = "Instructors")]
 		public async Task<ActionResult<GroupsListResponse>> GroupsList(Course course, [FromQuery] GroupsListParameters parameters)
@@ -41,6 +44,9 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			return await GetGroupsListResponseAsync(course, parameters).ConfigureAwait(false);
 		}
 
+		/// <summary>
+		/// Список архивных группу в курсе
+		/// </summary>
 		[HttpGet("in/{courseId}/archived")]
 		[Authorize(Policy = "Instructors")]
 		public async Task<ActionResult<GroupsListResponse>> ArchivedGroupsList(Course course, [FromQuery] GroupsListParameters parameters)
@@ -83,6 +89,10 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			};
 		}
 
+		/// <summary>
+		/// Создать новую группу в курсе
+		/// </summary>
+		/// <param name="parameters">Название новой группы</param>
 		[HttpPost("in/{courseId}")]
 		[Authorize(Policy = "Instructors")]
 		[ProducesResponseType((int) HttpStatusCode.Created)]
