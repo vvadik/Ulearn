@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Serilog;
-using Swashbuckle.AspNetCore.SwaggerGen;
+using Swashbuckle.AspNetCore.Annotations;
 using Ulearn.Web.Api.Models.Parameters.Groups;
 using Ulearn.Web.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Responses.Groups;

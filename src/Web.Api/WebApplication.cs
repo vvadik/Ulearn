@@ -22,6 +22,7 @@ using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
+using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.Swagger;
 using uLearn;
 using uLearn.Configuration;
@@ -29,6 +30,7 @@ using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Authorization;
 using Ulearn.Web.Api.Controllers.Notifications;
 using Ulearn.Web.Api.Models.Binders;
+using Ulearn.Web.Api.Models.Responses;
 using Ulearn.Web.Api.Swagger;
 using Vostok.Commons.Extensions.UnitConvertions;
 using Vostok.Hosting;
@@ -167,6 +169,16 @@ namespace Ulearn.Web.Api
 						Email = "support@ulearn.me"
 					}
 				});
+				
+				/* See https://github.com/mattfrear/Swashbuckle.AspNetCore.Filters#installation for manual about swagger request and response examples */
+				c.ExampleFilters();
+				
+				c.OperationFilter<BadRequestResponseOperationFilter>();
+				c.OperationFilter<AuthResponsesOperationFilter>();
+				c.OperationFilter<RemoveCourseParameterOperationFilter>();
+				
+				c.OperationFilter<AppendAuthorizeToSummaryOperationFilter>();
+				
 				c.AddSecurityDefinition("Bearer", new ApiKeyScheme
 				{
 					In = "header",
@@ -178,10 +190,9 @@ namespace Ulearn.Web.Api
 				{
 					{ "Bearer", new string [] {} }
 				});
-				c.OperationFilter<BadRequestResponseOperationFilter>();
-				c.OperationFilter<AuthResponsesOperationFilter>();
-				c.OperationFilter<RemoveCourseParameterOperationFilter>();
 			});
+			
+			services.AddSwaggerExamplesFromAssemblyOf<ApiResponse>();
 		}
 
 		private static void ConfigureDi(IServiceCollection services, Logger logger)
