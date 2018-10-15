@@ -5,6 +5,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Database.Models;
 using Database.Repos;
+using JetBrains.Annotations;
 using Serilog;
 using uLearn;
 
@@ -27,18 +28,28 @@ namespace Database
 
 		private readonly object @lock = new object();
 
+		[NotNull]
 		public async Task<Course> GetCourseAsync(CoursesRepo coursesRepo, string courseId)
 		{
-			var course = base.GetCourse(courseId);
+			Course course;
+			try
+			{
+				course = base.GetCourse(courseId);
+			}
+			catch (KeyNotFoundException)
+			{
+				course = null;
+			}
+
 			if (IsCourseVersionWasUpdatedRecent(courseId))
-				return course;
+				return course ?? throw new CourseNotFoundException(courseId);
 
 			courseVersionFetchTime[courseId] = DateTime.Now;
 
 			var publishedVersion = await coursesRepo.GetPublishedCourseVersionAsync(courseId).ConfigureAwait(false);
 
 			if (publishedVersion == null)
-				return course;
+				return course ?? throw new CourseNotFoundException(courseId);
 
 			ReloadCourseIfLoadedAndPublishedVersionsAreDifferent(courseId, publishedVersion);
 			return base.GetCourse(courseId);

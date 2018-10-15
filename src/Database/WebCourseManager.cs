@@ -24,16 +24,24 @@ namespace Database
 
 		public override Course GetCourse(string courseId)
 		{
-			var course = base.GetCourse(courseId);
+			Course course;
+			try
+			{
+				course = base.GetCourse(courseId);
+			}
+			catch (KeyNotFoundException)
+			{
+				course = null;
+			}
 			if (IsCourseVersionWasUpdatedRecent(courseId))
-				return course;
+				return course ?? throw new KeyNotFoundException($"Key {courseId} not found");
 
 			courseVersionFetchTime[courseId] = DateTime.Now;
 			var coursesRepo = new CoursesRepo();
 			var publishedVersion = coursesRepo.GetPublishedCourseVersion(courseId);
 
 			if (publishedVersion == null)
-				return course;
+				return course ?? throw new KeyNotFoundException($"Key {courseId} not found");
 
 			lock (@lock)
 			{
@@ -45,7 +53,7 @@ namespace Database
 				}
 				loadedCourseVersions[courseId.ToLower()] = publishedVersion.Id;
 			}
-			return course;
+			return course ?? throw new KeyNotFoundException($"Key {courseId} not found");
 		}
 
 		private bool IsCourseVersionWasUpdatedRecent(string courseId)
