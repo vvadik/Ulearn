@@ -10,11 +10,12 @@ import thunkMiddleware from "redux-thunk"
 import { createLogger } from "redux-logger"
 import { applyMiddleware, createStore } from "redux";
 
-import "./common.less"
 import "./App.less"
+import "./common.less"
 
 import rootReducer from "./redux/reducers"
 import api from "./api"
+import GroupsPage from "./pages/course/groups";
 
 let loggerMiddleware = createLogger();
 
@@ -94,6 +95,7 @@ class InternalUlearnApp extends Component {
 												   // Otherwise we make two GET requests sequentially.
 												   // Unfortunately some our GET handlers are not idempotent (i.e. /Admin/CheckNextExerciseForSlide)
 						<Switch>
+							<Route path="/:courseId/groups" component={GroupsPage}/>
 							<Route component={AnyPage} />
 						</Switch>
 					}

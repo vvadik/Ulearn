@@ -3,6 +3,7 @@ import config from "../config"
 import * as account from "./account"
 import * as courses from "./courses"
 import * as notifications from "./notifications"
+import * as groups from "./groups"
 
 const API_JWT_TOKEN_UPDATED = 'API_JWT_TOKEN_UPDATED';
 let apiJwtToken = '';
@@ -61,6 +62,7 @@ let api = {
     account: account,
     courses: courses,
     notifications: notifications,
+	groups: groups,
     get: get,
     post: post,
     request: request
