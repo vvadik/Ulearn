@@ -16,7 +16,11 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		{
 		}
 		
-		protected GroupInfo BuildGroupInfo(Group group, int? membersCount=null, IEnumerable<GroupAccess> accesses=null, bool addGroupApiUrl=false)
+		protected GroupInfo BuildGroupInfo(Group group,
+			int? membersCount=null,
+			IEnumerable<GroupAccess> accesses=null,
+			bool addGroupApiUrl=false,
+			bool? isUserMemberOfGroup=null)
 		{
 			if (group == null)
 				throw new ArgumentNullException(nameof(group));
@@ -30,6 +34,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 				InviteHash = group.InviteHash,
 				IsInviteLinkEnabled = group.IsInviteLinkEnabled,
 				IsArchived = group.IsArchived,
+				AreYouStudent = isUserMemberOfGroup,
 				
 				IsManualCheckingEnabled = group.IsManualCheckingEnabled,
 				IsManualCheckingEnabledForOldSolutions = group.IsManualCheckingEnabledForOldSolutions,

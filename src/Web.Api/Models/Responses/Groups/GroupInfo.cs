@@ -29,6 +29,9 @@ namespace Ulearn.Web.Api.Models.Responses.Groups
 		[DataMember(Name = "is_invite_link_enabled")]
 		public bool IsInviteLinkEnabled { get; set; }
 		
+		[DataMember(Name = "are_you_student", EmitDefaultValue = false)]
+		public bool? AreYouStudent { get; set; }
+		
 	
 		[DataMember(Name = "is_manual_checking_enabled")]
 		public bool IsManualCheckingEnabled { get; set; }

@@ -17,5 +17,6 @@ namespace Database.Repos.Groups
 		Task<Dictionary<string, List<int>>> GetUsersGroupsIdsAsync(string courseId, IEnumerable<string> usersIds);
 		Task<List<int>> GetUserGroupsIdsAsync(string courseId, string userId);
 		Task<List<Group>> GetUserGroupsAsync(string courseId, string userId);
+		Task<bool> IsUserMemberOfGroup(int groupId, string userId);
 	}
 }

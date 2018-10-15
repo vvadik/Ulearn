@@ -167,7 +167,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			
 			var groupMember = await groupMembersRepo.AddUserToGroupAsync(groupId, studentId).ConfigureAwait(false);
 			if (groupMember == null)
-				return StatusCode((int)HttpStatusCode.Conflict, new ErrorResponse($"User {studentId} is already a member of group {groupId}"));
+				return StatusCode((int)HttpStatusCode.Conflict, new ErrorResponse($"User {studentId} is already a student of group {groupId}"));
 
 			return Ok(new SuccessResponse($"Student {studentId} is added to group {groupId}"));
 		}

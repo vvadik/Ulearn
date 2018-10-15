@@ -39,6 +39,11 @@ namespace Database.Repos.Groups
 			return db.GroupMembers.Include(m => m.User).Where(m => groupsIds.Contains(m.GroupId) && !m.User.IsDeleted).ToListAsync();
 		}
 		
+		public Task<bool> IsUserMemberOfGroup(int groupId, string userId)
+		{
+			return db.GroupMembers.AnyAsync(m => m.GroupId == groupId && m.UserId == userId);
+		}
+		
 		public async Task<GroupMember> AddUserToGroupAsync(int groupId, string userId)
 		{
 			logger.Information($"Пытаюсь добавить пользователя {userId} в группу {groupId}");
