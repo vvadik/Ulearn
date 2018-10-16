@@ -516,11 +516,11 @@ class Notifications extends Component {
         if (isLoading)
             return (
                 <div className="notifications__dropdown">
-                    <Loader type="normal" active/>
+                    <Loader type="normal" active={true} />
                 </div>
             );
         else
-            return <div className="notifications__dropdown" dangerouslySetInnerHTML={{ __html: notifications }} />;
+            return <div className="notifications__dropdown legacy-page" dangerouslySetInnerHTML={{ __html: notifications }} />;
     }
 
     static propTypes = {

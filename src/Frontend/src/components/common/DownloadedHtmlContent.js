@@ -248,7 +248,7 @@ class DownloadedHtmlContent extends Component {
         let links = this.state.links;
         let bodyClassName = this.state.bodyClassName;
         return (
-            <div>
+            <div className="legacy-page">
                 <Meta meta={meta} links={links} bodyClassName={bodyClassName}/>
                 <Content body={this.state.body} />
             </div>
