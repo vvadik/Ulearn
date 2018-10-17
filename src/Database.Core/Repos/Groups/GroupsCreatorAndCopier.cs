@@ -55,7 +55,7 @@ namespace Database.Repos.Groups
 		}
 		
 		/* Copy group from one course to another. Replace owner only if newOwnerId is not empty */
-		public async Task<Group> CopyGroupAsync(Group group, string courseId, string newOwnerId="")
+		public async Task<Group> CopyGroupAsync(Group group, string courseId, string newOwnerId=null)
 		{
 			logger.Information($"Копирую группу «{group.Name}» (id={group.Id}) в курс {courseId}");
 			
@@ -92,6 +92,7 @@ namespace Database.Repos.Groups
 
 		private async Task CopyGroupMembersAsync(Group group, Group newGroup)
 		{
+			logger.Information($"Копирую участников из группы «{group.Name}» (id={group.Id}) в группу «{newGroup.Name}» (id={newGroup.Id})");
 			var members = group.NotDeletedMembers.Select(m => new GroupMember
 			{
 				UserId = m.UserId,
@@ -104,8 +105,9 @@ namespace Database.Repos.Groups
 
 		private async Task CopyGroupAccessesAsync(Group group, Group newGroup)
 		{
+			logger.Information($"Копирую доступы к группе «{group.Name}» (id={group.Id}) в группу «{newGroup.Name}» (id={newGroup.Id})");
 			var accesses = await db.GroupAccesses.Where(a => a.GroupId == group.Id && a.IsEnabled).ToListAsync().ConfigureAwait(false);
-			var courseInstructorsIds = userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.Instructor, newGroup.CourseId, includeHighRoles: true);
+			var courseInstructorsIds = await userRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRole.Instructor, newGroup.CourseId, includeHighRoles: true).ConfigureAwait(false);
 			foreach (var access in accesses)
 			{
 				if (! courseInstructorsIds.Contains(access.UserId))
@@ -126,6 +128,8 @@ namespace Database.Repos.Groups
 		
 		private async Task CopyEnabledAdditionalScoringGroupsAsync(Group group, Group newGroup)
 		{
+			logger.Information($"Копирую включенные scoring-group-ы из группы «{group.Name}» (id={group.Id}) в группу «{newGroup.Name}» (id={newGroup.Id})");
+			
 			var enabledAdditionalScoringGroups = await db.EnabledAdditionalScoringGroups
 				.Where(s => s.GroupId == group.Id)
 				.Select(s => s.ScoringGroupId)

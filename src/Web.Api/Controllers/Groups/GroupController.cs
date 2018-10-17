@@ -19,6 +19,7 @@ using Ulearn.Web.Api.Models.Responses.Groups;
 namespace Ulearn.Web.Api.Controllers.Groups
 {
 	[Route("/groups/{groupId:int:min(0)}")]
+	[ProducesResponseType((int) HttpStatusCode.OK)]
 	[ProducesResponseType((int) HttpStatusCode.NotFound)]
 	[ProducesResponseType((int) HttpStatusCode.Forbidden)]
 	[Authorize]
@@ -30,9 +31,11 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		private readonly IUsersRepo usersRepo;
 		private readonly IUserRolesRepo userRolesRepo;
 		private readonly INotificationsRepo notificationsRepo;
+		private readonly IGroupsCreatorAndCopier groupsCreatorAndCopier;
 
 		public GroupController(ILogger logger, WebCourseManager courseManager, UlearnDb db,
-			IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo, IUsersRepo usersRepo, IUserRolesRepo userRolesRepo, INotificationsRepo notificationsRepo)
+			IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo, IUsersRepo usersRepo, IUserRolesRepo userRolesRepo, INotificationsRepo notificationsRepo,
+			IGroupsCreatorAndCopier groupsCreatorAndCopier)
 			: base(logger, courseManager, db)
 		{
 			this.groupsRepo = groupsRepo;
@@ -41,6 +44,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			this.usersRepo = usersRepo;
 			this.userRolesRepo = userRolesRepo;
 			this.notificationsRepo = notificationsRepo;
+			this.groupsCreatorAndCopier = groupsCreatorAndCopier;
 		}
 
 		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -116,7 +120,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		public async Task<IActionResult> DeleteGroup(int groupId)
 		{
 			await groupsRepo.DeleteGroupAsync(groupId).ConfigureAwait(false);
-			return Ok(new SuccessResponse("Group has been deleted"));
+			return Ok(new SuccessResponse($"Group {groupId} has been deleted"));
 		}
 
 		/// <summary>
@@ -148,6 +152,31 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			await groupAccessesRepo.RevokeAccessAsync(groupId, parameters.OwnerId).ConfigureAwait(false);
 
 			return Ok(new SuccessResponse($"New group's owner is {parameters.OwnerId}"));
+		}
+
+		/// <summary>
+		/// Копирует группу в тот же или другой курс
+		/// </summary>
+		[HttpPost("copy")]
+		[SwaggerResponse((int) HttpStatusCode.NotFound, Description = "Course not found")]
+		[SwaggerResponse((int) HttpStatusCode.Forbidden, Description = "You have no access to destination course. You should be instructor or course admin.")]
+		public async Task<IActionResult> Copy(int groupId, [FromQuery] CopyGroupParameters parameters)
+		{
+			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
+			if (! courseManager.HasCourse(parameters.DestinationCourseId))
+				return NotFound($"Course {parameters.DestinationCourseId} not found");
+			if (! await CanCreateGroupInCourseAsync(UserId, parameters.DestinationCourseId).ConfigureAwait(false))
+				return Forbid();
+			
+			var newOwnerId = parameters.ChangeOwner ? UserId : null;
+			var newGroup = await groupsCreatorAndCopier.CopyGroupAsync(group, parameters.DestinationCourseId, newOwnerId).ConfigureAwait(false);
+
+			return Ok(new SuccessResponse($"Group {group.Id} has been copied to course {parameters.DestinationCourseId}. Id of new group is {newGroup.Id}"));
+		}
+		
+		private Task<bool> CanCreateGroupInCourseAsync(string userId, string courseId)
+		{
+			return userRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRole.Instructor);
 		}
 
 		/// <summary>

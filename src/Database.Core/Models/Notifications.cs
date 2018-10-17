@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Database.Repos;
 using Database.Repos.Groups;
 using Microsoft.Extensions.DependencyInjection;
@@ -314,7 +315,7 @@ namespace Database.Models
 		public abstract string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl);
 		public abstract NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl);
 
-		public abstract List<string> GetRecipientsIds(IServiceProvider serviceProvider);
+		public abstract Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider);
 		public virtual bool IsNotificationForEveryone => false;
 
 		public abstract bool IsActual();
@@ -402,10 +403,10 @@ namespace Database.Models
 			return null;
 		}
 
-		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
+		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
-			/* If you want to send system message you should create NotificationDelivery yourself. By default nobody receives it */
-			return new List<string>();
+			/* If you want to send system message you should create NotificationDelivery by yourself. By default nobody receives it */
+			return Task.FromResult(new List<string>());
 		}
 
 		public override bool IsActual()
@@ -435,10 +436,10 @@ namespace Database.Models
 			return null;
 		}
 
-		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
+		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
 			/* If you want to send message you should create NotificationDelivery yourself. By default nobody receives it */
-			return new List<string>();
+			return Task.FromResult(new List<string>());
 		}
 
 		public override bool IsActual()
@@ -514,10 +515,10 @@ namespace Database.Models
 			return $"{Comment.Author.VisibleName} прокомментировал{Comment.Author.Gender.ChooseEnding()} «{GetSlideTitle(course, slide)}»\n\n{Comment.Text.Trim()}";
 		}
 
-		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
+		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
 			var visitsRepo = serviceProvider.GetService<IVisitsRepo>();
-			return visitsRepo.GetCourseUsers(CourseId);
+			return visitsRepo.GetCourseUsersAsync(CourseId);
 		}
 
 		public override bool IsNotificationForEveryone => true;
@@ -564,9 +565,9 @@ namespace Database.Models
 					$"{Comment.Text.Trim()}";
 		}
 
-		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
+		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
-			return new List<string> { ParentComment.AuthorId };
+			return Task.FromResult(new List<string> { ParentComment.AuthorId });
 		}
 	}
 
@@ -599,9 +600,9 @@ namespace Database.Models
 					$"> {Comment.Text.Trim().Replace("\n", "\n >")}";
 		}
 
-		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
+		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
-			return new List<string> { Comment.AuthorId };
+			return Task.FromResult(new List<string> { Comment.AuthorId });
 		}
 	}
 
@@ -737,9 +738,9 @@ namespace Database.Models
 			return new NotificationButton("Перейти к странице с заданием", GetSlideUrl(course, slide, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
+		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
-			return new List<string> { Checking.UserId };
+			return Task.FromResult(new List<string> { Checking.UserId });
 		}
 
 		public override bool IsActual()
@@ -785,9 +786,9 @@ namespace Database.Models
 			return new NotificationButton("Перейти к странице с тестом", GetSlideUrl(course, slide, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
+		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
-			return new List<string> { Checking.UserId };
+			return Task.FromResult(new List<string> { Checking.UserId });
 		}
 
 		public override bool IsActual()
@@ -828,9 +829,9 @@ namespace Database.Models
 			return new NotificationButton("Смотреть сертификат", GetCertificateUrl(Certificate, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
+		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
-			return new List<string> { Certificate.UserId };
+			return Task.FromResult(new List<string> { Certificate.UserId });
 		}
 
 		public override bool IsActual()
@@ -875,9 +876,9 @@ namespace Database.Models
 			return null;
 		}
 
-		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
+		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
-			return new List<string> { Score.UserId };
+			return Task.FromResult(new List<string> { Score.UserId });
 		}
 
 		public override bool IsActual()
@@ -963,17 +964,17 @@ namespace Database.Models
 		}
 
 
-		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
+		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
 			var review = Comment.Review;
 			if (review == null)
-				return new List<string>();
+				return Task.FromResult(new List<string>());
 
 			var authorsIds = new HashSet<string>(review.Comments.Select(c => c.AuthorId));
 			authorsIds.Add(review.AuthorId);
-			authorsIds.Add(review.ExerciseChecking.UserId); 
+			authorsIds.Add(review.ExerciseChecking.UserId);
 
-			return authorsIds.ToList();
+			return Task.FromResult(authorsIds.ToList());
 		}
 
 		public override bool IsActual()
@@ -1044,9 +1045,9 @@ namespace Database.Models
 			return new NotificationButton("Перейти к группам", GetGroupsUrl(course, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
+		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
-			return new List<string> { Group.OwnerId };
+			return Task.FromResult(new List<string> { Group.OwnerId });
 		}
 
 		public override bool IsActual()
@@ -1078,9 +1079,9 @@ namespace Database.Models
 			return new NotificationButton("Перейти к группам", GetGroupsUrl(course, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
+		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
-			return new List<string> { Access.UserId };
+			return Task.FromResult(new List<string> { Access.UserId });
 		}
 
 		public override bool IsActual()
@@ -1112,9 +1113,9 @@ namespace Database.Models
 			return new NotificationButton("Перейти к группам", GetGroupsUrl(course, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
+		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
-			return new List<string> { Access.UserId };
+			return Task.FromResult(new List<string> { Access.UserId });
 		}
 
 		public override bool IsActual()
@@ -1150,11 +1151,10 @@ namespace Database.Models
 			return new NotificationButton("Перейти к группам", GetGroupsUrl(course, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
+		public override async Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
 			var groupAccessesRepo = serviceProvider.GetService<IGroupAccessesRepo>();
-			// TODO (andgein): make method GetRecipientsIds() asynced
-			var accesses = groupAccessesRepo.GetGroupAccessesAsync(GroupId).GetAwaiter().GetResult();
+			var accesses = await groupAccessesRepo.GetGroupAccessesAsync(GroupId).ConfigureAwait(false);
 			return accesses.Select(a => a.UserId).Concat(new [] { Group.OwnerId }).ToList();
 		}
 
@@ -1174,7 +1174,7 @@ namespace Database.Models
 		{
 			GroupId = groupId;
 			UserIds = string.Join(",", userIds);
-			var users = usersRepo.GetUsersByIds(userIds);
+			var users = usersRepo.GetUsersByIdsAsync(userIds).GetAwaiter().GetResult();
 			var userNames = users.Select(u => u.VisibleName).ToList();
 			UserDescriptions = GetUserDescriptions(userNames);
 		}
@@ -1208,11 +1208,10 @@ namespace Database.Models
 			return new NotificationButton("Перейти к группам", GetGroupsUrl(course, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
+		public override async Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
 			var groupAccessesRepo = serviceProvider.GetService<IGroupAccessesRepo>();
-			// TODO (andgein): make method GetRecipientsIds() asynced
-			var accesses = groupAccessesRepo.GetGroupAccessesAsync(GroupId).GetAwaiter().GetResult();
+			var accesses = await groupAccessesRepo.GetGroupAccessesAsync(GroupId).ConfigureAwait(false);
 			return accesses.Select(a => a.UserId).Concat(new [] { Group.OwnerId }).ToList();
 		}
 
@@ -1297,10 +1296,10 @@ namespace Database.Models
 			return $"{Comment.Author.VisibleName} оставил{Comment.Author.Gender.ChooseEnding()} комментарий для преподавателей в «{GetSlideTitle(course, slide)}»:\n\n{Comment.Text.Trim()}";
 		}
 
-		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
+		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
 			var userRolesRepo = serviceProvider.GetService<IUserRolesRepo>();
-			return userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.Instructor, CourseId);
+			return userRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRole.Instructor, CourseId);
 		}
 
 		public override List<Notification> GetBlockerNotifications(IServiceProvider serviceProvider)
@@ -1334,10 +1333,10 @@ namespace Database.Models
 			return $"{AddedUser.VisibleName} стал{AddedUser.Gender.ChooseEnding()} преподавателем курса «{course.Title}».";
 		}
 
-		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
+		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
 			var userRolesRepo = serviceProvider.GetService<IUserRolesRepo>();
-			return userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, CourseId);
+			return userRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRole.CourseAdmin, CourseId);
 		}
 
 		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
@@ -1374,10 +1373,10 @@ namespace Database.Models
 			return new NotificationButton("Перейти к группам", GetGroupsUrl(course, baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
+		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
 			var userRolesRepo = serviceProvider.GetService<IUserRolesRepo>();
-			return userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, CourseId);
+			return userRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRole.CourseAdmin, CourseId);
 		}
 
 		public override bool IsActual()
@@ -1417,10 +1416,10 @@ namespace Database.Models
 			return $"Загружена новая версия курса «{course.Title.EscapeHtml()}». Теперь её можно опубликовать.";
 		}
 
-		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
+		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
 			var userRolesRepo = serviceProvider.GetService<IUserRolesRepo>();
-			return userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, CourseId);
+			return userRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRole.CourseAdmin, CourseId);
 		}
 
 		public override bool IsActual()
@@ -1444,10 +1443,10 @@ namespace Database.Models
 					GetCourseUrl(course, baseUrl);
 		}
 
-		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
+		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
 			var userRolesRepo = serviceProvider.GetService<IUserRolesRepo>();
-			return userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, CourseId);
+			return userRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRole.CourseAdmin, CourseId);
 		}
 
 		public override bool IsActual()
@@ -1501,9 +1500,9 @@ namespace Database.Models
 			return new NotificationButton("Смотреть детали переноса курса", GetStepikExportProcessUrl(baseUrl));
 		}
 
-		public override List<string> GetRecipientsIds(IServiceProvider serviceProvider)
+		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
-			return new List<string> { Process.OwnerId };
+			return Task.FromResult(new List<string> { Process.OwnerId });
 		}
 
 		public override bool IsActual()

@@ -54,8 +54,8 @@ namespace Ulearn.Web.Api.Controllers
 			
 			count = Math.Min(count, 10000);
 			
-			var instructorIds = userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.Instructor, course.Id);
-			var instructors = usersRepo.GetUsersByIds(instructorIds);
+			var instructorIds = await userRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRole.Instructor, course.Id).ConfigureAwait(false);
+			var instructors = await usersRepo.GetUsersByIdsAsync(instructorIds).ConfigureAwait(false);
 			
 			var exerciseSlides = course.Slides.OfType<ExerciseSlide>().ToList();
 

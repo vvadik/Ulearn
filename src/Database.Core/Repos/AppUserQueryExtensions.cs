@@ -32,7 +32,7 @@ namespace Database.Repos
 		}
 
 		/* Pass count=0 to disable limiting */
-		public static async Task<List<UserRolesInfo>> GetUserRolesInfo(this IQueryable<ApplicationUser> applicationUsers, int count, UserManager<ApplicationUser> userManager)
+		public static async Task<List<UserRolesInfo>> GetUserRolesInfoAsync(this IQueryable<ApplicationUser> applicationUsers, int count, UserManager<ApplicationUser> userManager)
 		{
 			IQueryable<ApplicationUser> users = applicationUsers.OrderBy(u => u.UserName);
 			if (count > 0)

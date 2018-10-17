@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 namespace Database.Repos
 {
 	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
-	
 	public class UserRolesRepo : IUserRolesRepo
 	{
 		private readonly UlearnDb db;
@@ -27,7 +26,7 @@ namespace Database.Repos
 
 		public async Task<bool> ToggleRoleAsync(string courseId, string userId, CourseRole role)
 		{
-			var userRole = db.UserRoles.FirstOrDefault(u => u.UserId == userId && u.Role == role && u.CourseId == courseId);
+			var userRole = await db.UserRoles.FirstOrDefaultAsync(u => u.UserId == userId && u.Role == role && u.CourseId == courseId).ConfigureAwait(false);
 			if (userRole == null)
 				db.UserRoles.Add(new UserRole
 				{
@@ -42,30 +41,30 @@ namespace Database.Repos
 			return userRole == null;
 		}
 
-		public List<string> GetListOfUsersWithCourseRole(CourseRole? courseRole, string courseId, bool includeHighRoles = false)
+		public Task<List<string>> GetListOfUsersWithCourseRoleAsync(CourseRole? courseRole, string courseId, bool includeHighRoles=false)
 		{
 			if (!courseRole.HasValue)
 				return null;
 
-			var usersQuery = (IQueryable<UserRole>)db.UserRoles;
-			usersQuery = includeHighRoles
-				? usersQuery.Where(userRole => userRole.Role <= courseRole)
-				: usersQuery.Where(userRole => userRole.Role == courseRole);
+			var userRoles = db.UserRoles.AsQueryable();
+			userRoles = includeHighRoles
+				? userRoles.Where(userRole => userRole.Role <= courseRole)
+				: userRoles.Where(userRole => userRole.Role == courseRole);
 
 			if (!string.IsNullOrEmpty(courseId))
-				usersQuery = usersQuery.Where(userRole => userRole.CourseId == courseId);
-			return usersQuery.Select(user => user.UserId).Distinct().ToList();
+				userRoles = userRoles.Where(userRole => userRole.CourseId == courseId);
+			return userRoles.Select(user => user.UserId).Distinct().ToListAsync();
 		}
 		
-		public List<string> GetListOfUsersByPrivilege(bool onlyPrivileged, string courseId)
+		public Task<List<string>> GetListOfUsersByPrivilegeAsync(bool onlyPrivileged, string courseId)
 		{
 			if (!onlyPrivileged)
 				return null;
 
-			IQueryable<UserRole> usersQuery = db.UserRoles;
+			var userRoles = db.UserRoles.AsQueryable();
 			if (courseId != null)
-				usersQuery = usersQuery.Where(userRole => userRole.CourseId == courseId);
-			return usersQuery.Select(userRole => userRole.UserId).Distinct().ToList();
+				userRoles = userRoles.Where(userRole => userRole.CourseId == courseId);
+			return userRoles.Select(userRole => userRole.UserId).Distinct().ToListAsync();
 		}
 
 		public Task<bool> HasUserAccessToCourseAsync(string userId, string courseId, CourseRole minCourseRole)

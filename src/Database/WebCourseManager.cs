@@ -29,7 +29,7 @@ namespace Database
 			{
 				course = base.GetCourse(courseId);
 			}
-			catch (KeyNotFoundException)
+			catch (Exception e) when (e is KeyNotFoundException || e is CourseNotFoundException)
 			{
 				course = null;
 			}
