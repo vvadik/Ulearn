@@ -60,7 +60,7 @@ namespace uLearn.Web.Kontur.Passport
 				var userClaims = authenticationResult.UserClaims.ToList();
 				log.Info($"Received follow user claims from Kontur.Passport server: {string.Join(", ", userClaims.Select(c => c.Type + ": " + c.Value))}");
 				var name = userClaims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
-				var sid = userClaims.FirstOrDefault(c => c.Type == ClaimTypes.Sid)?.Value;
+				var sid = userClaims.FirstOrDefault(c => c.Type == KonturPassportConstants.SidClaimType)?.Value;
 				var email = userClaims.FirstOrDefault(c => c.Type == KonturPassportConstants.EmailClaimType)?.Value;
 				var avatarUrl = userClaims.FirstOrDefault(c => c.Type == KonturPassportConstants.AvatarUrlClaimType)?.Value;
 				var realNameParts = userClaims.FirstOrDefault(c => c.Type == KonturPassportConstants.NameClaimType)?.Value.Split(' ');
