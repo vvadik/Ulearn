@@ -81,9 +81,13 @@ namespace Database.Repos.Groups
 
 		public async Task<GroupMember> RemoveUserFromGroupAsync(int groupId, string userId)
 		{
+			logger.Information($"Удаляю пользователя {userId} из группы {groupId}");
+			
 			var member = db.GroupMembers.FirstOrDefault(m => m.GroupId == groupId && m.UserId == userId);
 			if (member != null)
 				db.GroupMembers.Remove(member);
+			else
+				logger.Information($"Пользователь {userId} не состоит в группе {groupId}");
 
 			await db.SaveChangesAsync().ConfigureAwait(false);
 			
@@ -92,6 +96,8 @@ namespace Database.Repos.Groups
 		
 		public async Task<List<GroupMember>> RemoveUsersFromGroupAsync(int groupId, List<string> userIds)
 		{
+			logger.Information($"Удаляю пользователей {string.Join(", ", userIds)} из группы {groupId}");
+			
 			var members = db.GroupMembers.Where(m => m.GroupId == groupId && userIds.Contains(m.UserId)).ToList();
 			db.GroupMembers.RemoveRange(members);
 

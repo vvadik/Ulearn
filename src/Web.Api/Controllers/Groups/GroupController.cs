@@ -246,6 +246,25 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		}
 
 		/// <summary>
+		/// Удалить студентов из группы
+		/// </summary>
+		[HttpDelete("students")]
+		public async Task<IActionResult> RemoveStudents(int groupId, RemoveStudentsParameters parameters)
+		{
+			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
+
+			var members = await groupMembersRepo.RemoveUsersFromGroupAsync(groupId, parameters.UserIds).ConfigureAwait(false);
+			
+			await notificationsRepo.AddNotificationAsync(
+				group.CourseId,
+				new GroupMembersHaveBeenRemovedNotification(group.Id, parameters.UserIds, usersRepo),
+				UserId
+			).ConfigureAwait(false);
+
+			return Ok(new SuccessResponse($"{members.Count} students have been removed from group {group.Id}"));
+		}
+
+		/// <summary>
 		/// Список доступов к группе
 		/// </summary>
 		[HttpGet("accesses")]
