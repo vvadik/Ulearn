@@ -265,6 +265,31 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		}
 
 		/// <summary>
+		/// Копирует студентов из одной группы в другую
+		/// </summary>
+		[HttpPost("students/copy/to/{destinationGroupId}")]
+		public async Task<IActionResult> CopyStudents(int groupId, int destinationGroupId, CopyStudentsParameters parameters)
+		{
+			var destinationGroup = await groupsRepo.FindGroupByIdAsync(destinationGroupId).ConfigureAwait(false);
+			if (destinationGroup == null)
+				return NotFound(new ErrorResponse($"Group {destinationGroupId} not found"));
+			
+			var isDestinationGroupAvailable = await groupAccessesRepo.IsGroupAvailableForUserAsync(destinationGroup, User).ConfigureAwait(false);
+			if (!isDestinationGroupAvailable)
+				return StatusCode((int) HttpStatusCode.Forbidden, new ErrorResponse($"You have no access to group {destinationGroupId}"));
+
+			var newMembers = await groupMembersRepo.CopyUsersFromOneGroupToAnotherAsync(groupId, destinationGroupId, parameters.UserIds).ConfigureAwait(false);
+			
+			await notificationsRepo.AddNotificationAsync(
+				destinationGroup.CourseId,
+				new GroupMembersHaveBeenAddedNotification(destinationGroupId, parameters.UserIds, usersRepo),
+				UserId
+			).ConfigureAwait(false);
+			
+			return Ok(new SuccessResponse($"{newMembers.Count} students have been copied from group {groupId} to group {destinationGroupId}"));
+		}
+
+		/// <summary>
 		/// Список доступов к группе
 		/// </summary>
 		[HttpGet("accesses")]

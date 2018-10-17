@@ -108,6 +108,8 @@ namespace Database.Repos.Groups
 		
 		public async Task<List<GroupMember>> CopyUsersFromOneGroupToAnotherAsync(int fromGroupId, int toGroupId, List<string> userIds)
 		{
+			logger.Information($"Копирую пользователей {string.Join(", ", userIds)} из группы {fromGroupId} в группу {toGroupId}");
+			
 			var membersUserIds = db.GroupMembers.Where(m => m.GroupId == fromGroupId && userIds.Contains(m.UserId)).Select(m => m.UserId).ToList();
 			var newMembers = new List<GroupMember>();
 			foreach (var memberUserId in membersUserIds)
