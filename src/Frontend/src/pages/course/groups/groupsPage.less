@@ -109,7 +109,6 @@ button {
   width: 100%;
   padding: 15px 0;
   transition: 0.3s ease-in;
-  transform: scale(1);
   margin-bottom: 20px;
   position: relative;
   border-bottom: 1px solid rgba(0, 0, 0, 0.15);
@@ -123,7 +122,7 @@ button {
   cursor: pointer;
 
   &:hover {
-	transform: scale(1.04);
+	box-shadow: 5px 4px 10px 0px rgba(20, 23, 28, 0.1);
   }
 
   &::before,
@@ -190,4 +189,8 @@ button {
 
 .group-action {
   justify-self: end;
+}
+
+.modal {
+  width: 50%;
 }

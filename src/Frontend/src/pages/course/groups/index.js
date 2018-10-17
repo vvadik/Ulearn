@@ -1,11 +1,13 @@
 import React, { Component } from "react";
 import api from "../../../api";
+import PropTypes from 'prop-types';
 import Loader from "@skbkontur/react-ui/components/Loader/Loader";
-import Button from "@skbkontur/react-ui/components/Button/Button";
-import Tabs from "@skbkontur/react-ui/components/Tabs/Tabs";
 import Input from "@skbkontur/react-ui/components/Input/Input";
 import Icon from "@skbkontur/react-ui/components/Icon/Icon";
-import GroupContainer from "./GroupContainer";
+import GroupInfo from "./GroupInfo";
+import GroupHeader from "./GroupHeader";
+// import GroupsSettingsPage from "./GroupSettingsPage";
+
 
 import "./groupsPage.less";
 
@@ -19,7 +21,7 @@ class GroupsPage extends AbstractPage {
 		this.state = {
 			loading: true,
 			groups: [],
-			filter: "active"
+			filter: "active",
 		}
 	};
 
@@ -43,16 +45,18 @@ class GroupsPage extends AbstractPage {
 	render() {
 		return (
 			<React.Fragment>
-				<GroupHeader 
+				<GroupHeader
 					onTabClick={this.onTabClick}
 					filter={this.state.filter}
+					openModal={this.openModal}
+					closeModal={this.closeModal}
 				/>
-				<GroupsWrapper
-					loading = {this.state.loading}
-					groups = {this.filteredGroups}
+				<GroupsList
+					loading={this.state.loading}
+					groups={this.filteredGroups}
 				/>
 			</React.Fragment>
-			)
+		)
 	};
 
 	get filteredGroups() {
@@ -66,39 +70,15 @@ class GroupsPage extends AbstractPage {
 	};
 }
 
+GroupsPage.propTypes = {
+	history: PropTypes.object,
+	location: PropTypes.object,
+	match: PropTypes.object
+};
+
 export default GroupsPage;
 
-class GroupHeader extends Component {
-	constructor() {
-		super();
-	};
-
-	onChange = (_, v) => {
-		this.props.onTabClick(v);
-	};
-
-	render() {
-		return (
-			<div className="group-header">
-				<div className="group-header-container">
-					<h2>Группы</h2>
-					<div className="buttons-container">
-						<Button use="primary" size="medium">Создать группу</Button>
-						<Button use="default" size="medium">Скопировать группу</Button>
-					</div>
-				</div>
-				<div className="tabs-container">
-					<Tabs  value={this.props.filter} onChange={this.onChange}>
-						<Tabs.Tab id="active">Активные</Tabs.Tab>
-						<Tabs.Tab id="archived">Архивные</Tabs.Tab>
-					</Tabs>
-				</div>
-			</div>
-		)
-	}
-}
-
-class GroupsWrapper extends Component {
+class GroupsList extends Component {
 
 	render() {
 		if (this.props.loading) {
@@ -108,9 +88,9 @@ class GroupsWrapper extends Component {
 		}
 		return (
 			<div className="groups-wrapper">
-				<Input className="search-field" placeholder="найти группу" leftIcon={<Icon name="Search" />} />
+				<Input className="search-field" placeholder="Начните вводить название группы" leftIcon={<Icon name="Search" />} />
 				{ this.props.groups.map(group =>
-					<GroupContainer
+					<GroupInfo
 						key={group.id}
 						group={group}
 					/>) }
@@ -118,3 +98,8 @@ class GroupsWrapper extends Component {
 		);
 	}
 }
+
+GroupsList.propTypes = {
+	groups: PropTypes.array,
+	loading: PropTypes.bool
+};

@@ -1,18 +1,19 @@
-import {Component} from "react";
-import {getPluralForm} from "../../../utils/getPluralForm";
+import { Component } from "react";
+import PropTypes from 'prop-types';
+import { getPluralForm } from "../../../utils/getPluralForm";
 import Icon from "@skbkontur/react-ui/components/Icon/Icon";
 import Kebab from "@skbkontur/react-ui/components/Kebab/Kebab";
 import MenuItem from "@skbkontur/react-ui/components/MenuItem/MenuItem";
 import React from "react";
 
-class GroupContainer extends Component {
+class GroupInfo extends Component {
 
 	render() {
 		const { group } = this.props;
 		if (!group) {
 			return null;
 		}
-		
+
 		const studentsCount = group.students_count || 0;
 		const pluralFormOfStudents = getPluralForm(studentsCount, 'студент', 'студента', 'студентов');
 		const owner = group.owner.visible_name || 'Неизвестный';
@@ -25,31 +26,47 @@ class GroupContainer extends Component {
 				<div className="group-content">
 					<h3 className="group-content__name">{ groupName }</h3>
 					<div className="group-content__count">
-						{ `${studentsCount} ${pluralFormOfStudents}` }
+						{studentsCount} {pluralFormOfStudents}
 					</div>
 					<div className="group-content__teachers">
 						Преподаватели: { teachers.join(', ') }
 					</div>
 					<div className="group-content__state">
-						<div className="group-content__state_on">
-							<Icon name={"Ok"}/>
-							Ведомость включена
-						</div>
-						<div className="group-content__state_off">
-							<Icon name={"Delete"}/>
-							Код-ревью выключено
-						</div>
+						{ this.renderSetting(group.can_users_see_group_progress, true) }
+						{ this.renderSetting(group.is_manual_checking_enabled, false) }
 					</div>
 				</div>
 				<div className="group-action">
-					<Kebab size={"large"}>
-						<MenuItem icon={"ArchiveUnpack"}>Архивировать</MenuItem>
-						<MenuItem icon={"Delete"}>Удалить</MenuItem>
+					<Kebab size="large">
+						<MenuItem icon="ArchiveUnpack">Архивировать</MenuItem>
+						<MenuItem icon="Delete">Удалить</MenuItem>
 					</Kebab>
 				</div>
 			</div>
 		)
 	}
+
+	renderSetting(enabled, isProgress) {
+		if (enabled) {
+			return (
+			<div className="group-content__state_on">
+				<Icon name="Ok"/>
+				{isProgress ? 'Ведомость включена' : 'Код-ревью включено'}
+			</div>
+			)
+		} else {
+			return (
+			<div className="group-content__state_off">
+				<Icon name="Delete"/>
+				{isProgress ? 'Ведомость выключена' : 'Код-ревью выключено'}
+			</div>
+			)
+		}
+	}
 }
 
-export default GroupContainer;
+GroupInfo.propTypes = {
+	group: PropTypes.object.isRequired
+};
+
+export default GroupInfo;
