@@ -100,7 +100,7 @@ namespace uLearn.Web
 	public class ServeStaticFileForEveryNonAjaxRequest : ActionFilterAttribute
 	{
 		private readonly List<string> excludedPrefixes;
-		private byte[] content;
+		private readonly byte[] content;
 		
 		public ServeStaticFileForEveryNonAjaxRequest(FileInfo file, List<string> excludedPrefixes)
 		{
@@ -129,8 +129,10 @@ namespace uLearn.Web
 					return;
 			
 			var acceptHeader = httpContext.Request.Headers["Accept"] ?? "";
+			var cspHeader = WebConfigurationManager.AppSettings["ulearn.web.cspHeader"] ?? "";
 			if (acceptHeader.Contains("text/html") && httpContext.Request.HttpMethod == "GET")
 			{
+				filterContext.HttpContext.Response.Headers.Add("Content-Security-Policy-Report-Only", cspHeader);
 				filterContext.Result = new FileContentResult(content, "text/html");
 			}
 		}

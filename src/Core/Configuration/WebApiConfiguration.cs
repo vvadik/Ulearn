@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Runtime.Serialization;
-using Telegram.Bot.Requests;
+﻿using System.Runtime.Serialization;
 using uLearn.Configuration;
 
 /* Move it to Web.Api.Configuration after disabling Ulearn.Web. Now it's here because Ulearn.Web should know about CookieKeyRingDirectory */
