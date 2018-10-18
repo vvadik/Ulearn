@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -58,8 +59,8 @@ namespace Ulearn.Web.Api.Controllers.Groups
 				return;
 			}
 
-			var isAvailable = await groupAccessesRepo.IsGroupAvailableForUserAsync(group, User).ConfigureAwait(false);
-			if (!isAvailable)
+			var isVisible = await groupAccessesRepo.IsGroupVisibleForUserAsync(group, User).ConfigureAwait(false);
+			if (!isVisible)
 			{
 				context.Result = StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse("You have no access to this group"));
 				return;
@@ -201,7 +202,6 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// </summary>
 		[HttpPost("students/{studentId:guid}")]
 		[SwaggerResponse((int) HttpStatusCode.NotFound, Description = "Can't find user")]
-		[ProducesResponseType((int) HttpStatusCode.Conflict)]
 		[SwaggerResponse((int) HttpStatusCode.Conflict, Description = "User is already a student of this group")]
 		public async Task<IActionResult> AddStudent(int groupId, string studentId)
 		{
@@ -265,17 +265,17 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		}
 
 		/// <summary>
-		/// Копирует студентов из одной группы в другую
+		/// Скопировать студентов из одной группы в другую
 		/// </summary>
-		[HttpPost("students/copy/to/{destinationGroupId}")]
+		[HttpPost("students/copy/to/{destinationGroupId:int:min(0)}")]
 		public async Task<IActionResult> CopyStudents(int groupId, int destinationGroupId, CopyStudentsParameters parameters)
 		{
 			var destinationGroup = await groupsRepo.FindGroupByIdAsync(destinationGroupId).ConfigureAwait(false);
 			if (destinationGroup == null)
 				return NotFound(new ErrorResponse($"Group {destinationGroupId} not found"));
 			
-			var isDestinationGroupAvailable = await groupAccessesRepo.IsGroupAvailableForUserAsync(destinationGroup, User).ConfigureAwait(false);
-			if (!isDestinationGroupAvailable)
+			var isDestinationGroupVisible = await groupAccessesRepo.IsGroupVisibleForUserAsync(destinationGroup, User).ConfigureAwait(false);
+			if (!isDestinationGroupVisible)
 				return StatusCode((int) HttpStatusCode.Forbidden, new ErrorResponse($"You have no access to group {destinationGroupId}"));
 
 			var newMembers = await groupMembersRepo.CopyUsersFromOneGroupToAnotherAsync(groupId, destinationGroupId, parameters.UserIds).ConfigureAwait(false);
@@ -300,6 +300,57 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			{
 				Accesses = accesses.Select(BuildGroupAccessesInfo).ToList()
 			};
+		}
+
+		/// <summary>
+		/// Выдать доступ к группе
+		/// </summary>
+		[HttpPost("accesses/{userId:guid}")]
+		[SwaggerResponse((int) HttpStatusCode.Conflict, "User already has access to group")]
+		/* TODO (andgein): We don't check that userId is Instructor of course. Should we check it? Or no? */
+		public async Task<IActionResult> GrantAccess(int groupId, string userId)
+		{
+			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
+			
+			var user = await usersRepo.FindUserByIdAsync(userId).ConfigureAwait(false);
+			if (user == null)
+				return NotFound(new ErrorResponse($"User {userId} not found"));
+
+			var alreadyHasAccess = await groupAccessesRepo.HasUserAccessToGroupAsync(groupId, userId).ConfigureAwait(false);
+			if (alreadyHasAccess)
+				return Conflict(new ErrorResponse($"User {userId} already has access to group {groupId}"));
+
+			var access = await groupAccessesRepo.GrantAccessAsync(groupId, userId, GroupAccessType.FullAccess, UserId).ConfigureAwait(false);
+			await notificationsRepo.AddNotificationAsync(group.CourseId, new GrantedAccessToGroupNotification { AccessId = access.Id }, UserId).ConfigureAwait(false);
+			
+			return Ok(new SuccessResponse($"User {userId} has full access to {groupId}"));
+		}
+
+		/// <summary>
+		/// Отозвать доступ к группе
+		/// </summary>
+		[HttpDelete("accesses/{userId:guid}")]
+		public async Task<IActionResult> RevokeAccess(int groupId, string userId)
+		{
+			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
+			
+			var canRevokeAccess = await groupAccessesRepo.CanRevokeAccessAsync(groupId, userId, User).ConfigureAwait(false);
+			if (!canRevokeAccess)
+				return Forbid();
+
+			var hasAccess = await groupAccessesRepo.HasUserAccessToGroupAsync(groupId, userId).ConfigureAwait(false);
+			if (!hasAccess)
+				return NotFound(new ErrorResponse($"User {userId} has no access to group {groupId}"));
+
+			var accesses = await groupAccessesRepo.RevokeAccessAsync(groupId, userId).ConfigureAwait(false);
+			foreach (var access in accesses)
+				await notificationsRepo.AddNotificationAsync(
+					group.CourseId,
+					new RevokedAccessToGroupNotification { AccessId = access.Id },
+					UserId
+				).ConfigureAwait(false);
+
+			return Ok(new SuccessResponse($"User {userId} has no access to {groupId}"));
 		}
 	}
 }
