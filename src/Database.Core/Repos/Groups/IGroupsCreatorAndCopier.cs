@@ -15,6 +15,6 @@ namespace Database.Repos.Groups
 			bool defaultProhibitFurtherReview=true,
 			bool isInviteLinkEnabled=true);
 
-		Task<Group> CopyGroupAsync(Group group, string courseId, string newOwnerId="");
+		Task<Group> CopyGroupAsync(Group group, string courseId, string newOwnerId=null);
 	}
 }

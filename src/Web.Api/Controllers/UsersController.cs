@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
@@ -26,13 +27,13 @@ namespace Ulearn.Web.Api.Controllers
 
 		[HttpGet("{courseId}/instructors")]
 		[Authorize(Policy = "Instructors")]
-		public ActionResult<InstructorsListResponse> InstructorsList(Course course)
+		public async Task<ActionResult<InstructorsListResponse>> InstructorsList(Course course)
 		{
 			if (course == null)
 				return NotFound();
 					
-			var instructorIds = userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.Instructor, course.Id);
-			var instructors = usersRepo.GetUsersByIds(instructorIds);
+			var instructorIds = await userRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRole.Instructor, course.Id).ConfigureAwait(false);
+			var instructors = await usersRepo.GetUsersByIdsAsync(instructorIds).ConfigureAwait(false);
 			return new InstructorsListResponse
 			{
 				Instructors = instructors.Select(i => BuildShortUserInfo(i, discloseLogin: true)).ToList()

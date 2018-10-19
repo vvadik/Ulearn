@@ -62,7 +62,7 @@ namespace Ulearn.Web.Api.Models.Binders
 				throw new ArgumentNullException(nameof(context));
 			}
 
-			if (context.Metadata.ModelType == typeof(Course))
+			if (context.Metadata.ModelType == typeof(Course) || context.Metadata.ModelType == typeof(ICourse))
 			{
 				return new BinderTypeModelBinder(typeof(CourseBinder));
 			}

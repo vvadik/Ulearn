@@ -13,11 +13,12 @@ namespace Database.Repos.Groups
 		Task<List<GroupAccess>> RevokeAccessAsync(int groupId, string userId);
 		Task<List<GroupAccess>> GetGroupAccessesAsync(int groupId);
 		Task<DefaultDictionary<int, List<GroupAccess>>> GetGroupAccessesAsync(IEnumerable<int> groupsIds);
-		Task<bool> IsGroupAvailableForUserAsync(int groupId, ClaimsPrincipal user);
-		Task<bool> IsGroupAvailableForUserAsync(Group group, ClaimsPrincipal user);
+		Task<bool> IsGroupVisibleForUserAsync(int groupId, ClaimsPrincipal user);
+		Task<bool> IsGroupVisibleForUserAsync(Group group, ClaimsPrincipal user);
 		Task<List<Group>> GetAvailableForUserGroupsAsync(string courseId, ClaimsPrincipal user, bool onlyArchived=false);
 		Task<List<Group>> GetAvailableForUserGroupsAsync(List<string> coursesIds, ClaimsPrincipal user, bool onlyArchived=false);
 		Task<bool> CanInstructorViewStudentAsync(ClaimsPrincipal instructor, string studentId);
 		Task<List<string>> GetCoursesWhereUserCanSeeAllGroupsAsync(ClaimsPrincipal user, IEnumerable<string> coursesIds);
+		Task<bool> HasUserAccessToGroupAsync(int groupId, string userId);
 	}
 }

@@ -35,7 +35,7 @@ namespace Database.Repos
 		}
 
 		/* Pass limit=0 to disable limiting */
-		public Task<List<UserRolesInfo>> FindUsers(UserSearchQuery query, int limit=100)
+		public async Task<List<UserRolesInfo>> FindUsers(UserSearchQuery query, int limit=100)
 		{
 			var role = db.Roles.FirstOrDefault(r => r.Name == query.Role);
 			var users = db.Users.Where(u => !u.IsDeleted);
@@ -44,13 +44,13 @@ namespace Database.Repos
 				var usersIds = GetUsersByNamePrefix(query.NamePrefix).Select(u => u.Id);
 				users = users.Where(u => usersIds.Contains(u.Id));
 			}
-			return users
+			return await users
 				.FilterByRole(role, userManager)
 				.FilterByUserIds(
-					userRolesRepo.GetListOfUsersWithCourseRole(query.CourseRole, query.CourseId, query.IncludeHighCourseRoles),
-					userRolesRepo.GetListOfUsersByPrivilege(query.OnlyPrivileged, query.CourseId)
+					await userRolesRepo.GetListOfUsersWithCourseRoleAsync(query.CourseRole, query.CourseId, query.IncludeHighCourseRoles).ConfigureAwait(false),
+					await userRolesRepo.GetListOfUsersByPrivilegeAsync(query.OnlyPrivileged, query.CourseId).ConfigureAwait(false)
 				)
-				.GetUserRolesInfo(limit, userManager);
+				.GetUserRolesInfoAsync(limit, userManager).ConfigureAwait(false);
 		}
 
 		public List<string> FilterUsersByNamePrefix(string namePrefix)
@@ -60,21 +60,23 @@ namespace Database.Repos
 		}
 
 		/* Pass limit=0 to disable limiting */
-		public Task<List<UserRolesInfo>> GetCourseInstructors(string courseId, int limit = 50)
+		public async Task<List<UserRolesInfo>> GetCourseInstructorsAsync(string courseId, int limit = 50)
 		{
-			return db.Users
+			return await db.Users
 				.Where(u => !u.IsDeleted)
-				.FilterByUserIds(userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.Instructor, courseId, includeHighRoles: true))
-				.GetUserRolesInfo(limit, userManager);
+				.FilterByUserIds(await userRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRole.Instructor, courseId, includeHighRoles: true).ConfigureAwait(false))
+				.GetUserRolesInfoAsync(limit, userManager)
+				.ConfigureAwait(false);
 		}
 
 		/* Pass limit=0 to disable limiting */
-		public Task<List<UserRolesInfo>> GetCourseAdmins(string courseId, int limit = 50)
+		public async Task<List<UserRolesInfo>> GetCourseAdminsAsync(string courseId, int limit = 50)
 		{
-			return db.Users
+			return await db.Users
 				.Where(u => !u.IsDeleted)	
-				.FilterByUserIds(userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, courseId, includeHighRoles: true))
-				.GetUserRolesInfo(limit, userManager);
+				.FilterByUserIds(await userRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRole.CourseAdmin, courseId, includeHighRoles: true).ConfigureAwait(false))
+				.GetUserRolesInfoAsync(limit, userManager)
+				.ConfigureAwait(false);
 		}
 
 		public async Task<List<string>> GetSysAdminsIdsAsync()
@@ -169,9 +171,9 @@ namespace Database.Repos
 			return db.Users.Where(u => (u.UserName == usernameOrEmail || u.Email == usernameOrEmail) && ! u.IsDeleted).ToList();
 		}
 
-		public IEnumerable<ApplicationUser> GetUsersByIds(IEnumerable<string> usersIds)
+		public Task<List<ApplicationUser>> GetUsersByIdsAsync(IEnumerable<string> usersIds)
 		{
-			return db.Users.Where(u => usersIds.Contains(u.Id) && ! u.IsDeleted);
+			return db.Users.Where(u => usersIds.Contains(u.Id) && ! u.IsDeleted).ToListAsync();
 		}
 		
 		public Task DeleteUserAsync(ApplicationUser user)

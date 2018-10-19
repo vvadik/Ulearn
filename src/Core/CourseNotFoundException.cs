@@ -1,7 +1,6 @@
 using System;
-using System.Runtime.Serialization;
 
-namespace Database
+namespace uLearn
 {
 	public class CourseNotFoundException : Exception
 	{

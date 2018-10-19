@@ -101,13 +101,23 @@ namespace Database.Repos.Groups
 				.ToDefaultDictionary();
 		}
 		
-		public async Task<bool> IsGroupAvailableForUserAsync(int groupId, ClaimsPrincipal user)
+		public async Task<bool> HasUserAccessToGroupAsync(int groupId, string userId)
 		{
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false) ?? throw new ArgumentNullException($"Can't find group with id={groupId}");
-			return await IsGroupAvailableForUserAsync(group, user).ConfigureAwait(false);
+			
+			if (group.OwnerId == userId)
+				return true;
+
+			return await db.GroupAccesses.Where(a => a.GroupId == groupId && a.UserId == userId && a.IsEnabled).AnyAsync().ConfigureAwait(false);
+		}
+		
+		public async Task<bool> IsGroupVisibleForUserAsync(int groupId, ClaimsPrincipal user)
+		{
+			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false) ?? throw new ArgumentNullException($"Can't find group with id={groupId}");
+			return await IsGroupVisibleForUserAsync(group, user).ConfigureAwait(false);
 		}
 
-		public async Task<bool> IsGroupAvailableForUserAsync(Group group, ClaimsPrincipal user)
+		public async Task<bool> IsGroupVisibleForUserAsync(Group group, ClaimsPrincipal user)
 		{
 			/* Course admins and other privileged users can see all groups in the course */
 			if (await CanUserSeeAllCourseGroupsAsync(user, group.CourseId).ConfigureAwait(false))
@@ -116,11 +126,7 @@ namespace Database.Repos.Groups
 			if (!user.HasAccessFor(group.CourseId, CourseRole.Instructor))
 				return false;
 
-			var userId = user.GetUserId();
-			var hasAccess = db.GroupAccesses.Any(a => a.UserId == userId && a.GroupId == group.Id && a.IsEnabled);
-			
-			/* Group is not deleted, user is group's owner or has access to this group */
-			return !group.IsDeleted && (group.OwnerId == userId || hasAccess);
+			return await HasUserAccessToGroupAsync(group.Id, user.GetUserId()).ConfigureAwait(false);
 		}
 
 		public Task<List<Group>> GetAvailableForUserGroupsAsync(string courseId, ClaimsPrincipal user, bool onlyArchived=false)
@@ -179,7 +185,7 @@ namespace Database.Repos.Groups
 
 			return result;
 		}
-		
+
 		private async Task<bool> CanUserSeeAllCourseGroupsAsync(ClaimsPrincipal user, string courseId)
 		{
 			var userId = user.GetUserId();

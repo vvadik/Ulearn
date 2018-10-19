@@ -32,7 +32,7 @@ namespace Database.Repos
 		IEnumerable<string> GetUsersVisitedAllSlides(IImmutableSet<Guid> slidesIds, DateTime periodStart, DateTime periodFinish, IEnumerable<string> usersIds = null);
 		IEnumerable<string> GetUsersVisitedAllSlides(VisitsFilterOptions options);
 		HashSet<string> GetUserCourses(string userId);
-		List<string> GetCourseUsers(string courseId);
+		Task<List<string>> GetCourseUsersAsync(string courseId);
 		List<RatingEntry> GetCourseRating(string courseId, int minScore);
 	}
 }

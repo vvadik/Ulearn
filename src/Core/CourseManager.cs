@@ -78,10 +78,15 @@ namespace uLearn
 			{
 				return GetCourse(courseId);
 			}
-			catch (KeyNotFoundException)
+			catch (Exception e) when (e is KeyNotFoundException || e is CourseNotFoundException) 
 			{
 				return null;
 			}
+		}
+
+		public bool HasCourse(string courseId)
+		{
+			return FindCourse(courseId) != null;
 		}
 
 		public Course GetVersion(Guid versionId)

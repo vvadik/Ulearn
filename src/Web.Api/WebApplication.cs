@@ -118,7 +118,7 @@ namespace Ulearn.Web.Api
                 .Build();
         }
 
-		private void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment, Logger logger, WebApiConfiguration configuration)
+		private void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment, ILogger logger, WebApiConfiguration configuration)
 		{
 			/* TODO (andgein): use UlearnDbFactory here */
 			services.AddDbContextPool<UlearnDb>(
@@ -136,10 +136,10 @@ namespace Ulearn.Web.Api
 			/* Add CORS */
 			services.AddCors();
 
-			ConfigureAuthServices(services, configuration, logger);
+			ConfigureAuthServices(services, configuration);
 		}
 
-		private static void ConfigureMvc(IServiceCollection services)
+		public static void ConfigureMvc(IServiceCollection services)
 		{
 			/* Asp.NET Core MVC */
 			services.AddMvc(options =>
@@ -192,7 +192,7 @@ namespace Ulearn.Web.Api
 					{ "Bearer", new string [] {} }
 				});
 				
-				/* Se https://docs.microsoft.com/ru-ru/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-2.1&tabs=visual-studio%2Cvisual-studio-xml for details */ 
+				/* See https://docs.microsoft.com/ru-ru/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-2.1&tabs=visual-studio%2Cvisual-studio-xml for details */ 
 				var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
 				var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
 				c.IncludeXmlComments(xmlPath);
@@ -201,11 +201,15 @@ namespace Ulearn.Web.Api
 			services.AddSwaggerExamplesFromAssemblyOf<ApiResponse>();
 		}
 
-		private static void ConfigureDi(IServiceCollection services, Logger logger)
+		public static void ConfigureDi(IServiceCollection services, ILogger logger)
 		{
-			services.AddSingleton<ILogger>(logger);
+			services.AddSingleton(logger);
 			services.AddSingleton<InitialDataCreator>();
-			services.AddSingleton<WebCourseManager>();
+			
+			var courseManager = new WebCourseManager(logger);
+			services.AddSingleton<WebCourseManager>(courseManager);
+			services.AddSingleton<IWebCourseManager>(courseManager);
+			
 			services.AddScoped<UlearnUserManager>();
 			services.AddScoped<IAuthorizationHandler, CourseRoleAuthorizationHandler>();
 			services.AddScoped<IAuthorizationHandler, CourseAccessAuthorizationHandler>();
@@ -236,7 +240,7 @@ namespace Ulearn.Web.Api
 			services.AddScoped<IQuizzesRepo, QuizzesRepo>();
 		}
 
-		private void ConfigureAuthServices(IServiceCollection services, WebApiConfiguration configuration, Logger logger)
+		public static void ConfigureAuthServices(IServiceCollection services, WebApiConfiguration configuration)
 		{
 			services.AddIdentity<ApplicationUser, IdentityRole>()
 				.AddEntityFrameworkStores<UlearnDb>()

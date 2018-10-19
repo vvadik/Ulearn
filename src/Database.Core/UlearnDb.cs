@@ -25,7 +25,7 @@ namespace Database
 
 		public Task CreateInitialDataAsync(InitialDataCreator creator)
 		{
-			return creator.CreateInitialDataAsync();
+			return creator.CreateAllAsync();
 		}
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -83,6 +83,10 @@ namespace Database
 			modelBuilder.Entity<GroupMembersHaveBeenRemovedNotification>().Property(n => n.GroupId).HasColumnName("GroupId");
 			modelBuilder.Entity<GroupMembersHaveBeenRemovedNotification>().Property(n => n.UserDescriptions).HasColumnName("UserDescriptions");
 			modelBuilder.Entity<GroupMembersHaveBeenRemovedNotification>().Property(n => n.UserIds).HasColumnName("UserIds");
+			
+			modelBuilder.Entity<GroupMembersHaveBeenAddedNotification>().Property(n => n.GroupId).HasColumnName("GroupId");
+			modelBuilder.Entity<GroupMembersHaveBeenAddedNotification>().Property(n => n.UserDescriptions).HasColumnName("UserDescriptions");
+			modelBuilder.Entity<GroupMembersHaveBeenAddedNotification>().Property(n => n.UserIds).HasColumnName("UserIds");
 			
 			
 			modelBuilder.Entity<CommentLike>()

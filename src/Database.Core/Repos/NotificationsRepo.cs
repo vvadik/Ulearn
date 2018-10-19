@@ -243,7 +243,7 @@ namespace Database.Repos
 			{
 				try
 				{
-					CreateDeliveriesForNotification(notification);
+					await CreateDeliveriesForNotification(notification).ConfigureAwait(false);
 				}
 				finally
 				{
@@ -254,7 +254,7 @@ namespace Database.Repos
 			}
 		}
 
-		private void CreateDeliveriesForNotification(Notification notification)
+		private async Task CreateDeliveriesForNotification(Notification notification)
 		{
 			var notificationType = notification.GetNotificationType();
 			logger.Information($"Found new notification {notificationType} #{notification.Id}");
@@ -274,7 +274,7 @@ namespace Database.Repos
 				);
 			}
 
-			var recipientsIds = notification.GetRecipientsIds(serviceProvider);
+			var recipientsIds = await notification.GetRecipientsIdsAsync(serviceProvider).ConfigureAwait(false);
 			logger.Information($"Recipients list for notification {notification.Id}: {recipientsIds.Count} user(s)");
 
 			if (recipientsIds.Count == 0)

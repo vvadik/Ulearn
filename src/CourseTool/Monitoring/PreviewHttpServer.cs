@@ -197,7 +197,7 @@ namespace uLearn.CourseTool.Monitoring
 
 		private byte[] AddNewSlide<TLessonOrQuiz>(HttpRequestEventArgs context, string path, TLessonOrQuiz lessonOrQuiz)
 		{
-			var prevSlide = course.FindSlide(GetSlideIndex(path));
+			var prevSlide = course.FindSlideByIndex(GetSlideIndex(path));
 			if (prevSlide == null)
 			{
 				context.Response.StatusCode = 404;

@@ -11,7 +11,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 {
 	public abstract class BaseGroupController : BaseController
 	{
-		protected BaseGroupController(ILogger logger, WebCourseManager courseManager, UlearnDb db)
+		protected BaseGroupController(ILogger logger, IWebCourseManager courseManager, UlearnDb db)
 			: base(logger, courseManager, db)
 		{
 		}

@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Database.Repos
 {
@@ -231,9 +232,9 @@ namespace Database.Repos
 			return new HashSet<string>(db.Visits.Where(v => v.UserId == userId).Select(v => v.CourseId).Distinct());
 		}
 
-		public List<string> GetCourseUsers(string courseId)
+		public Task<List<string>> GetCourseUsersAsync(string courseId)
 		{
-			return db.Visits.Where(v => v.CourseId == courseId).Select(v => v.UserId).Distinct().ToList();
+			return db.Visits.Where(v => v.CourseId == courseId).Select(v => v.UserId).Distinct().ToListAsync();
 		}
 		
 		public List<RatingEntry> GetCourseRating(string courseId, int minScore)

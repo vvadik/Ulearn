@@ -10,8 +10,8 @@ namespace Database.Repos
 		Task<ApplicationUser> FindUserByIdAsync(string userId);
 		Task<List<UserRolesInfo>> FindUsers(UserSearchQuery query, int limit = 100);
 		List<string> FilterUsersByNamePrefix(string namePrefix);
-		Task<List<UserRolesInfo>> GetCourseInstructors(string courseId, int limit = 50);
-		Task<List<UserRolesInfo>> GetCourseAdmins(string courseId, int limit = 50);
+		Task<List<UserRolesInfo>> GetCourseInstructorsAsync(string courseId, int limit = 50);
+		Task<List<UserRolesInfo>> GetCourseAdminsAsync(string courseId, int limit = 50);
 		Task<List<string>> GetSysAdminsIdsAsync();
 		Task ChangeTelegram(string userId, long chatId, string chatTitle);
 		Task ConfirmEmail(string userId, bool isConfirmed = true);
@@ -21,7 +21,7 @@ namespace Database.Repos
 		string GetUlearnBotUserId();
 		Task CreateUlearnBotUserIfNotExistsAsync();
 		List<ApplicationUser> FindUsersByUsernameOrEmail(string usernameOrEmail);
-		IEnumerable<ApplicationUser> GetUsersByIds(IEnumerable<string> usersIds);
+		Task<List<ApplicationUser>> GetUsersByIdsAsync(IEnumerable<string> usersIds);
 		Task DeleteUserAsync(ApplicationUser user);
 	}
 }

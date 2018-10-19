@@ -11,7 +11,7 @@ using uLearn;
 
 namespace Database
 {
-	public class WebCourseManager : CourseManager
+	public class WebCourseManager : CourseManager, IWebCourseManager
 	{
 		private readonly ILogger logger;
 
