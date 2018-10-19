@@ -7,7 +7,7 @@ using Ulearn.Common.Extensions;
 
 namespace uLearn
 {
-	public class Course
+	public class Course : ICourse
 	{
 		public Course(string id, List<Unit> units, CourseSettings settings, DirectoryInfo directory)
 		{
@@ -67,7 +67,7 @@ namespace uLearn
 		}
 
 		[CanBeNull]
-		public Slide FindSlide(int index)
+		public Slide FindSlideByIndex(int index)
 		{
 			return index >= 0 && index < Slides.Count ? Slides[index] : null;
 		}

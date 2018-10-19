@@ -25,7 +25,7 @@ namespace Database
 
 		public Task CreateInitialDataAsync(InitialDataCreator creator)
 		{
-			return creator.CreateInitialDataAsync();
+			return creator.CreateAllAsync();
 		}
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)

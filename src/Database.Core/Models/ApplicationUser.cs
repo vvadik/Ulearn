@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Identity;
 using uLearn;
 using Ulearn.Common;

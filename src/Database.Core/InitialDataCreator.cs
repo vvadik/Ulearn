@@ -13,6 +13,8 @@ namespace Database
 		private readonly RoleManager<IdentityRole> roleManager;
 		private readonly UlearnUserManager userManager;
 		private readonly IUsersRepo usersRepo;
+		
+		private readonly string sysAdminRole = LmsRoles.SysAdmin.ToString();
 
 		public InitialDataCreator(
 			UlearnDb db,
@@ -27,14 +29,17 @@ namespace Database
 			this.usersRepo = usersRepo;
 		}
 
-		public async Task CreateInitialDataAsync()
+		public async Task CreateRolesAsync()
 		{
-			var sysAdminRole = LmsRoles.SysAdmin.ToString();
 			if (! await db.Roles.AnyAsync(r => r.Name == sysAdminRole).ConfigureAwait(false))
 			{
 				await roleManager.CreateAsync(new IdentityRole(sysAdminRole)).ConfigureAwait(false);
 			}
+			await db.SaveChangesAsync().ConfigureAwait(false);
+		}
 
+		public async Task CreateUsersAsync()
+		{
 			if (! await db.Users.AnyAsync(u => u.UserName == "user").ConfigureAwait(false))
 			{
 				var user = new ApplicationUser { UserName = "user", FirstName = "User", LastName = "" };
@@ -46,10 +51,22 @@ namespace Database
 				await userManager.CreateAsync(user, "fullcontrol").ConfigureAwait(false);
 				await userManager.AddToRoleAsync(user, sysAdminRole).ConfigureAwait(false);
 			}
+			
+			await CreateRolesAsync().ConfigureAwait(false);
+		}
 
+		public async Task CreateUlearnBotUserAsync()
+		{
 			await usersRepo.CreateUlearnBotUserIfNotExistsAsync().ConfigureAwait(false);
 
 			await db.SaveChangesAsync().ConfigureAwait(false);
+		}
+
+		public async Task CreateAllAsync()
+		{
+			await CreateRolesAsync().ConfigureAwait(false);
+			await CreateUsersAsync().ConfigureAwait(false);
+			await CreateUlearnBotUserAsync().ConfigureAwait(false);
 		}
 	}
 }

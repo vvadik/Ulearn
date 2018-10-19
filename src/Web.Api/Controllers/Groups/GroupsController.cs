@@ -8,7 +8,6 @@ using Database.Repos.Groups;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using uLearn;
 using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Models.Parameters.Groups;
@@ -25,7 +24,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		private readonly IGroupAccessesRepo groupAccessesRepo;
 		private readonly IGroupMembersRepo groupMembersRepo;
 
-		public GroupsController(ILogger logger, WebCourseManager courseManager, UlearnDb db,
+		public GroupsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db,
 			IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo)
 			: base(logger, courseManager, db)
 		{
@@ -39,7 +38,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// </summary>
 		[HttpGet("in/{courseId}")]
 		[Authorize(Policy = "Instructors")]
-		public async Task<ActionResult<GroupsListResponse>> GroupsList(Course course, [FromQuery] GroupsListParameters parameters)
+		public async Task<ActionResult<GroupsListResponse>> GroupsList(ICourse course, [FromQuery] GroupsListParameters parameters)
 		{
 			return await GetGroupsListResponseAsync(course, parameters).ConfigureAwait(false);
 		}
@@ -49,12 +48,12 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// </summary>
 		[HttpGet("in/{courseId}/archived")]
 		[Authorize(Policy = "Instructors")]
-		public async Task<ActionResult<GroupsListResponse>> ArchivedGroupsList(Course course, [FromQuery] GroupsListParameters parameters)
+		public async Task<ActionResult<GroupsListResponse>> ArchivedGroupsList(ICourse course, [FromQuery] GroupsListParameters parameters)
 		{
 			return await GetGroupsListResponseAsync(course, parameters, onlyArchived: true).ConfigureAwait(false);
 		}
 		
-		private async Task<GroupsListResponse> GetGroupsListResponseAsync(Course course, GroupsListParameters parameters, bool onlyArchived=false)
+		private async Task<GroupsListResponse> GetGroupsListResponseAsync(ICourse course, GroupsListParameters parameters, bool onlyArchived=false)
 		{
 			var groups = await groupAccessesRepo.GetAvailableForUserGroupsAsync(course.Id, User, onlyArchived).ConfigureAwait(false);
 			/* Order groups by (name, createTime) and get one page of data (offset...offset+count) */

@@ -21,12 +21,12 @@ namespace Ulearn.Web.Api.Controllers
 	public class BaseController : Controller
 	{
 		protected readonly ILogger logger;
-		protected readonly WebCourseManager courseManager;
+		protected readonly IWebCourseManager courseManager;
 		protected readonly UlearnDb db;
 
 		protected string UserId => User.GetUserId();
 
-		public BaseController(ILogger logger, WebCourseManager courseManager, UlearnDb db)
+		public BaseController(ILogger logger, IWebCourseManager courseManager, UlearnDb db)
 		{
 			this.logger = logger ?? throw new ArgumentException(nameof(logger));
 			this.courseManager = courseManager ?? throw new ArgumentException(nameof(courseManager));
