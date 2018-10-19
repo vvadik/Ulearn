@@ -1,17 +1,9 @@
-using System.Security.Claims;
 using System.Threading.Tasks;
-using Database.Models;
-using Database.Repos;
 using Database.Repos.Groups;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using uLearn;
-using Ulearn.Web.Api.Controllers;
 using Ulearn.Web.Api.Controllers.Groups;
 using Ulearn.Web.Api.Models.Parameters.Groups;
 
