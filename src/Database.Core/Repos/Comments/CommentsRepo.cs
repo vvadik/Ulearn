@@ -6,6 +6,8 @@ using Database.Models;
 using Database.Repos.CourseRoles;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
+using Ulearn.Common;
+using Ulearn.Common.Extensions;
 
 namespace Database.Repos.Comments
 {
@@ -61,19 +63,46 @@ namespace Database.Repos.Comments
 			return db.Comments.Where(c => commentIds.Contains(c.Id)).ToListAsync();
 		}
 
+		public async Task<DefaultDictionary<int, List<Comment>>> GetRepliesAsync(IEnumerable<int> commentIds)
+		{
+			var replies = await db.Comments.Where(c => !c.IsDeleted && commentIds.Contains(c.ParentCommentId)).ToListAsync().ConfigureAwait(false);
+			return replies.GroupBy(c => c.ParentCommentId).ToDictionary(g => g.Key, g => g.ToList()).ToDefaultDictionary();
+		}
+
 		public Task<List<Comment>> GetSlideCommentsAsync(string courseId, Guid slideId)
 		{
-			return db.Comments.Where(x => x.SlideId == slideId && !x.IsDeleted).ToListAsync();
+			return db.Comments
+				.Include(c => c.Author)
+				.Where(c => c.SlideId == slideId && !c.IsDeleted)
+				.OrderBy(c => c.PublishTime)
+				.ToListAsync();
+		}
+		
+		public Task<List<Comment>> GetSlideTopLevelCommentsAsync(string courseId, Guid slideId)
+		{
+			return db.Comments
+				.Include(c => c.Author)
+				.Where(c => c.SlideId == slideId && !c.IsDeleted && c.ParentCommentId == -1)
+				.OrderBy(c => c.PublishTime)
+				.ToListAsync();
 		}
 
 		public Task<List<Comment>> GetSlidesCommentsAsync(string courseId, IEnumerable<Guid> slidesIds)
 		{
-			return db.Comments.Where(x => slidesIds.Contains(x.SlideId) && !x.IsDeleted).ToListAsync();
+			return db.Comments
+				.Include(c => c.Author)
+				.Where(c => slidesIds.Contains(c.SlideId) && !c.IsDeleted)
+				.OrderBy(c => c.PublishTime)
+				.ToListAsync();
 		}
 
 		public Task<List<Comment>> GetCourseCommentsAsync(string courseId)
 		{
-			return db.Comments.Where(x => x.CourseId == courseId && !x.IsDeleted).ToListAsync();
+			return db.Comments
+				.Include(c => c.Author)
+				.Where(c => c.CourseId == courseId && !c.IsDeleted)
+				.OrderBy(c => c.PublishTime)
+				.ToListAsync();
 		}
 
 		public async Task<Comment> ModifyCommentAsync(int commentId, Action<Comment> modifyAction)

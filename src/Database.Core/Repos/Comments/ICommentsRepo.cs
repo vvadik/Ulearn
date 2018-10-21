@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Database.Models;
+using Ulearn.Common;
 
 namespace Database.Repos.Comments
 {
@@ -32,5 +33,7 @@ namespace Database.Repos.Comments
 		Task<Comment> PinCommentAsync(int commentId, bool isPinned);
 		Task<Comment> MarkCommentAsCorrectAnswerAsync(int commentId, bool isCorrect = true);
 		Task<bool> IsUserAddedMaxCommentsInLastTimeAsync(string userId, int maxCount, TimeSpan lastTime);
+		Task<DefaultDictionary<int, List<Comment>>> GetRepliesAsync(IEnumerable<int> commentIds);
+		Task<List<Comment>> GetSlideTopLevelCommentsAsync(string courseId, Guid slideId);
 	}
 }

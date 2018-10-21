@@ -112,12 +112,12 @@ namespace Ulearn.Web.Api.Controllers
 			};
 		}		
 
-		protected CommentInfo BuildCommentInfo(Comment comment)
+		protected NotificationCommentInfo BuildCommentInfo(Comment comment)
 		{
 			if (comment == null)
 				return null;
 			
-			return new CommentInfo
+			return new NotificationCommentInfo
 			{
 				Id = comment.Id,
 				CourseId = comment.CourseId,
