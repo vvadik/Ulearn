@@ -3,7 +3,7 @@ using Database.Models;
 
 namespace Database.Repos
 {
-	public interface IConsumersRepo
+	public interface ILtiConsumersRepo
 	{
 		Task<LtiConsumer> FindAsync(string consumerKey);
 	}

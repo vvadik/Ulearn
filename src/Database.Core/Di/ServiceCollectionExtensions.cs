@@ -1,6 +1,7 @@
 using Database.Models;
 using Database.Repos;
 using Database.Repos.Comments;
+using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -48,7 +49,8 @@ namespace Database.Di
 			
 			/* Others */
 			services.AddScoped<IUsersRepo, UsersRepo>();
-			services.AddScoped<IUserRolesRepo, UserRolesRepo>();
+			services.AddScoped<ICourseRolesRepo, CourseRolesRepo>();
+			services.AddScoped<ICourseRoleUsersFilter, CourseRoleUsersFilter>();
 			services.AddScoped<ICoursesRepo, CoursesRepo>();
 			services.AddScoped<ISlideCheckingsRepo, SlideCheckingsRepo>();
 			services.AddScoped<IUserSolutionsRepo, UserSolutionsRepo>();

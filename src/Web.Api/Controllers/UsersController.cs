@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
+using Database.Repos.CourseRoles;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
@@ -15,14 +16,13 @@ namespace Ulearn.Web.Api.Controllers
 	[Route("/users")]
 	public class UsersController : BaseController
 	{
-		private readonly IUsersRepo usersRepo;
-		private readonly IUserRolesRepo userRolesRepo;
+		private readonly ICourseRoleUsersFilter courseRoleUsersFilter;
 
-		public UsersController(ILogger logger, WebCourseManager courseManager, IUsersRepo usersRepo, IUserRolesRepo userRolesRepo, UlearnDb db)
-			: base(logger, courseManager, db)
+		public UsersController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, 
+			IUsersRepo usersRepo, ICourseRoleUsersFilter courseRoleUsersFilter)
+			: base(logger, courseManager, db, usersRepo)
 		{
-			this.usersRepo = usersRepo ?? throw new ArgumentNullException(nameof(usersRepo));
-			this.userRolesRepo = userRolesRepo ?? throw new ArgumentNullException(nameof(userRolesRepo));
+			this.courseRoleUsersFilter = courseRoleUsersFilter ?? throw new ArgumentNullException(nameof(courseRoleUsersFilter));
 		}
 
 		[HttpGet("{courseId}/instructors")]
@@ -32,7 +32,7 @@ namespace Ulearn.Web.Api.Controllers
 			if (course == null)
 				return NotFound();
 					
-			var instructorIds = await userRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRole.Instructor, course.Id).ConfigureAwait(false);
+			var instructorIds = await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, course.Id).ConfigureAwait(false);
 			var instructors = await usersRepo.GetUsersByIdsAsync(instructorIds).ConfigureAwait(false);
 			return new InstructorsListResponse
 			{

@@ -1,5 +1,6 @@
 ﻿using System;
 using Database;
+using Database.Repos;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using uLearn;
@@ -10,8 +11,8 @@ namespace Ulearn.Web.Api.Controllers
 	[Route("/slides")]
 	public class SlidesController : BaseController
 	{
-		public SlidesController(ILogger logger, WebCourseManager courseManager, UlearnDb db)
-			: base(logger, courseManager, db)
+		public SlidesController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo)
+			: base(logger, courseManager, db, usersRepo)
 		{
 		}
 

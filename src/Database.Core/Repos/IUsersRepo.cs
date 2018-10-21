@@ -8,7 +8,7 @@ namespace Database.Repos
 	public interface IUsersRepo
 	{
 		Task<ApplicationUser> FindUserByIdAsync(string userId);
-		Task<List<UserRolesInfo>> FindUsers(UserSearchQuery query, int limit = 100);
+		Task<List<UserRolesInfo>> FindUsers(UserSearchQuery query, int limit=100);
 		List<string> FilterUsersByNamePrefix(string namePrefix);
 		Task<List<UserRolesInfo>> GetCourseInstructorsAsync(string courseId, int limit = 50);
 		Task<List<UserRolesInfo>> GetCourseAdminsAsync(string courseId, int limit = 50);
@@ -23,5 +23,6 @@ namespace Database.Repos
 		List<ApplicationUser> FindUsersByUsernameOrEmail(string usernameOrEmail);
 		Task<List<ApplicationUser>> GetUsersByIdsAsync(IEnumerable<string> usersIds);
 		Task DeleteUserAsync(ApplicationUser user);
+		bool IsSystemAdministrator(ApplicationUser user);
 	}
 }

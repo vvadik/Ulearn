@@ -2,6 +2,7 @@
 using Database.Extensions;
 using Database.Models;
 using Database.Repos;
+using Database.Repos.CourseRoles;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Serilog;
@@ -24,12 +25,14 @@ namespace Ulearn.Web.Api.Authorization
 	{
 		private readonly ILogger logger;
 		private readonly ICoursesRepo coursesRepo;
-		private readonly IUserRolesRepo userRolesRepo;
+		private readonly ICourseRolesRepo courseRolesRepo;
+		private readonly IUsersRepo usersRepo;
 
-		public CourseAccessAuthorizationHandler(ICoursesRepo coursesRepo, IUserRolesRepo userRolesRepo, ILogger logger)
+		public CourseAccessAuthorizationHandler(ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo, IUsersRepo usersRepo, ILogger logger)
 		{
 			this.coursesRepo = coursesRepo;
-			this.userRolesRepo = userRolesRepo;
+			this.courseRolesRepo = courseRolesRepo;
+			this.usersRepo = usersRepo;
 			this.logger = logger;
 		}
 
@@ -51,16 +54,28 @@ namespace Ulearn.Web.Api.Authorization
 				return;
 			}
 
-			if (context.User.IsSystemAdministrator())
+			if (!context.User.Identity.IsAuthenticated)
+			{
+				context.Fail();
+				return;
+			}
+
+			var userId = context.User.GetUserId();
+			var user = await usersRepo.FindUserByIdAsync(userId).ConfigureAwait(false);
+			if (user == null)
+			{
+				context.Fail();
+				return;
+			}
+			
+			if (usersRepo.IsSystemAdministrator(user))
 			{
 				context.Succeed(requirement);
 				return;
 			}
 
-			var userId = context.User.GetUserId();
-
-			var isCourseAdmin = await userRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRole.CourseAdmin);
-			if (isCourseAdmin || await coursesRepo.HasCourseAccessAsync(userId, courseId, requirement.CourseAccessType))
+			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
+			if (isCourseAdmin || await coursesRepo.HasCourseAccessAsync(userId, courseId, requirement.CourseAccessType).ConfigureAwait(false))
 				context.Succeed(requirement);
 			else
 				context.Fail();

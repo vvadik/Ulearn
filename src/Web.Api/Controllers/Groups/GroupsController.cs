@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Database;
+using Database.Repos;
 using Database.Repos.Groups;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,8 +26,9 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		private readonly IGroupMembersRepo groupMembersRepo;
 
 		public GroupsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db,
+			IUsersRepo usersRepo,
 			IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo)
-			: base(logger, courseManager, db)
+			: base(logger, courseManager, db, usersRepo)
 		{
 			this.groupsRepo = groupsRepo;
 			this.groupAccessesRepo = groupAccessesRepo;
@@ -55,7 +57,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		
 		private async Task<GroupsListResponse> GetGroupsListResponseAsync(ICourse course, GroupsListParameters parameters, bool onlyArchived=false)
 		{
-			var groups = await groupAccessesRepo.GetAvailableForUserGroupsAsync(course.Id, User, onlyArchived).ConfigureAwait(false);
+			var groups = await groupAccessesRepo.GetAvailableForUserGroupsAsync(course.Id, UserId, onlyArchived).ConfigureAwait(false);
 			/* Order groups by (name, createTime) and get one page of data (offset...offset+count) */
 			var groupIds = groups.OrderBy(g => g.Name, StringComparer.InvariantCultureIgnoreCase).ThenBy(g => g.CreateTime)
 				.Skip(parameters.Offset)

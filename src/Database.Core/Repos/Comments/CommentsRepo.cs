@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Database.Extensions;
 using Database.Models;
+using Database.Repos.CourseRoles;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Ulearn.Common.Extensions;
@@ -16,17 +17,19 @@ namespace Database.Repos.Comments
 	{
 		private readonly UlearnDb db;
 		private readonly ICommentPoliciesRepo commentPoliciesRepo;
+		private readonly ICourseRolesRepo courseRolesRepo;
 
-		public CommentsRepo(UlearnDb db, ICommentPoliciesRepo commentPoliciesRepo)
+		public CommentsRepo(UlearnDb db, ICommentPoliciesRepo commentPoliciesRepo, ICourseRolesRepo courseRolesRepo)
 		{
 			this.db = db;
 			this.commentPoliciesRepo = commentPoliciesRepo;
+			this.courseRolesRepo = courseRolesRepo;
 		}
 
-		public async Task<Comment> AddCommentAsync(ClaimsPrincipal author, string courseId, Guid slideId, int parentCommentId, string commentText)
+		public async Task<Comment> AddCommentAsync(string authorId, string courseId, Guid slideId, int parentCommentId, string commentText)
 		{
 			var commentsPolicy = await commentPoliciesRepo.GetCommentsPolicyAsync(courseId).ConfigureAwait(false);
-			var isInstructor = author.HasAccessFor(courseId, CourseRole.Instructor);
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(authorId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
 			var isApproved = commentsPolicy.ModerationPolicy == CommentModerationPolicy.Postmoderation || isInstructor;
 
 			/* Instructors' replies are automatically correct */
@@ -35,7 +38,7 @@ namespace Database.Repos.Comments
 			
 			var comment = new Comment
 			{
-				AuthorId = author.GetUserId(),
+				AuthorId = authorId,
 				CourseId = courseId,
 				SlideId = slideId,
 				ParentCommentId = parentCommentId,
@@ -45,9 +48,9 @@ namespace Database.Repos.Comments
 				PublishTime = DateTime.Now
 			};
 			db.Comments.Add(comment);
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 
-			return await db.Comments.FindAsync(comment.Id);
+			return await FindCommentByIdAsync(comment.Id).ConfigureAwait(false);
 		}
 
 		[ItemCanBeNull]
@@ -61,7 +64,6 @@ namespace Database.Repos.Comments
 			return db.Comments.Where(c => commentIds.Contains(c.Id)).ToListAsync();
 		}
 
-		/* Not asynced versions below */
 		public Task<List<Comment>> GetSlideCommentsAsync(string courseId, Guid slideId)
 		{
 			return db.Comments.Where(x => x.SlideId == slideId && !x.IsDeleted).ToListAsync();

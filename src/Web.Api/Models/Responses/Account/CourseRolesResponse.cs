@@ -24,7 +24,7 @@ namespace Ulearn.Web.Api.Models.Responses.Account
 		public string CourseId { get; set; }
 		
 		[DataMember(Name = "role")]
-		public CourseRole Role { get; set; }
+		public CourseRoleType Role { get; set; }
 	}
 
 	[DataContract]

@@ -418,7 +418,7 @@ namespace Database.Repos
 			var notificationTypes = GetAllNotificationTypes();
 
 			notificationTypes = notificationTypes
-				.Where(t => user.HasAccessFor(courseId, t.GetMinCourseRole()) || t.GetMinCourseRole() == CourseRole.Student)
+				.Where(t => user.HasAccessFor(courseId, t.GetMinCourseRole()) || t.GetMinCourseRole() == CourseRoleType.Student)
 				.OrderByDescending(t => t.GetMinCourseRole())
 				.ThenBy(t => (int)t)
 				.ToList();

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
+using Database.Repos.CourseRoles;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -101,7 +102,7 @@ namespace Web.Api.Tests.Controllers
 			return services.BuildServiceProvider();
 		}
 
-		private async Task CreateTestUsersAsync(IUsersRepo usersRepo, IUserRolesRepo userRolesRepo, UlearnUserManager userManager)
+		private async Task CreateTestUsersAsync(IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, UlearnUserManager userManager)
 		{
 			var result = await userManager.CreateAsync(TestUsers.Admin, TestUsers.AdminPassword).ConfigureAwait(false);
 			if (! result.Succeeded)
@@ -115,7 +116,7 @@ namespace Web.Api.Tests.Controllers
 		private Task CreateTestUsersAsync()
 		{
 			var usersRepo = serviceProvider.GetService<IUsersRepo>();
-			var userRolesRepo = serviceProvider.GetService<IUserRolesRepo>();
+			var userRolesRepo = serviceProvider.GetService<ICourseRolesRepo>();
 			var userManager = serviceProvider.GetService<UlearnUserManager>();
 			return CreateTestUsersAsync(usersRepo, userRolesRepo, userManager);
 		}

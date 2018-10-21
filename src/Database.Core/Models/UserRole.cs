@@ -17,6 +17,6 @@ namespace Database.Models
 		public string CourseId { get; set; }
 
 		[Required]
-		public CourseRole Role { get; set; }
+		public CourseRoleType Role { get; set; }
 	}
 }

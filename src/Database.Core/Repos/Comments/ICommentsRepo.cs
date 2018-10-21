@@ -8,7 +8,7 @@ namespace Database.Repos.Comments
 {
 	public interface ICommentsRepo
 	{
-		Task<Comment> AddCommentAsync(ClaimsPrincipal author, string courseId, Guid slideId, int parentCommentId, string commentText);
+		Task<Comment> AddCommentAsync(string authorId, string courseId, Guid slideId, int parentCommentId, string commentText);
 		Task<Comment> FindCommentByIdAsync(int commentId);
 		Task<List<Comment>> GetCommentsByIdsAsync(IEnumerable<int> commentIds);
 		Task<List<Comment>> GetSlideCommentsAsync(string courseId, Guid slideId);

@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Database.Models;
 using Database.Repos;
+using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 
@@ -21,8 +23,7 @@ namespace Database.Core.Tests.Repos.Groups
 		{
 			base.SetUp();
 
-			var userRolesRepo = new Mock<IUserRolesRepo>();
-			var groupsCreatorAndCopier = new GroupsCreatorAndCopier(db, logger, userRolesRepo.Object);
+			var groupsCreatorAndCopier = serviceProvider.GetService<GroupsCreatorAndCopier>();
 			var manualCheckingsForOldSolutionsAdder = new Mock<IManualCheckingsForOldSolutionsAdder>();
 
 			groupsRepo = new GroupsRepo(

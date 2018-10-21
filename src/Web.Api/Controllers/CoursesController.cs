@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Database;
 using Database.Repos;
@@ -16,8 +15,8 @@ namespace Ulearn.Web.Api.Controllers
 	{
 		private readonly ICoursesRepo coursesRepo;
 
-		public CoursesController(ILogger logger, WebCourseManager courseManager, UlearnDb db, ICoursesRepo coursesRepo)
-			: base(logger, courseManager, db)
+		public CoursesController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, ICoursesRepo coursesRepo, IUsersRepo usersRepo)
+			: base(logger, courseManager, db, usersRepo)
 		{
 			this.coursesRepo = coursesRepo;
 		}

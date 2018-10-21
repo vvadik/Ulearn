@@ -16,8 +16,8 @@ namespace Ulearn.Web.Api.Controllers
 	{
 		private readonly IUserSolutionsRepo userSolutionsRepo;
 
-		public ExerciseStatisticsController(ILogger logger, WebCourseManager courseManager, IUserSolutionsRepo userSolutionsRepo, UlearnDb db)
-			: base(logger, courseManager, db)
+		public ExerciseStatisticsController(ILogger logger, WebCourseManager courseManager, IUserSolutionsRepo userSolutionsRepo, UlearnDb db, IUsersRepo usersRepo)
+			: base(logger, courseManager, db, usersRepo)
 		{
 			this.userSolutionsRepo = userSolutionsRepo;
 		}

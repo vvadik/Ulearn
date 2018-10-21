@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Database.Repos
 {
-	public class ConsumersRepo : IConsumersRepo
+	public class LtiConsumersRepo : ILtiConsumersRepo
 	{
 		private readonly UlearnDb db;
 
-		public ConsumersRepo(UlearnDb db)
+		public LtiConsumersRepo(UlearnDb db)
 		{
 			this.db = db;
 		}
