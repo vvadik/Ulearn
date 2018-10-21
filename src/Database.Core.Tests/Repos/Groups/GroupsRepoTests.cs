@@ -23,7 +23,7 @@ namespace Database.Core.Tests.Repos.Groups
 		{
 			base.SetUp();
 
-			var groupsCreatorAndCopier = serviceProvider.GetService<GroupsCreatorAndCopier>();
+			var groupsCreatorAndCopier = serviceProvider.GetService<IGroupsCreatorAndCopier>();
 			var manualCheckingsForOldSolutionsAdder = new Mock<IManualCheckingsForOldSolutionsAdder>();
 
 			groupsRepo = new GroupsRepo(

@@ -5,23 +5,22 @@ using System.Threading.Tasks;
 using Database.Di;
 using Database.Models;
 using Database.Repos;
-using LtiLibrary.NetCore.Lti.v2;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Serilog;
-using Serilog.Core;
 using Serilog.Extensions.Logging;
 using Ulearn.Common;
 using Z.EntityFramework.Plus;
+using ILogger = Serilog.ILogger;
 
 namespace Database.Core.Tests.Repos
 {
 	public class BaseRepoTests
 	{
-		protected Logger logger;
+		protected ILogger logger;
 		protected UlearnDb db;
 		protected IServiceProvider serviceProvider;
 		protected UlearnUserManager userManager;
@@ -43,8 +42,12 @@ namespace Database.Core.Tests.Repos
 			userManager = serviceProvider.GetService<UlearnUserManager>();
 			
 			/* Configuring Z.EntityFramework.Plus for working with In-Memory database
-			   See https://entityframework-plus.net/batch-delete for details */
+			   See https://entityframework-plus.net/batch-delete for details. */
 			BatchDeleteManager.InMemoryDbContextFactory = () => CreateDbContext(loggerFactory);
+			
+			/* Cache Manager is not working with In-Memory database.
+			   See https://github.com/zzzprojects/EntityFramework-Plus/issues/391 for details. */
+			QueryCacheManager.IsEnabled = false;
 		}
 
 		private IServiceProvider ConfigureServices()
@@ -52,6 +55,7 @@ namespace Database.Core.Tests.Repos
 			var services = new ServiceCollection();
 			
 			services.AddSingleton(db);
+			services.AddSingleton(logger);
 			services.AddLogging(builder => builder.AddSerilog(logger));
 			services.AddDatabaseServices(logger);
 			services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<UlearnDb>();

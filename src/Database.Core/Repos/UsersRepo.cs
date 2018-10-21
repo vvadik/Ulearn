@@ -21,7 +21,7 @@ namespace Database.Repos
 		private readonly UlearnDb db;
 		private readonly UlearnUserManager userManager;
 		private readonly ICourseRoleUsersFilter courseRoleUsersFilter;
-		private readonly IdentityRole sysAdminRole;
+		private IdentityRole sysAdminRole = null;
 
 		public const string UlearnBotUsername = "ulearn-bot";
 
@@ -30,7 +30,6 @@ namespace Database.Repos
 			this.db = db;
 			this.userManager = userManager;
 			this.courseRoleUsersFilter = courseRoleUsersFilter;
-			sysAdminRole = db.Roles.FirstOrDefault(r => r.Name == LmsRoles.SysAdmin.ToString());			
 		}
 
 		public async Task<ApplicationUser> FindUserByIdAsync(string userId)
@@ -193,6 +192,9 @@ namespace Database.Repos
 		{
 			if (user?.Roles == null)
 				return false;
+			
+			if (sysAdminRole == null)
+				sysAdminRole = db.Roles.First(r => r.Name == LmsRoles.SysAdmin.ToString());	
 			
 			return user.Roles.Any(role => role.RoleId == sysAdminRole.Id);
 		}

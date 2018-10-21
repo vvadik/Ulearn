@@ -67,6 +67,10 @@ namespace Web.Api.Tests.Controllers
 			/* Configuring Z.EntityFramework.Plus for working with In-Memory database
 			   See https://entityframework-plus.net/batch-delete for details */
 			BatchDeleteManager.InMemoryDbContextFactory = () => CreateDbContext(loggerFactory);
+			
+			/* Cache Manager is not working with In-Memory database.
+			   See https://github.com/zzzprojects/EntityFramework-Plus/issues/391 for details. */
+			QueryCacheManager.IsEnabled = false;
 		}
 
 		private async Task CreateInitialDataInDatabaseAsync()
