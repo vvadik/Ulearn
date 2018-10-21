@@ -48,9 +48,6 @@ namespace Database.Models
 
 		public virtual ICollection<CommentLike> Likes { get; set; }
 
-		public bool IsTopLevel()
-		{
-			return ParentCommentId == -1;
-		}
+		public bool IsTopLevel => ParentCommentId == -1;
 	}
 }

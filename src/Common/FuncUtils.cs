@@ -8,7 +8,7 @@ using NUnit.Framework;
 
 namespace Ulearn.Common
 {
-	public class FuncUtils
+	public static class FuncUtils
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(FuncUtils));
 
@@ -35,33 +35,33 @@ namespace Ulearn.Common
 			throw new Exception($"Can\'t run function {func} for {triesCount} times");
 		}
 
-		public static async Task<T> TrySeveralTimesAsync<T>(Func<Task<T>> func, int triesCount, Func<Task> runAfterFail)
+		public static Task<T> TrySeveralTimesAsync<T>(Func<Task<T>> func, int triesCount, Func<Task> runAfterFail)
 		{
-			return await TrySeveralTimesAsync(func, triesCount, runAfterFail, typeof(Exception));
+			return TrySeveralTimesAsync(func, triesCount, runAfterFail, typeof(Exception));
 		}
 
-		public static async Task<T> TrySeveralTimesAsync<T>(Func<Task<T>> func, int triesCount, Type exceptionType)
+		public static Task<T> TrySeveralTimesAsync<T>(Func<Task<T>> func, int triesCount, Type exceptionType)
 		{
-			return await TrySeveralTimesAsync(func, triesCount, () => Task.Delay(100), exceptionType);
+			return TrySeveralTimesAsync(func, triesCount, () => Task.Delay(100), exceptionType);
 		}
 
-		public static async Task<T> TrySeveralTimesAsync<T>(Func<Task<T>> func, int triesCount)
+		public static Task<T> TrySeveralTimesAsync<T>(Func<Task<T>> func, int triesCount)
 		{
-			return await TrySeveralTimesAsync(func, triesCount, () => Task.Delay(100));
+			return TrySeveralTimesAsync(func, triesCount, () => Task.Delay(100));
 		}
 
-		public static async Task TrySeveralTimesAsync(Func<Task> func, int triesCount)
+		public static Task TrySeveralTimesAsync(Func<Task> func, int triesCount)
 		{
-			await TrySeveralTimesAsync(async () =>
+			return TrySeveralTimesAsync(async () =>
 			{
-				await func();
+				await func().ConfigureAwait(false);
 				return 0;
 			}, triesCount, () => Task.Delay(100));
 		}
 
 		public static T TrySeveralTimes<T>(Func<T> func, int triesCount, Action runAfterFail, Type exceptionType)
 		{
-			return TrySeveralTimesAsync(() => Task.Run(func), triesCount, () => Task.Run(runAfterFail), exceptionType).Result;
+			return TrySeveralTimesAsync(() => Task.Run(func), triesCount, () => Task.Run(runAfterFail), exceptionType).GetAwaiter().GetResult();
 		}
 
 		public static T TrySeveralTimes<T>(Func<T> func, int triesCount, Action runAfterFail)

@@ -19,6 +19,7 @@ using Ulearn.Common;
 using Ulearn.Web.Api;
 using Ulearn.Web.Api.Controllers;
 using Web.Api.Configuration;
+using Z.EntityFramework.Plus;
 
 namespace Web.Api.Tests.Controllers
 {
@@ -61,6 +62,10 @@ namespace Web.Api.Tests.Controllers
 			
 			await CreateInitialDataInDatabaseAsync().ConfigureAwait(false);
 			await CreateTestUsersAsync().ConfigureAwait(false);
+			
+			/* Configuring Z.EntityFramework.Plus for working with In-Memory database
+			   See https://entityframework-plus.net/batch-delete for details */
+			BatchDeleteManager.InMemoryDbContextFactory = () => CreateDbContext(loggerFactory);
 		}
 
 		private async Task CreateInitialDataInDatabaseAsync()

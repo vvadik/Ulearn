@@ -6,8 +6,10 @@ using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 using Database;
+using Database.Di;
 using Database.Models;
 using Database.Repos;
+using Database.Repos.Comments;
 using Database.Repos.Groups;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -204,48 +206,15 @@ namespace Ulearn.Web.Api
 		public static void ConfigureDi(IServiceCollection services, ILogger logger)
 		{
 			services.AddSingleton(logger);
-			services.AddSingleton<InitialDataCreator>();
-			
-			var courseManager = new WebCourseManager(logger);
-			services.AddSingleton<WebCourseManager>(courseManager);
-			services.AddSingleton<IWebCourseManager>(courseManager);
-			
-			services.AddScoped<UlearnUserManager>();
 			services.AddScoped<IAuthorizationHandler, CourseRoleAuthorizationHandler>();
 			services.AddScoped<IAuthorizationHandler, CourseAccessAuthorizationHandler>();
 			services.AddScoped<INotificationDataPreloader, NotificationDataPreloader>();
 
-			/* DI for database repos */
-			
-			/* Groups */
-			services.AddScoped<IGroupsRepo, GroupsRepo>();
-			services.AddScoped<IGroupMembersRepo, GroupMembersRepo>();
-			services.AddScoped<IGroupAccessesRepo, GroupAccessesRepo>();
-			services.AddScoped<IManualCheckingsForOldSolutionsAdder, ManualCheckingsForOldSolutionsAdder>();
-			services.AddScoped<IGroupsCreatorAndCopier, GroupsCreatorAndCopier>();
-			services.AddScoped<IUsersGroupsGetter, UsersGroupsGetter>();
-			/* Others */
-			services.AddScoped<IUsersRepo, UsersRepo>();
-			services.AddScoped<ICommentsRepo, CommentsRepo>();
-			services.AddScoped<IUserRolesRepo, UserRolesRepo>();
-			services.AddScoped<ICoursesRepo, CoursesRepo>();
-			services.AddScoped<ISlideCheckingsRepo, SlideCheckingsRepo>();
-			services.AddScoped<IUserSolutionsRepo, UserSolutionsRepo>();
-			services.AddScoped<IUserQuizzesRepo, UserQuizzesRepo>();
-			services.AddScoped<IVisitsRepo, VisitsRepo>();
-			services.AddScoped<ITextsRepo, TextsRepo>();
-			services.AddScoped<INotificationsRepo, NotificationsRepo>();
-			services.AddScoped<IFeedRepo, FeedRepo>();
-			services.AddScoped<ISystemAccessesRepo, SystemAccessesRepo>();
-			services.AddScoped<IQuizzesRepo, QuizzesRepo>();
+			services.AddDatabaseServices(logger);
 		}
 
 		public static void ConfigureAuthServices(IServiceCollection services, WebApiConfiguration configuration)
 		{
-			services.AddIdentity<ApplicationUser, IdentityRole>()
-				.AddEntityFrameworkStores<UlearnDb>()
-				.AddDefaultTokenProviders();
-
 			/* Configure sharing cookies between application.
 			   See https://docs.microsoft.com/en-us/aspnet/core/security/cookie-sharing?tabs=aspnetcore2x for details */
 			services.AddDataProtection()
