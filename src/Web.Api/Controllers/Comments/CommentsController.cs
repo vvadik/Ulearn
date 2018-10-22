@@ -1,15 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Database;
-using Database.Models;
 using Database.Repos;
 using Database.Repos.Comments;
 using Database.Repos.CourseRoles;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
-using Ulearn.Common;
 using Ulearn.Web.Api.Models.Parameters.Comments;
 using Ulearn.Web.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Responses.Comments;
@@ -17,22 +14,13 @@ using Ulearn.Web.Api.Models.Responses.Comments;
 namespace Ulearn.Web.Api.Controllers.Comments
 {
 	[Route("comments/in/{courseId}/")]
-	public class CommentsController : BaseController
+	public class CommentsController : BaseCommentController
 	{
-		private readonly ICommentsRepo commentsRepo;
-		private readonly ICommentLikesRepo commentLikesRepo;
-		private readonly ICourseRolesRepo courseRolesRepo;
-		private readonly ICoursesRepo coursesRepo;
-
 		public CommentsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db,
 			ICommentsRepo commentsRepo, ICommentLikesRepo commentLikesRepo,
-			IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, ICoursesRepo coursesRepo)
-			: base(logger, courseManager, db, usersRepo)
+			IUsersRepo usersRepo, ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo)
+			: base(logger, courseManager, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo)
 		{
-			this.commentsRepo = commentsRepo;
-			this.commentLikesRepo = commentLikesRepo;
-			this.courseRolesRepo = courseRolesRepo;
-			this.coursesRepo = coursesRepo;
 		}
 
 		[HttpGet("{slideId:guid}")]
@@ -52,7 +40,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			
 			return new CommentsListResponse
 			{
-				TopLevelComments = BuildCommentsListResponse(comments, true, canUserSeeNotApprovedComments, replies, commentLikesCount),
+				TopLevelComments = BuildCommentsListResponse(comments, canUserSeeNotApprovedComments, replies, commentLikesCount, addCourseIdAndSlideId: false, addParentCommentId: false, addReplies: true),
 				PaginationResponse = new PaginationResponse
 				{
 					Offset = parameters.Offset,
@@ -60,54 +48,6 @@ namespace Ulearn.Web.Api.Controllers.Comments
 					TotalCount = totalCount,
 				}
 			};
-		}
-
-		private List<CommentInfo> BuildCommentsListResponse(
-			IEnumerable<Comment> comments,
-			bool isTopLevel, bool canUserSeeNotApprovedComments, DefaultDictionary<int, List<Comment>> replies, DefaultDictionary<int, int> commentLikesCount
-		)
-		{
-			return comments.Select(c => BuildCommentInfo(c, isTopLevel, canUserSeeNotApprovedComments, replies, commentLikesCount)).ToList();
-		}
-		
-		private CommentInfo BuildCommentInfo(
-			Comment comment,
-			bool isTopLevel, bool canUserSeeNotApprovedComments, DefaultDictionary<int, List<Comment>> replies, DefaultDictionary<int, int> commentLikesCount
-		)
-		{
-			var commentInfo = new CommentInfo
-			{
-				Id = comment.Id,
-				Text = comment.Text,
-				Author = BuildShortUserInfo(comment.Author),
-				PublishTime = comment.PublishTime,
-				IsApproved = comment.IsApproved,
-				LikesCount = commentLikesCount[comment.Id],
-			};
-
-			if (!isTopLevel)
-			{
-				commentInfo.IsCorrectAnswer = comment.IsCorrectAnswer;
-				return commentInfo;
-			}
-			
-			commentInfo.IsPinnedToTop = comment.IsPinnedToTop;
-			var commentReplies = FilterVisibleComments(replies[comment.Id], canUserSeeNotApprovedComments);
-			commentInfo.Replies = BuildCommentsListResponse(commentReplies, false, canUserSeeNotApprovedComments, null, commentLikesCount);
-			
-			return commentInfo;
-		}
-
-		private List<Comment> FilterVisibleComments(List<Comment> comments, bool canUserSeeNotApprovedComments)
-		{
-			return canUserSeeNotApprovedComments ? comments : comments.Where(c => c.IsApproved || c.AuthorId == UserId).ToList();
-		}
-
-		private async Task<bool> CanUserSeeNotApprovedCommentsAsync(string userId, string courseId)
-		{
-			var hasCourseAccessForCommentEditing = await coursesRepo.HasCourseAccessAsync(userId, courseId, CourseAccessType.EditPinAndRemoveComments).ConfigureAwait(false);
-			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
-			return isCourseAdmin || hasCourseAccessForCommentEditing;
 		}
 	}
 }

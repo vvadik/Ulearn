@@ -52,15 +52,22 @@ namespace Database.Repos.Comments
 			return await FindCommentByIdAsync(comment.Id).ConfigureAwait(false);
 		}
 
-		[ItemCanBeNull]
-		public Task<Comment> FindCommentByIdAsync(int commentId)
+		public async Task<Comment> FindCommentByIdAsync(int commentId, bool includeDeleted=false)
 		{
-			return db.Comments.FindAsync(commentId);
+			var comment = await db.Comments.FindAsync(commentId).ConfigureAwait(false);
+			if (comment == null || (!includeDeleted && comment.IsDeleted))
+				return null;
+			return comment;
 		}
 
 		public Task<List<Comment>> GetCommentsByIdsAsync(IEnumerable<int> commentIds)
 		{
-			return db.Comments.Where(c => commentIds.Contains(c.Id)).ToListAsync();
+			return db.Comments.Where(c => !c.IsDeleted && commentIds.Contains(c.Id)).ToListAsync();
+		}
+
+		public Task<List<Comment>> GetRepliesAsync(int commentId)
+		{
+			return db.Comments.Where(c => !c.IsDeleted && c.ParentCommentId == commentId).ToListAsync();
 		}
 
 		public async Task<DefaultDictionary<int, List<Comment>>> GetRepliesAsync(IEnumerable<int> commentIds)
@@ -105,9 +112,9 @@ namespace Database.Repos.Comments
 				.ToListAsync();
 		}
 
-		public async Task<Comment> ModifyCommentAsync(int commentId, Action<Comment> modifyAction)
+		public async Task<Comment> ModifyCommentAsync(int commentId, Action<Comment> modifyAction, bool includeDeleted=false)
 		{
-			var comment = await FindCommentByIdAsync(commentId).ConfigureAwait(false);
+			var comment = await FindCommentByIdAsync(commentId).ConfigureAwait(false) ?? throw new ArgumentException($"Can't find comment with id {commentId}");
 			modifyAction(comment);
 			await db.SaveChangesAsync().ConfigureAwait(false);
 			return comment;
@@ -130,7 +137,7 @@ namespace Database.Repos.Comments
 
 		public Task<Comment> RestoreCommentAsync(int commentId)
 		{
-			return ModifyCommentAsync(commentId, c => c.IsDeleted = false);
+			return ModifyCommentAsync(commentId, c => c.IsDeleted = false, includeDeleted: true);
 		}
 
 		public Task<Comment> PinCommentAsync(int commentId, bool isPinned)

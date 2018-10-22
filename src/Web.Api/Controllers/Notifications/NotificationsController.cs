@@ -179,7 +179,7 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 		{
 			var data = new NotificationData();
 			if (notification is AbstractCommentNotification commentNotification)
-				data.Comment = BuildCommentInfo(notificationsData.CommentsByIds.GetOrDefault(commentNotification.CommentId));
+				data.Comment = BuildNotificationCommentInfo(notificationsData.CommentsByIds.GetOrDefault(commentNotification.CommentId));
 			return data;
 		}
 	}

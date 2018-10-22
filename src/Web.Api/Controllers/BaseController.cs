@@ -112,7 +112,7 @@ namespace Ulearn.Web.Api.Controllers
 			};
 		}		
 
-		protected NotificationCommentInfo BuildCommentInfo(Comment comment)
+		protected NotificationCommentInfo BuildNotificationCommentInfo(Comment comment)
 		{
 			if (comment == null)
 				return null;

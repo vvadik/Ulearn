@@ -41,5 +41,14 @@ namespace Ulearn.Web.Api.Models.Responses.Comments
 		
 		[DataMember(Name = "replies", EmitDefaultValue = false)]
 		public List<CommentInfo> Replies { get; set; }
+		
+		[DataMember(Name = "course_id", EmitDefaultValue = false)]
+		public string CourseId { get; set; }
+		
+		[DataMember(Name = "slide_id", EmitDefaultValue = false)]
+		public Guid? SlideId { get; set; }
+		
+		[DataMember(Name = "reply_to", EmitDefaultValue = false)]
+		public int? ParentCommentId { get; set; }
 	}
 }
