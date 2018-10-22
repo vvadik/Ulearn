@@ -7,6 +7,7 @@ using Database.Models;
 using Database.Repos;
 using Database.Repos.Comments;
 using Database.Repos.CourseRoles;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using NUnit.Framework;
@@ -19,13 +20,19 @@ using Ulearn.Web.Api.Models.Responses.Comments;
 
 namespace Ulearn.Web.Api.Controllers.Comments
 {
+	[ProducesResponseType((int) HttpStatusCode.OK)]
 	[SwaggerResponse((int) HttpStatusCode.Forbidden, "You don't have access to this comment")]
 	[Route("comment/{commentId:int:min(0)}")]
 	public class CommentController : BaseCommentController
 	{
-		public CommentController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo, ICommentsRepo commentsRepo, ICommentLikesRepo commentLikesRepo, ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo)
+		private readonly INotificationsRepo notificationsRepo;
+
+		public CommentController(ILogger logger, IWebCourseManager courseManager, UlearnDb db,
+			IUsersRepo usersRepo, ICommentsRepo commentsRepo, ICommentLikesRepo commentLikesRepo, ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo,
+			INotificationsRepo notificationsRepo)
 			: base(logger, courseManager, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo)
 		{
+			this.notificationsRepo = notificationsRepo;
 		}
 
 		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -110,6 +117,48 @@ namespace Ulearn.Web.Api.Controllers.Comments
 					TotalCount = likes.Count,
 				}
 			};
+		}
+
+		[Authorize]
+		[SwaggerResponse((int) HttpStatusCode.Conflict, "You have liked the comment already")]
+		[HttpPost("like")]
+		public async Task<IActionResult> Like(int commentId)
+		{
+			if (await commentLikesRepo.DidUserLikeComment(commentId, UserId).ConfigureAwait(false))
+				return Conflict(new ErrorResponse($"You have liked the comment {commentId} already"));
+					
+			await commentLikesRepo.LikeAsync(commentId, UserId).ConfigureAwait(false);
+
+			await NotifyAboutLikedComment(commentId).ConfigureAwait(false);
+			
+			return Ok(new SuccessResponse($"You have liked the comment {commentId}"));
+		}
+		
+		[Authorize]
+		[SwaggerResponse((int) HttpStatusCode.NotFound, "You don't have like for the comment")]
+		[HttpDelete("like")]
+		public async Task<IActionResult> Unlike(int commentId)
+		{
+			if (!await commentLikesRepo.DidUserLikeComment(commentId, UserId).ConfigureAwait(false))
+				return NotFound(new ErrorResponse($"You don't have like for the comment {commentId}"));
+			
+			await commentLikesRepo.UnlikeAsync(commentId, UserId).ConfigureAwait(false);
+			
+			return Ok(new SuccessResponse($"You have unliked the comment {commentId}"));
+		}
+		
+		private async Task NotifyAboutLikedComment(int commentId)
+		{
+			var comment = await commentsRepo.FindCommentByIdAsync(commentId).ConfigureAwait(false);
+			if (comment != null)
+			{
+				var notification = new LikedYourCommentNotification
+				{
+					Comment = comment,
+					LikedUserId = UserId,
+				};
+				await notificationsRepo.AddNotificationAsync(comment.CourseId, notification, UserId).ConfigureAwait(false);
+			}
 		}
 	}
 }

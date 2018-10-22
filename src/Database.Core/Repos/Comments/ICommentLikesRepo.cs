@@ -20,5 +20,6 @@ namespace Database.Repos.Comments
 
 		Task<List<int>> GetCommentsLikedByUserAsync(string courseId, Guid slideId, string userId);
 		Task<List<int>> GetCommentsLikedByUserAsync(string courseId, string userId);
+		Task<bool> DidUserLikeComment(int commentId, string userId);
 	}
 }

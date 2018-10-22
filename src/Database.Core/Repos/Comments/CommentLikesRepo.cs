@@ -46,6 +46,11 @@ namespace Database.Repos.Comments
 			await db.CommentLikes.Where(like => like.UserId == userId && like.CommentId == commentId).DeleteAsync().ConfigureAwait(false);
 		}
 
+		public Task<bool> DidUserLikeComment(int commentId, string userId)
+		{
+			return db.CommentLikes.Where(like => like.UserId == userId && like.CommentId == commentId).AnyAsync();
+		}
+
 		public Task<List<CommentLike>> GetLikesAsync(int commentId)
 		{
 			return db.CommentLikes.Include(like => like.User).Where(like => like.CommentId == commentId).OrderBy(like => like.Timestamp).ToListAsync();

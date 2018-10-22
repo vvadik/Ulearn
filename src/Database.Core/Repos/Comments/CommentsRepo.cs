@@ -81,7 +81,8 @@ namespace Database.Repos.Comments
 			return db.Comments
 				.Include(c => c.Author)
 				.Where(c => c.SlideId == slideId && !c.IsDeleted)
-				.OrderBy(c => c.PublishTime)
+				.OrderBy(c => !c.IsPinnedToTop)
+				.ThenBy(c => c.PublishTime)
 				.ToListAsync();
 		}
 		
@@ -90,7 +91,8 @@ namespace Database.Repos.Comments
 			return db.Comments
 				.Include(c => c.Author)
 				.Where(c => c.SlideId == slideId && !c.IsDeleted && c.ParentCommentId == -1)
-				.OrderBy(c => c.PublishTime)
+				.OrderBy(c => !c.IsPinnedToTop)
+				.ThenBy(c => c.PublishTime)
 				.ToListAsync();
 		}
 
@@ -99,7 +101,8 @@ namespace Database.Repos.Comments
 			return db.Comments
 				.Include(c => c.Author)
 				.Where(c => slidesIds.Contains(c.SlideId) && !c.IsDeleted)
-				.OrderBy(c => c.PublishTime)
+				.OrderBy(c => !c.IsPinnedToTop)
+				.ThenBy(c => c.PublishTime)
 				.ToListAsync();
 		}
 
