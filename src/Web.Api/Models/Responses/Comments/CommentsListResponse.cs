@@ -9,11 +9,11 @@ namespace Ulearn.Web.Api.Models.Responses.Comments
 	public class CommentsListResponse : PaginatedResponse
 	{
 		[DataMember(Name = "comments")]
-		public List<CommentInfo> TopLevelComments { get; set; }
+		public List<CommentResponse> TopLevelComments { get; set; }
 	}
 
 	[DataContract]
-	public class CommentInfo
+	public class CommentResponse
 	{
 		[DataMember(Name = "id")]
 		public int Id { get; set; }
@@ -40,7 +40,7 @@ namespace Ulearn.Web.Api.Models.Responses.Comments
 		public int LikesCount { get; set; }
 		
 		[DataMember(Name = "replies", EmitDefaultValue = false)]
-		public List<CommentInfo> Replies { get; set; }
+		public List<CommentResponse> Replies { get; set; }
 		
 		[DataMember(Name = "course_id", EmitDefaultValue = false)]
 		public string CourseId { get; set; }

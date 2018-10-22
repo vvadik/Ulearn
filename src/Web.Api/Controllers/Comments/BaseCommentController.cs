@@ -29,20 +29,20 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			this.courseRolesRepo = courseRolesRepo;
 		}
 
-		protected List<CommentInfo> BuildCommentsListResponse(IEnumerable<Comment> comments,
+		protected List<CommentResponse> BuildCommentsListResponse(IEnumerable<Comment> comments,
 			bool canUserSeeNotApprovedComments, DefaultDictionary<int, List<Comment>> replies, DefaultDictionary<int, int> commentLikesCount,
 			bool addCourseIdAndSlideId, bool addParentCommentId, bool addReplies)
 		{
-			return comments.Select(c => BuildCommentInfo(c, canUserSeeNotApprovedComments, replies, commentLikesCount, addCourseIdAndSlideId, addParentCommentId, addReplies)).ToList();
+			return comments.Select(c => BuildCommentResponse(c, canUserSeeNotApprovedComments, replies, commentLikesCount, addCourseIdAndSlideId, addParentCommentId, addReplies)).ToList();
 		}
 
-		protected CommentInfo BuildCommentInfo(
+		protected CommentResponse BuildCommentResponse(
 			Comment comment,
 			bool canUserSeeNotApprovedComments, DefaultDictionary<int, List<Comment>> replies, DefaultDictionary<int, int> commentLikesCount,
 			bool addCourseIdAndSlideId, bool addParentCommentId, bool addReplies
 		)
 		{
-			var commentInfo = new CommentInfo
+			var commentInfo = new CommentResponse
 			{
 				Id = comment.Id,
 				Text = comment.Text,

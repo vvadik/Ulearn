@@ -9,6 +9,7 @@ using Database.Repos.Comments;
 using Database.Repos.CourseRoles;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using NUnit.Framework;
 using Serilog;
 using Swashbuckle.AspNetCore.Annotations;
 using Ulearn.Common;
@@ -65,7 +66,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		}
 		
 		[HttpGet]
-		public async Task<ActionResult<CommentInfo>> Comment(int commentId, [FromQuery] CommentParameters parameters)
+		public async Task<ActionResult<CommentResponse>> Comment(int commentId, [FromQuery] CommentParameters parameters)
 		{
 			var comment = await commentsRepo.FindCommentByIdAsync(commentId).ConfigureAwait(false);
 			var canUserSeeNotApprovedComments = await CanUserSeeNotApprovedCommentsAsync(UserId, comment.CourseId).ConfigureAwait(false);
@@ -75,7 +76,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			{
 				var replies = await commentsRepo.GetRepliesAsync(commentId).ConfigureAwait(false);
 				likesCount = await commentLikesRepo.GetLikesCountsAsync(replies.Append(comment).Select(c => c.Id)).ConfigureAwait(false);
-				return BuildCommentInfo(
+				return BuildCommentResponse(
 					comment,
 					canUserSeeNotApprovedComments, new DefaultDictionary<int, List<Comment>> { {commentId, replies }}, likesCount,
 					addCourseIdAndSlideId: true, addParentCommentId: true, addReplies: true
@@ -83,11 +84,32 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			}
 			
 			likesCount = await commentLikesRepo.GetLikesCountsAsync(new [] { commentId }).ConfigureAwait(false);
-			return BuildCommentInfo(
+			return BuildCommentResponse(
 				comment,
 				canUserSeeNotApprovedComments, new DefaultDictionary<int, List<Comment>>(), likesCount,
 				addCourseIdAndSlideId: true, addParentCommentId: true, addReplies: false
 			);
+		}
+
+		[HttpGet("likes")]
+		public async Task<ActionResult<CommentLikesResponse>> Likes(int commentId, [FromQuery] CommentLikesParameters parameters)
+		{
+			var likes = await commentLikesRepo.GetLikesAsync(commentId).ConfigureAwait(false);
+			var paginatedLikes = likes.Skip(parameters.Offset).Take(parameters.Count).ToList();
+			return new CommentLikesResponse
+			{
+				Likes = paginatedLikes.Select(like => new CommentLikeInfo
+				{
+					User = BuildShortUserInfo(like.User),
+					Timestamp = like.Timestamp,
+				}).ToList(),
+				PaginationResponse = new PaginationResponse
+				{
+					Offset = parameters.Offset,
+					Count = paginatedLikes.Count,
+					TotalCount = likes.Count,
+				}
+			};
 		}
 	}
 }
