@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Database.Models;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Identity;
 
 namespace Database.Repos
 {
 	public interface IUsersRepo
 	{
+		[ItemCanBeNull]
 		Task<ApplicationUser> FindUserByIdAsync(string userId);
 		Task<List<UserRolesInfo>> FindUsers(UserSearchQuery query, int limit=100);
 		List<string> FilterUsersByNamePrefix(string namePrefix);

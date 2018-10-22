@@ -34,8 +34,11 @@ namespace Database.Repos
 
 		public async Task<ApplicationUser> FindUserByIdAsync(string userId)
 		{
-			var user = await db.Users.Include(u => u.Roles).DeferredFirstOrDefault(u => u.Id == userId).FromCacheAsync().ConfigureAwait(false);
-			return user == null || user.IsDeleted ? null : user;
+			var user = await db.Users.FindAsync(userId).ConfigureAwait(false);
+			if (user == null)
+				return null;
+			
+			return user.IsDeleted ? null : user;
 		}
 
 		/* Pass limit=0 to disable limiting */
