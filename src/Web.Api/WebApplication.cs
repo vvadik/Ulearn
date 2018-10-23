@@ -92,6 +92,7 @@ namespace Ulearn.Web.Api
 							.WithOrigins(configuration.Web.Cors.AllowOrigins)
 							.AllowAnyMethod()
 							.WithHeaders("Authorization")
+							.WithExposedHeaders("Location")
 							.AllowCredentials();
 					});
 					
