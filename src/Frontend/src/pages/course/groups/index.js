@@ -1,13 +1,8 @@
 import React, { Component } from "react";
-import api from "../../../api";
+import api from "../../../api/index";
 import PropTypes from 'prop-types';
-import Loader from "@skbkontur/react-ui/components/Loader/Loader";
-import Input from "@skbkontur/react-ui/components/Input/Input";
-import Icon from "@skbkontur/react-ui/components/Icon/Icon";
-import GroupInfo from "./GroupInfo";
-import GroupHeader from "./GroupHeader";
-// import GroupsSettingsPage from "./GroupSettingsPage";
-
+import GroupsList from "./GroupPage/GroupsList";
+import GroupHeader from "./GroupPage/GroupHeader";
 
 import "./groupsPage.less";
 
@@ -77,29 +72,3 @@ GroupsPage.propTypes = {
 };
 
 export default GroupsPage;
-
-class GroupsList extends Component {
-
-	render() {
-		if (this.props.loading) {
-			return (
-				<Loader type="big" active />
-			)
-		}
-		return (
-			<div className="groups-wrapper">
-				<Input className="search-field" placeholder="Начните вводить название группы" leftIcon={<Icon name="Search" />} />
-				{ this.props.groups.map(group =>
-					<GroupInfo
-						key={group.id}
-						group={group}
-					/>) }
-			</div>
-		);
-	}
-}
-
-GroupsList.propTypes = {
-	groups: PropTypes.array,
-	loading: PropTypes.bool
-};
