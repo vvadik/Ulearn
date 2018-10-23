@@ -72,6 +72,9 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			 await base.OnActionExecutionAsync(context, next).ConfigureAwait(false);
 		}
 		
+		/// <summary>
+		/// Информация о комментарии
+		/// </summary>
 		[HttpGet]
 		public async Task<ActionResult<CommentResponse>> Comment(int commentId, [FromQuery] CommentParameters parameters)
 		{
@@ -98,6 +101,9 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			);
 		}
 
+		/// <summary>
+		/// Лайки к комментарию
+		/// </summary>
 		[HttpGet("likes")]
 		public async Task<ActionResult<CommentLikesResponse>> Likes(int commentId, [FromQuery] CommentLikesParameters parameters)
 		{
@@ -119,6 +125,9 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			};
 		}
 
+		/// <summary>
+		/// Лайкнуть комментарий
+		/// </summary>
 		[Authorize]
 		[SwaggerResponse((int) HttpStatusCode.Conflict, "You have liked the comment already")]
 		[HttpPost("like")]
@@ -133,7 +142,10 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			
 			return Ok(new SuccessResponse($"You have liked the comment {commentId}"));
 		}
-		
+
+		/// <summary>
+		/// Удалить лайк к комментарию
+		/// </summary>
 		[Authorize]
 		[SwaggerResponse((int) HttpStatusCode.NotFound, "You don't have like for the comment")]
 		[HttpDelete("like")]

@@ -13,13 +13,13 @@ namespace Database.Di
 	{
 		public static IServiceCollection AddDatabaseServices(this IServiceCollection services, ILogger logger)
 		{
-			services.AddSingleton<InitialDataCreator>();
-			
+		
 			var courseManager = new WebCourseManager(logger);
 			services.AddSingleton<WebCourseManager>(courseManager);
 			services.AddSingleton<IWebCourseManager>(courseManager);
 			
 			services.AddScoped<UlearnUserManager>();
+			services.AddScoped<InitialDataCreator>();
 			
 			services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 				{

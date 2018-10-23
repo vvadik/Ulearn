@@ -102,7 +102,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			var ownerId = User.GetUserId();
 			var group = await groupsRepo.CreateGroupAsync(course.Id, parameters.Name, ownerId).ConfigureAwait(false);
 
-			var url = Url.Action(new UrlActionContext { Action = nameof(GroupController.Group), Controller = "Group", Values = new { groupId = @group.Id }});
+			var url = Url.Action(new UrlActionContext { Action = nameof(GroupController.Group), Controller = "Group", Values = new { groupId = group.Id }});
 			return Created(url, new CreateGroupResponse
 			{
 				GroupId = group.Id,

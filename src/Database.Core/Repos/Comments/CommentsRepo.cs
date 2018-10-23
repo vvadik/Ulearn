@@ -25,7 +25,7 @@ namespace Database.Repos.Comments
 			this.courseRolesRepo = courseRolesRepo;
 		}
 		
-		public async Task<Comment> AddCommentAsync(string authorId, string courseId, Guid slideId, int parentCommentId, string commentText)
+		public async Task<Comment> AddCommentAsync(string authorId, string courseId, Guid slideId, int parentCommentId, bool isForInstructorsOnly, string commentText)
 		{
 			var commentsPolicy = await commentPoliciesRepo.GetCommentsPolicyAsync(courseId).ConfigureAwait(false);
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(authorId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
@@ -33,7 +33,7 @@ namespace Database.Repos.Comments
 
 			/* Instructors' replies are automatically correct */
 			var isReply = parentCommentId != -1;
-			var isCorrectAnswer = isReply && isInstructor;
+			var isCorrectAnswer = isReply && isInstructor && !isForInstructorsOnly;
 			
 			var comment = new Comment
 			{
@@ -44,6 +44,7 @@ namespace Database.Repos.Comments
 				Text = commentText,
 				IsApproved = isApproved,
 				IsCorrectAnswer = isCorrectAnswer,
+				IsForInstructorsOnly = isForInstructorsOnly,
 				PublishTime = DateTime.Now
 			};
 			db.Comments.Add(comment);
@@ -155,7 +156,8 @@ namespace Database.Repos.Comments
 
 		public async Task<bool> IsUserAddedMaxCommentsInLastTimeAsync(string userId, int maxCount, TimeSpan lastTime)
 		{
-			var lastComments = db.Comments.Where(x => x.AuthorId == userId)
+			var lastComments = db.Comments
+				.Where(x => x.AuthorId == userId)
 				.OrderByDescending(x => x.PublishTime)
 				.Take(maxCount)
 				.OrderBy(x => x.PublishTime);

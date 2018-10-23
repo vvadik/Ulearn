@@ -17,9 +17,10 @@ namespace Database.Repos.Comments
 		/// <param name="courseId">Идентификатор курса</param>
 		/// <param name="slideId">Идентификатор слайда</param>
 		/// <param name="parentCommentId">Идентификатор родительского комментария. -1, если родительского комментарий нет</param>
+		/// <param name="isForInstructorsOnly">Комментарий для преподавателей?</param>
 		/// <param name="commentText">Текст комментария</param>
 		/// <returns>Добавленный комментарий</returns>
-		Task<Comment> AddCommentAsync(string authorId, string courseId, Guid slideId, int parentCommentId, string commentText);
+		Task<Comment> AddCommentAsync(string authorId, string courseId, Guid slideId, int parentCommentId, bool isForInstructorsOnly, string commentText);
 		
 		[ItemCanBeNull]
 		Task<Comment> FindCommentByIdAsync(int commentId, bool includeDeleted=false);
