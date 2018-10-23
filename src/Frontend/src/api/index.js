@@ -58,6 +58,12 @@ function post(url, options) {
     return request(url, options);
 }
 
+function patch(url, options) {
+	options = options || {};
+	options.method = 'PATCH';
+	return request(url, options);
+}
+
 let api = {
     account: account,
     courses: courses,
@@ -65,6 +71,7 @@ let api = {
 	groups: groups,
     get: get,
     post: post,
+	patch: patch,
     request: request
 };
 
