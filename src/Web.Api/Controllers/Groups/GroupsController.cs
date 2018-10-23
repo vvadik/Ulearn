@@ -97,12 +97,17 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		[HttpPost("in/{courseId}")]
 		[Authorize(Policy = "Instructors")]
 		[ProducesResponseType((int) HttpStatusCode.Created)]
-		public async Task<ActionResult> CreateGroup([FromRoute] Course course, CreateGroupParameters parameters)
+		public async Task<ActionResult<CreateGroupResponse>> CreateGroup([FromRoute] Course course, CreateGroupParameters parameters)
 		{
 			var ownerId = User.GetUserId();
 			var group = await groupsRepo.CreateGroupAsync(course.Id, parameters.Name, ownerId).ConfigureAwait(false);
 
-			return Created(Url.Action(new UrlActionContext { Action = nameof(GroupController.Group), Controller = "Group", Values = new { groupId = group.Id }}), null);
+			var url = Url.Action(new UrlActionContext { Action = nameof(GroupController.Group), Controller = "Group", Values = new { groupId = @group.Id }});
+			return Created(url, new CreateGroupResponse
+			{
+				GroupId = group.Id,
+				ApiUrl = url,
+			});
 		}
 	}
 }
