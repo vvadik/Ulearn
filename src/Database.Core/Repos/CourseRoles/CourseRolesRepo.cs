@@ -2,13 +2,11 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
-using Database.Repos.CourseRoles;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Database.Repos
+namespace Database.Repos.CourseRoles
 {
-	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
+	/* This repo is fully migrated to .NET Core and EF Core */
 	public class CourseRolesRepo : ICourseRolesRepo
 	{
 		private readonly UlearnDb db;
@@ -22,7 +20,7 @@ namespace Database.Repos
 			
 		public Task<Dictionary<string, CourseRoleType>> GetRolesAsync(string userId)
 		{
-			return db.UserRoles
+			return db.CourseRoles
 				.Where(role => role.UserId == userId)
 				.GroupBy(role => role.CourseId)
 				.ToDictionaryAsync(g => g.Key, g => g.Select(role => role.Role).Min());
@@ -30,19 +28,19 @@ namespace Database.Repos
 
 		public async Task<bool> ToggleRoleAsync(string courseId, string userId, CourseRoleType roleType)
 		{
-			var userRole = await db.UserRoles.FirstOrDefaultAsync(u => u.UserId == userId && u.Role == roleType && u.CourseId == courseId).ConfigureAwait(false);
-			if (userRole == null)
-				db.UserRoles.Add(new UserRole
+			var role = await db.CourseRoles.FirstOrDefaultAsync(u => u.UserId == userId && u.Role == roleType && u.CourseId == courseId).ConfigureAwait(false);
+			if (role == null)
+				db.CourseRoles.Add(new CourseRole
 				{
 					UserId = userId,
 					CourseId = courseId,
 					Role = roleType
 				});
 			else
-				db.UserRoles.Remove(userRole);
+				db.CourseRoles.Remove(role);
 			await db.SaveChangesAsync().ConfigureAwait(false);
 
-			return userRole == null;
+			return role == null;
 		}
 
 		public async Task<bool> HasUserAccessToCourseAsync(string userId, string courseId, CourseRoleType minCourseRoleType)
@@ -51,7 +49,7 @@ namespace Database.Repos
 			if (usersRepo.IsSystemAdministrator(user))
 				return true;
 			
-			return await db.UserRoles.Where(r => r.UserId == userId && r.CourseId == courseId && r.Role <= minCourseRoleType).AnyAsync().ConfigureAwait(false);
+			return await db.CourseRoles.Where(r => r.UserId == userId && r.CourseId == courseId && r.Role <= minCourseRoleType).AnyAsync().ConfigureAwait(false);
 		}
 
 		public async Task<bool> HasUserAccessToAnyCourseAsync(string userId, CourseRoleType minCourseRoleType)
@@ -60,7 +58,7 @@ namespace Database.Repos
 			if (usersRepo.IsSystemAdministrator(user))
 				return true;
 			
-			return await db.UserRoles.Where(r => r.UserId == userId && r.Role <= minCourseRoleType).AnyAsync().ConfigureAwait(false);
+			return await db.CourseRoles.Where(r => r.UserId == userId && r.Role <= minCourseRoleType).AnyAsync().ConfigureAwait(false);
 		}
 	}
 }

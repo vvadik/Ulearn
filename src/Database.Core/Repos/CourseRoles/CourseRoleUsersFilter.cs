@@ -20,14 +20,14 @@ namespace Database.Repos.CourseRoles
 			if (!courseRoleType.HasValue)
 				return null;
 
-			var userRoles = db.UserRoles.AsQueryable();
-			userRoles = includeHighRoles
-				? userRoles.Where(userRole => userRole.Role <= courseRoleType)
-				: userRoles.Where(userRole => userRole.Role == courseRoleType);
+			var courseRoles = db.CourseRoles.AsQueryable();
+			courseRoles = includeHighRoles
+				? courseRoles.Where(userRole => userRole.Role <= courseRoleType)
+				: courseRoles.Where(userRole => userRole.Role == courseRoleType);
 
 			if (!string.IsNullOrEmpty(courseId))
-				userRoles = userRoles.Where(userRole => userRole.CourseId == courseId);
-			return userRoles.Select(user => user.UserId).Distinct().ToListAsync();
+				courseRoles = courseRoles.Where(userRole => userRole.CourseId == courseId);
+			return courseRoles.Select(user => user.UserId).Distinct().ToListAsync();
 		}
 		
 		public Task<List<string>> GetListOfUsersByPrivilegeAsync(bool onlyPrivileged, string courseId)
@@ -35,10 +35,10 @@ namespace Database.Repos.CourseRoles
 			if (!onlyPrivileged)
 				return null;
 
-			var userRoles = db.UserRoles.AsQueryable();
+			var courseRoles = db.CourseRoles.AsQueryable();
 			if (courseId != null)
-				userRoles = userRoles.Where(userRole => userRole.CourseId == courseId);
-			return userRoles.Select(userRole => userRole.UserId).Distinct().ToListAsync();
+				courseRoles = courseRoles.Where(userRole => userRole.CourseId == courseId);
+			return courseRoles.Select(userRole => userRole.UserId).Distinct().ToListAsync();
 		}
 	}
 }

@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Database.Models
 {
-	public class UserRole
+	[Table("UserRoles")]
+	public class CourseRole
 	{
 		[Required]
 		[Key]
