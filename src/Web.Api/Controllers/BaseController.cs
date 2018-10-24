@@ -27,6 +27,7 @@ namespace Ulearn.Web.Api.Controllers
 		protected readonly IUsersRepo usersRepo;
 
 		protected string UserId => User.GetUserId();
+		protected bool IsAuthenticated => User.Identity.IsAuthenticated;
 
 		public BaseController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo)
 		{

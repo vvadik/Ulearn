@@ -1,4 +1,7 @@
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using Database.Models;
+using Ulearn.Web.Api.Models.Validations;
 
 namespace Ulearn.Web.Api.Models.Parameters.Comments
 {
@@ -6,6 +9,8 @@ namespace Ulearn.Web.Api.Models.Parameters.Comments
 	public class CreateCommentParameters
 	{
 		[DataMember(Name = "text", IsRequired = true)]
+		[NotEmpty(ErrorMessage = "Text can not be empty")]
+		[MaxLength(CommentsPolicy.MaxCommentLength, ErrorMessage = "Comment is too large. Max allowed length is 10000 chars")]
 		public string Text { get; set; }
 
 		[DataMember(Name = "reply_to")]

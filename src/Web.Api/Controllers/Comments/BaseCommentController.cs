@@ -18,15 +18,17 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		protected readonly ICommentLikesRepo commentLikesRepo;
 		protected readonly ICoursesRepo coursesRepo;
 		protected readonly ICourseRolesRepo courseRolesRepo;
+		protected readonly INotificationsRepo notificationsRepo;
 
 		public BaseCommentController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
-			ICommentsRepo commentsRepo, ICommentLikesRepo commentLikesRepo, ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo)
+			ICommentsRepo commentsRepo, ICommentLikesRepo commentLikesRepo, ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo, INotificationsRepo notificationsRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.commentsRepo = commentsRepo;
 			this.commentLikesRepo = commentLikesRepo;
 			this.coursesRepo = coursesRepo;
 			this.courseRolesRepo = courseRolesRepo;
+			this.notificationsRepo = notificationsRepo;
 		}
 
 		protected List<CommentResponse> BuildCommentsListResponse(IEnumerable<Comment> comments,
@@ -90,6 +92,32 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		protected List<Comment> FilterVisibleComments(List<Comment> comments, bool canUserSeeNotApprovedComments)
 		{
 			return canUserSeeNotApprovedComments ? comments : comments.Where(c => c.IsApproved || c.AuthorId == UserId).ToList();
+		}
+
+		protected async Task NotifyAboutNewCommentAsync(Comment comment)
+		{
+			var courseId = comment.CourseId;
+
+			if (! comment.IsTopLevel)
+			{
+				var parentComment = await commentsRepo.FindCommentByIdAsync(comment.ParentCommentId).ConfigureAwait(false);
+				if (parentComment != null)
+				{
+					var replyNotification = new RepliedToYourCommentNotification
+					{
+						Comment = comment,
+						ParentComment = parentComment,
+					};
+					await notificationsRepo.AddNotificationAsync(courseId, replyNotification, comment.AuthorId).ConfigureAwait(false);
+				}
+			}
+
+			/* Create NewComment[ForInstructors]Notification later than RepliedToYourCommentNotification, because the last one is blocker for the first one.
+			 * We don't send NewComment[ForInstructors]Notification if RepliedToYouCommentNotification exists */
+			var notification = comment.IsForInstructorsOnly
+				? (Notification) new NewCommentForInstructorsOnlyNotification { Comment = comment } 
+				: new NewCommentNotification { Comment = comment };
+			await notificationsRepo.AddNotificationAsync(courseId, notification, comment.AuthorId).ConfigureAwait(false);
 		}
 	}
 }

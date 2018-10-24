@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -7,6 +8,7 @@ using Database.Models;
 using Database.Repos;
 using Database.Repos.Comments;
 using Database.Repos.CourseRoles;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -25,22 +27,20 @@ namespace Ulearn.Web.Api.Controllers.Comments
 	[Route("comment/{commentId:int:min(0)}")]
 	public class CommentController : BaseCommentController
 	{
-		private readonly INotificationsRepo notificationsRepo;
-
 		public CommentController(ILogger logger, IWebCourseManager courseManager, UlearnDb db,
 			IUsersRepo usersRepo, ICommentsRepo commentsRepo, ICommentLikesRepo commentLikesRepo, ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo,
 			INotificationsRepo notificationsRepo)
-			: base(logger, courseManager, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo)
+			: base(logger, courseManager, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo, notificationsRepo)
 		{
-			this.notificationsRepo = notificationsRepo;
 		}
 
 		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
 		{
 			var commentId = (int) context.ActionArguments["commentId"];
-			var comment = await commentsRepo.FindCommentByIdAsync(commentId).ConfigureAwait(false);
+			var comment = await commentsRepo.FindCommentByIdAsync(commentId, includeDeleted: true).ConfigureAwait(false);
 
-			if (comment == null)
+			var isPatchRequest = context.HttpContext.Request.Method.Equals("PATCH", StringComparison.InvariantCultureIgnoreCase);
+			if (comment == null || (comment.IsDeleted && !isPatchRequest))
 			{
 				context.Result = NotFound(new ErrorResponse("Comment not found"));
 				return;
@@ -50,7 +50,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			{
 				var isAuthenticated = User.Identity.IsAuthenticated;
 				var canUserSeeNotApprovedComments = await CanUserSeeNotApprovedCommentsAsync(UserId, comment.CourseId).ConfigureAwait(false);
-				if (!isAuthenticated || !canUserSeeNotApprovedComments)
+				if (!isAuthenticated || (!canUserSeeNotApprovedComments && comment.AuthorId != UserId))
 				{
 					context.Result = StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse("You have no access to this comment"));
 					return;
@@ -69,7 +69,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 
 			context.ActionArguments["comment"] = comment;
 			
-			 await base.OnActionExecutionAsync(context, next).ConfigureAwait(false);
+			await base.OnActionExecutionAsync(context, next).ConfigureAwait(false);
 		}
 		
 		/// <summary>
@@ -99,6 +99,115 @@ namespace Ulearn.Web.Api.Controllers.Comments
 				canUserSeeNotApprovedComments, new DefaultDictionary<int, List<Comment>>(), likesCount,
 				addCourseIdAndSlideId: true, addParentCommentId: true, addReplies: false
 			);
+		}
+
+		/// <summary>
+		/// Удалить комментарий
+		/// </summary>
+		[Authorize]
+		[HttpDelete]
+		public async Task<IActionResult> DeleteComment(int commentId)
+		{
+			var comment = await commentsRepo.FindCommentByIdAsync(commentId).ConfigureAwait(false);
+			
+			var canEditOrDeleteComment = await CanEditOrDeleteCommentAsync(comment, UserId).ConfigureAwait(false);
+			if (!canEditOrDeleteComment)
+				return StatusCode((int)HttpStatusCode.Forbidden, "You can not delete this comment. Only author, course admin or user with special privileges can do it.");
+
+			await commentsRepo.DeleteCommentAsync(commentId).ConfigureAwait(false);
+
+			return Ok(new SuccessResponse($"Comment {commentId} successfully deleted"));
+		}
+
+		/// <summary>
+		/// Обновить комментарий и мета-информацию о нём. Если комментарий был удалён, то любой такой запрос восстанавливает его
+		/// </summary>
+		[Authorize]
+		[SwaggerResponse((int)HttpStatusCode.RequestEntityTooLarge, "Your comment is too large")]
+		[HttpPatch]
+		public async Task<IActionResult> UpdateComment(int commentId, [FromBody] UpdateCommentParameters parameters)
+		{
+			var comment = await commentsRepo.FindCommentByIdAsync(commentId, includeDeleted: true).ConfigureAwait(false);
+
+			if (comment == null)
+				return NotFound(new ErrorResponse($"Comment {commentId} not found"));
+
+			if (comment.IsDeleted)
+				await commentsRepo.RestoreCommentAsync(commentId).ConfigureAwait(false);
+
+			try
+			{
+				if (!string.IsNullOrEmpty(parameters.Text))
+					await UpdateCommentTextAsync(comment, parameters.Text).ConfigureAwait(false);
+				
+				if (parameters.IsApproved.HasValue)
+					await UpdateCommentIsApprovedAsync(comment, parameters.IsApproved.Value).ConfigureAwait(false);
+
+				if (parameters.IsPinned.HasValue)
+					await UpdateCommentIsPinnedAsync(comment, parameters.IsPinned.Value).ConfigureAwait(false);
+
+				if (parameters.IsCorrectAnswer.HasValue)
+					await UpdateCommentIsCorrectAnswerAsync(comment, parameters.IsCorrectAnswer.Value).ConfigureAwait(false);
+			}
+			catch (StatusCodeException e)
+			{
+				return StatusCode(e.Code, e.Message);
+			}
+
+			return Ok(new SuccessResponse($"Comment {commentId} successfully updated"));
+		}
+
+		private async Task UpdateCommentTextAsync([NotNull] Comment comment, string text)
+		{
+			var canEditOrDeleteComment = await CanEditOrDeleteCommentAsync(comment, UserId).ConfigureAwait(false);
+			if (!canEditOrDeleteComment)
+				throw new StatusCodeException((int)HttpStatusCode.Forbidden, "You can not edit this comment. Only author, course admin or user with special privileges can do it.");
+
+			if (text.Length > CommentsPolicy.MaxCommentLength)
+				throw new StatusCodeException((int)HttpStatusCode.RequestEntityTooLarge, new ErrorResponse($"Your comment is too large. Max allowed length is {CommentsPolicy.MaxCommentLength} chars"));
+			
+			await commentsRepo.EditCommentTextAsync(comment.Id, text).ConfigureAwait(false);
+		}
+		
+		private async Task UpdateCommentIsApprovedAsync([NotNull] Comment comment, bool isApproved)
+		{
+			var canModerateComments = await CanModerateCommentsInCourseAsync(comment.CourseId, UserId).ConfigureAwait(false);
+			if (!canModerateComments)
+				throw new StatusCodeException((int)HttpStatusCode.Forbidden, "You can not approve/disapprove this comment. Only course admin or user with special privileges can do it.");
+
+			await commentsRepo.ApproveCommentAsync(comment.Id, isApproved).ConfigureAwait(false);
+			if (!comment.IsApproved && isApproved)
+				await NotifyAboutNewCommentAsync(comment).ConfigureAwait(false);
+		}
+		
+		private async Task UpdateCommentIsPinnedAsync([NotNull] Comment comment, bool isPinned)
+		{
+			var canModerateComments = await CanModerateCommentsInCourseAsync(comment.CourseId, UserId).ConfigureAwait(false);
+			if (!canModerateComments)
+				throw new StatusCodeException((int)HttpStatusCode.Forbidden, "You can not pin/unpin this comment. Only course admin or user with special privileges can do it.");
+
+			await commentsRepo.PinCommentAsync(comment.Id, isPinned).ConfigureAwait(false);
+		}
+		
+		private async Task UpdateCommentIsCorrectAnswerAsync([NotNull] Comment comment, bool isCorrectAnswer)
+		{
+			var canModerateComments = await CanModerateCommentsInCourseAsync(comment.CourseId, UserId).ConfigureAwait(false);
+			if (!canModerateComments)
+				throw new StatusCodeException((int)HttpStatusCode.Forbidden, "You can not mark this comment as correct answer or remove this mark. Only course admin or user with special privileges can do it.");
+
+			await commentsRepo.MarkCommentAsCorrectAnswerAsync(comment.Id, isCorrectAnswer).ConfigureAwait(false);
+		}
+
+		private async Task<bool> CanEditOrDeleteCommentAsync(Comment comment, string userId)
+		{
+			return comment.AuthorId == userId || await CanModerateCommentsInCourseAsync(comment.CourseId, userId).ConfigureAwait(false);
+		}
+
+		private async Task<bool> CanModerateCommentsInCourseAsync(string courseId, string userId)
+		{
+			var hasCourseAccessForCommentEditing = await coursesRepo.HasCourseAccessAsync(userId, courseId, CourseAccessType.EditPinAndRemoveComments).ConfigureAwait(false);
+			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
+			return hasCourseAccessForCommentEditing || isCourseAdmin;
 		}
 
 		/// <summary>

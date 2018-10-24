@@ -5,6 +5,9 @@ namespace Ulearn.Web.Api.Models.Parameters.Comments
 {
 	public class SlideCommentsParameters : IPaginationParameters
 	{
+		[FromQuery(Name = "for_instuctors")]
+		public bool ForInstructors { get; set; }
+		
 		[FromQuery(Name = "offset")]
 		[MinValue(0, ErrorMessage = "Offset should be non-negative")]
 		public int Offset { get; set; }

@@ -24,15 +24,13 @@ namespace Ulearn.Web.Api.Controllers.Comments
 	public class CommentsController : BaseCommentController
 	{
 		private readonly ICommentPoliciesRepo commentPoliciesRepo;
-		private readonly INotificationsRepo notificationsRepo;
 
 		public CommentsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db,
 			ICommentsRepo commentsRepo, ICommentLikesRepo commentLikesRepo, ICommentPoliciesRepo commentPoliciesRepo,
 			IUsersRepo usersRepo, ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo, INotificationsRepo notificationsRepo)
-			: base(logger, courseManager, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo)
+			: base(logger, courseManager, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo, notificationsRepo)
 		{
 			this.commentPoliciesRepo = commentPoliciesRepo;
-			this.notificationsRepo = notificationsRepo;
 		}
 
 		/// <summary>
@@ -41,20 +39,17 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		[HttpGet("{slideId:guid}")]
 		public async Task<ActionResult<CommentsListResponse>> SlideComments(string courseId, Guid slideId, [FromQuery] SlideCommentsParameters parameters)
 		{
+			if (parameters.ForInstructors)
+			{
+				if (!IsAuthenticated)
+					return StatusCode((int)HttpStatusCode.Unauthorized, $"You should be authenticated to view instructor comments."); 
+				var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
+				if (!isInstructor)
+					return StatusCode((int)HttpStatusCode.Forbidden, $"You have no access to instructor comments on {courseId}. You should be instructor or course admin.");
+			}
+			
 			var comments = await commentsRepo.GetSlideTopLevelCommentsAsync(courseId, slideId).ConfigureAwait(false);
-			comments = comments.Where(c => !c.IsForInstructorsOnly).ToList();
-			return await GetSlideCommentsResponseAsync(comments, courseId, parameters).ConfigureAwait(false);
-		}
-
-		/// <summary>
-		/// Комментарии для преподавателей под слайдом
-		/// </summary>
-		[Authorize(Policy = "Instructors")]
-		[HttpGet("{slideId:guid}/for_instructors")]
-		public async Task<ActionResult<CommentsListResponse>> SlideCommentsForInstructors(string courseId, Guid slideId, [FromQuery] SlideCommentsParameters parameters)
-		{
-			var comments = await commentsRepo.GetSlideTopLevelCommentsAsync(courseId, slideId).ConfigureAwait(false);
-			comments = comments.Where(c => c.IsForInstructorsOnly).ToList();
+			comments = comments.Where(c => c.IsForInstructorsOnly == parameters.ForInstructors).ToList();
 			return await GetSlideCommentsResponseAsync(comments, courseId, parameters).ConfigureAwait(false);
 		}
 		
@@ -161,32 +156,6 @@ namespace Ulearn.Web.Api.Controllers.Comments
 				return false;
 
 			return true;
-		}
-		
-		private async Task NotifyAboutNewCommentAsync(Comment comment)
-		{
-			var courseId = comment.CourseId;
-
-			if (! comment.IsTopLevel)
-			{
-				var parentComment = await commentsRepo.FindCommentByIdAsync(comment.ParentCommentId).ConfigureAwait(false);
-				if (parentComment != null)
-				{
-					var replyNotification = new RepliedToYourCommentNotification
-					{
-						Comment = comment,
-						ParentComment = parentComment,
-					};
-					await notificationsRepo.AddNotificationAsync(courseId, replyNotification, comment.AuthorId).ConfigureAwait(false);
-				}
-			}
-
-			/* Create NewComment[ForInstructors]Notification later than RepliedToYourCommentNotification, because the last one is blocker for the first one.
-			 * We don't send NewComment[ForInstructors]Notification if RepliedToYouCommentNotification exists */
-			var notification = comment.IsForInstructorsOnly
-				? (Notification) new NewCommentForInstructorsOnlyNotification { Comment = comment } 
-				: new NewCommentNotification { Comment = comment };
-			await notificationsRepo.AddNotificationAsync(courseId, notification, comment.AuthorId).ConfigureAwait(false);
 		}
 	}
 }

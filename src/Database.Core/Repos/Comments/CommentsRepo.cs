@@ -118,7 +118,7 @@ namespace Database.Repos.Comments
 
 		public async Task<Comment> ModifyCommentAsync(int commentId, Action<Comment> modifyAction, bool includeDeleted=false)
 		{
-			var comment = await FindCommentByIdAsync(commentId).ConfigureAwait(false) ?? throw new ArgumentException($"Can't find comment with id {commentId}");
+			var comment = await FindCommentByIdAsync(commentId, includeDeleted).ConfigureAwait(false) ?? throw new ArgumentException($"Can't find comment with id {commentId}");
 			modifyAction(comment);
 			await db.SaveChangesAsync().ConfigureAwait(false);
 			return comment;
