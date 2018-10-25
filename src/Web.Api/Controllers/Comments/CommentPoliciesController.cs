@@ -38,6 +38,9 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			return base.OnActionExecutionAsync(context, next);
 		}
 
+		/// <summary>
+		/// Политика комментариев в курсе
+		/// </summary>
 		[HttpGet]
 		public async Task<ActionResult<CommentPolicyResponse>> Policy(string courseId)
 		{
@@ -50,8 +53,11 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			};
 		}
 
-		[Authorize(Policy = "CourseAdmins")]
+		/// <summary>
+		/// Изменить политику комментариев в курсе
+		/// </summary>
 		[HttpPatch]
+		[Authorize(Policy = "CourseAdmins")]
 		public async Task<IActionResult> UpdatePolicy(string courseId, [FromBody] UpdatePolicyParameters parameters)
 		{
 			var policy = await commentPoliciesRepo.GetCommentsPolicyAsync(courseId).ConfigureAwait(false);
