@@ -121,9 +121,9 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		/// <summary>
 		/// Обновить комментарий и мета-информацию о нём. Если комментарий был удалён, то любой такой запрос восстанавливает его
 		/// </summary>
+		[HttpPatch]
 		[Authorize]
 		[SwaggerResponse((int)HttpStatusCode.RequestEntityTooLarge, "Your comment is too large")]
-		[HttpPatch]
 		public async Task<IActionResult> UpdateComment(int commentId, [FromBody] UpdateCommentParameters parameters)
 		{
 			var comment = await commentsRepo.FindCommentByIdAsync(commentId, includeDeleted: true).ConfigureAwait(false);
@@ -131,27 +131,20 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			if (comment == null)
 				return NotFound(new ErrorResponse($"Comment {commentId} not found"));
 
-			if (comment.IsDeleted)
+			if (comment.IsDeleted && await CanEditOrDeleteCommentAsync(comment, UserId).ConfigureAwait(false))
 				await commentsRepo.RestoreCommentAsync(commentId).ConfigureAwait(false);
 
-			try
-			{
-				if (!string.IsNullOrEmpty(parameters.Text))
-					await UpdateCommentTextAsync(comment, parameters.Text).ConfigureAwait(false);
+			if (!string.IsNullOrEmpty(parameters.Text))
+				await UpdateCommentTextAsync(comment, parameters.Text).ConfigureAwait(false);
 				
-				if (parameters.IsApproved.HasValue)
-					await UpdateCommentIsApprovedAsync(comment, parameters.IsApproved.Value).ConfigureAwait(false);
+			if (parameters.IsApproved.HasValue)
+				await UpdateCommentIsApprovedAsync(comment, parameters.IsApproved.Value).ConfigureAwait(false);
 
-				if (parameters.IsPinned.HasValue)
-					await UpdateCommentIsPinnedAsync(comment, parameters.IsPinned.Value).ConfigureAwait(false);
+			if (parameters.IsPinned.HasValue)
+				await UpdateCommentIsPinnedAsync(comment, parameters.IsPinned.Value).ConfigureAwait(false);
 
-				if (parameters.IsCorrectAnswer.HasValue)
-					await UpdateCommentIsCorrectAnswerAsync(comment, parameters.IsCorrectAnswer.Value).ConfigureAwait(false);
-			}
-			catch (StatusCodeException e)
-			{
-				return StatusCode(e.Code, e.Message);
-			}
+			if (parameters.IsCorrectAnswer.HasValue)
+				await UpdateCommentIsCorrectAnswerAsync(comment, parameters.IsCorrectAnswer.Value).ConfigureAwait(false);
 
 			return Ok(new SuccessResponse($"Comment {commentId} successfully updated"));
 		}
@@ -163,7 +156,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 				throw new StatusCodeException((int)HttpStatusCode.Forbidden, "You can not edit this comment. Only author, course admin or user with special privileges can do it.");
 
 			if (text.Length > CommentsPolicy.MaxCommentLength)
-				throw new StatusCodeException((int)HttpStatusCode.RequestEntityTooLarge, new ErrorResponse($"Your comment is too large. Max allowed length is {CommentsPolicy.MaxCommentLength} chars"));
+				throw new StatusCodeException((int)HttpStatusCode.RequestEntityTooLarge, $"Your comment is too large. Max allowed length is {CommentsPolicy.MaxCommentLength} chars");
 			
 			await commentsRepo.EditCommentTextAsync(comment.Id, text).ConfigureAwait(false);
 		}
@@ -236,9 +229,9 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		/// <summary>
 		/// Лайкнуть комментарий
 		/// </summary>
+		[HttpPost("like")]
 		[Authorize]
 		[SwaggerResponse((int) HttpStatusCode.Conflict, "You have liked the comment already")]
-		[HttpPost("like")]
 		public async Task<IActionResult> Like(int commentId)
 		{
 			if (await commentLikesRepo.DidUserLikeComment(commentId, UserId).ConfigureAwait(false))
@@ -254,9 +247,9 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		/// <summary>
 		/// Удалить лайк к комментарию
 		/// </summary>
+		[HttpDelete("like")]
 		[Authorize]
 		[SwaggerResponse((int) HttpStatusCode.NotFound, "You don't have like for the comment")]
-		[HttpDelete("like")]
 		public async Task<IActionResult> Unlike(int commentId)
 		{
 			if (!await commentLikesRepo.DidUserLikeComment(commentId, UserId).ConfigureAwait(false))

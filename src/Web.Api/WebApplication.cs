@@ -29,6 +29,7 @@ using uLearn;
 using uLearn.Configuration;
 using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Authorization;
+using Ulearn.Web.Api.Controllers;
 using Ulearn.Web.Api.Controllers.Notifications;
 using Ulearn.Web.Api.Models.Binders;
 using Ulearn.Web.Api.Models.Responses;
@@ -214,6 +215,11 @@ namespace Ulearn.Web.Api
 			/* See https://github.com/IharYakimush/asp-net-core-exception-handling for details */
 			services.AddExceptionHandlingPolicies(options =>
 			{
+				options.For<StatusCodeException>()
+					.Response(exception => exception.Code)
+					.WithObjectResult((r, exception) => new ErrorResponse(exception.Message))
+					.Handled();
+				
 				/* Ensure that all exception types are handled by adding handler for generic exception at the end. */
 				options.For<Exception>()
 					.Log(lo =>

@@ -5,12 +5,10 @@ namespace Ulearn.Web.Api.Controllers
 	public class StatusCodeException : Exception
 	{
 		public int Code { get; }
-		public object Result { get; }
 
-		public StatusCodeException(int code, object result)
+		public StatusCodeException(int code, string message) : base(message)
 		{
 			Code = code;
-			Result = result;
 		}
 	}
 }
