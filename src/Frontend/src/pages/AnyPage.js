@@ -27,7 +27,7 @@ class AnyPage extends Component {
         }
 
         return (
-            <LinkClickCapturer exclude={["/Certificate/", "/elmah/"]}>
+            <LinkClickCapturer exclude={["/Certificate/", "/elmah/", "/Courses/"]}>
                 <DownloadedHtmlContent url={url}/>
             </LinkClickCapturer>
         )

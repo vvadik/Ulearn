@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using System.Threading.Tasks;
 using Database;
+using Database.Repos;
 using Database.Repos.Groups;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,8 +22,10 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		private readonly IGroupsRepo groupsRepo;
 		private readonly IGroupMembersRepo groupMembersRepo;
 
-		public JoinGroupController(ILogger logger, WebCourseManager courseManager, UlearnDb db, IGroupsRepo groupsRepo, IGroupMembersRepo groupMembersRepo)
-			: base(logger, courseManager, db)
+		public JoinGroupController(ILogger logger, WebCourseManager courseManager, UlearnDb db,
+			IUsersRepo usersRepo,
+			IGroupsRepo groupsRepo, IGroupMembersRepo groupMembersRepo)
+			: base(logger, courseManager, db, usersRepo)
 		{
 			this.groupsRepo = groupsRepo;
 			this.groupMembersRepo = groupMembersRepo;

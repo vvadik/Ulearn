@@ -19,13 +19,17 @@ import api from "./api"
 let loggerMiddleware = createLogger();
 
 function configureStore(preloadedState) {
-    return createStore(
+	let env = process.env.NODE_ENV || 'development';
+	let isDevelopment = env === 'development';
+
+	let middlewares = isDevelopment ?
+		applyMiddleware(thunkMiddleware, loggerMiddleware) :
+		applyMiddleware(thunkMiddleware);
+
+	return createStore(
         rootReducer,
         preloadedState,
-        applyMiddleware(
-            thunkMiddleware,
-            loggerMiddleware
-        )
+        middlewares
     )
 }
 

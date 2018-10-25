@@ -26,10 +26,11 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 		private static FeedNotificationTransport commentsFeedNotificationTransport;
 
 		public NotificationsController(ILogger logger, WebCourseManager courseManager, UlearnDb db,
+			IUsersRepo usersRepo,
 			INotificationsRepo notificationsRepo, IFeedRepo feedRepo,
 			IServiceProvider serviceProvider,
 			INotificationDataPreloader notificationDataPreloader)
-			: base(logger, courseManager, db)
+			: base(logger, courseManager, db, usersRepo)
 		{
 			this.notificationsRepo = notificationsRepo ?? throw new ArgumentNullException(nameof(notificationsRepo));
 			this.feedRepo = feedRepo ?? throw new ArgumentNullException(nameof(feedRepo));
@@ -178,7 +179,7 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 		{
 			var data = new NotificationData();
 			if (notification is AbstractCommentNotification commentNotification)
-				data.Comment = BuildCommentInfo(notificationsData.CommentsByIds.GetOrDefault(commentNotification.CommentId));
+				data.Comment = BuildNotificationCommentInfo(notificationsData.CommentsByIds.GetOrDefault(commentNotification.CommentId));
 			return data;
 		}
 	}

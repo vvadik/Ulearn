@@ -17,6 +17,6 @@
   <files>
     <file src="static\**\*.*" target="static\" />
     <file src="index.html" target="" />
-    <file src="service-worker.js" target="" />
+<!--    <file src="service-worker.js" target="" />-->
   </files>
 </package>

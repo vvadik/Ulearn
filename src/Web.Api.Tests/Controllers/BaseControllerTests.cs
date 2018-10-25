@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
+using Database.Repos.CourseRoles;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +20,7 @@ using Ulearn.Common;
 using Ulearn.Web.Api;
 using Ulearn.Web.Api.Controllers;
 using Web.Api.Configuration;
+using Z.EntityFramework.Plus;
 
 namespace Web.Api.Tests.Controllers
 {
@@ -61,6 +63,14 @@ namespace Web.Api.Tests.Controllers
 			
 			await CreateInitialDataInDatabaseAsync().ConfigureAwait(false);
 			await CreateTestUsersAsync().ConfigureAwait(false);
+			
+			/* Configuring Z.EntityFramework.Plus for working with In-Memory database
+			   See https://entityframework-plus.net/batch-delete for details */
+			BatchDeleteManager.InMemoryDbContextFactory = () => CreateDbContext(loggerFactory);
+			
+			/* Cache Manager is not working with In-Memory database.
+			   See https://github.com/zzzprojects/EntityFramework-Plus/issues/391 for details. */
+			QueryCacheManager.IsEnabled = false;
 		}
 
 		private async Task CreateInitialDataInDatabaseAsync()
@@ -96,7 +106,7 @@ namespace Web.Api.Tests.Controllers
 			return services.BuildServiceProvider();
 		}
 
-		private async Task CreateTestUsersAsync(IUsersRepo usersRepo, IUserRolesRepo userRolesRepo, UlearnUserManager userManager)
+		private async Task CreateTestUsersAsync(IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, UlearnUserManager userManager)
 		{
 			var result = await userManager.CreateAsync(TestUsers.Admin, TestUsers.AdminPassword).ConfigureAwait(false);
 			if (! result.Succeeded)
@@ -110,7 +120,7 @@ namespace Web.Api.Tests.Controllers
 		private Task CreateTestUsersAsync()
 		{
 			var usersRepo = serviceProvider.GetService<IUsersRepo>();
-			var userRolesRepo = serviceProvider.GetService<IUserRolesRepo>();
+			var userRolesRepo = serviceProvider.GetService<ICourseRolesRepo>();
 			var userManager = serviceProvider.GetService<UlearnUserManager>();
 			return CreateTestUsersAsync(usersRepo, userRolesRepo, userManager);
 		}

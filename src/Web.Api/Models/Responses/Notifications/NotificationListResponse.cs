@@ -51,11 +51,11 @@ namespace Ulearn.Web.Api.Models.Responses.Notifications
 	public class NotificationData
 	{
 		[DataMember(Name = "comment", EmitDefaultValue = false)]
-		public CommentInfo Comment { get; set; } 
+		public NotificationCommentInfo Comment { get; set; } 
 	}
 
 	[DataContract]
-	public class CommentInfo
+	public class NotificationCommentInfo
 	{
 		[DataMember(Name = "id")]
 		public int Id { get; set; }

@@ -12,7 +12,7 @@ namespace Database.Models
 	}
 
 	[JsonConverter(typeof(StringEnumConverter), true)]
-	public enum CourseRole
+	public enum CourseRoleType
 	{
 		[Display(Name = "Администратор курса")]
 		CourseAdmin,

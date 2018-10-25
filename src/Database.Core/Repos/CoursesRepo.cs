@@ -110,7 +110,7 @@ namespace Database.Repos
 
 		public bool CanRevokeAccess(string courseId, string userId, IPrincipal revokedBy)
 		{
-			return revokedBy.HasAccessFor(courseId, CourseRole.CourseAdmin);
+			return revokedBy.HasAccessFor(courseId, CourseRoleType.CourseAdmin);
 		}
 
 		public async Task<List<CourseAccess>> RevokeAccessAsync(string courseId, string userId, CourseAccessType accessType)

@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Database;
 using Database.Extensions;
 using Database.Models;
 using Database.Repos;
+using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -29,21 +31,19 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		private readonly IGroupsRepo groupsRepo;
 		private readonly IGroupAccessesRepo groupAccessesRepo;
 		private readonly IGroupMembersRepo groupMembersRepo;
-		private readonly IUsersRepo usersRepo;
-		private readonly IUserRolesRepo userRolesRepo;
+		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly INotificationsRepo notificationsRepo;
 		private readonly IGroupsCreatorAndCopier groupsCreatorAndCopier;
 
 		public GroupController(ILogger logger, WebCourseManager courseManager, UlearnDb db,
-			IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo, IUsersRepo usersRepo, IUserRolesRepo userRolesRepo, INotificationsRepo notificationsRepo,
+			IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, INotificationsRepo notificationsRepo,
 			IGroupsCreatorAndCopier groupsCreatorAndCopier)
-			: base(logger, courseManager, db)
+			: base(logger, courseManager, db, usersRepo)
 		{
 			this.groupsRepo = groupsRepo;
 			this.groupAccessesRepo = groupAccessesRepo;
 			this.groupMembersRepo = groupMembersRepo;
-			this.usersRepo = usersRepo;
-			this.userRolesRepo = userRolesRepo;
+			this.courseRolesRepo = courseRolesRepo;
 			this.notificationsRepo = notificationsRepo;
 			this.groupsCreatorAndCopier = groupsCreatorAndCopier;
 		}
@@ -59,7 +59,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 				return;
 			}
 
-			var isVisible = await groupAccessesRepo.IsGroupVisibleForUserAsync(group, User).ConfigureAwait(false);
+			var isVisible = await groupAccessesRepo.IsGroupVisibleForUserAsync(group, UserId).ConfigureAwait(false);
 			if (!isVisible)
 			{
 				context.Result = StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse("You have no access to this group"));
@@ -132,8 +132,9 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		public async Task<IActionResult> ChangeOwner(int groupId, [FromBody] ChangeOwnerParameters parameters)
 		{
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
-			
-			var canChangeOwner = group.OwnerId == UserId || User.HasAccessFor(group.CourseId, CourseRole.CourseAdmin);
+
+			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, group.CourseId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
+			var canChangeOwner = group.OwnerId == UserId || isCourseAdmin;
 			if (!canChangeOwner)
 				return StatusCode((int) HttpStatusCode.Forbidden, new ErrorResponse("You can't change the owner of this group. Only current owner and course admin can change the owner."));
 
@@ -141,7 +142,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			var user = await usersRepo.FindUserByIdAsync(parameters.OwnerId).ConfigureAwait(false);
 			if (user == null)
 				return NotFound(new ErrorResponse($"Can't find user with id {parameters.OwnerId}"));
-			var isInstructor = await userRolesRepo.HasUserAccessToCourseAsync(parameters.OwnerId, group.CourseId, CourseRole.Instructor).ConfigureAwait(false);
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(parameters.OwnerId, group.CourseId, CourseRoleType.Instructor).ConfigureAwait(false);
 			if (!isInstructor)
 				return NotFound(new ErrorResponse($"User {parameters.OwnerId} is not an instructor of course {group.CourseId}"));
 			
@@ -175,9 +176,10 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			return Ok(new SuccessResponse($"Group {group.Id} has been copied to course {parameters.DestinationCourseId}. Id of new group is {newGroup.Id}"));
 		}
 		
-		private Task<bool> CanCreateGroupInCourseAsync(string userId, string courseId)
+		private async Task<bool> CanCreateGroupInCourseAsync(string userId, string courseId)
 		{
-			return userRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRole.Instructor);
+			return await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.Instructor).ConfigureAwait(false) || 
+				await IsSystemAdministratorAsync().ConfigureAwait(false);
 		}
 
 		/// <summary>
@@ -274,7 +276,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			if (destinationGroup == null)
 				return NotFound(new ErrorResponse($"Group {destinationGroupId} not found"));
 			
-			var isDestinationGroupVisible = await groupAccessesRepo.IsGroupVisibleForUserAsync(destinationGroup, User).ConfigureAwait(false);
+			var isDestinationGroupVisible = await groupAccessesRepo.IsGroupVisibleForUserAsync(destinationGroup, UserId).ConfigureAwait(false);
 			if (!isDestinationGroupVisible)
 				return StatusCode((int) HttpStatusCode.Forbidden, new ErrorResponse($"You have no access to group {destinationGroupId}"));
 
@@ -334,7 +336,8 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		{
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
 			
-			var canRevokeAccess = await groupAccessesRepo.CanRevokeAccessAsync(groupId, userId, User).ConfigureAwait(false);
+			var canRevokeAccess = await groupAccessesRepo.CanRevokeAccessAsync(groupId, userId, UserId).ConfigureAwait(false) ||
+				await IsSystemAdministratorAsync().ConfigureAwait(false);
 			if (!canRevokeAccess)
 				return Forbid();
 

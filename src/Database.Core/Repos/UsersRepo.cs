@@ -4,11 +4,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
+using Database.Repos.CourseRoles;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using uLearn;
 using Ulearn.Common;
+using Z.EntityFramework.Plus;
 
 namespace Database.Repos
 {
@@ -17,21 +20,25 @@ namespace Database.Repos
 	{
 		private readonly UlearnDb db;
 		private readonly UlearnUserManager userManager;
-		private readonly IUserRolesRepo userRolesRepo;
+		private readonly ICourseRoleUsersFilter courseRoleUsersFilter;
+		private IdentityRole sysAdminRole = null;
 
 		public const string UlearnBotUsername = "ulearn-bot";
 
-		public UsersRepo(UlearnDb db, UlearnUserManager userManager, IUserRolesRepo userRolesRepo)
+		public UsersRepo(UlearnDb db, UlearnUserManager userManager, ICourseRoleUsersFilter courseRoleUsersFilter)
 		{
 			this.db = db;
 			this.userManager = userManager;
-			this.userRolesRepo = userRolesRepo;
+			this.courseRoleUsersFilter = courseRoleUsersFilter;
 		}
 
 		public async Task<ApplicationUser> FindUserByIdAsync(string userId)
 		{
 			var user = await db.Users.FindAsync(userId).ConfigureAwait(false);
-			return user == null || user.IsDeleted ? null : user;
+			if (user == null)
+				return null;
+			
+			return user.IsDeleted ? null : user;
 		}
 
 		/* Pass limit=0 to disable limiting */
@@ -47,8 +54,8 @@ namespace Database.Repos
 			return await users
 				.FilterByRole(role, userManager)
 				.FilterByUserIds(
-					await userRolesRepo.GetListOfUsersWithCourseRoleAsync(query.CourseRole, query.CourseId, query.IncludeHighCourseRoles).ConfigureAwait(false),
-					await userRolesRepo.GetListOfUsersByPrivilegeAsync(query.OnlyPrivileged, query.CourseId).ConfigureAwait(false)
+					await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(query.CourseRoleType, query.CourseId, query.IncludeHighCourseRoles).ConfigureAwait(false),
+					await courseRoleUsersFilter.GetListOfUsersByPrivilegeAsync(query.OnlyPrivileged, query.CourseId).ConfigureAwait(false)
 				)
 				.GetUserRolesInfoAsync(limit, userManager).ConfigureAwait(false);
 		}
@@ -64,7 +71,7 @@ namespace Database.Repos
 		{
 			return await db.Users
 				.Where(u => !u.IsDeleted)
-				.FilterByUserIds(await userRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRole.Instructor, courseId, includeHighRoles: true).ConfigureAwait(false))
+				.FilterByUserIds(await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, courseId, includeHighRoles: true).ConfigureAwait(false))
 				.GetUserRolesInfoAsync(limit, userManager)
 				.ConfigureAwait(false);
 		}
@@ -74,7 +81,7 @@ namespace Database.Repos
 		{
 			return await db.Users
 				.Where(u => !u.IsDeleted)	
-				.FilterByUserIds(await userRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRole.CourseAdmin, courseId, includeHighRoles: true).ConfigureAwait(false))
+				.FilterByUserIds(await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.CourseAdmin, courseId, includeHighRoles: true).ConfigureAwait(false))
 				.GetUserRolesInfoAsync(limit, userManager)
 				.ConfigureAwait(false);
 		}
@@ -182,6 +189,17 @@ namespace Database.Repos
 			/* Change name to make creating new user with same name possible */
 			user.UserName = user.UserName + "__deleted__" + (new Random().Next(100000));
 			return db.SaveChangesAsync();
+		}
+
+		public bool IsSystemAdministrator(ApplicationUser user)
+		{
+			if (user?.Roles == null)
+				return false;
+			
+			if (sysAdminRole == null)
+				sysAdminRole = db.Roles.First(r => r.Name == LmsRoles.SysAdmin.ToString());	
+			
+			return user.Roles.Any(role => role.RoleId == sysAdminRole.Id);
 		}
 	}
 

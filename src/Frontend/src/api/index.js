@@ -58,12 +58,15 @@ function post(url, options) {
 }
 
 let api = {
-    account: account,
-    courses: courses,
-    notifications: notifications,
+	refreshApiJwtToken: refreshApiJwtToken,
+
     get: get,
     post: post,
-    request: request
+    request: request,
+
+	account: account,
+	courses: courses,
+	notifications: notifications,
 };
 
 

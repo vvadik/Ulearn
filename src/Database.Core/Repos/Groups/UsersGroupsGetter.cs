@@ -22,11 +22,10 @@ namespace Database.Repos.Groups
 			this.groupAccessesRepo = groupAccessesRepo;
 		}
 
-		public async Task<Dictionary<string, List<Group>>> GetUsersGroupsAsync(List<string> courseIds, IEnumerable<string> userIds, ClaimsPrincipal currentUser, int maxCount=3, bool onlyArchived=false)
+		public async Task<Dictionary<string, List<Group>>> GetUsersGroupsAsync(List<string> courseIds, IEnumerable<string> userIds, string currentUserId, int maxCount=3, bool onlyArchived=false)
 		{
-			var coursesWhereUserCanSeeAllGroups = await groupAccessesRepo.GetCoursesWhereUserCanSeeAllGroupsAsync(currentUser, courseIds).ConfigureAwait(false);
+			var coursesWhereUserCanSeeAllGroups = await groupAccessesRepo.GetCoursesWhereUserCanSeeAllGroupsAsync(currentUserId, courseIds).ConfigureAwait(false);
 			coursesWhereUserCanSeeAllGroups = coursesWhereUserCanSeeAllGroups.Select(c => c.ToLower()).ToList();
-			var currentUserId = currentUser.GetUserId();
 
 			var groupsWithAccess = new HashSet<int>(db.GroupAccesses.Where(a => a.UserId == currentUserId && a.IsEnabled).Select(a => a.GroupId));
 			var userGroups = await db.GroupMembers
@@ -49,42 +48,42 @@ namespace Database.Repos.Groups
 			return usersGroups;
 		}
 
-		public async Task<Dictionary<string, List<string>>> GetUsersGroupsNamesAsync(List<string> courseIds, IEnumerable<string> userIds, ClaimsPrincipal currentUser, int maxCount=3, bool onlyArchived=false)
+		public async Task<Dictionary<string, List<string>>> GetUsersGroupsNamesAsync(List<string> courseIds, IEnumerable<string> userIds, string currentUserId, int maxCount=3, bool onlyArchived=false)
 		{
-			var usersGroups = await GetUsersGroupsAsync(courseIds, userIds, currentUser, maxCount + 1, onlyArchived).ConfigureAwait(false);
+			var usersGroups = await GetUsersGroupsAsync(courseIds, userIds, currentUserId, maxCount + 1, onlyArchived).ConfigureAwait(false);
 			return usersGroups.ToDictionary(
 				kv => kv.Key,
 				kv => kv.Value.Select((g, idx) => idx >= maxCount ? "..." : g.Name).ToList());
 		}
 
-		public async Task<Dictionary<string, List<int>>> GetUsersGroupsIdsAsync(List<string> courseIds, IEnumerable<string> userIds, ClaimsPrincipal currentUser, int maxCount=3, bool onlyArchived=false)
+		public async Task<Dictionary<string, List<int>>> GetUsersGroupsIdsAsync(List<string> courseIds, IEnumerable<string> userIds, string currentUserId, int maxCount=3, bool onlyArchived=false)
 		{
-			var usersGroups = await GetUsersGroupsAsync(courseIds, userIds, currentUser, maxCount, onlyArchived).ConfigureAwait(false);
+			var usersGroups = await GetUsersGroupsAsync(courseIds, userIds, currentUserId, maxCount, onlyArchived).ConfigureAwait(false);
 			return usersGroups.ToDictionary(
 				kv => kv.Key,
 				kv => kv.Value.Select(g => g.Id).ToList());
 		}
 
-		public async Task<Dictionary<string, string>> GetUsersGroupsNamesAsStringsAsync(List<string> courseIds, IEnumerable<string> userIds, ClaimsPrincipal currentUser, int maxCount=3, bool onlyArchived=false)
+		public async Task<Dictionary<string, string>> GetUsersGroupsNamesAsStringsAsync(List<string> courseIds, IEnumerable<string> userIds, string currentUserId, int maxCount=3, bool onlyArchived=false)
 		{
-			var usersGroups = await GetUsersGroupsNamesAsync(courseIds, userIds, currentUser, maxCount, onlyArchived).ConfigureAwait(false);
+			var usersGroups = await GetUsersGroupsNamesAsync(courseIds, userIds, currentUserId, maxCount, onlyArchived).ConfigureAwait(false);
 			return usersGroups.ToDictionary(kv => kv.Key, kv => string.Join(", ", kv.Value));
 		}
 
-		public Task<Dictionary<string, string>> GetUsersGroupsNamesAsStringsAsync(string courseId, IEnumerable<string> userIds, ClaimsPrincipal currentUser, int maxCount = 3, bool onlyArchived=false)
+		public Task<Dictionary<string, string>> GetUsersGroupsNamesAsStringsAsync(string courseId, IEnumerable<string> userIds, string currentUserId, int maxCount = 3, bool onlyArchived=false)
 		{
-			return GetUsersGroupsNamesAsStringsAsync(new List<string> { courseId }, userIds, currentUser, maxCount, onlyArchived);
+			return GetUsersGroupsNamesAsStringsAsync(new List<string> { courseId }, userIds, currentUserId, maxCount, onlyArchived);
 		}
 
-		public async Task<string> GetUserGroupsNamesAsStringAsync(List<string> courseIds, string userId, ClaimsPrincipal currentUser, int maxCount = 3, bool onlyArchived=false)
+		public async Task<string> GetUserGroupsNamesAsStringAsync(List<string> courseIds, string userId, string currentUserId, int maxCount = 3, bool onlyArchived=false)
 		{
-			var usersGroups = await GetUsersGroupsNamesAsStringsAsync(courseIds, new List<string> { userId }, currentUser, maxCount, onlyArchived).ConfigureAwait(false);
+			var usersGroups = await GetUsersGroupsNamesAsStringsAsync(courseIds, new List<string> { userId }, currentUserId, maxCount, onlyArchived).ConfigureAwait(false);
 			return usersGroups.GetOrDefault(userId, "");
 		}
 
-		public Task<string> GetUserGroupsNamesAsStringAsync(string courseId, string userId, ClaimsPrincipal currentUser, int maxCount = 3, bool onlyArchived=false)
+		public Task<string> GetUserGroupsNamesAsStringAsync(string courseId, string userId, string currentUserId, int maxCount = 3, bool onlyArchived=false)
 		{
-			return GetUserGroupsNamesAsStringAsync(new List<string> { courseId }, userId, currentUser, maxCount, onlyArchived);
+			return GetUserGroupsNamesAsStringAsync(new List<string> { courseId }, userId, currentUserId, maxCount, onlyArchived);
 		}
 	}
 }

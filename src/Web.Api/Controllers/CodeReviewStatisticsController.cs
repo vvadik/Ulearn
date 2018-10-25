@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
+using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,25 +20,28 @@ namespace Ulearn.Web.Api.Controllers
 	public class CodeReviewStatisticsController : BaseController
 	{
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
-		private readonly IUserRolesRepo userRolesRepo;
+		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IUsersRepo usersRepo;
 		private readonly IGroupsRepo groupsRepo;
 		private readonly IGroupMembersRepo groupMembersRepo;
+		private readonly ICourseRoleUsersFilter courseRoleUsersFilter;
 
 		public CodeReviewStatisticsController(ILogger logger, WebCourseManager courseManager,
 			ISlideCheckingsRepo slideCheckingsRepo,
-			IUserRolesRepo userRolesRepo,
+			ICourseRolesRepo courseRolesRepo,
 			IUsersRepo usersRepo,
 			IGroupsRepo groupsRepo,
 			IGroupMembersRepo groupMembersRepo,
+			ICourseRoleUsersFilter courseRoleUsersFilter,
 			UlearnDb db)
-			: base(logger, courseManager, db)
+			: base(logger, courseManager, db, usersRepo)
 		{
 			this.slideCheckingsRepo = slideCheckingsRepo;
-			this.userRolesRepo = userRolesRepo;
+			this.courseRolesRepo = courseRolesRepo;
 			this.usersRepo = usersRepo;
 			this.groupsRepo = groupsRepo;
 			this.groupMembersRepo = groupMembersRepo;
+			this.courseRoleUsersFilter = courseRoleUsersFilter;
 		}
 		
 		[HttpGet("{courseId}/instructors")]
@@ -54,7 +58,7 @@ namespace Ulearn.Web.Api.Controllers
 			
 			count = Math.Min(count, 10000);
 			
-			var instructorIds = await userRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRole.Instructor, course.Id).ConfigureAwait(false);
+			var instructorIds = await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, course.Id).ConfigureAwait(false);
 			var instructors = await usersRepo.GetUsersByIdsAsync(instructorIds).ConfigureAwait(false);
 			
 			var exerciseSlides = course.Slides.OfType<ExerciseSlide>().ToList();

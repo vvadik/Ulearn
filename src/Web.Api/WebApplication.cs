@@ -5,23 +5,23 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
+using Community.AspNetCore.ExceptionHandling;
+using Community.AspNetCore.ExceptionHandling.Mvc;
 using Database;
+using Database.Di;
 using Database.Models;
-using Database.Repos;
-using Database.Repos.Groups;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
-using Serilog.Core;
 using Serilog.Events;
 using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.Swagger;
@@ -39,7 +39,9 @@ using Vostok.Instrumentation.AspNetCore;
 using Vostok.Logging.Serilog;
 using Vostok.Logging.Serilog.Enrichers;
 using Vostok.Metrics;
+using Vostok.Tracing;
 using Web.Api.Configuration;
+using Enum = System.Enum;
 using ILogger = Serilog.ILogger;
 
 namespace Ulearn.Web.Api
@@ -90,8 +92,13 @@ namespace Ulearn.Web.Api
 							.WithOrigins(configuration.Web.Cors.AllowOrigins)
 							.AllowAnyMethod()
 							.WithHeaders("Authorization")
+							.WithExposedHeaders("Location")
 							.AllowCredentials();
 					});
+					
+					/* Add exception handling policy.
+					   See https://github.com/IharYakimush/asp-net-core-exception-handling */
+					app.UseExceptionHandlingPolicies();
 					
 					app.UseAuthentication();
 					app.UseMvc();
@@ -132,6 +139,7 @@ namespace Ulearn.Web.Api
 			ConfigureDi(services, logger);
 			ConfigureMvc(services);
 			ConfigureSwaggerDocumentation(services);
+			ConfigureExceptionPolicy(services, logger);
 
 			/* Add CORS */
 			services.AddCors();
@@ -200,52 +208,41 @@ namespace Ulearn.Web.Api
 			
 			services.AddSwaggerExamplesFromAssemblyOf<ApiResponse>();
 		}
+		
+		private void ConfigureExceptionPolicy(IServiceCollection services, ILogger logger)
+		{
+			/* See https://github.com/IharYakimush/asp-net-core-exception-handling for details */
+			services.AddExceptionHandlingPolicies(options =>
+			{
+				/* Ensure that all exception types are handled by adding handler for generic exception at the end. */
+				options.For<Exception>()
+					.Log(lo =>
+					{
+						lo.Level = (context, exception) => LogLevel.Error;
+					})
+					.Response(exception => (int) HttpStatusCode.InternalServerError, ResponseAlreadyStartedBehaviour.GoToNextHandler)
+					.ClearCacheHeaders()
+					.WithObjectResult((r, exception) => new ErrorResponse("Internal error occured"
+#if DEBUG
+	+ $". {exception.GetType().FullName}: {exception.Message}\n{exception.StackTrace}"
+#endif
+						))
+					.Handled();
+			});
+		}		
 
 		public static void ConfigureDi(IServiceCollection services, ILogger logger)
 		{
 			services.AddSingleton(logger);
-			services.AddSingleton<InitialDataCreator>();
-			
-			var courseManager = new WebCourseManager(logger);
-			services.AddSingleton<WebCourseManager>(courseManager);
-			services.AddSingleton<IWebCourseManager>(courseManager);
-			
-			services.AddScoped<UlearnUserManager>();
 			services.AddScoped<IAuthorizationHandler, CourseRoleAuthorizationHandler>();
 			services.AddScoped<IAuthorizationHandler, CourseAccessAuthorizationHandler>();
 			services.AddScoped<INotificationDataPreloader, NotificationDataPreloader>();
 
-			/* DI for database repos */
-			
-			/* Groups */
-			services.AddScoped<IGroupsRepo, GroupsRepo>();
-			services.AddScoped<IGroupMembersRepo, GroupMembersRepo>();
-			services.AddScoped<IGroupAccessesRepo, GroupAccessesRepo>();
-			services.AddScoped<IManualCheckingsForOldSolutionsAdder, ManualCheckingsForOldSolutionsAdder>();
-			services.AddScoped<IGroupsCreatorAndCopier, GroupsCreatorAndCopier>();
-			services.AddScoped<IUsersGroupsGetter, UsersGroupsGetter>();
-			/* Others */
-			services.AddScoped<IUsersRepo, UsersRepo>();
-			services.AddScoped<ICommentsRepo, CommentsRepo>();
-			services.AddScoped<IUserRolesRepo, UserRolesRepo>();
-			services.AddScoped<ICoursesRepo, CoursesRepo>();
-			services.AddScoped<ISlideCheckingsRepo, SlideCheckingsRepo>();
-			services.AddScoped<IUserSolutionsRepo, UserSolutionsRepo>();
-			services.AddScoped<IUserQuizzesRepo, UserQuizzesRepo>();
-			services.AddScoped<IVisitsRepo, VisitsRepo>();
-			services.AddScoped<ITextsRepo, TextsRepo>();
-			services.AddScoped<INotificationsRepo, NotificationsRepo>();
-			services.AddScoped<IFeedRepo, FeedRepo>();
-			services.AddScoped<ISystemAccessesRepo, SystemAccessesRepo>();
-			services.AddScoped<IQuizzesRepo, QuizzesRepo>();
+			services.AddDatabaseServices(logger);
 		}
 
 		public static void ConfigureAuthServices(IServiceCollection services, WebApiConfiguration configuration)
 		{
-			services.AddIdentity<ApplicationUser, IdentityRole>()
-				.AddEntityFrameworkStores<UlearnDb>()
-				.AddDefaultTokenProviders();
-
 			/* Configure sharing cookies between application.
 			   See https://docs.microsoft.com/en-us/aspnet/core/security/cookie-sharing?tabs=aspnetcore2x for details */
 			services.AddDataProtection()
@@ -295,8 +292,8 @@ namespace Ulearn.Web.Api
 
 			services.AddAuthorization(options =>
 			{
-				options.AddPolicy("Instructors", policy => policy.Requirements.Add(new CourseRoleRequirement(CourseRole.Instructor)));
-				options.AddPolicy("CourseAdmins", policy => policy.Requirements.Add(new CourseRoleRequirement(CourseRole.CourseAdmin)));
+				options.AddPolicy("Instructors", policy => policy.Requirements.Add(new CourseRoleRequirement(CourseRoleType.Instructor)));
+				options.AddPolicy("CourseAdmins", policy => policy.Requirements.Add(new CourseRoleRequirement(CourseRoleType.CourseAdmin)));
 				options.AddPolicy("SysAdmins", policy => policy.RequireRole(new List<string> { LmsRoles.SysAdmin.GetDisplayName() }));
 
 				foreach (var courseAccessType in Enum.GetValues(typeof(CourseAccessType)).Cast<CourseAccessType>())

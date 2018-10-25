@@ -23,4 +23,5 @@ VALUES
 ('20180724204642_AddCourseIdToSlideHintIndex', '2.0.1-rtm-125'),
 ('20180724205919_AddCourseIdToUserQuizzesIndex', '2.0.1-rtm-125'),
 ('20180921194528_IncreaseQuizAnswerSize', '2.0.1-rtm-125'),
-('20181011181051_RemoveUserExerciseSubmissionsApplicationUserField', '2.0.1-rtm-125')
+('20181011181051_RemoveUserExerciseSubmissionsApplicationUserField', '2.0.1-rtm-125'),
+('20181023045805_AddCommentForInstructorsOnly', '2.0.1-rtm-125')

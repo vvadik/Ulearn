@@ -1,4 +1,6 @@
+using System;
 using System.Runtime.Serialization;
+using Vostok.Tracing;
 
 namespace Ulearn.Web.Api.Models.Responses
 {
@@ -10,6 +12,12 @@ namespace Ulearn.Web.Api.Models.Responses
 		
 		[DataMember(Name = "message")]
 		public string Message { get; set; }
+
+		[DataMember(Name = "trace_id")]
+		public Guid TraceId { get; } = TraceContext.Current.TraceId;
+
+		[DataMember(Name = "timestamp")]
+		public DateTime Timestamp { get; } = DateTime.Now; 
 
 		public ErrorResponse(string message)
 		{

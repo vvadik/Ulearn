@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database;
 using Database.Models;
+using Database.Repos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Serilog;
@@ -23,14 +24,17 @@ namespace Ulearn.Web.Api.Controllers
 		protected readonly ILogger logger;
 		protected readonly IWebCourseManager courseManager;
 		protected readonly UlearnDb db;
+		protected readonly IUsersRepo usersRepo;
 
 		protected string UserId => User.GetUserId();
+		protected bool IsAuthenticated => User.Identity.IsAuthenticated;
 
-		public BaseController(ILogger logger, IWebCourseManager courseManager, UlearnDb db)
+		public BaseController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo)
 		{
 			this.logger = logger ?? throw new ArgumentException(nameof(logger));
 			this.courseManager = courseManager ?? throw new ArgumentException(nameof(courseManager));
-			this.db = db ?? throw new ArgumentException(nameof(db)); 
+			this.db = db ?? throw new ArgumentException(nameof(db));
+			this.usersRepo = usersRepo ?? throw new ArgumentException(nameof(usersRepo));
 		}
 
 		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -51,6 +55,12 @@ namespace Ulearn.Web.Api.Controllers
 			{
 				logger.Information("Выключаю автоматическое отслеживание изменений в EF Core: db.ChangeTracker.AutoDetectChangesEnabled = false");
 			}
+		}
+
+		protected async Task<bool> IsSystemAdministratorAsync()
+		{
+			var user = await usersRepo.FindUserByIdAsync(UserId).ConfigureAwait(false);
+			return usersRepo.IsSystemAdministrator(user);
 		}
 
 		protected UnitInfo BuildUnitInfo(string courseId, Unit unit)
@@ -103,12 +113,12 @@ namespace Ulearn.Web.Api.Controllers
 			};
 		}		
 
-		protected CommentInfo BuildCommentInfo(Comment comment)
+		protected NotificationCommentInfo BuildNotificationCommentInfo(Comment comment)
 		{
 			if (comment == null)
 				return null;
 			
-			return new CommentInfo
+			return new NotificationCommentInfo
 			{
 				Id = comment.Id,
 				CourseId = comment.CourseId,

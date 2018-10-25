@@ -13,7 +13,7 @@ namespace Ulearn.Web.Api.Models.Responses.Account
 		[DataMember(Name = "user", EmitDefaultValue = false)]
 		public ShortUserInfo User { get; set; }
 
-		[DataMember(Name = "account_problems")]
+		[DataMember(Name = "account_problems", EmitDefaultValue = false)]
 		public List<AccountProblem> AccountProblems { get; set; }
 	}
 

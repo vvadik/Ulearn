@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Database.Repos;
+using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 using Microsoft.Extensions.DependencyInjection;
 using uLearn;
@@ -105,11 +106,11 @@ namespace Database.Models
 
 	public class MinCourseRoleAttribute : Attribute
 	{
-		public readonly CourseRole MinCourseRole;
+		public readonly CourseRoleType minCourseRoleType;
 
-		public MinCourseRoleAttribute(CourseRole minCourseRole)
+		public MinCourseRoleAttribute(CourseRoleType minCourseRoleType)
 		{
-			MinCourseRole = minCourseRole;
+			this.minCourseRoleType = minCourseRoleType;
 		}
 	}
 
@@ -181,17 +182,17 @@ namespace Database.Models
 
 		// Instructors
 		[Display(Name = @"Кто-то присоединился к вашей группе", GroupName = @"Кто-то присоединился к вашей группе")]
-		[MinCourseRole(CourseRole.Instructor)]
+		[MinCourseRole(CourseRoleType.Instructor)]
 		[IsEnabledByDefault(false)]
 		JoinedToYourGroup = 101,
 
 		[Display(Name = @"Вас назначили преподавателем группы", GroupName = @"Вас назначили преподавателем групп")]
-		[MinCourseRole(CourseRole.Instructor)]
+		[MinCourseRole(CourseRoleType.Instructor)]
 		[IsEnabledByDefault(true)]
 		GrantedAccessToGroup = 102,
 
 		[Display(Name = @"Вы перестали быть преподавателем группы", GroupName = @"Вы перестали быть преподавателем группы")]
-		[MinCourseRole(CourseRole.Instructor)]
+		[MinCourseRole(CourseRoleType.Instructor)]
 		[IsEnabledByDefault(true)]
 		RevokedAccessToGroup = 103,
 
@@ -204,53 +205,53 @@ namespace Database.Models
 		*/
 		
 		[Display(Name = @"Преподаватель удалил студентов из вашей группы", GroupName = @"Преподаватель удалил студентов из ваших групп")]
-		[MinCourseRole(CourseRole.Instructor)]
+		[MinCourseRole(CourseRoleType.Instructor)]
 		[IsEnabledByDefault(true)]
 		GroupMembersHaveBeenRemoved = 105,
 		
 		[Display(Name = @"Преподаватель добавил студентов в вашу группу", GroupName = @"Преподаватель добавил студентов в ваши группы")]
-		[MinCourseRole(CourseRole.Instructor)]
+		[MinCourseRole(CourseRoleType.Instructor)]
 		[IsEnabledByDefault(true)]
 		GroupMembersHaveBeenAdded = 106,
 		
 		[Display(Name = @"Новый комментарий для преподавателей", GroupName = @"Новые комментарии для преподавателей")]
-		[MinCourseRole(CourseRole.Instructor)]
+		[MinCourseRole(CourseRoleType.Instructor)]
 		[IsEnabledByDefault(true)]
 		NewCommentForInstructorsOnly = 107,
 
 		// Course admins
 		[Display(Name = @"Добавлен новый преподаватель", GroupName = @"Добавлены новые преподаватели")]
-		[MinCourseRole(CourseRole.CourseAdmin)]
+		[MinCourseRole(CourseRoleType.CourseAdmin)]
 		[IsEnabledByDefault(true)]
 		AddedInstructor = 201,
 
 		[Display(Name = @"Создана новая группа", GroupName = @"Созданы новые группы")]
-		[MinCourseRole(CourseRole.CourseAdmin)]
+		[MinCourseRole(CourseRoleType.CourseAdmin)]
 		[IsEnabledByDefault(true)]
 		CreatedGroup = 202,
 
 		[Display(Name = @"Загружена новая версия курса", GroupName = @"Загружены новые версии курса")]
-		[MinCourseRole(CourseRole.CourseAdmin)]
+		[MinCourseRole(CourseRoleType.CourseAdmin)]
 		[IsEnabledByDefault(true)]
 		UploadedPackage = 203,
 
 		[Display(Name = @"Опубликована новая версия курса", GroupName = @"Опубликованы новые версии курса")]
-		[MinCourseRole(CourseRole.CourseAdmin)]
+		[MinCourseRole(CourseRoleType.CourseAdmin)]
 		[IsEnabledByDefault(true)]
 		PublishedPackage = 204,
 
 		[Display(Name = @"Курс скопирован на Степик", GroupName = @"Курсы скопированы на Степик")]
-		[MinCourseRole(CourseRole.CourseAdmin)]
+		[MinCourseRole(CourseRoleType.CourseAdmin)]
 		[IsEnabledByDefault(true)]
 		CourseExportedToStepik = 205,
 	}
 
 	public static class NotificationTypeExtensions
 	{
-		public static CourseRole GetMinCourseRole(this NotificationType type)
+		public static CourseRoleType GetMinCourseRole(this NotificationType type)
 		{
 			var attribute = type.GetAttribute<MinCourseRoleAttribute>();
-			return attribute?.MinCourseRole ?? CourseRole.Student;
+			return attribute?.minCourseRoleType ?? CourseRoleType.Student;
 		}
 
 		public static string GetDisplayName(this NotificationType type)
@@ -1298,8 +1299,8 @@ namespace Database.Models
 
 		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
-			var userRolesRepo = serviceProvider.GetService<IUserRolesRepo>();
-			return userRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRole.Instructor, CourseId);
+			var courseRoleUsersFilter = serviceProvider.GetService<ICourseRoleUsersFilter>();
+			return courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, CourseId, includeHighRoles: true);
 		}
 
 		public override List<Notification> GetBlockerNotifications(IServiceProvider serviceProvider)
@@ -1335,8 +1336,8 @@ namespace Database.Models
 
 		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
-			var userRolesRepo = serviceProvider.GetService<IUserRolesRepo>();
-			return userRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRole.CourseAdmin, CourseId);
+			var courseRoleUsersFilter = serviceProvider.GetService<ICourseRoleUsersFilter>();
+			return courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.CourseAdmin, CourseId);
 		}
 
 		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
@@ -1375,8 +1376,8 @@ namespace Database.Models
 
 		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
-			var userRolesRepo = serviceProvider.GetService<IUserRolesRepo>();
-			return userRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRole.CourseAdmin, CourseId);
+			var courseRoleUsersFilter = serviceProvider.GetService<ICourseRoleUsersFilter>();
+			return courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.CourseAdmin, CourseId);
 		}
 
 		public override bool IsActual()
@@ -1418,8 +1419,8 @@ namespace Database.Models
 
 		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
-			var userRolesRepo = serviceProvider.GetService<IUserRolesRepo>();
-			return userRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRole.CourseAdmin, CourseId);
+			var courseRoleUsersFilter = serviceProvider.GetService<ICourseRoleUsersFilter>();
+			return courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.CourseAdmin, CourseId);
 		}
 
 		public override bool IsActual()
@@ -1445,8 +1446,8 @@ namespace Database.Models
 
 		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
-			var userRolesRepo = serviceProvider.GetService<IUserRolesRepo>();
-			return userRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRole.CourseAdmin, CourseId);
+			var courseRoleUsersFilter = serviceProvider.GetService<ICourseRoleUsersFilter>();
+			return courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.CourseAdmin, CourseId);
 		}
 
 		public override bool IsActual()

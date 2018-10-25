@@ -113,7 +113,7 @@ namespace Database
 				.HasForeignKey(d => d.NotificationId)
 				.OnDelete(DeleteBehavior.Restrict);
 
-			SetDeleteBehavior<UserRole, ApplicationUser>(modelBuilder, r => r.User, r => r.UserId, DeleteBehavior.Cascade);
+			SetDeleteBehavior<CourseRole, ApplicationUser>(modelBuilder, r => r.User, r => r.UserId, DeleteBehavior.Cascade);
 
 			SetDeleteBehavior<ExerciseCodeReview, ApplicationUser>(modelBuilder, c => c.Author, c => c.AuthorId);
 
@@ -371,7 +371,7 @@ namespace Database
 		public DbSet<LtiConsumer> Consumers { get; set; }
 		public DbSet<LtiSlideRequest> LtiRequests { get; set; }
 		public DbSet<RestoreRequest> RestoreRequests { get; set; }
-		public DbSet<UserRole> UserRoles { get; set; }
+		public DbSet<CourseRole> CourseRoles { get; set; }
 
 		public DbSet<Comment> Comments { get; set; }
 		public DbSet<CommentLike> CommentLikes { get; set; }

@@ -15,7 +15,7 @@ namespace Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.3-rtm-32065")
+                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -324,6 +324,8 @@ namespace Database.Migrations
                     b.Property<bool>("IsCorrectAnswer");
 
                     b.Property<bool>("IsDeleted");
+
+                    b.Property<bool>("IsForInstructorsOnly");
 
                     b.Property<bool>("IsPinnedToTop");
 
@@ -1740,7 +1742,8 @@ namespace Database.Migrations
                 {
                     b.HasBaseType("Database.Models.Notification");
 
-                    b.Property<int>("GroupId");
+                    b.Property<int>("GroupId")
+                        .HasColumnName("CreatedGroupNotification_GroupId");
 
                     b.HasIndex("GroupId");
 
@@ -1778,6 +1781,60 @@ namespace Database.Migrations
                     b.ToTable("GroupMemberHasBeenRemovedNotification");
 
                     b.HasDiscriminator().HasValue("GroupMemberHasBeenRemovedNotification");
+                });
+
+            modelBuilder.Entity("Database.Models.GroupMembersHaveBeenAddedNotification", b =>
+                {
+                    b.HasBaseType("Database.Models.Notification");
+
+                    b.Property<int>("GroupId")
+                        .HasColumnName("GroupId");
+
+                    b.Property<string>("UserDescriptions")
+                        .HasColumnName("UserDescriptions");
+
+                    b.Property<string>("UserIds")
+                        .HasColumnName("UserIds");
+
+                    b.HasIndex("GroupId")
+                        .HasName("IX_Notifications_GroupId1");
+
+                    b.ToTable("GroupMembersHaveBeenAddedNotification");
+
+                    b.HasDiscriminator().HasValue("GroupMembersHaveBeenAddedNotification");
+                });
+
+            modelBuilder.Entity("Database.Models.GroupMembersHaveBeenRemovedNotification", b =>
+                {
+                    b.HasBaseType("Database.Models.Notification");
+
+                    b.Property<int>("GroupId")
+                        .HasColumnName("GroupId");
+
+                    b.Property<string>("UserDescriptions")
+                        .HasColumnName("UserDescriptions");
+
+                    b.Property<string>("UserIds")
+                        .HasColumnName("UserIds");
+
+                    b.HasIndex("GroupId")
+                        .HasName("IX_Notifications_GroupId2");
+
+                    b.ToTable("GroupMembersHaveBeenRemovedNotification");
+
+                    b.HasDiscriminator().HasValue("GroupMembersHaveBeenRemovedNotification");
+                });
+
+            modelBuilder.Entity("Database.Models.InstructorMessageNotification", b =>
+                {
+                    b.HasBaseType("Database.Models.Notification");
+
+                    b.Property<string>("Text")
+                        .IsRequired();
+
+                    b.ToTable("InstructorMessageNotification");
+
+                    b.HasDiscriminator().HasValue("InstructorMessageNotification");
                 });
 
             modelBuilder.Entity("Database.Models.JoinedToYourGroupNotification", b =>
@@ -1904,6 +1961,19 @@ namespace Database.Migrations
                     b.HasDiscriminator().HasValue("ReceivedAdditionalScoreNotification");
                 });
 
+            modelBuilder.Entity("Database.Models.ReceivedCertificateNotification", b =>
+                {
+                    b.HasBaseType("Database.Models.Notification");
+
+                    b.Property<Guid>("CertificateId");
+
+                    b.HasIndex("CertificateId");
+
+                    b.ToTable("ReceivedCertificateNotification");
+
+                    b.HasDiscriminator().HasValue("ReceivedCertificateNotification");
+                });
+
             modelBuilder.Entity("Database.Models.ReceivedCommentToCodeReviewNotification", b =>
                 {
                     b.HasBaseType("Database.Models.Notification");
@@ -1948,6 +2018,19 @@ namespace Database.Migrations
                     b.ToTable("RevokedAccessToGroupNotification");
 
                     b.HasDiscriminator().HasValue("RevokedAccessToGroupNotification");
+                });
+
+            modelBuilder.Entity("Database.Models.SystemMessageNotification", b =>
+                {
+                    b.HasBaseType("Database.Models.Notification");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnName("SystemMessageNotification_Text");
+
+                    b.ToTable("SystemMessageNotification");
+
+                    b.HasDiscriminator().HasValue("SystemMessageNotification");
                 });
 
             modelBuilder.Entity("Database.Models.UploadedPackageNotification", b =>
@@ -2510,6 +2593,24 @@ namespace Database.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
+            modelBuilder.Entity("Database.Models.GroupMembersHaveBeenAddedNotification", b =>
+                {
+                    b.HasOne("Database.Models.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .HasConstraintName("FK_Notifications_Groups_GroupId1")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Database.Models.GroupMembersHaveBeenRemovedNotification", b =>
+                {
+                    b.HasOne("Database.Models.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .HasConstraintName("FK_Notifications_Groups_GroupId2")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("Database.Models.JoinedToYourGroupNotification", b =>
                 {
                     b.HasOne("Database.Models.Group", "Group")
@@ -2583,6 +2684,14 @@ namespace Database.Migrations
                         .WithMany()
                         .HasForeignKey("ScoreId")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Database.Models.ReceivedCertificateNotification", b =>
+                {
+                    b.HasOne("Database.Models.Certificate", "Certificate")
+                        .WithMany()
+                        .HasForeignKey("CertificateId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Database.Models.ReceivedCommentToCodeReviewNotification", b =>

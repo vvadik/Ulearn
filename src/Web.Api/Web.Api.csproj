@@ -4,6 +4,7 @@
     <RootNamespace>Ulearn.Web.Api</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Community.AspNetCore.ExceptionHandling.Mvc" Version="2.0.3" />
     <PackageReference Include="EntityFrameworkProfiler.Appender" Version="5.0.5024" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.5" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.1.2" />

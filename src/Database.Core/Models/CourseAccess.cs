@@ -38,7 +38,7 @@ namespace Database.Models
 	[JsonConverter(typeof(StringEnumConverter), true)]
 	public enum CourseAccessType : short
 	{
-		/* Редактировать, закреплять, удалять (скрывать) комментарии */
+		/* Редактировать, закреплять, удалять (скрывать) комментарии, видеть неопубликованные комментарии */
 		[Display(Name = "Редактировать и удалять комментарии")]
 		EditPinAndRemoveComments = 1,
 

@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
-using Database.Repos;
+using Database.Repos.Comments;
 
 namespace Ulearn.Web.Api.Controllers.Notifications
 {

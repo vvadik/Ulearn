@@ -20,7 +20,7 @@ namespace Database.Repos
 
 		public List<Unit> GetVisibleUnits(Course course, IPrincipal user)
 		{
-			var canSeeEverything = user.HasAccessFor(course.Id, CourseRole.Tester);
+			var canSeeEverything = user.HasAccessFor(course.Id, CourseRoleType.Tester);
 			if (canSeeEverything)
 				return course.Units;
 

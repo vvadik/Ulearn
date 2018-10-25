@@ -7,6 +7,7 @@ using Database;
 using Database.Extensions;
 using Database.Models;
 using Database.Repos;
+using Database.Repos.CourseRoles;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -25,19 +26,17 @@ namespace Ulearn.Web.Api.Controllers
 	{
 		private readonly UlearnUserManager userManager;
 		private readonly SignInManager<ApplicationUser> signInManager;
-		private readonly IUserRolesRepo userRolesRepo;
+		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly ICoursesRepo coursesRepo;
 		private readonly WebApiConfiguration configuration;
 
-		public AccountController(
-			ILogger logger, IOptions<WebApiConfiguration> options, WebCourseManager courseManager, UlearnDb db, UlearnUserManager userManager, SignInManager<ApplicationUser> signInManager,
-			IUserRolesRepo userRolesRepo, ICoursesRepo coursesRepo
-		)
-			: base(logger, courseManager, db)
+		public AccountController(ILogger logger, IOptions<WebApiConfiguration> options, WebCourseManager courseManager, UlearnDb db, UlearnUserManager userManager, SignInManager<ApplicationUser> signInManager,
+			ICourseRolesRepo courseRolesRepo, ICoursesRepo coursesRepo, IUsersRepo usersRepo)
+			: base(logger, courseManager, db, usersRepo)
 		{
 			this.userManager = userManager;
 			this.signInManager = signInManager;
-			this.userRolesRepo = userRolesRepo;
+			this.courseRolesRepo = courseRolesRepo;
 			this.coursesRepo = coursesRepo;
 			this.configuration = options.Value;
 		}
@@ -73,7 +72,7 @@ namespace Ulearn.Web.Api.Controllers
 					"Подтвердите в профиле электронную почту, чтобы получать уведомления и восстановить доступ в случае утери пароля"
 				));
 			
-			var isInstructor = await userRolesRepo.HasUserAccessToAnyCourseAsync(user.Id, CourseRole.Instructor).ConfigureAwait(false);
+			var isInstructor = await courseRolesRepo.HasUserAccessToAnyCourseAsync(user.Id, CourseRoleType.Instructor).ConfigureAwait(false);
 			if (isInstructor && (string.IsNullOrEmpty(user.FirstName) || string.IsNullOrEmpty(user.LastName)))
 				problems.Add(new AccountProblem(
 					"Не указаны имя или фамилия",
@@ -120,7 +119,7 @@ namespace Ulearn.Web.Api.Controllers
 			var userId = User.GetUserId();	
 			var isSystemAdministrator = User.IsSystemAdministrator();
 			
-			var rolesByCourse = await userRolesRepo.GetRolesAsync(userId).ConfigureAwait(false);
+			var rolesByCourse = await courseRolesRepo.GetRolesAsync(userId).ConfigureAwait(false);
 			var courseAccesses = await coursesRepo.GetUserAccessesAsync(userId).ConfigureAwait(false);
 			var courseAccessesByCourseId = courseAccesses.GroupBy(a => a.CourseId).Select(
 				g => new CourseAccessResponse
@@ -133,7 +132,7 @@ namespace Ulearn.Web.Api.Controllers
 			return new CourseRolesResponse
 			{
 				IsSystemAdministrator = isSystemAdministrator,
-				Roles = rolesByCourse.Where(kvp => kvp.Value != CourseRole.Student).Select(kvp => new CourseRoleResponse
+				Roles = rolesByCourse.Where(kvp => kvp.Value != CourseRoleType.Student).Select(kvp => new CourseRoleResponse
 				{
 					CourseId = kvp.Key,
 					Role = kvp.Value,
