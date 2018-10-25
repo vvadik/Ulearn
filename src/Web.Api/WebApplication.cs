@@ -5,25 +5,23 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
+using Community.AspNetCore.ExceptionHandling;
+using Community.AspNetCore.ExceptionHandling.Mvc;
 using Database;
 using Database.Di;
 using Database.Models;
-using Database.Repos;
-using Database.Repos.Comments;
-using Database.Repos.Groups;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
-using Serilog.Core;
 using Serilog.Events;
 using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.Swagger;
@@ -41,7 +39,9 @@ using Vostok.Instrumentation.AspNetCore;
 using Vostok.Logging.Serilog;
 using Vostok.Logging.Serilog.Enrichers;
 using Vostok.Metrics;
+using Vostok.Tracing;
 using Web.Api.Configuration;
+using Enum = System.Enum;
 using ILogger = Serilog.ILogger;
 
 namespace Ulearn.Web.Api
@@ -96,6 +96,10 @@ namespace Ulearn.Web.Api
 							.AllowCredentials();
 					});
 					
+					/* Add exception handling policy.
+					   See https://github.com/IharYakimush/asp-net-core-exception-handling */
+					app.UseExceptionHandlingPolicies();
+					
 					app.UseAuthentication();
 					app.UseMvc();
 					
@@ -135,6 +139,7 @@ namespace Ulearn.Web.Api
 			ConfigureDi(services, logger);
 			ConfigureMvc(services);
 			ConfigureSwaggerDocumentation(services);
+			ConfigureExceptionPolicy(services, logger);
 
 			/* Add CORS */
 			services.AddCors();
@@ -203,6 +208,28 @@ namespace Ulearn.Web.Api
 			
 			services.AddSwaggerExamplesFromAssemblyOf<ApiResponse>();
 		}
+		
+		private void ConfigureExceptionPolicy(IServiceCollection services, ILogger logger)
+		{
+			/* See https://github.com/IharYakimush/asp-net-core-exception-handling for details */
+			services.AddExceptionHandlingPolicies(options =>
+			{
+				/* Ensure that all exception types are handled by adding handler for generic exception at the end. */
+				options.For<Exception>()
+					.Log(lo =>
+					{
+						lo.Level = (context, exception) => LogLevel.Error;
+					})
+					.Response(exception => (int) HttpStatusCode.InternalServerError, ResponseAlreadyStartedBehaviour.GoToNextHandler)
+					.ClearCacheHeaders()
+					.WithObjectResult((r, exception) => new ErrorResponse("Internal error occured"
+#if DEBUG
+	+ $". {exception.GetType().FullName}: {exception.Message}\n{exception.StackTrace}"
+#endif
+						))
+					.Handled();
+			});
+		}		
 
 		public static void ConfigureDi(IServiceCollection services, ILogger logger)
 		{
