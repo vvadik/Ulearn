@@ -12,7 +12,6 @@ using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using NUnit.Framework;
 using Serilog;
 using Swashbuckle.AspNetCore.Annotations;
 using Ulearn.Common;
@@ -42,7 +41,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			var isPatchRequest = context.HttpContext.Request.Method.Equals("PATCH", StringComparison.InvariantCultureIgnoreCase);
 			if (comment == null || (comment.IsDeleted && !isPatchRequest))
 			{
-				context.Result = NotFound(new ErrorResponse("Comment not found"));
+				context.Result = NotFound(new ErrorResponse($"Comment {commentId} not found"));
 				return;
 			}
 			
