@@ -2190,6 +2190,30 @@ h1 .copy-group-link {
 	width: 900px;
 }
 
+@media (max-width: 1200px) {
+	.legacy-page .code-review + .CodeMirror {
+		width: 700px;
+	}	
+}
+
+@media (max-width: 992px) {
+	.legacy-page .code-review + .CodeMirror {
+		width: 480px;
+	}
+}
+
+@media (max-width: 768px) {
+	.legacy-page .code-review + .CodeMirror {
+		width: 440px;
+	}
+}
+
+@media (max-width: 616px) {
+	.legacy-page .code-review + .CodeMirror {
+		width: 60%;
+	}
+}
+
 .legacy-page .exercise__reviews {
 	float: right;
 	width: 250px;
@@ -2205,6 +2229,13 @@ h1 .copy-group-link {
 @media (max-width: 720px) {
 	.legacy-page .exercise__reviews {
 		width: 150px;
+	}
+}
+
+@media (max-width: 616px) {
+	.legacy-page .exercise__reviews {
+		width: 39%;
+		margin-left: 0;
 	}
 }
 
