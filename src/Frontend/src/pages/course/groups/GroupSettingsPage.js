@@ -1,11 +1,11 @@
 import { Component } from 'react';
 import React from "react";
-import api from "../../../../api/index";
+import api from "../../../api/index";
 import PropTypes from "prop-types";
 import Tabs from "@skbkontur/react-ui/components/Tabs/Tabs";
 import Button from "@skbkontur/react-ui/components/Button/Button";
-import GroupMembers from "./GroupMembers";
-import GroupSettings from "./GroupSettings";
+import GroupMembers from "../../../components/groups/GroupSettingsPage/GroupMembers";
+import GroupSettings from "../../../components/groups/GroupSettingsPage/GroupSettings";
 
 import "./groupSettings.less";
 
@@ -29,23 +29,26 @@ class GroupSettingsPage extends Component {
 	};
 
 	render() {
+		const { group, open } = this.state;
 		return (
 			<React.Fragment>
 				<div className="wrapper">
-					<div className="content-container">
-						<h2>{ this.state.group.name }</h2>
-						<div className="tabs-container">
-							<Tabs value={this.state.open} onChange={this.onChangeTab}>
-								<Tabs.Tab id="settings">Настройки</Tabs.Tab>
-								<Tabs.Tab id="members">Участники</Tabs.Tab>
-							</Tabs>
+					<div className="content-wrapper">
+						<div className="content">
+							<h2>{ group.name }</h2>
+							<div className="tabs-container">
+								<Tabs value={open} onChange={this.onChangeTab}>
+									<Tabs.Tab id="settings">Настройки</Tabs.Tab>
+									<Tabs.Tab id="members">Участники</Tabs.Tab>
+								</Tabs>
+							</div>
+							{ (open === "settings") &&
+								<GroupSettings group={group}
+											   onChangeSettings={this.onChangeSettings}/> }
+							{ (open === "members")  && <GroupMembers group={group} /> }
+							<Button onClick={this.onClick} size="medium" use="primary">Сохранить</Button>
 						</div>
-						{ (this.state.open === "settings") && 
-							<GroupSettings group={this.state.group}
-										   onChangeSettings={this.onChangeSettings}/> }
-						{ (this.state.open === "members")  && <GroupMembers /> }
 					</div>
-					<Button onClick={this.onClick} size="medium" use="primary">Сохранить</Button>
 				</div>
 			</React.Fragment>
 		)
@@ -58,20 +61,23 @@ class GroupSettingsPage extends Component {
 	};
 
 	onChangeSettings = (field, value) => {
-		const { group } = this.state;
+		const { group, updatedFields } = this.state;
 		this.setState({
 			group: {
 				...group,
-				name: value,
 				[field]: value
 			},
+			updatedFields: {
+				...updatedFields,
+				[field]: value
+			}
 		});
-		console.log(group);
+		console.log(updatedFields);
 	};
 
 	onClick = () => {
-		const { group } = this.state;
-		api.groups.saveGroupSettings(group.id, group);
+		const { group, updatedFields } = this.state;
+		api.groups.saveGroupSettings(group.id, updatedFields);
 	};
 }
 

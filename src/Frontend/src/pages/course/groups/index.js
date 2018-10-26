@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-import api from "../../../api/index";
+import api from "../../../api";
 import PropTypes from 'prop-types';
-import GroupsList from "./GroupPage/GroupsList";
-import GroupHeader from "./GroupPage/GroupHeader";
+import GroupsList from "../../../components/groups/GroupMainPage/GroupsList";
+import GroupHeader from "../../../components/groups/GroupMainPage/GroupHeader";
 
 import "./groupsPage.less";
 
@@ -17,6 +17,7 @@ class GroupsPage extends AbstractPage {
 			loading: true,
 			groups: [],
 			filter: "active",
+			courseId: ""
 		}
 	};
 
@@ -32,25 +33,29 @@ class GroupsPage extends AbstractPage {
 			let groups = json.groups;
 			this.setState({
 				loading: false,
-				groups: groups,
+				courseId: courseId,
+				groups: groups
 			});
 		}).catch(console.error)
 	};
 
 	render() {
 		return (
-			<React.Fragment>
+			<div className="wrapper">
+				<div className="content-wrapper">
 				<GroupHeader
 					onTabClick={this.onTabClick}
 					filter={this.state.filter}
 					openModal={this.openModal}
 					closeModal={this.closeModal}
+					courseId={this.state.courseId}
 				/>
 				<GroupsList
 					loading={this.state.loading}
 					groups={this.filteredGroups}
 				/>
-			</React.Fragment>
+				</div>
+			</div>
 		)
 	};
 

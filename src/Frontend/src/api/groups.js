@@ -18,7 +18,6 @@ export function createGroup(courseId, name) {
 		body: JSON.stringify({ name: name })
 	}).then(response => {
 		let location = response.headers["location"];
-		console.log(location);
 	})
 }
 

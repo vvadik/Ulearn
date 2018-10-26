@@ -16,7 +16,7 @@ import "./common.less"
 import rootReducer from "./redux/reducers"
 import api from "./api"
 import GroupsPage from "./pages/course/groups/index";
-import GroupSettingsPage from "./pages/course/groups/GroupSettingsPage/GroupSettingsPage";
+import GroupSettingsPage from "./pages/course/groups/GroupSettingsPage";
 
 let loggerMiddleware = createLogger();
 

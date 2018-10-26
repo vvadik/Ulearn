@@ -30,10 +30,10 @@ class GroupHeader extends Component {
 
 	render() {
 		return (
-			<div>
+			<React.Fragment>
 				{ this.renderHeader() }
-				{this.state.modalOpened && <CreateGroupModal closeModal={this.closeModal}/>}
-			</div>
+				{this.state.modalOpened && <CreateGroupModal closeModal={this.closeModal} courseId={this.props.courseId}/>}
+			</React.Fragment>
 		)
 	}
 
@@ -60,7 +60,10 @@ class GroupHeader extends Component {
 
 GroupHeader.propTypes = {
 	onTabClick: PropTypes.func,
-	filter: PropTypes.string
+	filter: PropTypes.string,
+	openModal: PropTypes.bool,
+	closeModal: PropTypes.bool,
+	courseById: PropTypes.string
 };
 
 export default GroupHeader;

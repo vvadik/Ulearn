@@ -29,7 +29,7 @@ class GroupSettings extends Component {
 		const progress = group.can_students_see_group_progress || false;
 
 		return (
-			<div>
+			<div className="group-settings-wrapper">
 				<div className="group-name-field">
 					<div className="group-name-label">
 						<label htmlFor="groupName">Название группы</label>
@@ -38,7 +38,7 @@ class GroupSettings extends Component {
 						id="groupName"
 						type="text"
 						size="small"
-						width="88%"
+						width="80%"
 						placeholder="Здесь можно изменить название группы"
 						onChange={this.onChangeInput}
 					/>
@@ -68,7 +68,7 @@ class GroupSettings extends Component {
 		)
 	}
 
-	onChange = (_, field, value) => {
+	onChange = (field, _, value) => {
 		this.props.onChangeSettings(mapToServerName[field], value);
 	};
 

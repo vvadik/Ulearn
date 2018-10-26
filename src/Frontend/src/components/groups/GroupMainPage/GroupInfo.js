@@ -1,12 +1,12 @@
 import { Component } from "react";
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { getPluralForm } from "../../../../utils/getPluralForm";
+import { getPluralForm } from "../../../utils/getPluralForm";
 import Icon from "@skbkontur/react-ui/components/Icon/Icon";
 import Kebab from "@skbkontur/react-ui/components/Kebab/Kebab";
 import MenuItem from "@skbkontur/react-ui/components/MenuItem/MenuItem";
 import React from "react";
-import GroupSettingsPage from "../GroupSettingsPage/GroupSettingsPage";
+import GroupSettingsPage from "../../../pages/course/groups/GroupSettingsPage";
 
 class GroupInfo extends Component {
 
@@ -69,14 +69,16 @@ class GroupInfo extends Component {
 		}
 	}
 
-	handleGroupClick = () => {
-		window.open(GroupSettingsPage);
-	}
+	// handleGroupClick = () => {
+	// 	window.open(GroupSettingsPage);
+	// }
 
 }
 
 GroupInfo.propTypes = {
-	group: PropTypes.object.isRequired
+	group: PropTypes.object.isRequired,
+	key: PropTypes.string,
+	onClick: PropTypes.func
 };
 
 export default GroupInfo;

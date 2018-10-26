@@ -4,16 +4,21 @@ import Modal from '@skbkontur/react-ui/components/Modal/Modal';
 import Input from '@skbkontur/react-ui/components/Input/Input';
 import Button from '@skbkontur/react-ui/components/Button/Button';
 import React from 'react';
-import api from "../../../../api/index";
+import api from "../../../api/index";
 
 class CreateGroupModal extends Component {
+
+	state = {
+		name: null
+	};
+
 	render() {
 		return (
 			<Modal onClose={this.props.closeModal} width="40%">
-				<Modal.Header>Создание группы</Modal.Header>
+				<Modal.Header className="modal-header"></Modal.Header>
 				<Modal.Body>
-					<h2>Название группы</h2>
-					<Input placeholder="КН-201 УрФУ 2017"/>
+					<label className="modal-label">Название группы</label>
+					<Input width="63%" placeholder="КН-201 УрФУ 2017" onChange={this.onChangeInput}/>
 					<p>
 						Студенты увидят название группы, поэтому постарайтесь сделать его понятным.
 						Пример хорошего названия группы: «КН-201 УрФУ 2017», пример плохого:
@@ -27,14 +32,23 @@ class CreateGroupModal extends Component {
 		)
 	}
 
-	onClick() {
-		let name = "NEW NAME";
-		api.groups.createGroup("basicprogramming", name);
+	onChangeInput = (event) => {
+		const name = event.target.value;
+		this.setState({
+			name: name
+		});
+	};
+
+	onClick = () => {
+		const { courseId } = this.props;
+		const { name } = this.state;
+		api.groups.createGroup(courseId, name);
 	}
 }
 
 CreateGroupModal.propTypes = {
-	closeModal: PropTypes.func
+	closeModal: PropTypes.func,
+	courseId: PropTypes.string
 };
 
 export default CreateGroupModal;
