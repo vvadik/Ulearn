@@ -38,6 +38,7 @@ window.documentReadyFunctions.push(function () {
 		var $tableForHeader = $('<table></table>')
 			.addClass($table.attr('class'))
 			.addClass('sticky-header')
+			.addClass('legacy-page')
 			.css({
 				'position': 'fixed',
 				'left': $table.position().left,
@@ -75,6 +76,7 @@ window.documentReadyFunctions.push(function () {
 		var $tableAround = $('<table></table>')
 			.addClass($table.attr('class'))
 			.addClass('sticky-column')
+			.addClass('legacy-page')
 			.css({
 				'position': 'fixed',
 				'left': 0,
