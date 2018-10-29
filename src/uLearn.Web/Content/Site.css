@@ -225,7 +225,7 @@ footer:hover {
 }
 
 /* Fixes for jquery-ui */
-.legacy-page .ui-front {
+.ui-front {
 	z-index: 1100;
 }
 
