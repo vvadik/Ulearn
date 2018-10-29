@@ -35,7 +35,7 @@ namespace AntiPlagiarism.Web
                 .WriteTo.Airlock(LogEventLevel.Information);
 			
             if (hostingEnvironment.Log != null)
-                loggerConfiguration = loggerConfiguration.WriteTo.VostokLog(hostingEnvironment.Log);
+                loggerConfiguration = loggerConfiguration.WriteTo.VostokLog(hostingEnvironment.Log, LogEventLevel.Information);
             var logger = loggerConfiguration.CreateLogger();
 			
             return new WebHostBuilder()

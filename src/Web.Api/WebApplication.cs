@@ -64,11 +64,11 @@ namespace Ulearn.Web.Api
             var loggerConfiguration = new LoggerConfiguration()
                 .Enrich.With<ThreadEnricher>()
                 .Enrich.With<FlowContextEnricher>()
-                .MinimumLevel.Information()
+                .MinimumLevel.Debug()
                 .WriteTo.Airlock(LogEventLevel.Information);
 			
             if (hostingEnvironment.Log != null)
-                loggerConfiguration = loggerConfiguration.WriteTo.VostokLog(hostingEnvironment.Log);
+                loggerConfiguration = loggerConfiguration.WriteTo.VostokLog(hostingEnvironment.Log, LogEventLevel.Information);
             var logger = loggerConfiguration.CreateLogger();
 			
 			var configuration = ApplicationConfiguration.Read<WebApiConfiguration>();
