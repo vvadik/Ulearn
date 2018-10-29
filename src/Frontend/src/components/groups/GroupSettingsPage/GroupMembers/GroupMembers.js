@@ -3,6 +3,8 @@ import Input from "@skbkontur/react-ui/components/Input/Input";
 import React from "react";
 import PropTypes from "prop-types";
 
+import './style.less';
+
 class GroupMembers extends Component {
 
 	render() {

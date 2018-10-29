@@ -1,12 +1,13 @@
 import { Component } from "react";
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { getPluralForm } from "../../../utils/getPluralForm";
+import { getPluralForm } from "../../../../utils/getPluralForm";
 import Icon from "@skbkontur/react-ui/components/Icon/Icon";
 import Kebab from "@skbkontur/react-ui/components/Kebab/Kebab";
 import MenuItem from "@skbkontur/react-ui/components/MenuItem/MenuItem";
 import React from "react";
-import GroupSettingsPage from "../../../pages/course/groups/GroupSettingsPage";
+
+import './style.less';
 
 class GroupInfo extends Component {
 
@@ -25,29 +26,30 @@ class GroupInfo extends Component {
 		const teachers = [owner, ...teachersList];
 
 		return (
-			<Link to={`${groupId}`}>
-				<div className ="group">
-				<div className="group-content">
-					<h3 className="group-content__name">{ groupName }</h3>
-					<div className="group-content__count">
-						{studentsCount} {pluralFormOfStudents}
+			<Link to={`${groupId}`} onClick={this.handleClick}>
+				<div className="group">
+					<div className="group-content">
+
+						<h3 className="group-content__name">{groupName}</h3>
+						<div className="group-content__count">
+							{studentsCount} {pluralFormOfStudents}
+						</div>
+						<div className="group-content__teachers">
+							Преподаватели: {teachers.join(', ')}
+						</div>
+						<div className="group-content__state">
+							{this.renderSetting(group.can_users_see_group_progress, true)}
+							{this.renderSetting(group.is_manual_checking_enabled, false)}
+						</div>
 					</div>
-					<div className="group-content__teachers">
-						Преподаватели: { teachers.join(', ') }
-					</div>
-					<div className="group-content__state">
-						{ this.renderSetting(group.can_users_see_group_progress, true) }
-						{ this.renderSetting(group.is_manual_checking_enabled, false) }
+					<div className="group-action">
+						<Kebab size="large" onOpen={this.openKebab}>
+							<MenuItem icon="ArchiveUnpack">Архивировать</MenuItem>
+							<MenuItem icon="Delete">Удалить</MenuItem>
+						</Kebab>
 					</div>
 				</div>
-				<div className="group-action">
-					<Kebab size="large">
-						<MenuItem icon="ArchiveUnpack">Архивировать</MenuItem>
-						<MenuItem icon="Delete">Удалить</MenuItem>
-					</Kebab>
-				</div>
-			</div>
-		</Link>
+			</Link>
 		)
 	}
 
@@ -69,15 +71,19 @@ class GroupInfo extends Component {
 		}
 	}
 
-	// handleGroupClick = () => {
-	// 	window.open(GroupSettingsPage);
-	// }
+	handleClick = (event) => {
+		if (event !== event.target) {
+			return event.preventDefault()}
+		console.log('link');
+	};
 
+	openKebab = () => {
+		console.log('kebab');
+	};
 }
 
 GroupInfo.propTypes = {
 	group: PropTypes.object.isRequired,
-	key: PropTypes.string,
 	onClick: PropTypes.func
 };
 

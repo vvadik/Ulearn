@@ -2,9 +2,11 @@ import {Component} from "react";
 import Loader from "@skbkontur/react-ui/components/Loader/Loader";
 import Input from "@skbkontur/react-ui/components/Input/Input";
 import Icon from "@skbkontur/react-ui/components/Icon/Icon";
-import GroupInfo from "./GroupInfo";
+import GroupInfo from "../GroupInfo/GroupInfo";
 import PropTypes from "prop-types";
 import React from "react";
+
+import './style.less';
 
 class GroupsList extends Component {
 
@@ -21,7 +23,6 @@ class GroupsList extends Component {
 					<GroupInfo
 						key={group.id}
 						group={group}
-						onClick={this.handleGroupClick}
 					/>) }
 			</div>
 		);

@@ -4,8 +4,8 @@ import api from "../../../api/index";
 import PropTypes from "prop-types";
 import Tabs from "@skbkontur/react-ui/components/Tabs/Tabs";
 import Button from "@skbkontur/react-ui/components/Button/Button";
-import GroupMembers from "../../../components/groups/GroupSettingsPage/GroupMembers";
-import GroupSettings from "../../../components/groups/GroupSettingsPage/GroupSettings";
+import GroupMembers from "../../../components/groups/GroupSettingsPage/GroupMembers/GroupMembers";
+import GroupSettings from "../../../components/groups/GroupSettingsPage/GroupSettings/GroupSettings";
 
 import "./groupSettings.less";
 

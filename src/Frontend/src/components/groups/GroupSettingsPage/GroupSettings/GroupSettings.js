@@ -4,6 +4,8 @@ import Checkbox from "@skbkontur/react-ui/components/Checkbox/Checkbox";
 import React from "react";
 import PropTypes from "prop-types";
 
+import './style.less';
+
 const mapToServerName = {
 	oldSolution: 'is_manual_checking_enabled_for_old_solutions',
 	manualChecking: 'is_manual_checking_enabled',

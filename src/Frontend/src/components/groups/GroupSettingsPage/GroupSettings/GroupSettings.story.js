@@ -1,7 +1,9 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
-import GroupSettings from './GroupSettings'
+import GroupSettings from './GroupSettings';
+
+import './style.less';
 
 storiesOf('Settings/GroupSettings', module)
 	.add('default', () => (

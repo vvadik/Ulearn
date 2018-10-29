@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import api from "../../../api";
 import PropTypes from 'prop-types';
-import GroupsList from "../../../components/groups/GroupMainPage/GroupsList";
-import GroupHeader from "../../../components/groups/GroupMainPage/GroupHeader";
+import GroupsList from "../../../components/groups/GroupMainPage/GroupList/GroupsList";
+import GroupHeader from "../../../components/groups/GroupMainPage/GroupHeader/GroupHeader";
 
 import "./groupsPage.less";
 
