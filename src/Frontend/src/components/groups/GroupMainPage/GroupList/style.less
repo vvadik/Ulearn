@@ -1,9 +1,12 @@
+@import "../../../../variables.less";
+
 .groups-wrapper {
   margin: 30px auto;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   width: 70%;
+  height: 100%;
 
   .search-field {
 	padding: 8px 10px;
@@ -31,6 +34,10 @@
 
   input {
 	max-width: 100%;
+
+	@media (max-width: @maxPhoneWidth) {
+	  font-size: 12px;
+	}
   }
 
   a {
