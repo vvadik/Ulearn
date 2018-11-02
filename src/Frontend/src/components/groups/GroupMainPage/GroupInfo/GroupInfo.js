@@ -1,7 +1,7 @@
 import { Component } from "react";
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { getPluralForm } from "../../../../utils/getPluralForm";
+import getPluralForm from "../../../../utils/getPluralForm";
 import Icon from "@skbkontur/react-ui/components/Icon/Icon";
 import Kebab from "@skbkontur/react-ui/components/Kebab/Kebab";
 import MenuItem from "@skbkontur/react-ui/components/MenuItem/MenuItem";
@@ -26,61 +26,54 @@ class GroupInfo extends Component {
 		const teachers = [owner, ...teachersList];
 
 		return (
-			<Link to={`${groupId}`} onClick={this.handleClick}>
-				<div className="group">
-					<div className="group-content">
-
-						<h3 className="group-content__name">{groupName}</h3>
-						<div className="group-content__count">
-							{studentsCount} {pluralFormOfStudents}
+			<div className="group">
+				<div className="group-content-wrapper">
+					<Link to={`groups/${groupId}`}>
+						<div className="group-content">
+							<div className="group-content-main">
+								<h3 className="group-content-main__name">{groupName}</h3>
+								<div className="group-content-main__count">
+									{studentsCount} {pluralFormOfStudents}
+								</div>
+								<div className="group-content-main__teachers">
+									Преподаватели: {teachers.join(', ')}
+								</div>
+							</div>
+							<div className="group-content-state">
+								{this.renderSetting(group.can_users_see_group_progress, true)}
+								{this.renderSetting(group.is_manual_checking_enabled, false)}
+							</div>
 						</div>
-						<div className="group-content__teachers">
-							Преподаватели: {teachers.join(', ')}
-						</div>
-						<div className="group-content__state">
-							{this.renderSetting(group.can_users_see_group_progress, true)}
-							{this.renderSetting(group.is_manual_checking_enabled, false)}
-						</div>
-					</div>
-					<div className="group-action">
-						<Kebab size="large" onOpen={this.openKebab}>
-							<MenuItem icon="ArchiveUnpack">Архивировать</MenuItem>
-							<MenuItem icon="Delete">Удалить</MenuItem>
-						</Kebab>
-					</div>
+					</Link>
 				</div>
-			</Link>
+				<div className="group-action">
+					<Kebab size="large">
+						<MenuItem icon="ArchiveUnpack" onClick={() => this.props.makeArchival(group, groupId)}>Архивировать</MenuItem>
+						<MenuItem icon="Delete" onClick={() => this.props.deleteGroup(group, groupId)}>Удалить</MenuItem>
+					</Kebab>
+				</div>
+			</div>
 		)
 	}
 
 	renderSetting(enabled, isProgress) {
 		if (enabled) {
 			return (
-			<div className="group-content__state_on">
+			<div className="group-content-state_on">
 				<Icon name="Ok"/>
 				{isProgress ? 'Ведомость включена' : 'Код-ревью включено'}
 			</div>
 			)
 		} else {
 			return (
-			<div className="group-content__state_off">
+			<div className="group-content-state_off">
 				<Icon name="Delete"/>
 				{isProgress ? 'Ведомость выключена' : 'Код-ревью выключено'}
 			</div>
 			)
 		}
 	}
-
-	handleClick = (event) => {
-		if (event !== event.target) {
-			return event.preventDefault()}
-		console.log('link');
-	};
-
-	openKebab = () => {
-		console.log('kebab');
-	};
-}
+ }
 
 GroupInfo.propTypes = {
 	group: PropTypes.object.isRequired,

@@ -1,4 +1,4 @@
-export function getPluralForm(number, one, two, five) {
+export default function getPluralForm(number, one, two, five) {
 	number %= 100;
 	if (number >= 5 && number <= 20) {
 		return five;

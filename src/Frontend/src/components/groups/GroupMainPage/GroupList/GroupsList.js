@@ -18,11 +18,13 @@ class GroupsList extends Component {
 		}
 		return (
 			<div className="groups-wrapper">
-				<Input className="search-field" placeholder="Начните вводить название группы" leftIcon={<Icon name="Search" />} />
+				<Input className="search-field" placeholder="Название группы" leftIcon={<Icon name="Search" />} />
 				{ this.props.groups.map(group =>
 					<GroupInfo
 						key={group.id}
 						group={group}
+						deleteGroup={this.props.deleteGroup}
+						makeArchival={this.props.makeArchival}
 					/>) }
 			</div>
 		);

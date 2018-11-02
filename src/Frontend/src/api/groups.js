@@ -5,6 +5,11 @@ export function getCourseGroups(courseId) {
 		.then(response => response.json())
 }
 
+export function getCourseArchiveGroups(courseId) {
+	return api.get("groups/in/" + courseId + "/archived")
+		.then(response => response.json())
+}
+
 export function getGroup(groupId) {
 	return api.get("groups/" + groupId)
 		.then(response => response.json());
@@ -16,9 +21,7 @@ export function createGroup(courseId, name) {
 			'Content-Type': 'application/json'
 		},
 		body: JSON.stringify({ name: name })
-	}).then(response => {
-		let location = response.headers["location"];
-	})
+	}).then(response => response.json());
 }
 
 export function saveGroupSettings(groupId, groupSettings) {
@@ -27,5 +30,10 @@ export function saveGroupSettings(groupId, groupSettings) {
 			'Content-Type': 'application/json'
 		},
 		body: JSON.stringify(groupSettings)
-	})
+	}).then(response => response.json());
+}
+
+export function deleteGroup(groupId) {
+	return api.delete("groups/" + groupId)
+		.then(response => response.json());
 }

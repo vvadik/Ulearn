@@ -64,6 +64,12 @@ function patch(url, options) {
 	return request(url, options);
 }
 
+function deleteGroup(url, options) {
+	options = options || {};
+	options.method = 'DELETE';
+	return request(url, options);
+}
+
 let api = {
     account: account,
     courses: courses,
@@ -72,9 +78,9 @@ let api = {
     get: get,
     post: post,
 	patch: patch,
+	delete: deleteGroup,
     request: request
 };
-
 
 export default api;
 

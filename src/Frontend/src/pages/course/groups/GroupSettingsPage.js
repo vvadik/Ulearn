@@ -72,12 +72,11 @@ class GroupSettingsPage extends Component {
 				[field]: value
 			}
 		});
-		console.log(updatedFields);
 	};
 
-	onClick = () => {
+	onClick = async () => {
 		const { group, updatedFields } = this.state;
-		api.groups.saveGroupSettings(group.id, updatedFields);
+		await api.groups.saveGroupSettings(group.id, updatedFields);
 	};
 }
 

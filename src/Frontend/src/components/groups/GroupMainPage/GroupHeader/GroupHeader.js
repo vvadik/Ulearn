@@ -24,8 +24,12 @@ class GroupHeader extends Component {
 			<React.Fragment>
 				{ this.renderHeader() }
 				{ this.state.modalOpened &&
-					<CreateGroupModal closeModal={this.closeModal} courseId={this.props.courseId}
-				/>}
+					<CreateGroupModal
+						closeModal={this.closeModal}
+						onSubmit={this.props.onSubmit}
+						courseId={this.props.courseId}
+					/>
+				}
 			</React.Fragment>
 		)
 	}
