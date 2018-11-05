@@ -19,7 +19,7 @@ namespace AntiPlagiarism.Web.Configuration
 	{
 		public int CountOfLastAuthorsForCalculatingMeanAndDeviation { get; set; }
 		
-		public int RecalculateStatisticsAfterSubmisionsCount { get; set; }
+		public int RecalculateStatisticsAfterSubmissionsCount { get; set; }
 		
 		public int FaintSuspicionCoefficient { get; set; }
 		

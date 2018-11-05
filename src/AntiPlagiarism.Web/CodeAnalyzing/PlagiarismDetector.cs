@@ -127,7 +127,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			var snippetsOccurences = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(submission, maxSnippetsCountSecondSearch, 0, authorsCountThreshold);
 			var snippetsIds = new HashSet<int>(snippetsOccurences.Select(o => o.SnippetId));
 			
-			var allOtherOccurences = snippetsRepo.GetSnippetsOccurences(
+			var allOtherOccurences = snippetsRepo.GetSnippetsOccurrences(
 				snippetsIds,
 				/* Filter only snippet occurences in submissions BY THIS client, THIS task, THIS language and NOT BY THIS author */
 				o => o.Submission.ClientId == submission.ClientId &&

@@ -7,6 +7,7 @@ using AntiPlagiarism.Api.Models.Results;
 using AntiPlagiarism.Web.CodeAnalyzing;
 using AntiPlagiarism.Web.CodeAnalyzing.CSharp;
 using AntiPlagiarism.Web.Configuration;
+using AntiPlagiarism.Web.Database;
 using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Database.Repos;
 using AntiPlagiarism.Web.Extensions;
@@ -31,7 +32,8 @@ namespace AntiPlagiarism.Web.Controllers
 		private readonly AntiPlagiarismConfiguration configuration;
 
 		public ApiController(
-			ISubmissionsRepo submissionsRepo, ISnippetsRepo snippetsRepo, ITasksRepo tasksRepo,
+			AntiPlagiarismDb db,
+			ISubmissionsRepo submissionsRepo, ISnippetsRepo snippetsRepo, ITasksRepo tasksRepo, IClientsRepo clientsRepo,
 			StatisticsParametersFinder statisticsParametersFinder,
 			PlagiarismDetector plagiarismDetector,
 			CodeUnitsExtractor codeUnitsExtractor,
@@ -39,7 +41,7 @@ namespace AntiPlagiarism.Web.Controllers
 			ILogger logger,
 			IServiceScopeFactory serviceScopeFactory,
 			IOptions<AntiPlagiarismConfiguration> configuration)
-			: base(logger)
+			: base(logger, clientsRepo, db)
 		{
 			this.submissionsRepo = submissionsRepo;
 			this.snippetsRepo = snippetsRepo;
@@ -100,14 +102,14 @@ namespace AntiPlagiarism.Web.Controllers
 		{
 			var submissionsCount = await submissionsRepo.GetSubmissionsCountAsync(clientId, taskId).ConfigureAwait(false);
 			var oldSubmissionsCount = (await tasksRepo.FindTaskStatisticsParametersAsync(taskId).ConfigureAwait(false))?.SubmissionsCount ?? 0;
-			var recalculateStatisticsAfterSubmisionsCount = configuration.StatisticsAnalyzing.RecalculateStatisticsAfterSubmisionsCount;
+			var recalculateStatisticsAfterSubmissionsCount = configuration.StatisticsAnalyzing.RecalculateStatisticsAfterSubmissionsCount;
 			logger.Information($"Определяю, надо ли пересчитать статистические параметры задачи (TaskStatisticsParameters, параметры Mean и Deviation), задача {taskId}. " +
-								$"Старое количество решений {oldSubmissionsCount}, новое {submissionsCount}, параметр recalculateStatisticsAfterSubmisionsCount={recalculateStatisticsAfterSubmisionsCount}.");
+								$"Старое количество решений {oldSubmissionsCount}, новое {submissionsCount}, параметр recalculateStatisticsAfterSubmisionsCount={recalculateStatisticsAfterSubmissionsCount}.");
 
-			if (submissionsCount < recalculateStatisticsAfterSubmisionsCount)
+			if (submissionsCount < recalculateStatisticsAfterSubmissionsCount)
 				return submissionsCount >= 2 * oldSubmissionsCount;
 
-			return submissionsCount - oldSubmissionsCount >= recalculateStatisticsAfterSubmisionsCount;
+			return submissionsCount - oldSubmissionsCount >= recalculateStatisticsAfterSubmissionsCount;
 		}
 
 		private int GetTokensCount(string code)
@@ -122,7 +124,7 @@ namespace AntiPlagiarism.Web.Controllers
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
 
-			await snippetsRepo.RemoveSnippetsOccurencesForTaskAsync(parameters.TaskId).ConfigureAwait(false);
+			await snippetsRepo.RemoveSnippetsOccurrencesForTaskAsync(parameters.TaskId).ConfigureAwait(false);
 			var submissions = await submissionsRepo.GetSubmissionsByTaskAsync(client.Id, parameters.TaskId).ConfigureAwait(false);
 			foreach (var submission in submissions)
 			{
