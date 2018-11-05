@@ -5,7 +5,7 @@ using Ulearn.Web.Api.Models.Common;
 namespace Ulearn.Web.Api.Models.Responses.Account
 {
 	[DataContract]
-	public class GetMeResponse : ApiResponse
+	public class GetMeResponse : SuccessResponse
 	{
 		[DataMember(Name = "is_authenticated")]
 		public bool IsAuthenticated { get; set; }

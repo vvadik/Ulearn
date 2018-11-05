@@ -4,7 +4,7 @@ using Database.Models;
 namespace Ulearn.Web.Api.Models.Responses.Comments
 {
 	[DataContract]
-	public class CommentPolicyResponse
+	public class CommentPolicyResponse : SuccessResponse
 	{
 		[DataMember(Name = "are_comments_enabled")]
 		public bool AreCommentsEnabled { get; set; }

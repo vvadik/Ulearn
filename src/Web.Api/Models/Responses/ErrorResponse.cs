@@ -8,7 +8,7 @@ namespace Ulearn.Web.Api.Models.Responses
 	public class ErrorResponse : ApiResponse
 	{
 		[DataMember(Name = "status")]
-		public string Status { get; } = "error";
+		public ResponseStatus Status { get; } = ResponseStatus.Error;
 		
 		[DataMember(Name = "message")]
 		public string Message { get; set; }

@@ -124,7 +124,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		public async Task<IActionResult> DeleteGroup(int groupId)
 		{
 			await groupsRepo.DeleteGroupAsync(groupId).ConfigureAwait(false);
-			return Ok(new SuccessResponse($"Group {groupId} has been deleted"));
+			return Ok(new SuccessResponseWithMessage($"Group {groupId} has been deleted"));
 		}
 
 		/// <summary>
@@ -157,7 +157,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			/* Revoke access from new owner */
 			await groupAccessesRepo.RevokeAccessAsync(groupId, parameters.OwnerId).ConfigureAwait(false);
 
-			return Ok(new SuccessResponse($"New group's owner is {parameters.OwnerId}"));
+			return Ok(new SuccessResponseWithMessage($"New group's owner is {parameters.OwnerId}"));
 		}
 
 		/// <summary>
@@ -230,7 +230,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			if (groupMember == null)
 				return StatusCode((int)HttpStatusCode.Conflict, new ErrorResponse($"User {studentId} is already a student of group {groupId}"));
 
-			return Ok(new SuccessResponse($"Student {studentId} is added to group {groupId}"));
+			return Ok(new SuccessResponseWithMessage($"Student {studentId} is added to group {groupId}"));
 		}
 		
 		/// <summary>
@@ -257,7 +257,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 				UserId
 			).ConfigureAwait(false);
 
-			return Ok(new SuccessResponse($"Student {studentId} is removed from group {groupId}"));
+			return Ok(new SuccessResponseWithMessage($"Student {studentId} is removed from group {groupId}"));
 		}
 
 		/// <summary>
@@ -277,7 +277,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 				UserId
 			).ConfigureAwait(false);
 
-			return Ok(new SuccessResponse($"{members.Count} students have been removed from group {group.Id}"));
+			return Ok(new SuccessResponseWithMessage($"{members.Count} students have been removed from group {group.Id}"));
 		}
 
 		/// <summary>
@@ -303,7 +303,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 				UserId
 			).ConfigureAwait(false);
 			
-			return Ok(new SuccessResponse($"{newMembers.Count} students have been copied from group {groupId} to group {destinationGroupId}"));
+			return Ok(new SuccessResponseWithMessage($"{newMembers.Count} students have been copied from group {groupId} to group {destinationGroupId}"));
 		}
 
 		/// <summary>
@@ -342,7 +342,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			var access = await groupAccessesRepo.GrantAccessAsync(groupId, userId, GroupAccessType.FullAccess, UserId).ConfigureAwait(false);
 			await notificationsRepo.AddNotificationAsync(group.CourseId, new GrantedAccessToGroupNotification { AccessId = access.Id }, UserId).ConfigureAwait(false);
 			
-			return Ok(new SuccessResponse($"User {userId} has full access to {groupId}"));
+			return Ok(new SuccessResponseWithMessage($"User {userId} has full access to {groupId}"));
 		}
 
 		/// <summary>
@@ -371,7 +371,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 					UserId
 				).ConfigureAwait(false);
 
-			return Ok(new SuccessResponse($"User {userId} has no access to {groupId}"));
+			return Ok(new SuccessResponseWithMessage($"User {userId} has no access to {groupId}"));
 		}
 	}
 }

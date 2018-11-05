@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 namespace Ulearn.Web.Api.Models.Responses
 {
 	[DataContract]
-	public class PaginatedResponse : ApiResponse
+	public class PaginatedResponse : SuccessResponse
 	{
 		[DataMember(Name = "pagination", Order = 100)]
 		public PaginationResponse PaginationResponse { get; set; }

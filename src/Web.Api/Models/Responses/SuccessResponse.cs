@@ -5,13 +5,17 @@ namespace Ulearn.Web.Api.Models.Responses
 	[DataContract]
 	public class SuccessResponse : ApiResponse
 	{
-		[DataMember(Name = "status")]
-		public string Status { get; } = "ok";
-		
-		[DataMember(Name = "message", EmitDefaultValue = false)]
+		[DataMember(Name = "status", Order = 0)]
+		public ResponseStatus Status { get; } = ResponseStatus.Ok;
+	}
+
+	[DataContract]
+	public class SuccessResponseWithMessage : SuccessResponse
+	{
+		[DataMember(Name = "message", EmitDefaultValue = false, Order = 0)]
 		public string Message { get; set; }
 
-		public SuccessResponse(string message)
+		public SuccessResponseWithMessage(string message)
 		{
 			Message = message;
 		}

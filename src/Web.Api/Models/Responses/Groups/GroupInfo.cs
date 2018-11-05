@@ -6,7 +6,7 @@ using Ulearn.Web.Api.Models.Common;
 namespace Ulearn.Web.Api.Models.Responses.Groups
 {
 	[DataContract]
-	public class GroupInfo
+	public class GroupInfo : SuccessResponse
 	{
 		[DataMember(Name = "id")]
 		public int Id { get; set; }

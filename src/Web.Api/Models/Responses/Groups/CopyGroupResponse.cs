@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 namespace Ulearn.Web.Api.Models.Responses.Groups
 {
 	[DataContract]
-	public class CopyGroupResponse : ApiResponse
+	public class CopyGroupResponse : SuccessResponse
 	{
 		[DataMember(Name = "id")]
 		public int GroupId { get; set; }

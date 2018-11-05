@@ -71,7 +71,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 
 			await commentPoliciesRepo.SaveCommentsPolicyAsync(policy).ConfigureAwait(false);
 
-			return Ok(new SuccessResponse($"Comment policy for {courseId} successfully updated"));
+			return Ok(new SuccessResponseWithMessage($"Comment policy for {courseId} successfully updated"));
 		}
 	}
 }

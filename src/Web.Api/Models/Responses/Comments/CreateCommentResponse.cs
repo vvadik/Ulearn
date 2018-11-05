@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 namespace Ulearn.Web.Api.Models.Responses.Comments
 {
 	[DataContract]
-	public class CreateCommentResponse
+	public class CreateCommentResponse : SuccessResponse
 	{
 		[DataMember(Name = "id")]
 		public int CommentId { get; set; }

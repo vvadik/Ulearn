@@ -6,7 +6,7 @@ using Ulearn.Web.Api.Models.Common;
 namespace Ulearn.Web.Api.Models.Responses.Notifications
 {
 	[DataContract]
-	public class NotificationListResponse : ApiResponse
+	public class NotificationListResponse : SuccessResponse
 	{
 		[DataMember(Name = "important")]
 		public NotificationList Important { get; set; }

@@ -5,7 +5,7 @@ using Database.Models;
 namespace Ulearn.Web.Api.Models.Responses.Account
 {
 	[DataContract]
-	public class CourseRolesResponse : ApiResponse
+	public class CourseRolesResponse : SuccessResponse
 	{
 		[DataMember(Name = "is_system_administrator")]
 		public bool IsSystemAdministrator { get; set; }

@@ -115,7 +115,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 
 			await commentsRepo.DeleteCommentAsync(commentId).ConfigureAwait(false);
 
-			return Ok(new SuccessResponse($"Comment {commentId} successfully deleted"));
+			return Ok(new SuccessResponseWithMessage($"Comment {commentId} successfully deleted"));
 		}
 
 		/// <summary>
@@ -146,7 +146,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			if (parameters.IsCorrectAnswer.HasValue)
 				await UpdateCommentIsCorrectAnswerAsync(comment, parameters.IsCorrectAnswer.Value).ConfigureAwait(false);
 
-			return Ok(new SuccessResponse($"Comment {commentId} successfully updated"));
+			return Ok(new SuccessResponseWithMessage($"Comment {commentId} successfully updated"));
 		}
 
 		private async Task UpdateCommentTextAsync([NotNull] Comment comment, string text)
@@ -241,7 +241,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 
 			await NotifyAboutLikedComment(commentId).ConfigureAwait(false);
 			
-			return Ok(new SuccessResponse($"You have liked the comment {commentId}"));
+			return Ok(new SuccessResponseWithMessage($"You have liked the comment {commentId}"));
 		}
 
 		/// <summary>
@@ -257,7 +257,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			
 			await commentLikesRepo.UnlikeAsync(commentId, UserId).ConfigureAwait(false);
 			
-			return Ok(new SuccessResponse($"You have unliked the comment {commentId}"));
+			return Ok(new SuccessResponseWithMessage($"You have unliked the comment {commentId}"));
 		}
 		
 		private async Task NotifyAboutLikedComment(int commentId)

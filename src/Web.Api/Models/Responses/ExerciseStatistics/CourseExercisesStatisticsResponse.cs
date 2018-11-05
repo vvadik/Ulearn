@@ -6,7 +6,7 @@ using Ulearn.Web.Api.Models.Common;
 namespace Ulearn.Web.Api.Models.Responses.ExerciseStatistics
 {
 	[DataContract]
-	public class CourseExercisesStatisticsResponse : ApiResponse
+	public class CourseExercisesStatisticsResponse : SuccessResponse
 	{
 		[DataMember(Name = "exercises")]
 		public List<OneExerciseStatistics> Exercises { get; set; }
