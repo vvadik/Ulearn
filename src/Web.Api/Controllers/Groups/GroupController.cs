@@ -13,6 +13,7 @@ using Database.Repos.Groups;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Serilog;
 using Swashbuckle.AspNetCore.Annotations;
 using Ulearn.Web.Api.Models.Parameters.Groups;
@@ -22,7 +23,6 @@ using Ulearn.Web.Api.Models.Responses.Groups;
 namespace Ulearn.Web.Api.Controllers.Groups
 {
 	[Route("/groups/{groupId:int:min(0)}")]
-	[ProducesResponseType((int) HttpStatusCode.OK)]
 	[ProducesResponseType((int) HttpStatusCode.NotFound)]
 	[ProducesResponseType((int) HttpStatusCode.Forbidden)]
 	[Authorize]
@@ -75,6 +75,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// Информация о группе
 		/// </summary>
 		[HttpGet]
+		[ProducesResponseType((int) HttpStatusCode.OK)]
 		public async Task<ActionResult<GroupInfo>> Group(int groupId)
 		{
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
@@ -87,6 +88,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// Изменить группу
 		/// </summary>
 		[HttpPatch]
+		[ProducesResponseType((int) HttpStatusCode.OK)]
 		public async Task<ActionResult<GroupInfo>> UpdateGroup(int groupId, [FromBody] UpdateGroupParameters parameters)
 		{
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
@@ -118,6 +120,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// Удалить группу
 		/// </summary>
 		[HttpDelete]
+		[ProducesResponseType((int) HttpStatusCode.OK)]
 		public async Task<IActionResult> DeleteGroup(int groupId)
 		{
 			await groupsRepo.DeleteGroupAsync(groupId).ConfigureAwait(false);
@@ -128,6 +131,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// Сменить владельца группы
 		/// </summary>
 		[HttpPut("owner")]
+		[ProducesResponseType((int) HttpStatusCode.OK)]
 		[SwaggerResponse((int) HttpStatusCode.NotFound, Description = "Can't find user or user is not an instructor")]
 		public async Task<IActionResult> ChangeOwner(int groupId, [FromBody] ChangeOwnerParameters parameters)
 		{
@@ -160,9 +164,10 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// Копирует группу в тот же или другой курс
 		/// </summary>
 		[HttpPost("copy")]
+		[SwaggerResponse((int) HttpStatusCode.Created, Description = "Group has been copied", Type = typeof(CopyGroupResponse))]
 		[SwaggerResponse((int) HttpStatusCode.NotFound, Description = "Course not found")]
 		[SwaggerResponse((int) HttpStatusCode.Forbidden, Description = "You have no access to destination course. You should be instructor or course admin.")]
-		public async Task<IActionResult> Copy(int groupId, [FromQuery] CopyGroupParameters parameters)
+		public async Task<ActionResult<CopyGroupResponse>> Copy(int groupId, [FromQuery] CopyGroupParameters parameters)
 		{
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
 			if (! courseManager.HasCourse(parameters.DestinationCourseId))
@@ -173,7 +178,12 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			var newOwnerId = parameters.ChangeOwner ? UserId : null;
 			var newGroup = await groupsCreatorAndCopier.CopyGroupAsync(group, parameters.DestinationCourseId, newOwnerId).ConfigureAwait(false);
 
-			return Ok(new SuccessResponse($"Group {group.Id} has been copied to course {parameters.DestinationCourseId}. Id of new group is {newGroup.Id}"));
+			var url = Url.Action(new UrlActionContext { Action = nameof(Group), Controller = "Group", Values = new { groupId = group.Id }});
+			return Created(url, new CopyGroupResponse
+			{
+				GroupId = newGroup.Id,
+				ApiUrl = url
+			});
 		}
 		
 		private async Task<bool> CanCreateGroupInCourseAsync(string userId, string courseId)
@@ -186,6 +196,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// Список студентов группы
 		/// </summary>
 		[HttpGet("students")]
+		[ProducesResponseType((int) HttpStatusCode.OK)]
 		public async Task<ActionResult<GroupStudentsResponse>> GroupStudents(int groupId)
 		{
 			var members = await groupMembersRepo.GetGroupMembersAsync(groupId).ConfigureAwait(false);
@@ -203,11 +214,12 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// Добавить студента в группу
 		/// </summary>
 		[HttpPost("students/{studentId:guid}")]
+		[ProducesResponseType((int) HttpStatusCode.OK)]
 		[SwaggerResponse((int) HttpStatusCode.NotFound, Description = "Can't find user")]
 		[SwaggerResponse((int) HttpStatusCode.Conflict, Description = "User is already a student of this group")]
 		public async Task<IActionResult> AddStudent(int groupId, string studentId)
 		{
-			if (!User.IsSystemAdministrator())
+			if (!await IsSystemAdministratorAsync().ConfigureAwait(false))
 				return StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse("Only system administrator can add students to group directly"));
 			
 			var user = await usersRepo.FindUserByIdAsync(studentId).ConfigureAwait(false);
@@ -225,6 +237,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// Удалить студента из группы 
 		/// </summary>
 		[HttpDelete("students/{studentId:guid}")]
+		[ProducesResponseType((int) HttpStatusCode.OK)]
 		[SwaggerResponse((int) HttpStatusCode.NotFound, Description = "Can't find user or user is not a student of this group")]
 		public async Task<IActionResult> RemoveStudent(int groupId, string studentId)
 		{
@@ -251,6 +264,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// Удалить студентов из группы
 		/// </summary>
 		[HttpDelete("students")]
+		[ProducesResponseType((int) HttpStatusCode.OK)]
 		public async Task<IActionResult> RemoveStudents(int groupId, RemoveStudentsParameters parameters)
 		{
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
@@ -270,6 +284,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// Скопировать студентов из одной группы в другую
 		/// </summary>
 		[HttpPost("students/copy/to/{destinationGroupId:int:min(0)}")]
+		[ProducesResponseType((int) HttpStatusCode.OK)]
 		public async Task<IActionResult> CopyStudents(int groupId, int destinationGroupId, CopyStudentsParameters parameters)
 		{
 			var destinationGroup = await groupsRepo.FindGroupByIdAsync(destinationGroupId).ConfigureAwait(false);
@@ -295,6 +310,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// Список доступов к группе
 		/// </summary>
 		[HttpGet("accesses")]
+		[ProducesResponseType((int) HttpStatusCode.OK)]
 		public async Task<ActionResult<GroupAccessesResponse>> GroupAccesses(int groupId)
 		{
 			var accesses = await groupAccessesRepo.GetGroupAccessesAsync(groupId).ConfigureAwait(false);
@@ -308,8 +324,9 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// Выдать доступ к группе
 		/// </summary>
 		[HttpPost("accesses/{userId:guid}")]
+		[ProducesResponseType((int) HttpStatusCode.OK)]
 		[SwaggerResponse((int) HttpStatusCode.Conflict, "User already has access to group")]
-		/* TODO (andgein): We don't check that userId is Instructor of course. Should we check it? Or no? */
+		/* TODO (andgein): We don't check that userId is Instructor of course. Should we check it? Or not? */
 		public async Task<IActionResult> GrantAccess(int groupId, string userId)
 		{
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
@@ -332,6 +349,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// Отозвать доступ к группе
 		/// </summary>
 		[HttpDelete("accesses/{userId:guid}")]
+		[ProducesResponseType((int) HttpStatusCode.OK)]
 		public async Task<IActionResult> RevokeAccess(int groupId, string userId)
 		{
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
