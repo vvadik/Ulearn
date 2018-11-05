@@ -4,15 +4,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Extensions;
+using Serilog;
 
 namespace AntiPlagiarism.Web.CodeAnalyzing
 {
 	public class StatisticsParametersFinder
 	{
+		private readonly ILogger logger;
 		private readonly PlagiarismDetector plagiarismDetector;
 
-		public StatisticsParametersFinder(PlagiarismDetector plagiarismDetector)
+		public StatisticsParametersFinder(ILogger logger, PlagiarismDetector plagiarismDetector)
 		{
+			this.logger = logger;
 			this.plagiarismDetector = plagiarismDetector;
 		}
 
@@ -22,7 +25,9 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			
 			var weights = new List<double>();
 			foreach (var (firstSubmission, secondSubmission) in pairs)
-				weights.Add(await GetLinkWeight(firstSubmission, secondSubmission));
+				weights.Add(await GetLinkWeightAsync(firstSubmission, secondSubmission).ConfigureAwait(false));
+			
+			logger.Information($"Пересчитываю статистические параметры задачи (TaskStatisticsParameters) по следующему набору весов: [{string.Join(", ", weights)}]");
 			
 			var mean = weights.Mean();
 			var deviation = weights.Deviation(mean);
@@ -43,7 +48,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			return 2;
 		}
 
-		private Task<double> GetLinkWeight(Submission first, Submission second)
+		private Task<double> GetLinkWeightAsync(Submission first, Submission second)
 		{
 			return plagiarismDetector.GetWeightAsync(first, second);
 		}

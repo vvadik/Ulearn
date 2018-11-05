@@ -42,20 +42,20 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			logger.Information($"Вычисляю коэффициент похожести решения #{firstSubmission.Id} и #{secondSubmission.Id}");
 			var maxSnippetsCount = configuration.PlagiarismDetector.CountOfColdestSnippetsUsedToSecondSearch;
 			var authorsCountThreshold = configuration.PlagiarismDetector.SnippetAuthorsCountThreshold;
-			var snippetsOccurencesOfFirstSubmission = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(firstSubmission, maxSnippetsCount, 0, authorsCountThreshold);
-			logger.Debug($"Сниппеты первого решения: [{string.Join(", ", snippetsOccurencesOfFirstSubmission)}]");
-			var snippetsOccurencesOfSecondSubmission = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(secondSubmission, maxSnippetsCount, 0, authorsCountThreshold);
-			logger.Debug($"Сниппеты второго решения: [{string.Join(", ", snippetsOccurencesOfSecondSubmission)}]");
+			var snippetsOccurrencesOfFirstSubmission = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(firstSubmission, maxSnippetsCount, 0, authorsCountThreshold).ConfigureAwait(false);
+			logger.Debug($"Сниппеты первого решения: [{string.Join(", ", snippetsOccurrencesOfFirstSubmission)}]");
+			var snippetsOccurrencesOfSecondSubmission = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(secondSubmission, maxSnippetsCount, 0, authorsCountThreshold).ConfigureAwait(false);
+			logger.Debug($"Сниппеты второго решения: [{string.Join(", ", snippetsOccurrencesOfSecondSubmission)}]");
 
 			/* Group by snippets from the second submissions by snippetId for fast searching */
-			var snippetsOccurencesOfSecondSubmissionBySnippet = snippetsOccurencesOfSecondSubmission
+			var snippetsOccurencesOfSecondSubmissionBySnippet = snippetsOccurrencesOfSecondSubmission
 				.GroupBy(o => o.SnippetId)
 				.ToDictionary(g => g.Key, g => g.ToList())
 				.ToDefaultDictionary();
 			
 			var tokensMatchedInFirstSubmission = new DefaultDictionary<SnippetType, HashSet<int>>();
 			var tokensMatchedInSecondSubmission = new DefaultDictionary<SnippetType, HashSet<int>>();
-			foreach (var snippetOccurence in snippetsOccurencesOfFirstSubmission)
+			foreach (var snippetOccurence in snippetsOccurrencesOfFirstSubmission)
 			{
 				var snippet = snippetOccurence.Snippet;
 				foreach (var otherOccurence in snippetsOccurencesOfSecondSubmissionBySnippet[snippet.Id])
