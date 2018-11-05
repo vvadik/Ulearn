@@ -88,7 +88,7 @@ WriteLiteralTo(__razor_helper_writer, "/>\r\n");
 
 WriteLiteralTo(__razor_helper_writer, "\t</head>\r\n\t<body");
 
-WriteLiteralTo(__razor_helper_writer, " class=\"without-topbar\"");
+WriteLiteralTo(__razor_helper_writer, " class=\"without-topbar legacy-page\"");
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t<div");
 

@@ -6,7 +6,7 @@ namespace Ulearn.Web.Api.Models.Responses
 	public class SuccessResponse : ApiResponse
 	{
 		[DataMember(Name = "status")]
-		public string Status { get; set; } = "ok";
+		public string Status { get; } = "ok";
 		
 		[DataMember(Name = "message", EmitDefaultValue = false)]
 		public string Message { get; set; }
