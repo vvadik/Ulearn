@@ -165,14 +165,14 @@ namespace AntiPlagiarism.Web.Database.Repos
   		   So we decided to disable AutoDetectChangesEnabled temporary for some queries */
 		private void DisableAutoDetectChanges()
 		{
-			logger.Debug("Выключаю AutoDetectChangesEnabled ");
-			db.ChangeTracker.AutoDetectChangesEnabled = false;
+			logger.Debug("Выключаю AutoDetectChangesEnabled");
+			db.DisableAutoDetectChanges();
 		}
 
 		private void EnableAutoDetectChanges()
 		{
 			logger.Debug("Включаю AutoDetectChangesEnabled обратно");
-			db.ChangeTracker.AutoDetectChangesEnabled = true;
+			db.EnableAutoDetectChanges();
 		}
 
 		public async Task<Snippet> GetOrAddSnippetAsync(Snippet snippet)

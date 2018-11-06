@@ -255,17 +255,21 @@ namespace AntiPlagiarism.Web.Controllers
 			/* Create local submissions repo for preventing memory leaks */
 			using (var scope = serviceScopeFactory.CreateScope())
 			{
+				db.DisableAutoDetectChanges();
+				
 				var localSubmissionsRepo = scope.ServiceProvider.GetService<ISubmissionsRepo>();
 
 				logger.Information($"Пересчитываю статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId}");
 				var lastAuthorsIds = await localSubmissionsRepo.GetLastAuthorsByTaskAsync(clientId, taskId, configuration.StatisticsAnalyzing.CountOfLastAuthorsForCalculatingMeanAndDeviation).ConfigureAwait(false);
 				var lastSubmissions = await localSubmissionsRepo.GetLastSubmissionsByAuthorsForTaskAsync(clientId, taskId, lastAuthorsIds).ConfigureAwait(false);
 				var currentSubmissionsCount = await localSubmissionsRepo.GetSubmissionsCountAsync(clientId, taskId).ConfigureAwait(false);
-
+				
 				var statisticsParameters = await statisticsParametersFinder.FindStatisticsParametersAsync(lastSubmissions).ConfigureAwait(false);
 				logger.Information($"Новые статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId}: Mean={statisticsParameters.Mean}, Deviation={statisticsParameters.Deviation}");
 				statisticsParameters.TaskId = taskId;
 				statisticsParameters.SubmissionsCount = currentSubmissionsCount;
+				
+				db.EnableAutoDetectChanges();
 				await tasksRepo.SaveTaskStatisticsParametersAsync(statisticsParameters).ConfigureAwait(false);
 			}
 		}

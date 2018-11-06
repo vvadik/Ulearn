@@ -38,12 +38,12 @@ namespace AntiPlagiarism.Web.Database.Repos
 			return db.TasksStatisticsParameters.FindAsync(taskId);
 		}
 
-		public async Task SaveTaskStatisticsParametersAsync(TaskStatisticsParameters parameters)
+		public Task SaveTaskStatisticsParametersAsync(TaskStatisticsParameters parameters)
 		{
-			await FuncUtils.TrySeveralTimesAsync(
+			return FuncUtils.TrySeveralTimesAsync(
 				async () =>
 				{
-					await TrySaveTaskStatisticsParametersAsync(parameters);
+					await TrySaveTaskStatisticsParametersAsync(parameters).ConfigureAwait(false);
 					return true;
 				},
 				3,
@@ -54,10 +54,10 @@ namespace AntiPlagiarism.Web.Database.Repos
 
 		private async Task TrySaveTaskStatisticsParametersAsync(TaskStatisticsParameters parameters)
 		{
-			using (var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable))
+			using (var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable).ConfigureAwait(false))
 			{
 				db.AddOrUpdate(parameters, p => p.TaskId == parameters.TaskId);
-				await db.SaveChangesAsync();
+				await db.SaveChangesAsync().ConfigureAwait(false);
 				transaction.Commit();
 			}
 		}
