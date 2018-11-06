@@ -21,11 +21,12 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 
 		public async Task<TaskStatisticsParameters> FindStatisticsParametersAsync(List<Submission> submissions)
 		{
-			var pairs = submissions.SelectMany(s => submissions, Tuple.Create).Where(pair => pair.Item1.Id < pair.Item2.Id);
+			var pairs = submissions.SelectMany(s => submissions, Tuple.Create).Where(pair => pair.Item1.Id < pair.Item2.Id).ToList();
 			
 			var weights = new List<double>();
+			var pairIndex = 0;
 			foreach (var (firstSubmission, secondSubmission) in pairs)
-				weights.Add(await GetLinkWeightAsync(firstSubmission, secondSubmission).ConfigureAwait(false));
+				weights.Add(await GetLinkWeightAsync(firstSubmission, secondSubmission, pairIndex, pairs.Count).ConfigureAwait(false));
 			
 			logger.Information($"Пересчитываю статистические параметры задачи (TaskStatisticsParameters) по следующему набору весов: [{string.Join(", ", weights)}]");
 			
@@ -48,8 +49,9 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			return 2;
 		}
 
-		private Task<double> GetLinkWeightAsync(Submission first, Submission second)
+		private Task<double> GetLinkWeightAsync(Submission first, Submission second, int index, int totalCount)
 		{
+			logger.Information($"Вычисляю коэффициент похожести решения #{first.Id} и #{second.Id} ({index} из {totalCount})");
 			return plagiarismDetector.GetWeightAsync(first, second);
 		}
 		
