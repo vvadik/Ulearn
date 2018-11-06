@@ -153,6 +153,7 @@ namespace uLearn.Web.Kontur.Passport
 				string.Equals(Options.ReturnEndpointPath, Request.Path.Value, StringComparison.OrdinalIgnoreCase))
 			{
 				var ticket = await AuthenticateAsync();
+				ticket.Properties.IsPersistent = true;
 
 				var context = new KonturPassportReturnEndpointContext(Context, ticket)
 				{
