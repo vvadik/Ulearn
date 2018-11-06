@@ -83,9 +83,10 @@ namespace uLearn.Web.Models
 		public bool RememberMe { get; set; }
 	}
 
-	public class RegisterViewModel
+	public class RegistrationViewModel
 	{
 		[Required(ErrorMessage = "{0} должен быть у каждого пользователя")]
+		[RegularExpression(@"^[^@]+$", ErrorMessage = "{0} не может содержать собачку «@»")]
 		[Display(Name = "Логин")]
 		public string UserName { get; set; }
 

@@ -318,14 +318,14 @@ namespace uLearn.Web.Controllers
 		[AllowAnonymous]
 		public ActionResult Register(string returnUrl = null)
 		{
-			return View(new RegisterViewModel { ReturnUrl = returnUrl });
+			return View(new RegistrationViewModel { ReturnUrl = returnUrl });
 		}
 
 		[HttpPost]
 		[AllowAnonymous]
 		[ValidateInput(false)]
 		[ValidateAntiForgeryToken]
-		public async Task<ActionResult> Register(RegisterViewModel model)
+		public async Task<ActionResult> Register(RegistrationViewModel model)
 		{
 			if (ModelState.IsValid)
 			{
