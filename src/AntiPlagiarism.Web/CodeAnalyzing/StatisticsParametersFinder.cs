@@ -26,7 +26,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			var weights = new List<double>();
 			var pairIndex = 0;
 			foreach (var (firstSubmission, secondSubmission) in pairs)
-				weights.Add(await GetLinkWeightAsync(firstSubmission, secondSubmission, pairIndex, pairs.Count).ConfigureAwait(false));
+				weights.Add(await GetLinkWeightAsync(firstSubmission, secondSubmission, pairIndex++, pairs.Count).ConfigureAwait(false));
 			
 			logger.Information($"Пересчитываю статистические параметры задачи (TaskStatisticsParameters) по следующему набору весов: [{string.Join(", ", weights)}]");
 			
