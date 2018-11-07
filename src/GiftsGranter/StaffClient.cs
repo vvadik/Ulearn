@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Ulearn.Common;
 
 namespace GiftsGranter
 {
@@ -24,7 +25,7 @@ namespace GiftsGranter
 		private JObject Get(string url)
 		{
 			var client = CreateHttpClient();
-			var response = client.GetAsync($"https://staff.skbkontur.ru/api/{url}").Result;
+			var response = FuncUtils.TrySeveralTimesAsync(() => client.GetAsync($"https://staff.skbkontur.ru/api/{url}"), 3).GetAwaiter().GetResult();
 			return GetJsonResponse(response);
 		}
 
