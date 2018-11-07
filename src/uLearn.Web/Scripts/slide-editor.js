@@ -496,27 +496,53 @@ function addExerciseCodeReview(renderedReview) {
 
 var refreshPreviousDraftLastId = undefined;
 function refreshPreviousDraft(id) {
-    if (id == undefined)
-        id = refreshPreviousDraftLastId;
-    refreshPreviousDraftLastId = id;
+	if (id === undefined)
+		id = refreshPreviousDraftLastId;
+	refreshPreviousDraftLastId = id;
 
-    window.onbeforeunload = function () {
-        saveExerciseCodeDraft(id);
-    }
-    if (localStorage[id] != undefined && $('.code-exercise').length > 0) {
-        let codeMirrorEditor = $('.code-exercise')[0].codeMirrorEditor;
-        codeMirrorEditor.setValue(localStorage[id]);
-        /* Refresh codemirror editor. See https://stackoverflow.com/questions/8349571/codemirror-editor-is-not-loading-content-until-clicked */
-        setTimeout(function () {
-            codeMirrorEditor.refresh();
-        });
-    }
+	window.onbeforeunload = function () {
+		saveExerciseCodeDraft(id);
+	};
+	history.onpushstate = function() {
+		saveExerciseCodeDraft(id);
+	};
+
+	let solutions = JSON.parse(localStorage['exercise_solutions'] || '{}');
+
+	if (solutions[id] !== undefined && $('.code-exercise').length > 0) {
+		let codeMirrorEditor = $('.code-exercise')[0].codeMirrorEditor;
+		codeMirrorEditor.setValue(solutions[id]);
+		/* Refresh codemirror editor. See https://stackoverflow.com/questions/8349571/codemirror-editor-is-not-loading-content-until-clicked */
+		setTimeout(function () {
+			codeMirrorEditor.refresh();
+		});
+	}
 }
 
 function saveExerciseCodeDraft(id) {
-    if (id == undefined)
-        id = refreshPreviousDraftLastId;
+	if (id === undefined)
+		id = refreshPreviousDraftLastId;
 
-    if ($('.code-exercise').length > 0)
-        localStorage[id] = $('.code-exercise')[0].codeMirrorEditor.getValue();
+	if (localStorage['exercise_solutions'] === undefined)
+		localStorage['exercise_solutions'] = JSON.stringify({});
+
+	let solutions = JSON.parse(localStorage['exercise_solutions']);
+
+	if ($('.code-exercise').length > 0) {
+		solutions[id] = $('.code-exercise')[0].codeMirrorEditor.getValue();
+		localStorage['exercise_solutions'] = JSON.stringify(solutions);
+	}
 }
+
+/* Add event for detecting pushState() call. See http://felix-kling.de/blog/2011/01/06/how-to-detect-history-pushstate/ */
+(function(history){
+	var pushState = history.pushState;
+	history.pushState = function(state) {
+		if (typeof history.onpushstate === "function") {
+			history.onpushstate({state: state});
+		}
+		// ... whatever else you want to do
+		// maybe call onhashchange e.handler
+		return pushState.apply(history, arguments);
+	}
+})(window.history);

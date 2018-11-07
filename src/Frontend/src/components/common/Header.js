@@ -599,6 +599,7 @@ class LogoutLink extends Component {
     }
 
     onClick() {
+    	localStorage.removeItem('exercise_solutions');
         this.props.logout();
     }
 
