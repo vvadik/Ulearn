@@ -702,17 +702,21 @@
 			{
                 if (!block.Multiple && item.IsCorrect == ChoiceItemCorrectness.True)
                 {
-                    <span class="quiz__explanation__correct">Этот ответ правильный@(dotIfHasExplanation)</span>						
+                    <span class="quiz__explanation__correct">Этот ответ был правильным@(dotIfHasExplanation)</span>						
 				}
 				else if (!hasExplanation && block.Multiple && item.IsCorrect == ChoiceItemCorrectness.True)
 				{
-					<span class="quiz__explanation__incorrect">Неправильно.</span>
+					<span class="quiz__explanation__incorrect">Вы ошиблись.</span>
 					<span>Этот ответ надо было выбрать</span>
+				}
+				else if (block.Multiple)
+				{
+	                <span class="quiz__explanation__incorrect">Вы ошиблись@(dotIfHasExplanation)</span>
 				}
 				else
 				{
-	                <span class="quiz__explanation__incorrect">Неправильно@(dotIfHasExplanation)</span>
-                }
+					<span class="quiz__explanation__incorrect">Неправильно@(dotIfHasExplanation)</span>
+				}
 			}
 		}
 
