@@ -20,6 +20,7 @@ namespace uLearn.Web.Models
 	public class ExternalLoginConfirmationViewModel
 	{
 		[Required(ErrorMessage = "{0} есть у каждого пользователя")]
+		[RegularExpression(@"^[^@]+$", ErrorMessage = "{0} не может содержать собачку «@»")]
 		[Display(Name = "Логин")]
 		public string UserName { get; set; }
 
@@ -72,7 +73,7 @@ namespace uLearn.Web.Models
 	public class LoginViewModel
 	{
 		[Required(ErrorMessage = "Ты забыл логин?")]
-		[Display(Name = "Логин")]
+		[Display(Name = "Логин или емэйл")]
 		public string UserName { get; set; }
 
 		[Required(ErrorMessage = "Введи пароль")]
@@ -130,6 +131,7 @@ namespace uLearn.Web.Models
 		public bool HasPassword { get; set; }
 
 		[Required(ErrorMessage = "{0} должен быть у каждого пользователя")]
+		[RegularExpression(@"^[^@]+$", ErrorMessage = "{0} не может содержать собачку «@»")]
 		[Display(Name = "Логин")]
 		public string Name { get; set; }
 
