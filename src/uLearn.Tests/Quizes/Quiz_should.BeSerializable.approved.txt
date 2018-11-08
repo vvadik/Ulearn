@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-16"?>
-<Quiz xmlns:x="http://www.w3.org/2001/XMLSchema-instance" id="Id" maxDropCount="0" tries="3" manualCheck="false" xmlns="https://ulearn.azurewebsites.net/quiz">
+<Quiz xmlns:x="http://www.w3.org/2001/XMLSchema-instance" id="Id" tries="3" manualCheck="false" xmlns="https://ulearn.azurewebsites.net/quiz">
   <title>Title</title>
   <p>This is quiz!</p>
   <isTrue id="1" maxScore="1" answer="false">
