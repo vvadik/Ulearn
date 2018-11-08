@@ -103,15 +103,15 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			var authorsCountThreshold = configuration.PlagiarismDetector.SnippetAuthorsCountThreshold;
 
 			
-			/* We make two quieries for find suspicion submissions: first query is more limited by snippets count (`maxSnippetsCountFirstSearch` from configuration).
-			   For the first query we look for all submissions who are similar to our submission and filter only top-`maxSubmissionsAfterFirstSearch` by matched snippets count */
-			var snippetsOccurencesFirstSearch = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(
+			/* We make two queries for finding suspicion submissions: first query is more limited by snippets count (`maxSnippetsCountFirstSearch` from configuration).
+			   For the first query we are looking for all submissions which are similar to our submission and filter only top-`maxSubmissionsAfterFirstSearch` by matched snippets count */
+			var snippetsOccurrencesFirstSearch = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(
 				submission,
 				maxSnippetsCountFirstSearch,
 				authorsCountMinThreshold: 2,
 				authorsCountMaxThreshold: authorsCountThreshold
-			);
-			var snippetsIdsFirstSearch = new HashSet<int>(snippetsOccurencesFirstSearch.Select(o => o.SnippetId));
+			).ConfigureAwait(false);
+			var snippetsIdsFirstSearch = new HashSet<int>(snippetsOccurrencesFirstSearch.Select(o => o.SnippetId));
 			logger.Information($"Found following snippets after first search: {string.Join(", ", snippetsIdsFirstSearch)}");
 			var suspicionSubmissionIds = snippetsRepo.GetSubmissionIdsWithSameSnippets(
 				snippetsIdsFirstSearch,
@@ -124,10 +124,10 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			);
 			logger.Information($"Found following submissions after first search: {string.Join(", ", suspicionSubmissionIds)}");
 
-			var snippetsOccurences = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(submission, maxSnippetsCountSecondSearch, 0, authorsCountThreshold);
-			var snippetsIds = new HashSet<int>(snippetsOccurences.Select(o => o.SnippetId));
+			var snippetsOccurrences = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(submission, maxSnippetsCountSecondSearch, 0, authorsCountThreshold).ConfigureAwait(false);
+			var snippetsIds = new HashSet<int>(snippetsOccurrences.Select(o => o.SnippetId));
 			
-			var allOtherOccurences = snippetsRepo.GetSnippetsOccurrences(
+			var allOtherOccurrences = snippetsRepo.GetSnippetsOccurrences(
 				snippetsIds,
 				/* Filter only snippet occurences in submissions BY THIS client, THIS task, THIS language and NOT BY THIS author */
 				o => o.Submission.ClientId == submission.ClientId &&
@@ -138,22 +138,22 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 					suspicionSubmissionIds.Contains(o.SubmissionId)
 			).GroupBy(o => o.SnippetId).ToDictionary(kvp => kvp.Key, kvp => kvp.ToList());
 			
-			var snippetsStatistics = await snippetsRepo.GetSnippetsStatisticsAsync(submission.ClientId, submission.TaskId, snippetsIds);
+			var snippetsStatistics = await snippetsRepo.GetSnippetsStatisticsAsync(submission.ClientId, submission.TaskId, snippetsIds).ConfigureAwait(false);
 			
 			var matchedSnippets = new DefaultDictionary<int, List<MatchedSnippet>>();
-			var authorsCount = await submissionsRepo.GetAuthorsCountAsync(submission.ClientId, submission.TaskId);			
-			foreach (var snippetOccurence in snippetsOccurences)
+			var authorsCount = await submissionsRepo.GetAuthorsCountAsync(submission.ClientId, submission.TaskId).ConfigureAwait(false);			
+			foreach (var snippetOccurrence in snippetsOccurrences)
 			{
-				var otherOccurences = allOtherOccurences.GetOrDefault(snippetOccurence.SnippetId, new List<SnippetOccurence>());
+				var otherOccurrences = allOtherOccurrences.GetOrDefault(snippetOccurrence.SnippetId, new List<SnippetOccurence>());
 				
-				var snippet = snippetOccurence.Snippet;
+				var snippet = snippetOccurrence.Snippet;
 				var snippetType = snippet.SnippetType;
 
-				foreach (var otherOccurence in otherOccurences)
+				foreach (var otherOccurence in otherOccurrences)
 				{
 					for (var i = 0; i < snippet.TokensCount; i++)
 					{
-						var tokenIndexInThisSubmission = snippetOccurence.FirstTokenIndex + i;
+						var tokenIndexInThisSubmission = snippetOccurrence.FirstTokenIndex + i;
 						var tokenIndexInOtherSubmission = otherOccurence.FirstTokenIndex + i;
 						tokensMatchedInThisSubmission[Tuple.Create(otherOccurence.SubmissionId, snippetType)].Add(tokenIndexInThisSubmission);
 						tokensMatchedInOtherSubmissions[Tuple.Create(otherOccurence.SubmissionId, snippetType)].Add(tokenIndexInOtherSubmission);
@@ -163,21 +163,21 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 					{
 						SnippetType = snippetType,
 						TokensCount = snippet.TokensCount,
-						OriginalSubmissionFirstTokenIndex = snippetOccurence.FirstTokenIndex,
+						OriginalSubmissionFirstTokenIndex = snippetOccurrence.FirstTokenIndex,
 						PlagiarismSubmissionFirstTokenIndex = otherOccurence.FirstTokenIndex,
 						SnippetFrequency = GetSnippetFrequency(snippetsStatistics[snippet.Id], authorsCount),
 					});
 				}
 			}
 
-			var plagiateSubmissionIds = tokensMatchedInOtherSubmissions.Keys.Select(tuple => tuple.Item1).ToList();
-			var plagiateSubmissions = await submissionsRepo.GetSubmissionsByIdsAsync(plagiateSubmissionIds);
+			var plagiarismSubmissionIds = tokensMatchedInOtherSubmissions.Keys.Select(tuple => tuple.Item1).ToList();
+			var plagiarismSubmissions = await submissionsRepo.GetSubmissionsByIdsAsync(plagiarismSubmissionIds).ConfigureAwait(false);
 
 			var plagiarisms = new List<Plagiarism>();
 			
 			var allSnippetTypes = GetAllSnippetTypes();
 			var thisSubmissionLength = submission.TokensCount;
-			foreach (var plagiarismSubmission in plagiateSubmissions)
+			foreach (var plagiarismSubmission in plagiarismSubmissions)
 			{
 				var unionLength = 0;
 				foreach (var snippetType in allSnippetTypes)
@@ -190,8 +190,8 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 					unionLength += tokensMatchedInOtherSubmissions[submissionIdWithSnippetType].Count;
 				}
 
-				var plagiateSubmissionLength = plagiarismSubmission.TokensCount;
-				var totalLength = thisSubmissionLength + plagiateSubmissionLength;
+				var plagiarismSubmissionLength = plagiarismSubmission.TokensCount;
+				var totalLength = thisSubmissionLength + plagiarismSubmissionLength;
 				var weight = totalLength == 0 ? 0 : ((double)unionLength) / totalLength;
 				/* Normalize weight */
 				weight /= allSnippetTypes.Count;
@@ -224,7 +224,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 
 		private Plagiarism BuildPlagiarismInfo(Submission submission, double weight, List<MatchedSnippet> matchedSnippets)
 		{
-			/* We do TrimStart() because of issue in way of passing code ot codemirror on ulearn's frontend. We insert data into <textarea> which loses first spaces.
+			/* We do TrimStart() because of issue in a way of passing code to codemirror on ulearn's frontend. We insert data into <textarea> which loses first spaces.
 			   We can remove it after migrating to new, React-based frontend. */
 			var codeUnits = codeUnitsExtractor.Extract(submission.ProgramText.TrimStart());
 			return new Plagiarism

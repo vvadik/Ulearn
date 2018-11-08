@@ -14,6 +14,7 @@ using AntiPlagiarism.Web.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Remotion.Linq.Parsing.Structure.IntermediateModel;
 using Serilog;
 
 namespace AntiPlagiarism.Web.Controllers
@@ -290,11 +291,13 @@ namespace AntiPlagiarism.Web.Controllers
 			var strongSuspicionCoefficient = configuration.StatisticsAnalyzing.StrongSuspicionCoefficient;
 			var minFaintSuspicionLevel = configuration.StatisticsAnalyzing.MinFaintSuspicionLevel;
 			var minStrongSuspicionLevel = configuration.StatisticsAnalyzing.MinStrongSuspicionLevel;
+			var maxFaintSuspicionLevel = configuration.StatisticsAnalyzing.MaxFaintSuspicionLevel;
+			var maxStrongSuspicionLevel = configuration.StatisticsAnalyzing.MaxStrongSuspicionLevel;
 
 			return new SuspicionLevels
 			{
-				FaintSuspicion = GetSuspicionLevelWithThreshold(taskStatisticsParameters.Mean + faintSuspicionCoefficient * taskStatisticsParameters.Deviation, minFaintSuspicionLevel, 1),
-				StrongSuspicion = GetSuspicionLevelWithThreshold(taskStatisticsParameters.Mean + strongSuspicionCoefficient * taskStatisticsParameters.Deviation, minStrongSuspicionLevel, 1),
+				FaintSuspicion = GetSuspicionLevelWithThreshold(taskStatisticsParameters.Mean + faintSuspicionCoefficient * taskStatisticsParameters.Deviation, minFaintSuspicionLevel, maxFaintSuspicionLevel),
+				StrongSuspicion = GetSuspicionLevelWithThreshold(taskStatisticsParameters.Mean + strongSuspicionCoefficient * taskStatisticsParameters.Deviation, minStrongSuspicionLevel, maxStrongSuspicionLevel),
 			};
 		}
 

@@ -28,6 +28,10 @@ namespace AntiPlagiarism.Web.Configuration
 		public double MinFaintSuspicionLevel { get; set; }
 		
 		public double MinStrongSuspicionLevel { get; set; }
+		
+		public double MaxFaintSuspicionLevel { get; set; }
+		
+		public double MaxStrongSuspicionLevel { get; set; }
 	}
 
 	public class PlagiarismDetectorConfiguration

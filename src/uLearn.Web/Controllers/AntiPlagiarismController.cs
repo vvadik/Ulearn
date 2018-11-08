@@ -16,7 +16,6 @@ using Database.DataContexts;
 using Database.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Schema;
 using Serilog;
 using uLearn.Web.FilterAttributes;
 using Ulearn.Common;
@@ -75,7 +74,7 @@ namespace uLearn.Web.Controllers
 					Status = "not_checked",
 				}, JsonRequestBehavior.AllowGet);
 			
-			var antiPlagiarismsResult = await GetAuthorPlagiarismsAsync(submission);
+			var antiPlagiarismsResult = await GetAuthorPlagiarismsAsync(submission).ConfigureAwait(false);
 
 			var model = new AntiPlagiarismInfoModel
 			{
