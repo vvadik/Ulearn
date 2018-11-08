@@ -22,6 +22,9 @@ namespace Database.Repos.Comments
 			return policy ?? new CommentsPolicy
 			{
 				CourseId = courseId,
+				IsCommentsEnabled = true,
+				ModerationPolicy = CommentModerationPolicy.Postmoderation,
+				OnlyInstructorsCanReply = false,
 			};
 		}
 
