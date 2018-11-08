@@ -330,13 +330,19 @@ namespace uLearn.Web.Controllers
 			if (ModelState.IsValid)
 			{
 				/* Some users enter email with trailing whitespaces. Remove them (not users, but spaces!) */
-				model.Email = (model.Email ?? "").Trim(); 
+				model.Email = (model.Email ?? "").Trim();
+
+				if (!CanNewUserSetThisEmail(model.Email))
+				{
+					ModelState.AddModelError("Email", ManageMessageId.EmailAlreadyTaken.GetDisplayName());
+					return View(model);
+				}
 					
 				var user = new ApplicationUser { UserName = model.UserName, Email = model.Email, Gender = model.Gender };
 				var result = await userManager.CreateAsync(user, model.Password);
 				if (result.Succeeded)
 				{
-					await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: false);
+					await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: true);
 
 					if (!await SendConfirmationEmail(user))
 					{
@@ -522,6 +528,10 @@ namespace uLearn.Web.Controllers
 			[Display(Name = "Это имя уже занято, выберите другое")]
 			[IsError(true)]
 			NameAlreadyTaken,
+			
+			[Display(Name = "Этот адрес электронной почты уже используется другим пользователем")]
+			[IsError(true)]
+			EmailAlreadyTaken,
 
 			[Display(Name = "Не все поля заполнены верны. Проверьте, пожалуйста, и попробуйте ещё раз")]
 			[IsError(true)]
@@ -579,6 +589,15 @@ namespace uLearn.Web.Controllers
 			userModel.Email = (userModel.Email ?? "").Trim();
 			var emailChanged = string.Compare(user.Email, userModel.Email, StringComparison.OrdinalIgnoreCase) != 0;
 
+			if (emailChanged)
+			{
+				if (!CanUserSetThisEmail(user, user.Email))
+				{
+					log.Warn($"ChangeDetailsPartial(): email {userModel.Email} is already taken");
+					return RedirectToAction("Manage", new { Message = ManageMessageId.EmailAlreadyTaken });
+				}
+			}
+
 			user.UserName = userModel.Name;
 			user.FirstName = userModel.FirstName;
 			user.LastName = userModel.LastName;
@@ -593,7 +612,8 @@ namespace uLearn.Web.Controllers
 			await userManager.UpdateAsync(user);
 
 			if (emailChanged)
-				await ChangeEmail(user, user.Email);
+				await ChangeEmail(user, user.Email).ConfigureAwait(false);
+			
 			if (nameChanged)
 			{
 				AuthenticationManager.Logout(HttpContext);
@@ -637,13 +657,13 @@ namespace uLearn.Web.Controllers
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
 			var userId = User.Identity.GetUserId();
-			await usersRepo.ChangeTelegram(userId, chatId, chatTitle);
+			await usersRepo.ChangeTelegram(userId, chatId, chatTitle).ConfigureAwait(false);
 			metricSender.SendCount("connect_telegram.success");
 			await notificationsRepo.AddNotificationTransport(new TelegramNotificationTransport
 			{
 				UserId = userId,
 				IsEnabled = true,
-			});
+			}).ConfigureAwait(false);
 
 			return RedirectToAction("Manage", new { Message = ManageMessageId.TelegramAdded });
 		}
@@ -657,10 +677,10 @@ namespace uLearn.Web.Controllers
 			if (string.IsNullOrEmpty(realUserId))
 				return HttpNotFound();
 
-			var user = await userManager.FindByIdAsync(realUserId);
+			var user = await userManager.FindByIdAsync(realUserId).ConfigureAwait(false);
 			if (!User.Identity.IsAuthenticated || User.Identity.GetUserId() != realUserId)
 			{
-				await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: false);
+				await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: false).ConfigureAwait(false);
 			}
 			
 			if (user.Email != email || user.EmailConfirmed)
@@ -672,20 +692,26 @@ namespace uLearn.Web.Controllers
 				log.Warn($"Invalid signature in confirmation email link, expected \"{correctSignature}\", actual \"{signature}\". Email is \"{email}\",");
 				return RedirectToAction("Manage", new { Message = ManageMessageId.ErrorOccured });
 			}
+			
+			/* Is there are exist other users with same confirmed email, then un-confirm their emails */
+			var usersWithSameEmail = usersRepo.FindUsersByEmail(email);
+			foreach (var otherUser in usersWithSameEmail)
+				if (otherUser.EmailConfirmed)
+					await usersRepo.ConfirmEmail(otherUser.Id, false).ConfigureAwait(false);
 
-			await usersRepo.ConfirmEmail(realUserId);
+			await usersRepo.ConfirmEmail(realUserId).ConfigureAwait(false);
 			metricSender.SendCount("email_confirmation.confirmed");
 
 			/* Enable notification transport if it exists or create auto-enabled mail notification transport */
 			var mailNotificationTransport = notificationsRepo.FindUsersNotificationTransport<MailNotificationTransport>(realUserId, includeDisabled: true);
 			if (mailNotificationTransport != null)
-				await notificationsRepo.EnableNotificationTransport(mailNotificationTransport.Id);
+				await notificationsRepo.EnableNotificationTransport(mailNotificationTransport.Id).ConfigureAwait(false);
 			else
 				await notificationsRepo.AddNotificationTransport(new MailNotificationTransport
 				{
 					User = user,
 					IsEnabled = true,
-				});
+				}).ConfigureAwait(false);
 
 			return RedirectToAction("Manage", new { Message = ManageMessageId.EmailConfirmed });
 		}
@@ -693,14 +719,14 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> SendConfirmationEmail()
 		{
 			var userId = User.Identity.GetUserId();
-			var user = await userManager.FindByIdAsync(userId);
+			var user = await userManager.FindByIdAsync(userId).ConfigureAwait(false);
 			if (string.IsNullOrEmpty(user.Email))
 				return RedirectToAction("Manage", new { Message = ManageMessageId.UserHasNoEmail });
 
 			if (user.EmailConfirmed)
 				return RedirectToAction("Manage", new { Message = ManageMessageId.EmailAlreadyConfirmed });
 
-			if (!await SendConfirmationEmail(user))
+			if (!await SendConfirmationEmail(user).ConfigureAwait(false))
 			{
 				log.Warn($"SendConfirmationEmail(): can't send confirmation email to user {user}");
 				return RedirectToAction("Manage", new { Message = ManageMessageId.ErrorOccured });
@@ -711,15 +737,15 @@ namespace uLearn.Web.Controllers
 
 		public async Task ChangeEmail(ApplicationUser user, string email)
 		{
-			await usersRepo.ChangeEmail(user, email);
+			await usersRepo.ChangeEmail(user, email).ConfigureAwait(false);
 
 			/* Disable mail notification transport if exists */
 			var mailNotificationTransport = notificationsRepo.FindUsersNotificationTransport<MailNotificationTransport>(user.Id);
 			if (mailNotificationTransport != null)
-				await notificationsRepo.EnableNotificationTransport(mailNotificationTransport.Id, isEnabled: false);
+				await notificationsRepo.EnableNotificationTransport(mailNotificationTransport.Id, isEnabled: false).ConfigureAwait(false);
 
 			/* Send confirmation email to the new address */
-			await SendConfirmationEmail(user);
+			await SendConfirmationEmail(user).ConfigureAwait(false);
 		}
 
 		[AllowAnonymous]

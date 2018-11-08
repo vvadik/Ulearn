@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Configuration;
-using System.Web.Mvc;
 using Database.DataContexts;
 using Database.Models;
 using Kontur.Spam.Client;
@@ -99,7 +99,7 @@ namespace uLearn.Web.Controllers
 
 			try
 			{
-				await spamClient.SentMessageAsync(spamChannelId, messageInfo);
+				await spamClient.SentMessageAsync(spamChannelId, messageInfo).ConfigureAwait(false);
 			}
 			catch (Exception e)
 			{
@@ -108,8 +108,21 @@ namespace uLearn.Web.Controllers
 			}
 			metricSender.SendCount("email_confirmation.send_confirmation_email.success");
 
-			await usersRepo.UpdateLastConfirmationEmailTime(user);
+			await usersRepo.UpdateLastConfirmationEmailTime(user).ConfigureAwait(false);
 			return true;
+		}
+
+		/* User can not set email which are used (and confirmed) by other user already */
+		protected bool CanUserSetThisEmail(ApplicationUser user, string email)
+		{
+			var users = usersRepo.FindUsersByConfirmedEmail(email);
+			return users.All(u => u.Id == user.Id);
+		}
+		
+		protected bool CanNewUserSetThisEmail(string email)
+		{
+			var users = usersRepo.FindUsersByConfirmedEmail(email);
+			return !users.Any();
 		}
 	}
 }

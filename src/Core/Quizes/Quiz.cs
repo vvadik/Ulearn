@@ -29,7 +29,7 @@ namespace uLearn.Quizes
 		[XmlAttribute("id")]
 		public string Id;
 		
-		/* Deprecated. Use tries instead of maxDropCount */
+		[Obsolete("Use MaxTriesCount (attribute 'tries' in xml) instead")]
 		[XmlAttribute("maxDropCount")]
 		public int MaxDropCount;
 
@@ -61,8 +61,8 @@ namespace uLearn.Quizes
 		[XmlElement("matching", Type = typeof(MatchingBlock))]
 		public SlideBlock[] Blocks
 		{
-			get { return blocks ?? new SlideBlock[0]; }
-			set { blocks = value; }
+			get => blocks ?? new SlideBlock[0];
+			set => blocks = value;
 		}
 
 		public string NormalizedXml => this.XmlSerialize(true);

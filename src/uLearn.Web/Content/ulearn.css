@@ -1366,6 +1366,10 @@ body.lti-component {
 	margin-bottom: 15px;
 }
 
+.legacy-page .login-and-registration-form .col-sm-10 > .validation-summary-errors {
+	margin-bottom: 0;
+} 
+
 .legacy-page .login-and-registration-form .checkbox label::before,
 .legacy-page .login-and-registration-form .radio label::before {
 	border-width: 2px;
