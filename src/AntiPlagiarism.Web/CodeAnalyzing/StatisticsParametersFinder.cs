@@ -19,7 +19,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			this.plagiarismDetector = plagiarismDetector;
 		}
 
-		public async Task<TaskStatisticsParameters> FindStatisticsParametersAsync(List<Submission> submissions)
+		public async Task<(List<double>, TaskStatisticsParameters)> FindStatisticsParametersAsync(List<Submission> submissions)
 		{
 			var pairs = submissions.SelectMany(s => submissions, Tuple.Create).Where(pair => pair.Item1.Id < pair.Item2.Id).ToList();
 			
@@ -33,12 +33,12 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			var mean = weights.Mean();
 			var deviation = weights.Deviation(mean);
 			var tauCoefficient = GetTauCoefficient(submissions.Count);
-			return new TaskStatisticsParameters
+			return (weights, new TaskStatisticsParameters
 			{
 				Mean = mean,
 				Deviation = deviation,
 				//TauCoefficient = tauCoefficient,
-			};
+			});
 		}
 
 		public static double GetTauCoefficient(int count)

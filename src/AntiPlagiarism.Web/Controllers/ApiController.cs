@@ -153,15 +153,18 @@ namespace AntiPlagiarism.Web.Controllers
 			if (parameters.TaskId.HasValue)
 				taskIds = taskIds.Where(t => t == parameters.TaskId.Value).ToList();
 
+			var weights = new Dictionary<Guid, List<double>>();
 			foreach (var taskId in taskIds)
 			{
-				await CalculateTaskStatisticsParametersAsync(client.Id, taskId).ConfigureAwait(false);
+				weights[taskId] = await CalculateTaskStatisticsParametersAsync(client.Id, taskId).ConfigureAwait(false);
+				weights[taskId].Sort();
 				GC.Collect();
 			}
 
 			return Json(new RecalculateTaskStatisticsResult
 			{
-				TaskIds = taskIds
+				TaskIds = taskIds,
+				Weights = weights,
 			});
 		}
 
@@ -250,7 +253,8 @@ namespace AntiPlagiarism.Web.Controllers
 				await snippetsRepo.AddSnippetOccurenceAsync(submission, snippet, firstTokenIndex).ConfigureAwait(false);
 		}
 		
-		public async Task CalculateTaskStatisticsParametersAsync(int clientId, Guid taskId)
+		/// <returns>List of weights (numbers from [0, 1]) used for calculation mean and deviation for this task</returns>
+		public async Task<List<double>> CalculateTaskStatisticsParametersAsync(int clientId, Guid taskId)
 		{
 			/* Create local submissions repo for preventing memory leaks */
 			using (var scope = serviceScopeFactory.CreateScope())
@@ -264,13 +268,15 @@ namespace AntiPlagiarism.Web.Controllers
 				var lastSubmissions = await localSubmissionsRepo.GetLastSubmissionsByAuthorsForTaskAsync(clientId, taskId, lastAuthorsIds).ConfigureAwait(false);
 				var currentSubmissionsCount = await localSubmissionsRepo.GetSubmissionsCountAsync(clientId, taskId).ConfigureAwait(false);
 				
-				var statisticsParameters = await statisticsParametersFinder.FindStatisticsParametersAsync(lastSubmissions).ConfigureAwait(false);
+				var (weights, statisticsParameters) = await statisticsParametersFinder.FindStatisticsParametersAsync(lastSubmissions).ConfigureAwait(false);
 				logger.Information($"Новые статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId}: Mean={statisticsParameters.Mean}, Deviation={statisticsParameters.Deviation}");
 				statisticsParameters.TaskId = taskId;
 				statisticsParameters.SubmissionsCount = currentSubmissionsCount;
 				
 				db.EnableAutoDetectChanges();
 				await tasksRepo.SaveTaskStatisticsParametersAsync(statisticsParameters).ConfigureAwait(false);
+				
+				return weights;
 			}
 		}
 		
