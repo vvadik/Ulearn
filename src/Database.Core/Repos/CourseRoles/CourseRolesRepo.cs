@@ -60,5 +60,11 @@ namespace Database.Repos.CourseRoles
 			
 			return await db.CourseRoles.Where(r => r.UserId == userId && r.Role <= minCourseRoleType).AnyAsync().ConfigureAwait(false);
 		}
+
+		public async Task<List<string>> GetCoursesWhereUserIsInRoleAsync(string userId, CourseRoleType minCourseRoleType)
+		{
+			var roles = await db.CourseRoles.Where(r => r.UserId == userId && r.Role <= minCourseRoleType).ToListAsync().ConfigureAwait(false);
+			return roles.Select(r => r.CourseId).ToList();
+		}
 	}
 }
