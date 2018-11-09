@@ -5,70 +5,103 @@ import GroupsList from "../../../components/groups/GroupMainPage/GroupList/Group
 import GroupHeader from "../../../components/groups/GroupMainPage/GroupHeader/GroupHeader";
 
 import "./groupsPage.less";
+import connect from "react-redux/es/connect/connect";
 
 class AbstractPage extends Component {
-
+ // TODO: выяснить у Андрея, зачем оно. И реализоваьть или удалить.
 }
 
 class GroupsPage extends AbstractPage {
 	constructor(props) {
 		super(props);
 		this.state = {
-			loading: true,
 			groups: [],
-			filter: "active",
-			courseId: "",
 			archiveGroups: [],
+			filter: "active",
+			loading: true,
+			loadingArchived: false,
+			loadingActive: false
 		}
 	};
 
 	componentDidMount() {
-		let courseId = this.props.match.params.courseId;
-
-		api.groups.getCourseGroups(courseId).then(json => {
-			let groups = json.groups;
-			this.setState({
-				loading: false,
-				courseId: courseId,
-				groups: groups
-			});
-		}).catch(console.error);
-
-		api.groups.getCourseArchiveGroups(courseId).then(json => {
-		let archiveGroups = json.groups;
-		this.setState({
-			loading: false,
-			courseId: courseId,
-			archiveGroups: archiveGroups
-		});
-		}).catch(console.error)
+		this.loadingActiveGroups();
 	};
 
 	render() {
+		let courseId = this.props.match.params.courseId;
 		return (
 			<div className="wrapper">
 				<div className="content-wrapper">
 					<GroupHeader
-						onTabClick={this.onTabClick}
+						onTabChange={this.onTabChange}
 						filter={this.state.filter}
-						courseId={this.state.courseId}
-						onSubmit={this.onSubmit}
+						courseId={courseId}
+						createGroup={this.createGroup}
+						copyGroup={this.copyGroup}
+						groups={this.state.groups}
+						loading={this.state.loading}
 					/>
 					<GroupsList
-						loading={this.state.loading}
 						groups={this.filteredGroups}
 						deleteGroup={this.deleteGroup}
-						makeArchival={this.makeArchival}
+						toggleArchived={this.toggleArchived}
+						loading={this.loading}
 					/>
 				</div>
 			</div>
 		)
 	};
 
-	onTabClick = (id) => {
+	onTabChange = (id) => {
 		this.setState({
-			filter: id
-		})
+			filter: id,
+		});
+		if (id === "active") {
+			this.loadingActiveGroups();
+		} else {
+			this.loadingArchivedGroups();
+		}
+	};
+
+	loadingArchivedGroups = () => {
+		let courseId = this.props.match.params.courseId;
+		const { archiveGroups, loadingArchived } = this.state;
+		if (archiveGroups.length !== 0 || loadingArchived) {
+			return;
+		}
+
+		this.setState({
+			// loadingArchived: true,
+		});
+
+		api.groups.getCourseArchiveGroups(courseId).then(json => {
+			let archiveGroups = json.groups;
+			this.setState({
+				loadingArchived: false,
+				archiveGroups: archiveGroups
+			});
+		}).catch(console.error);
+	};
+
+	loadingActiveGroups = () => {
+		let courseId = this.props.match.params.courseId;
+		const { groups, loadingActive } = this.state;
+		if (groups.length !== 0 || loadingActive) {
+			return;
+		}
+
+		this.setState({
+			// loadingActive: false,
+		});
+
+		api.groups.getCourseGroups(courseId).then(json => {
+			let groups = json.groups;
+			this.setState({
+				loadingActive: false,
+				groups: groups
+			});
+		}).catch(console.error);
 	};
 
 	get filteredGroups() {
@@ -79,48 +112,65 @@ class GroupsPage extends AbstractPage {
 		}
 	};
 
-	makeArchival = async (group, groupId) => {
+	get loading() {
+		if (this.state.filter === "archived") {
+			return this.state.loadingArchived;
+		} else {
+			return this.state.loadingActive;
+		}
+	};
+
+	toggleArchived = (group, isArchived) => {
 		const newSettings = {
-			is_archived: true
+			is_archived: isArchived
 		};
-		await api.groups.saveGroupSettings(groupId, newSettings);
-		const { groups, archiveGroups } = this.state;
-		const updatedGroups = groups.filter(group => groupId !== group.id);
-		const updatedGroup = {...group, is_archived: true};
-		const updatedArchiveGroups = [updatedGroup, ...archiveGroups];
+		api.groups.saveGroupSettings(group.id, newSettings);
+
+		if (isArchived) {
+			this.moveGroup(group, 'groups', 'archiveGroups');
+		} else {
+			this.moveGroup(group, 'archiveGroups', 'groups');
+		}
+	};
+
+	moveGroup = (group, moveFrom, moveTo) => {
+		const groupsMoveFrom = this.state[moveFrom].filter(g => group.id !== g.id);
+		const groupsMoveTo = [group, ...this.state[moveTo]].sort((a, b) => a.name.localeCompare(b.name));
 
 		this.setState({
-			groups: updatedGroups,
-			archiveGroups: updatedArchiveGroups,
+			[moveFrom]: groupsMoveFrom,
+			[moveTo]: groupsMoveTo
 		});
 	};
 
-	deleteGroup = async (group, groupId) => {
-		const groups = this.filteredGroups;
-
-		if (groups.includes(group)) {
-			groups.splice(groups.indexOf(group), 1);
-			this.setState({
-				groups: groups,
-			})
-		}
-		await api.groups.deleteGroup(groupId);
+	copyGroup = async (groupId) => {
+		const { groups } = this.state;
+		const copyGroup = await api.groups.getGroup(groupId);
+		this.setState({
+			groups: [copyGroup, ...groups],
+		})
 	};
 
-	onSubmit = async (groupId) => {
-		const group = await api.groups.getGroup(groupId);
-		const groups = this.filteredGroups;
-		groups.unshift(group);
+	deleteGroup = (group, groupsName) => {
+		api.groups.deleteGroup(group.id);
+		const updateGroups = this.state[groupsName].filter(g => group.id !== g.id);
 		this.setState({
-			groups: groups,
+			[groupsName]: updateGroups,
+		});
+	};
+
+	createGroup = async (groupId) => {
+		const newGroup = await api.groups.getGroup(groupId);
+		const groups = this.filteredGroups;
+		this.setState({
+			groups: [newGroup, ...groups],
 		})
-	}
+	};
+
 }
 
 GroupsPage.propTypes = {
-	history: PropTypes.object,
-	location: PropTypes.object,
-	match: PropTypes.object
+	match: PropTypes.object,
 };
 
 export default GroupsPage;
