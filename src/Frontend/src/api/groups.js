@@ -21,8 +21,8 @@ export function createGroup(courseId, name) {
 		.then(response => response.json());
 }
 
-export function copyGroup(groupId, destination_course_id) {
-	return api.post("groups/" + groupId + "/copy?destination_course_id=" + destination_course_id)
+export function copyGroup(groupId, destination_course_id, value) {
+	return api.post("groups/" + groupId + "/copy?destination_course_id=" + encodeURIComponent(destination_course_id) + '&make_me_owner=' + value)
 		.then(response => response.json());
 }
 
@@ -37,8 +37,9 @@ export function deleteGroup(groupId) {
 		.then(response => response.json());
 }
 
-export function changeGroupOwner(groupId) {
-	return api.put("groups/" + groupId + '/owner')
+export function changeGroupOwner(groupId, owner) {
+	return api.put("groups/" + groupId + '/owner',
+		createRequestParams({owner: owner}))
 		.then(response => response.json());
 }
 

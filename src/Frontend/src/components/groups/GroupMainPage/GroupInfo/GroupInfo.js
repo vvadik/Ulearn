@@ -48,19 +48,17 @@ class GroupInfo extends Component {
 					</Link>
 				</div>
 				<div className="group-action">
-					<Kebab size="large">
-						{this.renderMenuItem()}
-					</Kebab>
+					{this.renderKebab()}
 				</div>
 			</div>
 		)
 	}
 
-	renderMenuItem() {
+	renderKebab() {
 		const { group } = this.props;
 
 		return (
-			<React.Fragment>
+			<Kebab size="large">
 				<MenuItem icon="ArchiveUnpack"
 						  onClick={() => this.props.toggleArchived(group, !group.is_archived)}>
 					{group.is_archived ?  'Восстановить' : 'Архивировать'}
@@ -69,7 +67,7 @@ class GroupInfo extends Component {
 						  onClick={() => this.props.deleteGroup(group, group.is_archived ? 'groups' : 'archiveGroups')}>
 					Удалить
 				</MenuItem>
-			</React.Fragment>
+			</Kebab>
 		)
 
 	}

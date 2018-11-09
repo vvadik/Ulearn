@@ -22,6 +22,6 @@ export function getCourseTitle(courseId) {
 }
 
 export function getUsersCourses() {
-	return api.get('/courses/as/instructor')
+	return api.get('/courses/?instructor')
 		.then(response => response.json());
 }

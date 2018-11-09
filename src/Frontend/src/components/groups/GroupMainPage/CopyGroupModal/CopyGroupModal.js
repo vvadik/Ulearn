@@ -8,7 +8,6 @@ import Button from '@skbkontur/react-ui/components/Button/Button';
 import Checkbox from '@skbkontur/react-ui/components/Checkbox/Checkbox'
 
 import './style.less';
-import connect from "react-redux/es/connect/connect";
 
 class CopyGroupModal extends Component {
 
@@ -21,7 +20,8 @@ class CopyGroupModal extends Component {
 			courseTitle: '',
 			hasError: false,
 			error: null,
-			changeOwner: false,
+			changeOwnerWindow: false,
+			changeOwner: true,
 			coursesGroups: {},
 			groups: [],
 			courses: [],
@@ -34,7 +34,6 @@ class CopyGroupModal extends Component {
 			this.setState({
 				courses: courses
 			});
-			console.log(courses);
 		});
 
 		let { courseId } = this.props;
@@ -79,52 +78,55 @@ class CopyGroupModal extends Component {
 	renderSelect() {
 		const { group, course, hasError } = this.state;
 		return (
-			<Gapped gap={20}>
+			<React.Fragment>
 				<label>
-					Выберите курс
-					<Select
-						autofocus
-						required
-						items={this.getCourses()}
-						onChange={this.newCourseValue}
-						width="200"
-						placeholder="Курс"
-						value={course}
-						error={hasError}
-					/>
+					<Gapped gap={20}>
+						Выберите курс
+						<Select
+							autofocus
+							required
+							items={this.getCourses()}
+							onChange={this.newCourseValue}
+							width="200"
+							placeholder="Курс"
+							value={course}
+							error={hasError}
+						/>
+					</Gapped>
 				</label>
 				<label>
-					Выберите группу
-					<Select
-						autofocus
-						required
-						items={this.getGroups()}
-						onChange={this.newGroupValue}
-						width="200"
-						placeholder="Выберите группу"
-						value={group}
-						error={hasError}
-					/>
+					<Gapped gap={20}>
+						Выберите группу
+						<Select
+							autofocus
+							required
+							items={this.getGroups()}
+							onChange={this.newGroupValue}
+							width="200"
+							placeholder="Выберите группу"
+							value={group}
+							error={hasError}
+						/>
+					</Gapped>
 				</label>
-				{this.state.changeOwner && this.renderViewOwner() }
-			</Gapped>
+				{ this.state.changeOwnerWindow && this.renderChangeOwner() }
+			</React.Fragment>
 		)
 	}
 
-	renderViewOwner() {
-		const { group, courseTitle } = this.state;
+	renderChangeOwner() {
+		const { group, courseTitle, changeOwner } = this.state;
 		return (
 			<div className="change-owner-block">
 				<p>Владелец этой группы {group.owner.visible_name} не является преподавателем курса
 					<b>"{ courseTitle }"</b>. Вы можете сделать себя владельцем скопированной группы.
 				</p>
-				<Checkbox checked={this.checked} onChange={this.changeOwner}>Сделать меня владельцем группы</Checkbox>
+				<Checkbox checked={changeOwner} onChange={(_, value) => this.setState({ changeOwner: value })}>Сделать меня владельцем группы</Checkbox>
 			</div>
 		)
 	}
 
 	getCourses = () => {
-		// const courseById = this.props.courses.courseById;
 		const { courses } = this.state;
 		return [
 			...courses.map(course => [course.id, course.title ])
@@ -177,27 +179,25 @@ class CopyGroupModal extends Component {
 		const instructorsId = instructors.map(instructor => instructor.id);
 		if (!(instructorsId.includes(ownerId))) {
 			this.setState({
-				changeOwner: true,
+				changeOwnerWindow: true,
 			})
 		}
 	};
 
-	changeOwner = (_, value) => {
-		return
-	};
-
 	onSubmit = async (e) => {
-		const { group } = this.state;
-		const { closeModal, copyGroup, courseId } = this.props;
+		const { group, courseId, changeOwner } = this.state;
+		const { closeModal, copyGroup } = this.props;
 		e.preventDefault();
-		if (!group) {
+		if (!courseId || (courseId && !group)) {
 			this.setState({
 				hasError: true,
-				error: 'Выберите группу',
+				error: 'Выберите курс',
 			});
 			return;
 		}
-		const newGroup = await api.groups.copyGroup(group.id, courseId);
+
+		const newGroup = await api.groups.copyGroup(group.id, courseId, changeOwner);
+		console.log(newGroup);
 		closeModal();
 		copyGroup(newGroup.id);
 	};
@@ -212,5 +212,3 @@ CopyGroupModal.propTypes = {
 };
 
 export default CopyGroupModal;
-
-// export default connect(CopyGroupModal.mapStateToProps)(CopyGroupModal);
