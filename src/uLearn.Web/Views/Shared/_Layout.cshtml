@@ -33,99 +33,6 @@
 	}
 </script>
 
-@*
-<div id="header" class="navbar navbar-inverse navbar-fixed-top">
-    <button type="button" class="navbar-toggle hide-side-bar-button" data-toggle="collapse" data-target=".side-bar">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-    </button>
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".greeting-collapse-class">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="/">Ulearn</a>
-            <ul class="notifications__mobile-nav nav navbar-nav pull-right visible-xs">
-                @if (User.Identity.IsAuthenticated)
-                {
-	                <li class="dropdown">
-                        @Html.Action("NotificationsTopbarPartial", "Feed", new { isMobile = true })
-                    </li>
-                }
-            </ul>
-        </div>
-        <ul class="notifications__mobile-dropdown notifications__dropdown navbar-collapse collapse visible-xs">
-
-        </ul>
-        <div class="greeting-collapse-class navbar-collapse collapse">
-            <ul class="top-navigation nav navbar-nav">
-                @{
-	                var courseManager = WebCourseManager.Instance;
-	                var coursesIds = new HashSet<string>(User.GetControllableCoursesId().Select(c => c.ToLower()));
-	                var courses = courseManager.GetCourses().Where(course => coursesIds.Contains(course.Id.ToLower())).OrderBy(c => c.Title).ToList();
-                }
-                @if (User.IsSystemAdministrator())
-                {
-	                <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Администрирование <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li>@Html.ActionLink("Пользователи", "List", "Account", new { role = LmsRoles.SysAdmin }, null)</li>
-                            <li>@Html.ActionLink("Статистика", "SystemStatistics", "Analytics")</li>
-                            <li>@Html.ActionLink("Песочница", "Index", "Sandbox")</li>
-                            <li>@Html.ActionLink("Стилевые ошибки в C#", "StyleValidations", "Admin")</li>
-                            <li class="divider"></li>
-                            <li class="dropdown-header">Курсы <a href="@Url.Action("CourseList", "Admin")">создать<span class="glyphicon glyphicon-plus"></span></a></li>
-                            @CoursesDropdown(courses)
-                        </ul>
-                    </li>
-                }
-                else if (User.HasAccess(CourseRole.Instructor))
-                {
-	                <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Мои курсы <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            @CoursesDropdown(courses)
-                        </ul>
-                    </li>
-                }
-
-                @if (User.HasAccess(CourseRole.Instructor))
-                {
-	                string courseId = null;
-	                try
-	                {
-		                courseId = Html.ViewContext.RouteData.Values["courseId"].ToString();
-	                }
-	                catch (Exception)
-	                {
-		                /* RouteData has no attribute 'courseId' */
-		                var controller = Html.ViewContext.RouteData.Values["controller"].ToString();
-		                if ((controller == "Admin" || controller == "Analytics" || controller == "Grader" || controller == "Notifications" || controller == "Stepik" || controller == "AntiPlagiarism") &&
-							Request.Params["courseId"] != null)
-		                {
-			                courseId = Request.Params["courseId"];
-		                }
-	                }
-	                @Html.Action("CourseInstructorNavbar", "Course", new { courseId })
-                }
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                @if (User.Identity.IsAuthenticated)
-                {
-	                <li class="dropdown hidden-xs">
-                        @Html.Action("NotificationsTopbarPartial", "Feed")
-                    </li>
-                }
-                @Html.Action("UserMenuPartial", "Account")
-            </ul>
-        </div>
-    </div>
-</div>
-*@
-
 @RenderBody()
 
 @Html.Action("CheckIsEmailConfirmed", "Account")
@@ -142,6 +49,7 @@
 						if (registrations.hasOwnProperty(registrationId)) {
 							var registration = registrations[registrationId];
 							registration.unregister();
+							window.location.reload();
 						}
 					}
 				});
@@ -158,31 +66,3 @@
 
 </body>
 </html>
-
-@helper CoursesDropdown(List<Course> courses)
-{
-	foreach (var course in courses.Take(10))
-	{
-		<li>@Html.ActionLink(course.Title.TruncateWithEllipsis(40), "UnitStatistics", "Analytics", new { courseId = course.Id }, new { title = course.Title })</li>
-	}
-	if (courses.Count > 10)
-	{
-		<li>
-			<a href="@Url.Action("CourseList", "Admin")">
-				<b>Все курсы</b>
-			</a>
-		</li>
-	}
-	if (courses.Count == 0)
-	{
-		<li>
-			<a>
-				<b>Нет курсов</b>
-			</a>
-			@if (User.IsSystemAdministrator())
-			{
-				@Html.ActionLink("Создать", "CourseList", "Admin")
-			}
-		</li>
-	}
-}
