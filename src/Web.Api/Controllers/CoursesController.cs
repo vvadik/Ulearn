@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Database;
 using Database.Models;
@@ -31,38 +32,22 @@ namespace Ulearn.Web.Api.Controllers
 		/// Список курсов
 		/// </summary>
 		[HttpGet("")]
-		public async Task<ActionResult<CoursesListResponse>> CoursesList()
+		public async Task<ActionResult<CoursesListResponse>> CoursesList([FromQuery] CourseRoleType? role=null)
 		{
-			var courses = await courseManager.GetCoursesAsync(coursesRepo).ConfigureAwait(false);
-			return new CoursesListResponse
-			{
-				Courses = courses.Select(
-					c => new ShortCourseInfo
-					{
-						Id = c.Id,
-						Title = c.Title,
-						ApiUrl = Url.Action(nameof(CourseInfo), "Courses", new { courseId = c.Id })
-					}
-				).ToList()
-			};
-		}
-
-		/// <summary>
-		/// Список курсов, в которых текущий пользователь имеет указанные права. Для системных администраторов возвращается список всех курсов
-		/// </summary>
-		[HttpGet("as/{role}")]
-		public async Task<ActionResult<CoursesListResponse>> CoursesListOfInstructor(CourseRoleType role)
-		{
+			if (role.HasValue && !IsAuthenticated)
+				return Unauthorized();
+			
 			if (role == CourseRoleType.Student)
 				return NotFound(new ErrorResponse("Role can not be student. Specify tester, instructor or courseAdmin"));
 			
 			var courses = await courseManager.GetCoursesAsync(coursesRepo).ConfigureAwait(false);
-			if (await IsSystemAdministratorAsync().ConfigureAwait(false))
-				return await CoursesList().ConfigureAwait(false);
 
-			var instructorCourseIds = await courseRolesRepo.GetCoursesWhereUserIsInRoleAsync(UserId, role).ConfigureAwait(false);
-			courses = courses.Where(c => instructorCourseIds.Contains(c.Id, StringComparer.InvariantCultureIgnoreCase));
-			
+			if (role.HasValue && !await IsSystemAdministratorAsync().ConfigureAwait(false))
+			{
+				var instructorCourseIds = await courseRolesRepo.GetCoursesWhereUserIsInRoleAsync(UserId, role.Value).ConfigureAwait(false);
+				courses = courses.Where(c => instructorCourseIds.Contains(c.Id, StringComparer.InvariantCultureIgnoreCase));
+			}
+
 			return new CoursesListResponse
 			{
 				Courses = courses.Select(
