@@ -1,15 +1,15 @@
-export default function getPluralForm(number, one, two, five) {
-	number %= 100;
-	if (number >= 5 && number <= 20) {
-		return five;
+export default function getPluralForm(count, one, some, many) {
+	count %= 100;
+	if (count >= 5 && count <= 20) {
+		return many;
 	}
-	number %= 10;
-	if (number === 1) {
+	count %= 10;
+	if (count === 1) {
 		return one;
 	}
-	if (number >= 2 && number < 5) {
-		return two;
+	if (count >= 2 && count < 5) {
+		return some;
 	}
-	return five;
+	return many;
 }
 
