@@ -1,12 +1,13 @@
-import { Component } from "react";
-import CreateGroupModal from "../CreateGroupModal/CreateGroupModal";
+import React, { Component } from "react";
+import PropTypes from "prop-types";
 import Button from "@skbkontur/react-ui/components/Button/Button";
 import Tabs from "@skbkontur/react-ui/components/Tabs/Tabs";
 import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
-import PropTypes from "prop-types";
-import React from "react";
+import CreateGroupModal from "../CreateGroupModal/CreateGroupModal";
+import CopyGroupModal from "../CopyGroupModal/CopyGroupModal";
 
 import './style.less';
+import api from "../../../../api";
 
 const TABS = {
 	active: 'active',
@@ -16,18 +17,28 @@ const TABS = {
 class GroupHeader extends Component {
 
 	state = {
-		modalOpened: false
+		modalCreateGroup: false,
+		modalCopyGroup: false,
 	};
 
 	render() {
 		return (
 			<React.Fragment>
 				{ this.renderHeader() }
-				{ this.state.modalOpened &&
+				{ this.state.modalCreateGroup &&
 					<CreateGroupModal
 						closeModal={this.closeModal}
-						onSubmit={this.props.onSubmit}
+						createGroup={this.props.createGroup}
 						courseId={this.props.courseId}
+					/>
+				}
+				{ this.state.modalCopyGroup &&
+					<CopyGroupModal
+						closeModal={this.closeModal}
+						courseId={this.props.courseId}
+						groups={this.props.groups}
+						copyGroup={this.props.copyGroup}
+						courseTitle={this.courseTitle}
 					/>
 				}
 			</React.Fragment>
@@ -36,13 +47,13 @@ class GroupHeader extends Component {
 
 	renderHeader() {
 		return (
-			<div className="group-header">
+			<header className="group-header">
 				<div className="group-header-container">
 					<h2>Группы</h2>
 					<div className="buttons-container">
 						<Gapped gap={20}>
-							<Button use="primary" size="medium" onClick={this.openModal}>Создать группу</Button>
-							<Button use="default" size="medium">Скопировать группу</Button>
+							<Button id="create" use="primary" size="medium" onClick={this.openCreateGroupModal}>Создать группу</Button>
+							<Button id="copy" use="default" size="medium" onClick={this.openCopyGroupModal}>Скопировать группу</Button>
 						</Gapped>
 					</div>
 				</div>
@@ -52,33 +63,48 @@ class GroupHeader extends Component {
 						<Tabs.Tab id={TABS.archived}>Архивные</Tabs.Tab>
 					</Tabs>
 				</div>
-			</div>
+			</header>
 		)
 	}
 
-	openModal = () => {
+	openCreateGroupModal = () => {
 		this.setState({
-			modalOpened: true
+			modalCreateGroup: true
+		})
+	};
+
+	openCopyGroupModal = () => {
+		this.setState({
+			modalCopyGroup: true
 		})
 	};
 
 	closeModal = () => {
 		this.setState({
-			modalOpened: false
+			modalCreateGroup: false,
+			modalCopyGroup: false,
+
 		})
 	};
 
 	onChange = (_, v) => {
-		this.props.onTabClick(v);
+		this.props.onTabChange(v);
+	};
+
+	get courseTitle() {
+		const { courseId } = this.props;
+		return api.courses.getCourseTitle(courseId);
 	};
 }
 
 GroupHeader.propTypes = {
-	onTabClick: PropTypes.func,
+	onTabChange: PropTypes.func,
 	filter: PropTypes.string,
-	openModal: PropTypes.bool,
-	closeModal: PropTypes.bool,
-	courseById: PropTypes.string
+	courseId: PropTypes.string,
+	copyGroup: PropTypes.func,
+	createGroup: PropTypes.func,
+	groups: PropTypes.array,
+	loading: PropTypes.bool,
 };
 
 export default GroupHeader;

@@ -1,7 +1,6 @@
-import {Component} from "react";
-import Input from "@skbkontur/react-ui/components/Input/Input";
-import React from "react";
+import React, {Component} from "react";
 import PropTypes from "prop-types";
+import Input from "@skbkontur/react-ui/components/Input/Input";
 
 import './style.less';
 

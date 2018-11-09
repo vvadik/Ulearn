@@ -1,5 +1,4 @@
-import { Component } from 'react';
-import React from "react";
+import React, { Component } from 'react';
 import api from "../../../api/index";
 import PropTypes from "prop-types";
 import Tabs from "@skbkontur/react-ui/components/Tabs/Tabs";

@@ -7,5 +7,5 @@ import './style.less';
 
 storiesOf('Group/GroupHeader', module)
 	.add('default', () => (
-		<GroupHeader onTabClick={action('click')} filter="hello"/>
+		<GroupHeader onTabChange={action('click')} filter="hello"/>
 	));
