@@ -2,6 +2,7 @@ import api from "../api"
 
 export function getCourses() {
     return dispatch => {
+
         return api.get("courses")
             .then(response => response.json())
             .then(json => {
@@ -13,4 +14,14 @@ export function getCourses() {
                 })
             });
     };
+}
+
+export function getCourseTitle(courseId) {
+	return api.get('courses/' + courseId)
+		.then(response => response.json());
+}
+
+export function getUsersCourses() {
+	return api.get('/courses/as/instructor')
+		.then(response => response.json());
 }

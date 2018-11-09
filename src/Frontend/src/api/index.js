@@ -4,6 +4,7 @@ import * as account from "./account"
 import * as courses from "./courses"
 import * as notifications from "./notifications"
 import * as groups from "./groups"
+import * as users from "./users"
 
 const API_JWT_TOKEN_UPDATED = 'API_JWT_TOKEN_UPDATED';
 let apiJwtToken = '';
@@ -64,6 +65,12 @@ function patch(url, options) {
 	return request(url, options);
 }
 
+function put(url, options) {
+	options = options || {};
+	options.method = 'PUT';
+	return request(url, options);
+}
+
 function deleteGroup(url, options) {
 	options = options || {};
 	options.method = 'DELETE';
@@ -75,9 +82,11 @@ let api = {
     courses: courses,
     notifications: notifications,
 	groups: groups,
+	users: users,
     get: get,
     post: post,
 	patch: patch,
+	put: put,
 	delete: deleteGroup,
     request: request
 };
