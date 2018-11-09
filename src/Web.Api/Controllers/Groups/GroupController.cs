@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Serilog;
 using Swashbuckle.AspNetCore.Annotations;
+using uLearn;
 using Ulearn.Web.Api.Models.Parameters.Groups;
 using Ulearn.Web.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Responses.Groups;
@@ -170,8 +171,8 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		public async Task<ActionResult<CopyGroupResponse>> Copy(int groupId, [FromQuery] CopyGroupParameters parameters)
 		{
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
-			if (! courseManager.HasCourse(parameters.DestinationCourseId))
-				return NotFound($"Course {parameters.DestinationCourseId} not found");
+			if (!courseManager.HasCourse(parameters.DestinationCourseId))
+				return NotFound(new ErrorResponse($"Course {parameters.DestinationCourseId} not found"));
 			if (! await CanCreateGroupInCourseAsync(UserId, parameters.DestinationCourseId).ConfigureAwait(false))
 				return Forbid();
 			
@@ -190,6 +191,86 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		{
 			return await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.Instructor).ConfigureAwait(false) || 
 				await IsSystemAdministratorAsync().ConfigureAwait(false);
+		}
+
+		/// <summary>
+		/// Список scoring-group курса с информаций о том, включены ли они для этой группы
+		/// </summary>
+		[HttpGet("scores")]
+		public async Task<ActionResult<GroupScoringGroupsResponse>> ScoringGroups(int groupId)
+		{
+			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
+			var course = courseManager.FindCourse(group.CourseId);
+			if (course == null)
+			{
+				logger.Error($"It's strange: group {groupId} exists, but course {group.CourseId} not. I will return 404");
+				return NotFound(new ErrorResponse("Group or course not found"));
+			}
+
+			var scoringGroups = course.Settings.Scoring.Groups.Values.ToList();
+			var scoringGroupsCanBeSetInSomeUnit = GetScoringGroupsCanBeSetInSomeUnit(course);
+			var enabledScoringGroups = await groupsRepo.GetEnabledAdditionalScoringGroupsForGroupAsync(groupId).ConfigureAwait(false);
+			return new GroupScoringGroupsResponse
+			{
+				ScoringGroups = scoringGroups.Select(scoringGroup => BuildGroupScoringGroupInfo(scoringGroup, scoringGroupsCanBeSetInSomeUnit, enabledScoringGroups)).ToList(),
+			};
+		}
+
+		/// <summary>
+		/// Сохраняет информацию о том, какие scoring-group включены для группы
+		/// </summary>
+		[HttpPost("scores")]
+		public async Task<IActionResult> SetScoringGroups(int groupId, SetScoringGroupsParameters parameters)
+		{
+			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
+			var course = courseManager.FindCourse(group.CourseId);
+			if (course == null)
+			{
+				logger.Error($"It's strange: group {groupId} exists, but course {group.CourseId} not. I will return 404");
+				return NotFound(new ErrorResponse("Group or course not found"));
+			}
+
+			var courseScoringGroupIds = course.Settings.Scoring.Groups.Values.Select(g => g.Id).ToList();
+			var scoringGroupsCanBeSetInSomeUnit = GetScoringGroupsCanBeSetInSomeUnit(course).Select(g => g.Id).ToList();
+			foreach (var scoringGroupId in parameters.ScoringGroupIds) {
+				if (!courseScoringGroupIds.Contains(scoringGroupId))
+					return NotFound(new ErrorResponse($"Score {scoringGroupId} not found in course {course.Id}"));
+				
+				var scoringGroup = course.Settings.Scoring.Groups[scoringGroupId];
+				if (scoringGroup.EnabledForEveryone)
+					return BadRequest(new ErrorResponse($"You can not enable or disable additional scoring for {scoringGroupId}, because it is enabled for all groups by course creator."));
+				
+				if (! scoringGroupsCanBeSetInSomeUnit.Contains(scoringGroupId))
+					return BadRequest(new ErrorResponse($"You can not enable or disable additional scoring for {scoringGroupId}, because there is no additional scores for this score in any unit. Contact with course creator."));
+			}
+
+			await groupsRepo.EnableAdditionalScoringGroupsForGroupAsync(groupId, parameters.ScoringGroupIds).ConfigureAwait(false);
+
+			return Ok(new SuccessResponseWithMessage($"Scores for group {groupId} updated"));
+		}
+
+		private static GroupScoringGroupInfo BuildGroupScoringGroupInfo(ScoringGroup scoringGroup, List<ScoringGroup> scoringGroupsCanBeSetInSomeUnit, List<EnabledAdditionalScoringGroup> enabledScoringGroups)
+		{
+			var canBeSetByInstructorInSomeUnit = scoringGroupsCanBeSetInSomeUnit.Select(g => g.Id).Contains(scoringGroup.Id);
+			var isEnabledManually = enabledScoringGroups.Select(g => g.ScoringGroupId).Contains(scoringGroup.Id);
+			return new GroupScoringGroupInfo
+			{
+				Id = scoringGroup.Id,
+				Abbreviation = scoringGroup.Abbreviation ?? "",
+				Description = scoringGroup.Description ?? "",
+				IsEnabledForEveryone = scoringGroup.EnabledForEveryone,
+				CanBeSetByInstructorInSomeUnit = canBeSetByInstructorInSomeUnit,
+				IsEnabled = (scoringGroup.EnabledForEveryone || !canBeSetByInstructorInSomeUnit) ? (bool?) null : isEnabledManually
+			};
+		}
+
+		private static List<ScoringGroup> GetScoringGroupsCanBeSetInSomeUnit(ICourse course)
+		{
+			return course.Units
+				.SelectMany(u => u.Scoring.Groups.Values)
+				.Where(g => g.CanBeSetByInstructor && !g.EnabledForEveryone)
+				.DistinctBy(g => g.Id)
+				.ToList();
 		}
 
 		/// <summary>
