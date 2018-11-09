@@ -27,6 +27,10 @@ function refreshApiJwtToken() {
         })
 }
 
+function clearApiJwtToken() {
+	apiJwtToken = ''
+}
+
 function request(url, options, isRetry) {
     options = options || {};
     options.credentials = options.credentials || 'include';
@@ -59,6 +63,7 @@ function post(url, options) {
 
 let api = {
 	refreshApiJwtToken: refreshApiJwtToken,
+	clearApiJwtToken: clearApiJwtToken,
 
     get: get,
     post: post,
