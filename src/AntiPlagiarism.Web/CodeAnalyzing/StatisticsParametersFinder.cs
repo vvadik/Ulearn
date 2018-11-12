@@ -28,6 +28,12 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			foreach (var (firstSubmission, secondSubmission) in pairs)
 				weights.Add(await GetLinkWeightAsync(firstSubmission, secondSubmission, pairIndex++, pairs.Count).ConfigureAwait(false));
 			
+			/* Remove all 1's from weights list.
+			   Ones are weights for pairs of absolutely identical solutions (i.e. copied from the internet or shared between students).
+			   They are negatively affect to the mean and standard deviation of weights. So we decided just remove them from the array before 
+			   calculation mean and deviation. See https://yt.skbkontur.ru/issue/ULEARN-78 for details. */
+			weights = weights.Where(w => w < 1 - 1e-6).ToList();
+			
 			logger.Information($"Пересчитываю статистические параметры задачи (TaskStatisticsParameters) по следующему набору весов: [{string.Join(", ", weights)}]");
 			
 			var mean = weights.Mean();
