@@ -34,6 +34,7 @@ namespace uLearn.CSharp
 		[TestCase(@"public int ToInt(){}")]
 		[TestCase(@"public string FromInt(){}")]
 		[TestCase(@"public static void With(){}")]
+		[TestCase(@"public static void DoYourThing(){}")]
 		public void ignore_correct_method_name(string code)
 		{
 			FindErrors(code).Should().BeNullOrEmpty();
@@ -50,7 +51,7 @@ namespace uLearn.CSharp
 
 		[TestCase(@"public class SomeClass{public SomeClass(){ }}")]
 		[TestCase(@"public class Point{public Point(){ }}")]
-		public void ignore_costructors(string code)
+		public void ignore_constructors(string code)
 		{
 			FindErrors(code).Should().BeNullOrEmpty();
 		}
