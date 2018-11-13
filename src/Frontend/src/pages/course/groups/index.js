@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { withRouter } from "react-router-dom";
 import api from "../../../api";
 import PropTypes from 'prop-types';
 import GroupsList from "../../../components/groups/GroupMainPage/GroupList/GroupsList";
@@ -18,9 +19,10 @@ class GroupsPage extends AbstractPage {
 			groups: [],
 			archiveGroups: [],
 			filter: "active",
-			loading: true,
 			loadingArchived: false,
-			loadingActive: false
+			loadingActive: false,
+			loadedArchived: false,
+			loadedActive: false,
 		}
 	};
 
@@ -40,7 +42,6 @@ class GroupsPage extends AbstractPage {
 						createGroup={this.createGroup}
 						copyGroup={this.copyGroup}
 						groups={this.state.groups}
-						loading={this.state.loading}
 					/>
 					<GroupsList
 						groups={this.filteredGroups}
@@ -66,19 +67,20 @@ class GroupsPage extends AbstractPage {
 
 	loadingArchivedGroups = () => {
 		let courseId = this.props.match.params.courseId;
-		const { archiveGroups, loadingArchived } = this.state;
-		if (archiveGroups.length !== 0 || loadingArchived) {
+		const { loadingArchived, loadedArchived } = this.state;
+		if (loadedArchived || loadingArchived) {
 			return;
 		}
 
 		this.setState({
-			// loadingArchived: true,
+			loadingArchived: true,
 		});
 
 		api.groups.getCourseArchiveGroups(courseId).then(json => {
 			let archiveGroups = json.groups;
 			this.setState({
 				loadingArchived: false,
+				loadedArchived: true,
 				archiveGroups: archiveGroups
 			});
 		}).catch(console.error);
@@ -86,20 +88,21 @@ class GroupsPage extends AbstractPage {
 
 	loadingActiveGroups = () => {
 		let courseId = this.props.match.params.courseId;
-		const { groups, loadingActive } = this.state;
-		if (groups.length !== 0 || loadingActive) {
+		const { loadingActive, loadedActive } = this.state;
+		if (loadedActive || loadingActive) {
 			return;
 		}
 
 		this.setState({
-			// loadingActive: false,
+			loadingActive: true,
 		});
 
 		api.groups.getCourseGroups(courseId).then(json => {
 			let groups = json.groups;
 			this.setState({
 				loadingActive: false,
-				groups: groups
+				loadedActive: true,
+				groups: groups,
 			});
 		}).catch(console.error);
 	};
@@ -125,7 +128,7 @@ class GroupsPage extends AbstractPage {
 			is_archived: isArchived
 		};
 		api.groups.saveGroupSettings(group.id, newSettings);
-
+		group = { ...group, ...newSettings };
 		if (isArchived) {
 			this.moveGroup(group, 'groups', 'archiveGroups');
 		} else {
@@ -136,7 +139,6 @@ class GroupsPage extends AbstractPage {
 	moveGroup = (group, moveFrom, moveTo) => {
 		const groupsMoveFrom = this.state[moveFrom].filter(g => group.id !== g.id);
 		const groupsMoveTo = [group, ...this.state[moveTo]].sort((a, b) => a.name.localeCompare(b.name));
-
 		this.setState({
 			[moveFrom]: groupsMoveFrom,
 			[moveTo]: groupsMoveTo
@@ -148,7 +150,8 @@ class GroupsPage extends AbstractPage {
 		const copyGroup = await api.groups.getGroup(groupId);
 		this.setState({
 			groups: [copyGroup, ...groups],
-		})
+		});
+		this.props.history.push(`${groupId}`);
 	};
 
 	deleteGroup = (group, groupsName) => {
@@ -164,7 +167,8 @@ class GroupsPage extends AbstractPage {
 		const groups = this.filteredGroups;
 		this.setState({
 			groups: [newGroup, ...groups],
-		})
+		});
+		this.props.history.push(`${groupId}`);
 	};
 
 }
@@ -173,4 +177,4 @@ GroupsPage.propTypes = {
 	match: PropTypes.object,
 };
 
-export default GroupsPage;
+export default withRouter(GroupsPage);

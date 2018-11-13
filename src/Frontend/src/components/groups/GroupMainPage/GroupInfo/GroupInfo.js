@@ -18,11 +18,13 @@ class GroupInfo extends Component {
 
 		const studentsCount = group.students_count || 0;
 		const pluralFormOfStudents = getPluralForm(studentsCount, 'студент', 'студента', 'студентов');
+		const teachersList = group.accesses.map(item => item.user.visible_name);
 		const owner = group.owner.visible_name || 'Неизвестный';
+		const teachers = [owner, ...teachersList];
+		const teachersCount = teachers.length;
+		const pluralFormOfTeachers = getPluralForm(teachersCount, 'преподаватель', 'преподаватели');
 		const groupName = group.name;
 		const groupId = group.id;
-		const teachersList = group.accesses.map(item => item.user.visible_name);
-		const teachers = [owner, ...teachersList];
 		const isCodeReviewEnabled = group.is_manual_checking_enabled;
 		const isProgressEnabled = group.can_users_see_group_progress;
 
@@ -37,7 +39,7 @@ class GroupInfo extends Component {
 									{studentsCount} {pluralFormOfStudents}
 								</div>
 								<div className="group-content-main__teachers">
-									Преподаватели: {teachers.join(', ')}
+									{`${pluralFormOfTeachers}: ${teachers.join(', ')}`}
 								</div>
 							</header>
 							<div className="group-content-state">
@@ -61,10 +63,10 @@ class GroupInfo extends Component {
 			<Kebab size="large">
 				<MenuItem icon="ArchiveUnpack"
 						  onClick={() => this.props.toggleArchived(group, !group.is_archived)}>
-					{group.is_archived ?  'Восстановить' : 'Архивировать'}
+					{group.is_archived ? 'Восстановить' : 'Архивировать'}
 				</MenuItem>
 				<MenuItem icon="Delete"
-						  onClick={() => this.props.deleteGroup(group, group.is_archived ? 'groups' : 'archiveGroups')}>
+						  onClick={() => this.props.deleteGroup(group, group.is_archived ? 'archiveGroups' : 'groups')}>
 					Удалить
 				</MenuItem>
 			</Kebab>
