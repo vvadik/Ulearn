@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Security;
@@ -9,6 +10,7 @@ using System.Text;
 using System.Threading;
 using log4net;
 using Metrics;
+using Microsoft.Build.Utilities;
 using Newtonsoft.Json;
 using RunCsJob.Api;
 using uLearn;
@@ -361,6 +363,10 @@ namespace RunCsJob
 			if (obj != null)
 				return GetResultFromException(obj);
 
+			var exception = ParseNotSerializedException(error);
+			if (exception != null)
+				return new RunningResults(Verdict.RuntimeError, error: error);
+
 			log.Warn($"Не вытащил информацию об исключении из строчки \"{error}\", проверяю код выхода: {exitCode}");
 			return GetResultFromNtStatus(exitCode, error);
 		}
@@ -427,6 +433,80 @@ namespace RunCsJob
 			{
 				return null;
 			}
+		}
+
+		/* Sometimes we've received something like this:
+		   Unhandled Exception: System.ArgumentException: Value does not fall within the expected range.
+			   at Memory.API.MagicAPI.Free(Int32 id)
+			   at Memory.API.APIObject.Finalize()
+			
+		   It's possible, i.e., for exceptions thrown from destructors. Let's try to parse them! */
+		private static Exception ParseNotSerializedException(string stderr)
+		{
+			stderr = stderr.Trim();
+			
+			const string unhandledException = "Unhandled Exception: ";
+			if (!stderr.StartsWith(unhandledException))
+				return null;
+			
+			log.Info($"Try to parse not-serialized and not-standard exception from following message: {stderr}");
+
+			var lines = stderr.SplitToLines();
+			var exceptionLine = lines[0].Substring(unhandledException.Length);
+			var exceptionLineColonIndex = exceptionLine.IndexOf(':');
+			if (exceptionLineColonIndex >= 0)
+			{
+				var exceptionTypeName = exceptionLine.Substring(0, exceptionLineColonIndex);
+				var exceptionMessage = exceptionLine.Length > exceptionLineColonIndex + 2 ? exceptionLine.Substring(exceptionLineColonIndex + 2) : "";
+				
+				var exceptionType = typeof(Exception).Assembly.GetTypes().FirstOrDefault(t => t.FullName == exceptionTypeName);
+				if (exceptionType == null)
+					return new Exception(exceptionMessage);
+
+				log.Info($"Defined exception type: {exceptionType.FullName}");
+
+				var exception = TryToCreateExceptionByTypeAndMessage(exceptionType, exceptionMessage);
+				if (exception == null)
+					return new Exception(exceptionMessage);
+
+				return exception;
+			}
+
+			return null;
+		}
+
+		private static Exception TryToCreateExceptionByTypeAndMessage(Type exceptionType, string exceptionMessage)
+		{
+			Exception exceptionObject = null;
+			try
+			{
+				exceptionObject = Activator.CreateInstance(exceptionType, exceptionMessage) as Exception;
+			}
+			catch (Exception e)
+			{
+				log.Warn($"Can't create exception object of type {exceptionType}: {e.Message}");
+			}
+
+			if (exceptionObject == null)
+			{
+				try
+				{
+					exceptionObject = Activator.CreateInstance(exceptionType) as Exception;
+				}
+				catch (Exception e)
+				{
+					log.Warn($"Can't create exception object of type {exceptionType}: {e.Message}");
+					return null;
+				}
+
+				if (exceptionObject == null)
+				{
+					log.Warn($"Can't create exception object of type {exceptionType}, returned null");
+					return null;
+				}
+			}
+
+			return exceptionObject;
 		}
 
 		private static RunningResults GetResultFromException(Exception ex)

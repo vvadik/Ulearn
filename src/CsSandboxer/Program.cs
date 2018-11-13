@@ -74,6 +74,11 @@ namespace CsSandboxer
 			Environment.Exit(3);
 		}
 
+		private static void HandleException(object sender, UnhandledExceptionEventArgs e)
+		{
+			HandleException(e.ExceptionObject as Exception);
+		}
+
 		private static AppDomain CreateDomain(string id, string assemblyPath)
 		{
 			var permSet = new PermissionSet(PermissionState.None);
@@ -100,12 +105,18 @@ namespace CsSandboxer
 			evidence.AddHostEvidence(new Zone(SecurityZone.Untrusted));
 			var fullyTrustAssemblies = typeof(Sandboxer).Assembly.Evidence.GetHostEvidence<StrongName>();
 
+			var applicationBase = Path.GetDirectoryName(assemblyPath);
 			var adSetup = new AppDomainSetup
 			{
-				ApplicationBase = Path.GetDirectoryName(assemblyPath),
+				ApplicationBase = applicationBase,
 			};
 
+			/* Copy CsSandboxer.exe to destination folder, because it's needed them to set domain.UnhandledException handler below. */
+			var sandboxAssembly = typeof(Sandboxer).Assembly.Location;
+			File.Copy(sandboxAssembly, Path.Combine(applicationBase, Path.GetFileName(sandboxAssembly)), overwrite: true);
+
 			var domain = AppDomain.CreateDomain(id, evidence, adSetup, permSet, fullyTrustAssemblies);
+			domain.UnhandledException += HandleException;
 			return domain;
 		}
 
