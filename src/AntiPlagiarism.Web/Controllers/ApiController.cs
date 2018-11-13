@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Remotion.Linq.Parsing.Structure.IntermediateModel;
 using Serilog;
+using Ulearn.Common.Extensions;
 
 namespace AntiPlagiarism.Web.Controllers
 {
@@ -155,10 +156,13 @@ namespace AntiPlagiarism.Web.Controllers
 				taskIds = taskIds.Where(t => t == parameters.TaskId.Value).ToList();
 
 			var weights = new Dictionary<Guid, List<double>>();
-			foreach (var taskId in taskIds)
+			foreach (var (index, taskId) in taskIds.Enumerate(start: 1))
 			{
 				weights[taskId] = await CalculateTaskStatisticsParametersAsync(client.Id, taskId).ConfigureAwait(false);
 				weights[taskId].Sort();
+
+				logger.Information($"RecalculateTaskStatistics: обработано {index.PluralizeInRussian(RussianPluralizationOptions.Tasks)} из {taskIds.Count}");
+				
 				GC.Collect();
 			}
 
@@ -254,7 +258,7 @@ namespace AntiPlagiarism.Web.Controllers
 				await snippetsRepo.AddSnippetOccurenceAsync(submission, snippet, firstTokenIndex).ConfigureAwait(false);
 		}
 		
-		/// <returns>List of weights (numbers from [0, 1]) used for calculation mean and deviation for this task</returns>
+		/// <returns>List of weights (numbers from [0, 1)) used for calculating mean and deviation for this task</returns>
 		public async Task<List<double>> CalculateTaskStatisticsParametersAsync(int clientId, Guid taskId)
 		{
 			/* Create local submissions repo for preventing memory leaks */
@@ -274,7 +278,6 @@ namespace AntiPlagiarism.Web.Controllers
 				statisticsParameters.TaskId = taskId;
 				statisticsParameters.SubmissionsCount = currentSubmissionsCount;
 				
-				db.EnableAutoDetectChanges();
 				await tasksRepo.SaveTaskStatisticsParametersAsync(statisticsParameters).ConfigureAwait(false);
 				
 				return weights;

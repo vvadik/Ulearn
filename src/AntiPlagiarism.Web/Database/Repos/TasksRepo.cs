@@ -38,6 +38,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 			return db.TasksStatisticsParameters.FindAsync(taskId);
 		}
 
+		/* It's very important that SaveTaskStatisticsParametersAsync() works with disabled EF's Change Tracker */		
 		public Task SaveTaskStatisticsParametersAsync(TaskStatisticsParameters parameters)
 		{
 			return FuncUtils.TrySeveralTimesAsync(
