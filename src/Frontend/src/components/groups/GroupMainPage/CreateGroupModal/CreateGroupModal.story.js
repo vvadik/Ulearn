@@ -7,5 +7,5 @@ import './style.less';
 
 storiesOf('Group/CreateGroupModal', module)
 	.add('default', () => (
-		<CreateGroupModal closeModal={action('closeModal')} courseId={'123'}/>
+		<CreateGroupModal onCloseModal={action('onCloseModal')} courseId={'123'}/>
 	));

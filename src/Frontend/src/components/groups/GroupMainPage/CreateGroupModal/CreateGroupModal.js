@@ -16,13 +16,15 @@ class CreateGroupModal extends Component {
 		name: '',
 		hasError: false,
 		error: null,
-		loading: false
+		loading: false,
+		groupId: null,
 	};
 
 	render() {
-		const { closeModal } = this.props;
+		const { onCloseModal } = this.props;
 		return (
-			<Modal onClose={closeModal} width={640}>
+			<Modal onClose={onCloseModal} width={640}>
+				<Modal.Header>Название группы</Modal.Header>
 				<form onSubmit={this.onSubmit}>
 					{this.renderModalBody()}
 					<Modal.Footer>
@@ -30,6 +32,7 @@ class CreateGroupModal extends Component {
 							use="primary"
 							size="medium"
 							type="submit"
+							disabled={!this.state.name}
 						>
 							Создать
 						</Button>
@@ -46,7 +49,6 @@ class CreateGroupModal extends Component {
 				<Loader type="big" active={this.state.loading}>
 					<label className="modal-label">
 						<Gapped gap={20}>
-							Название группы
 							<Tooltip render={this.tooltipRender} trigger='focus' pos="right top">
 								<Input placeholder="КН-201 УрФУ 2017"
 									   maxLength="20"
@@ -59,11 +61,11 @@ class CreateGroupModal extends Component {
 							</Tooltip>
 						</Gapped>
 					</label>
-					<p>
+					<p className="modal-instruction">
 						Студенты увидят название группы, поэтому постарайтесь сделать его понятным.<br />
-						Пример хорошего названия группы:
-						<span className="group-content-state_on">«КН-201 УрФУ 2017»,</span><br />
-						пример плохого: <span className="group-content-state_off"> «Моя группа 2»</span>
+						Пример хорошего названия группы: <span className="group-content-state_on">
+						КН-201 УрФУ 2017,</span><br />
+						пример плохого: <span className="group-content-state_off">Моя группа 2</span>
 					</p>
 				</Loader>
 			</Modal.Body>
@@ -72,7 +74,7 @@ class CreateGroupModal extends Component {
 
 	onSubmit = async (e) => {
 		const { name } = this.state;
-		const { closeModal, createGroup, courseId } = this.props;
+		const { onCloseModal, createGroup, courseId } = this.props;
 		e.preventDefault();
 		if (!name) {
 			this.setState({
@@ -86,8 +88,12 @@ class CreateGroupModal extends Component {
 			this.setState({
 				loading: true,
 			});
+		} else {
+			this.setState({
+				groupId: newGroup.id,
+			})
 		}
-		closeModal();
+		onCloseModal();
 		createGroup(newGroup.id);
 	};
 
@@ -113,7 +119,7 @@ class CreateGroupModal extends Component {
 }
 
 CreateGroupModal.propTypes = {
-	closeModal: PropTypes.func,
+	onCloseModal: PropTypes.func,
 	courseId: PropTypes.string,
 	createGroup: PropTypes.func,
 };

@@ -27,18 +27,16 @@ class GroupHeader extends Component {
 				{ this.renderHeader() }
 				{ this.state.modalCreateGroup &&
 					<CreateGroupModal
-						closeModal={this.closeModal}
+						onCloseModal={this.onCloseModal}
 						createGroup={this.props.createGroup}
 						courseId={this.props.courseId}
 					/>
 				}
 				{ this.state.modalCopyGroup &&
 					<CopyGroupModal
-						closeModal={this.closeModal}
 						courseId={this.props.courseId}
-						groups={this.props.groups}
-						copyGroup={this.props.copyGroup}
-						courseTitle={this.courseTitle}
+						onClose={this.onCloseModal}
+						onSubmit={this.props.copyGroup}
 					/>
 				}
 			</React.Fragment>
@@ -79,7 +77,7 @@ class GroupHeader extends Component {
 		})
 	};
 
-	closeModal = () => {
+	onCloseModal = () => {
 		this.setState({
 			modalCreateGroup: false,
 			modalCopyGroup: false,
@@ -90,11 +88,6 @@ class GroupHeader extends Component {
 	onChange = (_, v) => {
 		this.props.onTabChange(v);
 	};
-
-	get courseTitle() {
-		const { courseId } = this.props;
-		return api.courses.getCourseTitle(courseId);
-	};
 }
 
 GroupHeader.propTypes = {
@@ -104,7 +97,6 @@ GroupHeader.propTypes = {
 	copyGroup: PropTypes.func,
 	createGroup: PropTypes.func,
 	groups: PropTypes.array,
-	loading: PropTypes.bool,
 };
 
 export default GroupHeader;

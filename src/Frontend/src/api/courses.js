@@ -16,12 +16,7 @@ export function getCourses() {
     };
 }
 
-export function getCourseTitle(courseId) {
-	return api.get('courses/' + courseId)
-		.then(response => response.json());
-}
-
 export function getUsersCourses() {
-	return api.get('/courses/?instructor')
+	return api.get('courses/?instructor')
 		.then(response => response.json());
 }

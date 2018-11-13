@@ -2,70 +2,89 @@ import React, { Component } from 'react';
 import PropTypes from "prop-types";
 import api from "../../../../api";
 import Modal from '@skbkontur/react-ui/components/Modal/Modal';
-import Gapped from '@skbkontur/react-ui/components/Gapped';
 import Select from '@skbkontur/react-ui/components/Select/Select';
 import Button from '@skbkontur/react-ui/components/Button/Button';
-import Checkbox from '@skbkontur/react-ui/components/Checkbox/Checkbox'
+import Checkbox from '@skbkontur/react-ui/components/Checkbox/Checkbox';
 
 import './style.less';
 
 class CopyGroupModal extends Component {
-
 	constructor(props) {
 		super(props);
 		this.state = {
-			group: null,
+			// form
+			groupId: null,
 			courseId: null,
-			instructors: [],
-			courseTitle: '',
-			hasError: false,
-			error: null,
-			changeOwnerWindow: false,
 			changeOwner: true,
-			coursesGroups: {},
+			// ui
 			groups: [],
+			error: null,
+			// store
+			instructors: [],
 			courses: [],
 		};
 	}
 
 	componentDidMount() {
+		let currentCourseId = this.props.courseId;
+
+		this.loadCourses();
+		this.loadCourseInstructors(currentCourseId);
+	}
+
+	loadCourses = () => {
 		api.courses.getUsersCourses().then(json => {
 			let courses = json.courses;
 			this.setState({
 				courses: courses
 			});
 		});
+	};
 
-		let { courseId } = this.props;
-		api.courses.getCourseTitle(courseId).then(json => {
-			let courseTitle = json.title;
-			this.setState({
-				courseTitle: courseTitle,
-			});
-		}).catch(console.error);
-	}
+	loadGroups = (courseId) => {
+		api.groups.getCourseGroups(courseId)
+			.then(json => {
+				let groups = json.groups;
+				this.setState({
+					groups: groups,
+				});
+			}).catch(console.error);
+	};
+
+	loadCourseInstructors(courseId) {
+		api.users.getUsersCourse(courseId)
+			.then(json => {
+				let instructors = json.instructors;
+				this.setState({
+					instructors: instructors,
+				});
+			}).catch(console.error);
+	};
 
 	render() {
-		const { closeModal } = this.props;
-		const { courseTitle } = this.state;
+		const { onClose } = this.props;
+		let currentCourseId = this.props.courseId;
+		const courseTitle = this.getCourseTitle(currentCourseId);
 		return (
-		<Modal onClose={closeModal} width={640}>
+		<Modal onClose={onClose} width={640}> { /*FIXME*/ }
 			<Modal.Header>Скопировать группу</Modal.Header>
-				<form  onSubmit={this.onSubmit}>
+				<form onSubmit={this.onSubmit} method="post" action={this.openNewWindow}>
 					<Modal.Body>
-						<p>Новая группа будет создана для курса <b>"{ courseTitle }"</b>.
+						<p className="modal-text">Новая группа будет создана для курса <b>«{ courseTitle }»</b>.
 							Скопируются все настройки группы (в том числе владелец),
 							в неё автоматически добавятся участники из копируемой группы.
 							Преподаватели тоже будут добавлены в группу, если у них есть права на
-							курс <b>"{ courseTitle }"</b>.
+							курс <b>«{ courseTitle }»</b>.
 						</p>
-						{ this.renderSelect()}
+						{ this.renderCourseSelect() }
+						{ this.renderGroupSelect() }
 					</Modal.Body>
 					<Modal.Footer>
 						<Button
 							use="primary"
 							size="medium"
 							type="submit"
+							disabled={!this.state.groupId}
 						>
 							Cкопировать
 						</Button>
@@ -75,140 +94,164 @@ class CopyGroupModal extends Component {
 		)
 	}
 
-	renderSelect() {
-		const { group, course, hasError } = this.state;
+	renderCourseSelect() {
+		const { course } = this.state;
 		return (
 			<React.Fragment>
-				<label>
-					<Gapped gap={20}>
-						Выберите курс
-						<Select
-							autofocus
-							required
-							items={this.getCourses()}
-							onChange={this.newCourseValue}
-							width="200"
-							placeholder="Курс"
-							value={course}
-							error={hasError}
-						/>
-					</Gapped>
-				</label>
-				<label>
-					<Gapped gap={20}>
-						Выберите группу
-						<Select
-							autofocus
-							required
-							items={this.getGroups()}
-							onChange={this.newGroupValue}
-							width="200"
-							placeholder="Выберите группу"
-							value={group}
-							error={hasError}
-						/>
-					</Gapped>
-				</label>
-				{ this.state.changeOwnerWindow && this.renderChangeOwner() }
+				<p className="modal-text">
+					Вы можете выбрать курс, в котором являетесь преподавателем
+				</p>
+				<Select
+					autofocus
+					required
+					items={this.getCourseOptions()}
+					onChange={this.onCourseChange}
+					width="200"
+					placeholder="Курс"
+					value={course}
+					error={this.hasError()}
+					use="default"
+				/>
 			</React.Fragment>
 		)
 	}
 
+	renderGroupSelect() {
+		const { groupId } = this.state;
+		return (
+		<React.Fragment>
+			<p className="modal-text">
+				Вам доступны только те группы,в которых вы являетесь преподавателем
+			</p>
+			{ this.checkGroups()   && this.renderEmptyGroups() }
+			<Select
+				autofocus
+				required
+				items={this.getGroupOptions()}
+				onChange={this.onGroupChange}
+				width="200"
+				placeholder="Выберите группу"
+				value={groupId}
+				error={this.hasError()}
+				use="default"
+				disabled={!this.state.courseId}
+			/>
+			{ this.changeOwnerWindow() && this.renderChangeOwner() }
+		</React.Fragment>
+		);
+	};
+
+	renderEmptyGroups() {
+		return (
+			<p><b>В выбранном вами курсе нет доступных групп</b></p>
+		)
+	}
+
 	renderChangeOwner() {
-		const { group, courseTitle, changeOwner } = this.state;
+		const currentCourseId = this.props.courseId;
+		const { groupId, changeOwner } = this.state;
+		const group = this.getGroup(groupId);
+		const courseTitle = this.getCourseTitle(currentCourseId);
+
 		return (
 			<div className="change-owner-block">
-				<p>Владелец этой группы {group.owner.visible_name} не является преподавателем курса
-					<b>"{ courseTitle }"</b>. Вы можете сделать себя владельцем скопированной группы.
+				<p>Владелец этой группы <b>{group.owner.visible_name}</b> не является преподавателем курса
+					<b>«{ courseTitle }»</b>. Вы можете сделать себя владельцем скопированной группы.
 				</p>
 				<Checkbox checked={changeOwner} onChange={(_, value) => this.setState({ changeOwner: value })}>Сделать меня владельцем группы</Checkbox>
 			</div>
 		)
 	}
 
-	getCourses = () => {
+	hasError = () => {
+		return this.state.error !== null;
+    };
+
+	getCourseTitle = (courseId) => {
 		const { courses } = this.state;
-		return [
-			...courses.map(course => [course.id, course.title ])
-		];
+		const course = courses.find(c => c.id === courseId);
+
+		return course && course.title;
 	};
 
-	newCourseValue = (_, value) => {
-		this.setState({ courseId: value });
+	getGroup = (groupId) => {
+		const { groups } = this.state;
+
+		return groups.find(g => g.id === groupId);
+	};
+
+	getCourseOptions = () => {
+		const { courses } = this.state;
+
+		return courses.map(course => [course.id, course.title]);
+	};
+
+	onCourseChange = (_, value) => {
+
+		this.setState({
+			courseId: value,
+			groupId: null
+		});
+
 		this.loadGroups(value);
 	};
 
-	loadGroups = (courseId) => {
-		api.groups.getCourseGroups(courseId)
-			.then(json => {
-			let groups = json.groups;
-			this.setState({
-				groups: groups,
-			});
-		}).catch(console.error);
+	checkGroups = () => {
+		const { courseId, groups } = this.state;
+		if (!groups) {
+			return false;
+		}
+
+		return (courseId && groups.length === 0);
 	};
 
-	getGroups = () => {
+	getGroupOptions = () => {
 		const { groups } = this.state;
-		return [
-			...groups.map(group => [group, `${group.name}: ${group.students_count}`])
-		];
+
+		return groups.map(group => [group.id, `${group.name}: ${group.students_count}`]);
 	};
 
-	newGroupValue = (_, value) => {
-		this.setState({ group: value });
-		this.loadCourseInstructors(value);
+	onGroupChange = (_, value) => {
+		this.setState({ groupId: value });
 	};
 
-	loadCourseInstructors(group) {
-		let { courseId } = this.props;
+	changeOwnerWindow = () => {
+		const { groupId, instructors } = this.state;
+		const group = this.getGroup(groupId);
 
-		api.users.getUsersCourse(courseId)
-			.then(json => {
-			let instructors = json.instructors;
-			this.setState({
-				instructors: instructors,
-			});
-				this.checkOwner(group);
-		}).catch(console.error);
-	};
+		if (!group) {
+			return false;
+		}
 
-	checkOwner = (group) => {
-		const { instructors } = this.state;
 		const ownerId = group.owner.id;
 		const instructorsId = instructors.map(instructor => instructor.id);
-		if (!(instructorsId.includes(ownerId))) {
-			this.setState({
-				changeOwnerWindow: true,
-			})
-		}
+
+		return !(instructorsId.includes(ownerId));
 	};
 
 	onSubmit = async (e) => {
-		const { group, courseId, changeOwner } = this.state;
-		const { closeModal, copyGroup } = this.props;
+		const { groupId, changeOwner } = this.state;
+		const currentCourseId = this.props.courseId;
+		const { onClose, onSubmit } = this.props;
 		e.preventDefault();
-		if (!courseId || (courseId && !group)) {
+		if (!currentCourseId || !groupId) {
 			this.setState({
-				hasError: true,
 				error: 'Выберите курс',
 			});
 			return;
 		}
 
-		const newGroup = await api.groups.copyGroup(group.id, courseId, changeOwner);
-		console.log(newGroup);
-		closeModal();
-		copyGroup(newGroup.id);
+		const newGroup = await api.groups.copyGroup(groupId, currentCourseId, changeOwner);
+
+		onClose();
+		onSubmit(newGroup.id);
 	};
 }
 
 CopyGroupModal.propTypes = {
-	closeModal: PropTypes.func,
 	courseId: PropTypes.string,
-	groups: PropTypes.array,
-	copyGroup: PropTypes.func,
-	courses: PropTypes.object,
+	onClose: PropTypes.func,
+	onSubmit: PropTypes.func,
 };
 
 export default CopyGroupModal;
