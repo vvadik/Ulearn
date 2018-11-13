@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -440,7 +440,7 @@ namespace uLearn.Web.Controllers
 		{
 			var userId = User.Identity.GetUserId();
 			var isSkippedOrPassed = visitsRepo.IsSkippedOrPassed(course.Id, slide.Id, userId);
-			/* TODO: It's not nesessary create ExerciseBlockData here */
+			/* TODO: It's not necessary to create ExerciseBlockData here */
 			var model = new ExerciseBlockData(course.Id, slide)
 			{
 				IsSkippedOrPassed = isSkippedOrPassed,

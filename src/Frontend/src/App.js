@@ -55,7 +55,8 @@ setInterval(() => {
 
 class UlearnApp extends Component {
     render() {
-    	const isLti = window.location.pathname.toLowerCase().endsWith('/ltislide');
+		let pathname = window.location.pathname.toLowerCase();
+		const isLti = pathname.endsWith('/ltislide') || pathname.endsWith('/acceptedalert');
 
         return (
             <Provider store={store}>
