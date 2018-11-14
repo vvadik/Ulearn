@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
@@ -503,7 +503,7 @@ namespace Database.DataContexts
 
 			if (exerciseBlock.ExerciseType == ExerciseType.CheckOutput)
 			{
-				var expectedOutput = exerciseBlock?.ExpectedOutput.NormalizeEoln();
+				var expectedOutput = exerciseBlock.ExpectedOutput.NormalizeEoln();
 				return output.Equals(expectedOutput);
 			}
 

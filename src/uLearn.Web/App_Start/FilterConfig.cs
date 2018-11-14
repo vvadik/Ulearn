@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
@@ -75,7 +75,7 @@ namespace uLearn.Web
 
 		public static int GetRealPort(this HttpRequestBase request)
 		{
-			if (request.Url?.Scheme == "http" && request.Url?.Port == 80 && request.GetRealScheme() == "https")
+			if (request.Url?.Scheme == "http" && request.Url.Port == 80 && request.GetRealScheme() == "https")
 				return 443;
 			return request.Url?.Port ?? 80;
 		}
