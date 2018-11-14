@@ -59,13 +59,6 @@ namespace uLearn.Model.Blocks
 		[XmlElement("user-code-file-path")]
 		public string UserCodeFilePath { get; set; }
 
-		[XmlElement("user-code-file-name")]
-		public string ObsoleteUserCodeFileName
-		{
-			get => null;
-			set => UserCodeFilePath = value;
-		}
-
 		[XmlElement("exclude-path-for-checker")]
 		public string[] PathsToExcludeForChecker { get; set; }
 
