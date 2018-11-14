@@ -2,7 +2,7 @@
 using System.IO;
 using ApprovalTests;
 using NUnit.Framework;
-using uLearn.Model.Blocks;
+using uLearn.Courses.Slides.Blocks;
 using Ulearn.Common.Extensions;
 
 namespace uLearn.CSharp

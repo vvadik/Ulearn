@@ -27,6 +27,7 @@ using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.Swagger;
 using uLearn;
 using uLearn.Configuration;
+using uLearn.Courses;
 using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Authorization;
 using Ulearn.Web.Api.Controllers;

@@ -4,7 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.Build.Evaluation;
-using uLearn.Model.Blocks;
+using uLearn.Courses.Slides;
+using uLearn.Courses.Slides.Blocks;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 

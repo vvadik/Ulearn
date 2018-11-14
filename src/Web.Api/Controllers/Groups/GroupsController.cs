@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using uLearn;
+using uLearn.Courses;
 using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Models.Parameters.Groups;
 using Ulearn.Web.Api.Models.Responses;

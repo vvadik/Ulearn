@@ -3,7 +3,9 @@ using System.Xml.Serialization;
 using ApprovalTests.Reporters;
 using FluentAssertions;
 using NUnit.Framework;
-using uLearn.Model.Blocks;
+using uLearn.Courses;
+using uLearn.Courses.Slides.Blocks;
+using uLearn.Courses.Slides.Quizzes;
 using Ulearn.Common.Extensions;
 
 namespace uLearn.Quizes

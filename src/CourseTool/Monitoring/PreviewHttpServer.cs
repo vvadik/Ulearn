@@ -10,10 +10,12 @@ using Newtonsoft.Json;
 using NHttp;
 using RunCsJob;
 using RunCsJob.Api;
+using uLearn.Courses;
+using uLearn.Courses.Slides;
+using uLearn.Courses.Slides.Blocks;
+using uLearn.Courses.Slides.Quizzes;
 using uLearn.Helpers;
 using uLearn.Model;
-using uLearn.Model.Blocks;
-using uLearn.Quizes;
 using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
 

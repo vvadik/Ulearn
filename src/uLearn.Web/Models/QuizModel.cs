@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Database.Models;
-using uLearn.Quizes;
+using uLearn.Courses;
+using uLearn.Courses.Slides.Quizzes;
 using Ulearn.Common;
 
 namespace uLearn.Web.Models

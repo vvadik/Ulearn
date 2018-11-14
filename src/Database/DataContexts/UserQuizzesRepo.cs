@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ApprovalUtilities.Utilities;
 using Database.Models;
-using uLearn.Quizes;
+using uLearn.Courses.Slides.Quizzes;
 using Ulearn.Common.Extensions;
 
 namespace Database.DataContexts

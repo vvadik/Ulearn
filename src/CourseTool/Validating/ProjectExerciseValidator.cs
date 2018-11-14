@@ -6,8 +6,9 @@ using Microsoft.Build.Evaluation;
 using Microsoft.VisualBasic.FileIO;
 using RunCsJob;
 using RunCsJob.Api;
+using uLearn.Courses.Slides;
+using uLearn.Courses.Slides.Blocks;
 using uLearn.Helpers;
-using uLearn.Model.Blocks;
 using Ulearn.Common.Extensions;
 using SearchOption = Microsoft.VisualBasic.FileIO.SearchOption;
 

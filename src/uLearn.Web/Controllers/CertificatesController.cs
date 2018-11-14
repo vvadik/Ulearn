@@ -8,6 +8,7 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using Microsoft.AspNet.Identity;
+using uLearn.Courses;
 using uLearn.Web.Extensions;
 
 namespace uLearn.Web.Controllers

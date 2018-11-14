@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NUnit.Framework.Internal;
-using uLearn.Model.Blocks;
+using uLearn.Courses;
+using uLearn.Courses.Slides;
+using uLearn.Courses.Slides.Blocks;
 using uLearn.Model.Edx;
 using uLearn.Model.Edx.EdxComponents;
 

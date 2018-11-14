@@ -1,4 +1,4 @@
-﻿using uLearn.Quizes;
+﻿using uLearn.Courses.Slides.Quizzes;
 
 namespace uLearn.Web.Models
 {

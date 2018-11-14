@@ -4,7 +4,8 @@ using System.Linq;
 using Database;
 using Microsoft.CodeAnalysis.CSharp;
 using NUnit.Framework;
-using uLearn.Model.Blocks;
+using uLearn.Courses.Slides;
+using uLearn.Courses.Slides.Blocks;
 
 namespace uLearn.Web
 {

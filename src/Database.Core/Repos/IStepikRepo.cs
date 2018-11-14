@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Database.Models;
 using uLearn;
+using uLearn.Courses.Slides;
 
 namespace Database.Repos
 {

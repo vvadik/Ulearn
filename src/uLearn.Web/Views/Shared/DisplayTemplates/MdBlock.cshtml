@@ -1,3 +1,4 @@
 ﻿@using uLearn
-@model uLearn.Model.Blocks.MdBlock
+@using uLearn.Courses.Slides
+@model uLearn.Courses.Slides.Blocks.MdBlock
 @Html.Raw(Model.RenderMd(ViewBag.CourseId, ((Slide) ViewBag.Slide).Id, ((Slide)ViewBag.Slide).Info.SlideFile))

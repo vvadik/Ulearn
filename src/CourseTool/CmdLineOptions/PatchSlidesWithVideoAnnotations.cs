@@ -6,6 +6,8 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using CommandLine;
+using uLearn.Courses;
+using uLearn.Courses.Slides;
 
 namespace uLearn.CourseTool.CmdLineOptions
 {

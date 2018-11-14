@@ -1,4 +1,6 @@
 ﻿using System;
+using uLearn.Courses;
+using uLearn.Courses.Slides;
 
 namespace uLearn.Web.Models
 {

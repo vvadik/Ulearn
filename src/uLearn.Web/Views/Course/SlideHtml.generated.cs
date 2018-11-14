@@ -31,12 +31,13 @@ namespace uLearn.Web.Views.Course
     using log4net;
     using uLearn;
     using Ulearn.Common.Extensions;
-    using uLearn.Model.Blocks;
-    using uLearn.Quizes;
-    using uLearn.Web;
+	using uLearn.Web;
     using uLearn.Web.Controllers;
     using uLearn.Web.Extensions;
     using uLearn.Web.Models;
+	using uLearn.Courses.Slides;
+	using uLearn.Courses.Slides.Quizzes;
+	using uLearn.Courses.Slides.Blocks;
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("RazorGenerator", "2.0.0.0")]
     public class SlideHtml : System.Web.WebPages.HelperPage

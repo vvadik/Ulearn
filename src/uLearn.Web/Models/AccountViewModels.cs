@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 using Database.Models;
+using uLearn.Courses;
 using Ulearn.Common;
 
 namespace uLearn.Web.Models

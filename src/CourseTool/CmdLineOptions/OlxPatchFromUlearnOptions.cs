@@ -3,8 +3,9 @@ using System.IO;
 using System.Linq;
 using CommandLine;
 using Newtonsoft.Json;
+using uLearn.Courses;
+using uLearn.Courses.Slides.Blocks;
 using uLearn.CourseTool.Json;
-using uLearn.Model.Blocks;
 using uLearn.Model.Edx;
 
 namespace uLearn.CourseTool.CmdLineOptions

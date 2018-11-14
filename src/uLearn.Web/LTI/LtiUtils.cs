@@ -3,6 +3,7 @@ using Database.DataContexts;
 using Database.Models;
 using log4net;
 using LtiLibrary.Core.Outcomes.v1;
+using uLearn.Courses.Slides;
 using uLearn.Web.Controllers;
 using Ulearn.Common.Extensions;
 

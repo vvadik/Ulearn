@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Principal;
 using uLearn;
+using uLearn.Courses;
 
 namespace Database.Repos
 {

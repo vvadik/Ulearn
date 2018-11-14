@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.Build.Evaluation;
+using uLearn.Courses.Slides.Blocks;
 using uLearn.Helpers;
-using uLearn.Model.Blocks;
 using Ulearn.Common.Extensions;
 
 namespace uLearn

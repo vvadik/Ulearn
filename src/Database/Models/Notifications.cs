@@ -8,6 +8,8 @@ using System.Reflection;
 using System.Xml;
 using Database.DataContexts;
 using uLearn;
+using uLearn.Courses;
+using uLearn.Courses.Slides;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 

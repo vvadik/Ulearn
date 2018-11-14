@@ -11,7 +11,7 @@ using log4net;
 using Microsoft.EntityFrameworkCore;
 using RunCsJob.Api;
 using uLearn;
-using uLearn.Model.Blocks;
+using uLearn.Courses.Slides;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 

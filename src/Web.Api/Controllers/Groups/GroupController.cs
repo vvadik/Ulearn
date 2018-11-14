@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using Serilog;
 using Swashbuckle.AspNetCore.Annotations;
 using uLearn;
+using uLearn.Courses;
 using Ulearn.Web.Api.Models.Parameters.Groups;
 using Ulearn.Web.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Responses.Groups;

@@ -4,6 +4,7 @@ using System.Web.Mvc;
 using Database;
 using Database.DataContexts;
 using Database.Models;
+using uLearn.Courses.Slides;
 using uLearn.Web.FilterAttributes;
 
 namespace uLearn.Web.Controllers

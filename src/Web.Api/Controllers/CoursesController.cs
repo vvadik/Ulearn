@@ -9,6 +9,7 @@ using Database.Repos.CourseRoles;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using uLearn;
+using uLearn.Courses;
 using Ulearn.Web.Api.Models.Common;
 using Ulearn.Web.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Responses.Courses;

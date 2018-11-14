@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
-using uLearn.Quizes;
+using uLearn.Courses.Slides.Quizzes;
 using Ulearn.Common.Extensions;
 
 namespace Database.Repos

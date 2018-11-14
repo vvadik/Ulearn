@@ -12,6 +12,8 @@ using Newtonsoft.Json;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ionic.Zip;
+using uLearn.Courses;
+using uLearn.Courses.Slides;
 
 namespace uLearn.Web
 {

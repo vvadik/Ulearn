@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using CommandLine;
 using RunCsJob;
+using uLearn.Courses;
 using uLearn.CourseTool.Validating;
 
 namespace uLearn.CourseTool.CmdLineOptions

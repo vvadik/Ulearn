@@ -22,6 +22,7 @@ using RunCsJob.Api;
 using Serilog;
 using Serilog.Events;
 using Telegram.Bot.Types.Enums;
+using uLearn.Courses.Slides;
 using uLearn.Telegram;
 using uLearn.Web.AntiPlagiarismUsage;
 using Ulearn.Common;

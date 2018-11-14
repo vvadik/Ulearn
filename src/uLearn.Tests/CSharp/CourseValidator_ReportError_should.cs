@@ -7,9 +7,11 @@ using log4net.Config;
 using Microsoft.VisualBasic.FileIO;
 using NUnit.Framework;
 using test;
+using uLearn.Courses;
+using uLearn.Courses.Slides;
+using uLearn.Courses.Slides.Blocks;
 using uLearn.Helpers;
 using uLearn.Model;
-using uLearn.Model.Blocks;
 using Ulearn.Common.Extensions;
 
 namespace uLearn.CSharp

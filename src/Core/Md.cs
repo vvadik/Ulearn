@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Web;
 using MarkdownDeep;
 using Microsoft.AspNetCore.Html;
+using uLearn.Courses;
 
 namespace uLearn
 {

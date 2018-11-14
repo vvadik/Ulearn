@@ -2,6 +2,7 @@
 using System.IO;
 using log4net;
 using uLearn.Configuration;
+using uLearn.Courses.Slides;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 

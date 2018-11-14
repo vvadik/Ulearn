@@ -15,6 +15,7 @@ using Database.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security.Cookies;
 using uLearn.Configuration;
+using uLearn.Courses;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;

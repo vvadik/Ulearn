@@ -5,8 +5,10 @@ using FluentAssertions;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.VisualBasic.FileIO;
 using NUnit.Framework;
+using uLearn.Courses;
+using uLearn.Courses.Slides;
+using uLearn.Courses.Slides.Blocks;
 using uLearn.Model;
-using uLearn.Model.Blocks;
 using Ulearn.Common.Extensions;
 
 namespace uLearn.CSharp

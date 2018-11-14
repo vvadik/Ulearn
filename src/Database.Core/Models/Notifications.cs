@@ -10,6 +10,8 @@ using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 using Microsoft.Extensions.DependencyInjection;
 using uLearn;
+using uLearn.Courses;
+using uLearn.Courses.Slides;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 

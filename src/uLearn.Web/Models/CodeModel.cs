@@ -1,5 +1,5 @@
 ﻿using System;
-using uLearn.Model.Blocks;
+using uLearn.Courses.Slides.Blocks;
 
 namespace uLearn.Web.Models
 {

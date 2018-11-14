@@ -2,8 +2,10 @@
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
+using uLearn.Courses;
+using uLearn.Courses.Slides;
+using uLearn.Courses.Slides.Blocks;
 using uLearn.CSharp;
-using uLearn.Model.Blocks;
 using Ulearn.Common.Extensions;
 
 namespace uLearn

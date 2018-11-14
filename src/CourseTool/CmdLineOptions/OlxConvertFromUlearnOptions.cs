@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using CommandLine;
 using Newtonsoft.Json;
+using uLearn.Courses;
 using uLearn.CourseTool.Json;
 using uLearn.Model.Edx;
 using Ulearn.Common.Extensions;

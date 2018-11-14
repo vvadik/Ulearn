@@ -5,8 +5,8 @@ using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using uLearn.Courses.Slides.Blocks;
 using uLearn.Model;
-using uLearn.Model.Blocks;
 using Ulearn.Common.Extensions;
 
 namespace uLearn.CSharp

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Database.DataContexts;
 using log4net;
 using uLearn;
+using uLearn.Courses;
 
 namespace Database
 {

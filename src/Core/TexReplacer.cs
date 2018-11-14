@@ -47,8 +47,7 @@ namespace uLearn
 		private string PrepareTexInsert(Match match)
 		{
 			var insertId = match.Value;
-			Tuple<string, InsertionType> tex;
-			if (!texInserts.TryGetValue(insertId, out tex))
+			if (!texInserts.TryGetValue(insertId, out var tex))
 				return insertId;
 			if (tex.Item2 == InsertionType.Div)
 				return FormatTexDiv(tex.Item1);

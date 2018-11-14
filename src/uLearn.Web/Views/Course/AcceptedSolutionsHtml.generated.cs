@@ -1,4 +1,5 @@
 ﻿using Database.Extensions;
+using uLearn.Courses.Slides.Blocks;
 
 #pragma warning disable 1591
 //------------------------------------------------------------------------------
@@ -30,7 +31,6 @@ namespace uLearn.Web.Views.Course
 	using System.Web.WebPages;
 	using Database.Models;
 	using uLearn;
-	using uLearn.Model.Blocks;
 	using uLearn.Web.Extensions;
 	using uLearn.Web.Models;
 	using uLearn.Web.Views.Course;

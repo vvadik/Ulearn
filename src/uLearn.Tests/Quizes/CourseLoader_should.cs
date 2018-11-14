@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using NUnit.Framework;
+using uLearn.Courses;
 
 namespace uLearn.Quizes
 {

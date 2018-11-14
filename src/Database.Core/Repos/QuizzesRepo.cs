@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Database.Models;
-using uLearn.Quizes;
+using uLearn.Courses.Slides.Quizzes;
 
 namespace Database.Repos
 {

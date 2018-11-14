@@ -12,8 +12,10 @@ using log4net;
 using Microsoft.AspNet.Identity;
 using NUnit.Framework.Constraints;
 using uLearn;
+using uLearn.Courses;
+using uLearn.Courses.Slides;
+using uLearn.Courses.Slides.Quizzes;
 using uLearn.Extensions;
-using uLearn.Quizes;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 

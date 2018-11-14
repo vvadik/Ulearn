@@ -16,7 +16,8 @@ using EntityFramework.Functions;
 using log4net;
 using RunCsJob.Api;
 using uLearn;
-using uLearn.Model.Blocks;
+using uLearn.Courses.Slides;
+using uLearn.Courses.Slides.Blocks;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 

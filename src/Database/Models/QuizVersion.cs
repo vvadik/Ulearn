@@ -2,7 +2,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using uLearn;
-using uLearn.Quizes;
+using uLearn.Courses;
+using uLearn.Courses.Slides.Quizzes;
 using Ulearn.Common.Extensions;
 
 namespace Database.Models

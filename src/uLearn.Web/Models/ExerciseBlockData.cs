@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using System.Web.Mvc;
 using Database.Models;
-using uLearn.Model.Blocks;
+using uLearn.Courses.Slides;
+using uLearn.Courses.Slides.Blocks;
 
 namespace uLearn.Web.Models
 {

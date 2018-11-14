@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using uLearn.Model.Blocks;
+using uLearn.Courses.Slides.Blocks;
 using Ulearn.Common.Extensions;
 
 namespace uLearn.CSharp

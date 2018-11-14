@@ -1,5 +1,6 @@
 using System;
 using RunCsJob.Api;
+using uLearn.Courses.Slides;
 using Ulearn.Common.Extensions;
 
 namespace uLearn.CourseTool.Validating

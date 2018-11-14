@@ -6,6 +6,7 @@ using Database.Models;
 using JetBrains.Annotations;
 using log4net;
 using uLearn;
+using uLearn.Courses.Slides;
 using Ulearn.Common.Extensions;
 
 namespace Database.DataContexts

@@ -1,22 +1,13 @@
 ﻿using System;
 using System.IO;
 using Ionic.Zip;
-using uLearn.Model.Blocks;
+using uLearn.Courses.Slides;
+using uLearn.Courses.Slides.Blocks;
 
 namespace uLearn
 {
 	public static class Utils
 	{
-		public static string GetSource(string courseId, Guid slideId, CourseManager courseManager, string code)
-		{
-			return string.Equals(courseId, "web", StringComparison.OrdinalIgnoreCase) && slideId == Guid.Empty
-				? code
-				: ((SingleFileExerciseBlock)((ExerciseSlide)courseManager.GetCourse(courseId).GetSlideById(slideId))
-					.Exercise)
-				.BuildSolution(code)
-				.SourceCode;
-		}
-
 		public static void UnpackZip(byte[] data, string pathToExtractDir)
 		{
 			using (var ms = new MemoryStream(data))

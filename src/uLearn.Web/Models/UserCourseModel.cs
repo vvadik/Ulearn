@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Database.DataContexts;
 using Database.Models;
-using uLearn.Quizes;
+using uLearn.Courses;
+using uLearn.Courses.Slides;
+using uLearn.Courses.Slides.Quizzes;
 
 namespace uLearn.Web.Models
 {

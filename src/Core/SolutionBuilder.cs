@@ -1,5 +1,5 @@
-﻿using uLearn.Extensions;
-using uLearn.Model.Blocks;
+﻿using uLearn.Courses.Slides.Blocks;
+using uLearn.Extensions;
 
 namespace uLearn
 {

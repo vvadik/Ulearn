@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using uLearn.Model.Blocks;
+using uLearn.Courses;
+using uLearn.Courses.Slides.Blocks;
 using uLearn.Model.Edx;
 
 namespace uLearn.CourseTool

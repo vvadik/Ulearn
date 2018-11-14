@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using uLearn.Model.Blocks;
+using uLearn.Courses.Slides.Blocks;
 using Ulearn.Common.Extensions;
 
 namespace uLearn.Model

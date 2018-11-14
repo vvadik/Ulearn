@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using uLearn;
+using uLearn.Courses;
 using Ulearn.Web.Api.Models.Responses.Users;
 
 namespace Ulearn.Web.Api.Controllers

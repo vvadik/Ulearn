@@ -12,6 +12,7 @@ using Database.Models;
 using log4net;
 using Microsoft.AspNet.Identity;
 using Stepik.Api;
+using uLearn.Courses;
 using uLearn.Web.FilterAttributes;
 
 namespace uLearn.Web.Controllers

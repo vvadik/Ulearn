@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using uLearn.Courses;
+using uLearn.Courses.Slides;
 using uLearn.SpellChecking;
 
 namespace uLearn.Extensions

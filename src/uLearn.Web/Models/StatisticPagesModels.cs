@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Database.Models;
+using uLearn.Courses;
+using uLearn.Courses.Slides;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 

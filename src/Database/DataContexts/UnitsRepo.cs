@@ -5,6 +5,7 @@ using System.Security.Principal;
 using Database.Extensions;
 using Database.Models;
 using uLearn;
+using uLearn.Courses;
 
 namespace Database.DataContexts
 {

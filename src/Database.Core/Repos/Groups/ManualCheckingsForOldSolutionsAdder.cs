@@ -3,7 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Serilog;
 using uLearn;
-using uLearn.Quizes;
+using uLearn.Courses.Slides;
+using uLearn.Courses.Slides.Quizzes;
 
 namespace Database.Repos.Groups
 {
