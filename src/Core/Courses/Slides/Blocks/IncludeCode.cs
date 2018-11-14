@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Xml.Serialization;
-using uLearn.Model;
 using uLearn.Model.Edx.EdxComponents;
 
 namespace uLearn.Courses.Slides.Blocks

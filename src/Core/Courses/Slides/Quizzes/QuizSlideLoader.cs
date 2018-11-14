@@ -2,7 +2,6 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using uLearn.Model;
 using Ulearn.Common.Extensions;
 
 namespace uLearn.Courses.Slides.Quizzes

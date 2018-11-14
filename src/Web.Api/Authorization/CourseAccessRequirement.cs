@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Database.Extensions;
 using Database.Models;
 using Database.Repos;
 using Database.Repos.CourseRoles;

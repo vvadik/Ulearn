@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.Core.Objects;
 using System.Linq;
 using System.Reflection;
-using System.Xml;
 using Database.DataContexts;
 using uLearn;
 using uLearn.Courses;

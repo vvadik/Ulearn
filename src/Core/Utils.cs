@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
 using Ionic.Zip;
-using uLearn.Courses.Slides;
-using uLearn.Courses.Slides.Blocks;
 
 namespace uLearn
 {

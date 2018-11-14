@@ -6,7 +6,6 @@ using uLearn.Courses;
 using uLearn.Courses.Slides;
 using uLearn.Courses.Slides.Quizzes;
 using uLearn.CSharp;
-using uLearn.Model;
 using Ulearn.Common.Extensions;
 
 namespace uLearn

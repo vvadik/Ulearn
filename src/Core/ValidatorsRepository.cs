@@ -1,6 +1,5 @@
 using System.Linq;
 using uLearn.Courses.Slides.Blocks;
-using uLearn.CSharp;
 using uLearn.CSharp.Validators;
 using uLearn.CSharp.Validators.VerbInMethodNameValidation;
 

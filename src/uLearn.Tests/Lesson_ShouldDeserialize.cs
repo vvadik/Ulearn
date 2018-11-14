@@ -2,13 +2,11 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Xml.Serialization;
 using FluentAssertions;
 using NUnit.Framework;
 using uLearn.Courses;
 using uLearn.Courses.Slides;
 using uLearn.Courses.Slides.Blocks;
-using uLearn.Model;
 using Ulearn.Common.Extensions;
 
 namespace uLearn

@@ -8,7 +8,6 @@ using Database.Repos.CourseRoles;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
-using uLearn;
 using uLearn.Courses;
 using Ulearn.Web.Api.Models.Responses.Users;
 

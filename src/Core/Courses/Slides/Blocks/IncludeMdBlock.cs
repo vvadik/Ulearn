@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Xml.Serialization;
-using uLearn.Model;
 using uLearn.Model.Edx.EdxComponents;
 using Ulearn.Common.Extensions;
 

@@ -6,7 +6,6 @@ using Database.Repos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using uLearn;
 using uLearn.Courses;
 using uLearn.Courses.Slides;
 using Ulearn.Web.Api.Models.Responses.ExerciseStatistics;

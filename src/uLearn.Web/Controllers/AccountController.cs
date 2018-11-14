@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -13,7 +12,6 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using Microsoft.AspNet.Identity;
-using Microsoft.Owin.Security.Cookies;
 using uLearn.Configuration;
 using uLearn.Courses;
 using uLearn.Web.Extensions;

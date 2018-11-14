@@ -5,7 +5,6 @@ using System.Linq;
 using JetBrains.Annotations;
 using uLearn.Courses.Slides.Blocks;
 using uLearn.Courses.Slides.Quizzes;
-using uLearn.Model;
 using uLearn.Model.Edx;
 using uLearn.Model.Edx.EdxComponents;
 using Ulearn.Common.Extensions;

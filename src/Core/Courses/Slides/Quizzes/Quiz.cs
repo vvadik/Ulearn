@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using uLearn.Courses.Slides.Blocks;
-using uLearn.Model;
 using uLearn.Model.Edx.EdxComponents;
 using Ulearn.Common.Extensions;
 using Component = uLearn.Model.Edx.EdxComponents.Component;

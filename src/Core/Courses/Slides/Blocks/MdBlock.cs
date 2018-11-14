@@ -6,7 +6,6 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
-using uLearn.Model;
 using uLearn.Model.Edx.EdxComponents;
 using Ulearn.Common.Extensions;
 

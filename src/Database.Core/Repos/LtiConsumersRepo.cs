@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Database.Models;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;

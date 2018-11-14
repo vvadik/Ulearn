@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using Database.Repos.CourseRoles;
-using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;

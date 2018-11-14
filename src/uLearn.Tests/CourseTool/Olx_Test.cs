@@ -1,6 +1,3 @@
-using System.IO;
-using ApprovalTests;
-using ApprovalTests.Reporters;
 using NUnit.Framework;
 using uLearn.Model.Edx.EdxComponents;
 using Ulearn.Common.Extensions;

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Xml.Serialization;
-using uLearn.Model;
 using Ulearn.Common.Extensions;
 
 namespace uLearn.Courses.Slides.Blocks

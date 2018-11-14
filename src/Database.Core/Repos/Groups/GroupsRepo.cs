@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Database.Models;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using uLearn;
 using uLearn.Courses;
 
 namespace Database.Repos.Groups

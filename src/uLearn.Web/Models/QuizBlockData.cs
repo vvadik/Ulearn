@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Ulearn.Common;
+﻿using Ulearn.Common;
 
 namespace uLearn.Web.Models
 {

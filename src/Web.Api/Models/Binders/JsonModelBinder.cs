@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
 using Serilog;
-using StackExchange.Redis;
 
 namespace Ulearn.Web.Api.Models.Binders
 {

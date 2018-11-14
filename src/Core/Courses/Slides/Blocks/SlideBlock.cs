@@ -3,7 +3,6 @@ using System.Collections.Immutable;
 using System.ComponentModel;
 using System.IO;
 using System.Xml.Serialization;
-using uLearn.Model;
 using Component = uLearn.Model.Edx.EdxComponents.Component;
 
 namespace uLearn.Courses.Slides.Blocks

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Database.Extensions;
@@ -10,7 +9,6 @@ using Database.Models;
 using JetBrains.Annotations;
 using log4net;
 using Microsoft.AspNet.Identity;
-using NUnit.Framework.Constraints;
 using uLearn;
 using uLearn.Courses;
 using uLearn.Courses.Slides;

@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Xml.Serialization;
 using uLearn.Courses.Slides.Blocks;
-using uLearn.Model;
 
 namespace uLearn.Courses.Slides
 {

@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using uLearn.Courses.Slides.Blocks;
-using uLearn.Model;
 using Ulearn.Common.Extensions;
 
 namespace uLearn.Courses.Slides

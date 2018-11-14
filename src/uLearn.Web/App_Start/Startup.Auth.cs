@@ -8,7 +8,6 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Owin;
-using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Interop;
 using Owin;

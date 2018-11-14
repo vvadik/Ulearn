@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Database;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
-using uLearn;
 using uLearn.Courses;
 
 namespace Ulearn.Web.Api.Models.Binders

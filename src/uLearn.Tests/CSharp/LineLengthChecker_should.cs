@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using ApprovalUtilities.Utilities;
 using NUnit.Framework;
 using uLearn.CSharp.Validators;
 

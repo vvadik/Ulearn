@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using NUnit.Framework.Internal;
 using uLearn.Courses;
 using uLearn.Courses.Slides;
 using uLearn.Courses.Slides.Blocks;
