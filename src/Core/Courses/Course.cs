@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
-using uLearn.Courses.Slides;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Units;
 
-namespace uLearn.Courses
+namespace Ulearn.Core.Courses
 {
 	public class Course : ICourse
 	{

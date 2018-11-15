@@ -2,8 +2,9 @@
 using System.IO;
 using ApprovalTests;
 using NUnit.Framework;
-using uLearn.Courses.Slides.Blocks;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.CSharp;
 
 namespace uLearn.CSharp
 {

@@ -11,9 +11,10 @@ using log4net;
 using Microsoft.EntityFrameworkCore;
 using RunCsJob.Api;
 using uLearn;
-using uLearn.Courses.Slides;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses.Slides;
 
 namespace Database.Repos
 {

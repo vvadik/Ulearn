@@ -18,11 +18,12 @@ using LtiLibrary.Core.Extensions;
 using RunCsJob.Api;
 using Serilog;
 using Telegram.Bot.Types.Enums;
-using uLearn.Courses.Slides;
-using uLearn.Telegram;
 using uLearn.Web.AntiPlagiarismUsage;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Telegram;
 using XQueue;
 using XQueue.Models;
 

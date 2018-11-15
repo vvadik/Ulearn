@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis;
 
-namespace uLearn.CSharp
+namespace Ulearn.Core.CSharp
 {
 	public class BracesPair
 	{

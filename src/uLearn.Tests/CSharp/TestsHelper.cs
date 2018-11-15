@@ -7,9 +7,10 @@ using Microsoft.VisualBasic.FileIO;
 using NUnit.Framework;
 using RunCsJob;
 using test;
-using uLearn.Courses.Slides;
-using uLearn.Courses.Slides.Blocks;
 using uLearn.CourseTool.Validating;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Units;
 
 namespace uLearn.CSharp
 {

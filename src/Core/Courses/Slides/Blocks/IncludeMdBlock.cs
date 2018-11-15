@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Xml.Serialization;
-using uLearn.Model.Edx.EdxComponents;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Model.Edx.EdxComponents;
 
-namespace uLearn.Courses.Slides.Blocks
+namespace Ulearn.Core.Courses.Slides.Blocks
 {
 	[XmlType("include-md")]
 	public class IncludeMdBlock : SlideBlock

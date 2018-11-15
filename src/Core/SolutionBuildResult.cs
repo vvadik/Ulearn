@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using uLearn.CSharp;
+using Ulearn.Core.CSharp;
 
-namespace uLearn
+namespace Ulearn.Core
 {
 	public class SolutionBuildResult
 	{

@@ -1,4 +1,3 @@
-using Ionic.Zip;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -10,18 +9,20 @@ using System.Threading;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Ionic.Zip;
 using JetBrains.Annotations;
 using log4net;
 using Telegram.Bot.Types.Enums;
-using uLearn.Configuration;
-using uLearn.Courses;
-using uLearn.Courses.Slides.Blocks;
-using uLearn.Helpers;
-using uLearn.Telegram;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Configuration;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Units;
+using Ulearn.Core.Helpers;
+using Ulearn.Core.Telegram;
 
-namespace uLearn
+namespace Ulearn.Core
 {
 	public class CourseManager
 	{

@@ -15,7 +15,7 @@ using Serilog;
 using Serilog.Debugging;
 using Serilog.Events;
 using Serilog.Extensions.Logging;
-using uLearn.Configuration;
+using Ulearn.Core.Configuration;
 using Vostok.Logging.Serilog.Enrichers;
 using ILogger = Serilog.ILogger;
 

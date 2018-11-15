@@ -1,9 +1,9 @@
 using System;
 using System.IO;
 using System.Xml.Serialization;
-using uLearn.Model.Edx.EdxComponents;
+using Ulearn.Core.Model.Edx.EdxComponents;
 
-namespace uLearn.Courses.Slides.Blocks
+namespace Ulearn.Core.Courses.Slides.Blocks
 {
 	public class IncludeCode : SlideBlock
 	{

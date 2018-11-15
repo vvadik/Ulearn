@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using uLearn.Courses.Slides;
-using uLearn.Courses.Slides.Blocks;
-using uLearn.Courses.Slides.Quizzes;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Quizzes;
 
-namespace uLearn.Courses
+namespace Ulearn.Core.Courses
 {
 	public class CourseDiff
 	{

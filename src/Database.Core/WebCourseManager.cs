@@ -8,7 +8,8 @@ using Database.Repos;
 using JetBrains.Annotations;
 using Serilog;
 using uLearn;
-using uLearn.Courses;
+using Ulearn.Core;
+using Ulearn.Core.Courses;
 
 namespace Database
 {

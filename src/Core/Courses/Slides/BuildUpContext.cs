@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using uLearn.Model;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Units;
+using Ulearn.Core.Model;
 
-namespace uLearn.Courses.Slides
+namespace Ulearn.Core.Courses.Slides
 {
 	public class BuildUpContext
 	{

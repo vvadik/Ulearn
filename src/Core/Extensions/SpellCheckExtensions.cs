@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using uLearn.Courses;
-using uLearn.Courses.Slides;
-using uLearn.SpellChecking;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.SpellChecking;
 
-namespace uLearn.Extensions
+namespace Ulearn.Core.Extensions
 {
 	public static class SpellCheckExtensions
 	{

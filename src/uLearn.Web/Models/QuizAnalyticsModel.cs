@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using Database.Models;
-using uLearn.Courses;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Units;
 
 namespace uLearn.Web.Models
 {

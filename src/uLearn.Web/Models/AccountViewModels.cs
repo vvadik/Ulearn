@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 using Database.Models;
-using uLearn.Courses;
 using Ulearn.Common;
+using Ulearn.Core.Courses;
 
 namespace uLearn.Web.Models
 {

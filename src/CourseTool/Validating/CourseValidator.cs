@@ -4,11 +4,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using RunCsJob;
-using uLearn.Courses;
-using uLearn.Courses.Slides;
-using uLearn.Courses.Slides.Blocks;
-using uLearn.Extensions;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Extensions;
 
 namespace uLearn.CourseTool.Validating
 {

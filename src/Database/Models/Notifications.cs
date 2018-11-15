@@ -6,11 +6,11 @@ using System.Data.Entity.Core.Objects;
 using System.Linq;
 using System.Reflection;
 using Database.DataContexts;
-using uLearn;
-using uLearn.Courses;
-using uLearn.Courses.Slides;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Units;
 
 namespace Database.Models
 {

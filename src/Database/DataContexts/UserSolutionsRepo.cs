@@ -15,11 +15,11 @@ using Database.Models;
 using EntityFramework.Functions;
 using log4net;
 using RunCsJob.Api;
-using uLearn;
-using uLearn.Courses.Slides;
-using uLearn.Courses.Slides.Blocks;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Blocks;
 
 namespace Database.DataContexts
 {

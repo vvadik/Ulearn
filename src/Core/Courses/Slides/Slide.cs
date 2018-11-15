@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
-using uLearn.Courses.Slides.Blocks;
-using uLearn.Courses.Slides.Quizzes;
-using uLearn.Model.Edx;
-using uLearn.Model.Edx.EdxComponents;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Quizzes;
+using Ulearn.Core.Model.Edx;
+using Ulearn.Core.Model.Edx.EdxComponents;
 
-namespace uLearn.Courses.Slides
+namespace Ulearn.Core.Courses.Slides
 {
 	public class Slide
 	{

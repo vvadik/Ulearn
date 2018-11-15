@@ -2,10 +2,10 @@ using System;
 using System.Threading.Tasks;
 using log4net;
 using Telegram.Bot.Types.Enums;
-using uLearn.Configuration;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Configuration;
 
-namespace uLearn.Telegram
+namespace Ulearn.Core.Telegram
 {
 	public class ErrorsBot : TelegramBot
 	{

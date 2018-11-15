@@ -3,10 +3,10 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Xml.Serialization;
 using RunCsJob.Api;
-using uLearn.Model;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Model;
 
-namespace uLearn.Courses.Slides.Blocks
+namespace Ulearn.Core.Courses.Slides.Blocks
 {
 	[XmlType("single-file-exercise")]
 	public class SingleFileExerciseBlock : ExerciseBlock

@@ -1,4 +1,4 @@
-﻿using uLearn.Courses;
+﻿using Ulearn.Core.Courses;
 
 #pragma warning disable 1591
 //------------------------------------------------------------------------------

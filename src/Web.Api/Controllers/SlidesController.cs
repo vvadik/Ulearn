@@ -3,7 +3,7 @@ using Database;
 using Database.Repos;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
-using uLearn.Courses;
+using Ulearn.Core.Courses;
 using Ulearn.Web.Api.Models.Common;
 
 namespace Ulearn.Web.Api.Controllers

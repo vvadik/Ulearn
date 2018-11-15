@@ -3,10 +3,11 @@ using System.Xml.Serialization;
 using ApprovalTests.Reporters;
 using FluentAssertions;
 using NUnit.Framework;
-using uLearn.Courses;
-using uLearn.Courses.Slides.Blocks;
-using uLearn.Courses.Slides.Quizzes;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Quizzes;
+using Ulearn.Core.Courses.Units;
 
 namespace uLearn.Quizes
 {

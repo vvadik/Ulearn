@@ -2,11 +2,13 @@
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
-using uLearn.Courses;
-using uLearn.Courses.Slides;
-using uLearn.Courses.Slides.Blocks;
 using uLearn.CSharp;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Units;
+using Ulearn.Core.CSharp;
 
 namespace uLearn
 {

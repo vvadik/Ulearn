@@ -1,11 +1,11 @@
 using System.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using uLearn.Courses;
-using uLearn.Courses.Slides;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
 
-namespace uLearn.CSharp
+namespace Ulearn.Core.CSharp
 {
 	public static class SlideParser
 	{

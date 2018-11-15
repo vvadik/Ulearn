@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace uLearn.Courses.Slides.Blocks
+namespace Ulearn.Core.Courses.Slides.Blocks
 {
 	public static class SlideBlockExtensions
 	{

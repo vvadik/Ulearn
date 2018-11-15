@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web.WebPages;
-using uLearn.Courses;
-using uLearn.Courses.Slides;
-using uLearn.Courses.Slides.Blocks;
 using uLearn.Web.Models;
 using uLearn.Web.Views.Course;
+using Ulearn.Core;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Units;
 
 namespace uLearn.CourseTool.Monitoring
 {

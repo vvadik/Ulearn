@@ -5,8 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using JetBrains.Annotations;
-using uLearn;
 using Ulearn.Common;
+using Ulearn.Core;
 
 namespace Database.DataContexts
 {

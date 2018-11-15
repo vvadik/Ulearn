@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Security.Principal;
 using uLearn;
-using uLearn.Courses;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Units;
 
 namespace Database.Repos
 {

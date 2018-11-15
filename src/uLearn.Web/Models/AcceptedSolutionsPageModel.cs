@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Security.Principal;
-using uLearn.Courses.Slides;
+using Ulearn.Core;
+using Ulearn.Core.Courses.Slides;
 
 namespace uLearn.Web.Models
 {

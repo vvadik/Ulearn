@@ -8,11 +8,12 @@ using Database.DataContexts;
 using Database.Models;
 using log4net;
 using Metrics;
-using uLearn.Courses.Slides;
-using uLearn.CSharp;
-using uLearn.Telegram;
 using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.CSharp;
+using Ulearn.Core.Telegram;
 
 namespace uLearn.Web.Controllers
 {

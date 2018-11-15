@@ -2,10 +2,10 @@
 using log4net;
 using log4net.Config;
 using NUnit.Framework;
-using uLearn.Courses.Slides;
-using uLearn.Courses.Slides.Blocks;
-using uLearn.Courses.Slides.Quizzes;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Quizzes;
 
 namespace uLearn
 {

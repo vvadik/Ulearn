@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using uLearn;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
 
 namespace Database.Repos
 {

@@ -2,13 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using uLearn.Courses;
-using uLearn.Courses.Slides;
-using uLearn.Courses.Slides.Quizzes;
-using uLearn.CSharp;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Quizzes;
+using Ulearn.Core.CSharp;
 
-namespace uLearn
+namespace Ulearn.Core.Courses.Units
 {
 	public class UnitLoader
 	{

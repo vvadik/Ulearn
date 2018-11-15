@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using uLearn;
 using Ulearn.Common;
+using Ulearn.Core;
 
 namespace Database.Repos
 {

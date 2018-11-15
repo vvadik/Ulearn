@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
-using uLearn.Courses;
+using Ulearn.Core.Courses;
 
 namespace Database.Repos.Groups
 {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace uLearn
+namespace Ulearn.Core
 {
 	public enum SubmissionLanguage: short
 	{

@@ -6,10 +6,11 @@ using Microsoft.Build.Evaluation;
 using Microsoft.VisualBasic.FileIO;
 using RunCsJob;
 using RunCsJob.Api;
-using uLearn.Courses.Slides;
-using uLearn.Courses.Slides.Blocks;
-using uLearn.Helpers;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Helpers;
 using SearchOption = Microsoft.VisualBasic.FileIO.SearchOption;
 
 namespace uLearn.CourseTool.Validating

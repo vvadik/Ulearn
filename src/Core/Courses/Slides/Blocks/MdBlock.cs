@@ -6,10 +6,10 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
-using uLearn.Model.Edx.EdxComponents;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Model.Edx.EdxComponents;
 
-namespace uLearn.Courses.Slides.Blocks
+namespace Ulearn.Core.Courses.Slides.Blocks
 {
 	public class MdBlock : SlideBlock, IXmlSerializable
 	{

@@ -1,11 +1,11 @@
 ﻿using log4net.Appender;
 using log4net.Core;
-using Telegram.Bot.Types.Enums;
-using uLearn.Telegram;
 using Telegram.Bot.Exceptions;
+using Telegram.Bot.Types.Enums;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Telegram;
 
-namespace uLearn.Logging
+namespace Ulearn.Core.Logging
 {
 	public class TelegramAppender : AppenderSkeleton
 	{

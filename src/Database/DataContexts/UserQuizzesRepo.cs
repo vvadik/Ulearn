@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using ApprovalUtilities.Utilities;
 using Database.Models;
-using uLearn.Courses.Slides.Quizzes;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Slides.Quizzes;
 
 namespace Database.DataContexts
 {

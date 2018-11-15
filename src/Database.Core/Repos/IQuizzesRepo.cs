@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Database.Models;
-using uLearn.Courses.Slides.Quizzes;
+using Ulearn.Core.Courses.Slides.Quizzes;
 
 namespace Database.Repos
 {

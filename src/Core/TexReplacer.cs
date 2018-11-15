@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Web;
 
-namespace uLearn
+namespace Ulearn.Core
 {
 	public class TexReplacer
 	{

@@ -12,12 +12,13 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using Microsoft.AspNet.Identity;
-using uLearn.Configuration;
-using uLearn.Courses;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Configuration;
+using Ulearn.Core.Courses;
 using Web.Api.Configuration;
 
 namespace uLearn.Web.Controllers

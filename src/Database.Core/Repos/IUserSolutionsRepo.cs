@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Database.Models;
 using RunCsJob.Api;
 using uLearn;
+using Ulearn.Core;
 
 namespace Database.Repos
 {

@@ -1,8 +1,8 @@
 using System.IO;
 using System.Xml.Serialization;
-using uLearn.Model.Edx.EdxComponents;
+using Ulearn.Core.Model.Edx.EdxComponents;
 
-namespace uLearn.Courses.Slides.Blocks
+namespace Ulearn.Core.Courses.Slides.Blocks
 {
 	[XmlType("gallery-images")]
 	public class ImageGalleryBlock : SlideBlock

@@ -15,17 +15,19 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using Microsoft.VisualBasic.FileIO;
-using uLearn.Courses;
-using uLearn.Courses.Slides;
-using uLearn.Courses.Slides.Blocks;
-using uLearn.Courses.Slides.Quizzes;
-using uLearn.CSharp;
-using uLearn.Extensions;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Quizzes;
+using Ulearn.Core.Courses.Units;
+using Ulearn.Core.CSharp;
+using Ulearn.Core.Extensions;
 
 namespace uLearn.Web.Controllers
 {

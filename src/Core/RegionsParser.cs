@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Ulearn.Common.Extensions;
 
-namespace uLearn
+namespace Ulearn.Core
 {
 	public static class RegionsParser
 	{

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using uLearn.Courses;
+using Ulearn.Core.Courses;
 
 namespace uLearn.Web.Models
 {

@@ -4,9 +4,9 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
-using uLearn.Model.Edx.EdxComponents;
+using Ulearn.Core.Model.Edx.EdxComponents;
 
-namespace uLearn.Courses.Slides.Blocks
+namespace Ulearn.Core.Courses.Slides.Blocks
 {
 	public class VideoAnnotationFragment
 	{

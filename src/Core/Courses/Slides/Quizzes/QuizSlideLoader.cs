@@ -3,8 +3,9 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Units;
 
-namespace uLearn.Courses.Slides.Quizzes
+namespace Ulearn.Core.Courses.Slides.Quizzes
 {
 	public class QuizSlideLoader : ISlideLoader
 	{

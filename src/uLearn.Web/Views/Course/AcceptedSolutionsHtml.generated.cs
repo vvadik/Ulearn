@@ -1,5 +1,6 @@
 ﻿using Database.Extensions;
-using uLearn.Courses.Slides.Blocks;
+using Ulearn.Core;
+using Ulearn.Core.Courses.Slides.Blocks;
 
 #pragma warning disable 1591
 //------------------------------------------------------------------------------

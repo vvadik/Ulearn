@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
-using uLearn.Courses.Slides.Blocks;
-using uLearn.Courses.Slides.Quizzes;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Quizzes;
 
-namespace uLearn.Courses.Slides
+namespace Ulearn.Core.Courses.Slides
 {
 	[XmlType("exported-slide")]
 	public class ExportedSlide

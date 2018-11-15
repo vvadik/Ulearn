@@ -1,6 +1,6 @@
-﻿using uLearn.Courses.Slides;
-using uLearn.Courses.Slides.Blocks;
-using uLearn.Courses.Slides.Quizzes;
+﻿using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Quizzes;
 
 #pragma warning disable 1591
 //------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ namespace uLearn.Web.Views.Course
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Page(Courses.Course course, Slide slide, TocModel toc, IEnumerable<string> cssFiles, IEnumerable<string> jsFiles)
+public static System.Web.WebPages.HelperResult Page(Ulearn.Core.Courses.Course course, Slide slide, TocModel toc, IEnumerable<string> cssFiles, IEnumerable<string> jsFiles)
 {
 #line default
 #line hidden

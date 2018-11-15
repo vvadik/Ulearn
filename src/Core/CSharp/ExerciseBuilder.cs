@@ -4,10 +4,11 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using uLearn.Courses.Slides.Blocks;
+using uLearn;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Slides.Blocks;
 
-namespace uLearn.CSharp
+namespace Ulearn.Core.CSharp
 {
 	public class ExerciseBuilder : CSharpSyntaxRewriter
 	{

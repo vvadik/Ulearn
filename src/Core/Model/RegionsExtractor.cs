@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using uLearn.Courses.Slides.Blocks;
-using uLearn.CSharp;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.CSharp;
 
-namespace uLearn.Model
+namespace Ulearn.Core.Model
 {
 	public interface ISingleRegionExtractor
 	{

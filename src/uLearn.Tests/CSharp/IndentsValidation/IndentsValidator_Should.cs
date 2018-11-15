@@ -13,8 +13,9 @@ using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using NUnit.Framework;
-using uLearn.CSharp.Validators.IndentsValidation;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.CSharp;
+using Ulearn.Core.CSharp.Validators.IndentsValidation;
 
 // ReSharper disable InconsistentNaming
 

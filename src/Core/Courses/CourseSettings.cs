@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using Ulearn.Common.Extensions;
 
-namespace uLearn.Courses
+namespace Ulearn.Core.Courses
 {
 	/*
 	 * These settings are loading from course.xml from the root folder of course. 

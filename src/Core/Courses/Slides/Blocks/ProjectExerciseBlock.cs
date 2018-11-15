@@ -9,14 +9,14 @@ using System.Xml.Serialization;
 using log4net;
 using Microsoft.Build.Evaluation;
 using RunCsJob.Api;
-using uLearn.Extensions;
-using uLearn.Helpers;
-using uLearn.NUnitTestRunning;
-using uLearn.Properties;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Extensions;
+using Ulearn.Core.Helpers;
+using Ulearn.Core.NUnitTestRunning;
+using Ulearn.Core.Properties;
 
-namespace uLearn.Courses.Slides.Blocks
+namespace Ulearn.Core.Courses.Slides.Blocks
 {
 	[XmlType("proj-exercise")]
 	public class ProjectExerciseBlock : ExerciseBlock

@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Database.Models;
 using JetBrains.Annotations;
 using log4net;
-using uLearn.Courses.Slides;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Slides;
 
 namespace Database.DataContexts
 {

@@ -3,8 +3,8 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using log4net;
-using uLearn.Extensions;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Extensions;
 
 namespace Notifications
 {

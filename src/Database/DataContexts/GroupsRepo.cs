@@ -9,13 +9,13 @@ using Database.Models;
 using JetBrains.Annotations;
 using log4net;
 using Microsoft.AspNet.Identity;
-using uLearn;
-using uLearn.Courses;
-using uLearn.Courses.Slides;
-using uLearn.Courses.Slides.Quizzes;
-using uLearn.Extensions;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Quizzes;
+using Ulearn.Core.Extensions;
 
 namespace Database.DataContexts
 {

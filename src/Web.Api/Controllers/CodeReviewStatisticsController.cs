@@ -10,8 +10,8 @@ using Database.Repos.Groups;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using uLearn.Courses;
-using uLearn.Courses.Slides;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
 using Ulearn.Web.Api.Authorization;
 using Ulearn.Web.Api.Models.Responses.CodeReviewStatistics;
 

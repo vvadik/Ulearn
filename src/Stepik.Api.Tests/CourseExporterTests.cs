@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using log4net.Config;
 using NUnit.Framework;
-using uLearn.Courses;
+using Ulearn.Core.Courses;
 
 namespace Stepik.Api.Tests
 {

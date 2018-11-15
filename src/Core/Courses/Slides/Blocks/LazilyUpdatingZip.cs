@@ -8,7 +8,7 @@ using NUnit.Framework;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 
-namespace uLearn.Courses.Slides.Blocks
+namespace Ulearn.Core.Courses.Slides.Blocks
 {
 	public class LazilyUpdatingZip
 	{

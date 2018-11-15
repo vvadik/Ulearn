@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using uLearn.Courses;
-using uLearn.Courses.Slides;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Slides;
 
-namespace uLearn
+namespace Ulearn.Core.Courses.Units
 {
 	public class Unit
 	{

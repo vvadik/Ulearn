@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using uLearn.Courses.Slides;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Units;
 
-namespace uLearn.Courses
+namespace Ulearn.Core.Courses
 {
 	public interface ICourse
 	{

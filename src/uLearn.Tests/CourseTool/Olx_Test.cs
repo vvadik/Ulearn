@@ -1,6 +1,6 @@
 using NUnit.Framework;
-using uLearn.Model.Edx.EdxComponents;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Model.Edx.EdxComponents;
 
 namespace uLearn.CourseTool
 {

@@ -2,7 +2,7 @@
 using System.IO;
 using Ionic.Zip;
 
-namespace uLearn
+namespace Ulearn.Core
 {
 	public static class Utils
 	{

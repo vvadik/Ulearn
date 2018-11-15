@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using uLearn.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Blocks;
 
-namespace uLearn.Courses.Slides
+namespace Ulearn.Core.Courses.Slides
 {
 	public class ExerciseSlide : Slide
 	{

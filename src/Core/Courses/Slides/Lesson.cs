@@ -1,9 +1,9 @@
 using System;
 using System.Linq;
 using System.Xml.Serialization;
-using uLearn.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Blocks;
 
-namespace uLearn.Courses.Slides
+namespace Ulearn.Core.Courses.Slides
 {
 	[XmlType(IncludeInSchema = false)]
 	public enum BlockType

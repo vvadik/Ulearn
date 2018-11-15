@@ -4,10 +4,10 @@ using System.Linq;
 using log4net;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using uLearn.CSharp.Validators.IndentsValidation;
-using uLearn.CSharp.Validators.VerbInMethodNameValidation;
+using Ulearn.Core.CSharp.Validators.IndentsValidation;
+using Ulearn.Core.CSharp.Validators.VerbInMethodNameValidation;
 
-namespace uLearn.CSharp.Validators
+namespace Ulearn.Core.CSharp.Validators
 {
 	public class CSharpSolutionValidator : ISolutionValidator
 	{

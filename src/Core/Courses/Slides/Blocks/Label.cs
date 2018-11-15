@@ -1,6 +1,6 @@
 ﻿using System.Xml.Serialization;
 
-namespace uLearn.Courses.Slides.Blocks
+namespace Ulearn.Core.Courses.Slides.Blocks
 {
 	///<summary>Отметка в коде</summary>
 	public class Label

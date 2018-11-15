@@ -3,8 +3,9 @@ using System.Linq;
 using System.Web.Hosting;
 using Elmah;
 using log4net;
-using uLearn.Telegram;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Telegram;
 
 namespace uLearn.Web
 {

@@ -5,9 +5,9 @@ using System.Text.RegularExpressions;
 using System.Web;
 using MarkdownDeep;
 using Microsoft.AspNetCore.Html;
-using uLearn.Courses;
+using Ulearn.Core.Courses;
 
-namespace uLearn
+namespace Ulearn.Core
 {
 	public static class Md
 	{

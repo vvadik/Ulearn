@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace uLearn.CSharp
+namespace Ulearn.Core.CSharp
 {
 	public static class NameStylePrimitives
 	{

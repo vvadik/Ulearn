@@ -14,15 +14,16 @@ using Database.Models;
 using JetBrains.Annotations;
 using log4net;
 using Metrics;
-using uLearn.Courses;
-using uLearn.Courses.Slides.Quizzes;
-using uLearn.Extensions;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.LTI;
 using uLearn.Web.Models;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides.Quizzes;
+using Ulearn.Core.Extensions;
 
 namespace uLearn.Web.Controllers
 {

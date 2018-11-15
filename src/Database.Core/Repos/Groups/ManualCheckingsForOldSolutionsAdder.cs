@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Serilog;
-using uLearn.Courses.Slides;
-using uLearn.Courses.Slides.Quizzes;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Quizzes;
 
 namespace Database.Repos.Groups
 {

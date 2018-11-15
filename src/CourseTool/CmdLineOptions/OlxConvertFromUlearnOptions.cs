@@ -3,10 +3,11 @@ using System.IO;
 using System.Linq;
 using CommandLine;
 using Newtonsoft.Json;
-using uLearn.Courses;
 using uLearn.CourseTool.Json;
-using uLearn.Model.Edx;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Model.Edx;
 
 namespace uLearn.CourseTool.CmdLineOptions
 {

@@ -4,11 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.Build.Evaluation;
-using uLearn.Courses.Slides.Blocks;
-using uLearn.Helpers;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Helpers;
 
-namespace uLearn
+namespace Ulearn.Core
 {
 	public class FileToCopy
 	{

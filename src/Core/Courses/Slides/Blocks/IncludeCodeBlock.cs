@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using System.Xml.Serialization;
 using Ulearn.Common.Extensions;
 
-namespace uLearn.Courses.Slides.Blocks
+namespace Ulearn.Core.Courses.Slides.Blocks
 {
 	[XmlType("include-code")]
 	public class IncludeCodeBlock : IncludeCode

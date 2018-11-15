@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Xml.Serialization;
-using uLearn.Configuration;
+using Ulearn.Core.Configuration;
 
-namespace uLearn.Courses.Slides
+namespace Ulearn.Core.Courses.Slides
 {
 	public class SlideMetaDescription
 	{

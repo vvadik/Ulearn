@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using SyntaxNodeOrToken = uLearn.CSharp.Validators.IndentsValidation.SyntaxNodeOrToken;
+using SyntaxNodeOrToken = Ulearn.Core.CSharp.Validators.IndentsValidation.SyntaxNodeOrToken;
 
-namespace uLearn.CSharp.Validators
+namespace Ulearn.Core.CSharp.Validators
 {
 	public abstract class BaseStyleValidator : ICSharpSolutionValidator
 	{

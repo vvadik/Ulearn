@@ -1,6 +1,6 @@
 using System;
 
-namespace uLearn.CSharp
+namespace Ulearn.Core.CSharp
 {
 	public class ExerciseAttribute : Attribute
 	{

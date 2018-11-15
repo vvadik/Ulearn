@@ -5,11 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
 using RunCsJob.Api;
-using uLearn.Model.Edx.EdxComponents;
 using Ulearn.Common.Extensions;
-using Component = uLearn.Model.Edx.EdxComponents.Component;
+using Ulearn.Core.Model.Edx.EdxComponents;
+using Component = Ulearn.Core.Model.Edx.EdxComponents.Component;
 
-namespace uLearn.Courses.Slides.Blocks
+namespace Ulearn.Core.Courses.Slides.Blocks
 {
 	public abstract class ExerciseBlock : IncludeCode
 	{

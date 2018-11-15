@@ -1,10 +1,11 @@
 using System.IO;
 using System.Linq;
-using uLearn.Courses;
-using uLearn.Courses.Slides;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Units;
 
-namespace uLearn.CSharp
+namespace Ulearn.Core.CSharp
 {
 	public class CSharpSlideLoader : ISlideLoader
 	{

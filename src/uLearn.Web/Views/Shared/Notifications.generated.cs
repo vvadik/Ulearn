@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNet.Identity;
-using uLearn.Courses.Slides;
-using uLearn.Courses.Slides.Quizzes;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Quizzes;
+using Ulearn.Core.Extensions;
 
 #pragma warning disable 1591
 //------------------------------------------------------------------------------
@@ -35,7 +36,6 @@ namespace uLearn.Web.Views.Shared
     using uLearn;
     using Ulearn.Common;
     using Ulearn.Common.Extensions;
-    using uLearn.Extensions;
 	using uLearn.Web;
     using uLearn.Web.Extensions;
     using uLearn.Web.Models;
@@ -46,7 +46,7 @@ namespace uLearn.Web.Views.Shared
     {
 	
 
-	private static string GetSlideUrl(UrlHelper Url, Courses.Course course, Slide slide)
+	private static string GetSlideUrl(UrlHelper Url, Ulearn.Core.Courses.Course course, Slide slide)
 	{
 		return Url.RouteUrl("Course.SlideById", new { courseId = course.Id, slideId = slide.Url });
 	}
@@ -64,7 +64,7 @@ namespace uLearn.Web.Views.Shared
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult SlideLink(UrlHelper Url, Courses.Course course, Slide slide)
+public static System.Web.WebPages.HelperResult SlideLink(UrlHelper Url, Ulearn.Core.Courses.Course course, Slide slide)
 {
 #line default
 #line hidden
@@ -123,7 +123,7 @@ WriteLiteralTo(__razor_helper_writer, "</span>\r\n");
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Notification(SystemMessageNotification notification, Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+public static System.Web.WebPages.HelperResult Notification(SystemMessageNotification notification, Ulearn.Core.Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
 #line default
 #line hidden
@@ -176,7 +176,7 @@ WriteLiteralTo(__razor_helper_writer, "</div>\r\n\t\t</div>\r\n\t</div>\r\n");
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Notification(InstructorMessageNotification notification, Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+public static System.Web.WebPages.HelperResult Notification(InstructorMessageNotification notification, Ulearn.Core.Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
 #line default
 #line hidden
@@ -243,7 +243,7 @@ WriteLiteralTo(__razor_helper_writer, "</div>\r\n\t\t</div>\r\n\t</div>\r\n");
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Notification(NewCommentNotification notification, Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+public static System.Web.WebPages.HelperResult Notification(NewCommentNotification notification, Ulearn.Core.Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
 #line default
 #line hidden
@@ -336,7 +336,7 @@ WriteLiteralTo(__razor_helper_writer, "</div>\r\n\t\t</div>\r\n\t</div>\r\n");
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Notification(RepliedToYourCommentNotification notification, Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+public static System.Web.WebPages.HelperResult Notification(RepliedToYourCommentNotification notification, Ulearn.Core.Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
 #line default
 #line hidden
@@ -444,7 +444,7 @@ WriteLiteralTo(__razor_helper_writer, "</span>\r\n\t\t\t</div>\r\n\t\t</div>\r\n
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Notification(LikedYourCommentNotification notification, Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+public static System.Web.WebPages.HelperResult Notification(LikedYourCommentNotification notification, Ulearn.Core.Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
 #line default
 #line hidden
@@ -531,7 +531,7 @@ WriteLiteralTo(__razor_helper_writer, "</div>\r\n\t\t</div>\r\n\t</div>\r\n");
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Notification(PassedManualExerciseCheckingNotification notification, Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+public static System.Web.WebPages.HelperResult Notification(PassedManualExerciseCheckingNotification notification, Ulearn.Core.Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
 #line default
 #line hidden
@@ -621,7 +621,7 @@ WriteLiteralTo(__razor_helper_writer, "</div>\r\n\t\t</div>\r\n\t</div>\r\n");
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Notification(PassedManualQuizCheckingNotification notification, Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+public static System.Web.WebPages.HelperResult Notification(PassedManualQuizCheckingNotification notification, Ulearn.Core.Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
 #line default
 #line hidden
@@ -707,7 +707,7 @@ WriteLiteralTo(__razor_helper_writer, "</div>\r\n\t\t</div>\r\n\t</div>\r\n");
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Notification(ReceivedCertificateNotification notification, Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+public static System.Web.WebPages.HelperResult Notification(ReceivedCertificateNotification notification, Ulearn.Core.Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
 #line default
 #line hidden
@@ -772,7 +772,7 @@ WriteLiteralTo(__razor_helper_writer, "</div>\r\n\t\t</div>\r\n\t</div>\r\n");
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Notification(ReceivedAdditionalScoreNotification notification, Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+public static System.Web.WebPages.HelperResult Notification(ReceivedAdditionalScoreNotification notification, Ulearn.Core.Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
 #line default
 #line hidden
@@ -858,7 +858,7 @@ WriteLiteralTo(__razor_helper_writer, "</div>\r\n\t\t</div>\r\n\t</div>\r\n");
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Notification(ReceivedCommentToCodeReviewNotification notification, Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+public static System.Web.WebPages.HelperResult Notification(ReceivedCommentToCodeReviewNotification notification, Ulearn.Core.Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
 #line default
 #line hidden
@@ -945,7 +945,7 @@ WriteLiteralTo(__razor_helper_writer, "</div>\r\n        </div>\r\n    </div>\r\
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Notification(JoinedToYourGroupNotification notification, Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+public static System.Web.WebPages.HelperResult Notification(JoinedToYourGroupNotification notification, Ulearn.Core.Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
 #line default
 #line hidden
@@ -1018,7 +1018,7 @@ WriteLiteralTo(__razor_helper_writer, "</div>\r\n\t\t</div>\r\n\t</div>\r\n");
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Notification(GrantedAccessToGroupNotification notification, Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+public static System.Web.WebPages.HelperResult Notification(GrantedAccessToGroupNotification notification, Ulearn.Core.Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
 #line default
 #line hidden
@@ -1097,7 +1097,7 @@ WriteLiteralTo(__razor_helper_writer, "</div>\r\n\t\t</div>\r\n\t</div>\r\n");
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Notification(RevokedAccessToGroupNotification notification, Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+public static System.Web.WebPages.HelperResult Notification(RevokedAccessToGroupNotification notification, Ulearn.Core.Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
 #line default
 #line hidden
@@ -1166,7 +1166,7 @@ WriteLiteralTo(__razor_helper_writer, "</div>\r\n\t\t</div>\r\n\t</div>\r\n");
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Notification(GroupMemberHasBeenRemovedNotification notification, Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+public static System.Web.WebPages.HelperResult Notification(GroupMemberHasBeenRemovedNotification notification, Ulearn.Core.Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
 #line default
 #line hidden
@@ -1249,7 +1249,7 @@ WriteLiteralTo(__razor_helper_writer, "</div>\r\n\t\t</div>\r\n\t</div>\r\n");
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Notification(GroupMembersHaveBeenRemovedNotification notification, Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+public static System.Web.WebPages.HelperResult Notification(GroupMembersHaveBeenRemovedNotification notification, Ulearn.Core.Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
 #line default
 #line hidden
@@ -1336,7 +1336,7 @@ WriteLiteralTo(__razor_helper_writer, "</div>\r\n        </div>\r\n    </div>\r\
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Notification(GroupMembersHaveBeenAddedNotification notification, Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+public static System.Web.WebPages.HelperResult Notification(GroupMembersHaveBeenAddedNotification notification, Ulearn.Core.Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
 #line default
 #line hidden
@@ -1423,7 +1423,7 @@ WriteLiteralTo(__razor_helper_writer, "</div>\r\n        </div>\r\n    </div>\r\
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Notification(NewCommentForInstructorsOnlyNotification notification, Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+public static System.Web.WebPages.HelperResult Notification(NewCommentForInstructorsOnlyNotification notification, Ulearn.Core.Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
 #line default
 #line hidden
@@ -1520,7 +1520,7 @@ WriteLiteralTo(__razor_helper_writer, "</div>\r\n        </div>\r\n    </div>\r\
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Notification(AddedInstructorNotification notification, Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+public static System.Web.WebPages.HelperResult Notification(AddedInstructorNotification notification, Ulearn.Core.Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
 #line default
 #line hidden
@@ -1593,7 +1593,7 @@ WriteLiteralTo(__razor_helper_writer, "</div>\r\n\t\t</div>\r\n\t</div>\r\n");
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Notification(CreatedGroupNotification notification, Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+public static System.Web.WebPages.HelperResult Notification(CreatedGroupNotification notification, Ulearn.Core.Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
 #line default
 #line hidden
@@ -1670,7 +1670,7 @@ WriteLiteralTo(__razor_helper_writer, "</div>\r\n\t\t</div>\r\n\t</div>\r\n");
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Notification(UploadedPackageNotification notification, Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+public static System.Web.WebPages.HelperResult Notification(UploadedPackageNotification notification, Ulearn.Core.Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
 #line default
 #line hidden
@@ -1743,7 +1743,7 @@ WriteLiteralTo(__razor_helper_writer, "</div>\r\n\t\t</div>\r\n\t</div>\r\n");
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Notification(PublishedPackageNotification notification, Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+public static System.Web.WebPages.HelperResult Notification(PublishedPackageNotification notification, Ulearn.Core.Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
 #line default
 #line hidden
@@ -1816,7 +1816,7 @@ WriteLiteralTo(__razor_helper_writer, "</div>\r\n\t\t</div>\r\n\t</div>\r\n");
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Notification(CourseExportedToStepikNotification notification, Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+public static System.Web.WebPages.HelperResult Notification(CourseExportedToStepikNotification notification, Ulearn.Core.Courses.Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
 #line default
 #line hidden

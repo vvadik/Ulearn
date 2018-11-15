@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace uLearn.Courses
+namespace Ulearn.Core.Courses
 {
 	public static class CourseUnitUtils
 	{

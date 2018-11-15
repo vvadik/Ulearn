@@ -11,8 +11,8 @@ using Graphite;
 using log4net;
 using log4net.Config;
 using Metrics;
-using uLearn;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
 using XQueue;
 using XQueue.Models;
 

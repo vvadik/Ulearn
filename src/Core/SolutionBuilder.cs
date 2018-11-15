@@ -1,7 +1,7 @@
-﻿using uLearn.Courses.Slides.Blocks;
-using uLearn.Extensions;
+﻿using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Extensions;
 
-namespace uLearn
+namespace Ulearn.Core
 {
 	public class SolutionBuilder
 	{

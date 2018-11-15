@@ -1,7 +1,7 @@
 using System;
 using MarkdownDeep;
 
-namespace uLearn
+namespace Ulearn.Core
 {
 	public class Markdown2 : Markdown
 	{

@@ -3,8 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Database.DataContexts;
 using log4net;
-using uLearn;
-using uLearn.Courses;
+using Ulearn.Core;
+using Ulearn.Core.Courses;
 
 namespace Database
 {

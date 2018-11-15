@@ -4,9 +4,10 @@ using System.Web.Mvc;
 using Database;
 using Database.DataContexts;
 using Microsoft.AspNet.Identity;
-using uLearn.Courses.Slides;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
+using Ulearn.Core;
+using Ulearn.Core.Courses.Slides;
 
 namespace uLearn.Web.Controllers
 {

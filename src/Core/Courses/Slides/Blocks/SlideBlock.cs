@@ -3,9 +3,9 @@ using System.Collections.Immutable;
 using System.ComponentModel;
 using System.IO;
 using System.Xml.Serialization;
-using Component = uLearn.Model.Edx.EdxComponents.Component;
+using Component = Ulearn.Core.Model.Edx.EdxComponents.Component;
 
-namespace uLearn.Courses.Slides.Blocks
+namespace Ulearn.Core.Courses.Slides.Blocks
 {
 	public abstract class SlideBlock
 	{

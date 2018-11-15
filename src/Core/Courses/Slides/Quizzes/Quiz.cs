@@ -5,12 +5,12 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
-using uLearn.Courses.Slides.Blocks;
-using uLearn.Model.Edx.EdxComponents;
 using Ulearn.Common.Extensions;
-using Component = uLearn.Model.Edx.EdxComponents.Component;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Model.Edx.EdxComponents;
+using Component = Ulearn.Core.Model.Edx.EdxComponents.Component;
 
-namespace uLearn.Courses.Slides.Quizzes
+namespace Ulearn.Core.Courses.Slides.Quizzes
 {
 	[XmlRoot("Quiz", IsNullable = false, Namespace = "https://ulearn.azurewebsites.net/quiz")]
 	public class Quiz

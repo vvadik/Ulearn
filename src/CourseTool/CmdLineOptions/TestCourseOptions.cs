@@ -6,8 +6,8 @@ using System.Linq;
 using System.Text;
 using CommandLine;
 using RunCsJob;
-using uLearn.Courses;
 using uLearn.CourseTool.Validating;
+using Ulearn.Core.Courses;
 
 namespace uLearn.CourseTool.CmdLineOptions
 {

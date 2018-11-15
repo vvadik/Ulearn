@@ -1,9 +1,9 @@
 using System.Linq;
-using uLearn.Courses.Slides.Blocks;
-using uLearn.CSharp.Validators;
-using uLearn.CSharp.Validators.VerbInMethodNameValidation;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.CSharp.Validators;
+using Ulearn.Core.CSharp.Validators.VerbInMethodNameValidation;
 
-namespace uLearn
+namespace Ulearn.Core
 {
 	public class ValidatorsRepository
 	{

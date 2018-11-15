@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Ulearn.Common.Extensions;
 
-namespace uLearn.CSharp
+namespace Ulearn.Core.CSharp
 {
 	public static class SyntaxExtensions
 	{

@@ -4,12 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.Build.Evaluation;
-using uLearn.Courses.Slides;
-using uLearn.Courses.Slides.Blocks;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Blocks;
 
-namespace uLearn.Helpers
+namespace Ulearn.Core.Helpers
 {
 	public class ExerciseStudentZipBuilder
 	{

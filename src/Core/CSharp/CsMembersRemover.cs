@@ -3,10 +3,10 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using uLearn.Courses.Slides.Blocks;
-using uLearn.Model;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Model;
 
-namespace uLearn.CSharp
+namespace Ulearn.Core.CSharp
 {
 	public class CsMembersRemover : IRegionRemover
 	{

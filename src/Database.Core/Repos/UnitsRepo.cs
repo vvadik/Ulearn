@@ -5,7 +5,8 @@ using System.Security.Principal;
 using Database.Extensions;
 using Database.Models;
 using uLearn;
-using uLearn.Courses;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Units;
 
 namespace Database.Repos
 {

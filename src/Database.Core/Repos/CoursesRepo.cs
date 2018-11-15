@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Database.Extensions;
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
-using uLearn.Extensions;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Extensions;
 
 namespace Database.Repos
 {

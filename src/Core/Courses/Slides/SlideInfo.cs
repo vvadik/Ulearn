@@ -1,6 +1,7 @@
 ﻿using System.IO;
+using Ulearn.Core.Courses.Units;
 
-namespace uLearn.Courses.Slides
+namespace Ulearn.Core.Courses.Slides
 {
 	public class SlideInfo
 	{

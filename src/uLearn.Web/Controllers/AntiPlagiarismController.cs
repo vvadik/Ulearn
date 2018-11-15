@@ -17,11 +17,12 @@ using Database.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Serilog;
-using uLearn.Courses;
-using uLearn.Courses.Slides;
 using uLearn.Web.FilterAttributes;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
 
 namespace uLearn.Web.Controllers
 {

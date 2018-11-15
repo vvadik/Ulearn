@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using uLearn.CSharp.Validators;
+using Ulearn.Core.CSharp;
+using Ulearn.Core.CSharp.Validators;
 
 namespace uLearn.CSharp
 {

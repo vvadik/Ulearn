@@ -10,7 +10,7 @@ using NUnit.Framework.Internal;
 
 [assembly: InternalsVisibleTo("NUnit.Framework")]
 
-namespace uLearn.NUnitTestRunning
+namespace Ulearn.Core.NUnitTestRunning
 {
 	/// <summary>
 	/// Этот файл включен в ресурсы и добавляется в пришедший на проверку проект с задачей, если у нее в качестве способа проверки 

@@ -2,7 +2,7 @@
 using System.Collections.Specialized;
 using System.Linq;
 
-namespace uLearn.Extensions
+namespace Ulearn.Core.Extensions
 {
 	public static class NameValueCollectionExtensions
 	{

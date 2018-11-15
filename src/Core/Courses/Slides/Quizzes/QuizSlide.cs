@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace uLearn.Courses.Slides.Quizzes
+namespace Ulearn.Core.Courses.Slides.Quizzes
 {
 	public class QuizSlide : Slide
 	{

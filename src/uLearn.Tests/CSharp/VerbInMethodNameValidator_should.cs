@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using FluentAssertions;
 using NUnit.Framework;
-using uLearn.CSharp.Validators.VerbInMethodNameValidation;
+using Ulearn.Core.CSharp;
+using Ulearn.Core.CSharp.Validators.VerbInMethodNameValidation;
 
 namespace uLearn.CSharp
 {

@@ -4,10 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
-using uLearn.Courses;
 using Ulearn.Common.Extensions;
 
-namespace uLearn
+namespace Ulearn.Core.Courses.Units
 {
 	[XmlRoot("Unit", IsNullable = false, Namespace = "https://ulearn.azurewebsites.net/unit")]
 	public class UnitSettings

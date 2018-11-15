@@ -1,10 +1,11 @@
 ﻿using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using uLearn.Courses.Slides.Blocks;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Units;
 
-namespace uLearn.Courses.Slides
+namespace Ulearn.Core.Courses.Slides
 {
 	public class LessonSlideLoader : ISlideLoader
 	{

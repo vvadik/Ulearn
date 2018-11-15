@@ -1,4 +1,4 @@
-﻿using uLearn.Configuration;
+﻿using Ulearn.Core.Configuration;
 
 namespace AntiPlagiarism.Web.Configuration
 {

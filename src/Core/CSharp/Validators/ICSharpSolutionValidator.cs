@@ -2,7 +2,7 @@
 using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 
-namespace uLearn.CSharp.Validators
+namespace Ulearn.Core.CSharp.Validators
 {
 	public interface ICSharpSolutionValidator
 	{

@@ -11,10 +11,11 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Interop;
 using Owin;
-using uLearn.Configuration;
 using uLearn.Web.Kontur.Passport;
 using uLearn.Web.LTI;
 using uLearn.Web.Microsoft.Owin.Security.VK;
+using Ulearn.Core;
+using Ulearn.Core.Configuration;
 using Web.Api.Configuration;
 
 namespace uLearn.Web
