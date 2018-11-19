@@ -22,7 +22,8 @@ export function createGroup(courseId, name) {
 }
 
 export function copyGroup(groupId, destination_course_id, value) {
-	return api.post("groups/" + groupId + "/copy?destination_course_id=" + encodeURIComponent(destination_course_id) + '&make_me_owner=' + value)
+	return api.post("groups/" + groupId + "/copy?destination_course_id="
+		+ encodeURIComponent(destination_course_id) + '&make_me_owner=' + value)
 		.then(response => response.json());
 }
 
@@ -40,6 +41,22 @@ export function deleteGroup(groupId) {
 export function changeGroupOwner(groupId, owner) {
 	return api.put("groups/" + groupId + '/owner',
 		createRequestParams({owner: owner}))
+		.then(response => response.json());
+}
+
+export function getGroupScores(groupId) {
+	return api.get("groups/" + groupId + '/scores')
+		.then(response => response.json());
+}
+
+export function saveScoresSettings(groupId, scores) {
+	return api.post("groups/" + groupId + '/scores', {
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body:
+				JSON.stringify({ scores: scores }),
+			})
 		.then(response => response.json());
 }
 
