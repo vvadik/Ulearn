@@ -25,7 +25,7 @@ h2 {
   font-size: 32px;
   line-height: 40px;
   margin: 0 0 10px 0;
-  border-bottom: 1px solid #ebebeb;
+  //border-bottom: 1px solid #ebebeb;
   padding: 30px 0;
 }
 
@@ -54,9 +54,9 @@ h3 {
 }
 
 .group-settings-wrapper {
-  border-bottom: 1px solid #ebebeb;
-  width: 70%;
-  margin: 0 auto 40px;
+  //border-bottom: 1px solid #ebebeb;
+  width: 80%;
+  margin: 0 0 40px;
 }
 
 .group-name-field {
@@ -64,18 +64,19 @@ h3 {
 }
 
 .group-name-label {
-  width: 20%;
+  width: 30%;
   display: inline-block;
   line-height: 30px;
+  margin: 0 10px 25px 0;
 
-  label {
-	font-size: 22px;
+  h4 {
 	font-weight: 500;
+	font-size: 18px;
   }
+}
 
-  input {
-	width: 80%;
-  }
+.group-name-label + label {
+  width: 60%;
 }
 
 label {
@@ -84,5 +85,24 @@ label {
 
   input {
 	max-width: 100%;
+  }
+}
+
+.check-block {
+  margin-bottom: 35px;
+}
+
+.points-block {
+
+  label{
+	margin-bottom: 7px;
+  }
+  p {
+	margin-bottom: 10px;
+  }
+
+  .points-block-comment {
+	margin: -5px 0 10px 27px;
+	color: rgba(0, 0, 0, 0.5);
   }
 }
