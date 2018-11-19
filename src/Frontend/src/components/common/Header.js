@@ -1,7 +1,7 @@
 ﻿import React, { Component } from 'react'
 import * as PropTypes from 'prop-types'
 import { MenuItem, MenuSeparator } from "@skbkontur/react-ui/components/all";
-import Icon from "@skbkontur/react-ui/Icon"
+import Icon from "@skbkontur/react-icons"
 import MenuHeader from "@skbkontur/react-ui/MenuHeader"
 import Tooltip from "@skbkontur/react-ui/Tooltip"
 import Loader from "@skbkontur/react-ui/Loader"

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import Icon from "@skbkontur/react-ui/components/Icon/Icon";
+import Icon from "@skbkontur/react-icons";
 import Kebab from "@skbkontur/react-ui/components/Kebab/Kebab";
 import MenuItem from "@skbkontur/react-ui/components/MenuItem/MenuItem";
 import getPluralForm from "../../../../utils/getPluralForm";
@@ -31,23 +31,22 @@ class GroupInfo extends Component {
 		return (
 			<div className="group">
 				<div className="group-content-wrapper">
-					<Link to={`groups/${groupId}`}>
-						<div className="group-content">
-							<header className="group-content-main">
-								<h3 className="group-content-main__name">{groupName}</h3>
-								<div className="group-content-main__count">
-									{studentsCount} {pluralFormOfStudents}
-								</div>
-								<div className="group-content-main__teachers">
-									{`${pluralFormOfTeachers}: ${teachers.join(', ')}`}
-								</div>
-							</header>
-							<div className="group-content-state">
-								{this.renderSetting(isProgressEnabled, isProgressEnabled ? 'Ведомость включена': 'Ведомость выключена')}
-								{this.renderSetting(isCodeReviewEnabled, isCodeReviewEnabled ? 'Код-ревью включено' : 'Код-ревью выключено')}
+					<Link className="link-group-page" to={`groups/${groupId}`} />
+					<div className="group-content">
+						<header className="group-content-main">
+							<h3 className="group-content-main__name">{groupName}</h3>
+							<div className="group-content-main__count">
+								{studentsCount} {pluralFormOfStudents}
 							</div>
+							<div className="group-content-main__teachers">
+								{`${pluralFormOfTeachers}: ${teachers.join(', ')}`}
+							</div>
+						</header>
+						<div className="group-content-state">
+							{this.renderSetting(isProgressEnabled, isProgressEnabled ? 'Ведомость включена': 'Ведомость выключена')}
+							{this.renderSetting(isCodeReviewEnabled, isCodeReviewEnabled ? 'Код-ревью включено' : 'Код-ревью выключено')}
 						</div>
-					</Link>
+					</div>
 				</div>
 				<div className="group-action">
 					{this.renderKebab()}
