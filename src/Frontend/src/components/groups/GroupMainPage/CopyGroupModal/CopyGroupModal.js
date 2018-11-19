@@ -5,6 +5,7 @@ import Modal from '@skbkontur/react-ui/components/Modal/Modal';
 import Select from '@skbkontur/react-ui/components/Select/Select';
 import Button from '@skbkontur/react-ui/components/Button/Button';
 import Checkbox from '@skbkontur/react-ui/components/Checkbox/Checkbox';
+import getPluralForm from "../../../../utils/getPluralForm";
 
 import './style.less';
 
@@ -68,7 +69,7 @@ class CopyGroupModal extends Component {
 		return (
 		<Modal onClose={onClose} width={640}> { /*FIXME*/ }
 			<Modal.Header>Скопировать группу</Modal.Header>
-				<form onSubmit={this.onSubmit} method="post" action={this.openNewWindow}>
+				<form onSubmit={this.onSubmit} method="post">
 					<Modal.Body>
 						<p className="modal-text">Новая группа будет создана для курса <b>«{ courseTitle }»</b>.
 							Скопируются все настройки группы (в том числе владелец),
@@ -97,8 +98,8 @@ class CopyGroupModal extends Component {
 	renderCourseSelect() {
 		const { course } = this.state;
 		return (
-			<React.Fragment>
-				<p className="modal-text">
+			<label className="select-course">
+				<p className="course-info">
 					Вы можете выбрать курс, в котором являетесь преподавателем
 				</p>
 				<Select
@@ -112,18 +113,17 @@ class CopyGroupModal extends Component {
 					error={this.hasError()}
 					use="default"
 				/>
-			</React.Fragment>
+			</label>
 		)
 	}
 
 	renderGroupSelect() {
-		const { groupId } = this.state;
+		const { groupId, groups } = this.state;
 		return (
-		<React.Fragment>
-			<p className="modal-text">
+		<label className="select-group">
+			<p className="group-info">
 				Вам доступны только те группы,в которых вы являетесь преподавателем
 			</p>
-			{ this.checkGroups()   && this.renderEmptyGroups() }
 			<Select
 				autofocus
 				required
@@ -134,16 +134,17 @@ class CopyGroupModal extends Component {
 				value={groupId}
 				error={this.hasError()}
 				use="default"
-				disabled={!this.state.courseId}
+				disabled={groups.length === 0}
 			/>
+			{ this.checkGroups() && this.renderEmptyGroups() }
 			{ this.changeOwnerWindow() && this.renderChangeOwner() }
-		</React.Fragment>
+		</label>
 		);
 	};
 
 	renderEmptyGroups() {
 		return (
-			<p><b>В выбранном вами курсе нет доступных групп</b></p>
+			<p className="empty-group-text"><b>В выбранном вами курсе нет доступных групп</b></p>
 		)
 	}
 
@@ -208,7 +209,8 @@ class CopyGroupModal extends Component {
 	getGroupOptions = () => {
 		const { groups } = this.state;
 
-		return groups.map(group => [group.id, `${group.name}: ${group.students_count}`]);
+		return groups.map(group => [group.id, `${group.name}: ${group.students_count} 
+		${getPluralForm(group.students_count, 'студент', 'студента', 'студентов')}`]);
 	};
 
 	onGroupChange = (_, value) => {

@@ -1,8 +1,8 @@
 @import "../../../../variables.less";
 
 .group {
-  width: 103%;
-  padding: 0 0 15px 27px;
+  //width: 100%;
+  padding: 0 27px 15px 27px;
   transition: 0.3s ease-in;
   position: relative;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
@@ -22,13 +22,22 @@
 }
 
 .group-content-wrapper {
-  flex-grow: 1;
   font-size: 14px;
   cursor: pointer;
+  width: 100%;
 
   @media (max-width: @maxPhoneWidth) {
 	font-size: 12px;
   }
+}
+
+.link-group-page {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: block;
 }
 
 .group-content {
@@ -93,10 +102,11 @@
 
 .group-action {
   justify-self: end;
-  margin-right: 20px;
+  margin-right: 5px;
   height: 30px;
   cursor: pointer;
   align-self: baseline;
+  z-index: 9;
 
   @media (max-width: @maxPhoneWidth) {
 	margin-right: 0;
