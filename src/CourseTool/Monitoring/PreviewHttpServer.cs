@@ -254,12 +254,12 @@ namespace uLearn.CourseTool.Monitoring
 			var result = SandboxRunner.Run(exercise.CreateSubmission(Utils.NewNormalizedGuid(), code));
 			var runSolutionResult = new RunSolutionResult
 			{
-				IsRightAnswer = result.Verdict == Verdict.Ok && result.GetOutput().NormalizeEoln() == exercise.ExpectedOutput.NormalizeEoln(),
-				ActualOutput = result.GetOutput().NormalizeEoln(),
+				IsRightAnswer = exercise.IsCorrectRunResult(result),
+				ActualOutput = result.GetOutput()?.NormalizeEoln() ?? "",
 				ErrorMessage = result.CompilationOutput,
-				ExecutionServiceName = "this",
+				ExecutionServiceName = "course.exe",
 				IsCompileError = result.Verdict == Verdict.CompilationError,
-				ExpectedOutput = exercise.ExpectedOutput.NormalizeEoln(),
+				ExpectedOutput = exercise.ExpectedOutput?.NormalizeEoln() ?? "",
 				SubmissionId = 0,
 			};
 			if (buildResult.HasStyleErrors)
