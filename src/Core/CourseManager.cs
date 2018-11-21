@@ -17,7 +17,8 @@ using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
-using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Courses.Units;
 using Ulearn.Core.Helpers;
 using Ulearn.Core.Telegram;
@@ -41,7 +42,8 @@ namespace Ulearn.Core
 
 		private readonly ExerciseStudentZipsCache exerciseStudentZipsCache = new ExerciseStudentZipsCache();
 
-		private static readonly CourseLoader loader = new CourseLoader();
+		/* TODO (andgein): Use DI */
+		private static readonly CourseLoader loader = new CourseLoader(new UnitLoader(new XmlSlideLoader()));
 		private static readonly ErrorsBot errorsBot = new ErrorsBot();
 
 		public CourseManager(DirectoryInfo baseDirectory)

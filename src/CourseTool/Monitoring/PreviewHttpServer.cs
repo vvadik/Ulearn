@@ -16,6 +16,8 @@ using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Helpers;
 
@@ -180,9 +182,9 @@ namespace uLearn.CourseTool.Monitoring
 
 		private byte[] ServeAddQuiz(HttpRequestEventArgs context, string path)
 		{
-			var quiz = new Quiz
+			var quiz = new QuizSlide
 			{
-				Id = Guid.NewGuid().ToString("N"),
+				Id = Guid.NewGuid(),
 				Title = "Новый quiz"
 			};
 			return AddNewSlide(context, path, quiz);
@@ -190,14 +192,15 @@ namespace uLearn.CourseTool.Monitoring
 
 		private byte[] ServeAddLesson(HttpRequestEventArgs context, string path)
 		{
-			var lesson = new Lesson(
-				"Новый слайд", 
-				Guid.NewGuid(), 
-				new MdBlock("текст"));
+			var lesson = new Slide(new MarkdownBlock("текст"))
+			{
+				Id = Guid.NewGuid(),
+				Title = "Новый слайд",
+			};
 			return AddNewSlide(context, path, lesson);
 		}
 
-		private byte[] AddNewSlide<TLessonOrQuiz>(HttpRequestEventArgs context, string path, TLessonOrQuiz lessonOrQuiz)
+		private byte[] AddNewSlide<TSlide>(HttpRequestEventArgs context, string path, TSlide lessonOrQuiz)
 		{
 			var prevSlide = course.FindSlideByIndex(GetSlideIndex(path));
 			if (prevSlide == null)
@@ -205,8 +208,8 @@ namespace uLearn.CourseTool.Monitoring
 				context.Response.StatusCode = 404;
 				return new byte[0];
 			}
-			var serializer = new XmlSerializer(typeof(TLessonOrQuiz));
-			var newFile = GenerateSlideFilename<TLessonOrQuiz>(prevSlide);
+			var serializer = new XmlSerializer(typeof(TSlide));
+			var newFile = GenerateSlideFilename<TSlide>(prevSlide);
 			using (var s = new FileStream(Path.Combine(prevSlide.Info.Directory.FullName, newFile), FileMode.OpenOrCreate))
 				serializer.Serialize(s, lessonOrQuiz);
 			ReloadCourse();
@@ -248,7 +251,7 @@ namespace uLearn.CourseTool.Monitoring
 			return Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(runResult));
 		}
 
-		private static RunSolutionResult GetRunResult(ExerciseBlock exercise, string code)
+		private static RunSolutionResult GetRunResult(AbstractExerciseBlock exercise, string code)
 		{
 			var buildResult = exercise.BuildSolution(code);
 			if (buildResult.HasErrors)

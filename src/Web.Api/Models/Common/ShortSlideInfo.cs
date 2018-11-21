@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using Ulearn.Core.Courses.Slides;
 
 namespace Ulearn.Web.Api.Models.Common
 {
@@ -25,13 +24,5 @@ namespace Ulearn.Web.Api.Models.Common
 
 		[DataMember(Name = "api_url")]
 		public string ApiUrl { get; set; }
-	}
-
-	[JsonConverter(typeof(StringEnumConverter), true)]
-	public enum SlideType
-	{
-		Lesson = 1,
-		Exercise = 2,
-		Quiz = 3,
 	}
 }

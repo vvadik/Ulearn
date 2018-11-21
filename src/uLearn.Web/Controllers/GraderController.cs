@@ -11,6 +11,7 @@ using log4net;
 using uLearn.Web.FilterAttributes;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
 
 namespace uLearn.Web.Controllers
 {
@@ -163,7 +164,7 @@ namespace uLearn.Web.Controllers
 			if (automaticChecking == null || automaticChecking.Status != AutomaticExerciseCheckingStatus.Done)
 				return new SubmissionResult { Status = "IN_PROCESS" };
 
-			var score = (double)automaticChecking.Score / slide.Exercise.CorrectnessScore;
+			var score = (double)automaticChecking.Score / slide.Scoring.TestsScore;
 			if (score > 1)
 				score = 1;
 

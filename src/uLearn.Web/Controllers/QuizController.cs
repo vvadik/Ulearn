@@ -23,6 +23,7 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides.Quizzes;
+using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
 using Ulearn.Core.Extensions;
 
 namespace uLearn.Web.Controllers
@@ -115,7 +116,7 @@ namespace uLearn.Web.Controllers
 			var state = GetQuizState(courseId, userId, slideId);
 			var quizState = state.Item1;
 			var tryNumber = state.Item2;
-			var resultsForQuizes = GetResultForQuizes(courseId, userId, slideId, state.Item1);
+			var resultsForQuizzes = GetResultForQuizzes(courseId, userId, slideId, state.Item1);
 
 			log.Info($"Создаю тест для пользователя {userId} в слайде {courseId}:{slide.Id}, isLti = {isLti}");
 
@@ -128,14 +129,13 @@ namespace uLearn.Web.Controllers
 				quizVersion = quizzesRepo.AddQuizVersionIfNeeded(courseId, slide);
 
 			/* Restore quiz slide from version stored in the database */
-			var quiz = quizVersion.GetRestoredQuiz(course, course.FindUnitBySlideId(slide.Id));
-			slide = new QuizSlide(slide.Info, quiz);
+			slide = quizVersion.GetRestoredQuiz(course, course.FindUnitBySlideId(slide.Id));
 			
 			if (quizState == QuizState.Subtotal)
 			{
-				var score = resultsForQuizes?.AsEnumerable().Sum(res => res.Value) ?? 0;
+				var score = resultsForQuizzes?.AsEnumerable().Sum(res => res.Value) ?? 0;
 				/* QuizState.Subtotal is partially obsolete. If user fully solved quiz, then show answers. Else show empty quiz for the new try... */
-				if (score == quiz.MaxScore)
+				if (score == slide.MaxScore)
 					quizState = QuizState.Total;
 				/* ... and show last try's answers only if argument `send` has been passed in query */
 				else if (!send.HasValue)
@@ -152,7 +152,7 @@ namespace uLearn.Web.Controllers
 			var questionAnswersFrequency = new DefaultDictionary<string, DefaultDictionary<string, int>>();
 			if (User.HasAccessFor(courseId, CourseRole.CourseAdmin))
 			{
-				questionAnswersFrequency = quiz.Blocks.OfType<ChoiceBlock>().ToDictionary(
+				questionAnswersFrequency = slide.Blocks.OfType<ChoiceBlock>().ToDictionary(
 					block => block.Id,
 					block => userQuizzesRepo.GetAnswersFrequencyForChoiceBlock(courseId, slide.Id, block.Id).ToDefaultDictionary()
 				).ToDefaultDictionary();
@@ -165,7 +165,7 @@ namespace uLearn.Web.Controllers
 				QuizState = quizState,
 				TryNumber = tryNumber,
 				MaxTriesCount = maxTriesCount,
-				ResultsForQuizes = resultsForQuizes,
+				ResultsForQuizes = resultsForQuizzes,
 				AnswersToQuizes = userAnswers,
 				IsLti = isLti,
 				ManualQuizCheckQueueItem = manualQuizCheckQueueItem,
@@ -363,7 +363,7 @@ namespace uLearn.Web.Controllers
 
 		private IEnumerable<QuizInfoForDb> CreateQuizInfo(QuizSlide slide, IGrouping<string, QuizAnswer> answer)
 		{
-			var block = slide.GetBlockById(answer.Key);
+			var block = slide.FindBlockById(answer.Key);
 			if (block is FillInBlock)
 				return CreateQuizInfoForDb(block as FillInBlock, answer.First().Text);
 			if (block is ChoiceBlock)
@@ -565,7 +565,7 @@ namespace uLearn.Web.Controllers
 			{
 				var slide = quizSlide;
 				if (pass.QuizVersion != null)
-					slide = new QuizSlide(quizSlide.Info, pass.QuizVersion.GetRestoredQuiz(course, unit));
+					slide = pass.QuizVersion.GetRestoredQuiz(course, unit);
 				dict[pass.UserName] = GetUserQuizAnswers(slide, pass.UserQuizzes).ToList();
 			}
 			
@@ -781,7 +781,7 @@ namespace uLearn.Web.Controllers
 			return quizSlide.MaxTriesCount;
 		}
 
-		private Dictionary<string, int> GetResultForQuizes(string courseId, string userId, Guid slideId, QuizState state)
+		private Dictionary<string, int> GetResultForQuizzes(string courseId, string userId, Guid slideId, QuizState state)
 		{
 			return userQuizzesRepo.GetQuizBlocksTruth(courseId, userId, slideId);
 		}

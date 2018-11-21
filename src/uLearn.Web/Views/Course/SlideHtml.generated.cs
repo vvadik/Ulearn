@@ -1,7 +1,10 @@
 ﻿using Ulearn.Core;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Courses.Slides.Quizzes;
+using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
 
 #pragma warning disable 1591
 //------------------------------------------------------------------------------
@@ -111,9 +114,9 @@ public static System.Web.WebPages.HelperResult Blocks(BlockRenderContext context
 #line hidden
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
  
-	var countHiddenBlocks = context.Slide.GetBlocksRangesWithSameVisibility().Count(b => b[0].Hide);
+	var countHiddenBlocks = context.Slide.GetBlockRangesWithSameVisibility().Count(b => b[0].Hide);
 	var firstHiddenBlock = true;
-	foreach (var blockRange in context.Slide.GetBlocksRangesWithSameVisibility())
+	foreach (var blockRange in context.Slide.GetBlockRangesWithSameVisibility())
 	{
 		if (!blockRange[0].Hide)
 		{
@@ -369,14 +372,14 @@ WriteTo(__razor_helper_writer, maxScore == 0 ? "" : string.Format("{0} из {1}"
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Block(MdBlock block, BlockRenderContext context, HtmlHelper Html)
+public static System.Web.WebPages.HelperResult Block(MarkdownBlock block, BlockRenderContext context, HtmlHelper Html)
 {
 #line default
 #line hidden
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
  
 	
-WriteTo(__razor_helper_writer, MvcHtmlString.Create(block.RenderMd(context.Course.Id, context.Slide.Id, context.BaseUrl)));
+WriteTo(__razor_helper_writer, MvcHtmlString.Create(block.RenderMarkdown(context.Course.Id, context.Slide.Id, context.BaseUrl)));
 
                                                                                                
 
@@ -412,15 +415,10 @@ WriteLiteralTo(__razor_helper_writer, " class=\"code code-sample\"");
 
 WriteLiteralTo(__razor_helper_writer, " data-lang=\"");
 
-                        WriteTo(__razor_helper_writer, block.LangId);
+                        WriteTo(__razor_helper_writer, block.Language.GetName());
 
 WriteLiteralTo(__razor_helper_writer, "\"");
 
-WriteLiteralTo(__razor_helper_writer, " data-ver=\"");
-
-                                                 WriteTo(__razor_helper_writer, block.LangVer);
-
-WriteLiteralTo(__razor_helper_writer, "\"");
 
 WriteLiteralTo(__razor_helper_writer, ">");
 
@@ -464,15 +462,10 @@ WriteLiteralTo(__razor_helper_writer, " class=\"code code-sample\"");
 
 WriteLiteralTo(__razor_helper_writer, " data-lang=\"");
 
-                        WriteTo(__razor_helper_writer, block.LangId);
+                        WriteTo(__razor_helper_writer, block.Language.GetName());
 
 WriteLiteralTo(__razor_helper_writer, "\"");
 
-WriteLiteralTo(__razor_helper_writer, " data-ver=\"");
-
-                                                 WriteTo(__razor_helper_writer, block.LangVer);
-
-WriteLiteralTo(__razor_helper_writer, "\"");
 
 WriteLiteralTo(__razor_helper_writer, " data-code=\"");
 
@@ -716,7 +709,7 @@ WriteTo(__razor_helper_writer, RunErrors());
 
 #line default
 #line hidden
-public static System.Web.WebPages.HelperResult Block(ExerciseBlock block, BlockRenderContext context, HtmlHelper Html)
+public static System.Web.WebPages.HelperResult Block(AbstractExerciseBlock block, BlockRenderContext context, HtmlHelper Html)
 {
 #line default
 #line hidden
@@ -754,7 +747,7 @@ WriteLiteralTo(__razor_helper_writer, " class=\"code code-exercise hidden\"");
 
 WriteLiteralTo(__razor_helper_writer, " data-lang=\"");
 
-                                             WriteTo(__razor_helper_writer, block.LangId);
+                                             WriteTo(__razor_helper_writer, block.Language.GetName());
 
 WriteLiteralTo(__razor_helper_writer, "\"");
 
@@ -808,7 +801,7 @@ WriteLiteralTo(__razor_helper_writer, "\t                    <li>\r\n");
 
 WriteLiteralTo(__razor_helper_writer, "                            ");
 
-WriteTo(__razor_helper_writer, MvcHtmlString.Create(hint.RenderMd(context.BaseUrl)));
+WriteTo(__razor_helper_writer, MvcHtmlString.Create(hint.RenderMarkdown(context.BaseUrl)));
 
 WriteLiteralTo(__razor_helper_writer, "\r\n                        </li>\r\n");
 

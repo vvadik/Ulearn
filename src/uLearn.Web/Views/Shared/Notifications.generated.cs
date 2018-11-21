@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNet.Identity;
 using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Extensions;
 
@@ -593,7 +594,7 @@ WriteLiteralTo(__razor_helper_writer, ">Вы получили ");
 
 WriteLiteralTo(__razor_helper_writer, " из ");
 
-                                                                          WriteTo(__razor_helper_writer, slide.Exercise.MaxReviewScore.PluralizeInRussian(RussianPluralizationOptions.Score));
+                                                                          WriteTo(__razor_helper_writer, slide.Scoring.CodeReviewScore.PluralizeInRussian(RussianPluralizationOptions.Score));
 
 WriteLiteralTo(__razor_helper_writer, "</div>\r\n\t\t\t<div");
 

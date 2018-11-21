@@ -44,7 +44,7 @@ namespace RunCsJob
 
 		public async Task<List<RunnerSubmission>> TryGetSubmission()
 		{
-			var uri = GetUri("GetSubmissions", new [] {"language", SubmissionLanguage.CSharp.ToString("g")});
+			var uri = GetUri("GetSubmissions", new [] {"language", Language.CSharp.GetName()});
 			try
 			{
 				log.Info($"Отправляю запрос на {uri}");

@@ -14,6 +14,7 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Extensions;
 
@@ -254,7 +255,7 @@ namespace Database.DataContexts
 
 					var slideId = lastSubmission.SlideId;
 					var slide = course.FindSlideById(slideId) as ExerciseSlide;
-					if (slide == null || !slide.Exercise.RequireReview)
+					if (slide == null || !slide.Scoring.RequireReview)
 						continue;
 
 					log.Info($"Создаю ручную проверку для решения {lastSubmission.Id}, слайд {slideId}");

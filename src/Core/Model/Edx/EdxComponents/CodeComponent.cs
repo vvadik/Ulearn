@@ -1,5 +1,7 @@
 ﻿using System.IO;
 using System.Xml.Serialization;
+using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses;
 
 namespace Ulearn.Core.Model.Edx.EdxComponents
 {
@@ -10,7 +12,7 @@ namespace Ulearn.Core.Model.Edx.EdxComponents
 		public string Source;
 
 		[XmlIgnore]
-		public string LangId;
+		public Language Language;
 
 		[XmlAttribute("filename")]
 		public string Filename;
@@ -22,12 +24,12 @@ namespace Ulearn.Core.Model.Edx.EdxComponents
 		{
 		}
 
-		public CodeComponent(string urlName, string displayName, string filename, string langId, string source)
+		public CodeComponent(string urlName, string displayName, string filename, Language language, string source)
 		{
 			UrlName = urlName;
 			DisplayName = displayName;
 			Filename = filename;
-			LangId = langId;
+			Language = language;
 			Source = source;
 		}
 
@@ -41,7 +43,7 @@ namespace Ulearn.Core.Model.Edx.EdxComponents
 		{
 			File.WriteAllText(
 				$"{folderName}/static/code_{UrlName}.html",
-				File.ReadAllText($"{Utils.GetRootDirectory()}/templates/code.html").Replace("{0}", LangId).Replace("{1}", Source)
+				File.ReadAllText($"{Utils.GetRootDirectory()}/templates/code.html").Replace("{0}", Language.GetXmlEnumName()).Replace("{1}", Source)
 			);
 		}
 

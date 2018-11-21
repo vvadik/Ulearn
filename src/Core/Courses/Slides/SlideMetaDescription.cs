@@ -8,11 +8,10 @@ namespace Ulearn.Core.Courses.Slides
 	public class SlideMetaDescription
 	{
 		[XmlElement("image")]
-		// ReSharper disable once InconsistentNaming
-		public string _image { get; set; }
+		public string Image { get; set; }
 		
 		[XmlIgnore]
-		public string Image { get; set; }
+		public string AbsoluteImageUrl { get; private set; }
 
 		[XmlElement("keywords")]
 		public string Keywords { get; set; }
@@ -22,7 +21,7 @@ namespace Ulearn.Core.Courses.Slides
 
 		public void FixPaths(FileInfo slideFile)
 		{
-			if (string.IsNullOrEmpty(_image))
+			if (string.IsNullOrEmpty(Image))
 				return;
 
 			string relativeUrl;
@@ -40,10 +39,10 @@ namespace Ulearn.Core.Courses.Slides
 				relativeUrl = "";
 			}
 			
-			var imagePath = Path.Combine(relativeUrl, _image);
+			var imagePath = Path.Combine(relativeUrl, Image);
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 
-			Image = configuration.BaseUrl + imagePath;
+			AbsoluteImageUrl = configuration.BaseUrl + imagePath;
 		}
 	}
 }

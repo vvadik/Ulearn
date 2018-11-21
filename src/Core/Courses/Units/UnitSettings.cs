@@ -69,6 +69,9 @@ namespace Ulearn.Core.Courses.Units
 
 		public static UnitSettings CreateByTitle(string title, CourseSettings courseSettings)
 		{
+			/* We should register encoding provider for Encoding.GetEncoding(1251) works */
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+			
 			var unitSettings = new UnitSettings
 			{
 				/* We use Win1251 only for back compatibility.

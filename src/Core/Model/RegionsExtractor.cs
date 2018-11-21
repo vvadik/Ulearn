@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.CSharp;
 
@@ -14,18 +15,20 @@ namespace Ulearn.Core.Model
 	public class RegionsExtractor
 	{
 		private readonly List<ISingleRegionExtractor> extractors;
-		public readonly string file;
-		public readonly string langId;
+		public readonly string Filename;
+		public readonly Language? Language;
 
-		public RegionsExtractor(string code, string langId, string file = null)
+		public RegionsExtractor(string code, Language? language, string filename= null)
 		{
-			this.file = file;
-			this.langId = langId;
+			Filename = filename;
+			Language = language;
+			
 			extractors = new List<ISingleRegionExtractor>
 			{
 				new CommonSingleRegionExtractor(code)
 			};
-			if (langId == "cs")
+			
+			if (language == Core.Language.CSharp)
 				extractors.Add(new CsMembersExtractor(code));
 		}
 

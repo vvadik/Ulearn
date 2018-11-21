@@ -47,7 +47,7 @@ namespace Database.Models
 		
 		public bool AutomaticCheckingIsRightAnswer { get; set; }
 		
-		public SubmissionLanguage Language { get; set; }
+		public Language Language { get; set; }
 
 		public virtual IList<ManualExerciseChecking> ManualCheckings { get; set; }
 		

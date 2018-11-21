@@ -23,6 +23,7 @@ using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Telegram;
 using XQueue;
 using XQueue.Models;
@@ -62,7 +63,7 @@ namespace uLearn.Web.Controllers
 		{
 			CheckRunner(token);			
 			
-			if (!Enum.TryParse<SubmissionLanguage>(language, out var submissionLanguage))
+			if (!Enum.TryParse<Language>(language, out var submissionLanguage))
 				throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
 			
 			var sw = Stopwatch.StartNew();
@@ -203,7 +204,7 @@ namespace uLearn.Web.Controllers
 				return false;
 			}
 
-			var score = (double)checking.Score / slide.Exercise.CorrectnessScore;
+			var score = (double)checking.Score / slide.Scoring.TestsScore;
 			if (score > 1)
 				score = 1;
 

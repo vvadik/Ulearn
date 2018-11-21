@@ -62,7 +62,7 @@ namespace Database.Models
 		public bool AutomaticCheckingIsRightAnswer { get; set; }
 
 		[Index("IDX_UserExerciseSubmissions_ByLanguage")]
-		public SubmissionLanguage Language { get; set; }
+		public Language Language { get; set; }
 
 		public virtual IList<ManualExerciseChecking> ManualCheckings { get; set; }
 		

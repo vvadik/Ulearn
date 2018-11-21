@@ -1,6 +1,9 @@
 ﻿using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Courses.Slides.Quizzes;
+using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
 
 #pragma warning disable 1591
 //------------------------------------------------------------------------------
@@ -120,7 +123,7 @@ WriteLiteralTo(__razor_helper_writer, "\t\t\t\t\t");
 
 WriteTo(__razor_helper_writer, SlideHtml.Slide(new BlockRenderContext(course, slide, "/static/",
 						slide.Blocks.Select(
-							(b, i) => b is ExerciseBlock
+							(b, i) => b is AbstractExerciseBlock
 								? new ExerciseBlockData(course.Id, (ExerciseSlide)slide) { RunSolutionUrl = "/" + slide.Index.ToString("000") + ".html?query=submit", DebugView = true, IsGuest = false }
 								: b is AbstractQuestionBlock
 									? new QuizBlockData(new QuizModel

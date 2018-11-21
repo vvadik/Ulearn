@@ -7,7 +7,7 @@ using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Blocks;
-using Ulearn.Core.Courses.Units;
+using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Model.Edx;
 using Ulearn.Core.Model.Edx.EdxComponents;
 
@@ -18,9 +18,16 @@ namespace uLearn.CourseTool
 	public class Converter_should
 	{
 		private Course course;
-		private static readonly Unit unit = new Unit(UnitSettings.CreateByTitle("u1", CourseSettings.DefaultSettings), new DirectoryInfo("u1"));
-		private readonly Slide aTextSlide = new Slide(new[] { new MdBlock("hello"), }, new SlideInfo(unit, new FileInfo("file"), 0), "title", Guid.NewGuid(), null);
-		private readonly Slide exerciseSlide = new Slide(new ExerciseBlock[] { new ProjectExerciseBlock(), new SingleFileExerciseBlock() }, new SlideInfo(unit, new FileInfo("file"), 0), "title", slideIdFromCourse, null);
+
+		private readonly Slide aTextSlide = new Slide(new MarkdownBlock("hello")) {
+			Id = Guid.NewGuid(),
+			Title = "title", 
+		};
+		private readonly Slide exerciseSlide = new Slide(new ProjectExerciseBlock(), new SingleFileExerciseBlock())
+		{
+			Id = slideIdFromCourse,
+			Title = "title",
+		};
 		private const string youtubeIdFromCourse = "GZS36w_fxdg";
 		private static readonly Guid slideIdFromCourse = Guid.Parse("108C89D9-36F0-45E3-BBEE-B93AC971063F");
 		private CourseManager courseManager;

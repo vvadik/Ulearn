@@ -4,23 +4,21 @@ using System.IO;
 using System.Linq;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
-using Ulearn.Core.Courses.Slides.Quizzes;
-using Ulearn.Core.CSharp;
 
 namespace Ulearn.Core.Courses.Units
 {
-	public class UnitLoader
+	public class UnitLoader : IUnitLoader
 	{
-		private static readonly IList<ISlideLoader> slideLoaders = new ISlideLoader[]
-		{
-			new LessonSlideLoader(),
-			new CSharpSlideLoader(),
-			new QuizSlideLoader()
-		};
+		private readonly ISlideLoader slideLoader;
 
-		public static Unit LoadUnit(DirectoryInfo unitDir, CourseSettings courseSettings, string courseId, int firstSlideIndex)
+		public UnitLoader(ISlideLoader slideLoader)
 		{
-			var unitFile = unitDir.GetFile("Unit.xml");
+			this.slideLoader = slideLoader;
+		}
+		
+		public Unit LoadUnit(DirectoryInfo unitDir, CourseSettings courseSettings, string courseId, int firstSlideIndex)
+		{
+			var unitFile = unitDir.GetFile("unit.xml");
 			var unitSettings = unitFile.Exists
 				? UnitSettings.Load(unitFile, courseSettings)
 				: UnitSettings.CreateByTitle(GetUnitTitleFromFile(unitDir), courseSettings);
@@ -38,15 +36,11 @@ namespace Ulearn.Core.Courses.Units
 			return unit;
 		}
 
-		private static Slide LoadSlide(FileInfo file, Unit unit, int slideIndex, string courseId, CourseSettings courseSettings)
+		private Slide LoadSlide(FileInfo file, Unit unit, int slideIndex, string courseId, CourseSettings courseSettings)
 		{
 			try
 			{
-				var slideLoader = slideLoaders
-					.FirstOrDefault(loader => file.FullName.EndsWith(loader.Extension, StringComparison.InvariantCultureIgnoreCase));
-				if (slideLoader == null)
-					throw new CourseLoadingException($"Неизвестный формат слайда в файле {file.FullName}");
-				return slideLoader.Load(file, unit, slideIndex, courseId, courseSettings);
+				return slideLoader.Load(file, slideIndex, unit, courseId, courseSettings);
 			}
 			catch (Exception e)
 			{
@@ -56,6 +50,7 @@ namespace Ulearn.Core.Courses.Units
 			}
 		}
 
+		[Obsolete("It's old slide filename format. Don't use it now.")]
 		public static bool IsSlideFile(string name)
 		{
 			//S001_slide.ext

@@ -1,4 +1,5 @@
 ﻿using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Extensions;
 
 namespace Ulearn.Core

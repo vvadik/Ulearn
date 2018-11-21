@@ -67,7 +67,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 				var sequentialNote = new Sequential(sequentialId, displayName,
 					new[]
 					{
-						new Vertical(verticalId, displayName, new[] { new MdBlock(chapterNote.Markdown).ToEdxComponent(mdBlockId, displayName, chapterUnit.Directory.FullName) })
+						new Vertical(verticalId, displayName, new[] { new MarkdownBlock(chapterNote.Markdown).ToEdxComponent(mdBlockId, displayName, chapterUnit.Directory.FullName) })
 					}) { VisibleToStaffOnly = true };
 				if (!File.Exists($"{olxPath}/sequential/{sequentialNote.UrlName}.xml"))
 				{

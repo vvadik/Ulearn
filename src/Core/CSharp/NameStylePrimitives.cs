@@ -19,9 +19,9 @@ namespace Ulearn.Core.CSharp
 		public static bool IsNoArgsSetter(this MethodDeclarationSyntax method)
 		{
 			var name = method.Identifier.Text;
-			var isSeter = name.StartsWith("Set", StringComparison.OrdinalIgnoreCase);
+			var isSetter = name.StartsWith("Set", StringComparison.OrdinalIgnoreCase);
 			var noArgs = !method.ParameterList.Parameters.Any();
-			return noArgs && isSeter;
+			return noArgs && isSetter;
 		}
 
 		public static bool IsVoidGetter(this MethodDeclarationSyntax method)

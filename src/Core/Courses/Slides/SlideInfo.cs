@@ -5,7 +5,7 @@ namespace Ulearn.Core.Courses.Slides
 {
 	public class SlideInfo
 	{
-		public int Index { get; set; }
+		public int Index { get; private set; }
 		public Unit Unit { get; private set; }
 		public FileInfo SlideFile { get; set; }
 		public DirectoryInfo Directory => SlideFile.Directory;

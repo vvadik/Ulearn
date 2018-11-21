@@ -14,6 +14,7 @@ using Microsoft.AspNet.Identity;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Quizzes;
 
 namespace uLearn.Web.Controllers
@@ -172,7 +173,7 @@ namespace uLearn.Web.Controllers
 		private static int GetMaxScoreWithoutManualChecking(Slide slide)
 		{
 			if (slide is ExerciseSlide)
-				return (slide as ExerciseSlide).Exercise.CorrectnessScore;
+				return (slide as ExerciseSlide).Scoring.TestsScore;
 			if (slide is QuizSlide)
 				return (slide as QuizSlide).ManualChecking ? 0 : slide.MaxScore;
 			return slide.MaxScore;

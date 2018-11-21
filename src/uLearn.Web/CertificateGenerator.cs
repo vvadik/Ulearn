@@ -15,6 +15,7 @@ using Ionic.Zip;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
 
 namespace uLearn.Web
 {
@@ -275,7 +276,7 @@ namespace uLearn.Web
 			var codeReviewsCount = slideCheckingsRepo.GetUsersPassedManualExerciseCheckings(course.Id, certificate.UserId).Count();
 			var exercisesMaxReviewScores = course.Slides
 				.OfType<ExerciseSlide>().
-				ToDictionary(s => s.Id, s => s.Exercise.MaxReviewScore);
+				ToDictionary(s => s.Id, s => s.Scoring.CodeReviewScore);
 			var codeReviewsFullCount = slideCheckingsRepo
 				.GetUsersPassedManualExerciseCheckings(course.Id, certificate.UserId)
 				.Count(s => s.Score == exercisesMaxReviewScores.GetOrDefault(s.SlideId, -1));

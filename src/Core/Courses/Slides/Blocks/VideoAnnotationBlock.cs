@@ -31,6 +31,7 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		/// </summary>
 		[XmlElement("text")]
 		public string Text { get; set; }
+		
 		[XmlArray("fragments")]
 		[XmlArrayItem("fragment")]
 		public VideoAnnotationFragment[] Fragments { get; set; }
@@ -40,13 +41,13 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 			throw new NotImplementedException();
 		}
 
-		public override IEnumerable<SlideBlock> BuildUp(BuildUpContext context, IImmutableSet<string> filesInProgress)
+		public override IEnumerable<SlideBlock> BuildUp(SlideLoadingContext context, IImmutableSet<string> filesInProgress)
 		{
 			string FormatFragment(VideoAnnotationFragment f) 
 				=> $"* {f.StartTimeAsString} — {f.Text}";
 
 			var fragmentsList = string.Join("\n", Fragments.Select(FormatFragment));
-			yield return new MdBlock($"## Содержание видео\n\n{Text}\n\n{fragmentsList}");
+			yield return new MarkdownBlock($"## Содержание видео\n\n{Text}\n\n{fragmentsList}");
 		}
 	}
 }

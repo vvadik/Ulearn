@@ -10,6 +10,8 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Helpers;
 using SearchOption = Microsoft.VisualBasic.FileIO.SearchOption;
 
@@ -155,7 +157,7 @@ namespace uLearn.CourseTool.Validating
 			var tempExFolder = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ExerciseFolder_From_StudentZip"));
 			
 			exerciseStudentZipBuilder.BuildStudentZip(slide, tempExZipFilePath);
-			Utils.UnpackZip(tempExZipFilePath.Content(), tempExFolder.FullName);
+			Utils.UnpackZip(tempExZipFilePath.ReadAllContent(), tempExFolder.FullName);
 			try
 			{
 				ReportErrorIfStudentsZipHasWrongAnswerOrSolutionFiles(tempExFolder);

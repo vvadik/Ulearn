@@ -6,6 +6,7 @@ using Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Quizzes;
+using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
 
 namespace Database.Repos
 {

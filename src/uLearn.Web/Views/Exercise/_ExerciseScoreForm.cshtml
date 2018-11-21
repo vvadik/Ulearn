@@ -3,7 +3,8 @@
 @model uLearn.Web.Controllers.ExerciseScoreFormModel
 
 @{
-	var block = Model.Slide.Exercise;
+	var slide = Model.Slide;
+	var block = slide.Exercise;
 }
 
 <div class="exercise__add-review" style="display: none"
@@ -47,7 +48,7 @@
 				<div class="alert alert-danger mt10 ">Внимание. Эта работа прямо сейчас проверяется преподавателем @Model.Checking.LockedBy.VisibleName</div>
 			}
 
-			<h4>Оцените работу (максимальный балл @block.MaxReviewScore)</h4>
+			<h4>Оцените работу (максимальный балл @slide.Scoring.CodeReviewScore)</h4>
 			<div class="exercise__score">
 				<div class="btn-group" role="group">
 					@{
@@ -55,11 +56,11 @@
 					}
 					@foreach (var scorePercent in new[] { 0, 25, 50, 75, 100 })
 					{
-						var score = block.MaxReviewScore * scorePercent / 100;
+						var score = slide.Scoring.CodeReviewScore * scorePercent / 100;
 						/* For max review score < 4 we can not define percentage score,
                          * because they are the same (0% of 2 is equal to 25% of 2)
                          */
-						var isActive = Model.Checking.IsChecked && Model.Checking.Score == score && block.MaxReviewScore >= 4;
+						var isActive = Model.Checking.IsChecked && Model.Checking.Score == score && slide.Scoring.CodeReviewScore >= 4;
 						isPercentScoreActive = isPercentScoreActive || isActive;
 						<button type="button" class="btn btn-default @(isActive ? "active" : "")" data-value="@score" data-percent="@scorePercent">@scorePercent%</button>
 					}
@@ -70,7 +71,7 @@
 						var otherScoreInputDisplayProperty = displayOtherScoreInput ? "" : "display: none";
 					}
                     <a href="#" class="exercise__other-score-link internal-page-link @(displayOtherScoreInput ? "active" : "")">Другая оценка</a>
-					<input type="number" class="form-control" style="@otherScoreInputDisplayProperty" min="0" max="@block.MaxReviewScore" name="exerciseScore" required="required"
+					<input type="number" class="form-control" style="@otherScoreInputDisplayProperty" min="0" max="@slide.Scoring.CodeReviewScore" name="exerciseScore" required="required"
 							value="@(Model.Checking.IsChecked ? Model.Checking.Score.ToString() : "")"/>
 				</div>
 			</div>

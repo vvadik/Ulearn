@@ -1,32 +1,196 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Xml.Serialization;
 using JetBrains.Annotations;
+using Microsoft.CodeAnalysis.Operations;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Courses.Slides.Quizzes;
+using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
+using Ulearn.Core.Extensions;
 using Ulearn.Core.Model.Edx;
 using Ulearn.Core.Model.Edx.EdxComponents;
 
 namespace Ulearn.Core.Courses.Slides
 {
-	public class Slide
+	[XmlRoot("slide", IsNullable = false, Namespace = "https://ulearn.me/schema/v2")]
+	public class Slide : ISlide
 	{
-		public readonly string Title;
-		public SlideBlock[] Blocks { get; private set; }
-		public readonly SlideInfo Info;
-		public int Index => Info.Index;
-		public readonly Guid Id;
+		[XmlAttribute("id")]
+		public Guid Id { get; set; }
+
+		[XmlAttribute("type")]
+		public virtual SlideType Type { get; set; } = SlideType.Lesson;
+		
+		[XmlIgnore]
 		public string NormalizedGuid => Id.GetNormalizedGuid();
+		
+		[XmlAttribute("title")]
+		public string Title { get; set; }
+		
+		[XmlElement("meta")]
+		public SlideMetaDescription Meta { get; set; }
+		
+		[XmlElement("default-include-code-file")]
+		public string DefaultIncludeCodeFile { get; set; }
+		
+		/* Common blocks */
+		[XmlElement(typeof(YoutubeBlock))]
+		[XmlElement("markdown", typeof(MarkdownBlock))]
+		[XmlElement(typeof(CodeBlock))]
+		[XmlElement(typeof(TexBlock))]
+		[XmlElement(typeof(ImageGalleryBlock))]
+		[XmlElement(typeof(IncludeCodeBlock))]
+		[XmlElement(typeof(IncludeMarkdownBlock))]
+		[XmlElement(typeof(IncludeImageGalleryBlock))]
+		[XmlElement(typeof(VideoAnnotationBlock))]
+		
+		/* Quiz blocks */
+		[XmlElement(typeof(IsTrueBlock))]
+		[XmlElement(typeof(ChoiceBlock))]
+		[XmlElement(typeof(FillInBlock))]
+		[XmlElement(typeof(OrderingBlock))]
+		[XmlElement(typeof(MatchingBlock))]
+		
+		/* Exercise blocks */
+		[XmlElement(typeof(ProjectExerciseBlock))]
+		[XmlElement(typeof(SingleFileExerciseBlock))]
+		[XmlChoiceIdentifier(nameof(DefineBlockType))]
+		public SlideBlock[] Blocks { get; set; }
+		
+		[XmlIgnore]
+		public BlockType[] DefineBlockType;
+
+		/* This property is extended by QuizSlide and ExerciseSlide */
+		[XmlIgnore]
+		protected virtual Type[] AllowedBlockTypes { get; } =
+		{
+			typeof(YoutubeBlock),
+			typeof(MarkdownBlock),
+			typeof(CodeBlock),
+			typeof(TexBlock),
+			typeof(ImageGalleryBlock),
+			typeof(IncludeCodeBlock),
+			typeof(IncludeMarkdownBlock),
+			typeof(IncludeImageGalleryBlock),
+			typeof(VideoAnnotationBlock)
+		};
+		
+		[XmlIgnore]
+		public SlideInfo Info { get; set; }
+		
+		public int Index => Info.Index;
+		
 		public virtual bool ShouldBeSolved => false;
-		public int MaxScore { get; protected set; }
-		public SlideMetaDescription Meta { get; protected set; }
+
+		public virtual int MaxScore => 0;
+		
+		[XmlIgnore]
+		public string LatinTitle => Title.ToLatin();
+
+		[XmlIgnore]
+		public string Url => LatinTitle + "_" + NormalizedGuid;
 
 		[NotNull]
-		public string ScoringGroup { get; protected set; }
+		[XmlIgnore]
+		public virtual string ScoringGroup { get; protected set; } = "";
 
-		public IEnumerable<SlideBlock[]> GetBlocksRangesWithSameVisibility()
+		public Slide()
+		{
+		}
+
+		public Slide(params SlideBlock[] blocks)
+		{
+			Blocks = blocks;
+		}
+		
+		/*
+		public Slide(IEnumerable<SlideBlock> blocks, SlideInfo info, string title, Guid id, SlideMetaDescription meta)
+		{
+			try
+			{
+				Info = info;
+				Title = title;
+				Id = id;
+				MaxScore = 0;
+				Blocks = blocks.ToArray();
+				ScoringGroup = "";
+				Meta = meta;
+				foreach (var block in Blocks)
+					block.Validate();
+				
+				DefineBlockType = Blocks.Select(BlockTypeHelpers.GetBlockType).ToArray();
+			}
+			catch (Exception e)
+			{
+				throw new FormatException($"Error in slide {title} (id: {id}). {e.Message}", e);
+			}
+			
+			CheckBlockTypes();
+		}
+		*/
+
+		/// <summary>
+		/// Validate slide. We guarantee that Validate() will be called after BuildUp() 
+		/// </summary>
+		public virtual void Validate(CourseLoadingContext context)
+		{
+			var slideLoadingContext = new SlideLoadingContext(context, this);
+			foreach (var block in Blocks)
+				block.Validate(slideLoadingContext);
+		}
+
+		/// <summary>
+		/// Building slide and blocks, fill properties, initialize some values. Any work we need to do before work with slide.
+		/// </summary>
+		public virtual void BuildUp(CourseLoadingContext context)
+		{
+			Meta?.FixPaths(context.SlideFile);
+			Info = new SlideInfo(context.Unit, context.SlideFile, context.SlideIndex);
+			if (Blocks == null)
+				Blocks = new SlideBlock[0];
+			
+			/* Validate block types. We should do it before building up blocks */
+			CheckBlockTypes();
+			
+			/* ... and build blocks */
+			var slideLoadingContext = new SlideLoadingContext(context, this);
+			Blocks = Blocks.SelectMany(b => b.BuildUp(slideLoadingContext, ImmutableHashSet<string>.Empty)).ToArray();
+			
+			DefineBlockType = Blocks.Select(BlockTypeHelpers.GetBlockType).ToArray();
+		}
+
+		public void CheckBlockTypes()
+		{
+			foreach (var block in Blocks)
+			{
+				if (!AllowedBlockTypes.Any(type => type.IsInstanceOfType(block)))
+					throw new CourseLoadingException(
+						$"Недопустимый тип блока в слайде {Info.SlideFile.FullName}: <{block.GetType().GetXmlType()}>. " +
+						$"В этом слайде разрешены только следующие блоки: {string.Join(", ", AllowedBlockTypes.Select(t => $"<{t.GetXmlType()}>"))}"
+					);
+			}
+		}
+		
+		public AbstractQuestionBlock FindBlockById(string id)
+		{
+			return Blocks.OfType<AbstractQuestionBlock>().FirstOrDefault(block => block.Id == id);
+		}
+
+		public override string ToString()
+		{
+			return $"Title: {Title}, Id: {NormalizedGuid}, MaxScore: {MaxScore}";
+		}
+	
+		public IEnumerable<SlideBlock[]> GetBlockRangesWithSameVisibility()
 		{
 			if (Blocks.Length == 0)
 				yield break;
@@ -42,43 +206,16 @@ namespace Ulearn.Core.Courses.Slides
 			}
 			yield return range.ToArray();
 		}
-
-		public Slide(IEnumerable<SlideBlock> blocks, SlideInfo info, string title, Guid id, SlideMetaDescription meta)
-		{
-			try
-			{
-				Info = info;
-				Title = title;
-				Id = id;
-				MaxScore = 0;
-				Blocks = blocks.ToArray();
-				ScoringGroup = "";
-				Meta = meta;
-				foreach (var block in Blocks)
-					block.Validate();
-			}
-			catch (Exception e)
-			{
-				throw new FormatException($"Error in slide {title} (id: {id}). {e.Message}", e);
-			}
-		}
-
-		public override string ToString()
-		{
-			return $"Title: {Title}, Id: {NormalizedGuid}, MaxScore: {MaxScore}";
-		}
-
-		public string LatinTitle => Title.ToLatin();
-
-		public string Url => LatinTitle + "_" + NormalizedGuid;
-
+		
+		#region ExportToEdx
+		
 		private static IEnumerable<Vertical> OrdinarySlideToVerticals(string courseId, Slide slide, string ulearnBaseUrl, Dictionary<string, string> videoGuids, string ltiId, DirectoryInfo coursePackageRoot)
 		{
 			var componentIndex = 0;
 			var components = new List<Component>();
 			while (componentIndex < slide.Blocks.Length)
 			{
-				var blocks = slide.Blocks.Skip(componentIndex).TakeWhile(x => !(x is YoutubeBlock) && !(x is ExerciseBlock)).ToList();
+				var blocks = slide.Blocks.Skip(componentIndex).TakeWhile(x => !(x is YoutubeBlock) && !(x is AbstractExerciseBlock)).ToList();
 				if (blocks.Count != 0)
 				{
 					var innerComponents = new List<Component>();
@@ -109,31 +246,36 @@ namespace Ulearn.Core.Courses.Slides
 				}
 				if (componentIndex >= slide.Blocks.Length)
 					break;
-
-				var exerciseBlock = slide.Blocks[componentIndex] as ExerciseBlock;
+				
+				var exerciseBlock = slide.Blocks[componentIndex] as AbstractExerciseBlock;
 				var otherComponent = exerciseBlock != null
-					? exerciseBlock.GetExerciseComponent(componentIndex == 0 ? slide.Title : "Упражнение", slide, componentIndex, string.Format(ulearnBaseUrl + SlideUrlFormat, courseId, slide.Id), ltiId)
+					? ((ExerciseSlide)slide).GetExerciseComponent(componentIndex == 0 ? slide.Title : "Упражнение", slide, componentIndex, string.Format(ulearnBaseUrl + SlideUrlFormat, courseId, slide.Id), ltiId)
 					: ((YoutubeBlock)slide.Blocks[componentIndex]).GetVideoComponent(componentIndex == 0 ? slide.Title : "", slide, componentIndex, videoGuids);
 
 				components.Add(otherComponent);
 				componentIndex++;
 			}
 
-			var exerciseWithSolutionsToShow = slide.Blocks.OfType<ExerciseBlock>().FirstOrDefault(e => !e.HideShowSolutionsButton);
+			var exerciseWithSolutionsToShow = slide.Blocks.OfType<AbstractExerciseBlock>().FirstOrDefault(e => !e.HideShowSolutionsButton);
 			if (exerciseWithSolutionsToShow != null)
 			{
-				var comp = exerciseWithSolutionsToShow.GetSolutionsComponent(
+				var exerciseSlide = slide as ExerciseSlide;
+				Debug.Assert(exerciseSlide != null, nameof(exerciseSlide) + " != null");
+				var comp = exerciseSlide.GetSolutionsComponent(
 					"Решения",
 					slide, componentIndex,
 					string.Format(ulearnBaseUrl + SolutionsUrlFormat, courseId, slide.Id), ltiId);
 				components.Add(comp);
 				//yield return new Vertical(slide.NormalizedGuid + "0", "Решения", new[] { comp });
 			}
-			var exBlock = slide.Blocks.OfType<ExerciseBlock>().FirstOrDefault();
+			var exBlock = slide.Blocks.OfType<AbstractExerciseBlock>().FirstOrDefault();
 			if (exBlock == null)
 				yield return new Vertical(slide.NormalizedGuid, slide.Title, components.ToArray());
 			else
-				yield return new Vertical(slide.NormalizedGuid, slide.Title, components.ToArray(), EdxScoringGroupsHack.ToEdxName(exBlock.ScoringGroup), exBlock.MaxScore);
+			{
+				var exerciseSlide = (ExerciseSlide)slide;
+				yield return new Vertical(slide.NormalizedGuid, slide.Title, components.ToArray(), EdxScoringGroupsHack.ToEdxName(exerciseSlide.ScoringGroup), exerciseSlide.MaxScore);
+			}
 		}
 
 		private static IEnumerable<Vertical> QuizToVerticals(string courseId, QuizSlide slide, string slideUrl, string ltiId)
@@ -163,6 +305,21 @@ namespace Ulearn.Core.Courses.Slides
 				throw new Exception($"Slide {this}. {e.Message}", e);
 			}
 		}
+		
+		#endregion
+	}
+
+	[JsonConverter(typeof(StringEnumConverter), true)]
+	public enum SlideType
+	{
+		[XmlEnum("lesson")]
+		Lesson,
+		
+		[XmlEnum("quiz")]
+		Quiz,
+		
+		[XmlEnum("exercise")]
+		Exercise
 	}
 
 	class EdxScoringGroupsHack

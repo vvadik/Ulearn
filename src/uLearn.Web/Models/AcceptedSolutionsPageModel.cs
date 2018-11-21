@@ -2,6 +2,7 @@
 using System.Security.Principal;
 using Ulearn.Core;
 using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
 
 namespace uLearn.Web.Models
 {

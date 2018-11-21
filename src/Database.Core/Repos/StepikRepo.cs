@@ -108,8 +108,7 @@ namespace Database.Repos
 
 		public string GetSlideXmlIndicatedChanges(Slide slide)
 		{
-			var exportedSlide = new ExportedSlide(slide);
-			return exportedSlide.XmlSerialize(removeWhitespaces: true);
+			return slide.XmlSerialize(removeWhitespaces: true);
 		}
 
 		[CanBeNull]

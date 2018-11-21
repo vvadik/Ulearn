@@ -8,8 +8,21 @@ using Ulearn.Core.Courses.Units;
 
 namespace Ulearn.Core.Courses
 {
-	public class CourseLoader
+	public class CourseLoader : ICourseLoader
 	{
+		private readonly IUnitLoader unitLoader;
+
+		public CourseLoader(IUnitLoader unitLoader)
+		{
+			this.unitLoader = unitLoader;
+		}
+
+		/* For backward compatibility. In future we should use only DI */
+		public CourseLoader()
+			: this(new UnitLoader(new XmlSlideLoader()))
+		{
+		}
+		
 		public Course LoadCourse(DirectoryInfo dir)
 		{
 			var courseId = dir.Name;
@@ -73,7 +86,7 @@ namespace Ulearn.Core.Courses
 			}
 		}
 
-		private static IEnumerable<Unit> LoadUnits(DirectoryInfo dir, CourseSettings settings, string courseId)
+		private IEnumerable<Unit> LoadUnits(DirectoryInfo dir, CourseSettings settings, string courseId)
 		{
 			var unitsDirectories = dir.GetDirectories().OrderBy(d => d.Name);
 
@@ -82,7 +95,7 @@ namespace Ulearn.Core.Courses
 			var slideIndex = 0;
 			foreach (var unitDirectory in unitsDirectories)
 			{
-				var unit = UnitLoader.LoadUnit(unitDirectory, settings, courseId, slideIndex);
+				var unit = unitLoader.LoadUnit(unitDirectory, settings, courseId, slideIndex);
 
 				if (unitIds.Contains(unit.Id))
 					throw new CourseLoadingException($"Ошибка в курсе \"{settings.Title}\" при загрузке модуля \"{unit.Title}\" из {unitDirectory.FullName}. " +
@@ -91,7 +104,10 @@ namespace Ulearn.Core.Courses
 				unitIds.Add(unit.Id);
 
 				if (unitUrls.Contains(unit.Url))
-					throw new CourseLoadingException($"Ошибка в курсе \"{settings.Title}\" при загрузке модуля \"{unit.Title}\" из {unitDirectory.FullName}. Повторяющийся url-адрес модуля: {unit.Url}. Url-адреса модулей должны быть уникальными");
+					throw new CourseLoadingException(
+						$"Ошибка в курсе \"{settings.Title}\" при загрузке модуля \"{unit.Title}\" из {unitDirectory.FullName}. " +
+						$"Повторяющийся url-адрес модуля: {unit.Url}. Url-адреса модулей должны быть уникальными"
+					);
 				unitUrls.Add(unit.Url);
 
 				yield return unit;

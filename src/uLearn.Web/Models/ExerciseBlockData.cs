@@ -3,6 +3,8 @@ using System.Web.Mvc;
 using Database.Models;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 
 namespace uLearn.Web.Models
 {
@@ -22,7 +24,7 @@ namespace uLearn.Web.Models
 
 		public string CourseId { get; set; }
 		public ExerciseSlide Slide { get; set; }
-		public ExerciseBlock Block => Slide.Exercise;
+		public AbstractExerciseBlock Block => Slide.Exercise;
 		
 		public ApplicationUser CurrentUser { get; set; }
 

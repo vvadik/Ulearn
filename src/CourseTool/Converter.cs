@@ -37,7 +37,7 @@ namespace uLearn.CourseTool
 								displayName,
 								new[]
 								{
-									new MdBlock(unit.InstructorNote.Markdown)
+									new MarkdownBlock(unit.InstructorNote.Markdown)
 										.ToEdxComponent(mdBlockId, displayName, unit.Directory.FullName)
 								})
 						}) { VisibleToStaffOnly = true }

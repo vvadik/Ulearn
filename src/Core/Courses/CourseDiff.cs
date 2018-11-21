@@ -6,17 +6,18 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Slides.Quizzes;
+using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
 
 namespace Ulearn.Core.Courses
 {
 	public class CourseDiff
 	{
-		public Course OriginalCourse { get; private set; }
-		public Course ChangedCourse { get; private set; }
+		public Course OriginalCourse { get; }
+		public Course ChangedCourse { get; }
 
-		public List<Slide> RemovedSlides { get; set; }
-		public List<Slide> InsertedSlides { get; set; }
-		public List<SlideDiff> SlideDiffs { get; set; }
+		public List<Slide> RemovedSlides { get; }
+		public List<Slide> InsertedSlides { get; }
+		public List<SlideDiff> SlideDiffs { get; }
 
 		public CourseDiff(Course original, Course changed)
 		{
@@ -26,6 +27,7 @@ namespace Ulearn.Core.Courses
 			RemovedSlides = new List<Slide>();
 			InsertedSlides = new List<Slide>();
 			SlideDiffs = new List<SlideDiff>();
+			
 			FindDifferences();
 		}
 
@@ -55,12 +57,12 @@ namespace Ulearn.Core.Courses
 
 	public class SlideDiff
 	{
-		public Slide OriginalSlide { get; set; }
-		public Slide ChangedSlide { get; set; }
+		public Slide OriginalSlide { get; }
+		public Slide ChangedSlide { get; }
 
-		public List<SlideBlock> RemovedBlocks { get; set; }
-		public List<SlideBlock> InsertedBlocks { get; set; }
-		public List<SlideBlockDiff> SlideBlockDiffs { get; set; }
+		public List<SlideBlock> RemovedBlocks { get; }
+		public List<SlideBlock> InsertedBlocks { get; }
+		public List<SlideBlockDiff> SlideBlockDiffs { get; }
 
 		public SlideDiff(Slide original, Slide changed)
 		{
@@ -70,6 +72,7 @@ namespace Ulearn.Core.Courses
 			RemovedBlocks = new List<SlideBlock>();
 			InsertedBlocks = new List<SlideBlock>();
 			SlideBlockDiffs = new List<SlideBlockDiff>();
+			
 			FindDifferences();
 		}
 
@@ -125,8 +128,8 @@ namespace Ulearn.Core.Courses
 
 	public class SlideBlockDiff
 	{
-		public SlideBlock OriginalSlideBlock { get; set; }
-		public SlideBlock ChangedSlideBlock { get; set; }
+		public SlideBlock OriginalSlideBlock { get; }
+		public SlideBlock ChangedSlideBlock { get; }
 
 		public SlideBlockDiff(SlideBlock original, SlideBlock changed)
 		{

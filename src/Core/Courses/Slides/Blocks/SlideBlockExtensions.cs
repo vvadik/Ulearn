@@ -11,7 +11,7 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 
 		public static string Text(this SlideBlock block)
 		{
-			var md = block as MdBlock;
+			var md = block as MarkdownBlock;
 			if (md != null)
 				return md.Markdown;
 			var code = block as CodeBlock;

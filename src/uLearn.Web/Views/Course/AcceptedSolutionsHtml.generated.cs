@@ -58,7 +58,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "\"></div>\r\n");
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "	<p>");
 
 
-WebViewPage.WriteTo(@__razor_helper_writer, MvcHtmlString.Create(model.Slide.Exercise.CommentAfterExerciseIsSolved.RenderMd(model.Slide.Info.SlideFile)));
+WebViewPage.WriteTo(@__razor_helper_writer, MvcHtmlString.Create(model.Slide.Exercise.CommentAfterExerciseIsSolved.RenderMarkdown(model.Slide.Info.SlideFile)));
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "</p>\r\n");
 
@@ -71,7 +71,7 @@ WebViewPage.WriteLiteralTo(@__razor_helper_writer, "	<p>Изучите реше�
 	foreach (var solution in model.AcceptedSolutions)
 	{
 		var id = "solution_" + solution.Id;
-		var code = new CodeBlock(solution.Code, model.Slide.Exercise.LangId);
+		var code = new CodeBlock(solution.Code, model.Slide.Exercise.Language);
 
 WebViewPage.WriteLiteralTo(@__razor_helper_writer, "		<div id=\"");
 

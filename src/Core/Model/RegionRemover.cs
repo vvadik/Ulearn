@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.CSharp;
 
@@ -18,9 +19,9 @@ namespace Ulearn.Core.Model
 		private readonly List<IRegionRemover> regionRemovers = new List<IRegionRemover>();
 		private readonly string pragma;
 
-		public RegionRemover(string langId)
+		public RegionRemover(Language? language)
 		{
-			if (langId == "cs")
+			if (language == Language.CSharp)
 			{
 				regionRemovers.Add(new CsMembersRemover());
 				pragma = CsMembersRemover.Pragma;

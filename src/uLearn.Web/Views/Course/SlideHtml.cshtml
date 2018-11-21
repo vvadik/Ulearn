@@ -9,7 +9,10 @@
 @using Ulearn.Core
 @using Ulearn.Core.Courses.Slides
 @using Ulearn.Core.Courses.Slides.Blocks
+@using Ulearn.Core.Courses.Slides.Exercises
+@using Ulearn.Core.Courses.Slides.Exercises.Blocks
 @using Ulearn.Core.Courses.Slides.Quizzes
+@using Ulearn.Core.Courses.Slides.Quizzes.Blocks
 @* ReSharper restore RedundantUsingDirective *@
 
 
@@ -41,9 +44,9 @@
 
 @helper Blocks(BlockRenderContext context, HtmlHelper Html)
 {
-	var countHiddenBlocks = context.Slide.GetBlocksRangesWithSameVisibility().Count(b => b[0].Hide);
+	var countHiddenBlocks = context.Slide.GetBlockRangesWithSameVisibility().Count(b => b[0].Hide);
 	var firstHiddenBlock = true;
-	foreach (var blockRange in context.Slide.GetBlocksRangesWithSameVisibility())
+	foreach (var blockRange in context.Slide.GetBlockRangesWithSameVisibility())
 	{
 		if (!blockRange[0].Hide)
 		{
@@ -120,9 +123,9 @@
 @helper ShowScoreWithWords(int currentScore, int maxScore)
 { @(maxScore == 0 ? "" : string.Format("{0} из {1}", currentScore.PluralizeInRussian(RussianPluralizationOptions.Score), maxScore)) }
 
-@helper Block(MdBlock block, BlockRenderContext context, HtmlHelper Html)
+@helper Block(MarkdownBlock block, BlockRenderContext context, HtmlHelper Html)
 {
-	@MvcHtmlString.Create(block.RenderMd(context.Course.Id, context.Slide.Id, context.BaseUrl))
+	@MvcHtmlString.Create(block.RenderMarkdown(context.Course.Id, context.Slide.Id, context.BaseUrl))
 }
 
 @helper Block(CodeBlock block, BlockRenderContext context, HtmlHelper Html)
@@ -133,7 +136,7 @@
 	}
 	else
 	{
-		<textarea class="code code-sample" data-lang="@block.LangId" data-ver="@block.LangVer">@block.Code</textarea>
+		<textarea class="code code-sample" data-lang="@(block.Language.GetName())">@block.Code</textarea>
 	}
 }
 
@@ -143,7 +146,7 @@
 	var linesCountToShow = linesCount <= 20 ? linesCount : 5;
 	var visibleLines = block.Code.SplitToLinesWithEoln().Take(linesCountToShow).Join("");
 	<div class="expandable-code @(linesCount > linesCountToShow ? "collapsed" : "expanded")">
-        <textarea class="code code-sample" data-lang="@block.LangId" data-ver="@block.LangVer" data-code="@block.Code">@visibleLines</textarea>
+        <textarea class="code code-sample" data-lang="@block.Language.GetName()" data-code="@block.Code">@visibleLines</textarea>
         @if (linesCount > linesCountToShow)
         {
 	        <div class="expandable-code__button-wrapper">
@@ -203,7 +206,7 @@
 	@RunErrors()
 }
 
-@helper Block(ExerciseBlock block, BlockRenderContext context, HtmlHelper Html)
+@helper Block(AbstractExerciseBlock block, BlockRenderContext context, HtmlHelper Html)
 {
 	<div class="exercise">
 		@{
@@ -217,7 +220,7 @@
 			else
 			{
 				<div class="exercise__submission">
-					<textarea class="code code-exercise hidden" data-lang="@block.LangId">@( block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
+					<textarea class="code code-exercise hidden" data-lang="@block.Language.GetName()">@( block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
 					<div class="loading-spinner">
 						<img src="/Content/loading.gif"/>
 					</div>
@@ -242,7 +245,7 @@
                     @foreach (var hint in data.Block.HintsMd)
                     {
 	                    <li>
-                            @MvcHtmlString.Create(hint.RenderMd(context.BaseUrl))
+                            @MvcHtmlString.Create(hint.RenderMarkdown(context.BaseUrl))
                         </li>
                     }
                 </ol>

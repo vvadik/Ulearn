@@ -6,6 +6,7 @@ using ApprovalUtilities.Utilities;
 using Database.Models;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Quizzes;
+using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
 
 namespace Database.DataContexts
 {

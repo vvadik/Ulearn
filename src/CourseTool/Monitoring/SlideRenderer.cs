@@ -63,7 +63,7 @@ namespace uLearn.CourseTool.Monitoring
 		private string RenderSlide(Slide slide)
 		{
 			var page = StandaloneLayout.Page(course, slide, CreateToc(slide), GetCssFiles(), GetJsFiles());
-			foreach (var block in slide.Blocks.OfType<MdBlock>())
+			foreach (var block in slide.Blocks.OfType<MarkdownBlock>())
 				CopyLocalFiles(block.Markdown, slide.Info.Directory.FullName);
 			return "<!DOCTYPE html>\n" + page.ToHtmlString();
 		}
@@ -83,11 +83,12 @@ namespace uLearn.CourseTool.Monitoring
 				return null;
 
 			var similarSlide = unit.Slides.First();
-			var slide = new Slide(
-				new[] { new MdBlock(note.Markdown) },
-				new SlideInfo(unit, similarSlide.Info.SlideFile, -1), "Заметки преподавателю", Guid.NewGuid(),
-				null
-			);
+			var slide = new Slide(new MarkdownBlock(note.Markdown))
+			{
+				Id = Guid.NewGuid(),
+				Title = "Заметки преподавателю", 
+				Info = new SlideInfo(unit, similarSlide.Info.SlideFile, -1),
+			};
 			var page = StandaloneLayout.Page(course, slide, CreateToc(slide), GetCssFiles(), GetJsFiles());
 
 			CopyLocalFiles(note.Markdown, similarSlide.Info.Directory.FullName);

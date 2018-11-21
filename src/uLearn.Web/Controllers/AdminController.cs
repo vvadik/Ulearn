@@ -24,6 +24,7 @@ using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Courses.Units;
 using Ulearn.Core.CSharp;
@@ -317,7 +318,7 @@ namespace uLearn.Web.Controllers
 			filterOptions.OnlyChecked = null;
 			var allCheckingsSlidesIds = slideCheckingsRepo.GetManualCheckingQueue<T>(filterOptions).Select(c => c.SlideId).Distinct();
 
-			var emptySlideMock = new Slide(Enumerable.Empty<SlideBlock>(), new SlideInfo(null, null, -1), "", Guid.Empty, meta: null);
+			var emptySlideMock = new Slide { Info = new SlideInfo(null, null, -1), Title = "", Id = Guid.Empty};
 			var allCheckingsSlidesTitles = allCheckingsSlidesIds
 				.Select(s => new KeyValuePair<Guid, Slide>(s, course.FindSlideById(s)))
 				.Where(kvp => kvp.Value != null)
@@ -337,7 +338,7 @@ namespace uLearn.Web.Controllers
 			return View(viewName, new ManualCheckingQueueViewModel
 			{
 				CourseId = courseId,
-                /* TODO (andgein): Merge FindSlideById and GetSlideById */
+                /* TODO (andgein): Merge FindSlideById() and following GetSlideById() calls */
 				Checkings = checkings.Take(MaxShownQueueSize).Where(c => course.FindSlideById(c.SlideId) != null).Select(c =>
 				{
 					var slide = course.GetSlideById(c.SlideId);
@@ -346,7 +347,7 @@ namespace uLearn.Web.Controllers
 						CheckingQueueItem = c,
 						ContextSlideId = slide.Id,
 						ContextSlideTitle = slide.Title,
-						ContextMaxScore = (slide as ExerciseSlide)?.Exercise.MaxReviewScore ?? slide.MaxScore,
+						ContextMaxScore = (slide as ExerciseSlide)?.Scoring.CodeReviewScore ?? slide.MaxScore,
 						ContextTimestamp = c.Timestamp,
 						ContextReviews = reviews.GetOrDefault(c.Id, new List<ExerciseCodeReview>()),
 						ContextExerciseSolution = c is ManualExerciseChecking ?

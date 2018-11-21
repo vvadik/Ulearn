@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Web.Api.Authorization;
 using Ulearn.Web.Api.Models.Responses.CodeReviewStatistics;
 

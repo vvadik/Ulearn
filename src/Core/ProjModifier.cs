@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.Build.Evaluation;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Helpers;
 
 namespace Ulearn.Core
