@@ -131,5 +131,33 @@ namespace Ulearn.Core.Courses
 
 		[XmlText]
 		public string File { get; set; }
+
+		#region Equals
+		
+		protected bool Equals(PreludeFile other)
+		{
+			return Language == other.Language && string.Equals(File, other.File);
+		}
+
+		public override bool Equals(object obj)
+		{
+			if (ReferenceEquals(null, obj))
+				return false;
+			if (ReferenceEquals(this, obj))
+				return true;
+			if (obj.GetType() != this.GetType())
+				return false;
+			return Equals((PreludeFile)obj);
+		}
+
+		public override int GetHashCode()
+		{
+			unchecked
+			{
+				return ((int)Language * 397) ^ (File != null ? File.GetHashCode() : 0);
+			}
+		}
+		
+		#endregion
 	}
 }

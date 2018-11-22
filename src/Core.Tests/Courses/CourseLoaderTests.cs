@@ -40,6 +40,7 @@ namespace Ulearn.Core.Tests.Courses
 			Assert.AreEqual(2, course.Units.Count);
 			Assert.AreEqual(Language.CSharp, course.Settings.DefaultLanguage);
 			Assert.AreEqual("Simple Course", course.Title);
+			CollectionAssert.AreEqual(new [] { new PreludeFile(Language.Html, "Prelude.html"), }, course.Settings.Preludes);
 		}
 	}
 }
