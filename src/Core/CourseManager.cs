@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml;
 using System.Xml.Linq;
@@ -290,8 +289,9 @@ namespace Ulearn.Core
 			{
 				zip.AddEntry("Course.xml",
 					"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n" +
-					"<Course xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"https://ulearn.azurewebsites.net/course\">\n" +
-					$"\t<title>{courseId}</title>\n" + "</Course>",
+					$"<course xmlns=\"https://ulearn.me/schema/v2\" title=\"{courseId}\">\n" +
+					@"<units><add>*\unit.xml</add></units>" + 
+					"</course>",
 					Encoding.UTF8);
 				zip.Save(path);
 			}
@@ -301,20 +301,13 @@ namespace Ulearn.Core
 		{
 			helpPackage.CopyTo(path, true);
 			var nsResolver = new XmlNamespaceManager(new NameTable());
-			nsResolver.AddNamespace("course", "https://ulearn.azurewebsites.net/course");
-			nsResolver.AddNamespace("lesson", "https://ulearn.azurewebsites.net/lesson");
-			nsResolver.AddNamespace("quiz", "https://ulearn.azurewebsites.net/quiz");
-			nsResolver.AddNamespace("types", "https://ulearn.azurewebsites.net/types");
+			nsResolver.AddNamespace("ulearn", "https://ulearn.me/schema/v2");
 			using (var zip = ZipFile.Read(path, new ReadOptions { Encoding = Encoding.GetEncoding(866) }))
 			{
-				if (zip.ContainsEntry("Course.xml"))
-					UpdateXmlElement(zip["Course.xml"], "//course:Course/course:title", courseId, zip, nsResolver);
-				foreach (var entry in zip.SelectEntries("name = *.lesson.xml").Where(entry => UnitLoader.IsSlideFile(Path.GetFileName(entry.FileName))))
-					UpdateXmlElement(entry, "//lesson:Lesson/lesson:id", Guid.NewGuid().ToString(), zip, nsResolver);
-				foreach (var entry in zip.SelectEntries("name = *.quiz.xml").Where(entry => UnitLoader.IsSlideFile(Path.GetFileName(entry.FileName))))
-					UpdateXmlAttribute(entry, "//quiz:Quiz", "id", Guid.NewGuid().ToString(), zip, nsResolver);
-				foreach (var entry in zip.SelectEntries("name = *.cs").Where(entry => UnitLoader.IsSlideFile(Path.GetFileName(entry.FileName))))
-					UpdateCsFiles(entry, Guid.NewGuid().ToString(), zip);
+				if (zip.ContainsEntry("course.xml"))
+					UpdateXmlElement(zip["course.xml"], "//ulearn:course/course:title", courseId, zip, nsResolver);
+				foreach (var entry in zip.SelectEntries("name = *.xml"))
+					UpdateXmlAttribute(entry, "//ulearn:slide", "ulearn:id", Guid.NewGuid().ToString(), zip, nsResolver);
 			}
 		}
 
@@ -331,18 +324,6 @@ namespace Ulearn.Core
 				if (elementAttribute != null)
 					elementAttribute.Value = value;
 			}, zip, nsResolver);
-		}
-
-		private static void UpdateCsFiles(ZipEntry entry, string slideId, ZipFile zip)
-		{
-			string code;
-			using (var entryStream = entry.OpenReader())
-			{
-				code = new StreamReader(entryStream).ReadToEnd();
-			}
-			code = Regex.Replace(code, "(?<=\\[Slide\\(\".*\",\\s*\").+(?=\"\\)\\])", slideId);
-			zip.UpdateEntry(entry.FileName, code, Encoding.UTF8);
-			zip.Save();
 		}
 
 		private static void UpdateXmlEntity(ZipEntry entry, string selector, Action<XElement> update, ZipFile zip, IXmlNamespaceResolver nsResolver)
@@ -387,7 +368,7 @@ namespace Ulearn.Core
 
 		private readonly TimeSpan waitBetweenLockTries = TimeSpan.FromSeconds(0.1);
 		private readonly TimeSpan lockLifeTime = TimeSpan.FromMinutes(20);
-		private int updateCourseEachOperarionTriesCount = 5;
+		private int updateCourseEachOperationTriesCount = 5;
 
 		private FileInfo GetCourseLockFile(string courseId)
 		{
@@ -454,7 +435,7 @@ namespace Ulearn.Core
 		private void TrySeveralTimes(Action function)
 		{
 			Exception lastException = null;
-			for (var tryNumber = 1; tryNumber <= updateCourseEachOperarionTriesCount; tryNumber++)
+			for (var tryNumber = 1; tryNumber <= updateCourseEachOperationTriesCount; tryNumber++)
 			{
 				try
 				{

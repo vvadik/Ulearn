@@ -1145,11 +1145,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
-    <None Include="Properties\PublishProfiles\ulearn - FTP.pubxml" />
-    <None Include="Properties\PublishProfiles\ulearn - Web Deploy.pubxml" />
-    <None Include="Properties\PublishProfiles\ulearn-dev.pubxml" />
-    <None Include="Properties\PublishProfiles\ulearn.pubxml" />
-    <Content Include="Properties\webjobs-list.json" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\buttons.js" />
     <Content Include="Scripts\certificates-editor.js" />
