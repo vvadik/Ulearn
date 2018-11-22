@@ -158,6 +158,7 @@ class AbstractMyCoursesMenu extends Component {
     static VISIBLE_COURSES_COUNT = 10;
 
     static _getCourseMenuItems(courseIds, courseById) {
+    	courseIds = courseIds.filter(item => courseById[item] !== undefined);
         courseIds.sort((a, b) => courseById[a].title.localeCompare(courseById[b].title));
         let visibleCourseIds = courseIds.slice(0, AbstractMyCoursesMenu.VISIBLE_COURSES_COUNT);
         let items = visibleCourseIds.filter(courseId => courseById.hasOwnProperty(courseId)).map(courseId =>
@@ -601,7 +602,7 @@ class LogoutLink extends Component {
     }
 
     render() {
-        return <div className="header__logout-link"><a href="#" onClick={ this.onClick }>Выйти</a></div>
+        return <div className="header__logout-link"><a href="/" onClick={ this.onClick }>Выйти</a></div>
     }
 
     static mapStateToProps(state) {

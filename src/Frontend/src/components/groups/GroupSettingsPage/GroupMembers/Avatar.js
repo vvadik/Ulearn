@@ -39,3 +39,7 @@ export default class Avatar extends Component {
 		)
 	}
 }
+
+Avatar.propTypes = {
+	user: PropTypes.func,
+};

@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import api from "../../../api";
 import PropTypes from 'prop-types';
 import GroupsList from "../../../components/groups/GroupMainPage/GroupList/GroupsList";
 import GroupHeader from "../../../components/groups/GroupMainPage/GroupHeader/GroupHeader";
 
 import "./groupsPage.less";
-import connect from "react-redux/es/connect/connect";
 
 class AbstractPage extends Component {
  // TODO: выяснить у Андрея, зачем оно. И реализоваьть или удалить.
@@ -34,6 +34,9 @@ class GroupsPage extends AbstractPage {
 		let courseId = this.props.match.params.courseId;
 		return (
 			<div className="wrapper">
+				<Helmet>
+					<title>Группы в курсе</title>
+				</Helmet>
 				<div className="content-wrapper">
 					<GroupHeader
 						onTabChange={this.onTabChange}
@@ -44,6 +47,7 @@ class GroupsPage extends AbstractPage {
 						groups={this.state.groups}
 					/>
 					<GroupsList
+						courseId={courseId}
 						groups={this.filteredGroups}
 						deleteGroup={this.deleteGroup}
 						toggleArchived={this.toggleArchived}

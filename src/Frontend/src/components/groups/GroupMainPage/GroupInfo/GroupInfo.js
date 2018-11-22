@@ -7,6 +7,7 @@ import MenuItem from "@skbkontur/react-ui/components/MenuItem/MenuItem";
 import getPluralForm from "../../../../utils/getPluralForm";
 
 import './style.less';
+import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
 
 class GroupInfo extends Component {
 
@@ -31,7 +32,7 @@ class GroupInfo extends Component {
 		return (
 			<div className="group">
 				<div className="group-content-wrapper">
-					<Link className="link-group-page" to={`groups/${groupId}`} />
+					<Link className="link-group-page" to={`/${this.props.courseId}/groups/${groupId}`} />
 					<div className="group-content">
 						<header className="group-content-main">
 							<h3 className="group-content-main__name">{groupName}</h3>
@@ -60,13 +61,17 @@ class GroupInfo extends Component {
 
 		return (
 			<Kebab size="large">
-				<MenuItem icon="ArchiveUnpack"
-						  onClick={() => this.props.toggleArchived(group, !group.is_archived)}>
-					{group.is_archived ? 'Восстановить' : 'Архивировать'}
+				<MenuItem onClick={() => this.props.toggleArchived(group, !group.is_archived)}>
+					<Gapped gap={5}>
+						<Icon name="ArchiveUnpack" />
+						{group.is_archived ? 'Восстановить' : 'Архивировать'}
+					</Gapped>
 				</MenuItem>
-				<MenuItem icon="Delete"
-						  onClick={() => this.props.deleteGroup(group, group.is_archived ? 'archiveGroups' : 'groups')}>
-					Удалить
+				<MenuItem onClick={() => this.props.deleteGroup(group, group.is_archived ? 'archiveGroups' : 'groups')}>
+					<Gapped gap={5}>
+						<Icon name="Delete" />
+						Удалить
+					</Gapped>
 				</MenuItem>
 			</Kebab>
 		)
@@ -93,6 +98,7 @@ class GroupInfo extends Component {
  }
 
 GroupInfo.propTypes = {
+	courseId: PropTypes.string.isRequired,
 	group: PropTypes.object.isRequired,
 	deleteGroup: PropTypes.func,
 	toggleArchived: PropTypes.func,

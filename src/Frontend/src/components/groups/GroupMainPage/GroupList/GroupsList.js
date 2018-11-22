@@ -17,6 +17,7 @@ class GroupsList extends Component {
 						{ this.props.groups && this.props.groups.map(group =>
 							<GroupInfo
 								key={group.id}
+								courseId={this.props.courseId}
 								group={group}
 								deleteGroup={this.props.deleteGroup}
 								toggleArchived={this.props.toggleArchived}
@@ -30,6 +31,7 @@ class GroupsList extends Component {
 }
 
 GroupsList.propTypes = {
+	courseId: PropTypes.string.isRequired,
 	groups: PropTypes.array,
 	loading: PropTypes.bool,
 	deleteGroup: PropTypes.func,

@@ -38,9 +38,9 @@ export function deleteGroup(groupId) {
 		.then(response => response.json());
 }
 
-export function changeGroupOwner(groupId, owner) {
+export function changeGroupOwner(groupId, ownerId) {
 	return api.put("groups/" + groupId + '/owner',
-		createRequestParams({owner: owner}))
+		createRequestParams({owner_id: ownerId}))
 		.then(response => response.json());
 }
 
@@ -49,14 +49,24 @@ export function getGroupScores(groupId) {
 		.then(response => response.json());
 }
 
-export function saveScoresSettings(groupId, scores) {
+export function saveScoresSettings(groupId, scoresId) {
 	return api.post("groups/" + groupId + '/scores', {
 			headers: {
 				'Content-Type': 'application/json'
 			},
 			body:
-				JSON.stringify({ scores: scores }),
+				JSON.stringify({ scores: scoresId }),
 			})
+		.then(response => response.json());
+}
+
+export function getGroupAccesses(groupId) {
+	return api.get("groups/" + groupId + "/accesses")
+		.then(response => response.json());
+}
+
+export function removeAccess(groupId, userId) {
+	return api.delete("groups/" + groupId + "/accesses/" + userId)
 		.then(response => response.json());
 }
 

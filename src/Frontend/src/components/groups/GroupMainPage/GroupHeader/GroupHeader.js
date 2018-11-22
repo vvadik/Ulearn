@@ -7,7 +7,6 @@ import CreateGroupModal from "../CreateGroupModal/CreateGroupModal";
 import CopyGroupModal from "../CopyGroupModal/CopyGroupModal";
 
 import './style.less';
-import api from "../../../../api";
 
 const TABS = {
 	active: 'active',
