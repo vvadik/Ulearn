@@ -9,7 +9,7 @@ using Ulearn.Core.Model.Edx.EdxComponents;
 
 namespace Ulearn.Core.Courses.Slides.Blocks
 {
-	[XmlType("include-blocks")]
+	[XmlType("includeBlocks")]
 	public class IncludeBlocksBlock : SlideBlock
 	{
 		[XmlAttribute("file")]

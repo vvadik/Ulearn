@@ -67,19 +67,19 @@ namespace uLearn
 		[Test]
 		public void UserCodeFilePath()
 		{
-			var ex = DeserializeLesson("<proj-exercise>" +
-										"<user-code-file-path>user-code-name-111</user-code-file-path>" +
-										"</proj-exercise>").Blocks.Single();
+			var ex = DeserializeLesson("<csprojExercise>" +
+										"<userCodeFile>user-code-name-111</userCodeFile>" +
+										"</csprojExercise>").Blocks.Single();
 			((ProjectExerciseBlock)ex).UserCodeFilePath.Should().Be("user-code-name-111");
 		}
 
 		[Test]
 		public void ExerciseHints()
 		{
-			var ex = DeserializeLesson("<proj-exercise>" +
+			var ex = DeserializeLesson("<csprojExercise>" +
 										"<hint>Hint 1</hint>" +
 										"<hint>Hint 2</hint>" +
-										"</proj-exercise>").Blocks.Single() as ProjectExerciseBlock;
+										"</csprojExercise>").Blocks.Single() as ProjectExerciseBlock;
 			if (ex == null)
 				Assert.Fail("Can't parse exercise with hints");
 			ex.Hints.Should().HaveCount(2);

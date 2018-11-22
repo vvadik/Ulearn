@@ -27,7 +27,7 @@ namespace Ulearn.Core.Courses.Slides
 			if (slideFile == null)
 				slideFile = new FileInfo("<internal>");
 			
-			var slideType = DetectSlideType(fileContent, "<internal>");
+			var slideType = DetectSlideType(fileContent, slideFile.Name);
 
 			var slide = (Slide)fileContent.DeserializeXml(slideType);
 
@@ -56,7 +56,7 @@ namespace Ulearn.Core.Courses.Slides
 			}
 			catch (Exception e)
 			{
-				throw new CourseLoadingException($"Не могу прочитать слайд из файла {filename}. Возможно, там некорректный XML?");
+				throw new CourseLoadingException($"Не могу прочитать слайд из файла {filename}. Возможно, там некорректный XML?\n{e.Message}", e);
 			}
 
 			if (xmlDocument.DocumentElement == null)

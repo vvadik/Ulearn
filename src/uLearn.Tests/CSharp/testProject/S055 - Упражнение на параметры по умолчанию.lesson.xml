@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <slide xmlns="https://ulearn.me/schema/v2" type="exercise" id="d6165afa-81b2-452f-9e61-78d3580e0c27" title="Упражнение на параметры по умолчанию">
+	<scoring />
 	<markdown>Отрефакторьте класс MyFile, чтобы в нем остался только один метод</markdown>
 	<include-code>
 		<display only-body="false">Main</display>
 	</include-code>
-	<single-file-exercise file="_Упражнение на параметры по умолчанию.cs" language="csharp" type="check-output">
-		<max-score>5</max-score>
-		<initial-code xml:space="preserve">
+	<singleFileExercise file="_Упражнение на параметры по умолчанию.cs" language="csharp" type="check-output">
+		<initialCode xml:space="preserve">
 class MyFile
 {
     public static string ReadAll(string filename, Encoding enc)
@@ -19,19 +19,16 @@ class MyFile
     {
         return ReadAll(filename, Encoding.UTF8);
     }
-}</initial-code>
+}</initialCode>
     <expected xml:space="preserve">
 Use encoding System.Text.UTF8Encoding
 Use encoding System.Text.UTF32Encoding
 1</expected>
-		<hide-expected-output>false</hide-expected-output>
+		<hideExpectedOutput>false</hideExpectedOutput>
 		<validator>cs</validator>
-		<check-for-plagiarism>true</check-for-plagiarism>
-		<hide-solutions>false</hide-solutions>
-		<require-review>false</require-review>
-		<correctness-score>5</correctness-score>
-		<scoring-group>exercise</scoring-group>
+		<checkForPlagiarism>true</checkForPlagiarism>
+		<hideSolutions>false</hideSolutions>
 		<solution only-body="false">MyFile</solution>
-	</single-file-exercise>
-	<default-include-code-file>_Упражнение на параметры по умолчанию.cs</default-include-code-file>
+	</singleFileExercise>
+	<defaultIncludeCodeFile>_Упражнение на параметры по умолчанию.cs</defaultIncludeCodeFile>
 </slide>

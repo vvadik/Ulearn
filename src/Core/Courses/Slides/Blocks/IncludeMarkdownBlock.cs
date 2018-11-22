@@ -8,7 +8,7 @@ using Ulearn.Core.Model.Edx.EdxComponents;
 
 namespace Ulearn.Core.Courses.Slides.Blocks
 {
-	[XmlType("include-markdown")]
+	[XmlType("includeMarkdown")]
 	public class IncludeMarkdownBlock : SlideBlock
 	{
 		[XmlAttribute("file")]

@@ -11,7 +11,7 @@ using Component = Ulearn.Core.Model.Edx.EdxComponents.Component;
 
 namespace Ulearn.Core.Courses.Slides.Blocks
 {
-	[XmlType("include-code")]
+	[XmlType("includeCode")]
 	public class IncludeCodeBlock : SlideBlock
 	{
 		public IncludeCodeBlock(string codeFile)

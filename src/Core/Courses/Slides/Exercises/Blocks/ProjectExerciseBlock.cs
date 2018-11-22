@@ -19,7 +19,7 @@ using Ulearn.Core.Properties;
 
 namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 {
-	[XmlType("proj-exercise")]
+	[XmlType("csprojExercise")]
 	public class ProjectExerciseBlock : AbstractExerciseBlock
 	{
 		public const string BuildingTargetFrameworkVersion = "4.7";
@@ -50,26 +50,26 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			};
 		}
 
-		[XmlElement("csproj-file-path")]
+		[XmlElement("csprojFile")]
 		public string CsProjFilePath { get; set; }
 
-		[XmlElement("startup-object")]
+		[XmlElement("startupObject")]
 		public string StartupObject { get; set; }
 
-		[XmlElement("user-code-file-path")]
+		[XmlElement("userCodeFile")]
 		public string UserCodeFilePath { get; set; }
 
-		[XmlElement("exclude-path-for-checker")]
+		[XmlElement("excludePathForChecker")]
 		public string[] PathsToExcludeForChecker { get; set; }
 
-		[XmlElement("nunit-test-class")]
+		[XmlElement("nunitTestClass")]
 		public string[] NUnitTestClasses { get; set; }
 
-		[XmlElement("exclude-path-for-student")]
+		[XmlElement("excludePathForStudent")]
 		public string[] PathsToExcludeForStudent { get; set; }
 
-		[XmlElement("student-zip-is-buildable")]
-		public bool StudentZipIsBuildable { get; set; } = true;
+		[XmlElement("studentZipIsCompilable")]
+		public bool StudentZipIsCompilable { get; set; } = true;
 
 		public string ExerciseDirName => Path.GetDirectoryName(CsProjFilePath).EnsureNotNull("csproj должен быть в поддиректории");
 

@@ -4,7 +4,7 @@ using Ulearn.Core.Model.Edx.EdxComponents;
 
 namespace Ulearn.Core.Courses.Slides.Blocks
 {
-	[XmlType("gallery-images")]
+	[XmlType("galleryImages")]
 	public class ImageGalleryBlock : SlideBlock
 	{
 		[XmlElement("image")]

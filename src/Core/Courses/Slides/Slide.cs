@@ -39,7 +39,7 @@ namespace Ulearn.Core.Courses.Slides
 		[XmlElement("meta")]
 		public SlideMetaDescription Meta { get; set; }
 		
-		[XmlElement("default-include-code-file")]
+		[XmlElement("defaultIncludeCodeFile")]
 		public string DefaultIncludeCodeFile { get; set; }
 		
 		/* Common blocks */
@@ -112,32 +112,6 @@ namespace Ulearn.Core.Courses.Slides
 			Blocks = blocks;
 		}
 		
-		/*
-		public Slide(IEnumerable<SlideBlock> blocks, SlideInfo info, string title, Guid id, SlideMetaDescription meta)
-		{
-			try
-			{
-				Info = info;
-				Title = title;
-				Id = id;
-				MaxScore = 0;
-				Blocks = blocks.ToArray();
-				ScoringGroup = "";
-				Meta = meta;
-				foreach (var block in Blocks)
-					block.Validate();
-				
-				DefineBlockType = Blocks.Select(BlockTypeHelpers.GetBlockType).ToArray();
-			}
-			catch (Exception e)
-			{
-				throw new FormatException($"Error in slide {title} (id: {id}). {e.Message}", e);
-			}
-			
-			CheckBlockTypes();
-		}
-		*/
-
 		/// <summary>
 		/// Validate slide. We guarantee that Validate() will be called after BuildUp() 
 		/// </summary>

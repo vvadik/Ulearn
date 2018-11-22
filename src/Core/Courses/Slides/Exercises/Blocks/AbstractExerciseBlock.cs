@@ -48,7 +48,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		}
 		#endregion
 
-		[XmlElement("initial-code")]
+		[XmlElement("initialCode")]
 		public string ExerciseInitialCode { get; set; }
 		
 		[XmlElement("hint")]
@@ -61,7 +61,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		// Ожидаемый корректный вывод программы
 		public string ExpectedOutput { get; set; }
 
-		[XmlElement("hide-expected-output")]
+		[XmlElement("hideExpectedOutput")]
 		public bool HideExpectedOutputOnError { get; set; }
 
 		[XmlElement("validator")]
@@ -70,10 +70,10 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		[XmlElement("texts")]
 		public ExerciseTexts Texts { get; set; } = new ExerciseTexts();
 
-		[XmlElement("check-for-plagiarism")]
+		[XmlElement("checkForPlagiarism")]
 		public bool CheckForPlagiarism { get; set; } = true;
 
-		[XmlElement("hide-solutions")]
+		[XmlElement("hideSolutions")]
 		public bool HideShowSolutionsButton { get; set; }
 
 		[XmlIgnore]

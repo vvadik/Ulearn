@@ -133,7 +133,7 @@ namespace uLearn.CourseTool.Validating
 			var submission = ex.CreateSubmission(ex.CsprojFileName, initialCode);
 			var result = SandboxRunner.Run(submission);
 
-			if (ex.StudentZipIsBuildable)
+			if (ex.StudentZipIsCompilable)
 				ReportErrorIfInitialCodeVerdictIsNotOk(result);
 
 			ReportErrorIfInitialCodeIsSolution(result);
@@ -167,7 +167,7 @@ namespace uLearn.CourseTool.Validating
 				ReportErrorIfCsprojHasUserCodeOfNotCompileType(tempExFolder, csproj);
 				ReportErrorIfCsprojHasWrongAnswerOrSolutionItems(tempExFolder, csproj);
 
-				if (!ex.StudentZipIsBuildable)
+				if (!ex.StudentZipIsCompilable)
 					return;
 
 				var buildResult = MsBuildRunner.BuildProject(settings.MsBuildSettings, ex.CsprojFile.Name, tempExFolder);

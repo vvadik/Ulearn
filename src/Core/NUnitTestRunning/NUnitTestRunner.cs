@@ -14,7 +14,7 @@ namespace Ulearn.Core.NUnitTestRunning
 {
 	/// <summary>
 	/// Этот файл включен в ресурсы и добавляется в пришедший на проверку проект с задачей, если у нее в качестве способа проверки 
-	/// установлен nunit-test-class, а не startup-object
+	/// установлен nunitTestClass, а не startupObject
 	/// </summary>
 	public class NUnitTestRunner
 	{

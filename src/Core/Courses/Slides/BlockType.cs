@@ -21,22 +21,25 @@ namespace Ulearn.Core.Courses.Slides
 		[XmlEnum("tex")]
 		Tex,
 
-		[XmlEnum("gallery-images")]
+		[XmlEnum("galleryImages")]
 		GalleryImages,
 
-		[XmlEnum("include-code")]
+		[XmlEnum("includeCode")]
 		IncludeCode,
 
-		[XmlEnum("include-markdown")]
+		[XmlEnum("includeMarkdown")]
 		IncludeMarkdown,
+		
+		[XmlEnum("includeBlocks")]
+		IncludeBlocks,
 
 		[XmlEnum("gallery")]
 		IncludeImageGalleryBlock,
 
-		[XmlEnum("single-file-exercise")]
+		[XmlEnum("singleFileExercise")]
 		SingleFileExerciseBlock,
 
-		[XmlEnum("proj-exercise")]
+		[XmlEnum("csprojExercise")]
 		ProjectExerciseBlock,
 
 		[XmlEnum("annotation")]

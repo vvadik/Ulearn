@@ -8,27 +8,22 @@ using Ulearn.Common.Extensions;
 
 namespace Ulearn.Core.Courses.Units
 {
-	[XmlRoot("Unit", IsNullable = false, Namespace = "https://ulearn.azurewebsites.net/unit")]
+	[XmlRoot("Unit", IsNullable = false, Namespace = "https://ulearn.me/schema/v2")]
 	public class UnitSettings
 	{
-		public UnitSettings()
-		{
-			Scoring = new ScoringSettings();
-		}
-
-		[XmlElement("id")]
+		[XmlAttribute("id")]
 		public Guid Id { get; set; }
 
-		[XmlElement("url")]
+		[XmlAttribute("url")]
 		public string Url { get; set; }
 
-		[XmlElement("title")]
+		[XmlAttribute("title")]
 		public string Title { get; set; }
 
 		[XmlElement("scoring")]
-		public ScoringSettings Scoring { get; set; }
+		public ScoringSettings Scoring { get; set; } = new ScoringSettings();
 
-		[XmlElement("default-include-code-file")]
+		[XmlElement("defaultIncludeCodeFile")]
 		public string DefaultIncludeCodeFile { get; set; }
 
 		public static UnitSettings Load(FileInfo file, CourseSettings courseSettings)
