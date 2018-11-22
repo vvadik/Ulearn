@@ -24,6 +24,12 @@
       <Content Include="Courses\Slides\TestData\*">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
+      <Content Include="Courses\TestData\**\*">
+				<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			</Content>
+			<Content Include="Courses\Units\TestData\**\*">
+				<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			</Content>
     </ItemGroup>
 
 </Project>

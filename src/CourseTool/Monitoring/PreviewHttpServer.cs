@@ -314,7 +314,7 @@ namespace uLearn.CourseTool.Monitoring
 
 		Course ReloadCourse()
 		{
-			var loadedCourse = new CourseLoader().LoadCourse(new DirectoryInfo(courseDir));
+			var loadedCourse = new CourseLoader().Load(new DirectoryInfo(courseDir));
 			var renderer = new SlideRenderer(new DirectoryInfo(htmlDir), loadedCourse);
 			foreach (var slide in loadedCourse.Slides)
 				renderer.RenderSlideToFile(slide, htmlDir);

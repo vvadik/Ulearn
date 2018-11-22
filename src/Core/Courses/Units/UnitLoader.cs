@@ -16,18 +16,37 @@ namespace Ulearn.Core.Courses.Units
 			this.slideLoader = slideLoader;
 		}
 		
-		public Unit LoadUnit(DirectoryInfo unitDir, CourseSettings courseSettings, string courseId, int firstSlideIndex)
+		public Unit Load(FileInfo unitFile, CourseSettings courseSettings, string courseId, int firstSlideIndex)
 		{
-			var unitFile = unitDir.GetFile("unit.xml");
-			var unitSettings = unitFile.Exists
-				? UnitSettings.Load(unitFile, courseSettings)
-				: UnitSettings.CreateByTitle(GetUnitTitleFromFile(unitDir), courseSettings);
+			var unitDirectory = unitFile.Directory;
+			if (unitDirectory == null)
+				throw new CourseLoadingException($"Не могу загрузить модуль из {unitFile.FullName}: не могу определить, из какой папки читать файлы со слайдами.");
+			
+			UnitSettings unitSettings;
+			if (unitFile.Exists)
+				unitSettings = UnitSettings.Load(unitFile, courseSettings);
+			else
+			{
+				try
+				{
+					unitSettings = UnitSettings.CreateByTitle(GetUnitTitleFromFile(unitDirectory), courseSettings);
+				}
+				catch (Exception e)
+				{
+					throw new CourseLoadingException(
+						$"Не удалось прочитать настройки курса. Скорее всего, отсутствует или неправильно заполнен файл модуля {unitFile.Name} ({unitFile.FullName})."
+					);
+				}
+			}
 
-			var unit = new Unit(unitSettings, unitDir);
+			var unit = new Unit(unitSettings, unitDirectory);
 
-			unit.Slides = unitDir.GetFiles()
-				.Where(f => IsSlideFile(f.Name))
-				.OrderBy(f => f.Name)
+			var slideFiles = unitSettings
+				.SlidesPaths
+				.SelectMany(path => unitDirectory.GetFiles(path, SearchOption.TopDirectoryOnly).OrderBy(f => f.FullName, StringComparer.InvariantCultureIgnoreCase))
+				.Distinct();
+				
+			unit.Slides = slideFiles
 				.Select((f, internalIndex) => LoadSlide(f, unit, firstSlideIndex + internalIndex, courseId, courseSettings))
 				.ToList();
 

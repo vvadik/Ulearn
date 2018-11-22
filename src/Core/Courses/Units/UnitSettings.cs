@@ -8,7 +8,7 @@ using Ulearn.Common.Extensions;
 
 namespace Ulearn.Core.Courses.Units
 {
-	[XmlRoot("Unit", IsNullable = false, Namespace = "https://ulearn.me/schema/v2")]
+	[XmlRoot("unit", IsNullable = false, Namespace = "https://ulearn.me/schema/v2")]
 	public class UnitSettings
 	{
 		[XmlAttribute("id")]
@@ -25,6 +25,10 @@ namespace Ulearn.Core.Courses.Units
 
 		[XmlElement("defaultIncludeCodeFile")]
 		public string DefaultIncludeCodeFile { get; set; }
+		
+		[XmlArray("slides")]
+		[XmlArrayItem("add")]
+		public string[] SlidesPaths { get; set; } = new string[0];
 
 		public static UnitSettings Load(FileInfo file, CourseSettings courseSettings)
 		{
@@ -74,6 +78,7 @@ namespace Ulearn.Core.Courses.Units
 				Id = title.ToDeterministicGuid(Encoding.GetEncoding(1251)),
 				Url = title.ToLatin(),
 				Title = title,
+				SlidesPaths = new [] { "S*.xml" } /* For backward compatibility with old automatic slide's xml detection */
 			};
 
 			unitSettings.Scoring.CopySettingsFrom(courseSettings.Scoring);

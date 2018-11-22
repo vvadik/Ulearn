@@ -232,7 +232,7 @@ namespace Ulearn.Core
 		public Course LoadCourseFromDirectory(DirectoryInfo dir)
 		{
 			WaitWhileCourseIsLocked(GetCourseId(dir.Name));
-			return loader.LoadCourse(dir);
+			return loader.Load(dir);
 		}
 
 		public static string GetCourseId(string packageName)

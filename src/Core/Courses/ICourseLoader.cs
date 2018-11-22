@@ -4,6 +4,6 @@ namespace Ulearn.Core.Courses
 {
 	public interface ICourseLoader
 	{
-		Course LoadCourse(DirectoryInfo dir);
+		Course Load(DirectoryInfo dir);
 	}
 }

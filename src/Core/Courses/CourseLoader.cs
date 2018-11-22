@@ -5,6 +5,7 @@ using System.Linq;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Units;
+using Ulearn.Core.Extensions;
 
 namespace Ulearn.Core.Courses
 {
@@ -23,7 +24,7 @@ namespace Ulearn.Core.Courses
 		{
 		}
 		
-		public Course LoadCourse(DirectoryInfo dir)
+		public Course Load(DirectoryInfo dir)
 		{
 			var courseId = dir.Name;
 
@@ -88,24 +89,27 @@ namespace Ulearn.Core.Courses
 
 		private IEnumerable<Unit> LoadUnits(DirectoryInfo dir, CourseSettings settings, string courseId)
 		{
-			var unitsDirectories = dir.GetDirectories().OrderBy(d => d.Name);
+			var unitFiles = settings
+				.UnitPaths
+				.SelectMany(path => dir.GetFilesByMask(path).OrderBy(f => f.FullName, StringComparer.InvariantCultureIgnoreCase))
+				.Distinct();
 
 			var unitIds = new HashSet<Guid>();
 			var unitUrls = new HashSet<string>();
 			var slideIndex = 0;
-			foreach (var unitDirectory in unitsDirectories)
+			foreach (var unitFile in unitFiles)
 			{
-				var unit = unitLoader.LoadUnit(unitDirectory, settings, courseId, slideIndex);
+				var unit = unitLoader.Load(unitFile, settings, courseId, slideIndex);
 
 				if (unitIds.Contains(unit.Id))
-					throw new CourseLoadingException($"Ошибка в курсе \"{settings.Title}\" при загрузке модуля \"{unit.Title}\" из {unitDirectory.FullName}. " +
+					throw new CourseLoadingException($"Ошибка в курсе \"{settings.Title}\" при загрузке модуля \"{unit.Title}\" из {unitFile.FullName}. " +
 													 $"Повторяющийся идентификатор модуля: {unit.Id}. Идентификаторы модулей должны быть уникальными. " +
 													 $"К этому времени загружены модули {string.Join(", ", unitIds)}");
 				unitIds.Add(unit.Id);
 
 				if (unitUrls.Contains(unit.Url))
 					throw new CourseLoadingException(
-						$"Ошибка в курсе \"{settings.Title}\" при загрузке модуля \"{unit.Title}\" из {unitDirectory.FullName}. " +
+						$"Ошибка в курсе \"{settings.Title}\" при загрузке модуля \"{unit.Title}\" из {unitFile.FullName}. " +
 						$"Повторяющийся url-адрес модуля: {unit.Url}. Url-адреса модулей должны быть уникальными"
 					);
 				unitUrls.Add(unit.Url);

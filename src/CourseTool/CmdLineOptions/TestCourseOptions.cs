@@ -22,7 +22,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 			var ulearnDir = new DirectoryInfo($"{Dir}/{Config.ULearnCourseId}");
 			Console.Write("Loading Ulearn course from {0} ... ", ulearnDir.Name);
 			var sw = Stopwatch.StartNew();
-			var course = new CourseLoader().LoadCourse(ulearnDir);
+			var course = new CourseLoader().Load(ulearnDir);
 			Console.WriteLine(sw.ElapsedMilliseconds + " ms");
 			var slides = course.Slides;
 			if (SlideId != null)

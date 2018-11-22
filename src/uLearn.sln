@@ -12,6 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		quiz.xsd = quiz.xsd
 		types.xsd = types.xsd
 		unit.xsd = unit.xsd
+		schema.xsd = schema.xsd
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{6BAF4042-556E-48C8-BE45-27490ACFDDCC}"

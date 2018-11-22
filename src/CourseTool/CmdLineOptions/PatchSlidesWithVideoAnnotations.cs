@@ -111,7 +111,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 
 		public override void DoExecute()
 		{
-			var course = new CourseLoader().LoadCourse(new DirectoryInfo(Path.Combine(Dir, Config.ULearnCourseId)));
+			var course = new CourseLoader().Load(new DirectoryInfo(Path.Combine(Dir, Config.ULearnCourseId)));
 			Console.WriteLine($"{course.Slides.Count} slides loaded from {Config.ULearnCourseId}");
 			var googleDocFileId = course.Settings.VideoAnnotationsGoogleDoc ?? throw new Exception("no video-annotations-google-doc element in course.xml");
 			var annotations = ParseAnnotations(GetAnnotations(googleDocFileId)).ToList();

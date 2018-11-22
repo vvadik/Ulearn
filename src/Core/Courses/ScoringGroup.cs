@@ -4,7 +4,6 @@ namespace Ulearn.Core.Courses
 {
 	public class ScoringGroup
 	{
-		private const bool DefaultCanBeSetByInstructor = false;
 		private const int DefaultMaxAdditionalScore = 10;
 		private const bool DefaultEnabledForEveryone = false;
 
@@ -17,30 +16,9 @@ namespace Ulearn.Core.Courses
 		[XmlAttribute("description")]
 		public string Description { get; set; }
 
-		/* Hack to handle empty bool and integer attributes,
-		 * because standard XmlSerializer doesn't work with nullable (i.e. int? and bool?) fields */
-		[XmlAttribute("set_by_instructor")]
-		public string _canBeSetByInstructor;
-
-		[XmlIgnore]
-		public bool CanBeSetByInstructor
-		{
-			get
-			{
-				if (string.IsNullOrEmpty(_canBeSetByInstructor) || _canBeSetByInstructor.Trim().Length == 0)
-					return DefaultCanBeSetByInstructor;
-
-				return bool.TryParse(_canBeSetByInstructor, out bool value) ? value : DefaultCanBeSetByInstructor;
-			}
-			set => _canBeSetByInstructor = value.ToString();
-		}
-
-		[XmlIgnore]
-		public bool IsCanBeSetByInstructorSpecified => !string.IsNullOrEmpty(_canBeSetByInstructor);
-
-		[XmlAttribute("max_additional_score")]
+		[XmlAttribute("maxAdditionalScore")]
 		public string _maxAdditionalScore { get; set; }
-
+		
 		[XmlIgnore]
 		public int MaxAdditionalScore
 		{
@@ -62,7 +40,10 @@ namespace Ulearn.Core.Courses
 		[XmlIgnore]
 		public bool IsMaxAdditionalScoreSpecified => !string.IsNullOrEmpty(_maxAdditionalScore);
 
-		[XmlAttribute("enable_for_everyone")]
+		[XmlIgnore]
+		public bool CanBeSetByInstructor => IsMaxAdditionalScoreSpecified;
+
+		[XmlAttribute("enableForEveryone")]
 		public string _enabledForEveryone;
 
 		[XmlIgnore]
@@ -86,7 +67,6 @@ namespace Ulearn.Core.Courses
 
 		public void CopySettingsFrom(ScoringGroup otherScoringGroup)
 		{
-			_canBeSetByInstructor = string.IsNullOrEmpty(_canBeSetByInstructor) ? otherScoringGroup._canBeSetByInstructor : _canBeSetByInstructor;
 			_maxAdditionalScore = string.IsNullOrEmpty(_maxAdditionalScore) ? otherScoringGroup._maxAdditionalScore : _maxAdditionalScore;
 			_enabledForEveryone = string.IsNullOrEmpty(_enabledForEveryone) ? otherScoringGroup._enabledForEveryone : _enabledForEveryone;
 			Abbreviation = Abbreviation ?? otherScoringGroup.Abbreviation;

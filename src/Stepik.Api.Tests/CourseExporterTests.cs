@@ -34,7 +34,7 @@ namespace Stepik.Api.Tests
 		public async Task TestExportCourseFromDirectory(string coursePath)
 		{
 			var courseLoader = new CourseLoader();
-			var stubCourse = courseLoader.LoadCourse(new DirectoryInfo(coursePath));
+			var stubCourse = courseLoader.Load(new DirectoryInfo(coursePath));
 			await courseExporter.InitialExportCourse(stubCourse, new CourseInitialExportOptions(stepikCourseId, stepikXQueueName, new List<Guid>()));
 		}
 	}

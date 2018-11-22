@@ -18,7 +18,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 		{
 			var ulearnDir = new DirectoryInfo(string.Format("{0}/{1}", Dir, config.ULearnCourseId));
 			Console.WriteLine("Loading Ulearn course from {0}", ulearnDir.Name);
-			var ulearnCourse = new CourseLoader().LoadCourse(ulearnDir);
+			var ulearnCourse = new CourseLoader().Load(ulearnDir);
 			Console.WriteLine("Patching");
 			var videoJson = string.Format("{0}/{1}", Dir, config.Video);
 			var video = File.Exists(videoJson)
