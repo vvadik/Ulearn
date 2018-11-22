@@ -13,24 +13,54 @@ const mapToServerName = {
 class GroupScores extends Component {
 
 	render() {
-		const { score } = this.props;
-		const changeScores = score.are_additional_scores_enabled_in_this_group || false;
+		const {score} = this.props;
 
-		return(
+		return (
 			<label>
-				<Checkbox
-					checked={changeScores}
-					onChange={this.onChange}
-					disabled={score.id === 'exercise'}>
-					{this.renderText()}
-				</Checkbox>
-				<p className="points-block-comment">{ (score.id === 'exercise') ? this.renderExerciseScore() : score.description }</p>
+				{(score.id === 'exercise') ? this.renderExerciseScore() : this.renderOtherScores()}
+
+				<p className="points-block-comment">{score.description}</p>
 			</label>
 		);
 	}
 
+	renderOtherScores() {
+		const {score} = this.props;
+		const changeScores = score.are_additional_scores_enabled_in_this_group || false;
+
+		return (
+			<Checkbox
+				checked={changeScores}
+				onChange={this.onChange}>
+				{this.renderText()}
+			</Checkbox>
+		)
+	}
+
+
+	renderExerciseScore() {
+		const {score} = this.props;
+		const checkedScores = score.are_additional_scores_enabled_in_all_group || false;
+
+		return (
+			<React.Fragment>
+				<Checkbox
+					checked={checkedScores}
+					disabled>
+					{this.renderText()}
+				</Checkbox>
+				<div className="points-block-comment exercise-comment">
+					<p>{mapToServerName.allGroupScores && 'Баллы включены для всех автором курса, и преподаватель ' +
+					'не может отдельно включить или выключить эти баллы только в своей группе.'}</p>
+					<p>{mapToServerName.unitScores && 'В курсе нет ни одного модуля, в которых преподаватель мог бы выставлять баллы этого типа.'}</p>
+				</div>
+			</React.Fragment>
+		);
+	}
+
+
 	renderText() {
-		const { score } = this.props;
+		const {score} = this.props;
 		switch (score.id) {
 			case 'activity':
 				return 'Практика';
@@ -45,19 +75,15 @@ class GroupScores extends Component {
 		}
 	}
 
-	renderExerciseScore() {
-		if (mapToServerName.allGroupScores) {
-			return 'Баллы включены для всех автором курса, и преподатель ' +
-				'не может отдельно включить или выключить эти баллы только в своей группе';
-		} else if (mapToServerName.unitScores) {
-			return 'В курсе нет ни одного модуля, в которых преподаватель мог бы выставлять баллы этого типа';
-		}
-	}
-
 	onChange = (_, value) => {
-		const key = this.props.score.id;
-		this.props.onChangeScores(key, mapToServerName.groupScores, value);
+		const id = this.props.score.id;
+		this.props.onChangeScores(id, mapToServerName.groupScores, value);
 	};
 }
+
+GroupScores.propTypes = {
+	score: PropTypes.object,
+	onChangeScores: PropTypes.func,
+};
 
 export default GroupScores;
