@@ -8,7 +8,7 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		[XmlText]
 		public string Name { get; set; }
 
-		[XmlAttribute("only-body")]
+		[XmlAttribute("onlyBody")]
 		public bool OnlyBody { get; set; }
 	}
 }

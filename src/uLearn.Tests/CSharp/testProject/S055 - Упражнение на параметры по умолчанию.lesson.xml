@@ -3,7 +3,7 @@
 	<scoring />
 	<markdown>Отрефакторьте класс MyFile, чтобы в нем остался только один метод</markdown>
 	<include-code>
-		<display only-body="false">Main</display>
+		<display onlyBody="false">Main</display>
 	</include-code>
 	<singleFileExercise file="_Упражнение на параметры по умолчанию.cs" language="csharp" type="check-output">
 		<initialCode xml:space="preserve">
@@ -28,7 +28,7 @@ Use encoding System.Text.UTF32Encoding
 		<validator>cs</validator>
 		<checkForPlagiarism>true</checkForPlagiarism>
 		<hideSolutions>false</hideSolutions>
-		<solution only-body="false">MyFile</solution>
+		<solution onlyBody="false">MyFile</solution>
 	</singleFileExercise>
 	<defaultIncludeCodeFile>_Упражнение на параметры по умолчанию.cs</defaultIncludeCodeFile>
 </slide>

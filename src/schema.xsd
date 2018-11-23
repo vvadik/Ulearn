@@ -333,7 +333,7 @@
     <xs:complexType name="Label">
         <xs:simpleContent>
             <xs:extension base="NonEmptyString">
-                <xs:attribute name="only-body" type="xs:boolean" />
+                <xs:attribute name="onlyBody" type="xs:boolean" />
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
