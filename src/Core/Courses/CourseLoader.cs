@@ -92,7 +92,9 @@ namespace Ulearn.Core.Courses
 			var unitFiles = settings
 				.UnitPaths
 				.SelectMany(path => dir.GetFilesByMask(path).OrderBy(f => f.FullName, StringComparer.InvariantCultureIgnoreCase))
-				.Distinct();
+				.Distinct()
+				/* Don't load unit from course file! Even accidentally */
+				.Where(f => f != dir.GetFile("course.xml"));
 
 			var unitIds = new HashSet<Guid>();
 			var unitUrls = new HashSet<string>();

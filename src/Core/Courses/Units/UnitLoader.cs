@@ -44,7 +44,9 @@ namespace Ulearn.Core.Courses.Units
 			var slideFiles = unitSettings
 				.SlidesPaths
 				.SelectMany(path => unitDirectory.GetFiles(path, SearchOption.TopDirectoryOnly).OrderBy(f => f.FullName, StringComparer.InvariantCultureIgnoreCase))
-				.Distinct();
+				.Distinct()
+				/* Don't load slide from unit file! Even accidentally */
+				.Where(f => f != unitFile);
 				
 			unit.Slides = slideFiles
 				.Select((f, internalIndex) => LoadSlide(f, unit, firstSlideIndex + internalIndex, courseId, courseSettings))
