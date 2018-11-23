@@ -74,7 +74,7 @@ namespace Ulearn.Core.Courses.Slides.Quizzes
 		public override void BuildUp(CourseLoadingContext context)
 		{
 			if (string.IsNullOrEmpty(ScoringGroup))
-				ScoringGroup = context.CourseSettings.Scoring.DefaultScoringGroupForQuiz;
+				Scoring.ScoringGroup = context.CourseSettings.Scoring.DefaultScoringGroupForQuiz;
 
 			base.BuildUp(context);
 			

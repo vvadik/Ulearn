@@ -28,7 +28,7 @@ namespace Ulearn.Core.Courses
 				if (string.IsNullOrEmpty(_canBeSetByInstructor) || _canBeSetByInstructor.Trim().Length == 0)
 					return DefaultCanBeSetByInstructor;
 
-				return bool.TryParse(_maxAdditionalScore, out var result) ? result : DefaultCanBeSetByInstructor;
+				return bool.TryParse(_canBeSetByInstructor, out var result) ? result : DefaultCanBeSetByInstructor;
 			}
 			set => _canBeSetByInstructor = value.ToString();
 		}

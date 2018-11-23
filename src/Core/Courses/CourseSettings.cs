@@ -23,13 +23,13 @@ namespace Ulearn.Core.Courses
 
 		[XmlElement("manualChecking")]
 		public bool IsManualCheckingEnabled { get; set; }
-		
+
 		[XmlElement("scoring")]
-		public ScoringSettings Scoring { get; set; }
-		
+		public ScoringSettings Scoring { get; set; } = new ScoringSettings();
+
 		[XmlArray("units")]
 		[XmlArrayItem("add")]
-		public string[] UnitPaths { get; set; }
+		public string[] UnitPaths { get; set; } = new string[0];
 		
 		[XmlArray("preludes")]
 		[XmlArrayItem("prelude")]
@@ -50,7 +50,6 @@ namespace Ulearn.Core.Courses
 
 		public CourseSettings()
 		{
-			Scoring = new ScoringSettings();
 		}
 
 		public CourseSettings(string title, Language? defaultLanguage, PreludeFile[] preludes, string dictionaryFile)
@@ -93,7 +92,7 @@ namespace Ulearn.Core.Courses
 				if (scoringGroup.IsMaxAdditionalScoreSpecified &&
 					(!scoringGroup.IsCanBeSetByInstructorSpecified || !scoringGroup.CanBeSetByInstructor))
 					throw new CourseLoadingException(
-						$"Чтобы выставлять дополнительные баллы в группу {scoringGroup.Id}, установите у неё атрибут setByInstructor=\"true\" в настройках курса (файл course.xml). " +
+						$"Чтобы выставлять дополнительные баллы в группу {scoringGroup.Id}, установите у неё атрибут enableAdditionalScore=\"true\" в настройках курса (файл course.xml). " +
 						$"В противном случае атрибут maxAdditionalScore=\"{scoringGroup.MaxAdditionalScore}\" не действует."
 					);
 

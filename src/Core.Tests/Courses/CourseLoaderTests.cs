@@ -42,5 +42,13 @@ namespace Ulearn.Core.Tests.Courses
 			Assert.AreEqual("Simple Course", course.Title);
 			CollectionAssert.AreEqual(new [] { new PreludeFile(Language.Html, "Prelude.html"), }, course.Settings.Preludes);
 		}
+
+		[Test]
+		[Explicit("Для проверки загрузки конкретного курса")]
+		[TestCase(@"..\..\..\..\..\..\Courses\Courses\basicprogramming")]
+		public void LoadCourseFromPath(string path)
+		{
+			LoadCourseFromDirectory(path);
+		}
 	}
 }
