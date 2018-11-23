@@ -56,8 +56,8 @@ namespace Ulearn.Core.Courses.Units
 
 				if (scoringGroup.IsEnabledForEveryoneSpecified)
 					throw new CourseLoadingException(
-						$"В настройках модуля «{unitSettings.Title}» для группы баллов {scoringGroup.Id} указана опция enable_for_everyone=\"{scoringGroup._enabledForEveryone}\" (файл {file.Directory?.Name}/Unit.xml). " +
-						"Эту опцию можно указывать только в настройках всего курса (файл Course.xml)");
+						$"В настройках модуля «{unitSettings.Title}» для группы баллов {scoringGroup.Id} указана опция enableForEveryone=\"{scoringGroup._enabledForEveryone}\" (файл {file.FullName}). " +
+						"Эту опцию можно указывать только в настройках всего курса (файл course.xml)");
 			}
 
 			/* Copy other scoring groups and scoring settings from course settings */

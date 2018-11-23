@@ -90,7 +90,14 @@ namespace Ulearn.Core.Courses
 						"Понятное человеку название используйте в аббревиатуре и имени группы."
 					);
 				
-				if (!scoringGroup.IsMaxAdditionalScoreSpecified && scoringGroup.IsEnabledForEveryoneSpecified)
+				if (scoringGroup.IsMaxAdditionalScoreSpecified &&
+					(!scoringGroup.IsCanBeSetByInstructorSpecified || !scoringGroup.CanBeSetByInstructor))
+					throw new CourseLoadingException(
+						$"Чтобы выставлять дополнительные баллы в группу {scoringGroup.Id}, установите у неё атрибут setByInstructor=\"true\" в настройках курса (файл course.xml). " +
+						$"В противном случае атрибут maxAdditionalScore=\"{scoringGroup.MaxAdditionalScore}\" не действует."
+					);
+
+				if (!scoringGroup.CanBeSetByInstructor && scoringGroup.IsEnabledForEveryoneSpecified)
 					throw new CourseLoadingException(
 						$"Неправильные параметры для группы баллов {scoringGroup.Id} в файле course.xml. " +
 						"Опция enableForEveryone доступна только при установке опции maxAdditionalScore."
