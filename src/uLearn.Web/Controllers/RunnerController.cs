@@ -63,7 +63,7 @@ namespace uLearn.Web.Controllers
 		{
 			CheckRunner(token);			
 			
-			if (!Enum.TryParse<Language>(language, out var submissionLanguage))
+			if (!LanguageHelpers.TryParseByName(language, out var submissionLanguage))
 				throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
 			
 			var sw = Stopwatch.StartNew();

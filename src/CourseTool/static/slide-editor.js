@@ -101,7 +101,7 @@ function initCodeEditor($parent) {
 
         switch (langId) {
             case "cs":
-            case "сsharp":
+            case "csharp":
                 return { mode: "text/x-csharp", hint: CodeMirror.hint.csharp };
             case "py":
             case "python":

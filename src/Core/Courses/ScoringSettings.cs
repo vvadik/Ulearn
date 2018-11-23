@@ -27,7 +27,7 @@ namespace Ulearn.Core.Courses
 			string.IsNullOrEmpty(_defaultScoringGroupForExercise) ? DefaultScoringGroup : _defaultScoringGroupForExercise;
 
 		[XmlAttribute("default")]
-		public string DefaultScoringGroup { get; set; }
+		public string DefaultScoringGroup { get; set; } = "";
 
 		[XmlElement("group")]
 		public ScoringGroup[] _groups { get; set; }

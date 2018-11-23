@@ -45,7 +45,7 @@ namespace Ulearn.Core.Tests.Courses
 
 		[Test]
 		[Explicit("Для проверки загрузки конкретного курса")]
-		[TestCase(@"..\..\..\..\..\..\Courses\Courses\basicprogramming")]
+		[TestCase(@"..\..\..\..\..\..\Courses\Courses\Testing")]
 		public void LoadCourseFromPath(string path)
 		{
 			LoadCourseFromDirectory(path);

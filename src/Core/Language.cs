@@ -83,6 +83,25 @@ namespace Ulearn.Core
 			using (var ms = new MemoryStream(xmlBytes))
 				return (Language) serializer.Deserialize(ms);
 		}
+
+		public static Language ParseByName(string language)
+		{
+			return ParseFromXml(language);
+		}
+
+		public static bool TryParseByName(string language, out Language value)
+		{
+			try
+			{
+				value = ParseByName(language);
+				return true;
+			}
+			catch (Exception e)
+			{
+				value = Language.Text;
+				return false;
+			}
+		}
 	}
 
 	public static class LanguageExtensions
