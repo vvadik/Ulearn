@@ -4,6 +4,7 @@ using NUnit.Framework;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
 using Ulearn.Core.Courses.Units;
@@ -23,16 +24,12 @@ namespace Ulearn.Core.Tests.Courses.Slides
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
+			Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
+			
             loader = new XmlSlideLoader();
             courseSettings = new CourseSettings(CourseSettings.DefaultSettings);
             courseSettings.Scoring.Groups.Add("ScoringGroup1", new ScoringGroup { Id = "ScoringGroup1" });
-            unit = new Unit(UnitSettings.CreateByTitle("Unit title", courseSettings), new DirectoryInfo("."));
-        }
-
-        [SetUp]
-        public void SetUp()
-        {
-            Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
+            unit = new Unit(UnitSettings.CreateByTitle("Unit title", courseSettings), new DirectoryInfo(testDataDirectory));
         }
 
         private Slide LoadSlideFromXmlFile(string filename)
@@ -95,5 +92,21 @@ namespace Ulearn.Core.Tests.Courses.Slides
         {
             Assert.Catch<CourseLoadingException>(() => LoadSlideFromXmlFile("EmptyExercise.xml"));
         }
+
+		[Test]
+		public void LoadExerciseWithZeroPoints()
+		{
+			var slide = (ExerciseSlide) LoadSlideFromXmlFile("ExerciseWithZeroPoints.xml");
+			
+			Assert.AreEqual(0, slide.MaxScore);
+		}
+		
+		[Test]
+		public void LoadExerciseWithDefaultScore()
+		{
+			var slide = (ExerciseSlide) LoadSlideFromXmlFile("ExerciseWithDefaultScore.xml");
+			
+			Assert.AreEqual(5, slide.Scoring.TestsScore);
+		}
     }
 }

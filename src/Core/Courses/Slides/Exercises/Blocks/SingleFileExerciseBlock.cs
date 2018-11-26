@@ -30,6 +30,9 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			if (CodeFile == null)
 				throw new CourseLoadingException($"У блока <singleFileExercise> не указан атрибут file.");
 			
+			if (ExerciseInitialCode == null)
+				throw new CourseLoadingException($"У блока <singleFileExercise> не указан код, который надо показывать пользователю перед началом работы. Укажите его в тэге <initialCode>");
+			
 			if (!Language.HasValue)
 				Language = LanguageHelpers.GuessByExtension(new FileInfo(CodeFile));
 			

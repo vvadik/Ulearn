@@ -62,13 +62,13 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 			{
 				throw new CourseLoadingException(
 					$"Не найдено блоков с упражнениями (<singleFileExercise> или <csprojExercise>) в слайде «{Title}», " +
-					"для которого указан тип \"exercise\" (<slide type=\"exercise\">).");
+					"для которого уиспользован внешний тег <slide.exercise>. Если вы хотите создать обычный слайд без упражнения, используйте тег <slide>");
 			}
 			if (exerciseBlocksCount > 1)
 			{
 				throw new CourseLoadingException(
 					"Блок с упражнением (<singleFileExercise> или <csprojExercise>) может быть только один на слайде. " +
-					$"Но на слайде {Title} найдено {exerciseBlocksCount} таких блока.");
+					$"Но на слайде «{Title}» найдено {exerciseBlocksCount} таких блока.");
 			}
 			
 			base.Validate(context);

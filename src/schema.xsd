@@ -337,7 +337,7 @@
                     <xs:element name="comment" type="NonEmptyString" minOccurs="1" maxOccurs="1" />
                     <xs:element name="expected" type="StringWithXmlSpaces" minOccurs="1" maxOccurs="1" />
                     <xs:element name="hideSolutions" type="xs:boolean" minOccurs="1" maxOccurs="1" />
-                    <xs:element name="checkForPlagiarism" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="checkForPlagiarism" type="xs:boolean" minOccurs="0" maxOccurs="1" />
                     <xs:element name="hideExpectedOutput" type="xs:boolean" minOccurs="1" maxOccurs="1" />
                     <xs:element name="validator" type="NonEmptyString" minOccurs="1" maxOccurs="1" />
                 </xs:choice>
