@@ -6,12 +6,9 @@ using Ulearn.Core.Model.Edx.EdxComponents;
 
 namespace Ulearn.Core.Courses.Slides.Exercises
 {
-	[XmlRoot("slide", IsNullable = false, Namespace = "https://ulearn.me/schema/v2")]
+	[XmlRoot("slide.exercise", IsNullable = false, Namespace = "https://ulearn.me/schema/v2")]
 	public class ExerciseSlide : Slide
 	{
-		[XmlAttribute("type")]
-		public override SlideType Type { get; set; } = SlideType.Exercise;
-		
 		[XmlElement("scoring")]
 		public ExerciseScoringSettings Scoring { get; set; } = new ExerciseScoringSettings
 		{

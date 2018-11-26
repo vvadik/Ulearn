@@ -26,9 +26,6 @@ namespace Ulearn.Core.Courses.Slides
 	{
 		[XmlAttribute("id")]
 		public Guid Id { get; set; }
-
-		[XmlAttribute("type")]
-		public virtual SlideType Type { get; set; } = SlideType.Lesson;
 		
 		[XmlIgnore]
 		public string NormalizedGuid => Id.GetNormalizedGuid();

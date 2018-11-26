@@ -122,13 +122,9 @@
     
     <!-- Slide -->
 
-    <xs:element name="slide">
-        <xs:alternative test="@type='quiz'" type="QuizSlide" />
-        <xs:alternative test="@type='exercise'" type="ExerciseSlide" />
-        <xs:alternative test="@type='lesson'" type="Slide" />
-        <xs:alternative test="@type" type="xs:error" />
-        <xs:alternative type="Slide" />
-    </xs:element>
+	<xs:element name="slide" type="Slide"/>
+	<xs:element name="slide.quiz" type="QuizSlide"/>
+	<xs:element name="slide.exercise" type="ExerciseSlide"/>	
 
     <xs:complexType name="Slide">
         <xs:group ref="SlideInternals" />
@@ -170,16 +166,10 @@
     </xs:group>
     
     <xs:attributeGroup name="SlideAttributes">
-        <xs:attribute name="id" type="NonEmptyString">
+        <xs:attribute name="id" type="NonEmptyString" use="required">
             <xs:annotation>
                 <xs:documentation xml:lang="en">Slide's id, should be guid</xs:documentation>
                 <xs:documentation xml:lang="ru">Идентификатор слайда, должен быть гуидом</xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="type" type="SlideType">
-            <xs:annotation>
-                <xs:documentation xml:lang="en">Slide's type: simple slide-lesson, quiz or programming exercise</xs:documentation>
-                <xs:documentation xml:lang="ru">Тип слайда: обычный слайд-урок, тест или задача на программирование</xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="title" type="NonEmptyString" use="required">

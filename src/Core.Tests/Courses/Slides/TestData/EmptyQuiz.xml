@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<slide xmlns="https://ulearn.me/schema/v2" type="quiz">
+<slide.quiz xmlns="https://ulearn.me/schema/v2" title="Empty quiz">
 	
-</slide>
+</slide.quiz>

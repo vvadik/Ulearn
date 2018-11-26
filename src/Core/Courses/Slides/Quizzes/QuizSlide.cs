@@ -9,13 +9,10 @@ using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
 
 namespace Ulearn.Core.Courses.Slides.Quizzes
 {
-	[XmlRoot("slide", IsNullable = false, Namespace = "https://ulearn.me/schema/v2")]
+	[XmlRoot("slide.quiz", IsNullable = false, Namespace = "https://ulearn.me/schema/v2")]
 	public class QuizSlide : Slide
 	{
 		private static readonly Regex questionIdRegex = new Regex("^[0-9a-z_]+$", RegexOptions.IgnoreCase);
-		
-		[XmlAttribute("type")]
-		public override SlideType Type { get; set; } = SlideType.Quiz;
 		
 		[XmlElement("scoring")]
 		public QuizScoringSettings Scoring { get; set; } = new QuizScoringSettings

@@ -1,7 +1,9 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Xml;
+using System.Xml.Serialization;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Quizzes;
@@ -41,7 +43,7 @@ namespace Ulearn.Core.Courses.Slides
 
 		/// <summary>
 		/// Automatically detects slide type by XML file.
-		/// Slide file starts with &lt;slide type="quiz|exercise|lesson" ...%gt;, so we just extract attribute "type".
+		/// Slide file starts with &lt;slide%gt;, &lt;slide.quiz%gt; or &lt;slide.exercise%gt;.
 		/// </summary>
 		/// <param name="content">XML file with slide</param>
 		/// <param name="filename">filename, just for error message formatting</param>
@@ -60,22 +62,17 @@ namespace Ulearn.Core.Courses.Slides
 			}
 
 			if (xmlDocument.DocumentElement == null)
-				throw new CourseLoadingException($"Не могу определить, что за слайд лежит в {filename}. Возможно, там некорректный XML или он не начинается с тега <slide>...</slide>?");
-			
-			var typeAttribute = xmlDocument.DocumentElement.Attributes["type"];
-			if (typeAttribute == null)
-				return typeof(Slide);
+				throw new CourseLoadingException($"Не могу определить, что за слайд лежит в {filename}. Возможно, там некорректный XML или он не начинается с тега <slide>, <slide.quiz> или <slide.exercise>?");
 
-			if (typeAttribute.Value.EqualsIgnoreCase(SlideType.Quiz.GetXmlEnumName()))
-				return typeof(QuizSlide);
+			var knownTypes = new[] { typeof(Slide), typeof(QuizSlide), typeof(ExerciseSlide) };
+			foreach (var type in knownTypes)
+				if (xmlDocument.DocumentElement.Name == type.GetCustomAttribute<XmlRootAttribute>().ElementName)
+					return type;
 			
-			if (typeAttribute.Value.EqualsIgnoreCase(SlideType.Exercise.GetXmlEnumName()))
-				return typeof(ExerciseSlide);
-
-			var allowedTypes = string.Join(", ", Enum.GetValues(typeof(SlideType)).Cast<SlideType>().Select(t => $"\"{t.GetXmlEnumName()}\""));
+			var allowedTags = string.Join(", ", knownTypes.Select(t => t.GetCustomAttribute<XmlRootAttribute>().ElementName).Select(t => $"<{t}>"));
 			throw new CourseLoadingException(
 				$"Не могу определить, что за слайд лежит в {filename}. " +
-				$"Атрибут type (в <slide type=\"...\">) может быть одним из следующих: {allowedTypes}."
+				$"Внешний тег может быть одним из следующих: {allowedTags}."
 			);
 		}
 	}
