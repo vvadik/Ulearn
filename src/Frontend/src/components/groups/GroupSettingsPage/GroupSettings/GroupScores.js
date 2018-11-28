@@ -18,7 +18,6 @@ class GroupScores extends Component {
 		return (
 			<label>
 				{(score.id === 'exercise') ? this.renderExerciseScore() : this.renderOtherScores()}
-
 				<p className="points-block-comment">{score.description}</p>
 			</label>
 		);
@@ -37,7 +36,6 @@ class GroupScores extends Component {
 		)
 	}
 
-
 	renderExerciseScore() {
 		const {score} = this.props;
 		const checkedScores = score.are_additional_scores_enabled_in_all_group || false;
@@ -52,12 +50,12 @@ class GroupScores extends Component {
 				<div className="points-block-comment exercise-comment">
 					<p>{mapToServerName.allGroupScores && 'Баллы включены для всех автором курса, и преподаватель ' +
 					'не может отдельно включить или выключить эти баллы только в своей группе.'}</p>
-					<p>{mapToServerName.unitScores && 'В курсе нет ни одного модуля, в которых преподаватель мог бы выставлять баллы этого типа.'}</p>
+					<p>{mapToServerName.unitScores &&
+					'В курсе нет ни одного модуля, в которых преподаватель мог бы выставлять баллы этого типа.'}</p>
 				</div>
 			</React.Fragment>
 		);
 	}
-
 
 	renderText() {
 		const {score} = this.props;
