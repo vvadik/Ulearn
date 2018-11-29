@@ -35,14 +35,13 @@ namespace Ulearn.Core.Courses
 		[XmlArrayItem("prelude")]
 		public PreludeFile[] Preludes { get; set; }
 
-		[XmlElement("dictionary")]
+		[XmlElement("dictionaryFile")]
 		public string DictionaryFile { get; set; }
 		
 		public static readonly CourseSettings DefaultSettings = new CourseSettings(
 			null,
 			null,
-			new PreludeFile[0], 
-			"dictionary.txt"
+			new PreludeFile[0]
 		);
 
 		[XmlIgnore]
@@ -52,13 +51,12 @@ namespace Ulearn.Core.Courses
 		{
 		}
 
-		public CourseSettings(string title, Language? defaultLanguage, PreludeFile[] preludes, string dictionaryFile)
+		public CourseSettings(string title, Language? defaultLanguage, PreludeFile[] preludes)
 			: this()
 		{
 			Title = title;
 			DefaultLanguage = defaultLanguage;
 			Preludes = preludes;
-			DictionaryFile = dictionaryFile;
 		}
 
 		public CourseSettings(CourseSettings other)
@@ -112,11 +110,6 @@ namespace Ulearn.Core.Courses
 			if (prelude == null && Title != null && this != DefaultSettings)
 				return DefaultSettings.GetPrelude(language);
 			return prelude?.File;
-		}
-
-		public string GetDictionaryFile()
-		{
-			return DictionaryFile ?? DefaultSettings.DictionaryFile;
 		}
 	}
 

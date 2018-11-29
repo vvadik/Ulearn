@@ -133,7 +133,12 @@
 
     <xs:complexType name="QuizSlide" >
         <xs:sequence>
-            <xs:element name="scoring" type="QuizScoring" minOccurs="0" maxOccurs="1" />
+            <xs:element name="scoring" type="QuizScoring" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Quiz scoring settings</xs:documentation>
+					<xs:documentation xml:lang="ru">Настройки оценивания теста: количество попыток, ручная проверка и так далее...</xs:documentation>
+				</xs:annotation>
+			</xs:element>
             <xs:group ref="SlideInternals" />
         </xs:sequence>
         <xs:attributeGroup ref="SlideAttributes" />

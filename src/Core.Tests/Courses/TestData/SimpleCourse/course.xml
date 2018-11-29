@@ -8,6 +8,6 @@
 	</scoring>
 	<defaultLanguage>csharp</defaultLanguage>
 	<units>
-		<add>*\unit.xml</add>
+		<add>*/unit.xml</add>
 	</units>
 </course>
