@@ -19,12 +19,12 @@ namespace uLearn.CourseTool.Validating
 {
 	public class ProjectExerciseValidator : BaseValidator
 	{
-		private readonly ProjectExerciseBlock ex;
+		private readonly CsProjectExerciseBlock ex;
 		private readonly ExerciseSlide slide;
 		private readonly SandboxRunnerSettings settings;
 		private readonly ExerciseStudentZipBuilder exerciseStudentZipBuilder = new ExerciseStudentZipBuilder();
 
-		public ProjectExerciseValidator(BaseValidator baseValidator, SandboxRunnerSettings settings, ExerciseSlide slide, ProjectExerciseBlock exercise)
+		public ProjectExerciseValidator(BaseValidator baseValidator, SandboxRunnerSettings settings, ExerciseSlide slide, CsProjectExerciseBlock exercise)
 			: base(baseValidator)
 		{
 			this.settings = settings;

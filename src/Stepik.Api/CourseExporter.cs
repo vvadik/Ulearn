@@ -454,7 +454,7 @@ namespace Stepik.Api
 					{
 						Name = "external-grader",
 						Text = lastTextBlock.Text,
-						Cost = ((ExerciseSlide) slide).Scoring.TestsScore,
+						Cost = ((ExerciseSlide) slide).Scoring.PassedTestsScore,
 						Source = new StepikApiExternalGraderBlockSource(courseId, slide.Id, options.XQueueName, exerciseBlock.ExerciseInitialCode, stepikCSharpLanguageName)
 					};
 				case ChoiceBlock choiceBlock:

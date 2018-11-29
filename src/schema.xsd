@@ -157,8 +157,8 @@
             </xs:element>
             <xs:element name="defaultIncludeCodeFile" type="NonEmptyString" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
-                    <xs:documentation xml:lang="en">Default path for &lt;include-code&gt;, &lt;single-file-exercise&gt;, &lt;proj-exercise&gt;</xs:documentation>
-                    <xs:documentation xml:lang="ru">Путь по умолчанию для блоков &lt;include-code&gt;, &lt;single-file-exercise&gt;, &lt;proj-exercise&gt;</xs:documentation>
+                    <xs:documentation xml:lang="en">Default path for &lt;includeCode&gt;, &lt;exercise.file&gt;, &lt;exercise.csproj&gt;</xs:documentation>
+                    <xs:documentation xml:lang="ru">Путь по умолчанию для блоков &lt;includeCode&gt;, &lt;exercise.file&gt;, &lt;exercise.csproj&gt;</xs:documentation>
                 </xs:annotation>
             </xs:element>            
             <xs:group ref="Blocks" minOccurs="0" maxOccurs="unbounded"/>            
@@ -241,8 +241,8 @@
             <xs:element name="question.text" type="FillInBlock" />
             
             <!-- Exercise blocks -->
-            <xs:element name="csprojExercise" type="ProjectExercise" />
-            <xs:element name="singleFileExercise" type="SingleFileExercise" />
+            <xs:element name="exercise.csproj" type="ProjectExercise" />
+            <xs:element name="exercise.file" type="SingleFileExercise" />
         </xs:choice>
     </xs:group>
 
@@ -427,102 +427,135 @@
         </xs:complexContent>
     </xs:complexType>
 
+	<xs:complexType name="AbstractQuestion">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="text" minOccurs="1" maxOccurs="1" type="NonEmptyString">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Question</xs:documentation>
+					<xs:documentation xml:lang="ru">Текст вопроса</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="id" type="NonEmptyString" use="required">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">Identifier of the question. Should be unique in the slide.</xs:documentation>
+				<xs:documentation xml:lang="ru">Идентификатор вопроса. Должен быть уникальным в рамках слайда.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	
     <xs:complexType name="IsTrueBlock">
-        <xs:sequence minOccurs="1" maxOccurs="1">
-            <xs:element name="text" minOccurs="1" maxOccurs="1" type="NonEmptyString"/>
-        </xs:sequence>
-        <xs:attribute name="id" type="NonEmptyString" use="required" />
-        <xs:attribute name="answer" type="xs:boolean" use="optional" />
-        <xs:attribute name="explanation" type="xs:string" use="optional" />
-        <xs:attribute name="maxScore" type="xs:int" use="optional" />
+		<xs:complexContent>
+			<xs:extension base="AbstractQuestion">
+				<xs:attribute name="answer" type="xs:boolean" use="optional" />
+				<xs:attribute name="explanation" type="xs:string" use="optional" />
+				<xs:attribute name="maxScore" type="xs:int" use="optional" />
+			</xs:extension>			
+		</xs:complexContent>
     </xs:complexType>
 
     <xs:complexType name="ChoiceBlock">
-        <xs:sequence minOccurs="1" maxOccurs="1">
-            <xs:element name="text" minOccurs="1" maxOccurs="1" type="NonEmptyString"/>
-            <xs:element name="allowedMistakes" minOccurs="0" maxOccurs="1" type="AllowedMistakes"/>
-            <xs:element name="item" minOccurs="0" maxOccurs="unbounded">
-                <xs:complexType>
-                    <xs:simpleContent>
-                        <xs:extension base="NonEmptyString">
-                            <xs:attribute name="id" type="NonEmptyString" use="required" />
-                            <xs:attribute name="isCorrect" use="required">
-                                <xs:simpleType>
-                                    <xs:restriction base="NonEmptyString">
-                                        <xs:enumeration value="true" />
-                                        <xs:enumeration value="false" />
-                                        <xs:enumeration value="maybe" />
-                                    </xs:restriction>
-                                </xs:simpleType>
-                            </xs:attribute>
-                            <xs:attribute name="explanation" type="xs:string" use="optional" />
-                        </xs:extension>
-                    </xs:simpleContent>
-                </xs:complexType>
-            </xs:element>
-        </xs:sequence>
-        <xs:attribute name="id" type="NonEmptyString" use="required" />
-        <xs:attribute name="multiple" type="xs:boolean" use="optional" />
-        <xs:attribute name="shuffle" type="xs:boolean" use="optional" />
-        <xs:attribute name="maxScore" type="xs:int" use="optional" />
+		<xs:complexContent>
+			<xs:extension base="AbstractQuestion">
+				<xs:sequence minOccurs="1" maxOccurs="1">
+					<xs:element name="allowedMistakes" minOccurs="0" maxOccurs="1" type="AllowedMistakes"/>
+					<xs:element name="item" minOccurs="0" maxOccurs="unbounded">
+						<xs:complexType>
+							<xs:simpleContent>
+								<xs:extension base="NonEmptyString">
+									<xs:attribute name="id" type="NonEmptyString" use="required" />
+									<xs:attribute name="isCorrect" use="required">
+										<xs:simpleType>
+											<xs:restriction base="NonEmptyString">
+												<xs:enumeration value="true" />
+												<xs:enumeration value="false" />
+												<xs:enumeration value="maybe" />
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:attribute>
+									<xs:attribute name="explanation" type="xs:string" use="optional" />
+								</xs:extension>
+							</xs:simpleContent>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>				
+				<xs:attribute name="multiple" type="xs:boolean" use="optional" />
+				<xs:attribute name="shuffle" type="xs:boolean" use="optional" />
+				<xs:attribute name="maxScore" type="xs:int" use="optional" />
+			</xs:extension>
+		</xs:complexContent>        
     </xs:complexType>
 
     <xs:complexType name="FillInBlock">
-        <xs:sequence minOccurs="1" maxOccurs="1">
-            <xs:element name="text" minOccurs="1" maxOccurs="1" type="NonEmptyString" />
-            <xs:element name="sample" minOccurs="0" maxOccurs="1" type="xs:string" />
-            <xs:element name="regex" minOccurs="0" maxOccurs="unbounded">
-                <xs:complexType>
-                    <xs:simpleContent>
-                        <xs:extension base="xs:string">
-                            <xs:attribute name="ignoreCase" type="xs:boolean" use="optional" default="false" />
-                        </xs:extension>
-                    </xs:simpleContent>
-                </xs:complexType>
-            </xs:element>
-        </xs:sequence>
-        <xs:attribute name="explanation" type="xs:string" use="optional" />
-        <xs:attribute name="id" type="NonEmptyString" use="required" />
-        <xs:attribute name="maxScore" type="xs:int" use="optional" />
-        <xs:attribute name="multiline" type="xs:boolean" use="optional" />
+		<xs:complexContent>
+			<xs:extension base="AbstractQuestion">
+				<xs:sequence minOccurs="1" maxOccurs="1">
+					<xs:element name="sample" minOccurs="0" maxOccurs="1" type="xs:string">
+						<xs:annotation>
+							<xs:documentation xml:lang="en">Example of answer. Should match with at least of one regex</xs:documentation>
+							<xs:documentation xml:lang="ru">Пример ответа. Показывается студенту после использования всех попыток. Должен подходить хотя бы под одно регулярное выражение из &lt;regex&gt;</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="regex" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation xml:lang="en">Regular expression for correct answers</xs:documentation>
+							<xs:documentation xml:lang="ru">Регулярное выражение для проверки правильности ответа</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:simpleContent>
+								<xs:extension base="xs:string">
+									<xs:attribute name="ignoreCase" type="xs:boolean" use="optional" default="false" />
+								</xs:extension>
+							</xs:simpleContent>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="explanation" type="xs:string" use="optional" />				
+				<xs:attribute name="maxScore" type="xs:int" use="optional" />
+				<xs:attribute name="multiline" type="xs:boolean" use="optional" />
+			</xs:extension>
+		</xs:complexContent>        
     </xs:complexType>
 
     <xs:complexType name="OrderingBlock">
-        <xs:sequence minOccurs="1" maxOccurs="1">
-            <xs:element name="text" minOccurs="1" maxOccurs="1" type="NonEmptyString"/>
-
-            <xs:element name="explanation" type="xs:string" minOccurs="0" maxOccurs="1" />
-            <xs:element name="item" minOccurs="0" maxOccurs="unbounded">
-                <xs:complexType>
-                    <xs:simpleContent>
-                        <xs:extension base="NonEmptyString">
-                            <xs:attribute name="id" type="NonEmptyString" use="required" />
-                        </xs:extension>
-                    </xs:simpleContent>
-                </xs:complexType>
-            </xs:element>
-        </xs:sequence>
-        <xs:attribute name="id" type="NonEmptyString" use="required" />
-        <xs:attribute name="maxScore" type="xs:int" use="optional" />
+		<xs:complexContent>
+			<xs:extension base="AbstractQuestion">
+				<xs:sequence minOccurs="1" maxOccurs="1">		
+					<xs:element name="explanation" type="xs:string" minOccurs="0" maxOccurs="1" />
+					<xs:element name="item" minOccurs="0" maxOccurs="unbounded">
+						<xs:complexType>
+							<xs:simpleContent>
+								<xs:extension base="NonEmptyString">
+									<xs:attribute name="id" type="NonEmptyString" use="required" />
+								</xs:extension>
+							</xs:simpleContent>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>				
+				<xs:attribute name="maxScore" type="xs:int" use="optional" />
+			</xs:extension>
+		</xs:complexContent>
     </xs:complexType>
 
     <xs:complexType name="MatchingBlock">
-        <xs:sequence minOccurs="1" maxOccurs="1">
-            <xs:element name="text" minOccurs="1" maxOccurs="1" type="NonEmptyString"/>
-            <xs:element name="explanation" type="xs:string" minOccurs="0" maxOccurs="1" />
-            <xs:element name="match" minOccurs="0" maxOccurs="unbounded">
-                <xs:complexType>
-                    <xs:sequence minOccurs="1" maxOccurs="1">
-                        <xs:element name="fixed" minOccurs="1" maxOccurs="1" type="NonEmptyString"/>
-                        <xs:element name="movable" minOccurs="1" maxOccurs="1" type="NonEmptyString"/>
-                    </xs:sequence>
-                    <xs:attribute name="id" type="NonEmptyString" use="required" />
-                </xs:complexType>
-            </xs:element>
-        </xs:sequence>
-        <xs:attribute name="id" type="NonEmptyString" use="required" />
-        <xs:attribute name="shuffleFixed" type="xs:boolean" use="optional" />
-        <xs:attribute name="maxScore" type="xs:int" use="optional" />
+		<xs:complexContent>
+			<xs:extension base="AbstractQuestion">
+				<xs:sequence minOccurs="1" maxOccurs="1">
+					<xs:element name="explanation" type="xs:string" minOccurs="0" maxOccurs="1" />
+					<xs:element name="match" minOccurs="0" maxOccurs="unbounded">
+						<xs:complexType>
+							<xs:sequence minOccurs="1" maxOccurs="1">
+								<xs:element name="fixed" minOccurs="1" maxOccurs="1" type="NonEmptyString"/>
+								<xs:element name="movable" minOccurs="1" maxOccurs="1" type="NonEmptyString"/>
+							</xs:sequence>
+							<xs:attribute name="id" type="NonEmptyString" use="required" />
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="shuffleFixed" type="xs:boolean" use="optional" />
+				<xs:attribute name="maxScore" type="xs:int" use="optional" />
+			</xs:extension>
+		</xs:complexContent>
     </xs:complexType>
 
     <!-- Types -->
@@ -615,7 +648,7 @@
     </xs:complexType>
 
     <xs:complexType name="ExerciseScoring">
-        <xs:attribute name="testsScore" type="xs:int" use="optional">
+        <xs:attribute name="passedTestsScore" type="xs:int" use="optional">
             <xs:annotation>
                 <xs:documentation xml:lang="en">Score for correct solution (if all tests passed)</xs:documentation>
                 <xs:documentation xml:lang="ru">Количество баллов за верное решение (если прошли все тесты)</xs:documentation>

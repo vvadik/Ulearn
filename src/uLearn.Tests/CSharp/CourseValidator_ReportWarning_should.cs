@@ -24,7 +24,7 @@ namespace uLearn.CSharp
 
 		private static readonly DirectoryInfo tempSlideFolder = new DirectoryInfo(tempSlideFolderPath);
 
-		private static readonly ProjectExerciseBlock exerciseBlock = new ProjectExerciseBlock
+		private static readonly CsProjectExerciseBlock exerciseBlock = new CsProjectExerciseBlock
 		{
 			StartupObject = "test.Program",
 			UserCodeFilePath = TestsHelper.UserCodeFileName,

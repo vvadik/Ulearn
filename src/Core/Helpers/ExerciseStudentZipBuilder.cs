@@ -23,7 +23,7 @@ namespace Ulearn.Core.Helpers
 		
 		public void BuildStudentZip(Slide slide, FileInfo zipFile)
 		{
-			var block = (slide as ExerciseSlide)?.Exercise as ProjectExerciseBlock;
+			var block = (slide as ExerciseSlide)?.Exercise as CsProjectExerciseBlock;
 			if (block == null)
 				throw new InvalidOperationException($"Can't generate student zip for non-project exercise block: slide \"{slide.Title}\" ({slide.Id})");
 			
@@ -37,26 +37,26 @@ namespace Ulearn.Core.Helpers
 			zip.UpdateZip();
 		}
 		
-		private static bool NeedExcludeFromStudentZip(ProjectExerciseBlock block, FileInfo file)
+		private static bool NeedExcludeFromStudentZip(CsProjectExerciseBlock block, FileInfo file)
 		{
 			var relativeFilePath = file.GetRelativePath(block.ExerciseFolder.FullName);
 			return NeedExcludeFromStudentZip(block, relativeFilePath);
 		}
 
-		public static bool NeedExcludeFromStudentZip(ProjectExerciseBlock block, string filepath)
+		public static bool NeedExcludeFromStudentZip(CsProjectExerciseBlock block, string filepath)
 		{
 			return IsAnyWrongAnswerOrAnySolution(filepath) ||
 					block.PathsToExcludeForStudent != null && block.PathsToExcludeForStudent.Any(p => p == filepath);
 		}
 		
-		private static byte[] GetFileContentInStudentZip(ProjectExerciseBlock block, FileInfo file)
+		private static byte[] GetFileContentInStudentZip(CsProjectExerciseBlock block, FileInfo file)
 		{
 			if (!file.Name.Equals(block.CsprojFileName, StringComparison.InvariantCultureIgnoreCase))
 				return null;
 			return ProjModifier.ModifyCsproj(file, proj => ProjModifier.PrepareForStudentZip(proj, block));
 		}
 		
-		public static IEnumerable<FileContent> ResolveCsprojLinks(ProjectExerciseBlock block)
+		public static IEnumerable<FileContent> ResolveCsprojLinks(CsProjectExerciseBlock block)
 		{
 			return ResolveCsprojLinks(block.CsprojFile, block.BuildEnvironmentOptions.ToolsVersion);
 		}

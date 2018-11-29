@@ -148,7 +148,7 @@ namespace uLearn.CourseTool.Monitoring
 			
 			var zipBytes = GenerateExerciseStudentZip(slide);
 			context.Response.Headers.Add("Content-Type", "application/zip");
-			var projectExerciseBlock = ((slide as ExerciseSlide).Exercise as ProjectExerciseBlock);
+			var projectExerciseBlock = ((slide as ExerciseSlide).Exercise as CsProjectExerciseBlock);
 			context.Response.Headers.Add("Content-Disposition", $"attachment; filename=\"{projectExerciseBlock?.ExerciseDirName.ToLatin()}.zip\"");
 			
 			return zipBytes;

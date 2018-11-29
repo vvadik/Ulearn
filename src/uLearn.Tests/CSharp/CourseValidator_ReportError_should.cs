@@ -26,7 +26,7 @@ namespace uLearn.CSharp
 
 		private static readonly DirectoryInfo tempSlideFolder = new DirectoryInfo(tempSlideFolderPath);
 
-		private static ProjectExerciseBlock exerciseBlock;
+		private static CsProjectExerciseBlock exerciseBlock;
 
 		[OneTimeSetUp]
 		public void OneTimeSetUp()
@@ -38,7 +38,7 @@ namespace uLearn.CSharp
 		[SetUp]
 		public void SetUp()
 		{
-			exerciseBlock = new ProjectExerciseBlock
+			exerciseBlock = new CsProjectExerciseBlock
 			{
 				StartupObject = "test.Program",
 				UserCodeFilePath = TestsHelper.UserCodeFileName,
@@ -90,7 +90,7 @@ namespace uLearn.CSharp
 					noExcludedDirs,
 					noExcludedFiles,
 					ResolveCsprojLink,
-					ExerciseStudentZipBuilder.ResolveCsprojLinks(csProjFile, ProjectExerciseBlock.BuildingToolsVersion), 
+					ExerciseStudentZipBuilder.ResolveCsprojLinks(csProjFile, CsProjectExerciseBlock.BuildingToolsVersion), 
 					zipWithFullProj)
 				.UpdateZip();
 

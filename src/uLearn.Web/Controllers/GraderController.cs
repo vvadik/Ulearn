@@ -164,7 +164,7 @@ namespace uLearn.Web.Controllers
 			if (automaticChecking == null || automaticChecking.Status != AutomaticExerciseCheckingStatus.Done)
 				return new SubmissionResult { Status = "IN_PROCESS" };
 
-			var score = (double)automaticChecking.Score / slide.Scoring.TestsScore;
+			var score = (double)automaticChecking.Score / slide.Scoring.PassedTestsScore;
 			if (score > 1)
 				score = 1;
 

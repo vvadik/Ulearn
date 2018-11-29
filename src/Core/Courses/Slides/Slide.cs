@@ -58,7 +58,7 @@ namespace Ulearn.Core.Courses.Slides
 		[XmlElement(typeof(MatchingBlock))]
 		
 		/* Exercise blocks */
-		[XmlElement(typeof(ProjectExerciseBlock))]
+		[XmlElement(typeof(CsProjectExerciseBlock))]
 		[XmlElement(typeof(SingleFileExerciseBlock))]
 		[XmlChoiceIdentifier(nameof(DefineBlockType))]
 		public SlideBlock[] Blocks { get; set; }

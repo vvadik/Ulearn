@@ -26,7 +26,7 @@ namespace uLearn.CSharp
 	[TestFixture]
 	public class ProjectExerciseBlock_Should
 	{		
-		private ProjectExerciseBlock ex;
+		private CsProjectExerciseBlock ex;
 		private List<SlideBlock> exBlocks;
 
 		private readonly string tempSlideFolderPath = Path.Combine(TestContext.CurrentContext.TestDirectory, nameof(ProjectExerciseBlock_Should));
@@ -56,7 +56,7 @@ namespace uLearn.CSharp
 
 			Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
 
-			ex = new ProjectExerciseBlock
+			ex = new CsProjectExerciseBlock
 			{
 				StartupObject = "test.Program",
 				UserCodeFilePath = TestsHelper.UserCodeFileName,

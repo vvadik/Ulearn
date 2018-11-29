@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<slide xmlns="https://ulearn.me/schema/v2" type="exercise" id="d6165afa-81b2-452f-9e61-78d3580e0c27" title="Упражнение на параметры по умолчанию">
+<slide.exercise xmlns="https://ulearn.me/schema/v2" id="d6165afa-81b2-452f-9e61-78d3580e0c27" title="Упражнение на параметры по умолчанию">
 	<scoring />
+	
+	<defaultIncludeCodeFile>_Упражнение на параметры по умолчанию.cs</defaultIncludeCodeFile>
+	
 	<markdown>Отрефакторьте класс MyFile, чтобы в нем остался только один метод</markdown>
-	<include-code>
+	
+	<includeCode>
 		<display onlyBody="false">Main</display>
-	</include-code>
-	<singleFileExercise file="_Упражнение на параметры по умолчанию.cs" language="csharp" type="check-output">
+	</includeCode>
+	
+	<exercise.file file="_Упражнение на параметры по умолчанию.cs" language="csharp" type="check-output">
 		<initialCode xml:space="preserve">
 class MyFile
 {
@@ -29,6 +34,5 @@ Use encoding System.Text.UTF32Encoding
 		<checkForPlagiarism>true</checkForPlagiarism>
 		<hideSolutions>false</hideSolutions>
 		<solution onlyBody="false">MyFile</solution>
-	</singleFileExercise>
-	<defaultIncludeCodeFile>_Упражнение на параметры по умолчанию.cs</defaultIncludeCodeFile>
-</slide>
+	</exercise.file>	
+</slide.exercise>

@@ -106,7 +106,7 @@ namespace Ulearn.Core.Tests.Courses.Slides
 		{
 			var slide = (ExerciseSlide) LoadSlideFromXmlFile("ExerciseWithDefaultScore.xml");
 			
-			Assert.AreEqual(5, slide.Scoring.TestsScore);
+			Assert.AreEqual(5, slide.Scoring.PassedTestsScore);
 		}
     }
 }

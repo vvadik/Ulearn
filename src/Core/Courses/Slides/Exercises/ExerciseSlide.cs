@@ -12,7 +12,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 		[XmlElement("scoring")]
 		public ExerciseScoringSettings Scoring { get; set; } = new ExerciseScoringSettings
 		{
-			TestsScore = 5, 
+			PassedTestsScore = 5, 
 		};
 		
 		protected override Type[] AllowedBlockTypes => base.AllowedBlockTypes.Concat(new[] { typeof(AbstractExerciseBlock) }).ToArray();
@@ -21,7 +21,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 
 		public override string ScoringGroup => Scoring.ScoringGroup;
 
-		public override int MaxScore => Scoring.TestsScore + Scoring.CodeReviewScore;
+		public override int MaxScore => Scoring.PassedTestsScore + Scoring.CodeReviewScore;
 
 		[XmlIgnore]
 		public AbstractExerciseBlock Exercise => (AbstractExerciseBlock) Blocks.Single(b => b is AbstractExerciseBlock);
@@ -61,13 +61,13 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 			if (exerciseBlocksCount == 0)
 			{
 				throw new CourseLoadingException(
-					$"Не найдено блоков с упражнениями (<singleFileExercise> или <csprojExercise>) в слайде «{Title}», " +
+					$"Не найдено блоков с упражнениями (<exercise.file> или <exercise.csproj>) в слайде «{Title}», " +
 					"для которого уиспользован внешний тег <slide.exercise>. Если вы хотите создать обычный слайд без упражнения, используйте тег <slide>");
 			}
 			if (exerciseBlocksCount > 1)
 			{
 				throw new CourseLoadingException(
-					"Блок с упражнением (<singleFileExercise> или <csprojExercise>) может быть только один на слайде. " +
+					"Блок с упражнением (<exercise.file> или <exercise.csproj>) может быть только один на слайде. " +
 					$"Но на слайде «{Title}» найдено {exerciseBlocksCount} таких блока.");
 			}
 			
@@ -83,7 +83,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 		public Component GetExerciseComponent(string displayName, Slide slide, int componentIndex, string launchUrl,
 			string ltiId)
 		{
-			return new LtiComponent(displayName, slide.NormalizedGuid + componentIndex, launchUrl, ltiId, true, Scoring.TestsScore, false);
+			return new LtiComponent(displayName, slide.NormalizedGuid + componentIndex, launchUrl, ltiId, true, Scoring.PassedTestsScore, false);
 		}
 	}
 }

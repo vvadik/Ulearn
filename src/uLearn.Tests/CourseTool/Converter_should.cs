@@ -23,7 +23,7 @@ namespace uLearn.CourseTool
 			Id = Guid.NewGuid(),
 			Title = "title", 
 		};
-		private readonly Slide exerciseSlide = new Slide(new ProjectExerciseBlock(), new SingleFileExerciseBlock())
+		private readonly Slide exerciseSlide = new Slide(new CsProjectExerciseBlock(), new SingleFileExerciseBlock())
 		{
 			Id = slideIdFromCourse,
 			Title = "title",

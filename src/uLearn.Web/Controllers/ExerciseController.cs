@@ -565,10 +565,10 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 
 			var exerciseSlide = slide as ExerciseSlide;
-			if (!(exerciseSlide.Exercise is ProjectExerciseBlock))
+			if (!(exerciseSlide.Exercise is CsProjectExerciseBlock))
 				return HttpNotFound();
 
-			var block = (ProjectExerciseBlock) exerciseSlide.Exercise;
+			var block = (CsProjectExerciseBlock) exerciseSlide.Exercise;
 			var zipFile = exerciseStudentZipsCache.GenerateOrFindZip(courseId, exerciseSlide);
 			
 			return File(zipFile.FullName, "application/zip", block.CsprojFile.Name + ".zip");

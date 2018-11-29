@@ -19,14 +19,14 @@ using Ulearn.Core.Properties;
 
 namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 {
-	[XmlType("csprojExercise")]
-	public class ProjectExerciseBlock : AbstractExerciseBlock
+	[XmlType("exercise.csproj")]
+	public class CsProjectExerciseBlock : AbstractExerciseBlock
 	{
 		public const string BuildingTargetFrameworkVersion = "4.7";
 		public const string BuildingTargetNetCoreFrameworkVersion = "2.0";
 		public const string BuildingToolsVersion = "15.0";
 
-		private static readonly ILog log = LogManager.GetLogger(typeof(ProjectExerciseBlock)); 
+		private static readonly ILog log = LogManager.GetLogger(typeof(CsProjectExerciseBlock)); 
 		
 		public static string SolutionFilepathToUserCodeFilepath(string solutionFilepath)
 		{
@@ -37,9 +37,8 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			return path == null ? userCodeFilename : Path.Combine(path, userCodeFilename);
 		}
 
-		public ProjectExerciseBlock()
+		public CsProjectExerciseBlock()
 		{
-			StartupObject = "checking.CheckerRunner";
 			HideExpectedOutputOnError = true;
 			HideShowSolutionsButton = true;
 			BuildEnvironmentOptions = new BuildEnvironmentOptions
@@ -54,7 +53,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public string CsProjFilePath { get; set; }
 
 		[XmlElement("startupObject")]
-		public string StartupObject { get; set; }
+		public string StartupObject { get; set; } = "checking.CheckerRunner";
 
 		[XmlElement("userCodeFile")]
 		public string UserCodeFilePath { get; set; }

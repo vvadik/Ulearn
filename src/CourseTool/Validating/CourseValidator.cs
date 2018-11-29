@@ -32,7 +32,7 @@ namespace uLearn.CourseTool.Validating
 			{
 				LogSlideProcessing("Validate exercise", slide);
 
-				if (slide.Exercise is ProjectExerciseBlock exercise)
+				if (slide.Exercise is CsProjectExerciseBlock exercise)
 				{
 					new ProjectExerciseValidator(this, settings, slide, exercise).ValidateExercises();
 				}

@@ -490,7 +490,7 @@ namespace Ulearn.Core
 			{
 				slide.Info.SlideFile = (FileInfo)GetNewPathForFileAfterMoving(slide.Info.SlideFile, sourceDirectory, destinationDirectory);
 
-				foreach (var exerciseBlock in slide.Blocks.OfType<ProjectExerciseBlock>())
+				foreach (var exerciseBlock in slide.Blocks.OfType<CsProjectExerciseBlock>())
 					exerciseBlock.SlideFolderPath = (DirectoryInfo)GetNewPathForFileAfterMoving(exerciseBlock.SlideFolderPath, sourceDirectory, destinationDirectory);
 				
 				slide.Meta?.FixPaths(slide.Info.SlideFile);

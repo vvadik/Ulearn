@@ -173,7 +173,7 @@ namespace uLearn.Web.Controllers
 		private static int GetMaxScoreWithoutManualChecking(Slide slide)
 		{
 			if (slide is ExerciseSlide)
-				return (slide as ExerciseSlide).Scoring.TestsScore;
+				return (slide as ExerciseSlide).Scoring.PassedTestsScore;
 			if (slide is QuizSlide)
 				return (slide as QuizSlide).ManualChecking ? 0 : slide.MaxScore;
 			return slide.MaxScore;

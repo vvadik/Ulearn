@@ -10,8 +10,8 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 		[XmlAttribute("group")]
 		public string ScoringGroup { get; set; }
 
-		[XmlAttribute("testsScore")]
-		public int TestsScore { get; set; } = 5;
+		[XmlAttribute("passedTestsScore")]
+		public int PassedTestsScore { get; set; } = 5;
 		
 		/* .NET XML Serializer doesn't understand nullable fields, so we use this hack to make int? field */
 		[XmlIgnore]

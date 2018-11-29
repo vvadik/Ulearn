@@ -42,7 +42,7 @@ namespace Ulearn.Core
 			}
 		}
 		
-		public static void PrepareForStudentZip(Project proj, ProjectExerciseBlock ex)
+		public static void PrepareForStudentZip(Project proj, CsProjectExerciseBlock ex)
 		{
 			var toExclude = FindItemNames(proj, file => ExerciseStudentZipBuilder.NeedExcludeFromStudentZip(ex, file)).ToList();
 			var solutionsOfOtherTasks = toExclude.Where(n => ExerciseStudentZipBuilder.IsAnySolution(n) && ex.CorrectSolutionPath != n).ToList();
@@ -54,7 +54,7 @@ namespace Ulearn.Core
 			
 			RemoveCheckingFromCsproj(proj);
 			
-			var userCodeFilepathsOfOtherTasks = solutionsOfOtherTasks.Select(ProjectExerciseBlock.SolutionFilepathToUserCodeFilepath);
+			var userCodeFilepathsOfOtherTasks = solutionsOfOtherTasks.Select(CsProjectExerciseBlock.SolutionFilepathToUserCodeFilepath);
 			SetFilepathItemTypeToCompile(proj, userCodeFilepathsOfOtherTasks.Concat(new[] { ex.UserCodeFilePath }));
 			
 			ReplaceLinksWithItems(proj);
@@ -75,7 +75,7 @@ namespace Ulearn.Core
 				|| item.DirectMetadata.Any(md => md.Name == "Link" && md.EvaluatedValue.StartsWith("checking" + Path.DirectorySeparatorChar));
 		}
 
-		public static void PrepareForCheckingUserCode(Project proj, ProjectExerciseBlock ex, List<string> excludedPaths)
+		public static void PrepareForCheckingUserCode(Project proj, CsProjectExerciseBlock ex, List<string> excludedPaths)
 		{
 			var solutionRelativePath = ex.ExerciseFolder.GetRelativePathsOfFiles()
 				.SingleOrDefault(n => n.Equals(ex.CorrectSolutionPath, StringComparison.InvariantCultureIgnoreCase));

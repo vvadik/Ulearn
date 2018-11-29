@@ -438,7 +438,7 @@ namespace Database.Repos
 			var exerciseSlide = isWebRunner ? null : (ExerciseSlide)courseManager.GetCourse(checking.CourseId).GetSlideById(checking.SlideId);
 
 			var isRightAnswer = exerciseSlide?.Exercise?.IsCorrectRunResult(result) ?? false;
-			var score = exerciseSlide != null && isRightAnswer ? exerciseSlide.Scoring.TestsScore : 0;
+			var score = exerciseSlide != null && isRightAnswer ? exerciseSlide.Scoring.PassedTestsScore : 0;
 
 			/* For skipped slides score is always 0 */
 			if (visitsRepo.IsSkipped(checking.CourseId, checking.SlideId, checking.UserId))

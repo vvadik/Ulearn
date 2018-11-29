@@ -59,7 +59,7 @@ namespace uLearn.CSharp
 			FileSystem.CreateDirectory(path);
 		}
 
-		public static ProjectExerciseValidator BuildProjectExerciseValidator(ProjectExerciseBlock exBlock, StringBuilder valOut)
+		public static ProjectExerciseValidator BuildProjectExerciseValidator(CsProjectExerciseBlock exBlock, StringBuilder valOut)
 		{
 			var slide = BuildSlide(exBlock);
 			return new ProjectExerciseValidator(BuildValidator(slide, valOut), new SandboxRunnerSettings(), slide, exBlock);
@@ -85,7 +85,7 @@ namespace uLearn.CSharp
 			};
 		}
 
-		public static string ValidateBlock(ProjectExerciseBlock exBlock)
+		public static string ValidateBlock(CsProjectExerciseBlock exBlock)
 		{
 			var valOut = new StringBuilder();
 			var val = BuildProjectExerciseValidator(exBlock, valOut);

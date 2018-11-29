@@ -36,11 +36,11 @@ namespace Ulearn.Core.Courses.Slides
 		[XmlEnum("gallery")]
 		IncludeImageGalleryBlock,
 
-		[XmlEnum("singleFileExercise")]
+		[XmlEnum("exercise.file")]
 		SingleFileExerciseBlock,
 
-		[XmlEnum("csprojExercise")]
-		ProjectExerciseBlock,
+		[XmlEnum("exercise.csproj")]
+		CsProjectExerciseBlock,
 
 		[XmlEnum("annotation")]
 		VideoAnnotationBlock,
@@ -83,7 +83,7 @@ namespace Ulearn.Core.Courses.Slides
 				case OrderingBlock _: return BlockType.OrderingBlock;
 				case IsTrueBlock _: return BlockType.IsTrueBlock;
 				
-				case ProjectExerciseBlock _: return BlockType.ProjectExerciseBlock;
+				case CsProjectExerciseBlock _: return BlockType.CsProjectExerciseBlock;
 				case SingleFileExerciseBlock _: return BlockType.SingleFileExerciseBlock;
 				
 				default: throw new Exception("Unknown slide block " + block);

@@ -204,7 +204,7 @@ namespace uLearn.Web.Controllers
 				return false;
 			}
 
-			var score = (double)checking.Score / slide.Scoring.TestsScore;
+			var score = (double)checking.Score / slide.Scoring.PassedTestsScore;
 			if (score > 1)
 				score = 1;
 

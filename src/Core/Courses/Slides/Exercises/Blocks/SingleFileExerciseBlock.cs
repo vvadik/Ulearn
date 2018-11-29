@@ -9,7 +9,7 @@ using Ulearn.Core.Model;
 
 namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 {
-	[XmlType("singleFileExercise")]
+	[XmlType("exercise.file")]
 	public class SingleFileExerciseBlock : AbstractExerciseBlock
 	{
 		[XmlElement("solution")]
@@ -28,10 +28,10 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		{
 			CodeFile = CodeFile ?? context.Slide.DefaultIncludeCodeFile ?? context.Unit.Settings?.DefaultIncludeCodeFile;
 			if (CodeFile == null)
-				throw new CourseLoadingException($"У блока <singleFileExercise> не указан атрибут file.");
+				throw new CourseLoadingException($"У блока <exercise.file> не указан атрибут file.");
 			
 			if (ExerciseInitialCode == null)
-				throw new CourseLoadingException($"У блока <singleFileExercise> не указан код, который надо показывать пользователю перед началом работы. Укажите его в тэге <initialCode>");
+				throw new CourseLoadingException($"У блока <exercise.file> не указан код, который надо показывать пользователю перед началом работы. Укажите его в тэге <initialCode>");
 			
 			if (!Language.HasValue)
 				Language = LanguageHelpers.GuessByExtension(new FileInfo(CodeFile));
