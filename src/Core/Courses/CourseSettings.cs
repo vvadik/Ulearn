@@ -18,10 +18,10 @@ namespace Ulearn.Core.Courses
 		[XmlElement("defaultLanguage")]
 		public Language? DefaultLanguage { get; set; }
 
-		[XmlElement("enableCodeReviewAndQuizManualCheckForEveryone")]
+		[XmlElement("videoAnnotationsGoogleDoc")]
 		public string VideoAnnotationsGoogleDoc { get; set; }
 
-		[XmlElement("manualChecking")]
+		[XmlElement("enableCodeReviewAndQuizManualCheckForEveryone")]
 		public bool IsManualCheckingEnabled { get; set; }
 
 		[XmlElement("scoring")]
