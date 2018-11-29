@@ -38,7 +38,7 @@ namespace Ulearn.Core.Courses
 		[XmlElement("dictionaryFile")]
 		public string DictionaryFile { get; set; }
 		
-		public static readonly CourseSettings DefaultSettings = new CourseSettings(
+		public static CourseSettings DefaultSettings => new CourseSettings(
 			null,
 			null,
 			new PreludeFile[0]
@@ -85,19 +85,6 @@ namespace Ulearn.Core.Courses
 						$"Некорректный идентификатор группы баллов <group id={scoringGroup.Id}> (файл course.xml). " +
 						"Идентификатор группы баллов может состоить только из латинских букв, цифр и подчёркивания, а также не может быть пустым. " +
 						"Понятное человеку название используйте в аббревиатуре и имени группы."
-					);
-				
-				if (scoringGroup.IsMaxAdditionalScoreSpecified &&
-					(!scoringGroup.IsCanBeSetByInstructorSpecified || !scoringGroup.CanBeSetByInstructor))
-					throw new CourseLoadingException(
-						$"Чтобы выставлять дополнительные баллы в группу {scoringGroup.Id}, установите у неё атрибут enableAdditionalScore=\"true\" в настройках курса (файл course.xml). " +
-						$"В противном случае атрибут maxAdditionalScore=\"{scoringGroup.MaxAdditionalScore}\" не действует."
-					);
-
-				if (!scoringGroup.CanBeSetByInstructor && scoringGroup.IsEnabledForEveryoneSpecified)
-					throw new CourseLoadingException(
-						$"Неправильные параметры для группы баллов {scoringGroup.Id} в файле course.xml. " +
-						"Опция enableForEveryone доступна только при установке опции maxAdditionalScore."
 					);
 			}
 

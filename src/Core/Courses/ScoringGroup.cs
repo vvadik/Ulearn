@@ -4,9 +4,8 @@ namespace Ulearn.Core.Courses
 {
 	public class ScoringGroup
 	{
-		private const bool DefaultCanBeSetByInstructor = false;
-		private const int DefaultMaxAdditionalScore = 10;
-		private const bool DefaultEnabledForEveryone = false;
+		private const int defaultMaxAdditionalScore = 0;
+		private const bool defaultEnabledForEveryone = false;
 
 		[XmlAttribute("id")]
 		public string Id { get; set; }
@@ -16,26 +15,9 @@ namespace Ulearn.Core.Courses
 
 		[XmlAttribute("description")]
 		public string Description { get; set; }
-		
-		[XmlAttribute("enableAdditionalScore")]
-		public string _canBeSetByInstructor { get; set; }
-		
-		[XmlIgnore]
-		public bool CanBeSetByInstructor
-		{
-			get
-			{
-				if (string.IsNullOrEmpty(_canBeSetByInstructor) || _canBeSetByInstructor.Trim().Length == 0)
-					return DefaultCanBeSetByInstructor;
-
-				return bool.TryParse(_canBeSetByInstructor, out var result) ? result : DefaultCanBeSetByInstructor;
-			}
-			set => _canBeSetByInstructor = value.ToString();
-		}
 
 		[XmlIgnore]
-		public bool IsCanBeSetByInstructorSpecified => !string.IsNullOrEmpty(_canBeSetByInstructor);
-		
+		public bool CanBeSetByInstructor => MaxAdditionalScore > 0;
 
 		[XmlAttribute("maxAdditionalScore")]
 		public string _maxAdditionalScore { get; set; }
@@ -46,10 +28,10 @@ namespace Ulearn.Core.Courses
 			get
 			{
 				if (string.IsNullOrEmpty(_maxAdditionalScore) || _maxAdditionalScore.Trim().Length == 0)
-					return DefaultMaxAdditionalScore;
+					return defaultMaxAdditionalScore;
 
 				int result;
-				return int.TryParse(_maxAdditionalScore, out result) ? result : DefaultMaxAdditionalScore;
+				return int.TryParse(_maxAdditionalScore, out result) ? result : defaultMaxAdditionalScore;
 			}
 			set => _maxAdditionalScore = value.ToString();
 		}
@@ -70,9 +52,9 @@ namespace Ulearn.Core.Courses
 			get
 			{
 				if (string.IsNullOrEmpty(_enabledForEveryone) || _enabledForEveryone.Trim().Length == 0)
-					return DefaultEnabledForEveryone;
+					return defaultEnabledForEveryone;
 
-				return bool.TryParse(_enabledForEveryone, out bool value) ? value : DefaultEnabledForEveryone;
+				return bool.TryParse(_enabledForEveryone, out bool value) ? value : defaultEnabledForEveryone;
 			}
 			set => _enabledForEveryone = value.ToString();
 		}
@@ -85,7 +67,6 @@ namespace Ulearn.Core.Courses
 
 		public void CopySettingsFrom(ScoringGroup otherScoringGroup)
 		{
-			_canBeSetByInstructor = string.IsNullOrEmpty(_canBeSetByInstructor) ? otherScoringGroup._canBeSetByInstructor : _canBeSetByInstructor;
 			_maxAdditionalScore = string.IsNullOrEmpty(_maxAdditionalScore) ? otherScoringGroup._maxAdditionalScore : _maxAdditionalScore;
 			_enabledForEveryone = string.IsNullOrEmpty(_enabledForEveryone) ? otherScoringGroup._enabledForEveryone : _enabledForEveryone;
 			Abbreviation = Abbreviation ?? otherScoringGroup.Abbreviation;

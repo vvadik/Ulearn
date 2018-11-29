@@ -688,7 +688,6 @@
                 <xs:attribute name="id" type="NonEmptyString" use="required" />
                 <xs:attribute name="abbr" type="NonEmptyString" use="required" />
                 <xs:attribute name="description" type="NonEmptyString" use="optional" />
-				<xs:attribute name="enableAdditionalScore" type="xs:boolean" use="optional" />
                 <xs:attribute name="maxAdditionalScore" type="xs:integer" use="optional" />
                 <xs:attribute name="enableForEveryone" type="xs:boolean" use="optional" />
             </xs:extension>
