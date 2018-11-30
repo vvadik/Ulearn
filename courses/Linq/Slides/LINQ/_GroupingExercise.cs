@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using uLearn.CSharp;
 
 namespace uLearn.Courses.Linq.Slides.LINQ.LINQ.LINQ
 {
-	[Slide("Создание частотного словаря", "{0535734D-D258-44C6-99F3-F96258BCCA6F}")]
 	public class S140_GroupingExercise : SlideTestBase
 	{
 		/*
@@ -24,8 +23,6 @@ namespace uLearn.Courses.Linq.Slides.LINQ.LINQ.LINQ
 		    IEnumerable<T>                     Take(this IEnumerable<T> items, int count)
 		*/
 
-		[Exercise]
-		[SingleStatementMethod]
 		public static Tuple<string, int>[] GetMostFrequentWords(string text, int count)
 		{
 			return Regex.Split(text, @"\W+")
@@ -44,19 +41,6 @@ namespace uLearn.Courses.Linq.Slides.LINQ.LINQ.LINQ
 			*/
 		}
 
-		[ExpectedOutput(@"
-GetMostFrequentWords(""A box of biscuits, a box of mixed biscuits, and a biscuit mixer."", 2)
-  a 3
-  biscuits 2
-
-GetMostFrequentWords("""", 100)
-
-
-GetMostFrequentWords(""Each Easter Eddie eats eighty Easter eggs."", 3)
-  easter 2
-  each 1
-  eats 1")]
-		[HideOnSlide]
 		public static void Main()
 		{
 			CheckOn(2, "A box of biscuits, a box of mixed biscuits, and a biscuit mixer.");
@@ -64,7 +48,6 @@ GetMostFrequentWords(""Each Easter Eddie eats eighty Easter eggs."", 3)
 			CheckOn(3, "Each Easter Eddie eats eighty Easter eggs.");
 		}
 
-		[HideOnSlide]
 		private static void CheckOn(int count, string text)
 		{
 			Console.WriteLine("GetMostFrequentWords(\"{0}\", {1})", text, count);

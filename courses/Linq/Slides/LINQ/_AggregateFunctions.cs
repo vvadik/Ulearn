@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides.LINQ
 {
-	[Slide("Функции агрегирования", "{A6BACA4C-D211-428B-AE49-1F6882FD67F1}")]
 	[TestFixture]
 	public class S110_AggregateFunctions
 	{
@@ -15,7 +14,6 @@ namespace uLearn.Courses.Linq.Slides.LINQ
 		*/
 
 		[Test]
-		[ShowBodyOnSlide]
 		public void MinMaxAvg()
 		{
 			IEnumerable<int> nums = new int[] {8, 9, 0, 1, 2, 3, 4, 5, 6, 7};
@@ -49,7 +47,6 @@ namespace uLearn.Courses.Linq.Slides.LINQ
 		*/
 
 		[Test]
-		[ShowBodyOnSlide]
 		public void Test2()
 		{
 			int[] numbers = {1, 2, 6, 2, 8, 0, 10, 6, 1, 2};

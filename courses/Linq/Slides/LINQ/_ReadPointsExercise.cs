@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using uLearn.CSharp;
 
 namespace uLearn.Courses.Linq.Slides.LINQ.LINQ.LINQ
 {
-	[Slide("Чтение списка точек", "{563307C9-F265-4EA0-B06E-8390582F718E}")]
 	public class S030_ReadPointsExercise : SlideTestBase
 	{
 		/*
@@ -14,7 +13,6 @@ namespace uLearn.Courses.Linq.Slides.LINQ.LINQ.LINQ
 		Кто-то уже вызвал метод `File.ReadLines(filename)` и теперь у вас есть массив всех строк файла.
 		*/
 
-		[ExpectedOutput("1 -2\n-3 4\n0 2\n1 -42")]
 		public static void Main()
 		{
 			// Функция тестирования ParsePoints
@@ -41,13 +39,6 @@ namespace uLearn.Courses.Linq.Slides.LINQ.LINQ.LINQ
 		Постарайтесь не использовать функцию преобразования строки в число более одного раза.
 		*/
 
-		[Exercise]
-		[SingleStatementMethod]
-		[Hint("string.Split — разбивает строку на части по разделителю")]
-		[Hint("int.Parse преобразует строку в целое число.")]
-		[Hint(@"Каждую строку нужно преобразовать в точку. Преобразование — это дело для метода Select. 
-			Но каждая строка — это список координат, каждую из которых нужно преобразовать из строки в число.
-			Подумайте про Select внутри Select-а.")]
 		public static List<Point> ParsePoints(IEnumerable<string> lines)
 		{
 			return lines

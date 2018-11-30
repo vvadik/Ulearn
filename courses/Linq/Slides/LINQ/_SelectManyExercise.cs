@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using uLearn.CSharp;
 
 namespace uLearn.Courses.Linq.Slides.LINQ.LINQ.LINQ
 {
-	[Slide("Объединение коллекций", "{7DB3F797-B99B-4580-ABE6-BB4EE929BB6B}")]
 	public class S050_SelectManyExercise : SlideTestBase
 	{
 		/*
@@ -25,7 +24,6 @@ namespace uLearn.Courses.Linq.Slides.LINQ.LINQ.LINQ
 		Без использования `LINQ` решение могло бы выглядеть так:
 		*/
 
-		[ShowBodyOnSlide]
 		public string[] GetAllStudents_NoLinq(Classroom[] classes)
 		{
 			var allStudents = new List<string>();
@@ -43,7 +41,6 @@ namespace uLearn.Courses.Linq.Slides.LINQ.LINQ.LINQ
 		Напишите решение этой задачи с помощью `LINQ` в одно выражение.
 		*/
 
-		[ExpectedOutput("Alex Anna Bulat Galina Ilya Ivan Pavel Petr Vladimir")]
 		public static void Main()
 		{
 			Classroom[] classes =
@@ -57,10 +54,6 @@ namespace uLearn.Courses.Linq.Slides.LINQ.LINQ.LINQ
 			Console.WriteLine(string.Join(" ", allStudents));
 		}
 
-		[Exercise]
-		[SingleStatementMethod]
-		[Hint("`IEnumerable<R> SelectMany(this IEnumerable<T> items, Func<T, IEnumerable<R>> f)`")]
-		[Hint("`T[] ToArray(this IEnumerable<T> items)`")]
 		public static string[] GetAllStudents(Classroom[] classes)
 		{
 			return classes.SelectMany(c => c.Students).ToArray();

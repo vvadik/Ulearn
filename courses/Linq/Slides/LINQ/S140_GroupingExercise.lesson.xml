@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Lesson xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="https://ulearn.azurewebsites.net/lesson">
+  <title>Создание частотного словаря</title>
+  <id>0535734d-d258-44c6-99f3-f96258bcca6f</id>
+  <md>
+Дан текст, нужно вывести `count` наиболее часто встречающихся в тексте слов вместе с их частотой.
+Среди слов, встречающихся одинаково часто, отдавать предпочтение лексикографически меньшим словам.
+Слова сравнивать регистронезависимо и выводить в нижнем регистре.
+
+Напомним сигнатуры некоторых `LINQ`-методов, которые могут понадобиться в этом упражнении:
+
+    IEnumerable&lt;IGrouping&lt;K, T&gt;&gt;    GroupBy(this IEnumerable&lt;T&gt; items, Func&lt;T, K&gt; keySelector)
+    IOrderedEnumerable&lt;T&gt;           OrderBy(this IEnumerable&lt;T&gt; items, Func&lt;T, K&gt; keySelector)
+    IOrderedEnumerable&lt;T&gt; OrderByDescending(this IEnumerable&lt;T&gt; items, Func&lt;T, K&gt; keySelector)
+    IOrderedEnumerable&lt;T&gt;            ThenBy(this IOrderedEnumerable&lt;T&gt; items, Func&lt;T, K&gt; keySelector)
+    IOrderedEnumerable&lt;T&gt;  ThenByDescending(this IOrderedEnumerable&lt;T&gt; items, Func&lt;T, K&gt; keySelector)
+    IEnumerable&lt;T&gt;                     Take(this IEnumerable&lt;T&gt; items, int count)</md>
+  <single-file-exercise file="_GroupingExercise.cs" lang-id="cs" type="check-output">
+    <max-score>5</max-score>
+    <initial-code>public static Tuple&lt;string, int&gt;[] GetMostFrequentWords(string text, int count)
+{
+	return Regex.Split(text, @"\W+")
+		.Where(word =&gt; word != "")
+		// ваш код
+		.ToArray();
+}</initial-code>
+    <expected>
+GetMostFrequentWords("A box of biscuits, a box of mixed biscuits, and a biscuit mixer.", 2)
+  a 3
+  biscuits 2
+
+GetMostFrequentWords("", 100)
+
+
+GetMostFrequentWords("Each Easter Eddie eats eighty Easter eggs.", 3)
+  easter 2
+  each 1
+  eats 1</expected>
+    <hide-expected-output>false</hide-expected-output>
+    <validator>cs SingleStatementMethod</validator>
+    <texts />
+    <check-for-plagiarism>true</check-for-plagiarism>
+    <hide-solutions>false</hide-solutions>
+    <require-review>false</require-review>
+    <correctness-score>5</correctness-score>
+    <solution only-body="false">GetMostFrequentWords</solution>
+  </single-file-exercise>
+  <default-include-code-file>_GroupingExercise.cs</default-include-code-file>
+</Lesson>

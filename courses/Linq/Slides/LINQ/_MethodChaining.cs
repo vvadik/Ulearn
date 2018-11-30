@@ -1,9 +1,8 @@
-﻿using System.Linq;
+using System.Linq;
 using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides.LINQ
 {
-	[Slide("Method chaining", "{B7EDA13D-77E5-40B6-B5A9-66775E900EA6}")]
 	public class S013_MethodChaining
 	{
 
@@ -14,7 +13,6 @@ namespace uLearn.Courses.Linq.Slides.LINQ
 		*/
 
 		[Test]
-		[ShowBodyOnSlide]
 		public void MethodChainingSample()
 		{
 			Assert.That(
@@ -36,7 +34,6 @@ namespace uLearn.Courses.Linq.Slides.LINQ
 		*/
 
 		[Test]
-		[ShowBodyOnSlide]
 		public void MoreReadable()
 		{
 			var people = new[]{"Pavel Egorov", "Yuriy Okulovskiy", 

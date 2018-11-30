@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides.LINQ
 {
-	[Slide("ToDictionary и ToLookup", "{1998BB06-8008-4F53-BED8-838FC20C6067}")]
 	[TestFixture]
 	public class S150_Lookups
 	{
@@ -18,7 +17,6 @@ namespace uLearn.Courses.Linq.Slides.LINQ
 		*/
 
 		[Test]
-		[ShowBodyOnSlide]
 		public void Test()
 		{
 			string[] names = {"Pavel", "Peter", "Andrew", "Anna", "Alice", "John"};
@@ -39,7 +37,6 @@ namespace uLearn.Courses.Linq.Slides.LINQ
 		
 		*/
 
-		[ShowBodyOnSlide]
 		[Test]
 		public void TestName()
 		{
@@ -62,7 +59,6 @@ namespace uLearn.Courses.Linq.Slides.LINQ
 
 		*/
 
-		[ShowBodyOnSlide]
 		[Test]
 		public void ToLookupSample()
 		{

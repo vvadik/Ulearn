@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Lesson xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="https://ulearn.azurewebsites.net/lesson">
+  <title>Составление словаря</title>
+  <id>acb110b3-c2f0-4e1a-9645-76df88a75a7f</id>
+  <md>
+Текст задан массивом строк. 
+Вам нужно составить лексикографически упорядоченный список всех встречающихся в этом тексте слов.
+
+Слова нужно сравнивать регистронезависимо, а выводить в нижнем регистре.</md>
+  <include-code>
+    <display only-body="false">Main</display>
+  </include-code>
+  <single-file-exercise file="_SortExercise.cs" lang-id="cs" type="check-output">
+    <max-score>5</max-score>
+    <initial-code>public static string[] GetSortedWords(params string[] textLines)
+{
+	// ваше решение
+}</initial-code>
+    <hint>`Regex.Split` — позволяет задать регулярное выражение для разделителей слов и получить список слов.</hint>
+    <hint>`Regex.Split(s, @"\W+")` разбивает текст на слова</hint>
+    <hint>Подумайте, как скомбинировать SelectMany со вложенным `Regex.Split`</hint>
+    <hint>Пустая строка не является корректным словом</hint>
+    <hint>У класса `string` есть метод `ToLower` для приведения строки к нижнему регистру</hint>
+    <hint>`list.Distinct()` — возвращает список `list` без дубликатов</hint>
+    <expected>a
+albino
+an
+and
+are
+contagious
+dangerous
+entertain
+feel
+hello
+here
+hey
+how
+i
+it
+less
+libido
+lights
+low
+mosquito
+mulatto
+my
+now
+out
+s
+stupid
+the
+us
+we
+with
+yeah</expected>
+    <hide-expected-output>false</hide-expected-output>
+    <validator>cs SingleStatementMethod</validator>
+    <texts />
+    <check-for-plagiarism>true</check-for-plagiarism>
+    <hide-solutions>false</hide-solutions>
+    <require-review>false</require-review>
+    <correctness-score>5</correctness-score>
+    <solution only-body="false">GetSortedWords</solution>
+  </single-file-exercise>
+  <default-include-code-file>_SortExercise.cs</default-include-code-file>
+</Lesson>
