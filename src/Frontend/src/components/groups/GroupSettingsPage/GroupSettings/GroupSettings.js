@@ -4,50 +4,53 @@ import Input from "@skbkontur/react-ui/components/Input/Input";
 import GroupScores from "./GroupScores";
 import GroupSettingsCheckbox from "./GroupSettingsCheckbox";
 
-import './style.less';
+import styles from './style.less';
 
 class GroupSettings extends Component {
-
 	render() {
-		const { group, scores, onChangeSettings } = this.props;
+		const { group, scores, onChangeSettings, error } = this.props;
 
 		return (
-			<div className="group-settings-wrapper">
-				<form>
-					<div className="group-name-field">
-						<div className="group-name-label">
-							<label>
-								<h4>Название группы</h4>
-							</label>
-						</div>
-						<Input
-							type="text"
-							size="small"
-							// value={group.name}
-							placeholder="Здесь вы можете изменить название группы"
-							onChange={this.onChangeName}
-						/>
+			<div className={styles["group-settings-wrapper"]}>
+				<div className={styles["group-name-field"]}>
+					<div className={styles["group-name-label"]}>
+						<label>
+							<h4>Название группы</h4>
+						</label>
 					</div>
-					<div className="check-block points-block">
-						<h4>Код-ревью и проверка тестов</h4>
-						<GroupSettingsCheckbox
-							group={group}
-							onChangeSettings={onChangeSettings}/>
-					</div>
-					<div className="points-block">
-						<h4>Баллы</h4>
-						<p>Преподаватели могут выставлять студентам группы следующие баллы:</p>
-						{scores && scores.map(score =>
-							<GroupScores
-								key={score.id}
-								score={score}
-								onChangeScores={this.props.onChangeScores}
-							/>
-						)}
-					</div>
-				</form>
+					<Input
+						type="text"
+						required
+						size="small"
+						error={error}
+						value={this.inputValue}
+						placeholder="Здесь вы можете изменить название группы"
+						onChange={this.onChangeName} />
+				</div>
+				<div className={`${styles["check-block"]} ${styles["points-block"]}`}>
+					<h4>Код-ревью и проверка тестов</h4>
+					<GroupSettingsCheckbox
+						group={group}
+						onChangeSettings={onChangeSettings}/>
+				</div>
+				<div className={styles["points-block"]}>
+					<h4>Баллы</h4>
+					<p>Преподаватели могут выставлять студентам группы следующие баллы:</p>
+					{scores && scores.map(score =>
+						<GroupScores
+							key={score.id}
+							score={score}
+							onChangeScores={this.props.onChangeScores} />
+					)}
+				</div>
 			</div>
 		)
+	}
+
+	get inputValue() {
+		const { group, name } = this.props;
+
+		return (name !== undefined ? name : group.name) || '';
 	}
 
 	onChangeName = (_, value) => {

@@ -7,7 +7,7 @@ import Button from '@skbkontur/react-ui/components/Button/Button';
 import Checkbox from '@skbkontur/react-ui/components/Checkbox/Checkbox';
 import getPluralForm from "../../../../utils/getPluralForm";
 
-import './style.less';
+import styles from "./style.less";
 
 class CopyGroupModal extends Component {
 	constructor(props) {
@@ -67,11 +67,11 @@ class CopyGroupModal extends Component {
 		let currentCourseId = this.props.courseId;
 		const courseTitle = this.getCourseTitle(currentCourseId);
 		return (
-		<Modal onClose={onClose} width={640}> { /*FIXME*/ }
+		<Modal onClose={onClose} width={640}>
 			<Modal.Header>Скопировать группу</Modal.Header>
-				<form onSubmit={this.onSubmit} method="post">
+				<form onSubmit={this.onSubmit}>
 					<Modal.Body>
-						<p className="modal-text">Новая группа будет создана для курса <b>«{ courseTitle }»</b>.
+						<p className={styles["modal-text"]}>Новая группа будет создана для курса <b>«{ courseTitle }»</b>.
 							Скопируются все настройки группы (в том числе владелец),
 							в неё автоматически добавятся участники из копируемой группы.
 							Преподаватели тоже будут добавлены в группу, если у них есть права на
@@ -98,8 +98,8 @@ class CopyGroupModal extends Component {
 	renderCourseSelect() {
 		const { course } = this.state;
 		return (
-			<label className="select-course">
-				<p className="course-info">
+			<label className={styles["select-course"]}>
+				<p className={styles["course-info"]}>
 					Вы можете выбрать курс, в котором являетесь преподавателем
 				</p>
 				<Select
@@ -120,8 +120,8 @@ class CopyGroupModal extends Component {
 	renderGroupSelect() {
 		const { groupId, groups } = this.state;
 		return (
-		<label className="select-group">
-			<p className="group-info">
+		<label className={styles["select-group"]}>
+			<p className={styles["group-info"]}>
 				Вам доступны только те группы,в которых вы являетесь преподавателем
 			</p>
 			<Select
@@ -144,7 +144,7 @@ class CopyGroupModal extends Component {
 
 	renderEmptyGroups() {
 		return (
-			<p className="empty-group-text"><b>В выбранном вами курсе нет доступных групп</b></p>
+			<p className={styles["empty-group-text"]}><b>В выбранном вами курсе нет доступных групп</b></p>
 		)
 	}
 
@@ -155,7 +155,7 @@ class CopyGroupModal extends Component {
 		const courseTitle = this.getCourseTitle(currentCourseId);
 
 		return (
-			<div className="change-owner-block">
+			<div className={styles["change-owner-block"]}>
 				<p>Владелец этой группы <b>{group.owner.visible_name}</b> не является преподавателем курса
 					<b>«{ courseTitle }»</b>. Вы можете сделать себя владельцем скопированной группы.
 				</p>

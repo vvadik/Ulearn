@@ -6,7 +6,7 @@ import Button from "@skbkontur/react-ui/components/Button/Button";
 import GroupMembers from "../../../components/groups/GroupSettingsPage/GroupMembers/GroupMembers";
 import GroupSettings from "../../../components/groups/GroupSettingsPage/GroupSettings/GroupSettings";
 
-import "./groupSettings.less";
+import styles from "./groupPage.less";
 
 class GroupPage extends Component {
 	constructor(props) {
@@ -15,10 +15,11 @@ class GroupPage extends Component {
 			group: {},
 			open: "settings",
 			updatedFields: {},
+			error: false,
 			loading: false,
 			scores: [],
 			scoresId: [],
-		}
+		};
 	};
 
 	componentDidMount() {
@@ -47,57 +48,62 @@ class GroupPage extends Component {
 
 	render() {
 		let courseId = this.props.match.params.courseId;
-		const { group, open, loading, scores, updatedFields } = this.state;
+		const { group, open, loading, scores, updatedFields, error } = this.state;
 		return (
-			<React.Fragment>
-				<div className="wrapper">
-					<div className="content-wrapper">
-						<div className="content">
-							<h2>{ group.name }</h2>
-							<div className="tabs-container">
-								<Tabs value={open} onChange={this.onChangeTab}>
-									<Tabs.Tab id="settings">Настройки</Tabs.Tab>
-									<Tabs.Tab id="members">Участники</Tabs.Tab>
-								</Tabs>
-							</div>
-							{ (open === "settings") &&
+			<div className={styles["wrapper"]}>
+				<div className={styles["content-wrapper"]}>
+					<header className={styles["group-header"]}>
+						<h2>{ group.name }</h2>
+						<div className={styles["tabs-container"]}>
+							<Tabs value={open} onChange={this.onChangeTab}>
+								<Tabs.Tab id="settings">Настройки</Tabs.Tab>
+								<Tabs.Tab id="members">Участники</Tabs.Tab>
+							</Tabs>
+						</div>
+					</header>
+					<div className={styles["content"]}>
+						{ (open === "settings") &&
+							<form onSubmit={this.onLoadingSettings}>
 								<GroupSettings
+									name={updatedFields.name}
 									group={group}
 									scores={scores}
+									error={error}
 									onChangeName={this.onChangeName}
 									onChangeSettings={this.onChangeSettings}
-									onChangeScores={this.onChangeScores} /> }
-							{ (open === "members")  &&
-								<GroupMembers
-									courseId={courseId}
-									group={group}
-									onChangeGroupOwner={this.onChangeGroupOwner}
-									onChangeSettings={this.onChangeSettings}/> }
-							<Button
-								onClick={this.onLoadingSettings}
-								size="medium"
-								use="primary"
-								loading={loading}
-							>
-								Сохранить
-							</Button>
-						</div>
+									onChangeScores={this.onChangeScores} />
+								<Button
+									size="medium"
+									use="primary"
+									type="submit"
+									loading={loading}>
+									Сохранить
+								</Button>
+							</form> }
+						{ (open === "members")  &&
+							<GroupMembers
+								courseId={courseId}
+								group={group}
+								onChangeGroupOwner={this.onChangeGroupOwner}
+								onChangeSettings={this.onChangeSettings}/> }
 					</div>
 				</div>
-			</React.Fragment>
+			</div>
 		)
 	}
 
 	onChangeTab = (_, v) => {
 		this.setState({
-			open: v
+			open: v,
 		})
 	};
 
 	onChangeName = (value) => {
+		const { updatedFields } = this.state.updatedFields;
+
 		this.setState({
 			updatedFields: {
-				...this.state.updatedFields,
+				...updatedFields,
 				name: value,
 			}
 		});
@@ -143,20 +149,28 @@ class GroupPage extends Component {
 		});
 	};
 
-	onLoadingSettings = () => {
+	onLoadingSettings = (e) => {
 		const { group, updatedFields, scoresId } = this.state;
+
+		e.preventDefault();
 
 		this.setState({
 			loading: true,
 		});
 
-		api.groups.saveGroupSettings(group.id, updatedFields)
-			.then(group => {
-				this.setState({
-					loading: false,
-					group: group,
-				});
-			}).catch(console.error);
+		if (updatedFields.name.length === 0) {
+			this.setState({
+				error: true,
+			});
+		} else {
+			api.groups.saveGroupSettings(group.id, updatedFields)
+				.then(group => {
+					this.setState({
+						loading: false,
+						group: group,
+					});
+				}).catch(console.error);
+		}
 
 		api.groups.saveScoresSettings(group.id, scoresId)
 			.then(response => response)
