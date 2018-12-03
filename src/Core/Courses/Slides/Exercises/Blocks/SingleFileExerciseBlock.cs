@@ -63,7 +63,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			ExerciseCode = prelude + exerciseCode;
 			IndexToInsertSolution = index;
 			EthalonSolution = extractor.GetRegion(SolutionLabel);
-			Validator.ValidatorName = string.Join(" ", Language.GetXmlEnumName(), Validator.ValidatorName ?? "");
+			Validator.ValidatorName = string.Join(" ", Language.GetName(), Validator.ValidatorName ?? "");
 
 			yield return this;
 		}

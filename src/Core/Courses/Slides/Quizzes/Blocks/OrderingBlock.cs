@@ -13,7 +13,7 @@ namespace Ulearn.Core.Courses.Slides.Quizzes.Blocks
 		[XmlElement("item")]
 		public OrderingItem[] Items;
 
-		[XmlElement("explanation")]
+		[XmlAttribute("explanation")]
 		public string Explanation;
 
 		public override Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot)

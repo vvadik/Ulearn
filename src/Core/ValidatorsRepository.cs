@@ -12,7 +12,7 @@ namespace Ulearn.Core
 		{
 			var name = validatorDescription.ValidatorName ?? "";
 			var parts = name.ToLower().Split(' ');
-			if (parts.Contains("cs"))
+			if (parts.Contains("csharp"))
 			{
 				var validator = new CSharpSolutionValidator(validatorDescription.RemoveDefaults);
 				foreach (var part in parts)

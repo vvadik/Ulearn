@@ -1,10 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"           
            xmlns="https://ulearn.me/schema/v2"
            elementFormDefault="qualified"
-           targetNamespace="https://ulearn.me/schema/v2"
-           vc:minVersion="1.1">
+           targetNamespace="https://ulearn.me/schema/v2">
 
     <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/XML/1998/namespace" />
     
@@ -346,7 +344,7 @@
                     <xs:element name="hideExpectedOutput" type="xs:boolean" minOccurs="1" maxOccurs="1" />
                     <xs:element name="validator" type="NonEmptyString" minOccurs="1" maxOccurs="1" />
                 </xs:choice>
-                <xs:attribute name="type">
+                <xs:attribute name="type" use="optional">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
                             <xs:enumeration value="check-output" />
@@ -372,26 +370,19 @@
 
     <xs:complexType name="ProjectExercise">
         <xs:complexContent>
-            <xs:extension base="AbstractExercise">
-                <xs:sequence>
-                    <xs:element name="csprojFile" type="NonEmptyString">
-                        <xs:annotation>
-                            <xs:documentation>
-                                Путь до csproj-файла относительно директории с xml-файлом описания слайда.
-                            </xs:documentation>
-                        </xs:annotation>
-                    </xs:element>
+            <xs:extension base="AbstractExercise">				
+                <xs:sequence>                    
                     <xs:element name="userCodeFile" type="NonEmptyString">
                         <xs:annotation>
                             <xs:documentation>
-                                Путь относительно директории, в котором лежит csprojFile.
+                                Путь относительно директории, в котором лежит csproj.
                             </xs:documentation>
                         </xs:annotation>
                     </xs:element>
                     <xs:element name="excludePathForChecker" type="NonEmptyString" minOccurs="0" maxOccurs="unbounded">
                         <xs:annotation>
                             <xs:documentation>
-                                Путь относительно директории, в котором лежит csprojFile. Этот файл будет исключён из проекта при сборке для проверки.
+                                Путь относительно директории, в котором лежит csproj. Этот файл будет исключён из проекта при сборке для проверки.
                                 Обычно это файл с эталонным решением.
                             </xs:documentation>
                         </xs:annotation>
@@ -399,7 +390,7 @@
                     <xs:element name="excludePathForStudent" type="NonEmptyString" minOccurs="0" maxOccurs="unbounded" >
                         <xs:annotation>
                             <xs:documentation>
-                                Путь относительно директории, в котором лежит csprojFile. Этот файл будет исключён из проекта при сборке для студента.
+                                Путь относительно директории, в котором лежит csproj. Этот файл будет исключён из проекта при сборке для студента.
                             </xs:documentation>
                         </xs:annotation>
                     </xs:element>
@@ -428,6 +419,13 @@
                         </xs:element>
                     </xs:choice>
                 </xs:sequence>
+				<xs:attribute name="csproj" type="NonEmptyString" use="required">
+					<xs:annotation>
+						<xs:documentation>
+							Путь до csproj-файла относительно директории с xml-файлом описания слайда.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

@@ -49,7 +49,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			};
 		}
 
-		[XmlElement("csprojFile")]
+		[XmlAttribute("csproj")]
 		public string CsProjFilePath { get; set; }
 
 		[XmlElement("startupObject")]

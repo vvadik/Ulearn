@@ -15,7 +15,7 @@ namespace Ulearn.Core.Courses.Slides.Quizzes.Blocks
 		[XmlAttribute("shuffleFixed")]
 		public bool ShuffleFixed;
 
-		[XmlElement("explanation")]
+		[XmlAttribute("explanation")]
 		public string Explanation;
 
 		[XmlElement("match")]
