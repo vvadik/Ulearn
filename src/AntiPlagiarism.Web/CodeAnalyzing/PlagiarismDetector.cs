@@ -48,7 +48,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			logger.Debug($"Сниппеты второго решения: [{string.Join(", ", snippetsOccurrencesOfSecondSubmission)}]");
 
 			/* Group by snippets from the second submissions by snippetId for fast searching */
-			var snippetsOccurencesOfSecondSubmissionBySnippet = snippetsOccurrencesOfSecondSubmission
+			var snippetsOccurrencesOfSecondSubmissionBySnippet = snippetsOccurrencesOfSecondSubmission
 				.GroupBy(o => o.SnippetId)
 				.ToDictionary(g => g.Key, g => g.ToList())
 				.ToDefaultDictionary();
@@ -58,7 +58,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			foreach (var snippetOccurence in snippetsOccurrencesOfFirstSubmission)
 			{
 				var snippet = snippetOccurence.Snippet;
-				foreach (var otherOccurence in snippetsOccurencesOfSecondSubmissionBySnippet[snippet.Id])
+				foreach (var otherOccurence in snippetsOccurrencesOfSecondSubmissionBySnippet[snippet.Id])
 				{
 					logger.Debug($"Нашёл совпадающий сниппет в обоих решениях: {snippet}");
 					for (var i = 0; i < snippet.TokensCount; i++)
@@ -81,7 +81,8 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 				unionLength += tokensMatchedInSecondSubmission[snippetType].Count;
 			}
 			
-			var totalLength = firstSubmission.TokensCount + secondSubmission.TokensCount;
+			var totalLength = GetTokensCountFromSnippetOccurrences(snippetsOccurrencesOfFirstSubmission) + 
+							GetTokensCountFromSnippetOccurrences(snippetsOccurrencesOfSecondSubmission);
 			var weight = totalLength == 0 ? 0 : ((double)unionLength) / totalLength;
 
 			/* Normalize weight */
@@ -89,6 +90,18 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			
 			logger.Information($"Совпавших токенов {unionLength}, всего токенов {totalLength}, итоговый коэффициент {weight}");
 			return weight;
+		}
+
+		private static int GetTokensCountFromSnippetOccurrences(IEnumerable<SnippetOccurence> occurrences)
+		{
+			var tokens = new HashSet<int>();
+			foreach (var occurrence in occurrences)
+			{
+				for (var i = 0; i < occurrence.Snippet.TokensCount; i++)
+					tokens.Add(occurrence.FirstTokenIndex + i);
+			}
+
+			return tokens.Count;
 		}
 
 		public async Task<List<Plagiarism>> GetPlagiarismsAsync(Submission submission, SuspicionLevels suspicionLevels)
