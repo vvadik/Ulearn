@@ -81,6 +81,7 @@
     "@types/react": "^16.4.6",
     "less": "^3.5.2",
     "less-loader": "^4.1.0",
-    "moment": "^2.22.2"
+    "moment": "^2.22.2",
+    "moment-timezone": "^0.5.23"
   }
 }

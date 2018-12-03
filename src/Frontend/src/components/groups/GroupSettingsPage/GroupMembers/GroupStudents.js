@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import PropTypes from "prop-types";
 import moment from "moment";
 import 'moment/locale/ru';
+import "moment-timezone";
 import Checkbox from "@skbkontur/react-ui/components/Checkbox/Checkbox";
 import Kebab from "@skbkontur/react-ui/components/Kebab/Kebab";
 import MenuItem from "@skbkontur/react-ui/components/MenuItem/MenuItem";
@@ -26,6 +27,8 @@ export default class GroupStudents extends Component {
 
 	render() {
 		const { students } = this.props;
+		const grantTime = (grantTime) => moment.tz(grantTime, 'Europe/Moscow').tz('Asia/Yekaterinburg').format();
+
 		return(
 			<React.Fragment>
 				<div>
@@ -47,7 +50,7 @@ export default class GroupStudents extends Component {
 								<Avatar user={item.user} size={styles["_small"]}/>
 								{ item.user.visible_name } {' '}
 								<span className={styles["students-action__text"]}>{ getWordForm('вступила', 'вступил', item.user.gender) }
-									{' '} { moment(item.adding_time).fromNow() }</span>
+									{' '} { moment(grantTime(item.adding_time)).fromNow() }</span>
 							</Checkbox>
 							<Kebab size="large" >
 								<MenuItem onClick={() => this.props.onDeleteStudent(item.user.id)}>

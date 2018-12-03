@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import Icon from "@skbkontur/react-icons";
 import moment from "moment";
 import 'moment/locale/ru';
+import "moment-timezone";
 import api from "../../../../api";
 import Input from "@skbkontur/react-ui/components/Input/Input";
 import Toggle from "@skbkontur/react-ui/components/Toggle/Toggle";
@@ -118,6 +119,7 @@ class GroupMembers extends Component {
 
 	renderTeachers() {
 		const { accesses } = this.state;
+		const grantTime = (grantTime) => moment.tz(grantTime, 'Europe/Moscow').tz('Asia/Yekaterinburg').format();
 
 		return (accesses.map(item =>
 			<React.Fragment
@@ -128,7 +130,8 @@ class GroupMembers extends Component {
 						<div>{item.user.visible_name}</div>
 						<span className={styles["teacher-status"]}>
 							Полный доступ {getWordForm('предоставила', 'предоставил', item.user.gender)}
-							{' '} {item.granted_by.visible_name} {moment(item.grant_time).fromNow()}
+							{' '} {item.granted_by.visible_name} {' '}
+							{ moment(grantTime(item.grant_time)).fromNow() }
 						</span>
 					</div>
 					<div className={styles["group-action"]}>
@@ -204,7 +207,7 @@ class GroupMembers extends Component {
 			.concat({
 				user: item,
 				granted_by: group.owner,
-				grant_time: `${new Date()}`
+				grant_time: moment(),
 			});
 
 		this.setState({
