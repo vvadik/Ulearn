@@ -1,5 +1,6 @@
 	import api from "../api/"
 
+// Groups
 export function getCourseGroups(courseId) {
 	return api.get("groups/in/" + courseId)
 		.then(response => response.json())
@@ -10,6 +11,7 @@ export function getCourseArchiveGroups(courseId) {
 		.then(response => response.json())
 }
 
+// Group
 export function getGroup(groupId) {
 	return api.get("groups/" + groupId)
 		.then(response => response.json());
@@ -44,6 +46,7 @@ export function changeGroupOwner(groupId, ownerId) {
 		.then(response => response.json());
 }
 
+// Scores
 export function getGroupScores(groupId) {
 	return api.get("groups/" + groupId + '/scores')
 		.then(response => response.json());
@@ -60,13 +63,30 @@ export function saveScoresSettings(groupId, scoresId) {
 		.then(response => response.json());
 }
 
+// Accesses
 export function getGroupAccesses(groupId) {
 	return api.get("groups/" + groupId + "/accesses")
 		.then(response => response.json());
 }
 
+export function addGroupAccesses(groupId, userId) {
+	return api.post("groups/" + groupId + "/accesses/" + userId)
+		.then(response => response.json());
+}
+
 export function removeAccess(groupId, userId) {
 	return api.delete("groups/" + groupId + "/accesses/" + userId)
+		.then(response => response.json());
+}
+
+//Students
+export function getStudents(groupId) {
+	return api.get("groups/" + groupId + "/students")
+		.then(response => response.json());
+}
+
+export function deleteStudent(groupId, studentId) {
+	return api.delete("groups/" + groupId + "/students/" + studentId)
 		.then(response => response.json());
 }
 

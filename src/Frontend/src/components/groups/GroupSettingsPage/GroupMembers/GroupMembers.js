@@ -11,9 +11,10 @@ import MenuItem from "@skbkontur/react-ui/components/MenuItem/MenuItem";
 import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
 import Avatar from "./Avatar";
 import GroupStudents from "./GroupStudents";
+import ComboboxSearch from "./ComboboxSearch";
+import getWordForm from "../../../../utils/getWordForm";
 
-import './style.less';
-import {ComboboxSearch} from "../GroupSettings/ComboboxSearch";
+import styles from './style.less';
 
 class GroupMembers extends Component {
 
@@ -55,22 +56,22 @@ class GroupMembers extends Component {
 		const inviteLink = group.is_invite_link_enabled || false;
 
 		return (
-			<div className="group-settings-wrapper">
-				<div className="teachers-block">
+			<div className={styles["group-settings-wrapper"]}>
+				<div className={styles["teachers-block"]}>
 					<h4>Преподаватели</h4>
 					<p>
 						Преподаватели могут видеть список участников группы, проводить код-ревью
 						и проверку тестов, выставлять баллы и смотреть ведомость.
 					</p>
-					<div className="teacher-block">
-						<Avatar user={owner} />
-						<div className="teacher-block-name">
+					<div className={styles["teacher-block"]}>
+						<Avatar user={owner} size={styles["_big"]}/>
+						<div className={styles["teacher-block-name"]}>
 							<div>{owner.visible_name}</div>
-							<span className="teacher-status">Владелец</span>
+							<span className={styles["teacher-status"]}>Владелец</span>
 						</div>
 					</div>
 					{(accesses.length > 0) && this.renderTeachers()}
-					<label className="teacher-block-search">
+					<label className={styles["teacher-block-search"]}>
 						<p>Добавить преподавателя:</p>
 						<ComboboxSearch
 							selected={selected}
@@ -80,9 +81,9 @@ class GroupMembers extends Component {
 							onAddTeacher={this.onAddTeacher}/>
 					</label>
 				</div>
-				<div className="students-block">
+				<div className={styles["students-block"]}>
 					<h4>Студенты</h4>
-					<div className="students-block-invite">
+					<div className={styles["students-block-invite"]}>
 						<p>Отправьте своим студентам ссылку для вступления в группу:</p>
 						{inviteLink &&
 						<Input
@@ -92,19 +93,23 @@ class GroupMembers extends Component {
 							selectAllOnFocus
 						/>
 						}
-						<div className="toggle-invite">
-							<label className="toggle-label">
+						<div className={styles["toggle-invite"]}>
+							<label className={styles["toggle-label"]}>
 								<Toggle
 									checked={inviteLink}
 									onChange={this.toggleHash}
 									color="default">
 								</Toggle>
-								Ссылка для вступления в группу {inviteLink ? 'включена' : 'выключена'}
+								Ссылка в группу {inviteLink ? 'включена' : 'выключена'}
 							</label>
 						</div>
 					</div>
-					<div className="students-list">
-						{(students.length >0) && <GroupStudents students={students} />}
+					<div className={styles["students-list"]}>
+						{(students.length >0) &&
+						<GroupStudents
+							students={students}
+							group={group}
+							onDeleteStudent={this.onDeleteStudent}/>}
 					</div>
 				</div>
 			</div>
@@ -117,15 +122,16 @@ class GroupMembers extends Component {
 		return (accesses.map(item =>
 			<React.Fragment
 				key={item.user.id}>
-				<div className="teacher-block">
-					<Avatar user={item.user} />
-					<div className="teacher-block-name">
+				<div className={styles["teacher-block"]}>
+					<Avatar user={item.user} size={styles["_big"]} />
+					<div className={styles["teacher-block-name"]}>
 						<div>{item.user.visible_name}</div>
-						<span className="teacher-status">
-							Полный доступ предоставил(а) {item.granted_by.visible_name}{moment(item.grant_time).fromNow()}
+						<span className={styles["teacher-status"]}>
+							Полный доступ {getWordForm('предоставила', 'предоставил', item.user.gender)}
+							{' '} {item.granted_by.visible_name} {moment(item.grant_time).fromNow()}
 						</span>
 					</div>
-					<div className="group-action">
+					<div className={styles["group-action"]}>
 						{this.renderKebab(item.user)}
 					</div>
 				</div>
@@ -198,7 +204,7 @@ class GroupMembers extends Component {
 			.concat({
 				user: item,
 				granted_by: group.owner,
-				grant_time: ''
+				grant_time: `${new Date()}`
 			});
 
 		this.setState({
@@ -212,6 +218,19 @@ class GroupMembers extends Component {
 
 	toggleHash = (value) => {
 		this.props.onChangeSettings('is_invite_link_enabled', value);
+	};
+
+	onDeleteStudent = (student) => {
+		const { group } = this.props.group;
+		const updateStudents = this.state.students.filter(item => item.user.id !== student);
+
+		this.setState({
+			students: updateStudents,
+		});
+
+		api.groups.deleteStudent(group.id, student)
+			.then(response => response.json())
+			.catch(console.error)
 	};
 }
 
