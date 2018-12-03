@@ -11,7 +11,7 @@ import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { findDOMNode } from "react-dom"
 
-import './Header.less'
+import styles from './Header.less'
 import { getQueryStringParameter } from "../../utils";
 
 import api from "../../api"
@@ -34,10 +34,10 @@ class Header extends Component {
     render() {
         if (this.props.initializing) {
             return (
-                <div className="header">
+                <div className={styles["header"]}>
                     <Logo>
-                        <span className="visible-only-phone"><Icon name="Home"/></span>
-                        <span className="visible-at-least-tablet">Ulearn.me</span>
+                        <span className={styles["visible-only-phone"]}><Icon name="Home"/></span>
+                        <span className={styles["visible-at-least-tablet"]}>Ulearn.me</span>
                     </Logo>
 
                     <TocMenu />
@@ -69,20 +69,20 @@ class Header extends Component {
         }
 
         return (
-            <div className="header">
+            <div className={styles["header"]}>
                 <Logo>
-                    <span className="visible-only-phone"><Icon name="Home"/></span>
-                    <span className="visible-at-least-tablet">Ulearn.me</span>
+                    <span className={styles["visible-only-phone"]}><Icon name="Home"/></span>
+                    <span className={styles["visible-at-least-tablet"]}>Ulearn.me</span>
                 </Logo>
 
                 <TocMenu />
 
-                <div className="visible-at-least-tablet">
+                <div className={styles["visible-at-least-tablet"]}>
                     { this.props.account.isSystemAdministrator && <SysAdminMenu controllableCourseIds={controllableCourseIds}/> }
                     { ! this.props.account.isSystemAdministrator && controllableCourseIds.length > 0 && <MyCoursesMenu controllableCourseIds={controllableCourseIds}/>}
                     { isCourseMenuVisible && <CourseMenu courseId={ this.props.courses.currentCourseId } role={ courseRole } accesses={ courseAccesses }/> }
                 </div>
-                <div className="visible-only-phone">
+                <div className={styles["visible-only-phone"]}>
                     <MobileCourseMenu
                         isSystemAdministrator={ this.props.account.isSystemAdministrator }
                         controllableCourseIds={ controllableCourseIds }
@@ -116,7 +116,7 @@ export default connect(Header.mapStateToProps)(Header);
 class Logo extends Component {
     render() {
         return (
-            <div className="header__logo">
+            <div className={styles["header__logo"]}>
                 <Link to="/">
                     { this.props.children }
                 </Link>
@@ -140,11 +140,11 @@ class TocMenu extends Component {
     render() {
         const isInsideCourse = this.isInsideCourse();
         return (
-            <div className="visible-only-phone">
+            <div className={styles["visible-only-phone"]}>
                 {
                     isInsideCourse &&
-                    <div className="header__toc-menu">
-                        <span className="icon" onClick={this.onClick}>
+                    <div className={styles["header__toc-menu"]}>
+                        <span className={styles["icon"]} onClick={this.onClick}>
                             <Icon name="StructureTree"/>
                         </span>
                     </div>
@@ -194,12 +194,12 @@ class SysAdminMenu extends AbstractMyCoursesMenu {
 
     render() {
         return (
-            <div className="header__sysadmin-menu">
+            <div className={styles["header__sysadmin-menu"]}>
                 <DropdownMenu
                     caption={
                         <div>
-                            <span className="visible-only-phone"><span className="icon"><Icon name="DocumentGroup"/></span></span>
-                            <span className="caption visible-at-least-tablet">Администрирование <span className="caret"/></span>
+                            <span className={styles["visible-only-phone"]}><span className={styles["icon"]}><Icon name="DocumentGroup"/></span></span>
+                            <span className={`${styles["caption"]} ${styles["visible-at-least-tablet"]}`}>Администрирование <span className={styles["caret"]}/></span>
                         </div>
                     }
                 >
@@ -219,12 +219,12 @@ class MyCoursesMenu extends AbstractMyCoursesMenu {
 
     render() {
         return (
-            <div className="header__my-courses-menu">
+            <div className={styles["header__my-courses-menu"]}>
                 <DropdownMenu
                     caption={
                         <div>
-                            <span className="visible-only-phone"><span className="icon"><Icon name="DocumentGroup"/></span></span>
-                            <span className="caption visible-at-least-tablet">Мои курсы <span className="caret"/></span>
+                            <span className={styles["visible-only-phone"]}><span className={styles["icon"]}><Icon name="DocumentGroup"/></span></span>
+                            <span className={`${styles["caption"]} ${styles["visible-at-least-tablet"]}`}>Мои курсы <span className={styles["caret"]}/></span>
                         </div>
                     }
                 >
@@ -280,11 +280,11 @@ class CourseMenu extends Component {
             return null;
 
         return (
-            <div className="header__course-menu">
+            <div className={styles["header__course-menu"]}>
                 <DropdownMenu
                     caption={<div>
-                        <span className="visible-only-phone"><span className="icon"><Icon name="DocumentSolid"/></span></span>
-                        <span className="caption visible-at-least-tablet" title={ course.title }><span className="courseName">{ course.title }</span> <span className="caret"/></span>
+                        <span className={styles["visible-only-phone"]}><span className={styles["icon"]}><Icon name="DocumentSolid"/></span></span>
+                        <span className={`${styles["caption"]} ${styles["visible-at-least-tablet"]}`}  title={ course.title }><span className={styles["courseName"]}>{ course.title }</span> <span className={styles["caret"]}/></span>
                     </div>}
                     menuWidth={300}
                 >
@@ -313,9 +313,9 @@ CourseMenu = connect(CourseMenu.mapStateToProps)(CourseMenu);
 class MobileCourseMenu extends AbstractMyCoursesMenu {
     render() {
         return (
-            <div className="header__course-menu">
+            <div className={styles["header__course-menu"]}>
                 <DropdownMenu
-                    caption={ <span className="icon"><Icon name="DocumentSolid"/></span> }
+                    caption={ <span className={styles["icon"]}><Icon name="DocumentSolid"/></span> }
                     menuWidth={250}
                 >
                     { this.props.isCourseMenuVisible ? CourseMenu.menuItems(this.props.courseId, this.props.role, this.props.accesses) : null}
@@ -352,7 +352,7 @@ class Menu extends Component {
 
         if (this.props.account.isAuthenticated) {
             return (
-                <div className="header__menu">
+                <div className={styles["header__menu"]}>
                     <NotificationsMenu/>
                     <ProfileLink account={this.props.account}/>
                     <Separator/>
@@ -361,7 +361,7 @@ class Menu extends Component {
             )
         } else {
             return (
-                <div className="header__menu">
+                <div className={styles["header__menu"]}>
                     <RegistrationLink returnUrl={returnUrl }/>
                     <Separator/>
                     <LoginLink returnUrl={returnUrl }/>
@@ -451,12 +451,12 @@ class NotificationsMenu extends Component {
         const { windowWidth, isOpened, counter, isLoading, notificationsHtml } = this.state;
         const isMobile = windowWidth <= 767;
         return (
-            <div className={isOpened ? "opened" : ""} ref={node => this.ref = node}>
+            <div className={isOpened ? styles["opened"] : ""} ref={node => this.ref = node}>
                 <NotificationsIcon counter={counter} onClick={this.onClick}/>
                 {
                     isOpened &&
                     <DropdownContainer getParent={() => findDOMNode(this)} offsetY={0} align="right" offsetX={isMobile ? -112 : 0}>
-                        <div className="dropdown-container" ref={node => this.dropdownContainerRef = node}>
+                        <div className={styles["dropdown-container"]} ref={node => this.dropdownContainerRef = node}>
                             <Notifications isLoading={isLoading} notifications={notificationsHtml}/>
                         </div>
                     </DropdownContainer>
@@ -485,13 +485,13 @@ NotificationsMenu = connect(NotificationsMenu.mapStateToProps, NotificationsMenu
 class NotificationsIcon extends Component {
     render() {
         return (
-            <div className={"header__notifications-icon " + (this.props.counter === 0 ? "without-counter" : "")} onClick={ this.props.onClick }>
-                <span className="icon">
+            <div className={styles["header__notifications-icon"] + (this.props.counter === 0 ? styles["without-counter"] : "")} onClick={ this.props.onClick }>
+                <span className={styles["icon"]}>
                     <Icon name="NotificationBell"/>
                 </span>
                 {
                     this.props.counter > 0 &&
-                    <span className="counter">
+                    <span className={styles["counter"]}>
                         { this.props.counter > 99 ? "99+" : this.props.counter}
                     </span>
                 }
@@ -514,12 +514,12 @@ class Notifications extends Component {
         const {isLoading, notifications} = this.props;
         if (isLoading)
             return (
-                <div className="notifications__dropdown">
+                <div className={styles["notifications__dropdown"]}>
                     <Loader type="normal" active/>
                 </div>
             );
         else
-            return <div className="notifications__dropdown" dangerouslySetInnerHTML={{ __html: notifications }} />;
+            return <div className={styles["notifications__dropdown"]} dangerouslySetInnerHTML={{ __html: notifications }} />;
     }
 
     static propTypes = {
@@ -568,12 +568,12 @@ class ProfileLink extends Component {
             )
         }
 
-        return (<div className="header__profile-link">
+        return (<div className={styles["header__profile-link"]}>
             <Link to="/Account/Manage">
-                <span className="icon">
+                <span className={styles["icon"]}>
                     { icon }
                 </span>
-                <span className="username">
+                <span className={styles["username"]}>
                     { this.props.account.visibleName || 'Профиль' }
                 </span>
             </Link>
@@ -587,7 +587,7 @@ class ProfileLink extends Component {
 
 class Separator extends Component {
     render() {
-        return <div className="header__separator"/>
+        return <div className={styles["header__separator"]}/>
     }
 }
 
@@ -602,7 +602,7 @@ class LogoutLink extends Component {
     }
 
     render() {
-        return <div className="header__logout-link"><a href="/" onClick={ this.onClick }>Выйти</a></div>
+        return <div className={styles["header__logout-link"]}><a href="/" onClick={ this.onClick }>Выйти</a></div>
     }
 
     static mapStateToProps(state) {
@@ -621,7 +621,7 @@ LogoutLink = connect(LogoutLink.mapStateToProps, LogoutLink.mapDispatchToProps)(
 class RegistrationLink extends Component {
     render() {
         return (
-            <div className="header__registration-link">
+            <div className={styles["header__registration-link"]}>
                 <Link to={ "/Account/Register?returnUrl=" + (this.props.returnUrl || "/")}>Зарегистрироваться</Link>
             </div>
         )
@@ -635,7 +635,7 @@ class RegistrationLink extends Component {
 class LoginLink extends Component {
     render() {
         return (
-            <div className="header__login-link">
+            <div className={styles["header__login-link"]}>
                 <Link to={ "/Login?returnUrl=" + (this.props.returnUrl || "/") }>Войти</Link>
             </div>
         )

@@ -1,3 +1,5 @@
+@import "../../../../variables.less";
+
 button {
   border: 0;
   color: #404040;
@@ -36,38 +38,25 @@ h3 {
   font-weight: 500;
 }
 
-.wrapper {
-  width: 100%;
-  background-color: #f2f2f2;
-  margin: 0 auto;
-}
-
-.content-wrapper {
-  background: #fff;
-  width: 70%;
-  margin: 0 auto;
-}
-
-.content {
-  width: 80%;
-  margin: 0 auto;
-}
-
 .group-settings-wrapper {
-  //border-bottom: 1px solid #ebebeb;
-  width: 80%;
-  margin: 0 0 40px;
+  width: 100%;
+  margin: 0 0 40px 0;
+
+  @media (max-width: @maxTabletWidth) {
+	margin: 0 auto;
+	width: 100%;
+	height: 100%;
+  }
 }
 
 .group-name-field {
-  margin-top: 20px;
+  margin-bottom: 35px;
 }
 
 .group-name-label {
-  width: 20%;
   display: inline-block;
   line-height: 30px;
-  margin: 0 10px 25px 0;
+  margin: 0 20px 0 0;
 
   h4 {
 	font-weight: 500;
@@ -78,6 +67,7 @@ h3 {
 
 .group-name-label + label {
   width: 60%;
+  min-width: 250px;
 }
 
 label {
@@ -118,7 +108,6 @@ label {
 }
 
 .exercise-comment {
-
   p {
 	margin: 0;
   }

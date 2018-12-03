@@ -1,148 +1,190 @@
+@import "../../../../variables.less";
+
 .wrapper {
-  width: 100%;
-  background-color: #f2f2f2;
-  margin: 0 auto;
-}
-
-.content-wrapper {
-  background: #fff;
-  width: 80%;
-  margin: 0 auto;
-}
-
-.group-settings-wrapper {
-  //border-bottom: 1px solid #ebebeb;
-  width: 70%;
-  margin: 0 auto 40px;
-}
-
-.content {
-  width: 80%;
-  margin: 0 auto;
-}
-
-h2 {
-  font-weight: 500;
-  text-align: left;
-  font-size: 32px;
-  line-height: 40px;
-  margin: 0 0 10px 0;
-  border-bottom: none;
-  padding: 30px 0;
-}
-
-h4 {
-  font-size: 18px;
-  line-height: 30px;
-  margin: 10px 0 15px 0;
-  font-weight: 500;
-}
-
-.teachers-block {
-  margin-bottom: 30px;
-
-  h4 {
-	margin: 20px 0 5px 0;
+	width: 100%;
+	background-color: #f2f2f2;
+	margin: 0 auto;
   }
 
-  label {
-	margin: 0 0 10px 0;
+  .content-wrapper {
+	background: #fff;
+	width: 80%;
+	margin: 0 auto;
+  }
 
-	p {
-	  margin-bottom: 10px;
+  .group-settings-wrapper {
+	width: 100%;
+	margin: 0 0 40px 0;
+  }
+
+  .content {
+	width: 80%;
+	margin: 0 auto;
+  }
+
+  h2 {
+	font-weight: 500;
+	text-align: left;
+	font-size: 32px;
+	line-height: 40px;
+	margin: 0 0 10px 0;
+	border-bottom: none;
+	padding: 30px 0;
+  }
+
+  h4 {
+	font-size: 18px;
+	line-height: 30px;
+	margin: 10px 0 15px 0;
+	font-weight: 500;
+  }
+
+  .teachers-block {
+	margin-bottom: 30px;
+
+	h4 {
+	  margin: 20px 0 5px 0;
+	}
+
+	label {
+	  margin: 0;
+
+	  p {
+		margin-bottom: 10px;
+	  }
+	}
+
+	input {
+	  width: 100%;
 	}
   }
 
-  input {
-	width: 100%;
+  .teacher-block {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	margin: 10px 0;
+	align-items: flex-start;
+
+	.teacher-block-name {
+	  margin-left: 15px;
+	}
+
+	.teacher-status {
+	  color: #737373;
+
+	  @media (max-width: @maxPhoneWidth) {
+		display: none;
+	  }
+	}
+
+	.group-action {
+	  margin-left: auto;
+	}
   }
-}
-
-.teacher-block {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  margin: 10px 0;
-  align-items: flex-start;
-
-  .teacher-block-name {
-	margin-left: 15px;
+  .students-block h4 {
+	  margin: 0 0 5px 0;
   }
 
-  .teacher-photo {
+  .photo-avatar {
 	display: inline-block;
 	border-radius: 4px;
-	width: 55px;
-	height: 55px;
-  }
-
-  .teacher-status {
-	color: #737373;
   }
 
   .color-avatar {
 	color: #fff;
+	text-align: center;
+	padding: 5px 0;
+  }
+
+  ._big {
 	font-size: 30px;
 	font-weight: 500;
-	text-align: center;
-	padding-top: 5px;
-	border-radius: 4px;
+	min-width: 55px;
+	height: 55px;
   }
 
-  .group-action {
-	margin-left: auto;
-  }
-}
-.students-block {
-  h4 {
-	margin: 0 0 5px 0;
-  }
-}
-
-.students-block-invite {
-  margin: 0 0 20px;
-
-  p {
-	margin: 10px 0;
+  ._small {
+	font-size: 16px;
+	min-width: 20px;
+	height: 20px;
+	font-weight: 700;
+	padding: 0;
+	margin-right: 10px;
   }
 
-  label {
-	display: block;
-	width: 100%;
+  .combo-item {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+
+	.combo-item_login {
+	  margin-left: auto;
+	}
   }
 
-  .toggle-invite {
-	margin: 10px 0;
+  .students-block-invite {
+	margin: 0 0 20px;
 
-	.toggle-label {
-	  width: 350px;
+	p {
+	  margin: 10px 0;
 	}
 
 	label {
-	  display: inline-block;
-	  margin-right: 10px;
-	  width: 34px;
+	  display: block;
+	  width: 100%;
+	}
+
+	.toggle-invite {
+	  margin: 10px 0;
+
+	  .toggle-label {
+		width: 350px;
+	  }
+
+	  label {
+		display: inline-block;
+		margin-right: 10px;
+		width: 34px;
+	  }
 	}
   }
-}
 
-.combo-item {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
+  .students-actions {
+	display: flex;
+	justify-content: flex-start;
+	flex-direction: row;
+	align-items: center;
+	margin: 30px 10px 10px 0;
 
-  .combo-item_avatar {
-	font-size: 16px;
-	font-weight: 500;
-	color: #fff;
-	width: 20px;
-	height: 20px;
-	text-align: center;
-	border-radius: 4px;
-	margin-right: 5px;
+	label {
+	  width: auto;
+	  margin-right: 20px;
+	}
   }
 
-  .combo-item_login {
-	margin-left: auto;
+  .students-action {
+	border: none;
+	background: transparent;
+	color: #aaa;
+	padding: 0;
+	margin-right: 10px;
   }
-}
+
+  .students-action__text {
+	@media (max-width: @maxPhoneWidth) {
+	  display: none;
+	}
+  }
+
+  ._active {
+	color: #000;
+  }
+
+  .student-block {
+	display: flex;
+	justify-content: flex-start;
+	flex-direction: row;
+  }
+
+

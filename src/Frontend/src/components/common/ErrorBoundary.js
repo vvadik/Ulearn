@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 
+import styles from './Header.less';
+
 /* It's error boundary for React 16 and above. It supports Raven from sentry.io.
  * See https://github.com/getsentry/raven-js/blob/master/docs/integrations/react.rst and
  * https://reactjs.org/blog/2017/07/26/error-handling-in-react-16.html for details */
@@ -22,7 +24,7 @@ class ErrorBoundary extends Component {
             /* render fallback UI */
             return (
                 <div
-                    className="error"
+                    className={styles["error"]}
                     onClick={() => Raven.lastEventId() && Raven.showReportDialog()}>
                     <p>We're sorry — something's gone wrong.</p>
                     <p>Our team has been notified, but click here fill out a report.</p>

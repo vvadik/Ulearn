@@ -6,7 +6,7 @@ import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
 import CreateGroupModal from "../CreateGroupModal/CreateGroupModal";
 import CopyGroupModal from "../CopyGroupModal/CopyGroupModal";
 
-import './style.less';
+import styles from "./style.less";
 
 const TABS = {
 	active: 'active',
@@ -44,17 +44,17 @@ class GroupHeader extends Component {
 
 	renderHeader() {
 		return (
-			<header className="group-header">
-				<div className="group-header-container">
+			<header className={styles["group-header"]}>
+				<div className={styles["group-header-container"]}>
 					<h2>Группы</h2>
-					<div className="buttons-container">
+					<div className={styles["buttons-container"]}>
 						<Gapped gap={20}>
 							<Button id="create" use="primary" size="medium" onClick={this.openCreateGroupModal}>Создать группу</Button>
 							<Button id="copy" use="default" size="medium" onClick={this.openCopyGroupModal}>Скопировать группу</Button>
 						</Gapped>
 					</div>
 				</div>
-				<div className="tabs-container">
+				<div className={styles["tabs-container"]}>
 					<Tabs value={this.props.filter} onChange={this.onChange}>
 						<Tabs.Tab id={TABS.active}>Активные</Tabs.Tab>
 						<Tabs.Tab id={TABS.archived}>Архивные</Tabs.Tab>

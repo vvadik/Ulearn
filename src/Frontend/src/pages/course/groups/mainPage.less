@@ -1,3 +1,4 @@
+@import "./../../../variables.less";
 @minHeight: calc(100vh - 60px);
 
 html, body, #root {
@@ -44,4 +45,9 @@ button {
   margin: 0 auto;
   height: 100%;
   min-height: @minHeight;
+
+  @media (max-width: @maxTabletWidth) {
+	width: 100%;
+  }
+
 }

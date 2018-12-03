@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import PropTypes from "prop-types";
 import Checkbox from "@skbkontur/react-ui/components/Checkbox/Checkbox";
 
-import './style.less';
+import styles from './style.less';
 
 const mapToServerName = {
 	groupScores: 'are_additional_scores_enabled_in_this_group',
@@ -18,7 +18,7 @@ class GroupScores extends Component {
 		return (
 			<label>
 				{(score.id === 'exercise') ? this.renderExerciseScore() : this.renderOtherScores()}
-				<p className="points-block-comment">{score.description}</p>
+				<p className={styles["points-block-comment"]}>{score.description}</p>
 			</label>
 		);
 	}
@@ -47,7 +47,7 @@ class GroupScores extends Component {
 					disabled>
 					{this.renderText()}
 				</Checkbox>
-				<div className="points-block-comment exercise-comment">
+				<div className={`${styles["points-block-comment"]} ${styles["exercise-comment"]}`}>
 					<p>{mapToServerName.allGroupScores && 'Баллы включены для всех автором курса, и преподаватель ' +
 					'не может отдельно включить или выключить эти баллы только в своей группе.'}</p>
 					<p>{mapToServerName.unitScores &&

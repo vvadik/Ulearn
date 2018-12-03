@@ -173,6 +173,8 @@ module.exports = {
                             importLoaders: 1,
                             minimize: true,
                             sourceMap: shouldUseSourceMap,
+							localIdentName: '[hash:base64:5]',
+							modules: true,
                         },
                     },
                     require.resolve('less-loader'),

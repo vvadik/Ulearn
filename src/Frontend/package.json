@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@skbkontur/react-icons": "^3.1.1",
-    "@skbkontur/react-ui": "^0.28.0",
+    "@skbkontur/react-ui": "^0.30.0",
     "array-from": "^2.1.1",
     "autoprefixer": "7.1.6",
     "babel-core": "6.26.0",

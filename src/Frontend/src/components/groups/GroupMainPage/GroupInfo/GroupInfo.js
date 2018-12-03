@@ -4,10 +4,10 @@ import { Link } from 'react-router-dom';
 import Icon from "@skbkontur/react-icons";
 import Kebab from "@skbkontur/react-ui/components/Kebab/Kebab";
 import MenuItem from "@skbkontur/react-ui/components/MenuItem/MenuItem";
+import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
 import getPluralForm from "../../../../utils/getPluralForm";
 
-import './style.less';
-import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
+import styles from "./style.less";
 
 class GroupInfo extends Component {
 
@@ -30,26 +30,26 @@ class GroupInfo extends Component {
 		const isProgressEnabled = group.can_users_see_group_progress;
 
 		return (
-			<div className="group">
-				<div className="group-content-wrapper">
-					<Link className="link-group-page" to={`/${this.props.courseId}/groups/${groupId}`} />
-					<div className="group-content">
-						<header className="group-content-main">
-							<h3 className="group-content-main__name">{groupName}</h3>
-							<div className="group-content-main__count">
+			<div className={styles["group"]}>
+				<div className={styles["group-content-wrapper"]}>
+					<Link className={styles["link-group-page"]} to={`/${this.props.courseId}/groups/${groupId}`} />
+					<div className={styles["group-content"]}>
+						<header className={styles["group-content-main"]}>
+							<h3 className={styles["group-content-main__name"]}>{groupName}</h3>
+							<div className={styles["group-content-main__count"]}>
 								{studentsCount} {pluralFormOfStudents}
 							</div>
-							<div className="group-content-main__teachers">
+							<div className={styles["group-content-main__teachers"]}>
 								{`${pluralFormOfTeachers}: ${teachers.join(', ')}`}
 							</div>
 						</header>
-						<div className="group-content-state">
+						<div className={styles["group-content-state"]}>
 							{this.renderSetting(isProgressEnabled, isProgressEnabled ? 'Ведомость включена': 'Ведомость выключена')}
 							{this.renderSetting(isCodeReviewEnabled, isCodeReviewEnabled ? 'Код-ревью включено' : 'Код-ревью выключено')}
 						</div>
 					</div>
 				</div>
-				<div className="group-action">
+				<div className={styles["group-action"]}>
 					{this.renderKebab()}
 				</div>
 			</div>
@@ -81,14 +81,14 @@ class GroupInfo extends Component {
 	renderSetting(enabled, text) {
 		if (enabled) {
 			return (
-			<div className="group-content-state_on">
+			<div className={styles["group-content-state_on"]}>
 				<Icon name="Ok"/>
 				{text}
 			</div>
 			)
 		} else {
 			return (
-			<div className="group-content-state_off">
+			<div className={styles["group-content-state_off"]}>
 				<Icon name="Delete"/>
 				{text}
 			</div>

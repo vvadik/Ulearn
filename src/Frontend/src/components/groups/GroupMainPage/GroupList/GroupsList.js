@@ -5,15 +5,15 @@ import Input from "@skbkontur/react-ui/components/Input/Input";
 import Icon from "@skbkontur/react-icons";
 import GroupInfo from "../GroupInfo/GroupInfo";
 
-import './style.less';
+import styles from "./style.less";
 
 class GroupsList extends Component {
 	render() {
 		return (
-			<section className="groups-wrapper">
-				<Input className="search-field" placeholder="Название группы" leftIcon={<Icon name="Search" />} />
+			<section className={styles["groups-wrapper"]}>
+				<Input className={styles["search-field"]} placeholder="Название группы" leftIcon={<Icon name="Search" />} />
 				<Loader type="big" active={this.props.loading}>
-					<div className="groups-container">
+					<div className={styles["groups-container"]}>
 						{ this.props.groups && this.props.groups.map(group =>
 							<GroupInfo
 								key={group.id}

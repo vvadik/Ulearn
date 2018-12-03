@@ -1,10 +1,12 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import api from "../../../../api";
+import api from "../../../../api/index";
 import ComboBox from "@skbkontur/react-ui/components/ComboBox/ComboBox";
-import colorHash from "../../../../utils/colorHash";
+import Avatar from "./Avatar";
 
-export class ComboboxSearch extends Component {
+import styles from './style.less';
+
+class ComboboxSearch extends Component {
 	render () {
 		const { selected } = this.props;
 		return (
@@ -28,7 +30,6 @@ export class ComboboxSearch extends Component {
 			return (owner.id !== item.id) &&
 			(accesses.filter(i => i.user.id === item.id)).length === 0;
 		};
-		// TODO objIncludes(obj, propNames, query)
 
 		return api.users.getUsersCourse(this.props.courseId)
 			.then(json => {
@@ -54,17 +55,12 @@ export class ComboboxSearch extends Component {
 
 	renderItem = (item) => {
 		const name = item.label;
-		const firstLetter = name[name.search(/[a-zA-Zа-яА-Я]/)].toUpperCase();
 
 		return (
-		<div className="combo-item">
-			<div
-				className="combo-item_avatar"
-				style={{backgroundColor: `${colorHash(name)}`}}>
-				{firstLetter}
-			</div>
+		<div className={styles["combo-item"]}>
+			<Avatar user={item} size={styles["_small"]}/>
 			<span>{name}</span>
-			<span className="combo-item_login">логин: {item.login}</span>
+			<span className={styles["combo-item_login"]}>логин: {item.login}</span>
 		</div>
 		)
 	};
@@ -92,3 +88,5 @@ ComboboxSearch.propTypes = {
 	accesses: PropTypes.array,
 	owner: PropTypes.object,
 };
+
+export default ComboboxSearch;

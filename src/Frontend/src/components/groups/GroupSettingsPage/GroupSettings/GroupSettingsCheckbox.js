@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import PropTypes from "prop-types";
 import Checkbox from "@skbkontur/react-ui/components/Checkbox/Checkbox";
 
-import './style.less';
+import styles from './style.less';
 
 const mapToServerName = {
 	oldSolution: 'is_manual_checking_enabled_for_old_solutions',
@@ -52,13 +52,13 @@ export default class GroupSettingsCheckbox extends Component {
 					{ this.renderSettings(oldSolution,
 						"Отправить на код-ревью и ручную проверку тестов старые решения участников",
 						this.bindOldSolution) }
-					<p className="points-block-comment">Если эта опция выключена, то при вступлении
+					<p className={styles["points-block-comment"]}>Если эта опция выключена, то при вступлении
 						студента в группу его старые решения не будут отправлены на код-ревью</p>
 				</label>
 				<label>
 					{this.renderSettings(review, "По умолчанию запрещать второе прохождение код-ревью",
 						this.bindReview)}
-					<p className="points-block-comment">В каждом код-ревью вы сможете выбирать,
+					<p className={styles["points-block-comment"]}>В каждом код-ревью вы сможете выбирать,
 						разрешить ли студенту второй раз отправить свой код на проверку.
 						Эта опция задаёт лишь значение по умолчанию</p>
 				</label>

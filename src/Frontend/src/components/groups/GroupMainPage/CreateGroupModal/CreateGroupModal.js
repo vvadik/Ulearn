@@ -8,7 +8,7 @@ import Tooltip from '@skbkontur/react-ui/components/Tooltip/Tooltip';
 import Loader from "@skbkontur/react-ui/components/Loader/Loader";
 import api from "../../../../api";
 
-import './style.less';
+import styles from "./style.less";
 
 class CreateGroupModal extends Component {
 
@@ -47,7 +47,7 @@ class CreateGroupModal extends Component {
 		return (
 			<Modal.Body>
 				<Loader type="big" active={this.state.loading}>
-					<label className="modal-label">
+					<label className={styles["modal-label"]}>
 						<Gapped gap={20}>
 							<Tooltip render={this.tooltipRender} trigger='focus' pos="right top">
 								<Input placeholder="КН-201 УрФУ 2017"
@@ -61,11 +61,11 @@ class CreateGroupModal extends Component {
 							</Tooltip>
 						</Gapped>
 					</label>
-					<p className="modal-instruction">
+					<p className={styles["modal-instruction"]}>
 						Студенты увидят название группы, поэтому постарайтесь сделать его понятным.<br />
-						Пример хорошего названия группы: <span className="group-content-state_on">
+						Пример хорошего названия группы: <span className={styles["group-content-state_on"]}>
 						КН-201 УрФУ 2017,</span><br />
-						пример плохого: <span className="group-content-state_off">Моя группа 2</span>
+						пример плохого: <span className={styles["group-content-state_off"]}>Моя группа 2</span>
 					</p>
 				</Loader>
 			</Modal.Body>

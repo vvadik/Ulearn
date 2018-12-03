@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import GroupsList from "../../../components/groups/GroupMainPage/GroupList/GroupsList";
 import GroupHeader from "../../../components/groups/GroupMainPage/GroupHeader/GroupHeader";
 
-import "./groupsPage.less";
+import styles from "./mainPage.less";
 
 class AbstractPage extends Component {
  // TODO: выяснить у Андрея, зачем оно. И реализоваьть или удалить.
@@ -33,11 +33,11 @@ class GroupsPage extends AbstractPage {
 	render() {
 		let courseId = this.props.match.params.courseId;
 		return (
-			<div className="wrapper">
+			<div className={styles["wrapper"]}>
 				<Helmet>
 					<title>Группы в курсе</title>
 				</Helmet>
-				<div className="content-wrapper">
+				<div className={styles["content-wrapper"]}>
 					<GroupHeader
 						onTabChange={this.onTabChange}
 						filter={this.state.filter}
