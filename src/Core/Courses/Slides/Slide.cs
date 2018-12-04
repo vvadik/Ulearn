@@ -136,7 +136,13 @@ namespace Ulearn.Core.Courses.Slides
 			var slideLoadingContext = new SlideLoadingContext(context, this);
 			Blocks = Blocks.SelectMany(b => b.BuildUp(slideLoadingContext, ImmutableHashSet<string>.Empty)).ToArray();
 			
-			DefineBlockType = Blocks.Select(BlockTypeHelpers.GetBlockType).ToArray();
+			DefineBlockTypes();
+		}
+
+		public void DefineBlockTypes()
+		{
+			if (Blocks != null)
+				DefineBlockType = Blocks.Select(BlockTypeHelpers.GetBlockType).ToArray();
 		}
 
 		public void CheckBlockTypes()
