@@ -16,6 +16,7 @@ class GroupPage extends Component {
 			open: "settings",
 			updatedFields: {},
 			error: false,
+			loadSettings: false,
 			loading: false,
 			scores: [],
 			scoresId: [],
@@ -25,30 +26,40 @@ class GroupPage extends Component {
 	componentDidMount() {
 		let groupId = this.props.match.params.groupId;
 
-		this.loadGroup(groupId);
 		this.loadGroupScores(groupId);
+		this.loadGroup(groupId);
 	};
 
 	loadGroup = (groupId) => {
 		api.groups.getGroup(groupId).then(group => {
 			this.setState({
 				group,
+				loading: !this.state.scores ? true : false,
 			});
 		}).catch(console.error);
+
+		this.setState({
+			loading: true,
+		});
 	};
 
 	loadGroupScores = (groupId) => {
 		api.groups.getGroupScores(groupId).then(json => {
 			let scores = json.scores;
 			this.setState({
-				scores,
+				scores: scores,
+				loading: this.state.group.id ? false : true,
 			});
 		}).catch(console.error);
+
+		this.setState({
+			loading: true,
+		});
 	};
 
 	render() {
 		let courseId = this.props.match.params.courseId;
-		const { group, open, loading, scores, updatedFields, error } = this.state;
+		const { group, open, loadSettings, loading, scores, updatedFields, error } = this.state;
 		return (
 			<div className={styles["wrapper"]}>
 				<div className={styles["content-wrapper"]}>
@@ -65,6 +76,7 @@ class GroupPage extends Component {
 						{ (open === "settings") &&
 							<form onSubmit={this.onLoadingSettings}>
 								<GroupSettings
+									loading={loading}
 									name={updatedFields.name}
 									group={group}
 									scores={scores}
@@ -76,7 +88,7 @@ class GroupPage extends Component {
 									size="medium"
 									use="primary"
 									type="submit"
-									loading={loading}>
+									loading={loadSettings}>
 									Сохранить
 								</Button>
 							</form> }
@@ -155,25 +167,28 @@ class GroupPage extends Component {
 		e.preventDefault();
 
 		this.setState({
-			loading: true,
+			loadSettings: true,
+			group: {
+			...group,
+				name: updatedFields.name,
+			}
 		});
 
-		if (updatedFields.name.length === 0) {
-			this.setState({
-				error: true,
-			});
-		} else {
-			api.groups.saveGroupSettings(group.id, updatedFields)
-				.then(group => {
-					this.setState({
-						loading: false,
-						group: group,
-					});
-				}).catch(console.error);
-		}
+		api.groups.saveGroupSettings(group.id, updatedFields)
+			.then(group => {
+				this.setState({
+					loadSettings: false,
+					group: group,
+				});
+			}).catch(console.error);
 
 		api.groups.saveScoresSettings(group.id, scoresId)
-			.then(response => response)
+			.then(response => {
+				this.setState({
+					loadSettings: false,
+				});
+				return response;
+			})
 			.catch(console.error);
 	};
 }

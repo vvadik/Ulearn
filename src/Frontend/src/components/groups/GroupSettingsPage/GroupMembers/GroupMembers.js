@@ -10,9 +10,10 @@ import Toggle from "@skbkontur/react-ui/components/Toggle/Toggle";
 import Kebab from "@skbkontur/react-ui/components/Kebab/Kebab";
 import MenuItem from "@skbkontur/react-ui/components/MenuItem/MenuItem";
 import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
+import ComboboxSearch from "./ComboboxSearch";
+import Loader from "@skbkontur/react-ui/components/Loader/Loader";
 import Avatar from "./Avatar";
 import GroupStudents from "./GroupStudents";
-import ComboboxSearch from "./ComboboxSearch";
 import getWordForm from "../../../../utils/getWordForm";
 
 import styles from './style.less';
@@ -23,6 +24,8 @@ class GroupMembers extends Component {
 		accesses: [],
 		selected: null,
 		students: [],
+		loadingTeachers: false,
+		loadingStudents: false,
 	};
 
 	componentDidMount() {
@@ -37,8 +40,13 @@ class GroupMembers extends Component {
 			let accesses = json.accesses;
 			this.setState({
 				accesses,
+				loadingTeachers: false,
 			});
 		}).catch(console.error);
+
+		this.setState({
+			loadingTeachers: true,
+		});
 	};
 
 	loadStudents = (groupId) => {
@@ -46,12 +54,17 @@ class GroupMembers extends Component {
 			let students = json.students;
 			this.setState({
 				students,
+				loadingStudents: false,
 			});
 		}).catch(console.error);
+
+		this.setState({
+			loadingStudents: true,
+		});
 	};
 
 	render() {
-		const { accesses, students, selected } = this.state;
+		const { accesses, students, selected, loadingStudents, loadingTeachers } = this.state;
 		const { group, courseId } = this.props;
 		const owner = group.owner;
 		const inviteLink = group.is_invite_link_enabled || false;
@@ -64,14 +77,16 @@ class GroupMembers extends Component {
 						Преподаватели могут видеть список участников группы, проводить код-ревью
 						и проверку тестов, выставлять баллы и смотреть ведомость.
 					</p>
-					<div className={styles["teacher-block"]}>
-						<Avatar user={owner} size={styles["_big"]}/>
-						<div className={styles["teacher-block-name"]}>
-							<div>{owner.visible_name}</div>
-							<span className={styles["teacher-status"]}>Владелец</span>
+					<Loader type="normal" active={loadingTeachers}>
+						<div className={styles["teacher-block"]}>
+							<Avatar user={owner} size={styles["_big"]}/>
+							<div className={styles["teacher-block-name"]}>
+								<div>{owner.visible_name}</div>
+								<span className={styles["teacher-status"]}>Владелец</span>
+							</div>
 						</div>
-					</div>
-					{(accesses.length > 0) && this.renderTeachers()}
+						{(accesses.length > 0) && this.renderTeachers()}
+					</Loader>
 					<label className={styles["teacher-block-search"]}>
 						<p>Добавить преподавателя:</p>
 						<ComboboxSearch
@@ -105,13 +120,15 @@ class GroupMembers extends Component {
 							</label>
 						</div>
 					</div>
-					<div className={styles["students-list"]}>
-						{(students.length >0) &&
-						<GroupStudents
-							students={students}
-							group={group}
-							onDeleteStudent={this.onDeleteStudent}/>}
-					</div>
+					<Loader type="normal" active={loadingStudents}>
+						<div className={styles["students-list"]}>
+							{(students.length >0) &&
+							<GroupStudents
+								students={students}
+								group={group}
+								onDeleteStudent={this.onDeleteStudent}/>}
+						</div>
+					</Loader>
 				</div>
 			</div>
 		)
@@ -129,7 +146,7 @@ class GroupMembers extends Component {
 					<div className={styles["teacher-block-name"]}>
 						<div>{item.user.visible_name}</div>
 						<span className={styles["teacher-status"]}>
-							Полный доступ {getWordForm('предоставила', 'предоставил', item.user.gender)}
+							Полный доступ {getWordForm('предоставила', 'предоставил', this.props.group.owner.gender)}
 							{' '} {item.granted_by.visible_name} {' '}
 							{ moment(grantTime(item.grant_time)).fromNow() }
 						</span>
