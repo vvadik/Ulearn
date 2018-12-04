@@ -11,7 +11,7 @@ import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { findDOMNode } from "react-dom"
 
-import styles from './Header.less'
+import styles from './Header.less';
 import { getQueryStringParameter } from "../../utils";
 
 import api from "../../api"
@@ -485,7 +485,7 @@ NotificationsMenu = connect(NotificationsMenu.mapStateToProps, NotificationsMenu
 class NotificationsIcon extends Component {
     render() {
         return (
-            <div className={styles["header__notifications-icon"] + (this.props.counter === 0 ? styles["without-counter"] : "")} onClick={ this.props.onClick }>
+            <div className={`${styles["header__notifications-icon"]} ${this.props.counter === 0 ? styles["without-counter"] : ""}`} onClick={ this.props.onClick }>
                 <span className={styles["icon"]}>
                     <Icon name="NotificationBell"/>
                 </span>

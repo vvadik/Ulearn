@@ -5,8 +5,13 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  width: 70%;
+  width: 80%;
   height: 100%;
+
+  @media (max-width: @maxTabletWidth) {
+	margin: 30px 0;
+	width: 100%;
+  }
 
   .search-field {
 	padding: 8px 10px;
@@ -31,14 +36,20 @@
 	font-weight: 400;
 	width: 100%;
 	margin: 0;
+
+	@media (max-width: @maxTabletWidth) {
+	  padding: 0 27px;
+	}
+
+	div {
+	  @media (max-width: @maxTabletWidth) {
+		left: 27px;
+	  }
+	}
   }
 
   input {
 	max-width: 100%;
-
-	@media (max-width: @maxPhoneWidth) {
-	  font-size: 12px;
-	}
   }
 
   a {
@@ -48,4 +59,8 @@
 
 .groups-container {
   margin: 0 -27px;
+
+  @media (max-width: @maxTabletWidth) {
+	margin: 0;
+  }
 }

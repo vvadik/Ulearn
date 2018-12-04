@@ -174,7 +174,6 @@ class GroupsPage extends AbstractPage {
 		});
 		this.props.history.push(`${groupId}`);
 	};
-
 }
 
 GroupsPage.propTypes = {

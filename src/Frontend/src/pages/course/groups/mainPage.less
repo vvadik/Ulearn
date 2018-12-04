@@ -9,6 +9,7 @@ body {
   font-family: "Segoe UI",Arial,sans-serif;
   margin: 0;
   padding-bottom: 0;
+  min-width: 320px;
 }
 
 a {
@@ -46,8 +47,11 @@ button {
   height: 100%;
   min-height: @minHeight;
 
+  @media (max-width: @maxLaptopWidth) {
+	width: 90%;
+  }
+
   @media (max-width: @maxTabletWidth) {
 	width: 100%;
   }
-
 }

@@ -10,18 +10,18 @@
 
   @media (max-width: @maxTabletWidth) {
 	display: block;
-	border-bottom: none;
+	padding: 30px 27px 0;
   }
 
   .group-header-container {
 	display: flex;
 	justify-content: space-between;
-	width: 70%;
+	width: 80%;
 	margin: 0 auto;
 
 	@media (max-width: @maxTabletWidth		) {
 	  display: block;
-	  border-bottom: none;
+	  width: 100%;
 	}
 
   h2 {
@@ -34,32 +34,33 @@
 
 	@media (max-width: @maxPhoneWidth) {
 	  font-size: 22px;
+	  padding: 0;
 	}
   }
 
   .buttons-container {
 	margin: 20px 0;
 
-	@media (max-width: @maxPhoneWidth) {
-	  //padding-left: 27px;
-	}
-
 	button {
 	  @media (max-width: @maxPhoneWidth) {
-		font-size: 12px;
+		font-size: 14px;
 	  }
 	}
   }
-  }
+}
 
 
   .tabs-container {
-	width: 70%;
+	width: 80%;
 	margin: 30px auto -1px;
+
+	@media (max-width: @maxTabletWidth) {
+	  width: 100%;
+	}
 
 	a {
 	  @media (max-width: @maxPhoneWidth) {
-		font-size: 12px;
+		font-size: 16px;
 	  }
 	}
 
