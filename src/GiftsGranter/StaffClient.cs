@@ -49,7 +49,7 @@ namespace GiftsGranter
 
 		public JObject GetUser(string sid)
 		{
-			return Get($"users/getBySid?sid={sid}");
+			return Get($"users/{sid}");
 		}
 
 		public JObject GetUserGifts(int staffUserId)
