@@ -68,7 +68,7 @@ class CopyGroupModal extends Component {
 		const courseTitle = this.getCourseTitle(currentCourseId);
 		return (
 		<Modal onClose={onClose} width={640}>
-			<Modal.Header>Скопировать группу</Modal.Header>
+			<Modal.Header>Скопировать группу из курса</Modal.Header>
 				<form onSubmit={this.onSubmit}>
 					<Modal.Body>
 						<p className={styles["modal-text"]}>Новая группа будет создана для курса <b>«{ courseTitle }»</b>.

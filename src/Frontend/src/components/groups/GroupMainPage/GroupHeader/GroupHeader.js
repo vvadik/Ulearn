@@ -50,7 +50,7 @@ class GroupHeader extends Component {
 					<div className={styles["buttons-container"]}>
 						<Gapped gap={20}>
 							<Button id="create" use="primary" size="medium" onClick={this.openCreateGroupModal}>Создать группу</Button>
-							<Button id="copy" use="default" size="medium" onClick={this.openCopyGroupModal}>Скопировать группу</Button>
+							<Button id="copy" use="default" size="medium" onClick={this.openCopyGroupModal}>Скопировать группу из курса</Button>
 						</Gapped>
 					</div>
 				</div>

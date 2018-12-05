@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
+import {Helmet} from "react-helmet";
 import api from "../../../api/index";
 import Tabs from "@skbkontur/react-ui/components/Tabs/Tabs";
 import Button from "@skbkontur/react-ui/components/Button/Button";
@@ -62,6 +63,9 @@ class GroupPage extends Component {
 		const { group, open, loadSettings, loading, scores, updatedFields, error } = this.state;
 		return (
 			<div className={styles["wrapper"]}>
+				<Helmet>
+					<title>{`Группа ${group.name}`}</title>
+				</Helmet>
 				<div className={styles["content-wrapper"]}>
 					<header className={styles["group-header"]}>
 						<h2>{ group.name }</h2>

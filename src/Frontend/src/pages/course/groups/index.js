@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { Helmet } from "react-helmet";
+import connect from "react-redux/es/connect/connect";
 import api from "../../../api";
 import PropTypes from 'prop-types';
 import GroupsList from "../../../components/groups/GroupMainPage/GroupList/GroupsList";
@@ -32,10 +33,16 @@ class GroupsPage extends AbstractPage {
 
 	render() {
 		let courseId = this.props.match.params.courseId;
+		const courseById = this.props.courses.courseById;
+		const course = courseById[courseId];
+		if (course === undefined) {
+			return;
+		}
+
 		return (
 			<div className={styles["wrapper"]}>
 				<Helmet>
-					<title>Группы в курсе</title>
+					<title>Группы в курсе {course.title.toLowerCase()}</title>
 				</Helmet>
 				<div className={styles["content-wrapper"]}>
 					<GroupHeader
@@ -150,12 +157,13 @@ class GroupsPage extends AbstractPage {
 	};
 
 	copyGroup = async (groupId) => {
+		let courseId = this.props.match.params.courseId;
 		const { groups } = this.state;
 		const copyGroup = await api.groups.getGroup(groupId);
 		this.setState({
 			groups: [copyGroup, ...groups],
 		});
-		this.props.history.push(`${groupId}`);
+		this.props.history.push(`/${courseId}/groups/${groupId}`);
 	};
 
 	deleteGroup = (group, groupsName) => {
@@ -167,17 +175,27 @@ class GroupsPage extends AbstractPage {
 	};
 
 	createGroup = async (groupId) => {
+		let courseId = this.props.match.params.courseId;
 		const newGroup = await api.groups.getGroup(groupId);
 		const groups = this.filteredGroups;
 		this.setState({
 			groups: [newGroup, ...groups],
 		});
-		this.props.history.push(`${groupId}`);
+		this.props.history.push(`/${courseId}/groups/${groupId}`);
 	};
+
+	static mapStateToProps(state) {
+		return {
+			courses: state.courses,
+		}
+	}
 }
 
 GroupsPage.propTypes = {
 	match: PropTypes.object,
+	courses: PropTypes.object,
 };
+
+GroupsPage = connect(GroupsPage.mapStateToProps)(GroupsPage);
 
 export default withRouter(GroupsPage);
