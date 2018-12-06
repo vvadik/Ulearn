@@ -43,7 +43,6 @@ namespace uLearn.Web.Controllers
 
 		private readonly UserQuizzesRepo userQuizzesRepo;
 		private readonly VisitsRepo visitsRepo;
-		private readonly QuizzesRepo quizzesRepo;
 		private readonly GroupsRepo groupsRepo;
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
 		private readonly NotificationsRepo notificationsRepo;
@@ -54,7 +53,6 @@ namespace uLearn.Web.Controllers
 
 			userQuizzesRepo = new UserQuizzesRepo(db);
 			visitsRepo = new VisitsRepo(db);
-			quizzesRepo = new QuizzesRepo(db);
 			groupsRepo = new GroupsRepo(db, courseManager);
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
 			notificationsRepo = new NotificationsRepo(db);
@@ -120,17 +118,6 @@ namespace uLearn.Web.Controllers
 
 			log.Info($"Создаю тест для пользователя {userId} в слайде {courseId}:{slide.Id}, isLti = {isLti}");
 
-			var quizVersion = quizzesRepo.GetLastQuizVersion(courseId, slideId);
-			if (quizState != QuizState.NotPassed)
-				quizVersion = userQuizzesRepo.FindQuizVersionFromUsersAnswer(courseId, slideId, userId);
-
-			/* If we haven't quiz version in database, create it */
-			if (quizVersion == null)
-				quizVersion = quizzesRepo.AddQuizVersionIfNeeded(courseId, slide);
-
-			/* Restore quiz slide from version stored in the database */
-			slide = quizVersion.GetRestoredQuiz(course, course.FindUnitBySlideId(slide.Id));
-			
 			if (quizState == QuizState.Subtotal)
 			{
 				var score = resultsForQuizzes?.AsEnumerable().Sum(res => res.Value) ?? 0;
@@ -309,23 +296,12 @@ namespace uLearn.Web.Controllers
 				metricSender.SendCount($"quiz.manual_score.{checking.CourseId}");
 				metricSender.SendCount($"quiz.manual_score.{checking.CourseId}.{checking.SlideId}");
 
-				var answers = userQuizzesRepo.GetAnswersForUser(checking.CourseId, checking.SlideId, checking.UserId);
-
-				QuizVersion quizVersion;
-				/* If there is no user's answers for quiz, get the latest quiz version */
-				if (answers.Count == 0)
-					quizVersion = quizzesRepo.GetLastQuizVersion(checking.CourseId, checking.SlideId);
-				else
-				{
-					var firstAnswer = answers.FirstOrDefault().Value.FirstOrDefault();
-					quizVersion = firstAnswer != null
-						? firstAnswer.QuizVersion
-						: quizzesRepo.GetFirstQuizVersion(checking.CourseId, checking.SlideId);
-				}
-
 				var totalScore = 0;
 
-				var quiz = quizVersion.GetRestoredQuiz(course, unit);
+				var quiz = course.FindSlideById(checking.SlideId);
+				if (quiz == null)
+					return Redirect(errorUrl + "Этого теста больше нет в курсе");
+						
 				foreach (var question in quiz.Blocks.OfType<AbstractQuestionBlock>())
 				{
 					var scoreFieldName = "quiz__score__" + question.Id;
@@ -519,85 +495,6 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		[HttpPost]
-		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public async Task<ActionResult> MergeQuizVersions(string courseId, Guid slideId, int quizVersionId, int mergeWithQuizVersionId)
-		{
-			using (var transcation = db.Database.BeginTransaction())
-			{
-				var quizVersion = db.QuizVersions.FirstOrDefault(x => x.CourseId == courseId && x.SlideId == slideId && x.Id == quizVersionId);
-				var mergeWithQuizVersion = db.QuizVersions.FirstOrDefault(x => x.CourseId == courseId && x.SlideId == slideId && x.Id == mergeWithQuizVersionId);
-				if (quizVersion == null || mergeWithQuizVersion == null)
-					return HttpNotFound();
-
-				foreach (var userQuiz in db.UserQuizzes.Where(x => x.QuizVersionId == mergeWithQuizVersionId))
-					userQuiz.QuizVersionId = quizVersionId;
-
-				quizVersion.NormalizedXml = mergeWithQuizVersion.NormalizedXml;
-
-				db.QuizVersions.Remove(mergeWithQuizVersion);
-
-				await db.SaveChangesAsync();
-
-				transcation.Commit();
-			}
-
-			return RedirectToAction("SlideById", "Course", new { courseId, slideId });
-		}
-
-		[HttpGet]
-		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public ActionResult Analytics(string courseId, Guid slideId, DateTime periodStart)
-		{
-			var course = courseManager.GetCourse(courseId);
-			var unit = course.FindUnitBySlideId(slideId);
-			var quizSlide = (QuizSlide)course.GetSlideById(slideId);
-			
-			var quizVersions = quizzesRepo.GetQuizVersions(courseId, quizSlide.Id).ToList();
-			var dict = new SortedDictionary<string, List<QuizAnswerInfo>>();
-			var passes = db.UserQuizzes
-				.Where(q => quizSlide.Id == q.SlideId && !q.isDropped && periodStart <= q.Timestamp)
-				.GroupBy(q => q.UserId)
-				.Join(db.Users, g => g.Key, user => user.Id, (g, user) => new { UserId = user.Id, user.UserName, UserQuizzes = g.ToList(), QuizVersion = g.FirstOrDefault().QuizVersion })
-				.ToList();
-			
-			foreach (var pass in passes)
-			{
-				var slide = quizSlide;
-				if (pass.QuizVersion != null)
-					slide = pass.QuizVersion.GetRestoredQuiz(course, unit);
-				dict[pass.UserName] = GetUserQuizAnswers(slide, pass.UserQuizzes).ToList();
-			}
-			
-			var userIds = passes.Select(p => p.UserId).Distinct().ToList();
-			var userNameById = passes.ToDictionary(p => p.UserId, p => p.UserName);
-			var groups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, User).ToDictionary(kv => userNameById[kv.Key], kv => kv.Value);
-			var rightAnswersCount = dict.Values
-				.SelectMany(list => list
-					.Where(info => info.Score == info.MaxScore))
-				.GroupBy(arg => arg.Id)
-				.ToDictionary(grouping => grouping.Key, grouping => grouping.Count());
-
-			var usersByQuizVersion = passes.GroupBy(p => p.QuizVersion?.Id).ToDictionary(g => g.Key, g => g.Select(u => u.UserName).ToList());
-			var usersWaitsForManualCheck = slideCheckingsRepo.GetManualCheckingQueue<ManualQuizChecking>(
-				new ManualCheckingQueueFilterOptions { CourseId = courseId, SlidesIds = new List<Guid> { quizSlide.Id } }
-			).ToList().Select(i => i.User.UserName).ToImmutableHashSet();
-
-			return PartialView(new QuizAnalyticsModel
-			{
-				Course = course,
-				Unit = course.FindUnitBySlideId(quizSlide.Id),
-				SlideId = quizSlide.Id,
-
-				UserAnswers = dict,
-				QuizVersions = quizVersions,
-				UsersByQuizVersion = usersByQuizVersion,
-				RightAnswersCount = rightAnswersCount,
-				GroupByUser = groups,
-				UsersWaitsForManualCheck = usersWaitsForManualCheck,
-			});
-		}
-
 		private static IEnumerable<QuizAnswerInfo> GetUserQuizAnswers(QuizSlide slide, IEnumerable<UserQuiz> userQuizzes)
 		{
 			var answers = userQuizzes.GroupBy(q => q.QuizId).ToDictionary(g => g.Key, g => g.ToList());
@@ -656,7 +553,7 @@ namespace uLearn.Web.Controllers
 			{
 				AnswersId = ans,
 				Id = questionIndex.ToString(),
-				RealyRightAnswer = new HashSet<string>(block.Items.Where(x => x.IsCorrect.IsTrueOrMaybe()).Select(x => x.Id)),
+				CorrectAnswer = new HashSet<string>(block.Items.Where(x => x.IsCorrect.IsTrueOrMaybe()).Select(x => x.Id)),
 				Score = score,
 				MaxScore = maxScore,
 				IsRight = isRight

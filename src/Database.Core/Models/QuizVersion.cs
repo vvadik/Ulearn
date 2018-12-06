@@ -9,6 +9,7 @@ using Ulearn.Core.Courses.Units;
 
 namespace Database.Models
 {
+	/*
 	public class QuizVersion
 	{
 		private static readonly XmlSlideLoader loader = new XmlSlideLoader();
@@ -36,4 +37,5 @@ namespace Database.Models
 			return (QuizSlide) loader.Load(xmlBytes, 0, unit, course.Id, course.Settings);
 		}
 	}
+	*/
 }

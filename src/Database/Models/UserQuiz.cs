@@ -22,10 +22,6 @@ namespace Database.Models
 		[Index("IDX_UserQuiz_ByCourseSlideAndQuiz", 2)]
 		public Guid SlideId { get; set; }
 
-		public virtual QuizVersion QuizVersion { get; set; }
-
-		public int? QuizVersionId { get; set; }
-
 		public virtual ApplicationUser User { get; set; }
 
 		[StringLength(64)]

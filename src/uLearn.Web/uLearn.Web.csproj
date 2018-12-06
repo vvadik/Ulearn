@@ -683,7 +683,7 @@
     <Compile Include="Models\IntructorNoteModel.cs" />
     <Compile Include="Models\LtiQuizModel.cs" />
     <Compile Include="Models\PrevNextButtonsModel.cs" />
-    <Compile Include="Models\QuizAnalyticsModel.cs" />
+    <Compile Include="Models\QuizAnswerInfo.cs" />
     <Compile Include="Models\QuizBlockData.cs" />
     <Compile Include="Models\QuizModel.cs" />
     <Compile Include="Models\QuizState.cs" />
@@ -1357,7 +1357,6 @@
     <Content Include="Views\Shared\DisplayTemplates\YoutubeBlock.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\HintWithLikeButton.cshtml" />
     <Content Include="Views\Hint\UseHint.cshtml" />
-    <Content Include="Views\Quiz\Analytics.cshtml" />
     <Content Include="Views\Account\List.cshtml" />
     <Content Include="Views\Admin\Units.cshtml" />
     <Content Include="Views\Admin\CourseList.cshtml" />

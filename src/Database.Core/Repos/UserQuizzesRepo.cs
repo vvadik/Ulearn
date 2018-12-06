@@ -14,22 +14,18 @@ namespace Database.Repos
 	public class UserQuizzesRepo : IUserQuizzesRepo
 	{
 		private readonly UlearnDb db;
-		private readonly IQuizzesRepo quizzesRepo;
 
-		public UserQuizzesRepo(UlearnDb db, IQuizzesRepo quizzesRepo)
+		public UserQuizzesRepo(UlearnDb db)
 		{
 			this.db = db;
-			this.quizzesRepo = quizzesRepo;
 		}
 
 		public async Task<UserQuiz> AddUserQuiz(string courseId, bool isRightAnswer, string itemId, string quizId, Guid slideId, string text, string userId, DateTime time, int quizBlockScore, int quizBlockMaxScore)
 		{
-			var currentQuizVersion = quizzesRepo.GetLastQuizVersion(courseId, slideId);
 			var userQuiz = new UserQuiz
 			{
 				CourseId = courseId,
 				SlideId = slideId,
-				QuizVersionId = currentQuizVersion.Id,
 				IsRightAnswer = isRightAnswer,
 				ItemId = itemId,
 				QuizId = quizId,
@@ -89,22 +85,6 @@ namespace Database.Repos
 				answer[block.Id] = ans;
 			}
 			return answer;
-		}
-
-		public QuizVersion FindQuizVersionFromUsersAnswer(string courseId, Guid slideId, string userId)
-		{
-			var firstUserAnswer = db.UserQuizzes.FirstOrDefault(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId && !x.isDropped);
-
-			if (firstUserAnswer == null)
-				return null;
-
-			/* If we know version which user has answered*/
-			if (firstUserAnswer.QuizVersion != null)
-				return firstUserAnswer.QuizVersion;
-
-			/* If user's version is null, show first created version for this slide ever */
-			var quizzesRepo = new QuizzesRepo(db);
-			return quizzesRepo.GetFirstQuizVersion(courseId, slideId);
 		}
 
 		public int GetAverageStatistics(Guid slideId, string courseId)
@@ -208,7 +188,7 @@ namespace Database.Repos
 		{
 			var answers = db.UserQuizzes.Where(q => q.CourseId == courseId && q.SlideId == slideId && q.QuizId == quizId);
 			var totalTries = answers.Select(q => new { q.UserId, q.Timestamp }).Distinct().Count();
-			/* Don't call GroupBy().ToDictionary() because of perfomance issues.
+			/* Don't call GroupBy().ToDictionary() because of performance issues.
 			   See http://code-ninja.org/blog/2014/07/24/entity-framework-never-call-groupby-todictionary/ for details */
 			return answers
 				.GroupBy(q => q.ItemId)

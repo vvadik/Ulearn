@@ -261,9 +261,6 @@ namespace Database
 			AddIndex<Notification>(modelBuilder, c => c.CreateTime);
 			AddIndex<Notification>(modelBuilder, c => c.AreDeliveriesCreated);
 
-			AddIndex<QuizVersion>(modelBuilder, c => c.SlideId);
-			AddIndex<QuizVersion>(modelBuilder, c => new { c.SlideId, c.LoadingTime });
-		
 			AddIndex<ManualExerciseChecking>(modelBuilder, c => new { c.CourseId, c.SlideId });
 			AddIndex<ManualExerciseChecking>(modelBuilder, c => new { c.CourseId, c.SlideId, c.UserId, c.ProhibitFurtherManualCheckings });
 			AddIndex<ManualExerciseChecking>(modelBuilder, c => new { c.CourseId, c.SlideId, c.Timestamp });
@@ -377,7 +374,6 @@ namespace Database
 		public DbSet<CommentLike> CommentLikes { get; set; }
 		public DbSet<CommentsPolicy> CommentsPolicies { get; set; }
 
-		public DbSet<QuizVersion> QuizVersions { get; set; }
 		public DbSet<CourseVersion> CourseVersions { get; set; }
 
 		public DbSet<ManualExerciseChecking> ManualExerciseCheckings { get; set; }

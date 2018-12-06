@@ -237,7 +237,6 @@
     <Compile Include="DataContexts\GroupsRepo.cs" />
     <Compile Include="DataContexts\LtiRequestsRepo.cs" />
     <Compile Include="DataContexts\NotificationsRepo.cs" />
-    <Compile Include="DataContexts\QuizzesRepo.cs" />
     <Compile Include="DataContexts\RestoreRequestRepo.cs" />
     <Compile Include="DataContexts\SlideCheckingsRepo.cs" />
     <Compile Include="DataContexts\SlideHintRepo.cs" />

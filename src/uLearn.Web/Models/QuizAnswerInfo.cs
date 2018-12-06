@@ -1,26 +1,7 @@
-using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using Database.Models;
-using Ulearn.Core.Courses;
-using Ulearn.Core.Courses.Units;
 
 namespace uLearn.Web.Models
 {
-	public class QuizAnalyticsModel
-	{
-		public Course Course { get; set; }
-		public Unit Unit { get; set; }		
-		public Guid SlideId { get; set; }
-
-		public SortedDictionary<string, List<QuizAnswerInfo>> UserAnswers { get; set; }
-		public List<QuizVersion> QuizVersions { get; set; }
-		public Dictionary<int?, List<string>> UsersByQuizVersion { get; set; }
-		public Dictionary<string, int> RightAnswersCount { get; set; }
-		public Dictionary<string, string> GroupByUser { get; set; }
-		public ImmutableHashSet<string> UsersWaitsForManualCheck { get; set; }
-	}
-
 	public class QuizAnswerInfo
 	{
 		public string Id { get; set; }
@@ -43,7 +24,7 @@ namespace uLearn.Web.Models
 	public class ChoiceBlockAnswerInfo : QuizAnswerInfo
 	{
 		public SortedDictionary<string, bool> AnswersId { get; set; }
-		public HashSet<string> RealyRightAnswer { get; set; }
+		public HashSet<string> CorrectAnswer { get; set; }
 	}
 
 	public class OrderingBlockAnswerInfo : QuizAnswerInfo

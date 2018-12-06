@@ -60,7 +60,6 @@ namespace Database.Di
 			services.AddScoped<INotificationsRepo, NotificationsRepo>();
 			services.AddScoped<IFeedRepo, FeedRepo>();
 			services.AddScoped<ISystemAccessesRepo, SystemAccessesRepo>();
-			services.AddScoped<IQuizzesRepo, QuizzesRepo>();
 
 			return services;
 		}
