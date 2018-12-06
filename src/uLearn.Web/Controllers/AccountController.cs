@@ -591,7 +591,7 @@ namespace uLearn.Web.Controllers
 
 			if (emailChanged)
 			{
-				if (!CanUserSetThisEmail(user, user.Email))
+				if (!CanUserSetThisEmail(user, userModel.Email))
 				{
 					log.Warn($"ChangeDetailsPartial(): email {userModel.Email} is already taken");
 					return RedirectToAction("Manage", new { Message = ManageMessageId.EmailAlreadyTaken });
