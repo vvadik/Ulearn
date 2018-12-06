@@ -86,27 +86,6 @@ namespace Database.DataContexts
 			return answer;
 		}
 
-		public int GetAverageStatistics(Guid slideId, string courseId)
-		{
-			var newA = db.UserQuizzes
-							.Where(x => x.CourseId == courseId && x.SlideId == slideId)
-							.GroupBy(x => x.UserId)
-							.Select(x => x
-								.GroupBy(y => y.QuizId)
-								.Select(y => y.All(z => z.QuizBlockScore == z.QuizBlockMaxScore))
-								.Select(y => y ? 1 : 0)
-								.DefaultIfEmpty()
-								.Average())
-							.DefaultIfEmpty()
-							.Average() * 100;
-			return (int)newA;
-		}
-
-		public int GetSubmitQuizCount(Guid slideId, string courseId)
-		{
-			return db.UserQuizzes.Where(x => x.CourseId == courseId && x.SlideId == slideId).Select(x => x.User).Distinct().Count();
-		}
-
 		public async Task RemoveAnswers(string courseId, string userId, Guid slideId)
 		{
 			var answersToRemove = db.UserQuizzes.Where(q => q.CourseId == courseId && q.UserId == userId && q.SlideId == slideId).ToList();

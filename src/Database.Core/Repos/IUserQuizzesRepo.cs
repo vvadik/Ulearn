@@ -15,8 +15,6 @@ namespace Database.Repos
 		HashSet<Guid> GetIdOfQuizPassedSlides(string courseId, string userId);
 		HashSet<Guid> GetIdOfQuizSlidesScoredMaximum(string courseId, string userId);
 		Dictionary<string, List<UserQuiz>> GetAnswersForShowOnSlide(string courseId, QuizSlide slide, string userId);
-		int GetAverageStatistics(Guid slideId, string courseId);
-		int GetSubmitQuizCount(Guid slideId, string courseId);
 		Task RemoveAnswers(string courseId, string userId, Guid slideId);
 		Task DropQuizAsync(string courseId, string userId, Guid slideId);
 		void DropQuiz(string courseId, string userId, Guid slideId);
