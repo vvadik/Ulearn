@@ -15,12 +15,14 @@ namespace Database.Repos.Groups
 		private readonly UlearnDb db;
 		private readonly ILogger logger;
 		private readonly ICourseRoleUsersFilter courseRoleUsersFilter;
+		private readonly IManualCheckingsForOldSolutionsAdder manualCheckingsForOldSolutionsAdder;
 
-		public GroupsCreatorAndCopier(UlearnDb db, ILogger logger, ICourseRoleUsersFilter courseRoleUsersFilter)
+		public GroupsCreatorAndCopier(UlearnDb db, ILogger logger, ICourseRoleUsersFilter courseRoleUsersFilter, IManualCheckingsForOldSolutionsAdder manualCheckingsForOldSolutionsAdder)
 		{
 			this.db = db;
 			this.logger = logger;
 			this.courseRoleUsersFilter = courseRoleUsersFilter;
+			this.manualCheckingsForOldSolutionsAdder = manualCheckingsForOldSolutionsAdder;
 		}
 
 		public async Task<Group> CreateGroupAsync(
@@ -99,8 +101,15 @@ namespace Database.Repos.Groups
 				UserId = m.UserId,
 				GroupId = newGroup.Id,
 				AddingTime = DateTime.Now,
-			});
+			}).ToList();
 			db.GroupMembers.AddRange(members);
+
+			if (newGroup.IsManualCheckingEnabledForOldSolutions)
+			{
+				logger.Information($"Добавляю старые решения студентов в очередь на проверку");
+				await manualCheckingsForOldSolutionsAdder.AddManualCheckingsForOldSolutionsAsync(newGroup.CourseId, members.Select(m => m.UserId).ToList()).ConfigureAwait(false);
+			}
+
 			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 

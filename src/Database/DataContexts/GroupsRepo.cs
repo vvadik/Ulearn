@@ -112,9 +112,13 @@ namespace Database.DataContexts
 				UserId = m.UserId,
 				GroupId = newGroup.Id,
 				AddingTime = DateTime.Now,
-			});
+			}).ToList();
 			db.GroupMembers.AddRange(members);
-			await db.SaveChangesAsync();
+
+			if (newGroup.IsManualCheckingEnabledForOldSolutions)
+				await AddManualCheckingsForOldSolutions(newGroup.CourseId, members.Select(m => m.UserId).ToList()).ConfigureAwait(false);
+
+			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
 		private async Task CopyGroupAccesses(Group group, Group newGroup)
