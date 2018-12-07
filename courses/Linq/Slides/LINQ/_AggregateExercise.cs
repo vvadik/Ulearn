@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using uLearn.CSharp;
 
 namespace uLearn.Courses.Linq.Slides.LINQ.LINQ.LINQ
 {
-	[Slide("Поиск самого длинного слова", "{04A35AE5-67B9-4674-B4C5-98E8976F87F9}")]
 	public class S120_AggregateExercise : SlideTestBase
 	{
 		/*
@@ -19,17 +18,12 @@ namespace uLearn.Courses.Linq.Slides.LINQ.LINQ.LINQ
 
 		*/
 
-		[Exercise]
-		[SingleStatementMethod]
-		[Hint("Вспомните про кортежи")]
-		[Hint("Вспомните про особенности сравнения кортежей")]
 		public static string GetLongest(IEnumerable<string> words)
 		{
 			return words.Min(line => Tuple.Create(-line.Length, line)).Item2;
 			//ваш код
 		}
 
-		[ExpectedOutput("azaz\nsdsd\n12345")]
 		public static void Main()
 		{
 			Console.WriteLine(GetLongest(new[] {"azaz", "as", "sdsd"}));

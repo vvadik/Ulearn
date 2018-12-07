@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using uLearn.CSharp;
 
 namespace uLearn.Courses.Linq.Slides.LINQ.LINQ.LINQ
 {
-	[Slide("Декартово произведение", "{FF3215D3-5CC7-4C28-83B1-77465F570DC8}")]
 	public class S060_CartesianProduct : SlideTestBase
 	{
 		/*
@@ -20,33 +19,12 @@ namespace uLearn.Courses.Linq.Slides.LINQ.LINQ.LINQ
 
 		*/
 
-		[ExpectedOutput(@"Neighbours of (1 2)
-0 1
-0 2
-0 3
-1 1
-1 3
-2 1
-2 2
-2 3
-Neighbours of (0 0)
--1 -1
--1 0
--1 1
-0 -1
-0 1
-1 -1
-1 0
-1 1
-")]
-		[HideOnSlide]
 		public static void Main()
 		{
 			CheckForPoint(new Point(1, 2));
 			CheckForPoint(new Point(0, 0));
 		}
 
-		[HideOnSlide]
 		private static void CheckForPoint(Point point)
 		{
 			Console.WriteLine("Neighbours of ({0})", point);
@@ -55,9 +33,6 @@ Neighbours of (0 0)
 				Console.WriteLine(line);
 		}
 
-		[Exercise]
-		[Hint("Декартово произведение множества {-1, 0, 1} на себя даст все возможные относительные координаты соседей")]
-		[Hint("Используйте вызов Select внутри вызова SelectMany")]
 		public static IEnumerable<Point> GetNeighbours(Point p)
 		{
 			int[] d = { -1, 0, 1 };
@@ -70,7 +45,6 @@ Neighbours of (0 0)
 			*/
 		}
 
-		[HideOnSlide]
 		public static bool IsRightCartesian(IEnumerable<Point> neighbors)
 		{
 			var correctAnswer = new HashSet<Point>()
@@ -87,7 +61,6 @@ Neighbours of (0 0)
 			return neighbors.All(correctAnswer.Contains);
 		}
 
-		[HideOnSlide]
 		public class Point
 		{
 			[HideOnSlide]
@@ -96,22 +69,18 @@ Neighbours of (0 0)
 				X = x;
 				Y = y;
 			}
-			[HideOnSlide]
 			public int X, Y;
 
-			[HideOnSlide]
 			public override string ToString()
 			{
 				return string.Format("{0} {1}", X, Y);
 			}
 
-			[HideOnSlide]
 			protected bool Equals(Point other)
 			{
 				return X == other.X && Y == other.Y;
 			}
 
-			[HideOnSlide]
 			public override bool Equals(object obj)
 			{
 				if (ReferenceEquals(null, obj)) return false;
@@ -120,7 +89,6 @@ Neighbours of (0 0)
 				return Equals((Point)obj);
 			}
 
-			[HideOnSlide]
 			public override int GetHashCode()
 			{
 				unchecked

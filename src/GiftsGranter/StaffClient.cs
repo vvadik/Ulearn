@@ -25,8 +25,11 @@ namespace GiftsGranter
 		private JObject Get(string url)
 		{
 			var client = CreateHttpClient();
-			var response = FuncUtils.TrySeveralTimesAsync(() => client.GetAsync($"https://staff.skbkontur.ru/api/{url}"), 3).GetAwaiter().GetResult();
-			return GetJsonResponse(response);
+			return FuncUtils.TrySeveralTimesAsync(async () =>
+			{
+				var response = await client.GetAsync($"https://staff.skbkontur.ru/api/{url}").ConfigureAwait(false);
+				return GetJsonResponse(response);
+			}, 3).GetAwaiter().GetResult();
 		}
 
 		private HttpClient CreateHttpClient()
@@ -46,7 +49,7 @@ namespace GiftsGranter
 
 		public JObject GetUser(string sid)
 		{
-			return Get($"users/getBySid?sid={sid}");
+			return Get($"users/{sid}");
 		}
 
 		public JObject GetUserGifts(int staffUserId)

@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Lesson xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="https://ulearn.azurewebsites.net/lesson">
+  <title>SelectMany</title>
+  <id>51df2d25-94f2-4d92-9304-397540c7233c</id>
+  <md>
+Этот метод несколько менее очевиден, чем предыдущие, однако он довольно часто пригождается в самых разных задачах.
+
+`IEnumerable&lt;R&gt; SelectMany(this IEnumerable&lt;T&gt; items, Func&lt;T, IEnumerable&lt;R&gt;&gt; f)`
+
+В качестве аргумента он принимает функцию, преобразующую каждый элемент исходной последовательности
+в новую последовательность. А результатом работы является конкатенация всех полученных последовательностей.
+
+Следующий пример пояснит работу этого метода:</md>
+  <include-code>
+    <display only-body="true">SelectManyDemo</display>
+  </include-code>
+  <md>Впрочем строка уже сама по себе является последовательностью символов и реализует интерфейс `IEnumerable&lt;char&gt;`,
+поэтому вызов `ToCharArray` на самом деле лишний.</md>
+  <include-code>
+    <display only-body="true">SelectManyDemo2</display>
+  </include-code>
+  <default-include-code-file>_SelectManySample.cs</default-include-code-file>
+</Lesson>

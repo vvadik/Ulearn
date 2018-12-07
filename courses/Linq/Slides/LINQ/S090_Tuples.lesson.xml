@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Lesson xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="https://ulearn.azurewebsites.net/lesson">
+  <title>Работа с кортежами</title>
+  <id>693d46e6-2400-43e4-afdf-4eca760a052f</id>
+  <md>В C# есть серия классов `Tuple&lt;T1&gt;`, `Tuple&lt;T1, T2&gt;`, `Tuple&lt;T1, T2, T3&gt;`, ... 
+для описания кортежей размера 1, 2 ... 7.
+
+Пример ниже демонстрирует основные возможности работы с этими классами.</md>
+  <include-code>
+    <display only-body="true">Sample</display>
+  </include-code>
+  <md>Создание кортежа с помощью конструктора выглядит довольно громоздко.
+При вызове методов компилятор C# обычно способен самостоятельно вывести типы-параметры, 
+однако к сожалению вывод типов невозможен при работе с конструкторами.
+
+Поэтому, чтобы облегчить синтаксис создания кортежей, существует класс `Tuple` с серией статических методов, создающих кортежи.</md>
+  <include-code>
+    <display only-body="true">CreateTuple</display>
+  </include-code>
+  <md>Поскольку это методы, для них уже работает вывод типов и запись создания кортежа становится заметно компактнее и приятнее.
+
+Всегда используйте эти методы вместо конструкторов.</md>
+  <default-include-code-file>_Tuples.cs</default-include-code-file>
+</Lesson>

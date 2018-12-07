@@ -1480,7 +1480,7 @@ namespace uLearn.Web.Controllers
 			var scoringGroup = unit.Scoring.Groups[scoringGroupId];
 			if (string.IsNullOrEmpty(score))
 			{
-				await additionalScoresRepo.RemoveAdditionalScores(courseId, unitId, userId, scoringGroupId);
+				await additionalScoresRepo.RemoveAdditionalScores(courseId, unitId, userId, scoringGroupId).ConfigureAwait(false);
 				return Json(new { status = "ok", score = "" });
 			}
 
@@ -1489,8 +1489,10 @@ namespace uLearn.Web.Controllers
 			if (scoreInt < 0 || scoreInt > scoringGroup.MaxAdditionalScore)
 				return Json(new { status = "error", error = $"Баллы должны быть от 0 до {scoringGroup.MaxAdditionalScore}" });
 
-			var additionalScore = await additionalScoresRepo.SetAdditionalScore(courseId, unitId, userId, scoringGroupId, scoreInt, User.Identity.GetUserId());
-			await NotifyAboutAdditionalScore(additionalScore);
+			var (additionalScore, oldScore) = 
+				await additionalScoresRepo.SetAdditionalScore(courseId, unitId, userId, scoringGroupId, scoreInt, User.Identity.GetUserId()).ConfigureAwait(false);
+			if (!oldScore.HasValue || oldScore.Value != scoreInt)
+				await NotifyAboutAdditionalScore(additionalScore).ConfigureAwait(false);
 
 			return Json(new { status = "ok", score = scoreInt });
 		}
@@ -1502,7 +1504,7 @@ namespace uLearn.Web.Controllers
 			if (label == null || label.OwnerId != User.Identity.GetUserId())
 				return Json(new { status = "error", message = "Label not found or not owned by you" });
 
-			await groupsRepo.AddLabelToGroup(groupId, labelId);
+			await groupsRepo.AddLabelToGroup(groupId, labelId).ConfigureAwait(false);
 			return Json(new { status = "ok" });
 		}
 		

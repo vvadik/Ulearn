@@ -1,9 +1,8 @@
-﻿using System.Linq;
+using System.Linq;
 using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides.LINQ
 {
-	[Slide("Группировка", "{421B0115-80E0-42B6-BE2D-79BD3661A2AD}")]
 	[TestFixture]
 	public class S130_Grouping
 	{
@@ -21,7 +20,6 @@ namespace uLearn.Courses.Linq.Slides.LINQ
 		*/
 
 		[Test]
-		[ShowBodyOnSlide]
 		public void Test()
 		{
 			string[] names = {"Pavel", "Peter", "Andrew", "Anna", "Alice", "John"};
@@ -45,7 +43,6 @@ namespace uLearn.Courses.Linq.Slides.LINQ
 		`SelectMany` после `GroupBy` не поменяют состав последовательности, но могут изменить порядок следования элементов:
 		*/
 
-		[ShowBodyOnSlide]
 		[Test]
 		public void SelectManyGroupBy()
 		{

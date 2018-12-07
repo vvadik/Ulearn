@@ -158,7 +158,7 @@ namespace uLearn.Web.Controllers
 				IsCompileError = automaticChecking?.IsCompilationError ?? false,
 				ErrorMessage = automaticChecking?.CompilationError.Text ?? "",
 				IsRightAnswer = submission.AutomaticCheckingIsRightAnswer,
-				ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : exerciseSlide.Exercise.ExpectedOutput.NormalizeEoln(),
+				ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : exerciseSlide.Exercise.ExpectedOutput?.NormalizeEoln(),
 				ActualOutput = automaticChecking?.Output.Text ?? "",
 				ExecutionServiceName = automaticChecking?.ExecutionServiceName ?? "ulearn",
 				SentToReview = sendToReview,

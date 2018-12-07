@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Lesson xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="https://ulearn.azurewebsites.net/lesson">
+  <title>Объединение коллекций</title>
+  <id>7db3f797-b99b-4580-abe6-bb4ee929bb6b</id>
+  <md>
+Вам дан список всех классов в школе. Нужно получить список всех учащихся всех классов.
+
+Учебный класс определен так:</md>
+  <include-code>
+    <display only-body="false">Classroom</display>
+  </include-code>
+  <md>
+Без использования `LINQ` решение могло бы выглядеть так:</md>
+  <include-code>
+    <display only-body="true">GetAllStudents_NoLinq</display>
+  </include-code>
+  <md>Напишите решение этой задачи с помощью `LINQ` в одно выражение.</md>
+  <include-code>
+    <display only-body="false">Main</display>
+  </include-code>
+  <single-file-exercise file="_SelectManyExercise.cs" lang-id="cs" type="check-output">
+    <max-score>5</max-score>
+    <initial-code>public static string[] GetAllStudents(Classroom[] classes)
+{
+}</initial-code>
+    <hint>`IEnumerable&lt;R&gt; SelectMany(this IEnumerable&lt;T&gt; items, Func&lt;T, IEnumerable&lt;R&gt;&gt; f)`</hint>
+    <hint>`T[] ToArray(this IEnumerable&lt;T&gt; items)`</hint>
+    <expected>Alex Anna Bulat Galina Ilya Ivan Pavel Petr Vladimir</expected>
+    <hide-expected-output>false</hide-expected-output>
+    <validator>cs SingleStatementMethod</validator>
+    <texts />
+    <check-for-plagiarism>true</check-for-plagiarism>
+    <hide-solutions>false</hide-solutions>
+    <require-review>false</require-review>
+    <correctness-score>5</correctness-score>
+    <solution only-body="false">GetAllStudents</solution>
+  </single-file-exercise>
+  <default-include-code-file>_SelectManyExercise.cs</default-include-code-file>
+</Lesson>

@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides.LINQ
 {
-	[Slide("SelectMany", "{51DF2D25-94F2-4D92-9304-397540C7233C}")]
 	[TestFixture]
 	public class S040_SelectManySample
 	{
@@ -20,7 +19,6 @@ namespace uLearn.Courses.Linq.Slides.LINQ
 		Следующий пример пояснит работу этого метода:
 		*/
 
-		[ShowBodyOnSlide]
 		[Test]
 		public void SelectManyDemo()
 		{
@@ -34,7 +32,6 @@ namespace uLearn.Courses.Linq.Slides.LINQ
 		поэтому вызов `ToCharArray` на самом деле лишний.
 		*/
 
-		[ShowBodyOnSlide]
 		[Test]
 		public void SelectManyDemo2()
 		{

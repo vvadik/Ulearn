@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using uLearn.CSharp;
 
 namespace uLearn.Courses.Linq.Slides.LINQ.LINQ.LINQ
 {
-	[Slide("Чтение массива чисел", "{CBA7BC68-F1B9-46B1-93D4-49AC113A1D02}")]
 	public class S020_ReadNumbersExercise : SlideTestBase
 	{
 		/*
@@ -19,7 +18,6 @@ namespace uLearn.Courses.Linq.Slides.LINQ.LINQ.LINQ
 		У вас даже есть метод `Main`, запускающий ваш метод на тестовых данных:
 		*/
 
-		[ExpectedOutput("0\n0\n1\n-3\n0")]
 		public static void Main()
 		{
 			foreach (var num in ParseNumbers(new[] {"-0", "+0000"}))
@@ -32,9 +30,6 @@ namespace uLearn.Courses.Linq.Slides.LINQ.LINQ.LINQ
 		Реализуйте метод `ParseNumbers` в одно `LINQ`-выражение.
 		*/
 
-		[Exercise]
-		[SingleStatementMethod]
-		[Hint("`int.Parse` преобразует строку в целое число.")]
 		public static int[] ParseNumbers(IEnumerable<string> lines)
 		{
 			return lines

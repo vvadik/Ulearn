@@ -1,9 +1,8 @@
-﻿using System;
+using System;
 using NUnit.Framework;
 
 namespace uLearn.Courses.Linq.Slides.LINQ
 {
-	[Slide("Работа с кортежами", "{693D46E6-2400-43E4-AFDF-4ECA760A052F}")]
 	[TestFixture]
 	public class S090_Tuples
 	{
@@ -14,7 +13,6 @@ namespace uLearn.Courses.Linq.Slides.LINQ
 		Пример ниже демонстрирует основные возможности работы с этими классами.
 		*/
 
-		[ShowBodyOnSlide]
 		[Test]
 		public void Sample()
 		{
@@ -41,7 +39,6 @@ namespace uLearn.Courses.Linq.Slides.LINQ
 
 		Поэтому, чтобы облегчить синтаксис создания кортежей, существует класс `Tuple` с серией статических методов, создающих кортежи.
 		*/
-		[ShowBodyOnSlide]
 		public void CreateTuple()
 		{
 			var t1 = Tuple.Create(42, "abc");

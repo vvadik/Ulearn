@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Lesson xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="https://ulearn.azurewebsites.net/lesson">
+  <title>Сортировка кортежей</title>
+  <id>80d43879-1099-4972-aee1-6eb3edf1e923</id>
+  <md>Еще одно полезное свойство кортежей — они реализуют интерфейс `IComparable`, 
+сравнивающий кортежи по компонентам. 
+То есть `Tuple.Create(1, 2)` будет меньше `Tuple.Create(2, 1)`.
+Этот интерфейс по умолчанию используется в методах сортировки и поиска минимума и максимума.
+
+Используя этот факт, решите следующую задачу.
+
+Дан текст, нужно составить список всех встречающихся в тексте слов, 
+упорядоченный сначала по возрастанию длины слова, а потом лексикографически.
+
+Запрещено использовать `ThenBy` и `ThenByDescending`.</md>
+  <single-file-exercise file="_SortTuplesExercise.cs" lang-id="cs" type="check-output">
+    <max-score>5</max-score>
+    <initial-code>public static List&lt;string&gt;  GetSortedWords(string text)
+{
+	// ваше решение
+}</initial-code>
+    <hint>`Regex.Split` — позволяет задать регулярное выражение для разделителей слов и получить список слов.</hint>
+    <hint>`Regex.Split(s, @"\W+")` разбивает текст на слова</hint>
+    <hint>Пустая строка не является корректным словом</hint>
+    <hint>`keySelector` в `OrderBy` должен возвращать ключ сортировки. Этот ключ может быть кортежем.</hint>
+    <expected>
+GetSortedWords("A box of biscuits, a box of mixed biscuits, and a biscuit mixer.")
+'a' 'of' 'and' 'box' 'mixed' 'mixer' 'biscuit' 'biscuits'
+
+GetSortedWords("")
+
+
+GetSortedWords("Each Easter Eddie eats eighty Easter eggs.")
+'each' 'eats' 'eggs' 'eddie' 'easter' 'eighty'
+</expected>
+    <hide-expected-output>false</hide-expected-output>
+    <validator>cs SingleStatementMethod</validator>
+    <texts />
+    <check-for-plagiarism>true</check-for-plagiarism>
+    <hide-solutions>false</hide-solutions>
+    <require-review>false</require-review>
+    <correctness-score>5</correctness-score>
+    <solution only-body="false">GetSortedWords</solution>
+  </single-file-exercise>
+  <default-include-code-file>_SortTuplesExercise.cs</default-include-code-file>
+</Lesson>

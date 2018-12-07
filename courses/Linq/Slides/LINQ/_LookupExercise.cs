@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using uLearn.CSharp;
 
 namespace uLearn.Courses.Linq.Slides.LINQ.LINQ.LINQ
 {
-	[Slide("Создание обратного индекса", "{52CAF978-4BB7-4CC1-92FB-607153DA0A1E}")]
 	public class S160_LookupExercise : SlideTestBase
 	{
 		/*
@@ -35,11 +34,6 @@ namespace uLearn.Courses.Linq.Slides.LINQ.LINQ.LINQ
 
 
 
-		[Hint("Сегодня никаких подсказок!")]
-		[Hint("Да, задача сложная, но тем не менее подсказок не будет!")]
-		[Hint("Ну правда, пора научиться решать подобные задачи без подсказок!")]
-		[Exercise]
-		[SingleStatementMethod]
 		public static ILookup<string, int> BuildInvertedIndex(Document[] documents)
 		{
 			return
@@ -56,13 +50,6 @@ namespace uLearn.Courses.Linq.Slides.LINQ.LINQ.LINQ
 			// ваш код
 		}
 
-		[ExpectedOutput(@"
-SearchQuery('world') found documents: 1, 2
-SearchQuery('words') found documents: 2, 3
-SearchQuery('power') found documents: 3
-SearchQuery('cthulhu') found documents: 
-SearchQuery('') found documents: 
-")]
 		public static void Main()
 		{
 			Document[] documents =
@@ -80,7 +67,6 @@ SearchQuery('') found documents:
 			SearchQuery("", index);
 		}
 
-		[HideOnSlide]
 		private static void SearchQuery(string word, ILookup<string, int> index)
 		{
 
