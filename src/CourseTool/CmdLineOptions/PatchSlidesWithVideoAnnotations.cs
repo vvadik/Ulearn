@@ -28,6 +28,11 @@ namespace uLearn.CourseTool.CmdLineOptions
 			}
 		}
 
+		private static string GetGoogleDocLink(string docId)
+		{
+			return $"https://docs.google.com/document/d/{docId}/edit";
+		}
+
 		static IEnumerable<(Guid slideId, XElement annotation)> ParseAnnotations(string[] lines)
 		{
 			var i = 0;
@@ -110,7 +115,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 		public override void DoExecute()
 		{
 			var course = new CourseLoader().LoadCourse(new DirectoryInfo(Path.Combine(Dir, Config.ULearnCourseId)));
-			Console.WriteLine($"{course.Slides.Count} slides loaded from {Config.ULearnCourseId}");
+			Console.WriteLine($"{course.Slides.Count} slides have been loaded from {Config.ULearnCourseId}");
 			var googleDocFileId = course.Settings.VideoAnnotationsGoogleDoc ?? throw new Exception("no video-annotations-google-doc element in course.xml");
 			var annotations = ParseAnnotations(GetAnnotations(googleDocFileId)).ToList();
 			Console.WriteLine($"{annotations.Count} annotations loaded from google doc {googleDocFileId}");
@@ -120,7 +125,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 			{
 				var slide = course.GetSlideById(annotation.slideId);
 				var xSlide = XDocument.Load(slide.Info.SlideFile.FullName);
-				PatchSlide(xSlide, slide, annotation.annotation);
+				PatchSlide(xSlide, slide, annotation.annotation, GetGoogleDocLink(course.Settings.VideoAnnotationsGoogleDoc));
 				var oldText = File.ReadAllText(slide.Info.SlideFile.FullName);
 				xSlide.Save(slide.Info.SlideFile.FullName);
 				var newText = File.ReadAllText(slide.Info.SlideFile.FullName);
@@ -134,12 +139,19 @@ namespace uLearn.CourseTool.CmdLineOptions
 			Console.WriteLine($"Changed {changedFiles} files of {unchangedFiles} processed");
 		}
 
-		private static void PatchSlide(XDocument xSlide, Slide slide, XElement annotation)
+		private static void PatchSlide(XDocument xSlide, Slide slide, XElement annotation, string googleDocLink)
 		{
 			var slideRoot = xSlide.Root ?? throw new Exception("no root?!");
 			foreach (var annotationElement in slideRoot.Elements(ns + "annotation").ToList())
+			{
+				var nextNode = annotationElement.NextNode;
+				if (nextNode is XElement element && element.FirstNode is XText text && text.Value.Contains("Ошибка в расшифровке"))
+					nextNode.Remove();
 				annotationElement.Remove();
+			}
+
 			var videoElement = slideRoot.Element(ns + "youtube") ?? throw new Exception($"no youtube block on slide {slide.Info.SlideFile}");
+			videoElement.AddAfterSelf(new XElement(ns + "md", new XText($"_Ошибка в расшифровке видео? [Предложите исправление!]({googleDocLink})_")));
 			videoElement.AddAfterSelf(annotation);
 		}
 	}
