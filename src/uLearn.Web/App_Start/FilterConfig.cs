@@ -13,9 +13,10 @@ using System.Web.Routing;
 using Database.DataContexts;
 using LtiLibrary.Core.Extensions;
 using Microsoft.AspNet.Identity;
-using uLearn.Configuration;
 using uLearn.Web.Kontur.Passport;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Configuration;
 using Web.Api.Configuration;
 
 namespace uLearn.Web

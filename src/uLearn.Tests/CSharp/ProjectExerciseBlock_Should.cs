@@ -10,10 +10,15 @@ using NUnit.Framework;
 using RunCsJob;
 using RunCsJob.Api;
 using test;
-using uLearn.Helpers;
-using uLearn.Model;
-using uLearn.Model.Blocks;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Exercises.Blocks;
+using Ulearn.Core.Courses.Units;
+using Ulearn.Core.Helpers;
 using SearchOption = System.IO.SearchOption;
 
 namespace uLearn.CSharp
@@ -21,7 +26,7 @@ namespace uLearn.CSharp
 	[TestFixture]
 	public class ProjectExerciseBlock_Should
 	{		
-		private ProjectExerciseBlock ex;
+		private CsProjectExerciseBlock ex;
 		private List<SlideBlock> exBlocks;
 
 		private readonly string tempSlideFolderPath = Path.Combine(TestContext.CurrentContext.TestDirectory, nameof(ProjectExerciseBlock_Should));
@@ -51,7 +56,7 @@ namespace uLearn.CSharp
 
 			Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
 
-			ex = new ProjectExerciseBlock
+			ex = new CsProjectExerciseBlock
 			{
 				StartupObject = "test.Program",
 				UserCodeFilePath = TestsHelper.UserCodeFileName,
@@ -61,13 +66,13 @@ namespace uLearn.CSharp
 			};
 
 			var unit = new Unit(null, ex.SlideFolderPath);
-			var ctx = new BuildUpContext(unit, CourseSettings.DefaultSettings, null, "Test", string.Empty);
+			var ctx = new SlideLoadingContext("Test", unit, CourseSettings.DefaultSettings, null);
 			exBlocks = ex.BuildUp(ctx, ImmutableHashSet<string>.Empty).ToList();
 			
 			var builder = new ExerciseStudentZipBuilder();
-			builder.BuildStudentZip(new ExerciseSlide(exBlocks, new SlideInfo(unit, null, 1), "", Guid.NewGuid(), meta: null), studentExerciseZipFilePath);
+			builder.BuildStudentZip(new ExerciseSlide(exBlocks.ToArray()), studentExerciseZipFilePath);
 			
-			Utils.UnpackZip(studentExerciseZipFilePath.Content(), studentExerciseFolderPath);
+			Utils.UnpackZip(studentExerciseZipFilePath.ReadAllContent(), studentExerciseFolderPath);
 
 			var zipBytes = ex.GetZipBytesForChecker("i_am_user_code");
 			Utils.UnpackZip(zipBytes, checkerExerciseFolderPath);
@@ -149,7 +154,7 @@ namespace uLearn.CSharp
 				Input = "",
 				NeedRun = true,
 				ProjectFileName = "test.csproj",
-				ZipFileData = studentExerciseZipFilePath.Content()
+				ZipFileData = studentExerciseZipFilePath.ReadAllContent()
 			};
 			var result = SandboxRunner.Run(submission);
 

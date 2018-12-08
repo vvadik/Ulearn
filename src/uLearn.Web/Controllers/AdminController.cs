@@ -15,15 +15,20 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using Microsoft.VisualBasic.FileIO;
-using uLearn.CSharp;
-using uLearn.Extensions;
-using uLearn.Model.Blocks;
-using uLearn.Quizes;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Quizzes;
+using Ulearn.Core.Courses.Units;
+using Ulearn.Core.CSharp;
+using Ulearn.Core.Extensions;
 
 namespace uLearn.Web.Controllers
 {
@@ -38,7 +43,6 @@ namespace uLearn.Web.Controllers
 		private readonly UserRolesRepo userRolesRepo;
 		private readonly CommentsRepo commentsRepo;
 		private readonly UserManager<ApplicationUser> userManager;
-		private readonly QuizzesRepo quizzesRepo;
 		private readonly CoursesRepo coursesRepo;
 		private readonly GroupsRepo groupsRepo;
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
@@ -58,7 +62,6 @@ namespace uLearn.Web.Controllers
 			userRolesRepo = new UserRolesRepo(db);
 			commentsRepo = new CommentsRepo(db);
 			userManager = new ULearnUserManager(db);
-			quizzesRepo = new QuizzesRepo(db);
 			coursesRepo = new CoursesRepo(db);
 			groupsRepo = new GroupsRepo(db, courseManager);
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
@@ -152,12 +155,6 @@ namespace uLearn.Web.Controllers
 		{
 			var packageName = courseManager.GetPackageName(courseId);
 			return File(courseManager.GetCourseVersionFile(versionId).FullName, "application/zip", packageName);
-		}
-
-		private void CreateQuizVersionsForSlides(string courseId, IEnumerable<Slide> slides)
-		{
-			foreach (var slide in slides.OfType<QuizSlide>())
-				quizzesRepo.AddQuizVersionIfNeeded(courseId, slide);
 		}
 
 		private async Task NotifyAboutCourseVersion(string courseId, Guid versionId, string userId)
@@ -313,7 +310,7 @@ namespace uLearn.Web.Controllers
 			filterOptions.OnlyChecked = null;
 			var allCheckingsSlidesIds = slideCheckingsRepo.GetManualCheckingQueue<T>(filterOptions).Select(c => c.SlideId).Distinct();
 
-			var emptySlideMock = new Slide(Enumerable.Empty<SlideBlock>(), new SlideInfo(null, null, -1), "", Guid.Empty, meta: null);
+			var emptySlideMock = new Slide { Info = new SlideInfo(null, null, -1), Title = "", Id = Guid.Empty};
 			var allCheckingsSlidesTitles = allCheckingsSlidesIds
 				.Select(s => new KeyValuePair<Guid, Slide>(s, course.FindSlideById(s)))
 				.Where(kvp => kvp.Value != null)
@@ -333,7 +330,7 @@ namespace uLearn.Web.Controllers
 			return View(viewName, new ManualCheckingQueueViewModel
 			{
 				CourseId = courseId,
-                /* TODO (andgein): Merge FindSlideById and GetSlideById */
+                /* TODO (andgein): Merge FindSlideById() and following GetSlideById() calls */
 				Checkings = checkings.Take(MaxShownQueueSize).Where(c => course.FindSlideById(c.SlideId) != null).Select(c =>
 				{
 					var slide = course.GetSlideById(c.SlideId);
@@ -342,7 +339,7 @@ namespace uLearn.Web.Controllers
 						CheckingQueueItem = c,
 						ContextSlideId = slide.Id,
 						ContextSlideTitle = slide.Title,
-						ContextMaxScore = (slide as ExerciseSlide)?.Exercise.MaxReviewScore ?? slide.MaxScore,
+						ContextMaxScore = (slide as ExerciseSlide)?.Scoring.CodeReviewScore ?? slide.MaxScore,
 						ContextTimestamp = c.Timestamp,
 						ContextReviews = reviews.GetOrDefault(c.Id, new List<ExerciseCodeReview>()),
 						ContextExerciseSolution = c is ManualExerciseChecking ?
@@ -644,8 +641,6 @@ namespace uLearn.Web.Controllers
 				extractedVersionDirectory,
 				extractedCourseDirectory);
 
-			log.Info($"Создаю версии тестов для курса {courseId}");
-			CreateQuizVersionsForSlides(courseId, version.Slides);
 			log.Info($"Помечаю версию {versionId} как опубликованную версию курса {courseId}");
 			await coursesRepo.MarkCourseVersionAsPublished(versionId);
 			await NotifyAboutPublishedCourseVersion(courseId, versionId, User.Identity.GetUserId());

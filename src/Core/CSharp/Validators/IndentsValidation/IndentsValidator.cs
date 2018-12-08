@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using uLearn.CSharp.Validators.IndentsValidation.Reporters;
+using Ulearn.Core.CSharp.Validators.IndentsValidation.Reporters;
 
-namespace uLearn.CSharp.Validators.IndentsValidation
+namespace Ulearn.Core.CSharp.Validators.IndentsValidation
 {
 	public class IndentsValidator : BaseStyleValidator
 	{

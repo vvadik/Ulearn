@@ -12,6 +12,7 @@ using Database.Models;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
+using Ulearn.Core;
 
 namespace uLearn.Web.Controllers
 {

@@ -1,3 +1,5 @@
+using Ulearn.Core.Courses;
+
 namespace uLearn.Web.Models
 {
 	public class IntructorNoteModel

@@ -13,14 +13,18 @@ using Database.Models;
 using Elmah;
 using JetBrains.Annotations;
 using Microsoft.AspNet.Identity;
-using uLearn.Helpers;
-using uLearn.Model.Blocks;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.LTI;
 using uLearn.Web.Models;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Exercises.Blocks;
+using Ulearn.Core.Helpers;
 
 namespace uLearn.Web.Controllers
 {
@@ -248,7 +252,7 @@ namespace uLearn.Web.Controllers
 					return Redirect(errorUrl + "Неверное количество баллов");
 
 				/* Invalid form: score isn't from range 0..MAX_SCORE */
-				if (score < 0 || score > exercise.MaxReviewScore)
+				if (score < 0 || score > slide.Scoring.CodeReviewScore)
 					return Redirect(errorUrl + $"Неверное количество баллов: {score}");
 
 				checking.ProhibitFurtherManualCheckings = false;
@@ -328,7 +332,7 @@ namespace uLearn.Web.Controllers
 			await slideCheckingsRepo.LockManualChecking(checking, User.Identity.GetUserId());
 			await slideCheckingsRepo.MarkManualCheckingAsChecked(checking, exerciseScore);
 			/* 100%-mark sets ProhibitFurtherChecking to true */
-			if (exerciseScore == slide.Exercise.MaxReviewScore)
+			if (exerciseScore == slide.Scoring.CodeReviewScore)
 				await slideCheckingsRepo.ProhibitFurtherExerciseManualChecking(checking);
 			
 			await visitsRepo.UpdateScoreForVisit(courseId, slideId, userId);
@@ -561,10 +565,10 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 
 			var exerciseSlide = slide as ExerciseSlide;
-			if (!(exerciseSlide.Exercise is ProjectExerciseBlock))
+			if (!(exerciseSlide.Exercise is CsProjectExerciseBlock))
 				return HttpNotFound();
 
-			var block = (ProjectExerciseBlock) exerciseSlide.Exercise;
+			var block = (CsProjectExerciseBlock) exerciseSlide.Exercise;
 			var zipFile = exerciseStudentZipsCache.GenerateOrFindZip(courseId, exerciseSlide);
 			
 			return File(zipFile.FullName, "application/zip", block.CsprojFile.Name + ".zip");
@@ -658,7 +662,7 @@ namespace uLearn.Web.Controllers
 
 		public string CourseId;
 		public ExerciseSlide Slide;
-		public ExerciseBlock Block => Slide.Exercise;
+		public AbstractExerciseBlock Block => Slide.Exercise;
 
 		public bool IsLti = false;
 		public bool IsCodeEditableAndSendable = true;

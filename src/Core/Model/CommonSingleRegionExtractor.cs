@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using uLearn.Model.Blocks;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Slides.Blocks;
 
-namespace uLearn.Model
+namespace Ulearn.Core.Model
 {
 	public class CommonSingleRegionExtractor : ISingleRegionExtractor
 	{

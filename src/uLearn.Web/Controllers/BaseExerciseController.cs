@@ -8,10 +8,13 @@ using Database.DataContexts;
 using Database.Models;
 using log4net;
 using Metrics;
-using uLearn.CSharp;
-using uLearn.Telegram;
 using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.CSharp;
+using Ulearn.Core.Telegram;
 
 namespace uLearn.Web.Controllers
 {
@@ -86,14 +89,14 @@ namespace uLearn.Web.Controllers
 
 			var compilationErrorMessage = buildResult.HasErrors ? buildResult.ErrorMessage : null;
 			var dontRunSubmission = buildResult.HasErrors;
-			var submissionLanguage = SubmissionLanguageHelpers.ByLangId(exerciseSlide.Exercise.LangId);
+			var submissionLanguage = exerciseSlide.Exercise.Language.Value;
 			var submission = await userSolutionsRepo.AddUserExerciseSubmission(
 				courseId, exerciseSlide.Id,
 				userCode, compilationErrorMessage, null,
 				userId, "uLearn", GenerateSubmissionName(exerciseSlide, userName),
 				submissionLanguage,
 				dontRunSubmission ? AutomaticExerciseCheckingStatus.Done : AutomaticExerciseCheckingStatus.Waiting
-			);
+			).ConfigureAwait(false);
 
 			if (buildResult.HasErrors)
 				return new RunSolutionResult { IsCompileError = true, ErrorMessage = buildResult.ErrorMessage, SubmissionId = submission.Id, ExecutionServiceName = "uLearn" };
@@ -127,7 +130,7 @@ namespace uLearn.Web.Controllers
 
 			var automaticChecking = submission.AutomaticChecking;
 			var isProhibitedUserToSendForReview = slideCheckingsRepo.IsProhibitedToSendExerciseToManualChecking(courseId, exerciseSlide.Id, userId);
-			var sendToReview = exerciseBlock.RequireReview &&
+			var sendToReview = exerciseSlide.Scoring.RequireReview &&
 								submission.AutomaticCheckingIsRightAnswer &&
 								!isProhibitedUserToSendForReview &&
 								groupsRepo.IsManualCheckingEnabledForUser(course, userId);

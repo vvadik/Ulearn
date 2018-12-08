@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using uLearn.CSharp;
+using Ulearn.Core.CSharp;
 
 namespace Database.Models
 {

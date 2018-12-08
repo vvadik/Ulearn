@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Database.Repos;
-using uLearn;
+using Ulearn.Core.Courses;
 
 namespace Database
 {

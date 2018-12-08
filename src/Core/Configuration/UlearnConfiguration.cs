@@ -2,7 +2,7 @@
 using System.IO;
 using Microsoft.Extensions.Configuration;
 
-namespace uLearn.Configuration
+namespace Ulearn.Core.Configuration
 {
 	public static class ApplicationConfiguration
 	{

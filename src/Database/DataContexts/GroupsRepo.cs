@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Database.Extensions;
@@ -10,12 +9,14 @@ using Database.Models;
 using JetBrains.Annotations;
 using log4net;
 using Microsoft.AspNet.Identity;
-using NUnit.Framework.Constraints;
-using uLearn;
-using uLearn.Extensions;
-using uLearn.Quizes;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Quizzes;
+using Ulearn.Core.Extensions;
 
 namespace Database.DataContexts
 {
@@ -258,7 +259,7 @@ namespace Database.DataContexts
 
 					var slideId = lastSubmission.SlideId;
 					var slide = course.FindSlideById(slideId) as ExerciseSlide;
-					if (slide == null || !slide.Exercise.RequireReview)
+					if (slide == null || !slide.Scoring.RequireReview)
 						continue;
 
 					log.Info($"Создаю ручную проверку для решения {lastSubmission.Id}, слайд {slideId}");

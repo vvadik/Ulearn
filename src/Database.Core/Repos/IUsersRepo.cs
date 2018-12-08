@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Database.Models;
 using JetBrains.Annotations;
-using Microsoft.AspNetCore.Identity;
 
 namespace Database.Repos
 {

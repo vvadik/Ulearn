@@ -1,13 +1,15 @@
 ﻿@* Generator: MvcHelper GeneratePrettyNames: true DisableLinePragmas: true *@
 @using Database.Models
 @using Microsoft.AspNet.Identity
-@using uLearn
-@using uLearn.Extensions
-@using uLearn.Quizes
 @using uLearn.Web.Extensions
 @using uLearn.Web.Views.Shared
 @using Ulearn.Common
 @using Ulearn.Common.Extensions
+@using Ulearn.Core.Courses
+@using Ulearn.Core.Courses.Slides
+@using Ulearn.Core.Courses.Slides.Exercises
+@using Ulearn.Core.Courses.Slides.Quizzes
+@using Ulearn.Core.Extensions
 
 @functions
 {
@@ -129,7 +131,7 @@
 		<div class="media-body">
 			<div class="notifications__notification__header">@UserName(notification.InitiatedBy) @(notification.IsRecheck ? "пере" : "")проверил@(notification.InitiatedBy.Gender.ChooseEnding()) ваше решение<br/>по&nbsp;«@slide.Title.MakeNestedQuotes()»
 			</div>
-			<div class="notifications__notification__score">Вы получили @notification.Checking.Score из @slide.Exercise.MaxReviewScore.PluralizeInRussian(RussianPluralizationOptions.Score)</div>
+			<div class="notifications__notification__score">Вы получили @notification.Checking.Score из @slide.Scoring.CodeReviewScore.PluralizeInRussian(RussianPluralizationOptions.Score)</div>
 			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
 		</div>
 	</div>

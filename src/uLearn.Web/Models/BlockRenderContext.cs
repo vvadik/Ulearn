@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Database.Models;
-using uLearn.Model.Blocks;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Blocks;
 
 namespace uLearn.Web.Models
 {

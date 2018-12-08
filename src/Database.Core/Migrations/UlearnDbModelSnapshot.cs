@@ -427,6 +427,27 @@ namespace Database.Migrations
                     b.ToTable("CourseAccesses");
                 });
 
+            modelBuilder.Entity("Database.Models.CourseRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CourseId")
+                        .IsRequired();
+
+                    b.Property<int>("Role");
+
+                    b.Property<string>("UserId")
+                        .HasMaxLength(64);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserRoles");
+                });
+
             modelBuilder.Entity("Database.Models.CourseVersion", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1063,32 +1084,6 @@ namespace Database.Migrations
                     b.ToTable("NotificationTransportSettings");
                 });
 
-            modelBuilder.Entity("Database.Models.QuizVersion", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("CourseId")
-                        .IsRequired()
-                        .HasMaxLength(64);
-
-                    b.Property<DateTime>("LoadingTime");
-
-                    b.Property<string>("NormalizedXml")
-                        .IsRequired();
-
-                    b.Property<Guid>("SlideId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SlideId");
-
-                    b.HasIndex("SlideId", "LoadingTime");
-
-                    b.ToTable("QuizVersions");
-                });
-
             modelBuilder.Entity("Database.Models.RestoreRequest", b =>
                 {
                     b.Property<string>("Id")
@@ -1446,8 +1441,6 @@ namespace Database.Migrations
                     b.Property<string>("QuizId")
                         .HasMaxLength(64);
 
-                    b.Property<int?>("QuizVersionId");
-
                     b.Property<Guid>("SlideId");
 
                     b.Property<string>("Text")
@@ -1465,8 +1458,6 @@ namespace Database.Migrations
 
                     b.HasIndex("ItemId");
 
-                    b.HasIndex("QuizVersionId");
-
                     b.HasIndex("UserId");
 
                     b.HasIndex("SlideId", "Timestamp");
@@ -1476,27 +1467,6 @@ namespace Database.Migrations
                     b.HasIndex("CourseId", "UserId", "SlideId", "isDropped", "QuizId", "ItemId");
 
                     b.ToTable("UserQuizs");
-                });
-
-            modelBuilder.Entity("Database.Models.UserRole", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("CourseId")
-                        .IsRequired();
-
-                    b.Property<int>("Role");
-
-                    b.Property<string>("UserId")
-                        .HasMaxLength(64);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserRoles");
                 });
 
             modelBuilder.Entity("Database.Models.Visit", b =>
@@ -2164,6 +2134,14 @@ namespace Database.Migrations
                         .HasForeignKey("UserId");
                 });
 
+            modelBuilder.Entity("Database.Models.CourseRole", b =>
+                {
+                    b.HasOne("Database.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("Database.Models.CourseVersion", b =>
                 {
                     b.HasOne("Database.Models.ApplicationUser", "Author")
@@ -2455,18 +2433,6 @@ namespace Database.Migrations
                 });
 
             modelBuilder.Entity("Database.Models.UserQuiz", b =>
-                {
-                    b.HasOne("Database.Models.QuizVersion", "QuizVersion")
-                        .WithMany()
-                        .HasForeignKey("QuizVersionId");
-
-                    b.HasOne("Database.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("Database.Models.UserRole", b =>
                 {
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()

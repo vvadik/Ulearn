@@ -1,4 +1,4 @@
-namespace uLearn.CSharp.Validators.IndentsValidation
+namespace Ulearn.Core.CSharp.Validators.IndentsValidation
 {
 	internal enum IndentType
 	{

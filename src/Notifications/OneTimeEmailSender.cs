@@ -1,14 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
-using System.Web.UI.WebControls;
 using System.Xml.Serialization;
-using Database.Models;
 using log4net;
-using NUnit.Framework.Constraints;
-using uLearn.Extensions;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Extensions;
 
 namespace Notifications
 {
@@ -17,7 +13,7 @@ namespace Notifications
 		private const string configFilename = "sender.xml";
 
 		private static readonly ILog log = LogManager.GetLogger(typeof(OneTimeEmailSender));
-		private KonturSpamEmailSender emailSender;		
+		private readonly KonturSpamEmailSender emailSender;		
 
 		public OneTimeEmailSender()
 		{

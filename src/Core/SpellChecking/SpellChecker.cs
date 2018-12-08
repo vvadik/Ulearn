@@ -4,10 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using NHunspell;
-using uLearn.Properties;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Properties;
 
-namespace uLearn.SpellChecking
+namespace Ulearn.Core.SpellChecking
 {
 	public class SpellingError
 	{

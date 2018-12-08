@@ -2,8 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Serilog;
-using uLearn;
-using uLearn.Quizes;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Quizzes;
 
 namespace Database.Repos.Groups
 {
@@ -53,7 +54,7 @@ namespace Database.Repos.Groups
 
 					var slideId = lastSubmission.SlideId;
 					var slide = course.FindSlideById(slideId) as ExerciseSlide;
-					if (slide == null || !slide.Exercise.RequireReview)
+					if (slide == null || !slide.Scoring.RequireReview)
 						continue;
 
 					logger.Information($"Создаю ручную проверку для решения {lastSubmission.Id}, слайд {slideId}");

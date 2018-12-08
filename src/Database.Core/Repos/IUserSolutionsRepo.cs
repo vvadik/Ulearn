@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Database.Models;
 using RunCsJob.Api;
 using uLearn;
+using Ulearn.Core;
 
 namespace Database.Repos
 {
@@ -41,7 +42,7 @@ namespace Database.Repos
 		HashSet<Guid> GetIdOfPassedSlides(string courseId, string userId);
 		IQueryable<UserExerciseSubmission> GetAllSubmissions(int max, int skip);
 		UserExerciseSubmission FindNoTrackingSubmission(int id);
-		Task<UserExerciseSubmission> GetUnhandledSubmission(string agentName, SubmissionLanguage language);
+		Task<UserExerciseSubmission> GetUnhandledSubmission(string agentName, Language language);
 		UserExerciseSubmission FindSubmissionById(int id);
 		UserExerciseSubmission FindSubmissionById(string id);
 		List<UserExerciseSubmission> FindSubmissionsByIds(List<string> checkingsIds);

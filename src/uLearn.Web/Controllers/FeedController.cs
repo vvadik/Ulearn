@@ -5,14 +5,13 @@ using System.Net;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using System.Xml;
 using Database;
 using Database.DataContexts;
-using Database.Migrations;
 using Database.Models;
 using log4net;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.FilterAttributes;
+using Ulearn.Core;
 
 namespace uLearn.Web.Controllers
 {

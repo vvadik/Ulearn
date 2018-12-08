@@ -4,6 +4,7 @@
 @using uLearn.Web.Extensions
 @using uLearn.Web.Views.Course
 @using Ulearn.Common.Extensions
+@using Ulearn.Core
 
 @model ExerciseBlockData
 
@@ -85,7 +86,7 @@
 			else if (Model.SubmissionSelectedByUser.AutomaticCheckingIsRightAnswer)
 			{
 				status = string.IsNullOrEmpty(texts.AllTestsPassed) ? "Все тесты пройдены" : texts.AllTestsPassed;
-				if (!Model.Slide.Exercise.RequireReview)
+				if (!Model.Slide.Scoring.RequireReview)
 				{
 					status = string.IsNullOrEmpty(texts.AllTestsPassedWithoutReview)
 						? "Все тесты пройдены, задача сдана"
@@ -160,7 +161,8 @@
 			</div>
 		}
 		<textarea id="secretCodeExercise" class="hide">@Model.Block.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
-		<textarea class="code @classString hidden" data-lang="@Model.Block.LangId">@(Model.Solution ?? Model.Block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
+	
+		<textarea class="code @classString hidden" data-lang="@Model.Block.Language.GetName()">@(Model.Solution ?? Model.Block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
 		<div class="loading-spinner">
 			<img src="/Content/loading.gif"/>
 		</div>

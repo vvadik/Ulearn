@@ -8,8 +8,8 @@ using Database.Models;
 using EntityFramework.Functions;
 using JetBrains.Annotations;
 using Microsoft.AspNet.Identity;
-using uLearn;
 using Ulearn.Common;
+using Ulearn.Core;
 
 namespace Database.DataContexts
 {

@@ -6,21 +6,24 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using CommandLine;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
 
 namespace uLearn.CourseTool.CmdLineOptions
 {
-	[Verb("patch-annotations", HelpText = "Patch slides video-annotations, replacing them with data from doogle-doc")]
+	[Verb("patch-annotations", HelpText = "Patch slides video-annotations, replacing them with data from google-doc")]
 	class PatchSlidesWithVideoAnnotations : AbstractOptions
 	{
-		private static readonly XNamespace ns = "https://ulearn.azurewebsites.net/lesson";
-
+		private static readonly XNamespace ns = "https://ulearn.me/schema/v2";
+		
+		/* Key is intentionally hardcoded. Permissions restricted. */
+		private const string youtubeKey = "AIzaSyD2OrsI15dHkISxexd-bMQCkxRCJV8mu_c";
 
 		static string[] GetAnnotations(string fileId)
 		{
 			using (var client = new HttpClient())
 			{
-				// Key is intentionally hardcoded. Permissions restricted.
-				var url = $@"https://www.googleapis.com/drive/v3/files/{fileId}/export?mimeType=text/plain&key=AIzaSyD2OrsI15dHkISxexd-bMQCkxRCJV8mu_c";
+				var url = $@"https://www.googleapis.com/drive/v3/files/{fileId}/export?mimeType=text/plain&key={youtubeKey}";
 				return client
 					.GetStringAsync(url)
 					.Result
@@ -114,11 +117,13 @@ namespace uLearn.CourseTool.CmdLineOptions
 
 		public override void DoExecute()
 		{
-			var course = new CourseLoader().LoadCourse(new DirectoryInfo(Path.Combine(Dir, Config.ULearnCourseId)));
-			Console.WriteLine($"{course.Slides.Count} slides have been loaded from {Config.ULearnCourseId}");
-			var googleDocFileId = course.Settings.VideoAnnotationsGoogleDoc ?? throw new Exception("no video-annotations-google-doc element in course.xml");
+			var course = new CourseLoader().Load(new DirectoryInfo(Path.Combine(Dir, Config.ULearnCourseId)));
+			Console.WriteLine($"{course.Slides.Count} slide(s) have been loaded from {Config.ULearnCourseId}");
+			
+			var googleDocFileId = course.Settings.VideoAnnotationsGoogleDoc ?? throw new Exception("There is no <videoAnnotationsGoogleDoc> element in course.xml");
 			var annotations = ParseAnnotations(GetAnnotations(googleDocFileId)).ToList();
-			Console.WriteLine($"{annotations.Count} annotations loaded from google doc {googleDocFileId}");
+			Console.WriteLine($"{annotations.Count} annotation(s) loaded from google doc {googleDocFileId}");
+			
 			var changedFiles = 0;
 			var unchangedFiles = 0;
 			foreach (var annotation in annotations)
@@ -141,7 +146,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 
 		private static void PatchSlide(XDocument xSlide, Slide slide, XElement annotation, string googleDocLink)
 		{
-			var slideRoot = xSlide.Root ?? throw new Exception("no root?!");
+			var slideRoot = xSlide.Root ?? throw new Exception("No root?!");
 			foreach (var annotationElement in slideRoot.Elements(ns + "annotation").ToList())
 			{
 				var nextNode = annotationElement.NextNode;
@@ -150,8 +155,8 @@ namespace uLearn.CourseTool.CmdLineOptions
 				annotationElement.Remove();
 			}
 
-			var videoElement = slideRoot.Element(ns + "youtube") ?? throw new Exception($"no youtube block on slide {slide.Info.SlideFile}");
-			videoElement.AddAfterSelf(new XElement(ns + "md", new XText($"_Ошибка в расшифровке видео? [Предложите исправление!]({googleDocLink})_")));
+			var videoElement = slideRoot.Element(ns + "youtube") ?? throw new Exception($"There is no <youtube> block on slide {slide.Info.SlideFile.FullName}");
+			videoElement.AddAfterSelf(new XElement(ns + "markdown", new XText($"_Ошибка в расшифровке видео? [Предложите исправление!]({googleDocLink})_")));
 			videoElement.AddAfterSelf(annotation);
 		}
 	}

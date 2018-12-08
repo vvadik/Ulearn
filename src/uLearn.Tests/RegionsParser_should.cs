@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
 
 namespace uLearn
 {

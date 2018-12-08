@@ -98,13 +98,15 @@ function initCodeEditor($parent) {
 
         if (!langId)
             return { mode: "text/plain", hint: null };
-
+       
         switch (langId) {
             case "cs":
-            case "сsharp":
+            case "csharp":
                 return { mode: "text/x-csharp", hint: CodeMirror.hint.csharp };
             case "py":
             case "python":
+			case "python2":
+			case "python3":
                 return { mode: "text/x-python", hint: CodeMirror.hint.python };
             case "js":
             case "javascript":

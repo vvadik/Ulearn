@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Web;
 using Microsoft.Owin;
-using uLearn.Extensions;
+using Ulearn.Core.Extensions;
 
 namespace uLearn.Web.Extensions
 {

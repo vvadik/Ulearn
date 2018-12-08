@@ -2,7 +2,8 @@
 using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
-using uLearn.CSharp.Validators;
+using Ulearn.Core.CSharp;
+using Ulearn.Core.CSharp.Validators;
 
 namespace uLearn.CSharp
 {

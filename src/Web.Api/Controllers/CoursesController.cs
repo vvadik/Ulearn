@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using Database;
 using Database.Models;
@@ -8,7 +7,7 @@ using Database.Repos;
 using Database.Repos.CourseRoles;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
-using uLearn;
+using Ulearn.Core.Courses;
 using Ulearn.Web.Api.Models.Common;
 using Ulearn.Web.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Responses.Courses;

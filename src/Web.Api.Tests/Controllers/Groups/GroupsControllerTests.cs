@@ -3,7 +3,7 @@ using Database.Repos.Groups;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
-using uLearn;
+using Ulearn.Core.Courses;
 using Ulearn.Web.Api.Controllers.Groups;
 using Ulearn.Web.Api.Models.Parameters.Groups;
 

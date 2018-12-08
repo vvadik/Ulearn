@@ -8,7 +8,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Configuration;
 using System.Web.Http;
-using System.Web.Mvc;
 using AntiPlagiarism.Api;
 using AntiPlagiarism.Api.Models.Parameters;
 using Database;
@@ -16,16 +15,16 @@ using Database.DataContexts;
 using Database.Models;
 using log4net;
 using LtiLibrary.Core.Extensions;
-using Microsoft.CodeAnalysis.VisualBasic.Syntax;
-using Newtonsoft.Json;
 using RunCsJob.Api;
 using Serilog;
-using Serilog.Events;
 using Telegram.Bot.Types.Enums;
-using uLearn.Telegram;
 using uLearn.Web.AntiPlagiarismUsage;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Telegram;
 using XQueue;
 using XQueue.Models;
 
@@ -64,7 +63,7 @@ namespace uLearn.Web.Controllers
 		{
 			CheckRunner(token);			
 			
-			if (!Enum.TryParse<SubmissionLanguage>(language, out var submissionLanguage))
+			if (!LanguageHelpers.TryParseByName(language, out var submissionLanguage))
 				throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
 			
 			var sw = Stopwatch.StartNew();
@@ -205,7 +204,7 @@ namespace uLearn.Web.Controllers
 				return false;
 			}
 
-			var score = (double)checking.Score / slide.Exercise.CorrectnessScore;
+			var score = (double)checking.Score / slide.Scoring.PassedTestsScore;
 			if (score > 1)
 				score = 1;
 

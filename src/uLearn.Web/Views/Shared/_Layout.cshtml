@@ -1,7 +1,4 @@
-﻿@using Database.Extensions
-@using uLearn
-@using uLearn.Extensions
-@using uLearn.Web.Controllers
+﻿@using uLearn.Web.Controllers
 <!DOCTYPE html>
 <html>
 <head>
@@ -18,7 +15,7 @@
 
 	if (ViewBag.Meta != null)
 	{
-		if (!string.IsNullOrEmpty(ViewBag.Meta.Image)) { metaImageUrl = ViewBag.Meta.Image; }
+		if (!string.IsNullOrEmpty(ViewBag.Meta.AbsoluteImageUrl)) { metaImageUrl = ViewBag.Meta.AbsoluteImageUrl; }
 		if (!string.IsNullOrEmpty(ViewBag.Meta.Description)) { metaDescription = ViewBag.Meta.Description; }
 		if (!string.IsNullOrEmpty(ViewBag.Meta.Keywords)) { metaKeywords = ViewBag.Meta.Keywords; }
 	}

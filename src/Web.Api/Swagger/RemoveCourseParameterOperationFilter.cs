@@ -1,7 +1,7 @@
 using System.Linq;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using uLearn;
+using Ulearn.Core.Courses;
 
 namespace Ulearn.Web.Api.Swagger
 {

@@ -8,10 +8,9 @@ using Database.Repos.CourseRoles;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using uLearn;
 using Ulearn.Common;
-using Z.EntityFramework.Plus;
+using Ulearn.Core;
 
 namespace Database.Repos
 {

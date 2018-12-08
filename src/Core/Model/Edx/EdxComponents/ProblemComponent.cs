@@ -3,7 +3,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using Ulearn.Common.Extensions;
 
-namespace uLearn.Model.Edx.EdxComponents
+namespace Ulearn.Core.Model.Edx.EdxComponents
 {
 	public class ProblemComponent : Component
 	{

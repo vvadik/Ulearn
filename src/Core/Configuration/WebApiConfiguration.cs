@@ -1,8 +1,9 @@
 ﻿using System.Runtime.Serialization;
-using uLearn.Configuration;
+using Ulearn.Core.Configuration;
 
 /* Move it to Web.Api.Configuration after disabling Ulearn.Web. Now it's here because Ulearn.Web should know about CookieKeyRingDirectory */
 
+// ReSharper disable once CheckNamespace
 namespace Web.Api.Configuration
 {
 	public class WebApiConfiguration : UlearnConfiguration
