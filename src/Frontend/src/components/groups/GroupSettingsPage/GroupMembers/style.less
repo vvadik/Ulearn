@@ -123,30 +123,27 @@
 	}
   }
 
-  .students-block-invite {
-	margin: 0 0 20px;
+  .students-invite-text {
+	  margin: 10px 0 5px 0;
+  }
 
-	p {
-	  margin: 10px 0;
+  .students-invite {
+	margin: 0 10px 5px 0;
+	display: inline-block;
+	vertical-align: super;
+  }
+
+  .invite-link {
+	display: inline-block;
+	margin: 5px 0 15px;
+	cursor: pointer;
+
+	&_on {
+	  color: #3f9726;
 	}
 
-	label {
-	  display: block;
-	  width: 100%;
-	}
-
-	.toggle-invite {
-	  margin: 10px 0;
-
-	  .toggle-label {
-		width: 350px;
-	  }
-
-	  label {
-		display: inline-block;
-		margin-right: 10px;
-		width: 34px;
-	  }
+	&_off {
+	  color: #aaa;
 	}
   }
 
@@ -155,7 +152,7 @@
 	justify-content: flex-start;
 	flex-direction: row;
 	align-items: center;
-	margin: 30px 10px 10px 0;
+	margin: 0 10px 10px 0;
 
 	label {
 	  width: auto;
@@ -184,7 +181,8 @@
   .student-block {
 	display: flex;
 	justify-content: flex-start;
-	flex-direction: row;
+	flex-direction: column;
+	width: fit-content;
   }
 
 

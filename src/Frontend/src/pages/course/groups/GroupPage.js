@@ -4,6 +4,7 @@ import {Helmet} from "react-helmet";
 import api from "../../../api/index";
 import Tabs from "@skbkontur/react-ui/components/Tabs/Tabs";
 import Button from "@skbkontur/react-ui/components/Button/Button";
+import Toast from "@skbkontur/react-ui/components/Toast/Toast";
 import GroupMembers from "../../../components/groups/GroupSettingsPage/GroupMembers/GroupMembers";
 import GroupSettings from "../../../components/groups/GroupSettingsPage/GroupSettings/GroupSettings";
 
@@ -101,7 +102,9 @@ class GroupPage extends Component {
 								courseId={courseId}
 								group={group}
 								onChangeGroupOwner={this.onChangeGroupOwner}
-								onChangeSettings={this.onChangeSettings}/> }
+								onChangeSettings={this.onChangeSettings}
+								onLoadingSettings={this.onLoadingSettings}/>
+						}
 					</div>
 				</div>
 			</div>
@@ -167,6 +170,8 @@ class GroupPage extends Component {
 
 	onLoadingSettings = (e) => {
 		const { group, updatedFields, scoresId } = this.state;
+
+		Toast.push('Настройки сохранены');
 
 		e.preventDefault();
 
