@@ -2,6 +2,7 @@
 @using RunCsJob.Api
 @using uLearn.Web.Extensions
 @using Ulearn.Common.Extensions
+@using Ulearn.Core
 
 @model SubmissionsListModel
 
@@ -32,7 +33,7 @@
 		<tr class="@SubmissionClass(automaticChecking != null ? automaticChecking.GetVerdict() : "") submitions-item" data-id="@submission.Id">
 			<td>@submission.Id</td>
             <td title="@submission.Timestamp">@submission.Timestamp.ToPrettyString(true)</td>
-            <td>@submission.Language.GetDisplayName()</td>
+            <td>@submission.Language.GetName()<td>
             @if (automaticChecking != null)
             {
 	            <td>@automaticChecking.Elapsed</td>
