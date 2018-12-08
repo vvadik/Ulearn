@@ -4,8 +4,6 @@ import moment from "moment";
 import 'moment/locale/ru';
 import "moment-timezone";
 import Checkbox from "@skbkontur/react-ui/components/Checkbox/Checkbox";
-import Kebab from "@skbkontur/react-ui/components/Kebab/Kebab";
-import MenuItem from "@skbkontur/react-ui/components/MenuItem/MenuItem";
 import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
 import Select from "@skbkontur/react-ui/components/Select/Select";
 import Icon from "@skbkontur/react-icons";
@@ -16,17 +14,21 @@ import styles from './style.less';
 import CopyGroupModal from "../../GroupMainPage/CopyGroupModal/CopyGroupModal";
 
 export default class GroupStudents extends Component {
+	constructor(props) {
+		super(props);
 
-	state = {
-		checked: false,
-		modalOpen: false,
-		course: '',
-		value: '',
-		studentsId: [],
-	};
+		this.state = {
+			studentsId: {},
+			checkedAll: false,
+			modalOpen: false,
+			course: '',
+			value: '',
+		};
+	}
 
 	render() {
 		const { students } = this.props;
+ 		// console.log(students);
 		const grantTime = (grantTime) => moment.tz(grantTime, 'Europe/Moscow').tz('Asia/Yekaterinburg').format();
 
 		return(
@@ -34,8 +36,8 @@ export default class GroupStudents extends Component {
 				<div>
 					<div className={styles["students-actions"]}>
 						<Checkbox
-							checked={this.state.checked}
-							onChange={(_, value) => this.setState({checked: value })}>
+							checked={this.state.checkedAll}
+							onChange={this.onCheckAllStudents}>
 							<span>Выбрать всех</span>
 						</Checkbox>
 						{this.renderStudentActions()}
@@ -45,21 +47,15 @@ export default class GroupStudents extends Component {
 						<div className={styles["student-block"]}
 							key={item.user.id}>
 							<Checkbox
-								checked={this.state.checked}
-								onChange={this.onCheckStudent}>
-								<Avatar user={item.user} size={styles["_small"]}/>
+								checked={this.state.studentsId[item.user.id] || false}
+								onChange={(_, value) => this.onCheckStudent(item.user.id, _, value)}>
+								<Avatar user={item.user} size={styles["_small"]} />
 								{ item.user.visible_name } {' '}
-								<span className={styles["students-action__text"]}>{ getWordForm('вступила', 'вступил', item.user.gender) }
-									{' '} { moment(grantTime(item.adding_time)).fromNow() }</span>
+								<span className={styles["students-action__text"]}>
+									{ getWordForm('вступила', 'вступил', item.user.gender) }
+									{' '} { moment(grantTime(item.adding_time)).fromNow() }
+								</span>
 							</Checkbox>
-							<Kebab size="large" >
-								<MenuItem onClick={() => this.props.onDeleteStudent(item.user.id)}>
-									<Gapped gap={5}>
-									<Icon name="Delete" />
-									Удалить
-									</Gapped>
-								</MenuItem>
-							</Kebab>
 						</div>
 					)}
 					</div>
@@ -70,9 +66,13 @@ export default class GroupStudents extends Component {
 	}
 
 	renderStudentActions() {
-		let buttonState = `${styles["students-action"]}`;
-		if (this.state.checked) {
+		const { studentsId } = this.state;
+		const studentsIdToArray = Object.keys(studentsId);
+ 		let buttonState = `${styles["students-action"]}`;
+		if (studentsIdToArray.length > 0) {
 			buttonState = `${styles["students-action"]} ${styles["_active"]}`
+		} else {
+			buttonState = `${styles["students-action"]}`
 		}
 
 		return (
@@ -89,7 +89,7 @@ export default class GroupStudents extends Component {
 			<button
 				className={buttonState}
 				disabled={!this.state.checked}
-				onClick={() => this.props.onDeleteStudents}
+				onClick={this.props.onDeleteStudents}
 				>
 				<Gapped gap={3}>
 					<Icon name="Trash" />
@@ -149,16 +149,55 @@ export default class GroupStudents extends Component {
 		})
 	};
 
-	onCheckStudent = (_, value, item) => {
-		const { studentsId, checked } = this.state;
+	onCheckAllStudents = (_, value) => {
+		const { students } = this.props;
+		const updatedStudentsId = students.map(item => ({[item.user.id]: value}))
+			.reduce(function(result, item) {
+			let key = Object.keys(item)[0];
+			result[key] = item[key];
+			return result;
+			}
+		);
+		console.log('studentsId', updatedStudentsId);
+
 		this.setState({
-			checked: value,
+			checkedAll: value,
+			studentsId: {
+				...updatedStudentsId,
+			},
 		});
-		if(checked) {
+	};
+
+	onCheckStudent = (id, _, value) => {
+		const { studentsId } = this.state;
+		const { students } = this.props;
+		const studentsIdToArray = Object.keys(studentsId);
+		const studentsToArrayOfIds = students.map(item => item.user.id);
+		studentsId[id] = value;
+
+		this.setState({
+			studentsId,
+			});
+
+		if ((value === false)) {
 			this.setState({
-				studentsId: [...studentsId, item.user.id],
+				studentsId,
 			});
 		}
+		console.log('checkOne', studentsId);
+
+		if ((studentsToArrayOfIds.length - 1 === studentsIdToArray.length) &&
+			studentsIdToArray.length > 0) {
+			this.setState({
+				checkedAll: true,
+			});
+		} else {
+			this.setState({
+				checkedAll: false,
+			})
+		}
+		// console.log('idFromObject:', studentsIdToArray);
+		// console.log('idFromArray', studentsToArrayOfIds);
 	};
 
 	getCourseOptions = () => {

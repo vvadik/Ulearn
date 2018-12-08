@@ -85,8 +85,9 @@ export function getStudents(groupId) {
 		.then(response => response.json());
 }
 
-export function deleteStudent(groupId, studentId) {
-	return api.delete("groups/" + groupId + "/students/" + studentId)
+export function deleteStudents(groupId, students) {
+	return api.delete("groups/" + groupId + "/students/",
+		createRequestParams({student_ids: students}))
 		.then(response => response.json());
 }
 
