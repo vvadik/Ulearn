@@ -6,10 +6,10 @@ namespace Ulearn.Core.Courses.Slides.Quizzes
 	public class QuizScoringSettings : ISlideScoringSettings
 	{
 		[XmlAttribute("tries")]
-		public int MaxTriesCount { get; set; }
-		
+		public int MaxTriesCount { get; set; } = 2;
+
 		[XmlAttribute("manualCheck")]
-		public bool ManualChecking { get; set; }
+		public bool ManualChecking { get; set; } = false;
 		
 		[XmlAttribute("group")]
 		public string ScoringGroup { get; set; }
