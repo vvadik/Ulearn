@@ -52,7 +52,7 @@ class CopyGroupModal extends Component {
 			}).catch(console.error);
 	};
 
-	loadCourseInstructors(courseId) {
+	loadCourseInstructors = (courseId) => {
 		api.users.getUsersCourse(courseId)
 			.then(json => {
 				let instructors = json.instructors;
@@ -67,8 +67,8 @@ class CopyGroupModal extends Component {
 		let currentCourseId = this.props.courseId;
 		const courseTitle = this.getCourseTitle(currentCourseId);
 		return (
-		<Modal onClose={onClose} width={640}>
-			<Modal.Header>Скопировать группу из курса</Modal.Header>
+			<Modal onClose={onClose} width={640}>
+				<Modal.Header>Скопировать группу из курса</Modal.Header>
 				<form onSubmit={this.onSubmit}>
 					<Modal.Body>
 						<p className={styles["modal-text"]}>Новая группа будет создана для курса <b>«{ courseTitle }»</b>.
@@ -96,7 +96,7 @@ class CopyGroupModal extends Component {
 	}
 
 	renderCourseSelect() {
-		const { course } = this.state;
+		const { courseId } = this.state;
 		return (
 			<label className={styles["select-course"]}>
 				<p className={styles["course-info"]}>
@@ -109,7 +109,7 @@ class CopyGroupModal extends Component {
 					onChange={this.onCourseChange}
 					width="200"
 					placeholder="Курс"
-					value={course}
+					value={courseId}
 					error={this.hasError()}
 					use="default"
 				/>

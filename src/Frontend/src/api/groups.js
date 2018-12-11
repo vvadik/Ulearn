@@ -87,7 +87,13 @@ export function getStudents(groupId) {
 
 export function deleteStudents(groupId, students) {
 	return api.delete("groups/" + groupId + "/students/",
-		createRequestParams({student_ids: students}))
+		createRequestParams({'student_ids': students}))
+		.then(response => response.json());
+}
+
+export function copyStudents(groupId, destinationGroupId, students) {
+	return api.post("groups/" + groupId + "/students/copy/to/" + destinationGroupId,
+		createRequestParams({'student_ids': students}))
 		.then(response => response.json());
 }
 
