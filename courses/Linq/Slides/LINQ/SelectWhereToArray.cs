@@ -37,7 +37,7 @@ namespace uLearn.Courses.Linq.Slides.LINQ
 
 		private readonly S010_Intro.Letter[] letters = new S010_Intro.Letter[0];
 
-		public IEnumerable<int> GetNewLettersIds()
+		public IEnumerable<int> GetNewLetterIds()
 		{
 			return letters
 				.Where(l => l.IsNew) // Оставили только новые письма
