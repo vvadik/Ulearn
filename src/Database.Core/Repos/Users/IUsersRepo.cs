@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Database.Models;
 using JetBrains.Annotations;
 
-namespace Database.Repos
+namespace Database.Repos.Users
 {
 	public interface IUsersRepo
 	{
@@ -25,5 +25,7 @@ namespace Database.Repos
 		Task<List<ApplicationUser>> GetUsersByIdsAsync(IEnumerable<string> usersIds);
 		Task DeleteUserAsync(ApplicationUser user);
 		bool IsSystemAdministrator(ApplicationUser user);
+		Task<List<string>> GetUserIdsWithLmsRoleAsync(LmsRoleType lmsRole);
+		Task<List<string>> FindUsersBySocialProviderKeyAsync(string providerKey);
 	}
 }

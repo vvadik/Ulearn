@@ -12,6 +12,9 @@ namespace Ulearn.Web.Api.Models.Common
 		[DataMember(Name = "login", EmitDefaultValue = false)]
 		public string Login { get; set; }
 		
+		[DataMember(Name = "email", EmitDefaultValue = false)]
+		public string Email { get; set; }
+		
 		[DataMember(Name = "first_name")]	
 		public string FirstName { get; set; }
 		

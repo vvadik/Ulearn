@@ -23,5 +23,7 @@ namespace Database.Repos
 		Task<DefaultDictionary<string, List<CourseAccess>>> GetCoursesAccessesAsync(IEnumerable<string> coursesIds);
 		Task<bool> HasCourseAccessAsync(string userId, string courseId, CourseAccessType accessType);
 		Task<List<CourseAccess>> GetUserAccessesAsync(string userId);
+		Task<List<string>> GetPublishedCourseIdsAsync();
+		Task<List<string>> GetCoursesUserHasAccessTo(string userId, CourseAccessType accessType);
 	}
 }

@@ -6,6 +6,7 @@ using Database.Models;
 using Database.Repos;
 using Database.Repos.Comments;
 using Database.Repos.CourseRoles;
+using Database.Repos.Users;
 using Serilog;
 using Ulearn.Common;
 using Ulearn.Web.Api.Models.Responses.Comments;

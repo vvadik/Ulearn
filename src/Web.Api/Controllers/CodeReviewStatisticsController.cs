@@ -7,6 +7,7 @@ using Database.Models;
 using Database.Repos;
 using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
+using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Serilog;

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
+using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Serilog;
@@ -102,12 +103,13 @@ namespace Ulearn.Web.Api.Controllers
 			}
 		}
 
-		protected ShortUserInfo BuildShortUserInfo(ApplicationUser user, bool discloseLogin=false)
+		protected ShortUserInfo BuildShortUserInfo(ApplicationUser user, bool discloseLogin=false, bool discloseEmail=false)
 		{
 			return new ShortUserInfo
 			{
 				Id = user.Id,
 				Login = discloseLogin ? user.UserName : null,
+				Email = discloseEmail ? user.Email : null,
 				FirstName = user.FirstName ?? "",
 				LastName = user.LastName ?? "",
 				VisibleName = user.VisibleName,

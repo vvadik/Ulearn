@@ -3,6 +3,8 @@ using Database.Repos;
 using Database.Repos.Comments;
 using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
+using Database.Repos.Users;
+using Database.Repos.Users.Search;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -47,8 +49,19 @@ namespace Database.Di
 			services.AddScoped<ICommentLikesRepo, CommentLikesRepo>();
 			services.AddScoped<ICommentPoliciesRepo, CommentPoliciesRepo>();
 			
-			/* Others */
+			/* Users */
 			services.AddScoped<IUsersRepo, UsersRepo>();
+			services.AddScoped<IUserSearcher, UserSearcher>();
+			services.AddScoped<IAccessRestrictor, AccessRestrictor>();
+			services.AddScoped<IFilter, FilterByCourseRole>();
+			services.AddScoped<IFilter, FilterByLmsRole>();
+			services.AddScoped<ISearcher, SearcherByUserId>();
+			services.AddScoped<ISearcher, SearcherByNames>();
+			services.AddScoped<ISearcher, SearcherByLogin>();
+			services.AddScoped<ISearcher, SearcherByEmail>();
+			services.AddScoped<ISearcher, SearcherBySocialLogin>();
+			
+			/* Others */
 			services.AddScoped<ICourseRolesRepo, CourseRolesRepo>();
 			services.AddScoped<ICourseRoleUsersFilter, CourseRoleUsersFilter>();
 			services.AddScoped<ICoursesRepo, CoursesRepo>();

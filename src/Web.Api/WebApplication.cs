@@ -299,7 +299,7 @@ namespace Ulearn.Web.Api
 			{
 				options.AddPolicy("Instructors", policy => policy.Requirements.Add(new CourseRoleRequirement(CourseRoleType.Instructor)));
 				options.AddPolicy("CourseAdmins", policy => policy.Requirements.Add(new CourseRoleRequirement(CourseRoleType.CourseAdmin)));
-				options.AddPolicy("SysAdmins", policy => policy.RequireRole(new List<string> { LmsRoles.SysAdmin.GetDisplayName() }));
+				options.AddPolicy("SysAdmins", policy => policy.RequireRole(new List<string> { LmsRoleType.SysAdmin.GetDisplayName() }));
 
 				foreach (var courseAccessType in Enum.GetValues(typeof(CourseAccessType)).Cast<CourseAccessType>())
 				{

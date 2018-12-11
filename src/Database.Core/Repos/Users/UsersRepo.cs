@@ -8,11 +8,10 @@ using Database.Repos.CourseRoles;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using uLearn;
 using Ulearn.Common;
 using Ulearn.Core;
 
-namespace Database.Repos
+namespace Database.Repos.Users
 {
 	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
 	public class UsersRepo : IUsersRepo
@@ -41,6 +40,7 @@ namespace Database.Repos
 		}
 
 		/* Pass limit=0 to disable limiting */
+		[Obsolete("Use UserSearcher instead")]
 		public async Task<List<UserRolesInfo>> FindUsers(UserSearchQuery query, int limit=100)
 		{
 			var role = db.Roles.FirstOrDefault(r => r.Name == query.Role);
@@ -59,12 +59,13 @@ namespace Database.Repos
 				.GetUserRolesInfoAsync(limit, userManager).ConfigureAwait(false);
 		}
 
+		[Obsolete("Use UserSearcher instead")]
 		public List<string> FilterUsersByNamePrefix(string namePrefix)
 		{
 			var deletedUserIds = db.Users.Where(u => u.IsDeleted).Select(u => u.Id).ToList();
 			return GetUsersByNamePrefix(namePrefix).Where(u => !deletedUserIds.Contains(u.Id)).Select(u => u.Id).ToList();
 		}
-
+		
 		/* Pass limit=0 to disable limiting */
 		public async Task<List<UserRolesInfo>> GetCourseInstructorsAsync(string courseId, int limit = 50)
 		{
@@ -85,12 +86,22 @@ namespace Database.Repos
 				.ConfigureAwait(false);
 		}
 
-		public async Task<List<string>> GetSysAdminsIdsAsync()
+		public Task<List<string>> FindUsersBySocialProviderKeyAsync(string providerKey)
 		{
-			var role = await db.Roles.FirstOrDefaultAsync(r => r.Name == LmsRoles.SysAdmin.ToString()).ConfigureAwait(false);
+			return db.UserLogins.Where(login => login.ProviderKey == providerKey).Select(login => login.UserId).Distinct().ToListAsync();
+		}
+
+		public async Task<List<string>> GetUserIdsWithLmsRoleAsync(LmsRoleType lmsRole)
+		{
+			var role = await db.Roles.FirstOrDefaultAsync(r => r.Name == lmsRole.ToString()).ConfigureAwait(false);
 			if (role == null)
 				return new List<string>();
 			return db.Users.Where(u => ! u.IsDeleted).FilterByRole(role, userManager).Select(u => u.Id).ToList();
+		}
+		
+		public Task<List<string>> GetSysAdminsIdsAsync()
+		{
+			return GetUserIdsWithLmsRoleAsync(LmsRoleType.SysAdmin);
 		}
 
 		public async Task ChangeTelegram(string userId, long chatId, string chatTitle)
@@ -114,6 +125,7 @@ namespace Database.Repos
 			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
+		[Obsolete("Use UserSearcher instead")]
 		private IQueryable<UserIdWrapper> GetUsersByNamePrefix(string name)
 		{
 			if (string.IsNullOrEmpty(name))
@@ -196,7 +208,7 @@ namespace Database.Repos
 				return false;
 			
 			if (sysAdminRole == null)
-				sysAdminRole = db.Roles.First(r => r.Name == LmsRoles.SysAdmin.ToString());	
+				sysAdminRole = db.Roles.First(r => r.Name == LmsRoleType.SysAdmin.ToString());	
 			
 			return user.Roles.Any(role => role.RoleId == sysAdminRole.Id);
 		}

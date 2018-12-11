@@ -6,6 +6,7 @@ using Database;
 using Database.Models;
 using Database.Repos;
 using Database.Repos.CourseRoles;
+using Database.Repos.Users;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -114,7 +115,7 @@ namespace Web.Api.Tests.Controllers
 			
 			TestUsers.Admin = await userManager.FindByNameAsync(TestUsers.Admin.UserName).ConfigureAwait(false);
 			logger.Information($"Created user {TestUsers.Admin.UserName} with password {TestUsers.AdminPassword}, id = {TestUsers.Admin.Id}");
-			await userManager.AddToRoleAsync(TestUsers.Admin, LmsRoles.SysAdmin.ToString()).ConfigureAwait(false);
+			await userManager.AddToRoleAsync(TestUsers.Admin, LmsRoleType.SysAdmin.ToString()).ConfigureAwait(false);
 		}
 
 		private Task CreateTestUsersAsync()

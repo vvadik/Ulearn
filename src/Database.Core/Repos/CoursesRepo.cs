@@ -22,6 +22,14 @@ namespace Database.Repos
 			this.db = db;
 		}
 
+		public Task<List<string>> GetPublishedCourseIdsAsync()
+		{
+			return db.CourseVersions
+				.Select(v => v.CourseId)
+				.Distinct()
+				.ToListAsync();
+		}
+
 		public Task<CourseVersion> GetPublishedCourseVersionAsync(string courseId)
 		{
 			return db.CourseVersions.AsNoTracking()
@@ -154,6 +162,11 @@ namespace Database.Repos
 		public Task<List<CourseAccess>> GetUserAccessesAsync(string userId)
 		{
 			return db.CourseAccesses.Where(a => a.UserId == userId && a.IsEnabled).ToListAsync();
+		}
+
+		public Task<List<string>> GetCoursesUserHasAccessTo(string userId, CourseAccessType accessType)
+		{
+			return db.CourseAccesses.Where(a => a.UserId == userId && a.IsEnabled && a.AccessType == accessType).Select(a => a.CourseId).Distinct().ToListAsync();
 		}
 	}
 }

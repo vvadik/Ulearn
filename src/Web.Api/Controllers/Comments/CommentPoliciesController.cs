@@ -3,6 +3,7 @@ using Database;
 using Database.Repos;
 using Database.Repos.Comments;
 using Database.Repos.CourseRoles;
+using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
