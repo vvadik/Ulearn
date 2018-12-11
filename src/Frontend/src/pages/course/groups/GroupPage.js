@@ -60,7 +60,6 @@ class GroupPage extends Component {
 	};
 
 	render() {
-		let courseId = this.props.match.params.courseId;
 		const { group, open, loadSettings, loading, scores, updatedFields, error } = this.state;
 		return (
 			<div className={styles["wrapper"]}>
@@ -99,11 +98,9 @@ class GroupPage extends Component {
 							</form> }
 						{ (open === "members")  &&
 							<GroupMembers
-								courseId={courseId}
 								group={group}
 								onChangeGroupOwner={this.onChangeGroupOwner}
-								onChangeSettings={this.onChangeSettings}
-								onLoadingSettings={this.onLoadingSettings}/>
+								onChangeSettings={this.onChangeSettings}/>
 						}
 					</div>
 				</div>

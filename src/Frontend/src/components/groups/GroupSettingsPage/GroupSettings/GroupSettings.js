@@ -62,6 +62,9 @@ class GroupSettings extends Component {
 }
 
 GroupSettings.propTypes = {
+	name: PropTypes.string,
+	error: PropTypes.bool,
+	loading: PropTypes.bool,
 	group: PropTypes.object,
 	scores: PropTypes.array,
 	onChangeSettings: PropTypes.func,

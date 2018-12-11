@@ -18,6 +18,8 @@ import GroupStudents from "./GroupStudents";
 import getWordForm from "../../../../utils/getWordForm";
 
 import styles from './style.less';
+import Toggle from "@skbkontur/react-ui/components/Toggle/Toggle";
+import Input from "@skbkontur/react-ui/components/Input/Input";
 
 class GroupMembers extends Component {
 
@@ -28,6 +30,7 @@ class GroupMembers extends Component {
 		loadingTeachers: false,
 		loadingStudents: false,
 		copied: false,
+		inviteLink: true,
 	};
 
 	componentDidMount() {
@@ -67,7 +70,7 @@ class GroupMembers extends Component {
 
 	render() {
 		const { accesses, students, loadingStudents, loadingTeachers } = this.state;
-		const { group, courseId } = this.props;
+		const { group } = this.props;
 		const owner = group.owner;
 
 		return (
@@ -173,24 +176,28 @@ class GroupMembers extends Component {
 		const { group } = this.props;
 		const inviteLink = group.is_invite_link_enabled || false;
 		return (
-			<div>
-				{inviteLink && this.renderInviteHash()}
-				<span
-					className={`${styles["invite-link"]} ${styles[`invite-link${inviteLink ? '_off' : '_on'}`]}`}
-					onClick={this.onToggleHash}>
-					{inviteLink ? 'Выключить ссылку' : 'Включить ссылку для вступления в группу'}
-				</span>
-			</div>
+			<label>
+				<div className={styles["toggle-invite"]}>
+					<Toggle
+						checked={inviteLink}
+						onChange={this.onToggleHash}
+						color="default">
+					</Toggle>
+					<span className={styles["toggle-invite-text"]}>
+						Ссылка для вступления в группу { inviteLink ? ' включена' : ' выключена' }
+					</span>
+				</div>
+					{ inviteLink && this.renderInvite() }
+			</label>
 		)
 	}
 
-	renderInviteHash() {
+	renderInvite() {
 		const { group } = this.props;
 
 		return (
-			<React.Fragment>
-				<p className={styles["students-invite-text"]}>Отправьте своим студентам ссылку для вступления в группу:</p>
-				<div className={styles["students-invite"]}>
+			<div className={styles["invite-link-block"]}>
+				<div className={styles["invite-link-text"]}>
 					<CopyToClipboard
 						text={`https://ulearn.me/Account/JoinGroup?hash=${group.invite_hash}`}
 						onCopy={() => this.setState({copied: true})}>
@@ -202,7 +209,15 @@ class GroupMembers extends Component {
 						</Button>
 					</CopyToClipboard>
 				</div>
-			</React.Fragment>
+				<div className={styles["invite-link-input"]}>
+					<Input
+						type="text"
+						value={`https://ulearn.me/Account/JoinGroup?hash=${group.invite_hash}`}
+						readOnly
+						selectAllOnFocus
+					/>
+				</div>
+			</div>
 		)
 	}
 
@@ -263,13 +278,11 @@ class GroupMembers extends Component {
 			.catch(console.error);
 	};
 
-	onToggleHash = (event) => {
+	onToggleHash = () => {
 		const { group } = this.props;
 		const inviteLink = group.is_invite_link_enabled || false;
 		const field = 'is_invite_link_enabled';
 		const updatedField = {[field]: !inviteLink};
-
-		event.preventDefault();
 
 		this.setState({copied: false});
 		this.props.onChangeSettings(field, !inviteLink);
@@ -293,7 +306,6 @@ class GroupMembers extends Component {
 }
 
 GroupMembers.propTypes = {
-	courseId: PropTypes.string,
 	group: PropTypes.object,
 	onChangeSettings: PropTypes.func,
 	onChangeGroupOwner: PropTypes.func,

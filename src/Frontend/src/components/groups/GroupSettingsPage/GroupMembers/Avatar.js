@@ -42,5 +42,6 @@ export default class Avatar extends Component {
 }
 
 Avatar.propTypes = {
+	size: PropTypes.string,
 	user: PropTypes.object,
 };

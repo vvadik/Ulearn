@@ -70,23 +70,20 @@ export default class GroupStudents extends Component {
 	renderStudentActions() {
 		const { studentIds } = this.state;
  		let buttonState = `${styles["students-action"]}`;
-		studentIds.size > 0 ? buttonState += ` ${styles["_active"]}` : buttonState;
 
 		return (
 		<React.Fragment>
-			<Button
-				use="link"
-				// className={buttonState}
+			<button
+				className={studentIds.size > 0 ? buttonState + ` ${styles["button-copy"]}` : buttonState}
 				disabled={studentIds.size === 0}
 				onClick={this.onOpenModal}>
 				<Gapped gap={3}>
 					<Icon name="Copy" />
 					<span className={styles["students-action__text"]}>Скопировать в группу...</span>
 				</Gapped>
-			</Button>
-			<Button
-				use="link"
-				// className={buttonState}
+			</button>
+			<button
+				className={studentIds.size > 0 ? buttonState + ` ${styles["button-delete"]}` : buttonState}
 				disabled={studentIds.size === 0}
 				onClick={this.onDeleteStudents}
 				>
@@ -94,7 +91,7 @@ export default class GroupStudents extends Component {
 					<Icon name="Trash" />
 					<span className={styles["students-action__text"]}>Исключить из группы</span>
 				</Gapped>
-			</Button>
+			</button>
 		</React.Fragment>
 		);
 	}
