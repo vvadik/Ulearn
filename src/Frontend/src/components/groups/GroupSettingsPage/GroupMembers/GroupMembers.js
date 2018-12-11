@@ -67,7 +67,7 @@ class GroupMembers extends Component {
 
 	render() {
 		const { accesses, students, loadingStudents, loadingTeachers } = this.state;
-		const { group } = this.props;
+		const { group, courseId } = this.props;
 		const owner = group.owner;
 
 		return (
@@ -78,7 +78,7 @@ class GroupMembers extends Component {
 						Преподаватели могут видеть список участников группы, проводить код-ревью
 						и проверку тестов, выставлять баллы и смотреть ведомость.
 					</p>
-					<Loader type="normal" active={loadingTeachers}>
+					<Loader type="big" active={loadingTeachers}>
 						<div className={styles["teacher-block"]}>
 							<Avatar user={owner} size={styles["_big"]} />
 							<div className={styles["teacher-block-name"]}>
@@ -93,13 +93,13 @@ class GroupMembers extends Component {
 				<div className={styles["students-block"]}>
 					<h4>Студенты</h4>
 					{ this.renderInviteBlock() }
-					<Loader type="normal" active={loadingStudents}>
+					<Loader type="big" active={loadingStudents}>
 						<div className={styles["students-list"]}>
 							{(students.length >0) &&
 							<GroupStudents
 								students={students}
 								group={group}
-								onDeleteStudent={this.onDeleteStudent}/>}
+								onDeleteStudents={this.onDeleteStudents}/>}
 						</div>
 					</Loader>
 				</div>
@@ -280,10 +280,10 @@ class GroupMembers extends Component {
 
 	onDeleteStudents = (students) => {
 		const { group } = this.props;
-		// const updateStudents = this.state.students.filter(item => item.user.id !== ...students);
+		const updatedStudents = this.state.students.filter((item) => !students.includes(item.user.id));
 
 		this.setState({
-			students,
+			students: updatedStudents,
 		});
 
 		api.groups.deleteStudents(group.id, students)
