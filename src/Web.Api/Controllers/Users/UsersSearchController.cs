@@ -31,7 +31,7 @@ namespace Ulearn.Web.Api.Controllers.Users
 		}
 
 		[HttpGet]
-		[SwaggerResponse((int) HttpStatusCode.BadRequest, "Invalid parameters")]
+		// [SwaggerResponse((int) HttpStatusCode.BadRequest, "Invalid parameters")]
 		public async Task<ActionResult<UsersSearchResponse>> Search([FromQuery] UsersSearchParameters parameters)
 		{
 			var words = parameters.Query?.Split(' ', '\t').ToList() ?? new List<string>();
