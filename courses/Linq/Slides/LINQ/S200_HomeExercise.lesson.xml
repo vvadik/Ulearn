@@ -1,8 +1,6 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Lesson xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="https://ulearn.azurewebsites.net/lesson">
-  <title>Задача для самостоятельного решения</title>
-  <id>fce846df-84c4-426b-9d5c-cc99e2fba454</id>
-  <md>Напишите программу, которая измеряет сходство двух текстов, подсчитывая коэффициент Жаккара по множествам N-грамм.
+<?xml version='1.0' encoding='UTF-8'?>
+<slide xmlns="https://ulearn.me/schema/v2" title="Задача для самостоятельного решения" id="fce846df-84c4-426b-9d5c-cc99e2fba454">
+  <markdown>Напишите программу, которая измеряет сходство двух текстов, подсчитывая коэффициент Жаккара по множествам N-грамм.
 
 ### N-граммы
 
@@ -67,5 +65,5 @@ $$J(T_1, T_2) = \frac{common(T_1, T_2)}{total(T_1, T_2)}$$
 	program.exe ulitka_na_sklone.txt bespokoystvo.txt 3
 	47624
 	23739
-	0.188947385958482</md>
-</Lesson>
+	0.188947385958482</markdown>
+</slide>

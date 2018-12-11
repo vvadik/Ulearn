@@ -1,8 +1,6 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Lesson xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="https://ulearn.azurewebsites.net/lesson">
-  <title>Take, Skip, ToArray, ToList</title>
-  <id>11c65f91-8698-48d9-9a97-ba5b42d27133</id>
-  <md> Пора познакомиться еще с несколькими простыми, но часто используемыми методами.
+<?xml version='1.0' encoding='UTF-8'?>
+<slide xmlns="https://ulearn.me/schema/v2" title="Take, Skip, ToArray, ToList" id="11c65f91-8698-48d9-9a97-ba5b42d27133">
+  <markdown> Пора познакомиться еще с несколькими простыми, но часто используемыми методами.
 
 `Take` обрезает последовательность после указанного количества элементов.
 
@@ -16,9 +14,9 @@
 
 Эти методы, как и предыдущие, не меняют исходную коллекцию, а возвращают новую последовательность.
 
-Можете изучить пример, показывающий работу всех этих методов вместе:</md>
-  <include-code>
-    <display only-body="true">BasicFunctional</display>
-  </include-code>
-  <default-include-code-file>_AdditionalMethods.cs</default-include-code-file>
-</Lesson>
+Можете изучить пример, показывающий работу всех этих методов вместе:</markdown>
+  <includeCode>
+    <display onlyBody="true">BasicFunctional</display>
+  </includeCode>
+  <defaultIncludeCodeFile>_AdditionalMethods.cs</defaultIncludeCodeFile>
+</slide>

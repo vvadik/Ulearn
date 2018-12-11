@@ -37,11 +37,11 @@ namespace uLearn.Courses.Linq.Slides.LINQ
 
 		private readonly S010_Intro.Letter[] letters = new S010_Intro.Letter[0];
 
-		public IEnumerable<int> GetNewLetterIds()
+		public IEnumerable<int> GetNewLettersIds()
 		{
 			return letters
-				.Where(letter => letter.IsNew) // Оставили только новые письма
-				.Select(letter => letter.Id);  // Каждое оставшееся письмо превратили в его идентификатор
+				.Where(l => l.IsNew) // Оставили только новые письма
+				.Select(l => l.Id);  // Каждое оставшееся письмо превратили в его идентификатор
 		}
 	}
 }

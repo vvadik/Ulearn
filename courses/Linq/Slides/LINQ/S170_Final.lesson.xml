@@ -1,12 +1,10 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Lesson xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="https://ulearn.azurewebsites.net/lesson">
-  <title>Итог</title>
-  <id>fef32c59-f9e4-4d75-95fa-9e22cbb0b1bc</id>
-  <md>Поздравляем, вы прошли практикум!
+<?xml version='1.0' encoding='UTF-8'?>
+<slide xmlns="https://ulearn.me/schema/v2" title="Итог" id="fef32c59-f9e4-4d75-95fa-9e22cbb0b1bc">
+  <markdown>Поздравляем, вы прошли практикум!
 
 Вот еще некоторые темы, которые стоит освоить самостоятельно:
 
 * Особый синтаксис LINQ `from n in nums where n &gt; 0 select n*n`. Его плюсы проявляются в запросах, использующих SelectMany.
 * Написание собственных методов расширения для манипуляции коллекциями.
-* LINQ2SQL и прочие LINQ2*</md>
-</Lesson>
+* LINQ2SQL и прочие LINQ2*</markdown>
+</slide>

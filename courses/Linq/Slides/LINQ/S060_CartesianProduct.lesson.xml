@@ -1,22 +1,20 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Lesson xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="https://ulearn.azurewebsites.net/lesson">
-  <title>Декартово произведение</title>
-  <id>ff3215d3-5cc7-4c28-83b1-77465f570dc8</id>
-  <md>
+<?xml version='1.0' encoding='UTF-8'?>
+<slide.exercise xmlns="https://ulearn.me/schema/v2" title="Декартово произведение" id="ff3215d3-5cc7-4c28-83b1-77465f570dc8">
+  <scoring passedTestsScore="5"/>
+  <markdown>
 Одно из не совсем очевидных применений `SelectMany` — это вычисление декартова произведения двух множеств.
 Опробуйте этот трюк на следующей задаче:
 
 Вычислить координаты всех восьми соседей заданной точки.
 
 Можете полагаться на то, что в классе `Point` переопределен метод `Equals`, 
-сравнивающий точки покоординатно.</md>
-  <single-file-exercise file="_CartesianProduct.cs" lang-id="cs" type="check-output">
-    <max-score>5</max-score>
-    <initial-code>public static IEnumerable&lt;Point&gt; GetNeighbours(Point p)
+сравнивающий точки покоординатно.</markdown>
+  <exercise.file file="_CartesianProduct.cs" type="check-output" language="csharp">
+    <initialCode>public static IEnumerable&lt;Point&gt; GetNeighbours(Point p)
 {
 	int[] d = {-1, 0, 1}; // используйте подсказку, если не понимаете зачем тут этот массив :)
 	return ...
-}</initial-code>
+}</initialCode>
     <hint>Декартово произведение множества {-1, 0, 1} на себя даст все возможные относительные координаты соседей</hint>
     <hint>Используйте вызов Select внутри вызова SelectMany</hint>
     <expected>Neighbours of (1 2)
@@ -38,14 +36,12 @@ Neighbours of (0 0)
 1 0
 1 1
 </expected>
-    <hide-expected-output>false</hide-expected-output>
+    <hideExpectedOutput>false</hideExpectedOutput>
     <validator>cs</validator>
-    <texts />
-    <check-for-plagiarism>true</check-for-plagiarism>
-    <hide-solutions>false</hide-solutions>
-    <require-review>false</require-review>
-    <correctness-score>5</correctness-score>
-    <solution only-body="false">GetNeighbours</solution>
-  </single-file-exercise>
-  <default-include-code-file>_CartesianProduct.cs</default-include-code-file>
-</Lesson>
+    <texts/>
+    <checkForPlagiarism>true</checkForPlagiarism>
+    <hideSolutions>false</hideSolutions>
+    <solution onlyBody="false">GetNeighbours</solution>
+  </exercise.file>
+  <defaultIncludeCodeFile>_CartesianProduct.cs</defaultIncludeCodeFile>
+</slide.exercise>

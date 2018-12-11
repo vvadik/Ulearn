@@ -1,8 +1,6 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Lesson xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="https://ulearn.azurewebsites.net/lesson">
-  <title>Группировка</title>
-  <id>421b0115-80e0-42b6-be2d-79bd3661a2ad</id>
-  <md>
+<?xml version='1.0' encoding='UTF-8'?>
+<slide xmlns="https://ulearn.me/schema/v2" title="Группировка" id="421b0115-80e0-42b6-be2d-79bd3661a2ad">
+  <markdown>
 `LINQ` содержит несколько методов группировки элементов последовательности по некоторому признаку.
 Основной способ группировки — это метод `GroupBy`. Вот его полная сигнатура:
 
@@ -11,16 +9,16 @@
 `keySelector` по каждому элементу последовательности получает значение ключа. 
 Все элементы последовательности с одинаковым значением ключа образуют группу.
 
-Пример ниже показывает, как можно разбить список имен в группы по первой букве имени:</md>
-  <include-code>
-    <display only-body="true">Test</display>
-  </include-code>
-  <md>В некотором смысле `GroupBy` — это метод противоположный по действию методу `SelectMany`.
+Пример ниже показывает, как можно разбить список имен в группы по первой букве имени:</markdown>
+  <includeCode>
+    <display onlyBody="true">Test</display>
+  </includeCode>
+  <markdown>В некотором смысле `GroupBy` — это метод противоположный по действию методу `SelectMany`.
 `GroupBy` создает группы, а `SelectMany` из списка групп делает плоский список.
 
-`SelectMany` после `GroupBy` не поменяют состав последовательности, но могут изменить порядок следования элементов:</md>
-  <include-code>
-    <display only-body="true">SelectManyGroupBy</display>
-  </include-code>
-  <default-include-code-file>_Grouping.cs</default-include-code-file>
-</Lesson>
+`SelectMany` после `GroupBy` не поменяют состав последовательности, но могут изменить порядок следования элементов:</markdown>
+  <includeCode>
+    <display onlyBody="true">SelectManyGroupBy</display>
+  </includeCode>
+  <defaultIncludeCodeFile>_Grouping.cs</defaultIncludeCodeFile>
+</slide>

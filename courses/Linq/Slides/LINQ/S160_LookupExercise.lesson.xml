@@ -1,8 +1,7 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Lesson xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="https://ulearn.azurewebsites.net/lesson">
-  <title>Создание обратного индекса</title>
-  <id>52caf978-4bb7-4cc1-92fb-607153da0a1e</id>
-  <md>
+<?xml version='1.0' encoding='UTF-8'?>
+<slide.exercise xmlns="https://ulearn.me/schema/v2" title="Создание обратного индекса" id="52caf978-4bb7-4cc1-92fb-607153da0a1e">
+  <scoring passedTestsScore="5"/>
+  <markdown>
 Обратный индекс — это структура данных, часто использующаяся в задачах 
 полнотекстового поиска нужного документа в большой базе документов.
 
@@ -11,22 +10,21 @@
 
 Вам требуется по списку документов построить обратный индекс.
 
-Документ определен так:</md>
-  <include-code>
-    <display only-body="false">Document</display>
-  </include-code>
-  <md>Обратный индекс в нашем случае — это словарь `ILookup&lt;string, int&gt;`, 
+Документ определен так:</markdown>
+  <includeCode>
+    <display onlyBody="false">Document</display>
+  </includeCode>
+  <markdown>Обратный индекс в нашем случае — это словарь `ILookup&lt;string, int&gt;`, 
 ключом в котором является слово, а значениями — идентификаторы
-всех документов, содержащих это слово.</md>
-  <include-code>
-    <display only-body="false">Main</display>
-  </include-code>
-  <single-file-exercise file="_LookupExercise.cs" lang-id="cs" type="check-output">
-    <max-score>5</max-score>
-    <initial-code>public static ILookup&lt;string, int&gt; BuildInvertedIndex(Document[] documents)
+всех документов, содержащих это слово.</markdown>
+  <includeCode>
+    <display onlyBody="false">Main</display>
+  </includeCode>
+  <exercise.file file="_LookupExercise.cs" type="check-output" language="csharp">
+    <initialCode>public static ILookup&lt;string, int&gt; BuildInvertedIndex(Document[] documents)
 {
 	// ваш код
-}</initial-code>
+}</initialCode>
     <hint>Сегодня никаких подсказок!</hint>
     <hint>Да, задача сложная, но тем не менее подсказок не будет!</hint>
     <hint>Ну правда, пора научиться решать подобные задачи без подсказок!</hint>
@@ -37,14 +35,12 @@ SearchQuery('power') found documents: 3
 SearchQuery('cthulhu') found documents: 
 SearchQuery('') found documents: 
 </expected>
-    <hide-expected-output>false</hide-expected-output>
+    <hideExpectedOutput>false</hideExpectedOutput>
     <validator>cs SingleStatementMethod</validator>
-    <texts />
-    <check-for-plagiarism>true</check-for-plagiarism>
-    <hide-solutions>false</hide-solutions>
-    <require-review>false</require-review>
-    <correctness-score>5</correctness-score>
-    <solution only-body="false">BuildInvertedIndex</solution>
-  </single-file-exercise>
-  <default-include-code-file>_LookupExercise.cs</default-include-code-file>
-</Lesson>
+    <texts/>
+    <checkForPlagiarism>true</checkForPlagiarism>
+    <hideSolutions>false</hideSolutions>
+    <solution onlyBody="false">BuildInvertedIndex</solution>
+  </exercise.file>
+  <defaultIncludeCodeFile>_LookupExercise.cs</defaultIncludeCodeFile>
+</slide.exercise>

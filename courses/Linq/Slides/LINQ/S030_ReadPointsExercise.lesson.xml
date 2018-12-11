@@ -1,25 +1,23 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Lesson xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="https://ulearn.azurewebsites.net/lesson">
-  <title>Чтение списка точек</title>
-  <id>563307c9-f265-4ea0-b06e-8390582f718e</id>
-  <md>
+<?xml version='1.0' encoding='UTF-8'?>
+<slide.exercise xmlns="https://ulearn.me/schema/v2" title="Чтение списка точек" id="563307c9-f265-4ea0-b06e-8390582f718e">
+  <scoring passedTestsScore="5"/>
+  <markdown>
 В файле в каждой строке написаны две координаты точки (X, Y), разделенные пробелом.
-Кто-то уже вызвал метод `File.ReadLines(filename)` и теперь у вас есть массив всех строк файла.</md>
-  <include-code>
-    <display only-body="false">Main</display>
-    <display only-body="false">Point</display>
-  </include-code>
-  <md>Реализуйте метод `ParsePoints` в одно `LINQ`-выражение.
+Кто-то уже вызвал метод `File.ReadLines(filename)` и теперь у вас есть массив всех строк файла.</markdown>
+  <includeCode>
+    <display onlyBody="false">Main</display>
+    <display onlyBody="false">Point</display>
+  </includeCode>
+  <markdown>Реализуйте метод `ParsePoints` в одно `LINQ`-выражение.
 
-Постарайтесь не использовать функцию преобразования строки в число более одного раза.</md>
-  <single-file-exercise file="_ReadPointsExercise.cs" lang-id="cs" type="check-output">
-    <max-score>5</max-score>
-    <initial-code>public static List&lt;Point&gt; ParsePoints(IEnumerable&lt;string&gt; lines)
+Постарайтесь не использовать функцию преобразования строки в число более одного раза.</markdown>
+  <exercise.file file="_ReadPointsExercise.cs" type="check-output" language="csharp">
+    <initialCode>public static List&lt;Point&gt; ParsePoints(IEnumerable&lt;string&gt; lines)
 {
 	return lines
 		.Select(...)
 		...
-}</initial-code>
+}</initialCode>
     <hint>string.Split — разбивает строку на части по разделителю</hint>
     <hint>int.Parse преобразует строку в целое число.</hint>
     <hint>Каждую строку нужно преобразовать в точку. Преобразование — это дело для метода Select. 
@@ -29,14 +27,12 @@
 -3 4
 0 2
 1 -42</expected>
-    <hide-expected-output>false</hide-expected-output>
+    <hideExpectedOutput>false</hideExpectedOutput>
     <validator>cs SingleStatementMethod</validator>
-    <texts />
-    <check-for-plagiarism>true</check-for-plagiarism>
-    <hide-solutions>false</hide-solutions>
-    <require-review>false</require-review>
-    <correctness-score>5</correctness-score>
-    <solution only-body="false">ParsePoints</solution>
-  </single-file-exercise>
-  <default-include-code-file>_ReadPointsExercise.cs</default-include-code-file>
-</Lesson>
+    <texts/>
+    <checkForPlagiarism>true</checkForPlagiarism>
+    <hideSolutions>false</hideSolutions>
+    <solution onlyBody="false">ParsePoints</solution>
+  </exercise.file>
+  <defaultIncludeCodeFile>_ReadPointsExercise.cs</defaultIncludeCodeFile>
+</slide.exercise>
