@@ -63,7 +63,6 @@ namespace uLearn.Courses.Linq.Slides.LINQ.LINQ.LINQ
 
 		public class Point
 		{
-			[HideOnSlide]
 			public Point(int x, int y)
 			{
 				X = x;
