@@ -5,6 +5,7 @@ using Database;
 using Database.Models;
 using Database.Repos;
 using Database.Repos.CourseRoles;
+using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Ulearn.Core.Courses;

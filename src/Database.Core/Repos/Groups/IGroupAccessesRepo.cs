@@ -17,7 +17,10 @@ namespace Database.Repos.Groups
 		Task<bool> IsGroupVisibleForUserAsync(Group group, string userId);
 		Task<List<Group>> GetAvailableForUserGroupsAsync(string courseId, string userId, bool onlyArchived=false);
 		Task<List<Group>> GetAvailableForUserGroupsAsync(List<string> coursesIds, string userId, bool onlyArchived=false);
+		Task<List<Group>> GetAvailableForUserGroupsAsync(string userId, bool onlyArchived=false);
 		Task<bool> CanInstructorViewStudentAsync(string instructorId, string studentId);
 		Task<List<string>> GetCoursesWhereUserCanSeeAllGroupsAsync(string userId, IEnumerable<string> coursesIds);
+		Task<List<GroupMember>> GetMembersOfAllGroupsAvailableForUserAsync(string userId);
+		Task<List<ApplicationUser>> GetInstructorsOfAllGroupsAvailableForUserAsync(string userId);
 	}
 }

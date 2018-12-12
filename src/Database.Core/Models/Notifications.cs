@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Database.Repos;
 using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
+using Database.Repos.Users;
 using Microsoft.Extensions.DependencyInjection;
 using uLearn;
 using Ulearn.Common;

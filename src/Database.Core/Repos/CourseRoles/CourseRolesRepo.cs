@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
+using Database.Repos.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace Database.Repos.CourseRoles
@@ -65,6 +66,11 @@ namespace Database.Repos.CourseRoles
 		{
 			var roles = await db.CourseRoles.Where(r => r.UserId == userId && r.Role <= minCourseRoleType).ToListAsync().ConfigureAwait(false);
 			return roles.Select(r => r.CourseId).ToList();
+		}
+
+		public Task<List<string>> GetUsersWithRoleAsync(string courseId, CourseRoleType minCourseRoleType)
+		{
+			return db.CourseRoles.Where(r => r.CourseId == courseId && r.Role <= minCourseRoleType).Select(r => r.UserId).ToListAsync();
 		}
 	}
 }

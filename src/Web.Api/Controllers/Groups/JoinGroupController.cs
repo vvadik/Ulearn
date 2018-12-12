@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Database;
 using Database.Repos;
 using Database.Repos.Groups;
+using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;

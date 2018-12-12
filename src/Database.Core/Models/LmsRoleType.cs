@@ -5,7 +5,7 @@ using Newtonsoft.Json.Converters;
 namespace Database.Models
 {
 	[JsonConverter(typeof(StringEnumConverter), true)]
-	public enum LmsRoles 
+	public enum LmsRoleType 
 	{
 		[Display(Name = "Сис. админ")]
 		SysAdmin

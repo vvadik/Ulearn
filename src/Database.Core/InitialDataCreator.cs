@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Database.Models;
 using Database.Repos;
+using Database.Repos.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,7 +14,7 @@ namespace Database
 		private readonly UlearnUserManager userManager;
 		private readonly IUsersRepo usersRepo;
 		
-		private readonly string sysAdminRole = LmsRoles.SysAdmin.ToString();
+		private readonly string sysAdminRole = LmsRoleType.SysAdmin.ToString();
 
 		public InitialDataCreator(
 			UlearnDb db,

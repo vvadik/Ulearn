@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using Database.Models;
 using Database.Repos;
+using Database.Repos.Users;
 
 namespace Database.Extensions
 {
@@ -66,7 +67,7 @@ namespace Database.Extensions
 		[Obsolete]
 		public static bool IsSystemAdministrator(this IPrincipal principal)
 		{
-			return principal.IsInRole(LmsRoles.SysAdmin.ToString());
+			return principal.IsInRole(LmsRoleType.SysAdmin.ToString());
 		}
 
 		[Obsolete]
