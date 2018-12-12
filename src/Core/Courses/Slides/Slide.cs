@@ -112,9 +112,9 @@ namespace Ulearn.Core.Courses.Slides
 		/// <summary>
 		/// Validate slide. We guarantee that Validate() will be called after BuildUp() 
 		/// </summary>
-		public virtual void Validate(CourseLoadingContext context)
+		public virtual void Validate(SlideLoadingContext context)
 		{
-			var slideLoadingContext = new SlideLoadingContext(context, this);
+			var slideLoadingContext = new SlideBuildingContext(context, this);
 			foreach (var block in Blocks)
 				block.Validate(slideLoadingContext);
 		}
@@ -122,7 +122,7 @@ namespace Ulearn.Core.Courses.Slides
 		/// <summary>
 		/// Building slide and blocks, fill properties, initialize some values. Any work we need to do before work with slide.
 		/// </summary>
-		public virtual void BuildUp(CourseLoadingContext context)
+		public virtual void BuildUp(SlideLoadingContext context)
 		{
 			Meta?.FixPaths(context.SlideFile);
 			Info = new SlideInfo(context.Unit, context.SlideFile, context.SlideIndex);
@@ -133,7 +133,7 @@ namespace Ulearn.Core.Courses.Slides
 			CheckBlockTypes();
 			
 			/* ... and build blocks */
-			var slideLoadingContext = new SlideLoadingContext(context, this);
+			var slideLoadingContext = new SlideBuildingContext(context, this);
 			Blocks = Blocks.SelectMany(b => b.BuildUp(slideLoadingContext, ImmutableHashSet<string>.Empty)).ToArray();
 			
 			DefineBlockTypes();

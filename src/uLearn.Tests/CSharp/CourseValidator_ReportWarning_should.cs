@@ -42,7 +42,7 @@ namespace uLearn.CSharp
 			if (File.Exists(studentZipFilepath))
 				File.Delete(studentZipFilepath);
 
-			var ctx = new SlideLoadingContext("Test", new Unit(null, exerciseBlock.SlideFolderPath), CourseSettings.DefaultSettings, null);
+			var ctx = new SlideBuildingContext("Test", new Unit(null, exerciseBlock.SlideFolderPath), CourseSettings.DefaultSettings, null);
 			// ReSharper disable once ReturnValueOfPureMethodIsNotUsed
 			exerciseBlock.BuildUp(ctx, ImmutableHashSet<string>.Empty).ToList();
 		}
@@ -93,7 +93,8 @@ namespace uLearn.CSharp
 			};
 
 			var unit = new Unit(UnitSettings.CreateByTitle("Unit title", courseSettings), TestsHelper.ProjSlideFolder);
-			var exerciseSlide = (ExerciseSlide) new XmlSlideLoader().Load(exerciseXmlFile, 1, unit, "Test", courseSettings);
+			var slideLoadingContext = new SlideLoadingContext("Test", unit, courseSettings, exerciseXmlFile, 1);
+			var exerciseSlide = (ExerciseSlide) new XmlSlideLoader().Load(slideLoadingContext);
 			
 			var validatorOut = TestsHelper.ValidateExerciseSlide(exerciseSlide);
 			

@@ -5,6 +5,6 @@ namespace Ulearn.Core.Courses.Slides
 {
 	public interface ISlideLoader
 	{
-		Slide Load(FileInfo file, int slideIndex, Unit unit, string courseId, CourseSettings settings);
+		Slide Load(SlideLoadingContext context);
 	}
 }

@@ -23,7 +23,7 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		{
 		}
 
-		public override IEnumerable<SlideBlock> BuildUp(SlideLoadingContext context, IImmutableSet<string> filesInProgress)
+		public override IEnumerable<SlideBlock> BuildUp(SlideBuildingContext context, IImmutableSet<string> filesInProgress)
 		{
 			yield return new ImageGalleryBlock(context.UnitDirectory.GetFilenames(Directory)) { Hide = Hide };
 		}

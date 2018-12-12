@@ -40,7 +40,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 			return $"ExerciseSlide: {Exercise}";
 		}
 
-		public override void BuildUp(CourseLoadingContext context)
+		public override void BuildUp(SlideLoadingContext context)
 		{
 			if (string.IsNullOrEmpty(ScoringGroup))
 				Scoring.ScoringGroup = context.CourseSettings.Scoring.DefaultScoringGroupForExercise;
@@ -48,7 +48,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 			base.BuildUp(context);
 		}
 
-		public override void Validate(CourseLoadingContext context)
+		public override void Validate(SlideLoadingContext context)
 		{
 			var scoringGroupsIds = context.CourseSettings.Scoring.Groups.Keys;
 			var scoringGroup = Scoring.ScoringGroup;
@@ -62,7 +62,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 			{
 				throw new CourseLoadingException(
 					$"Не найдено блоков с упражнениями (<exercise.file> или <exercise.csproj>) в слайде «{Title}», " +
-					"для которого уиспользован внешний тег <slide.exercise>. Если вы хотите создать обычный слайд без упражнения, используйте тег <slide>");
+					"для которого использован внешний тег <slide.exercise>. Если вы хотите создать обычный слайд без упражнения, используйте тег <slide>");
 			}
 			if (exerciseBlocksCount > 1)
 			{

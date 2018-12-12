@@ -41,7 +41,7 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 			throw new NotImplementedException();
 		}
 
-		public override IEnumerable<SlideBlock> BuildUp(SlideLoadingContext context, IImmutableSet<string> filesInProgress)
+		public override IEnumerable<SlideBlock> BuildUp(SlideBuildingContext context, IImmutableSet<string> filesInProgress)
 		{
 			string FormatFragment(VideoAnnotationFragment f) 
 				=> $"* {f.StartTimeAsString} — {f.Text}";

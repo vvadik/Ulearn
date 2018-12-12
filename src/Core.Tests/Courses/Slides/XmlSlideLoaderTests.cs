@@ -35,7 +35,8 @@ namespace Ulearn.Core.Tests.Courses.Slides
         private Slide LoadSlideFromXmlFile(string filename)
 		{
 			var slideFile = new DirectoryInfo(testDataDirectory).GetFile(filename);
-			return loader.Load(slideFile, 1, unit, "CourseId", courseSettings);
+			var slideLoadingContext = new SlideLoadingContext("CourseId", unit, courseSettings, slideFile, 1);
+			return loader.Load(slideLoadingContext);
 		}
 
         [Test]

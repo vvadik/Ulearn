@@ -19,7 +19,7 @@ namespace Ulearn.Core.Courses.Slides.Quizzes.Blocks
 			return text.ToLower() == Answer.ToString().ToLower();
 		}
 
-		public override void Validate(SlideLoadingContext slideLoadingContext)
+		public override void Validate(SlideBuildingContext slideBuildingContext)
 		{
 		}
 

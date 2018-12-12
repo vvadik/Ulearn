@@ -103,7 +103,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		
 		public BuildEnvironmentOptions BuildEnvironmentOptions { get; set; }
 
-		public override IEnumerable<SlideBlock> BuildUp(SlideLoadingContext context, IImmutableSet<string> filesInProgress)
+		public override IEnumerable<SlideBlock> BuildUp(SlideBuildingContext context, IImmutableSet<string> filesInProgress)
 		{
 			if (!Language.HasValue)
 				Language = context.CourseSettings.DefaultLanguage;

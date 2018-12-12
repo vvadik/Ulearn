@@ -7,31 +7,7 @@ using Ulearn.Core.Model;
 
 namespace Ulearn.Core.Courses.Slides
 {
-	public class CourseLoadingContext
-	{
-		public string CourseId { get; private set; }
-		public CourseSettings CourseSettings { get; private set; }
-		
-		public DirectoryInfo UnitDirectory { get; }
-		public FileInfo SlideFile { get; }
-		public int SlideIndex { get; private set; }
-		
-		public Unit Unit { get; }
-
-		public CourseLoadingContext(string courseId, Unit unit, CourseSettings courseSettings, FileInfo slideFile, int slideIndex)
-		{
-			CourseId = courseId;
-			
-			Unit = unit;
-			UnitDirectory = unit.Directory;
-			
-			CourseSettings = courseSettings;
-			SlideFile = slideFile;
-			SlideIndex = slideIndex;
-		}
-	}
-
-	public class SlideLoadingContext
+	public class SlideBuildingContext
 	{
 		public string CourseId { get; private set; }
 		public CourseSettings CourseSettings { get; private set; }
@@ -43,7 +19,7 @@ namespace Ulearn.Core.Courses.Slides
 		
 		private List<RegionsExtractor> Extractors { get; }
 
-		public SlideLoadingContext(string courseId, Unit unit, CourseSettings courseSettings, Slide slide)
+		public SlideBuildingContext(string courseId, Unit unit, CourseSettings courseSettings, Slide slide)
 		{
 			CourseId = courseId;
 			
@@ -56,8 +32,8 @@ namespace Ulearn.Core.Courses.Slides
 			Extractors = new List<RegionsExtractor>();
 		}
 
-		public SlideLoadingContext(CourseLoadingContext courseContext, Slide slide)
-			:this(courseContext.CourseId, courseContext.Unit, courseContext.CourseSettings, slide)
+		public SlideBuildingContext(SlideLoadingContext slideContext, Slide slide)
+			:this(slideContext.CourseId, slideContext.Unit, slideContext.CourseSettings, slide)
 		{
 		}
 

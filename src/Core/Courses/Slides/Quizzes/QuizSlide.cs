@@ -38,7 +38,7 @@ namespace Ulearn.Core.Courses.Slides.Quizzes
 
 		public string QuizNormalizedXml => this.XmlSerialize(removeWhitespaces: true);
 
-		public override void Validate(CourseLoadingContext context)
+		public override void Validate(SlideLoadingContext context)
 		{
 			var scoringGroupsIds = context.CourseSettings.Scoring.Groups.Keys;
 			if (!string.IsNullOrEmpty(ScoringGroup) && !scoringGroupsIds.Contains(ScoringGroup))
@@ -68,7 +68,7 @@ namespace Ulearn.Core.Courses.Slides.Quizzes
 			base.Validate(context);
 		}
 
-		public override void BuildUp(CourseLoadingContext context)
+		public override void BuildUp(SlideLoadingContext context)
 		{
 			if (string.IsNullOrEmpty(ScoringGroup))
 				Scoring.ScoringGroup = context.CourseSettings.Scoring.DefaultScoringGroupForQuiz;

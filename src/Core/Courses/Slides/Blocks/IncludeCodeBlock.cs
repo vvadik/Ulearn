@@ -54,7 +54,7 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		[XmlElement("display")]
 		public Label[] DisplayLabels { get; set; }
 		
-		protected void FillProperties(SlideLoadingContext context)
+		protected void FillProperties(SlideBuildingContext context)
 		{
 			CodeFile = CodeFile ?? context.Slide.DefaultIncludeCodeFile ?? context.Unit.Settings?.DefaultIncludeCodeFile;
 			if (CodeFile == null)
@@ -71,7 +71,7 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 			return new CodeComponent();
 		}
 
-		public override IEnumerable<SlideBlock> BuildUp(SlideLoadingContext context, IImmutableSet<string> filesInProgress)
+		public override IEnumerable<SlideBlock> BuildUp(SlideBuildingContext context, IImmutableSet<string> filesInProgress)
 		{
 			FillProperties(context);
 			DisplayLabels = DisplayLabels ?? new Label[0];

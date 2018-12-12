@@ -13,11 +13,11 @@ namespace Ulearn.Core.Courses.Slides
 		[DefaultValue(false)]
 		public bool Hide { get; set; }
 
-		public virtual void Validate(SlideLoadingContext slideLoadingContext)
+		public virtual void Validate(SlideBuildingContext slideBuildingContext)
 		{
 		}
 
-		public virtual IEnumerable<SlideBlock> BuildUp(SlideLoadingContext context, IImmutableSet<string> filesInProgress)
+		public virtual IEnumerable<SlideBlock> BuildUp(SlideBuildingContext context, IImmutableSet<string> filesInProgress)
 		{
 			yield return this;
 		}

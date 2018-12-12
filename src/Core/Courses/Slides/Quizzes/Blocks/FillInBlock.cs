@@ -22,7 +22,7 @@ namespace Ulearn.Core.Courses.Slides.Quizzes.Blocks
 		[XmlAttribute("multiline")]
 		public bool Multiline;
 
-		public override void Validate(SlideLoadingContext slideLoadingContext)
+		public override void Validate(SlideBuildingContext slideBuildingContext)
 		{
 			if (string.IsNullOrEmpty(Sample))
 				return;

@@ -17,23 +17,21 @@ namespace Ulearn.Core.Courses.Slides
 		/// Loads slide from XML file
 		/// </summary>
 		/// <returns>Slide, QuizSlide or ExerciseSlide object</returns>
-		public Slide Load(FileInfo file, int slideIndex, Unit unit, string courseId, CourseSettings settings)
+		public Slide Load(SlideLoadingContext context)
 		{
-			var fileContent = file.ReadAllContent();
+			var fileContent = context.SlideFile.ReadAllContent();
 
-			return Load(fileContent, slideIndex, unit, courseId, settings, file);
+			return Load(fileContent, context);
 		}
 
-		public Slide Load(byte[] fileContent, int slideIndex, Unit unit, string courseId, CourseSettings settings, FileInfo slideFile=null)
+		public Slide Load(byte[] fileContent, SlideLoadingContext context)
 		{
-			if (slideFile == null)
-				slideFile = new FileInfo("<internal>");
+			var slideFile = context.SlideFile ?? new FileInfo("<internal>");
 			
 			var slideType = DetectSlideType(fileContent, slideFile.Name);
 
 			var slide = (Slide)fileContent.DeserializeXml(slideType);
 
-			var context = new CourseLoadingContext(courseId, unit, settings, slideFile, slideIndex);
 			slide.BuildUp(context);
 
 			slide.Validate(context);
@@ -72,7 +70,7 @@ namespace Ulearn.Core.Courses.Slides
 			var allowedTags = string.Join(", ", knownTypes.Select(t => t.GetCustomAttribute<XmlRootAttribute>().ElementName).Select(t => $"<{t}>"));
 			throw new CourseLoadingException(
 				$"Не могу определить, что за слайд лежит в {filename}. " +
-				$"Внешний тег может быть одним из следующих: {allowedTags}."
+				$"Внешний тег должен быть одним из следующих: {allowedTags}."
 			);
 		}
 	}

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Remotion.Linq.Clauses;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Units;
@@ -26,19 +27,42 @@ namespace Ulearn.Core.Courses
 		
 		public Course Load(DirectoryInfo dir)
 		{
+			try
+			{
+				return UnsafeLoad(dir);
+			}
+			catch (Exception e) when (!e.GetType().IsAssignableFrom(typeof(CourseLoadingException)))
+			{
+				throw new CourseLoadingException("Не удалось загрузить курс. ", e);
+			}
+		}
+
+		private Course UnsafeLoad(DirectoryInfo dir)
+		{
 			var courseId = dir.Name;
 
+			var loadFromDirectory = dir;
 			var courseXmls = dir.GetFiles("course.xml", SearchOption.AllDirectories).ToList();
 			if (courseXmls.Count == 1)
-				dir = courseXmls[0].Directory;
+				loadFromDirectory = courseXmls[0].Directory;
 			else
-				dir = dir.HasSubdirectory("Slides") ? dir.GetSubdirectory("Slides") : dir;
+				loadFromDirectory = loadFromDirectory.HasSubdirectory("Slides") ? loadFromDirectory.GetSubdirectory("Slides") : loadFromDirectory;
 
-			var settings = CourseSettings.Load(dir);
-			if (string.IsNullOrEmpty(settings.Title)) {
+			CourseSettings settings;
+			try
+			{
+				settings = CourseSettings.Load(loadFromDirectory);
+			}
+			catch (Exception e)
+			{
+				throw new CourseLoadingException($"Не удалось прочитать настройки курса из файла course.xml. {e.Message}", e.InnerException);
+			}
+
+			if (string.IsNullOrEmpty(settings.Title))
+			{
 				try
 				{
-					settings.Title = GetCourseTitleFromFile(dir);
+					settings.Title = GetCourseTitleFromFile(loadFromDirectory);
 				}
 				catch (Exception e)
 				{
@@ -48,7 +72,9 @@ namespace Ulearn.Core.Courses
 				}
 			}
 
-			var units = LoadUnits(dir, settings, courseId).ToList();
+			var context = new CourseLoadingContext(courseId, settings, dir, loadFromDirectory.GetFile("course.xml"));
+
+			var units = LoadUnits(context).ToList();
 			var slides = units.SelectMany(u => u.Slides).ToList();
 			CheckDuplicateSlideIds(slides);
 			AddDefaultScoringGroupIfNeeded(units, slides, settings);
@@ -87,31 +113,31 @@ namespace Ulearn.Core.Courses
 			}
 		}
 
-		private IEnumerable<Unit> LoadUnits(DirectoryInfo dir, CourseSettings settings, string courseId)
+		private IEnumerable<Unit> LoadUnits(CourseLoadingContext context)
 		{
-			var unitFiles = settings
+			var unitFiles = context.CourseSettings
 				.UnitPaths
-				.SelectMany(path => dir.GetFilesByMask(path).OrderBy(f => f.FullName, StringComparer.InvariantCultureIgnoreCase))
+				.SelectMany(path => context.CourseXml.Directory.GetFilesByMask(path).OrderBy(f => f.FullName, StringComparer.InvariantCultureIgnoreCase))
 				.Distinct()
 				/* Don't load unit from course file! Even accidentally */
-				.Where(f => f != dir.GetFile("course.xml"));
+				.Where(f => f != context.CourseXml);
 
 			var unitIds = new HashSet<Guid>();
 			var unitUrls = new HashSet<string>();
 			var slideIndex = 0;
 			foreach (var unitFile in unitFiles)
 			{
-				var unit = unitLoader.Load(unitFile, settings, courseId, slideIndex);
+				var unit = unitLoader.Load(unitFile, context, slideIndex);
 
 				if (unitIds.Contains(unit.Id))
-					throw new CourseLoadingException($"Ошибка в курсе \"{settings.Title}\" при загрузке модуля \"{unit.Title}\" из {unitFile.FullName}. " +
+					throw new CourseLoadingException($"Ошибка в курсе \"{context.CourseSettings.Title}\" при загрузке модуля \"{unit.Title}\" из {unitFile.FullName}. " +
 													 $"Повторяющийся идентификатор модуля: {unit.Id}. Идентификаторы модулей должны быть уникальными. " +
 													 $"К этому времени загружены модули {string.Join(", ", unitIds)}");
 				unitIds.Add(unit.Id);
 
 				if (unitUrls.Contains(unit.Url))
 					throw new CourseLoadingException(
-						$"Ошибка в курсе \"{settings.Title}\" при загрузке модуля \"{unit.Title}\" из {unitFile.FullName}. " +
+						$"Ошибка в курсе \"{context.CourseSettings.Title}\" при загрузке модуля \"{unit.Title}\" из {unitFile.FullName}. " +
 						$"Повторяющийся url-адрес модуля: {unit.Url}. Url-адреса модулей должны быть уникальными"
 					);
 				unitUrls.Add(unit.Url);

@@ -100,7 +100,7 @@ namespace uLearn
 
 		private static SlideBlock[] DeserializeBlocks(string blocksXml)
 		{
-			var buildUpContext = new SlideLoadingContext("Test", new Unit(null, new DirectoryInfo(".")), CourseSettings.DefaultSettings, null);
+			var buildUpContext = new SlideBuildingContext("Test", new Unit(null, new DirectoryInfo(".")), CourseSettings.DefaultSettings, null);
 			var blocks = DeserializeLesson(blocksXml).Blocks;
 			return blocks.SelectMany(b => b.BuildUp(buildUpContext, ImmutableHashSet<string>.Empty)).ToArray();
 		}

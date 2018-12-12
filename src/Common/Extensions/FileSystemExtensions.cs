@@ -51,6 +51,11 @@ namespace Ulearn.Common.Extensions
 			return Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
 		}
 
+		public static string GetRelativePath(this FileSystemInfo file, DirectoryInfo folder)
+		{
+			return file.GetRelativePath(folder.FullName);
+		}
+
 		public static IEnumerable<string> GetRelativePathsOfFiles(this DirectoryInfo dir)
 		{
 			return Directory.EnumerateFiles(dir.FullName, "*", SearchOption.AllDirectories)

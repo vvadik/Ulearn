@@ -28,7 +28,7 @@ namespace Ulearn.Core.Courses.Slides.Quizzes.Blocks
 			return Shuffle ? Items.Shuffle().ToArray() : Items;
 		}
 
-		public override void Validate(SlideLoadingContext slideLoadingContext)
+		public override void Validate(SlideBuildingContext slideBuildingContext)
 		{
 			if (Items.DistinctBy(i => i.Id).Count() != Items.Length)
 				throw new FormatException("Duplicate choice id in quizBlock " + Id);

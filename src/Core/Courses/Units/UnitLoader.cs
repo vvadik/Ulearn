@@ -16,25 +16,25 @@ namespace Ulearn.Core.Courses.Units
 			this.slideLoader = slideLoader;
 		}
 		
-		public Unit Load(FileInfo unitFile, CourseSettings courseSettings, string courseId, int firstSlideIndex)
+		public Unit Load(FileInfo unitFile, CourseLoadingContext context, int firstSlideIndex)
 		{
 			var unitDirectory = unitFile.Directory;
 			if (unitDirectory == null)
-				throw new CourseLoadingException($"Не могу загрузить модуль из {unitFile.FullName}: не могу определить, из какой папки читать файлы со слайдами.");
+				throw new CourseLoadingException($"Не могу загрузить модуль из {unitFile.GetRelativePath(context.CourseDirectory)}: не могу определить, из какой папки читать файлы со слайдами.");
 			
 			UnitSettings unitSettings;
 			if (unitFile.Exists)
-				unitSettings = UnitSettings.Load(unitFile, courseSettings);
+				unitSettings = UnitSettings.Load(unitFile, context.CourseSettings);
 			else
 			{
 				try
 				{
-					unitSettings = UnitSettings.CreateByTitle(GetUnitTitleFromFile(unitDirectory), courseSettings);
+					unitSettings = UnitSettings.CreateByTitle(GetUnitTitleFromFile(unitDirectory), context.CourseSettings);
 				}
 				catch (Exception e)
 				{
 					throw new CourseLoadingException(
-						$"Не удалось прочитать настройки курса. Скорее всего, отсутствует или неправильно заполнен файл модуля {unitFile.Name} ({unitFile.FullName})."
+						$"Не удалось прочитать настройки курса. Скорее всего, отсутствует или неправильно заполнен файл модуля {unitFile.Name} ({unitFile.GetRelativePath(context.CourseDirectory)})."
 					);
 				}
 			}
@@ -49,7 +49,7 @@ namespace Ulearn.Core.Courses.Units
 				.Where(f => f != unitFile);
 				
 			unit.Slides = slideFiles
-				.Select((f, internalIndex) => LoadSlide(f, unit, firstSlideIndex + internalIndex, courseId, courseSettings))
+				.Select((f, internalIndex) => LoadSlide(f, unit, firstSlideIndex + internalIndex, context))
 				.ToList();
 
 			unit.LoadInstructorNote();
@@ -57,17 +57,18 @@ namespace Ulearn.Core.Courses.Units
 			return unit;
 		}
 
-		private Slide LoadSlide(FileInfo file, Unit unit, int slideIndex, string courseId, CourseSettings courseSettings)
+		private Slide LoadSlide(FileInfo file, Unit unit, int slideIndex, CourseLoadingContext context)
 		{
+			var slideLoadingContext = new SlideLoadingContext(context, unit, file, slideIndex);
 			try
 			{
-				return slideLoader.Load(file, slideIndex, unit, courseId, courseSettings);
+				return slideLoader.Load(slideLoadingContext);
 			}
 			catch (Exception e)
 			{
 				if (e.GetType().IsSubclassOf(typeof(CourseLoadingException)))
 					throw;
-				throw new CourseLoadingException($"Не могу загрузить слайд из файла {file.FullName}", e);
+				throw new CourseLoadingException($"Не могу загрузить слайд из файла {file.GetRelativePath(context.CourseDirectory)}", e);
 			}
 		}
 

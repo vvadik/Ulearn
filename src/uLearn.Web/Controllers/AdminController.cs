@@ -23,9 +23,7 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
-using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Slides.Exercises;
-using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Courses.Units;
 using Ulearn.Core.CSharp;
 using Ulearn.Core.Extensions;
@@ -190,8 +188,12 @@ namespace uLearn.Web.Controllers
 			catch (Exception e)
 			{
 				var errorMessage = e.Message.ToLowerFirstLetter();
-				if (e.InnerException != null)
+				while (e.InnerException != null)
+				{
 					errorMessage += $"\n\n{e.InnerException.Message}";
+					e = e.InnerException;
+				}
+
 				return RedirectToAction("Packages", new { courseId, error=errorMessage });
 			}
 			
@@ -213,6 +215,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
+		[ValidateInput(false)]
 		public ActionResult Packages(string courseId, string error="")
 		{
 			var hasPackage = courseManager.HasPackageFor(courseId);
@@ -1334,7 +1337,7 @@ namespace uLearn.Web.Controllers
 				parser.TextFieldType = FieldType.Delimited;
 				parser.SetDelimiters(",");
 				if (parser.EndOfData)
-					return View(model.WithError("Пустой файл? В файле с данными должна присутствовать строка к заголовком"));
+					return View(model.WithError("Пустой файл? В файле с данными должна присутствовать строка с заголовком"));
 
 				string[] headers;
 				try

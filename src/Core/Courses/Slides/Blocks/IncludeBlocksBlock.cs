@@ -24,7 +24,7 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		{
 		}
 
-		public override IEnumerable<SlideBlock> BuildUp(SlideLoadingContext context, IImmutableSet<string> filesInProgress)
+		public override IEnumerable<SlideBlock> BuildUp(SlideBuildingContext context, IImmutableSet<string> filesInProgress)
 		{
 			if (filesInProgress.Contains(File))
 				throw new Exception("Cyclic dependency");
