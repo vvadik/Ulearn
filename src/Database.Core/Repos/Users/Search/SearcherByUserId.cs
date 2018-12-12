@@ -38,7 +38,7 @@ namespace Database.Repos.Users.Search
 			if (strict)
 				return Task.FromResult(users.Where(u => u.Id == term));
 
-			return Task.FromResult(users.Where(u => u.Id.StartsWith(term)));
+			return Task.FromResult(users.Where(u => u.Id.StartsWith(term)).OrderBy(u => u.Id).Take(limit));
 		}
 	}
 }

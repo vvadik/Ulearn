@@ -30,6 +30,9 @@ namespace Database.Repos.Users.Search
 			params Expression<Func<ApplicationUser, string>>[] userProperties
 		)
 		{
+			if (userProperties.Length == 0)
+				throw new ArgumentException("UserProperties should be specified", nameof(userProperties));
+			
 			this.usersRepo = usersRepo;
 			this.courseRolesRepo = courseRolesRepo;
 			this.accessRestrictor = accessRestrictor;
@@ -77,7 +80,7 @@ namespace Database.Repos.Users.Search
 			if (strict)
 				return users.Search(userProperties).EqualTo(term);
 
-			return users.Search(userProperties).StartsWith(term);
+			return users.Search(userProperties).StartsWith(term).OrderBy(u => u.Id).Take(limit);
 		}
 	}
 }

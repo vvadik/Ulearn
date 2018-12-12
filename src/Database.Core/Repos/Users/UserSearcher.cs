@@ -56,7 +56,7 @@ namespace Database.Repos.Users
 			foreach (var filter in filters)
 				result = await filter.FilterAsync(result, request).ConfigureAwait(false);
 
-			return result.OrderBy(u => u.LastName).ThenBy(u => u.FirstName).Take(limit).Select(u => new FoundUser
+			return result.OrderByDescending(u => usersFields[u.Id].Count).ThenBy(u => u.LastName).ThenBy(u => u.FirstName).Take(limit).Select(u => new FoundUser
 			{
 				User = u,
 				Fields = usersFields[u.Id],
