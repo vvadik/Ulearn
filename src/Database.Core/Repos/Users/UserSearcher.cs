@@ -40,8 +40,6 @@ namespace Database.Repos.Users
 					hasInstructorAccessToGroupMembers: true,
 					hasInstructorAccessToGroupInstructors: true
 				).ConfigureAwait(false);
-
-				result = result.OrderBy(u => u.Id).Take(maxUsersCountToFetch);
 			}
 
 			var usersFields = new DefaultDictionary<string, HashSet<SearchField>>();
@@ -75,6 +73,9 @@ namespace Database.Repos.Users
 			
 			foreach (var filter in filters)
 				result = await filter.FilterAsync(result, request).ConfigureAwait(false);
+
+			if (result.Count() > maxUsersCountToFetch)
+				result = result.OrderBy(u => u.Id).Take(maxUsersCountToFetch);
 
 			return result
 				.OrderByDescending(u => usersFields[u.Id].Count)

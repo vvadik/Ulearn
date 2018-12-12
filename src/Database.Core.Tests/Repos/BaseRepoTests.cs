@@ -40,6 +40,8 @@ namespace Database.Core.Tests.Repos
 			serviceProvider = ConfigureServices();
 			
 			userManager = serviceProvider.GetService<UlearnUserManager>();
+			CreateInitialDataInDatabaseAsync().GetAwaiter().GetResult();
+			CreateTestUsersAsync().GetAwaiter().GetResult();
 			
 			/* Configuring Z.EntityFramework.Plus for working with In-Memory database
 			   See https://entityframework-plus.net/batch-delete for details. */
@@ -88,5 +90,37 @@ namespace Database.Core.Tests.Repos
 
 			return await userManager.FindByNameAsync(userName).ConfigureAwait(false);
 		}
+		
+		private async Task CreateInitialDataInDatabaseAsync()
+		{
+			var initialDataCreator = serviceProvider.GetService<InitialDataCreator>();
+			await initialDataCreator.CreateRolesAsync().ConfigureAwait(false);
+		}
+		
+		private async Task CreateTestUsersAsync()
+		{
+			var result = await userManager.CreateAsync(TestUsers.Admin, TestUsers.AdminPassword).ConfigureAwait(false);
+			if (! result.Succeeded)
+				throw new InvalidOperationException($"Can't create admin user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+			
+			TestUsers.Admin = await userManager.FindByNameAsync(TestUsers.Admin.UserName).ConfigureAwait(false);
+			logger.Information($"Created user {TestUsers.Admin.UserName} with password {TestUsers.AdminPassword}, id = {TestUsers.Admin.Id}");
+			await userManager.AddToRoleAsync(TestUsers.Admin, LmsRoleType.SysAdmin.ToString()).ConfigureAwait(false);
+		}
+	}
+	
+	public static class TestUsers
+	{
+		public static ApplicationUser Admin = new ApplicationUser
+		{
+			UserName = "admin",
+			FirstName = "Super",
+			LastName = "Administrator",
+			Email = "admin@ulearn.me",
+			Gender = Gender.Male,
+			Registered = DateTime.Now,
+		};
+
+		public const string AdminPassword = "AdminPassword123!";
 	}
 }

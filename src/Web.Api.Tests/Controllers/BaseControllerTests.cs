@@ -107,7 +107,7 @@ namespace Web.Api.Tests.Controllers
 			return services.BuildServiceProvider();
 		}
 
-		private async Task CreateTestUsersAsync(IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, UlearnUserManager userManager)
+		private async Task CreateTestUsersAsync(UlearnUserManager userManager)
 		{
 			var result = await userManager.CreateAsync(TestUsers.Admin, TestUsers.AdminPassword).ConfigureAwait(false);
 			if (! result.Succeeded)
@@ -120,10 +120,8 @@ namespace Web.Api.Tests.Controllers
 
 		private Task CreateTestUsersAsync()
 		{
-			var usersRepo = serviceProvider.GetService<IUsersRepo>();
-			var userRolesRepo = serviceProvider.GetService<ICourseRolesRepo>();
 			var userManager = serviceProvider.GetService<UlearnUserManager>();
-			return CreateTestUsersAsync(usersRepo, userRolesRepo, userManager);
+			return CreateTestUsersAsync(userManager);
 		}
 
 		protected async Task AuthenticateUserInControllerAsync(BaseController controller, ApplicationUser user)

@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Database.Models;
 using Database.Repos.Users;
 using Database.Repos.Users.Search;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
@@ -19,8 +21,22 @@ namespace Database.Core.Tests.Repos.Users
 		{
 			base.SetUp();
 
-			var accessRestrictor = new Mock<AccessRestrictor>();
-			userSearcher = new UserSearcher(db, accessRestrictor.Object, serviceProvider.GetServices<ISearcher>(), serviceProvider.GetServices<IFilter>());
+			var accessRestrictor = serviceProvider.GetService<IAccessRestrictor>();
+			userSearcher = new UserSearcher(db, accessRestrictor, serviceProvider.GetServices<ISearcher>(), serviceProvider.GetServices<IFilter>());
+		}
+
+		private Task<List<FoundUser>> SearchAsAdminAsync(List<string> words)
+		{
+			return userSearcher.SearchUsersAsync(new UserSearchRequest
+			{
+				CurrentUser = TestUsers.Admin,
+				Words = words
+			});
+		}
+
+		private Task<List<FoundUser>> SearchAsAdminAsync(string word)
+		{
+			return SearchAsAdminAsync(new List<string> { word });
 		}
 
 		[Test]
@@ -28,10 +44,7 @@ namespace Database.Core.Tests.Repos.Users
 		{
 			var user = await CreateUserAsync("test").ConfigureAwait(false);
 			
-			var result = await userSearcher.SearchUsersAsync(new UserSearchRequest
-			{
-				Words = new List<string> { user.Id.Substring(0, 5) }
-			}).ConfigureAwait(false);
+			var result = await SearchAsAdminAsync(user.Id.Substring(0, 5)).ConfigureAwait(false);
 			
 			Assert.AreEqual(1, result.Count);
 		}
@@ -44,11 +57,8 @@ namespace Database.Core.Tests.Repos.Users
 
 			if (user1.Id.Substring(0, 5) == user2.Id.Substring(0, 5))
 				return;
-			
-			var result = await userSearcher.SearchUsersAsync(new UserSearchRequest
-			{
-				Words = new List<string> { user1.Id.Substring(0, 5) }
-			}).ConfigureAwait(false);
+
+			var result = await SearchAsAdminAsync(user1.Id.Substring(0, 5)).ConfigureAwait(false);
 			
 			Assert.AreEqual(1, result.Count);
 		}
@@ -62,11 +72,8 @@ namespace Database.Core.Tests.Repos.Users
 			var user2 = await CreateUserAsync("test2").ConfigureAwait(false);
 			while (user1.Id.Substring(0, 3) != user2.Id.Substring(0, 3))
 				user2 = await CreateUserAsync("test" + StringUtils.GenerateAlphanumericString(10)).ConfigureAwait(false);
-			
-			var result = await userSearcher.SearchUsersAsync(new UserSearchRequest
-			{
-				Words = new List<string> { user1.Id.Substring(0, 3) }
-			}).ConfigureAwait(false);
+
+			var result = await SearchAsAdminAsync(user1.Id.Substring(0, 3)).ConfigureAwait(false);
 			
 			Assert.AreEqual(2, result.Count);
 		}
