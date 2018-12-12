@@ -73,20 +73,48 @@ namespace Ulearn.Web.Api.Controllers.Users
 				MinCourseRoleType = parameters.CourseRoleType,
 				LmsRole = parameters.LmsRoleType,
 			};
-			var strictUsers = await userSearcher.SearchUsersAsync(request, strict: true).ConfigureAwait(false);
-			var nonStrictUsers = await userSearcher.SearchUsersAsync(request, strict: false).ConfigureAwait(false);
 			
-			/* Make copy */
+			/* Start the search!
+			 * First of all we will try to find `strict` users: users with strict match for pattern. These users will be at first place in the response.
+			 */
+			
+			var strictUsers = await userSearcher.SearchUsersAsync(request, strict: true, offset: 0, count: parameters.Offset + parameters.Count).ConfigureAwait(false);
+			
 			var users = strictUsers.ToList();
-			/* ... and add to the copy all non-strict users if there is no this user in strict users list */
-			foreach (var user in nonStrictUsers)
+
+			/* If strict users count is enough for answer, just take needed piece of list */
+			if (users.Count >= parameters.Offset + parameters.Count)
 			{
-				var alreadyExistUser = strictUsers.FirstOrDefault(u => u.User.Id == user.User.Id);
-				if (alreadyExistUser != null)
-					alreadyExistUser.Fields.UnionWith(user.Fields);
-				else
-					users.Add(user);
+				users = users.Skip(parameters.Offset).Take(parameters.Count).ToList();
 			}
+			else
+			{
+				/* If there is part of strict users which we should return, then cut off it */
+				if (parameters.Offset < users.Count)
+					users = users.Skip(parameters.Offset).ToList();
+				else
+					users.Clear();
+				
+				/*
+				 *  (strict users) (non-strict users)
+				 *  0     1    2    3    4    5    6
+				 *             ^              ^
+				 *             offset         offset+count
+				 */
+				var nonStrictUsers = await userSearcher.SearchUsersAsync(request, strict: false, offset: parameters.Offset - strictUsers.Count, count: parameters.Count - users.Count).ConfigureAwait(false);
+				
+				/* Add all non-strict users if there is no this user in strict users list */
+				foreach (var user in nonStrictUsers)
+				{
+					var alreadyExistUser = strictUsers.FirstOrDefault(u => u.User.Id == user.User.Id);
+					if (alreadyExistUser != null)
+						alreadyExistUser.Fields.UnionWith(user.Fields);
+					else
+						users.Add(user);
+				}
+			}
+			
+			
 			return new UsersSearchResponse
 			{
 				Users = users.Select(u => new FoundUserResponse
@@ -94,6 +122,11 @@ namespace Ulearn.Web.Api.Controllers.Users
 					User = BuildShortUserInfo(u.User, discloseLogin: u.Fields.Contains(SearchField.Login), discloseEmail: u.Fields.Contains(SearchField.Email)),
 					Fields = u.Fields.ToList(),
 				}).ToList(),
+				PaginationResponse = new PaginationResponse
+				{
+					Offset = parameters.Offset,
+					Count = users.Count,
+				}
 			};
 		}
 	}

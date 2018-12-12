@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
+using Database.Repos.CourseRoles;
 using Database.Repos.Users.Search;
 using Ulearn.Common;
 
@@ -10,19 +11,38 @@ namespace Database.Repos.Users
 	public class UserSearcher : IUserSearcher
 	{
 		private readonly UlearnDb db;
+		private readonly IAccessRestrictor accessRestrictor;
 		private readonly List<ISearcher> searchers;
 		private readonly List<IFilter> filters;
 
-		public UserSearcher(UlearnDb db, IEnumerable<ISearcher> searchers, IEnumerable<IFilter> filters)
+		private const int maxUsersCountToFetch = 2000;
+
+		public UserSearcher(UlearnDb db, IAccessRestrictor accessRestrictor, IEnumerable<ISearcher> searchers, IEnumerable<IFilter> filters)
 		{
 			this.db = db;
+			this.accessRestrictor = accessRestrictor;
 			this.searchers = searchers.ToList();
 			this.filters = filters.ToList();
 		}
 
-		public async Task<List<FoundUser>> SearchUsersAsync(UserSearchRequest request, bool strict = false, int limit = 50)
+		public async Task<List<FoundUser>> SearchUsersAsync(UserSearchRequest request, bool strict = false, int offset = 0, int count = 50)
 		{
 			var result = db.Users.Where(u => !u.IsDeleted);
+
+			/* For empty requests return all users which we have access to. I.e. if current user is instructor, then return users from his groups.
+			   Don't fetch from database more than 2000 users. */
+			if (request.Words.Count == 0)
+			{
+				result = await accessRestrictor.RestrictUsersSetAsync(
+					result, request.CurrentUser,
+					hasSystemAdministratorAccess: true,
+					hasCourseAdminAccess: true,
+					hasInstructorAccessToGroupMembers: true,
+					hasInstructorAccessToGroupInstructors: true
+				).ConfigureAwait(false);
+
+				result = result.OrderBy(u => u.Id).Take(maxUsersCountToFetch);
+			}
 
 			var usersFields = new DefaultDictionary<string, HashSet<SearchField>>();
 			
@@ -56,11 +76,18 @@ namespace Database.Repos.Users
 			foreach (var filter in filters)
 				result = await filter.FilterAsync(result, request).ConfigureAwait(false);
 
-			return result.OrderByDescending(u => usersFields[u.Id].Count).ThenBy(u => u.LastName).ThenBy(u => u.FirstName).Take(limit).Select(u => new FoundUser
-			{
-				User = u,
-				Fields = usersFields[u.Id],
-			}).ToList();
+			return result
+				.OrderByDescending(u => usersFields[u.Id].Count)
+				.ThenBy(u => u.LastName)
+				.ThenBy(u => u.FirstName)
+				.Skip(offset)
+				.Take(count)
+				.Select(u => new FoundUser
+				{
+					User = u,
+					Fields = usersFields[u.Id],
+				})
+				.ToList();
 		}
 	}
 

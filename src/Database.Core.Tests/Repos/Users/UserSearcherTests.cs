@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Database.Repos.Users;
 using Database.Repos.Users.Search;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using NUnit.Framework;
 using Ulearn.Common;
 
@@ -18,7 +19,8 @@ namespace Database.Core.Tests.Repos.Users
 		{
 			base.SetUp();
 
-			userSearcher = new UserSearcher(db, serviceProvider.GetServices<ISearcher>(), serviceProvider.GetServices<IFilter>());
+			var accessRestrictor = new Mock<AccessRestrictor>();
+			userSearcher = new UserSearcher(db, accessRestrictor.Object, serviceProvider.GetServices<ISearcher>(), serviceProvider.GetServices<IFilter>());
 		}
 
 		[Test]

@@ -6,7 +6,7 @@ using Ulearn.Web.Api.Models.Common;
 namespace Ulearn.Web.Api.Models.Responses.Users
 {
 	[DataContract]
-	public class UsersSearchResponse : ApiResponse
+	public class UsersSearchResponse : PaginatedResponse
 	{
 		[DataMember(Name = "users")]
 		public List<FoundUserResponse> Users { get; set; }
