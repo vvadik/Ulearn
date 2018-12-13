@@ -638,7 +638,7 @@ namespace uLearn.Web.Controllers
 			/* and move course from version's directory to courses's directory */
 			var extractedVersionDirectory = courseManager.GetExtractedVersionDirectory(versionId);
 			var extractedCourseDirectory = courseManager.GetExtractedCourseDirectory(courseId);
-			log.Info($"Перемещаю паку с версий в папку с курсом: {extractedVersionDirectory.FullName} → {extractedCourseDirectory.FullName}");
+			log.Info($"Перемещаю папку с версией в папку с курсом: {extractedVersionDirectory.FullName} → {extractedCourseDirectory.FullName}");
 			courseManager.MoveCourse(
 				version,
 				extractedVersionDirectory,
