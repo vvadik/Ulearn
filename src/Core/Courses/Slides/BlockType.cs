@@ -34,31 +34,34 @@ namespace Ulearn.Core.Courses.Slides
 		IncludeBlocks,
 
 		[XmlEnum("gallery")]
-		IncludeImageGalleryBlock,
+		IncludeImageGallery,
+		
+		[XmlEnum("html")]
+		Html,
 
 		[XmlEnum("exercise.file")]
-		SingleFileExerciseBlock,
+		SingleFileExercise,
 
 		[XmlEnum("exercise.csproj")]
-		CsProjectExerciseBlock,
+		CsProjectExercise,
 
 		[XmlEnum("annotation")]
-		VideoAnnotationBlock,
+		VideoAnnotation,
 		
 		[XmlEnum("question.isTrue")]
-		IsTrueBlock,
+		IsTrueQuestion,
 		
 		[XmlEnum("question.choice")]
-		ChoiceBlock,
+		ChoiceQuestion,
 		
 		[XmlEnum("question.text")]
-		FillInBlock,
+		TextQuestion,
 		
 		[XmlEnum("question.order")]
-		OrderingBlock,
+		OrderQuestion,
 		
 		[XmlEnum("question.match")]
-		MatchingBlock,
+		MatchQuestion,
 	}
 
 	public static class BlockTypeHelpers
@@ -71,20 +74,21 @@ namespace Ulearn.Core.Courses.Slides
 				case CodeBlock _: return BlockType.Code;
 				case ImageGalleryBlock _: return BlockType.GalleryImages;
 				case IncludeCodeBlock _: return BlockType.IncludeCode;
-				case IncludeImageGalleryBlock _: return BlockType.IncludeImageGalleryBlock;
+				case IncludeImageGalleryBlock _: return BlockType.IncludeImageGallery;
 				case IncludeMarkdownBlock _: return BlockType.IncludeMarkdown;
 				case MarkdownBlock _: return BlockType.Markdown;
 				case TexBlock _: return BlockType.Tex; 
-				case VideoAnnotationBlock _: return BlockType.VideoAnnotationBlock;
+				case VideoAnnotationBlock _: return BlockType.VideoAnnotation;
+				case HtmlBlock _: return BlockType.Html;
 				
-				case FillInBlock _: return BlockType.FillInBlock;
-				case ChoiceBlock _: return BlockType.ChoiceBlock;
-				case MatchingBlock _: return BlockType.MatchingBlock;
-				case OrderingBlock _: return BlockType.OrderingBlock;
-				case IsTrueBlock _: return BlockType.IsTrueBlock;
+				case FillInBlock _: return BlockType.TextQuestion;
+				case ChoiceBlock _: return BlockType.ChoiceQuestion;
+				case MatchingBlock _: return BlockType.MatchQuestion;
+				case OrderingBlock _: return BlockType.OrderQuestion;
+				case IsTrueBlock _: return BlockType.IsTrueQuestion;
 				
-				case CsProjectExerciseBlock _: return BlockType.CsProjectExerciseBlock;
-				case SingleFileExerciseBlock _: return BlockType.SingleFileExerciseBlock;
+				case CsProjectExerciseBlock _: return BlockType.CsProjectExercise;
+				case SingleFileExerciseBlock _: return BlockType.SingleFileExercise;
 				
 				default: throw new Exception("Unknown slide block " + block);
 			}

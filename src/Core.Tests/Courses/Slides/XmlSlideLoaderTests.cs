@@ -4,6 +4,7 @@ using NUnit.Framework;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
@@ -108,6 +109,19 @@ namespace Ulearn.Core.Tests.Courses.Slides
 			var slide = (ExerciseSlide) LoadSlideFromXmlFile("ExerciseWithDefaultScore.xml");
 			
 			Assert.AreEqual(5, slide.Scoring.PassedTestsScore);
+		}
+
+		[Test]
+		public void LoadSlideWithHtmlBlock()
+		{
+			var slide = LoadSlideFromXmlFile("SlideWithHtmlBlock.xml");
+			
+			Assert.IsAssignableFrom<HtmlBlock>(slide.Blocks[0]);
+			
+			var firstBlock = (HtmlBlock)slide.Blocks[0];
+			Assert.IsTrue(firstBlock.Content.Contains("Abracadabra"));
+			Assert.IsTrue(firstBlock.Content.Contains("<br />"));
+			Assert.IsTrue(firstBlock.Content.Contains("Second text"));
 		}
     }
 }

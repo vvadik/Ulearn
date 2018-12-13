@@ -49,6 +49,7 @@ namespace Ulearn.Core.Courses.Slides
 		[XmlElement(typeof(IncludeMarkdownBlock))]
 		[XmlElement(typeof(IncludeImageGalleryBlock))]
 		[XmlElement(typeof(VideoAnnotationBlock))]
+		[XmlElement("html", typeof(HtmlBlock))]
 		
 		/* Quiz blocks */
 		[XmlElement(typeof(IsTrueBlock))]
@@ -78,7 +79,8 @@ namespace Ulearn.Core.Courses.Slides
 			typeof(IncludeCodeBlock),
 			typeof(IncludeMarkdownBlock),
 			typeof(IncludeImageGalleryBlock),
-			typeof(VideoAnnotationBlock)
+			typeof(VideoAnnotationBlock),
+			typeof(HtmlBlock)
 		};
 		
 		[XmlIgnore]

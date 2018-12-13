@@ -220,6 +220,7 @@
             <xs:element name="gallery" type="NonEmptyString" />
             <xs:element name="includeBlocks" type="Include" />            
             <xs:element name="annotation" type="VideoAnnotation" />
+			<xs:element name="html" type="Html" />
             
             <!-- Quiz blocks -->
             <xs:element name="question.isTrue" type="IsTrueBlock" />
@@ -294,6 +295,13 @@
             </xs:element>
         </xs:sequence>
     </xs:complexType>
+
+	<xs:complexType name="Html" mixed="true">
+		<xs:sequence>
+			<xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:anyAttribute processContents="skip"/>
+	</xs:complexType>
 
     <xs:complexType name="MarkdownBlock" mixed="true">
         <xs:sequence minOccurs="0" maxOccurs="unbounded">

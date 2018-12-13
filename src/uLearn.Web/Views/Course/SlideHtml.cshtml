@@ -194,6 +194,11 @@
 	</div>
 }
 
+@helper Block(HtmlBlock block, BlockRenderContext context, HtmlHelper Html)
+{
+	@Html.Raw(block.Content)
+}
+
 @helper CodeTextArea(string initialCode, string langId, string runSolutionUrl)
 {
 	<textarea class="code code-exercise" data-lang="@langId">@initialCode</textarea>
