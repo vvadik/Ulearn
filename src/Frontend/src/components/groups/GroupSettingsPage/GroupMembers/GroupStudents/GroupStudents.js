@@ -27,32 +27,28 @@ class GroupStudents extends Component {
 
 		return(
 			<React.Fragment>
+				<div className={styles["actions-block"]}>
+					<Checkbox
+						checked={studentIds.size === studentsArrayOfIds.length || false}
+						onChange={this.onCheckAllStudents}>
+						Выбрать всех
+					</Checkbox>
+					{this.renderStudentActions()}
+				</div>
 				<div>
-					<div className={styles["actions-block"]}>
+					{students.map(item =>
+					<div className={styles["student-block"]}
+						key={item.user.id}>
 						<Checkbox
-							checked={studentIds.size === studentsArrayOfIds.length || false}
-							onChange={this.onCheckAllStudents}>
-							<span>Выбрать всех</span>
+							checked={studentIds.has(item.user.id) || false}
+							onChange={(_, value) => this.onCheckStudent(item.user.id, _, value)}>
+							<Avatar user={item.user} size={styles.small} />
+							{ item.user.visible_name } <span className={styles["action-text"]}>
+								{ `${ getWordForm('вступила', 'вступил', item.user.gender) }
+								${ moment(grantTime(item.adding_time)).fromNow() }` }</span>
 						</Checkbox>
-						{this.renderStudentActions()}
 					</div>
-					<div>
-						{students.map(item =>
-						<div className={styles["student-block"]}
-							key={item.user.id}>
-							<Checkbox
-								checked={studentIds.has(item.user.id) || false}
-								onChange={(_, value) => this.onCheckStudent(item.user.id, _, value)}>
-								<Avatar user={item.user} size={styles.small} />
-								{ item.user.visible_name } {' '}
-								<span className={styles["action-text"]}>
-									{ getWordForm('вступила', 'вступил', item.user.gender) }
-									{' '} { moment(grantTime(item.adding_time)).fromNow() }
-								</span>
-							</Checkbox>
-						</div>
 					)}
-					</div>
 				</div>
 				{ modalOpen &&
 				<CopyStudentsModal
@@ -65,12 +61,12 @@ class GroupStudents extends Component {
 
 	renderStudentActions() {
 		const { studentIds } = this.state;
- 		let buttonState = `${styles.action}`;
+ 		let buttonClass = `${styles.action}`;
 
 		return (
 		<React.Fragment>
 			<button
-				className={studentIds.size > 0 ? buttonState + ` ${styles["button-copy"]}` : buttonState}
+				className={studentIds.size > 0 ? `${buttonClass} ${styles["button-copy"]}` : buttonClass}
 				disabled={studentIds.size === 0}
 				onClick={this.onOpenModal}>
 				<Gapped gap={3}>
@@ -79,7 +75,7 @@ class GroupStudents extends Component {
 				</Gapped>
 			</button>
 			<button
-				className={studentIds.size > 0 ? buttonState + ` ${styles["button-delete"]}` : buttonState}
+				className={studentIds.size > 0 ? `${buttonClass} ${styles["button-delete"]}` : buttonClass}
 				disabled={studentIds.size === 0}
 				onClick={this.onDeleteStudents}
 				>

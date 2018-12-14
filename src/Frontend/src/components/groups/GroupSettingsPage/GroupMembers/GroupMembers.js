@@ -8,8 +8,8 @@ import Icon from "@skbkontur/react-icons";
 import Kebab from "@skbkontur/react-ui/components/Kebab/Kebab";
 import MenuItem from "@skbkontur/react-ui/components/MenuItem/MenuItem";
 import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
-import ComboboxSearch from "./Combobox/ComboboxSearch";
 import Loader from "@skbkontur/react-ui/components/Loader/Loader";
+import ComboboxInstructorsSearch from "./Combobox/ComboboxInstructorsSearch";
 import Avatar from "./Avatar/Avatar";
 import GroupStudents from "./GroupStudents/GroupStudents";
 import InviteBlock from "./InviteBlock/InviteBlock";
@@ -108,7 +108,7 @@ class GroupMembers extends Component {
 
 	renderTeachers() {
 		const { accesses } = this.state;
-		const grantTime = (grantTime) => moment.tz(grantTime, 'Europe/Moscow').tz('Asia/Yekaterinburg').format();
+		const grantTime = (grantTime) => moment(grantTime).tz('Asia/Yekaterinburg').format();
 
 		return (accesses.map(item =>
 			<React.Fragment
@@ -118,9 +118,8 @@ class GroupMembers extends Component {
 					<div className={styles["teacher-name"]}>
 						<div>{item.user.visible_name}</div>
 						<span className={styles["teacher-status"]}>
-							Полный доступ {getWordForm('предоставила', 'предоставил', this.props.group.owner.gender)}
-							{' '} {item.granted_by.visible_name} {' '}
-							{ moment(grantTime(item.grant_time)).fromNow() }
+							Полный доступ { `${getWordForm('предоставила', 'предоставил', this.props.group.owner.gender)}
+							${item.granted_by.visible_name} ${moment(grantTime(item.grant_time)).fromNow()}` }
 						</span>
 					</div>
 					<div className={styles["teacher-action"]}>
@@ -158,7 +157,7 @@ class GroupMembers extends Component {
 		return (
 			<label className={styles["teacher-search"]}>
 				<p>Добавить преподавателя:</p>
-				<ComboboxSearch
+				<ComboboxInstructorsSearch
 					selected={selected}
 					courseId={courseId}
 					accesses={accesses}
@@ -181,7 +180,6 @@ class GroupMembers extends Component {
 		this.props.onChangeGroupOwner(user);
 
 		api.groups.changeGroupOwner(group.id, user.id)
-			.then(response => response)
 			.catch(console.error);
 	};
 
@@ -194,7 +192,6 @@ class GroupMembers extends Component {
 		});
 
 		api.groups.removeAccess(this.props.group.id, user.id)
-			.then(response => response)
 			.catch(console.error);
 	};
 
@@ -214,7 +211,7 @@ class GroupMembers extends Component {
 			.concat({
 				user: item,
 				granted_by: group.owner,
-				grant_time: moment(),
+				grant_time: new Date(),
 			});
 
 		this.setState({
@@ -222,7 +219,6 @@ class GroupMembers extends Component {
 		});
 
 		api.groups.addGroupAccesses(group.id, item.value)
-			.then(response => response)
 			.catch(console.error);
 	};
 

@@ -157,7 +157,6 @@ class GroupListPage extends AbstractPage {
 
 	deleteGroup = (group, groupsName) => {
 		api.groups.deleteGroup(group.id)
-			.then(response => response)
 			.catch(console.error);
 
 		const updateGroups = this.state[groupsName].filter(g => group.id !== g.id);
@@ -173,7 +172,6 @@ class GroupListPage extends AbstractPage {
 		};
 
 		api.groups.saveGroupSettings(group.id, newSettings)
-			.then(response => response)
 			.catch(console.error);
 
 		group = { ...group, ...newSettings };

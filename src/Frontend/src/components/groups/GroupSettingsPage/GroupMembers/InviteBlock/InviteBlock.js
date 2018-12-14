@@ -5,36 +5,31 @@ import api from "../../../../../api";
 import Toggle from "@skbkontur/react-ui/components/Toggle/Toggle";
 import Button from "@skbkontur/react-ui/components/Button/Button";
 import Toast from "@skbkontur/react-ui/components/Toast/Toast";
-import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
-import Icon from "@skbkontur/react-icons";
+import LinkIcon from "@skbkontur/react-icons/Link";
 import Input from "@skbkontur/react-ui/components/Input/Input";
 
 import styles from './style.less';
 
 class InviteBlock extends Component {
 
-	state = {
-		copied: false,
-	};
-
 	render() {
 		const { group } = this.props;
-		const inviteLink = group.is_invite_link_enabled || false;
+		const inviteLinkEnabled = group.is_invite_link_enabled || false;
 
 		return (
-			<label>
-				<div className={styles["toggle-invite"]}>
-					<Toggle
-						checked={inviteLink}
-						onChange={this.onToggleHash}
-						color="default">
-					</Toggle>
-					<span className={styles["toggle-invite-text"]}>
-						Ссылка для вступления в группу { inviteLink ? ' включена' : ' выключена' }
-					</span>
-				</div>
-				{ inviteLink && this.renderInvite() }
-			</label>
+			<div className={styles["toggle-invite"]}>
+				<label>
+						<Toggle
+							checked={inviteLinkEnabled}
+							onChange={this.onToggleHash}
+							color="default">
+						</Toggle>
+						<span className={styles["toggle-invite-text"]}>
+							Ссылка для вступления в группу { inviteLinkEnabled ? ' включена' : ' выключена' }
+						</span>
+				</label>
+				{ inviteLinkEnabled && this.renderInvite() }
+			</div>
 		)
 	}
 
@@ -44,14 +39,9 @@ class InviteBlock extends Component {
 		return (
 			<div className={styles["inviteLink-block"]}>
 				<div className={styles["inviteLink-text"]}>
-					<CopyToClipboard
-						text={`https://ulearn.me/Account/JoinGroup?hash=${group.invite_hash}`}
-						onCopy={() => this.setState({copied: true})}>
-						<Button use="link" onClick={() => Toast.push('Ссылка скопирована')}>
-							<Gapped gap={5}>
-								<Icon name="Link" />
-								Скопировать ссылку
-							</Gapped>
+					<CopyToClipboard text={`https://ulearn.me/Account/JoinGroup?hash=${group.invite_hash}`}>
+						<Button use="link" icon={<LinkIcon />} onClick={() => Toast.push('Ссылка скопирована')}>
+							Скопировать ссылку
 						</Button>
 					</CopyToClipboard>
 				</div>
@@ -73,11 +63,9 @@ class InviteBlock extends Component {
 		const field = 'is_invite_link_enabled';
 		const updatedField = {[field]: !inviteLink};
 
-		this.setState({copied: false});
 		onChangeSettings(field, !inviteLink);
 
 		api.groups.saveGroupSettings(group.id, updatedField)
-			.then(response => response)
 			.catch(console.error);
 	};
 }

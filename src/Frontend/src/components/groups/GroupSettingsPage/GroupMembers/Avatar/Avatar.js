@@ -7,17 +7,15 @@ import styles from './style.less';
 class Avatar extends Component {
 
 	render() {
-		const { user, size } = this.props;
+		const {user, size} = this.props;
 		const imageUrl = user.avatar_url;
-		const userName = user.visible_name;
-		const userFirstLetter = userName[userName.search(/[a-zA-Zа-яА-Я]/)].toUpperCase();
 		let className = `${styles["photo-avatar"]} ${size}`;
 
-		return (
-			<React.Fragment>
-				{ imageUrl ? this.renderImage(imageUrl, className) : this.renderCircle(userName, userFirstLetter, className) }
-			</React.Fragment>
-			)
+		if (imageUrl) {
+			return this.renderImage(imageUrl, className)
+		}
+
+		return this.renderCircle(className)
 	}
 
 	renderImage(url, className) {
@@ -30,13 +28,16 @@ class Avatar extends Component {
 		);
 	}
 
-	renderCircle(name, letter, className) {
+	renderCircle(className) {
+		const userName = this.props.user.visible_name;
+		const firstLetterIndex = userName.search(/[a-zа-яё]/i);
+		const userFirstLetter = firstLetterIndex !== -1 ? userName[firstLetterIndex].toUpperCase() : '?';
 		let divStyle = {
-			backgroundColor: `${colorHash(name)}`,
+			backgroundColor: `${colorHash(userName)}`,
 		};
 
 		return (
-			<div style={divStyle} className={ `${className} ${styles["color-avatar"]}` }>{ letter }</div>
+			<div style={divStyle} className={`${className} ${styles["color-avatar"]}`}>{ userFirstLetter }</div>
 		)
 	}
 }

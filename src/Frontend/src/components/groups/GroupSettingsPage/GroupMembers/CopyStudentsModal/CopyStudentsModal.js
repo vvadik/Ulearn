@@ -84,7 +84,6 @@ class CopyStudentsModal extends Component {
 						placeholder="Курс"
 						value={courseId}
 						error={this.hasError()}
-						use="default"
 					/>
 				</label>
 			</React.Fragment>
@@ -108,7 +107,6 @@ class CopyStudentsModal extends Component {
 						placeholder="Группа"
 						value={groupId}
 						error={this.hasError()}
-						use="default"
 						disabled={groups.length === 0}
 					/>
 				</label>
@@ -164,7 +162,6 @@ class CopyStudentsModal extends Component {
 	onSubmit = (e) => {
 		const { groupId, courseId } = this.state;
 		const { studentIds, currentGroupId, onClose } = this.props;
-		const students = [...studentIds];
 
 		e.preventDefault();
 
@@ -175,8 +172,9 @@ class CopyStudentsModal extends Component {
 			return;
 		}
 
+		const students = [...studentIds];
+
 		api.groups.copyStudents(currentGroupId, groupId, students)
-			.then(response => response)
 			.catch(console.error);
 
 		onClose();

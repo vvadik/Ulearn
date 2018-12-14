@@ -6,7 +6,7 @@ import Avatar from "../Avatar/Avatar";
 
 import styles from './style.less';
 
-class ComboboxSearch extends Component {
+class ComboboxInstructorsSearch extends Component {
 
 	render () {
 		const { selected } = this.props;
@@ -26,8 +26,8 @@ class ComboboxSearch extends Component {
 
 	getItems = (query) => {
 		const { accesses, owner } = this.props;
-		const includes = (stack, item) => stack.toLowerCase().includes(item.toLowerCase());
-		const uniqueValue = (item) => {
+		const includes = (str, substr) => str.toLowerCase().includes(substr.toLowerCase());
+		const isAddedUser = (item) => {
 			return (owner.id !== item.id) &&
 			(accesses.filter(i => i.user.id === item.id)).length === 0;
 		};
@@ -36,7 +36,7 @@ class ComboboxSearch extends Component {
 			.then(json => {
 				return json.instructors
 					.filter(item => {
-						return (uniqueValue(item)) &&
+						return (isAddedUser(item)) &&
 							(includes(item.visible_name, query) ||
 							includes(item.login, query))
 					})
@@ -66,14 +66,12 @@ class ComboboxSearch extends Component {
 		)
 	};
 
-	renderNotFound = (item) => {
-		if (item === undefined) {
+	renderNotFound = () => {
 			return (
 				<span>
 					В этом курсе нет свободных преподавателей
 				</span>
 			)
-		}
 	};
 
 	onChangeItem = (_, item) => {
@@ -81,7 +79,7 @@ class ComboboxSearch extends Component {
 	}
 }
 
-ComboboxSearch.propTypes = {
+ComboboxInstructorsSearch.propTypes = {
 	selected: PropTypes.object,
 	courseId: PropTypes.string,
 	onAddTeacher: PropTypes.func,
@@ -89,4 +87,4 @@ ComboboxSearch.propTypes = {
 	owner: PropTypes.object,
 };
 
-export default ComboboxSearch;
+export default ComboboxInstructorsSearch;
