@@ -1,33 +1,32 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
-import api from "../../../../api";
+import api from "../../../../../api/index";
 import Select from "@skbkontur/react-ui/components/Select/Select";
 import Modal from "@skbkontur/react-ui/components/Modal/Modal";
 import Button from "@skbkontur/react-ui/components/Button/Button";
 import Toast from "@skbkontur/react-ui/components/Toast/Toast";
+import getPluralForm from "../../../../../utils/getPluralForm";
 
 import styles from './style.less';
-import getPluralForm from "../../../../utils/getPluralForm";
 
-export default class CopyStudentsModal extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			groupId: null,
-			courseId: null,
-			groups: [],
-			courses: [],
-			error: null,
-		};
-	}
+class CopyStudentsModal extends Component {
+
+	state = {
+		groupId: null,
+		courseId: null,
+		groups: [],
+		courses: [],
+		error: null,
+	};
 
 	componentDidMount() {
-		api.courses.getUsersCourses().then(json => {
+		api.courses.getUserCourses()
+			.then(json => {
 			let courses = json.courses;
 			this.setState({
-				courses: courses
+				courses,
 			});
-		});
+		}).catch(console.error);
 	}
 
 	loadGroups = (courseId) => {
@@ -35,7 +34,7 @@ export default class CopyStudentsModal extends Component {
 			.then(json => {
 				let groups = json.groups;
 				this.setState({
-					groups: groups,
+					groups,
 				});
 			}).catch(console.error);
 	};
@@ -47,7 +46,7 @@ export default class CopyStudentsModal extends Component {
 				<Modal.Header>Скопировать группу из курса</Modal.Header>
 				<form onSubmit={this.onSubmit}>
 					<Modal.Body>
-						<p className={styles["modal-text"]}>Студенты будут добавлены в выбранную группу.
+						<p className={styles["common-info"]}>Студенты будут добавлены в выбранную группу.
 							Скопируются все данные студента, в том числе прогресс студента. (Но это не точно)
 						</p>
 						{ this.renderCourseSelect() }
@@ -99,7 +98,7 @@ export default class CopyStudentsModal extends Component {
 				<p className={styles["group-info"]}>
 					Выберите группу, в которую будут скопированы студентов
 				</p>
-				<label className={styles["select-course"]}>
+				<label className={styles["select-group"]}>
 					<Select
 						autofocus
 						required
@@ -112,15 +111,15 @@ export default class CopyStudentsModal extends Component {
 						use="default"
 						disabled={groups.length === 0}
 					/>
-					{ this.onCheckGroups() && this.renderEmptyGroups() }
 				</label>
+					{ this.checkGroups() && this.renderEmptyGroups() }
 			</React.Fragment>
 		)
 	}
 
 	renderEmptyGroups() {
 		return (
-			<p className={styles["empty-group-text"]}><b>В выбранном вами курсе нет доступных групп</b></p>
+			<p className={styles["empty-group-info"]}><b>В выбранном вами курсе нет доступных групп</b></p>
 		)
 	}
 
@@ -154,7 +153,7 @@ export default class CopyStudentsModal extends Component {
 		return this.state.error !== null;
 	};
 
-	onCheckGroups = () => {
+	checkGroups = () => {
 		const { courseId, groups } = this.state;
 		if (!groups) {
 			return false;
@@ -183,10 +182,12 @@ export default class CopyStudentsModal extends Component {
 		onClose();
 		Toast.push('Скопировано');
 	};
-};
+}
 
 CopyStudentsModal.propTypes = {
 	onCloseModal: PropTypes.func,
 	currentGroupId: PropTypes.number,
 	studentIds: PropTypes.object,
 };
+
+export default CopyStudentsModal;

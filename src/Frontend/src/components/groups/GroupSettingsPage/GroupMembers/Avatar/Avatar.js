@@ -1,10 +1,10 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
-import colorHash from '../../../../utils/colorHash';
+import colorHash from '../../../../../utils/colorHash';
 
 import styles from './style.less';
 
-export default class Avatar extends Component {
+class Avatar extends Component {
 
 	render() {
 		const { user, size } = this.props;
@@ -45,3 +45,5 @@ Avatar.propTypes = {
 	size: PropTypes.string,
 	user: PropTypes.object,
 };
+
+export default Avatar;

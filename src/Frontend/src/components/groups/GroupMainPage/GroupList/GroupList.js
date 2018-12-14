@@ -7,7 +7,7 @@ import GroupInfo from "../GroupInfo/GroupInfo";
 
 import styles from "./style.less";
 
-class GroupsList extends Component {
+class GroupList extends Component {
 	render() {
 		return (
 			<section className={styles.wrapper}>
@@ -30,7 +30,7 @@ class GroupsList extends Component {
 	}
 }
 
-GroupsList.propTypes = {
+GroupList.propTypes = {
 	courseId: PropTypes.string.isRequired,
 	groups: PropTypes.array,
 	loading: PropTypes.bool,
@@ -38,4 +38,4 @@ GroupsList.propTypes = {
 	toggleArchived: PropTypes.func,
 };
 
-export default GroupsList;
+export default GroupList;

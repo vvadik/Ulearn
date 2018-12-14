@@ -1,0 +1,44 @@
+@import "../../../../../variables.less";
+
+.toggle-invite {
+  cursor: pointer;
+  margin: 10px 0 5px;
+}
+
+.toggle-invite-text {
+  margin-left: 7px;
+}
+
+.inviteLink-block {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 5px 0 10px;
+  cursor: pointer;
+}
+
+.inviteLink-text {
+  display: inline-block;
+  margin-right: 10px;
+
+  span {
+	&:hover {
+	  text-decoration-line: underline;
+	}
+  }
+}
+
+.inviteLink-input {
+  display: inline-block;
+  width: 100%;
+
+  label {
+	width: 100%;
+  }
+
+  @media (max-width: @maxPhoneWidth) {
+	display: none;
+  }
+}
+

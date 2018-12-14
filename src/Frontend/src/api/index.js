@@ -71,7 +71,7 @@ function put(url, options) {
 	return request(url, options);
 }
 
-function deleteGroup(url, options) {
+function deleteRequest(url, options) { /* delete - зарезервированное слово, поэтому так */
 	options = options || {};
 	options.method = 'DELETE';
 	return request(url, options);
@@ -87,7 +87,7 @@ let api = {
     post: post,
 	patch: patch,
 	put: put,
-	delete: deleteGroup,
+	delete: deleteRequest,
     request: request
 };
 

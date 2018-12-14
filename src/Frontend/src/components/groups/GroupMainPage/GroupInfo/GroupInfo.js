@@ -13,89 +13,91 @@ class GroupInfo extends Component {
 
 	render() {
 		const { group } = this.props;
+
 		if (!group) {
 			return null;
 		}
 
 		const studentsCount = group.students_count || 0;
 		const pluralFormOfStudents = getPluralForm(studentsCount, 'студент', 'студента', 'студентов');
+		const isCodeReviewEnabled = group.is_manual_checking_enabled;
+		const isProgressEnabled = group.can_users_see_group_progress;
+
+		return (
+			<div className={styles.wrapper}>
+				<div className={styles["content-wrapper"]}>
+					<Link className={styles["link-to-group-page"]} to={`/${this.props.courseId}/groups/${group.id}`} />
+					<div className={styles["content-block"]}>
+						<header className={styles.content}>
+							<h3 className={styles["group-name"]}>{group.name}</h3>
+							<div className={styles["students-count"]}>
+								{studentsCount} {pluralFormOfStudents}
+							</div>
+							{this.renderTeachers()}
+						</header>
+						<div className={styles["group-settings"]}>
+							{this.renderSetting(isProgressEnabled, isProgressEnabled ?
+								'Ведомость включена': 'Ведомость выключена')}
+							{this.renderSetting(isCodeReviewEnabled, isCodeReviewEnabled ?
+								'Код-ревью включено' : 'Код-ревью выключено')}
+						</div>
+					</div>
+				</div>
+				{this.renderActions()}
+			</div>
+		)
+	}
+
+	renderTeachers() {
+		const { group } = this.props;
 		const teachersList = group.accesses.map(item => item.user.visible_name);
 		const owner = group.owner.visible_name || 'Неизвестный';
 		const teachers = [owner, ...teachersList];
 		const teachersCount = teachers.length;
 		const pluralFormOfTeachers = getPluralForm(teachersCount, 'преподаватель', 'преподаватели');
-		const groupName = group.name;
-		const groupId = group.id;
-		const isCodeReviewEnabled = group.is_manual_checking_enabled;
-		const isProgressEnabled = group.can_users_see_group_progress;
 
 		return (
-			<div className={styles["group"]}>
-				<div className={styles["group-content-wrapper"]}>
-					<Link className={styles["link-group-page"]} to={`/${this.props.courseId}/groups/${groupId}`} />
-					<div className={styles["group-content"]}>
-						<header className={styles["group-content-main"]}>
-							<h3 className={styles["group-content-main__name"]}>{groupName}</h3>
-							<div className={styles["group-content-main__count"]}>
-								{studentsCount} {pluralFormOfStudents}
-							</div>
-							<div className={styles["group-content-main__teachers"]}>
-								{`${pluralFormOfTeachers}: ${teachers.join(', ')}`}
-							</div>
-						</header>
-						<div className={styles["group-content-state"]}>
-							{this.renderSetting(isProgressEnabled, isProgressEnabled ? 'Ведомость включена': 'Ведомость выключена')}
-							{this.renderSetting(isCodeReviewEnabled, isCodeReviewEnabled ? 'Код-ревью включено' : 'Код-ревью выключено')}
-						</div>
-					</div>
-				</div>
-				<div className={styles["group-action"]}>
-					{this.renderKebab()}
-				</div>
+			<div className={styles["teachers-list"]}>
+				{`${pluralFormOfTeachers}: ${teachers.join(', ')}`}
 			</div>
 		)
-	}
-
-	renderKebab() {
-		const { group } = this.props;
-
-		return (
-			<Kebab size="large">
-				<MenuItem onClick={() => this.props.toggleArchived(group, !group.is_archived)}>
-					<Gapped gap={5}>
-						<Icon name="ArchiveUnpack" />
-						{group.is_archived ? 'Восстановить' : 'Архивировать'}
-					</Gapped>
-				</MenuItem>
-				<MenuItem onClick={() => this.props.deleteGroup(group, group.is_archived ? 'archiveGroups' : 'groups')}>
-					<Gapped gap={5}>
-						<Icon name="Delete" />
-						Удалить
-					</Gapped>
-				</MenuItem>
-			</Kebab>
-		)
-
 	}
 
 	renderSetting(enabled, text) {
-		if (enabled) {
-			return (
-			<div className={styles["group-content-state_on"]}>
-				<Icon name="Ok"/>
-				{text}
+		return (
+			<div className={enabled ? styles["settings-on"] : styles["settings-off"]}>
+				<Gapped gap={5}>
+					{ enabled ? <Icon name="Ok"/> : <Icon name="Delete"/> }
+					{text}
+				</Gapped>
 			</div>
-			)
-		} else {
-			return (
-			<div className={styles["group-content-state_off"]}>
-				<Icon name="Delete"/>
-				{text}
-			</div>
-			)
-		}
+		)
 	}
- }
+
+	renderActions() {
+		const { group } = this.props;
+
+		return (
+			<div className={styles["group-action"]}>
+				<Kebab size="large">
+					<MenuItem onClick={() => this.props.toggleArchived(group, !group.is_archived)}>
+						<Gapped gap={5}>
+							<Icon name="ArchiveUnpack" />
+							{group.is_archived ? 'Восстановить' : 'Архивировать'}
+						</Gapped>
+					</MenuItem>
+					<MenuItem onClick={() => this.props.deleteGroup(group, group.is_archived ?
+						'archiveGroups' : 'groups')}>
+						<Gapped gap={5}>
+							<Icon name="Delete" />
+							Удалить
+						</Gapped>
+					</MenuItem>
+				</Kebab>
+			</div>
+		)
+	}
+}
 
 GroupInfo.propTypes = {
 	courseId: PropTypes.string.isRequired,

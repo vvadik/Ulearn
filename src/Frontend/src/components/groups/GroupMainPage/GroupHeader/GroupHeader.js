@@ -44,9 +44,9 @@ class GroupHeader extends Component {
 
 	renderHeader() {
 		return (
-			<header className={styles["group-header"]}>
-				<div className={styles["group-header-container"]}>
-					<h2>Группы</h2>
+			<header className={styles["header"]}>
+				<div className={styles["header-container"]}>
+					<h2 className={styles["header-name"]}>Группы</h2>
 					<div className={styles["buttons-container"]}>
 						<Gapped gap={20}>
 							<Button id="create" use="primary" size="medium" onClick={this.openCreateGroupModal}>Создать группу</Button>
@@ -66,13 +66,16 @@ class GroupHeader extends Component {
 
 	openCreateGroupModal = () => {
 		this.setState({
-			modalCreateGroup: true
+			modalCreateGroup: true,
+			modalCopyGroup: false,
 		})
 	};
 
 	openCopyGroupModal = () => {
 		this.setState({
-			modalCopyGroup: true
+			modalCopyGroup: true,
+			modalCreateGroup: false,
+
 		})
 	};
 

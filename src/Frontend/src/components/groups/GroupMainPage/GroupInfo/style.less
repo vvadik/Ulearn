@@ -1,11 +1,10 @@
 @import "../../../../variables.less";
+@indent: 27px;
 
-.group {
-  padding: 0 27px 15px 27px;
-  transition: 0.3s ease-in;
+.wrapper {
+  padding: 0 @indent 15px;
   position: relative;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: none;
   background: #fff;
   border-radius: 2px;
   display: flex;
@@ -19,13 +18,13 @@
   }
 }
 
-.group-content-wrapper {
+.content-wrapper {
   font-size: 14px;
   cursor: pointer;
   width: 100%;
 }
 
-.link-group-page {
+.link-to-group-page {
   position: absolute;
   top: 0;
   right: 0;
@@ -34,7 +33,7 @@
   display: block;
 }
 
-.group-content {
+.content-block {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -44,53 +43,41 @@
   }
 }
 
-.group-content-main {
+.content {
   width: 55%;
   align-self: baseline;
 
   @media (max-width: @maxTabletWidth) {
 	width: 100%;
   }
-
-  @media (max-width: @maxPhoneWidth) {
-	width: 100%;
-  }
 }
 
-.group-content-main__name {
+.group-name {
   font-size: 18px;
   color: #337ab7;
   margin-bottom: 7px;
 }
 
-.group-content-main__teachers,
-.group-content-main__count {
+.teachers-list,
+.students-count {
   color: #333;
   opacity: 80%;
 }
 
-.group-content-state {
+.group-settings {
   width: 35%;
   align-self: flex-end;
-
-  span {
-	margin-right: 5px;
-  }
 
   @media (max-width: @maxTabletWidth) {
 	width: 100%;
   }
-
-  @media (max-width: @maxPhoneWidth) {
-	display: none;
-  }
 }
 
-.group-content-state_on {
+.settings-on{
   color: #3F9726;
 }
 
-.group-content-state_off {
+.settings-off {
   color: #D97E00;
 }
 
@@ -100,7 +87,7 @@
   height: 30px;
   cursor: pointer;
   align-self: baseline;
-  z-index: 9;
+  z-index: 1;
 
   @media (max-width: @maxPhoneWidth) {
 	margin-right: 0;

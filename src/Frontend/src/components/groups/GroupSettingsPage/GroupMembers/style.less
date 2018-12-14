@@ -1,238 +1,65 @@
 @import "../../../../variables.less";
 
 .wrapper {
-	width: 100%;
-	background-color: #f2f2f2;
-	margin: 0 auto;
-  }
+  width: 100%;
+  margin: 0 0 40px 0;
+}
 
-  .content-wrapper {
-	background: #fff;
-	width: 80%;
-	margin: 0 auto;
-  }
+.teachers {
+  margin-bottom: 30px;
+}
 
-  .group-settings-wrapper {
-	width: 100%;
-	margin: 0 0 40px 0;
-  }
+.teachers-header {
+  margin: 20px 0 5px 0;
+}
 
-  .content {
-	width: 80%;
-	margin: 0 auto;
-  }
-
-  h2 {
-	font-weight: 500;
-	text-align: left;
-	font-size: 32px;
-	line-height: 40px;
-	margin: 0 0 10px 0;
-	border-bottom: none;
-	padding: 30px 0;
-  }
-
-  h4 {
-	font-size: 18px;
-	line-height: 30px;
-	margin: 10px 0 15px 0;
-	font-weight: 500;
-  }
-
-  .teachers-block {
-	margin-bottom: 30px;
-
-	h4 {
-	  margin: 20px 0 5px 0;
-	}
-
-	label {
-	  margin: 0;
-
-	  p {
-		margin-bottom: 10px;
-	  }
-	}
-
-	input {
-	  width: 100%;
-	}
-  }
-
-  .teacher-block {
-	display: flex;
-	flex-direction: row;
-	justify-content: flex-start;
-	margin: 10px 0;
-	align-items: flex-start;
-
-	.teacher-block-name {
-	  margin-left: 15px;
-	}
-
-	.teacher-status {
-	  color: #737373;
-
-	  @media (max-width: @maxPhoneWidth) {
-		display: none;
-	  }
-	}
-
-	.group-action {
-	  margin-left: auto;
-	}
-  }
-  .students-block h4 {
-	  margin: 0 0 5px 0;
-  }
-
-  .photo-avatar {
-	display: inline-block;
-	border-radius: 4px;
-  }
-
-  .color-avatar {
-	color: #fff;
-	text-align: center;
-	padding: 5px 0;
-  }
-
-  ._big {
-	font-size: 30px;
-	font-weight: 500;
-	min-width: 55px;
-	height: 55px;
-  }
-
-  ._small {
-	font-size: 16px;
-	min-width: 20px;
-	height: 20px;
-	font-weight: 700;
-	padding: 0;
-	margin-right: 10px;
-  }
-
-  .combo-item {
-	display: flex;
-	flex-direction: row;
-	justify-content: flex-start;
-
-	.combo-item_login {
-	  margin-left: auto;
-	}
-  }
-
-  .toggle-invite {
-	cursor: pointer;
-	margin: 10px 0 5px;
-  }
-
-  .toggle-invite-text {
-	margin-left: 7px;
-  }
-
-  .invite-link-block {
-	display: flex;
-	flex-direction: row;
-	justify-content: flex-start;
-	align-items: center;
-	margin: 5px 0 10px;
-	cursor: pointer;
-  }
-
-  .invite-link-input {
-	display: inline-block;
-	width: 100%;
-
-	label {
-	  width: 100%;
-	}
-
-	@media (max-width: @maxPhoneWidth) {
-	  display: none;
-	}
-  }
-
-  .invite-link-text {
-	display: inline-block;
-	margin-right: 10px;
-
-	span {
-	  &:hover {
-		text-decoration-line: underline;
-		text-decoration-style: solid;
-		text-decoration-color: #3072C4;
-	  }
-	}
-  }
-
-  .students-actions {
-	display: flex;
-	justify-content: flex-start;
-	flex-direction: row;
-	align-items: center;
-	margin: 0 0 10px 0;
-
-	label {
-	  width: auto;
-	  margin: 0 30px 0 0;
-	}
-  }
-
-  .students-action {
-	border: none;
-	background: transparent;
-	color: #A0A0A0;
-	padding: 0;
-	margin-right: 20px;
-  }
-
-  .button-copy {
-	color: #3072C4;
-  }
-
-  .button-delete {
-	color: #CE0014;
-  }
-
-  .students-action__text {
-	@media (max-width: @maxPhoneWidth) {
-	  display: none;
-	}
-	&:hover {
-	  text-decoration-line: underline;
-	}
-  }
-
-  .student-block {
-	display: flex;
-	justify-content: flex-start;
-	flex-direction: column;
-	width: fit-content;
-  }
-
-  .modal-text {
+.teachers-info {
 	margin-bottom: 10px;
-  }
+}
 
-  .select-course {
-	width: fit-content;
-  }
+.teacher-block {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  margin: 10px 0;
+  align-items: flex-start;
+}
 
-  .course-info, .group-info {
-	margin: 0 0 5px;
-  }
+.teacher-name {
+  margin-left: 15px;
+}
 
-  .group-info {
-	margin-top: 15px;
-  }
+.teacher-status {
+  color: #737373;
 
-  .empty-group-text {
-	display: inline-block;
-	margin-left: 10px;
+  @media (max-width: @maxPhoneWidth) {
+	display: none;
   }
+}
 
+.teacher-action {
+  margin-left: auto;
+}
+
+.students-header {
+	margin: 0 0 5px 0;
+}
+
+.big {
+  font-size: 30px;
+  font-weight: 500;
+  min-width: 55px;
+  height: 55px;
+}
+
+.small {
+  font-size: 16px;
+  min-width: 20px;
+  height: 20px;
+  font-weight: 700;
+  padding: 0;
+  margin-right: 10px;
+}
 
 
 

@@ -16,7 +16,7 @@ export function getCourses() {
     };
 }
 
-export function getUsersCourses() {
-	return api.get('courses/?instructor')
+export function getUserCourses() {
+	return api.get('courses?role=instructor')
 		.then(response => response.json());
 }

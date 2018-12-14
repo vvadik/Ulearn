@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet";
 import connect from "react-redux/es/connect/connect";
 import PropTypes from 'prop-types';
 import api from "../../../api";
-import GroupsList from "../../../components/groups/GroupMainPage/GroupList/GroupsList";
+import GroupList from "../../../components/groups/GroupMainPage/GroupList/GroupList";
 import GroupHeader from "../../../components/groups/GroupMainPage/GroupHeader/GroupHeader";
 
 import styles from "./mainPage.less";
@@ -13,7 +13,7 @@ class AbstractPage extends Component {
  // TODO: выяснить у Андрея, зачем оно. И реализоваьть или удалить.
 }
 
-class GroupsPage extends AbstractPage {
+class GroupListPage extends AbstractPage {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -34,6 +34,7 @@ class GroupsPage extends AbstractPage {
 	loadingActiveGroups = () => {
 		let courseId = this.props.match.params.courseId;
 		const { loadingActive, loadedActive } = this.state;
+
 		if (loadedActive || loadingActive) {
 			return;
 		}
@@ -56,6 +57,7 @@ class GroupsPage extends AbstractPage {
 	loadingArchivedGroups = () => {
 		let courseId = this.props.match.params.courseId;
 		const { loadingArchived, loadedArchived } = this.state;
+
 		if (loadedArchived || loadingArchived) {
 			return;
 		}
@@ -97,7 +99,7 @@ class GroupsPage extends AbstractPage {
 						copyGroup={this.copyGroup}
 						groups={this.state.groups}
 					/>
-					<GroupsList
+					<GroupList
 						courseId={courseId}
 						groups={this.filteredGroups}
 						deleteGroup={this.deleteGroup}
@@ -113,6 +115,7 @@ class GroupsPage extends AbstractPage {
 		this.setState({
 			filter: id,
 		});
+
 		if (id === "active") {
 			this.loadingActiveGroups();
 		} else {
@@ -124,9 +127,11 @@ class GroupsPage extends AbstractPage {
 		let courseId = this.props.match.params.courseId;
 		const newGroup = await api.groups.getGroup(groupId);
 		const groups = this.filteredGroups;
+
 		this.setState({
 			groups: [newGroup, ...groups],
 		});
+
 		this.props.history.push(`/${courseId}/groups/${groupId}`);
 	};
 
@@ -134,9 +139,11 @@ class GroupsPage extends AbstractPage {
 		let courseId = this.props.match.params.courseId;
 		const { groups } = this.state;
 		const copyGroup = await api.groups.getGroup(groupId);
+
 		this.setState({
 			groups: [copyGroup, ...groups],
 		});
+
 		this.props.history.push(`/${courseId}/groups/${groupId}`);
 	};
 
@@ -149,8 +156,12 @@ class GroupsPage extends AbstractPage {
 	};
 
 	deleteGroup = (group, groupsName) => {
-		api.groups.deleteGroup(group.id);
+		api.groups.deleteGroup(group.id)
+			.then(response => response)
+			.catch(console.error);
+
 		const updateGroups = this.state[groupsName].filter(g => group.id !== g.id);
+
 		this.setState({
 			[groupsName]: updateGroups,
 		});
@@ -160,8 +171,13 @@ class GroupsPage extends AbstractPage {
 		const newSettings = {
 			is_archived: isArchived
 		};
-		api.groups.saveGroupSettings(group.id, newSettings);
+
+		api.groups.saveGroupSettings(group.id, newSettings)
+			.then(response => response)
+			.catch(console.error);
+
 		group = { ...group, ...newSettings };
+
 		if (isArchived) {
 			this.moveGroup(group, 'groups', 'archiveGroups');
 		} else {
@@ -172,6 +188,7 @@ class GroupsPage extends AbstractPage {
 	moveGroup = (group, moveFrom, moveTo) => {
 		const groupsMoveFrom = this.state[moveFrom].filter(g => group.id !== g.id);
 		const groupsMoveTo = [group, ...this.state[moveTo]].sort((a, b) => a.name.localeCompare(b.name));
+
 		this.setState({
 			[moveFrom]: groupsMoveFrom,
 			[moveTo]: groupsMoveTo
@@ -193,11 +210,11 @@ class GroupsPage extends AbstractPage {
 	}
 }
 
-GroupsPage.propTypes = {
+GroupListPage.propTypes = {
 	match: PropTypes.object,
 	courses: PropTypes.object,
 };
 
-GroupsPage = connect(GroupsPage.mapStateToProps)(GroupsPage);
+GroupListPage = connect(GroupListPage.mapStateToProps)(GroupListPage);
 
-export default withRouter(GroupsPage);
+export default withRouter(GroupListPage);

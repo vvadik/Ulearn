@@ -1,76 +1,77 @@
 @import "../../../../variables.less";
+@indent: 27px;
 
-.group-header {
+.header {
   width: 100%;
   margin: 0 auto;
   background: #fff;
   border-bottom: 1px solid #eee;
   padding: 30px 0 0;
 
+  @media (max-width: @maxTabletWidth) {
+	display: block;
+	padding: 30px @indent 0;
+  }
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  width: 80%;
+  margin: 0 auto;
 
   @media (max-width: @maxTabletWidth) {
 	display: block;
-	padding: 30px 27px 0;
+	width: 100%;
+  }
+}
+
+.header-name {
+  font-weight: 500;
+  text-align: left;
+  font-size: 32px;
+  line-height: 30px;
+  border: none;
+  margin: 0;
+
+  @media (max-width: @maxPhoneWidth) {
+	font-size: 22px;
+	padding: 0;
+  }
+}
+
+.buttons-container {
+   margin: 20px 0;
+
+   button {
+	 @media (max-width: @maxPhoneWidth) {
+	   font-size: 14px;
+	 }
+   }
+ }
+
+.tabs-container {
+  width: 80%;
+  margin: 30px auto -1px;
+
+  @media (max-width: @maxTabletWidth) {
+	width: 100%;
   }
 
-  .group-header-container {
-	display: flex;
-	justify-content: space-between;
-	width: 80%;
-	margin: 0 auto;
-
-	@media (max-width: @maxTabletWidth		) {
-	  display: block;
-	  width: 100%;
-	}
-
-  h2 {
-	font-weight: 500;
-	text-align: left;
-	font-size: 32px;
-	line-height: 30px;
-	border: none;
-	margin: 0;
-
+  a {
 	@media (max-width: @maxPhoneWidth) {
-	  font-size: 22px;
-	  padding: 0;
+	  font-size: 16px;
 	}
   }
 
-  .buttons-container {
-	margin: 20px 0;
+  a:hover {
+	text-decoration: none;
+	color: #333;
+  }
 
-	button {
-	  @media (max-width: @maxPhoneWidth) {
-		font-size: 14px;
-	  }
-	}
+  a:focus {
+	text-decoration: none;
   }
 }
 
 
-  .tabs-container {
-	width: 80%;
-	margin: 30px auto -1px;
-
-	@media (max-width: @maxTabletWidth) {
-	  width: 100%;
-	}
-
-	a {
-	  @media (max-width: @maxPhoneWidth) {
-		font-size: 16px;
-	  }
-	}
-
-	a:hover {
-	  text-decoration: none;
-	  color: #333;
-	}
-
-	a:focus {
-	  text-decoration: none;
-	}
-  }
-}

@@ -1,4 +1,4 @@
-	import api from "../api/"
+import api from "../api/"
 
 // Groups
 export function getCourseGroups(courseId) {
@@ -19,13 +19,13 @@ export function getGroup(groupId) {
 
 export function createGroup(courseId, name) {
 	return api.post("groups/in/" + courseId,
-		createRequestParams({ name: name }))
+		createRequestParams({ name }))
 		.then(response => response.json());
 }
 
-export function copyGroup(groupId, destination_course_id, value) {
+export function copyGroup(groupId, destinationCourseId, makeMeOwner) {
 	return api.post("groups/" + groupId + "/copy?destination_course_id="
-		+ encodeURIComponent(destination_course_id) + '&make_me_owner=' + value)
+		+ encodeURIComponent(destinationCourseId) + '&make_me_owner=' + makeMeOwner)
 		.then(response => response.json());
 }
 

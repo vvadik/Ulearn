@@ -15,7 +15,7 @@ import "./common.less"
 
 import rootReducer from "./redux/reducers"
 import api from "./api"
-import GroupsPage from "./pages/course/groups/index";
+import GroupListPage from "./pages/course/groups/GroupListPage";
 import GroupPage from "./pages/course/groups/GroupPage";
 
 let loggerMiddleware = createLogger();
@@ -96,7 +96,7 @@ class InternalUlearnApp extends Component {
 												   // Otherwise we make two GET requests sequentially.
 												   // Unfortunately some our GET handlers are not idempotent (i.e. /Admin/CheckNextExerciseForSlide)
 						<Switch>
-							<Route path="/:courseId/groups/" component={GroupsPage} exact/>
+							<Route path="/:courseId/groups/" component={GroupListPage} exact/>
 							<Route path="/:courseId/groups/:groupId/" component={GroupPage} exact/>
 							<Route component={AnyPage} />
 						</Switch>

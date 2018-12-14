@@ -11,18 +11,16 @@ import GroupSettings from "../../../components/groups/GroupSettingsPage/GroupSet
 import styles from "./groupPage.less";
 
 class GroupPage extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			group: {},
-			open: "settings",
-			updatedFields: {},
-			error: false,
-			loadSettings: false,
-			loading: false,
-			scores: [],
-			scoresId: [],
-		};
+
+	state = {
+		group: {},
+		open: "settings",
+		updatedFields: {},
+		error: false,
+		loadSettings: false,
+		loading: false,
+		scores: [],
+		scoresId: [],
 	};
 
 	componentDidMount() {
@@ -33,7 +31,8 @@ class GroupPage extends Component {
 	};
 
 	loadGroup = (groupId) => {
-		api.groups.getGroup(groupId).then(group => {
+		api.groups.getGroup(groupId)
+			.then(group => {
 			this.setState({
 				group,
 				loading: !this.state.scores ? true : false,
@@ -46,7 +45,8 @@ class GroupPage extends Component {
 	};
 
 	loadGroupScores = (groupId) => {
-		api.groups.getGroupScores(groupId).then(json => {
+		api.groups.getGroupScores(groupId)
+			.then(json => {
 			let scores = json.scores;
 			this.setState({
 				scores: scores,
@@ -60,15 +60,17 @@ class GroupPage extends Component {
 	};
 
 	render() {
+		let courseId = this.props.match.params.courseId;
 		const { group, open, loadSettings, loading, scores, updatedFields, error } = this.state;
+
 		return (
-			<div className={styles["wrapper"]}>
+			<div className={styles.wrapper}>
 				<Helmet>
 					<title>{`Группа ${group.name}`}</title>
 				</Helmet>
 				<div className={styles["content-wrapper"]}>
 					<header className={styles["group-header"]}>
-						<h2>{ group.name }</h2>
+						<h2 className={styles["group-name"]}>{ group.name }</h2>
 						<div className={styles["tabs-container"]}>
 							<Tabs value={open} onChange={this.onChangeTab}>
 								<Tabs.Tab id="settings">Настройки</Tabs.Tab>
@@ -76,9 +78,9 @@ class GroupPage extends Component {
 							</Tabs>
 						</div>
 					</header>
-					<div className={styles["content"]}>
+					<div className={styles.content}>
 						{ (open === "settings") &&
-							<form onSubmit={this.onLoadingSettings}>
+							<form onSubmit={this.loadingSettings}>
 								<GroupSettings
 									loading={loading}
 									name={updatedFields.name}
@@ -98,6 +100,7 @@ class GroupPage extends Component {
 							</form> }
 						{ (open === "members")  &&
 							<GroupMembers
+								courseId={courseId}
 								group={group}
 								onChangeGroupOwner={this.onChangeGroupOwner}
 								onChangeSettings={this.onChangeSettings}/>
@@ -165,7 +168,7 @@ class GroupPage extends Component {
 		});
 	};
 
-	onLoadingSettings = (e) => {
+	loadingSettings = (e) => {
 		const { group, updatedFields, scoresId } = this.state;
 
 		Toast.push('Настройки сохранены');

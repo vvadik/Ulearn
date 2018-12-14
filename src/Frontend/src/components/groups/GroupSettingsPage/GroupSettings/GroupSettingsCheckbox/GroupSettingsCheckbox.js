@@ -11,7 +11,7 @@ const mapToServerName = {
 	progress: 'can_students_see_group_progress',
 };
 
-export default class GroupSettingsCheckbox extends Component {
+class GroupSettingsCheckbox extends Component {
 	constructor(props) {
 		super(props);
 		this.bindProgress = this.onChange.bind(this, 'progress');
@@ -27,16 +27,16 @@ export default class GroupSettingsCheckbox extends Component {
 
 		return (
 			<React.Fragment>
-				<label>
+				<label className={styles["settings-checkbox"]}>
 					{this.renderSettings(progress, "Открыть ведомость курса студентам", this.bindProgress)}
 				</label>
-				<label>
+				<label className={styles["settings-checkbox"]}>
 				{ this.renderSettings(manualChecking,
 					"Включить код-ревью и ручную проверку тестов для участников группы",
 					this.bindManualChecking) }
 				</label>
 				{manualChecking && this.renderReviewSettings()}
-		</React.Fragment>
+			</React.Fragment>
 		)
 	}
 
@@ -45,20 +45,19 @@ export default class GroupSettingsCheckbox extends Component {
 		const oldSolution = group.is_manual_checking_enabled_for_old_solutions || false;
 		const review = group.default_prohibit_further_review || false;
 
-
 		return (
 			<React.Fragment>
-				<label>
+				<label className={styles["settings-checkbox"]}>
 					{ this.renderSettings(oldSolution,
 						"Отправить на код-ревью и ручную проверку тестов старые решения участников",
 						this.bindOldSolution) }
-					<p className={styles["points-block-comment"]}>Если эта опция выключена, то при вступлении
+					<p className={styles["settings-comment"]}>Если эта опция выключена, то при вступлении
 						студента в группу его старые решения не будут отправлены на код-ревью</p>
 				</label>
-				<label>
+				<label className={styles["settings-checkbox"]}>
 					{this.renderSettings(review, "По умолчанию запрещать второе прохождение код-ревью",
 						this.bindReview)}
-					<p className={styles["points-block-comment"]}>В каждом код-ревью вы сможете выбирать,
+					<p className={styles["settings-comment"]}>В каждом код-ревью вы сможете выбирать,
 						разрешить ли студенту второй раз отправить свой код на проверку.
 						Эта опция задаёт лишь значение по умолчанию</p>
 				</label>
@@ -82,4 +81,6 @@ GroupSettingsCheckbox.propTypes = {
 	group: PropTypes.object,
 	onChangeSettings: PropTypes.func,
 };
+
+export default GroupSettingsCheckbox;
 

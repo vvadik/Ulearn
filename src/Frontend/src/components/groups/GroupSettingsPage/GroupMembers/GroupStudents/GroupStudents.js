@@ -6,21 +6,18 @@ import "moment-timezone";
 import Checkbox from "@skbkontur/react-ui/components/Checkbox/Checkbox";
 import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
 import Icon from "@skbkontur/react-icons";
-import Avatar from "./Avatar";
-import CopyStudentsModal from "./CopyStudentsModal/CopyStudentsModal";
-import getWordForm from "../../../../utils/getWordForm";
+import Avatar from "../Avatar/Avatar";
+import CopyStudentsModal from "../CopyStudentsModal/CopyStudentsModal";
+import getWordForm from "../../../../../utils/getWordForm";
 
 import styles from './style.less';
 
-export default class GroupStudents extends Component {
-	constructor(props) {
-		super(props);
+class GroupStudents extends Component {
 
-		this.state = {
-			studentIds: new Set(),
-			modalOpen: false,
-		};
-	}
+	state = {
+		studentIds: new Set(),
+		modalOpen: false,
+	};
 
 	render() {
 		const { students, group } = this.props;
@@ -31,7 +28,7 @@ export default class GroupStudents extends Component {
 		return(
 			<React.Fragment>
 				<div>
-					<div className={styles["students-actions"]}>
+					<div className={styles["actions-block"]}>
 						<Checkbox
 							checked={studentIds.size === studentsArrayOfIds.length || false}
 							onChange={this.onCheckAllStudents}>
@@ -46,9 +43,9 @@ export default class GroupStudents extends Component {
 							<Checkbox
 								checked={studentIds.has(item.user.id) || false}
 								onChange={(_, value) => this.onCheckStudent(item.user.id, _, value)}>
-								<Avatar user={item.user} size={styles["_small"]} />
+								<Avatar user={item.user} size={styles.small} />
 								{ item.user.visible_name } {' '}
-								<span className={styles["students-action__text"]}>
+								<span className={styles["action-text"]}>
 									{ getWordForm('вступила', 'вступил', item.user.gender) }
 									{' '} { moment(grantTime(item.adding_time)).fromNow() }
 								</span>
@@ -68,7 +65,7 @@ export default class GroupStudents extends Component {
 
 	renderStudentActions() {
 		const { studentIds } = this.state;
- 		let buttonState = `${styles["students-action"]}`;
+ 		let buttonState = `${styles.action}`;
 
 		return (
 		<React.Fragment>
@@ -78,7 +75,7 @@ export default class GroupStudents extends Component {
 				onClick={this.onOpenModal}>
 				<Gapped gap={3}>
 					<Icon name="Copy" />
-					<span className={styles["students-action__text"]}>Скопировать в группу...</span>
+					<span className={styles["action-text"]}>Скопировать в группу...</span>
 				</Gapped>
 			</button>
 			<button
@@ -88,7 +85,7 @@ export default class GroupStudents extends Component {
 				>
 				<Gapped gap={3}>
 					<Icon name="Trash" />
-					<span className={styles["students-action__text"]}>Исключить из группы</span>
+					<span className={styles["action-text"]}>Исключить из группы</span>
 				</Gapped>
 			</button>
 		</React.Fragment>
@@ -148,3 +145,4 @@ GroupStudents.propTypes = {
 	group: PropTypes.object,
 	onDeleteStudents: PropTypes.func,
 };
+export default GroupStudents;

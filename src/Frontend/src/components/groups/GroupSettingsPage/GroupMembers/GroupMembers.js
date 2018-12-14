@@ -1,25 +1,21 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
-import {CopyToClipboard} from 'react-copy-to-clipboard';
 import moment from "moment";
 import 'moment/locale/ru';
 import "moment-timezone";
 import api from "../../../../api";
 import Icon from "@skbkontur/react-icons";
 import Kebab from "@skbkontur/react-ui/components/Kebab/Kebab";
-import Toast from "@skbkontur/react-ui/components/Toast/Toast";
 import MenuItem from "@skbkontur/react-ui/components/MenuItem/MenuItem";
 import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
-import Button from "@skbkontur/react-ui/components/Button/Button";
-import ComboboxSearch from "./ComboboxSearch";
+import ComboboxSearch from "./Combobox/ComboboxSearch";
 import Loader from "@skbkontur/react-ui/components/Loader/Loader";
-import Avatar from "./Avatar";
-import GroupStudents from "./GroupStudents";
+import Avatar from "./Avatar/Avatar";
+import GroupStudents from "./GroupStudents/GroupStudents";
+import InviteBlock from "./InviteBlock/InviteBlock";
 import getWordForm from "../../../../utils/getWordForm";
 
 import styles from './style.less';
-import Toggle from "@skbkontur/react-ui/components/Toggle/Toggle";
-import Input from "@skbkontur/react-ui/components/Input/Input";
 
 class GroupMembers extends Component {
 
@@ -29,8 +25,6 @@ class GroupMembers extends Component {
 		students: [],
 		loadingTeachers: false,
 		loadingStudents: false,
-		copied: false,
-		inviteLink: true,
 	};
 
 	componentDidMount() {
@@ -41,31 +35,33 @@ class GroupMembers extends Component {
 	}
 
 	loadGroupAccesses = (groupId) => {
-		api.groups.getGroupAccesses(groupId).then(json => {
+		this.setState({
+			loadingTeachers: true,
+		});
+
+		api.groups.getGroupAccesses(groupId)
+			.then(json => {
 			let accesses = json.accesses;
 			this.setState({
 				accesses,
 				loadingTeachers: false,
 			});
 		}).catch(console.error);
-
-		this.setState({
-			loadingTeachers: true,
-		});
 	};
 
 	loadStudents = (groupId) => {
-		api.groups.getStudents(groupId).then(json => {
+		this.setState({
+			loadingStudents: true,
+		});
+
+		api.groups.getStudents(groupId)
+			.then(json => {
 			let students = json.students;
 			this.setState({
 				students,
 				loadingStudents: false,
 			});
 		}).catch(console.error);
-
-		this.setState({
-			loadingStudents: true,
-		});
 	};
 
 	render() {
@@ -74,17 +70,17 @@ class GroupMembers extends Component {
 		const owner = group.owner;
 
 		return (
-			<div className={styles["group-settings-wrapper"]}>
-				<div className={styles["teachers-block"]}>
-					<h4>Преподаватели</h4>
-					<p>
+			<div className={styles.wrapper}>
+				<div className={styles.teachers}>
+					<h4 className={styles["teachers-header"]}>Преподаватели</h4>
+					<p className={styles["teachers-info"]}>
 						Преподаватели могут видеть список участников группы, проводить код-ревью
 						и проверку тестов, выставлять баллы и смотреть ведомость.
 					</p>
 					<Loader type="big" active={loadingTeachers}>
 						<div className={styles["teacher-block"]}>
-							<Avatar user={owner} size={styles["_big"]} />
-							<div className={styles["teacher-block-name"]}>
+							<Avatar user={owner} size={styles.big} />
+							<div className={styles["teacher-name"]}>
 								<div>{ owner.visible_name }</div>
 								<span className={styles["teacher-status"]}>Владелец</span>
 							</div>
@@ -94,8 +90,8 @@ class GroupMembers extends Component {
 					{ this.renderTeachersSearch() }
 				</div>
 				<div className={styles["students-block"]}>
-					<h4>Студенты</h4>
-					{ this.renderInviteBlock() }
+					<h4 className={styles["students-header"]}>Студенты</h4>
+					<InviteBlock group={group} onChangeSettings={this.props.onChangeSettings}/>
 					<Loader type="big" active={loadingStudents}>
 						<div className={styles["students-list"]}>
 							{(students.length >0) &&
@@ -118,8 +114,8 @@ class GroupMembers extends Component {
 			<React.Fragment
 				key={item.user.id}>
 				<div className={styles["teacher-block"]}>
-					<Avatar user={item.user} size={styles["_big"]} />
-					<div className={styles["teacher-block-name"]}>
+					<Avatar user={item.user} size={styles.big} />
+					<div className={styles["teacher-name"]}>
 						<div>{item.user.visible_name}</div>
 						<span className={styles["teacher-status"]}>
 							Полный доступ {getWordForm('предоставила', 'предоставил', this.props.group.owner.gender)}
@@ -127,7 +123,7 @@ class GroupMembers extends Component {
 							{ moment(grantTime(item.grant_time)).fromNow() }
 						</span>
 					</div>
-					<div className={styles["group-action"]}>
+					<div className={styles["teacher-action"]}>
 						{this.renderKebab(item.user)}
 					</div>
 				</div>
@@ -160,7 +156,7 @@ class GroupMembers extends Component {
 		const { accesses, selected } = this.state;
 
 		return (
-			<label className={styles["teacher-block-search"]}>
+			<label className={styles["teacher-search"]}>
 				<p>Добавить преподавателя:</p>
 				<ComboboxSearch
 					selected={selected}
@@ -169,55 +165,6 @@ class GroupMembers extends Component {
 					owner={group.owner}
 					onAddTeacher={this.onAddTeacher}/>
 			</label>
-		)
-	}
-
-	renderInviteBlock() {
-		const { group } = this.props;
-		const inviteLink = group.is_invite_link_enabled || false;
-		return (
-			<label>
-				<div className={styles["toggle-invite"]}>
-					<Toggle
-						checked={inviteLink}
-						onChange={this.onToggleHash}
-						color="default">
-					</Toggle>
-					<span className={styles["toggle-invite-text"]}>
-						Ссылка для вступления в группу { inviteLink ? ' включена' : ' выключена' }
-					</span>
-				</div>
-					{ inviteLink && this.renderInvite() }
-			</label>
-		)
-	}
-
-	renderInvite() {
-		const { group } = this.props;
-
-		return (
-			<div className={styles["invite-link-block"]}>
-				<div className={styles["invite-link-text"]}>
-					<CopyToClipboard
-						text={`https://ulearn.me/Account/JoinGroup?hash=${group.invite_hash}`}
-						onCopy={() => this.setState({copied: true})}>
-						<Button use="link" onClick={() => Toast.push('Ссылка скопирована')}>
-							<Gapped gap={5}>
-								<Icon name="Link" />
-								Скопировать ссылку
-							</Gapped>
-						</Button>
-					</CopyToClipboard>
-				</div>
-				<div className={styles["invite-link-input"]}>
-					<Input
-						type="text"
-						value={`https://ulearn.me/Account/JoinGroup?hash=${group.invite_hash}`}
-						readOnly
-						selectAllOnFocus
-					/>
-				</div>
-			</div>
 		)
 	}
 
@@ -255,6 +202,7 @@ class GroupMembers extends Component {
 		this.setState({
 			selected: item,
 			});
+
 		this.onLoadTeacher(item);
 	};
 
@@ -274,19 +222,6 @@ class GroupMembers extends Component {
 		});
 
 		api.groups.addGroupAccesses(group.id, item.value)
-			.then(response => response)
-			.catch(console.error);
-	};
-
-	onToggleHash = () => {
-		const { group } = this.props;
-		const inviteLink = group.is_invite_link_enabled || false;
-		const field = 'is_invite_link_enabled';
-		const updatedField = {[field]: !inviteLink};
-
-		this.setState({copied: false});
-		this.props.onChangeSettings(field, !inviteLink);
-		api.groups.saveGroupSettings(group.id, updatedField)
 			.then(response => response)
 			.catch(console.error);
 	};

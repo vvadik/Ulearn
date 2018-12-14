@@ -16,9 +16,9 @@ class GroupScores extends Component {
 		const { score } = this.props;
 
 		return (
-			<label>
+			<label className={styles["settings-checkbox"]}>
 				{(score.id === 'exercise') ? this.renderExerciseScore() : this.renderOtherScores()}
-				<p className={styles["points-block-comment"]}>{score.description}</p>
+				<p className={styles["settings-comment"]}>{score.description}</p>
 			</label>
 		);
 	}
@@ -47,10 +47,10 @@ class GroupScores extends Component {
 					disabled>
 					{this.renderText()}
 				</Checkbox>
-				<div className={`${styles["points-block-comment"]} ${styles["exercise-comment"]}`}>
-					<p>{mapToServerName.allGroupScores && 'Баллы включены для всех автором курса, и преподаватель ' +
+				<div className={styles["settings-comment"]}>
+					<p className={styles["exercise-comment"]}>{mapToServerName.allGroupScores && 'Баллы включены для всех автором курса, и преподаватель ' +
 					'не может отдельно включить или выключить эти баллы только в своей группе.'}</p>
-					<p>{mapToServerName.unitScores &&
+					<p className={styles["exercise-comment"]}>{mapToServerName.unitScores &&
 					'В курсе нет ни одного модуля, в которых преподаватель мог бы выставлять баллы этого типа.'}</p>
 				</div>
 			</React.Fragment>

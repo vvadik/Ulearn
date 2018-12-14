@@ -1,6 +1,7 @@
 @import "../../../../variables.less";
+@indent: 27px;
 
-.groups-wrapper {
+.wrapper {
   margin: 30px auto;
   display: flex;
   flex-direction: column;
@@ -13,37 +14,18 @@
 	width: 100%;
   }
 
-  .search-field {
-	padding: 8px 10px;
-	border: 1px solid #d9d9d9;
-	width: 100%;
-	border-radius: 2px;
-	background: white;
-	color: black;
-	outline: none;
-	font-size: 15px;
-	line-height: 1.4em;
-	margin-bottom: 30px;
-  }
-
-  .search-field[placeholder] {
-	color: #a0a0a0;
-	padding-left: 25px;
-	font-size: 14px;
-  }
-
   label {
 	font-weight: 400;
 	width: 100%;
 	margin: 0;
 
 	@media (max-width: @maxTabletWidth) {
-	  padding: 0 27px;
+	  padding: 0 @indent;
 	}
 
 	div {
 	  @media (max-width: @maxTabletWidth) {
-		left: 27px;
+		left:  @indent;
 	  }
 	}
   }
@@ -51,14 +33,10 @@
   input {
 	max-width: 100%;
   }
-
-  a {
-	text-decoration: none;
-  }
 }
 
-.groups-container {
-  margin: 0 -27px;
+.content {
+  margin: 0 -@indent;
 
   @media (max-width: @maxTabletWidth) {
 	margin: 0;

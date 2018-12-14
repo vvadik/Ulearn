@@ -1,17 +1,17 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
-import GroupsList from './GroupsList'
+import GroupList from './GroupList'
 import { MemoryRouter } from 'react-router';
 
 import './style.less';
 
-storiesOf('Group/GroupsList', module)
+storiesOf('Group/GroupList', module)
 	.addDecorator(story => (
 		<MemoryRouter initialEntries={['/groups/']}>{story()}</MemoryRouter>
 	))
 	.add('default', () => (
-		<GroupsList groups={getGroups()} />
+		<GroupList groups={getGroups()} />
 	));
 
 function getGroups() {

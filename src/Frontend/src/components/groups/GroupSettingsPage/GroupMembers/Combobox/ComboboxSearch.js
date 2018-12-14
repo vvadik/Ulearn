@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import api from "../../../../api/index";
+import api from "../../../../../api/index";
 import ComboBox from "@skbkontur/react-ui/components/ComboBox/ComboBox";
-import Avatar from "./Avatar/Avatar";
+import Avatar from "../Avatar/Avatar";
 
 import styles from './style.less';
 
 class ComboboxSearch extends Component {
+
 	render () {
 		const { selected } = this.props;
 		return (
@@ -57,10 +58,10 @@ class ComboboxSearch extends Component {
 		const name = item.label;
 
 		return (
-		<div className={styles["combo-item"]}>
+		<div className={styles["teacher"]}>
 			<Avatar user={item} size={styles.small}/>
 			<span>{name}</span>
-			<span className={styles["combo-item_login"]}>логин: {item.login}</span>
+			<span className={styles["teacher_login"]}>логин: {item.login}</span>
 		</div>
 		)
 	};
@@ -73,7 +74,6 @@ class ComboboxSearch extends Component {
 				</span>
 			)
 		}
-
 	};
 
 	onChangeItem = (_, item) => {
