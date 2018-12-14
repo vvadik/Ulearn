@@ -13,7 +13,7 @@ const mapToServerName = {
 class GroupScores extends Component {
 
 	render() {
-		const {score} = this.props;
+		const { score } = this.props;
 
 		return (
 			<label>

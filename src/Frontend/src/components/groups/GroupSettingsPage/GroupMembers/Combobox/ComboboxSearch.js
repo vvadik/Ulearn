@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import api from "../../../../api/index";
 import ComboBox from "@skbkontur/react-ui/components/ComboBox/ComboBox";
-import Avatar from "./Avatar";
+import Avatar from "./Avatar/Avatar";
 
 import styles from './style.less';
 
@@ -31,7 +31,7 @@ class ComboboxSearch extends Component {
 			(accesses.filter(i => i.user.id === item.id)).length === 0;
 		};
 
-		return api.users.getUsersCourse(this.props.courseId)
+		return api.users.getCourseInstructors(this.props.courseId)
 			.then(json => {
 				return json.instructors
 					.filter(item => {
@@ -58,7 +58,7 @@ class ComboboxSearch extends Component {
 
 		return (
 		<div className={styles["combo-item"]}>
-			<Avatar user={item} size={styles["_small"]}/>
+			<Avatar user={item} size={styles.small}/>
 			<span>{name}</span>
 			<span className={styles["combo-item_login"]}>логин: {item.login}</span>
 		</div>

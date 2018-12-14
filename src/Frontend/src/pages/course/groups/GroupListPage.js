@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import connect from "react-redux/es/connect/connect";
-import api from "../../../api";
 import PropTypes from 'prop-types';
+import api from "../../../api";
 import GroupsList from "../../../components/groups/GroupMainPage/GroupList/GroupsList";
 import GroupHeader from "../../../components/groups/GroupMainPage/GroupHeader/GroupHeader";
 
@@ -31,6 +31,50 @@ class GroupsPage extends AbstractPage {
 		this.loadingActiveGroups();
 	};
 
+	loadingActiveGroups = () => {
+		let courseId = this.props.match.params.courseId;
+		const { loadingActive, loadedActive } = this.state;
+		if (loadedActive || loadingActive) {
+			return;
+		}
+
+		this.setState({
+			loadingActive: true,
+		});
+
+		api.groups.getCourseGroups(courseId)
+			.then(json => {
+			let groups = json.groups;
+			this.setState({
+				loadingActive: false,
+				loadedActive: true,
+				groups,
+			});
+		}).catch(console.error);
+	};
+
+	loadingArchivedGroups = () => {
+		let courseId = this.props.match.params.courseId;
+		const { loadingArchived, loadedArchived } = this.state;
+		if (loadedArchived || loadingArchived) {
+			return;
+		}
+
+		this.setState({
+			loadingArchived: true,
+		});
+
+		api.groups.getCourseArchiveGroups(courseId)
+			.then(json => {
+			let archiveGroups = json.groups;
+			this.setState({
+				loadingArchived: false,
+				loadedArchived: true,
+				archiveGroups,
+			});
+		}).catch(console.error);
+	};
+
 	render() {
 		let courseId = this.props.match.params.courseId;
 		const courseById = this.props.courses.courseById;
@@ -40,7 +84,7 @@ class GroupsPage extends AbstractPage {
 		}
 
 		return (
-			<div className={styles["wrapper"]}>
+			<div className={styles.wrapper}>
 				<Helmet>
 					<title>Группы в курсе {course.title.toLowerCase()}</title>
 				</Helmet>
@@ -76,46 +120,24 @@ class GroupsPage extends AbstractPage {
 		}
 	};
 
-	loadingArchivedGroups = () => {
+	createGroup = async (groupId) => {
 		let courseId = this.props.match.params.courseId;
-		const { loadingArchived, loadedArchived } = this.state;
-		if (loadedArchived || loadingArchived) {
-			return;
-		}
-
+		const newGroup = await api.groups.getGroup(groupId);
+		const groups = this.filteredGroups;
 		this.setState({
-			loadingArchived: true,
+			groups: [newGroup, ...groups],
 		});
-
-		api.groups.getCourseArchiveGroups(courseId).then(json => {
-			let archiveGroups = json.groups;
-			this.setState({
-				loadingArchived: false,
-				loadedArchived: true,
-				archiveGroups: archiveGroups
-			});
-		}).catch(console.error);
+		this.props.history.push(`/${courseId}/groups/${groupId}`);
 	};
 
-	loadingActiveGroups = () => {
+	copyGroup = async (groupId) => {
 		let courseId = this.props.match.params.courseId;
-		const { loadingActive, loadedActive } = this.state;
-		if (loadedActive || loadingActive) {
-			return;
-		}
-
+		const { groups } = this.state;
+		const copyGroup = await api.groups.getGroup(groupId);
 		this.setState({
-			loadingActive: true,
+			groups: [copyGroup, ...groups],
 		});
-
-		api.groups.getCourseGroups(courseId).then(json => {
-			let groups = json.groups;
-			this.setState({
-				loadingActive: false,
-				loadedActive: true,
-				groups: groups,
-			});
-		}).catch(console.error);
+		this.props.history.push(`/${courseId}/groups/${groupId}`);
 	};
 
 	get filteredGroups() {
@@ -126,12 +148,12 @@ class GroupsPage extends AbstractPage {
 		}
 	};
 
-	get loading() {
-		if (this.state.filter === "archived") {
-			return this.state.loadingArchived;
-		} else {
-			return this.state.loadingActive;
-		}
+	deleteGroup = (group, groupsName) => {
+		api.groups.deleteGroup(group.id);
+		const updateGroups = this.state[groupsName].filter(g => group.id !== g.id);
+		this.setState({
+			[groupsName]: updateGroups,
+		});
 	};
 
 	toggleArchived = (group, isArchived) => {
@@ -156,32 +178,12 @@ class GroupsPage extends AbstractPage {
 		});
 	};
 
-	copyGroup = async (groupId) => {
-		let courseId = this.props.match.params.courseId;
-		const { groups } = this.state;
-		const copyGroup = await api.groups.getGroup(groupId);
-		this.setState({
-			groups: [copyGroup, ...groups],
-		});
-		this.props.history.push(`/${courseId}/groups/${groupId}`);
-	};
-
-	deleteGroup = (group, groupsName) => {
-		api.groups.deleteGroup(group.id);
-		const updateGroups = this.state[groupsName].filter(g => group.id !== g.id);
-		this.setState({
-			[groupsName]: updateGroups,
-		});
-	};
-
-	createGroup = async (groupId) => {
-		let courseId = this.props.match.params.courseId;
-		const newGroup = await api.groups.getGroup(groupId);
-		const groups = this.filteredGroups;
-		this.setState({
-			groups: [newGroup, ...groups],
-		});
-		this.props.history.push(`/${courseId}/groups/${groupId}`);
+	get loading() {
+		if (this.state.filter === "archived") {
+			return this.state.loadingArchived;
+		} else {
+			return this.state.loadingActive;
+		}
 	};
 
 	static mapStateToProps(state) {

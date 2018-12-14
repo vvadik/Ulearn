@@ -7,11 +7,10 @@ import Checkbox from "@skbkontur/react-ui/components/Checkbox/Checkbox";
 import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
 import Icon from "@skbkontur/react-icons";
 import Avatar from "./Avatar";
-import CopyStudentsModal from "./CopyStudentsModal";
+import CopyStudentsModal from "./CopyStudentsModal/CopyStudentsModal";
 import getWordForm from "../../../../utils/getWordForm";
 
 import styles from './style.less';
-import Button from "@skbkontur/react-ui/components/Button/Button";
 
 export default class GroupStudents extends Component {
 	constructor(props) {

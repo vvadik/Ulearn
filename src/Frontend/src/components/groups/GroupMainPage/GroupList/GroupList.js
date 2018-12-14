@@ -10,10 +10,10 @@ import styles from "./style.less";
 class GroupsList extends Component {
 	render() {
 		return (
-			<section className={styles["groups-wrapper"]}>
-				<Input className={styles["search-field"]} placeholder="Название группы" leftIcon={<Icon name="Search" />} />
+			<section className={styles.wrapper}>
+				<Input placeholder="Название группы" leftIcon={<Icon name="Search" />} />
 				<Loader type="big" active={this.props.loading}>
-					<div className={styles["groups-container"]}>
+					<div className={styles.content}>
 						{ this.props.groups && this.props.groups.map(group =>
 							<GroupInfo
 								key={group.id}
