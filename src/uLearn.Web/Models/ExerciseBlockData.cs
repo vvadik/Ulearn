@@ -60,6 +60,7 @@ namespace uLearn.Web.Models
 		public List<UserExerciseSubmission> Submissions { get; set; }
 		public ManualExerciseChecking ManualChecking { get; set; }
 		public List<string> TopUserReviewComments { get; set; }
+		public List<string> TopOtherUsersReviewComments { get; set; }
 	}
 
 	public enum ExerciseReviewState

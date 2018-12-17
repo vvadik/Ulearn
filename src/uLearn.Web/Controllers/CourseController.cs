@@ -290,9 +290,9 @@ namespace uLearn.Web.Controllers
 			if (manualChecking != null)
 				userId = manualChecking.UserId;
 
-			var visiter = await VisitSlide(course.Id, slide.Id, userId);
+			var visiter = await VisitSlide(course.Id, slide.Id, userId).ConfigureAwait(false);
 			var maxSlideScore = GetMaxSlideScoreForUser(course, slide, userId);
-			var defaultProhibitFutherReview = groupsRepo.GetDefaultProhibitFutherReviewForUser(course.Id, userId, User);
+			var defaultProhibitFurtherReview = groupsRepo.GetDefaultProhibitFutherReviewForUser(course.Id, userId, User);
 			var manualCheckingsLeft = manualChecking != null ? GetManualCheckingsCountInQueue(course.Id, slide, groupsIds) : 0;
 
 			var score = Tuple.Create(visiter.Score, maxSlideScore);
@@ -307,7 +307,7 @@ namespace uLearn.Web.Controllers
 					course, slide, manualChecking, exerciseSubmissionId, groupsIds,
 					autoplay: autoplay,
 					isManualCheckingReadonly: isManualCheckingReadonly,
-					defaultProhibitFutherReview: defaultProhibitFutherReview, manualCheckingsLeft: manualCheckingsLeft),
+					defaultProhibitFutherReview: defaultProhibitFurtherReview, manualCheckingsLeft: manualCheckingsLeft),
 				ManualChecking = manualChecking,
 				ContextManualCheckingUserGroups = manualChecking != null ? groupsRepo.GetUserGroupsNamesAsString(course.Id, manualChecking.UserId, User) : "",
 				ContextManualCheckingUserArchivedGroups = manualChecking != null ? groupsRepo.GetUserGroupsNamesAsString(course.Id, manualChecking.UserId, User, onlyArchived: true) : "",

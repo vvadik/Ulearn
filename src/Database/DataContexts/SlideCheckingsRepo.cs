@@ -306,6 +306,24 @@ namespace Database.DataContexts
 				.ToList();
 		}
 
+		public List<string> GetTopOtherUsersReviewComments(string courseId, Guid slideId, string userId, int count, IEnumerable<string> excludeComments)
+		{
+			return db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)
+				.Where(r => r.ExerciseChecking.CourseId == courseId &&
+							r.ExerciseChecking.SlideId == slideId &&
+							! excludeComments.Contains(r.Comment) &&
+							r.AuthorId != userId &&
+							!r.HiddenFromTopComments &&
+							!r.IsDeleted)
+				.GroupBy(r => r.Comment)
+				.OrderByDescending(g => g.Select(r => r.AuthorId).Distinct().Count())
+				.ThenByDescending(g => g.Count())
+				.ThenByDescending(g => g.Max(r => r.ExerciseChecking.Timestamp))
+				.Take(count)
+				.Select(g => g.Key)
+				.ToList();
+		}
+
 		public async Task HideFromTopCodeReviewComments(string courseId, Guid slideId, string userId, string comment)
 		{
 			var reviews = db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)

@@ -2163,14 +2163,44 @@ h1 .copy-group-link {
 }
 
 .legacy-page .exercise__add-review__top-comments {
-	padding-left: 25px;
+	padding-left: 10px;
+}
+
+.legacy-page .exercise__top-review-comments {
+	overflow-y: auto;
+	max-height: 180px;
+}
+
+.legacy-page .exercise__top-review-comments b {
+	display: inline-block;
+	margin-left: 15px;
+}
+
+.legacy-page .exercise__top-review-comments::-webkit-scrollbar {
+	width: 7px;
+}
+
+.legacy-page .exercise__top-review-comments::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+}
+
+.legacy-page .exercise__top-review-comments::-webkit-scrollbar-thumb {
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	background: #f6f6f6;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
 }
 
 .legacy-page .exercise__top-review-comments .comment {
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	overflow: hidden;
-	margin-left: -15px;
+}
+
+.legacy-page .exercise__top-review-comments .comment:not(.with-remove-link) {
+	margin-left: 15px;
 }
 
 .legacy-page .exercise__top-review-comments .comment .remove-link {

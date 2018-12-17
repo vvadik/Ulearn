@@ -82,7 +82,7 @@ namespace Database.Repos
 				foreach (var checking in checkings)
 				{
 					// Use EntityState.Deleted because EF could don't know about these checkings (they have been retrieved via AsNoTracking())
-					// TODO (andgein): Now it's not retrieived via AsNoTracking(). Fix this.
+					// TODO (andgein): Now it's not retrieved via AsNoTracking(). Fix this.
 					foreach (var review in checking.Reviews.ToList())
 						db.Entry(review).State = EntityState.Deleted;
 					
@@ -299,6 +299,24 @@ namespace Database.Repos
 							!r.IsDeleted)
 				.GroupBy(r => r.Comment)
 				.OrderByDescending(g => g.Count())
+				.ThenByDescending(g => g.Max(r => r.ExerciseChecking.Timestamp))
+				.Take(count)
+				.Select(g => g.Key)
+				.ToList();
+		}
+		
+		public List<string> GetTopOtherUsersReviewComments(string courseId, Guid slideId, string userId, int count, IEnumerable<string> excludeComments)
+		{
+			return db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)
+				.Where(r => r.ExerciseChecking.CourseId == courseId &&
+							r.ExerciseChecking.SlideId == slideId &&
+							! excludeComments.Contains(r.Comment) &&
+							r.AuthorId != userId &&
+							!r.HiddenFromTopComments &&
+							!r.IsDeleted)
+				.GroupBy(r => r.Comment)
+				.OrderByDescending(g => g.Select(r => r.AuthorId).Distinct().Count())
+				.ThenByDescending(g => g.Count())
 				.ThenByDescending(g => g.Max(r => r.ExerciseChecking.Timestamp))
 				.Take(count)
 				.Select(g => g.Key)

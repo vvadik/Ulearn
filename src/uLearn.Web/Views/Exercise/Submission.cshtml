@@ -219,7 +219,9 @@
 
 @if (Model.ManualChecking != null)
 {
-	@Html.Partial("_TopUserReviewComments", Model)
+	<div class="exercise__top-review-comments hidden">
+		@Html.Partial("_TopUserReviewComments", Model)
+	</div>
 }
 
 @if (User.HasAccessFor(Model.CourseId, CourseRole.Instructor) && ! Model.InstructorView)

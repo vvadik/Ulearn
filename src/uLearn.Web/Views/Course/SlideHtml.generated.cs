@@ -918,7 +918,7 @@ WriteTo(__razor_helper_writer, Html.Partial(
 					context.ManualCheckingsLeft,
 					context.GroupsIds,
 					isCurrentSubmissionChecking: (context.VersionId == null || checking.Submission.Id == context.VersionId) && !context.IsManualCheckingReadonly,
-					defaultProhibitFutherReview: context.DefaultProhibitFutherReview
+					defaultProhibitFurtherReview: context.DefaultProhibitFutherReview
 					)));
 
                       
