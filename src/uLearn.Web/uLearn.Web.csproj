@@ -1202,6 +1202,7 @@
     <Content Include="Scripts\slide-run.js" />
     <Content Include="Scripts\slide-solutions-like.js" />
     <Content Include="Scripts\slide-nav.js" />
+    <Content Include="Scripts\slide-spoilers.js" />
     <Content Include="Scripts\slide-tex.js" />
     <Content Include="Scripts\slide-utils.js" />
     <Content Include="Scripts\slide-versions.js" />

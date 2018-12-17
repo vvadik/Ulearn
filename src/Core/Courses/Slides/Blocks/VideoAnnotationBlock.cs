@@ -48,6 +48,10 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 
 			var fragmentsList = string.Join("\n", Fragments.Select(FormatFragment));
 			yield return new MarkdownBlock($"## Содержание видео\n\n{Text}\n\n{fragmentsList}");
+
+			var googleDocLink = context.CourseSettings.VideoAnnotationsGoogleDoc;
+			if (! string.IsNullOrEmpty(googleDocLink))
+				yield return new MarkdownBlock($"_Ошибка в расшифровке видео? [Предложите исправление!]({googleDocLink})_");
 		}
 	}
 }

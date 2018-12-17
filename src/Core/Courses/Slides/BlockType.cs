@@ -38,6 +38,9 @@ namespace Ulearn.Core.Courses.Slides
 		
 		[XmlEnum("html")]
 		Html,
+		
+		[XmlEnum("spoiler")]
+		Spoiler,
 
 		[XmlEnum("exercise.file")]
 		SingleFileExercise,
@@ -80,6 +83,7 @@ namespace Ulearn.Core.Courses.Slides
 				case TexBlock _: return BlockType.Tex; 
 				case VideoAnnotationBlock _: return BlockType.VideoAnnotation;
 				case HtmlBlock _: return BlockType.Html;
+				case SpoilerBlock _: return BlockType.Spoiler;
 				
 				case FillInBlock _: return BlockType.TextQuestion;
 				case ChoiceBlock _: return BlockType.ChoiceQuestion;

@@ -86,7 +86,7 @@ namespace Ulearn.Core.Tests.Courses.Slides
             Assert.AreEqual(3, quizSlide.Blocks.Length);
             Assert.AreEqual(5, quizSlide.MaxScore);
             Assert.AreEqual("Внимание, вопрос!", ((AbstractQuestionBlock) quizSlide.Blocks[0]).Text);
-            CollectionAssert.AreEqual(new RegexInfo[1] { new RegexInfo { Pattern = "\\d+" } }, ((FillInBlock) quizSlide.Blocks[0]).Regexes);
+            CollectionAssert.AreEqual(new[] { new RegexInfo { Pattern = "\\d+" } }, ((FillInBlock) quizSlide.Blocks[0]).Regexes);
         }
 
         [Test]
@@ -120,8 +120,22 @@ namespace Ulearn.Core.Tests.Courses.Slides
 			
 			var firstBlock = (HtmlBlock)slide.Blocks[0];
 			Assert.IsTrue(firstBlock.Content.Contains("Abracadabra"));
-			Assert.IsTrue(firstBlock.Content.Contains("<br />"));
+			Assert.IsTrue(firstBlock.Content.Contains("<br>"));
 			Assert.IsTrue(firstBlock.Content.Contains("Second text"));
+		}
+
+		[Test]
+		public void LoadSlideWithSpoilerBlock()
+		{
+			var slide = LoadSlideFromXmlFile("SlideWithSpoilerBlock.xml");
+			
+			Assert.IsAssignableFrom<SpoilerBlock>(slide.Blocks[0]);
+
+			var firstBlock = (SpoilerBlock)slide.Blocks[0];
+			Assert.AreEqual(2, firstBlock.Blocks.Length);
+			Assert.AreEqual("Spoiler", firstBlock.Text);
+			Assert.IsAssignableFrom<CodeBlock>(firstBlock.Blocks[0]);
+			Assert.IsAssignableFrom<YoutubeBlock>(firstBlock.Blocks[1]);
 		}
     }
 }

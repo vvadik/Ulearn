@@ -26,7 +26,7 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 
 		public override string ToString()
 		{
-			return $"Html";
+			return $"Html {Content.Substring(0, 50)}";
 		}
 
 		public override Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot)
@@ -50,23 +50,27 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 			}
 
 			var innerXml = reader.ReadInnerXml();
-			Content = RemoveXmlNamespaces(innerXml.RemoveCommonNesting());
+			
+			Content = RemoveXmlNamespacesAndAutoExpandEmptyTags(innerXml.RemoveCommonNesting());
 		}
 
-		private string RemoveXmlNamespaces(string innerXmlContent)
+		/* We need to remove xml namespaces (which are inherited from ulearn's xml) and
+		   to expand empty tags (i.e. replace auto-collapsed <iframe ... /> to <iframe ...></iframe>) */
+		private string RemoveXmlNamespacesAndAutoExpandEmptyTags(string innerXmlContent)
 		{
-			/* Add outer tag, otherwise XML is not correct and XmlUtils can't parse it and remove namespace */
+			/* Add outer tag, otherwise XML is not correct and XmlUtils can't parse it */
 			var xml = $"<node>{innerXmlContent}</node>";
 			
 			var xmlWithoutNs = XmlUtils.RemoveAllNamespaces(xml);
+			var resultXml = XmlUtils.ExpandEmptyTags(xmlWithoutNs);
 			
 			/* Delete outer tag */
-			if (xmlWithoutNs.StartsWith("<node>"))
-				xmlWithoutNs = xmlWithoutNs.Remove(0, "<node>".Length);
-			if (xmlWithoutNs.EndsWith("</node>"))
-				xmlWithoutNs = xmlWithoutNs.Remove(xmlWithoutNs.Length - "</node>".Length);
+			if (resultXml.StartsWith("<node>"))
+				resultXml = resultXml.Remove(0, "<node>".Length);
+			if (resultXml.EndsWith("</node>"))
+				resultXml = resultXml.Remove(resultXml.Length - "</node>".Length);
 
-			return xmlWithoutNs;
+			return resultXml;
 		}
 
 		public void WriteXml(XmlWriter writer)

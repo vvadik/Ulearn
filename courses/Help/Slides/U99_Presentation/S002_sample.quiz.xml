@@ -28,6 +28,11 @@ Header 1				| h2
      <iframe width="560" height="315" src="https://www.youtube.com/embed/9NcPvmk4vfo" frameborder="0"
 				allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="allowfullscreen"/>
   </html>
+  <spoiler text="Можно прятать спойлер под кнопку">
+    <markdown>
+       Под спойлером могут быть *любые блоки*.
+    </markdown>
+  </spoiler>
   <question.text id="fillInQuestion" explanation="Описание правильного ответа" maxScore="2" multiline="true">
     <text>Введите корректное число</text>
     <sample>42</sample>

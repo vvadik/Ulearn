@@ -148,15 +148,9 @@ namespace uLearn.CourseTool.CmdLineOptions
 		{
 			var slideRoot = xSlide.Root ?? throw new Exception("No root?!");
 			foreach (var annotationElement in slideRoot.Elements(ns + "annotation").ToList())
-			{
-				var nextNode = annotationElement.NextNode;
-				if (nextNode is XElement element && element.FirstNode is XText text && text.Value.Contains("Ошибка в расшифровке"))
-					nextNode.Remove();
 				annotationElement.Remove();
-			}
 
 			var videoElement = slideRoot.Element(ns + "youtube") ?? throw new Exception($"There is no <youtube> block on slide {slide.Info.SlideFile.FullName}");
-			videoElement.AddAfterSelf(new XElement(ns + "markdown", new XText($"_Ошибка в расшифровке видео? [Предложите исправление!]({googleDocLink})_")));
 			videoElement.AddAfterSelf(annotation);
 		}
 	}

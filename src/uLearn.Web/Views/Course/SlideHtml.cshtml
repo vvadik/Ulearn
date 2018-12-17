@@ -1,13 +1,12 @@
 ﻿@* Generator: MvcHelper GeneratePrettyNames: true DisableLinePragmas: true *@
+@using System.Linq
 @using Database.Models
-@using uLearn
 @using uLearn.Web.Controllers
 @using uLearn.Web.Extensions
 @* ReSharper disable RedundantUsingDirective *@
 @using uLearn.Web.Models
 @using Ulearn.Common.Extensions
 @using Ulearn.Core
-@using Ulearn.Core.Courses.Slides
 @using Ulearn.Core.Courses.Slides.Blocks
 @using Ulearn.Core.Courses.Slides.Exercises
 @using Ulearn.Core.Courses.Slides.Exercises.Blocks
@@ -197,6 +196,21 @@
 @helper Block(HtmlBlock block, BlockRenderContext context, HtmlHelper Html)
 {
 	@Html.Raw(block.Content)
+}
+
+@helper Block(SpoilerBlock block, BlockRenderContext context, HtmlHelper Html)
+{
+	<div class="spoiler-block" data-hide-quiz-button="@block.HideQuizButton.ToString().ToLower()">
+		<div class="spoiler-block__button">
+			<button class="btn btn-success">@block.Text</button>
+		</div>
+		<div class="spoiler-block__content" style="display: none">
+			@foreach (var innerBlock in block.Blocks)
+			{
+				@Block((dynamic)innerBlock, context, Html)
+			}
+		</div>
+	</div>
 }
 
 @helper CodeTextArea(string initialCode, string langId, string runSolutionUrl)

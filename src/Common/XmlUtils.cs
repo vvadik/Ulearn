@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Xml.Linq;
+using Ulearn.Common.Extensions;
 
 namespace Ulearn.Common
 {
@@ -21,5 +22,14 @@ namespace Ulearn.Common
 			
 			return new XElement(xmlElement.Name.LocalName, child, attributes);
 		}
+
+		public static string ExpandEmptyTags(string xmlDocument)
+		{
+			var xElement = XElement.Parse(xmlDocument);
+			return xElement.XmlSerialize(expandEmptyTags: true);
+		}
 	}
+	
+	
+	
 }

@@ -39,6 +39,12 @@ namespace Ulearn.Core.Courses.Slides
 		[XmlElement("defaultIncludeCodeFile")]
 		public string DefaultIncludeCodeFile { get; set; }
 		
+		/* If you add new block type, don't forget to:
+		 * 1. Add it to AllowedBlockTypes of Slide, QuizSlide or ExerciseSlide
+		 * 2. If it's a common block, add it inside of SpoilerBlock tags too
+		 * 3. Add definition for new block type in BlockType.cs
+		 */
+		
 		/* Common blocks */
 		[XmlElement(typeof(YoutubeBlock))]
 		[XmlElement("markdown", typeof(MarkdownBlock))]
@@ -50,6 +56,7 @@ namespace Ulearn.Core.Courses.Slides
 		[XmlElement(typeof(IncludeImageGalleryBlock))]
 		[XmlElement(typeof(VideoAnnotationBlock))]
 		[XmlElement("html", typeof(HtmlBlock))]
+		[XmlElement(typeof(SpoilerBlock))]
 		
 		/* Quiz blocks */
 		[XmlElement(typeof(IsTrueBlock))]
@@ -80,7 +87,8 @@ namespace Ulearn.Core.Courses.Slides
 			typeof(IncludeMarkdownBlock),
 			typeof(IncludeImageGalleryBlock),
 			typeof(VideoAnnotationBlock),
-			typeof(HtmlBlock)
+			typeof(HtmlBlock),
+			typeof(SpoilerBlock)
 		};
 		
 		[XmlIgnore]

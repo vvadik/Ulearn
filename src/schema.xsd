@@ -210,17 +210,7 @@
 
     <xs:group name="Blocks">
         <xs:choice>
-            <xs:element name="galleryImages" type="GalleryImages" />
-            <xs:element name="tex" type="Tex" />
-            <xs:element name="markdown" type="MarkdownBlock" />
-            <xs:element name="code" type="Code" />
-            <xs:element name="youtube" type="NonEmptyString" />
-            <xs:element name="includeCode" type="IncludeCodeBlock" />
-            <xs:element name="includeMarkdown" type="Include" />
-            <xs:element name="gallery" type="NonEmptyString" />
-            <xs:element name="includeBlocks" type="Include" />            
-            <xs:element name="annotation" type="VideoAnnotation" />
-			<xs:element name="html" type="Html" />
+			<xs:group ref="CommonBlocks"/>            
             
             <!-- Quiz blocks -->
             <xs:element name="question.isTrue" type="IsTrueBlock" />
@@ -249,6 +239,23 @@
             <xs:element name="exercise.file" type="SingleFileExercise" />
         </xs:choice>
     </xs:group>
+	
+	<xs:group name="CommonBlocks">
+		<xs:choice>
+			<xs:element name="galleryImages" type="GalleryImages" />
+			<xs:element name="tex" type="Tex" />
+			<xs:element name="markdown" type="MarkdownBlock" />
+			<xs:element name="code" type="Code" />
+			<xs:element name="youtube" type="NonEmptyString" />
+			<xs:element name="includeCode" type="IncludeCodeBlock" />
+			<xs:element name="includeMarkdown" type="Include" />
+			<xs:element name="gallery" type="NonEmptyString" />
+			<xs:element name="includeBlocks" type="Include" />
+			<xs:element name="annotation" type="VideoAnnotation" />
+			<xs:element name="html" type="Html" />
+			<xs:element name="spoiler" type="Spoiler" />
+		</xs:choice>
+	</xs:group>
 
     <xs:complexType name="GalleryImages">
         <xs:sequence maxOccurs="unbounded">
@@ -300,7 +307,16 @@
 		<xs:sequence>
 			<xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
-		<xs:anyAttribute processContents="skip"/>
+		<xs:attribute name="hide" type="xs:boolean" />
+	</xs:complexType>
+	
+	<xs:complexType name="Spoiler">
+		<xs:sequence>
+			<xs:group ref="CommonBlocks" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="text" type="NonEmptyString" use="required" />
+		<xs:attribute name="hideQuizButton" type="xs:boolean" use="optional" />
+		<xs:attribute name="hide" type="xs:boolean" use="optional" />
 	</xs:complexType>
 
     <xs:complexType name="MarkdownBlock" mixed="true">
