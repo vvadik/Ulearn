@@ -160,6 +160,40 @@ window.documentReadyFunctions.push(function () {
 		updateTopReviewComments($(this));
 	});
 
+	function getSelectedText($textarea)
+	{		
+		var textarea = $textarea[0];
+
+		// Standards Compliant Version
+		if (textarea.selectionStart !== undefined)
+		{ 
+			var startPos = textarea.selectionStart;
+			var endPos = textarea.selectionEnd;
+			return textarea.value.substring(startPos, endPos);
+		}
+		// IE Version
+		else if (document.selection !== undefined)
+		{ 
+			textarea.focus();
+			var sel = document.selection.createRange();
+			return sel.text;
+		}
+	}
+	
+	/* Ctrl+C should copy text from CodeMirror if nothing is selected in review comment form */
+	$('.exercise__add-review__comment').keydown(function(e) {
+		if (e.keyCode === 67 && e.ctrlKey) {
+			var selectedText = getSelectedText($('.exercise__add-review__comment'));			
+			if (selectedText.length === 0) {
+				var codeMirrorSelectedText = $('.code-review')[0].codeMirrorEditor.getSelection();
+				/* We use new AsyncClipboardAPI. It is supported only by modern browsers
+				   https://www.w3.org/TR/clipboard-apis/#async-clipboard-api
+				*/
+				navigator.clipboard.writeText(codeMirrorSelectedText)
+			}
+		}
+	});
+
 	$('.exercise__top-review-comments').on('click', '.comment .copy-comment-link', function(e) {
 		e.preventDefault();
 		$('.exercise__add-review__comment')
