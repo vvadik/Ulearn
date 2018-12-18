@@ -19,14 +19,13 @@ class InviteBlock extends Component {
 		return (
 			<div className={styles["toggle-invite"]}>
 				<label>
-						<Toggle
-							checked={inviteLinkEnabled}
-							onChange={this.onToggleHash}
-							color="default">
-						</Toggle>
-						<span className={styles["toggle-invite-text"]}>
-							Ссылка для вступления в группу { inviteLinkEnabled ? ' включена' : ' выключена' }
-						</span>
+					<Toggle
+						checked={inviteLinkEnabled}
+						onChange={this.onToggle}>
+					</Toggle>
+					<span className={styles["toggle-invite-text"]}>
+						Ссылка для вступления в группу { inviteLinkEnabled ? ' включена' : ' выключена' }
+					</span>
 				</label>
 				{ inviteLinkEnabled && this.renderInvite() }
 			</div>
@@ -57,22 +56,17 @@ class InviteBlock extends Component {
 		)
 	}
 
-	onToggleHash = () => {
-		const { group, onChangeSettings } = this.props;
-		const inviteLink = group.is_invite_link_enabled || false;
-		const field = 'is_invite_link_enabled';
-		const updatedField = {[field]: !inviteLink};
+	onToggle = () => {
+		const { group } = this.props;
+		const inviteLinkEnabled = group.is_invite_link_enabled;
 
-		onChangeSettings(field, !inviteLink);
-
-		api.groups.saveGroupSettings(group.id, updatedField)
+		api.groups.saveGroupSettings(group.id, {'is_invite_link_enabled': !inviteLinkEnabled})
 			.catch(console.error);
 	};
 }
 
 InviteBlock.propTypes = {
 	group: PropTypes.object,
-	onChangeSettings: PropTypes.func,
 };
 
 export default InviteBlock;

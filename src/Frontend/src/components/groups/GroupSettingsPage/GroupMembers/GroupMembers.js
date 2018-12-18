@@ -1,5 +1,6 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
+import {withRouter} from "react-router-dom";
 import moment from "moment";
 import 'moment/locale/ru';
 import "moment-timezone";
@@ -28,7 +29,7 @@ class GroupMembers extends Component {
 	};
 
 	componentDidMount() {
-		const groupId = this.props.group.id;
+		const { groupId } = this.props.match.params;
 
 		this.loadGroupAccesses(groupId);
 		this.loadStudents(groupId);
@@ -69,6 +70,10 @@ class GroupMembers extends Component {
 		const { group } = this.props;
 		const owner = group.owner;
 
+		if (!owner) {
+			return null;
+		}
+
 		return (
 			<div className={styles.wrapper}>
 				<div className={styles.teachers}>
@@ -91,7 +96,7 @@ class GroupMembers extends Component {
 				</div>
 				<div className={styles["students-block"]}>
 					<h4 className={styles["students-header"]}>Студенты</h4>
-					<InviteBlock group={group} onChangeSettings={this.props.onChangeSettings}/>
+					<InviteBlock group={group} />
 					<Loader type="big" active={loadingStudents}>
 						<div className={styles["students-list"]}>
 							{(students.length >0) &&
@@ -108,6 +113,8 @@ class GroupMembers extends Component {
 
 	renderTeachers() {
 		const { accesses } = this.state;
+		const owner = this.props.group.owner;
+		moment.tz.setDefault('Europe/Moscow');
 		const grantTime = (grantTime) => moment(grantTime).tz('Asia/Yekaterinburg').format();
 
 		return (accesses.map(item =>
@@ -118,7 +125,7 @@ class GroupMembers extends Component {
 					<div className={styles["teacher-name"]}>
 						<div>{item.user.visible_name}</div>
 						<span className={styles["teacher-status"]}>
-							Полный доступ { `${getWordForm('предоставила', 'предоставил', this.props.group.owner.gender)}
+							Полный доступ { `${getWordForm('предоставила', 'предоставил', owner.gender)}
 							${item.granted_by.visible_name} ${moment(grantTime(item.grant_time)).fromNow()}` }
 						</span>
 					</div>
@@ -238,8 +245,7 @@ class GroupMembers extends Component {
 
 GroupMembers.propTypes = {
 	group: PropTypes.object,
-	onChangeSettings: PropTypes.func,
 	onChangeGroupOwner: PropTypes.func,
 };
 
-export default GroupMembers;
+export default withRouter(GroupMembers);

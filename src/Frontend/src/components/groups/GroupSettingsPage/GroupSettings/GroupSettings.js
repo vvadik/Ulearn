@@ -53,9 +53,9 @@ class GroupSettings extends Component {
 	}
 
 	get inputValue() {
-		const { group, name } = this.props;
+		const { name } = this.props;
 
-		return (name !== undefined ? name : group.name) || '';
+		return name || '';
 	}
 
 	onChangeName = (_, value) => {

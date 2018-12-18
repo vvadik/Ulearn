@@ -23,7 +23,6 @@ class GroupStudents extends Component {
 		const { students, group } = this.props;
 		const { studentIds, modalOpen } = this.state;
 		const studentsArrayOfIds = students.map(item => item.user.id);
-		const grantTime = (grantTime) => moment.tz(grantTime, 'Europe/Moscow').tz('Asia/Yekaterinburg').format();
 
 		return(
 			<React.Fragment>
@@ -35,21 +34,7 @@ class GroupStudents extends Component {
 					</Checkbox>
 					{this.renderStudentActions()}
 				</div>
-				<div>
-					{students.map(item =>
-					<div className={styles["student-block"]}
-						key={item.user.id}>
-						<Checkbox
-							checked={studentIds.has(item.user.id) || false}
-							onChange={(_, value) => this.onCheckStudent(item.user.id, _, value)}>
-							<Avatar user={item.user} size={styles.small} />
-							{ item.user.visible_name } <span className={styles["action-text"]}>
-								{ `${ getWordForm('вступила', 'вступил', item.user.gender) }
-								${ moment(grantTime(item.adding_time)).fromNow() }` }</span>
-						</Checkbox>
-					</div>
-					)}
-				</div>
+				{this.renderStudents()}
 				{ modalOpen &&
 				<CopyStudentsModal
 					currentGroupId={group.id}
@@ -88,6 +73,31 @@ class GroupStudents extends Component {
 		);
 	}
 
+	renderStudents() {
+		const { students } = this.props;
+		const { studentIds } = this.state;
+		moment.tz.setDefault('Europe/Moscow');
+		const grantTime = (grantTime) => moment(grantTime).tz('Asia/Yekaterinburg').format();
+
+		return (
+			<div>
+				{students.map(item =>
+					<div className={styles["student-block"]}
+						 key={item.user.id}>
+						<Checkbox
+							checked={studentIds.has(item.user.id) || false}
+							onChange={(_, value) => this.onCheckStudent(item.user.id, _, value)}>
+							<Avatar user={item.user} size={styles.small} />
+							{ item.user.visible_name } <span className={styles["action-text"]}>
+								{ `${ getWordForm('вступила', 'вступил', item.user.gender) }
+								${ moment(grantTime(item.adding_time)).fromNow() }` }</span>
+						</Checkbox>
+					</div>
+				)}
+			</div>
+		)
+	}
+
 	onOpenModal = () => {
 		this.setState({
 			modalOpen: true,
@@ -117,7 +127,8 @@ class GroupStudents extends Component {
 
 	onCheckStudent = (id, _, value) => {
 		const { studentIds } = this.state;
-		const copyStudents = new Set([...studentIds]);
+		const copyStudents = new Set(studentIds);
+		console.log(copyStudents);
 
 		if (value) {
 			copyStudents.add(id);
