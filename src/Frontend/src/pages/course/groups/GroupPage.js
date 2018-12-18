@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
-import {Helmet} from "react-helmet";
+import { Redirect } from 'react-router-dom';
+import { Helmet } from "react-helmet";
 import api from "../../../api/index";
 import Tabs from "@skbkontur/react-ui/components/Tabs/Tabs";
 import Button from "@skbkontur/react-ui/components/Button/Button";
@@ -14,7 +15,6 @@ class GroupPage extends Component {
 
 	state = {
 		group: {},
-		open: "settings",
 		updatedFields: {},
 		error: false,
 		loadSettings: false,
@@ -35,7 +35,7 @@ class GroupPage extends Component {
 			.then(group => {
 			this.setState({
 				group,
-				loading: !this.state.scores ? true : false,
+				loading: !this.state.scores,
 			});
 		}).catch(console.error);
 
@@ -50,7 +50,7 @@ class GroupPage extends Component {
 			let scores = json.scores;
 			this.setState({
 				scores: scores,
-				loading: this.state.group.id ? false : true,
+				loading: !this.state.group.id,
 			});
 		}).catch(console.error);
 
@@ -60,8 +60,11 @@ class GroupPage extends Component {
 	};
 
 	render() {
-		let courseId = this.props.match.params.courseId;
-		const { group, open, loadSettings, loading, scores, updatedFields, error } = this.state;
+		const { group, loadSettings, loading, scores, updatedFields, error } = this.state;
+		const { courseId, groupId, groupPage } = this.props.match.params;
+
+		if (!groupPage) {
+			return <Redirect to={`/${courseId}/groups/${groupId}/settings`} /> }
 
 		return (
 			<div className={styles.wrapper}>
@@ -72,38 +75,40 @@ class GroupPage extends Component {
 					<header className={styles["group-header"]}>
 						<h2 className={styles["group-name"]}>{ group.name }</h2>
 						<div className={styles["tabs-container"]}>
-							<Tabs value={open} onChange={this.onChangeTab}>
+							<Tabs value={groupPage} onChange={this.onChangeTab}>
 								<Tabs.Tab id="settings">Настройки</Tabs.Tab>
 								<Tabs.Tab id="members">Участники</Tabs.Tab>
 							</Tabs>
 						</div>
 					</header>
 					<div className={styles.content}>
-						{ (open === "settings") &&
-							<form onSubmit={this.loadingSettings}>
-								<GroupSettings
-									loading={loading}
-									name={updatedFields.name}
+						{ groupPage === "settings" ? (
+								<form onSubmit={this.loadingSettings}>
+									<GroupSettings
+										loading={loading}
+										name={updatedFields.name  !== undefined ? updatedFields.name : group.name}
+										group={group}
+										scores={scores}
+										error={error}
+										onChangeName={this.onChangeName}
+										onChangeSettings={this.onChangeSettings}
+										onChangeScores={this.onChangeScores} />
+									<Button
+										size="medium"
+										use="primary"
+										type="submit"
+										loading={loadSettings}>
+										Сохранить
+									</Button>
+								</form>
+							) : groupPage === "members" ? (
+								<GroupMembers
+									courseId={courseId}
 									group={group}
-									scores={scores}
-									error={error}
-									onChangeName={this.onChangeName}
-									onChangeSettings={this.onChangeSettings}
-									onChangeScores={this.onChangeScores} />
-								<Button
-									size="medium"
-									use="primary"
-									type="submit"
-									loading={loadSettings}>
-									Сохранить
-								</Button>
-							</form> }
-						{ (open === "members")  &&
-							<GroupMembers
-								courseId={courseId}
-								group={group}
-								onChangeGroupOwner={this.onChangeGroupOwner}
-								onChangeSettings={this.onChangeSettings}/>
+									onChangeGroupOwner={this.onChangeGroupOwner}/>
+							) : (
+								<div>404</div>
+							)
 						}
 					</div>
 				</div>
@@ -111,10 +116,10 @@ class GroupPage extends Component {
 		)
 	}
 
-	onChangeTab = (_, v) => {
-		this.setState({
-			open: v,
-		})
+	onChangeTab = (event, value) => {
+		const { courseId, groupId } = this.props.match.params;
+
+		this.props.history.push(`/${courseId}/groups/${groupId}/${value}`);
 	};
 
 	onChangeName = (value) => {
