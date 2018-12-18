@@ -9,28 +9,12 @@ import styles from './style.less';
 
 class GroupSettings extends Component {
 	render() {
-		const { group, scores, onChangeSettings, error, loading } = this.props;
+		const { group, scores, onChangeSettings, loading, onChangeScores } = this.props;
 
 		return (
 			<Loader type="big" active={loading}>
 				<div className={styles.wrapper}>
-					<div className={styles["changeName-block"]}>
-						<div className={styles["changeName-header-block"]}>
-							<label>
-								<h4 className={styles["changeName-header"]}>Название группы</h4>
-							</label>
-						</div>
-						<div className={styles["changeName-search"]}>
-							<Input
-								type="text"
-								required
-								size="small"
-								error={error}
-								value={this.inputValue}
-								placeholder="Здесь вы можете изменить название группы"
-								onChange={this.onChangeName} />
-						</div>
-					</div>
+					{ this.renderChangeGroupName()}
 					<div className={`${styles["checkbox-block"]} ${styles.settings}`}>
 						<h4 className={styles["settings-header"]}>Код-ревью и проверка тестов</h4>
 						<GroupSettingsCheckbox
@@ -44,11 +28,33 @@ class GroupSettings extends Component {
 							<GroupScores
 								key={score.id}
 								score={score}
-								onChangeScores={this.props.onChangeScores} />
+								onChangeScores={onChangeScores} />
 						)}
 					</div>
 				</div>
 			</Loader>
+		)
+	}
+
+	renderChangeGroupName() {
+		return (
+			<div className={styles["change-name"]}>
+				<header className={styles["change-name-header"]}>
+					<label>
+						<h4 className={styles["change-name-label"]}>Название группы</h4>
+					</label>
+				</header>
+				<div className={styles["change-name-input"]}>
+					<Input
+						type="text"
+						required
+						size="small"
+						error={this.props.error}
+						value={this.inputValue}
+						placeholder="Здесь вы можете изменить название группы"
+						onChange={this.onChangeName} />
+				</div>
+			</div>
 		)
 	}
 

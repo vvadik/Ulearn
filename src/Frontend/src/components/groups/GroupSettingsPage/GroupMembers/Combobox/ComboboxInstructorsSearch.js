@@ -59,7 +59,7 @@ class ComboboxInstructorsSearch extends Component {
 
 		return (
 		<div className={styles["teacher"]}>
-			<Avatar user={item} size={styles.small}/>
+			<Avatar user={item} size='small'/>
 			<span>{name}</span>
 			<span className={styles["teacher_login"]}>логин: {item.login}</span>
 		</div>

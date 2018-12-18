@@ -9,7 +9,7 @@ class Avatar extends Component {
 	render() {
 		const {user, size} = this.props;
 		const imageUrl = user.avatar_url;
-		let className = `${styles["photo-avatar"]} ${size}`;
+		let className = `${styles["photo-avatar"]} ${styles[size] || 'big'}`;
 
 		if (imageUrl) {
 			return this.renderImage(imageUrl, className)

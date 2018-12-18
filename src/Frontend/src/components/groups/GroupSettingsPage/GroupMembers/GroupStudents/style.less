@@ -16,17 +16,16 @@
 .action {
   border: none;
   background: transparent;
-  color: #A0A0A0;
-  padding: 0;
-  margin-right: 20px;
+  color: @disabledColor;
+  text-align: center;
 }
 
 .button-copy {
-  color: #3072C4;
+  color: @linkColor;
 }
 
 .button-delete {
-  color: #CE0014;
+  color: @negativeColor;
 }
 
 .action-text {
@@ -34,7 +33,7 @@
 	display: none;
   }
   &:hover {
-	text-decoration-line: underline;
+	text-decoration: underline;
   }
 }
 
@@ -44,13 +43,3 @@
   flex-direction: column;
   width: fit-content;
 }
-
-.small {
-  font-size: 16px;
-  min-width: 20px;
-  height: 20px;
-  font-weight: 700;
-  padding: 0;
-  margin-right: 10px;
-}
-

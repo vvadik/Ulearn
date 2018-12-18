@@ -87,7 +87,7 @@ class GroupStudents extends Component {
 						<Checkbox
 							checked={studentIds.has(item.user.id) || false}
 							onChange={(_, value) => this.onCheckStudent(item.user.id, _, value)}>
-							<Avatar user={item.user} size={styles.small} />
+							<Avatar user={item.user} size='small' />
 							{ item.user.visible_name } <span className={styles["action-text"]}>
 								{ `${ getWordForm('вступила', 'вступил', item.user.gender) }
 								${ moment(grantTime(item.adding_time)).fromNow() }` }</span>
@@ -128,7 +128,6 @@ class GroupStudents extends Component {
 	onCheckStudent = (id, _, value) => {
 		const { studentIds } = this.state;
 		const copyStudents = new Set(studentIds);
-		console.log(copyStudents);
 
 		if (value) {
 			copyStudents.add(id);

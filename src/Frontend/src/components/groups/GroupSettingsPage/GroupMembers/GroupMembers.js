@@ -84,7 +84,7 @@ class GroupMembers extends Component {
 					</p>
 					<Loader type="big" active={loadingTeachers}>
 						<div className={styles["teacher-block"]}>
-							<Avatar user={owner} size={styles.big} />
+							<Avatar user={owner} size='big' />
 							<div className={styles["teacher-name"]}>
 								<div>{ owner.visible_name }</div>
 								<span className={styles["teacher-status"]}>Владелец</span>
@@ -121,7 +121,7 @@ class GroupMembers extends Component {
 			<React.Fragment
 				key={item.user.id}>
 				<div className={styles["teacher-block"]}>
-					<Avatar user={item.user} size={styles.big} />
+					<Avatar user={item.user} size='big' />
 					<div className={styles["teacher-name"]}>
 						<div>{item.user.visible_name}</div>
 						<span className={styles["teacher-status"]}>

@@ -36,20 +36,21 @@ class InviteBlock extends Component {
 		const { group } = this.props;
 
 		return (
-			<div className={styles["inviteLink-block"]}>
-				<div className={styles["inviteLink-text"]}>
+			<div className={styles["invite-link"]}>
+				<div className={styles["invite-link-text"]}>
 					<CopyToClipboard text={`https://ulearn.me/Account/JoinGroup?hash=${group.invite_hash}`}>
 						<Button use="link" icon={<LinkIcon />} onClick={() => Toast.push('Ссылка скопирована')}>
 							Скопировать ссылку
 						</Button>
 					</CopyToClipboard>
 				</div>
-				<div className={styles["inviteLink-input"]}>
+				<div className={styles["invite-link-input"]}>
 					<Input
 						type="text"
 						value={`https://ulearn.me/Account/JoinGroup?hash=${group.invite_hash}`}
 						readOnly
 						selectAllOnFocus
+						width="100%"
 					/>
 				</div>
 			</div>
@@ -58,7 +59,7 @@ class InviteBlock extends Component {
 
 	onToggle = () => {
 		const { group } = this.props;
-		const inviteLinkEnabled = group.is_invite_link_enabled;
+		const inviteLinkEnabled = group.is_invite_link_enabled || false;
 
 		api.groups.saveGroupSettings(group.id, {'is_invite_link_enabled': !inviteLinkEnabled})
 			.catch(console.error);

@@ -10,6 +10,13 @@ const mapToServerName = {
 	unitScores: 'can_instructor_set_additional_score_in_some_unit',
 };
 
+const dictionary = {
+	'activity': 'Практика',
+	'seminar': 'Семинары',
+	'exercise': 'Упражнения',
+	'homework': 'Домашние задания',
+};
+
 class GroupScores extends Component {
 
 	render() {
@@ -17,7 +24,7 @@ class GroupScores extends Component {
 
 		return (
 			<label className={styles["settings-checkbox"]}>
-				{(score.id === 'exercise') ? this.renderExerciseScore() : this.renderOtherScores()}
+				{(score.id === 'exercise') ? this.renderExerciseScores() : this.renderOtherScores()}
 				<p className={styles["settings-comment"]}>{score.description}</p>
 			</label>
 		);
@@ -25,18 +32,19 @@ class GroupScores extends Component {
 
 	renderOtherScores() {
 		const {score} = this.props;
+		const id = score.id;
 		const changeScores = score.are_additional_scores_enabled_in_this_group || false;
 
 		return (
 			<Checkbox
 				checked={changeScores}
 				onChange={this.onChange}>
-				{this.renderText()}
+				{dictionary[id]}
 			</Checkbox>
 		)
 	}
 
-	renderExerciseScore() {
+	renderExerciseScores() {
 		const {score} = this.props;
 		const checkedScores = score.are_additional_scores_enabled_in_all_group || false;
 
@@ -45,7 +53,7 @@ class GroupScores extends Component {
 				<Checkbox
 					checked={checkedScores}
 					disabled>
-					{this.renderText()}
+					{dictionary.exercise}
 				</Checkbox>
 				<div className={styles["settings-comment"]}>
 					<p className={styles["exercise-comment"]}>{mapToServerName.allGroupScores && 'Баллы включены для всех автором курса, и преподаватель ' +
@@ -55,22 +63,6 @@ class GroupScores extends Component {
 				</div>
 			</React.Fragment>
 		);
-	}
-
-	renderText() {
-		const {score} = this.props;
-		switch (score.id) {
-			case 'activity':
-				return 'Практика';
-			case 'seminar':
-				return 'Семинары';
-			case 'exercise':
-				return 'Упражнения';
-			case 'homework':
-				return 'Домашние задания';
-			default:
-				return null;
-		}
 	}
 
 	onChange = (_, value) => {
