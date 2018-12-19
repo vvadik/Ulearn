@@ -94,7 +94,7 @@ class GroupListPage extends AbstractPage {
 					<GroupHeader
 						onTabChange={this.onTabChange}
 						filter={this.state.filter}
-						courseId={courseId}
+						course={course}
 						createGroup={this.createGroup}
 						copyGroup={this.copyGroup}
 						groups={this.state.groups}
