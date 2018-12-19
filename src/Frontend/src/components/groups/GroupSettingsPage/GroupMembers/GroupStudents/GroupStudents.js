@@ -49,7 +49,7 @@ class GroupStudents extends Component {
  		let buttonClass = `${styles.action}`;
 
 		return (
-		<React.Fragment>
+		<div className={styles["action-buttons"]}>
 			<button
 				className={studentIds.size > 0 ? `${buttonClass} ${styles["button-copy"]}` : buttonClass}
 				disabled={studentIds.size === 0}
@@ -69,7 +69,7 @@ class GroupStudents extends Component {
 					<span className={styles["action-text"]}>Исключить из группы</span>
 				</Gapped>
 			</button>
-		</React.Fragment>
+		</div>
 		);
 	}
 

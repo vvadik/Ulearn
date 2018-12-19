@@ -12,9 +12,13 @@ import styles from './style.less';
 
 class InviteBlock extends Component {
 
+	state = {
+		inviteLinkEnabled: true,
+	};
+
 	render() {
-		const { group } = this.props;
-		const inviteLinkEnabled = group.is_invite_link_enabled || false;
+		// const { group } = this.props;
+		const inviteLinkEnabled = this.state.inviteLinkEnabled;
 
 		return (
 			<div className={styles["toggle-invite"]}>
@@ -50,7 +54,7 @@ class InviteBlock extends Component {
 						value={`https://ulearn.me/Account/JoinGroup?hash=${group.invite_hash}`}
 						readOnly
 						selectAllOnFocus
-						width="100%"
+						width="65%"
 					/>
 				</div>
 			</div>
@@ -59,7 +63,12 @@ class InviteBlock extends Component {
 
 	onToggle = () => {
 		const { group } = this.props;
-		const inviteLinkEnabled = group.is_invite_link_enabled || false;
+		const inviteLinkEnabled = this.state.inviteLinkEnabled;
+		console.log(inviteLinkEnabled);
+
+		this.setState ({
+			inviteLinkEnabled: !inviteLinkEnabled,
+		});
 
 		api.groups.saveGroupSettings(group.id, {'is_invite_link_enabled': !inviteLinkEnabled})
 			.catch(console.error);
