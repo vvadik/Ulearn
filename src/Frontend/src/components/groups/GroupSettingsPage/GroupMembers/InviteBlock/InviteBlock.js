@@ -17,7 +17,6 @@ class InviteBlock extends Component {
 	};
 
 	render() {
-		// const { group } = this.props;
 		const inviteLinkEnabled = this.state.inviteLinkEnabled;
 
 		return (
@@ -64,7 +63,6 @@ class InviteBlock extends Component {
 	onToggle = () => {
 		const { group } = this.props;
 		const inviteLinkEnabled = this.state.inviteLinkEnabled;
-		console.log(inviteLinkEnabled);
 
 		this.setState ({
 			inviteLinkEnabled: !inviteLinkEnabled,
