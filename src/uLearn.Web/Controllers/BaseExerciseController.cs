@@ -96,7 +96,7 @@ namespace uLearn.Web.Controllers
 				userId, "uLearn", GenerateSubmissionName(exerciseSlide, userName),
 				submissionLanguage,
 				dontRunSubmission ? AutomaticExerciseCheckingStatus.Done : AutomaticExerciseCheckingStatus.Waiting
-			).ConfigureAwait(false);
+			);
 
 			if (buildResult.HasErrors)
 				return new RunSolutionResult { IsCompileError = true, ErrorMessage = buildResult.ErrorMessage, SubmissionId = submission.Id, ExecutionServiceName = "uLearn" };
@@ -115,7 +115,7 @@ namespace uLearn.Web.Controllers
 					IsCompillerFailure = true,
 					ErrorMessage = "К сожалению, из-за большой нагрузки мы не смогли оперативно проверить ваше решение. " +
 									"Мы попробуем проверить его позже, просто подождите и обновите страницу. ",
-					ExecutionServiceName = "uLearn"
+					ExecutionServiceName = "ulearn"
 				};
 			}
 

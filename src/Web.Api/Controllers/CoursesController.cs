@@ -8,9 +8,9 @@ using Database.Repos.CourseRoles;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
+using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Core.Courses;
 using Ulearn.Web.Api.Models.Common;
-using Ulearn.Web.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Responses.Courses;
 
 namespace Ulearn.Web.Api.Controllers

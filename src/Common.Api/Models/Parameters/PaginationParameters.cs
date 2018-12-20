@@ -1,4 +1,4 @@
-namespace Ulearn.Web.Api.Models.Parameters
+namespace Ulearn.Common.Api.Models.Parameters
 {
 	public interface IPaginationParameters
 	{

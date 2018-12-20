@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Database.Models;
-using Ulearn.Web.Api.Models.Validations;
+using Ulearn.Common.Api.Models.Validations;
 
 namespace Ulearn.Web.Api.Models.Parameters.Comments
 {

@@ -639,6 +639,7 @@
     <Compile Include="App_Start\RazorGeneratorMvcStart.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="CertificateGenerator.cs" />
+    <Compile Include="Clients\UlearnVideoAnnotationsClient.cs" />
     <Compile Include="codemirror\CsCompleterGenerator.cs" />
     <Compile Include="Controllers\AntiPlagiarismController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
@@ -1497,6 +1498,10 @@
       <Project>{a019580a-4cf2-475e-bd57-7f57f411b64f}</Project>
       <Name>AntiPlagiarism.Api</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Common.Api\Common.Api.csproj">
+      <Project>{295dc817-74c6-432b-ad1e-349644f1ac59}</Project>
+      <Name>Common.Api</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{3CC038A1-6AA0-49B0-9485-DB9589626BC3}</Project>
       <Name>Common</Name>
@@ -1520,6 +1525,10 @@
     <ProjectReference Include="..\Stepik.Api\Stepik.Api.csproj">
       <Project>{60247c0a-b6ee-46e2-ab66-c7285f5f1345}</Project>
       <Name>Stepik.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VideoAnnotations.Api\VideoAnnotations.Api.csproj">
+      <Project>{8dbf67fc-f88e-4f33-bf81-8033ff597c91}</Project>
+      <Name>VideoAnnotations.Api</Name>
     </ProjectReference>
     <ProjectReference Include="..\XQueue\XQueue.csproj">
       <Project>{4b227920-6eb6-476f-95c7-1cdbe02dae3f}</Project>

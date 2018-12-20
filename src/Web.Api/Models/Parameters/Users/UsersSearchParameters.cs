@@ -1,7 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using Database.Models;
 using Microsoft.AspNetCore.Mvc;
-using Ulearn.Web.Api.Models.Validations;
+using Ulearn.Common.Api.Models.Parameters;
+using Ulearn.Common.Api.Models.Validations;
 
 namespace Ulearn.Web.Api.Models.Parameters.Users
 {

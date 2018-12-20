@@ -258,7 +258,7 @@ namespace AntiPlagiarism.Web.Controllers
 		}
 		
 		/// <returns>List of weights (numbers from [0, 1)) used for calculating mean and deviation for this task</returns>
-		public async Task<List<double>> CalculateTaskStatisticsParametersAsync(int clientId, Guid taskId)
+		private async Task<List<double>> CalculateTaskStatisticsParametersAsync(int clientId, Guid taskId)
 		{
 			/* Create local submissions repo for preventing memory leaks */
 			using (var scope = serviceScopeFactory.CreateScope())

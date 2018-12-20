@@ -19,8 +19,7 @@ namespace Ulearn.Common
 		{
 			value = default(TValue);
 
-			LinkedListNode<LruCacheItem<TKey, TValue>> node;
-			if (!cache.TryGetValue(key, out node))
+			if (!cache.TryGetValue(key, out var node))
 				return false;
 
 			value = node.Value.Value;
@@ -39,6 +38,13 @@ namespace Ulearn.Common
 			var node = new LinkedListNode<LruCacheItem<TKey, TValue>>(cacheItem);
 			lastUsedItems.AddLast(node);
 			cache.Add(key, node);
+		}
+		
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		public void Clear()
+		{
+			cache.Clear();
+			lastUsedItems.Clear();
 		}
 
 		private void RemoveFirst()

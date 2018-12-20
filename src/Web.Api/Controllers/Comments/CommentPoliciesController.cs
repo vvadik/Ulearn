@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Serilog;
+using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Parameters.Comments;
-using Ulearn.Web.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Responses.Comments;
 
 namespace Ulearn.Web.Api.Controllers.Comments

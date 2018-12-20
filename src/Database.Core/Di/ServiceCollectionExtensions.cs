@@ -15,7 +15,6 @@ namespace Database.Di
 	{
 		public static IServiceCollection AddDatabaseServices(this IServiceCollection services, ILogger logger)
 		{
-		
 			var courseManager = new WebCourseManager(logger);
 			services.AddSingleton<WebCourseManager>(courseManager);
 			services.AddSingleton<IWebCourseManager>(courseManager);

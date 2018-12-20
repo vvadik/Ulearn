@@ -1,11 +1,15 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Ulearn.Common.Extensions;
 
-namespace Ulearn.Web.Api.Models.Responses
+namespace Ulearn.Common.Api.Models.Responses
 {
 	public class ApiResponse
 	{
-		
+		public override string ToString()
+		{
+			return this.JsonSerialize();
+		}
 	}
 
 	[JsonConverter(typeof(StringEnumConverter), true)]

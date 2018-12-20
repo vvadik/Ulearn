@@ -1,6 +1,5 @@
 ﻿using System;
 using Database;
-using Database.Repos;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;

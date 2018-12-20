@@ -14,9 +14,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Serilog;
 using Swashbuckle.AspNetCore.Annotations;
+using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Models.Parameters.Comments;
-using Ulearn.Web.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Responses.Comments;
 
 namespace Ulearn.Web.Api.Controllers.Comments

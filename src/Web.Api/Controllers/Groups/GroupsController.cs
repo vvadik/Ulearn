@@ -4,16 +4,15 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Database;
-using Database.Repos;
 using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
 using Ulearn.Web.Api.Models.Parameters.Groups;
-using Ulearn.Web.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Responses.Groups;
 using ILogger = Serilog.ILogger;
 

@@ -3,8 +3,8 @@ using System.Runtime.Serialization;
 using Database.Models;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
+using Ulearn.Common.Api.Models.Validations;
 using Ulearn.Web.Api.Models.Binders;
-using Ulearn.Web.Api.Models.Validations;
 
 namespace Ulearn.Web.Api.Models.Parameters.Comments
 {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Database;
 using Database.Models;
-using Database.Repos;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Serilog;

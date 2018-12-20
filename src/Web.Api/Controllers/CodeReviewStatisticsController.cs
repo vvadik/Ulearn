@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Ulearn.Core.Courses;
-using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Web.Api.Authorization;
 using Ulearn.Web.Api.Models.Responses.CodeReviewStatistics;
@@ -24,7 +23,6 @@ namespace Ulearn.Web.Api.Controllers
 	{
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
 		private readonly ICourseRolesRepo courseRolesRepo;
-		private readonly IUsersRepo usersRepo;
 		private readonly IGroupsRepo groupsRepo;
 		private readonly IGroupMembersRepo groupMembersRepo;
 		private readonly ICourseRoleUsersFilter courseRoleUsersFilter;
@@ -41,7 +39,6 @@ namespace Ulearn.Web.Api.Controllers
 		{
 			this.slideCheckingsRepo = slideCheckingsRepo;
 			this.courseRolesRepo = courseRolesRepo;
-			this.usersRepo = usersRepo;
 			this.groupsRepo = groupsRepo;
 			this.groupMembersRepo = groupMembersRepo;
 			this.courseRoleUsersFilter = courseRoleUsersFilter;

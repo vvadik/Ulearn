@@ -9,9 +9,8 @@ using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
-using Swashbuckle.AspNetCore.Annotations;
+using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Parameters.Users;
-using Ulearn.Web.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Responses.Users;
 
 namespace Ulearn.Web.Api.Controllers.Users

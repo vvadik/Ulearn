@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Ulearn.Web.Api.Models.Validations
+namespace Ulearn.Common.Api.Models.Validations
 {
 	public class MinValueAttribute : ValidationAttribute
 	{

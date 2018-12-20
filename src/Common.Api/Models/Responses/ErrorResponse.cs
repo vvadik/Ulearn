@@ -2,7 +2,7 @@ using System;
 using System.Runtime.Serialization;
 using Vostok.Tracing;
 
-namespace Ulearn.Web.Api.Models.Responses
+namespace Ulearn.Common.Api.Models.Responses
 {
 	[DataContract]
 	public class ErrorResponse : ApiResponse

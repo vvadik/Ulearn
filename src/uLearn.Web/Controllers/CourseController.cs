@@ -368,7 +368,7 @@ namespace uLearn.Web.Controllers
 				isLti: isLti,
 				autoplay: autoplay,
 				isManualCheckingReadonly: isManualCheckingReadonly,
-				defaultProhibitFutherReview: defaultProhibitFutherReview
+				defaultProhibitFurtherReview: defaultProhibitFutherReview
 			)
 			{
 				VersionId = exerciseSubmissionId

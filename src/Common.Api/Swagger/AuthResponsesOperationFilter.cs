@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Ulearn.Web.Api.Swagger
+namespace Ulearn.Common.Api.Swagger
 {
 	public class AuthResponsesOperationFilter : IOperationFilter
 	{

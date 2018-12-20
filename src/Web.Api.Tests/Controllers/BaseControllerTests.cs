@@ -27,6 +27,8 @@ namespace Web.Api.Tests.Controllers
 {
 	public class BaseControllerTests
 	{
+		private WebApplication application;		
+		
 		protected Logger logger;
 		protected UlearnDb db;
 		protected IServiceProvider serviceProvider;
@@ -48,6 +50,11 @@ namespace Web.Api.Tests.Controllers
 				CookieKeyRingDirectory = "."
 			}
 		};
+
+		public BaseControllerTests()
+		{
+			application = new WebApplication();
+		}
 
 		public async Task SetupTestInfrastructureAsync(Action<IServiceCollection> addServices=null)
 		{
@@ -98,9 +105,9 @@ namespace Web.Api.Tests.Controllers
 			
 			services.AddSingleton(db);
 			services.AddLogging(builder => builder.AddSerilog(logger));
-			WebApplication.ConfigureDi(services, logger);
-			WebApplication.ConfigureAuthServices(services, FakeWebApiConfiguration);
-			WebApplication.ConfigureMvc(services);
+			application.ConfigureDi(services, logger);
+			application.ConfigureAuthServices(services, FakeWebApiConfiguration);
+			application.ConfigureMvc(services);
 
 			addServices?.Invoke(services);
 

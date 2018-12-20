@@ -1,6 +1,6 @@
 using System;
 
-namespace Ulearn.Web.Api.Controllers
+namespace Ulearn.Common.Api
 {
 	public class StatusCodeException : Exception
 	{

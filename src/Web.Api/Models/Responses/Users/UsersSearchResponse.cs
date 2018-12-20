@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Database.Repos.Users;
+using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Common;
 
 namespace Ulearn.Web.Api.Models.Responses.Users

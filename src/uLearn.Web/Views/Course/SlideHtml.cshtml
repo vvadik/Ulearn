@@ -1,10 +1,12 @@
 ﻿@* Generator: MvcHelper GeneratePrettyNames: true DisableLinePragmas: true *@
 @using System.Linq
 @using Database.Models
+@using uLearn.Web.Clients
 @using uLearn.Web.Controllers
 @using uLearn.Web.Extensions
 @* ReSharper disable RedundantUsingDirective *@
 @using uLearn.Web.Models
+@using Ulearn.Common.Api
 @using Ulearn.Common.Extensions
 @using Ulearn.Core
 @using Ulearn.Core.Courses.Slides.Blocks
@@ -12,6 +14,8 @@
 @using Ulearn.Core.Courses.Slides.Exercises.Blocks
 @using Ulearn.Core.Courses.Slides.Quizzes
 @using Ulearn.Core.Courses.Slides.Quizzes.Blocks
+@using Ulearn.VideoAnnotations.Api.Models.Parameters.Annotations
+@using Ulearn.VideoAnnotations.Api.Models.Responses.Annotations
 @* ReSharper restore RedundantUsingDirective *@
 
 
@@ -177,6 +181,47 @@
 			Ускорить видео?
 		</a>
 	</div>
+
+	if (!string.IsNullOrEmpty(context.Course.Settings.VideoAnnotationsGoogleDoc))
+	{
+		var client = UlearnVideoAnnotationsClient.Instance;
+		try
+		{
+			var annotationsResponse = client.GetAnnotationsAsync(new AnnotationsParameters
+			{
+				GoogleDocId = context.Course.Settings.VideoAnnotationsGoogleDoc,
+				VideoId = block.VideoId
+			}).GetAwaiter().GetResult();
+
+			@ShowVideoAnnotations(annotationsResponse.Annotation, context, Html);
+		}
+		catch (ApiClientException e)
+		{
+			/* Annotations not found. It's ok */
+		}
+	}
+}
+
+@helper ShowVideoAnnotations(Annotation annotation, BlockRenderContext context, HtmlHelper Html)
+{
+	<h2>
+		Содержание видео
+	</h2>
+	@annotation.Text
+	<div class="video-annotations">
+		@foreach (var fragment in annotation.Fragments)
+		{
+			<div class="fragment">
+				<span class="offset">@fragment.Offset.ToString(@"mm\:ss")</span> — @fragment.Text
+			</div>	 
+		}
+	</div>
+ 
+	var googleDocLink = context.Course.Settings.VideoAnnotationsGoogleDoc;
+	if (!string.IsNullOrEmpty(googleDocLink))
+	{
+		<div>Ошибка в содержании? <a href="https://docs.google.com/document/d/@googleDocLink">Предложите исправление!</a></div>
+	}
 }
 
 @helper Block(ImageGalleryBlock block, BlockRenderContext context, HtmlHelper Html)
@@ -289,7 +334,7 @@
 					context.ManualCheckingsLeft,
 					context.GroupsIds,
 					isCurrentSubmissionChecking: (context.VersionId == null || checking.Submission.Id == context.VersionId) && !context.IsManualCheckingReadonly,
-					defaultProhibitFurtherReview: context.DefaultProhibitFutherReview
+					defaultProhibitFurtherReview: context.DefaultProhibitFurtherReview
 					))
 		}
 	</div>

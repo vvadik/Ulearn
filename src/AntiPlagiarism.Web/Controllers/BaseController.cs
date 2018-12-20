@@ -7,6 +7,7 @@ using AntiPlagiarism.Web.Database.Repos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Serilog;
+using Ulearn.Common.Api.Models.Responses;
 
 
 namespace AntiPlagiarism.Web.Controllers
@@ -33,23 +34,13 @@ namespace AntiPlagiarism.Web.Controllers
 			if (string.IsNullOrEmpty(token))
 			{
 				context.HttpContext.Response.StatusCode = (int) HttpStatusCode.Forbidden;
-				context.Result = new JsonResult(new
-				{
-					status = "error",
-					error = "E001",
-					message = "Not authenticated request. Pass 'token' parameter to query string.",
-				});
+				context.Result = new JsonResult(new ErrorResponse("Not authenticated request. Pass 'token' parameter to query string."));
 				return;
 			}
 			if (! Guid.TryParse(token, out var tokenGuid))
 			{
 				context.HttpContext.Response.StatusCode = (int) HttpStatusCode.Forbidden;
-				context.Result = new JsonResult(new
-				{
-					status = "error",
-					error = "E002",
-					message = "Not authenticated request. Pass correct GUID as 'token' parameter to query string.",
-				});
+				context.Result = new JsonResult(new ErrorResponse("Not authenticated request. Pass correct GUID as 'token' parameter to query string."));
 				return;
 			}
 			
@@ -58,12 +49,7 @@ namespace AntiPlagiarism.Web.Controllers
 			if (client == null)
 			{
 				context.HttpContext.Response.StatusCode = (int) HttpStatusCode.Forbidden;
-				context.Result = new JsonResult(new
-				{
-					status = "error",
-					error = "E003",
-					message = "Not authenticated request. Token is invalid or disabled for a while.",
-				});
+				context.Result = new JsonResult(new ErrorResponse("Not authenticated request. Token is invalid or disabled for a while."));
 				return;
 			}
 			

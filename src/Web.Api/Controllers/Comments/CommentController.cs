@@ -16,8 +16,9 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Serilog;
 using Swashbuckle.AspNetCore.Annotations;
 using Ulearn.Common;
+using Ulearn.Common.Api;
+using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Parameters.Comments;
-using Ulearn.Web.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Responses.Comments;
 
 namespace Ulearn.Web.Api.Controllers.Comments
@@ -79,6 +80,8 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		public async Task<ActionResult<CommentResponse>> Comment(int commentId, [FromQuery] CommentParameters parameters)
 		{
 			var comment = await commentsRepo.FindCommentByIdAsync(commentId).ConfigureAwait(false);
+			if (comment == null)
+				return NotFound(new ErrorResponse($"Comment {commentId} not found"));
 			var canUserSeeNotApprovedComments = await CanUserSeeNotApprovedCommentsAsync(UserId, comment.CourseId).ConfigureAwait(false);
 			
 			DefaultDictionary<int, int> likesCount;

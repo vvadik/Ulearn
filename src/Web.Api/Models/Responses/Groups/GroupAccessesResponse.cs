@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Database.Models;
+using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Common;
 
 namespace Ulearn.Web.Api.Models.Responses.Groups
