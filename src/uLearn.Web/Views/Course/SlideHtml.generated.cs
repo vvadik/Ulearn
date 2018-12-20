@@ -681,7 +681,7 @@ WriteAttributeTo(__razor_helper_writer, "href", Tuple.Create(" href=\"", 7597), 
 , 7639), false)
 );
 
-WriteLiteralTo(__razor_helper_writer, ">Предложите исправление!</a></div>\r\n");
+WriteLiteralTo(__razor_helper_writer, ">Предложите исправление</a>!</div>\r\n");
 
 	}
 
