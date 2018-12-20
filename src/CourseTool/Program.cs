@@ -21,7 +21,7 @@ namespace uLearn.CourseTool
 					MonitorOptions, 
 					ULearnOptions, 
 					TestCourseOptions,
-					PatchSlidesWithVideoAnnotations
+					GenerateEmptyVideoAnnotations
 				>(args)
 				.MapResult(
 					(AbstractOptions options) => ExecuteOption(options),
