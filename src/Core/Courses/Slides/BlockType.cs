@@ -48,9 +48,6 @@ namespace Ulearn.Core.Courses.Slides
 		[XmlEnum("exercise.csproj")]
 		CsProjectExercise,
 
-		[XmlEnum("annotation")]
-		VideoAnnotation,
-		
 		[XmlEnum("question.isTrue")]
 		IsTrueQuestion,
 		
@@ -81,7 +78,6 @@ namespace Ulearn.Core.Courses.Slides
 				case IncludeMarkdownBlock _: return BlockType.IncludeMarkdown;
 				case MarkdownBlock _: return BlockType.Markdown;
 				case TexBlock _: return BlockType.Tex; 
-				case VideoAnnotationBlock _: return BlockType.VideoAnnotation;
 				case HtmlBlock _: return BlockType.Html;
 				case SpoilerBlock _: return BlockType.Spoiler;
 				

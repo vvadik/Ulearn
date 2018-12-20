@@ -251,7 +251,6 @@
 			<xs:element name="includeMarkdown" type="Include" />
 			<xs:element name="gallery" type="NonEmptyString" />
 			<xs:element name="includeBlocks" type="Include" />
-			<xs:element name="annotation" type="VideoAnnotation" />
 			<xs:element name="html" type="Html" />
 			<xs:element name="spoiler" type="Spoiler" />
 		</xs:choice>
@@ -283,27 +282,7 @@
         <xs:attribute name="hide" type="xs:boolean" />
     </xs:complexType>
 
-    <xs:complexType name="VideoAnnotation">
-        <xs:sequence minOccurs="1" maxOccurs="1">
-            <xs:element name="text" minOccurs="1" maxOccurs="1" type="NonEmptyString" />
-            <xs:element name="fragments" minOccurs="0" maxOccurs="1">
-                <xs:complexType>
-                    <xs:sequence minOccurs="1" maxOccurs="1">
-                        <xs:element name="fragment" minOccurs="1" maxOccurs="unbounded">
-                            <xs:complexType>
-                                <xs:sequence minOccurs="1" maxOccurs="1">
-                                    <xs:element name="start" type="TimeCode" minOccurs="1" maxOccurs="1" />
-                                    <xs:element name="text" type="NonEmptyString" minOccurs="1" maxOccurs="1" />
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-        </xs:sequence>
-    </xs:complexType>
-
-	<xs:complexType name="Html" mixed="true">
+    <xs:complexType name="Html" mixed="true">
 		<xs:sequence>
 			<xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
