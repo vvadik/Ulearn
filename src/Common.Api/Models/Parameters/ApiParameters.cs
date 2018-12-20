@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
@@ -8,6 +9,11 @@ namespace Ulearn.Common.Api.Models.Parameters
 {
 	public class ApiParameters
 	{
+		public override string ToString()
+		{
+			return ConstructQueryString(ToNameValueCollection());
+		}
+
 		public NameValueCollection ToNameValueCollection(string iEnumerableValuesSeparator = ",")
 		{
 			/* Get all properties of the object */
@@ -49,6 +55,16 @@ namespace Ulearn.Common.Api.Models.Parameters
 			if (fromQueryAttribute != null)
 				return fromQueryAttribute.Name;
 			return property.Name;
+		}
+		
+		private static string ConstructQueryString(NameValueCollection parameters)
+		{
+			var items = new List<string>();
+
+			foreach (string name in parameters)
+				items.Add(string.Concat(name, "=", System.Web.HttpUtility.UrlEncode(parameters[name])));
+
+			return string.Join("&", items.ToArray());
 		}
 	}
 }
