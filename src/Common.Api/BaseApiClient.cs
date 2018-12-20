@@ -33,7 +33,9 @@ namespace Ulearn.Common.Api
 			where TResult: ApiResponse
 		{
 			HttpResponseMessage response;
-			logger.Information("Send {method} request to {serviceName} ({url}) with parameters: {parameters}", method.Method, settings.ServiceName, url, parameters.ToString());
+			if (settings.LogRequestsAndResponses)
+				logger.Information("Send {method} request to {serviceName} ({url}) with parameters: {parameters}", method.Method, settings.ServiceName, url, parameters.ToString());
+			
 			try
 			{
 				if (method == HttpMethod.Get)
@@ -66,7 +68,9 @@ namespace Ulearn.Common.Api
 				throw new ApiClientException($"Can't parse response from {settings.ServiceName}: {e.Message}", e);
 			}
 			
-			logger.Information("Received response from {serviceName}: {result}", settings.ServiceName, result);
+			if (settings.LogRequestsAndResponses)
+				logger.Information("Received response from {serviceName}: {result}", settings.ServiceName, result);
+			
 			return result;
 		}
 
@@ -97,5 +101,7 @@ namespace Ulearn.Common.Api
 		public TimeSpan DefaultTimeout { get; set; } = TimeSpan.FromSeconds(10);
 
 		public string ServiceName { get; set; } = "service";
+
+		public bool LogRequestsAndResponses { get; set; } = true;
 	}
 }

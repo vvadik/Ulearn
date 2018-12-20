@@ -595,11 +595,7 @@ WriteLiteralTo(__razor_helper_writer, "></span>\r\n\t\t\tУскорить вид
 		var client = UlearnVideoAnnotationsClient.Instance;
 		try
 		{
-			var annotationsResponse = client.GetAnnotationsAsync(new AnnotationsParameters
-			{
-				GoogleDocId = context.Course.Settings.VideoAnnotationsGoogleDoc,
-				VideoId = block.VideoId
-			}).GetAwaiter().GetResult();
+			var annotationsResponse = client.GetAnnotationsAsync(context.Course.Settings.VideoAnnotationsGoogleDoc, block.VideoId).GetAwaiter().GetResult();
 
 			
 WriteTo(__razor_helper_writer, ShowVideoAnnotations(annotationsResponse.Annotation, context, Html));

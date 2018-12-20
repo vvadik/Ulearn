@@ -187,11 +187,7 @@
 		var client = UlearnVideoAnnotationsClient.Instance;
 		try
 		{
-			var annotationsResponse = client.GetAnnotationsAsync(new AnnotationsParameters
-			{
-				GoogleDocId = context.Course.Settings.VideoAnnotationsGoogleDoc,
-				VideoId = block.VideoId
-			}).GetAwaiter().GetResult();
+			var annotationsResponse = client.GetAnnotationsAsync(context.Course.Settings.VideoAnnotationsGoogleDoc, block.VideoId).GetAwaiter().GetResult();
 
 			@ShowVideoAnnotations(annotationsResponse.Annotation, context, Html);
 		}
