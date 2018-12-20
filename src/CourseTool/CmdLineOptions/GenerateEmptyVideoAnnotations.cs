@@ -25,14 +25,14 @@ namespace uLearn.CourseTool.CmdLineOptions
 			var resultHtmlFilename = $"{Config.ULearnCourseId}.annotations.html";
 			using (var writer = new StreamWriter(resultHtmlFilename))
 			{
-				writer.WriteLine("<html><head></head><body>");
+				writer.WriteLine($"<html><head><title>{course.Title}</title><style>.videoId {{ color: #999; font-size: 12px; }}</style></head><body>");
 				foreach (var slide in course.Slides)
 				{
 					var videoBlocks = slide.Blocks.OfType<YoutubeBlock>();
 					foreach (var videoBlock in videoBlocks)
 					{
 						writer.WriteLine($"<h1># {slide.Title.EscapeHtml()}</h1>");
-						writer.WriteLine($"{videoBlock.VideoId}");
+						writer.WriteLine($"<span class='videoId'>{videoBlock.VideoId.EscapeHtml()}</span>");
 					}
 				}
 				writer.WriteLine("</body></html>");
