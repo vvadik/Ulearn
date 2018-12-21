@@ -289,3 +289,7 @@ footer:hover {
 .legacy-page .checkbox input[type="radio"]:disabled + input[type=hidden] + label {
 	opacity: 0.75;
 }
+
+.legacy-page .link-text {
+	color: #337ab7;
+}
