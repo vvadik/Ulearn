@@ -51,7 +51,10 @@ window.documentReadyFunctions.push(function () {
 					threshold: null
 				}
 			},
-		});
+			credits: {
+				enabled: false,
+			},
+		});		
 	}
 
 	showChartByDataFrom('#usersByCountVisitedSlides');
