@@ -2128,6 +2128,30 @@ h1 .copy-group-link {
 	text-decoration: none;
 }
 
+.legacy-page .analytics__other-units-link {	
+	font-size: 16px;
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 12px;
+}
+
+@media (min-width: 720px) {
+	.legacy-page .analytics__other-units-link {
+		margin-bottom: 20px;
+		font-size: 20px;
+		margin-left: -23px;
+		margin-right: -23px;
+	}
+}
+
+.legacy-page .analytics__other-units-link > div:first-child {
+	text-align: left;
+}
+
+.legacy-page .analytics__other-units-link > div:last-child {
+	text-align: right;
+}
+
 /* Code review */
 .legacy-page .exercise__add-review {
 	position: absolute;

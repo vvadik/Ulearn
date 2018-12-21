@@ -9,6 +9,26 @@
 
 <div class="container">
 	<h2>@Model.User.VisibleName, «@Model.Unit.Title»</h2>
+	
+	@if (Model.PreviousUnit != null || Model.NextUnit != null)
+	{
+		<div class="analytics__other-units-link">
+			@if (Model.PreviousUnit != null)
+			{
+				<div>
+					@Html.ActionLink("← " + Model.PreviousUnit.Title, "UserUnitStatistics", new { courseId = Model.Course.Id, userId = Model.User.Id, unitId = Model.PreviousUnit.Id})
+				</div>
+			}
+			&nbsp;
+			@if (Model.NextUnit != null)
+			{
+				<div class="pull-right">
+					@Html.ActionLink(Model.NextUnit.Title + " →", "UserUnitStatistics", new { courseId = Model.Course.Id, userId = Model.User.Id, unitId = Model.NextUnit.Id})
+				</div>
+			}
+		</div>
+	}
+	
 	<div class="user-submissions">
 		@{
 			var shownAnySubmission = false;

@@ -504,6 +504,10 @@ namespace uLearn.Web.Controllers
 				.DistinctBy(u => u.SlideId);
 			var userScores = visitsRepo.GetScoresForSlides(courseId, userId, slides.Select(s => s.Id));
 
+			var unitIndex = course.Units.FindIndex(u => u.Id == unitId);
+			var previousUnit = unitIndex == 0 ? null : course.Units[unitIndex - 1];
+			var nextUnit = unitIndex == course.Units.Count - 1 ? null : course.Units[unitIndex + 1];
+
 			var model = new UserUnitStatisticsPageModel
 			{
 				Course = course,
@@ -512,6 +516,8 @@ namespace uLearn.Web.Controllers
 				Slides = slides.ToDictionary(s => s.Id),
 				Submissions = acceptedSubmissions.ToList(),
 				Scores = userScores,
+				PreviousUnit = previousUnit,
+				NextUnit = nextUnit,
 			};
 
 			return View(model);
@@ -804,6 +810,8 @@ namespace uLearn.Web.Controllers
 		public List<UserExerciseSubmission> Submissions { get; set; }
 		public Dictionary<Guid, Slide> Slides { get; set; }
 		public Dictionary<Guid, int> Scores { get; set; }
+		public Unit PreviousUnit { get; set; }
+		public Unit NextUnit { get; set; }
 	}
 
 	public class UserSolutionsViewModel
