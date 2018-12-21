@@ -194,6 +194,7 @@
 		catch (ApiClientException e)
 		{
 			/* Annotations not found. It's ok */
+			@SuggestAnnotations(context, Html)
 		}
 	}
 }
@@ -217,6 +218,18 @@
 	if (!string.IsNullOrEmpty(googleDocLink))
 	{
 		<div>Ошибка в содержании? <a href="https://docs.google.com/document/d/@googleDocLink" target="_blank">Предложите исправление</a><span class="link-text">!</span></div>
+	}
+}
+
+@helper SuggestAnnotations(BlockRenderContext context, HtmlHelper Html)
+{
+	<h2>
+		Содержание видео
+	</h2>
+	var googleDocLink = context.Course.Settings.VideoAnnotationsGoogleDoc;
+	if (!string.IsNullOrEmpty(googleDocLink))
+	{
+		<div>Помогите написать <a href="https://docs.google.com/document/d/@googleDocLink" target="_blank">текстовое содержание</a> этого видео.</div>
 	}
 }
 
