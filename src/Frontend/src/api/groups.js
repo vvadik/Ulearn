@@ -2,106 +2,76 @@ import api from "../api/"
 
 // Groups
 export function getCourseGroups(courseId) {
-	return api.get("groups/in/" + courseId)
-		.then(response => response.json())
+	return api.get("groups/in/" + courseId);
 }
 
-export function getCourseArchiveGroups(courseId) {
+export function getCourseArchivedGroups(courseId) {
 	return api.get("groups/in/" + courseId + "/archived")
-		.then(response => response.json())
 }
 
 // Group
 export function getGroup(groupId) {
-	return api.get("groups/" + groupId)
-		.then(response => response.json());
+	return api.get("groups/" + groupId);
 }
 
 export function createGroup(courseId, name) {
 	return api.post("groups/in/" + courseId,
-		createRequestParams({ name }))
-		.then(response => response.json());
+		api.api.createRequestParams({ name }));
 }
 
 export function copyGroup(groupId, destinationCourseId, makeMeOwner) {
 	return api.post("groups/" + groupId + "/copy?destination_course_id="
-		+ encodeURIComponent(destinationCourseId) + '&make_me_owner=' + makeMeOwner)
-		.then(response => response.json());
+		+ encodeURIComponent(destinationCourseId) + '&make_me_owner=' + makeMeOwner);
 }
 
 export function saveGroupSettings(groupId, groupSettings) {
 	return api.patch("groups/" + groupId,
-		createRequestParams(groupSettings))
-		.then(response => response.json());
+		api.createRequestParams(groupSettings));
 }
 
 export function deleteGroup(groupId) {
-	return api.delete("groups/" + groupId)
-		.then(response => response.json());
+	return api.delete("groups/" + groupId);
 }
 
 export function changeGroupOwner(groupId, ownerId) {
 	return api.put("groups/" + groupId + '/owner',
-		createRequestParams({owner_id: ownerId}))
-		.then(response => response.json());
+		api.createRequestParams({owner_id: ownerId}));
 }
 
 // Scores
 export function getGroupScores(groupId) {
 	return api.get("groups/" + groupId + '/scores')
-		.then(response => response.json());
 }
 
 export function saveScoresSettings(groupId, scoresId) {
-	return api.post("groups/" + groupId + '/scores', {
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body:
-				JSON.stringify({ scores: scoresId }),
-			})
-		.then(response => response.json());
+	return api.post("groups/" + groupId + '/scores',
+			api.createRequestParams({'scores': scoresId}));
 }
 
 // Accesses
 export function getGroupAccesses(groupId) {
-	return api.get("groups/" + groupId + "/accesses")
-		.then(response => response.json());
+	return api.get("groups/" + groupId + "/accesses");
 }
 
 export function addGroupAccesses(groupId, userId) {
-	return api.post("groups/" + groupId + "/accesses/" + userId)
-		.then(response => response.json());
+	return api.post("groups/" + groupId + "/accesses/" + userId);
 }
 
 export function removeAccess(groupId, userId) {
-	return api.delete("groups/" + groupId + "/accesses/" + userId)
-		.then(response => response.json());
+	return api.delete("groups/" + groupId + "/accesses/" + userId);
 }
 
-//Students
+// Students
 export function getStudents(groupId) {
-	return api.get("groups/" + groupId + "/students")
-		.then(response => response.json());
+	return api.get("groups/" + groupId + "/students");
 }
 
-export function deleteStudents(groupId, students) {
+export function deleteStudents(groupId, studentIds) {
 	return api.delete("groups/" + groupId + "/students/",
-		createRequestParams({'student_ids': students}))
-		.then(response => response.json());
+		api.createRequestParams({'student_ids': studentIds}));
 }
 
-export function copyStudents(groupId, destinationGroupId, students) {
+export function copyStudents(groupId, destinationGroupId, studentIds) {
 	return api.post("groups/" + groupId + "/students/copy/to/" + destinationGroupId,
-		createRequestParams({'student_ids': students}))
-		.then(response => response.json());
-}
-
-function createRequestParams(body) {
-	return {
-		headers: {
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify(body)
-	}
+		api.createRequestParams({'student_ids': studentIds}));
 }

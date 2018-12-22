@@ -4,7 +4,6 @@ export function getCourses() {
     return dispatch => {
 
         return api.get("courses")
-            .then(response => response.json())
             .then(json => {
                 let courseById = {};
                 json.courses.forEach(c => courseById[c.id.toLowerCase()] = c);
@@ -17,6 +16,5 @@ export function getCourses() {
 }
 
 export function getUserCourses() {
-	return api.get('courses?role=instructor')
-		.then(response => response.json());
+	return api.get('courses?role=instructor');
 }

@@ -3,7 +3,6 @@ import api from "../api"
 export function getCurrentUser() {
     return dispatch => {
         return api.get('account')
-            .then(response => response.json())
             .then(json => {
                 let isAuthenticated = json.is_authenticated;
                 if (! isAuthenticated)
@@ -33,7 +32,6 @@ export function getCurrentUser() {
 export function getRoles() {
     return dispatch => {
         return api.get('account/roles')
-            .then(response => response.json())
             .then(json => {
                 let courseRoles = json.course_roles;
                 let courseRolesObject = {};
@@ -56,7 +54,6 @@ export function getRoles() {
 export function logout() {
     return dispatch => {
         return api.post('account/logout')
-            .then(response => response.json())
             .then(json => {
                 if (json.logout)
                     dispatch({

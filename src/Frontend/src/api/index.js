@@ -45,8 +45,8 @@ function request(url, options, isRetry) {
         .then(value => {
             if (value === API_JWT_TOKEN_UPDATED)
                 return request(url, options, true);
-            return Promise.resolve(value);
-        })
+            return Promise.resolve(value.json());
+        });
 }
 
 function get(url, options) {
@@ -77,6 +77,15 @@ function deleteRequest(url, options) { /* delete - зарезервирован�
 	return request(url, options);
 }
 
+function createRequestParams(body) {
+	return {
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(body)
+	}
+}
+
 let api = {
     account: account,
     courses: courses,
@@ -88,7 +97,8 @@ let api = {
 	patch: patch,
 	put: put,
 	delete: deleteRequest,
-    request: request
+    request: request,
+	createRequestParams: createRequestParams,
 };
 
 export default api;
