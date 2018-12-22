@@ -1,25 +1,25 @@
-import getWordForm from './getWordForm';
+import getGenderForm from './getGenderForm';
 
-describe('getWordForm', () => {
+describe('getGenderForm', () => {
 	test('для мужчины', () => {
-		expect(getWordForm('была', 'был', 'male')).toBe('был');
+		expect(getGenderForm('male', 'была', 'был')).toBe('был');
 	});
 	test('для женщины', () => {
-		expect(getWordForm('была', 'был', 'female')).toBe('была');
+		expect(getGenderForm('female', 'была', 'был')).toBe('была');
 	});
 	test('для пустой строки', () => {
-		expect(getWordForm('была', 'был', '')).toBe('был');
+		expect(getGenderForm('', 'была', 'был')).toBe('был');
 	});
 	test('для числа', () => {
-		expect(getWordForm('была', 'был', 1)).toBe('был');
+		expect(getGenderForm(1, 'была', 'был')).toBe('был');
 	});
 	test('для числа', () => {
-		expect(getWordForm('была', 'был', '1')).toBe('был');
+		expect(getGenderForm('1', 'была', 'был')).toBe('был');
 	});
 	test('для undefined', () => {
-		expect(getWordForm('была', 'был', undefined)).toBe('был');
+		expect(getGenderForm(undefined, 'была', 'был')).toBe('был');
 	});
 	test('для null', () => {
-		expect(getWordForm('была', 'был', null)).toBe('был');
+		expect(getGenderForm(null, 'была', 'был')).toBe('был');
 	});
 });

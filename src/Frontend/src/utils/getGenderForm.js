@@ -1,7 +1,7 @@
-export default function getWordForm(firstWord, secondWord, gender) {
+export default function getGenderForm(gender, female, male) {
 	if (gender === 'female') {
-		return firstWord;
+		return female;
 	} else {
-		return secondWord;
+		return male;
 	}
 }

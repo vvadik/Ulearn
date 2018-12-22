@@ -36,10 +36,8 @@ class GroupInfo extends Component {
 							{this.renderTeachers()}
 						</header>
 						<div className={styles["group-settings"]}>
-							{this.renderSetting(isProgressEnabled, isProgressEnabled ?
-								'Ведомость включена': 'Ведомость выключена')}
-							{this.renderSetting(isCodeReviewEnabled, isCodeReviewEnabled ?
-								'Код-ревью включено' : 'Код-ревью выключено')}
+							{this.renderSetting(isProgressEnabled, 'Ведомость включена', 'Ведомость выключена')}
+							{this.renderSetting(isCodeReviewEnabled, 'Код-ревью включено', 'Код-ревью выключено')}
 						</div>
 					</div>
 				</div>
@@ -63,12 +61,12 @@ class GroupInfo extends Component {
 		)
 	}
 
-	renderSetting(enabled, text) {
+	renderSetting(enabled, textIfEnabled, textIfDisabled) {
 		return (
 			<div className={enabled ? styles["settings-on"] : styles["settings-off"]}>
 				<Gapped gap={5}>
 					{ enabled ? <Icon name="Ok"/> : <Icon name="Delete"/> }
-					{text}
+					{enabled ? textIfEnabled : textIfDisabled}
 				</Gapped>
 			</div>
 		)

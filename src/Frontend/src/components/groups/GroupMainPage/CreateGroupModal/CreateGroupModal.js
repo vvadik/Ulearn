@@ -45,7 +45,7 @@ class CreateGroupModal extends Component {
 
 		return (
 			<Modal.Body>
-				<Tooltip render={this.tooltipRender} trigger='focus' pos="right top">
+				<Tooltip render={this.checkError} trigger='focus' pos="right top">
 					<Input placeholder="КН-201 УрФУ 2017"
 						   maxLength="20"
 						   value={name || ''}
@@ -86,7 +86,7 @@ class CreateGroupModal extends Component {
 		createGroup(newGroup.id);
 	};
 
-	tooltipRender = () => {
+	checkError = () => {
 		const { error } = this.state;
 
 		if (!error) {

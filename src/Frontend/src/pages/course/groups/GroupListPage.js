@@ -66,7 +66,7 @@ class GroupListPage extends AbstractPage {
 			loadingArchived: true,
 		});
 
-		api.groups.getCourseArchiveGroups(courseId)
+		api.groups.getCourseArchivedGroups(courseId)
 			.then(json => {
 			let archiveGroups = json.groups;
 			this.setState({

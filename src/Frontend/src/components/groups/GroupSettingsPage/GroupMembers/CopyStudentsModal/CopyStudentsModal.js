@@ -43,12 +43,9 @@ class CopyStudentsModal extends Component {
 		const { onClose } = this.props;
 		return (
 			<Modal onClose={onClose} width={640}>
-				<Modal.Header>Скопировать группу из курса</Modal.Header>
+				<Modal.Header>Скопировать студентов</Modal.Header>
 				<form onSubmit={this.onSubmit}>
 					<Modal.Body>
-						<p className={styles["common-info"]}>Студенты будут добавлены в выбранную группу.
-							Скопируются все данные студента, в том числе прогресс студента. (Но это не точно)
-						</p>
 						{ this.renderCourseSelect() }
 						{ this.renderGroupSelect() }
 					</Modal.Body>
@@ -72,7 +69,7 @@ class CopyStudentsModal extends Component {
 		return (
 			<React.Fragment>
 				<p className={styles["course-info"]}>
-					Выберите курс, в который будут скопированы студенты
+					Выберите курс, в который надо скопировать студентов
 				</p>
 				<label className={styles["select-course"]}>
 					<Select
@@ -95,7 +92,7 @@ class CopyStudentsModal extends Component {
 		return (
 			<React.Fragment>
 				<p className={styles["group-info"]}>
-					Выберите группу, в которую будут скопированы студентов
+					Выберите группу
 				</p>
 				<label className={styles["select-group"]}>
 					<Select
@@ -116,8 +113,11 @@ class CopyStudentsModal extends Component {
 	}
 
 	renderEmptyGroups() {
+		const { courses, courseId } = this.state;
 		return (
-			<p className={styles["empty-group-info"]}><b>В выбранном вами курсе нет доступных групп</b></p>
+			<p className={styles["empty-group-info"]}>
+				<b>В курсе {this.getTitle(courses, courseId)} нет доступных вам групп</b>
+			</p>
 		)
 	}
 
@@ -126,6 +126,10 @@ class CopyStudentsModal extends Component {
 		return courses.map(course => [course.id, course.title]);
 	};
 
+	getTitle = (arr, id) => {
+		const item = arr.find(item => item.id === id);
+		return item.title || item.name;
+	};
 
 	onCourseChange = (_, value) => {
 		this.setState({
@@ -160,7 +164,7 @@ class CopyStudentsModal extends Component {
 	};
 
 	onSubmit = (e) => {
-		const { groupId, courseId } = this.state;
+		const { groupId, courseId, groups } = this.state;
 		const { studentIds, currentGroupId, onClose } = this.props;
 
 		e.preventDefault();
@@ -178,7 +182,7 @@ class CopyStudentsModal extends Component {
 			.catch(console.error);
 
 		onClose();
-		Toast.push('Скопировано');
+		Toast.push(`Студенты скопированы в группу ${this.getTitle(groups, groupId)}`);
 	};
 }
 

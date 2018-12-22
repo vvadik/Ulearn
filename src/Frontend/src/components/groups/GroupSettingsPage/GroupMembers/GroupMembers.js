@@ -2,8 +2,6 @@ import React, {Component} from "react";
 import PropTypes from "prop-types";
 import {withRouter} from "react-router-dom";
 import moment from "moment";
-import 'moment/locale/ru';
-import "moment-timezone";
 import api from "../../../../api";
 import Icon from "@skbkontur/react-icons";
 import Kebab from "@skbkontur/react-ui/components/Kebab/Kebab";
@@ -14,7 +12,7 @@ import ComboboxInstructorsSearch from "./Combobox/ComboboxInstructorsSearch";
 import Avatar from "./Avatar/Avatar";
 import GroupStudents from "./GroupStudents/GroupStudents";
 import InviteBlock from "./InviteBlock/InviteBlock";
-import getWordForm from "../../../../utils/getWordForm";
+import getGenderForm from "../../../../utils/getGenderForm";
 
 import styles from './style.less';
 
@@ -114,8 +112,8 @@ class GroupMembers extends Component {
 	renderTeachers() {
 		const { accesses } = this.state;
 		const owner = this.props.group.owner;
-		moment.tz.setDefault('Europe/Moscow');
-		const grantTime = (grantTime) => moment(grantTime).tz('Asia/Yekaterinburg').format();
+
+		const grantTime = (grantTime) => moment(grantTime).format();
 
 		return (accesses.map(item =>
 			<React.Fragment
@@ -125,7 +123,7 @@ class GroupMembers extends Component {
 					<div className={styles["teacher-name"]}>
 						<div>{item.user.visible_name}</div>
 						<span className={styles["teacher-status"]}>
-							Полный доступ { `${getWordForm('предоставила', 'предоставил', owner.gender)}
+							Полный доступ { `${getGenderForm(owner.gender, 'предоставила', 'предоставил')}
 							${item.granted_by.visible_name} ${moment(grantTime(item.grant_time)).fromNow()}` }
 						</span>
 					</div>
@@ -238,7 +236,6 @@ class GroupMembers extends Component {
 		});
 
 		api.groups.deleteStudents(group.id, students)
-			.then(response => response.json())
 			.catch(console.error);
 	};
 }

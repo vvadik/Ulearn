@@ -8,7 +8,7 @@ import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
 import Icon from "@skbkontur/react-icons";
 import Avatar from "../Avatar/Avatar";
 import CopyStudentsModal from "../CopyStudentsModal/CopyStudentsModal";
-import getWordForm from "../../../../../utils/getWordForm";
+import getGenderForm from "../../../../../utils/getGenderForm";
 
 import styles from './style.less';
 
@@ -76,8 +76,7 @@ class GroupStudents extends Component {
 	renderStudents() {
 		const { students } = this.props;
 		const { studentIds } = this.state;
-		moment.tz.setDefault('Europe/Moscow');
-		const grantTime = (grantTime) => moment(grantTime).tz('Asia/Yekaterinburg').format();
+		const grantTime = (grantTime) => moment(grantTime).format();
 
 		return (
 			<div>
@@ -89,7 +88,7 @@ class GroupStudents extends Component {
 							onChange={(_, value) => this.onCheckStudent(item.user.id, _, value)}>
 							<Avatar user={item.user} size='small' />
 							{ item.user.visible_name } <span className={styles["action-text"]}>
-								{ `${ getWordForm('вступила', 'вступил', item.user.gender) }
+								{ `${ getGenderForm(item.user.gender, 'вступила', 'вступил') }
 								${ moment(grantTime(item.adding_time)).fromNow() }` }</span>
 						</Checkbox>
 					</div>
@@ -127,16 +126,16 @@ class GroupStudents extends Component {
 
 	onCheckStudent = (id, _, value) => {
 		const { studentIds } = this.state;
-		const copyStudents = new Set(studentIds);
+		const studentsCopy = new Set(studentIds);
 
 		if (value) {
-			copyStudents.add(id);
+			studentsCopy.add(id);
 		} else {
-			copyStudents.delete(id);
+			studentsCopy.delete(id);
 		}
 
 		this.setState({
-			studentIds: copyStudents,
+			studentIds: studentsCopy,
 		});
 	};
 
