@@ -1,4 +1,5 @@
 @import "../../variables.less";
+@import "../../common.less";
 
 @headerHeight: 50px;
 
@@ -260,20 +261,3 @@
   border-left: 4px solid transparent;
 }
 
-.visible-only-phone {
-  display: none;
-
-  @media (max-width: @maxPhoneWidth) {
-	& {
-	  display: initial;
-	}
-  }
-}
-
-.visible-at-least-tablet {
-  @media (max-width: @maxPhoneWidth) {
-	& {
-	  display: none !important;
-	}
-  }
-}

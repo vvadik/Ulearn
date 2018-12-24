@@ -1,66 +1,12 @@
 @import "./../../../variables.less";
+@import "./groupListPage.less";
 @minHeight: calc(100vh - 60px);
-
-html, body, #root {
-  height: 100%;
-}
-
-body {
-  margin: 0;
-  font-family: "Segoe UI",Arial,sans-serif;
-  min-width: 320px;
-}
-
-h2 {
-  font-weight: 500;
-  text-align: left;
-  font-size: 32px;
-  line-height: 40px;
-  margin: 0 0 10px 0;
-  border-bottom: none;
-  padding: 30px 0;
-}
-
-h3 {
-  font-size: 22px;
-  line-height: 30px;
-  margin: 10px 0 15px 0;
-  font-weight: 500;
-}
-
-.wrapper {
-  width: 100%;
-  background-color: #f2f2f2;
-  margin: 0 auto;
-  min-height: @minHeight;
-}
-
-.content-wrapper {
-  background: #fff;
-  width: 70%;
-  margin: 0 auto;
-  height: 100%;
-  min-height: @minHeight;
-
-  @media (max-width: @maxLaptopWidth) {
-	width: 90%;
-  }
-
-  @media (max-width: @maxTabletWidth) {
-	width: 100%;
-  }
-}
 
 .group-header {
   width: 100%;
   margin: 0 auto;
-  background: #fff;
   border-bottom: 1px solid #eee;
   padding: 30px 0 0;
-
-  @media (max-width: @maxTabletWidth) {
-	display: block;
-  }
 }
 
 .group-name {
@@ -71,6 +17,7 @@ h3 {
   font-size: 32px;
   line-height: 30px;
   border: none;
+  padding: 30px 0;
 
   @media (max-width: @maxTabletWidth) {
 	padding: 0;
@@ -85,10 +32,7 @@ h3 {
   width: 80%;
   margin: 30px auto -1px;
 
-  a:hover {
-	text-decoration: none;
-  }
-
+  a:hover,
   a:focus {
 	text-decoration: none;
   }

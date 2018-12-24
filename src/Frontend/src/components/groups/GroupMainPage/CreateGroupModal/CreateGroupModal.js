@@ -66,7 +66,7 @@ class CreateGroupModal extends Component {
 
 	onSubmit = async (e) => {
 		const { name } = this.state;
-		const { onCloseModal, createGroup, courseId } = this.props;
+		const { onCloseModal, onSubmit, courseId } = this.props;
 
 		e.preventDefault();
 
@@ -83,7 +83,7 @@ class CreateGroupModal extends Component {
 		this.setState({ loading: false, });
 
 		onCloseModal();
-		createGroup(newGroup.id);
+		onSubmit(newGroup.id);
 	};
 
 	checkError = () => {
@@ -111,7 +111,7 @@ class CreateGroupModal extends Component {
 CreateGroupModal.propTypes = {
 	onCloseModal: PropTypes.func,
 	courseId: PropTypes.string,
-	createGroup: PropTypes.func,
+	onSubmit: PropTypes.func,
 };
 
 export default CreateGroupModal;

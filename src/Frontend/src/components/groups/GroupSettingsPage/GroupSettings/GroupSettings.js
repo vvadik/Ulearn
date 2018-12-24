@@ -52,7 +52,8 @@ class GroupSettings extends Component {
 						error={this.props.error}
 						value={this.inputValue}
 						placeholder="Здесь вы можете изменить название группы"
-						onChange={this.onChangeName} />
+						onChange={this.onChangeName}
+						width="100%"/>
 				</div>
 			</div>
 		)

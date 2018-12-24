@@ -16,7 +16,7 @@ export function getGroup(groupId) {
 
 export function createGroup(courseId, name) {
 	return api.post("groups/in/" + courseId,
-		api.api.createRequestParams({ name }));
+		api.createRequestParams({ name }));
 }
 
 export function copyGroup(groupId, destinationCourseId, makeMeOwner) {

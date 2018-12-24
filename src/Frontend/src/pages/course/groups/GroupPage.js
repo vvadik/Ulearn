@@ -17,7 +17,7 @@ class GroupPage extends Component {
 		open: "settings",
 		updatedFields: {},
 		error: false,
-		loadSettings: false,
+		loadingSettings: false,
 		loading: false,
 		scores: [],
 		scoresId: [],
@@ -45,6 +45,10 @@ class GroupPage extends Component {
 	};
 
 	loadGroupScores = (groupId) => {
+		this.setState({
+			loading: true,
+		});
+
 		api.groups.getGroupScores(groupId)
 			.then(json => {
 			let scores = json.scores;
@@ -53,15 +57,11 @@ class GroupPage extends Component {
 				loading: this.state.group.id ? false : true,
 			});
 		}).catch(console.error);
-
-		this.setState({
-			loading: true,
-		});
 	};
 
 	render() {
 		let courseId = this.props.match.params.courseId;
-		const { group, open, loadSettings, loading, scores, updatedFields, error } = this.state;
+		const { group, open } = this.state;
 
 		return (
 			<div className={styles.wrapper}>
@@ -69,35 +69,10 @@ class GroupPage extends Component {
 					<title>{`Группа ${group.name}`}</title>
 				</Helmet>
 				<div className={styles["content-wrapper"]}>
-					<header className={styles["group-header"]}>
-						<h2 className={styles["group-name"]}>{ group.name }</h2>
-						<div className={styles["tabs-container"]}>
-							<Tabs value={open} onChange={this.onChangeTab}>
-								<Tabs.Tab id="settings">Настройки</Tabs.Tab>
-								<Tabs.Tab id="members">Участники</Tabs.Tab>
-							</Tabs>
-						</div>
-					</header>
+					{ this.renderHeader() }
 					<div className={styles.content}>
 						{ (open === "settings") &&
-							<form onSubmit={this.loadingSettings}>
-								<GroupSettings
-									loading={loading}
-									name={updatedFields.name}
-									group={group}
-									scores={scores}
-									error={error}
-									onChangeName={this.onChangeName}
-									onChangeSettings={this.onChangeSettings}
-									onChangeScores={this.onChangeScores} />
-								<Button
-									size="medium"
-									use="primary"
-									type="submit"
-									loading={loadSettings}>
-									Сохранить
-								</Button>
-							</form> }
+							this.renderSettings() }
 						{ (open === "members")  &&
 							<GroupMembers
 								courseId={courseId}
@@ -108,6 +83,46 @@ class GroupPage extends Component {
 					</div>
 				</div>
 			</div>
+		)
+	}
+
+	renderHeader() {
+		const { group, open } = this.state;
+
+		return (
+			<header className={styles["group-header"]}>
+				<h2 className={styles["group-name"]}>{ group.name }</h2>
+				<div className={styles["tabs-container"]}>
+					<Tabs value={open} onChange={this.onChangeTab}>
+						<Tabs.Tab id="settings">Настройки</Tabs.Tab>
+						<Tabs.Tab id="members">Участники</Tabs.Tab>
+					</Tabs>
+				</div>
+			</header>
+		)
+	}
+
+	renderSettings() {
+		const {group, loadingSettings, loading, scores, updatedFields, error } = this.state;
+		return (
+			<form onSubmit={this.sendSettings}>
+				<GroupSettings
+					loading={loading}
+					name={updatedFields.name !== undefined ? updatedFields.name : group.name}
+					group={group}
+					scores={scores}
+					error={error}
+					onChangeName={this.onChangeName}
+					onChangeSettings={this.onChangeSettings}
+					onChangeScores={this.onChangeScores} />
+				<Button
+					size="medium"
+					use="primary"
+					type="submit"
+					loading={loadingSettings}>
+					Сохранить
+				</Button>
+			</form>
 		)
 	}
 
@@ -143,11 +158,9 @@ class GroupPage extends Component {
 		});
 	};
 
-	onChangeGroupOwner = (user) => {
+	onChangeGroupOwner = (user, updatedGroupAccesses) => {
 		const { group } = this.state;
-		const updatedGroupAccesses = group.accesses.filter(item =>
-			item.user.id !== user.id);
-		const updatedGroup = { ...group, owner: user, updatedGroupAccesses };
+		const updatedGroup = { ...group, owner: user, accesses: updatedGroupAccesses };
 		this.setState({
 			group: updatedGroup,
 		});
@@ -168,7 +181,7 @@ class GroupPage extends Component {
 		});
 	};
 
-	loadingSettings = (e) => {
+	sendSettings = (e) => {
 		const { group, updatedFields, scoresId } = this.state;
 
 		Toast.push('Настройки сохранены');
@@ -176,7 +189,7 @@ class GroupPage extends Component {
 		e.preventDefault();
 
 		this.setState({
-			loadSettings: true,
+			loadingSettings: true,
 			group: {
 			...group,
 				name: updatedFields.name,
@@ -186,18 +199,17 @@ class GroupPage extends Component {
 		api.groups.saveGroupSettings(group.id, updatedFields)
 			.then(group => {
 				this.setState({
-					loadSettings: false,
+					loadingSettings: false,
 					group: group,
 				});
 			}).catch(console.error);
 
 		api.groups.saveScoresSettings(group.id, scoresId)
-			.then(response => {
+			.then(
 				this.setState({
-					loadSettings: false,
-				});
-				return response;
-			})
+					loadingSettings: false,
+				})
+			)
 			.catch(console.error);
 	};
 }

@@ -238,7 +238,7 @@ class CopyGroupModal extends Component {
 	onSubmit = async (e) => {
 		const { groupId, changeOwner } = this.state;
 		const currentCourseId = this.props.courseId;
-		const { onClose, onSubmit } = this.props;
+		const { onCloseModal, onSubmit } = this.props;
 		e.preventDefault();
 		if (!currentCourseId || !groupId) {
 			this.setState({
@@ -251,14 +251,14 @@ class CopyGroupModal extends Component {
 		const newGroup = await api.groups.copyGroup(groupId, currentCourseId, changeOwner);
 		this.setState({ loadGroup: false });
 
-		onClose();
+		onCloseModal();
 		onSubmit(newGroup.id);
 	};
 }
 
 CopyGroupModal.propTypes = {
 	courseId: PropTypes.string,
-	onClose: PropTypes.func,
+	onCloseModal: PropTypes.func,
 	onSubmit: PropTypes.func,
 };
 

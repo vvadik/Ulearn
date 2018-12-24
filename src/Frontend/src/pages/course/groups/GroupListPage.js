@@ -7,7 +7,7 @@ import api from "../../../api";
 import GroupList from "../../../components/groups/GroupMainPage/GroupList/GroupList";
 import GroupHeader from "../../../components/groups/GroupMainPage/GroupHeader/GroupHeader";
 
-import styles from "./mainPage.less";
+import styles from "./groupListPage.less";
 
 class AbstractPage extends Component {
  // TODO: выяснить у Андрея, зачем оно. И реализоваьть или удалить.
@@ -95,8 +95,7 @@ class GroupListPage extends AbstractPage {
 						onTabChange={this.onTabChange}
 						filter={this.state.filter}
 						courseId={courseId}
-						createGroup={this.createGroup}
-						copyGroup={this.copyGroup}
+						addGroup={this.addGroup}
 						groups={this.state.groups}
 					/>
 					<GroupList
@@ -123,25 +122,14 @@ class GroupListPage extends AbstractPage {
 		}
 	};
 
-	createGroup = async (groupId) => {
+	addGroup = async (groupId) => {
 		let courseId = this.props.match.params.courseId;
-		const newGroup = await api.groups.getGroup(groupId);
 		const groups = this.filteredGroups;
+
+		const newGroup = await api.groups.getGroup(groupId);
 
 		this.setState({
 			groups: [newGroup, ...groups],
-		});
-
-		this.props.history.push(`/${courseId}/groups/${groupId}`);
-	};
-
-	copyGroup = async (groupId) => {
-		let courseId = this.props.match.params.courseId;
-		const { groups } = this.state;
-		const copyGroup = await api.groups.getGroup(groupId);
-
-		this.setState({
-			groups: [copyGroup, ...groups],
 		});
 
 		this.props.history.push(`/${courseId}/groups/${groupId}`);

@@ -123,7 +123,7 @@ class GroupMembers extends Component {
 					<div className={styles["teacher-name"]}>
 						<div>{item.user.visible_name}</div>
 						<span className={styles["teacher-status"]}>
-							Полный доступ { `${getGenderForm(owner.gender, 'предоставила', 'предоставил')}
+							Полный доступ { `${getGenderForm(owner.gender, 'предоставила', 'предоставил') }
 							${item.granted_by.visible_name} ${moment(grantTime(item.grant_time)).fromNow()}` }
 						</span>
 					</div>
@@ -176,13 +176,12 @@ class GroupMembers extends Component {
 		const { accesses } = this.state;
 		const { group } = this.props;
 		const updatedAccesses = accesses.map(item =>
-			item.user.id === user.id ? {...item, user: group.owner} : item);
-
+			item.user.id === user.id ? {...item, user: group.owner, grant_time: new Date()} : item);
 		this.setState({
 			accesses: updatedAccesses,
 		});
 
-		this.props.onChangeGroupOwner(user);
+		this.props.onChangeGroupOwner(user, updatedAccesses);
 
 		api.groups.changeGroupOwner(group.id, user.id)
 			.catch(console.error);
@@ -221,6 +220,7 @@ class GroupMembers extends Component {
 
 		this.setState({
 			accesses: updatedAccesses,
+			selected: null,
 		});
 
 		api.groups.addGroupAccesses(group.id, item.value)

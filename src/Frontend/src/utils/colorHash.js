@@ -6,9 +6,9 @@ export default function colorHash(str) {
 	}
 
 	let r, g, b;
-	r = ~~(('0.' + Math.sin(sum + 1).toString().substr(6)) * 256);
-	g = ~~(('0.' + Math.sin(sum + 2).toString().substr(6)) * 256);
-	b = ~~(('0.' + Math.sin(sum + 3).toString().substr(6)) * 256);
+	r = Math.trunc(('0.' + Math.sin(sum + 1).toString().substr(6)) * 256);
+	g = Math.trunc(('0.' + Math.sin(sum + 2).toString().substr(6)) * 256);
+	b = Math.trunc(('0.' + Math.sin(sum + 3).toString().substr(6)) * 256);
 
 	return "rgb(" + r + ", " + g + ", " + b + ")";
 }

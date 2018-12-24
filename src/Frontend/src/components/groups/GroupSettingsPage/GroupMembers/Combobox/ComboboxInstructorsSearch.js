@@ -32,6 +32,10 @@ class ComboboxInstructorsSearch extends Component {
 			(accesses.filter(i => i.user.id === item.id)).length === 0;
 		};
 
+			// if (json.instructors.find(isAddedUser) === undefined ) {
+			// 	return 	<span>В этом курсе нет преподавателей с таким именем</span>;
+			// }
+
 		return api.users.getCourseInstructors(this.props.courseId)
 			.then(json => {
 				return json.instructors
@@ -69,7 +73,7 @@ class ComboboxInstructorsSearch extends Component {
 	renderNotFound = () => {
 			return (
 				<span>
-					В этом курсе нет свободных преподавателей
+					В этом курсе нет преподавателей c таким именем
 				</span>
 			)
 	};
