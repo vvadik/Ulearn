@@ -2919,6 +2919,7 @@ h1 .copy-group-link {
 
 .legacy-page .course-statistics.sticky-column td.student-name {
 	background-color: white;
+	display: block;
 }
 /* End of course statistics*/
 

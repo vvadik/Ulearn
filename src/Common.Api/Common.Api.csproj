@@ -8,10 +8,10 @@
     <ItemGroup>
 			<PackageReference Include="AspNetCore.Http.Extensions" Version="1.0.1" />
 			<PackageReference Include="Community.AspNetCore.ExceptionHandling.Mvc" Version="2.0.3" />
-			<PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.1.2" />
-			<PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.3" />
-			<PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.1.3" />
-			<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.1.3" />
+			<PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
+			<PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
+			<PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
+			<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.0" />
 			<PackageReference Include="Vostok.Hosting" Version="1.0.0-beta000055" />
 			<PackageReference Include="Vostok.Instrumentation.AspNetCore" Version="1.0.0-beta000031" />
 			<PackageReference Include="Serilog">
