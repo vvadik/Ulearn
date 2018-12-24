@@ -149,7 +149,7 @@ namespace Ulearn.Common.Api
 				});
 
 				/* See https://docs.microsoft.com/ru-ru/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-2.1&tabs=visual-studio%2Cvisual-studio-xml for details */
-				var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+				var xmlFile = $"{Assembly.GetEntryAssembly().GetName().Name}.xml";
 				var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
 				c.IncludeXmlComments(xmlPath);
 				
