@@ -12,4 +12,3 @@ export default function colorHash(str) {
 
 	return "rgb(" + r + ", " + g + ", " + b + ")";
 }
-

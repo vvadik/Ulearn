@@ -32,10 +32,6 @@ class ComboboxInstructorsSearch extends Component {
 			(accesses.filter(i => i.user.id === item.id)).length === 0;
 		};
 
-			// if (json.instructors.find(isAddedUser) === undefined ) {
-			// 	return 	<span>В этом курсе нет преподавателей с таким именем</span>;
-			// }
-
 		return api.users.getCourseInstructors(this.props.courseId)
 			.then(json => {
 				return json.instructors
@@ -65,17 +61,23 @@ class ComboboxInstructorsSearch extends Component {
 		<div className={styles["teacher"]}>
 			<Avatar user={item} size='small'/>
 			<span>{name}</span>
-			<span className={styles["teacher_login"]}>логин: {item.login}</span>
+			<span className={styles["teacher-login"]}>логин: {item.login}</span>
 		</div>
 		)
 	};
 
 	renderNotFound = () => {
-			return (
-				<span>
-					В этом курсе нет преподавателей c таким именем
-				</span>
-			)
+		const { selected } = this.props;
+
+		if (selected === null) {
+			return 	<span>В этом курсе нет преподавателей</span>;
+	}
+
+		return (
+			<span>
+				В этом курсе нет преподавателей c таким именем
+			</span>
+		)
 	};
 
 	onChangeItem = (_, item) => {

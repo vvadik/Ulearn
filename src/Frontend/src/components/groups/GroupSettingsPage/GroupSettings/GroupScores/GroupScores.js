@@ -31,7 +31,7 @@ class GroupScores extends Component {
 	}
 
 	renderOtherScores() {
-		const {score} = this.props;
+		const { score } = this.props;
 		const id = score.id;
 		const changeScores = score.are_additional_scores_enabled_in_this_group || false;
 

@@ -17,7 +17,7 @@ class GroupPage extends Component {
 		open: "settings",
 		updatedFields: {},
 		error: false,
-		loadingSettings: false,
+		loadingAllSettings: false,
 		loading: false,
 		scores: [],
 		scoresId: [],
@@ -103,7 +103,7 @@ class GroupPage extends Component {
 	}
 
 	renderSettings() {
-		const {group, loadingSettings, loading, scores, updatedFields, error } = this.state;
+		const {group, loadingAllSettings, loading, scores, updatedFields, error } = this.state;
 		return (
 			<form onSubmit={this.sendSettings}>
 				<GroupSettings
@@ -119,7 +119,7 @@ class GroupPage extends Component {
 					size="medium"
 					use="primary"
 					type="submit"
-					loading={loadingSettings}>
+					loading={loadingAllSettings}>
 					Сохранить
 				</Button>
 			</form>
@@ -183,34 +183,39 @@ class GroupPage extends Component {
 
 	sendSettings = (e) => {
 		const { group, updatedFields, scoresId } = this.state;
-
-		Toast.push('Настройки сохранены');
+		let loadingScores = true;
+		let loadingSettings = true;
 
 		e.preventDefault();
 
 		this.setState({
-			loadingSettings: true,
+			loadingAllSettings: true,
 			group: {
-			...group,
+				...group,
 				name: updatedFields.name,
 			}
 		});
 
 		api.groups.saveGroupSettings(group.id, updatedFields)
 			.then(group => {
+				if (group) { loadingSettings = false; }
+
 				this.setState({
-					loadingSettings: false,
-					group: group,
+					loadingAllSettings: Boolean(loadingSettings && loadingScores),
+					group,
 				});
 			}).catch(console.error);
 
 		api.groups.saveScoresSettings(group.id, scoresId)
-			.then(
+			.then( response => {
+				if (response) { loadingScores = false; }
+
 				this.setState({
-					loadingSettings: false,
-				})
-			)
-			.catch(console.error);
+					loadingAllSettings: Boolean(loadingScores && loadingSettings),
+				});
+			}).catch(console.error);
+
+		Toast.push('Настройки сохранены');
 	};
 }
 
