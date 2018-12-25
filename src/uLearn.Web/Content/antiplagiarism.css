@@ -143,3 +143,11 @@
 .antiplagiarism .antiplagiarism__not-matched {
     cursor: pointer;
 }
+
+.antiplagiarism-status__popover {
+	
+}
+
+.antiplagiarism-status__popover button {
+	margin-top: 5px;	
+}

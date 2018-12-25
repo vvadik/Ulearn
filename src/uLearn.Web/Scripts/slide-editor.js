@@ -23,21 +23,13 @@ window.documentReadyFunctions.push(function () {
 
         $self.find('.exercise__add-review__button').click(function () {
             var $button = $(this);
-            var comment = $self.find('.exercise__add-review__comment').val();
-            var params = {
-                StartLine: editorLastRange.anchor.line,
-                StartPosition: editorLastRange.anchor.ch,
-                FinishLine: editorLastRange.head.line,
-                FinishPosition: editorLastRange.head.ch,
-                Comment: comment,
-            };
+            var comment = $self.find('.exercise__add-review__comment').val();            
             $button.text('Сохранение..').attr('disabled', 'disabled');
-            $.post(addReviewUrl, params, function (renderedReview) {
-                addExerciseCodeReview(renderedReview);
-                $self.find('.exercise__add-review__comment').val('');
-                $self.hide();
-                $button.text('Сохранить (Ctrl+Enter)').removeAttr('disabled');
-            });
+            postExerciseCodeReview(addReviewUrl, editorLastRange, comment, function(){
+				$self.find('.exercise__add-review__comment').val('');
+				$self.hide();
+				$button.text('Сохранить (Ctrl+Enter)').removeAttr('disabled');
+			});
         });
 
         /* Trigger button clock on Ctrl + Enter, process Escape key */
@@ -494,6 +486,21 @@ function addExerciseCodeReview(renderedReview) {
     $.each($reviews, function (idx, $item) { $reviewsBlock.append($item); });
 
     placeCodeReviews();
+}
+
+function postExerciseCodeReview(url, selection, comment, callback) {
+	var params = {
+		StartLine: selection.anchor.line,
+		StartPosition: selection.anchor.ch,
+		FinishLine: selection.head.line,
+		FinishPosition: selection.head.ch,
+		Comment: comment,
+	};
+	$.post(url, params, function (renderedReview) {
+		addExerciseCodeReview(renderedReview);
+		if (callback)
+			callback();
+	});
 }
 
 var refreshPreviousDraftLastId = undefined;
