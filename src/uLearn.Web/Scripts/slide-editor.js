@@ -213,6 +213,29 @@ function initCodeEditor($parent) {
 
                         $addReviewPopupInput.trigger('input');
                         $addReviewPopupInput.focus();
+                        
+                        /* Show tooltip with hint about Ctrl+C */
+						if (navigator.clipboard) {
+							var minLine = Math.min(range.anchor.line, range.head.line);
+							/* Don't show tooltip on first 4 lines, it is overlapped */
+							if (minLine >= 4) {
+								if (window.codeMirrorSelectionHint)
+									clearTimeout(window.codeMirrorSelectionHint);
+
+								window.codeMirrorSelectionHint = setTimeout(function () {
+									var $codeMirrorSelectedText = $('.CodeMirror-selectedtext:last-child').first();
+									if ($codeMirrorSelectedText.length === 0)
+										$codeMirrorSelectedText = $('.CodeMirror-selectedtext').last();
+									$codeMirrorSelectedText.tooltip({
+										title: 'Скопируйте выделенный текст с помощью Ctrl+C',
+										placement: 'top',
+										trigger: 'manual',
+										fallbackPlacement: 'right',
+									});
+									$codeMirrorSelectedText.tooltip('show');
+								}, 100);
+							}
+						}
                     });
             }
 
