@@ -151,3 +151,9 @@
 .antiplagiarism-status__popover button {
 	margin-top: 5px;	
 }
+
+.antiplagiarism-status .close-popover {
+	color: black;
+	cursor: pointer;
+	text-decoration: none;
+}

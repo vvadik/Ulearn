@@ -6,7 +6,6 @@ window.documentReadyFunctions.push(function() {
 		var needScroll =  $link ? $link.data('scroll') !== false : true;
 		if ($object.length) {
 			var scrollTo = function () {
-				console.log('scrollTo');
 				if (!needScroll)
 					return;
 				$('html').animate({

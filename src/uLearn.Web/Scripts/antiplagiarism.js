@@ -1,10 +1,18 @@
 function fetchAntiPlagiarismStatus($plagiarismStatus) {
+	function closePopovers($plagiarismStatus, $plagiarismStatusFixedCopy) {
+		$plagiarismStatus.popover('hide');
+		$plagiarismStatus.popover('disable');
+		$plagiarismStatusFixedCopy.popover('hide');
+		$plagiarismStatusFixedCopy.popover('disable');
+	}
+	
     $plagiarismStatus.removeClass('found-level0 found-level1 found-level2');
     
     var url = $plagiarismStatus.data('antiplagiarismUrl');
     var addCodeReviewUrl = $plagiarismStatus.data('addExerciseCodeReviewUrl');
     var $plagiarismStatusFixedCopy = $plagiarismStatus.clone().addClass('fixed').hide().insertAfter($plagiarismStatus);
     var $codeMirror = $plagiarismStatus.parent().find('.CodeMirror');
+    
     $.getJSON(url, function (data) {
         if (data.status === 'not_checked') {
             $plagiarismStatus.addClass('not-checked');
@@ -37,7 +45,7 @@ function fetchAntiPlagiarismStatus($plagiarismStatus) {
 		
 		if (data.suspicion_level !== 0) {
 			let popoverOptions = {
-				title: 'Списано?',
+				title: 'Списано?<a class="pull-right close-popover">&times;</a>',
 				content: '<div class="antiplagiarism-status__popover"><p>Оставить комментарий студенту и поставить 0 баллов за задачу?</p><button class="btn btn-default antiplagiarism-shame-button">Списано!</button></div>',
 				html: true,
 				placement: 'bottom',
@@ -49,17 +57,15 @@ function fetchAntiPlagiarismStatus($plagiarismStatus) {
 			$plagiarismStatusFixedCopy.popover(Object.assign(popoverOptions, {container: $plagiarismStatusFixedCopy}));
 
 			$plagiarismStatus.popover('show');
-			
-			$plagiarismStatus.on('click', '.antiplagiarism-shame-button', function() {
+
+			var $exerciseSubmission = $('.exercise__submission');
+			$exerciseSubmission.on('click', '.antiplagiarism-shame-button', function() {
 				postExerciseCodeReview(addCodeReviewUrl, {
 					head: { line: 0, ch: 0 },
 					anchor: { line: 1, ch: 0 }
 				}, 'Ваше решение списано у другого студента. Пожалуйста, выполняйте задания самостоятельно.');
 
-				$plagiarismStatus.popover('hide');
-				$plagiarismStatus.popover('disable');
-				$plagiarismStatusFixedCopy.popover('hide');
-				$plagiarismStatusFixedCopy.popover('disable');
+				closePopovers($plagiarismStatus, $plagiarismStatusFixedCopy);
 				
 				/* Set 0 points */
 				var $exerciseScore = $('.exercise__score');
@@ -71,6 +77,10 @@ function fetchAntiPlagiarismStatus($plagiarismStatus) {
 
 				/* Scroll to the exercise form */
 				$('.exercise__score-form').smoothScroll();
+			});
+
+			$exerciseSubmission.on('click', '.popover-title .close-popover', function() {
+				closePopovers($plagiarismStatus, $plagiarismStatusFixedCopy);
 			});
 		}
     });
