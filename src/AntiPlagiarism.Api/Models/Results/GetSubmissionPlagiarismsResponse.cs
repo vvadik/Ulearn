@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Ulearn.Common.Api.Models.Responses;
 
 namespace AntiPlagiarism.Api.Models.Results
 {
 	[DataContract]
-	public class GetSubmissionPlagiarismsResult : ApiSuccessResult
+	public class GetSubmissionPlagiarismsResponse : SuccessResponse
 	{
 		[DataMember(Name = "submission")]
 		public SubmissionInfo SubmissionInfo { get; set; }
@@ -21,7 +22,7 @@ namespace AntiPlagiarism.Api.Models.Results
 		[DataMember(Name = "analyzed_code_units")]
 		public List<AnalyzedCodeUnit> AnalyzedCodeUnits { get; set; }
 
-		public GetSubmissionPlagiarismsResult()
+		public GetSubmissionPlagiarismsResponse()
 		{
 			Plagiarisms = new List<Plagiarism>();
 		}

@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Serilog;
+using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
 
 namespace AntiPlagiarism.Web.Controllers
@@ -56,13 +57,13 @@ namespace AntiPlagiarism.Web.Controllers
 		}
 		
 		[HttpPost(Api.Urls.AddSubmission)]
-		public async Task<IActionResult> AddSubmission(AddSubmissionParameters parameters)
+		public async Task<ActionResult<AddSubmissionResponse>> AddSubmission(AddSubmissionParameters parameters)
 		{
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
 
 			if (parameters.Code.Length > configuration.MaxCodeLength)
-				return Json(ApiError.Create($"Code is too long. Maximum length is {configuration.MaxCodeLength} bytes"));
+				return BadRequest(new ErrorResponse($"Code is too long. Maximum length is {configuration.MaxCodeLength} bytes"));
 
 			var tokensCount = GetTokensCount(parameters.Code);
 			var submission = await submissionsRepo.AddSubmissionAsync(
@@ -88,10 +89,10 @@ namespace AntiPlagiarism.Web.Controllers
 			if (await NeedToRecalculateTaskStatistics(client.Id, submission.TaskId).ConfigureAwait(false))
 				await CalculateTaskStatisticsParametersAsync(client.Id, submission.TaskId).ConfigureAwait(false);
 			
-			return Json(new AddSubmissionResult
+			return new AddSubmissionResponse
 			{
 				SubmissionId = submission.Id,
-			});
+			};
 		}
 
 		/* Определяет, пора ли пересчитывать параметры Mean и Deviation для заданной задачи.
@@ -133,7 +134,7 @@ namespace AntiPlagiarism.Web.Controllers
 			}
 			await CalculateTaskStatisticsParametersAsync(client.Id, parameters.TaskId).ConfigureAwait(false);
 
-			return Json(new RebuildSnippetsForTaskResult
+			return Json(new RebuildSnippetsForTaskResponse
 			{
 				SubmissionsIds = submissions.Select(s => s.Id).ToList(),
 			});
@@ -148,7 +149,7 @@ namespace AntiPlagiarism.Web.Controllers
 			var taskIds = await tasksRepo.GetTaskIds().ConfigureAwait(false);
 
 			if (parameters.FromTaskId.HasValue && parameters.TaskId.HasValue)
-				return Json(ApiError.Create("You should pass from_task_id or task_id, not both"));
+				return BadRequest(new ErrorResponse("You should pass from_task_id or task_id, not both"));
 			if (parameters.FromTaskId.HasValue)
 				taskIds = taskIds.Skip(taskIds.FindIndex(taskId => taskId == parameters.FromTaskId)).ToList();
 			if (parameters.TaskId.HasValue)
@@ -165,7 +166,7 @@ namespace AntiPlagiarism.Web.Controllers
 				GC.Collect();
 			}
 
-			return Json(new RecalculateTaskStatisticsResult
+			return Json(new RecalculateTaskStatisticsResponse
 			{
 				TaskIds = taskIds,
 				Weights = weights,
@@ -180,13 +181,13 @@ namespace AntiPlagiarism.Web.Controllers
 			
 			var submission = await submissionsRepo.FindSubmissionByIdAsync(parameters.SubmissionId).ConfigureAwait(false);
 			if (submission == null || submission.ClientId != client.Id)
-				return Json(ApiError.Create("Invalid submission id"));
+				return NotFound(new ErrorResponse("Invalid submission id"));
 
 			var suspicionLevels = await GetSuspicionLevelsAsync(submission.TaskId).ConfigureAwait(false);
 			if (suspicionLevels == null)
-				return Json(ApiError.Create("Not enough statistics for defining suspicion levels"));
+				return Ok(new ErrorResponse("Not enough statistics for defining suspicion levels"));				
 				
-			var result = new GetSubmissionPlagiarismsResult
+			var result = new GetSubmissionPlagiarismsResponse
 			{
 				SubmissionInfo = submission.GetSubmissionInfoForApi(),
 				Plagiarisms = await plagiarismDetector.GetPlagiarismsAsync(submission, suspicionLevels).ConfigureAwait(false),
@@ -206,16 +207,14 @@ namespace AntiPlagiarism.Web.Controllers
 
 			var maxLastSubmissionsCount = configuration.Actions.GetAuthorPlagiarisms.MaxLastSubmissionsCount;
 			if (parameters.LastSubmissionsCount <= 0 || parameters.LastSubmissionsCount > maxLastSubmissionsCount)
-				return Json(ApiError.Create(
-					$"Invalid last_submissions_count. This value should be at least 1 and at most {maxLastSubmissionsCount}"
-				));
+				return BadRequest(new ErrorResponse($"Invalid last_submissions_count. This value should be at least 1 and at most {maxLastSubmissionsCount}"));
 
 			var suspicionLevels = await GetSuspicionLevelsAsync(parameters.TaskId).ConfigureAwait(false);
 			if (suspicionLevels == null)
-				return Json(ApiError.Create("Not enough statistics for defining suspicion levels"));
+				return Ok(new ErrorResponse("Not enough statistics for defining suspicion levels"));
 
 			var submissions = await submissionsRepo.GetSubmissionsByAuthorAndTaskAsync(client.Id, parameters.AuthorId, parameters.TaskId, parameters.LastSubmissionsCount).ConfigureAwait(false);			
-			var result = new GetAuthorPlagiarismsResult
+			var result = new GetAuthorPlagiarismsResponse
 			{
 				SuspicionLevels = suspicionLevels,
 			};

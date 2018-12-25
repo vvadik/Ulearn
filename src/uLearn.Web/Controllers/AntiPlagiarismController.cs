@@ -145,7 +145,7 @@ namespace uLearn.Web.Controllers
 				Submissions = submissions,
 				UsersGroups = usersGroups,
 				UsersArchivedGroups = usersArchivedGroups,
-				AntiPlagiarismResult = antiPlagiarismsResult,
+				AntiPlagiarismResponse = antiPlagiarismsResult,
 			});
 		}
 		
@@ -183,10 +183,10 @@ namespace uLearn.Web.Controllers
 			return $", подозрительность — {weightPercents}%";
 		}
 
-		private static readonly ConcurrentDictionary<Tuple<Guid, Guid>, Tuple<DateTime, GetAuthorPlagiarismsResult>> plagiarismsCache = new ConcurrentDictionary<Tuple<Guid, Guid>, Tuple<DateTime, GetAuthorPlagiarismsResult>>();
+		private static readonly ConcurrentDictionary<Tuple<Guid, Guid>, Tuple<DateTime, GetAuthorPlagiarismsResponse>> plagiarismsCache = new ConcurrentDictionary<Tuple<Guid, Guid>, Tuple<DateTime, GetAuthorPlagiarismsResponse>>();
 		private static readonly TimeSpan cacheLifeTime = TimeSpan.FromMinutes(10);
 
-		private static async Task<GetAuthorPlagiarismsResult> GetAuthorPlagiarismsAsync(UserExerciseSubmission submission)
+		private static async Task<GetAuthorPlagiarismsResponse> GetAuthorPlagiarismsAsync(UserExerciseSubmission submission)
 		{
 			RemoveOldValuesFromCache();
 			var userId = Guid.Parse(submission.UserId);
@@ -253,7 +253,7 @@ namespace uLearn.Web.Controllers
 		
 		public DefaultDictionary<string, string> UsersArchivedGroups { get; set; }
 		
-		public GetAuthorPlagiarismsResult AntiPlagiarismResult { get; set; }
+		public GetAuthorPlagiarismsResponse AntiPlagiarismResponse { get; set; }
 		
 		public Dictionary<int, UserExerciseSubmission> Submissions { get; set; }
 	}

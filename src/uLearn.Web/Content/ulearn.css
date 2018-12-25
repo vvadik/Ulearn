@@ -702,6 +702,10 @@
 	margin: 20px 0;
 }	
 
+.legacy-page .suggest-video-annotations {
+	margin-bottom: 25px;
+}
+
 .legacy-page .unit-statistic-ref {
 	color: yellowgreen;
 }
