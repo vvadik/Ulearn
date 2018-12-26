@@ -60,11 +60,11 @@ class CopyGroupModal extends Component {
 	};
 
 	render() {
-		const { onClose } = this.props;
+		const { onCloseModal } = this.props;
 		const courseTitle = this.getCourseTitle(this.props.courseId);
 
 		return (
-			<Modal onClose={onClose} width={640}>
+			<Modal onClose={onCloseModal} width={640}>
 				<Modal.Header>Скопировать группу из курса</Modal.Header>
 				<form onSubmit={this.onSubmit}>
 					<Modal.Body>

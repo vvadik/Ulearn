@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
+import connect from "react-redux/es/connect/connect";
+import {withRouter} from "react-router-dom";
 import {Helmet} from "react-helmet";
 import api from "../../../api/index";
 import Tabs from "@skbkontur/react-ui/components/Tabs/Tabs";
@@ -25,6 +27,9 @@ class GroupPage extends Component {
 
 	componentDidMount() {
 		let groupId = this.props.match.params.groupId;
+		let courseId = this.props.match.params.courseId;
+
+		this.props.enterToCourse(courseId);
 
 		this.loadGroupScores(groupId);
 		this.loadGroup(groupId);
@@ -217,6 +222,21 @@ class GroupPage extends Component {
 
 		Toast.push('Настройки сохранены');
 	};
+
+	static mapStateToProps(state) {
+		return {
+			courses: state.courses,
+		}
+	}
+
+	static mapDispatchToProps(dispatch) {
+		return {
+			enterToCourse: (courseId) => dispatch({
+				type: 'COURSES__COURSE_ENTERED',
+				courseId: courseId
+			}),
+		}
+	}
 }
 
 GroupPage.propTypes = {
@@ -225,7 +245,8 @@ GroupPage.propTypes = {
 	match: PropTypes.object,
 };
 
-export default GroupPage;
+GroupPage = connect(GroupPage.mapStateToProps, GroupPage.mapDispatchToProps)(GroupPage);
+export default withRouter(GroupPage);
 
 
 

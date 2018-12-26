@@ -28,11 +28,13 @@ class GroupListPage extends AbstractPage {
 	};
 
 	componentDidMount() {
-		this.loadingActiveGroups();
+		let courseId = this.props.match.params.courseId;
+
+		this.loadingActiveGroups(courseId);
+		this.props.enterToCourse(courseId);
 	};
 
-	loadingActiveGroups = () => {
-		let courseId = this.props.match.params.courseId;
+	loadingActiveGroups = (courseId) => {
 		const { loadingActive, loadedActive } = this.state;
 
 		if (loadedActive || loadingActive) {
@@ -194,6 +196,15 @@ class GroupListPage extends AbstractPage {
 			courses: state.courses,
 		}
 	}
+
+	static mapDispatchToProps(dispatch) {
+		return {
+			enterToCourse: (courseId) => dispatch({
+				type: 'COURSES__COURSE_ENTERED',
+				courseId: courseId
+			}),
+		}
+	}
 }
 
 GroupListPage.propTypes = {
@@ -201,6 +212,6 @@ GroupListPage.propTypes = {
 	courses: PropTypes.object,
 };
 
-GroupListPage = connect(GroupListPage.mapStateToProps)(GroupListPage);
+GroupListPage = connect(GroupListPage.mapStateToProps, GroupListPage.mapDispatchToProps)(GroupListPage);
 
 export default withRouter(GroupListPage);

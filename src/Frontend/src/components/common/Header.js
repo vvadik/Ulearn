@@ -12,6 +12,7 @@ import { connect } from "react-redux";
 import { findDOMNode } from "react-dom"
 
 import styles from './Header.less';
+
 import { getQueryStringParameter } from "../../utils";
 
 import api from "../../api"

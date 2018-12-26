@@ -7,6 +7,7 @@ import Avatar from "../Avatar/Avatar";
 import styles from './style.less';
 
 class ComboboxInstructorsSearch extends Component {
+	state = { query: '' };
 
 	render () {
 		const { selected } = this.props;
@@ -20,6 +21,7 @@ class ComboboxInstructorsSearch extends Component {
 			renderValue={this.renderItem}
 			renderNotFound={this.renderNotFound}
 			onChange={this.onChangeItem}
+			onInputChange={query => this.setState({ query })}
 			placeholder="Начните вводить имя, фамилию или логин преподавателя"/>
 		);
 	}
@@ -67,17 +69,11 @@ class ComboboxInstructorsSearch extends Component {
 	};
 
 	renderNotFound = () => {
-		const { selected } = this.props;
+		const msg = this.state.query
+			? 'В этом курсе нет преподавателей c таким именем'
+		    : 'В этом курсе нет преподавателей';
 
-		if (selected === null) {
-			return 	<span>В этом курсе нет преподавателей</span>;
-	}
-
-		return (
-			<span>
-				В этом курсе нет преподавателей c таким именем
-			</span>
-		)
+		return <span>{msg}</span>;
 	};
 
 	onChangeItem = (_, item) => {
