@@ -42,12 +42,14 @@ class CopyStudentsModal extends Component {
 	render() {
 		const { onClose } = this.props;
 		return (
-			<Modal onClose={onClose} width={640}>
+			<Modal onClose={onClose} width="100%">
 				<Modal.Header>Скопировать студентов</Modal.Header>
 				<form onSubmit={this.onSubmit}>
 					<Modal.Body>
-						{ this.renderCourseSelect() }
-						{ this.renderGroupSelect() }
+						<div className={styles["modal-content"]}>
+							{ this.renderCourseSelect() }
+							{ this.renderGroupSelect() }
+						</div>
 					</Modal.Body>
 					<Modal.Footer>
 						<Button

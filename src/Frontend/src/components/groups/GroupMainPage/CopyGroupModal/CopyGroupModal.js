@@ -64,18 +64,20 @@ class CopyGroupModal extends Component {
 		const courseTitle = this.getCourseTitle(this.props.courseId);
 
 		return (
-			<Modal onClose={onCloseModal} width={640}>
+			<Modal onClose={onCloseModal} width="100%" alignTop={true}>
 				<Modal.Header>Скопировать группу из курса</Modal.Header>
 				<form onSubmit={this.onSubmit}>
 					<Modal.Body>
-						<p className={styles["common-info"]}>Новая группа будет создана для курса <b>«{ courseTitle }»</b>.
-							Скопируются все настройки группы (в том числе владелец),
-							в неё автоматически добавятся участники из копируемой группы.
-							Преподаватели тоже будут добавлены в группу, если у них есть права на
-							курс <b>«{ courseTitle }»</b>.
-						</p>
-						{ this.renderCourseSelect() }
-						{ this.renderGroupSelect() }
+						<div className={styles["modal-content"]}>
+							<p className={styles["common-info"]}>Новая группа будет создана для курса <b>«{ courseTitle }»</b>.
+								Скопируются все настройки группы (в том числе владелец),
+								в неё автоматически добавятся участники из копируемой группы.
+								Преподаватели тоже будут добавлены в группу, если у них есть права на
+								курс <b>«{ courseTitle }»</b>.
+							</p>
+							{ this.renderCourseSelect() }
+							{ this.renderGroupSelect() }
+						</div>
 					</Modal.Body>
 					<Modal.Footer>
 						<Button

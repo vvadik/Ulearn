@@ -21,10 +21,12 @@ class CreateGroupModal extends Component {
 		const { onCloseModal } = this.props;
 
 		return (
-			<Modal onClose={onCloseModal} width={640}>
+			<Modal onClose={onCloseModal} width="100%" alignTop={true}>
 				<Modal.Header>Название группы</Modal.Header>
 				<form onSubmit={this.onSubmit}>
-					{this.renderModalBody()}
+					<Modal.Body>
+						{this.renderModalBody()}
+					</Modal.Body>
 					<Modal.Footer>
 						<Button
 							use="primary"
@@ -44,7 +46,7 @@ class CreateGroupModal extends Component {
 		const { name, hasError } = this.state;
 
 		return (
-			<Modal.Body>
+			<div className={styles["modal-content"]}>
 				<Tooltip render={this.checkError} trigger='focus' pos="right top">
 					<Input placeholder="КН-201 УрФУ 2017"
 						   maxLength="20"
@@ -60,7 +62,7 @@ class CreateGroupModal extends Component {
 					КН-201 УрФУ 2017,</span><br />
 					пример плохого: <span className={styles["bad-name"]}>Моя группа 2</span>
 				</p>
-			</Modal.Body>
+			</div>
 		)
 	}
 
