@@ -208,8 +208,10 @@ class GroupListPage extends AbstractPage {
 }
 
 GroupListPage.propTypes = {
+	history: PropTypes.object,
 	match: PropTypes.object,
 	courses: PropTypes.object,
+	enterToCourse: PropTypes.func,
 };
 
 GroupListPage = connect(GroupListPage.mapStateToProps, GroupListPage.mapDispatchToProps)(GroupListPage);

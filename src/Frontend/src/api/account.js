@@ -12,6 +12,7 @@ export function getCurrentUser() {
                     dispatch({
                         type: 'ACCOUNT__USER_INFO_UPDATED',
                         isAuthenticated: true,
+						id: user.id,
                         login: user.login,
                         firstName: user.first_name,
                         lastName: user.last_name,

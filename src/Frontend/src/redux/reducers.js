@@ -14,6 +14,7 @@ function account(state = initialAccountState, action) {
             let newState = {...state};
             newState.isAuthenticated = action.isAuthenticated;
             if (newState.isAuthenticated) {
+            	newState.id = action.id;
                 newState.login = action.login;
                 newState.firstName = action.firstName;
                 newState.lastName = action.lastName;

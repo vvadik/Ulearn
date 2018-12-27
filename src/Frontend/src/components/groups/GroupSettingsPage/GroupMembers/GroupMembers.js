@@ -111,7 +111,8 @@ class GroupMembers extends Component {
 
 	renderTeachers() {
 		const { accesses } = this.state;
-		const owner = this.props.group.owner;
+		const { group, role, userId } = this.props;
+		const owner = group.owner;
 
 		const grantTime = (grantTime) => moment(grantTime).format();
 
@@ -128,7 +129,7 @@ class GroupMembers extends Component {
 						</span>
 					</div>
 					<div className={styles["teacher-action"]}>
-						{this.renderKebab(item.user)}
+						{((group.owner.id === userId) || (role === 'courseAdmin')) && this.renderKebab(item)}
 					</div>
 				</div>
 			</React.Fragment>
@@ -136,21 +137,25 @@ class GroupMembers extends Component {
 		)
 	};
 
-	renderKebab(user) {
+	renderKebab(item) {
+		const { group, role, userId } = this.props;
+
 		return (
 			<Kebab size="large">
-				<MenuItem onClick={() => this.onChangeOwner(user)}>
+				<MenuItem onClick={() => this.onChangeOwner(item.user)}>
 					<Gapped gap={5}>
 						<Icon name="User" />
 						Сделать владельцем
 					</Gapped>
 				</MenuItem>
-				<MenuItem onClick={() => this.onRemoveTeacher(user)}>
+				{((group.owner.id === userId) || (role === 'courseAdmin') || (item.granted_by.id === userId)) &&
+				<MenuItem onClick={() => this.onRemoveTeacher(item.user)}>
 					<Gapped gap={5}>
-					<Icon name="Delete" />
-					Забрать доступ
+						<Icon name="Delete"/>
+						Забрать доступ
 					</Gapped>
 				</MenuItem>
+				}
 			</Kebab>
 		)
 	}
@@ -241,8 +246,12 @@ class GroupMembers extends Component {
 }
 
 GroupMembers.propTypes = {
+	courseId: PropTypes.string,
 	group: PropTypes.object,
+	match: PropTypes.object,
 	onChangeGroupOwner: PropTypes.func,
+	role: PropTypes.string,
+	userId: PropTypes.string,
 };
 
 export default withRouter(GroupMembers);

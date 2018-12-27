@@ -20,6 +20,7 @@ import api from "../../api"
 
 let accountPropTypes = PropTypes.shape({
     isAuthenticated: PropTypes.bool.isRequired,
+	id: PropTypes.string,
     login: PropTypes.string,
     firstName: PropTypes.string,
     lastName: PropTypes.string,

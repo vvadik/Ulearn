@@ -66,6 +66,15 @@ class GroupPage extends Component {
 
 	render() {
 		let courseId = this.props.match.params.courseId;
+		let rolesByCourse = this.props.account.roleByCourse;
+		let courseRole = '';
+		if (this.props.account.isSystemAdministrator) {
+			courseRole = 'courseAdmin';
+		} else {
+			courseRole = rolesByCourse[courseId];
+		}
+		let userId = this.props.account.id;
+
 		const { group, open } = this.state;
 
 		return (
@@ -81,9 +90,10 @@ class GroupPage extends Component {
 						{ (open === "members")  &&
 							<GroupMembers
 								courseId={courseId}
+								userId={userId}
+								role={courseRole}
 								group={group}
-								onChangeGroupOwner={this.onChangeGroupOwner}
-								onChangeSettings={this.onChangeSettings}/>
+								onChangeGroupOwner={this.onChangeGroupOwner}/>
 						}
 					</div>
 				</div>
@@ -226,6 +236,7 @@ class GroupPage extends Component {
 	static mapStateToProps(state) {
 		return {
 			courses: state.courses,
+			account: state.account,
 		}
 	}
 
@@ -240,9 +251,10 @@ class GroupPage extends Component {
 }
 
 GroupPage.propTypes = {
-	history: PropTypes.object,
-	location: PropTypes.object,
+	account: PropTypes.object,
+	courses: PropTypes.object,
 	match: PropTypes.object,
+	enterToCourse: PropTypes.func,
 };
 
 GroupPage = connect(GroupPage.mapStateToProps, GroupPage.mapDispatchToProps)(GroupPage);
