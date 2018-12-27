@@ -7,10 +7,13 @@ import api from "../../../api/index";
 import Tabs from "@skbkontur/react-ui/components/Tabs/Tabs";
 import Button from "@skbkontur/react-ui/components/Button/Button";
 import Toast from "@skbkontur/react-ui/components/Toast/Toast";
+import Link from "@skbkontur/react-ui/components/Link/Link";
 import GroupMembers from "../../../components/groups/GroupSettingsPage/GroupMembers/GroupMembers";
 import GroupSettings from "../../../components/groups/GroupSettingsPage/GroupSettings/GroupSettings";
 
 import styles from "./groupPage.less";
+import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
+import Icon from "@skbkontur/react-icons";
 
 class GroupPage extends Component {
 
@@ -106,6 +109,13 @@ class GroupPage extends Component {
 
 		return (
 			<header className={styles["group-header"]}>
+				<div className={styles["link-to-prev-page-block"]}>
+					<div className={styles["link-to-prev-page"]}>
+						<Link onClick={this.goToPrevPage}>
+							← Все группы
+						</Link>
+					</div>
+				</div>
 				<h2 className={styles["group-name"]}>{ group.name }</h2>
 				<div className={styles["tabs-container"]}>
 					<Tabs value={open} onChange={this.onChangeTab}>
@@ -196,6 +206,10 @@ class GroupPage extends Component {
 		});
 	};
 
+	goToPrevPage = () => {
+		this.props.history.goBack()
+	};
+
 	sendSettings = (e) => {
 		const { group, updatedFields, scoresId } = this.state;
 		let loadingScores = true;
@@ -251,6 +265,7 @@ class GroupPage extends Component {
 }
 
 GroupPage.propTypes = {
+	history: PropTypes.object,
 	account: PropTypes.object,
 	courses: PropTypes.object,
 	match: PropTypes.object,

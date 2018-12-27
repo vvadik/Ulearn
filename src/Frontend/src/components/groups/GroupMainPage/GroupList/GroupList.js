@@ -1,8 +1,6 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
 import Loader from "@skbkontur/react-ui/components/Loader/Loader";
-import Input from "@skbkontur/react-ui/components/Input/Input";
-import Icon from "@skbkontur/react-icons";
 import GroupInfo from "../GroupInfo/GroupInfo";
 
 import styles from "./style.less";
@@ -11,7 +9,6 @@ class GroupList extends Component {
 	render() {
 		return (
 			<section className={styles.wrapper}>
-				<Input placeholder="Название группы" leftIcon={<Icon name="Search" />} />
 				<Loader type="big" active={this.props.loading}>
 					<div className={styles.content}>
 						{ this.props.groups && this.props.groups.map(group =>
