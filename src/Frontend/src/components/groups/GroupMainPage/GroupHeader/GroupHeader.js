@@ -26,14 +26,14 @@ class GroupHeader extends Component {
 				{ this.renderHeader() }
 				{ this.state.modalCreateGroup &&
 					<CreateGroupModal
-						courseId={this.props.courseId}
+						courseId={this.props.course.id}
 						onCloseModal={this.onCloseModal}
 						onSubmit={this.props.addGroup}
 					/>
 				}
 				{ this.state.modalCopyGroup &&
 					<CopyGroupModal
-						courseId={this.props.courseId}
+						course={this.props.course}
 						onCloseModal={this.onCloseModal}
 						onSubmit={this.props.addGroup}
 					/>
@@ -95,7 +95,7 @@ class GroupHeader extends Component {
 GroupHeader.propTypes = {
 	onTabChange: PropTypes.func,
 	filter: PropTypes.string,
-	courseId: PropTypes.string,
+	course: PropTypes.object,
 	addGroup: PropTypes.func,
 	groups: PropTypes.array,
 };

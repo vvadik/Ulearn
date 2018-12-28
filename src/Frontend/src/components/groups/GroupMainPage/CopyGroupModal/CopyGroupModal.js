@@ -5,6 +5,7 @@ import Modal from '@skbkontur/react-ui/components/Modal/Modal';
 import Select from '@skbkontur/react-ui/components/Select/Select';
 import Button from '@skbkontur/react-ui/components/Button/Button';
 import Checkbox from '@skbkontur/react-ui/components/Checkbox/Checkbox';
+import Loader from "@skbkontur/react-ui/components/Loader/Loader";
 import getPluralForm from "../../../../utils/getPluralForm";
 
 import styles from "./style.less";
@@ -19,11 +20,12 @@ class CopyGroupModal extends Component {
 		error: null,
 		instructors: [],
 		courses: [],
-		loadGroup: false,
+		loadingGroups: false,
+		loading: false,
 	};
 
 	componentDidMount() {
-		const currentCourseId = this.props.courseId;
+		const currentCourseId = this.props.course.id;
 
 		this.loadCourses();
 		this.loadCourseInstructors(currentCourseId);
@@ -50,18 +52,19 @@ class CopyGroupModal extends Component {
 	};
 
 	loadGroups = (courseId) => {
+		this.setState({ loadingGroups: true });
 		api.groups.getCourseGroups(courseId)
 			.then(json => {
 				let groups = json.groups;
 				this.setState({
 					groups,
+					loadingGroups: false,
 				});
 			}).catch(console.error);
 	};
 
 	render() {
-		const { onCloseModal } = this.props;
-		const courseTitle = this.getCourseTitle(this.props.courseId);
+		const { onCloseModal, course } = this.props;
 
 		return (
 			<Modal onClose={onCloseModal} width="100%" alignTop={true}>
@@ -69,11 +72,11 @@ class CopyGroupModal extends Component {
 				<form onSubmit={this.onSubmit}>
 					<Modal.Body>
 						<div className={styles["modal-content"]}>
-							<p className={styles["common-info"]}>Новая группа будет создана для курса <b>«{ courseTitle }»</b>.
+							<p className={styles["common-info"]}>Новая группа будет создана для курса <b>«{ course.title }»</b>.
 								Скопируются все настройки группы (в том числе владелец),
 								в неё автоматически добавятся участники из копируемой группы.
 								Преподаватели тоже будут добавлены в группу, если у них есть права на
-								курс <b>«{ courseTitle }»</b>.
+								курс <b>«{ course.title }»</b>.
 							</p>
 							{ this.renderCourseSelect() }
 							{ this.renderGroupSelect() }
@@ -85,7 +88,7 @@ class CopyGroupModal extends Component {
 							size="medium"
 							type="submit"
 							disabled={!this.state.groupId}
-							loading={this.state.loadGroup}>
+							loading={this.state.loading}>
 							Cкопировать
 						</Button>
 					</Modal.Footer>
@@ -126,22 +129,24 @@ class CopyGroupModal extends Component {
 				<p className={styles["group-info"]}>
 					Вам доступны только те группы, в которых вы являетесь преподавателем
 				</p>
-				<label className={styles["select-group"]}>
-					<Select
-						autofocus
-						required
-						items={this.getGroupOptions()}
-						onChange={this.onGroupChange}
-						width="200"
-						placeholder="Выберите группу"
-						value={groupId}
-						error={this.hasError()}
-						use="default"
-						disabled={groups.length === 0}
-					/>
-					{ this.checkGroups() && this.renderEmptyGroups() }
-					{ this.checkOwner() && this.renderChangeOwner() }
-				</label>
+				<Loader type="normal" active={this.state.loadingGroups}>
+					<label className={styles["select-group"]}>
+						<Select
+							autofocus
+							required
+							items={this.getGroupOptions()}
+							onChange={this.onGroupChange}
+							width="200"
+							placeholder="Выберите группу"
+							value={groupId}
+							error={this.hasError()}
+							use="default"
+							disabled={groups.length === 0}
+						/>
+						{this.state.loadingGroups ? null : (this.checkGroups() && this.renderEmptyGroups())}
+						{ this.checkOwner() && this.renderChangeOwner() }
+					</label>
+				</Loader>
 			</React.Fragment>
 		);
 	};
@@ -153,30 +158,25 @@ class CopyGroupModal extends Component {
 	}
 
 	renderChangeOwner() {
-		const currentCourseId = this.props.courseId;
 		const { groupId, changeOwner } = this.state;
 		const group = this.getGroup(groupId);
-		const courseTitle = this.getCourseTitle(currentCourseId);
 
 		return (
 			<div className={styles["change-owner-block"]}>
-				<p className={styles["change-owner-info"]}>Владелец этой группы <b>{group.owner.visible_name}</b> не является преподавателем курса
-					<b>«{ courseTitle }»</b>. Вы можете сделать себя владельцем скопированной группы.
+				<p className={styles["change-owner-info"]}>
+					Владелец этой группы <b>{group.owner.visible_name}</b> не является преподавателем
+					курса <b>«{ this.props.course.title }»</b>.
+					Вы можете сделать себя владельцем скопированной группы.
 				</p>
-				<Checkbox checked={changeOwner} onChange={this.onChangeOwner}>Сделать меня владельцем группы</Checkbox>
+				<Checkbox checked={changeOwner} onChange={this.onChangeOwner}>
+					Сделать меня владельцем группы
+				</Checkbox>
 			</div>
 		)
 	}
 
 	hasError = () => {
 		return this.state.error !== null;
-	};
-
-	getCourseTitle = (courseId) => {
-		const { courses } = this.state;
-		const course = courses.find(c => c.id === courseId);
-
-		return course && course.title;
 	};
 
 	getGroup = (groupId) => {
@@ -249,9 +249,9 @@ class CopyGroupModal extends Component {
 			return;
 		}
 
-		this.setState({ loadGroup: true });
+		this.setState({ loading: true });
 		const newGroup = await api.groups.copyGroup(groupId, currentCourseId, changeOwner);
-		this.setState({ loadGroup: false });
+		this.setState({ loading: false });
 
 		onCloseModal();
 		onSubmit(newGroup.id);
@@ -259,7 +259,7 @@ class CopyGroupModal extends Component {
 }
 
 CopyGroupModal.propTypes = {
-	courseId: PropTypes.string,
+	course: PropTypes.object,
 	onCloseModal: PropTypes.func,
 	onSubmit: PropTypes.func,
 };

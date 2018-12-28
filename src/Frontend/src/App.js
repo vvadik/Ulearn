@@ -96,8 +96,9 @@ class InternalUlearnApp extends Component {
 												   // Otherwise we make two GET requests sequentially.
 												   // Unfortunately some our GET handlers are not idempotent (i.e. /Admin/CheckNextExerciseForSlide)
 						<Switch>
-							<Route path="/:courseId/groups/" component={GroupListPage} exact/>
-							<Route path="/:courseId/groups/:groupId/" component={GroupPage} exact/>
+							<Route path="/:courseId/groups/" component={GroupListPage} exact />
+							<Route path="/:courseId/groups/:groupId/" component={GroupPage} exact />
+							<Route path="/:courseId/groups/:groupId/:groupPage" component={GroupPage} exact />
 							<Route component={AnyPage} />
 						</Switch>
 					}

@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
 import connect from "react-redux/es/connect/connect";
+import { Redirect } from 'react-router-dom';
 import {withRouter} from "react-router-dom";
-import {Helmet} from "react-helmet";
+import { Helmet } from "react-helmet";
 import api from "../../../api/index";
 import Tabs from "@skbkontur/react-ui/components/Tabs/Tabs";
 import Button from "@skbkontur/react-ui/components/Button/Button";
@@ -19,7 +20,6 @@ class GroupPage extends Component {
 
 	state = {
 		group: {},
-		open: "settings",
 		updatedFields: {},
 		error: false,
 		loadingAllSettings: false,
@@ -43,7 +43,7 @@ class GroupPage extends Component {
 			.then(group => {
 			this.setState({
 				group,
-				loading: !this.state.scores ? true : false,
+				loading: !this.state.scores,
 			});
 		}).catch(console.error);
 
@@ -62,13 +62,17 @@ class GroupPage extends Component {
 			let scores = json.scores;
 			this.setState({
 				scores: scores,
-				loading: this.state.group.id ? false : true,
+				loading: !this.state.group.id,
 			});
 		}).catch(console.error);
 	};
 
 	render() {
-		let courseId = this.props.match.params.courseId;
+		const { group, loadSettings, loading, scores, updatedFields, error } = this.state;
+		const { courseId, groupId, groupPage } = this.props.match.params;
+
+		if (!groupPage) {
+			return <Redirect to={`/${courseId}/groups/${groupId}/settings`} /> }
 		let rolesByCourse = this.props.account.roleByCourse;
 		let courseRole = '';
 		if (this.props.account.isSystemAdministrator) {
@@ -86,11 +90,11 @@ class GroupPage extends Component {
 					<title>{`Группа ${group.name}`}</title>
 				</Helmet>
 				<div className={styles["content-wrapper"]}>
-					{ this.renderHeader() }
+					{ this.renderHeader() }					
 					<div className={styles.content}>
-						{ (open === "settings") &&
+						{ groupPage === "settings" &&
 							this.renderSettings() }
-						{ (open === "members")  &&
+						{ groupPage === "members" &&
 							<GroupMembers
 								courseId={courseId}
 								userId={userId}
@@ -118,7 +122,7 @@ class GroupPage extends Component {
 				</div>
 				<h2 className={styles["group-name"]}>{ group.name }</h2>
 				<div className={styles["tabs-container"]}>
-					<Tabs value={open} onChange={this.onChangeTab}>
+					<Tabs value={groupPage} onChange={this.onChangeTab}>
 						<Tabs.Tab id="settings">Настройки</Tabs.Tab>
 						<Tabs.Tab id="members">Участники</Tabs.Tab>
 					</Tabs>
@@ -126,12 +130,12 @@ class GroupPage extends Component {
 			</header>
 		)
 	}
-
+	
 	renderSettings() {
 		const {group, loadingAllSettings, loading, scores, updatedFields, error } = this.state;
 		return (
 			<form onSubmit={this.sendSettings}>
-				<GroupSettings
+				<GroupSettings 
 					loading={loading}
 					name={updatedFields.name !== undefined ? updatedFields.name : group.name}
 					group={group}
@@ -151,10 +155,10 @@ class GroupPage extends Component {
 		)
 	}
 
-	onChangeTab = (_, v) => {
-		this.setState({
-			open: v,
-		})
+	onChangeTab = (event, value) => {
+		const { courseId, groupId } = this.props.match.params;
+
+		this.props.history.push(`/${courseId}/groups/${groupId}/${value}`);
 	};
 
 	onChangeName = (value) => {

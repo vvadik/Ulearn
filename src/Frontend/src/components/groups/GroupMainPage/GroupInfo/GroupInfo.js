@@ -29,7 +29,9 @@ class GroupInfo extends Component {
 					<Link className={styles["link-to-group-page"]} to={`/${this.props.courseId}/groups/${group.id}`} />
 					<div className={styles["content-block"]}>
 						<header className={styles.content}>
-							<h3 className={styles["group-name"]}>{group.name}</h3>
+							<Link to={`/${this.props.courseId}/groups/${group.id}`}>
+								<h3 className={styles["group-name"]}>{group.name}</h3>
+							</Link>
 							<div className={styles["students-count"]}>
 								{studentsCount} {pluralFormOfStudents}
 							</div>
@@ -49,14 +51,21 @@ class GroupInfo extends Component {
 	renderTeachers() {
 		const { group } = this.props;
 		const teachersList = group.accesses.map(item => item.user.visible_name);
+		const shortTeachersList = teachersList.filter((item, index) => index < 3);
+		const teachersExcess = teachersList.length - shortTeachersList.length;
 		const owner = group.owner.visible_name || 'Неизвестный';
-		const teachers = [owner, ...teachersList];
+		const teachers = [owner, ...shortTeachersList];
 		const teachersCount = teachers.length;
 		const pluralFormOfTeachers = getPluralForm(teachersCount, 'преподаватель', 'преподаватели');
 
 		return (
 			<div className={styles["teachers-list"]}>
-				{`${pluralFormOfTeachers}: ${teachers.join(', ')}`}
+				{ `${pluralFormOfTeachers}: ${teachers.join(', ')} ` }
+				{ teachersExcess > 0 &&
+				<Link className={styles["link-to-group-members"]} to={`/${this.props.courseId}/groups/${group.id}/members`}>
+					и ещё {teachersExcess}
+				</Link>
+				}
 			</div>
 		)
 	}
