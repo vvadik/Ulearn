@@ -143,9 +143,9 @@ class CopyGroupModal extends Component {
 							use="default"
 							disabled={groups.length === 0}
 						/>
-						{this.state.loadingGroups ? null : (this.checkGroups() && this.renderEmptyGroups())}
-						{ this.checkOwner() && this.renderChangeOwner() }
 					</label>
+					{this.state.loadingGroups ? null : (this.checkGroups() && this.renderEmptyGroups())}
+					{ this.checkOwner() && this.renderChangeOwner() }
 				</Loader>
 			</React.Fragment>
 		);
@@ -238,11 +238,13 @@ class CopyGroupModal extends Component {
 	onChangeOwner = (_, value) => this.setState({ changeOwner: value });
 
 	onSubmit = async (e) => {
-		const { groupId, changeOwner } = this.state;
-		const currentCourseId = this.props.courseId;
+		const { groupId, courseId, changeOwner } = this.state;
+		const currentCourseId = this.props.course.id;
 		const { onCloseModal, onSubmit } = this.props;
+
 		e.preventDefault();
-		if (!currentCourseId || !groupId) {
+
+		if (!courseId || !groupId) {
 			this.setState({
 				error: 'Выберите курс',
 			});

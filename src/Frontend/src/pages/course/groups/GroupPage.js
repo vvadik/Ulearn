@@ -13,8 +13,6 @@ import GroupMembers from "../../../components/groups/GroupSettingsPage/GroupMemb
 import GroupSettings from "../../../components/groups/GroupSettingsPage/GroupSettings/GroupSettings";
 
 import styles from "./groupPage.less";
-import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
-import Icon from "@skbkontur/react-icons";
 
 class GroupPage extends Component {
 
@@ -68,21 +66,23 @@ class GroupPage extends Component {
 	};
 
 	render() {
-		const { group, loadSettings, loading, scores, updatedFields, error } = this.state;
+		const { group } = this.state;
 		const { courseId, groupId, groupPage } = this.props.match.params;
 
 		if (!groupPage) {
-			return <Redirect to={`/${courseId}/groups/${groupId}/settings`} /> }
+			return <Redirect to={`/${courseId}/groups/${groupId}/settings`} />
+		}
+
 		let rolesByCourse = this.props.account.roleByCourse;
 		let courseRole = '';
+
 		if (this.props.account.isSystemAdministrator) {
 			courseRole = 'courseAdmin';
 		} else {
 			courseRole = rolesByCourse[courseId];
 		}
-		let userId = this.props.account.id;
 
-		const { group, open } = this.state;
+		let userId = this.props.account.id;
 
 		return (
 			<div className={styles.wrapper}>
@@ -100,7 +100,7 @@ class GroupPage extends Component {
 								userId={userId}
 								role={courseRole}
 								group={group}
-								onChangeGroupOwner={this.onChangeGroupOwner}/>
+								onChangeGroupOwner={this.onChangeGroupOwner} />
 						}
 					</div>
 				</div>
@@ -109,7 +109,8 @@ class GroupPage extends Component {
 	}
 
 	renderHeader() {
-		const { group, open } = this.state;
+		const { group } = this.state;
+		const { groupPage } = this.props.match.params;
 
 		return (
 			<header className={styles["group-header"]}>
@@ -132,7 +133,7 @@ class GroupPage extends Component {
 	}
 	
 	renderSettings() {
-		const {group, loadingAllSettings, loading, scores, updatedFields, error } = this.state;
+		const { group, loadingAllSettings, loading, scores, updatedFields, error } = this.state;
 		return (
 			<form onSubmit={this.sendSettings}>
 				<GroupSettings 
@@ -155,7 +156,7 @@ class GroupPage extends Component {
 		)
 	}
 
-	onChangeTab = (event, value) => {
+	onChangeTab = (_, value) => {
 		const { courseId, groupId } = this.props.match.params;
 
 		this.props.history.push(`/${courseId}/groups/${groupId}/${value}`);
@@ -211,7 +212,9 @@ class GroupPage extends Component {
 	};
 
 	goToPrevPage = () => {
-		this.props.history.goBack()
+		let courseId = this.props.match.params.courseId;
+
+		this.props.history.push(`/${courseId}/groups/`);
 	};
 
 	sendSettings = (e) => {
@@ -277,6 +280,7 @@ GroupPage.propTypes = {
 };
 
 GroupPage = connect(GroupPage.mapStateToProps, GroupPage.mapDispatchToProps)(GroupPage);
+
 export default withRouter(GroupPage);
 
 

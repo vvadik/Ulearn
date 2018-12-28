@@ -51,7 +51,7 @@ class GroupInfo extends Component {
 	renderTeachers() {
 		const { group } = this.props;
 		const teachersList = group.accesses.map(item => item.user.visible_name);
-		const shortTeachersList = teachersList.filter((item, index) => index < 3);
+		const shortTeachersList = teachersList.filter((item, index) => index < 2);
 		const teachersExcess = teachersList.length - shortTeachersList.length;
 		const owner = group.owner.visible_name || 'Неизвестный';
 		const teachers = [owner, ...shortTeachersList];

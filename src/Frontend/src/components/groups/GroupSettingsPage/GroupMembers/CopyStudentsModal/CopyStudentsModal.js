@@ -8,6 +8,7 @@ import Toast from "@skbkontur/react-ui/components/Toast/Toast";
 import getPluralForm from "../../../../../utils/getPluralForm";
 
 import styles from './style.less';
+import Loader from "@skbkontur/react-ui/components/Loader/Loader";
 
 class CopyStudentsModal extends Component {
 
@@ -17,6 +18,8 @@ class CopyStudentsModal extends Component {
 		groups: [],
 		courses: [],
 		error: null,
+		loadingGroups: false,
+		loading: false,
 	};
 
 	componentDidMount() {
@@ -30,11 +33,13 @@ class CopyStudentsModal extends Component {
 	}
 
 	loadGroups = (courseId) => {
+		this.setState({ loadingGroups: true });
 		api.groups.getCourseGroups(courseId)
 			.then(json => {
 				let groups = json.groups;
 				this.setState({
 					groups,
+					loadingGroups: false,
 				});
 			}).catch(console.error);
 	};
@@ -57,7 +62,7 @@ class CopyStudentsModal extends Component {
 							size="medium"
 							type="submit"
 							disabled={!this.state.groupId}
-						>
+							loading={this.state.loading}>
 							Cкопировать
 						</Button>
 					</Modal.Footer>
@@ -96,20 +101,21 @@ class CopyStudentsModal extends Component {
 				<p className={styles["group-info"]}>
 					Выберите группу
 				</p>
-				<label className={styles["select-group"]}>
-					<Select
-						autofocus
-						required
-						items={this.getGroupOptions()}
-						onChange={this.onGroupChange}
-						width="200"
-						placeholder="Группа"
-						value={groupId}
-						error={this.hasError()}
-						disabled={groups.length === 0}
-					/>
-				</label>
-					{ this.checkGroups() && this.renderEmptyGroups() }
+				<Loader type="normal" active={this.state.loadingGroups}>
+					<label className={styles["select-group"]}>
+						<Select
+							autofocus
+							required
+							items={this.getGroupOptions()}
+							onChange={this.onGroupChange}
+							width="200"
+							placeholder="Группа"
+							value={groupId}
+							error={this.hasError()}
+							disabled={groups.length === 0} />
+					</label>
+					{this.state.loadingGroups ? null : (this.checkGroups() && this.renderEmptyGroups()) }
+				</Loader>
 			</React.Fragment>
 		)
 	}
@@ -180,8 +186,10 @@ class CopyStudentsModal extends Component {
 
 		const students = [...studentIds];
 
+		this.setState({ loading: true });
 		api.groups.copyStudents(currentGroupId, groupId, students)
 			.catch(console.error);
+		this.setState({ loading: false });
 
 		onClose();
 		Toast.push(`Студенты скопированы в группу ${this.getTitle(groups, groupId)}`);
