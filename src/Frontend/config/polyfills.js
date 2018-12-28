@@ -25,3 +25,5 @@ if (process.env.NODE_ENV === 'test') {
 Array.from = require('array-from');
 
 require('url-polyfill');
+
+require('polyfill-array-includes');

@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
-using uLearn.CSharp.Validators;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.CSharp.Validators;
 
 namespace uLearn.CSharp.ExponentiationValidation
 {

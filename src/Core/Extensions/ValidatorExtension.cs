@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace uLearn.Extensions
+namespace Ulearn.Core.Extensions
 {
 	internal static class ValidatorExtension
 	{

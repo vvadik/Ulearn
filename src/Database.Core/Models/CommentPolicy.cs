@@ -1,9 +1,12 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Database.Models
 {
+	[JsonConverter(typeof(StringEnumConverter), true)]
 	public enum CommentModerationPolicy
 	{
 		Premoderation,

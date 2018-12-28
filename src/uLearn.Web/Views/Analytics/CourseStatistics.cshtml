@@ -1,15 +1,13 @@
 ﻿@using System.Linq
 @using Database.Extensions
 @using Database.Models
-@using uLearn.Extensions
-@using uLearn.Web.Extensions
 @using Ulearn.Common
 @using Ulearn.Common.Extensions
+@using Ulearn.Core.Extensions
 @model CourseStatisticPageModel
 
 @functions {
-	/* Returns css class from grade-0 to grade-15*/
-
+	/* Returns css class from grade-0 to grade-15 */
 	private string GradeCssClass(int score, int maxScore, bool zerosWithoutClass = true)
 	{
 		if (score > maxScore)
@@ -19,19 +17,16 @@
 	}
 
 	/* Returns css class from only-full__grade-0 to only-full__grade-15 */
-
 	private string OnlyFullGradeCssClass(int score, int maxScore)
 	{
 		return "only-full__" + GradeCssClass(score, maxScore, false);
 	}
-
 }
 
 @{
 	ViewBag.Title = Model.Course.Title;
 }
 
-<body>
 <div class="wide-container">
 <h2>
 	@if (!Model.IsInstructor)
@@ -392,4 +387,3 @@
 }
 </div>
 </div>
-</body>

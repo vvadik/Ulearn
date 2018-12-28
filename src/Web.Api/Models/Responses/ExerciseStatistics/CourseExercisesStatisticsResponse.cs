@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Common;
 
 namespace Ulearn.Web.Api.Models.Responses.ExerciseStatistics
 {
 	[DataContract]
-	public class CourseExercisesStatisticsResponse : ApiResponse
+	public class CourseExercisesStatisticsResponse : SuccessResponse
 	{
 		[DataMember(Name = "exercises")]
 		public List<OneExerciseStatistics> Exercises { get; set; }
@@ -19,7 +20,7 @@ namespace Ulearn.Web.Api.Models.Responses.ExerciseStatistics
 	public class OneExerciseStatistics
 	{
 		[DataMember(Name = "exercise")]
-		public SlideInfo Exercise { get; set; }
+		public ShortSlideInfo Exercise { get; set; }
 
 		[DataMember(Name = "submissions_count")]
 		public int SubmissionsCount { get; set; }

@@ -21,13 +21,17 @@ import GroupPage from "./pages/course/groups/GroupPage";
 let loggerMiddleware = createLogger();
 
 function configureStore(preloadedState) {
-    return createStore(
+	let env = process.env.NODE_ENV || 'development';
+	let isDevelopment = env === 'development';
+
+	let middlewares = isDevelopment ?
+		applyMiddleware(thunkMiddleware, loggerMiddleware) :
+		applyMiddleware(thunkMiddleware);
+
+	return createStore(
         rootReducer,
         preloadedState,
-        applyMiddleware(
-            thunkMiddleware,
-            loggerMiddleware
-        )
+        middlewares
     )
 }
 
@@ -53,7 +57,8 @@ setInterval(() => {
 
 class UlearnApp extends Component {
     render() {
-    	const isLti = window.location.pathname.toLowerCase().endsWith('/ltislide');
+		let pathname = window.location.pathname.toLowerCase();
+		const isLti = pathname.endsWith('/ltislide') || pathname.endsWith('/acceptedalert');
 
         return (
             <Provider store={store}>

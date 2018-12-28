@@ -8,10 +8,12 @@ using Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Extensions;
 
 namespace Database.Repos
 {
-	public class CoursesRepo
+	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
+	public class CoursesRepo : ICoursesRepo
 	{
 		private readonly UlearnDb db;
 
@@ -20,12 +22,20 @@ namespace Database.Repos
 			this.db = db;
 		}
 
-		public CourseVersion GetPublishedCourseVersion(string courseId)
+		public Task<List<string>> GetPublishedCourseIdsAsync()
+		{
+			return db.CourseVersions
+				.Select(v => v.CourseId)
+				.Distinct()
+				.ToListAsync();
+		}
+
+		public Task<CourseVersion> GetPublishedCourseVersionAsync(string courseId)
 		{
 			return db.CourseVersions.AsNoTracking()
 				.Where(v => v.CourseId == courseId && v.PublishTime != null)
 				.OrderByDescending(v => v.PublishTime)
-				.FirstOrDefault();
+				.FirstOrDefaultAsync();
 		}
 
 		public Task<List<CourseVersion>> GetCourseVersionsAsync(string courseId)
@@ -75,8 +85,16 @@ namespace Database.Repos
 			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
-		/* Course accesses */
+		public async Task<List<CourseVersion>> GetPublishedCourseVersionsAsync()
+		{
+			var courseVersions = await db.CourseVersions.AsNoTracking().ToListAsync().ConfigureAwait(false);
+			return courseVersions
+				.GroupBy(v => v.CourseId.ToLower())
+				.Select(g => g.MaxBy(v => v.PublishTime))
+				.ToList();
+		}
 
+		/* Course accesses */
 		public async Task<CourseAccess> GrantAccessAsync(string courseId, string userId, CourseAccessType accessType, string grantedById)
 		{
 			var currentAccess = await db.CourseAccesses.FirstOrDefaultAsync(a => a.CourseId == courseId && a.UserId == userId && a.AccessType == accessType).ConfigureAwait(false);
@@ -100,7 +118,7 @@ namespace Database.Repos
 
 		public bool CanRevokeAccess(string courseId, string userId, IPrincipal revokedBy)
 		{
-			return revokedBy.HasAccessFor(courseId, CourseRole.CourseAdmin);
+			return revokedBy.HasAccessFor(courseId, CourseRoleType.CourseAdmin);
 		}
 
 		public async Task<List<CourseAccess>> RevokeAccessAsync(string courseId, string userId, CourseAccessType accessType)
@@ -112,7 +130,7 @@ namespace Database.Repos
 			foreach (var access in accesses)
 				access.IsEnabled = false;
 
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 			return accesses;
 		}
 
@@ -144,6 +162,11 @@ namespace Database.Repos
 		public Task<List<CourseAccess>> GetUserAccessesAsync(string userId)
 		{
 			return db.CourseAccesses.Where(a => a.UserId == userId && a.IsEnabled).ToListAsync();
+		}
+
+		public Task<List<string>> GetCoursesUserHasAccessTo(string userId, CourseAccessType accessType)
+		{
+			return db.CourseAccesses.Where(a => a.UserId == userId && a.IsEnabled && a.AccessType == accessType).Select(a => a.CourseId).Distinct().ToListAsync();
 		}
 	}
 }

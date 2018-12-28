@@ -5,7 +5,7 @@ using System.IO;
 using System.Threading;
 using NUnit.Framework;
 using RunCsJob.Api;
-using uLearn;
+using Ulearn.Core;
 
 namespace RunCsJob
 {

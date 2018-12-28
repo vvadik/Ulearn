@@ -94,13 +94,13 @@ namespace uLearn.Web.Extensions
 			for (var i = 0; i < lineNumber; i++)
 			{
 				currentIndex = s.IndexOf('\n', currentIndex) + 1;
-				if (currentIndex == -1)
+				if (currentIndex == 0)
 					return 0;
 			}
 			return currentIndex;
 		}
 
-		public static int FindPositionByLineAndCharacted(this string s, int lineNumber, int charNumber)
+		public static int FindPositionByLineAndCharacter(this string s, int lineNumber, int charNumber)
 		{
 			return s.FindLineStartIndex(lineNumber) + charNumber;
 		}

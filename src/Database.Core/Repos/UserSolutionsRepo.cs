@@ -11,18 +11,22 @@ using log4net;
 using Microsoft.EntityFrameworkCore;
 using RunCsJob.Api;
 using uLearn;
-using uLearn.Model.Blocks;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
 
 namespace Database.Repos
 {
-	public class UserSolutionsRepo
+	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
+	
+	public class UserSolutionsRepo : IUserSolutionsRepo
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(UserSolutionsRepo));
 		private readonly UlearnDb db;
-		private readonly TextsRepo textsRepo;
-		private readonly VisitsRepo visitsRepo;
+		private readonly ITextsRepo textsRepo;
+		private readonly IVisitsRepo visitsRepo;
 		private readonly WebCourseManager courseManager;
 
 		private static volatile ConcurrentDictionary<int, DateTime> unhandledSubmissions = new ConcurrentDictionary<int, DateTime>();
@@ -31,7 +35,7 @@ namespace Database.Repos
 
 		public UserSolutionsRepo(
 			UlearnDb db,
-			TextsRepo textsRepo, VisitsRepo visitsRepo, 
+			ITextsRepo textsRepo, IVisitsRepo visitsRepo, 
 			WebCourseManager courseManager)
 		{
 			this.db = db;
@@ -297,10 +301,10 @@ namespace Database.Repos
 
 		private static volatile SemaphoreSlim getSubmissionSemaphore = new SemaphoreSlim(1);
 
-		public async Task<UserExerciseSubmission> GetUnhandledSubmission(string agentName, SubmissionLanguage language)
+		public async Task<UserExerciseSubmission> GetUnhandledSubmission(string agentName, Language language)
 		{
 			log.Info("GetUnhandledSubmission(): trying to acquire semaphore");
-			var semaphoreLocked = await getSubmissionSemaphore.WaitAsync(TimeSpan.FromSeconds(2));
+			var semaphoreLocked = await getSubmissionSemaphore.WaitAsync(TimeSpan.FromSeconds(2)).ConfigureAwait(false);
 			if (!semaphoreLocked)
 			{
 				log.Error("GetUnhandledSubmission(): Can't lock semaphore for 2 seconds");
@@ -310,7 +314,7 @@ namespace Database.Repos
 
 			try
 			{
-				return await TryGetExerciseSubmission(agentName, language);
+				return await TryGetExerciseSubmission(agentName, language).ConfigureAwait(false);
 			}
 			catch (Exception e)
 			{
@@ -325,7 +329,7 @@ namespace Database.Repos
 			}
 		}
 
-		private async Task<UserExerciseSubmission> TryGetExerciseSubmission(string agentName, SubmissionLanguage language)
+		private async Task<UserExerciseSubmission> TryGetExerciseSubmission(string agentName, Language language)
 		{
 			var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
 			UserExerciseSubmission submission;
@@ -350,7 +354,7 @@ namespace Database.Repos
 				submission.AutomaticChecking.Status = AutomaticExerciseCheckingStatus.Running;
 				submission.AutomaticChecking.CheckingAgentName = agentName;
 
-				await SaveAll(new List<AutomaticExerciseChecking> { submission.AutomaticChecking });
+				await SaveAll(new List<AutomaticExerciseChecking> { submission.AutomaticChecking }).ConfigureAwait(false);
 
 				transaction.Commit();
 
@@ -377,9 +381,9 @@ namespace Database.Repos
 			return db.UserExerciseSubmissions.Where(c => checkingsIds.Contains(c.Id.ToString())).ToList();
 		}
 
-		private async Task UpdateIsRightAnswerForSubmission(AutomaticExerciseChecking checking)
+		private Task UpdateIsRightAnswerForSubmission(AutomaticExerciseChecking checking)
 		{
-			await db.UserExerciseSubmissions
+			return db.UserExerciseSubmissions
 				.Where(s => s.AutomaticCheckingId == checking.Id)
 				.ForEachAsync(s => s.AutomaticCheckingIsRightAnswer = checking.IsRightAnswer);
 		}
@@ -390,10 +394,10 @@ namespace Database.Repos
 			{
 				log.Info($"Обновляю статус автоматической проверки #{checking.Id}: {checking.Status}");
 				db.AddOrUpdate(checking, c => c.Id == checking.Id);
-				await UpdateIsRightAnswerForSubmission(checking);
+				await UpdateIsRightAnswerForSubmission(checking).ConfigureAwait(false);
 			}
 
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
 		public async Task SaveResults(List<RunningResults> results)
@@ -409,8 +413,8 @@ namespace Database.Repos
 				}
 				var res = new List<AutomaticExerciseChecking>();
 				foreach (var submission in submissions)
-					res.Add(await UpdateAutomaticExerciseChecking(submission.AutomaticChecking, resultsDict[submission.Id.ToString()]));
-				await SaveAll(res);
+					res.Add(await UpdateAutomaticExerciseChecking(submission.AutomaticChecking, resultsDict[submission.Id.ToString()]).ConfigureAwait(false));
+				await SaveAll(res).ConfigureAwait(false);
 
 				foreach (var submission in submissions)
 					if (!handledSubmissions.TryAdd(submission.Id, DateTime.Now))
@@ -434,7 +438,7 @@ namespace Database.Repos
 			var exerciseSlide = isWebRunner ? null : (ExerciseSlide)courseManager.GetCourse(checking.CourseId).GetSlideById(checking.SlideId);
 
 			var isRightAnswer = exerciseSlide?.Exercise?.IsCorrectRunResult(result) ?? false;
-			var score = exerciseSlide != null && isRightAnswer ? exerciseSlide.Exercise.CorrectnessScore : 0;
+			var score = exerciseSlide != null && isRightAnswer ? exerciseSlide.Scoring.PassedTestsScore : 0;
 
 			/* For skipped slides score is always 0 */
 			if (visitsRepo.IsSkipped(checking.CourseId, checking.SlideId, checking.UserId))

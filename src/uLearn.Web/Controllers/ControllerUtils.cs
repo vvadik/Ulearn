@@ -11,8 +11,11 @@ using Database.Extensions;
 using Database.Models;
 using log4net;
 using Microsoft.AspNet.Identity;
-using uLearn.Quizes;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Quizzes;
 
 namespace uLearn.Web.Controllers
 {
@@ -170,7 +173,7 @@ namespace uLearn.Web.Controllers
 		private static int GetMaxScoreWithoutManualChecking(Slide slide)
 		{
 			if (slide is ExerciseSlide)
-				return (slide as ExerciseSlide).Exercise.CorrectnessScore;
+				return (slide as ExerciseSlide).Scoring.PassedTestsScore;
 			if (slide is QuizSlide)
 				return (slide as QuizSlide).ManualChecking ? 0 : slide.MaxScore;
 			return slide.MaxScore;

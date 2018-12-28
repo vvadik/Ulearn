@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using ApprovalUtilities.Utilities;
 using Database.Models;
-using uLearn.Quizes;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Slides.Quizzes;
+using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
 
 namespace Database.DataContexts
 {
@@ -21,13 +21,10 @@ namespace Database.DataContexts
 
 		public async Task<UserQuiz> AddUserQuiz(string courseId, bool isRightAnswer, string itemId, string quizId, Guid slideId, string text, string userId, DateTime time, int quizBlockScore, int quizBlockMaxScore)
 		{
-			var quizzesRepo = new QuizzesRepo(db);
-			var currentQuizVersion = quizzesRepo.GetLastQuizVersion(courseId, slideId);
 			var userQuiz = new UserQuiz
 			{
 				CourseId = courseId,
 				SlideId = slideId,
-				QuizVersionId = currentQuizVersion.Id,
 				IsRightAnswer = isRightAnswer,
 				ItemId = itemId,
 				QuizId = quizId,
@@ -87,43 +84,6 @@ namespace Database.DataContexts
 				answer[block.Id] = ans;
 			}
 			return answer;
-		}
-
-		public QuizVersion FindQuizVersionFromUsersAnswer(string courseId, Guid slideId, string userId)
-		{
-			var firstUserAnswer = db.UserQuizzes.FirstOrDefault(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId && !x.isDropped);
-
-			if (firstUserAnswer == null)
-				return null;
-
-			/* If we know version which user has answered*/
-			if (firstUserAnswer.QuizVersion != null)
-				return firstUserAnswer.QuizVersion;
-
-			/* If user's version is null, show first created version for this slide ever */
-			var quizzesRepo = new QuizzesRepo(db);
-			return quizzesRepo.GetFirstQuizVersion(courseId, slideId);
-		}
-
-		public int GetAverageStatistics(Guid slideId, string courseId)
-		{
-			var newA = db.UserQuizzes
-							.Where(x => x.CourseId == courseId && x.SlideId == slideId)
-							.GroupBy(x => x.UserId)
-							.Select(x => x
-								.GroupBy(y => y.QuizId)
-								.Select(y => y.All(z => z.QuizBlockScore == z.QuizBlockMaxScore))
-								.Select(y => y ? 1 : 0)
-								.DefaultIfEmpty()
-								.Average())
-							.DefaultIfEmpty()
-							.Average() * 100;
-			return (int)newA;
-		}
-
-		public int GetSubmitQuizCount(Guid slideId, string courseId)
-		{
-			return db.UserQuizzes.Where(x => x.CourseId == courseId && x.SlideId == slideId).Select(x => x.User).Distinct().Count();
 		}
 
 		public async Task RemoveAnswers(string courseId, string userId, Guid slideId)

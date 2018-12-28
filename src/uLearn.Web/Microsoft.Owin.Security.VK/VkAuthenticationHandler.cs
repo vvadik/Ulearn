@@ -189,7 +189,8 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 			{
 				// TODO: error responses
 
-				AuthenticationTicket ticket = await AuthenticateAsync();
+				var ticket = await AuthenticateAsync();
+				ticket.Properties.IsPersistent = true;
 
 				var context = new VkReturnEndpointContext(Context, ticket);
 				context.SignInAsAuthenticationType = Options.SignInAsAuthenticationType;

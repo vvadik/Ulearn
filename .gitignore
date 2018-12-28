@@ -198,3 +198,5 @@ private.settings
 
 # Rider and WebStorm files
 .idea/
+
+src/uLearn\.Web/Courses

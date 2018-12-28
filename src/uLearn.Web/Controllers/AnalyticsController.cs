@@ -13,12 +13,17 @@ using Database.Models;
 using Microsoft.AspNet.Identity;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
-using uLearn.Quizes;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Helpers;
 using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Quizzes;
+using Ulearn.Core.Courses.Units;
 
 namespace uLearn.Web.Controllers
 {
@@ -499,6 +504,10 @@ namespace uLearn.Web.Controllers
 				.DistinctBy(u => u.SlideId);
 			var userScores = visitsRepo.GetScoresForSlides(courseId, userId, slides.Select(s => s.Id));
 
+			var unitIndex = course.Units.FindIndex(u => u.Id == unitId);
+			var previousUnit = unitIndex == 0 ? null : course.Units[unitIndex - 1];
+			var nextUnit = unitIndex == course.Units.Count - 1 ? null : course.Units[unitIndex + 1];
+
 			var model = new UserUnitStatisticsPageModel
 			{
 				Course = course,
@@ -507,6 +516,8 @@ namespace uLearn.Web.Controllers
 				Slides = slides.ToDictionary(s => s.Id),
 				Submissions = acceptedSubmissions.ToList(),
 				Scores = userScores,
+				PreviousUnit = previousUnit,
+				NextUnit = nextUnit,
 			};
 
 			return View(model);
@@ -799,6 +810,8 @@ namespace uLearn.Web.Controllers
 		public List<UserExerciseSubmission> Submissions { get; set; }
 		public Dictionary<Guid, Slide> Slides { get; set; }
 		public Dictionary<Guid, int> Scores { get; set; }
+		public Unit PreviousUnit { get; set; }
+		public Unit NextUnit { get; set; }
 	}
 
 	public class UserSolutionsViewModel

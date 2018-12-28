@@ -7,9 +7,11 @@ using AntiPlagiarism.Api.Models.Parameters;
 using AntiPlagiarism.Api.Models.Results;
 using Serilog.Core;
 using Ulearn.Common.Extensions;
+using HttpClientExtensions = AspNetCore.Http.Extensions.HttpClientExtensions;
 
 namespace AntiPlagiarism.Api
 {
+	/* TODO (andgein): This client should migrate to BaseApiClient from Common.Api */
 	public class AntiPlagiarismClient : IAntiPlagiarismClient
 	{
 		private static readonly TimeSpan defaultTimeout = TimeSpan.FromMinutes(10);
@@ -39,9 +41,9 @@ namespace AntiPlagiarism.Api
 			try
 			{
 				if (method == HttpMethod.Get)
-					response = await httpClient.GetAsync(BuildUrl(httpClient.BaseAddress + url, token, parameters.ToNameValueCollection()));
+					response = await httpClient.GetAsync(BuildUrl(httpClient.BaseAddress + url, token, parameters.ToNameValueCollection())).ConfigureAwait(false);
 				else if (method == HttpMethod.Post)
-					response = await httpClient.PostAsJsonAsync(BuildUrl(httpClient.BaseAddress + url, token), parameters);
+					response = await HttpClientExtensions.PostAsJsonAsync(httpClient, BuildUrl(httpClient.BaseAddress + url, token).ToString(), parameters).ConfigureAwait(false);
 				else
 					throw new AntiPlagiarismClientException($"Internal error: unsupported method for request: {method.Method}");
 			}
@@ -60,7 +62,7 @@ namespace AntiPlagiarism.Api
 			TResult result;
 			try
 			{
-				result = await response.Content.ReadAsJsonAsync<TResult>();
+				result = await response.Content.ReadAsJsonAsync<TResult>().ConfigureAwait(false);
 			}
 			catch (Exception e)
 			{

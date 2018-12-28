@@ -4,7 +4,8 @@ using System.Linq;
 using System.Security.Principal;
 using Database.Extensions;
 using Database.Models;
-using uLearn;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Units;
 
 namespace Database.DataContexts
 {

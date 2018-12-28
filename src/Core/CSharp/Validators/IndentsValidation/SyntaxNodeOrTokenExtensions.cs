@@ -2,7 +2,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace uLearn.CSharp.Validators.IndentsValidation
+namespace Ulearn.Core.CSharp.Validators.IndentsValidation
 {
 	internal static class SyntaxNodeOrTokenExtensions
 	{

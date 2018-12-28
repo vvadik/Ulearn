@@ -10,7 +10,8 @@ using Ulearn.Common.Extensions;
 
 namespace Database.Repos
 {
-	public class TextsRepo
+	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
+	public class TextsRepo : ITextsRepo
 	{
 		private readonly UlearnDb db;
 		public const int MaxTextSize = 20000;
@@ -46,7 +47,7 @@ namespace Database.Repos
 
 			try
 			{
-				await db.SaveChangesAsync();
+				await db.SaveChangesAsync().ConfigureAwait(false);
 			}
 			catch (DbUpdateException)
 			{

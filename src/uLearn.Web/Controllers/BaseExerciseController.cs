@@ -8,10 +8,13 @@ using Database.DataContexts;
 using Database.Models;
 using log4net;
 using Metrics;
-using uLearn.CSharp;
-using uLearn.Telegram;
 using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.CSharp;
+using Ulearn.Core.Telegram;
 
 namespace uLearn.Web.Controllers
 {
@@ -86,7 +89,7 @@ namespace uLearn.Web.Controllers
 
 			var compilationErrorMessage = buildResult.HasErrors ? buildResult.ErrorMessage : null;
 			var dontRunSubmission = buildResult.HasErrors;
-			var submissionLanguage = SubmissionLanguageHelpers.ByLangId(exerciseSlide.Exercise.LangId);
+			var submissionLanguage = exerciseSlide.Exercise.Language.Value;
 			var submission = await userSolutionsRepo.AddUserExerciseSubmission(
 				courseId, exerciseSlide.Id,
 				userCode, compilationErrorMessage, null,
@@ -112,7 +115,7 @@ namespace uLearn.Web.Controllers
 					IsCompillerFailure = true,
 					ErrorMessage = "К сожалению, из-за большой нагрузки мы не смогли оперативно проверить ваше решение. " +
 									"Мы попробуем проверить его позже, просто подождите и обновите страницу. ",
-					ExecutionServiceName = "uLearn"
+					ExecutionServiceName = "ulearn"
 				};
 			}
 
@@ -127,7 +130,7 @@ namespace uLearn.Web.Controllers
 
 			var automaticChecking = submission.AutomaticChecking;
 			var isProhibitedUserToSendForReview = slideCheckingsRepo.IsProhibitedToSendExerciseToManualChecking(courseId, exerciseSlide.Id, userId);
-			var sendToReview = exerciseBlock.RequireReview &&
+			var sendToReview = exerciseSlide.Scoring.RequireReview &&
 								submission.AutomaticCheckingIsRightAnswer &&
 								!isProhibitedUserToSendForReview &&
 								groupsRepo.IsManualCheckingEnabledForUser(course, userId);
@@ -155,7 +158,7 @@ namespace uLearn.Web.Controllers
 				IsCompileError = automaticChecking?.IsCompilationError ?? false,
 				ErrorMessage = automaticChecking?.CompilationError.Text ?? "",
 				IsRightAnswer = submission.AutomaticCheckingIsRightAnswer,
-				ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : exerciseSlide.Exercise.ExpectedOutput.NormalizeEoln(),
+				ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : exerciseSlide.Exercise.ExpectedOutput?.NormalizeEoln(),
 				ActualOutput = automaticChecking?.Output.Text ?? "",
 				ExecutionServiceName = automaticChecking?.ExecutionServiceName ?? "ulearn",
 				SentToReview = sendToReview,

@@ -40,7 +40,7 @@ function autoEnlargeTextarea() {
         }
 	};
 
-	var $commentsRules = $('.comments__rules');
+	var $commentsRules;
 
 	String.prototype.br2nl = function () {
 		return this.replace(/<br\s*\/?>/gi, "\n");
@@ -335,6 +335,7 @@ function autoEnlargeTextarea() {
 	
     window.documentReadyFunctions.push(function () {
         var $comments = $('.comments');
+		$commentsRules = $('.comments__rules');
 
         /* Set up handlers */
         $comments.on('click', '.reply-form input[name=commentText]', expandReplyForm);

@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using Database.Extensions;
 using Database.Models;
-using Database.Repos;
+using Database.Repos.CourseRoles;
+using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Serilog;
@@ -11,22 +11,24 @@ namespace Ulearn.Web.Api.Authorization
 {
 	public class CourseRoleRequirement : IAuthorizationRequirement
 	{
-		public readonly CourseRole MinCourseRole;
+		public readonly CourseRoleType minCourseRoleType;
 
-		public CourseRoleRequirement(CourseRole minCourseRole)
+		public CourseRoleRequirement(CourseRoleType minCourseRoleType)
 		{
-			MinCourseRole = minCourseRole;
+			this.minCourseRoleType = minCourseRoleType;
 		}
 	}
 	
 	public class CourseRoleAuthorizationHandler : AuthorizationHandler<CourseRoleRequirement>
 	{
-		private readonly UserRolesRepo userRolesRepo;
+		private readonly ICourseRolesRepo courseRolesRepo;
+		private readonly IUsersRepo usersRepo;
 		private readonly ILogger logger;
 
-		public CourseRoleAuthorizationHandler(UserRolesRepo userRolesRepo, ILogger logger)
+		public CourseRoleAuthorizationHandler(ICourseRolesRepo courseRolesRepo, IUsersRepo usersRepo, ILogger logger)
 		{
-			this.userRolesRepo = userRolesRepo;
+			this.courseRolesRepo = courseRolesRepo;
+			this.usersRepo = usersRepo;
 			this.logger = logger;
 		}
 
@@ -47,16 +49,28 @@ namespace Ulearn.Web.Api.Authorization
 				context.Fail();
 				return;
 			}
+			
+			if (!context.User.Identity.IsAuthenticated)
+			{
+				context.Fail();
+				return;
+			}
 
-			if (context.User.IsSystemAdministrator())
+			var userId = context.User.GetUserId();
+			var user = await usersRepo.FindUserByIdAsync(userId).ConfigureAwait(false);
+			if (user == null)
+			{
+				context.Fail();
+				return;
+			}
+
+			if (usersRepo.IsSystemAdministrator(user))
 			{
 				context.Succeed(requirement);
 				return;
 			}
 
-			var userId = context.User.GetUserId();
-
-			if (await userRolesRepo.HasUserAccessToCourseAsync(userId, courseId, requirement.MinCourseRole))
+			if (await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, requirement.minCourseRoleType).ConfigureAwait(false))
 				context.Succeed(requirement);
 			else
 				context.Fail();

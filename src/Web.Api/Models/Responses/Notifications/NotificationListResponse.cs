@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Common;
 
 namespace Ulearn.Web.Api.Models.Responses.Notifications
 {
 	[DataContract]
-	public class NotificationListResponse : ApiResponse
+	public class NotificationListResponse : SuccessResponse
 	{
 		[DataMember(Name = "important")]
 		public NotificationList Important { get; set; }
@@ -51,11 +52,11 @@ namespace Ulearn.Web.Api.Models.Responses.Notifications
 	public class NotificationData
 	{
 		[DataMember(Name = "comment", EmitDefaultValue = false)]
-		public CommentInfo Comment { get; set; } 
+		public NotificationCommentInfo Comment { get; set; } 
 	}
 
 	[DataContract]
-	public class CommentInfo
+	public class NotificationCommentInfo
 	{
 		[DataMember(Name = "id")]
 		public int Id { get; set; }

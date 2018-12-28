@@ -2,20 +2,18 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
 using Database;
 using Database.Extensions;
 using Database.Models;
 using Database.Repos;
+using Database.Repos.CourseRoles;
+using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using NUnit.Framework;
 using Serilog;
 using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Authorization;
@@ -29,35 +27,36 @@ namespace Ulearn.Web.Api.Controllers
 	{
 		private readonly UlearnUserManager userManager;
 		private readonly SignInManager<ApplicationUser> signInManager;
-		private readonly UserRolesRepo userRolesRepo;
-		private readonly CoursesRepo coursesRepo;
+		private readonly ICourseRolesRepo courseRolesRepo;
+		private readonly ICoursesRepo coursesRepo;
 		private readonly WebApiConfiguration configuration;
 
-		public AccountController(
-			ILogger logger, IOptions<WebApiConfiguration> options, WebCourseManager courseManager, UlearnDb db, UlearnUserManager userManager, SignInManager<ApplicationUser> signInManager,
-			UserRolesRepo userRolesRepo, CoursesRepo coursesRepo
-		)
-			: base(logger, courseManager, db)
+		public AccountController(ILogger logger, IOptions<WebApiConfiguration> options, WebCourseManager courseManager, UlearnDb db, UlearnUserManager userManager, SignInManager<ApplicationUser> signInManager,
+			ICourseRolesRepo courseRolesRepo, ICoursesRepo coursesRepo, IUsersRepo usersRepo)
+			: base(logger, courseManager, db, usersRepo)
 		{
 			this.userManager = userManager;
 			this.signInManager = signInManager;
-			this.userRolesRepo = userRolesRepo;
+			this.courseRolesRepo = courseRolesRepo;
 			this.coursesRepo = coursesRepo;
 			this.configuration = options.Value;
 		}
 
+		/// <summary>
+		/// Информация о текущем пользователе 
+		/// </summary>
 		[HttpGet]
 		[Authorize]
-		public async Task<IActionResult> Me()
+		public async Task<ActionResult<GetMeResponse>> Me()
 		{
 			var userId = User.GetUserId();
-			var user = await userManager.FindByIdAsync(userId);
-			return Json(new GetMeResponse
+			var user = await userManager.FindByIdAsync(userId).ConfigureAwait(false);
+			return new GetMeResponse
 			{
 				IsAuthenticated = true,
 				User = BuildShortUserInfo(user, discloseLogin: true),
 				AccountProblems = await GetAccountProblems(user).ConfigureAwait(false),
-			});
+			};
 		}
 
 		private async Task<List<AccountProblem>> GetAccountProblems(ApplicationUser user)
@@ -74,7 +73,7 @@ namespace Ulearn.Web.Api.Controllers
 					"Подтвердите в профиле электронную почту, чтобы получать уведомления и восстановить доступ в случае утери пароля"
 				));
 			
-			var isInstructor = await userRolesRepo.HasUserAccessToAnyCourseAsync(user.Id, CourseRole.Instructor).ConfigureAwait(false);
+			var isInstructor = await courseRolesRepo.HasUserAccessToAnyCourseAsync(user.Id, CourseRoleType.Instructor).ConfigureAwait(false);
 			if (isInstructor && (string.IsNullOrEmpty(user.FirstName) || string.IsNullOrEmpty(user.LastName)))
 				problems.Add(new AccountProblem(
 					"Не указаны имя или фамилия",
@@ -84,9 +83,12 @@ namespace Ulearn.Web.Api.Controllers
 			return problems;
 		}
 
+		/// <summary>
+		/// Получить JWT-токен по кукам 
+		/// </summary>
 		[HttpPost("token")]
 		[Authorize(AuthenticationSchemes = "Identity.Application" /* = IdentityConstants.ApplicationScheme */)]
-		public IActionResult Token()
+		public ActionResult<TokenResponse> Token()
 		{
 			var claims = User.Claims;
 			
@@ -102,20 +104,23 @@ namespace Ulearn.Web.Api.Controllers
 				signingCredentials: signingCredentials
 			);
 			var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-			return Json(new TokenResponse
+			return new TokenResponse
 			{
 				Token = tokenString,
-			});
+			};
 		}
 
+		/// <summary>
+		/// Список ролей («курс-админ», «преподаватель», «тестер») текущего пользователя
+		/// </summary>
 		[HttpGet("roles")]
 		[Authorize]
-		public async Task<IActionResult> CourseRoles()
+		public async Task<ActionResult<CourseRolesResponse>> CourseRoles()
 		{
 			var userId = User.GetUserId();	
 			var isSystemAdministrator = User.IsSystemAdministrator();
 			
-			var rolesByCourse = await userRolesRepo.GetRolesAsync(userId).ConfigureAwait(false);
+			var rolesByCourse = await courseRolesRepo.GetRolesAsync(userId).ConfigureAwait(false);
 			var courseAccesses = await coursesRepo.GetUserAccessesAsync(userId).ConfigureAwait(false);
 			var courseAccessesByCourseId = courseAccesses.GroupBy(a => a.CourseId).Select(
 				g => new CourseAccessResponse
@@ -125,28 +130,31 @@ namespace Ulearn.Web.Api.Controllers
 				}
 			).ToList();
 			
-			return Json(new CourseRolesResponse
+			return new CourseRolesResponse
 			{
 				IsSystemAdministrator = isSystemAdministrator,
-				Roles = rolesByCourse.Where(kvp => kvp.Value != CourseRole.Student).Select(kvp => new CourseRoleResponse
+				Roles = rolesByCourse.Where(kvp => kvp.Value != CourseRoleType.Student).Select(kvp => new CourseRoleResponse
 				{
 					CourseId = kvp.Key,
 					Role = kvp.Value,
 				}).ToList(),
 				Accesses = courseAccessesByCourseId,
-			});
+			};
 		}
 
+		/// <summary>
+		/// Выход
+		/// </summary>
 		[HttpPost("logout")]
 		[Authorize]
-		public async Task<IActionResult> Logout()
+		public async Task<ActionResult<LogoutResponse>> Logout()
 		{
 			await signInManager.SignOutAsync().ConfigureAwait(false);
 			
-			return Json(new LogoutResponse
+			return new LogoutResponse
 			{
 				Logout = true
-			});
+			};
 		}
 	}
 }

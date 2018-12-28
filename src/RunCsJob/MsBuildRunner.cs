@@ -37,6 +37,11 @@ namespace RunCsJob
 			var project = new Project(path, null, settings.MsBuildToolsVersion, new ProjectCollection());
 			project.SetProperty("CscToolPath", settings.CompilerDirectory.FullName);
 			
+			/* Workaround for MSB4216 (we don't know why it appears at some moment)
+			 * https://medium.com/@kviat/msb4216-fix-83d9e891a47b
+			 */
+			project.SetProperty("DisableOutOfProcTaskHost", "true");
+			
 			/* WPF markups should be compiled in separate AppDomain, otherwise MsBuild raises NRE while building:
 			 * https://stackoverflow.com/questions/1552092/microsoft-build-buildengine-engine-throws-error-when-building-wpf-application
 			 */

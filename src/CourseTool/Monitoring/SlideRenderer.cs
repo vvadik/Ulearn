@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web.WebPages;
-using uLearn.Model.Blocks;
 using uLearn.Web.Models;
 using uLearn.Web.Views.Course;
+using Ulearn.Core;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Units;
 
 namespace uLearn.CourseTool.Monitoring
 {
@@ -59,7 +63,7 @@ namespace uLearn.CourseTool.Monitoring
 		private string RenderSlide(Slide slide)
 		{
 			var page = StandaloneLayout.Page(course, slide, CreateToc(slide), GetCssFiles(), GetJsFiles());
-			foreach (var block in slide.Blocks.OfType<MdBlock>())
+			foreach (var block in slide.Blocks.OfType<MarkdownBlock>())
 				CopyLocalFiles(block.Markdown, slide.Info.Directory.FullName);
 			return "<!DOCTYPE html>\n" + page.ToHtmlString();
 		}
@@ -79,11 +83,12 @@ namespace uLearn.CourseTool.Monitoring
 				return null;
 
 			var similarSlide = unit.Slides.First();
-			var slide = new Slide(
-				new[] { new MdBlock(note.Markdown) },
-				new SlideInfo(unit, similarSlide.Info.SlideFile, -1), "Заметки преподавателю", Guid.NewGuid(),
-				null
-			);
+			var slide = new Slide(new MarkdownBlock(note.Markdown))
+			{
+				Id = Guid.NewGuid(),
+				Title = "Заметки преподавателю", 
+				Info = new SlideInfo(unit, similarSlide.Info.SlideFile, -1),
+			};
 			var page = StandaloneLayout.Page(course, slide, CreateToc(slide), GetCssFiles(), GetJsFiles());
 
 			CopyLocalFiles(note.Markdown, similarSlide.Info.Directory.FullName);
@@ -139,6 +144,8 @@ namespace uLearn.CourseTool.Monitoring
 			yield return "scripts/clike.js";
 			yield return "scripts/javascript.js";
 			yield return "scripts/python.js";
+			yield return "scripts/xml.js";
+			yield return "scripts/htmlembedded.js";
 			yield return "scripts/show-hint.js";
 			yield return "scripts/cscompleter.js";
 			yield return "scripts/csharp-hint.js";

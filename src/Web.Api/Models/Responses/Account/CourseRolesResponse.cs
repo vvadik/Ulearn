@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Database.Models;
+using Ulearn.Common.Api.Models.Responses;
 
 namespace Ulearn.Web.Api.Models.Responses.Account
 {
 	[DataContract]
-	public class CourseRolesResponse : ApiResponse
+	public class CourseRolesResponse : SuccessResponse
 	{
 		[DataMember(Name = "is_system_administrator")]
 		public bool IsSystemAdministrator { get; set; }
@@ -24,7 +25,7 @@ namespace Ulearn.Web.Api.Models.Responses.Account
 		public string CourseId { get; set; }
 		
 		[DataMember(Name = "role")]
-		public CourseRole Role { get; set; }
+		public CourseRoleType Role { get; set; }
 	}
 
 	[DataContract]

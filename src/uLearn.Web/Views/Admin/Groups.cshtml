@@ -1,16 +1,24 @@
 ﻿@using Database.Extensions
 @using Database.Models
-@using uLearn.Extensions
 @using uLearn.Web.Extensions
 @using uLearn.Web.Views.Shared
 @using Ulearn.Common
 @using Ulearn.Common.Extensions
+@using Ulearn.Core.Extensions
 
 @model uLearn.Web.Controllers.GroupsViewModel
 
 @helper GroupSettings(string fieldsPrefix, bool setFirstHeader=false)
 {
 	<h3 class="@(setFirstHeader ? "first-header" : "")">Код-ревью и проверка тестов</h3>
+
+	<div class="checkbox checkbox-default">
+		<input checked="checked" data-default-value="true" id="@(fieldsPrefix)canUsersSeeGroupProgress" name="canUsersSeeGroupProgress" type="checkbox" value="true">
+		<input type="hidden" name="canUsersSeeGroupProgress" value="false" />
+		<label for="@(fieldsPrefix)canUsersSeeGroupProgress">
+			Открыть ведомость курса студентам <br/>
+		</label>
+	</div>
 
 	<div class="checkbox checkbox-default">
 		<input checked="checked" data-default-value="true" id="@(fieldsPrefix)manualChecking" name="manualChecking" type="checkbox" value="true" @(Model.CourseManualCheckingEnabled ? "disabled" : "")>
@@ -93,7 +101,7 @@
 @functions
 {
 
-	List<SelectListItemWithAttributes> GetCopyableCgroupsSelectListItems(string defaultText="Выберите группу")
+	List<SelectListItemWithAttributes> GetCopyableGroupsSelectListItems(string defaultText="Выберите группу")
 	{
 		var selectGroups = Model.CoursesNames.ToDictionary(kv => kv.Key.ToLower(), kv => new SelectListGroup { Name = kv.Value });
 		var instructorsUsersIds = new HashSet<string>(Model.Instructors.Select(i => i.UserId));
@@ -382,7 +390,7 @@
                         <button class="pull-right modal__edit-group__mass-remove-button btn btn-danger btn-xs" data-url="@Url.Action("RemoveUsersFromGroup")">Удалить из группы</button>
                         <nobr>
                             <div class="input-group input-group-xs">
-                                @Html.DropDownListWithItemAttributes("copyToGroupId", GetCopyableCgroupsSelectListItems("Скопировать студентов в группу"), new { @class = "form-control" })
+                                @Html.DropDownListWithItemAttributes("copyToGroupId", GetCopyableGroupsSelectListItems("Скопировать студентов в группу"), new { @class = "form-control" })
                             </div>
                             <button class="modal__edit-group__mass-copy-button btn btn-primary btn-xs" data-url="@Url.Action("CopyUsersFromOneGroupToAnother")">Копировать</button>
                             <span class="modal__edit-group__mass-copy-status"></span>
@@ -448,7 +456,7 @@
 						</p>
 					</div>
 					<div class="form-group input-group">
-						@Html.DropDownListWithItemAttributes("groupId", GetCopyableCgroupsSelectListItems(), new { @class = "form-control" })
+						@Html.DropDownListWithItemAttributes("groupId", GetCopyableGroupsSelectListItems(), new { @class = "form-control" })
 					</div>
 					<div class="form-group copy-group__change-owner-block">
 						<p class="help-block">

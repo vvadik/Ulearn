@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using uLearn.CSharp.Validators;
+using Ulearn.Core.CSharp.Validators;
 
-namespace uLearn.CSharp
+namespace Ulearn.Core.CSharp
 {
 	public abstract class BaseNamingChecker : BaseStyleValidator
 	{

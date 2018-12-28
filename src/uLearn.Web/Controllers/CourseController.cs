@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,13 +13,19 @@ using Database.Models;
 using Elmah;
 using log4net;
 using LtiLibrary.Owin.Security.Lti;
-using uLearn.Model.Blocks;
-using uLearn.Quizes;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.LTI;
 using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Exercises.Blocks;
+using Ulearn.Core.Courses.Slides.Quizzes;
+using Ulearn.Core.Courses.Units;
 
 namespace uLearn.Web.Controllers
 {
@@ -265,7 +271,7 @@ namespace uLearn.Web.Controllers
 					course,
 					slide,
 					slide.Info.DirectoryRelativePath,
-					slide.Blocks.Select(block => block is ExerciseBlock ? new ExerciseBlockData(course.Id, (ExerciseSlide)slide, false) { Url = Url } : (dynamic)null).ToArray(),
+					slide.Blocks.Select(block => block is AbstractExerciseBlock ? new ExerciseBlockData(course.Id, (ExerciseSlide)slide, false) { Url = Url } : (dynamic)null).ToArray(),
 					isGuest: true,
 					autoplay: autoplay),
 				IsGuest = true,
@@ -284,9 +290,9 @@ namespace uLearn.Web.Controllers
 			if (manualChecking != null)
 				userId = manualChecking.UserId;
 
-			var visiter = await VisitSlide(course.Id, slide.Id, userId);
+			var visiter = await VisitSlide(course.Id, slide.Id, userId).ConfigureAwait(false);
 			var maxSlideScore = GetMaxSlideScoreForUser(course, slide, userId);
-			var defaultProhibitFutherReview = groupsRepo.GetDefaultProhibitFutherReviewForUser(course.Id, userId, User);
+			var defaultProhibitFurtherReview = groupsRepo.GetDefaultProhibitFutherReviewForUser(course.Id, userId, User);
 			var manualCheckingsLeft = manualChecking != null ? GetManualCheckingsCountInQueue(course.Id, slide, groupsIds) : 0;
 
 			var score = Tuple.Create(visiter.Score, maxSlideScore);
@@ -301,7 +307,7 @@ namespace uLearn.Web.Controllers
 					course, slide, manualChecking, exerciseSubmissionId, groupsIds,
 					autoplay: autoplay,
 					isManualCheckingReadonly: isManualCheckingReadonly,
-					defaultProhibitFutherReview: defaultProhibitFutherReview, manualCheckingsLeft: manualCheckingsLeft),
+					defaultProhibitFutherReview: defaultProhibitFurtherReview, manualCheckingsLeft: manualCheckingsLeft),
 				ManualChecking = manualChecking,
 				ContextManualCheckingUserGroups = manualChecking != null ? groupsRepo.GetUserGroupsNamesAsString(course.Id, manualChecking.UserId, User) : "",
 				ContextManualCheckingUserArchivedGroups = manualChecking != null ? groupsRepo.GetUserGroupsNamesAsString(course.Id, manualChecking.UserId, User, onlyArchived: true) : "",
@@ -362,7 +368,7 @@ namespace uLearn.Web.Controllers
 				isLti: isLti,
 				autoplay: autoplay,
 				isManualCheckingReadonly: isManualCheckingReadonly,
-				defaultProhibitFutherReview: defaultProhibitFutherReview
+				defaultProhibitFurtherReview: defaultProhibitFutherReview
 			)
 			{
 				VersionId = exerciseSubmissionId
@@ -440,7 +446,7 @@ namespace uLearn.Web.Controllers
 		{
 			var userId = User.Identity.GetUserId();
 			var isSkippedOrPassed = visitsRepo.IsSkippedOrPassed(course.Id, slide.Id, userId);
-			/* TODO: It's not nesessary create ExerciseBlockData here */
+			/* TODO: It's not necessary to create ExerciseBlockData here */
 			var model = new ExerciseBlockData(course.Id, slide)
 			{
 				IsSkippedOrPassed = isSkippedOrPassed,

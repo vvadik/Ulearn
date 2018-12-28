@@ -23,15 +23,18 @@
     }
 
     .header__logo {
-        color: #3072C4;
+        color: @linkColor;
         font-size: 18px;        
         
         a {
             display: inline-block;
             padding: 11px 20px 15px 30px;
+			text-decoration: none;
+			color: inherit;
             
             &:hover, &:active, &:focus {
                 text-decoration: none;
+				color: @linkHoverColor;
             }
 
             @media (max-width: @maxPhoneWidth) {
@@ -51,6 +54,7 @@
     .header__sysadmin-menu,
     .header__my-courses-menu {
         display: inline-block;
+		cursor: pointer;
 
         > * {
             display: inline-block;
@@ -171,6 +175,7 @@
             > a {
                 display: inline-block;
                 padding: 11px 15px;
+				text-decoration: none;
 
                 > * {
                     vertical-align: middle;
@@ -203,6 +208,7 @@
             > a {
                 display: inline-block;
                 padding: 15px 30px 13px 15px;
+				text-decoration: none;
 
                 @media (max-width: @maxLaptopWidth) {
                     & {

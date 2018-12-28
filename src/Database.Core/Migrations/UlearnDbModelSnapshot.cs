@@ -15,7 +15,7 @@ namespace Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.0-rtm-30799")
+                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -325,6 +325,8 @@ namespace Database.Migrations
 
                     b.Property<bool>("IsDeleted");
 
+                    b.Property<bool>("IsForInstructorsOnly");
+
                     b.Property<bool>("IsPinnedToTop");
 
                     b.Property<int>("ParentCommentId");
@@ -423,6 +425,27 @@ namespace Database.Migrations
                     b.HasIndex("CourseId", "UserId", "IsEnabled");
 
                     b.ToTable("CourseAccesses");
+                });
+
+            modelBuilder.Entity("Database.Models.CourseRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CourseId")
+                        .IsRequired();
+
+                    b.Property<int>("Role");
+
+                    b.Property<string>("UserId")
+                        .HasMaxLength(64);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserRoles");
                 });
 
             modelBuilder.Entity("Database.Models.CourseVersion", b =>
@@ -1061,32 +1084,6 @@ namespace Database.Migrations
                     b.ToTable("NotificationTransportSettings");
                 });
 
-            modelBuilder.Entity("Database.Models.QuizVersion", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("CourseId")
-                        .IsRequired()
-                        .HasMaxLength(64);
-
-                    b.Property<DateTime>("LoadingTime");
-
-                    b.Property<string>("NormalizedXml")
-                        .IsRequired();
-
-                    b.Property<Guid>("SlideId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SlideId");
-
-                    b.HasIndex("SlideId", "LoadingTime");
-
-                    b.ToTable("QuizVersions");
-                });
-
             modelBuilder.Entity("Database.Models.RestoreRequest", b =>
                 {
                     b.Property<string>("Id")
@@ -1334,8 +1331,6 @@ namespace Database.Migrations
 
                     b.Property<int?>("AntiPlagiarismSubmissionId");
 
-                    b.Property<string>("ApplicationUserId");
-
                     b.Property<int?>("AutomaticCheckingId");
 
                     b.Property<bool>("AutomaticCheckingIsRightAnswer");
@@ -1357,13 +1352,12 @@ namespace Database.Migrations
                     b.Property<DateTime>("Timestamp");
 
                     b.Property<string>("UserId")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(64);
 
                     b.HasKey("Id");
 
                     b.HasIndex("AntiPlagiarismSubmissionId");
-
-                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("AutomaticCheckingId");
 
@@ -1447,8 +1441,6 @@ namespace Database.Migrations
                     b.Property<string>("QuizId")
                         .HasMaxLength(64);
 
-                    b.Property<int?>("QuizVersionId");
-
                     b.Property<Guid>("SlideId");
 
                     b.Property<string>("Text")
@@ -1466,8 +1458,6 @@ namespace Database.Migrations
 
                     b.HasIndex("ItemId");
 
-                    b.HasIndex("QuizVersionId");
-
                     b.HasIndex("UserId");
 
                     b.HasIndex("SlideId", "Timestamp");
@@ -1477,27 +1467,6 @@ namespace Database.Migrations
                     b.HasIndex("CourseId", "UserId", "SlideId", "isDropped", "QuizId", "ItemId");
 
                     b.ToTable("UserQuizs");
-                });
-
-            modelBuilder.Entity("Database.Models.UserRole", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("CourseId")
-                        .IsRequired();
-
-                    b.Property<int>("Role");
-
-                    b.Property<string>("UserId")
-                        .HasMaxLength(64);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserRoles");
                 });
 
             modelBuilder.Entity("Database.Models.Visit", b =>
@@ -1743,7 +1712,8 @@ namespace Database.Migrations
                 {
                     b.HasBaseType("Database.Models.Notification");
 
-                    b.Property<int>("GroupId");
+                    b.Property<int>("GroupId")
+                        .HasColumnName("CreatedGroupNotification_GroupId");
 
                     b.HasIndex("GroupId");
 
@@ -1781,6 +1751,60 @@ namespace Database.Migrations
                     b.ToTable("GroupMemberHasBeenRemovedNotification");
 
                     b.HasDiscriminator().HasValue("GroupMemberHasBeenRemovedNotification");
+                });
+
+            modelBuilder.Entity("Database.Models.GroupMembersHaveBeenAddedNotification", b =>
+                {
+                    b.HasBaseType("Database.Models.Notification");
+
+                    b.Property<int>("GroupId")
+                        .HasColumnName("GroupId");
+
+                    b.Property<string>("UserDescriptions")
+                        .HasColumnName("UserDescriptions");
+
+                    b.Property<string>("UserIds")
+                        .HasColumnName("UserIds");
+
+                    b.HasIndex("GroupId")
+                        .HasName("IX_Notifications_GroupId1");
+
+                    b.ToTable("GroupMembersHaveBeenAddedNotification");
+
+                    b.HasDiscriminator().HasValue("GroupMembersHaveBeenAddedNotification");
+                });
+
+            modelBuilder.Entity("Database.Models.GroupMembersHaveBeenRemovedNotification", b =>
+                {
+                    b.HasBaseType("Database.Models.Notification");
+
+                    b.Property<int>("GroupId")
+                        .HasColumnName("GroupId");
+
+                    b.Property<string>("UserDescriptions")
+                        .HasColumnName("UserDescriptions");
+
+                    b.Property<string>("UserIds")
+                        .HasColumnName("UserIds");
+
+                    b.HasIndex("GroupId")
+                        .HasName("IX_Notifications_GroupId2");
+
+                    b.ToTable("GroupMembersHaveBeenRemovedNotification");
+
+                    b.HasDiscriminator().HasValue("GroupMembersHaveBeenRemovedNotification");
+                });
+
+            modelBuilder.Entity("Database.Models.InstructorMessageNotification", b =>
+                {
+                    b.HasBaseType("Database.Models.Notification");
+
+                    b.Property<string>("Text")
+                        .IsRequired();
+
+                    b.ToTable("InstructorMessageNotification");
+
+                    b.HasDiscriminator().HasValue("InstructorMessageNotification");
                 });
 
             modelBuilder.Entity("Database.Models.JoinedToYourGroupNotification", b =>
@@ -1907,6 +1931,19 @@ namespace Database.Migrations
                     b.HasDiscriminator().HasValue("ReceivedAdditionalScoreNotification");
                 });
 
+            modelBuilder.Entity("Database.Models.ReceivedCertificateNotification", b =>
+                {
+                    b.HasBaseType("Database.Models.Notification");
+
+                    b.Property<Guid>("CertificateId");
+
+                    b.HasIndex("CertificateId");
+
+                    b.ToTable("ReceivedCertificateNotification");
+
+                    b.HasDiscriminator().HasValue("ReceivedCertificateNotification");
+                });
+
             modelBuilder.Entity("Database.Models.ReceivedCommentToCodeReviewNotification", b =>
                 {
                     b.HasBaseType("Database.Models.Notification");
@@ -1951,6 +1988,19 @@ namespace Database.Migrations
                     b.ToTable("RevokedAccessToGroupNotification");
 
                     b.HasDiscriminator().HasValue("RevokedAccessToGroupNotification");
+                });
+
+            modelBuilder.Entity("Database.Models.SystemMessageNotification", b =>
+                {
+                    b.HasBaseType("Database.Models.Notification");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnName("SystemMessageNotification_Text");
+
+                    b.ToTable("SystemMessageNotification");
+
+                    b.HasDiscriminator().HasValue("SystemMessageNotification");
                 });
 
             modelBuilder.Entity("Database.Models.UploadedPackageNotification", b =>
@@ -2082,6 +2132,14 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("Database.Models.CourseRole", b =>
+                {
+                    b.HasOne("Database.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Database.Models.CourseVersion", b =>
@@ -2351,10 +2409,6 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Database.Models.UserExerciseSubmission", b =>
                 {
-                    b.HasOne("Database.Models.ApplicationUser")
-                        .WithMany("Solutions")
-                        .HasForeignKey("ApplicationUserId");
-
                     b.HasOne("Database.Models.AutomaticExerciseChecking", "AutomaticChecking")
                         .WithMany()
                         .HasForeignKey("AutomaticCheckingId");
@@ -2373,24 +2427,12 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.UserQuestion", b =>
                 {
                     b.HasOne("Database.Models.ApplicationUser", "User")
-                        .WithMany("Questions")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Database.Models.UserQuiz", b =>
-                {
-                    b.HasOne("Database.Models.QuizVersion", "QuizVersion")
-                        .WithMany()
-                        .HasForeignKey("QuizVersionId");
-
-                    b.HasOne("Database.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("Database.Models.UserRole", b =>
                 {
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
@@ -2517,6 +2559,24 @@ namespace Database.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
+            modelBuilder.Entity("Database.Models.GroupMembersHaveBeenAddedNotification", b =>
+                {
+                    b.HasOne("Database.Models.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .HasConstraintName("FK_Notifications_Groups_GroupId1")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Database.Models.GroupMembersHaveBeenRemovedNotification", b =>
+                {
+                    b.HasOne("Database.Models.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .HasConstraintName("FK_Notifications_Groups_GroupId2")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("Database.Models.JoinedToYourGroupNotification", b =>
                 {
                     b.HasOne("Database.Models.Group", "Group")
@@ -2590,6 +2650,14 @@ namespace Database.Migrations
                         .WithMany()
                         .HasForeignKey("ScoreId")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Database.Models.ReceivedCertificateNotification", b =>
+                {
+                    b.HasOne("Database.Models.Certificate", "Certificate")
+                        .WithMany()
+                        .HasForeignKey("CertificateId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Database.Models.ReceivedCommentToCodeReviewNotification", b =>

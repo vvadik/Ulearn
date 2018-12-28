@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
@@ -13,9 +13,10 @@ using System.Web.Routing;
 using Database.DataContexts;
 using LtiLibrary.Core.Extensions;
 using Microsoft.AspNet.Identity;
-using uLearn.Configuration;
 using uLearn.Web.Kontur.Passport;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Configuration;
 using Web.Api.Configuration;
 
 namespace uLearn.Web
@@ -36,6 +37,7 @@ namespace uLearn.Web
 				"/Certificate/",
 				"/Analytics/ExportCourseStatisticsAs",
 				"/Exercise/StudentZip",
+				"/Content/"
 			}));
 			
 			var requireHttps = Convert.ToBoolean(WebConfigurationManager.AppSettings["ulearn.requireHttps"] ?? "true");
@@ -74,7 +76,7 @@ namespace uLearn.Web
 
 		public static int GetRealPort(this HttpRequestBase request)
 		{
-			if (request.Url?.Scheme == "http" && request.Url?.Port == 80 && request.GetRealScheme() == "https")
+			if (request.Url?.Scheme == "http" && request.Url.Port == 80 && request.GetRealScheme() == "https")
 				return 443;
 			return request.Url?.Port ?? 80;
 		}
@@ -99,7 +101,7 @@ namespace uLearn.Web
 	public class ServeStaticFileForEveryNonAjaxRequest : ActionFilterAttribute
 	{
 		private readonly List<string> excludedPrefixes;
-		private byte[] content;
+		private readonly byte[] content;
 		
 		public ServeStaticFileForEveryNonAjaxRequest(FileInfo file, List<string> excludedPrefixes)
 		{
@@ -128,8 +130,10 @@ namespace uLearn.Web
 					return;
 			
 			var acceptHeader = httpContext.Request.Headers["Accept"] ?? "";
+			var cspHeader = WebConfigurationManager.AppSettings["ulearn.web.cspHeader"] ?? "";
 			if (acceptHeader.Contains("text/html") && httpContext.Request.HttpMethod == "GET")
 			{
+				filterContext.HttpContext.Response.Headers.Add("Content-Security-Policy-Report-Only", cspHeader);
 				filterContext.Result = new FileContentResult(content, "text/html");
 			}
 		}

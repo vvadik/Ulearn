@@ -4,6 +4,7 @@
 @using uLearn.Web.Extensions
 @using uLearn.Web.Views.Course
 @using Ulearn.Common.Extensions
+@using Ulearn.Core
 
 @model ExerciseBlockData
 
@@ -85,7 +86,7 @@
 			else if (Model.SubmissionSelectedByUser.AutomaticCheckingIsRightAnswer)
 			{
 				status = string.IsNullOrEmpty(texts.AllTestsPassed) ? "Все тесты пройдены" : texts.AllTestsPassed;
-				if (!Model.Slide.Exercise.RequireReview)
+				if (!Model.Slide.Scoring.RequireReview)
 				{
 					status = string.IsNullOrEmpty(texts.AllTestsPassedWithoutReview)
 						? "Все тесты пройдены, задача сдана"
@@ -115,14 +116,15 @@
 		{
 			<p class="antiplagiarism-status"
                data-antiplagiarism-url="@Url.Action("Info", "AntiPlagiarism", new { courseId = Model.CourseId, submissionId = currentSubmissionId })"
-               data-antiplagiarism-details-url="@Url.Action("Details", "AntiPlagiarism", new { courseId = Model.CourseId, submissionId = currentSubmissionId })">
+				data-antiplagiarism-details-url="@Url.Action("Details", "AntiPlagiarism", new { courseId = Model.CourseId, submissionId = currentSubmissionId })"
+				data-add-exercise-code-review-url="@Url.Action("AddExerciseCodeReview", "Exercise", new { courseId = Model.CourseId, checkingId = Model.ManualChecking.Id })">
                 Проверка на&nbsp;списывание: ищу похожие решения у&nbsp;других студентов...
             </p>
 		}
 
 		if (Model.ReviewState == ExerciseReviewState.Reviewed || Model.InstructorView || Model.Reviews.Any())
 		{
-			var showOnlyAutomaticalReviews = Model.ReviewState != ExerciseReviewState.Reviewed && !Model.InstructorView;
+			var showOnlyAutomaticReviews = Model.ReviewState != ExerciseReviewState.Reviewed && !Model.InstructorView;
 			/* For reviewed submission without reviews don't show reviews panel at all */
 			var isEmpty = Model.Reviews.Count == 0 && !canAddReviews ? "empty" : "";
 			<div class="exercise__reviews @isEmpty">
@@ -143,7 +145,7 @@
 						}
 					}
 
-					if (showOnlyAutomaticalReviews && !review.Author.IsUlearnBot())
+					if (showOnlyAutomaticReviews && !review.Author.IsUlearnBot())
 					{
 						continue;
 					}
@@ -154,13 +156,14 @@
 						ManualChecking = Model.ManualChecking,
 						CurrentUser = Model.CurrentUser,
 						CanReply = canReply,
-						ShowOnlyAutomaticalReviews = showOnlyAutomaticalReviews,
+						ShowOnlyAutomaticalReviews = showOnlyAutomaticReviews,
 					})
 				}
 			</div>
 		}
 		<textarea id="secretCodeExercise" class="hide">@Model.Block.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
-		<textarea class="code @classString hidden" data-lang="@Model.Block.LangId">@(Model.Solution ?? Model.Block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
+	
+		<textarea class="code @classString hidden" data-lang="@Model.Block.Language.GetName()">@(Model.Solution ?? Model.Block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
 		<div class="loading-spinner">
 			<img src="/Content/loading.gif"/>
 		</div>
@@ -217,7 +220,9 @@
 
 @if (Model.ManualChecking != null)
 {
-	@Html.Partial("_TopUserReviewComments", Model)
+	<div class="exercise__top-review-comments hidden">
+		@Html.Partial("_TopUserReviewComments", Model)
+	</div>
 }
 
 @if (User.HasAccessFor(Model.CourseId, CourseRole.Instructor) && ! Model.InstructorView)

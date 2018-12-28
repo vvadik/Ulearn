@@ -1,4 +1,4 @@
-﻿import React, { Component } from 'react'
+import React, { Component } from 'react'
 import * as PropTypes from 'prop-types'
 import { MenuItem, MenuSeparator } from "@skbkontur/react-ui/components/all";
 import Icon from "@skbkontur/react-icons"
@@ -51,6 +51,7 @@ class Header extends Component {
         let accessesByCourse = this.props.account.accessesByCourse;
 
         let controllableCourseIds = Object.keys(roleByCourse).filter(courseId => roleByCourse[courseId] !== 'tester');
+		controllableCourseIds = controllableCourseIds.map(s => s.toLowerCase());
         if (this.props.account.isSystemAdministrator)
             controllableCourseIds = Object.keys(this.props.courses.courseById);
         let isCourseMenuVisible = (
@@ -164,7 +165,7 @@ class AbstractMyCoursesMenu extends Component {
         courseIds.sort((a, b) => courseById[a].title.localeCompare(courseById[b].title));
         let visibleCourseIds = courseIds.slice(0, AbstractMyCoursesMenu.VISIBLE_COURSES_COUNT);
         let items = visibleCourseIds.filter(courseId => courseById.hasOwnProperty(courseId)).map(courseId =>
-            <MenuItem href={"/Course/" + courseId } key={courseId} component={ LinkComponent }>{ courseById[courseId].title }</MenuItem>
+            <MenuItem href={ "/Course/" + courseId } key={ courseId } component={ LinkComponent }>{ courseById[courseId].title }</MenuItem>
         );
         if (courseIds.length > visibleCourseIds.length)
             items.push(<MenuItem href="/Admin/CourseList" key="-course-list" component={ LinkComponent }><strong>Все курсы</strong></MenuItem>);
@@ -517,7 +518,7 @@ class Notifications extends Component {
         if (isLoading)
             return (
                 <div className={styles["notifications__dropdown"]}>
-                    <Loader type="normal" active/>
+                    <Loader type="normal" active={true} />
                 </div>
             );
         else
@@ -600,6 +601,7 @@ class LogoutLink extends Component {
     }
 
     onClick() {
+    	localStorage.removeItem('exercise_solutions');
         this.props.logout();
     }
 

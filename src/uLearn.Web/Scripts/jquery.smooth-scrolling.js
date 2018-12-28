@@ -3,13 +3,13 @@
 window.documentReadyFunctions.push(function() {
 	$.fn.smoothScroll = function (callback, $link) {
 		var $object = this;
-		var needScroll =  $link.data('scroll') !== false;
+		var needScroll =  $link ? $link.data('scroll') !== false : true;
 		if ($object.length) {
 			var scrollTo = function () {
 				if (!needScroll)
 					return;
 				$('html').animate({
-					scrollTop: $object.first().offset().top - $('.navbar').height()
+					scrollTop: $object.first().offset().top - $('.header').height()
 				},
 				{
 					duration: 1000,

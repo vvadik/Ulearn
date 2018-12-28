@@ -1,6 +1,6 @@
 /* Antiplagiarism status */
 
-.antiplagiarism-status {
+.legacy-page .antiplagiarism-status {
     background-color: #f7f7f7;
     padding: 11px 18px;
     color: #333;
@@ -8,24 +8,24 @@
     margin: 0;
 }
 
-.antiplagiarism-status.fixed {
+.legacy-page .antiplagiarism-status.fixed {
     position: fixed;
     top: 50px;
     z-index: 5;
 }
 
 @media (min-width: 768px) {
-    .antiplagiarism-status.fixed {
+	.legacy-page .antiplagiarism-status.fixed {
         width: 750px;
     }
 }
 @media (min-width: 992px) {
-    .antiplagiarism-status.fixed {
+	.legacy-page .antiplagiarism-status.fixed {
         width: 970px;
     }
 }
 @media (min-width: 1200px) {
-    .antiplagiarism-status.fixed {
+	.legacy-page .antiplagiarism-status.fixed {
         width: 1170px;
     }
 }
@@ -142,4 +142,18 @@
 .antiplagiarism .antiplagiarism__full-matched,
 .antiplagiarism .antiplagiarism__not-matched {
     cursor: pointer;
+}
+
+.antiplagiarism-status__popover {
+	
+}
+
+.antiplagiarism-status__popover button {
+	margin-top: 5px;	
+}
+
+.antiplagiarism-status .close-popover {
+	color: black;
+	cursor: pointer;
+	text-decoration: none;
 }

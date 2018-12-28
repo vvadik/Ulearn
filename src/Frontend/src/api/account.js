@@ -56,10 +56,12 @@ export function logout() {
     return dispatch => {
         return api.post('account/logout')
             .then(json => {
-                if (json.logout)
-                    dispatch({
-                        type: 'ACCOUNT__USER_LOGOUTED',
-                    });
+                if (json.logout) {
+                	api.clearApiJwtToken();
+					dispatch({
+						type: 'ACCOUNT__USER_LOGOUTED',
+					});
+				}
             })
     }
 }

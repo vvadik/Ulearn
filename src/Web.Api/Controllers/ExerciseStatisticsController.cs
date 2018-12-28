@@ -3,10 +3,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database;
 using Database.Repos;
+using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using uLearn;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Web.Api.Models.Responses.ExerciseStatistics;
 
 namespace Ulearn.Web.Api.Controllers
@@ -14,16 +16,16 @@ namespace Ulearn.Web.Api.Controllers
 	[Route("/exercise/statistics")]
 	public class ExerciseStatisticsController : BaseController
 	{
-		private readonly UserSolutionsRepo userSolutionsRepo;
+		private readonly IUserSolutionsRepo userSolutionsRepo;
 
-		public ExerciseStatisticsController(ILogger logger, WebCourseManager courseManager, UserSolutionsRepo userSolutionsRepo, UlearnDb db)
-			: base(logger, courseManager, db)
+		public ExerciseStatisticsController(ILogger logger, WebCourseManager courseManager, IUserSolutionsRepo userSolutionsRepo, UlearnDb db, IUsersRepo usersRepo)
+			: base(logger, courseManager, db, usersRepo)
 		{
 			this.userSolutionsRepo = userSolutionsRepo;
 		}
 
 		[HttpGet("{courseId}")]
-		public async Task<IActionResult> CourseStatistics(Course course, int count=10000, DateTime? from=null, DateTime? to=null)
+		public async Task<ActionResult<CourseExercisesStatisticsResponse>> CourseStatistics(Course course, int count=10000, DateTime? from=null, DateTime? to=null)
 		{
 			if (course == null)
 				return NotFound();
@@ -44,7 +46,7 @@ namespace Ulearn.Web.Api.Controllers
 				.OrderByDescending(s => s.Timestamp)
 				.Take(count)
 				.Select(s => Tuple.Create(s.SlideId, s.AutomaticCheckingIsRightAnswer, s.Timestamp))
-				.ToListAsync();
+				.ToListAsync().ConfigureAwait(false);
 
 			const int daysLimit = 30;
 			var result = new CourseExercisesStatisticsResponse
@@ -75,7 +77,7 @@ namespace Ulearn.Web.Api.Controllers
 					}).ToList()
 			};
 
-			return Json(result);
+			return result;
 		}
 	}
 }

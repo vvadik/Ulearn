@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using uLearn.Model.Blocks;
-using uLearn.Model.Edx;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Units;
+using Ulearn.Core.Model.Edx;
 
 namespace uLearn.CourseTool
 {
@@ -35,7 +37,7 @@ namespace uLearn.CourseTool
 								displayName,
 								new[]
 								{
-									new MdBlock(unit.InstructorNote.Markdown)
+									new MarkdownBlock(unit.InstructorNote.Markdown)
 										.ToEdxComponent(mdBlockId, displayName, unit.Directory.FullName)
 								})
 						}) { VisibleToStaffOnly = true }

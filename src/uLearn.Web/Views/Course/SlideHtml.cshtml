@@ -1,14 +1,21 @@
 ﻿@* Generator: MvcHelper GeneratePrettyNames: true DisableLinePragmas: true *@
+@using System.Linq
 @using Database.Models
-@using log4net
-@using uLearn
-@using uLearn.Model.Blocks
-@using uLearn.Quizes
+@using uLearn.Web.Clients
 @using uLearn.Web.Controllers
 @using uLearn.Web.Extensions
 @* ReSharper disable RedundantUsingDirective *@
 @using uLearn.Web.Models
+@using Ulearn.Common.Api
 @using Ulearn.Common.Extensions
+@using Ulearn.Core
+@using Ulearn.Core.Courses.Slides.Blocks
+@using Ulearn.Core.Courses.Slides.Exercises
+@using Ulearn.Core.Courses.Slides.Exercises.Blocks
+@using Ulearn.Core.Courses.Slides.Quizzes
+@using Ulearn.Core.Courses.Slides.Quizzes.Blocks
+@using Ulearn.VideoAnnotations.Api.Models.Parameters.Annotations
+@using Ulearn.VideoAnnotations.Api.Models.Responses.Annotations
 @* ReSharper restore RedundantUsingDirective *@
 
 
@@ -40,9 +47,9 @@
 
 @helper Blocks(BlockRenderContext context, HtmlHelper Html)
 {
-	var countHiddenBlocks = context.Slide.GetBlocksRangesWithSameVisibility().Count(b => b[0].Hide);
+	var countHiddenBlocks = context.Slide.GetBlockRangesWithSameVisibility().Count(b => b[0].Hide);
 	var firstHiddenBlock = true;
-	foreach (var blockRange in context.Slide.GetBlocksRangesWithSameVisibility())
+	foreach (var blockRange in context.Slide.GetBlockRangesWithSameVisibility())
 	{
 		if (!blockRange[0].Hide)
 		{
@@ -119,9 +126,9 @@
 @helper ShowScoreWithWords(int currentScore, int maxScore)
 { @(maxScore == 0 ? "" : string.Format("{0} из {1}", currentScore.PluralizeInRussian(RussianPluralizationOptions.Score), maxScore)) }
 
-@helper Block(MdBlock block, BlockRenderContext context, HtmlHelper Html)
+@helper Block(MarkdownBlock block, BlockRenderContext context, HtmlHelper Html)
 {
-	@MvcHtmlString.Create(block.RenderMd(context.Course.Id, context.Slide.Id, context.BaseUrl))
+	@MvcHtmlString.Create(block.RenderMarkdown(context.Course.Id, context.Slide.Id, context.BaseUrl))
 }
 
 @helper Block(CodeBlock block, BlockRenderContext context, HtmlHelper Html)
@@ -132,7 +139,7 @@
 	}
 	else
 	{
-		<textarea class="code code-sample" data-lang="@block.LangId" data-ver="@block.LangVer">@block.Code</textarea>
+		<textarea class="code code-sample" data-lang="@(block.Language.GetName())">@block.Code</textarea>
 	}
 }
 
@@ -142,7 +149,7 @@
 	var linesCountToShow = linesCount <= 20 ? linesCount : 5;
 	var visibleLines = block.Code.SplitToLinesWithEoln().Take(linesCountToShow).Join("");
 	<div class="expandable-code @(linesCount > linesCountToShow ? "collapsed" : "expanded")">
-        <textarea class="code code-sample" data-lang="@block.LangId" data-ver="@block.LangVer" data-code="@block.Code">@visibleLines</textarea>
+        <textarea class="code code-sample" data-lang="@block.Language.GetName()" data-code="@block.Code">@visibleLines</textarea>
         @if (linesCount > linesCountToShow)
         {
 	        <div class="expandable-code__button-wrapper">
@@ -174,9 +181,59 @@
 			Ускорить видео?
 		</a>
 	</div>
+
+	if (!string.IsNullOrEmpty(context.Course.Settings.VideoAnnotationsGoogleDoc))
+	{
+		var client = UlearnVideoAnnotationsClient.Instance;
+		try
+		{
+			var annotationsResponse = client.GetAnnotationsAsync(context.Course.Settings.VideoAnnotationsGoogleDoc, block.VideoId).GetAwaiter().GetResult();
+
+			@ShowVideoAnnotations(annotationsResponse.Annotation, context, Html);
+		}
+		catch (ApiClientException e)
+		{
+			/* Annotations not found. It's ok */
+			@SuggestAnnotations(context, Html)
+		}
+	}
 }
 
-@helper Block(ImageGaleryBlock block, BlockRenderContext context, HtmlHelper Html)
+@helper ShowVideoAnnotations(Annotation annotation, BlockRenderContext context, HtmlHelper Html)
+{
+	<h2>
+		Содержание видео
+	</h2>
+	@annotation.Text
+	<div class="video-annotations">
+		@foreach (var fragment in annotation.Fragments)
+		{
+			<div class="fragment">
+				<span class="offset">@fragment.Offset.ToString(@"mm\:ss")</span> — @fragment.Text
+			</div>	 
+		}
+	</div>
+ 
+	var googleDocLink = context.Course.Settings.VideoAnnotationsGoogleDoc;
+	if (!string.IsNullOrEmpty(googleDocLink))
+	{
+		<div>Ошибка в содержании? <a href="https://docs.google.com/document/d/@googleDocLink" target="_blank">Предложите исправление</a><span class="link-text">!</span></div>
+	}
+}
+
+@helper SuggestAnnotations(BlockRenderContext context, HtmlHelper Html)
+{
+	<h2>
+		Содержание видео
+	</h2>
+	var googleDocLink = context.Course.Settings.VideoAnnotationsGoogleDoc;
+	if (!string.IsNullOrEmpty(googleDocLink))
+	{
+		<div>Помогите написать <a href="https://docs.google.com/document/d/@googleDocLink" target="_blank">текстовое содержание</a> этого видео.</div>
+	}
+}
+
+@helper Block(ImageGalleryBlock block, BlockRenderContext context, HtmlHelper Html)
 {
 	<div class="flexslider">
 		<ul class="slides">
@@ -187,6 +244,26 @@
 				</li>
 			}
 		</ul>
+	</div>
+}
+
+@helper Block(HtmlBlock block, BlockRenderContext context, HtmlHelper Html)
+{
+	@Html.Raw(block.Content)
+}
+
+@helper Block(SpoilerBlock block, BlockRenderContext context, HtmlHelper Html)
+{
+	<div class="spoiler-block" data-hide-quiz-button="@block.HideQuizButton.ToString().ToLower()">
+		<div class="spoiler-block__button">
+			<button class="btn btn-success">@block.Text</button>
+		</div>
+		<div class="spoiler-block__content" style="display: none">
+			@foreach (var innerBlock in block.Blocks)
+			{
+				@Block((dynamic)innerBlock, context, Html)
+			}
+		</div>
 	</div>
 }
 
@@ -202,7 +279,7 @@
 	@RunErrors()
 }
 
-@helper Block(ExerciseBlock block, BlockRenderContext context, HtmlHelper Html)
+@helper Block(AbstractExerciseBlock block, BlockRenderContext context, HtmlHelper Html)
 {
 	<div class="exercise">
 		@{
@@ -216,7 +293,7 @@
 			else
 			{
 				<div class="exercise__submission">
-					<textarea class="code code-exercise hidden" data-lang="@block.LangId">@( block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
+					<textarea class="code code-exercise hidden" data-lang="@block.Language.GetName()">@( block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
 					<div class="loading-spinner">
 						<img src="/Content/loading.gif"/>
 					</div>
@@ -241,7 +318,7 @@
                     @foreach (var hint in data.Block.HintsMd)
                     {
 	                    <li>
-                            @MvcHtmlString.Create(hint.RenderMd(context.BaseUrl))
+                            @MvcHtmlString.Create(hint.RenderMarkdown(context.BaseUrl))
                         </li>
                     }
                 </ol>
@@ -266,7 +343,7 @@
 					context.ManualCheckingsLeft,
 					context.GroupsIds,
 					isCurrentSubmissionChecking: (context.VersionId == null || checking.Submission.Id == context.VersionId) && !context.IsManualCheckingReadonly,
-					defaultProhibitFutherReview: context.DefaultProhibitFutherReview
+					defaultProhibitFurtherReview: context.DefaultProhibitFurtherReview
 					))
 		}
 	</div>
@@ -702,17 +779,21 @@
 			{
                 if (!block.Multiple && item.IsCorrect == ChoiceItemCorrectness.True)
                 {
-                    <span class="quiz__explanation__correct">Этот ответ правильный@(dotIfHasExplanation)</span>						
+                    <span class="quiz__explanation__correct">Этот ответ был правильным@(dotIfHasExplanation)</span>						
 				}
 				else if (!hasExplanation && block.Multiple && item.IsCorrect == ChoiceItemCorrectness.True)
 				{
-					<span class="quiz__explanation__incorrect">Неправильно.</span>
+					<span class="quiz__explanation__incorrect">Вы ошиблись.</span>
 					<span>Этот ответ надо было выбрать</span>
+				}
+				else if (block.Multiple)
+				{
+	                <span class="quiz__explanation__incorrect">Вы ошиблись@(dotIfHasExplanation)</span>
 				}
 				else
 				{
-	                <span class="quiz__explanation__incorrect">Неправильно@(dotIfHasExplanation)</span>
-                }
+					<span class="quiz__explanation__incorrect">Неправильно@(dotIfHasExplanation)</span>
+				}
 			}
 		}
 

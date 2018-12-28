@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Database.Models;
-using uLearn.Model.Blocks;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
 
 namespace uLearn.Web.Models
 {
@@ -19,14 +20,14 @@ namespace uLearn.Web.Models
 		public bool RevealHidden { get; private set; }
 		public bool Autoplay { get; private set; }
 		public bool IsManualCheckingReadonly { get; private set; }
-		public bool DefaultProhibitFutherReview { get; set; }
+		public bool DefaultProhibitFurtherReview { get; set; }
 
 		/* GroupsIds != null if instructor filtered users by group and see their works */
 		public List<string> GroupsIds { get; set; }
 
 		/* User's version of slide, i.e. for exercises */
 		public int? VersionId { get; set; }
-
+		
 		public dynamic GetBlockData(SlideBlock block)
 		{
 			var index = Array.IndexOf(Slide.Blocks, block);
@@ -38,7 +39,7 @@ namespace uLearn.Web.Models
 		public BlockRenderContext(Course course, Slide slide, string baseUrl, dynamic[] blockData,
 			bool isGuest = false, bool revealHidden = false, AbstractManualSlideChecking manualChecking = null,
 			int manualCheckingsLeft = 0, bool canUserFillQuiz = false, List<string> groupsIds = null, bool isLti = false, bool autoplay = false,
-			bool isManualCheckingReadonly = false, bool defaultProhibitFutherReview = true)
+			bool isManualCheckingReadonly = false, bool defaultProhibitFurtherReview = true)
 		{
 			if (blockData.Length != slide.Blocks.Length)
 				throw new ArgumentException("BlockRenderContext(): BlockData.Length should be slide.Blocks.Length");
@@ -55,7 +56,7 @@ namespace uLearn.Web.Models
 			IsLti = isLti;
 			Autoplay = autoplay;
 			IsManualCheckingReadonly = isManualCheckingReadonly;
-			DefaultProhibitFutherReview = defaultProhibitFutherReview;
+			DefaultProhibitFurtherReview = defaultProhibitFurtherReview;
 		}
 	}
 }

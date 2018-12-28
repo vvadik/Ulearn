@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace uLearn.Extensions
+namespace Ulearn.Core.Extensions
 {
     public static class TypeInfoExtensions
     {

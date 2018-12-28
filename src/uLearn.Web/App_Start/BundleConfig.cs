@@ -53,6 +53,8 @@ namespace uLearn.Web
 				"~/codemirror/mode/clike/clike.js",
 				"~/codemirror/mode/javascript/javascript.js",
 				"~/codemirror/mode/python/python.js",
+				"~/codemirror/mode/xml/xml.js",
+				"~/codemirror/mode/htmlembedded/htmlembedded.js",
 				"~/codemirror/addon/hint/show-hint.js",
 				"~/codemirror/addon/hint/cscompleter.js",
 				"~/codemirror/addon/hint/csharp-hint.js",

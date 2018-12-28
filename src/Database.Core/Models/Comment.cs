@@ -41,6 +41,9 @@ namespace Database.Models
 
 		[Required]
 		public bool IsPinnedToTop { get; set; }
+		
+		[Required]
+		public bool IsForInstructorsOnly { get; set; }
 
 		// For top-level comments ParentCommentId = -1 
 		[Required]
@@ -48,9 +51,6 @@ namespace Database.Models
 
 		public virtual ICollection<CommentLike> Likes { get; set; }
 
-		public bool IsTopLevel()
-		{
-			return ParentCommentId == -1;
-		}
+		public bool IsTopLevel => ParentCommentId == -1;
 	}
 }

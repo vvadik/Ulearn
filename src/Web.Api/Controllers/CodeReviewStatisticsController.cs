@@ -5,11 +5,14 @@ using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
-using Microsoft.AspNetCore.Authorization;
+using Database.Repos.CourseRoles;
+using Database.Repos.Groups;
+using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using uLearn;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Web.Api.Authorization;
 using Ulearn.Web.Api.Models.Responses.CodeReviewStatistics;
 
@@ -18,27 +21,32 @@ namespace Ulearn.Web.Api.Controllers
 	[Route("/codereview/statistics")]
 	public class CodeReviewStatisticsController : BaseController
 	{
-		private readonly SlideCheckingsRepo slideCheckingsRepo;
-		private readonly UserRolesRepo userRolesRepo;
-		private readonly UsersRepo usersRepo;
-		private readonly GroupsRepo groupsRepo;
+		private readonly ISlideCheckingsRepo slideCheckingsRepo;
+		private readonly ICourseRolesRepo courseRolesRepo;
+		private readonly IGroupsRepo groupsRepo;
+		private readonly IGroupMembersRepo groupMembersRepo;
+		private readonly ICourseRoleUsersFilter courseRoleUsersFilter;
 
 		public CodeReviewStatisticsController(ILogger logger, WebCourseManager courseManager,
-			SlideCheckingsRepo slideCheckingsRepo,
-			UserRolesRepo userRolesRepo,
-			UsersRepo usersRepo,
-			GroupsRepo groupsRepo, UlearnDb db)
-			: base(logger, courseManager, db)
+			ISlideCheckingsRepo slideCheckingsRepo,
+			ICourseRolesRepo courseRolesRepo,
+			IUsersRepo usersRepo,
+			IGroupsRepo groupsRepo,
+			IGroupMembersRepo groupMembersRepo,
+			ICourseRoleUsersFilter courseRoleUsersFilter,
+			UlearnDb db)
+			: base(logger, courseManager, db, usersRepo)
 		{
 			this.slideCheckingsRepo = slideCheckingsRepo;
-			this.userRolesRepo = userRolesRepo;
-			this.usersRepo = usersRepo;
+			this.courseRolesRepo = courseRolesRepo;
 			this.groupsRepo = groupsRepo;
+			this.groupMembersRepo = groupMembersRepo;
+			this.courseRoleUsersFilter = courseRoleUsersFilter;
 		}
 		
 		[HttpGet("{courseId}/instructors")]
 		[CourseAccessAuthorize(CourseAccessType.ApiViewCodeReviewStatistics)]
-		public async Task<IActionResult> InstructorsStatistics(Course course, int count=10000, DateTime? from=null, DateTime? to=null)
+		public async Task<ActionResult<CodeReviewInstructorsStatisticsResponse>> InstructorsStatistics(Course course, int count=10000, DateTime? from=null, DateTime? to=null)
 		{
 			if (course == null)
 				return NotFound();
@@ -50,8 +58,8 @@ namespace Ulearn.Web.Api.Controllers
 			
 			count = Math.Min(count, 10000);
 			
-			var instructorIds = userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.Instructor, course.Id);
-			var instructors = usersRepo.GetUsersByIds(instructorIds);
+			var instructorIds = await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, course.Id).ConfigureAwait(false);
+			var instructors = await usersRepo.GetUsersByIdsAsync(instructorIds).ConfigureAwait(false);
 			
 			var exerciseSlides = course.Slides.OfType<ExerciseSlide>().ToList();
 
@@ -60,9 +68,9 @@ namespace Ulearn.Web.Api.Controllers
 				CourseId = course.Id,
 				Count = count,
 				OnlyChecked = null,
-				From = from.Value,
+				From = @from.Value,
 				To = to.Value,
-			}).Include(c => c.Reviews).ToListAsync();
+			}).Include(c => c.Reviews).ToListAsync().ConfigureAwait(false);
 
 			var result = new CodeReviewInstructorsStatisticsResponse
 			{
@@ -72,8 +80,8 @@ namespace Ulearn.Web.Api.Controllers
 			foreach (var instructor in instructors)
 			{
 				var checkingsCheckedByInstructor = allSlideCheckings.Where(c => c.IsChecked && (c.LockedById == instructor.Id || c.Reviews.Any(r => r.AuthorId == instructor.Id))).ToList();
-				var instructorGroups = await groupsRepo.GetMyGroupsFilterAccessibleToUserAsync(course.Id, instructor.Id);
-				var instructorGroupMemberIds = (await groupsRepo.GetGroupsMembersAsync(instructorGroups.Select(g => g.Id))).Select(m => m.UserId);
+				var instructorGroups = await groupsRepo.GetMyGroupsFilterAccessibleToUserAsync(course.Id, instructor.Id).ConfigureAwait(false);
+				var instructorGroupMemberIds = (await groupMembersRepo.GetGroupsMembersAsync(instructorGroups.Select(g => g.Id)).ConfigureAwait(false)).Select(m => m.UserId);
 				var checkingQueue = allSlideCheckings.Where(c => !c.IsChecked && instructorGroupMemberIds.Contains(c.UserId)).ToList();
 				var comments = checkingsCheckedByInstructor.SelectMany(c => c.NotDeletedReviews).ToList();
 				var instructorStatistics = new CodeReviewInstructorStatistics
@@ -94,7 +102,7 @@ namespace Ulearn.Web.Api.Controllers
 				result.Instructors.Add(instructorStatistics);
 			}
 
-			return Json(result);
+			return result;
 		}
 	}
 }

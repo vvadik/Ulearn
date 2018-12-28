@@ -318,6 +318,70 @@ namespace MyNamespace1
 		{
 		}
 	}
+
+	public class CommentsClass8
+	{
+#if MYDEBUG
+		public void SomeMethod()
+		{
+		}
+#endif
+	}
+	
+	public class CommentsClass8b
+	{
+#if true
+		public void SomeMethod()
+		{
+		}
+#endif
+	}	
+
+	public class CommentsClass9
+	{
+#if MYDEBUG
+		public void SomeMethod()
+		{
+		}
+#endif
+
+		private int field;
+	}
+	
+	public class CommentsClass9b
+	{
+#if true
+		public void SomeMethod()
+		{
+		}
+#endif
+
+		private int field;
+	}	
+	
+	public class CommentsClass10
+	{
+#if MYDEBUG
+		public void SomeMethod()
+		{
+		}
+#else
+		public void AnotherMethod()
+		{
+		}
+#endif
+
+		private int field;
+	}	
+	
+	public class CommentsClass11
+	{
+		#if MYDEBUG
+		public void SomeMethod()
+		{
+		}
+		#endif
+	}	
 }
 
 namespace MyNamespace1

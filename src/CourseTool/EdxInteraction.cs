@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
 
 namespace uLearn.CourseTool
 {

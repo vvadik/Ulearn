@@ -3,10 +3,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using uLearn;
+using Ulearn.Core;
 
 namespace Database.Repos
 {
-	public class SlideRateRepo
+	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
+	public class SlideRateRepo : ISlideRateRepo
 	{
 		private readonly UlearnDb db;
 

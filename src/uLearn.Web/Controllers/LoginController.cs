@@ -32,17 +32,35 @@ namespace uLearn.Web.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				var user = await userManager.FindAsync(model.UserName, model.Password);
+				var user = await userManager.FindAsync(model.UserName, model.Password).ConfigureAwait(false);
+
+				if (user == null)
+				{
+					/* If user with this username is not exists then try to find user with this email.
+					   It allows to login not only with username/password, but with email/password */
+					user = await userManager.FindByEmailAsync(model.UserName).ConfigureAwait(false);
+
+					if (user != null)
+					{
+						/* For signing in via email/password we need to be sure that email is confirmed */
+						if (!user.EmailConfirmed)
+							user = null;
+
+						if (!await userManager.CheckPasswordAsync(user, model.Password).ConfigureAwait(false))
+							user = null;
+					}
+				}
+				
 				if (user != null)
 				{
-					await AuthenticationManager.LoginAsync(HttpContext, user, model.RememberMe);
-					await SendConfirmationEmailAfterLogin(user);
+					await AuthenticationManager.LoginAsync(HttpContext, user, model.RememberMe).ConfigureAwait(false);
+					await SendConfirmationEmailAfterLogin(user).ConfigureAwait(false);
 					return Redirect(this.FixRedirectUrl(returnUrl));
 				}
 				ModelState.AddModelError("", @"Неверное имя пользователя или пароль");
 			}
 
-			// If we got this far, something failed, redisplay form
+			/* If we got this far, something failed, redisplay form */
 			ViewBag.ReturnUrl = returnUrl;
 			return View(model);
 		}
@@ -115,12 +133,24 @@ namespace uLearn.Web.Controllers
 			{
 				return View("ExternalLoginFailure");
 			}
+			
 			ViewBag.LoginProvider = info.Login.LoginProvider;
+			ViewBag.ReturnUrl = returnUrl;
+			
 			if (ModelState.IsValid)
 			{
 				var userAvatarUrl = info.ExternalIdentity.FindFirstValue("AvatarUrl");
 				var firstName = info.ExternalIdentity.FindFirstValue(ClaimTypes.GivenName);
 				var lastName = info.ExternalIdentity.FindFirstValue(ClaimTypes.Surname);
+				
+				/* Some users enter email with trailing whitespaces. Remove them (not users, but spaces!) */
+				model.Email = (model.Email ?? "").Trim();
+				
+				if (!CanNewUserSetThisEmail(model.Email))
+				{
+					ModelState.AddModelError("Email", AccountController.ManageMessageId.EmailAlreadyTaken.GetDisplayName());
+					return View(model);
+				}
 
 				var user = new ApplicationUser
 				{
@@ -156,8 +186,7 @@ namespace uLearn.Web.Controllers
 				}
 				this.AddErrors(result);
 			}
-
-			ViewBag.ReturnUrl = returnUrl;
+			
 			return View(model);
 		}
 

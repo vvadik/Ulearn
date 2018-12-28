@@ -37,7 +37,7 @@ window.documentReadyFunctions.push(function () {
 		/* Add <table></table> tags around copied thead */
 		var $tableForHeader = $('<table></table>')
 			.addClass($table.attr('class'))
-			.addClass('sticky-header')
+			.addClass('sticky-header')			
 			.css({
 				'position': 'fixed',
 				'left': $table.position().left,
@@ -114,7 +114,8 @@ window.documentReadyFunctions.push(function () {
 
 		$stickyColumn = createTableFirstColumnCopy($table);
 		$stickyColumn.hide();
-		$('body').append($stickyColumn);
+		var $legacyContainer = $('<div></div>').addClass('legacy-page').append($stickyColumn);
+		$('body').append($legacyContainer);
 
 		relocateStickyHeaderAndColumn($table, $stickyHeader, $stickyColumn, minTopOffset);
 	};
@@ -125,7 +126,8 @@ window.documentReadyFunctions.push(function () {
 
 		$stickyHeader = createTableHeaderCopy($table, minTopOffset);
 		$stickyHeader.hide();
-		$('body').append($stickyHeader);
+		var $legacyContainer = $('<div></div>').addClass('legacy-page').append($stickyHeader);
+		$('body').append($legacyContainer);
 
 		rerenderStickyColumn($table, minTopOffset);
 	};

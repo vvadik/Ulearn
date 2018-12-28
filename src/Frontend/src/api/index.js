@@ -23,10 +23,14 @@ function refreshApiJwtToken() {
         .then(json => {
             let token = json.token;
             if (! token)
-                return Promise.reject(new Error('Can\'t get token from API: /account/token returned bad json: ' + JSON.stringify(json)))
+                return Promise.reject(new Error('Can\'t get token from API: /account/token returned bad json: ' + JSON.stringify(json)));
             apiJwtToken = token;
             return Promise.resolve(API_JWT_TOKEN_UPDATED);
         })
+}
+
+function clearApiJwtToken() {
+	apiJwtToken = ''
 }
 
 function request(url, options, isRetry) {
@@ -87,17 +91,19 @@ function createRequestParams(body) {
 }
 
 let api = {
-    account: account,
-    courses: courses,
-    notifications: notifications,
+	refreshApiJwtToken: refreshApiJwtToken,
+	clearApiJwtToken: clearApiJwtToken,
+	get: get,
+	post: post,post: post,
+	account: account,
+	courses: courses,
+	notifications: notifications,
 	groups: groups,
 	users: users,
-    get: get,
-    post: post,
 	patch: patch,
 	put: put,
 	delete: deleteRequest,
-    request: request,
+	request: request,
 	createRequestParams: createRequestParams,
 };
 

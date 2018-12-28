@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Ulearn.Common.Extensions;
-using SyntaxNodeOrToken = uLearn.CSharp.Validators.IndentsValidation.SyntaxNodeOrToken;
+using SyntaxNodeOrToken = Ulearn.Core.CSharp.Validators.IndentsValidation.SyntaxNodeOrToken;
 
-namespace uLearn.CSharp
+namespace Ulearn.Core.CSharp
 {
 	public class SolutionStyleError
 	{

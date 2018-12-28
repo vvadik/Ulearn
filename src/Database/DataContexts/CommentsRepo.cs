@@ -154,6 +154,9 @@ namespace Database.DataContexts
 			return policy ?? new CommentsPolicy
 			{
 				CourseId = courseId,
+				IsCommentsEnabled = true,
+				ModerationPolicy = CommentModerationPolicy.Postmoderation,
+				OnlyInstructorsCanReply = false,
 			};
 		}
 

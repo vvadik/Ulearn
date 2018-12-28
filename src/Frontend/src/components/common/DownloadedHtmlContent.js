@@ -248,7 +248,7 @@ class DownloadedHtmlContent extends Component {
         let links = this.state.links;
         let bodyClassName = this.state.bodyClassName;
         return (
-            <div>
+            <div className="legacy-page">
                 <Meta meta={meta} links={links} bodyClassName={bodyClassName}/>
                 <Content body={this.state.body} />
             </div>
@@ -273,10 +273,9 @@ class DownloadedHtmlContent extends Component {
 
         let forms = Array.from(document.body.getElementsByTagName('form'));
         let postForms = forms.filter(f => f.method.toLowerCase() === 'post' && ! f.onsubmit && f.action);
-        console.log('Found forms with method="POST" and without onsubmit:', postForms);
         postForms.forEach(f => {
-            let url = f.action;
-            if (exceptions.some(e => getUrlParts(url).pathname.startsWith(e)))
+            let formUrl = f.action;
+            if (exceptions.some(e => getUrlParts(formUrl).pathname.startsWith(e)))
                 return;
 
             f.addEventListener('submit', e => {
@@ -290,26 +289,33 @@ class DownloadedHtmlContent extends Component {
                 if (button && button.name && button.value)
                     formData.append(button.name, button.value);
 
-                fetch(url, {
+                fetch(formUrl, {
                     method: 'POST',
                     credentials: 'include',
                     body: formData
                 }).then(response => {
                     if (response.redirected) {
                         /* If it was the login form, then update user information in header */
-                        let oldUrlPathname = getUrlParts(url).pathname;
-                        if (oldUrlPathname.startsWith('/Login') || oldUrlPathname.startsWith('/Account/') || oldUrlPathname.startsWith('/RestorePassword/'))
+						let formUrlParts = getUrlParts(formUrl).pathname;
+                        if (formUrlParts.startsWith('/Login') || formUrlParts.startsWith('/Account/') || formUrlParts.startsWith('/RestorePassword/'))
                             this.props.updateUserInformation();
 
-                        let newUrl = getUrlParts(response.url);
-                        this.context.router.history.replace(newUrl.pathname + newUrl.search);
+						let newUrlParts = getUrlParts(response.url);
+
+                        /* Is URL has not been changed then add random query parameter to enforce page reloading */
+						let oldUrlParts = getUrlParts(window.location.href);
+                        const isUrlChanged = oldUrlParts.pathname + oldUrlParts.search !== newUrlParts.pathname + newUrlParts.search;
+                        if (! isUrlChanged)
+							newUrlParts.search += (newUrlParts.search === '' ? '?' : '&') + 'rnd=' + Math.random();
+
+                        this.context.router.history.replace(newUrlParts.pathname + newUrlParts.search);
                         return Promise.resolve(undefined);
                     }
                     return response.text()
                 }).then(data => {
                     if (typeof data === 'undefined')
                         return;
-                    this.processNewHtmlContent(url, data)
+                    this.processNewHtmlContent(formUrl, data)
                 })
             });
         });

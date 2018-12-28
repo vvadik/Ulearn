@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using CommandLine;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
 
 namespace uLearn.CourseTool.CmdLineOptions
 {

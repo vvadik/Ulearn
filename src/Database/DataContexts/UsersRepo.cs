@@ -8,8 +8,8 @@ using Database.Models;
 using EntityFramework.Functions;
 using JetBrains.Annotations;
 using Microsoft.AspNet.Identity;
-using uLearn;
 using Ulearn.Common;
+using Ulearn.Core;
 
 namespace Database.DataContexts
 {
@@ -83,25 +83,25 @@ namespace Database.DataContexts
 			return db.Users.Where(u => !u.IsDeleted).FilterByRole(role, userManager).Select(u => u.Id).ToList();
 		}
 
-		public async Task ChangeTelegram(string userId, long chatId, string chatTitle)
+		public Task ChangeTelegram(string userId, long chatId, string chatTitle)
 		{
 			var user = FindUserById(userId);
 			if (user == null)
-				return;
+				return Task.CompletedTask;
 
 			user.TelegramChatId = chatId;
 			user.TelegramChatTitle = chatTitle;
-			await db.SaveChangesAsync();
+			return db.SaveChangesAsync();
 		}
 
-		public async Task ConfirmEmail(string userId, bool isConfirmed = true)
+		public Task ConfirmEmail(string userId, bool isConfirmed = true)
 		{
 			var user = FindUserById(userId);
 			if (user == null)
-				return;
+				return Task.CompletedTask;
 
 			user.EmailConfirmed = isConfirmed;
-			await db.SaveChangesAsync();
+			return db.SaveChangesAsync();
 		}
 
 		private const string nameSpace = nameof(UsersRepo);
@@ -169,6 +169,16 @@ namespace Database.DataContexts
 		public List<ApplicationUser> FindUsersByUsernameOrEmail(string usernameOrEmail)
 		{
 			return db.Users.Where(u => u.UserName == usernameOrEmail || u.Email == usernameOrEmail).ToList();
+		}
+		
+		public List<ApplicationUser> FindUsersByEmail(string email)
+		{
+			return db.Users.Where(u => u.Email == email).ToList();
+		}
+		
+		public List<ApplicationUser> FindUsersByConfirmedEmail(string email)
+		{
+			return db.Users.Where(u => u.Email == email && u.EmailConfirmed).ToList();
 		}
 
 		public IEnumerable<ApplicationUser> GetUsersByIds(IEnumerable<string> usersIds)

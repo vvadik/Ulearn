@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace uLearn.CSharp.Validators
+namespace Ulearn.Core.CSharp.Validators
 {
     public class BracketValidator : BaseStyleValidator
     {
@@ -17,6 +17,9 @@ namespace uLearn.CSharp.Validators
         {
             var expression = returnStatementSyntax.Expression;
             if (expression == null)
+                yield break;
+
+            if (expression is TupleExpressionSyntax)
                 yield break;
 
             var syntaxKinds = expression.DescendantTokens().Select(x => x.Kind()).ToArray();

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Database;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
-using uLearn;
+using Ulearn.Core.Courses;
 
 namespace Ulearn.Web.Api.Models.Binders
 {
@@ -47,9 +47,8 @@ namespace Ulearn.Web.Api.Models.Binders
 			if (string.IsNullOrEmpty(value))
 				return Task.CompletedTask;
 			
-			// Model will be null if not found
 			var model = courseManager.FindCourse(value);
-			bindingContext.Result = ModelBindingResult.Success(model);
+			bindingContext.Result = model == null ? ModelBindingResult.Failed() : ModelBindingResult.Success(model);
 			return Task.CompletedTask;
 		}
 	}
@@ -63,7 +62,7 @@ namespace Ulearn.Web.Api.Models.Binders
 				throw new ArgumentNullException(nameof(context));
 			}
 
-			if (context.Metadata.ModelType == typeof(Course))
+			if (context.Metadata.ModelType == typeof(Course) || context.Metadata.ModelType == typeof(ICourse))
 			{
 				return new BinderTypeModelBinder(typeof(CourseBinder));
 			}

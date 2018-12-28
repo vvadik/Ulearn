@@ -23,21 +23,13 @@ window.documentReadyFunctions.push(function () {
 
         $self.find('.exercise__add-review__button').click(function () {
             var $button = $(this);
-            var comment = $self.find('.exercise__add-review__comment').val();
-            var params = {
-                StartLine: editorLastRange.anchor.line,
-                StartPosition: editorLastRange.anchor.ch,
-                FinishLine: editorLastRange.head.line,
-                FinishPosition: editorLastRange.head.ch,
-                Comment: comment,
-            };
+            var comment = $self.find('.exercise__add-review__comment').val();            
             $button.text('Сохранение..').attr('disabled', 'disabled');
-            $.post(addReviewUrl, params, function (renderedReview) {
-                addExerciseCodeReview(renderedReview);
-                $self.find('.exercise__add-review__comment').val('');
-                $self.hide();
-                $button.text('Сохранить (Ctrl+Enter)').removeAttr('disabled');
-            });
+            postExerciseCodeReview(addReviewUrl, editorLastRange, comment, function(){
+				$self.find('.exercise__add-review__comment').val('');
+				$self.hide();
+				$button.text('Сохранить (Ctrl+Enter)').removeAttr('disabled');
+			});
         });
 
         /* Trigger button clock on Ctrl + Enter, process Escape key */
@@ -98,13 +90,15 @@ function initCodeEditor($parent) {
 
         if (!langId)
             return { mode: "text/plain", hint: null };
-
+       
         switch (langId) {
             case "cs":
-            case "сsharp":
+            case "csharp":
                 return { mode: "text/x-csharp", hint: CodeMirror.hint.csharp };
             case "py":
             case "python":
+			case "python2":
+			case "python3":
                 return { mode: "text/x-python", hint: CodeMirror.hint.python };
             case "js":
             case "javascript":
@@ -219,6 +213,29 @@ function initCodeEditor($parent) {
 
                         $addReviewPopupInput.trigger('input');
                         $addReviewPopupInput.focus();
+                        
+                        /* Show tooltip with hint about Ctrl+C */
+						if (navigator.clipboard) {
+							var minLine = Math.min(range.anchor.line, range.head.line);
+							/* Don't show tooltip on first 4 lines, it is overlapped */
+							if (minLine >= 4) {
+								if (window.codeMirrorSelectionHint)
+									clearTimeout(window.codeMirrorSelectionHint);
+
+								window.codeMirrorSelectionHint = setTimeout(function () {
+									var $codeMirrorSelectedText = $('.CodeMirror-selectedtext:last-child').first();
+									if ($codeMirrorSelectedText.length === 0)
+										$codeMirrorSelectedText = $('.CodeMirror-selectedtext').last();
+									$codeMirrorSelectedText.tooltip({
+										title: 'Скопируйте выделенный текст с помощью Ctrl+C',
+										placement: 'top',
+										trigger: 'manual',
+										fallbackPlacement: 'right',
+									});
+									$codeMirrorSelectedText.tooltip('show');
+								}, 100);
+							}
+						}
                     });
             }
 
@@ -494,29 +511,70 @@ function addExerciseCodeReview(renderedReview) {
     placeCodeReviews();
 }
 
+function postExerciseCodeReview(url, selection, comment, callback) {
+	var params = {
+		StartLine: selection.anchor.line,
+		StartPosition: selection.anchor.ch,
+		FinishLine: selection.head.line,
+		FinishPosition: selection.head.ch,
+		Comment: comment,
+	};
+	$.post(url, params, function (renderedReview) {
+		addExerciseCodeReview(renderedReview);
+		if (callback)
+			callback();
+	});
+}
+
 var refreshPreviousDraftLastId = undefined;
 function refreshPreviousDraft(id) {
-    if (id == undefined)
-        id = refreshPreviousDraftLastId;
-    refreshPreviousDraftLastId = id;
+	if (id === undefined)
+		id = refreshPreviousDraftLastId;
+	refreshPreviousDraftLastId = id;
 
-    window.onbeforeunload = function () {
-        saveExerciseCodeDraft(id);
-    }
-    if (localStorage[id] != undefined && $('.code-exercise').length > 0) {
-        let codeMirrorEditor = $('.code-exercise')[0].codeMirrorEditor;
-        codeMirrorEditor.setValue(localStorage[id]);
-        /* Refresh codemirror editor. See https://stackoverflow.com/questions/8349571/codemirror-editor-is-not-loading-content-until-clicked */
-        setTimeout(function () {
-            codeMirrorEditor.refresh();
-        });
-    }
+	window.onbeforeunload = function () {
+		saveExerciseCodeDraft(id);
+	};
+	history.onpushstate = function() {
+		saveExerciseCodeDraft(id);
+	};
+
+	let solutions = JSON.parse(localStorage['exercise_solutions'] || '{}');
+
+	if (solutions[id] !== undefined && $('.code-exercise').length > 0) {
+		let codeMirrorEditor = $('.code-exercise')[0].codeMirrorEditor;
+		codeMirrorEditor.setValue(solutions[id]);
+		/* Refresh codemirror editor. See https://stackoverflow.com/questions/8349571/codemirror-editor-is-not-loading-content-until-clicked */
+		setTimeout(function () {
+			codeMirrorEditor.refresh();
+		});
+	}
 }
 
 function saveExerciseCodeDraft(id) {
-    if (id == undefined)
-        id = refreshPreviousDraftLastId;
+	if (id === undefined)
+		id = refreshPreviousDraftLastId;
 
-    if ($('.code-exercise').length > 0)
-        localStorage[id] = $('.code-exercise')[0].codeMirrorEditor.getValue();
+	if (localStorage['exercise_solutions'] === undefined)
+		localStorage['exercise_solutions'] = JSON.stringify({});
+
+	let solutions = JSON.parse(localStorage['exercise_solutions']);
+
+	if ($('.code-exercise').length > 0) {
+		solutions[id] = $('.code-exercise')[0].codeMirrorEditor.getValue();
+		localStorage['exercise_solutions'] = JSON.stringify(solutions);
+	}
 }
+
+/* Add event for detecting pushState() call. See http://felix-kling.de/blog/2011/01/06/how-to-detect-history-pushstate/ */
+(function(history){
+	var pushState = history.pushState;
+	history.pushState = function(state) {
+		if (typeof history.onpushstate === "function") {
+			history.onpushstate({state: state});
+		}
+		// ... whatever else you want to do
+		// maybe call onhashchange e.handler
+		return pushState.apply(history, arguments);
+	}
+})(window.history);

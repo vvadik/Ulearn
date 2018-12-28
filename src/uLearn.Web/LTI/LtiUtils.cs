@@ -5,6 +5,7 @@ using log4net;
 using LtiLibrary.Core.Outcomes.v1;
 using uLearn.Web.Controllers;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Slides;
 
 namespace uLearn.Web.LTI
 {

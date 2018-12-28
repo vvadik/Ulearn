@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
@@ -15,10 +15,13 @@ using Database.Models;
 using EntityFramework.Functions;
 using log4net;
 using RunCsJob.Api;
-using uLearn;
-using uLearn.Model.Blocks;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 
 namespace Database.DataContexts
 {
@@ -46,7 +49,7 @@ namespace Database.DataContexts
 			string courseId, Guid slideId,
 			string code, string compilationError, string output,
 			string userId, string executionServiceName, string displayName,
-			SubmissionLanguage language,
+			Language language,
 			AutomaticExerciseCheckingStatus status = AutomaticExerciseCheckingStatus.Waiting)
 		{
 			if (string.IsNullOrWhiteSpace(code))
@@ -316,7 +319,7 @@ namespace Database.DataContexts
 
 		private static volatile SemaphoreSlim getSubmissionSemaphore = new SemaphoreSlim(1);
 
-		public async Task<UserExerciseSubmission> GetUnhandledSubmission(string agentName, SubmissionLanguage language)
+		public async Task<UserExerciseSubmission> GetUnhandledSubmission(string agentName, Language language)
 		{
 			log.Info("GetUnhandledSubmission(): trying to acquire semaphore");
 			var semaphoreLocked = await getSubmissionSemaphore.WaitAsync(TimeSpan.FromSeconds(2));
@@ -344,7 +347,7 @@ namespace Database.DataContexts
 			}
 		}
 
-		private async Task<UserExerciseSubmission> TryGetExerciseSubmission(string agentName, SubmissionLanguage language)
+		private async Task<UserExerciseSubmission> TryGetExerciseSubmission(string agentName, Language language)
 		{
 			var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
 			UserExerciseSubmission submission;
@@ -369,7 +372,7 @@ namespace Database.DataContexts
 				submission.AutomaticChecking.Status = AutomaticExerciseCheckingStatus.Running;
 				submission.AutomaticChecking.CheckingAgentName = agentName;
 
-				await SaveAll(new List<AutomaticExerciseChecking> { submission.AutomaticChecking });
+				await SaveAll(new List<AutomaticExerciseChecking> { submission.AutomaticChecking }).ConfigureAwait(false);
 
 				transaction.Commit();
 
@@ -413,7 +416,7 @@ namespace Database.DataContexts
 			}
 			try
 			{
-				await db.ObjectContext().SaveChangesAsync(SaveOptions.DetectChangesBeforeSave);
+				await db.ObjectContext().SaveChangesAsync(SaveOptions.DetectChangesBeforeSave).ConfigureAwait(false);
 			}
 			catch (DbEntityValidationException e)
 			{
@@ -436,8 +439,8 @@ namespace Database.DataContexts
 				}
 				var res = new List<AutomaticExerciseChecking>();
 				foreach (var submission in submissions)
-					res.Add(await UpdateAutomaticExerciseChecking(submission.AutomaticChecking, resultsDict[submission.Id.ToString()]));
-				await SaveAll(res);
+					res.Add(await UpdateAutomaticExerciseChecking(submission.AutomaticChecking, resultsDict[submission.Id.ToString()]).ConfigureAwait(false));
+				await SaveAll(res).ConfigureAwait(false);
 
 				foreach (var submission in submissions)
 					if (!handledSubmissions.TryAdd(submission.Id, DateTime.Now))
@@ -461,7 +464,7 @@ namespace Database.DataContexts
 			var exerciseSlide = isWebRunner ? null : (ExerciseSlide)courseManager.GetCourse(checking.CourseId).GetSlideById(checking.SlideId);
 			
 			var isRightAnswer = IsRightAnswer(result, output, exerciseSlide?.Exercise);
-			var score = exerciseSlide != null && isRightAnswer ? exerciseSlide.Exercise.CorrectnessScore : 0;
+			var score = exerciseSlide != null && isRightAnswer ? exerciseSlide.Scoring.PassedTestsScore: 0;
 
 			/* For skipped slides score is always 0 */
 			if (visitsRepo.IsSkipped(checking.CourseId, checking.SlideId, checking.UserId))
@@ -489,7 +492,7 @@ namespace Database.DataContexts
 			return newChecking;
 		}
 
-		private bool IsRightAnswer(RunningResults result, string output, ExerciseBlock exerciseBlock)
+		private bool IsRightAnswer(RunningResults result, string output, AbstractExerciseBlock exerciseBlock)
 		{
 			if (result.Verdict != Verdict.Ok )
 				return false;
@@ -503,7 +506,7 @@ namespace Database.DataContexts
 
 			if (exerciseBlock.ExerciseType == ExerciseType.CheckOutput)
 			{
-				var expectedOutput = exerciseBlock?.ExpectedOutput.NormalizeEoln();
+				var expectedOutput = exerciseBlock.ExpectedOutput.NormalizeEoln();
 				return output.Equals(expectedOutput);
 			}
 

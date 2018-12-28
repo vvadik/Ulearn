@@ -16,6 +16,7 @@
   </metadata>
   <files>
     <file src="static\**\*.*" target="static\" />
-    <file src="..\Frontend\build\index.html" target="" />
+    <file src="index.html" target="" />
+<!--    <file src="service-worker.js" target="" />-->
   </files>
 </package>

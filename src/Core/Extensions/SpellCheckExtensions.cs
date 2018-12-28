@@ -1,15 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using uLearn.SpellChecking;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.SpellChecking;
 
-namespace uLearn.Extensions
+namespace Ulearn.Core.Extensions
 {
 	public static class SpellCheckExtensions
 	{
 		public static string[] SpellCheck(this Course course)
 		{
-			using (var spellchecker = new SpellChecker(course.TryGetDictionaryPath()))
+			var dictionaryPath = course.TryGetDictionaryPath();
+			if (string.IsNullOrEmpty(dictionaryPath))
+				return Array.Empty<string>();
+			
+			using (var spellchecker = new SpellChecker(dictionaryPath))
 			{
 				return spellchecker.SpellCheckCourse(course);
 			}
@@ -36,7 +43,7 @@ namespace uLearn.Extensions
 
 		public static string SpellCheckSlide(this SpellChecker spellchecker, Slide slide)
 		{
-			var prefix = string.Format("{0} ({1}):", slide.Title, slide.NormalizedGuid);
+			var prefix = $"{slide.Title} ({slide.NormalizedGuid}):";
 			var titleErrors = spellchecker.SpellCheckString(slide.Title);
 			var blocksErrors = slide.Blocks.Select(b => b.TryGetText()).Where(s => !string.IsNullOrWhiteSpace(s)).SelectMany(spellchecker.SpellCheckString);
 			var errorsList = titleErrors.Concat(blocksErrors).Select(e => e.ToPrettyString()).ToList();
@@ -45,7 +52,7 @@ namespace uLearn.Extensions
 
 		public static string ToPrettyString(this SpellingError error)
 		{
-			return string.Format("Найдено '{0}', возможные варианты: [{1}]", error.Mispelling, string.Join(", ", error.Suggestions));
+			return $"Найдено '{error.Mispelling}', возможные варианты: [{string.Join(", ", error.Suggestions)}]";
 		}
 
 		private static string ToPrettyMessage(string title, IList<string> errors)
@@ -58,7 +65,10 @@ namespace uLearn.Extensions
 
 		private static string TryGetDictionaryPath(this Course course)
 		{
-			var file = Path.Combine(course.Directory.FullName, course.Settings.GetDictionaryFile());
+			if (course.Settings.DictionaryFile == null)
+				return null;
+			
+			var file = Path.Combine(course.Directory.FullName, course.Settings.DictionaryFile);
 			return File.Exists(file) ? file : null;
 		}
 	}

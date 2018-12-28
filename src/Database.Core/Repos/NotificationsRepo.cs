@@ -15,18 +15,21 @@ using Ulearn.Common.Extensions;
 
 namespace Database.Repos
 {
-	public class NotificationsRepo
+	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
+	public class NotificationsRepo : INotificationsRepo
 	{
 		private const int maxNotificationsSendingFails = 15;
 		public static TimeSpan sendNotificationsDelayAfterCreating = TimeSpan.FromMinutes(1);
 
 		private readonly UlearnDb db;
 		private readonly ILogger logger;
+		private readonly IServiceProvider serviceProvider;
 
-		public NotificationsRepo(UlearnDb db, ILogger logger)
+		public NotificationsRepo(UlearnDb db, ILogger logger, IServiceProvider serviceProvider)
 		{
 			this.db = db;
 			this.logger = logger;
+			this.serviceProvider = serviceProvider;
 		}
 
 		private static DateTime CalculateNextTryTime(DateTime createTime, int failsCount)
@@ -54,7 +57,7 @@ namespace Database.Repos
 
 		private async Task DeleteOldNotificationTransportsAsync<TTransport>(string userId) where TTransport : NotificationTransport
 		{
-			await DeleteOldNotificationTransportsAsync(typeof(TTransport), userId);
+			await DeleteOldNotificationTransportsAsync(typeof(TTransport), userId).ConfigureAwait(false);
 		}
 
 		private async Task DeleteOldNotificationTransportsAsync(Type transportType, string userId)
@@ -65,7 +68,7 @@ namespace Database.Repos
 			var transports = await db.NotificationTransports
 				.Where(t => t.UserId == userId && !t.IsDeleted)
 				.DynamicOfType(transportType)
-				.ToListAsync();
+				.ToListAsync().ConfigureAwait(false);
 			foreach (var transport in transports)
 				transport.IsDeleted = true;
 		}
@@ -74,12 +77,12 @@ namespace Database.Repos
 		{
 			using (var transaction = db.Database.BeginTransaction())
 			{
-				await DeleteOldNotificationTransportsAsync(transport.GetType(), transport.UserId);
+				await DeleteOldNotificationTransportsAsync(transport.GetType(), transport.UserId).ConfigureAwait(false);
 				
 				transport.IsDeleted = false;
 				db.NotificationTransports.Add(transport);
 				
-				await db.SaveChangesAsync();
+				await db.SaveChangesAsync().ConfigureAwait(false);
 				transaction.Commit();
 			}
 		}
@@ -91,12 +94,12 @@ namespace Database.Repos
 
 		public async Task EnableNotificationTransport(int transportId, bool isEnabled = true)
 		{
-			var transport = await db.NotificationTransports.FindAsync(transportId);
+			var transport = await db.NotificationTransports.FindAsync(transportId).ConfigureAwait(false);
 			if (transport == null)
 				return;
 
 			transport.IsEnabled = isEnabled;
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
 		public Task<List<NotificationTransport>> GetUsersNotificationTransportsAsync(string userId, bool includeDisabled = false)
@@ -117,7 +120,7 @@ namespace Database.Repos
 
 		public async Task<T> FindUsersNotificationTransportAsync<T>(string userId, bool includeDisabled = false) where T : NotificationTransport
 		{
-			return (await GetUsersNotificationTransportsAsync(userId, includeDisabled)).OfType<T>().FirstOrDefault();
+			return (await GetUsersNotificationTransportsAsync(userId, includeDisabled).ConfigureAwait(false)).OfType<T>().FirstOrDefault();
 		}
 		
 		public T FindUsersNotificationTransport<T>(string userId, bool includeDisabled = false) where T : NotificationTransport
@@ -145,14 +148,15 @@ namespace Database.Repos
 
 			
 			db.AddOrUpdate(settings, s => s.Id == settings.Id);
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
 		public async Task<DefaultDictionary<int, NotificationTransportSettings>> GetNotificationTransportsSettingsAsync(string courseId, NotificationType type, List<int> transportIds)
 		{
 			var settings = await db.NotificationTransportSettings
 				.Where(s => s.CourseId == courseId && s.NotificationType == type && transportIds.Contains(s.NotificationTransportId))
-				.ToDictionaryAsync(s => s.NotificationTransportId, s => s);
+				.ToDictionaryAsync(s => s.NotificationTransportId, s => s)
+				.ConfigureAwait(false);
 			return settings.ToDefaultDictionary();
 		}
 
@@ -161,7 +165,8 @@ namespace Database.Repos
 		{
 			var settings = await db.NotificationTransportSettings
 				.Where(s => s.CourseId == courseId && transportIds.Contains(s.NotificationTransportId))
-				.ToDictionaryAsync(s => Tuple.Create(s.NotificationTransportId, s.NotificationType), s => s);
+				.ToDictionaryAsync(s => Tuple.Create(s.NotificationTransportId, s.NotificationType), s => s)
+				.ConfigureAwait(false);
 			return settings.ToDefaultDictionary(() => null);
 		}
 
@@ -170,18 +175,19 @@ namespace Database.Repos
 		{
 			var settings = await db.NotificationTransportSettings
 				.Where(s => s.CourseId == courseId)
-				.ToDictionaryAsync(s => Tuple.Create(s.NotificationTransportId, s.NotificationType), s => s);
+				.ToDictionaryAsync(s => Tuple.Create(s.NotificationTransportId, s.NotificationType), s => s)
+				.ConfigureAwait(false);
 			return settings.ToDefaultDictionary(() => null);
 		}
 
-		public async Task AddNotificationAsync(string courseId, Notification notification, string initiatedUserId)
+		public Task AddNotificationAsync(string courseId, Notification notification, string initiatedUserId)
 		{
 			notification.CreateTime = DateTime.Now;
 			notification.InitiatedById = initiatedUserId;
 			notification.CourseId = courseId;
 			db.Notifications.Add(notification);
 
-			await db.SaveChangesAsync();
+			return db.SaveChangesAsync();
 		}
 
 		public Task<List<NotificationDelivery>> GetDeliveriesForSendingNowAsync()
@@ -194,60 +200,61 @@ namespace Database.Repos
 			).ToListAsync();
 		}
 
-		public async Task MarkDeliveriesAsSentAsync(List<int> deliveriesIds)
+		public Task MarkDeliveriesAsSentAsync(List<int> deliveriesIds)
 		{
 			foreach (var d in db.NotificationDeliveries.Where(d => deliveriesIds.Contains(d.Id)))
 				d.Status = NotificationDeliveryStatus.Sent;
-			await db.SaveChangesAsync();
+			return db.SaveChangesAsync();
 		}
 
 		private async Task SetDeliveryStatusAsync(int deliveryId, NotificationDeliveryStatus status)
 		{
-			var delivery = await db.NotificationDeliveries.FindAsync(deliveryId);
+			var delivery = await db.NotificationDeliveries.FindAsync(deliveryId).ConfigureAwait(false);
 			if (delivery == null)
 				return;
 
 			delivery.Status = status;
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
-		public async Task MarkDeliveryAsReadAsync(int deliveryId)
+		public Task MarkDeliveryAsReadAsync(int deliveryId)
 		{
-			await SetDeliveryStatusAsync(deliveryId, NotificationDeliveryStatus.Read);
+			return SetDeliveryStatusAsync(deliveryId, NotificationDeliveryStatus.Read);
 		}
 
-		public async Task MarkDeliveryAsWontSendAsync(int deliveryId)
+		public Task MarkDeliveryAsWontSendAsync(int deliveryId)
 		{
-			await SetDeliveryStatusAsync(deliveryId, NotificationDeliveryStatus.WontSend);
+			return SetDeliveryStatusAsync(deliveryId, NotificationDeliveryStatus.WontSend);
 		}
 
-		public async Task MarkDeliveryAsSentAsync(int deliveryId)
+		public Task MarkDeliveryAsSentAsync(int deliveryId)
 		{
-			await SetDeliveryStatusAsync(deliveryId, NotificationDeliveryStatus.Sent);
+			return SetDeliveryStatusAsync(deliveryId, NotificationDeliveryStatus.Sent);
 		}
 
 		public async Task CreateDeliveriesAsync()
 		{
 			var minuteAgo = DateTime.Now.Subtract(sendNotificationsDelayAfterCreating);
-			var notifications = await db.Notifications.Where(
-				n => !n.AreDeliveriesCreated && n.CreateTime < minuteAgo
-			).OrderBy(n => n.Id).ToListAsync();
+			var notifications = await db.Notifications.Where(n => !n.AreDeliveriesCreated && n.CreateTime < minuteAgo)
+				.OrderBy(n => n.Id)
+				.ToListAsync()
+				.ConfigureAwait(false);
 			foreach (var notification in notifications)
 			{
 				try
 				{
-					CreateDeliviesForNotification(notification);
+					await CreateDeliveriesForNotification(notification).ConfigureAwait(false);
 				}
 				finally
 				{
 					notification.AreDeliveriesCreated = true;
 				}
 
-				await db.SaveChangesAsync();
+				await db.SaveChangesAsync().ConfigureAwait(false);
 			}
 		}
 
-		private void CreateDeliviesForNotification(Notification notification)
+		private async Task CreateDeliveriesForNotification(Notification notification)
 		{
 			var notificationType = notification.GetNotificationType();
 			logger.Information($"Found new notification {notificationType} #{notification.Id}");
@@ -258,7 +265,7 @@ namespace Database.Repos
 				return;
 			}
 
-			var blockerNotifications = notification.GetBlockerNotifications(db);
+			var blockerNotifications = notification.GetBlockerNotifications(serviceProvider);
 			if (blockerNotifications.Count > 0)
 			{
 				logger.Information(
@@ -267,7 +274,7 @@ namespace Database.Repos
 				);
 			}
 
-			var recipientsIds = notification.GetRecipientsIds(db);
+			var recipientsIds = await notification.GetRecipientsIdsAsync(serviceProvider).ConfigureAwait(false);
 			logger.Information($"Recipients list for notification {notification.Id}: {recipientsIds.Count} user(s)");
 
 			if (recipientsIds.Count == 0)
@@ -379,14 +386,14 @@ namespace Database.Repos
 			return db.NotificationDeliveries.Where(d => notificationsIds.Contains(d.NotificationId) && transportsIds.Contains(d.NotificationTransportId));
 		}
 
-		public async Task MarkDeliveriesAsFailedAsync(IEnumerable<NotificationDelivery> deliveries)
+		public Task MarkDeliveriesAsFailedAsync(IEnumerable<NotificationDelivery> deliveries)
 		{
 			foreach (var delivery in deliveries)
 			{
 				delivery.FailsCount++;
 				delivery.NextTryTime = CalculateNextTryTime(delivery.CreateTime, delivery.FailsCount);
 			}
-			await db.SaveChangesAsync();
+			return db.SaveChangesAsync();
 		}
 
 		public Task MarkDeliveryAsFailedAsync(NotificationDelivery delivery)
@@ -411,7 +418,7 @@ namespace Database.Repos
 			var notificationTypes = GetAllNotificationTypes();
 
 			notificationTypes = notificationTypes
-				.Where(t => user.HasAccessFor(courseId, t.GetMinCourseRole()) || t.GetMinCourseRole() == CourseRole.Student)
+				.Where(t => user.HasAccessFor(courseId, t.GetMinCourseRole()) || t.GetMinCourseRole() == CourseRoleType.Student)
 				.OrderByDescending(t => t.GetMinCourseRole())
 				.ThenBy(t => (int)t)
 				.ToList();
@@ -457,7 +464,8 @@ namespace Database.Repos
 		{
 			var lastNotification = await db.NotificationDeliveries.Where(d => d.NotificationTransportId == notificationTransport.Id)
 				.OrderByDescending(d => d.CreateTime)
-				.FirstOrDefaultAsync();
+				.FirstOrDefaultAsync()
+				.ConfigureAwait(false);
 			return lastNotification?.CreateTime;
 		}
 	}

@@ -1,7 +1,7 @@
 let config = window.config;
 
-/* Be default configuration is provided by backend via inserting JSON in index.html. If backend didn't provide
- * configuration (i.e. in local environment for starts via webpack dev server), load it from settings.json */
+/* By default configuration is provided by backend via inserting JSON in index.html. If backend didn't provide
+ * configuration (i.e. in local environment for launches via webpack dev server), load it from settings.json */
 if (! config || Object.keys(config).length === 0) {
     config = require("./settings.json");
 

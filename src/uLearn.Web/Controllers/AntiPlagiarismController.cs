@@ -16,11 +16,14 @@ using Database.DataContexts;
 using Database.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Schema;
 using Serilog;
 using uLearn.Web.FilterAttributes;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
 
 namespace uLearn.Web.Controllers
 {
@@ -75,7 +78,7 @@ namespace uLearn.Web.Controllers
 					Status = "not_checked",
 				}, JsonRequestBehavior.AllowGet);
 			
-			var antiPlagiarismsResult = await GetAuthorPlagiarismsAsync(submission);
+			var antiPlagiarismsResult = await GetAuthorPlagiarismsAsync(submission).ConfigureAwait(false);
 
 			var model = new AntiPlagiarismInfoModel
 			{
@@ -211,7 +214,7 @@ namespace uLearn.Web.Controllers
 				{
 					/* Remove cached value if it is too old */
 					if (DateTime.Now.Subtract(cachedValue.Item1) > cacheLifeTime)
-						plagiarismsCache.TryRemove(key, out var _);
+						plagiarismsCache.TryRemove(key, out _);
 				}
 			}
 		}

@@ -15,15 +15,18 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using Microsoft.VisualBasic.FileIO;
-using uLearn.CSharp;
-using uLearn.Extensions;
-using uLearn.Model.Blocks;
-using uLearn.Quizes;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Units;
+using Ulearn.Core.CSharp;
+using Ulearn.Core.Extensions;
 
 namespace uLearn.Web.Controllers
 {
@@ -38,7 +41,6 @@ namespace uLearn.Web.Controllers
 		private readonly UserRolesRepo userRolesRepo;
 		private readonly CommentsRepo commentsRepo;
 		private readonly UserManager<ApplicationUser> userManager;
-		private readonly QuizzesRepo quizzesRepo;
 		private readonly CoursesRepo coursesRepo;
 		private readonly GroupsRepo groupsRepo;
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
@@ -58,7 +60,6 @@ namespace uLearn.Web.Controllers
 			userRolesRepo = new UserRolesRepo(db);
 			commentsRepo = new CommentsRepo(db);
 			userManager = new ULearnUserManager(db);
-			quizzesRepo = new QuizzesRepo(db);
 			coursesRepo = new CoursesRepo(db);
 			groupsRepo = new GroupsRepo(db, courseManager);
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
@@ -154,12 +155,6 @@ namespace uLearn.Web.Controllers
 			return File(courseManager.GetCourseVersionFile(versionId).FullName, "application/zip", packageName);
 		}
 
-		private void CreateQuizVersionsForSlides(string courseId, IEnumerable<Slide> slides)
-		{
-			foreach (var slide in slides.OfType<QuizSlide>())
-				quizzesRepo.AddQuizVersionIfNeeded(courseId, slide);
-		}
-
 		private async Task NotifyAboutCourseVersion(string courseId, Guid versionId, string userId)
 		{
 			var notification = new UploadedPackageNotification
@@ -193,8 +188,12 @@ namespace uLearn.Web.Controllers
 			catch (Exception e)
 			{
 				var errorMessage = e.Message.ToLowerFirstLetter();
-				if (e.InnerException != null)
-					errorMessage += $" ({e.InnerException.Message})";
+				while (e.InnerException != null)
+				{
+					errorMessage += $"\n\n{e.InnerException.Message}";
+					e = e.InnerException;
+				}
+
 				return RedirectToAction("Packages", new { courseId, error=errorMessage });
 			}
 			
@@ -216,6 +215,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
+		[ValidateInput(false)]
 		public ActionResult Packages(string courseId, string error="")
 		{
 			var hasPackage = courseManager.HasPackageFor(courseId);
@@ -313,7 +313,7 @@ namespace uLearn.Web.Controllers
 			filterOptions.OnlyChecked = null;
 			var allCheckingsSlidesIds = slideCheckingsRepo.GetManualCheckingQueue<T>(filterOptions).Select(c => c.SlideId).Distinct();
 
-			var emptySlideMock = new Slide(Enumerable.Empty<SlideBlock>(), new SlideInfo(null, null, -1), "", Guid.Empty, meta: null);
+			var emptySlideMock = new Slide { Info = new SlideInfo(null, null, -1), Title = "", Id = Guid.Empty};
 			var allCheckingsSlidesTitles = allCheckingsSlidesIds
 				.Select(s => new KeyValuePair<Guid, Slide>(s, course.FindSlideById(s)))
 				.Where(kvp => kvp.Value != null)
@@ -333,7 +333,7 @@ namespace uLearn.Web.Controllers
 			return View(viewName, new ManualCheckingQueueViewModel
 			{
 				CourseId = courseId,
-                /* TODO (andgein): Merge FindSlideById and GetSlideById */
+                /* TODO (andgein): Merge FindSlideById() and following GetSlideById() calls */
 				Checkings = checkings.Take(MaxShownQueueSize).Where(c => course.FindSlideById(c.SlideId) != null).Select(c =>
 				{
 					var slide = course.GetSlideById(c.SlideId);
@@ -342,7 +342,7 @@ namespace uLearn.Web.Controllers
 						CheckingQueueItem = c,
 						ContextSlideId = slide.Id,
 						ContextSlideTitle = slide.Title,
-						ContextMaxScore = (slide as ExerciseSlide)?.Exercise.MaxReviewScore ?? slide.MaxScore,
+						ContextMaxScore = (slide as ExerciseSlide)?.Scoring.CodeReviewScore ?? slide.MaxScore,
 						ContextTimestamp = c.Timestamp,
 						ContextReviews = reviews.GetOrDefault(c.Id, new List<ExerciseCodeReview>()),
 						ContextExerciseSolution = c is ManualExerciseChecking ?
@@ -638,14 +638,12 @@ namespace uLearn.Web.Controllers
 			/* and move course from version's directory to courses's directory */
 			var extractedVersionDirectory = courseManager.GetExtractedVersionDirectory(versionId);
 			var extractedCourseDirectory = courseManager.GetExtractedCourseDirectory(courseId);
-			log.Info($"Перемещаю паку с версий в папку с курсом: {extractedVersionDirectory.FullName} → {extractedCourseDirectory.FullName}");
+			log.Info($"Перемещаю папку с версией в папку с курсом: {extractedVersionDirectory.FullName} → {extractedCourseDirectory.FullName}");
 			courseManager.MoveCourse(
 				version,
 				extractedVersionDirectory,
 				extractedCourseDirectory);
 
-			log.Info($"Создаю версии тестов для курса {courseId}");
-			CreateQuizVersionsForSlides(courseId, version.Slides);
 			log.Info($"Помечаю версию {versionId} как опубликованную версию курса {courseId}");
 			await coursesRepo.MarkCourseVersionAsPublished(versionId);
 			await NotifyAboutPublishedCourseVersion(courseId, versionId, User.Identity.GetUserId());
@@ -899,7 +897,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> UpdateGroupApi(string courseId, int groupId, bool manualChecking, bool manualCheckingForOldSolutions, bool defaultProhibitFutherReview, string name=null)
+		public async Task<ActionResult> UpdateGroupApi(string courseId, int groupId, bool manualChecking, bool manualCheckingForOldSolutions, bool defaultProhibitFutherReview, bool canUsersSeeGroupProgress, string name=null)
 		{
 			var group = groupsRepo.FindGroupById(groupId);
 			if (!CanModifyGroup(group) || ! group.CourseId.EqualsIgnoreCase(courseId))
@@ -912,7 +910,7 @@ namespace uLearn.Web.Controllers
 
 			log.Info($"Обновляю группу «{group.Name}» → «{name}» (Id = {group.Id}) для курса {courseId}");
 
-			await groupsRepo.ModifyGroup(groupId, name, manualChecking, manualCheckingForOldSolutions, defaultProhibitFutherReview);
+			await groupsRepo.ModifyGroup(groupId, name, manualChecking, manualCheckingForOldSolutions, defaultProhibitFutherReview, canUsersSeeGroupProgress);
 
 			var course = courseManager.GetCourse(group.CourseId);
 			await UpdateEnabledScoringGroupsForGroup(course, groupId);
@@ -1101,6 +1099,7 @@ namespace uLearn.Web.Controllers
 					isManualCheckingEnabledForOldSolutions = group.IsManualCheckingEnabledForOldSolutions,
 					isInviteLinkEnabled = group.IsInviteLinkEnabled,
 					defaultProhibitFutherReview = group.DefaultProhibitFutherReview,
+					canUsersSeeGroupProgress = group.CanUsersSeeGroupProgress
 				},
 				members = members.Select(model => this.RenderPartialViewToString("_GroupMember", model)).ToList(),
 				enabledScoringGroups = enabledScoringGroups.Select(g => g.ScoringGroupId).ToList(),
@@ -1338,7 +1337,7 @@ namespace uLearn.Web.Controllers
 				parser.TextFieldType = FieldType.Delimited;
 				parser.SetDelimiters(",");
 				if (parser.EndOfData)
-					return View(model.WithError("Пустой файл? В файле с данными должна присутствовать строка к заголовком"));
+					return View(model.WithError("Пустой файл? В файле с данными должна присутствовать строка с заголовком"));
 
 				string[] headers;
 				try
@@ -1484,7 +1483,7 @@ namespace uLearn.Web.Controllers
 			var scoringGroup = unit.Scoring.Groups[scoringGroupId];
 			if (string.IsNullOrEmpty(score))
 			{
-				await additionalScoresRepo.RemoveAdditionalScores(courseId, unitId, userId, scoringGroupId);
+				await additionalScoresRepo.RemoveAdditionalScores(courseId, unitId, userId, scoringGroupId).ConfigureAwait(false);
 				return Json(new { status = "ok", score = "" });
 			}
 
@@ -1493,8 +1492,10 @@ namespace uLearn.Web.Controllers
 			if (scoreInt < 0 || scoreInt > scoringGroup.MaxAdditionalScore)
 				return Json(new { status = "error", error = $"Баллы должны быть от 0 до {scoringGroup.MaxAdditionalScore}" });
 
-			var additionalScore = await additionalScoresRepo.SetAdditionalScore(courseId, unitId, userId, scoringGroupId, scoreInt, User.Identity.GetUserId());
-			await NotifyAboutAdditionalScore(additionalScore);
+			var (additionalScore, oldScore) = 
+				await additionalScoresRepo.SetAdditionalScore(courseId, unitId, userId, scoringGroupId, scoreInt, User.Identity.GetUserId()).ConfigureAwait(false);
+			if (!oldScore.HasValue || oldScore.Value != scoreInt)
+				await NotifyAboutAdditionalScore(additionalScore).ConfigureAwait(false);
 
 			return Json(new { status = "ok", score = scoreInt });
 		}
@@ -1506,7 +1507,7 @@ namespace uLearn.Web.Controllers
 			if (label == null || label.OwnerId != User.Identity.GetUserId())
 				return Json(new { status = "error", message = "Label not found or not owned by you" });
 
-			await groupsRepo.AddLabelToGroup(groupId, labelId);
+			await groupsRepo.AddLabelToGroup(groupId, labelId).ConfigureAwait(false);
 			return Json(new { status = "ok" });
 		}
 		
