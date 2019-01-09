@@ -169,7 +169,7 @@ namespace uLearn.Web.Controllers
 			return user;
 		}
 
-		private async Task NotifyAbountUserJoinedToGroup(Group group, string userId)
+		private async Task NotifyAboutUserJoinedToGroup(Group group, string userId)
 		{
 			var notification = new JoinedToYourGroupNotification
 			{
@@ -189,7 +189,7 @@ namespace uLearn.Web.Controllers
 			{
 				var alreadyInGroup = await groupsRepo.AddUserToGroup(group.Id, User.Identity.GetUserId()) == null;
 				if (! alreadyInGroup)
-					await NotifyAbountUserJoinedToGroup(group, User.Identity.GetUserId());
+					await NotifyAboutUserJoinedToGroup(group, User.Identity.GetUserId());
 
 				var courseId = group.CourseId;
 

@@ -398,7 +398,7 @@ namespace uLearn.Web.Controllers
 			filterOptions.PeriodStart = periodStart;
 			filterOptions.PeriodFinish = realPeriodFinish;
 
-			var usersIds = visitsRepo.GetVisitsInPeriod(filterOptions).DistinctBy(v => v.UserId).Select(v => v.UserId);
+			var usersIds = visitsRepo.GetVisitsInPeriod(filterOptions).Select(v => v.UserId).Distinct().ToList();
 			/* If we filtered out users from one or several groups show them all */
 			if (filterOptions.UserIds != null && !filterOptions.IsUserIdsSupplement)
 				usersIds = filterOptions.UserIds;
