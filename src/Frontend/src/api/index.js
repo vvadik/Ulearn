@@ -93,18 +93,21 @@ function createRequestParams(body) {
 let api = {
 	refreshApiJwtToken: refreshApiJwtToken,
 	clearApiJwtToken: clearApiJwtToken,
+
+	request: request,
+	createRequestParams: createRequestParams,
+
 	get: get,
-	post: post,post: post,
+	post: post,
+	patch: patch,
+	put: put,
+	delete: deleteRequest,
+
 	account: account,
 	courses: courses,
 	notifications: notifications,
 	groups: groups,
 	users: users,
-	patch: patch,
-	put: put,
-	delete: deleteRequest,
-	request: request,
-	createRequestParams: createRequestParams,
 };
 
 export default api;

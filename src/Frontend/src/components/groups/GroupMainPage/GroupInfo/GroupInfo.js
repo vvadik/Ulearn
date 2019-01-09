@@ -29,7 +29,7 @@ class GroupInfo extends Component {
 					<Link className={styles["link-to-group-page"]} to={`/${this.props.courseId}/groups/${group.id}`} />
 					<div className={styles["content-block"]}>
 						<header className={styles.content}>
-							<Link to={`/${this.props.courseId}/groups/${group.id}`}>
+							<Link to={`/${this.props.courseId}/groups/${group.id}/`}>
 								<h3 className={styles["group-name"]}>{group.name}</h3>
 							</Link>
 							<div className={styles["students-count"]}>

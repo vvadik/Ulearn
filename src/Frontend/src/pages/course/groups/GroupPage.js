@@ -28,7 +28,7 @@ class GroupPage extends Component {
 
 	componentDidMount() {
 		let groupId = this.props.match.params.groupId;
-		let courseId = this.props.match.params.courseId;
+		let courseId = this.props.match.params.courseId.toLowerCase();
 
 		this.props.enterToCourse(courseId);
 
@@ -212,7 +212,7 @@ class GroupPage extends Component {
 	};
 
 	goToPrevPage = () => {
-		let courseId = this.props.match.params.courseId;
+		let courseId = this.props.match.params.courseId.toLowerCase();
 
 		this.props.history.push(`/${courseId}/groups/`);
 	};

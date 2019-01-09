@@ -17,6 +17,7 @@ class GroupListPage extends AbstractPage {
 	constructor(props) {
 		super(props);
 		this.state = {
+			courseId: this.props.match.params.courseId.toLowerCase(),
 			groups: [],
 			archiveGroups: [],
 			filter: "active",
@@ -28,13 +29,13 @@ class GroupListPage extends AbstractPage {
 	};
 
 	componentDidMount() {
-		let courseId = this.props.match.params.courseId;
+		let { courseId } = this.state;
 
-		this.loadingActiveGroups(courseId);
+		this.loadActiveGroups(courseId);
 		this.props.enterToCourse(courseId);
 	};
 
-	loadingActiveGroups = (courseId) => {
+	loadActiveGroups = (courseId) => {
 		const { loadingActive, loadedActive } = this.state;
 
 		if (loadedActive || loadingActive) {
@@ -56,8 +57,7 @@ class GroupListPage extends AbstractPage {
 		}).catch(console.error);
 	};
 
-	loadingArchivedGroups = () => {
-		let courseId = this.props.match.params.courseId;
+	loadArchivedGroups = (courseId) => {
 		const { loadingArchived, loadedArchived } = this.state;
 
 		if (loadedArchived || loadingArchived) {
@@ -80,7 +80,7 @@ class GroupListPage extends AbstractPage {
 	};
 
 	render() {
-		let courseId = this.props.match.params.courseId;
+		let { courseId } = this.state;
 		const courseById = this.props.courses.courseById;
 		const course = courseById[courseId];
 		if (course === undefined) {
@@ -118,14 +118,14 @@ class GroupListPage extends AbstractPage {
 		});
 
 		if (id === "active") {
-			this.loadingActiveGroups();
+			this.loadActiveGroups(this.state.courseId);
 		} else {
-			this.loadingArchivedGroups();
+			this.loadArchivedGroups(this.state.courseId);
 		}
 	};
 
 	addGroup = async (groupId) => {
-		let courseId = this.props.match.params.courseId;
+		let courseId = this.state.courseId;
 		const groups = this.filteredGroups;
 
 		const newGroup = await api.groups.getGroup(groupId);

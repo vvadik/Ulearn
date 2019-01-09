@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Switch, Route, BrowserRouter } from 'react-router-dom';
+import {Switch, Route, BrowserRouter, Redirect} from 'react-router-dom';
 
 import AnyPage from "./pages/AnyPage";
 import ErrorBoundary from "./components/common/ErrorBoundary";
@@ -17,6 +17,7 @@ import rootReducer from "./redux/reducers"
 import api from "./api"
 import GroupListPage from "./pages/course/groups/GroupListPage";
 import GroupPage from "./pages/course/groups/GroupPage";
+import {getQueryStringParameter} from "./utils";
 
 let loggerMiddleware = createLogger();
 
@@ -101,9 +102,12 @@ class InternalUlearnApp extends Component {
 												   // Otherwise we make two GET requests sequentially.
 												   // Unfortunately some our GET handlers are not idempotent (i.e. /Admin/CheckNextExerciseForSlide)
 						<Switch>
+							<Route path="/Admin/Groups" component={redirectLegacyPage("/:courseId/groups")} />
+
 							<Route path="/:courseId/groups/" component={GroupListPage} exact />
 							<Route path="/:courseId/groups/:groupId/" component={GroupPage} exact />
 							<Route path="/:courseId/groups/:groupId/:groupPage" component={GroupPage} exact />
+
 							<Route component={AnyPage} />
 						</Switch>
 					}
@@ -129,5 +133,17 @@ class InternalUlearnApp extends Component {
 }
 
 InternalUlearnApp = connect(InternalUlearnApp.mapStateToProps, InternalUlearnApp.mapDispatchToProps)(InternalUlearnApp);
+
+function redirectLegacyPage(to) {
+	let courseId = getQueryStringParameter("courseId");
+	if (courseId)
+		to = to.replace(":courseId", courseId);
+
+	return class extends Component {
+		render() {
+			return <Redirect to={to} />;
+		}
+	};
+}
 
 export default UlearnApp;

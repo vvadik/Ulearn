@@ -3,6 +3,7 @@ using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -687,41 +688,8 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult Groups(string courseId)
 		{
-			var userId = User.Identity.GetUserId();
-
-			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User, includeArchived: true);
-			var groupsIds = groups.Select(g => g.Id).ToList();
-
-			var course = courseManager.GetCourse(courseId);
-			var scoringGroupsCanBeSetInSomeUnit = GetScoringGroupsCanBeSetInSomeUnit(course);
-			var enabledScoringGroups = groupsRepo.GetEnabledAdditionalScoringGroups(courseId)
-				.GroupBy(e => e.GroupId)
-				.ToDictionary(g => g.Key, g => g.Select(e => e.ScoringGroupId).ToList());
-
-			var instructors = usersRepo.GetCourseInstructors(courseId, userManager, limit: 100);
-			var coursesIds = User.GetControllableCoursesId().ToList();
-			var groupsMayBeCopied = groupsRepo.GetAvailableForUserGroups(coursesIds, User).ToList();
-			
-			var labels = groupsRepo.GetLabels(userId).ToDictionary(l => l.Id, l => l);
-			var labelsOnGroups = groupsRepo.GetGroupsLabels(groupsIds);
-
-			var groupAccesses = groupsRepo.GetGroupsAccesses(groupsIds);
-
-			return View("Groups", new GroupsViewModel
-			{
-				Course = course,
-				CourseManualCheckingEnabled = course.Settings.IsManualCheckingEnabled,
-				Groups = groups,
-				CanModifyGroup = groups.ToDictionary(g => g.Id, CanModifyGroup),
-				ScoringGroupsCanBeSetInSomeUnit = scoringGroupsCanBeSetInSomeUnit,
-				EnabledScoringGroups = enabledScoringGroups,
-				Instructors = instructors,
-				GroupsMayBeCopied = groupsMayBeCopied,
-				CoursesNames = courseManager.GetCourses().ToDictionary(c => c.Id.ToLower(), c => c.Title),
-				Labels = labels,
-				LabelsOnGroups = labelsOnGroups,
-				GroupAccesses = groupAccesses,
-			});
+			/* This action is moved to react-based frontend application */
+			return Redirect($"/{courseId.ToLower(CultureInfo.InvariantCulture)}/groups");
 		}
 
 		private async Task NotifyAboutNewGroup(Group group, string initiatedUserId)

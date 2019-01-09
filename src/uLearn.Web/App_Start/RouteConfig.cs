@@ -52,17 +52,24 @@ namespace uLearn.Web
 				url: "CourseList",
 				defaults: new { controller = "Home", action = "Index" }
 			);
+			
+			/* We need to specify all controllers here.
+			   Otherwise all new, react-based routes (i.e. /basicprogramming/groups) will be routed to unknown controller ("basicprogrammingcontroller"),
+			   not to ErrorsController (next route here).*/
 			routes.MapRoute(
 				name: "Default",
 				url: "{controller}/{action}",
-				defaults: new { controller = "Home", action = "Index" }
+				defaults: new { controller = "Home", action = "Index" },
+				constraints: new { controller = @"^(Account|Admin|Analytics|AntiPlagiarism|Certificates|Comments|Course|Errors|Exercise|Feed|Grader|Hint|Home|Login|Notifications|Questions|Quiz|RestorePassword|Runner|Sandbox|SlideNavigation|Stepik|Telegram|Visits)$" }
 			);
+			
 			
 			/* After all your routes */
 			routes.MapRoute(
-				"NotFound",
-				"{*pathInfo}",
-				defaults: new { controller = "Errors", action = "Error404" });
+				name: "NotFound",
+				url: "{*pathInfo}",
+				defaults: new { controller = "Errors", action = "Error404" }
+			);
 		}
 	}
 }

@@ -245,7 +245,7 @@ class CourseMenu extends Component {
         let items = [
             <MenuItem href={"/Course/" + courseId} key="Course" component={ LinkComponent }>Просмотр курса</MenuItem>,
             <MenuSeparator key="CourseMenuSeparator1"/>,
-            <MenuItem href={"/Admin/Groups?courseId=" + courseId} key="Groups" component={ LinkComponent }>Группы</MenuItem>,
+            <MenuItem href={`/${courseId}/groups/`} key="Groups" component={ LinkComponent }>Группы</MenuItem>,
             <MenuItem href={"/Analytics/CourseStatistics?courseId=" + courseId} key="CourseStatistics" component={ LinkComponent }>Ведомость курса</MenuItem>,
             <MenuItem href={"/Analytics/UnitStatistics?courseId=" + courseId} key="UnitStatistics" component={ LinkComponent }>Ведомость модуля</MenuItem>,
             <MenuItem href={"/Admin/Certificates?courseId=" + courseId} key="Certificates" component={ LinkComponent }>Сертификаты</MenuItem>,

@@ -143,7 +143,9 @@ namespace Database.Repos.Groups
 			var groupsWithAccess = new HashSet<int>(db.GroupAccesses.Where(a => a.UserId == userId && a.IsEnabled).Select(a => a.GroupId));
 			var groups = db.Groups
 				.Include(g => g.Owner)
-				.Where(g => !g.IsDeleted && (onlyArchived ? g.IsArchived : !g.IsArchived) &&
+				.Where(g => !g.IsDeleted && 
+							(onlyArchived ? g.IsArchived : !g.IsArchived) &&
+							coursesIds.Contains(g.CourseId) &&
 							(
 								/* Course admins can see all groups */
 								coursesWhereUserCanSeeAllGroups.Contains(g.CourseId) ||
