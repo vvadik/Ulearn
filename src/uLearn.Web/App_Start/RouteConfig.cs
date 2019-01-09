@@ -57,6 +57,12 @@ namespace uLearn.Web
 				url: "{controller}/{action}",
 				defaults: new { controller = "Home", action = "Index" }
 			);
+			
+			/* After all your routes */
+			routes.MapRoute(
+				"NotFound",
+				"{*pathInfo}",
+				defaults: new { controller = "Errors", action = "Error404" });
 		}
 	}
 }
