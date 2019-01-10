@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Community.AspNetCore.ExceptionHandling;
 using Database;
 using Database.Di;
 using Database.Models;
@@ -12,14 +11,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Serilog;
-using Serilog.Events;
 using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Ulearn.Common.Api;
@@ -32,9 +28,6 @@ using Ulearn.Web.Api.Models.Binders;
 using Ulearn.Web.Api.Swagger;
 using Vostok.Commons.Extensions.UnitConvertions;
 using Vostok.Hosting;
-using Vostok.Instrumentation.AspNetCore;
-using Vostok.Logging.Serilog;
-using Vostok.Logging.Serilog.Enrichers;
 using Vostok.Metrics;
 using Web.Api.Configuration;
 using Enum = System.Enum;
@@ -68,7 +61,7 @@ namespace Ulearn.Web.Api
 				builder
 					.WithOrigins(configuration.Web.Cors.AllowOrigins)
 					.AllowAnyMethod()
-					.WithHeaders("Authorization")
+					.WithHeaders("Authorization", "Content-Type")
 					.WithExposedHeaders("Location")
 					.AllowCredentials();
 			});
