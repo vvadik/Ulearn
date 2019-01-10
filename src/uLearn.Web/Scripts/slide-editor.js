@@ -204,7 +204,7 @@ function initCodeEditor($parent) {
                         var maxLine = Math.max(range.anchor.line, range.head.line);
                         var coords = cm.cursorCoords({ line: maxLine + 1, ch: 1 }, 'page');
 
-                        if (range.anchor == range.head) {
+                        if (range.anchor === range.head) {
                             $addReviewPopup.hide();
                             return;
                         }
@@ -232,6 +232,8 @@ function initCodeEditor($parent) {
 										trigger: 'manual',
 										fallbackPlacement: 'right',
 									});
+									/* Hide all others tooltips */
+									$('.CodeMirror-selectedtext').tooltip('hide');
 									$codeMirrorSelectedText.tooltip('show');
 								}, 100);
 							}
