@@ -86,8 +86,8 @@ class GroupPage extends Component {
 
 		return (
 			<div className={styles.wrapper}>
-				<Helmet>
-					<title>{`Группа ${group.name}`}</title>
+				<Helmet defer={false}>
+					<title>Группа {group.name}</title>
 				</Helmet>
 				<div className={styles["content-wrapper"]}>
 					{ this.renderHeader() }					
