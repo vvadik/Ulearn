@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -201,8 +201,8 @@ namespace uLearn.Web.Controllers
 			{
 				AuthorId = userId,
 				TaskId = taskId
-			});
-			plagiarismsCache.AddOrUpdate(cacheKey, _key => Tuple.Create(DateTime.Now, value), (_key, _old) => Tuple.Create(DateTime.Now, value));
+			}).ConfigureAwait(false);
+			plagiarismsCache.AddOrUpdate(cacheKey, key => Tuple.Create(DateTime.Now, value), (key, old) => Tuple.Create(DateTime.Now, value));
 			return value;
 		}
 

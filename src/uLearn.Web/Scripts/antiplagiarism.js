@@ -62,11 +62,11 @@ function fetchAntiPlagiarismStatus($plagiarismStatus) {
 
 				/* Set 0 points */
 				var $exerciseScore = $('.exercise__score');
-				$exerciseScore.find('[data-value="0"]').click();
+				$exerciseScore.find('[data-value="0"]:not(.active)').click();
 				
 				/* Prohibit further review */
 				var $prohibitFurtherReview = $('#prohibitFurtherReview');
-				$prohibitFurtherReview.attr('checked', 'checked');
+				$prohibitFurtherReview.prop('checked', true);
 
 				/* Scroll to the exercise form */
 				$('.exercise__score-form').smoothScroll();

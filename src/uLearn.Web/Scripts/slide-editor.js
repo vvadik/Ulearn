@@ -32,7 +32,7 @@ window.documentReadyFunctions.push(function () {
 			});
         });
 
-        /* Trigger button clock on Ctrl + Enter, process Escape key */
+        /* Trigger button click on Ctrl + Enter, process Escape key */
         $self.find('.exercise__add-review__comment').keydown(function(e) {
             if (e.ctrlKey && e.keyCode === 13) {
                 $self.find('.exercise__add-review__button').trigger('click');
@@ -50,9 +50,27 @@ window.documentReadyFunctions.push(function () {
 
     if ($('.exercise__reviews').length > 0)
         placeCodeReviews();
+    
+    if ($('.exercise__score-form-wrapper').length > 0)
+    	setScrollHandlerForExerciseScoreForm();
 });
 
 var editorLastRange, currentReviewTextMarker, reviewsTextMarkers, exerciseCodeDoc, $exerciseCodeBlock;
+
+function setScrollHandlerForExerciseScoreForm() {
+	var $wrapper = $('.exercise__score-form-wrapper');
+	var wrapperHeight = $wrapper.outerHeight();
+	var $exerciseCodeMirror = $($exerciseCodeBlock.codeMirrorEditor.display.wrapper);
+	$(window).scroll(function(){
+		var scrollTop = $(window).scrollTop();
+		var scrollBottom = scrollTop + $(window).height();
+		var codeMirrorOffsetTop = $exerciseCodeMirror.offset().top;
+		var codeMirrorOffsetBottom = codeMirrorOffsetTop + $exerciseCodeMirror.outerHeight();
+
+		var isFixed = scrollBottom >= codeMirrorOffsetTop + wrapperHeight + 50 && scrollBottom <= codeMirrorOffsetBottom + wrapperHeight;
+		$wrapper.toggleClass('fixed', isFixed);
+	});
+}
 
 function initCodeEditor($parent) {
     if (!$parent)
@@ -66,7 +84,7 @@ function initCodeEditor($parent) {
         $exerciseCodeBlock = $('.code-review')[0];
     else
         $exerciseCodeBlock = $('.code-reviewed')[0];
-
+            
     ﻿CodeMirror.commands.autocomplete = function (cm) {        
         var hint = cm.options.langInfo.hint;
         if (hint)
@@ -86,7 +104,7 @@ function initCodeEditor($parent) {
     }
 
     function getLangInfo(langId) {
-        // see http://codemirror.net/mode/
+        /* See http://codemirror.net/mode/ for details */
 
         if (!langId)
             return { mode: "text/plain", hint: null };
@@ -175,7 +193,7 @@ function initCodeEditor($parent) {
                 lineWrapping: true,
                 extraKeys: extraKeys,
                 readOnly: !editable,
-                //autoCloseBrackets: true, // workaround: autoCloseBracket breakes indentation after for|while|...
+                //autoCloseBrackets: true, // workaround: autoCloseBracket breaks indentation after for|while|...
                 styleActiveLine: editable,
                 matchBrackets: true,
                 styleSelectedText: true,
@@ -426,7 +444,7 @@ function initCodeEditor($parent) {
         });
     }); 
     
-    /* Ecpanding code */
+    /* Expanding code */
     $('.expandable-code__button').click(function (e) {
         e.preventDefault();
         
