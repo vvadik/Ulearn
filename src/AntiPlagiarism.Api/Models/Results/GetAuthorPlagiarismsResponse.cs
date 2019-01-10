@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Ulearn.Common.Api.Models.Responses;
 
 namespace AntiPlagiarism.Api.Models.Results
 {
 	[DataContract]
-	public class GetAuthorPlagiarismsResult : ApiSuccessResult
+	public class GetAuthorPlagiarismsResponse : SuccessResponse
 	{
 		[DataMember(Name = "submissions")]
 		public List<ResearchedSubmission> ResearchedSubmissions { get; set; }
@@ -12,7 +13,7 @@ namespace AntiPlagiarism.Api.Models.Results
 		[DataMember(Name = "suspicion_levels")]
 		public SuspicionLevels SuspicionLevels { get; set; }		
 
-		public GetAuthorPlagiarismsResult()
+		public GetAuthorPlagiarismsResponse()
 		{
 			ResearchedSubmissions = new List<ResearchedSubmission>();
 		}

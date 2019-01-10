@@ -598,7 +598,7 @@ namespace uLearn.Web.Controllers
 		{
 			/* Check that one directory is not a parent of another one */
 			if (source.FullName.StartsWith(target.FullName) || target.FullName.StartsWith(source.FullName))
-				throw new Exception("Can\'t copy files recursifely from parent to child directory or from child to parent");
+				throw new Exception("Can\'t copy files recursively from parent to child directory or from child to parent");
 
 			foreach (var subDirectory in source.GetDirectories())
 				CopyFilesRecursively(subDirectory, target.CreateSubdirectory(subDirectory.Name));

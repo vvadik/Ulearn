@@ -187,7 +187,11 @@
 		var client = UlearnVideoAnnotationsClient.Instance;
 		try
 		{
-			var annotationsResponse = client.GetAnnotationsAsync(context.Course.Settings.VideoAnnotationsGoogleDoc, block.VideoId).GetAwaiter().GetResult();
+			var annotationsResponse = client.GetAnnotationsAsync(new AnnotationsParameters
+			{
+				GoogleDocId = context.Course.Settings.VideoAnnotationsGoogleDoc, 
+				VideoId = block.VideoId
+			}).GetAwaiter().GetResult();
 
 			@ShowVideoAnnotations(annotationsResponse.Annotation, context, Html);
 		}
@@ -229,7 +233,7 @@
 	var googleDocLink = context.Course.Settings.VideoAnnotationsGoogleDoc;
 	if (!string.IsNullOrEmpty(googleDocLink))
 	{
-		<div>Помогите написать <a href="https://docs.google.com/document/d/@googleDocLink" target="_blank">текстовое содержание</a> этого видео.</div>
+		<div class="suggest-video-annotations">Помогите написать <a href="https://docs.google.com/document/d/@googleDocLink" target="_blank">текстовое содержание</a> этого видео.</div>
 	}
 }
 

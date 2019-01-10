@@ -369,7 +369,7 @@ class Meta extends Component {
         meta.description = decodeHtmlEntities(meta.description);
         meta.keywords = decodeHtmlEntities(meta.keywords);
         return (
-            <Helmet>
+            <Helmet defer={false}>
                 <title>{ meta.title }</title>
                 <meta name="title" content={ meta.title }/>
                 <meta property="og:title" content={ meta.title }/>
