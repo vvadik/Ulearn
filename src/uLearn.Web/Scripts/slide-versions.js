@@ -50,12 +50,15 @@ function setExerciseVersion(versionId, showOutput) {
 		if ($scoreForm.length > 0) {
 			var submissionId = parseInt($scoreForm.data('submissionId'));
 			$scoreForm.toggle(submissionId === versionId);
+
+			/* setScrollHandlerForExerciseScoreForm() is defined in slide-editor.js */
+			setScrollHandlerForExerciseScoreForm();
 		}
+		
+		/* placeCodeReviews() is defined in slide-editor.js */        
+		placeCodeReviews();		
 
-        /* placeCodeReviews is available on slide-editor.js */
-		placeCodeReviews();
-
-        /* Fetching antiplagiarism status (fetchAntiPlagiarismStatus() is available on antiplagiarism.js) */
+        /* Fetching antiplagiarism status (fetchAntiPlagiarismStatus() is defined in antiplagiarism.js) */
         $('.antiplagiarism-status').each(function () {
             fetchAntiPlagiarismStatus($(this));
         });
