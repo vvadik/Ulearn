@@ -709,6 +709,7 @@
     <Compile Include="Controllers\JsonDataContractController.cs" />
     <Compile Include="Controllers\JsonDataContractHelpers.cs" />
     <Compile Include="Controllers\NotificationsController.cs" />
+    <Compile Include="Controllers\SpaController.cs" />
     <Compile Include="Controllers\StepikController.cs" />
     <Compile Include="Controllers\TelegramController.cs" />
     <Compile Include="Controllers\BaseUserController.cs" />
@@ -1486,7 +1487,6 @@
     <Content Include="Views\Comments\_CommentText.cshtml" />
     <Content Include="Views\Admin\Comments.cshtml" />
     <Content Include="Views\Admin\ManualQuizCheckingQueue.cshtml" />
-    <Content Include="Views\Admin\Groups.cshtml" />
     <Content Include="Views\Account\JoinGroup.cshtml" />
     <Content Include="Views\Course\CourseInstructorNavbar.cshtml" />
     <Content Include="Views\Admin\ManualExerciseCheckingQueue.cshtml" />
@@ -1535,8 +1535,6 @@
     <Content Include="Views\Stepik\UpdateOptions.cshtml" />
     <Content Include="Views\Stepik\UpdateStarted.cshtml" />
     <Content Include="Views\Stepik\Process.cshtml" />
-    <Content Include="Views\Admin\_GroupAccess.cshtml" />
-    <Content Include="Views\Admin\_GroupMember.cshtml" />
     <Content Include="Views\Account\Profile.cshtml" />
     <Content Include="Views\Shared\_Footer.cshtml" />
   </ItemGroup>
