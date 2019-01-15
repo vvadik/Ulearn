@@ -1,5 +1,5 @@
 function fetchAntiPlagiarismStatus($plagiarismStatus) {
-	let shameComment = 'Ой! Наш робот нашёл решения других студентов, подозрительно похожие на ваше. ' +
+	var shameComment = 'Ой! Наш робот нашёл решения других студентов, подозрительно похожие на ваше. ' +
 		'Так может быть, если вы позаимствовали части программы, взяли их из открытых источников либо сами поделились своим кодом. ' +
 		'Выполняйте задания самостоятельно.';
 	
@@ -19,7 +19,7 @@ function fetchAntiPlagiarismStatus($plagiarismStatus) {
             return;
         }
 
-        let className = 'found-level' + data.suspicion_level;
+        var className = 'found-level' + data.suspicion_level;
         $plagiarismStatus.addClass(className);
         $plagiarismStatusFixedCopy.addClass(className);
         var message = '';
@@ -159,7 +159,7 @@ window.documentReadyFunctions.push(function () {
         /* Setup click handlers */
         $(originalCodeMirror.getWrapperElement()).on('click', function (e) {
             var cursor = originalCodeMirror.getCursor();
-            let originalLine = cursor.line;
+            var originalLine = cursor.line;
             
             var bestMatchedLine = bestMatchedLines[originalLine];
             if (bestMatchedLine === undefined || bestMatchedLine < 0) // -2 or -1
@@ -169,7 +169,7 @@ window.documentReadyFunctions.push(function () {
         });
         $(plagiarismCodeMirror.getWrapperElement()).on('click', function (e) {
             var cursor = plagiarismCodeMirror.getCursor();
-            let plagiarismLine = cursor.line;
+            var plagiarismLine = cursor.line;
 
             var originalLine = undefined;
             $.each(bestMatchedLines, function (index, value) {
