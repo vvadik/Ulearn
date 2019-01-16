@@ -8,6 +8,7 @@ using Database.Extensions;
 using Database.Models;
 using Database.Repos;
 using Database.Repos.CourseRoles;
+using Database.Repos.SystemAccessesRepo;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -29,16 +30,18 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly SignInManager<ApplicationUser> signInManager;
 		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly ICoursesRepo coursesRepo;
+		private readonly ISystemAccessesRepo systemAccessesRepo;
 		private readonly WebApiConfiguration configuration;
 
 		public AccountController(ILogger logger, IOptions<WebApiConfiguration> options, WebCourseManager courseManager, UlearnDb db, UlearnUserManager userManager, SignInManager<ApplicationUser> signInManager,
-			ICourseRolesRepo courseRolesRepo, ICoursesRepo coursesRepo, IUsersRepo usersRepo)
+			ICourseRolesRepo courseRolesRepo, ICoursesRepo coursesRepo, IUsersRepo usersRepo, ISystemAccessesRepo systemAccessesRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.userManager = userManager;
 			this.signInManager = signInManager;
 			this.courseRolesRepo = courseRolesRepo;
 			this.coursesRepo = coursesRepo;
+			this.systemAccessesRepo = systemAccessesRepo;
 			this.configuration = options.Value;
 		}
 
@@ -49,13 +52,14 @@ namespace Ulearn.Web.Api.Controllers
 		[Authorize]
 		public async Task<ActionResult<GetMeResponse>> Me()
 		{
-			var userId = User.GetUserId();
-			var user = await userManager.FindByIdAsync(userId).ConfigureAwait(false);
+			var user = await userManager.FindByIdAsync(UserId).ConfigureAwait(false);
+			var systemAccesses = await systemAccessesRepo.GetSystemAccessesAsync(UserId).ConfigureAwait(false);
 			return new GetMeResponse
 			{
 				IsAuthenticated = true,
 				User = BuildShortUserInfo(user, discloseLogin: true),
 				AccountProblems = await GetAccountProblems(user).ConfigureAwait(false),
+				SystemAccesses = systemAccesses.Select(a => a.AccessType).ToList(),
 			};
 		}
 

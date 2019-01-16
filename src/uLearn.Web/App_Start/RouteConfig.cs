@@ -46,16 +46,17 @@ namespace uLearn.Web
 				url: "Certificate/{certificateId}/{*path}",
 				defaults: new { controller = "Certificates", action = "CertificateFile" }
 			);
-			/* For react application which can not proxy root url in devserver mode */
+			
+			/* For react application which is not able to proxy root url (/) in webpack devserver */
 			routes.MapRoute(
 				name: "CourseList",
 				url: "CourseList",
 				defaults: new { controller = "Home", action = "Index" }
 			);
 			
-			/* We need to specify all controllers here.
+			/* We should enumerate all controllers here.
 			   Otherwise all new, react-based routes (i.e. /basicprogramming/groups) will be routed to unknown controller ("basicprogrammingcontroller"),
-			   not to ErrorsController (next route here).*/
+			   not to SpaController (next route below). */
 			routes.MapRoute(
 				name: "Default",
 				url: "{controller}/{action}",
@@ -63,12 +64,11 @@ namespace uLearn.Web
 				constraints: new { controller = @"^(Account|Admin|Analytics|AntiPlagiarism|Certificates|Comments|Course|Errors|Exercise|Feed|Grader|Hint|Home|Login|Notifications|Questions|Quiz|RestorePassword|Runner|Sandbox|SlideNavigation|Stepik|Telegram|Visits)$" }
 			);
 			
-			
 			/* After all your routes */
 			routes.MapRoute(
 				name: "NotFound",
 				url: "{*pathInfo}",
-				defaults: new { controller = "Errors", action = "Error404" }
+				defaults: new { controller = "Spa", action = "IndexHtml" }
 			);
 		}
 	}

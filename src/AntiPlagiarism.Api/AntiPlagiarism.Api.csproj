@@ -11,6 +11,7 @@
     <PackageReference Include="Serilog" Version="2.7.1" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common.Api\Common.Api.csproj" />
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{3CC038A1-6AA0-49B0-9485-DB9589626BC3}</Project>
       <Name>Common</Name>

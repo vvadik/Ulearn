@@ -1,6 +1,7 @@
 ﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
 
 window.documentReadyFunctions.push(function () {
+	var $exerciseScoreFormWrapper = $('.exercise__score-form-wrapper');
 	var $exerciseScoreForm = $('.exercise__score-form');
 	var $exerciseSimpleScoreForm = $('.exercise__simple-score-form');
 	var isSimpleScoreForm = $exerciseSimpleScoreForm.length > 0;
@@ -95,6 +96,8 @@ window.documentReadyFunctions.push(function () {
 		$otherScoreInput.focus();
 		$otherScoreLink.addClass('active');
 
+		$exerciseScoreFormWrapper.removeClass('short');
+
         /* Restore prohibitFurtherReview checkbox state */
         var $checkbox = $exerciseScoreForm.closest('.exercise').find('[name="prohibitFurtherReview"]');
         $checkbox.prop('checked', $checkbox.data('initial-state'));
@@ -119,6 +122,10 @@ window.documentReadyFunctions.push(function () {
 			$otherScoreLink.removeClass('active');
 			$otherScoreInput.val(wasActive ? "" : $self.data('value'));
 			
+			/* If score form is fixed, then open full version */
+			if (!wasActive)
+				$exerciseScoreFormWrapper.removeClass('short');
+						
 			/* Clicking on button "100%" makes prohibitFurtherReview checkbox checked. */
             var $checkbox = $exerciseScoreForm.closest('.exercise').find('[name="prohibitFurtherReview"]');
 			if ($self.data('percent') === 100) {

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Database.Models;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Common;
 
@@ -16,6 +17,9 @@ namespace Ulearn.Web.Api.Models.Responses.Account
 
 		[DataMember(Name = "account_problems", EmitDefaultValue = false)]
 		public List<AccountProblem> AccountProblems { get; set; }
+		
+		[DataMember(Name = "system_accesses")]
+		public List<SystemAccessType> SystemAccesses { get; set; }
 	}
 
 	[DataContract]

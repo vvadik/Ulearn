@@ -1,10 +1,7 @@
 function fetchAntiPlagiarismStatus($plagiarismStatus) {
-	function closePopovers($plagiarismStatus, $plagiarismStatusFixedCopy) {
-		$plagiarismStatus.popover('hide');
-		$plagiarismStatus.popover('disable');
-		$plagiarismStatusFixedCopy.popover('hide');
-		$plagiarismStatusFixedCopy.popover('disable');
-	}
+	var shameComment = 'Ой! Наш робот нашёл решения других студентов, подозрительно похожие на ваше. ' +
+		'Так может быть, если вы позаимствовали части программы, взяли их из открытых источников либо сами поделились своим кодом. ' +
+		'Выполняйте задания самостоятельно.';
 	
     $plagiarismStatus.removeClass('found-level0 found-level1 found-level2');
     
@@ -22,7 +19,7 @@ function fetchAntiPlagiarismStatus($plagiarismStatus) {
             return;
         }
 
-        let className = 'found-level' + data.suspicion_level;
+        var className = 'found-level' + data.suspicion_level;
         $plagiarismStatus.addClass(className);
         $plagiarismStatusFixedCopy.addClass(className);
         var message = '';
@@ -31,56 +28,46 @@ function fetchAntiPlagiarismStatus($plagiarismStatus) {
             case 0: message = 'похожих решений не найдено'; break;
             case 1:
             case 2:
-                var singleNumberMessage = 'у {count} другого студента найдено {very} похожее решение. {link}';
-                var pluralNumberMessage = 'у {count} других студентов найдены {very} похожие решения. {link}';
+                var singleNumberMessage = 'у {count} другого студента найдено {very} похожее решение. {details_link} и {shame_link}.';
+                var pluralNumberMessage = 'у {count} других студентов найдены {very} похожие решения. {details_link} и {shame_link}.';
                 message = data.suspicious_authors_count === 1 ? singleNumberMessage : pluralNumberMessage;
                 break;
         }
         message = message.replace('{count}', data.suspicious_authors_count);
         message = message.replace('{very}', data.suspicion_level === 2 ? '<b>очень</b>' : '');
-        message = message.replace('{link}', '<a href="' + $plagiarismStatus.data('antiplagiarismDetailsUrl') + '" target="_blank">Посмотреть</a>');
+        message = message.replace('{details_link}', 'Посмотрите <a href="' + $plagiarismStatus.data('antiplagiarismDetailsUrl') + '" target="_blank">подробности</a>');
+		message = message.replace('{shame_link}', '<a class="internal-page-link antiplagiarism-shame-button" href="#">поставьте 0 баллов</a>');
         
         $plagiarismStatus.html('Проверка на списывание: ' + message);
 		$plagiarismStatusFixedCopy.html($plagiarismStatus.html());
 		
-		if (data.suspicion_level !== 0) {
-			let popoverOptions = {
-				title: 'Списано?<a class="pull-right close-popover">&times;</a>',
-				content: '<div class="antiplagiarism-status__popover"><p>Оставить комментарий студенту и поставить 0 баллов за задачу?</p><button class="btn btn-default antiplagiarism-shame-button">Списано!</button></div>',
+		if (data.suspicion_level !== 0) {			
+			$('.antiplagiarism-shame-button').tooltip({
+				title: '<div class="text-left">Нажмите, если тоже думаете, что решение списано: мы поставим за него 0 баллов и оставим студенту комментарий. Все действия обратимы.</div>',
 				html: true,
 				placement: 'bottom',
-				fallbackPlacement: 'flip',
-				trigger: 'manual',
-				animation: false,
-			};
-			$plagiarismStatus.popover(Object.assign(popoverOptions, {container: $plagiarismStatus}));
-			$plagiarismStatusFixedCopy.popover(Object.assign(popoverOptions, {container: $plagiarismStatusFixedCopy}));
-
-			$plagiarismStatus.popover('show');
-
+				fallbackPlacement: 'left',
+				trigger: 'hover',
+			});
+			
 			var $exerciseSubmission = $('.exercise__submission');
-			$exerciseSubmission.on('click', '.antiplagiarism-shame-button', function() {
+			$exerciseSubmission.on('click', '.antiplagiarism-shame-button', function(e) {
+				e.preventDefault();
+				
+				$('.antiplagiarism-shame-button').tooltip('hide');
+				
 				postExerciseCodeReview(addCodeReviewUrl, {
 					head: { line: 0, ch: 0 },
 					anchor: { line: 1, ch: 0 }
-				}, 'Ваше решение списано у другого студента. Пожалуйста, выполняйте задания самостоятельно.');
+				}, shameComment);
 
-				closePopovers($plagiarismStatus, $plagiarismStatusFixedCopy);
-				
 				/* Set 0 points */
 				var $exerciseScore = $('.exercise__score');
-				$exerciseScore.find('[data-value="0"]').click();
+				$exerciseScore.find('[data-value="0"]:not(.active)').click();
 				
 				/* Prohibit further review */
 				var $prohibitFurtherReview = $('#prohibitFurtherReview');
-				$prohibitFurtherReview.attr('checked', 'checked');
-
-				/* Scroll to the exercise form */
-				$('.exercise__score-form').smoothScroll();
-			});
-
-			$exerciseSubmission.on('click', '.popover-title .close-popover', function() {
-				closePopovers($plagiarismStatus, $plagiarismStatusFixedCopy);
+				$prohibitFurtherReview.prop('checked', true);
 			});
 		}
     });
@@ -95,20 +82,11 @@ function fetchAntiPlagiarismStatus($plagiarismStatus) {
         if (scrollTop >= plagiarismStatusOffset - headerHeight && scrollTop < codeMirrorBottom - 2 * headerHeight) {
             if (! isVisible) {                
                 $plagiarismStatusFixedCopy.show();
-                /*$plagiarismStatus.removeClass('visible-antiplagiarism-status');
-                $plagiarismStatusFixedCopy.addClass('visible-antiplagiarism-status');*/
-				$plagiarismStatus.popover('hide');
-				$plagiarismStatusFixedCopy.popover('show');
             }
         }
         else {
             if (isVisible) {
                 $plagiarismStatusFixedCopy.hide();
-
-				/*$plagiarismStatus.addClass('visible-antiplagiarism-status');
-				$plagiarismStatusFixedCopy.removeClass('visible-antiplagiarism-status');*/
-				$plagiarismStatus.popover('show');
-				$plagiarismStatusFixedCopy.popover('hide');
             }
         }
     });
@@ -179,7 +157,7 @@ window.documentReadyFunctions.push(function () {
         /* Setup click handlers */
         $(originalCodeMirror.getWrapperElement()).on('click', function (e) {
             var cursor = originalCodeMirror.getCursor();
-            let originalLine = cursor.line;
+            var originalLine = cursor.line;
             
             var bestMatchedLine = bestMatchedLines[originalLine];
             if (bestMatchedLine === undefined || bestMatchedLine < 0) // -2 or -1
@@ -189,7 +167,7 @@ window.documentReadyFunctions.push(function () {
         });
         $(plagiarismCodeMirror.getWrapperElement()).on('click', function (e) {
             var cursor = plagiarismCodeMirror.getCursor();
-            let plagiarismLine = cursor.line;
+            var plagiarismLine = cursor.line;
 
             var originalLine = undefined;
             $.each(bestMatchedLines, function (index, value) {

@@ -1,22 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Principal;
 using System.Threading.Tasks;
-using Database.Extensions;
 using Database.Models;
+using Database.Repos.Users;
 using Microsoft.EntityFrameworkCore;
 
-namespace Database.Repos
+namespace Database.Repos.SystemAccessesRepo
 {
-	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
+	/* This repo is fully migrated to .NET Core and EF Core */
 	public class SystemAccessesRepo : ISystemAccessesRepo
 	{
 		private readonly UlearnDb db;
+		private readonly IUsersRepo usersRepo;
 
-		public SystemAccessesRepo(UlearnDb db)
+		public SystemAccessesRepo(UlearnDb db, IUsersRepo usersRepo)
 		{
 			this.db = db;
+			this.usersRepo = usersRepo;
 		}
 		
 		public async Task<SystemAccess> GrantAccessAsync(string userId, SystemAccessType accessType, string grantedById)
@@ -39,9 +40,9 @@ namespace Database.Repos
 			return db.SystemAccesses.Include(a => a.GrantedBy).Single(a => a.Id == currentAccess.Id);
 		}
 
-		public bool CanRevokeAccess(string userId, IPrincipal revokedBy)
+		public bool CanRevokeAccess(string userId, ApplicationUser revokedBy)
 		{
-			return revokedBy.IsSystemAdministrator();
+			return usersRepo.IsSystemAdministrator(revokedBy);
 		}
 
 		public async Task<List<SystemAccess>> RevokeAccessAsync(string userId, SystemAccessType accessType)

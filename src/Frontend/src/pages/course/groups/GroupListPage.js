@@ -89,7 +89,7 @@ class GroupListPage extends AbstractPage {
 
 		return (
 			<div className={styles.wrapper}>
-				<Helmet>
+				<Helmet defer={false}>
 					<title>Группы в курсе {course.title.toLowerCase()}</title>
 				</Helmet>
 				<div className={styles["content-wrapper"]}>

@@ -36,7 +36,7 @@ class Header extends Component {
     render() {
         if (this.props.initializing) {
             return (
-                <div className={styles["header"]}>
+                <div className={styles["header"] + " header"}>
                     <Logo>
                         <span className={styles["visible-only-phone"]}><Icon name="Home"/></span>
                         <span className={styles["visible-at-least-tablet"]}>Ulearn.me</span>
@@ -71,8 +71,9 @@ class Header extends Component {
             courseAccesses = accessesByCourse[courseId] || [];
         }
 
+		/* Div should have class .header because some legacy javascript code uses $('.header') for calculating header height */
         return (
-            <div className={styles["header"]}>
+            <div className={styles["header"] + " header"}>
                 <Logo>
                     <span className={styles["visible-only-phone"]}><Icon name="Home"/></span>
                     <span className={styles["visible-at-least-tablet"]}>Ulearn.me</span>

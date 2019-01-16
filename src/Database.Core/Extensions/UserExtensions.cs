@@ -4,7 +4,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using Database.Models;
-using Database.Repos;
 using Database.Repos.Users;
 
 namespace Database.Extensions
@@ -13,8 +12,8 @@ namespace Database.Extensions
 	{
 		private const string courseRoleClaimType = "CourseRole";
 		
-		/* TODO (andgein): Replace to working with UserRolesRepo */
-		[Obsolete("Use UserRolesRepo.HasUserAccessToCourseAsync() instead")]
+		/* TODO (andgein): Refactor code: just call CourseRolesRepo's methods */
+		[Obsolete("Use CourseRolesRepo.HasUserAccessToCourseAsync() instead")]
 		public static bool HasAccessFor(this IPrincipal principal, string courseId, CourseRoleType minAccessLevel)
 		{
 			if (principal.IsSystemAdministrator())
@@ -25,7 +24,7 @@ namespace Database.Extensions
 			return courseRole?.Item2 <= minAccessLevel;
 		}
 
-		[Obsolete("Use UserRolesRepo.HasUserAccessToAnyCourseAsync() instead")]
+		[Obsolete("Use CourseRolesRepo.HasUserAccessToAnyCourseAsync() instead")]
 		public static bool HasAccess(this IPrincipal principal, CourseRoleType minAccessLevel)
 		{
 			if (principal.IsSystemAdministrator())

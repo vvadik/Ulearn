@@ -32,9 +32,9 @@ window.documentReadyFunctions.push(function () {
 			});
         });
 
-        /* Trigger button clock on Ctrl + Enter, process Escape key */
+        /* Trigger button click on Ctrl + Enter, also process Escape key */
         $self.find('.exercise__add-review__comment').keydown(function(e) {
-            if (e.ctrlKey && e.keyCode === 13) {
+            if (e.ctrlKey && e.keyCode === 13) { // Ctrl + Enter
                 $self.find('.exercise__add-review__button').trigger('click');
             }
             if (e.keyCode === 27) { // Escape
@@ -50,9 +50,77 @@ window.documentReadyFunctions.push(function () {
 
     if ($('.exercise__reviews').length > 0)
         placeCodeReviews();
+    
+    if ($('.exercise__score-form-wrapper').length > 0)
+    	setScrollHandlerForExerciseScoreForm();
 });
 
 var editorLastRange, currentReviewTextMarker, reviewsTextMarkers, exerciseCodeDoc, $exerciseCodeBlock;
+
+function setScrollHandlerForExerciseScoreForm() {
+	var $wrapper = $('.exercise__score-form-wrapper');
+	var wrapperHeight = $wrapper.outerHeight();
+	var $exerciseCodeMirror = $($exerciseCodeBlock.codeMirrorEditor.display.wrapper);
+	
+	var scrollHandlerForExerciseScoreForm = function(){
+		if ($wrapper.length === 0)
+			return;
+		
+		var scrollTop = $(window).scrollTop();
+		var scrollBottom = scrollTop + $(window).height();
+		var codeMirrorOffsetTop = $exerciseCodeMirror.offset().top;
+		var codeMirrorOffsetBottom = codeMirrorOffsetTop + $exerciseCodeMirror.outerHeight();
+		
+		var isShortVersion = $wrapper.hasClass('short');
+		/* 50 and 20 are hand-picked constants for smooth fixing */
+		var fixingOffset = isShortVersion ? -50 : 20;
+		var isFixed = scrollBottom >= codeMirrorOffsetTop + wrapperHeight + 50 && scrollBottom <= codeMirrorOffsetBottom + wrapperHeight + fixingOffset;
+		$wrapper.toggleClass('fixed', isFixed);
+	};
+	
+	$(window).scroll(scrollHandlerForExerciseScoreForm);
+	$(window).resize(scrollHandlerForExerciseScoreForm);
+	/* Call handler to fix score's form layout immediately after page loading */
+	scrollHandlerForExerciseScoreForm();
+}
+
+function showTooltipAboutCopyingFromCodemirror(range) {
+	if (navigator.clipboard) {
+		var minLine = Math.min(range.anchor.line, range.head.line);
+		/* Don't show tooltip on first 4 lines, it is overlapped */
+		if (minLine >= 4) {
+			if (window.codeMirrorSelectionHint)
+				clearTimeout(window.codeMirrorSelectionHint);
+
+			window.codeMirrorSelectionHint = setTimeout(function () {
+				var $codeMirrorSelectedText = $('.CodeMirror-selected:first-child').first();
+				if ($codeMirrorSelectedText.length === 0)
+					$codeMirrorSelectedText = $('.CodeMirror-selected').first();
+				
+				/* Hack: remove z-index of parent, otherwise text is overlapped tooltip */
+				$codeMirrorSelectedText.parent().css('z-index', 'auto');
+				
+				$codeMirrorSelectedText.tooltip({
+					title: 'Скопируйте выделенный текст с помощью Ctrl+C',
+					placement: 'top',
+					trigger: 'manual',
+					fallbackPlacement: 'right',
+				});
+				/* Hide all others tooltips */
+				$('.CodeMirror-selectedtext').tooltip('hide');
+				$codeMirrorSelectedText.tooltip('show');
+			}, 100);
+		}
+	}
+}
+
+function placeAddReviewPopup($addReviewPopup, internalCoords, $addReviewPopupInput) {
+	$addReviewPopup.show();
+	$addReviewPopup.offset({top: internalCoords.top, left: internalCoords.left});
+
+	$addReviewPopupInput.trigger('input');
+	$addReviewPopupInput.focus();
+}
 
 function initCodeEditor($parent) {
     if (!$parent)
@@ -66,7 +134,7 @@ function initCodeEditor($parent) {
         $exerciseCodeBlock = $('.code-review')[0];
     else
         $exerciseCodeBlock = $('.code-reviewed')[0];
-
+            
     ﻿CodeMirror.commands.autocomplete = function (cm) {        
         var hint = cm.options.langInfo.hint;
         if (hint)
@@ -86,7 +154,7 @@ function initCodeEditor($parent) {
     }
 
     function getLangInfo(langId) {
-        // see http://codemirror.net/mode/
+        /* See http://codemirror.net/mode/ for details */
 
         if (!langId)
             return { mode: "text/plain", hint: null };
@@ -156,7 +224,7 @@ function initCodeEditor($parent) {
             var langInfo = getLangInfo(langId);
             var mac = CodeMirror.keyMap.default === CodeMirror.keyMap.macDefault;
             var ctrlSpace = (mac ? "Cmd" : "Ctrl") + "-Space";
-            let extraKeys = {
+            var extraKeys = {
                 ".": function(cm) {
                     setTimeout(function() { cm.execCommand("autocomplete"); }, 100);
                     return CodeMirror.Pass;
@@ -175,7 +243,7 @@ function initCodeEditor($parent) {
                 lineWrapping: true,
                 extraKeys: extraKeys,
                 readOnly: !editable,
-                //autoCloseBrackets: true, // workaround: autoCloseBracket breakes indentation after for|while|...
+                //autoCloseBrackets: true, // workaround: autoCloseBracket breaks indentation after for|while|...
                 styleActiveLine: editable,
                 matchBrackets: true,
                 styleSelectedText: true,
@@ -195,48 +263,47 @@ function initCodeEditor($parent) {
                 editor.on("beforeSelectionChange",
                     function (cm, params) {
                         unselectAllReviews();
+					});
+                
+                /* Register mouseup handler for codemirror's div:
+                	a) show tooltip with hint only if selection is not empty
+                	b) and place review popup
+                */
+				$(editor.display.wrapper).on('mouseup', function(){
+					var codemirrorDocument = editor.getDoc();
 
-                        if (params.ranges < 1)
-                            return;
+					/* Just in case if there are several selections */
+					var range = codemirrorDocument.listSelections()[0];
+					
+					var selectedText = codemirrorDocument.getSelection();
+					if (selectedText) {						
+						showTooltipAboutCopyingFromCodemirror(range);						
+					}
+					
+					editorLastRange = range;
+					var maxLine = Math.max(range.anchor.line, range.head.line);
+					var coords = editor.cursorCoords({line: maxLine + 1, ch: 1}, 'page');
 
-                        var range = params.ranges[0];
-                        editorLastRange = range;
-                        var maxLine = Math.max(range.anchor.line, range.head.line);
-                        var coords = cm.cursorCoords({ line: maxLine + 1, ch: 1 }, 'page');
+					if (range.anchor === range.head) {
+						$addReviewPopup.hide();
+						return;
+					}
+					placeAddReviewPopup($addReviewPopup, coords, $addReviewPopupInput);
+					
+					/* Scroll window to fit add-review popup in view */
+					var $wrapper = $('.exercise__score-form-wrapper');
+					var isFixed = $wrapper.hasClass('fixed');
+					if (isFixed && coords.top + $addReviewPopup.outerHeight() >= $wrapper.offset().top) {
+						var scrollTop = $(window).scrollTop();
+						var additionalMargin = 10;
+						scrollTop += (coords.top + $addReviewPopup.outerHeight()) - $wrapper.offset().top + additionalMargin;
+						window.scrollTo({ top: scrollTop, behavior: 'smooth' });
+					}					
+				});
 
-                        if (range.anchor == range.head) {
-                            $addReviewPopup.hide();
-                            return;
-                        }
-                        $addReviewPopup.show();
-                        $addReviewPopup.offset({ top: coords.top, left: coords.left });
-
-                        $addReviewPopupInput.trigger('input');
-                        $addReviewPopupInput.focus();
-                        
-                        /* Show tooltip with hint about Ctrl+C */
-						if (navigator.clipboard) {
-							var minLine = Math.min(range.anchor.line, range.head.line);
-							/* Don't show tooltip on first 4 lines, it is overlapped */
-							if (minLine >= 4) {
-								if (window.codeMirrorSelectionHint)
-									clearTimeout(window.codeMirrorSelectionHint);
-
-								window.codeMirrorSelectionHint = setTimeout(function () {
-									var $codeMirrorSelectedText = $('.CodeMirror-selectedtext:last-child').first();
-									if ($codeMirrorSelectedText.length === 0)
-										$codeMirrorSelectedText = $('.CodeMirror-selectedtext').last();
-									$codeMirrorSelectedText.tooltip({
-										title: 'Скопируйте выделенный текст с помощью Ctrl+C',
-										placement: 'top',
-										trigger: 'manual',
-										fallbackPlacement: 'right',
-									});
-									$codeMirrorSelectedText.tooltip('show');
-								}, 100);
-							}
-						}
-                    });
+				$(editor.display.wrapper).on('mousedown', function(){
+					$addReviewPopup.hide();
+				});
             }
 
             editor.on('cursorActivity',
@@ -424,7 +491,7 @@ function initCodeEditor($parent) {
         });
     }); 
     
-    /* Ecpanding code */
+    /* Expanding code */
     $('.expandable-code__button').click(function (e) {
         e.preventDefault();
         
@@ -539,10 +606,10 @@ function refreshPreviousDraft(id) {
 		saveExerciseCodeDraft(id);
 	};
 
-	let solutions = JSON.parse(localStorage['exercise_solutions'] || '{}');
+	var solutions = JSON.parse(localStorage['exercise_solutions'] || '{}');
 
 	if (solutions[id] !== undefined && $('.code-exercise').length > 0) {
-		let codeMirrorEditor = $('.code-exercise')[0].codeMirrorEditor;
+		var codeMirrorEditor = $('.code-exercise')[0].codeMirrorEditor;
 		codeMirrorEditor.setValue(solutions[id]);
 		/* Refresh codemirror editor. See https://stackoverflow.com/questions/8349571/codemirror-editor-is-not-loading-content-until-clicked */
 		setTimeout(function () {
@@ -558,7 +625,7 @@ function saveExerciseCodeDraft(id) {
 	if (localStorage['exercise_solutions'] === undefined)
 		localStorage['exercise_solutions'] = JSON.stringify({});
 
-	let solutions = JSON.parse(localStorage['exercise_solutions']);
+	var solutions = JSON.parse(localStorage['exercise_solutions']);
 
 	if ($('.code-exercise').length > 0) {
 		solutions[id] = $('.code-exercise')[0].codeMirrorEditor.getValue();

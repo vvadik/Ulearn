@@ -1,10 +1,12 @@
 ﻿@using Database.Extensions
 @using Database.Models
+@using uLearn.Web.Controllers
 @using uLearn.Web.Extensions
 @using uLearn.Web.Views.Shared
 @using Ulearn.Common.Extensions
 @using Ulearn.Core.Extensions
 @model uLearn.Web.Controllers.AntiPlagiarismDetailsModel
+
 
 @{
 	ViewBag.Title = "Проверка на списывание";
@@ -39,7 +41,7 @@
                 </h3>
 
                 @{
-	                var submissionWeights = Model.AntiPlagiarismResult.ResearchedSubmissions
+	                var submissionWeights = Model.AntiPlagiarismResponse.ResearchedSubmissions
 		                .Where(s => submissionsByAntiPlagiarismIds.ContainsKey(s.SubmissionInfo.Id))
 		                .ToDictionary(
                             s => submissionsByAntiPlagiarismIds[s.SubmissionInfo.Id].Id,
@@ -61,7 +63,7 @@
             </div>
         </div>
         
-	    var researchedSubmission = Model.AntiPlagiarismResult.ResearchedSubmissions.FirstOrDefault(s => s.SubmissionInfo.Id == submission.AntiPlagiarismSubmissionId);
+	    var researchedSubmission = Model.AntiPlagiarismResponse.ResearchedSubmissions.FirstOrDefault(s => s.SubmissionInfo.Id == submission.AntiPlagiarismSubmissionId);
 	    const int maxPlagiarismsShown = 10;
 	    if (researchedSubmission != null && researchedSubmission.Plagiarisms.Count > 0)
 	    {
@@ -78,7 +80,7 @@
 				    continue;
 			    }
 			    
-			    if (plagiarism.Weight >= Model.AntiPlagiarismResult.SuspicionLevels.StrongSuspicion)
+			    if (plagiarism.Weight >= Model.AntiPlagiarismResponse.SuspicionLevels.StrongSuspicion)
 			    {
 				    if (!wasStrongSuspicion)
 				    {
@@ -93,7 +95,7 @@
                         </div>
 				    }
 			    } 
-			    else if (plagiarism.Weight >= Model.AntiPlagiarismResult.SuspicionLevels.FaintSuspicion && !wasFaintSuspicion)
+			    else if (plagiarism.Weight >= Model.AntiPlagiarismResponse.SuspicionLevels.FaintSuspicion && !wasFaintSuspicion)
 			    {
 				    wasFaintSuspicion = true;
 				    <div class="suspicion-level-description faint-level">

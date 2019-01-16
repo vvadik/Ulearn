@@ -30,6 +30,10 @@
     }
 }
 
+.legacy-page .antiplagiarism-status .tooltip {
+	z-index: 4;
+}
+
 .antiplagiarism-status b {
     font-weight: 600;
 }
