@@ -47,6 +47,7 @@ function fetchAntiPlagiarismStatus($plagiarismStatus) {
 				html: true,
 				placement: 'bottom',
 				fallbackPlacement: 'left',
+				trigger: 'hover',
 			});
 			
 			var $exerciseSubmission = $('.exercise__submission');
