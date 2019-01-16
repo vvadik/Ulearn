@@ -9,18 +9,19 @@
     "storybook": "start-storybook -p 9001 -c .storybook"
   },
   "dependencies": {
+    "@babel/core": "^7.0.0",
+    "@babel/plugin-proposal-class-properties": "^7.0.0",
+    "@babel/polyfill": "^7.0.0",
+    "@babel/runtime": "^7.0.0",
     "@skbkontur/react-icons": "3.1.1",
     "@skbkontur/react-ui": "0.30.0",
-    "@babel/polyfill": "^7.0.0",
     "array-from": "2.1.1",
     "autoprefixer": "9.1.5",
-    "babel-core": "6.26.3",
     "babel-eslint": "10.0.1",
-    "babel-jest": "23.6.0",
+    "babel-jest": "^23.4.2",
     "babel-loader": "8.0.4",
+    "babel-core": "7.0.0-bridge.0",
     "babel-preset-react-app": "^5.0.3",
-    "babel-plugin-transform-class-properties": "^6.24.1",
-    "babel-runtime": "6.26.0",
     "case-sensitive-paths-webpack-plugin": "2.1.2",
     "chalk": "2.4.1",
     "css-loader": "1.0.0",
@@ -64,7 +65,7 @@
     "url-loader": "1.1.1",
     "url-polyfill": "^1.1.0",
     "webpack": "4.20.2",
-    "webpack-dev-server": "3.1.9",
+    "webpack-dev-server": "^3.1.14",
     "webpack-manifest-plugin": "2.0.4",
     "whatwg-fetch": "3.0.0"
   },
@@ -86,7 +87,7 @@
       "react-app"
     ],
     "plugins": [
-      "transform-class-properties"
+      "@babel/plugin-proposal-class-properties"
     ]
   },
   "eslintConfig": {
@@ -94,17 +95,17 @@
   },
   "proxy": "https://localhost:44300",
   "devDependencies": {
-    "@storybook/react": "3.4.11",
     "@babel/preset-env": "^7.1.0",
+    "@storybook/react": "3.4.11",
     "@types/file-saver": "1.3.0",
-    "less-loader": "^4.1.0",
-    "moment": "2.22.2",
-    "moment-timezone": "0.5.23",
-    "react-copy-to-clipboard": "5.0.1",
     "@types/react": "^16.4.15",
     "html-webpack-plugin": "next",
     "less": "^3.8.1",
+    "less-loader": "^4.1.0",
     "mini-css-extract-plugin": "^0.4.3",
+    "moment": "2.22.2",
+    "moment-timezone": "0.5.23",
+    "react-copy-to-clipboard": "5.0.1",
     "uglifyjs-webpack-plugin": "latest"
   }
 }
