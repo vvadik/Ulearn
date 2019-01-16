@@ -70,12 +70,16 @@ function setScrollHandlerForExerciseScoreForm() {
 		var scrollBottom = scrollTop + $(window).height();
 		var codeMirrorOffsetTop = $exerciseCodeMirror.offset().top;
 		var codeMirrorOffsetBottom = codeMirrorOffsetTop + $exerciseCodeMirror.outerHeight();
-
-		var isFixed = scrollBottom >= codeMirrorOffsetTop + wrapperHeight + 50 && scrollBottom <= codeMirrorOffsetBottom + wrapperHeight + 20;
+		
+		var isShortVersion = $wrapper.hasClass('short');
+		/* 50 and 20 are hand-picked constants for smooth fixing */
+		var fixingOffset = isShortVersion ? -50 : 20;
+		var isFixed = scrollBottom >= codeMirrorOffsetTop + wrapperHeight + 50 && scrollBottom <= codeMirrorOffsetBottom + wrapperHeight + fixingOffset;
 		$wrapper.toggleClass('fixed', isFixed);
 	};
 	
 	$(window).scroll(scrollHandlerForExerciseScoreForm);
+	$(window).resize(scrollHandlerForExerciseScoreForm);
 	/* Call handler to fix score's form layout immediately after page loading */
 	scrollHandlerForExerciseScoreForm();
 }
@@ -89,9 +93,13 @@ function showTooltipAboutCopyingFromCodemirror(range) {
 				clearTimeout(window.codeMirrorSelectionHint);
 
 			window.codeMirrorSelectionHint = setTimeout(function () {
-				var $codeMirrorSelectedText = $('.CodeMirror-selectedtext:last-child').first();
+				var $codeMirrorSelectedText = $('.CodeMirror-selected:first-child').first();
 				if ($codeMirrorSelectedText.length === 0)
-					$codeMirrorSelectedText = $('.CodeMirror-selectedtext').last();
+					$codeMirrorSelectedText = $('.CodeMirror-selected').first();
+				
+				/* Hack: remove z-index of parent, otherwise text is overlapped tooltip */
+				$codeMirrorSelectedText.parent().css('z-index', 'auto');
+				
 				$codeMirrorSelectedText.tooltip({
 					title: 'Скопируйте выделенный текст с помощью Ctrl+C',
 					placement: 'top',
@@ -107,26 +115,8 @@ function showTooltipAboutCopyingFromCodemirror(range) {
 }
 
 function placeAddReviewPopup($addReviewPopup, internalCoords, $addReviewPopupInput) {
-	/* We should select: is popup will be on the top or on the bottom?
-	   First of all we will try to open it below,
-	   but it's overlapped with score form, we will open it above
-	*/
-	var $scoreFormWrapper = $('.exercise__score-form-wrapper');
-	var scoreFormTop = $scoreFormWrapper.position().top;
-	var above = false; /* Default option: put popup below */
-	
-	var potentialPopupBottom = $scoreFormWrapper.offset().top + internalCoords.top + $addReviewPopup.outerHeight();
-	if (potentialPopupBottom >= scoreFormTop)
-		above = true;	
-	
-	// TODO TODO TODO TODO
-	above = false;
-	
 	$addReviewPopup.show();
-	if (above)
-		$addReviewPopup.offset({top: internalCoords.top - $addReviewPopup.outerHeight() - 20, left: internalCoords.left}); // 20 is margin for current line
-	else
-		$addReviewPopup.offset({top: internalCoords.top, left: internalCoords.left});
+	$addReviewPopup.offset({top: internalCoords.top, left: internalCoords.left});
 
 	$addReviewPopupInput.trigger('input');
 	$addReviewPopupInput.focus();
@@ -273,34 +263,47 @@ function initCodeEditor($parent) {
                 editor.on("beforeSelectionChange",
                     function (cm, params) {
                         unselectAllReviews();
-						
-                        if (params.ranges < 1)
-                            return;
-
-                        var range = params.ranges[0];
-						editorLastRange = range;
-						var maxLine = Math.max(range.anchor.line, range.head.line);
-						var coords = cm.cursorCoords({line: maxLine + 1, ch: 1}, 'page');
-
-						if (range.anchor === range.head) {
-							$addReviewPopup.hide();
-							return;
-						}
-						placeAddReviewPopup($addReviewPopup, coords, $addReviewPopupInput);
 					});
                 
-                /* Register mouseup handler for codemirror's div: show tooltip with hint only if selection is not empty */
+                /* Register mouseup handler for codemirror's div:
+                	a) show tooltip with hint only if selection is not empty
+                	b) and place review popup
+                */
 				$(editor.display.wrapper).on('mouseup', function(){
 					var codemirrorDocument = editor.getDoc();
 
 					/* Just in case if there are several selections */
-					var primarySelection = codemirrorDocument.listSelections()[0];
+					var range = codemirrorDocument.listSelections()[0];
 					
 					var selectedText = codemirrorDocument.getSelection();
 					if (selectedText) {						
-						showTooltipAboutCopyingFromCodemirror(primarySelection);						
+						showTooltipAboutCopyingFromCodemirror(range);						
 					}
-				});                
+					
+					editorLastRange = range;
+					var maxLine = Math.max(range.anchor.line, range.head.line);
+					var coords = editor.cursorCoords({line: maxLine + 1, ch: 1}, 'page');
+
+					if (range.anchor === range.head) {
+						$addReviewPopup.hide();
+						return;
+					}
+					placeAddReviewPopup($addReviewPopup, coords, $addReviewPopupInput);
+					
+					/* Scroll window to fit add-review popup in view */
+					var $wrapper = $('.exercise__score-form-wrapper');
+					var isFixed = $wrapper.hasClass('fixed');
+					if (isFixed && coords.top + $addReviewPopup.outerHeight() >= $wrapper.offset().top) {
+						var scrollTop = $(window).scrollTop();
+						var additionalMargin = 10;
+						scrollTop += (coords.top + $addReviewPopup.outerHeight()) - $wrapper.offset().top + additionalMargin;
+						window.scrollTo({ top: scrollTop, behavior: 'smooth' });
+					}					
+				});
+
+				$(editor.display.wrapper).on('mousedown', function(){
+					$addReviewPopup.hide();
+				});
             }
 
             editor.on('cursorActivity',

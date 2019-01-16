@@ -47,6 +47,7 @@ function fetchAntiPlagiarismStatus($plagiarismStatus) {
 				html: true,
 				placement: 'bottom',
 				fallbackPlacement: 'left',
+				trigger: 'hover',
 			});
 			
 			var $exerciseSubmission = $('.exercise__submission');
@@ -67,9 +68,6 @@ function fetchAntiPlagiarismStatus($plagiarismStatus) {
 				/* Prohibit further review */
 				var $prohibitFurtherReview = $('#prohibitFurtherReview');
 				$prohibitFurtherReview.prop('checked', true);
-
-				/* Scroll to the exercise form */
-				$('.exercise__score-form').smoothScroll();
 			});
 		}
     });
