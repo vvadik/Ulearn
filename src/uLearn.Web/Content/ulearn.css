@@ -2159,7 +2159,7 @@ h1 .copy-group-link {
 /* Code review */
 .legacy-page .exercise__add-review {
 	position: absolute;
-	z-index: 10;
+	z-index: 4;
 	background-color: white;
 	padding: 10px;
 	border: 1px solid #ccc;
@@ -2485,11 +2485,12 @@ h1 .copy-group-link {
 	bottom: 0;
 	position: fixed;
 	z-index: 10;
-	padding-top: 10px;
+	padding-top: 1px;
 	box-shadow: 0px -4px 4px -4px rgba(0, 0, 0, 0.48);
 	width: 1214px;
 	margin-left: -20px;
 	padding-left: 5px;
+	padding-right: 9px;
 }
 
 @media (max-width: 768px) {
@@ -2500,6 +2501,20 @@ h1 .copy-group-link {
 	.legacy-page .exercise__score-form-wrapper.fixed {
 		width: 100%;
 	}
+}
+
+.legacy-page .exercise__score-form-wrapper.fixed.short {
+	padding-bottom: 10px;
+}
+
+.legacy-page .exercise__score-form-wrapper.fixed.short .hide-on-short {
+	display: none;
+	transition: all 0.5s ease;
+}
+
+.legacy-page .exercise__review-selection-hint {
+	float: right;
+	margin-right: 265px;
 }
 
 .legacy-page .manual-checkings-left {
@@ -2639,6 +2654,10 @@ h1 .copy-group-link {
 	position: relative;
 	top: -10px;
 	padding: 30px 0;
+}
+
+.legacy-page .exercise .CodeMirror-selected + .tooltip {
+	z-index: 4;
 }
 
 /* Certificates */
