@@ -80,19 +80,23 @@ class GroupStudents extends Component {
 
 		return (
 			<div>
-				{students.map(item =>
-					<div className={styles["student-block"]}
-						 key={item.user.id}>
-						<Checkbox
-							checked={studentIds.has(item.user.id) || false}
-							onChange={(_, value) => this.onCheckStudent(item.user.id, _, value)}>
-							<Avatar user={item.user} size='small' />
-							{ item.user.visible_name } <span className={styles["action-text"]}>
-								{ `${ getGenderForm(item.user.gender, 'вступила', 'вступил') }
-								${ moment(grantTime(item.adding_time)).fromNow() }` }</span>
-						</Checkbox>
-					</div>
-				)}
+				{students
+					.sort((a, b) => a.user.visible_name.localeCompare(b.user.visible_name))
+					.map(item =>
+						<div className={styles["student-block"]}
+							 key={item.user.id}>
+							<Checkbox
+								checked={studentIds.has(item.user.id) || false}
+								onChange={(_, value) => this.onCheckStudent(item.user.id, _, value)}>
+								<Avatar user={item.user} size='small' />
+								{ item.user.visible_name }
+								{ item.adding_time && <span className={styles["action-text"]}>
+									{ `${ getGenderForm(item.user.gender, 'вступила', 'вступил') }
+									${ moment(grantTime(item.adding_time)).fromNow() }` }</span> }
+							</Checkbox>
+						</div>
+					)
+				}
 			</div>
 		)
 	}

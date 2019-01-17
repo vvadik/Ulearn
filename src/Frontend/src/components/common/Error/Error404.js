@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import styles from "./style.less";
 
-class Catch404 extends Component {
+class Error404 extends Component {
 	render() {
 		return (
 			<div className={styles.wrapper}>
@@ -22,4 +22,4 @@ class Catch404 extends Component {
 	}
 }
 
-export default Catch404;
+export default Error404;

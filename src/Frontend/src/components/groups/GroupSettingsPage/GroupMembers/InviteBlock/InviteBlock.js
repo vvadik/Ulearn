@@ -41,7 +41,7 @@ class InviteBlock extends Component {
 		return (
 			<div className={styles["invite-link"]}>
 				<div className={styles["invite-link-text"]}>
-					<CopyToClipboard text={`https://ulearn.me/Account/JoinGroup?hash=${group.invite_hash}`}>
+					<CopyToClipboard text={`${window.location.origin}/Account/JoinGroup?hash=${group.invite_hash}`}>
 						<Button use="link" icon={<LinkIcon />} onClick={() => Toast.push('Ссылка скопирована')}>
 							Скопировать ссылку
 						</Button>

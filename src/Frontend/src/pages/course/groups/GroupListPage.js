@@ -17,7 +17,6 @@ class GroupListPage extends AbstractPage {
 	constructor(props) {
 		super(props);
 		this.state = {
-			courseId: this.props.match.params.courseId.toLowerCase(),
 			groups: [],
 			archiveGroups: [],
 			filter: "active",
@@ -28,11 +27,13 @@ class GroupListPage extends AbstractPage {
 		}
 	};
 
-	componentDidMount() {
-		let { courseId } = this.state;
+	get courseId() {
+		return this.props.match.params.courseId.toLowerCase();
+	}
 
-		this.loadActiveGroups(courseId);
-		this.props.enterToCourse(courseId);
+	componentDidMount() {
+		this.loadActiveGroups(this.courseId);
+		this.props.enterToCourse(this.courseId);
 	};
 
 	loadActiveGroups = (courseId) => {
@@ -50,11 +51,16 @@ class GroupListPage extends AbstractPage {
 			.then(json => {
 			let groups = json.groups;
 			this.setState({
-				loadingActive: false,
 				loadedActive: true,
 				groups,
 			});
-		}).catch(console.error);
+		})
+			.catch(console.error)
+			.finally(() =>
+				this.setState({
+					loadingActive: false,
+				})
+			)
 	};
 
 	loadArchivedGroups = (courseId) => {
@@ -72,18 +78,23 @@ class GroupListPage extends AbstractPage {
 			.then(json => {
 			let archiveGroups = json.groups;
 			this.setState({
-				loadingArchived: false,
 				loadedArchived: true,
 				archiveGroups,
 			});
-		}).catch(console.error);
+		})
+			.catch(console.error)
+			.finally(() =>
+				this.setState({
+					loadingArchived: false,
+				})
+			)
 	};
 
 	render() {
-		let { courseId } = this.state;
 		const courseById = this.props.courses.courseById;
-		const course = courseById[courseId];
-		if (course === undefined) {
+		const course = courseById[this.courseId];
+
+		if (!course) {
 			return;
 		}
 
@@ -101,7 +112,7 @@ class GroupListPage extends AbstractPage {
 						groups={this.state.groups}
 					/>
 					<GroupList
-						courseId={courseId}
+						courseId={this.courseId}
 						groups={this.filteredGroups}
 						deleteGroup={this.deleteGroup}
 						toggleArchived={this.toggleArchived}
@@ -118,23 +129,21 @@ class GroupListPage extends AbstractPage {
 		});
 
 		if (id === "active") {
-			this.loadActiveGroups(this.state.courseId);
+			this.loadActiveGroups(this.courseId);
 		} else {
-			this.loadArchivedGroups(this.state.courseId);
+			this.loadArchivedGroups(this.courseId);
 		}
 	};
 
 	addGroup = async (groupId) => {
-		let courseId = this.state.courseId;
 		const groups = this.filteredGroups;
-
 		const newGroup = await api.groups.getGroup(groupId);
 
 		this.setState({
 			groups: [newGroup, ...groups],
 		});
 
-		this.props.history.push(`/${courseId}/groups/${groupId}`);
+		this.props.history.push(`/${this.courseId}/groups/${groupId}`);
 	};
 
 	get filteredGroups() {

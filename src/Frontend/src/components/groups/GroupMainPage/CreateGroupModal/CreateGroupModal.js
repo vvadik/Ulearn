@@ -81,11 +81,15 @@ class CreateGroupModal extends Component {
 		}
 
 		this.setState({ loading: true, });
-		const newGroup = await api.groups.createGroup(courseId, name);
-		this.setState({ loading: false, });
-
-		onCloseModal();
-		onSubmit(newGroup.id);
+		try {
+			const newGroup = await api.groups.createGroup(courseId, name);
+			onCloseModal();
+			onSubmit(newGroup.id);
+		} catch(e) {
+			console.error(e);
+		} finally {
+			this.setState({ loading: false, });
+		}
 	};
 
 	checkError = () => {

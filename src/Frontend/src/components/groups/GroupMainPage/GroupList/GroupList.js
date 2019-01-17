@@ -11,14 +11,16 @@ class GroupList extends Component {
 			<section className={styles.wrapper}>
 				<Loader type="big" active={this.props.loading}>
 					<div className={styles.content}>
-						{ this.props.groups && this.props.groups.map(group =>
-							<GroupInfo
-								key={group.id}
-								courseId={this.props.courseId}
-								group={group}
-								deleteGroup={this.props.deleteGroup}
-								toggleArchived={this.props.toggleArchived}
-							/>)
+						{ this.props.groups && this.props.groups
+							.sort((a, b) => a.name.localeCompare(b.name))
+							.map(group =>
+								<GroupInfo
+									key={group.id}
+									courseId={this.props.courseId}
+									group={group}
+									deleteGroup={this.props.deleteGroup}
+									toggleArchived={this.props.toggleArchived}
+								/>)
 						}
 					</div>
 				</Loader>

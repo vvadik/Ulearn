@@ -116,24 +116,26 @@ class GroupMembers extends Component {
 
 		const grantTime = (grantTime) => moment(grantTime).format();
 
-		return (accesses.map(item =>
-			<React.Fragment
-				key={item.user.id}>
-				<div className={styles["teacher-block"]}>
-					<Avatar user={item.user} size='big' />
-					<div className={styles["teacher-name"]}>
-						<div>{item.user.visible_name}</div>
-						<span className={styles["teacher-status"]}>
-							Полный доступ { `${getGenderForm(owner.gender, 'предоставила', 'предоставил') }
-							${item.granted_by.visible_name} ${moment(grantTime(item.grant_time)).fromNow()}` }
-						</span>
+		return (accesses
+			.sort((a, b) => a.user.visible_name.localeCompare(b.user.visible_name))
+			.map(item =>
+				<React.Fragment
+					key={item.user.id}>
+					<div className={styles["teacher-block"]}>
+						<Avatar user={item.user} size='big' />
+						<div className={styles["teacher-name"]}>
+							<div>{item.user.visible_name}</div>
+							<span className={styles["teacher-status"]}>
+								Полный доступ { `${getGenderForm(owner.gender, 'предоставила', 'предоставил') }
+								${item.granted_by.visible_name} ${moment(grantTime(item.grant_time)).fromNow()}` }
+							</span>
+						</div>
+						<div className={styles["teacher-action"]}>
+							{((group.owner.id === userId) || (role === 'courseAdmin')) && this.renderKebab(item)}
+						</div>
 					</div>
-					<div className={styles["teacher-action"]}>
-						{((group.owner.id === userId) || (role === 'courseAdmin')) && this.renderKebab(item)}
-					</div>
-				</div>
-			</React.Fragment>
-			)
+				</React.Fragment>
+				)
 		)
 	};
 

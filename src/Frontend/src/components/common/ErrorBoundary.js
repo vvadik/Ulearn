@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 
 import styles from './Header.less';
+import Toast from "@skbkontur/react-ui/components/Toast/Toast";
 
 /* It's error boundary for React 16 and above. It supports Raven from sentry.io.
  * See https://github.com/getsentry/raven-js/blob/master/docs/integrations/react.rst and
@@ -23,17 +24,19 @@ class ErrorBoundary extends Component {
         if (this.state.error) {
             /* render fallback UI */
             return (
-                <div
-                    className={styles["error"]}
-                    onClick={() => Raven.lastEventId() && Raven.showReportDialog()}>
-                    <p>We're sorry — something's gone wrong.</p>
-                    <p>Our team has been notified, but click here fill out a report.</p>
-                </div>
+            	<React.Fragment>
+					<div
+						className={styles["error"]}
+						onClick={() => Raven.lastEventId() && Raven.showReportDialog()}>
+						<p>We're sorry — something's gone wrong.</p>
+						<p>Our team has been notified, but click here fill out a report.</p>
+					</div>
+					{ Toast.push('Что-то пошло не так. Попробуйте перезагрузить страницу.') }
+				</React.Fragment>
             );
-        } else {
-            /* when there's not an error, render children untouched */
-            return this.props.children;
         }
+		/* when there's not an error, render children untouched */
+		return this.props.children;
     }
 }
 

@@ -8,6 +8,11 @@ import * as users from "./users"
 
 const API_JWT_TOKEN_UPDATED = 'API_JWT_TOKEN_UPDATED';
 let apiJwtToken = '';
+let serverErrorHandler = () => {};
+
+function setServerErrorHandler(handler) {
+	serverErrorHandler = handler;
+}
 
 function refreshApiJwtToken() {
     return fetch(config.api.endpoint + 'account/token', { credentials: 'include', method: 'POST' })
@@ -33,24 +38,35 @@ function clearApiJwtToken() {
 	apiJwtToken = ''
 }
 
+class ApiError extends Error {
+	constructor(message, response) {
+		super(message);
+		this.response = response;
+	}
+}
+
 function request(url, options, isRetry) {
     options = options || {};
     options.credentials = options.credentials || 'include';
     options.headers = options.headers || {};
     options.headers['Authorization'] = 'Bearer ' + apiJwtToken;
     return fetch(config.api.endpoint + url, options)
-        .then(response => {
+		.then(response => {
             if (response.status >= 200 && response.status < 300)
-                return Promise.resolve(response);
-            if (response.status === 401 && ! isRetry)
+                return response;
+            if (response.status === 401 && !isRetry)
                 return refreshApiJwtToken();
-            return Promise.reject(response);
+			if (response.status >= 500)
+				serverErrorHandler();
+
+			throw new ApiError("Api error", response);
         })
         .then(value => {
             if (value === API_JWT_TOKEN_UPDATED)
                 return request(url, options, true);
-            return Promise.resolve(value.json());
-        });
+
+            return value.json();
+        })
 }
 
 function get(url, options) {
@@ -93,6 +109,7 @@ function createRequestParams(body) {
 let api = {
 	refreshApiJwtToken: refreshApiJwtToken,
 	clearApiJwtToken: clearApiJwtToken,
+	setServerErrorHandler: serverErrorHandler,
 
 	request: request,
 	createRequestParams: createRequestParams,

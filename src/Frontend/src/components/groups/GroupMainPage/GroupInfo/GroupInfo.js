@@ -21,7 +21,7 @@ class GroupInfo extends Component {
 		const studentsCount = group.students_count || 0;
 		const pluralFormOfStudents = getPluralForm(studentsCount, 'студент', 'студента', 'студентов');
 		const isCodeReviewEnabled = group.is_manual_checking_enabled;
-		const isProgressEnabled = group.can_users_see_group_progress;
+		const isProgressEnabled = group.can_students_see_group_progress;
 
 		return (
 			<div className={styles.wrapper}>

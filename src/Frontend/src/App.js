@@ -15,6 +15,7 @@ import "./common.less"
 
 import rootReducer from "./redux/reducers"
 import api from "./api"
+import Toast from "@skbkontur/react-ui/components/Toast/Toast";
 import GroupListPage from "./pages/course/groups/GroupListPage";
 import GroupPage from "./pages/course/groups/GroupPage";
 import {getQueryStringParameter} from "./utils";
@@ -55,6 +56,7 @@ setInterval(() => {
         store.dispatch(api.notifications.getNotificationsCount(store.getState().notifications.lastTimestamp))
 }, 60 * 1000);
 
+api.setServerErrorHandler(() => Toast.push('Произошла ошибка. Попробуйте перезагрузить страницу.'));
 
 class UlearnApp extends Component {
     render() {
@@ -73,7 +75,7 @@ class InternalUlearnApp extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            initializing: true
+            initializing: true,
         }
     }
 
