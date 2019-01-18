@@ -103,6 +103,7 @@ namespace uLearn.Web
 				"~/Scripts/antiplagiarism.js",
 				"~/Scripts/style-errors-settings.js",
 				"~/Scripts/exercise/student-submissions.js",
+				"~/Scripts/react-renderer.js",
 			};
 		}
 

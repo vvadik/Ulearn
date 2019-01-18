@@ -1244,6 +1244,7 @@
     <Content Include="Scripts\notifications.js" />
     <Content Include="Scripts\notify-custom.min.js" />
     <Content Include="Scripts\profile.js" />
+    <Content Include="Scripts\react-renderer.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.matchmedia.addListener.js" />
     <Content Include="Scripts\respond.min.js" />
