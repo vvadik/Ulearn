@@ -38,13 +38,6 @@ function clearApiJwtToken() {
 	apiJwtToken = ''
 }
 
-class ApiError extends Error {
-	constructor(message, response) {
-		super(message);
-		this.response = response;
-	}
-}
-
 function request(url, options, isRetry) {
     options = options || {};
     options.credentials = options.credentials || 'include';
@@ -59,7 +52,7 @@ function request(url, options, isRetry) {
 			if (response.status >= 500)
 				serverErrorHandler();
 
-			throw new ApiError("Api error", response);
+			return Promise.reject(response);
         })
         .then(value => {
             if (value === API_JWT_TOKEN_UPDATED)
