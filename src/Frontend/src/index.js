@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import UlearnApp from './App';
-// import registerServiceWorker from './registerServiceWorker';
-import { DEFAULT_TIMEZONE } from './consts/general'
+import { DEFAULT_TIMEZONE } from './consts/general';
+import "./externalComponentRenderer";
 
 import moment from "moment";
 import 'moment/locale/ru';
@@ -14,8 +14,15 @@ ReactDOM.render((
     <UlearnApp />
 ), document.getElementById('root'));
 
-// registerServiceWorker();
 
+
+/* TODO (andgein):
+* Replace with
+*
+* import { unregister } from './registerServiceWorker';
+* unregister()
+*
+* in future. */
 function unregisterServiceWorker() {
 	if (window.navigator && navigator.serviceWorker) {
 		navigator.serviceWorker.getRegistrations()
@@ -26,5 +33,4 @@ function unregisterServiceWorker() {
 			});
 	}
 }
-
 unregisterServiceWorker();

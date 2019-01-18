@@ -109,7 +109,7 @@ function createRequestParams(body) {
 let api = {
 	refreshApiJwtToken: refreshApiJwtToken,
 	clearApiJwtToken: clearApiJwtToken,
-	setServerErrorHandler: serverErrorHandler,
+	setServerErrorHandler: setServerErrorHandler,
 
 	request: request,
 	createRequestParams: createRequestParams,
