@@ -4,6 +4,7 @@ const initialAccountState = {
     isAuthenticated: false,
     isSystemAdministrator: false,
     accountProblems: [],
+	system_accesses: [],
     roleByCourse: {},
     accessesByCourse: {}
 };
@@ -20,6 +21,7 @@ function account(state = initialAccountState, action) {
                 newState.lastName = action.lastName;
                 newState.visibleName = action.visibleName;
                 newState.accountProblems = action.accountProblems;
+                newState.systemAccesses = action.systemAccesses;
             }
             return newState;
         case 'ACCOUNT__USER_ROLES_UPDATED':

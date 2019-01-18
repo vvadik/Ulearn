@@ -79,6 +79,7 @@ class GroupPage extends Component {
 		}
 
 		let rolesByCourse = this.props.account.roleByCourse;
+		let systemAccesses = this.props.account.systemAccesses;
 		let courseRole = '';
 
 		if (this.props.account.isSystemAdministrator) {
@@ -104,6 +105,8 @@ class GroupPage extends Component {
 								courseId={courseId}
 								userId={userId}
 								role={courseRole}
+								isSysAdmin={this.props.account.isSystemAdministrator}
+								systemAccesses={systemAccesses}
 								group={group}
 								onChangeGroupOwner={this.onChangeGroupOwner} />
 						}

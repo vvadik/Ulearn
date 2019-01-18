@@ -8,6 +8,7 @@ import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
 import Icon from "@skbkontur/react-icons";
 import Avatar from "../Avatar/Avatar";
 import CopyStudentsModal from "../CopyStudentsModal/CopyStudentsModal";
+import Profile from '../Profile';
 import getGenderForm from "../../../../../utils/getGenderForm";
 
 import styles from './style.less';
@@ -74,7 +75,7 @@ class GroupStudents extends Component {
 	}
 
 	renderStudents() {
-		const { students } = this.props;
+		const { students, systemAccesses, isSysAdmin } = this.props;
 		const { studentIds } = this.state;
 		const grantTime = (grantTime) => moment(grantTime).format();
 
@@ -89,8 +90,10 @@ class GroupStudents extends Component {
 								checked={studentIds.has(item.user.id) || false}
 								onChange={(_, value) => this.onCheckStudent(item.user.id, _, value)}>
 								<Avatar user={item.user} size='small' />
-								{ item.user.visible_name }
-								{ item.adding_time && <span className={styles["action-text"]}>
+								<Profile
+									user={item.user}
+									systemAccesses={systemAccesses}
+									isSysAdmin={isSysAdmin} /> { item.adding_time && <span className={styles["action-text"]}>
 									{ `${ getGenderForm(item.user.gender, 'вступила', 'вступил') }
 									${ moment(grantTime(item.adding_time)).fromNow() }` }</span> }
 							</Checkbox>
@@ -153,5 +156,8 @@ GroupStudents.propTypes = {
 	students: PropTypes.array,
 	group: PropTypes.object,
 	onDeleteStudents: PropTypes.func,
+	isSysAdmin: PropTypes.bool,
+	systemAccesses: PropTypes.array,
 };
+
 export default GroupStudents;

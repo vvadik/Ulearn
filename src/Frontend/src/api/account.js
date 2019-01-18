@@ -17,7 +17,8 @@ export function getCurrentUser() {
                         firstName: user.first_name,
                         lastName: user.last_name,
                         visibleName: user.visible_name,
-                        accountProblems: json.account_problems
+                        accountProblems: json.account_problems,
+						systemAccesses: json.system_accesses,
                     });
                     dispatch(api.account.getRoles());
                 }

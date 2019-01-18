@@ -12,6 +12,7 @@ import ComboboxInstructorsSearch from "./Combobox/ComboboxInstructorsSearch";
 import Avatar from "./Avatar/Avatar";
 import GroupStudents from "./GroupStudents/GroupStudents";
 import InviteBlock from "./InviteBlock/InviteBlock";
+import Profile from './Profile';
 import getGenderForm from "../../../../utils/getGenderForm";
 
 import styles from './style.less';
@@ -72,6 +73,8 @@ class GroupMembers extends Component {
 			return null;
 		}
 
+		const { systemAccesses, isSysAdmin } = this.props;
+
 		return (
 			<div className={styles.wrapper}>
 				<div className={styles.teachers}>
@@ -84,8 +87,10 @@ class GroupMembers extends Component {
 						<div className={styles["teacher-block"]}>
 							<Avatar user={owner} size='big' />
 							<div className={styles["teacher-name"]}>
-								<div>{ owner.visible_name }</div>
-								<span className={styles["teacher-status"]}>Владелец</span>
+								<Profile
+									user={owner}
+									systemAccesses={systemAccesses}
+									isSysAdmin={isSysAdmin} /> <span className={styles["teacher-status"]}>Владелец</span>
 							</div>
 						</div>
 						{ (accesses.length > 0) && this.renderTeachers() }
@@ -99,6 +104,8 @@ class GroupMembers extends Component {
 						<div className={styles["students-list"]}>
 							{(students.length >0) &&
 							<GroupStudents
+								isSysAdmin={isSysAdmin}
+								systemAccesses={systemAccesses}
 								students={students}
 								group={group}
 								onDeleteStudents={this.onDeleteStudents}/>}
@@ -116,6 +123,8 @@ class GroupMembers extends Component {
 
 		const grantTime = (grantTime) => moment(grantTime).format();
 
+		const { systemAccesses, isSysAdmin } = this.props;
+
 		return (accesses
 			.sort((a, b) => a.user.visible_name.localeCompare(b.user.visible_name))
 			.map(item =>
@@ -124,8 +133,10 @@ class GroupMembers extends Component {
 					<div className={styles["teacher-block"]}>
 						<Avatar user={item.user} size='big' />
 						<div className={styles["teacher-name"]}>
-							<div>{item.user.visible_name}</div>
-							<span className={styles["teacher-status"]}>
+							<Profile
+								user={item.user}
+								systemAccesses={systemAccesses}
+								isSysAdmin={isSysAdmin} /> <span className={styles["teacher-status"]}>
 								Полный доступ { `${getGenderForm(owner.gender, 'предоставила', 'предоставил') }
 								${item.granted_by.visible_name} ${moment(grantTime(item.grant_time)).fromNow()}` }
 							</span>
@@ -254,6 +265,8 @@ GroupMembers.propTypes = {
 	onChangeGroupOwner: PropTypes.func,
 	role: PropTypes.string,
 	userId: PropTypes.string,
+	isSysAdmin: PropTypes.bool,
+	systemAccesses: PropTypes.array,
 };
 
 export default withRouter(GroupMembers);
