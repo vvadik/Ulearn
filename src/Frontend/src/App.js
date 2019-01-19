@@ -140,11 +140,14 @@ class InternalUlearnApp extends Component {
 InternalUlearnApp = connect(InternalUlearnApp.mapStateToProps, InternalUlearnApp.mapDispatchToProps)(InternalUlearnApp);
 
 function redirectLegacyPage(to) {
-	let courseId = getQueryStringParameter("courseId");
-	if (courseId)
-		to = to.replace(":courseId", courseId);
-
 	return class extends Component {
+		constructor(props) {
+			super(props);
+			let courseId = getQueryStringParameter("courseId");
+			if (courseId)
+				to = to.replace(":courseId", courseId);
+		}
+
 		render() {
 			return <Redirect to={to} />;
 		}
