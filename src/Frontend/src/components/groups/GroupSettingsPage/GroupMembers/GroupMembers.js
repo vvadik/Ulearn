@@ -46,7 +46,13 @@ class GroupMembers extends Component {
 				accesses,
 				loadingTeachers: false,
 			});
-		}).catch(console.error);
+			})
+			.catch(console.error)
+			.finally(() =>
+				this.setState({
+					loadingTeachers: false,
+				})
+			)
 	};
 
 	loadStudents = (groupId) => {
@@ -56,12 +62,18 @@ class GroupMembers extends Component {
 
 		api.groups.getStudents(groupId)
 			.then(json => {
-			let students = json.students;
-			this.setState({
-				students,
-				loadingStudents: false,
-			});
-		}).catch(console.error);
+				let students = json.students;
+				this.setState({
+					students,
+					loadingStudents: false,
+				});
+			})
+			.catch(console.error)
+			.finally(() =>
+				this.setState({
+					loadingStudents: false,
+				})
+			)
 	};
 
 	render() {

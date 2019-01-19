@@ -11,6 +11,7 @@ import Toast from "@skbkontur/react-ui/components/Toast/Toast";
 import Link from "@skbkontur/react-ui/components/Link/Link";
 import GroupMembers from "../../../components/groups/GroupSettingsPage/GroupMembers/GroupMembers";
 import GroupSettings from "../../../components/groups/GroupSettingsPage/GroupSettings/GroupSettings";
+import Error404 from "../../../components/common/Error/Error404.js";
 
 import styles from "./groupPage.less";
 
@@ -26,6 +27,7 @@ class GroupPage extends Component {
 		loading: false,
 		scores: [],
 		scoresId: [],
+		status: '',
 	};
 
 	componentDidMount() {
@@ -41,15 +43,20 @@ class GroupPage extends Component {
 	loadGroup = (groupId) => {
 		api.groups.getGroup(groupId)
 			.then(group => {
-			this.setState({
-				group,
-			});
-		})
-			.catch(console.error)
-			.finally(() =>
-			this.setState({
-				loadingGroup: false,
+				this.setState({
+					group,
+				});
 			})
+			.catch(() => {
+				this.setState({
+					status: 'error',
+				});
+			})
+			.finally(() => {
+				this.setState({
+					loadingGroup: false,
+				})
+			}
 		);
 	};
 
@@ -74,9 +81,14 @@ class GroupPage extends Component {
 		let courseId = this.props.match.params.courseId.toLowerCase();
 		const { groupId, groupPage } = this.props.match.params;
 
+		if(this.state.status === "error") {
+			return <Error404 />;
+		}
+
 		if (!groupPage) {
 			return <Redirect to={`/${courseId}/groups/${groupId}/settings`} />
 		}
+
 
 		let rolesByCourse = this.props.account.roleByCourse;
 		let systemAccesses = this.props.account.systemAccesses;
@@ -118,7 +130,12 @@ class GroupPage extends Component {
 
 	renderHeader() {
 		const { group } = this.state;
-		const { groupPage } = this.props.match.params;
+		const { groupId, groupPage } = this.props.match.params;
+		let courseId = this.props.match.params.courseId.toLowerCase();
+
+		if (!['settings', 'members'].includes(groupPage)) {
+			return <Redirect to={`/${courseId}/groups/${groupId}/settings`} />
+		}
 
 		return (
 			<header className={styles["group-header"]}>

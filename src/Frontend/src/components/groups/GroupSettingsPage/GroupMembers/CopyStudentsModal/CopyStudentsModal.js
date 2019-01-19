@@ -41,7 +41,13 @@ class CopyStudentsModal extends Component {
 					groups,
 					loadingGroups: false,
 				});
-			}).catch(console.error);
+			})
+			.catch(console.error)
+			.finally(() =>
+				this.setState({
+				loadingGroups: false,
+			})
+		)
 	};
 
 	render() {
@@ -188,11 +194,16 @@ class CopyStudentsModal extends Component {
 
 		this.setState({ loading: true });
 		api.groups.copyStudents(currentGroupId, groupId, students)
-			.catch(console.error)
+			.then(() =>
+				Toast.push(`Студенты скопированы в группу ${this.getTitle(groups, groupId)}`)
+			)
+			.catch((err) => {
+				console.error(err);
+				Toast.push('Произошла ошибка ');
+			})
 			.finally(() => this.setState({ loading: false }));
 
 		onClose();
-		Toast.push(`Студенты скопированы в группу ${this.getTitle(groups, groupId)}`);
 	};
 }
 

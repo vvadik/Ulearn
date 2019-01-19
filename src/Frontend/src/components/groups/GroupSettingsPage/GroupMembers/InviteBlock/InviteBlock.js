@@ -50,7 +50,7 @@ class InviteBlock extends Component {
 				<div className={styles["invite-link-input"]}>
 					<Input
 						type="text"
-						value={`https://ulearn.me/Account/JoinGroup?hash=${group.invite_hash}`}
+						value={`${window.location.origin}/Account/JoinGroup?hash=${group.invite_hash}`}
 						readOnly
 						selectAllOnFocus
 						width="65%"

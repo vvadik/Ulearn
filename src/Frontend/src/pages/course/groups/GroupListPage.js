@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import api from "../../../api";
 import GroupList from "../../../components/groups/GroupMainPage/GroupList/GroupList";
 import GroupHeader from "../../../components/groups/GroupMainPage/GroupHeader/GroupHeader";
+import Error404 from "../../../components/common/Error/Error404";
 
 import styles from "./groupListPage.less";
 
@@ -24,6 +25,7 @@ class GroupListPage extends AbstractPage {
 			loadingActive: false,
 			loadedArchived: false,
 			loadedActive: false,
+			status: '',
 		}
 	};
 
@@ -49,13 +51,17 @@ class GroupListPage extends AbstractPage {
 
 		api.groups.getCourseGroups(courseId)
 			.then(json => {
-			let groups = json.groups;
-			this.setState({
-				loadedActive: true,
-				groups,
-			});
-		})
-			.catch(console.error)
+				let groups = json.groups;
+				this.setState({
+					loadedActive: true,
+					groups,
+				});
+			})
+			.catch(() => {
+				this.setState({
+					status: 'error',
+				});
+			})
 			.finally(() =>
 				this.setState({
 					loadingActive: false,
@@ -94,14 +100,18 @@ class GroupListPage extends AbstractPage {
 		const courseById = this.props.courses.courseById;
 		const course = courseById[this.courseId];
 
+		if(this.state.status === "error") {
+			return <Error404 />;
+		}
+
 		if (!course) {
-			return;
+			return null;
 		}
 
 		return (
 			<div className={styles.wrapper}>
 				<Helmet defer={false}>
-					<title>Группы в курсе {course.title.toLowerCase()}</title>
+					<title>{`Группы в курсе ${course.title.toLowerCase()}`}</title>
 				</Helmet>
 				<div className={styles["content-wrapper"]}>
 					<GroupHeader

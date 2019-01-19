@@ -52,7 +52,7 @@ function request(url, options, isRetry) {
 			if (response.status >= 500)
 				serverErrorHandler();
 
-			return Promise.reject(response);
+	return Promise.reject(new Error(`${response.status}`));
         })
         .then(value => {
             if (value === API_JWT_TOKEN_UPDATED)

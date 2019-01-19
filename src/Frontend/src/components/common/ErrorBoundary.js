@@ -31,7 +31,7 @@ class ErrorBoundary extends Component {
 						<p>We're sorry — something's gone wrong.</p>
 						<p>Our team has been notified, but click here fill out a report.</p>
 					</div>
-					{ Toast.push('Что-то пошло не так. Попробуйте перезагрузить страницу.') }
+					{ Toast.push('Произошла ошибка. Попробуйте перезагрузить страницу.') }
 				</React.Fragment>
             );
         }
