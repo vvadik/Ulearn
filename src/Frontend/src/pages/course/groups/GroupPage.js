@@ -264,10 +264,7 @@ class GroupPage extends Component {
 				this.setState({ group });
 				Toast.push('Настройки сохранены');
 			})
-			.catch((err) => {
-				console.error(err);
-				Toast.push('Произошла ошибка ');
-			})
+			.catch(console.error)
 			.finally(() => {
 				this.setState({ loadingAllSettings: false });
 			});

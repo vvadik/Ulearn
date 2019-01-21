@@ -197,10 +197,7 @@ class CopyStudentsModal extends Component {
 			.then(() =>
 				Toast.push(`Студенты скопированы в группу ${this.getTitle(groups, groupId)}`)
 			)
-			.catch((err) => {
-				console.error(err);
-				Toast.push('Произошла ошибка ');
-			})
+			.catch(console.error)
 			.finally(() => this.setState({ loading: false }));
 
 		onClose();

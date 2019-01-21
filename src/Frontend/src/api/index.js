@@ -52,8 +52,12 @@ function request(url, options, isRetry) {
 			if (response.status >= 500)
 				serverErrorHandler();
 
-	return Promise.reject(new Error(`${response.status}`));
+			throw new Error(`HTTP response code: ${response.status}`);
         })
+		.catch((error) => {
+			console.error(error);
+			throw error;
+		})
         .then(value => {
             if (value === API_JWT_TOKEN_UPDATED)
                 return request(url, options, true);
@@ -63,6 +67,10 @@ function request(url, options, isRetry) {
 }
 
 function get(url, options) {
+	if (!request) {
+		console.error();
+	}
+
     return request(url, options);
 }
 

@@ -63,10 +63,10 @@ class CopyGroupModal extends Component {
 			})
 			.catch(console.error)
 			.finally(() =>
-			this.setState({
-				loadingGroups: false,
-			})
-		);
+				this.setState({
+					loadingGroups: false,
+				})
+			);
 	};
 
 	render() {
