@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using ApprovalUtilities.Utilities;
@@ -19,24 +20,40 @@ namespace Database.DataContexts
 			this.db = db;
 		}
 
-		public async Task<UserQuiz> AddUserQuiz(string courseId, bool isRightAnswer, string itemId, string quizId, Guid slideId, string text, string userId, DateTime time, int quizBlockScore, int quizBlockMaxScore)
+		public UserQuizSubmission FindLastUserSubmission(string courseId, Guid slideId, string userId)
 		{
-			var userQuiz = new UserQuiz
+			return db.UserQuizSubmissions.Where(s => s.CourseId == courseId && s.UserId == userId && s.SlideId == slideId && !s.IsDropped).OrderByDescending(s => s.Timestamp).FirstOrDefault();
+		}		
+		
+		public async Task<UserQuizSubmission> AddSubmission(string courseId, Guid slideId, string userId, DateTime timestamp)
+		{
+			var submission = new UserQuizSubmission
 			{
 				CourseId = courseId,
 				SlideId = slideId,
-				IsRightAnswer = isRightAnswer,
-				ItemId = itemId,
-				QuizId = quizId,
-				Text = text,
-				Timestamp = time,
 				UserId = userId,
+				Timestamp = timestamp,
+			};
+			db.UserQuizSubmissions.Add(submission);
+			await db.SaveChangesAsync().ConfigureAwait(false);
+			return submission;
+		}
+		
+		public async Task<UserQuiz> AddUserQuizAnswer(int submissionId, bool isRightAnswer, string blockId, string itemId, string text, int quizBlockScore, int quizBlockMaxScore)
+		{
+			var answer = new UserQuiz
+			{
+				SubmissionId = submissionId,
+				IsRightAnswer = isRightAnswer,
+				BlockId = blockId,
+				ItemId = itemId,
+				Text = text,
 				QuizBlockScore = quizBlockScore,
 				QuizBlockMaxScore = quizBlockMaxScore
 			};
-			db.UserQuizzes.Add(userQuiz);
-			await db.SaveChangesAsync();
-			return userQuiz;
+			db.UserQuizzes.Add(answer);
+			await db.SaveChangesAsync().ConfigureAwait(false);
+			return answer;
 		}
 
 		public bool IsWaitingForManualCheck(string courseId, Guid slideId, string userId)
@@ -46,127 +63,113 @@ namespace Database.DataContexts
 
 		public bool IsQuizSlidePassed(string courseId, string userId, Guid slideId)
 		{
-			return db.UserQuizzes.Any(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId && !x.isDropped);
+			return db.UserQuizSubmissions.Any(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId && !x.IsDropped);
 		}
 
 		public IEnumerable<bool> GetQuizDropStates(string courseId, string userId, Guid slideId)
 		{
-			return db.UserQuizzes
+			return db.UserQuizSubmissions
 				.Where(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId)
-				.DistinctBy(q => q.Timestamp)
-				.Select(q => q.isDropped);
+				.Select(q => q.IsDropped);
 		}
 
-		public HashSet<Guid> GetIdOfQuizPassedSlides(string courseId, string userId)
+		public HashSet<Guid> GetPassedSlideIds(string courseId, string userId)
 		{
-			return new HashSet<Guid>(db.UserQuizzes.Where(x => x.CourseId == courseId && x.UserId == userId).Select(x => x.SlideId).Distinct());
+			return new HashSet<Guid>(db.UserQuizSubmissions.Where(x => x.CourseId == courseId && x.UserId == userId).Select(x => x.SlideId).Distinct());
 		}
 
-		public HashSet<Guid> GetIdOfQuizSlidesScoredMaximum(string courseId, string userId)
+		public HashSet<Guid> GetPassedSlideIdsWithMaximumScore(string courseId, string userId)
 		{
-			var passedQuizzes = GetIdOfQuizPassedSlides(courseId, userId);
-			var notScoredMaximumQuizzes = db.UserQuizzes.Where(x => x.CourseId == courseId && x.UserId == userId && x.QuizBlockScore != x.QuizBlockMaxScore).Select(x => x.SlideId).Distinct();
-			passedQuizzes.ExceptWith(notScoredMaximumQuizzes);
+			var passedQuizzes = GetPassedSlideIds(courseId, userId);
+			var notScoredMaximumSlides = db.UserQuizzes
+				.Include(a => a.Submission)
+				.Where(x => x.Submission.CourseId == courseId && x.Submission.UserId == userId && x.QuizBlockScore != x.QuizBlockMaxScore)
+				.Select(x => x.Submission.SlideId)
+				.Distinct();
+			passedQuizzes.ExceptWith(notScoredMaximumSlides);
 			return passedQuizzes;
 		}
 
-		public Dictionary<string, List<UserQuiz>> GetAnswersForShowOnSlide(string courseId, QuizSlide slide, string userId)
+		public Dictionary<string, List<UserQuiz>> GetAnswersForShowingOnSlide(string courseId, QuizSlide slide, string userId, UserQuizSubmission submission=null)
 		{
 			if (slide == null)
 				return null;
+			
+			if (submission == null)
+				submission = FindLastUserSubmission(courseId, slide.Id, userId);
+			
 			var answer = new Dictionary<string, List<UserQuiz>>();
 			foreach (var block in slide.Blocks.OfType<AbstractQuestionBlock>())
 			{
-				var ans = db.UserQuizzes
-					.Where(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slide.Id && x.QuizId == block.Id && !x.isDropped)
-					.OrderBy(x => x.Id)
-					.ToList();
-				answer[block.Id] = ans;
+				if (submission != null)
+				{
+					var ans = db.UserQuizzes
+						.Where(q => q.SubmissionId == submission.Id && q.BlockId == block.Id)
+						.OrderBy(x => x.Id)
+						.ToList();
+
+					answer[block.Id] = ans;
+				}
+				else
+					answer[block.Id] = new List<UserQuiz>();
+				
 			}
 			return answer;
 		}
 
-		public async Task RemoveAnswers(string courseId, string userId, Guid slideId)
+		public async Task DropQuizAsync(string courseId, Guid slideId, string userId)
 		{
-			var answersToRemove = db.UserQuizzes.Where(q => q.CourseId == courseId && q.UserId == userId && q.SlideId == slideId).ToList();
-			db.UserQuizzes.RemoveRange(answersToRemove);
-			await db.SaveChangesAsync();
-		}
-
-		public async Task DropQuizAsync(string courseId, string userId, Guid slideId)
-		{
-			var quizzes = db.UserQuizzes.Where(q => q.CourseId == courseId && q.UserId == userId && q.SlideId == slideId).ToList();
-			foreach (var q in quizzes)
-			{
-				q.isDropped = true;
-			}
-			await db.SaveChangesAsync();
+			var submissions = await db.UserQuizSubmissions.Where(s => s.CourseId == courseId && s.UserId == userId && s.SlideId == slideId && !s.IsDropped).ToListAsync().ConfigureAwait(false);
+			foreach (var submission in submissions)
+				submission.IsDropped = true;
+			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 		
-		public void DropQuiz(string courseId, string userId, Guid slideId)
+		public void DropQuiz(string courseId, Guid slideId, string userId)
 		{
-			var quizzes = db.UserQuizzes.Where(q => q.CourseId == courseId && q.UserId == userId && q.SlideId == slideId).ToList();
-			foreach (var q in quizzes)
-			{
-				q.isDropped = true;
-			}
+			var submissions = db.UserQuizSubmissions.Where(s => s.CourseId == courseId && s.UserId == userId && s.SlideId == slideId && !s.IsDropped).ToList();
+			foreach (var submission in submissions)
+				submission.IsDropped = true;
 			db.SaveChanges();
 		}
 
-		public Dictionary<string, int> GetQuizBlocksTruth(string courseId, string userId, Guid slideId)
+		public Dictionary<string, int> GetUserScores(string courseId, Guid slideId, string userId)
 		{
+			var submission = FindLastUserSubmission(courseId, slideId, userId);
+			if (submission == null)
+				return new Dictionary<string, int>();
+			
 			return db.UserQuizzes
-				.Where(q => q.CourseId == courseId && q.UserId == userId && q.SlideId == slideId && !q.isDropped)
-				.DistinctBy(q => q.QuizId)
-				.ToDictionary(q => q.QuizId, q => q.QuizBlockScore);
+				.Where(q => q.SubmissionId == submission.Id)
+				.ToList()
+				.DistinctBy(q => q.BlockId)
+				.ToDictionary(q => q.BlockId, q => q.QuizBlockScore);
 		}
 
-		public bool IsQuizScoredMaximum(string courseId, string userId, Guid slideId)
+		public bool IsQuizScoredMaximum(string courseId, Guid slideId, string userId)
 		{
+			var submission = FindLastUserSubmission(courseId, slideId, userId);
+			if (submission == null)
+				return false;
+			
 			return db.UserQuizzes
-				.Where(q => q.CourseId == courseId && q.UserId == userId && q.SlideId == slideId && !q.isDropped)
+				.Where(q => q.SubmissionId == submission.Id)
 				.All(q => q.QuizBlockScore == q.QuizBlockMaxScore);
 		}
 
-		public Dictionary<string, List<UserQuiz>> GetAnswersForUser(string courseId, Guid slideId, string userId)
-		{
-			return db.UserQuizzes
-				.Where(ans => ans.CourseId == courseId && ans.UserId == userId && ans.SlideId == slideId && !ans.isDropped)
-				.ToLookup(ans => ans.QuizId)
-				.ToDictionary(g => g.Key, g => g.ToList());
-		}
-
-		public ManualQuizChecking FindManualQuizChecking(string courseId, Guid slideId, string userId)
-		{
-			return db.ManualQuizCheckings
-				.Where(i => i.CourseId == courseId && i.SlideId == slideId && i.UserId == userId && !i.IsChecked)
-				.OrderByDescending(i => i.Timestamp)
-				.FirstOrDefault();
-		}
-
-		public async Task SetScoreForQuizBlock(string courseId, string userId, Guid slideId, string blockId, int score)
+		public async Task SetScoreForQuizBlock(int submissionId, string blockId, int score)
 		{
 			db.UserQuizzes
-				.Where(q => q.CourseId == courseId && q.UserId == userId && q.SlideId == slideId && q.QuizId == blockId)
+				.Where(q => q.SubmissionId == submissionId && q.BlockId == blockId)
 				.ForEach(q => q.QuizBlockScore = score);
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
-
-		public async Task RemoveUserQuizzes(string courseId, Guid slideId, string userId)
-		{
-			db.UserQuizzes.RemoveRange(
-				db.UserQuizzes.Where(
-					q => q.CourseId == courseId && q.SlideId == slideId && q.UserId == userId && !q.isDropped
-				)
-			);
-			await db.SaveChangesAsync();
-		}
-
+		
 		public Dictionary<string, int> GetAnswersFrequencyForChoiceBlock(string courseId, Guid slideId, string quizId)
 		{
-			var answers = db.UserQuizzes.Where(q => q.CourseId == courseId && q.SlideId == slideId && q.QuizId == quizId);
-			var totalTries = answers.Select(q => new { q.UserId, q.Timestamp }).Distinct().Count();
-			/* Don't call GroupBy().ToDictionary() because of perfomance issues.
+			var answers = db.UserQuizzes.Include(q => q.SubmissionId).Where(q => q.Submission.CourseId == courseId && q.Submission.SlideId == slideId && q.BlockId == quizId);
+			var totalTries = answers.Select(q => new { q.Submission.UserId, q.Submission.Timestamp }).Distinct().Count();
+			/* Don't call GroupBy().ToDictionary() because of performance issues.
 			   See http://code-ninja.org/blog/2014/07/24/entity-framework-never-call-groupby-todictionary/ for details */
 			return answers
 				.GroupBy(q => q.ItemId)

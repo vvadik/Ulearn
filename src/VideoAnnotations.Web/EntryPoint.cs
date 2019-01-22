@@ -18,7 +18,7 @@ namespace Ulearn.VideoAnnotations.Web
         private static IVostokHost BuildVostokHost(params string[] args)
         {
             return new VostokHostBuilder<WebApplication>()
-                .SetServiceInfo("ulearn", "Web.Api")
+                .SetServiceInfo("ulearn", "VideoAnnotations.Web")
                 .ConfigureAppConfiguration(configurationBuilder =>
                 {
                     configurationBuilder.AddCommandLine(args);

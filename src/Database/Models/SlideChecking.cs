@@ -10,9 +10,7 @@ namespace Database.Models
 {
 	public class AbstractSlideChecking : ITimedSlideAction
 	{
-		[Key]
-		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		public int Id { get; set; }
+		public virtual int Id { get; set; }
 
 		[Required]
 		[StringLength(64)]
@@ -84,6 +82,10 @@ namespace Database.Models
 
 	public class AutomaticExerciseChecking : AbstractAutomaticSlideChecking
 	{
+		[Key]
+		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+		public override int Id { get; set; }
+		
 		public AutomaticExerciseCheckingStatus Status { get; set; }
 
 		public TimeSpan? Elapsed { get; set; }
@@ -128,14 +130,18 @@ namespace Database.Models
 
 	public class ManualExerciseChecking : AbstractManualSlideChecking
 	{
+		[Key]
+		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+		public override int Id { get; set; }
+		
 		[Required]
 		public int SubmissionId { get; set; }
 
+		public virtual UserExerciseSubmission Submission { get; set; }
+		
 		[Required]
 		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndUser", 4)]
 		public bool ProhibitFurtherManualCheckings { get; set; }
-
-		public virtual UserExerciseSubmission Submission { get; set; }
 
 		public virtual IList<ExerciseCodeReview> Reviews { get; set; }
 
@@ -145,9 +151,19 @@ namespace Database.Models
 
 	public class AutomaticQuizChecking : AbstractAutomaticSlideChecking
 	{
+		/* This field is not identity and is not database-generated because EF generates Id as foreign key to UserQuizSubmission.Id */
+		[Key]
+		public override int Id { get; set; }
+		
+		public virtual UserQuizSubmission Submission { get; set; }
 	}
 
 	public class ManualQuizChecking : AbstractManualSlideChecking
 	{
+		/* This field is not identity and is not database-generated because EF generates Id as foreign key to UserQuizSubmission.Id */
+		[Key]
+		public override int Id { get; set; }
+
+		public virtual UserQuizSubmission Submission { get; set; }
 	}
 }

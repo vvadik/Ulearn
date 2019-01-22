@@ -82,9 +82,9 @@ function areAllAnswered(needingCount) {
 }
 
 
-function QuizAnswer(type, quizId, itemId, text) {
-	this.QuizType = type;
-	this.QuizId = quizId;
+function QuizAnswer(type, blockId, itemId, text) {
+	this.BlockType = type;
+	this.BlockId = blockId;
 	this.ItemId = itemId;
 	this.Text = text;
 }

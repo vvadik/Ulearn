@@ -403,7 +403,7 @@ namespace uLearn.Web.Controllers
 						});
 
 				if (! recheck)
-					await slideCheckingsRepo.LockManualChecking(checking, User.Identity.GetUserId());
+					await slideCheckingsRepo.LockManualChecking(checking, User.Identity.GetUserId()).ConfigureAwait(false);
 				transaction.Commit();
 			}
 
@@ -438,28 +438,28 @@ namespace uLearn.Web.Controllers
 			}
 		}
 
-		public async Task<ActionResult> CheckQuiz(string courseId, int id, bool recheck = false)
+		public Task<ActionResult> CheckQuiz(string courseId, int id, bool recheck = false)
 		{
 			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
-			return await InternalManualCheck<ManualQuizChecking>(courseId, "ManualQuizCheckingQueue", id, false, groupsIds, recheck);
+			return InternalManualCheck<ManualQuizChecking>(courseId, "ManualQuizCheckingQueue", id, false, groupsIds, recheck);
 		}
 
-		public async Task<ActionResult> CheckExercise(string courseId, int id, bool recheck = false)
+		public Task<ActionResult> CheckExercise(string courseId, int id, bool recheck = false)
 		{
 			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
-			return await InternalManualCheck<ManualExerciseChecking>(courseId, "ManualExerciseCheckingQueue", id, false, groupsIds, recheck);
+			return InternalManualCheck<ManualExerciseChecking>(courseId, "ManualExerciseCheckingQueue", id, false, groupsIds, recheck);
 		}
 
-		public async Task<ActionResult> CheckNextQuizForSlide(string courseId, Guid slideId)
+		public Task<ActionResult> CheckNextQuizForSlide(string courseId, Guid slideId)
 		{
 			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
-			return await CheckNextManualCheckingForSlide<ManualQuizChecking>("ManualQuizCheckingQueue", courseId, slideId, groupsIds);
+			return CheckNextManualCheckingForSlide<ManualQuizChecking>("ManualQuizCheckingQueue", courseId, slideId, groupsIds);
 		}
 
-		public async Task<ActionResult> CheckNextExerciseForSlide(string courseId, Guid slideId)
+		public Task<ActionResult> CheckNextExerciseForSlide(string courseId, Guid slideId)
 		{
 			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
-			return await CheckNextManualCheckingForSlide<ManualExerciseChecking>("ManualExerciseCheckingQueue", courseId, slideId, groupsIds);
+			return CheckNextManualCheckingForSlide<ManualExerciseChecking>("ManualExerciseCheckingQueue", courseId, slideId, groupsIds);
 		}
 
 		[HttpPost]

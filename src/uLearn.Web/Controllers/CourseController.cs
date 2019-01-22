@@ -102,7 +102,7 @@ namespace uLearn.Web.Controllers
 
 				if (queueItem == null)
 				{
-					/* It's possible when checking has not been fully checked, lock has been released, but after it user re-send him solution and old waiting checking has been removed */
+					/* It's possible when checking has not been fully checked, lock has been released, but after it user re-send his solution and we removed old waiting checking */
 					var fakeQueueItem = slide is QuizSlide ? (AbstractManualSlideChecking) new ManualQuizChecking() : new ManualExerciseChecking();
 					return RedirectToAction(GetAdminQueueActionName(fakeQueueItem), "Admin", new
 					{
@@ -519,7 +519,7 @@ namespace uLearn.Web.Controllers
 			db.SolutionLikes.RemoveRange(db.SolutionLikes.Where(q => q.UserId == userId && q.Submission.SlideId == slideId));
 
 			db.UserExerciseSubmissions.RemoveSlideAction(courseId, slideId, userId);
-			db.UserQuizzes.RemoveSlideAction(courseId, slideId, userId);
+			db.UserQuizSubmissions.RemoveSlideAction(courseId, slideId, userId);
 			db.Visits.RemoveSlideAction(courseId, slideId, userId);
 			await slideCheckingsRepo.RemoveAttempts(courseId, slideId, userId, false);
 

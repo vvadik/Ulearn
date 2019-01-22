@@ -14,7 +14,7 @@ namespace uLearn.Web.Models
 		public QuizSlide Slide { get; set; }
 		public QuizState QuizState { get; set; }
 		public Dictionary<string, List<UserQuiz>> AnswersToQuizes { get; set; }
-		public Dictionary<string, int> ResultsForQuizes { get; set; }
+		public Dictionary<string, int> ScoresForBlocks { get; set; }
 
 		/* (quizId -> (itemId -> frequency%)) */
 		public DefaultDictionary<string, DefaultDictionary<string, int>> QuestionAnswersFrequency { get; set; } = new DefaultDictionary<string, DefaultDictionary<string, int>>();
@@ -23,7 +23,7 @@ namespace uLearn.Web.Models
 		public int MaxTriesCount { get; set; }
 		public bool IsLti { get; set; }
 		public bool IsGuest { get; set; }
-		public ManualQuizChecking ManualQuizCheckQueueItem { get; set; }
+		public ManualQuizChecking Checking { get; set; }
 		public bool CanUserFillQuiz { get; set; }
 
 		/* GroupsIds != null if instructor filtered users by group and see their works */
@@ -33,10 +33,10 @@ namespace uLearn.Web.Models
 
 		public int Score
 		{
-			get { return ResultsForQuizes?.AsEnumerable().Sum(res => res.Value) ?? 0; }
+			get { return ScoresForBlocks?.AsEnumerable().Sum(res => res.Value) ?? 0; }
 		}
 
-		public int QuestionsCount => ResultsForQuizes?.Count ?? 0;
+		public int QuestionsCount => ScoresForBlocks?.Count ?? 0;
 
 		public string IsLtiToString => IsLti.ToString().ToLowerInvariant();
 	}

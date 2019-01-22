@@ -1,55 +1,29 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Database.Models
 {
-	public class UserQuiz : ITimedSlideAction
+	public class UserQuiz
 	{
 		[Required]
 		[Key]
 		public int Id { get; set; }
-
-		[Required]
+		
+		[Index("IDX_UserQuizAnswer_BySubmissionAndBlock", 1)]
+		public int SubmissionId { get; set; }
+		
+		public virtual UserQuizSubmission Submission { get; set; }
+		
 		[StringLength(64)]
-		[Index("FullIndex", 1)]
-		[Index("IDX_UserQuiz_ByCourseSlideAndQuiz", 1)]
-		public string CourseId { get; set; }
-
-		[Required]
-		[Index("FullIndex", 2)]
-		[Index("StatisticsIndex", 1)]
-		[Index("IDX_UserQuiz_ByCourseSlideAndQuiz", 2)]
-		public Guid SlideId { get; set; }
-
-		public virtual ApplicationUser User { get; set; }
+		[Index("IDX_UserQuizAnswer_BySubmissionAndBlock", 2)]
+		public string BlockId { get; set; }
 
 		[StringLength(64)]
-		[Required]
-		[Index("FullIndex", 3)]
-		public string UserId { get; set; }
-
-		[StringLength(64)]
-		[Index("FullIndex", 5)]
-		[Index("IDX_UserQuiz_ByCourseSlideAndQuiz", 3)]
-		public string QuizId { get; set; }
-
-		[StringLength(64)]
-		[Index("FullIndex", 6)]
-		[Index("IDX_UserQuiz_ByItem")]
+		[Index("IDX_UserQuizAnswer_ByItem")]
 		public string ItemId { get; set; }
 
 		[StringLength(8192)]
 		public string Text { get; set; }
-
-		[Required]
-		[Index("StatisticsIndex", 2)]
-		public DateTime Timestamp { get; set; }
-
-		[Required]
-		[Index("FullIndex", 4)]
-		public bool isDropped { get; set; }
-
 
 		[Required]
 		// Корректный ли вариант ItemId
