@@ -76,10 +76,6 @@
 	{
 		<p class="quiz-status">@status</p>
 	}
-	if (!string.IsNullOrEmpty(Request.QueryString["error"]))
-	{
-		<p class="alert alert-danger">@Request.QueryString["error"]</p>
-	}
 
 	var remains = Model.MaxTriesCount - Model.TryNumber;
 	var isInstructor = User.HasAccessFor(Model.Course.Id, CourseRole.Instructor);
@@ -114,7 +110,8 @@
 		manualChecking: Model.Checking,
 		canUserFillQuiz: Model.CanUserFillQuiz,
 		groupsIds: null,
-		isLti: Model.IsLti
+		isLti: Model.IsLti,
+		userScores: Model.UserScores
 		);
 
 	MvcForm form = null;

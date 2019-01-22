@@ -119,13 +119,13 @@ namespace uLearn.Web.Controllers
 			
 			var quizState = state.Item1;
 			var tryNumber = state.Item2;
-			var scoresForBlocks = GetScoresForBlocks(courseId, userId, slideId, state.Item1);
+			var userScores = GetUserScoresForBlocks(courseId, userId, slideId, manualQuizCheckQueueItem?.Submission);
 
 			log.Info($"Создаю тест для пользователя {userId} в слайде {courseId}:{slide.Id}, isLti = {isLti}");
 
 			if (quizState == QuizState.Subtotal)
 			{
-				var score = scoresForBlocks?.AsEnumerable().Sum(res => res.Value) ?? 0;
+				var score = userScores?.AsEnumerable().Sum(res => res.Value) ?? 0;
 				/* QuizState.Subtotal is partially obsolete. If user fully solved quiz, then show answers. Else show empty quiz for the new try... */
 				if (score == slide.MaxScore)
 					quizState = QuizState.Total;
@@ -157,7 +157,7 @@ namespace uLearn.Web.Controllers
 				QuizState = quizState,
 				TryNumber = tryNumber,
 				MaxTriesCount = maxTriesCount,
-				ScoresForBlocks = scoresForBlocks,
+				UserScores = userScores,
 				AnswersToQuizes = userAnswers,
 				IsLti = isLti,
 				Checking = manualQuizCheckQueueItem,
@@ -297,12 +297,6 @@ namespace uLearn.Web.Controllers
 			{
 				var checking = slideCheckingsRepo.FindManualCheckingById<ManualQuizChecking>(id);
 
-				if (checking.IsChecked)
-					return Redirect(errorUrl + "Эта работа уже была проверена");
-
-				if (!checking.IsLockedBy(User.Identity))
-					return Redirect(errorUrl + "Эта работа проверяется другим инструктором");
-
 				var course = courseManager.GetCourse(checking.CourseId);
 				var unit = course.FindUnitBySlideId(checking.SlideId);
 
@@ -344,7 +338,7 @@ namespace uLearn.Web.Controllers
 					metricSender.SendCount($"quiz.manual_score.{checking.CourseId}.{checking.SlideId}.full_scored");
 				}
 
-				await NotifyAboutManualQuizChecking(checking);
+				await NotifyAboutManualQuizChecking(checking).ConfigureAwait(false);
 			}
 
 			return Redirect(nextUrl);
@@ -691,9 +685,9 @@ namespace uLearn.Web.Controllers
 			return quizSlide.MaxTriesCount;
 		}
 
-		private Dictionary<string, int> GetScoresForBlocks(string courseId, string userId, Guid slideId, QuizState state)
+		private Dictionary<string, int> GetUserScoresForBlocks(string courseId, string userId, Guid slideId, UserQuizSubmission submission)
 		{
-			return userQuizzesRepo.GetUserScores(courseId, slideId, userId);
+			return userQuizzesRepo.GetUserScores(courseId, slideId, userId, submission);
 		}
 
 		private Tuple<QuizState, int> GetQuizState(string courseId, string userId, Guid slideId)

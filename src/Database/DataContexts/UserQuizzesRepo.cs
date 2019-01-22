@@ -133,12 +133,15 @@ namespace Database.DataContexts
 			db.SaveChanges();
 		}
 
-		public Dictionary<string, int> GetUserScores(string courseId, Guid slideId, string userId)
+		public Dictionary<string, int> GetUserScores(string courseId, Guid slideId, string userId, UserQuizSubmission submission = null)
 		{
-			var submission = FindLastUserSubmission(courseId, slideId, userId);
 			if (submission == null)
-				return new Dictionary<string, int>();
-			
+			{
+				submission = FindLastUserSubmission(courseId, slideId, userId);
+				if (submission == null)
+					return new Dictionary<string, int>();
+			}
+
 			return db.UserQuizAnswers
 				.Where(q => q.SubmissionId == submission.Id)
 				.ToList()

@@ -14,7 +14,7 @@ namespace uLearn.Web.Models
 		public QuizSlide Slide { get; set; }
 		public QuizState QuizState { get; set; }
 		public Dictionary<string, List<UserQuizAnswer>> AnswersToQuizes { get; set; }
-		public Dictionary<string, int> ScoresForBlocks { get; set; }
+		public Dictionary<string, int> UserScores { get; set; }
 
 		/* (quizId -> (itemId -> frequency%)) */
 		public DefaultDictionary<string, DefaultDictionary<string, int>> QuestionAnswersFrequency { get; set; } = new DefaultDictionary<string, DefaultDictionary<string, int>>();
@@ -33,10 +33,10 @@ namespace uLearn.Web.Models
 
 		public int Score
 		{
-			get { return ScoresForBlocks?.AsEnumerable().Sum(res => res.Value) ?? 0; }
+			get { return UserScores?.AsEnumerable().Sum(res => res.Value) ?? 0; }
 		}
 
-		public int QuestionsCount => ScoresForBlocks?.Count ?? 0;
+		public int QuestionsCount => UserScores?.Count ?? 0;
 
 		public string IsLtiToString => IsLti.ToString().ToLowerInvariant();
 	}

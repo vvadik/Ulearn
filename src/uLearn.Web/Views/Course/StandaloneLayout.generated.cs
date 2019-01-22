@@ -132,7 +132,7 @@ WriteTo(__razor_helper_writer, SlideHtml.Slide(new BlockRenderContext(course, sl
 										Slide = (QuizSlide)slide
 									}, i, QuizState.Total, debugView: true)
 									: (dynamic)null
-							).ToArray(),
+						).ToArray(),
 						isGuest: false,
 						revealHidden: true
 						),
