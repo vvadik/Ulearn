@@ -5,6 +5,7 @@ import * as courses from "./courses"
 import * as notifications from "./notifications"
 import * as groups from "./groups"
 import * as users from "./users"
+import * as comments from "./comments"
 
 const API_JWT_TOKEN_UPDATED = 'API_JWT_TOKEN_UPDATED';
 let apiJwtToken = '';
@@ -126,6 +127,7 @@ let api = {
 	notifications: notifications,
 	groups: groups,
 	users: users,
+	comments: comments,
 };
 
 export default api;

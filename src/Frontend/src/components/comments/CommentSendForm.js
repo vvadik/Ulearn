@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import connect from "react-redux/es/connect/connect";
 import PropTypes from "prop-types";
+import api from "../../api/index";
 import Textarea from "@skbkontur/react-ui/components/Textarea/Textarea";
 import Button from "@skbkontur/react-ui/components/Button/Button";
 import LinkIcon from "@skbkontur/react-icons/Link";
@@ -9,21 +10,28 @@ import ArrowChevron2Right from "@skbkontur/react-icons/ArrowChevron2Right";
 import Avatar from "../common/Avatar/Avatar";
 
 import styles from "./comment.less";
+import {getQueryStringParameter} from "../../utils";
 
 class CommentSendForm extends Component {
 	state = {
-		value: '',
+		text: '',
 		loading: false,
 	};
 
+	componentDidMount() {
+		let courseId = this.props.match.params.courseId.toLowerCase();
+
+		this.props.enterToCourse(courseId);
+	}
+
 	render() {
-		// let userId = this.props.account.id;
+		let userId = this.props.account.id;
 
 		return (
 		<div>
 			<h1 className={styles.header}>Комментарии</h1>
 			<div className={styles["comment-send-form"]}>
-				{/*<Avatar user={userId} size='big' />*/}
+				<Avatar user={userId} size='big' />
 				<form onSubmit={this.onSubmit}>
 					<div className={styles["comment-send"]}>
 						<Textarea
@@ -31,7 +39,7 @@ class CommentSendForm extends Component {
 							width={540}
 							maxRows={15}
 							rows={5}
-							onChange={(_, value) => this.setState({ value })}
+							onChange={(_, value) => this.setState({ text: value })}
 							autoResize
 							placeholder="Комментарий"
 						/>
@@ -58,19 +66,39 @@ class CommentSendForm extends Component {
 	}
 
 	onSubmit = () => {
-		console.log('Hello');
+		const text = this.state.text;
+		const replyTo = 0;
+		const isForInstructors = false;
+		const slideId = 0;
+		let courseId = this.props.match.params.courseId.toLowerCase();
+
+		this.setState({ loading: true });
+		api.comments.addComment(courseId, slideId, text, replyTo, isForInstructors)
+			.catch(console.error)
+			.finally(this.setState({ loading: false}))
 	};
 
 	static mapStateToProps(state) {
 		return {
 			account: state.account,
 		}
-	}
+	};
+
+	static mapDispatchToProps(dispatch) {
+		return {
+			enterToCourse: (courseId) => dispatch({
+				type: 'COURSES__COURSE_ENTERED',
+				courseId: courseId
+			}),
+		}
+	};
 }
 
 CommentSendForm.propTypes = {
 	account: PropTypes.object,
+	match: PropTypes.object,
+	enterToCourse: PropTypes.func,
 };
 
-// CommentSendForm = connect(CommentSendForm.mapStateToProps)(CommentSendForm);
+CommentSendForm = connect(CommentSendForm.mapStateToProps, CommentSendForm.mapDispatchToProps)(CommentSendForm);
 export default CommentSendForm;
