@@ -733,6 +733,10 @@
     <Compile Include="Migrations\201901212242411_RemoveIdentityFromQuizCheckingsIds.Designer.cs">
       <DependentUpon>201901212242411_RemoveIdentityFromQuizCheckingsIds.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201901220511203_RenameUserQuizs.cs" />
+    <Compile Include="Migrations\201901220511203_RenameUserQuizs.Designer.cs">
+      <DependentUpon>201901220511203_RenameUserQuizs.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -773,7 +777,7 @@
     <Compile Include="Models\UnitAppearance.cs" />
     <Compile Include="Models\UserExerciseSubmission.cs" />
     <Compile Include="Models\UserQuestion.cs" />
-    <Compile Include="Models\UserQuiz.cs" />
+    <Compile Include="Models\UserQuizAnswer.cs" />
     <Compile Include="Models\UserQuizSubmission.cs" />
     <Compile Include="Models\UserRole.cs" />
     <Compile Include="Models\XQueueExerciseSubmission.cs" />
@@ -1138,6 +1142,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201901212242411_RemoveIdentityFromQuizCheckingsIds.resx">
       <DependentUpon>201901212242411_RemoveIdentityFromQuizCheckingsIds.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901220511203_RenameUserQuizs.resx">
+      <DependentUpon>201901220511203_RenameUserQuizs.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

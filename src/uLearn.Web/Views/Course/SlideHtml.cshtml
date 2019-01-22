@@ -1,4 +1,4 @@
-﻿@* Generator: MvcHelper GeneratePrettyNames: true DisableLinePragmas: true *@
+@* Generator: MvcHelper GeneratePrettyNames: true DisableLinePragmas: true *@
 @using System.Linq
 @using Database.Models
 @using uLearn.Web.Clients
@@ -821,7 +821,7 @@
 		return isGuest ? "disabled" : null;
 	}
 
-	private static List<MatchingMatch> GetFixedItemsAccordingToUserAnswers(List<UserQuiz> userAnswers, List<MatchingMatch> fixedItems)
+	private static List<MatchingMatch> GetFixedItemsAccordingToUserAnswers(List<UserQuizAnswer> userAnswers, List<MatchingMatch> fixedItems)
 	{
 		var filteredFixedItems = new List<MatchingMatch>();
 		foreach (var fixedItem in fixedItems)
@@ -833,7 +833,7 @@
 		return filteredFixedItems;
 	}
 
-	private static List<MatchingMatch> GetMovableItemsAccordingToUserAnswers(List<UserQuiz> userAnswers, List<MatchingMatch> fixedItems)
+	private static List<MatchingMatch> GetMovableItemsAccordingToUserAnswers(List<UserQuizAnswer> userAnswers, List<MatchingMatch> fixedItems)
 	{
 		var movableItems = new List<MatchingMatch>();
 		foreach (var fixedItem in fixedItems)

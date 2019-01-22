@@ -128,7 +128,7 @@ WriteTo(__razor_helper_writer, SlideHtml.Slide(new BlockRenderContext(course, sl
 								: b is AbstractQuestionBlock
 									? new QuizBlockData(new QuizModel
 									{
-										AnswersToQuizes = slide.Blocks.OfType<AbstractQuestionBlock>().ToDictionary(x => x.Id, x => new List<UserQuiz>()),
+										AnswersToQuizes = slide.Blocks.OfType<AbstractQuestionBlock>().ToDictionary(x => x.Id, x => new List<UserQuizAnswer>()),
 										Slide = (QuizSlide)slide
 									}, i, QuizState.Total, debugView: true)
 									: (dynamic)null

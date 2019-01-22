@@ -13,7 +13,7 @@ namespace uLearn.Web.Models
 
 		public QuizSlide Slide { get; set; }
 		public QuizState QuizState { get; set; }
-		public Dictionary<string, List<UserQuiz>> AnswersToQuizes { get; set; }
+		public Dictionary<string, List<UserQuizAnswer>> AnswersToQuizes { get; set; }
 		public Dictionary<string, int> ScoresForBlocks { get; set; }
 
 		/* (quizId -> (itemId -> frequency%)) */

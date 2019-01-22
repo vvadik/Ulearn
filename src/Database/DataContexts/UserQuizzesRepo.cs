@@ -39,9 +39,9 @@ namespace Database.DataContexts
 			return submission;
 		}
 		
-		public async Task<UserQuiz> AddUserQuizAnswer(int submissionId, bool isRightAnswer, string blockId, string itemId, string text, int quizBlockScore, int quizBlockMaxScore)
+		public async Task<UserQuizAnswer> AddUserQuizAnswer(int submissionId, bool isRightAnswer, string blockId, string itemId, string text, int quizBlockScore, int quizBlockMaxScore)
 		{
-			var answer = new UserQuiz
+			var answer = new UserQuizAnswer
 			{
 				SubmissionId = submissionId,
 				IsRightAnswer = isRightAnswer,
@@ -51,7 +51,7 @@ namespace Database.DataContexts
 				QuizBlockScore = quizBlockScore,
 				QuizBlockMaxScore = quizBlockMaxScore
 			};
-			db.UserQuizzes.Add(answer);
+			db.UserQuizAnswers.Add(answer);
 			await db.SaveChangesAsync().ConfigureAwait(false);
 			return answer;
 		}
@@ -81,7 +81,7 @@ namespace Database.DataContexts
 		public HashSet<Guid> GetPassedSlideIdsWithMaximumScore(string courseId, string userId)
 		{
 			var passedQuizzes = GetPassedSlideIds(courseId, userId);
-			var notScoredMaximumSlides = db.UserQuizzes
+			var notScoredMaximumSlides = db.UserQuizAnswers
 				.Include(a => a.Submission)
 				.Where(x => x.Submission.CourseId == courseId && x.Submission.UserId == userId && x.QuizBlockScore != x.QuizBlockMaxScore)
 				.Select(x => x.Submission.SlideId)
@@ -90,7 +90,7 @@ namespace Database.DataContexts
 			return passedQuizzes;
 		}
 
-		public Dictionary<string, List<UserQuiz>> GetAnswersForShowingOnSlide(string courseId, QuizSlide slide, string userId, UserQuizSubmission submission=null)
+		public Dictionary<string, List<UserQuizAnswer>> GetAnswersForShowingOnSlide(string courseId, QuizSlide slide, string userId, UserQuizSubmission submission=null)
 		{
 			if (slide == null)
 				return null;
@@ -98,12 +98,12 @@ namespace Database.DataContexts
 			if (submission == null)
 				submission = FindLastUserSubmission(courseId, slide.Id, userId);
 			
-			var answer = new Dictionary<string, List<UserQuiz>>();
+			var answer = new Dictionary<string, List<UserQuizAnswer>>();
 			foreach (var block in slide.Blocks.OfType<AbstractQuestionBlock>())
 			{
 				if (submission != null)
 				{
-					var ans = db.UserQuizzes
+					var ans = db.UserQuizAnswers
 						.Where(q => q.SubmissionId == submission.Id && q.BlockId == block.Id)
 						.OrderBy(x => x.Id)
 						.ToList();
@@ -111,7 +111,7 @@ namespace Database.DataContexts
 					answer[block.Id] = ans;
 				}
 				else
-					answer[block.Id] = new List<UserQuiz>();
+					answer[block.Id] = new List<UserQuizAnswer>();
 				
 			}
 			return answer;
@@ -139,7 +139,7 @@ namespace Database.DataContexts
 			if (submission == null)
 				return new Dictionary<string, int>();
 			
-			return db.UserQuizzes
+			return db.UserQuizAnswers
 				.Where(q => q.SubmissionId == submission.Id)
 				.ToList()
 				.DistinctBy(q => q.BlockId)
@@ -152,14 +152,14 @@ namespace Database.DataContexts
 			if (submission == null)
 				return false;
 			
-			return db.UserQuizzes
+			return db.UserQuizAnswers
 				.Where(q => q.SubmissionId == submission.Id)
 				.All(q => q.QuizBlockScore == q.QuizBlockMaxScore);
 		}
 
 		public async Task SetScoreForQuizBlock(int submissionId, string blockId, int score)
 		{
-			db.UserQuizzes
+			db.UserQuizAnswers
 				.Where(q => q.SubmissionId == submissionId && q.BlockId == blockId)
 				.ForEach(q => q.QuizBlockScore = score);
 			await db.SaveChangesAsync().ConfigureAwait(false);
@@ -167,7 +167,7 @@ namespace Database.DataContexts
 		
 		public Dictionary<string, int> GetAnswersFrequencyForChoiceBlock(string courseId, Guid slideId, string quizId)
 		{
-			var answers = db.UserQuizzes.Include(q => q.SubmissionId).Where(q => q.Submission.CourseId == courseId && q.Submission.SlideId == slideId && q.BlockId == quizId);
+			var answers = db.UserQuizAnswers.Include(q => q.SubmissionId).Where(q => q.Submission.CourseId == courseId && q.Submission.SlideId == slideId && q.BlockId == quizId);
 			var totalTries = answers.Select(q => new { q.Submission.UserId, q.Submission.Timestamp }).Distinct().Count();
 			/* Don't call GroupBy().ToDictionary() because of performance issues.
 			   See http://code-ninja.org/blog/2014/07/24/entity-framework-never-call-groupby-todictionary/ for details */

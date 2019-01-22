@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Database.Models
 {
-	public class UserQuiz
+	public class UserQuizAnswer
 	{
 		[Required]
 		[Key]

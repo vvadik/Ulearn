@@ -508,7 +508,7 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		private static IEnumerable<QuizAnswerInfo> GetUserQuizAnswers(QuizSlide slide, IEnumerable<UserQuiz> userQuizzes)
+		private static IEnumerable<QuizAnswerInfo> GetUserQuizAnswers(QuizSlide slide, IEnumerable<UserQuizAnswer> userQuizzes)
 		{
 			var answers = userQuizzes.GroupBy(q => q.BlockId).ToDictionary(g => g.Key, g => g.ToList());
 			foreach (var block in slide.Blocks.OfType<AbstractQuestionBlock>())
@@ -524,9 +524,9 @@ namespace uLearn.Web.Controllers
 					yield return GetMatchingBlockAnswerInfo(answers, (MatchingBlock)block, block.QuestionIndex);
 		}
 
-		private static QuizAnswerInfo GetFillInBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuiz>> answers, string quizId, int questionIndex)
+		private static QuizAnswerInfo GetFillInBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuizAnswer>> answers, string quizId, int questionIndex)
 		{
-			UserQuiz answer = null;
+			UserQuizAnswer answer = null;
 			if (answers.ContainsKey(quizId))
 				answer = answers[quizId].FirstOrDefault();
 			return new FillInBlockAnswerInfo
@@ -539,9 +539,9 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		private static QuizAnswerInfo GetChoiceBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuiz>> answers, ChoiceBlock block, int questionIndex)
+		private static QuizAnswerInfo GetChoiceBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuizAnswer>> answers, ChoiceBlock block, int questionIndex)
 		{
-			IEnumerable<UserQuiz> answer = new List<UserQuiz>();
+			IEnumerable<UserQuizAnswer> answer = new List<UserQuizAnswer>();
 			if (answers.ContainsKey(block.Id))
 				answer = answers[block.Id].Where(q => q.ItemId != null);
 
@@ -574,9 +574,9 @@ namespace uLearn.Web.Controllers
 		}
 
 
-		private static QuizAnswerInfo GetIsTrueBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuiz>> answers, string quizId, int questionIndex)
+		private static QuizAnswerInfo GetIsTrueBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuizAnswer>> answers, string quizId, int questionIndex)
 		{
-			UserQuiz answer = null;
+			UserQuizAnswer answer = null;
 			if (answers.ContainsKey(quizId))
 				answer = answers[quizId].FirstOrDefault();
 			return new IsTrueBlockAnswerInfo
@@ -590,10 +590,10 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		private static QuizAnswerInfo GetOrderingBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuiz>> answers, OrderingBlock block, int questionIndex)
+		private static QuizAnswerInfo GetOrderingBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuizAnswer>> answers, OrderingBlock block, int questionIndex)
 		{
-			IEnumerable<UserQuiz> userAnswers = new List<UserQuiz>();
-			UserQuiz firstAnswer = null;
+			IEnumerable<UserQuizAnswer> userAnswers = new List<UserQuizAnswer>();
+			UserQuizAnswer firstAnswer = null;
 			if (answers.ContainsKey(block.Id))
 			{
 				userAnswers = answers[block.Id].Where(q => q.ItemId != null);
@@ -613,10 +613,10 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		private static QuizAnswerInfo GetMatchingBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuiz>> answers, MatchingBlock block, int questionIndex)
+		private static QuizAnswerInfo GetMatchingBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuizAnswer>> answers, MatchingBlock block, int questionIndex)
 		{
-			IEnumerable<UserQuiz> userAnswers = new List<UserQuiz>();
-			UserQuiz firstAnswer = null;
+			IEnumerable<UserQuizAnswer> userAnswers = new List<UserQuizAnswer>();
+			UserQuizAnswer firstAnswer = null;
 			if (answers.ContainsKey(block.Id))
 			{
 				userAnswers = answers[block.Id].Where(q => q.ItemId != null);
