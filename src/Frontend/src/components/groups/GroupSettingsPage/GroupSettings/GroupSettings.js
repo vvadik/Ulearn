@@ -5,7 +5,7 @@ import Loader from "@skbkontur/react-ui/components/Loader/Loader";
 import GroupScores from "./GroupScores/GroupScores";
 import GroupSettingsCheckbox from "./GroupSettingsCheckbox/GroupSettingsCheckbox";
 
-import styles from './style.less';
+import styles from './groupSettings.less';
 
 class GroupSettings extends Component {
 	render() {

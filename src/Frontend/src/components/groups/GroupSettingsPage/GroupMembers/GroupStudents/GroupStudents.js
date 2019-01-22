@@ -6,12 +6,12 @@ import "moment-timezone";
 import Checkbox from "@skbkontur/react-ui/components/Checkbox/Checkbox";
 import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
 import Icon from "@skbkontur/react-icons";
-import Avatar from "../Avatar/Avatar";
+import Avatar from "../../../../common/Avatar/Avatar";
 import CopyStudentsModal from "../CopyStudentsModal/CopyStudentsModal";
 import Profile from '../Profile';
 import getGenderForm from "../../../../../utils/getGenderForm";
 
-import styles from './style.less';
+import styles from './groupStudents.less';
 
 class GroupStudents extends Component {
 

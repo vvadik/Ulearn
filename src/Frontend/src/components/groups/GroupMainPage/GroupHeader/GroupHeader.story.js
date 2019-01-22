@@ -3,7 +3,7 @@ import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 import GroupHeader from './GroupHeader';
 
-import './style.less';
+import './groupHeader.less';
 
 storiesOf('Group/GroupHeader', module)
 	.add('default', () => (

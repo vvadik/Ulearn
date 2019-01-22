@@ -1,8 +1,8 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
-import colorHash from '../../../../../utils/colorHash';
+import colorHash from '../../../utils/colorHash';
 
-import styles from './style.less';
+import styles from './avatar.less';
 
 class Avatar extends Component {
 

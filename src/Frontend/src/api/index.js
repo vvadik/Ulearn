@@ -67,11 +67,7 @@ function request(url, options, isRetry) {
 }
 
 function get(url, options) {
-	if (!request) {
-		console.error();
-	}
-
-    return request(url, options);
+	return request(url, options);
 }
 
 function post(url, options) {

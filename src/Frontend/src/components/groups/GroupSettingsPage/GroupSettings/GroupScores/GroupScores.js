@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import PropTypes from "prop-types";
 import Checkbox from "@skbkontur/react-ui/components/Checkbox/Checkbox";
 
-import styles from './style.less';
+import styles from './groupScores.less';
 
 const mapToServerName = {
 	groupScores: 'are_additional_scores_enabled_in_this_group',

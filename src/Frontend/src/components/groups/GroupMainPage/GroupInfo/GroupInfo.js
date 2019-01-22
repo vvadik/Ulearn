@@ -7,7 +7,7 @@ import MenuItem from "@skbkontur/react-ui/components/MenuItem/MenuItem";
 import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
 import getPluralForm from "../../../../utils/getPluralForm";
 
-import styles from "./style.less";
+import styles from "./groupInfo.less";
 
 class GroupInfo extends Component {
 

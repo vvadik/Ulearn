@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import Loader from "@skbkontur/react-ui/components/Loader/Loader";
 import GroupInfo from "../GroupInfo/GroupInfo";
 
-import styles from "./style.less";
+import styles from "./groupList.less";
 
 class GroupList extends Component {
 	render() {

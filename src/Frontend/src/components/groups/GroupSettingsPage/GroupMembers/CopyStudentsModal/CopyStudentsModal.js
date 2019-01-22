@@ -7,7 +7,7 @@ import Button from "@skbkontur/react-ui/components/Button/Button";
 import Toast from "@skbkontur/react-ui/components/Toast/Toast";
 import getPluralForm from "../../../../../utils/getPluralForm";
 
-import styles from './style.less';
+import styles from './copyStudentsModal.less';
 import Loader from "@skbkontur/react-ui/components/Loader/Loader";
 
 class CopyStudentsModal extends Component {

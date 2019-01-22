@@ -9,13 +9,13 @@ import MenuItem from "@skbkontur/react-ui/components/MenuItem/MenuItem";
 import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
 import Loader from "@skbkontur/react-ui/components/Loader/Loader";
 import ComboboxInstructorsSearch from "./Combobox/ComboboxInstructorsSearch";
-import Avatar from "./Avatar/Avatar";
+import Avatar from "../../../common/Avatar/Avatar";
 import GroupStudents from "./GroupStudents/GroupStudents";
 import InviteBlock from "./InviteBlock/InviteBlock";
 import Profile from './Profile';
 import getGenderForm from "../../../../utils/getGenderForm";
 
-import styles from './style.less';
+import styles from './groupMembers.less';
 
 class GroupMembers extends Component {
 

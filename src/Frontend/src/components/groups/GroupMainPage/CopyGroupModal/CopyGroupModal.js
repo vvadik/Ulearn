@@ -8,7 +8,7 @@ import Checkbox from '@skbkontur/react-ui/components/Checkbox/Checkbox';
 import Loader from "@skbkontur/react-ui/components/Loader/Loader";
 import getPluralForm from "../../../../utils/getPluralForm";
 
-import styles from "./style.less";
+import styles from "./copyGroupModal.less";
 
 class CopyGroupModal extends Component {
 
