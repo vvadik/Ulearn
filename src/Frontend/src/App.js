@@ -18,8 +18,7 @@ import GroupListPage from "./pages/course/groups/GroupListPage";
 import GroupPage from "./pages/course/groups/GroupPage";
 import { getQueryStringParameter } from "./utils";
 
-import "./common.less"
-import "./App.less"
+import styles from "./App.less"
 
 let loggerMiddleware = createLogger();
 
@@ -100,7 +99,7 @@ class InternalUlearnApp extends Component {
             <BrowserRouter>
                 <ErrorBoundary>
 					{ isHeaderVisible && <Header initializing={this.state.initializing}/> }
-					{ isHeaderVisible && <div className="header-content-divider" /> }
+					{ isHeaderVisible && <div className={styles.headerContentDivider} /> }
 					<NotFoundErrorBoundary>
 						{ ! this.state.initializing && // Avoiding bug: don't show page while initializing.
 													   // Otherwise we make two GET requests sequentially.
