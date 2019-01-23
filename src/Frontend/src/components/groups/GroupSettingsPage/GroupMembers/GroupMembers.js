@@ -16,6 +16,7 @@ import Profile from './Profile';
 import getGenderForm from "../../../../utils/getGenderForm";
 
 import styles from './groupMembers.less';
+import Toast from "@skbkontur/react-ui/components/Toast/Toast";
 
 class GroupMembers extends Component {
 
@@ -266,7 +267,10 @@ class GroupMembers extends Component {
 		});
 
 		api.groups.deleteStudents(group.id, students)
-			.catch(console.error);
+			.catch(console.error)
+			.then(() => {
+				Toast.push("Студенты исключены из группы");
+			});
 	};
 }
 

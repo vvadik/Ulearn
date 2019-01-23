@@ -21,16 +21,19 @@ class GroupSettings extends Component {
 							group={group}
 							onChangeSettings={onChangeSettings}/>
 					</div>
-					<div className={styles.settings}>
-						<h4 className={styles["settings-header"]}>Баллы</h4>
-						<p className={styles["settings-text"]}>Преподаватели могут выставлять студентам группы следующие баллы:</p>
-						{scores && scores.map(score =>
-							<GroupScores
-								key={score.id}
-								score={score}
-								onChangeScores={onChangeScores} />
-						)}
-					</div>
+					{scores &&
+						<div className={styles.settings}>
+							<h4 className={styles["settings-header"]}>Баллы</h4>
+							<p className={styles["settings-text"]}>Преподаватели могут выставлять студентам группы следующие
+								баллы:</p>
+							{scores.map(score =>
+								<GroupScores
+									key={score.id}
+									score={score}
+									onChangeScores={onChangeScores}/>
+							)}
+						</div>
+					}
 				</div>
 			</Loader>
 		)
@@ -40,9 +43,7 @@ class GroupSettings extends Component {
 		return (
 			<div className={styles["change-name"]}>
 				<header className={styles["change-name-header"]}>
-					<label>
-						<h4 className={styles["change-name-label"]}>Название группы</h4>
-					</label>
+					<h4 className={styles["change-name-label"]}>Название группы</h4>
 				</header>
 				<div className={styles["change-name-input"]}>
 					<Input

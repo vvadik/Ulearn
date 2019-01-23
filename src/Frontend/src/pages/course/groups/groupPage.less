@@ -1,17 +1,26 @@
 @import "./../../../variables.less";
-@import "./groupListPage.less";
+
 @minHeight: calc(100vh - 60px);
+@indent: 50px;
+@tableIndent: 25px;
+@phoneIndent: 15px;
 
 .group-header {
   width: 100%;
-  margin: 0 auto;
-  border-bottom: 1px solid #eee;
-  padding: 30px 0 0;
+  margin: -50px auto 0;
+
+  @media (max-width: @maxTabletWidth) {
+    margin-top: 0;
+  }
 }
 
 .link-to-prev-page-block {
-  width: 80%;
-  margin: 0 auto;
+  margin: 18px auto 0 -20px;
+
+  @media (max-width: @maxTabletWidth) {
+    margin-left: 0;
+    margin-top: 0;
+  }
 }
 
 .link-to-prev-page {
@@ -20,8 +29,7 @@
 }
 
 .group-name {
-  width: 80%;
-  margin: 30px auto 20px;
+  margin: 15px auto 15px;
   font-weight: 500;
   text-align: left;
   font-size: 32px;
@@ -34,21 +42,51 @@
 
   @media (max-width: @maxPhoneWidth) {
 	font-size: 22px;
+    line-height: 22px;
   }
 }
 
+/* TODO (andgein): It's copy-paste from GroupHeader/style.less */
 .tabs-container {
-  width: 80%;
-  margin: 30px auto -1px;
+	margin: 0 -@indent 0 -@indent;
+	padding-left: @indent;
+	border-bottom: 1px solid #eee;
 
-  a:hover,
-  a:focus {
-	text-decoration: none;
-  }
+	@media (max-width: @maxTabletWidth) {
+		width: 100%;
+		margin: 0 -@tableIndent 0 -@tableIndent;
+		padding-left: @tableIndent;
+	}
+
+	@media (max-width: @maxPhoneWidth) {
+		margin: 0 -@phoneIndent 0 -@phoneIndent;
+		padding-left: @phoneIndent;
+	}
+
+	a {
+		@media (max-width: @maxPhoneWidth) {
+			font-size: 14px;
+			padding: 7px 0;
+			margin-left: 7px;
+			margin-right: 7px;
+
+			&:first-child {
+				margin-left: 20px;
+			}
+		}
+
+		&:hover,
+		&:focus {
+			text-decoration: none;
+		}
+	}
 }
 
 .content {
-  width: 80%;
-  margin: 30px auto;
+  margin: 20px auto;
+
+  @media (max-width: @maxPhoneWidth) {
+    margin-top: 10px;
+  }
 }
 

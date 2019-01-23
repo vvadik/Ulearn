@@ -6,16 +6,19 @@ label {
 
 .wrapper {
   width: 100%;
-  margin: 0 0 40px 0;
+  margin: 0 0 20px 0;
 
   @media (max-width: @maxTabletWidth) {
-	margin: 0 auto 30px;
-	width: 100%;
+	margin: 0 auto 20px;
   }
 }
 
 .change-name {
-  margin-bottom: 35px;
+  margin-bottom: 20px;
+
+  @media (max-width: @maxPhoneWidth) {
+    margin-bottom: 10px;
+  }
 }
 
 .change-name-header {
@@ -24,20 +27,26 @@ label {
   margin: 0 20px 0 0;
 }
 
-.change-name-label {
+.change-name-label,
+.settings-header {
   font-weight: 500;
   font-size: 18px;
-  margin: 0 0 15px 0;
-}
-
-.checkbox-block {
-  margin-bottom: 35px;
+  margin: 0 0 7px 0;
 }
 
 .settings-header {
-  margin: 10px 0;
+  padding-top: 7px;
+}
+
+.checkbox-block {
+  margin-bottom: 20px;
+
+  @media (max-width: @maxPhoneWidth) {
+	margin-bottom: 10px;
+  }
 }
 
 .settings-text {
+  margin-top: 0;
   margin-bottom: 10px;
 }

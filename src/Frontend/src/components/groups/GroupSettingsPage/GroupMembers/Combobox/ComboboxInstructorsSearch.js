@@ -71,7 +71,7 @@ class ComboboxInstructorsSearch extends Component {
 	renderNotFound = () => {
 		const msg = this.state.query
 			? 'В этом курсе нет преподавателей c таким именем'
-		    : 'В этом курсе нет преподавателей';
+		    : 'В этом курсе больше нет преподавателей';
 
 		return <span>{msg}</span>;
 	};

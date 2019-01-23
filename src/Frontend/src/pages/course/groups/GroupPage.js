@@ -14,6 +14,7 @@ import GroupSettings from "../../../components/groups/GroupSettingsPage/GroupSet
 import Error404 from "../../../components/common/Error/Error404.js";
 
 import styles from "./groupPage.less";
+import {asPage} from "../../index";
 
 class GroupPage extends Component {
 
@@ -103,28 +104,26 @@ class GroupPage extends Component {
 		let userId = this.props.account.id;
 
 		return (
-			<div className={styles.wrapper}>
+			<React.Fragment>
 				<Helmet defer={true}>
 					<title>{`Группа ${group.name}`}</title>
 				</Helmet>
-				<div className={styles["content-wrapper"]}>
-					{ this.renderHeader() }
-					<div className={styles.content}>
-						{ groupPage === "settings" &&
-							this.renderSettings() }
-						{ groupPage === "members" &&
-							<GroupMembers
-								courseId={courseId}
-								userId={userId}
-								role={courseRole}
-								isSysAdmin={this.props.account.isSystemAdministrator}
-								systemAccesses={systemAccesses}
-								group={group}
-								onChangeGroupOwner={this.onChangeGroupOwner} />
-						}
-					</div>
+				{ this.renderHeader() }
+				<div className={styles.content}>
+					{ groupPage === "settings" &&
+						this.renderSettings() }
+					{ groupPage === "members" &&
+						<GroupMembers
+							courseId={courseId}
+							userId={userId}
+							role={courseRole}
+							isSysAdmin={this.props.account.isSystemAdministrator}
+							systemAccesses={systemAccesses}
+							group={group}
+							onChangeGroupOwner={this.onChangeGroupOwner} />
+					}
 				</div>
-			</div>
+			</React.Fragment>
 		)
 	}
 
@@ -146,11 +145,11 @@ class GroupPage extends Component {
 						</Link>
 					</div>
 				</div>
-				<h2 className={styles["group-name"]}>{ group.name }</h2>
+				<h2 className={styles["group-name"]}>{ group.name ? group.name : " " }</h2>
 				<div className={styles["tabs-container"]}>
 					<Tabs value={groupPage} onChange={this.onChangeTab}>
 						<Tabs.Tab id="settings">Настройки</Tabs.Tab>
-						<Tabs.Tab id="members">Участники</Tabs.Tab>
+						<Tabs.Tab id="members">Преподаватели и студенты</Tabs.Tab>
 					</Tabs>
 				</div>
 			</header>
@@ -297,8 +296,4 @@ GroupPage.propTypes = {
 
 GroupPage = connect(GroupPage.mapStateToProps, GroupPage.mapDispatchToProps)(GroupPage);
 
-export default withRouter(GroupPage);
-
-
-
-
+export default withRouter(asPage(GroupPage));

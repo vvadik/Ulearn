@@ -93,7 +93,7 @@ class GroupStudents extends Component {
 								<Profile
 									user={item.user}
 									systemAccesses={systemAccesses}
-									isSysAdmin={isSysAdmin} /> { item.adding_time && <span className={styles["action-text"]}>
+									isSysAdmin={isSysAdmin} /> { item.adding_time && <span>
 									{ `${ getGenderForm(item.user.gender, 'вступила', 'вступил') }
 									${ moment(grantTime(item.adding_time)).fromNow() }` }</span> }
 							</Checkbox>

@@ -80,9 +80,9 @@ class CopyGroupModal extends Component {
 						<div className={styles["modal-content"]}>
 							<p className={styles["common-info"]}>Новая группа будет создана для курса <b>«{ course.title }»</b>.
 								Скопируются все настройки группы (в том числе владелец),
-								в неё автоматически добавятся участники из копируемой группы.
-								Преподаватели тоже будут добавлены в группу, если у них есть права на
-								курс <b>«{ course.title }»</b>.
+								в неё автоматически добавятся студенты из копируемой группы.
+								Преподаватели тоже будут добавлены в группу, если у них есть права
+								на&nbsp;курс <b>«{ course.title }»</b>.
 							</p>
 							{ this.renderCourseSelect() }
 							{ this.renderGroupSelect() }

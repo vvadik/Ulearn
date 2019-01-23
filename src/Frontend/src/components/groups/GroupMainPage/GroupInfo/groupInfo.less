@@ -1,20 +1,38 @@
 @import "../../../../variables.less";
-@indent: 27px;
+@indent: 50px;
+@tableIndent: 25px;
 
 .wrapper {
-  padding: 0 @indent 15px;
+  padding: 5px @indent 20px;
   position: relative;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  background: #fff;
-  border-radius: 2px;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: baseline;
   cursor: pointer;
 
+  &:last-child {
+    border-bottom: 0;
+  }
+
   &:hover {
 	background-color: rgba(0,0,0,.02);
+
+    a {
+	  text-decoration: underline;
+      text-decoration-color: #3072c4;
+    }
+  }
+
+  @media (max-width: @maxTabletWidth) {
+	  padding-left: 0;
+	  padding-right: 0;
+  }
+
+  @media (max-width: @maxPhoneWidth) {
+	  padding-top: 0;
+	  padding-bottom: 15px;
   }
 }
 
@@ -41,6 +59,10 @@
   @media (max-width: @maxTabletWidth) {
 	flex-direction: column;
   }
+
+  a {
+    text-decoration: none;
+  }
 }
 
 .content {
@@ -51,20 +73,26 @@
 	width: 100%;
   }
 
-  a {
-    text-decoration-color: #3072c4;
-  }
+  @media (max-width: @maxPhoneWidth) {
+	font-size: 12px;
+ }
 }
 
 .group-name {
   font-size: 18px;
+  font-weight: 500;
   color: @linkColor;
+  margin-top: 12px;
   margin-bottom: 7px;
   opacity: 0.99;
   z-index: 1;
 
   &:hover {
 	text-decoration: underline;
+  }
+
+  @media (max-width: @maxPhoneWidth) {
+    font-size: 16px;
   }
 }
 
@@ -79,6 +107,11 @@
 
   @media (max-width: @maxTabletWidth) {
 	width: 100%;
+  }
+
+  @media (max-width: @maxPhoneWidth) {
+    font-size: 12px;
+    margin-top: 10px;
   }
 }
 

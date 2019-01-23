@@ -26,7 +26,7 @@ class GroupInfo extends Component {
 		return (
 			<div className={styles.wrapper}>
 				<div className={styles["content-wrapper"]}>
-					<Link className={styles["link-to-group-page"]} to={`/${this.props.courseId}/groups/${group.id}`} />
+					<Link className={styles["link-to-group-page"]} to={`/${this.props.courseId}/groups/${group.id}/`} />
 					<div className={styles["content-block"]}>
 						<header className={styles.content}>
 							<Link to={`/${this.props.courseId}/groups/${group.id}/`}>
@@ -56,7 +56,7 @@ class GroupInfo extends Component {
 		const owner = group.owner.visible_name || 'Неизвестный';
 		const teachers = [owner, ...shortTeachersList];
 		const teachersCount = teachers.length;
-		const pluralFormOfTeachers = getPluralForm(teachersCount, 'преподаватель', 'преподаватели');
+		const pluralFormOfTeachers = getPluralForm(teachersCount, 'Преподаватель', 'Преподаватели');
 
 		return (
 			<div className={styles["teachers-list"]}>

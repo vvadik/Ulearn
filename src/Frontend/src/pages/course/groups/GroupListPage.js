@@ -1,22 +1,19 @@
-import React, { Component } from "react";
+import React, {Component, createRef} from "react";
 import { withRouter } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import connect from "react-redux/es/connect/connect";
 import PropTypes from 'prop-types';
 import api from "../../../api";
+import { asPage } from "../../index";
 import GroupList from "../../../components/groups/GroupMainPage/GroupList/GroupList";
 import GroupHeader from "../../../components/groups/GroupMainPage/GroupHeader/GroupHeader";
 import Error404 from "../../../components/common/Error/Error404";
+import Toast from "@skbkontur/react-ui/components/Toast/Toast";
 
-import styles from "./groupListPage.less";
-
-class AbstractPage extends Component {
- // TODO: выяснить у Андрея, зачем оно. И реализоваьть или удалить.
-}
-
-class GroupListPage extends AbstractPage {
+class GroupListPage extends Component {
 	constructor(props) {
 		super(props);
+		this.headerRef = createRef();
 		this.state = {
 			groups: [],
 			archiveGroups: [],
@@ -82,12 +79,12 @@ class GroupListPage extends AbstractPage {
 
 		api.groups.getCourseArchivedGroups(courseId)
 			.then(json => {
-			let archiveGroups = json.groups;
-			this.setState({
-				loadedArchived: true,
-				archiveGroups,
-			});
-		})
+				let archiveGroups = json.groups;
+				this.setState({
+					loadedArchived: true,
+					archiveGroups,
+				});
+			})
 			.catch(console.error)
 			.finally(() =>
 				this.setState({
@@ -100,7 +97,7 @@ class GroupListPage extends AbstractPage {
 		const courseById = this.props.courses.courseById;
 		const course = courseById[this.courseId];
 
-		if(this.state.status === "error") {
+		if (this.state.status === "error") {
 			return <Error404 />;
 		}
 
@@ -109,27 +106,35 @@ class GroupListPage extends AbstractPage {
 		}
 
 		return (
-			<div className={styles.wrapper}>
+			<React.Fragment>
 				<Helmet defer={false}>
 					<title>{`Группы в курсе ${course.title.toLowerCase()}`}</title>
 				</Helmet>
-				<div className={styles["content-wrapper"]}>
-					<GroupHeader
-						onTabChange={this.onTabChange}
-						filter={this.state.filter}
-						course={course}
-						addGroup={this.addGroup}
-						groups={this.state.groups}
-					/>
-					<GroupList
-						courseId={this.courseId}
-						groups={this.filteredGroups}
-						deleteGroup={this.deleteGroup}
-						toggleArchived={this.toggleArchived}
-						loading={this.loading}
-					/>
-				</div>
-			</div>
+				<GroupHeader
+					onTabChange={this.onTabChange}
+					filter={this.state.filter}
+					course={course}
+					addGroup={this.addGroup}
+					groups={this.state.groups}
+					ref={this.headerRef}
+				/>
+				<GroupList
+					courseId={this.courseId}
+					groups={this.filteredGroups}
+					deleteGroup={this.deleteGroup}
+					toggleArchived={this.toggleArchived}
+					loading={this.loading}
+				>
+					{ this.state.filter === "archived" && <div>
+						У вас нет архивных групп. Когда какая-нибудь группа станет вам больше не&nbsp;нужна, заархивируйте её.
+						Архивные группы будут жить здесь вечно и не&nbsp;помешают вам в&nbsp;текущей работе. Однако если понадобится, вы всегда
+						сможете вернуться к&nbsp;ним.
+					</div> }
+					{ this.state.filter === "active" && <div>
+						У вас нет активных групп. Создайте группу и пригласите в неё студентов, чтобы видеть их прогресс, проверять их тесты и делать код-ревью их решений.
+					</div> }
+				</GroupList>
+			</React.Fragment>
 		)
 	};
 
@@ -181,7 +186,10 @@ class GroupListPage extends AbstractPage {
 		};
 
 		api.groups.saveGroupSettings(group.id, newSettings)
-			.catch(console.error);
+			.catch(console.error)
+			.then(() => {
+				Toast.push(isArchived ? `Группа «${group.name}» заархивирована` : `Группа «${group.name}» восстановлена`)
+			});
 
 		group = { ...group, ...newSettings };
 
@@ -235,4 +243,4 @@ GroupListPage.propTypes = {
 
 GroupListPage = connect(GroupListPage.mapStateToProps, GroupListPage.mapDispatchToProps)(GroupListPage);
 
-export default withRouter(GroupListPage);
+export default withRouter(asPage(GroupListPage));

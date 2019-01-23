@@ -24,6 +24,11 @@ class GroupList extends Component {
 						}
 					</div>
 				</Loader>
+				{ ! this.props.loading && this.props.groups && this.props.groups.length === 0 &&
+					<div className={ styles.noGroups }>
+						{ this.props.children }
+					</div>
+				}
 			</section>
 		);
 	}
