@@ -2,7 +2,7 @@
 
 @minHeight: calc(100vh - 60px);
 @indent: 50px;
-@tableIndent: 25px;
+@tabletIndent: 25px;
 @phoneIndent: 15px;
 
 .group-header {
@@ -43,6 +43,7 @@
   @media (max-width: @maxPhoneWidth) {
 	font-size: 22px;
     line-height: 22px;
+    margin: 10px 0;
   }
 }
 
@@ -54,8 +55,8 @@
 
 	@media (max-width: @maxTabletWidth) {
 		width: 100%;
-		margin: 0 -@tableIndent 0 -@tableIndent;
-		padding-left: @tableIndent;
+		margin: 0 -@tabletIndent 0 -@tabletIndent;
+		padding-left: @tabletIndent;
 	}
 
 	@media (max-width: @maxPhoneWidth) {

@@ -1,6 +1,7 @@
 @import "../../../../variables.less";
 @indent: 50px;
-@tableIndent: 25px;
+@tabletIndent: 25px;
+@phoneIndent: 15px;
 
 .wrapper {
   padding: 5px @indent 20px;
@@ -26,11 +27,12 @@
   }
 
   @media (max-width: @maxTabletWidth) {
-	  padding-left: 0;
+	  padding-left: @tabletIndent;
 	  padding-right: 0;
   }
 
   @media (max-width: @maxPhoneWidth) {
+	  padding-left: @phoneIndent;
 	  padding-top: 0;
 	  padding-bottom: 15px;
   }

@@ -1,5 +1,7 @@
 @import "../../../../variables.less";
 @indent: 50px;
+@tabletIndent: 25px;
+@phoneIndent: 15px;
 
 .wrapper {
   margin: 0 auto;
@@ -37,7 +39,13 @@
   margin: 0 -@indent;
 
   @media (max-width: @maxTabletWidth) {
-	margin: 0;
+	margin-left: -@tabletIndent;
+    margin-right: -@tabletIndent;
+  }
+
+  @media (max-width: @maxPhoneWidth) {
+	margin-left: -@phoneIndent;
+    margin-right: -@phoneIndent;
   }
 }
 

@@ -16,14 +16,17 @@ label {
 .change-name {
   margin-bottom: 20px;
 
+  @media (max-width: @maxTabletWidth) {
+	margin-bottom: 12px;
+  }
+
   @media (max-width: @maxPhoneWidth) {
-    margin-bottom: 10px;
+    margin-bottom: 4px;
   }
 }
 
 .change-name-header {
   display: inline-block;
-  line-height: 30px;
   margin: 0 20px 0 0;
 }
 
