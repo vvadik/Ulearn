@@ -8,6 +8,7 @@ import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
 import getPluralForm from "../../../../utils/getPluralForm";
 
 import styles from "./groupInfo.less";
+import {Mobile, NotMobile} from "../../../../utils/responsive";
 
 class GroupInfo extends Component {
 
@@ -84,23 +85,34 @@ class GroupInfo extends Component {
 	renderActions() {
 		const { group } = this.props;
 
+		let menuItems = [
+			<MenuItem onClick={() => this.props.toggleArchived(group, !group.is_archived)} key="toggleArchived">
+				<Gapped gap={5}>
+					<Icon name="ArchiveUnpack" />
+					{group.is_archived ? 'Восстановить' : 'Архивировать'}
+				</Gapped>
+			</MenuItem>,
+			<MenuItem onClick={() => this.props.deleteGroup(group, group.is_archived ?
+				'archiveGroups' : 'groups')} key="delete">
+				<Gapped gap={5}>
+					<Icon name="Delete" />
+					Удалить
+				</Gapped>
+			</MenuItem>
+		];
+
 		return (
 			<div className={styles["group-action"]}>
-				<Kebab size="large">
-					<MenuItem onClick={() => this.props.toggleArchived(group, !group.is_archived)}>
-						<Gapped gap={5}>
-							<Icon name="ArchiveUnpack" />
-							{group.is_archived ? 'Восстановить' : 'Архивировать'}
-						</Gapped>
-					</MenuItem>
-					<MenuItem onClick={() => this.props.deleteGroup(group, group.is_archived ?
-						'archiveGroups' : 'groups')}>
-						<Gapped gap={5}>
-							<Icon name="Delete" />
-							Удалить
-						</Gapped>
-					</MenuItem>
-				</Kebab>
+				<Mobile>
+					<Kebab size="large" positions={["left top"]} disableAnimations={true}>
+						{ menuItems }
+					</Kebab>
+				</Mobile>
+				<NotMobile>
+					<Kebab size="large" positions={["bottom right"]} disableAnimations={false}>
+						{ menuItems }
+					</Kebab>
+				</NotMobile>
 			</div>
 		)
 	}

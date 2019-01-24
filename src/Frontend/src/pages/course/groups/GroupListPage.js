@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet";
 import connect from "react-redux/es/connect/connect";
 import PropTypes from 'prop-types';
 import api from "../../../api";
-import { asPage } from "../../index";
+import { Page } from "../../index";
 import GroupList from "../../../components/groups/GroupMainPage/GroupList/GroupList";
 import GroupHeader from "../../../components/groups/GroupMainPage/GroupHeader/GroupHeader";
 import Error404 from "../../../components/common/Error/Error404";
@@ -106,7 +106,7 @@ class GroupListPage extends Component {
 		}
 
 		return (
-			<React.Fragment>
+			<Page>
 				<Helmet defer={false}>
 					<title>{`Группы в курсе ${course.title.toLowerCase()}`}</title>
 				</Helmet>
@@ -134,7 +134,7 @@ class GroupListPage extends Component {
 						У вас нет активных групп. Создайте группу и пригласите в неё студентов, чтобы видеть их прогресс, проверять их тесты и делать код-ревью их решений.
 					</div> }
 				</GroupList>
-			</React.Fragment>
+			</Page>
 		)
 	};
 
@@ -171,7 +171,10 @@ class GroupListPage extends Component {
 
 	deleteGroup = (group, groupsName) => {
 		api.groups.deleteGroup(group.id)
-			.catch(console.error);
+			.catch(console.error)
+			.then(() => {
+				Toast.push(`Группа «${group.name}» удалена`);
+			});
 
 		const updateGroups = this.state[groupsName].filter(g => group.id !== g.id);
 
@@ -243,4 +246,4 @@ GroupListPage.propTypes = {
 
 GroupListPage = connect(GroupListPage.mapStateToProps, GroupListPage.mapDispatchToProps)(GroupListPage);
 
-export default withRouter(asPage(GroupListPage));
+export default withRouter(GroupListPage);

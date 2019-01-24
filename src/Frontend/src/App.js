@@ -56,7 +56,7 @@ setInterval(() => {
         store.dispatch(api.notifications.getNotificationsCount(store.getState().notifications.lastTimestamp))
 }, 60 * 1000);
 
-api.setServerErrorHandler(() => Toast.push('Произошла ошибка. Попробуйте перезагрузить страницу.'));
+api.setServerErrorHandler((message) => Toast.push(message ? message : 'Произошла ошибка. Попробуйте перезагрузить страницу.'));
 
 class UlearnApp extends Component {
     render() {

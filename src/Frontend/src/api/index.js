@@ -56,6 +56,7 @@ function request(url, options, isRetry) {
         })
 		.catch((error) => {
 			console.error(error);
+			serverErrorHandler('Нет можем подключиться к серверу. Попробуйте обновить страницу.');
 			throw error;
 		})
         .then(value => {

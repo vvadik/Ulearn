@@ -9,9 +9,14 @@ class GroupList extends Component {
 	render() {
 		return (
 			<section className={styles.wrapper}>
-				<Loader type="big" active={this.props.loading}>
+				{ this.props.loading &&
+					<div className={styles.loaderWrapper}>
+						<Loader type="big" active={true}/>
+					</div>
+				}
+				{ !this.props.loading &&
 					<div className={styles.content}>
-						{ this.props.groups && this.props.groups
+						{this.props.groups && this.props.groups
 							.sort((a, b) => a.name.localeCompare(b.name))
 							.map(group =>
 								<GroupInfo
@@ -23,8 +28,8 @@ class GroupList extends Component {
 								/>)
 						}
 					</div>
-				</Loader>
-				{ ! this.props.loading && this.props.groups && this.props.groups.length === 0 &&
+				}
+				{ !this.props.loading && this.props.groups && this.props.groups.length === 0 &&
 					<div className={ styles.noGroups }>
 						{ this.props.children }
 					</div>
