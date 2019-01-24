@@ -109,9 +109,10 @@ namespace Ulearn.Web.Api
 					/* Disable model checking because in other case stack overflow raised on course model binding.
 					   See https://github.com/aspnet/Mvc/issues/7357 for details */
 					options.ModelMetadataDetailsProviders.Add(new SuppressChildValidationMetadataProvider(typeof(Course)));
+					options.ModelMetadataDetailsProviders.Add(new SuppressChildValidationMetadataProvider(typeof(ICourse)));
 				}
 			).AddApplicationPart(GetType().Assembly)
-				.AddControllersAsServices();;
+				.AddControllersAsServices();
 		}
 
 		protected override void ConfigureSwaggerDocumentationGeneration(SwaggerGenOptions c)
