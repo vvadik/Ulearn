@@ -254,6 +254,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			return new GroupScoringGroupInfo
 			{
 				Id = scoringGroup.Id,
+				Name = scoringGroup.Name ?? "",
 				Abbreviation = scoringGroup.Abbreviation ?? "",
 				Description = scoringGroup.Description ?? "",
 				IsEnabledForEveryone = scoringGroup.EnabledForEveryone,

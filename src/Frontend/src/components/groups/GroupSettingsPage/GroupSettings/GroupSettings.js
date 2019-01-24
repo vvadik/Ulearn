@@ -21,7 +21,7 @@ class GroupSettings extends Component {
 							group={group}
 							onChangeSettings={onChangeSettings}/>
 					</div>
-					{scores &&
+					{scores.length > 0 &&
 						<div className={styles.settings}>
 							<h4 className={styles["settings-header"]}>Баллы</h4>
 							<p className={styles["settings-text"]}>Преподаватели могут выставлять студентам группы следующие

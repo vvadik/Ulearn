@@ -259,7 +259,7 @@ class GroupPage extends Component {
 			.all([saveGroup, saveScores])
 			.then(([group, scores]) => {
 				this.setState({ group });
-				Toast.push('Настройки сохранены');
+				Toast.push('Настройки группы сохранены');
 			})
 			.catch(console.error)
 			.finally(() => {
