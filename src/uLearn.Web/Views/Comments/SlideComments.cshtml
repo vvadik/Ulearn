@@ -62,7 +62,7 @@
 	var forEveryoneTopLevelComments = Model.TopLevelComments.Where(c => !c.IsForInstructorsOnly).ToList();
 }
 
-<div class="react-render" data-component="CommentSendForm" data-props="{}"></div>
+<div class="react-render" data-component="CommentSendForm" data-props="@(new { account="account", match="match", enterToCourse="enterToCourse"}.JsonSerialize())"></div>
 
 <h3>Комментарии</h3>
 

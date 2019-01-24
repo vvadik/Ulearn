@@ -10,19 +10,53 @@ import ArrowChevron2Right from "@skbkontur/react-icons/ArrowChevron2Right";
 import Avatar from "../common/Avatar/Avatar";
 
 import styles from "./comment.less";
-import {getQueryStringParameter} from "../../utils";
 
 class CommentSendForm extends Component {
 	state = {
+		comments: [],
 		text: '',
 		loading: false,
 	};
 
 	componentDidMount() {
-		let courseId = this.props.match.params.courseId.toLowerCase();
+		const slideId = this.props.match.params.slideId;
 
-		this.props.enterToCourse(courseId);
+		this.props.enterToCourse(this.courseId, slideId);
+		this.loadComment(this.courseId, slideId, this.isInstructor);
 	}
+
+	get courseId() {
+		return this.props.match.params.courseId.toLowerCase();
+	}
+
+	get role() {
+		return this.props.account.roleByCourse[this.courseId];
+	}
+
+	_instructor = null;
+	get isInstructor() {
+		if (this._instructor === null) {
+			this._instructor = this.props.account.isSystemAdministrator ||
+				['courseAdmin', 'instructor'].includes(this.role);
+		}
+		return this._instructor;
+	}
+
+	loadComment = (courseId, slideId) => {
+		this.setState({ loading: true });
+
+		api.comments.getComments(courseId, slideId)
+			.then(json => {
+				let comments = json.comments;
+				this.setState({
+					comments: comments,
+					loading: false,
+				})
+			})
+			.catch(console.error)
+			.finally(this.setState({ loading: false })
+			)
+	};
 
 	render() {
 		let userId = this.props.account.id;
@@ -68,14 +102,12 @@ class CommentSendForm extends Component {
 	onSubmit = () => {
 		const text = this.state.text;
 		const replyTo = 0;
-		const isForInstructors = false;
-		const slideId = 0;
-		let courseId = this.props.match.params.courseId.toLowerCase();
+		const slideId = this.props.match.params;
 
 		this.setState({ loading: true });
-		api.comments.addComment(courseId, slideId, text, replyTo, isForInstructors)
+		api.comments.addComment(this.courseId, slideId, text, replyTo, this.isInstructor)
 			.catch(console.error)
-			.finally(this.setState({ loading: false}))
+			.finally(this.setState({ loading: false }));
 	};
 
 	static mapStateToProps(state) {
@@ -86,9 +118,10 @@ class CommentSendForm extends Component {
 
 	static mapDispatchToProps(dispatch) {
 		return {
-			enterToCourse: (courseId) => dispatch({
+			enterToCourse: (courseId, slideId) => dispatch({
 				type: 'COURSES__COURSE_ENTERED',
-				courseId: courseId
+				courseId: courseId,
+				slideId: slideId,
 			}),
 		}
 	};
