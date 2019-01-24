@@ -155,6 +155,9 @@ class DownloadedHtmlContent extends Component {
         let courseId = this._getCourseIdFromUrl();
         this.props.enterToCourse(courseId);
 
+        let slideId = this._getSlideIdFromUrl();
+        this.props.enterToCourse(slideId);
+
         let el = document.createElement('html');
         el.innerHTML = data;
         let head = el.getElementsByTagName('head')[0];
@@ -206,6 +209,10 @@ class DownloadedHtmlContent extends Component {
         this.lastRenderedUrl = url;
         DownloadedHtmlContent.removeBootstrapModalBackdrop();
     }
+
+    _getSlideIdFromUrl() {
+    	return window.location.pathname.split('/')[3].split('_').pop();
+	}
 
     _getCourseIdFromUrl() {
         /* 1. Extract courseId from urls like /Course/<courseId/... */
@@ -330,9 +337,10 @@ class DownloadedHtmlContent extends Component {
 
     static mapDispatchToProps(dispatch) {
         return {
-            enterToCourse: (courseId) => dispatch({
+            enterToCourse: (courseId, slideId) => dispatch({
                 type: 'COURSES__COURSE_ENTERED',
-                courseId: courseId
+                courseId: courseId,
+				slideId: slideId,
             }),
             updateUserInformation: () => dispatch(api.account.getCurrentUser())
         }

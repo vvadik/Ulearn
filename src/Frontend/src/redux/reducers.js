@@ -58,7 +58,8 @@ function courses(state = initialCoursesState, action) {
         case 'COURSES__COURSE_ENTERED':
             return {
                 ...state,
-                currentCourseId: action.courseId
+                currentCourseId: action.courseId,
+				currentSlideId: action.slideId,
             };
         default:
             return state;
