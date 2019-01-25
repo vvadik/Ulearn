@@ -326,7 +326,7 @@ namespace uLearn.Web.Controllers
 
 			/* TODO: check if 0 <= exerciseScore <= exercise.MaxReviewScore */
 
-			await slideCheckingsRepo.RemoveWaitingManualExerciseCheckings(courseId, slideId, userId).ConfigureAwait(false);
+			await slideCheckingsRepo.RemoveWaitingManualCheckings<ManualExerciseChecking>(courseId, slideId, userId).ConfigureAwait(false);
 			ManualExerciseChecking checking;
 			if (updateCheckingId.HasValue)
 				checking = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(updateCheckingId.Value);

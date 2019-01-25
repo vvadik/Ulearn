@@ -22,7 +22,7 @@ namespace Database.DataContexts
 
 		public UserQuizSubmission FindLastUserSubmission(string courseId, Guid slideId, string userId)
 		{
-			return db.UserQuizSubmissions.Where(s => s.CourseId == courseId && s.UserId == userId && s.SlideId == slideId && !s.IsDropped).OrderByDescending(s => s.Timestamp).FirstOrDefault();
+			return db.UserQuizSubmissions.Where(s => s.CourseId == courseId && s.UserId == userId && s.SlideId == slideId).OrderByDescending(s => s.Timestamp).FirstOrDefault();
 		}		
 		
 		public async Task<UserQuizSubmission> AddSubmission(string courseId, Guid slideId, string userId, DateTime timestamp)
@@ -61,16 +61,10 @@ namespace Database.DataContexts
 			return db.ManualQuizCheckings.Any(c => c.CourseId == courseId && c.SlideId == slideId && c.UserId == userId && !c.IsChecked);
 		}
 
-		public bool IsQuizSlidePassed(string courseId, string userId, Guid slideId)
-		{
-			return db.UserQuizSubmissions.Any(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId && !x.IsDropped);
-		}
-
-		public IEnumerable<bool> GetQuizDropStates(string courseId, string userId, Guid slideId)
+		public int GetUsedAttemptsCount(string courseId, string userId, Guid slideId)
 		{
 			return db.UserQuizSubmissions
-				.Where(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId)
-				.Select(q => q.IsDropped);
+				.Count(s => s.CourseId == courseId && s.UserId == userId && s.SlideId == slideId);
 		}
 
 		public HashSet<Guid> GetPassedSlideIds(string courseId, string userId)
@@ -116,23 +110,7 @@ namespace Database.DataContexts
 			}
 			return answer;
 		}
-
-		public async Task DropQuizAsync(string courseId, Guid slideId, string userId)
-		{
-			var submissions = await db.UserQuizSubmissions.Where(s => s.CourseId == courseId && s.UserId == userId && s.SlideId == slideId && !s.IsDropped).ToListAsync().ConfigureAwait(false);
-			foreach (var submission in submissions)
-				submission.IsDropped = true;
-			await db.SaveChangesAsync().ConfigureAwait(false);
-		}
 		
-		public void DropQuiz(string courseId, Guid slideId, string userId)
-		{
-			var submissions = db.UserQuizSubmissions.Where(s => s.CourseId == courseId && s.UserId == userId && s.SlideId == slideId && !s.IsDropped).ToList();
-			foreach (var submission in submissions)
-				submission.IsDropped = true;
-			db.SaveChanges();
-		}
-
 		public Dictionary<string, int> GetUserScores(string courseId, Guid slideId, string userId, UserQuizSubmission submission = null)
 		{
 			if (submission == null)

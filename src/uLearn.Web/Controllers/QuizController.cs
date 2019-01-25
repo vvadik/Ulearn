@@ -86,13 +86,13 @@ namespace uLearn.Web.Controllers
 			public int QuizBlockMaxScore;
 		}
 
-		public bool CanUserFillQuiz(QuizState state)
+		public bool CanUserFillQuiz(QuizStatus status)
 		{
-			return state == QuizState.NotPassed || state == QuizState.WaitForCheck;
+			return status == QuizStatus.ReadyToSend || status == QuizStatus.WaitsForManualChecking;
 		}
 
 		[AllowAnonymous]
-		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isGuest, bool isLti = false, ManualQuizChecking manualQuizCheckQueueItem = null, int? send = null)
+		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isGuest, bool isLti = false, ManualQuizChecking manualQuizCheckQueueItem = null, int? send = null, bool attempt = false)
 		{
 			metricSender.SendCount("quiz.show");
 			if (isLti)
@@ -110,36 +110,29 @@ namespace uLearn.Web.Controllers
 				return PartialView(GuestQuiz(course, slide));
 			}
 			var slideId = slide.Id;
-			var maxTriesCount = GetMaxTriesCount(courseId, slide);
-			var state = GetQuizState(courseId, userId, slideId);
+			var maxAttemptsCount = GetMaxAttemptsCount(courseId, slide);
+			var userScores = GetUserScoresForBlocks(courseId, userId, slideId, manualQuizCheckQueueItem?.Submission);
+
+			var score = userScores?.AsEnumerable().Sum(res => res.Value) ?? 0;
+			
+			var state = GetQuizState(courseId, userId, slideId, score, slide.MaxScore, manualQuizCheckQueueItem?.Submission);
+
+			log.Info($"Показываю тест для пользователя {userId} в слайде {courseId}:{slide.Id}, isLti = {isLti}");
 			
 			/* If it's manual checking, change quiz state to IsChecking for correct rendering */
 			if (manualQuizCheckQueueItem != null)
-				state = Tuple.Create(QuizState.IsChecking, state.Item2);
+				state.Status = QuizStatus.IsCheckingByInstructor;
 			
-			var quizState = state.Item1;
-			var tryNumber = state.Item2;
-			var userScores = GetUserScoresForBlocks(courseId, userId, slideId, manualQuizCheckQueueItem?.Submission);
-
-			log.Info($"Создаю тест для пользователя {userId} в слайде {courseId}:{slide.Id}, isLti = {isLti}");
-
-			if (quizState == QuizState.Subtotal)
-			{
-				var score = userScores?.AsEnumerable().Sum(res => res.Value) ?? 0;
-				/* QuizState.Subtotal is partially obsolete. If user fully solved quiz, then show answers. Else show empty quiz for the new try... */
-				if (score == slide.MaxScore)
-					quizState = QuizState.Total;
-				/* ... and show last try's answers only if argument `send` has been passed in query */
-				else if (!send.HasValue)
-				{
-					quizState = QuizState.NotPassed;
-					/* ... if we will show answers from last try then drop quiz */
-					userQuizzesRepo.DropQuiz(courseId, slideId, userId);
-				}
-			}			
+			/* For manually checked quizzes show last attempt's answers until ?attempt=true is defined in query string */
+			if (slide.ManualChecking && manualQuizCheckQueueItem == null && state.Status == QuizStatus.ReadyToSend && state.UsedAttemptsCount > 0 && !attempt)
+				state.Status = QuizStatus.Sent;
+			
+			/* We want to show user's answer if user sent answers just now */
+			if (state.Status == QuizStatus.ReadyToSend && send.HasValue)
+				state.Status = QuizStatus.Sent;
 
 			var userAnswers = userQuizzesRepo.GetAnswersForShowingOnSlide(courseId, slide, userId, manualQuizCheckQueueItem?.Submission);
-			var canUserFillQuiz = CanUserFillQuiz(quizState);
+			var canUserFillQuiz = CanUserFillQuiz(state.Status);
 
 			var questionAnswersFrequency = new DefaultDictionary<string, DefaultDictionary<string, int>>();
 			if (User.HasAccessFor(courseId, CourseRole.CourseAdmin))
@@ -154,11 +147,10 @@ namespace uLearn.Web.Controllers
 			{
 				Course = course,
 				Slide = slide,
-				QuizState = quizState,
-				TryNumber = tryNumber,
-				MaxTriesCount = maxTriesCount,
+				QuizState = state,
+				MaxAttemptsCount = maxAttemptsCount,
 				UserScores = userScores,
-				AnswersToQuizes = userAnswers,
+				AnswersToQuizzes = userAnswers,
 				IsLti = isLti,
 				Checking = manualQuizCheckQueueItem,
 				CanUserFillQuiz = canUserFillQuiz,
@@ -184,15 +176,17 @@ namespace uLearn.Web.Controllers
 				return new HttpNotFoundResult();
 
 			var userId = User.Identity.GetUserId();
-			var maxTriesCount = GetMaxTriesCount(courseId, slide);
-			var quizState = GetQuizState(courseId, userId, slideId);
-			if (!CanUserFillQuiz(quizState.Item1))
+			var maxTriesCount = GetMaxAttemptsCount(courseId, slide);
+			
+			/* Not it's not important what user's score is, so just pass 0 */
+			var state = GetQuizState(courseId, userId, slideId, 0, slide.MaxScore);
+			if (!CanUserFillQuiz(state.Status))
 				return new HttpStatusCodeResult(HttpStatusCode.OK, "Already answered");
 
-			var tryIndex = quizState.Item2;
-			metricSender.SendCount($"quiz.submit.try.{tryIndex}");
-			metricSender.SendCount($"quiz.submit.{courseId}.try.{tryIndex}");
-			metricSender.SendCount($"quiz.submit.{courseId}.{slideId}.try.{tryIndex}");
+			var attemptNumber = state.UsedAttemptsCount;
+			metricSender.SendCount($"quiz.submit.try.{attemptNumber}");
+			metricSender.SendCount($"quiz.submit.{courseId}.try.{attemptNumber}");
+			metricSender.SendCount($"quiz.submit.{courseId}.{slideId}.try.{attemptNumber}");
 
 			if (slide.ManualChecking && !groupsRepo.IsManualCheckingEnabledForUser(course, userId))
 				return new HttpStatusCodeResult(HttpStatusCode.OK, "Manual checking is disabled for you");
@@ -232,32 +226,32 @@ namespace uLearn.Web.Controllers
 
 			if (slide.ManualChecking)
 			{
-				/* If this quiz is already queued for checking for this user, don't add it to the queue again */
-				if (quizState.Item1 != QuizState.WaitForCheck)
-				{
-					await slideCheckingsRepo.AddManualQuizChecking(submission, courseId, slideId, userId).ConfigureAwait(false);
-					await visitsRepo.MarkVisitsAsWithManualChecking(courseId, slideId, userId).ConfigureAwait(false);
-				}
+				/* If this quiz is already queued for checking for this user, remove waiting checkings */
+				if (state.Status == QuizStatus.WaitsForManualChecking)
+					await slideCheckingsRepo.RemoveWaitingManualCheckings<ManualQuizChecking>(courseId, slideId, userId).ConfigureAwait(false);
+				
+				await slideCheckingsRepo.AddManualQuizChecking(submission, courseId, slideId, userId).ConfigureAwait(false);
+				await visitsRepo.MarkVisitsAsWithManualChecking(courseId, slideId, userId).ConfigureAwait(false);
 			}
 			/* Recalculate score for quiz if this attempt is allowed. Don't recalculate score if this attempt number is more then maxTriesCount */
-			else if (tryIndex < maxTriesCount)
+			else if (attemptNumber < maxTriesCount)
 			{
 				var score = allQuizInfos
 					.DistinctBy(forDb => forDb.BlockId)
 					.Sum(forDb => forDb.QuizBlockScore);
 				
-				metricSender.SendCount($"quiz.submit.try.{tryIndex}.score", score);
-				metricSender.SendCount($"quiz.submit.{courseId}.try.{tryIndex}.score", score);
-				metricSender.SendCount($"quiz.submit.{courseId}.{slideId}.try.{tryIndex}.score", score);
+				metricSender.SendCount($"quiz.submit.try.{attemptNumber}.score", score);
+				metricSender.SendCount($"quiz.submit.{courseId}.try.{attemptNumber}.score", score);
+				metricSender.SendCount($"quiz.submit.{courseId}.{slideId}.try.{attemptNumber}.score", score);
 				metricSender.SendCount($"quiz.submit.score", score);
 				metricSender.SendCount($"quiz.submit.{courseId}.score", score);
 				metricSender.SendCount($"quiz.submit.{courseId}.{slideId}.score", score);
 
 				if (score == slide.MaxScore)
 				{
-					metricSender.SendCount($"quiz.submit.try.{tryIndex}.full_passed");
-					metricSender.SendCount($"quiz.submit.{courseId}.try.{tryIndex}.full_passed");
-					metricSender.SendCount($"quiz.submit.{courseId}.{slideId}.try.{tryIndex}.full_passed");
+					metricSender.SendCount($"quiz.submit.try.{attemptNumber}.full_passed");
+					metricSender.SendCount($"quiz.submit.{courseId}.try.{attemptNumber}.full_passed");
+					metricSender.SendCount($"quiz.submit.{courseId}.{slideId}.try.{attemptNumber}.full_passed");
 					metricSender.SendCount($"quiz.submit.full_passed");
 					metricSender.SendCount($"quiz.submit.{courseId}.full_passed");
 					metricSender.SendCount($"quiz.submit.{courseId}.{slideId}.full_passed");
@@ -502,162 +496,24 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		private static IEnumerable<QuizAnswerInfo> GetUserQuizAnswers(QuizSlide slide, IEnumerable<UserQuizAnswer> userQuizzes)
-		{
-			var answers = userQuizzes.GroupBy(q => q.BlockId).ToDictionary(g => g.Key, g => g.ToList());
-			foreach (var block in slide.Blocks.OfType<AbstractQuestionBlock>())
-				if (block is FillInBlock)
-					yield return GetFillInBlockAnswerInfo(answers, block.Id, block.QuestionIndex);
-				else if (block is ChoiceBlock)
-					yield return GetChoiceBlockAnswerInfo(answers, (ChoiceBlock)block, block.QuestionIndex);
-				else if (block is IsTrueBlock)
-					yield return GetIsTrueBlockAnswerInfo(answers, block.Id, block.QuestionIndex);
-				else if (block is OrderingBlock)
-					yield return GetOrderingBlockAnswerInfo(answers, (OrderingBlock)block, block.QuestionIndex);
-				else if (block is MatchingBlock)
-					yield return GetMatchingBlockAnswerInfo(answers, (MatchingBlock)block, block.QuestionIndex);
-		}
-
-		private static QuizAnswerInfo GetFillInBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuizAnswer>> answers, string quizId, int questionIndex)
-		{
-			UserQuizAnswer answer = null;
-			if (answers.ContainsKey(quizId))
-				answer = answers[quizId].FirstOrDefault();
-			return new FillInBlockAnswerInfo
-			{
-				Answer = answer?.Text,
-				IsRight = answer != null && answer.IsRightAnswer,
-				Score = answer?.QuizBlockScore ?? 0,
-				MaxScore = answer?.QuizBlockMaxScore ?? 0,
-				Id = questionIndex.ToString()
-			};
-		}
-
-		private static QuizAnswerInfo GetChoiceBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuizAnswer>> answers, ChoiceBlock block, int questionIndex)
-		{
-			IEnumerable<UserQuizAnswer> answer = new List<UserQuizAnswer>();
-			if (answers.ContainsKey(block.Id))
-				answer = answers[block.Id].Where(q => q.ItemId != null);
-
-			var ans = new SortedDictionary<string, bool>();
-			foreach (var item in block.Items)
-			{
-				ans[item.Id] = false;
-			}
-
-			var isRight = false;
-			var score = 0;
-			var maxScore = 0;
-			foreach (var quizItem in answer.Where(quizItem => ans.ContainsKey(quizItem.ItemId)))
-			{
-				isRight = quizItem.IsQuizBlockScoredMaximum;
-				ans[quizItem.ItemId] = true;
-				score = quizItem.QuizBlockScore;
-				maxScore = quizItem.QuizBlockMaxScore;
-			}
-
-			return new ChoiceBlockAnswerInfo
-			{
-				AnswersId = ans,
-				Id = questionIndex.ToString(),
-				CorrectAnswer = new HashSet<string>(block.Items.Where(x => x.IsCorrect.IsTrueOrMaybe()).Select(x => x.Id)),
-				Score = score,
-				MaxScore = maxScore,
-				IsRight = isRight
-			};
-		}
-
-
-		private static QuizAnswerInfo GetIsTrueBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuizAnswer>> answers, string quizId, int questionIndex)
-		{
-			UserQuizAnswer answer = null;
-			if (answers.ContainsKey(quizId))
-				answer = answers[quizId].FirstOrDefault();
-			return new IsTrueBlockAnswerInfo
-			{
-				IsAnswered = answer != null,
-				Answer = answer != null && answer.Text == "True",
-				Id = questionIndex.ToString(),
-				IsRight = answer != null && answer.IsRightAnswer,
-				Score = answer?.QuizBlockScore ?? 0,
-				MaxScore = answer?.QuizBlockMaxScore ?? 0,
-			};
-		}
-
-		private static QuizAnswerInfo GetOrderingBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuizAnswer>> answers, OrderingBlock block, int questionIndex)
-		{
-			IEnumerable<UserQuizAnswer> userAnswers = new List<UserQuizAnswer>();
-			UserQuizAnswer firstAnswer = null;
-			if (answers.ContainsKey(block.Id))
-			{
-				userAnswers = answers[block.Id].Where(q => q.ItemId != null);
-				firstAnswer = userAnswers.FirstOrDefault();
-			}
-
-			var answersPositions = userAnswers.Select(
-				userAnswer => block.Items.FindIndex(i => i.GetHash() == userAnswer.ItemId)
-			).ToList();
-
-			return new OrderingBlockAnswerInfo
-			{
-				Id = questionIndex.ToString(),
-				AnswersPositions = answersPositions,
-				Score = firstAnswer?.QuizBlockScore ?? 0,
-				MaxScore = firstAnswer?.QuizBlockMaxScore ?? 0,
-			};
-		}
-
-		private static QuizAnswerInfo GetMatchingBlockAnswerInfo(IReadOnlyDictionary<string, List<UserQuizAnswer>> answers, MatchingBlock block, int questionIndex)
-		{
-			IEnumerable<UserQuizAnswer> userAnswers = new List<UserQuizAnswer>();
-			UserQuizAnswer firstAnswer = null;
-			if (answers.ContainsKey(block.Id))
-			{
-				userAnswers = answers[block.Id].Where(q => q.ItemId != null);
-				firstAnswer = userAnswers.FirstOrDefault();
-			}
-
-			var isRightMatches = new List<bool>();
-			foreach (var match in block.Matches)
-			{
-				var userAnswer = userAnswers.FirstOrDefault(a => a.ItemId == match.GetHashForFixedItem());
-				isRightMatches.Add(userAnswer != null && userAnswer.IsRightAnswer);
-			}
-
-			return new MatchingBlockAnswerInfo
-			{
-				Id = questionIndex.ToString(),
-				IsRightMatches = isRightMatches,
-				Score = firstAnswer?.QuizBlockScore ?? 0,
-				MaxScore = firstAnswer?.QuizBlockMaxScore ?? 0,
-			};
-		}
-
 		[HttpPost]
-		public async Task<ActionResult> DropQuiz(string courseId, Guid slideId, bool isLti)
+		public async Task<ActionResult> RestartQuiz(string courseId, Guid slideId, bool isLti)
 		{
 			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
 			if (slide is QuizSlide)
 			{
 				var userId = User.Identity.GetUserId();
-				var userQuizDrops = userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).Count(b => b);
-				var maxTriesCount = GetMaxTriesCount(courseId, slide as QuizSlide);
+				var usedAttemptsCount = userQuizzesRepo.GetUsedAttemptsCount(courseId, userId, slideId);
+				var maxTriesCount = GetMaxAttemptsCount(courseId, slide as QuizSlide);
 				var isQuizScoredMaximum = userQuizzesRepo.IsQuizScoredMaximum(courseId, slideId, userId);
-				if (userQuizDrops + 1 < maxTriesCount && !isQuizScoredMaximum)
+				if (usedAttemptsCount < maxTriesCount && !isQuizScoredMaximum)
 				{
-					await userQuizzesRepo.DropQuizAsync(courseId, slideId, userId);
-					await visitsRepo.UpdateScoreForVisit(courseId, slideId, userId);
+					await visitsRepo.UpdateScoreForVisit(courseId, slideId, userId).ConfigureAwait(false);
 					if (isLti)
 						LtiUtils.SubmitScore(courseId, slide, userId);
 				}
-				else if ((userQuizDrops + 1 >= maxTriesCount || isQuizScoredMaximum) && !(slide as QuizSlide).ManualChecking)
-				{
-					/* Allow user to drop quiz after all tries are exceeded, but don't update score */
-					await userQuizzesRepo.DropQuizAsync(courseId, slideId, userId);
-				}
-				
 			}
-			var model = new { courseId, slideId = slide.Id, isLti };
+			var model = new { courseId, slideId = slide.Id, isLti, attempt = true };
 			if (isLti)
 				return RedirectToAction("LtiSlide", "Course", model);
 			return RedirectToAction("SlideById", "Course", model);
@@ -670,11 +526,11 @@ namespace uLearn.Web.Controllers
 				Course = course,
 				Slide = slide,
 				IsGuest = true,
-				QuizState = QuizState.NotPassed,
+				QuizState = new QuizState(QuizStatus.ReadyToSend, 0, 0, slide.MaxScore),
 			};
 		}
 
-		private int GetMaxTriesCount(string courseId, QuizSlide quizSlide)
+		private int GetMaxAttemptsCount(string courseId, QuizSlide quizSlide)
 		{
 			if (User.HasAccessFor(courseId, CourseRole.Tester))
 				return InfinityTriesCount;
@@ -690,24 +546,43 @@ namespace uLearn.Web.Controllers
 			return userQuizzesRepo.GetUserScores(courseId, slideId, userId, submission);
 		}
 
-		private Tuple<QuizState, int> GetQuizState(string courseId, string userId, Guid slideId)
+		private QuizState GetQuizState(string courseId, string userId, Guid slideId, int userScore, int maxScore, UserQuizSubmission submission=null)
 		{
 			log.Info($"Ищу статус прохождения теста {courseId}:{slideId} для пользователя {userId}");
-			var states = userQuizzesRepo.GetQuizDropStates(courseId, userId, slideId).ToList();
-
-			var submission = userQuizzesRepo.FindLastUserSubmission(courseId, slideId, userId);
-			var queueItem = submission?.ManualChecking;
-			if (queueItem != null)
+			
+			var lastSubmission = userQuizzesRepo.FindLastUserSubmission(courseId, slideId, userId);
+			
+			var manualChecking = submission?.ManualChecking ?? lastSubmission?.ManualChecking;
+			if (manualChecking != null)
 			{
-				log.Info($"Статус прохождения теста {courseId}:{slideId} для пользователя {userId}: есть ручная проверка №{queueItem.Id}, проверяется ли сейчас: {queueItem.IsLocked}");
-				if (queueItem.IsChecked)
-					return Tuple.Create(QuizState.Subtotal, states.Count);
-				return Tuple.Create(queueItem.IsLocked ? QuizState.IsChecking : QuizState.WaitForCheck, states.Count);
+				/* For manually checked quizzes attempts are counting by manual checkings, not by user quiz submissions
+				   (because user can resend quiz before instructor checked and score it) */
+				var manualCheckingCount = GetManualCheckingCount(courseId, userId, slideId, submission);
+				
+				log.Info($"Статус прохождения теста {courseId}:{slideId} для пользователя {userId}: есть ручная проверка №{manualChecking.Id}, проверяется ли сейчас: {manualChecking.IsLocked}");
+				if (manualChecking.IsChecked)
+					return new QuizState(QuizStatus.ReadyToSend, manualCheckingCount, userScore, maxScore);
+				return new QuizState(manualChecking.IsLocked ? QuizStatus.IsCheckingByInstructor : QuizStatus.WaitsForManualChecking, manualCheckingCount, userScore, maxScore);
 			}
+			
+			var usedAttemptsCount = userQuizzesRepo.GetUsedAttemptsCount(courseId, userId, slideId);
+			return new QuizState(QuizStatus.ReadyToSend, usedAttemptsCount, userScore, maxScore);
+		}
 
-			if (states.Any(b => !b))
-				return Tuple.Create(QuizState.Subtotal, states.Count);
-			return Tuple.Create(QuizState.NotPassed, states.Count);
+		private int GetManualCheckingCount(string courseId, string userId, Guid slideId, UserQuizSubmission beforeSubmissions=null)
+		{
+			var queue = slideCheckingsRepo.GetManualCheckingQueue<ManualQuizChecking>(new ManualCheckingQueueFilterOptions
+			{
+				CourseId = courseId,
+				SlidesIds = new[] { slideId },
+				UserIds = new List<string> { userId },
+				OnlyChecked = null, // For calculating not checked submissions as well as checked ones
+			}).ToList();
+
+			if (beforeSubmissions != null)
+				queue = queue.Where(s => s.Timestamp < beforeSubmissions.Timestamp).ToList();
+					
+			return queue.Count();
 		}
 	}
 }

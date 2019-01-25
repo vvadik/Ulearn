@@ -13,14 +13,14 @@ namespace uLearn.Web.Models
 
 		public QuizSlide Slide { get; set; }
 		public QuizState QuizState { get; set; }
-		public Dictionary<string, List<UserQuizAnswer>> AnswersToQuizes { get; set; }
+		
+		public Dictionary<string, List<UserQuizAnswer>> AnswersToQuizzes { get; set; }
 		public Dictionary<string, int> UserScores { get; set; }
 
 		/* (quizId -> (itemId -> frequency%)) */
 		public DefaultDictionary<string, DefaultDictionary<string, int>> QuestionAnswersFrequency { get; set; } = new DefaultDictionary<string, DefaultDictionary<string, int>>();
 
-		public int TryNumber { get; set; }
-		public int MaxTriesCount { get; set; }
+		public int MaxAttemptsCount { get; set; }
 		public bool IsLti { get; set; }
 		public bool IsGuest { get; set; }
 		public ManualQuizChecking Checking { get; set; }

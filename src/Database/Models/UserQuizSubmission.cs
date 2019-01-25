@@ -35,8 +35,6 @@ namespace Database.Models
 		[Index("IDX_UserQuizSubmission_BySlideAndTime", 3)]
 		public DateTime Timestamp { get; set; }
 		
-		public bool IsDropped { get; set; }
-		
 		public virtual AutomaticQuizChecking AutomaticChecking { get; set; }
 		
 		public virtual ManualQuizChecking ManualChecking { get; set; }

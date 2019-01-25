@@ -159,7 +159,7 @@ namespace Database.Migrations
 				")");
 			
 			Sql("INSERT INTO ManualQuizCheckingsTemp " +
-				"SELECT ISNULL(MAX(q.SubmissionId), MAX(q2.SubmissionId)) as Id, c.CourseId, c.SlideId, c.Timestamp, c.UserId, c.LockedUntil, c.LockedById, c.IsChecked, c.Score " +
+				"SELECT ISNULL(MAX(q.SubmissionId), MIN(q2.SubmissionId)) as Id, c.CourseId, c.SlideId, c.Timestamp, c.UserId, c.LockedUntil, c.LockedById, c.IsChecked, c.Score " +
 				"FROM ManualQuizCheckings c " +
 				"LEFT JOIN UserQuizs q ON c.CourseId = q.CourseId AND c.SlideId = q.SlideId AND c.UserId = q.UserId AND c.Timestamp >= q.Timestamp " +
 				"LEFT JOIN UserQuizs q2 ON c.CourseId = q2.CourseId AND c.SlideId = q2.SlideId AND c.UserId = q2.UserId AND c.Timestamp < q2.Timestamp " +

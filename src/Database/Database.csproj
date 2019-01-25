@@ -737,6 +737,10 @@
     <Compile Include="Migrations\201901220511203_RenameUserQuizs.Designer.cs">
       <DependentUpon>201901220511203_RenameUserQuizs.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201901242025259_RemoveQuizSubmissionIsDropped.cs" />
+    <Compile Include="Migrations\201901242025259_RemoveQuizSubmissionIsDropped.Designer.cs">
+      <DependentUpon>201901242025259_RemoveQuizSubmissionIsDropped.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -1145,6 +1149,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201901220511203_RenameUserQuizs.resx">
       <DependentUpon>201901220511203_RenameUserQuizs.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901242025259_RemoveQuizSubmissionIsDropped.resx">
+      <DependentUpon>201901242025259_RemoveQuizSubmissionIsDropped.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

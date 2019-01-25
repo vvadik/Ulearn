@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Security.Principal;
+using Database.DataContexts;
 using Microsoft.AspNet.Identity;
 
 namespace Database.Models
@@ -39,6 +40,10 @@ namespace Database.Models
 		public virtual ApplicationUser User { get; set; }
 
 		public int Score { get; set; }
+
+		public virtual void PreRemove(ULearnDb db)
+		{
+		}
 	}
 
 	public class AbstractManualSlideChecking : AbstractSlideChecking
@@ -147,6 +152,11 @@ namespace Database.Models
 
 		[NotMapped]
 		public List<ExerciseCodeReview> NotDeletedReviews => Reviews.Where(r => !r.IsDeleted).ToList();
+
+		public override void PreRemove(ULearnDb db)
+		{
+			db.Set<ExerciseCodeReview>().RemoveRange(Reviews);
+		}
 	}
 
 	public class AutomaticQuizChecking : AbstractAutomaticSlideChecking

@@ -75,22 +75,18 @@ namespace Database.DataContexts
 			return manualChecking;
 		}
 
-		public async Task RemoveWaitingManualExerciseCheckings(string courseId, Guid slideId, string userId)
+		public async Task RemoveWaitingManualCheckings<T>(string courseId, Guid slideId, string userId) where T : AbstractManualSlideChecking
 		{
 			using (var transaction = db.Database.BeginTransaction())
 			{
-				var checkings = GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId, noTracking: false)
+				var checkings = GetSlideCheckingsByUser<T>(courseId, slideId, userId, noTracking: false)
 					.AsEnumerable()
 					.Where(c => !c.IsChecked && !c.IsLocked)
 					.ToList();
 				foreach (var checking in checkings)
 				{
-					// Use EntityState.Deleted because EF could don't know about these checkings (they have been retrieved via AsNoTracking())
-					// TODO (andgein): Now it's not retrieived via AsNoTracking(). Fix this.
-					foreach (var review in checking.Reviews.ToList())
-						db.Entry(review).State = EntityState.Deleted;
-					
-					db.Entry(checking).State = EntityState.Deleted;
+					checking.PreRemove(db);
+					db.Set<T>().Remove(checking);
 				}
 
 				await db.SaveChangesAsync().ConfigureAwait(false);
