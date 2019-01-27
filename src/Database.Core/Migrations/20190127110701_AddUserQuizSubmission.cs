@@ -7,7 +7,8 @@ namespace Database.Migrations
     public partial class AddUserQuizSubmission : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
-        {
+		{
+			return;
             migrationBuilder.DropTable(
                 name: "UserQuizs");
 
@@ -120,7 +121,8 @@ namespace Database.Migrations
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
-        {
+		{
+			return;
             migrationBuilder.DropForeignKey(
                 name: "FK_AutomaticQuizCheckings_UserQuizSubmissions_Id",
                 table: "AutomaticQuizCheckings");
