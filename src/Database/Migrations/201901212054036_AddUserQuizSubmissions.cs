@@ -140,7 +140,7 @@ namespace Database.Migrations
 			
 			Sql("SET IDENTITY_INSERT AutomaticQuizCheckings OFF");
 			
-			// Sql("DBCC CHECKIDENT('AutomaticQuizCheckings', RESEED, 0)");
+			// Sql("DBCC CHECKIDENT('AutomaticQuizCheckings', RESEED)");
 			
 			Sql("DROP TABLE AutomaticQuizCheckingsTemp");
 		}
@@ -161,13 +161,14 @@ namespace Database.Migrations
 				")");
 			
 			Sql("INSERT INTO ManualQuizCheckingsTemp " +
-				"SELECT ISNULL(ISNULL(MAX(q.SubmissionId), MIN(q2.SubmissionId)), c.Id) as Id, c.CourseId, c.SlideId, c.Timestamp, c.UserId, c.LockedUntil, c.LockedById, c.IsChecked, c.Score " +
+				"SELECT ISNULL(MAX(q.SubmissionId), MIN(q2.SubmissionId)) as Id, c.CourseId, c.SlideId, c.Timestamp, c.UserId, c.LockedUntil, c.LockedById, c.IsChecked, c.Score " +
 				"FROM ManualQuizCheckings c " +
 				"LEFT JOIN UserQuizs q ON c.CourseId = q.CourseId AND c.SlideId = q.SlideId AND c.UserId = q.UserId AND c.Timestamp >= q.Timestamp " +
 				"LEFT JOIN UserQuizs q2 ON c.CourseId = q2.CourseId AND c.SlideId = q2.SlideId AND c.UserId = q2.UserId AND c.Timestamp < q2.Timestamp " +
 				"GROUP BY c.CourseId, c.SlideId, c.Timestamp, c.UserId, c.LockedUntil, c.LockedById, c.IsChecked, c.Score");
 			
 			/* Delete notifications (it's too difficult to restore these links) */
+			Sql("DELETE FROM NotificationDeliveries WHERE NotificationId IN (SELECT Id FROM Notifications WHERE Discriminator = 'PassedManualQuizCheckingNotification')");
 			Sql("DELETE FROM Notifications WHERE Discriminator = 'PassedManualQuizCheckingNotification'");
 			
 			/* Copy ManualQuizCheckingsTemp to ManualQuizCheckings */
@@ -181,7 +182,7 @@ namespace Database.Migrations
 			
 			Sql("SET IDENTITY_INSERT ManualQuizCheckings OFF");
 			
-			// Sql("DBCC CHECKIDENT('ManualQuizCheckings', RESEED, 0)");
+			// Sql("DBCC CHECKIDENT('ManualQuizCheckings', RESEED)");
 			
 			Sql("DROP TABLE ManualQuizCheckingsTemp");
 		}
