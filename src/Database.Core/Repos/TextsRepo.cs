@@ -14,7 +14,7 @@ namespace Database.Repos
 	public class TextsRepo : ITextsRepo
 	{
 		private readonly UlearnDb db;
-		public const int MaxTextSize = 20000;
+		public const int MaxTextSize = 50000;
 
 		public TextsRepo(UlearnDb db)
 		{

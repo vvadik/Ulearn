@@ -139,7 +139,7 @@ namespace Database.DataContexts
 		{
 			try
 			{
-				return await base.SaveChangesAsync();
+				return await base.SaveChangesAsync().ConfigureAwait(false);
 			}
 			catch (DbEntityValidationException ex)
 			{
