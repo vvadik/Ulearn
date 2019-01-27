@@ -22,7 +22,7 @@
 @functions
 {
 
-	private static bool IsBlockCorrect(QuizBlockData model, AbstractQuestionBlock block)
+	private static bool IsBlockCorrect(QuizBlockData model, AbstractQuestionBlock block) 
 	{
 		int blockScore;
 		var isBlockCorrect = model.QuizModel != null && model.QuizModel.ResultsForQuizes != null && 
@@ -185,20 +185,23 @@
 	if (!string.IsNullOrEmpty(context.Course.Settings.VideoAnnotationsGoogleDoc))
 	{
 		var client = UlearnVideoAnnotationsClient.Instance;
-		try
+		if (client != null)
 		{
-			var annotationsResponse = client.GetAnnotationsAsync(new AnnotationsParameters
+			try
 			{
-				GoogleDocId = context.Course.Settings.VideoAnnotationsGoogleDoc, 
-				VideoId = block.VideoId
-			}).GetAwaiter().GetResult();
+				var annotationsResponse = client.GetAnnotationsAsync(new AnnotationsParameters
+				{
+					GoogleDocId = context.Course.Settings.VideoAnnotationsGoogleDoc,
+					VideoId = block.VideoId
+				}).GetAwaiter().GetResult();
 
-			@ShowVideoAnnotations(annotationsResponse.Annotation, context, Html);
-		}
-		catch (ApiClientException e)
-		{
-			/* Annotations not found. It's ok */
-			@SuggestAnnotations(context, Html)
+				@ShowVideoAnnotations(annotationsResponse.Annotation, context, Html)
+			}
+			catch (ApiClientException e)
+			{
+				/* Annotations not found. It's ok */
+				@SuggestAnnotations(context, Html)
+			}
 		}
 	}
 }
