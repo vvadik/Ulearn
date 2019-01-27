@@ -96,7 +96,8 @@ namespace Database.Migrations
 			
 			Sql("SET IDENTITY_INSERT UserQuizs OFF");
 			
-			Sql("DBCC CHECKIDENT('UserQuizs', RESEED, 0)");
+			/* We have no permissions for DBCC CHECKIDENT or the production database */
+			// Sql("DBCC CHECKIDENT('UserQuizs', RESEED)");
 			
 			Sql("DROP TABLE UserQuizsTemp");
 		}
@@ -138,7 +139,7 @@ namespace Database.Migrations
 			
 			Sql("SET IDENTITY_INSERT AutomaticQuizCheckings OFF");
 			
-			Sql("DBCC CHECKIDENT('AutomaticQuizCheckings', RESEED, 0)");
+			// Sql("DBCC CHECKIDENT('AutomaticQuizCheckings', RESEED, 0)");
 			
 			Sql("DROP TABLE AutomaticQuizCheckingsTemp");
 		}
@@ -179,7 +180,7 @@ namespace Database.Migrations
 			
 			Sql("SET IDENTITY_INSERT ManualQuizCheckings OFF");
 			
-			Sql("DBCC CHECKIDENT('ManualQuizCheckings', RESEED, 0)");
+			// Sql("DBCC CHECKIDENT('ManualQuizCheckings', RESEED, 0)");
 			
 			Sql("DROP TABLE ManualQuizCheckingsTemp");
 		}
