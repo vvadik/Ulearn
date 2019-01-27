@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database;
 using Database.Models;
+using Database.Models.Comments;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;

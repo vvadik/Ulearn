@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using ApprovalUtilities.Utilities;
 using Database.Models;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Quizzes;

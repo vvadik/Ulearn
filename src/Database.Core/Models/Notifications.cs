@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Database.Models.Comments;
 using Database.Repos;
 using Database.Repos.CourseRoles;
 using Database.Repos.Groups;

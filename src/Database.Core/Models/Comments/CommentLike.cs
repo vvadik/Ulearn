@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Database.Models
+namespace Database.Models.Comments
 {
 	public class CommentLike
 	{

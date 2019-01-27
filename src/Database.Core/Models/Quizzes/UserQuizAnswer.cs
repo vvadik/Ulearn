@@ -2,45 +2,26 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Database.Models
+namespace Database.Models.Quizzes
 {
-	/* For backward compatibility: EF Core changed table naming convention.
-	   See https://github.com/aspnet/Announcements/issues/167 for details */
-	[Table("UserQuizs")]
-	public class UserQuiz : ITimedSlideAction
+	public class UserQuizAnswer
 	{
 		[Required]
 		[Key]
 		public int Id { get; set; }
-
-		[Required]
+		
+		public int SubmissionId { get; set; }
+		
+		public virtual UserQuizSubmission Submission { get; set; }
+		
 		[StringLength(64)]
-		public string CourseId { get; set; }
-
-		[Required]
-		public Guid SlideId { get; set; }
-
-		public virtual ApplicationUser User { get; set; }
-
-		[StringLength(64)]
-		[Required]
-		public string UserId { get; set; }
-
-		[StringLength(64)]
-		public string QuizId { get; set; }
+		public string BlockId { get; set; }
 
 		[StringLength(64)]
 		public string ItemId { get; set; }
 
 		[StringLength(8192)]
 		public string Text { get; set; }
-
-		[Required]
-		public DateTime Timestamp { get; set; }
-
-		[Required]
-		public bool isDropped { get; set; }
-
 
 		[Required]
 		// Корректный ли вариант ItemId

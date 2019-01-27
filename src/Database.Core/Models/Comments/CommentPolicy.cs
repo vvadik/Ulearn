@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Database.Models
+namespace Database.Models.Comments
 {
 	[JsonConverter(typeof(StringEnumConverter), true)]
 	public enum CommentModerationPolicy

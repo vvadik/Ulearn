@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
+using Database.Models.Comments;
 using Microsoft.EntityFrameworkCore;
 using Z.EntityFramework.Plus;
 
