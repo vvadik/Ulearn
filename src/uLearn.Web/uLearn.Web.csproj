@@ -213,10 +213,6 @@
       <HintPath>..\packages\Microsoft.AspNetCore.Mvc.Abstractions.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Mvc.Abstractions.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.AspNetCore.Mvc.Core, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
-      <HintPath>..\packages\Microsoft.AspNetCore.Mvc.Core.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Mvc.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Microsoft.AspNetCore.ResponseCaching.Abstractions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
       <HintPath>..\packages\Microsoft.AspNetCore.ResponseCaching.Abstractions.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.ResponseCaching.Abstractions.dll</HintPath>
       <Private>True</Private>
@@ -743,7 +739,6 @@
     <Compile Include="Models\IntructorNoteModel.cs" />
     <Compile Include="Models\LtiQuizModel.cs" />
     <Compile Include="Models\PrevNextButtonsModel.cs" />
-    <Compile Include="Models\QuizAnswerInfo.cs" />
     <Compile Include="Models\QuizBlockData.cs" />
     <Compile Include="Models\QuizModel.cs" />
     <Compile Include="Models\QuizState.cs" />

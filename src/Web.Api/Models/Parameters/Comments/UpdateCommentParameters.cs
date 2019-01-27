@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Database.Models;
+using Database.Models.Comments;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Ulearn.Common.Api.Models.Validations;

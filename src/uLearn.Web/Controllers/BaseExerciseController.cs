@@ -136,7 +136,7 @@ namespace uLearn.Web.Controllers
 								groupsRepo.IsManualCheckingEnabledForUser(course, userId);
 			if (sendToReview)
 			{
-				await slideCheckingsRepo.RemoveWaitingManualExerciseCheckings(courseId, exerciseSlide.Id, userId);
+				await slideCheckingsRepo.RemoveWaitingManualCheckings<ManualExerciseChecking>(courseId, exerciseSlide.Id, userId);
 				await slideCheckingsRepo.AddManualExerciseChecking(courseId, exerciseSlide.Id, userId, submission);
 				await visitsRepo.MarkVisitsAsWithManualChecking(courseId, exerciseSlide.Id, userId);
 				metricSender.SendCount($"exercise.{exerciseMetricId}.sent_to_review");

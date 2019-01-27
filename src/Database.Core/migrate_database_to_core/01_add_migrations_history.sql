@@ -25,4 +25,5 @@ VALUES
 ('20180921194528_IncreaseQuizAnswerSize', '2.0.1-rtm-125'),
 ('20181011181051_RemoveUserExerciseSubmissionsApplicationUserField', '2.0.1-rtm-125'),
 ('20181023045805_AddCommentForInstructorsOnly', '2.0.1-rtm-125'),
-('20181206181013_RemoveQuizVersions', '2.0.1-rtm-125')
+('20181206181013_RemoveQuizVersions', '2.0.1-rtm-125'),
+('20190127110701_AddUserQuizSubmission', '2.0.1-rtm-125')

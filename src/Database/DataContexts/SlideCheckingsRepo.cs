@@ -7,6 +7,7 @@ using Database.Extensions;
 using Database.Models;
 using JetBrains.Annotations;
 using Ulearn.Common.Extensions;
+using Z.EntityFramework.Plus;
 
 namespace Database.DataContexts
 {
@@ -19,24 +20,27 @@ namespace Database.DataContexts
 			this.db = db;
 		}
 
-		public async Task AddQuizAttemptForManualChecking(string courseId, Guid slideId, string userId)
+		public async Task<ManualQuizChecking> AddManualQuizChecking(UserQuizSubmission submission, string courseId, Guid slideId, string userId)
 		{
 			var manualChecking = new ManualQuizChecking
 			{
+				Submission = submission,
 				CourseId = courseId,
 				SlideId = slideId,
 				UserId = userId,
 				Timestamp = DateTime.Now,
 			};
 			db.ManualQuizCheckings.Add(manualChecking);
-
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
+			
+			return manualChecking;
 		}
 
-		public async Task AddQuizAttemptWithAutomaticChecking(string courseId, Guid slideId, string userId, int automaticScore)
+		public async Task<AutomaticQuizChecking> AddAutomaticQuizChecking(UserQuizSubmission submission, string courseId, Guid slideId, string userId, int automaticScore)
 		{
 			var automaticChecking = new AutomaticQuizChecking
 			{
+				Submission = submission,
 				CourseId = courseId,
 				SlideId = slideId,
 				UserId = userId,
@@ -44,8 +48,9 @@ namespace Database.DataContexts
 				Score = automaticScore,
 			};
 			db.AutomaticQuizCheckings.Add(automaticChecking);
+			await db.SaveChangesAsync().ConfigureAwait(false);
 
-			await db.SaveChangesAsync();
+			return automaticChecking;
 		}
 
 		public IEnumerable<ManualExerciseChecking> GetUsersPassedManualExerciseCheckings(string courseId, string userId)
@@ -65,30 +70,26 @@ namespace Database.DataContexts
 			};
 			db.ManualExerciseCheckings.Add(manualChecking);
 
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 
 			return manualChecking;
 		}
 
-		public async Task RemoveWaitingManualExerciseCheckings(string courseId, Guid slideId, string userId)
+		public async Task RemoveWaitingManualCheckings<T>(string courseId, Guid slideId, string userId) where T : AbstractManualSlideChecking
 		{
 			using (var transaction = db.Database.BeginTransaction())
 			{
-				var checkings = GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId, noTracking: false)
+				var checkings = GetSlideCheckingsByUser<T>(courseId, slideId, userId, noTracking: false)
 					.AsEnumerable()
 					.Where(c => !c.IsChecked && !c.IsLocked)
 					.ToList();
 				foreach (var checking in checkings)
 				{
-					// Use EntityState.Deleted because EF could don't know abount these checkings (they have been retrieved via AsNoTracking())
-					// TODO (andgein): Now it's not retrieived via AsNoTracking(). Fix this.
-					foreach (var review in checking.Reviews.ToList())
-						db.Entry(review).State = EntityState.Deleted;
-					
-					db.Entry(checking).State = EntityState.Deleted;
+					checking.PreRemove(db);
+					db.Set<T>().Remove(checking);
 				}
 
-				await db.SaveChangesAsync();
+				await db.SaveChangesAsync().ConfigureAwait(false);
 				transaction.Commit();
 			}
 		}
@@ -114,7 +115,7 @@ namespace Database.DataContexts
 			db.ManualExerciseCheckings.RemoveSlideAction(courseId, slideId, userId);
 			db.AutomaticExerciseCheckings.RemoveSlideAction(courseId, slideId, userId);
 			if (saveChanges)
-				await db.SaveChangesAsync();
+				await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
 		public bool IsSlidePassed(string courseId, Guid slideId, string userId)
@@ -216,7 +217,7 @@ namespace Database.DataContexts
 		{
 			checkingItem.LockedById = lockedById;
 			checkingItem.LockedUntil = DateTime.Now.Add(TimeSpan.FromMinutes(30));
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
 		public async Task MarkManualCheckingAsChecked<T>(T queueItem, int score) where T : AbstractManualSlideChecking
@@ -225,13 +226,13 @@ namespace Database.DataContexts
 			queueItem.LockedUntil = null;
 			queueItem.IsChecked = true;
 			queueItem.Score = score;
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
 		public async Task ProhibitFurtherExerciseManualChecking(ManualExerciseChecking checking)
 		{
 			checking.ProhibitFurtherManualCheckings = true;
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
 		private async Task<ExerciseCodeReview> AddExerciseCodeReview([CanBeNull] UserExerciseSubmission submission, [CanBeNull] ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime)
@@ -249,20 +250,20 @@ namespace Database.DataContexts
 				AddingTime = setAddingTime ? DateTime.Now : ExerciseCodeReview.NullAddingTime,
 			});
 
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 
 			/* Extract review from database to fill review.Author by EF's DynamicProxy */
 			return db.ExerciseCodeReviews.AsNoTracking().FirstOrDefault(r => r.Id == review.Id);
 		}
 		
-		public async Task<ExerciseCodeReview> AddExerciseCodeReview(ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime=true)
+		public Task<ExerciseCodeReview> AddExerciseCodeReview(ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime=true)
 		{
-			return await AddExerciseCodeReview(null, checking, userId, startLine, startPosition, finishLine, finishPosition, comment, setAddingTime);
+			return AddExerciseCodeReview(null, checking, userId, startLine, startPosition, finishLine, finishPosition, comment, setAddingTime);
 		}
 
-		public async Task<ExerciseCodeReview> AddExerciseCodeReview(UserExerciseSubmission submission, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime=false)
+		public Task<ExerciseCodeReview> AddExerciseCodeReview(UserExerciseSubmission submission, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime=false)
 		{
-			return await AddExerciseCodeReview(submission, null, userId, startLine, startPosition, finishLine, finishPosition, comment, setAddingTime);
+			return AddExerciseCodeReview(submission, null, userId, startLine, startPosition, finishLine, finishPosition, comment, setAddingTime);
 		}
 
 		public ExerciseCodeReview FindExerciseCodeReviewById(int reviewId)
@@ -273,13 +274,13 @@ namespace Database.DataContexts
 		public async Task DeleteExerciseCodeReview(ExerciseCodeReview review)
 		{
 			review.IsDeleted = true;
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
 		public async Task UpdateExerciseCodeReview(ExerciseCodeReview review, string newComment)
 		{
 			review.Comment = newComment;
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
 		public Dictionary<int, List<ExerciseCodeReview>> GetExerciseCodeReviewForCheckings(IEnumerable<int> checkingsIds)
@@ -335,7 +336,7 @@ namespace Database.DataContexts
 
 			foreach (var review in reviews)
 				review.HiddenFromTopComments = true;
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
 		public List<ExerciseCodeReview> GetAllReviewComments(string courseId, Guid slideId)
@@ -359,7 +360,7 @@ namespace Database.DataContexts
 			};
 
 			db.ExerciseCodeReviewComments.Add(codeReviewComment);
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 
 			/* Extract review from database to fill review.Author by EF's DynamicProxy */
 			return db.ExerciseCodeReviewComments.AsNoTracking().FirstOrDefault(r => r.Id == codeReviewComment.Id);
@@ -373,7 +374,7 @@ namespace Database.DataContexts
 		public async Task DeleteExerciseCodeReviewComment(ExerciseCodeReviewComment comment)
 		{
 			comment.IsDeleted = true;
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 	}
 }

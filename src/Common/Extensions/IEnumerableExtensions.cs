@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Ulearn.Common.Extensions
@@ -35,6 +36,12 @@ namespace Ulearn.Common.Extensions
 		public static string Join(this IEnumerable<object> collection, string separator)
 		{
 			return string.Join(separator, collection.Select(o => o.ToString()));
+		}
+		
+		public static void ForEach<T>(this IEnumerable<T> collection, Action<T> action)
+		{
+			foreach (var obj in collection)
+				action(obj);
 		}
 	}
 }

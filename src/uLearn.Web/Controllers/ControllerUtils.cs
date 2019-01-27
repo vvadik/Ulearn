@@ -153,7 +153,7 @@ namespace uLearn.Web.Controllers
 		public static HashSet<Guid> GetSolvedSlides(UserSolutionsRepo solutionsRepo, UserQuizzesRepo userQuizzesRepo, Course course, string userId)
 		{
 			var solvedSlides = solutionsRepo.GetIdOfPassedSlides(course.Id, userId);
-			solvedSlides.UnionWith(userQuizzesRepo.GetIdOfQuizPassedSlides(course.Id, userId));
+			solvedSlides.UnionWith(userQuizzesRepo.GetPassedSlideIds(course.Id, userId));
 			return solvedSlides;
 		}
 

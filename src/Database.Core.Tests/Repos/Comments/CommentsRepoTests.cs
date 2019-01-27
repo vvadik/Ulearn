@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Database.Models;
+using Database.Models.Comments;
 using Database.Repos.Comments;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
