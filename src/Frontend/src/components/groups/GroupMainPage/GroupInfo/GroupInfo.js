@@ -101,6 +101,7 @@ class GroupInfo extends Component {
 			</MenuItem>
 		];
 
+		/* TODO (andgein): Change to size="medium" inside of <Mobile> after updating to the new react-ui version */
 		return (
 			<div className={styles["group-action"]}>
 				<Mobile>
