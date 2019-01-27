@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import Link from "@skbkontur/react-ui/components/Link/Link";
 
-import styles from "Profile.less"
+import styles from "./Profile.less"
 
 function Profile(props) {
 	const { isSysAdmin, systemAccesses, user } = props;
