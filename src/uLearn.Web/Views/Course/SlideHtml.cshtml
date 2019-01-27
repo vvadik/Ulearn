@@ -83,6 +83,8 @@
 	QuizBlockData model = context.GetBlockData(block);
 	if (model.QuizState.Status == QuizStatus.Sent)
 	{
+		model.QuizModel.UserScores.TryGetValue(block.Id, out blockScore);
+		
 		var isBlockCorrect = IsBlockCorrect(model, block);
 		mark = "glyphicon " + (isBlockCorrect ? "glyphicon-ok" : "glyphicon-remove");
 		style = "color: " + (isBlockCorrect ? "green" : "red");
@@ -289,7 +291,7 @@
 {
 	<div class="exercise">
 		@{
-			ExerciseBlockData data = context.GetBlockData(block) ?? new ExerciseBlockData(context.Course.Id, context.Slide as ExerciseSlide) { IsGuest = context.IsGuest, IsLti = context.IsLti };
+			ExerciseBlockData data = context.GetBlockData(block);
 			var manualCheckingId = context.ManualChecking != null ? (int?)context.ManualChecking.Id : null;
 
 			if (Html != null)
@@ -368,7 +370,7 @@
 		{
 			var item = items[itemIndex];
 			var id = isMultiply ? itemIndex + "noMult" : model.BlockIndex.ToString();
-			var itemChecked = model.QuizState.Status != QuizStatus.ReadyToSend && model.QuizModel.AnswersToQuizzes[block.Id].Select(x => x.ItemId).Contains(item.Id);
+			var itemChecked = model.ShowUserAnswers && model.QuizModel.AnswersToQuizzes[block.Id].Select(x => x.ItemId).Contains(item.Id);
 			var ans = itemChecked ? "checked" : "";
 			var itemClass = "";
 			var title = "";
@@ -387,6 +389,10 @@
 				@if (model.ShowQuestionStatistics)
 				{
 					var className = item.IsCorrect.IsTrueOrMaybe() ? "quiz__statistics__correct" : "quiz__statistics__incorrect";
+					if ((context.Slide as QuizSlide).ManualChecking)
+					{
+						className = "";
+					}
 					<div class="quiz__statistics @className" title="Этот вариант выбирают в @(model.QuestionAnswersFrequency[item.Id])% случаев">@(model.QuestionAnswersFrequency[item.Id])%</div>
 				}
 				<input @ans autocomplete="off" id='@( block.Id + "quizBlock" + item.Id)' name=@( "group" + id) type="@inputType" @GetGuestDisable(context.IsGuest) @readonlyAttr>
@@ -447,14 +453,12 @@
 @helper QuizBlock(FillInBlock block, BlockRenderContext context)
 {
 	var value = "";
-	var quizRes = "";
 	QuizBlockData model = context.GetBlockData(block);
-	if (model.QuizState.Status != QuizStatus.ReadyToSend && model.QuizModel.AnswersToQuizzes[block.Id].FirstOrDefault() != null)
+	if (model.ShowUserAnswers && model.QuizModel.AnswersToQuizzes[block.Id].FirstOrDefault() != null)
 	{
 		var answers = model.QuizModel.AnswersToQuizzes[block.Id];
 		var userAnswer = answers.FirstOrDefault();
 		value = userAnswer != null ? userAnswer.Text : "";
-		// quizRes = model.QuizState.IsScoredMaximum ? (userAnswer.IsRightAnswer ? "right-quiz" : "wrong-quiz") : "";
 	}
 	var sample = block.Sample;
 	var readonlyAttr = context.CanUserFillQuiz ? "" : "readonly";
@@ -462,14 +466,15 @@
 		<label @GetGuestOnclick(context.IsGuest)>
 			@if (block.Multiline)
 			{
-				<textarea class="form-control @quizRes" id='@( block.Id + "quizBlock")' maxlength="@QuizController.MaxFillInBlockSize" @GetGuestDisable(context.IsGuest) @readonlyAttr cols="110" rows="5">@value</textarea>
+				<textarea class="form-control" id='@( block.Id + "quizBlock")' maxlength="@QuizController.MaxFillInBlockSize" @GetGuestDisable(context.IsGuest) @readonlyAttr cols="110" rows="5">@value</textarea>
 			}
 			else
 			{
 				<input
 					autocomplete="off"
-					class="form-control @quizRes"
-					value="@value" id='@( block.Id + "quizBlock")'
+					class="form-control"
+					value="@value"
+					id='@(block.Id + "quizBlock")'
 					maxlength="@QuizController.MaxFillInBlockSize"
 					size="68"
 					@GetGuestDisable(context.IsGuest)
@@ -497,7 +502,7 @@
 	var falseTitle = "";
 	var isUserAnswerCorrect = false;
 	QuizBlockData model = context.GetBlockData(block);
-	if (model.QuizState.Status != QuizStatus.ReadyToSend && model.QuizModel.AnswersToQuizzes[block.Id].FirstOrDefault() != null)
+	if (model.ShowUserAnswers && model.QuizModel.AnswersToQuizzes[block.Id].FirstOrDefault() != null)
 	{
 		var userAnswer = model.QuizModel.AnswersToQuizzes[block.Id].Select(x => x.Text).FirstOrDefault() == "True";
 		isUserAnswerCorrect = userAnswer == block.Answer;
@@ -545,7 +550,7 @@
 	var items = block.ShuffledItems();
 	var correctItems = block.Items;
 	QuizBlockData model = context.GetBlockData(block);
-	if (model.QuizState.Status != QuizStatus.ReadyToSend && model.QuizModel.AnswersToQuizzes[block.Id].FirstOrDefault() != null)
+	if (model.ShowUserAnswers && model.QuizModel.AnswersToQuizzes[block.Id].FirstOrDefault() != null)
 	{
 		var userAnswers = model.QuizModel.AnswersToQuizzes[block.Id].Select(x => x.ItemId).ToList();
 		items = items.OrderBy(item => userAnswers.IndexOf(item.GetHash())).ToArray();
@@ -596,7 +601,7 @@
 	var movableItems = block.GetMatches(true);
 
 	QuizBlockData model = context.GetBlockData(block);
-	if (model.QuizState.Status != QuizStatus.ReadyToSend && model.QuizModel.AnswersToQuizzes[block.Id].FirstOrDefault() != null)
+	if (model.ShowUserAnswers && model.QuizModel.AnswersToQuizzes[block.Id].FirstOrDefault() != null)
 	{
 		var userAnswers = model.QuizModel.AnswersToQuizzes[block.Id];
 		fixedItems = GetFixedItemsAccordingToUserAnswers(userAnswers, fixedItems)
@@ -642,7 +647,7 @@
 					<div class="quiz quiz-block-matching__item @isRightClass row">
 						<input autocomplete="off" id='@( block.Id + "quizBlock" + fixedItem.GetHashForFixedItem())' type="hidden">
 						<div class="quiz-block-matching__fixed-item col-xs-3" data-item-id="@fixedItem.GetHashForFixedItem()">@fixedItem.FixedItem.RenderTex().ToLegacyHtmlString()</div>
-						@if (model.QuizState.Status == QuizStatus.ReadyToSend)
+						@if (model.QuizState.Status == QuizStatus.ReadyToSend && !model.ShowUserAnswers)
 						{
 							<div class="quiz-block-matching__droppable col-xs-3" data-block-id="@block.Id" data-item-id="@fixedItem.GetHashForFixedItem()"></div>
 							<div class="quiz-block-matching__source__droppable col-xs-3 col-xs-offset-1 added" data-block-id="@block.Id" data-movable-item-id="@movableItem.GetHashForMovableItem()">
@@ -716,7 +721,6 @@
 		<pre class="no-rounds"><code class="run-details"></code></pre>
 	</div>
 }
-
 
 @helper ExerciseControls(ExerciseControlsModel model)
 {

@@ -37,6 +37,18 @@ namespace uLearn.Web.Models
 			}
 		}
 
+		public bool ShowUserAnswers
+		{
+			get
+			{
+				if (QuizState.Status == QuizStatus.ReadyToSend)
+					/* Show previous user's answers in slides with enabled manual checking */
+					return QuizModel.Slide.ManualChecking;
+				
+				return true;
+			}
+		}
+
 		public bool ShowExplanations => ShowCorrectAnswers;
 		public bool ShowQuestionStatistics => !DebugView && IsCourseAdmin;
 	}

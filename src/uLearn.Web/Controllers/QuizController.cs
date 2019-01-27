@@ -127,7 +127,7 @@ namespace uLearn.Web.Controllers
 			if (slide.ManualChecking && manualQuizCheckQueueItem == null && state.Status == QuizStatus.ReadyToSend && state.UsedAttemptsCount > 0 && !attempt)
 				state.Status = QuizStatus.Sent;
 			
-			/* We want to show user's answer if user sent answers just now */
+			/* We also want to show user's answer if user sent answers just now */
 			if (state.Status == QuizStatus.ReadyToSend && send.HasValue)
 				state.Status = QuizStatus.Sent;
 
