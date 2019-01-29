@@ -280,9 +280,22 @@ namespace uLearn.Web.Controllers
 			return ControllerUtils.GetFilterOptionsByGroup<ManualCheckingQueueFilterOptions>(groupsRepo, User, courseId, groupsIds);
 		}
 
-		private ActionResult ManualCheckingQueue<T>(string actionName, string viewName, string courseId, bool done, List<string> groupsIds, string userId = "", Guid? slideId = null, string message = "") where T : AbstractManualSlideChecking
+		/* Returns merged checking queue for exercises (code reviews) as well as for quizzes */
+		private List<AbstractManualSlideChecking> GetMergedCheckingQueue(ManualCheckingQueueFilterOptions filterOptions)
 		{
-			var MaxShownQueueSize = 500;
+			var result = slideCheckingsRepo.GetManualCheckingQueue<ManualExerciseChecking>(filterOptions).Cast<AbstractManualSlideChecking>().ToList();
+			result.AddRange(slideCheckingsRepo.GetManualCheckingQueue<ManualQuizChecking>(filterOptions));
+
+			result = result.OrderByDescending(c => c.Timestamp).ToList();
+			if (filterOptions.Count > 0)
+				result = result.Take(filterOptions.Count).ToList();
+
+			return result;
+		}
+
+		private ActionResult InternalCheckingQueue(string courseId, bool done, List<string> groupsIds, string userId = "", Guid? slideId = null, string message = "")
+		{
+			const int maxShownQueueSize = 500;
 			var course = courseManager.GetCourse(courseId);
 
 			var filterOptions = GetManualCheckingFilterOptionsByGroup(courseId, groupsIds);
@@ -295,11 +308,11 @@ namespace uLearn.Web.Controllers
 				filterOptions.SlidesIds = new List<Guid> { slideId.Value };
 
 			filterOptions.OnlyChecked = done;
-			filterOptions.Count = MaxShownQueueSize + 1;
-			var checkings = slideCheckingsRepo.GetManualCheckingQueue<T>(filterOptions).ToList();
+			filterOptions.Count = maxShownQueueSize + 1;
+			var checkings = GetMergedCheckingQueue(filterOptions).ToList();
 
 			if (!checkings.Any() && !string.IsNullOrEmpty(message))
-				return RedirectToAction(actionName, new { courseId, group = string.Join(",", groupsIds) });
+				return RedirectToAction("CheckingQueue", new { courseId, group = string.Join(",", groupsIds) });
 
 			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
 			var reviews = slideCheckingsRepo.GetExerciseCodeReviewForCheckings(checkings.Select(c => c.Id));
@@ -307,12 +320,12 @@ namespace uLearn.Web.Controllers
 			var solutions = userSolutionsRepo.GetSolutionsForSubmissions(submissionsIds);
 
 			filterOptions.SlidesIds = null;
-			var usedCheckings = slideCheckingsRepo.GetManualCheckingQueue<T>(filterOptions);
+			var usedCheckings = GetMergedCheckingQueue(filterOptions);
 			var usedSlidesIds = new HashSet<Guid>(usedCheckings.Select(c => c.SlideId));
 
 			filterOptions = GetManualCheckingFilterOptionsByGroup(courseId, groupsIds);
 			filterOptions.OnlyChecked = null;
-			var allCheckingsSlidesIds = slideCheckingsRepo.GetManualCheckingQueue<T>(filterOptions).Select(c => c.SlideId).Distinct();
+			var allCheckingsSlidesIds = GetMergedCheckingQueue(filterOptions).Select(c => c.SlideId).Distinct();
 
 			var emptySlideMock = new Slide { Info = new SlideInfo(null, null, -1), Title = "", Id = Guid.Empty};
 			var allCheckingsSlidesTitles = allCheckingsSlidesIds
@@ -327,15 +340,16 @@ namespace uLearn.Web.Controllers
 				.ThenBy(s => s.Value.Index)
 				.Select(s => new KeyValuePair<Guid, string>(s.Key, s.Value.Title))
 				.ToList();
-			/* Remove divider iff it is first or last */
+			
+			/* Remove divider iff it is first or last item */
 			if (allCheckingsSlidesTitles.First().Key == Guid.Empty || allCheckingsSlidesTitles.Last().Key == Guid.Empty)
 				allCheckingsSlidesTitles.RemoveAll(kvp => kvp.Key == Guid.Empty);
 
-			return View(viewName, new ManualCheckingQueueViewModel
+			return View("CheckingQueue", new ManualCheckingQueueViewModel
 			{
 				CourseId = courseId,
                 /* TODO (andgein): Merge FindSlideById() and following GetSlideById() calls */
-				Checkings = checkings.Take(MaxShownQueueSize).Where(c => course.FindSlideById(c.SlideId) != null).Select(c =>
+				Checkings = checkings.Take(maxShownQueueSize).Where(c => course.FindSlideById(c.SlideId) != null).Select(c =>
 				{
 					var slide = course.GetSlideById(c.SlideId);
 					return new ManualCheckingQueueItemViewModel
@@ -346,8 +360,8 @@ namespace uLearn.Web.Controllers
 						ContextMaxScore = (slide as ExerciseSlide)?.Scoring.CodeReviewScore ?? slide.MaxScore,
 						ContextTimestamp = c.Timestamp,
 						ContextReviews = reviews.GetOrDefault(c.Id, new List<ExerciseCodeReview>()),
-						ContextExerciseSolution = c is ManualExerciseChecking ?
-							solutions.GetOrDefault((c as ManualExerciseChecking).SubmissionId, "") :
+						ContextExerciseSolution = c is ManualExerciseChecking checking ?
+							solutions.GetOrDefault(checking.SubmissionId, "") :
 							"",
 					};
 				}).ToList(),
@@ -355,25 +369,29 @@ namespace uLearn.Web.Controllers
 				SelectedGroupsIds = groupsIds,
 				Message = message,
 				AlreadyChecked = done,
-				ExistsMore = checkings.Count > MaxShownQueueSize,
+				ExistsMore = checkings.Count > maxShownQueueSize,
 				ShowFilterForm = string.IsNullOrEmpty(userId),
 				SlidesTitles = allCheckingsSlidesTitles,
 			});
 		}
 
-		public ActionResult ManualQuizCheckingQueue(string courseId, bool done = false, string userId = "", Guid? slideId = null, string message = "")
+		public ActionResult CheckingQueue(string courseId, bool done = false, string userId = "", Guid? slideId = null, string message = "")
 		{
 			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
-			return ManualCheckingQueue<ManualQuizChecking>("ManualQuizCheckingQueue", "ManualQuizCheckingQueue", courseId, done, groupsIds, userId, slideId, message);
+			return InternalCheckingQueue(courseId, done, groupsIds, userId, slideId, message);
 		}
 
+		/* Redirects for backward compatibility. Can be removed after February, 2019 */
 		public ActionResult ManualExerciseCheckingQueue(string courseId, bool done = false, string userId = "", Guid? slideId = null, string message = "")
 		{
-			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
-			return ManualCheckingQueue<ManualExerciseChecking>("ManualExerciseCheckingQueue", "ManualExerciseCheckingQueue", courseId, done, groupsIds, userId, slideId, message);
+			return RedirectToAction("CheckingQueue", new { courseId = courseId, done = done, userId = userId, slideId = slideId, message = message });
+		}
+		public ActionResult ManualQuizCheckingQueue(string courseId, bool done = false, string userId = "", Guid? slideId = null, string message = "")
+		{
+			return RedirectToAction("CheckingQueue", new { courseId = courseId, done = done, userId = userId, slideId = slideId, message = message });
 		}
 
-		private async Task<ActionResult> InternalManualCheck<T>(string courseId, string actionName, int queueItemId, bool ignoreLock = false, List<string> groupsIds = null, bool recheck = false) where T : AbstractManualSlideChecking
+		private async Task<ActionResult> InternalManualChecking<T>(string courseId, int queueItemId, bool ignoreLock = false, List<string> groupsIds = null, bool recheck = false) where T : AbstractManualSlideChecking
 		{
 			T checking;
 			var joinedGroupsIds = string.Join(",", groupsIds ?? new List<string>());
@@ -381,7 +399,7 @@ namespace uLearn.Web.Controllers
 			{
 				checking = slideCheckingsRepo.FindManualCheckingById<T>(queueItemId);
 				if (checking == null)
-					return RedirectToAction(actionName,
+					return RedirectToAction("CheckingQueue",
 						new
 						{
 							courseId = courseId,
@@ -394,7 +412,7 @@ namespace uLearn.Web.Controllers
 					return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
 				if (checking.IsChecked && !recheck)
-					return RedirectToAction(actionName,
+					return RedirectToAction("CheckingQueue",
 						new
 						{
 							courseId = checking.CourseId,
@@ -417,7 +435,7 @@ namespace uLearn.Web.Controllers
 			});
 		}
 
-		private async Task<ActionResult> CheckNextManualCheckingForSlide<T>(string actionName, string courseId, Guid slideId, List<string> groupsIds) where T : AbstractManualSlideChecking
+		private async Task<ActionResult> CheckNextManualCheckingForSlide<T>(string courseId, Guid slideId, List<string> groupsIds) where T : AbstractManualSlideChecking
 		{
 			using (var transaction = db.Database.BeginTransaction())
 			{
@@ -429,38 +447,36 @@ namespace uLearn.Web.Controllers
 
 				var itemToCheck = checkings.FirstOrDefault(i => !i.IsLocked);
 				if (itemToCheck == null)
-					return RedirectToAction(actionName, new { courseId, group = string.Join(",", groupsIds), message = "slide_checked" });
+					return RedirectToAction("CheckingQueue", new { courseId, group = string.Join(",", groupsIds), message = "slide_checked" });
 
-				await slideCheckingsRepo.LockManualChecking(itemToCheck, User.Identity.GetUserId());
+				await slideCheckingsRepo.LockManualChecking(itemToCheck, User.Identity.GetUserId()).ConfigureAwait(false);
 
 				transaction.Commit();
 
-				return await InternalManualCheck<T>(courseId, actionName, itemToCheck.Id, true, groupsIds);
+				return await InternalManualChecking<T>(courseId, itemToCheck.Id, ignoreLock: true, groupsIds: groupsIds).ConfigureAwait(false);
 			}
 		}
 
-		public Task<ActionResult> CheckQuiz(string courseId, int id, bool recheck = false)
+		public Task<ActionResult> Checking(string courseId, int id, bool recheck = false)
 		{
 			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
-			return InternalManualCheck<ManualQuizChecking>(courseId, "ManualQuizCheckingQueue", id, false, groupsIds, recheck);
-		}
-
-		public Task<ActionResult> CheckExercise(string courseId, int id, bool recheck = false)
-		{
-			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
-			return InternalManualCheck<ManualExerciseChecking>(courseId, "ManualExerciseCheckingQueue", id, false, groupsIds, recheck);
+			var checking = slideCheckingsRepo.FindManualCheckingById(id);
+			if (checking is ManualExerciseChecking)
+				return InternalManualChecking<ManualExerciseChecking>(courseId, id, ignoreLock: false, groupsIds: groupsIds, recheck: recheck);
+			else
+				return InternalManualChecking<ManualQuizChecking>(courseId, id, ignoreLock: false, groupsIds: groupsIds, recheck: recheck);
 		}
 
 		public Task<ActionResult> CheckNextQuizForSlide(string courseId, Guid slideId)
 		{
 			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
-			return CheckNextManualCheckingForSlide<ManualQuizChecking>("ManualQuizCheckingQueue", courseId, slideId, groupsIds);
+			return CheckNextManualCheckingForSlide<ManualQuizChecking>(courseId, slideId, groupsIds);
 		}
 
 		public Task<ActionResult> CheckNextExerciseForSlide(string courseId, Guid slideId)
 		{
 			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
-			return CheckNextManualCheckingForSlide<ManualExerciseChecking>("ManualExerciseCheckingQueue", courseId, slideId, groupsIds);
+			return CheckNextManualCheckingForSlide<ManualExerciseChecking>(courseId, slideId, groupsIds);
 		}
 
 		[HttpPost]
@@ -1619,7 +1635,7 @@ namespace uLearn.Web.Controllers
 		public bool OnlyInstructorsCanReply { get; set; }
 		public List<CommentViewModel> Comments { get; set; }
 	}
-
+	
 	public class ManualCheckingQueueViewModel
 	{
 		public string CourseId { get; set; }

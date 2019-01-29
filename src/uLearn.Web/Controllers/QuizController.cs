@@ -153,6 +153,7 @@ namespace uLearn.Web.Controllers
 				AnswersToQuizzes = userAnswers,
 				IsLti = isLti,
 				Checking = manualQuizCheckQueueItem,
+				ManualCheckingsLeft = manualQuizCheckQueueItem != null ? GetManualCheckingsCountInQueue(course, slide) : 0,
 				CanUserFillQuiz = canUserFillQuiz,
 				GroupsIds = Request.GetMultipleValuesFromQueryString("group"),
 				QuestionAnswersFrequency = questionAnswersFrequency,
@@ -160,7 +161,13 @@ namespace uLearn.Web.Controllers
 
 			return PartialView(model);
 		}
-		
+
+		private int GetManualCheckingsCountInQueue(ICourse course, QuizSlide slide)
+		{
+			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
+			return ControllerUtils.GetManualCheckingsCountInQueue(slideCheckingsRepo, groupsRepo, User, course.Id, slide, groupsIds);
+		}
+
 		[HttpPost]
 		public async Task<ActionResult> SubmitQuiz(string courseId, Guid slideId, string answer, bool isLti)
 		{

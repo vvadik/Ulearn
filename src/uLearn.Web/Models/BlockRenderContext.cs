@@ -26,7 +26,7 @@ namespace uLearn.Web.Models
 		public bool DefaultProhibitFurtherReview { get; set; }
 		public Dictionary<string, int> UserScores { get; }
 
-		/* GroupsIds != null if instructor filtered users by group and see their works */
+		/* GroupsIds != null if instructor filtered users by group and see their submissions */
 		public List<string> GroupsIds { get; set; }
 
 		/* User's version of slide, i.e. for exercises */

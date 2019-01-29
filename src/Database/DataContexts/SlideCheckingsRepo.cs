@@ -181,8 +181,8 @@ namespace Database.DataContexts
 		}
 		
 		#endregion
-		
 
+		
 		public IEnumerable<T> GetManualCheckingQueue<T>(ManualCheckingQueueFilterOptions options) where T : AbstractManualSlideChecking
 		{
 			var query = db.Set<T>().Where(c => c.CourseId == options.CourseId);
@@ -206,6 +206,11 @@ namespace Database.DataContexts
 		public T FindManualCheckingById<T>(int id) where T : AbstractManualSlideChecking
 		{
 			return db.Set<T>().Find(id);
+		}
+
+		public AbstractManualSlideChecking FindManualCheckingById(int id)
+		{
+			return (AbstractManualSlideChecking) FindManualCheckingById<ManualQuizChecking>(id) ?? FindManualCheckingById<ManualExerciseChecking>(id);
 		}
 
 		public bool IsProhibitedToSendExerciseToManualChecking(string courseId, Guid slideId, string userId)

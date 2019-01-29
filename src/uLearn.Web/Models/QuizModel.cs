@@ -24,6 +24,7 @@ namespace uLearn.Web.Models
 		public bool IsLti { get; set; }
 		public bool IsGuest { get; set; }
 		public ManualQuizChecking Checking { get; set; }
+		public int ManualCheckingsLeft { get; set; }
 		public bool CanUserFillQuiz { get; set; }
 
 		/* GroupsIds != null if instructor filtered users by group and see their works */

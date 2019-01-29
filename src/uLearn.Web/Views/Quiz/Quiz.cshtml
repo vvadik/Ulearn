@@ -81,6 +81,11 @@
 	{
 		<p class="quiz-status">@status</p>
 	}
+	
+	if (Model.Checking != null && Model.Checking.IsLocked && !Model.Checking.IsLockedBy(User.Identity))
+	{
+		<div class="alert alert-danger mt10 ">Внимание. Эта работа прямо сейчас проверяется преподавателем @Model.Checking.LockedBy.VisibleName</div>
+	}
 
 	var remains = Model.MaxAttemptsCount - Model.QuizState.UsedAttemptsCount;
 	var isInstructor = User.HasAccessFor(Model.Course.Id, CourseRole.Instructor);
@@ -143,12 +148,28 @@
 		<div id="SubmitQuiz" data-url='@Url.Action("SubmitQuiz", "Quiz")'>
 			@if (Model.Checking != null)
 			{
-				<input type="submit" class="btn @(Model.Checking.IsChecked ? "btn-primary" : "btn-default") quiz-button" form="quiz__score-form" value="Сохранить и вернуться">
+				/* This attempt should not be calculated as left checking */
+				Model.ManualCheckingsLeft--;
+				
+				<input type="submit" class="btn @(Model.Checking.IsChecked || Model.ManualCheckingsLeft == 0 ? "btn-primary" : "btn-default") quiz-button" form="quiz__score-form" value="Сохранить и вернуться">
 				if (!Model.Checking.IsChecked)
 				{
-					<input type="submit" class="btn btn-primary quiz-button" form="quiz__score-form" value="Сохранить и перейти к следующему"
-							data-url="@Url.Action("CheckNextQuizForSlide", "Admin", new { courseId = Model.Course.Id, slideId = Model.Slide.Id, group = Model.GroupsIdsJoined })"
-							onclick="$('[name=nextUrl]').val($(this).data('url'))">
+					if (Model.ManualCheckingsLeft == 0)
+					{
+						<div class="text-muted no-manual-checkings-left">
+							Это последняя работа по&nbsp;тесту
+						</div>
+					}
+					else
+					{
+						<input type="submit" class="btn btn-primary quiz-button" form="quiz__score-form" value="Сохранить и перейти к следующему"
+								data-url="@Url.Action("CheckNextQuizForSlide", "Admin", new { courseId = Model.Course.Id, slideId = Model.Slide.Id, group = Model.GroupsIdsJoined })"
+								onclick="$('[name=nextUrl]').val($(this).data('url'))">
+						<div class="text-muted manual-checkings-left">
+							По этому тесту остал@(Model.ManualCheckingsLeft % 10 == 1 && (Model.ManualCheckingsLeft % 100 / 10 != 1) ? "ась" : "ось")
+							@Model.ManualCheckingsLeft.PluralizeInRussian(RussianPluralizationOptions.Checkings)
+						</div>
+					}
 				}
 			}
 			else if (Model.QuizState.Status == QuizStatus.ReadyToSend)
