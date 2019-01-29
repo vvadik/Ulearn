@@ -435,7 +435,7 @@ namespace uLearn.Web.Controllers
 			});
 		}
 
-		private async Task<ActionResult> CheckNextManualCheckingForSlide<T>(string courseId, Guid slideId, List<string> groupsIds) where T : AbstractManualSlideChecking
+		private async Task<ActionResult> CheckNextManualCheckingForSlide<T>(string courseId, Guid slideId, List<string> groupsIds, int previousCheckingId) where T : AbstractManualSlideChecking
 		{
 			using (var transaction = db.Database.BeginTransaction())
 			{
@@ -445,7 +445,8 @@ namespace uLearn.Web.Controllers
 				filterOptions.SlidesIds = new List<Guid> { slideId };
 				var checkings = slideCheckingsRepo.GetManualCheckingQueue<T>(filterOptions).ToList();
 
-				var itemToCheck = checkings.FirstOrDefault(i => !i.IsLocked);
+				/* First of all try to find checking with Id < previousCheckingId (early) */
+				var itemToCheck = checkings.FirstOrDefault(c => !c.IsLocked && c.Id < previousCheckingId) ?? checkings.FirstOrDefault(c => !c.IsLocked);
 				if (itemToCheck == null)
 					return RedirectToAction("CheckingQueue", new { courseId, group = string.Join(",", groupsIds), message = "slide_checked" });
 
@@ -467,16 +468,16 @@ namespace uLearn.Web.Controllers
 				return InternalManualChecking<ManualQuizChecking>(courseId, id, ignoreLock: false, groupsIds: groupsIds, recheck: recheck);
 		}
 
-		public Task<ActionResult> CheckNextQuizForSlide(string courseId, Guid slideId)
+		public Task<ActionResult> CheckNextQuizForSlide(string courseId, Guid slideId, int previous)
 		{
 			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
-			return CheckNextManualCheckingForSlide<ManualQuizChecking>(courseId, slideId, groupsIds);
+			return CheckNextManualCheckingForSlide<ManualQuizChecking>(courseId, slideId, groupsIds, previous);
 		}
 
-		public Task<ActionResult> CheckNextExerciseForSlide(string courseId, Guid slideId)
+		public Task<ActionResult> CheckNextExerciseForSlide(string courseId, Guid slideId, int previous)
 		{
 			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
-			return CheckNextManualCheckingForSlide<ManualExerciseChecking>(courseId, slideId, groupsIds);
+			return CheckNextManualCheckingForSlide<ManualExerciseChecking>(courseId, slideId, groupsIds, previous);
 		}
 
 		[HttpPost]

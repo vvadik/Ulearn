@@ -1,6 +1,7 @@
 ﻿@using Database.Extensions
 @using Database.Models
 @using uLearn.Web.Controllers
+@using uLearn.Web.Extensions
 @using uLearn.Web.Views.Course
 @using Ulearn.Common.Extensions
 @using Ulearn.Core.Courses.Slides.Quizzes
@@ -79,7 +80,11 @@
 
 	if (!string.IsNullOrEmpty(status))
 	{
-		<p class="quiz-status">@status</p>
+		<p class="quiz-status">
+			@status@*
+			*@@if (Model.Checking != null)
+			{<text>. @Model.Checking.Timestamp.ToPrettyString()</text>}
+		</p>
 	}
 	
 	if (Model.Checking != null && Model.Checking.IsLocked && !Model.Checking.IsLockedBy(User.Identity))
@@ -163,7 +168,7 @@
 					else
 					{
 						<input type="submit" class="btn btn-primary quiz-button" form="quiz__score-form" value="Сохранить и перейти к следующему"
-								data-url="@Url.Action("CheckNextQuizForSlide", "Admin", new { courseId = Model.Course.Id, slideId = Model.Slide.Id, group = Model.GroupsIdsJoined })"
+								data-url="@Url.Action("CheckNextQuizForSlide", "Admin", new { courseId = Model.Course.Id, slideId = Model.Slide.Id, group = Model.GroupsIdsJoined, previous = Model.Checking.Id })"
 								onclick="$('[name=nextUrl]').val($(this).data('url'))">
 						<div class="text-muted manual-checkings-left">
 							По этому тесту остал@(Model.ManualCheckingsLeft % 10 == 1 && (Model.ManualCheckingsLeft % 100 / 10 != 1) ? "ась" : "ось")
