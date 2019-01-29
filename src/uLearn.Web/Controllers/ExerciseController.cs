@@ -321,7 +321,7 @@ namespace uLearn.Web.Controllers
 						Status = "error",
 						Error = "has_greatest_score",
 						Score = manualScore.ToString(),
-						CheckedQueueUrl = Url.Action("ManualExerciseCheckingQueue", "Admin", new { courseId, done = true, userId, slideId })
+						CheckedQueueUrl = Url.Action("CheckingQueue", "Admin", new { courseId, done = true, userId, slideId })
 					});
 
 			/* TODO: check if 0 <= exerciseScore <= exercise.MaxReviewScore */

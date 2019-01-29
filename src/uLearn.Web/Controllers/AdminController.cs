@@ -337,6 +337,8 @@ namespace uLearn.Web.Controllers
 					new KeyValuePair<Guid, Slide>(Guid.Empty, emptySlideMock)
 				})
 				.OrderBy(s => usedSlidesIds.Contains(s.Key) ? 0 : 1)
+				/* Order slides by frequency in the queue */
+				.ThenByDescending(s => usedCheckings.Count(c => c.SlideId == s.Key))
 				.ThenBy(s => s.Value.Index)
 				.Select(s => new KeyValuePair<Guid, string>(s.Key, s.Value.Title))
 				.ToList();
@@ -382,13 +384,13 @@ namespace uLearn.Web.Controllers
 		}
 
 		/* Redirects for backward compatibility. Can be removed after February, 2019 */
-		public ActionResult ManualExerciseCheckingQueue(string courseId, bool done = false, string userId = "", Guid? slideId = null, string message = "")
+		public ActionResult ManualExerciseCheckingQueue(string courseId, bool done = false, string userId = "", Guid? slideId = null, string message = "", string group = "")
 		{
-			return RedirectToAction("CheckingQueue", new { courseId = courseId, done = done, userId = userId, slideId = slideId, message = message });
+			return RedirectToAction("CheckingQueue", new { courseId = courseId, done = done, userId = userId, slideId = slideId, message = message, group = group });
 		}
-		public ActionResult ManualQuizCheckingQueue(string courseId, bool done = false, string userId = "", Guid? slideId = null, string message = "")
+		public ActionResult ManualQuizCheckingQueue(string courseId, bool done = false, string userId = "", Guid? slideId = null, string message = "", string group = "")
 		{
-			return RedirectToAction("CheckingQueue", new { courseId = courseId, done = done, userId = userId, slideId = slideId, message = message });
+			return RedirectToAction("CheckingQueue", new { courseId = courseId, done = done, userId = userId, slideId = slideId, message = message, group = group });
 		}
 
 		private async Task<ActionResult> InternalManualChecking<T>(string courseId, int queueItemId, bool ignoreLock = false, List<string> groupsIds = null, bool recheck = false) where T : AbstractManualSlideChecking
