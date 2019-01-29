@@ -269,8 +269,7 @@ class CourseMenu extends Component {
         items = items.concat([
             <MenuSeparator key="CourseMenuSeparator3" />,
             <MenuItem href={"/Admin/Comments?courseId=" + courseId} key="Comments" component={ LinkComponent }>Комментарии</MenuItem>,
-            <MenuItem href={"/Admin/CheckingQueue?courseId=" + courseId} key="ManualQuizCheckingQueue" component={ LinkComponent }>Проверка тестов</MenuItem>,
-            <MenuItem href={"/Admin/CheckingQueue?courseId=" + courseId} key="ManualExerciseCheckingQueue" component={ LinkComponent }>Код-ревью</MenuItem>,
+            <MenuItem href={"/Admin/CheckingQueue?courseId=" + courseId} key="ManualCheckingQueue" component={ LinkComponent }>Код-ревью и проверка тестов</MenuItem>,
         ]);
 
         return items;
