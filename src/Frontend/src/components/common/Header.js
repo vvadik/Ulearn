@@ -258,7 +258,7 @@ class CourseMenu extends Component {
         if (hasUsersMenuItem || hasCourseAdminMenuItems)
             items.push(<MenuSeparator key="CourseMenuSeparator2"/>);
         if (hasUsersMenuItem)
-            items.push(<MenuItem href={"/Admin/Users?courseId=" + courseId} key="Users" component={ LinkComponent }>Пользователи</MenuItem>);
+            items.push(<MenuItem href={"/Admin/Users?courseId=" + courseId} key="Users" component={ LinkComponent }>Студенты и преподаватели</MenuItem>);
         if (hasCourseAdminMenuItems)
             items = items.concat([
                 <MenuItem href={"/Admin/Packages?courseId=" + courseId} key="Packages" component={ LinkComponent }>Экспорт и импорт курса</MenuItem>,

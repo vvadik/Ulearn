@@ -1292,31 +1292,4 @@ namespace uLearn.Web.Controllers
 		public Guid VersionId { get; set; }
 		public CourseDiff CourseDiff { get; set; }
 	}
-
-	public class GroupsViewModel
-	{
-		public Course Course { get; set; }
-		public bool CourseManualCheckingEnabled { get; set; }
-
-		public List<Group> Groups { get; set; }
-		public Dictionary<int, bool> CanModifyGroup { get; set; }
-		public List<ScoringGroup> ScoringGroupsCanBeSetInSomeUnit { get; set; }
-		public Dictionary<int, List<string>> EnabledScoringGroups { get; set; }
-
-		public List<UserRolesInfo> Instructors { get; set; }
-		public List<Group> GroupsMayBeCopied { get; set; }
-		public Dictionary<string, string> CoursesNames { get; set; }
-
-		public Dictionary<int, GroupLabel> Labels { get; set; }
-		public DefaultDictionary<int, List<int>> LabelsOnGroups { get; set; }
-
-		public DefaultDictionary<int, List<GroupAccess>> GroupAccesses { get; set; }
-	}
-
-	public class GroupAccessViewModel
-	{
-		public GroupAccess Access { get; set; }
-
-		public bool CanBeRevoked { get; set; }
-	}
 }
