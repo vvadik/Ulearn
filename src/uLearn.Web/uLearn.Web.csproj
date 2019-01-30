@@ -1118,6 +1118,7 @@
     <Content Include="codemirror\theme\xq-dark.css" />
     <Content Include="codemirror\theme\xq-light.css" />
     <Content Include="Content\404.jpg" />
+    <Content Include="Content\analytics.css" />
     <Content Include="Content\antiplagiarism.css" />
     <Content Include="Content\awesome-bootstrap-checkbox.css" />
     <Content Include="Content\banner-campus.png" />
@@ -1131,6 +1132,11 @@
     <Content Include="Content\bootstrap.ulearn.css" />
     <Content Include="Content\bounce.css" />
     <Content Include="Content\buttons.css" />
+    <Content Include="Content\certificates.css" />
+    <Content Include="Content\code_review.css" />
+    <Content Include="Content\comments.css" />
+    <Content Include="Content\course_statistics.css" />
+    <Content Include="Content\course_versions.css" />
     <Content Include="Content\exercise\student-submissions.css" />
     <Content Include="Content\font-awesome.css" />
     <Content Include="Content\fonts\fontawesome-webfont.svg" />
@@ -1139,9 +1145,11 @@
     <Content Include="Content\likely.css" />
     <Content Include="Content\loading-ring.gif" />
     <Content Include="Content\loading.gif" />
+    <Content Include="Content\login_and_registration.css" />
     <Content Include="Content\logo.png" />
     <Content Include="Content\modals.css" />
     <Content Include="Content\notifications.css" />
+    <Content Include="Content\notification_settings.css" />
     <Content Include="Content\stepik.css" />
     <Content Include="Content\tablesorter.css" />
     <Content Include="Content\ulearn.css" />
@@ -1153,7 +1161,7 @@
     <Content Include="flexslider\jquery.flexslider.js" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
-    <Content Include="Content\Site.css" />
+    <Content Include="Content\main.css" />
     <Content Include="Jsdifflib\jsdifflib.css" />
     <Content Include="katex\*.css" />
     <Content Include="katex\katex.js" />
