@@ -245,12 +245,17 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult Comments(string courseId)
 		{
+			const int commentsCountLimit = 500;
+			
 			var userId = User.Identity.GetUserId();			
 			
 			var course = courseManager.GetCourse(courseId);
 			var commentsPolicy = commentsRepo.GetCommentsPolicy(courseId);
 
-			var comments = commentsRepo.GetCourseComments(courseId).Where(c => ! c.IsForInstructorsOnly).OrderByDescending(x => x.PublishTime).ToList();
+			var comments = commentsRepo.GetCourseComments(courseId)
+				.Where(c => !c.IsForInstructorsOnly)
+				.OrderByDescending(x => x.PublishTime)
+				.ToList();
 			var commentsLikes = commentsRepo.GetCommentsLikesCounts(comments);
 			var commentsLikedByUser = commentsRepo.GetCourseCommentsLikedByUser(courseId, userId);
 			var commentsById = comments.ToDictionary(x => x.Id);
@@ -263,7 +268,7 @@ namespace uLearn.Web.Controllers
 				IsCommentsEnabled = commentsPolicy.IsCommentsEnabled,
 				ModerationPolicy = commentsPolicy.ModerationPolicy,
 				OnlyInstructorsCanReply = commentsPolicy.OnlyInstructorsCanReply,
-				Comments = (from c in comments
+				Comments = (from c in comments.Take(commentsCountLimit)
 					let slide = course.FindSlideById(c.SlideId)
 					where slide != null
 					select
