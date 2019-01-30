@@ -272,15 +272,18 @@ class DownloadedHtmlContent extends Component {
         let exceptions = ["/Login/ExternalLogin", "/Login/DoLinkLogin"];
 
         let forms = Array.from(document.body.getElementsByTagName('form'));
-        let postForms = forms.filter(f => f.method.toLowerCase() === 'post' && ! f.onsubmit && f.action);
+        let postForms = forms.filter(f => f.method.toLowerCase() === 'post' && !f.onsubmit && f.action);
         postForms.forEach(f => {
             let formUrl = f.action;
             if (exceptions.some(e => getUrlParts(formUrl).pathname.startsWith(e)))
                 return;
 
             f.addEventListener('submit', e => {
+				let formTarget = f.target;
+				if (formTarget === '_blank')
+					return true;
+
                 e.preventDefault();
-                console.log('Catched submit event', e);
 
                 /* Add button's data to form data */
 

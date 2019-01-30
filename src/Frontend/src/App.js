@@ -61,11 +61,12 @@ api.setServerErrorHandler((message) => Toast.push(message ? message : 'Прои�
 class UlearnApp extends Component {
     render() {
 		let pathname = window.location.pathname.toLowerCase();
-		const isLti = pathname.endsWith('/ltislide') || pathname.endsWith('/acceptedalert');
+		let isLti = pathname.endsWith('/ltislide') || pathname.endsWith('/acceptedalert');
+		let isHeaderVisible = !isLti;
 
         return (
             <Provider store={store}>
-                <InternalUlearnApp isLti={isLti}/>
+                <InternalUlearnApp isHeaderVisible={isHeaderVisible}/>
             </Provider>
         )
     }
@@ -94,7 +95,7 @@ class InternalUlearnApp extends Component {
     }
 
     render() {
-    	const isHeaderVisible = ! this.props.isLti;
+    	const isHeaderVisible = this.props.isHeaderVisible;
         return (
             <BrowserRouter>
                 <ErrorBoundary>
