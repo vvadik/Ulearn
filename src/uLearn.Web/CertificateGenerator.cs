@@ -188,7 +188,7 @@ namespace uLearn.Web
 			content = content.Replace($"%{parameterName}|in_html%", htmlEncodedValue);
 			content = content.Replace($"%{parameterName}%", htmlEncodedValue);
 
-			var quotesEncodedValue = parameterValue.Replace(@"\", @"\\").Replace("\"", "\\\"").Replace("'", @"\'");
+			var quotesEncodedValue = parameterValue.EncodeQuotes();
 			content = content.Replace($"%{parameterName}|in_quotes%", quotesEncodedValue);
 
 			return content;

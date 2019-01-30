@@ -74,7 +74,7 @@ namespace uLearn.Web.Controllers
 			certificateGenerator = new CertificateGenerator(db, courseManager);
 		}
 
-		public ActionResult CourseList(string courseCreationLastTry = null)
+		public ActionResult Courses(string courseId = null, string courseTitle = null)
 		{
 			var courses = new HashSet<string>(User.GetControllableCoursesId());
 			var incorrectChars = new string(CourseManager.GetInvalidCharacters().OrderBy(c => c).Where(c => 32 <= c).ToArray());
@@ -86,7 +86,8 @@ namespace uLearn.Web.Controllers
 					Title = course.Title,
 					LastWriteTime = courseManager.GetLastWriteTime(course.Id)
 				}).ToList(),
-				CourseCreationLastTry = courseCreationLastTry,
+				LastTryCourseId = courseId,
+				LastTryCourseTitle = courseTitle,
 				InvalidCharacters = incorrectChars
 			};
 			return View(model);
@@ -208,11 +209,19 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		[ULearnAuthorize(ShouldBeSysAdmin = true)]
-		public ActionResult CreateCourse(string courseId)
+		public async Task<ActionResult> CreateCourse(string courseId, string courseTitle)
 		{
-			if (!courseManager.TryCreateCourse(courseId))
-				return RedirectToAction("CourseList", new { courseCreationLastTry = courseId });
-			return RedirectToAction("Users", new { courseId, onlyPrivileged = true });
+			var versionId = Guid.NewGuid();
+			
+			if (!courseManager.TryCreateCourse(courseId, courseTitle, versionId))
+				return RedirectToAction("Courses", new { courseId = courseId, courseTitle = courseTitle });
+
+			var userId = User.Identity.GetUserId();
+			await coursesRepo.AddCourseVersion(courseId, versionId, userId).ConfigureAwait(false);
+			await coursesRepo.MarkCourseVersionAsPublished(versionId).ConfigureAwait(false);
+			await NotifyAboutPublishedCourseVersion(courseId, versionId, userId).ConfigureAwait(false);
+			
+			return RedirectToAction("Packages", new { courseId, onlyPrivileged = true });
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
@@ -508,7 +517,7 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 
 			if (string.IsNullOrEmpty(queryModel.CourseId))
-				return RedirectToAction("CourseList");
+				return RedirectToAction("Courses");
 			return View(queryModel);
 		}
 
@@ -1227,7 +1236,8 @@ namespace uLearn.Web.Controllers
 	public class CourseListViewModel
 	{
 		public List<CourseViewModel> Courses;
-		public string CourseCreationLastTry { get; set; }
+		public string LastTryCourseId { get; set; }
+		public string LastTryCourseTitle { get; set; }
 		public string InvalidCharacters { get; set; }
 	}
 

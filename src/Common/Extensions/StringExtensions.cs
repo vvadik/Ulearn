@@ -200,5 +200,10 @@ namespace Ulearn.Common.Extensions
 		{
 			return string.Equals(first, second, StringComparison.InvariantCultureIgnoreCase);
 		}
+
+		public static string EncodeQuotes(this string text)
+		{
+			return text.Replace(@"\", @"\\").Replace(@"""", @"\""").Replace("'", @"\'");
+		}
 	}
 }

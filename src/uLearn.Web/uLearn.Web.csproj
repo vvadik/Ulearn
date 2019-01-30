@@ -1418,7 +1418,7 @@
     <Content Include="Views\Hint\UseHint.cshtml" />
     <Content Include="Views\Account\List.cshtml" />
     <Content Include="Views\Admin\Units.cshtml" />
-    <Content Include="Views\Admin\CourseList.cshtml" />
+    <Content Include="Views\Admin\Courses.cshtml" />
     <Content Include="Views\Analytics\UnitStatistics.cshtml" />
     <Content Include="Views\Course\InstructorNote.cshtml" />
     <Content Include="Views\Questions\Items.cshtml" />
