@@ -12,11 +12,14 @@
 		{
 			if (User.IsSystemAdministrator())
 			{
-				<li>@Html.ActionLink(course.Title, "Users", new { courseId = course.Id, onlyPrivileged = true })</li>
+				<li>
+					@Html.RouteLink(course.Id, "Course.Slide", new { courseId = course.Id }):
+					«@course.Title»
+				</li>
 			}
 			else
 			{
-				<li>@Html.ActionLink(course.Title, "UnitStatistics", "Analytics", new { courseId = course.Id }, new { })</li>
+				<li>@Html.RouteLink(course.Title, "Course.Slide", new { courseId = course.Id }):</li>
 			}
 		}
 	</ul>

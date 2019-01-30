@@ -76,16 +76,26 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult Courses(string courseId = null, string courseTitle = null)
 		{
-			var courses = new HashSet<string>(User.GetControllableCoursesId());
+			var controllableCourses = new HashSet<string>(User.GetControllableCoursesId());
 			var incorrectChars = new string(CourseManager.GetInvalidCharacters().OrderBy(c => c).Where(c => 32 <= c).ToArray());
+			var courses = courseManager.GetCourses()
+				.Where(course => controllableCourses.Contains(course.Id));
+
+			if (User.IsSystemAdministrator())
+				courses = courses.OrderBy(course => course.Id, StringComparer.InvariantCultureIgnoreCase);
+			else
+				courses = courses.OrderBy(course => course.Title, StringComparer.InvariantCultureIgnoreCase);
+			
 			var model = new CourseListViewModel
 			{
-				Courses = courseManager.GetCourses().Where(course => courses.Contains(course.Id)).Select(course => new CourseViewModel
-				{
-					Id = course.Id,
-					Title = course.Title,
-					LastWriteTime = courseManager.GetLastWriteTime(course.Id)
-				}).ToList(),
+				Courses = courses
+					.Select(course => new CourseViewModel
+					{
+						Id = course.Id,
+						Title = course.Title,
+						LastWriteTime = courseManager.GetLastWriteTime(course.Id)
+					})
+					.ToList(),
 				LastTryCourseId = courseId,
 				LastTryCourseTitle = courseTitle,
 				InvalidCharacters = incorrectChars
