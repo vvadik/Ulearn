@@ -352,7 +352,7 @@ namespace uLearn.Web.Controllers
 			var allCheckingsSlidesIds = GetMergedCheckingQueue(filterOptions).Select(c => c.SlideId).Distinct();
 
 			var emptySlideMock = new Slide { Info = new SlideInfo(null, null, -1), Title = "", Id = Guid.Empty};
-			var allCheckingsSlidesTitles = allCheckingsSlidesIds
+			var allCheckingsSlides = allCheckingsSlidesIds
 				.Select(s => new KeyValuePair<Guid, Slide>(s, course.FindSlideById(s)))
 				.Where(kvp => kvp.Value != null)
 				.Union(new List<KeyValuePair<Guid, Slide>>
@@ -364,12 +364,12 @@ namespace uLearn.Web.Controllers
 				/* Order slides by frequency in the queue */
 				.ThenByDescending(s => usedCheckings.Count(c => c.SlideId == s.Key))
 				.ThenBy(s => s.Value.Index)
-				.Select(s => new KeyValuePair<Guid, string>(s.Key, s.Value.Title))
+				.Select(s => new KeyValuePair<Guid, Slide>(s.Key, s.Value))
 				.ToList();
 			
 			/* Remove divider iff it is first or last item */
-			if (allCheckingsSlidesTitles.First().Key == Guid.Empty || allCheckingsSlidesTitles.Last().Key == Guid.Empty)
-				allCheckingsSlidesTitles.RemoveAll(kvp => kvp.Key == Guid.Empty);
+			if (allCheckingsSlides.First().Key == Guid.Empty || allCheckingsSlides.Last().Key == Guid.Empty)
+				allCheckingsSlides.RemoveAll(kvp => kvp.Key == Guid.Empty);
 
 			return View("CheckingQueue", new ManualCheckingQueueViewModel
 			{
@@ -397,7 +397,7 @@ namespace uLearn.Web.Controllers
 				AlreadyChecked = done,
 				ExistsMore = checkings.Count > maxShownQueueSize,
 				ShowFilterForm = string.IsNullOrEmpty(userId),
-				SlidesTitles = allCheckingsSlidesTitles,
+				Slides = allCheckingsSlides,
 			});
 		}
 
@@ -1293,7 +1293,7 @@ namespace uLearn.Web.Controllers
 		public bool AlreadyChecked { get; set; }
 		public bool ExistsMore { get; set; }
 		public bool ShowFilterForm { get; set; }
-		public List<KeyValuePair<Guid, string>> SlidesTitles { get; set; }
+		public List<KeyValuePair<Guid, Slide>> Slides { get; set; }
 	}
 
 	public class ManualCheckingQueueItemViewModel
