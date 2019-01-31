@@ -74,19 +74,30 @@ namespace uLearn.Web.Controllers
 			certificateGenerator = new CertificateGenerator(db, courseManager);
 		}
 
-		public ActionResult CourseList(string courseCreationLastTry = null)
+		public ActionResult Courses(string courseId = null, string courseTitle = null)
 		{
-			var courses = new HashSet<string>(User.GetControllableCoursesId());
+			var controllableCourses = new HashSet<string>(User.GetControllableCoursesId());
 			var incorrectChars = new string(CourseManager.GetInvalidCharacters().OrderBy(c => c).Where(c => 32 <= c).ToArray());
+			var courses = courseManager.GetCourses()
+				.Where(course => controllableCourses.Contains(course.Id));
+
+			if (User.IsSystemAdministrator())
+				courses = courses.OrderBy(course => course.Id, StringComparer.InvariantCultureIgnoreCase);
+			else
+				courses = courses.OrderBy(course => course.Title, StringComparer.InvariantCultureIgnoreCase);
+			
 			var model = new CourseListViewModel
 			{
-				Courses = courseManager.GetCourses().Where(course => courses.Contains(course.Id)).Select(course => new CourseViewModel
-				{
-					Id = course.Id,
-					Title = course.Title,
-					LastWriteTime = courseManager.GetLastWriteTime(course.Id)
-				}).ToList(),
-				CourseCreationLastTry = courseCreationLastTry,
+				Courses = courses
+					.Select(course => new CourseViewModel
+					{
+						Id = course.Id,
+						Title = course.Title,
+						LastWriteTime = courseManager.GetLastWriteTime(course.Id)
+					})
+					.ToList(),
+				LastTryCourseId = courseId,
+				LastTryCourseTitle = courseTitle,
 				InvalidCharacters = incorrectChars
 			};
 			return View(model);
@@ -208,11 +219,19 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		[ULearnAuthorize(ShouldBeSysAdmin = true)]
-		public ActionResult CreateCourse(string courseId)
+		public async Task<ActionResult> CreateCourse(string courseId, string courseTitle)
 		{
-			if (!courseManager.TryCreateCourse(courseId))
-				return RedirectToAction("CourseList", new { courseCreationLastTry = courseId });
-			return RedirectToAction("Users", new { courseId, onlyPrivileged = true });
+			var versionId = Guid.NewGuid();
+			
+			if (!courseManager.TryCreateCourse(courseId, courseTitle, versionId))
+				return RedirectToAction("Courses", new { courseId = courseId, courseTitle = courseTitle });
+
+			var userId = User.Identity.GetUserId();
+			await coursesRepo.AddCourseVersion(courseId, versionId, userId).ConfigureAwait(false);
+			await coursesRepo.MarkCourseVersionAsPublished(versionId).ConfigureAwait(false);
+			await NotifyAboutPublishedCourseVersion(courseId, versionId, userId).ConfigureAwait(false);
+			
+			return RedirectToAction("Packages", new { courseId, onlyPrivileged = true });
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
@@ -236,12 +255,17 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult Comments(string courseId)
 		{
+			const int commentsCountLimit = 500;
+			
 			var userId = User.Identity.GetUserId();			
 			
 			var course = courseManager.GetCourse(courseId);
 			var commentsPolicy = commentsRepo.GetCommentsPolicy(courseId);
 
-			var comments = commentsRepo.GetCourseComments(courseId).Where(c => ! c.IsForInstructorsOnly).OrderByDescending(x => x.PublishTime).ToList();
+			var comments = commentsRepo.GetCourseComments(courseId)
+				.Where(c => !c.IsForInstructorsOnly)
+				.OrderByDescending(x => x.PublishTime)
+				.ToList();
 			var commentsLikes = commentsRepo.GetCommentsLikesCounts(comments);
 			var commentsLikedByUser = commentsRepo.GetCourseCommentsLikedByUser(courseId, userId);
 			var commentsById = comments.ToDictionary(x => x.Id);
@@ -254,7 +278,7 @@ namespace uLearn.Web.Controllers
 				IsCommentsEnabled = commentsPolicy.IsCommentsEnabled,
 				ModerationPolicy = commentsPolicy.ModerationPolicy,
 				OnlyInstructorsCanReply = commentsPolicy.OnlyInstructorsCanReply,
-				Comments = (from c in comments
+				Comments = (from c in comments.Take(commentsCountLimit)
 					let slide = course.FindSlideById(c.SlideId)
 					where slide != null
 					select
@@ -280,9 +304,22 @@ namespace uLearn.Web.Controllers
 			return ControllerUtils.GetFilterOptionsByGroup<ManualCheckingQueueFilterOptions>(groupsRepo, User, courseId, groupsIds);
 		}
 
-		private ActionResult ManualCheckingQueue<T>(string actionName, string viewName, string courseId, bool done, List<string> groupsIds, string userId = "", Guid? slideId = null, string message = "") where T : AbstractManualSlideChecking
+		/* Returns merged checking queue for exercises (code reviews) as well as for quizzes */
+		private List<AbstractManualSlideChecking> GetMergedCheckingQueue(ManualCheckingQueueFilterOptions filterOptions)
 		{
-			var MaxShownQueueSize = 500;
+			var result = slideCheckingsRepo.GetManualCheckingQueue<ManualExerciseChecking>(filterOptions).Cast<AbstractManualSlideChecking>().ToList();
+			result.AddRange(slideCheckingsRepo.GetManualCheckingQueue<ManualQuizChecking>(filterOptions));
+
+			result = result.OrderByDescending(c => c.Timestamp).ToList();
+			if (filterOptions.Count > 0)
+				result = result.Take(filterOptions.Count).ToList();
+
+			return result;
+		}
+
+		private ActionResult InternalCheckingQueue(string courseId, bool done, List<string> groupsIds, string userId = "", Guid? slideId = null, string message = "")
+		{
+			const int maxShownQueueSize = 500;
 			var course = courseManager.GetCourse(courseId);
 
 			var filterOptions = GetManualCheckingFilterOptionsByGroup(courseId, groupsIds);
@@ -295,11 +332,11 @@ namespace uLearn.Web.Controllers
 				filterOptions.SlidesIds = new List<Guid> { slideId.Value };
 
 			filterOptions.OnlyChecked = done;
-			filterOptions.Count = MaxShownQueueSize + 1;
-			var checkings = slideCheckingsRepo.GetManualCheckingQueue<T>(filterOptions).ToList();
+			filterOptions.Count = maxShownQueueSize + 1;
+			var checkings = GetMergedCheckingQueue(filterOptions).ToList();
 
 			if (!checkings.Any() && !string.IsNullOrEmpty(message))
-				return RedirectToAction(actionName, new { courseId, group = string.Join(",", groupsIds) });
+				return RedirectToAction("CheckingQueue", new { courseId, group = string.Join(",", groupsIds) });
 
 			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
 			var reviews = slideCheckingsRepo.GetExerciseCodeReviewForCheckings(checkings.Select(c => c.Id));
@@ -307,15 +344,15 @@ namespace uLearn.Web.Controllers
 			var solutions = userSolutionsRepo.GetSolutionsForSubmissions(submissionsIds);
 
 			filterOptions.SlidesIds = null;
-			var usedCheckings = slideCheckingsRepo.GetManualCheckingQueue<T>(filterOptions);
+			var usedCheckings = GetMergedCheckingQueue(filterOptions);
 			var usedSlidesIds = new HashSet<Guid>(usedCheckings.Select(c => c.SlideId));
 
 			filterOptions = GetManualCheckingFilterOptionsByGroup(courseId, groupsIds);
 			filterOptions.OnlyChecked = null;
-			var allCheckingsSlidesIds = slideCheckingsRepo.GetManualCheckingQueue<T>(filterOptions).Select(c => c.SlideId).Distinct();
+			var allCheckingsSlidesIds = GetMergedCheckingQueue(filterOptions).Select(c => c.SlideId).Distinct();
 
 			var emptySlideMock = new Slide { Info = new SlideInfo(null, null, -1), Title = "", Id = Guid.Empty};
-			var allCheckingsSlidesTitles = allCheckingsSlidesIds
+			var allCheckingsSlides = allCheckingsSlidesIds
 				.Select(s => new KeyValuePair<Guid, Slide>(s, course.FindSlideById(s)))
 				.Where(kvp => kvp.Value != null)
 				.Union(new List<KeyValuePair<Guid, Slide>>
@@ -324,18 +361,21 @@ namespace uLearn.Web.Controllers
 					new KeyValuePair<Guid, Slide>(Guid.Empty, emptySlideMock)
 				})
 				.OrderBy(s => usedSlidesIds.Contains(s.Key) ? 0 : 1)
+				/* Order slides by frequency in the queue */
+				.ThenByDescending(s => usedCheckings.Count(c => c.SlideId == s.Key))
 				.ThenBy(s => s.Value.Index)
-				.Select(s => new KeyValuePair<Guid, string>(s.Key, s.Value.Title))
+				.Select(s => new KeyValuePair<Guid, Slide>(s.Key, s.Value))
 				.ToList();
-			/* Remove divider iff it is first or last */
-			if (allCheckingsSlidesTitles.First().Key == Guid.Empty || allCheckingsSlidesTitles.Last().Key == Guid.Empty)
-				allCheckingsSlidesTitles.RemoveAll(kvp => kvp.Key == Guid.Empty);
+			
+			/* Remove divider iff it is first or last item */
+			if (allCheckingsSlides.First().Key == Guid.Empty || allCheckingsSlides.Last().Key == Guid.Empty)
+				allCheckingsSlides.RemoveAll(kvp => kvp.Key == Guid.Empty);
 
-			return View(viewName, new ManualCheckingQueueViewModel
+			return View("CheckingQueue", new ManualCheckingQueueViewModel
 			{
 				CourseId = courseId,
                 /* TODO (andgein): Merge FindSlideById() and following GetSlideById() calls */
-				Checkings = checkings.Take(MaxShownQueueSize).Where(c => course.FindSlideById(c.SlideId) != null).Select(c =>
+				Checkings = checkings.Take(maxShownQueueSize).Where(c => course.FindSlideById(c.SlideId) != null).Select(c =>
 				{
 					var slide = course.GetSlideById(c.SlideId);
 					return new ManualCheckingQueueItemViewModel
@@ -346,8 +386,8 @@ namespace uLearn.Web.Controllers
 						ContextMaxScore = (slide as ExerciseSlide)?.Scoring.CodeReviewScore ?? slide.MaxScore,
 						ContextTimestamp = c.Timestamp,
 						ContextReviews = reviews.GetOrDefault(c.Id, new List<ExerciseCodeReview>()),
-						ContextExerciseSolution = c is ManualExerciseChecking ?
-							solutions.GetOrDefault((c as ManualExerciseChecking).SubmissionId, "") :
+						ContextExerciseSolution = c is ManualExerciseChecking checking ?
+							solutions.GetOrDefault(checking.SubmissionId, "") :
 							"",
 					};
 				}).ToList(),
@@ -355,25 +395,29 @@ namespace uLearn.Web.Controllers
 				SelectedGroupsIds = groupsIds,
 				Message = message,
 				AlreadyChecked = done,
-				ExistsMore = checkings.Count > MaxShownQueueSize,
+				ExistsMore = checkings.Count > maxShownQueueSize,
 				ShowFilterForm = string.IsNullOrEmpty(userId),
-				SlidesTitles = allCheckingsSlidesTitles,
+				Slides = allCheckingsSlides,
 			});
 		}
 
-		public ActionResult ManualQuizCheckingQueue(string courseId, bool done = false, string userId = "", Guid? slideId = null, string message = "")
+		public ActionResult CheckingQueue(string courseId, bool done = false, string userId = "", Guid? slideId = null, string message = "")
 		{
 			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
-			return ManualCheckingQueue<ManualQuizChecking>("ManualQuizCheckingQueue", "ManualQuizCheckingQueue", courseId, done, groupsIds, userId, slideId, message);
+			return InternalCheckingQueue(courseId, done, groupsIds, userId, slideId, message);
 		}
 
-		public ActionResult ManualExerciseCheckingQueue(string courseId, bool done = false, string userId = "", Guid? slideId = null, string message = "")
+		/* Redirects for backward compatibility. Can be removed after February, 2019 */
+		public ActionResult ManualExerciseCheckingQueue(string courseId, bool done = false, string userId = "", Guid? slideId = null, string message = "", string group = "")
 		{
-			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
-			return ManualCheckingQueue<ManualExerciseChecking>("ManualExerciseCheckingQueue", "ManualExerciseCheckingQueue", courseId, done, groupsIds, userId, slideId, message);
+			return RedirectToAction("CheckingQueue", new { courseId = courseId, done = done, userId = userId, slideId = slideId, message = message, group = group });
+		}
+		public ActionResult ManualQuizCheckingQueue(string courseId, bool done = false, string userId = "", Guid? slideId = null, string message = "", string group = "")
+		{
+			return RedirectToAction("CheckingQueue", new { courseId = courseId, done = done, userId = userId, slideId = slideId, message = message, group = group });
 		}
 
-		private async Task<ActionResult> InternalManualCheck<T>(string courseId, string actionName, int queueItemId, bool ignoreLock = false, List<string> groupsIds = null, bool recheck = false) where T : AbstractManualSlideChecking
+		private async Task<ActionResult> InternalManualChecking<T>(string courseId, int queueItemId, bool ignoreLock = false, List<string> groupsIds = null, bool recheck = false) where T : AbstractManualSlideChecking
 		{
 			T checking;
 			var joinedGroupsIds = string.Join(",", groupsIds ?? new List<string>());
@@ -381,7 +425,7 @@ namespace uLearn.Web.Controllers
 			{
 				checking = slideCheckingsRepo.FindManualCheckingById<T>(queueItemId);
 				if (checking == null)
-					return RedirectToAction(actionName,
+					return RedirectToAction("CheckingQueue",
 						new
 						{
 							courseId = courseId,
@@ -394,7 +438,7 @@ namespace uLearn.Web.Controllers
 					return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
 				if (checking.IsChecked && !recheck)
-					return RedirectToAction(actionName,
+					return RedirectToAction("CheckingQueue",
 						new
 						{
 							courseId = checking.CourseId,
@@ -404,7 +448,7 @@ namespace uLearn.Web.Controllers
 						});
 
 				if (! recheck)
-					await slideCheckingsRepo.LockManualChecking(checking, User.Identity.GetUserId());
+					await slideCheckingsRepo.LockManualChecking(checking, User.Identity.GetUserId()).ConfigureAwait(false);
 				transaction.Commit();
 			}
 
@@ -417,7 +461,7 @@ namespace uLearn.Web.Controllers
 			});
 		}
 
-		private async Task<ActionResult> CheckNextManualCheckingForSlide<T>(string actionName, string courseId, Guid slideId, List<string> groupsIds) where T : AbstractManualSlideChecking
+		private async Task<ActionResult> CheckNextManualCheckingForSlide<T>(string courseId, Guid slideId, List<string> groupsIds, int previousCheckingId) where T : AbstractManualSlideChecking
 		{
 			using (var transaction = db.Database.BeginTransaction())
 			{
@@ -427,40 +471,39 @@ namespace uLearn.Web.Controllers
 				filterOptions.SlidesIds = new List<Guid> { slideId };
 				var checkings = slideCheckingsRepo.GetManualCheckingQueue<T>(filterOptions).ToList();
 
-				var itemToCheck = checkings.FirstOrDefault(i => !i.IsLocked);
+				/* First of all try to find checking with Id < previousCheckingId (early) */
+				var itemToCheck = checkings.FirstOrDefault(c => !c.IsLocked && c.Id < previousCheckingId) ?? checkings.FirstOrDefault(c => !c.IsLocked);
 				if (itemToCheck == null)
-					return RedirectToAction(actionName, new { courseId, group = string.Join(",", groupsIds), message = "slide_checked" });
+					return RedirectToAction("CheckingQueue", new { courseId, group = string.Join(",", groupsIds), message = "slide_checked" });
 
-				await slideCheckingsRepo.LockManualChecking(itemToCheck, User.Identity.GetUserId());
+				await slideCheckingsRepo.LockManualChecking(itemToCheck, User.Identity.GetUserId()).ConfigureAwait(false);
 
 				transaction.Commit();
 
-				return await InternalManualCheck<T>(courseId, actionName, itemToCheck.Id, true, groupsIds);
+				return await InternalManualChecking<T>(courseId, itemToCheck.Id, ignoreLock: true, groupsIds: groupsIds).ConfigureAwait(false);
 			}
 		}
 
-		public async Task<ActionResult> CheckQuiz(string courseId, int id, bool recheck = false)
+		public Task<ActionResult> Checking(string courseId, int id, bool recheck = false)
 		{
 			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
-			return await InternalManualCheck<ManualQuizChecking>(courseId, "ManualQuizCheckingQueue", id, false, groupsIds, recheck);
+			var checking = slideCheckingsRepo.FindManualCheckingById(id);
+			if (checking is ManualExerciseChecking)
+				return InternalManualChecking<ManualExerciseChecking>(courseId, id, ignoreLock: false, groupsIds: groupsIds, recheck: recheck);
+			else
+				return InternalManualChecking<ManualQuizChecking>(courseId, id, ignoreLock: false, groupsIds: groupsIds, recheck: recheck);
 		}
 
-		public async Task<ActionResult> CheckExercise(string courseId, int id, bool recheck = false)
+		public Task<ActionResult> CheckNextQuizForSlide(string courseId, Guid slideId, int previous)
 		{
 			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
-			return await InternalManualCheck<ManualExerciseChecking>(courseId, "ManualExerciseCheckingQueue", id, false, groupsIds, recheck);
+			return CheckNextManualCheckingForSlide<ManualQuizChecking>(courseId, slideId, groupsIds, previous);
 		}
 
-		public async Task<ActionResult> CheckNextQuizForSlide(string courseId, Guid slideId)
+		public Task<ActionResult> CheckNextExerciseForSlide(string courseId, Guid slideId, int previous)
 		{
 			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
-			return await CheckNextManualCheckingForSlide<ManualQuizChecking>("ManualQuizCheckingQueue", courseId, slideId, groupsIds);
-		}
-
-		public async Task<ActionResult> CheckNextExerciseForSlide(string courseId, Guid slideId)
-		{
-			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
-			return await CheckNextManualCheckingForSlide<ManualExerciseChecking>("ManualExerciseCheckingQueue", courseId, slideId, groupsIds);
+			return CheckNextManualCheckingForSlide<ManualExerciseChecking>(courseId, slideId, groupsIds, previous);
 		}
 
 		[HttpPost]
@@ -489,7 +532,7 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 
 			if (string.IsNullOrEmpty(queryModel.CourseId))
-				return RedirectToAction("CourseList");
+				return RedirectToAction("Courses");
 			return View(queryModel);
 		}
 
@@ -692,388 +735,6 @@ namespace uLearn.Web.Controllers
 			return Redirect($"/{courseId.ToLower(CultureInfo.InvariantCulture)}/groups");
 		}
 
-		private async Task NotifyAboutNewGroup(Group group, string initiatedUserId)
-		{
-			var notification = new CreatedGroupNotification
-			{
-				Group = group,
-			};
-			await notificationsRepo.AddNotification(group.CourseId, notification, initiatedUserId);
-		}
-
-		[HttpPost]
-		public async Task<ActionResult> CreateGroupApi(string courseId, string name)
-		{
-			var ownerId = User.Identity.GetUserId();
-			if (string.IsNullOrEmpty(name))
-				return Json(new { status = "error", message = "Название группы не может быть пустым" });
-
-			log.Info($"Создаю группу «{name}» для курса {courseId} (id владельца {ownerId})");
-
-			var group = await groupsRepo.CreateGroup(courseId, name, ownerId, true, true);
-			log.Info($"Группа «{name}» (Id = {group.Id}) создана");
-
-			var course = courseManager.GetCourse(courseId);
-			await UpdateEnabledScoringGroupsForGroup(course, group.Id);
-			await NotifyAboutNewGroup(group, ownerId);
-
-			return Json(new { status = "ok", groupId = group.Id });
-		}
-
-		[HttpPost]
-		public async Task<ActionResult> CreateGroup(string courseId, string name, bool isPublic, bool manualChecking, bool manualCheckingForOldSolutions, string ownerId)
-		{
-			var currentUserId = User.Identity.GetUserId();
-			if (string.IsNullOrEmpty(ownerId))
-				ownerId = currentUserId;
-
-			log.Info($"Создаю группу «{name}» для курса {courseId} (id владельца {ownerId}, публичная = {isPublic})");
-
-			var group = await groupsRepo.CreateGroup(courseId, name, ownerId, manualChecking, manualCheckingForOldSolutions);
-			log.Info($"Группа «{name}» (Id = {group.Id}) создана");
-
-			var course = courseManager.GetCourse(courseId);
-			await UpdateEnabledScoringGroupsForGroup(course, group.Id);
-			await NotifyAboutNewGroup(group, currentUserId);
-
-			return RedirectToAction("Groups", new { courseId });
-		}
-
-		[HttpPost]
-		public async Task<ActionResult> CopyGroup(string courseId, int groupId, bool changeOwner)
-		{
-			var group = groupsRepo.FindGroupById(groupId);
-			if (!CanSeeGroup(group))
-				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-
-			log.Info($"Копирую группу «{group.Name}» (Id = {group.Id}) в курс {courseId} (заменить владельца: {changeOwner})");
-
-			var newOwnerId = changeOwner ? User.Identity.GetUserId() : "";
-			var newGroup = await groupsRepo.CopyGroup(group, courseId, newOwnerId);
-			log.Info($"Скопировал группу, новый Id = {newGroup.Id}");
-
-			return RedirectToAction("Groups", new { courseId });
-		}
-
-		private bool CanSeeGroup(Group group)
-		{
-			if (group == null)
-				return false;
-			return CanModifyGroup(group);
-		}
-
-		private bool CanModifyGroup(Group group)
-		{
-			if (group == null)
-				return false;
-
-			var courseId = group.CourseId;
-			if (groupsRepo.CanUserSeeAllCourseGroups(User, courseId))
-				return true;
-
-			var userId = User.Identity.GetUserId();
-			if (group.OwnerId == userId)
-				return true;
-
-			var accesses = groupsRepo.GetGroupAccesses(group.Id);
-			return accesses.Any(a => a.UserId == userId);
-		}
-
-		private bool CanAddUsersToGroupManually()
-		{
-			return User.IsSystemAdministrator();
-		}
-
-		[HttpPost]
-		public async Task<ActionResult> AddUserToGroup(int groupId, string userId)
-		{
-			var group = groupsRepo.FindGroupById(groupId);
-			if (!CanAddUsersToGroupManually())
-				return Json(new { status = "error", message = "Вы не можете добавлять пользователей в группы"});
-
-			var user = usersRepo.FindUserById(userId);
-			if (user == null)
-				return Json(new { status = "error", message = $"Пользователь с id {userId} не найден" });
-
-			log.Info($"Добавляю пользователя {user.VisibleName} (Id = {userId}) в группу «{group.Name}» (Id = {group.Id})");
-			var member = await groupsRepo.AddUserToGroup(groupId, userId);
-
-			if (member == null)
-				return Json(new { status = "error", message = $"{user.VisibleName} уже учится в этой группе" });
-			return Json(new { status = "ok", html = this.RenderPartialViewToString("_GroupMember", member) });
-		}
-
-		[HttpPost]
-		public async Task<ActionResult> RemoveUserFromGroup(int groupId, string userId)
-		{
-			var group = groupsRepo.FindGroupById(groupId);
-			if (!CanModifyGroup(group))
-				return Json(new { status = "error", message = "Вы не можете удалять пользователей из этой группы" });
-
-			var user = usersRepo.FindUserById(userId);
-			if (user == null)
-				return Json(new { status = "error", message = $"Не могу найти пользователя {userId}" });
-
-			log.Info($"Удаляю пользователя {user.VisibleName} (Id = {userId}) из группы «{group.Name}» (Id = {group.Id})");
-
-			var member = await groupsRepo.RemoveUserFromGroup(groupId, userId);
-			
-			var currentUserId = User.Identity.GetUserId();
-			if (member != null)
-				await notificationsRepo.AddNotification(group.CourseId, new GroupMembersHaveBeenRemovedNotification(groupId, new List<string> { userId }, usersRepo), currentUserId);
-
-			return Json(new { status = "ok", removed = member != null ? "true" : "false" });
-		}
-
-		[HttpPost]
-		public async Task<ActionResult> RemoveUsersFromGroup(int groupId)
-		{
-			var group = groupsRepo.FindGroupById(groupId);
-			if (!CanModifyGroup(group))
-				return Json(new { status = "error", message = "Вы не можете удалять пользователей из этой группы" });
-
-			var userIds = Request.Form.GetMultipleValues("userId");
-			log.Info($"Удаляю пользователей {string.Join(", ", userIds)} из группы «{group.Name}» (Id = {group.Id})");
-
-			var members = await groupsRepo.RemoveUsersFromGroup(groupId, userIds);
-			
-			var currentUserId = User.Identity.GetUserId();
-			await notificationsRepo.AddNotification(group.CourseId, new GroupMembersHaveBeenRemovedNotification(group.Id, userIds, usersRepo), currentUserId);
-			
-			return Json(new { status = "ok", removed_count = members.Count });
-		}
-
-		[HttpPost]
-		public async Task<ActionResult> CopyUsersFromOneGroupToAnother(int fromGroupId, int toGroupId)
-		{
-			var fromGroup = groupsRepo.FindGroupById(fromGroupId);
-			if (!CanModifyGroup(fromGroup))
-				return Json(new { status = "error", message = "Вы не можете копировать пользователей из этой группы" });
-			var toGroup = groupsRepo.FindGroupById(toGroupId);
-			if (!CanModifyGroup(toGroup))
-				return Json(new { status = "error", message = "Вы не можете копировать пользователей в эту группу" });
-
-			var userIds = Request.Form.GetMultipleValues("userId");
-			log.Info($"Копирую пользователей {string.Join(", ", userIds)} из группы «{fromGroup.Name}» (Id = {fromGroup.Id}) в группу «{toGroup.Name}» (Id = {toGroup.Id})");
-
-			var members = await groupsRepo.CopyUsersFromOneGroupToAnother(fromGroupId, toGroupId, userIds);	
-			
-			var currentUserId = User.Identity.GetUserId();
-			await notificationsRepo.AddNotification(toGroup.CourseId, new GroupMembersHaveBeenAddedNotification(toGroup.Id, userIds, usersRepo), currentUserId);
-			
-			return Json(new { status = "ok", copied_count = members.Count });
-		}
-
-		[HttpPost]
-		public async Task<ActionResult> UpdateGroupApi(string courseId, int groupId, bool manualChecking, bool manualCheckingForOldSolutions, bool defaultProhibitFutherReview, bool canUsersSeeGroupProgress, string name=null)
-		{
-			var group = groupsRepo.FindGroupById(groupId);
-			if (!CanModifyGroup(group) || ! group.CourseId.EqualsIgnoreCase(courseId))
-				return Json(new { status = "error", message = "Вы не можете редактировать эту группу" });
-
-			if (name == "")
-				return Json(new { status = "error", message = "Название группы не может быть пустым" });
-			if (name == null)
-				name = group.Name;
-
-			log.Info($"Обновляю группу «{group.Name}» → «{name}» (Id = {group.Id}) для курса {courseId}");
-
-			await groupsRepo.ModifyGroup(groupId, name, manualChecking, manualCheckingForOldSolutions, defaultProhibitFutherReview, canUsersSeeGroupProgress);
-
-			var course = courseManager.GetCourse(group.CourseId);
-			await UpdateEnabledScoringGroupsForGroup(course, groupId);
-
-			return Json(new { status = "ok", groupId = groupId });
-		}
-
-		[HttpPost]
-		public async Task<ActionResult> ChangeGroupOwnerApi(string courseId, int groupId, string newOwnerId)
-		{
-			var group = groupsRepo.FindGroupById(groupId);
-			if (! group.CourseId.EqualsIgnoreCase(courseId) || ! CanChangeGroupOwner(group))
-				return Json(new { status = "error", message = "Вы не можете сменить владельца у этой группы" });
-
-			var newOwner = usersRepo.FindUserById(newOwnerId);
-			if (newOwner == null)
-				return Json(new { status = "error", message = $"Пользователь {newOwnerId} не найден" });
-
-			log.Info($"Меняю владельца группы «{group.Name}» (Id = {group.Id}) на {newOwner.VisibleName} (Id = {newOwnerId})");
-
-			/* Grant full access to previous owner */
-			await groupsRepo.GrantAccess(groupId, group.OwnerId, GroupAccessType.FullAccess, group.OwnerId);
-			/* Change owner */
-			await groupsRepo.ChangeOwner(groupId, newOwnerId);
-			/* Revoke access from new owner */
-			await groupsRepo.RevokeAccess(groupId, newOwnerId);
-
-			return Json(new { status = "ok", groupId = groupId });
-		}
-
-		private bool CanChangeGroupOwner(Group group)
-		{
-			return group.OwnerId == User.Identity.GetUserId() || User.HasAccessFor(group.CourseId, CourseRole.CourseAdmin);
-		}
-
-		[HttpPost]
-		public async Task<ActionResult> ArchiveGroupApi(string courseId, int groupId, bool isArchived)
-		{
-			var group = groupsRepo.FindGroupById(groupId);
-			if (!CanModifyGroup(group) || ! group.CourseId.EqualsIgnoreCase(courseId))
-				return Json(new { status = "error", message = "Вы не можете редактировать эту группу" });
-
-			log.Info($"Обновляю архивность группы «{group.Name}». Была ли архивна: {group.IsArchived}. Архивна теперь: {isArchived}");
-
-			await groupsRepo.ArchiveGroup(groupId, isArchived);
-
-			return Json(new { status = "ok", groupId = groupId });
-		}
-
-		[HttpPost]
-		public async Task<ActionResult> ArchiveGroup(int groupId, bool isArchived)
-		{
-			var group = groupsRepo.FindGroupById(groupId);
-			if (!CanModifyGroup(group))
-				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-
-			log.Info($"Обновляю архивность группы «{group.Name}». Была ли архивна: {group.IsArchived}. Архивна теперь: {isArchived}");
-
-			await groupsRepo.ArchiveGroup(groupId, isArchived);
-
-			return RedirectToAction("Groups", new { courseId = group.CourseId });
-		}
-
-		private async Task UpdateEnabledScoringGroupsForGroup(Course course, int groupId)
-		{
-			var scoringGroups = GetScoringGroupsCanBeSetInSomeUnit(course);
-			var enabledScoringGroupsIds = new List<string>();
-			foreach (var scoringGroup in scoringGroups)
-			{
-				var checkboxName = "scoring-group__" + scoringGroup.Id;
-				if (!string.IsNullOrEmpty(Request.Form[checkboxName]) && Request.Form[checkboxName] != "false")
-				{
-					log.Info($"Включаю группу баллов «{scoringGroup.Name}» ({scoringGroup.Id}) для группы Id = {groupId}");
-					enabledScoringGroupsIds.Add(scoringGroup.Id);
-				}
-			}
-			await groupsRepo.EnableAdditionalScoringGroupsForGroup(groupId, enabledScoringGroupsIds);
-		}
-
-		[HttpPost]
-		public async Task<ActionResult> RemoveGroup(int groupId)
-		{
-			var group = groupsRepo.FindGroupById(groupId);
-			if (!CanModifyGroup(group))
-				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-
-			log.Info($"Удаляю группу «{group.Name}» (Id = {groupId})");
-			await groupsRepo.RemoveGroup(groupId);
-
-			return RedirectToAction("Groups", new { courseId = group.CourseId });
-		}
-
-		[HttpPost]
-		public async Task<ActionResult> EnableGroupInviteLink(int groupId, bool isEnabled)
-		{
-			var group = groupsRepo.FindGroupById(groupId);
-			if (!CanModifyGroup(group))
-				return Json(new { status = "error", message = "Вы не можете изменять настройки ссылки для этой группы" });
-
-			log.Info($"В{(isEnabled ? "" : "ы")}ключаю инвайт-ссылку для группы «{group.Name}» (Id = {groupId})");
-			await groupsRepo.EnableInviteLink(groupId, isEnabled);
-
-			return Json(new { status = "ok", isEnabled = isEnabled });
-		}
-
-		[HttpPost]
-		public async Task<ActionResult> GrantAccessToGroup(int groupId, string userId)
-		{
-			var group = groupsRepo.FindGroupById(groupId);
-			if (!CanModifyGroup(group))
-				return Json(new { status = "error", message = "Вы не можете выдавать права на эту группу" });
-
-			var user = usersRepo.FindUserById(userId);
-			if (user == null)
-				return Json(new { status = "error", message = $"Пользователь {userId} не найден" });
-
-			if (groupsRepo.GetGroupAccesses(groupId).Select(a => a.UserId).Contains(userId) || group.OwnerId == userId)
-				return Json(new { status = "error", message = $"{user.VisibleName} уже является преподавателем этой группы" });
-
-			var currentUserId = User.Identity.GetUserId();
-			var access = await groupsRepo.GrantAccess(groupId, userId, GroupAccessType.FullAccess, currentUserId);
-			await notificationsRepo.AddNotification(group.CourseId, new GrantedAccessToGroupNotification { AccessId = access.Id }, currentUserId);
-
-			var renderedHtml = this.RenderPartialViewToString("_GroupAccess", new GroupAccessViewModel
-			{
-				Access = access,
-				CanBeRevoked = true,
-			});
-			return Json(new { status = "ok", html = renderedHtml });
-		}
-
-		[HttpPost]
-		public async Task<ActionResult> RevokeAccessFromGroup(int groupId, string userId)
-		{
-			var group = groupsRepo.FindGroupById(groupId);
-			if (!CanModifyGroup(group) || ! groupsRepo.CanRevokeAccess(groupId, userId, User))
-				return Json(new { status = "error", message = "Вы не можете забрать права на группу у этого пользователя" });
-
-			var currentUserId = User.Identity.GetUserId();
-			var accesses = await groupsRepo.RevokeAccess(groupId, userId);
-			foreach (var access in accesses)
-				await notificationsRepo.AddNotification(group.CourseId, new RevokedAccessToGroupNotification { AccessId = access.Id }, currentUserId);
-			return Json(new { status = "ok", userId = userId });
-		}
-
-		public ActionResult GroupInfo(int groupId)
-		{
-			var group = groupsRepo.FindGroupById(groupId);
-			if (!CanModifyGroup(group))
-				return Json(new { status = "error", message = "Вы не можете редактировать эту группу" });
-
-			var userId = User.Identity.GetUserId();
-
-			var accesses = groupsRepo.GetGroupAccesses(groupId);
-			var accessesViewModels = accesses.Select(a => new GroupAccessViewModel
-			{
-				Access = a,
-				CanBeRevoked = group.OwnerId == userId || a.GrantedById == userId || a.UserId == userId || User.HasAccessFor(group.CourseId, CourseRole.CourseAdmin),
-			}).ToList();
-			accessesViewModels.Insert(0, new GroupAccessViewModel
-			{
-				Access = new GroupAccess
-				{
-					User = group.Owner,
-					AccessType = GroupAccessType.Owner,
-					Group = group,
-					GrantTime = group.CreateTime ?? DateTime.MaxValue,
-				},
-				CanBeRevoked = false,
-			});
-
-			var members = groupsRepo.GetGroupMembers(groupId).OrderBy(m => m.User.VisibleNameWithLastNameFirst);
-
-			var enabledScoringGroups = groupsRepo.GetEnabledAdditionalScoringGroupsForGroup(groupId);
-
-			return Json(new
-			{
-				status = "ok",
-				inviteLink = Url.Action("JoinGroup", "Account", new { hash = group.InviteHash }, Request.GetRealScheme()),
-				isInviteLinkEnabled = group.IsInviteLinkEnabled,
-				accesses = accessesViewModels.Select(model => this.RenderPartialViewToString("_GroupAccess", model)).ToList(),
-				group = new
-				{
-					name = group.Name,
-					isManualCheckingEnabled = group.IsManualCheckingEnabled,
-					isManualCheckingEnabledForOldSolutions = group.IsManualCheckingEnabledForOldSolutions,
-					isInviteLinkEnabled = group.IsInviteLinkEnabled,
-					defaultProhibitFutherReview = group.DefaultProhibitFutherReview,
-					canUsersSeeGroupProgress = group.CanUsersSeeGroupProgress
-				},
-				members = members.Select(model => this.RenderPartialViewToString("_GroupMember", model)).ToList(),
-				enabledScoringGroups = enabledScoringGroups.Select(g => g.ScoringGroupId).ToList(),
-			}, JsonRequestBehavior.AllowGet);
-		}
-		
 		public class UserSearchResultModel
 		{
 			public string id { get; set; }
@@ -1590,7 +1251,8 @@ namespace uLearn.Web.Controllers
 	public class CourseListViewModel
 	{
 		public List<CourseViewModel> Courses;
-		public string CourseCreationLastTry { get; set; }
+		public string LastTryCourseId { get; set; }
+		public string LastTryCourseTitle { get; set; }
 		public string InvalidCharacters { get; set; }
 	}
 
@@ -1619,7 +1281,7 @@ namespace uLearn.Web.Controllers
 		public bool OnlyInstructorsCanReply { get; set; }
 		public List<CommentViewModel> Comments { get; set; }
 	}
-
+	
 	public class ManualCheckingQueueViewModel
 	{
 		public string CourseId { get; set; }
@@ -1631,7 +1293,7 @@ namespace uLearn.Web.Controllers
 		public bool AlreadyChecked { get; set; }
 		public bool ExistsMore { get; set; }
 		public bool ShowFilterForm { get; set; }
-		public List<KeyValuePair<Guid, string>> SlidesTitles { get; set; }
+		public List<KeyValuePair<Guid, Slide>> Slides { get; set; }
 	}
 
 	public class ManualCheckingQueueItemViewModel
@@ -1654,32 +1316,5 @@ namespace uLearn.Web.Controllers
 		public bool IsVersionPublished { get; set; }
 		public Guid VersionId { get; set; }
 		public CourseDiff CourseDiff { get; set; }
-	}
-
-	public class GroupsViewModel
-	{
-		public Course Course { get; set; }
-		public bool CourseManualCheckingEnabled { get; set; }
-
-		public List<Group> Groups { get; set; }
-		public Dictionary<int, bool> CanModifyGroup { get; set; }
-		public List<ScoringGroup> ScoringGroupsCanBeSetInSomeUnit { get; set; }
-		public Dictionary<int, List<string>> EnabledScoringGroups { get; set; }
-
-		public List<UserRolesInfo> Instructors { get; set; }
-		public List<Group> GroupsMayBeCopied { get; set; }
-		public Dictionary<string, string> CoursesNames { get; set; }
-
-		public Dictionary<int, GroupLabel> Labels { get; set; }
-		public DefaultDictionary<int, List<int>> LabelsOnGroups { get; set; }
-
-		public DefaultDictionary<int, List<GroupAccess>> GroupAccesses { get; set; }
-	}
-
-	public class GroupAccessViewModel
-	{
-		public GroupAccess Access { get; set; }
-
-		public bool CanBeRevoked { get; set; }
 	}
 }

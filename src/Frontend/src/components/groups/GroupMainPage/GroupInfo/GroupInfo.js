@@ -7,7 +7,8 @@ import MenuItem from "@skbkontur/react-ui/components/MenuItem/MenuItem";
 import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
 import getPluralForm from "../../../../utils/getPluralForm";
 
-import styles from "./style.less";
+import styles from "./groupInfo.less";
+import {Mobile, NotMobile} from "../../../../utils/responsive";
 
 class GroupInfo extends Component {
 
@@ -26,10 +27,10 @@ class GroupInfo extends Component {
 		return (
 			<div className={styles.wrapper}>
 				<div className={styles["content-wrapper"]}>
-					<Link className={styles["link-to-group-page"]} to={`/${this.props.courseId}/groups/${group.id}`} />
+					<Link className={styles["link-to-group-page"]} to={`/${this.props.courseId}/groups/${group.id}/`} />
 					<div className={styles["content-block"]}>
 						<header className={styles.content}>
-							<Link to={`/${this.props.courseId}/groups/${group.id}/`}>
+							<Link to={`/${this.props.courseId}/groups/${group.id}/`} className={styles.groupLink}>
 								<h3 className={styles["group-name"]}>{group.name}</h3>
 							</Link>
 							<div className={styles["students-count"]}>
@@ -56,7 +57,7 @@ class GroupInfo extends Component {
 		const owner = group.owner.visible_name || 'Неизвестный';
 		const teachers = [owner, ...shortTeachersList];
 		const teachersCount = teachers.length;
-		const pluralFormOfTeachers = getPluralForm(teachersCount, 'преподаватель', 'преподаватели');
+		const pluralFormOfTeachers = getPluralForm(teachersCount, 'Преподаватель', 'Преподаватели');
 
 		return (
 			<div className={styles["teachers-list"]}>
@@ -84,23 +85,35 @@ class GroupInfo extends Component {
 	renderActions() {
 		const { group } = this.props;
 
+		let menuItems = [
+			<MenuItem onClick={() => this.props.toggleArchived(group, !group.is_archived)} key="toggleArchived">
+				<Gapped gap={5}>
+					<Icon name="ArchiveUnpack" />
+					{group.is_archived ? 'Восстановить' : 'Архивировать'}
+				</Gapped>
+			</MenuItem>,
+			<MenuItem onClick={() => this.props.deleteGroup(group, group.is_archived ?
+				'archiveGroups' : 'groups')} key="delete">
+				<Gapped gap={5}>
+					<Icon name="Delete" />
+					Удалить
+				</Gapped>
+			</MenuItem>
+		];
+
+		/* TODO (andgein): Change to size="medium" inside of <Mobile> after updating to the new react-ui version */
 		return (
 			<div className={styles["group-action"]}>
-				<Kebab size="large">
-					<MenuItem onClick={() => this.props.toggleArchived(group, !group.is_archived)}>
-						<Gapped gap={5}>
-							<Icon name="ArchiveUnpack" />
-							{group.is_archived ? 'Восстановить' : 'Архивировать'}
-						</Gapped>
-					</MenuItem>
-					<MenuItem onClick={() => this.props.deleteGroup(group, group.is_archived ?
-						'archiveGroups' : 'groups')}>
-						<Gapped gap={5}>
-							<Icon name="Delete" />
-							Удалить
-						</Gapped>
-					</MenuItem>
-				</Kebab>
+				<Mobile>
+					<Kebab size="large" positions={["left top"]} disableAnimations={true}>
+						{ menuItems }
+					</Kebab>
+				</Mobile>
+				<NotMobile>
+					<Kebab size="large" positions={["bottom right"]} disableAnimations={false}>
+						{ menuItems }
+					</Kebab>
+				</NotMobile>
 			</div>
 		)
 	}

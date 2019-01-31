@@ -321,12 +321,12 @@ namespace uLearn.Web.Controllers
 						Status = "error",
 						Error = "has_greatest_score",
 						Score = manualScore.ToString(),
-						CheckedQueueUrl = Url.Action("ManualExerciseCheckingQueue", "Admin", new { courseId, done = true, userId, slideId })
+						CheckedQueueUrl = Url.Action("CheckingQueue", "Admin", new { courseId, done = true, userId, slideId })
 					});
 
 			/* TODO: check if 0 <= exerciseScore <= exercise.MaxReviewScore */
 
-			await slideCheckingsRepo.RemoveWaitingManualExerciseCheckings(courseId, slideId, userId).ConfigureAwait(false);
+			await slideCheckingsRepo.RemoveWaitingManualCheckings<ManualExerciseChecking>(courseId, slideId, userId).ConfigureAwait(false);
 			ManualExerciseChecking checking;
 			if (updateCheckingId.HasValue)
 				checking = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(updateCheckingId.Value);

@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import PropTypes from "prop-types";
 import Checkbox from "@skbkontur/react-ui/components/Checkbox/Checkbox";
 
-import styles from './style.less';
+import styles from './groupSettingsCheckbox.less';
 
 const mapToServerName = {
 	oldSolution: 'is_manual_checking_enabled_for_old_solutions',

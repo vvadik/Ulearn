@@ -169,7 +169,7 @@ class AbstractMyCoursesMenu extends Component {
             <MenuItem href={ "/Course/" + courseId } key={ courseId } component={ LinkComponent }>{ courseById[courseId].title }</MenuItem>
         );
         if (courseIds.length > visibleCourseIds.length)
-            items.push(<MenuItem href="/Admin/CourseList" key="-course-list" component={ LinkComponent }><strong>Все курсы</strong></MenuItem>);
+            items.push(<MenuItem href="/Admin/Courses" key="-course-list" component={ LinkComponent }><strong>Все курсы</strong></MenuItem>);
         return items;
     }
 
@@ -258,7 +258,7 @@ class CourseMenu extends Component {
         if (hasUsersMenuItem || hasCourseAdminMenuItems)
             items.push(<MenuSeparator key="CourseMenuSeparator2"/>);
         if (hasUsersMenuItem)
-            items.push(<MenuItem href={"/Admin/Users?courseId=" + courseId} key="Users" component={ LinkComponent }>Пользователи</MenuItem>);
+            items.push(<MenuItem href={"/Admin/Users?courseId=" + courseId} key="Users" component={ LinkComponent }>Студенты и преподаватели</MenuItem>);
         if (hasCourseAdminMenuItems)
             items = items.concat([
                 <MenuItem href={"/Admin/Packages?courseId=" + courseId} key="Packages" component={ LinkComponent }>Экспорт и импорт курса</MenuItem>,
@@ -269,8 +269,7 @@ class CourseMenu extends Component {
         items = items.concat([
             <MenuSeparator key="CourseMenuSeparator3" />,
             <MenuItem href={"/Admin/Comments?courseId=" + courseId} key="Comments" component={ LinkComponent }>Комментарии</MenuItem>,
-            <MenuItem href={"/Admin/ManualQuizCheckingQueue?courseId=" + courseId} key="ManualQuizCheckingQueue" component={ LinkComponent }>Проверка тестов</MenuItem>,
-            <MenuItem href={"/Admin/ManualExerciseCheckingQueue?courseId=" + courseId} key="ManualExerciseCheckingQueue" component={ LinkComponent }>Код-ревью</MenuItem>,
+            <MenuItem href={"/Admin/CheckingQueue?courseId=" + courseId} key="ManualCheckingQueue" component={ LinkComponent }>Код-ревью и проверка тестов</MenuItem>,
         ]);
 
         return items;

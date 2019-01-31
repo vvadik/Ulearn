@@ -45,11 +45,20 @@ function request(url, options, isRetry) {
     options.headers = options.headers || {};
     options.headers['Authorization'] = 'Bearer ' + apiJwtToken;
     return fetch(config.api.endpoint + url, options)
+		.catch((error) => {
+			if (window.navigator.onLine === false)
+				serverErrorHandler('Не можем подключиться к серверу');
+			else
+				serverErrorHandler('Не можем подключиться к серверу. Попробуйте обновить страницу.');
+
+			throw error;
+		})
 		.then(response => {
             if (response.status >= 200 && response.status < 300)
                 return response;
             if (response.status === 401 && !isRetry)
                 return refreshApiJwtToken();
+
 			if (response.status >= 500)
 				serverErrorHandler();
 
@@ -68,11 +77,7 @@ function request(url, options, isRetry) {
 }
 
 function get(url, options) {
-	if (!request) {
-		console.error();
-	}
-
-    return request(url, options);
+	return request(url, options);
 }
 
 function post(url, options) {

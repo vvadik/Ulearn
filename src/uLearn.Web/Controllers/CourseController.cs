@@ -102,9 +102,9 @@ namespace uLearn.Web.Controllers
 
 				if (queueItem == null)
 				{
-					/* It's possible when checking has not been fully checked, lock has been released, but after it user re-send him solution and old waiting checking has been removed */
+					/* It's possible when checking has not been fully checked, lock has been released, but after it user re-send his solution and we removed old waiting checking */
 					var fakeQueueItem = slide is QuizSlide ? (AbstractManualSlideChecking) new ManualQuizChecking() : new ManualExerciseChecking();
-					return RedirectToAction(GetAdminQueueActionName(fakeQueueItem), "Admin", new
+					return RedirectToAction("CheckingQueue", "Admin", new
 					{
 						courseId = courseId,
 						message = "checking_removed"
@@ -131,24 +131,6 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 			var slide = course.GetSlideById(slideGuid);
 			return RedirectToRoute("Course.SlideById", new { courseId = course.Id, slideId = slide.Url });
-		}
-
-		private string GetAdminQueueActionName(AbstractManualSlideChecking queueItem)
-		{
-			if (queueItem is ManualQuizChecking)
-				return "ManualQuizCheckingQueue";
-			if (queueItem is ManualExerciseChecking)
-				return "ManualExerciseCheckingQueue";
-			return "";
-		}
-
-		private string GetAdminCheckActionName(AbstractManualSlideChecking queueItem)
-		{
-			if (queueItem is ManualQuizChecking)
-				return "CheckQuiz";
-			if (queueItem is ManualExerciseChecking)
-				return "CheckExercise";
-			return "";
 		}
 
 		[AllowAnonymous]
@@ -293,7 +275,7 @@ namespace uLearn.Web.Controllers
 			var visiter = await VisitSlide(course.Id, slide.Id, userId).ConfigureAwait(false);
 			var maxSlideScore = GetMaxSlideScoreForUser(course, slide, userId);
 			var defaultProhibitFurtherReview = groupsRepo.GetDefaultProhibitFutherReviewForUser(course.Id, userId, User);
-			var manualCheckingsLeft = manualChecking != null ? GetManualCheckingsCountInQueue(course.Id, slide, groupsIds) : 0;
+			var manualCheckingsLeft = manualChecking != null ? ControllerUtils.GetManualCheckingsCountInQueue(slideCheckingsRepo, groupsRepo, User, course.Id, slide, groupsIds) : 0;
 
 			var score = Tuple.Create(visiter.Score, maxSlideScore);
 			var model = new CoursePageModel
@@ -307,34 +289,13 @@ namespace uLearn.Web.Controllers
 					course, slide, manualChecking, exerciseSubmissionId, groupsIds,
 					autoplay: autoplay,
 					isManualCheckingReadonly: isManualCheckingReadonly,
-					defaultProhibitFutherReview: defaultProhibitFurtherReview, manualCheckingsLeft: manualCheckingsLeft),
+					defaultProhibitFurtherReview: defaultProhibitFurtherReview, manualCheckingsLeft: manualCheckingsLeft),
 				ManualChecking = manualChecking,
 				ContextManualCheckingUserGroups = manualChecking != null ? groupsRepo.GetUserGroupsNamesAsString(course.Id, manualChecking.UserId, User) : "",
 				ContextManualCheckingUserArchivedGroups = manualChecking != null ? groupsRepo.GetUserGroupsNamesAsString(course.Id, manualChecking.UserId, User, onlyArchived: true) : "",
 				IsGuest = false
 			};
 			return model;
-		}
-
-		private int GetManualCheckingsCountInQueue(string courseId, Slide slide, List<string> groupsIds)
-		{
-			var filterOptions = GetManualCheckingFilterOptionsByGroup(courseId, groupsIds);
-			if (filterOptions.UserIds == null)
-				groupsIds = new List<string> { "all" };
-			filterOptions.SlidesIds = new List<Guid> { slide.Id };
-			
-			if (slide is ExerciseSlide)
-				return slideCheckingsRepo.GetManualCheckingQueue<ManualExerciseChecking>(filterOptions).Count();
-			if (slide is QuizSlide)
-				return slideCheckingsRepo.GetManualCheckingQueue<ManualQuizChecking>(filterOptions).Count();
-			
-			throw new ArgumentException("Slide should be quiz or exercise", nameof(slide));
-		}
-		
-		/* Copy&paste from AdminController */
-		private ManualCheckingQueueFilterOptions GetManualCheckingFilterOptionsByGroup(string courseId, List<string> groupsIds)
-		{
-			return ControllerUtils.GetFilterOptionsByGroup<ManualCheckingQueueFilterOptions>(groupsRepo, User, courseId, groupsIds);
 		}
 
 		private int GetMaxSlideScoreForUser(Course course, Slide slide, string userId)
@@ -349,7 +310,7 @@ namespace uLearn.Web.Controllers
 		private BlockRenderContext CreateRenderContext(Course course, Slide slide, 
 			AbstractManualSlideChecking manualChecking = null, 
 			int? exerciseSubmissionId = null, List<string> groupsIds = null, bool isLti = false,
-			bool autoplay = false, bool isManualCheckingReadonly = false, bool defaultProhibitFutherReview = true,
+			bool autoplay = false, bool isManualCheckingReadonly = false, bool defaultProhibitFurtherReview = true,
 			int manualCheckingsLeft = 0)
 		{
 			/* ExerciseController will fill blockDatas later */
@@ -368,7 +329,7 @@ namespace uLearn.Web.Controllers
 				isLti: isLti,
 				autoplay: autoplay,
 				isManualCheckingReadonly: isManualCheckingReadonly,
-				defaultProhibitFurtherReview: defaultProhibitFutherReview
+				defaultProhibitFurtherReview: defaultProhibitFurtherReview
 			)
 			{
 				VersionId = exerciseSubmissionId
@@ -519,7 +480,7 @@ namespace uLearn.Web.Controllers
 			db.SolutionLikes.RemoveRange(db.SolutionLikes.Where(q => q.UserId == userId && q.Submission.SlideId == slideId));
 
 			db.UserExerciseSubmissions.RemoveSlideAction(courseId, slideId, userId);
-			db.UserQuizzes.RemoveSlideAction(courseId, slideId, userId);
+			db.UserQuizSubmissions.RemoveSlideAction(courseId, slideId, userId);
 			db.Visits.RemoveSlideAction(courseId, slideId, userId);
 			await slideCheckingsRepo.RemoveAttempts(courseId, slideId, userId, false);
 
@@ -529,21 +490,6 @@ namespace uLearn.Web.Controllers
 			await db.SaveChangesAsync();
 
 			return RedirectToAction("SlideById", new { courseId, slideId = slide.Id });
-		}
-
-		public ActionResult CourseInstructorNavbar(string courseId)
-		{
-			if (string.IsNullOrEmpty(courseId) || !User.HasAccessFor(courseId, CourseRole.Instructor))
-				return PartialView((CourseInstructorNavbarViewModel)null);
-
-			var course = courseManager.GetCourse(courseId);
-			var canAddInstructors = coursesRepo.HasCourseAccess(User.Identity.GetUserId(), courseId, CourseAccessType.AddAndRemoveInstructors);
-			return PartialView(new CourseInstructorNavbarViewModel
-			{
-				CourseId = courseId,
-				CourseTitle = course.Title,
-				CanAddInstructors = canAddInstructors,
-			});
 		}
 	}
 }

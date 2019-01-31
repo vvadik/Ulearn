@@ -16,7 +16,6 @@ import ReactDOM from "react-dom";
  */
 
 /* Import all components you want to insert into legacy (cshtml+jquery) layout */
-import Comment from "./components/comments/Comment/Comment"
 import CommentSendForm from "./components/comments/CommentSendForm";
 
 /* Define names for all components you want to use */

@@ -52,6 +52,16 @@ namespace Database.DataContexts
 				.HasForeignKey(d => d.NotificationId)
 				.WillCascadeOnDelete(false);
 			
+			modelBuilder.Entity<UserQuizSubmission>()
+				.HasOptional(s => s.AutomaticChecking)
+				.WithRequired(c => c.Submission)
+				.WillCascadeOnDelete(false);
+			
+			modelBuilder.Entity<UserQuizSubmission>()
+				.HasOptional(s => s.ManualChecking)
+				.WithRequired(c => c.Submission)
+				.WillCascadeOnDelete(false);
+			
 			modelBuilder.Entity<UserRole>().HasRequired(r => r.User).WithMany().HasForeignKey(r => r.UserId).WillCascadeOnDelete();
 			
 			CancelCascaseDeleting<ExerciseCodeReview, ApplicationUser, string>(modelBuilder, c => c.Author, c => c.AuthorId);
@@ -139,7 +149,7 @@ namespace Database.DataContexts
 		{
 			try
 			{
-				return await base.SaveChangesAsync();
+				return await base.SaveChangesAsync().ConfigureAwait(false);
 			}
 			catch (DbEntityValidationException ex)
 			{
@@ -165,7 +175,7 @@ namespace Database.DataContexts
 		public DbSet<Visit> Visits { get; set; }
 		public DbSet<SlideHint> Hints { get; set; }
 		public DbSet<Like> SolutionLikes { get; set; }
-		public DbSet<UserQuiz> UserQuizzes { get; set; }
+		public DbSet<UserQuizAnswer> UserQuizAnswers { get; set; }
 		public DbSet<UnitAppearance> UnitAppearances { get; set; }
 		public DbSet<TextBlob> Texts { get; set; }
 		public DbSet<LtiConsumer> Consumers { get; set; }
@@ -184,6 +194,7 @@ namespace Database.DataContexts
 		public DbSet<ManualQuizChecking> ManualQuizCheckings { get; set; }
 		public DbSet<AutomaticQuizChecking> AutomaticQuizCheckings { get; set; }
 		public DbSet<UserExerciseSubmission> UserExerciseSubmissions { get; set; }
+		public DbSet<UserQuizSubmission> UserQuizSubmissions { get; set; }
 		public DbSet<ExerciseCodeReview> ExerciseCodeReviews { get; set; }
 		public DbSet<ExerciseCodeReviewComment> ExerciseCodeReviewComments { get; set; }
 

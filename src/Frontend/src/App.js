@@ -18,8 +18,7 @@ import GroupListPage from "./pages/course/groups/GroupListPage";
 import GroupPage from "./pages/course/groups/GroupPage";
 import { getQueryStringParameter } from "./utils";
 
-import "./common.less"
-import "./App.less"
+import styles from "./App.less"
 
 let loggerMiddleware = createLogger();
 
@@ -57,16 +56,17 @@ setInterval(() => {
         store.dispatch(api.notifications.getNotificationsCount(store.getState().notifications.lastTimestamp))
 }, 60 * 1000);
 
-api.setServerErrorHandler(() => Toast.push('Произошла ошибка. Попробуйте перезагрузить страницу.'));
+api.setServerErrorHandler((message) => Toast.push(message ? message : 'Произошла ошибка. Попробуйте перезагрузить страницу.'));
 
 class UlearnApp extends Component {
     render() {
 		let pathname = window.location.pathname.toLowerCase();
-		const isLti = pathname.endsWith('/ltislide') || pathname.endsWith('/acceptedalert');
+		let isLti = pathname.endsWith('/ltislide') || pathname.endsWith('/acceptedalert');
+		let isHeaderVisible = !isLti;
 
         return (
             <Provider store={store}>
-                <InternalUlearnApp isLti={isLti}/>
+                <InternalUlearnApp isHeaderVisible={isHeaderVisible}/>
             </Provider>
         )
     }
@@ -95,12 +95,12 @@ class InternalUlearnApp extends Component {
     }
 
     render() {
-    	const isHeaderVisible = ! this.props.isLti;
+    	const isHeaderVisible = this.props.isHeaderVisible;
         return (
             <BrowserRouter>
                 <ErrorBoundary>
 					{ isHeaderVisible && <Header initializing={this.state.initializing}/> }
-					{ isHeaderVisible && <div className="header-content-divider" /> }
+					{ isHeaderVisible && <div className={styles.headerContentDivider} /> }
 					<NotFoundErrorBoundary>
 						{ ! this.state.initializing && // Avoiding bug: don't show page while initializing.
 													   // Otherwise we make two GET requests sequentially.

@@ -32,7 +32,7 @@ namespace Ulearn.Web.Api.Controllers
 			if (course == null)
 				return NotFound();
 					
-			var instructorIds = await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, course.Id).ConfigureAwait(false);
+			var instructorIds = await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, course.Id, includeHighRoles: true).ConfigureAwait(false);
 			var instructors = await usersRepo.GetUsersByIdsAsync(instructorIds).ConfigureAwait(false);
 			return new InstructorsListResponse
 			{

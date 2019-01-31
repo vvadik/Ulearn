@@ -6,7 +6,8 @@ import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
 import CreateGroupModal from "../CreateGroupModal/CreateGroupModal";
 import CopyGroupModal from "../CopyGroupModal/CopyGroupModal";
 
-import styles from "./style.less";
+import styles from "./groupHeader.less";
+import {Mobile, NotMobile} from "../../../../utils/responsive";
 
 const TABS = {
 	active: 'active',
@@ -48,10 +49,18 @@ class GroupHeader extends Component {
 				<div className={styles["header-container"]}>
 					<h2 className={styles["header-name"]}>Группы</h2>
 					<div className={styles["buttons-container"]}>
-						<Gapped gap={20}>
-							<Button id="create" use="primary" size="medium" onClick={this.openCreateGroupModal}>Создать группу</Button>
-							<Button id="copy" use="default" size="medium" onClick={this.openCopyGroupModal}>Скопировать группу из курса</Button>
-						</Gapped>
+						<Mobile>
+							<Gapped gap={10}>
+								<Button id="create" use="primary" size="small" onClick={this.openCreateGroupModal}>Создать группу</Button>
+								<Button id="copy" use="default" size="small" onClick={this.openCopyGroupModal}>Скопировать из...</Button>
+							</Gapped>
+						</Mobile>
+						<NotMobile>
+							<Gapped gap={20}>
+								<Button id="create" use="primary" size="medium" onClick={this.openCreateGroupModal}>Создать группу</Button>
+								<Button id="copy" use="default" size="medium" onClick={this.openCopyGroupModal}>Скопировать группу из курса</Button>
+							</Gapped>
+						</NotMobile>
 					</div>
 				</div>
 				<div className={styles["tabs-container"]}>

@@ -25,6 +25,9 @@ namespace Ulearn.Web.Api.Models.Responses.Comments
 		[DataMember(Name = "text")]
 		public string Text { get; set; }
 		
+		[DataMember(Name = "rendered_text")]
+		public string RenderedText { get; set; }
+		
 		[DataMember(Name = "publish_time")]
 		public DateTime PublishTime { get; set; }
 		

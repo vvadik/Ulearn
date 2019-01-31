@@ -8,7 +8,7 @@ import Toast from "@skbkontur/react-ui/components/Toast/Toast";
 import LinkIcon from "@skbkontur/react-icons/Link";
 import Input from "@skbkontur/react-ui/components/Input/Input";
 
-import styles from './style.less';
+import styles from './inviteBlock.less';
 
 class InviteBlock extends Component {
 

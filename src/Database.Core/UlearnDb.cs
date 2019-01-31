@@ -6,6 +6,8 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Database.Models;
+using Database.Models.Quizzes;
+using Database.Models.Comments;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -112,6 +114,18 @@ namespace Database
 				.WithMany(n => n.Deliveries)
 				.HasForeignKey(d => d.NotificationId)
 				.OnDelete(DeleteBehavior.Restrict);
+			
+			modelBuilder.Entity<UserQuizSubmission>()
+				.HasOne(s => s.AutomaticChecking)
+				.WithOne(c => c.Submission)
+				.HasForeignKey<AutomaticQuizChecking>(p => p.Id)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			modelBuilder.Entity<UserQuizSubmission>()
+				.HasOne(s => s.ManualChecking)
+				.WithOne(c => c.Submission)
+				.HasForeignKey<ManualQuizChecking>(p => p.Id)
+				.OnDelete(DeleteBehavior.Restrict);			
 
 			SetDeleteBehavior<CourseRole, ApplicationUser>(modelBuilder, r => r.User, r => r.UserId, DeleteBehavior.Cascade);
 
@@ -311,10 +325,12 @@ namespace Database
 			AddIndex<UserExerciseSubmission>(modelBuilder, c => c.AntiPlagiarismSubmissionId);
 			AddIndex<UserExerciseSubmission>(modelBuilder, c => c.Language);
 
-			AddIndex<UserQuiz>(modelBuilder, c => new { c.SlideId, c.Timestamp });
-			AddIndex<UserQuiz>(modelBuilder, c => new { c.CourseId, c.UserId, c.SlideId, c.isDropped, c.QuizId, c.ItemId });
-			AddIndex<UserQuiz>(modelBuilder, c => new { c.CourseId, c.SlideId, c.QuizId });
-			AddIndex<UserQuiz>(modelBuilder, c => c.ItemId );
+			AddIndex<UserQuizAnswer>(modelBuilder, c => new { c.SubmissionId, c.BlockId });
+			AddIndex<UserQuizAnswer>(modelBuilder, c => new { c.ItemId });
+
+			AddIndex<UserQuizSubmission>(modelBuilder, c => new { c.CourseId, c.SlideId });
+			AddIndex<UserQuizSubmission>(modelBuilder, c => new { c.CourseId, c.SlideId, c.UserId });
+			AddIndex<UserQuizSubmission>(modelBuilder, c => new { c.CourseId, c.SlideId, c.Timestamp });
 			
 			AddIndex<Visit>(modelBuilder, c => new { c.SlideId, c.UserId });
 			AddIndex<Visit>(modelBuilder, c => new { c.CourseId, c.SlideId, c.UserId });
@@ -331,7 +347,6 @@ namespace Database
 			return type.Assembly.GetTypes().Where(t => t.IsSubclassOf(type) && !t.IsAbstract && t != type).ToList();
 		}		
 
-		/* Construct easy understandable message on DbEntityValidationException */
 		public override int SaveChanges()
 		{
 			ValidateChanges();
@@ -362,7 +377,7 @@ namespace Database
 		public DbSet<Visit> Visits { get; set; }
 		public DbSet<SlideHint> Hints { get; set; }
 		public DbSet<Like> SolutionLikes { get; set; }
-		public DbSet<UserQuiz> UserQuizzes { get; set; }
+		public DbSet<UserQuizAnswer> UserQuizAnswers { get; set; }
 		public DbSet<UnitAppearance> UnitAppearances { get; set; }
 		public DbSet<TextBlob> Texts { get; set; }
 		public DbSet<LtiConsumer> Consumers { get; set; }
@@ -381,6 +396,7 @@ namespace Database
 		public DbSet<ManualQuizChecking> ManualQuizCheckings { get; set; }
 		public DbSet<AutomaticQuizChecking> AutomaticQuizCheckings { get; set; }
 		public DbSet<UserExerciseSubmission> UserExerciseSubmissions { get; set; }
+		public DbSet<UserQuizSubmission> UserQuizSubmissions { get; set; }
 		public DbSet<ExerciseCodeReview> ExerciseCodeReviews { get; set; }
 		public DbSet<ExerciseCodeReviewComment> ExerciseCodeReviewComments { get; set; }
 

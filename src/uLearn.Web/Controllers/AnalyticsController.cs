@@ -634,7 +634,7 @@ namespace uLearn.Web.Controllers
 
 		private Dictionary<DateTime, int> GetQuizPassedStats(IEnumerable<Guid> slideIds, DateTime firstDay, DateTime lastDay)
 		{
-			return GroupByDays(FilterByTime(FilterBySlides(db.UserQuizzes, slideIds), firstDay, lastDay));
+			return GroupByDays(FilterByTime(FilterBySlides(db.UserQuizSubmissions, slideIds), firstDay, lastDay));
 		}
 
 		private Dictionary<DateTime, Tuple<int, int>> GetSlidesVisitedStats(IEnumerable<Guid> slideIds, DateTime firstDay, DateTime lastDay)

@@ -10,7 +10,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ApprovalUtilities.Utilities;
 using Database.Models;
 using EntityFramework.Functions;
 using log4net;
@@ -18,8 +17,6 @@ using RunCsJob.Api;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
-using Ulearn.Core.Courses.Slides;
-using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 

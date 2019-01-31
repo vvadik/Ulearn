@@ -263,12 +263,12 @@ namespace Database.DataContexts
 						continue;
 
 					log.Info($"Создаю ручную проверку для решения {lastSubmission.Id}, слайд {slideId}");
-					await slideCheckingsRepo.AddManualExerciseChecking(courseId, slideId, userId, lastSubmission);
-					await visitsRepo.MarkVisitsAsWithManualChecking(courseId, slideId, userId);
+					await slideCheckingsRepo.AddManualExerciseChecking(courseId, slideId, userId, lastSubmission).ConfigureAwait(false);
+					await visitsRepo.MarkVisitsAsWithManualChecking(courseId, slideId, userId).ConfigureAwait(false);
 				}
 
 			/* For quizzes */
-			var passedQuizzesIds = userQuizzesRepo.GetIdOfQuizPassedSlides(courseId, userId);
+			var passedQuizzesIds = userQuizzesRepo.GetPassedSlideIds(courseId, userId);
 			foreach (var quizSlideId in passedQuizzesIds)
 			{
 				var slide = course.FindSlideById(quizSlideId) as QuizSlide;
@@ -277,8 +277,12 @@ namespace Database.DataContexts
 				if (!userQuizzesRepo.IsWaitingForManualCheck(courseId, quizSlideId, userId))
 				{
 					log.Info($"Создаю ручную проверку для теста {slide.Id}");
-					await slideCheckingsRepo.AddQuizAttemptForManualChecking(courseId, quizSlideId, userId);
-					await visitsRepo.MarkVisitsAsWithManualChecking(courseId, quizSlideId, userId);
+					var submission = userQuizzesRepo.FindLastUserSubmission(courseId, quizSlideId, userId);
+					if (submission == null)
+						continue;
+					
+					await slideCheckingsRepo.AddManualQuizChecking(submission, courseId, quizSlideId, userId).ConfigureAwait(false);
+					await visitsRepo.MarkVisitsAsWithManualChecking(courseId, quizSlideId, userId).ConfigureAwait(false);
 				}
 			}
 		}
