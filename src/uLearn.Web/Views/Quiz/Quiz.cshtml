@@ -16,10 +16,11 @@
 	const string allTriesExceeded = "Использованы все попытки. Вы можете пройти тест ещё раз, но ваши баллы за него не изменятся";
 	if (Model.Checking != null)
 	{
-		status = string.Format("{0}, попытка {1} из {2}",
+		status = string.Format("{0}, попытка {1} из {2}. {3}",
 			Model.Checking.User.VisibleName,
 			Model.QuizState.UsedAttemptsCount + 1,
-			Model.Slide.MaxTriesCount
+			triesCountMessage,
+			Model.Checking.Timestamp.ToPrettyString()
 			);
 	}
 	else if (!Model.IsGuest && Model.QuizState.Status == QuizStatus.ReadyToSend)
@@ -81,9 +82,7 @@
 	if (!string.IsNullOrEmpty(status))
 	{
 		<p class="quiz-status">
-			@status@*
-			*@@if (Model.Checking != null)
-			{<text>. @Model.Checking.Timestamp.ToPrettyString()</text>}
+			@status
 		</p>
 	}
 	
