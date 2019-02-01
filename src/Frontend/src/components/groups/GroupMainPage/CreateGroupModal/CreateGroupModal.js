@@ -80,7 +80,7 @@ class CreateGroupModal extends Component {
 			return;
 		}
 
-		this.setState({ loading: true, });
+		this.setState({ sending: true, });
 		try {
 			const newGroup = await api.groups.createGroup(courseId, name);
 			onCloseModal();
@@ -88,7 +88,7 @@ class CreateGroupModal extends Component {
 		} catch(e) {
 			console.error(e);
 		} finally {
-			this.setState({ loading: false, });
+			this.setState({ sending: false, });
 		}
 	};
 

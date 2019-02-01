@@ -192,13 +192,13 @@ class CopyStudentsModal extends Component {
 
 		const students = [...studentIds];
 
-		this.setState({ loading: true });
+		this.setState({ sending: true });
 		api.groups.copyStudents(currentGroupId, groupId, students)
 			.then(() =>
 				Toast.push(`Студенты скопированы в группу ${this.getTitle(groups, groupId)}`)
 			)
 			.catch(console.error)
-			.finally(() => this.setState({ loading: false }));
+			.finally(() => this.setState({ sending: false }));
 
 		onClose();
 	};

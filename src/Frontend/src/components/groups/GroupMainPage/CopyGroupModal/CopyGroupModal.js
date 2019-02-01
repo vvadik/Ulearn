@@ -257,7 +257,7 @@ class CopyGroupModal extends Component {
 			return;
 		}
 
-		this.setState({ loading: true });
+		this.setState({ sending: true });
 		try {
 			const newGroup = await api.groups.copyGroup(groupId, currentCourseId, changeOwner);
 			onCloseModal();
@@ -266,7 +266,7 @@ class CopyGroupModal extends Component {
 			console.error(e);
 		}
 		finally {
-			this.setState({ loading: false });
+			this.setState({ sending: false });
 		}
 	};
 }

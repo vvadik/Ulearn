@@ -5,9 +5,9 @@ export function getCurrentUser() {
         return api.get('account')
             .then(json => {
                 let isAuthenticated = json.is_authenticated;
-                if (! isAuthenticated)
-                    dispatch({ type: 'ACCOUNT__USER_INFO_UPDATED', isAuthenticated: false });
-                else {
+                if (! isAuthenticated) {
+					dispatch({ type: 'ACCOUNT__USER_INFO_UPDATED', isAuthenticated: false });
+				} else {
                     let user = json.user;
                     dispatch({
                         type: 'ACCOUNT__USER_INFO_UPDATED',
@@ -17,6 +17,7 @@ export function getCurrentUser() {
                         firstName: user.first_name,
                         lastName: user.last_name,
                         visibleName: user.visible_name,
+						avatarUrl: user.avatar_url,
                         accountProblems: json.account_problems,
 						systemAccesses: json.system_accesses,
                     });

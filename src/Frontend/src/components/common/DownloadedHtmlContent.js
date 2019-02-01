@@ -132,7 +132,7 @@ class DownloadedHtmlContent extends Component {
                     return Promise.resolve(undefined);
                 }
                 this.setState(s => {
-                    s.loading = true;
+                    s.sending = true;
                     return s;
                 });
                 return response.text();
@@ -167,7 +167,7 @@ class DownloadedHtmlContent extends Component {
         let titles = head.getElementsByTagName('title');
 
         this.setState({
-            loading: false,
+            sending: false,
             body: body.innerHTML,
 			bodyClassName: body.className,
             links: links
@@ -201,7 +201,7 @@ class DownloadedHtmlContent extends Component {
             imageUrl: '',
         };
         this.setState(s => {
-            s.loading = false;
+            s.sending = false;
             s.meta = meta;
             return s;
         });
@@ -211,7 +211,10 @@ class DownloadedHtmlContent extends Component {
     }
 
     _getSlideIdFromUrl() {
-    	return window.location.pathname.split('/')[3].split('_').pop();
+    	const pathname = window.location.pathname;
+		if (pathname.startsWith('/Course/')) {
+			return window.location.pathname.split('/')[3].split('_').pop();
+		}
 	}
 
     _getCourseIdFromUrl() {
@@ -239,7 +242,7 @@ class DownloadedHtmlContent extends Component {
     }
 
     render() {
-        if (this.state.loading) {
+        if (this.state.sending) {
             return (
                 <Loader type="big" active>
                     { this.getContent() }
