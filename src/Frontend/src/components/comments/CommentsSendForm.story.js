@@ -10,7 +10,12 @@ const nameOnlyUser = {
 	"avatarUrl": null,
 };
 
-class Story extends React.Component {
+const userWithAvatar = {
+	"visibleName": "Vasiliy Terkin",
+	"avatarUrl": "https://staff.skbkontur.ru/content/images/default-user-woman.png",
+};
+
+class SendingCommentStory extends React.Component {
 	state = {
 		id: Date.now().toString(),
 		sending: false,
@@ -28,7 +33,7 @@ class Story extends React.Component {
 		});
 		setTimeout(() => {
 			this.setState({
-				//id: Date.now().toString(),
+				id: Date.now().toString(),
 				sending: false,
 			})
 		}, 500)
@@ -40,11 +45,11 @@ storiesOf('Comments/CommentSendForm', module)
 	.add('default', () => (
 		<div>
 			<CommentSendForm onSubmit={action('sendComment')} commentId={'1'} author={nameOnlyUser} sending={false}/>
-			<CommentSendForm onSubmit={action('sendComment')} commentId={'2'} author={nameOnlyUser} sending={true}/>
-			<Story/>
+			<CommentSendForm onSubmit={action('sendComment')} commentId={'2'} author={userWithAvatar} sending={true}/>
+			<h3>Успешная отправка комментария очищает поле ввода</h3>
+			<SendingCommentStory success={true}/>
+			<h3>Ошибка при отправке комментария НЕ очищает поле ввода</h3>
+			<SendingCommentStory success={false}/>
 		</div>
-	))
-	.add('sending', () => (
-		<CommentSendForm onSubmit={action('sendComment')} sending={true} author={nameOnlyUser}/>
 	));
 
