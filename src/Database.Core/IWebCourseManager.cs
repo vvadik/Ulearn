@@ -27,7 +27,7 @@ namespace Database
 		string GetPackageName(string courseId);
 		string GetPackageName(Guid versionId);
 		DateTime GetLastWriteTime(string courseId);
-		bool TryCreateCourse(string courseId);
+		bool TryCreateCourse(string courseId, string courseTitle, Guid firstVersionId);
 		void EnsureVersionIsExtracted(Guid versionId);
 		bool HasPackageFor(string courseId);
 		Course FindCourseBySlideById(Guid slideId);

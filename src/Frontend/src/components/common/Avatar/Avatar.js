@@ -21,7 +21,7 @@ class Avatar extends Component {
 	renderImage(url, className) {
 		return (
 			<img
-			alt="фото"
+			alt="Аватарка"
 			className={className}
 			src={url}
 			/>

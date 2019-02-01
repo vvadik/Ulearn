@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Serilog;
-using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Quizzes;
 
@@ -63,13 +62,13 @@ namespace Database.Repos.Groups
 				}
 
 			/* For quizzes */
-			var passedQuizzesIds = userQuizzesRepo.GetIdOfQuizPassedSlides(courseId, userId);
+			var passedQuizzesIds = await userQuizzesRepo.GetPassedSlideIdsAsync(courseId, userId).ConfigureAwait(false);
 			foreach (var quizSlideId in passedQuizzesIds)
 			{
 				var slide = course.FindSlideById(quizSlideId) as QuizSlide;
 				if (slide == null || !slide.ManualChecking)
 					continue;
-				if (!userQuizzesRepo.IsWaitingForManualCheck(courseId, quizSlideId, userId))
+				if (! await userQuizzesRepo.IsWaitingForManualCheckAsync(courseId, quizSlideId, userId).ConfigureAwait(false))
 				{
 					logger.Information($"Создаю ручную проверку для теста {slide.Id}");
 					await slideCheckingsRepo.AddQuizAttemptForManualChecking(courseId, quizSlideId, userId).ConfigureAwait(false);

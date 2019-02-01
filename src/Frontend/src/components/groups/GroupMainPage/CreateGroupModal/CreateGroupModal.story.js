@@ -3,7 +3,7 @@ import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 import CreateGroupModal from './CreateGroupModal';
 
-import './style.less';
+import './createGroupModal.less';
 
 storiesOf('Group/CreateGroupModal', module)
 	.add('default', () => (

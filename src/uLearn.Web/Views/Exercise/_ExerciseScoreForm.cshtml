@@ -40,7 +40,7 @@
 
 			<input type="hidden" name="id" value="@Model.Checking.Id"/>
 			<input type="hidden" name="errorUrl" value="@Url.RouteUrl("Course.SlideById", new { courseId = Model.CourseId, slideId = Model.Slide.Url, CheckQueueItemId = Model.Checking.Id, group = Model.GroupsIdsJoined })&amp;error="/>
-			<input type="hidden" name="nextUrl" value="@Url.Action("ManualExerciseCheckingQueue", "Admin", new { courseId = Model.CourseId, group = Model.GroupsIdsJoined, done = Model.Checking.IsChecked })"/>
+			<input type="hidden" name="nextUrl" value="@Url.Action("CheckingQueue", "Admin", new { courseId = Model.CourseId, group = Model.GroupsIdsJoined, done = Model.Checking.IsChecked })"/>
 
 			@if (Model.Checking.IsLocked && !Model.Checking.IsLockedBy(User.Identity))
 			{
@@ -117,7 +117,7 @@
 					else
 					{
 						<input type="submit" class="btn btn-primary" value="Сохранить и перейти к следующему"
-							   data-url="@Url.Action("CheckNextExerciseForSlide", "Admin", new { Model.CourseId, slideId = Model.Slide.Id, group = Model.GroupsIdsJoined })"
+							   data-url="@Url.Action("CheckNextExerciseForSlide", "Admin", new { Model.CourseId, slideId = Model.Slide.Id, group = Model.GroupsIdsJoined, previous = Model.Checking.Id })"
 							   onclick="$('[name=nextUrl]').val($(this).data('url'))"/>
 						<div class="text-muted manual-checkings-left">
 							По этой задаче остал@(Model.ManualCheckingsLeft % 10 == 1 && (Model.ManualCheckingsLeft % 100 / 10 != 1) ? "ась" : "ось")

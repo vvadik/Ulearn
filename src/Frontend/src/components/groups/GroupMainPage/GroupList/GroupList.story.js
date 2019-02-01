@@ -4,7 +4,7 @@ import { action } from '@storybook/addon-actions';
 import GroupList from './GroupList'
 import { MemoryRouter } from 'react-router';
 
-import './style.less';
+import './groupList.less';
 
 storiesOf('Group/GroupList', module)
 	.addDecorator(story => (

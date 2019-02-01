@@ -13,8 +13,8 @@ class Error404 extends Component {
 						<a href="/">Вернуться на главную</a>
 					</p>
 					<p>
-						Если адрес страницы верный, напишите нам о&nbsp;том, что произошло, на&nbsp;<a
-						href="mailto:support@ulearn.me">support@ulearn.me</a>.
+						Если адрес страницы верный, напишите нам о&nbsp;том, что произошло,
+						на&nbsp;<a href="mailto:support@ulearn.me">support@ulearn.me</a>.
 					</p>
 				</div>
 			</div>

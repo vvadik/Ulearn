@@ -725,6 +725,22 @@
     <Compile Include="Migrations\201812061808280_RemoveQuizVersions.Designer.cs">
       <DependentUpon>201812061808280_RemoveQuizVersions.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201901212054036_AddUserQuizSubmissions.cs" />
+    <Compile Include="Migrations\201901212054036_AddUserQuizSubmissions.Designer.cs">
+      <DependentUpon>201901212054036_AddUserQuizSubmissions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201901212242411_RemoveIdentityFromQuizCheckingsIds.cs" />
+    <Compile Include="Migrations\201901212242411_RemoveIdentityFromQuizCheckingsIds.Designer.cs">
+      <DependentUpon>201901212242411_RemoveIdentityFromQuizCheckingsIds.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201901220511203_RenameUserQuizs.cs" />
+    <Compile Include="Migrations\201901220511203_RenameUserQuizs.Designer.cs">
+      <DependentUpon>201901220511203_RenameUserQuizs.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201901242025259_RemoveQuizSubmissionIsDropped.cs" />
+    <Compile Include="Migrations\201901242025259_RemoveQuizSubmissionIsDropped.Designer.cs">
+      <DependentUpon>201901242025259_RemoveQuizSubmissionIsDropped.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -765,7 +781,8 @@
     <Compile Include="Models\UnitAppearance.cs" />
     <Compile Include="Models\UserExerciseSubmission.cs" />
     <Compile Include="Models\UserQuestion.cs" />
-    <Compile Include="Models\UserQuiz.cs" />
+    <Compile Include="Models\UserQuizAnswer.cs" />
+    <Compile Include="Models\UserQuizSubmission.cs" />
     <Compile Include="Models\UserRole.cs" />
     <Compile Include="Models\XQueueExerciseSubmission.cs" />
     <Compile Include="Models\XQueueWatcher.cs" />
@@ -1123,6 +1140,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201812061808280_RemoveQuizVersions.resx">
       <DependentUpon>201812061808280_RemoveQuizVersions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901212054036_AddUserQuizSubmissions.resx">
+      <DependentUpon>201901212054036_AddUserQuizSubmissions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901212242411_RemoveIdentityFromQuizCheckingsIds.resx">
+      <DependentUpon>201901212242411_RemoveIdentityFromQuizCheckingsIds.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901220511203_RenameUserQuizs.resx">
+      <DependentUpon>201901220511203_RenameUserQuizs.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901242025259_RemoveQuizSubmissionIsDropped.resx">
+      <DependentUpon>201901242025259_RemoveQuizSubmissionIsDropped.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

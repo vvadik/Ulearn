@@ -15,7 +15,7 @@ namespace Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
+                .HasAnnotation("ProductVersion", "2.2.0-rtm-35687")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -211,9 +211,7 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Database.Models.AutomaticQuizChecking", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<int>("Id");
 
                     b.Property<string>("CourseId")
                         .IsRequired()
@@ -305,7 +303,7 @@ namespace Database.Migrations
                     b.ToTable("CertificateTemplates");
                 });
 
-            modelBuilder.Entity("Database.Models.Comment", b =>
+            modelBuilder.Entity("Database.Models.Comments.Comment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -347,7 +345,7 @@ namespace Database.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("Database.Models.CommentLike", b =>
+            modelBuilder.Entity("Database.Models.Comments.CommentLike", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -371,7 +369,7 @@ namespace Database.Migrations
                     b.ToTable("CommentLikes");
                 });
 
-            modelBuilder.Entity("Database.Models.CommentsPolicy", b =>
+            modelBuilder.Entity("Database.Models.Comments.CommentsPolicy", b =>
                 {
                     b.Property<string>("CourseId")
                         .ValueGeneratedOnAdd()
@@ -920,9 +918,7 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Database.Models.ManualQuizChecking", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<int>("Id");
 
                     b.Property<string>("CourseId")
                         .IsRequired()
@@ -1082,6 +1078,69 @@ namespace Database.Migrations
                     b.HasIndex("CourseId", "NotificationType");
 
                     b.ToTable("NotificationTransportSettings");
+                });
+
+            modelBuilder.Entity("Database.Models.Quizzes.UserQuizAnswer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("BlockId")
+                        .HasMaxLength(64);
+
+                    b.Property<bool>("IsRightAnswer");
+
+                    b.Property<string>("ItemId")
+                        .HasMaxLength(64);
+
+                    b.Property<int>("QuizBlockMaxScore");
+
+                    b.Property<int>("QuizBlockScore");
+
+                    b.Property<int>("SubmissionId");
+
+                    b.Property<string>("Text")
+                        .HasMaxLength(8192);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemId");
+
+                    b.HasIndex("SubmissionId", "BlockId");
+
+                    b.ToTable("UserQuizAnswers");
+                });
+
+            modelBuilder.Entity("Database.Models.Quizzes.UserQuizSubmission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CourseId")
+                        .IsRequired()
+                        .HasMaxLength(40);
+
+                    b.Property<Guid>("SlideId");
+
+                    b.Property<DateTime>("Timestamp");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(40);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("CourseId", "SlideId");
+
+                    b.HasIndex("CourseId", "SlideId", "Timestamp");
+
+                    b.HasIndex("CourseId", "SlideId", "UserId");
+
+                    b.ToTable("UserQuizSubmissions");
                 });
 
             modelBuilder.Entity("Database.Models.RestoreRequest", b =>
@@ -1419,56 +1478,6 @@ namespace Database.Migrations
                     b.ToTable("UserQuestions");
                 });
 
-            modelBuilder.Entity("Database.Models.UserQuiz", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("CourseId")
-                        .IsRequired()
-                        .HasMaxLength(64);
-
-                    b.Property<bool>("IsRightAnswer");
-
-                    b.Property<string>("ItemId")
-                        .HasMaxLength(64);
-
-                    b.Property<int>("QuizBlockMaxScore");
-
-                    b.Property<int>("QuizBlockScore");
-
-                    b.Property<string>("QuizId")
-                        .HasMaxLength(64);
-
-                    b.Property<Guid>("SlideId");
-
-                    b.Property<string>("Text")
-                        .HasMaxLength(8192);
-
-                    b.Property<DateTime>("Timestamp");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(64);
-
-                    b.Property<bool>("isDropped");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ItemId");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("SlideId", "Timestamp");
-
-                    b.HasIndex("CourseId", "SlideId", "QuizId");
-
-                    b.HasIndex("CourseId", "UserId", "SlideId", "isDropped", "QuizId", "ItemId");
-
-                    b.ToTable("UserQuizs");
-                });
-
             modelBuilder.Entity("Database.Models.Visit", b =>
                 {
                     b.Property<int>("Id")
@@ -1690,8 +1699,6 @@ namespace Database.Migrations
 
                     b.HasIndex("AddedUserId");
 
-                    b.ToTable("AddedInstructorNotification");
-
                     b.HasDiscriminator().HasValue("AddedInstructorNotification");
                 });
 
@@ -1702,8 +1709,6 @@ namespace Database.Migrations
                     b.Property<int>("ProcessId");
 
                     b.HasIndex("ProcessId");
-
-                    b.ToTable("CourseExportedToStepikNotification");
 
                     b.HasDiscriminator().HasValue("CourseExportedToStepikNotification");
                 });
@@ -1717,8 +1722,6 @@ namespace Database.Migrations
 
                     b.HasIndex("GroupId");
 
-                    b.ToTable("CreatedGroupNotification");
-
                     b.HasDiscriminator().HasValue("CreatedGroupNotification");
                 });
 
@@ -1729,8 +1732,6 @@ namespace Database.Migrations
                     b.Property<int>("AccessId");
 
                     b.HasIndex("AccessId");
-
-                    b.ToTable("GrantedAccessToGroupNotification");
 
                     b.HasDiscriminator().HasValue("GrantedAccessToGroupNotification");
                 });
@@ -1747,8 +1748,6 @@ namespace Database.Migrations
                     b.HasIndex("GroupId");
 
                     b.HasIndex("UserId");
-
-                    b.ToTable("GroupMemberHasBeenRemovedNotification");
 
                     b.HasDiscriminator().HasValue("GroupMemberHasBeenRemovedNotification");
                 });
@@ -1769,8 +1768,6 @@ namespace Database.Migrations
                     b.HasIndex("GroupId")
                         .HasName("IX_Notifications_GroupId1");
 
-                    b.ToTable("GroupMembersHaveBeenAddedNotification");
-
                     b.HasDiscriminator().HasValue("GroupMembersHaveBeenAddedNotification");
                 });
 
@@ -1790,8 +1787,6 @@ namespace Database.Migrations
                     b.HasIndex("GroupId")
                         .HasName("IX_Notifications_GroupId2");
 
-                    b.ToTable("GroupMembersHaveBeenRemovedNotification");
-
                     b.HasDiscriminator().HasValue("GroupMembersHaveBeenRemovedNotification");
                 });
 
@@ -1801,8 +1796,6 @@ namespace Database.Migrations
 
                     b.Property<string>("Text")
                         .IsRequired();
-
-                    b.ToTable("InstructorMessageNotification");
 
                     b.HasDiscriminator().HasValue("InstructorMessageNotification");
                 });
@@ -1822,8 +1815,6 @@ namespace Database.Migrations
 
                     b.HasIndex("JoinedUserId");
 
-                    b.ToTable("JoinedToYourGroupNotification");
-
                     b.HasDiscriminator().HasValue("JoinedToYourGroupNotification");
                 });
 
@@ -1842,8 +1833,6 @@ namespace Database.Migrations
 
                     b.HasIndex("LikedUserId");
 
-                    b.ToTable("LikedYourCommentNotification");
-
                     b.HasDiscriminator().HasValue("LikedYourCommentNotification");
                 });
 
@@ -1857,8 +1846,6 @@ namespace Database.Migrations
                     b.HasIndex("CommentId")
                         .HasName("IX_Notifications_CommentId11");
 
-                    b.ToTable("NewCommentForInstructorsOnlyNotification");
-
                     b.HasDiscriminator().HasValue("NewCommentForInstructorsOnlyNotification");
                 });
 
@@ -1870,8 +1857,6 @@ namespace Database.Migrations
                         .HasColumnName("CommentId1");
 
                     b.HasIndex("CommentId");
-
-                    b.ToTable("NewCommentNotification");
 
                     b.HasDiscriminator().HasValue("NewCommentNotification");
                 });
@@ -1886,8 +1871,6 @@ namespace Database.Migrations
 
                     b.HasIndex("CheckingId");
 
-                    b.ToTable("PassedManualExerciseCheckingNotification");
-
                     b.HasDiscriminator().HasValue("PassedManualExerciseCheckingNotification");
                 });
 
@@ -1900,8 +1883,6 @@ namespace Database.Migrations
 
                     b.HasIndex("CheckingId");
 
-                    b.ToTable("PassedManualQuizCheckingNotification");
-
                     b.HasDiscriminator().HasValue("PassedManualQuizCheckingNotification");
                 });
 
@@ -1912,8 +1893,6 @@ namespace Database.Migrations
                     b.Property<Guid>("CourseVersionId");
 
                     b.HasIndex("CourseVersionId");
-
-                    b.ToTable("PublishedPackageNotification");
 
                     b.HasDiscriminator().HasValue("PublishedPackageNotification");
                 });
@@ -1926,8 +1905,6 @@ namespace Database.Migrations
 
                     b.HasIndex("ScoreId");
 
-                    b.ToTable("ReceivedAdditionalScoreNotification");
-
                     b.HasDiscriminator().HasValue("ReceivedAdditionalScoreNotification");
                 });
 
@@ -1938,8 +1915,6 @@ namespace Database.Migrations
                     b.Property<Guid>("CertificateId");
 
                     b.HasIndex("CertificateId");
-
-                    b.ToTable("ReceivedCertificateNotification");
 
                     b.HasDiscriminator().HasValue("ReceivedCertificateNotification");
                 });
@@ -1952,8 +1927,6 @@ namespace Database.Migrations
                         .HasColumnName("CommentId");
 
                     b.HasIndex("CommentId");
-
-                    b.ToTable("ReceivedCommentToCodeReviewNotification");
 
                     b.HasDiscriminator().HasValue("ReceivedCommentToCodeReviewNotification");
                 });
@@ -1971,8 +1944,6 @@ namespace Database.Migrations
 
                     b.HasIndex("ParentCommentId");
 
-                    b.ToTable("RepliedToYourCommentNotification");
-
                     b.HasDiscriminator().HasValue("RepliedToYourCommentNotification");
                 });
 
@@ -1985,8 +1956,6 @@ namespace Database.Migrations
 
                     b.HasIndex("AccessId");
 
-                    b.ToTable("RevokedAccessToGroupNotification");
-
                     b.HasDiscriminator().HasValue("RevokedAccessToGroupNotification");
                 });
 
@@ -1997,8 +1966,6 @@ namespace Database.Migrations
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasColumnName("SystemMessageNotification_Text");
-
-                    b.ToTable("SystemMessageNotification");
 
                     b.HasDiscriminator().HasValue("SystemMessageNotification");
                 });
@@ -2012,17 +1979,12 @@ namespace Database.Migrations
 
                     b.HasIndex("CourseVersionId");
 
-                    b.ToTable("UploadedPackageNotification");
-
                     b.HasDiscriminator().HasValue("UploadedPackageNotification");
                 });
 
             modelBuilder.Entity("Database.Models.FeedNotificationTransport", b =>
                 {
                     b.HasBaseType("Database.Models.NotificationTransport");
-
-
-                    b.ToTable("FeedNotificationTransport");
 
                     b.HasDiscriminator().HasValue("FeedNotificationTransport");
                 });
@@ -2031,18 +1993,12 @@ namespace Database.Migrations
                 {
                     b.HasBaseType("Database.Models.NotificationTransport");
 
-
-                    b.ToTable("MailNotificationTransport");
-
                     b.HasDiscriminator().HasValue("MailNotificationTransport");
                 });
 
             modelBuilder.Entity("Database.Models.TelegramNotificationTransport", b =>
                 {
                     b.HasBaseType("Database.Models.NotificationTransport");
-
-
-                    b.ToTable("TelegramNotificationTransport");
 
                     b.HasDiscriminator().HasValue("TelegramNotificationTransport");
                 });
@@ -2078,6 +2034,11 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Database.Models.AutomaticQuizChecking", b =>
                 {
+                    b.HasOne("Database.Models.Quizzes.UserQuizSubmission", "Submission")
+                        .WithOne("AutomaticChecking")
+                        .HasForeignKey("Database.Models.AutomaticQuizChecking", "Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -2102,7 +2063,7 @@ namespace Database.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
-            modelBuilder.Entity("Database.Models.Comment", b =>
+            modelBuilder.Entity("Database.Models.Comments.Comment", b =>
                 {
                     b.HasOne("Database.Models.ApplicationUser", "Author")
                         .WithMany()
@@ -2110,9 +2071,9 @@ namespace Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Database.Models.CommentLike", b =>
+            modelBuilder.Entity("Database.Models.Comments.CommentLike", b =>
                 {
-                    b.HasOne("Database.Models.Comment", "Comment")
+                    b.HasOne("Database.Models.Comments.Comment", "Comment")
                         .WithMany("Likes")
                         .HasForeignKey("CommentId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -2307,6 +2268,11 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Database.Models.ManualQuizChecking", b =>
                 {
+                    b.HasOne("Database.Models.Quizzes.UserQuizSubmission", "Submission")
+                        .WithOne("ManualChecking")
+                        .HasForeignKey("Database.Models.ManualQuizChecking", "Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Database.Models.ApplicationUser", "LockedBy")
                         .WithMany()
                         .HasForeignKey("LockedById");
@@ -2351,6 +2317,22 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.NotificationTransport", "NotificationTransport")
                         .WithMany()
                         .HasForeignKey("NotificationTransportId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Database.Models.Quizzes.UserQuizAnswer", b =>
+                {
+                    b.HasOne("Database.Models.Quizzes.UserQuizSubmission", "Submission")
+                        .WithMany()
+                        .HasForeignKey("SubmissionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Database.Models.Quizzes.UserQuizSubmission", b =>
+                {
+                    b.HasOne("Database.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
@@ -2425,14 +2407,6 @@ namespace Database.Migrations
                 });
 
             modelBuilder.Entity("Database.Models.UserQuestion", b =>
-                {
-                    b.HasOne("Database.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("Database.Models.UserQuiz", b =>
                 {
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
@@ -2592,7 +2566,7 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Database.Models.LikedYourCommentNotification", b =>
                 {
-                    b.HasOne("Database.Models.Comment", "Comment")
+                    b.HasOne("Database.Models.Comments.Comment", "Comment")
                         .WithMany()
                         .HasForeignKey("CommentId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -2605,7 +2579,7 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Database.Models.NewCommentForInstructorsOnlyNotification", b =>
                 {
-                    b.HasOne("Database.Models.Comment", "Comment")
+                    b.HasOne("Database.Models.Comments.Comment", "Comment")
                         .WithMany()
                         .HasForeignKey("CommentId")
                         .HasConstraintName("FK_Notifications_Comments_CommentId11")
@@ -2614,7 +2588,7 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Database.Models.NewCommentNotification", b =>
                 {
-                    b.HasOne("Database.Models.Comment", "Comment")
+                    b.HasOne("Database.Models.Comments.Comment", "Comment")
                         .WithMany()
                         .HasForeignKey("CommentId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -2669,12 +2643,12 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Database.Models.RepliedToYourCommentNotification", b =>
                 {
-                    b.HasOne("Database.Models.Comment", "Comment")
+                    b.HasOne("Database.Models.Comments.Comment", "Comment")
                         .WithMany()
                         .HasForeignKey("CommentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Database.Models.Comment", "ParentComment")
+                    b.HasOne("Database.Models.Comments.Comment", "ParentComment")
                         .WithMany()
                         .HasForeignKey("ParentCommentId")
                         .OnDelete(DeleteBehavior.Restrict);

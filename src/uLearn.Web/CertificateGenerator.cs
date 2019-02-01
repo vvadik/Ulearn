@@ -188,7 +188,7 @@ namespace uLearn.Web
 			content = content.Replace($"%{parameterName}|in_html%", htmlEncodedValue);
 			content = content.Replace($"%{parameterName}%", htmlEncodedValue);
 
-			var quotesEncodedValue = parameterValue.Replace(@"\", @"\\").Replace("\"", "\\\"").Replace("'", @"\'");
+			var quotesEncodedValue = parameterValue.EncodeQuotes();
 			content = content.Replace($"%{parameterName}|in_quotes%", quotesEncodedValue);
 
 			return content;
@@ -263,8 +263,8 @@ namespace uLearn.Web
 
 		private string ReplaceQuizzesBuiltinParameters(string content, Certificate certificate, Course course)
 		{
-			var passedQuizzesCount = userQuizzesRepo.GetIdOfQuizPassedSlides(course.Id, certificate.UserId).Count;
-			var scoredMaximumQuizzesCount = userQuizzesRepo.GetIdOfQuizSlidesScoredMaximum(course.Id, certificate.UserId).Count;
+			var passedQuizzesCount = userQuizzesRepo.GetPassedSlideIds(course.Id, certificate.UserId).Count;
+			var scoredMaximumQuizzesCount = userQuizzesRepo.GetPassedSlideIdsWithMaximumScore(course.Id, certificate.UserId).Count;
 
 			content = SubstituteOneParameter(content, "quizzes.passed", passedQuizzesCount.ToString());
 			content = SubstituteOneParameter(content, "quizzes.passed_maxscore", scoredMaximumQuizzesCount.ToString());

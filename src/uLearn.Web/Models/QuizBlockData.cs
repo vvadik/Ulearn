@@ -23,7 +23,7 @@ namespace uLearn.Web.Models
 			DebugView = debugView;
 		}
 
-		private bool TriesFinished => QuizModel.TryNumber + 1 > QuizModel.MaxTriesCount; 
+		private bool AttemptsLimitExceeded => QuizModel.QuizState.UsedAttemptsCount + 1 > QuizModel.MaxAttemptsCount; 
 
 		public bool ShowCorrectAnswers
 		{
@@ -31,11 +31,21 @@ namespace uLearn.Web.Models
 			{
 				if (QuizModel.Slide.ManualChecking)
 					return false;
-				if (QuizState == QuizState.Total)
-					return true;
-				if (QuizState == QuizState.Subtotal)
-					return TriesFinished || IsInstructor;
+				if (QuizState.Status == QuizStatus.Sent)
+					return QuizState.IsScoredMaximum || AttemptsLimitExceeded || IsInstructor;
 				return false;
+			}
+		}
+
+		public bool ShowUserAnswers
+		{
+			get
+			{
+				if (QuizState.Status == QuizStatus.ReadyToSend)
+					/* Show previous user's answers in slides with enabled manual checking */
+					return QuizModel.Slide.ManualChecking;
+				
+				return true;
 			}
 		}
 

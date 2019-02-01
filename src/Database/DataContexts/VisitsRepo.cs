@@ -21,7 +21,7 @@ namespace Database.DataContexts
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
 		}
 
-		public async Task AddVisit(string courseId, Guid slideId, string userId, string ipAddress)
+		public Task AddVisit(string courseId, Guid slideId, string userId, string ipAddress)
 		{
 			var visit = FindVisit(courseId, slideId, userId);
 			if (visit == null)
@@ -37,7 +37,7 @@ namespace Database.DataContexts
 			}
 			else if (visit.IpAddress != ipAddress)
 				visit.IpAddress = ipAddress;
-			await db.SaveChangesAsync();
+			return db.SaveChangesAsync();
 		}
 
 		public int GetVisitsCount(string courseId, Guid slideId)
@@ -65,14 +65,14 @@ namespace Database.DataContexts
 			return db.Visits.Any(v => v.CourseId == courseId && v.UserId == userId);
 		}
 
-		public async Task UpdateScoreForVisit(string courseId, Guid slideId, string userId)
+		public Task UpdateScoreForVisit(string courseId, Guid slideId, string userId)
 		{
 			var newScore = slideCheckingsRepo.GetManualScoreForSlide(courseId, slideId, userId) +
 							slideCheckingsRepo.GetAutomaticScoreForSlide(courseId, slideId, userId);
 			var isPassed = slideCheckingsRepo.IsSlidePassed(courseId, slideId, userId);
 			log.Info($"Обновляю количество баллов пользователя {userId} за слайд {slideId} в курсе \"{courseId}\". " +
 					 $"Новое количество баллов: {newScore}, слайд пройден: {isPassed}");
-			await UpdateAttempts(courseId, slideId, userId, visit =>
+			return UpdateAttempts(courseId, slideId, userId, visit =>
 			{
 				visit.Score = newScore;
 				visit.IsPassed = isPassed;
@@ -87,12 +87,12 @@ namespace Database.DataContexts
 			if (visit == null)
 				return;
 			action(visit);
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
-		public async Task RemoveAttempts(string courseId, Guid slideId, string userId)
+		public Task RemoveAttempts(string courseId, Guid slideId, string userId)
 		{
-			await UpdateAttempts(courseId, slideId, userId, visit =>
+			return UpdateAttempts(courseId, slideId, userId, visit =>
 			{
 				visit.AttemptsCount = 0;
 				visit.Score = 0;
@@ -119,9 +119,9 @@ namespace Database.DataContexts
 				.ToList();
 		}
 
-		public async Task MarkVisitsAsWithManualChecking(string courseId, Guid slideId, string userId)
+		public Task MarkVisitsAsWithManualChecking(string courseId, Guid slideId, string userId)
 		{
-			await UpdateAttempts(courseId, slideId, userId, visit => { visit.HasManualChecking = true; });
+			 return UpdateAttempts(courseId, slideId, userId, visit => { visit.HasManualChecking = true; });
 		}
 
 		public int GetScore(string courseId, Guid slideId, string userId)

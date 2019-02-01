@@ -14,8 +14,9 @@ import GroupStudents from "./GroupStudents/GroupStudents";
 import InviteBlock from "./InviteBlock/InviteBlock";
 import Profile from './Profile';
 import getGenderForm from "../../../../utils/getGenderForm";
-
-import styles from './style.less';
+import styles from './groupMembers.less';
+import Toast from "@skbkontur/react-ui/components/Toast/Toast";
+import {Mobile, NotMobile} from "../../../../utils/responsive";
 
 class GroupMembers extends Component {
 
@@ -165,23 +166,39 @@ class GroupMembers extends Component {
 	renderKebab(item) {
 		const { group, role, userId } = this.props;
 
-		return (
-			<Kebab size="large">
-				<MenuItem onClick={() => this.onChangeOwner(item.user)}>
-					<Gapped gap={5}>
-						<Icon name="User" />
-						Сделать владельцем
-					</Gapped>
-				</MenuItem>
-				{((group.owner.id === userId) || (role === 'courseAdmin') || (item.granted_by.id === userId)) &&
-				<MenuItem onClick={() => this.onRemoveTeacher(item.user)}>
+		let menuItems = [
+			<MenuItem onClick={() => this.onChangeOwner(item.user)} key="changeOwner">
+				<Gapped gap={5}>
+					<Icon name="User" />
+					Сделать владельцем
+				</Gapped>
+			</MenuItem>
+		];
+		if (group.owner.id === userId || role === 'courseAdmin' || item.granted_by.id === userId){
+			menuItems.push(
+				<MenuItem onClick={() => this.onRemoveTeacher(item.user)} key="removeTeacher">
 					<Gapped gap={5}>
 						<Icon name="Delete"/>
 						Забрать доступ
 					</Gapped>
 				</MenuItem>
-				}
-			</Kebab>
+			);
+		}
+
+		/* TODO (andgein): Change to size="medium" inside of <Mobile> after updating to the new react-ui version */
+		return (
+			<React.Fragment>
+				<Mobile>
+					<Kebab size="large" positions={["left top"]} disableAnimations={true}>
+						{ menuItems }
+					</Kebab>
+				</Mobile>
+				<NotMobile>
+					<Kebab size="large" positions={["bottom right"]} disableAnimations={false}>
+						{ menuItems }
+					</Kebab>
+				</NotMobile>
+			</React.Fragment>
 		)
 	}
 
@@ -266,7 +283,10 @@ class GroupMembers extends Component {
 		});
 
 		api.groups.deleteStudents(group.id, students)
-			.catch(console.error);
+			.catch(console.error)
+			.then(() => {
+				Toast.push("Студенты исключены из группы");
+			});
 	};
 }
 

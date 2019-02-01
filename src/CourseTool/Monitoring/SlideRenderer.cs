@@ -128,7 +128,7 @@ namespace uLearn.CourseTool.Monitoring
 			yield return "styles/jsdifflib.css";
 			yield return "styles/katex.min.css";
 			yield return "styles/show-hint.css";
-			yield return "styles/site.css";
+			yield return "styles/main.css";
 			yield return "styles/ulearn.css";
 		}
 

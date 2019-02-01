@@ -3,7 +3,7 @@ import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 import GroupMembers from './GroupMembers';
 
-import './style.less';
+import './groupMembers.less';
 
 storiesOf('Settings/GroupMembers', module)
 	.add('default', () => (

@@ -4,7 +4,7 @@ import api from "../../../../../api/index";
 import ComboBox from "@skbkontur/react-ui/components/ComboBox/ComboBox";
 import Avatar from "../../../../common/Avatar/Avatar";
 
-import styles from './style.less';
+import styles from './comboboxInstructorsSearch.less';
 
 class ComboboxInstructorsSearch extends Component {
 	state = { query: '' };
@@ -71,7 +71,7 @@ class ComboboxInstructorsSearch extends Component {
 	renderNotFound = () => {
 		const msg = this.state.query
 			? 'В этом курсе нет преподавателей c таким именем'
-		    : 'В этом курсе нет преподавателей';
+		    : 'В этом курсе больше нет преподавателей';
 
 		return <span>{msg}</span>;
 	};

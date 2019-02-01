@@ -12,8 +12,8 @@ import Link from "@skbkontur/react-ui/components/Link/Link";
 import GroupMembers from "../../../components/groups/GroupSettingsPage/GroupMembers/GroupMembers";
 import GroupSettings from "../../../components/groups/GroupSettingsPage/GroupSettings/GroupSettings";
 import Error404 from "../../../components/common/Error/Error404.js";
-
 import styles from "./groupPage.less";
+import { Page } from "../../index";
 
 class GroupPage extends Component {
 
@@ -63,11 +63,11 @@ class GroupPage extends Component {
 	loadGroupScores = (groupId) => {
 		api.groups.getGroupScores(groupId)
 			.then(json => {
-			let scores = json.scores;
-			this.setState({
-				scores: scores,
-			});
-		})
+				let scores = json.scores;
+				this.setState({
+					scores: scores,
+				});
+			})
 			.catch(console.error)
 			.finally(() =>
 				this.setState({
@@ -81,14 +81,13 @@ class GroupPage extends Component {
 		let courseId = this.props.match.params.courseId.toLowerCase();
 		const { groupId, groupPage } = this.props.match.params;
 
-		if(this.state.status === "error") {
+		if (this.state.status === "error") {
 			return <Error404 />;
 		}
 
 		if (!groupPage) {
 			return <Redirect to={`/${courseId}/groups/${groupId}/settings`} />
 		}
-
 
 		let rolesByCourse = this.props.account.roleByCourse;
 		let systemAccesses = this.props.account.systemAccesses;
@@ -103,28 +102,26 @@ class GroupPage extends Component {
 		let userId = this.props.account.id;
 
 		return (
-			<div className={styles.wrapper}>
+			<Page>
 				<Helmet defer={true}>
 					<title>{`Группа ${group.name}`}</title>
 				</Helmet>
-				<div className={styles["content-wrapper"]}>
-					{ this.renderHeader() }
-					<div className={styles.content}>
-						{ groupPage === "settings" &&
-							this.renderSettings() }
-						{ groupPage === "members" &&
-							<GroupMembers
-								courseId={courseId}
-								userId={userId}
-								role={courseRole}
-								isSysAdmin={this.props.account.isSystemAdministrator}
-								systemAccesses={systemAccesses}
-								group={group}
-								onChangeGroupOwner={this.onChangeGroupOwner} />
-						}
-					</div>
+				{ this.renderHeader() }
+				<div className={styles.content}>
+					{ groupPage === "settings" &&
+						this.renderSettings() }
+					{ groupPage === "members" &&
+						<GroupMembers
+							courseId={courseId}
+							userId={userId}
+							role={courseRole}
+							isSysAdmin={this.props.account.isSystemAdministrator}
+							systemAccesses={systemAccesses}
+							group={group}
+							onChangeGroupOwner={this.onChangeGroupOwner} />
+					}
 				</div>
-			</div>
+			</Page>
 		)
 	}
 
@@ -146,11 +143,11 @@ class GroupPage extends Component {
 						</Link>
 					</div>
 				</div>
-				<h2 className={styles["group-name"]}>{ group.name }</h2>
+				<h2 className={styles["group-name"]}>{ group.name ? group.name : " " }</h2>
 				<div className={styles["tabs-container"]}>
 					<Tabs value={groupPage} onChange={this.onChangeTab}>
 						<Tabs.Tab id="settings">Настройки</Tabs.Tab>
-						<Tabs.Tab id="members">Участники</Tabs.Tab>
+						<Tabs.Tab id="members">Преподаватели и студенты</Tabs.Tab>
 					</Tabs>
 				</div>
 			</header>
@@ -262,7 +259,7 @@ class GroupPage extends Component {
 			.all([saveGroup, saveScores])
 			.then(([group, scores]) => {
 				this.setState({ group });
-				Toast.push('Настройки сохранены');
+				Toast.push('Настройки группы сохранены');
 			})
 			.catch(console.error)
 			.finally(() => {
@@ -298,7 +295,3 @@ GroupPage.propTypes = {
 GroupPage = connect(GroupPage.mapStateToProps, GroupPage.mapDispatchToProps)(GroupPage);
 
 export default withRouter(GroupPage);
-
-
-
-

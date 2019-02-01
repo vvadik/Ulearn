@@ -6,7 +6,7 @@ import Input from '@skbkontur/react-ui/components/Input/Input';
 import Button from '@skbkontur/react-ui/components/Button/Button';
 import Tooltip from '@skbkontur/react-ui/components/Tooltip/Tooltip';
 
-import styles from "./style.less";
+import styles from "./createGroupModal.less";
 
 class CreateGroupModal extends Component {
 

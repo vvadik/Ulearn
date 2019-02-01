@@ -48,6 +48,8 @@ namespace Ulearn.Web.Api.Models.Binders
 				return Task.CompletedTask;
 			
 			var model = courseManager.FindCourse(value);
+			if (model == null)
+				bindingContext.ModelState.TryAddModelError(modelName, $"Course {value} not found");
 			bindingContext.Result = model == null ? ModelBindingResult.Failed() : ModelBindingResult.Success(model);
 			return Task.CompletedTask;
 		}
