@@ -20,6 +20,7 @@ function account(state = initialAccountState, action) {
                 newState.firstName = action.firstName;
                 newState.lastName = action.lastName;
                 newState.visibleName = action.visibleName;
+                newState.avatarUrl = action.avatarUrl;
                 newState.accountProblems = action.accountProblems;
                 newState.systemAccesses = action.systemAccesses;
             }
@@ -46,6 +47,7 @@ function account(state = initialAccountState, action) {
 const initialCoursesState = {
     courseById: {},
     currentCourseId: undefined,
+	currentSlideId: undefined,
 };
 
 function courses(state = initialCoursesState, action) {
