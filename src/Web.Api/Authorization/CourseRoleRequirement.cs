@@ -19,17 +19,15 @@ namespace Ulearn.Web.Api.Authorization
 		}
 	}
 	
-	public class CourseRoleAuthorizationHandler : AuthorizationHandler<CourseRoleRequirement>
+	public class CourseRoleAuthorizationHandler : BaseCourseAuthorizationHandler<CourseRoleRequirement>
 	{
 		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IUsersRepo usersRepo;
-		private readonly ILogger logger;
 
-		public CourseRoleAuthorizationHandler(ICourseRolesRepo courseRolesRepo, IUsersRepo usersRepo, ILogger logger)
+		public CourseRoleAuthorizationHandler(ICourseRolesRepo courseRolesRepo, IUsersRepo usersRepo, ILogger logger) : base(logger)
 		{
 			this.courseRolesRepo = courseRolesRepo;
 			this.usersRepo = usersRepo;
-			this.logger = logger;
 		}
 
 		protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, CourseRoleRequirement requirement)
@@ -41,11 +39,10 @@ namespace Ulearn.Web.Api.Authorization
 				context.Fail();
 				return;
 			}
-			
-			var routeData = mvcContext.RouteData;
-			if (!(routeData.Values["courseId"] is string courseId))
+
+			var courseId = await GetCourseIdFromRequestAsync(mvcContext).ConfigureAwait(false);
+			if (string.IsNullOrEmpty(courseId))
 			{
-				logger.Error("Can't find `courseId` parameter in route data for checking course role requirement.");
 				context.Fail();
 				return;
 			}

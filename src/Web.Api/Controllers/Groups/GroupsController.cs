@@ -18,7 +18,7 @@ using ILogger = Serilog.ILogger;
 
 namespace Ulearn.Web.Api.Controllers.Groups
 {
-	[Route("/groups")]
+	[Route("/groups/")]
 	public class GroupsController : BaseGroupController
 	{
 		private readonly IGroupsRepo groupsRepo;
@@ -38,26 +38,16 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// <summary>
 		/// Список неархивных групп в курсе
 		/// </summary>
-		[HttpGet("in/{courseId}")]
+		[HttpGet]
 		[Authorize(Policy = "Instructors")]
-		public async Task<ActionResult<GroupsListResponse>> GroupsList(ICourse course, [FromQuery] GroupsListParameters parameters)
+		public async Task<ActionResult<GroupsListResponse>> GroupsList([FromQuery] GroupsListParameters parameters)
 		{
-			return await GetGroupsListResponseAsync(course, parameters).ConfigureAwait(false);
-		}
-
-		/// <summary>
-		/// Список архивных группу в курсе
-		/// </summary>
-		[HttpGet("in/{courseId}/archived")]
-		[Authorize(Policy = "Instructors")]
-		public async Task<ActionResult<GroupsListResponse>> ArchivedGroupsList(ICourse course, [FromQuery] GroupsListParameters parameters)
-		{
-			return await GetGroupsListResponseAsync(course, parameters, onlyArchived: true).ConfigureAwait(false);
+			return await GetGroupsListResponseAsync(parameters).ConfigureAwait(false);
 		}
 		
-		private async Task<GroupsListResponse> GetGroupsListResponseAsync(ICourse course, GroupsListParameters parameters, bool onlyArchived=false)
+		private async Task<GroupsListResponse> GetGroupsListResponseAsync(GroupsListParameters parameters)
 		{
-			var groups = await groupAccessesRepo.GetAvailableForUserGroupsAsync(course.Id, UserId, onlyArchived).ConfigureAwait(false);
+			var groups = await groupAccessesRepo.GetAvailableForUserGroupsAsync(parameters.CourseId, UserId, parameters.Archived).ConfigureAwait(false);
 			/* Order groups by (name, createTime) and get one page of data (offset...offset+count) */
 			var groupIds = groups.OrderBy(g => g.Name, StringComparer.InvariantCultureIgnoreCase).ThenBy(g => g.CreateTime)
 				.Skip(parameters.Offset)
@@ -94,13 +84,13 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// Создать новую группу в курсе
 		/// </summary>
 		/// <param name="parameters">Название новой группы</param>
-		[HttpPost("in/{courseId}")]
+		[HttpPost]
 		[Authorize(Policy = "Instructors")]
 		[ProducesResponseType((int) HttpStatusCode.Created)]
-		public async Task<ActionResult<CreateGroupResponse>> CreateGroup([FromRoute] Course course, CreateGroupParameters parameters)
+		public async Task<ActionResult<CreateGroupResponse>> CreateGroup(CreateGroupParameters parameters)
 		{
 			var ownerId = User.GetUserId();
-			var group = await groupsRepo.CreateGroupAsync(course.Id, parameters.Name, ownerId).ConfigureAwait(false);
+			var group = await groupsRepo.CreateGroupAsync(parameters.CourseId, parameters.Name, ownerId).ConfigureAwait(false);
 
 			var url = Url.Action(new UrlActionContext { Action = nameof(GroupController.Group), Controller = "Group", Values = new { groupId = group.Id }});
 			return Created(url, new CreateGroupResponse

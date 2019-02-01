@@ -14,7 +14,7 @@ using Ulearn.Web.Api.Models.Responses.Comments;
 
 namespace Ulearn.Web.Api.Controllers.Comments
 {
-	[Route("comments/policies/{courseId}")]
+	[Route("commentPolicies/{courseId}")]
 	public class CommentPoliciesController : BaseCommentController
 	{
 		private readonly ICommentPoliciesRepo commentPoliciesRepo;

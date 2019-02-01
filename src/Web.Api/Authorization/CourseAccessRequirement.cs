@@ -20,20 +20,17 @@ namespace Ulearn.Web.Api.Authorization
 		}
 	}
 	
-	/* TODO (andgein): extract common logic to BaseCourseHandler */
-	public class CourseAccessAuthorizationHandler : AuthorizationHandler<CourseAccessRequirement>
+	public class CourseAccessAuthorizationHandler : BaseCourseAuthorizationHandler<CourseAccessRequirement>
 	{
-		private readonly ILogger logger;
 		private readonly ICoursesRepo coursesRepo;
 		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IUsersRepo usersRepo;
 
-		public CourseAccessAuthorizationHandler(ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo, IUsersRepo usersRepo, ILogger logger)
+		public CourseAccessAuthorizationHandler(ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo, IUsersRepo usersRepo, ILogger logger) : base(logger)
 		{
 			this.coursesRepo = coursesRepo;
 			this.courseRolesRepo = courseRolesRepo;
 			this.usersRepo = usersRepo;
-			this.logger = logger;
 		}
 
 		protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, CourseAccessRequirement requirement)
@@ -46,10 +43,9 @@ namespace Ulearn.Web.Api.Authorization
 				return;
 			}
 			
-			var routeData = mvcContext.RouteData;
-			if (!(routeData.Values["courseId"] is string courseId))
+			var courseId = await GetCourseIdFromRequestAsync(mvcContext).ConfigureAwait(false);
+			if (string.IsNullOrEmpty(courseId))
 			{
-				logger.Error("Can't find `courseId` parameter in route data for checking course access requirement.");
 				context.Fail();
 				return;
 			}
