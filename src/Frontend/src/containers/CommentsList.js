@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import connect from "react-redux/es/connect/connect";
 import PropTypes from "prop-types";
-import api from "../../api/index";
+import api from "./../api/index";
 import Loader from "@skbkontur/react-ui/components/Loader/Loader";
-import CommentSendForm from "../CommentSendForm";
+import CommentSendForm from "../components/comments/CommentSendForm";
+import {COURSES__COURSE_ENTERED} from "../consts/actions";
 
-import styles from "../comment.less";
+import styles from "../components/comments/comment.less";
 
 class CommentsList extends Component {
 	state = {
@@ -13,19 +14,9 @@ class CommentsList extends Component {
 		loading: false,
 	};
 
-	componentDidMount() {
-		const slideId = this.props.match.params.slideId;
-
-		this.props.enterToCourse(this.courseId, slideId);
-		this.loadComments(this.courseId, slideId, this.isInstructor);
-	}
-
-	get courseId() {
-		return this.props.match.params.courseId.toLowerCase();
-	}
-
 	get role() {
-		return this.props.account.roleByCourse[this.courseId];
+		const courseId = this.props.enterToCourse.courseId;
+		return this.props.account.roleByCourse[courseId];
 	}
 
 	_instructor = null;
@@ -35,6 +26,13 @@ class CommentsList extends Component {
 				['courseAdmin', 'instructor'].includes(this.role);
 		}
 		return this._instructor;
+	}
+
+	componentDidMount() {
+		const slideId = this.props.match.params.slideId;
+
+		this.props.enterToCourse(this.courseId, slideId);
+		this.loadComments(this.courseId, slideId, this.isInstructor);
 	}
 
 	loadComments = (courseId, slideId) => {
@@ -57,27 +55,38 @@ class CommentsList extends Component {
 		return (
 			<Loader active={this.state.loading}>
 				<h1 className={styles.header}>Комментарии</h1>
-				<CommentSendForm />
-				<div>Здксь будет список комментариев</div>
+				<CommentSendForm onSubmit={this.onSubmit}/>
+				<div>Здесь будет список комментариев</div>
 			</Loader>
 		)
 	}
 
-	static mapStateToProps(state) {
-		return {
-			account: state.account,
-		}
-	};
+	onSubmit() {
+		const text = this.state.text;
+		const replyTo = 0;
+		const { slideId, courseId } = this.props.enterToCourse.slideId;
 
-	static mapDispatchToProps(dispatch) {
-		return {
-			enterToCourse: (courseId, slideId) => dispatch({
-				type: 'COURSES__COURSE_ENTERED',
-				courseId: courseId,
-				slideId: slideId,
-			}),
-		}
-	};
+		this.setState({ loading: true });
+		api.comments.addComment(courseId, slideId, text, replyTo, this.isInstructor)
+			.catch(console.error)
+			.finally(this.setState({ loading: false }));
+	}
+}
+
+function mapStateToProps(state) {
+	return {
+		account: state.account,
+	}
+}
+
+function mapDispatchToProps(dispatch, state) {
+	return {
+		enterToCourse: (text) => dispatch({
+			type: COURSES__COURSE_ENTERED,
+			courseId: state.courseId,
+			slideId: state.slideId,
+		}),
+	}
 }
 
 CommentsList.propTypes = {
@@ -86,5 +95,5 @@ CommentsList.propTypes = {
 	enterToCourse: PropTypes.func,
 };
 
-CommentsList = connect(CommentsList.mapStateToProps, CommentsList.mapDispatchToProps)(CommentsList);
+CommentsList = connect(mapStateToProps, mapDispatchToProps)(CommentsList);
 export default CommentsList;
