@@ -2,6 +2,8 @@
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Ulearn.Core.CSharp;
+using Ulearn.Core.CSharp.Validators;
 
 namespace uLearn.CSharp.Validators
 {
@@ -27,16 +29,12 @@ namespace uLearn.CSharp.Validators
 			{
 				case ReturnStatementSyntax _:
 				case ThrowStatementSyntax _:
-					yield return new SolutionStyleError(StyleErrorType.RedundantElse01, correspondingElseClause);
-					break;
-				case BlockSyntax blockSyntax:
-					var statementsInBlock = blockSyntax.ChildNodes();
-					var returnStatementsInBlock = statementsInBlock.OfType<ReturnStatementSyntax>();
-					if (returnStatementsInBlock.Any())
+					var elseChildNodes = correspondingElseClause
+						.ChildNodes()
+						.ToList();
+					if (elseChildNodes.Count > 0 && elseChildNodes[0] is BlockSyntax)
 						yield return new SolutionStyleError(StyleErrorType.RedundantElse01, correspondingElseClause);
-					var throwStatementsInBlock = statementsInBlock.OfType<ThrowStatementSyntax>();
-					if (throwStatementsInBlock.Any())
-						yield return new SolutionStyleError(StyleErrorType.RedundantElse01, correspondingElseClause);
+					
 					break;
 			}
 		}
