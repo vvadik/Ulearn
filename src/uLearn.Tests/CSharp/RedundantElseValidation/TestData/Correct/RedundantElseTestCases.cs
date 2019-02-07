@@ -4,28 +4,30 @@ namespace uLearn.CSharp.RedundantElseValidation.TestData.Correct
 {
 	public class RedundantElseTestCases
 	{
-		public bool ReturnInIfStatement()
+		public bool MoreThanOneStatementInIfStatement()
 		{
 			if (true)
 			{
-				if (true)
-					return true;
 				var a = 1;
+				return true;
 			}
 			else
+			{
+				var a = 2;
 				return false;
+			}
 		}
-		
-		public void ThrowInIfStatement()
+
+		public bool OnluOneStatementInElseClause()
 		{
 			if (true)
 			{
-				if (true)
-					throw new Exception();
-				var a = 1;
+				return true;
 			}
 			else
-				ReturnInIfStatement();
+			{
+				return false;
+			}
 		}
 	}
 }
