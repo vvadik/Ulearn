@@ -1,9 +1,11 @@
 import React, {Component} from 'react';
 import PropTypes from "prop-types";
+// import KeyboardEventHandler from 'react-keyboard-event-handler';
 import BaseTextarea from "@skbkontur/react-ui/components/Textarea/Textarea";
 import Button from "@skbkontur/react-ui/components/Button/Button";
 import Avatar from "../common/Avatar/Avatar";
 import MarkdownButton from "./CommentSendForm/MarkdownButton";
+import {Mobile, NotMobile} from "../../utils/responsive";
 
 import styles from "./comment.less";
 
@@ -20,6 +22,12 @@ class Textarea extends BaseTextarea {
 		};
 	};
 }
+
+const markupByOperation = {
+	bold: '**',
+	italic: '_',
+	code: '```',
+};
 
 class CommentSendForm extends Component {
 	constructor(props) {
@@ -60,45 +68,104 @@ class CommentSendForm extends Component {
 							maxRows={15}
 							rows={4}
 							onChange={this.onChange}
+							onKeyDown={(e) => (((e.key === 'b' || e.key === 'i') && e.ctrlKey) ||
+								(e.key === 'q' && e.altKey)) && this.onKeyPress(e)}
 							autoResize
 							placeholder="Комментарий"
-							disabled={sending}
-						/>
+							disabled={sending} />
 						<div className={styles.commentButtons}>
-							<Button
-								use="primary"
-								size="medium"
-								type="submit"
-								loading={sending}>
-								Оставить комментарий
-							</Button>
+							<div className={styles.sendButtonDesktop}>
+								<NotMobile>
+									<Button
+										use="primary"
+										size="medium"
+										type="submit"
+										loading={sending}>
+										Оставить комментарий
+									</Button>
+								</NotMobile>
+							</div>
 							<div className={styles.markdownButtons}>
 								<span className={styles.markdownText}>Поддерживаем markdown</span>
 								<MarkdownButton
-									text="**жирный** Ctrl+B"
+									text={this.renderHint('bold')}
 									name="bold" width={11}
 									onClick={this.onClick('bold')}/>
 								<MarkdownButton
-									text="*курсив* Ctrl+I"
+									text={this.renderHint('italic')}
 									name="cursive" width={12}
-									onClick={this.onClick('cursive')}/>
+									onClick={this.onClick('italic')}/>
 								<MarkdownButton
-									text="(ссылка)[url] Ctrl+k"
-									name="link" width={18}
-									onClick={this.onClick('link')}/>
-								<MarkdownButton
-									text="```код``` Ctrl+Shift+Q"
+									text={this.renderHint('code')}
 									name="code" width={20}
 									onClick={this.onClick('code')}/>
 							</div>
 						</div>
+						<Mobile>
+							<Button
+								use="primary"
+								size="small"
+								type="submit"
+								loading={sending}>
+								Оставить комментарий
+							</Button>
+						</Mobile>
 					</form>
 				</div>
 			</div>
 		)
 	}
 
-	onChange = (_, value) => {
+	renderHint(markdownType) {
+		switch(markdownType) {
+			case "bold":
+				return <span className={styles._yellow}>**<span className={styles._white}>жирный</span>**
+					<br/><span className={styles._yellow}>Ctrl+B</span>
+				</span>;
+			case "italic":
+				return  <span className={styles._yellow}>_<span className={styles._white}>курсив</span>_
+					<br/><span className={styles._yellow}>Ctrl+I</span>
+				</span>;
+			case "link":
+				return <span>[ссылка](url) <br/>
+					<span className={styles._yellow}>Ctrl+K</span>
+				</span>;
+			case "code":
+				return  <span className={styles._yellow}>```<span className={styles._white}>код</span>```
+					<br/><span className={styles._yellow}>Ctrl+Shift+Q</span>
+				</span>;
+			default:
+				return <span>обычный текст</span>;
+		}
+	};
+
+	onKeyPress = (e) => {
+		const range = this.textarea.current.selectionRange;
+		let text = this.state.text;
+		let markdownType = '';
+		switch(e.key) {
+			case ("Control" || "Meta") && "b":
+				markdownType = 'bold';
+				break;
+			case ("Control" || "Meta") && "i":
+				markdownType = 'italic';
+				break;
+			case "Alt" && "q":
+				markdownType = 'code';
+				break;
+			default:
+				return;
+		}
+		let {finalText, finalSelectionRange} = CommentSendForm.wrapRangeWithMarkdown(text, range, markdownType);
+		this.setState({ text: finalText }, () => {
+			this.textarea.current.setSelectionRange(
+				finalSelectionRange.start,
+				finalSelectionRange.end,
+			);
+		});
+	};
+
+	onChange = (e, value) => {
 		this.setState({text: value});
 
 		if (this.state.text) {
@@ -108,41 +175,53 @@ class CommentSendForm extends Component {
 		}
 	};
 
-	onClick = (type) => () => {
-		// let selection = window.getSelection().toString();
-		// let selectionEl = document.onblur;
+	onClick = (markdownType) => () => {
 		const range = this.textarea.current.selectionRange;
+		let text = this.state.text;
+		let {finalText, finalSelectionRange} = CommentSendForm.wrapRangeWithMarkdown(text, range, markdownType);
 
-		const before = this.state.text.substr(0, range.start);
-		const target = this.state.text.substr(range.start, range.end - range.start);
-		const after = this.state.text.substr(range.end);
-
-		const formatted = this.applyFormat(target, type);
-		const offset = formatted.indexOf(target);
-
-		const text = before + formatted + after;
-
-		this.setState({ text }, () => {
+		this.setState({ text: finalText }, () => {
 			this.textarea.current.setSelectionRange(
-				range.start + offset,
-				range.end + offset,
+				finalSelectionRange.start,
+				finalSelectionRange.end,
 			);
 		});
+		this.textarea.current.focus();
 	};
 
-	applyFormat(text, type) {
-		switch(type) {
-			case "bold":
-				return `**${text}**`;
-			case "cursive":
-				return `_${text}_`;
-			case "link":
-				return `[${text}](${text})`;
-			case "code":
-				return `\`${text}\``;
-			default:
-				return text;
+	static wrapRangeWithMarkdown(text, range, markdownType) {
+		if (typeof text !== "string") {
+			throw new TypeError("text should be a string");
 		}
+		if (typeof range !== "object" || range === null
+			|| !('start' in range) || !('end' in range)
+		    || typeof range.start !== 'number' || typeof range.end !== 'number'
+		) {
+			throw new TypeError("range should be an object with `start` and `end` properties of type `number`");
+		}
+		if (range.start < 0 || range.end < range.start || range.end > text.length) {
+			throw new RangeError("range should be within 0 and text.length");
+		}
+		if (!(markdownType in markupByOperation)) {
+			throw new TypeError("unknown markdownType");
+		}
+
+		const before = text.substr(0, range.start);
+		const target = text.substr(range.start, range.end - range.start);
+		const after = text.substr(range.end);
+		const formatted = markupByOperation[markdownType] + target + markupByOperation[markdownType];
+		const finalText = before + formatted + after;
+		const finalSelectionRange = {};
+
+		if (target.length === 0) {
+			finalSelectionRange.start = range.start + markupByOperation[markdownType].length;
+			finalSelectionRange.end = range.start + markupByOperation[markdownType].length;
+		} else {
+			finalSelectionRange.start = range.start;
+			finalSelectionRange.end = range.start + formatted.length;
+		}
+
+		return {finalText, finalSelectionRange};
 	}
 
 	onSubmit = (event) => {
@@ -172,12 +251,13 @@ const accountModel = PropTypes.shape({
 });
 
 CommentSendForm.propTypes = {
+	/** Идентифицирует комментарий, с которым работает компонент.
+	 * При изменении идентификатора текст в поле ввода очищается. При сохранении того же идентификатора - текст сохраняется. */
 	commentId: PropTypes.string,
 	author: accountModel,
 	sending: PropTypes.bool,
-	error: PropTypes.oneOf(PropTypes.string, PropTypes.object),
+	error: PropTypes.oneOf([PropTypes.string, PropTypes.object]),
 	onSubmit: PropTypes.func,
 };
-
 
 export default CommentSendForm;
