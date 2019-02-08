@@ -7,7 +7,7 @@ function MarkdownButton(props) {
 	const { text, name, width, onClick } = props;
 	return (
 		<Hint pos="top" text={text}>
-			<button onClick={onClick}>
+			<button onClick={onClick} type="button">
 				<SVGIcon name={name} width={width}/>
 			</button>
 		</Hint>
@@ -15,7 +15,7 @@ function MarkdownButton(props) {
 }
 
 MarkdownButton.propTypes = {
-	text: PropTypes.string,
+	text: PropTypes.object,
 	name: PropTypes.string,
 	width: PropTypes.number,
 };

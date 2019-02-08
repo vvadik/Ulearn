@@ -17,7 +17,7 @@ button {
 .commentSendForm {
   display: flex;
   flex-direction: row;
-  //justify-content: space-between;
+  justify-content: space-between;
   margin: 20px 0 40px;
 }
 
@@ -36,6 +36,7 @@ button {
   justify-content: flex-start;
   align-items: flex-start;
   margin-left: 12px;
+  width: 100%;
 
   textarea {
 	max-width: 100%;
@@ -51,11 +52,31 @@ button {
   margin-top: 7px;
 }
 
+.sendButtonDesktop {
+  display: inline-block;
+
+  @media (max-width: @maxPhoneWidth) {
+	display: none;
+  }
+}
+
+.sendButtonMobile {
+  display: none;
+
+  @media (max-width: @maxPhoneWidth) {
+	display: block;
+  }
+}
+
 .markdownButtons {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+
+  @media (max-width: @maxPhoneWidth) {
+	margin-bottom: 10px;
+  }
 }
 
 .markdownText {
@@ -64,4 +85,29 @@ button {
   text-align: center;
   color: @disabledColor;
   margin-right: 26px;
+
+  @media (max-width: @maxPhoneWidth) {
+	  display: none;
+  }
 }
+
+._yellow {
+  color: #FFF0BC;
+}
+
+._white {
+  color: #ffffff;
+}
+
+._red {
+  color: #D70C17;
+}
+
+._black {
+  color: #333333;
+}
+
+._blue {
+  color: @linkColor;
+}
+

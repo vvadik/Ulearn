@@ -5,9 +5,9 @@ import Tabs from "@skbkontur/react-ui/components/Tabs/Tabs";
 import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
 import CreateGroupModal from "../CreateGroupModal/CreateGroupModal";
 import CopyGroupModal from "../CopyGroupModal/CopyGroupModal";
+import {Mobile, NotMobile} from "../../../../utils/responsive";
 
 import styles from "./groupHeader.less";
-import {Mobile, NotMobile} from "../../../../utils/responsive";
 
 const TABS = {
 	active: 'active',

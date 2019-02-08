@@ -6,9 +6,9 @@ import Kebab from "@skbkontur/react-ui/components/Kebab/Kebab";
 import MenuItem from "@skbkontur/react-ui/components/MenuItem/MenuItem";
 import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
 import getPluralForm from "../../../../utils/getPluralForm";
+import {Mobile, NotMobile} from "../../../../utils/responsive";
 
 import styles from "./groupInfo.less";
-import {Mobile, NotMobile} from "../../../../utils/responsive";
 
 class GroupInfo extends Component {
 

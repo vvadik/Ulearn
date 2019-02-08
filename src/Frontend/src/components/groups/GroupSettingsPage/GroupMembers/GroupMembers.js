@@ -8,15 +8,16 @@ import Kebab from "@skbkontur/react-ui/components/Kebab/Kebab";
 import MenuItem from "@skbkontur/react-ui/components/MenuItem/MenuItem";
 import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
 import Loader from "@skbkontur/react-ui/components/Loader/Loader";
+import Toast from "@skbkontur/react-ui/components/Toast/Toast";
 import ComboboxInstructorsSearch from "./Combobox/ComboboxInstructorsSearch";
 import Avatar from "../../../common/Avatar/Avatar";
 import GroupStudents from "./GroupStudents/GroupStudents";
 import InviteBlock from "./InviteBlock/InviteBlock";
 import Profile from './Profile';
 import getGenderForm from "../../../../utils/getGenderForm";
-import styles from './groupMembers.less';
-import Toast from "@skbkontur/react-ui/components/Toast/Toast";
 import {Mobile, NotMobile} from "../../../../utils/responsive";
+
+import styles from './groupMembers.less';
 
 class GroupMembers extends Component {
 
