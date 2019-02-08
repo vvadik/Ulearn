@@ -1,6 +1,7 @@
 import React from 'react';
-import {storiesOf} from '@storybook/react';
+import { storiesOf } from '@storybook/react';
 import {action} from '@storybook/addon-actions';
+import { withViewport } from '@storybook/addon-viewport';
 import CommentSendForm from './CommentSendForm';
 
 import './../../common.less';
@@ -17,7 +18,7 @@ const userWithAvatar = {
 
 class SendingCommentStory extends React.Component {
 	state = {
-		id: Date.now().toString(),
+		id: "first",
 		sending: false,
 	};
 
@@ -32,17 +33,19 @@ class SendingCommentStory extends React.Component {
 			sending: true,
 		});
 		setTimeout(() => {
-			this.setState({
-				id: Date.now().toString(),
+			let newState = {
 				sending: false,
-			})
-		}, 500)
-
-	}
+			};
+			if (this.props.success)
+				newState.id = "second";
+			this.setState(newState)
+		}, 500);
+	};
 }
 
 storiesOf('Comments/CommentSendForm', module)
-	.add('default', () => (
+	.addDecorator(withViewport())
+	.add('desktop', () => (
 		<div>
 			<CommentSendForm onSubmit={action('sendComment')} commentId={'1'} author={nameOnlyUser} sending={false}/>
 			<CommentSendForm onSubmit={action('sendComment')} commentId={'2'} author={userWithAvatar} sending={true}/>
@@ -51,5 +54,13 @@ storiesOf('Comments/CommentSendForm', module)
 			<h3>Ошибка при отправке комментария НЕ очищает поле ввода</h3>
 			<SendingCommentStory success={false}/>
 		</div>
-	));
+	), { viewport: 'desktop' })
+	.addDecorator(withViewport())
+	.add('tablet', () => (
+		<CommentSendForm onSubmit={action('sendComment')} commentId={'1'} author={nameOnlyUser} sending={false}/>
+	), { viewport: "tablet" })
+	.addDecorator(withViewport())
+	.add('mobile', () => (
+		<CommentSendForm onSubmit={action('sendComment')} commentId={'1'} author={nameOnlyUser} sending={false}/>
+	), { viewport: "mobile" });
 
