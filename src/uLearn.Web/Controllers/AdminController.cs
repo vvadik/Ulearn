@@ -1,4 +1,4 @@
-﻿using log4net;
+using log4net;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
@@ -484,14 +484,16 @@ namespace uLearn.Web.Controllers
 			}
 		}
 
-		public Task<ActionResult> Checking(string courseId, int id, bool recheck = false)
+		public Task<ActionResult> QuizChecking(string courseId, int id, bool recheck = false)
 		{
 			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
-			var checking = slideCheckingsRepo.FindManualCheckingById(id);
-			if (checking is ManualExerciseChecking)
-				return InternalManualChecking<ManualExerciseChecking>(courseId, id, ignoreLock: false, groupsIds: groupsIds, recheck: recheck);
-			else
-				return InternalManualChecking<ManualQuizChecking>(courseId, id, ignoreLock: false, groupsIds: groupsIds, recheck: recheck);
+			return InternalManualChecking<ManualQuizChecking>(courseId, id, ignoreLock: false, groupsIds: groupsIds, recheck: recheck);
+		}
+
+		public Task<ActionResult> ExerciseChecking(string courseId, int id, bool recheck = false)
+		{
+			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
+			return InternalManualChecking<ManualExerciseChecking>(courseId, id, ignoreLock: false, groupsIds: groupsIds, recheck: recheck);
 		}
 
 		public Task<ActionResult> CheckNextQuizForSlide(string courseId, Guid slideId, int previous)

@@ -4,6 +4,7 @@
 @using Ulearn.Common
 @using Ulearn.Common.Extensions
 @using Ulearn.Core.Extensions
+@using System.Linq
 
 @model uLearn.Web.Controllers.ManualCheckingQueueViewModel
 
@@ -38,10 +39,10 @@
 			{
 				<p>Время проверки вышло. Выберите другую работу</p>
 			}
-            @if (Model.Message == "checking_removed")
-            {
-	            <p>Студент отправил новое решение по&nbsp;этой задаче или этому тесту. Старое больше недоступно для&nbsp;проверки</p>
-            }
+			@if (Model.Message == "checking_removed")
+			{
+				<p>Студент отправил новое решение по&nbsp;этой задаче или этому тесту. Старое больше недоступно для&nbsp;проверки</p>
+			}
 		</div>
 	}
 
@@ -49,7 +50,7 @@
 	{
 		if (Model.AlreadyChecked)
 		{
-			<hr/>
+			<hr />
 			<div class="text-muted">Здесь будут проверенные преподавателями тесты и программы студентов. Пока ничего не&nbsp;проверено.</div>
 		}
 		else
@@ -65,7 +66,8 @@
 		var checking = checkingModel.CheckingQueueItem;
 		var isExercise = checking is ManualExerciseChecking;
 		var isQuiz = checking is ManualQuizChecking;
-		<hr/>
+		var checkingActionName = isQuiz ? "QuizChecking" : "ExerciseChecking";
+		<hr />
 		<div>
 			<div>
 				<p>
@@ -106,7 +108,7 @@
 						}
 					</p>
 					<p>
-						@Html.ActionLink("Посмотреть", "Checking", new { Model.CourseId, checking.Id, Group = Model.SelectedGroupsIdsJoined, recheck = true }, new { @class = "btn btn-sm btn-info" })
+						@Html.ActionLink("Посмотреть", checkingActionName, new { Model.CourseId, checking.Id, Group = Model.SelectedGroupsIdsJoined, recheck = true }, new { @class = "btn btn-sm btn-info" })
 					</p>
 				}
 				else if (checking.IsLocked)
@@ -114,22 +116,22 @@
 					<p>
 						Проверяется преподавателем <b>@checking.LockedBy.VisibleName</b>,
 						заблокирована ещё на&nbsp;@{
-							                     var minutes = (int)(checking.LockedUntil.Value - DateTime.Now).TotalMinutes;
-							                     @minutes.PluralizeInRussian(RussianPluralizationOptions.MinuteDative)
-						                     }
+							var minutes = (int)(checking.LockedUntil.Value - DateTime.Now).TotalMinutes;
+							@minutes.PluralizeInRussian(RussianPluralizationOptions.MinuteDative)
+						}
 					</p>
 					if (checking.IsLockedBy(User.Identity))
 					{
-						@Html.ActionLink("Вернуться к проверке →", "Checking", new { Model.CourseId, checking.Id, Group = Model.SelectedGroupsIdsJoined }, new { @class = "btn btn-sm btn-primary" })
+						@Html.ActionLink("Вернуться к проверке →", checkingActionName, new { Model.CourseId, checking.Id, Group = Model.SelectedGroupsIdsJoined }, new { @class = "btn btn-sm btn-primary" })
 					}
 					else
 					{
-						@Html.ActionLink("Все равно проверить →", "Checking", new { Model.CourseId, checking.Id, Group = Model.SelectedGroupsIdsJoined }, new { @class = "btn btn-sm btn-primary" })
+						@Html.ActionLink("Все равно проверить →", checkingActionName, new { Model.CourseId, checking.Id, Group = Model.SelectedGroupsIdsJoined }, new { @class = "btn btn-sm btn-primary" })
 					}
 				}
 				else
 				{
-					@Html.ActionLink("Перейти к проверке →", "Checking", new { Model.CourseId, checking.Id, Group = Model.SelectedGroupsIdsJoined }, new { @class = "btn btn-sm btn-success" })
+					@Html.ActionLink("Перейти к проверке →", checkingActionName, new { Model.CourseId, checking.Id, Group = Model.SelectedGroupsIdsJoined }, new { @class = "btn btn-sm btn-success" })
 				}
 			</div>
 		</div>

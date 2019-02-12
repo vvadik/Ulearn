@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -206,11 +206,6 @@ namespace Database.DataContexts
 		public T FindManualCheckingById<T>(int id) where T : AbstractManualSlideChecking
 		{
 			return db.Set<T>().Find(id);
-		}
-
-		public AbstractManualSlideChecking FindManualCheckingById(int id)
-		{
-			return (AbstractManualSlideChecking) FindManualCheckingById<ManualQuizChecking>(id) ?? FindManualCheckingById<ManualExerciseChecking>(id);
 		}
 
 		public bool IsProhibitedToSendExerciseToManualChecking(string courseId, Guid slideId, string userId)
