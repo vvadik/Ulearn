@@ -11,10 +11,12 @@ import Input from "@skbkontur/react-ui/components/Input/Input";
 import styles from './inviteBlock.less';
 
 class InviteBlock extends Component {
-
-	state = {
-		inviteLinkEnabled: true,
-	};
+	constructor(props) {
+		super(props);
+		this.state = {
+			inviteLinkEnabled: props.group.is_invite_link_enabled
+		};
+	}
 
 	render() {
 		const inviteLinkEnabled = this.state.inviteLinkEnabled;
