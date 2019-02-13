@@ -1,5 +1,5 @@
 import connect from "react-redux/es/connect/connect";
-import CommentSendForm from "../components/comments/CommentSendForm";
+import CommentSendForm from "../components/comments/CommentSendForm/CommentSendForm";
 import { COURSES__COURSE_ENTERED } from '../consts/actions';
 
 function mapStateToProps(state) {

@@ -3,10 +3,10 @@ import connect from "react-redux/es/connect/connect";
 import PropTypes from "prop-types";
 import api from "./../api/index";
 import Loader from "@skbkontur/react-ui/components/Loader/Loader";
-import CommentSendForm from "../components/comments/CommentSendForm";
+import CommentSendForm from "../components/comments/CommentSendForm/CommentSendForm";
 import {COURSES__COURSE_ENTERED} from "../consts/actions";
 
-import styles from "../components/comments/comment.less";
+import styles from "../components/comments/CommentSendForm/commentSendForm.less";
 
 class CommentsList extends Component {
 	state = {

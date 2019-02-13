@@ -17,9 +17,9 @@ import {Provider} from "react-redux";
  */
 
 /* Import all components you want to insert into legacy (cshtml+jquery) layout */
-import Comment from "./components/comments/CommentSendForm/Comment";
+import Comment from "./components/comments/Comment/Comment";
 // import CommentsList from "./components/comments/CommentsList";
-import CommentSendForm from "./components/comments/CommentSendForm";
+import CommentSendForm from "./components/comments/CommentSendForm/CommentSendForm";
 
 /* Define names for all components you want to use */
 const components = {
