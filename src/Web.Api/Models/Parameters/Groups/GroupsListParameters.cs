@@ -13,6 +13,6 @@ namespace Ulearn.Web.Api.Models.Parameters.Groups
 		[FromQuery(Name = "count")]
 		[MinValue(0, ErrorMessage = "Count should be non-negative")]
 		[MaxValue(200, ErrorMessage = "Count should be at most 200")]
-		public int Count { get; set; } = 50;
+		public int Count { get; set; } = 200;
 	}
 }
