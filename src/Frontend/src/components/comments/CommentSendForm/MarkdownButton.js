@@ -1,23 +1,30 @@
 import React from 'react';
 import PropTypes from "prop-types";
 import Hint from "@skbkontur/react-ui/components/Hint/Hint";
-import SVGIcon from "../SVGIcons/SVGIcon";
 
 function MarkdownButton(props) {
-	const { text, name, width, onClick } = props;
+	const { hint, icon, width, height, onClick } = props;
 	return (
-		<Hint pos="top" text={text}>
+		<Hint pos="top" text={hint}>
 			<button onClick={onClick} type="button">
-				<SVGIcon name={name} width={width}/>
+				<svg
+					width={width}
+					height={height}
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+				>
+					{icon}
+				</svg>
 			</button>
 		</Hint>
 	)
 }
 
 MarkdownButton.propTypes = {
-	text: PropTypes.object,
-	name: PropTypes.string,
+	hint: PropTypes.element,
+	icon: PropTypes.element,
 	width: PropTypes.number,
+	height: PropTypes.number
 };
 
 export default MarkdownButton;
