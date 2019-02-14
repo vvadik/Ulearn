@@ -69,6 +69,7 @@ class InviteBlock extends Component {
 		this.setState ({
 			inviteLinkEnabled: !inviteLinkEnabled,
 		});
+		this.props.group.is_invite_link_enabled = !inviteLinkEnabled;
 
 		api.groups.saveGroupSettings(group.id, {'is_invite_link_enabled': !inviteLinkEnabled})
 			.catch(console.error);
