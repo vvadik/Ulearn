@@ -17,12 +17,13 @@ using Serilog;
 using Swashbuckle.AspNetCore.Annotations;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
+using Ulearn.Web.Api.Authorization;
 using Ulearn.Web.Api.Models.Parameters.Comments;
 using Ulearn.Web.Api.Models.Responses.Comments;
 
 namespace Ulearn.Web.Api.Controllers.Comments
 {
-	[Route("comments/")]
+	[Route("/comments")]
 	public class CommentsController : BaseCommentController
 	{
 		private readonly ICommentPoliciesRepo commentPoliciesRepo;
@@ -89,9 +90,9 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		[HttpPost]
 		[SwaggerResponse((int)HttpStatusCode.TooManyRequests, "You are commenting too fast. Please wait some time")]
 		[SwaggerResponse((int)HttpStatusCode.RequestEntityTooLarge, "Your comment is too large")]
-		public async Task<ActionResult<CreateCommentResponse>> CreateComment([FromBody] CreateCommentParameters parameters)
+		public async Task<ActionResult<CreateCommentResponse>> CreateComment([FromQuery] CourseAuthorizationParameters courseAuthorizationParameters, CreateCommentParameters parameters)
 		{
-			var courseId = parameters.CourseId;
+			var courseId = courseAuthorizationParameters.CourseId;
 			var slideId = parameters.SlideId;
 			
 			if (parameters.IsForInstructorsOnly)

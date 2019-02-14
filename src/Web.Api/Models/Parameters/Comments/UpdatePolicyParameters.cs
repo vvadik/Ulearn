@@ -7,7 +7,6 @@ using Ulearn.Web.Api.Models.Binders;
 namespace Ulearn.Web.Api.Models.Parameters.Comments
 {
 	[DataContract]
-	[ModelBinder(typeof(JsonModelBinder), Name="parameters")]
 	public class UpdatePolicyParameters
 	{
 		[DataMember(Name = "are_comments_enabled")]

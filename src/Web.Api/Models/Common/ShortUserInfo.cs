@@ -15,10 +15,10 @@ namespace Ulearn.Web.Api.Models.Common
 		[DataMember(Name = "email", EmitDefaultValue = false)]
 		public string Email { get; set; }
 		
-		[DataMember(Name = "first_name")]	
+		[DataMember(Name = "first_name")]
 		public string FirstName { get; set; }
 		
-		[DataMember(Name = "last_name")]	
+		[DataMember(Name = "last_name")]
 		public string LastName { get; set; }
 		
 		[DataMember(Name = "visible_name")]

@@ -8,11 +8,8 @@ using Ulearn.Web.Api.Authorization;
 namespace Ulearn.Web.Api.Models.Parameters.Comments
 {
 	[DataContract]
-	public class CreateCommentParameters : ICourseAuthorizationParameters
+	public class CreateCommentParameters
 	{
-		[DataMember(Name = "course_id", IsRequired = true)]
-		public string CourseId { get; set; }
-		
 		[DataMember(Name = "slide_id", IsRequired = true)]
 		public Guid SlideId { get; set; }
 		

@@ -7,7 +7,6 @@ using Ulearn.Web.Api.Models.Binders;
 namespace Ulearn.Web.Api.Models.Parameters.Groups
 {
 	[DataContract]
-	[ModelBinder(typeof(JsonModelBinder), Name="parameters")]
 	public class CopyStudentsParameters
 	{
 		[DataMember(Name = "destination_group_id", IsRequired = true)]

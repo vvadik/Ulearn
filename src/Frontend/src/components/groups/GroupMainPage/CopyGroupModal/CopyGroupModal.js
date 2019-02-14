@@ -44,7 +44,7 @@ class CopyGroupModal extends Component {
 	loadCourseInstructors = (courseId) => {
 		api.users.getCourseInstructors(courseId)
 			.then(json => {
-				let instructors = json.instructors;
+				let instructors = json.users.map(item => item.user);
 				this.setState({
 					instructors,
 				});

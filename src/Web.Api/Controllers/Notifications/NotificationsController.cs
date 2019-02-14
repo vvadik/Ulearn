@@ -50,6 +50,9 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 			await next().ConfigureAwait(false);
 		}
 
+		/// <summary>
+		/// Список уведомлений и комментариев
+		/// </summary>
 		[HttpGet]
 		[Authorize]
 		public async Task<ActionResult<NotificationListResponse>> NotificationList()
@@ -64,6 +67,9 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 			};
 		}
 
+		/// <summary>
+		/// Число непрочитанных уведомлений
+		/// </summary>
 		[HttpGet("count")]
 		[Authorize]
 		public async Task<ActionResult<NotificationsCountResponse>> NotificationsCount([FromQuery] NotificationsCountParameters parameters)

@@ -13,6 +13,9 @@ namespace Ulearn.Web.Api.Models.Common
 		[DataMember(Name = "title")]
 		public string Title { get; set; }
 
+		/// <summary>
+		/// Человекочитаемый фрагмент url для слайда
+		/// </summary>
 		[DataMember(Name = "slug")]
 		public string Slug { get; set; }
 

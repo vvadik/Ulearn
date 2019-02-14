@@ -26,7 +26,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 {
 	[ProducesResponseType((int) HttpStatusCode.OK)]
 	[SwaggerResponse((int) HttpStatusCode.Forbidden, "You don't have access to this comment")]
-	[Route("comments/{commentId:int:min(0)}/")]
+	[Route("/comments/{commentId:int:min(0)}")]
 	public class CommentController : BaseCommentController
 	{
 		public CommentController(ILogger logger, IWebCourseManager courseManager, UlearnDb db,

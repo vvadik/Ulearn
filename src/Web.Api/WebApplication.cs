@@ -94,7 +94,7 @@ namespace Ulearn.Web.Api
 			services.AddCors();
 
 			ConfigureAuthServices(services, configuration);
-			
+
 			services.AddSwaggerExamplesFromAssemblyOf<WebApplication>();
 		}
 
@@ -112,7 +112,8 @@ namespace Ulearn.Web.Api
 					options.ModelMetadataDetailsProviders.Add(new SuppressChildValidationMetadataProvider(typeof(ICourse)));
 				}
 			).AddApplicationPart(GetType().Assembly)
-				.AddControllersAsServices();
+				.AddControllersAsServices()
+				.AddXmlSerializerFormatters();
 		}
 
 		protected override void ConfigureSwaggerDocumentationGeneration(SwaggerGenOptions c)

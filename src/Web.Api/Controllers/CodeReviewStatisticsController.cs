@@ -9,16 +9,16 @@ using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Web.Api.Authorization;
 using Ulearn.Web.Api.Models.Responses.CodeReviewStatistics;
 
 namespace Ulearn.Web.Api.Controllers
 {
-	[Route("/codereview/statistics")]
+	[Route("/codereview-statistics")]
 	public class CodeReviewStatisticsController : BaseController
 	{
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
@@ -43,11 +43,15 @@ namespace Ulearn.Web.Api.Controllers
 			this.groupMembersRepo = groupMembersRepo;
 			this.courseRoleUsersFilter = courseRoleUsersFilter;
 		}
-		
-		[HttpGet("{courseId}/instructors")]
+
+		/// <summary>
+		/// Статистика по выполненным ревью для каждого преподавателя в курсе
+		/// </summary>
+		[HttpGet]
 		[CourseAccessAuthorize(CourseAccessType.ApiViewCodeReviewStatistics)]
-		public async Task<ActionResult<CodeReviewInstructorsStatisticsResponse>> InstructorsStatistics(Course course, int count=10000, DateTime? from=null, DateTime? to=null)
+		public async Task<ActionResult<CodeReviewInstructorsStatisticsResponse>> InstructorsStatistics([FromQuery(Name = "course_id")][BindRequired]string courseId, int count=10000, DateTime? from=null, DateTime? to=null)
 		{
+			var course = courseManager.FindCourse(courseId);
 			if (course == null)
 				return NotFound();
 			

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
+using Ulearn.Web.Api.Authorization;
 using Ulearn.Web.Api.Models.Parameters.Groups;
 using Ulearn.Web.Api.Models.Responses.Groups;
 using ILogger = Serilog.ILogger;
@@ -87,10 +88,10 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		[HttpPost]
 		[Authorize(Policy = "Instructors")]
 		[ProducesResponseType((int) HttpStatusCode.Created)]
-		public async Task<ActionResult<CreateGroupResponse>> CreateGroup(CreateGroupParameters parameters)
+		public async Task<ActionResult<CreateGroupResponse>> CreateGroup([FromQuery] CourseAuthorizationParameters courseAuthorizationParameters, CreateGroupParameters parameters)
 		{
 			var ownerId = User.GetUserId();
-			var group = await groupsRepo.CreateGroupAsync(parameters.CourseId, parameters.Name, ownerId).ConfigureAwait(false);
+			var group = await groupsRepo.CreateGroupAsync(courseAuthorizationParameters.CourseId, parameters.Name, ownerId).ConfigureAwait(false);
 
 			var url = Url.Action(new UrlActionContext { Action = nameof(GroupController.Group), Controller = "Group", Values = new { groupId = group.Id }});
 			return Created(url, new CreateGroupResponse

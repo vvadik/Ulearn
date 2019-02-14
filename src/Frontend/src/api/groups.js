@@ -2,11 +2,11 @@ import api from "../api/"
 
 // Groups
 export function getCourseGroups(courseId) {
-	return api.get("groups/?course_id=" + courseId);
+	return api.get("groups?course_id=" + courseId);
 }
 
 export function getCourseArchivedGroups(courseId) {
-	return api.get("groups/?course_id=" + courseId + "&archived=true")
+	return api.get("groups?course_id=" + courseId + "&archived=true")
 }
 
 // Group
@@ -15,8 +15,8 @@ export function getGroup(groupId) {
 }
 
 export function createGroup(courseId, name) {
-	return api.post("groups/",
-		api.createRequestParams({ courseId, name }));
+	return api.post("groups?course_id=" + courseId,
+		api.createRequestParams({name: name}));
 }
 
 export function copyGroup(groupId, destinationCourseId, makeMeOwner) {
@@ -67,11 +67,11 @@ export function getStudents(groupId) {
 }
 
 export function deleteStudents(groupId, studentIds) {
-	return api.delete("groups/" + groupId + "/students/",
+	return api.delete("groups/" + groupId + "/students",
 		api.createRequestParams({'student_ids': studentIds}));
 }
 
 export function copyStudents(groupId, destinationGroupId, studentIds) {
-	return api.post("groups/" + groupId + "/students/",
+	return api.post("groups/" + groupId + "/students",
 		api.createRequestParams({'destination_group_id': destinationGroupId, 'student_ids': studentIds}));
 }

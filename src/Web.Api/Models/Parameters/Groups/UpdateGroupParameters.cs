@@ -6,7 +6,6 @@ using Ulearn.Web.Api.Models.Binders;
 namespace Ulearn.Web.Api.Models.Parameters.Groups
 {
 	[DataContract]
-	[ModelBinder(typeof(JsonModelBinder), Name="parameters")]
 	public class UpdateGroupParameters
 	{
 		[DataMember(Name = "name")]

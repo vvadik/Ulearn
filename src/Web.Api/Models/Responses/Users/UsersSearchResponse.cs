@@ -17,7 +17,10 @@ namespace Ulearn.Web.Api.Models.Responses.Users
 	{
 		[DataMember(Name = "user")]
 		public ShortUserInfo User { get; set; }
-		
+
+		/// <summary>
+		/// Поле, по содержимому которого полнотекстовым поиском найден пользователь
+		/// </summary>
 		[DataMember(Name = "fields")]
 		public List<SearchField> Fields { get; set; }
 	}

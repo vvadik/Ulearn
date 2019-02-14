@@ -36,7 +36,8 @@ class ComboboxInstructorsSearch extends Component {
 
 		return api.users.getCourseInstructors(this.props.courseId)
 			.then(json => {
-				return json.instructors
+				return json.users
+					.map(item => item.user)
 					.filter(item => {
 						return (isAddedUser(item)) &&
 							(includes(item.visible_name, query) ||

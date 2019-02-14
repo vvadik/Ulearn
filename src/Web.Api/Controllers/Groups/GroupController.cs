@@ -293,7 +293,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// <summary>
 		/// Добавить студента в группу
 		/// </summary>
-		[HttpPost("students/{studentId:guid}/")]
+		[HttpPost("students/{studentId:guid}")]
 		[ProducesResponseType((int) HttpStatusCode.OK)]
 		[SwaggerResponse((int) HttpStatusCode.NotFound, Description = "Can't find user")]
 		[SwaggerResponse((int) HttpStatusCode.Conflict, Description = "User is already a student of this group")]
@@ -316,7 +316,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// <summary>
 		/// Удалить студента из группы 
 		/// </summary>
-		[HttpDelete("students/{studentId:guid}/")]
+		[HttpDelete("students/{studentId:guid}")]
 		[ProducesResponseType((int) HttpStatusCode.OK)]
 		[SwaggerResponse((int) HttpStatusCode.NotFound, Description = "Can't find user or user is not a student of this group")]
 		public async Task<IActionResult> RemoveStudent(int groupId, string studentId)
@@ -343,7 +343,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// <summary>
 		/// Удалить студентов из группы
 		/// </summary>
-		[HttpDelete("students/")]
+		[HttpDelete("students")]
 		[ProducesResponseType((int) HttpStatusCode.OK)]
 		public async Task<IActionResult> RemoveStudents(int groupId, RemoveStudentsParameters parameters)
 		{
@@ -363,7 +363,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// <summary>
 		/// Скопировать студентов из одной группы в другую
 		/// </summary>
-		[HttpPost("students/")]
+		[HttpPost("students")]
 		[ProducesResponseType((int) HttpStatusCode.OK)]
 		public async Task<IActionResult> CopyStudents(int groupId, CopyStudentsParameters parameters)
 		{
@@ -405,7 +405,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// <summary>
 		/// Выдать доступ к группе
 		/// </summary>
-		[HttpPost("accesses/{userId:guid}/")]
+		[HttpPost("accesses/{userId:guid}")]
 		[ProducesResponseType((int) HttpStatusCode.OK)]
 		[SwaggerResponse((int) HttpStatusCode.Conflict, "User already has access to group")]
 		/* TODO (andgein): We don't check that userId is Instructor of course. Should we check it? Or not? */
@@ -430,7 +430,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// <summary>
 		/// Отозвать доступ к группе
 		/// </summary>
-		[HttpDelete("accesses/{userId:guid}/")]
+		[HttpDelete("accesses/{userId:guid}")]
 		[ProducesResponseType((int) HttpStatusCode.OK)]
 		public async Task<IActionResult> RevokeAccess(int groupId, string userId)
 		{

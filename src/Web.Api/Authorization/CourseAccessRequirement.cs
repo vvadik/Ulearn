@@ -43,7 +43,7 @@ namespace Ulearn.Web.Api.Authorization
 				return;
 			}
 			
-			var courseId = await GetCourseIdFromRequestAsync(mvcContext).ConfigureAwait(false);
+			var courseId = GetCourseIdFromRequestAsync(mvcContext);
 			if (string.IsNullOrEmpty(courseId))
 			{
 				context.Fail();
