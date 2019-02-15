@@ -10,10 +10,6 @@ namespace Ulearn.Web.Api.Models.Parameters.Groups
 	public class CopyStudentsParameters
 	{
 		[DataMember(IsRequired = true)]
-		[MinValue(0)]
-		public int DestinationGroupId { get; set; }
-		
-		[DataMember(IsRequired = true)]
 		public List<string> StudentIds { get; set; }
 	}
 }

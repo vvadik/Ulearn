@@ -120,7 +120,6 @@ class GroupMembers extends Component {
 								isSysAdmin={isSysAdmin}
 								systemAccesses={systemAccesses}
 								students={students}
-								group={group}
 								onDeleteStudents={this.onDeleteStudents}/>}
 						</div>
 					</Loader>

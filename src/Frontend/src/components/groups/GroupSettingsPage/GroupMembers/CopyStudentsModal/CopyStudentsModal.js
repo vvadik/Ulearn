@@ -179,7 +179,7 @@ class CopyStudentsModal extends Component {
 
 	onSubmit = (e) => {
 		const { groupId, courseId, groups } = this.state;
-		const { studentIds, currentGroupId, onClose } = this.props;
+		const { studentIds, onClose } = this.props;
 
 		e.preventDefault();
 
@@ -193,7 +193,7 @@ class CopyStudentsModal extends Component {
 		const students = [...studentIds];
 
 		this.setState({ loading: true });
-		api.groups.copyStudents(currentGroupId, groupId, students)
+		api.groups.copyStudents(groupId, students)
 			.then(() =>
 				Toast.push(`Студенты скопированы в группу ${this.getTitle(groups, groupId)}`)
 			)
@@ -206,7 +206,6 @@ class CopyStudentsModal extends Component {
 
 CopyStudentsModal.propTypes = {
 	onCloseModal: PropTypes.func,
-	currentGroupId: PropTypes.number,
 	studentIds: PropTypes.object,
 };
 

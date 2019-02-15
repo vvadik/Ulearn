@@ -146,7 +146,7 @@ namespace Database.Repos.Groups
 				.Include(g => g.Owner)
 				.Where(g => !g.IsDeleted && 
 							(onlyArchived ? g.IsArchived : !g.IsArchived) &&
-							coursesIds.Contains(g.CourseId) &&
+							(coursesIds == null || coursesIds.Contains(g.CourseId)) &&
 							(
 								/* Course admins can see all groups */
 								coursesWhereUserCanSeeAllGroups.Contains(g.CourseId) ||
@@ -207,7 +207,7 @@ namespace Database.Repos.Groups
 		public async Task<List<GroupMember>> GetMembersOfAllGroupsAvailableForUserAsync(string userId)
 		{
 			var groups = await GetAvailableForUserGroupsAsync(userId).ConfigureAwait(false);
-			return await groupMembersRepo.GetGroupsMembersAsync(groups.Select(g => g.Id)).ConfigureAwait(false);
+			return await groupMembersRepo.GetGroupsMembersAsync(groups.Select(g => g.Id).ToList()).ConfigureAwait(false);
 		}
 
 		public async Task<List<ApplicationUser>> GetInstructorsOfAllGroupsAvailableForUserAsync(string userId)

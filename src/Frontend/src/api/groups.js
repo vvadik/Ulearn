@@ -71,7 +71,7 @@ export function deleteStudents(groupId, studentIds) {
 		api.createRequestParams({studentIds}));
 }
 
-export function copyStudents(groupId, destinationGroupId, studentIds) {
+export function copyStudents(groupId, studentIds) {
 	return api.post("groups/" + groupId + "/students",
-		api.createRequestParams({destinationGroupId, studentIds}));
+		api.createRequestParams({studentIds}));
 }

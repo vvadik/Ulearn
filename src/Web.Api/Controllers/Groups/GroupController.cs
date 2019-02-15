@@ -192,7 +192,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		}
 
 		/// <summary>
-		/// Список scoring-group курса с информаций о том, включены ли они для этой группы
+		/// Список scoring-group курса (примеры: Упражнения, Активность на практике) с информаций о том, включены ли они для этой группы
 		/// </summary>
 		[HttpGet("scores")]
 		public async Task<ActionResult<GroupScoringGroupsResponse>> ScoringGroups(int groupId)
@@ -361,31 +361,35 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		}
 
 		/// <summary>
-		/// Скопировать студентов из одной группы в другую
+		/// Скопировать студентов в группу
 		/// </summary>
 		[HttpPost("students")]
 		[ProducesResponseType((int) HttpStatusCode.OK)]
 		public async Task<IActionResult> CopyStudents(int groupId, CopyStudentsParameters parameters)
 		{
-			var destinationGroupId = parameters.DestinationGroupId;
-			
-			var destinationGroup = await groupsRepo.FindGroupByIdAsync(destinationGroupId).ConfigureAwait(false);
+			var destinationGroup = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
 			if (destinationGroup == null)
-				return NotFound(new ErrorResponse($"Group {destinationGroupId} not found"));
+				return NotFound(new ErrorResponse($"Group {groupId} not found"));
 			
 			var isDestinationGroupVisible = await groupAccessesRepo.IsGroupVisibleForUserAsync(destinationGroup, UserId).ConfigureAwait(false);
 			if (!isDestinationGroupVisible)
-				return StatusCode((int) HttpStatusCode.Forbidden, new ErrorResponse($"You have no access to group {destinationGroupId}"));
+				return StatusCode((int) HttpStatusCode.Forbidden, new ErrorResponse($"You have no access to group {groupId}"));
 
-			var newMembers = await groupMembersRepo.CopyUsersFromOneGroupToAnotherAsync(groupId, destinationGroupId, parameters.StudentIds).ConfigureAwait(false);
+			var membersOfAllGroupsAvailableForUser = (await groupAccessesRepo.GetMembersOfAllGroupsAvailableForUserAsync(UserId).ConfigureAwait(false))
+				.Select(gm => gm.UserId);
+
+			var studentsToCopySet = parameters.StudentIds.ToHashSet();
+			studentsToCopySet.IntersectWith(membersOfAllGroupsAvailableForUser);
+
+			var newMembers = await groupMembersRepo.AddUsersToGroupAsync(groupId, studentsToCopySet).ConfigureAwait(false);
 			
 			await notificationsRepo.AddNotificationAsync(
 				destinationGroup.CourseId,
-				new GroupMembersHaveBeenAddedNotification(destinationGroupId, parameters.StudentIds, usersRepo),
+				new GroupMembersHaveBeenAddedNotification(groupId, parameters.StudentIds, usersRepo),
 				UserId
 			).ConfigureAwait(false);
 			
-			return Ok(new SuccessResponseWithMessage($"{newMembers.Count} students have been copied from group {groupId} to group {destinationGroupId}"));
+			return Ok(new SuccessResponseWithMessage($"{newMembers.Count} students have been copied to group {groupId}"));
 		}
 
 		/// <summary>

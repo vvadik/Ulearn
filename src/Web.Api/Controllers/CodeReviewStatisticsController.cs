@@ -85,7 +85,7 @@ namespace Ulearn.Web.Api.Controllers
 			{
 				var checkingsCheckedByInstructor = allSlideCheckings.Where(c => c.IsChecked && (c.LockedById == instructor.Id || c.Reviews.Any(r => r.AuthorId == instructor.Id))).ToList();
 				var instructorGroups = await groupsRepo.GetMyGroupsFilterAccessibleToUserAsync(course.Id, instructor.Id).ConfigureAwait(false);
-				var instructorGroupMemberIds = (await groupMembersRepo.GetGroupsMembersAsync(instructorGroups.Select(g => g.Id)).ConfigureAwait(false)).Select(m => m.UserId);
+				var instructorGroupMemberIds = (await groupMembersRepo.GetGroupsMembersAsync(instructorGroups.Select(g => g.Id).ToList()).ConfigureAwait(false)).Select(m => m.UserId);
 				var checkingQueue = allSlideCheckings.Where(c => !c.IsChecked && instructorGroupMemberIds.Contains(c.UserId)).ToList();
 				var comments = checkingsCheckedByInstructor.SelectMany(c => c.NotDeletedReviews).ToList();
 				var instructorStatistics = new CodeReviewInstructorStatistics

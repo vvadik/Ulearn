@@ -170,7 +170,7 @@ class CopyGroupModal extends Component {
 		return (
 			<div className={styles["change-owner-block"]}>
 				<p className={styles["change-owner-info"]}>
-					Владелец этой группы <b>{group.owner.visible_name}</b> не является преподавателем
+					Владелец этой группы <b>{group.owner.visibleName}</b> не является преподавателем
 					курса <b>«{ this.props.course.title }»</b>.
 					Вы можете сделать себя владельцем скопированной группы.
 				</p>
