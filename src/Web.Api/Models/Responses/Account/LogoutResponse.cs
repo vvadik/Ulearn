@@ -6,7 +6,7 @@ namespace Ulearn.Web.Api.Models.Responses.Account
 	[DataContract]
 	public class LogoutResponse : SuccessResponse
 	{
-		[DataMember(Name = "logout")]
+		[DataMember]
 		public bool Logout { get; set; }
 	}
 }

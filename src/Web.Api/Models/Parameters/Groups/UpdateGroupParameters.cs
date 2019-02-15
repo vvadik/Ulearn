@@ -8,27 +8,27 @@ namespace Ulearn.Web.Api.Models.Parameters.Groups
 	[DataContract]
 	public class UpdateGroupParameters
 	{
-		[DataMember(Name = "name")]
+		[DataMember]
 		[NotEmpty(ErrorMessage = "Group name can not be empty", CanBeNull = true)]
 		public string Name { get; set; }
 		
-		[DataMember(Name = "is_archived")]
+		[DataMember]
 		public bool? IsArchived { get; set; }
 		
-		[DataMember(Name = "is_invite_link_enabled")]
+		[DataMember]
 		public bool? IsInviteLinkEnabled { get; set; }
 		
 		
-		[DataMember(Name = "is_manual_checking_enabled")]
+		[DataMember]
 		public bool? IsManualCheckingEnabled { get; set; }
 		
-		[DataMember(Name = "is_manual_checking_enabled_for_old_solutions")]
+		[DataMember]
 		public bool? IsManualCheckingEnabledForOldSolutions { get; set; }
 		
-		[DataMember(Name = "default_prohibit_further_review")]
+		[DataMember]
 		public bool? DefaultProhibitFurtherReview { get; set; }
 		
-		[DataMember(Name = "can_students_see_group_progress")]
+		[DataMember]
 		public bool? CanStudentsSeeGroupProgress { get; set; }
 	}
 }

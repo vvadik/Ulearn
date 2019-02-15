@@ -180,7 +180,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			var url = Url.Action(new UrlActionContext { Action = nameof(Group), Controller = "Group", Values = new { groupId = group.Id }});
 			return Created(url, new CopyGroupResponse
 			{
-				GroupId = newGroup.Id,
+				Id = newGroup.Id,
 				ApiUrl = url
 			});
 		}
@@ -210,7 +210,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			var enabledScoringGroups = await groupsRepo.GetEnabledAdditionalScoringGroupsForGroupAsync(groupId).ConfigureAwait(false);
 			return new GroupScoringGroupsResponse
 			{
-				ScoringGroups = scoringGroups.Select(scoringGroup => BuildGroupScoringGroupInfo(scoringGroup, scoringGroupsCanBeSetInSomeUnit, enabledScoringGroups)).ToList(),
+				Scores = scoringGroups.Select(scoringGroup => BuildGroupScoringGroupInfo(scoringGroup, scoringGroupsCanBeSetInSomeUnit, enabledScoringGroups)).ToList(),
 			};
 		}
 
@@ -230,7 +230,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 
 			var courseScoringGroupIds = course.Settings.Scoring.Groups.Values.Select(g => g.Id).ToList();
 			var scoringGroupsCanBeSetInSomeUnit = GetScoringGroupsCanBeSetInSomeUnit(course).Select(g => g.Id).ToList();
-			foreach (var scoringGroupId in parameters.ScoringGroupIds) {
+			foreach (var scoringGroupId in parameters.Scores) {
 				if (!courseScoringGroupIds.Contains(scoringGroupId))
 					return NotFound(new ErrorResponse($"Score {scoringGroupId} not found in course {course.Id}"));
 				
@@ -242,7 +242,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 					return BadRequest(new ErrorResponse($"You can not enable or disable additional scoring for {scoringGroupId}, because there is no additional scores for this score in any unit. Contact with course creator."));
 			}
 
-			await groupsRepo.EnableAdditionalScoringGroupsForGroupAsync(groupId, parameters.ScoringGroupIds).ConfigureAwait(false);
+			await groupsRepo.EnableAdditionalScoringGroupsForGroupAsync(groupId, parameters.Scores).ConfigureAwait(false);
 
 			return Ok(new SuccessResponseWithMessage($"Scores for group {groupId} updated"));
 		}
@@ -257,9 +257,9 @@ namespace Ulearn.Web.Api.Controllers.Groups
 				Name = scoringGroup.Name ?? "",
 				Abbreviation = scoringGroup.Abbreviation ?? "",
 				Description = scoringGroup.Description ?? "",
-				IsEnabledForEveryone = scoringGroup.EnabledForEveryone,
-				CanBeSetByInstructorInSomeUnit = canBeSetByInstructorInSomeUnit,
-				IsEnabled = (scoringGroup.EnabledForEveryone || !canBeSetByInstructorInSomeUnit) ? (bool?) null : isEnabledManually
+				AreAdditionalScoresEnabledForAllGroups = scoringGroup.EnabledForEveryone,
+				CanInstructorSetAdditionalScoreInSomeUnit = canBeSetByInstructorInSomeUnit,
+				AreAdditionalScoresEnabledInThisGroup = (scoringGroup.EnabledForEveryone || !canBeSetByInstructorInSomeUnit) ? (bool?) null : isEnabledManually
 			};
 		}
 
@@ -349,11 +349,11 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		{
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
 
-			var members = await groupMembersRepo.RemoveUsersFromGroupAsync(groupId, parameters.UserIds).ConfigureAwait(false);
+			var members = await groupMembersRepo.RemoveUsersFromGroupAsync(groupId, parameters.StudentIds).ConfigureAwait(false);
 			
 			await notificationsRepo.AddNotificationAsync(
 				group.CourseId,
-				new GroupMembersHaveBeenRemovedNotification(group.Id, parameters.UserIds, usersRepo),
+				new GroupMembersHaveBeenRemovedNotification(group.Id, parameters.StudentIds, usersRepo),
 				UserId
 			).ConfigureAwait(false);
 
@@ -377,11 +377,11 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			if (!isDestinationGroupVisible)
 				return StatusCode((int) HttpStatusCode.Forbidden, new ErrorResponse($"You have no access to group {destinationGroupId}"));
 
-			var newMembers = await groupMembersRepo.CopyUsersFromOneGroupToAnotherAsync(groupId, destinationGroupId, parameters.UserIds).ConfigureAwait(false);
+			var newMembers = await groupMembersRepo.CopyUsersFromOneGroupToAnotherAsync(groupId, destinationGroupId, parameters.StudentIds).ConfigureAwait(false);
 			
 			await notificationsRepo.AddNotificationAsync(
 				destinationGroup.CourseId,
-				new GroupMembersHaveBeenAddedNotification(destinationGroupId, parameters.UserIds, usersRepo),
+				new GroupMembersHaveBeenAddedNotification(destinationGroupId, parameters.StudentIds, usersRepo),
 				UserId
 			).ConfigureAwait(false);
 			

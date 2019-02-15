@@ -7,7 +7,7 @@ namespace Ulearn.Web.Api.Models.Parameters.Groups
 	[DataContract]
 	public class ChangeOwnerParameters
 	{
-		[DataMember(Name = "owner_id", IsRequired = true)]
+		[DataMember(IsRequired = true)]
 		public string OwnerId { get; set; }
 	}
 }

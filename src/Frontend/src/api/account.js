@@ -4,7 +4,7 @@ export function getCurrentUser() {
     return dispatch => {
         return api.get('account')
             .then(json => {
-                let isAuthenticated = json.is_authenticated;
+                let isAuthenticated = json.isAuthenticated;
                 if (! isAuthenticated)
                     dispatch({ type: 'ACCOUNT__USER_INFO_UPDATED', isAuthenticated: false });
                 else {
@@ -14,11 +14,11 @@ export function getCurrentUser() {
                         isAuthenticated: true,
 						id: user.id,
                         login: user.login,
-                        firstName: user.first_name,
-                        lastName: user.last_name,
-                        visibleName: user.visible_name,
-                        accountProblems: json.account_problems,
-						systemAccesses: json.system_accesses,
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        visibleName: user.visibleName,
+                        accountProblems: json.accountProblems,
+						systemAccesses: json.systemAccesses,
                     });
                     dispatch(api.account.getRoles());
                 }
@@ -35,17 +35,17 @@ export function getRoles() {
     return dispatch => {
         return api.get('account/roles')
             .then(json => {
-                let courseRoles = json.course_roles;
+                let courseRoles = json.courseRoles;
                 let courseRolesObject = {};
-                courseRoles.forEach(c => courseRolesObject[c.course_id.toLowerCase()] = c.role);
+                courseRoles.forEach(c => courseRolesObject[c.courseId.toLowerCase()] = c.role);
 
-                let courseAccesses = json.course_accesses;
+                let courseAccesses = json.courseAccesses;
                 let courseAccessesObject = {};
-                courseAccesses.forEach(c => courseAccessesObject[c.course_id.toLowerCase()] = c.accesses);
+                courseAccesses.forEach(c => courseAccessesObject[c.courseId.toLowerCase()] = c.accesses);
 
                 dispatch({
                     type: 'ACCOUNT__USER_ROLES_UPDATED',
-                    isSystemAdministrator: json.is_system_administrator,
+                    isSystemAdministrator: json.isSystemAdministrator,
                     roleByCourse: courseRolesObject,
                     accessesByCourse: courseAccessesObject
                 })

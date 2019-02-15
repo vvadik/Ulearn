@@ -6,13 +6,13 @@ namespace Ulearn.Web.Api.Models.Common
 	[DataContract]
 	public class CourseInfo
 	{
-		[DataMember(Name = "id")]
+		[DataMember]
 		public string Id { get; set; }
 		
-		[DataMember(Name = "title")]
+		[DataMember]
 		public string Title { get; set; }
 		
-		[DataMember(Name = "units")]
+		[DataMember]
 		public List<UnitInfo> Units { get; set; }
 	}
 }

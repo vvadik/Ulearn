@@ -7,13 +7,13 @@ namespace Ulearn.Web.Api.Models.Common
 	[DataContract]
 	public class UnitInfo
 	{
-		[DataMember(Name = "id")]
+		[DataMember]
 		public Guid Id { get; set; }
 		
-		[DataMember(Name = "title")]
+		[DataMember]
 		public string Title { get; set; }
 		
-		[DataMember(Name = "slides")]
+		[DataMember]
 		public List<ShortSlideInfo> Slides { get; set; }
 	}
 }

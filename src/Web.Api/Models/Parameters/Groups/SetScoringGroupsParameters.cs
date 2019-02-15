@@ -9,7 +9,10 @@ namespace Ulearn.Web.Api.Models.Parameters.Groups
 	[DataContract]
 	public class SetScoringGroupsParameters : ApiParameters
 	{
-		[DataMember(Name = "scores", IsRequired = true)]
-		public List<string> ScoringGroupIds { get; set; }
+		/// <summary>
+		/// ScoringGroupIds
+		/// </summary>
+		[DataMember(IsRequired = true)]
+		public List<string> Scores { get; set; }
 	}
 }

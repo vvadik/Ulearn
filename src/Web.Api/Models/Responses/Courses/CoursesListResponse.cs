@@ -8,7 +8,7 @@ namespace Ulearn.Web.Api.Models.Responses.Courses
 	[DataContract]
 	public class CoursesListResponse : SuccessResponse
 	{
-		[DataMember(Name = "courses")]
+		[DataMember]
 		public List<ShortCourseInfo> Courses { get; set; }
 	}
 }

@@ -72,7 +72,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			return new GroupsListResponse
 			{
 				Groups = groupInfos,
-				PaginationResponse = new PaginationResponse
+				Pagination = new PaginationResponse
 				{
 					Offset = parameters.Offset,
 					Count = filteredGroups.Count,
@@ -96,7 +96,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			var url = Url.Action(new UrlActionContext { Action = nameof(GroupController.Group), Controller = "Group", Values = new { groupId = group.Id }});
 			return Created(url, new CreateGroupResponse
 			{
-				GroupId = group.Id,
+				Id = group.Id,
 				ApiUrl = url,
 			});
 		}

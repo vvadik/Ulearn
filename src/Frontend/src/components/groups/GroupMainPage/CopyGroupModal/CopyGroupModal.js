@@ -219,8 +219,8 @@ class CopyGroupModal extends Component {
 	getGroupOptions = () => {
 		const { groups } = this.state;
 
-		return groups.map(group => [group.id, `${group.name}: ${group.students_count} 
-		${getPluralForm(group.students_count, 'студент', 'студента', 'студентов')}`]);
+		return groups.map(group => [group.id, `${group.name}: ${group.studentsCount} 
+		${getPluralForm(group.studentsCount, 'студент', 'студента', 'студентов')}`]);
 	};
 
 	onGroupChange = (_, value) => {

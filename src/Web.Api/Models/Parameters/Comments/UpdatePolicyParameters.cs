@@ -9,13 +9,13 @@ namespace Ulearn.Web.Api.Models.Parameters.Comments
 	[DataContract]
 	public class UpdatePolicyParameters
 	{
-		[DataMember(Name = "are_comments_enabled")]
+		[DataMember]
 		public bool? AreCommentsEnabled { get; set; }
 		
-		[DataMember(Name = "moderation")]
+		[DataMember]
 		public CommentModerationPolicy? ModerationPolicy { get; set; }
 		
-		[DataMember(Name = "only_instructors_can_reply")]
+		[DataMember]
 		public bool? OnlyInstructorsCanReply { get; set; }
 	}
 }

@@ -7,25 +7,25 @@ namespace Ulearn.Web.Api.Models.Common
 	[DataContract]
 	public class ShortSlideInfo
 	{
-		[DataMember(Name = "id")]
+		[DataMember]
 		public Guid Id { get; set; }
 		
-		[DataMember(Name = "title")]
+		[DataMember]
 		public string Title { get; set; }
 
 		/// <summary>
 		/// Человекочитаемый фрагмент url для слайда
 		/// </summary>
-		[DataMember(Name = "slug")]
+		[DataMember]
 		public string Slug { get; set; }
 
-		[DataMember(Name = "max_score")]
+		[DataMember]
 		public int MaxScore { get; set; }
 		
-		[DataMember(Name = "type")]
+		[DataMember]
 		public SlideType Type { get; set; }
 
-		[DataMember(Name = "api_url")]
+		[DataMember]
 		public string ApiUrl { get; set; }
 	}
 }

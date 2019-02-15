@@ -74,7 +74,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			return new CommentsListResponse
 			{
 				TopLevelComments = BuildCommentsListResponse(comments, canUserSeeNotApprovedComments, replies, commentLikesCount, addCourseIdAndSlideId: false, addParentCommentId: false, addReplies: true),
-				PaginationResponse = new PaginationResponse
+				Pagination = new PaginationResponse
 				{
 					Offset = parameters.Offset,
 					Count = comments.Count,
@@ -135,7 +135,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			var url = Url.Action(new UrlActionContext { Action = nameof(CommentController.Comment), Controller = "Comment", Values = new { commentId = comment.Id } });
 			return new CreateCommentResponse
 			{
-				CommentId = comment.Id,
+				Id = comment.Id,
 				ApiUrl = url,
 			};
 		}

@@ -11,11 +11,15 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Ulearn.Common.Api;
@@ -24,6 +28,7 @@ using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
 using Ulearn.Web.Api.Authorization;
 using Ulearn.Web.Api.Controllers.Notifications;
+using Ulearn.Web.Api.Models;
 using Ulearn.Web.Api.Models.Binders;
 using Ulearn.Web.Api.Swagger;
 using Vostok.Commons.Extensions.UnitConvertions;
@@ -61,7 +66,7 @@ namespace Ulearn.Web.Api
 				builder
 					.WithOrigins(configuration.Web.Cors.AllowOrigins)
 					.AllowAnyMethod()
-					.WithHeaders("Authorization", "Content-Type")
+					.WithHeaders("Authorization", "Content-Type", "Json-Naming-Strategy")
 					.WithExposedHeaders("Location")
 					.AllowCredentials();
 			});
@@ -113,7 +118,20 @@ namespace Ulearn.Web.Api
 				}
 			).AddApplicationPart(GetType().Assembly)
 				.AddControllersAsServices()
-				.AddXmlSerializerFormatters();
+				.AddXmlSerializerFormatters()
+				.AddJsonOptions(opt => 
+					opt.SerializerSettings.ContractResolver = new ApiHeaderJsonContractResolver(new ApiHeaderJsonNamingStrategyOptions
+					{
+						DefaultStrategy = new SnakeCaseNamingStrategy(),
+						HeaderName = "Json-Naming-Strategy",
+						HttpContextAccessorProvider = services.BuildServiceProvider().GetService<IHttpContextAccessor>,
+						NamingStrategies = new Dictionary<string, NamingStrategy>
+						{
+							{"camelcase", new CamelCaseNamingStrategy() },
+							{"snakecase", new SnakeCaseNamingStrategy() }
+						}
+					}, services.BuildServiceProvider().GetService<IMemoryCache>)
+				);
 		}
 
 		protected override void ConfigureSwaggerDocumentationGeneration(SwaggerGenOptions c)

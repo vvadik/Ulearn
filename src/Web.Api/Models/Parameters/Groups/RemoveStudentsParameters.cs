@@ -8,7 +8,7 @@ namespace Ulearn.Web.Api.Models.Parameters.Groups
 	[DataContract]
 	public class RemoveStudentsParameters
 	{
-		[DataMember(Name = "student_ids", IsRequired = true)]
-		public List<string> UserIds { get; set; }
+		[DataMember(IsRequired = true)]
+		public List<string> StudentIds { get; set; }
 	}
 }

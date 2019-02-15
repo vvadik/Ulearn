@@ -134,7 +134,7 @@ namespace Ulearn.Web.Api.Controllers.Users
 						discloseEmail: u.Fields.Contains(SearchField.Email)),
 					Fields = u.Fields.ToList(),
 				}).ToList(),
-				PaginationResponse = new PaginationResponse
+				Pagination = new PaginationResponse
 				{
 					Offset = parameters.Offset,
 					Count = users.Count,

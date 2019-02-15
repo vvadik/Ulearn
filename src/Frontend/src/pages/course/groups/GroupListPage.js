@@ -185,7 +185,7 @@ class GroupListPage extends Component {
 
 	toggleArchived = (group, isArchived) => {
 		const newSettings = {
-			is_archived: isArchived
+			isArchived
 		};
 
 		api.groups.saveGroupSettings(group.id, newSettings)

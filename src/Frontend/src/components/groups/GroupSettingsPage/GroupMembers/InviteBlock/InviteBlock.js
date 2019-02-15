@@ -41,7 +41,7 @@ class InviteBlock extends Component {
 		return (
 			<div className={styles["invite-link"]}>
 				<div className={styles["invite-link-text"]}>
-					<CopyToClipboard text={`${window.location.origin}/Account/JoinGroup?hash=${group.invite_hash}`}>
+					<CopyToClipboard text={`${window.location.origin}/Account/JoinGroup?hash=${group.inviteHash}`}>
 						<Button use="link" icon={<LinkIcon />} onClick={() => Toast.push('Ссылка скопирована')}>
 							Скопировать ссылку
 						</Button>
@@ -50,7 +50,7 @@ class InviteBlock extends Component {
 				<div className={styles["invite-link-input"]}>
 					<Input
 						type="text"
-						value={`${window.location.origin}/Account/JoinGroup?hash=${group.invite_hash}`}
+						value={`${window.location.origin}/Account/JoinGroup?hash=${group.inviteHash}`}
 						readOnly
 						selectAllOnFocus
 						width="65%"
@@ -68,7 +68,7 @@ class InviteBlock extends Component {
 			inviteLinkEnabled: !inviteLinkEnabled,
 		});
 
-		api.groups.saveGroupSettings(group.id, {'is_invite_link_enabled': !inviteLinkEnabled})
+		api.groups.saveGroupSettings(group.id, {'isInviteLinkEnabled': !inviteLinkEnabled})
 			.catch(console.error);
 	};
 }

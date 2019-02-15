@@ -40,12 +40,12 @@ class ComboboxInstructorsSearch extends Component {
 					.map(item => item.user)
 					.filter(item => {
 						return (isAddedUser(item)) &&
-							(includes(item.visible_name, query) ||
+							(includes(item.visibleName, query) ||
 							includes(item.login, query))
 					})
 					.map(item => ({
 								value: item.id,
-								label: item.visible_name,
+								label: item.visibleName,
 								...item,
 							}
 						)

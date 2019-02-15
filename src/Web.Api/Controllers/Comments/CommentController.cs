@@ -145,8 +145,8 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			if (parameters.IsApproved.HasValue)
 				await UpdateCommentIsApprovedAsync(comment, parameters.IsApproved.Value).ConfigureAwait(false);
 
-			if (parameters.IsPinned.HasValue)
-				await UpdateCommentIsPinnedAsync(comment, parameters.IsPinned.Value).ConfigureAwait(false);
+			if (parameters.IsPinnedToTop.HasValue)
+				await UpdateCommentIsPinnedAsync(comment, parameters.IsPinnedToTop.Value).ConfigureAwait(false);
 
 			if (parameters.IsCorrectAnswer.HasValue)
 				await UpdateCommentIsCorrectAnswerAsync(comment, parameters.IsCorrectAnswer.Value).ConfigureAwait(false);
@@ -222,7 +222,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 					User = BuildShortUserInfo(like.User),
 					Timestamp = like.Timestamp,
 				}).ToList(),
-				PaginationResponse = new PaginationResponse
+				Pagination = new PaginationResponse
 				{
 					Offset = parameters.Offset,
 					Count = paginatedLikes.Count,

@@ -9,11 +9,11 @@ namespace Ulearn.Web.Api.Models.Parameters.Groups
 	[DataContract]
 	public class CopyStudentsParameters
 	{
-		[DataMember(Name = "destination_group_id", IsRequired = true)]
+		[DataMember(IsRequired = true)]
 		[MinValue(0)]
 		public int DestinationGroupId { get; set; }
 		
-		[DataMember(Name = "student_ids", IsRequired = true)]
-		public List<string> UserIds { get; set; }
+		[DataMember(IsRequired = true)]
+		public List<string> StudentIds { get; set; }
 	}
 }

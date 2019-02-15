@@ -6,7 +6,7 @@ namespace Ulearn.Web.Api.Models.Parameters.Groups
 	public class CopyGroupParameters
 	{
 		[FromQuery(Name = "destination_course_id")]
-		[BindRequired]		
+		[BindRequired]
 		public string DestinationCourseId { get; set; }
 
 		[FromQuery(Name = "make_me_owner")]
