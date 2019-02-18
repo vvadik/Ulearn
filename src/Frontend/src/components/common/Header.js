@@ -600,9 +600,10 @@ class LogoutLink extends Component {
         this.onClick = this.onClick.bind(this);
     }
 
-    onClick() {
+    onClick(e) {
     	localStorage.removeItem('exercise_solutions');
         this.props.logout();
+        e.preventDefault();
     }
 
     render() {
