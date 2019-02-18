@@ -62,6 +62,7 @@ export function logout() {
 					dispatch({
 						type: 'ACCOUNT__USER_LOGOUTED',
 					});
+					window.location.reload(true);
 				}
             })
     }
