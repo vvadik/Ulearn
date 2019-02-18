@@ -122,6 +122,8 @@ namespace Database.Repos.Groups
 			{
 				if (! courseInstructorsIds.Contains(access.UserId))
 					continue;
+				if (newGroup.OwnerId == access.UserId)
+					continue;
 				db.GroupAccesses.Add(new GroupAccess
 				{
 					GroupId = newGroup.Id,
