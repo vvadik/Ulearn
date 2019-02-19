@@ -4,6 +4,7 @@ import { storiesOf } from '@storybook/react';
 import {action} from "@storybook/addon-actions";
 import Comment from './Comment';
 import CommentSendForm from "../CommentSendForm/CommentSendForm";
+import Toast from "@skbkontur/react-ui/components/Toast/Toast";
 
 import '../../../common.less';
 
@@ -18,44 +19,69 @@ const userWithAvatar = {
 };
 
 
-class OpenCommentForm extends React.Component {
+class DeleteComment extends React.Component {
 	state = {
-		openForm: false,
+		commentsList: [{id: 1, text: "hello, i'm a first comment"}, {id: 2, text: "hello, i'm a second comment"}],
 	};
 
 	render() {
+
 		return (
 			<React.Fragment>
-				<Comment
-					onClick={this.onClick}
-					author={nameOnlyUser}
-					commentText='Дэн Абрамов предлагает не беспокоиться, но его слова действуют не на всех'
-					dateAdded={'2019-01-01T01:37:56'}
-					likesCount={10}
-					sending={false}/>
-				{ this.state.openForm && <CommentSendForm onSubmit={action('sendComment')} commentId={'2'} author={userWithAvatar} sending={false}/> }
+				{ this.state.commentsList.map(comment => {
+					return (
+					<Comment
+						key={comment.id}
+						commentId={comment.id}
+						author={nameOnlyUser}
+						commentHtml={comment.text}
+						publishDate={'2019-01-01T01:37:56'}
+						likesCount={10}
+						isLiked={true}
+						sending={false}
+						showReplyButton={true}
+						deleteComment={this.deleteComment}>
+						<CommentSendForm author={userWithAvatar}/>
+					</Comment>
+				)}
+			)}
 			</React.Fragment>
 		)
 	}
 
-	onClick = () =>  {
-	this.setState({
-		openForm: true,
-	});
-	console.log('!');
-}
+	deleteComment = (commentId) => {
+		const newCommentsList = this.state.commentsList
+			.filter(comment => comment.id !== commentId);
+
+		this.setState({
+			commentsList: newCommentsList,
+		});
+
+		Toast.push("Комментарий удалён",  {
+			label: "Восстановить",
+			handler: () => {
+				this.setState({
+					commentsList: [...newCommentsList, {id: commentId}],
+				});
+				Toast.push("Комментарий восстановлен")
+			}
+		});
+	}
 }
 
 storiesOf('Comments/Comment', module)
-	.add('desktop', () => (
+	.add('only comment', () => (
 		<Comment
 			author={nameOnlyUser}
-			commentText='Сама природа JS и его способы использования готовят нас к тому, что никогда не настанет светлых времен с современными рантаймами.'
+			commentHtml={'Сама природа <code>JS</code> и его способы <b>использования</b> готовят нас к тому, что никогда не настанет светлых времен с <a href="https://kontur.ru">современными рантаймами</a>.<br><br>Аминь!'}
 			dateAdded={'2019-01-01T01:37:56'}
 			likesCount={10}
 			isLiked={true}
 			sending={false}
 			showReplyButton={true}>
-			<div>Форма ответа на комментарий</div>
+			<CommentSendForm author={userWithAvatar} />
 		</Comment>
-	), { viewport: 'desktop' });
+	), { viewport: 'desktop' })
+	.add('comment with delete action', () => (
+		<DeleteComment />
+	),{ viewport: 'desktop' } );

@@ -1,52 +1,49 @@
 import React, {Component} from 'react';
 import PropTypes from "prop-types";
+import moment from "moment";
+import * as debounce from "debounce";
 import Icon from "@skbkontur/react-icons";
+import Hint from "@skbkontur/react-ui/components/Hint/Hint";
+import Textarea from "@skbkontur/react-ui/components/Textarea/Textarea";
 import Avatar from "../../common/Avatar/Avatar";
 
 import styles from "./comment.less";
-import moment from "moment";
-import * as debounce from "debounce";
+import Button from "@skbkontur/react-ui/components/Button/Button";
+import CommentSendForm from "../CommentSendForm/CommentSendForm";
+import MarkdownEditor from "../CommentSendForm/MarkdownEditor";
+import Action from "./Action";
 
 /*
 Props:
-isLiked Залайкано ли текущим пользователем?
-likesCount Колиество лойков
-Событие likeChanged(поставил ли лайк?) debounce
-isTopLevel
-bool sendFormOpened
-bool showReplyButton
-
-State:
-	likesCount из пропсов
-	isLiked из пропсов
-
- */
+  "is_approved": true,
+  "is_correct_answer": true,
+  "is_pinned_to_top": true,
+  "likes_count": 0,
+  "replies": [
+    null
+  ],
+  "course_id": "string",
+  "slide_id": "string",
+  "reply_to": 0
+}
+*/
 
 class Comment extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			openForm: props.sendFormOpened,
+			commentId: props.commentId,
 			likesCount: props.likesCount,
 			isLiked: props.isLiked,
+			openForm: false,
+			openEditCommentForm: false,
 		};
-
 		this.debouncedSendChangedLike = debounce(this.sendChangedLike, 300);
 	};
 
-	// static getDerivedStateFromProps(props, state) {
-	// 	if (props.likesCount !== state.likesCount) {
-	// 		return {
-	// 			commentId: props.likesCount,
-	// 		}
-	// 	}
-	//
-	// 	return null;
-	// }
-
 	render() {
-		const {children, author, commentText, publishDate, showReplyButton } = this.props;
-		const { likesCount, isLiked } = this.state;
+		const {children, author, publishDate} = this.props;
+		const {likesCount, isLiked} = this.state;
 		return (
 			<React.Fragment>
 				<div className={styles.comment}>
@@ -59,28 +56,18 @@ class Comment extends Component {
 									<Icon
 										name={'ThumbUp'}
 										color={isLiked ? '#D70C17' : '#A0A0A0'}
-										size={16} />
+										size={16}/>
 								</button>
 								<span className={styles.likesCount}>{likesCount}</span>
 							</div>
 						</div>
-						<div className={styles.timeSinceAdded}>{moment(publishDate).fromNow()}</div>
-						<p className={styles.text}>{ commentText }</p>
-						<div className={styles.actions}>
-							{ showReplyButton &&
-							<button className={styles.sendAnswer} onClick={this.openCommentSendForm}>
-								<Icon name={'ArrowCorner1'} color={'#3072C4'}/>
-								<span className={styles.buttonText}>Ответить</span>
-							</button>}
-							<button className={`${styles.sendAnswer} ${styles.userButton}`}>
-								<Icon name={'Edit'} color={'#3072C4'}/>
-								<span className={styles.buttonText}>Редактировать</span>
-							</button>
-							<button className={`${styles.sendAnswer} ${styles.userButton}`}>
-								<Icon name={'Delete'} color={'#3072C4'}/>
-								<span className={styles.buttonText}>Удалить</span>
-							</button>
-						</div>
+						<Hint pos="bottom" text={publishDate}>
+							<div className={styles.timeSinceAdded}>
+								{moment(publishDate).fromNow()}
+							</div>
+						</Hint>
+						{ this.state.openEditCommentForm ? this.renderEditCommentForm() :
+							this.renderComment()}
 						{ this.state.openForm && children }
 					</div>
 				</div>
@@ -88,8 +75,46 @@ class Comment extends Component {
 		);
 	}
 
+	renderComment() {
+		return (
+			<React.Fragment>
+				<p className={styles.text}>
+					<span dangerouslySetInnerHTML={{__html: this.props.commentHtml}} />
+				</p>
+				{ this.renderActions() }
+			</React.Fragment>
+		)
+	}
+
+	renderEditCommentForm() {
+		const { commentHtml, sending, commentId, author } = this.props;
+
+		return (
+			<CommentSendForm text={commentHtml} author={author} action={'edit'} sending={sending} />
+		)
+	}
+
+	renderActions() {
+		return (
+			<div className={styles.actions}>
+				<button type="button" className={styles.sendAnswer} onClick={this.openCommentSendForm}>
+					<Icon name={'ArrowCorner1'} />
+					<span className={styles.buttonText}>Ответить</span>
+				</button>
+				<button type="button" className={styles.sendAnswer} onClick={this.editComment}>
+					<Icon name={'Edit'} />
+					<span className={styles.buttonText}>Редактировать</span>
+				</button>
+				<button type="button" className={styles.sendAnswer} onClick={this.deleteComment}>
+					<Icon name={'Delete'} />
+					<span className={styles.buttonText}>Удалить</span>
+				</button>
+			</div>
+		)
+	}
+
 	onLikeChanged = () => {
-		const { isLiked, likesCount } = this.state;
+		const {isLiked, likesCount} = this.state;
 
 		if (!isLiked) {
 			this.setState({
@@ -116,21 +141,16 @@ class Comment extends Component {
 		});
 	};
 
-	onSubmit = (event) => {
-		const {onSubmit} = this.props;
-
-		event.preventDefault();
-
-		// if (!text) {
-		// 	this.setState({
-		// 		error: "Заполните поле комментария",
-		// 	});
-		// 	return;
-		// }
-
-		onSubmit();
+	deleteComment = () => {
+		const { commentId } = this.props;
+		this.props.deleteComment(commentId);
 	};
 
+	editComment = () => {
+		this.setState({
+			openEditCommentForm: true,
+		});
+	};
 }
 
 const accountModel = PropTypes.shape({
@@ -142,16 +162,14 @@ Comment.propTypes = {
 	/** Идентифицирует комментарий, с которым работает компонент.
 	 * При изменении идентификатора текст в поле ввода очищается. При сохранении того же идентификатора - текст сохраняется. */
 	isLiked: PropTypes.bool,
-	sendFormOpened: PropTypes.bool,
 	likesCount: PropTypes.number,
 	likeChanged: PropTypes.func,
-	publishDate: PropTypes.string,
-	showReplyButton: PropTypes.bool,
-	commentId: PropTypes.string,
+	sendFormOpened: PropTypes.bool,
 	author: accountModel,
-	sending: PropTypes.bool,
-	error: PropTypes.oneOf([PropTypes.string, PropTypes.object]),
-	onSubmit: PropTypes.func,
+	publishDate: PropTypes.string,
+	commentHtml: PropTypes.string,
+	showReplyButton: PropTypes.bool,
+	commentId: PropTypes.number,
 };
 
 export default Comment;

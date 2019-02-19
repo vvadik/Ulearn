@@ -1,30 +1,53 @@
-import React from 'react';
+import React, {Component} from 'react';
 import PropTypes from "prop-types";
 import Hint from "@skbkontur/react-ui/components/Hint/Hint";
 
-function MarkdownButton(props) {
-	const { hint, icon, width, height, onClick } = props;
-	return (
-		<Hint pos="top" text={hint}>
-			<button onClick={onClick} type="button">
-				<svg
-					width={width}
-					height={height}
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-				>
-					{icon}
-				</svg>
-			</button>
-		</Hint>
-	)
+import styles from "./commentSendForm.less";
+
+class MarkdownButton extends Component {
+
+	render() {
+		const { markupByOperation } = this.props;
+		return (
+			<div className={styles.markdownButtons}>
+				<span className={styles.markdownText}>Поддерживаем markdown</span>
+				{Object.values(markupByOperation)
+					.map(operation => this.renderMarkdownButton(operation))}
+			</div>
+		);
+	}
+
+	renderMarkdownButton(operation) {
+		return (
+			<Hint pos="top" text={this.renderHint(operation)}>
+				<button onClick={this.onClick(operation)} type="button">
+					<svg
+						width={20}
+						height={18}
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+					>
+						{operation.icon}
+					</svg>
+				</button>
+			</Hint>
+		)
+	}
+
+	renderHint({description, markup, hotkey}) {
+		return <span className={styles._yellow}>{markup}<span className={styles._white}>{description}</span>{markup}
+			<br/><span className={styles._yellow}>{hotkey.asText}</span>
+		</span>;
+	};
+
+	onClick = (operation) => () => {
+		this.props.onClick(operation);
+	};
 }
 
 MarkdownButton.propTypes = {
-	hint: PropTypes.element,
-	icon: PropTypes.element,
-	width: PropTypes.number,
-	height: PropTypes.number
+	markupByOperation: PropTypes.object,
+	onClick: PropTypes.func,
 };
 
 export default MarkdownButton;
