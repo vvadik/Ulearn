@@ -4,6 +4,8 @@ import BaseTextarea from "@skbkontur/react-ui/components/Textarea/Textarea";
 import {boldIcon, codeIcon, italicIcon} from "../SVGIcons/SVGIcon";
 import MarkdownButton from "./MarkdownButton";
 
+import styles from "./commentSendForm.less";
+
 const markupByOperation = {
 	bold: {
 		markup: '**',
@@ -39,7 +41,6 @@ const markupByOperation = {
 
 // monkey patch
 class Textarea extends BaseTextarea {
-
 	get selectionRange() {
 		if (!this.node) {
 			throw new Error('Cannot call "selectionRange" on unmounted Input');
@@ -53,50 +54,41 @@ class Textarea extends BaseTextarea {
 }
 
 class MarkdownEditor extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			text: props.text,
-		};
-	}
-
-	get text() {
-		return this.state.text;
-	}
-
 	textarea = React.createRef();
 
 	render() {
+		const {hasError, text} = this.props;
+
 		return (
 			<React.Fragment>
 				<Textarea
 					ref={this.textarea}
-					value={this.state.text}
+					value={text}
 					width={'100%'}
-					error={this.props.hasError()}
+					error={hasError}
 					maxRows={15}
 					rows={4}
-					onChange={this.onChange}
-					onKeyDown={this.onKeyPress}
+					onChange={this.handleChange}
+					onKeyDown={this.handleKeyDown}
 					autoResize
 					placeholder="Комментарий" />
-				<MarkdownButton
-					markupByOperation={markupByOperation}
-					onClick={this.onClick} />
+				<div className={styles.footer}>
+					{ this.props.children }
+					<MarkdownButton
+						markupByOperation={markupByOperation}
+						onClick={this.handleClick} />
+				</div>
 			</React.Fragment>
 		)
 	}
 
-	onChange = (e, value) => {
-		this.setState({ text: value });
+	handleChange = (e, value) => {
+		const {onChange} = this.props;
 
-
-		if (this.state.text) {
-			this.props.hasError(this.state.text);
-		}
+		onChange(value);
 	};
 
-	onKeyPress = (e) => {
+	handleKeyDown = (e) => {
 		for (let operation of Object.values(markupByOperation)) {
 			if (e.key === operation.hotkey.key &&
 				(e.ctrlKey || e.metaKey) === !!operation.hotkey.ctrl &&
@@ -107,17 +99,17 @@ class MarkdownEditor extends Component {
 		}
 	};
 
-	onClick = (operation) => {
+	handleClick = (operation) => {
 		this.transformTextToMarkdown(operation);
 	};
 
 	transformTextToMarkdown = (operation) => {
+		const {onChange, text} = this.props;
 		const range = this.textarea.current.selectionRange;
-		let text = this.state.text;
 
 		let {finalText, finalSelectionRange} = MarkdownEditor.wrapRangeWithMarkdown(text, range, operation);
 
-		this.setState({ text: finalText }, () => {
+		onChange(finalText).then(() => {
 			this.textarea.current.setSelectionRange(
 				finalSelectionRange.start,
 				finalSelectionRange.end,
@@ -158,7 +150,7 @@ class MarkdownEditor extends Component {
 }
 
 MarkdownEditor.propTypes = {
-	hasError: PropTypes.func,
+	hasError: PropTypes.bool,
 	text: PropTypes.string,
 };
 

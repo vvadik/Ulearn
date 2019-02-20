@@ -2,9 +2,9 @@ import React from 'react';
 import { storiesOf } from '@storybook/react';
 // import { withViewport } from '@storybook/addon-viewport';
 import {action} from "@storybook/addon-actions";
+import Toast from "@skbkontur/react-ui/components/Toast/Toast";
 import Comment from './Comment';
 import CommentSendForm from "../CommentSendForm/CommentSendForm";
-import Toast from "@skbkontur/react-ui/components/Toast/Toast";
 
 import '../../../common.less';
 
@@ -19,9 +19,12 @@ const userWithAvatar = {
 };
 
 
-class DeleteComment extends React.Component {
+class WrapperComment extends React.Component {
 	state = {
-		commentsList: [{id: 1, text: "hello, i'm a first comment"}, {id: 2, text: "hello, i'm a second comment"}],
+		commentsList: [
+			{id: 1, text: "Решать эти задачи можно прямо в браузере, а специальная проверяющая система тут же проверит ваше решение."},
+			{id: 2, text: "После успешного решения некоторых задач вы сможете посмотреть решения других обучающихся. "},
+			{id: 3, text: "Если вам что-то непонятно или вы нашли ошибку на слайде — пишите об этом в комментариях под слайдом."}],
 	};
 
 	render() {
@@ -34,20 +37,36 @@ class DeleteComment extends React.Component {
 						key={comment.id}
 						commentId={comment.id}
 						author={nameOnlyUser}
-						commentHtml={comment.text}
+						commentText={comment.text}
 						publishDate={'2019-01-01T01:37:56'}
 						likesCount={10}
 						isLiked={true}
 						sending={false}
 						showReplyButton={true}
-						deleteComment={this.deleteComment}>
-						<CommentSendForm author={userWithAvatar}/>
+						deleteComment={this.deleteComment}
+						pinnedComment={this.pinnedComment}>
+						<CommentSendForm
+							onSubmit={action('sendComment')}
+							text={comment.text}
+							submitTitle={'Отправить'}
+							commentId={'1'}
+							sending={false}
+							// editComment={() => this.editComment(comment.id, comment.text)}
+							author={userWithAvatar}/>
 					</Comment>
 				)}
 			)}
 			</React.Fragment>
 		)
 	}
+
+	// editComment = (id, text) => {
+	// 	const changedComment = this.state.commentsList.filter(comment => comment.id === id);
+	// 	const commentListWithoutChangedComment = this.state.commentsList.filter(comment => comment.id !== id);
+	// 	this.setState({
+	// 		commentsList: [...commentListWithoutChangedComment, {...changedComment, text: this.state.text}]
+	// 	})
+	// };
 
 	deleteComment = (commentId) => {
 		const newCommentsList = this.state.commentsList
@@ -66,22 +85,19 @@ class DeleteComment extends React.Component {
 				Toast.push("Комментарий восстановлен")
 			}
 		});
-	}
+	};
+
+	pinnedComment = (id) => {
+		const pinnedComment = this.state.commentsList.filter(comment => comment.id === id);
+		const commentListWithoutPinnedComment = this.state.commentsList.filter(comment => comment.id !== id);
+
+		this.setState({
+			commentsList: pinnedComment.concat(commentListWithoutPinnedComment),
+		});
+	};
 }
 
 storiesOf('Comments/Comment', module)
-	.add('only comment', () => (
-		<Comment
-			author={nameOnlyUser}
-			commentHtml={'Сама природа <code>JS</code> и его способы <b>использования</b> готовят нас к тому, что никогда не настанет светлых времен с <a href="https://kontur.ru">современными рантаймами</a>.<br><br>Аминь!'}
-			dateAdded={'2019-01-01T01:37:56'}
-			likesCount={10}
-			isLiked={true}
-			sending={false}
-			showReplyButton={true}>
-			<CommentSendForm author={userWithAvatar} />
-		</Comment>
-	), { viewport: 'desktop' })
-	.add('comment with delete action', () => (
-		<DeleteComment />
+	.add('comment with actions', () => (
+		<WrapperComment />
 	),{ viewport: 'desktop' } );

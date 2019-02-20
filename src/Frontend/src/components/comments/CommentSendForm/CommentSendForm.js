@@ -3,28 +3,22 @@ import PropTypes from "prop-types";
 import Button from "@skbkontur/react-ui/components/Button/Button";
 import Avatar from "../../common/Avatar/Avatar";
 import MarkdownEditor from "./MarkdownEditor";
-import {Mobile, NotMobile} from "../../../utils/responsive";
 
 import styles from "./commentSendForm.less";
-import Action from "../Comment/Action";
-
-// <CommentSendForm key={commentId} />
 
 class CommentSendForm extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			error: null,
-			commentId: props.commentId,
-		};
-	}
+	state = {
+		text: '',
+		error: null,
+		commentId: null,
+	};
 
 	static getDerivedStateFromProps(props, state) {
 		if (props.commentId !== state.commentId) {
 			return {
-				text: '',
+				text: props.text || '',
 				commentId: props.commentId,
-			}
+			};
 		}
 
 		return null;
@@ -33,50 +27,72 @@ class CommentSendForm extends Component {
 	editor = React.createRef();
 
 	render() {
-		const { author, commentId, commentText } = this.props;
+		const { author } = this.props;
+		const { error, text } = this.state;
 
 		return (
 			<React.Fragment>
 				<div className={styles.commentSendForm}>
-					<Avatar user={author} size='big'/>
-					<form className={styles.commentSend} onSubmit={this.onSubmit}>
+					{author && (
+						<div className={styles.avatar}>
+							<Avatar user={author} size='big' />
+						</div>
+					)}
+					<form className={styles.commentSend} onSubmit={this.handleSubmit}>
 						<MarkdownEditor
 							ref={this.editor}
-							hasError={this.hasError}
-							text={commentId ? commentText : '' }/>
-						{ this.renderAction(this.props.action) }
+							hasError={error !== null}
+							text={text}
+							onChange={this.handleChange}
+						>
+							<div className={styles.buttons}>
+								{this.renderSubmitButton()}
+								{this.renderCancelButton()}
+							</div>
+						</MarkdownEditor>
 					</form>
 				</div>
 			</React.Fragment>
 		)
 	}
 
-	renderAction(action) {
-		const { commentId, sending } = this.props;
+	renderSubmitButton() {
+		const { submitTitle = 'Оставить комментарий', sending } = this.props;
+
 		return (
-			<React.Fragment>
-				<div className={styles.commentButtons}>
-					<div className={styles.sendButtonDesktop}>
-						<NotMobile>
-							<Action commentId={commentId} sending={sending} action={action} />
-							{ action === 'edit' && <Action commentId={commentId} sending={sending} action={action} /> }
-						</NotMobile>
-					</div>
-				</div>
-				<Mobile>
-					<Action commentId={commentId} sending={sending} action={action} />
-					{ action === 'edit' && <Action commentId={commentId} sending={sending} action={action} /> }
-				</Mobile>
-			</React.Fragment>
-		)
+			<Button
+				use="primary"
+				size="medium"
+				type="submit"
+				loading={sending}>
+				{submitTitle}
+			</Button>
+		);
 	}
 
-	onSubmit = (event) => {
-		const text = this.editor.current.text;
+	renderCancelButton() {
+		const { onCancel, cancelTitle = 'Отменить' } = this.props;
 
-		const { onSubmit } = this.props;
+		if (!onCancel) {
+			return null;
+		}
 
+		return (
+			<Button
+				use="secondary"
+				size="medium"
+				type="button"
+				onClick={onCancel}>
+				{cancelTitle}
+			</Button>
+		);
+	}
+
+	handleSubmit = (event) => {
 		event.preventDefault();
+
+		const { text } = this.state;
+		const { onSubmit } = this.props;
 
 		if (!text) {
 			this.setState({
@@ -88,14 +104,11 @@ class CommentSendForm extends Component {
 		onSubmit(text);
 	};
 
-	hasError = (textValue) => {
-		if (textValue) {
-			this.setState({
-				error: null,
-			});
-		}
-		return this.state.error !== null;
-	};
+	handleChange = (text) => {
+		return new Promise((resolve) => {
+			this.setState({ text, error: null }, resolve);
+		});
+	}
 }
 
 const accountModel = PropTypes.shape({
@@ -105,7 +118,8 @@ const accountModel = PropTypes.shape({
 
 CommentSendForm.propTypes = {
 	/** Идентифицирует комментарий, с которым работает компонент.
-	 * При изменении идентификатора текст в поле ввода очищается. При сохранении того же идентификатора - текст сохраняется. */
+	 * При изменении идентификатора текст в поле ввода очищается.
+	 * При сохранении того же идентификатора - текст сохраняется.*/
 	commentId: PropTypes.string,
 	author: accountModel,
 	sending: PropTypes.bool,
