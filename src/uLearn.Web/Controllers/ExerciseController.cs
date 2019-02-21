@@ -179,7 +179,7 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public ActionResult SlideCodeReviewComments(string courseId, Guid slideId)
 		{
-			var comments = slideCheckingsRepo.GetAllReviewComments(courseId, slideId);
+			var comments = slideCheckingsRepo.GetLastYearReviewComments(courseId, slideId);
 			return PartialView("_SlideCodeReviewComments", comments);
 		}
 		

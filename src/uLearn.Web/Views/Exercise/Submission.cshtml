@@ -231,8 +231,9 @@
 	@Html.Action("StudentSubmissions", "Exercise", new { courseId = Model.CourseId, slideId = Model.Slide.Id })
 }
 
-@if (Model.ManualChecking == null && User.HasAccessFor(Model.CourseId, CourseRole.CourseAdmin))
+@if (Model.ManualChecking == null && User.HasAccessFor(Model.CourseId, CourseRole.CourseAdmin) && false) 
 {
+	//NOTE: feature is disabled due to performance
 	@Html.Action("SlideCodeReviewComments", "Exercise", new { courseId = Model.CourseId, slideId = Model.Slide.Id })
 }
 

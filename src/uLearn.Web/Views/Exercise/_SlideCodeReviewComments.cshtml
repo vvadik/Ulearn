@@ -9,6 +9,7 @@
 		.GroupBy(r => r.Comment)
 		.OrderByDescending(g => g.Count())
 		.ThenByDescending(g => g.Max(r => r.ExerciseChecking.Timestamp))
+		.Take(50)
 		.ToList();
 }
 
