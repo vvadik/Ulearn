@@ -34,7 +34,7 @@ namespace Web.Api.Tests.Controllers.Groups
 			
 			await AuthenticateUserInControllerAsync(groupsController, TestUsers.Admin).ConfigureAwait(false);
 
-			var result = await groupsController.GroupsList(course.Object, new GroupsListParameters()).ConfigureAwait(false);
+			var result = await groupsController.GroupsList(new GroupsListParameters { CourseId = "courseId" }).ConfigureAwait(false);
 			Assert.AreEqual(1, result.Value.Groups.Count);
 		}
 	}

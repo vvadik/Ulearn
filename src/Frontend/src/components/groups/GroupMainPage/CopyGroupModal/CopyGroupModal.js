@@ -44,7 +44,7 @@ class CopyGroupModal extends Component {
 	loadCourseInstructors = (courseId) => {
 		api.users.getCourseInstructors(courseId)
 			.then(json => {
-				let instructors = json.instructors;
+				let instructors = json.users.map(item => item.user);
 				this.setState({
 					instructors,
 				});
@@ -170,7 +170,7 @@ class CopyGroupModal extends Component {
 		return (
 			<div className={styles["change-owner-block"]}>
 				<p className={styles["change-owner-info"]}>
-					Владелец этой группы <b>{group.owner.visible_name}</b> не является преподавателем
+					Владелец этой группы <b>{group.owner.visibleName}</b> не является преподавателем
 					курса <b>«{ this.props.course.title }»</b>.
 					Вы можете сделать себя владельцем скопированной группы.
 				</p>
@@ -219,8 +219,8 @@ class CopyGroupModal extends Component {
 	getGroupOptions = () => {
 		const { groups } = this.state;
 
-		return groups.map(group => [group.id, `${group.name}: ${group.students_count} 
-		${getPluralForm(group.students_count, 'студент', 'студента', 'студентов')}`]);
+		return groups.map(group => [group.id, `${group.name}: ${group.studentsCount} 
+		${getPluralForm(group.studentsCount, 'студент', 'студента', 'студентов')}`]);
 	};
 
 	onGroupChange = (_, value) => {

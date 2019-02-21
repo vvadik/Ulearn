@@ -9,26 +9,26 @@ namespace Ulearn.Web.Api.Models.Responses.Account
 	[DataContract]
 	public class GetMeResponse : SuccessResponse
 	{
-		[DataMember(Name = "is_authenticated")]
+		[DataMember]
 		public bool IsAuthenticated { get; set; }
 		
-		[DataMember(Name = "user", EmitDefaultValue = false)]
+		[DataMember(EmitDefaultValue = false)]
 		public ShortUserInfo User { get; set; }
 
-		[DataMember(Name = "account_problems", EmitDefaultValue = false)]
+		[DataMember(EmitDefaultValue = false)]
 		public List<AccountProblem> AccountProblems { get; set; }
 		
-		[DataMember(Name = "system_accesses")]
+		[DataMember]
 		public List<SystemAccessType> SystemAccesses { get; set; }
 	}
 
 	[DataContract]
 	public class AccountProblem
 	{
-		[DataMember(Name = "title")]
+		[DataMember]
 		public string Title { get; set; }
 		
-		[DataMember(Name = "description")]
+		[DataMember]
 		public string Description { get; set; }
 
 		public AccountProblem(string title, string description)

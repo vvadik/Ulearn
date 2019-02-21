@@ -31,7 +31,7 @@ namespace Ulearn.Web.Api.Controllers
 		/// <summary>
 		/// Список курсов
 		/// </summary>
-		[HttpGet("")]
+		[HttpGet]
 		public async Task<ActionResult<CoursesListResponse>> CoursesList([FromQuery] CourseRoleType? role=null)
 		{
 			if (role.HasValue && !IsAuthenticated)

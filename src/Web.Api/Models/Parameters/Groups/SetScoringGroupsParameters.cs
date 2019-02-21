@@ -7,10 +7,12 @@ using Ulearn.Web.Api.Models.Binders;
 namespace Ulearn.Web.Api.Models.Parameters.Groups
 {
 	[DataContract]
-	[ModelBinder(typeof(JsonModelBinder), Name="parameters")]
 	public class SetScoringGroupsParameters : ApiParameters
 	{
-		[DataMember(Name = "scores", IsRequired = true)]
-		public List<string> ScoringGroupIds { get; set; }
+		/// <summary>
+		/// ScoringGroupIds
+		/// </summary>
+		[DataMember(IsRequired = true)]
+		public List<string> Scores { get; set; }
 	}
 }

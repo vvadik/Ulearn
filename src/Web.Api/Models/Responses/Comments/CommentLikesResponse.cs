@@ -9,17 +9,17 @@ namespace Ulearn.Web.Api.Models.Responses.Comments
 	[DataContract]
 	public class CommentLikesResponse : PaginatedResponse
 	{
-		[DataMember(Name = "likes")]
+		[DataMember]
 		public List<CommentLikeInfo> Likes { get; set; }
 	}
 
 	[DataContract]
 	public class CommentLikeInfo
 	{
-		[DataMember(Name = "user")]
+		[DataMember]
 		public ShortUserInfo User { get; set; }
 		
-		[DataMember(Name = "timestamp")]
+		[DataMember]
 		public DateTime Timestamp { get; set; }
 	}
 }

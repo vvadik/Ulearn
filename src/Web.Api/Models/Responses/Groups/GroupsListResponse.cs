@@ -7,7 +7,7 @@ namespace Ulearn.Web.Api.Models.Responses.Groups
 	[DataContract]
 	public class GroupsListResponse : PaginatedResponse
 	{
-		[DataMember(Name = "groups")]
+		[DataMember]
 		public List<GroupInfo> Groups { get; set; }
 	}
 }

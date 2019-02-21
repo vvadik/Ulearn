@@ -8,33 +8,33 @@ namespace Ulearn.Web.Api.Models.Responses.Account
 	[DataContract]
 	public class CourseRolesResponse : SuccessResponse
 	{
-		[DataMember(Name = "is_system_administrator")]
-		public bool IsSystemAdministrator { get; set; }
+		[DataMember]
 		
-		[DataMember(Name = "course_roles")]
-		public List<CourseRoleResponse> Roles { get; set; }
+		public bool IsSystemAdministrator { get; set; }
+		[DataMember]
+		public List<CourseRoleResponse> CourseRoles { get; set; }
 
-		[DataMember(Name = "course_accesses")]
-		public List<CourseAccessResponse> Accesses { get; set; }
+		[DataMember]
+		public List<CourseAccessResponse> CourseAccesses { get; set; }
 	}
 
 	[DataContract]
 	public class CourseRoleResponse
 	{
-		[DataMember(Name = "course_id")]
+		[DataMember]
 		public string CourseId { get; set; }
 		
-		[DataMember(Name = "role")]
+		[DataMember]
 		public CourseRoleType Role { get; set; }
 	}
 
 	[DataContract]
 	public class CourseAccessResponse
 	{
-		[DataMember(Name = "course_id")]
+		[DataMember]
 		public string CourseId { get; set; }
 		
-		[DataMember(Name = "accesses")]
+		[DataMember]
 		public List<CourseAccessType> Accesses { get; set; }
 	}
 }

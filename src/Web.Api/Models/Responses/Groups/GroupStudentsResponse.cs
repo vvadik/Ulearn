@@ -9,17 +9,17 @@ namespace Ulearn.Web.Api.Models.Responses.Groups
 	[DataContract]
 	public class GroupStudentsResponse : SuccessResponse
 	{
-		[DataMember(Name = "students")]
+		[DataMember]
 		public List<GroupStudentInfo> Students { get; set; }
 	}
 
 	[DataContract]
 	public class GroupStudentInfo
 	{
-		[DataMember(Name = "user")]
+		[DataMember]
 		public ShortUserInfo User { get; set; }
 		
-		[DataMember(Name = "adding_time")]
+		[DataMember]
 		public DateTime? AddingTime { get; set; }
 	}
 }

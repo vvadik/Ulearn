@@ -5,9 +5,9 @@ import Checkbox from "@skbkontur/react-ui/components/Checkbox/Checkbox";
 import styles from './groupScores.less';
 
 const mapToServerName = {
-	groupScores: 'are_additional_scores_enabled_in_this_group',
-	allGroupScores: 'are_additional_scores_enabled_for_all_groups',
-	unitScores: 'can_instructor_set_additional_score_in_some_unit',
+	groupScores: 'areAdditionalScoresEnabledInThisGroup',
+	allGroupScores: 'areAdditionalScoresEnabledForAllGroups',
+	unitScores: 'canInstructorSetAdditionalScoreInSomeUnit',
 };
 
 class GroupScores extends Component {

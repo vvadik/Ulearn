@@ -7,10 +7,10 @@ namespace Ulearn.Web.Api.Models.Responses.Notifications
 	[DataContract]
 	public class NotificationsCountResponse : SuccessResponse
 	{
-		[DataMember(Name = "count")]
+		[DataMember]
 		public int Count { get; set; }
 
-		[DataMember(Name = "last_timestamp")]
+		[DataMember]
 		public DateTime? LastTimestamp { get; set; }
 	}
 }

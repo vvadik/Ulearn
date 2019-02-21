@@ -2,11 +2,11 @@ import api from "../api/"
 
 // Groups
 export function getCourseGroups(courseId) {
-	return api.get("groups/in/" + courseId);
+	return api.get("groups?course_id=" + courseId);
 }
 
 export function getCourseArchivedGroups(courseId) {
-	return api.get("groups/in/" + courseId + "/archived")
+	return api.get("groups?course_id=" + courseId + "&archived=true")
 }
 
 // Group
@@ -15,8 +15,8 @@ export function getGroup(groupId) {
 }
 
 export function createGroup(courseId, name) {
-	return api.post("groups/in/" + courseId,
-		api.createRequestParams({ name }));
+	return api.post("groups?course_id=" + courseId,
+		api.createRequestParams({name}));
 }
 
 export function copyGroup(groupId, destinationCourseId, makeMeOwner) {
@@ -35,7 +35,7 @@ export function deleteGroup(groupId) {
 
 export function changeGroupOwner(groupId, ownerId) {
 	return api.put("groups/" + groupId + '/owner',
-		api.createRequestParams({owner_id: ownerId}));
+		api.createRequestParams({ownerId}));
 }
 
 // Scores
@@ -67,11 +67,11 @@ export function getStudents(groupId) {
 }
 
 export function deleteStudents(groupId, studentIds) {
-	return api.delete("groups/" + groupId + "/students/",
-		api.createRequestParams({'student_ids': studentIds}));
+	return api.delete("groups/" + groupId + "/students",
+		api.createRequestParams({studentIds}));
 }
 
-export function copyStudents(groupId, destinationGroupId, studentIds) {
-	return api.post("groups/" + groupId + "/students/copy/to/" + destinationGroupId,
-		api.createRequestParams({'student_ids': studentIds}));
+export function copyStudents(groupId, studentIds) {
+	return api.post("groups/" + groupId + "/students",
+		api.createRequestParams({studentIds}));
 }

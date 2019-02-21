@@ -10,8 +10,8 @@ function Profile(props) {
 	const profileUrl = `/Account/Profile?userId=${user.id}`;
 
 	return canViewProfiles
-		? <Link href={profileUrl}>{user.visible_name}</Link>
-		: <div className={styles.name}>{user.visible_name}</div>;
+		? <Link href={profileUrl}>{user.visibleName}</Link>
+		: <div className={styles.name}>{user.visibleName}</div>;
 }
 
 Profile.propTypes = {

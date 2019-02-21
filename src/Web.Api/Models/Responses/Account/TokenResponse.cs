@@ -6,7 +6,7 @@ namespace Ulearn.Web.Api.Models.Responses.Account
 	[DataContract]
 	public class TokenResponse : SuccessResponse
 	{
-		[DataMember(Name = "token")]
+		[DataMember]
 		public string Token { get; set; }
 	}
 }

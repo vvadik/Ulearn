@@ -21,7 +21,7 @@ class GroupStudents extends Component {
 	};
 
 	render() {
-		const { students, group } = this.props;
+		const { students } = this.props;
 		const { studentIds, modalOpen } = this.state;
 		const studentsArrayOfIds = students.map(item => item.user.id);
 
@@ -38,7 +38,6 @@ class GroupStudents extends Component {
 				{this.renderStudents()}
 				{ modalOpen &&
 				<CopyStudentsModal
-					currentGroupId={group.id}
 					studentIds={studentIds}
 					onClose={this.onCloseModal}/> }
 			</React.Fragment>
@@ -82,7 +81,7 @@ class GroupStudents extends Component {
 		return (
 			<div>
 				{students
-					.sort((a, b) => a.user.visible_name.localeCompare(b.user.visible_name))
+					.sort((a, b) => a.user.visibleName.localeCompare(b.user.visible_name))
 					.map(item =>
 						<div className={styles["student-block"]}
 							 key={item.user.id}>
@@ -93,9 +92,9 @@ class GroupStudents extends Component {
 								<Profile
 									user={item.user}
 									systemAccesses={systemAccesses}
-									isSysAdmin={isSysAdmin} /> { item.adding_time && <span className={styles.addingTime}>
+									isSysAdmin={isSysAdmin} /> { item.addingTime && <span className={styles.addingTime}>
 									{ `${ getGenderForm(item.user.gender, 'вступила', 'вступил') }
-									${ moment(grantTime(item.adding_time)).fromNow() }` }</span> }
+									${ moment(grantTime(item.addingTime)).fromNow() }` }</span> }
 							</Checkbox>
 						</div>
 					)
@@ -154,7 +153,6 @@ class GroupStudents extends Component {
 
 GroupStudents.propTypes = {
 	students: PropTypes.array,
-	group: PropTypes.object,
 	onDeleteStudents: PropTypes.func,
 	isSysAdmin: PropTypes.bool,
 	systemAccesses: PropTypes.array,

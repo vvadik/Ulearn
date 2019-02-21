@@ -9,36 +9,36 @@ namespace Ulearn.Web.Api.Models.Responses.ExerciseStatistics
 	[DataContract]
 	public class CourseExercisesStatisticsResponse : SuccessResponse
 	{
-		[DataMember(Name = "exercises")]
+		[DataMember]
 		public List<OneExerciseStatistics> Exercises { get; set; }
 		
-		[DataMember(Name = "analyzed_submissions_count")]
+		[DataMember]
 		public int AnalyzedSubmissionsCount { get; set; }
 	}
 
 	[DataContract]
 	public class OneExerciseStatistics
 	{
-		[DataMember(Name = "exercise")]
+		[DataMember]
 		public ShortSlideInfo Exercise { get; set; }
 
-		[DataMember(Name = "submissions_count")]
+		[DataMember]
 		public int SubmissionsCount { get; set; }
 		
-		[DataMember(Name = "accepted_count")]
+		[DataMember]
 		public int AcceptedCount { get; set; }
 		
-		[DataMember(Name = "last_dates")]
+		[DataMember]
 		public Dictionary<DateTime, OneExerciseStatisticsForDate> LastDates { get; set; }
 	}
 
 	[DataContract]
 	public class OneExerciseStatisticsForDate
 	{
-		[DataMember(Name = "submissions_count")]
+		[DataMember]
 		public int SubmissionsCount { get; set; }
 		
-		[DataMember(Name = "accepted_count")]
+		[DataMember]
 		public int AcceptedCount { get; set; }
 	}
 }
