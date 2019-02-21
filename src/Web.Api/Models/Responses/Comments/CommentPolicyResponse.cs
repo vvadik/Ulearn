@@ -8,13 +8,13 @@ namespace Ulearn.Web.Api.Models.Responses.Comments
 	[DataContract]
 	public class CommentPolicyResponse : SuccessResponse
 	{
-		[DataMember(Name = "are_comments_enabled")]
+		[DataMember]
 		public bool AreCommentsEnabled { get; set; }
 		
-		[DataMember(Name = "moderation")]
+		[DataMember]
 		public CommentModerationPolicy ModerationPolicy { get; set; }
 		
-		[DataMember(Name = "only_instructors_can_reply")]
+		[DataMember]
 		public bool OnlyInstructorsCanReply { get; set; }
 	}
 }

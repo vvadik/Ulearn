@@ -9,16 +9,19 @@ namespace Ulearn.Web.Api.Models.Responses.Users
 	[DataContract]
 	public class UsersSearchResponse : PaginatedResponse
 	{
-		[DataMember(Name = "users")]
+		[DataMember]
 		public List<FoundUserResponse> Users { get; set; }
 	}
 
 	public class FoundUserResponse
 	{
-		[DataMember(Name = "user")]
+		[DataMember]
 		public ShortUserInfo User { get; set; }
-		
-		[DataMember(Name = "fields")]
+
+		/// <summary>
+		/// Поле, по содержимому которого полнотекстовым поиском найден пользователь
+		/// </summary>
+		[DataMember]
 		public List<SearchField> Fields { get; set; }
 	}
 }

@@ -5,10 +5,10 @@ import Checkbox from "@skbkontur/react-ui/components/Checkbox/Checkbox";
 import styles from './groupSettingsCheckbox.less';
 
 const mapToServerName = {
-	oldSolution: 'is_manual_checking_enabled_for_old_solutions',
-	manualChecking: 'is_manual_checking_enabled',
-	review: 'default_prohibit_further_review',
-	progress: 'can_students_see_group_progress',
+	oldSolution: 'isManualCheckingEnabledForOldSolutions',
+	manualChecking: 'isManualCheckingEnabled',
+	review: 'defaultProhibitFurtherReview',
+	progress: 'canStudentsSeeGroupProgress',
 };
 
 class GroupSettingsCheckbox extends Component {
@@ -22,8 +22,8 @@ class GroupSettingsCheckbox extends Component {
 
 	render () {
 		const { group } = this.props;
-		const manualChecking = group.is_manual_checking_enabled || false;
-		const progress = group.can_students_see_group_progress || false;
+		const manualChecking = group.isManualCheckingEnabled || false;
+		const progress = group.canStudentsSeeGroupProgress || false;
 
 		return (
 			<React.Fragment>
@@ -42,8 +42,8 @@ class GroupSettingsCheckbox extends Component {
 
 	renderReviewSettings() {
 		const { group } = this.props;
-		const oldSolution = group.is_manual_checking_enabled_for_old_solutions || false;
-		const review = group.default_prohibit_further_review || false;
+		const oldSolution = group.isManualCheckingEnabledForOldSolutions || false;
+		const review = group.defaultProhibitFurtherReview || false;
 
 		return (
 			<React.Fragment>

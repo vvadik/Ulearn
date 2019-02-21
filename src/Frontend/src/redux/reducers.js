@@ -4,7 +4,7 @@ const initialAccountState = {
     isAuthenticated: false,
     isSystemAdministrator: false,
     accountProblems: [],
-	system_accesses: [],
+	systemAccesses: [],
     roleByCourse: {},
     accessesByCourse: {}
 };

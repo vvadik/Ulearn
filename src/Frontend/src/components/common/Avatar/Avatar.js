@@ -8,7 +8,7 @@ class Avatar extends Component {
 
 	render() {
 		const {user, size} = this.props;
-		const imageUrl = user.avatar_url;
+		const imageUrl = user.avatarUrl;
 		let className = `${styles["photo-avatar"]} ${styles[size] || 'big'}`;
 
 		if (imageUrl) {
@@ -29,7 +29,7 @@ class Avatar extends Component {
 	}
 
 	renderCircle(className) {
-		const userName = this.props.user.visible_name;
+		const userName = this.props.user.visibleName;
 		const firstLetterIndex = userName.search(/[a-zа-яё]/i);
 		const userFirstLetter = firstLetterIndex !== -1 ? userName[firstLetterIndex].toUpperCase() : '?';
 		let divStyle = {

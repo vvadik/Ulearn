@@ -5,20 +5,20 @@ namespace Ulearn.Common.Api.Models.Responses
 	[DataContract]
 	public class PaginatedResponse : SuccessResponse
 	{
-		[DataMember(Name = "pagination", Order = 100)]
-		public PaginationResponse PaginationResponse { get; set; }
+		[DataMember(Order = 100)]
+		public PaginationResponse Pagination { get; set; }
 	}
 
 	[DataContract]
 	public class PaginationResponse
 	{
-		[DataMember(Name = "offset")]
+		[DataMember]
 		public int Offset { get; set; }
 		
-		[DataMember(Name = "count")]
+		[DataMember]
 		public int Count { get; set; }
 		
-		[DataMember(Name = "total_count", EmitDefaultValue = false, Order = 1)]
+		[DataMember(EmitDefaultValue = false)]
 		public int? TotalCount { get; set; }
 	}
 }

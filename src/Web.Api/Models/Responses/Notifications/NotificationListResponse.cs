@@ -9,71 +9,71 @@ namespace Ulearn.Web.Api.Models.Responses.Notifications
 	[DataContract]
 	public class NotificationListResponse : SuccessResponse
 	{
-		[DataMember(Name = "important")]
+		[DataMember]
 		public NotificationList Important { get; set; }
 		
-		[DataMember(Name = "comments")]
+		[DataMember]
 		public NotificationList Comments { get; set; }
 	}
 
 	[DataContract]
 	public class NotificationList
 	{
-		[DataMember(Name = "last_view_timestamp")]
+		[DataMember]
 		public DateTime? LastViewTimestamp { get; set; }
 		
-		[DataMember(Name = "notifications")]
+		[DataMember]
 		public List<NotificationInfo> Notifications { get; set; }
 	}
 
 	[DataContract]
 	public class NotificationInfo
 	{
-		[DataMember(Name = "id")]
+		[DataMember]
 		public int Id { get; set; }
 		
-		[DataMember(Name = "type")]
+		[DataMember]
 		public string Type { get; set; }
 		
-		[DataMember(Name = "author")]
+		[DataMember]
 		public ShortUserInfo Author { get; set; }
 		
-		[DataMember(Name = "create_time")]
+		[DataMember]
 		public DateTime CreateTime { get; set; }
 		
-		[DataMember(Name = "course_id")]
+		[DataMember]
 		public string CourseId { get; set; }
 		
-		[DataMember(Name = "data")]
+		[DataMember]
 		public NotificationData Data { get; set; }
 	}
 
 	[DataContract]
 	public class NotificationData
 	{
-		[DataMember(Name = "comment", EmitDefaultValue = false)]
+		[DataMember(EmitDefaultValue = false)]
 		public NotificationCommentInfo Comment { get; set; } 
 	}
 
 	[DataContract]
 	public class NotificationCommentInfo
 	{
-		[DataMember(Name = "id")]
+		[DataMember]
 		public int Id { get; set; }
 		
-		[DataMember(Name = "author")]
+		[DataMember]
 		public ShortUserInfo Author { get; set; }
 		
-		[DataMember(Name = "course_id")]
+		[DataMember]
 		public string CourseId { get; set; }
 		
-		[DataMember(Name = "slide_id")]
+		[DataMember]
 		public Guid SlideId { get; set; }
 		
-		[DataMember(Name = "text")]
+		[DataMember]
 		public string Text { get; set; }
 		
-		[DataMember(Name = "publish_time")]
+		[DataMember]
 		public DateTime PublishTime { get; set; }
 	}
 }

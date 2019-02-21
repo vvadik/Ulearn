@@ -9,36 +9,36 @@ namespace Ulearn.Web.Api.Models.Responses.CodeReviewStatistics
 	[DataContract]
 	public class CodeReviewInstructorsStatisticsResponse : SuccessResponse
 	{
-		[DataMember(Name = "instructors")]
+		[DataMember]
 		public List<CodeReviewInstructorStatistics> Instructors { get; set; }
 		
-		[DataMember(Name = "analyzed_code_reviews_count")]
+		[DataMember]
 		public int AnalyzedCodeReviewsCount { get; set; }
 	}
 
 	[DataContract]
 	public class CodeReviewInstructorStatistics
 	{
-		[DataMember(Name = "instructor")]
+		[DataMember]
 		public ShortUserInfo Instructor { get; set; }
 		
-		[DataMember(Name = "exercises")]
+		[DataMember]
 		public List<CodeReviewExerciseStatistics> Exercises { get; set; }
 	}
 
 	[DataContract]
 	public class CodeReviewExerciseStatistics
 	{
-		[DataMember(Name = "slide_id")]
+		[DataMember]
 		public Guid SlideId { get; set; }
 		
-		[DataMember(Name = "reviewed_submissions_count")]
+		[DataMember]
 		public int ReviewedSubmissionsCount { get; set; }
 		
-		[DataMember(Name = "queue_size")]
+		[DataMember]
 		public int QueueSize { get; set; }
 		
-		[DataMember(Name = "comments_count")]
+		[DataMember]
 		public int CommentsCount { get; set; }
 	}
 }

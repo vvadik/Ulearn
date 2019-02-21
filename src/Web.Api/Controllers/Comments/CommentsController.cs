@@ -17,12 +17,13 @@ using Serilog;
 using Swashbuckle.AspNetCore.Annotations;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
+using Ulearn.Web.Api.Authorization;
 using Ulearn.Web.Api.Models.Parameters.Comments;
 using Ulearn.Web.Api.Models.Responses.Comments;
 
 namespace Ulearn.Web.Api.Controllers.Comments
 {
-	[Route("comments/in/{courseId}/")]
+	[Route("/comments")]
 	public class CommentsController : BaseCommentController
 	{
 		private readonly ICommentPoliciesRepo commentPoliciesRepo;
@@ -38,9 +39,12 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		/// <summary>
 		/// Комментарии под слайдом
 		/// </summary>
-		[HttpGet("{slideId:guid}")]
-		public async Task<ActionResult<CommentsListResponse>> SlideComments(string courseId, Guid slideId, [FromQuery] SlideCommentsParameters parameters)
+		[HttpGet]
+		public async Task<ActionResult<CommentsListResponse>> SlideComments([FromQuery] SlideCommentsParameters parameters)
 		{
+			var courseId = parameters.CourseId;
+			var slideId = parameters.SlideId;
+			
 			if (parameters.ForInstructors)
 			{
 				if (!IsAuthenticated)
@@ -70,7 +74,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			return new CommentsListResponse
 			{
 				TopLevelComments = BuildCommentsListResponse(comments, canUserSeeNotApprovedComments, replies, commentLikesCount, addCourseIdAndSlideId: false, addParentCommentId: false, addReplies: true),
-				PaginationResponse = new PaginationResponse
+				Pagination = new PaginationResponse
 				{
 					Offset = parameters.Offset,
 					Count = comments.Count,
@@ -83,11 +87,14 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		/// Добавить комментарий под слайдом
 		/// </summary>
 		[Authorize]
+		[HttpPost]
 		[SwaggerResponse((int)HttpStatusCode.TooManyRequests, "You are commenting too fast. Please wait some time")]
 		[SwaggerResponse((int)HttpStatusCode.RequestEntityTooLarge, "Your comment is too large")]
-		[HttpPost("{slideId:guid}")]
-		public async Task<ActionResult<CreateCommentResponse>> CreateComment(string courseId, Guid slideId, [FromBody] CreateCommentParameters parameters)
+		public async Task<ActionResult<CreateCommentResponse>> CreateComment([FromQuery] CourseAuthorizationParameters courseAuthorizationParameters, CreateCommentParameters parameters)
 		{
+			var courseId = courseAuthorizationParameters.CourseId;
+			var slideId = parameters.SlideId;
+			
 			if (parameters.IsForInstructorsOnly)
 			{
 				var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
@@ -128,7 +135,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			var url = Url.Action(new UrlActionContext { Action = nameof(CommentController.Comment), Controller = "Comment", Values = new { commentId = comment.Id } });
 			return new CreateCommentResponse
 			{
-				CommentId = comment.Id,
+				Id = comment.Id,
 				ApiUrl = url,
 			};
 		}

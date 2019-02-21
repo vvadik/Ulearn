@@ -19,10 +19,10 @@ class GroupInfo extends Component {
 			return null;
 		}
 
-		const studentsCount = group.students_count || 0;
+		const studentsCount = group.studentsCount || 0;
 		const pluralFormOfStudents = getPluralForm(studentsCount, 'студент', 'студента', 'студентов');
-		const isCodeReviewEnabled = group.is_manual_checking_enabled;
-		const isProgressEnabled = group.can_students_see_group_progress;
+		const isCodeReviewEnabled = group.isManualCheckingEnabled;
+		const isProgressEnabled = group.canStudentsSeeGroupProgress;
 
 		return (
 			<div className={styles.wrapper}>
@@ -51,10 +51,10 @@ class GroupInfo extends Component {
 
 	renderTeachers() {
 		const { group } = this.props;
-		const teachersList = group.accesses.map(item => item.user.visible_name);
+		const teachersList = group.accesses.map(item => item.user.visibleName);
 		const shortTeachersList = teachersList.filter((item, index) => index < 2);
 		const teachersExcess = teachersList.length - shortTeachersList.length;
-		const owner = group.owner.visible_name || 'Неизвестный';
+		const owner = group.owner.visibleName || 'Неизвестный';
 		const teachers = [owner, ...shortTeachersList];
 		const teachersCount = teachers.length;
 		const pluralFormOfTeachers = getPluralForm(teachersCount, 'Преподаватель', 'Преподаватели');
@@ -86,13 +86,13 @@ class GroupInfo extends Component {
 		const { group } = this.props;
 
 		let menuItems = [
-			<MenuItem onClick={() => this.props.toggleArchived(group, !group.is_archived)} key="toggleArchived">
+			<MenuItem onClick={() => this.props.toggleArchived(group, !group.isArchived)} key="toggleArchived">
 				<Gapped gap={5}>
 					<Icon name="ArchiveUnpack" />
-					{group.is_archived ? 'Восстановить' : 'Архивировать'}
+					{group.isArchived ? 'Восстановить' : 'Архивировать'}
 				</Gapped>
 			</MenuItem>,
-			<MenuItem onClick={() => this.props.deleteGroup(group, group.is_archived ?
+			<MenuItem onClick={() => this.props.deleteGroup(group, group.isArchived ?
 				'archiveGroups' : 'groups')} key="delete">
 				<Gapped gap={5}>
 					<Icon name="Delete" />
