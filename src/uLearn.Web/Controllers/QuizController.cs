@@ -46,6 +46,7 @@ namespace uLearn.Web.Controllers
 		private readonly GroupsRepo groupsRepo;
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
 		private readonly NotificationsRepo notificationsRepo;
+		private readonly UnitsRepo unitsRepo;
 
 		public QuizController()
 		{
@@ -56,6 +57,7 @@ namespace uLearn.Web.Controllers
 			groupsRepo = new GroupsRepo(db, courseManager);
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
 			notificationsRepo = new NotificationsRepo(db);
+			unitsRepo = new UnitsRepo(db);
 		}
 
 		[UsedImplicitly]
@@ -338,8 +340,9 @@ namespace uLearn.Web.Controllers
 					metricSender.SendCount($"quiz.manual_score.{checking.CourseId}.full_scored");
 					metricSender.SendCount($"quiz.manual_score.{checking.CourseId}.{checking.SlideId}.full_scored");
 				}
-
-				await NotifyAboutManualQuizChecking(checking).ConfigureAwait(false);
+				
+				if(unit != null && unitsRepo.IsUnitVisibleForStudents(course, unit.Id))
+					await NotifyAboutManualQuizChecking(checking).ConfigureAwait(false);
 			}
 
 			return Redirect(nextUrl);

@@ -34,6 +34,7 @@ namespace uLearn.Web.Controllers
 		protected readonly NotificationsRepo notificationsRepo;
 		protected readonly UsersRepo usersRepo;
 		protected readonly StyleErrorsRepo styleErrorsRepo;
+		protected readonly UnitsRepo unitsRepo;
 		
 		private static readonly TimeSpan executionTimeout = TimeSpan.FromSeconds(45);
 		
@@ -55,6 +56,7 @@ namespace uLearn.Web.Controllers
 			notificationsRepo = new NotificationsRepo(db);
 			usersRepo = new UsersRepo(db);
 			styleErrorsRepo = new StyleErrorsRepo(db);
+			unitsRepo = new UnitsRepo(db);
 		}
 
 		private string GenerateSubmissionName(Slide exerciseSlide, string userName)
