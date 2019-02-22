@@ -19,7 +19,8 @@ namespace Database.DataContexts
 			: base("DefaultConnection", throwIfV1Schema: false)
 		{
 			System.Data.Entity.Database.SetInitializer(new MigrateDatabaseToLatestVersion<ULearnDb, Configuration>());
-			//Database.Log = str => log.Debug(str);
+			if(log.IsDebugEnabled)
+				Database.Log = log.Debug;
 		}
 
 		protected override void OnModelCreating(DbModelBuilder modelBuilder)
