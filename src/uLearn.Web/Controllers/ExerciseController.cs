@@ -201,8 +201,14 @@ namespace uLearn.Web.Controllers
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 				
 			var comment = await slideCheckingsRepo.AddExerciseCodeReviewComment(currentUserId, reviewId, text).ConfigureAwait(false);
+
 			if (review.ExerciseCheckingId.HasValue && review.ExerciseChecking.IsChecked)
-				await NotifyAboutCodeReviewComment(comment).ConfigureAwait(false);
+			{
+				var course = courseManager.GetCourse(submissionCourseId);
+				var unit = course.FindUnitBySlideId(review.Submission.SlideId);
+				if (unit != null && unitsRepo.IsUnitVisibleForStudents(course, unit.Id))
+					await NotifyAboutCodeReviewComment(comment).ConfigureAwait(false);
+			}
 
 			return PartialView("_ExerciseReviewComment", comment);
 		}
@@ -266,7 +272,9 @@ namespace uLearn.Web.Controllers
 
 				transaction.Commit();
 
-				await NotifyAboutManualExerciseChecking(checking).ConfigureAwait(false);
+				var unit = course.FindUnitBySlideId(checking.SlideId);
+				if(unit != null && unitsRepo.IsUnitVisibleForStudents(course, unit.Id))
+					await NotifyAboutManualExerciseChecking(checking).ConfigureAwait(false);
 			}
 
 			return Redirect(nextUrl);
