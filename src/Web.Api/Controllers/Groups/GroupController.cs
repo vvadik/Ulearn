@@ -384,14 +384,11 @@ namespace Ulearn.Web.Api.Controllers.Groups
 
 			var newMembers = await groupMembersRepo.AddUsersToGroupAsync(groupId, studentsToCopySet).ConfigureAwait(false);
 			
-			if (!destinationGroup.CourseId.Contains("сasting", StringComparison.OrdinalIgnoreCase))
-			{
-				await notificationsRepo.AddNotificationAsync(
-					destinationGroup.CourseId,
-					new GroupMembersHaveBeenAddedNotification(groupId, parameters.StudentIds, usersRepo),
-					UserId
-				).ConfigureAwait(false);
-			}
+			await notificationsRepo.AddNotificationAsync(
+				destinationGroup.CourseId,
+				new GroupMembersHaveBeenAddedNotification(groupId, parameters.StudentIds, usersRepo),
+				UserId
+			).ConfigureAwait(false);
 
 			return Ok(new SuccessResponseWithMessage($"{newMembers.Count} students have been copied to group {groupId}"));
 		}
