@@ -46,7 +46,7 @@ Avatar.propTypes = {
 	size: PropTypes.string,
 	user: PropTypes.shape({
 		avatarUrl: PropTypes.string,
-		visibleName: PropTypes.string,
+		visibleName: PropTypes.string.isRequired,
 	}),
 };
 

@@ -111,17 +111,12 @@ class CommentSendForm extends Component {
 	}
 }
 
-const accountModel = PropTypes.shape({
-	id: PropTypes.string,
-	url: PropTypes.string,
-});
-
 CommentSendForm.propTypes = {
 	/** Идентифицирует комментарий, с которым работает компонент.
 	 * При изменении идентификатора текст в поле ввода очищается.
 	 * При сохранении того же идентификатора - текст сохраняется.*/
 	commentId: PropTypes.string,
-	author: accountModel,
+	author: Avatar.propTypes,
 	sending: PropTypes.bool,
 	error: PropTypes.oneOf([PropTypes.string, PropTypes.object]),
 	onSubmit: PropTypes.func,
