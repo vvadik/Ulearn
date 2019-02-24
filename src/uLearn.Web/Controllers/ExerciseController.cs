@@ -204,8 +204,8 @@ namespace uLearn.Web.Controllers
 
 			if (review.ExerciseCheckingId.HasValue && review.ExerciseChecking.IsChecked)
 			{
-				var course = courseManager.GetCourse(submissionCourseId);
-				var unit = course.FindUnitBySlideId(review.Submission.SlideId);
+				var course = courseManager.FindCourse(submissionCourseId);
+				var unit = course?.FindUnitBySlideId(review.Submission.SlideId);
 				if (unit != null && unitsRepo.IsUnitVisibleForStudents(course, unit.Id))
 					await NotifyAboutCodeReviewComment(comment).ConfigureAwait(false);
 			}
