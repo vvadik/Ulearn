@@ -57,6 +57,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 				PublishTime = comment.PublishTime,
 				IsApproved = comment.IsApproved,
 				LikesCount = commentLikesCount[comment.Id],
+				Replies = new List<CommentResponse>()
 			};
 			
 			if (addCourseIdAndSlideId)

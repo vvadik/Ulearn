@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using JetBrains.Annotations;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Common;
 
@@ -43,7 +45,8 @@ namespace Ulearn.Web.Api.Models.Responses.Comments
 		[DataMember]
 		public int LikesCount { get; set; }
 		
-		[DataMember(EmitDefaultValue = false)]
+		[NotNull]
+		[DataMember]
 		public List<CommentResponse> Replies { get; set; }
 		
 		[DataMember(EmitDefaultValue = false)]
