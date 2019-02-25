@@ -111,14 +111,14 @@
 
 		}
 
-		var showAntiplagiarismStatus = Model.InstructorView;
+		var showAntiplagiarismStatus = Model.InstructorView && manualCheckingId != null;
 
 		if (showAntiplagiarismStatus)
 		{
 			<p class="antiplagiarism-status"
 			   data-antiplagiarism-url="@Url.Action("Info", "AntiPlagiarism", new { courseId = Model.CourseId, submissionId = currentSubmissionId })"
 			   data-antiplagiarism-details-url="@Url.Action("Details", "AntiPlagiarism", new { courseId = Model.CourseId, submissionId = currentSubmissionId })"
-			   data-add-exercise-code-review-url="@Url.Action("AddExerciseCodeReview", "Exercise", new { courseId = Model.CourseId, checkingId = manualCheckingId })">
+			   data-add-exercise-code-review-url="@Url.Action("AddExerciseCodeReview", "Exercise", new { courseId = Model.CourseId, checkingId = manualCheckingId.Value })">
 				Проверка на&nbsp;списывание: ищу похожие решения у&nbsp;других студентов...
 			</p>
 		}
