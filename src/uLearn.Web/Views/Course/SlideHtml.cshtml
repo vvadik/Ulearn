@@ -1,4 +1,5 @@
 ﻿@* Generator: MvcHelper GeneratePrettyNames: true DisableLinePragmas: true *@
+@using System.Diagnostics
 @using System.Linq
 @using Database.Models
 @using uLearn.Web.Clients
@@ -362,6 +363,9 @@
 
 @helper QuizBlock(ChoiceBlock block, BlockRenderContext context)
 {
+	var log = log4net.LogManager.GetLogger("SlideHtml.cshtml");
+	try
+	{
 	var items = block.ShuffledItems();
 	var isMultiply = block.Multiple;
 	var inputType = isMultiply ? "checkbox" : "radio";
@@ -408,15 +412,25 @@
 				}
 			</div>
 		}
-        @{
-	        var isBlockCorrect = IsBlockCorrect(model, block);
-	        if (model.ShowCorrectAnswers && isBlockCorrect && mistakesCount.HasAtLeastOneMistake())
-	        {
-		        @ShowMistakesExplanation(mistakesCount)
-	        }
-        }
-        
-    </div>
+		@{
+			var isBlockCorrect = IsBlockCorrect(model, block);
+			if (model.ShowCorrectAnswers && isBlockCorrect && mistakesCount.HasAtLeastOneMistake())
+			{
+				@ShowMistakesExplanation(mistakesCount)
+			}
+		}
+
+	</div>
+	}
+	catch (Exception ex)
+	{
+		var st = new StackTrace(ex, true);
+		var frame = st.GetFrame(0);
+		var line = frame.GetFileLineNumber();
+		log.Error(ex);
+		log.Error("lineNumber: " + line);
+		throw;
+	}
 }
 
 @helper ShowMistakesExplanation(MistakesCount mistakesCount)
