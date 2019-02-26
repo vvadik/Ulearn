@@ -69,11 +69,16 @@ namespace Ulearn.Web.Api.Controllers.Comments
 
 			var replies = await commentsRepo.GetRepliesAsync(comments.Select(c => c.Id)).ConfigureAwait(false);
 			var allCommentsIds = comments.Concat(replies.SelectMany(g => g.Value)).Select(c => c.Id);
-			var commentLikesCount = await commentLikesRepo.GetLikesCountsAsync(allCommentsIds).ConfigureAwait(false);
+
+			var commentLikesCountTask = commentLikesRepo.GetLikesCountsAsync(allCommentsIds);
+			var likedByUserCommentsIdsTask = commentLikesRepo.GetCommentsLikedByUserAsync(courseId, parameters.SlideId, UserId);
+			await Task.WhenAll(commentLikesCountTask, likedByUserCommentsIdsTask).ConfigureAwait(false);
+			var commentLikesCount = commentLikesCountTask.Result;
+			var likedByUserCommentsIds = likedByUserCommentsIdsTask.Result.ToHashSet();
 
 			return new CommentsListResponse
 			{
-				TopLevelComments = BuildCommentsListResponse(comments, canUserSeeNotApprovedComments, replies, commentLikesCount, addCourseIdAndSlideId: false, addParentCommentId: false, addReplies: true),
+				TopLevelComments = BuildCommentsListResponse(comments, canUserSeeNotApprovedComments, replies, commentLikesCount, likedByUserCommentsIds, addCourseIdAndSlideId: false, addParentCommentId: false, addReplies: true),
 				Pagination = new PaginationResponse
 				{
 					Offset = parameters.Offset,

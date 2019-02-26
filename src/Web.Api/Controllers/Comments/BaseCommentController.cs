@@ -36,15 +36,15 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		}
 
 		protected List<CommentResponse> BuildCommentsListResponse(IEnumerable<Comment> comments,
-			bool canUserSeeNotApprovedComments, DefaultDictionary<int, List<Comment>> replies, DefaultDictionary<int, int> commentLikesCount,
+			bool canUserSeeNotApprovedComments, DefaultDictionary<int, List<Comment>> replies, DefaultDictionary<int, int> commentLikesCount, HashSet<int> likedByUserCommentsIds,
 			bool addCourseIdAndSlideId, bool addParentCommentId, bool addReplies)
 		{
-			return comments.Select(c => BuildCommentResponse(c, canUserSeeNotApprovedComments, replies, commentLikesCount, addCourseIdAndSlideId, addParentCommentId, addReplies)).ToList();
+			return comments.Select(c => BuildCommentResponse(c, canUserSeeNotApprovedComments, replies, commentLikesCount, likedByUserCommentsIds, addCourseIdAndSlideId, addParentCommentId, addReplies)).ToList();
 		}
 
 		protected CommentResponse BuildCommentResponse(
 			Comment comment,
-			bool canUserSeeNotApprovedComments, DefaultDictionary<int, List<Comment>> replies, DefaultDictionary<int, int> commentLikesCount,
+			bool canUserSeeNotApprovedComments, DefaultDictionary<int, List<Comment>> replies, DefaultDictionary<int, int> commentLikesCount, HashSet<int> likedByUserCommentsIds,
 			bool addCourseIdAndSlideId, bool addParentCommentId, bool addReplies
 		)
 		{
@@ -56,6 +56,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 				Author = BuildShortUserInfo(comment.Author),
 				PublishTime = comment.PublishTime,
 				IsApproved = comment.IsApproved,
+				IsLiked = likedByUserCommentsIds.Contains(comment.Id),
 				LikesCount = commentLikesCount[comment.Id],
 				Replies = new List<CommentResponse>()
 			};
@@ -79,7 +80,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			if (addReplies)
 			{
 				var commentReplies = FilterVisibleComments(replies[comment.Id], canUserSeeNotApprovedComments);
-				commentInfo.Replies = BuildCommentsListResponse(commentReplies, canUserSeeNotApprovedComments, null, commentLikesCount, addCourseIdAndSlideId, addParentCommentId, addReplies);
+				commentInfo.Replies = BuildCommentsListResponse(commentReplies, canUserSeeNotApprovedComments, null, commentLikesCount, likedByUserCommentsIds, addCourseIdAndSlideId, addParentCommentId, addReplies);
 			}
 
 			return commentInfo;

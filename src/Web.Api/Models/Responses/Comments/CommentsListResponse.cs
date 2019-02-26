@@ -41,6 +41,9 @@ namespace Ulearn.Web.Api.Models.Responses.Comments
 
 		[DataMember(EmitDefaultValue = false)]
 		public bool? IsPinnedToTop { get; set; }
+		
+		[DataMember]
+		public bool IsLiked { get; set; }
 
 		[DataMember]
 		public int LikesCount { get; set; }
