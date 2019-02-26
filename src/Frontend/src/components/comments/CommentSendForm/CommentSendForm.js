@@ -2,9 +2,9 @@ import React, {Component} from 'react';
 import PropTypes from "prop-types";
 import Button from "@skbkontur/react-ui/components/Button/Button";
 import Avatar from "../../common/Avatar/Avatar";
-import MarkdownEditor from "./MarkdownEditor";
+import MarkdownEditor from "./MarkdownEditor/MarkdownEditor";
 
-import styles from "./commentSendForm.less";
+import styles from "./CommentSendForm.less";
 
 class CommentSendForm extends Component {
 	state = {
@@ -63,7 +63,7 @@ class CommentSendForm extends Component {
 			<Button
 				use="primary"
 				size="medium"
-				type="submit"
+		type="submit"
 				loading={sending}>
 				{submitTitle}
 			</Button>
@@ -116,7 +116,7 @@ CommentSendForm.propTypes = {
 	 * При изменении идентификатора текст в поле ввода очищается.
 	 * При сохранении того же идентификатора - текст сохраняется.*/
 	commentId: PropTypes.string,
-	author: Avatar.propTypes,
+	author: Avatar.propTypes.user,
 	sending: PropTypes.bool,
 	error: PropTypes.oneOf([PropTypes.string, PropTypes.object]),
 	onSubmit: PropTypes.func,

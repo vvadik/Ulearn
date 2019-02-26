@@ -1,0 +1,36 @@
+@import "../../../../variables.less";
+
+button {
+  outline: none;
+}
+
+.markdownButtons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  @media (max-width: @maxPhoneWidth) {
+	margin-bottom: 10px;
+  }
+}
+
+.markdownText {
+  line-height: 15px;
+  font-size: 12px;
+  text-align: center;
+  color: @disabledColor;
+  margin-right: 26px;
+
+  @media (max-width: @maxPhoneWidth) {
+	display: none;
+  }
+}
+
+._yellow {
+  color: #FFF0BC;
+}
+
+._white {
+  color: #ffffff;
+}

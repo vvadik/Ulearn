@@ -6,7 +6,7 @@ import Loader from "@skbkontur/react-ui/components/Loader/Loader";
 import CommentSendForm from "../components/comments/CommentSendForm/CommentSendForm";
 import {COURSES__COURSE_ENTERED} from "../consts/actions";
 
-import styles from "../components/comments/CommentSendForm/commentSendForm.less";
+import styles from "../components/comments/CommentSendForm/CommentSendForm.less";
 
 class CommentsList extends Component {
 	state = {

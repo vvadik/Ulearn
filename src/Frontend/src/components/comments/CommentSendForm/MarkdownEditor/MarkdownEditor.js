@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import PropTypes from "prop-types";
 import BaseTextarea from "@skbkontur/react-ui/components/Textarea/Textarea";
-import {boldIcon, codeIcon, italicIcon} from "../SVGIcons/SVGIcon";
-import MarkdownButton from "./MarkdownButton";
+import {boldIcon, codeIcon, italicIcon} from "../../SVGIcons/SVGIcon";
+import MarkdownButtons from "../MarkdownButtons/MarkdownButtons";
 
-import styles from "./commentSendForm.less";
+import styles from "./MarkdownEditor.less";
 
 const markupByOperation = {
 	bold: {
@@ -74,7 +74,7 @@ class MarkdownEditor extends Component {
 					placeholder="Комментарий" />
 				<div className={styles.footer}>
 					{ this.props.children }
-					<MarkdownButton
+					<MarkdownButtons
 						markupByOperation={markupByOperation}
 						onClick={this.handleClick} />
 				</div>

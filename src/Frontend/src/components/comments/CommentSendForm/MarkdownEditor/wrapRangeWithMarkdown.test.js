@@ -1,4 +1,4 @@
-import CommentSendForm from "./CommentSendForm";
+import CommentSendForm from "../CommentSendForm";
 
 describe('CommentSendForm.wrapRangeWithMarkdown', () => {
 	test.each([
