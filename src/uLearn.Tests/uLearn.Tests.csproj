@@ -399,6 +399,9 @@
     <Content Include="CSharp\testProject\projDir\AnotherTask.WrongAnswer.88.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Compile Include="CSharp\RedundantElseValidation\RedundantElseValidator_Should.cs" />
+    <Compile Include="CSharp\RedundantElseValidation\TestData\Correct\RedundantElseTestCases.cs" />
+    <Compile Include="CSharp\RedundantElseValidation\TestData\Incorrect\RedundantElseTestCases.cs" />
     <Compile Include="CSharp\RefArgumentsValidation\TestData\Correct\RefArgumentsValidationTestDataClass.cs" />
     <Compile Include="CSharp\RefArgumentsValidation\TestData\Incorrect\RefArgumentsValidationTestDataClass.cs" />
     <Compile Include="CSharp\RefArgumentsValidation\RefArgumentsValidator_should.cs" />

@@ -53,7 +53,7 @@ namespace uLearn.CSharp.ArrayGetLengthValidation
 		{
 			var code = file.ContentAsUtf8();
 			var errors = validator.FindErrors(code);
-			if (errors != null)
+			if (errors != null && errors.Count != 0)
 			{
 				Console.WriteLine(errors);
 			}
@@ -69,13 +69,13 @@ namespace uLearn.CSharp.ArrayGetLengthValidation
 
 			var errors = validator.FindErrors(fileContent);
 
-			if (errors != null)
+			if (errors != null && errors.Count != 0)
 			{
 				File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
 						"..", "CSharp", "ExampleFiles", "errors", $"{file.Name}_errors.txt"),
 					$@"{fileContent}
 
-{errors}");
+{errors.Join(Environment.NewLine)}");
 
 				Assert.Fail();
 			}
@@ -88,13 +88,13 @@ namespace uLearn.CSharp.ArrayGetLengthValidation
 			var fileContent = file.ContentAsUtf8();
 
 			var errors = validator.FindErrors(fileContent);
-			if (errors != null)
+			if (errors != null && errors.Count != 0)
 			{
 				File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
 						"..", "CSharp", "ExampleFiles", "submissions_errors", $"{file.Name}_errors.txt"),
 					$@"{fileContent}
 
-{errors}");
+{errors.Join(Environment.NewLine)}");
 
 				Assert.Fail();
 			}
