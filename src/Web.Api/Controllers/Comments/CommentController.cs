@@ -86,13 +86,14 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			var canUserSeeNotApprovedComments = await CanUserSeeNotApprovedCommentsAsync(UserId, comment.CourseId).ConfigureAwait(false);
 			
 			DefaultDictionary<int, int> likesCount;
+			var likedByUserCommentsIds = (await commentLikesRepo.GetCommentsLikedByUserAsync(comment.CourseId, comment.SlideId, UserId).ConfigureAwait(false)).ToHashSet();
 			if (parameters.WithReplies)
 			{
 				var replies = await commentsRepo.GetRepliesAsync(commentId).ConfigureAwait(false);
 				likesCount = await commentLikesRepo.GetLikesCountsAsync(replies.Append(comment).Select(c => c.Id)).ConfigureAwait(false);
 				return BuildCommentResponse(
 					comment,
-					canUserSeeNotApprovedComments, new DefaultDictionary<int, List<Comment>> { {commentId, replies }}, likesCount,
+					canUserSeeNotApprovedComments, new DefaultDictionary<int, List<Comment>> { {commentId, replies }}, likesCount, likedByUserCommentsIds,
 					addCourseIdAndSlideId: true, addParentCommentId: true, addReplies: true
 				);
 			}
@@ -100,7 +101,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			likesCount = await commentLikesRepo.GetLikesCountsAsync(new [] { commentId }).ConfigureAwait(false);
 			return BuildCommentResponse(
 				comment,
-				canUserSeeNotApprovedComments, new DefaultDictionary<int, List<Comment>>(), likesCount,
+				canUserSeeNotApprovedComments, new DefaultDictionary<int, List<Comment>>(), likesCount, likedByUserCommentsIds,
 				addCourseIdAndSlideId: true, addParentCommentId: true, addReplies: false
 			);
 		}

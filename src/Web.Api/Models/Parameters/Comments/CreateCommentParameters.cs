@@ -21,9 +21,10 @@ namespace Ulearn.Web.Api.Models.Parameters.Comments
 		/// <summary>
 		/// Id комментария, на который это ответ
 		/// </summary>
+		[DataMember]
 		public int? ParentCommentId { get; set; }
 
 		[DataMember]
-		public bool IsForInstructorsOnly { get; set; }
+		public bool ForInstructors { get; set; }
 	}
 }
