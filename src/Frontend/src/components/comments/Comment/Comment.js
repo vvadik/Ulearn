@@ -1,22 +1,29 @@
-import React, {Component} from 'react';
+import React, { Component, createContext } from 'react';
 import PropTypes from "prop-types";
 import moment from "moment";
 import * as debounce from "debounce";
-import Icon from "@skbkontur/react-icons";
 import Hint from "@skbkontur/react-ui/components/Hint/Hint";
-import Kebab from "@skbkontur/react-ui/components/Kebab/Kebab";
-import MenuItem from "@skbkontur/react-ui/components/MenuItem/MenuItem";
 import Avatar from "../../common/Avatar/Avatar";
 import CommentSendForm from "../CommentSendForm/CommentSendForm";
+import Like from "./Like/Like";
+import InstructorActions from "./Kebab/InstructorActions";
+import Header from "./Header/Header";
+import Marks from "./Marks/Marks";
+import Actions from "./Actions/Actions";
 
-import styles from "./comment.less";
+import styles from "./Comment.less";
 
-
+export const CommentMarksContext = createContext({
+	isApproved: false,
+	isCorrectAnswer: false,
+	isPinnedToTop: false,
+});
 
 class Comment extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			replies: props.replies,
 			likesCount: props.likesCount,
 			isLiked: props.isLiked,
 			showReplyForm: false,
@@ -29,58 +36,33 @@ class Comment extends Component {
 	};
 
 	render() {
-		const {children, author, publishDate, userRoles} = this.props;
-		const {likesCount, isLiked} = this.state;
+		const {children, author, publishDate, userRoles } = this.props;
+		const {likesCount, isLiked, isApproved, isCorrectAnswer, isPinnedToTop } = this.state;
 		return (
-			<React.Fragment>
+			<CommentMarksContext.Provider value={{ isApproved, isCorrectAnswer, isPinnedToTop }}>
 				<div className={styles.comment}>
 					<Avatar user={author} size='big'/>
 					<div className={styles.content}>
-						<div className={styles.header}>
-							<h3 className={styles.author}>{author.visibleName}</h3>
-							<div>
-								<button className={styles.likesAction} onClick={this.onLikeChanged}>
-									<Icon name='ThumbUp' color={isLiked ? '#D70C17' : '#A0A0A0'} size={16} />
-								</button>
-								<span className={styles.likesCount}>{likesCount}</span>
-							</div>
-							{ this.state.isApproved && this.renderHiddenCommentMark() }
-							{ this.state.isCorrectAnswer && this.renderCorrectAnswerMark() }
-							{ this.state.isPinnedToTop && this.renderPinnedToTopMark() }
+						<Header name={author.visibleName}>
+							<Like checked={isLiked} count={likesCount} onClick={this.handleLikeClick} />
+							<Marks
+								isApproved={isApproved}
+								isCorrectAnswer={isCorrectAnswer}
+								isPinnedToTop={isPinnedToTop} />
 							{ this.canModerateComments(userRoles, 'editPinAndRemoveComments') &&
-								<div className={styles.instructorsActions}>
-									<Kebab positions={['bottom right']} size="large" disableAnimations={false}>
-										<MenuItem
-											icon={<Icon.Edit size="small"/>}
-											onClick={this.editComment}>
-											Редактировать
-										</MenuItem>
-										<MenuItem
-											icon={<Icon.EyeClosed size="small"/>}
-											onClick={this.hideComment}>
-											{ this.state.isApproved ? 'Опубликовать' : 'Скрыть' }
-										</MenuItem>
-										<MenuItem
-											icon={<Icon.Delete size="small"/>}
-											onClick={this.deleteComment}>
-											Удалить
-										</MenuItem>
-									</Kebab>
-								</div>
-							}
-						</div>
+							<InstructorActions isApproved={isApproved} dispatch={this.dispatch}/> }
+						</Header>
 						<Hint pos="bottom" text={publishDate} disableAnimations={false} useWrapper={false}>
 							<div className={styles.timeSinceAdded}>
 								{moment(publishDate).fromNow()}
 							</div>
 						</Hint>
-						{ this.state.showEditForm ?
-							this.renderEditCommentForm() :
-							this.renderComment()}
+						{ this.state.showEditForm ?	this.renderEditCommentForm() : this.renderComment() }
 						{ this.state.showReplyForm && children }
+						{ children }
 					</div>
 				</div>
-			</React.Fragment>
+			</CommentMarksContext.Provider>
 		);
 	}
 
@@ -88,91 +70,28 @@ class Comment extends Component {
 		return (
 			<React.Fragment>
 				<p className={styles.text}>
-					<span dangerouslySetInnerHTML={{__html: this.props.commentText}} />
+					<span dangerouslySetInnerHTML={{__html: this.props.renderCommentText}} />
 				</p>
-				{ this.renderActions() }
+				<Actions
+					{...this.props}
+					{...this.state}
+					dispatch={this.dispatch}
+					canModerateComments={this.canModerateComments}/>
 			</React.Fragment>
 		)
 	}
 
-	renderCorrectAnswerMark() {
-		return (
-		<div className={styles.correctAnswerMark}>
-			<Icon name='Star' size={15} />
-			<span className={styles.correctAnswerText}>Правильный ответ</span>
-		</div>
-		)
-	}
-
-	renderHiddenCommentMark() {
-		return (
-			<div className={styles.hiddenCommentMark}>
-				Скрытый
-			</div>
-		)
-	}
-
-	renderPinnedToTopMark() {
-		return (
-			<div className={styles.pinnedToTopMark}>
-				<Icon name='Pin' size={15} />
-				<span className={styles.pinnedToTopText}>Закреплено</span>
-			</div>
-		)
-	}
-
 	renderEditCommentForm() {
-		const { commentText, sending } = this.props;
+		const { text, sending } = this.props;
 
 		return (
 			<CommentSendForm
-				text={commentText}
+				text={text}
 				autofocus
 				onSubmit={this.onSubmit}
 				submitTitle={'Сохранить'}
 				onCancel={this.handleEditCancel}
 				sending={sending} />
-		)
-	}
-
-	renderActions() {
-			const { user, author, userRoles, parentCommentId } = this.props;
-
-		return (
-			<div className={styles.actions}>
-				{ !parentCommentId && this.renderButton(this.showReplyForm, 'ArrowCorner1', 'Ответить') }
-				{ user.id === author.id &&
-					<div>
-						{this.renderButton(this.editComment, 'Edit', 'Редактировать')}
-						{this.renderButton(this.deleteComment, 'Delete', 'Удалить')}
-					</div>
-				}
-				{ this.canModerateComments(userRoles, 'viewAllStudentsSubmissions') && this.renderLink() }
-				{ this.canModerateComments(userRoles, 'editPinAndRemoveComments') &&
-					<div>
-						{ parentCommentId ? this.renderButton(this.markAsCorrectAnswer, 'Star2',
-							this.state.isCorrectAnswer ? 'Снять отметку' : 'Отметить правильным') :
-						 this.renderButton(this.pinComment, 'Pin',
-							this.state.isPinnedToTop ? 'Открепить' : 'Закрепить') }
-					</div>
-				}
-			</div>
-		)
-	}
-
-	renderButton(onClick, icon, text) {
-		return <button type="button" className={styles.sendAnswer} onClick={onClick}>
-			<Icon name={icon} />
-			<span className={styles.buttonText}>{text}</span>
-		</button>;
-	}
-
-	renderLink() {
-		return (
-			<a href={this.props.url} className={styles.sendAnswer}>
-				<Icon name='DocumentLite' />
-				<span className={styles.linkText}>Посмотреть решения</span>
-			</a>
 		)
 	}
 
@@ -184,7 +103,7 @@ class Comment extends Component {
 		this.setState({ showEditForm: false });
 	};
 
-	onLikeChanged = () => {
+	handleLikeClick = () => {
 		const {isLiked, likesCount} = this.state;
 		const { likeChanged } = this.props;
 
@@ -215,7 +134,7 @@ class Comment extends Component {
 		this.props.deleteComment(commentId);
 	};
 
-	editComment = () => {
+	showEditComment = () => {
 		this.setState({
 			showEditForm: true,
 		});
@@ -243,6 +162,23 @@ class Comment extends Component {
 		this.debouncedSendData(pinComment, commentId, isPinnedToTop);
 	};
 
+	dispatch = (action) => {
+		switch(action) {
+			case 'togglePinned':
+				return this.pinComment();
+			case 'toggleCorrect':
+				return this.markAsCorrectAnswer();
+			case 'toggleHidden':
+				return this.hideComment();
+			case 'edit':
+				return this.showEditComment();
+			case 'delete':
+				return this.deleteComment();
+			case 'reply':
+				return this.showReplyForm();
+		}
+	};
+
 	hideComment = () => {
 		const { isApproved } = this.state;
 		const { commentId, hideComment } = this.props;
@@ -258,10 +194,15 @@ class Comment extends Component {
 		return () => action(value, flag);
 	};
 
-	onSubmit = (e, text) => {
-		e.preventDefault();
+	onSubmit = (text) => {
+		const { commentId } = this.props;
 
-		this.props.onSubmit(text);
+		this.setState({
+			showReplyForm: false,
+			showEditForm: false,
+		});
+
+		this.props.onSubmit(commentId, text);
 	}
 }
 
@@ -289,6 +230,7 @@ Comment.propTypes = {
 	user: userModel,
 	userRoles: userRolesModel,
 	author: authorModel,
+	replies: PropTypes.arrayOf(PropTypes.object),
 	parentCommentId: PropTypes.number,
 	isLiked: PropTypes.bool,
 	isApproved: PropTypes.bool,
@@ -296,7 +238,10 @@ Comment.propTypes = {
 	likeChanged: PropTypes.func,
 	sendFormOpened: PropTypes.bool,
 	publishDate: PropTypes.string,
-	commentText: PropTypes.string,
+	text: PropTypes.string,
+	renderCommentText: PropTypes.oneOfType([
+		PropTypes.string, PropTypes.element
+	]),
 	showReplyButton: PropTypes.bool,
 	commentId: PropTypes.number,
 	hideComment: PropTypes.func,
@@ -304,6 +249,8 @@ Comment.propTypes = {
 	pinComment: PropTypes.func,
 	url: PropTypes.string,
 	onSubmit: PropTypes.func,
+	onChange: PropTypes.func,
+	deleteComment: PropTypes.func,
 };
 
 export default Comment;
