@@ -122,7 +122,7 @@ namespace Ulearn.Web.Api
 				.AddJsonOptions(opt => 
 					opt.SerializerSettings.ContractResolver = new ApiHeaderJsonContractResolver(new ApiHeaderJsonNamingStrategyOptions
 					{
-						DefaultStrategy = new SnakeCaseNamingStrategy(),
+						DefaultStrategy = new CamelCaseNamingStrategy(),
 						HeaderName = "Json-Naming-Strategy",
 						HttpContextAccessorProvider = services.BuildServiceProvider().GetService<IHttpContextAccessor>,
 						NamingStrategies = new Dictionary<string, NamingStrategy>

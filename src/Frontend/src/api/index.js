@@ -43,7 +43,6 @@ function request(url, options, isRetry) {
     options.credentials = options.credentials || 'include';
     options.headers = options.headers || {};
     options.headers['Authorization'] = 'Bearer ' + apiJwtToken;
-	options.headers['Json-Naming-Strategy'] = 'camelcase';
     return fetch(config.api.endpoint + url, options)
 		.catch((error) => {
 			if (window.navigator.onLine === false)
