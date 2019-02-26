@@ -137,21 +137,21 @@ class WrapperForCommentsByRoles extends React.Component {
 									author={userWithAvatar}/>
 								{ comment.replies ? comment.replies.map(reply => {
 									return (
-										<Comment
-										url={'https://dev.ulearn.me/Course/BasicProgramming/eb894d4d-5854-4684-898b-5480895685e5?CheckQueueItemId=232301&Group=492'}
-										commentId={reply.id}
-										author={reply.author}
-										user={userWithAvatar}
-										userRoles={reply.author}
-										text={reply.commentText}
-										renderCommentText={reply.renderCommentText}
-										publishDate={'2019-01-01T01:37:56'}
-										likesCount={10}
-										isLiked={true}
-										sending={false}
-										deleteComment={this.deleteComment}
-										onSubmit={this.onSubmit}
-										parentCommentId={reply.parentCommentId} />)
+											<Comment
+											url={'https://dev.ulearn.me/Course/BasicProgramming/eb894d4d-5854-4684-898b-5480895685e5?CheckQueueItemId=232301&Group=492'}
+											commentId={reply.id}
+											author={reply.author}
+											user={userWithAvatar}
+											userRoles={reply.author}
+											text={reply.commentText}
+											renderCommentText={reply.renderCommentText}
+											publishDate={'2019-01-01T01:37:56'}
+											likesCount={10}
+											isLiked={true}
+											sending={false}
+											deleteComment={this.deleteComment}
+											onSubmit={this.onSubmit}
+											parentCommentId={reply.parentCommentId} />)
 									}) : null
 								}
 							</Comment>

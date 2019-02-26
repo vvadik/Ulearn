@@ -1,4 +1,5 @@
 import React, { Component, createContext } from 'react';
+import { CommentActionHandlers } from './commonPropTypes';
 import PropTypes from "prop-types";
 import moment from "moment";
 import * as debounce from "debounce";
@@ -23,20 +24,19 @@ class Comment extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			replies: props.replies,
+			showEditForm: false,
 			likesCount: props.likesCount,
 			isLiked: props.isLiked,
-			showReplyForm: false,
-			showEditForm: false,
-			isCorrectAnswer: false,
-			isApproved: false,
-			isPinnedToTop: false,
+			isCorrectAnswer: props.isCorrectAnswer,
+			isApproved: props.isApproved,
+			isPinnedToTop: props.isPinnedToTop,
 		};
+
 		this.debouncedSendData = debounce(this.sendData, 300);
 	};
 
 	render() {
-		const {children, author, publishDate, userRoles } = this.props;
+		const {children, author, publishTime, userRoles } = this.props;
 		const {likesCount, isLiked, isApproved, isCorrectAnswer, isPinnedToTop } = this.state;
 		return (
 			<CommentMarksContext.Provider value={{ isApproved, isCorrectAnswer, isPinnedToTop }}>
@@ -50,15 +50,14 @@ class Comment extends Component {
 								isCorrectAnswer={isCorrectAnswer}
 								isPinnedToTop={isPinnedToTop} />
 							{ this.canModerateComments(userRoles, 'editPinAndRemoveComments') &&
-							<InstructorActions isApproved={isApproved} dispatch={this.dispatch}/> }
+							<InstructorActions isApproved={isApproved} dispatch={this.dispatch} actionHandlers={this.actionHandlers}/> }
 						</Header>
-						<Hint pos="bottom" text={publishDate} disableAnimations={false} useWrapper={false}>
+						<Hint pos="bottom" text={publishTime} disableAnimations={false} useWrapper={false}>
 							<div className={styles.timeSinceAdded}>
-								{moment(publishDate).fromNow()}
+								{moment(publishTime).fromNow()}
 							</div>
 						</Hint>
 						{ this.state.showEditForm ?	this.renderEditCommentForm() : this.renderComment() }
-						{ this.state.showReplyForm && children }
 						{ children }
 					</div>
 				</div>
@@ -88,7 +87,7 @@ class Comment extends Component {
 			<CommentSendForm
 				text={text}
 				autofocus
-				onSubmit={this.onSubmit}
+				onSubmit={this.handleEditComment}
 				submitTitle={'Сохранить'}
 				onCancel={this.handleEditCancel}
 				sending={sending} />
@@ -97,15 +96,12 @@ class Comment extends Component {
 
 	canModerateComments = (role, accesses) => {
 		return role.isSystemAdministrator || role.courseRole === 'CourseAdmin' ||
-			(role.courseRole === 'Instructor' && role.courseAccesses.includes(accesses)) };
-
-	handleEditCancel = () => {
-		this.setState({ showEditForm: false });
+			(role.courseRole === 'Instructor' && role.courseAccesses.includes(accesses))
 	};
 
 	handleLikeClick = () => {
 		const {isLiked, likesCount} = this.state;
-		const { likeChanged } = this.props;
+		const {commentId, likeChanged} = this.props;
 
 		if (!isLiked) {
 			this.setState({
@@ -119,25 +115,32 @@ class Comment extends Component {
 			})
 		}
 
-		this.debouncedSendData(likeChanged, likesCount, isLiked);
+
+		this.debouncedSendData(likeChanged, commentId, isLiked);
 	};
 
 	showReplyForm = () => {
-		this.setState({
-			showReplyForm: true,
-		});
-	};
-
-	deleteComment = () => {
-		const { commentId } = this.props;
-
-		this.props.deleteComment(commentId);
+		this.props.showReplyForm();
 	};
 
 	showEditComment = () => {
 		this.setState({
 			showEditForm: true,
 		});
+	};
+
+	handleEditCancel = () => {
+		this.setState({ showEditForm: false });
+	};
+
+	handleEditComment = (text) => {
+		const { commentId, onEditComment } = this.props;
+
+		this.setState({
+			showEditForm: false,
+		});
+
+		onEditComment(commentId, text);
 	};
 
 	markAsCorrectAnswer = () => {
@@ -162,6 +165,21 @@ class Comment extends Component {
 		this.debouncedSendData(pinComment, commentId, isPinnedToTop);
 	};
 
+	hideComment = () => {
+		const { isApproved } = this.state;
+		const { commentId, hideComment } = this.props;
+
+		this.setState({
+			isApproved: !isApproved,
+		});
+
+		this.debouncedSendData(hideComment, commentId, isApproved);
+	};
+
+	deleteComment = () => {
+		this.props.deleteComment(this.props.commentId);
+	};
+
 	dispatch = (action) => {
 		switch(action) {
 			case 'togglePinned':
@@ -179,45 +197,10 @@ class Comment extends Component {
 		}
 	};
 
-	hideComment = () => {
-		const { isApproved } = this.state;
-		const { commentId, hideComment } = this.props;
-
-		this.setState({
-			isApproved: !isApproved,
-		});
-
-		this.debouncedSendData(hideComment, commentId, isApproved);
-	};
-
 	sendData = (action, value, flag) => {
 		return () => action(value, flag);
 	};
-
-	onSubmit = (text) => {
-		const { commentId } = this.props;
-
-		this.setState({
-			showReplyForm: false,
-			showEditForm: false,
-		});
-
-		this.props.onSubmit(commentId, text);
-	}
 }
-
-const authorModel = PropTypes.shape({
-	id: PropTypes.string.isRequired,
-	visibleName: PropTypes.string.isRequired,
-	avatarUrl: PropTypes.string,
-});
-
-const userModel = PropTypes.shape({
-	id: PropTypes.string.isRequired,
-	visibleName: PropTypes.string.isRequired,
-	avatarUrl: PropTypes.string,
-});
-
 const userRolesModel = PropTypes.shape({
 	isSystemAdministrator: PropTypes.bool,
 	courseRole: PropTypes.string.isRequired,
@@ -227,30 +210,32 @@ const userRolesModel = PropTypes.shape({
 Comment.propTypes = {
 	/** Идентифицирует комментарий, с которым работает компонент.
 	 * При изменении идентификатора текст в поле ввода очищается. При сохранении того же идентификатора - текст сохраняется. */
-	user: userModel,
+	commentId: PropTypes.number,
+	author: Avatar.propTypes.user,
+	user: Avatar.propTypes.user,
 	userRoles: userRolesModel,
-	author: authorModel,
-	replies: PropTypes.arrayOf(PropTypes.object),
-	parentCommentId: PropTypes.number,
-	isLiked: PropTypes.bool,
-	isApproved: PropTypes.bool,
-	likesCount: PropTypes.number,
-	likeChanged: PropTypes.func,
-	sendFormOpened: PropTypes.bool,
-	publishDate: PropTypes.string,
 	text: PropTypes.string,
 	renderCommentText: PropTypes.oneOfType([
 		PropTypes.string, PropTypes.element
 	]),
-	showReplyButton: PropTypes.bool,
-	commentId: PropTypes.number,
+	url: PropTypes.string,
+	publishTime: PropTypes.string,
+	isLiked: PropTypes.bool,
+	isApproved: PropTypes.bool,
+	isPinnedToTop: PropTypes.bool,
+	isCorrectAnswer: PropTypes.bool,
+	parentCommentId: PropTypes.number,
+	likesCount: PropTypes.number,
+	likeChanged: PropTypes.func,
+	showReplyForm: PropTypes.func,
 	hideComment: PropTypes.func,
+	onLikeChanged: PropTypes.func,
 	markAsCorrectAnswer: PropTypes.func,
 	pinComment: PropTypes.func,
-	url: PropTypes.string,
 	onSubmit: PropTypes.func,
-	onChange: PropTypes.func,
+	onEditComment: PropTypes.func,
 	deleteComment: PropTypes.func,
+	actionHandlers: CommentActionHandlers
 };
 
 export default Comment;
