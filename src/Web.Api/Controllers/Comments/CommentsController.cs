@@ -100,7 +100,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			var courseId = courseAuthorizationParameters.CourseId;
 			var slideId = parameters.SlideId;
 			
-			if (parameters.IsForInstructorsOnly)
+			if (parameters.ForInstructors)
 			{
 				var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
 				if (!isInstructor)
@@ -111,12 +111,12 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			{
 				var parentComment = await commentsRepo.FindCommentByIdAsync(parameters.ParentCommentId.Value).ConfigureAwait(false);
 				if (parentComment == null || !parentComment.CourseId.EqualsIgnoreCase(courseId) || parentComment.SlideId != slideId || !parentComment.IsTopLevel)
-					return BadRequest(new ErrorResponse($"`reply_to` comment {parameters.ParentCommentId.Value} not found, belongs to other course, other slide or is not a top-level comment"));
+					return BadRequest(new ErrorResponse($"`parentCommentId` comment {parameters.ParentCommentId.Value} not found, belongs to other course, other slide or is not a top-level comment"));
 				
 
-				if (parentComment.IsForInstructorsOnly != parameters.IsForInstructorsOnly)
+				if (parentComment.IsForInstructorsOnly != parameters.ForInstructors)
 					return BadRequest(new ErrorResponse(
-						$"`reply_to` comment {parameters.ParentCommentId.Value} is {(parentComment.IsForInstructorsOnly ? "" : "not")} for instructors, but new one {(parameters.IsForInstructorsOnly ? "is" : "is not")}"
+						$"`parentCommentId` comment {parameters.ParentCommentId.Value} is {(parentComment.IsForInstructorsOnly ? "" : "not")} for instructors, but new one {(parameters.ForInstructors ? "is" : "is not")}"
 					));
 			}
 			
@@ -132,7 +132,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 				return StatusCode((int)HttpStatusCode.RequestEntityTooLarge, new ErrorResponse($"Your comment is too large. Max allowed length is {CommentsPolicy.MaxCommentLength} chars"));
 			
 			var parentCommentId = parameters.ParentCommentId ?? -1;
-			var comment = await commentsRepo.AddCommentAsync(UserId, courseId, slideId, parentCommentId, parameters.IsForInstructorsOnly, parameters.Text).ConfigureAwait(false);
+			var comment = await commentsRepo.AddCommentAsync(UserId, courseId, slideId, parentCommentId, parameters.ForInstructors, parameters.Text).ConfigureAwait(false);
 			
 			if (comment.IsApproved)
 				await NotifyAboutNewCommentAsync(comment).ConfigureAwait(false);
