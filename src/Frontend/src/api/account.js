@@ -54,16 +54,20 @@ export function getRoles() {
 }
 
 export function logout() {
-    return dispatch => {
+    return () => {
         return api.post('account/logout')
             .then(json => {
                 if (json.logout) {
-                	api.clearApiJwtToken();
-					dispatch({
-						type: 'ACCOUNT__USER_LOGOUTED',
-					});
-					window.location.reload(true);
+					localStorage.removeItem('exercise_solutions');
+					api.clearApiJwtToken();
+					redirectToMainPage();
 				}
-            })
+			});
+
+		function redirectToMainPage() {
+			let parser = document.createElement('a');
+			parser.href = window.location.href;
+			window.location.href = parser.protocol + "//" + parser.host;
+		}
     }
 }

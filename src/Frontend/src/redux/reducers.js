@@ -31,13 +31,6 @@ function account(state = initialAccountState, action) {
                 roleByCourse: action.roleByCourse,
                 accessesByCourse: action.accessesByCourse
             };
-        case 'ACCOUNT__USER_LOGOUTED':
-            return {
-                ...state,
-                isAuthenticated: false,
-                isSystemAdministrator: false,
-                roleByCourse: {}
-            };
         default:
             return state;
     }
