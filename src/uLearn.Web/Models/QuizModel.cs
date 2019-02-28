@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Database.Models;
+using JetBrains.Annotations;
 using Ulearn.Common;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides.Quizzes;
@@ -14,7 +15,9 @@ namespace uLearn.Web.Models
 		public QuizSlide Slide { get; set; }
 		public QuizState QuizState { get; set; }
 		
+		[CanBeNull]
 		public Dictionary<string, List<UserQuizAnswer>> AnswersToQuizzes { get; set; }
+		[CanBeNull]
 		public Dictionary<string, int> UserScores { get; set; }
 
 		/* (quizId -> (itemId -> frequency%)) */
@@ -23,6 +26,7 @@ namespace uLearn.Web.Models
 		public int MaxAttemptsCount { get; set; }
 		public bool IsLti { get; set; }
 		public bool IsGuest { get; set; }
+		[CanBeNull]
 		public ManualQuizChecking Checking { get; set; }
 		public int ManualCheckingsLeft { get; set; }
 		public bool CanUserFillQuiz { get; set; }
