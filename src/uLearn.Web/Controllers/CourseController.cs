@@ -467,7 +467,9 @@ namespace uLearn.Web.Controllers
 			if (submission != null)
 			{
 				await solutionsRepo.RemoveSubmission(submission);
-				await visitsRepo.UpdateScoreForVisit(courseId, submission.SlideId, submission.UserId);
+				var course = courseManager.GetCourse(courseId);
+				var slide = course.GetSlideById(slideId);
+				await visitsRepo.UpdateScoreForVisit(courseId, submission.SlideId, slide.MaxScore, submission.UserId);
 			}
 			return RedirectToAction("AcceptedSolutions", new { courseId, slideId });
 		}

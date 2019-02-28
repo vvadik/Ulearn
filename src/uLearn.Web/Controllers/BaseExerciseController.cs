@@ -144,7 +144,7 @@ namespace uLearn.Web.Controllers
 				metricSender.SendCount($"exercise.{exerciseMetricId}.sent_to_review");
 				metricSender.SendCount("exercise.sent_to_review");
 			}
-			await visitsRepo.UpdateScoreForVisit(courseId, exerciseSlide.Id, userId);
+			await visitsRepo.UpdateScoreForVisit(courseId, exerciseSlide.Id, exerciseSlide.MaxScore, userId);
 
 			if (automaticChecking != null)
 			{
