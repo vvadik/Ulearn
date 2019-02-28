@@ -30,5 +30,5 @@ window.renderReactComponent = function (componentType, element, props) {
 
 	let Component = components[componentType];
 
-	ReactDOM.render(<Component {...props}/>, element);
+	ReactDOM.render(<Component {...props} />, element);
 };

@@ -6,9 +6,9 @@ import GroupMembers from './GroupMembers';
 import './groupMembers.less';
 
 storiesOf('Settings/GroupMembers', module)
-	.add('default', () => (
-		<GroupMembers group={getGroup()}/>
-	));
+.add('default', () => (
+	<GroupMembers group={getGroup()} />
+));
 
 function getGroup() {
 	return {

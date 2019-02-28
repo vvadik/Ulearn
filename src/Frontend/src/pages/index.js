@@ -11,7 +11,7 @@ export class Page extends Component {
 		return (
 			<div className={styles.wrapper}>
 				<div className={styles.contentWrapper}>
-					{ this.props.children }
+					{this.props.children}
 				</div>
 			</div>
 		)

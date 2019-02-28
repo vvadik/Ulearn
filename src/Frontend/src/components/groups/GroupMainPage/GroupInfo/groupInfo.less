@@ -1,4 +1,5 @@
 @import "../../../../variables.less";
+
 @indent: 50px;
 @tabletIndent: 25px;
 @phoneIndent: 15px;
@@ -18,23 +19,23 @@
   }
 
   &:hover {
-	background-color: rgba(0,0,0,.02);
+    background-color: rgba(0, 0, 0, .02);
 
     a.groupLink {
-	  text-decoration: underline;
+      text-decoration: underline;
       text-decoration-color: #3072c4;
     }
   }
 
   @media (max-width: @maxTabletWidth) {
-	  padding-left: @tabletIndent;
-	  padding-right: 0;
+    padding-left: @tabletIndent;
+    padding-right: 0;
   }
 
   @media (max-width: @maxPhoneWidth) {
-	  padding-left: @phoneIndent;
-	  padding-top: 0;
-	  padding-bottom: 15px;
+    padding-left: @phoneIndent;
+    padding-top: 0;
+    padding-bottom: 15px;
   }
 }
 
@@ -59,7 +60,7 @@
   justify-content: space-between;
 
   @media (max-width: @maxTabletWidth) {
-	flex-direction: column;
+    flex-direction: column;
   }
 
   a {
@@ -77,12 +78,12 @@
   align-self: baseline;
 
   @media (max-width: @maxTabletWidth) {
-	width: 100%;
+    width: 100%;
   }
 
   @media (max-width: @maxPhoneWidth) {
-	font-size: 12px;
- }
+    font-size: 12px;
+  }
 }
 
 .group-name {
@@ -95,7 +96,7 @@
   z-index: 1;
 
   &:hover {
-	text-decoration: underline;
+    text-decoration: underline;
   }
 
   @media (max-width: @maxPhoneWidth) {
@@ -113,7 +114,7 @@
   align-self: flex-end;
 
   @media (max-width: @maxTabletWidth) {
-	width: 100%;
+    width: 100%;
   }
 
   @media (max-width: @maxPhoneWidth) {

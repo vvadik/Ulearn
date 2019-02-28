@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Checkbox from "@skbkontur/react-ui/components/Checkbox/Checkbox";
 
@@ -20,8 +20,8 @@ class GroupSettingsCheckbox extends Component {
 		this.bindReview = this.onChange.bind(this, 'review');
 	}
 
-	render () {
-		const { group } = this.props;
+	render() {
+		const {group} = this.props;
 		const manualChecking = group.isManualCheckingEnabled || false;
 		const progress = group.canStudentsSeeGroupProgress || false;
 
@@ -31,9 +31,9 @@ class GroupSettingsCheckbox extends Component {
 					{this.renderSettings(progress, "Открыть ведомость курса студентам", this.bindProgress)}
 				</label>
 				<label className={styles["settings-checkbox"]}>
-				{ this.renderSettings(manualChecking,
-					"Включить код-ревью и ручную проверку тестов для участников группы",
-					this.bindManualChecking) }
+					{this.renderSettings(manualChecking,
+						"Включить код-ревью и ручную проверку тестов для участников группы",
+						this.bindManualChecking)}
 				</label>
 				{manualChecking && this.renderReviewSettings()}
 			</React.Fragment>
@@ -41,16 +41,16 @@ class GroupSettingsCheckbox extends Component {
 	}
 
 	renderReviewSettings() {
-		const { group } = this.props;
+		const {group} = this.props;
 		const oldSolution = group.isManualCheckingEnabledForOldSolutions || false;
 		const review = group.defaultProhibitFurtherReview || false;
 
 		return (
 			<React.Fragment>
 				<label className={styles["settings-checkbox"]}>
-					{ this.renderSettings(oldSolution,
+					{this.renderSettings(oldSolution,
 						"Отправить на код-ревью и ручную проверку тестов старые решения участников",
-						this.bindOldSolution) }
+						this.bindOldSolution)}
 					<p className={styles["settings-comment"]}>Если эта опция выключена, то при вступлении
 						студента в группу его старые решения не будут отправлены на код-ревью</p>
 				</label>
@@ -72,7 +72,7 @@ class GroupSettingsCheckbox extends Component {
 	};
 
 	onChange = (field, _, value) => {
-		const { onChangeSettings } = this.props;
+		const {onChangeSettings} = this.props;
 		onChangeSettings(mapToServerName[field], value);
 	};
 }

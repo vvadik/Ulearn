@@ -6,6 +6,7 @@ import GroupSettings from './GroupSettings';
 import './groupSettings.less';
 
 storiesOf('Settings/GroupSettings', module)
-	.add('default', () => (
-		<GroupSettings group={{test: "test"}} updatedFields={{name: 'maria'}} onChangeSettings={action('change')}/>
-	));
+.add('default', () => (
+	<GroupSettings group={{test: "test"}} updatedFields={{name: 'maria'}}
+				   onChangeSettings={action('change')} />
+));

@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import api from "../../../../../api/index";
 import Select from "@skbkontur/react-ui/components/Select/Select";
@@ -24,7 +24,7 @@ class CopyStudentsModal extends Component {
 
 	componentDidMount() {
 		api.courses.getUserCourses()
-			.then(json => {
+		.then(json => {
 			let courses = json.courses;
 			this.setState({
 				courses,
@@ -33,33 +33,33 @@ class CopyStudentsModal extends Component {
 	}
 
 	loadGroups = (courseId) => {
-		this.setState({ loadingGroups: true });
+		this.setState({loadingGroups: true});
 		api.groups.getCourseGroups(courseId)
-			.then(json => {
-				let groups = json.groups;
-				this.setState({
-					groups,
-					loadingGroups: false,
-				});
-			})
-			.catch(console.error)
-			.finally(() =>
-				this.setState({
+		.then(json => {
+			let groups = json.groups;
+			this.setState({
+				groups,
+				loadingGroups: false,
+			});
+		})
+		.catch(console.error)
+		.finally(() =>
+			this.setState({
 				loadingGroups: false,
 			})
 		)
 	};
 
 	render() {
-		const { onClose } = this.props;
+		const {onClose} = this.props;
 		return (
 			<Modal onClose={onClose} width="100%">
 				<Modal.Header>Скопировать студентов</Modal.Header>
 				<form onSubmit={this.onSubmit}>
 					<Modal.Body>
 						<div className={styles["modal-content"]}>
-							{ this.renderCourseSelect() }
-							{ this.renderGroupSelect() }
+							{this.renderCourseSelect()}
+							{this.renderGroupSelect()}
 						</div>
 					</Modal.Body>
 					<Modal.Footer>
@@ -78,7 +78,7 @@ class CopyStudentsModal extends Component {
 	}
 
 	renderCourseSelect() {
-		const { courseId } = this.state;
+		const {courseId} = this.state;
 		return (
 			<React.Fragment>
 				<p className={styles["course-info"]}>
@@ -101,7 +101,7 @@ class CopyStudentsModal extends Component {
 	}
 
 	renderGroupSelect() {
-		const { groupId, groups } = this.state;
+		const {groupId, groups} = this.state;
 		return (
 			<React.Fragment>
 				<p className={styles["group-info"]}>
@@ -120,14 +120,14 @@ class CopyStudentsModal extends Component {
 							error={this.hasError()}
 							disabled={groups.length === 0} />
 					</label>
-					{this.state.loadingGroups ? null : (this.checkGroups() && this.renderEmptyGroups()) }
+					{this.state.loadingGroups ? null : (this.checkGroups() && this.renderEmptyGroups())}
 				</Loader>
 			</React.Fragment>
 		)
 	}
 
 	renderEmptyGroups() {
-		const { courses, courseId } = this.state;
+		const {courses, courseId} = this.state;
 		return (
 			<p className={styles["empty-group-info"]}>
 				<b>В курсе {this.getTitle(courses, courseId)} нет доступных вам групп</b>
@@ -136,7 +136,7 @@ class CopyStudentsModal extends Component {
 	}
 
 	getCourseOptions = () => {
-		const { courses } = this.state;
+		const {courses} = this.state;
 		return courses.map(course => [course.id, course.title]);
 	};
 
@@ -155,14 +155,14 @@ class CopyStudentsModal extends Component {
 	};
 
 	getGroupOptions = () => {
-		const { groups } = this.state;
+		const {groups} = this.state;
 
 		return groups.map(group => [group.id, `${group.name}: ${group.studentsCount} 
 		${getPluralForm(group.studentsCount, 'студент', 'студента', 'студентов')}`]);
 	};
 
 	onGroupChange = (_, value) => {
-		this.setState({ groupId: value });
+		this.setState({groupId: value});
 	};
 
 	hasError = () => {
@@ -170,7 +170,7 @@ class CopyStudentsModal extends Component {
 	};
 
 	checkGroups = () => {
-		const { courseId, groups } = this.state;
+		const {courseId, groups} = this.state;
 		if (!groups) {
 			return false;
 		}
@@ -178,8 +178,8 @@ class CopyStudentsModal extends Component {
 	};
 
 	onSubmit = (e) => {
-		const { groupId, courseId, groups } = this.state;
-		const { studentIds, onClose } = this.props;
+		const {groupId, courseId, groups} = this.state;
+		const {studentIds, onClose} = this.props;
 
 		e.preventDefault();
 
@@ -192,13 +192,13 @@ class CopyStudentsModal extends Component {
 
 		const students = [...studentIds];
 
-		this.setState({ loading: true });
+		this.setState({loading: true});
 		api.groups.copyStudents(groupId, students)
-			.then(() =>
-				Toast.push(`Студенты скопированы в группу ${this.getTitle(groups, groupId)}`)
-			)
-			.catch(console.error)
-			.finally(() => this.setState({ loading: false }));
+		.then(() =>
+			Toast.push(`Студенты скопированы в группу ${this.getTitle(groups, groupId)}`)
+		)
+		.catch(console.error)
+		.finally(() => this.setState({loading: false}));
 
 		onClose();
 	};

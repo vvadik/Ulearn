@@ -9,7 +9,7 @@ class Comment extends Component {
 	render() {
 		return (
 			<div>
-				Hello, it's a comment. Props are { this.props.first } and { this.props.second }
+				Hello, it's a comment. Props are {this.props.first} and {this.props.second}
 			</div>
 		);
 	}

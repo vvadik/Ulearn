@@ -5,7 +5,7 @@ import Link from "@skbkontur/react-ui/components/Link/Link";
 import styles from "./Profile.less"
 
 function Profile(props) {
-	const { isSysAdmin, systemAccesses, user } = props;
+	const {isSysAdmin, systemAccesses, user} = props;
 	const canViewProfiles = systemAccesses.includes("viewAllProfiles") || isSysAdmin;
 	const profileUrl = `/Account/Profile?userId=${user.id}`;
 

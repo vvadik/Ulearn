@@ -31,110 +31,110 @@ function configureStore(preloadedState) {
 		applyMiddleware(thunkMiddleware);
 
 	return createStore(
-        rootReducer,
-        preloadedState,
-        middlewares
-    )
+		rootReducer,
+		preloadedState,
+		middlewares
+	)
 }
 
 let store = configureStore({
-    account: {
-        isAuthenticated: false,
-        isSystemAdministrator: false,
-        roleByCourse: {},
-        accessesByCourse: {},
-    },
-    notifications: {
-        count: 0,
-        lastTimestamp: undefined
-    }
+	account: {
+		isAuthenticated: false,
+		isSystemAdministrator: false,
+		roleByCourse: {},
+		accessesByCourse: {},
+	},
+	notifications: {
+		count: 0,
+		lastTimestamp: undefined
+	}
 });
 
 // Update notifications count each minute
 setInterval(() => {
-    if (store.getState().account.isAuthenticated)
-        store.dispatch(api.notifications.getNotificationsCount(store.getState().notifications.lastTimestamp))
+	if (store.getState().account.isAuthenticated)
+		store.dispatch(api.notifications.getNotificationsCount(store.getState().notifications.lastTimestamp))
 }, 60 * 1000);
 
 api.setServerErrorHandler((message) => Toast.push(message ? message : 'Произошла ошибка. Попробуйте перезагрузить страницу.'));
 
 class UlearnApp extends Component {
-    render() {
+	render() {
 		let pathname = window.location.pathname.toLowerCase();
 		let isLti = pathname.endsWith('/ltislide') || pathname.endsWith('/acceptedalert');
 		let isHeaderVisible = !isLti;
 
-        return (
-            <Provider store={store}>
-                <InternalUlearnApp isHeaderVisible={isHeaderVisible}/>
-            </Provider>
-        )
-    }
+		return (
+			<Provider store={store}>
+				<InternalUlearnApp isHeaderVisible={isHeaderVisible} />
+			</Provider>
+		)
+	}
 }
 
 class InternalUlearnApp extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            initializing: true,
-        }
-    }
+	constructor(props) {
+		super(props);
+		this.state = {
+			initializing: true,
+		}
+	}
 
-    componentDidMount() {
-        this.props.getCurrentUser();
-        this.props.getCourses();
-    }
+	componentDidMount() {
+		this.props.getCurrentUser();
+		this.props.getCourses();
+	}
 
-    componentWillReceiveProps(nextProps, nextState) {
-        this.setState({
-            initializing: false
-        });
-        if (! this.props.account.isAuthenticated && nextProps.account.isAuthenticated) {
-            this.props.getNotificationsCount();
-        }
-    }
+	componentWillReceiveProps(nextProps, nextState) {
+		this.setState({
+			initializing: false
+		});
+		if (!this.props.account.isAuthenticated && nextProps.account.isAuthenticated) {
+			this.props.getNotificationsCount();
+		}
+	}
 
-    render() {
-    	const isHeaderVisible = this.props.isHeaderVisible;
-        return (
-            <BrowserRouter>
-                <ErrorBoundary>
-					{ isHeaderVisible && <Header initializing={this.state.initializing}/> }
-					{ isHeaderVisible && <div className={styles.headerContentDivider} /> }
+	render() {
+		const isHeaderVisible = this.props.isHeaderVisible;
+		return (
+			<BrowserRouter>
+				<ErrorBoundary>
+					{isHeaderVisible && <Header initializing={this.state.initializing} />}
+					{isHeaderVisible && <div className={styles.headerContentDivider} />}
 					<NotFoundErrorBoundary>
-						{ ! this.state.initializing && // Avoiding bug: don't show page while initializing.
-													   // Otherwise we make two GET requests sequentially.
-													   // Unfortunately some our GET handlers are not idempotent (i.e. /Admin/CheckNextExerciseForSlide)
-							<Switch>
-								<Route path="/Admin/Groups" component={redirectLegacyPage("/:courseId/groups")} />
+						{!this.state.initializing && // Avoiding bug: don't show page while initializing.
+						// Otherwise we make two GET requests sequentially.
+						// Unfortunately some our GET handlers are not idempotent (i.e. /Admin/CheckNextExerciseForSlide)
+						<Switch>
+							<Route path="/Admin/Groups" component={redirectLegacyPage("/:courseId/groups")} />
 
-								<Route path="/:courseId/groups/" component={GroupListPage} exact />
-								<Route path="/:courseId/groups/:groupId/" component={GroupPage} exact />
-								<Route path="/:courseId/groups/:groupId/:groupPage" component={GroupPage} exact />
+							<Route path="/:courseId/groups/" component={GroupListPage} exact />
+							<Route path="/:courseId/groups/:groupId/" component={GroupPage} exact />
+							<Route path="/:courseId/groups/:groupId/:groupPage" component={GroupPage} exact />
 
-								<Route component={AnyPage} />
-							</Switch>
+							<Route component={AnyPage} />
+						</Switch>
 						}
 					</NotFoundErrorBoundary>
-                    <YandexMetrika/>
-                </ErrorBoundary>
-            </BrowserRouter>
-        );
-    }
+					<YandexMetrika />
+				</ErrorBoundary>
+			</BrowserRouter>
+		);
+	}
 
-    static mapStateToProps(state) {
-        return {
-            account: state.account,
-        }
-    }
+	static mapStateToProps(state) {
+		return {
+			account: state.account,
+		}
+	}
 
-    static mapDispatchToProps(dispatch) {
-        return {
-            getCurrentUser: () => dispatch(api.account.getCurrentUser()),
-            getCourses: () => dispatch(api.courses.getCourses()),
-            getNotificationsCount: () => dispatch(api.notifications.getNotificationsCount())
-        }
-    }
+	static mapDispatchToProps(dispatch) {
+		return {
+			getCurrentUser: () => dispatch(api.account.getCurrentUser()),
+			getCourses: () => dispatch(api.courses.getCourses()),
+			getNotificationsCount: () => dispatch(api.notifications.getNotificationsCount())
+		}
+	}
 }
 
 InternalUlearnApp = connect(InternalUlearnApp.mapStateToProps, InternalUlearnApp.mapDispatchToProps)(InternalUlearnApp);

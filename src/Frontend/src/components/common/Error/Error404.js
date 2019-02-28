@@ -6,7 +6,8 @@ class Error404 extends Component {
 	render() {
 		return (
 			<div className={styles.wrapper}>
-				<img src="https://ulearn.me/Content/404.jpg" alt="в поисках адреса страницы" className={styles.image} />
+				<img src="https://ulearn.me/Content/404.jpg" alt="в поисках адреса страницы"
+					 className={styles.image} />
 				<div className={styles.text}>
 					<h2>СТРАНИЦА НЕ НАЙДЕНА</h2>
 					<p>

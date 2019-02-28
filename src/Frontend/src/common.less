@@ -1,32 +1,32 @@
 @import "variables.less";
 
 .caret {
-    display: inline-block;
-    width: 0;
-    height: 0;
-    margin-left: 2px;
-    vertical-align: middle;
-    border-top: 4px dashed;
-    border-top: 4px solid \9;
-    border-right: 4px solid transparent;
-    border-left: 4px solid transparent;
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-left: 2px;
+  vertical-align: middle;
+  border-top: 4px dashed;
+  border-top: 4px solid \9;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
 }
 
 .visible-only-phone {
-    display: none;
+  display: none;
 
-    @media (max-width: @maxPhoneWidth) {
-        & {
-            display: initial;
-        }
+  @media (max-width: @maxPhoneWidth) {
+    & {
+      display: initial;
     }
+  }
 }
 
 .visible-at-least-tablet {
-    @media (max-width: @maxPhoneWidth) {
-        & {
-            display: none !important;
-        }
+  @media (max-width: @maxPhoneWidth) {
+    & {
+      display: none !important;
     }
+  }
 }
 
