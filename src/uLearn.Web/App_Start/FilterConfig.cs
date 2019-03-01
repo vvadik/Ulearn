@@ -11,8 +11,10 @@ using System.Web.Configuration;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Database.DataContexts;
+using log4net;
 using LtiLibrary.Core.Extensions;
 using Microsoft.AspNet.Identity;
+using NUnit.Framework.Internal;
 using uLearn.Web.Kontur.Passport;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
@@ -21,7 +23,7 @@ using Web.Api.Configuration;
 
 namespace uLearn.Web
 {
-	public class FilterConfig
+	public static class FilterConfig
 	{
 		public static void RegisterGlobalFilters(GlobalFilterCollection filters)
 		{
@@ -50,6 +52,7 @@ namespace uLearn.Web
 
 	public class AntiForgeryTokenFilter : FilterAttribute, IExceptionFilter
 	{
+		private static readonly ILog log = LogManager.GetLogger(typeof(AntiForgeryTokenFilter));
 		public void OnException(ExceptionContext filterContext)
 		{
 			if (!(filterContext.Exception is HttpAntiForgeryException))
@@ -60,6 +63,25 @@ namespace uLearn.Web
 			else
 				filterContext.Result = new RedirectResult("/");
 
+			log.Info($"{nameof(AntiForgeryTokenFilter)} did his job");
+			filterContext.ExceptionHandled = true;
+		}
+	}
+	
+	public class HandleHttpAntiForgeryException : ActionFilterAttribute, IExceptionFilter
+	{
+		private static readonly ILog log = LogManager.GetLogger(typeof(HandleHttpAntiForgeryException));
+		public void OnException(ExceptionContext filterContext)
+		{
+			if (!(filterContext.Exception is HttpAntiForgeryException))
+				return;
+
+			if (filterContext.RequestContext.HttpContext.Request.IsAjaxRequest())
+				filterContext.Result = new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+			else
+				filterContext.Result = new RedirectResult("/");
+
+			log.Info($"{nameof(HandleHttpAntiForgeryException)} did his job");
 			filterContext.ExceptionHandled = true;
 		}
 	}

@@ -62,6 +62,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> Index(string username)
 		{
 			metricSender.SendCount("restore_password.try");
@@ -157,6 +158,7 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		[ValidateInput(false)]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> SetNewPassword(SetNewPasswordModel model)
 		{
 			var answer = new SetNewPasswordModel
