@@ -173,7 +173,7 @@ class AbstractMyCoursesMenu extends Component {
 			<MenuItem href={"/Course/" + courseId} key={courseId}
 					  component={LinkComponent}>{courseById[courseId].title}</MenuItem>
 		);
-		if (courseIds.length > visibleCourseIds.length)
+		if (courseIds.length > visibleCourseIds.length || courseIds.length === 0)
 			items.push(<MenuItem href="/Admin/Courses" key="-course-list" component={LinkComponent}><strong>Все
 				курсы</strong></MenuItem>);
 		return items;

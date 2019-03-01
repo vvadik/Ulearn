@@ -269,7 +269,7 @@ namespace uLearn.Web.Controllers
 				await slideCheckingsRepo.MarkManualCheckingAsChecked(checking, score).ConfigureAwait(false);
 				if (prohibitFurtherReview.HasValue && prohibitFurtherReview.Value)
 					await slideCheckingsRepo.ProhibitFurtherExerciseManualChecking(checking).ConfigureAwait(false);
-				await visitsRepo.UpdateScoreForVisit(checking.CourseId, checking.SlideId, checking.UserId).ConfigureAwait(false);
+				await visitsRepo.UpdateScoreForVisit(checking.CourseId, checking.SlideId, slide.MaxScore, checking.UserId).ConfigureAwait(false);
 
 				transaction.Commit();
 
@@ -347,7 +347,7 @@ namespace uLearn.Web.Controllers
 			if (exerciseScore == slide.Scoring.CodeReviewScore)
 				await slideCheckingsRepo.ProhibitFurtherExerciseManualChecking(checking).ConfigureAwait(false);
 			
-			await visitsRepo.UpdateScoreForVisit(courseId, slideId, userId).ConfigureAwait(false);
+			await visitsRepo.UpdateScoreForVisit(courseId, slideId, slide.MaxScore, userId).ConfigureAwait(false);
 
 			await NotifyAboutManualExerciseChecking(checking).ConfigureAwait(false);
 

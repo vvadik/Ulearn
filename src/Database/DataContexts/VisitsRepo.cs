@@ -65,10 +65,11 @@ namespace Database.DataContexts
 			return db.Visits.Any(v => v.CourseId == courseId && v.UserId == userId);
 		}
 
-		public Task UpdateScoreForVisit(string courseId, Guid slideId, string userId)
+		public Task UpdateScoreForVisit(string courseId, Guid slideId, int maxSlideScore, string userId)
 		{
 			var newScore = slideCheckingsRepo.GetManualScoreForSlide(courseId, slideId, userId) +
 							slideCheckingsRepo.GetAutomaticScoreForSlide(courseId, slideId, userId);
+			newScore = Math.Min(newScore, maxSlideScore);
 			var isPassed = slideCheckingsRepo.IsSlidePassed(courseId, slideId, userId);
 			log.Info($"Обновляю количество баллов пользователя {userId} за слайд {slideId} в курсе \"{courseId}\". " +
 					 $"Новое количество баллов: {newScore}, слайд пройден: {isPassed}");

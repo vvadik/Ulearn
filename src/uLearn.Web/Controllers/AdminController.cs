@@ -219,6 +219,7 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		[ULearnAuthorize(ShouldBeSysAdmin = true)]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> CreateCourse(string courseId, string courseTitle)
 		{
 			var versionId = Guid.NewGuid();
@@ -511,6 +512,7 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> SaveCommentsPolicy(AdminCommentsViewModel model)
 		{
 			var courseId = model.CourseId;

@@ -75,8 +75,8 @@ namespace uLearn.Web.Controllers
 		{
 			var result = new T { CourseId = courseId };
 
-			/* if groupsIds contains "all" (it should be exclusive), get all users. Available only for instructors  */
-			if (groupsIds.Contains("all") && User.HasAccessFor(courseId, CourseRole.Instructor))
+			/* if groupsIds contains "all" (it should be exclusive), get all users. Available only for course admins */
+			if (groupsIds.Contains("all") && User.HasAccessFor(courseId, CourseRole.CourseAdmin))
 				return result;
 			/* if groupsIds contains "not-group" (it should be exclusive), get all users not in any groups, available only for course admins */
 			if (groupsIds.Contains("not-in-group") && User.HasAccessFor(courseId, CourseRole.CourseAdmin))
