@@ -8,30 +8,31 @@ import * as users from "./users"
 
 const API_JWT_TOKEN_UPDATED = 'API_JWT_TOKEN_UPDATED';
 let apiJwtToken = '';
-let serverErrorHandler = () => {};
+let serverErrorHandler = () => {
+};
 
 function setServerErrorHandler(handler) {
 	serverErrorHandler = handler;
 }
 
 function refreshApiJwtToken() {
-    return fetch(config.api.endpoint + 'account/token', { credentials: 'include', method: 'POST' })
-        .then(response => {
-            if (response.status !== 200) {
-                let error = new Error(response.statusText || response.status);
-                error.response = response;
-                return Promise.reject(error);
-            }
+	return fetch(config.api.endpoint + 'account/token', {credentials: 'include', method: 'POST'})
+	.then(response => {
+		if (response.status !== 200) {
+			let error = new Error(response.statusText || response.status);
+			error.response = response;
+			return Promise.reject(error);
+		}
 
-            return response.json();
-        })
-        .then(json => {
-            let token = json.token;
-            if (! token)
-                return Promise.reject(new Error('Can\'t get token from API: /account/token returned bad json: ' + JSON.stringify(json)));
-            apiJwtToken = token;
-            return Promise.resolve(API_JWT_TOKEN_UPDATED);
-        })
+		return response.json();
+	})
+	.then(json => {
+		let token = json.token;
+		if (!token)
+			return Promise.reject(new Error('Can\'t get token from API: /account/token returned bad json: ' + JSON.stringify(json)));
+		apiJwtToken = token;
+		return Promise.resolve(API_JWT_TOKEN_UPDATED);
+	})
 }
 
 function clearApiJwtToken() {
@@ -39,40 +40,40 @@ function clearApiJwtToken() {
 }
 
 function request(url, options, isRetry) {
-    options = options || {};
-    options.credentials = options.credentials || 'include';
-    options.headers = options.headers || {};
-    options.headers['Authorization'] = 'Bearer ' + apiJwtToken;
-    return fetch(config.api.endpoint + url, options)
-		.catch((error) => {
-			if (window.navigator.onLine === false)
-				serverErrorHandler('Не можем подключиться к серверу');
-			else
-				serverErrorHandler('Не можем подключиться к серверу. Попробуйте обновить страницу.');
+	options = options || {};
+	options.credentials = options.credentials || 'include';
+	options.headers = options.headers || {};
+	options.headers['Authorization'] = 'Bearer ' + apiJwtToken;
+	return fetch(config.api.endpoint + url, options)
+	.catch((error) => {
+		if (window.navigator.onLine === false)
+			serverErrorHandler('Не можем подключиться к серверу');
+		else
+			serverErrorHandler('Не можем подключиться к серверу. Попробуйте обновить страницу.');
 
-			throw error;
-		})
-		.then(response => {
-            if (response.status >= 200 && response.status < 300)
-                return response;
-            if (response.status === 401 && !isRetry)
-                return refreshApiJwtToken();
+		throw error;
+	})
+	.then(response => {
+		if (response.status >= 200 && response.status < 300)
+			return response;
+		if (response.status === 401 && !isRetry)
+			return refreshApiJwtToken();
 
-			if (response.status >= 500)
-				serverErrorHandler();
+		if (response.status >= 500)
+			serverErrorHandler();
 
-			throw new Error(`HTTP response code: ${response.status}`);
-        })
-		.catch((error) => {
-			console.error(error);
-			throw error;
-		})
-        .then(value => {
-            if (value === API_JWT_TOKEN_UPDATED)
-                return request(url, options, true);
+		throw new Error(`HTTP response code: ${response.status}`);
+	})
+	.catch((error) => {
+		console.error(error);
+		throw error;
+	})
+	.then(value => {
+		if (value === API_JWT_TOKEN_UPDATED)
+			return request(url, options, true);
 
-            return value.json();
-        })
+		return value.json();
+	})
 }
 
 function get(url, options) {
@@ -80,9 +81,9 @@ function get(url, options) {
 }
 
 function post(url, options) {
-    options = options || {};
-    options.method = 'POST';
-    return request(url, options);
+	options = options || {};
+	options.method = 'POST';
+	return request(url, options);
 }
 
 function patch(url, options) {

@@ -1,6 +1,6 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
-import {CopyToClipboard} from 'react-copy-to-clipboard';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import api from "../../../../../api";
 import Toggle from "@skbkontur/react-ui/components/Toggle/Toggle";
 import Button from "@skbkontur/react-ui/components/Button/Button";
@@ -29,21 +29,22 @@ class InviteBlock extends Component {
 						onChange={this.onToggle}>
 					</Toggle>
 					<span className={styles["toggle-invite-text"]}>
-						Ссылка для вступления в группу { inviteLinkEnabled ? ' включена' : ' выключена' }
+						Ссылка для вступления в группу {inviteLinkEnabled ? ' включена' : ' выключена'}
 					</span>
 				</label>
-				{ inviteLinkEnabled && this.renderInvite() }
+				{inviteLinkEnabled && this.renderInvite()}
 			</div>
 		)
 	}
 
 	renderInvite() {
-		const { group } = this.props;
+		const {group} = this.props;
 
 		return (
 			<div className={styles["invite-link"]}>
 				<div className={styles["invite-link-text"]}>
-					<CopyToClipboard text={`${window.location.origin}/Account/JoinGroup?hash=${group.inviteHash}`}>
+					<CopyToClipboard
+						text={`${window.location.origin}/Account/JoinGroup?hash=${group.inviteHash}`}>
 						<Button use="link" icon={<LinkIcon />} onClick={() => Toast.push('Ссылка скопирована')}>
 							Скопировать ссылку
 						</Button>
@@ -63,16 +64,16 @@ class InviteBlock extends Component {
 	}
 
 	onToggle = () => {
-		const { group } = this.props;
+		const {group} = this.props;
 		const inviteLinkEnabled = this.state.inviteLinkEnabled;
 
-		this.setState ({
+		this.setState({
 			inviteLinkEnabled: !inviteLinkEnabled,
 		});
 		this.props.group.is_invite_link_enabled = !inviteLinkEnabled;
 
 		api.groups.saveGroupSettings(group.id, {'isInviteLinkEnabled': !inviteLinkEnabled})
-			.catch(console.error);
+		.catch(console.error);
 	};
 }
 

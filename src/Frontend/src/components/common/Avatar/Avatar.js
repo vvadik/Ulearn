@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import colorHash from '../../../utils/colorHash';
 
@@ -21,9 +21,9 @@ class Avatar extends Component {
 	renderImage(url, className) {
 		return (
 			<img
-			alt="Аватарка"
-			className={className}
-			src={url}
+				alt="Аватарка"
+				className={className}
+				src={url}
 			/>
 		);
 	}
@@ -37,7 +37,7 @@ class Avatar extends Component {
 		};
 
 		return (
-			<div style={divStyle} className={`${className} ${styles["color-avatar"]}`}>{ userFirstLetter }</div>
+			<div style={divStyle} className={`${className} ${styles["color-avatar"]}`}>{userFirstLetter}</div>
 		)
 	}
 }

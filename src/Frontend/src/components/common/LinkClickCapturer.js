@@ -9,24 +9,24 @@ import * as PropTypes from 'prop-types';
 const isModifiedEvent = (e => !!(e.metaKey || e.altKey || e.ctrlKey || e.shiftKey));
 
 const getNearest = (branch, root, tagName) => {
-    let candidate = branch;
+	let candidate = branch;
 
-    while (candidate && candidate.tagName !== tagName) {
-        candidate =
-            candidate.parentElement === root ? null : candidate.parentElement;
-    }
+	while (candidate && candidate.tagName !== tagName) {
+		candidate =
+			candidate.parentElement === root ? null : candidate.parentElement;
+	}
 
-    return candidate;
+	return candidate;
 };
 
 const hasTarget = (anchor) => anchor.target && anchor.target !== '_self';
 
 const isSameDomain = (anchor) =>
-    anchor &&
-    window &&
-    window.location &&
-    anchor.protocol === window.location.protocol &&
-    anchor.host === window.location.host;
+	anchor &&
+	window &&
+	window.location &&
+	anchor.protocol === window.location.protocol &&
+	anchor.host === window.location.host;
 
 const fileRegex = /\.[a-zA-Z0-9]{2,4}$/;
 
@@ -35,63 +35,63 @@ const isAnchorLink = (anchor) => anchor && anchor.href.indexOf("#") !== -1;
 const isProbablyFile = (anchor) => anchor && anchor.pathname && fileRegex.test(anchor.pathname);
 
 const isClientRoutable = (anchor) =>
-    anchor &&
-    isSameDomain(anchor) &&
-    !hasTarget(anchor) &&
-    !isProbablyFile(anchor);
+	anchor &&
+	isSameDomain(anchor) &&
+	!hasTarget(anchor) &&
+	!isProbablyFile(anchor);
 
 
 class LinkClickCapturer extends Component {
-    constructor(props) {
-        super(props);
-        this.exclude = props.exclude || [];
-    }
+	constructor(props) {
+		super(props);
+		this.exclude = props.exclude || [];
+	}
 
-    onClick = e => {
-        // Ignore canceled events, modified clicks, and right clicks.
-        if (e.defaultPrevented || e.button !== 0 || isModifiedEvent(e))
-            return;
+	onClick = e => {
+		// Ignore canceled events, modified clicks, and right clicks.
+		if (e.defaultPrevented || e.button !== 0 || isModifiedEvent(e))
+			return;
 
-        const anchor = getNearest(e.target, e.currentTarget, 'A');
+		const anchor = getNearest(e.target, e.currentTarget, 'A');
 
-        if (!isClientRoutable(anchor))
-            return;
+		if (!isClientRoutable(anchor))
+			return;
 
-        if (this.exclude.some(prefix => anchor.pathname.startsWith(prefix)))
-            return;
+		if (this.exclude.some(prefix => anchor.pathname.startsWith(prefix)))
+			return;
 
-        e.preventDefault();
+		e.preventDefault();
 
-        if (isAnchorLink(anchor))
-            return;
+		if (isAnchorLink(anchor))
+			return;
 
-        this.context.router.history.push({
-            pathname: anchor.pathname,
-            search: anchor.search
-        });
-    };
+		this.context.router.history.push({
+			pathname: anchor.pathname,
+			search: anchor.search
+		});
+	};
 
-    render() {
-        return (
-            <div onClick={this.onClick}>
-                {this.props.children}
-            </div>
-        );
-    }
+	render() {
+		return (
+			<div onClick={this.onClick}>
+				{this.props.children}
+			</div>
+		);
+	}
 
-    static contextTypes = {
-        router: PropTypes.shape({
-            history: PropTypes.shape({
-                push: PropTypes.func.isRequired,
-                replace: PropTypes.func.isRequired,
-                createHref: PropTypes.func.isRequired
-            }).isRequired
-        }).isRequired
-    };
+	static contextTypes = {
+		router: PropTypes.shape({
+			history: PropTypes.shape({
+				push: PropTypes.func.isRequired,
+				replace: PropTypes.func.isRequired,
+				createHref: PropTypes.func.isRequired
+			}).isRequired
+		}).isRequired
+	};
 
-    static propTypes = {
-        exclude: PropTypes.arrayOf(PropTypes.string).isRequired
-    }
+	static propTypes = {
+		exclude: PropTypes.arrayOf(PropTypes.string).isRequired
+	}
 }
 
 export default LinkClickCapturer;
