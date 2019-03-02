@@ -1,55 +1,66 @@
-import React, { Component } from 'react';
+import React, {Component, useContext} from 'react';
 import PropTypes from "prop-types";
 import CommentSendForm from "../CommentSendForm/CommentSendForm";
 import Comment from "../Comment/Comment";
-import {CommentActionHandlers} from "../Comment/commonPropTypes";
+import {CommentContext} from "../CommentsList/CommentsList";
+// import {CommentActionHandlers} from "../Comment/commonPropTypes";
+
+import styles from './Thread.less';
+import Stub from "../Stub/Stub";
+
 
 class Thread extends Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			comment: props.comment,
 			showReplyForm: false,
 			sending: false,
 		}
 	}
 
-	renderComment(comment){
-		const { showReplyForm } = this.state;
+	render() {
+		const { comment } = this.props;
+		const hasReplyAction = !((comment.replies || []).length > 0);
+
+
+		return (
+			this.renderComment(comment, hasReplyAction)
+		)
+	}
+
+	renderComment(comment, hasReplyAction = false){
 		const { getUserSolutionsUrl, user, userRoles } = this.props;
+		const { showReplyForm, sending } = this.state;
+		console.log('in Thread', this.commentActionHandlers);
+		// const { dispatch } = useContext(CommentContext);
+
 
 		return (
 			<Comment
-			commentId={comment.id}
-			author={comment.author}
-			user={user.id}
-			userRoles={userRoles}
-			text={comment.text}
-			renderCommentText={comment.renderedText}
+			key={comment.id}
 			url={getUserSolutionsUrl(comment.author.id)}
-			publishTime={comment.publishTime}
-			isApproved={comment.isApproved}
-			isPinnedToTop={comment.isPinnedToTop}
-			isLiked={comment.isLiked}
-			likesCount={comment.likesCount}
-			sending={this.state.sending}
-			actionHandlers={this.actionHandlers}
-			showReplyForm={this.handleShowReplyForm}
-			deleteComment={this.deleteComment}
-			onEditComment={this.onEditComment}
-			onLikeChanged={this.handleLikeChange}
-			pinComment={this.handlePinComment}
-			markAsCorrectAnswer={this.handleMarkAsCorrectAnswer}
-			hideComment={this.handleHideComment}>
-			{ comment.replies && comment.replies.length > 0 && comment.replies.map(reply => this.renderComment(reply))}
-			{ showReplyForm && <CommentSendForm onSubmit={this.onSubmit}/> }
-			</Comment>)
-
-	}
-	render() {
-		const { comment, } = this.state;
-		return this.renderComment(comment);
+			user={user}
+			userRoles={userRoles}
+			comment={comment}
+			commentActions={this.commentActionHandlers}
+			hasReplyAction={hasReplyAction}
+			sending={sending}>
+			{ (comment.replies || []).map((reply, index, replies) =>
+				<div key={reply.id} className={styles.replies}>
+					{this.renderComment(reply, index + 1 === replies.length)}
+				</div>) }
+			{ !comment.parentCommentId && showReplyForm &&
+				<div className={styles.replyForm}>
+					<CommentSendForm
+						author={user}
+						autofocus
+						sending={sending}
+						submitTitle={'Отправить'}
+						onSubmit={this.onSubmit} />
+				</div> }
+			</Comment>
+		)
 	}
 
 	handleShowReplyForm = () => {
@@ -58,65 +69,40 @@ class Thread extends Component {
 		});
 	};
 
-	handleMarkAsCorrectAnswer = (id, isCorrectAnswer) => {
-		this.props.handleMarkAsCorrectAnswer(id, isCorrectAnswer);
-		//PATCH: api.comment.changeComment(id, `isCorrectAnswer: ${isCorrectAnswer}`)
-	};
-
-	handleHideComment = (id, isApproved) => {
-		this.props.handleHideComment(id, isApproved);
-		//PATCH: api.comment.changeComment(id, `isApproved: ${isApproved}`)
-	};
-
-	handlePinComment = (id, isPinnedToTop) => {
-		this.props.handlePinComment(id, isPinnedToTop);
-		//PATCH: api.comment.changeComment(id, `isPinnedToTop: ${isPinnedToTop}`)
-	};
-
-	handleLikeChange = (id, isLiked) => {
-		this.props.handleLikeChange(id, isLiked);
-
-		// if (isLiked) {
-			// POST: api.comment.likeComment(id);
-		// 	} else {
-			//	DELETE: api.comment.dislike(id);
-		// }
-	};
-
-	onEditComment = (text) => {
-		this.props.editComment(text);
-		//PATCH: api.comment.changeComment(id, `text: ${text}`)
-	};
-
-	deleteComment = (id) => {
-		this.props.deleteComment(id);
-		//DELETE: api.comment.deleteComment(id);
-	};
-
-	onSubmit = (id, text) => {
+	onSubmit = (text) => {
 		this.setState({
 			showReplyForm: false,
 		});
 
-		this.props.addReplyComment(id, text);
+		this.props.handleAddReplyComment(text);
 
 		//POST: api.comment.addComment()
-	}
+	};
+
+	commentActionHandlers = {
+		handleShowReplyForm: this.handleShowReplyForm,
+		handleCorrectAnswerMark: this.props.handleCorrectAnswerMark,
+		handlePinnedToTopMark: this.props.handlePinnedToTopMark,
+		handleVisibleMark: this.props.handleVisibleMark,
+		handleLikeChanged: this.props.handleLikeChanged,
+		handleEditComment: this.props.handleEditComment,
+		handleDeleteComment: this.props.handleDeleteComment,
+	};
 }
 
 Thread.propTypes = {
-	comment: PropTypes.object,
 	user: PropTypes.object,
-	getUserSolutionsUrl: PropTypes.func,
 	userRoles: PropTypes.object,
-	handleHideComment: PropTypes.func,
-	handlePinComment: PropTypes.func,
-	handleMarkAsCorrectAnswer: PropTypes.func,
+	comment: PropTypes.object,
+	getUserSolutionsUrl: PropTypes.func,
+	handleVisibleMark: PropTypes.func,
+	handlePinnedToTopMark: PropTypes.func,
+	handleCorrectAnswerMark: PropTypes.func,
 	handleLikeChange: PropTypes.func,
-	addReplyComment: PropTypes.func,
-	editComment: PropTypes.func,
-	deleteComment: PropTypes.func,
-	actionHandlers: CommentActionHandlers
+	handleShowEditComment: PropTypes.func,
+	handleDeleteComment: PropTypes.func,
+	handleAddReplyComment: PropTypes.func,
+	// actionHandlers: CommentActionHandlers
 };
 
 export default Thread;

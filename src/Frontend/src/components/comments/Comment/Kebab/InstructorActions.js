@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import PropTypes from "prop-types";
 import Kebab from "@skbkontur/react-ui/components/Kebab/Kebab";
 import MenuItem from "@skbkontur/react-ui/components/MenuItem/MenuItem";
@@ -6,26 +6,24 @@ import Icon from "@skbkontur/react-icons";
 
 import styles from "./InstructorActions.less";
 
-export default function InstructorActions({ isApproved, dispatch }) {
-	const handleEditClick = () => dispatch('edit');
-	const handleHideClick = () => dispatch('toggleHidden');
-	const handleDeleteClick = () => dispatch('delete');
+export default function InstructorActions(props) {
+	const { commentActions, isApproved } = props;
 
 	return <div className={styles.instructorsActions}>
 		<Kebab positions={['bottom right']} size="large" disableAnimations={false}>
 			<MenuItem
 				icon={<Icon.Edit size="small"/>}
-				onClick={handleEditClick}>
+				onClick={commentActions.handleShowEditComment}>
 				Редактировать
 			</MenuItem>
 			<MenuItem
 				icon={<Icon.EyeClosed size="small"/>}
-				onClick={handleHideClick}>
+				onClick={commentActions.handleVisibleMark}>
 				{ isApproved ? 'Опубликовать' : 'Скрыть' }
 			</MenuItem>
 			<MenuItem
 				icon={<Icon.Delete size="small"/>}
-				onClick={handleDeleteClick}>
+				onClick={commentActions.handleDeleteComment}>
 				Удалить
 			</MenuItem>
 		</Kebab>
@@ -34,5 +32,5 @@ export default function InstructorActions({ isApproved, dispatch }) {
 
 InstructorActions.propTypes = {
 	isApproved: PropTypes.bool,
-	dispatch: PropTypes.func,
+	commentActions: PropTypes.object,
 };

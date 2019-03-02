@@ -1,12 +1,12 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
+import {action} from '@storybook/addon-actions';
 import Thread from "./Thread";
-import PropTypes from "prop-types";
-import Comment from "../Comment/Comment";
 
 const user = {
+	"is_authenticated": true,
 	"id": "11",
-	"visibleName": "Louisa",
+	"visibleName": "Pavel",
 	"avatarUrl": null,
 };
 
@@ -33,25 +33,32 @@ const comment = {
 	replies: [
 		{ id: 2000,
 			author: {
-				"id": "1",
-				"visibleName": "Мария Парадеева",
+				"id": "10",
+				"visibleName": "Maria",
 				"avatarUrl": "https://staff.skbkontur.ru/content/images/default-user-woman.png",
 			},
 			text: "Я **не согласна**",
+			replies: [],
 			renderedText: "Я <b>не согласна</b>",
 			publishTime: "2019-02-18T14:12:41.947",
 			isApproved: false,
-			isCorrectAnswer: true,
+			isCorrectAnswer: false,
 			likesCount: 0,
 			parentCommentId: 1999
 		}
 	],
 };
 
-function getUserSolutionUrl(userId){
+function getUserSolutionUrl(userId) {
 	return `https://dev.ulearn.me/Analytics/UserSolutions?courseId=BasicProgramming&slideId=90bcb61e-57f0-4baa-8bc9-10c9cfd27f58&userId=${userId}`;
-}
+};
+
 storiesOf('Comments/Thread', module)
 	.add('комментарий с ответами', () => (
-		<Thread comment={comment} user={user} getUserSolutionsUrl={getUserSolutionUrl} userRoles={userRoles} />
+		<Thread
+			comment={comment}
+			user={user}
+			getUserSolutionsUrl={getUserSolutionUrl}
+			userRoles={userRoles}
+			addReplyComment={action('addReplyComment')} />
 	), { viewport: 'desktop' });

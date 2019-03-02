@@ -45,6 +45,7 @@ class Avatar extends Component {
 Avatar.propTypes = {
 	size: PropTypes.string,
 	user: PropTypes.shape({
+		id: PropTypes.string.isRequired,
 		avatarUrl: PropTypes.string,
 		visibleName: PropTypes.string.isRequired,
 	}),

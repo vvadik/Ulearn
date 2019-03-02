@@ -20,7 +20,7 @@ class MarkdownButtons extends Component {
 	renderMarkdownButton(name, operation) {
 		return (
 			<div key={name}>
-				<Hint pos="top" text={this.renderHint(operation)}>
+				<Hint pos="top" text={this.renderHint(operation)} disableAnimations={false} useWrapper={true}>
 					<button onClick={this.onClick(operation)} type="button">
 						<svg
 							width={20}

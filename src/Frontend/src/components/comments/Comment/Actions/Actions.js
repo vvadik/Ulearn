@@ -1,56 +1,66 @@
 import React from "react";
 import Icon from "@skbkontur/react-icons";
+// import { Link } from 'react-router-dom';
 
 import styles from "../Comment.less";
 
-const actions = {
-	reply: {
-		action: 'reply',
-		icon: 'ArrowCorner1',
-		text: 'Ответить',
-	},
-};
-
-export default function Actions(props) {
-	const { user, author, userRoles, parentCommentId, url, dispatch,
-		canModerateComments, isCorrectAnswer, isPinnedToTop } = props;
-
-	return (
-		<div className={styles.actions}>
-			{ !parentCommentId &&
-					/*<Action type='reply' />}*/
-					<Button onClick={() => dispatch('reply')} icon={'ArrowCorner1'} text={'Ответить'} /> }
-			{ user.id === author.id &&
-				<div>
-					{<Button onClick={() => dispatch('edit')} icon={'Edit'} text={'Редактировать'} />}
-					{<Button onClick={() => dispatch('delete')} icon={'Delete'} text={'Удалить'} />}
-				</div>}
-			{ canModerateComments(userRoles, 'viewAllStudentsSubmissions') &&
-				<Link url={url} /> }
-			{ canModerateComments(userRoles, 'editPinAndRemoveComments') &&
-				<div>
-					{ parentCommentId
-						? <Button onClick={() => dispatch('toggleCorrect')}
-								  icon={'Star2'}
-								  text={isCorrectAnswer ? 'Снять отметку' : 'Отметить правильным'} />
-						: <Button onClick={() => dispatch('togglePinned')}
-								icon={'Pin'}
-								text={isPinnedToTop ? 'Открепить' : 'Закрепить'} /> }
-				</div> }
-		</div>
-	)
-}
-
-const Button = ({ onClick, icon, text }) => (
+const Button = ({ onClick, icon, children }) => (
 	<button type="button" className={styles.sendAnswer} onClick={onClick}>
 		<Icon name={icon} />
-		<span className={styles.buttonText}>{text}</span>
+		<span className={styles.buttonText}>{children}</span>
 	</button>
 );
 
-const Link = ({ url }) => (
+const ActionLink = ({ url, icon, children }) => (
 	<a href={url} className={styles.sendAnswer}>
-		<Icon name='DocumentLite' />
-		<span className={styles.linkText}>Посмотреть решения</span>
+		<Icon name={icon} />
+		<span className={styles.linkText}>{children}</span>
 	</a>
 );
+
+export default function CommentActions(props) {
+	const { user, author, userRoles, parentCommentId, url, hasReplyAction,
+		canModerateComments, isCorrectAnswer, isPinnedToTop, commentActions } = props;
+
+	const actions = [];
+
+	if (!hasReplyAction) {
+		actions.push(<Button onClick={commentActions.handleShowReplyForm} icon='ArrowCorner1'>Ответить</Button>);
+	}
+
+	if (user.id === author.id) {
+		actions.push(<Button onClick={commentActions.handleShowEditComment} icon='Edit'>Редактировать</Button>);
+		actions.push(<Button onClick={commentActions.handleDeleteComment} icon='Delete'>Удалить</Button>);
+	}
+	
+	if (canModerateComments(userRoles, 'viewAllStudentsSubmissions')) {
+		actions.push(<ActionLink url={url} icon='DocumentLite'>Посмотреть решения</ActionLink>);
+	}
+
+	if (canModerateComments(userRoles, 'editPinAndRemoveComments')) {
+		if (parentCommentId) {
+			actions.push(<Button onClick={commentActions.handleCorrectAnswerMark} icon={'Star2'}>
+				{isCorrectAnswer ? 'Снять отметку' : 'Отметить правильным'}</Button>)
+		} else {
+			actions.push(<Button onClick={commentActions.handlePinnedToTopMark} icon={'Pin'}>
+				{isPinnedToTop ? 'Открепить' : 'Закрепить'}</Button>)
+		}
+	}
+
+	return (
+		<div className={styles.actions}>
+			{ actions }
+			{/*{actions.map(action => {*/}
+				{/*if (!action.isAvailable) {*/}
+					{/*return null;*/}
+				{/*}*/}
+
+				{/*if (action.type === types.button) {*/}
+					{/*return <Button >{action.text}</Button>*/}
+				{/*}*/}
+				{/*return <ActionLink icon={action}>{action.text}</ActionLink>*/}
+			{/*})}*/}
+		</div>
+	)
+};
+

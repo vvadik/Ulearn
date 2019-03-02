@@ -63,7 +63,7 @@ class CommentSendForm extends Component {
 			<Button
 				use="primary"
 				size="medium"
-		type="submit"
+				type="submit"
 				loading={sending}>
 				{submitTitle}
 			</Button>
@@ -115,11 +115,14 @@ CommentSendForm.propTypes = {
 	/** Идентифицирует комментарий, с которым работает компонент.
 	 * При изменении идентификатора текст в поле ввода очищается.
 	 * При сохранении того же идентификатора - текст сохраняется.*/
+	text: PropTypes.string,
 	commentId: PropTypes.string,
+	submitTitle: PropTypes.string,
 	author: Avatar.propTypes.user,
 	sending: PropTypes.bool,
 	error: PropTypes.oneOf([PropTypes.string, PropTypes.object]),
 	onSubmit: PropTypes.func,
+	onCancel: PropTypes.func,
 };
 
 export default CommentSendForm;

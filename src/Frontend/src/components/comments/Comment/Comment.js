@@ -1,5 +1,4 @@
 import React, { Component, createContext } from 'react';
-import { CommentActionHandlers } from './commonPropTypes';
 import PropTypes from "prop-types";
 import moment from "moment";
 import * as debounce from "debounce";
@@ -11,81 +10,89 @@ import InstructorActions from "./Kebab/InstructorActions";
 import Header from "./Header/Header";
 import Marks from "./Marks/Marks";
 import Actions from "./Actions/Actions";
+import { CommentContext } from "../CommentsList/CommentsList";
+import { CommentActionHandlers } from './commonPropTypes';
 
 import styles from "./Comment.less";
 
-export const CommentMarksContext = createContext({
-	isApproved: false,
-	isCorrectAnswer: false,
-	isPinnedToTop: false,
-});
 
 class Comment extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			showEditForm: false,
-			likesCount: props.likesCount,
-			isLiked: props.isLiked,
-			isCorrectAnswer: props.isCorrectAnswer,
-			isApproved: props.isApproved,
-			isPinnedToTop: props.isPinnedToTop,
+			likesCount: props.comment.likesCount,
+			isLiked: props.comment.isLiked,
+			isCorrectAnswer: props.comment.isCorrectAnswer,
+			isApproved: props.comment.isApproved,
+			isPinnedToTop: props.comment.isPinnedToTop,
 		};
 
 		this.debouncedSendData = debounce(this.sendData, 300);
 	};
 
 	render() {
-		const {children, author, publishTime, userRoles } = this.props;
-		const {likesCount, isLiked, isApproved, isCorrectAnswer, isPinnedToTop } = this.state;
+		// const { dispatch } = useContext(CommentContext);
+		const {children, comment, userRoles} = this.props;
+		const {likesCount, isLiked, isApproved, isCorrectAnswer, isPinnedToTop, showEditForm} = this.state;
+
 		return (
-			<CommentMarksContext.Provider value={{ isApproved, isCorrectAnswer, isPinnedToTop }}>
-				<div className={styles.comment}>
-					<Avatar user={author} size='big'/>
-					<div className={styles.content}>
-						<Header name={author.visibleName}>
-							<Like checked={isLiked} count={likesCount} onClick={this.handleLikeClick} />
-							<Marks
-								isApproved={isApproved}
-								isCorrectAnswer={isCorrectAnswer}
-								isPinnedToTop={isPinnedToTop} />
-							{ this.canModerateComments(userRoles, 'editPinAndRemoveComments') &&
-							<InstructorActions isApproved={isApproved} dispatch={this.dispatch} actionHandlers={this.actionHandlers}/> }
-						</Header>
-						<Hint pos="bottom" text={publishTime} disableAnimations={false} useWrapper={false}>
-							<div className={styles.timeSinceAdded}>
-								{moment(publishTime).fromNow()}
-							</div>
-						</Hint>
-						{ this.state.showEditForm ?	this.renderEditCommentForm() : this.renderComment() }
-						{ children }
-					</div>
+			<div className={styles.comment}>
+				<Avatar user={comment.author} size='big' />
+				<div className={styles.content}>
+					<Header name={comment.author.visibleName}>
+						<Like checked={isLiked} count={likesCount} onClick={this.handleLikeClick} />
+						<Marks
+							isApproved={isApproved}
+							isCorrectAnswer={isCorrectAnswer}
+							isPinnedToTop={isPinnedToTop} />
+						{this.canModerateComments(userRoles, 'editPinAndRemoveComments') ?
+							<InstructorActions
+								handleShowEditComment={this.handleShowEditComment}
+								commentActions={this.commentActionsHandlers} isApproved={isApproved} /> : null}
+					</Header>
+					<Hint pos="bottom" text={comment.publishTime} disableAnimations={false} useWrapper={false}>
+						<div className={styles.timeSinceAdded}>
+							{moment(comment.publishTime).fromNow()}
+						</div>
+					</Hint>
+					{showEditForm ? this.renderEditCommentForm() : this.renderComment()}
+					{children}
 				</div>
-			</CommentMarksContext.Provider>
+			</div>
 		);
 	}
 
 	renderComment() {
+		const {isCorrectAnswer, isPinnedToTop} = this.state;
+		const {comment, commentActions, user, userRoles, url, hasReplyAction} = this.props;
+		console.log('inComment', commentActions);
 		return (
 			<React.Fragment>
 				<p className={styles.text}>
-					<span dangerouslySetInnerHTML={{__html: this.props.renderCommentText}} />
+					<span dangerouslySetInnerHTML={{__html: comment.renderedText}} />
 				</p>
 				<Actions
-					{...this.props}
-					{...this.state}
-					dispatch={this.dispatch}
-					canModerateComments={this.canModerateComments}/>
+					author={comment.author}
+					user={user}
+					userRoles={userRoles}
+					url={url}
+					hasReplyAction={hasReplyAction}
+					parentCommentId={comment.parentCommentId}
+					isCorrectAnswer={isCorrectAnswer}
+					isPinnedToTop={isPinnedToTop}
+					commentActions={this.commentActionsHandlers}
+					canModerateComments={this.canModerateComments} />
 			</React.Fragment>
 		)
 	}
 
 	renderEditCommentForm() {
-		const { text, sending } = this.props;
+		const {comment, sending} = this.props;
 
 		return (
 			<CommentSendForm
-				text={text}
+				text={comment.commentText}
 				autofocus
 				onSubmit={this.handleEditComment}
 				submitTitle={'Сохранить'}
@@ -101,7 +108,7 @@ class Comment extends Component {
 
 	handleLikeClick = () => {
 		const {isLiked, likesCount} = this.state;
-		const {commentId, likeChanged} = this.props;
+		const {comment, commentActions} = this.props;
 
 		if (!isLiked) {
 			this.setState({
@@ -115,92 +122,87 @@ class Comment extends Component {
 			})
 		}
 
-
-		this.debouncedSendData(likeChanged, commentId, isLiked);
+		this.debouncedSendData(commentActions.handleLikeChanged, comment.id, isLiked);
 	};
 
-	showReplyForm = () => {
-		this.props.showReplyForm();
+	handleShowReplyForm = () => {
+		this.props.commentActions.handleShowReplyForm();
 	};
 
-	showEditComment = () => {
+	handleShowEditComment = () => {
 		this.setState({
 			showEditForm: true,
 		});
 	};
 
 	handleEditCancel = () => {
-		this.setState({ showEditForm: false });
+		this.setState({showEditForm: false});
 	};
 
 	handleEditComment = (text) => {
-		const { commentId, onEditComment } = this.props;
+		const {comment, commentActions} = this.props;
 
 		this.setState({
 			showEditForm: false,
 		});
 
-		onEditComment(commentId, text);
+		commentActions.handleEditComment(comment.id, text);
 	};
 
-	markAsCorrectAnswer = () => {
-		const { isCorrectAnswer } = this.state;
-		const { commentId, markAsCorrectAnswer } = this.props;
+	handleCorrectAnswerMark = () => {
+		const {isCorrectAnswer} = this.state;
+		const {comment, commentActions} = this.props;
+		console.log(commentActions);
 
 		this.setState({
 			isCorrectAnswer: !isCorrectAnswer,
 		});
 
-		this.debouncedSendData(markAsCorrectAnswer, commentId, isCorrectAnswer);
+		this.debouncedSendData(commentActions.handleCorrectAnswerMark, comment.id, isCorrectAnswer);
 	};
 
-	pinComment = () => {
-		const { isPinnedToTop } = this.state;
-		const { commentId, pinComment } = this.props;
+	handlePinnedToTopMark = () => {
+		const {isPinnedToTop} = this.state;
+		const {comment, commentActions} = this.props;
 
 		this.setState({
 			isPinnedToTop: !isPinnedToTop,
 		});
 
-		this.debouncedSendData(pinComment, commentId, isPinnedToTop);
+		this.debouncedSendData(commentActions.handlePinnedToTopMark, comment.id, isPinnedToTop);
 	};
 
-	hideComment = () => {
-		const { isApproved } = this.state;
-		const { commentId, hideComment } = this.props;
+	handleVisibleMark = () => {
+		const {isApproved} = this.state;
+		const {comment, commentActions} = this.props;
 
 		this.setState({
 			isApproved: !isApproved,
 		});
 
-		this.debouncedSendData(hideComment, commentId, isApproved);
+		this.debouncedSendData(commentActions.handleVisibleMark, comment.id, isApproved);
 	};
 
-	deleteComment = () => {
-		this.props.deleteComment(this.props.commentId);
-	};
-
-	dispatch = (action) => {
-		switch(action) {
-			case 'togglePinned':
-				return this.pinComment();
-			case 'toggleCorrect':
-				return this.markAsCorrectAnswer();
-			case 'toggleHidden':
-				return this.hideComment();
-			case 'edit':
-				return this.showEditComment();
-			case 'delete':
-				return this.deleteComment();
-			case 'reply':
-				return this.showReplyForm();
-		}
+	handleDeleteComment = () => {
+		const {comment, commentActions} = this.props;
+		this.props.commentActions.handleDeleteComment();
 	};
 
 	sendData = (action, value, flag) => {
 		return () => action(value, flag);
 	};
+
+	commentActionsHandlers = {
+		handleShowEditComment: this.handleShowEditComment,
+		handleShowReplyForm: this.handleShowReplyForm,
+		handleCorrectAnswerMark: this.handleCorrectAnswerMark,
+		handlePinnedToTopMark: this.handlePinnedToTopMark,
+		handleVisibleMark: this.handleVisibleMark,
+		handleEditComment: this.handleEditComment,
+		handleDeleteComment: this.handleDeleteComment,
+	};
 }
+
 const userRolesModel = PropTypes.shape({
 	isSystemAdministrator: PropTypes.bool,
 	courseRole: PropTypes.string.isRequired,
@@ -210,32 +212,22 @@ const userRolesModel = PropTypes.shape({
 Comment.propTypes = {
 	/** Идентифицирует комментарий, с которым работает компонент.
 	 * При изменении идентификатора текст в поле ввода очищается. При сохранении того же идентификатора - текст сохраняется. */
-	commentId: PropTypes.number,
-	author: Avatar.propTypes.user,
 	user: Avatar.propTypes.user,
 	userRoles: userRolesModel,
-	text: PropTypes.string,
-	renderCommentText: PropTypes.oneOfType([
-		PropTypes.string, PropTypes.element
-	]),
+	comment: PropTypes.object,
+	children: PropTypes.array,
 	url: PropTypes.string,
-	publishTime: PropTypes.string,
-	isLiked: PropTypes.bool,
-	isApproved: PropTypes.bool,
-	isPinnedToTop: PropTypes.bool,
-	isCorrectAnswer: PropTypes.bool,
-	parentCommentId: PropTypes.number,
-	likesCount: PropTypes.number,
-	likeChanged: PropTypes.func,
+	sending: PropTypes.bool,
+	hasReplyAction: PropTypes.bool,
+	commentActions: PropTypes.object,
 	showReplyForm: PropTypes.func,
-	hideComment: PropTypes.func,
 	onLikeChanged: PropTypes.func,
+	hideComment: PropTypes.func,
 	markAsCorrectAnswer: PropTypes.func,
 	pinComment: PropTypes.func,
-	onSubmit: PropTypes.func,
 	onEditComment: PropTypes.func,
 	deleteComment: PropTypes.func,
-	actionHandlers: CommentActionHandlers
+	// actionHandlers: CommentActionHandlers
 };
 
 export default Comment;

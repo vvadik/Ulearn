@@ -47,27 +47,32 @@ storiesOf('Comments/CommentSendForm', module)
 	.addDecorator(withViewport())
 	.add('desktop', () => (
 		<div>
+			<h2>Формы с разными кнопками отправки</h2>
+			<h3>Оставить комментарий</h3>
 			<CommentSendForm
 				onSubmit={action('sendComment')}
 				commentId={'1'}
 				author={nameOnlyUser}
 				sending={false}
 			/>
+			<h3>Отправить ответ на комментарий</h3>
 			<CommentSendForm
-				onSubmit={action('sendComment')}
+				onSubmit={action('addReplyToComment')}
 				submitTitle={'Отправить'}
 				commentId={'1'}
 				author={nameOnlyUser}
 				sending={false}
 			/>
+			<h3>Редактировать комментарий с кнопкой отмены отправки</h3>
 			<CommentSendForm
-				onSubmit={action('sendComment')}
+				onSubmit={action('editComment')}
 				submitTitle={'Сохранить'}
 				onCancel={action('cancelComment')}
 				commentId={'1'}
 				author={nameOnlyUser}
 				sending={false}
 			/>
+			<h3>Форма в состоянии отправки</h3>
 			<CommentSendForm onSubmit={action('sendComment')} commentId={'2'} author={userWithAvatar} sending={true}/>
 			<h3>Успешная отправка комментария очищает поле ввода</h3>
 			<SendingCommentStory success={true}/>
