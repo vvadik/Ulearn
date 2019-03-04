@@ -1,113 +1,197 @@
-import React, {Component, createContext} from 'react';
-import PropTypes from "prop-types";
+import React, { Component } from 'react';
+import * as debounce from "debounce";
 import Thread from "../Thread/Thread";
-
-export const CommentContext = createContext({
-	dispatch: () => {},
-});
-
-const handlersName = {
-	togglePinnedMark: 'togglePinnedMark',
-	toggleCorrectAnswerMark: 'toggleCorrectAnswerMark',
-	toggleVisibleMark: 'toggleVisibleMark',
-	toggleLikeChange: 'toggleLikeChange',
-	editComment: 'editComment',
-	deleteComment: 'deleteComment',
-	addReplyComment: 'addReplyComment',
-};
 
 class CommentsList extends Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			comments: [],
+			threads: props.comments
+			// .map(comment => ({
+			// 	comment: {
+			// 		...comment,
+			// 		replies: comment.replies.map(reply => ({
+			// 			comment: reply,
+			// 			sending: false,
+			// 			// showEditForm: false,
+			// 		})),
+			// 	},
+				// showReplyForm: false,
+				// sending: false,
+				// showEditForm: false,
+			// })),
 		};
 	}
 
 	render() {
-		const { dispatch } = this;
-
+		const { threads } = this.state;
 		return (
-			<CommentContext.Provider value={{ dispatch }}>
-				{this.state.comments.map((comment) =>
+			<>
+				{threads.map((comment) =>
 					<Thread
 						key={comment.id}
 						comment={comment}
-						handleLikeChange={this.handleLikeChange}
-						handleCorrectAnswerMark={this.handleCorrectAnswerMark}
-						handleVisibleMark={this.handleVisibleMark}
-						handlePinnedToTopMark={this.handlePinnedToTopMark}
-						handleEditComment={this.handleEditComment}
-						handleDeleteComment={this.handleDeleteComment}
-						handleAddReplyComment={this.handleAddReplyComment}
-						getUserSolution={this.getUserSolution}
+						actions={{
+							handleLikeClick: this.handleLikeClick,
+							handleCorrectAnswerMark: this.handleCorrectAnswerMark,
+							handleVisibleMark: this.handleVisibleMark,
+							handlePinnedToTopMark: this.handlePinnedToTopMark,
+							// handleShowReplyForm: this.handleShowReplyForm,
+							// handleShowEditForm: this.handleShowEditForm,
+							handleHideEditForm: this.handleHideEditForm,
+							handleEditComment: this.handleEditComment,
+							handleDeleteComment: this.handleDeleteComment,
+							handleAddReplyComment: this.handleAddReplyComment,
+							handleSubmitComment: this.handleSubmitComment,
+						}}
+						getUserSolutionsUrl={this.props.getUserSolutionsUrl}
+						user={this.props.user}
+						userRoles={this.props.userRoles}
 					/>)}
-			</CommentContext.Provider>
+			</>
 		)
 	}
 
-	handleLikeChange = (id, isLiked) => {
+	findComment(id, threads) {
+		for (const thread of threads) {
+			if (thread.id === id) {
+				return thread;
+			}
 
-		// if (isLiked) {
-			// POST: api.comment.likeComment(id);
-		// 	} else {
-			//	DELETE: api.comment.dislike(id);
-		// }
+			for (const reply of thread.replies || []) {
+				if (reply.id === id) {
+					return reply;
+				}
+			}
+		}
+	}
+
+	updateThread(id, reducer) {
+		this.setState(() => {
+			// const threads = JSON.parse(JSON.stringify(state.threads));
+			const threads = [...this.state.threads];
+			const thread = threads.find(thread => thread.id === id);
+
+			Object.assign(thread, reducer(thread));
+
+			return threads;
+		});
+	}
+
+	updateComment(id, reducer) {
+		this.setState(() => {
+			// const threads = JSON.parse(JSON.stringify(state.threads));
+			const threads = [...this.state.threads];
+			const comment = this.findComment(id, threads);
+
+			Object.assign(comment, reducer(comment));
+
+			return threads;
+		});
+	}
+
+	handleLikeClick = (commentId) => {
+		this.updateComment(commentId, ({ isLiked, likesCount }) => ({
+			likesCount: isLiked ? likesCount - 1 : likesCount + 1,
+			isLiked: !isLiked,
+		}));
+
+		console.log(`API:toggleLikeClick:#{comment.id}`);
 	};
 
-	handleCorrectAnswerMark = (id, isCorrectAnswer) => {
-		//PATCH: api.comment.changeComment(id, `isCorrectAnswer: ${isCorrectAnswer}`)
+	handleVisibleMark = (commentId) => {
+
+		this.updateComment(commentId, ({ isApproved }) => ({
+			isApproved: !isApproved,
+		}));
+
+		// this.debouncedSendData(this.handleVisibleMark, commentId, isApproved);
+		console.log(`API:toggleVisibleMark:#{comment.id}`);
 	};
 
-	handleVisibleMark = (id, isApproved) => {
-		//PATCH: api.comment.changeComment(id, `isApproved: ${isApproved}`)
+	handleCorrectAnswerMark = (commentId) => {
+		this.updateComment(commentId, ({ isCorrectAnswer }) => ({
+			isCorrectAnswer: !isCorrectAnswer,
+		}));
+		// this.debouncedSendData(this.handleCorrectAnswerMark, commentId, isCorrectAnswer);
+		console.log(`API:toggleCorrectAnswerMark:#{comment.id}`);
 	};
 
-	handlePinnedToTopMark = (id, isPinnedToTop) => {
-		//PATCH: api.comment.changeComment(id, `isPinnedToTop: ${isPinnedToTop}`)
+	handlePinnedToTopMark = (commentId) => {
+		this.updateComment(commentId, ({ isPinnedToTop }) => ({
+			isPinnedToTop: !isPinnedToTop,
+		}));
+		// this.debouncedSendData(this.handlePinnedToTopMark, commentId, isPinnedToTop);
+		console.log(`API:togglePinnedToTopMark:#{comment.id}`);
 	};
 
-	handleEditComment = (text) => {
-		//PATCH: api.comment.changeComment(id, `text: ${text}`)
+	// handleShowReplyForm = (commentId) => {
+	// 	this.updateThread(commentId, () => ({
+	// 		showReplyForm: true,
+	// 	}));
+	// };
+	//
+	// handleShowEditForm = (commentId) => {
+	// 	this.updateThread(commentId, () => ({
+	// 		showEditForm: true,
+	// 	}));
+	// };
+
+	// handleHideEditForm = (commentId) => {
+	// 	this.updateThread(commentId, () => ({
+	// 		showEditForm: false,
+	// 	}));
+	// };
+
+	handleEditComment = (commentId, text) => {
+		// this.updateThread(commentId, () => ({
+		// 	showEditForm: false,
+		// }));
+
+		this.updateComment(commentId, () => ({
+			text,
+		}));
+
+		console.log(commentId, `API: updated text:#{comment.id}`);
 	};
 
-	handleAddReplyComment = (text) => {
-		console.log(text);
+	handleAddReplyComment = (commentId, text) => {
+		// this.updateThread(commentId, () => ({
+		// 	showReplyForm: false,
+		// }));
+
+		this.updateComment(commentId, () => ({
+			text,
+		}));
+
+		console.log(`API: added reply to:#{comment.parentCommentId}`);
 	};
 
-	handleDeleteComment = (id) => {
-		//DELETE: api.comment.deleteComment(id);
-	};
+	handleDeleteComment = (commentId) => {
+		const threads = [...this.state.threads];
+		const comment = this.findComment(commentId, this.state.threads);
+		// const targetThread = threads.find(thread => thread.replies.includes(comment));
+		// // console.log(targetThread);
+		// const updateThreads = threads.find(thread => thread.id !== targetThread.id);
+		// // console.log('target', targetThread);
+		// // console.log(updateThreads);
+		// const newReplies = targetThread.replies.filter(reply => reply.id !== commentId);
+		// console.log(newReplies);
+		const newThreads = threads.filter(thread => thread.id !== commentId);
 
-	getUserSolution(userId) {
-		return `https://dev.ulearn.me/Analytics/UserSolutions?courseId=BasicProgramming&slideId=90bcb61e-57f0-4baa-8bc9-10c9cfd27f58&userId=${userId}`;
-	};
-
-	dispatch = (action) => {
-		switch (action) {
-			case handlersName.togglePinnedMark:
-				return this.handlePinnedToTopMark();
-			case handlersName.toggleVisibleMark:
-				return this.handleVisibleMark();
-			case handlersName.toggleCorrectAnswerMark:
-				return this.handleCorrectAnswerMark();
-			case handlersName.editComment:
-				return this.handleEditComment();
-			case handlersName.deleteComment:
-				return this.handleDeleteComment();
-			case handlersName.addReplyComment:
-				return this.handleAddReplyComment();
-			case handlersName.toggleLikeChange:
-				return this.handleLikeChange();
-			default:
-				return console.warn(`No case for this handlers name ${action}`)
+		if (comment.hasOwnProperty('parentCommentId')) {
+			// this.updateComment(commentId, () => ({
+			// 	replies: newReplies,
+			// }));
+		} else {
+			this.updateThread(commentId, () => newThreads);
 		}
 	};
+
+	// sendData = (action, value, flag) => {
+	// 	return () => action(value, flag);
+	// };
 }
-
-CommentsList.propTypes = {
-
-};
 
 export default CommentsList;

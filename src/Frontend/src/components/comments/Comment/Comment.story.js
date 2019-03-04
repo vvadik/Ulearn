@@ -127,7 +127,7 @@ class WrapperForCommentsByRoles extends React.Component {
 						<div key={comment.id}>
 							<h3>{` Автор.id: ${userWithAvatar.id} / Пользователь.id: ${comment.author.id} / Роль: ${comment.author.courseRole} / Права: ${comment.author.courseAccesses}` }</h3>
 							<Comment
-								url={'https://dev.ulearn.me'}
+								// url={this.props.getUserSolutionsUrl(comment.author.id)}
 								comment={comment}
 								text={comment.commentText}
 								renderedText={comment.renderedText}
@@ -163,12 +163,6 @@ class WrapperForCommentsByRoles extends React.Component {
 				Toast.push("Комментарий восстановлен")
 			}
 		});
-	};
-
-	showReplyForm = () => {
-		this.setState({
-			showReplyForm: true,
-		})
 	};
 
 	addReplyComment = (id, text) => {
