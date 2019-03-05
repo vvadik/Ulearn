@@ -392,7 +392,6 @@ namespace Database.Models
 	public class SystemMessageNotification : Notification
 	{
 		[Required]
-		[Column("Text")]
 		public string Text { get; set; }
 
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
@@ -426,7 +425,6 @@ namespace Database.Models
 	public class InstructorMessageNotification : Notification
 	{
 		[Required]
-		[Column("Text")]
 		public string Text { get; set; }
 
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
@@ -1362,7 +1360,6 @@ namespace Database.Models
 	public class CreatedGroupNotification : Notification
 	{
 		[Required]
-		[Column("GroupId")]
 		public int GroupId { get; set; }
 
 		public virtual Group Group { get; set; }
