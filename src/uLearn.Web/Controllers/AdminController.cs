@@ -715,6 +715,9 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public async Task<ActionResult> DeleteVersion(string courseId, Guid versionId)
 		{
+			/* Remove notifications from database */
+			await notificationsRepo.RemoveNotifications(versionId);
+			
 			/* Remove information from database */
 			await coursesRepo.DeleteCourseVersion(courseId, versionId);
 
