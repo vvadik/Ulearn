@@ -7,11 +7,15 @@ import MarkdownEditor from "./MarkdownEditor/MarkdownEditor";
 import styles from "./CommentSendForm.less";
 
 class CommentSendForm extends Component {
-	state = {
-		text: '',
-		error: null,
-		commentId: null,
-	};
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			text: '',
+			error: null,
+			commentId: props.commentId,
+		};
+	}
 
 	static getDerivedStateFromProps(props, state) {
 		if (props.commentId !== state.commentId) {
@@ -92,7 +96,7 @@ class CommentSendForm extends Component {
 		event.preventDefault();
 
 		const { text } = this.state;
-		const { onSubmit } = this.props;
+		const { commentId, handleSubmit } = this.props;
 
 		if (!text) {
 			this.setState({
@@ -101,7 +105,7 @@ class CommentSendForm extends Component {
 			return;
 		}
 
-		onSubmit(text);
+		handleSubmit(commentId, text);
 	};
 
 	handleChange = (text) => {
@@ -112,17 +116,13 @@ class CommentSendForm extends Component {
 }
 
 CommentSendForm.propTypes = {
-	/** Идентифицирует комментарий, с которым работает компонент.
-	 * При изменении идентификатора текст в поле ввода очищается.
-	 * При сохранении того же идентификатора - текст сохраняется.*/
-	text: PropTypes.string,
-	commentId: PropTypes.string,
-	submitTitle: PropTypes.string,
-	author: Avatar.propTypes.user,
+	author: PropTypes.object,
 	sending: PropTypes.bool,
-	error: PropTypes.oneOf([PropTypes.string, PropTypes.object]),
-	onSubmit: PropTypes.func,
+	submitTitle: PropTypes.string,
 	onCancel: PropTypes.func,
+	cancelTitle: PropTypes.string,
+	commentId: PropTypes.string,
+	handleSubmit: PropTypes.func,
 };
 
 export default CommentSendForm;

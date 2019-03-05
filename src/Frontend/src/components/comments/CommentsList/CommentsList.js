@@ -1,113 +1,250 @@
-import React, {Component, createContext} from 'react';
+import React, { Component } from 'react';
 import PropTypes from "prop-types";
+import * as debounce from "debounce";
 import Thread from "../Thread/Thread";
+import Toast from "@skbkontur/react-ui/components/Toast/Toast";
+import CommentSendForm from "../CommentSendForm/CommentSendForm";
+import Icon from "@skbkontur/react-icons";
 
-export const CommentContext = createContext({
-	dispatch: () => {},
-});
-
-const handlersName = {
-	togglePinnedMark: 'togglePinnedMark',
-	toggleCorrectAnswerMark: 'toggleCorrectAnswerMark',
-	toggleVisibleMark: 'toggleVisibleMark',
-	toggleLikeChange: 'toggleLikeChange',
-	editComment: 'editComment',
-	deleteComment: 'deleteComment',
-	addReplyComment: 'addReplyComment',
-};
+import styles from "./CommentsList.less";
 
 class CommentsList extends Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			comments: [],
+			threads: props.comments,
+			commentEditing: {
+				commentId: null,
+				sending: false
+			},
+			reply: {
+				commentId: null,
+				sending: false
+			},
+			sending: false,
 		};
+
+	// this.debouncedSendData = debounce(this.sendData, 300);
 	}
 
 	render() {
-		const { dispatch } = this;
-
+		const { threads, commentEditing, reply, sending } = this.state;
 		return (
-			<CommentContext.Provider value={{ dispatch }}>
-				{this.state.comments.map((comment) =>
+			<>
+				<CommentSendForm author={this.props.user} handleSubmit={this.handleAddComment} sending={sending} />
+				{threads.map((comment) =>
 					<Thread
 						key={comment.id}
 						comment={comment}
-						handleLikeChange={this.handleLikeChange}
-						handleCorrectAnswerMark={this.handleCorrectAnswerMark}
-						handleVisibleMark={this.handleVisibleMark}
-						handlePinnedToTopMark={this.handlePinnedToTopMark}
-						handleEditComment={this.handleEditComment}
-						handleDeleteComment={this.handleDeleteComment}
-						handleAddReplyComment={this.handleAddReplyComment}
-						getUserSolution={this.getUserSolution}
+						commentEditing={commentEditing}
+						reply={reply}
+						actions={{
+							handleLikeClick: this.handleLikeClick,
+							handleCorrectAnswerMark: this.handleCorrectAnswerMark,
+							handleApprovedMark: this.handleApprovedMark,
+							handlePinnedToTopMark: this.handlePinnedToTopMark,
+							handleEditComment: this.handleEditComment,
+							handleAddReplyComment: this.handleAddReplyComment,
+							handleDeleteComment: this.handleDeleteComment,
+							handleShowEditForm: this.handleShowEditForm,
+							handleShowReplyForm: this.handleShowReplyForm,
+							// handleSubmitComment: this.handleSubmitComment,
+						}}
+						getUserSolutionsUrl={this.getUserSolutionsUrl}
+						user={this.props.user}
+						userRoles={this.props.userRoles}
 					/>)}
-			</CommentContext.Provider>
+				<button className={styles.sendButton}>
+					<Icon name="CommentLite" color="#3072C4"/>
+						<span className={styles.sendButtonText}>Оставить комментарий</span>
+				</button>
+			</>
 		)
 	}
 
-	handleLikeChange = (id, isLiked) => {
+	findComment(id, threads) {
+		for (const thread of threads) {
+			if (thread.id === id) {
+				return thread;
+			}
 
-		// if (isLiked) {
-			// POST: api.comment.likeComment(id);
-		// 	} else {
-			//	DELETE: api.comment.dislike(id);
-		// }
-	};
-
-	handleCorrectAnswerMark = (id, isCorrectAnswer) => {
-		//PATCH: api.comment.changeComment(id, `isCorrectAnswer: ${isCorrectAnswer}`)
-	};
-
-	handleVisibleMark = (id, isApproved) => {
-		//PATCH: api.comment.changeComment(id, `isApproved: ${isApproved}`)
-	};
-
-	handlePinnedToTopMark = (id, isPinnedToTop) => {
-		//PATCH: api.comment.changeComment(id, `isPinnedToTop: ${isPinnedToTop}`)
-	};
-
-	handleEditComment = (text) => {
-		//PATCH: api.comment.changeComment(id, `text: ${text}`)
-	};
-
-	handleAddReplyComment = (text) => {
-		console.log(text);
-	};
-
-	handleDeleteComment = (id) => {
-		//DELETE: api.comment.deleteComment(id);
-	};
-
-	getUserSolution(userId) {
-		return `https://dev.ulearn.me/Analytics/UserSolutions?courseId=BasicProgramming&slideId=90bcb61e-57f0-4baa-8bc9-10c9cfd27f58&userId=${userId}`;
-	};
-
-	dispatch = (action) => {
-		switch (action) {
-			case handlersName.togglePinnedMark:
-				return this.handlePinnedToTopMark();
-			case handlersName.toggleVisibleMark:
-				return this.handleVisibleMark();
-			case handlersName.toggleCorrectAnswerMark:
-				return this.handleCorrectAnswerMark();
-			case handlersName.editComment:
-				return this.handleEditComment();
-			case handlersName.deleteComment:
-				return this.handleDeleteComment();
-			case handlersName.addReplyComment:
-				return this.handleAddReplyComment();
-			case handlersName.toggleLikeChange:
-				return this.handleLikeChange();
-			default:
-				return console.warn(`No case for this handlers name ${action}`)
+			for (const reply of thread.replies || []) {
+				if (reply.id === id) {
+					return reply;
+				}
+			}
 		}
+	}
+
+	updateThread(id, reducer) {
+		this.setState(() => {
+			// const threads = JSON.parse(JSON.stringify(state.threads));
+			const threads = [...this.state.threads];
+			const thread = threads.find(thread => thread.id === id);
+
+			Object.assign(thread, reducer(thread));
+
+			return threads;
+		});
+	}
+
+	updateComment(id, reducer) {
+		this.setState(() => {
+			// const threads = JSON.parse(JSON.stringify(state.threads));
+			const threads = [...this.state.threads];
+			const comment = this.findComment(id, threads);
+
+			Object.assign(comment, reducer(comment));
+
+			return threads;
+		});
+	}
+
+	handleAddComment = ()=> {
+		this.setState({
+			threads: [...this.state.threads],
+			sending: false,
+		})
 	};
+
+	handleLikeClick = (commentId) => {
+		this.updateComment(commentId, ({ isLiked, likesCount }) => ({
+			likesCount: isLiked ? likesCount - 1 : likesCount + 1,
+			isLiked: !isLiked,
+		}));
+
+		// this.debouncedSendData(handleLikeClick, commentId, isLiked);
+
+		console.log(`API:toggleLikeClick:#{comment.id}`);
+	};
+
+	handleApprovedMark = (commentId) => {
+
+		this.updateComment(commentId, ({ isApproved }) => ({
+			isApproved: !isApproved,
+		}));
+
+		// this.debouncedSendData(this.handleVisibleMark, commentId, isApproved);
+		console.log(`API:toggleVisibleMark:#{comment.id}`);
+	};
+
+	handleCorrectAnswerMark = (commentId) => {
+		this.updateComment(commentId, ({ isCorrectAnswer }) => ({
+			isCorrectAnswer: !isCorrectAnswer,
+		}));
+		// this.debouncedSendData(this.handleCorrectAnswerMark, commentId, isCorrectAnswer);
+		console.log(`API:toggleCorrectAnswerMark:#{comment.id}`);
+	};
+
+	handlePinnedToTopMark = (commentId) => {
+		this.updateComment(commentId, ({ isPinnedToTop }) => ({
+			isPinnedToTop: !isPinnedToTop,
+		}));
+		// this.debouncedSendData(this.handlePinnedToTopMark, commentId, isPinnedToTop);
+		console.log(`API:togglePinnedToTopMark:#{comment.id}`);
+	};
+
+	handleShowEditForm = (commentId) => {
+		this.setState({
+			commentEditing: {...this.state.commentEditing,
+				commentId: commentId,
+			}
+		});
+	};
+
+	handleShowReplyForm = (commentId) => {
+		this.setState({
+			reply: {...this.state.reply,
+				commentId: commentId,
+			}
+		});
+	};
+
+
+	handleEditComment = (commentId, text) => {
+		this.updateComment(commentId, () => ({
+			text,
+		}));
+
+		this.setState({
+			commentEditing: {
+				commentId: null,
+				sending: false,
+			}
+		});
+
+		console.log(commentId, `API: updated text:#{comment.id}`);
+	};
+
+	handleAddReplyComment = (commentId, text) => {
+		this.updateComment(commentId, () => ({
+			text,
+		}));
+
+		this.setState({
+			reply: {
+				commentId: commentId,
+				sending: true,
+			}
+		});
+
+		this.setState({
+			reply: {
+				commentId: null,
+				sending: false,
+			}
+		});
+
+		console.log(`API: added reply to:#{comment.parentCommentId}`);
+	};
+
+	getUserSolutionsUrl = (userId) => {
+		const { courseId, slideId } = this.props;
+		return `${window.location.origin}/Analytics/UserSolutions?courseId=${courseId}&slideId=${slideId}&userId=${userId}`;
+	};
+
+	handleDeleteComment = (commentId) => {
+		const threads = [...this.state.threads];
+		const comment = this.findComment(commentId, this.state.threads);
+		const newThreads = threads.filter(thread => thread.id !== commentId);
+
+		if (comment.parentCommentId) {
+		const targetThread = threads.find(thread => thread.replies.includes(comment));
+		const updatedThreads = threads.filter(thread => thread.id !== targetThread.id);
+		const newReplies = targetThread.replies.filter(reply => reply.id !== commentId);
+			this.setState({
+				threads: [{...targetThread, replies: newReplies}, ...updatedThreads],
+			});
+		} else {
+			this.setState({
+				threads: newThreads,
+			});
+		}
+
+		Toast.push("Комментарий удалён", {
+			label: "Восстановить",
+			handler: () => {
+				this.setState({
+					threads: [...threads],
+				});
+				Toast.push("Комментарий восстановлен")
+			}
+		});
+	};
+
+	// sendData = (action, value, flag) => {
+	// 	return () => action(value, flag);
+	// };
 }
 
 CommentsList.propTypes = {
-
+	user: PropTypes.object,
+	comments: PropTypes.array,
+	courseId: PropTypes.string,
+	slideId: PropTypes.string,
+	userRoles: PropTypes.object,
+	threads: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default CommentsList;
