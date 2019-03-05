@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import Icon from "@skbkontur/react-icons";
 
 import styles from "../Comment.less";
@@ -18,18 +19,20 @@ const ActionLink = ({ url, icon, children }) => (
 );
 
 export default function CommentActions(props) {
-	const { user, comment, userRoles, url, hasReplyAction, canModerateComments,
-		handleShowEditForm, handleShowReplyForm, actions } = props;
+	const { user, comment, userRoles, url, hasReplyAction, canModerateComments, actions } = props;
 
 	const commentActions = [];
 
-	if (!hasReplyAction) {
-		commentActions.push(<Button onClick={() => handleShowReplyForm(true)} icon='ArrowCorner1'>Ответить</Button>);
+	if (hasReplyAction) {
+		commentActions.push(
+			<Button onClick={() => actions.handleShowReplyForm(comment.id)} icon='ArrowCorner1'>Ответить</Button>);
 	}
 
 	if (user.id === comment.author.id) {
-		commentActions.push(<Button onClick={() => handleShowEditForm(true)} icon='Edit'>Редактировать</Button>);
-		commentActions.push(<Button onClick={() => actions.handleDeleteComment(comment.id)} icon='Delete'>Удалить</Button>);
+		commentActions.push(
+			<Button onClick={() => actions.handleShowEditForm(comment.id)} icon='Edit'>Редактировать</Button>);
+		commentActions.push(
+			<Button onClick={() => actions.handleDeleteComment(comment.id)} icon='Delete'>Удалить</Button>);
 	}
 	
 	if (canModerateComments(userRoles, 'viewAllStudentsSubmissions')) {
@@ -51,5 +54,15 @@ export default function CommentActions(props) {
 			{ commentActions }
 		</div>
 	)
+};
+
+CommentActions.propTypes = {
+	user: PropTypes.object,
+	userRoles: PropTypes.object,
+	comment: PropTypes.object,
+	actions: PropTypes.object,
+	url: PropTypes.string,
+	hasReplyAction: PropTypes.bool,
+	canModerateComments: PropTypes.func,
 };
 

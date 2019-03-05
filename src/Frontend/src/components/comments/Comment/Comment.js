@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from "prop-types";
 import moment from "moment";
 import Hint from "@skbkontur/react-ui/components/Hint/Hint";
 import Avatar from "../../common/Avatar/Avatar";
@@ -12,17 +13,9 @@ import CommentActions from "./CommentActions/CommentActions";
 import styles from "./Comment.less";
 
 class Comment extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			showEditForm: false,
-			sending: props.sending,
-		};
-	}
 
 	render() {
-		const {actions, children, comment, userRoles } = this.props;
-		// const { comment } = commentState;
+		const { actions, children, commentEditing,  comment, userRoles } = this.props;
 
 		return (
 			<div className={styles.comment}>
@@ -39,7 +32,6 @@ class Comment extends Component {
 							isPinnedToTop={comment.isPinnedToTop} />
 						{this.canModerateComments(userRoles, 'editPinAndRemoveComments') ?
 							<InstructorActions
-								handleShowEditForm={this.handleShowEditForm}
 								commentId={comment.id}
 								actions={actions}
 								isApproved={comment.isApproved} />
@@ -50,7 +42,7 @@ class Comment extends Component {
 							{moment(comment.publishTime).fromNow()}
 						</div>
 					</Hint>
-					{this.state.showEditForm ? this.renderEditCommentForm() : this.renderComment()}
+					{comment.id === commentEditing.commentId ? this.renderEditCommentForm() : this.renderComment()}
 					{children}
 				</div>
 			</div>
@@ -58,7 +50,7 @@ class Comment extends Component {
 	}
 
 	renderComment() {
-		const {comment, user, userRoles, getUserSolutionsUrl, hasReplyAction, actions, handleShowReplyForm} = this.props;
+		const {comment, user, userRoles, getUserSolutionsUrl, hasReplyAction, actions} = this.props;
 		const url = getUserSolutionsUrl(comment.author.id);
 		return (
 			<React.Fragment>
@@ -66,8 +58,6 @@ class Comment extends Component {
 					<span dangerouslySetInnerHTML={{__html: comment.renderedText}} />
 				</p>
 				<CommentActions
-					handleShowReplyForm={handleShowReplyForm}
-					handleShowEditForm={this.handleShowEditForm}
 					comment={comment}
 					user={user}
 					userRoles={userRoles}
@@ -80,16 +70,17 @@ class Comment extends Component {
 	}
 
 	renderEditCommentForm() {
-		const {comment, actions } = this.props;
+		const { comment, actions, commentEditing } = this.props;
 
 		return (
 			<CommentSendForm
 				commentId={comment.id}
 				handleSubmit={actions.handleEditComment}
-				handleShowForm={this.handleShowEditForm}
+				commentEditing={commentEditing}
 				submitTitle={'Сохранить'}
-				onCancel={() => this.handleShowEditForm(false)}
-				sending={this.state.sending} />
+				sending={commentEditing.sending}
+				onCancel={() => actions.handleShowEditForm(null)}
+			/>
 		)
 	}
 
@@ -97,12 +88,17 @@ class Comment extends Component {
 		return role.isSystemAdministrator || role.courseRole === 'CourseAdmin' ||
 			(role.courseRole === 'Instructor' && role.courseAccesses.includes(accesses))
 	};
-
-	handleShowEditForm = (flag) => {
-		this.setState({
-			showEditForm: flag,
-		})
-	};
 }
+
+Comment.propTypes = {
+	user: PropTypes.object,
+	userRoles: PropTypes.object,
+	getUserSolutionsUrl: PropTypes.func,
+	comment: PropTypes.object,
+	children: PropTypes.element,
+	actions: PropTypes.object,
+	commentEditing: PropTypes.object,
+	hasReplyAction: PropTypes.bool,
+};
 
 export default Comment;

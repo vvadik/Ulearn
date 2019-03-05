@@ -1,23 +1,19 @@
 import React, { Component } from 'react';
+import PropTypes from "prop-types";
 import Comment from "../Comment/Comment";
 import CommentSendForm from "../CommentSendForm/CommentSendForm";
 
 import styles from './Thread.less';
 
 class Thread extends Component {
-	state = {
-		showReplyForm: false,
-		sending: false,
-	};
 
 	render() {
 		const { comment } = this.props;
-
 		return this.renderComment(comment);
 	}
 
 	renderComment(comment, isLastChild = true) {
-		const { user } = this.props;
+		const { user, reply, commentEditing, actions } = this.props;
 		const replies = comment.replies || [];
 
 		const isLastCommentInThread = replies.length === 0 && isLastChild;
@@ -28,8 +24,7 @@ class Thread extends Component {
 				key={comment.id}
 				comment={comment}
 				hasReplyAction={isLastCommentInThread}
-				handleShowReplyForm={this.handleShowReplyForm}
-				showEditForm={this.state.showEditForm}
+				commentEditing={commentEditing}
 				// context?
 				actions={this.props.actions}
 				getUserSolutionsUrl={this.props.getUserSolutionsUrl}
@@ -39,26 +34,30 @@ class Thread extends Component {
 				<div key={reply.id} className={styles.replies}>
 					{this.renderComment(reply, index + 1 === replies.length)}
 				</div>) }
-			{ isParentComment && this.state.showReplyForm &&
+			{ isParentComment && comment.id === reply.commentId &&
 				<div className={styles.replyForm}>
 					<CommentSendForm
 						commentId={comment.id}
+						sending={reply.sending}
 						author={user}
-						sending={comment.sending}
 						submitTitle='Отправить'
-						handleShowForm={this.handleShowReplyForm}
-						handleSubmit={this.props.actions.handleAddReplyComment} />
+						onCancel={() => actions.handleShowReplyForm(null)}
+						handleSubmit={actions.handleAddReplyComment} />
 				</div> }
 			</Comment>
 		);
 	}
-
-		handleShowReplyForm = (flag) => {
-			this.setState({
-				showReplyForm: flag,
-			});
-		};
 }
+
+Thread.propTypes = {
+	user: PropTypes.object,
+	userRoles: PropTypes.object,
+	comment: PropTypes.object,
+	reply: PropTypes.object,
+	commentEditing: PropTypes.object,
+	actions: PropTypes.object,
+	getUserSolutionsUrl: PropTypes.func,
+};
 
 export default Thread;
 

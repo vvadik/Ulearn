@@ -105,8 +105,6 @@ class CommentSendForm extends Component {
 			return;
 		}
 
-		this.props.handleShowForm(false);
-
 		handleSubmit(commentId, text);
 	};
 
@@ -116,5 +114,15 @@ class CommentSendForm extends Component {
 		});
 	}
 }
+
+CommentSendForm.propTypes = {
+	author: PropTypes.object,
+	sending: PropTypes.bool,
+	submitTitle: PropTypes.string,
+	onCancel: PropTypes.func,
+	cancelTitle: PropTypes.string,
+	commentId: PropTypes.string,
+	handleSubmit: PropTypes.func,
+};
 
 export default CommentSendForm;

@@ -40,7 +40,7 @@ const comments = [
 					"avatarUrl": "https://staff.skbkontur.ru/content/images/default-user-woman.png",
 				},
 				text: "Я **не согласна**",
-				replies: [],
+				replies: [	],
 				renderedText: "Я <b>не согласна</b>",
 				publishTime: "2019-02-18T14:12:41.947",
 				isApproved: true,
