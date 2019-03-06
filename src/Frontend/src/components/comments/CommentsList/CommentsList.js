@@ -13,21 +13,60 @@ class CommentsList extends Component {
 	constructor(props) {
 		super(props);
 
-		this.state = {
-			threads: props.comments,
-			commentEditing: {
-				commentId: null,
-				sending: false
-			},
-			reply: {
-				commentId: null,
-				sending: false
-			},
-			sending: false,
-		};
+	this.state = {
+		threads: [],
+		commentEditing: {
+			commentId: null,
+			sending: false},
+		reply: {
+			commentId: null,
+			sending: false
+		},
+		sending: false,
+		loadingComments: false,
+		loadedComments: false,
+		status: '',
+	};
 
 	// this.debouncedSendData = debounce(this.sendData, 300);
 	}
+
+	componentDidMount() {
+		const { isForInstructor } = this.props;
+
+		this.loadComments(this.courseId, this.slideId, isForInstructor);
+	};
+
+	loadComments = (courseId, slideId, isForInstructor) => {
+		const { loadedComments, loadingComments } = this.state;
+
+		if (loadedComments || loadingComments) {
+			return;
+		}
+
+		this.setState({
+			loadingComments: true,
+		});
+
+		this.props.commentsApi.getComments(courseId, slideId, isForInstructor)
+		.then(json => {
+			let comments = json.topLevelComments;
+			this.setState({
+				loadedComments: true,
+				threads: comments,
+			});
+		})
+		.catch(() => {
+			this.setState({
+				status: 'error',
+			});
+		})
+		.finally(() =>
+			this.setState({
+				loadingComments: false,
+			})
+		);
+	};
 
 	render() {
 		const { threads, commentEditing, reply, sending } = this.state;
@@ -155,6 +194,7 @@ class CommentsList extends Component {
 	};
 
 	handleShowReplyForm = (commentId) => {
+		console.log(commentId);
 		this.setState({
 			reply: {...this.state.reply,
 				commentId: commentId,
@@ -165,7 +205,7 @@ class CommentsList extends Component {
 
 	handleEditComment = (commentId, text) => {
 		this.updateComment(commentId, () => ({
-			text,
+			renderedText: text,
 		}));
 
 		this.setState({
@@ -242,9 +282,11 @@ class CommentsList extends Component {
 CommentsList.propTypes = {
 	user: userType.isRequired,
 	userRoles: userRoles.isRequired,
-	comments: PropTypes.arrayOf(comment).isRequired,
-	courseId: PropTypes.string,
-	slideId: PropTypes.string,
+	isForInstructor: PropTypes.bool,
+	commentsApi: PropTypes.any,
+	//comments: PropTypes.arrayOf(comment).isRequired,
+	courseId: PropTypes.string.isRequired,
+	slideId: PropTypes.string.isRequired,
 };
 
 export default CommentsList;

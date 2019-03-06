@@ -91,11 +91,24 @@ function getUserSolutionsUrl(userId) {
 	return `https://dev.ulearn.me/Analytics/UserSolutions?courseId=BasicProgramming&slideId=90bcb61e-57f0-4baa-8bc9-10c9cfd27f58&userId=${userId}`;
 }
 
+const fakeCommentsApi = {
+	getComments: () => Promise.resolve({topLevelComments: comments}),
+	addComment: () => Promise.resolve(console.log('API: added comment')),
+	deleteComment: () => Promise.resolve(console.log('API: delete comment')),
+	updateComment: () => Promise.resolve(console.log('API: update comment')),
+	likeComment: () => Promise.resolve(console.log('API: like comment')),
+	dislikeComment: () => Promise.resolve(console.log('API: dislike comment')),
+
+};
+
 storiesOf('Comments/CommentsList', module)
 	.add('список комментариев', () => (
 		<CommentsList
 			comments={comments}
 			getUserSolutionsUrl={getUserSolutionsUrl(user.id)}
 			user={user}
-			userRoles={userRoles} />
+			userRoles={userRoles}
+			courseId={'BasicProgramming'}
+			slideId={'90bcb61e-57f0-4baa-8bc9-10c9cfd27f58'}
+			commentsApi={fakeCommentsApi} />
 	), { viewport: 'desktop' });

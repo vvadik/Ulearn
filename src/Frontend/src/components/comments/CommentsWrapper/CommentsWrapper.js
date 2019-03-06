@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
 import { userRoles, user } from "../commonPropTypes";
-import api from "../../../api";
 import Button from "@skbkontur/react-ui/components/Button/Button";
 import Icon from "@skbkontur/react-icons";
 import Tabs from "@skbkontur/react-ui/components/Tabs/Tabs";
@@ -18,41 +17,20 @@ class CommentsWrapper extends Component {
 		this.state = {
 			comments: [],
 			activeTab: "allComments",
-			loadingComments: false,
-			loadedComments: false,
 			openModal: false,
 			status: '',
 		};
 	}
 
-	// get courseId() {
-	// 	return this.props.match.params.courseId.toLowerCase();
-	// }
-	//
-	// get slideId() {
-	// 	return this.props.match.params.courseId.slideId.toLowerCase();
-	// }
-
 	componentDidMount() {
-		this.loadComments(this.courseId, this.slideId, false);
+		this.loadComments(this.props.courseId, this.props.slideId, true);
 	};
 
 	loadComments = (courseId, slideId, isForInstructor) => {
-		const { loadedComments, loadingComments } = this.state;
-
-		if (loadedComments || loadingComments) {
-			return;
-		}
-
-		this.setState({
-			loadingComments: true,
-		});
-
-		api.comments.apiRequests.getComments(courseId, slideId, isForInstructor)
+		this.props.commentsApi.getComments(courseId, slideId, isForInstructor)
 		.then(json => {
-			let comments = json.comments;
+			let comments = json.topLevelComments;
 			this.setState({
-				loadedComments: true,
 				comments: comments,
 			});
 		})
@@ -61,16 +39,12 @@ class CommentsWrapper extends Component {
 				status: 'error',
 			});
 		})
-		.finally(() =>
-			this.setState({
-				loadingComments: false,
-			})
-		);
 	};
 
 	render() {
-		const { user, userRoles } = this.props;
-		const { comments, activeTab } = this.state;
+		const { user, userRoles, courseId, slideId, commentsApi } = this.props;
+		const { activeTab } = this.state;
+		const isForInstructor = activeTab === 'commentsForInstructors';
 
 		// if (this.state.status === "error") {
 		// 	return <Error404 />;
@@ -81,7 +55,13 @@ class CommentsWrapper extends Component {
 				{ this.renderHeader() }
 				{this.state.openModal && <CommentPolicySettings handleOpenModal={this.handleOpenModal} />}
 				<div className={styles.commentsContainer}>
-					<CommentsList comments={comments} user={user} userRoles={userRoles} slideId={this.slideId} courseId={this.courseId}>
+					<CommentsList
+						isForInstructor={isForInstructor}
+						commentsApi={commentsApi}
+						user={user}
+						userRoles={userRoles}
+						slideId={slideId}
+						courseId={courseId}>
 						{ activeTab === "allComments" &&
 						<p>
 							К этому слайду ещё нет коммаентариев. Вы можете начать беседу со студентами,
@@ -100,6 +80,7 @@ class CommentsWrapper extends Component {
 
 	renderHeader() {
 		const {userRoles} = this.props;
+		const commentsCount = this.state.comments.length;
 		return (
 			<header className={styles.header}>
 				<div className={styles.headerRow}>
@@ -112,7 +93,10 @@ class CommentsWrapper extends Component {
 					userRoles.courseRole === 'Instructor') &&
 				<Tabs value={this.state.activeTab} onChange={this.handleTabChange}>
 					<Tabs.Tab id="allComments">К слайду</Tabs.Tab>
-					<Tabs.Tab id="commentsForInstructors">Для преподавателей</Tabs.Tab>
+					<Tabs.Tab id="commentsForInstructors">
+						Для преподавателей
+						<span className={styles.commentsCount}>{commentsCount}</span>
+					</Tabs.Tab>
 				</Tabs>}
 			</header>
 		)
@@ -122,12 +106,6 @@ class CommentsWrapper extends Component {
 		this.setState({
 			activeTab: id,
 		});
-
-		if (id === "allComments") {
-			this.loadComments(this.courseId, this.slideId, false);
-		} else {
-			this.loadComments(this.courseId, this.slideId, true);
-		}
 	};
 
 	handleOpenModal = (flag) => {
@@ -138,10 +116,11 @@ class CommentsWrapper extends Component {
 }
 
 CommentsWrapper.propTypes = {
-	courseId: PropTypes.string,
-	slideId: PropTypes.string,
 	user: user,
 	userRoles: userRoles,
+	courseId: PropTypes.string,
+	slideId: PropTypes.string,
+	commentsApi: PropTypes.objectOf(PropTypes.func),
 };
 
 export default CommentsWrapper;
