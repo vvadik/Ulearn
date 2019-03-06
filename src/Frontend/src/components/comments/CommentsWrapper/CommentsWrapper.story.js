@@ -86,6 +86,16 @@ const userRoles = {
 	"courseAccesses": ["editPinAndRemoveComments"],
 };
 
+const fakeCommentsApi = {
+	getComments: () => Promise.resolve({topLevelComments: comments}),
+	addComment: () => Promise.resolve(console.log('API: added comment')),
+	deleteComment: () => Promise.resolve(console.log('API: delete comment')),
+	updateComment: () => Promise.resolve(console.log('API: update comment')),
+	likeComment: () => Promise.resolve(console.log('API: like comment')),
+	dislikeComment: () => Promise.resolve(console.log('API: dislike comment')),
+
+};
+
 storiesOf('Comments/CommentsWrapper', module)
 .add('список комментариев', () => (
 	<CommentsWrapper
@@ -93,5 +103,5 @@ storiesOf('Comments/CommentsWrapper', module)
 		userRoles={userRoles}
 		slideId={'90bcb61e-57f0-4baa-8bc9-10c9cfd27f58'}
 		courseId={'BasicProgramming'}
-		comments={comments}	/>
+		commentsApi={fakeCommentsApi}	/>
 ), { viewport: 'desktop' });
