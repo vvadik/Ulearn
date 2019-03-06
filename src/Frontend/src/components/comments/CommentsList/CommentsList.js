@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
+import { userType, userRoles, comment } from "../commonPropTypes";
 import * as debounce from "debounce";
 import Thread from "../Thread/Thread";
 import Toast from "@skbkontur/react-ui/components/Toast/Toast";
@@ -239,12 +240,11 @@ class CommentsList extends Component {
 }
 
 CommentsList.propTypes = {
-	user: PropTypes.object,
-	comments: PropTypes.array,
+	user: userType.isRequired,
+	userRoles: userRoles.isRequired,
+	comments: PropTypes.arrayOf(comment).isRequired,
 	courseId: PropTypes.string,
 	slideId: PropTypes.string,
-	userRoles: PropTypes.object,
-	threads: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default CommentsList;

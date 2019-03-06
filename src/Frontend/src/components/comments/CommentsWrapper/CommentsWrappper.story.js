@@ -86,12 +86,12 @@ const userRoles = {
 	"courseAccesses": ["editPinAndRemoveComments"],
 };
 
-storiesOf('Comments/CommentsContainer', module)
+storiesOf('Comments/CommentsWrapper', module)
 .add('список комментариев', () => (
 	<CommentsWrapper
 		user={user}
 		userRoles={userRoles}
 		slideId={'90bcb61e-57f0-4baa-8bc9-10c9cfd27f58'}
 		courseId={'BasicProgramming'}
-		threads={comments}/>
+		comments={comments}	/>
 ), { viewport: 'desktop' });

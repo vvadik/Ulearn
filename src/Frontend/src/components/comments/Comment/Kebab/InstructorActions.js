@@ -31,7 +31,7 @@ export default function InstructorActions(props) {
 }
 
 InstructorActions.propTypes = {
-	isApproved: PropTypes.bool,
-	actions: PropTypes.object,
 	commentId: PropTypes.number,
+	actions: PropTypes.objectOf(PropTypes.func),
+	isApproved: PropTypes.bool,
 };

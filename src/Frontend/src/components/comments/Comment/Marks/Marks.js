@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import Icon from "@skbkontur/react-icons";
 
 import styles from "./Marks.less";
@@ -30,3 +31,9 @@ const PinnedToTopMark = () => (
 		<span className={styles.text}>Закреплено</span>
 	</div>
 );
+
+Marks.propTypes = {
+	isApproved: PropTypes.bool,
+	isCorrectAnswer: PropTypes.bool,
+	isPinnedToTop: PropTypes.bool,
+};

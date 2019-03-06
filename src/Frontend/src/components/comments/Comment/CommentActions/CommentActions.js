@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { comment, userRoles, userType } from "../../commonPropTypes";
 import Icon from "@skbkontur/react-icons";
 
 import styles from "../Comment.less";
@@ -57,10 +58,10 @@ export default function CommentActions(props) {
 };
 
 CommentActions.propTypes = {
-	user: PropTypes.object,
-	userRoles: PropTypes.object,
-	comment: PropTypes.object,
-	actions: PropTypes.object,
+	user: userType.isRequired,
+	userRoles: userRoles.isRequired,
+	comment: comment.isRequired,
+	actions: PropTypes.objectOf(PropTypes.func),
 	url: PropTypes.string,
 	hasReplyAction: PropTypes.bool,
 	canModerateComments: PropTypes.func,

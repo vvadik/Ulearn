@@ -4,7 +4,6 @@ import { action } from '@storybook/addon-actions';
 import CommentsList from "./CommentsList";
 
 const user = {
-	"is_authenticated": true,
 	"id": "11",
 	"visibleName": "Pavel",
 	"avatarUrl": null,
@@ -13,7 +12,9 @@ const user = {
 const userRoles = {
 	"isSystemAdministrator": true,
 	"courseRole": "Student",
-	"courseAccesses": ["nothing"],
+	"courseAccesses": [{
+		accesses: null,
+	}],
 };
 
 const comments = [
@@ -40,7 +41,7 @@ const comments = [
 					"avatarUrl": "https://staff.skbkontur.ru/content/images/default-user-woman.png",
 				},
 				text: "Я **не согласна**",
-				replies: [	],
+				replies: [],
 				renderedText: "Я <b>не согласна</b>",
 				publishTime: "2019-02-18T14:12:41.947",
 				isApproved: true,
@@ -94,9 +95,7 @@ storiesOf('Comments/CommentsList', module)
 	.add('список комментариев', () => (
 		<CommentsList
 			comments={comments}
-			getUserSolutionsUrl={(userId) => {
-				return `https://dev.ulearn.me/Analytics/UserSolutions?courseId=BasicProgramming&slideId=90bcb61e-57f0-4baa-8bc9-10c9cfd27f58&userId=${userId}`;
-			}}
+			getUserSolutionsUrl={getUserSolutionsUrl(user.id)}
 			user={user}
 			userRoles={userRoles} />
 	), { viewport: 'desktop' });

@@ -14,4 +14,5 @@ export default function Header({ name, children }) {
 
 Header.propTypes = {
 	name: PropTypes.string,
+	children: PropTypes.array,
 };

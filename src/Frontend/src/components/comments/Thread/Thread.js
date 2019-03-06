@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
+import { userType, userRoles, comment, commentStatus } from "../commonPropTypes";
 import Comment from "../Comment/Comment";
 import CommentSendForm from "../CommentSendForm/CommentSendForm";
 
@@ -50,12 +51,12 @@ class Thread extends Component {
 }
 
 Thread.propTypes = {
-	user: PropTypes.object,
-	userRoles: PropTypes.object,
-	comment: PropTypes.object,
-	reply: PropTypes.object,
-	commentEditing: PropTypes.object,
-	actions: PropTypes.object,
+	user: userType.isRequired,
+	userRoles: userRoles.isRequired,
+	comment: comment.isRequired,
+	reply: commentStatus,
+	commentEditing: commentStatus,
+	actions: PropTypes.objectOf(PropTypes.func),
 	getUserSolutionsUrl: PropTypes.func,
 };
 

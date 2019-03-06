@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
+import { userRoles, userType, comment, commentStatus } from "../commonPropTypes";
 import moment from "moment";
 import Hint from "@skbkontur/react-ui/components/Hint/Hint";
 import Avatar from "../../common/Avatar/Avatar";
@@ -15,7 +16,7 @@ import styles from "./Comment.less";
 class Comment extends Component {
 
 	render() {
-		const { actions, children, commentEditing,  comment, userRoles } = this.props;
+		const { actions, children, commentEditing, comment, userRoles } = this.props;
 
 		return (
 			<div className={styles.comment}>
@@ -76,7 +77,6 @@ class Comment extends Component {
 			<CommentSendForm
 				commentId={comment.id}
 				handleSubmit={actions.handleEditComment}
-				commentEditing={commentEditing}
 				submitTitle={'Сохранить'}
 				sending={commentEditing.sending}
 				onCancel={() => actions.handleShowEditForm(null)}
@@ -91,13 +91,13 @@ class Comment extends Component {
 }
 
 Comment.propTypes = {
-	user: PropTypes.object,
-	userRoles: PropTypes.object,
+	user: userType.isRequired,
+	userRoles: userRoles.isRequired,
+	comment: comment.isRequired,
+	actions: PropTypes.objectOf(PropTypes.func),
+	children: PropTypes.array,
 	getUserSolutionsUrl: PropTypes.func,
-	comment: PropTypes.object,
-	children: PropTypes.element,
-	actions: PropTypes.object,
-	commentEditing: PropTypes.object,
+	commentEditing: commentStatus,
 	hasReplyAction: PropTypes.bool,
 };
 

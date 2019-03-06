@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from "prop-types";
+import { userType } from "../commonPropTypes";
 import Button from "@skbkontur/react-ui/components/Button/Button";
 import Avatar from "../../common/Avatar/Avatar";
 import MarkdownEditor from "./MarkdownEditor/MarkdownEditor";
@@ -116,13 +117,13 @@ class CommentSendForm extends Component {
 }
 
 CommentSendForm.propTypes = {
-	author: PropTypes.object,
+	author: userType,
+	commentId: PropTypes.string,
+	handleSubmit: PropTypes.func,
 	sending: PropTypes.bool,
 	submitTitle: PropTypes.string,
 	onCancel: PropTypes.func,
 	cancelTitle: PropTypes.string,
-	commentId: PropTypes.string,
-	handleSubmit: PropTypes.func,
 };
 
 export default CommentSendForm;

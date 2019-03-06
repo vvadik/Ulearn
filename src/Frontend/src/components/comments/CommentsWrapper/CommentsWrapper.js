@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
+import { userRoles, user } from "../commonPropTypes";
 import api from "../../../api";
 import Button from "@skbkontur/react-ui/components/Button/Button";
 import Icon from "@skbkontur/react-icons";
@@ -49,10 +50,10 @@ class CommentsWrapper extends Component {
 
 		api.comments.apiRequests.getComments(courseId, slideId, isForInstructor)
 		.then(json => {
-			let commentsList = json.comments;
+			let comments = json.comments;
 			this.setState({
 				loadedComments: true,
-				comments: commentsList,
+				comments: comments,
 			});
 		})
 		.catch(() => {
@@ -139,8 +140,8 @@ class CommentsWrapper extends Component {
 CommentsWrapper.propTypes = {
 	courseId: PropTypes.string,
 	slideId: PropTypes.string,
-	user: PropTypes.object,
-	userRoles: PropTypes.object,
+	user: user,
+	userRoles: userRoles,
 };
 
 export default CommentsWrapper;
