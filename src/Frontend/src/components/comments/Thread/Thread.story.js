@@ -13,7 +13,32 @@ const user = {
 const userRoles = {
 	"isSystemAdministrator": true,
 	"courseRole": "Student",
-	"courseAccesses": ["nothing"],
+	"courseAccesses": [{
+		accesses: null,
+	}],
+};
+
+const commentEditing = {
+	commentId: null,
+	sending: false
+};
+
+const reply = {
+	commentId: null,
+	sending: false
+};
+
+const actions = {
+	handleLikeClick: action('likeComment'),
+	handleCorrectAnswerMark: action('correctMark'),
+	handleApprovedMark: action('approvedMark'),
+	handlePinnedToTopMark: action('pinnedToTopMark'),
+	handleEditComment: action('editComment'),
+	handleAddReplyComment: action('addReplyComment'),
+	handleDeleteComment: action('deleteComment'),
+	handleShowEditForm: action('showEditForm'),
+	handleShowReplyForm: action('showReplyForm'),
+	// handleSubmitComment: this.handleSubmitComment,
 };
 
 const comment = {
@@ -60,5 +85,7 @@ storiesOf('Comments/Thread', module)
 			user={user}
 			getUserSolutionsUrl={getUserSolutionUrl}
 			userRoles={userRoles}
-			addReplyComment={action('addReplyComment')} />
+			commentEditing={commentEditing}
+			reply={reply}
+			actions={actions} />
 	), { viewport: 'desktop' });

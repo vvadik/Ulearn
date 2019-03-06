@@ -16,7 +16,6 @@ class Thread extends Component {
 	renderComment(comment, isLastChild = true) {
 		const { user, reply, commentEditing, actions } = this.props;
 		const replies = comment.replies || [];
-
 		const isLastCommentInThread = replies.length === 0 && isLastChild;
 		const isParentComment = !comment.parentCommentId;
 

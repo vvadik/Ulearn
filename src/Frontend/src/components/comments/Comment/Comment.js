@@ -77,6 +77,7 @@ class Comment extends Component {
 			<CommentSendForm
 				commentId={comment.id}
 				handleSubmit={actions.handleEditComment}
+				text={comment.text}
 				submitTitle={'Сохранить'}
 				sending={commentEditing.sending}
 				onCancel={() => actions.handleShowEditForm(null)}

@@ -12,7 +12,7 @@ class CommentSendForm extends Component {
 		super(props);
 
 		this.state = {
-			text: '',
+			text:  props.text || '',
 			error: null,
 			commentId: props.commentId,
 		};
@@ -118,7 +118,7 @@ class CommentSendForm extends Component {
 
 CommentSendForm.propTypes = {
 	author: userType,
-	commentId: PropTypes.string,
+	commentId: PropTypes.number,
 	handleSubmit: PropTypes.func,
 	sending: PropTypes.bool,
 	submitTitle: PropTypes.string,

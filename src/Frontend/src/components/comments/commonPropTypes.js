@@ -32,7 +32,6 @@ export const userRoles = shape({
 	))
 });
 
-
 export const comment = shape({
 	id: number.isRequired,
 	author: userType.isRequired,
@@ -43,10 +42,10 @@ export const comment = shape({
 	isCorrectAnswer: bool,
 	isPinnedToTop: bool,
 	likesCount: number,
-	courseId: string,
 	replies: array,
-	slideId: string,
 	parentCommentId: number,
+	courseId: string,
+	slideId: string,
 });
 
 export const commentStatus = shape({
