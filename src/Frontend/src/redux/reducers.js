@@ -54,7 +54,6 @@ function courses(state = initialCoursesState, action) {
 			return {
 				...state,
 				currentCourseId: action.courseId
-				currentSlideId: action.slideId,
 			};
 		default:
 			return state;
