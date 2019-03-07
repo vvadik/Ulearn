@@ -192,7 +192,7 @@ class DownloadedHtmlContent extends Component {
 		this.setPostFormSubmitHandler();
 
 		let meta = window.meta || {
-			title: titles ? titles[0].innerText : 'Ulearn',
+			title: titles && titles.length ? titles[0].innerText : 'Ulearn',
 			description: 'Интерактивные учебные онлайн-курсы по программированию',
 			keywords: '',
 			imageUrl: '',

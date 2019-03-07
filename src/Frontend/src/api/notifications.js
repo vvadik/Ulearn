@@ -7,7 +7,7 @@ export function getNotificationsCount(lastTimestamp) {
 			dispatch({
 				type: 'NOTIFICATIONS__COUNT_UPDATED',
 				count: json.count,
-				lastTimestamp: json.last_timestamp,
+				lastTimestamp: json.lastTimestamp,
 			})
 		})
 	}
