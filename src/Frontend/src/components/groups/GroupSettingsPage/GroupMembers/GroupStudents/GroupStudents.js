@@ -81,7 +81,7 @@ class GroupStudents extends Component {
 		return (
 			<div>
 				{students
-				.sort((a, b) => a.user.visibleName.localeCompare(b.user.visible_name))
+				.sort((a, b) => a.user.visibleName.localeCompare(b.user.visibleName))
 				.map(item =>
 					<div className={styles["student-block"]}
 						 key={item.user.id}>
