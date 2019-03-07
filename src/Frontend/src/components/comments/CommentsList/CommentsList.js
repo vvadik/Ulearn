@@ -28,16 +28,16 @@ class CommentsList extends Component {
 		status: '',
 	};
 
-	// this.debouncedSendData = debounce(this.sendData, 300);
+	this.debouncedSendData = debounce(this.sendData, 300);
 	}
 
 	componentDidMount() {
-		const { isForInstructor } = this.props;
+		const { forInstructors } = this.props;
 
-		this.loadComments(this.courseId, this.slideId, isForInstructor);
+		this.loadComments(this.courseId, this.slideId, forInstructors);
 	};
 
-	loadComments = (courseId, slideId, isForInstructor) => {
+	loadComments = (courseId, slideId, forInstructors) => {
 		const { loadedComments, loadingComments } = this.state;
 
 		if (loadedComments || loadingComments) {
@@ -48,7 +48,7 @@ class CommentsList extends Component {
 			loadingComments: true,
 		});
 
-		this.props.commentsApi.getComments(courseId, slideId, isForInstructor)
+		this.props.commentsApi.getComments(courseId, slideId, forInstructors)
 		.then(json => {
 			let comments = json.topLevelComments;
 			this.setState({
@@ -141,48 +141,70 @@ class CommentsList extends Component {
 		});
 	}
 
-	handleAddComment = ()=> {
+	handleAddComment = async (text) => {
+		const { commentsApi, courseId, slideId, forInstructors } = this.props;
+		const newComment = await commentsApi.addComment(courseId, slideId, text, forInstructors);
+
+		if (!newComment) {
+			this.setState({
+				sending: true,
+			});
+		}
+
 		this.setState({
-			threads: [...this.state.threads],
+			threads: [newComment, ...this.state.threads],
 			sending: false,
-		})
+		});
 	};
 
-	handleLikeClick = (commentId) => {
+	handleLikeClick = (commentId, isLiked) => {
+		const { commentsApi } = this.props;
+
 		this.updateComment(commentId, ({ isLiked, likesCount }) => ({
 			likesCount: isLiked ? likesCount - 1 : likesCount + 1,
 			isLiked: !isLiked,
 		}));
 
-		// this.debouncedSendData(handleLikeClick, commentId, isLiked);
+		if (isLiked) {
+			commentsApi.likeComment(commentId)
+				.catch(console.error)
+			// this.debouncedSendData(commentsApi.likeComment, commentId);
+		}
 
-		console.log(`API:toggleLikeClick:#{comment.id}`);
+		commentsApi.dislikeComment(commentId)
+			.catch(console.error)
+			// this.debouncedSendData(commentsApi.dislikeComment, commentId);
 	};
 
-	handleApprovedMark = (commentId) => {
+	handleApprovedMark = (commentId, isApproved) => {
 
 		this.updateComment(commentId, ({ isApproved }) => ({
 			isApproved: !isApproved,
 		}));
 
-		// this.debouncedSendData(this.handleVisibleMark, commentId, isApproved);
-		console.log(`API:toggleVisibleMark:#{comment.id}`);
+		// this.debouncedSendData(commentsApi.updateComment, commentId, isApproved);
+		this.props.commentsApi.updateComment(commentId, isApproved)
+			.catch(console.error);
 	};
 
-	handleCorrectAnswerMark = (commentId) => {
+	handleCorrectAnswerMark = (commentId, isCorrectAnswer) => {
 		this.updateComment(commentId, ({ isCorrectAnswer }) => ({
 			isCorrectAnswer: !isCorrectAnswer,
 		}));
-		// this.debouncedSendData(this.handleCorrectAnswerMark, commentId, isCorrectAnswer);
-		console.log(`API:toggleCorrectAnswerMark:#{comment.id}`);
+
+		// this.debouncedSendData(commentsApi.updateComment, commentId, isCorrectAnswer);
+		this.props.commentsApi.updateComment(commentId, isCorrectAnswer)
+			.catch(console.error);
 	};
 
-	handlePinnedToTopMark = (commentId) => {
+	handlePinnedToTopMark = (commentId, isPinnedToTop ) => {
 		this.updateComment(commentId, ({ isPinnedToTop }) => ({
 			isPinnedToTop: !isPinnedToTop,
 		}));
-		// this.debouncedSendData(this.handlePinnedToTopMark, commentId, isPinnedToTop);
-		console.log(`API:togglePinnedToTopMark:#{comment.id}`);
+
+		// this.debouncedSendData(commentsApi.updateComment, commentId, isPinnedToTop);
+		this.props.commentsApi.updateComment(commentId, isPinnedToTop)
+			.catch(console.error);
 	};
 
 	handleShowEditForm = (commentId) => {
@@ -202,7 +224,6 @@ class CommentsList extends Component {
 		});
 	};
 
-
 	handleEditComment = (commentId, text) => {
 		this.updateComment(commentId, () => ({
 			renderedText: text,
@@ -215,20 +236,38 @@ class CommentsList extends Component {
 			}
 		});
 
-		console.log(commentId, `API: updated text:#{comment.id}`);
+		// this.debouncedSendData(commentsApi.updateComment, commentId, text);
+		this.props.commentsApi.updateComment(commentId, text)
+			.then(() =>
+				this.setState({
+					commentEditing: commentId,
+					sending: true,
+				})
+			)
+			.catch(console.error)
+			.finally(() =>
+				this.setState({
+					sending: false,
+				})
+			)
 	};
 
-	handleAddReplyComment = (commentId, text) => {
+	handleAddReplyComment = async (commentId, text) => {
+		const { commentsApi, courseId, slideId, forInstructors } = this.props;
+		const newComment = await commentsApi.addComment(courseId, slideId, text, forInstructors);
+
 		this.updateComment(commentId, () => ({
 			text,
 		}));
 
-		this.setState({
-			reply: {
-				commentId: commentId,
-				sending: true,
-			}
-		});
+		if (!newComment) {
+			this.setState({
+				reply: {
+					commentId: commentId,
+					sending: true,
+				}
+			});
+		}
 
 		this.setState({
 			reply: {
@@ -238,11 +277,6 @@ class CommentsList extends Component {
 		});
 
 		console.log(`API: added reply to:#{comment.parentCommentId}`);
-	};
-
-	getUserSolutionsUrl = (userId) => {
-		const { courseId, slideId } = this.props;
-		return `${window.location.origin}/Analytics/UserSolutions?courseId=${courseId}&slideId=${slideId}&userId=${userId}`;
 	};
 
 	handleDeleteComment = (commentId) => {
@@ -272,17 +306,25 @@ class CommentsList extends Component {
 				Toast.push("Комментарий восстановлен")
 			}
 		});
+
+		this.props.commentsApi.deleteComment(commentId)
+			.catch(console.error);
 	};
 
-	// sendData = (action, value, flag) => {
-	// 	return () => action(value, flag);
-	// };
+	getUserSolutionsUrl = (userId) => {
+		const { courseId, slideId } = this.props;
+		return `${window.location.origin}/Analytics/UserSolutions?courseId=${courseId}&slideId=${slideId}&userId=${userId}`;
+	};
+
+	sendData = (action, id, value) => {
+		return () => action(id, value);
+	};
 }
 
 CommentsList.propTypes = {
 	user: userType.isRequired,
 	userRoles: userRoles.isRequired,
-	isForInstructor: PropTypes.bool,
+	forInstructors: PropTypes.bool,
 	commentsApi: PropTypes.any,
 	//comments: PropTypes.arrayOf(comment).isRequired,
 	courseId: PropTypes.string.isRequired,

@@ -42,10 +42,12 @@ export default function CommentActions(props) {
 
 	if (canModerateComments(userRoles, 'editPinAndRemoveComments')) {
 		if (comment.parentCommentId) {
-			commentActions.push(<Button onClick={() => actions.handleCorrectAnswerMark(comment.id)} icon={'Star2'}>
+			commentActions.push(<Button onClick={() => actions.handleCorrectAnswerMark(comment.id, comment.isCorrectAnswer)}
+										icon={'Star2'}>
 				{comment.isCorrectAnswer ? 'Снять отметку' : 'Отметить правильным'}</Button>)
 		} else {
-			commentActions.push(<Button onClick={() => actions.handlePinnedToTopMark(comment.id)} icon={'Pin'}>
+			commentActions.push(<Button onClick={() => actions.handlePinnedToTopMark(comment.id, comment.isPinnedToTop)}
+										icon={'Pin'}>
 				{comment.isPinnedToTop ? 'Открепить' : 'Закрепить'}</Button>)
 		}
 	}

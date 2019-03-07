@@ -18,7 +18,7 @@ export default function InstructorActions(props) {
 			</MenuItem>
 			<MenuItem
 				icon={<Icon.EyeClosed size="small"/>}
-				onClick={() => actions.handleApprovedMark(commentId)}>
+				onClick={() => actions.handleApprovedMark(commentId, isApproved)}>
 				{ isApproved ? 'Опубликовать' : 'Скрыть' }
 			</MenuItem>
 			<MenuItem

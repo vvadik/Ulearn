@@ -26,8 +26,8 @@ class CommentsWrapper extends Component {
 		this.loadComments(this.props.courseId, this.props.slideId, true);
 	};
 
-	loadComments = (courseId, slideId, isForInstructor) => {
-		this.props.commentsApi.getComments(courseId, slideId, isForInstructor)
+	loadComments = (courseId, slideId, forInstructors) => {
+		this.props.commentsApi.getComments(courseId, slideId, forInstructors)
 		.then(json => {
 			let comments = json.topLevelComments;
 			this.setState({
@@ -44,11 +44,11 @@ class CommentsWrapper extends Component {
 	render() {
 		const { user, userRoles, courseId, slideId, commentsApi } = this.props;
 		const { activeTab } = this.state;
-		const isForInstructor = activeTab === 'commentsForInstructors';
+		const forInstructors = activeTab === 'commentsForInstructors';
 
-		// if (this.state.status === "error") {
-		// 	return <Error404 />;
-		// }
+		if (this.state.status === "error") {
+			return <Error404 />;
+		}
 
 		return (
 			<div className={styles.wrapper}>
@@ -56,7 +56,7 @@ class CommentsWrapper extends Component {
 				{this.state.openModal && <CommentPolicySettings handleOpenModal={this.handleOpenModal} />}
 				<div className={styles.commentsContainer}>
 					<CommentsList
-						isForInstructor={isForInstructor}
+						forInstructors={forInstructors}
 						commentsApi={commentsApi}
 						user={user}
 						userRoles={userRoles}

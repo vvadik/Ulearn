@@ -26,7 +26,7 @@ class Comment extends Component {
 						<Like
 							checked={comment.isLiked}
 							count={comment.likesCount}
-							onClick={() => actions.handleLikeClick(comment.id)} />
+							onClick={() => actions.handleLikeClick(comment.id, comment.isLiked)} />
 						<Marks
 							isApproved={comment.isApproved}
 							isCorrectAnswer={comment.isCorrectAnswer}

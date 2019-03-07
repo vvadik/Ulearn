@@ -5,12 +5,13 @@ export function getComments(courseId, slideId, isForInstructors) {
 		+ encodeURIComponent(isForInstructors));
 }
 
-export function addComment(courseId, slideId, text, isForInstructorsOnly) {
+export function addComment(courseId, slideId, text, forInstructors, parentId) {
 	return api.post("/comments/in/" + courseId + "/" + slideId,
 		api.createRequestParams({
 			"slideId": slideId,
 			"text": text,
-			"isForInstructorsOnly": isForInstructorsOnly,
+			"parentCommentId": parentId,
+			"forInstructors": forInstructors,
 		})
 	);
 }
