@@ -304,11 +304,13 @@ namespace Ulearn.Core
 		private static void CreateCourseFromExample(string courseId, string courseTitle, string path, FileInfo examplePackage)
 		{
 			examplePackage.CopyTo(path, true);
+			File.SetLastWriteTime(examplePackage.FullName, DateTime.Now);
+			
 			var nsResolver = new XmlNamespaceManager(new NameTable());
 			nsResolver.AddNamespace("ulearn", "https://ulearn.me/schema/v2");
 			using (var zip = ZipFile.Read(path, new ReadOptions { Encoding = Encoding.GetEncoding(866) }))
 			{
-				var courseXml = zip.Entries.FirstOrDefault(e => e.FileName == "course.xml" && !e.IsDirectory);
+				var courseXml = zip.Entries.FirstOrDefault(e => Path.GetFileName(e.FileName) == "course.xml" && !e.IsDirectory);
 				if (courseXml != null)
 					UpdateXmlAttribute(zip["course.xml"], "//ulearn:course", "title", courseTitle, zip, nsResolver);
 			}

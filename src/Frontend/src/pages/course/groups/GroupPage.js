@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from "prop-types";
 import connect from "react-redux/es/connect/connect";
 import { Redirect } from 'react-router-dom';
-import {withRouter} from "react-router-dom";
+import { withRouter } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import api from "../../../api/index";
 import Tabs from "@skbkontur/react-ui/components/Tabs/Tabs";
@@ -42,17 +42,17 @@ class GroupPage extends Component {
 
 	loadGroup = (groupId) => {
 		api.groups.getGroup(groupId)
-			.then(group => {
-				this.setState({
-					group,
-				});
-			})
-			.catch(() => {
-				this.setState({
-					status: 'error',
-				});
-			})
-			.finally(() => {
+		.then(group => {
+			this.setState({
+				group,
+			});
+		})
+		.catch(() => {
+			this.setState({
+				status: 'error',
+			});
+		})
+		.finally(() => {
 				this.setState({
 					loadingGroup: false,
 				})
@@ -62,24 +62,24 @@ class GroupPage extends Component {
 
 	loadGroupScores = (groupId) => {
 		api.groups.getGroupScores(groupId)
-			.then(json => {
-				let scores = json.scores;
-				this.setState({
-					scores: scores,
-				});
+		.then(json => {
+			let scores = json.scores;
+			this.setState({
+				scores: scores,
+			});
+		})
+		.catch(console.error)
+		.finally(() =>
+			this.setState({
+				loadingScores: false,
 			})
-			.catch(console.error)
-			.finally(() =>
-				this.setState({
-					loadingScores: false,
-				})
-			);
+		);
 	};
 
 	render() {
-		const { group } = this.state;
+		const {group} = this.state;
 		let courseId = this.props.match.params.courseId.toLowerCase();
-		const { groupId, groupPage } = this.props.match.params;
+		const {groupId, groupPage} = this.props.match.params;
 
 		if (this.state.status === "error") {
 			return <Error404 />;
@@ -106,19 +106,19 @@ class GroupPage extends Component {
 				<Helmet defer={true}>
 					<title>{`Группа ${group.name}`}</title>
 				</Helmet>
-				{ this.renderHeader() }
+				{this.renderHeader()}
 				<div className={styles.content}>
-					{ groupPage === "settings" &&
-						this.renderSettings() }
-					{ groupPage === "members" &&
-						<GroupMembers
-							courseId={courseId}
-							userId={userId}
-							role={courseRole}
-							isSysAdmin={this.props.account.isSystemAdministrator}
-							systemAccesses={systemAccesses}
-							group={group}
-							onChangeGroupOwner={this.onChangeGroupOwner} />
+					{groupPage === "settings" &&
+					this.renderSettings()}
+					{groupPage === "members" &&
+					<GroupMembers
+						courseId={courseId}
+						userId={userId}
+						role={courseRole}
+						isSysAdmin={this.props.account.isSystemAdministrator}
+						systemAccesses={systemAccesses}
+						group={group}
+						onChangeGroupOwner={this.onChangeGroupOwner} />
 					}
 				</div>
 			</Page>
@@ -126,8 +126,8 @@ class GroupPage extends Component {
 	}
 
 	renderHeader() {
-		const { group } = this.state;
-		const { groupId, groupPage } = this.props.match.params;
+		const {group} = this.state;
+		const {groupId, groupPage} = this.props.match.params;
 		let courseId = this.props.match.params.courseId.toLowerCase();
 
 		if (!['settings', 'members'].includes(groupPage)) {
@@ -143,7 +143,7 @@ class GroupPage extends Component {
 						</Link>
 					</div>
 				</div>
-				<h2 className={styles["group-name"]}>{ group.name ? group.name : " " }</h2>
+				<h2 className={styles["group-name"]}>{group.name ? group.name : " "}</h2>
 				<div className={styles["tabs-container"]}>
 					<Tabs value={groupPage} onChange={this.onChangeTab}>
 						<Tabs.Tab id="settings">Настройки</Tabs.Tab>
@@ -153,12 +153,12 @@ class GroupPage extends Component {
 			</header>
 		)
 	}
-	
+
 	renderSettings() {
-		const { group, loadingAllSettings, scores, updatedFields, error } = this.state;
+		const {group, loadingAllSettings, scores, updatedFields, error} = this.state;
 		return (
 			<form onSubmit={this.sendSettings}>
-				<GroupSettings 
+				<GroupSettings
 					loading={this.state.loadingScores && this.state.loadingGroup}
 					name={updatedFields.name !== undefined ? updatedFields.name : group.name}
 					group={group}
@@ -179,13 +179,13 @@ class GroupPage extends Component {
 	}
 
 	onChangeTab = (_, value) => {
-		const { courseId, groupId } = this.props.match.params;
+		const {courseId, groupId} = this.props.match.params;
 
 		this.props.history.push(`/${courseId}/groups/${groupId}/${value}`);
 	};
 
 	onChangeName = (value) => {
-		const { updatedFields } = this.state.updatedFields;
+		const {updatedFields} = this.state.updatedFields;
 
 		this.setState({
 			updatedFields: {
@@ -196,7 +196,7 @@ class GroupPage extends Component {
 	};
 
 	onChangeSettings = (field, value) => {
-		const { group, updatedFields } = this.state;
+		const {group, updatedFields} = this.state;
 
 		this.setState({
 			group: {
@@ -211,21 +211,21 @@ class GroupPage extends Component {
 	};
 
 	onChangeGroupOwner = (user, updatedGroupAccesses) => {
-		const { group } = this.state;
-		const updatedGroup = { ...group, owner: user, accesses: updatedGroupAccesses };
+		const {group} = this.state;
+		const updatedGroup = {...group, owner: user, accesses: updatedGroupAccesses};
 		this.setState({
 			group: updatedGroup,
 		});
 	};
 
 	onChangeScores = (key, field, value) => {
-		const { scores } = this.state;
+		const {scores} = this.state;
 		const updatedScores = scores
-			.map(item => item.id === key ? {...item, [field]: value } : item);
+		.map(item => item.id === key ? {...item, [field]: value} : item);
 
 		const scoresInGroup = updatedScores
-			.filter(item => item[field] === true)
-			.map(item => item.id);
+		.filter(item => item[field] === true)
+		.map(item => item.id);
 
 		this.setState({
 			scores: updatedScores,
@@ -240,7 +240,7 @@ class GroupPage extends Component {
 	};
 
 	sendSettings = (e) => {
-		const { group, updatedFields, scoresId } = this.state;
+		const {group, updatedFields, scoresId} = this.state;
 
 		e.preventDefault();
 
@@ -256,15 +256,15 @@ class GroupPage extends Component {
 		const saveScores = api.groups.saveScoresSettings(group.id, scoresId);
 
 		Promise
-			.all([saveGroup, saveScores])
-			.then(([group, scores]) => {
-				this.setState({ group });
-				Toast.push('Настройки группы сохранены');
-			})
-			.catch(console.error)
-			.finally(() => {
-				this.setState({ loadingAllSettings: false });
-			});
+		.all([saveGroup, saveScores])
+		.then(([group, scores]) => {
+			this.setState({group});
+			Toast.push('Настройки группы сохранены');
+		})
+		.catch(console.error)
+		.finally(() => {
+			this.setState({loadingAllSettings: false});
+		});
 	};
 
 	static mapStateToProps(state) {

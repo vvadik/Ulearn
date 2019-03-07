@@ -11,9 +11,8 @@ import "moment-timezone";
 moment.tz.setDefault(DEFAULT_TIMEZONE);
 
 ReactDOM.render((
-    <UlearnApp />
+	<UlearnApp />
 ), document.getElementById('root'));
-
 
 
 /* TODO (andgein):
@@ -26,11 +25,12 @@ ReactDOM.render((
 function unregisterServiceWorker() {
 	if (window.navigator && navigator.serviceWorker) {
 		navigator.serviceWorker.getRegistrations()
-			.then(function (registrations) {
-				for (let registration of registrations) {
-					registration.unregister();
-				}
-			});
+		.then(function (registrations) {
+			for (let registration of registrations) {
+				registration.unregister();
+			}
+		});
 	}
 }
+
 unregisterServiceWorker();

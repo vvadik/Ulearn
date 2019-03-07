@@ -1,18 +1,18 @@
 import api from "../api"
 
 export function getCourses() {
-    return dispatch => {
+	return dispatch => {
 
-        return api.get("courses")
-            .then(json => {
-                let courseById = {};
-                json.courses.forEach(c => courseById[c.id.toLowerCase()] = c);
-                dispatch({
-                    type: 'COURSES__UPDATED',
-                    courseById: courseById
-                })
-            });
-    };
+		return api.get("courses")
+		.then(json => {
+			let courseById = {};
+			json.courses.forEach(c => courseById[c.id.toLowerCase()] = c);
+			dispatch({
+				type: 'COURSES__UPDATED',
+				courseById: courseById
+			})
+		});
+	};
 }
 
 export function getUserCourses() {

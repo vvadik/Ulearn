@@ -33,7 +33,7 @@ class CopyGroupModal extends Component {
 
 	loadCourses = () => {
 		api.courses.getUserCourses()
-			.then(json => {
+		.then(json => {
 			let courses = json.courses;
 			this.setState({
 				courses,
@@ -43,34 +43,34 @@ class CopyGroupModal extends Component {
 
 	loadCourseInstructors = (courseId) => {
 		api.users.getCourseInstructors(courseId)
-			.then(json => {
-				let instructors = json.instructors;
-				this.setState({
-					instructors,
-				});
-			}).catch(console.error);
+		.then(json => {
+			let instructors = json.users.map(item => item.user);
+			this.setState({
+				instructors,
+			});
+		}).catch(console.error);
 	};
 
 	loadGroups = (courseId) => {
-		this.setState({ loadingGroups: true });
+		this.setState({loadingGroups: true});
 		api.groups.getCourseGroups(courseId)
-			.then(json => {
-				let groups = json.groups;
-				this.setState({
-					groups,
-					loadingGroups: false,
-				});
+		.then(json => {
+			let groups = json.groups;
+			this.setState({
+				groups,
+				loadingGroups: false,
+			});
+		})
+		.catch(console.error)
+		.finally(() =>
+			this.setState({
+				loadingGroups: false,
 			})
-			.catch(console.error)
-			.finally(() =>
-				this.setState({
-					loadingGroups: false,
-				})
-			);
+		);
 	};
 
 	render() {
-		const { onCloseModal, course } = this.props;
+		const {onCloseModal, course} = this.props;
 
 		return (
 			<Modal onClose={onCloseModal} width="100%" alignTop={true}>
@@ -78,14 +78,15 @@ class CopyGroupModal extends Component {
 				<form onSubmit={this.onSubmit}>
 					<Modal.Body>
 						<div className={styles["modal-content"]}>
-							<p className={styles["common-info"]}>Новая группа будет создана для курса <b>«{ course.title }»</b>.
+							<p className={styles["common-info"]}>Новая группа будет создана для
+								курса <b>«{course.title}»</b>.
 								Скопируются все настройки группы (в том числе владелец),
 								в неё автоматически добавятся студенты из копируемой группы.
 								Преподаватели тоже будут добавлены в группу, если у них есть права
-								на&nbsp;курс <b>«{ course.title }»</b>.
+								на&nbsp;курс <b>«{course.title}»</b>.
 							</p>
-							{ this.renderCourseSelect() }
-							{ this.renderGroupSelect() }
+							{this.renderCourseSelect()}
+							{this.renderGroupSelect()}
 						</div>
 					</Modal.Body>
 					<Modal.Footer>
@@ -104,7 +105,7 @@ class CopyGroupModal extends Component {
 	}
 
 	renderCourseSelect() {
-		const { courseId } = this.state;
+		const {courseId} = this.state;
 
 		return (
 			<React.Fragment>
@@ -128,7 +129,7 @@ class CopyGroupModal extends Component {
 	}
 
 	renderGroupSelect() {
-		const { groupId, groups } = this.state;
+		const {groupId, groups} = this.state;
 
 		return (
 			<React.Fragment>
@@ -151,7 +152,7 @@ class CopyGroupModal extends Component {
 						/>
 					</label>
 					{this.state.loadingGroups ? null : (this.checkGroups() && this.renderEmptyGroups())}
-					{ this.checkOwner() && this.renderChangeOwner() }
+					{this.checkOwner() && this.renderChangeOwner()}
 				</Loader>
 			</React.Fragment>
 		);
@@ -164,14 +165,14 @@ class CopyGroupModal extends Component {
 	}
 
 	renderChangeOwner() {
-		const { groupId, changeOwner } = this.state;
+		const {groupId, changeOwner} = this.state;
 		const group = this.getGroup(groupId);
 
 		return (
 			<div className={styles["change-owner-block"]}>
 				<p className={styles["change-owner-info"]}>
-					Владелец этой группы <b>{group.owner.visible_name}</b> не является преподавателем
-					курса <b>«{ this.props.course.title }»</b>.
+					Владелец этой группы <b>{group.owner.visibleName}</b> не является преподавателем
+					курса <b>«{this.props.course.title}»</b>.
 					Вы можете сделать себя владельцем скопированной группы.
 				</p>
 				<Checkbox checked={changeOwner} onChange={this.onChangeOwner}>
@@ -186,13 +187,13 @@ class CopyGroupModal extends Component {
 	};
 
 	getGroup = (groupId) => {
-		const { groups } = this.state;
+		const {groups} = this.state;
 
 		return groups.find(g => g.id === groupId);
 	};
 
 	getCourseOptions = () => {
-		const { courses } = this.state;
+		const {courses} = this.state;
 
 		return courses.map(course => [course.id, course.title]);
 	};
@@ -208,7 +209,7 @@ class CopyGroupModal extends Component {
 	};
 
 	checkGroups = () => {
-		const { courseId, groups } = this.state;
+		const {courseId, groups} = this.state;
 		if (!groups) {
 			return false;
 		}
@@ -217,18 +218,18 @@ class CopyGroupModal extends Component {
 	};
 
 	getGroupOptions = () => {
-		const { groups } = this.state;
+		const {groups} = this.state;
 
-		return groups.map(group => [group.id, `${group.name}: ${group.students_count} 
-		${getPluralForm(group.students_count, 'студент', 'студента', 'студентов')}`]);
+		return groups.map(group => [group.id, `${group.name}: ${group.studentsCount} 
+		${getPluralForm(group.studentsCount, 'студент', 'студента', 'студентов')}`]);
 	};
 
 	onGroupChange = (_, value) => {
-		this.setState({ groupId: value });
+		this.setState({groupId: value});
 	};
 
 	checkOwner = () => {
-		const { groupId, instructors } = this.state;
+		const {groupId, instructors} = this.state;
 		const group = this.getGroup(groupId);
 
 		if (!group) {
@@ -241,12 +242,12 @@ class CopyGroupModal extends Component {
 		return !(instructorsId.includes(ownerId));
 	};
 
-	onChangeOwner = (_, value) => this.setState({ changeOwner: value });
+	onChangeOwner = (_, value) => this.setState({changeOwner: value});
 
 	onSubmit = async (e) => {
-		const { groupId, courseId, changeOwner } = this.state;
+		const {groupId, courseId, changeOwner} = this.state;
 		const currentCourseId = this.props.course.id;
-		const { onCloseModal, onSubmit } = this.props;
+		const {onCloseModal, onSubmit} = this.props;
 
 		e.preventDefault();
 
@@ -257,16 +258,15 @@ class CopyGroupModal extends Component {
 			return;
 		}
 
-		this.setState({ sending: true });
+		this.setState({loading: true});
 		try {
 			const newGroup = await api.groups.copyGroup(groupId, currentCourseId, changeOwner);
 			onCloseModal();
 			onSubmit(newGroup.id);
-		} catch(e) {
+		} catch (e) {
 			console.error(e);
-		}
-		finally {
-			this.setState({ sending: false });
+		} finally {
+			this.setState({loading: false});
 		}
 	};
 }

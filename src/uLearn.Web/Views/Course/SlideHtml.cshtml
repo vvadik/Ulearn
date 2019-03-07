@@ -1,4 +1,5 @@
 ﻿@* Generator: MvcHelper GeneratePrettyNames: true DisableLinePragmas: true *@
+@using System.Diagnostics
 @using System.Linq
 @using Database.Models
 @using uLearn.Web.Clients
@@ -83,8 +84,11 @@
 	QuizBlockData model = context.GetBlockData(block);
 	if (model.QuizState.Status == QuizStatus.Sent)
 	{
-		model.QuizModel.UserScores.TryGetValue(block.Id, out blockScore);
-		
+		if (model.QuizModel.UserScores != null)
+		{
+			model.QuizModel.UserScores.TryGetValue(block.Id, out blockScore);
+		}
+
 		var isBlockCorrect = IsBlockCorrect(model, block);
 		mark = "glyphicon " + (isBlockCorrect ? "glyphicon-ok" : "glyphicon-remove");
 		style = "color: " + (isBlockCorrect ? "green" : "red");
@@ -373,7 +377,7 @@
 		{
 			var item = items[itemIndex];
 			var id = isMultiply ? itemIndex + "noMult" : model.BlockIndex.ToString();
-			var itemChecked = model.ShowUserAnswers && model.QuizModel.AnswersToQuizzes[block.Id].Select(x => x.ItemId).Contains(item.Id);
+			var itemChecked = model.ShowUserAnswers && model.QuizModel.AnswersToQuizzes != null && model.QuizModel.AnswersToQuizzes[block.Id].Select(x => x.ItemId).Contains(item.Id);
 			var ans = itemChecked ? "checked" : "";
 			var itemClass = "";
 			var title = "";
@@ -408,15 +412,15 @@
 				}
 			</div>
 		}
-        @{
-	        var isBlockCorrect = IsBlockCorrect(model, block);
-	        if (model.ShowCorrectAnswers && isBlockCorrect && mistakesCount.HasAtLeastOneMistake())
-	        {
-		        @ShowMistakesExplanation(mistakesCount)
-	        }
-        }
-        
-    </div>
+		@{
+			var isBlockCorrect = IsBlockCorrect(model, block);
+			if (model.ShowCorrectAnswers && isBlockCorrect && mistakesCount.HasAtLeastOneMistake())
+			{
+				@ShowMistakesExplanation(mistakesCount)
+			}
+		}
+
+	</div>
 }
 
 @helper ShowMistakesExplanation(MistakesCount mistakesCount)
@@ -457,7 +461,7 @@
 {
 	var value = "";
 	QuizBlockData model = context.GetBlockData(block);
-	if (model.ShowUserAnswers && model.QuizModel.AnswersToQuizzes[block.Id].FirstOrDefault() != null)
+	if (model.ShowUserAnswers && model.QuizModel.AnswersToQuizzes != null && model.QuizModel.AnswersToQuizzes[block.Id].FirstOrDefault() != null)
 	{
 		var answers = model.QuizModel.AnswersToQuizzes[block.Id];
 		var userAnswer = answers.FirstOrDefault();
@@ -505,7 +509,7 @@
 	var falseTitle = "";
 	var isUserAnswerCorrect = false;
 	QuizBlockData model = context.GetBlockData(block);
-	if (model.ShowUserAnswers && model.QuizModel.AnswersToQuizzes[block.Id].FirstOrDefault() != null)
+	if (model.ShowUserAnswers && model.QuizModel.AnswersToQuizzes != null && model.QuizModel.AnswersToQuizzes[block.Id].FirstOrDefault() != null)
 	{
 		var userAnswer = model.QuizModel.AnswersToQuizzes[block.Id].Select(x => x.Text).FirstOrDefault() == "True";
 		isUserAnswerCorrect = userAnswer == block.Answer;
@@ -553,7 +557,7 @@
 	var items = block.ShuffledItems();
 	var correctItems = block.Items;
 	QuizBlockData model = context.GetBlockData(block);
-	if (model.ShowUserAnswers && model.QuizModel.AnswersToQuizzes[block.Id].FirstOrDefault() != null)
+	if (model.ShowUserAnswers && model.QuizModel.AnswersToQuizzes != null && model.QuizModel.AnswersToQuizzes[block.Id].FirstOrDefault() != null)
 	{
 		var userAnswers = model.QuizModel.AnswersToQuizzes[block.Id].Select(x => x.ItemId).ToList();
 		items = items.OrderBy(item => userAnswers.IndexOf(item.GetHash())).ToArray();
@@ -604,7 +608,7 @@
 	var movableItems = block.GetMatches(true);
 
 	QuizBlockData model = context.GetBlockData(block);
-	if (model.ShowUserAnswers && model.QuizModel.AnswersToQuizzes[block.Id].FirstOrDefault() != null)
+	if (model.ShowUserAnswers && model.QuizModel.AnswersToQuizzes != null && model.QuizModel.AnswersToQuizzes[block.Id].FirstOrDefault() != null)
 	{
 		var userAnswers = model.QuizModel.AnswersToQuizzes[block.Id];
 		fixedItems = GetFixedItemsAccordingToUserAnswers(userAnswers, fixedItems)

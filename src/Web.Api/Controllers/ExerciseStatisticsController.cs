@@ -5,15 +5,15 @@ using Database;
 using Database.Repos;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Web.Api.Models.Responses.ExerciseStatistics;
 
 namespace Ulearn.Web.Api.Controllers
 {
-	[Route("/exercise/statistics")]
+	[Route("/exercise-statistics")]
 	public class ExerciseStatisticsController : BaseController
 	{
 		private readonly IUserSolutionsRepo userSolutionsRepo;
@@ -24,9 +24,13 @@ namespace Ulearn.Web.Api.Controllers
 			this.userSolutionsRepo = userSolutionsRepo;
 		}
 
-		[HttpGet("{courseId}")]
-		public async Task<ActionResult<CourseExercisesStatisticsResponse>> CourseStatistics(Course course, int count=10000, DateTime? from=null, DateTime? to=null)
+		/// <summary>
+		/// Статистика по выполнению каждого упражнения в курсе
+		/// </summary>
+		[HttpGet]
+		public async Task<ActionResult<CourseExercisesStatisticsResponse>> CourseStatistics([FromQuery(Name = "course_id")][BindRequired]string courseId, int count=10000, DateTime? from=null, DateTime? to=null)
 		{
+			var course = courseManager.FindCourse(courseId);
 			if (course == null)
 				return NotFound();
 			

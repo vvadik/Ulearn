@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import colorHash from '../../../utils/colorHash';
 
@@ -8,7 +8,7 @@ class Avatar extends Component {
 
 	render() {
 		const {user, size} = this.props;
-		const imageUrl = user.avatar_url || user.avatarUrl;
+		const imageUrl = user.avatarUrl;
 		let className = `${styles["photo-avatar"]} ${styles[size] || 'big'}`;
 
 		if (imageUrl) {
@@ -21,15 +21,15 @@ class Avatar extends Component {
 	renderImage(url, className) {
 		return (
 			<img
-			alt="Аватарка"
-			className={className}
-			src={url}
+				alt="Аватарка"
+				className={className}
+				src={url}
 			/>
 		);
 	}
 
 	renderCircle(className) {
-		const userName = this.props.user.visible_name || this.props.user.visibleName;
+		const userName = this.props.user.visibleName;
 		const firstLetterIndex = userName.search(/[a-zа-яё]/i);
 		const userFirstLetter = firstLetterIndex !== -1 ? userName[firstLetterIndex].toUpperCase() : '?';
 		let divStyle = {
@@ -37,7 +37,7 @@ class Avatar extends Component {
 		};
 
 		return (
-			<div style={divStyle} className={`${className} ${styles["color-avatar"]}`}>{ userFirstLetter }</div>
+			<div style={divStyle} className={`${className} ${styles["color-avatar"]}`}>{userFirstLetter}</div>
 		)
 	}
 }

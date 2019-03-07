@@ -2,11 +2,11 @@ import React, { Component } from "react";
 import Error404 from "./Error404";
 
 
- export class UrlError extends Error {
-	 constructor(message, response) {
-		 super();
-		 this.response = response;
-	 }
+export class UrlError extends Error {
+	constructor(message, response) {
+		super();
+		this.response = response;
+	}
 }
 
 class NotFoundErrorBoundary extends Component {
@@ -16,7 +16,7 @@ class NotFoundErrorBoundary extends Component {
 
 	componentDidCatch(error, errorInfo) {
 		if (error instanceof UrlError) {
-			this.setState({ error })
+			this.setState({error})
 		} else {
 			Error();
 		}

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Serilog;
@@ -12,6 +13,7 @@ namespace Ulearn.VideoAnnotations.Api.Client
 {
 	public class VideoAnnotationsClient : BaseApiClient, IVideoAnnotationsClient
 	{
+		private readonly ILogger logger;
 		public VideoAnnotationsClient(ILogger logger, Uri endpointUrl)
 			:base(logger, new ApiClientSettings
 			{
@@ -19,11 +21,15 @@ namespace Ulearn.VideoAnnotations.Api.Client
 				ServiceName = "video annotations service",
 			})
 		{
+			this.logger = logger;
 		}
 
-		public Task<AnnotationsResponse> GetAnnotationsAsync(AnnotationsParameters parameters)
+		public async Task<AnnotationsResponse> GetAnnotationsAsync(AnnotationsParameters parameters)
 		{
-			return MakeRequestAsync<AnnotationsParameters, AnnotationsResponse>(HttpMethod.Get, Urls.Annotations, parameters);
+			var sw = Stopwatch.StartNew();
+			var response = await MakeRequestAsync<AnnotationsParameters, AnnotationsResponse>(HttpMethod.Get, Urls.Annotations, parameters).ConfigureAwait(false);
+			logger.Information("GetAnnotationsAsync " + sw.ElapsedMilliseconds + " ms");
+			return response;
 		}
 		
 		public Task ClearAsync()

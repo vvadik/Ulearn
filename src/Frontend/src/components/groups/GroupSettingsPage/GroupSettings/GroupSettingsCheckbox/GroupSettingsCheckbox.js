@@ -1,14 +1,14 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Checkbox from "@skbkontur/react-ui/components/Checkbox/Checkbox";
 
 import styles from './groupSettingsCheckbox.less';
 
 const mapToServerName = {
-	oldSolution: 'is_manual_checking_enabled_for_old_solutions',
-	manualChecking: 'is_manual_checking_enabled',
-	review: 'default_prohibit_further_review',
-	progress: 'can_students_see_group_progress',
+	oldSolution: 'isManualCheckingEnabledForOldSolutions',
+	manualChecking: 'isManualCheckingEnabled',
+	review: 'defaultProhibitFurtherReview',
+	progress: 'canStudentsSeeGroupProgress',
 };
 
 class GroupSettingsCheckbox extends Component {
@@ -20,10 +20,10 @@ class GroupSettingsCheckbox extends Component {
 		this.bindReview = this.onChange.bind(this, 'review');
 	}
 
-	render () {
-		const { group } = this.props;
-		const manualChecking = group.is_manual_checking_enabled || false;
-		const progress = group.can_students_see_group_progress || false;
+	render() {
+		const {group} = this.props;
+		const manualChecking = group.isManualCheckingEnabled || false;
+		const progress = group.canStudentsSeeGroupProgress || false;
 
 		return (
 			<React.Fragment>
@@ -31,9 +31,9 @@ class GroupSettingsCheckbox extends Component {
 					{this.renderSettings(progress, "Открыть ведомость курса студентам", this.bindProgress)}
 				</label>
 				<label className={styles["settings-checkbox"]}>
-				{ this.renderSettings(manualChecking,
-					"Включить код-ревью и ручную проверку тестов для участников группы",
-					this.bindManualChecking) }
+					{this.renderSettings(manualChecking,
+						"Включить код-ревью и ручную проверку тестов для участников группы",
+						this.bindManualChecking)}
 				</label>
 				{manualChecking && this.renderReviewSettings()}
 			</React.Fragment>
@@ -41,16 +41,16 @@ class GroupSettingsCheckbox extends Component {
 	}
 
 	renderReviewSettings() {
-		const { group } = this.props;
-		const oldSolution = group.is_manual_checking_enabled_for_old_solutions || false;
-		const review = group.default_prohibit_further_review || false;
+		const {group} = this.props;
+		const oldSolution = group.isManualCheckingEnabledForOldSolutions || false;
+		const review = group.defaultProhibitFurtherReview || false;
 
 		return (
 			<React.Fragment>
 				<label className={styles["settings-checkbox"]}>
-					{ this.renderSettings(oldSolution,
+					{this.renderSettings(oldSolution,
 						"Отправить на код-ревью и ручную проверку тестов старые решения участников",
-						this.bindOldSolution) }
+						this.bindOldSolution)}
 					<p className={styles["settings-comment"]}>Если эта опция выключена, то при вступлении
 						студента в группу его старые решения не будут отправлены на код-ревью</p>
 				</label>
@@ -72,7 +72,7 @@ class GroupSettingsCheckbox extends Component {
 	};
 
 	onChange = (field, _, value) => {
-		const { onChangeSettings } = this.props;
+		const {onChangeSettings} = this.props;
 		onChangeSettings(mapToServerName[field], value);
 	};
 }

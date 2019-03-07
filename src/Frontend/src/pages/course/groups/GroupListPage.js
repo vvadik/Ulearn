@@ -1,4 +1,4 @@
-import React, {Component, createRef} from "react";
+import React, { Component, createRef } from "react";
 import { withRouter } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import connect from "react-redux/es/connect/connect";
@@ -36,7 +36,7 @@ class GroupListPage extends Component {
 	};
 
 	loadActiveGroups = (courseId) => {
-		const { loadingActive, loadedActive } = this.state;
+		const {loadingActive, loadedActive} = this.state;
 
 		if (loadedActive || loadingActive) {
 			return;
@@ -47,27 +47,27 @@ class GroupListPage extends Component {
 		});
 
 		api.groups.getCourseGroups(courseId)
-			.then(json => {
-				let groups = json.groups;
-				this.setState({
-					loadedActive: true,
-					groups,
-				});
+		.then(json => {
+			let groups = json.groups;
+			this.setState({
+				loadedActive: true,
+				groups,
+			});
+		})
+		.catch(() => {
+			this.setState({
+				status: 'error',
+			});
+		})
+		.finally(() =>
+			this.setState({
+				loadingActive: false,
 			})
-			.catch(() => {
-				this.setState({
-					status: 'error',
-				});
-			})
-			.finally(() =>
-				this.setState({
-					loadingActive: false,
-				})
-			)
+		)
 	};
 
 	loadArchivedGroups = (courseId) => {
-		const { loadingArchived, loadedArchived } = this.state;
+		const {loadingArchived, loadedArchived} = this.state;
 
 		if (loadedArchived || loadingArchived) {
 			return;
@@ -78,19 +78,19 @@ class GroupListPage extends Component {
 		});
 
 		api.groups.getCourseArchivedGroups(courseId)
-			.then(json => {
-				let archiveGroups = json.groups;
-				this.setState({
-					loadedArchived: true,
-					archiveGroups,
-				});
+		.then(json => {
+			let archiveGroups = json.groups;
+			this.setState({
+				loadedArchived: true,
+				archiveGroups,
+			});
+		})
+		.catch(console.error)
+		.finally(() =>
+			this.setState({
+				loadingArchived: false,
 			})
-			.catch(console.error)
-			.finally(() =>
-				this.setState({
-					loadingArchived: false,
-				})
-			)
+		)
 	};
 
 	render() {
@@ -125,14 +125,17 @@ class GroupListPage extends Component {
 					toggleArchived={this.toggleArchived}
 					loading={this.loading}
 				>
-					{ this.state.filter === "archived" && <div>
-						У вас нет архивных групп. Когда какая-нибудь группа станет вам больше не&nbsp;нужна, заархивируйте её.
-						Архивные группы будут жить здесь вечно и не&nbsp;помешают вам в&nbsp;текущей работе. Однако если понадобится, вы всегда
+					{this.state.filter === "archived" && <div>
+						У вас нет архивных групп. Когда какая-нибудь группа станет вам больше не&nbsp;нужна,
+						заархивируйте её.
+						Архивные группы будут жить здесь вечно и не&nbsp;помешают вам в&nbsp;текущей работе. Однако если
+						понадобится, вы всегда
 						сможете вернуться к&nbsp;ним.
-					</div> }
-					{ this.state.filter === "active" && <div>
-						У вас нет активных групп. Создайте группу и пригласите в неё студентов, чтобы видеть их прогресс, проверять их тесты и делать код-ревью их решений.
-					</div> }
+					</div>}
+					{this.state.filter === "active" && <div>
+						У вас нет активных групп. Создайте группу и пригласите в неё студентов, чтобы видеть их
+						прогресс, проверять их тесты и делать код-ревью их решений.
+					</div>}
 				</GroupList>
 			</Page>
 		)
@@ -171,10 +174,10 @@ class GroupListPage extends Component {
 
 	deleteGroup = (group, groupsName) => {
 		api.groups.deleteGroup(group.id)
-			.catch(console.error)
-			.then(() => {
-				Toast.push(`Группа «${group.name}» удалена`);
-			});
+		.catch(console.error)
+		.then(() => {
+			Toast.push(`Группа «${group.name}» удалена`);
+		});
 
 		const updateGroups = this.state[groupsName].filter(g => group.id !== g.id);
 
@@ -185,16 +188,16 @@ class GroupListPage extends Component {
 
 	toggleArchived = (group, isArchived) => {
 		const newSettings = {
-			is_archived: isArchived
+			isArchived
 		};
 
 		api.groups.saveGroupSettings(group.id, newSettings)
-			.catch(console.error)
-			.then(() => {
-				Toast.push(isArchived ? `Группа «${group.name}» заархивирована` : `Группа «${group.name}» восстановлена`)
-			});
+		.catch(console.error)
+		.then(() => {
+			Toast.push(isArchived ? `Группа «${group.name}» заархивирована` : `Группа «${group.name}» восстановлена`)
+		});
 
-		group = { ...group, ...newSettings };
+		group = {...group, ...newSettings};
 
 		if (isArchived) {
 			this.moveGroup(group, 'groups', 'archiveGroups');

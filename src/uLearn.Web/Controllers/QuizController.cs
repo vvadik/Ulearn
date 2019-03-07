@@ -46,6 +46,7 @@ namespace uLearn.Web.Controllers
 		private readonly GroupsRepo groupsRepo;
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
 		private readonly NotificationsRepo notificationsRepo;
+		private readonly UnitsRepo unitsRepo;
 
 		public QuizController()
 		{
@@ -56,6 +57,7 @@ namespace uLearn.Web.Controllers
 			groupsRepo = new GroupsRepo(db, courseManager);
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
 			notificationsRepo = new NotificationsRepo(db);
+			unitsRepo = new UnitsRepo(db);
 		}
 
 		[UsedImplicitly]
@@ -265,7 +267,7 @@ namespace uLearn.Web.Controllers
 				}
 				
 				await slideCheckingsRepo.AddAutomaticQuizChecking(submission, courseId, slideId, userId, score).ConfigureAwait(false);
-				await visitsRepo.UpdateScoreForVisit(courseId, slideId, userId).ConfigureAwait(false);
+				await visitsRepo.UpdateScoreForVisit(courseId, slideId, slide.MaxScore, userId).ConfigureAwait(false);
 				if (isLti)
 					LtiUtils.SubmitScore(courseId, slide, userId);
 			}
@@ -300,6 +302,7 @@ namespace uLearn.Web.Controllers
 
 				var course = courseManager.GetCourse(checking.CourseId);
 				var unit = course.FindUnitBySlideId(checking.SlideId);
+				var slide = course.GetSlideById(checking.SlideId);
 
 				metricSender.SendCount($"quiz.manual_score.{checking.CourseId}");
 				metricSender.SendCount($"quiz.manual_score.{checking.CourseId}.{checking.SlideId}");
@@ -326,7 +329,8 @@ namespace uLearn.Web.Controllers
 				}
 
 				await slideCheckingsRepo.MarkManualCheckingAsChecked(checking, totalScore).ConfigureAwait(false);
-				await visitsRepo.UpdateScoreForVisit(checking.CourseId, checking.SlideId, checking.UserId).ConfigureAwait(false);
+				
+				await visitsRepo.UpdateScoreForVisit(checking.CourseId, checking.SlideId, slide.MaxScore, checking.UserId).ConfigureAwait(false);
 				transaction.Commit();
 
 				metricSender.SendCount($"quiz.manual_score.score", totalScore);
@@ -338,8 +342,9 @@ namespace uLearn.Web.Controllers
 					metricSender.SendCount($"quiz.manual_score.{checking.CourseId}.full_scored");
 					metricSender.SendCount($"quiz.manual_score.{checking.CourseId}.{checking.SlideId}.full_scored");
 				}
-
-				await NotifyAboutManualQuizChecking(checking).ConfigureAwait(false);
+				
+				if(unit != null && unitsRepo.IsUnitVisibleForStudents(course, unit.Id))
+					await NotifyAboutManualQuizChecking(checking).ConfigureAwait(false);
 			}
 
 			return Redirect(nextUrl);
@@ -515,7 +520,7 @@ namespace uLearn.Web.Controllers
 				var isQuizScoredMaximum = userQuizzesRepo.IsQuizScoredMaximum(courseId, slideId, userId);
 				if (usedAttemptsCount < maxTriesCount && !isQuizScoredMaximum)
 				{
-					await visitsRepo.UpdateScoreForVisit(courseId, slideId, userId).ConfigureAwait(false);
+					await visitsRepo.UpdateScoreForVisit(courseId, slideId, slide.MaxScore, userId).ConfigureAwait(false);
 					if (isLti)
 						LtiUtils.SubmitScore(courseId, slide, userId);
 				}

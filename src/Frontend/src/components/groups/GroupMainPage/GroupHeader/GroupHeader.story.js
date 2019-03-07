@@ -6,6 +6,6 @@ import GroupHeader from './GroupHeader';
 import './groupHeader.less';
 
 storiesOf('Group/GroupHeader', module)
-	.add('default', () => (
-		<GroupHeader onTabChange={action('click')} filter="hello"/>
-	));
+.add('default', () => (
+	<GroupHeader onTabChange={action('click')} filter="hello" />
+));

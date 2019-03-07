@@ -34,5 +34,5 @@ window.renderReactComponent = function (componentType, element, props) {
 
 	let Component = components[componentType];
 
-		ReactDOM.render(<Provider store={window.ulearnReduxStore}><Component {...props}/></Provider>, element);
+	ReactDOM.render(<Component {...props} />, element);
 };

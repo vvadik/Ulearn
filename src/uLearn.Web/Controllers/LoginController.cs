@@ -28,6 +28,7 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		[ValidateInput(false)]
 		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> Index(LoginViewModel model, string returnUrl)
 		{
 			if (ModelState.IsValid)
@@ -79,6 +80,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
 		public ActionResult ExternalLogin(string provider, string returnUrl)
 		{
 			// Request a redirect to the external login provider
@@ -122,6 +124,7 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		[ValidateInput(false)]
 		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> ExternalLoginConfirmation(ExternalLoginConfirmationViewModel model, string returnUrl)
 		{
 			if (User.Identity.IsAuthenticated)
@@ -209,6 +212,7 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		[ULearnAuthorize]
 		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
 		public ActionResult DoLinkLogin(string provider, string returnUrl="")
 		{
 			// Request a redirect to the external login provider to link a login for the current user
@@ -264,6 +268,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
 		public ActionResult LogOff()
 		{
 			AuthenticationManager.Logout(HttpContext);

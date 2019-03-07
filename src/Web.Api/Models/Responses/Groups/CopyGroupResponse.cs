@@ -6,10 +6,10 @@ namespace Ulearn.Web.Api.Models.Responses.Groups
 	[DataContract]
 	public class CopyGroupResponse : SuccessResponse
 	{
-		[DataMember(Name = "id")]
-		public int GroupId { get; set; }
+		[DataMember]
+		public int Id { get; set; }
 		
-		[DataMember(Name = "api_url")]
+		[DataMember]
 		public string ApiUrl { get; set; }
 	}
 }

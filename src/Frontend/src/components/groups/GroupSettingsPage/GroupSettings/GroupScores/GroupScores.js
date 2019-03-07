@@ -1,13 +1,13 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Checkbox from "@skbkontur/react-ui/components/Checkbox/Checkbox";
 
 import styles from './groupScores.less';
 
 const mapToServerName = {
-	groupScores: 'are_additional_scores_enabled_in_this_group',
-	allGroupScores: 'are_additional_scores_enabled_for_all_groups',
-	unitScores: 'can_instructor_set_additional_score_in_some_unit',
+	groupScores: 'areAdditionalScoresEnabledInThisGroup',
+	allGroupScores: 'areAdditionalScoresEnabledForAllGroups',
+	unitScores: 'canInstructorSetAdditionalScoreInSomeUnit',
 };
 
 class GroupScores extends Component {
@@ -15,24 +15,24 @@ class GroupScores extends Component {
 	render() {
 		return (
 			<label className={styles["settings-checkbox"]}>
-				{ this.renderCheckbox() }
+				{this.renderCheckbox()}
 			</label>
 		);
 	}
 
 	renderCheckbox() {
-		const { score } = this.props;
+		const {score} = this.props;
 		const isChecked = score[mapToServerName.groupScores] || score[mapToServerName.allGroupScores] || false;
 		const isDisabled = score[mapToServerName.allGroupScores] || !score[mapToServerName.unitScores];
 
 		return (
 			<React.Fragment>
 				<Checkbox checked={isChecked} disabled={isDisabled} onChange={this.onChange}>
-					{ score.name }
+					{score.name}
 				</Checkbox>
 
 				<p className={styles["settings-comment"]}>
-					{ score.description }
+					{score.description}
 				</p>
 
 				<div className={styles["settings-comment"]}>

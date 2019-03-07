@@ -13,6 +13,7 @@ using Database.Models;
 using log4net;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Z.EntityFramework.Plus;
 
 namespace Database.DataContexts
 {
@@ -176,6 +177,20 @@ namespace Database.DataContexts
 			notification.InitiatedById = initiatedUserId;
 			notification.CourseId = courseId;
 			db.Notifications.Add(notification);
+
+			await db.SaveChangesAsync();
+		}
+		
+		public async Task RemoveNotifications(Guid courseVersionId)
+		{
+			// Cascade delete not work: multiple cascade paths
+			var forRemove = db.Notifications.OfType<UploadedPackageNotification>().Where(n => n.CourseVersionId == courseVersionId).Cast<AbstractPackageNotification>()
+				.Concat(db.Notifications.OfType<PublishedPackageNotification>().Where(n => n.CourseVersionId == courseVersionId)).ToList();
+
+			if (forRemove.Count == 0)
+				return;
+
+			db.Notifications.RemoveRange(forRemove);
 
 			await db.SaveChangesAsync();
 		}

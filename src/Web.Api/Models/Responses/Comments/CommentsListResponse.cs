@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using JetBrains.Annotations;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Common;
 
@@ -9,50 +11,54 @@ namespace Ulearn.Web.Api.Models.Responses.Comments
 	[DataContract]
 	public class CommentsListResponse : PaginatedResponse
 	{
-		[DataMember(Name = "comments")]
+		[DataMember]
 		public List<CommentResponse> TopLevelComments { get; set; }
 	}
 
 	[DataContract]
 	public class CommentResponse
 	{
-		[DataMember(Name = "id")]
+		[DataMember]
 		public int Id { get; set; }
 		
-		[DataMember(Name = "author")]
+		[DataMember]
 		public ShortUserInfo Author { get; set; }
 		
-		[DataMember(Name = "text")]
+		[DataMember]
 		public string Text { get; set; }
 		
-		[DataMember(Name = "rendered_text")]
+		[DataMember]
 		public string RenderedText { get; set; }
 		
-		[DataMember(Name = "publish_time")]
+		[DataMember]
 		public DateTime PublishTime { get; set; }
 		
-		[DataMember(Name = "is_approved")]
+		[DataMember]
 		public bool IsApproved { get; set; }
 
-		[DataMember(Name = "is_correct_answer", EmitDefaultValue = false)]
+		[DataMember(EmitDefaultValue = false)]
 		public bool? IsCorrectAnswer { get; set; }
 
-		[DataMember(Name = "is_pinned_to_top", EmitDefaultValue = false)]
+		[DataMember(EmitDefaultValue = false)]
 		public bool? IsPinnedToTop { get; set; }
+		
+		[DataMember]
+		public bool IsLiked { get; set; }
 
-		[DataMember(Name = "likes_count")]
+		[DataMember]
 		public int LikesCount { get; set; }
 		
-		[DataMember(Name = "replies", EmitDefaultValue = false)]
+		[NotNull]
+		[DataMember]
 		public List<CommentResponse> Replies { get; set; }
 		
-		[DataMember(Name = "course_id", EmitDefaultValue = false)]
+		[DataMember(EmitDefaultValue = false)]
 		public string CourseId { get; set; }
 		
-		[DataMember(Name = "slide_id", EmitDefaultValue = false)]
+		[DataMember(EmitDefaultValue = false)]
 		public Guid? SlideId { get; set; }
 		
-		[DataMember(Name = "reply_to", EmitDefaultValue = false)]
+		[DataMember(EmitDefaultValue = false)]
 		public int? ParentCommentId { get; set; }
 	}
 }

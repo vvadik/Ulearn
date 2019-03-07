@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import moment from "moment";
 import 'moment/locale/ru';
@@ -21,11 +21,11 @@ class GroupStudents extends Component {
 	};
 
 	render() {
-		const { students, group } = this.props;
-		const { studentIds, modalOpen } = this.state;
+		const {students} = this.props;
+		const {studentIds, modalOpen} = this.state;
 		const studentsArrayOfIds = students.map(item => item.user.id);
 
-		return(
+		return (
 			<React.Fragment>
 				<div className={styles["actions-block"]}>
 					<Checkbox
@@ -36,69 +36,68 @@ class GroupStudents extends Component {
 					{this.renderStudentActions()}
 				</div>
 				{this.renderStudents()}
-				{ modalOpen &&
+				{modalOpen &&
 				<CopyStudentsModal
-					currentGroupId={group.id}
 					studentIds={studentIds}
-					onClose={this.onCloseModal}/> }
+					onClose={this.onCloseModal} />}
 			</React.Fragment>
 		)
 	}
 
 	renderStudentActions() {
-		const { studentIds } = this.state;
- 		let buttonClass = `${styles.action}`;
+		const {studentIds} = this.state;
+		let buttonClass = `${styles.action}`;
 
 		return (
-		<div className={styles["action-buttons"]}>
-			<button
-				className={studentIds.size > 0 ? `${buttonClass} ${styles["button-copy"]}` : buttonClass}
-				disabled={studentIds.size === 0}
-				onClick={this.onOpenModal}>
-				<Gapped gap={3}>
-					<Icon name="Copy" />
-					<span className={styles["action-text"]}>Скопировать в группу...</span>
-				</Gapped>
-			</button>
-			<button
-				className={studentIds.size > 0 ? `${buttonClass} ${styles["button-delete"]}` : buttonClass}
-				disabled={studentIds.size === 0}
-				onClick={this.onDeleteStudents}
+			<div className={styles["action-buttons"]}>
+				<button
+					className={studentIds.size > 0 ? `${buttonClass} ${styles["button-copy"]}` : buttonClass}
+					disabled={studentIds.size === 0}
+					onClick={this.onOpenModal}>
+					<Gapped gap={3}>
+						<Icon name="Copy" />
+						<span className={styles["action-text"]}>Скопировать в группу...</span>
+					</Gapped>
+				</button>
+				<button
+					className={studentIds.size > 0 ? `${buttonClass} ${styles["button-delete"]}` : buttonClass}
+					disabled={studentIds.size === 0}
+					onClick={this.onDeleteStudents}
 				>
-				<Gapped gap={3}>
-					<Icon name="Trash" />
-					<span className={styles["action-text"]}>Исключить из группы</span>
-				</Gapped>
-			</button>
-		</div>
+					<Gapped gap={3}>
+						<Icon name="Trash" />
+						<span className={styles["action-text"]}>Исключить из группы</span>
+					</Gapped>
+				</button>
+			</div>
 		);
 	}
 
 	renderStudents() {
-		const { students, systemAccesses, isSysAdmin } = this.props;
-		const { studentIds } = this.state;
+		const {students, systemAccesses, isSysAdmin} = this.props;
+		const {studentIds} = this.state;
 		const grantTime = (grantTime) => moment(grantTime).format();
 
 		return (
 			<div>
 				{students
-					.sort((a, b) => a.user.visible_name.localeCompare(b.user.visible_name))
-					.map(item =>
-						<div className={styles["student-block"]}
-							 key={item.user.id}>
-							<Checkbox
-								checked={studentIds.has(item.user.id) || false}
-								onChange={(_, value) => this.onCheckStudent(item.user.id, _, value)}>
-								<Avatar user={item.user} size='small' />
-								<Profile
-									user={item.user}
-									systemAccesses={systemAccesses}
-									isSysAdmin={isSysAdmin} /> { item.adding_time && <span className={styles.addingTime}>
-									{ `${ getGenderForm(item.user.gender, 'вступила', 'вступил') }
-									${ moment(grantTime(item.adding_time)).fromNow() }` }</span> }
-							</Checkbox>
-						</div>
-					)
+				.sort((a, b) => a.user.visibleName.localeCompare(b.user.visible_name))
+				.map(item =>
+					<div className={styles["student-block"]}
+						 key={item.user.id}>
+						<Checkbox
+							checked={studentIds.has(item.user.id) || false}
+							onChange={(_, value) => this.onCheckStudent(item.user.id, _, value)}>
+							<Avatar user={item.user} size='small' />
+							<Profile
+								user={item.user}
+								systemAccesses={systemAccesses}
+								isSysAdmin={isSysAdmin} /> {item.addingTime && <span className={styles.addingTime}>
+									{`${getGenderForm(item.user.gender, 'вступила', 'вступил')}
+									${moment(grantTime(item.addingTime)).fromNow()}`}</span>}
+						</Checkbox>
+					</div>
+				)
 				}
 			</div>
 		)
@@ -117,7 +116,7 @@ class GroupStudents extends Component {
 	};
 
 	onCheckAllStudents = (_, value) => {
-		const { students } = this.props;
+		const {students} = this.props;
 		const studentsToArrayOfIds = students.map(item => item.user.id);
 
 		if (value) {
@@ -132,7 +131,7 @@ class GroupStudents extends Component {
 	};
 
 	onCheckStudent = (id, _, value) => {
-		const { studentIds } = this.state;
+		const {studentIds} = this.state;
 		const studentsCopy = new Set(studentIds);
 
 		if (value) {
@@ -154,7 +153,6 @@ class GroupStudents extends Component {
 
 GroupStudents.propTypes = {
 	students: PropTypes.array,
-	group: PropTypes.object,
 	onDeleteStudents: PropTypes.func,
 	isSysAdmin: PropTypes.bool,
 	systemAccesses: PropTypes.array,

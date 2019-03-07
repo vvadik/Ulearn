@@ -18,7 +18,7 @@ class CreateGroupModal extends Component {
 	};
 
 	render() {
-		const { onCloseModal } = this.props;
+		const {onCloseModal} = this.props;
 
 		return (
 			<Modal onClose={onCloseModal} width="100%" alignTop={true}>
@@ -43,7 +43,7 @@ class CreateGroupModal extends Component {
 	}
 
 	renderModalBody() {
-		const { name, hasError } = this.state;
+		const {name, hasError} = this.state;
 
 		return (
 			<div className={styles["modal-content"]}>
@@ -67,8 +67,8 @@ class CreateGroupModal extends Component {
 	}
 
 	onSubmit = async (e) => {
-		const { name } = this.state;
-		const { onCloseModal, onSubmit, courseId } = this.props;
+		const {name} = this.state;
+		const {onCloseModal, onSubmit, courseId} = this.props;
 
 		e.preventDefault();
 
@@ -80,20 +80,20 @@ class CreateGroupModal extends Component {
 			return;
 		}
 
-		this.setState({ sending: true, });
+		this.setState({loading: true,});
 		try {
 			const newGroup = await api.groups.createGroup(courseId, name);
 			onCloseModal();
 			onSubmit(newGroup.id);
-		} catch(e) {
+		} catch (e) {
 			console.error(e);
 		} finally {
-			this.setState({ sending: false, });
+			this.setState({loading: false,});
 		}
 	};
 
 	checkError = () => {
-		const { error } = this.state;
+		const {error} = this.state;
 
 		if (!error) {
 			return null;

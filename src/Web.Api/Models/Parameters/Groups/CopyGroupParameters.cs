@@ -1,12 +1,12 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Ulearn.Web.Api.Models.Parameters.Groups
 {
 	public class CopyGroupParameters
 	{
-		[Required]
 		[FromQuery(Name = "destination_course_id")]
+		[BindRequired]
 		public string DestinationCourseId { get; set; }
 
 		[FromQuery(Name = "make_me_owner")]

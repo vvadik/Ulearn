@@ -6,6 +6,6 @@ import CreateGroupModal from './CreateGroupModal';
 import './createGroupModal.less';
 
 storiesOf('Group/CreateGroupModal', module)
-	.add('default', () => (
-		<CreateGroupModal onCloseModal={action('onCloseModal')} courseId={'123'}/>
-	));
+.add('default', () => (
+	<CreateGroupModal onCloseModal={action('onCloseModal')} courseId={'123'} />
+));

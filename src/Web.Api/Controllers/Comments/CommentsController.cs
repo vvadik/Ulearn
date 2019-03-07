@@ -17,12 +17,13 @@ using Serilog;
 using Swashbuckle.AspNetCore.Annotations;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
+using Ulearn.Web.Api.Authorization;
 using Ulearn.Web.Api.Models.Parameters.Comments;
 using Ulearn.Web.Api.Models.Responses.Comments;
 
 namespace Ulearn.Web.Api.Controllers.Comments
 {
-	[Route("comments/in/{courseId}/")]
+	[Route("/comments")]
 	public class CommentsController : BaseCommentController
 	{
 		private readonly ICommentPoliciesRepo commentPoliciesRepo;
@@ -38,9 +39,12 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		/// <summary>
 		/// Комментарии под слайдом
 		/// </summary>
-		[HttpGet("{slideId:guid}")]
-		public async Task<ActionResult<CommentsListResponse>> SlideComments(string courseId, Guid slideId, [FromQuery] SlideCommentsParameters parameters)
+		[HttpGet]
+		public async Task<ActionResult<CommentsListResponse>> SlideComments([FromQuery] SlideCommentsParameters parameters)
 		{
+			var courseId = parameters.CourseId;
+			var slideId = parameters.SlideId;
+			
 			if (parameters.ForInstructors)
 			{
 				if (!IsAuthenticated)
@@ -65,12 +69,17 @@ namespace Ulearn.Web.Api.Controllers.Comments
 
 			var replies = await commentsRepo.GetRepliesAsync(comments.Select(c => c.Id)).ConfigureAwait(false);
 			var allCommentsIds = comments.Concat(replies.SelectMany(g => g.Value)).Select(c => c.Id);
-			var commentLikesCount = await commentLikesRepo.GetLikesCountsAsync(allCommentsIds).ConfigureAwait(false);
+
+			var commentLikesCountTask = commentLikesRepo.GetLikesCountsAsync(allCommentsIds);
+			var likedByUserCommentsIdsTask = commentLikesRepo.GetCommentsLikedByUserAsync(courseId, parameters.SlideId, UserId);
+			await Task.WhenAll(commentLikesCountTask, likedByUserCommentsIdsTask).ConfigureAwait(false);
+			var commentLikesCount = commentLikesCountTask.Result;
+			var likedByUserCommentsIds = likedByUserCommentsIdsTask.Result.ToHashSet();
 
 			return new CommentsListResponse
 			{
-				TopLevelComments = BuildCommentsListResponse(comments, canUserSeeNotApprovedComments, replies, commentLikesCount, addCourseIdAndSlideId: false, addParentCommentId: false, addReplies: true),
-				PaginationResponse = new PaginationResponse
+				TopLevelComments = BuildCommentsListResponse(comments, canUserSeeNotApprovedComments, replies, commentLikesCount, likedByUserCommentsIds, addCourseIdAndSlideId: false, addParentCommentId: false, addReplies: true),
+				Pagination = new PaginationResponse
 				{
 					Offset = parameters.Offset,
 					Count = comments.Count,
@@ -83,12 +92,15 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		/// Добавить комментарий под слайдом
 		/// </summary>
 		[Authorize]
+		[HttpPost]
 		[SwaggerResponse((int)HttpStatusCode.TooManyRequests, "You are commenting too fast. Please wait some time")]
 		[SwaggerResponse((int)HttpStatusCode.RequestEntityTooLarge, "Your comment is too large")]
-		[HttpPost("{slideId:guid}")]
-		public async Task<ActionResult<CreateCommentResponse>> CreateComment(string courseId, Guid slideId, [FromBody] CreateCommentParameters parameters)
+		public async Task<ActionResult<CreateCommentResponse>> CreateComment([FromQuery] CourseAuthorizationParameters courseAuthorizationParameters, CreateCommentParameters parameters)
 		{
-			if (parameters.IsForInstructorsOnly)
+			var courseId = courseAuthorizationParameters.CourseId;
+			var slideId = parameters.SlideId;
+			
+			if (parameters.ForInstructors)
 			{
 				var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
 				if (!isInstructor)
@@ -99,12 +111,12 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			{
 				var parentComment = await commentsRepo.FindCommentByIdAsync(parameters.ParentCommentId.Value).ConfigureAwait(false);
 				if (parentComment == null || !parentComment.CourseId.EqualsIgnoreCase(courseId) || parentComment.SlideId != slideId || !parentComment.IsTopLevel)
-					return BadRequest(new ErrorResponse($"`reply_to` comment {parameters.ParentCommentId.Value} not found, belongs to other course, other slide or is not a top-level comment"));
+					return BadRequest(new ErrorResponse($"`parentCommentId` comment {parameters.ParentCommentId.Value} not found, belongs to other course, other slide or is not a top-level comment"));
 				
 
-				if (parentComment.IsForInstructorsOnly != parameters.IsForInstructorsOnly)
+				if (parentComment.IsForInstructorsOnly != parameters.ForInstructors)
 					return BadRequest(new ErrorResponse(
-						$"`reply_to` comment {parameters.ParentCommentId.Value} is {(parentComment.IsForInstructorsOnly ? "" : "not")} for instructors, but new one {(parameters.IsForInstructorsOnly ? "is" : "is not")}"
+						$"`parentCommentId` comment {parameters.ParentCommentId.Value} is {(parentComment.IsForInstructorsOnly ? "" : "not")} for instructors, but new one {(parameters.ForInstructors ? "is" : "is not")}"
 					));
 			}
 			
@@ -120,7 +132,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 				return StatusCode((int)HttpStatusCode.RequestEntityTooLarge, new ErrorResponse($"Your comment is too large. Max allowed length is {CommentsPolicy.MaxCommentLength} chars"));
 			
 			var parentCommentId = parameters.ParentCommentId ?? -1;
-			var comment = await commentsRepo.AddCommentAsync(UserId, courseId, slideId, parentCommentId, parameters.IsForInstructorsOnly, parameters.Text).ConfigureAwait(false);
+			var comment = await commentsRepo.AddCommentAsync(UserId, courseId, slideId, parentCommentId, parameters.ForInstructors, parameters.Text).ConfigureAwait(false);
 			
 			if (comment.IsApproved)
 				await NotifyAboutNewCommentAsync(comment).ConfigureAwait(false);
@@ -128,7 +140,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			var url = Url.Action(new UrlActionContext { Action = nameof(CommentController.Comment), Controller = "Comment", Values = new { commentId = comment.Id } });
 			return new CreateCommentResponse
 			{
-				CommentId = comment.Id,
+				Id = comment.Id,
 				ApiUrl = url,
 			};
 		}

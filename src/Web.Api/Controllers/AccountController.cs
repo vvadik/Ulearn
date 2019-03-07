@@ -137,12 +137,12 @@ namespace Ulearn.Web.Api.Controllers
 			return new CourseRolesResponse
 			{
 				IsSystemAdministrator = isSystemAdministrator,
-				Roles = rolesByCourse.Where(kvp => kvp.Value != CourseRoleType.Student).Select(kvp => new CourseRoleResponse
+				CourseRoles = rolesByCourse.Where(kvp => kvp.Value != CourseRoleType.Student).Select(kvp => new CourseRoleResponse
 				{
 					CourseId = kvp.Key,
 					Role = kvp.Value,
 				}).ToList(),
-				Accesses = courseAccessesByCourseId,
+				CourseAccesses = courseAccessesByCourseId,
 			};
 		}
 

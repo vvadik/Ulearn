@@ -7,71 +7,72 @@ import Avatar from "../../../../common/Avatar/Avatar";
 import styles from './comboboxInstructorsSearch.less';
 
 class ComboboxInstructorsSearch extends Component {
-	state = { query: '' };
+	state = {query: ''};
 
-	render () {
-		const { selected } = this.props;
+	render() {
+		const {selected} = this.props;
 		return (
-		<ComboBox
-			getItems={this.getItems}
-			size="small"
-			width="100%"
-			value={selected}
-			renderItem={this.renderItem}
-			renderValue={this.renderItem}
-			renderNotFound={this.renderNotFound}
-			onChange={this.onChangeItem}
-			onInputChange={query => this.setState({ query })}
-			placeholder="Начните вводить имя, фамилию или логин преподавателя"/>
+			<ComboBox
+				getItems={this.getItems}
+				size="small"
+				width="100%"
+				value={selected}
+				renderItem={this.renderItem}
+				renderValue={this.renderItem}
+				renderNotFound={this.renderNotFound}
+				onChange={this.onChangeItem}
+				onInputChange={query => this.setState({query})}
+				placeholder="Начните вводить имя, фамилию или логин преподавателя" />
 		);
 	}
 
 	getItems = (query) => {
-		const { accesses, owner } = this.props;
+		const {accesses, owner} = this.props;
 		const includes = (str, substr) => str.toLowerCase().includes(substr.toLowerCase());
 		const isAddedUser = (item) => {
 			return (owner.id !== item.id) &&
-			(accesses.filter(i => i.user.id === item.id)).length === 0;
+				(accesses.filter(i => i.user.id === item.id)).length === 0;
 		};
 
 		return api.users.getCourseInstructors(this.props.courseId)
-			.then(json => {
-				return json.instructors
-					.filter(item => {
-						return (isAddedUser(item)) &&
-							(includes(item.visible_name, query) ||
-							includes(item.login, query))
-					})
-					.map(item => ({
-								value: item.id,
-								label: item.visible_name,
-								...item,
-							}
-						)
-					)
-				})
-			.catch(error => {
-				console.error(error);
-				return [];
-			});
+		.then(json => {
+			return json.users
+			.map(item => item.user)
+			.filter(item => {
+				return (isAddedUser(item)) &&
+					(includes(item.visibleName, query) ||
+						includes(item.login, query))
+			})
+			.map(item => ({
+						value: item.id,
+						label: item.visibleName,
+						...item,
+					}
+				)
+			)
+		})
+		.catch(error => {
+			console.error(error);
+			return [];
+		});
 	};
 
 	renderItem = (item) => {
 		const name = item.label;
 
 		return (
-		<div className={styles["teacher"]}>
-			<Avatar user={item} size='small'/>
-			<span>{name}</span>
-			<span className={styles["teacher-login"]}>логин: {item.login}</span>
-		</div>
+			<div className={styles["teacher"]}>
+				<Avatar user={item} size='small' />
+				<span>{name}</span>
+				<span className={styles["teacher-login"]}>логин: {item.login}</span>
+			</div>
 		)
 	};
 
 	renderNotFound = () => {
 		const msg = this.state.query
 			? 'В этом курсе нет преподавателей c таким именем'
-		    : 'В этом курсе больше нет преподавателей';
+			: 'В этом курсе больше нет преподавателей';
 
 		return <span>{msg}</span>;
 	};

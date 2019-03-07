@@ -11,13 +11,6 @@
 		{
 			new SelectListItemWithAttributes
 			{
-				Text = "Все пользователи",
-				Value = "all",
-				Selected = Model.SelectedGroupsIds.Contains("all"),
-				HtmlAttributes = new { data_exclusive = "true" }
-			},
-			new SelectListItemWithAttributes
-			{
 				Text = "Мои группы",
 				Value = "",
 				Selected = Model.SelectedGroupsIds.Count == 0 || Model.SelectedGroupsIds.Any(string.IsNullOrEmpty),
@@ -26,11 +19,18 @@
 		};
 		if (User.HasAccessFor(Model.CourseId, CourseRole.CourseAdmin))
 		{
-			groupsListItems.Insert(1, new SelectListItemWithAttributes
+			groupsListItems.Add(new SelectListItemWithAttributes
 			{
 				Text = "Ни в одной группе",
 				Value = "not-in-group",
 				Selected = Model.SelectedGroupsIds.Contains("not-in-group"),
+				HtmlAttributes = new { data_exclusive = "true" }
+			});
+			groupsListItems.Add(new SelectListItemWithAttributes
+			{
+				Text = "Все пользователи",
+				Value = "all",
+				Selected = Model.SelectedGroupsIds.Contains("all"),
 				HtmlAttributes = new { data_exclusive = "true" }
 			});
 		}

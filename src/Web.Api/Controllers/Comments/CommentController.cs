@@ -26,7 +26,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 {
 	[ProducesResponseType((int) HttpStatusCode.OK)]
 	[SwaggerResponse((int) HttpStatusCode.Forbidden, "You don't have access to this comment")]
-	[Route("comment/{commentId:int:min(0)}")]
+	[Route("/comments/{commentId:int:min(0)}")]
 	public class CommentController : BaseCommentController
 	{
 		public CommentController(ILogger logger, IWebCourseManager courseManager, UlearnDb db,
@@ -86,13 +86,14 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			var canUserSeeNotApprovedComments = await CanUserSeeNotApprovedCommentsAsync(UserId, comment.CourseId).ConfigureAwait(false);
 			
 			DefaultDictionary<int, int> likesCount;
+			var likedByUserCommentsIds = (await commentLikesRepo.GetCommentsLikedByUserAsync(comment.CourseId, comment.SlideId, UserId).ConfigureAwait(false)).ToHashSet();
 			if (parameters.WithReplies)
 			{
 				var replies = await commentsRepo.GetRepliesAsync(commentId).ConfigureAwait(false);
 				likesCount = await commentLikesRepo.GetLikesCountsAsync(replies.Append(comment).Select(c => c.Id)).ConfigureAwait(false);
 				return BuildCommentResponse(
 					comment,
-					canUserSeeNotApprovedComments, new DefaultDictionary<int, List<Comment>> { {commentId, replies }}, likesCount,
+					canUserSeeNotApprovedComments, new DefaultDictionary<int, List<Comment>> { {commentId, replies }}, likesCount, likedByUserCommentsIds,
 					addCourseIdAndSlideId: true, addParentCommentId: true, addReplies: true
 				);
 			}
@@ -100,7 +101,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			likesCount = await commentLikesRepo.GetLikesCountsAsync(new [] { commentId }).ConfigureAwait(false);
 			return BuildCommentResponse(
 				comment,
-				canUserSeeNotApprovedComments, new DefaultDictionary<int, List<Comment>>(), likesCount,
+				canUserSeeNotApprovedComments, new DefaultDictionary<int, List<Comment>>(), likesCount, likedByUserCommentsIds,
 				addCourseIdAndSlideId: true, addParentCommentId: true, addReplies: false
 			);
 		}
@@ -145,8 +146,8 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			if (parameters.IsApproved.HasValue)
 				await UpdateCommentIsApprovedAsync(comment, parameters.IsApproved.Value).ConfigureAwait(false);
 
-			if (parameters.IsPinned.HasValue)
-				await UpdateCommentIsPinnedAsync(comment, parameters.IsPinned.Value).ConfigureAwait(false);
+			if (parameters.IsPinnedToTop.HasValue)
+				await UpdateCommentIsPinnedAsync(comment, parameters.IsPinnedToTop.Value).ConfigureAwait(false);
 
 			if (parameters.IsCorrectAnswer.HasValue)
 				await UpdateCommentIsCorrectAnswerAsync(comment, parameters.IsCorrectAnswer.Value).ConfigureAwait(false);
@@ -222,7 +223,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 					User = BuildShortUserInfo(like.User),
 					Timestamp = like.Timestamp,
 				}).ToList(),
-				PaginationResponse = new PaginationResponse
+				Pagination = new PaginationResponse
 				{
 					Offset = parameters.Offset,
 					Count = paginatedLikes.Count,

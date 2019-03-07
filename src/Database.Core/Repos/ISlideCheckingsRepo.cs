@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -34,6 +34,5 @@ namespace Database.Repos
 		List<string> GetTopUserReviewComments(string courseId, Guid slideId, string userId, int count);
 		Task HideFromTopCodeReviewComments(string courseId, Guid slideId, string userId, string comment);
 		List<ExerciseCodeReview> GetAllReviewComments(string courseId, Guid slideId);
-		AbstractManualSlideChecking FindManualCheckingById(int id);
 	}
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -206,11 +206,6 @@ namespace Database.Repos
 			return db.Set<T>().Find(id);
 		}
 		
-		public AbstractManualSlideChecking FindManualCheckingById(int id)
-		{
-			return (AbstractManualSlideChecking) FindManualCheckingById<ManualQuizChecking>(id) ?? FindManualCheckingById<ManualExerciseChecking>(id);
-		}
-
 		public bool IsProhibitedToSendExerciseToManualChecking(string courseId, Guid slideId, string userId)
 		{
 			return GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId).Any(c => c.ProhibitFurtherManualCheckings);

@@ -5,13 +5,13 @@ namespace Ulearn.Web.Api.Models.Common
 	[DataContract]
 	public class ShortCourseInfo
 	{
-		[DataMember(Name = "id")]
+		[DataMember]
 		public string Id { get; set; }
 		
-		[DataMember(Name = "title")]
+		[DataMember]
 		public string Title { get; set; }
 		
-		[DataMember(Name = "api_url")]
+		[DataMember]
 		public string ApiUrl { get; set; }
 	}
 }

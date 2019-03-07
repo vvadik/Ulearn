@@ -9,52 +9,52 @@ namespace Ulearn.Web.Api.Models.Responses.Groups
 	[DataContract]
 	public class GroupInfo : SuccessResponse
 	{
-		[DataMember(Name = "id")]
+		[DataMember]
 		public int Id { get; set; }
 
-		[DataMember(Name = "create_time")]
+		[DataMember]
 		public DateTime? CreateTime { get; set; }
 		
-		[DataMember(Name = "name")]
+		[DataMember]
 		public string Name { get; set; }
 		
-		[DataMember(Name = "is_archived")]
+		[DataMember]
 		public bool IsArchived { get; set; }
 
-		[DataMember(Name = "owner")]
+		[DataMember]
 		public ShortUserInfo Owner { get; set; }
 		
-		[DataMember(Name = "invite_hash")]
+		[DataMember]
 		public Guid InviteHash { get; set; }
 		
-		[DataMember(Name = "is_invite_link_enabled")]
+		[DataMember]
 		public bool IsInviteLinkEnabled { get; set; }
 		
-		[DataMember(Name = "are_you_student", EmitDefaultValue = false)]
+		[DataMember(EmitDefaultValue = false)]
 		public bool? AreYouStudent { get; set; }
 		
 	
-		[DataMember(Name = "is_manual_checking_enabled")]
+		[DataMember]
 		public bool IsManualCheckingEnabled { get; set; }
 		
-		[DataMember(Name = "is_manual_checking_enabled_for_old_solutions")]
+		[DataMember]
 		public bool IsManualCheckingEnabledForOldSolutions { get; set; }
 		
-		[DataMember(Name = "default_prohibit_further_review")]
+		[DataMember]
 		public bool DefaultProhibitFurtherReview { get; set; }
 		
-		[DataMember(Name = "can_students_see_group_progress")]
+		[DataMember]
 		public bool CanStudentsSeeGroupProgress { get; set; }
 		
 		
-		[DataMember(Name = "students_count", EmitDefaultValue = false)]
+		[DataMember(EmitDefaultValue = false)]
 		public int? StudentsCount { get; set; }
 		
-		[DataMember(Name = "accesses", EmitDefaultValue = false)]
+		[DataMember(EmitDefaultValue = false)]
 		public List<GroupAccessesInfo> Accesses { get; set; }
 		
 		
-		[DataMember(Name = "api_url", EmitDefaultValue = false)]
+		[DataMember(EmitDefaultValue = false)]
 		public string ApiUrl { get; set; }
 	}
 }

@@ -7,16 +7,20 @@ using System.Threading.Tasks;
 using Database.Migrations;
 using Database.Models;
 using EntityFramework.Functions;
+using log4net;
 using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace Database.DataContexts
 {
 	public class ULearnDb : IdentityDbContext<ApplicationUser>
 	{
+		private readonly ILog log = LogManager.GetLogger(typeof(ULearnDb));
 		public ULearnDb()
 			: base("DefaultConnection", throwIfV1Schema: false)
 		{
 			System.Data.Entity.Database.SetInitializer(new MigrateDatabaseToLatestVersion<ULearnDb, Configuration>());
+			if(log.IsDebugEnabled)
+				Database.Log = log.Debug;
 		}
 
 		protected override void OnModelCreating(DbModelBuilder modelBuilder)

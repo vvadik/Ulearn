@@ -179,7 +179,7 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public ActionResult SlideCodeReviewComments(string courseId, Guid slideId)
 		{
-			var comments = slideCheckingsRepo.GetAllReviewComments(courseId, slideId);
+			var comments = slideCheckingsRepo.GetLastYearReviewComments(courseId, slideId);
 			return PartialView("_SlideCodeReviewComments", comments);
 		}
 		
@@ -201,8 +201,15 @@ namespace uLearn.Web.Controllers
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 				
 			var comment = await slideCheckingsRepo.AddExerciseCodeReviewComment(currentUserId, reviewId, text).ConfigureAwait(false);
+
 			if (review.ExerciseCheckingId.HasValue && review.ExerciseChecking.IsChecked)
-				await NotifyAboutCodeReviewComment(comment).ConfigureAwait(false);
+			{
+				var course = courseManager.FindCourse(submissionCourseId);
+				var slideId = review.ExerciseChecking.SlideId;
+				var unit = course?.FindUnitBySlideId(slideId);
+				if (unit != null && unitsRepo.IsUnitVisibleForStudents(course, unit.Id))
+					await NotifyAboutCodeReviewComment(comment).ConfigureAwait(false);
+			}
 
 			return PartialView("_ExerciseReviewComment", comment);
 		}
@@ -262,11 +269,13 @@ namespace uLearn.Web.Controllers
 				await slideCheckingsRepo.MarkManualCheckingAsChecked(checking, score).ConfigureAwait(false);
 				if (prohibitFurtherReview.HasValue && prohibitFurtherReview.Value)
 					await slideCheckingsRepo.ProhibitFurtherExerciseManualChecking(checking).ConfigureAwait(false);
-				await visitsRepo.UpdateScoreForVisit(checking.CourseId, checking.SlideId, checking.UserId).ConfigureAwait(false);
+				await visitsRepo.UpdateScoreForVisit(checking.CourseId, checking.SlideId, slide.MaxScore, checking.UserId).ConfigureAwait(false);
 
 				transaction.Commit();
 
-				await NotifyAboutManualExerciseChecking(checking).ConfigureAwait(false);
+				var unit = course.FindUnitBySlideId(checking.SlideId);
+				if(unit != null && unitsRepo.IsUnitVisibleForStudents(course, unit.Id))
+					await NotifyAboutManualExerciseChecking(checking).ConfigureAwait(false);
 			}
 
 			return Redirect(nextUrl);
@@ -338,7 +347,7 @@ namespace uLearn.Web.Controllers
 			if (exerciseScore == slide.Scoring.CodeReviewScore)
 				await slideCheckingsRepo.ProhibitFurtherExerciseManualChecking(checking).ConfigureAwait(false);
 			
-			await visitsRepo.UpdateScoreForVisit(courseId, slideId, userId).ConfigureAwait(false);
+			await visitsRepo.UpdateScoreForVisit(courseId, slideId, slide.MaxScore, userId).ConfigureAwait(false);
 
 			await NotifyAboutManualExerciseChecking(checking).ConfigureAwait(false);
 

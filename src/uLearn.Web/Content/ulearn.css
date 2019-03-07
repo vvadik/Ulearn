@@ -116,7 +116,7 @@
 	border-bottom-color: inherit;
 }
 
-.legacy-page .popover-trigger:hover, 
+.legacy-page .popover-trigger:hover,
 .legacy-page .popover-trigger:focus,
 .legacy-page .popover-trigger:active {
 	text-decoration: none;
@@ -183,8 +183,8 @@
 	background-color: #e7f1ff;
 	padding: 20px;
 	color: #000 !important;
-    margin-left: -20px;
-    margin-right: -20px;
+	margin-left: -20px;
+	margin-right: -20px;
 }
 
 .legacy-page .revealed .CodeMirror {
@@ -192,12 +192,12 @@
 }
 
 .legacy-page .revealed .CodeMirror .CodeMirror-gutters {
-    background-color: #e7f1ff;
+	background-color: #e7f1ff;
 	color: #333;
 }
 
 .legacy-page .revealed__description {
-	font-style: italic;	
+	font-style: italic;
 	margin-bottom: 15px;
 }
 
@@ -221,7 +221,7 @@
 }
 
 .legacy-page p + .revealed {
-    margin-top: 20px;
+	margin-top: 20px;
 }
 
 .legacy-page .statistic-container {
@@ -265,7 +265,7 @@
 
 .legacy-page .jumbotron-logo {
 	float: left;
-    margin: -20px 30px 0;
+	margin: -20px 30px 0;
 }
 
 .legacy-page .slide-container .container,
@@ -282,7 +282,7 @@
 }
 
 .legacy-page .slide .slide__title {
-    margin-right: 20px;
+	margin-right: 20px;
 }
 
 /* ReSharper disable Html.CssClassElementsNotFound */
@@ -403,7 +403,7 @@
 .legacy-page .nav .units-list-item .slides-list a:not(.selected):active .underline-on-parent-hover,
 .legacy-page .nav .units-list-item .slides-list a:not(.selected):focus .underline-on-parent-hover {
 	text-decoration: underline;
-} 
+}
 
 .legacy-page #nav_arrows {
 	margin-top: 10px;
@@ -411,7 +411,7 @@
 
 .legacy-page .next_button,
 .legacy-page #prev_slide_button {
-	height: 40px;	
+	height: 40px;
 }
 
 .legacy-page .right {
@@ -583,7 +583,7 @@
 }
 
 .legacy-page .quiz-button {
-	margin-top: 15px;	 
+	margin-top: 15px;
 }
 
 .legacy-page .quiz-status,
@@ -594,7 +594,7 @@
 	padding: 11px 18px;
 	color: #333;
 	font-size: 13pt;
-	margin-bottom: 30px;	
+	margin-bottom: 30px;
 }
 
 .legacy-page .exercise-block-status,
@@ -645,14 +645,14 @@
 		top: 0;
 		left: -27px;
 	}
-	
+
 	.legacy-page .quiz-block__is-question__title.with-mark .quiz-block__text {
 		margin-left: -27px;
 	}
 }
 
 .legacy-page .quiz-block__is-question__title > * {
-	vertical-align: middle;	
+	vertical-align: middle;
 }
 
 .legacy-page .hide-side-bar-button {
@@ -687,19 +687,19 @@
 	overflow: hidden;
 }
 
-	.legacy-page .video-container iframe,
-	.legacy-page .video-container object,
-	.legacy-page .video-container embed {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-	}
-	
+.legacy-page .video-container iframe,
+.legacy-page .video-container object,
+.legacy-page .video-container embed {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
 .legacy-page .video-annotations {
 	margin: 20px 0;
-}	
+}
 
 .legacy-page .suggest-video-annotations {
 	margin-bottom: 25px;
@@ -743,10 +743,10 @@
 	font-weight: bold;
 }
 
-	.legacy-page .course-name > a:hover {
-		background-color: white !important;
-		color: #428BCA;
-	}
+.legacy-page .course-name > a:hover {
+	background-color: white !important;
+	color: #428BCA;
+}
 
 .legacy-page .submitions-item {
 	cursor: pointer;
@@ -760,48 +760,48 @@
 	width: 100%;
 }
 
-	.legacy-page table.diff tbody {
-		font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
-	}
+.legacy-page table.diff tbody {
+	font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+}
 
-	.legacy-page table.diff thead th:first-child {
-		width: 30px;
-	}
+.legacy-page table.diff thead th:first-child {
+	width: 30px;
+}
 
-	.legacy-page table.diff th {
-		background: aliceblue;
-		font-weight: normal;
-		border: 1px solid lightblue /*#BBC*/;
-		text-align: center !important;
-	}
+.legacy-page table.diff th {
+	background: aliceblue;
+	font-weight: normal;
+	border: 1px solid lightblue /*#BBC*/;
+	text-align: center !important;
+}
 
-	.legacy-page table.diff tbody th {
-		font-size: 11px;
-		color: #428bca /*#886*/;
-	}
+.legacy-page table.diff tbody th {
+	font-size: 11px;
+	color: #428bca /*#886*/;
+}
 
-	.legacy-page table.diff tbody td {
-		padding: 0 .4em;
-		padding-top: .4em;
-		vertical-align: top;
-		border-right: 1px solid aliceblue;
-	}
+.legacy-page table.diff tbody td {
+	padding: 0 .4em;
+	padding-top: .4em;
+	vertical-align: top;
+	border-right: 1px solid aliceblue;
+}
 
-	.legacy-page table.diff .different:nth-child(odd) td {
-		background-color: #E99;
-	}
+.legacy-page table.diff .different:nth-child(odd) td {
+	background-color: #E99;
+}
 
-	.legacy-page table.diff .different:nth-child(even) td {
-		background-color: #FAA;
-	}
+.legacy-page table.diff .different:nth-child(even) td {
+	background-color: #FAA;
+}
 
-	.legacy-page table.diff .equals:nth-child(odd) td {
-		background-color: #9E9;
-	}
+.legacy-page table.diff .equals:nth-child(odd) td {
+	background-color: #9E9;
+}
 
-	.legacy-page table.diff .equals:nth-child(even) td {
-		background-color: #AFA;
-	}
+.legacy-page table.diff .equals:nth-child(even) td {
+	background-color: #AFA;
+}
 
 .legacy-page .expand-slide-diff-link {
 	display: inline-block;
@@ -843,46 +843,47 @@ body.lti-component {
 }
 
 /* User avatars */
-.legacy-page .user__avatar {
+/* Don't add .legacy-page in this block, because avatars are used in notifications dropdown */
+.user__avatar {
 	width: 54px;
 	height: 54px;
 	display: inline-block;
 	border-radius: 4px;
 }
 
-.legacy-page .user__avatar.small {
+.user__avatar.small {
 	width: 24px;
 	height: 24px;
 }
 
-.legacy-page .user__avatar.xsmall {
+.user__avatar.xsmall {
 	width: 18px;
 	height: 18px;
 }
 
-.legacy-page .user__avatar.large {
+.user__avatar.large {
 	width: 100px;
 	height: 100px;
 }
 
-.legacy-page .user__avatar.user__avatar__placeholder {
+.user__avatar.user__avatar__placeholder {
 	color: white;
 	font-size: 25pt;
 	text-align: center;
 	padding-top: 3px;
 }
 
-.legacy-page .user__avatar.user__avatar__placeholder.small {
+.user__avatar.user__avatar__placeholder.small {
 	font-size: 12pt;
 	padding-top: 2px;
 }
 
-.legacy-page .user__avatar.user__avatar__placeholder.xsmall {
+.user__avatar.user__avatar__placeholder.xsmall {
 	font-size: 9pt;
 	padding-top: 1px;
 }
 
-.legacy-page .user__avatar.user__avatar__placeholder.large {
+.user__avatar.user__avatar__placeholder.large {
 	font-size: 40pt;
 	padding-top: 10px;
 }
@@ -897,7 +898,7 @@ body.lti-component {
 }
 
 .legacy-page #externalLogins #socialLoginList .btn {
-	margin-bottom: 5px;	
+	margin-bottom: 5px;
 }
 
 .legacy-page #externalLogins table td {
@@ -1021,7 +1022,7 @@ body.lti-component {
 }
 
 .legacy-page .quiz-block-ordering:not(.not-movable) .quiz-block-ordering__item {
-	cursor: n-resize;	
+	cursor: n-resize;
 }
 
 .legacy-page .quiz-block-ordering.not-movable .quiz-block-ordering__item {
@@ -1037,7 +1038,7 @@ body.lti-component {
 	margin-left: 5px;
 	cursor: pointer;
 	color: #69c;
-	
+
 	height: 100%;
 	position: absolute;
 	right: 6px;
@@ -1067,7 +1068,7 @@ body.lti-component {
 
 .legacy-page .quiz-block-matching ul {
 	list-style: none;
-	padding-left: 15px;	
+	padding-left: 15px;
 }
 
 .legacy-page .quiz-block-matching .quiz-block-matching__fixed-item,
@@ -1087,7 +1088,7 @@ body.lti-component {
 }
 
 .legacy-page .quiz-block-matching:not(.not-movable) .quiz-block-matching__movable-item {
-	cursor: move;	
+	cursor: move;
 }
 
 .legacy-page .quiz-block-matching.not-movable .quiz-block-matching__item > * {
@@ -1173,7 +1174,7 @@ body.lti-component {
 
 /* Quiz Analytics */
 .legacy-page .analytics__quiz-version__info {
-	margin-top: 15px;	
+	margin-top: 15px;
 }
 
 .legacy-page table.analytics__user-answers {
@@ -1239,9 +1240,9 @@ body.lti-component {
 
 @media (max-width: 768px) {
 	.legacy-page .exercise__score-form-wrapper {
-		padding-left: 15px !important;	
+		padding-left: 15px !important;
 	}
-	
+
 	.legacy-page .exercise__score-form-wrapper.fixed {
 		width: 100%;
 	}
@@ -1274,9 +1275,9 @@ body.lti-component {
 }
 
 .legacy-page .no-manual-checkings-left {
-    display: inline-block;
-    margin-left: 7px;
-    vertical-align: middle;
+	display: inline-block;
+	margin-left: 7px;
+	vertical-align: middle;
 }
 
 .legacy-page #exercise__submission__output {
@@ -1455,7 +1456,7 @@ body.lti-component {
 	.legacy-page #manual-checking-queue-filter-form .manual-checking-queue-filter-form__done-filter {
 		display: block;
 	}
-	
+
 	.legacy-page #manual-checking-queue-filter-form .checkbox {
 		padding-left: 0px;
 		padding-top: 5px;

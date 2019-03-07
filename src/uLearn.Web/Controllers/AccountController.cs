@@ -201,6 +201,7 @@ namespace uLearn.Web.Controllers
 
 		[ULearnAuthorize(ShouldBeSysAdmin = true)]
 		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
 		public ActionResult ToggleSystemRole(string userId, string role)
 		{
 			if (userId == User.Identity.GetUserId())
@@ -223,6 +224,7 @@ namespace uLearn.Web.Controllers
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> ToggleRole(string courseId, string userId, CourseRole role)
 		{
 			var currentUserId = User.Identity.GetUserId();
@@ -248,6 +250,7 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		[ULearnAuthorize(ShouldBeSysAdmin = true)]
 		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> DeleteUser(string userId)
 		{
 			var user = usersRepo.FindUserById(userId);
@@ -325,6 +328,7 @@ namespace uLearn.Web.Controllers
 		[AllowAnonymous]
 		[ValidateInput(false)]
 		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> Register(RegistrationViewModel model)
 		{
 			if (ModelState.IsValid)
@@ -367,6 +371,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> Disassociate(string loginProvider, string providerKey)
 		{
 			var result = await userManager.RemoveLoginAsync(User.Identity.GetUserId(), new UserLoginInfo(loginProvider, providerKey));
@@ -392,6 +397,7 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		[ValidateInput(false)]
 		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> Manage(ManageUserViewModel model)
 		{
 			var hasPassword = ControllerUtils.HasPassword(userManager, User);
@@ -453,6 +459,7 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		[ValidateInput(false)]
 		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> StudentInfo(LtiUserViewModel userInfo)
 		{
 			var userId = User.Identity.GetUserId();
@@ -558,6 +565,7 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		[ValidateInput(false)]
 		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> ChangeDetailsPartial(UserViewModel userModel)
 		{
 			if (userModel.Render)
@@ -626,6 +634,7 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(ShouldBeSysAdmin = true)]
 		[ValidateAntiForgeryToken]
 		[ValidateInput(false)]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> ResetPassword(string newPassword, string userId)
 		{
 			var user = await userManager.FindByIdAsync(userId);

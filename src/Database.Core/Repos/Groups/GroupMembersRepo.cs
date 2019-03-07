@@ -34,7 +34,7 @@ namespace Database.Repos.Groups
 			return db.GroupMembers.Include(m => m.User).Where(m => m.GroupId == groupId && !m.User.IsDeleted).ToListAsync();
 		}
 		
-		public Task<List<GroupMember>> GetGroupsMembersAsync(IEnumerable<int> groupsIds)
+		public Task<List<GroupMember>> GetGroupsMembersAsync(ICollection<int> groupsIds)
 		{
 			return db.GroupMembers.Include(m => m.User).Where(m => groupsIds.Contains(m.GroupId) && !m.User.IsDeleted).ToListAsync();
 		}
@@ -106,13 +106,12 @@ namespace Database.Repos.Groups
 			return members;
 		}
 		
-		public async Task<List<GroupMember>> CopyUsersFromOneGroupToAnotherAsync(int fromGroupId, int toGroupId, List<string> userIds)
+		public async Task<List<GroupMember>> AddUsersToGroupAsync(int toGroupId, ICollection<string> userIds)
 		{
-			logger.Information($"Копирую пользователей {string.Join(", ", userIds)} из группы {fromGroupId} в группу {toGroupId}");
+			logger.Information($"Добавляю пользователей {string.Join(", ", userIds)} в группу {toGroupId}");
 			
-			var membersUserIds = db.GroupMembers.Where(m => m.GroupId == fromGroupId && userIds.Contains(m.UserId)).Select(m => m.UserId).ToList();
 			var newMembers = new List<GroupMember>();
-			foreach (var memberUserId in membersUserIds)
+			foreach (var memberUserId in userIds)
 				newMembers.Add(await AddUserToGroupAsync(toGroupId, memberUserId).ConfigureAwait(false));
 			
 			return newMembers;
@@ -125,7 +124,7 @@ namespace Database.Repos.Groups
 		}
 
 		/* Return Dictionary<userId, List<groupId>> */
-		public Task<Dictionary<string, List<int>>> GetUsersGroupsIdsAsync(string courseId, IEnumerable<string> usersIds)
+		public Task<Dictionary<string, List<int>>> GetUsersGroupsIdsAsync(string courseId, List<string> usersIds)
 		{
 			var groupsIds = groupsRepo.GetCourseGroupsQueryable(courseId).Select(g => g.Id);
 			return db.GroupMembers

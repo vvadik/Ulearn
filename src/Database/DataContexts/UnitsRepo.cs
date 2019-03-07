@@ -29,6 +29,11 @@ namespace Database.DataContexts
 				.Select(u => u.UnitId));
 			return course.Units.Where(u => visibleUnitsIds.Contains(u.Id)).ToList();
 		}
+		
+		public bool IsUnitVisibleForStudents(Course course, Guid unitId)
+		{
+			return db.UnitAppearances.Any(u => u.UnitId == unitId && u.CourseId == course.Id && u.PublishTime <= DateTime.Now);
+		}
 
 		public DateTime GetNextUnitPublishTime(string courseId)
 		{

@@ -1,4 +1,4 @@
-﻿using log4net;
+using log4net;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
@@ -219,6 +219,7 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		[ULearnAuthorize(ShouldBeSysAdmin = true)]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> CreateCourse(string courseId, string courseTitle)
 		{
 			var versionId = Guid.NewGuid();
@@ -484,14 +485,16 @@ namespace uLearn.Web.Controllers
 			}
 		}
 
-		public Task<ActionResult> Checking(string courseId, int id, bool recheck = false)
+		public Task<ActionResult> QuizChecking(string courseId, int id, bool recheck = false)
 		{
 			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
-			var checking = slideCheckingsRepo.FindManualCheckingById(id);
-			if (checking is ManualExerciseChecking)
-				return InternalManualChecking<ManualExerciseChecking>(courseId, id, ignoreLock: false, groupsIds: groupsIds, recheck: recheck);
-			else
-				return InternalManualChecking<ManualQuizChecking>(courseId, id, ignoreLock: false, groupsIds: groupsIds, recheck: recheck);
+			return InternalManualChecking<ManualQuizChecking>(courseId, id, ignoreLock: false, groupsIds: groupsIds, recheck: recheck);
+		}
+
+		public Task<ActionResult> ExerciseChecking(string courseId, int id, bool recheck = false)
+		{
+			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
+			return InternalManualChecking<ManualExerciseChecking>(courseId, id, ignoreLock: false, groupsIds: groupsIds, recheck: recheck);
 		}
 
 		public Task<ActionResult> CheckNextQuizForSlide(string courseId, Guid slideId, int previous)
@@ -509,6 +512,7 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> SaveCommentsPolicy(AdminCommentsViewModel model)
 		{
 			var courseId = model.CourseId;
@@ -711,6 +715,9 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public async Task<ActionResult> DeleteVersion(string courseId, Guid versionId)
 		{
+			/* Remove notifications from database */
+			await notificationsRepo.RemoveNotifications(versionId);
+			
 			/* Remove information from database */
 			await coursesRepo.DeleteCourseVersion(courseId, versionId);
 

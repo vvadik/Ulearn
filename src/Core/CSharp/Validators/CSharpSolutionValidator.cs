@@ -4,6 +4,7 @@ using System.Linq;
 using log4net;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using uLearn.CSharp.Validators;
 using Ulearn.Core.CSharp.Validators.IndentsValidation;
 using Ulearn.Core.CSharp.Validators.VerbInMethodNameValidation;
 
@@ -29,6 +30,7 @@ namespace Ulearn.Core.CSharp.Validators
 			new RefArgumentsValidator(),
 			new VarInVariableDeclarationValidator(),
             new BracketValidator(),
+            new RedundantElseValidator(),
 			new IndentsValidator()
 		};
 

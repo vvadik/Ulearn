@@ -16,6 +16,9 @@ namespace Ulearn.Web.Api.Controllers
 		{
 		}
 
+		/// <summary>
+		/// Информация о слайде, достаточная для отображения списка слайдов
+		/// </summary>
 		[HttpGet("{courseId}/{slideId}")]
 		public ActionResult<ShortSlideInfo> SlideInfo(Course course, Guid slideId)
 		{
