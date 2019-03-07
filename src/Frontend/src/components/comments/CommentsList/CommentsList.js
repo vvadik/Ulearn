@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
 import { userType, userRoles, comment } from "../commonPropTypes";
-import * as debounce from "debounce";
+//import * as debounce from "debounce";
 import Thread from "../Thread/Thread";
 import Toast from "@skbkontur/react-ui/components/Toast/Toast";
 import CommentSendForm from "../CommentSendForm/CommentSendForm";
@@ -28,7 +28,7 @@ class CommentsList extends Component {
 		status: '',
 	};
 
-	this.debouncedSendData = debounce(this.sendData, 300);
+	//this.debouncedSendData = debounce(this.sendData, 300);
 	}
 
 	componentDidMount() {

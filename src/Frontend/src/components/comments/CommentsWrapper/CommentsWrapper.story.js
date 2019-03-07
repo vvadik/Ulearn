@@ -74,7 +74,7 @@ const comments = [
 ];
 
 const user = {
-	"is_authenticated": true,
+	"isAuthenticated": true,
 	"id": "11",
 	"visibleName": "Pavel",
 	"avatarUrl": null,

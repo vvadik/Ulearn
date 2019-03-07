@@ -70,8 +70,9 @@ namespace uLearn.Web.Controllers
 			var canSeeNotApprovedComments = canModerateComments;
 
 			var canViewAuthorSubmissions = coursesRepo.HasCourseAccess(userId, courseId, CourseAccessType.ViewAllStudentsSubmissions) || User.HasAccessFor(courseId, CourseRole.CourseAdmin);
-			var canViewProfiles = systemAccessesRepo.HasSystemAccess(userId, SystemAccessType.ViewAllProfiles) || User.IsSystemAdministrator();			
-
+			var canViewProfiles = systemAccessesRepo.HasSystemAccess(userId, SystemAccessType.ViewAllProfiles) || User.IsSystemAdministrator();
+			var courseAccesses = coursesRepo.GetCourseAccesses(courseId, userId);
+			
 			var model = new SlideCommentsModel
 			{
 				CourseId = courseId,
@@ -89,7 +90,8 @@ namespace uLearn.Web.Controllers
 				CommentsPolicy = commentsPolicy,
 				CanViewAuthorProfiles = canViewProfiles,
 				CanViewAndAddCommentsForInstructorsOnly = CanViewAndAddCommentsForInstructorsOnly(User, courseId),
-				ShowOnlyInstructorsOnlyComments = showOnlyInstructorsOnlyComments
+				ShowOnlyInstructorsOnlyComments = showOnlyInstructorsOnlyComments,
+				CourseAccesses = courseAccesses
 			};
 			return PartialView(model);
 		}
@@ -368,5 +370,6 @@ namespace uLearn.Web.Controllers
 		public CommentsPolicy CommentsPolicy { get; set; }
 		public bool CanViewAndAddCommentsForInstructorsOnly { get; set; }
 		public bool ShowOnlyInstructorsOnlyComments { get; set; }
+		public List<CourseAccess> CourseAccesses { get; set; }
 	}
 }
