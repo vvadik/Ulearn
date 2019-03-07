@@ -346,7 +346,6 @@ class DownloadedHtmlContent extends Component {
 			enterToCourse: (courseId) => dispatch({
 				type: 'COURSES__COURSE_ENTERED',
 				courseId: courseId
-				slideId: slideId,
 			}),
 			updateUserInformation: () => dispatch(api.account.getCurrentUser())
 		}
