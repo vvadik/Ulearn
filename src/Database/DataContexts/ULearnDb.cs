@@ -54,7 +54,7 @@ namespace Database.DataContexts
 				.HasRequired(d => d.Notification)
 				.WithMany(n => n.Deliveries)
 				.HasForeignKey(d => d.NotificationId)
-				.WillCascadeOnDelete(false);
+				.WillCascadeOnDelete(true);
 			
 			modelBuilder.Entity<UserQuizSubmission>()
 				.HasOptional(s => s.AutomaticChecking)
