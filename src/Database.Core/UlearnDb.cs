@@ -116,7 +116,7 @@ namespace Database
 				.HasOne(d => d.Notification)
 				.WithMany(n => n.Deliveries)
 				.HasForeignKey(d => d.NotificationId)
-				.OnDelete(DeleteBehavior.Restrict);
+				.OnDelete(DeleteBehavior.Cascade);
 			
 			modelBuilder.Entity<UserQuizSubmission>()
 				.HasOne(s => s.AutomaticChecking)

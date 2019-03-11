@@ -114,7 +114,10 @@ namespace uLearn.Web
 				return;
 			if (!string.Equals(filterContext.HttpContext.Request.HttpMethod, "GET", StringComparison.OrdinalIgnoreCase) &&
 				!string.Equals(filterContext.HttpContext.Request.HttpMethod, "HEAD", StringComparison.OrdinalIgnoreCase))
-				throw new InvalidOperationException("Require HTTPS");
+			{
+				filterContext.Result = new HttpStatusCodeResult(HttpStatusCode.Forbidden, "SSL required"); // 403.4 - SSL required
+				return;
+			}
 			var url = "https://" + filterContext.HttpContext.Request.Url?.Host + filterContext.HttpContext.Request.RawUrl;
 			filterContext.Result = new RedirectResult(url);
 		}
