@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Net;
+using System.Runtime.Serialization;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -371,5 +372,50 @@ namespace uLearn.Web.Controllers
 		public bool CanViewAndAddCommentsForInstructorsOnly { get; set; }
 		public bool ShowOnlyInstructorsOnlyComments { get; set; }
 		public List<CourseAccess> CourseAccesses { get; set; }
+	}
+
+	[DataContract]
+	public class CommentsWrapperData
+	{
+		[DataMember(Name = "slideId", EmitDefaultValue = true)]
+		public Guid SlideId;
+		
+		[DataMember(Name = "courseId", EmitDefaultValue = true)]
+		public string CourseId;
+		
+		[DataMember(Name = "user", EmitDefaultValue = true)]
+		public CommentsWrapperUserData User;
+		
+		[DataMember(Name = "userRoles", EmitDefaultValue = true)]
+		public CommentsWrapperUserRolesData UserRoles;
+	}
+
+	[DataContract]
+	public class CommentsWrapperUserData
+	{
+		[DataMember(Name = "id", EmitDefaultValue = true)]
+		public string Id;
+
+		[DataMember(Name = "isAuthenticated", EmitDefaultValue = true)]
+		public bool IsAuthenticated;
+		
+		[DataMember(Name = "visibleName", EmitDefaultValue = true)]
+		public string VisibleName;
+		
+		[DataMember(Name = "avatarUrl", EmitDefaultValue = true)]
+		public string AvatarUrl;
+	}
+	
+	[DataContract]
+	public class CommentsWrapperUserRolesData
+	{
+		[DataMember(Name = "isSystemAdministrator", EmitDefaultValue = true)]
+		public bool IsSystemAdministrator;
+		
+		[DataMember(Name = "courseRole", EmitDefaultValue = true)]
+		public string CourseRole;
+		
+		[DataMember(Name = "courseAccesses", EmitDefaultValue = true)]
+		public List<string> CourseAccesses;
 	}
 }
