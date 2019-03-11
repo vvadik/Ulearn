@@ -1,4 +1,4 @@
-import api from "../api/";
+import api from "./index";
 
 export function getComments(courseId, slideId, isForInstructors) {
 	return api.get("/comments/in/" + courseId + "/" + slideId + "?for_instructors="

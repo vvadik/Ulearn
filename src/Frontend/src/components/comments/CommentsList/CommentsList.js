@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
-import { userType, userRoles, comment } from "../commonPropTypes";
+import { userType, userRoles } from "../commonPropTypes";
 //import * as debounce from "debounce";
 import Thread from "../Thread/Thread";
 import Toast from "@skbkontur/react-ui/components/Toast/Toast";
@@ -13,20 +13,20 @@ class CommentsList extends Component {
 	constructor(props) {
 		super(props);
 
-	this.state = {
-		threads: [],
-		commentEditing: {
-			commentId: null,
-			sending: false},
-		reply: {
-			commentId: null,
-			sending: false
-		},
-		sending: false,
-		loadingComments: false,
-		loadedComments: false,
-		status: '',
-	};
+		this.state = {
+			threads: [],
+			commentEditing: {
+				commentId: null,
+				sending: false},
+			reply: {
+				commentId: null,
+				sending: false
+			},
+			sending: false,
+			loadingComments: false,
+			loadedComments: false,
+			status: '',
+		};
 
 	//this.debouncedSendData = debounce(this.sendData, 300);
 	}
@@ -49,27 +49,28 @@ class CommentsList extends Component {
 		});
 
 		this.props.commentsApi.getComments(courseId, slideId, forInstructors)
-		.then(json => {
-			let comments = json.topLevelComments;
-			this.setState({
-				loadedComments: true,
-				threads: comments,
-			});
-		})
-		.catch(() => {
-			this.setState({
-				status: 'error',
-			});
-		})
-		.finally(() =>
-			this.setState({
-				loadingComments: false,
+			.then(json => {
+				let comments = json.topLevelComments;
+				this.setState({
+					loadedComments: true,
+					threads: comments,
+				});
 			})
-		);
+			.catch(() => {
+				this.setState({
+					status: 'error',
+				});
+			})
+			.finally(() =>
+				this.setState({
+					loadingComments: false,
+				})
+			);
 	};
 
 	render() {
 		const { threads, commentEditing, reply, sending } = this.state;
+
 		return (
 			<>
 				<CommentSendForm author={this.props.user} handleSubmit={this.handleAddComment} sending={sending} />
@@ -216,7 +217,6 @@ class CommentsList extends Component {
 	};
 
 	handleShowReplyForm = (commentId) => {
-		console.log(commentId);
 		this.setState({
 			reply: {...this.state.reply,
 				commentId: commentId,
@@ -275,40 +275,41 @@ class CommentsList extends Component {
 				sending: false,
 			}
 		});
-
-		console.log(`API: added reply to:#{comment.parentCommentId}`);
 	};
 
 	handleDeleteComment = (commentId) => {
-		const threads = [...this.state.threads];
-		const comment = this.findComment(commentId, this.state.threads);
-		const newThreads = threads.filter(thread => thread.id !== commentId);
+		const threads = JSON.parse(JSON.stringify(this.state.threads));
+		const queue = [threads];
 
-		if (comment.parentCommentId) {
-		const targetThread = threads.find(thread => thread.replies.includes(comment));
-		const updatedThreads = threads.filter(thread => thread.id !== targetThread.id);
-		const newReplies = targetThread.replies.filter(reply => reply.id !== commentId);
-			this.setState({
-				threads: [{...targetThread, replies: newReplies}, ...updatedThreads],
-			});
-		} else {
-			this.setState({
-				threads: newThreads,
+		while (queue.length > 0) {
+			const thread = queue.shift();
+			const comment = thread.find(c => c.id === commentId);
+			const index = thread.findIndex(c => c.id === commentId);
+
+			if (index !== -1) {
+				thread.splice(index, 1);
+				this.setState({ threads });
+
+				this.props.commentsApi.deleteComment(commentId)
+					.catch(console.error);
+
+				Toast.push("Комментарий удалён", {
+					label: "Восстановить",
+					handler: () => {
+						thread.splice(index, 0, comment);
+						this.setState({ threads });
+						Toast.push("Комментарий восстановлен")
+					}
+				});
+				return;
+			}
+
+			thread.forEach(comment => {
+				queue.push(comment.replies);
 			});
 		}
 
-		Toast.push("Комментарий удалён", {
-			label: "Восстановить",
-			handler: () => {
-				this.setState({
-					threads: [...threads],
-				});
-				Toast.push("Комментарий восстановлен")
-			}
-		});
-
-		this.props.commentsApi.deleteComment(commentId)
-			.catch(console.error);
+		throw new Error(`Comment with id ${commentId} not found`);
 	};
 
 	getUserSolutionsUrl = (userId) => {
@@ -325,7 +326,7 @@ CommentsList.propTypes = {
 	user: userType.isRequired,
 	userRoles: userRoles.isRequired,
 	forInstructors: PropTypes.bool,
-	commentsApi: PropTypes.any,
+	commentsApi: PropTypes.objectOf(PropTypes.func),
 	//comments: PropTypes.arrayOf(comment).isRequired,
 	courseId: PropTypes.string.isRequired,
 	slideId: PropTypes.string.isRequired,

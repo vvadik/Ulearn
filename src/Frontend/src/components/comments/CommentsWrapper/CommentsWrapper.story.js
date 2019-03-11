@@ -93,7 +93,6 @@ const fakeCommentsApi = {
 	updateComment: () => Promise.resolve(console.log('API: update comment')),
 	likeComment: () => Promise.resolve(console.log('API: like comment')),
 	dislikeComment: () => Promise.resolve(console.log('API: dislike comment')),
-
 };
 
 storiesOf('Comments/CommentsWrapper', module)

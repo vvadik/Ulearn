@@ -85,12 +85,12 @@ class CommentsWrapper extends Component {
 			<header className={styles.header}>
 				<div className={styles.headerRow}>
 					<h1 className={styles.headerName}>Комментарии</h1>
-					{(userRoles.isSystemAdministrator || userRoles.courseRole === 'CourseAdmin') &&
+					{(userRoles.isSystemAdministrator || userRoles.courseRole === 'courseAdmin') &&
 					<Button size="medium" icon={<Icon.Settings />}
 							onClick={() => this.handleOpenModal(true)}>Настроить</Button>}
 				</div>
-				{(userRoles.isSystemAdministrator || userRoles.courseRole === 'CourseAdmin' ||
-					userRoles.courseRole === 'Instructor') &&
+				{(userRoles.isSystemAdministrator || userRoles.courseRole === 'courseAdmin' ||
+					userRoles.courseRole === 'instructor') &&
 				<Tabs value={this.state.activeTab} onChange={this.handleTabChange}>
 					<Tabs.Tab id="allComments">К слайду</Tabs.Tab>
 					<Tabs.Tab id="commentsForInstructors">
@@ -116,10 +116,10 @@ class CommentsWrapper extends Component {
 }
 
 CommentsWrapper.propTypes = {
-	user: user,
-	userRoles: userRoles,
-	courseId: PropTypes.string,
-	slideId: PropTypes.string,
+	user: user.isRequired,
+	userRoles: userRoles.isRequired,
+	courseId: PropTypes.string.isRequired,
+	slideId: PropTypes.string.isRequired,
 	commentsApi: PropTypes.objectOf(PropTypes.func),
 };
 
