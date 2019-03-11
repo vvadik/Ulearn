@@ -1,35 +1,29 @@
-import { shape, objectOf, oneOf, arrayOf, bool, array, number, string } from 'prop-types';
+import { shape, oneOf, arrayOf, bool, array, number, string } from 'prop-types';
 
 export const userType = shape({
 	id: string.isRequired,
+	visibleName: string.isRequired,
 	login: string,
 	email: string,
 	firstName: string,
 	lastName: string,
-	visibleName: string.isRequired,
 	avatarUrl: string,
 	gender: string,
 });
 
 export const user = shape({
-	isAuthenticated: bool,
-	user: userType.isRequired,
-	systemAccesses: oneOf(['ViewAllProfiles', 'ViewAllGroupMembers']),
+	isAuthenticated: bool.isRequired,
+	id: string.isRequired,
+	visibleName: string.isRequired,
+	avatarUrl: string,
+	systemAccesses: oneOf(['viewAllProfiles', 'viewAllGroupMembers']),
 });
 
 export const userRoles = shape({
 	isSystemAdministrator: bool,
-	courseRoles: shape({
-		courseId: string,
-		role: oneOf(['courseAdmin', 'instructor', 'tester', 'student']),
-	}),
-	courseAccesses: arrayOf(objectOf(
-		shape({
-			courseId: string,
-			accesses: oneOf(["editPinAndRemoveComments", "ViewAllStudentsSubmissions", "AddAndRemoveInstructors",
-				"ViewAllGroupMembers", "ApiViewCodeReviewStatistics"])
-		}),
-	))
+	courseRoles: oneOf(['courseAdmin', 'instructor', 'tester', 'student']),
+	courseAccesses: arrayOf(oneOf(["editPinAndRemoveComments", "viewAllStudentsSubmissions", "addAndRemoveInstructors",
+		"viewAllGroupMembers", "apiViewCodeReviewStatistics"])),
 });
 
 export const comment = shape({

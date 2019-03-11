@@ -78,6 +78,7 @@ const user = {
 	"id": "11",
 	"visibleName": "Pavel",
 	"avatarUrl": null,
+	"systemAccesses": ["viewAllProfiles"],
 };
 
 const userRoles = {
