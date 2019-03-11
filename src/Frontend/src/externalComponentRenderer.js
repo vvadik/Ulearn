@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import {Provider} from "react-redux";
+import { Provider } from "react-redux";
 
 /* This module allows to insert react components inside legacy layout.
  * Use following syntax to render react component:

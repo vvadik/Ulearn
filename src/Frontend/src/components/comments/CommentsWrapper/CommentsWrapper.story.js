@@ -27,7 +27,7 @@ const comments = [
 					"avatarUrl": "https://staff.skbkontur.ru/content/images/default-user-woman.png",
 				},
 				text: "Я **не согласна**",
-				replies: [	],
+				replies: [],
 				renderedText: "Я <b>не согласна</b>",
 				publishTime: "2019-02-18T14:12:41.947",
 				isApproved: true,
@@ -103,5 +103,5 @@ storiesOf('Comments/CommentsWrapper', module)
 		userRoles={userRoles}
 		slideId={'90bcb61e-57f0-4baa-8bc9-10c9cfd27f58'}
 		courseId={'BasicProgramming'}
-		commentsApi={fakeCommentsApi}	/>
-), { viewport: 'desktop' });
+		commentsApi={fakeCommentsApi} />
+), {viewport: 'desktop'});

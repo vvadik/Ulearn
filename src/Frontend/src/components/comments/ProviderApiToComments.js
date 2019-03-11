@@ -4,8 +4,8 @@ import { userRoles, user } from "./commonPropTypes";
 import api from "../../api";
 import CommentsWrapper from "./CommentsWrapper/CommentsWrapper";
 
-function ProviderApiToComments (props) {
-	const { user, userRoles, courseId, slideId } = props;
+function ProviderApiToComments(props) {
+	const {user, userRoles, courseId, slideId} = props;
 
 	return (
 		<CommentsWrapper

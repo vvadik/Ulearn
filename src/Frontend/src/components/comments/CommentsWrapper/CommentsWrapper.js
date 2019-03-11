@@ -42,8 +42,8 @@ class CommentsWrapper extends Component {
 	};
 
 	render() {
-		const { user, userRoles, courseId, slideId, commentsApi } = this.props;
-		const { activeTab } = this.state;
+		const {user, userRoles, courseId, slideId, commentsApi} = this.props;
+		const {activeTab} = this.state;
 		const forInstructors = activeTab === 'commentsForInstructors';
 
 		if (this.state.status === "error") {
@@ -52,7 +52,7 @@ class CommentsWrapper extends Component {
 
 		return (
 			<div className={styles.wrapper}>
-				{ this.renderHeader() }
+				{this.renderHeader()}
 				{this.state.openModal && <CommentPolicySettings handleOpenModal={this.handleOpenModal} />}
 				<div className={styles.commentsContainer}>
 					<CommentsList
@@ -62,16 +62,16 @@ class CommentsWrapper extends Component {
 						userRoles={userRoles}
 						slideId={slideId}
 						courseId={courseId}>
-						{ activeTab === "allComments" &&
+						{activeTab === "allComments" &&
 						<p>
 							К этому слайду ещё нет коммаентариев. Вы можете начать беседу со студентами,
 							добавив комментарий.
-						</p> }
-						{ activeTab === "commentsForInstructors" &&
+						</p>}
+						{activeTab === "commentsForInstructors" &&
 						<p>
 							К этому слайду нет комментариев преподавателей. Вы можете начать беседу с преподавателями,
 							добавив комментарий.
-						</p> }
+						</p>}
 					</CommentsList>
 				</div>
 			</div>

@@ -7,22 +7,22 @@ import Icon from "@skbkontur/react-icons";
 import styles from "./InstructorActions.less";
 
 export default function InstructorActions(props) {
-	const { actions, isApproved, commentId } = props;
+	const {actions, isApproved, commentId} = props;
 
 	return <div className={styles.instructorsActions}>
 		<Kebab positions={['bottom right']} size="large" disableAnimations={false}>
 			<MenuItem
-				icon={<Icon.Edit size="small"/>}
+				icon={<Icon.Edit size="small" />}
 				onClick={() => actions.handleShowEditForm(commentId)}>
 				Редактировать
 			</MenuItem>
 			<MenuItem
-				icon={<Icon.EyeClosed size="small"/>}
+				icon={<Icon.EyeClosed size="small" />}
 				onClick={() => actions.handleApprovedMark(commentId, isApproved)}>
-				{ isApproved ? 'Опубликовать' : 'Скрыть' }
+				{isApproved ? 'Опубликовать' : 'Скрыть'}
 			</MenuItem>
 			<MenuItem
-				icon={<Icon.Delete size="small"/>}
+				icon={<Icon.Delete size="small" />}
 				onClick={() => actions.handleDeleteComment(commentId)}>
 				Удалить
 			</MenuItem>

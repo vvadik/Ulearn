@@ -9,12 +9,12 @@ import styles from './Thread.less';
 class Thread extends Component {
 
 	render() {
-		const { comment } = this.props;
+		const {comment} = this.props;
 		return this.renderComment(comment);
 	}
 
 	renderComment(comment, isLastChild = true) {
-		const { user, reply, commentEditing, actions } = this.props;
+		const {user, reply, commentEditing, actions} = this.props;
 		const replies = comment.replies || [];
 		const isLastCommentInThread = replies.length === 0 && isLastChild;
 		const isParentComment = !comment.parentCommentId;
@@ -29,12 +29,12 @@ class Thread extends Component {
 				actions={this.props.actions}
 				getUserSolutionsUrl={this.props.getUserSolutionsUrl}
 				user={this.props.user}
-				userRoles={this.props.userRoles} >
-			{ replies.map((reply, index) =>
-				<div key={reply.id} className={styles.replies}>
-					{this.renderComment(reply, index + 1 === replies.length)}
-				</div>) }
-			{ isParentComment && comment.id === reply.commentId &&
+				userRoles={this.props.userRoles}>
+				{replies.map((reply, index) =>
+					<div key={reply.id} className={styles.replies}>
+						{this.renderComment(reply, index + 1 === replies.length)}
+					</div>)}
+				{isParentComment && comment.id === reply.commentId &&
 				<div className={styles.replyForm}>
 					<CommentSendForm
 						commentId={comment.id}
@@ -43,7 +43,7 @@ class Thread extends Component {
 						submitTitle='Отправить'
 						onCancel={() => actions.handleShowReplyForm(null)}
 						handleSubmit={actions.handleAddReplyComment} />
-				</div> }
+				</div>}
 			</Comment>
 		);
 	}

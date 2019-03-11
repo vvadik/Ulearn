@@ -6,7 +6,7 @@ function mapStateToProps(state) {
 	return {
 		account: state.account,
 	}
-};
+}
 
 function mapDispatchToProps(dispatch, state) {
 	return {
@@ -16,6 +16,6 @@ function mapDispatchToProps(dispatch, state) {
 			slideId: state.slideId,
 		}),
 	}
-};
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(CommentSendForm);

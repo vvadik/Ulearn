@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import api from "./../api/index";
 import Loader from "@skbkontur/react-ui/components/Loader/Loader";
 import CommentSendForm from "../components/comments/CommentSendForm/CommentSendForm";
-import {COURSES__COURSE_ENTERED} from "../consts/actions";
+import { COURSES__COURSE_ENTERED } from "../consts/actions";
 
 import styles from "../components/comments/CommentSendForm/CommentSendForm.less";
 
@@ -20,6 +20,7 @@ class CommentsList extends Component {
 	}
 
 	_instructor = null;
+
 	get isInstructor() {
 		if (this._instructor === null) {
 			this._instructor = this.props.account.isSystemAdministrator ||
@@ -36,26 +37,26 @@ class CommentsList extends Component {
 	}
 
 	loadComments = (courseId, slideId) => {
-		this.setState({ sending: true });
+		this.setState({sending: true});
 
 		api.comments.getComments(courseId, slideId)
-			.then(json => {
-				let comments = json.comments;
-				this.setState({
-					comments: comments,
-					sending: false,
-				})
+		.then(json => {
+			let comments = json.comments;
+			this.setState({
+				comments: comments,
+				sending: false,
 			})
-			.catch(console.error)
-			.finally(this.setState({ sending: false })
-			)
+		})
+		.catch(console.error)
+		.finally(this.setState({sending: false})
+		)
 	};
 
 	render() {
 		return (
 			<Loader active={this.state.loading}>
 				<h1 className={styles.header}>Комментарии</h1>
-				<CommentSendForm onSubmit={this.onSubmit}/>
+				<CommentSendForm onSubmit={this.onSubmit} />
 				<div>Здесь будет список комментариев</div>
 			</Loader>
 		)
@@ -64,12 +65,12 @@ class CommentsList extends Component {
 	onSubmit() {
 		const text = this.state.text;
 		const replyTo = 0;
-		const { slideId, courseId } = this.props.enterToCourse.slideId;
+		const {slideId, courseId} = this.props.enterToCourse.slideId;
 
-		this.setState({ loading: true });
+		this.setState({loading: true});
 		api.comments.addComment(courseId, slideId, text, replyTo, this.isInstructor)
-			.catch(console.error)
-			.finally(this.setState({ loading: false }));
+		.catch(console.error)
+		.finally(this.setState({loading: false}));
 	}
 }
 

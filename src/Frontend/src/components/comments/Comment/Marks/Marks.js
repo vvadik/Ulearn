@@ -4,12 +4,12 @@ import Icon from "@skbkontur/react-icons";
 
 import styles from "./Marks.less";
 
-export default function Marks ({ isApproved, isCorrectAnswer, isPinnedToTop }) {
+export default function Marks({isApproved, isCorrectAnswer, isPinnedToTop}) {
 	return (
 		<>
-			{isApproved && <HiddenMark/>}
-			{isCorrectAnswer && <CorrectAnswerMark/>}
-			{isPinnedToTop && <PinnedToTopMark/>}
+			{isApproved && <HiddenMark />}
+			{isCorrectAnswer && <CorrectAnswerMark />}
+			{isPinnedToTop && <PinnedToTopMark />}
 		</>
 	)
 };

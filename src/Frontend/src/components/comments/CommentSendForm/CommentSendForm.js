@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import PropTypes from "prop-types";
 import { userType } from "../commonPropTypes";
 import Button from "@skbkontur/react-ui/components/Button/Button";
@@ -12,7 +12,7 @@ class CommentSendForm extends Component {
 		super(props);
 
 		this.state = {
-			text:  props.text || '',
+			text: props.text || '',
 			error: null,
 			commentId: props.commentId,
 		};
@@ -32,8 +32,8 @@ class CommentSendForm extends Component {
 	editor = React.createRef();
 
 	render() {
-		const { author } = this.props;
-		const { error, text } = this.state;
+		const {author} = this.props;
+		const {error, text} = this.state;
 
 		return (
 			<React.Fragment>
@@ -62,7 +62,7 @@ class CommentSendForm extends Component {
 	}
 
 	renderSubmitButton() {
-		const { submitTitle = 'Оставить комментарий', sending } = this.props;
+		const {submitTitle = 'Оставить комментарий', sending} = this.props;
 
 		return (
 			<Button
@@ -76,7 +76,7 @@ class CommentSendForm extends Component {
 	}
 
 	renderCancelButton() {
-		const { onCancel, cancelTitle = 'Отменить' } = this.props;
+		const {onCancel, cancelTitle = 'Отменить'} = this.props;
 
 		if (!onCancel) {
 			return null;
@@ -96,8 +96,8 @@ class CommentSendForm extends Component {
 	handleSubmit = (event) => {
 		event.preventDefault();
 
-		const { text } = this.state;
-		const { commentId, handleSubmit } = this.props;
+		const {text} = this.state;
+		const {commentId, handleSubmit} = this.props;
 
 		if (!text) {
 			this.setState({
@@ -111,7 +111,7 @@ class CommentSendForm extends Component {
 
 	handleChange = (text) => {
 		return new Promise((resolve) => {
-			this.setState({ text, error: null }, resolve);
+			this.setState({text, error: null}, resolve);
 		});
 	}
 }

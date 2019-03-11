@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import PropTypes from "prop-types";
 import Hint from "@skbkontur/react-ui/components/Hint/Hint";
 
@@ -7,12 +7,12 @@ import styles from "./MarkdownButtons.less";
 class MarkdownButtons extends Component {
 
 	render() {
-		const { markupByOperation } = this.props;
+		const {markupByOperation} = this.props;
 		return (
 			<div className={styles.markdownButtons}>
 				<span className={styles.markdownText}>Поддерживаем markdown</span>
 				{Object.entries(markupByOperation)
-					.map(([name, operation]) => this.renderMarkdownButton(name, operation))}
+				.map(([name, operation]) => this.renderMarkdownButton(name, operation))}
 			</div>
 		);
 	}
@@ -38,7 +38,7 @@ class MarkdownButtons extends Component {
 
 	renderHint({description, markup, hotkey}) {
 		return <span className={styles._yellow}>{markup}<span className={styles._white}>{description}</span>{markup}
-			<br/><span className={styles._yellow}>{hotkey.asText}</span>
+			<br /><span className={styles._yellow}>{hotkey.asText}</span>
 		</span>;
 	};
 

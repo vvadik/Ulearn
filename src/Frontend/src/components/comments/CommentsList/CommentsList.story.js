@@ -102,13 +102,13 @@ const fakeCommentsApi = {
 };
 
 storiesOf('Comments/CommentsList', module)
-	.add('список комментариев', () => (
-		<CommentsList
-			comments={comments}
-			getUserSolutionsUrl={getUserSolutionsUrl(user.id)}
-			user={user}
-			userRoles={userRoles}
-			courseId={'BasicProgramming'}
-			slideId={'90bcb61e-57f0-4baa-8bc9-10c9cfd27f58'}
-			commentsApi={fakeCommentsApi} />
-	), { viewport: 'desktop' });
+.add('список комментариев', () => (
+	<CommentsList
+		comments={comments}
+		getUserSolutionsUrl={getUserSolutionsUrl(user.id)}
+		user={user}
+		userRoles={userRoles}
+		courseId={'BasicProgramming'}
+		slideId={'90bcb61e-57f0-4baa-8bc9-10c9cfd27f58'}
+		commentsApi={fakeCommentsApi} />
+), {viewport: 'desktop'});
