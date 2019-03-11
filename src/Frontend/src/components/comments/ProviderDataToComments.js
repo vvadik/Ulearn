@@ -4,7 +4,7 @@ import { userRoles, user } from "./commonPropTypes";
 import api from "../../api";
 import CommentsWrapper from "./CommentsWrapper/CommentsWrapper";
 
-function ProviderApiToComments (props) {
+export default function ProviderDataToComments (props) {
 	const { user, userRoles, courseId, slideId } = props;
 
 	return (
@@ -18,7 +18,7 @@ function ProviderApiToComments (props) {
 	)
 }
 
-ProviderApiToComments.propTypes = {
+ProviderDataToComments.propTypes = {
 	user: user.isRequired,
 	userRoles: userRoles.isRequired,
 	courseId: PropTypes.string.isRequired,

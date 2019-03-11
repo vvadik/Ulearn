@@ -1,6 +1,5 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import {Provider} from "react-redux";
 
 /* This module allows to insert react components inside legacy layout.
  * Use following syntax to render react component:
@@ -17,17 +16,20 @@ import {Provider} from "react-redux";
  */
 
 /* Import all components you want to insert into legacy (cshtml+jquery) layout */
-import Comment from "./components/comments/Comment/Comment";
-import CommentsList from "./components/comments/CommentsList/CommentsList";
+
+import ProviderDataToComments from "./components/comments/ProviderDataToComments";
 import CommentsWrapper from "./components/comments/CommentsWrapper/CommentsWrapper";
+import CommentsList from "./components/comments/CommentsList/CommentsList";
+import Comment from "./components/comments/Comment/Comment";
 import CommentSendForm from "./components/comments/CommentSendForm/CommentSendForm";
 
 /* Define names for all components you want to use */
 const components = {
-	'CommentsList': CommentsList,
-	'CommentSendForm': CommentSendForm,
+	'ProviderDataToComments': ProviderDataToComments,
 	'CommentsWrapper': CommentsWrapper,
+	'CommentsList': CommentsList,
 	'Comment': Comment,
+	'CommentSendForm': CommentSendForm,
 };
 
 window.renderReactComponent = function (componentType, element, props) {
