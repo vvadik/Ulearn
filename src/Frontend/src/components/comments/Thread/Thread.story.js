@@ -1,6 +1,6 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
-import {action} from '@storybook/addon-actions';
+import { action } from '@storybook/addon-actions';
 import Thread from "./Thread";
 
 const user = {
@@ -56,7 +56,8 @@ const comment = {
 	isLiked: true,
 	likesCount: 10,
 	replies: [
-		{ id: 2000,
+		{
+			id: 2000,
 			author: {
 				"id": "10",
 				"visibleName": "Maria",
@@ -76,16 +77,16 @@ const comment = {
 
 function getUserSolutionUrl(userId) {
 	return `https://dev.ulearn.me/Analytics/UserSolutions?courseId=BasicProgramming&slideId=90bcb61e-57f0-4baa-8bc9-10c9cfd27f58&userId=${userId}`;
-};
+}
 
 storiesOf('Comments/Thread', module)
-	.add('комментарий с ответами', () => (
-		<Thread
-			comment={comment}
-			user={user}
-			getUserSolutionsUrl={getUserSolutionUrl}
-			userRoles={userRoles}
-			commentEditing={commentEditing}
-			reply={reply}
-			actions={actions} />
-	), { viewport: 'desktop' });
+.add('комментарий с ответами', () => (
+	<Thread
+		comment={comment}
+		user={user}
+		getUserSolutionsUrl={getUserSolutionUrl}
+		userRoles={userRoles}
+		commentEditing={commentEditing}
+		reply={reply}
+		actions={actions} />
+), {viewport: 'desktop'});

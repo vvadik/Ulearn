@@ -5,7 +5,7 @@ import api from "../../api";
 import CommentsWrapper from "./CommentsWrapper/CommentsWrapper";
 
 export default function ProviderDataToComments (props) {
-	const { user, userRoles, courseId, slideId } = props;
+	const {user, userRoles, courseId, slideId} = props;
 
 	return (
 		<CommentsWrapper

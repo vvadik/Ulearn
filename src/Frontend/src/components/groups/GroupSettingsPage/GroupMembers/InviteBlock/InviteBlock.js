@@ -14,25 +14,25 @@ class InviteBlock extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			inviteLinkEnabled: props.group.is_invite_link_enabled
+			isInviteLinkEnabled: props.group.isInviteLinkEnabled
 		};
 	}
 
 	render() {
-		const inviteLinkEnabled = this.state.inviteLinkEnabled;
+		const isInviteLinkEnabled = this.state.isInviteLinkEnabled;
 
 		return (
 			<div className={styles["toggle-invite"]}>
 				<label>
 					<Toggle
-						checked={inviteLinkEnabled}
+						checked={isInviteLinkEnabled}
 						onChange={this.onToggle}>
 					</Toggle>
 					<span className={styles["toggle-invite-text"]}>
-						Ссылка для вступления в группу {inviteLinkEnabled ? ' включена' : ' выключена'}
+						Ссылка для вступления в группу {isInviteLinkEnabled ? ' включена' : ' выключена'}
 					</span>
 				</label>
-				{inviteLinkEnabled && this.renderInvite()}
+				{isInviteLinkEnabled && this.renderInvite()}
 			</div>
 		)
 	}
@@ -65,14 +65,14 @@ class InviteBlock extends Component {
 
 	onToggle = () => {
 		const {group} = this.props;
-		const inviteLinkEnabled = this.state.inviteLinkEnabled;
+		const isInviteLinkEnabled = this.state.isInviteLinkEnabled;
 
 		this.setState({
-			inviteLinkEnabled: !inviteLinkEnabled,
+			isInviteLinkEnabled: !isInviteLinkEnabled,
 		});
-		this.props.group.is_invite_link_enabled = !inviteLinkEnabled;
+		this.props.group.isInviteLinkEnabled = !isInviteLinkEnabled;
 
-		api.groups.saveGroupSettings(group.id, {'isInviteLinkEnabled': !inviteLinkEnabled})
+		api.groups.saveGroupSettings(group.id, {'isInviteLinkEnabled': !isInviteLinkEnabled})
 		.catch(console.error);
 	};
 }

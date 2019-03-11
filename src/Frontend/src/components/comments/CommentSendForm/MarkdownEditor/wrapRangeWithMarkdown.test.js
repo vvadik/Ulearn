@@ -14,8 +14,14 @@ describe('CommentSendForm.wrapRangeWithMarkdown', () => {
 		["hello", 1, 2, "```", "h```e```llo", 1, 8],
 	])('%s with selection, %i, %i %s -> %s with selection, %i, %i',
 		(text, selectionStart, selectionEnd, markup, expectedText, expectedSelectionStart, expectedSelectionEnd) => {
-		const result = CommentSendForm.wrapRangeWithMarkdown(text, {start:selectionStart, end:selectionEnd}, {markup: markup});
-		expect(result).toEqual({finalText: expectedText, finalSelectionRange:{end: expectedSelectionEnd, start: expectedSelectionStart}});
-	});
+			const result = CommentSendForm.wrapRangeWithMarkdown(text, {
+				start: selectionStart,
+				end: selectionEnd
+			}, {markup: markup});
+			expect(result).toEqual({
+				finalText: expectedText,
+				finalSelectionRange: {end: expectedSelectionEnd, start: expectedSelectionStart}
+			});
+		});
 });
 

@@ -1,7 +1,7 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import PropTypes from "prop-types";
 import BaseTextarea from "@skbkontur/react-ui/components/Textarea/Textarea";
-import {boldIcon, codeIcon, italicIcon} from "../../SVGIcons/SVGIcon";
+import { boldIcon, codeIcon, italicIcon } from "../../SVGIcons/SVGIcon";
 import MarkdownButtons from "../MarkdownButtons/MarkdownButtons";
 
 import styles from "./MarkdownEditor.less";
@@ -73,7 +73,7 @@ class MarkdownEditor extends Component {
 					autoResize
 					placeholder="Комментарий" />
 				<div className={styles.footer}>
-					{ children }
+					{children}
 					<MarkdownButtons
 						markupByOperation={markupByOperation}
 						onClick={this.handleClick} />

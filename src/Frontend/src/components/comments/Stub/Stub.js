@@ -4,7 +4,7 @@ import Button from "@skbkontur/react-ui/components/Button/Button";
 
 import styles from './Stub.less';
 
-function Stub (props) {
+function Stub(props) {
 	return (
 		<div className={styles.stub}>
 			<span className={styles.stubText}>Оставлять комментарии могут только зарегистрированные пользователи</span>

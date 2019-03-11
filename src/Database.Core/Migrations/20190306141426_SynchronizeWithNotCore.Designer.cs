@@ -4,14 +4,16 @@ using Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Database.Migrations
 {
     [DbContext(typeof(UlearnDb))]
-    partial class UlearnDbModelSnapshot : ModelSnapshot
+    [Migration("20190306141426_SynchronizeWithNotCore")]
+    partial class SynchronizeWithNotCore
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2297,7 +2299,7 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.Notification", "Notification")
                         .WithMany("Deliveries")
                         .HasForeignKey("NotificationId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Database.Models.NotificationTransport", "NotificationTransport")
                         .WithMany()

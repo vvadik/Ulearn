@@ -155,8 +155,8 @@ class DownloadedHtmlContent extends Component {
 		let courseId = this._getCourseIdFromUrl();
 		this.props.enterToCourse(courseId);
 
-        let slideId = this._getSlideIdFromUrl();
-        this.props.enterToCourse(slideId);
+		let slideId = this._getSlideIdFromUrl();
+		this.props.enterToCourse(slideId);
 
 		let el = document.createElement('html');
 		el.innerHTML = data;
@@ -195,7 +195,7 @@ class DownloadedHtmlContent extends Component {
 		this.setPostFormSubmitHandler();
 
 		let meta = window.meta || {
-			title: titles ? titles[0].innerText : 'Ulearn',
+			title: titles && titles.length ? titles[0].innerText : 'Ulearn',
 			description: 'Интерактивные учебные онлайн-курсы по программированию',
 			keywords: '',
 			imageUrl: '',
@@ -210,8 +210,8 @@ class DownloadedHtmlContent extends Component {
 		DownloadedHtmlContent.removeBootstrapModalBackdrop();
 	}
 
-    _getSlideIdFromUrl() {
-    	const pathname = window.location.pathname;
+	_getSlideIdFromUrl() {
+		const pathname = window.location.pathname;
 		if (pathname.startsWith('/Course/')) {
 			return window.location.pathname.split('/')[3].split('_').pop();
 		}

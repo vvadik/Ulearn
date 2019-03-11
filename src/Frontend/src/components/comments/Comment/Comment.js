@@ -16,7 +16,7 @@ import styles from "./Comment.less";
 class Comment extends Component {
 
 	render() {
-		const { actions, children, commentEditing, comment, userRoles } = this.props;
+		const {actions, children, commentEditing, comment, userRoles} = this.props;
 
 		return (
 			<div className={styles.comment}>
@@ -71,7 +71,7 @@ class Comment extends Component {
 	}
 
 	renderEditCommentForm() {
-		const { comment, actions, commentEditing } = this.props;
+		const {comment, actions, commentEditing} = this.props;
 
 		return (
 			<CommentSendForm

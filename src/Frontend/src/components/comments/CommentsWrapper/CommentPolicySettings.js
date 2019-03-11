@@ -8,7 +8,7 @@ import Button from "@skbkontur/react-ui/components/Button/Button";
 
 class CommentPolicySettings extends Component {
 	render() {
-		const { canComment, handleToggleCanComment, handleSaveSettings, handleOpenModal } = this.props;
+		const {canComment, handleToggleCanComment, handleSaveSettings, handleOpenModal} = this.props;
 		return (
 			<Modal onClose={() => handleOpenModal(false)}>
 				<Modal.Header>Настройки комментариев курса</Modal.Header>
@@ -22,10 +22,10 @@ class CommentPolicySettings extends Component {
 					</div>
 					<div>
 						<RadioGroup name="moderation" defaultValue="3">
-								<Gapped vertical gap={10}>
-									<Radio value="1">Премодерация</Radio>
-									<Radio checked value="3">Постмодерация</Radio>
-								</Gapped>
+							<Gapped vertical gap={10}>
+								<Radio value="1">Премодерация</Radio>
+								<Radio checked value="3">Постмодерация</Radio>
+							</Gapped>
 						</RadioGroup>
 					</div>
 				</Modal.Body>

@@ -741,6 +741,10 @@
     <Compile Include="Migrations\201901242025259_RemoveQuizSubmissionIsDropped.Designer.cs">
       <DependentUpon>201901242025259_RemoveQuizSubmissionIsDropped.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201903061415434_DeleteNotificationDeliveryOnDeleteNotification.cs" />
+    <Compile Include="Migrations\201903061415434_DeleteNotificationDeliveryOnDeleteNotification.Designer.cs">
+      <DependentUpon>201903061415434_DeleteNotificationDeliveryOnDeleteNotification.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -1152,6 +1156,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201901242025259_RemoveQuizSubmissionIsDropped.resx">
       <DependentUpon>201901242025259_RemoveQuizSubmissionIsDropped.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201903061415434_DeleteNotificationDeliveryOnDeleteNotification.resx">
+      <DependentUpon>201903061415434_DeleteNotificationDeliveryOnDeleteNotification.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

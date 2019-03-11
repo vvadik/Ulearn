@@ -17,7 +17,8 @@ class CommentsList extends Component {
 			threads: [],
 			commentEditing: {
 				commentId: null,
-				sending: false},
+				sending: false
+			},
 			reply: {
 				commentId: null,
 				sending: false
@@ -28,17 +29,17 @@ class CommentsList extends Component {
 			status: '',
 		};
 
-	//this.debouncedSendData = debounce(this.sendData, 300);
+		//this.debouncedSendData = debounce(this.sendData, 300);
 	}
 
 	componentDidMount() {
-		const { forInstructors } = this.props;
+		const {forInstructors} = this.props;
 
 		this.loadComments(this.courseId, this.slideId, forInstructors);
 	};
 
 	loadComments = (courseId, slideId, forInstructors) => {
-		const { loadedComments, loadingComments } = this.state;
+		const {loadedComments, loadingComments} = this.state;
 
 		if (loadedComments || loadingComments) {
 			return;
@@ -69,7 +70,7 @@ class CommentsList extends Component {
 	};
 
 	render() {
-		const { threads, commentEditing, reply, sending } = this.state;
+		const {threads, commentEditing, reply, sending} = this.state;
 
 		return (
 			<>
@@ -97,8 +98,8 @@ class CommentsList extends Component {
 						userRoles={this.props.userRoles}
 					/>)}
 				<button className={styles.sendButton}>
-					<Icon name="CommentLite" color="#3072C4"/>
-						<span className={styles.sendButtonText}>Оставить комментарий</span>
+					<Icon name="CommentLite" color="#3072C4" />
+					<span className={styles.sendButtonText}>Оставить комментарий</span>
 				</button>
 			</>
 		)
@@ -143,7 +144,7 @@ class CommentsList extends Component {
 	}
 
 	handleAddComment = async (text) => {
-		const { commentsApi, courseId, slideId, forInstructors } = this.props;
+		const {commentsApi, courseId, slideId, forInstructors} = this.props;
 		const newComment = await commentsApi.addComment(courseId, slideId, text, forInstructors);
 
 		if (!newComment) {
@@ -159,58 +160,59 @@ class CommentsList extends Component {
 	};
 
 	handleLikeClick = (commentId, isLiked) => {
-		const { commentsApi } = this.props;
+		const {commentsApi} = this.props;
 
-		this.updateComment(commentId, ({ isLiked, likesCount }) => ({
+		this.updateComment(commentId, ({isLiked, likesCount}) => ({
 			likesCount: isLiked ? likesCount - 1 : likesCount + 1,
 			isLiked: !isLiked,
 		}));
 
 		if (isLiked) {
 			commentsApi.likeComment(commentId)
-				.catch(console.error)
+			.catch(console.error)
 			// this.debouncedSendData(commentsApi.likeComment, commentId);
 		}
 
 		commentsApi.dislikeComment(commentId)
-			.catch(console.error)
-			// this.debouncedSendData(commentsApi.dislikeComment, commentId);
+		.catch(console.error)
+		// this.debouncedSendData(commentsApi.dislikeComment, commentId);
 	};
 
 	handleApprovedMark = (commentId, isApproved) => {
 
-		this.updateComment(commentId, ({ isApproved }) => ({
+		this.updateComment(commentId, ({isApproved}) => ({
 			isApproved: !isApproved,
 		}));
 
 		// this.debouncedSendData(commentsApi.updateComment, commentId, isApproved);
 		this.props.commentsApi.updateComment(commentId, isApproved)
-			.catch(console.error);
+		.catch(console.error);
 	};
 
 	handleCorrectAnswerMark = (commentId, isCorrectAnswer) => {
-		this.updateComment(commentId, ({ isCorrectAnswer }) => ({
+		this.updateComment(commentId, ({isCorrectAnswer}) => ({
 			isCorrectAnswer: !isCorrectAnswer,
 		}));
 
 		// this.debouncedSendData(commentsApi.updateComment, commentId, isCorrectAnswer);
 		this.props.commentsApi.updateComment(commentId, isCorrectAnswer)
-			.catch(console.error);
+		.catch(console.error);
 	};
 
-	handlePinnedToTopMark = (commentId, isPinnedToTop ) => {
-		this.updateComment(commentId, ({ isPinnedToTop }) => ({
+	handlePinnedToTopMark = (commentId, isPinnedToTop) => {
+		this.updateComment(commentId, ({isPinnedToTop}) => ({
 			isPinnedToTop: !isPinnedToTop,
 		}));
 
 		// this.debouncedSendData(commentsApi.updateComment, commentId, isPinnedToTop);
 		this.props.commentsApi.updateComment(commentId, isPinnedToTop)
-			.catch(console.error);
+		.catch(console.error);
 	};
 
 	handleShowEditForm = (commentId) => {
 		this.setState({
-			commentEditing: {...this.state.commentEditing,
+			commentEditing: {
+				...this.state.commentEditing,
 				commentId: commentId,
 			}
 		});
@@ -218,7 +220,8 @@ class CommentsList extends Component {
 
 	handleShowReplyForm = (commentId) => {
 		this.setState({
-			reply: {...this.state.reply,
+			reply: {
+				...this.state.reply,
 				commentId: commentId,
 			}
 		});
@@ -238,22 +241,22 @@ class CommentsList extends Component {
 
 		// this.debouncedSendData(commentsApi.updateComment, commentId, text);
 		this.props.commentsApi.updateComment(commentId, text)
-			.then(() =>
-				this.setState({
-					commentEditing: commentId,
-					sending: true,
-				})
-			)
-			.catch(console.error)
-			.finally(() =>
-				this.setState({
-					sending: false,
-				})
-			)
+		.then(() =>
+			this.setState({
+				commentEditing: commentId,
+				sending: true,
+			})
+		)
+		.catch(console.error)
+		.finally(() =>
+			this.setState({
+				sending: false,
+			})
+		)
 	};
 
 	handleAddReplyComment = async (commentId, text) => {
-		const { commentsApi, courseId, slideId, forInstructors } = this.props;
+		const {commentsApi, courseId, slideId, forInstructors} = this.props;
 		const newComment = await commentsApi.addComment(courseId, slideId, text, forInstructors);
 
 		this.updateComment(commentId, () => ({
@@ -313,7 +316,7 @@ class CommentsList extends Component {
 	};
 
 	getUserSolutionsUrl = (userId) => {
-		const { courseId, slideId } = this.props;
+		const {courseId, slideId} = this.props;
 		return `${window.location.origin}/Analytics/UserSolutions?courseId=${courseId}&slideId=${slideId}&userId=${userId}`;
 	};
 

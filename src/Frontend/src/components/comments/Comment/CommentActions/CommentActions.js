@@ -5,14 +5,14 @@ import Icon from "@skbkontur/react-icons";
 
 import styles from "../Comment.less";
 
-const Button = ({ onClick, icon, children }) => (
+const Button = ({onClick, icon, children}) => (
 	<button type="button" className={styles.sendAnswer} onClick={onClick}>
 		<Icon name={icon} />
 		<span className={styles.buttonText}>{children}</span>
 	</button>
 );
 
-const ActionLink = ({ url, icon, children }) => (
+const ActionLink = ({url, icon, children}) => (
 	<a href={url} className={styles.sendAnswer}>
 		<Icon name={icon} />
 		<span className={styles.linkText}>{children}</span>
@@ -20,7 +20,7 @@ const ActionLink = ({ url, icon, children }) => (
 );
 
 export default function CommentActions(props) {
-	const { user, comment, userRoles, url, hasReplyAction, canModerateComments, actions } = props;
+	const {user, comment, userRoles, url, hasReplyAction, canModerateComments, actions} = props;
 
 	const commentActions = [];
 
@@ -35,15 +35,16 @@ export default function CommentActions(props) {
 		commentActions.push(
 			<Button onClick={() => actions.handleDeleteComment(comment.id)} icon='Delete'>Удалить</Button>);
 	}
-	
+
 	if (canModerateComments(userRoles, 'viewAllStudentsSubmissions')) {
 		commentActions.push(<ActionLink url={url} icon='DocumentLite'>Посмотреть решения</ActionLink>);
 	}
 
 	if (canModerateComments(userRoles, 'editPinAndRemoveComments')) {
 		if (comment.parentCommentId) {
-			commentActions.push(<Button onClick={() => actions.handleCorrectAnswerMark(comment.id, comment.isCorrectAnswer)}
-										icon={'Star2'}>
+			commentActions.push(<Button
+				onClick={() => actions.handleCorrectAnswerMark(comment.id, comment.isCorrectAnswer)}
+				icon={'Star2'}>
 				{comment.isCorrectAnswer ? 'Снять отметку' : 'Отметить правильным'}</Button>)
 		} else {
 			commentActions.push(<Button onClick={() => actions.handlePinnedToTopMark(comment.id, comment.isPinnedToTop)}
@@ -54,7 +55,7 @@ export default function CommentActions(props) {
 
 	return (
 		<div className={styles.actions}>
-			{ commentActions }
+			{commentActions}
 		</div>
 	)
 };
