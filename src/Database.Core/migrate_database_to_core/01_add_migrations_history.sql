@@ -1,4 +1,6 @@
-﻿INSERT INTO dbo.__EFMigrationsHistory
+﻿﻿DELETE FROM dbo.__EFMigrationsHistory
+
+INSERT INTO dbo.__EFMigrationsHistory
 (MigrationId, ProductVersion)
 VALUES
 ('20180202103914_InitialCreate', '2.0.1-rtm-125'),
