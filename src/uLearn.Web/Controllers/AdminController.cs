@@ -157,7 +157,9 @@ namespace uLearn.Web.Controllers
 		public ActionResult DownloadPackage(string courseId)
 		{
 			var packageName = courseManager.GetPackageName(courseId);
-			return File(courseManager.GetStagingCoursePath(courseId), "application/zip", packageName);
+			var path = courseManager.GetStagingCoursePath(courseId);
+			var content = System.IO.File.ReadAllBytes(path);
+			return File(content, "application/zip", packageName);
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
@@ -165,6 +167,16 @@ namespace uLearn.Web.Controllers
 		{
 			var packageName = courseManager.GetPackageName(courseId);
 			return File(courseManager.GetCourseVersionFile(versionId).FullName, "application/zip", packageName);
+		}
+		
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
+		public ActionResult DownloadCourseFile(string courseId)
+		{
+			var content = coursesRepo.GetCourseFile(courseId);
+			if(content == null)
+				return new HttpStatusCodeResult(HttpStatusCode.NotFound);
+			var packageName = courseManager.GetPackageName(courseId);
+			return File(content, "application/zip", packageName);
 		}
 
 		private async Task NotifyAboutCourseVersion(string courseId, Guid versionId, string userId)
@@ -670,11 +682,14 @@ namespace uLearn.Web.Controllers
 			var versionFile = courseManager.GetCourseVersionFile(versionId);
 			var courseFile = courseManager.GetStagingCourseFile(courseId);
 			var oldCourse = courseManager.GetCourse(courseId);
+			
+			log.Info($"загружаю {versionId} курса {courseId} в таблицу {nameof(CourseFile)}");
+			await coursesRepo.AddCourseFile(courseId, versionId, courseFile.ReadAllContent()).ConfigureAwait(false);
 
 			/* First, try to load course from LRU-cache or zip file */
 			log.Info($"Загружаю версию {versionId}");
 			var version = courseManager.GetVersion(versionId);
-
+			
 			/* Copy version's zip file to course's zip archive, overwrite if need */
 			log.Info($"Копирую архив с версий в архив с курсом: {versionFile.FullName} → {courseFile.FullName}");
 			versionFile.CopyTo(courseFile.FullName, true);
