@@ -32,9 +32,9 @@
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-	<ContentWithTargetPath Include="migrate_database_to_core/01_add_migrations_history.sql">
+    <ContentWithTargetPath Include="migrate_database_to_core/01_add_migrations_history.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  <TargetPath>add_migrations_history.sql</TargetPath>
+      <TargetPath>add_migrations_history.sql</TargetPath>
     </ContentWithTargetPath>
   </ItemGroup>
 </Project>

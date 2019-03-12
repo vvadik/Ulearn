@@ -1,4 +1,4 @@
-﻿﻿DELETE FROM dbo.__EFMigrationsHistory
+﻿TRUNCATE TABLE dbo.__EFMigrationsHistory
 
 INSERT INTO dbo.__EFMigrationsHistory
 (MigrationId, ProductVersion)
