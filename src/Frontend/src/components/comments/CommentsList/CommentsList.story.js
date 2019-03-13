@@ -93,6 +93,7 @@ function getUserSolutionsUrl(userId) {
 
 const fakeCommentsApi = {
 	getComments: () => Promise.resolve({topLevelComments: comments}),
+	getComment: () => Promise.resolve(console.log('API: get comment')),
 	addComment: () => Promise.resolve(console.log('API: added comment')),
 	deleteComment: () => Promise.resolve(console.log('API: delete comment')),
 	updateComment: () => Promise.resolve(console.log('API: update comment')),
