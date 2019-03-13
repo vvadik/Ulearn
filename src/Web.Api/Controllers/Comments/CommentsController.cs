@@ -78,7 +78,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 
 			return new CommentsListResponse
 			{
-				TopLevelComments = BuildCommentsListResponse(comments, canUserSeeNotApprovedComments, replies, commentLikesCount, likedByUserCommentsIds, addCourseIdAndSlideId: false, addParentCommentId: false, addReplies: true),
+				TopLevelComments = BuildCommentsListResponse(comments, canUserSeeNotApprovedComments, replies, commentLikesCount, likedByUserCommentsIds, addCourseIdAndSlideId: false, addParentCommentId: true, addReplies: true),
 				Pagination = new PaginationResponse
 				{
 					Offset = parameters.Offset,
