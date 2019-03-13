@@ -5,17 +5,21 @@ import Button from "@skbkontur/react-ui/components/Button/Button";
 import Icon from "@skbkontur/react-icons";
 import Tabs from "@skbkontur/react-ui/components/Tabs/Tabs";
 import CommentsList from "../CommentsList/CommentsList";
-import Error404 from "../../common/Error/Error404";
 import CommentPolicySettings from "./CommentPolicySettings";
 
 import styles from './CommentsWrapper.less';
+
+const TABS = {
+	allComments: 'allComments',
+	instructorsComments: 'instructorsComments',
+};
 
 class CommentsWrapper extends Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			comments: [],
+			instructorComments: [],
 			activeTab: "allComments",
 			openModal: false,
 			status: '',
@@ -23,55 +27,42 @@ class CommentsWrapper extends Component {
 	}
 
 	componentDidMount() {
-		this.loadComments(this.props.courseId, this.props.slideId, true);
+		const { courseId, slideId, userRoles } = this.props;
+		if (this.isInstructor(userRoles))
+			this.loadComments(courseId, slideId);
 	};
 
-	loadComments = (courseId, slideId, forInstructors) => {
-		this.props.commentsApi.getComments(courseId, slideId, forInstructors)
-		.then(json => {
-			let comments = json.topLevelComments;
-			this.setState({
-				comments: comments,
-			});
-		})
-		.catch(() => {
-			this.setState({
-				status: 'error',
-			});
-		})
+	loadComments = (courseId, slideId) => {
+		this.props.commentsApi.getComments(courseId, slideId, true)
+			.then(json => {
+				let comments = json.topLevelComments;
+				this.setState({
+					instructorComments: comments,
+				});
+			})
+			.catch(() => {
+				//TODO
+				this.setState({
+					status: 'error',
+				});
+			})
 	};
 
 	render() {
 		const {user, userRoles, courseId, slideId, commentsApi} = this.props;
-		const {activeTab} = this.state;
-		const forInstructors = activeTab === 'commentsForInstructors';
-
-		if (this.state.status === "error") {
-			return <Error404 />;
-		}
 
 		return (
 			<div className={styles.wrapper}>
 				{this.renderHeader()}
 				{this.state.openModal && <CommentPolicySettings handleOpenModal={this.handleOpenModal} />}
-				<div className={styles.commentsContainer}>
+				<div className={styles.commentsContainer} key={this.state.activeTab}>
 					<CommentsList
-						forInstructors={forInstructors}
+						forInstructors={this.state.activeTab === TABS.instructorsComments}
 						commentsApi={commentsApi}
 						user={user}
 						userRoles={userRoles}
 						slideId={slideId}
 						courseId={courseId}>
-						{activeTab === "allComments" &&
-						<p>
-							К этому слайду ещё нет коммаентариев. Вы можете начать беседу со студентами,
-							добавив комментарий.
-						</p>}
-						{activeTab === "commentsForInstructors" &&
-						<p>
-							К этому слайду нет комментариев преподавателей. Вы можете начать беседу с преподавателями,
-							добавив комментарий.
-						</p>}
 					</CommentsList>
 				</div>
 			</div>
@@ -80,27 +71,38 @@ class CommentsWrapper extends Component {
 
 	renderHeader() {
 		const {userRoles} = this.props;
-		const commentsCount = this.state.comments.length;
+		const {activeTab } = this.state;
+		const commentsCount = this.state.instructorComments.length;
+
 		return (
 			<header className={styles.header}>
 				<div className={styles.headerRow}>
 					<h1 className={styles.headerName}>Комментарии</h1>
-					{(userRoles.isSystemAdministrator || userRoles.courseRole === 'courseAdmin') &&
+					{this.isCourseAdmin(userRoles) &&
 					<Button size="medium" icon={<Icon.Settings />}
 							onClick={() => this.handleOpenModal(true)}>Настроить</Button>}
 				</div>
-				{(userRoles.isSystemAdministrator || userRoles.courseRole === 'courseAdmin' ||
-					userRoles.courseRole === 'instructor') &&
-				<Tabs value={this.state.activeTab} onChange={this.handleTabChange}>
-					<Tabs.Tab id="allComments">К слайду</Tabs.Tab>
-					<Tabs.Tab id="commentsForInstructors">
+				{this.isInstructor(userRoles) &&
+				<Tabs value={activeTab} onChange={this.handleTabChange}>
+					<Tabs.Tab id={TABS.allComments}>К слайду</Tabs.Tab>
+					<Tabs.Tab id={TABS.instructorsComments}>
 						Для преподавателей
-						<span className={styles.commentsCount}>{commentsCount}</span>
+						{activeTab === TABS.allComments && <span className={styles.commentsCount}>{commentsCount}</span>}
 					</Tabs.Tab>
 				</Tabs>}
 			</header>
 		)
 	};
+
+	isCourseAdmin(userRoles) {
+		return userRoles.isSystemAdministrator ||
+			userRoles.courseRole === 'courseAdmin';
+	}
+
+	isInstructor(userRoles) {
+		return this.isCourseAdmin(userRoles) ||
+			userRoles.courseRole === 'instructor';
+	}
 
 	handleTabChange = (_, id) => {
 		this.setState({
@@ -108,9 +110,9 @@ class CommentsWrapper extends Component {
 		});
 	};
 
-	handleOpenModal = (flag) => {
+	handleOpenModal = (openModal) => {
 		this.setState({
-			openModal: flag,
+			openModal: openModal,
 		})
 	};
 }

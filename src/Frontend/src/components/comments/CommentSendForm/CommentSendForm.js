@@ -15,6 +15,7 @@ class CommentSendForm extends Component {
 			text: props.text || '',
 			error: null,
 			commentId: props.commentId,
+			status: props.isSuccessSend,
 		};
 	}
 
@@ -36,7 +37,7 @@ class CommentSendForm extends Component {
 		const {error, text} = this.state;
 
 		return (
-			<React.Fragment>
+			<>
 				<div className={styles.commentSendForm}>
 					{author && (
 						<div className={styles.avatar}>
@@ -57,7 +58,7 @@ class CommentSendForm extends Component {
 						</MarkdownEditor>
 					</form>
 				</div>
-			</React.Fragment>
+			</>
 		)
 	}
 
@@ -97,7 +98,6 @@ class CommentSendForm extends Component {
 		event.preventDefault();
 
 		const {text} = this.state;
-		const {commentId, handleSubmit} = this.props;
 
 		if (!text) {
 			this.setState({
@@ -106,6 +106,8 @@ class CommentSendForm extends Component {
 			return;
 		}
 
+		const {commentId, handleSubmit} = this.props;
+
 		handleSubmit(commentId, text);
 	};
 
@@ -113,13 +115,16 @@ class CommentSendForm extends Component {
 		return new Promise((resolve) => {
 			this.setState({text, error: null}, resolve);
 		});
-	}
+	};
+
 }
 
 CommentSendForm.propTypes = {
 	author: userType,
 	commentId: PropTypes.number,
 	handleSubmit: PropTypes.func,
+	handleAddNewComment: PropTypes.func,
+	isSuccessSend: PropTypes.string,
 	sending: PropTypes.bool,
 	submitTitle: PropTypes.string,
 	onCancel: PropTypes.func,

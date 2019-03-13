@@ -1,9 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { comment, userRoles, userType } from "../../commonPropTypes";
+import uuid from 'uuid';
 import Icon from "@skbkontur/react-icons";
 
 import styles from "../Comment.less";
+
 
 const Button = ({onClick, icon, children}) => (
 	<button type="button" className={styles.sendAnswer} onClick={onClick}>
@@ -26,30 +28,59 @@ export default function CommentActions(props) {
 
 	if (hasReplyAction) {
 		commentActions.push(
-			<Button onClick={() => actions.handleShowReplyForm(comment.id)} icon='ArrowCorner1'>Ответить</Button>);
+			<Button
+				key={uuid()}
+				onClick={() => actions.handleShowReplyForm(comment.id)}
+				icon='ArrowCorner1'>
+			Ответить
+			</Button>);
 	}
 
 	if (user.id === comment.author.id) {
 		commentActions.push(
-			<Button onClick={() => actions.handleShowEditForm(comment.id)} icon='Edit'>Редактировать</Button>);
+			<Button
+				key={uuid()}
+				onClick={() => actions.handleShowEditForm(comment.id)}
+				icon='Edit'>
+			Редактировать
+			</Button>);
+
 		commentActions.push(
-			<Button onClick={() => actions.handleDeleteComment(comment.id)} icon='Delete'>Удалить</Button>);
+			<Button
+				key={uuid()}
+				onClick={() => actions.handleDeleteComment(comment.id)}
+				icon='Delete'>
+			Удалить
+			</Button>);
 	}
 
 	if (canModerateComments(userRoles, 'viewAllStudentsSubmissions')) {
-		commentActions.push(<ActionLink url={url} icon='DocumentLite'>Посмотреть решения</ActionLink>);
+		commentActions.push(
+			<ActionLink
+				key={uuid()}
+				url={url}
+				icon='DocumentLite'>
+			Посмотреть решения
+			</ActionLink>);
 	}
 
 	if (canModerateComments(userRoles, 'editPinAndRemoveComments')) {
 		if (comment.parentCommentId) {
-			commentActions.push(<Button
-				onClick={() => actions.handleCorrectAnswerMark(comment.id, comment.isCorrectAnswer)}
-				icon={'Star2'}>
-				{comment.isCorrectAnswer ? 'Снять отметку' : 'Отметить правильным'}</Button>)
+			commentActions.push(
+				<Button
+					key={uuid()}
+					onClick={() => actions.handleCorrectAnswerMark(comment.id, comment.isCorrectAnswer)}
+					icon={'Star2'}>
+				{comment.isCorrectAnswer ? 'Снять отметку' : 'Отметить правильным'}
+				</Button>)
 		} else {
-			commentActions.push(<Button onClick={() => actions.handlePinnedToTopMark(comment.id, comment.isPinnedToTop)}
-										icon={'Pin'}>
-				{comment.isPinnedToTop ? 'Открепить' : 'Закрепить'}</Button>)
+			commentActions.push(
+				<Button
+					key={uuid()}
+					onClick={() => actions.handlePinnedToTopMark(comment.id, comment.isPinnedToTop)}
+					icon={'Pin'}>
+				{comment.isPinnedToTop ? 'Открепить' : 'Закрепить'}
+				</Button>)
 		}
 	}
 

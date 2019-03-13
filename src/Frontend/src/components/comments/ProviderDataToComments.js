@@ -1,21 +1,23 @@
-import React from 'react-dom';
+import React, { Component } from 'react';
 import PropTypes from "prop-types";
 import { userRoles, user } from "./commonPropTypes";
 import api from "../../api";
 import CommentsWrapper from "./CommentsWrapper/CommentsWrapper";
 
-export default function ProviderDataToComments (props) {
-	const {user, userRoles, courseId, slideId} = props;
+class ProviderDataToComments extends Component {
+	render() {
+		const {user, userRoles, courseId, slideId} = this.props;
 
-	return (
-		<CommentsWrapper
-			user={user}
-			userRoles={userRoles}
-			courseId={courseId}
-			slideId={slideId}
-			commentsApi={api.comments}
-		/>
-	)
+		return (
+			<CommentsWrapper
+				user={user}
+				userRoles={userRoles}
+				courseId={courseId}
+				slideId={slideId}
+				commentsApi={api.comments}
+			/>
+		)
+	}
 }
 
 ProviderDataToComments.propTypes = {
@@ -24,3 +26,5 @@ ProviderDataToComments.propTypes = {
 	courseId: PropTypes.string.isRequired,
 	slideId: PropTypes.string.isRequired,
 };
+
+export default ProviderDataToComments;
