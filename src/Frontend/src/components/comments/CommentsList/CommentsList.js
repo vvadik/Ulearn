@@ -9,6 +9,8 @@ import Toast from "@skbkontur/react-ui/components/Toast/Toast";
 import Thread from "../Thread/Thread";
 import CommentSendForm from "../CommentSendForm/CommentSendForm";
 import Error404 from "../../common/Error/Error404";
+import Stub from "../Stub/Stub";
+
 
 import styles from "./CommentsList.less";
 
@@ -33,6 +35,8 @@ class CommentsList extends Component {
 			status: '',
 		};
 
+		this.myRef = React.createRef();
+
 		//this.debouncedSendData = debounce(this.sendData, 300);
 	}
 
@@ -43,11 +47,9 @@ class CommentsList extends Component {
 	};
 
 	loadComments = (courseId, slideId, forInstructors) => {
-		const {loadedComments, loadingComments} = this.state;
-
-		// if (loadingComments) {
-		// 	return;
-		// }
+		if (this.state.loadingComments) {
+			return;
+		}
 
 		this.setState({
 			loadingComments: true,
@@ -58,7 +60,7 @@ class CommentsList extends Component {
 			let comments = json.topLevelComments;
 			this.setState({
 				threads: comments,
-				loadedComments: true,
+				loadingComments: false,
 			});
 		})
 		.catch(() => {
@@ -74,8 +76,8 @@ class CommentsList extends Component {
 	};
 
 	render() {
-		const {threads, commentEditing, reply, sending, status, newCommentId} = this.state;
-		const {user, userRoles, forInstructors} = this.props;
+		const {threads, commentEditing, reply, sending, status, newCommentId, loadingComments} = this.state;
+		const {user, userRoles, courseId, slideId} = this.props;
 
 		if (this.state.status === "error") {
 			return <Error404 />;
@@ -83,70 +85,74 @@ class CommentsList extends Component {
 
 		return (
 			<>
-				{ threads.length === 0 ?
-					(!forInstructors ?
-						<p>
-							К этому слайду ещё нет коммаентариев. Вы можете начать беседу со студентами,
-							добавив комментарий.
-						</p>
-					:
-						<p>
-						К этому слайду нет комментариев преподавателей. Вы можете начать беседу с преподавателями,
-						добавив комментарий.
-						</p>
-					)
-				:
+				{ threads.length === 0 && this.renderStubForEmptyComments()}
 				<>
+					{!user.isAuthenticated ? <Stub courseId={courseId} slideId={slideId} /> :
 					<CommentSendForm
+						ref={this.myRef}
 						commentId={newCommentId}
 						author={user}
 						handleSubmit={this.handleAddComment}
 						sending={sending}
-						isSuccessSend={status} />
-					<Loader type="big" active={this.state.loadingComments}>
-						<TransitionGroup>
-							{threads.map((comment) =>
-							<CSSTransition
+						isSuccessSend={status} />}
+					<Loader type="big" active={loadingComments} />
+					<TransitionGroup>
+						{threads.map((comment) =>
+						<CSSTransition
+							key={comment.id}
+							mountOnEnter
+							unmountOnExit
+							classNames={{
+								enter: styles.enter,
+								exit: styles.exit,
+								enterActive: styles.enterActive,
+								exitActive: styles.exitActive,
+							}}
+							timeout={1000}>
+							<Thread
 								key={comment.id}
-								mountOnEnter
-								unmountOnExit
-								// classNames={styles["comment"]}
-								classNames={{
-									enter: styles.enter,
-									exit: styles.exit,
-									activeEnter: styles.enterActive,
-									activeExit: styles.exitActive,
+								comment={comment}
+								commentEditing={commentEditing}
+								reply={reply}
+								actions={{
+									handleLikeClick: this.handleLikeClick,
+									handleCorrectAnswerMark: this.handleCorrectAnswerMark,
+									handleApprovedMark: this.handleApprovedMark,
+									handlePinnedToTopMark: this.handlePinnedToTopMark,
+									handleEditComment: this.handleEditComment,
+									handleAddReplyComment: this.handleAddReplyComment,
+									handleDeleteComment: this.handleDeleteComment,
+									handleShowEditForm: this.handleShowEditForm,
+									handleShowReplyForm: this.handleShowReplyForm,
 								}}
-								timeout={1000}>
-								<Thread
-									key={comment.id}
-									comment={comment}
-									commentEditing={commentEditing}
-									reply={reply}
-									actions={{
-										handleLikeClick: this.handleLikeClick,
-										handleCorrectAnswerMark: this.handleCorrectAnswerMark,
-										handleApprovedMark: this.handleApprovedMark,
-										handlePinnedToTopMark: this.handlePinnedToTopMark,
-										handleEditComment: this.handleEditComment,
-										handleAddReplyComment: this.handleAddReplyComment,
-										handleDeleteComment: this.handleDeleteComment,
-										handleShowEditForm: this.handleShowEditForm,
-										handleShowReplyForm: this.handleShowReplyForm,
-										// handleSubmitComment: this.handleSubmitComment,
-									}}
-									getUserSolutionsUrl={this.getUserSolutionsUrl}
-									user={user}
-									userRoles={userRoles} />
-							</CSSTransition>)}
-						</TransitionGroup>
-					</Loader>
-					<button className={styles.sendButton}>
+								getUserSolutionsUrl={this.getUserSolutionsUrl}
+								user={user}
+								userRoles={userRoles} />
+						</CSSTransition>)}
+					</TransitionGroup>
+					{user.isAuthenticated &&
+					<button className={styles.sendButton} onClick={this.handleScrollToTop}>
 						<Icon name="CommentLite" color="#3072C4" />
 						<span className={styles.sendButtonText}>Оставить комментарий</span>
-					</button>
+					</button>}
 				</>
-				}
+			</>
+		)
+	}
+
+	renderStubForEmptyComments() {
+		return (
+			<>
+				{!this.props.forInstructors ?
+				<p className={styles.emptyComments}>
+					К этому слайду ещё нет коммаентариев. Вы можете начать беседу со студентами,
+					добавив комментарий.
+				</p>
+				:
+				<p className={styles.emptyComments}>
+					К этому слайду нет комментариев преподавателей. Вы можете начать беседу с преподавателями,
+					добавив комментарий.
+				</p>}
 			</>
 		)
 	}
@@ -167,8 +173,7 @@ class CommentsList extends Component {
 
 	updateThread(id, reducer) {
 		this.setState(() => {
-			// const threads = JSON.parse(JSON.stringify(state.threads));
-			const threads = [...this.state.threads];
+			const threads = JSON.parse(JSON.stringify(this.state.threads));
 			const thread = threads.find(thread => thread.id === id);
 
 			Object.assign(thread, reducer(thread));
@@ -179,8 +184,7 @@ class CommentsList extends Component {
 
 	updateComment(id, reducer) {
 		this.setState(() => {
-			// const threads = JSON.parse(JSON.stringify(state.threads));
-			const threads = [...this.state.threads];
+			const threads = JSON.parse(JSON.stringify(this.state.threads));
 			const comment = this.findComment(id, threads);
 
 			Object.assign(comment, reducer(comment));
@@ -191,6 +195,7 @@ class CommentsList extends Component {
 
 	handleAddComment = async (commentId, text) => {
 		const {commentsApi, courseId, slideId, forInstructors} = this.props;
+		const threads = JSON.parse(JSON.stringify(this.state.threads));
 
 		this.setState({
 			sending: true,
@@ -201,7 +206,7 @@ class CommentsList extends Component {
 			const newComment = await commentsApi.getComment(request.id);
 
 			this.setState({
-				threads: [newComment, ...this.state.threads],
+				threads: [newComment, ...threads],
 				sending: false,
 				status: 'success',
 				newCommentId: this.state.newCommentId + 1,
@@ -413,6 +418,10 @@ class CommentsList extends Component {
 		throw new Error(`Comment with id ${commentId} not found`);
 	};
 
+	handleScrollToTop = () => {
+		window.scrollTo(0, this.myRef.current.offsetTop);
+	};
+
 	getUserSolutionsUrl = (userId) => {
 		const {courseId, slideId} = this.props;
 		return `${window.location.origin}/Analytics/UserSolutions?courseId=${courseId}&slideId=${slideId}&userId=${userId}`;
@@ -428,7 +437,6 @@ CommentsList.propTypes = {
 	userRoles: userRoles.isRequired,
 	forInstructors: PropTypes.bool,
 	commentsApi: PropTypes.objectOf(PropTypes.func),
-	//comments: PropTypes.arrayOf(comment).isRequired,
 	courseId: PropTypes.string.isRequired,
 	slideId: PropTypes.string.isRequired,
 };
