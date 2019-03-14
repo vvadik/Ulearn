@@ -14,6 +14,23 @@
 	text-align: right;
 }
 
+.legacy-page .analytics__dashboard #unit-statistics-students-table .small-table__right-cell {
+	display: table-cell;
+	max-width: 50px;
+	min-width: 50px;
+	width: 50px;
+	padding-right: 3px;
+}
+
+.legacy-page .analytics__dashboard #unit-statistics-students-table {
+	width: 100%;
+	display: table;
+}
+
+.legacy-page .analytics__dashboard #unit-statistics-students-table .glyphicon {
+	top: 0;
+}
+
 .legacy-page .analytics__dashboard .small-table__title {
 	border-top: 1px solid #ccc;
 	border-bottom: 1px solid #ccc;
@@ -30,12 +47,40 @@
 	width: 50px;
 }
 
+.legacy-page .analytics__dashboard #unit-statistics-students-table .small-table__title__cell
+{
+	display: table-cell;
+	width: 50px;
+	min-width: 50px;
+	max-width: 50px;
+	height: 23px;
+}
+
+.legacy-page .analytics__dashboard #unit-statistics-students-table .small-table__title__cell:first-child  {
+	text-align: left;
+	width: 100%;
+	
+}
+
 .legacy-page .analytics__dashboard .additional-scores__edit-mode__save-button {
 	display: none;
 }
 
 .legacy-page .analytics__dashboard .student {
 	height: 30px;
+}
+
+.legacy-page .analytics__dashboard #unit-statistics-students-table .small-table__student-progress-cell {
+	display: table-cell;
+	width: 150px;
+	min-width: 150px;
+	max-width: 150px;
+}
+
+.legacy-page .analytics__dashboard #unit-statistics-students-table .small-table__student-name-cell {
+	white-space: nowrap;
+	padding-right: 10px;
+	width: 100%;
 }
 
 .legacy-page .analytics__dashboard .student-progress {
@@ -76,6 +121,11 @@
 	.legacy-page .analytics__dashboard .student-progress {
 		width: 90px;
 	}
+	.legacy-page .analytics__dashboard #unit-statistics-students-table .small-table__student-progress-cell {
+		width: 90px;
+		min-width: 90px;
+		max-width: 90px;
+	}
 
 	.legacy-page .analytics__dashboard #students .student {
 		margin-bottom: 10px;
@@ -84,6 +134,13 @@
 	.legacy-page .analytics__dashboard .small-table__title__cell,
 	.legacy-page .analytics__dashboard .small-table__right-cell
 	{
+		width: 40px;
+	}
+
+	.legacy-page .analytics__dashboard #unit-statistics-students-table .small-table__right-cell,
+	.legacy-page .analytics__dashboard #unit-statistics-students-table .small-table__title__cell {
+		max-width: 40px;
+		min-width: 40px;
 		width: 40px;
 	}
 
@@ -98,8 +155,14 @@
 
 @media (max-width: 600px) {
 	.legacy-page .analytics__dashboard .small-table__title__cell,
-	.legacy-page .analytics__dashboard .small-table__right-cell
-	{
+	.legacy-page .analytics__dashboard .small-table__right-cell {
+		width: 35px;
+	}
+	
+	.legacy-page .analytics__dashboard #unit-statistics-students-table .small-table__right-cell,
+	.legacy-page .analytics__dashboard #unit-statistics-students-table .small-table__title__cell {
+		max-width: 35px;
+		min-width: 35px;
 		width: 35px;
 	}
 }
@@ -156,4 +219,10 @@
 
 .legacy-page .analytics__other-units-link > div:last-child {
 	text-align: right;
+}
+
+.legacy-page .hidden-xs-table-cell{ display: table-cell !important; }
+
+@media (max-width: 767px) {
+	.legacy-page .hidden-xs-table-cell { display: none !important; }
 }
