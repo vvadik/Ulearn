@@ -7,14 +7,21 @@ import Tabs from "@skbkontur/react-ui/components/Tabs/Tabs";
 import CommentsList from "../CommentsList/CommentsList";
 import CommentPolicySettings from "./CommentPolicySettings";
 
-import styles from './CommentsWrapper.less';
+import styles from './CommentsView.less';
 
 const TABS = {
 	allComments: 'allComments',
 	instructorsComments: 'instructorsComments',
 };
 
-class CommentsWrapper extends Component {
+const ROLES = {
+	systemAdministrator: 'isSystemAdministrator',
+	courseAdmin: 'courseAdmin',
+	instructor: 'instructor',
+	student: 'student',
+};
+
+class CommentsView extends Component {
 	constructor(props) {
 		super(props);
 
@@ -22,7 +29,6 @@ class CommentsWrapper extends Component {
 			instructorComments: [],
 			activeTab: "allComments",
 			openModal: false,
-			status: '',
 		};
 	}
 
@@ -40,12 +46,7 @@ class CommentsWrapper extends Component {
 					instructorComments: comments,
 				});
 			})
-			.catch(() => {
-				//TODO
-				this.setState({
-					status: 'error',
-				});
-			})
+			.catch(console.error);
 	};
 
 	render() {
@@ -83,25 +84,28 @@ class CommentsWrapper extends Component {
 							onClick={() => this.handleOpenModal(true)}>Настроить</Button>}
 				</div>
 				{this.isInstructor(userRoles) &&
-				<Tabs value={activeTab} onChange={this.handleTabChange}>
-					<Tabs.Tab id={TABS.allComments}>К слайду</Tabs.Tab>
-					<Tabs.Tab id={TABS.instructorsComments}>
-						Для преподавателей
-						{activeTab === TABS.allComments && <span className={styles.commentsCount}>{commentsCount}</span>}
-					</Tabs.Tab>
-				</Tabs>}
+				<div className={styles.tabs}>
+					<Tabs value={activeTab} onChange={this.handleTabChange}>
+						<Tabs.Tab id={TABS.allComments}>К слайду</Tabs.Tab>
+						<Tabs.Tab id={TABS.instructorsComments}>
+							Для преподавателей
+							{activeTab === TABS.allComments &&
+							<span className={styles.commentsCount}>{commentsCount}</span>}
+						</Tabs.Tab>
+					</Tabs>
+				</div>}
 			</header>
 		)
 	};
 
 	isCourseAdmin(userRoles) {
 		return userRoles.isSystemAdministrator ||
-			userRoles.courseRole === 'courseAdmin';
+			userRoles.courseRole === ROLES.courseAdmin;
 	}
 
 	isInstructor(userRoles) {
 		return this.isCourseAdmin(userRoles) ||
-			userRoles.courseRole === 'instructor';
+			userRoles.courseRole === ROLES.instructor;
 	}
 
 	handleTabChange = (_, id) => {
@@ -117,7 +121,7 @@ class CommentsWrapper extends Component {
 	};
 }
 
-CommentsWrapper.propTypes = {
+CommentsView.propTypes = {
 	user: user.isRequired,
 	userRoles: userRoles.isRequired,
 	courseId: PropTypes.string.isRequired,
@@ -125,4 +129,4 @@ CommentsWrapper.propTypes = {
 	commentsApi: PropTypes.objectOf(PropTypes.func),
 };
 
-export default CommentsWrapper;
+export default CommentsView;

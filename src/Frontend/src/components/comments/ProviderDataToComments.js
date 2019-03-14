@@ -2,14 +2,15 @@ import React, { Component } from 'react';
 import PropTypes from "prop-types";
 import { userRoles, user } from "./commonPropTypes";
 import api from "../../api";
-import CommentsWrapper from "./CommentsWrapper/CommentsWrapper";
+import CommentsView from "./CommentsView/CommentsView";
 
 class ProviderDataToComments extends Component {
 	render() {
 		const {user, userRoles, courseId, slideId} = this.props;
+		console.log(user);
 
 		return (
-			<CommentsWrapper
+			<CommentsView
 				user={user}
 				userRoles={userRoles}
 				courseId={courseId}

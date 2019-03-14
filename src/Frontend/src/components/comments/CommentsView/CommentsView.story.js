@@ -1,7 +1,6 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
-import { action } from '@storybook/addon-actions';
-import CommentsWrapper from "./CommentsWrapper";
+import CommentsView from "./CommentsView";
 
 const comments = [
 	{
@@ -96,9 +95,9 @@ const fakeCommentsApi = {
 	dislikeComment: () => Promise.resolve(console.log('API: dislike comment')),
 };
 
-storiesOf('Comments/CommentsWrapper', module)
+storiesOf('Comments/CommentsView', module)
 .add('список комментариев', () => (
-	<CommentsWrapper
+	<CommentsView
 		user={user}
 		userRoles={userRoles}
 		slideId={'90bcb61e-57f0-4baa-8bc9-10c9cfd27f58'}

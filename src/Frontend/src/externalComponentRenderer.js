@@ -18,7 +18,7 @@ import ReactDOM from "react-dom";
 /* Import all components you want to insert into legacy (cshtml+jquery) layout */
 
 import ProviderDataToComments from "./components/comments/ProviderDataToComments";
-import CommentsWrapper from "./components/comments/CommentsWrapper/CommentsWrapper";
+import CommentsView from "./components/comments/CommentsView/CommentsView";
 import CommentsList from "./components/comments/CommentsList/CommentsList";
 import Comment from "./components/comments/Comment/Comment";
 import CommentSendForm from "./components/comments/CommentSendForm/CommentSendForm";
@@ -26,7 +26,7 @@ import CommentSendForm from "./components/comments/CommentSendForm/CommentSendFo
 /* Define names for all components you want to use */
 const components = {
 	'ProviderDataToComments': ProviderDataToComments,
-	'CommentsWrapper': CommentsWrapper,
+	'CommentsView': CommentsView,
 	'CommentsList': CommentsList,
 	'Comment': Comment,
 	'CommentSendForm': CommentSendForm,
