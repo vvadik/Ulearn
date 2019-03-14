@@ -155,8 +155,8 @@ class DownloadedHtmlContent extends Component {
 		let courseId = this._getCourseIdFromUrl();
 		this.props.enterToCourse(courseId);
 
-		let slideId = this._getSlideIdFromUrl();
-		this.props.enterToCourse(slideId);
+		// let slideId = this._getSlideIdFromUrl();
+		// this.props.enterToCourse(slideId);
 
 		let el = document.createElement('html');
 		el.innerHTML = data;
@@ -210,12 +210,13 @@ class DownloadedHtmlContent extends Component {
 		DownloadedHtmlContent.removeBootstrapModalBackdrop();
 	}
 
-	_getSlideIdFromUrl() {
-		const pathname = window.location.pathname;
-		if (pathname.startsWith('/Course/')) {
-			return window.location.pathname.split('/')[3].split('_').pop();
-		}
-	}
+	// _getSlideIdFromUrl() {
+	// 	const pathname = window.location.pathname;
+	// 	console.log(pathname);
+	// 	if (pathname.startsWith('/Course/')) {
+	// 		return window.location.pathname.split('/')[3].split('_').pop();
+	// 	}
+	// }
 
 	_getCourseIdFromUrl() {
 		/* 1. Extract courseId from urls like /Course/<courseId/... */

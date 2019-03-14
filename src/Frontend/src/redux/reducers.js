@@ -40,7 +40,7 @@ function account(state = initialAccountState, action) {
 const initialCoursesState = {
 	courseById: {},
 	currentCourseId: undefined,
-	currentSlideId: undefined,
+	// currentSlideId: undefined,
 };
 
 function courses(state = initialCoursesState, action) {
