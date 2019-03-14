@@ -165,7 +165,7 @@ class TocMenu extends Component {
 class AbstractMyCoursesMenu extends Component {
 	static VISIBLE_COURSES_COUNT = 10;
 
-	static _getCourseMenuItems(courseIds, courseById) {
+	static _getCourseMenuItems(courseIds, courseById, isSystemAdministrator) {
 		courseIds = courseIds.filter(item => courseById[item] !== undefined);
 		courseIds.sort((a, b) => courseById[a].title.localeCompare(courseById[b].title));
 		let visibleCourseIds = courseIds.slice(0, AbstractMyCoursesMenu.VISIBLE_COURSES_COUNT);
@@ -173,7 +173,7 @@ class AbstractMyCoursesMenu extends Component {
 			<MenuItem href={"/Course/" + courseId} key={courseId}
 					  component={LinkComponent}>{courseById[courseId].title}</MenuItem>
 		);
-		if (courseIds.length > visibleCourseIds.length || courseIds.length === 0)
+		if (courseIds.length > visibleCourseIds.length || courseIds.length === 0 || isSystemAdministrator)
 			items.push(<MenuItem href="/Admin/Courses" key="-course-list" component={LinkComponent}><strong>Все
 				курсы</strong></MenuItem>);
 		return items;
@@ -202,7 +202,7 @@ class SysAdminMenu extends AbstractMyCoursesMenu {
 				C#</MenuItem>,
 			<MenuSeparator key="SysAdminMenuSeparator" />,
 			<MenuHeader key="Courses">Курсы</MenuHeader>
-		].concat(AbstractMyCoursesMenu._getCourseMenuItems(courseIds, courseById));
+		].concat(AbstractMyCoursesMenu._getCourseMenuItems(courseIds, courseById, true));
 	}
 
 	render() {
@@ -230,7 +230,7 @@ SysAdminMenu = connect(SysAdminMenu.mapStateToProps)(SysAdminMenu);
 
 class MyCoursesMenu extends AbstractMyCoursesMenu {
 	static menuItems(courseIds, courseById) {
-		return AbstractMyCoursesMenu._getCourseMenuItems(courseIds, courseById)
+		return AbstractMyCoursesMenu._getCourseMenuItems(courseIds, courseById, false)
 	}
 
 	render() {

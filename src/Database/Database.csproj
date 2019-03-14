@@ -745,6 +745,10 @@
     <Compile Include="Migrations\201903061415434_DeleteNotificationDeliveryOnDeleteNotification.Designer.cs">
       <DependentUpon>201903061415434_DeleteNotificationDeliveryOnDeleteNotification.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201903111115321_AddCourseFiles.cs" />
+    <Compile Include="Migrations\201903111115321_AddCourseFiles.Designer.cs">
+      <DependentUpon>201903111115321_AddCourseFiles.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -760,6 +764,7 @@
     <Compile Include="Models\ExerciseCodeReviewComment.cs" />
     <Compile Include="Models\ExerciseSolutionByGrader.cs" />
     <Compile Include="Models\FeedUpdateTimestamp.cs" />
+    <Compile Include="Models\CourseFile.cs" />
     <Compile Include="Models\GraderClient.cs" />
     <Compile Include="Models\Group.cs" />
     <Compile Include="Models\GroupAccess.cs" />
@@ -1159,6 +1164,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201903061415434_DeleteNotificationDeliveryOnDeleteNotification.resx">
       <DependentUpon>201903061415434_DeleteNotificationDeliveryOnDeleteNotification.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201903111115321_AddCourseFiles.resx">
+      <DependentUpon>201903111115321_AddCourseFiles.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

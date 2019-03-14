@@ -6,6 +6,7 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using Database.Extensions;
 using Database.Models;
+using JetBrains.Annotations;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 
@@ -134,6 +135,26 @@ namespace Database.DataContexts
 		public bool HasCourseAccess(string userId, string courseId, CourseAccessType accessType)
 		{
 			return db.CourseAccesses.Any(a => a.CourseId == courseId && a.UserId == userId && a.AccessType == accessType && a.IsEnabled);
+		}
+		
+		// Add new and remove old course files 
+		public async Task AddCourseFile(string courseId, Guid versionId, byte[] content)
+		{
+			var file = new CourseFile
+			{
+				CourseId = courseId,
+				CourseVersionId = versionId,
+				File = content
+			};
+			db.CourseFiles.RemoveRange(db.CourseFiles.Where(f => f.CourseId.Equals(courseId, StringComparison.OrdinalIgnoreCase)));
+			db.CourseFiles.Add(file);
+			await db.SaveChangesAsync();
+		}
+
+		[CanBeNull]
+		public byte[] GetCourseFile(string courseId)
+		{
+			return db.CourseFiles.FirstOrDefault(f => f.CourseId.Equals(courseId, StringComparison.OrdinalIgnoreCase))?.File;
 		}
 	}
 }

@@ -34,7 +34,7 @@ class ComboboxInstructorsSearch extends Component {
 				(accesses.filter(i => i.user.id === item.id)).length === 0;
 		};
 
-		return api.users.getCourseInstructors(this.props.courseId)
+		return api.users.getCourseInstructors(this.props.courseId, query)
 		.then(json => {
 			return json.users
 			.map(item => item.user)

@@ -1,4 +1,6 @@
-﻿INSERT INTO dbo.__EFMigrationsHistory
+﻿TRUNCATE TABLE dbo.__EFMigrationsHistory
+
+INSERT INTO dbo.__EFMigrationsHistory
 (MigrationId, ProductVersion)
 VALUES
 ('20180202103914_InitialCreate', '2.0.1-rtm-125'),
@@ -31,4 +33,5 @@ VALUES
 ('201901220511203_RenameUserQuizs', '2.0.1-rtm-125'),
 ('201901242025259_RemoveQuizSubmissionIsDropped', '2.0.1-rtm-125'),
 ('20190306141426_SynchronizeWithNotCore', '2.2.0-rtm-35687'),
-('20190306141613_DeleteNotificationDeliveryOnDeleteNotification', '2.2.0-rtm-35687')
+('20190306141613_DeleteNotificationDeliveryOnDeleteNotification', '2.2.0-rtm-35687'),
+('20190311111649_AddCourseFiles', '2.2.0-rtm-35687')
