@@ -70,4 +70,4 @@
 	var commentsWrapperUserRoles = User == null ? null : new CommentsWrapperUserRolesData { IsSystemAdministrator = User.IsSystemAdministrator(), CourseRole = courseRoleString, CourseAccesses = courseAccesses };
 }
 
-<div class="react-render" data-component="ProviderDataToComments" data-props="@(new { slideId = Model.Slide.Id, courseId = Model.CourseId, user = commentsWrapperUser, userRoles = commentsWrapperUserRoles }.JsonSerialize())"></div>
+<div class="react-render" data-component="CommentsView" data-props="@(new { slideId = Model.Slide.Id, courseId = Model.CourseId, user = commentsWrapperUser, userRoles = commentsWrapperUserRoles }.JsonSerialize())"></div>
