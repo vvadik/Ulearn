@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from "prop-types";
 import { userType, userRoles } from "../commonPropTypes";
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
-//import * as debounce from "debounce";
+import * as debounce from "debounce";
 import Icon from "@skbkontur/react-icons";
 import Loader from "@skbkontur/react-ui/components/Loader/Loader";
 import Toast from "@skbkontur/react-ui/components/Toast/Toast";
@@ -33,11 +33,12 @@ class CommentsList extends Component {
 			loadingComments: false,
 			loadedComments: false,
 			status: '',
+			animation: false,
 		};
 
 		this.myRef = React.createRef();
 
-		//this.debouncedSendData = debounce(this.sendData, 300);
+		this.debouncedSendData = debounce(this.sendData, 2000);
 	}
 
 	componentDidMount() {
@@ -62,6 +63,7 @@ class CommentsList extends Component {
 				threads: comments,
 				loadingComments: false,
 			});
+			// scroll to highlighted comment
 		})
 		.catch(() => {
 			this.setState({
@@ -76,67 +78,80 @@ class CommentsList extends Component {
 	};
 
 	render() {
-		const {threads, commentEditing, reply, sending, status, newCommentId, loadingComments} = this.state;
-		const {user, userRoles, courseId, slideId} = this.props;
+		const {threads, sending, status, newCommentId, loadingComments} = this.state;
+		const {user, courseId, slideId} = this.props;
 
 		if (this.state.status === "error") {
 			return <Error404 />;
 		}
 
 		return (
-			<>
-				{ threads.length === 0 && this.renderStubForEmptyComments()}
-				<>
-					{!user.isAuthenticated ? <Stub courseId={courseId} slideId={slideId} /> :
-					<CommentSendForm
-						ref={this.myRef}
-						commentId={newCommentId}
-						author={user}
-						handleSubmit={this.handleAddComment}
-						sending={sending}
-						isSuccessSend={status} />}
-					<Loader type="big" active={loadingComments} />
-					<TransitionGroup>
-						{threads.map((comment) =>
-						<CSSTransition
-							key={comment.id}
-							mountOnEnter
-							unmountOnExit
-							classNames={{
-								enter: styles.enter,
-								exit: styles.exit,
-								enterActive: styles.enterActive,
-								exitActive: styles.exitActive,
+			<div ref={this.myRef}>
+				{threads.length === 0 && this.renderStubForEmptyComments()}
+				{!user.isAuthenticated ? <Stub courseId={courseId} slideId={slideId} /> :
+				<CommentSendForm
+					commentId={newCommentId}
+					author={user}
+					handleSubmit={this.handleAddComment}
+					sending={sending}
+					isSuccessSend={status} />}
+				<Loader type="big" active={loadingComments} />
+				{this.renderThreads()}
+				{(user.isAuthenticated && threads.length > 0) &&
+				<button className={styles.sendButton} onClick={this.handleScrollToTop}>
+					<Icon name="CommentLite" color="#3072C4" />
+					<span className={styles.sendButtonText}>Оставить комментарий</span>
+				</button>}
+			</div>
+		)
+	}
+
+	renderThreads() {
+		const {threads, commentEditing, reply} = this.state;
+		const {user, userRoles} = this.props;
+
+		return (
+			<TransitionGroup enter={this.state.animation}>
+				{threads
+				.sort((a, b) => b.publishTime - a.publishTime)
+				.map((comment) =>
+				<CSSTransition
+					key={comment.id}
+					appear={true}
+					in={this.state.animation}
+					mountOnEnter
+					unmountOnExit
+					classNames={{
+						enter: styles.enter,
+						exit: styles.exit,
+						enterActive: styles.enterActive,
+						exitActive: styles.exitActive,
+					}}
+					timeout={1000}>
+					<section className={styles.thread} key={comment.id}>
+						<Thread
+							// key={comment.id}
+							animation={this.state.animation}
+							comment={comment}
+							commentEditing={commentEditing}
+							reply={reply}
+							actions={{
+								handleLikeClick: this.handleLikeClick,
+								handleCorrectAnswerMark: this.handleCorrectAnswerMark,
+								handleApprovedMark: this.handleApprovedMark,
+								handlePinnedToTopMark: this.handlePinnedToTopMark,
+								handleEditComment: this.handleEditComment,
+								handleAddReplyComment: this.handleAddReplyComment,
+								handleDeleteComment: this.handleDeleteComment,
+								handleShowEditForm: this.handleShowEditForm,
+								handleShowReplyForm: this.handleShowReplyForm,
 							}}
-							timeout={1000}>
-							<Thread
-								key={comment.id}
-								comment={comment}
-								commentEditing={commentEditing}
-								reply={reply}
-								actions={{
-									handleLikeClick: this.handleLikeClick,
-									handleCorrectAnswerMark: this.handleCorrectAnswerMark,
-									handleApprovedMark: this.handleApprovedMark,
-									handlePinnedToTopMark: this.handlePinnedToTopMark,
-									handleEditComment: this.handleEditComment,
-									handleAddReplyComment: this.handleAddReplyComment,
-									handleDeleteComment: this.handleDeleteComment,
-									handleShowEditForm: this.handleShowEditForm,
-									handleShowReplyForm: this.handleShowReplyForm,
-								}}
-								getUserSolutionsUrl={this.getUserSolutionsUrl}
-								user={user}
-								userRoles={userRoles} />
-						</CSSTransition>)}
-					</TransitionGroup>
-					{user.isAuthenticated &&
-					<button className={styles.sendButton} onClick={this.handleScrollToTop}>
-						<Icon name="CommentLite" color="#3072C4" />
-						<span className={styles.sendButtonText}>Оставить комментарий</span>
-					</button>}
-				</>
-			</>
+							getUserSolutionsUrl={this.getUserSolutionsUrl}
+							user={user}
+							userRoles={userRoles} />
+					</section>
+					</CSSTransition>)}
+			</TransitionGroup>
 		)
 	}
 
@@ -184,7 +199,8 @@ class CommentsList extends Component {
 
 	updateComment(id, reducer) {
 		this.setState(() => {
-			const threads = JSON.parse(JSON.stringify(this.state.threads));
+			// const threads = JSON.parse(JSON.stringify(this.state.threads));
+			const threads = [...this.state.threads];
 			const comment = this.findComment(id, threads);
 
 			Object.assign(comment, reducer(comment));
@@ -199,6 +215,7 @@ class CommentsList extends Component {
 
 		this.setState({
 			sending: true,
+			animation: true,
 		});
 
 		try {
@@ -231,14 +248,10 @@ class CommentsList extends Component {
 		}));
 
 		if (!isLiked) {
-			commentsApi.likeComment(commentId)
-				.catch(console.error);
-			// this.debouncedSendData(commentsApi.likeComment, commentId);
+			this.debouncedSendData(commentsApi.likeComment, commentId);
 		} else {
-			commentsApi.dislikeComment(commentId)
-				.catch(console.error);
+			this.debouncedSendData(commentsApi.dislikeComment, commentId);
 		}
-		// this.debouncedSendData(commentsApi.dislikeComment, commentId);
 	};
 
 	handleApprovedMark = (commentId, isApproved) => {
@@ -247,9 +260,7 @@ class CommentsList extends Component {
 			isApproved: !isApproved,
 		}));
 
-		// this.debouncedSendData(commentsApi.updateComment, commentId, isApproved);
-		this.props.commentsApi.updateComment(commentId, {'isApproved': !isApproved})
-			.catch(console.error);
+		this.debouncedSendData(this.props.commentsApi.updateComment, commentId, {'isApproved': !isApproved});
 	};
 
 	handleCorrectAnswerMark = (commentId, isCorrectAnswer) => {
@@ -257,9 +268,7 @@ class CommentsList extends Component {
 			isCorrectAnswer: !isCorrectAnswer,
 		}));
 
-		// this.debouncedSendData(commentsApi.updateComment, commentId, isCorrectAnswer);
-		this.props.commentsApi.updateComment(commentId, {'isCorrectAnswer': !isCorrectAnswer})
-		.catch(console.error);
+		this.debouncedSendData(this.props.commentsApi.updateComment, commentId, {'isCorrectAnswer': !isCorrectAnswer});
 	};
 
 	handlePinnedToTopMark = (commentId, isPinnedToTop) => {
@@ -274,9 +283,7 @@ class CommentsList extends Component {
 			threads: [comment, ...filteredComments],
 		});
 
-		// this.debouncedSendData(commentsApi.updateComment, commentId, isPinnedToTop);
-		this.props.commentsApi.updateComment(commentId, {'isPinnedToTop': !isPinnedToTop})
-			.catch(console.error);
+		this.debouncedSendData(this.props.commentsApi.updateComment, commentId, {'isPinnedToTop': !isPinnedToTop});
 	};
 
 	handleShowEditForm = (commentId) => {
@@ -309,7 +316,6 @@ class CommentsList extends Component {
 			}
 		});
 
-		// this.debouncedSendData(commentsApi.updateComment, commentId, text);
 		this.props.commentsApi.updateComment(commentId, {'text': text})
 			.then(() =>
 				this.setState({
@@ -338,6 +344,7 @@ class CommentsList extends Component {
 		}));
 
 		this.setState({
+			animation: true,
 			reply: {
 				commentId: commentId,
 				sending: true,
@@ -347,14 +354,18 @@ class CommentsList extends Component {
 		const request = await commentsApi.addComment(courseId, slideId, text, commentId, forInstructors);
 		const newReply = await commentsApi.getComment(request.id);
 
-		const comment = this.state.threads.find(comment => comment.id === commentId);
+		const index = this.state.threads.findIndex(comment => comment.id === commentId);
+		const comment = this.state.threads[index];
 		const newReplies = comment.replies.concat(newReply);
 		const newComment = {...comment, replies: newReplies};
-		const filteredThreads = this.state.threads.filter(comment => comment.id !== commentId);
 
 		try {
 			this.setState({
-				threads: [newComment, ...filteredThreads],
+				threads: [
+					...this.state.threads.slice(0, index),
+					newComment,
+					...this.state.threads.slice(index + 1),
+				],
 				reply: {
 					commentId: null,
 					sending: false,
@@ -383,6 +394,10 @@ class CommentsList extends Component {
 	handleDeleteComment = (commentId) => {
 		const threads = JSON.parse(JSON.stringify(this.state.threads));
 		const queue = [threads];
+
+		this.setState({
+			animation: true,
+		});
 
 		while (queue.length > 0) {
 			const thread = queue.shift();
@@ -419,7 +434,12 @@ class CommentsList extends Component {
 	};
 
 	handleScrollToTop = () => {
-		window.scrollTo(0, this.myRef.current.offsetTop);
+		const headerHeight = 60;
+		window.scrollTo({
+			left: 0,
+			top: this.myRef.current.offsetTop - headerHeight,
+			behavior: "smooth"
+		});
 	};
 
 	getUserSolutionsUrl = (userId) => {
@@ -427,9 +447,9 @@ class CommentsList extends Component {
 		return `${window.location.origin}/Analytics/UserSolutions?courseId=${courseId}&slideId=${slideId}&userId=${userId}`;
 	};
 
-	sendData = (action, id, value) => {
-		return () => action(id, value);
-	};
+	sendData = (method, commentId, property) =>
+		method(commentId, property)
+			.catch(console.error);
 }
 
 CommentsList.propTypes = {
