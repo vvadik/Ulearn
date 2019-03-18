@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from "prop-types";
+import Link from "@skbkontur/react-ui/components/Link/Link";
 import Button from "@skbkontur/react-ui/components/Button/Button";
 import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
 
@@ -14,12 +15,11 @@ function Stub(props) {
 		<div className={styles.stub}>
 			<span className={styles.stubText}>Оставлять комментарии могут только зарегистрированные пользователи</span>
 			<Gapped gap={10} vertical>
-			<a href={urlToRegister}>
-				<Button width={200} use="primary" size="large" type="button" align="center">
-				Зарегистрироваться
-			</Button>
-			</a>
-			<a href={urlToEnter}><Button use="link">Войти</Button></a>
+				<Link href={urlToRegister}>
+					<Button width={200} use="primary" size="large" type="button" align="center">
+					Зарегистрироваться</Button>
+				</Link>
+				<Link href={urlToEnter}><Button use="link">Войти</Button></Link>
 			</Gapped>
 		</div>
 	);

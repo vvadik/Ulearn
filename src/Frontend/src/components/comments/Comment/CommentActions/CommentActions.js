@@ -2,7 +2,9 @@ import React from "react";
 import PropTypes from "prop-types";
 import { comment, userRoles, userType } from "../../commonPropTypes";
 import uuid from 'uuid';
+import Link from "@skbkontur/react-ui/components/Link/Link";
 import Icon from "@skbkontur/react-icons";
+import { Mobile, NotMobile } from "../../../../utils/responsive";
 
 import styles from "../Comment.less";
 
@@ -10,15 +12,15 @@ import styles from "../Comment.less";
 const Button = ({onClick, icon, children}) => (
 	<button type="button" className={styles.sendAnswer} onClick={onClick}>
 		<Icon name={icon} />
-		<span className={styles.buttonText}>{children}</span>
+		<span className={styles.buttonText}><NotMobile>{children}</NotMobile></span>
 	</button>
 );
 
 const ActionLink = ({url, icon, children}) => (
-	<a href={url} className={styles.sendAnswer}>
+	<Link href={url}>
 		<Icon name={icon} />
-		<span className={styles.linkText}>{children}</span>
-	</a>
+		<span className={styles.linkText}><NotMobile>{children}</NotMobile></span>
+	</Link>
 );
 
 export default function CommentActions(props) {
@@ -27,10 +29,12 @@ export default function CommentActions(props) {
 	const commentActions = [];
 
 	if (hasReplyAction) {
+		const commentId = comment.parentCommentId ? comment.parentCommentId : comment.id;
+
 		commentActions.push(
 			<Button
 				key={uuid()}
-				onClick={() => actions.handleShowReplyForm(comment.id)}
+				onClick={() => actions.handleShowReplyForm(commentId)}
 				icon='ArrowCorner1'>
 			Ответить
 			</Button>);
