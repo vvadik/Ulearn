@@ -72,6 +72,7 @@ namespace uLearn.Web.Controllers
 
 			var canViewAuthorSubmissions = coursesRepo.HasCourseAccess(userId, courseId, CourseAccessType.ViewAllStudentsSubmissions) || User.HasAccessFor(courseId, CourseRole.CourseAdmin);
 			var canViewProfiles = systemAccessesRepo.HasSystemAccess(userId, SystemAccessType.ViewAllProfiles) || User.IsSystemAdministrator();
+			var systemAccesses = systemAccessesRepo.GetSystemAccesses(userId);
 			var courseAccesses = coursesRepo.GetCourseAccesses(courseId, userId);
 			
 			var model = new SlideCommentsModel
@@ -92,7 +93,8 @@ namespace uLearn.Web.Controllers
 				CanViewAuthorProfiles = canViewProfiles,
 				CanViewAndAddCommentsForInstructorsOnly = CanViewAndAddCommentsForInstructorsOnly(User, courseId),
 				ShowOnlyInstructorsOnlyComments = showOnlyInstructorsOnlyComments,
-				CourseAccesses = courseAccesses
+				CourseAccesses = courseAccesses,
+				SystemAccesses = systemAccesses
 			};
 			return PartialView(model);
 		}
@@ -372,10 +374,11 @@ namespace uLearn.Web.Controllers
 		public bool CanViewAndAddCommentsForInstructorsOnly { get; set; }
 		public bool ShowOnlyInstructorsOnlyComments { get; set; }
 		public List<CourseAccess> CourseAccesses { get; set; }
+		public List<SystemAccess> SystemAccesses { get; set; }
 	}
 
 	[DataContract]
-	public class CommentsWrapperData
+	public class CommentsViewData
 	{
 		[DataMember(Name = "slideId", EmitDefaultValue = true)]
 		public Guid SlideId;
@@ -404,6 +407,9 @@ namespace uLearn.Web.Controllers
 		
 		[DataMember(Name = "avatarUrl", EmitDefaultValue = true)]
 		public string AvatarUrl;
+		
+		[DataMember(Name = "systemAccesses", EmitDefaultValue = true)]
+		public List<string> SystemAccesses;
 	}
 	
 	[DataContract]
