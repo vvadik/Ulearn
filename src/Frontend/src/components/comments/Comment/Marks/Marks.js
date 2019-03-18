@@ -4,18 +4,19 @@ import Icon from "@skbkontur/react-icons";
 
 import styles from "./Marks.less";
 
-export default function Marks({isApproved, isCorrectAnswer, isPinnedToTop}) {
+export default function Marks({isApproved, isCorrectAnswer, isPinnedToTop, canViewStudentsGroup}) {
 	return (
 		<>
-			{isApproved && <HiddenMark />}
+			{!isApproved && <HiddenMark />}
 			{isCorrectAnswer && <CorrectAnswerMark />}
 			{isPinnedToTop && <PinnedToTopMark />}
+			{canViewStudentsGroup && <GroupMark />}
 		</>
 	)
 };
 
 const HiddenMark = () => (
-	<div className={`${styles.mark} ${styles.hiddenComment}`}>Скрытый</div>
+	<div className={`${styles.mark} ${styles.approvedComment}`}>Скрытый</div>
 );
 
 const CorrectAnswerMark = () => (
@@ -32,7 +33,14 @@ const PinnedToTopMark = () => (
 	</div>
 );
 
+const GroupMark = () => (
+	<div className={`${styles.mark} ${styles.group}`}>
+		<span className={styles.text}>группа</span>
+	</div>
+);
+
 Marks.propTypes = {
+	canViewStudentsGroup: PropTypes.bool,
 	isApproved: PropTypes.bool,
 	isCorrectAnswer: PropTypes.bool,
 	isPinnedToTop: PropTypes.bool,
