@@ -6,6 +6,7 @@ import Icon from "@skbkontur/react-icons";
 import Tabs from "@skbkontur/react-ui/components/Tabs/Tabs";
 import CommentsList from "../CommentsList/CommentsList";
 import CommentPolicySettings from "./CommentPolicySettings";
+import api from "../../../api";
 
 import styles from './CommentsView.less';
 
@@ -31,6 +32,10 @@ class CommentsView extends Component {
 			openModal: false,
 		};
 	}
+
+	static defaultProps = {
+		commentsApi: api.comments
+	};
 
 	componentDidMount() {
 		const { courseId, slideId, userRoles } = this.props;

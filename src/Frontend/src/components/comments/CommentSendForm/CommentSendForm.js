@@ -37,28 +37,26 @@ class CommentSendForm extends Component {
 		const {error, text} = this.state;
 
 		return (
-			<>
-				<div className={styles.commentSendForm}>
-					{author && (
-						<div className={styles.avatar}>
-							<Avatar user={author} size='big' />
+			<div className={styles.commentSendForm}>
+				{author && (
+					<div className={styles.avatar}>
+						<Avatar user={author} size='big' />
+					</div>
+				)}
+				<form className={styles.commentSend} onSubmit={this.handleSubmit}>
+					<MarkdownEditor
+						ref={this.editor}
+						hasError={error !== null}
+						text={text}
+						onChange={this.handleChange}
+					>
+						<div className={styles.buttons}>
+							{this.renderSubmitButton()}
+							{this.renderCancelButton()}
 						</div>
-					)}
-					<form className={styles.commentSend} onSubmit={this.handleSubmit}>
-						<MarkdownEditor
-							ref={this.editor}
-							hasError={error !== null}
-							text={text}
-							onChange={this.handleChange}
-						>
-							<div className={styles.buttons}>
-								{this.renderSubmitButton()}
-								{this.renderCancelButton()}
-							</div>
-						</MarkdownEditor>
-					</form>
-				</div>
-			</>
+					</MarkdownEditor>
+				</form>
+			</div>
 		)
 	}
 
