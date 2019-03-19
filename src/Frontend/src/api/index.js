@@ -40,6 +40,8 @@ function clearApiJwtToken() {
 }
 
 function request(url, options, isRetry) {
+	if(apiJwtToken === '')
+		;
 	options = options || {};
 	options.credentials = options.credentials || 'include';
 	options.headers = options.headers || {};
