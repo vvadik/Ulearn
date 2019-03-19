@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Net;
-using System.Runtime.Serialization;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -17,6 +16,8 @@ using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Quizzes;
 
 namespace uLearn.Web.Controllers
 {
@@ -72,7 +73,9 @@ namespace uLearn.Web.Controllers
 
 			var canViewAuthorSubmissions = coursesRepo.HasCourseAccess(userId, courseId, CourseAccessType.ViewAllStudentsSubmissions) || User.HasAccessFor(courseId, CourseRole.CourseAdmin);
 			var canViewProfiles = systemAccessesRepo.HasSystemAccess(userId, SystemAccessType.ViewAllProfiles) || User.IsSystemAdministrator();
+			var systemAccesses = systemAccessesRepo.GetSystemAccesses(userId);
 			var courseAccesses = coursesRepo.GetCourseAccesses(courseId, userId);
+			var slideType = GetSlideType(slide);
 			
 			var model = new SlideCommentsModel
 			{
@@ -92,9 +95,24 @@ namespace uLearn.Web.Controllers
 				CanViewAuthorProfiles = canViewProfiles,
 				CanViewAndAddCommentsForInstructorsOnly = CanViewAndAddCommentsForInstructorsOnly(User, courseId),
 				ShowOnlyInstructorsOnlyComments = showOnlyInstructorsOnlyComments,
-				CourseAccesses = courseAccesses
+				CourseAccesses = courseAccesses,
+				SystemAccesses = systemAccesses,
+				SlideType = slideType
 			};
 			return PartialView(model);
+		}
+		
+		private static SlideType GetSlideType(Slide slide)
+		{
+			switch (slide)
+			{
+				case ExerciseSlide _:
+					return SlideType.Exercise;
+				case QuizSlide _:
+					return SlideType.Quiz;
+				default:
+					return SlideType.Lesson;
+			}
 		}
 
 		private bool CanModerateComments(IPrincipal user, string courseId)
@@ -372,50 +390,7 @@ namespace uLearn.Web.Controllers
 		public bool CanViewAndAddCommentsForInstructorsOnly { get; set; }
 		public bool ShowOnlyInstructorsOnlyComments { get; set; }
 		public List<CourseAccess> CourseAccesses { get; set; }
-	}
-
-	[DataContract]
-	public class CommentsWrapperData
-	{
-		[DataMember(Name = "slideId", EmitDefaultValue = true)]
-		public Guid SlideId;
-		
-		[DataMember(Name = "courseId", EmitDefaultValue = true)]
-		public string CourseId;
-		
-		[DataMember(Name = "user", EmitDefaultValue = true)]
-		public CommentsWrapperUserData User;
-		
-		[DataMember(Name = "userRoles", EmitDefaultValue = true)]
-		public CommentsWrapperUserRolesData UserRoles;
-	}
-
-	[DataContract]
-	public class CommentsWrapperUserData
-	{
-		[DataMember(Name = "id", EmitDefaultValue = true)]
-		public string Id;
-
-		[DataMember(Name = "isAuthenticated", EmitDefaultValue = true)]
-		public bool IsAuthenticated;
-		
-		[DataMember(Name = "visibleName", EmitDefaultValue = true)]
-		public string VisibleName;
-		
-		[DataMember(Name = "avatarUrl", EmitDefaultValue = true)]
-		public string AvatarUrl;
-	}
-	
-	[DataContract]
-	public class CommentsWrapperUserRolesData
-	{
-		[DataMember(Name = "isSystemAdministrator", EmitDefaultValue = true)]
-		public bool IsSystemAdministrator;
-		
-		[DataMember(Name = "courseRole", EmitDefaultValue = true)]
-		public string CourseRole;
-		
-		[DataMember(Name = "courseAccesses", EmitDefaultValue = true)]
-		public List<string> CourseAccesses;
+		public List<SystemAccess> SystemAccesses { get; set; }
+		public SlideType SlideType { get; set; }
 	}
 }
