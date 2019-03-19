@@ -60,25 +60,25 @@
 <form id="__AjaxAntiForgeryForm" action="#" method="post">@Html.AntiForgeryToken()</form>
 
 @{
-	var commentsWrapperUser = new CommentsWrapperUserData
+	var commentsWrapperUser = new
 	{
-		Id = Model.CurrentUser == null ? null : Model.CurrentUser.Id,
-		IsAuthenticated = Model.IsAuthorizedAndCanComment,
-		VisibleName = Model.CurrentUser == null ? null : Model.CurrentUser.VisibleName,
-		AvatarUrl = Model.CurrentUser == null ? null : Model.CurrentUser.AvatarUrl,
-		SystemAccesses = Model.SystemAccesses.Select(a => a.AccessType.ToString("G")).Select(a => char.ToLowerInvariant(a[0]) + a.Substring(1)).ToList()
+		id = Model.CurrentUser == null ? null : Model.CurrentUser.Id,
+		isAuthenticated = Model.IsAuthorizedAndCanComment,
+		visibleName = Model.CurrentUser == null ? null : Model.CurrentUser.VisibleName,
+		avatarUrl = Model.CurrentUser == null ? null : Model.CurrentUser.AvatarUrl,
+		systemAccesses = Model.SystemAccesses.Select(a => a.AccessType.ToString("G")).Select(a => char.ToLowerInvariant(a[0]) + a.Substring(1)).ToList()
 	};
 	var courseRole = User == null ? null : User.GetCourseRole(Model.CourseId);
 	var courseRoleString = courseRole == null ? null : courseRole.Value.ToString("G");
 	courseRoleString = courseRole == null ? null : char.ToLowerInvariant(courseRoleString[0]) + courseRoleString.Substring(1);
 	var courseAccesses = Model.CourseAccesses.Select(a => a.AccessType.ToString("G")).Select(a => char.ToLowerInvariant(a[0]) + a.Substring(1)).ToList();
-	var commentsWrapperUserRoles = User == null ? null : new CommentsWrapperUserRolesData
-	{
-		IsSystemAdministrator = User.IsSystemAdministrator(),
-		CourseRole = courseRoleString,
-		CourseAccesses = courseAccesses
+	var commentsWrapperUserRoles = User == null ? null : new {
+		isSystemAdministrator = User.IsSystemAdministrator(),
+		courseRole = courseRoleString,
+		courseAccesses = courseAccesses
 	};
-	var commentsViewModel = new CommentsViewData { SlideId = Model.Slide.Id, CourseId = Model.CourseId, User = commentsWrapperUser, UserRoles = commentsWrapperUserRoles }.JsonSerialize();
+	var slideType = Model.SlideType;
+	var commentsViewModel = new { slideId = Model.Slide.Id, courseId = Model.CourseId, user = commentsWrapperUser, userRoles = commentsWrapperUserRoles, slideType = slideType }.JsonSerialize();
 }
 
 <div class="react-render" data-component="CommentsView" data-props="@commentsViewModel"></div>
