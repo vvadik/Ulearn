@@ -1,6 +1,9 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
+import { withViewport } from '@storybook/addon-viewport';
 import CommentsView from "./CommentsView";
+import CommentSendForm from "../CommentSendForm/CommentSendForm";
+import { action } from "@storybook/addon-actions";
 
 const comments = [
 	{
@@ -96,11 +99,30 @@ const fakeCommentsApi = {
 };
 
 storiesOf('Comments/CommentsView', module)
-.add('список комментариев', () => (
+.addDecorator(withViewport())
+.add('desktop', () => (
 	<CommentsView
 		user={user}
 		userRoles={userRoles}
 		slideId={'90bcb61e-57f0-4baa-8bc9-10c9cfd27f58'}
 		courseId={'BasicProgramming'}
 		commentsApi={fakeCommentsApi} />
-), {viewport: 'desktop'});
+), {viewport: 'desktop'})
+.addDecorator(withViewport())
+.add('tablet', () => (
+	<CommentsView
+		user={user}
+		userRoles={userRoles}
+		slideId={'90bcb61e-57f0-4baa-8bc9-10c9cfd27f58'}
+		courseId={'BasicProgramming'}
+		commentsApi={fakeCommentsApi} />
+), {viewport: "tablet"})
+.addDecorator(withViewport())
+.add('mobile', () => (
+	<CommentsView
+		user={user}
+		userRoles={userRoles}
+		slideId={'90bcb61e-57f0-4baa-8bc9-10c9cfd27f58'}
+		courseId={'BasicProgramming'}
+		commentsApi={fakeCommentsApi} />
+), {viewport: "mobile"});

@@ -8,7 +8,6 @@ import { Mobile, NotMobile } from "../../../../utils/responsive";
 
 import styles from "../Comment.less";
 
-
 const Button = ({onClick, icon, children}) => (
 	<button type="button" className={styles.sendAnswer} onClick={onClick}>
 		<Icon name={icon} />

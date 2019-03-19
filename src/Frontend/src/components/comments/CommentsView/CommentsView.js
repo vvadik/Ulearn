@@ -84,9 +84,9 @@ class CommentsView extends Component {
 			<header className={styles.header}>
 				<div className={styles.headerRow}>
 					<h1 className={styles.headerName}>Комментарии</h1>
-					{this.isCourseAdmin(userRoles) &&
-					<Button size="medium" icon={<Icon.Settings />}
-							onClick={() => this.handleOpenModal(true)}>Настроить</Button>}
+					{/*{this.isCourseAdmin(userRoles) &&*/}
+					{/*<Button size="medium" icon={<Icon.Settings />}*/}
+							{/*onClick={() => this.handleOpenModal(true)}>Настроить</Button>}*/}
 				</div>
 				{this.isInstructor(userRoles) &&
 				<div className={styles.tabs}>

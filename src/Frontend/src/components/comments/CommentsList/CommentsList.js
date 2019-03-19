@@ -11,7 +11,6 @@ import CommentSendForm from "../CommentSendForm/CommentSendForm";
 import Error404 from "../../common/Error/Error404";
 import Stub from "../Stub/Stub";
 
-
 import styles from "./CommentsList.less";
 
 class CommentsList extends Component {
@@ -79,7 +78,7 @@ class CommentsList extends Component {
 
 	render() {
 		const {threads, sending, status, newCommentId, loadingComments} = this.state;
-		const {user, courseId, slideId} = this.props;
+		const {user, courseId, slideId, forInstructors} = this.props;
 
 		if (this.state.status === "error") {
 			return <Error404 />;
@@ -90,6 +89,7 @@ class CommentsList extends Component {
 				{threads.length === 0 && this.renderStubForEmptyComments()}
 				{!user.isAuthenticated ? <Stub courseId={courseId} slideId={slideId} /> :
 				<CommentSendForm
+					isForInstructors={forInstructors}
 					commentId={newCommentId}
 					author={user}
 					handleSubmit={this.handleAddComment}

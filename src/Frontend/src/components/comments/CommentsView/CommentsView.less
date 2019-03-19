@@ -1,3 +1,5 @@
+@import "./../../../variables.less";
+
 .wrapper {
   display: flex;
   flex-direction: column;
@@ -8,8 +10,11 @@
   flex-direction: column;
   margin: 20px 0 0;
 
-  a, a:hover, a:active {
-    text-decoration: none;
+}
+
+h1 {
+  @media (max-width: @maxPhoneWidth) {
+    font-size: 30px;
   }
 }
 
@@ -32,6 +37,14 @@
 
 .tabs {
   border-bottom: 1px solid #eee;
+
+  a {
+    text-decoration: none;
+
+    @media (max-width: @maxPhoneWidth) {
+      font-size: 16px;
+    }
+  }
 }
 
 .commentsContainer {

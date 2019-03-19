@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import Icon from "@skbkontur/react-icons";
 
 import styles from "./Marks.less";
+import { NotMobile } from "../../../../utils/responsive";
 
 export default function Marks({isApproved, isCorrectAnswer, isPinnedToTop, canViewStudentsGroup}) {
 	return (
@@ -16,20 +17,23 @@ export default function Marks({isApproved, isCorrectAnswer, isPinnedToTop, canVi
 };
 
 const HiddenMark = () => (
-	<div className={`${styles.mark} ${styles.approvedComment}`}>Скрытый</div>
+	<div className={`${styles.mark} ${styles.approvedComment}`}>
+		<Icon name='EyeClosed' size={15} />
+		<NotMobile><span className={styles.text}>Скрытый</span></NotMobile>
+	</div>
 );
 
 const CorrectAnswerMark = () => (
 	<div className={`${styles.mark} ${styles.correctAnswer}`}>
 		<Icon name='Star' size={15} />
-		<span className={styles.text}>Правильный ответ</span>
+		<NotMobile><span className={styles.text}>Правильный&nbsp;ответ</span></NotMobile>
 	</div>
 );
 
 const PinnedToTopMark = () => (
 	<div className={`${styles.mark} ${styles.pinnedToTop}`}>
 		<Icon name='Pin' size={15} />
-		<span className={styles.text}>Закреплено</span>
+		<NotMobile><span className={styles.text}>Закреплено</span></NotMobile>
 	</div>
 );
 

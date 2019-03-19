@@ -30,26 +30,28 @@ class Thread extends Component {
 				getUserSolutionsUrl={getUserSolutionsUrl}
 				user={user}
 				userRoles={userRoles}>
-				<TransitionGroup enter={this.props.animation}>
-					{replies.map((reply, index) =>
-						<CSSTransition
-							key={reply.id}
-							mountOnEnter
-							unmountOnExit
-							in={this.props.animation}
-							classNames={{
-								enter: styles.enter,
-								exit: styles.exit,
-								enterActive: styles.enterActive,
-								exitActive: styles.exitActive,
-							}}
-							timeout={1000}>
-							<div key={reply.id} className={styles.replies}>
-								{this.renderComment(reply, index + 1 === replies.length)}
-							</div>
-						</CSSTransition>
-					)}
-				</TransitionGroup>
+				<div className={styles.repliesWrapper}>
+					<TransitionGroup enter={this.props.animation}>
+						{replies.map((reply, index) =>
+							<CSSTransition
+								key={reply.id}
+								mountOnEnter
+								unmountOnExit
+								in={this.props.animation}
+								classNames={{
+									enter: styles.enter,
+									exit: styles.exit,
+									enterActive: styles.enterActive,
+									exitActive: styles.exitActive,
+								}}
+								timeout={1000}>
+								<div key={reply.id} className={styles.reply}>
+									{this.renderComment(reply, index + 1 === replies.length)}
+								</div>
+							</CSSTransition>
+						)}
+					</TransitionGroup>
+				</div>
 				{(isParentComment && comment.id === this.props.reply.commentId) &&
 					<div className={styles.replyForm}>
 						<CommentSendForm
