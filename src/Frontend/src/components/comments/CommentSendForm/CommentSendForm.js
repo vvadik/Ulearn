@@ -4,6 +4,7 @@ import { userType } from "../commonPropTypes";
 import Button from "@skbkontur/react-ui/components/Button/Button";
 import Avatar from "../../common/Avatar/Avatar";
 import MarkdownEditor from "./MarkdownEditor/MarkdownEditor";
+import { NotMobile } from "../../../utils/responsive";
 
 import styles from "./CommentSendForm.less";
 
@@ -33,19 +34,22 @@ class CommentSendForm extends Component {
 	editor = React.createRef();
 
 	render() {
-		const {author} = this.props;
+		const {author, isForInstructors} = this.props;
 		const {error, text} = this.state;
 
 		return (
 			<div className={styles.commentSendForm}>
 				{author && (
-					<div className={styles.avatar}>
-						<Avatar user={author} size='big' />
-					</div>
+					<NotMobile>
+						<div className={styles.avatar}>
+							<Avatar user={author} size='big' />
+						</div>
+					</NotMobile>
 				)}
 				<form className={styles.commentSend} onSubmit={this.handleSubmit}>
 					<MarkdownEditor
 						ref={this.editor}
+						isForInstructors={isForInstructors}
 						hasError={error !== null}
 						text={text}
 						onChange={this.handleChange}
@@ -123,6 +127,7 @@ CommentSendForm.propTypes = {
 	handleSubmit: PropTypes.func,
 	handleAddNewComment: PropTypes.func,
 	isSuccessSend: PropTypes.string,
+	isForInstructors: PropTypes.bool,
 	sending: PropTypes.bool,
 	submitTitle: PropTypes.string,
 	onCancel: PropTypes.func,

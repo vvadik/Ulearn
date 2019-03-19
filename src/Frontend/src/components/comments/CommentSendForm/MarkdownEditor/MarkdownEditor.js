@@ -57,7 +57,7 @@ class MarkdownEditor extends Component {
 	textarea = React.createRef();
 
 	render() {
-		const {hasError, text, children} = this.props;
+		const {hasError, text, children, isForInstructors} = this.props;
 
 		return (
 			<React.Fragment>
@@ -71,7 +71,7 @@ class MarkdownEditor extends Component {
 					onChange={this.handleChange}
 					onKeyDown={this.handleKeyDown}
 					autoResize
-					placeholder="Комментарий" />
+					placeholder={isForInstructors ? "Комментарий для преподавателей" : "Комментарий"} />
 				<div className={styles.footer}>
 					{children}
 					<MarkdownButtons
@@ -151,6 +151,7 @@ class MarkdownEditor extends Component {
 
 MarkdownEditor.propTypes = {
 	hasError: PropTypes.bool,
+	isForInstructors: PropTypes.bool,
 	text: PropTypes.string,
 	onChange: PropTypes.func,
 	children: PropTypes.element,
