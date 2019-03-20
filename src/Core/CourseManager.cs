@@ -64,7 +64,7 @@ namespace Ulearn.Core
 		public virtual IEnumerable<Course> GetCourses()
 		{
 			LoadCoursesIfNotYet();
-			return courses.Values;
+			return courses.Values.OrderBy(c => c.Title, StringComparer.OrdinalIgnoreCase);
 		}
 
 		[NotNull]

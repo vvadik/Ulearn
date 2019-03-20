@@ -300,8 +300,10 @@ class DownloadedHtmlContent extends Component {
 					if (response.redirected) {
 						/* If it was the login form, then update user information in header */
 						let formUrlParts = getUrlParts(formUrl).pathname;
-						if (formUrlParts.startsWith('/Login') || formUrlParts.startsWith('/Account/') || formUrlParts.startsWith('/RestorePassword/'))
+						if (formUrlParts.startsWith('/Login') || formUrlParts.startsWith('/Account/') || formUrlParts.startsWith('/RestorePassword/')) {
 							this.props.updateUserInformation();
+							this.props.updateCourses();
+						}
 
 						let newUrlParts = getUrlParts(response.url);
 
@@ -337,7 +339,8 @@ class DownloadedHtmlContent extends Component {
 				type: 'COURSES__COURSE_ENTERED',
 				courseId: courseId
 			}),
-			updateUserInformation: () => dispatch(api.account.getCurrentUser())
+			updateUserInformation: () => dispatch(api.account.getCurrentUser()),
+			updateCourses: () => dispatch(api.courses.getCourses()),
 		}
 	}
 

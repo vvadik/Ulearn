@@ -167,7 +167,6 @@ class AbstractMyCoursesMenu extends Component {
 
 	static _getCourseMenuItems(courseIds, courseById, isSystemAdministrator) {
 		courseIds = courseIds.filter(item => courseById[item] !== undefined);
-		courseIds.sort((a, b) => courseById[a].title.localeCompare(courseById[b].title));
 		let visibleCourseIds = courseIds.slice(0, AbstractMyCoursesMenu.VISIBLE_COURSES_COUNT);
 		let items = visibleCourseIds.filter(courseId => courseById.hasOwnProperty(courseId)).map(courseId =>
 			<MenuItem href={"/Course/" + courseId} key={courseId}
