@@ -39,14 +39,13 @@ namespace uLearn.Web.Controllers
 				{
 					/* If user with this username is not exists then try to find user with this email.
 					   It allows to login not only with username/password, but with email/password */
-					user = await userManager.FindByEmailAsync(model.UserName).ConfigureAwait(false);
+					var usersWithEmail = usersRepo.FindUsersByEmail(model.UserName);
+					
+					/* For signing in via email/password we need to be sure that email is confirmed */
+					user = usersWithEmail.FirstOrDefault(u => u.EmailConfirmed);
 
 					if (user != null)
 					{
-						/* For signing in via email/password we need to be sure that email is confirmed */
-						if (!user.EmailConfirmed)
-							user = null;
-
 						if (!await userManager.CheckPasswordAsync(user, model.Password).ConfigureAwait(false))
 							user = null;
 					}
