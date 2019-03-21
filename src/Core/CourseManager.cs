@@ -312,7 +312,7 @@ namespace Ulearn.Core
 			{
 				var courseXml = zip.Entries.FirstOrDefault(e => Path.GetFileName(e.FileName) == "course.xml" && !e.IsDirectory);
 				if (courseXml != null)
-					UpdateXmlAttribute(zip["course.xml"], "//ulearn:course", "title", courseTitle, zip, nsResolver);
+					UpdateXmlAttribute(zip[courseXml.FileName], "//ulearn:course", "title", courseTitle, zip, nsResolver);
 			}
 		}
 
