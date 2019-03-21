@@ -2,7 +2,7 @@ import React from 'react';
 import { storiesOf } from '@storybook/react';
 import { withViewport } from '@storybook/addon-viewport';
 import CommentsView from "./CommentsView";
-import CommentSendForm from "../CommentSendForm/CommentSendForm";
+import { addParameters } from '@storybook/react';
 import { action } from "@storybook/addon-actions";
 
 const comments = [

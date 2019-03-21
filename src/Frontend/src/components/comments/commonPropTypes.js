@@ -16,7 +16,7 @@ export const user = shape({
 	id: string.isRequired,
 	visibleName: string.isRequired,
 	avatarUrl: string,
-	systemAccesses: oneOf(['viewAllProfiles', 'viewAllGroupMembers']),
+	systemAccesses: array,
 });
 
 export const userRoles = shape({
