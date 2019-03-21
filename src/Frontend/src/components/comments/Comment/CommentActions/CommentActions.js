@@ -23,7 +23,7 @@ const ActionLink = ({url, icon, children}) => (
 );
 
 export default function CommentActions(props) {
-	const {user, comment, userRoles, url, hasReplyAction, canModerateComments, actions} = props;
+	const {user, comment, userRoles, url, hasReplyAction, canModerateComments, actions, slideType} = props;
 
 	const commentActions = [];
 
@@ -57,7 +57,7 @@ export default function CommentActions(props) {
 			</Button>);
 	}
 
-	if (canModerateComments(userRoles, 'viewAllStudentsSubmissions')) {
+	if (slideType === 'Exercise' && canModerateComments(userRoles, 'viewAllStudentsSubmissions')) {
 		commentActions.push(
 			<ActionLink
 				key={uuid()}
@@ -102,5 +102,6 @@ CommentActions.propTypes = {
 	url: PropTypes.string,
 	hasReplyAction: PropTypes.bool,
 	canModerateComments: PropTypes.func,
+	slideType: PropTypes.string,
 };
 

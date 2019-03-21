@@ -31,6 +31,8 @@ class CommentsView extends Component {
 			activeTab: "allComments",
 			openModal: false,
 		};
+
+		this.headerRef = React.createRef();
 	}
 
 	static defaultProps = {
@@ -55,7 +57,7 @@ class CommentsView extends Component {
 	};
 
 	render() {
-		const {user, userRoles, courseId, slideId, commentsApi} = this.props;
+		const {user, userRoles, courseId, slideId, slideType, commentsApi} = this.props;
 
 		return (
 			<div className={styles.wrapper}>
@@ -63,6 +65,8 @@ class CommentsView extends Component {
 				{this.state.openModal && <CommentPolicySettings handleOpenModal={this.handleOpenModal} />}
 				<div className={styles.commentsContainer} key={this.state.activeTab}>
 					<CommentsList
+						slideType={slideType}
+						headerRef={this.headerRef}
 						forInstructors={this.state.activeTab === TABS.instructorsComments}
 						commentsApi={commentsApi}
 						user={user}
@@ -81,7 +85,7 @@ class CommentsView extends Component {
 		const commentsCount = this.state.instructorComments.length;
 
 		return (
-			<header className={styles.header}>
+			<header className={styles.header} ref={this.headerRef}>
 				<div className={styles.headerRow}>
 					<h1 className={styles.headerName}>Комментарии</h1>
 					{/*{this.isCourseAdmin(userRoles) &&*/}
@@ -131,6 +135,7 @@ CommentsView.propTypes = {
 	userRoles: userRoles.isRequired,
 	courseId: PropTypes.string.isRequired,
 	slideId: PropTypes.string.isRequired,
+	slideType: PropTypes.string.isRequired,
 	commentsApi: PropTypes.objectOf(PropTypes.func),
 };
 
