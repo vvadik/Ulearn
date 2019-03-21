@@ -15,6 +15,19 @@ import CommentActions from "./CommentActions/CommentActions";
 import styles from "./Comment.less";
 
 class Comment extends Component {
+	ref = React.createRef();
+
+	// componentDidMount() {
+	// 	if (this.props.scrollIntoView) {
+	// 		this.scrollIntoView();
+	// 	}
+	// }
+	//
+	// componentDidUpdate() {
+	// 	if (this.props.scrollIntoView) {
+	// 		this.scrollIntoView();
+	// 	}
+	// }
 
 	render() {
 		const {actions, children, commentEditing, comment, userRoles,user} = this.props;
@@ -26,7 +39,7 @@ class Comment extends Component {
 		const profileUrl = `${window.location.origin}/Account/Profile?userId=${comment.author.id}`;
 
 		return (
-			<div className={styles.comment}>
+			<div className={styles.comment} ref={this.ref}>
 				{canViewProfiles ? <Link href={profileUrl}><Avatar user={comment.author} size='big' /></Link> :
 					<Avatar user={comment.author} size='big' />}
 				<div className={styles.content}>
@@ -63,7 +76,7 @@ class Comment extends Component {
 	}
 
 	renderComment() {
-		const {comment, user, userRoles, getUserSolutionsUrl, hasReplyAction, actions} = this.props;
+		const {comment, user, userRoles, getUserSolutionsUrl, hasReplyAction, actions, slideType} = this.props;
 		const url = getUserSolutionsUrl(comment.author.id);
 		return (
 			<React.Fragment>
@@ -71,6 +84,7 @@ class Comment extends Component {
 					<span dangerouslySetInnerHTML={{__html: comment.renderedText}} />
 				</p>
 				<CommentActions
+					slideType={slideType}
 					comment={comment}
 					user={user}
 					userRoles={userRoles}
@@ -101,6 +115,15 @@ class Comment extends Component {
 		return role.isSystemAdministrator || role.courseRole === 'CourseAdmin' ||
 			(role.courseRole === 'Instructor' && role.courseAccesses.includes(accesses))
 	};
+
+	scrollIntoView() {
+		const headerHeight = 60;
+		window.scrollTo({
+			left: 0,
+			top: this.ref.current.offsetTop - headerHeight,
+			behavior: "smooth"
+		});
+	}
 }
 
 Comment.propTypes = {
@@ -112,6 +135,7 @@ Comment.propTypes = {
 	getUserSolutionsUrl: PropTypes.func,
 	commentEditing: commentStatus,
 	hasReplyAction: PropTypes.bool,
+	slideType: PropTypes.string,
 };
 
 export default Comment;

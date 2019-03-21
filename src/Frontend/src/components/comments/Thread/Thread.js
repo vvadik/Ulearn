@@ -8,6 +8,7 @@ import CommentSendForm from "../CommentSendForm/CommentSendForm";
 import styles from './Thread.less';
 
 class Thread extends Component {
+	commentRefs = {};
 
 	render() {
 		const {comment} = this.props;
@@ -15,19 +16,22 @@ class Thread extends Component {
 	}
 
 	renderComment(comment, isLastChild = true) {
-		const {user, userRoles, reply, commentEditing, actions, getUserSolutionsUrl} = this.props;
+		const {user, userRoles, reply, commentEditing, actions, getUserSolutionsUrl, slideType} = this.props;
 		const replies = comment.replies || [];
 		const isLastCommentInThread = replies.length === 0 && isLastChild;
 		const isParentComment = !comment.parentCommentId;
 
 		return (
 			<Comment
+				ref={(el) => { this.commentRefs[comment.id] = el }}
+				// scrollIntoView={this.props.scrollToComment === comment.id}
 				key={comment.id}
 				comment={comment}
 				hasReplyAction={isLastCommentInThread}
 				commentEditing={commentEditing}
 				actions={actions}
 				getUserSolutionsUrl={getUserSolutionsUrl}
+				slideType={slideType}
 				user={user}
 				userRoles={userRoles}>
 				<div className={styles.repliesWrapper}>
@@ -71,6 +75,16 @@ class Thread extends Component {
 
 		return user.id === authorId || userRoles.isSystemAdministrator ||
 			(userRoles.accesses && userRoles.accesses.includes('editPinAndRemoveComments'));
+	};
+
+	scrollCommentIntoView(commentId) {
+		const commentRef = this.commentRefs[commentId];
+
+		if (!commentRef) {
+			return;
+		}
+
+		commentRef.scrollIntoView();
 	}
 }
 
@@ -82,6 +96,7 @@ Thread.propTypes = {
 	commentEditing: commentStatus,
 	actions: PropTypes.objectOf(PropTypes.func),
 	getUserSolutionsUrl: PropTypes.func,
+	slideType: PropTypes.string,
 };
 
 export default Thread;
