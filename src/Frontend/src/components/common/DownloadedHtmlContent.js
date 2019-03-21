@@ -106,8 +106,10 @@ class DownloadedHtmlContent extends Component {
 			if (response.redirected) {
 				/* If it was a redirect from external login callback, then update user information */
 				const oldUrlPathname = getUrlParts(url).pathname;
-				if (oldUrlPathname.startsWith("/Login/ExternalLoginCallback"))
+				if (oldUrlPathname.startsWith("/Login/ExternalLoginCallback")) {
 					this.props.updateUserInformation();
+					this.props.updateCourses();
+				}
 
 				let newUrl = getUrlParts(response.url);
 				this.context.router.history.replace(newUrl.pathname + newUrl.search);
