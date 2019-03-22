@@ -12,6 +12,7 @@ using Metrics;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Configuration;
 using Message = uLearn.Web.Models.Message;
 
 namespace uLearn.Web.Controllers
@@ -32,7 +33,7 @@ namespace uLearn.Web.Controllers
 			this.db = db;
 			userManager = new ULearnUserManager(db);
 			requestRepo = new RestoreRequestRepo(db);
-			metricSender = new GraphiteMetricSender("web");
+			metricSender = new GraphiteMetricSender(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName);
 
 			var spamEndpoint = WebConfigurationManager.AppSettings["ulearn.spam.endpoint"] ?? "";
 			var spamLogin = WebConfigurationManager.AppSettings["ulearn.spam.login"] ?? "ulearn";

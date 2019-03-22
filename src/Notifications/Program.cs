@@ -10,6 +10,7 @@ using Graphite;
 using log4net;
 using log4net.Config;
 using Metrics;
+using Ulearn.Core.Configuration;
 
 namespace Notifications
 {
@@ -30,7 +31,7 @@ namespace Notifications
 		{
 			this.courseManager = courseManager;
 			notificationSender = new NotificationSender(courseManager);
-			keepAliver = new ServiceKeepAliver("notifications");
+			keepAliver = new ServiceKeepAliver(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName);
 
 			if (!int.TryParse(ConfigurationManager.AppSettings["ulearn.notifications.keepAlive.interval"], out var keepAliveIntervalSeconds))
 				keepAliveIntervalSeconds = 30;
