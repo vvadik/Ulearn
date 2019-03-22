@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
 import { userRoles, user } from "../commonPropTypes";
-import Button from "@skbkontur/react-ui/components/Button/Button";
-import Icon from "@skbkontur/react-icons";
 import Tabs from "@skbkontur/react-ui/components/Tabs/Tabs";
 import CommentsList from "../CommentsList/CommentsList";
 import CommentPolicySettings from "./CommentPolicySettings";
@@ -136,7 +134,6 @@ CommentsView.propTypes = {
 	courseId: PropTypes.string.isRequired,
 	slideId: PropTypes.string.isRequired,
 	slideType: PropTypes.string.isRequired,
-	commentsApi: PropTypes.objectOf(PropTypes.func),
 };
 
 export default CommentsView;

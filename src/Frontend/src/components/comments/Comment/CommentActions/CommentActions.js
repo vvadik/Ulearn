@@ -4,21 +4,21 @@ import { comment, userRoles, userType } from "../../commonPropTypes";
 import uuid from 'uuid';
 import Link from "@skbkontur/react-ui/components/Link/Link";
 import Icon from "@skbkontur/react-icons";
-import { Mobile, NotMobile } from "../../../../utils/responsive";
+import { NotMobile } from "../../../../utils/responsive";
 
 import styles from "../Comment.less";
 
 const Button = ({onClick, icon, children}) => (
 	<button type="button" className={styles.sendAnswer} onClick={onClick}>
 		<Icon name={icon} />
-		<span className={styles.buttonText}><NotMobile>{children}</NotMobile></span>
+		<span className={styles.buttonText}>{children}</span>
 	</button>
 );
 
 const ActionLink = ({url, icon, children}) => (
 	<Link href={url}>
 		<Icon name={icon} />
-		<span className={styles.linkText}><NotMobile>{children}</NotMobile></span>
+		<span className={styles.linkText}>{children}</span>
 	</Link>
 );
 
@@ -41,50 +41,24 @@ export default function CommentActions(props) {
 
 	if (user.id === comment.author.id) {
 		commentActions.push(
-			<Button
-				key={uuid()}
-				onClick={() => actions.handleShowEditForm(comment.id)}
-				icon='Edit'>
-			Редактировать
-			</Button>);
-
-		commentActions.push(
-			<Button
-				key={uuid()}
-				onClick={() => actions.handleDeleteComment(comment.id)}
-				icon='Delete'>
-			Удалить
-			</Button>);
+			<NotMobile key={uuid()}>
+				<Button
+					onClick={() => actions.handleShowEditForm(comment.id)}
+					icon='Edit'>
+				Редактировать
+				</Button>
+			</NotMobile>);
 	}
 
-	if (slideType === 'Exercise' && canModerateComments(userRoles, 'viewAllStudentsSubmissions')) {
+	if (slideType === 'exercise' && canModerateComments(userRoles, 'viewAllStudentsSubmissions')) {
 		commentActions.push(
-			<ActionLink
-				key={uuid()}
-				url={url}
-				icon='DocumentLite'>
-			Посмотреть решения
-			</ActionLink>);
-	}
-
-	if (canModerateComments(userRoles, 'editPinAndRemoveComments')) {
-		if (comment.parentCommentId) {
-			commentActions.push(
-				<Button
-					key={uuid()}
-					onClick={() => actions.handleCorrectAnswerMark(comment.id, comment.isCorrectAnswer)}
-					icon={'Star2'}>
-				{comment.isCorrectAnswer ? 'Снять отметку' : 'Отметить правильным'}
-				</Button>)
-		} else {
-			commentActions.push(
-				<Button
-					key={uuid()}
-					onClick={() => actions.handlePinnedToTopMark(comment.id, comment.isPinnedToTop)}
-					icon={'Pin'}>
-				{comment.isPinnedToTop ? 'Открепить' : 'Закрепить'}
-				</Button>)
-		}
+			<NotMobile key={uuid()}>
+				<ActionLink
+					url={url}
+					icon='DocumentLite'>
+				Посмотреть решения
+				</ActionLink>
+			</NotMobile>);
 	}
 
 	return (
@@ -99,7 +73,6 @@ CommentActions.propTypes = {
 	userRoles: userRoles.isRequired,
 	comment: comment.isRequired,
 	actions: PropTypes.objectOf(PropTypes.func),
-	url: PropTypes.string,
 	hasReplyAction: PropTypes.bool,
 	canModerateComments: PropTypes.func,
 	slideType: PropTypes.string,

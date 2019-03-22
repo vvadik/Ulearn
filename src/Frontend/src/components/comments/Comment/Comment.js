@@ -7,7 +7,7 @@ import Link from "@skbkontur/react-ui/components/Link/Link";
 import Avatar from "../../common/Avatar/Avatar";
 import CommentSendForm from "../CommentSendForm/CommentSendForm";
 import Like from "./Like/Like";
-import InstructorActions from "./Kebab/InstructorActions";
+import KebabActions from "./Kebab/KebabActions";
 import Header from "./Header/Header";
 import Marks from "./Marks/Marks";
 import CommentActions from "./CommentActions/CommentActions";
@@ -30,7 +30,7 @@ class Comment extends Component {
 	// }
 
 	render() {
-		const {actions, children, commentEditing, comment, userRoles,user} = this.props;
+		const {actions, children, commentEditing, comment, userRoles,user, slideType, getUserSolutionsUrl} = this.props;
 		const canViewProfiles = (user.systemAccesses && user.systemAccesses.includes("viewAllProfiles")) ||
 			userRoles.isSystemAdministrator;
 		const canViewStudentsGroup = (user.systemAccesses && user.systemAccesses.includes("ViewAllGroupMembers")) ||
@@ -56,12 +56,14 @@ class Comment extends Component {
 							isApproved={comment.isApproved}
 							isCorrectAnswer={comment.isCorrectAnswer}
 							isPinnedToTop={comment.isPinnedToTop} />
-						{this.canModerateComments(userRoles, 'editPinAndRemoveComments') ?
-							<InstructorActions
-								commentId={comment.id}
-								actions={actions}
-								isApproved={comment.isApproved} />
-							: null}
+						<KebabActions
+							user={user}
+							url={getUserSolutionsUrl(comment.author.id)}
+							canModerateComments={this.canModerateComments}
+							userRoles={userRoles}
+							slideType={slideType}
+							comment={comment}
+							actions={actions} />
 					</Header>
 					<Hint pos="bottom" text={comment.publishTime} disableAnimations={false} useWrapper={false}>
 						<div className={styles.timeSinceAdded}>
@@ -76,8 +78,7 @@ class Comment extends Component {
 	}
 
 	renderComment() {
-		const {comment, user, userRoles, getUserSolutionsUrl, hasReplyAction, actions, slideType} = this.props;
-		const url = getUserSolutionsUrl(comment.author.id);
+		const {comment, user, userRoles, hasReplyAction, actions, slideType} = this.props;
 		return (
 			<React.Fragment>
 				<p className={styles.text}>
@@ -88,7 +89,6 @@ class Comment extends Component {
 					comment={comment}
 					user={user}
 					userRoles={userRoles}
-					url={url}
 					hasReplyAction={hasReplyAction}
 					actions={actions}
 					canModerateComments={this.canModerateComments} />
@@ -112,8 +112,8 @@ class Comment extends Component {
 	}
 
 	canModerateComments = (role, accesses) => {
-		return role.isSystemAdministrator || role.courseRole === 'CourseAdmin' ||
-			(role.courseRole === 'Instructor' && role.courseAccesses.includes(accesses))
+		return role.isSystemAdministrator || role.courseRole === 'courseAdmin' ||
+			(role.courseRole === 'instructor' && role.courseAccesses.includes(accesses))
 	};
 
 	scrollIntoView() {

@@ -1,3 +1,5 @@
+@import "./../../../variables.less";
+
 button {
   outline: none;
 }
@@ -24,6 +26,13 @@ button {
 
 .text {
   margin: 10px 0 5px;
+  width: 95%;
+}
+
+.comment p  {
+  @media(max-width: @maxPhoneWidth) {
+    margin: 0;
+  }
 }
 
 .actions {

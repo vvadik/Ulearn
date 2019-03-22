@@ -6,6 +6,7 @@ import Comment from "../Comment/Comment";
 import CommentSendForm from "../CommentSendForm/CommentSendForm";
 
 import styles from './Thread.less';
+import { Mobile, NotMobile } from "../../../utils/responsive";
 
 class Thread extends Component {
 	commentRefs = {};
@@ -22,6 +23,7 @@ class Thread extends Component {
 		const isParentComment = !comment.parentCommentId;
 
 		return (
+			<>
 			<Comment
 				ref={(el) => { this.commentRefs[comment.id] = el }}
 				// scrollIntoView={this.props.scrollToComment === comment.id}
@@ -34,28 +36,9 @@ class Thread extends Component {
 				slideType={slideType}
 				user={user}
 				userRoles={userRoles}>
-				<div className={styles.repliesWrapper}>
-					<TransitionGroup enter={this.props.animation}>
-						{replies.map((reply, index) =>
-							<CSSTransition
-								key={reply.id}
-								mountOnEnter
-								unmountOnExit
-								in={this.props.animation}
-								classNames={{
-									enter: styles.enter,
-									exit: styles.exit,
-									enterActive: styles.enterActive,
-									exitActive: styles.exitActive,
-								}}
-								timeout={1000}>
-								<div key={reply.id} className={styles.reply}>
-									{this.renderComment(reply, index + 1 === replies.length)}
-								</div>
-							</CSSTransition>
-						)}
-					</TransitionGroup>
-				</div>
+				<NotMobile>
+					{this.renderReplies(comment)}
+				</NotMobile>
 				{(isParentComment && comment.id === this.props.reply.commentId) &&
 					<div className={styles.replyForm}>
 						<CommentSendForm
@@ -67,6 +50,38 @@ class Thread extends Component {
 							handleSubmit={actions.handleAddReplyComment} />
 					</div>}
 			</Comment>
+			<Mobile>
+				{this.renderReplies(comment)}
+			</Mobile>
+			</>
+		)
+	}
+
+	renderReplies(comment) {
+		const replies = comment.replies || [];
+		return (
+			<div className={styles.repliesWrapper}>
+				<TransitionGroup enter={this.props.animation}>
+					{replies.map((reply, index) =>
+						<CSSTransition
+							key={reply.id}
+							mountOnEnter
+							unmountOnExit
+							in={this.props.animation}
+							classNames={{
+								enter: styles.enter,
+								exit: styles.exit,
+								enterActive: styles.enterActive,
+								exitActive: styles.exitActive,
+							}}
+							timeout={1000}>
+							<div key={reply.id} className={styles.reply}>
+								{this.renderComment(reply, index + 1 === replies.length)}
+							</div>
+						</CSSTransition>
+					)}
+				</TransitionGroup>
+			</div>
 		)
 	}
 
