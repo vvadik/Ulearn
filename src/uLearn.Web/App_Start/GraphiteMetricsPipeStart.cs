@@ -1,6 +1,6 @@
-﻿using System;
-using Graphite.Web;
+﻿using Graphite.Web;
 using System.Web.Configuration;
+using Metrics;
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 using uLearn.Web;
 
@@ -10,19 +10,21 @@ namespace uLearn.Web
 {
 	public class GraphiteMetricsPipeStart
 	{
-		private static bool IsGraphiteSendingEnabled => !string.IsNullOrEmpty(WebConfigurationManager.ConnectionStrings["statsd"]?.ConnectionString);
-		private static readonly string machineName = Environment.MachineName.Replace(".", "_").ToLower();
-
 		public static void PreStart()
 		{
-			if (!IsGraphiteSendingEnabled)
+			var connectionString = WebConfigurationManager.ConnectionStrings["statsd"]?.ConnectionString;
+			var isGraphiteSendingEnabled = string.IsNullOrEmpty(connectionString);
+			
+			if (!isGraphiteSendingEnabled)
 				return;
+			
+			var config = StatsdConfiguration.CreateFrom(connectionString);
 
 			// Make sure MetricsPipe handles BeginRequest and EndRequest
 			DynamicModuleUtility.RegisterModule(typeof(MetricsPipeStartupModule));
 
 			MetricsPipeStartupModule.Settings.ReportRequestTime = true;
-			MetricsPipeStartupModule.Settings.RequestTimePrefix = $"web.{machineName}.request.time";
+			MetricsPipeStartupModule.Settings.RequestTimePrefix = MetricSender.BuildKey(config.Prefix, "web", "request.time");
 		}
 	}
 }

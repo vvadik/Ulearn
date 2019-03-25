@@ -38,7 +38,7 @@ namespace Metrics
 		}
 
 		/* Builds key "{prefix}.{service}.{machine_name}.{key}" */
-		private string BuildKey(string key)
+		public static string BuildKey(string prefix, string service, string key)
 		{
 			var parts = new[] { prefix, service, MachineName, key }
 				.Where(s => !string.IsNullOrEmpty(s))
@@ -51,7 +51,7 @@ namespace Metrics
 			if (!IsEnabled)
 				return;
 
-			var builtKey = BuildKey(key);
+			var builtKey = BuildKey(prefix, service, key);
 			log.Info($"Send count metric {builtKey}, value {value}");
 			try
 			{
@@ -68,7 +68,7 @@ namespace Metrics
 			if (!IsEnabled)
 				return;
 
-			var builtKey = BuildKey(key);
+			var builtKey = BuildKey(prefix, service, key);
 			log.Info($"Send timing metric {builtKey}, value {value}");
 			try
 			{
@@ -85,7 +85,7 @@ namespace Metrics
 			if (!IsEnabled)
 				return;
 
-			var builtKey = BuildKey(key);
+			var builtKey = BuildKey(prefix, service, key);
 			log.Info($"Send gauge metric {builtKey}, value {value}");
 			try
 			{
