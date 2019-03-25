@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Database;
 using Database.Extensions;
@@ -94,11 +96,32 @@ namespace Ulearn.Web.Api.Controllers
 		[Authorize(AuthenticationSchemes = "Identity.Application" /* = IdentityConstants.ApplicationScheme */)]
 		public ActionResult<TokenResponse> Token()
 		{
-			var claims = User.Claims;
+			var claims = User.Claims.ToList();
+			var expires = DateTime.Now.AddHours(configuration.Web.Authentication.Jwt.LifeTimeHours);
+			return GetTokenInternal(expires, claims);
+		}
+		
+		/// <summary>
+		/// Получить ключ на пользователя на заданныей срок в днях
+		/// </summary>
+		[HttpPost("api-token")]
+		//[ApiExplorerSettings(IgnoreApi = true)]
+		[Authorize]
+		public async Task<ActionResult<TokenResponse>> ApiToken([FromQuery] int days)
+		{
+			var isInstructor = await courseRolesRepo.HasUserAccessToAnyCourseAsync(User.GetUserId(), CourseRoleType.Instructor).ConfigureAwait(false);
+			if(!isInstructor)
+				return StatusCode((int)HttpStatusCode.Forbidden, "You should be at least instructor");
 			
+			var expires = DateTime.Now.AddDays(days);
+			var claims = User.Claims.ToList();
+			return GetTokenInternal(expires, claims);
+		}
+
+		private TokenResponse GetTokenInternal(DateTime expires, IList<Claim> claims)
+		{
 			var key = JwtBearerHelpers.CreateSymmetricSecurityKey(configuration.Web.Authentication.Jwt.IssuerSigningKey);
 			var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-			var expires = DateTime.Now.AddHours(configuration.Web.Authentication.Jwt.LifeTimeHours);
 
 			var token = new JwtSecurityToken(
 				configuration.Web.Authentication.Jwt.Issuer,
