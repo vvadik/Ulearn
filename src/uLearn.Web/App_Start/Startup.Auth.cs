@@ -8,14 +8,14 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Owin;
-using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Interop;
 using Owin;
-using uLearn.Configuration;
 using uLearn.Web.Kontur.Passport;
 using uLearn.Web.LTI;
 using uLearn.Web.Microsoft.Owin.Security.VK;
+using Ulearn.Core;
+using Ulearn.Core.Configuration;
 using Web.Api.Configuration;
 
 namespace uLearn.Web
@@ -30,12 +30,13 @@ namespace uLearn.Web
 			var configuration = ApplicationConfiguration.Read<WebApiConfiguration>();
 			
 			// Enable the application to use a cookie to store information for the signed in user
-			var cookieKeyRingDirectoy = new DirectoryInfo(Path.Combine(Utils.GetAppPath(), configuration.Web.CookieKeyRingDirectory));
+			var cookieKeyRingDirectory = new DirectoryInfo(Path.Combine(Utils.GetAppPath(), configuration.Web.CookieKeyRingDirectory));
 			app.UseCookieAuthentication(new CookieAuthenticationOptions
 			{
 				AuthenticationType = "Identity.Application",
 				CookieName = configuration.Web.CookieName,
 				CookieDomain = configuration.Web.CookieDomain,
+				CookieSecure = configuration.Web.CookieSecure ? CookieSecureOption.Always : CookieSecureOption.Never,
 				
 				LoginPath = new PathString("/Login"),
 				Provider = new CookieAuthenticationProvider
@@ -50,7 +51,7 @@ namespace uLearn.Web
 			       See https://docs.microsoft.com/en-us/aspnet/core/security/cookie-sharing?tabs=aspnetcore2x for details */
 				TicketDataFormat = new AspNetTicketDataFormat(
 					new DataProtectorShim(
-						DataProtectionProvider.Create(cookieKeyRingDirectoy, builder => builder.SetApplicationName("ulearn"))
+						DataProtectionProvider.Create(cookieKeyRingDirectory, builder => builder.SetApplicationName("ulearn"))
 							.CreateProtector(
 								"Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware",
 								"Identity.Application",

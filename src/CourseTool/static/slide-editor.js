@@ -1,4 +1,6 @@
-﻿$(document).ready(function () {
+﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
+
+window.documentReadyFunctions.push(function () {
     initCodeEditor();
 
     $('.exercise__add-review').each(function () {
@@ -99,10 +101,12 @@ function initCodeEditor($parent) {
 
         switch (langId) {
             case "cs":
-            case "сsharp":
+            case "csharp":
                 return { mode: "text/x-csharp", hint: CodeMirror.hint.csharp };
             case "py":
             case "python":
+			case "python2":
+			case "python3":				
                 return { mode: "text/x-python", hint: CodeMirror.hint.python };
             case "js":
             case "javascript":
@@ -473,22 +477,37 @@ function addExerciseCodeReview(renderedReview) {
 
 var refreshPreviousDraftLastId = undefined;
 function refreshPreviousDraft(id) {
-    if (id == undefined)
+    if (id === undefined)
         id = refreshPreviousDraftLastId;
     refreshPreviousDraftLastId = id;
 
     window.onbeforeunload = function () {
         saveExerciseCodeDraft(id);
-    }
-    if (localStorage[id] != undefined && $('.code-exercise').length > 0) {
-        $('.code-exercise')[0].codeMirrorEditor.setValue(localStorage[id]);
+    };
+
+	let solutions = JSON.parse(localStorage['exercise_solutions'] || '{}');
+    
+    if (solutions[id] !== undefined && $('.code-exercise').length > 0) {
+		let codeMirrorEditor = $('.code-exercise')[0].codeMirrorEditor;
+		codeMirrorEditor.setValue(solutions[id]);
+		/* Refresh codemirror editor. See https://stackoverflow.com/questions/8349571/codemirror-editor-is-not-loading-content-until-clicked */
+		setTimeout(function () {
+			codeMirrorEditor.refresh();
+		});
     }
 }
 
 function saveExerciseCodeDraft(id) {
-    if (id == undefined)
+    if (id === undefined)
         id = refreshPreviousDraftLastId;
+    
+    if (localStorage['exercise_solutions'] === undefined)
+		localStorage['exercise_solutions'] = JSON.stringify({});
+    
+    let solutions = JSON.parse(localStorage['exercise_solutions']); 
 
-    if ($('.code-exercise').length > 0)
-        localStorage[id] = $('.code-exercise')[0].codeMirrorEditor.getValue();
+    if ($('.code-exercise').length > 0) {
+		solutions[id] = $('.code-exercise')[0].codeMirrorEditor.getValue();
+		localStorage['exercise_solutions'] = JSON.stringify(solutions);
+	}
 }

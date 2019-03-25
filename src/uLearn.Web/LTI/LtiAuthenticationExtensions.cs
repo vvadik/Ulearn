@@ -6,7 +6,6 @@ using LtiLibrary.Core.Common;
 using LtiLibrary.Core.OAuth;
 using LtiLibrary.Owin.Security.Lti;
 using LtiLibrary.Owin.Security.Lti.Provider;
-using Microsoft.AspNet.Identity;
 using Owin;
 using uLearn.Web.Extensions;
 

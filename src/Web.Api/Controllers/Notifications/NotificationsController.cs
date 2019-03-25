@@ -5,63 +5,110 @@ using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
+using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Serilog;
 using Ulearn.Common.Extensions;
-using Ulearn.Web.Api.Models.Results.Notifications;
+using Ulearn.Web.Api.Models.Parameters.Notifications;
+using Ulearn.Web.Api.Models.Responses.Notifications;
 
 namespace Ulearn.Web.Api.Controllers.Notifications
 {
 	[Route("/notifications")]
 	public class NotificationsController : BaseController
 	{
-		private readonly UlearnDb db;
-		private readonly NotificationsRepo notificationsRepo;
-		private readonly FeedRepo feedRepo;
-		private readonly NotificationDataPreloader notificationDataPreloader;
+		private readonly INotificationsRepo notificationsRepo;
+		private readonly IFeedRepo feedRepo;
+		private readonly IServiceProvider serviceProvider;
+		private readonly INotificationDataPreloader notificationDataPreloader;
 
 		private static FeedNotificationTransport commentsFeedNotificationTransport;
 
-		public NotificationsController(ILogger logger, WebCourseManager courseManager, UlearnDb db, NotificationsRepo notificationsRepo, FeedRepo feedRepo, NotificationDataPreloader notificationDataPreloader)
-			: base(logger, courseManager, db)
+		public NotificationsController(ILogger logger, WebCourseManager courseManager, UlearnDb db,
+			IUsersRepo usersRepo,
+			INotificationsRepo notificationsRepo, IFeedRepo feedRepo,
+			IServiceProvider serviceProvider,
+			INotificationDataPreloader notificationDataPreloader)
+			: base(logger, courseManager, db, usersRepo)
 		{
-			this.db = db ?? throw new ArgumentNullException(nameof(db));
 			this.notificationsRepo = notificationsRepo ?? throw new ArgumentNullException(nameof(notificationsRepo));
 			this.feedRepo = feedRepo ?? throw new ArgumentNullException(nameof(feedRepo));
-			this.notificationDataPreloader = notificationDataPreloader;
+			this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+			this.notificationDataPreloader = notificationDataPreloader ?? throw new ArgumentNullException(nameof(notificationDataPreloader));
 
 			if (commentsFeedNotificationTransport == null)
 				commentsFeedNotificationTransport = feedRepo.GetCommentsFeedNotificationTransport();
 		}
 
-		[HttpGet]
-		[Authorize]
-		public async Task<IActionResult> NotificationList()
+		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
 		{
 			var userId = User.GetUserId();
-			var (importantNotificationList, commentsNotificationList) = await GetNotificationListsAsync(userId);
-			// await feedRepo.UpdateFeedViewTimestampAsync(userId, commentsFeedNotificationTransport.Id, DateTime.Now);
+			await feedRepo.AddFeedNotificationTransportIfNeededAsync(userId).ConfigureAwait(false);
 
-			return Json(new NotificationListResult
+			await next().ConfigureAwait(false);
+		}
+
+		/// <summary>
+		/// Список уведомлений и комментариев
+		/// </summary>
+		[HttpGet]
+		[Authorize]
+		public async Task<ActionResult<NotificationListResponse>> NotificationList()
+		{
+			var userId = User.GetUserId();
+			var (importantNotificationList, commentsNotificationList) = await GetNotificationListsAsync(userId).ConfigureAwait(false);
+
+			return new NotificationListResponse
 			{
 				Important = importantNotificationList,
 				Comments = commentsNotificationList,
-			});
+			};
+		}
+
+		/// <summary>
+		/// Число непрочитанных уведомлений
+		/// </summary>
+		[HttpGet("count")]
+		[Authorize]
+		public async Task<ActionResult<NotificationsCountResponse>> NotificationsCount([FromQuery] NotificationsCountParameters parameters)
+		{
+			var userId = User.GetUserId();
+			var userNotificationTransport = await feedRepo.GetUsersFeedNotificationTransportAsync(userId).ConfigureAwait(false);
+			var unreadCountAndLastTimestamp = await GetUnreadNotificationsCountAndLastTimestampAsync(userId, userNotificationTransport, parameters.LastTimestamp).ConfigureAwait(false);
+
+			return new NotificationsCountResponse
+			{
+				Count = unreadCountAndLastTimestamp.Item1,
+				LastTimestamp = unreadCountAndLastTimestamp.Item2,
+			};
+		}
+		
+		private async Task<Tuple<int, DateTime?>> GetUnreadNotificationsCountAndLastTimestampAsync(string userId, FeedNotificationTransport transport, DateTime? from = null)
+		{
+			var realFrom = from ?? await feedRepo.GetFeedViewTimestampAsync(userId, transport.Id).ConfigureAwait(false) ?? DateTime.MinValue;
+			var unreadCount = await feedRepo.GetNotificationsCountAsync(userId, realFrom, transport).ConfigureAwait(false);
+			if (unreadCount > 0)
+			{
+				from = await feedRepo.GetLastDeliveryTimestampAsync(transport).ConfigureAwait(false);
+			}
+
+			return Tuple.Create(unreadCount, from);
 		}
 		
 		private async Task<(NotificationList, NotificationList)> GetNotificationListsAsync(string userId)
 		{
-			var notificationTransport = await feedRepo.GetUsersFeedNotificationTransportAsync(userId);
+			var notificationTransport = await feedRepo.GetUsersFeedNotificationTransportAsync(userId).ConfigureAwait(false);
 
 			var importantNotifications = new List<Notification>();
 			if (notificationTransport != null)
 			{
-				importantNotifications = (await feedRepo.GetFeedNotificationDeliveriesAsync(userId, n => n.Notification.InitiatedBy, transports: notificationTransport))
+				importantNotifications = (await feedRepo.GetFeedNotificationDeliveriesAsync(userId, n => n.Notification.InitiatedBy, transports: notificationTransport).ConfigureAwait(false))
 					.Select(d => d.Notification)
 					.ToList();
 			}
-			var commentsNotifications = (await feedRepo.GetFeedNotificationDeliveriesAsync(userId, n => n.Notification.InitiatedBy, transports: commentsFeedNotificationTransport))
+			var commentsNotifications = (await feedRepo.GetFeedNotificationDeliveriesAsync(userId, n => n.Notification.InitiatedBy, transports: commentsFeedNotificationTransport).ConfigureAwait(false))
 				.Select(d => d.Notification)
 				.ToList();
 			
@@ -77,13 +124,13 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 			
 			logger.Information($"[GetNotificationList] Step 3 done, removed not actual notifications: left {importantNotifications.Count} important notifications and {commentsNotifications.Count} comment notifications");
 
-			var importantLastViewTimestamp = await feedRepo.GetFeedViewTimestampAsync(userId, notificationTransport?.Id ?? -1);
-			var commentsLastViewTimestamp = await feedRepo.GetFeedViewTimestampAsync(userId, commentsFeedNotificationTransport.Id);
+			var importantLastViewTimestamp = await feedRepo.GetFeedViewTimestampAsync(userId, notificationTransport?.Id ?? -1).ConfigureAwait(false);
+			var commentsLastViewTimestamp = await feedRepo.GetFeedViewTimestampAsync(userId, commentsFeedNotificationTransport.Id).ConfigureAwait(false);
 
 			logger.Information("[GetNotificationList] Step 4, building models");
 
 			var allNotifications = importantNotifications.Concat(commentsNotifications).ToList();
-			var notificationsData = await notificationDataPreloader.LoadAsync(allNotifications);
+			var notificationsData = await notificationDataPreloader.LoadAsync(allNotifications).ConfigureAwait(false);
 			
 			var importantNotificationList = new NotificationList
 			{
@@ -107,7 +154,7 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 			
 			foreach (var notification in notifications)
 			{
-				if (notification.IsBlockedByAnyNotificationFrom(db, allNotifications))
+				if (notification.IsBlockedByAnyNotificationFrom(serviceProvider, allNotifications))
 					continue;
 				yield return notification;
 			}
@@ -139,7 +186,7 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 		{
 			var data = new NotificationData();
 			if (notification is AbstractCommentNotification commentNotification)
-				data.Comment = BuildCommentInfo(notificationsData.CommentsByIds.GetOrDefault(commentNotification.CommentId));
+				data.Comment = BuildNotificationCommentInfo(notificationsData.CommentsByIds.GetOrDefault(commentNotification.CommentId));
 			return data;
 		}
 	}

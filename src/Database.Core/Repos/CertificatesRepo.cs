@@ -1,23 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Database.Models;
-using Ionic.Zip;
-using log4net;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using uLearn;
-using uLearn.Configuration;
-using Ulearn.Common.Extensions;
 
 namespace Database.Repos
 {
-	public class CertificatesRepo
+	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
+	public class CertificatesRepo : ICertificatesRepo
 	{
 		private readonly UlearnDb db;
 

@@ -1,4 +1,4 @@
-﻿using uLearn.Configuration;
+﻿using Ulearn.Core.Configuration;
 
 namespace AntiPlagiarism.Web.Configuration
 {
@@ -19,7 +19,7 @@ namespace AntiPlagiarism.Web.Configuration
 	{
 		public int CountOfLastAuthorsForCalculatingMeanAndDeviation { get; set; }
 		
-		public int RecalculateStatisticsAfterSubmisionsCount { get; set; }
+		public int RecalculateStatisticsAfterSubmissionsCount { get; set; }
 		
 		public int FaintSuspicionCoefficient { get; set; }
 		
@@ -28,6 +28,10 @@ namespace AntiPlagiarism.Web.Configuration
 		public double MinFaintSuspicionLevel { get; set; }
 		
 		public double MinStrongSuspicionLevel { get; set; }
+		
+		public double MaxFaintSuspicionLevel { get; set; }
+		
+		public double MaxStrongSuspicionLevel { get; set; }
 	}
 
 	public class PlagiarismDetectorConfiguration

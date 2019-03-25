@@ -1,7 +1,6 @@
 using Microsoft.CodeAnalysis;
-using uLearn.CSharp.Validators.IndentsValidation;
 
-namespace uLearn.CSharp
+namespace Ulearn.Core.CSharp
 {
 	public class BracesPair
 	{

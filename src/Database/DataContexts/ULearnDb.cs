@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.Common;
 using System.Data.Entity;
 using System.Data.Entity.Validation;
 using System.Linq;
@@ -8,16 +7,20 @@ using System.Threading.Tasks;
 using Database.Migrations;
 using Database.Models;
 using EntityFramework.Functions;
+using log4net;
 using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace Database.DataContexts
 {
 	public class ULearnDb : IdentityDbContext<ApplicationUser>
 	{
+		private readonly ILog log = LogManager.GetLogger(typeof(ULearnDb));
 		public ULearnDb()
 			: base("DefaultConnection", throwIfV1Schema: false)
 		{
 			System.Data.Entity.Database.SetInitializer(new MigrateDatabaseToLatestVersion<ULearnDb, Configuration>());
+			if(log.IsDebugEnabled)
+				Database.Log = log.Debug;
 		}
 
 		protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -51,6 +54,16 @@ namespace Database.DataContexts
 				.HasRequired(d => d.Notification)
 				.WithMany(n => n.Deliveries)
 				.HasForeignKey(d => d.NotificationId)
+				.WillCascadeOnDelete(true);
+			
+			modelBuilder.Entity<UserQuizSubmission>()
+				.HasOptional(s => s.AutomaticChecking)
+				.WithRequired(c => c.Submission)
+				.WillCascadeOnDelete(false);
+			
+			modelBuilder.Entity<UserQuizSubmission>()
+				.HasOptional(s => s.ManualChecking)
+				.WithRequired(c => c.Submission)
 				.WillCascadeOnDelete(false);
 			
 			modelBuilder.Entity<UserRole>().HasRequired(r => r.User).WithMany().HasForeignKey(r => r.UserId).WillCascadeOnDelete();
@@ -140,7 +153,7 @@ namespace Database.DataContexts
 		{
 			try
 			{
-				return await base.SaveChangesAsync();
+				return await base.SaveChangesAsync().ConfigureAwait(false);
 			}
 			catch (DbEntityValidationException ex)
 			{
@@ -166,7 +179,7 @@ namespace Database.DataContexts
 		public DbSet<Visit> Visits { get; set; }
 		public DbSet<SlideHint> Hints { get; set; }
 		public DbSet<Like> SolutionLikes { get; set; }
-		public DbSet<UserQuiz> UserQuizzes { get; set; }
+		public DbSet<UserQuizAnswer> UserQuizAnswers { get; set; }
 		public DbSet<UnitAppearance> UnitAppearances { get; set; }
 		public DbSet<TextBlob> Texts { get; set; }
 		public DbSet<LtiConsumer> Consumers { get; set; }
@@ -178,14 +191,15 @@ namespace Database.DataContexts
 		public DbSet<CommentLike> CommentLikes { get; set; }
 		public DbSet<CommentsPolicy> CommentsPolicies { get; set; }
 
-		public DbSet<QuizVersion> QuizVersions { get; set; }
 		public DbSet<CourseVersion> CourseVersions { get; set; }
+		public DbSet<CourseFile> CourseFiles { get; set; }
 
 		public DbSet<ManualExerciseChecking> ManualExerciseCheckings { get; set; }
 		public DbSet<AutomaticExerciseChecking> AutomaticExerciseCheckings { get; set; }
 		public DbSet<ManualQuizChecking> ManualQuizCheckings { get; set; }
 		public DbSet<AutomaticQuizChecking> AutomaticQuizCheckings { get; set; }
 		public DbSet<UserExerciseSubmission> UserExerciseSubmissions { get; set; }
+		public DbSet<UserQuizSubmission> UserQuizSubmissions { get; set; }
 		public DbSet<ExerciseCodeReview> ExerciseCodeReviews { get; set; }
 		public DbSet<ExerciseCodeReviewComment> ExerciseCodeReviewComments { get; set; }
 

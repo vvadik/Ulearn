@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,13 +13,19 @@ using Database.Models;
 using Elmah;
 using log4net;
 using LtiLibrary.Owin.Security.Lti;
-using uLearn.Model.Blocks;
-using uLearn.Quizes;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.LTI;
 using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Exercises.Blocks;
+using Ulearn.Core.Courses.Slides.Quizzes;
+using Ulearn.Core.Courses.Units;
 
 namespace uLearn.Web.Controllers
 {
@@ -96,9 +102,9 @@ namespace uLearn.Web.Controllers
 
 				if (queueItem == null)
 				{
-					/* It's possible when checking has not been fully checked, lock has been released, but after it user re-send him solution and old waiting checking has been removed */
+					/* It's possible when checking has not been fully checked, lock has been released, but after it user re-send his solution and we removed old waiting checking */
 					var fakeQueueItem = slide is QuizSlide ? (AbstractManualSlideChecking) new ManualQuizChecking() : new ManualExerciseChecking();
-					return RedirectToAction(GetAdminQueueActionName(fakeQueueItem), "Admin", new
+					return RedirectToAction("CheckingQueue", "Admin", new
 					{
 						courseId = courseId,
 						message = "checking_removed"
@@ -125,24 +131,6 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 			var slide = course.GetSlideById(slideGuid);
 			return RedirectToRoute("Course.SlideById", new { courseId = course.Id, slideId = slide.Url });
-		}
-
-		private string GetAdminQueueActionName(AbstractManualSlideChecking queueItem)
-		{
-			if (queueItem is ManualQuizChecking)
-				return "ManualQuizCheckingQueue";
-			if (queueItem is ManualExerciseChecking)
-				return "ManualExerciseCheckingQueue";
-			return "";
-		}
-
-		private string GetAdminCheckActionName(AbstractManualSlideChecking queueItem)
-		{
-			if (queueItem is ManualQuizChecking)
-				return "CheckQuiz";
-			if (queueItem is ManualExerciseChecking)
-				return "CheckExercise";
-			return "";
 		}
 
 		[AllowAnonymous]
@@ -174,7 +162,7 @@ namespace uLearn.Web.Controllers
 				var ltiRequest = await owinRequest.ParseLtiRequestAsync();
 				log.Info($"Нашёл LTI request в запросе: {ltiRequest.JsonSerialize()}");
 				userId = Request.GetOwinContext().Authentication.AuthenticationResponseGrant.Identity.GetUserId();
-				await ltiRequestsRepo.Update(userId, slide.Id, ltiRequest.JsonSerialize());
+				await ltiRequestsRepo.Update(courseId, userId, slide.Id, ltiRequest.JsonSerialize());
 
 				/* Substitute http(s) scheme with real scheme from header */
 				var uriBuilder = new UriBuilder(ltiRequest.Url)
@@ -196,7 +184,7 @@ namespace uLearn.Web.Controllers
 			try
 			{
 				if (visit.IsPassed)
-					LtiUtils.SubmitScore(slide, userId, visit);
+					LtiUtils.SubmitScore(courseId, slide, userId, visit);
 			}
 			catch (Exception e)
 			{
@@ -265,7 +253,7 @@ namespace uLearn.Web.Controllers
 					course,
 					slide,
 					slide.Info.DirectoryRelativePath,
-					slide.Blocks.Select(block => block is ExerciseBlock ? new ExerciseBlockData(course.Id, (ExerciseSlide)slide, false) { Url = Url } : (dynamic)null).ToArray(),
+					slide.Blocks.Select(block => block is AbstractExerciseBlock ? new ExerciseBlockData(course.Id, (ExerciseSlide)slide, false) { Url = Url } : (dynamic)null).ToArray(),
 					isGuest: true,
 					autoplay: autoplay),
 				IsGuest = true,
@@ -284,10 +272,10 @@ namespace uLearn.Web.Controllers
 			if (manualChecking != null)
 				userId = manualChecking.UserId;
 
-			var visiter = await VisitSlide(course.Id, slide.Id, userId);
+			var visiter = await VisitSlide(course.Id, slide.Id, userId).ConfigureAwait(false);
 			var maxSlideScore = GetMaxSlideScoreForUser(course, slide, userId);
-			var defaultProhibitFutherReview = groupsRepo.GetDefaultProhibitFutherReviewForUser(course.Id, userId, User);
-			var manualCheckingsLeft = manualChecking != null ? GetManualCheckingsCountInQueue(course.Id, slide, groupsIds) : 0;
+			var defaultProhibitFurtherReview = groupsRepo.GetDefaultProhibitFutherReviewForUser(course.Id, userId, User);
+			var manualCheckingsLeft = manualChecking != null ? ControllerUtils.GetManualCheckingsCountInQueue(slideCheckingsRepo, groupsRepo, User, course.Id, slide, groupsIds) : 0;
 
 			var score = Tuple.Create(visiter.Score, maxSlideScore);
 			var model = new CoursePageModel
@@ -301,34 +289,13 @@ namespace uLearn.Web.Controllers
 					course, slide, manualChecking, exerciseSubmissionId, groupsIds,
 					autoplay: autoplay,
 					isManualCheckingReadonly: isManualCheckingReadonly,
-					defaultProhibitFutherReview: defaultProhibitFutherReview, manualCheckingsLeft: manualCheckingsLeft),
+					defaultProhibitFurtherReview: defaultProhibitFurtherReview, manualCheckingsLeft: manualCheckingsLeft),
 				ManualChecking = manualChecking,
 				ContextManualCheckingUserGroups = manualChecking != null ? groupsRepo.GetUserGroupsNamesAsString(course.Id, manualChecking.UserId, User) : "",
 				ContextManualCheckingUserArchivedGroups = manualChecking != null ? groupsRepo.GetUserGroupsNamesAsString(course.Id, manualChecking.UserId, User, onlyArchived: true) : "",
 				IsGuest = false
 			};
 			return model;
-		}
-
-		private int GetManualCheckingsCountInQueue(string courseId, Slide slide, List<string> groupsIds)
-		{
-			var filterOptions = GetManualCheckingFilterOptionsByGroup(courseId, groupsIds);
-			if (filterOptions.UserIds == null)
-				groupsIds = new List<string> { "all" };
-			filterOptions.SlidesIds = new List<Guid> { slide.Id };
-			
-			if (slide is ExerciseSlide)
-				return slideCheckingsRepo.GetManualCheckingQueue<ManualExerciseChecking>(filterOptions).Count();
-			if (slide is QuizSlide)
-				return slideCheckingsRepo.GetManualCheckingQueue<ManualQuizChecking>(filterOptions).Count();
-			
-			throw new ArgumentException("Slide should be quiz or exercise", nameof(slide));
-		}
-		
-		/* Copy&paste from AdminController */
-		private ManualCheckingQueueFilterOptions GetManualCheckingFilterOptionsByGroup(string courseId, List<string> groupsIds)
-		{
-			return ControllerUtils.GetFilterOptionsByGroup<ManualCheckingQueueFilterOptions>(groupsRepo, User, courseId, groupsIds);
 		}
 
 		private int GetMaxSlideScoreForUser(Course course, Slide slide, string userId)
@@ -343,7 +310,7 @@ namespace uLearn.Web.Controllers
 		private BlockRenderContext CreateRenderContext(Course course, Slide slide, 
 			AbstractManualSlideChecking manualChecking = null, 
 			int? exerciseSubmissionId = null, List<string> groupsIds = null, bool isLti = false,
-			bool autoplay = false, bool isManualCheckingReadonly = false, bool defaultProhibitFutherReview = true,
+			bool autoplay = false, bool isManualCheckingReadonly = false, bool defaultProhibitFurtherReview = true,
 			int manualCheckingsLeft = 0)
 		{
 			/* ExerciseController will fill blockDatas later */
@@ -362,7 +329,7 @@ namespace uLearn.Web.Controllers
 				isLti: isLti,
 				autoplay: autoplay,
 				isManualCheckingReadonly: isManualCheckingReadonly,
-				defaultProhibitFutherReview: defaultProhibitFutherReview
+				defaultProhibitFurtherReview: defaultProhibitFurtherReview
 			)
 			{
 				VersionId = exerciseSubmissionId
@@ -386,7 +353,7 @@ namespace uLearn.Web.Controllers
 		private async Task<AcceptedSolutionsPageModel> CreateAcceptedSolutionsModel(Course course, ExerciseSlide slide, bool isLti)
 		{
 			var userId = User.Identity.GetUserId();
-			var isPassed = visitsRepo.IsPassed(slide.Id, userId);
+			var isPassed = visitsRepo.IsPassed(course.Id, slide.Id, userId);
 			if (!isPassed)
 				await visitsRepo.SkipSlide(course.Id, slide.Id, userId);
 			var submissions = solutionsRepo.GetBestTrendingAndNewAcceptedSolutions(course.Id, slide.Id);
@@ -439,8 +406,8 @@ namespace uLearn.Web.Controllers
 		private ExerciseBlockData CreateAcceptedAlertModel(ExerciseSlide slide, Course course)
 		{
 			var userId = User.Identity.GetUserId();
-			var isSkippedOrPassed = visitsRepo.IsSkippedOrPassed(slide.Id, userId);
-			/* TODO: It's not nesessary create ExerciseBlockData here */
+			var isSkippedOrPassed = visitsRepo.IsSkippedOrPassed(course.Id, slide.Id, userId);
+			/* TODO: It's not necessary to create ExerciseBlockData here */
 			var model = new ExerciseBlockData(course.Id, slide)
 			{
 				IsSkippedOrPassed = isSkippedOrPassed,
@@ -500,7 +467,9 @@ namespace uLearn.Web.Controllers
 			if (submission != null)
 			{
 				await solutionsRepo.RemoveSubmission(submission);
-				await visitsRepo.UpdateScoreForVisit(courseId, submission.SlideId, submission.UserId);
+				var course = courseManager.GetCourse(courseId);
+				var slide = course.GetSlideById(slideId);
+				await visitsRepo.UpdateScoreForVisit(courseId, submission.SlideId, slide.MaxScore, submission.UserId);
 			}
 			return RedirectToAction("AcceptedSolutions", new { courseId, slideId });
 		}
@@ -512,32 +481,17 @@ namespace uLearn.Web.Controllers
 			var userId = User.Identity.GetUserId();
 			db.SolutionLikes.RemoveRange(db.SolutionLikes.Where(q => q.UserId == userId && q.Submission.SlideId == slideId));
 
-			db.UserExerciseSubmissions.RemoveSlideAction(slideId, userId);
-			db.UserQuizzes.RemoveSlideAction(slideId, userId);
-			db.Visits.RemoveSlideAction(slideId, userId);
+			db.UserExerciseSubmissions.RemoveSlideAction(courseId, slideId, userId);
+			db.UserQuizSubmissions.RemoveSlideAction(courseId, slideId, userId);
+			db.Visits.RemoveSlideAction(courseId, slideId, userId);
 			await slideCheckingsRepo.RemoveAttempts(courseId, slideId, userId, false);
 
-			db.UserQuestions.RemoveSlideAction(slideId, userId);
-			db.SlideRates.RemoveSlideAction(slideId, userId);
-			db.Hints.RemoveSlideAction(slideId, userId);
+			db.UserQuestions.RemoveSlideAction(courseId, slideId, userId);
+			db.SlideRates.RemoveSlideAction(courseId, slideId, userId);
+			db.Hints.RemoveSlideAction(courseId, slideId, userId);
 			await db.SaveChangesAsync();
 
 			return RedirectToAction("SlideById", new { courseId, slideId = slide.Id });
-		}
-
-		public ActionResult CourseInstructorNavbar(string courseId)
-		{
-			if (string.IsNullOrEmpty(courseId) || !User.HasAccessFor(courseId, CourseRole.Instructor))
-				return PartialView((CourseInstructorNavbarViewModel)null);
-
-			var course = courseManager.GetCourse(courseId);
-			var canAddInstructors = coursesRepo.HasCourseAccess(User.Identity.GetUserId(), courseId, CourseAccessType.AddAndRemoveInstructors);
-			return PartialView(new CourseInstructorNavbarViewModel
-			{
-				CourseId = courseId,
-				CourseTitle = course.Title,
-				CanAddInstructors = canAddInstructors,
-			});
 		}
 	}
 }

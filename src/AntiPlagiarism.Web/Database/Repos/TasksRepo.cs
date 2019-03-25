@@ -5,7 +5,6 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using AntiPlagiarism.Web.Database.Models;
-using AntiPlagiarism.Web.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
@@ -38,12 +37,13 @@ namespace AntiPlagiarism.Web.Database.Repos
 			return db.TasksStatisticsParameters.FindAsync(taskId);
 		}
 
-		public async Task SaveTaskStatisticsParametersAsync(TaskStatisticsParameters parameters)
+		/* It's very important that SaveTaskStatisticsParametersAsync() works with disabled EF's Change Tracker */		
+		public Task SaveTaskStatisticsParametersAsync(TaskStatisticsParameters parameters)
 		{
-			await FuncUtils.TrySeveralTimesAsync(
+			return FuncUtils.TrySeveralTimesAsync(
 				async () =>
 				{
-					await TrySaveTaskStatisticsParametersAsync(parameters);
+					await TrySaveTaskStatisticsParametersAsync(parameters).ConfigureAwait(false);
 					return true;
 				},
 				3,
@@ -54,10 +54,10 @@ namespace AntiPlagiarism.Web.Database.Repos
 
 		private async Task TrySaveTaskStatisticsParametersAsync(TaskStatisticsParameters parameters)
 		{
-			using (var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable))
+			using (var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable).ConfigureAwait(false))
 			{
 				db.AddOrUpdate(parameters, p => p.TaskId == parameters.TaskId);
-				await db.SaveChangesAsync();
+				await db.SaveChangesAsync().ConfigureAwait(false);
 				transaction.Commit();
 			}
 		}

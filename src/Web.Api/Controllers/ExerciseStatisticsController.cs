@@ -3,28 +3,34 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database;
 using Database.Repos;
+using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using uLearn;
-using Ulearn.Web.Api.Models.Results.ExerciseStatistics;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Web.Api.Models.Responses.ExerciseStatistics;
 
 namespace Ulearn.Web.Api.Controllers
 {
-	[Route("/exercise/statistics")]
+	[Route("/exercise-statistics")]
 	public class ExerciseStatisticsController : BaseController
 	{
-		private readonly UserSolutionsRepo userSolutionsRepo;
+		private readonly IUserSolutionsRepo userSolutionsRepo;
 
-		public ExerciseStatisticsController(ILogger logger, WebCourseManager courseManager, UserSolutionsRepo userSolutionsRepo, UlearnDb db)
-			: base(logger, courseManager, db)
+		public ExerciseStatisticsController(ILogger logger, WebCourseManager courseManager, IUserSolutionsRepo userSolutionsRepo, UlearnDb db, IUsersRepo usersRepo)
+			: base(logger, courseManager, db, usersRepo)
 		{
 			this.userSolutionsRepo = userSolutionsRepo;
 		}
 
-		[Route("{courseId}")]
-		public async Task<IActionResult> CourseStatistics(Course course, int count=10000, DateTime? from=null, DateTime? to=null)
+		/// <summary>
+		/// Статистика по выполнению каждого упражнения в курсе
+		/// </summary>
+		[HttpGet]
+		public async Task<ActionResult<CourseExercisesStatisticsResponse>> CourseStatistics([FromQuery(Name = "course_id")][BindRequired]string courseId, int count=10000, DateTime? from=null, DateTime? to=null)
 		{
+			var course = courseManager.FindCourse(courseId);
 			if (course == null)
 				return NotFound();
 			
@@ -44,10 +50,10 @@ namespace Ulearn.Web.Api.Controllers
 				.OrderByDescending(s => s.Timestamp)
 				.Take(count)
 				.Select(s => Tuple.Create(s.SlideId, s.AutomaticCheckingIsRightAnswer, s.Timestamp))
-				.ToListAsync();
+				.ToListAsync().ConfigureAwait(false);
 
 			const int daysLimit = 30;
-			var result = new CourseExercisesStatisticsResult
+			var result = new CourseExercisesStatisticsResponse
 			{
 				AnalyzedSubmissionsCount = submissions.Count,
 				Exercises = exerciseSlides.Select(
@@ -75,7 +81,7 @@ namespace Ulearn.Web.Api.Controllers
 					}).ToList()
 			};
 
-			return Json(result);
+			return result;
 		}
 	}
 }

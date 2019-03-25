@@ -5,7 +5,7 @@
 @model uLearn.Web.Controllers.StudentSubmissionsModel
 
 @{
-	var requireReview = Model.Slide.Exercise.RequireReview;
+	var requireReview = Model.Slide.Scoring.RequireReview;
 	var studentsCount = Model.Users.Count;
 	var rowsCountToShow = Model.ShowAll ? studentsCount : 2;
 }

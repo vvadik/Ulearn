@@ -1,4 +1,6 @@
-﻿$(function() {
+﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
+
+window.documentReadyFunctions.push(function() {
 	$(".exercise__submission").on('click', '#GetHintButton', function() {
 		showHintForUser($(this));
 	});

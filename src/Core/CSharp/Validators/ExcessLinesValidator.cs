@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace uLearn.CSharp.Validators
+namespace Ulearn.Core.CSharp.Validators
 {
 	public class ExcessLinesValidator : BaseStyleValidator
 	{
@@ -37,12 +37,12 @@ namespace uLearn.CSharp.Validators
 
 			if (openBraceLine != firstStatementLine
 				&& openBraceLine + 1 != firstStatementLine
-				&& !IsComment(bracesPair.Open.Parent, openBraceLine + 1))
+				&& !IsCommentOrRegionOrDisabledText(bracesPair.Open.Parent, openBraceLine + 1))
 				yield return new SolutionStyleError(StyleErrorType.ExcessLines01, bracesPair.Open);
 
 			if (closeBraceLine != lastStatementLine
 				&& closeBraceLine - 1 != lastStatementLine
-				&& !IsComment(bracesPair.Open.Parent, closeBraceLine - 1))
+				&& !IsCommentOrRegionOrDisabledText(bracesPair.Open.Parent, closeBraceLine - 1))
 				yield return new SolutionStyleError(StyleErrorType.ExcessLines02, bracesPair.Close);
 		}
 
@@ -103,7 +103,10 @@ namespace uLearn.CSharp.Validators
 			return null;
 		}
 
-		private static bool IsComment(SyntaxNode syntaxNode, int line)
+		/// <summary>
+		/// Check is line is inside multiline comment or inside #region..#endregion or inside #ifdef..#endif
+		/// </summary>
+		private static bool IsCommentOrRegionOrDisabledText(SyntaxNode syntaxNode, int line)
 		{
 			return syntaxNode.DescendantTrivia()
 				.Where(x => x.Kind() == SyntaxKind.MultiLineCommentTrivia
@@ -111,7 +114,10 @@ namespace uLearn.CSharp.Validators
 							|| x.Kind() == SyntaxKind.MultiLineDocumentationCommentTrivia
 							|| x.Kind() == SyntaxKind.SingleLineDocumentationCommentTrivia
 							|| x.Kind() == SyntaxKind.RegionDirectiveTrivia
-							|| x.Kind() == SyntaxKind.EndRegionDirectiveTrivia)
+							|| x.Kind() == SyntaxKind.EndRegionDirectiveTrivia
+							|| x.Kind() == SyntaxKind.IfDirectiveTrivia
+							|| x.Kind() == SyntaxKind.EndIfDirectiveTrivia
+							|| x.Kind() == SyntaxKind.DisabledTextTrivia)
 				.Any(x =>
 				{
 					var startLine = x.GetLocation().GetLineSpan().StartLinePosition.Line + 1;

@@ -62,6 +62,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> Index(string username)
 		{
 			metricSender.SendCount("restore_password.try");
@@ -84,12 +85,6 @@ namespace uLearn.Web.Controllers
 				if (string.IsNullOrWhiteSpace(user.Email))
 				{
 					answer.Messages.Add(new Message($"У пользователя {user.UserName} не указана электронная почта"));
-					continue;
-				}
-
-				if (!user.EmailConfirmed)
-				{
-					answer.Messages.Add(new Message($"У пользователя {user.UserName} не подтверждена электронная почта"));
 					continue;
 				}
 
@@ -122,7 +117,7 @@ namespace uLearn.Web.Controllers
 
 			var subject = "Восстановление пароля от ulearn.me";
 			var textBody = "Чтобы изменить пароль к аккаунту " + user.UserName + ", перейдите по ссылке: " + url + ".";
-			var htmlBody = "Чтобы изменить пароль к аккаунту " + user.UserName + ", перейдите по ссылке: <a href=\"" + url + "\">" + url + "</a>.";
+			var htmlBody = "Чтобы изменить пароль к аккаунту " + user.UserName.EscapeHtml() + ", перейдите по ссылке: <a href=\"" + url + "\">" + url + "</a>.";
 			var messageInfo = new MessageSentInfo
 			{
 				RecipientAddress = user.Email,
@@ -162,6 +157,8 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
+		[ValidateInput(false)]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> SetNewPassword(SetNewPasswordModel model)
 		{
 			var answer = new SetNewPasswordModel

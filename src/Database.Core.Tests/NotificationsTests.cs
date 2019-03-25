@@ -23,16 +23,16 @@ namespace Database.Core.Tests
 				.WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss.ffff } {Level}] {Message:lj}{NewLine}{Exception}")
 				.CreateLogger();
 			
-			// Create database context with logging
+			/* Create database context with logging */
 			// var db = new UlearnDbFactory().CreateDbContext(new string[0], new LoggerFactory(new List<ILoggerProvider> { new SerilogLoggerProvider(log) }));
 			var db = new UlearnDbFactory().CreateDbContext(new string[0]);
 			
-			// Disable changetracker if needed
+			/* Disable changetracker if needed */
 			// db.ChangeTracker.AutoDetectChangesEnabled = false;
 						
 			var serviceCollection = new ServiceCollection();
 			serviceCollection.AddSingleton(db);
-			serviceCollection.AddSingleton<Serilog.ILogger>(log);			
+			serviceCollection.AddSingleton<ILogger>(log);			
 			serviceCollection.AddTransient<NotificationsRepo>();
 			serviceCollection.AddTransient<FeedRepo>();
 			serviceCollection.AddTransient<VisitsRepo>();
@@ -40,17 +40,16 @@ namespace Database.Core.Tests
 			serviceProvider = serviceCollection.BuildServiceProvider();
 		}
 		
-		[Test]
 		[TestCase("b189e18e-1866-47ec-8091-5a280a9c7945")]
 		[Explicit]
 		public async Task SlowNotificationsActualityChecking(string userId)
 		{
 			var feedRepo = serviceProvider.GetService<FeedRepo>();
 			
-			var transport = await feedRepo.GetUsersFeedNotificationTransportAsync(userId);
+			var transport = await feedRepo.GetUsersFeedNotificationTransportAsync(userId).ConfigureAwait(false);
 			Console.WriteLine($@"Feed notification transport: {transport}");
 			
-			var deliveries = await feedRepo.GetFeedNotificationDeliveriesAsync(userId, d => d.Notification, transport);
+			var deliveries = await feedRepo.GetFeedNotificationDeliveriesAsync(userId, d => d.Notification, transport).ConfigureAwait(false);
 			var notifications = deliveries.Select(d => d.Notification).ToList();
 			
 			foreach (var notification in notifications)

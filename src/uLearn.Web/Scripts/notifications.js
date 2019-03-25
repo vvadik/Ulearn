@@ -1,4 +1,6 @@
-﻿$(document).ready(function () {
+﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
+
+window.documentReadyFunctions.push(function () {
 	var $notificaticationsIconLink = $('.notifications__icon-link');
 	var $counter = $('.notifications__counter');
 	var $dropdownContent = $('.notifications__dropdown');
@@ -22,7 +24,8 @@
 		if (!isDesktopVersionOpened && !isMobileVersionOpened) {
 			var loadUrl = $self.data('notificationsUrl');
 			$dropdownContent.html('<li class="notifications__info">Загружаю последние уведомления...</li>');
-			$dropdownContent.load(loadUrl, function() {
+			$.get(loadUrl, function(data) {
+                $dropdownContent.html(data);
 				$counter.text('0').hide();
 			});
 		}

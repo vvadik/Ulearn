@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Ulearn.Common.Extensions;
-using SyntaxNodeOrToken = uLearn.CSharp.Validators.IndentsValidation.SyntaxNodeOrToken;
+using SyntaxNodeOrToken = Ulearn.Core.CSharp.Validators.IndentsValidation.SyntaxNodeOrToken;
 
-namespace uLearn.CSharp
+namespace Ulearn.Core.CSharp
 {
 	public class SolutionStyleError
 	{
@@ -206,7 +205,7 @@ namespace uLearn.CSharp
 		Recursion02,
 		
 		
-		[MessageTemplate("Используйте return вместо if")]
+		[MessageTemplate("Используйте return вместо if. Конструкцию `if (expr) return true; else return false;` можно записать проще: `return expr`.")]
 		RedundantIf01,
 
 
@@ -216,6 +215,10 @@ namespace uLearn.CSharp
 		
 		[MessageTemplate("Используйте `var` при инициализации локальной переменной.")]
 		VarInVariableDeclaration01,
+		
+		
+		[MessageTemplate("В блоке `if` всегда происходит выход из функции, поэтому `else` можно убрать.")]
+		RedundantElse01,
 	}
 
 	[AttributeUsage(AttributeTargets.Field, Inherited = false, AllowMultiple = false)]

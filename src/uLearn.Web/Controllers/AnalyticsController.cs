@@ -13,12 +13,17 @@ using Database.Models;
 using Microsoft.AspNet.Identity;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
-using uLearn.Quizes;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Helpers;
 using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Quizzes;
+using Ulearn.Core.Courses.Units;
 
 namespace uLearn.Web.Controllers
 {
@@ -341,7 +346,7 @@ namespace uLearn.Web.Controllers
 						foreach (var slide in shouldBeSolvedSlides)
 						{
 							var slideScore = model.ScoreByUserAndSlide[Tuple.Create(user.UserId, slide.Id)];
-							builder.AddCell(onlyFullScores ? model.GetOnlyFullScore(slideScore, slide.MaxScore) : slideScore);
+							builder.AddCell(onlyFullScores ? model.GetOnlyFullScore(slideScore, slide) : slideScore);
 						}
 						if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)
 							builder.AddCell(model.AdditionalScores[Tuple.Create(user.UserId, unit.Id, scoringGroup.Id)]);
@@ -393,7 +398,7 @@ namespace uLearn.Web.Controllers
 			filterOptions.PeriodStart = periodStart;
 			filterOptions.PeriodFinish = realPeriodFinish;
 
-			var usersIds = visitsRepo.GetVisitsInPeriod(filterOptions).DistinctBy(v => v.UserId).Select(v => v.UserId);
+			var usersIds = visitsRepo.GetVisitsInPeriod(filterOptions).Select(v => v.UserId).Distinct().ToList();
 			/* If we filtered out users from one or several groups show them all */
 			if (filterOptions.UserIds != null && !filterOptions.IsUserIdsSupplement)
 				usersIds = filterOptions.UserIds;
@@ -499,6 +504,10 @@ namespace uLearn.Web.Controllers
 				.DistinctBy(u => u.SlideId);
 			var userScores = visitsRepo.GetScoresForSlides(courseId, userId, slides.Select(s => s.Id));
 
+			var unitIndex = course.Units.FindIndex(u => u.Id == unitId);
+			var previousUnit = unitIndex == 0 ? null : course.Units[unitIndex - 1];
+			var nextUnit = unitIndex == course.Units.Count - 1 ? null : course.Units[unitIndex + 1];
+
 			var model = new UserUnitStatisticsPageModel
 			{
 				Course = course,
@@ -507,6 +516,8 @@ namespace uLearn.Web.Controllers
 				Slides = slides.ToDictionary(s => s.Id),
 				Submissions = acceptedSubmissions.ToList(),
 				Scores = userScores,
+				PreviousUnit = previousUnit,
+				NextUnit = nextUnit,
 			};
 
 			return View(model);
@@ -556,7 +567,7 @@ namespace uLearn.Web.Controllers
 			if (unit == null)
 				return HttpNotFound();
 			var slides = unit.Slides.ToArray();
-			var users = GetUserInfos(slides, periodStart).OrderByDescending(GetRating).ToArray();
+			var users = GetUserInfos(courseId, slides, periodStart).OrderByDescending(GetRating).ToArray();
 			return PartialView(new UserProgressViewModel
 			{
 				Slides = slides,
@@ -623,7 +634,7 @@ namespace uLearn.Web.Controllers
 
 		private Dictionary<DateTime, int> GetQuizPassedStats(IEnumerable<Guid> slideIds, DateTime firstDay, DateTime lastDay)
 		{
-			return GroupByDays(FilterByTime(FilterBySlides(db.UserQuizzes, slideIds), firstDay, lastDay));
+			return GroupByDays(FilterByTime(FilterBySlides(db.UserQuizSubmissions, slideIds), firstDay, lastDay));
 		}
 
 		private Dictionary<DateTime, Tuple<int, int>> GetSlidesVisitedStats(IEnumerable<Guid> slideIds, DateTime firstDay, DateTime lastDay)
@@ -666,14 +677,14 @@ namespace uLearn.Web.Controllers
 						+ (s.IsQuizPassed ? s.QuizPercentage / 100.0 : 0));
 		}
 
-		private IEnumerable<UserInfo> GetUserInfos(Slide[] slides, DateTime periodStart, DateTime? periodFinish = null)
+		private IEnumerable<UserInfo> GetUserInfos(string courseId, Slide[] slides, DateTime periodStart, DateTime? periodFinish = null)
 		{
 			if (!periodFinish.HasValue)
 				periodFinish = DateTime.Now;
 
 			var slidesIds = slides.Select(s => s.Id).ToImmutableHashSet();
 
-			var dq = visitsRepo.GetVisitsInPeriod(slidesIds, periodStart, periodFinish.Value)
+			var dq = visitsRepo.GetVisitsInPeriod(courseId, slidesIds, periodStart, periodFinish.Value)
 				.Select(v => v.UserId)
 				.Distinct()
 				.Join(db.Visits, s => s, v => v.UserId, (s, visiters) => visiters)
@@ -799,6 +810,8 @@ namespace uLearn.Web.Controllers
 		public List<UserExerciseSubmission> Submissions { get; set; }
 		public Dictionary<Guid, Slide> Slides { get; set; }
 		public Dictionary<Guid, int> Scores { get; set; }
+		public Unit PreviousUnit { get; set; }
+		public Unit NextUnit { get; set; }
 	}
 
 	public class UserSolutionsViewModel

@@ -82,14 +82,16 @@ function areAllAnswered(needingCount) {
 }
 
 
-function QuizAnswer(type, quizId, itemId, text) {
-	this.QuizType = type;
-	this.QuizId = quizId;
+function QuizAnswer(type, blockId, itemId, text) {
+	this.BlockType = type;
+	this.BlockId = blockId;
 	this.ItemId = itemId;
 	this.Text = text;
 }
 
-$(document).ready(function() {
+window.documentReadyFunctions = window.documentReadyFunctions || [];
+
+window.documentReadyFunctions.push(function() {
 	$.fn.moveUp = function() {
 		$.each(this, function() {
 			$(this).after($(this).prev());

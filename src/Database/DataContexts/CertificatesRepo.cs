@@ -1,19 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data.Entity;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Database.Models;
-using Ionic.Zip;
-using log4net;
 using Newtonsoft.Json;
-using uLearn;
-using Ulearn.Common;
-using Ulearn.Common.Extensions;
 
 namespace Database.DataContexts
 {

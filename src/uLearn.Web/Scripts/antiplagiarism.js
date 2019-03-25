@@ -1,9 +1,15 @@
 function fetchAntiPlagiarismStatus($plagiarismStatus) {
+	var shameComment = 'Ой! Наш робот нашёл решения других студентов, подозрительно похожие на ваше. ' +
+		'Так может быть, если вы позаимствовали части программы, взяли их из открытых источников либо сами поделились своим кодом. ' +
+		'Выполняйте задания самостоятельно.';
+	
     $plagiarismStatus.removeClass('found-level0 found-level1 found-level2');
     
     var url = $plagiarismStatus.data('antiplagiarismUrl');
+    var addCodeReviewUrl = $plagiarismStatus.data('addExerciseCodeReviewUrl');
     var $plagiarismStatusFixedCopy = $plagiarismStatus.clone().addClass('fixed').hide().insertAfter($plagiarismStatus);
     var $codeMirror = $plagiarismStatus.parent().find('.CodeMirror');
+    
     $.getJSON(url, function (data) {
         if (data.status === 'not_checked') {
             $plagiarismStatus.addClass('not-checked');
@@ -13,7 +19,7 @@ function fetchAntiPlagiarismStatus($plagiarismStatus) {
             return;
         }
 
-        let className = 'found-level' + data.suspicion_level;
+        var className = 'found-level' + data.suspicion_level;
         $plagiarismStatus.addClass(className);
         $plagiarismStatusFixedCopy.addClass(className);
         var message = '';
@@ -22,24 +28,55 @@ function fetchAntiPlagiarismStatus($plagiarismStatus) {
             case 0: message = 'похожих решений не найдено'; break;
             case 1:
             case 2:
-                var singleNumberMessage = 'у {count} другого студента найдено {very} похожее решение. {link}';
-                var pluralNumberMessage = 'у {count} других студентов найдены {very} похожие решения. {link}';
+                var singleNumberMessage = 'у {count} другого студента найдено {very} похожее решение. {details_link} и {shame_link}.';
+                var pluralNumberMessage = 'у {count} других студентов найдены {very} похожие решения. {details_link} и {shame_link}.';
                 message = data.suspicious_authors_count === 1 ? singleNumberMessage : pluralNumberMessage;
                 break;
         }
         message = message.replace('{count}', data.suspicious_authors_count);
         message = message.replace('{very}', data.suspicion_level === 2 ? '<b>очень</b>' : '');
-        message = message.replace('{link}', '<a href="' + $plagiarismStatus.data('antiplagiarismDetailsUrl') + '" target="_blank">Посмотреть</a>');
+        message = message.replace('{details_link}', 'Посмотрите <a href="' + $plagiarismStatus.data('antiplagiarismDetailsUrl') + '" target="_blank">подробности</a>');
+		message = message.replace('{shame_link}', '<a class="internal-page-link antiplagiarism-shame-button" href="#">поставьте 0 баллов</a>');
         
         $plagiarismStatus.html('Проверка на списывание: ' + message);
-        $plagiarismStatusFixedCopy.html($plagiarismStatus.html());
+		$plagiarismStatusFixedCopy.html($plagiarismStatus.html());
+		
+		if (data.suspicion_level !== 0) {			
+			$('.antiplagiarism-shame-button').tooltip({
+				title: '<div class="text-left">Нажмите, если тоже думаете, что решение списано: мы поставим за него 0 баллов и оставим студенту комментарий. Все действия обратимы.</div>',
+				html: true,
+				placement: 'bottom',
+				fallbackPlacement: 'left',
+				trigger: 'hover',
+			});
+			
+			var $exerciseSubmission = $('.exercise__submission');
+			$exerciseSubmission.on('click', '.antiplagiarism-shame-button', function(e) {
+				e.preventDefault();
+				
+				$('.antiplagiarism-shame-button').tooltip('hide');
+				
+				postExerciseCodeReview(addCodeReviewUrl, {
+					head: { line: 0, ch: 0 },
+					anchor: { line: 1, ch: 0 }
+				}, shameComment);
+
+				/* Set 0 points */
+				var $exerciseScore = $('.exercise__score');
+				$exerciseScore.find('[data-value="0"]:not(.active)').click();
+				
+				/* Prohibit further review */
+				var $prohibitFurtherReview = $('#prohibitFurtherReview');
+				$prohibitFurtherReview.prop('checked', true);
+			});
+		}
     });
     
-    var plagiarismStatusOffset = $plagiarismStatus.offset().top;
-    var headerHeight = $('#header').outerHeight();    
+    var headerHeight = $('.header').outerHeight();    
     var codeMirrorBottom = $codeMirror.offset().top + $codeMirror.outerHeight();
     $(window).scroll(function () {
         var scrollTop = $(window).scrollTop();
+		var plagiarismStatusOffset = $plagiarismStatus.offset().top;
 
         var isVisible = $plagiarismStatusFixedCopy.is(':visible');
         if (scrollTop >= plagiarismStatusOffset - headerHeight && scrollTop < codeMirrorBottom - 2 * headerHeight) {
@@ -75,7 +112,9 @@ function getDiff(a, b, ignoreWhitespace) {
 }
 /* End of extracted from merge addon for codemirror */
 
-$(document).ready(function () {
+window.documentReadyFunctions = window.documentReadyFunctions || [];
+
+window.documentReadyFunctions.push(function () {
     $('.antiplagiarism__data').each(function () {
         var $self = $(this);
         var originalSubmissionId = $self.data('originalSubmissionId');
@@ -118,7 +157,7 @@ $(document).ready(function () {
         /* Setup click handlers */
         $(originalCodeMirror.getWrapperElement()).on('click', function (e) {
             var cursor = originalCodeMirror.getCursor();
-            let originalLine = cursor.line;
+            var originalLine = cursor.line;
             
             var bestMatchedLine = bestMatchedLines[originalLine];
             if (bestMatchedLine === undefined || bestMatchedLine < 0) // -2 or -1
@@ -128,7 +167,7 @@ $(document).ready(function () {
         });
         $(plagiarismCodeMirror.getWrapperElement()).on('click', function (e) {
             var cursor = plagiarismCodeMirror.getCursor();
-            let plagiarismLine = cursor.line;
+            var plagiarismLine = cursor.line;
 
             var originalLine = undefined;
             $.each(bestMatchedLines, function (index, value) {
@@ -176,7 +215,7 @@ $(document).ready(function () {
         $('html').animate({scrollTop: $('html').scrollTop() - marginTopDiff}, 500, 'linear');        
     }
     
-    /* Returns array result, result[i] contains token indecies which contains in i-th line of input */
+    /* Returns array result, result[i] contains token indexes which contains in i-th line of input */
     function getTokensByLines(text, tokens) {
         var currentTokenIndex = 0;
         var lineIndex = 0;
@@ -223,12 +262,16 @@ $(document).ready(function () {
         
         $.each(matchedSnippets, function (idx, matchedSnippet) {
             for (var tokenIndex = 0; tokenIndex < matchedSnippet.snippet_tokens_count; ++tokenIndex) {
-                var originalTokenIndex = matchedSnippet.original_submission_first_token_index + tokenIndex;
-                var plagiarismTokenIndex = matchedSnippet.plagiarism_submission_first_token_index + tokenIndex;
-                var originalLine = originalLineByTokens[originalTokenIndex][0];
-                var plagiarismLine = plagiarismLineByTokens[plagiarismTokenIndex][0];
-                
-                lineWeights[originalLine][plagiarismLine]++;
+            	try {
+					var originalTokenIndex = matchedSnippet.original_submission_first_token_index + tokenIndex;
+					var plagiarismTokenIndex = matchedSnippet.plagiarism_submission_first_token_index + tokenIndex;
+					var originalLine = originalLineByTokens[originalTokenIndex][0];
+					var plagiarismLine = plagiarismLineByTokens[plagiarismTokenIndex][0];
+
+					lineWeights[originalLine][plagiarismLine]++;
+				} catch (e) {
+					console.error(e);
+				}
             }                
         });
         

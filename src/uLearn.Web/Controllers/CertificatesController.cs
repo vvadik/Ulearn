@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 using Database;
 using Database.DataContexts;
@@ -8,6 +9,8 @@ using Database.Extensions;
 using Database.Models;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses;
 
 namespace uLearn.Web.Controllers
 {
@@ -33,7 +36,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[AllowAnonymous]
-		public ActionResult Index(string userId = "")
+		public async Task<ActionResult> Index(string userId = "")
 		{
 			if (string.IsNullOrEmpty(userId) && User.Identity.IsAuthenticated)
 				userId = User.Identity.GetUserId();
@@ -41,12 +44,35 @@ namespace uLearn.Web.Controllers
 			if (string.IsNullOrEmpty(userId))
 				return HttpNotFound();
 
+			var user = await userManager.FindByIdAsync(userId);
+			if (user == null)
+				return HttpNotFound();
+
 			var certificates = certificatesRepo.GetUserCertificates(userId);
 			var coursesTitles = courseManager.GetCourses().ToDictionary(c => c.Id.ToLower(), c => c.Title);
 
 			return View("List", new UserCertificatesViewModel
 			{
-				User = userManager.FindById(userId),
+				User = user,
+				Certificates = certificates,
+				CoursesTitles = coursesTitles,
+			});
+		}
+		
+		[Authorize]
+		public ActionResult Partial()
+		{
+			var userId = User.Identity.GetUserId();
+			var user = userManager.FindById(userId);
+			if (user == null)
+				return HttpNotFound();
+
+			var certificates = certificatesRepo.GetUserCertificates(userId);
+			var coursesTitles = courseManager.GetCourses().ToDictionary(c => c.Id.ToLower(), c => c.Title);
+
+			return PartialView("ListPartial", new UserCertificatesViewModel
+			{
+				User = user,
 				Certificates = certificates,
 				CoursesTitles = coursesTitles,
 			});

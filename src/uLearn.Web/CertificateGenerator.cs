@@ -12,6 +12,10 @@ using Newtonsoft.Json;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ionic.Zip;
+using Ulearn.Core;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
 
 namespace uLearn.Web
 {
@@ -184,7 +188,7 @@ namespace uLearn.Web
 			content = content.Replace($"%{parameterName}|in_html%", htmlEncodedValue);
 			content = content.Replace($"%{parameterName}%", htmlEncodedValue);
 
-			var quotesEncodedValue = parameterValue.Replace(@"\", @"\\").Replace("\"", "\\\"").Replace("'", @"\'");
+			var quotesEncodedValue = parameterValue.EncodeQuotes();
 			content = content.Replace($"%{parameterName}|in_quotes%", quotesEncodedValue);
 
 			return content;
@@ -259,8 +263,8 @@ namespace uLearn.Web
 
 		private string ReplaceQuizzesBuiltinParameters(string content, Certificate certificate, Course course)
 		{
-			var passedQuizzesCount = userQuizzesRepo.GetIdOfQuizPassedSlides(course.Id, certificate.UserId).Count;
-			var scoredMaximumQuizzesCount = userQuizzesRepo.GetIdOfQuizSlidesScoredMaximum(course.Id, certificate.UserId).Count;
+			var passedQuizzesCount = userQuizzesRepo.GetPassedSlideIds(course.Id, certificate.UserId).Count;
+			var scoredMaximumQuizzesCount = userQuizzesRepo.GetPassedSlideIdsWithMaximumScore(course.Id, certificate.UserId).Count;
 
 			content = SubstituteOneParameter(content, "quizzes.passed", passedQuizzesCount.ToString());
 			content = SubstituteOneParameter(content, "quizzes.passed_maxscore", scoredMaximumQuizzesCount.ToString());
@@ -272,7 +276,7 @@ namespace uLearn.Web
 			var codeReviewsCount = slideCheckingsRepo.GetUsersPassedManualExerciseCheckings(course.Id, certificate.UserId).Count();
 			var exercisesMaxReviewScores = course.Slides
 				.OfType<ExerciseSlide>().
-				ToDictionary(s => s.Id, s => s.Exercise.MaxReviewScore);
+				ToDictionary(s => s.Id, s => s.Scoring.CodeReviewScore);
 			var codeReviewsFullCount = slideCheckingsRepo
 				.GetUsersPassedManualExerciseCheckings(course.Id, certificate.UserId)
 				.Count(s => s.Score == exercisesMaxReviewScores.GetOrDefault(s.SlideId, -1));

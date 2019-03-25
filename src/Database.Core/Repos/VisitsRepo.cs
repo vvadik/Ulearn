@@ -4,18 +4,20 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Database.Repos
 {
-	public class VisitsRepo
+	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
+	public class VisitsRepo : IVisitsRepo
 	{
 		private readonly UlearnDb db;
-		private readonly SlideCheckingsRepo slideCheckingsRepo;
+		private readonly ISlideCheckingsRepo slideCheckingsRepo;
 
-		public VisitsRepo(UlearnDb db)
+		public VisitsRepo(UlearnDb db, ISlideCheckingsRepo slideCheckingsRepo)
 		{
 			this.db = db;
-			slideCheckingsRepo = new SlideCheckingsRepo(db);
+			this.slideCheckingsRepo = slideCheckingsRepo;
 		}
 
 		public async Task AddVisit(string courseId, Guid slideId, string userId, string ipAddress)
@@ -230,9 +232,9 @@ namespace Database.Repos
 			return new HashSet<string>(db.Visits.Where(v => v.UserId == userId).Select(v => v.CourseId).Distinct());
 		}
 
-		public List<string> GetCourseUsers(string courseId)
+		public Task<List<string>> GetCourseUsersAsync(string courseId)
 		{
-			return db.Visits.Where(v => v.CourseId == courseId).Select(v => v.UserId).Distinct().ToList();
+			return db.Visits.Where(v => v.CourseId == courseId).Select(v => v.UserId).Distinct().ToListAsync();
 		}
 		
 		public List<RatingEntry> GetCourseRating(string courseId, int minScore)

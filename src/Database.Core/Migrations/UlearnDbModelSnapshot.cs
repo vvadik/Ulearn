@@ -4,9 +4,7 @@ using Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.EntityFrameworkCore.ValueGeneration;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Database.Migrations
 {
@@ -17,13 +15,15 @@ namespace Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.0-preview2-30571")
+                .HasAnnotation("ProductVersion", "2.2.0-rtm-35687")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Database.Models.AdditionalScore", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CourseId")
                         .IsRequired()
@@ -83,7 +83,7 @@ namespace Database.Migrations
 
                     b.Property<string>("FirstName");
 
-                    b.Property<short>("Gender");
+                    b.Property<short?>("Gender");
 
                     b.Property<bool>("IsDeleted");
 
@@ -149,7 +149,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.AutomaticExerciseChecking", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CheckingAgentName")
                         .HasMaxLength(256);
@@ -210,8 +211,7 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Database.Models.AutomaticQuizChecking", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                    b.Property<int>("Id");
 
                     b.Property<string>("CourseId")
                         .IsRequired()
@@ -303,10 +303,11 @@ namespace Database.Migrations
                     b.ToTable("CertificateTemplates");
                 });
 
-            modelBuilder.Entity("Database.Models.Comment", b =>
+            modelBuilder.Entity("Database.Models.Comments.Comment", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("AuthorId")
                         .IsRequired()
@@ -321,6 +322,8 @@ namespace Database.Migrations
                     b.Property<bool>("IsCorrectAnswer");
 
                     b.Property<bool>("IsDeleted");
+
+                    b.Property<bool>("IsForInstructorsOnly");
 
                     b.Property<bool>("IsPinnedToTop");
 
@@ -342,10 +345,11 @@ namespace Database.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("Database.Models.CommentLike", b =>
+            modelBuilder.Entity("Database.Models.Comments.CommentLike", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("CommentId");
 
@@ -365,7 +369,7 @@ namespace Database.Migrations
                     b.ToTable("CommentLikes");
                 });
 
-            modelBuilder.Entity("Database.Models.CommentsPolicy", b =>
+            modelBuilder.Entity("Database.Models.Comments.CommentsPolicy", b =>
                 {
                     b.Property<string>("CourseId")
                         .ValueGeneratedOnAdd()
@@ -385,7 +389,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.CourseAccess", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<short>("AccessType");
 
@@ -420,6 +425,49 @@ namespace Database.Migrations
                     b.ToTable("CourseAccesses");
                 });
 
+            modelBuilder.Entity("Database.Models.CourseFile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CourseId")
+                        .IsRequired()
+                        .HasMaxLength(64);
+
+                    b.Property<Guid>("CourseVersionId");
+
+                    b.Property<byte[]>("File")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseVersionId");
+
+                    b.ToTable("CourseFiles");
+                });
+
+            modelBuilder.Entity("Database.Models.CourseRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CourseId")
+                        .IsRequired();
+
+                    b.Property<int>("Role");
+
+                    b.Property<string>("UserId")
+                        .HasMaxLength(64);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserRoles");
+                });
+
             modelBuilder.Entity("Database.Models.CourseVersion", b =>
                 {
                     b.Property<Guid>("Id")
@@ -451,7 +499,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.EnabledAdditionalScoringGroup", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("GroupId");
 
@@ -468,7 +517,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.ExerciseCodeReview", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime>("AddingTime");
 
@@ -509,7 +559,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.ExerciseCodeReviewComment", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime>("AddingTime");
 
@@ -538,7 +589,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.ExerciseSolutionByGrader", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<Guid>("ClientId");
 
@@ -559,7 +611,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.FeedViewTimestamp", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime>("Timestamp");
 
@@ -608,7 +661,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.Group", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<bool>("CanUsersSeeGroupProgress");
 
@@ -654,7 +708,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.GroupAccess", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<short>("AccessType");
 
@@ -690,7 +745,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.GroupLabel", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ColorHex")
                         .HasMaxLength(6);
@@ -716,7 +772,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.GroupMember", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime?>("AddingTime");
 
@@ -738,7 +795,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.LabelOnGroup", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("GroupId");
 
@@ -759,7 +817,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.Like", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("SubmissionId");
 
@@ -781,7 +840,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.LtiConsumer", b =>
                 {
                     b.Property<int>("ConsumerId")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Key")
                         .IsRequired()
@@ -805,7 +865,12 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.LtiSlideRequest", b =>
                 {
                     b.Property<int>("RequestId")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CourseId")
+                        .IsRequired()
+                        .HasMaxLength(100);
 
                     b.Property<string>("Request")
                         .IsRequired();
@@ -818,7 +883,7 @@ namespace Database.Migrations
 
                     b.HasKey("RequestId");
 
-                    b.HasIndex("SlideId", "UserId");
+                    b.HasIndex("CourseId", "SlideId", "UserId");
 
                     b.ToTable("LtiSlideRequests");
                 });
@@ -826,7 +891,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.ManualExerciseChecking", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CourseId")
                         .IsRequired()
@@ -874,8 +940,7 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Database.Models.ManualQuizChecking", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                    b.Property<int>("Id");
 
                     b.Property<string>("CourseId")
                         .IsRequired()
@@ -918,7 +983,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.Notification", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<bool>("AreDeliveriesCreated");
 
@@ -953,7 +1019,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.NotificationDelivery", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime>("CreateTime");
 
@@ -983,7 +1050,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.NotificationTransport", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Discriminator")
                         .IsRequired();
@@ -1009,7 +1077,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.NotificationTransportSettings", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CourseId")
                         .HasMaxLength(100);
@@ -1033,29 +1102,67 @@ namespace Database.Migrations
                     b.ToTable("NotificationTransportSettings");
                 });
 
-            modelBuilder.Entity("Database.Models.QuizVersion", b =>
+            modelBuilder.Entity("Database.Models.Quizzes.UserQuizAnswer", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("CourseId")
-                        .IsRequired()
+                    b.Property<string>("BlockId")
                         .HasMaxLength(64);
 
-                    b.Property<DateTime>("LoadingTime");
+                    b.Property<bool>("IsRightAnswer");
 
-                    b.Property<string>("NormalizedXml")
-                        .IsRequired();
+                    b.Property<string>("ItemId")
+                        .HasMaxLength(64);
 
-                    b.Property<Guid>("SlideId");
+                    b.Property<int>("QuizBlockMaxScore");
+
+                    b.Property<int>("QuizBlockScore");
+
+                    b.Property<int>("SubmissionId");
+
+                    b.Property<string>("Text")
+                        .HasMaxLength(8192);
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SlideId");
+                    b.HasIndex("ItemId");
 
-                    b.HasIndex("SlideId", "LoadingTime");
+                    b.HasIndex("SubmissionId", "BlockId");
 
-                    b.ToTable("QuizVersions");
+                    b.ToTable("UserQuizAnswers");
+                });
+
+            modelBuilder.Entity("Database.Models.Quizzes.UserQuizSubmission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CourseId")
+                        .IsRequired()
+                        .HasMaxLength(40);
+
+                    b.Property<Guid>("SlideId");
+
+                    b.Property<DateTime>("Timestamp");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(40);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("CourseId", "SlideId");
+
+                    b.HasIndex("CourseId", "SlideId", "Timestamp");
+
+                    b.HasIndex("CourseId", "SlideId", "UserId");
+
+                    b.ToTable("UserQuizSubmissions");
                 });
 
             modelBuilder.Entity("Database.Models.RestoreRequest", b =>
@@ -1079,7 +1186,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.SlideHint", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CourseId")
                         .IsRequired()
@@ -1099,7 +1207,7 @@ namespace Database.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.HasIndex("SlideId", "HintId", "UserId", "IsHintHelped");
+                    b.HasIndex("CourseId", "SlideId", "HintId", "UserId", "IsHintHelped");
 
                     b.ToTable("SlideHints");
                 });
@@ -1107,7 +1215,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.SlideRate", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CourseId")
                         .IsRequired()
@@ -1133,7 +1242,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.StepikAccessToken", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("AccessToken")
                         .IsRequired()
@@ -1157,7 +1267,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.StepikExportProcess", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime?>("FinishTime");
 
@@ -1194,7 +1305,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.StepikExportSlideAndStepMap", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<Guid>("SlideId");
 
@@ -1223,7 +1335,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.SystemAccess", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<short>("AccessType");
 
@@ -1270,7 +1383,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.UnitAppearance", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CourseId")
                         .IsRequired()
@@ -1293,11 +1407,10 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.UserExerciseSubmission", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int?>("AntiPlagiarismSubmissionId");
-
-                    b.Property<string>("ApplicationUserId");
 
                     b.Property<int?>("AutomaticCheckingId");
 
@@ -1320,13 +1433,12 @@ namespace Database.Migrations
                     b.Property<DateTime>("Timestamp");
 
                     b.Property<string>("UserId")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(64);
 
                     b.HasKey("Id");
 
                     b.HasIndex("AntiPlagiarismSubmissionId");
-
-                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("AutomaticCheckingId");
 
@@ -1354,7 +1466,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.UserQuestion", b =>
                 {
                     b.Property<int>("QuestionId")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CourseId")
                         .HasMaxLength(64);
@@ -1387,81 +1500,11 @@ namespace Database.Migrations
                     b.ToTable("UserQuestions");
                 });
 
-            modelBuilder.Entity("Database.Models.UserQuiz", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("CourseId")
-                        .IsRequired()
-                        .HasMaxLength(64);
-
-                    b.Property<bool>("IsRightAnswer");
-
-                    b.Property<string>("ItemId")
-                        .HasMaxLength(64);
-
-                    b.Property<int>("QuizBlockMaxScore");
-
-                    b.Property<int>("QuizBlockScore");
-
-                    b.Property<string>("QuizId")
-                        .HasMaxLength(64);
-
-                    b.Property<int?>("QuizVersionId");
-
-                    b.Property<Guid>("SlideId");
-
-                    b.Property<string>("Text")
-                        .HasMaxLength(1024);
-
-                    b.Property<DateTime>("Timestamp");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(64);
-
-                    b.Property<bool>("isDropped");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ItemId");
-
-                    b.HasIndex("QuizVersionId");
-
-                    b.HasIndex("SlideId", "Timestamp");
-
-                    b.HasIndex("CourseId", "SlideId", "QuizId");
-
-                    b.HasIndex("UserId", "SlideId", "isDropped", "QuizId", "ItemId");
-
-                    b.ToTable("UserQuizs");
-                });
-
-            modelBuilder.Entity("Database.Models.UserRole", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("CourseId")
-                        .IsRequired();
-
-                    b.Property<int>("Role");
-
-                    b.Property<string>("UserId")
-                        .HasMaxLength(64);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserRoles");
-                });
-
             modelBuilder.Entity("Database.Models.Visit", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("AttemptsCount");
 
@@ -1503,7 +1546,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.XQueueExerciseSubmission", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<bool>("IsResultSent");
 
@@ -1526,7 +1570,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.XQueueWatcher", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("BaseUrl")
                         .IsRequired();
@@ -1583,7 +1628,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ClaimType");
 
@@ -1602,7 +1648,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ClaimType");
 
@@ -1674,8 +1721,6 @@ namespace Database.Migrations
 
                     b.HasIndex("AddedUserId");
 
-                    b.ToTable("AddedInstructorNotification");
-
                     b.HasDiscriminator().HasValue("AddedInstructorNotification");
                 });
 
@@ -1687,8 +1732,6 @@ namespace Database.Migrations
 
                     b.HasIndex("ProcessId");
 
-                    b.ToTable("CourseExportedToStepikNotification");
-
                     b.HasDiscriminator().HasValue("CourseExportedToStepikNotification");
                 });
 
@@ -1696,11 +1739,10 @@ namespace Database.Migrations
                 {
                     b.HasBaseType("Database.Models.Notification");
 
-                    b.Property<int>("GroupId");
+                    b.Property<int>("GroupId")
+                        .HasColumnName("GroupId");
 
                     b.HasIndex("GroupId");
-
-                    b.ToTable("CreatedGroupNotification");
 
                     b.HasDiscriminator().HasValue("CreatedGroupNotification");
                 });
@@ -1712,8 +1754,6 @@ namespace Database.Migrations
                     b.Property<int>("AccessId");
 
                     b.HasIndex("AccessId");
-
-                    b.ToTable("GrantedAccessToGroupNotification");
 
                     b.HasDiscriminator().HasValue("GrantedAccessToGroupNotification");
                 });
@@ -1731,9 +1771,56 @@ namespace Database.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("GroupMemberHasBeenRemovedNotification");
-
                     b.HasDiscriminator().HasValue("GroupMemberHasBeenRemovedNotification");
+                });
+
+            modelBuilder.Entity("Database.Models.GroupMembersHaveBeenAddedNotification", b =>
+                {
+                    b.HasBaseType("Database.Models.Notification");
+
+                    b.Property<int>("GroupId")
+                        .HasColumnName("GroupId");
+
+                    b.Property<string>("UserDescriptions")
+                        .HasColumnName("UserDescriptions");
+
+                    b.Property<string>("UserIds")
+                        .HasColumnName("UserIds");
+
+                    b.HasIndex("GroupId")
+                        .HasName("IX_Notifications_GroupId1");
+
+                    b.HasDiscriminator().HasValue("GroupMembersHaveBeenAddedNotification");
+                });
+
+            modelBuilder.Entity("Database.Models.GroupMembersHaveBeenRemovedNotification", b =>
+                {
+                    b.HasBaseType("Database.Models.Notification");
+
+                    b.Property<int>("GroupId")
+                        .HasColumnName("GroupId");
+
+                    b.Property<string>("UserDescriptions")
+                        .HasColumnName("UserDescriptions");
+
+                    b.Property<string>("UserIds")
+                        .HasColumnName("UserIds");
+
+                    b.HasIndex("GroupId")
+                        .HasName("IX_Notifications_GroupId2");
+
+                    b.HasDiscriminator().HasValue("GroupMembersHaveBeenRemovedNotification");
+                });
+
+            modelBuilder.Entity("Database.Models.InstructorMessageNotification", b =>
+                {
+                    b.HasBaseType("Database.Models.Notification");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnName("Text");
+
+                    b.HasDiscriminator().HasValue("InstructorMessageNotification");
                 });
 
             modelBuilder.Entity("Database.Models.JoinedToYourGroupNotification", b =>
@@ -1750,8 +1837,6 @@ namespace Database.Migrations
                     b.HasIndex("GroupId");
 
                     b.HasIndex("JoinedUserId");
-
-                    b.ToTable("JoinedToYourGroupNotification");
 
                     b.HasDiscriminator().HasValue("JoinedToYourGroupNotification");
                 });
@@ -1771,8 +1856,6 @@ namespace Database.Migrations
 
                     b.HasIndex("LikedUserId");
 
-                    b.ToTable("LikedYourCommentNotification");
-
                     b.HasDiscriminator().HasValue("LikedYourCommentNotification");
                 });
 
@@ -1786,8 +1869,6 @@ namespace Database.Migrations
                     b.HasIndex("CommentId")
                         .HasName("IX_Notifications_CommentId11");
 
-                    b.ToTable("NewCommentForInstructorsOnlyNotification");
-
                     b.HasDiscriminator().HasValue("NewCommentForInstructorsOnlyNotification");
                 });
 
@@ -1799,8 +1880,6 @@ namespace Database.Migrations
                         .HasColumnName("CommentId1");
 
                     b.HasIndex("CommentId");
-
-                    b.ToTable("NewCommentNotification");
 
                     b.HasDiscriminator().HasValue("NewCommentNotification");
                 });
@@ -1815,8 +1894,6 @@ namespace Database.Migrations
 
                     b.HasIndex("CheckingId");
 
-                    b.ToTable("PassedManualExerciseCheckingNotification");
-
                     b.HasDiscriminator().HasValue("PassedManualExerciseCheckingNotification");
                 });
 
@@ -1829,8 +1906,6 @@ namespace Database.Migrations
 
                     b.HasIndex("CheckingId");
 
-                    b.ToTable("PassedManualQuizCheckingNotification");
-
                     b.HasDiscriminator().HasValue("PassedManualQuizCheckingNotification");
                 });
 
@@ -1841,8 +1916,6 @@ namespace Database.Migrations
                     b.Property<Guid>("CourseVersionId");
 
                     b.HasIndex("CourseVersionId");
-
-                    b.ToTable("PublishedPackageNotification");
 
                     b.HasDiscriminator().HasValue("PublishedPackageNotification");
                 });
@@ -1855,9 +1928,18 @@ namespace Database.Migrations
 
                     b.HasIndex("ScoreId");
 
-                    b.ToTable("ReceivedAdditionalScoreNotification");
-
                     b.HasDiscriminator().HasValue("ReceivedAdditionalScoreNotification");
+                });
+
+            modelBuilder.Entity("Database.Models.ReceivedCertificateNotification", b =>
+                {
+                    b.HasBaseType("Database.Models.Notification");
+
+                    b.Property<Guid>("CertificateId");
+
+                    b.HasIndex("CertificateId");
+
+                    b.HasDiscriminator().HasValue("ReceivedCertificateNotification");
                 });
 
             modelBuilder.Entity("Database.Models.ReceivedCommentToCodeReviewNotification", b =>
@@ -1868,8 +1950,6 @@ namespace Database.Migrations
                         .HasColumnName("CommentId");
 
                     b.HasIndex("CommentId");
-
-                    b.ToTable("ReceivedCommentToCodeReviewNotification");
 
                     b.HasDiscriminator().HasValue("ReceivedCommentToCodeReviewNotification");
                 });
@@ -1887,8 +1967,6 @@ namespace Database.Migrations
 
                     b.HasIndex("ParentCommentId");
 
-                    b.ToTable("RepliedToYourCommentNotification");
-
                     b.HasDiscriminator().HasValue("RepliedToYourCommentNotification");
                 });
 
@@ -1901,9 +1979,18 @@ namespace Database.Migrations
 
                     b.HasIndex("AccessId");
 
-                    b.ToTable("RevokedAccessToGroupNotification");
-
                     b.HasDiscriminator().HasValue("RevokedAccessToGroupNotification");
+                });
+
+            modelBuilder.Entity("Database.Models.SystemMessageNotification", b =>
+                {
+                    b.HasBaseType("Database.Models.Notification");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnName("Text");
+
+                    b.HasDiscriminator().HasValue("SystemMessageNotification");
                 });
 
             modelBuilder.Entity("Database.Models.UploadedPackageNotification", b =>
@@ -1915,17 +2002,12 @@ namespace Database.Migrations
 
                     b.HasIndex("CourseVersionId");
 
-                    b.ToTable("UploadedPackageNotification");
-
                     b.HasDiscriminator().HasValue("UploadedPackageNotification");
                 });
 
             modelBuilder.Entity("Database.Models.FeedNotificationTransport", b =>
                 {
                     b.HasBaseType("Database.Models.NotificationTransport");
-
-
-                    b.ToTable("FeedNotificationTransport");
 
                     b.HasDiscriminator().HasValue("FeedNotificationTransport");
                 });
@@ -1934,18 +2016,12 @@ namespace Database.Migrations
                 {
                     b.HasBaseType("Database.Models.NotificationTransport");
 
-
-                    b.ToTable("MailNotificationTransport");
-
                     b.HasDiscriminator().HasValue("MailNotificationTransport");
                 });
 
             modelBuilder.Entity("Database.Models.TelegramNotificationTransport", b =>
                 {
                     b.HasBaseType("Database.Models.NotificationTransport");
-
-
-                    b.ToTable("TelegramNotificationTransport");
 
                     b.HasDiscriminator().HasValue("TelegramNotificationTransport");
                 });
@@ -1981,6 +2057,11 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Database.Models.AutomaticQuizChecking", b =>
                 {
+                    b.HasOne("Database.Models.Quizzes.UserQuizSubmission", "Submission")
+                        .WithOne("AutomaticChecking")
+                        .HasForeignKey("Database.Models.AutomaticQuizChecking", "Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -2005,7 +2086,7 @@ namespace Database.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
-            modelBuilder.Entity("Database.Models.Comment", b =>
+            modelBuilder.Entity("Database.Models.Comments.Comment", b =>
                 {
                     b.HasOne("Database.Models.ApplicationUser", "Author")
                         .WithMany()
@@ -2013,9 +2094,9 @@ namespace Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Database.Models.CommentLike", b =>
+            modelBuilder.Entity("Database.Models.Comments.CommentLike", b =>
                 {
-                    b.HasOne("Database.Models.Comment", "Comment")
+                    b.HasOne("Database.Models.Comments.Comment", "Comment")
                         .WithMany("Likes")
                         .HasForeignKey("CommentId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -2035,6 +2116,22 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("Database.Models.CourseFile", b =>
+                {
+                    b.HasOne("Database.Models.CourseVersion", "CourseVersion")
+                        .WithMany()
+                        .HasForeignKey("CourseVersionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Database.Models.CourseRole", b =>
+                {
+                    b.HasOne("Database.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Database.Models.CourseVersion", b =>
@@ -2202,6 +2299,11 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Database.Models.ManualQuizChecking", b =>
                 {
+                    b.HasOne("Database.Models.Quizzes.UserQuizSubmission", "Submission")
+                        .WithOne("ManualChecking")
+                        .HasForeignKey("Database.Models.ManualQuizChecking", "Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Database.Models.ApplicationUser", "LockedBy")
                         .WithMany()
                         .HasForeignKey("LockedById");
@@ -2225,7 +2327,7 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.Notification", "Notification")
                         .WithMany("Deliveries")
                         .HasForeignKey("NotificationId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Database.Models.NotificationTransport", "NotificationTransport")
                         .WithMany()
@@ -2246,6 +2348,22 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.NotificationTransport", "NotificationTransport")
                         .WithMany()
                         .HasForeignKey("NotificationTransportId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Database.Models.Quizzes.UserQuizAnswer", b =>
+                {
+                    b.HasOne("Database.Models.Quizzes.UserQuizSubmission", "Submission")
+                        .WithMany()
+                        .HasForeignKey("SubmissionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Database.Models.Quizzes.UserQuizSubmission", b =>
+                {
+                    b.HasOne("Database.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
@@ -2304,10 +2422,6 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Database.Models.UserExerciseSubmission", b =>
                 {
-                    b.HasOne("Database.Models.ApplicationUser")
-                        .WithMany("Solutions")
-                        .HasForeignKey("ApplicationUserId");
-
                     b.HasOne("Database.Models.AutomaticExerciseChecking", "AutomaticChecking")
                         .WithMany()
                         .HasForeignKey("AutomaticCheckingId");
@@ -2324,26 +2438,6 @@ namespace Database.Migrations
                 });
 
             modelBuilder.Entity("Database.Models.UserQuestion", b =>
-                {
-                    b.HasOne("Database.Models.ApplicationUser", "User")
-                        .WithMany("Questions")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("Database.Models.UserQuiz", b =>
-                {
-                    b.HasOne("Database.Models.QuizVersion", "QuizVersion")
-                        .WithMany()
-                        .HasForeignKey("QuizVersionId");
-
-                    b.HasOne("Database.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("Database.Models.UserRole", b =>
                 {
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
@@ -2470,6 +2564,24 @@ namespace Database.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
+            modelBuilder.Entity("Database.Models.GroupMembersHaveBeenAddedNotification", b =>
+                {
+                    b.HasOne("Database.Models.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .HasConstraintName("FK_Notifications_Groups_GroupId1")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Database.Models.GroupMembersHaveBeenRemovedNotification", b =>
+                {
+                    b.HasOne("Database.Models.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .HasConstraintName("FK_Notifications_Groups_GroupId2")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("Database.Models.JoinedToYourGroupNotification", b =>
                 {
                     b.HasOne("Database.Models.Group", "Group")
@@ -2485,7 +2597,7 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Database.Models.LikedYourCommentNotification", b =>
                 {
-                    b.HasOne("Database.Models.Comment", "Comment")
+                    b.HasOne("Database.Models.Comments.Comment", "Comment")
                         .WithMany()
                         .HasForeignKey("CommentId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -2498,7 +2610,7 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Database.Models.NewCommentForInstructorsOnlyNotification", b =>
                 {
-                    b.HasOne("Database.Models.Comment", "Comment")
+                    b.HasOne("Database.Models.Comments.Comment", "Comment")
                         .WithMany()
                         .HasForeignKey("CommentId")
                         .HasConstraintName("FK_Notifications_Comments_CommentId11")
@@ -2507,7 +2619,7 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Database.Models.NewCommentNotification", b =>
                 {
-                    b.HasOne("Database.Models.Comment", "Comment")
+                    b.HasOne("Database.Models.Comments.Comment", "Comment")
                         .WithMany()
                         .HasForeignKey("CommentId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -2545,6 +2657,14 @@ namespace Database.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
+            modelBuilder.Entity("Database.Models.ReceivedCertificateNotification", b =>
+                {
+                    b.HasOne("Database.Models.Certificate", "Certificate")
+                        .WithMany()
+                        .HasForeignKey("CertificateId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("Database.Models.ReceivedCommentToCodeReviewNotification", b =>
                 {
                     b.HasOne("Database.Models.ExerciseCodeReviewComment", "Comment")
@@ -2554,12 +2674,12 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Database.Models.RepliedToYourCommentNotification", b =>
                 {
-                    b.HasOne("Database.Models.Comment", "Comment")
+                    b.HasOne("Database.Models.Comments.Comment", "Comment")
                         .WithMany()
                         .HasForeignKey("CommentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Database.Models.Comment", "ParentComment")
+                    b.HasOne("Database.Models.Comments.Comment", "ParentComment")
                         .WithMany()
                         .HasForeignKey("ParentCommentId")
                         .OnDelete(DeleteBehavior.Restrict);

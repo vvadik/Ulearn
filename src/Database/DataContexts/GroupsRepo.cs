@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Database.Extensions;
@@ -10,12 +9,14 @@ using Database.Models;
 using JetBrains.Annotations;
 using log4net;
 using Microsoft.AspNet.Identity;
-using NUnit.Framework.Constraints;
-using uLearn;
-using uLearn.Extensions;
-using uLearn.Quizes;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Quizzes;
+using Ulearn.Core.Extensions;
 
 namespace Database.DataContexts
 {
@@ -66,16 +67,15 @@ namespace Database.DataContexts
 			return group;
 		}
 
-		/* Copy group from one course to another. Replaces owner only if newOwnerId is not empty */
-
+		/* Copy group from one course to another. Replace owner only if newOwnerId is not empty */
 		public async Task<Group> CopyGroup(Group group, string courseId, string newOwnerId = "")
 		{
 			var newGroup = await CopyGroupWithoutMembers(group, courseId, newOwnerId);
 			await CopyGroupMembers(group, newGroup);
 			await CopyGroupAccesses(group, newGroup);
 
-			/* We can also copy group's scoring-group settings if their are in one course */
-			if (courseId == group.CourseId)
+			/* We can also copy group's scoring-group settings if they are in one course */
+			if (group.CourseId.EqualsIgnoreCase(courseId))
 			{
 				await CopyEnabledAdditionalScoringGroups(group, newGroup);
 			}
@@ -96,7 +96,10 @@ namespace Database.DataContexts
 				CanUsersSeeGroupProgress = group.CanUsersSeeGroupProgress,
 				IsManualCheckingEnabled = group.IsManualCheckingEnabled,
 				IsInviteLinkEnabled = group.IsInviteLinkEnabled,
+				DefaultProhibitFutherReview = group.DefaultProhibitFutherReview,
+				IsManualCheckingEnabledForOldSolutions = group.IsManualCheckingEnabledForOldSolutions,
 				InviteHash = Guid.NewGuid(),
+				CreateTime = DateTime.Now,
 			};
 			db.Groups.Add(newGroup);
 			await db.SaveChangesAsync();
@@ -109,9 +112,14 @@ namespace Database.DataContexts
 			{
 				UserId = m.UserId,
 				GroupId = newGroup.Id,
-			});
+				AddingTime = DateTime.Now,
+			}).ToList();
 			db.GroupMembers.AddRange(members);
-			await db.SaveChangesAsync();
+
+			if (newGroup.IsManualCheckingEnabledForOldSolutions)
+				await AddManualCheckingsForOldSolutions(newGroup.CourseId, members.Select(m => m.UserId).ToList()).ConfigureAwait(false);
+
+			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
 		private async Task CopyGroupAccesses(Group group, Group newGroup)
@@ -149,7 +157,7 @@ namespace Database.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		public async Task<Group> ModifyGroup(int groupId, string newName, bool newIsManualCheckingEnabled, bool newIsManualCheckingEnabledForOldSolutions, bool defaultProhibitFutherReview)
+		public async Task<Group> ModifyGroup(int groupId, string newName, bool newIsManualCheckingEnabled, bool newIsManualCheckingEnabledForOldSolutions, bool defaultProhibitFutherReview, bool canUsersSeeGroupProgress)
 		{
 			var group = FindGroupById(groupId);
 			group.Name = newName;
@@ -160,6 +168,7 @@ namespace Database.DataContexts
 
 			group.IsManualCheckingEnabledForOldSolutions = newIsManualCheckingEnabledForOldSolutions;
 			group.DefaultProhibitFutherReview = defaultProhibitFutherReview;
+			group.CanUsersSeeGroupProgress = canUsersSeeGroupProgress; 
 			await db.SaveChangesAsync();
 
 			return group;
@@ -250,16 +259,16 @@ namespace Database.DataContexts
 
 					var slideId = lastSubmission.SlideId;
 					var slide = course.FindSlideById(slideId) as ExerciseSlide;
-					if (slide == null || !slide.Exercise.RequireReview)
+					if (slide == null || !slide.Scoring.RequireReview)
 						continue;
 
 					log.Info($"Создаю ручную проверку для решения {lastSubmission.Id}, слайд {slideId}");
-					await slideCheckingsRepo.AddManualExerciseChecking(courseId, slideId, userId, lastSubmission);
-					await visitsRepo.MarkVisitsAsWithManualChecking(slideId, userId);
+					await slideCheckingsRepo.AddManualExerciseChecking(courseId, slideId, userId, lastSubmission).ConfigureAwait(false);
+					await visitsRepo.MarkVisitsAsWithManualChecking(courseId, slideId, userId).ConfigureAwait(false);
 				}
 
 			/* For quizzes */
-			var passedQuizzesIds = userQuizzesRepo.GetIdOfQuizPassedSlides(courseId, userId);
+			var passedQuizzesIds = userQuizzesRepo.GetPassedSlideIds(courseId, userId);
 			foreach (var quizSlideId in passedQuizzesIds)
 			{
 				var slide = course.FindSlideById(quizSlideId) as QuizSlide;
@@ -268,8 +277,12 @@ namespace Database.DataContexts
 				if (!userQuizzesRepo.IsWaitingForManualCheck(courseId, quizSlideId, userId))
 				{
 					log.Info($"Создаю ручную проверку для теста {slide.Id}");
-					await slideCheckingsRepo.AddQuizAttemptForManualChecking(courseId, quizSlideId, userId);
-					await visitsRepo.MarkVisitsAsWithManualChecking(quizSlideId, userId);
+					var submission = userQuizzesRepo.FindLastUserSubmission(courseId, quizSlideId, userId);
+					if (submission == null)
+						continue;
+					
+					await slideCheckingsRepo.AddManualQuizChecking(submission, courseId, quizSlideId, userId).ConfigureAwait(false);
+					await visitsRepo.MarkVisitsAsWithManualChecking(courseId, quizSlideId, userId).ConfigureAwait(false);
 				}
 			}
 		}

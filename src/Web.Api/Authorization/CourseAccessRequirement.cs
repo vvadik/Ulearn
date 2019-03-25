@@ -1,7 +1,8 @@
 ﻿using System.Threading.Tasks;
-using Database.Extensions;
 using Database.Models;
 using Database.Repos;
+using Database.Repos.CourseRoles;
+using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Serilog;
@@ -19,18 +20,17 @@ namespace Ulearn.Web.Api.Authorization
 		}
 	}
 	
-	/* TODO (andgein): extract common logic to BaseCourseHandler */
-	public class CourseAccessAuthorizationHandler : AuthorizationHandler<CourseAccessRequirement>
+	public class CourseAccessAuthorizationHandler : BaseCourseAuthorizationHandler<CourseAccessRequirement>
 	{
-		private readonly ILogger logger;
-		private readonly CoursesRepo coursesRepo;
-		private readonly UserRolesRepo userRolesRepo;
+		private readonly ICoursesRepo coursesRepo;
+		private readonly ICourseRolesRepo courseRolesRepo;
+		private readonly IUsersRepo usersRepo;
 
-		public CourseAccessAuthorizationHandler(CoursesRepo coursesRepo, UserRolesRepo userRolesRepo, ILogger logger)
+		public CourseAccessAuthorizationHandler(ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo, IUsersRepo usersRepo, ILogger logger) : base(logger)
 		{
 			this.coursesRepo = coursesRepo;
-			this.userRolesRepo = userRolesRepo;
-			this.logger = logger;
+			this.courseRolesRepo = courseRolesRepo;
+			this.usersRepo = usersRepo;
 		}
 
 		protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, CourseAccessRequirement requirement)
@@ -43,24 +43,35 @@ namespace Ulearn.Web.Api.Authorization
 				return;
 			}
 			
-			var routeData = mvcContext.RouteData;
-			if (!(routeData.Values["courseId"] is string courseId))
+			var courseId = GetCourseIdFromRequestAsync(mvcContext);
+			if (string.IsNullOrEmpty(courseId))
 			{
-				logger.Error("Can't find `courseId` parameter in route data for checking course access requirement.");
 				context.Fail();
 				return;
 			}
 
-			if (context.User.IsSystemAdministrator())
+			if (!context.User.Identity.IsAuthenticated)
+			{
+				context.Fail();
+				return;
+			}
+
+			var userId = context.User.GetUserId();
+			var user = await usersRepo.FindUserByIdAsync(userId).ConfigureAwait(false);
+			if (user == null)
+			{
+				context.Fail();
+				return;
+			}
+			
+			if (usersRepo.IsSystemAdministrator(user))
 			{
 				context.Succeed(requirement);
 				return;
 			}
 
-			var userId = context.User.GetUserId();
-
-			var isCourseAdmin = await userRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRole.CourseAdmin);
-			if (isCourseAdmin || await coursesRepo.HasCourseAccessAsync(userId, courseId, requirement.CourseAccessType))
+			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
+			if (isCourseAdmin || await coursesRepo.HasCourseAccessAsync(userId, courseId, requirement.CourseAccessType).ConfigureAwait(false))
 				context.Succeed(requirement);
 			else
 				context.Fail();

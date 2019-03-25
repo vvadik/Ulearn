@@ -1,4 +1,6 @@
-﻿$(document).ready(function () {
+﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
+
+window.documentReadyFunctions.push(function () {
 	var $courseStatistics = $('.course-statistics');
 
 	/* Sticky header functions */
@@ -35,7 +37,7 @@
 		/* Add <table></table> tags around copied thead */
 		var $tableForHeader = $('<table></table>')
 			.addClass($table.attr('class'))
-			.addClass('sticky-header')
+			.addClass('sticky-header')			
 			.css({
 				'position': 'fixed',
 				'left': $table.position().left,
@@ -83,7 +85,7 @@
 		return $tableAround;
 	};
 
-	var documentHeaderHeight = $('#header').outerHeight();
+	var documentHeaderHeight = $('.header').outerHeight();
 	var $stickyHeader;
 	var $stickyColumn;
 
@@ -112,7 +114,8 @@
 
 		$stickyColumn = createTableFirstColumnCopy($table);
 		$stickyColumn.hide();
-		$('body').append($stickyColumn);
+		var $legacyContainer = $('<div></div>').addClass('legacy-page').append($stickyColumn);
+		$('body').append($legacyContainer);
 
 		relocateStickyHeaderAndColumn($table, $stickyHeader, $stickyColumn, minTopOffset);
 	};
@@ -123,7 +126,8 @@
 
 		$stickyHeader = createTableHeaderCopy($table, minTopOffset);
 		$stickyHeader.hide();
-		$('body').append($stickyHeader);
+		var $legacyContainer = $('<div></div>').addClass('legacy-page').append($stickyHeader);
+		$('body').append($legacyContainer);
 
 		rerenderStickyColumn($table, minTopOffset);
 	};

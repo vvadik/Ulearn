@@ -14,6 +14,8 @@ using Microsoft.AspNet.Identity;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses.Slides;
 
 namespace uLearn.Web.Controllers
 {
@@ -139,6 +141,7 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		[ValidateInput(false)]
 		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> AddComment(string courseId, Guid slideId, bool forInstructorsOnly, string commentText, string parentCommentId)
 		{
 			var parentCommentIdInt = -1;
@@ -225,6 +228,7 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize]
 		[HttpPost]
 		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> LikeComment(int commentId)
 		{
 			var userId = User.Identity.GetUserId();
@@ -252,6 +256,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> ApproveComment(int commentId, bool isApproved = true)
 		{
 			var comment = commentsRepo.FindCommentById(commentId);
@@ -269,6 +274,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> PinComment(int commentId, bool isPinned)
 		{
 			var comment = commentsRepo.FindCommentById(commentId);
@@ -292,6 +298,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> DeleteComment(int commentId)
 		{
 			var comment = commentsRepo.FindCommentById(commentId);
@@ -304,6 +311,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> RestoreComment(int commentId)
 		{
 			var comment = commentsRepo.FindCommentById(commentId);
@@ -317,6 +325,7 @@ namespace uLearn.Web.Controllers
 		[ValidateInput(false)]
 		[HttpPost]
 		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> EditCommentText(int commentId, string newText)
 		{
 			var comment = commentsRepo.FindCommentById(commentId);
@@ -329,6 +338,7 @@ namespace uLearn.Web.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> MarkAsCorrectAnswer(int commentId, bool isCorrect = true)
 		{
 			var comment = commentsRepo.FindCommentById(commentId);

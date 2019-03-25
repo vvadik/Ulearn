@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using uLearn.Properties;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Properties;
 
-namespace uLearn.CSharp.Validators.VerbInMethodNameValidation
+namespace Ulearn.Core.CSharp.Validators.VerbInMethodNameValidation
 {
     public class VerbInMethodNameValidator : BaseStyleValidator
     {

@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using RunCsJob.Api;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Slides;
 
 namespace uLearn.CourseTool.Validating
 {
@@ -51,14 +52,9 @@ namespace uLearn.CourseTool.Validating
 			InfoMessage?.Invoke(message);
 		}
 
-		protected static bool VerdictIsNotOk(RunningResults result)
+		protected static bool IsCompiledAndExecuted(RunningResults result)
 		{
-			return !result.Verdict.IsOneOf(Verdict.Ok, Verdict.MemoryLimit, Verdict.TimeLimit);
-		}
-
-		protected static bool IsSolution(RunningResults result)
-		{
-			return result.Verdict == Verdict.Ok && result.Output == "";
+			return result.Verdict.IsOneOf(Verdict.Ok, Verdict.OutputLimit, Verdict.MemoryLimit, Verdict.TimeLimit);
 		}
 	}
 }

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace uLearn.CSharp.Validators.IndentsValidation.Reporters
+namespace Ulearn.Core.CSharp.Validators.IndentsValidation.Reporters
 {
 	internal static class BracesContentNotIndentedOrNotConsistentReporter
 	{

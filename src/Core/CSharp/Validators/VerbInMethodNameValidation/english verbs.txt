@@ -8452,6 +8452,7 @@ divvying
 dizen
 dizzies
 dizzy
+do
 doat
 doats
 dock
@@ -30813,3 +30814,5 @@ increment
 decrement
 inc
 dec
+dequeue
+enqueue

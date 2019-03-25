@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Database.Models
 {
@@ -33,9 +35,10 @@ namespace Database.Models
 		public bool IsEnabled { get; set; }
 	}
 
+	[JsonConverter(typeof(StringEnumConverter), true)]
 	public enum CourseAccessType : short
 	{
-		/* Редактировать, закреплять, удалять (скрывать) комментарии */
+		/* Редактировать, закреплять, удалять (скрывать) комментарии, видеть неопубликованные комментарии */
 		[Display(Name = "Редактировать и удалять комментарии")]
 		EditPinAndRemoveComments = 1,
 
@@ -53,8 +56,12 @@ namespace Database.Models
 		[Display(Name = "Получать в АПИ статистику по код-ревью (/codereveiew/statistics)")]
 		ApiViewCodeReviewStatistics = 101,
 		
+		
+		/*
+		// Antiplagiarism service is enabled for everyone now. But don't use value 1001 for another features to avoid collissions.		
 		[Display(Name = "Фича: антиплагиат")]
-		FeatureAntiPlagiarism = 1001,
+		FeatureUseAntiPlagiarism = 1001,
+		*/
 	}
 
 	public static class CourseAccessTypeExtensions

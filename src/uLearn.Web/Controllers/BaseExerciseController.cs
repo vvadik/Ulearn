@@ -8,10 +8,13 @@ using Database.DataContexts;
 using Database.Models;
 using log4net;
 using Metrics;
-using uLearn.CSharp;
-using uLearn.Telegram;
 using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.CSharp;
+using Ulearn.Core.Telegram;
 
 namespace uLearn.Web.Controllers
 {
@@ -31,6 +34,7 @@ namespace uLearn.Web.Controllers
 		protected readonly NotificationsRepo notificationsRepo;
 		protected readonly UsersRepo usersRepo;
 		protected readonly StyleErrorsRepo styleErrorsRepo;
+		protected readonly UnitsRepo unitsRepo;
 		
 		private static readonly TimeSpan executionTimeout = TimeSpan.FromSeconds(45);
 		
@@ -52,6 +56,7 @@ namespace uLearn.Web.Controllers
 			notificationsRepo = new NotificationsRepo(db);
 			usersRepo = new UsersRepo(db);
 			styleErrorsRepo = new StyleErrorsRepo(db);
+			unitsRepo = new UnitsRepo(db);
 		}
 
 		private string GenerateSubmissionName(Slide exerciseSlide, string userName)
@@ -86,7 +91,7 @@ namespace uLearn.Web.Controllers
 
 			var compilationErrorMessage = buildResult.HasErrors ? buildResult.ErrorMessage : null;
 			var dontRunSubmission = buildResult.HasErrors;
-			var submissionLanguage = SubmissionLanguageHelpers.ByLangId(exerciseSlide.Exercise.LangId);
+			var submissionLanguage = exerciseSlide.Exercise.Language.Value;
 			var submission = await userSolutionsRepo.AddUserExerciseSubmission(
 				courseId, exerciseSlide.Id,
 				userCode, compilationErrorMessage, null,
@@ -112,7 +117,7 @@ namespace uLearn.Web.Controllers
 					IsCompillerFailure = true,
 					ErrorMessage = "К сожалению, из-за большой нагрузки мы не смогли оперативно проверить ваше решение. " +
 									"Мы попробуем проверить его позже, просто подождите и обновите страницу. ",
-					ExecutionServiceName = "uLearn"
+					ExecutionServiceName = "ulearn"
 				};
 			}
 
@@ -127,19 +132,19 @@ namespace uLearn.Web.Controllers
 
 			var automaticChecking = submission.AutomaticChecking;
 			var isProhibitedUserToSendForReview = slideCheckingsRepo.IsProhibitedToSendExerciseToManualChecking(courseId, exerciseSlide.Id, userId);
-			var sendToReview = exerciseBlock.RequireReview &&
+			var sendToReview = exerciseSlide.Scoring.RequireReview &&
 								submission.AutomaticCheckingIsRightAnswer &&
 								!isProhibitedUserToSendForReview &&
 								groupsRepo.IsManualCheckingEnabledForUser(course, userId);
 			if (sendToReview)
 			{
-				await slideCheckingsRepo.RemoveWaitingManualExerciseCheckings(courseId, exerciseSlide.Id, userId);
+				await slideCheckingsRepo.RemoveWaitingManualCheckings<ManualExerciseChecking>(courseId, exerciseSlide.Id, userId);
 				await slideCheckingsRepo.AddManualExerciseChecking(courseId, exerciseSlide.Id, userId, submission);
-				await visitsRepo.MarkVisitsAsWithManualChecking(exerciseSlide.Id, userId);
+				await visitsRepo.MarkVisitsAsWithManualChecking(courseId, exerciseSlide.Id, userId);
 				metricSender.SendCount($"exercise.{exerciseMetricId}.sent_to_review");
 				metricSender.SendCount("exercise.sent_to_review");
 			}
-			await visitsRepo.UpdateScoreForVisit(courseId, exerciseSlide.Id, userId);
+			await visitsRepo.UpdateScoreForVisit(courseId, exerciseSlide.Id, exerciseSlide.MaxScore, userId);
 
 			if (automaticChecking != null)
 			{
@@ -155,7 +160,7 @@ namespace uLearn.Web.Controllers
 				IsCompileError = automaticChecking?.IsCompilationError ?? false,
 				ErrorMessage = automaticChecking?.CompilationError.Text ?? "",
 				IsRightAnswer = submission.AutomaticCheckingIsRightAnswer,
-				ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : exerciseSlide.Exercise.ExpectedOutput.NormalizeEoln(),
+				ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : exerciseSlide.Exercise.ExpectedOutput?.NormalizeEoln(),
 				ActualOutput = automaticChecking?.Output.Text ?? "",
 				ExecutionServiceName = automaticChecking?.ExecutionServiceName ?? "ulearn",
 				SentToReview = sendToReview,

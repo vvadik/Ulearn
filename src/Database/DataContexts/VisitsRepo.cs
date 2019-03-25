@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using log4net;
-using Z.EntityFramework.Plus;
 
 namespace Database.DataContexts
 {
@@ -22,7 +21,7 @@ namespace Database.DataContexts
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
 		}
 
-		public async Task AddVisit(string courseId, Guid slideId, string userId, string ipAddress)
+		public Task AddVisit(string courseId, Guid slideId, string userId, string ipAddress)
 		{
 			var visit = FindVisit(courseId, slideId, userId);
 			if (visit == null)
@@ -38,10 +37,10 @@ namespace Database.DataContexts
 			}
 			else if (visit.IpAddress != ipAddress)
 				visit.IpAddress = ipAddress;
-			await db.SaveChangesAsync();
+			return db.SaveChangesAsync();
 		}
 
-		public int GetVisitsCount(Guid slideId, string courseId)
+		public int GetVisitsCount(string courseId, Guid slideId)
 		{
 			return db.Visits.Count(x => x.CourseId == courseId && x.SlideId == slideId);
 		}
@@ -66,32 +65,35 @@ namespace Database.DataContexts
 			return db.Visits.Any(v => v.CourseId == courseId && v.UserId == userId);
 		}
 
-		public async Task UpdateScoreForVisit(string courseId, Guid slideId, string userId)
+		public Task UpdateScoreForVisit(string courseId, Guid slideId, int maxSlideScore, string userId)
 		{
 			var newScore = slideCheckingsRepo.GetManualScoreForSlide(courseId, slideId, userId) +
 							slideCheckingsRepo.GetAutomaticScoreForSlide(courseId, slideId, userId);
+			newScore = Math.Min(newScore, maxSlideScore);
 			var isPassed = slideCheckingsRepo.IsSlidePassed(courseId, slideId, userId);
 			log.Info($"Обновляю количество баллов пользователя {userId} за слайд {slideId} в курсе \"{courseId}\". " +
-					 $"Новое количество баллов: {newScore}, слайд пройден?: {isPassed}");
-			await UpdateAttempts(slideId, userId, visit =>
+					 $"Новое количество баллов: {newScore}, слайд пройден: {isPassed}");
+			return UpdateAttempts(courseId, slideId, userId, visit =>
 			{
 				visit.Score = newScore;
 				visit.IsPassed = isPassed;
 			});
 		}
 
-		private async Task UpdateAttempts(Guid slideId, string userId, Action<Visit> action)
+		private async Task UpdateAttempts(string courseId, Guid slideId, string userId, Action<Visit> action)
 		{
-			var visit = db.Visits.FirstOrDefault(v => v.SlideId == slideId && v.UserId == userId);
+			var visit = db.Visits.FirstOrDefault(
+				v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId
+			);
 			if (visit == null)
 				return;
 			action(visit);
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
-		public async Task RemoveAttempts(Guid slideId, string userId)
+		public Task RemoveAttempts(string courseId, Guid slideId, string userId)
 		{
-			await UpdateAttempts(slideId, userId, visit =>
+			return UpdateAttempts(courseId, slideId, userId, visit =>
 			{
 				visit.AttemptsCount = 0;
 				visit.Score = 0;
@@ -118,15 +120,15 @@ namespace Database.DataContexts
 				.ToList();
 		}
 
-		public async Task MarkVisitsAsWithManualChecking(Guid slideId, string userId)
+		public Task MarkVisitsAsWithManualChecking(string courseId, Guid slideId, string userId)
 		{
-			await UpdateAttempts(slideId, userId, visit => { visit.HasManualChecking = true; });
+			 return UpdateAttempts(courseId, slideId, userId, visit => { visit.HasManualChecking = true; });
 		}
 
-		public int GetScore(Guid slideId, string userId)
+		public int GetScore(string courseId, Guid slideId, string userId)
 		{
 			return db.Visits
-				.Where(v => v.SlideId == slideId && v.UserId == userId)
+				.Where(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId)
 				.Select(v => v.Score)
 				.FirstOrDefault();
 		}
@@ -153,30 +155,34 @@ namespace Database.DataContexts
 			return db.Visits.Any(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId && v.IsSkipped);
 		}
 
-		public bool IsPassed(Guid slideId, string userId)
+		public bool IsPassed(string courseId, Guid slideId, string userId)
 		{
-			return db.Visits.Any(v => v.SlideId == slideId && v.UserId == userId && v.IsPassed);
+			return db.Visits.Any(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId && v.IsPassed);
 		}
 
-		public bool IsSkippedOrPassed(Guid slideId, string userId)
+		public bool IsSkippedOrPassed(string courseId, Guid slideId, string userId)
 		{
-			return db.Visits.Any(v => v.SlideId == slideId && v.UserId == userId && (v.IsPassed || v.IsSkipped));
+			return db.Visits.Any(
+				v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId && (v.IsPassed || v.IsSkipped)
+			);
 		}
 
 		public async Task AddVisits(IEnumerable<Visit> visits)
 		{
 			foreach (var visit in visits)
 			{
-				if (db.Visits.Any(x => x.UserId == visit.UserId && x.SlideId == visit.SlideId))
+				if (db.Visits.Any(x => x.UserId == visit.UserId && x.SlideId == visit.SlideId && x.CourseId == visit.CourseId))
 					continue;
 				db.Visits.Add(visit);
 			}
 			await db.SaveChangesAsync();
 		}
 
-		public IQueryable<Visit> GetVisitsInPeriod(IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish, IEnumerable<string> usersIds = null)
+		public IQueryable<Visit> GetVisitsInPeriod(string courseId, IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish, IEnumerable<string> usersIds = null)
 		{
-			var filteredVisits = db.Visits.Where(v => slidesIds.Contains(v.SlideId) && periodStart <= v.Timestamp && v.Timestamp <= periodFinish);
+			var filteredVisits = db.Visits.Where(
+				v => v.CourseId == courseId && slidesIds.Contains(v.SlideId) && periodStart <= v.Timestamp && v.Timestamp <= periodFinish
+			);
 			if (usersIds != null)
 				filteredVisits = filteredVisits.Where(v => usersIds.Contains(v.UserId));
 			return filteredVisits;
@@ -184,7 +190,9 @@ namespace Database.DataContexts
 
 		public IQueryable<Visit> GetVisitsInPeriod(VisitsFilterOptions options)
 		{
-			var filteredVisits = db.Visits.Where(v => options.PeriodStart <= v.Timestamp && v.Timestamp <= options.PeriodFinish);
+			var filteredVisits = db.Visits.Where(
+				v => v.CourseId == options.CourseId && options.PeriodStart <= v.Timestamp && v.Timestamp <= options.PeriodFinish
+			);
 			if (options.SlidesIds != null)
 				filteredVisits = filteredVisits.Where(v => options.SlidesIds.Contains(v.SlideId));
 			if (options.UserIds != null)
@@ -204,11 +212,11 @@ namespace Database.DataContexts
 				.ToDictionary(g => g.Key, g => g.ToList());
 		}
 
-		public IEnumerable<string> GetUsersVisitedAllSlides(IImmutableSet<Guid> slidesIds, DateTime periodStart, DateTime periodFinish, IEnumerable<string> usersIds = null)
+		public IEnumerable<string> GetUsersVisitedAllSlides(string courseId, IImmutableSet<Guid> slidesIds, DateTime periodStart, DateTime periodFinish, IEnumerable<string> usersIds = null)
 		{
 			var slidesCount = slidesIds.Count;
 
-			return GetVisitsInPeriod(slidesIds, periodStart, periodFinish, usersIds)
+			return GetVisitsInPeriod(courseId, slidesIds, periodStart, periodFinish, usersIds)
 				.Select(v => new { v.UserId, v.SlideId })
 				.Distinct()
 				.GroupBy(v => v.UserId)
@@ -241,12 +249,32 @@ namespace Database.DataContexts
 			return db.Visits.Where(v => v.CourseId == courseId).Select(v => v.UserId).Distinct().ToList();
 		}
 		
-		public List<RatingEntry> GetCourseRating(string courseId, int minScore)
+		public List<RatingEntry> GetCourseRating(string courseId, int minScore, List<Guid> requiredSlides)
 		{
-			return db.Visits.Where(v => v.CourseId == courseId)
+			var grouppedVisits = db.Visits.Where(v => v.CourseId == courseId)
 				.GroupBy(v => v.UserId)
 				.Where(g => g.Sum(v => v.Score) >= minScore)
-				.ToList()
+				.ToList();
+			var userIds = grouppedVisits.Select(g => g.Key).ToList();
+
+			List<string> usersWithAllRequiredSlides;
+			if (requiredSlides.Count > 0)
+			{
+				usersWithAllRequiredSlides = db.Visits
+					.Where(v => v.CourseId == courseId && requiredSlides.Contains(v.SlideId) && userIds.Contains(v.UserId))
+					.GroupBy(v => v.UserId)
+					.ToList()
+					.Where(g => g.DistinctBy(v => v.SlideId).Count() >= requiredSlides.Count)
+					.Select(g => g.Key)
+					.ToList();
+			}
+			else
+			{
+				usersWithAllRequiredSlides = userIds;
+			}
+
+			return grouppedVisits
+				.Where(g => usersWithAllRequiredSlides.Contains(g.Key))
 				.Select(g => new RatingEntry(g.First().User, g.Sum(v => v.Score), g.Max(v => v.Timestamp)))
 				.OrderByDescending(r => r.Score)
 				.ToList();

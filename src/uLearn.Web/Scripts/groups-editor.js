@@ -1,4 +1,6 @@
-﻿$(document).ready(function () {
+﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
+
+window.documentReadyFunctions.push(function () {
 	var addUserToGroupUrl = "/Admin/AddUserToGroup";
 	var token = $('input[name="__RequestVerificationToken"]').val();
 
@@ -253,6 +255,7 @@
             $modal.find('[name="manualChecking"]').prop('checked', data.group.isManualCheckingEnabled);
             $modal.find('[name="manualCheckingForOldSolutions"]').prop('checked', data.group.isManualCheckingEnabledForOldSolutions).closest('.checkbox').toggle(data.group.isManualCheckingEnabled);
             $modal.find('[name="defaultProhibitFutherReview"]').prop('checked', data.group.defaultProhibitFutherReview);
+			$modal.find('[name="canUsersSeeGroupProgress"]').prop('checked', data.group.canUsersSeeGroupProgress);
 
             $modal.find('.scoring-group-checkbox input').prop('checked', false);
             data.enabledScoringGroups.forEach(function (scoringGroupId) {

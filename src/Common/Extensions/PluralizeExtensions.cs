@@ -136,5 +136,15 @@
 			hideNumberOne = false,
 			smallNumbersAreWords = false,
 		};
+		
+		public static readonly RussianPluralizationOptions Tasks = new RussianPluralizationOptions
+		{
+			One = "задача",
+			Two = "задачи",
+			Five = "задач",
+			Gender = Gender.Female,
+			hideNumberOne = false,
+			smallNumbersAreWords = false,
+		};
 	}
 }

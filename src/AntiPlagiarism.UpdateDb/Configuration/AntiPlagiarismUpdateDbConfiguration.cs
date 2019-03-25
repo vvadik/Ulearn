@@ -1,5 +1,5 @@
 ﻿using AntiPlagiarism.Web.Configuration;
-using uLearn.Configuration;
+using Ulearn.Core.Configuration;
 
 namespace AntiPlagiarism.UpdateDb.Configuration
 {

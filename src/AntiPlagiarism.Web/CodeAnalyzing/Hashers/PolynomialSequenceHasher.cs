@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.CodeAnalysis.Operations;
 
 namespace AntiPlagiarism.Web.CodeAnalyzing.Hashers
 {
