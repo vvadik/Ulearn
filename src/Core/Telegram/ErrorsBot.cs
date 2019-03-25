@@ -11,14 +11,14 @@ namespace Ulearn.Core.Telegram
 	public class ErrorsBot : TelegramBot
 	{
 		private readonly ILog log = LogManager.GetLogger(typeof(ErrorsBot));
-		private readonly GraphiteMetricSender metricSender;
+		private readonly MetricSender metricSender;
 
 		public ErrorsBot()
 		{
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 			channel = configuration.Telegram.Errors.Channel;
 			var serviceName = configuration.GraphiteServiceName ?? System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.ToLower();
-			metricSender = new GraphiteMetricSender(serviceName);
+			metricSender = new MetricSender(serviceName);
 		}
 
 		public async Task PostToChannelAsync(string message, ParseMode parseMode = ParseMode.Default)
