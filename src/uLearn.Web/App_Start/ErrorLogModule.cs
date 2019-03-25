@@ -13,7 +13,6 @@ namespace uLearn.Web
 	public class ErrorLogModule : Elmah.ErrorLogModule
 	{
 		private readonly ErrorsBot errorsBot;
-		private readonly GraphiteMetricSender metricSender;
 		
 		private static readonly ILog log = LogManager.GetLogger(typeof(ErrorLogModule));
 
@@ -31,7 +30,6 @@ namespace uLearn.Web
 
 			Logged += OnLogged;
 			errorsBot = new ErrorsBot();
-			metricSender = new GraphiteMetricSender("web");
 		}
 
 		private bool IsErrorIgnoredForTelegramChannel(Error error)
@@ -51,7 +49,6 @@ namespace uLearn.Web
 			if (!IsErrorIgnoredForTelegramChannel(error))
 			{
 				errorsBot.PostToChannel(entryId, error.Exception);
-				metricSender.SendCount("errors");
 			}
 		}
 	}
