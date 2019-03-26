@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Database.Models;
 using Database.Models.Comments;
 using Database.Repos.Comments;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,9 +39,9 @@ namespace Database.Core.Tests.Repos.Comments
 		[Test]
 		public async Task AddAndFindComment()
 		{
-			var userId = Guid.NewGuid().ToString();
+			var user = await CreateUserAsync("test").ConfigureAwait(false);
 			
-			var comment = await commentsRepo.AddCommentAsync(userId, "courseId", Guid.NewGuid(), -1, false, "Comment text").ConfigureAwait(false);
+			var comment = await commentsRepo.AddCommentAsync(user.Id, "courseId", Guid.NewGuid(), -1, false, "Comment text").ConfigureAwait(false);
 			var foundComment = await commentsRepo.FindCommentByIdAsync(comment.Id).ConfigureAwait(false);
 			
 			Assert.AreEqual(comment, foundComment);
@@ -51,10 +50,10 @@ namespace Database.Core.Tests.Repos.Comments
 		[Test]
 		public async Task AddAndGetSlideComment()
 		{
-			var userId = Guid.NewGuid().ToString();
+			var user = await CreateUserAsync("test").ConfigureAwait(false);
 			var slideId = Guid.NewGuid();
 			
-			var comment = await commentsRepo.AddCommentAsync(userId, "courseId", slideId, -1, false, "Comment text").ConfigureAwait(false);
+			var comment = await commentsRepo.AddCommentAsync(user.Id, "courseId", slideId, -1, false, "Comment text").ConfigureAwait(false);
 			var comments = await commentsRepo.GetSlideCommentsAsync("courseId", slideId).ConfigureAwait(false);
 			
 			Assert.AreEqual(1, comments.Count);
@@ -70,8 +69,8 @@ namespace Database.Core.Tests.Repos.Comments
 			var comments = new List<Comment>();
 			for (var i = 0; i < commentsCount; i++)
 			{
-				var userId = Guid.NewGuid().ToString();
-				var comment = await commentsRepo.AddCommentAsync(userId, "courseId", slideId, -1, false, "Comment text").ConfigureAwait(false);
+				var user = await CreateUserAsync($"test{i}").ConfigureAwait(false);
+				var comment = await commentsRepo.AddCommentAsync(user.Id, "courseId", slideId, -1, false, "Comment text").ConfigureAwait(false);
 				comments.Add(comment);
 			}
 			var foundComments = await commentsRepo.GetSlideCommentsAsync("courseId", slideId).ConfigureAwait(false);
@@ -87,9 +86,9 @@ namespace Database.Core.Tests.Repos.Comments
 			var comments = new List<Comment>();
 			for (var i = 0; i < commentsCount; i++)
 			{
-				var userId = Guid.NewGuid().ToString();
+				var user = await CreateUserAsync($"test{i}").ConfigureAwait(false);
 				var slideId = Guid.NewGuid();
-				var comment = await commentsRepo.AddCommentAsync(userId, "courseId", slideId, -1, false, "Comment text").ConfigureAwait(false);
+				var comment = await commentsRepo.AddCommentAsync(user.Id, "courseId", slideId, -1, false, "Comment text").ConfigureAwait(false);
 				comments.Add(comment);
 			}
 			var foundComments = await commentsRepo.GetCourseCommentsAsync("courseId").ConfigureAwait(false);

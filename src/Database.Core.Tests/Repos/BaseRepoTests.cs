@@ -81,7 +81,13 @@ namespace Database.Core.Tests.Repos
 			if (password == null)
 				password = StringUtils.GenerateSecureAlphanumericString(10);
 			
-			var user = new ApplicationUser { UserName = userName };
+			var user = new ApplicationUser
+			{
+				UserName = userName,
+				FirstName = userName,
+				LastName = userName,
+				Email = $"{userName}@test.ru"
+			};
 			var result = await userManager.CreateAsync(user, password).ConfigureAwait(false);
 			if (! result.Succeeded)
 				throw new InvalidOperationException($"Can't create user {userName} with password {password}:\n{string.Join("\n", result.Errors.Select(e => e.Description))}");
