@@ -33,8 +33,8 @@ class Comment extends Component {
 		const {actions, children, commentEditing, comment, userRoles,user, slideType, getUserSolutionsUrl} = this.props;
 		const canViewProfiles = (user.systemAccesses && user.systemAccesses.includes("viewAllProfiles")) ||
 			userRoles.isSystemAdministrator;
-		const canViewStudentsGroup = (user.systemAccesses && user.systemAccesses.includes("ViewAllGroupMembers")) ||
-			(userRoles.courseAccesses && userRoles.courseAccesses.includes("ViewAllGroupMembers")) ||
+		const canViewStudentsGroup = (user.systemAccesses && user.systemAccesses.includes("viewAllGroupMembers")) ||
+			(userRoles.courseAccesses && userRoles.courseAccesses.includes("viewAllGroupMembers")) ||
 			userRoles.isSystemAdministrator;
 		const profileUrl = `${window.location.origin}/Account/Profile?userId=${comment.author.id}`;
 
@@ -56,6 +56,8 @@ class Comment extends Component {
 							isApproved={comment.isApproved}
 							isCorrectAnswer={comment.isCorrectAnswer}
 							isPinnedToTop={comment.isPinnedToTop} />
+						{ (user.isAuthenticated && (user.id === comment.author.id ||
+							this.canModerateComments(userRoles, 'editPinAndRemoveComments'))) &&
 						<KebabActions
 							user={user}
 							url={getUserSolutionsUrl(comment.author.id)}
@@ -63,7 +65,7 @@ class Comment extends Component {
 							userRoles={userRoles}
 							slideType={slideType}
 							comment={comment}
-							actions={actions} />
+							actions={actions} /> }
 					</Header>
 					<Hint pos="bottom" text={comment.publishTime} disableAnimations={false} useWrapper={false}>
 						<div className={styles.timeSinceAdded}>
@@ -78,21 +80,23 @@ class Comment extends Component {
 	}
 
 	renderComment() {
-		const {comment, user, userRoles, hasReplyAction, actions, slideType} = this.props;
+		const {comment, user, userRoles, hasReplyAction, actions, slideType, getUserSolutionsUrl} = this.props;
 		return (
-			<React.Fragment>
+			<>
 				<p className={styles.text}>
 					<span dangerouslySetInnerHTML={{__html: comment.renderedText}} />
 				</p>
+				{ user.isAuthenticated &&
 				<CommentActions
 					slideType={slideType}
 					comment={comment}
 					user={user}
+					url={getUserSolutionsUrl(comment.author.id)}
 					userRoles={userRoles}
 					hasReplyAction={hasReplyAction}
 					actions={actions}
-					canModerateComments={this.canModerateComments} />
-			</React.Fragment>
+					canModerateComments={this.canModerateComments} /> }
+			</>
 		)
 	}
 

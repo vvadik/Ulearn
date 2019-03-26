@@ -39,7 +39,7 @@ export default function CommentActions(props) {
 			</Button>);
 	}
 
-	if (user.id === comment.author.id) {
+	if (user.id === comment.author.id || canModerateComments(userRoles, 'editPinAndRemoveComments')) {
 		commentActions.push(
 			<NotMobile key={uuid()}>
 				<Button
@@ -73,8 +73,10 @@ CommentActions.propTypes = {
 	userRoles: userRoles.isRequired,
 	comment: comment.isRequired,
 	actions: PropTypes.objectOf(PropTypes.func),
+	url: PropTypes.string,
 	hasReplyAction: PropTypes.bool,
 	canModerateComments: PropTypes.func,
 	slideType: PropTypes.string,
+	getUserSolutionsUrl: PropTypes.func,
 };
 

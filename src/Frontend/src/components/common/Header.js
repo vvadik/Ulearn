@@ -662,7 +662,7 @@ class LogoutLink extends Component {
 	}
 
 	render() {
-		return <div className={styles["header__logout-link"]}><a href="" onClick={this.onClick}>Выйти</a></div>
+		return <div className={styles["header__logout-link"]}><button onClick={this.onClick}>Выйти</button></div>
 	}
 
 	static mapStateToProps(state) {

@@ -18,7 +18,7 @@ const markupByOperation = {
 		icon: boldIcon,
 	},
 	italic: {
-		markup: '_',
+		markup: '__',
 		description: "курсив",
 		hotkey: {
 			asText: 'Ctrl + I',

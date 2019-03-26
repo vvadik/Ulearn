@@ -25,7 +25,7 @@ const HiddenMark = () => (
 
 const CorrectAnswerMark = () => (
 	<div className={`${styles.mark} ${styles.correctAnswer}`}>
-		<Icon name='Star' size={15} />
+		<Icon name='Ok' size={15} />
 		<NotMobile><span className={styles.text}>Правильный&nbsp;ответ</span></NotMobile>
 	</div>
 );

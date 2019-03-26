@@ -39,7 +39,7 @@ class CommentsList extends Component {
 		this.threadRef = React.createRef();
 		this.threadRefs = {};
 
-		this.debouncedSendData = debounce(this.sendData, 2000);
+		this.debouncedSendData = debounce(this.sendData, 1000);
 	}
 
 	componentDidMount() {
@@ -171,7 +171,7 @@ class CommentsList extends Component {
 						enterActive: styles.enterActive,
 						exitActive: styles.exitActive,
 					}}
-					timeout={1000}>
+					timeout={500}>
 					<section className={styles.thread} key={comment.id} ref={this.threadRef}>
 						<Thread
 							ref={(el) => { this.threadRefs[comment.id] = el }}
@@ -205,7 +205,7 @@ class CommentsList extends Component {
 		return (
 			!this.props.forInstructors ?
 				<p className={styles.emptyComments}>
-					К этому слайду ещё нет коммаентариев. Вы можете начать беседу со студентами,
+					К этому слайду ещё нет комментариев. Вы можете начать беседу со студентами,
 					добавив комментарий.
 				</p>
 				:
@@ -230,17 +230,6 @@ class CommentsList extends Component {
 		}
 	}
 
-	updateThread(id, reducer) {
-		this.setState(() => {
-			const threads = JSON.parse(JSON.stringify(this.state.threads));
-			const thread = threads.find(thread => thread.id === id);
-
-			Object.assign(thread, reducer(thread));
-
-			return threads;
-		});
-	}
-
 	updateComment(id, reducer) {
 		this.setState(() => {
 			// const threads = JSON.parse(JSON.stringify(this.state.threads));
@@ -263,8 +252,7 @@ class CommentsList extends Component {
 		});
 
 		try {
-			const request = await commentsApi.addComment(courseId, slideId, text, null, forInstructors);
-			const newComment = await commentsApi.getComment(request.id);
+			const newComment = await commentsApi.addComment(courseId, slideId, text, null, forInstructors);
 			const pinnedComments = threads.filter(comment => comment.isPinnedToTop);
 			const filteredComments = threads.filter(comment => !comment.isPinnedToTop)
 				.sort((a, b) => new Date(b.publishTime) - new Date(a.publishTime));
@@ -280,9 +268,10 @@ class CommentsList extends Component {
 				newCommentId: this.state.newCommentId + 1,
 			});
 
-			if(!request) {
+			if(!newComment) {
 				Toast.push("Не удалось добавить комментарий. Попробуйте снова.");
 				this.setState({
+					newCommentId: this.state.newCommentId,
 					status: 'error',
 					sending: false,
 				});
@@ -308,10 +297,11 @@ class CommentsList extends Component {
 			isLiked: !isLiked,
 		}));
 
+
 		if (!isLiked) {
-			this.debouncedSendData(commentsApi.likeComment, commentId);
+			commentsApi.likeComment(commentId);
 		} else {
-			this.debouncedSendData(commentsApi.dislikeComment, commentId);
+			commentsApi.dislikeComment(commentId);
 		}
 	};
 
@@ -339,10 +329,23 @@ class CommentsList extends Component {
 
 		const comment = this.state.threads.find(comment => comment.id === commentId);
 		const filteredComments = this.state.threads.filter(comment => comment.id !== commentId);
+		const pinnedComments = this.state.threads.filter(comment => comment.isPinnedToTop);
+		const filteredPinnedComments = pinnedComments.filter(comment => comment.id !== commentId);
+		const filteredCommentsWithoutPin = [...filteredComments, {...comment, "isPinnedToTop": !isPinnedToTop}]
+			.sort((a, b) => new Date(b.publishTime) - new Date(a.publishTime));
 
-		this.setState({
-			threads: [comment, ...filteredComments],
-		});
+		if (!isPinnedToTop) {
+			this.setState({
+				threads: [comment, ...filteredComments],
+			});
+		} else {
+			this.setState({
+				threads: [
+					...filteredPinnedComments,
+					...filteredCommentsWithoutPin
+				]
+			});
+		}
 
 		this.debouncedSendData(this.props.commentsApi.updateComment, commentId, {'isPinnedToTop': !isPinnedToTop});
 	};
@@ -432,13 +435,12 @@ class CommentsList extends Component {
 
 
 		try {
-			const request = await commentsApi.addComment(courseId, slideId, text, commentId, forInstructors);
-			const newReply = await commentsApi.getComment(request.id);
-
+			const newReply = await commentsApi.addComment(courseId, slideId, text, commentId, forInstructors);
 			const index = this.state.threads.findIndex(comment => comment.id === commentId);
 			const comment = this.state.threads[index];
 			const newReplies = comment.replies.concat(newReply);
 			const newComment = {...comment, replies: newReplies};
+
 			this.setState({
 				threads: [
 					...this.state.threads.slice(0, index),
@@ -452,7 +454,7 @@ class CommentsList extends Component {
 				status: 'success',
 			});
 
-			if (!request) {
+			if (!newReply) {
 				throw new Error('Произошла ошибка');
 			}
 		} catch (e) {

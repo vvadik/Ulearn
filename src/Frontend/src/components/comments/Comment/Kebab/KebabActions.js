@@ -13,7 +13,7 @@ export default function KebabActions(props) {
 
 		return (
 			<div className={styles.instructorsActions}>
-		<Kebab positions={['bottom right']} size="large" disableAnimations={false}>
+		<Kebab positions={['left top']} size="large" disableAnimations={false}>
 			{(user.id === comment.author.id || canModerateComments(userRoles, 'editPinAndRemoveComments')) &&
 				<>
 					<MenuItem
@@ -47,7 +47,7 @@ export default function KebabActions(props) {
 				{comment.parentCommentId ?
 				<MenuItem
 					onClick={() => actions.handleCorrectAnswerMark(comment.id, comment.isCorrectAnswer)}
-					icon={<Icon name='Star2' size="small" />}>
+					icon={<Icon name='Ok' size="small" />}>
 					{comment.isCorrectAnswer ? 'Снять отметку' : 'Отметить правильным'}
 				</MenuItem> :
 				<MenuItem

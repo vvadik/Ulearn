@@ -74,7 +74,7 @@ class Thread extends Component {
 								enterActive: styles.enterActive,
 								exitActive: styles.exitActive,
 							}}
-							timeout={1000}>
+							timeout={500}>
 							<div key={reply.id} className={styles.reply}>
 								{this.renderComment(reply, index + 1 === replies.length)}
 							</div>

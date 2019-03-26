@@ -24,7 +24,7 @@ export function deleteComment(commentId) {
 	return api.delete("comments/" + commentId);
 }
 
-export function updateComment(commentId, commentSettings) {
+export function updateComment(commentId, commentSettings = {}) {
 	return api.patch("comments/" + commentId,
 		api.createRequestParams(commentSettings)
 	);
