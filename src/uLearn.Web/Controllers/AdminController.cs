@@ -156,7 +156,6 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public ActionResult DownloadPackage(string courseId)
 		{
-			throw new Exception("Test exception");
 			var packageName = courseManager.GetPackageName(courseId);
 			var path = courseManager.GetStagingCoursePath(courseId);
 			var content = System.IO.File.ReadAllBytes(path);
