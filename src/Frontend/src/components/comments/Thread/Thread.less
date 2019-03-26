@@ -2,6 +2,11 @@
 
 .repliesWrapper {
   width: 100%;
+
+  @media(max-width: @maxPhoneWidth) {
+    margin-left: 30px;
+    width: inherit;
+  }
 }
 
 .reply {
@@ -20,12 +25,13 @@
 
 /*classes for react-transition-group*/
 .enter {
-  background-color: rgba(40,153,234,0.3);
+  background-color: rgba(40,153,234, 0.3);
+  //background: #cce9f7;
 }
 
 .enterActive  {
   background-color: transparent;
-  transition: background-color 3000ms ease;
+  transition: background 1000ms ease;
 }
 
 .exit {
@@ -34,5 +40,5 @@
 
 .exitActive {
   opacity: 0.01;
-  transition: opacity 1000ms ease;
+  transition: opacity 500ms ease;
 }
