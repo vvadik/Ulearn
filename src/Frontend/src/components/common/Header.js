@@ -73,7 +73,7 @@ class Header extends Component {
 
 		/* Div should have class .header because some legacy javascript code uses $('.header') for calculating header height */
 		return (
-			<div className={styles["header"] + " header"}>
+			<div className={styles["header"] + " header"} id="header">
 				<Logo>
 					<span className={styles["visible-only-phone"]}><Icon name="Home" /></span>
 					<span className={styles["visible-at-least-tablet"]}>Ulearn.me</span>
