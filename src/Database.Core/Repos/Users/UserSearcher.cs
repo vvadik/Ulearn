@@ -34,11 +34,11 @@ namespace Database.Repos.Users
 			if (request.Words.Count == 0)
 			{
 				result = await accessRestrictor.RestrictUsersSetAsync(
-					result, request.CurrentUser,
+					result, request.CurrentUser, request.CourseId,
 					hasSystemAdministratorAccess: true,
 					hasCourseAdminAccess: true,
 					hasInstructorAccessToGroupMembers: true,
-					hasInstructorAccessToGroupInstructors: true
+					hasInstructorAccessToCourseInstructors: true
 				).ConfigureAwait(false);
 			}
 
@@ -56,7 +56,7 @@ namespace Database.Repos.Users
 					var isAvailable = await searcher.IsAvailableForSearchAsync(request.CurrentUser).ConfigureAwait(false);
 					if (isAvailable)
 					{
-						var scope = await searcher.GetSearchScopeAsync(result, request.CurrentUser).ConfigureAwait(false);
+						var scope = await searcher.GetSearchScopeAsync(result, request.CurrentUser, request.CourseId).ConfigureAwait(false);
 						var searcherResult = await searcher.SearchAsync(scope, word, strict).ConfigureAwait(false);
 
 						var foundUserIds = searcherResult.Select(u => u.Id).ToList();
