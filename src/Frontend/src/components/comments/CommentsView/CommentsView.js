@@ -119,6 +119,12 @@ class CommentsView extends Component {
 		this.setState({
 			activeTab: id,
 		});
+
+
+		if (id === TABS.instructorsComments) {
+			window.history.pushState ? window.history.pushState({}, '', window.location.pathname) :
+			window.location.hash = '';
+		}
 	};
 
 	handleOpenModal = (openModal) => {

@@ -1,8 +1,8 @@
 import { shape, oneOf, arrayOf, bool, array, number, string } from 'prop-types';
 
 export const userType = shape({
-	id: string.isRequired,
-	visibleName: string.isRequired,
+	id: string,
+	visibleName: string,
 	login: string,
 	email: string,
 	firstName: string,
@@ -13,8 +13,8 @@ export const userType = shape({
 
 export const user = shape({
 	isAuthenticated: bool.isRequired,
-	id: string.isRequired,
-	visibleName: string.isRequired,
+	id: string,
+	visibleName: string,
 	avatarUrl: string,
 	systemAccesses: array,
 });

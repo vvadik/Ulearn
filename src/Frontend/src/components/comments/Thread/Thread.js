@@ -9,7 +9,6 @@ import styles from './Thread.less';
 import { Mobile, NotMobile } from "../../../utils/responsive";
 
 class Thread extends Component {
-	commentRefs = {};
 
 	render() {
 		const {comment} = this.props;
@@ -24,35 +23,33 @@ class Thread extends Component {
 
 		return (
 			<>
-			<Comment
-				ref={(el) => { this.commentRefs[comment.id] = el }}
-				// scrollIntoView={this.props.scrollToComment === comment.id}
-				key={comment.id}
-				comment={comment}
-				hasReplyAction={isLastCommentInThread}
-				commentEditing={commentEditing}
-				actions={actions}
-				getUserSolutionsUrl={getUserSolutionsUrl}
-				slideType={slideType}
-				user={user}
-				userRoles={userRoles}>
-				<NotMobile>
+				<Comment
+					key={comment.id}
+					comment={comment}
+					hasReplyAction={isLastCommentInThread}
+					commentEditing={commentEditing}
+					actions={actions}
+					getUserSolutionsUrl={getUserSolutionsUrl}
+					slideType={slideType}
+					user={user}
+					userRoles={userRoles}>
+					<NotMobile>
+						{this.renderReplies(comment)}
+					</NotMobile>
+					{(isParentComment && comment.id === this.props.reply.commentId) &&
+						<div className={styles.replyForm}>
+							<CommentSendForm
+								commentId={comment.id}
+								sending={reply.sending}
+								author={user}
+								submitTitle='Отправить'
+								onCancel={() => actions.handleShowReplyForm(null)}
+								handleSubmit={actions.handleAddReplyComment} />
+						</div>}
+				</Comment>
+				<Mobile>
 					{this.renderReplies(comment)}
-				</NotMobile>
-				{(isParentComment && comment.id === this.props.reply.commentId) &&
-					<div className={styles.replyForm}>
-						<CommentSendForm
-							commentId={comment.id}
-							sending={reply.sending}
-							author={user}
-							submitTitle='Отправить'
-							onCancel={() => actions.handleShowReplyForm(null)}
-							handleSubmit={actions.handleAddReplyComment} />
-					</div>}
-			</Comment>
-			<Mobile>
-				{this.renderReplies(comment)}
-			</Mobile>
+				</Mobile>
 			</>
 		)
 	}
@@ -83,23 +80,6 @@ class Thread extends Component {
 				</TransitionGroup>
 			</div>
 		)
-	}
-
- 	canSeeNotApprovedComment = (authorId) => {
-		const { user, userRoles } = this.props;
-
-		return user.id === authorId || userRoles.isSystemAdministrator ||
-			(userRoles.accesses && userRoles.accesses.includes('editPinAndRemoveComments'));
-	};
-
-	scrollCommentIntoView(commentId) {
-		const commentRef = this.commentRefs[commentId];
-
-		if (!commentRef) {
-			return;
-		}
-
-		commentRef.scrollIntoView();
 	}
 }
 

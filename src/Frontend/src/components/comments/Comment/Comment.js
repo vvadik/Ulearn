@@ -11,23 +11,18 @@ import KebabActions from "./Kebab/KebabActions";
 import Header from "./Header/Header";
 import Marks from "./Marks/Marks";
 import CommentActions from "./CommentActions/CommentActions";
+import scrollIntoView from "./../../../utils/scrollIntoView";
 
 import styles from "./Comment.less";
 
 class Comment extends Component {
 	ref = React.createRef();
 
-	// componentDidMount() {
-	// 	if (this.props.scrollIntoView) {
-	// 		this.scrollIntoView();
-	// 	}
-	// }
-	//
-	// componentDidUpdate() {
-	// 	if (this.props.scrollIntoView) {
-	// 		this.scrollIntoView();
-	// 	}
-	// }
+	componentDidMount() {
+		if (window.location.hash === `#comment-${this.props.comment.id}`) {
+			scrollIntoView(this.ref);
+		}
+	}
 
 	render() {
 		const {actions, children, commentEditing, comment, userRoles,user, slideType, getUserSolutionsUrl} = this.props;
@@ -119,15 +114,6 @@ class Comment extends Component {
 		return role.isSystemAdministrator || role.courseRole === 'courseAdmin' ||
 			(role.courseRole === 'instructor' && role.courseAccesses.includes(accesses))
 	};
-
-	scrollIntoView() {
-		const headerHeight = 60;
-		window.scrollTo({
-			left: 0,
-			top: this.ref.current.offsetTop - headerHeight,
-			behavior: "smooth"
-		});
-	}
 }
 
 Comment.propTypes = {

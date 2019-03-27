@@ -30,51 +30,23 @@ class CommentsList extends Component {
 			},
 			sending: false,
 			loadingComments: false,
-			loadedComments: false,
 			status: '',
 			animation: false,
-			// scrollToComment: null,
 		};
 
 		this.threadRef = React.createRef();
-		this.threadRefs = {};
 
 		this.debouncedSendData = debounce(this.sendData, 1000);
 	}
 
 	componentDidMount() {
 		const {courseId, slideId, forInstructors} = this.props;
-		document.body.addEventListener('click', this.handleClickCommentFromNotification);
 
 		this.loadComments(courseId, slideId, forInstructors);
 	};
 
-	componentWillUnmount() {
-		document.removeEventListener('click', this.handleClickCommentFromNotification);
-	}
-
-	handleClickCommentFromNotification = (event) => {
-		let node = event.target;
-
-		while (true) {
-			if (!node || (node.classList && node.classList.contains('notifications__new-comment-notification'))) {
-				break;
-			}
-			node = node.parentNode;
-		}
-
-		if (!node) {
-			return;
-		}
-
-		const commentId = Number(window.location.hash.split('-')[1]);
-
-		Object.values(this.threadRefs).forEach(threadRef => threadRef.scrollCommentIntoView(commentId));
-		// this.setState({scrollToComment: commentId });
-	};
-
 	loadComments = (courseId, slideId, forInstructors) => {
-		if (this.state.loadingComments || this.state.loadedComments) {
+		if (this.state.loadingComments) {
 			return;
 		}
 
@@ -83,26 +55,24 @@ class CommentsList extends Component {
 		});
 
 		this.props.commentsApi.getComments(courseId, slideId, forInstructors)
-		.then(json => {
-			let comments = json.topLevelComments;
-			this.setState({
-				threads: comments,
-				loadingComments: false,
-				loadedComments: true,
-			});
-			// scroll to highlighted comment
-		})
-		.catch(() => {
-			this.setState({
-				status: 'error',
-			});
-		})
-		.finally(() => {
-			this.setState({
-				loadingComments: false,
-				loadedComments: true,
+			.then(json => {
+				let comments = json.topLevelComments;
+				this.setState({
+					threads: comments,
+					loadingComments: false,
+				});
+				// scroll to highlighted comment
 			})
-		});
+			.catch(() => {
+				this.setState({
+					status: 'error',
+				});
+			})
+			.finally(() => {
+				this.setState({
+					loadingComments: false,
+				})
+			});
 	};
 
 	render() {
@@ -113,11 +83,15 @@ class CommentsList extends Component {
 			return <Error404 />;
 		}
 
+		if (!courseId || !slideId) {
+			return null;
+		}
+
 		return (
 			<>
 				{forInstructors && <p className={styles.textForInstructors}>Эти комментарии скрыты для студентов</p>}
 				{!user.isAuthenticated && <Stub courseId={courseId} slideId={slideId} />}
-				{loadingComments ? <Loader type="big" active={loadingComments} /> :
+				{loadingComments ? <div className={styles.emptyDiv}><Loader type="big" active={loadingComments} /></div> :
 					threads.length === 0 ?
 						<>
 							{this.renderStubForEmptyComments()}
@@ -174,8 +148,6 @@ class CommentsList extends Component {
 					timeout={500}>
 					<section className={styles.thread} key={comment.id} ref={this.threadRef}>
 						<Thread
-							ref={(el) => { this.threadRefs[comment.id] = el }}
-							// scrollToComment={this.state.scrollToComment}
 							animation={this.state.animation}
 							comment={comment}
 							commentEditing={commentEditing}
