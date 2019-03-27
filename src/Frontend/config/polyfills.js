@@ -1,11 +1,5 @@
 'use strict';
 
-require('es6-promise').polyfill();
-require('promise.prototype.finally');
-
-// const Promise = require('es6-promise');
-const Promise = require('es6-promise').Promise;
-
 if (typeof Promise === 'undefined') {
   // Rejection tracking prevents a common issue where React gets into an
   // inconsistent state due to an error, but it gets swallowed by a Promise,
@@ -14,11 +8,7 @@ if (typeof Promise === 'undefined') {
   window.Promise = require('promise/lib/es6-extensions.js');
 }
 
-if (!('Promise' in window)) {
-	window.Promise = Promise;
-} else if (!('finally' in window.Promise.prototype)) {
-	window.Promise.prototype.finally = Promise.prototype.finally;
-}
+require('promise.prototype.finally').shim();
 
 // fetch() polyfill for making API calls.
 require('whatwg-fetch');
