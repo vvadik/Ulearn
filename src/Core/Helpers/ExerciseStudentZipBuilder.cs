@@ -63,13 +63,24 @@ namespace Ulearn.Core.Helpers
 		
 		public static IEnumerable<FileContent> ResolveCsprojLinks(FileInfo csprojFile, string toolsVersion)
 		{
-			var project = new Project(csprojFile.FullName, null, toolsVersion, new ProjectCollection());
-			var filesToCopy = ProjModifier.ReplaceLinksWithItemsAndReturnWhatToCopy(project);
-			foreach (var fileToCopy in filesToCopy)
-			{
-				var fullSourcePath = Path.Combine(project.DirectoryPath, fileToCopy.SourceFile);
-				yield return new FileContent { Path = fileToCopy.DestinationFile, Data = File.ReadAllBytes(fullSourcePath) };
-			}
+			
+			return FuncUtils.Using(
+				new ProjectCollection(),
+				projectCollection =>
+				{
+					return Body();
+					IEnumerable<FileContent> Body()
+					{
+						var project = new Project(csprojFile.FullName, null, toolsVersion, projectCollection);
+						var filesToCopy = ProjModifier.ReplaceLinksWithItemsAndReturnWhatToCopy(project);
+						foreach (var fileToCopy in filesToCopy)
+						{
+							var fullSourcePath = Path.Combine(project.DirectoryPath, fileToCopy.SourceFile);
+							yield return new FileContent { Path = fileToCopy.DestinationFile, Data = File.ReadAllBytes(fullSourcePath) };
+						}
+					}
+				}, 
+				projectCollection => projectCollection.UnloadAllProjects());
 		}
 	}
 }

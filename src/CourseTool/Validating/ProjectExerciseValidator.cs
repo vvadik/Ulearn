@@ -6,6 +6,7 @@ using Microsoft.Build.Evaluation;
 using Microsoft.VisualBasic.FileIO;
 using RunCsJob;
 using RunCsJob.Api;
+using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses.Slides;
@@ -163,9 +164,15 @@ namespace uLearn.CourseTool.Validating
 				ReportErrorIfStudentsZipHasWrongAnswerOrSolutionFiles(tempExFolder);
 
 				var csprojFile = tempExFolder.GetFile(ex.CsprojFileName);
-				var csproj = new Project(csprojFile.FullName, null, null, new ProjectCollection());
-				ReportErrorIfCsprojHasUserCodeOfNotCompileType(tempExFolder, csproj);
-				ReportErrorIfCsprojHasWrongAnswerOrSolutionItems(tempExFolder, csproj);
+				FuncUtils.Using(
+					new ProjectCollection(),
+					projectCollection =>
+					{
+						var csproj = new Project(csprojFile.FullName, null, null, projectCollection);
+						ReportErrorIfCsprojHasUserCodeOfNotCompileType(tempExFolder, csproj);
+						ReportErrorIfCsprojHasWrongAnswerOrSolutionItems(tempExFolder, csproj);
+					}, 
+					projectCollection => projectCollection.UnloadAllProjects());
 
 				if (!ex.StudentZipIsCompilable)
 					return;
