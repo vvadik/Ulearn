@@ -19,15 +19,8 @@ class Comment extends Component {
 	ref = React.createRef();
 
 	componentDidMount() {
-		this.locationHashChange();
-
-		window.addEventListener("hashchange", this.locationHashChange, false);
-	}
-
-	locationHashChange = () => {
 		if (window.location.hash === `#comment-${this.props.comment.id}`) {
 			scrollIntoView(this.ref);
-			window.history.pushState({}, '', window.location.pathname);
 		}
 	};
 
@@ -42,6 +35,7 @@ class Comment extends Component {
 
 		return (
 			<div className={styles.comment} ref={this.ref}>
+				<a className={styles.anchor} name={`comment-${this.props.comment.id}`} href="#"/>
 				{canViewProfiles ? <Link href={profileUrl}><Avatar user={comment.author} size='big' /></Link> :
 					<Avatar user={comment.author} size='big' />}
 				<div className={styles.content}>

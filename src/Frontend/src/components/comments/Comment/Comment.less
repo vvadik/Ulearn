@@ -1,5 +1,7 @@
 @import "./../../../variables.less";
 
+@headerWithDividerHeight: 60px;
+
 button {
   outline: none;
 }
@@ -9,6 +11,7 @@ button {
   flex-direction: row;
   width: 100%;
   word-wrap: break-word;
+  position: relative;
 }
 
 .content {
@@ -70,4 +73,9 @@ button {
   font-weight: 400;
   margin: 0 20px 0 5px;
   font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+}
+
+.anchor {
+  position: absolute;
+  top: -@headerWithDividerHeight;
 }
