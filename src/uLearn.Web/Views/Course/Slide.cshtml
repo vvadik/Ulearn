@@ -110,6 +110,7 @@
 				@Html.Action("SlideComments", "Comments", new { courseId = Model.CourseId, slideId = Model.Slide.Id, showOnlyInstructorsOnlyComments = true})
 			}
 			
+			@Html.Partial("~/Views/Shared/_Footer.cshtml")
 		</div>
 	</div>
 </div>
