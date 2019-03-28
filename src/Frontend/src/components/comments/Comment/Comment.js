@@ -19,10 +19,17 @@ class Comment extends Component {
 	ref = React.createRef();
 
 	componentDidMount() {
+		this.locationHashChange();
+
+		window.addEventListener("hashchange", this.locationHashChange, false);
+	}
+
+	locationHashChange = () => {
 		if (window.location.hash === `#comment-${this.props.comment.id}`) {
 			scrollIntoView(this.ref);
+			window.history.pushState({}, '', window.location.pathname);
 		}
-	}
+	};
 
 	render() {
 		const {actions, children, commentEditing, comment, userRoles,user, slideType, getUserSolutionsUrl} = this.props;
