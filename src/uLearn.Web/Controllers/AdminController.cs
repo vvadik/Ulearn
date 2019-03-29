@@ -19,7 +19,6 @@ using Microsoft.VisualBasic.FileIO;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
-using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
@@ -829,8 +828,8 @@ namespace uLearn.Web.Controllers
 			log.Info($"Создаю шаблон сертификата «{name}» для курса {courseId}");
 			var archiveName = SaveUploadedTemplate(archive);
 			var template = await certificatesRepo.AddTemplate(courseId, name, archiveName);
+			await LoadUploadedTemplateToBD(archiveName, template.Id).ConfigureAwait(false);
 			log.Info($"Создал шаблон, Id = {template.Id}, путь к архиву {template.ArchiveName}");
-
 			return RedirectToAction("Certificates", new { courseId });
 		}
 
@@ -850,6 +849,12 @@ namespace uLearn.Web.Controllers
 			return archiveName;
 		}
 
+		private async Task LoadUploadedTemplateToBD(string archiveName, Guid templateId)
+		{
+			var content = await certificateGenerator.GetTemplateArchivePath(archiveName).ReadAllContentAsync().ConfigureAwait(false);
+			await certificatesRepo.AddCertificateTemplateArchive(archiveName, templateId, content).ConfigureAwait(false);
+		}
+
 		[HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public async Task<ActionResult> EditCertificateTemplate(string courseId, Guid templateId, string name, HttpPostedFileBase archive)
@@ -863,6 +868,7 @@ namespace uLearn.Web.Controllers
 			if (archive != null && archive.ContentLength > 0)
 			{
 				var archiveName = SaveUploadedTemplate(archive);
+				await LoadUploadedTemplateToBD(archiveName, template.Id).ConfigureAwait(false);
 				log.Info($"Загружен новый архив в {archiveName}");
 				await certificatesRepo.ChangeTemplateArchiveName(templateId, archiveName);
 			}

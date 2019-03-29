@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
+using Database.Migrations;
 using Database.Models;
 using Newtonsoft.Json;
 
@@ -119,6 +120,18 @@ namespace Database.DataContexts
 		public async Task RemoveCertificate(Certificate certificate)
 		{
 			certificate.IsDeleted = true;
+			await db.SaveChangesAsync();
+		}
+
+		public async Task AddCertificateTemplateArchive(string archiveName, Guid certificateTemplateId, byte[] content)
+		{
+			var archive = new CertificateTemplateArchive
+			{
+				ArchiveName = archiveName,
+				CertificateTemplateId = certificateTemplateId,
+				Content = content
+			};
+			db.CertificateTemplateArchives.Add(archive);
 			await db.SaveChangesAsync();
 		}
 	}
