@@ -169,16 +169,6 @@ namespace uLearn.Web.Controllers
 			return File(courseManager.GetCourseVersionFile(versionId).FullName, "application/zip", packageName);
 		}
 		
-		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
-		public ActionResult DownloadCourseFile(string courseId)
-		{
-			var content = coursesRepo.GetCourseFile(courseId)?.File;
-			if(content == null)
-				return new HttpStatusCodeResult(HttpStatusCode.NotFound);
-			var packageName = courseManager.GetPackageName(courseId);
-			return File(content, "application/zip", packageName);
-		}
-
 		private async Task NotifyAboutCourseVersion(string courseId, Guid versionId, string userId)
 		{
 			var notification = new UploadedPackageNotification
@@ -242,6 +232,8 @@ namespace uLearn.Web.Controllers
 			var userId = User.Identity.GetUserId();
 			await coursesRepo.AddCourseVersion(courseId, versionId, userId).ConfigureAwait(false);
 			await coursesRepo.MarkCourseVersionAsPublished(versionId).ConfigureAwait(false);
+			var courseFile = courseManager.GetStagingCourseFile(courseId);
+			await coursesRepo.AddCourseFile(courseId, versionId, courseFile.ReadAllContent()).ConfigureAwait(false);
 			await NotifyAboutPublishedCourseVersion(courseId, versionId, userId).ConfigureAwait(false);
 			
 			return RedirectToAction("Packages", new { courseId, onlyPrivileged = true });
@@ -1205,6 +1197,23 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> EnableStyleValidation(StyleErrorType errorType, bool isEnabled)
 		{
 			await styleErrorsRepo.EnableStyleErrorAsync(errorType, isEnabled);
+			return Json(new { status = "ok" });
+		}
+		
+		[SysAdminsOnly]
+		[HttpPost]
+		public async Task<ActionResult> UploadPublishedCoursesToBd()
+		{
+			var courses = courseManager.GetCourses();
+			foreach (var course in courses)
+			{
+				var publishedVersion = coursesRepo.GetPublishedCourseVersion(course.Id);
+				if(publishedVersion == null)
+					continue;
+				var fileInfo = courseManager.GetStagingCourseFile(course.Id);
+				var content = await fileInfo.ReadAllContentAsync().ConfigureAwait(false);
+				await coursesRepo.AddCourseFile(course.Id, publishedVersion.Id, content).ConfigureAwait(false);
+			}
 			return Json(new { status = "ok" });
 		}
 	}
