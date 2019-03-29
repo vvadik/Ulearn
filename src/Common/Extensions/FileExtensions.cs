@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Ionic.Zip;
 using Newtonsoft.Json;
@@ -29,6 +30,17 @@ namespace Ulearn.Common.Extensions
 		public static byte[] ReadAllContent(this FileInfo file)
 		{
 			return File.ReadAllBytes(file.FullName);
+		}
+		
+		public static async Task<byte[]> ReadAllContentAsync(this FileInfo file)
+		{
+			byte[] result;
+			using (var stream = File.Open(file.FullName, FileMode.Open))
+			{
+				result = new byte[stream.Length];
+				await stream.ReadAsync(result, 0, (int)stream.Length);
+			}
+			return result;
 		}
 
 		public static T DeserializeJson<T>(this string content)

@@ -143,8 +143,12 @@ namespace Ulearn.Core
 			{
 				if (courses.Count != 0)
 					return;
-				log.Info($"Загружаю курсы из {stagedDirectory.FullName}");
 				var courseZips = stagedDirectory.GetFiles("*.zip");
+				var courseIdsWithZips = courseZips.Select(z => GetCourseId(z.FullName));
+				LoadCourseZipsToDiskFromExternalStorage(courseIdsWithZips);
+				
+				log.Info($"Загружаю курсы из {stagedDirectory.FullName}");
+				courseZips = stagedDirectory.GetFiles("*.zip");
 				foreach (var zipFile in courseZips)
 				{
 					log.Info($"Обновляю курс из {zipFile.Name}");
@@ -164,6 +168,11 @@ namespace Ulearn.Core
 			if (firstException != null)
 				throw firstException;
 		}
+
+		protected virtual void LoadCourseZipsToDiskFromExternalStorage(IEnumerable<string> existingOnDiskCourseIds)
+		{
+			// NONE
+		} 
 
 		protected Course ReloadCourse(string courseId)
 		{
