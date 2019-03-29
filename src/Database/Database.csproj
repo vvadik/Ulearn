@@ -749,11 +749,16 @@
     <Compile Include="Migrations\201903111115321_AddCourseFiles.Designer.cs">
       <DependentUpon>201903111115321_AddCourseFiles.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201903291321473_AddCertificateTemplateArchive.cs" />
+    <Compile Include="Migrations\201903291321473_AddCertificateTemplateArchive.Designer.cs">
+      <DependentUpon>201903291321473_AddCertificateTemplateArchive.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
     <Compile Include="Models\Certificate.cs" />
     <Compile Include="Models\CertificateTemplate.cs" />
+    <Compile Include="Models\CertificateTemplateArchive.cs" />
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\CommentLike.cs" />
     <Compile Include="Models\CommentPolicy.cs" />
@@ -1167,6 +1172,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201903111115321_AddCourseFiles.resx">
       <DependentUpon>201903111115321_AddCourseFiles.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201903291321473_AddCertificateTemplateArchive.resx">
+      <DependentUpon>201903291321473_AddCertificateTemplateArchive.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
