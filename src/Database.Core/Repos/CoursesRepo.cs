@@ -168,5 +168,29 @@ namespace Database.Repos
 		{
 			return db.CourseAccesses.Where(a => a.UserId == userId && a.IsEnabled && a.AccessType == accessType).Select(a => a.CourseId).Distinct().ToListAsync();
 		}
+		
+		// Add new and remove old course file
+		public async Task AddCourseFile(string courseId, Guid versionId, byte[] content)
+		{
+			var file = new CourseFile
+			{
+				CourseId = courseId,
+				CourseVersionId = versionId,
+				File = content
+			};
+			db.CourseFiles.RemoveRange(db.CourseFiles.Where(f => f.CourseId.Equals(courseId, StringComparison.OrdinalIgnoreCase)));
+			db.CourseFiles.Add(file);
+			await db.SaveChangesAsync();
+		}
+
+		public Task<CourseFile> GetCourseFileAsync(string courseId)
+		{
+			return db.CourseFiles.FirstOrDefaultAsync(f => f.CourseId.Equals(courseId, StringComparison.OrdinalIgnoreCase));
+		}
+		
+		public Task<List<CourseFile>> GetCourseFilesAsync(IEnumerable<string> exceptCourseIds)
+		{
+			return db.CourseFiles.Where(a => !exceptCourseIds.Contains(a.CourseId)).ToListAsync();
+		}
 	}
 }

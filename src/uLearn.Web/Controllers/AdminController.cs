@@ -172,7 +172,7 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public ActionResult DownloadCourseFile(string courseId)
 		{
-			var content = coursesRepo.GetCourseFile(courseId);
+			var content = coursesRepo.GetCourseFile(courseId)?.File;
 			if(content == null)
 				return new HttpStatusCodeResult(HttpStatusCode.NotFound);
 			var packageName = courseManager.GetPackageName(courseId);
