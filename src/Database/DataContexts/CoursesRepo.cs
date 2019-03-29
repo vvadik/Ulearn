@@ -9,6 +9,7 @@ using Database.Models;
 using JetBrains.Annotations;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
 
 namespace Database.DataContexts
 {
@@ -137,7 +138,7 @@ namespace Database.DataContexts
 			return db.CourseAccesses.Any(a => a.CourseId == courseId && a.UserId == userId && a.AccessType == accessType && a.IsEnabled);
 		}
 		
-		// Add new and remove old course files 
+		// Add new and remove old course file
 		public async Task AddCourseFile(string courseId, Guid versionId, byte[] content)
 		{
 			var file = new CourseFile
@@ -152,9 +153,14 @@ namespace Database.DataContexts
 		}
 
 		[CanBeNull]
-		public byte[] GetCourseFile(string courseId)
+		public CourseFile GetCourseFile(string courseId)
 		{
-			return db.CourseFiles.FirstOrDefault(f => f.CourseId.Equals(courseId, StringComparison.OrdinalIgnoreCase))?.File;
+			return db.CourseFiles.FirstOrDefault(f => f.CourseId.Equals(courseId, StringComparison.OrdinalIgnoreCase));
+		}
+		
+		public List<CourseFile> GetCourseFiles(IEnumerable<string> existingOnDiskCourseIds)
+		{
+			return db.CourseFiles.Where(a => !existingOnDiskCourseIds.Contains(a.CourseId)).ToList();
 		}
 	}
 }

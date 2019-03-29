@@ -25,5 +25,8 @@ namespace Database.Repos
 		Task<List<CourseAccess>> GetUserAccessesAsync(string userId);
 		Task<List<string>> GetPublishedCourseIdsAsync();
 		Task<List<string>> GetCoursesUserHasAccessTo(string userId, CourseAccessType accessType);
+		Task AddCourseFile(string courseId, Guid versionId, byte[] content);
+		Task<CourseFile> GetCourseFileAsync(string courseId);
+		Task<List<CourseFile>> GetCourseFilesAsync(IEnumerable<string> exceptCourseIds);
 	}
 }
