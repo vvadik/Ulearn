@@ -84,7 +84,7 @@ namespace Notifications
 			}
 			catch (Exception e)
 			{
-				log.Error($"Can\'t send message via Spam.API to {to} with subject {subject}", e);
+				log.Warn($"Can\'t send message via Spam.API to {to} with subject {subject}", e);
 				metricSender.SendCount("send_email.fail");
 				metricSender.SendCount($"send_email.fail.to.{recipientEmailMetricName}");
 				throw;
