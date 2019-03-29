@@ -100,7 +100,7 @@ const fakeCommentsApi = {
 };
 
 storiesOf("Comments/CommentsList", module)
-.add("список комментариев", () => (
+.add("comments list", () => (
 	<CommentsList
 		slideType={"exercise"}
 		comments={comments}

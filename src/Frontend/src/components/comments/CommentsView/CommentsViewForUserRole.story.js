@@ -10,7 +10,7 @@ const comments = [
 		renderedText: "Решать эти задачи <b>можно</b> прямо в браузере, а специальная проверяющая система тут же проверит ваше решение.",
 		author: {
 			"id": "11",
-			"visibleName": "Louisa",
+			"visibleName": "Maria",
 			"avatarUrl": null,
 		},
 		publishTime: "2019-01-18T14:12:41.947",
@@ -23,7 +23,7 @@ const comments = [
 				id: 2000,
 				author: {
 					"id": "10",
-					"visibleName": "Maria",
+					"visibleName": "Pavel",
 					"avatarUrl": "https://staff.skbkontur.ru/content/images/default-user-woman.png",
 				},
 				text: "Я **не согласна**",
@@ -39,7 +39,7 @@ const comments = [
 			{
 				id: 2001,
 				author: {
-					"id": "11",
+					"id": "13",
 					"visibleName": "Kate",
 					"avatarUrl": "https://staff.skbkontur.ru/content/images/default-user-woman.png",
 				},

@@ -68,7 +68,8 @@ class Comment extends Component {
 					canViewStudentsGroup={canViewStudentsGroup}
 					comment={comment} />
 				{(user.isAuthenticated && (user.id === comment.author.id ||
-					this.canModerateComments(userRoles, ACCESSES.editPinAndRemoveComments))) &&
+					this.canModerateComments(userRoles, ACCESSES.editPinAndRemoveComments) ||
+					this.canModerateComments(userRoles, ACCESSES.viewAllStudentsSubmissions))) &&
 				<KebabActions
 					user={user}
 					url={getUserSolutionsUrl(comment.author.id)}

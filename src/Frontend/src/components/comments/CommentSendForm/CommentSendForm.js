@@ -124,7 +124,6 @@ CommentSendForm.propTypes = {
 	author: userType,
 	commentId: PropTypes.number,
 	handleSubmit: PropTypes.func,
-	handleAddNewComment: PropTypes.func,
 	isSuccessSend: PropTypes.string,
 	isForInstructors: PropTypes.bool,
 	sending: PropTypes.bool,

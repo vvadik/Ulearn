@@ -17,9 +17,9 @@ export const ACCESSES = {
 	viewAllProfiles: 'viewAllProfiles',
 	viewAllGroupMembers: 'viewAllGroupMembers',
 	editPinAndRemoveComments: 'editPinAndRemoveComments',
-	viewAllStudentsSubmissions: 'ViewAllStudentsSubmissions',
-	addAndRemoveInstructors: 'AddAndRemoveInstructors',
-	apiViewCodeReviewStatistics: 'ApiViewCodeReviewStatistics',
+	viewAllStudentsSubmissions: 'viewAllStudentsSubmissions',
+	addAndRemoveInstructors: 'addAndRemoveInstructors',
+	apiViewCodeReviewStatistics: 'apiViewCodeReviewStatistics',
 };
 
 export const SLIDETYPE = {

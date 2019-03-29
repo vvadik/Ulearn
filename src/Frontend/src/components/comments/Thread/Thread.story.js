@@ -1,6 +1,6 @@
-import React from 'react';
-import { storiesOf } from '@storybook/react';
-import { action } from '@storybook/addon-actions';
+import React from "react";
+import { storiesOf } from "@storybook/react";
+import { action } from "@storybook/addon-actions";
 import Thread from "./Thread";
 
 const user = {
@@ -29,16 +29,15 @@ const reply = {
 };
 
 const actions = {
-	handleLikeClick: action('likeComment'),
-	handleCorrectAnswerMark: action('correctMark'),
-	handleApprovedMark: action('approvedMark'),
-	handlePinnedToTopMark: action('pinnedToTopMark'),
-	handleEditComment: action('editComment'),
-	handleAddReplyComment: action('addReplyComment'),
-	handleDeleteComment: action('deleteComment'),
-	handleShowEditForm: action('showEditForm'),
-	handleShowReplyForm: action('showReplyForm'),
-	// handleSubmitComment: this.handleSubmitComment,
+	handleLikeClick: action("likeComment"),
+	handleCorrectAnswerMark: action("correctMark"),
+	handleApprovedMark: action("approvedMark"),
+	handlePinnedToTopMark: action("pinnedToTopMark"),
+	handleEditComment: action("editComment"),
+	handleAddReplyComment: action("addReplyComment"),
+	handleDeleteComment: action("deleteComment"),
+	handleShowEditForm: action("showEditForm"),
+	handleShowReplyForm: action("showReplyForm"),
 };
 
 const comment = {
@@ -79,8 +78,8 @@ function getUserSolutionUrl(userId) {
 	return `https://dev.ulearn.me/Analytics/UserSolutions?courseId=BasicProgramming&slideId=90bcb61e-57f0-4baa-8bc9-10c9cfd27f58&userId=${userId}`;
 }
 
-storiesOf('Comments/Thread', module)
-.add('комментарий с ответами', () => (
+storiesOf("Comments/Thread", module)
+.add("comment with replies", () => (
 	<Thread
 		comment={comment}
 		user={user}
@@ -89,4 +88,4 @@ storiesOf('Comments/Thread', module)
 		commentEditing={commentEditing}
 		reply={reply}
 		actions={actions} />
-), {viewport: 'desktop'});
+), {viewport: "desktop"});

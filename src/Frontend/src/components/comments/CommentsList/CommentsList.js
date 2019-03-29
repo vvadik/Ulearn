@@ -375,8 +375,6 @@ class CommentsList extends Component {
 	handleAddReplyComment = async (commentId, text) => {
 		const {commentsApi, courseId, slideId, forInstructors} = this.props;
 
-		this.updateComment(commentId, () => ({text}));
-
 		this.setState({
 			animation: true,
 			reply: {

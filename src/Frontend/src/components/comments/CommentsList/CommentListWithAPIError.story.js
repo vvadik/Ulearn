@@ -122,7 +122,7 @@ storiesOf("Comments/CommentsList", module)
 		slideId={"90bcb61e-57f0-4baa-8bc9-10c9cfd27f58"}
 		commentsApi={brokenCommentsApi} />
 ), {viewport: "desktop"})
-.add("api delete comment error", () => (
+.add("api request error", () => (
 	<CommentsList
 		slideType={"exercise"}
 		comments={comments}
