@@ -2,10 +2,6 @@
 
 @headerWithDividerHeight: 60px;
 
-button {
-  outline: none;
-}
-
 .comment {
   display: flex;
   flex-direction: row;
@@ -31,51 +27,13 @@ button {
 .text {
   margin: 10px 0 5px;
   width: 95%;
-}
 
-.comment p  {
   @media(max-width: @maxPhoneWidth) {
     margin: 0;
   }
 }
 
-.actions {
-  display: flex;
-  justify-content: flex-start;
-  align-items: baseline;
-  margin-top: 5px;
-  cursor: pointer;
-}
-
-.userButton {
-  display: none;
-  cursor: pointer;
-}
-
-.sendAnswer {
-  border: 0;
-  background: transparent;
-  color: #3072C4;
-  padding: 0;
-  margin-right: 20px;
-  cursor: pointer;
-  height: 20px;
-}
-
-.buttonText {
-  display: inline-block;
-  margin-left: 5px;
-  font-size: 13px;
-}
-
-.linkText {
-  font-size: 13px;
-  font-weight: 400;
-  margin: 0 20px 0 5px;
-  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
-}
-
-.anchor {
+.commentAnchor {
   position: absolute;
   top: -@headerWithDividerHeight;
 }

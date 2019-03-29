@@ -1,12 +1,12 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { userType, userRoles, comment, commentStatus } from "../commonPropTypes";
-import { TransitionGroup, CSSTransition } from 'react-transition-group';
+import { TransitionGroup, CSSTransition } from "react-transition-group";
 import Comment from "../Comment/Comment";
 import CommentSendForm from "../CommentSendForm/CommentSendForm";
-
-import styles from './Thread.less';
 import { Mobile, NotMobile } from "../../../utils/responsive";
+
+import styles from "./Thread.less";
 
 class Thread extends Component {
 
@@ -37,15 +37,15 @@ class Thread extends Component {
 						{this.renderReplies(comment)}
 					</NotMobile>
 					{(isParentComment && comment.id === this.props.reply.commentId) &&
-						<div className={styles.replyForm}>
-							<CommentSendForm
-								commentId={comment.id}
-								sending={reply.sending}
-								author={user}
-								submitTitle='Отправить'
-								onCancel={() => actions.handleShowReplyForm(null)}
-								handleSubmit={actions.handleAddReplyComment} />
-						</div>}
+					<div className={styles.replyForm}>
+						<CommentSendForm
+							commentId={comment.id}
+							sending={reply.sending}
+							author={user}
+							submitTitle="Отправить"
+							onCancel={() => actions.handleShowReplyForm(null)}
+							handleSubmit={actions.handleAddReplyComment} />
+					</div>}
 				</Comment>
 				<Mobile>
 					{this.renderReplies(comment)}
@@ -86,12 +86,13 @@ class Thread extends Component {
 Thread.propTypes = {
 	user: userType.isRequired,
 	userRoles: userRoles.isRequired,
+	slideType: PropTypes.string,
 	comment: comment.isRequired,
 	reply: commentStatus,
 	commentEditing: commentStatus,
 	actions: PropTypes.objectOf(PropTypes.func),
+	animation: PropTypes.bool,
 	getUserSolutionsUrl: PropTypes.func,
-	slideType: PropTypes.string,
 };
 
 export default Thread;

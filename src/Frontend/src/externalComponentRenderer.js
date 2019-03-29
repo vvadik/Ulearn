@@ -24,15 +24,15 @@ import CommentSendForm from "./components/comments/CommentSendForm/CommentSendFo
 
 /* Define names for all components you want to use */
 const components = {
-	'CommentsView': CommentsView,
-	'CommentsList': CommentsList,
-	'Comment': Comment,
-	'CommentSendForm': CommentSendForm,
+	"CommentsView": CommentsView,
+	"CommentsList": CommentsList,
+	"Comment": Comment,
+	"CommentSendForm": CommentSendForm,
 };
 
 window.renderReactComponent = function (componentType, element, props) {
 	if (components[componentType] === undefined) {
-		throw new Error('Unknown component type: ' + componentType + '. Allowed types are: [' + Object.keys(components).join(", ") + "]");
+		throw new Error("Unknown component type: " + componentType + ". Allowed types are: [" + Object.keys(components).join(", ") + "]");
 	}
 
 	let Component = components[componentType];

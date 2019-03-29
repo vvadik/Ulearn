@@ -1,24 +1,12 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { userRoles, user } from "../commonPropTypes";
+import api from "../../../api";
+import { TABS, ROLES } from "../../../consts/general";
 import Tabs from "@skbkontur/react-ui/components/Tabs/Tabs";
 import CommentsList from "../CommentsList/CommentsList";
-import CommentPolicySettings from "./CommentPolicySettings";
-import api from "../../../api";
 
-import styles from './CommentsView.less';
-
-const TABS = {
-	allComments: 'allComments',
-	instructorsComments: 'instructorsComments',
-};
-
-const ROLES = {
-	systemAdministrator: 'isSystemAdministrator',
-	courseAdmin: 'courseAdmin',
-	instructor: 'instructor',
-	student: 'student',
-};
+import styles from "./CommentsView.less";
 
 class CommentsView extends Component {
 	constructor(props) {
@@ -26,7 +14,7 @@ class CommentsView extends Component {
 
 		this.state = {
 			instructorComments: [],
-			activeTab: "allComments",
+			activeTab: TABS.allComments,
 			openModal: false,
 		};
 
@@ -38,20 +26,21 @@ class CommentsView extends Component {
 	};
 
 	componentDidMount() {
-		const { courseId, slideId, userRoles } = this.props;
+		const {courseId, slideId, userRoles} = this.props;
+
 		if (this.isInstructor(userRoles))
 			this.loadComments(courseId, slideId);
 	};
 
 	loadComments = (courseId, slideId) => {
 		this.props.commentsApi.getComments(courseId, slideId, true)
-			.then(json => {
-				let comments = json.topLevelComments;
-				this.setState({
-					instructorComments: comments,
-				});
-			})
-			.catch(console.error);
+		.then(json => {
+			let comments = json.topLevelComments;
+			this.setState({
+				instructorComments: comments,
+			});
+		})
+		.catch(console.error);
 	};
 
 	render() {
@@ -60,7 +49,6 @@ class CommentsView extends Component {
 		return (
 			<div className={styles.wrapper}>
 				{this.renderHeader()}
-				{this.state.openModal && <CommentPolicySettings handleOpenModal={this.handleOpenModal} />}
 				<div className={styles.commentsContainer} key={this.state.activeTab}>
 					<CommentsList
 						slideType={slideType}
@@ -79,16 +67,13 @@ class CommentsView extends Component {
 
 	renderHeader() {
 		const {userRoles} = this.props;
-		const {activeTab } = this.state;
+		const {activeTab} = this.state;
 		const commentsCount = this.state.instructorComments.length;
 
 		return (
 			<header className={styles.header} ref={this.headerRef}>
 				<div className={styles.headerRow}>
 					<h1 className={styles.headerName}>Комментарии</h1>
-					{/*{this.isCourseAdmin(userRoles) &&*/}
-					{/*<Button size="medium" icon={<Icon.Settings />}*/}
-							{/*onClick={() => this.handleOpenModal(true)}>Настроить</Button>}*/}
 				</div>
 				{this.isInstructor(userRoles) &&
 				<div className={styles.tabs}>
@@ -96,8 +81,8 @@ class CommentsView extends Component {
 						<Tabs.Tab id={TABS.allComments}>К слайду</Tabs.Tab>
 						<Tabs.Tab id={TABS.instructorsComments}>
 							Для преподавателей
-							{activeTab === TABS.allComments &&
-							<span className={styles.commentsCount}>{commentsCount}</span>}
+							{(activeTab === TABS.allComments && commentsCount > 0) &&
+							<span className={styles.commentsAmount}>{commentsCount}</span>}
 						</Tabs.Tab>
 					</Tabs>
 				</div>}
@@ -120,17 +105,10 @@ class CommentsView extends Component {
 			activeTab: id,
 		});
 
-
 		if (id === TABS.instructorsComments) {
-			window.history.pushState ? window.history.pushState({}, '', window.location.pathname) :
-			window.location.hash = '';
+			window.history.pushState ? window.history.pushState({}, "", window.location.pathname) :
+				window.location.hash = "";
 		}
-	};
-
-	handleOpenModal = (openModal) => {
-		this.setState({
-			openModal: openModal,
-		})
 	};
 }
 

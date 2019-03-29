@@ -7,6 +7,6 @@ export default function scrollIntoView(element) {
 	window.scrollTo({
 		left: 0,
 		top: element.current.offsetTop - headerHeight - dividerHeight,
-		behavior: "smooth"
+		behavior: 'smooth'
 	});
 }

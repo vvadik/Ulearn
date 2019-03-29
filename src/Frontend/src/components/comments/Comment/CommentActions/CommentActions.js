@@ -1,17 +1,18 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { comment, userRoles, userType } from "../../commonPropTypes";
-import uuid from 'uuid';
 import Link from "@skbkontur/react-ui/components/Link/Link";
 import Icon from "@skbkontur/react-icons";
+import { ACCESSES, SLIDETYPE } from "../../../../consts/general";
+import uuid from "uuid";
 import { NotMobile } from "../../../../utils/responsive";
 
-import styles from "../Comment.less";
+import styles from "./CommentActions.less";
 
 const Button = ({onClick, icon, children}) => (
-	<button type="button" className={styles.sendAnswer} onClick={onClick}>
+	<button type="button" className={styles.reply} onClick={onClick}>
 		<Icon name={icon} />
-		<span className={styles.buttonText}>{children}</span>
+		<span className={styles.text}>{children}</span>
 	</button>
 );
 
@@ -34,29 +35,29 @@ export default function CommentActions(props) {
 			<Button
 				key={uuid()}
 				onClick={() => actions.handleShowReplyForm(commentId)}
-				icon='ArrowCorner1'>
-			Ответить
+				icon="ArrowCorner1">
+				Ответить
 			</Button>);
 	}
 
-	if (user.id === comment.author.id || canModerateComments(userRoles, 'editPinAndRemoveComments')) {
+	if (user.id === comment.author.id || canModerateComments(userRoles, ACCESSES.editPinAndRemoveComments)) {
 		commentActions.push(
 			<NotMobile key={uuid()}>
 				<Button
 					onClick={() => actions.handleShowEditForm(comment.id)}
-					icon='Edit'>
-				Редактировать
+					icon="Edit">
+					Редактировать
 				</Button>
 			</NotMobile>);
 	}
 
-	if (slideType === 'exercise' && canModerateComments(userRoles, 'viewAllStudentsSubmissions')) {
+	if (slideType === SLIDETYPE.exercise && canModerateComments(userRoles, ACCESSES.viewAllStudentsSubmissions)) {
 		commentActions.push(
 			<NotMobile key={uuid()}>
 				<ActionLink
 					url={url}
-					icon='DocumentLite'>
-				Посмотреть решения
+					icon="DocumentLite">
+					Посмотреть решения
 				</ActionLink>
 			</NotMobile>);
 	}

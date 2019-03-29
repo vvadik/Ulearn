@@ -1,9 +1,9 @@
-import React from 'react';
-import { storiesOf } from '@storybook/react';
-import { action } from '@storybook/addon-actions';
+import React from "react";
+import { storiesOf } from "@storybook/react";
 import CommentsList from "./CommentsList";
 
 const user = {
+	"isAuthenticated": true,
 	"id": "11",
 	"visibleName": "Pavel",
 	"avatarUrl": null,
@@ -12,9 +12,7 @@ const user = {
 const userRoles = {
 	"isSystemAdministrator": true,
 	"courseRole": "Student",
-	"courseAccesses": [{
-		accesses: null,
-	}],
+	"courseAccesses": [],
 };
 
 const comments = [
@@ -93,23 +91,23 @@ function getUserSolutionsUrl(userId) {
 
 const fakeCommentsApi = {
 	getComments: () => Promise.resolve({topLevelComments: comments}),
-	getComment: () => Promise.resolve(console.log('API: get comment')),
-	addComment: () => Promise.resolve(console.log('API: added comment')),
-	deleteComment: () => Promise.resolve(console.log('API: delete comment')),
-	updateComment: () => Promise.resolve(console.log('API: update comment')),
-	likeComment: () => Promise.resolve(console.log('API: like comment')),
-	dislikeComment: () => Promise.resolve(console.log('API: dislike comment')),
-
+	getComment: () => Promise.resolve(console.log("API: get comment")),
+	addComment: () => Promise.resolve(console.log("API: added comment")),
+	deleteComment: () => Promise.resolve(console.log("API: delete comment")),
+	updateComment: () => Promise.resolve(console.log("API: update comment")),
+	likeComment: () => Promise.resolve(console.log("API: like comment")),
+	dislikeComment: () => Promise.resolve(console.log("API: dislike comment")),
 };
 
-storiesOf('Comments/CommentsList', module)
-.add('список комментариев', () => (
+storiesOf("Comments/CommentsList", module)
+.add("список комментариев", () => (
 	<CommentsList
+		slideType={"exercise"}
 		comments={comments}
 		getUserSolutionsUrl={getUserSolutionsUrl(user.id)}
 		user={user}
 		userRoles={userRoles}
-		courseId={'BasicProgramming'}
-		slideId={'90bcb61e-57f0-4baa-8bc9-10c9cfd27f58'}
+		courseId={"BasicProgramming"}
+		slideId={"90bcb61e-57f0-4baa-8bc9-10c9cfd27f58"}
 		commentsApi={fakeCommentsApi} />
-), {viewport: 'desktop'});
+), {viewport: "desktop"});

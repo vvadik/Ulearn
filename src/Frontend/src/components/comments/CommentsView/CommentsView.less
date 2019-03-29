@@ -5,6 +5,10 @@
   flex-direction: column;
 }
 
+.commentsContainer {
+  margin-top: 15px;
+}
+
 .header {
   display: flex;
   flex-direction: column;
@@ -12,7 +16,14 @@
 
 }
 
-h1 {
+.headerName {
+  margin: 0;
+  font-family: "Segoe UI", serif;
+  line-height: 40px;
+  font-size: 32px;
+  text-align: center;
+  font-weight: 400;
+
   @media (max-width: @maxPhoneWidth) {
     font-size: 30px;
   }
@@ -24,15 +35,6 @@ h1 {
   justify-content: space-between;
   align-items: center;
   margin: 20px 0 0;
-}
-
-.headerName {
-  margin: 0;
-  font-family: "Segoe UI", serif;
-  line-height: 40px;
-  font-size: 32px;
-  text-align: center;
-  font-weight: 400;
 }
 
 .tabs {
@@ -47,11 +49,7 @@ h1 {
   }
 }
 
-.commentsContainer {
-  margin-top: 15px;
-}
-
-.commentsCount {
+.commentsAmount {
   display: inline-block;
   background: #DADADA;
   border-radius: 100px;

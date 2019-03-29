@@ -1,14 +1,14 @@
-import React from 'react';
+import React from "react";
 import PropTypes from "prop-types";
 import Link from "@skbkontur/react-ui/components/Link/Link";
 import Button from "@skbkontur/react-ui/components/Button/Button";
 import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
 
-import styles from './Stub.less';
+import styles from "./Stub.less";
 
 function Stub(props) {
-	const { courseId, slideId } = props;
-	const urlToRegister =`${window.location.origin}/Account/Register?returnUrl=/Course/${courseId}/${slideId}`;
+	const {courseId, slideId} = props;
+	const urlToRegister = `${window.location.origin}/Account/Register?returnUrl=/Course/${courseId}/${slideId}`;
 	const urlToEnter = `${window.location.origin}/Login?returnUrl=/Course/${courseId}/${slideId}`;
 
 	return (
@@ -17,7 +17,7 @@ function Stub(props) {
 			<Gapped gap={10} vertical>
 				<Link href={urlToRegister}>
 					<Button width={200} use="primary" size="large" type="button" align="center">
-					Зарегистрироваться</Button>
+						Зарегистрироваться</Button>
 				</Link>
 				<Link href={urlToEnter}><Button use="link">Войти</Button></Link>
 			</Gapped>

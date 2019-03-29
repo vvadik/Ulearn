@@ -1,9 +1,7 @@
-import React from 'react';
-import { storiesOf } from '@storybook/react';
-import { withViewport } from '@storybook/addon-viewport';
+import React from "react";
+import { storiesOf } from "@storybook/react";
+import { withViewport } from "@storybook/addon-viewport";
 import CommentsView from "./CommentsView";
-import { addParameters } from '@storybook/react';
-import { action } from "@storybook/addon-actions";
 
 const comments = [
 	{
@@ -91,38 +89,41 @@ const userRoles = {
 
 const fakeCommentsApi = {
 	getComments: () => Promise.resolve({topLevelComments: comments}),
-	addComment: () => Promise.resolve(console.log('API: added comment')),
-	deleteComment: () => Promise.resolve(console.log('API: delete comment')),
-	updateComment: () => Promise.resolve(console.log('API: update comment')),
-	likeComment: () => Promise.resolve(console.log('API: like comment')),
-	dislikeComment: () => Promise.resolve(console.log('API: dislike comment')),
+	addComment: () => Promise.resolve(console.log("API: added comment")),
+	deleteComment: () => Promise.resolve(console.log("API: delete comment")),
+	updateComment: () => Promise.resolve(console.log("API: update comment")),
+	likeComment: () => Promise.resolve(console.log("API: like comment")),
+	dislikeComment: () => Promise.resolve(console.log("API: dislike comment")),
 };
 
-storiesOf('Comments/CommentsView', module)
+storiesOf("Comments/CommentsView", module)
 .addDecorator(withViewport())
-.add('desktop', () => (
+.add("desktop", () => (
 	<CommentsView
+		slideType={"exercise"}
 		user={user}
 		userRoles={userRoles}
-		slideId={'90bcb61e-57f0-4baa-8bc9-10c9cfd27f58'}
-		courseId={'BasicProgramming'}
+		slideId={"90bcb61e-57f0-4baa-8bc9-10c9cfd27f58"}
+		courseId={"BasicProgramming"}
 		commentsApi={fakeCommentsApi} />
-), {viewport: 'desktop'})
+), {viewport: "desktop"})
 .addDecorator(withViewport())
-.add('tablet', () => (
+.add("tablet", () => (
 	<CommentsView
+		slideType={"exercise"}
 		user={user}
 		userRoles={userRoles}
-		slideId={'90bcb61e-57f0-4baa-8bc9-10c9cfd27f58'}
-		courseId={'BasicProgramming'}
+		slideId={"90bcb61e-57f0-4baa-8bc9-10c9cfd27f58"}
+		courseId={"BasicProgramming"}
 		commentsApi={fakeCommentsApi} />
 ), {viewport: "tablet"})
 .addDecorator(withViewport())
-.add('mobile', () => (
+.add("mobile", () => (
 	<CommentsView
+		slideType={"exercise"}
 		user={user}
 		userRoles={userRoles}
-		slideId={'90bcb61e-57f0-4baa-8bc9-10c9cfd27f58'}
-		courseId={'BasicProgramming'}
+		slideId={"90bcb61e-57f0-4baa-8bc9-10c9cfd27f58"}
+		courseId={"BasicProgramming"}
 		commentsApi={fakeCommentsApi} />
 ), {viewport: "mobile"});

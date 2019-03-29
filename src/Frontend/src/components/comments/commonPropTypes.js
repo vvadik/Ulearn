@@ -1,4 +1,4 @@
-import { shape, oneOf, arrayOf, bool, array, number, string } from 'prop-types';
+import { shape, oneOf, arrayOf, bool, array, number, string } from "prop-types";
 
 export const userType = shape({
 	id: string,
@@ -21,7 +21,7 @@ export const user = shape({
 
 export const userRoles = shape({
 	isSystemAdministrator: bool,
-	courseRoles: oneOf(['courseAdmin', 'instructor', 'tester', 'student']),
+	courseRoles: oneOf(["courseAdmin", "instructor", "tester", "student"]),
 	courseAccesses: arrayOf(oneOf(["editPinAndRemoveComments", "viewAllStudentsSubmissions", "addAndRemoveInstructors",
 		"viewAllGroupMembers", "apiViewCodeReviewStatistics"])),
 });

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import BaseTextarea from "@skbkontur/react-ui/components/Textarea/Textarea";
 import { boldIcon, codeIcon, italicIcon } from "../../SVGIcons/SVGIcon";
@@ -8,30 +8,30 @@ import styles from "./MarkdownEditor.less";
 
 const markupByOperation = {
 	bold: {
-		markup: '**',
+		markup: "**",
 		description: "жирный",
 		hotkey: {
-			asText: 'Ctrl + B',
+			asText: "Ctrl + B",
 			ctrl: true,
 			key: "b"
 		},
 		icon: boldIcon,
 	},
 	italic: {
-		markup: '__',
+		markup: "__",
 		description: "курсив",
 		hotkey: {
-			asText: 'Ctrl + I',
+			asText: "Ctrl + I",
 			ctrl: true,
 			key: "i"
 		},
 		icon: italicIcon,
 	},
 	code: {
-		markup: '```',
+		markup: "```",
 		description: "блок кода",
 		hotkey: {
-			asText: 'Alt + Q',
+			asText: "Alt + Q",
 			alt: true,
 			key: "q"
 		},
@@ -43,7 +43,7 @@ const markupByOperation = {
 class Textarea extends BaseTextarea {
 	get selectionRange() {
 		if (!this.node) {
-			throw new Error('Cannot call "selectionRange" on unmounted Input');
+			throw new Error(`Cannot call ${this.selectionRange} on unmounted Input`);
 		}
 
 		return {
@@ -60,11 +60,11 @@ class MarkdownEditor extends Component {
 		const {hasError, text, children, isForInstructors} = this.props;
 
 		return (
-			<React.Fragment>
+			<>
 				<Textarea
 					ref={this.textarea}
 					value={text}
-					width={'100%'}
+					width={"100%"}
 					error={hasError}
 					maxRows={15}
 					rows={4}
@@ -72,13 +72,13 @@ class MarkdownEditor extends Component {
 					onKeyDown={this.handleKeyDown}
 					autoResize
 					placeholder={isForInstructors ? "Комментарий для преподавателей" : "Комментарий"} />
-				<div className={styles.footer}>
+				<div className={styles.formFooter}>
 					{children}
 					<MarkdownButtons
 						markupByOperation={markupByOperation}
 						onClick={this.handleClick} />
 				</div>
-			</React.Fragment>
+			</>
 		)
 	}
 
@@ -109,7 +109,8 @@ class MarkdownEditor extends Component {
 
 		let {finalText, finalSelectionRange} = MarkdownEditor.wrapRangeWithMarkdown(text, range, operation);
 
-		onChange(finalText).then(() => {
+		onChange(finalText)
+		.then(() => {
 			this.textarea.current.setSelectionRange(
 				finalSelectionRange.start,
 				finalSelectionRange.end,
@@ -121,15 +122,17 @@ class MarkdownEditor extends Component {
 		if (typeof text !== "string") {
 			throw new TypeError("text should be a string");
 		}
+
 		if (typeof range !== "object" || range === null
-			|| !('start' in range) || !('end' in range)
-			|| typeof range.start !== 'number' || typeof range.end !== 'number'
-		) {
+			|| !("start" in range) || !("end" in range)
+			|| typeof range.start !== "number" || typeof range.end !== "number") {
 			throw new TypeError("range should be an object with `start` and `end` properties of type `number`");
 		}
+
 		if (range.start < 0 || range.end < range.start || range.end > text.length) {
 			throw new RangeError("range should be within 0 and text.length");
 		}
+
 		const before = text.substr(0, range.start);
 		const target = text.substr(range.start, range.end - range.start);
 		const after = text.substr(range.end);

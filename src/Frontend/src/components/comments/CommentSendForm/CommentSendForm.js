@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { userType } from "../commonPropTypes";
 import Button from "@skbkontur/react-ui/components/Button/Button";
@@ -13,7 +13,7 @@ class CommentSendForm extends Component {
 		super(props);
 
 		this.state = {
-			text: props.text || '',
+			text: props.text || "",
 			error: null,
 			commentId: props.commentId,
 			status: props.isSuccessSend,
@@ -23,11 +23,10 @@ class CommentSendForm extends Component {
 	static getDerivedStateFromProps(props, state) {
 		if (props.commentId !== state.commentId) {
 			return {
-				text: props.text || '',
+				text: props.text || "",
 				commentId: props.commentId,
 			};
 		}
-
 		return null;
 	}
 
@@ -38,15 +37,15 @@ class CommentSendForm extends Component {
 		const {error, text} = this.state;
 
 		return (
-			<div className={styles.commentSendForm}>
+			<div className={styles.formContainer}>
 				{author && (
 					<NotMobile>
 						<div className={styles.avatar}>
-							<Avatar user={author} size='big' />
+							<Avatar user={author} size="big" />
 						</div>
 					</NotMobile>
 				)}
-				<form className={styles.commentSend} onSubmit={this.handleSubmit}>
+				<form className={styles.form} onSubmit={this.handleSubmit}>
 					<MarkdownEditor
 						ref={this.editor}
 						isForInstructors={isForInstructors}
@@ -65,7 +64,7 @@ class CommentSendForm extends Component {
 	}
 
 	renderSubmitButton() {
-		const {submitTitle = 'Оставить комментарий', sending} = this.props;
+		const {submitTitle = "Оставить комментарий", sending} = this.props;
 
 		return (
 			<Button
@@ -79,7 +78,7 @@ class CommentSendForm extends Component {
 	}
 
 	renderCancelButton() {
-		const {onCancel, cancelTitle = 'Отменить'} = this.props;
+		const {onCancel, cancelTitle = "Отменить"} = this.props;
 
 		if (!onCancel) {
 			return null;

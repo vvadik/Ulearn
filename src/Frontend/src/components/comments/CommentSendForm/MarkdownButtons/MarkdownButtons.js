@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Hint from "@skbkontur/react-ui/components/Hint/Hint";
 
@@ -8,6 +8,7 @@ class MarkdownButtons extends Component {
 
 	render() {
 		const {markupByOperation} = this.props;
+
 		return (
 			<div className={styles.markdownButtons}>
 				<span className={styles.markdownText}>Поддерживаем markdown</span>
@@ -21,7 +22,7 @@ class MarkdownButtons extends Component {
 		return (
 			<div key={name}>
 				<Hint pos="top" text={this.renderHint(operation)} disableAnimations={false} useWrapper={true}>
-					<button onClick={this.onClick(operation)} type="button">
+					<button className={styles.button} onClick={this.onClick(operation)} type="button">
 						<svg
 							width={20}
 							height={18}
