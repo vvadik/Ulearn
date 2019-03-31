@@ -4,8 +4,10 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NHunspell;
-using uLearn.Properties;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.CSharp;
+using Ulearn.Core.CSharp.Validators;
+using Ulearn.Core.Properties;
 
 namespace uLearn.CSharp.Validators.SpellingValidator
 {
@@ -115,7 +117,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 			}
 
 			return currentCheckingWord != ""
-				? new SolutionStyleError(tokenWithConcatenatedWords, $"В слове {concatenatedWords} допущена опечатка.")
+				? new SolutionStyleError(StyleErrorType.Misspeling01, tokenWithConcatenatedWords, $"В слове {concatenatedWords} допущена опечатка.")
 				: null;
 		}
 	}
