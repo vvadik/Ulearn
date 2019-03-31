@@ -1,7 +1,7 @@
 ﻿using Telegram.Bot;
-using uLearn.Configuration;
+using Ulearn.Core.Configuration;
 
-namespace uLearn.Telegram
+namespace Ulearn.Core.Telegram
 {
 	public class TelegramBot
 	{

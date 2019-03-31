@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace uLearn.CSharp.Validators
+namespace Ulearn.Core.CSharp.Validators
 {
 	public class NotEmptyCodeValidator : BaseStyleValidator, IStrictValidator
 	{
@@ -13,7 +13,7 @@ namespace uLearn.CSharp.Validators
 			if (!hasCode)
 				return new List<SolutionStyleError>
 				{
-					new SolutionStyleError(userSolution.GetRoot(), "Пустое решение?!")
+					new SolutionStyleError(StyleErrorType.NotEmpty01, userSolution.GetRoot())
 				};
 			
 			return new List<SolutionStyleError>();

@@ -3,7 +3,7 @@ using System.Configuration;
 using System.Threading.Tasks;
 using log4net;
 using Telegram.Bot.Types.Enums;
-using uLearn.Telegram;
+using Ulearn.Core.Telegram;
 
 namespace GiftsGranter
 {

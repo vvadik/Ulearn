@@ -2,11 +2,22 @@
 using System.IO;
 using Microsoft.Extensions.Configuration;
 
-namespace uLearn.Configuration
+namespace Ulearn.Core.Configuration
 {
 	public static class ApplicationConfiguration
 	{
 		public static T Read<T>(IDictionary<string, string> initialData, bool isAppsettingsJsonOptional=false) where T : AbstractConfiguration
+		{
+			var configuration = GetConfiguration(initialData, isAppsettingsJsonOptional);
+			return configuration.Get<T>();
+		}
+		
+		public static T Read<T>(bool isAppsettingsJsonOptional=false) where T : AbstractConfiguration
+		{
+			return Read<T>(new Dictionary<string, string>(), isAppsettingsJsonOptional);
+		}
+
+		public static IConfiguration GetConfiguration(IDictionary<string, string> initialData, bool isAppsettingsJsonOptional=false)
 		{
 			var applicationPath = string.IsNullOrEmpty(Utils.WebApplicationPhysicalPath)
 				? Directory.GetCurrentDirectory()
@@ -16,19 +27,31 @@ namespace uLearn.Configuration
 				.SetBasePath(applicationPath)
 				.AddJsonFile("appsettings.json", optional: isAppsettingsJsonOptional, reloadOnChange: true)
 				.Build();
-			
-			return configuration.Get<T>();
+
+			return configuration;
 		}
 		
-		public static T Read<T>(bool isAppsettingsJsonOptional=false) where T : AbstractConfiguration
+		public static IConfiguration GetConfiguration(bool isAppsettingsJsonOptional=false)
 		{
-			return Read<T>(new Dictionary<string, string>(), isAppsettingsJsonOptional);
+			return GetConfiguration(new Dictionary<string, string>(), isAppsettingsJsonOptional);
 		}
+		
 	}
 	
 	public abstract class AbstractConfiguration
 	{
 		 
+	}
+	
+	public class HostLogConfiguration
+	{
+		public bool Console { get; set; }
+		
+		public string PathFormat { get; set; }
+		
+		public string MinimumLevel { get; set; }
+		
+		public bool EnableEntityFrameworkLogging { get; set; }
 	}
 	
 	public class UlearnConfiguration : AbstractConfiguration
@@ -44,6 +67,8 @@ namespace uLearn.Configuration
 		public string ExerciseStudentZipsDirectory { get; set; }
 		
 		public CertificateConfiguration Certificates { get; set; }
+
+		public string GraphiteServiceName { get; set; }
 	}
 
 	public class TelegramConfiguration

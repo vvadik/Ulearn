@@ -4,10 +4,9 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using uLearn.CSharp.Validators.IndentsValidation;
 using Ulearn.Common.Extensions;
 
-namespace uLearn.CSharp
+namespace Ulearn.Core.CSharp
 {
 	public static class SyntaxExtensions
 	{
@@ -58,6 +57,10 @@ namespace uLearn.CSharp
 
 		public static SyntaxToken Identifier(this MemberDeclarationSyntax syntax)
 		{
+			if (syntax is FieldDeclarationSyntax fieldDeclarationSyntax)
+			{
+				return fieldDeclarationSyntax.Declaration.Variables.FirstOrDefault().Identifier;
+			}
 			return ((dynamic)syntax).Identifier;
 		}
 
@@ -85,7 +88,7 @@ namespace uLearn.CSharp
 		public static IEnumerable<AttributeSyntax> GetAttributes<TAttr>(this MemberDeclarationSyntax node)
 			where TAttr : Attribute
 		{
-			string attrShortName = GetAttributeShortName<TAttr>();
+			var attrShortName = GetAttributeShortName<TAttr>();
 			return node.AttributeLists()
 				.SelectMany(a => a.Attributes)
 				.Where(a => a.Name.ToString() == attrShortName);
@@ -93,7 +96,7 @@ namespace uLearn.CSharp
 
 		public static string GetAttributeShortName<TAttr>()
 		{
-			string attrName = typeof(TAttr).Name;
+			var attrName = typeof(TAttr).Name;
 			return attrName.EndsWith("Attribute") ? attrName.Substring(0, attrName.Length - "Attribute".Length) : attrName;
 		}
 
@@ -138,7 +141,7 @@ namespace uLearn.CSharp
 			return PrettyString((dynamic)node);
 		}
 
-		public static string ToNotIdentedString(this SyntaxNode node)
+		public static string ToNotIndentedString(this SyntaxNode node)
 		{
 			return node.ToString().RemoveCommonNesting();
 		}
@@ -159,13 +162,13 @@ namespace uLearn.CSharp
 		{
 			var braces = tree.GetRoot().DescendantTokens()
 				.Where(t => t.IsKind(SyntaxKind.OpenBraceToken) || t.IsKind(SyntaxKind.CloseBraceToken));
-			var openbracesStack = new Stack<SyntaxToken>();
+			var openBracesStack = new Stack<SyntaxToken>();
 			foreach (var brace in braces)
 			{
 				if (brace.IsKind(SyntaxKind.OpenBraceToken))
-					openbracesStack.Push(brace);
+					openBracesStack.Push(brace);
 				else
-					yield return new BracesPair(openbracesStack.Pop(), brace);
+					yield return new BracesPair(openBracesStack.Pop(), brace);
 			}
 		}
 	}

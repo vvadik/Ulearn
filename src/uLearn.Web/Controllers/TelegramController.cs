@@ -55,7 +55,7 @@ namespace uLearn.Web.Controllers
 
 			switch (update.Type)
 			{
-				case UpdateType.MessageUpdate:
+				case UpdateType.Message:
 					await OnMessage(update.Message);
 					break;
 			}

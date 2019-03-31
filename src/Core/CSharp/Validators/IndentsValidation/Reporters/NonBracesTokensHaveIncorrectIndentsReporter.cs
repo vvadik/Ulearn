@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace uLearn.CSharp.Validators.IndentsValidation.Reporters
+namespace Ulearn.Core.CSharp.Validators.IndentsValidation.Reporters
 {
 	internal static class NonBracesTokensHaveIncorrectIndentsReporter
 	{
@@ -31,10 +31,10 @@ namespace uLearn.CSharp.Validators.IndentsValidation.Reporters
 				var parentStart = parent.GetValidationStartIndexInSpaces();
 				if (rootStart == 0)
 					yield break;
-				var validateIndent = ValidateIndent(rootStatementSyntax, rootStart, parentStart, rootLine, parentLine);
-				if (validateIndent != null)
+				var errorType = GetIndentErrorType(rootStart, parentStart, rootLine, parentLine);
+				if (errorType.HasValue)
 				{
-					yield return new SolutionStyleError(rootStatementSyntax, validateIndent);
+					yield return new SolutionStyleError(errorType.Value, rootStatementSyntax);
 					yield break;
 				}
 			}
@@ -61,18 +61,18 @@ namespace uLearn.CSharp.Validators.IndentsValidation.Reporters
 
 				if (statementClause.HasExcessNewLines())
 				{
-					yield return new SolutionStyleError(statementClause,
-						$"Выражение не должно иметь лишние переносы строк после родителя ({GetNodePosition(rootStatementSyntax)}).");
+					yield return new SolutionStyleError(StyleErrorType.Indents10, statementClause);
 					continue;
 				}
+
 				if (!statementClause.OnSameIndentWithParent.HasValue)
 				{
 					if (statementStart != rootStart)
 					{
-						var report = ValidateIndent(rootStatementSyntax, statementStart, rootStart, statementLine, rootLine);
-						if (report != null)
+						var errorType = GetIndentErrorType(statementStart, rootStart, statementLine, rootLine);
+						if (errorType.HasValue)
 						{
-							yield return new SolutionStyleError(statementClause, report);
+							yield return new SolutionStyleError(errorType.Value, statementClause);
 							continue;
 						}
 					}
@@ -83,8 +83,7 @@ namespace uLearn.CSharp.Validators.IndentsValidation.Reporters
 					{
 						if (statementStart != rootStart)
 						{
-							yield return new SolutionStyleError(statementClause,
-								$"Выражение должно иметь такой же отступ, как у родителя ({GetNodePosition(rootStatementSyntax)}).");
+							yield return new SolutionStyleError(StyleErrorType.Indents11, statementClause);
 							continue;
 						}
 					}
@@ -92,14 +91,15 @@ namespace uLearn.CSharp.Validators.IndentsValidation.Reporters
 					{
 						if (IsAllowedOneLineSyntaxToken(rootEndLine, statementLine, rootStatementSyntax, statementClause))
 							continue;
-						var report = ValidateIndent(rootStatementSyntax, statementStart, rootStart, statementLine, rootLine);
-						if (report != null)
+						var errorType = GetIndentErrorType(statementStart, rootStart, statementLine, rootLine);
+						if (errorType.HasValue)
 						{
-							yield return new SolutionStyleError(statementClause, report);
+							yield return new SolutionStyleError(errorType.Value, statementClause);
 							continue;
 						}
 					}
 				}
+
 				foreach (var nestedError in CheckNonBracesStatements(statementClause))
 					yield return nestedError;
 			}
@@ -121,29 +121,27 @@ namespace uLearn.CSharp.Validators.IndentsValidation.Reporters
 					statementClause.Kind != SyntaxKind.DoStatement;
 		}
 
-		private static string ValidateIndent(
-			SyntaxNodeOrToken root,
-			int statementStart,
+		private static StyleErrorType? GetIndentErrorType(int statementStart,
 			int rootStart,
 			int statementLine,
 			int rootLine)
 		{
 			if (statementLine == rootLine)
 			{
-				return "Выражение должно иметь дополнительный перенос строки " +
-						$"после родителя ({GetNodePosition(root)}).";
+				return StyleErrorType.Indents07;
 			}
+
 			if (statementStart <= rootStart)
 			{
-				return "Выражение должно иметь отступ больше, " +
-						$"чем у родителя ({GetNodePosition(root)}).";
+				return StyleErrorType.Indents08;
 			}
+
 			var delta = statementStart - rootStart;
 			if (delta < 4)
 			{
-				return "Выражение должно иметь отступ не меньше 4 пробелов " +
-						$"относительно родителя ({GetNodePosition(root)}).";
+				return StyleErrorType.Indents09;
 			}
+
 			return null;
 		}
 
@@ -154,13 +152,8 @@ namespace uLearn.CSharp.Validators.IndentsValidation.Reporters
 					|| syntaxKind == SyntaxKind.WhileStatement
 					|| syntaxKind == SyntaxKind.ForStatement
 					|| syntaxKind == SyntaxKind.ForEachStatement
-					|| syntaxKind == SyntaxKind.DoStatement;
-		}
-
-		private static string GetNodePosition(SyntaxNodeOrToken nodeOrToken)
-		{
-			var linePosition = nodeOrToken.GetFileLinePositionSpan().StartLinePosition;
-			return $"cтрока {linePosition.Line + 1}, позиция {linePosition.Character}";
+					|| syntaxKind == SyntaxKind.DoStatement
+					|| syntaxKind == SyntaxKind.UsingStatement;
 		}
 	}
 }

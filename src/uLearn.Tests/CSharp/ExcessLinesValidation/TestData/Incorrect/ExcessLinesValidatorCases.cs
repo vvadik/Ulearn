@@ -60,6 +60,10 @@ namespace uLearn.CSharp.ExcessLinesValidation.TestData.Incorrect
 			}
 
 		}
+		
+		public void SomeMethod12() { SomeMethod11(); }
+		public void SomeMethod13() { SomeMethod11(); }
+		
 	}
 
 	public class SomeClass4
@@ -131,4 +135,26 @@ namespace MyNamespace1
 }
 namespace MyNamespace1
 {
+	public class Foo
+	{
+		public Foo()
+		{
+		}
+		private int Pr { get; set; } = 0;
+	}
+}
+
+namespace MyNamespace1
+{
+	public class IfDefClass
+	{
+		
+#if true
+		public void SomeMethod()
+		{
+		}
+#endif
+
+		private int field;
+	}	
 }

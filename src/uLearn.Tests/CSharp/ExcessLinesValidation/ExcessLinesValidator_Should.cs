@@ -6,8 +6,8 @@ using ApprovalTests.Namers;
 using ApprovalTests.Reporters;
 using FluentAssertions;
 using NUnit.Framework;
-using uLearn.CSharp.Validators;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.CSharp.Validators;
 
 // ReSharper disable InconsistentNaming
 
@@ -44,9 +44,9 @@ namespace uLearn.CSharp.ExcessLinesValidation
 		{
 			var code = CorrectTestDataDir.GetFiles(filename).Single().ContentAsUtf8();
 			var errors = new ExcessLinesValidator().FindErrors(code);
-			if (errors != null)
+			if (errors.Any())
 			{
-				Console.WriteLine(errors);
+				Console.WriteLine(errors.Select(e => e.GetMessageWithPositions().ToList()));
 			}
 			errors.Should().BeNullOrEmpty();
 		}

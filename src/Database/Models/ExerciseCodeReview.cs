@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using JetBrains.Annotations;
 
 namespace Database.Models
 {
@@ -21,6 +22,7 @@ namespace Database.Models
 		/* This field is used only for reviews not attached to specific ManualExerciseChecking */
 		public int? SubmissionId { get; set; }
 		
+		[CanBeNull]
 		public virtual UserExerciseSubmission Submission { get; set; }
 
 		[Required]

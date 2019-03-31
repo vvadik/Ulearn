@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using uLearn.CSharp.Validators;
+using Ulearn.Core.CSharp;
+using Ulearn.Core.CSharp.Validators;
 
 namespace uLearn.CSharp
 {
@@ -87,11 +88,12 @@ namespace uLearn.CSharp
 		[Test]
 		public void inspect_fieldName()
 		{
-			CheckCorrect("class A{ int a; }");
 			CheckCorrect("class A{ public int A; }");
 			CheckIncorrect("class A{ public int a; }");
 			CheckCorrect("class A{ private int a; }");
 			CheckIncorrect("class A{ private int A; }");
+			CheckCorrect("class A{ int a; }");
+			CheckIncorrect("class A{ int A; }");
 			CheckCorrect("class A{ internal int a; }");
 			CheckCorrect("class A{ internal int A; }");
 			CheckCorrect("class A{ public int A, B, C; }");

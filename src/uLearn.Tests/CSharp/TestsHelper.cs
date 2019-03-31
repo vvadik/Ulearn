@@ -8,13 +8,17 @@ using NUnit.Framework;
 using RunCsJob;
 using test;
 using uLearn.CourseTool.Validating;
-using uLearn.Model.Blocks;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Exercises.Blocks;
+using Ulearn.Core.Courses.Units;
 
 namespace uLearn.CSharp
 {
 	public static class TestsHelper
 	{
-		public static readonly string ProjSlideFolderPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "CSharp", "TestProject");
+		public static readonly string ProjSlideFolderPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "CSharp", "testProject");
 		public static readonly DirectoryInfo ProjSlideFolder = new DirectoryInfo(ProjSlideFolderPath);
 
 		public static readonly string ProjExerciseFolderPath = Path.Combine(ProjSlideFolderPath, "ProjDir");
@@ -55,7 +59,7 @@ namespace uLearn.CSharp
 			FileSystem.CreateDirectory(path);
 		}
 
-		public static ProjectExerciseValidator BuildProjectExerciseValidator(ProjectExerciseBlock exBlock, StringBuilder valOut)
+		public static ProjectExerciseValidator BuildProjectExerciseValidator(CsProjectExerciseBlock exBlock, StringBuilder valOut)
 		{
 			var slide = BuildSlide(exBlock);
 			return new ProjectExerciseValidator(BuildValidator(slide, valOut), new SandboxRunnerSettings(), slide, exBlock);
@@ -69,14 +73,19 @@ namespace uLearn.CSharp
 			return v;
 		}
 
-		public static ExerciseSlide BuildSlide(ExerciseBlock ex)
+		public static ExerciseSlide BuildSlide(AbstractExerciseBlock exerciseBlock)
 		{
 			var unit = new Unit(new UnitSettings { Title = "UnitTitle" }, null);
 			var slideInfo = new SlideInfo(unit, null, 0);
-			return new ExerciseSlide(new List<SlideBlock> { ex }, slideInfo, "SlideTitle", Guid.Empty, meta: null);
+			return new ExerciseSlide(exerciseBlock)
+			{
+				Id = Guid.Empty,
+				Title = "SlideTitle",
+				Info = slideInfo,
+			};
 		}
 
-		public static string ValidateBlock(ProjectExerciseBlock exBlock)
+		public static string ValidateBlock(CsProjectExerciseBlock exBlock)
 		{
 			var valOut = new StringBuilder();
 			var val = BuildProjectExerciseValidator(exBlock, valOut);
@@ -84,10 +93,18 @@ namespace uLearn.CSharp
 			return valOut.ToString();
 		}
 
-		public static string ValidateBlock(ExerciseBlock exBlock)
+		public static string ValidateBlock(AbstractExerciseBlock exBlock)
 		{
 			var valOut = new StringBuilder();
 			var val = BuildValidator(BuildSlide(exBlock), valOut);
+			val.ValidateExercises();
+			return valOut.ToString();
+		}
+
+		public static string ValidateExerciseSlide(ExerciseSlide slide)
+		{
+			var valOut = new StringBuilder();
+			var val = BuildValidator(slide, valOut);
 			val.ValidateExercises();
 			return valOut.ToString();
 		}

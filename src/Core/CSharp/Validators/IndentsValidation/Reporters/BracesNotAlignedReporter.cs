@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace uLearn.CSharp.Validators.IndentsValidation.Reporters
+namespace Ulearn.Core.CSharp.Validators.IndentsValidation.Reporters
 {
 	internal static class BracesNotAlignedReporter
 	{
@@ -13,9 +13,7 @@ namespace uLearn.CSharp.Validators.IndentsValidation.Reporters
 				var closeBraceIndent = new Indent(braces.Close);
 				if (openBraceIndent.IndentedTokenIsFirstAtLine && openBraceIndent.LengthInSpaces != closeBraceIndent.LengthInSpaces)
 				{
-					yield return new SolutionStyleError(
-						braces.Open,
-						$"Парные фигурные скобки ({braces}) должны иметь одинаковый отступ.");
+					yield return new SolutionStyleError(StyleErrorType.Indents03, braces.Open, braces);
 				}
 			}
 		}

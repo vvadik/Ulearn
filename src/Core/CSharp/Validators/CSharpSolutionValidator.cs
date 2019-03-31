@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using log4net;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using uLearn.CSharp.Validators.IndentsValidation;
-using uLearn.CSharp.Validators.VerbInMethodNameValidation;
+using uLearn.CSharp.Validators;
+using Ulearn.Core.CSharp.Validators.IndentsValidation;
+using Ulearn.Core.CSharp.Validators.VerbInMethodNameValidation;
 
-namespace uLearn.CSharp.Validators
+namespace Ulearn.Core.CSharp.Validators
 {
 	public class CSharpSolutionValidator : ISolutionValidator
 	{
+		private static readonly ILog log = LogManager.GetLogger(typeof(CSharpSolutionValidator));
+		
 		private readonly List<ICSharpSolutionValidator> validators = new List<ICSharpSolutionValidator>
 		{
 			new NotEmptyCodeValidator(),
@@ -25,6 +29,8 @@ namespace uLearn.CSharp.Validators
 			new ExcessLinesValidator(),
 			new RefArgumentsValidator(),
 			new VarInVariableDeclarationValidator(),
+            new BracketValidator(),
+            new RedundantElseValidator(),
 			new IndentsValidator()
 		};
 
@@ -69,7 +75,8 @@ namespace uLearn.CSharp.Validators
 			}
 			catch (Exception e)
 			{
-				return new List<SolutionStyleError> { new SolutionStyleError(solutionTree.GetRoot(), e.Message)};
+				log.Error("Can't run style validators", e);
+				return new List<SolutionStyleError>();
 			}
 		}
 

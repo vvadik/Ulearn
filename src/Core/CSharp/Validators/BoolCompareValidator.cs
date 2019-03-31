@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace uLearn.CSharp.Validators
+namespace Ulearn.Core.CSharp.Validators
 {
 	public class BoolCompareValidator : BaseStyleValidator
 	{
@@ -24,7 +24,7 @@ namespace uLearn.CSharp.Validators
 			var rightNodeTree = binaryExpression.Right as LiteralExpressionSyntax;
 			if (IsBooleanType(rightNodeTypeInfo) && IsBooleanType(leftNodeTypeInfo)
 				&& (IsBoolLiteral(leftNodeTree) || IsBoolLiteral(rightNodeTree)))
-				yield return new SolutionStyleError(binaryExpression, "Ненужное сравнение с переменной типа `bool`. Вместо `x == true` лучше писать просто `x`, а вместо `x != true` лучше писать `!x`.");
+				yield return new SolutionStyleError(StyleErrorType.BoolCompare01, binaryExpression);
 		}
 
 		private static bool IsBoolLiteral(LiteralExpressionSyntax node)

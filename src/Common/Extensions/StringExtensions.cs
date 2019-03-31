@@ -140,12 +140,13 @@ namespace Ulearn.Common.Extensions
 			}
 			return result;
 		}
-
-		public static Guid ToDeterministicGuid(this string arg)
+		
+		public static Guid ToDeterministicGuid(this string arg, Encoding encoding=null)
 		{
+			encoding = encoding ?? Encoding.UTF8;
 			using (var md5 = MD5.Create())
 			{
-				var hash = md5.ComputeHash(Encoding.Default.GetBytes(arg));
+				var hash = md5.ComputeHash(encoding.GetBytes(arg));
 				return new Guid(hash);
 			}
 		}
@@ -154,7 +155,7 @@ namespace Ulearn.Common.Extensions
 		{
 			byte[] hash;
 			using (var md5 = MD5.Create())
-				hash = md5.ComputeHash(Encoding.Default.GetBytes(arg));
+				hash = md5.ComputeHash(Encoding.UTF8.GetBytes(arg));
 
 			var sb = new StringBuilder();
 			foreach (var b in hash)
@@ -215,6 +216,11 @@ namespace Ulearn.Common.Extensions
 		public static bool EqualsIgnoreCase(this string first, string second)
 		{
 			return string.Equals(first, second, StringComparison.InvariantCultureIgnoreCase);
+		}
+
+		public static string EncodeQuotes(this string text)
+		{
+			return text.Replace(@"\", @"\\").Replace(@"""", @"\""").Replace("'", @"\'");
 		}
 	}
 }

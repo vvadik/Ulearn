@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace uLearn.CSharp.Validators
+namespace Ulearn.Core.CSharp.Validators
 {
 	public class ExcessLinesValidator : BaseStyleValidator
 	{
@@ -37,13 +37,13 @@ namespace uLearn.CSharp.Validators
 
 			if (openBraceLine != firstStatementLine
 				&& openBraceLine + 1 != firstStatementLine
-				&& !IsComment(bracesPair.Open.Parent, openBraceLine + 1))
-				yield return new SolutionStyleError(bracesPair.Open, "После открывающей скобки не должно быть лишнего переноса строки.");
+				&& !IsCommentOrRegionOrDisabledText(bracesPair.Open.Parent, openBraceLine + 1))
+				yield return new SolutionStyleError(StyleErrorType.ExcessLines01, bracesPair.Open);
 
 			if (closeBraceLine != lastStatementLine
 				&& closeBraceLine - 1 != lastStatementLine
-				&& !IsComment(bracesPair.Open.Parent, closeBraceLine - 1))
-				yield return new SolutionStyleError(bracesPair.Close, "Перед закрывающей скобкой не должно быть лишнего переноса строки.");
+				&& !IsCommentOrRegionOrDisabledText(bracesPair.Open.Parent, closeBraceLine - 1))
+				yield return new SolutionStyleError(StyleErrorType.ExcessLines02, bracesPair.Close);
 		}
 
 		private SolutionStyleError ReportWhenExistExcessLineBetweenDeclaration(BracesPair bracesPair)
@@ -54,7 +54,7 @@ namespace uLearn.CSharp.Validators
 				return null;
 
 			if (declarationLine + 1 != openBraceLine)
-				return new SolutionStyleError(bracesPair.Open, "Между объявлением и открывающей скобкой не должно быть лишнего переноса строки.");
+				return new SolutionStyleError(StyleErrorType.ExcessLines03, bracesPair.Open);
 
 			return null;
 		}
@@ -62,13 +62,14 @@ namespace uLearn.CSharp.Validators
 		private SolutionStyleError ReportWhenNotExistLineBetweenBlocks(BracesPair bracesPair)
 		{
 			var closeBraceLine = GetStartLine(bracesPair.Close);
+			var openBraceLine = GetStartLine(bracesPair.Open);
 
 			var nextSyntaxNode = GetNextNode(bracesPair.Open.Parent);
 			if (nextSyntaxNode == null || nextSyntaxNode is StatementSyntax)
 				return null;
 			var nextSyntaxNodeLine = GetStartLine(nextSyntaxNode);
-			if (closeBraceLine + 1 == nextSyntaxNodeLine)
-				return new SolutionStyleError(bracesPair.Close, "После закрывающей скобки нужно оставить одну пустую строку.");
+			if (closeBraceLine + 1 == nextSyntaxNodeLine && closeBraceLine != openBraceLine)
+				return new SolutionStyleError(StyleErrorType.ExcessLines04, bracesPair.Close);
 
 			return null;
 		}
@@ -77,7 +78,9 @@ namespace uLearn.CSharp.Validators
 		{
 			SyntaxNode[] statements;
 			SyntaxNode target;
-			if (syntaxNode.Parent is MethodDeclarationSyntax || syntaxNode.Parent is StatementSyntax)
+			if (syntaxNode.Parent is MethodDeclarationSyntax 
+				|| syntaxNode.Parent is StatementSyntax
+				|| syntaxNode.Parent is ConstructorDeclarationSyntax)
 			{
 				statements = GetStatements(syntaxNode.Parent.Parent);
 				target = syntaxNode.Parent;
@@ -100,11 +103,21 @@ namespace uLearn.CSharp.Validators
 			return null;
 		}
 
-		private static bool IsComment(SyntaxNode syntaxNode, int line)
+		/// <summary>
+		/// Check is line is inside multiline comment or inside #region..#endregion or inside #ifdef..#endif
+		/// </summary>
+		private static bool IsCommentOrRegionOrDisabledText(SyntaxNode syntaxNode, int line)
 		{
 			return syntaxNode.DescendantTrivia()
 				.Where(x => x.Kind() == SyntaxKind.MultiLineCommentTrivia
-							|| x.Kind() == SyntaxKind.SingleLineCommentTrivia)
+							|| x.Kind() == SyntaxKind.SingleLineCommentTrivia
+							|| x.Kind() == SyntaxKind.MultiLineDocumentationCommentTrivia
+							|| x.Kind() == SyntaxKind.SingleLineDocumentationCommentTrivia
+							|| x.Kind() == SyntaxKind.RegionDirectiveTrivia
+							|| x.Kind() == SyntaxKind.EndRegionDirectiveTrivia
+							|| x.Kind() == SyntaxKind.IfDirectiveTrivia
+							|| x.Kind() == SyntaxKind.EndIfDirectiveTrivia
+							|| x.Kind() == SyntaxKind.DisabledTextTrivia)
 				.Any(x =>
 				{
 					var startLine = x.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
@@ -133,10 +146,18 @@ namespace uLearn.CSharp.Validators
 		{
 			switch (syntaxNode)
 			{
+				case ConstructorDeclarationSyntax constructorDeclarationSyntax:
+					var initializer = constructorDeclarationSyntax.Initializer;
+					if (initializer != null)
+						return GetEndLine(initializer);
+					return GetEndArgumentsLine(constructorDeclarationSyntax);
 				case ClassDeclarationSyntax classDeclarationSyntax:
 					var baseListSyntax = classDeclarationSyntax.BaseList;
+					var classConstraints = classDeclarationSyntax.ConstraintClauses;
+					if (classConstraints.Any())
+						return GetEndLine(classConstraints.Last());
 					if (baseListSyntax == null)
-						return GetStartLine(syntaxNode);
+						return GetStartLine(classDeclarationSyntax.Identifier);
 					return GetEndLine(baseListSyntax);
 				case BlockSyntax blockSyntax:
 					if (blockSyntax.Parent.Kind() == SyntaxKind.Block)
@@ -147,6 +168,14 @@ namespace uLearn.CSharp.Validators
 					if (!constraintClauseSyntaxs.Any())
 						return GetEndArgumentsLine(methodDeclarationSyntax);
 					return GetEndLine(constraintClauseSyntaxs.Last());
+				case IfStatementSyntax ifStatementSyntax:
+					return GetEndLine(ifStatementSyntax.CloseParenToken);
+				case WhileStatementSyntax whileStatementSyntax:
+					return GetEndLine(whileStatementSyntax.CloseParenToken);
+				case ForEachStatementSyntax forEachStatementSyntax:
+					return GetEndLine(forEachStatementSyntax.CloseParenToken);
+				case ForStatementSyntax forStatementSyntax:
+					return GetEndLine(forStatementSyntax.CloseParenToken);
 				default:
 					return GetStartLine(syntaxNode);
 			}
@@ -162,12 +191,23 @@ namespace uLearn.CSharp.Validators
 			return syntaxNode.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
 		}
 
+		private static int GetEndLine(SyntaxToken syntaxToken)
+		{
+			return syntaxToken.GetLocation().GetLineSpan().EndLinePosition.Line + 1;
+		}
+
 		private static int GetEndLine(SyntaxNode syntaxNode)
 		{
 			return syntaxNode.GetLocation().GetLineSpan().EndLinePosition.Line + 1;
 		}
 
 		private static int GetEndArgumentsLine(MethodDeclarationSyntax declarationSyntax)
+		{
+			var parametersCloseToken = declarationSyntax.ParameterList.CloseParenToken;
+			return parametersCloseToken.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
+		}
+
+		private static int GetEndArgumentsLine(ConstructorDeclarationSyntax declarationSyntax)
 		{
 			var parametersCloseToken = declarationSyntax.ParameterList.CloseParenToken;
 			return parametersCloseToken.GetLocation().GetLineSpan().StartLinePosition.Line + 1;

@@ -1,5 +1,6 @@
 ﻿using System;
 using Database.Models;
+using Ulearn.Core.Courses.Slides;
 
 namespace uLearn.Web.Models
 {
@@ -13,6 +14,7 @@ namespace uLearn.Web.Models
 		public BlockRenderContext BlockRenderContext { get; set; }
 		public AbstractManualSlideChecking ManualChecking { get; set; }
 		public string ContextManualCheckingUserGroups { get; set; }
+		public string ContextManualCheckingUserArchivedGroups { get; set; }		
 		public bool IsGuest { get; set; }
 		public string Error { get; set; }
 	}

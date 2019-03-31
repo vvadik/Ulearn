@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using uLearn;
+using Ulearn.Core;
 
 namespace Database.Models
 {
 	public class UserExerciseSubmission : ITimedSlideAction
 	{
-		[Required]
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int Id { get; set; }
@@ -40,12 +41,13 @@ namespace Database.Models
 
 		public virtual IList<Like> Likes { get; set; }
 
-		public int AutomaticCheckingId { get; set; }
-
-		[Required]
+		public int? AutomaticCheckingId { get; set; }
+		
 		public virtual AutomaticExerciseChecking AutomaticChecking { get; set; }
-
+		
 		public bool AutomaticCheckingIsRightAnswer { get; set; }
+		
+		public Language Language { get; set; }
 
 		public virtual IList<ManualExerciseChecking> ManualCheckings { get; set; }
 		

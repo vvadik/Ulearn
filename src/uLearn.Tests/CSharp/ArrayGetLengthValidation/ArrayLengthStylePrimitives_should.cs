@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NUnit.Framework;
+using Ulearn.Core.CSharp;
 
 namespace uLearn.CSharp.ArrayGetLengthValidation
 {

@@ -8452,6 +8452,7 @@ divvying
 dizen
 dizzies
 dizzy
+do
 doat
 doats
 dock
@@ -14315,6 +14316,7 @@ inhume
 inhumed
 inhumes
 inhuming
+init
 initial
 initialize
 initializes
@@ -30812,3 +30814,5 @@ increment
 decrement
 inc
 dec
+dequeue
+enqueue

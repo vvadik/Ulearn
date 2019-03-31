@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Ulearn.Common.Extensions;
 
-namespace uLearn.CSharp.Validators
+namespace Ulearn.Core.CSharp.Validators
 {
 	public class RedundantIfStyleValidator : BaseStyleValidator
 	{
@@ -32,7 +32,7 @@ namespace uLearn.CSharp.Validators
 												.Call(r => r.Expression as LiteralExpressionSyntax)
 												.Call(IsBoolLiteral, false);
 			if (trueStatementIsReturnBoolLiteral && falseStatementIsReturnBoolLiteral == true)
-				yield return new SolutionStyleError(ifElseStatement, "Используйте return вместо if");
+				yield return new SolutionStyleError(StyleErrorType.RedundantIf01, ifElseStatement);
 		}
 
 		private static bool IsBoolLiteral(LiteralExpressionSyntax node)

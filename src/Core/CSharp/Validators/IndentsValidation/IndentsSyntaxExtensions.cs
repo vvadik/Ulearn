@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace uLearn.CSharp.Validators.IndentsValidation
+namespace Ulearn.Core.CSharp.Validators.IndentsValidation
 {
 	internal static class IndentsSyntaxExtensions
 	{
@@ -80,6 +80,11 @@ namespace uLearn.CSharp.Validators.IndentsValidation
 					var innerWhileStatement = whileStatement.Statement;
 					yield return SyntaxNodeOrToken.Create(rootTree, whileStatement.Statement,
 						innerWhileStatement is WhileStatementSyntax ? (bool?)null : false);
+					yield break;
+				case UsingStatementSyntax usingStatementSyntax:
+					var innerUsingStatement = usingStatementSyntax.Statement;
+					yield return SyntaxNodeOrToken.Create(rootTree, usingStatementSyntax.Statement,
+						innerUsingStatement is UsingStatementSyntax ? (bool?)null : false);
 					yield break;
 				default:
 					yield break;
