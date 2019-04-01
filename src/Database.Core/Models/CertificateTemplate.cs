@@ -23,6 +23,7 @@ namespace Database.Models
 		public bool IsDeleted { get; set; }
 
 		[Required]
+		[StringLength(128)]
 		public string ArchiveName { get; set; }
 
 		public virtual ICollection<Certificate> Certificates { get; set; }

@@ -10,6 +10,7 @@ using log4net;
 using Metrics;
 using Microsoft.AspNet.Identity;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Configuration;
 
 namespace uLearn.Web.Controllers
 {
@@ -21,7 +22,7 @@ namespace uLearn.Web.Controllers
 		protected UserManager<ApplicationUser> userManager;
 		protected readonly UsersRepo usersRepo;
 
-		protected readonly GraphiteMetricSender metricSender;
+		protected readonly MetricSender metricSender;
 
 		protected readonly string secretForHashes;
 
@@ -34,7 +35,7 @@ namespace uLearn.Web.Controllers
 			this.db = db;
 			userManager = new ULearnUserManager(db);
 			usersRepo = new UsersRepo(db);
-			metricSender = new GraphiteMetricSender("web");
+			metricSender = new MetricSender(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName);
 
 			secretForHashes = WebConfigurationManager.AppSettings["ulearn.secretForHashes"] ?? "";
 

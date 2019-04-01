@@ -13,6 +13,7 @@ using log4net.Config;
 using Metrics;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
+using Ulearn.Core.Configuration;
 using XQueue;
 using XQueue.Models;
 
@@ -25,7 +26,7 @@ namespace XQueueWatcher
 		private static readonly ILog log = LogManager.GetLogger(typeof(Program));
 		private static readonly CourseManager courseManager = WebCourseManager.Instance;
 
-		private static readonly ServiceKeepAliver keepAliver = new ServiceKeepAliver("xqueuewatcher");
+		private static readonly ServiceKeepAliver keepAliver = new ServiceKeepAliver(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName);
 		
 		private static readonly Dictionary<int, XQueueClient> clientsCache = new Dictionary<int, XQueueClient>();
 

@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using log4net;
+using Metrics;
 using Telegram.Bot.Types.Enums;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
@@ -10,10 +11,14 @@ namespace Ulearn.Core.Telegram
 	public class ErrorsBot : TelegramBot
 	{
 		private readonly ILog log = LogManager.GetLogger(typeof(ErrorsBot));
+		private readonly MetricSender metricSender;
 
 		public ErrorsBot()
 		{
-			channel = ApplicationConfiguration.Read<UlearnConfiguration>().Telegram.Errors.Channel;
+			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
+			channel = configuration.Telegram.Errors.Channel;
+			var serviceName = configuration.GraphiteServiceName ?? System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.ToLower();
+			metricSender = new MetricSender(serviceName);
 		}
 
 		public async Task PostToChannelAsync(string message, ParseMode parseMode = ParseMode.Default)
@@ -21,6 +26,7 @@ namespace Ulearn.Core.Telegram
 			if (!IsBotEnabled)
 				return;
 
+			metricSender.SendCount("errors");
 			log.Info($"Отправляю в телеграм-канал {channel} сообщение об ошибке:\n{message}");
 			if (message.Length > MaxMessageSize)
 			{

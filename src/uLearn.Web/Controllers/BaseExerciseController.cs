@@ -11,6 +11,7 @@ using Metrics;
 using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
+using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.CSharp;
@@ -25,7 +26,7 @@ namespace uLearn.Web.Controllers
 
 		protected readonly ULearnDb db;
 		protected readonly CourseManager courseManager;
-		protected readonly GraphiteMetricSender metricSender;
+		protected readonly MetricSender metricSender;
 
 		protected readonly UserSolutionsRepo userSolutionsRepo;
 		protected readonly SlideCheckingsRepo slideCheckingsRepo;
@@ -39,11 +40,11 @@ namespace uLearn.Web.Controllers
 		private static readonly TimeSpan executionTimeout = TimeSpan.FromSeconds(45);
 		
 		public BaseExerciseController()
-			: this(new ULearnDb(), WebCourseManager.Instance, new GraphiteMetricSender("web"))
+			: this(new ULearnDb(), WebCourseManager.Instance, new MetricSender(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName))
 		{
 		}
 
-		public BaseExerciseController(ULearnDb db, CourseManager courseManager, GraphiteMetricSender metricSender)
+		public BaseExerciseController(ULearnDb db, CourseManager courseManager, MetricSender metricSender)
 		{
 			this.db = db;
 			this.courseManager = courseManager;

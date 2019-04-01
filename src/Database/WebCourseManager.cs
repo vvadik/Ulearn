@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using Database.DataContexts;
 using log4net;
 using Ulearn.Core;
@@ -11,6 +12,7 @@ namespace Database
 	public class WebCourseManager : CourseManager
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(WebCourseManager));
+		public static readonly WebCourseManager Instance = new WebCourseManager();
 
 		private readonly Dictionary<string, Guid> loadedCourseVersions = new Dictionary<string, Guid>();
 		private readonly ConcurrentDictionary<string, DateTime> courseVersionFetchTime = new ConcurrentDictionary<string, DateTime>();
@@ -71,7 +73,27 @@ namespace Database
 				loadedCourseVersions[courseId.ToLower()] = versionId;
 			}
 		}
-
-		public static readonly WebCourseManager Instance = new WebCourseManager();
+		
+		protected override void LoadCourseZipsToDiskFromExternalStorage(IEnumerable<string> existingOnDiskCourseIds)
+		{
+			log.Info($"Загружаю курсы из БД");
+			var coursesRepo = new CoursesRepo();
+			var files = coursesRepo.GetCourseFiles(existingOnDiskCourseIds);
+			foreach (var zipFile in files)
+			{
+				try
+				{
+					var stagingCourseFile = GetStagingCourseFile(zipFile.CourseId);
+					File.WriteAllBytes(stagingCourseFile.FullName, zipFile.File);
+					var versionCourseFile = GetCourseVersionFile(zipFile.CourseVersionId);
+					if (!versionCourseFile.Exists)
+						File.WriteAllBytes(versionCourseFile.FullName, zipFile.File);
+				}
+				catch(Exception ex)
+				{
+					log.Error($"Не смог загрузить {zipFile.CourseId} из базы данных", ex);
+				}
+			}
+		}
 	}
 }

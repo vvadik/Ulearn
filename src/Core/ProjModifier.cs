@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.Build.Evaluation;
+using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
@@ -27,8 +28,14 @@ namespace Ulearn.Core
 	{
 		public static byte[] ModifyCsproj(FileInfo csproj, Action<Project> changingAction, string toolsVersion=null)
 		{
-			var proj = new Project(csproj.FullName, null, toolsVersion, new ProjectCollection());
-			return ModifyCsproj(proj, changingAction);
+			return FuncUtils.Using(
+				new ProjectCollection(),
+				projectCollection =>
+				{
+					var proj = new Project(csproj.FullName, null, toolsVersion, projectCollection);
+					return ModifyCsproj(proj, changingAction);
+				}, 
+				projectCollection => projectCollection.UnloadAllProjects());
 		}
 
 		private static byte[] ModifyCsproj(Project proj, Action<Project> changingAction)

@@ -69,6 +69,10 @@
       <Project>{803c067a-5553-467d-9470-116fe2430255}</Project>
       <Name>Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Metrics\Metrics.csproj">
+      <Project>{b6b60d19-c6bd-4d66-95da-14480a18770c}</Project>
+      <Name>Metrics</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />

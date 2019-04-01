@@ -67,6 +67,8 @@ namespace Ulearn.Core.Configuration
 		public string ExerciseStudentZipsDirectory { get; set; }
 		
 		public CertificateConfiguration Certificates { get; set; }
+
+		public string GraphiteServiceName { get; set; }
 	}
 
 	public class TelegramConfiguration

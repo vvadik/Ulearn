@@ -411,6 +411,7 @@ namespace Database
 		public DbSet<GroupAccess> GroupAccesses { get; set; }
 
 		public DbSet<CertificateTemplate> CertificateTemplates { get; set; }
+		public DbSet<CertificateTemplateArchive> CertificateTemplateArchives { get; set; }
 		public DbSet<Certificate> Certificates { get; set; }
 
 		public DbSet<AdditionalScore> AdditionalScores { get; set; }
