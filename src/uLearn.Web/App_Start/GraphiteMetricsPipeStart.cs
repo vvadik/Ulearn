@@ -13,7 +13,7 @@ namespace uLearn.Web
 		public static void PreStart()
 		{
 			var connectionString = WebConfigurationManager.ConnectionStrings["statsd"]?.ConnectionString;
-			var isGraphiteSendingEnabled = string.IsNullOrEmpty(connectionString);
+			var isGraphiteSendingEnabled = !string.IsNullOrEmpty(connectionString);
 			
 			if (!isGraphiteSendingEnabled)
 				return;
