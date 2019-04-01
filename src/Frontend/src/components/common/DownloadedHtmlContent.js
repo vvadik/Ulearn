@@ -112,8 +112,12 @@ class DownloadedHtmlContent extends Component {
 				}
 
 				let newUrl = getUrlParts(response.url);
-				this.context.router.history.replace(newUrl.pathname + newUrl.search);
-				return Promise.resolve(undefined);
+				if(oldUrlPathname.startsWith('/Account/ReturnHijack') || oldUrlPathname.startsWith('/Account/Hijack')) {
+					window.location.href = newUrl.pathname + newUrl.search;
+				} else {
+					this.context.router.history.replace(newUrl.pathname + newUrl.search);
+					return Promise.resolve(undefined);
+				}
 			}
 			/* Process attaches: download them and return url back */
 			if (response.headers.has('Content-Disposition')) {
@@ -315,8 +319,13 @@ class DownloadedHtmlContent extends Component {
 						if (!isUrlChanged)
 							newUrlParts.search += (newUrlParts.search === '' ? '?' : '&') + 'rnd=' + Math.random();
 
-						this.context.router.history.replace(newUrlParts.pathname + newUrlParts.search);
-						return Promise.resolve(undefined);
+						if(formUrlParts.startsWith('/Account/ReturnHijack') || formUrlParts.startsWith('/Account/Hijack')) {
+							window.location.href = newUrlParts.pathname + newUrlParts.search;
+						}
+						else {
+							this.context.router.history.replace(newUrlParts.pathname + newUrlParts.search);
+							return Promise.resolve(undefined);
+						}
 					}
 					return response.text()
 				}).then(data => {
