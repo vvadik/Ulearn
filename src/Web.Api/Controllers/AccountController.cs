@@ -105,7 +105,7 @@ namespace Ulearn.Web.Api.Controllers
 		/// Получить ключ на пользователя на заданныей срок в днях
 		/// </summary>
 		[HttpPost("api-token")]
-		//[ApiExplorerSettings(IgnoreApi = true)]
+		[ApiExplorerSettings(IgnoreApi = true)]
 		[Authorize]
 		public async Task<ActionResult<TokenResponse>> ApiToken([FromQuery] int days)
 		{
