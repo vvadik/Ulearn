@@ -201,6 +201,9 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult ExportCourseStatisticsAsJson(CourseStatisticsParams param)
 		{
+			if(param.CourseId == null)
+				return HttpNotFound();
+
 			var model = GetCourseStatisticsModel(param, 3000);
 
 			var filename = model.Course.Id + ".json";
@@ -212,6 +215,9 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult ExportCourseStatisticsAsXml(CourseStatisticsParams param)
 		{
+			if(param.CourseId == null)
+				return HttpNotFound();
+			
 			var model = GetCourseStatisticsModel(param, 3000);
 
 			var filename = model.Course.Id + ".xml";
@@ -223,6 +229,9 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult ExportCourseStatisticsAsXlsx(CourseStatisticsParams param)
 		{
+			if(param.CourseId == null)
+				return HttpNotFound();
+			
 			var model = GetCourseStatisticsModel(param, 3000);
 
 			var package = new ExcelPackage();
@@ -362,6 +371,9 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Student)]
 		public ActionResult CourseStatistics(CourseStatisticsParams param, int max=200)
 		{
+			if(param.CourseId == null)
+				return HttpNotFound();
+			
 			var usersLimit = max;
 			if (usersLimit > 300)
 				usersLimit = 300;
