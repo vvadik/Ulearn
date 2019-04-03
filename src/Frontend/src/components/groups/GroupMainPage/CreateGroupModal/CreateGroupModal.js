@@ -49,7 +49,7 @@ class CreateGroupModal extends Component {
 			<div className={styles["modal-content"]}>
 				<Tooltip render={this.checkError} trigger='focus' pos="right top">
 					<Input placeholder="КН-201 УрФУ 2017"
-						   maxLength="20"
+						   maxLength="300"
 						   value={name || ''}
 						   error={hasError}
 						   onChange={this.onChangeInput}
