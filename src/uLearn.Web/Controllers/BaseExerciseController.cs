@@ -101,9 +101,6 @@ namespace uLearn.Web.Controllers
 			if (buildResult.HasErrors)
 				return new RunSolutionResult { IsCompileError = true, ErrorMessage = buildResult.ErrorMessage, SubmissionId = submission.Id, ExecutionServiceName = "uLearn" };
 
-			if (submission.AutomaticCheckingIsRightAnswer)
-				await CreateStyleErrorsReviewsForSubmission(submission, buildResult.StyleErrors, exerciseMetricId);
-			
 			try
 			{
 				if (submissionLanguage.HasAutomaticChecking())
@@ -127,6 +124,9 @@ namespace uLearn.Web.Controllers
 				metricSender.SendCount($"exercise.{exerciseMetricId}.dont_wait_result");
 				return new RunSolutionResult { SubmissionId = submission.Id };
 			}
+			
+			if (submission.AutomaticCheckingIsRightAnswer)
+				await CreateStyleErrorsReviewsForSubmission(submission, buildResult.StyleErrors, exerciseMetricId);
 
 			/* Update the submission */
 			submission = userSolutionsRepo.FindNoTrackingSubmission(submission.Id);

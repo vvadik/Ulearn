@@ -425,35 +425,25 @@ namespace Database.DataContexts
 
 		public async Task SaveResults(List<RunningResults> results, Func<UserExerciseSubmission, Task> onSave)
 		{
-			var resultsDict = results.ToDictionary(result => result.Id);
-			using (var transaction = db.Database.BeginTransaction())
+			log.Info($"Сохраняю информацию о проверке решений: [{string.Join(", ", results.Select(r => r.Id))}]");
+			var submissions = FindSubmissionsByIds(results.Select(result => result.Id).ToList());
+			if (submissions.Count != results.Count)
+				log.Warn($"Нашёл в базе данных не все решения. Искал: [{string.Join(", ", results.Select(r => r.Id))}]. Нашёл: [{string.Join(", ", submissions.Select(s => s.Id))}]");
+			var submissionToResult = results.ToDictionary(result => result.Id);
+			foreach (var submission in submissions)
 			{
-				log.Info($"Сохраняю информацию о проверке решений: [{string.Join(", ", results.Select(r => r.Id))}]");
-				var submissions = FindSubmissionsByIds(results.Select(result => result.Id).ToList());
-				if (submissions.Count != results.Count)
+				using (var transaction = db.Database.BeginTransaction())
 				{
-					log.Warn($"Нашёл в базе данных не все решения. Искал: [{string.Join(", ", results.Select(r => r.Id))}]. Нашёл: [{string.Join(", ", submissions.Select(s => s.Id))}]");
+					var aec = await UpdateAutomaticExerciseChecking(submission.AutomaticChecking, submissionToResult[submission.Id.ToString()]).ConfigureAwait(false);
+					await SaveAll(Enumerable.Repeat(aec, 1)).ConfigureAwait(false);
+					transaction.Commit();
+					db.ObjectContext().AcceptAllChanges();
 				}
-				var res = new List<AutomaticExerciseChecking>();
-				foreach (var submission in submissions)
-					res.Add(await UpdateAutomaticExerciseChecking(submission.AutomaticChecking, resultsDict[submission.Id.ToString()]).ConfigureAwait(false));
-				await SaveAll(res).ConfigureAwait(false);
-
-				foreach (var submission in submissions)
-					await onSave(submission).ConfigureAwait(false);
-				
-				foreach (var submission in submissions)
-				{
-					if (!handledSubmissions.TryAdd(submission.Id, DateTime.Now))
-						log.Warn($"Не удалось запомнить, что проверка {submission.Id} проверена, а результат сохранен в базу");
-				}
-
-				log.Info($"Есть информация о следующих проверках, которые ещё не забраны клиентом: [{string.Join(", ", handledSubmissions.Keys)}]");
-
-				transaction.Commit();
-
-				db.ObjectContext().AcceptAllChanges();
+				await onSave(submission).ConfigureAwait(false);
+				if (!handledSubmissions.TryAdd(submission.Id, DateTime.Now))
+					log.Warn($"Не удалось запомнить, что проверка {submission.Id} проверена, а результат сохранен в базу");
 			}
+			log.Info($"Есть информация о следующих проверках, которые ещё не забраны клиентом: [{string.Join(", ", handledSubmissions.Keys)}]");
 		}
 
 		private async Task<AutomaticExerciseChecking> UpdateAutomaticExerciseChecking(AutomaticExerciseChecking checking, RunningResults result)

@@ -84,9 +84,9 @@ namespace Database.DataContexts
 			return manualChecking;
 		}
 
-		public async Task RemoveWaitingManualCheckings<T>(string courseId, Guid slideId, string userId) where T : AbstractManualSlideChecking
+		public async Task RemoveWaitingManualCheckings<T>(string courseId, Guid slideId, string userId, bool inTransaction = true) where T : AbstractManualSlideChecking
 		{
-			using (var transaction = db.Database.BeginTransaction())
+			using (var transaction = inTransaction ? db.Database.BeginTransaction() : null)
 			{
 				var checkings = GetSlideCheckingsByUser<T>(courseId, slideId, userId, noTracking: false)
 					.AsEnumerable()
@@ -99,7 +99,7 @@ namespace Database.DataContexts
 				}
 
 				await db.SaveChangesAsync().ConfigureAwait(false);
-				transaction.Commit();
+				transaction?.Commit();
 			}
 		}
 
