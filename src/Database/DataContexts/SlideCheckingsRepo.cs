@@ -61,6 +61,11 @@ namespace Database.DataContexts
 		{
 			return db.ManualExerciseCheckings.Where(c => c.CourseId == courseId && c.UserId == userId && c.IsChecked).DistinctBy(c => c.SlideId);
 		}
+		
+		public bool HasManualExerciseChecking(string courseId, Guid slideId, string userId, int submissionId)
+		{
+			return db.ManualExerciseCheckings.Any(c => c.CourseId == courseId && c.UserId == userId && c.SlideId == slideId && c.SubmissionId == submissionId);
+		}
 
 		public async Task<ManualExerciseChecking> AddManualExerciseChecking(string courseId, Guid slideId, string userId, UserExerciseSubmission submission)
 		{

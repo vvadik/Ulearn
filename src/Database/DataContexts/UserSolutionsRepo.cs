@@ -356,7 +356,7 @@ namespace Database.DataContexts
 						s.Timestamp > notSoLongAgo
 						&& s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting
 						&& s.Language == language);
-				
+
 				if (!submissionsQueryable.Any())
 					return null;
 				
@@ -423,7 +423,7 @@ namespace Database.DataContexts
 			}
 		}
 
-		public async Task SaveResults(List<RunningResults> results)
+		public async Task SaveResults(List<RunningResults> results, Func<UserExerciseSubmission, Task> onSave)
 		{
 			var resultsDict = results.ToDictionary(result => result.Id);
 			using (var transaction = db.Database.BeginTransaction())
@@ -440,8 +440,13 @@ namespace Database.DataContexts
 				await SaveAll(res).ConfigureAwait(false);
 
 				foreach (var submission in submissions)
+					await onSave(submission).ConfigureAwait(false);
+				
+				foreach (var submission in submissions)
+				{
 					if (!handledSubmissions.TryAdd(submission.Id, DateTime.Now))
 						log.Warn($"Не удалось запомнить, что проверка {submission.Id} проверена, а результат сохранен в базу");
+				}
 
 				log.Info($"Есть информация о следующих проверках, которые ещё не забраны клиентом: [{string.Join(", ", handledSubmissions.Keys)}]");
 

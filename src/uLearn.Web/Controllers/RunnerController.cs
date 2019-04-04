@@ -15,6 +15,7 @@ using Database.DataContexts;
 using Database.Models;
 using log4net;
 using LtiLibrary.Core.Extensions;
+using Metrics;
 using RunCsJob.Api;
 using Serilog;
 using Telegram.Bot.Types.Enums;
@@ -22,7 +23,7 @@ using uLearn.Web.AntiPlagiarismUsage;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
-using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Telegram;
 using XQueue;
@@ -35,8 +36,13 @@ namespace uLearn.Web.Controllers
 		private static readonly ILog log = LogManager.GetLogger(typeof(RunnerController));
 
 		private readonly UserSolutionsRepo userSolutionsRepo;
+		private readonly SlideCheckingsRepo slideCheckingsRepo;
+		private readonly VisitsRepo visitsRepo;
+		private readonly GroupsRepo groupsRepo;
+		private readonly UsersRepo usersRepo;
 		private readonly ULearnDb db;
 		private readonly CourseManager courseManager;
+		private readonly MetricSender metricSender;
 
 		private static readonly List<IResultObserver> resultObserveres = new List<IResultObserver>
 		{
@@ -50,6 +56,11 @@ namespace uLearn.Web.Controllers
 			this.db = db;
 			this.courseManager = courseManager;
 			userSolutionsRepo = new UserSolutionsRepo(db, courseManager);
+			slideCheckingsRepo = new SlideCheckingsRepo(db);
+			visitsRepo = new VisitsRepo(db);
+			groupsRepo = new GroupsRepo(db, courseManager);
+			usersRepo = new UsersRepo(db);
+			metricSender = new MetricSender(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName);
 		}
 
 		public RunnerController()
@@ -134,7 +145,7 @@ namespace uLearn.Web.Controllers
 			}
 			CheckRunner(token);
 			log.Info($"Получил от RunCsJob результаты проверки решений: [{string.Join(", ", results.Select(r => r.Id))}] от агента {agent}");
-			await FuncUtils.TrySeveralTimesAsync(() => userSolutionsRepo.SaveResults(results), 3).ConfigureAwait(false);
+			await FuncUtils.TrySeveralTimesAsync(() => userSolutionsRepo.SaveResults(results, SendToReviewAndUpdateScore), 3).ConfigureAwait(false);
 
 			var submissionsByIds = userSolutionsRepo
 				.FindSubmissionsByIds(results.Select(result => result.Id).ToList())
@@ -145,6 +156,39 @@ namespace uLearn.Web.Controllers
 				if (!submissionsByIds.ContainsKey(result.Id))
 					continue;
 				await SendResultToObservers(submissionsByIds[result.Id], result).ConfigureAwait(false);
+			}
+		}
+		
+		private async Task SendToReviewAndUpdateScore(UserExerciseSubmission submission)
+		{
+			var userId = submission.User.Id;
+			var courseId = submission.CourseId;
+			var course = courseManager.GetCourse(courseId);
+			var exerciseSlide = course.FindSlideById(submission.SlideId) as ExerciseSlide;
+			if (exerciseSlide == null)
+				return;
+			var exerciseMetricId = BaseExerciseController.GetExerciseMetricId(courseId, exerciseSlide);
+			var automaticChecking = submission.AutomaticChecking;
+			var isProhibitedUserToSendForReview = slideCheckingsRepo.IsProhibitedToSendExerciseToManualChecking(courseId, exerciseSlide.Id, userId);
+			var sendToReview = exerciseSlide.Scoring.RequireReview &&
+								submission.AutomaticCheckingIsRightAnswer &&
+								!isProhibitedUserToSendForReview &&
+								groupsRepo.IsManualCheckingEnabledForUser(course, userId);
+			if (sendToReview)
+			{
+				await slideCheckingsRepo.RemoveWaitingManualCheckings<ManualExerciseChecking>(courseId, exerciseSlide.Id, userId);
+				await slideCheckingsRepo.AddManualExerciseChecking(courseId, exerciseSlide.Id, userId, submission);
+				await visitsRepo.MarkVisitsAsWithManualChecking(courseId, exerciseSlide.Id, userId);
+				metricSender.SendCount($"exercise.{exerciseMetricId}.sent_to_review");
+				metricSender.SendCount("exercise.sent_to_review");
+			}
+
+			await visitsRepo.UpdateScoreForVisit(courseId, exerciseSlide.Id, exerciseSlide.MaxScore, userId);
+
+			if (automaticChecking != null)
+			{
+				var verdictForMetric = automaticChecking.GetVerdict().Replace(" ", "");
+				metricSender.SendCount($"exercise.{exerciseMetricId}.{verdictForMetric}");
 			}
 		}
 
