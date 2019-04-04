@@ -170,13 +170,13 @@ namespace uLearn.Web.Controllers
 			var exerciseMetricId = BaseExerciseController.GetExerciseMetricId(courseId, exerciseSlide);
 			var automaticChecking = submission.AutomaticChecking;
 			var isProhibitedUserToSendForReview = slideCheckingsRepo.IsProhibitedToSendExerciseToManualChecking(courseId, exerciseSlide.Id, userId);
-			var sendToReview = exerciseSlide.Scoring.RequireReview &&
-								submission.AutomaticCheckingIsRightAnswer &&
-								!isProhibitedUserToSendForReview &&
-								groupsRepo.IsManualCheckingEnabledForUser(course, userId);
+			var sendToReview = exerciseSlide.Scoring.RequireReview
+								&& submission.AutomaticCheckingIsRightAnswer
+								&& !isProhibitedUserToSendForReview
+								&& groupsRepo.IsManualCheckingEnabledForUser(course, userId);
 			if (sendToReview)
 			{
-				await slideCheckingsRepo.RemoveWaitingManualCheckings<ManualExerciseChecking>(courseId, exerciseSlide.Id, userId);
+				await slideCheckingsRepo.RemoveWaitingManualCheckings<ManualExerciseChecking>(courseId, exerciseSlide.Id, userId, false);
 				await slideCheckingsRepo.AddManualExerciseChecking(courseId, exerciseSlide.Id, userId, submission);
 				await visitsRepo.MarkVisitsAsWithManualChecking(courseId, exerciseSlide.Id, userId);
 				metricSender.SendCount($"exercise.{exerciseMetricId}.sent_to_review");
