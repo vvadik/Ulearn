@@ -125,11 +125,12 @@ namespace uLearn.Web.Controllers
 				return new RunSolutionResult { SubmissionId = submission.Id };
 			}
 			
-			if (submission.AutomaticCheckingIsRightAnswer)
-				await CreateStyleErrorsReviewsForSubmission(submission, buildResult.StyleErrors, exerciseMetricId);
-
 			/* Update the submission */
 			submission = userSolutionsRepo.FindNoTrackingSubmission(submission.Id);
+			
+			if (submission.AutomaticCheckingIsRightAnswer)
+				await CreateStyleErrorsReviewsForSubmission(submission, buildResult.StyleErrors, exerciseMetricId);
+			
 			var automaticChecking = submission.AutomaticChecking;
 			var sentToReview = slideCheckingsRepo.HasManualExerciseChecking(courseId, exerciseSlide.Id, userId, submission.Id);
 			
