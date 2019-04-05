@@ -145,7 +145,9 @@ namespace uLearn.Web.Controllers
 			}
 			CheckRunner(token);
 			log.Info($"Получил от RunCsJob результаты проверки решений: [{string.Join(", ", results.Select(r => r.Id))}] от агента {agent}");
-			await FuncUtils.TrySeveralTimesAsync(() => userSolutionsRepo.SaveResults(results, SendToReviewAndUpdateScore), 3).ConfigureAwait(false);
+
+			foreach (var result in results)
+				await FuncUtils.TrySeveralTimesAsync(() => userSolutionsRepo.SaveResult(result, SendToReviewAndUpdateScore), 3).ConfigureAwait(false);
 
 			var submissionsByIds = userSolutionsRepo
 				.FindSubmissionsByIds(results.Select(result => result.Id).ToList())
