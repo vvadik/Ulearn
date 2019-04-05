@@ -61,6 +61,11 @@ namespace Database.DataContexts
 		{
 			return db.ManualExerciseCheckings.Where(c => c.CourseId == courseId && c.UserId == userId && c.IsChecked).DistinctBy(c => c.SlideId);
 		}
+		
+		public bool HasManualExerciseChecking(string courseId, Guid slideId, string userId, int submissionId)
+		{
+			return db.ManualExerciseCheckings.Any(c => c.CourseId == courseId && c.UserId == userId && c.SlideId == slideId && c.SubmissionId == submissionId);
+		}
 
 		public async Task<ManualExerciseChecking> AddManualExerciseChecking(string courseId, Guid slideId, string userId, UserExerciseSubmission submission)
 		{
@@ -79,9 +84,9 @@ namespace Database.DataContexts
 			return manualChecking;
 		}
 
-		public async Task RemoveWaitingManualCheckings<T>(string courseId, Guid slideId, string userId) where T : AbstractManualSlideChecking
+		public async Task RemoveWaitingManualCheckings<T>(string courseId, Guid slideId, string userId, bool startTransaction = true) where T : AbstractManualSlideChecking
 		{
-			using (var transaction = db.Database.BeginTransaction())
+			using (var transaction = startTransaction ? db.Database.BeginTransaction() : null)
 			{
 				var checkings = GetSlideCheckingsByUser<T>(courseId, slideId, userId, noTracking: false)
 					.AsEnumerable()
@@ -94,7 +99,7 @@ namespace Database.DataContexts
 				}
 
 				await db.SaveChangesAsync().ConfigureAwait(false);
-				transaction.Commit();
+				transaction?.Commit();
 			}
 		}
 
