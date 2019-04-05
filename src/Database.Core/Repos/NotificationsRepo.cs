@@ -315,7 +315,7 @@ namespace Database.Repos
 			else if (notification.IsNotificationForEveryone)
 			{
 				/* Add notification to all common transports */
-				/* It's used i.e. for new-comment notification which should be sent to everyone in the course */
+				/* It's used for notifications which should be sent to everyone in the course */
 				logger.Information($"Notification #{notification.Id}. This notification type is sent to everyone, so add it to all common transports ({commonTransports.Count} transport(s)):");
 				foreach (var commonTransport in commonTransports)
 				{

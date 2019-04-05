@@ -217,6 +217,17 @@ namespace Database.Repos.Groups
 			return accesses.SelectMany(a => a.Value).Select(a => a.User).ToList();
 		}
 		
+		public async Task<List<string>> GetInstructorsOfAllGroupsWhereUserIsMemberAsync(string courseId, string userId)
+		{
+			var groupsWhereUserIsStudent = await groupMembersRepo.GetUserGroupsAsync(courseId, userId).ConfigureAwait(false);
+			var accesses = await GetGroupAccessesAsync(groupsWhereUserIsStudent.Select(g => g.Id)).ConfigureAwait(false);
+			var ownersIds = groupsWhereUserIsStudent.Select(g => g.OwnerId);
+			return accesses
+				.SelectMany(kvp => kvp.Value.Select(a => a.User.Id))
+				.Concat(ownersIds)
+				.ToList();
+		}
+		
 		private async Task<List<string>> GetCoursesWhereUserCanSeeAllGroupsAsync(string userId)
 		{
 			if (await systemAccessesRepo.HasSystemAccessAsync(userId, SystemAccessType.ViewAllGroupMembers).ConfigureAwait(false))

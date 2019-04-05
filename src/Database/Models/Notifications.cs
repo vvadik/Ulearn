@@ -341,7 +341,7 @@ namespace Database.Models
 
 		public abstract bool IsActual();
 
-		/* Returns list of notifications, which blocks this notification from sending to specific user. I.e. NewComment is blocked by ReplyToYourComment or NewCommentFromStudentFormYourGroup */
+		/* Returns list of notifications, which blocks this notification from sending to specific user. I.e. NewComment is blocked by ReplyToYourComment or NewCommentFromYourGroupStudent */
 		public virtual List<Notification> GetBlockerNotifications(ULearnDb db)
 		{
 			return new List<Notification>();
@@ -599,7 +599,7 @@ namespace Database.Models
 
 		public override List<string> GetRecipientsIds(ULearnDb db)
 		{
-			return new GroupsRepo(db, WebCourseManager.Instance).GetInstructorsOfAllGroupsWhereUserIsStudent(CourseId, Comment.Author).ToList();
+			return new GroupsRepo(db, WebCourseManager.Instance).GetInstructorsOfAllGroupsWhereUserIsMember(CourseId, Comment.Author).ToList();
 		}
 
 		public override bool IsNotificationForEveryone => true;

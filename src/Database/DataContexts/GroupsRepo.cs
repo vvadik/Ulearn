@@ -703,7 +703,7 @@ namespace Database.DataContexts
 				.ToDefaultDictionary();
 		}
 		
-		public List<string> GetInstructorsOfAllGroupsWhereUserIsStudent(string courseId, ApplicationUser user)
+		public IEnumerable<string> GetInstructorsOfAllGroupsWhereUserIsMember(string courseId, ApplicationUser user)
 		{
 			var groupIds = GetGroups(courseId).Select(g => g.Id);
 			var groupsWhereUserIsStudent = db.GroupMembers
@@ -715,8 +715,7 @@ namespace Database.DataContexts
 			var accesses = GetGroupsAccesses(groupsWhereUserIsStudent.Select(g => g.Id));
 			return accesses
 				.SelectMany(kvp => kvp.Value.Select(a => a.User.Id))
-				.Concat(ownersIds)
-				.ToList();
+				.Concat(ownersIds);
 		}
 	}
 }

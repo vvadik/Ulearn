@@ -223,6 +223,11 @@ namespace Database.Models
 		[MinCourseRole(CourseRoleType.Instructor)]
 		[IsEnabledByDefault(true)]
 		NewCommentForInstructorsOnly = 107,
+		
+		[Display(Name = @"Новый комментарий от студента вашей группы", GroupName = @"Новый комментарий от студента вашей группы")]
+		[MinCourseRole(CourseRoleType.Instructor)]
+		[IsEnabledByDefault(true)]
+		NewCommentFromYourGroupStudent = 108,
 
 		// Course admins
 		[Display(Name = @"Добавлен новый преподаватель", GroupName = @"Добавлены новые преподаватели")]
@@ -326,7 +331,7 @@ namespace Database.Models
 
 		public abstract bool IsActual();
 
-		/* Returns list of notifications, which blocks this notification from sending to specific user. I.e. NewComment is blocked by ReplyToYourComment */
+		/* Returns list of notifications, which blocks this notification from sending to specific user. I.e. NewComment is blocked by ReplyToYourComment or NewCommentFromYourGroupStudent */
 		/* Override this method together with IsBlockedByAnyNotificationFrom() */
 		public virtual List<Notification> GetBlockerNotifications(IServiceProvider serviceProvider)
 		{
@@ -527,17 +532,18 @@ namespace Database.Models
 			return visitsRepo.GetCourseUsersAsync(CourseId);
 		}
 
-		public override bool IsNotificationForEveryone => true;
-
 		public override List<Notification> GetBlockerNotifications(IServiceProvider serviceProvider)
 		{
 			var notificationsRepo = serviceProvider.GetService<INotificationsRepo>(); 
-			return notificationsRepo.FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId).Cast<Notification>().ToList();
+			var repliedNotifications = notificationsRepo.FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId);
+			var yourGroupNotifications = notificationsRepo.FindNotifications<NewCommentFromYourGroupStudentNotification>(n => n.CommentId == CommentId);
+			return repliedNotifications.Cast<Notification>().Concat(yourGroupNotifications).ToList();
 		}
 		
 		public override bool IsBlockedByAnyNotificationFrom(IServiceProvider serviceProvider, List<Notification> notifications)
 		{
-			return notifications.OfType<RepliedToYourCommentNotification>().Any(n => n.CommentId == CommentId);
+			return notifications.OfType<RepliedToYourCommentNotification>().Any(n => n.CommentId == CommentId)
+				|| notifications.OfType<NewCommentFromYourGroupStudentNotification>().Any(n => n.CommentId == CommentId);
 		}
 	}
 
@@ -574,6 +580,47 @@ namespace Database.Models
 		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
 			return Task.FromResult(new List<string> { ParentComment.AuthorId });
+		}
+	}
+	
+	[NotificationType(NotificationType.NewCommentFromYourGroupStudent)]
+	public class NewCommentFromYourGroupStudentNotification : AbstractCommentNotification
+	{
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
+		{
+			var slide = course.FindSlideById(Comment.SlideId);
+			if (slide == null)
+				return null;
+
+			return $"<b>{Comment.Author.VisibleName.EscapeHtml()} прокомментировал{Comment.Author.Gender.ChooseEnding()} «{GetSlideTitle(course, slide).EscapeHtml()}»</b><br/><br/>" +
+					$"{GetHtmlCommentText()}";
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
+		{
+			var slide = course.FindSlideById(Comment.SlideId);
+			if (slide == null)
+				return null;
+
+			return $"{Comment.Author.VisibleName} прокомментировал{Comment.Author.Gender.ChooseEnding()} «{GetSlideTitle(course, slide)}»\n\n{Comment.Text.Trim()}";
+		}
+
+		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
+		{
+			var groupAccessesRepo = serviceProvider.GetService<IGroupAccessesRepo>();
+			return groupAccessesRepo.GetInstructorsOfAllGroupsWhereUserIsMemberAsync(CourseId, Comment.Author.Id);
+		}
+
+		public override List<Notification> GetBlockerNotifications(IServiceProvider serviceProvider)
+		{
+			var notificationsRepo = serviceProvider.GetService<INotificationsRepo>(); 
+			var repliedToYourCommentNotifications = notificationsRepo.FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId);
+			return repliedToYourCommentNotifications.Cast<Notification>().ToList();
+		}
+		
+		public override bool IsBlockedByAnyNotificationFrom(IServiceProvider serviceProvider, List<Notification> notifications)
+		{
+			return notifications.OfType<RepliedToYourCommentNotification>().Any(n => n.CommentId == CommentId);
 		}
 	}
 
