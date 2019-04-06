@@ -97,15 +97,23 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 			var wordsInIdentifier = identifier.ValueText.SplitByCamelCase();
 			foreach (var word in wordsInIdentifier)
 			{
-				if (!wordsToExcept.Contains(word.ToLowerInvariant()) && !hunspell.Spell(word))
+				var wordForCheck = RemoveIfySuffix(word.ToLowerInvariant());
+				if (!wordsToExcept.Contains(wordForCheck) && !hunspell.Spell(wordForCheck))
 				{
-					var possibleErrorInWord = CheckConcatenatedWordsInLowerCaseForError(word, identifier);
+					var possibleErrorInWord = CheckConcatenatedWordsInLowerCaseForError(wordForCheck, identifier);
 					if (possibleErrorInWord != null)
 						yield return possibleErrorInWord;
 				}
 			}
 		}
-		
+
+		private string RemoveIfySuffix(string word)
+		{
+			return word.LastIndexOf("ify", StringComparison.InvariantCultureIgnoreCase) > 0
+				? word.Substring(0, word.Length - 3)
+				: word;
+		}
+
 		private SolutionStyleError CheckConcatenatedWordsInLowerCaseForError(string concatenatedWords, SyntaxToken tokenWithConcatenatedWords)
 		{
 			var currentCheckingWord = "";
