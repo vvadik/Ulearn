@@ -33,7 +33,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 			var methodIdentifier = methodDeclaration.Identifier;
 			var errorsInParameters = InspectMethodParameters(methodDeclaration);
 
-			return CheckIdentifierNameForSpellingErrors(methodIdentifier).Concat(errorsInParameters);
+			return CheckIdentifierNameForSpellingErrors(methodIdentifier, methodDeclaration.ReturnType.ToString()).Concat(errorsInParameters);
 		}
 
 		private List<SolutionStyleError> InspectMethodParameters(MethodDeclarationSyntax methodDeclaration)
@@ -48,17 +48,10 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 		private SolutionStyleError InspectMethodParameter(ParameterSyntax parameter)
 		{
 			var identifier = parameter.Identifier;
-			var identifierText = identifier.Text;
-			var errorsInParameterName = CheckIdentifierNameForSpellingErrors(identifier);
-			foreach (var errorInParameterName in errorsInParameterName)
-			{
-				var parameterTypeAsString = parameter.Type.ToString();
-				if (!parameterTypeAsString.StartsWith(identifierText, StringComparison.InvariantCultureIgnoreCase)
-					|| identifierText.Equals(parameterTypeAsString.MakeTypeNameAbbreviation(), StringComparison.InvariantCultureIgnoreCase))
-					return errorInParameterName;
-			}
+			var parameterTypeAsString = parameter.Type.ToString();
+			var errorsInParameterName = CheckIdentifierNameForSpellingErrors(identifier, parameterTypeAsString);
 
-			return null;
+			return errorsInParameterName.FirstOrDefault();
 		}
 
 		private IEnumerable<SolutionStyleError> InspectVariablesNames(VariableDeclarationSyntax variableDeclarationSyntax, SemanticModel semanticModel)
@@ -72,12 +65,12 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 			var variableIdentifier = variableDeclaratorSyntax.Identifier;
 			var variableType = variableTypeInfo.Type;
 			var variableTypeName = variableType.Name;
-			var variableName = variableIdentifier.Text;
-			if (variableTypeName.StartsWith(variableName, StringComparison.InvariantCultureIgnoreCase)
-				|| variableTypeName.MakeTypeNameAbbreviation().Equals(variableName, StringComparison.InvariantCultureIgnoreCase))
-				return new List<SolutionStyleError>();
+			// var variableName = variableIdentifier.Text;
+			// if (variableTypeName.StartsWith(variableName, StringComparison.InvariantCultureIgnoreCase) //
+			// 	|| variableTypeName.MakeTypeNameAbbreviation().Equals(variableName, StringComparison.InvariantCultureIgnoreCase)) // TODO: перетащить проверку в CheckIdentifierName?
+			// 	return new List<SolutionStyleError>();
 			
-			return CheckIdentifierNameForSpellingErrors(variableIdentifier);
+			return CheckIdentifierNameForSpellingErrors(variableIdentifier, variableTypeName);
 		}
 
 		private IEnumerable<SolutionStyleError> InspectPropertiesNames(PropertyDeclarationSyntax propertyDeclaration)
@@ -85,22 +78,25 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 			var propertyType = propertyDeclaration.Type;
 			var propertyTypeAsString = propertyType.ToString();
 			var propertyName = propertyDeclaration.Identifier.Text;
-			if (propertyTypeAsString.StartsWith(propertyName, StringComparison.InvariantCultureIgnoreCase)
-				|| propertyTypeAsString.MakeTypeNameAbbreviation().Equals(propertyName, StringComparison.InvariantCultureIgnoreCase))
-				return new List<SolutionStyleError>();
+			// if (propertyTypeAsString.StartsWith(propertyName, StringComparison.InvariantCultureIgnoreCase)
+			// 	|| propertyTypeAsString.MakeTypeNameAbbreviation().Equals(propertyName, StringComparison.InvariantCultureIgnoreCase))
+			// 	return new List<SolutionStyleError>();
 			
-			return CheckIdentifierNameForSpellingErrors(propertyDeclaration.Identifier);
+			return CheckIdentifierNameForSpellingErrors(propertyDeclaration.Identifier, propertyTypeAsString);
 		}
 
-		private IEnumerable<SolutionStyleError> CheckIdentifierNameForSpellingErrors(SyntaxToken identifier)
+		private IEnumerable<SolutionStyleError> CheckIdentifierNameForSpellingErrors(SyntaxToken identifier, string typeAsString)
 		{
 			var wordsInIdentifier = identifier.ValueText.SplitByCamelCase();
 			foreach (var word in wordsInIdentifier)
 			{
 				var wordForCheck = RemoveIfySuffix(word.ToLowerInvariant());
-				if (!wordsToExcept.Contains(wordForCheck) && !hunspell.Spell(wordForCheck))
+				if (!(typeAsString.StartsWith(wordForCheck, StringComparison.InvariantCultureIgnoreCase)
+					|| wordForCheck.Equals(typeAsString.MakeTypeNameAbbreviation(), StringComparison.InvariantCultureIgnoreCase)) // TODO: сделать и для небольших частей?
+					&&	!wordsToExcept.Contains(wordForCheck) && !hunspell.Spell(wordForCheck))
 				{
 					var possibleErrorInWord = CheckConcatenatedWordsInLowerCaseForError(wordForCheck, identifier);
+					
 					if (possibleErrorInWord != null)
 						yield return possibleErrorInWord;
 				}
