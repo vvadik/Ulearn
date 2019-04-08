@@ -130,7 +130,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		[HttpPatch]
 		[Authorize]
 		[SwaggerResponse((int)HttpStatusCode.RequestEntityTooLarge, "Your comment is too large")]
-		public async Task<IActionResult> UpdateComment(int commentId, [FromBody] UpdateCommentParameters parameters)
+		public async Task<ActionResult<CommentResponse>> UpdateComment(int commentId, [FromBody] UpdateCommentParameters parameters)
 		{
 			var comment = await commentsRepo.FindCommentByIdAsync(commentId, includeDeleted: true).ConfigureAwait(false);
 
@@ -152,7 +152,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			if (parameters.IsCorrectAnswer.HasValue)
 				await UpdateCommentIsCorrectAnswerAsync(comment, parameters.IsCorrectAnswer.Value).ConfigureAwait(false);
 
-			return Ok(new SuccessResponseWithMessage($"Comment {commentId} successfully updated"));
+			return await Comment(commentId, new CommentParameters { WithReplies = false }).ConfigureAwait(false);
 		}
 
 		private async Task UpdateCommentTextAsync([NotNull] Comment comment, string text)
