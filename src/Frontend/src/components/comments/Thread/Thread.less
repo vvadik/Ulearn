@@ -1,4 +1,5 @@
 @import "./../../../variables.less";
+@import "../commonStyles.less";
 
 .repliesWrapper {
   width: 100%;
@@ -9,7 +10,7 @@
   }
 }
 
-.reply {
+.action {
   margin-top: 15px;
   width: 100%;
 
@@ -23,21 +24,6 @@
   width: 100%;
 }
 
-/*classes for react-transition-group*/
-.enter {
-  background-color: rgba(40,153,234, 0.3);
-}
-
-.enterActive  {
-  background-color: transparent;
-  transition: background 1000ms ease;
-}
-
-.exit {
-  opacity: 1;
-}
-
-.exitActive {
-  opacity: 0.01;
-  transition: opacity 500ms ease;
+.visibleOnDesktopAndTablet {
+  width: 100%;
 }

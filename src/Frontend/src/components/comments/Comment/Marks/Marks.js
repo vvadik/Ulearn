@@ -2,7 +2,6 @@ import React from "react";
 import PropTypes from "prop-types";
 import { comment } from "../../commonPropTypes";
 import Icon from "@skbkontur/react-icons";
-import { NotMobile } from "../../../../utils/responsive";
 
 import styles from "./Marks.less";
 
@@ -20,21 +19,27 @@ export default function Marks({comment, canViewStudentsGroup}) {
 const HiddenMark = () => (
 	<div className={`${styles.mark} ${styles.approvedComment}`}>
 		<Icon name="EyeClosed" size={15} />
-		<NotMobile><span className={styles.text}>Скрытый</span></NotMobile>
+		<span className={`${styles.text} ${styles.visibleOnDesktopAndTablet}`}>
+			Скрытый
+		</span>
 	</div>
 );
 
 const CorrectAnswerMark = () => (
 	<div className={`${styles.mark} ${styles.correctAnswer}`}>
 		<Icon name="Ok" size={15} />
-		<NotMobile><span className={styles.text}>Правильный&nbsp;ответ</span></NotMobile>
+		<span className={`${styles.text} ${styles.visibleOnDesktopAndTablet}`}>
+			Правильный&nbsp;ответ
+		</span>
 	</div>
 );
 
 const PinnedToTopMark = () => (
 	<div className={`${styles.mark} ${styles.pinnedToTop}`}>
 		<Icon name="Pin" size={15} />
-		<NotMobile><span className={styles.text}>Закреплено</span></NotMobile>
+		<span className={`${styles.text} ${styles.visibleOnDesktopAndTablet}`}>
+			Закреплено
+		</span>
 	</div>
 );
 
@@ -46,5 +51,5 @@ const GroupMark = () => (
 
 Marks.propTypes = {
 	comment: comment.isRequired,
-	canViewStudentsGroup: PropTypes.bool,
+	canViewStudentsGroup: PropTypes.func,
 };

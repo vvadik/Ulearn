@@ -10,7 +10,7 @@ import Thread from "../Thread/Thread";
 import CommentSendForm from "../CommentSendForm/CommentSendForm";
 import Error404 from "../../common/Error/Error404";
 import Stub from "../Stub/Stub";
-import scrollIntoView from "../../../utils/scrollIntoView";
+import scrollToView from "../../../utils/scrollToView";
 
 import styles from "./CommentsList.less";
 
@@ -35,9 +35,9 @@ class CommentsList extends Component {
 			animation: false,
 		};
 
-		this.threadRef = React.createRef();
+		this.lastThreadRef = React.createRef();
 
-		this.debouncedSendData = debounce(this.sendData, 1000);
+		this.debouncedSendData = debounce(this.sendData, 300);
 	}
 
 	componentDidMount() {
@@ -56,23 +56,23 @@ class CommentsList extends Component {
 		});
 
 		this.props.commentsApi.getComments(courseId, slideId, forInstructors)
-		.then(json => {
-			let comments = json.topLevelComments;
-			this.setState({
-				threads: comments,
-				loadingComments: false,
-			});
-		})
-		.catch(() => {
-			this.setState({
-				status: "error",
-			});
-		})
-		.finally(() => {
-			this.setState({
-				loadingComments: false,
+			.then(json => {
+				const comments = json.topLevelComments;
+				this.setState({
+					threads: comments,
+					loadingComments: false,
+				});
 			})
-		});
+			.catch(() => {
+				this.setState({
+					status: "error",
+				});
+			})
+			.finally(() => {
+				this.setState({
+					loadingComments: false,
+				})
+			});
 	};
 
 	render() {
@@ -114,59 +114,64 @@ class CommentsList extends Component {
 		const {sending, status, newCommentId} = this.state;
 		const {user, forInstructors} = this.props;
 
-		return (
-			user.isAuthenticated &&
-			<CommentSendForm
-				isForInstructors={forInstructors}
-				commentId={newCommentId}
-				author={user}
-				handleSubmit={this.handleAddComment}
-				sending={sending}
-				isSuccessSend={status} />
-		)
+		if (user.isAuthenticated) {
+			return (
+				<CommentSendForm
+					isForInstructors={forInstructors}
+					commentId={newCommentId}
+					author={user}
+					handleSubmit={this.handleAddComment}
+					sending={sending}
+					sendStatus={status} />
+			)
+		}
 	}
 
 	renderThreads() {
-		const {threads, commentEditing, reply} = this.state;
+		const {threads, commentEditing, reply, animation} = this.state;
 		const {user, userRoles, slideType} = this.props;
+		const transitionStyles = {
+			enter: styles.enter,
+			exit: styles.exit,
+			enterActive: styles.enterActive,
+			exitActive: styles.exitActive,
+		};
+
+		const actions = {
+			handleLikeClick: this.handleLikeClick,
+			handleCorrectAnswerMark: this.handleCorrectAnswerMark,
+			handleApprovedMark: this.handleApprovedMark,
+			handlePinnedToTopMark: this.handlePinnedToTopMark,
+			handleEditComment: this.handleEditComment,
+			handleAddReplyComment: this.handleAddReplyComment,
+			handleDeleteComment: this.handleDeleteComment,
+			handleShowEditForm: this.handleShowEditForm,
+			handleShowReplyForm: this.handleShowReplyForm,
+		};
+
 
 		return (
-			<TransitionGroup enter={this.state.animation}>
+			<TransitionGroup enter={animation}>
 				{threads
 				.map((comment) =>
 					<CSSTransition
 						key={comment.id}
-						appear={true}
-						in={this.state.animation}
+						appear
+						in={animation}
 						mountOnEnter
 						unmountOnExit
-						classNames={{
-							enter: styles.enter,
-							exit: styles.exit,
-							enterActive: styles.enterActive,
-							exitActive: styles.exitActive,
-						}}
-						timeout={500}>
-						<section className={styles.thread} key={comment.id} ref={this.threadRef}>
+						classNames={transitionStyles}
+						timeout={1000}>
+						<section className={styles.thread} key={comment.id} ref={this.lastThreadRef}>
 							<Thread
 								user={user}
 								userRoles={userRoles}
 								slideType={slideType}
-								animation={this.state.animation}
+								animation={animation}
 								comment={comment}
 								commentEditing={commentEditing}
 								reply={reply}
-								actions={{
-									handleLikeClick: this.handleLikeClick,
-									handleCorrectAnswerMark: this.handleCorrectAnswerMark,
-									handleApprovedMark: this.handleApprovedMark,
-									handlePinnedToTopMark: this.handlePinnedToTopMark,
-									handleEditComment: this.handleEditComment,
-									handleAddReplyComment: this.handleAddReplyComment,
-									handleDeleteComment: this.handleDeleteComment,
-									handleShowEditForm: this.handleShowEditForm,
-									handleShowReplyForm: this.handleShowReplyForm,
-								}}
+								actions={actions}
 								getUserSolutionsUrl={this.getUserSolutionsUrl} />
 						</section>
 					</CSSTransition>)}
@@ -175,48 +180,95 @@ class CommentsList extends Component {
 	}
 
 	renderStubForEmptyComments() {
-		return (
-			!this.props.forInstructors ?
+		if (!this.props.forInstructors) {
+			return (
 				<p className={styles.textForEmptyComments}>
 					К этому слайду ещё нет комментариев. Вы можете начать беседу со студентами,
 					добавив комментарий.
 				</p>
-				:
+			)
+		} else {
+			return (
 				<p className={styles.textForEmptyComments}>
 					К этому слайду нет комментариев преподавателей. Вы можете начать беседу с преподавателями,
 					добавив комментарий.
 				</p>
-		)
+			)
+		}
 	}
 
-	findComment(id, threads) {
-		for (const thread of threads) {
+	findCommentPosition(id, threads) {
+		for (let i = 0; i < threads.length; i++) {
+			const thread = threads[i];
 			if (thread.id === id) {
-				return thread;
+				return [threads, i];
 			}
 
-			for (const reply of thread.replies || []) {
+			if (!thread.replies) continue;
+
+			for (let j = 0; j < thread.replies.length; j++) {
+				const reply = thread.replies[j];
 				if (reply.id === id) {
-					return reply;
+					return [thread.replies, j];
 				}
 			}
 		}
 	}
 
+	findComment(id, threads) {
+		const [parentArray, index] = this.findCommentPosition(id, threads);
+
+		return parentArray[index];
+	}
+
+	deleteComment(id, threads) {
+		const [parentArray, index] = this.findCommentPosition(id, threads);
+		const comment = parentArray[index];
+		parentArray.splice(index, 1);
+
+		function restoreComment() {
+			parentArray.splice(index, 0, comment);
+		}
+
+		return restoreComment;
+	}
+
+	compareThreads(a, b) {
+		if (a.isPinnedToTop && !b.isPinnedToTop) {
+			return -1;
+		}
+
+		if (!a.isPinnedToTop && b.isPinnedToTop) {
+			return 1;
+		}
+
+		if (a.publishTime > b.publishTime ) {
+			return -1;
+		}
+
+		if (a.publishTime < b.publishTime ) {
+			return 1;
+		}
+
+		return 0;
+	}
+
 	updateComment(id, reducer) {
-		this.setState(() => {
-			const threads = [...this.state.threads];
-			const comment = this.findComment(id, threads);
+		const threads = [...this.state.threads];
+		const comment = this.findComment(id, threads);
 
-			Object.assign(comment, reducer(comment));
+		Object.assign(comment, reducer(comment));
 
-			return threads;
-		});
+		if (!comment.parentCommentId) {
+			threads.sort(this.compareThreads)
+		}
+
+		this.setState({ threads });
 	}
 
 	handleAddComment = async (commentId, text) => {
 		const {commentsApi, courseId, slideId, forInstructors} = this.props;
-		const threads = JSON.parse(JSON.stringify(this.state.threads));
+		const threads = [...this.state.threads];
 
 		this.setState({
 			sending: true,
@@ -235,19 +287,17 @@ class CommentsList extends Component {
 					newComment,
 					...filteredComments,
 				],
-				sending: false,
 				newCommentId: this.state.newCommentId + 1,
 			});
 
-			this.handleScroll(this.threadRef);
+			this.handleScroll(this.lastThreadRef);
 		}
 		catch (e) {
 			Toast.push("Не удалось добавить комментарий. Попробуйте снова.");
 			this.setState({
 				newCommentId: this.state.newCommentId,
-				sending: false,
 			});
-			console.log(e);
+			console.error(e);
 		}
 		finally {
 			this.setState({
@@ -259,16 +309,16 @@ class CommentsList extends Component {
 	handleLikeClick = (commentId, isLiked) => {
 		const {commentsApi} = this.props;
 
-		this.updateComment(commentId, ({isLiked, likesCount}) => ({
+		this.updateComment(commentId, ({ likesCount }) => ({
 			likesCount: isLiked ? likesCount - 1 : likesCount + 1,
 			isLiked: !isLiked,
 		}));
 
-		this.debouncedSendData(!isLiked ? commentsApi.likeComment : commentsApi.dislikeComment, commentId);
+		this.debouncedSendData(isLiked ? commentsApi.dislikeComment : commentsApi.likeComment, commentId);
 	};
 
 	handleApprovedMark = (commentId, isApproved) => {
-		this.updateComment(commentId, ({isApproved}) => ({
+		this.updateComment(commentId, () => ({
 			isApproved: !isApproved,
 		}));
 
@@ -276,7 +326,7 @@ class CommentsList extends Component {
 	};
 
 	handleCorrectAnswerMark = (commentId, isCorrectAnswer) => {
-		this.updateComment(commentId, ({isCorrectAnswer}) => ({
+		this.updateComment(commentId, () => ({
 			isCorrectAnswer: !isCorrectAnswer,
 		}));
 
@@ -284,31 +334,11 @@ class CommentsList extends Component {
 	};
 
 	handlePinnedToTopMark = (commentId, isPinnedToTop) => {
-		this.updateComment(commentId, ({isPinnedToTop}) => ({
+		this.updateComment(commentId, () => ({
 			isPinnedToTop: !isPinnedToTop,
 		}));
 
-		const comment = this.state.threads.find(comment => comment.id === commentId);
-		const filteredComments = this.state.threads.filter(comment => comment.id !== commentId);
-		const pinnedComments = this.state.threads.filter(comment => comment.isPinnedToTop);
-		const filteredPinnedComments = pinnedComments.filter(comment => comment.id !== commentId);
-		const filteredCommentsWithoutPin = [...filteredComments, {...comment, "isPinnedToTop": !isPinnedToTop}]
-		.sort((a, b) => new Date(b.publishTime) - new Date(a.publishTime));
-
-		if (!isPinnedToTop) {
-			this.setState({
-				threads: [comment, ...filteredComments],
-			});
-		} else {
-			this.setState({
-				threads: [
-					...filteredPinnedComments,
-					...filteredCommentsWithoutPin
-				]
-			});
-		}
-
-		this.debouncedSendData(this.props.commentsApi.updateComment, commentId, {"isPinnedToTop": !isPinnedToTop});
+		this.debouncedSendData(this.props.commentsApi.updateComment, commentId, {isPinnedToTop: !isPinnedToTop});
 	};
 
 	handleShowEditForm = (commentId) => {
@@ -351,7 +381,6 @@ class CommentsList extends Component {
 			this.setState({
 				commentEditing: {
 					commentId: null,
-					sending: false,
 				},
 			});
 		} catch (e) {
@@ -359,10 +388,9 @@ class CommentsList extends Component {
 			this.setState({
 				commentEditing: {
 					commentId: commentId,
-					sending: false,
 				},
 			});
-			console.log(e);
+			console.error(e);
 		} finally {
 			this.setState({
 				commentEditing: {
@@ -398,7 +426,6 @@ class CommentsList extends Component {
 				],
 				reply: {
 					commentId: null,
-					sending: false,
 				},
 			});
 		} catch (e) {
@@ -406,10 +433,9 @@ class CommentsList extends Component {
 			this.setState({
 				reply: {
 					commentId: commentId,
-					sending: false,
 				},
 			});
-			console.log(e);
+			console.error(e);
 		} finally {
 			this.setState({
 				reply: {
@@ -421,51 +447,37 @@ class CommentsList extends Component {
 
 	handleDeleteComment = (commentId) => {
 		const threads = JSON.parse(JSON.stringify(this.state.threads));
-		const queue = [threads];
 
 		this.setState({
 			animation: true,
 		});
 
-		while (queue.length > 0) {
-			const thread = queue.shift();
-			const index = thread.findIndex(c => c.id === commentId);
+		const restoreComment = this.deleteComment(commentId, threads);
+		this.setState({threads});
 
-			if (index !== -1) {
-				const comment = thread[index];
-				thread.splice(index, 1);
+		this.props.commentsApi.deleteComment(commentId)
+			.then(
+				Toast.push("Комментарий удалён", {
+					label: "Восстановить",
+					handler: () => {
+						restoreComment();
+						this.setState({threads});
+						Toast.push("Комментарий восстановлен");
+
+						this.props.commentsApi.updateComment(commentId)
+						.catch(console.error);
+					}
+				})
+			)
+			.catch(e => {
+				Toast.push("Комментарий не удалён. Произошла ошибка, попробуйте снова");
 				this.setState({threads});
-
-				this.props.commentsApi.deleteComment(commentId)
-				.then(
-					Toast.push("Комментарий удалён", {
-						label: "Восстановить",
-						handler: () => {
-							thread.splice(index, 0, comment);
-							this.setState({threads});
-
-							this.props.commentsApi.updateComment(commentId)
-							.catch(console.error);
-							Toast.push("Комментарий восстановлен");
-						}
-					})
-				)
-				.catch(e => {
-					Toast.push("Комментарий не удалён. Произошла ошибка, попробуйте снова");
-					this.setState({threads});
-					console.log(e);
-				});
-				return;
-			}
-
-			thread.forEach(comment => {
-				queue.push(comment.replies);
+				console.error(e);
 			});
-		}
 	};
 
 	handleScroll = (ref) => {
-		scrollIntoView(ref);
+		scrollToView(ref);
 	};
 
 	getUserSolutionsUrl = (userId) => {
@@ -477,7 +489,7 @@ class CommentsList extends Component {
 		method(commentId, property)
 		.catch(e => {
 			Toast.push("Не удалось изменить комментарий. Произошла ошибка, попробуйте снова");
-			console.log(e);
+			console.error(e);
 		});
 }
 

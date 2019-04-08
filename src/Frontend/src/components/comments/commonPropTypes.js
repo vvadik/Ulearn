@@ -1,4 +1,4 @@
-import { shape, oneOf, arrayOf, bool, array, number, string } from "prop-types";
+import { shape, oneOf, arrayOf, bool, array, number, string, element, objectOf } from "prop-types";
 
 export const userType = shape({
 	id: string,
@@ -36,14 +36,31 @@ export const comment = shape({
 	isCorrectAnswer: bool,
 	isPinnedToTop: bool,
 	likesCount: number,
-	replies: array,
 	parentCommentId: number,
 	courseId: string,
 	slideId: string,
 });
+
+comment.replies = arrayOf(comment);
 
 export const commentStatus = shape({
 	commentId: number,
 	sending: bool,
 });
 
+export const markdownType = oneOf(['bold', 'italic', 'code']);
+
+export const markdownDescription = shape({
+		[markdownType]: shape({
+		markup: string,
+		description: string,
+		hotkey: shape ({
+			asText: string,
+			ctrl: bool,
+			key: string,
+		}),
+		icon: element,
+	}),
+});
+
+export const markupOperation = objectOf(markdownDescription);

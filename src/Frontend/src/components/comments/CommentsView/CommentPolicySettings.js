@@ -8,9 +8,9 @@ import Button from "@skbkontur/react-ui/components/Button/Button";
 
 class CommentPolicySettings extends Component {
 	render() {
-		const {canComment, handleToggleCanComment, handleSaveSettings, handleOpenModal} = this.props;
+		const {canComment, handleToggleCanComment, handleSaveSettings, handleCloseModal} = this.props;
 		return (
-			<Modal onClose={() => handleOpenModal(false)}>
+			<Modal onClose={() => handleCloseModal()}>
 				<Modal.Header>Настройки комментариев курса</Modal.Header>
 				<Modal.Body>
 					<div>
@@ -31,7 +31,7 @@ class CommentPolicySettings extends Component {
 				</Modal.Body>
 				<Modal.Footer panel={true}>
 					<Button use="primary" onClick={handleSaveSettings}>Сохранить</Button>
-					<Button onClick={() => handleOpenModal(false)}>Отменить</Button>
+					<Button onClick={() => handleCloseModal()}>Отменить</Button>
 				</Modal.Footer>
 			</Modal>
 		)

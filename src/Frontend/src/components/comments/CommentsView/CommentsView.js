@@ -101,11 +101,11 @@ class CommentsView extends Component {
 	}
 
 	handleTabChange = (_, id) => {
-		this.setState({
-			activeTab: id,
-		});
+		if (id !== this.state.activeTab) {
+			this.setState({
+				activeTab: id,
+			});
 
-		if (id === TABS.instructorsComments) {
 			window.history.pushState ? window.history.pushState({}, "", window.location.pathname) :
 				window.location.hash = "";
 		}

@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import { markupOperation } from "../../commonPropTypes";
 import Hint from "@skbkontur/react-ui/components/Hint/Hint";
 
 import styles from "./MarkdownButtons.less";
@@ -21,7 +22,7 @@ class MarkdownButtons extends Component {
 	renderMarkdownButton(name, operation) {
 		return (
 			<div key={name}>
-				<Hint pos="top" text={this.renderHint(operation)} disableAnimations={false} useWrapper={true}>
+				<Hint pos="top" text={this.renderHint(operation)} disableAnimations={false} useWrapper>
 					<button className={styles.button} onClick={this.onClick(operation)} type="button">
 						<svg
 							width={20}
@@ -38,9 +39,13 @@ class MarkdownButtons extends Component {
 	}
 
 	renderHint({description, markup, hotkey}) {
-		return <span className={styles._yellow}>{markup}<span className={styles._white}>{description}</span>{markup}
-			<br /><span className={styles._yellow}>{hotkey.asText}</span>
-		</span>;
+		return (
+			<span className={styles.lightYellow}>
+				{markup}
+				<span className={styles.white}>{description}</span>
+				{markup}<br />
+				<span className={styles.lightYellow}>{hotkey.asText}</span>
+			</span>)
 	};
 
 	onClick = (operation) => () => {
@@ -49,7 +54,7 @@ class MarkdownButtons extends Component {
 }
 
 MarkdownButtons.propTypes = {
-	markupByOperation: PropTypes.object,
+	markupByOperation: markupOperation,
 	onClick: PropTypes.func,
 };
 

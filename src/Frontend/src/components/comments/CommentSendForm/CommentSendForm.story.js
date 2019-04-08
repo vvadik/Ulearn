@@ -74,7 +74,7 @@ storiesOf("Comments/CommentSendForm", module)
 		<CommentSendForm
 			handleSubmit={action("editComment")}
 			submitTitle={"Сохранить"}
-			onCancel={action("cancelComment")}
+			handleCancel={action("cancelComment")}
 			commentId={1}
 			author={nameOnlyUser}
 			sending={false}

@@ -1,3 +1,6 @@
+@import "./../../../../variables.less";
+@import "./../../commonStyles.less";
+
 .mark {
   text-align: center;
   line-height: 20px;
@@ -6,30 +9,31 @@
   border-radius: 3px;
 }
 
-.correctAnswer, .pinnedToTop {
+.correctAnswer,
+.pinnedToTop {
   padding: 1px 6px 1px;
   color: #fff;
 }
 
 .correctAnswer {
-  background: #3F9726;
+  background: @successColor;
 }
 
 .pinnedToTop {
-  background: #3072C4;
+  background: @linkColor;
 }
 
 .approvedComment {
   padding: 1px 6px 1px;
-  background: #F2F2F2;
-  border: 1px solid #E5E5E5;
-  color: #A0A0A0;
+  background: @whiteSmoke;
+  border: 1px solid @lightGrey;
+  color: @disabledColor;
 }
 
 .group {
   display: none;
-  border: 1px solid #F69C00;
-  color: #F69C00;
+  border: 1px solid @accentColor;
+  color: @accentColor;
   text-transform: uppercase;
   line-height: 20px;
   letter-spacing: 1px;

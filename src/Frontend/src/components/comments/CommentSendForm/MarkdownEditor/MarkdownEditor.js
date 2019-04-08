@@ -13,7 +13,7 @@ const markupByOperation = {
 		hotkey: {
 			asText: "Ctrl + B",
 			ctrl: true,
-			key: "b"
+			key: ["b", "и"],
 		},
 		icon: boldIcon,
 	},
@@ -23,7 +23,7 @@ const markupByOperation = {
 		hotkey: {
 			asText: "Ctrl + I",
 			ctrl: true,
-			key: "i"
+			key: ["i", "ш"],
 		},
 		icon: italicIcon,
 	},
@@ -33,7 +33,7 @@ const markupByOperation = {
 		hotkey: {
 			asText: "Alt + Q",
 			alt: true,
-			key: "q"
+			key: ["q", "й"],
 		},
 		icon: codeIcon,
 	},
@@ -90,13 +90,17 @@ class MarkdownEditor extends Component {
 
 	handleKeyDown = (e) => {
 		for (let operation of Object.values(markupByOperation)) {
-			if (e.key === operation.hotkey.key &&
-				(e.ctrlKey || e.metaKey) === !!operation.hotkey.ctrl &&
-				e.altKey === !!operation.hotkey.alt) {
+			if (this.isKeyFromMarkdownOperation(e, operation)) {
 				this.transformTextToMarkdown(operation);
 				return;
 			}
 		}
+	};
+
+	isKeyFromMarkdownOperation = (event, operation) => {
+		return operation.hotkey.key.includes(event.key) &&
+			(event.ctrlKey || event.metaKey) === !!operation.hotkey.ctrl &&
+			event.altKey === !!operation.hotkey.alt;
 	};
 
 	handleClick = (operation) => {
@@ -109,8 +113,7 @@ class MarkdownEditor extends Component {
 
 		let {finalText, finalSelectionRange} = MarkdownEditor.wrapRangeWithMarkdown(text, range, operation);
 
-		onChange(finalText)
-		.then(() => {
+		onChange(finalText, () => {
 			this.textarea.current.setSelectionRange(
 				finalSelectionRange.start,
 				finalSelectionRange.end,
@@ -119,17 +122,20 @@ class MarkdownEditor extends Component {
 	};
 
 	static wrapRangeWithMarkdown(text, range, operation) {
+		const isErrorInRangeType = typeof range !== "object" || range === null;
+		const isErrorInStartEndAvailable = !("start" in range) || !("end" in range);
+		const isErrorInStartEndType = typeof range.start !== "number" || typeof range.end !== "number";
+		const isErrorInRangeLength = range.start < 0 || range.end < range.start || range.end > text.length;
+
 		if (typeof text !== "string") {
 			throw new TypeError("text should be a string");
 		}
 
-		if (typeof range !== "object" || range === null
-			|| !("start" in range) || !("end" in range)
-			|| typeof range.start !== "number" || typeof range.end !== "number") {
+		if (isErrorInRangeType|| isErrorInStartEndAvailable || isErrorInStartEndType) {
 			throw new TypeError("range should be an object with `start` and `end` properties of type `number`");
 		}
 
-		if (range.start < 0 || range.end < range.start || range.end > text.length) {
+		if (isErrorInRangeLength) {
 			throw new RangeError("range should be within 0 and text.length");
 		}
 

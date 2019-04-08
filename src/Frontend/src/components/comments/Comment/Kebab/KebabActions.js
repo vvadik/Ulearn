@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { comment, userType, userRoles } from "../../commonPropTypes";
 import Kebab from "@skbkontur/react-ui/components/Kebab/Kebab";
@@ -8,13 +8,27 @@ import { ACCESSES, SLIDETYPE } from "../../../../consts/general";
 
 import styles from "./KebabActions.less";
 
+function useIsMobileView() {
+	const handleWindowResize = () => {
+		setIsMobileView(document.documentElement.clientWidth < 768);
+	};
+	const [isMobileView, setIsMobileView] = useState(false);
+	useEffect(() => {
+		window.addEventListener('resize', handleWindowResize);
+
+		return () => window.removeEventListener('resize', handleWindowResize);
+	}, []);
+
+	return isMobileView;
+}
+
 export default function KebabActions(props) {
 	const {user, comment, userRoles, url, canModerateComments, actions, slideType} = props;
 	const canModerate = canModerateComments(userRoles, ACCESSES.editPinAndRemoveComments);
 	const canDeleteAndEdit = (user.id === comment.author.id || canModerate);
 	const canSeeSubmissions = (slideType === SLIDETYPE.exercise &&
 		canModerateComments(userRoles, ACCESSES.viewAllStudentsSubmissions));
-	const viewInMobile = document.documentElement.clientWidth < 768;
+	const isMobileView = useIsMobileView();
 
 	return (
 		<div className={styles.instructorsActions}>
@@ -25,13 +39,13 @@ export default function KebabActions(props) {
 					onClick={() => actions.handleDeleteComment(comment.id)}>
 					Удалить
 				</MenuItem>}
-				{(canDeleteAndEdit && viewInMobile) &&
+				{(canDeleteAndEdit && isMobileView) &&
 				<MenuItem
 					icon={<Icon.Edit size="small" />}
 					onClick={() => actions.handleShowEditForm(comment.id)}>
 					Редактировать
 				</MenuItem>}
-				{(canSeeSubmissions && viewInMobile) &&
+				{(canSeeSubmissions && isMobileView) &&
 				<MenuItem
 					href={url}
 					icon={<Icon name="DocumentLite" size="small" />}>
@@ -43,19 +57,18 @@ export default function KebabActions(props) {
 					onClick={() => actions.handleApprovedMark(comment.id, comment.isApproved)}>
 					{!comment.isApproved ? "Опубликовать" : "Скрыть"}
 				</MenuItem>}
-				{canModerate ?
-					comment.parentCommentId ?
-						<MenuItem
-							onClick={() => actions.handleCorrectAnswerMark(comment.id, comment.isCorrectAnswer)}
-							icon={<Icon name="Ok" size="small" />}>
-							{comment.isCorrectAnswer ? "Снять отметку" : "Отметить правильным"}
-						</MenuItem> :
-						<MenuItem
-							onClick={() => actions.handlePinnedToTopMark(comment.id, comment.isPinnedToTop)}
-							icon={<Icon name="Pin" size="small" />}>
-							{comment.isPinnedToTop ? "Открепить" : "Закрепить"}
-						</MenuItem>
-					: null}
+				{(canModerate && comment.parentCommentId) &&
+					<MenuItem
+						onClick={() => actions.handleCorrectAnswerMark(comment.id, comment.isCorrectAnswer)}
+						icon={<Icon name="Ok" size="small" />}>
+						{comment.isCorrectAnswer ? "Снять отметку" : "Отметить правильным"}
+					</MenuItem>}
+				{(canModerate && !comment.parentCommentId) &&
+					<MenuItem
+						onClick={() => actions.handlePinnedToTopMark(comment.id, comment.isPinnedToTop)}
+						icon={<Icon name="Pin" size="small" />}>
+						{comment.isPinnedToTop ? "Открепить" : "Закрепить"}
+					</MenuItem>}
 			</Kebab>
 		</div>
 	)

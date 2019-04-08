@@ -4,7 +4,6 @@ import { userType } from "../commonPropTypes";
 import Button from "@skbkontur/react-ui/components/Button/Button";
 import Avatar from "../../common/Avatar/Avatar";
 import MarkdownEditor from "./MarkdownEditor/MarkdownEditor";
-import { NotMobile } from "../../../utils/responsive";
 
 import styles from "./CommentSendForm.less";
 
@@ -16,8 +15,10 @@ class CommentSendForm extends Component {
 			text: props.text || "",
 			error: null,
 			commentId: props.commentId,
-			status: props.isSuccessSend,
+			status: props.sendStatus,
 		};
+
+		this.editor = React.createRef();
 	}
 
 	static getDerivedStateFromProps(props, state) {
@@ -30,7 +31,6 @@ class CommentSendForm extends Component {
 		return null;
 	}
 
-	editor = React.createRef();
 
 	render() {
 		const {author, isForInstructors} = this.props;
@@ -39,11 +39,9 @@ class CommentSendForm extends Component {
 		return (
 			<div className={styles.formContainer}>
 				{author && (
-					<NotMobile>
-						<div className={styles.avatar}>
-							<Avatar user={author} size="big" />
-						</div>
-					</NotMobile>
+					<div className={`${styles.avatar} ${styles.visibleOnDesktopAndTablet}`}>
+						<Avatar user={author} size="big" />
+					</div>
 				)}
 				<form className={styles.form} onSubmit={this.handleSubmit}>
 					<MarkdownEditor
@@ -78,9 +76,9 @@ class CommentSendForm extends Component {
 	}
 
 	renderCancelButton() {
-		const {onCancel, cancelTitle = "Отменить"} = this.props;
+		const {handleCancel, cancelTitle = "Отменить"} = this.props;
 
-		if (!onCancel) {
+		if (!handleCancel) {
 			return null;
 		}
 
@@ -89,7 +87,7 @@ class CommentSendForm extends Component {
 				use="secondary"
 				size="medium"
 				type="button"
-				onClick={onCancel}>
+				onClick={handleCancel}>
 				{cancelTitle}
 			</Button>
 		);
@@ -112,23 +110,20 @@ class CommentSendForm extends Component {
 		handleSubmit(commentId, text);
 	};
 
-	handleChange = (text) => {
-		return new Promise((resolve) => {
-			this.setState({text, error: null}, resolve);
-		});
+	handleChange = (text, callback) => {
+		this.setState({text, error: null}, callback);
 	};
-
 }
 
 CommentSendForm.propTypes = {
 	author: userType,
 	commentId: PropTypes.number,
 	handleSubmit: PropTypes.func,
-	isSuccessSend: PropTypes.string,
+	sendStatus: PropTypes.string,
 	isForInstructors: PropTypes.bool,
 	sending: PropTypes.bool,
 	submitTitle: PropTypes.string,
-	onCancel: PropTypes.func,
+	handleCancel: PropTypes.func,
 	cancelTitle: PropTypes.string,
 };
 

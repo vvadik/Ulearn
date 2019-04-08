@@ -1,7 +1,5 @@
 @import "./../../../variables.less";
 
-@headerWithDividerHeight: 60px;
-
 .comment {
   display: flex;
   flex-direction: row;
@@ -20,7 +18,7 @@
 }
 
 .timeSinceAdded {
-  color: #808080;
+  color: @additionalColor;
   font-size: 14px;
 }
 
@@ -33,7 +31,12 @@
   }
 }
 
+.textFromServer {
+  display: inline-block;
+  margin-right: 15px;
+}
+
 .commentAnchor {
   position: absolute;
-  top: -@headerWithDividerHeight;
+  top: -(@headerHeight + @headerDivider);
 }

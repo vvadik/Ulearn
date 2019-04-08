@@ -1,4 +1,4 @@
-export default function scrollIntoView(element) {
+export default function scrollToView(element) {
 	const header = document.getElementById('header');
 	let headerHeight = header.getBoundingClientRect().height;
 	const divider = document.getElementById('headerContentDivider');

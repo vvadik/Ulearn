@@ -2,25 +2,26 @@ import React from "react";
 import PropTypes from "prop-types";
 import { comment, userRoles, userType } from "../../commonPropTypes";
 import Link from "@skbkontur/react-ui/components/Link/Link";
+import Button from "@skbkontur/react-ui/components/Button/Button";
 import Icon from "@skbkontur/react-icons";
 import { ACCESSES, SLIDETYPE } from "../../../../consts/general";
-import uuid from "uuid";
-import { NotMobile } from "../../../../utils/responsive";
 
 import styles from "./CommentActions.less";
 
-const Button = ({onClick, icon, children}) => (
-	<button type="button" className={styles.reply} onClick={onClick}>
-		<Icon name={icon} />
-		<span className={styles.text}>{children}</span>
-	</button>
+const ButtonAction = ({onClick, icon, children}) => (
+	<div className={styles.action}>
+		<Button use="link" onClick={onClick} icon={<Icon name={icon} />}>
+			{children}
+		</Button>
+	</div>
 );
 
-const ActionLink = ({url, icon, children}) => (
-	<Link href={url}>
-		<Icon name={icon} />
-		<span className={styles.linkText}>{children}</span>
-	</Link>
+const LinkAction = ({url, icon, children}) => (
+	<div className={styles.action}>
+		<Link href={url} icon={<Icon name={icon} />}>
+			{children}
+		</Link>
+	</div>
 );
 
 export default function CommentActions(props) {
@@ -32,34 +33,34 @@ export default function CommentActions(props) {
 		const commentId = comment.parentCommentId ? comment.parentCommentId : comment.id;
 
 		commentActions.push(
-			<Button
-				key={uuid()}
+			<ButtonAction
+				key="Ответить"
 				onClick={() => actions.handleShowReplyForm(commentId)}
 				icon="ArrowCorner1">
 				Ответить
-			</Button>);
+			</ButtonAction>);
 	}
 
 	if (user.id === comment.author.id || canModerateComments(userRoles, ACCESSES.editPinAndRemoveComments)) {
 		commentActions.push(
-			<NotMobile key={uuid()}>
-				<Button
-					onClick={() => actions.handleShowEditForm(comment.id)}
-					icon="Edit">
-					Редактировать
-				</Button>
-			</NotMobile>);
+		<div className={styles.visibleOnDesktopAndTablet}  key="Редактировать">
+			<ButtonAction
+				onClick={() => actions.handleShowEditForm(comment.id)}
+				icon="Edit">
+				Редактировать
+			</ButtonAction>
+		</div>);
 	}
 
 	if (slideType === SLIDETYPE.exercise && canModerateComments(userRoles, ACCESSES.viewAllStudentsSubmissions)) {
 		commentActions.push(
-			<NotMobile key={uuid()}>
-				<ActionLink
+			<div className={styles.visibleOnDesktopAndTablet}  key="Решения">
+				<LinkAction
 					url={url}
 					icon="DocumentLite">
 					Посмотреть решения
-				</ActionLink>
-			</NotMobile>);
+				</LinkAction>
+			</div>);
 	}
 
 	return (

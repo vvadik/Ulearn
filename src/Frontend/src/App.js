@@ -49,7 +49,7 @@ let store = configureStore({
 		lastTimestamp: undefined
 	}
 });
-window.ulearnReduxStore = store;
+
 // Update notifications count each minute
 setInterval(() => {
 	if (store.getState().account.isAuthenticated)

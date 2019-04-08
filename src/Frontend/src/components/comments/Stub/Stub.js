@@ -19,7 +19,7 @@ function Stub(props) {
 					<Button width={200} use="primary" size="large" type="button" align="center">
 						Зарегистрироваться</Button>
 				</Link>
-				<Link href={urlToEnter}><Button use="link">Войти</Button></Link>
+				<Link href={urlToEnter}>Войти</Link>
 			</Gapped>
 		</div>
 	);
