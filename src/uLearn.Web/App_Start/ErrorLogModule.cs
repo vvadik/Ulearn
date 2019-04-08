@@ -3,6 +3,7 @@ using System.Linq;
 using System.Web.Hosting;
 using Elmah;
 using log4net;
+using Metrics;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Telegram;
@@ -12,6 +13,7 @@ namespace uLearn.Web
 	public class ErrorLogModule : Elmah.ErrorLogModule
 	{
 		private readonly ErrorsBot errorsBot;
+		
 		private static readonly ILog log = LogManager.GetLogger(typeof(ErrorLogModule));
 
 		private static readonly List<string> ignorableForTelegramChannelSubstrings = new List<string>
@@ -45,7 +47,9 @@ namespace uLearn.Web
 				error.Exception);
 
 			if (!IsErrorIgnoredForTelegramChannel(error))
+			{
 				errorsBot.PostToChannel(entryId, error.Exception);
+			}
 		}
 	}
 }

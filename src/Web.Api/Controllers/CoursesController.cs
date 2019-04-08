@@ -6,6 +6,7 @@ using Database.Models;
 using Database.Repos;
 using Database.Repos.CourseRoles;
 using Database.Repos.Users;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Ulearn.Common.Api.Models.Responses;
@@ -42,10 +43,18 @@ namespace Ulearn.Web.Api.Controllers
 			
 			var courses = await courseManager.GetCoursesAsync(coursesRepo).ConfigureAwait(false);
 
-			if (role.HasValue && !await IsSystemAdministratorAsync().ConfigureAwait(false))
+			var isSystemAdministrator = await IsSystemAdministratorAsync().ConfigureAwait(false);
+
+			if (role.HasValue && !isSystemAdministrator)
 			{
-				var instructorCourseIds = await courseRolesRepo.GetCoursesWhereUserIsInRoleAsync(UserId, role.Value).ConfigureAwait(false);
-				courses = courses.Where(c => instructorCourseIds.Contains(c.Id, StringComparer.InvariantCultureIgnoreCase));
+				var courseIdsAsRole = await courseRolesRepo.GetCoursesWhereUserIsInRoleAsync(UserId, role.Value).ConfigureAwait(false);
+				courses = courses.Where(c => courseIdsAsRole.Contains(c.Id, StringComparer.InvariantCultureIgnoreCase)).OrderBy(c => c.Title);
+			}
+
+			if (isSystemAdministrator)
+			{
+				var instructorCourseIds = await courseRolesRepo.GetCoursesWhereUserIsInRoleAsync(UserId, CourseRoleType.Instructor).ConfigureAwait(false);
+				courses = courses.OrderBy(c => !instructorCourseIds.Contains(c.Id, StringComparer.InvariantCultureIgnoreCase)).ThenBy(c => c.Title);
 			}
 
 			return new CoursesListResponse

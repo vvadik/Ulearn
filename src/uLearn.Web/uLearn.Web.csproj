@@ -32,6 +32,7 @@
     <UseGlobalApplicationHostFile />
     <TargetFrameworkProfile />
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -1572,7 +1573,7 @@
       <Name>Database</Name>
     </ProjectReference>
     <ProjectReference Include="..\Metrics\Metrics.csproj">
-      <Project>{6BF55402-68F0-4BA3-9F03-E42C3912C9CA}</Project>
+      <Project>{b6b60d19-c6bd-4d66-95da-14480a18770c}</Project>
       <Name>Metrics</Name>
     </ProjectReference>
     <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj">

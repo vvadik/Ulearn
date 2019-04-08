@@ -19,7 +19,6 @@ using Microsoft.VisualBasic.FileIO;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
-using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
@@ -169,16 +168,6 @@ namespace uLearn.Web.Controllers
 			return File(courseManager.GetCourseVersionFile(versionId).FullName, "application/zip", packageName);
 		}
 		
-		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
-		public ActionResult DownloadCourseFile(string courseId)
-		{
-			var content = coursesRepo.GetCourseFile(courseId);
-			if(content == null)
-				return new HttpStatusCodeResult(HttpStatusCode.NotFound);
-			var packageName = courseManager.GetPackageName(courseId);
-			return File(content, "application/zip", packageName);
-		}
-
 		private async Task NotifyAboutCourseVersion(string courseId, Guid versionId, string userId)
 		{
 			var notification = new UploadedPackageNotification
@@ -242,6 +231,8 @@ namespace uLearn.Web.Controllers
 			var userId = User.Identity.GetUserId();
 			await coursesRepo.AddCourseVersion(courseId, versionId, userId).ConfigureAwait(false);
 			await coursesRepo.MarkCourseVersionAsPublished(versionId).ConfigureAwait(false);
+			var courseFile = courseManager.GetStagingCourseFile(courseId);
+			await coursesRepo.AddCourseFile(courseId, versionId, courseFile.ReadAllContent()).ConfigureAwait(false);
 			await NotifyAboutPublishedCourseVersion(courseId, versionId, userId).ConfigureAwait(false);
 			
 			return RedirectToAction("Packages", new { courseId, onlyPrivileged = true });
@@ -829,8 +820,8 @@ namespace uLearn.Web.Controllers
 			log.Info($"Создаю шаблон сертификата «{name}» для курса {courseId}");
 			var archiveName = SaveUploadedTemplate(archive);
 			var template = await certificatesRepo.AddTemplate(courseId, name, archiveName);
+			await LoadUploadedTemplateToBD(archiveName, template.Id).ConfigureAwait(false);
 			log.Info($"Создал шаблон, Id = {template.Id}, путь к архиву {template.ArchiveName}");
-
 			return RedirectToAction("Certificates", new { courseId });
 		}
 
@@ -850,6 +841,12 @@ namespace uLearn.Web.Controllers
 			return archiveName;
 		}
 
+		private async Task LoadUploadedTemplateToBD(string archiveName, Guid templateId)
+		{
+			var content = await certificateGenerator.GetTemplateArchivePath(archiveName).ReadAllContentAsync().ConfigureAwait(false);
+			await certificatesRepo.AddCertificateTemplateArchive(archiveName, templateId, content).ConfigureAwait(false);
+		}
+
 		[HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public async Task<ActionResult> EditCertificateTemplate(string courseId, Guid templateId, string name, HttpPostedFileBase archive)
@@ -863,6 +860,7 @@ namespace uLearn.Web.Controllers
 			if (archive != null && archive.ContentLength > 0)
 			{
 				var archiveName = SaveUploadedTemplate(archive);
+				await LoadUploadedTemplateToBD(archiveName, template.Id).ConfigureAwait(false);
 				log.Info($"Загружен новый архив в {archiveName}");
 				await certificatesRepo.ChangeTemplateArchiveName(templateId, archiveName);
 			}
@@ -1205,6 +1203,23 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> EnableStyleValidation(StyleErrorType errorType, bool isEnabled)
 		{
 			await styleErrorsRepo.EnableStyleErrorAsync(errorType, isEnabled);
+			return Json(new { status = "ok" });
+		}
+		
+		[SysAdminsOnly]
+		[HttpPost]
+		public async Task<ActionResult> UploadPublishedCoursesToBd()
+		{
+			var courses = courseManager.GetCourses();
+			foreach (var course in courses)
+			{
+				var publishedVersion = coursesRepo.GetPublishedCourseVersion(course.Id);
+				if(publishedVersion == null)
+					continue;
+				var fileInfo = courseManager.GetStagingCourseFile(course.Id);
+				var content = await fileInfo.ReadAllContentAsync().ConfigureAwait(false);
+				await coursesRepo.AddCourseFile(course.Id, publishedVersion.Id, content).ConfigureAwait(false);
+			}
 			return Json(new { status = "ok" });
 		}
 	}

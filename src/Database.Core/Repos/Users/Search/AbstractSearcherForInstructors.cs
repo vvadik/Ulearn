@@ -18,14 +18,14 @@ namespace Database.Repos.Users.Search
 		private readonly bool hasSystemAdministratorAccess;
 		private readonly bool hasCourseAdminAccess;
 		private readonly bool hasInstructorAccessToGroupMembers;
-		private readonly bool hasInstructorAccessToGroupInstructors;
+		private readonly bool hasInstructorAccessToCourseInstructors;
 		private readonly SearchField searchField;
 
 		private readonly Expression<Func<ApplicationUser, string>>[] userProperties;
 
 		public AbstractSearcherForInstructors(
 			IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, IAccessRestrictor accessRestrictor,
-			bool hasSystemAdministratorAccess, bool hasCourseAdminAccess, bool hasInstructorAccessToGroupMembers, bool hasInstructorAccessToGroupInstructors,
+			bool hasSystemAdministratorAccess, bool hasCourseAdminAccess, bool hasInstructorAccessToGroupMembers, bool hasInstructorAccessToCourseInstructors,
 			SearchField searchField,
 			params Expression<Func<ApplicationUser, string>>[] userProperties
 		)
@@ -40,7 +40,7 @@ namespace Database.Repos.Users.Search
 			this.hasSystemAdministratorAccess = hasSystemAdministratorAccess;
 			this.hasCourseAdminAccess = hasCourseAdminAccess;
 			this.hasInstructorAccessToGroupMembers = hasInstructorAccessToGroupMembers;
-			this.hasInstructorAccessToGroupInstructors = hasInstructorAccessToGroupInstructors;
+			this.hasInstructorAccessToCourseInstructors = hasInstructorAccessToCourseInstructors;
 			
 			this.searchField = searchField;
 			this.userProperties = userProperties;
@@ -51,14 +51,14 @@ namespace Database.Repos.Users.Search
 			return searchField;
 		}
 
-		public virtual Task<IQueryable<ApplicationUser>> GetSearchScopeAsync(IQueryable<ApplicationUser> users, ApplicationUser currentUser)
+		public virtual Task<IQueryable<ApplicationUser>> GetSearchScopeAsync(IQueryable<ApplicationUser> users, ApplicationUser currentUser, string courseId)
 		{
 			return accessRestrictor.RestrictUsersSetAsync(
-				users, currentUser,
+				users, currentUser, courseId,
 				hasSystemAdministratorAccess,
 				hasCourseAdminAccess,
 				hasInstructorAccessToGroupMembers,
-				hasInstructorAccessToGroupInstructors
+				hasInstructorAccessToCourseInstructors
 			);
 		}
 

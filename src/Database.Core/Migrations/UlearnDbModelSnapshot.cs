@@ -283,7 +283,8 @@ namespace Database.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("ArchiveName")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(128);
 
                     b.Property<string>("CourseId")
                         .IsRequired()
@@ -301,6 +302,23 @@ namespace Database.Migrations
                     b.HasIndex("CourseId");
 
                     b.ToTable("CertificateTemplates");
+                });
+
+            modelBuilder.Entity("Database.Models.CertificateTemplateArchive", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(128);
+
+                    b.Property<Guid>("CertificateTemplateId");
+
+                    b.Property<byte[]>("Content")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CertificateTemplateId");
+
+                    b.ToTable("CertificateTemplateArchives");
                 });
 
             modelBuilder.Entity("Database.Models.Comments.Comment", b =>
@@ -2084,6 +2102,14 @@ namespace Database.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Database.Models.CertificateTemplateArchive", b =>
+                {
+                    b.HasOne("Database.Models.CertificateTemplate", "CertificateTemplate")
+                        .WithMany()
+                        .HasForeignKey("CertificateTemplateId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Database.Models.Comments.Comment", b =>

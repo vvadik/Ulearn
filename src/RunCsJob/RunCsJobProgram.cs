@@ -151,6 +151,9 @@ namespace RunCsJob
 		private void MainLoop(Client client)
 		{
 			var serviceKeepAliver = new ServiceKeepAliver("runcsjob");
+			if (!int.TryParse(ConfigurationManager.AppSettings["ulearn.runcsjob.keepAlive.interval"], out var keepAliveIntervalSeconds))
+				keepAliveIntervalSeconds = 30;
+			var keepAliveInterval = TimeSpan.FromSeconds(keepAliveIntervalSeconds);
 			while (!shutdownEvent.WaitOne(0))
 			{
 				List<RunnerSubmission> newUnhandled;
@@ -180,7 +183,7 @@ namespace RunCsJob
 						log.Error("Не могу отправить результаты проверки на ulearn", e);
 					}
 				}
-				serviceKeepAliver.Ping(TimeSpan.FromMinutes(1));
+				serviceKeepAliver.Ping(keepAliveInterval);
 				Thread.Sleep(sleep);
 			}
 		}

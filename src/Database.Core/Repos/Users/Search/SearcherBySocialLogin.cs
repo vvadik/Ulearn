@@ -23,14 +23,14 @@ namespace Database.Repos.Users.Search
 			return SearchField.SocialLogin;
 		}
 
-		public Task<IQueryable<ApplicationUser>> GetSearchScopeAsync(IQueryable<ApplicationUser> users, ApplicationUser currentUser)
+		public Task<IQueryable<ApplicationUser>> GetSearchScopeAsync(IQueryable<ApplicationUser> users, ApplicationUser currentUser, string courseId)
 		{
 			return accessRestrictor.RestrictUsersSetAsync(
-				users, currentUser,
+				users, currentUser, courseId,
 				hasSystemAdministratorAccess: true, 
 				hasCourseAdminAccess: false,
 				hasInstructorAccessToGroupMembers: false,
-				hasInstructorAccessToGroupInstructors: false
+				hasInstructorAccessToCourseInstructors: false
 			);
 		}
 

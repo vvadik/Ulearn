@@ -19,7 +19,7 @@ namespace Database.Repos.Users.Search
 			return SearchField.UserId;
 		}
 
-		public Task<IQueryable<ApplicationUser>> GetSearchScopeAsync(IQueryable<ApplicationUser> users, ApplicationUser currentUser)
+		public Task<IQueryable<ApplicationUser>> GetSearchScopeAsync(IQueryable<ApplicationUser> users, ApplicationUser currentUser, string courseId)
 		{
 			return Task.FromResult(users);
 		}

@@ -61,7 +61,7 @@ namespace AntiPlagiarism.UpdateDb
 						
 						try
 						{
-							await UpdateSnippetsFromSubmissionAsync(snippetsRepo, submission);
+							await UpdateSnippetsFromSubmissionAsync(snippetsRepo, submission).ConfigureAwait(false);
 						}
 						catch (Exception e)
 						{
@@ -84,7 +84,7 @@ namespace AntiPlagiarism.UpdateDb
 		private async Task UpdateSnippetsFromSubmissionAsync(ISnippetsRepo snippetsRepo, Submission submission)
 		{
 			var occurences = new HashSet<Tuple<int, int>>(
-				(await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(submission))
+				(await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(submission).ConfigureAwait(false))
 				.Select(o => Tuple.Create(o.SnippetId, o.FirstTokenIndex))
 			);
 			

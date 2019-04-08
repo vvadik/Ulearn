@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using NHunspell;
 using Ulearn.Common.Extensions;
@@ -58,7 +59,7 @@ namespace Ulearn.Core.SpellChecking
 		public SpellChecker(string customDictionaryPath)
 		{
 			prefixes = Resources.customPrefixes.SplitToLines();
-			hunspell = new Hunspell(Resources.ru_RU_aff, Resources.ru_RU_dic);
+			hunspell = new Hunspell(Encoding.UTF8.GetBytes(Resources.ru_RU_aff), Encoding.UTF8.GetBytes(Resources.ru_RU_dic));
 
 			InitializeInternalCustomDicionary(hunspell);
 

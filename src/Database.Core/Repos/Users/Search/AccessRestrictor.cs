@@ -20,8 +20,8 @@ namespace Database.Repos.Users.Search
 			this.groupAccessesRepo = groupAccessesRepo;
 		}
 
-		public async Task<IQueryable<ApplicationUser>> RestrictUsersSetAsync(IQueryable<ApplicationUser> users, ApplicationUser currentUser,
-			bool hasSystemAdministratorAccess, bool hasCourseAdminAccess, bool hasInstructorAccessToGroupMembers, bool hasInstructorAccessToGroupInstructors)
+		public async Task<IQueryable<ApplicationUser>> RestrictUsersSetAsync(IQueryable<ApplicationUser> users, ApplicationUser currentUser, string courseId,
+			bool hasSystemAdministratorAccess, bool hasCourseAdminAccess, bool hasInstructorAccessToGroupMembers, bool hasInstructorAccessToCourseInstructors)
 		{
 			if (hasSystemAdministratorAccess && usersRepo.IsSystemAdministrator(currentUser))
 				return users;
@@ -37,10 +37,13 @@ namespace Database.Repos.Users.Search
 				userIds.UnionWith(groupsMembers.Select(m => m.UserId));
 			}
 
-			if (hasInstructorAccessToGroupInstructors)
+			if (hasInstructorAccessToCourseInstructors)
 			{
-				var groupsInstructors = await groupAccessesRepo.GetInstructorsOfAllGroupsAvailableForUserAsync(currentUser.Id).ConfigureAwait(false);
-				userIds.UnionWith(groupsInstructors.Select(u => u.Id));
+				var courseInstructors =
+					courseId != null
+						? await courseRolesRepo.GetUsersWithRoleAsync(courseId, CourseRoleType.Instructor)
+						: (await groupAccessesRepo.GetInstructorsOfAllGroupsAvailableForUserAsync(currentUser.Id).ConfigureAwait(false)).Select(u => u.Id);
+				userIds.UnionWith(courseInstructors);
 			}
 
 			return users.Where(u => userIds.Contains(u.Id));
