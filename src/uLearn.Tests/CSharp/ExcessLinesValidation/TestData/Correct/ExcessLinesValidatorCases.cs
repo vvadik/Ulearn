@@ -13,6 +13,12 @@ namespace uLearn.CSharp.ExcessLinesValidation.TestData.Correct
 	}
 	#endregion
 
+	public interface InterfaceWithWhere<out T>
+		where T: IInterface1
+	{
+		T GetCommand();
+	}
+	
 	public class SomeClass2<T>
 		: BaseClass
 		where T : IComparable<T>

@@ -151,13 +151,13 @@ namespace Ulearn.Core.CSharp.Validators
 					if (initializer != null)
 						return GetEndLine(initializer);
 					return GetEndArgumentsLine(constructorDeclarationSyntax);
-				case ClassDeclarationSyntax classDeclarationSyntax:
-					var baseListSyntax = classDeclarationSyntax.BaseList;
-					var classConstraints = classDeclarationSyntax.ConstraintClauses;
-					if (classConstraints.Any())
-						return GetEndLine(classConstraints.Last());
+				case TypeDeclarationSyntax typeDeclarationSyntax:
+					var baseListSyntax = typeDeclarationSyntax.BaseList;
+					var typeConstraints = typeDeclarationSyntax.ConstraintClauses;
+					if (typeConstraints.Any())
+						return GetEndLine(typeConstraints.Last());
 					if (baseListSyntax == null)
-						return GetStartLine(classDeclarationSyntax.Identifier);
+						return GetStartLine(typeDeclarationSyntax.Identifier);
 					return GetEndLine(baseListSyntax);
 				case BlockSyntax blockSyntax:
 					if (blockSyntax.Parent.Kind() == SyntaxKind.Block)
