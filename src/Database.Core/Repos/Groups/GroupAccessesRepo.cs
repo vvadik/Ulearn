@@ -221,10 +221,11 @@ namespace Database.Repos.Groups
 		{
 			var groupsWhereUserIsStudent = await groupMembersRepo.GetUserGroupsAsync(courseId, userId).ConfigureAwait(false);
 			var accesses = await GetGroupAccessesAsync(groupsWhereUserIsStudent.Select(g => g.Id)).ConfigureAwait(false);
-			var ownersIds = groupsWhereUserIsStudent.Select(g => g.OwnerId);
+			var ownersIds = groupsWhereUserIsStudent.Select(g => g.OwnerId).ToList();
 			return accesses
 				.SelectMany(kvp => kvp.Value.Select(a => a.User.Id))
 				.Concat(ownersIds)
+				.Distinct()
 				.ToList();
 		}
 		

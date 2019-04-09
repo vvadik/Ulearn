@@ -532,6 +532,8 @@ namespace Database.Models
 			return visitsRepo.GetCourseUsersAsync(CourseId);
 		}
 
+		public override bool IsNotificationForEveryone => true;
+
 		public override List<Notification> GetBlockerNotifications(IServiceProvider serviceProvider)
 		{
 			var notificationsRepo = serviceProvider.GetService<INotificationsRepo>(); 
