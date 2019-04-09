@@ -126,9 +126,14 @@ namespace Ulearn.Web.Api.Controllers.Comments
 					await notificationsRepo.AddNotificationAsync(courseId, replyNotification, comment.AuthorId).ConfigureAwait(false);
 				}
 			}
+			
+			/* Create NewCommentFromStudentFormYourGroupNotification later than RepliedToYourCommentNotification, because the last one is blocker for the first one.
+			 * We don't send NewCommentNotification if there is a RepliedToYouCommentNotification */
+			var commentFromYourGroupStudentNotification = new NewCommentFromYourGroupStudentNotification { Comment = comment };
+			await notificationsRepo.AddNotificationAsync(courseId, commentFromYourGroupStudentNotification, comment.AuthorId);
 
-			/* Create NewComment[ForInstructors]Notification later than RepliedToYourCommentNotification, because the last one is blocker for the first one.
-			 * We don't send NewComment[ForInstructors]Notification if RepliedToYouCommentNotification exists */
+			/* Create NewComment[ForInstructors]Notification later than RepliedToYourCommentNotification and NewCommentFromYourGroupStudentNotification, because the last one is blocker for the first one.
+			 * We don't send NewCommentNotification if there is a RepliedToYouCommentNotification or NewCommentFromYourGroupStudentNotification */
 			var notification = comment.IsForInstructorsOnly
 				? (Notification) new NewCommentForInstructorsOnlyNotification { Comment = comment } 
 				: new NewCommentNotification { Comment = comment };
