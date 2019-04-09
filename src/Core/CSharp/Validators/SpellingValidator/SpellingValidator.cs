@@ -91,15 +91,25 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 			foreach (var word in wordsInIdentifier)
 			{
 				var wordForCheck = RemoveIfySuffix(word.ToLowerInvariant());
-				if (!(typeAsString.StartsWith(wordForCheck, StringComparison.InvariantCultureIgnoreCase)
-					|| wordForCheck.Equals(typeAsString.MakeTypeNameAbbreviation(), StringComparison.InvariantCultureIgnoreCase)) // TODO: сделать и для небольших частей?
-					&&	!wordsToExcept.Contains(wordForCheck) && !hunspell.Spell(wordForCheck))
+				var wordInDifferentNumbers = GetWordInDifferentNumbers(wordForCheck);
+				var doesWordContainError = true;
+				foreach (var wordInDifferentNumber in wordInDifferentNumbers)
 				{
-					var possibleErrorInWord = CheckConcatenatedWordsInLowerCaseForError(wordForCheck, identifier);
-					
+					if (typeAsString.StartsWith(wordInDifferentNumber, StringComparison.InvariantCultureIgnoreCase) // TODO: проверять множественное число
+						|| wordInDifferentNumber.Equals(typeAsString.MakeTypeNameAbbreviation(), StringComparison.InvariantCultureIgnoreCase) // TODO: сделать и для небольших частей?
+						|| wordsToExcept.Contains(wordForCheck) || hunspell.Spell(wordInDifferentNumber))
+					{
+						doesWordContainError = false;
+						break;
+					}
+					var possibleErrorInWord = CheckConcatenatedWordsInLowerCaseForError(wordInDifferentNumber, identifier);
 					if (possibleErrorInWord != null)
-						yield return possibleErrorInWord;
+						continue;
+					doesWordContainError = false;
+					break;
 				}
+				if (doesWordContainError)
+					yield return new SolutionStyleError(StyleErrorType.Misspeling01, identifier, $"В слове {word} допущена опечатка.");
 			}
 		}
 
@@ -108,6 +118,15 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 			return word.LastIndexOf("ify", StringComparison.InvariantCultureIgnoreCase) > 0
 				? word.Substring(0, word.Length - 3)
 				: word;
+		}
+
+		private IEnumerable<string> GetWordInDifferentNumbers(string word)
+		{
+			yield return word;
+			if (word.Length > 1 && word.EndsWith("s", StringComparison.InvariantCultureIgnoreCase))
+				yield return word.Substring(0, word.Length - 1);
+			if (word.Length > 2 && word.EndsWith("es", StringComparison.InvariantCultureIgnoreCase))
+				yield return word.Substring(0, word.Length - 2);
 		}
 
 		private SolutionStyleError CheckConcatenatedWordsInLowerCaseForError(string concatenatedWords, SyntaxToken tokenWithConcatenatedWords)
