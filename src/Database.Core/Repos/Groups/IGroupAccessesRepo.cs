@@ -22,5 +22,6 @@ namespace Database.Repos.Groups
 		Task<List<string>> GetCoursesWhereUserCanSeeAllGroupsAsync(string userId, IEnumerable<string> coursesIds);
 		Task<List<GroupMember>> GetMembersOfAllGroupsAvailableForUserAsync(string userId);
 		Task<List<ApplicationUser>> GetInstructorsOfAllGroupsAvailableForUserAsync(string userId);
+		Task<List<string>> GetInstructorsOfAllGroupsWhereUserIsMemberAsync(string courseId, string userId);
 	}
 }
