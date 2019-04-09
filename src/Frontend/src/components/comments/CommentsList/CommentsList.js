@@ -370,8 +370,7 @@ class CommentsList extends Component {
 		});
 
 		try {
-			const request = await commentsApi.updateComment(commentId, {"text": text});
-			const newComment = await commentsApi.getComment(commentId);
+			const newComment = await commentsApi.updateComment(commentId, {"text": text});
 
 			this.updateComment(commentId, () => ({
 				text: text,
