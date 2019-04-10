@@ -16,7 +16,8 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 		private static readonly Hunspell hunspell = new Hunspell(Resources.en_US_aff, Resources.en_US_dic);
 		private static readonly HashSet<string> wordsToExcept = new HashSet<string>
 		{
-			"func", "arg", "pos", "bmp", "prev", "next", "rnd", "autocomplete", "tuple", "len", "api", "tuples", "vm"
+			"func", "arg", "pos", "bmp", "prev", "next", "rnd", "autocomplete", "tuple", "len", "api", "tuples", "vm",
+			"ptr", "btn"
 		};
 		
 		public override List<SolutionStyleError> FindErrors(SyntaxTree userSolution, SemanticModel semanticModel)
