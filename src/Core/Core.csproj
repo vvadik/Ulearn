@@ -38,6 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\Metrics\Metrics.csproj" />
     <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj" />
     <ProjectReference Include="..\Ulearn.CSharpAttributes\Ulearn.CSharpAttributes.csproj" />
   </ItemGroup>

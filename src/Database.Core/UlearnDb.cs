@@ -79,6 +79,7 @@ namespace Database
 			modelBuilder.Entity<ReceivedCommentToCodeReviewNotification>().Property(n => n.CommentId).HasColumnName("CommentId");
 			modelBuilder.Entity<NewCommentNotification>().Property(n => n.CommentId).HasColumnName("CommentId1");
 			modelBuilder.Entity<NewCommentForInstructorsOnlyNotification>().Property(n => n.CommentId).HasColumnName("CommentId1");
+			modelBuilder.Entity<NewCommentFromYourGroupStudentNotification>().Property(n => n.CommentId).HasColumnName("CommentId1");
 			modelBuilder.Entity<RepliedToYourCommentNotification>().Property(n => n.CommentId).HasColumnName("CommentId1");
 			modelBuilder.Entity<LikedYourCommentNotification>().Property(n => n.CommentId).HasColumnName("CommentId1");
 			modelBuilder.Entity<CreatedGroupNotification>().Property(n => n.GroupId).HasColumnName("GroupId");
@@ -160,6 +161,7 @@ namespace Database
 			SetDeleteBehavior<ReceivedAdditionalScoreNotification, AdditionalScore>(modelBuilder, c => c.Score, c => c.ScoreId);
 
 			SetDeleteBehavior<NewCommentNotification, Comment>(modelBuilder, c => c.Comment, c => c.CommentId);
+			SetDeleteBehavior<NewCommentFromYourGroupStudentNotification, Comment>(modelBuilder, c => c.Comment, c => c.CommentId);
 			SetDeleteBehavior<LikedYourCommentNotification, Comment>(modelBuilder, c => c.Comment, c => c.CommentId);
 			SetDeleteBehavior<RepliedToYourCommentNotification, Comment>(modelBuilder, c => c.Comment, c => c.CommentId);
 			SetDeleteBehavior<RepliedToYourCommentNotification, Comment>(modelBuilder, c => c.ParentComment, c => c.ParentCommentId);
@@ -411,6 +413,7 @@ namespace Database
 		public DbSet<GroupAccess> GroupAccesses { get; set; }
 
 		public DbSet<CertificateTemplate> CertificateTemplates { get; set; }
+		public DbSet<CertificateTemplateArchive> CertificateTemplateArchives { get; set; }
 		public DbSet<Certificate> Certificates { get; set; }
 
 		public DbSet<AdditionalScore> AdditionalScores { get; set; }

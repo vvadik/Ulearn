@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using log4net;
@@ -86,6 +87,49 @@ namespace Ulearn.Common
 				func();
 				return 0;
 			}, triesCount, () => { });
+		}
+
+		public static void Using<TDisposable>(TDisposable disposable, Action<TDisposable> body, Action<TDisposable> additionalDisposeAction = null)
+			where TDisposable : IDisposable
+		{
+			try
+			{
+				body(disposable);
+			}
+			finally
+			{
+				additionalDisposeAction?.Invoke(disposable);
+				disposable.Dispose();
+			}
+		}
+		
+		public static TOut Using<TDisposable, TOut>(TDisposable disposable, Func<TDisposable, TOut> body, Action<TDisposable> additionalDisposeAction = null)
+			where TDisposable : IDisposable
+		{
+			try
+			{
+				return body(disposable);
+			}
+			finally
+			{
+				additionalDisposeAction?.Invoke(disposable);
+				disposable.Dispose();
+			}
+		}
+		
+		public static IEnumerable<TOut> Using<TDisposable, TOut>(TDisposable disposable, Func<TDisposable, IEnumerable<TOut>> body, Action<TDisposable> additionalDisposeAction = null)
+			where TDisposable : IDisposable
+		{
+			try
+			{
+				foreach (var result in body(disposable))
+				yield return result;
+			}
+			finally
+			{
+				additionalDisposeAction?.Invoke(disposable);
+				disposable.Dispose();
+			}
 		}
 	}
 

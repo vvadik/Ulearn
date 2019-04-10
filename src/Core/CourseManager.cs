@@ -64,7 +64,7 @@ namespace Ulearn.Core
 		public virtual IEnumerable<Course> GetCourses()
 		{
 			LoadCoursesIfNotYet();
-			return courses.Values;
+			return courses.Values.OrderBy(c => c.Title, StringComparer.OrdinalIgnoreCase);
 		}
 
 		[NotNull]
@@ -143,8 +143,12 @@ namespace Ulearn.Core
 			{
 				if (courses.Count != 0)
 					return;
-				log.Info($"Загружаю курсы из {stagedDirectory.FullName}");
 				var courseZips = stagedDirectory.GetFiles("*.zip");
+				var courseIdsWithZips = courseZips.Select(z => GetCourseId(z.FullName));
+				LoadCourseZipsToDiskFromExternalStorage(courseIdsWithZips);
+				
+				log.Info($"Загружаю курсы из {stagedDirectory.FullName}");
+				courseZips = stagedDirectory.GetFiles("*.zip");
 				foreach (var zipFile in courseZips)
 				{
 					log.Info($"Обновляю курс из {zipFile.Name}");
@@ -164,6 +168,11 @@ namespace Ulearn.Core
 			if (firstException != null)
 				throw firstException;
 		}
+
+		protected virtual void LoadCourseZipsToDiskFromExternalStorage(IEnumerable<string> existingOnDiskCourseIds)
+		{
+			// NONE
+		} 
 
 		protected Course ReloadCourse(string courseId)
 		{
@@ -312,7 +321,7 @@ namespace Ulearn.Core
 			{
 				var courseXml = zip.Entries.FirstOrDefault(e => Path.GetFileName(e.FileName) == "course.xml" && !e.IsDirectory);
 				if (courseXml != null)
-					UpdateXmlAttribute(zip["course.xml"], "//ulearn:course", "title", courseTitle, zip, nsResolver);
+					UpdateXmlAttribute(zip[courseXml.FileName], "//ulearn:course", "title", courseTitle, zip, nsResolver);
 			}
 		}
 

@@ -9,6 +9,7 @@ import * as comments from "./comments"
 
 const API_JWT_TOKEN_UPDATED = "API_JWT_TOKEN_UPDATED";
 let apiJwtToken = "";
+let refreshApiJwtTokenPromise = undefined;
 let serverErrorHandler = () => {
 };
 
@@ -41,6 +42,19 @@ function clearApiJwtToken() {
 }
 
 function request(url, options, isRetry) {
+	if(!isRetry && (refreshApiJwtTokenPromise !== undefined || apiJwtToken === '')) {
+		if(refreshApiJwtTokenPromise === undefined) {
+			refreshApiJwtTokenPromise = refreshApiJwtToken();
+		}
+		return refreshApiJwtTokenPromise
+		.catch(_ => {
+		})
+		.then(_ => { // catch + then = finally, but real finally does not return its result
+			refreshApiJwtTokenPromise = undefined;
+			return request(url, options, true);
+		});
+	}
+
 	options = options || {};
 	options.credentials = options.credentials || "include";
 	options.headers = options.headers || {};
@@ -53,28 +67,32 @@ function request(url, options, isRetry) {
 			serverErrorHandler("Не можем подключиться к серверу. Попробуйте обновить страницу.");
 
 		throw error;
-	})
-	.then(response => {
+	}).then(response => {
 		if (response.status >= 200 && response.status < 300)
 			return response;
-		if (response.status === 401 && !isRetry)
-			return refreshApiJwtToken();
-
+		if (response.status === 401) {
+			if(!isRetry) {
+				if (refreshApiJwtTokenPromise !== undefined)
+					return response;
+				return refreshApiJwtTokenPromise = refreshApiJwtToken();
+			} else {
+				return response;
+			}
+		}
 		if (response.status >= 500)
 			serverErrorHandler();
 
 		throw new Error(`HTTP response code: ${response.status}`);
 	})
-	.catch((error) => {
-		console.error(error);
-		throw error;
-	})
 	.then(value => {
 		if (value === API_JWT_TOKEN_UPDATED)
 			return request(url, options, true);
-
-		return value.json();
-	})
+		if(value.status >= 200 && value.status < 300)
+			return value.json();
+		return value;
+	}).finally(_ => {
+		refreshApiJwtTokenPromise = undefined;
+	});
 }
 
 function get(url, options) {

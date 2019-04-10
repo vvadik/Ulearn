@@ -106,12 +106,18 @@ class DownloadedHtmlContent extends Component {
 			if (response.redirected) {
 				/* If it was a redirect from external login callback, then update user information */
 				const oldUrlPathname = getUrlParts(url).pathname;
-				if (oldUrlPathname.startsWith("/Login/ExternalLoginCallback"))
+				if (oldUrlPathname.startsWith("/Login/ExternalLoginCallback")) {
 					this.props.updateUserInformation();
+					this.props.updateCourses();
+				}
 
 				let newUrl = getUrlParts(response.url);
-				this.context.router.history.replace(newUrl.pathname + newUrl.search);
-				return Promise.resolve(undefined);
+				if(oldUrlPathname.startsWith('/Account/ReturnHijack') || oldUrlPathname.startsWith('/Account/Hijack')) {
+					window.location.href = newUrl.pathname + newUrl.search;
+				} else {
+					this.context.router.history.replace(newUrl.pathname + newUrl.search);
+					return Promise.resolve(undefined);
+				}
 			}
 			/* Process attaches: download them and return url back */
 			if (response.headers.has('Content-Disposition')) {
@@ -300,8 +306,10 @@ class DownloadedHtmlContent extends Component {
 					if (response.redirected) {
 						/* If it was the login form, then update user information in header */
 						let formUrlParts = getUrlParts(formUrl).pathname;
-						if (formUrlParts.startsWith('/Login') || formUrlParts.startsWith('/Account/') || formUrlParts.startsWith('/RestorePassword/'))
+						if (formUrlParts.startsWith('/Login') || formUrlParts.startsWith('/Account/') || formUrlParts.startsWith('/RestorePassword/')) {
 							this.props.updateUserInformation();
+							this.props.updateCourses();
+						}
 
 						let newUrlParts = getUrlParts(response.url);
 
@@ -311,8 +319,13 @@ class DownloadedHtmlContent extends Component {
 						if (!isUrlChanged)
 							newUrlParts.search += (newUrlParts.search === '' ? '?' : '&') + 'rnd=' + Math.random();
 
-						this.context.router.history.replace(newUrlParts.pathname + newUrlParts.search);
-						return Promise.resolve(undefined);
+						if(formUrlParts.startsWith('/Account/ReturnHijack') || formUrlParts.startsWith('/Account/Hijack')) {
+							window.location.href = newUrlParts.pathname + newUrlParts.search;
+						}
+						else {
+							this.context.router.history.replace(newUrlParts.pathname + newUrlParts.search);
+							return Promise.resolve(undefined);
+						}
 					}
 					return response.text()
 				}).then(data => {
@@ -337,7 +350,8 @@ class DownloadedHtmlContent extends Component {
 				type: 'COURSES__COURSE_ENTERED',
 				courseId: courseId
 			}),
-			updateUserInformation: () => dispatch(api.account.getCurrentUser())
+			updateUserInformation: () => dispatch(api.account.getCurrentUser()),
+			updateCourses: () => dispatch(api.courses.getCourses()),
 		}
 	}
 

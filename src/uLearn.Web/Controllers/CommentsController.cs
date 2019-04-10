@@ -237,9 +237,14 @@ namespace uLearn.Web.Controllers
 					await notificationsRepo.AddNotification(courseId, replyNotification, comment.AuthorId);
 				}
 			}
-
-			/* Create NewCommentNotification later than RepliedToYourCommentNotification, because the last one is blocker for the first one.
+			
+			/* Create NewCommentFromStudentFormYourGroupNotification later than RepliedToYourCommentNotification, because the last one is blocker for the first one.
 			 * We don't send NewCommentNotification if there is a RepliedToYouCommentNotification */
+			var commentFromYourGroupStudentNotification = new NewCommentFromYourGroupStudentNotification { Comment = comment };
+			await notificationsRepo.AddNotification(courseId, commentFromYourGroupStudentNotification, comment.AuthorId);
+
+			/* Create NewCommentNotification later than RepliedToYourCommentNotification and NewCommentFromYourGroupStudentNotification, because the last one is blocker for the first one.
+			 * We don't send NewCommentNotification if there is a RepliedToYouCommentNotification or NewCommentFromYourGroupStudentNotification */
 			var notification = comment.IsForInstructorsOnly
 				? (Notification) new NewCommentForInstructorsOnlyNotification { Comment = comment } 
 				: new NewCommentNotification { Comment = comment };

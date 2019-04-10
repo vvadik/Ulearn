@@ -201,6 +201,9 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult ExportCourseStatisticsAsJson(CourseStatisticsParams param)
 		{
+			if(param.CourseId == null)
+				return HttpNotFound();
+
 			var model = GetCourseStatisticsModel(param, 3000);
 
 			var filename = model.Course.Id + ".json";
@@ -212,6 +215,9 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult ExportCourseStatisticsAsXml(CourseStatisticsParams param)
 		{
+			if(param.CourseId == null)
+				return HttpNotFound();
+			
 			var model = GetCourseStatisticsModel(param, 3000);
 
 			var filename = model.Course.Id + ".xml";
@@ -223,6 +229,9 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult ExportCourseStatisticsAsXlsx(CourseStatisticsParams param)
 		{
+			if(param.CourseId == null)
+				return HttpNotFound();
+			
 			var model = GetCourseStatisticsModel(param, 3000);
 
 			var package = new ExcelPackage();
@@ -362,6 +371,9 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Student)]
 		public ActionResult CourseStatistics(CourseStatisticsParams param, int max=200)
 		{
+			if(param.CourseId == null)
+				return HttpNotFound();
+			
 			var usersLimit = max;
 			if (usersLimit > 300)
 				usersLimit = 300;
@@ -497,11 +509,18 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 			
 			var slides = unit.Slides;
-			var exercises = slides.OfType<ExerciseSlide>();
+			var exercises = slides.OfType<ExerciseSlide>().ToList();
 			var acceptedSubmissions = userSolutionsRepo
 				.GetAllAcceptedSubmissionsByUser(courseId, exercises.Select(s => s.Id), userId)
 				.OrderByDescending(s => s.Timestamp)
-				.DistinctBy(u => u.SlideId);
+				.DistinctBy(u => u.SlideId)
+				.ToList();
+			var reviewedSubmissions = userSolutionsRepo
+				.GetAllAcceptedSubmissionsByUser(courseId, exercises.Select(s => s.Id), userId)
+				.Where(s => s.ManualCheckings.Any(c => c.IsChecked))
+				.OrderByDescending(s => s.Timestamp)
+				.DistinctBy(u => u.SlideId)
+				.ToList();
 			var userScores = visitsRepo.GetScoresForSlides(courseId, userId, slides.Select(s => s.Id));
 
 			var unitIndex = course.Units.FindIndex(u => u.Id == unitId);
@@ -514,7 +533,8 @@ namespace uLearn.Web.Controllers
 				Unit = unit,
 				User = user,
 				Slides = slides.ToDictionary(s => s.Id),
-				Submissions = acceptedSubmissions.ToList(),
+				Submissions = acceptedSubmissions,
+				ReviewedSubmissions = reviewedSubmissions,
 				Scores = userScores,
 				PreviousUnit = previousUnit,
 				NextUnit = nextUnit,
@@ -808,6 +828,7 @@ namespace uLearn.Web.Controllers
 		public Unit Unit { get; set; }
 		public ApplicationUser User { get; set; }
 		public List<UserExerciseSubmission> Submissions { get; set; }
+		public List<UserExerciseSubmission> ReviewedSubmissions { get; set; }
 		public Dictionary<Guid, Slide> Slides { get; set; }
 		public Dictionary<Guid, int> Scores { get; set; }
 		public Unit PreviousUnit { get; set; }

@@ -101,6 +101,7 @@ namespace Database.DataContexts
 			CancelCascaseDeleting<ReceivedAdditionalScoreNotification, AdditionalScore, int?>(modelBuilder, c => c.Score, c => c.ScoreId, isRequired: false);
 			
 			CancelCascaseDeleting<NewCommentNotification, Comment, int>(modelBuilder, c => c.Comment, c => c.CommentId);
+			CancelCascaseDeleting<NewCommentFromYourGroupStudentNotification, Comment, int>(modelBuilder, c => c.Comment, c => c.CommentId);
 			CancelCascaseDeleting<LikedYourCommentNotification, Comment, int>(modelBuilder, c => c.Comment, c => c.CommentId);
 			CancelCascaseDeleting<RepliedToYourCommentNotification, Comment, int>(modelBuilder, c => c.Comment, c => c.CommentId);
 			CancelCascaseDeleting<RepliedToYourCommentNotification, Comment, int>(modelBuilder, c => c.ParentComment, c => c.ParentCommentId);
@@ -210,6 +211,7 @@ namespace Database.DataContexts
 		public DbSet<GroupAccess> GroupAccesses { get; set; }
 
 		public DbSet<CertificateTemplate> CertificateTemplates { get; set; }
+		public DbSet<CertificateTemplateArchive> CertificateTemplateArchives { get; set; }
 		public DbSet<Certificate> Certificates { get; set; }
 
 		public DbSet<AdditionalScore> AdditionalScores { get; set; }
