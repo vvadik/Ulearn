@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Transactions;
 using AntiPlagiarism.Web.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Ulearn.Common;
@@ -54,11 +55,11 @@ namespace AntiPlagiarism.Web.Database.Repos
 
 		private async Task TrySaveTaskStatisticsParametersAsync(TaskStatisticsParameters parameters)
 		{
-			using (var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable).ConfigureAwait(false))
+			using (var ts = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromSeconds(30)))
 			{
 				db.AddOrUpdate(parameters, p => p.TaskId == parameters.TaskId);
 				await db.SaveChangesAsync().ConfigureAwait(false);
-				transaction.Commit();
+				ts.Complete();
 			}
 		}
 	}
