@@ -95,7 +95,8 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 				var doesWordContainError = true;
 				foreach (var wordInDifferentNumber in wordInDifferentNumbers)
 				{
-					if (typeAsString.StartsWith(wordInDifferentNumber, StringComparison.InvariantCultureIgnoreCase) // TODO: проверять множественное число
+					if (wordInDifferentNumber.Length <= 2
+						|| typeAsString.StartsWith(wordInDifferentNumber, StringComparison.InvariantCultureIgnoreCase) // TODO: проверять множественное число
 						|| wordInDifferentNumber.Equals(typeAsString.MakeTypeNameAbbreviation(), StringComparison.InvariantCultureIgnoreCase) // TODO: сделать и для небольших частей?
 						|| wordsToExcept.Contains(wordForCheck) || hunspell.Spell(wordInDifferentNumber))
 					{
