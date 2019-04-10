@@ -16,8 +16,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 		private static readonly Hunspell hunspell = new Hunspell(Resources.en_US_aff, Resources.en_US_dic);
 		private static readonly HashSet<string> wordsToExcept = new HashSet<string>
 		{
-			"func", "arg", "args", "pos", "sw", "bmp", "prev", "next", "rnd", "ui", "autocomplete", "tuple", "len", "api", "tuples", "vm",
-			"ai"
+			"func", "arg", "pos", "bmp", "prev", "next", "rnd", "autocomplete", "tuple", "len", "api", "tuples", "vm"
 		};
 		
 		public override List<SolutionStyleError> FindErrors(SyntaxTree userSolution, SemanticModel semanticModel)
@@ -98,7 +97,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 					if (wordInDifferentNumber.Length <= 2
 						|| typeAsString.StartsWith(wordInDifferentNumber, StringComparison.InvariantCultureIgnoreCase) // TODO: проверять множественное число
 						|| wordInDifferentNumber.Equals(typeAsString.MakeTypeNameAbbreviation(), StringComparison.InvariantCultureIgnoreCase) // TODO: сделать и для небольших частей?
-						|| wordsToExcept.Contains(wordForCheck) || hunspell.Spell(wordInDifferentNumber))
+						|| wordsToExcept.Contains(wordInDifferentNumber) || hunspell.Spell(wordInDifferentNumber))
 					{
 						doesWordContainError = false;
 						break;
