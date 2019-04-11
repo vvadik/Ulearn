@@ -8,7 +8,7 @@ import { ACCESSES, SLIDETYPE } from "../../../../consts/general";
 
 import styles from "./CommentActions.less";
 
-const ButtonAction = ({onClick, icon, children}) => (
+const ActionButton = ({onClick, icon, children}) => (
 	<div className={styles.action}>
 		<Button use="link" onClick={onClick} icon={<Icon name={icon} />}>
 			{children}
@@ -16,7 +16,7 @@ const ButtonAction = ({onClick, icon, children}) => (
 	</div>
 );
 
-const LinkAction = ({url, icon, children}) => (
+const ActionLink = ({url, icon, children}) => (
 	<div className={styles.action}>
 		<Link href={url} icon={<Icon name={icon} />}>
 			{children}
@@ -33,33 +33,33 @@ export default function CommentActions(props) {
 		const commentId = comment.parentCommentId ? comment.parentCommentId : comment.id;
 
 		commentActions.push(
-			<ButtonAction
+			<ActionButton
 				key="Ответить"
 				onClick={() => actions.handleShowReplyForm(commentId)}
 				icon="ArrowCorner1">
 				Ответить
-			</ButtonAction>);
+			</ActionButton>);
 	}
 
 	if (user.id === comment.author.id || canModerateComments(userRoles, ACCESSES.editPinAndRemoveComments)) {
 		commentActions.push(
 		<div className={styles.visibleOnDesktopAndTablet}  key="Редактировать">
-			<ButtonAction
+			<ActionButton
 				onClick={() => actions.handleShowEditForm(comment.id)}
 				icon="Edit">
 				Редактировать
-			</ButtonAction>
+			</ActionButton>
 		</div>);
 	}
 
 	if (slideType === SLIDETYPE.exercise && canModerateComments(userRoles, ACCESSES.viewAllStudentsSubmissions)) {
 		commentActions.push(
 			<div className={styles.visibleOnDesktopAndTablet}  key="Решения">
-				<LinkAction
+				<ActionLink
 					url={url}
 					icon="DocumentLite">
 					Посмотреть решения
-				</LinkAction>
+				</ActionLink>
 			</div>);
 	}
 
