@@ -8,11 +8,8 @@
     <ProjectReference Include="..\Metrics\Metrics.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NETStandard.Library" Version="2.0.3" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.4.1" />
+    <PackageReference Include="System.Net.Http" Version="4.3.2" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="4.4.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System.Net.Http" Condition="'$(TargetFramework)' == 'net47'" />
   </ItemGroup>
 </Project>
