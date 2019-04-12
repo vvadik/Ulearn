@@ -147,7 +147,9 @@ namespace uLearn.Web.Controllers
 			log.Info($"Получил от RunCsJob результаты проверки решений: [{string.Join(", ", results.Select(r => r.Id))}] от агента {agent}");
 
 			foreach (var result in results)
-				await FuncUtils.TrySeveralTimesAsync(() => userSolutionsRepo.SaveResult(result, SendToReviewAndUpdateScore), 3).ConfigureAwait(false);
+				await FuncUtils.TrySeveralTimesAsync(() => userSolutionsRepo.SaveResult(result, 
+					submission => BaseExerciseController.SendToReviewAndUpdateScore(submission, courseManager, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender, false)
+				), 3).ConfigureAwait(false);
 
 			var submissionsByIds = userSolutionsRepo
 				.FindSubmissionsByIds(results.Select(result => result.Id).ToList())
@@ -161,38 +163,6 @@ namespace uLearn.Web.Controllers
 			}
 		}
 		
-		private async Task SendToReviewAndUpdateScore(UserExerciseSubmission submission)
-		{
-			var userId = submission.User.Id;
-			var courseId = submission.CourseId;
-			var course = courseManager.GetCourse(courseId);
-			var exerciseSlide = course.FindSlideById(submission.SlideId) as ExerciseSlide;
-			if (exerciseSlide == null)
-				return;
-			var exerciseMetricId = BaseExerciseController.GetExerciseMetricId(courseId, exerciseSlide);
-			var automaticChecking = submission.AutomaticChecking;
-			var isProhibitedUserToSendForReview = slideCheckingsRepo.IsProhibitedToSendExerciseToManualChecking(courseId, exerciseSlide.Id, userId);
-			var sendToReview = exerciseSlide.Scoring.RequireReview
-								&& submission.AutomaticCheckingIsRightAnswer
-								&& !isProhibitedUserToSendForReview
-								&& groupsRepo.IsManualCheckingEnabledForUser(course, userId);
-			if (sendToReview)
-			{
-				await slideCheckingsRepo.RemoveWaitingManualCheckings<ManualExerciseChecking>(courseId, exerciseSlide.Id, userId, false);
-				await slideCheckingsRepo.AddManualExerciseChecking(courseId, exerciseSlide.Id, userId, submission);
-				await visitsRepo.MarkVisitsAsWithManualChecking(courseId, exerciseSlide.Id, userId);
-				metricSender.SendCount($"exercise.{exerciseMetricId}.sent_to_review");
-				metricSender.SendCount("exercise.sent_to_review");
-			}
-
-			await visitsRepo.UpdateScoreForVisit(courseId, exerciseSlide.Id, exerciseSlide.MaxScore, userId);
-
-			if (automaticChecking != null)
-			{
-				var verdictForMetric = automaticChecking.GetVerdict().Replace(" ", "");
-				metricSender.SendCount($"exercise.{exerciseMetricId}.{verdictForMetric}");
-			}
-		}
 
 		private Task SendResultToObservers(UserExerciseSubmission submission, RunningResults result)
 		{
