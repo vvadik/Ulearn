@@ -4,6 +4,7 @@ using uLearn.CSharp.ExcessLinesValidation.TestData;
 
 namespace uLearn.CSharp.ExcessLinesValidation.TestData.Correct
 {
+	using List = System.Collections.Generic;
 	#region MyRegion
 	public class BaseClass { }
 
@@ -13,6 +14,12 @@ namespace uLearn.CSharp.ExcessLinesValidation.TestData.Correct
 	}
 	#endregion
 
+	public interface InterfaceWithWhere<out T>
+		where T: IInterface1
+	{
+		T GetCommand();
+	}
+	
 	public class SomeClass2<T>
 		: BaseClass
 		where T : IComparable<T>

@@ -113,6 +113,7 @@ class DownloadedHtmlContent extends Component {
 
 				let newUrl = getUrlParts(response.url);
 				if(oldUrlPathname.startsWith('/Account/ReturnHijack') || oldUrlPathname.startsWith('/Account/Hijack')) {
+					localStorage.removeItem('exercise_solutions');
 					window.location.href = newUrl.pathname + newUrl.search;
 				} else {
 					this.context.router.history.replace(newUrl.pathname + newUrl.search);
@@ -320,6 +321,7 @@ class DownloadedHtmlContent extends Component {
 							newUrlParts.search += (newUrlParts.search === '' ? '?' : '&') + 'rnd=' + Math.random();
 
 						if(formUrlParts.startsWith('/Account/ReturnHijack') || formUrlParts.startsWith('/Account/Hijack')) {
+							localStorage.removeItem('exercise_solutions');
 							window.location.href = newUrlParts.pathname + newUrlParts.search;
 						}
 						else {

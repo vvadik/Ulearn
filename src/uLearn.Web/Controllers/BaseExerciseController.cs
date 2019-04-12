@@ -132,7 +132,11 @@ namespace uLearn.Web.Controllers
 				await CreateStyleErrorsReviewsForSubmission(submission, buildResult.StyleErrors, exerciseMetricId);
 			
 			var automaticChecking = submission.AutomaticChecking;
-			var sentToReview = slideCheckingsRepo.HasManualExerciseChecking(courseId, exerciseSlide.Id, userId, submission.Id);
+			bool sentToReview;
+			if (!submissionLanguage.HasAutomaticChecking())
+				sentToReview = await SendToReviewAndUpdateScore(submission, courseManager, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender, true).ConfigureAwait(false);
+			else
+				sentToReview = slideCheckingsRepo.HasManualExerciseChecking(courseId, exerciseSlide.Id, userId, submission.Id);
 			
 			var result = new RunSolutionResult
 			{
@@ -152,8 +156,45 @@ namespace uLearn.Web.Controllers
 			}
 			return result;
 		}
+		
+		public static async Task<bool> SendToReviewAndUpdateScore(UserExerciseSubmission submission,
+			CourseManager courseManager, SlideCheckingsRepo slideCheckingsRepo, GroupsRepo groupsRepo, VisitsRepo visitsRepo, MetricSender metricSender,
+			bool startTransaction)
+		{
+			var userId = submission.User.Id;
+			var courseId = submission.CourseId;
+			var course = courseManager.GetCourse(courseId);
+			var exerciseSlide = course.FindSlideById(submission.SlideId) as ExerciseSlide;
+			if (exerciseSlide == null)
+				return false;
+			var exerciseMetricId = GetExerciseMetricId(courseId, exerciseSlide);
+			var automaticChecking = submission.AutomaticChecking;
+			var isProhibitedUserToSendForReview = slideCheckingsRepo.IsProhibitedToSendExerciseToManualChecking(courseId, exerciseSlide.Id, userId);
+			var sendToReview = exerciseSlide.Scoring.RequireReview
+								&& submission.AutomaticCheckingIsRightAnswer
+								&& !isProhibitedUserToSendForReview
+								&& groupsRepo.IsManualCheckingEnabledForUser(course, userId);
+			if (sendToReview)
+			{
+				await slideCheckingsRepo.RemoveWaitingManualCheckings<ManualExerciseChecking>(courseId, exerciseSlide.Id, userId, false);
+				await slideCheckingsRepo.AddManualExerciseChecking(courseId, exerciseSlide.Id, userId, submission);
+				await visitsRepo.MarkVisitsAsWithManualChecking(courseId, exerciseSlide.Id, userId);
+				metricSender.SendCount($"exercise.{exerciseMetricId}.sent_to_review");
+				metricSender.SendCount("exercise.sent_to_review");
+			}
 
-		public static string GetExerciseMetricId(string courseId, ExerciseSlide exerciseSlide)
+			await visitsRepo.UpdateScoreForVisit(courseId, exerciseSlide.Id, exerciseSlide.MaxScore, userId);
+
+			if (automaticChecking != null)
+			{
+				var verdictForMetric = automaticChecking.GetVerdict().Replace(" ", "");
+				metricSender.SendCount($"exercise.{exerciseMetricId}.{verdictForMetric}");
+			}
+
+			return sendToReview;
+		}
+
+		private static string GetExerciseMetricId(string courseId, ExerciseSlide exerciseSlide)
 		{
 			var slideTitleForMetric = exerciseSlide.LatinTitle.Replace(".", "_").ToLower(CultureInfo.InvariantCulture);
 			if (slideTitleForMetric.Length > 25)

@@ -11,7 +11,7 @@ namespace Ulearn.Core.CSharp.Validators
 		protected override IEnumerable<SolutionStyleError> InspectName(SyntaxToken identifier)
 		{
 			var name = identifier.Text;
-			if (string.IsNullOrEmpty(name))
+			if (string.IsNullOrEmpty(name) || name.All(c => c == '_'))
 				yield break;
 			var mustStartWithUpper = MustStartWithUpper(identifier.Parent);
 			var mustStartWithLower = MustStartWithLower(identifier.Parent);

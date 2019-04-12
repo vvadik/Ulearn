@@ -24,8 +24,10 @@ namespace Ulearn.Core.CSharp.Validators
 
 		private IEnumerable<SolutionStyleError> InspectMethod<TCycle>(TCycle cycleStatement, SemanticModel semanticModel) where TCycle: StatementSyntax
 		{
-			var methodInvocations = cycleStatement
-				.DescendantNodes()
+			var forStatement = cycleStatement as ForStatementSyntax;
+			var methodInvocations = (forStatement != null
+					? forStatement.Condition.DescendantNodes().Concat(forStatement.Statement.DescendantNodes())
+					: cycleStatement.DescendantNodes())
 				.OfType<InvocationExpressionSyntax>()
 				.ToList();
 

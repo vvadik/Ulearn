@@ -135,7 +135,7 @@ namespace Ulearn.Core.CSharp.Validators
 				case ClassDeclarationSyntax classDeclarationSyntax:
 					return classDeclarationSyntax.Members.Cast<SyntaxNode>().ToArray();
 				case NamespaceDeclarationSyntax namespaceDeclarationSyntax:
-					return namespaceDeclarationSyntax.Members.Cast<SyntaxNode>().ToArray();
+					return namespaceDeclarationSyntax.Usings.Cast<SyntaxNode>().Concat(namespaceDeclarationSyntax.Members).ToArray();
 				case CompilationUnitSyntax compilationUnitSyntax:
 					return compilationUnitSyntax.Members.Cast<SyntaxNode>().ToArray();
 			}
@@ -151,13 +151,13 @@ namespace Ulearn.Core.CSharp.Validators
 					if (initializer != null)
 						return GetEndLine(initializer);
 					return GetEndArgumentsLine(constructorDeclarationSyntax);
-				case ClassDeclarationSyntax classDeclarationSyntax:
-					var baseListSyntax = classDeclarationSyntax.BaseList;
-					var classConstraints = classDeclarationSyntax.ConstraintClauses;
-					if (classConstraints.Any())
-						return GetEndLine(classConstraints.Last());
+				case TypeDeclarationSyntax typeDeclarationSyntax:
+					var baseListSyntax = typeDeclarationSyntax.BaseList;
+					var typeConstraints = typeDeclarationSyntax.ConstraintClauses;
+					if (typeConstraints.Any())
+						return GetEndLine(typeConstraints.Last());
 					if (baseListSyntax == null)
-						return GetStartLine(classDeclarationSyntax.Identifier);
+						return GetStartLine(typeDeclarationSyntax.Identifier);
 					return GetEndLine(baseListSyntax);
 				case BlockSyntax blockSyntax:
 					if (blockSyntax.Parent.Kind() == SyntaxKind.Block)
