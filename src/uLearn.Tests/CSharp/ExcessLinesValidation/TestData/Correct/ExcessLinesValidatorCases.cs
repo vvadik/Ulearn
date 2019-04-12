@@ -4,6 +4,7 @@ using uLearn.CSharp.ExcessLinesValidation.TestData;
 
 namespace uLearn.CSharp.ExcessLinesValidation.TestData.Correct
 {
+	using List = System.Collections.Generic;
 	#region MyRegion
 	public class BaseClass { }
 

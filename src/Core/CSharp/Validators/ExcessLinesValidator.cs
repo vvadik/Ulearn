@@ -135,7 +135,7 @@ namespace Ulearn.Core.CSharp.Validators
 				case ClassDeclarationSyntax classDeclarationSyntax:
 					return classDeclarationSyntax.Members.Cast<SyntaxNode>().ToArray();
 				case NamespaceDeclarationSyntax namespaceDeclarationSyntax:
-					return namespaceDeclarationSyntax.Members.Cast<SyntaxNode>().ToArray();
+					return namespaceDeclarationSyntax.Usings.Cast<SyntaxNode>().Concat(namespaceDeclarationSyntax.Members).ToArray();
 				case CompilationUnitSyntax compilationUnitSyntax:
 					return compilationUnitSyntax.Members.Cast<SyntaxNode>().ToArray();
 			}
