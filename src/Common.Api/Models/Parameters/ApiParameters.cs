@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 
@@ -62,7 +63,7 @@ namespace Ulearn.Common.Api.Models.Parameters
 			var items = new List<string>();
 
 			foreach (string name in parameters)
-				items.Add(string.Concat(name, "=", System.Web.HttpUtility.UrlEncode(parameters[name])));
+				items.Add(string.Concat(name, "=", WebUtility.UrlEncode(parameters[name])));
 
 			return string.Join("&", items.ToArray());
 		}
