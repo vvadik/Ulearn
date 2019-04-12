@@ -13,7 +13,10 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 {
 	public class SpellingValidator: BaseStyleValidator
 	{
-		private static readonly Hunspell hunspell = new Hunspell(Resources.en_US_aff, Resources.en_US_dic);
+		private static readonly Hunspell hunspellEnUS = new Hunspell(Resources.en_US_aff, Resources.en_US_dic);
+		private static readonly Hunspell hunspellEnGb = new Hunspell(Resources.en_GB_aff, Resources.en_GB_dic);
+		private static readonly Hunspell hunspellLa = new Hunspell(Resources.la_aff, Resources.la_dic);
+		
 		private static readonly HashSet<string> wordsToExcept = new HashSet<string>
 		{
 			"func", "arg", "pos", "bmp", "prev", "next", "rnd", "autocomplete", "tuple", "len", "api", "tuples", "vm",
@@ -98,7 +101,10 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 					if (wordInDifferentNumber.Length <= 2
 						|| typeAsString.StartsWith(wordInDifferentNumber, StringComparison.InvariantCultureIgnoreCase) // TODO: проверять множественное число
 						|| wordInDifferentNumber.Equals(typeAsString.MakeTypeNameAbbreviation(), StringComparison.InvariantCultureIgnoreCase) // TODO: сделать и для небольших частей?
-						|| wordsToExcept.Contains(wordInDifferentNumber) || hunspell.Spell(wordInDifferentNumber))
+						|| wordsToExcept.Contains(wordInDifferentNumber)
+						|| hunspellEnUS.Spell(wordInDifferentNumber)
+						|| hunspellEnGb.Spell(wordInDifferentNumber)
+						|| hunspellLa.Spell(wordInDifferentNumber))
 					{
 						doesWordContainError = false;
 						break;
@@ -136,7 +142,11 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 			foreach (var symbol in concatenatedWords)
 			{
 				currentCheckingWord += symbol;
-				if (currentCheckingWord == "I" || currentCheckingWord.Length != 1 && hunspell.Spell(currentCheckingWord))
+				if (currentCheckingWord == "I"
+					|| currentCheckingWord.Length != 1
+					&& (hunspellEnUS.Spell(currentCheckingWord)
+						|| hunspellEnGb.Spell(currentCheckingWord)
+						|| hunspellLa.Spell(currentCheckingWord)))
 					currentCheckingWord = "";
 			}
 
