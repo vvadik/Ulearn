@@ -30,7 +30,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 
 		public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
 		{
-			var courseId = (string)context.ActionArguments["course_id"];
+			var courseId = (string)context.ActionArguments["courseId"];
 			if (!courseManager.HasCourse(courseId))
 			{
 				context.Result = NotFound(new ErrorResponse($"Course {courseId} not found"));
