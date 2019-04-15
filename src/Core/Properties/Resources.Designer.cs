@@ -311,5 +311,27 @@ namespace Ulearn.Core.Properties {
                 return ((byte[])(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to func
+        ///arg
+        ///pos
+        ///bmp
+        ///prev
+        ///next
+        ///rnd
+        ///autocomplete
+        ///tuple
+        ///len
+        ///api
+        ///tuples
+        ///ptr
+        ///btn.
+        /// </summary>
+        public static string spelling_exceptions {
+            get {
+                return ResourceManager.GetString("spelling_exceptions", resourceCulture);
+            }
+        }
     }
 }
