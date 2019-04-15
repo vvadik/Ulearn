@@ -55,7 +55,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 
 		private async Task TrySaveTaskStatisticsParametersAsync(TaskStatisticsParameters parameters)
 		{
-			using (var ts = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromSeconds(30)))
+			using (var ts = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromSeconds(30), TransactionScopeAsyncFlowOption.Enabled))
 			{
 				db.AddOrUpdate(parameters, p => p.TaskId == parameters.TaskId);
 				await db.SaveChangesAsync().ConfigureAwait(false);
