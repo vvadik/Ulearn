@@ -17,16 +17,10 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 		private static readonly Hunspell hunspellEnGb = new Hunspell(Resources.en_GB_aff, Resources.en_GB_dic);
 		private static readonly Hunspell hunspellLa = new Hunspell(Resources.la_aff, Resources.la_dic);
 		private static readonly HashSet<string> wordsToExcept = new HashSet<string>(Resources.spelling_exceptions.SplitToLines());
-		
-		// private static readonly HashSet<string> wordsToExcept = new HashSet<string>
-		// {
-		// 	"func", "arg", "pos", "bmp", "prev", "next", "rnd", "autocomplete", "tuple", "len", "api", "tuples", "vm",
-		// 	"ptr", "btn"
-		// };
-		
+
 		public override List<SolutionStyleError> FindErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{	
-			return InspectAll<MethodDeclarationSyntax>(userSolution, InspectMethodsNamesAndArguments)
+			return InspectAll<MethodDeclarationSyntax>(userSolution, InspectMethodsNamesAndArguments) // TODO: проверять имена классов?
 				.Concat(InspectAll<VariableDeclarationSyntax>(userSolution, semanticModel, InspectVariablesNames))
 				.Concat(InspectAll<PropertyDeclarationSyntax>(userSolution, InspectPropertiesNames))
 				.ToList();
@@ -69,11 +63,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 			var variableIdentifier = variableDeclaratorSyntax.Identifier;
 			var variableType = variableTypeInfo.Type;
 			var variableTypeName = variableType.Name;
-			// var variableName = variableIdentifier.Text;
-			// if (variableTypeName.StartsWith(variableName, StringComparison.InvariantCultureIgnoreCase) //
-			// 	|| variableTypeName.MakeTypeNameAbbreviation().Equals(variableName, StringComparison.InvariantCultureIgnoreCase)) // TODO: перетащить проверку в CheckIdentifierName?
-			// 	return new List<SolutionStyleError>();
-			
+
 			return CheckIdentifierNameForSpellingErrors(variableIdentifier, variableTypeName);
 		}
 
@@ -81,11 +71,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 		{
 			var propertyType = propertyDeclaration.Type;
 			var propertyTypeAsString = propertyType.ToString();
-			var propertyName = propertyDeclaration.Identifier.Text;
-			// if (propertyTypeAsString.StartsWith(propertyName, StringComparison.InvariantCultureIgnoreCase)
-			// 	|| propertyTypeAsString.MakeTypeNameAbbreviation().Equals(propertyName, StringComparison.InvariantCultureIgnoreCase))
-			// 	return new List<SolutionStyleError>();
-			
+
 			return CheckIdentifierNameForSpellingErrors(propertyDeclaration.Identifier, propertyTypeAsString);
 		}
 
@@ -99,13 +85,8 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 				var doesWordContainError = true;
 				foreach (var wordInDifferentNumber in wordInDifferentNumbers)
 				{
-					if (wordInDifferentNumber.Length <= 2
-						|| typeAsString.StartsWith(wordInDifferentNumber, StringComparison.InvariantCultureIgnoreCase) // TODO: проверять множественное число
-						|| wordInDifferentNumber.Equals(typeAsString.MakeTypeNameAbbreviation(), StringComparison.InvariantCultureIgnoreCase) // TODO: сделать и для небольших частей?
-						|| wordsToExcept.Contains(wordInDifferentNumber)
-						|| hunspellEnUS.Spell(wordInDifferentNumber)
-						|| hunspellEnGb.Spell(wordInDifferentNumber)
-						|| hunspellLa.Spell(wordInDifferentNumber))
+					if (CheckForSpecialCases(wordInDifferentNumber, typeAsString) // TODO: сделать и для небольших частей?
+						|| IsWordContainedInDictionaries(wordInDifferentNumber))
 					{
 						doesWordContainError = false;
 						break;
@@ -119,6 +100,13 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 				if (doesWordContainError)
 					yield return new SolutionStyleError(StyleErrorType.Misspeling01, identifier, $"В слове {word} допущена опечатка.");
 			}
+		}
+
+		private static bool CheckForSpecialCases(string wordInDifferentNumber, string typeAsString)
+		{
+			return wordInDifferentNumber.Length <= 2
+					|| typeAsString.StartsWith(wordInDifferentNumber, StringComparison.InvariantCultureIgnoreCase)
+					|| wordInDifferentNumber.Equals(typeAsString.MakeTypeNameAbbreviation(), StringComparison.InvariantCultureIgnoreCase);
 		}
 
 		private string RemoveIfySuffix(string word)
@@ -136,7 +124,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 			if (word.Length > 2 && word.EndsWith("es", StringComparison.InvariantCultureIgnoreCase))
 				yield return word.Substring(0, word.Length - 2);
 		}
-
+		
 		private SolutionStyleError CheckConcatenatedWordsInLowerCaseForError(string concatenatedWords, SyntaxToken tokenWithConcatenatedWords)
 		{
 			var currentCheckingWord = "";
@@ -145,15 +133,21 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 				currentCheckingWord += symbol;
 				if (currentCheckingWord == "I"
 					|| currentCheckingWord.Length != 1
-					&& (hunspellEnUS.Spell(currentCheckingWord)
-						|| hunspellEnGb.Spell(currentCheckingWord)
-						|| hunspellLa.Spell(currentCheckingWord)))
+					&& IsWordContainedInDictionaries(currentCheckingWord))
 					currentCheckingWord = "";
 			}
 
 			return currentCheckingWord != ""
 				? new SolutionStyleError(StyleErrorType.Misspeling01, tokenWithConcatenatedWords, $"В слове {concatenatedWords} допущена опечатка.")
 				: null;
+		}
+
+		private bool IsWordContainedInDictionaries(string word)
+		{
+			return wordsToExcept.Contains(word)
+					|| hunspellEnUS.Spell(word)
+					|| hunspellEnGb.Spell(word)
+					|| hunspellLa.Spell(word);
 		}
 	}
 }
