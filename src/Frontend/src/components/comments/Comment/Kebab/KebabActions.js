@@ -17,7 +17,7 @@ export default function KebabActions(props) {
 
 	return (
 		<div className={styles.instructorsActions}>
-			<Kebab positions={["left top"]} size="large" disableAnimations={true}>
+			<Kebab positions={["bottom right"]} size="large" disableAnimations={true}>
 				{canDeleteAndEdit &&
 				<MenuItem
 					icon={<Icon.Delete size="small" />}

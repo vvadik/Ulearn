@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { userType, userRoles, comment, commentStatus } from "../commonPropTypes";
+import { userType, userRoles, comment, commentStatus, commentPolicy } from "../commonPropTypes";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import Comment from "../Comment/Comment";
 import CommentSendForm from "../CommentSendForm/CommentSendForm";
@@ -16,7 +16,8 @@ class Thread extends Component {
 	}
 
 	renderComment(comment, isLastChild) {
-		const {user, userRoles, reply, commentEditing, actions, getUserSolutionsUrl, slideType} = this.props;
+		const {user, userRoles, reply, commentEditing, actions, slideType,
+			getUserSolutionsUrl, onlyInstructorsCanReply} = this.props;
 		const isLastCommentInThread = isLastChild;
 		const isParentComment = !comment.parentCommentId;
 
@@ -27,6 +28,7 @@ class Thread extends Component {
 					comment={comment}
 					hasReplyAction={isLastCommentInThread}
 					commentEditing={commentEditing}
+					onlyInstructorsCanReply={onlyInstructorsCanReply}
 					actions={actions}
 					getUserSolutionsUrl={getUserSolutionsUrl}
 					slideType={slideType}
@@ -89,6 +91,7 @@ Thread.propTypes = {
 	userRoles: userRoles.isRequired,
 	slideType: PropTypes.string,
 	comment: comment.isRequired,
+	onlyInstructorsCanReply: PropTypes.bool,
 	reply: commentStatus,
 	commentEditing: commentStatus,
 	actions: PropTypes.objectOf(PropTypes.func),

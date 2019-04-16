@@ -4,7 +4,7 @@ import { comment, userRoles, userType } from "../../commonPropTypes";
 import Link from "@skbkontur/react-ui/components/Link/Link";
 import Button from "@skbkontur/react-ui/components/Button/Button";
 import Icon from "@skbkontur/react-icons";
-import { ACCESSES, SLIDETYPE } from "../../../../consts/general";
+import { ACCESSES, ROLES, SLIDETYPE } from "../../../../consts/general";
 
 import styles from "./CommentActions.less";
 
@@ -25,11 +25,12 @@ const ActionLink = ({url, icon, children}) => (
 );
 
 export default function CommentActions(props) {
-	const {user, comment, userRoles, url, hasReplyAction, canModerateComments, actions, slideType} = props;
+	const {user, comment, userRoles, url, hasReplyAction, canModerateComments,
+		actions, slideType, canReply} = props;
 
 	const commentActions = [];
 
-	if (hasReplyAction) {
+	if (canReply && hasReplyAction) {
 		const commentId = comment.parentCommentId ? comment.parentCommentId : comment.id;
 
 		commentActions.push(

@@ -12,7 +12,7 @@ class MarkdownButtons extends Component {
 
 		return (
 			<div className={styles.markdownButtons}>
-				<span className={styles.markdownText}>Поддерживаем markdown</span>
+				<span className={styles.markdownText}>Поддерживаем Markdown</span>
 				{Object.entries(markupByOperation)
 				.map(([name, operation]) => this.renderMarkdownButton(name, operation))}
 			</div>
@@ -21,7 +21,7 @@ class MarkdownButtons extends Component {
 
 	renderMarkdownButton(name, operation) {
 		return (
-			<div key={name}>
+			<div key={name} className={styles.buttonBlock}>
 				<Hint pos="top" text={this.renderHint(operation)} disableAnimations={false} useWrapper>
 					<button className={styles.button} onClick={this.onClick(operation)} type="button">
 						<svg

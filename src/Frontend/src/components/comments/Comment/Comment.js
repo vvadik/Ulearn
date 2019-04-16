@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { userRoles, userType, comment, commentStatus } from "../commonPropTypes";
+import { userRoles, userType, comment, commentStatus, commentPolicy } from "../commonPropTypes";
 import moment from "moment";
 import Link from "@skbkontur/react-ui/components/Link/Link";
 import Avatar from "../../common/Avatar/Avatar";
@@ -14,6 +14,7 @@ import scrollToView from "../../../utils/scrollToView";
 import { ACCESSES, ROLES } from "../../../consts/general";
 
 import styles from "./Comment.less";
+import Hint from "@skbkontur/react-ui/components/Hint/Hint";
 
 class Comment extends Component {
 	ref = React.createRef();
@@ -38,7 +39,11 @@ class Comment extends Component {
 				<div className={styles.content}>
 					{this.renderHeader(profileUrl, canViewProfiles)}
 					<div className={styles.timeSinceAdded}>
-						{moment(comment.publishTime).fromNow()}
+						<Hint
+							pos="right middle"
+							text={`${moment(comment.publishTime).local().format('YYYY-MM-DD HH:mm:ss')}`}>
+							{moment(comment.publishTime).fromNow()}
+						</Hint>
 					</div>
 					{comment.id === commentEditing.commentId ? this.renderEditCommentForm() : this.renderComment()}
 					{children}
@@ -79,7 +84,8 @@ class Comment extends Component {
 	}
 
 	renderComment() {
-		const {comment, user, userRoles, hasReplyAction, actions, slideType, getUserSolutionsUrl} = this.props;
+		const {comment, user, userRoles, hasReplyAction, actions, slideType,
+			getUserSolutionsUrl} = this.props;
 		return (
 			<>
 				<p className={styles.text}>
@@ -89,6 +95,7 @@ class Comment extends Component {
 				<CommentActions
 					slideType={slideType}
 					comment={comment}
+					canReply={this.canReply(userRoles)}
 					user={user}
 					url={getUserSolutionsUrl(comment.author.id)}
 					userRoles={userRoles}
@@ -114,8 +121,14 @@ class Comment extends Component {
 	}
 
 	canModerateComments = (role, accesses) => {
-		return role.isSystemAdministrator || role.courseRole === ROLES.courseAdmin ||
-			(role.courseRole === ROLES.instructor && role.courseAccesses.includes(accesses))
+		return role.isSystemAdministrator || role.courseRoles === ROLES.courseAdmin ||
+			(role.courseRoles === ROLES.instructor && role.courseAccesses.includes(accesses))
+	};
+
+	canReply = (role) => {
+		return 	(role.courseRoles === ROLES.student && !this.props.onlyInstructorsCanReply) ||
+			(role.isSystemAdministrator || role.courseRoles === ROLES.courseAdmin ||
+			role.courseRoles === ROLES.instructor);
 	};
 
 	canViewStudentsGroup = () => {
@@ -131,6 +144,7 @@ Comment.propTypes = {
 	user: userType.isRequired,
 	userRoles: userRoles.isRequired,
 	comment: comment.isRequired,
+	onlyInstructorsCanReply: PropTypes.bool,
 	actions: PropTypes.objectOf(PropTypes.func),
 	children: PropTypes.array,
 	getUserSolutionsUrl: PropTypes.func,

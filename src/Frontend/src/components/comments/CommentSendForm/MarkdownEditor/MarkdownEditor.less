@@ -1,7 +1,14 @@
+@import "../../../../variables.less";
+
 .formFooter {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: baseline;
   width: inherit;
   margin-top: 12px;
+
+  @media (max-width: @maxPhoneWidth) {
+    align-items: center;
+  }
 }

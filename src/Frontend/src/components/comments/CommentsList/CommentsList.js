@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { userType, userRoles } from "../commonPropTypes";
+import { userType, userRoles, commentPolicy } from "../commonPropTypes";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import * as debounce from "debounce";
 import Icon from "@skbkontur/react-icons";
@@ -77,7 +77,7 @@ class CommentsList extends Component {
 
 	render() {
 		const {threads, loadingComments} = this.state;
-		const {user, courseId, slideId, forInstructors} = this.props;
+		const {user, courseId, slideId, forInstructors, commentPolicy} = this.props;
 
 		if (this.state.status === "error") {
 			return <Error404 />;
@@ -90,7 +90,8 @@ class CommentsList extends Component {
 		return (
 			<>
 				{forInstructors && <p className={styles.textForInstructors}>Эти комментарии скрыты для студентов</p>}
-				{!user.isAuthenticated && <Stub courseId={courseId} slideId={slideId} />}
+				{!user.isAuthenticated &&
+				<Stub hasThreads={threads.length > 0} courseId={courseId} slideId={slideId} />}
 				{loadingComments ? <div className={styles.spacer}><Loader type="big" active={loadingComments} /></div> :
 					threads.length === 0 ?
 						<>
@@ -101,7 +102,7 @@ class CommentsList extends Component {
 							{this.renderSendForm()}
 							{this.renderThreads()}
 						</>}
-				{(user.isAuthenticated && threads.length > 0) &&
+				{(commentPolicy.areCommentsEnabled && user.isAuthenticated && threads.length > 0) &&
 				<button className={styles.sendButton} onClick={() => this.handleScroll(this.props.headerRef)}>
 					<Icon name="CommentLite" color="#3072C4" />
 					<span className={styles.sendButtonText}>Оставить комментарий</span>
@@ -112,9 +113,9 @@ class CommentsList extends Component {
 
 	renderSendForm() {
 		const {sending, status, newCommentId} = this.state;
-		const {user, forInstructors} = this.props;
+		const {user, forInstructors, commentPolicy} = this.props;
 
-		if (user.isAuthenticated) {
+		if (user.isAuthenticated && commentPolicy.areCommentsEnabled) {
 			return (
 				<CommentSendForm
 					isForInstructors={forInstructors}
@@ -129,7 +130,7 @@ class CommentsList extends Component {
 
 	renderThreads() {
 		const {threads, commentEditing, reply, animation} = this.state;
-		const {user, userRoles, slideType} = this.props;
+		const {user, userRoles, slideType, commentPolicy} = this.props;
 		const transitionStyles = {
 			enter: styles.enter,
 			exit: styles.exit,
@@ -169,6 +170,7 @@ class CommentsList extends Component {
 								slideType={slideType}
 								animation={animation}
 								comment={comment}
+								onlyInstructorsCanReply={commentPolicy.onlyInstructorsCanReply}
 								commentEditing={commentEditing}
 								reply={reply}
 								actions={actions}
@@ -180,20 +182,23 @@ class CommentsList extends Component {
 	}
 
 	renderStubForEmptyComments() {
-		if (!this.props.forInstructors) {
-			return (
-				<p className={styles.textForEmptyComments}>
-					К этому слайду ещё нет комментариев. Вы можете начать беседу со студентами,
-					добавив комментарий.
-				</p>
-			)
-		} else {
-			return (
-				<p className={styles.textForEmptyComments}>
-					К этому слайду нет комментариев преподавателей. Вы можете начать беседу с преподавателями,
-					добавив комментарий.
-				</p>
-			)
+		const {user, forInstructors} = this.props;
+		if (user.isAuthenticated) {
+		 	if (!forInstructors) {
+				return (
+					<p className={styles.textForEmptyComments}>
+						К этому слайду ещё нет комментариев. Вы можете начать беседу со студентами,
+						добавив комментарий.
+					</p>
+				)
+			} else {
+				return (
+					<p className={styles.textForEmptyComments}>
+						К этому слайду нет комментариев преподавателей. Вы можете начать беседу с преподавателями,
+						добавив комментарий.
+					</p>
+				)
+			}
 		}
 	}
 
@@ -314,7 +319,19 @@ class CommentsList extends Component {
 			isLiked: !isLiked,
 		}));
 
-		this.debouncedSendData(isLiked ? commentsApi.dislikeComment : commentsApi.likeComment, commentId);
+		if (isLiked === true) {
+			commentsApi.dislikeComment(commentId)
+				.catch(e => {
+					Toast.push("Не удалось изменить комментарий. Произошла ошибка, попробуйте снова");
+					console.error(e);
+				});
+		} else {
+			commentsApi.likeComment(commentId)
+				.catch(e => {
+					Toast.push("Не удалось изменить комментарий. Произошла ошибка, попробуйте снова");
+					console.error(e);
+				});
+		}
 	};
 
 	handleApprovedMark = (commentId, isApproved) => {
@@ -499,6 +516,7 @@ CommentsList.propTypes = {
 	slideType: PropTypes.string.isRequired,
 	forInstructors: PropTypes.bool,
 	commentsApi: PropTypes.objectOf(PropTypes.func),
+	commentPolicy: commentPolicy,
 	courseId: PropTypes.string.isRequired,
 };
 

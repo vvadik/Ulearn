@@ -20,7 +20,7 @@ const HiddenMark = () => (
 	<div className={`${styles.mark} ${styles.approvedComment}`}>
 		<Icon name="EyeClosed" size={15} />
 		<span className={`${styles.text} ${styles.visibleOnDesktopAndTablet}`}>
-			Скрытый
+			Скрыт
 		</span>
 	</div>
 );
@@ -38,7 +38,7 @@ const PinnedToTopMark = () => (
 	<div className={`${styles.mark} ${styles.pinnedToTop}`}>
 		<Icon name="Pin" size={15} />
 		<span className={`${styles.text} ${styles.visibleOnDesktopAndTablet}`}>
-			Закреплено
+			Закреплен
 		</span>
 	</div>
 );
