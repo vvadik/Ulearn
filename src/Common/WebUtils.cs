@@ -16,7 +16,10 @@ namespace Ulearn.Common
 		public override string ToString()
 		{
 			var pairs = this.Cast<string>().Select(key => (key, this[key])).ToDictionary(t => t.Item1, t => t.Item2);
-			return QueryHelpers.AddQueryString("", pairs);
+			var qs = QueryHelpers.AddQueryString("", pairs);
+			if (qs.Length > 0 && qs[0] == '?')
+				return qs.Substring(1);
+			return qs;
 		}
 	}
 	
