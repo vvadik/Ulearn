@@ -9,7 +9,6 @@ namespace uLearn.CSharp.SpellingValidation.TestData.Correct
 
 		public Func<int> GetFunc(int arg)
 		{
-			var sw = new Stopwatch();
 			return () => arg;
 		}
 	}
