@@ -80,7 +80,7 @@ namespace Ulearn.Common.Api
 				parameters = new NameValueCollection();
 		
 			var builder = new UriBuilder(url);
-			var queryString = HttpUtility.ParseQueryString(builder.Query);
+			var queryString = WebUtils.ParseQueryString(builder.Query);
 			foreach (var parameterName in parameters.AllKeys)
 				queryString[parameterName] = parameters[parameterName];
 

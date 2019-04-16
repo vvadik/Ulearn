@@ -6,6 +6,7 @@ using System.Web;
 using AntiPlagiarism.Api.Models.Parameters;
 using AntiPlagiarism.Api.Models.Results;
 using Serilog.Core;
+using Ulearn.Common;
 using Ulearn.Common.Api;
 using Ulearn.Common.Extensions;
 using HttpClientExtensions = AspNetCore.Http.Extensions.HttpClientExtensions;
@@ -32,7 +33,7 @@ namespace AntiPlagiarism.Api
 		protected override Uri AddCustomParametersToUrl(Uri url)
 		{
 			var builder = new UriBuilder(url);
-			var queryString = HttpUtility.ParseQueryString(builder.Query);
+			var queryString = WebUtils.ParseQueryString(builder.Query);
 			queryString["token"] = token;
 			builder.Query = queryString.ToQueryString();
 			return builder.Uri;
@@ -44,7 +45,7 @@ namespace AntiPlagiarism.Api
 				parameters = new NameValueCollection();
 			
 			var builder = new UriBuilder(baseUrl);
-			var queryString = HttpUtility.ParseQueryString(builder.Query);
+			var queryString = WebUtils.ParseQueryString(builder.Query);
 			queryString["token"] = token;
 			foreach (var parameterName in parameters.AllKeys)
 				queryString[parameterName] = parameters[parameterName];

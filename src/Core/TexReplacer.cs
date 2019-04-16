@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Web;
 
@@ -58,12 +59,12 @@ namespace Ulearn.Core
 
 		protected virtual string FormatTexSpan(string tex)
 		{
-			return "<span class='tex'>" + HttpUtility.HtmlEncode(tex) + "</span>";
+			return "<span class='tex'>" + WebUtility.HtmlEncode(tex) + "</span>";
 		}
 
 		protected virtual string FormatTexDiv(string tex)
 		{
-			return "</p><div class='tex'>\\displaystyle " + HttpUtility.HtmlEncode(tex) + "</div><p>";
+			return "</p><div class='tex'>\\displaystyle " + WebUtility.HtmlEncode(tex) + "</div><p>";
 		}
 
 		private string MakeInsertId(Match match, InsertionType insertionType)
@@ -90,12 +91,12 @@ namespace Ulearn.Core
 
 		protected override string FormatTexSpan(string tex)
 		{
-			return "`" + HttpUtility.HtmlEncode(tex) + "`";
+			return "`" + WebUtility.HtmlEncode(tex) + "`";
 		}
 
 		protected override string FormatTexDiv(string tex)
 		{
-			return "[mathjax]" + HttpUtility.HtmlEncode(tex) + "[/mathjax]";
+			return "[mathjax]" + WebUtility.HtmlEncode(tex) + "[/mathjax]";
 		}
 	}
 }
