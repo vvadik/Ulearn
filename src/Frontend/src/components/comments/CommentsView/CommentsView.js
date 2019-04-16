@@ -14,6 +14,7 @@ class CommentsView extends Component {
 
 		this.state = {
 			instructorComments: [],
+			commentPolicy: {},
 			activeTab: TABS.allComments,
 			openModal: false,
 		};
@@ -28,8 +29,20 @@ class CommentsView extends Component {
 	componentDidMount() {
 		const {courseId, slideId, userRoles} = this.props;
 
+		this.loadCommentPolicy(courseId);
+
 		if (this.isInstructor(userRoles))
 			this.loadComments(courseId, slideId);
+	};
+
+	loadCommentPolicy = (courseId) => {
+		this.props.commentsApi.getCommentPolicy(courseId)
+			.then(commentPolicy => {
+				this.setState ({
+					commentPolicy: commentPolicy,
+				})
+			})
+			.catch(console.error);
 	};
 
 	loadComments = (courseId, slideId) => {
@@ -55,6 +68,7 @@ class CommentsView extends Component {
 						headerRef={this.headerRef}
 						forInstructors={this.state.activeTab === TABS.instructorsComments}
 						commentsApi={commentsApi}
+						commentPolicy={this.state.commentPolicy}
 						user={user}
 						userRoles={userRoles}
 						slideId={slideId}

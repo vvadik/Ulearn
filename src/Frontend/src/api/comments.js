@@ -38,3 +38,7 @@ export function dislikeComment(commentId) {
 	return api.delete(`comments/${commentId}/like`);
 }
 
+export function getCommentPolicy(courseId) {
+	return api.get(`comment-policies?course_id=${courseId}`);
+}
+

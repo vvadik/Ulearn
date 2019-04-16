@@ -26,6 +26,13 @@ export const userRoles = shape({
 		"viewAllGroupMembers", "apiViewCodeReviewStatistics"])),
 });
 
+export const commentPolicy = shape({
+	areCommentsEnabled: bool,
+	moderationPolicy: string,
+	onlyInstructorsCanReply: bool,
+	status: string,
+});
+
 export const comment = shape({
 	id: number.isRequired,
 	author: userType.isRequired,
