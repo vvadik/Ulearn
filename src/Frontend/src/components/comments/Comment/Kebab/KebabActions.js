@@ -9,7 +9,7 @@ import { ACCESSES, SLIDETYPE } from "../../../../consts/general";
 import styles from "./KebabActions.less";
 
 export default function KebabActions(props) {
-	const {user, comment, userRoles, url, canModerateComments, actions, slideType} = props;
+	const {user, comment, userRoles, url, canModerateComments, actions, slideType, handleCommentBackGround} = props;
 	const canModerate = canModerateComments(userRoles, ACCESSES.editPinAndRemoveComments);
 	const canDeleteAndEdit = (user.id === comment.author.id || canModerate);
 	const canSeeSubmissions = (slideType === SLIDETYPE.exercise &&
@@ -21,7 +21,7 @@ export default function KebabActions(props) {
 				{canDeleteAndEdit &&
 				<MenuItem
 					icon={<Icon.Delete size="small" />}
-					onClick={() => actions.handleDeleteComment(comment.id)}>
+					onClick={() => actions.handleDeleteComment(comment)}>
 					Удалить
 				</MenuItem>}
 				{canDeleteAndEdit &&
@@ -43,7 +43,10 @@ export default function KebabActions(props) {
 				{canModerate &&
 				<MenuItem
 					icon={<Icon.EyeClosed size="small" />}
-					onClick={() => actions.handleApprovedMark(comment.id, comment.isApproved)}>
+					onClick={() => {
+						actions.handleApprovedMark(comment.id, comment.isApproved);
+						handleCommentBackGround(comment.id, comment.isApproved)}
+					}>
 					{!comment.isApproved ? "Опубликовать" : "Скрыть"}
 				</MenuItem>}
 				{(canModerate && comment.parentCommentId) &&
@@ -70,5 +73,6 @@ KebabActions.propTypes = {
 	userRoles: userRoles.isRequired,
 	url: PropTypes.string,
 	canModerateComments: PropTypes.func,
+	handleCommentBackGround: PropTypes.func,
 	slideType: PropTypes.string,
 };

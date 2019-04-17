@@ -13,10 +13,11 @@ class CommentsView extends Component {
 		super(props);
 
 		this.state = {
-			instructorComments: [],
+			instructorsComments: [],
 			commentPolicy: {},
 			activeTab: TABS.allComments,
 			openModal: false,
+			instructorsCommentCount: 0,
 		};
 
 		this.headerRef = React.createRef();
@@ -50,7 +51,8 @@ class CommentsView extends Component {
 		.then(json => {
 			let comments = json.topLevelComments;
 			this.setState({
-				instructorComments: comments,
+				instructorsComments: comments,
+				instructorsCommentCount: comments.length,
 			});
 		})
 		.catch(console.error);
@@ -65,6 +67,7 @@ class CommentsView extends Component {
 				<div className={styles.commentsContainer} key={this.state.activeTab}>
 					<CommentsList
 						slideType={slideType}
+						handleInstructorsCommentCount={this.handleInstructorsCommentCount}
 						headerRef={this.headerRef}
 						forInstructors={this.state.activeTab === TABS.instructorsComments}
 						commentsApi={commentsApi}
@@ -81,8 +84,7 @@ class CommentsView extends Component {
 
 	renderHeader() {
 		const {userRoles} = this.props;
-		const {activeTab} = this.state;
-		const commentsCount = this.state.instructorComments.length;
+		const {activeTab, instructorsCommentCount} = this.state;
 
 		return (
 			<header className={styles.header} ref={this.headerRef}>
@@ -95,9 +97,11 @@ class CommentsView extends Component {
 						<Tabs.Tab id={TABS.allComments}>К слайду</Tabs.Tab>
 						<Tabs.Tab id={TABS.instructorsComments}>
 							Для преподавателей
-							{(activeTab === TABS.allComments && commentsCount > 0) &&
-							<span className={styles.commentsAmount}>{commentsCount}</span>}
+							{instructorsCommentCount > 0 &&
+							<span className={styles.commentsCount}>{instructorsCommentCount}</span>}
 						</Tabs.Tab>
+						{activeTab === TABS.instructorsComments &&
+						<span className={styles.textForInstructors}>Эти комментарии скрыты для студентов</span>}
 					</Tabs>
 				</div>}
 			</header>
@@ -124,6 +128,18 @@ class CommentsView extends Component {
 				window.location.hash = "";
 		}
 	};
+
+	handleInstructorsCommentCount = (action) => {
+		if (action === "add") {
+			this.setState({
+				instructorsCommentCount: this.state.instructorsCommentCount + 1,
+			})
+		} else {
+			this.setState({
+				instructorsCommentCount: this.state.instructorsCommentCount - 1,
+			})
+		}
+	}
 }
 
 CommentsView.propTypes = {

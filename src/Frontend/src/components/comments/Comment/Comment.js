@@ -17,6 +17,13 @@ import styles from "./Comment.less";
 import Hint from "@skbkontur/react-ui/components/Hint/Hint";
 
 class Comment extends Component {
+	constructor(props) {
+		super(props);
+
+		 this.state = {
+		 	isApproved: props.comment.isApproved,
+		 }
+	}
 	ref = React.createRef();
 
 	componentDidMount() {
@@ -32,7 +39,7 @@ class Comment extends Component {
 		const profileUrl = `${window.location.origin}/Account/Profile?userId=${comment.author.id}`;
 
 		return (
-			<div className={styles.comment} ref={this.ref}>
+			<div className={`${styles.comment} ${!this.state.isApproved ? styles.isNotApproved : ''}`} ref={this.ref}>
 				<span className={styles.commentAnchor}  id={`comment-${this.props.comment.id}`} />
 				{canViewProfiles ? <Link href={profileUrl}><Avatar user={comment.author} size="big" /></Link> :
 					<Avatar user={comment.author} size="big" />}
@@ -42,7 +49,7 @@ class Comment extends Component {
 						<Hint
 							pos="right middle"
 							text={`${moment(comment.publishTime).local().format('YYYY-MM-DD HH:mm:ss')}`}>
-							{moment(comment.publishTime).fromNow()}
+							{moment(comment.publishTime).startOf('minute').fromNow()}
 						</Hint>
 					</div>
 					{comment.id === commentEditing.commentId ? this.renderEditCommentForm() : this.renderComment()}
@@ -54,7 +61,7 @@ class Comment extends Component {
 
 	renderHeader(profileUrl, canViewProfiles) {
 		const {actions, comment, userRoles, user, slideType, getUserSolutionsUrl} = this.props;
-		const canSeeKebabActions = user.isAuthenticated && (user.id === comment.author.id ||
+		const canSeeKebabActions = user.id && (user.id === comment.author.id ||
 			this.canModerateComments(userRoles, ACCESSES.editPinAndRemoveComments) ||
 			this.canModerateComments(userRoles, ACCESSES.viewAllStudentsSubmissions));
 
@@ -64,6 +71,7 @@ class Comment extends Component {
 				canViewProfiles={canViewProfiles}
 				name={comment.author.visibleName}>
 				<Like
+					canLike={user.isAuthenticated}
 					isLiked={comment.isLiked}
 					count={comment.likesCount}
 					onClick={() => actions.handleLikeClick(comment.id, comment.isLiked)} />
@@ -78,7 +86,8 @@ class Comment extends Component {
 					userRoles={userRoles}
 					slideType={slideType}
 					comment={comment}
-					actions={actions} />}
+					actions={actions}
+					handleCommentBackGround={this.handleCommentBackground} />}
 			</Header>
 		)
 	}
@@ -86,12 +95,13 @@ class Comment extends Component {
 	renderComment() {
 		const {comment, user, userRoles, hasReplyAction, actions, slideType,
 			getUserSolutionsUrl} = this.props;
+
 		return (
 			<>
 				<p className={styles.text}>
 					<span className={styles.textFromServer} dangerouslySetInnerHTML={{__html: comment.renderedText}} />
 				</p>
-				{user.isAuthenticated &&
+				{user.id &&
 				<CommentActions
 					slideType={slideType}
 					comment={comment}
@@ -121,14 +131,16 @@ class Comment extends Component {
 	}
 
 	canModerateComments = (role, accesses) => {
-		return role.isSystemAdministrator || role.courseRoles === ROLES.courseAdmin ||
-			(role.courseRoles === ROLES.instructor && role.courseAccesses.includes(accesses))
+		return role.isSystemAdministrator || role.courseRole === ROLES.courseAdmin ||
+			(role.courseRole === ROLES.instructor && role.courseAccesses.includes(accesses))
 	};
 
 	canReply = (role) => {
-		return 	(role.courseRoles === ROLES.student && !this.props.onlyInstructorsCanReply) ||
-			(role.isSystemAdministrator || role.courseRoles === ROLES.courseAdmin ||
-			role.courseRoles === ROLES.instructor);
+		const {commentPolicy} = this.props;
+
+		return 	(commentPolicy.areCommentsEnabled && ((role.courseRole === ROLES.student && !commentPolicy.onlyInstructorsCanReply) ||
+			(role.isSystemAdministrator || role.courseRole === ROLES.courseAdmin ||
+			role.courseRole === ROLES.instructor)));
 	};
 
 	canViewStudentsGroup = () => {
@@ -138,17 +150,23 @@ class Comment extends Component {
 			(userRoles.courseAccesses && userRoles.courseAccesses.includes(ACCESSES.viewAllGroupMembers)) ||
 			userRoles.isSystemAdministrator;
 	};
+
+	handleCommentBackground = (commentId, isApproved) => {
+		this.setState({
+			isApproved,
+		});
+	};
 }
 
 Comment.propTypes = {
 	user: userType.isRequired,
 	userRoles: userRoles.isRequired,
 	comment: comment.isRequired,
-	onlyInstructorsCanReply: PropTypes.bool,
 	actions: PropTypes.objectOf(PropTypes.func),
 	children: PropTypes.array,
 	getUserSolutionsUrl: PropTypes.func,
 	commentEditing: commentStatus,
+	commentPolicy: commentPolicy,
 	hasReplyAction: PropTypes.bool,
 	slideType: PropTypes.string,
 };

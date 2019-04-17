@@ -6,6 +6,7 @@
   width: 100%;
   word-wrap: break-word;
   position: relative;
+  border-radius: 4px;
 }
 
 .content {
@@ -20,6 +21,7 @@
 .timeSinceAdded {
   color: @disabledColor;
   font-size: 14px;
+  cursor: default;
 }
 
 .text {
@@ -35,9 +37,17 @@
   display: inline-block;
   margin-right: 15px;
   font-size: 16px;
+
+  pre {
+    margin: 0;
+  }
 }
 
 .commentAnchor {
   position: absolute;
   top: -(@headerHeight + @headerDivider);
+}
+
+.isNotApproved {
+  background: @whiteSmoke;
 }

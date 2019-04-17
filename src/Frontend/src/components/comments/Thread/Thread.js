@@ -17,7 +17,7 @@ class Thread extends Component {
 
 	renderComment(comment, isLastChild) {
 		const {user, userRoles, reply, commentEditing, actions, slideType,
-			getUserSolutionsUrl, onlyInstructorsCanReply} = this.props;
+			getUserSolutionsUrl, commentPolicy} = this.props;
 		const isLastCommentInThread = isLastChild;
 		const isParentComment = !comment.parentCommentId;
 
@@ -28,7 +28,7 @@ class Thread extends Component {
 					comment={comment}
 					hasReplyAction={isLastCommentInThread}
 					commentEditing={commentEditing}
-					onlyInstructorsCanReply={onlyInstructorsCanReply}
+					commentPolicy={commentPolicy}
 					actions={actions}
 					getUserSolutionsUrl={getUserSolutionsUrl}
 					slideType={slideType}
@@ -94,6 +94,7 @@ Thread.propTypes = {
 	onlyInstructorsCanReply: PropTypes.bool,
 	reply: commentStatus,
 	commentEditing: commentStatus,
+	commentPolicy: commentPolicy,
 	actions: PropTypes.objectOf(PropTypes.func),
 	animation: PropTypes.bool,
 	getUserSolutionsUrl: PropTypes.func,

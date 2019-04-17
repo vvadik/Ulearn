@@ -4,7 +4,7 @@ import { comment, userRoles, userType } from "../../commonPropTypes";
 import Link from "@skbkontur/react-ui/components/Link/Link";
 import Button from "@skbkontur/react-ui/components/Button/Button";
 import Icon from "@skbkontur/react-icons";
-import { ACCESSES, ROLES, SLIDETYPE } from "../../../../consts/general";
+import { ACCESSES, SLIDETYPE } from "../../../../consts/general";
 
 import styles from "./CommentActions.less";
 

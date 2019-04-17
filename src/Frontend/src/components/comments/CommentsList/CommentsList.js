@@ -77,7 +77,7 @@ class CommentsList extends Component {
 
 	render() {
 		const {threads, loadingComments} = this.state;
-		const {user, courseId, slideId, forInstructors, commentPolicy} = this.props;
+		const {user, courseId, slideId, commentPolicy} = this.props;
 
 		if (this.state.status === "error") {
 			return <Error404 />;
@@ -89,20 +89,14 @@ class CommentsList extends Component {
 
 		return (
 			<>
-				{forInstructors && <p className={styles.textForInstructors}>Эти комментарии скрыты для студентов</p>}
-				{!user.isAuthenticated &&
-				<Stub hasThreads={threads.length > 0} courseId={courseId} slideId={slideId} />}
 				{loadingComments ? <div className={styles.spacer}><Loader type="big" active={loadingComments} /></div> :
-					threads.length === 0 ?
-						<>
-							{this.renderStubForEmptyComments()}
-							{this.renderSendForm()}
-						</> :
-						<>
-							{this.renderSendForm()}
-							{this.renderThreads()}
-						</>}
-				{(commentPolicy.areCommentsEnabled && user.isAuthenticated && threads.length > 0) &&
+					<>
+						{!user.id && <Stub hasThreads={threads.length > 0} courseId={courseId} slideId={slideId} />}
+						{(user.id && !commentPolicy.areCommentsEnabled) && this.renderMessageIfCommentsDisabled()}
+						{this.renderSendForm()}
+						{this.renderThreads()}
+					</>}
+				{(commentPolicy.areCommentsEnabled && user.id && threads.length > 7) &&
 				<button className={styles.sendButton} onClick={() => this.handleScroll(this.props.headerRef)}>
 					<Icon name="CommentLite" color="#3072C4" />
 					<span className={styles.sendButtonText}>Оставить комментарий</span>
@@ -111,12 +105,20 @@ class CommentsList extends Component {
 		)
 	}
 
+	renderMessageIfCommentsDisabled() {
+		return (
+			<div className={styles.textForEmptyComments}>
+				В данный момент комментарии выключены.
+			</div>
+			)
+	};
+
 	renderSendForm() {
 		const {sending, status, newCommentId} = this.state;
 		const {user, forInstructors, commentPolicy} = this.props;
 
-		if (user.isAuthenticated && commentPolicy.areCommentsEnabled) {
-			return (
+		return (
+			user.id && (commentPolicy.areCommentsEnabled || commentPolicy.onlyInstructorsCanReply) &&
 				<CommentSendForm
 					isForInstructors={forInstructors}
 					commentId={newCommentId}
@@ -124,9 +126,8 @@ class CommentsList extends Component {
 					handleSubmit={this.handleAddComment}
 					sending={sending}
 					sendStatus={status} />
-			)
-		}
-	}
+		)
+	};
 
 	renderThreads() {
 		const {threads, commentEditing, reply, animation} = this.state;
@@ -150,7 +151,6 @@ class CommentsList extends Component {
 			handleShowReplyForm: this.handleShowReplyForm,
 		};
 
-
 		return (
 			<TransitionGroup enter={animation}>
 				{threads
@@ -170,7 +170,7 @@ class CommentsList extends Component {
 								slideType={slideType}
 								animation={animation}
 								comment={comment}
-								onlyInstructorsCanReply={commentPolicy.onlyInstructorsCanReply}
+								commentPolicy={commentPolicy}
 								commentEditing={commentEditing}
 								reply={reply}
 								actions={actions}
@@ -179,27 +179,6 @@ class CommentsList extends Component {
 					</CSSTransition>)}
 			</TransitionGroup>
 		)
-	}
-
-	renderStubForEmptyComments() {
-		const {user, forInstructors} = this.props;
-		if (user.isAuthenticated) {
-		 	if (!forInstructors) {
-				return (
-					<p className={styles.textForEmptyComments}>
-						К этому слайду ещё нет комментариев. Вы можете начать беседу со студентами,
-						добавив комментарий.
-					</p>
-				)
-			} else {
-				return (
-					<p className={styles.textForEmptyComments}>
-						К этому слайду нет комментариев преподавателей. Вы можете начать беседу с преподавателями,
-						добавив комментарий.
-					</p>
-				)
-			}
-		}
 	}
 
 	findCommentPosition(id, threads) {
@@ -272,7 +251,7 @@ class CommentsList extends Component {
 	}
 
 	handleAddComment = async (commentId, text) => {
-		const {commentsApi, courseId, slideId, forInstructors} = this.props;
+		const {commentsApi, courseId, slideId, forInstructors, handleInstructorsCommentCount} = this.props;
 		const threads = [...this.state.threads];
 
 		this.setState({
@@ -296,6 +275,10 @@ class CommentsList extends Component {
 			});
 
 			this.handleScroll(this.lastThreadRef);
+
+			if (forInstructors) {
+				handleInstructorsCommentCount("add");
+			}
 		}
 		catch (e) {
 			Toast.push("Не удалось добавить комментарий. Попробуйте снова.");
@@ -461,35 +444,44 @@ class CommentsList extends Component {
 		}
 	};
 
-	handleDeleteComment = (commentId) => {
+	handleDeleteComment = (comment) => {
 		const threads = JSON.parse(JSON.stringify(this.state.threads));
+		const {forInstructors, handleInstructorsCommentCount} = this.props;
 
 		this.setState({
 			animation: true,
 		});
 
-		const restoreComment = this.deleteComment(commentId, threads);
+		const restoreComment = this.deleteComment(comment.id, threads);
 		this.setState({threads});
 
-		this.props.commentsApi.deleteComment(commentId)
-			.then(
-				Toast.push("Комментарий удалён", {
-					label: "Восстановить",
-					handler: () => {
-						restoreComment();
-						this.setState({threads});
-						Toast.push("Комментарий восстановлен");
+		try {
+			this.props.commentsApi.deleteComment(comment.id);
 
-						this.props.commentsApi.updateComment(commentId)
-						.catch(console.error);
+			if (forInstructors && !comment.parentCommentId) {
+				handleInstructorsCommentCount("delete");
+			}
+
+			Toast.push("Комментарий удалён", {
+				label: "Восстановить",
+				handler: () => {
+					restoreComment();
+					this.setState({ threads });
+
+					if (forInstructors && !comment.parentCommentId) {
+						handleInstructorsCommentCount("add");
 					}
-				})
-			)
-			.catch(e => {
-				Toast.push("Комментарий не удалён. Произошла ошибка, попробуйте снова");
-				this.setState({threads});
-				console.error(e);
-			});
+
+					Toast.push("Комментарий восстановлен");
+
+					this.props.commentsApi.updateComment(comment.id);
+				}
+			})
+		} catch (e) {
+			Toast.push("Комментарий не удалён. Произошла ошибка, попробуйте снова");
+			this.setState({threads});
+			console.error(e);
+		}
 	};
 
 	handleScroll = (ref) => {
@@ -515,6 +507,7 @@ CommentsList.propTypes = {
 	slideId: PropTypes.string.isRequired,
 	slideType: PropTypes.string.isRequired,
 	forInstructors: PropTypes.bool,
+	handleInstructorsCommentCount: PropTypes.func,
 	commentsApi: PropTypes.objectOf(PropTypes.func),
 	commentPolicy: commentPolicy,
 	courseId: PropTypes.string.isRequired,

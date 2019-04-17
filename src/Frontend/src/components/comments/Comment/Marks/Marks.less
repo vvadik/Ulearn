@@ -7,11 +7,12 @@
   font-size: 14px;
   margin-left: 10px;
   border-radius: 3px;
+  cursor: default;
 }
 
 .correctAnswer,
 .pinnedToTop {
-  padding: 1px 6px 1px;
+  padding: 2px 6px 2px;
   color: #fff;
 }
 
@@ -24,9 +25,11 @@
 }
 
 .approvedComment {
+  display: flex;
+  align-items: center;
   padding: 1px 6px 1px;
-  background: @whiteSmoke;
-  border: 1px solid @lightGrey;
+  background-color: #fff;
+  border: 1px solid @disabledColor;
   color: @disabledColor;
 }
 

@@ -3,13 +3,23 @@
 .wrapper {
   display: flex;
   align-items: baseline;
+  padding: 2px 5px 3px 4px;
+  cursor: default;
+}
+
+.hover {
+    cursor: pointer;
+    border-radius: 3px;
+
+  &:hover {
+    background-color: rgba(0,0,0,.04);
+  }
 }
 
 .action {
   border: 0;
   background: transparent;
   padding: 0;
-  cursor: pointer;
   outline: none;
 
   &:hover {
