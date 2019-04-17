@@ -128,18 +128,28 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 		private SolutionStyleError CheckConcatenatedWordsInLowerCaseForError(string concatenatedWords, SyntaxToken tokenWithConcatenatedWords)
 		{
 			var currentCheckingWord = "";
-			foreach (var symbol in concatenatedWords)
+			var foundWords = new HashSet<string>();
+			while (currentCheckingWord.Length != concatenatedWords.Length)
 			{
-				currentCheckingWord += symbol;
-				if (currentCheckingWord == "I"
-					|| currentCheckingWord.Length != 1
-					&& IsWordContainedInDictionaries(currentCheckingWord))
-					currentCheckingWord = "";
+				currentCheckingWord = "";
+				foreach (var symbol in concatenatedWords)
+				{
+					currentCheckingWord += symbol;
+					if (!foundWords.Contains(currentCheckingWord)
+						&& (currentCheckingWord == "I"
+						|| currentCheckingWord.Length != 1
+						&& IsWordContainedInDictionaries(currentCheckingWord)))
+					{
+						foundWords.Add(currentCheckingWord);
+						currentCheckingWord = "";
+					}
+				}
+
+				if (currentCheckingWord == "")
+					return null;
 			}
 
-			return currentCheckingWord != ""
-				? new SolutionStyleError(StyleErrorType.Misspeling01, tokenWithConcatenatedWords, $"В слове {concatenatedWords} допущена опечатка.")
-				: null;
+			return new SolutionStyleError(StyleErrorType.Misspeling01, tokenWithConcatenatedWords, $"В слове {concatenatedWords} допущена опечатка.");
 		}
 
 		private bool IsWordContainedInDictionaries(string word)

@@ -41,7 +41,7 @@ namespace uLearn.CSharp.SpellingValidation
 		private readonly SpellingValidator validator = new SpellingValidator();
 
 		[TestCaseSource(nameof(IncorrectFiles))]
-		public void FindErrors(FileInfo file)
+		public void  FindErrors(FileInfo file)
 		{
 			var code = file.ContentAsUtf8();
 			var errors = validator.FindErrors(code);
