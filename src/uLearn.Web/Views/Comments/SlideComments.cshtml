@@ -63,7 +63,7 @@
 	var commentsWrapperUser = new
 	{
 		id = Model.CurrentUser == null ? null : Model.CurrentUser.Id,
-		isAuthenticated = Model.IsAuthorizedAndCanComment,
+		isAuthenticated = User.Identity.IsAuthenticated,
 		visibleName = Model.CurrentUser == null ? null : Model.CurrentUser.VisibleName,
 		avatarUrl = Model.CurrentUser == null ? null : Model.CurrentUser.AvatarUrl,
 		systemAccesses = Model.SystemAccesses.Select(a => a.AccessType.ToString("G")).Select(a => char.ToLowerInvariant(a[0]) + a.Substring(1)).ToList()
