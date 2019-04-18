@@ -4,6 +4,7 @@
   display: flex;
   align-items: baseline;
   padding: 2px 5px 3px 4px;
+  color: @disabledColor;
   cursor: default;
 }
 
@@ -16,19 +17,18 @@
   }
 }
 
+.isLiked {
+  color: @likeColor;
+}
+
 .action {
   border: 0;
   background: transparent;
   padding: 0;
   outline: none;
-
-  &:hover {
-    color: @darkGrey;
-  }
 }
 
 .count {
-  color: @additionalColor;
   font-size: 14px;
   margin-left: 3px;
 }

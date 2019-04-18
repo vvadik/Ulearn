@@ -101,7 +101,9 @@ class CommentsView extends Component {
 							<span className={styles.commentsCount}>{instructorsCommentCount}</span>}
 						</Tabs.Tab>
 						{activeTab === TABS.instructorsComments &&
-						<span className={styles.textForInstructors}>Эти комментарии скрыты для студентов</span>}
+						<span className={`${styles.textForInstructors} ${styles["visible-at-least-tablet"]}`}>
+							Эти комментарии скрыты для студентов
+						</span>}
 					</Tabs>
 				</div>}
 			</header>
