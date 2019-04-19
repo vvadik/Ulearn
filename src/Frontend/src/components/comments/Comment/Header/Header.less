@@ -1,3 +1,5 @@
+@import "../../../../variables.less";
+
 .header {
   display: flex;
   flex-direction: row;
@@ -9,4 +11,8 @@
 .author {
   font-size: 18px;
   margin: 0 5px 0 0;
+
+  @media (max-width: @maxPhoneWidth) {
+    font-size: 16px;
+  }
 }
