@@ -140,6 +140,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			if (comment.IsDeleted && await CanEditOrDeleteCommentAsync(comment, UserId).ConfigureAwait(false))
 				await commentsRepo.RestoreCommentAsync(commentId).ConfigureAwait(false);
 
+			parameters.Text?.TrimEnd();
 			if (!string.IsNullOrEmpty(parameters.Text))
 				await UpdateCommentTextAsync(comment, parameters.Text).ConfigureAwait(false);
 				

@@ -100,6 +100,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		{
 			var courseId = courseAuthorizationParameters.CourseId;
 			var slideId = parameters.SlideId;
+			parameters.Text.TrimEnd();
 			
 			if (parameters.ForInstructors)
 			{
