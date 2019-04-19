@@ -242,7 +242,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		public async Task<IActionResult> Like(int commentId)
 		{
 			if (await commentLikesRepo.DidUserLikeComment(commentId, UserId).ConfigureAwait(false))
-				return Conflict(new ErrorResponse($"You have liked the comment {commentId} already"));
+				return Ok(new SuccessResponseWithMessage($"You have liked the comment {commentId} already"));
 					
 			await commentLikesRepo.LikeAsync(commentId, UserId).ConfigureAwait(false);
 
@@ -260,7 +260,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		public async Task<IActionResult> Unlike(int commentId)
 		{
 			if (!await commentLikesRepo.DidUserLikeComment(commentId, UserId).ConfigureAwait(false))
-				return NotFound(new ErrorResponse($"You don't have like for the comment {commentId}"));
+				return Ok(new SuccessResponseWithMessage($"You don't have like for the comment {commentId}"));
 			
 			await commentLikesRepo.UnlikeAsync(commentId, UserId).ConfigureAwait(false);
 			
