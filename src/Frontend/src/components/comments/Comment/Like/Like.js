@@ -6,8 +6,7 @@ import styles from "./Like.less";
 
 export default function Like({isLiked, count, onClick, canLike}) {
 	return (
-		<div
-			className={`${styles.wrapper} ${canLike ? styles.hover : ""} ${isLiked ? styles.isLiked : ""}`}>
+		<div className={`${styles.wrapper} ${canLike ? styles.hover : ""} ${isLiked ? styles.isLiked : ""}`}>
 			<button className={styles.action} onClick={canLike ? onClick : null}>
 				<Icon name="ThumbUp" size={16} />
 			</button>

@@ -139,6 +139,11 @@ class CommentsList extends Component {
 			exitActive: styles.exitActive,
 		};
 
+		const duration = {
+			enter: 1000,
+			exit: 500,
+		};
+
 		const actions = {
 			handleLikeClick: this.handleLikeClick,
 			handleCorrectAnswerMark: this.handleCorrectAnswerMark,
@@ -162,7 +167,7 @@ class CommentsList extends Component {
 						mountOnEnter
 						unmountOnExit
 						classNames={transitionStyles}
-						timeout={1000}>
+						timeout={duration}>
 						<section className={styles.thread} key={comment.id} ref={this.lastThreadRef}>
 							<Thread
 								user={user}

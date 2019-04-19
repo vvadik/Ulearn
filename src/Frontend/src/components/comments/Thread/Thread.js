@@ -64,6 +64,11 @@ class Thread extends Component {
 			exitActive: styles.exitActive,
 		};
 
+		const duration = {
+			enter: 1000,
+			exit: 500,
+		};
+
 		return (
 			<div className={styles.repliesWrapper}>
 				<TransitionGroup enter={this.props.animation}>
@@ -74,7 +79,7 @@ class Thread extends Component {
 							unmountOnExit
 							in={this.props.animation}
 							classNames={transitionStyles}
-							timeout={500}>
+							timeout={duration}>
 							<div key={reply.id} className={styles.reply}>
 								{this.renderComment(reply, index + 1 === replies.length)}
 							</div>
