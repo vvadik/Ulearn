@@ -13,7 +13,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 {
 	public class SpellingValidator: BaseStyleValidator
 	{
-		private static readonly Hunspell hunspellEnUS = new Hunspell(Resources.en_US_aff, Resources.en_US_dic);
+		private static readonly Hunspell hunspellEnUs = new Hunspell(Resources.en_US_aff, Resources.en_US_dic);
 		private static readonly Hunspell hunspellEnGb = new Hunspell(Resources.en_GB_aff, Resources.en_GB_dic);
 		private static readonly Hunspell hunspellLa = new Hunspell(Resources.la_aff, Resources.la_dic);
 		private static readonly HashSet<string> wordsToExcept = new HashSet<string>(Resources.spelling_exceptions.SplitToLines());
@@ -85,7 +85,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 				var doesWordContainError = true;
 				foreach (var wordInDifferentNumber in wordInDifferentNumbers)
 				{
-					if (CheckForSpecialCases(wordInDifferentNumber, typeAsString) // TODO: сделать и для небольших частей?
+					if (CheckForSpecialCases(wordInDifferentNumber, typeAsString)
 						|| IsWordContainedInDictionaries(wordInDifferentNumber))
 					{
 						doesWordContainError = false;
@@ -132,16 +132,20 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 			while (currentCheckingWord.Length != concatenatedWords.Length)
 			{
 				currentCheckingWord = "";
+				var isFirstWord = true;
 				foreach (var symbol in concatenatedWords)
 				{
 					currentCheckingWord += symbol;
 					if (!foundWords.Contains(currentCheckingWord)
-						&& (currentCheckingWord == "I"
-						|| currentCheckingWord.Length != 1
+						&& (currentCheckingWord.Length == 1 && isFirstWord
+						||	currentCheckingWord.Length != 1
 						&& IsWordContainedInDictionaries(currentCheckingWord)))
 					{
 						foundWords.Add(currentCheckingWord);
+						if (isFirstWord && IsWordContainedInDictionaries(concatenatedWords.Substring(currentCheckingWord.Length))) // это нужно для переменных типа dfunction b substring
+							return null;
 						currentCheckingWord = "";
+						isFirstWord = false;
 					}
 				}
 
@@ -152,12 +156,12 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 			return new SolutionStyleError(StyleErrorType.Misspeling01, tokenWithConcatenatedWords, $"В слове {concatenatedWords} допущена опечатка.");
 		}
 
-		private bool IsWordContainedInDictionaries(string word)
+		private bool IsWordContainedInDictionaries(string word) // есть проблема, при которой разные части одного слова проверяются в разных словарях (одна часть - в английском, вторая - в латинском)?
 		{
 			return wordsToExcept.Contains(word)
-					|| hunspellEnUS.Spell(word)
+					|| hunspellEnUs.Spell(word)
 					|| hunspellEnGb.Spell(word)
-					|| hunspellLa.Spell(word);
+					|| hunspellLa.Spell(word.ToLowerInvariant());
 		}
 	}
 }
