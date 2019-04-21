@@ -229,6 +229,11 @@ namespace Database.Models
 		[MinCourseRole(CourseRole.Instructor)]
 		[IsEnabledByDefault(true)]
 		NewCommentForInstructorsOnly = 107,
+		
+		[Display(Name = @"Новый комментарий от студента вашей группы", GroupName = @"Новый комментарий от студента вашей группы")]
+		[MinCourseRole(CourseRole.Instructor)]
+		[IsEnabledByDefault(true)]
+		NewCommentFromYourGroupStudent = 108,
 
 		// Course admins
 		[Display(Name = @"Добавлен новый преподаватель", GroupName = @"Добавлены новые преподаватели")]
@@ -336,7 +341,7 @@ namespace Database.Models
 
 		public abstract bool IsActual();
 
-		/* Returns list of notifications, which blocks this notification from sending to specific user. I.e. NewComment is blocked by ReplyToYourComment */
+		/* Returns list of notifications, which blocks this notification from sending to specific user. I.e. NewComment is blocked by ReplyToYourComment or NewCommentFromYourGroupStudent */
 		public virtual List<Notification> GetBlockerNotifications(ULearnDb db)
 		{
 			return new List<Notification>();
@@ -527,7 +532,10 @@ namespace Database.Models
 
 		public override List<Notification> GetBlockerNotifications(ULearnDb db)
 		{
-			return new NotificationsRepo(db).FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId).Cast<Notification>().ToList();
+			var notificationsRepo = new NotificationsRepo(db);
+			var repliedNotifications = notificationsRepo.FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId);
+			var yourGroupNotifications = notificationsRepo.FindNotifications<NewCommentFromYourGroupStudentNotification>(n => n.CommentId == CommentId);
+			return repliedNotifications.Cast<Notification>().Concat(yourGroupNotifications).ToList();
 		}
 	}
 
@@ -564,6 +572,43 @@ namespace Database.Models
 		public override List<string> GetRecipientsIds(ULearnDb db)
 		{
 			return new List<string> { ParentComment.AuthorId };
+		}
+	}
+	
+	[NotificationType(NotificationType.NewCommentFromYourGroupStudent)]
+	public class NewCommentFromYourGroupStudentNotification : AbstractCommentNotification
+	{
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
+		{
+			var slide = course.FindSlideById(Comment.SlideId);
+			if (slide == null)
+				return null;
+
+			return $"<b>{Comment.Author.VisibleName.EscapeHtml()}</b> прокомментировал{Comment.Author.Gender.ChooseEnding()} «{GetSlideTitle(course, slide).EscapeHtml()}»:<br/><br/>" +
+					$"{GetHtmlCommentText()}";
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
+		{
+			var slide = course.FindSlideById(Comment.SlideId);
+			if (slide == null)
+				return null;
+
+			return $"{Comment.Author.VisibleName} прокомментировал{Comment.Author.Gender.ChooseEnding()} «{GetSlideTitle(course, slide)}»:\n\n{Comment.Text.Trim()}";
+		}
+
+		public override List<string> GetRecipientsIds(ULearnDb db)
+		{
+			return new GroupsRepo(db, WebCourseManager.Instance).GetInstructorsOfAllGroupsWhereUserIsMember(CourseId, Comment.Author).ToList();
+		}
+
+		public override bool IsNotificationForEveryone => true;
+
+		public override List<Notification> GetBlockerNotifications(ULearnDb db)
+		{
+			var notificationsRepo = new NotificationsRepo(db);
+			var repliedToYourCommentNotifications = notificationsRepo.FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId);
+			return repliedToYourCommentNotifications.Cast<Notification>().ToList();
 		}
 	}
 

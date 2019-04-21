@@ -702,5 +702,21 @@ namespace Database.DataContexts
 				.ToDictionary(g => g.Key, g => g.ToList())
 				.ToDefaultDictionary();
 		}
+		
+		public IEnumerable<string> GetInstructorsOfAllGroupsWhereUserIsMember(string courseId, ApplicationUser user)
+		{
+			var groupIds = GetGroups(courseId).Select(g => g.Id).ToList();
+			var groupsWhereUserIsStudent = db.GroupMembers
+				.Include(a => a.User)
+				.Where(m => m.UserId == user.Id && !m.User.IsDeleted && groupIds.Contains(m.GroupId))
+				.Select(m => m.Group)
+				.ToList();
+			var ownersIds = groupsWhereUserIsStudent.Select(g => g.OwnerId).ToList();
+			var accesses = GetGroupsAccesses(groupsWhereUserIsStudent.Select(g => g.Id));
+			return accesses
+				.SelectMany(kvp => kvp.Value.Select(a => a.User.Id))
+				.Concat(ownersIds)
+				.Distinct();
+		}
 	}
 }

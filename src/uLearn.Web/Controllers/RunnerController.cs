@@ -15,6 +15,7 @@ using Database.DataContexts;
 using Database.Models;
 using log4net;
 using LtiLibrary.Core.Extensions;
+using Metrics;
 using RunCsJob.Api;
 using Serilog;
 using Telegram.Bot.Types.Enums;
@@ -22,7 +23,7 @@ using uLearn.Web.AntiPlagiarismUsage;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
-using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Telegram;
 using XQueue;
@@ -35,8 +36,13 @@ namespace uLearn.Web.Controllers
 		private static readonly ILog log = LogManager.GetLogger(typeof(RunnerController));
 
 		private readonly UserSolutionsRepo userSolutionsRepo;
+		private readonly SlideCheckingsRepo slideCheckingsRepo;
+		private readonly VisitsRepo visitsRepo;
+		private readonly GroupsRepo groupsRepo;
+		private readonly UsersRepo usersRepo;
 		private readonly ULearnDb db;
 		private readonly CourseManager courseManager;
+		private readonly MetricSender metricSender;
 
 		private static readonly List<IResultObserver> resultObserveres = new List<IResultObserver>
 		{
@@ -50,6 +56,11 @@ namespace uLearn.Web.Controllers
 			this.db = db;
 			this.courseManager = courseManager;
 			userSolutionsRepo = new UserSolutionsRepo(db, courseManager);
+			slideCheckingsRepo = new SlideCheckingsRepo(db);
+			visitsRepo = new VisitsRepo(db);
+			groupsRepo = new GroupsRepo(db, courseManager);
+			usersRepo = new UsersRepo(db);
+			metricSender = new MetricSender(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName);
 		}
 
 		public RunnerController()
@@ -134,7 +145,11 @@ namespace uLearn.Web.Controllers
 			}
 			CheckRunner(token);
 			log.Info($"Получил от RunCsJob результаты проверки решений: [{string.Join(", ", results.Select(r => r.Id))}] от агента {agent}");
-			await FuncUtils.TrySeveralTimesAsync(() => userSolutionsRepo.SaveResults(results), 3).ConfigureAwait(false);
+
+			foreach (var result in results)
+				await FuncUtils.TrySeveralTimesAsync(() => userSolutionsRepo.SaveResult(result, 
+					submission => BaseExerciseController.SendToReviewAndUpdateScore(submission, courseManager, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender, false)
+				), 3).ConfigureAwait(false);
 
 			var submissionsByIds = userSolutionsRepo
 				.FindSubmissionsByIds(results.Select(result => result.Id).ToList())
@@ -147,6 +162,7 @@ namespace uLearn.Web.Controllers
 				await SendResultToObservers(submissionsByIds[result.Id], result).ConfigureAwait(false);
 			}
 		}
+		
 
 		private Task SendResultToObservers(UserExerciseSubmission submission, RunningResults result)
 		{

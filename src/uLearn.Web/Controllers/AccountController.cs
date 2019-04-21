@@ -228,10 +228,10 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> ToggleRole(string courseId, string userId, CourseRole role)
 		{
 			var currentUserId = User.Identity.GetUserId();
-			if (userManager.FindById(userId) == null || userId == currentUserId)
-				return Json(new { status = "error", message = "Вы не можете назначать администратором, преподавателем или тестером сами себя." });
-
 			var isCourseAdmin = User.HasAccessFor(courseId, CourseRole.CourseAdmin);
+			if ((userManager.FindById(userId) == null || userId == currentUserId) && (!isCourseAdmin || role == CourseRole.CourseAdmin) && !User.IsSystemAdministrator())
+				return Json(new { status = "error", message = "Вы не можете изменить эту роль у самих себя." });
+
 			var canAddInstructors = coursesRepo.HasCourseAccess(currentUserId, courseId, CourseAccessType.AddAndRemoveInstructors);
 			if (!isCourseAdmin && !canAddInstructors)
 				return Json(new { status = "error", message = "У вас нет прав назначать преподавателей или тестеров. Это могут делать только администраторы курса и преподаватели со специальными правами." });

@@ -103,7 +103,8 @@ namespace Ulearn.Core.Properties {
         ///биграммной
         ///биграммные
         ///биграммный:полный
-        ///биграммных        /// [rest of string was truncated]&quot;;.
+        ///биграммных
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         public static string customDictionary {
             get {
@@ -293,22 +294,64 @@ namespace Ulearn.Core.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
+        ///   Looks up a localized string similar to SET UTF-8
+        ///TRY оаитенрсвйлпкьыяудмзшбчгщюжцёхфэъАВСМКГПТЕИЛФНДОЭРЗЮЯБХЖШЦУЧЬЫЪЩЙЁ
+        ///
+        ///FLAG long
+        ///
+        ///SFX II Y 61
+        ///SFX II а и [гкхжчшщ]а #сорока --&gt; сороки (е.ч.р.п. и мн.ч.и.п.+в.п.)
+        ///SFX II а ы [^гкхжчшщ]а #шуба --&gt; шубы (е.ч.р.п. и мн.ч.и.п.+в.п.)
+        ///SFX II а е а #сорока --&gt; сороке (е.ч.д.п.+п.п.)
+        ///SFX II а у а #сорока --&gt; сороку (е.ч.в.п.)
+        ///SFX II а ам а #сорока --&gt; сорокам (мн.ч.д.п.)
+        ///SFX II а ами а #сорока --&gt; сороками (мн.ч.т.п.)
+        ///SFX II а ах а #сорока --&gt; сороках (мн.ч.п.п.)
+        ///SFX II я и я #баня --&gt; бани  [rest of string was truncated]&quot;;.
         /// </summary>
-        public static byte[] ru_RU_aff {
+        public static string ru_RU_aff {
             get {
-                object obj = ResourceManager.GetObject("ru_RU_aff", resourceCulture);
-                return ((byte[])(obj));
+                return ResourceManager.GetString("ru_RU_aff", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
+        ///   Looks up a localized string similar to 173975
+        ///а
+        ///аба/IIIhIw
+        ///абажур/IIIiIhIk
+        ///абажурный/CCCDCO
+        ///абажурчик/IIIiIhIk
+        ///абаз/IIIiIhIk
+        ///абазин/IIIiIh
+        ///абазинец/IKIw
+        ///абазинка/IIIhIe
+        ///абазинский/CCZZ
+        ///абазия/IIIw
+        ///абак/IIIiIhIk
+        ///абака/IIIhIw
+        ///Абакан/IIIiIhIk
+        ///абаканский/CCZZ
+        ///аббат/IIIiIhIk
+        ///аббатиса/IIIhIe
+        ///аббатский/CCZZ
+        ///аббатство/IIIw
+        ///аббревиатура/IIIhIw
+        ///аббревиатурный/CCCDCO
+        ///аббревиация/IIIw
+        ///абвер/IIIiIhIk
+        ///абверовский/CCZZ
+        ///абдикация/IIIw
+        ///абдомен/IIIiIhIk
+        ///абдоминальный/CCCDCO
+        ///абдуктор/IIIiIhIk
+        ///абдукторный/CCCDCO
+        ///абдукция/IIIw
+        ///Абдул/II [rest of string was truncated]&quot;;.
         /// </summary>
-        public static byte[] ru_RU_dic {
+        public static string ru_RU_dic {
             get {
-                object obj = ResourceManager.GetObject("ru_RU_dic", resourceCulture);
-                return ((byte[])(obj));
+                return ResourceManager.GetString("ru_RU_dic", resourceCulture);
             }
         }
         

@@ -13,18 +13,17 @@ namespace uLearn.Web
 		public static void PreStart()
 		{
 			var connectionString = WebConfigurationManager.ConnectionStrings["statsd"]?.ConnectionString;
-			var isGraphiteSendingEnabled = string.IsNullOrEmpty(connectionString);
+			var isGraphiteSendingEnabled = !string.IsNullOrEmpty(connectionString);
 			
 			if (!isGraphiteSendingEnabled)
 				return;
 			
-			var config = StatsdConfiguration.CreateFrom(connectionString);
-
 			// Make sure MetricsPipe handles BeginRequest and EndRequest
 			DynamicModuleUtility.RegisterModule(typeof(MetricsPipeStartupModule));
 
 			MetricsPipeStartupModule.Settings.ReportRequestTime = true;
-			MetricsPipeStartupModule.Settings.RequestTimePrefix = MetricSender.BuildKey(config.Prefix, "web", "request.time");
+			// The prefix is added elsewhere. If you specify here, there will be duplication
+			MetricsPipeStartupModule.Settings.RequestTimePrefix = MetricSender.BuildKey(null, "web", "request.time");
 		}
 	}
 }

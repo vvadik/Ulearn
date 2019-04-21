@@ -36,7 +36,6 @@
 		@foreach (var submission in Model.Submissions)
 		{
 			var slide = (ExerciseSlide)Model.Slides[submission.SlideId];
-			var block = slide.Exercise;
 			var manualScore = -1;
 			if (!slide.Scoring.RequireReview)
 			{
@@ -50,7 +49,7 @@
 					</h3>
 					<div class="date">
 						Сдана <span title="@submission.Timestamp.ToPrettyString(true)">@submission.Timestamp.ToAgoPrettyString(true)</span>,
-						<a href="@Url.Action("UserSolutions", "Analytics", new { courseId = submission.CourseId, slideId = slide.Id, userId = submission.UserId })" target="_blank">
+						<a href="@Url.Action("UserSolutions", "Analytics", new { courseId = submission.CourseId, slideId = slide.Id, userId = submission.UserId, version = submission.Id })" target="_blank">
 							<span class="hidden-xs-inline">смотреть</span> код
 						</a>
 					</div>
@@ -92,14 +91,15 @@
 				</form>
 
 				@{
-					var lastManualChecking = submission.ManualCheckings.LastOrDefault(c => c.IsChecked);
-					var solution = submission.SolutionCode.Text;
+					var reviewedSubmission = Model.ReviewedSubmissions.FirstOrDefault(s => s.SlideId == submission.SlideId);
+					var lastManualChecking = reviewedSubmission == null ? null : reviewedSubmission.ManualCheckings.LastOrDefault(c => c.IsChecked);
+					var solution = reviewedSubmission == null ? null : reviewedSubmission.SolutionCode.Text;
 				}
 				@if (lastManualChecking != null && lastManualChecking.NotDeletedReviews.Any())
 				{
 					<div class="last-review-comments">
 						<div>
-							<strong>Комментари@(lastManualChecking.NotDeletedReviews.Count > 1 ? "и" : "й") последнего код-ревью:</strong>
+							<strong>Комментари@(lastManualChecking.NotDeletedReviews.Count > 1 ? "и" : "й") <a href="@Url.Action("UserSolutions", "Analytics", new { courseId = reviewedSubmission.CourseId, slideId = slide.Id, userId = reviewedSubmission.UserId, version = reviewedSubmission.Id })" target="_blank">последнего код-ревью</a>:</strong>
 						</div>
 
 						@foreach (var review in lastManualChecking.NotDeletedReviews)

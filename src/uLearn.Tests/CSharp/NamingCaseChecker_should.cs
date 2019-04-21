@@ -114,6 +114,12 @@ namespace uLearn.CSharp
 			CheckCorrect("class C{ int M(){ Action a => { int a, b;} } }");
 		}
 
+		[Test]
+		public void inspect_discards()
+		{
+			//CheckCorrect("class C{ void M() {var (_, b) = (1, 2);} }");
+			CheckCorrect("class C{ void M(Action<int, int> a) {a(1, 1);} void M2() {M((_, b) => { });}}");
+		}
 		private void CheckCorrect(string correctCode)
 		{
 			Assert.That(FindErrors(correctCode), Is.Empty, correctCode);
