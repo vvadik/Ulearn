@@ -64,7 +64,7 @@ class CommentsView extends Component {
 		return (
 			<div className={styles.wrapper}>
 				{this.renderHeader()}
-				<div className={styles.commentsContainer} key={this.state.activeTab}>
+				<div key={this.state.activeTab}>
 					<CommentsList
 						slideType={slideType}
 						handleInstructorsCommentCount={this.handleInstructorsCommentCount}
@@ -102,7 +102,7 @@ class CommentsView extends Component {
 						</Tabs.Tab>
 						{activeTab === TABS.instructorsComments &&
 						<span className={`${styles.textForInstructors} ${styles["visible-at-least-tablet"]}`}>
-							Эти комментарии скрыты для студентов
+							Студенты не видят эти комментарии
 						</span>}
 					</Tabs>
 				</div>}

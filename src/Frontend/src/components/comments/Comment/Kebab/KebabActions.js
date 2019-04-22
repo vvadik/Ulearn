@@ -24,14 +24,12 @@ export default function KebabActions(props) {
 					onClick={() => actions.handleDeleteComment(comment)}>
 					Удалить
 				</MenuItem>}
-				{canDeleteAndEdit &&
-				<div className={styles.visibleOnPhone}>
+				{canDeleteAndEdit && window.matchMedia("(max-width: 767px)").matches &&
 					<MenuItem
-						icon={<Icon.Edit size="small" />}
-						onClick={() => actions.handleShowEditForm(comment.id)}>
-						Редактировать
-					</MenuItem>
-				</div>}
+					icon={<Icon.Edit size="small" />}
+					onClick={() => actions.handleShowEditForm(comment.id)}>
+					Редактировать
+					</MenuItem>}
 				{canSeeSubmissions &&
 				<div className={styles.visibleOnPhone}>
 					<MenuItem

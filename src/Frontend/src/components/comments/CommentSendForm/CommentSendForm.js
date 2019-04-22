@@ -31,9 +31,8 @@ class CommentSendForm extends Component {
 		return null;
 	}
 
-
 	render() {
-		const {author, isForInstructors} = this.props;
+		const {author, isForInstructors, isShowFocus} = this.props;
 		const {error, text} = this.state;
 
 		return (
@@ -45,6 +44,7 @@ class CommentSendForm extends Component {
 				)}
 				<form className={styles.form} onSubmit={this.handleSubmit}>
 					<MarkdownEditor
+						isShowFocus={isShowFocus}
 						ref={this.editor}
 						isForInstructors={isForInstructors}
 						hasError={error !== null}
@@ -67,7 +67,7 @@ class CommentSendForm extends Component {
 		return (
 			<Button
 				use="primary"
-				size="medium"
+				size={window.matchMedia("(max-width: 767px)").matches ? "small" : "medium"}
 				type="submit"
 				loading={sending}>
 				{submitTitle}
@@ -85,7 +85,7 @@ class CommentSendForm extends Component {
 		return (
 			<Button
 				use="secondary"
-				size="medium"
+				size={window.matchMedia("(max-width: 767px)").matches ? "small" : "medium"}
 				type="button"
 				onClick={handleCancel}>
 				{cancelTitle}
@@ -121,6 +121,7 @@ CommentSendForm.propTypes = {
 	handleSubmit: PropTypes.func,
 	sendStatus: PropTypes.string,
 	isForInstructors: PropTypes.bool,
+	isShowFocus: PropTypes.bool,
 	sending: PropTypes.bool,
 	submitTitle: PropTypes.string,
 	handleCancel: PropTypes.func,

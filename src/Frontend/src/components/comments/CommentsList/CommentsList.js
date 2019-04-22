@@ -20,6 +20,7 @@ class CommentsList extends Component {
 
 		this.state = {
 			newCommentId: 1,
+			saveCommentLikeStatus: null,
 			threads: [],
 			commentEditing: {
 				commentId: null,
@@ -107,7 +108,7 @@ class CommentsList extends Component {
 
 	renderMessageIfCommentsDisabled() {
 		return (
-			<div className={styles.textForEmptyComments}>
+			<div className={styles.textForDisabledComments}>
 				В данный момент комментарии выключены.
 			</div>
 			)
@@ -307,19 +308,7 @@ class CommentsList extends Component {
 			isLiked: !isLiked,
 		}));
 
-		if (isLiked === true) {
-			commentsApi.dislikeComment(commentId)
-				.catch(e => {
-					Toast.push("Не удалось изменить комментарий. Произошла ошибка, попробуйте снова");
-					console.error(e);
-				});
-		} else {
-			commentsApi.likeComment(commentId)
-				.catch(e => {
-					Toast.push("Не удалось изменить комментарий. Произошла ошибка, попробуйте снова");
-					console.error(e);
-				});
-		}
+		this.debouncedSendData(isLiked ? commentsApi.dislikeComment : commentsApi.likeComment, commentId);
 	};
 
 	handleApprovedMark = (commentId, isApproved) => {
@@ -351,7 +340,7 @@ class CommentsList extends Component {
 			commentEditing: {
 				...this.state.commentEditing,
 				commentId: commentId,
-			}
+			},
 		});
 	};
 
@@ -360,7 +349,7 @@ class CommentsList extends Component {
 			reply: {
 				...this.state.reply,
 				commentId: commentId,
-			}
+			},
 		});
 	};
 

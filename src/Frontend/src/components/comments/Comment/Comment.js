@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { userRoles, userType, comment, commentStatus, commentPolicy } from "../commonPropTypes";
 import moment from "moment";
 import Link from "@skbkontur/react-ui/components/Link/Link";
+import Hint from "@skbkontur/react-ui/components/Hint/Hint";
 import Avatar from "../../common/Avatar/Avatar";
 import CommentSendForm from "../CommentSendForm/CommentSendForm";
 import Like from "./Like/Like";
@@ -14,7 +15,6 @@ import scrollToView from "../../../utils/scrollToView";
 import { ACCESSES, ROLES } from "../../../consts/general";
 
 import styles from "./Comment.less";
-import Hint from "@skbkontur/react-ui/components/Hint/Hint";
 
 class Comment extends Component {
 	constructor(props) {
@@ -48,7 +48,7 @@ class Comment extends Component {
 					<div className={styles.timeSinceAdded}>
 						<Hint
 							pos="right middle"
-							text={`${moment(comment.publishTime).local().format('YYYY-MM-DD HH:mm:ss')}`}>
+							text={`${moment(comment.publishTime).local().format('DD MMMM YYYY в HH:mm:ss')}`}>
 							{moment(comment.publishTime).startOf('minute').fromNow()}
 						</Hint>
 					</div>
@@ -121,6 +121,7 @@ class Comment extends Component {
 
 		return (
 			<CommentSendForm
+				isShowFocus={comment.id === commentEditing.commentId}
 				commentId={comment.id}
 				handleSubmit={actions.handleEditComment}
 				text={comment.text}
@@ -137,10 +138,9 @@ class Comment extends Component {
 
 	canReply = (role) => {
 		const {commentPolicy} = this.props;
-
-		return 	(commentPolicy.areCommentsEnabled && ((role.courseRole === ROLES.student && !commentPolicy.onlyInstructorsCanReply) ||
-			(role.isSystemAdministrator || role.courseRole === ROLES.courseAdmin ||
-			role.courseRole === ROLES.instructor)));
+		return 	(commentPolicy.areCommentsEnabled && ((role.courseRole === ROLES.student || role.courseRole === null ||
+			role.courseRole.length === 0) || role.isSystemAdministrator || role.courseRole === ROLES.courseAdmin ||
+			role.courseRole === ROLES.instructor));
 	};
 
 	canViewStudentsGroup = () => {

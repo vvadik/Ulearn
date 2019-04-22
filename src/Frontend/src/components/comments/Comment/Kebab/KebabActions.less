@@ -4,3 +4,9 @@
   margin-left: auto;
   cursor: pointer;
 }
+
+.visibleOnPhone {
+  @media (max-width: @maxPhoneWidth) {
+    display: contents;
+  }
+}

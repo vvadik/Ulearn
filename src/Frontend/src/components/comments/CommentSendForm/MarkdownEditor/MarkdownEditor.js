@@ -56,6 +56,14 @@ class Textarea extends BaseTextarea {
 class MarkdownEditor extends Component {
 	textarea = React.createRef();
 
+	componentDidMount() {
+		const { isShowFocus } = this.props;
+
+		if (isShowFocus) {
+			this.textarea.current.focus();
+		}
+	}
+
 	render() {
 		const {hasError, text, children, isForInstructors} = this.props;
 
@@ -160,6 +168,7 @@ class MarkdownEditor extends Component {
 
 MarkdownEditor.propTypes = {
 	hasError: PropTypes.bool,
+	isShowFocus: PropTypes.bool,
 	isForInstructors: PropTypes.bool,
 	text: PropTypes.string,
 	onChange: PropTypes.func,
