@@ -1338,7 +1338,7 @@ namespace Database.Models
 
 		public override List<string> GetRecipientsIds(ULearnDb db)
 		{
-			return new UserRolesRepo(db).GetListOfUsersWithCourseRole(CourseRole.Instructor, CourseId);
+			return new UserRolesRepo(db).GetListOfUsersWithCourseRole(CourseRole.Instructor, CourseId, true);
 		}
 
 		public override List<Notification> GetBlockerNotifications(ULearnDb db)
