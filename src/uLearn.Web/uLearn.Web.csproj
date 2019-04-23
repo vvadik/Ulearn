@@ -704,6 +704,7 @@
     <Compile Include="Controllers\CertificatesController.cs" />
     <Compile Include="Controllers\ErrorsController.cs" />
     <Compile Include="Controllers\FeedController.cs" />
+    <Compile Include="Controllers\GitWebhookController.cs" />
     <Compile Include="Controllers\GraderController.cs" />
     <Compile Include="Controllers\JsonDataContractController.cs" />
     <Compile Include="Controllers\JsonDataContractHelpers.cs" />
