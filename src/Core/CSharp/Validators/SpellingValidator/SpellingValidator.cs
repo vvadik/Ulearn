@@ -49,8 +49,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 		private SolutionStyleError InspectMethodParameter(ParameterSyntax parameter)
 		{
 			var identifier = parameter.Identifier;
-			var parameterTypeAsString = parameter.Type.ToString();
-			var errorsInParameterName = CheckIdentifierNameForSpellingErrors(identifier, parameterTypeAsString);
+			var errorsInParameterName = CheckIdentifierNameForSpellingErrors(identifier, parameter.Type.ToString());
 
 			return errorsInParameterName.FirstOrDefault();
 		}
@@ -63,11 +62,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 
 		private IEnumerable<SolutionStyleError> InspectVariablesNames(VariableDeclaratorSyntax variableDeclaratorSyntax, TypeInfo variableTypeInfo)
 		{
-			var variableIdentifier = variableDeclaratorSyntax.Identifier;
-			var variableType = variableTypeInfo.Type;
-			var variableTypeName = variableType.Name;
-
-			return CheckIdentifierNameForSpellingErrors(variableIdentifier, variableTypeName);
+			return CheckIdentifierNameForSpellingErrors(variableDeclaratorSyntax.Identifier, variableTypeInfo.Type.Name);
 		}
 
 		private IEnumerable<SolutionStyleError> InspectPropertiesNames(PropertyDeclarationSyntax propertyDeclaration)
