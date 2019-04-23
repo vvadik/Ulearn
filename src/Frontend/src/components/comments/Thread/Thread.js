@@ -20,6 +20,7 @@ class Thread extends Component {
 			getUserSolutionsUrl, commentPolicy} = this.props;
 		const isLastCommentInThread = isLastChild;
 		const isParentComment = !comment.parentCommentId;
+		const focusedReplyForm = {inReplyForm: isParentComment && comment.id === this.props.reply.commentId,};
 
 		return (
 			<>
@@ -34,12 +35,13 @@ class Thread extends Component {
 					slideType={slideType}
 					user={user}
 					userRoles={userRoles}>
-					<div className={styles.visibleOnDesktopAndTablet}>
+					<div>
 						{this.renderReplies(comment)}
 					</div>
 					{(isParentComment && comment.id === this.props.reply.commentId) &&
 					<div className={styles.replyForm}>
 						<CommentSendForm
+							isShowFocus={focusedReplyForm}
 							commentId={comment.id}
 							sending={reply.sending}
 							author={user}
@@ -48,9 +50,6 @@ class Thread extends Component {
 							handleSubmit={actions.handleAddReplyComment} />
 					</div>}
 				</Comment>
-				<div className={styles.visibleOnPhone}>
-					{this.renderReplies(comment)}
-				</div>
 			</>
 		)
 	}

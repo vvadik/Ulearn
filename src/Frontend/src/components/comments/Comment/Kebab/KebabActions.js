@@ -18,13 +18,28 @@ export default function KebabActions(props) {
 	return (
 		<div className={styles.instructorsActions}>
 			<Kebab positions={["bottom right"]} size="large" disableAnimations={true}>
+				{canModerate &&
+				<MenuItem
+					icon={<Icon.EyeClosed size="small" />}
+					onClick={() => {
+						actions.handleApprovedMark(comment.id, comment.isApproved);
+						handleCommentBackGround(comment.id, comment.isApproved)}
+					}>
+					{!comment.isApproved ? "Опубликовать" : "Скрыть"}
+				</MenuItem>}
 				{canDeleteAndEdit &&
 				<MenuItem
 					icon={<Icon.Delete size="small" />}
 					onClick={() => actions.handleDeleteComment(comment)}>
 					Удалить
 				</MenuItem>}
-				{canDeleteAndEdit && window.matchMedia("(max-width: 767px)").matches &&
+				{(canModerate && !comment.parentCommentId) &&
+				<MenuItem
+					onClick={() => actions.handlePinnedToTopMark(comment.id, comment.isPinnedToTop)}
+					icon={<Icon name="Pin" size="small" />}>
+					{comment.isPinnedToTop ? "Открепить" : "Закрепить"}
+				</MenuItem>}
+				{canDeleteAndEdit &&
 					<MenuItem
 					icon={<Icon.Edit size="small" />}
 					onClick={() => actions.handleShowEditForm(comment.id)}>
@@ -38,26 +53,11 @@ export default function KebabActions(props) {
 						Посмотеть решения
 					</MenuItem>
 				</div>}
-				{canModerate &&
-				<MenuItem
-					icon={<Icon.EyeClosed size="small" />}
-					onClick={() => {
-						actions.handleApprovedMark(comment.id, comment.isApproved);
-						handleCommentBackGround(comment.id, comment.isApproved)}
-					}>
-					{!comment.isApproved ? "Опубликовать" : "Скрыть"}
-				</MenuItem>}
 				{(canModerate && comment.parentCommentId) &&
 					<MenuItem
 						onClick={() => actions.handleCorrectAnswerMark(comment.id, comment.isCorrectAnswer)}
 						icon={<Icon name="Ok" size="small" />}>
 						{comment.isCorrectAnswer ? "Снять отметку" : "Отметить правильным"}
-					</MenuItem>}
-				{(canModerate && !comment.parentCommentId) &&
-					<MenuItem
-						onClick={() => actions.handlePinnedToTopMark(comment.id, comment.isPinnedToTop)}
-						icon={<Icon name="Pin" size="small" />}>
-						{comment.isPinnedToTop ? "Открепить" : "Закрепить"}
 					</MenuItem>}
 			</Kebab>
 		</div>

@@ -65,6 +65,7 @@ export default function CommentActions(props) {
 	}
 
 	return (
+		commentActions.length > 0 &&
 		<div className={styles.actions}>
 			{commentActions}
 		</div>
