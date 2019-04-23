@@ -39,3 +39,7 @@ sierpinski
 gcd
 loc
 sobel
+rgx
+lgth
+vect
+vec
