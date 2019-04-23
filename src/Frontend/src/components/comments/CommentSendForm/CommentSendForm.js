@@ -49,7 +49,8 @@ class CommentSendForm extends Component {
 						isForInstructors={isForInstructors}
 						hasError={error !== null}
 						text={text}
-						onChange={this.handleChange}
+						handleChange={this.handleChange}
+						handleSubmit={this.handleSubmit}
 					>
 						<div className={styles.buttons}>
 							{this.renderSubmitButton()}
@@ -121,7 +122,7 @@ CommentSendForm.propTypes = {
 	handleSubmit: PropTypes.func,
 	sendStatus: PropTypes.string,
 	isForInstructors: PropTypes.bool,
-	isShowFocus: PropTypes.bool,
+	isShowFocus: PropTypes.objectOf(PropTypes.bool),
 	sending: PropTypes.bool,
 	submitTitle: PropTypes.string,
 	handleCancel: PropTypes.func,

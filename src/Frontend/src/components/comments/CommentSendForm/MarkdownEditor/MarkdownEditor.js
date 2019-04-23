@@ -57,9 +57,9 @@ class MarkdownEditor extends Component {
 	textarea = React.createRef();
 
 	componentDidMount() {
-		const { isShowFocus } = this.props;
+		const {inSendForm, inEditForm, inReplyForm} = this.props.isShowFocus;
 
-		if (isShowFocus) {
+		if (inSendForm || inEditForm || inReplyForm) {
 			this.textarea.current.focus();
 		}
 	}
@@ -91,9 +91,9 @@ class MarkdownEditor extends Component {
 	}
 
 	handleChange = (e, value) => {
-		const {onChange} = this.props;
+		const {handleChange} = this.props;
 
-		onChange(value);
+		handleChange(value);
 	};
 
 	handleKeyDown = (e) => {
@@ -102,6 +102,11 @@ class MarkdownEditor extends Component {
 				this.transformTextToMarkdown(operation);
 				return;
 			}
+		}
+
+		if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+			this.handleChange();
+			this.props.handleSubmit(window.event);
 		}
 	};
 
@@ -116,12 +121,12 @@ class MarkdownEditor extends Component {
 	};
 
 	transformTextToMarkdown = (operation) => {
-		const {onChange, text} = this.props;
+		const {handleChange, text} = this.props;
 		const range = this.textarea.current.selectionRange;
 
 		let {finalText, finalSelectionRange} = MarkdownEditor.wrapRangeWithMarkdown(text, range, operation);
 
-		onChange(finalText, () => {
+		handleChange(finalText, () => {
 			this.textarea.current.setSelectionRange(
 				finalSelectionRange.start,
 				finalSelectionRange.end,
@@ -168,10 +173,10 @@ class MarkdownEditor extends Component {
 
 MarkdownEditor.propTypes = {
 	hasError: PropTypes.bool,
-	isShowFocus: PropTypes.bool,
+	isShowFocus: PropTypes.objectOf(PropTypes.bool),
 	isForInstructors: PropTypes.bool,
 	text: PropTypes.string,
-	onChange: PropTypes.func,
+	handleChange: PropTypes.func,
 	children: PropTypes.element,
 };
 

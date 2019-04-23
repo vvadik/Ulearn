@@ -30,6 +30,7 @@ class CommentsList extends Component {
 				commentId: null,
 				sending: false
 			},
+			showFocus: false,
 			sending: false,
 			loadingComments: false,
 			status: "",
@@ -98,7 +99,7 @@ class CommentsList extends Component {
 						{this.renderThreads()}
 					</>}
 				{(commentPolicy.areCommentsEnabled && user.id && threads.length > 7) &&
-				<button className={styles.sendButton} onClick={() => this.handleScroll(this.props.headerRef)}>
+				<button className={styles.sendButton} onClick={this.handleShowSendForm}>
 					<Icon name="CommentLite" color="#3072C4" />
 					<span className={styles.sendButtonText}>Оставить комментарий</span>
 				</button>}
@@ -115,12 +116,15 @@ class CommentsList extends Component {
 	};
 
 	renderSendForm() {
-		const {sending, status, newCommentId} = this.state;
+		const {sending, status, newCommentId, showFocus} = this.state;
 		const {user, forInstructors, commentPolicy} = this.props;
+		const focusedSendForm = {inSendForm: showFocus,};
 
 		return (
 			user.id && (commentPolicy.areCommentsEnabled || commentPolicy.onlyInstructorsCanReply) &&
 				<CommentSendForm
+					key={showFocus}
+					isShowFocus={focusedSendForm}
 					isForInstructors={forInstructors}
 					commentId={newCommentId}
 					author={user}
@@ -333,6 +337,13 @@ class CommentsList extends Component {
 		}));
 
 		this.debouncedSendData(this.props.commentsApi.updateComment, commentId, {isPinnedToTop: !isPinnedToTop});
+	};
+
+	handleShowSendForm = () => {
+		this.handleScroll(this.props.headerRef);
+		this.setState({
+			showFocus: true,
+		});
 	};
 
 	handleShowEditForm = (commentId) => {

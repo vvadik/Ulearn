@@ -48,8 +48,8 @@ class Comment extends Component {
 					<div className={styles.timeSinceAdded}>
 						<Hint
 							pos="right middle"
-							text={`${moment(comment.publishTime).local().format('DD MMMM YYYY в HH:mm:ss')}`}>
-							{moment(comment.publishTime).startOf('minute').fromNow()}
+							text={`${moment(comment.publishTime).local().format("DD MMMM YYYY в HH:mm")}`}>
+							{moment(comment.publishTime).startOf("minute").fromNow()}
 						</Hint>
 					</div>
 					{comment.id === commentEditing.commentId ? this.renderEditCommentForm() : this.renderComment()}
@@ -118,10 +118,11 @@ class Comment extends Component {
 
 	renderEditCommentForm() {
 		const {comment, actions, commentEditing} = this.props;
+		const focusedEditForm = {inEditForm: comment.id === commentEditing.commentId,};
 
 		return (
 			<CommentSendForm
-				isShowFocus={comment.id === commentEditing.commentId}
+				isShowFocus={focusedEditForm}
 				commentId={comment.id}
 				handleSubmit={actions.handleEditComment}
 				text={comment.text}
