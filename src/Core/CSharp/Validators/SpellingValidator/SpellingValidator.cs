@@ -31,7 +31,10 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 			var methodIdentifier = methodDeclaration.Identifier;
 			var errorsInParameters = InspectMethodParameters(methodDeclaration);
 
-			return CheckIdentifierNameForSpellingErrors(methodIdentifier, methodDeclaration.ReturnType.ToString()).Concat(errorsInParameters);
+			return CheckIdentifierNameForSpellingErrors(
+					methodIdentifier,
+					methodDeclaration.ReturnType.ToString())
+				.Concat(errorsInParameters);
 		}
 
 		private List<SolutionStyleError> InspectMethodParameters(MethodDeclarationSyntax methodDeclaration)
