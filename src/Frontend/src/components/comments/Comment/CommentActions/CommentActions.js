@@ -44,7 +44,7 @@ export default function CommentActions(props) {
 
 	if (user.id === comment.author.id || canModerateComments(userRoles, ACCESSES.editPinAndRemoveComments)) {
 		commentActions.push(
-		<div className={styles.visibleOnDesktopAndTablet}  key="Редактировать">
+		<div className={styles.visibleOnDesktopAndTablet} key="Редактировать">
 			<ActionButton
 				onClick={() => actions.handleShowEditForm(comment.id)}
 				icon="Edit">

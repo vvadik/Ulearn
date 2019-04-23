@@ -23,34 +23,32 @@ class Thread extends Component {
 		const focusedReplyForm = {inReplyForm: isParentComment && comment.id === this.props.reply.commentId,};
 
 		return (
-			<>
-				<Comment
-					key={comment.id}
-					comment={comment}
-					hasReplyAction={isLastCommentInThread}
-					commentEditing={commentEditing}
-					commentPolicy={commentPolicy}
-					actions={actions}
-					getUserSolutionsUrl={getUserSolutionsUrl}
-					slideType={slideType}
-					user={user}
-					userRoles={userRoles}>
-					<div>
-						{this.renderReplies(comment)}
-					</div>
-					{(isParentComment && comment.id === this.props.reply.commentId) &&
-					<div className={styles.replyForm}>
-						<CommentSendForm
-							isShowFocus={focusedReplyForm}
-							commentId={comment.id}
-							sending={reply.sending}
-							author={user}
-							submitTitle="Отправить"
-							handleCancel={() => actions.handleShowReplyForm(null)}
-							handleSubmit={actions.handleAddReplyComment} />
-					</div>}
-				</Comment>
-			</>
+			<Comment
+				key={comment.id}
+				comment={comment}
+				hasReplyAction={isLastCommentInThread}
+				commentEditing={commentEditing}
+				commentPolicy={commentPolicy}
+				actions={actions}
+				getUserSolutionsUrl={getUserSolutionsUrl}
+				slideType={slideType}
+				user={user}
+				userRoles={userRoles}>
+				<div className={styles.replies}>
+					{this.renderReplies(comment)}
+				</div>
+				{(isParentComment && comment.id === this.props.reply.commentId) &&
+				<div className={styles.replyForm}>
+					<CommentSendForm
+						isShowFocus={focusedReplyForm}
+						commentId={comment.id}
+						sending={reply.sending}
+						author={user}
+						submitTitle="Отправить"
+						handleCancel={() => actions.handleShowReplyForm(null)}
+						handleSubmit={actions.handleAddReplyComment} />
+				</div>}
+			</Comment>
 		)
 	}
 
