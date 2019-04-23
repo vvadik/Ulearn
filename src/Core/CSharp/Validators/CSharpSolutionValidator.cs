@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using uLearn.CSharp.Validators;
 using Ulearn.Core.CSharp.Validators.IndentsValidation;
 using Ulearn.Core.CSharp.Validators.VerbInMethodNameValidation;
+using uLearn.CSharp.Validators.SpellingValidator;
 
 namespace Ulearn.Core.CSharp.Validators
 {
@@ -31,6 +32,7 @@ namespace Ulearn.Core.CSharp.Validators
 			new VarInVariableDeclarationValidator(),
             new BracketValidator(),
             new RedundantElseValidator(),
+			new SpellingValidator(),
 			new IndentsValidator()
 		};
 
