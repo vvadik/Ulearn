@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Serilog;
 using Swashbuckle.AspNetCore.Annotations;
+using Ulearn.Common;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Authorization;
@@ -78,7 +79,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 
 			return new CommentsListResponse
 			{
-				TopLevelComments = BuildCommentsListResponse(comments, canUserSeeNotApprovedComments, replies, commentLikesCount, likedByUserCommentsIds, addCourseIdAndSlideId: false, addParentCommentId: false, addReplies: true),
+				TopLevelComments = BuildCommentsListResponse(comments, canUserSeeNotApprovedComments, replies, commentLikesCount, likedByUserCommentsIds, addCourseIdAndSlideId: false, addParentCommentId: true, addReplies: true),
 				Pagination = new PaginationResponse
 				{
 					Offset = parameters.Offset,
@@ -95,10 +96,11 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		[HttpPost]
 		[SwaggerResponse((int)HttpStatusCode.TooManyRequests, "You are commenting too fast. Please wait some time")]
 		[SwaggerResponse((int)HttpStatusCode.RequestEntityTooLarge, "Your comment is too large")]
-		public async Task<ActionResult<CreateCommentResponse>> CreateComment([FromQuery] CourseAuthorizationParameters courseAuthorizationParameters, CreateCommentParameters parameters)
+		public async Task<ActionResult<CommentResponse>> CreateComment([FromQuery] CourseAuthorizationParameters courseAuthorizationParameters, CreateCommentParameters parameters)
 		{
 			var courseId = courseAuthorizationParameters.CourseId;
 			var slideId = parameters.SlideId;
+			parameters.Text.TrimEnd();
 			
 			if (parameters.ForInstructors)
 			{
@@ -137,12 +139,11 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			if (comment.IsApproved)
 				await NotifyAboutNewCommentAsync(comment).ConfigureAwait(false);
 
-			var url = Url.Action(new UrlActionContext { Action = nameof(CommentController.Comment), Controller = "Comment", Values = new { commentId = comment.Id } });
-			return new CreateCommentResponse
-			{
-				Id = comment.Id,
-				ApiUrl = url,
-			};
+			return BuildCommentResponse(
+				comment,
+				false, new DefaultDictionary<int, List<Comment>>(), new DefaultDictionary<int, int>(), new HashSet<int>(), // canUserSeeNotApprovedComments not used if addReplies == false
+				addCourseIdAndSlideId: true, addParentCommentId: true, addReplies: false
+			);
 		}
 		
 		private async Task<bool> CanCommentNowAsync(string userId, string courseId, CommentsPolicy commentsPolicy)

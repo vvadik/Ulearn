@@ -1,3 +1,5 @@
+@import "./../../../variables.less";
+
 .photo-avatar {
   display: inline-block;
   border-radius: 4px;
@@ -14,6 +16,13 @@
   font-weight: 500;
   min-width: 55px;
   height: 55px;
+
+  @media(max-width: @maxPhoneWidth) {
+    font-size: 20px;
+    font-weight: 500;
+    min-width: 40px;
+    height: 40px;
+  }
 }
 
 .small {

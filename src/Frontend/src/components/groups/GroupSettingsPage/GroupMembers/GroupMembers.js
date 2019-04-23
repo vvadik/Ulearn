@@ -1,6 +1,6 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 import PropTypes from "prop-types";
-import { withRouter } from "react-router-dom";
+import {withRouter} from "react-router-dom";
 import moment from "moment";
 import api from "../../../../api";
 import Icon from "@skbkontur/react-icons";
@@ -16,7 +16,7 @@ import Profile from './Profile';
 import getGenderForm from "../../../../utils/getGenderForm";
 import styles from './groupMembers.less';
 import Toast from "@skbkontur/react-ui/components/Toast/Toast";
-import { Mobile, NotMobile } from "../../../../utils/responsive";
+import {Mobile, NotMobile} from "../../../../utils/responsive";
 
 class GroupMembers extends Component {
 
@@ -29,7 +29,7 @@ class GroupMembers extends Component {
 	};
 
 	componentDidMount() {
-		const {groupId} = this.props.match.params;
+		const { groupId } = this.props.match.params;
 
 		this.loadGroupAccesses(groupId);
 		this.loadStudents(groupId);
@@ -41,19 +41,19 @@ class GroupMembers extends Component {
 		});
 
 		api.groups.getGroupAccesses(groupId)
-		.then(json => {
+			.then(json => {
 			let accesses = json.accesses;
 			this.setState({
 				accesses,
 				loadingTeachers: false,
 			});
-		})
-		.catch(console.error)
-		.finally(() =>
-			this.setState({
-				loadingTeachers: false,
 			})
-		)
+			.catch(console.error)
+			.finally(() =>
+				this.setState({
+					loadingTeachers: false,
+				})
+			)
 	};
 
 	loadStudents = (groupId) => {
@@ -62,31 +62,31 @@ class GroupMembers extends Component {
 		});
 
 		api.groups.getStudents(groupId)
-		.then(json => {
-			let students = json.students;
-			this.setState({
-				students,
-				loadingStudents: false,
-			});
-		})
-		.catch(console.error)
-		.finally(() =>
-			this.setState({
-				loadingStudents: false,
+			.then(json => {
+				let students = json.students;
+				this.setState({
+					students,
+					loadingStudents: false,
+				});
 			})
-		)
+			.catch(console.error)
+			.finally(() =>
+				this.setState({
+					loadingStudents: false,
+				})
+			)
 	};
 
 	render() {
-		const {accesses, students, loadingStudents, loadingTeachers} = this.state;
-		const {group} = this.props;
+		const { accesses, students, loadingStudents, loadingTeachers } = this.state;
+		const { group } = this.props;
 		const owner = group.owner;
 
 		if (!owner) {
 			return null;
 		}
 
-		const {systemAccesses, isSysAdmin} = this.props;
+		const { systemAccesses, isSysAdmin } = this.props;
 
 		return (
 			<div className={styles.wrapper}>
@@ -103,25 +103,25 @@ class GroupMembers extends Component {
 								<Profile
 									user={owner}
 									systemAccesses={systemAccesses}
-									isSysAdmin={isSysAdmin} /> <span
-								className={styles["teacher-status"]}>Владелец</span>
+									isSysAdmin={isSysAdmin} /> <span className={styles["teacher-status"]}>Владелец</span>
 							</div>
 						</div>
-						{(accesses.length > 0) && this.renderTeachers()}
+						{ (accesses.length > 0) && this.renderTeachers() }
 					</Loader>
-					{this.renderTeachersSearch()}
+					{ this.renderTeachersSearch() }
 				</div>
 				<div className={styles["students-block"]}>
 					<h4 className={styles["students-header"]}>Студенты</h4>
 					<InviteBlock group={group} />
 					<Loader type="big" active={loadingStudents}>
 						<div className={styles["students-list"]}>
-							{(students.length > 0) &&
+							{(students.length >0) &&
 							<GroupStudents
 								isSysAdmin={isSysAdmin}
 								systemAccesses={systemAccesses}
 								students={students}
-								onDeleteStudents={this.onDeleteStudents} />}
+								group={group}
+								onDeleteStudents={this.onDeleteStudents}/>}
 						</div>
 					</Loader>
 				</div>
@@ -130,16 +130,16 @@ class GroupMembers extends Component {
 	}
 
 	renderTeachers() {
-		const {accesses} = this.state;
-		const {group, role, userId} = this.props;
+		const { accesses } = this.state;
+		const { group, role, userId } = this.props;
 		const owner = group.owner;
 
 		const grantTime = (grantTime) => moment(grantTime).format();
 
-		const {systemAccesses, isSysAdmin} = this.props;
+		const { systemAccesses, isSysAdmin } = this.props;
 
 		return (accesses
-			.sort((a, b) => a.user.visibleName.localeCompare(b.user.visibleName))
+			.sort((a, b) => a.user.visible_name.localeCompare(b.user.visible_name))
 			.map(item =>
 				<React.Fragment
 					key={item.user.id}>
@@ -150,8 +150,8 @@ class GroupMembers extends Component {
 								user={item.user}
 								systemAccesses={systemAccesses}
 								isSysAdmin={isSysAdmin} /> <span className={styles["teacher-status"]}>
-								Полный доступ {`${getGenderForm(owner.gender, 'предоставила', 'предоставил')}
-								${item.grantedBy.visibleName} ${moment(grantTime(item.grantTime)).fromNow()}`}
+								Полный доступ { `${getGenderForm(owner.gender, 'предоставила', 'предоставил') }
+								${item.granted_by.visible_name} ${moment(grantTime(item.grant_time)).fromNow()}` }
 							</span>
 						</div>
 						<div className={styles["teacher-action"]}>
@@ -159,12 +159,12 @@ class GroupMembers extends Component {
 						</div>
 					</div>
 				</React.Fragment>
-			)
+				)
 		)
 	};
 
 	renderKebab(item) {
-		const {group, role, userId} = this.props;
+		const { group, role, userId } = this.props;
 
 		let menuItems = [
 			<MenuItem onClick={() => this.onChangeOwner(item.user)} key="changeOwner">
@@ -174,11 +174,11 @@ class GroupMembers extends Component {
 				</Gapped>
 			</MenuItem>
 		];
-		if (group.owner.id === userId || role === 'courseAdmin' || item.grantedBy.id === userId) {
+		if (group.owner.id === userId || role === 'courseAdmin' || item.granted_by.id === userId){
 			menuItems.push(
 				<MenuItem onClick={() => this.onRemoveTeacher(item.user)} key="removeTeacher">
 					<Gapped gap={5}>
-						<Icon name="Delete" />
+						<Icon name="Delete"/>
 						Забрать доступ
 					</Gapped>
 				</MenuItem>
@@ -190,12 +190,12 @@ class GroupMembers extends Component {
 			<React.Fragment>
 				<Mobile>
 					<Kebab size="large" positions={["left top"]} disableAnimations={true}>
-						{menuItems}
+						{ menuItems }
 					</Kebab>
 				</Mobile>
 				<NotMobile>
 					<Kebab size="large" positions={["bottom right"]} disableAnimations={false}>
-						{menuItems}
+						{ menuItems }
 					</Kebab>
 				</NotMobile>
 			</React.Fragment>
@@ -203,8 +203,8 @@ class GroupMembers extends Component {
 	}
 
 	renderTeachersSearch() {
-		const {group, courseId} = this.props;
-		const {accesses, selected} = this.state;
+		const { group, courseId } = this.props;
+		const { accesses, selected } = this.state;
 
 		return (
 			<label className={styles["teacher-search"]}>
@@ -214,16 +214,16 @@ class GroupMembers extends Component {
 					courseId={courseId}
 					accesses={accesses}
 					owner={group.owner}
-					onAddTeacher={this.onAddTeacher} />
+					onAddTeacher={this.onAddTeacher}/>
 			</label>
 		)
 	}
 
 	onChangeOwner = (user) => {
-		const {accesses} = this.state;
-		const {group} = this.props;
+		const { accesses } = this.state;
+		const { group } = this.props;
 		const updatedAccesses = accesses.map(item =>
-			item.user.id === user.id ? {...item, user: group.owner, grantTime: new Date()} : item);
+			item.user.id === user.id ? {...item, user: group.owner, grant_time: new Date()} : item);
 		this.setState({
 			accesses: updatedAccesses,
 		});
@@ -231,39 +231,39 @@ class GroupMembers extends Component {
 		this.props.onChangeGroupOwner(user, updatedAccesses);
 
 		api.groups.changeGroupOwner(group.id, user.id)
-		.catch(console.error);
+			.catch(console.error);
 	};
 
 	onRemoveTeacher = (user) => {
-		const {accesses} = this.state;
+		const { accesses } = this.state;
 		const updatedAccesses = accesses
-		.filter(item => item.user.id !== user.id);
+			.filter(item => item.user.id !== user.id);
 		this.setState({
 			accesses: updatedAccesses,
 		});
 
 		api.groups.removeAccess(this.props.group.id, user.id)
-		.catch(console.error);
+			.catch(console.error);
 	};
 
 	onAddTeacher = (item) => {
 		this.setState({
 			selected: item,
-		});
+			});
 
 		this.onLoadTeacher(item);
 	};
 
 	onLoadTeacher = (item) => {
-		const {accesses} = this.state;
-		const {group} = this.props;
+		const { accesses } = this.state;
+		const { group } = this.props;
 		const updatedAccesses = accesses
-		.filter(i => i.user.id !== item.value)
-		.concat({
-			user: item,
-			grantedBy: group.owner,
-			grantTime: new Date(),
-		});
+			.filter(i => i.user.id !== item.value)
+			.concat({
+				user: item,
+				granted_by: group.owner,
+				grant_time: new Date(),
+			});
 
 		this.setState({
 			accesses: updatedAccesses,
@@ -271,11 +271,11 @@ class GroupMembers extends Component {
 		});
 
 		api.groups.addGroupAccesses(group.id, item.value)
-		.catch(console.error);
+			.catch(console.error);
 	};
 
 	onDeleteStudents = (students) => {
-		const {group} = this.props;
+		const { group } = this.props;
 		const updatedStudents = this.state.students.filter((item) => !students.includes(item.user.id));
 
 		this.setState({
@@ -283,10 +283,10 @@ class GroupMembers extends Component {
 		});
 
 		api.groups.deleteStudents(group.id, students)
-		.catch(console.error)
-		.then(() => {
-			Toast.push("Студенты исключены из группы");
-		});
+			.catch(console.error)
+			.then(() => {
+				Toast.push("Студенты исключены из группы");
+			});
 	};
 }
 

@@ -1,4 +1,6 @@
 ﻿@using System.Web.Mvc.Html
+@using Database.DataContexts
+@using Database.Extensions
 @using Database.Models
 @using Microsoft.AspNet.Identity
 @using uLearn.Web.Controllers
@@ -58,94 +60,25 @@
 <form id="__AjaxAntiForgeryForm" action="#" method="post">@Html.AntiForgeryToken()</form>
 
 @{
-	var forInstructorsOnlyTopLevelComments = Model.TopLevelComments.Where(c => c.IsForInstructorsOnly).ToList();
-	var forEveryoneTopLevelComments = Model.TopLevelComments.Where(c => !c.IsForInstructorsOnly).ToList();
-}
-
-<h3>Комментарии</h3>
-
-@if (Model.CanViewAndAddCommentsForInstructorsOnly)
-{
-	<div class="comments comments-for-instructors-only">
-        <div class="comments-for-instructors-only__description">
-            Студенты не&nbsp;видят эти комментарии
-            <span class="with-long-tooltip cursor-pointer" data-toggle="tooltip" data-placement="top" title="Это блок комментариев, доступных только преподавателям">
-                <span class="fa fa-question-circle"></span>
-            </span>
-        </div>
-        @foreach (var topLevelComment in forInstructorsOnlyTopLevelComments)
-        {
-	        @Html.Partial("_Comment", BuildCommentViewModel(topLevelComment, Model.Slide))
-        }
-        @TopLevelReplyForm(forInstructorsOnly: true)
-    </div>
-}
- 
-@if (!Model.ShowOnlyInstructorsOnlyComments)
-{
-	 if (forEveryoneTopLevelComments.Any() || Model.IsAuthorizedAndCanComment)
-	 {
-		 <div class="comments">
-             @foreach (var topLevelComment in forEveryoneTopLevelComments)
-             {
-	             @Html.Partial("_Comment", BuildCommentViewModel(topLevelComment, Model.Slide))
-             }
-
-             @if (Model.IsAuthorizedAndCanComment)
-             {
-	             @TopLevelReplyForm(forInstructorsOnly: false)
-             }
-             else if (Model.CommentsPolicy.IsCommentsEnabled)
-             {
-	             <div class="comments_policy__message gray">
-                     @Html.ActionLink("Войдите", "Login", "Account", new { returnUrl = Request.RawUrl }, new { }), чтобы оставить комментарий
-                 </div>
-             }
-             else
-             {
-	             <div class="comments_policy__message gray">
-                     Только преподаватели могут оставлять комментарии
-                 </div>
-             }
-         </div>
-	 }
-	 else
-	 {
-		 if (Model.CommentsPolicy.IsCommentsEnabled)
-		 {
-			 <div class="comments">
-                 <div class="comments_policy__message">
-                     Комментариев пока нет. @Html.ActionLink("Войдите", "Login", "Account", new { returnUrl = Request.RawUrl }, new { }), чтобы написать свой.
-                 </div>
-             </div>
-		 }
-		 else
-		 {
-			 <div class="comments">
-                 <div class="comments_policy__message">
-                     Комментарии могут оставлять только преподаватели.
-                 </div>
-             </div>
-		 }
-	 }
-}
-
-<div class="comments__rules alert alert-warning">
-	<div>
-		Работает форматирование: <b>**жирный текст**</b>, <i>__курсивный текст__</i>, <span class="inline-pre">`код`</span>, <span class="inline-pre">```многострочный код```</span>.
-	</div>
-	@if (Model.Slide is ExerciseSlide)
+	var commentsWrapperUser = new
 	{
-		<div class="comments__rules__good-tone">
-			Простые правила хороших комментариев:
-			<ul>
-				<li>Используйте подсказки перед тем, как задать вопрос в комментариях.</li>
-				<li>Воздержитесь от вопросов «Почему у меня не работает?». Отлаживайте, экспериментируйте, думайте!</li>
-				<li>Пожалуйста, не публикуйте свои решения.</li>
-				<li>
-					Мы будем благодарны вам за доброжелательный тон в комментариях.
-				</li>
-			</ul>
-		</div>
-	}
-</div>
+		id = Model.CurrentUser == null ? null : Model.CurrentUser.Id,
+		isAuthenticated = User.Identity.IsAuthenticated,
+		visibleName = Model.CurrentUser == null ? null : Model.CurrentUser.VisibleName,
+		avatarUrl = Model.CurrentUser == null ? null : Model.CurrentUser.AvatarUrl,
+		systemAccesses = Model.SystemAccesses.Select(a => a.AccessType.ToString("G")).Select(a => char.ToLowerInvariant(a[0]) + a.Substring(1)).ToList()
+	};
+	var courseRole = User == null ? null : User.GetCourseRole(Model.CourseId);
+	var courseRoleString = courseRole == null ? null : courseRole.Value.ToString("G");
+	courseRoleString = courseRole == null ? null : char.ToLowerInvariant(courseRoleString[0]) + courseRoleString.Substring(1);
+	var courseAccesses = Model.CourseAccesses.Select(a => a.AccessType.ToString("G")).Select(a => char.ToLowerInvariant(a[0]) + a.Substring(1)).ToList();
+	var commentsWrapperUserRoles = User == null ? null : new {
+		isSystemAdministrator = User.IsSystemAdministrator(),
+		courseRole = courseRoleString,
+		courseAccesses = courseAccesses
+	};
+	var slideType = Model.SlideType;
+	var commentsViewModel = new { slideId = Model.Slide.Id, courseId = Model.CourseId, user = commentsWrapperUser, userRoles = commentsWrapperUserRoles, slideType = slideType }.JsonSerialize();
+}
+
+<div class="react-render" data-component="CommentsView" data-props="@commentsViewModel"></div>

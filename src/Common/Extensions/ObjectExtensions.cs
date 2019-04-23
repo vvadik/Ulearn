@@ -53,7 +53,8 @@ namespace Ulearn.Common.Extensions
 		{
 			return JsonConvert.SerializeObject(o, formatting, new JsonSerializerSettings
 			{
-				NullValueHandling = NullValueHandling.Ignore
+				NullValueHandling = NullValueHandling.Include,
+				DefaultValueHandling = DefaultValueHandling.Include
 			});
 		}
 	}
