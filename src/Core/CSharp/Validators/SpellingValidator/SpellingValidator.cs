@@ -140,7 +140,9 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 						&& IsWordContainedInDictionaries(currentCheckingWord)))
 					{
 						foundWords.Add(currentCheckingWord);
-						if (isFirstWord && IsWordContainedInDictionaries(concatenatedWords.Substring(currentCheckingWord.Length))) // это нужно для переменных типа dfunction b substring
+						if (isFirstWord
+							&& IsWordContainedInDictionaries(
+								concatenatedWords.Substring(currentCheckingWord.Length))) // это нужно для переменных типа dfunction b substring
 							return null;
 						currentCheckingWord = "";
 						isFirstWord = false;
