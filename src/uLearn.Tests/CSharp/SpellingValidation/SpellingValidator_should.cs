@@ -89,7 +89,7 @@ namespace uLearn.CSharp.SpellingValidation
 			var fileContent = file.ContentAsUtf8();
 
 			var errors = validator.FindErrors(fileContent);
-			if (!errors.Any())
+			if (errors.Any())
 			{
 				File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
 						"..", "CSharp", "ExampleFiles", "submissions_errors", "spelling_validation", $"{file.Name}_errors.txt"),
