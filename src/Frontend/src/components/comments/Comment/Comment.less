@@ -14,8 +14,9 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
-  margin-left: 10px;
   width: inherit;
+  margin-left: 10px;
+  word-wrap: break-word;
 }
 
 .timeSinceAdded {
@@ -30,6 +31,7 @@
   align-items: flex-start;
   margin: 10px 0 5px;
   width: 95%;
+  word-wrap: break-word;
 
   @media(max-width: @maxPhoneWidth) {
     margin: 0;
@@ -45,7 +47,8 @@
 
   pre {
     margin: 5px 0;
-    width: fit-content;
+    width: auto;
+    word-wrap: normal;
   }
 }
 

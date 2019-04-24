@@ -22,7 +22,7 @@ class MarkdownButtons extends Component {
 	renderMarkdownButton(name, operation) {
 		return (
 			<div key={name} className={styles.buttonBlock}>
-				<Hint pos="top" text={this.renderHint(operation)} disableAnimations={false} useWrapper>
+				<Hint pos="bottom" text={this.renderHint(operation)} disableAnimations={false} useWrapper>
 					<button className={styles.button} onClick={this.onClick(operation)} type="button">
 						<svg
 							width={20}
