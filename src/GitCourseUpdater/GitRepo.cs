@@ -16,10 +16,12 @@ namespace GitCourseUpdater
 {
 	public interface IGitRepo : IDisposable
 	{
-		MemoryStream GetMasterLastCommitStateAsZip();
+		MemoryStream GetCurrentStateAsZip();
 		CommitInfo GetMasterLastCommitInfo();
 		CommitInfo GetCommitInfo(string hash);
 		List<string> GetChangedFiles(string fromHash, string toHash);
+		void CheckoutCommit(string hash);
+		void CheckoutBranchAndPull(string name);
 	}
 	
 	public class GitRepo : IGitRepo
@@ -61,7 +63,7 @@ namespace GitCourseUpdater
 			}
 		}
 		
-		public MemoryStream GetMasterLastCommitStateAsZip()
+		public MemoryStream GetCurrentStateAsZip()
 		{
 			logger.Information($"Start load '{repoDirName}' to zip");
 			var zip = ZipHelper.CreateFromDirectory(Path.Combine(reposBaseDir, repoDirName), CompressionLevel.Optimal, false, Encoding.UTF8,
@@ -104,6 +106,34 @@ namespace GitCourseUpdater
 			return treeChanges.Select(c => c.Path).ToList();
 		}
 		
+		public void CheckoutCommit(string hash)
+		{
+			logger.Information($"Start checkout '{url}' commit '{hash}' in '{repoDirName}'");
+			Commands.Checkout(repo, hash);
+			logger.Information($"Successfully checkout '{url}' commit '{hash}' in '{repoDirName}'");
+		}
+
+		public void CheckoutBranchAndPull(string name)
+		{
+			name = name.Replace("origin/", "");
+			var remoteBranch = repo.Branches[$"origin/{name}"];
+			if (remoteBranch == null)
+				throw new ArgumentException($"Branch 'origin/{name}' does not exist");
+			if (repo.Branches[name] == null)
+			{
+				var localBranch = repo.CreateBranch(name, remoteBranch.Tip);
+				repo.Branches.Update(localBranch, b =>
+				{
+					b.Remote = "origin";
+					b.UpstreamBranch = $"refs/heads/{name}";
+				});
+			}
+			logger.Information($"Start checkout '{url}' branch '{name}' in '{repoDirName}'");
+			Commands.Checkout(repo, name);
+			logger.Information($"Successfully checkout '{url}' branch '{name}' in '{repoDirName}'");
+			Pull();
+		}
+		
 		private static CommitInfo ToCommitInfo(Commit commit)
 		{
 			return new CommitInfo
@@ -126,7 +156,11 @@ namespace GitCourseUpdater
 					return false;
 				var repoPath = Path.Combine(reposBaseDir, repoDirName);
 				repo = new Repository(repoPath);
-				Pull();
+				HardReset();
+				if(HasUncommittedChanges())
+					throw new LibGit2SharpException($"Has uncommited changes in '{repoDirName}'");
+				FetchAll();
+				CheckoutBranchAndPull("master");
 			}
 			catch (Exception ex)
 			{
@@ -168,11 +202,21 @@ namespace GitCourseUpdater
 			return string.Join("_", filename.Split(Path.GetInvalidFileNameChars()));
 		}
 
+		private void FetchAll()
+		{
+			var logMessage = "";
+			var options = new FetchOptions { CredentialsProvider = credentialsHandler };
+			logger.Information($"Start fetch all '{url}' in '{repoDirName}'");
+			foreach (var remote in repo.Network.Remotes)
+			{
+				var refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
+				Commands.Fetch(repo, remote.Name, refSpecs, options, logMessage);
+			}
+			logger.Information($"Successfully fetch all '{url}' in '{repoDirName}'");
+		}
+
 		private void Pull()
 		{
-			HardReset();
-			if(HasUncommittedChanges())
-				throw new LibGit2SharpException($"Has uncommited changes in '{repoDirName}'");
 			var options = new PullOptions { FetchOptions = new FetchOptions { CredentialsProvider = credentialsHandler } };
 			// Так как сделан hard reset, мерджа не должно случиться
 			var signature = new Signature(new Identity("MERGE_USER_NAME", "MERGE_USER_EMAIL"), DateTimeOffset.Now);
