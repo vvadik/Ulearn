@@ -139,7 +139,7 @@ class GroupMembers extends Component {
 		const { systemAccesses, isSysAdmin } = this.props;
 
 		return (accesses
-			.sort((a, b) => a.user.visible_name.localeCompare(b.user.visible_name))
+			.sort((a, b) => a.user.visibleName.localeCompare(b.user.visibleName))
 			.map(item =>
 				<React.Fragment
 					key={item.user.id}>
@@ -151,7 +151,7 @@ class GroupMembers extends Component {
 								systemAccesses={systemAccesses}
 								isSysAdmin={isSysAdmin} /> <span className={styles["teacher-status"]}>
 								Полный доступ { `${getGenderForm(owner.gender, 'предоставила', 'предоставил') }
-								${item.granted_by.visible_name} ${moment(grantTime(item.grant_time)).fromNow()}` }
+								${item.grantedBy.visibleName} ${moment(grantTime(item.grantTime)).fromNow()}` }
 							</span>
 						</div>
 						<div className={styles["teacher-action"]}>
@@ -174,7 +174,7 @@ class GroupMembers extends Component {
 				</Gapped>
 			</MenuItem>
 		];
-		if (group.owner.id === userId || role === 'courseAdmin' || item.granted_by.id === userId){
+		if (group.owner.id === userId || role === 'courseAdmin' || item.grantedBy.id === userId){
 			menuItems.push(
 				<MenuItem onClick={() => this.onRemoveTeacher(item.user)} key="removeTeacher">
 					<Gapped gap={5}>
@@ -223,7 +223,7 @@ class GroupMembers extends Component {
 		const { accesses } = this.state;
 		const { group } = this.props;
 		const updatedAccesses = accesses.map(item =>
-			item.user.id === user.id ? {...item, user: group.owner, grant_time: new Date()} : item);
+			item.user.id === user.id ? {...item, user: group.owner, grantTime: new Date()} : item);
 		this.setState({
 			accesses: updatedAccesses,
 		});
@@ -261,8 +261,8 @@ class GroupMembers extends Component {
 			.filter(i => i.user.id !== item.value)
 			.concat({
 				user: item,
-				granted_by: group.owner,
-				grant_time: new Date(),
+				grantedBy: group.owner,
+				grantTime: new Date(),
 			});
 
 		this.setState({
