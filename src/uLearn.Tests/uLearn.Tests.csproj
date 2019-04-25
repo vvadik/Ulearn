@@ -415,7 +415,9 @@
     </Content>
     <Compile Include="CSharp\SpellingValidation\TestData\Correct\FileWithLatinNames.cs" />
     <Compile Include="CSharp\SpellingValidation\TestData\Correct\FileWithoutMisspellings.cs" />
+    <Compile Include="CSharp\SpellingValidation\TestData\Correct\FileWithRussianNames.cs" />
     <Compile Include="CSharp\SpellingValidation\TestData\Correct\FileWithShortNamesOrAbbreviations.cs" />
+    <Compile Include="CSharp\SpellingValidation\TestData\Correct\FileWithWordsStartingWithCapitalLetter.cs" />
     <Compile Include="CSharp\SpellingValidation\TestData\Incorrect\FileWithMisspellings.cs" />
     <Compile Include="CSharp\VarInVariableDeclarationValidator_should.cs" />
     <Compile Include="CSharp\TestPaths.cs" />
