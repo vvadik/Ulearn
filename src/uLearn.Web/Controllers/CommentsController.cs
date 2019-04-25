@@ -16,6 +16,8 @@ using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Quizzes;
 
 namespace uLearn.Web.Controllers
 {
@@ -70,8 +72,11 @@ namespace uLearn.Web.Controllers
 			var canSeeNotApprovedComments = canModerateComments;
 
 			var canViewAuthorSubmissions = coursesRepo.HasCourseAccess(userId, courseId, CourseAccessType.ViewAllStudentsSubmissions) || User.HasAccessFor(courseId, CourseRole.CourseAdmin);
-			var canViewProfiles = systemAccessesRepo.HasSystemAccess(userId, SystemAccessType.ViewAllProfiles) || User.IsSystemAdministrator();			
-
+			var canViewProfiles = systemAccessesRepo.HasSystemAccess(userId, SystemAccessType.ViewAllProfiles) || User.IsSystemAdministrator();
+			var systemAccesses = systemAccessesRepo.GetSystemAccesses(userId);
+			var courseAccesses = coursesRepo.GetCourseAccesses(courseId, userId);
+			var slideType = GetSlideType(slide);
+			
 			var model = new SlideCommentsModel
 			{
 				CourseId = courseId,
@@ -89,9 +94,25 @@ namespace uLearn.Web.Controllers
 				CommentsPolicy = commentsPolicy,
 				CanViewAuthorProfiles = canViewProfiles,
 				CanViewAndAddCommentsForInstructorsOnly = CanViewAndAddCommentsForInstructorsOnly(User, courseId),
-				ShowOnlyInstructorsOnlyComments = showOnlyInstructorsOnlyComments
+				ShowOnlyInstructorsOnlyComments = showOnlyInstructorsOnlyComments,
+				CourseAccesses = courseAccesses,
+				SystemAccesses = systemAccesses,
+				SlideType = slideType
 			};
 			return PartialView(model);
+		}
+		
+		private static SlideType GetSlideType(Slide slide)
+		{
+			switch (slide)
+			{
+				case ExerciseSlide _:
+					return SlideType.Exercise;
+				case QuizSlide _:
+					return SlideType.Quiz;
+				default:
+					return SlideType.Lesson;
+			}
 		}
 
 		private bool CanModerateComments(IPrincipal user, string courseId)
@@ -373,5 +394,8 @@ namespace uLearn.Web.Controllers
 		public CommentsPolicy CommentsPolicy { get; set; }
 		public bool CanViewAndAddCommentsForInstructorsOnly { get; set; }
 		public bool ShowOnlyInstructorsOnlyComments { get; set; }
+		public List<CourseAccess> CourseAccesses { get; set; }
+		public List<SystemAccess> SystemAccesses { get; set; }
+		public SlideType SlideType { get; set; }
 	}
 }

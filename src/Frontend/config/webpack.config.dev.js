@@ -163,15 +163,15 @@ module.exports = {
           {
             test: /\.less$/,
             use: [
-              require.resolve('style-loader'),
+              'style-loader',
               {
-                  loader: require.resolve('css-loader'),
+                  loader: 'css-loader',
                   options: {
 					  modules: true,
 					  localIdentName: '[name]__[local]--[hash:base64:5]',
                   },
               },
-              require.resolve('less-loader'),
+              'less-loader',
             ]
           },
           // "postcss" loader applies autoprefixer to our CSS.

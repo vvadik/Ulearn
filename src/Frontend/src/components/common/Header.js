@@ -73,7 +73,7 @@ class Header extends Component {
 
 		/* Div should have class .header because some legacy javascript code uses $('.header') for calculating header height */
 		return (
-			<div className={styles["header"] + " header"}>
+			<div className={styles["header"] + " header"} id="header">
 				<Logo>
 					<span className={styles["visible-only-phone"]}><Icon name="Home" /></span>
 					<span className={styles["visible-at-least-tablet"]}>Ulearn.me</span>
@@ -432,11 +432,13 @@ class NotificationsMenu extends Component {
 	componentDidMount() {
 		window.addEventListener('resize', this._handleWindowSizeChange);
 		document.addEventListener('mousedown', this._handleClickOutside);
+		document.addEventListener('click', this._handleClickInsideNotification);
 	}
 
 	componentWillUnmount() {
 		window.removeEventListener('resize', this._handleWindowSizeChange);
 		document.removeEventListener('mousedown', this._handleClickOutside);
+		document.addEventListener('click', this._handleClickInsideNotification);
 	}
 
 	_handleWindowSizeChange = () => {
@@ -444,11 +446,31 @@ class NotificationsMenu extends Component {
 	};
 
 	_handleClickOutside = (event) => {
-		if (this.ref && !this.ref.contains(event.target) && this.dropdownContainerRef && !this.dropdownContainerRef.contains(event.target)) {
+		if (this.ref && !this.ref.contains(event.target) && this.dropdownContainerRef &&
+			!this.dropdownContainerRef.contains(event.target)) {
 			this.setState({
 				isOpened: false,
 			});
 		}
+	};
+
+	_handleClickInsideNotification = (event) => {
+		let node = event.target;
+
+		while (true) {
+			if (!node || (node.classList && node.classList.contains('notifications__new-comment-notification'))) {
+				break;
+			}
+			node = node.parentNode;
+		}
+
+		if (this.ref && this.dropdownContainerRef && (this.ref.contains(node) ||
+			this.dropdownContainerRef.contains(node))) {
+			this.setState({
+				isOpened: false,
+			});
+		}
+
 	};
 
 	static _loadNotifications() {
@@ -639,7 +661,7 @@ class LogoutLink extends Component {
 	}
 
 	render() {
-		return <div className={styles["header__logout-link"]}><a href="" onClick={this.onClick}>Выйти</a></div>
+		return <div className={styles["header__logout-link"]}><button className={styles["header__logout-button"]} onClick={this.onClick}>Выйти</button></div>
 	}
 
 	static mapStateToProps(state) {

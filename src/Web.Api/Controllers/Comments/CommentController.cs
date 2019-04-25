@@ -130,7 +130,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		[HttpPatch]
 		[Authorize]
 		[SwaggerResponse((int)HttpStatusCode.RequestEntityTooLarge, "Your comment is too large")]
-		public async Task<IActionResult> UpdateComment(int commentId, [FromBody] UpdateCommentParameters parameters)
+		public async Task<ActionResult<CommentResponse>> UpdateComment(int commentId, [FromBody] UpdateCommentParameters parameters)
 		{
 			var comment = await commentsRepo.FindCommentByIdAsync(commentId, includeDeleted: true).ConfigureAwait(false);
 
@@ -140,6 +140,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			if (comment.IsDeleted && await CanEditOrDeleteCommentAsync(comment, UserId).ConfigureAwait(false))
 				await commentsRepo.RestoreCommentAsync(commentId).ConfigureAwait(false);
 
+			parameters.Text?.TrimEnd();
 			if (!string.IsNullOrEmpty(parameters.Text))
 				await UpdateCommentTextAsync(comment, parameters.Text).ConfigureAwait(false);
 				
@@ -152,7 +153,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			if (parameters.IsCorrectAnswer.HasValue)
 				await UpdateCommentIsCorrectAnswerAsync(comment, parameters.IsCorrectAnswer.Value).ConfigureAwait(false);
 
-			return Ok(new SuccessResponseWithMessage($"Comment {commentId} successfully updated"));
+			return await Comment(commentId, new CommentParameters { WithReplies = false }).ConfigureAwait(false);
 		}
 
 		private async Task UpdateCommentTextAsync([NotNull] Comment comment, string text)
@@ -241,7 +242,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		public async Task<IActionResult> Like(int commentId)
 		{
 			if (await commentLikesRepo.DidUserLikeComment(commentId, UserId).ConfigureAwait(false))
-				return Conflict(new ErrorResponse($"You have liked the comment {commentId} already"));
+				return Ok(new SuccessResponseWithMessage($"You have liked the comment {commentId} already"));
 					
 			await commentLikesRepo.LikeAsync(commentId, UserId).ConfigureAwait(false);
 
@@ -259,7 +260,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		public async Task<IActionResult> Unlike(int commentId)
 		{
 			if (!await commentLikesRepo.DidUserLikeComment(commentId, UserId).ConfigureAwait(false))
-				return NotFound(new ErrorResponse($"You don't have like for the comment {commentId}"));
+				return Ok(new SuccessResponseWithMessage($"You don't have like for the comment {commentId}"));
 			
 			await commentLikesRepo.UnlikeAsync(commentId, UserId).ConfigureAwait(false);
 			

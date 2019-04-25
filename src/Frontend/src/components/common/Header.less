@@ -1,7 +1,5 @@
 @import "../../variables.less";
 
-@headerHeight: 50px;
-
 .header {
   position: fixed;
   top: 0;
@@ -205,10 +203,14 @@
     .header__logout-link,
     .header__login-link,
     .header__registration-link {
+      > button,
       > a {
         display: inline-block;
         padding: 15px 30px 13px 15px;
         text-decoration: none;
+        border: none;
+        outline: none;
+        background: transparent;
 
         @media (max-width: @maxLaptopWidth) {
           & {

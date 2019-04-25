@@ -1,5 +1,13 @@
 @import "variables.less";
 
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", "Helvetica Neue", Roboto, Arial, sans-serif;
+}
+
 .caret {
   display: inline-block;
   width: 0;
@@ -12,21 +20,21 @@
   border-left: 4px solid transparent;
 }
 
-.visible-only-phone {
-  display: none;
-
-  @media (max-width: @maxPhoneWidth) {
-    & {
-      display: initial;
-    }
+@media (min-width: @maxTabletWidth) {
+  .visible-only-desktop {
+    display: initial;
   }
 }
 
-.visible-at-least-tablet {
-  @media (max-width: @maxPhoneWidth) {
-    & {
-      display: none !important;
-    }
+@media (max-width: @maxPhoneWidth) {
+  .visible-only-phone {
+    display: initial;
+  }
+}
+
+@media (max-width: @maxPhoneWidth) {
+  .visible-at-least-tablet {
+    display: none !important;
   }
 }
 

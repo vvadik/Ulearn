@@ -5,9 +5,19 @@ module.exports = (baseConfig, env, defaultConfig) => {
 	defaultConfig.module.rules.push(
 		{
 			test: /\.less$/,
-			loaders: ['style-loader', 'css-loader', 'less-loader'],
+			use: [
+				'style-loader',
+				{
+					loader: 'css-loader',
+					options: {
+						modules: true,
+						localIdentName: '[name]__[local]--[hash:base64:5]',
+					},
+				},
+				'less-loader',
+			],
 			include: path.resolve(__dirname, '../src/')
-		}
+		},
 	);
 
 	return defaultConfig

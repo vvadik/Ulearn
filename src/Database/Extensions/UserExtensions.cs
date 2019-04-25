@@ -52,6 +52,11 @@ namespace Database.Extensions
 			}
 		}
 
+		public static CourseRole? GetCourseRole(this IPrincipal principal, string courseId)
+		{
+			return principal.GetAllRoles().FirstOrDefault(t => string.Equals(t.Item1, courseId, StringComparison.OrdinalIgnoreCase))?.Item2;
+		}
+
 		public static IEnumerable<string> GetCoursesIdFor(this IPrincipal principal, CourseRole role)
 		{
 			return principal.GetAllRoles().Where(t => t.Item2 <= role).Select(t => t.Item1);

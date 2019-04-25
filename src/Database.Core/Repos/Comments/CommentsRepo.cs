@@ -93,7 +93,7 @@ namespace Database.Repos.Comments
 				.Include(c => c.Author)
 				.Where(c => c.SlideId == slideId && !c.IsDeleted && c.ParentCommentId == -1)
 				.OrderBy(c => !c.IsPinnedToTop)
-				.ThenBy(c => c.PublishTime)
+				.ThenByDescending(c => c.PublishTime)
 				.ToListAsync();
 		}
 

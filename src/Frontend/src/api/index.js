@@ -5,9 +5,10 @@ import * as courses from "./courses"
 import * as notifications from "./notifications"
 import * as groups from "./groups"
 import * as users from "./users"
+import * as comments from "./comments"
 
-const API_JWT_TOKEN_UPDATED = 'API_JWT_TOKEN_UPDATED';
-let apiJwtToken = '';
+const API_JWT_TOKEN_UPDATED = "API_JWT_TOKEN_UPDATED";
+let apiJwtToken = "";
 let refreshApiJwtTokenPromise = undefined;
 let serverErrorHandler = () => {
 };
@@ -17,7 +18,7 @@ function setServerErrorHandler(handler) {
 }
 
 function refreshApiJwtToken() {
-	return fetch(config.api.endpoint + 'account/token', {credentials: 'include', method: 'POST'})
+	return fetch(config.api.endpoint + "account/token", {credentials: "include", method: "POST"})
 	.then(response => {
 		if (response.status !== 200) {
 			let error = new Error(response.statusText || response.status);
@@ -37,7 +38,7 @@ function refreshApiJwtToken() {
 }
 
 function clearApiJwtToken() {
-	apiJwtToken = ''
+	apiJwtToken = ""
 }
 
 function request(url, options, isRetry) {
@@ -55,15 +56,15 @@ function request(url, options, isRetry) {
 	}
 
 	options = options || {};
-	options.credentials = options.credentials || 'include';
+	options.credentials = options.credentials || "include";
 	options.headers = options.headers || {};
-	options.headers['Authorization'] = 'Bearer ' + apiJwtToken;
+	options.headers["Authorization"] = "Bearer " + apiJwtToken;
 	return fetch(config.api.endpoint + url, options)
 	.catch((error) => {
 		if (window.navigator.onLine === false)
-			serverErrorHandler('Не можем подключиться к серверу');
+			serverErrorHandler("Не можем подключиться к серверу");
 		else
-			serverErrorHandler('Не можем подключиться к серверу. Попробуйте обновить страницу.');
+			serverErrorHandler("Не можем подключиться к серверу. Попробуйте обновить страницу.");
 
 		throw error;
 	}).then(response => {
@@ -100,32 +101,32 @@ function get(url, options) {
 
 function post(url, options) {
 	options = options || {};
-	options.method = 'POST';
+	options.method = "POST";
 	return request(url, options);
 }
 
 function patch(url, options) {
 	options = options || {};
-	options.method = 'PATCH';
+	options.method = "PATCH";
 	return request(url, options);
 }
 
 function put(url, options) {
 	options = options || {};
-	options.method = 'PUT';
+	options.method = "PUT";
 	return request(url, options);
 }
 
 function deleteRequest(url, options) { /* delete - зарезервированное слово, поэтому так */
 	options = options || {};
-	options.method = 'DELETE';
+	options.method = "DELETE";
 	return request(url, options);
 }
 
 function createRequestParams(body) {
 	return {
 		headers: {
-			'Content-Type': 'application/json',
+			"Content-Type": "application/json",
 		},
 		body: JSON.stringify(body)
 	}
@@ -150,6 +151,7 @@ let api = {
 	notifications: notifications,
 	groups: groups,
 	users: users,
+	comments: comments,
 };
 
 export default api;
