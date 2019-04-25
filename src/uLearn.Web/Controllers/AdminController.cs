@@ -214,6 +214,18 @@ namespace uLearn.Web.Controllers
 			await coursesRepo.AddCourseVersion(courseId, versionId, userId);
 			await NotifyAboutCourseVersion(courseId, versionId, userId);
 
+			try
+			{
+				var courseVersions = coursesRepo.GetCourseVersions(courseId);
+				var previousUnpublishedVersions = courseVersions.Where(v => v.PublishTime == null && v.Id != versionId).ToList();
+				foreach (var unpublishedVersion in previousUnpublishedVersions)
+					await DeleteVersion(courseId, unpublishedVersion.Id).ConfigureAwait(false);
+			}
+			catch (Exception ex)
+			{
+				log.Warn("Error during delete previous unpublished versions", ex);
+			}
+
 			return RedirectToAction("Diagnostics", new { courseId, versionId });
 		}
 
