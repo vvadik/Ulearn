@@ -8,6 +8,7 @@ using System.Web.Http;
 using System.Threading.Tasks;
 using System.Web.Configuration;
 using System.Web.Mvc;
+using log4net;
 using Newtonsoft.Json;
 
 namespace uLearn.Web.Controllers
@@ -15,11 +16,15 @@ namespace uLearn.Web.Controllers
 
 	public class GitWebhookController : ApiController
 	{
-		private readonly string gitSecret;
+		private static readonly ILog log = LogManager.GetLogger(typeof(GitWebhookController));
+		
+		private readonly string githubSecret;
+		private readonly string gitlabSecret;
 		
 		public GitWebhookController()
 		{
-			gitSecret = WebConfigurationManager.AppSettings["webhook.git.secret"];
+			githubSecret = WebConfigurationManager.AppSettings["git.webhook.github.secret"];
+			gitlabSecret = WebConfigurationManager.AppSettings["git.webhook.gitlab.secret"];
 		}
 		
 		[System.Web.Http.HttpPost]
@@ -36,6 +41,8 @@ namespace uLearn.Web.Controllers
 				return await ProcessGithubRequest(githubEventName).ConfigureAwait(false);
 			if (!string.IsNullOrWhiteSpace(gitlabEventName))
 				return await ProcessGitlabRequest(gitlabEventName).ConfigureAwait(false);
+			log.Warn("Event header not found");
+			return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 		}
 
 		public async Task<ActionResult> ProcessGithubRequest(string eventName)
@@ -63,7 +70,7 @@ namespace uLearn.Web.Controllers
 			string token = null;
 			if (Request.Headers.TryGetValues("X-Gitlab-Token", out var signatures))
 				token = signatures.FirstOrDefault();
-			if (token != gitSecret)
+			if (token != gitlabSecret)
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 			var jsonContent = await Request.Content.ReadAsStringAsync().ConfigureAwait(false);
 			var content = JsonConvert.DeserializeObject<GitlabPushData>(jsonContent);
@@ -76,6 +83,7 @@ namespace uLearn.Web.Controllers
 
 		private async Task UpdateRepo(string url)
 		{
+			log.Info($"Git webhook push event url '{url}'");
 			throw new NotImplementedException();
 		}
 		
@@ -99,7 +107,7 @@ namespace uLearn.Web.Controllers
 				return false;
 			
 			var signature = signatureWithPrefix.Substring(sha1Prefix.Length);
-			var secret = Encoding.ASCII.GetBytes(gitSecret);
+			var secret = Encoding.ASCII.GetBytes(githubSecret);
 			var payloadBytes = Encoding.ASCII.GetBytes(payload);
 
 			using (var hmSha1 = new HMACSHA1(secret))
