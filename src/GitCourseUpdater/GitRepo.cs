@@ -156,7 +156,6 @@ namespace GitCourseUpdater
 					return false;
 				var repoPath = Path.Combine(reposBaseDir, repoDirName);
 				repo = new Repository(repoPath);
-				HardReset();
 				if(HasUncommittedChanges())
 					throw new LibGit2SharpException($"Has uncommited changes in '{repoDirName}'");
 				FetchAll();
@@ -218,7 +217,7 @@ namespace GitCourseUpdater
 		private void Pull()
 		{
 			var options = new PullOptions { FetchOptions = new FetchOptions { CredentialsProvider = credentialsHandler } };
-			// Так как сделан hard reset, мерджа не должно случиться
+			// мерджа не должно случиться
 			var signature = new Signature(new Identity("MERGE_USER_NAME", "MERGE_USER_EMAIL"), DateTimeOffset.Now);
 			logger.Information($"Start pull '{url}' in '{repoDirName}'");
 			var result = Commands.Pull(repo, signature, options);
@@ -227,14 +226,6 @@ namespace GitCourseUpdater
 				throw new LibGit2SharpException($"Pull status is {result.Status} for '{repoDirName}'");
 		}
 
-		// git reset --hard origin/master
-		private void HardReset()
-		{
-			var originMaster = repo.Branches["origin/master"];
-			logger.Information($"Start reset '{url}' in '{repoDirName}'");
-			repo.Reset(ResetMode.Hard, originMaster.Tip);
-			logger.Information($"Successfully reset '{url}' in '{repoDirName}'");
-		}
 		
 		public bool HasUncommittedChanges()
 		{

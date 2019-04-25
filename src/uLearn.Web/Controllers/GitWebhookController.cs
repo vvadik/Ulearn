@@ -10,6 +10,7 @@ using System.Web.Configuration;
 using System.Web.Mvc;
 using log4net;
 using Newtonsoft.Json;
+using Ulearn.Core.Configuration;
 
 namespace uLearn.Web.Controllers
 {
@@ -23,12 +24,13 @@ namespace uLearn.Web.Controllers
 		
 		public GitWebhookController()
 		{
-			githubSecret = WebConfigurationManager.AppSettings["git.webhook.github.secret"];
-			gitlabSecret = WebConfigurationManager.AppSettings["git.webhook.gitlab.secret"];
+			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
+			githubSecret = configuration.Git.Webhook.Github.Secret;
+			gitlabSecret = configuration.Git.Webhook.Gitlab.Secret;
 		}
 		
 		[System.Web.Http.HttpPost]
-		[System.Web.Http.Route("CourseWebhook")]
+		[System.Web.Http.Route("CoursesWebhook")]
 		public async Task<ActionResult> GithubWebhook()
 		{
 			string githubEventName = null;
