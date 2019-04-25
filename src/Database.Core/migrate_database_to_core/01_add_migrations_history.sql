@@ -49,4 +49,5 @@ VALUES
 ('20190306141426_SynchronizeWithNotCore', '2.2.0-rtm-35687'),
 ('20190306141613_DeleteNotificationDeliveryOnDeleteNotification', '2.2.0-rtm-35687'),
 ('20190311111649_AddCourseFiles', '2.2.0-rtm-35687'),
-('20190329125346_AddCertificateTemplateArchive', '2.2.0-rtm-35687')
+('20190329125346_AddCertificateTemplateArchive', '2.2.0-rtm-35687'),
+('20190425091311_CourseVersionGit', '2.2.0-rtm-35687')

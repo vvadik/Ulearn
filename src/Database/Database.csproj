@@ -750,6 +750,10 @@
     <Compile Include="Migrations\201903291321473_AddCertificateTemplateArchive.Designer.cs">
       <DependentUpon>201903291321473_AddCertificateTemplateArchive.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201904250906053_CourseVersionGit.cs" />
+    <Compile Include="Migrations\201904250906053_CourseVersionGit.Designer.cs">
+      <DependentUpon>201904250906053_CourseVersionGit.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -1172,6 +1176,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201903291321473_AddCertificateTemplateArchive.resx">
       <DependentUpon>201903291321473_AddCertificateTemplateArchive.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201904250906053_CourseVersionGit.resx">
+      <DependentUpon>201904250906053_CourseVersionGit.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
