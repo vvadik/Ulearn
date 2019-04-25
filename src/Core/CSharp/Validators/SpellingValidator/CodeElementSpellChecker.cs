@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using NHunspell;
 using Ulearn.Common.Extensions;
@@ -42,11 +43,12 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 			}
 		}
 		
-		private static bool CheckForSpecialCases(string wordInDifferentNumber, string typeAsString = null)
+		private static bool CheckForSpecialCases(string word, string typeAsString = null)
 		{
-			return wordInDifferentNumber.Length <= 2
-					|| (typeAsString != null && typeAsString.StartsWith(wordInDifferentNumber, StringComparison.InvariantCultureIgnoreCase))
-					|| wordInDifferentNumber.Equals(typeAsString?.MakeTypeNameAbbreviation(), StringComparison.InvariantCultureIgnoreCase);
+			return word.Length <= 2
+					|| Regex.IsMatch(word, @"\p{IsCyrillic}")
+					|| typeAsString != null && typeAsString.StartsWith(word, StringComparison.InvariantCultureIgnoreCase)
+					|| word.Equals(typeAsString?.MakeTypeNameAbbreviation(), StringComparison.InvariantCultureIgnoreCase);
 		}
 
 		private string RemoveIfySuffix(string word)
