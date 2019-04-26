@@ -42,10 +42,27 @@ class CommentsList extends Component {
 		this.debouncedSendData = debounce(this.sendData, 300);
 	}
 
+	componentWillMount() {
+		window.addEventListener("hashchange", this.handleScrollFromNotifications);
+	}
+
 	componentDidMount() {
 		const {courseId, slideId, forInstructors} = this.props;
 
 		this.loadComments(courseId, slideId, forInstructors);
+	};
+
+	componentWillUnmount() {
+		window.removeEventListener("hashchange", this.handleScrollFromNotifications);
+
+	}
+
+	handleScrollFromNotifications = () => {
+		const {courseId, slideId, forInstructors} = this.props;
+
+		if (window.location.hash.includes("#comment")) {
+			this.loadComments(courseId, slideId, forInstructors);
+		}
 	};
 
 	loadComments = (courseId, slideId, forInstructors) => {
@@ -80,6 +97,7 @@ class CommentsList extends Component {
 	render() {
 		const {threads, loadingComments} = this.state;
 		const {user, courseId, slideId, commentPolicy} = this.props;
+		const replies = threads.reduce((sum, current) => sum + current.replies.length, 0);
 
 		if (this.state.status === "error") {
 			return <Error404 />;
@@ -98,7 +116,7 @@ class CommentsList extends Component {
 						{this.renderSendForm()}
 						{this.renderThreads()}
 					</>}
-				{(commentPolicy.areCommentsEnabled && user.id && threads.length > 7) &&
+				{(commentPolicy.areCommentsEnabled && user.id && (threads.length + replies) > 7) &&
 				<button className={styles.sendButton} onClick={this.handleShowSendForm}>
 					<Icon name="CommentLite" color="#3072C4" />
 					<span className={styles.sendButtonText}>Оставить комментарий</span>
