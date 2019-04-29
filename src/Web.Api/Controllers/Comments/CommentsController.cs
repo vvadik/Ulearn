@@ -71,29 +71,13 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			var replies = await commentsRepo.GetRepliesAsync(comments.Select(c => c.Id)).ConfigureAwait(false);
 			var allComments = comments.Concat(replies.SelectMany(g => g.Value)).ToList();
 
-			var commentLikesCountTask = commentLikesRepo.GetLikesCountsAsync(allComments.Select(c => c.Id));
-			var likedByUserCommentsIdsTask = commentLikesRepo.GetCommentsLikedByUserAsync(courseId, parameters.SlideId, UserId);
-			var isInstructorTask = courseRolesRepo.HasUserAccessToCourseAsync(User.GetUserId(), courseId, CourseRoleType.Instructor);
-			var availableGroupsTask = Task.Run(async () =>
-			{
-				var isInstructor = await isInstructorTask.ConfigureAwait(false);
-				var _canViewAllGroupMembers = isInstructor && await groupAccessesRepo.CanUserSeeAllCourseGroupsAsync(User.GetUserId(), courseId).ConfigureAwait(false);
-				var _userAvailableGroupsIds = !isInstructor ? null : (await groupAccessesRepo.GetAvailableForUserGroupsAsync(courseId).ConfigureAwait(false)).Select(g => g.Id).ToHashSet();
-				return (_canViewAllGroupMembers, _userAvailableGroupsIds);
-			});
-			var authors2GroupsTask = Task.Run(async () =>
-			{
-				var isInstructor = await isInstructorTask.ConfigureAwait(false);;
-				if (!isInstructor)
-					return null;
-				var authorsIds = allComments.Select(c => c.Author.Id).Distinct().ToList();
-				return await groupMembersRepo.GetUsersGroupsAsync(courseId, authorsIds).ConfigureAwait(false);
-			});
-			await Task.WhenAll(commentLikesCountTask, likedByUserCommentsIdsTask, availableGroupsTask, authors2GroupsTask).ConfigureAwait(false);
-			var commentLikesCount = commentLikesCountTask.Result;
-			var likedByUserCommentsIds = likedByUserCommentsIdsTask.Result.ToHashSet();
-			var authors2Groups = authors2GroupsTask.Result;
-			var (canViewAllGroupMembers, userAvailableGroupsIds) = availableGroupsTask.Result;
+			var commentLikesCount = await commentLikesRepo.GetLikesCountsAsync(allComments.Select(c => c.Id)).ConfigureAwait(false);
+			var likedByUserCommentsIds = (await commentLikesRepo.GetCommentsLikedByUserAsync(courseId, parameters.SlideId, UserId).ConfigureAwait(false)).ToHashSet();
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(User.GetUserId(), courseId, CourseRoleType.Instructor).ConfigureAwait(false);
+			var canViewAllGroupMembers = isInstructor && await groupAccessesRepo.CanUserSeeAllCourseGroupsAsync(User.GetUserId(), courseId).ConfigureAwait(false);
+			var userAvailableGroupsIds = !isInstructor ? null : (await groupAccessesRepo.GetAvailableForUserGroupsAsync(User.GetUserId()).ConfigureAwait(false)).Select(g => g.Id).ToHashSet();
+			var authorsIds = allComments.Select(c => c.Author.Id).Distinct().ToList();
+			var authors2Groups = !isInstructor ? null : await groupMembersRepo.GetUsersGroupsAsync(courseId, authorsIds).ConfigureAwait(false);
 
 			return new CommentsListResponse
 			{
