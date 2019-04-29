@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -9,10 +8,10 @@ using Database.Models.Comments;
 using Database.Repos;
 using Database.Repos.Comments;
 using Database.Repos.CourseRoles;
+using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Serilog;
 using Swashbuckle.AspNetCore.Annotations;
 using Ulearn.Common;
@@ -31,8 +30,9 @@ namespace Ulearn.Web.Api.Controllers.Comments
 
 		public CommentsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db,
 			ICommentsRepo commentsRepo, ICommentLikesRepo commentLikesRepo, ICommentPoliciesRepo commentPoliciesRepo,
-			IUsersRepo usersRepo, ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo, INotificationsRepo notificationsRepo)
-			: base(logger, courseManager, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo, notificationsRepo)
+			IUsersRepo usersRepo, ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo, INotificationsRepo notificationsRepo,
+			IGroupMembersRepo groupMembersRepo, IGroupAccessesRepo groupAccessesRepo)
+			: base(logger, courseManager, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo, notificationsRepo, groupMembersRepo, groupAccessesRepo)
 		{
 			this.commentPoliciesRepo = commentPoliciesRepo;
 		}
@@ -69,17 +69,37 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			comments = comments.Skip(parameters.Offset).Take(parameters.Count).ToList();
 
 			var replies = await commentsRepo.GetRepliesAsync(comments.Select(c => c.Id)).ConfigureAwait(false);
-			var allCommentsIds = comments.Concat(replies.SelectMany(g => g.Value)).Select(c => c.Id);
+			var allComments = comments.Concat(replies.SelectMany(g => g.Value)).ToList();
 
-			var commentLikesCountTask = commentLikesRepo.GetLikesCountsAsync(allCommentsIds);
+			var commentLikesCountTask = commentLikesRepo.GetLikesCountsAsync(allComments.Select(c => c.Id));
 			var likedByUserCommentsIdsTask = commentLikesRepo.GetCommentsLikedByUserAsync(courseId, parameters.SlideId, UserId);
-			await Task.WhenAll(commentLikesCountTask, likedByUserCommentsIdsTask).ConfigureAwait(false);
+			var isInstructorTask = courseRolesRepo.HasUserAccessToCourseAsync(User.GetUserId(), courseId, CourseRoleType.Instructor);
+			var availableGroupsTask = Task.Run(async () =>
+			{
+				var isInstructor = await isInstructorTask.ConfigureAwait(false);
+				var _canViewAllGroupMembers = isInstructor && await groupAccessesRepo.CanUserSeeAllCourseGroupsAsync(User.GetUserId(), courseId).ConfigureAwait(false);
+				var _userAvailableGroupsIds = !isInstructor ? null : (await groupAccessesRepo.GetAvailableForUserGroupsAsync(courseId).ConfigureAwait(false)).Select(g => g.Id).ToHashSet();
+				return (_canViewAllGroupMembers, _userAvailableGroupsIds);
+			});
+			var authors2GroupsTask = Task.Run(async () =>
+			{
+				var isInstructor = await isInstructorTask.ConfigureAwait(false);;
+				if (!isInstructor)
+					return null;
+				var authorsIds = allComments.Select(c => c.Author.Id).Distinct().ToList();
+				return await groupMembersRepo.GetUsersGroupsAsync(courseId, authorsIds).ConfigureAwait(false);
+			});
+			await Task.WhenAll(commentLikesCountTask, likedByUserCommentsIdsTask, availableGroupsTask, authors2GroupsTask).ConfigureAwait(false);
 			var commentLikesCount = commentLikesCountTask.Result;
 			var likedByUserCommentsIds = likedByUserCommentsIdsTask.Result.ToHashSet();
+			var authors2Groups = authors2GroupsTask.Result;
+			var (canViewAllGroupMembers, userAvailableGroupsIds) = availableGroupsTask.Result;
 
 			return new CommentsListResponse
 			{
-				TopLevelComments = BuildCommentsListResponse(comments, canUserSeeNotApprovedComments, replies, commentLikesCount, likedByUserCommentsIds, addCourseIdAndSlideId: false, addParentCommentId: true, addReplies: true),
+				TopLevelComments = BuildCommentsListResponse(comments, canUserSeeNotApprovedComments, replies, commentLikesCount, likedByUserCommentsIds,
+					authors2Groups, userAvailableGroupsIds, canViewAllGroupMembers,
+					addCourseIdAndSlideId: false, addParentCommentId: true, addReplies: true),
 				Pagination = new PaginationResponse
 				{
 					Offset = parameters.Offset,
@@ -142,7 +162,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			return BuildCommentResponse(
 				comment,
 				false, new DefaultDictionary<int, List<Comment>>(), new DefaultDictionary<int, int>(), new HashSet<int>(), // canUserSeeNotApprovedComments not used if addReplies == false
-				addCourseIdAndSlideId: true, addParentCommentId: true, addReplies: false
+				null, null, false, addCourseIdAndSlideId: true, addParentCommentId: true, addReplies: false
 			);
 		}
 		
