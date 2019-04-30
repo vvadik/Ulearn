@@ -97,7 +97,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			if (isInstructor)
 			{
 				canViewAllGroupMembers = await groupAccessesRepo.CanUserSeeAllCourseGroupsAsync(User.GetUserId(), comment.CourseId).ConfigureAwait(false);
-				userAvailableGroupsIds = (await groupAccessesRepo.GetAvailableForUserGroupsAsync(comment.CourseId).ConfigureAwait(false)).Select(g => g.Id).ToHashSet();
+				userAvailableGroupsIds = (await groupAccessesRepo.GetAvailableForUserGroupsAsync(User.GetUserId()).ConfigureAwait(false)).Select(g => g.Id).ToHashSet();
 			}
 
 			if (parameters.WithReplies)

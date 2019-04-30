@@ -78,7 +78,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 				commentInfo.AuthorGroups = authorId2Groups[comment.AuthorId]
 					.Where(g => canViewAllGroupMembers || userAvailableGroups.Contains(g.Id))
 					.Select(g => BuildShortGroupInfo(g, userAvailableGroups.Contains(g.Id)))
-					.ToList().EmptyIfNull();
+					.ToList().NullIfEmpty();
 			}
 
 			if (addCourseIdAndSlideId)

@@ -45,7 +45,7 @@ namespace Ulearn.Common.Extensions
 		}
 		
 		[CanBeNull]
-		public static IEnumerable<T> NullIfEmpty<T>(this ICollection<T> items)
+		public static List<T> NullIfEmpty<T>(this List<T> items)
 		{
 			return items?.Count == 0 ? null : items;
 		}
