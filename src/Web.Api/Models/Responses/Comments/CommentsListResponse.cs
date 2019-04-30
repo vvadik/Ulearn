@@ -25,6 +25,9 @@ namespace Ulearn.Web.Api.Models.Responses.Comments
 		public ShortUserInfo Author { get; set; }
 		
 		[DataMember]
+		public List<ShortGroupInfo> AuthorGroups { get; set; }
+		
+		[DataMember]
 		public string Text { get; set; }
 		
 		[DataMember]
