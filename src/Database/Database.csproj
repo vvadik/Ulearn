@@ -97,10 +97,6 @@
       <HintPath>..\packages\Microsoft.CodeAnalysis.Workspaces.Common.2.8.2\lib\net46\Microsoft.CodeAnalysis.Workspaces.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.CodeAnalysis.Workspaces.Desktop, Version=2.8.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <HintPath>..\packages\Microsoft.CodeAnalysis.Workspaces.Common.2.8.2\lib\net46\Microsoft.CodeAnalysis.Workspaces.Desktop.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
