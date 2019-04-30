@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { userType, userRoles, commentPolicy } from "../commonPropTypes";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
+import { TABS } from "../../../consts/general";
 import * as debounce from "debounce";
 import Icon from "@skbkontur/react-icons";
 import Loader from "@skbkontur/react-ui/components/Loader/Loader";
@@ -42,28 +43,40 @@ class CommentsList extends Component {
 		this.debouncedSendData = debounce(this.sendData, 300);
 	}
 
-	componentWillMount() {
-		window.addEventListener("hashchange", this.handleScrollFromNotifications);
-	}
-
 	componentDidMount() {
-		const {courseId, slideId, forInstructors} = this.props;
+		const { courseId, slideId, forInstructors } = this.props;
+		this.loadComments(courseId, slideId, forInstructors)
+			.then(() => {
+				if (window.location.hash.includes("#comment")) {
+					this.handleScrollToCommentByHashFormUrl();
+				}
+			});
 
-		this.loadComments(courseId, slideId, forInstructors);
+		window.addEventListener("hashchange", this.handleScrollToCommentByHashFormUrl);
 	};
 
 	componentWillUnmount() {
-		window.removeEventListener("hashchange", this.handleScrollFromNotifications);
-
+		window.removeEventListener("hashchange", this.handleScrollToCommentByHashFormUrl);
 	}
 
-	handleScrollFromNotifications = () => {
-		const {courseId, slideId, forInstructors} = this.props;
+	get commentIds() {
+		const {threads} = this.state;
+		const commentIds = [];
 
-		if (window.location.hash.includes("#comment")) {
-			this.loadComments(courseId, slideId, forInstructors);
+		for (let i = 0; i < threads.length; i++) {
+			const thread = threads[i];
+			commentIds.push(thread.id);
+
+			if (!thread.replies) continue;
+
+			for (let j = 0; j < thread.replies.length; j++) {
+				const reply = thread.replies[j];
+				commentIds.push(reply.id);
+			}
 		}
-	};
+
+		return commentIds;
+	}
 
 	loadComments = (courseId, slideId, forInstructors) => {
 		if (this.state.loadingComments) {
@@ -74,14 +87,17 @@ class CommentsList extends Component {
 			loadingComments: true,
 		});
 
-		this.props.commentsApi.getComments(courseId, slideId, forInstructors)
+		 const commentsApiRequest = this.props.commentsApi.getComments(courseId, slideId, forInstructors)
 			.then(json => {
 				const comments = json.topLevelComments;
 				this.setState({
 					threads: comments,
 					loadingComments: false,
 				});
-			})
+				return comments;
+			});
+
+		 commentsApiRequest
 			.catch(() => {
 				this.setState({
 					status: "error",
@@ -90,8 +106,26 @@ class CommentsList extends Component {
 			.finally(() => {
 				this.setState({
 					loadingComments: false,
-				})
+				});
 			});
+
+		 return commentsApiRequest;
+	};
+
+	handleScrollToCommentByHashFormUrl = () => {
+		const {courseId, slideId, forInstructors, handleTabChange} = this.props;
+
+		if (window.location.hash.includes("#comment")) {
+			const startIndex = window.location.hash.indexOf('-') + 1;
+			const commentIdFromHash = +window.location.hash.slice(startIndex);
+			const nameChangesTab = forInstructors ? TABS.allComments : TABS.instructorsComments;
+
+			if (!this.commentIds.includes(commentIdFromHash)) {
+				this.loadComments(courseId, slideId, forInstructors);
+				if (!this.commentIds.includes(commentIdFromHash))
+					handleTabChange(nameChangesTab, false);
+			}
+		}
 	};
 
 	render() {
