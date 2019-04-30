@@ -144,5 +144,13 @@ namespace Database.Repos.Groups
 			var userGroupsIds = await GetUserGroupsIdsAsync(courseId, userId).ConfigureAwait(false);
 			return groupsRepo.GetCourseGroupsQueryable(courseId).Where(g => userGroupsIds.Contains(g.Id)).ToList();
 		}
+		
+		public async Task<Dictionary<string, List<Group>>> GetUsersGroupsAsync(string courseId, List<string> usersIds)
+		{
+			var userGroupsIds = await GetUsersGroupsIdsAsync(courseId, usersIds).ConfigureAwait(false);
+			var ids = userGroupsIds.Values.SelectMany(g => g).Distinct().ToList();
+			var groups = groupsRepo.GetCourseGroupsQueryable(courseId).Where(g => ids.Contains(g.Id)).ToDictionary(g => g.Id, g => g);
+			return userGroupsIds.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Select(id => groups[id]).ToList());
+		}
 	}
 }

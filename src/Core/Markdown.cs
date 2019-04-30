@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Web;
 using Microsoft.AspNetCore.Html;
@@ -39,7 +40,7 @@ namespace Ulearn.Core
 		public static HtmlString RenderTex(this string textWithTex)
 		{
 			var texReplacer = new TexReplacer(textWithTex);
-			string html = HttpUtility.HtmlEncode(texReplacer.ReplacedText);
+			string html = WebUtility.HtmlEncode(texReplacer.ReplacedText);
 			return new HtmlString(texReplacer.PlaceTexInsertsBack(html));
 		}
 

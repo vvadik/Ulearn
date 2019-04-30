@@ -240,7 +240,7 @@ namespace Database.Repos.Groups
 			return new HashSet<string>(coursesAsCourseAdmin).Concat(coursesWithCourseAccess).ToList();
 		}
 
-		private async Task<bool> CanUserSeeAllCourseGroupsAsync(string userId, string courseId)
+		public async Task<bool> CanUserSeeAllCourseGroupsAsync(string userId, string courseId)
 		{
 			var canViewAllGroupMembersGlobal = await systemAccessesRepo.HasSystemAccessAsync(userId, SystemAccessType.ViewAllGroupMembers).ConfigureAwait(false);
 			var canViewAllGroupMembersInCourse = await coursesRepo.HasCourseAccessAsync(userId, courseId, CourseAccessType.ViewAllGroupMembers).ConfigureAwait(false);

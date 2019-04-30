@@ -4,11 +4,13 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Database;
+using Database.Extensions;
 using Database.Models;
 using Database.Models.Comments;
 using Database.Repos;
 using Database.Repos.Comments;
 using Database.Repos.CourseRoles;
+using Database.Repos.Groups;
 using Database.Repos.Users;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authorization;
@@ -19,6 +21,8 @@ using Swashbuckle.AspNetCore.Annotations;
 using Ulearn.Common;
 using Ulearn.Common.Api;
 using Ulearn.Common.Api.Models.Responses;
+using Ulearn.Common.Extensions;
+using Ulearn.Web.Api.Models.Common;
 using Ulearn.Web.Api.Models.Parameters.Comments;
 using Ulearn.Web.Api.Models.Responses.Comments;
 
@@ -31,8 +35,8 @@ namespace Ulearn.Web.Api.Controllers.Comments
 	{
 		public CommentController(ILogger logger, IWebCourseManager courseManager, UlearnDb db,
 			IUsersRepo usersRepo, ICommentsRepo commentsRepo, ICommentLikesRepo commentLikesRepo, ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo,
-			INotificationsRepo notificationsRepo)
-			: base(logger, courseManager, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo, notificationsRepo)
+			INotificationsRepo notificationsRepo, IGroupMembersRepo groupMembersRepo, IGroupAccessesRepo groupAccessesRepo)
+			: base(logger, courseManager, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo, notificationsRepo, groupMembersRepo, groupAccessesRepo)
 		{
 		}
 
@@ -87,22 +91,38 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			
 			DefaultDictionary<int, int> likesCount;
 			var likedByUserCommentsIds = (await commentLikesRepo.GetCommentsLikedByUserAsync(comment.CourseId, comment.SlideId, UserId).ConfigureAwait(false)).ToHashSet();
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(User.GetUserId(), comment.CourseId, CourseRoleType.Instructor).ConfigureAwait(false);
+			var canViewAllGroupMembers = false;
+			HashSet<int> userAvailableGroupsIds = null;
+			if (isInstructor)
+			{
+				canViewAllGroupMembers = await groupAccessesRepo.CanUserSeeAllCourseGroupsAsync(User.GetUserId(), comment.CourseId).ConfigureAwait(false);
+				userAvailableGroupsIds = (await groupAccessesRepo.GetAvailableForUserGroupsAsync(User.GetUserId()).ConfigureAwait(false)).Select(g => g.Id).ToHashSet();
+			}
+
 			if (parameters.WithReplies)
 			{
 				var replies = await commentsRepo.GetRepliesAsync(commentId).ConfigureAwait(false);
+				var allComments = replies.Append(comment).ToList();
 				likesCount = await commentLikesRepo.GetLikesCountsAsync(replies.Append(comment).Select(c => c.Id)).ConfigureAwait(false);
+				var authorsIds = allComments.Select(c => c.Author.Id).Distinct().ToList();
+				var authors2Groups = !isInstructor ? null : await groupMembersRepo.GetUsersGroupsAsync(comment.CourseId, authorsIds).ConfigureAwait(false);
 				return BuildCommentResponse(
 					comment,
 					canUserSeeNotApprovedComments, new DefaultDictionary<int, List<Comment>> { {commentId, replies }}, likesCount, likedByUserCommentsIds,
-					addCourseIdAndSlideId: true, addParentCommentId: true, addReplies: true
+					authors2Groups, userAvailableGroupsIds, canViewAllGroupMembers, addCourseIdAndSlideId: true, addParentCommentId: true, addReplies: true
 				);
 			}
 			
 			likesCount = await commentLikesRepo.GetLikesCountsAsync(new [] { commentId }).ConfigureAwait(false);
+			var author2Groups = !isInstructor ? null : new Dictionary<string, List<Group>>{
+				{comment.Author.Id,
+				await groupMembersRepo.GetUserGroupsAsync(comment.CourseId, comment.Author.Id).ConfigureAwait(false)}
+			};
 			return BuildCommentResponse(
 				comment,
-				canUserSeeNotApprovedComments, new DefaultDictionary<int, List<Comment>>(), likesCount, likedByUserCommentsIds,
-				addCourseIdAndSlideId: true, addParentCommentId: true, addReplies: false
+				canUserSeeNotApprovedComments, new DefaultDictionary<int, List<Comment>>(), likesCount, likedByUserCommentsIds, author2Groups,
+				userAvailableGroupsIds, canViewAllGroupMembers, addCourseIdAndSlideId: true, addParentCommentId: true, addReplies: false
 			);
 		}
 

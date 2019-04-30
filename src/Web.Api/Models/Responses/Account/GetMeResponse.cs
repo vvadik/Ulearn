@@ -31,6 +31,10 @@ namespace Ulearn.Web.Api.Models.Responses.Account
 		[DataMember]
 		public string Description { get; set; }
 
+		public AccountProblem()
+		{
+		}
+		
 		public AccountProblem(string title, string description)
 		{
 			Title = title;
