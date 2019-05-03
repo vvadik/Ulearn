@@ -7,6 +7,7 @@ using NHunspell;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.CSharp;
 using Ulearn.Core.CSharp.Validators;
+using Ulearn.Core.Model.Edx.EdxComponents;
 using Ulearn.Core.Properties;
 
 namespace uLearn.CSharp.Validators.SpellingValidator
@@ -28,12 +29,13 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 		private IEnumerable<SolutionStyleError> InspectMethodsNamesAndArguments(MethodDeclarationSyntax methodDeclaration)
 		{
 			var methodIdentifier = methodDeclaration.Identifier;
-			var errorsInParameters = InspectMethodParameters(methodDeclaration);
-
-			return CheckIdentifierNameForSpellingErrors(
-					methodIdentifier,
-					methodDeclaration.ReturnType.ToString())
-				.Concat(errorsInParameters);
+			var errors = InspectMethodParameters(methodDeclaration);
+			var errorInMethodName = CheckIdentifierNameForSpellingErrors(
+				methodIdentifier,
+				methodDeclaration.ReturnType.ToString());
+			if (errorInMethodName != null)
+				errors.Add(errorInMethodName);
+			return errors;
 		}
 
 		private List<SolutionStyleError> InspectMethodParameters(MethodDeclarationSyntax methodDeclaration)
@@ -48,9 +50,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 		private SolutionStyleError InspectMethodParameter(ParameterSyntax parameter)
 		{
 			var identifier = parameter.Identifier;
-			var errorsInParameterName = CheckIdentifierNameForSpellingErrors(identifier, parameter.Type.ToString());
-
-			return errorsInParameterName.FirstOrDefault();
+			return CheckIdentifierNameForSpellingErrors(identifier, parameter.Type.ToString());
 		}
 
 		private IEnumerable<SolutionStyleError> InspectVariablesNames(VariableDeclarationSyntax variableDeclarationSyntax, SemanticModel semanticModel)
@@ -61,42 +61,64 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 
 		private IEnumerable<SolutionStyleError> InspectClassNames(ClassDeclarationSyntax classDeclarationSyntax)
 		{
-			return CheckIdentifierNameForSpellingErrors(classDeclarationSyntax.Identifier);
+			var errors = new List<SolutionStyleError>();
+			var errorInName = CheckIdentifierNameForSpellingErrors(classDeclarationSyntax.Identifier);
+			if (errorInName != null)
+				errors.Add(errorInName);
+			return errors;
 		}
 		
 		private IEnumerable<SolutionStyleError> InspectStructNames(StructDeclarationSyntax structDeclarationSyntax)
 		{
-			return CheckIdentifierNameForSpellingErrors(structDeclarationSyntax.Identifier);
+			var errors = new List<SolutionStyleError>();
+			var errorInName = CheckIdentifierNameForSpellingErrors(structDeclarationSyntax.Identifier);
+			if (errorInName != null)
+				errors.Add(errorInName);
+			return errors;
 		}
 		
 		private IEnumerable<SolutionStyleError> InspectInterfaceNames(InterfaceDeclarationSyntax interfaceDeclarationSyntax)
 		{
 			var interfaceNameParts = interfaceDeclarationSyntax.Identifier.ValueText.SplitByCamelCase();
-			var errorInInterfaceSymbol = new List<SolutionStyleError>();
+			var errors = new List<SolutionStyleError>();
 			if (interfaceNameParts.First() != "I")
-				errorInInterfaceSymbol.Add(new SolutionStyleError(
+				errors.Add(new SolutionStyleError(
 					StyleErrorType.Misspeling01,
 					interfaceDeclarationSyntax.Identifier,
 					$"Имя интерфейса должно начинаться с I"));
-			return errorInInterfaceSymbol.Concat(CheckIdentifierNameForSpellingErrors(interfaceDeclarationSyntax.Identifier));
+			var errorInName = CheckIdentifierNameForSpellingErrors(interfaceDeclarationSyntax.Identifier);
+			if (errorInName != null)
+				errors.Add(errorInName);
+			return errors;
 		}
 
 		private IEnumerable<SolutionStyleError> InspectVariablesNames(VariableDeclaratorSyntax variableDeclaratorSyntax, TypeInfo variableTypeInfo)
 		{
-			return CheckIdentifierNameForSpellingErrors(variableDeclaratorSyntax.Identifier, variableTypeInfo.Type.Name);
+			var errors = new List<SolutionStyleError>();
+			var errrorInVariable = CheckIdentifierNameForSpellingErrors(variableDeclaratorSyntax.Identifier, variableTypeInfo.Type.Name);
+			if (errrorInVariable != null)
+				errors.Add(errrorInVariable);
+			return new List<SolutionStyleError>();
 		}
 
 		private IEnumerable<SolutionStyleError> InspectPropertiesNames(PropertyDeclarationSyntax propertyDeclaration)
 		{
+			var errors = new List<SolutionStyleError>();
 			var propertyType = propertyDeclaration.Type;
 			var propertyTypeAsString = propertyType.ToString();
-
-			return CheckIdentifierNameForSpellingErrors(propertyDeclaration.Identifier, propertyTypeAsString);
+			var errorInPropertyName = CheckIdentifierNameForSpellingErrors(propertyDeclaration.Identifier, propertyTypeAsString);
+			if (errorInPropertyName != null)
+				errors.Add(errorInPropertyName);
+			
+			return errors;
 		}
 
-		private IEnumerable<SolutionStyleError> CheckIdentifierNameForSpellingErrors(SyntaxToken identifier, string typeAsString = null)
+		private SolutionStyleError CheckIdentifierNameForSpellingErrors(SyntaxToken identifier, string typeAsString = null)
 		{
-			return spellChecker.CheckIdentifierNameForSpellingErrors(identifier, typeAsString);
+			var identifierName = identifier.ValueText;
+			return spellChecker.CheckIdentifierNameForSpellingErrors(identifierName, typeAsString)
+				? new SolutionStyleError(StyleErrorType.Misspeling01, identifier, $"В слове {identifierName} допущена опечатка.")
+				: null;
 		}
 	}
 }

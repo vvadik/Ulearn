@@ -16,9 +16,9 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 		private static readonly Hunspell hunspellLa = new Hunspell(Resources.la_aff, Resources.la_dic);
 		private static readonly HashSet<string> wordsToExcept = new HashSet<string>(Resources.spelling_exceptions.SplitToLines());
 		
-		public IEnumerable<SolutionStyleError> CheckIdentifierNameForSpellingErrors(SyntaxToken identifier, string typeAsString = null)
+		public bool CheckIdentifierNameForSpellingErrors(string identifierName, string typeAsString = null)
 		{
-			var wordsInIdentifier = identifier.ValueText.SplitByCamelCase();
+			var wordsInIdentifier = identifierName.SplitByCamelCase();
 			foreach (var word in wordsInIdentifier)
 			{
 				var wordForCheck = RemoveIfySuffix(word);
@@ -32,15 +32,18 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 						doesWordContainError = false;
 						break;
 					}
-					var possibleErrorInWord = CheckConcatenatedWordsInLowerCaseForError(wordInDifferentNumber, identifier);
-					if (possibleErrorInWord != null)
+					var wordContainsError = CheckConcatenatedWordsInLowerCaseForError(wordInDifferentNumber);
+					if (wordContainsError)
 						continue;
 					doesWordContainError = false;
 					break;
 				}
+
 				if (doesWordContainError)
-					yield return new SolutionStyleError(StyleErrorType.Misspeling01, identifier, $"В слове {word} допущена опечатка.");
+					return true;
 			}
+
+			return false;
 		}
 		
 		private static bool CheckForSpecialCases(string word, string typeAsString = null)
@@ -67,7 +70,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 				yield return word.Substring(0, word.Length - 2);
 		}
 		
-		private SolutionStyleError CheckConcatenatedWordsInLowerCaseForError(string concatenatedWords, SyntaxToken tokenWithConcatenatedWords)
+		private bool CheckConcatenatedWordsInLowerCaseForError(string concatenatedWords)
 		{
 			var currentCheckingWord = "";
 			var foundWords = new HashSet<string>();
@@ -87,19 +90,19 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 						if (isFirstWord
 							&& IsWordContainedInDictionaries(
 								concatenatedWords.Substring(currentCheckingWord.Length))) // это нужно для переменных типа dfunction b substring
-							return null;
+							return false;
 						currentCheckingWord = "";
 						isFirstWord = false;
 					}
 				}
 
 				if (currentCheckingWord == "")
-					return null;
+					return false;
 			}
 
-			return new SolutionStyleError(StyleErrorType.Misspeling01, tokenWithConcatenatedWords, $"В слове {concatenatedWords} допущена опечатка.");
+			return true;
 		}
-
+		
 		private bool IsWordContainedInDictionaries(string word) // есть проблема, при которой разные части одного слова проверяются в разных словарях (одна часть - в английском, вторая - в латинском)?
 		{
 			return wordsToExcept.Contains(word.ToLowerInvariant())
