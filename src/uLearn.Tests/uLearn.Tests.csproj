@@ -405,6 +405,7 @@
     <Compile Include="CSharp\RefArgumentsValidation\TestData\Correct\RefArgumentsValidationTestDataClass.cs" />
     <Compile Include="CSharp\RefArgumentsValidation\TestData\Incorrect\RefArgumentsValidationTestDataClass.cs" />
     <Compile Include="CSharp\RefArgumentsValidation\RefArgumentsValidator_should.cs" />
+    <Compile Include="CSharp\SpellingValidation\CodeElementSpellChecking\CodeElementSpellChecker_should.cs" />
     <Compile Include="CSharp\SpellingValidation\SpellingValidator_should.cs" />
     <Compile Include="CSharp\SpellingValidation\TestData\Correct\FileWithAmeticanVariantOfEnglish.cs" />
     <Compile Include="CSharp\SpellingValidation\TestData\Correct\FileWithBritishVariantOfEnglish.cs" />
