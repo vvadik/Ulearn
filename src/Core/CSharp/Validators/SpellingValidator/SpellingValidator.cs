@@ -79,13 +79,13 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 		
 		private IEnumerable<SolutionStyleError> InspectInterfaceNames(InterfaceDeclarationSyntax interfaceDeclarationSyntax)
 		{
-			var interfaceNameParts = interfaceDeclarationSyntax.Identifier.ValueText.SplitByCamelCase();
+			var interfaceNameParts = interfaceDeclarationSyntax.Identifier.ValueText.SplitByCamelCase().ToList();
 			var errors = new List<SolutionStyleError>();
 			if (interfaceNameParts.First() != "I")
 				errors.Add(new SolutionStyleError(
 					StyleErrorType.Misspeling01,
 					interfaceDeclarationSyntax.Identifier,
-					$"Имя интерфейса должно начинаться с I"));
+						interfaceNameParts.First(), "Имя интерфейса должно начинаться с I"));
 			var errorInName = CheckIdentifierNameForSpellingErrors(interfaceDeclarationSyntax.Identifier);
 			if (errorInName != null)
 				errors.Add(errorInName);
@@ -117,7 +117,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 		{
 			var identifierName = identifier.ValueText;
 			return spellChecker.CheckIdentifierNameForSpellingErrors(identifierName, typeAsString)
-				? new SolutionStyleError(StyleErrorType.Misspeling01, identifier, $"В слове {identifierName} допущена опечатка.")
+				? new SolutionStyleError(StyleErrorType.Misspeling01, identifier, identifierName, "")
 				: null;
 		}
 	}

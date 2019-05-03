@@ -220,7 +220,7 @@ namespace Ulearn.Core.CSharp
 		[MessageTemplate("В блоке `if` всегда происходит выход из функции, поэтому `else` можно убрать.")]
 		RedundantElse01,
 		
-		[MessageTemplate("Возможно, в слове {0} есть ошибка в написании.")]
+		[MessageTemplate("Возможно, в слове {0} есть ошибка в написании. {1}")]
 		Misspeling01,
 	}
 
