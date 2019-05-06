@@ -6,7 +6,6 @@ import Hint from "@skbkontur/react-ui/components/Hint/Hint";
 import styles from "./MarkdownButtons.less";
 
 class MarkdownButtons extends Component {
-
 	render() {
 		const {markupByOperation} = this.props;
 
@@ -14,27 +13,32 @@ class MarkdownButtons extends Component {
 			<div className={styles.markdownButtons}>
 				<span className={styles.markdownText}>Поддерживаем Markdown</span>
 				{Object.entries(markupByOperation)
-				.map(([name, operation]) => this.renderMarkdownButton(name, operation))}
+				.map(([name, operation]) =>
+					<div key={name} className={styles.buttonBlock}>
+						{!window.matchMedia("(max-width: 767px)").matches ?
+						<Hint
+							pos="bottom"
+							text={this.renderHint(operation)}>
+							{this.renderMarkdownButton(name, operation)}
+						</Hint> : this.renderMarkdownButton(name, operation)}
+					</div>)}
 			</div>
 		);
 	}
 
 	renderMarkdownButton(name, operation) {
 		return (
-			<div key={name} className={styles.buttonBlock}>
-				<Hint pos="bottom" text={this.renderHint(operation)} disableAnimations={false} useWrapper>
-					<button className={styles.button} onClick={this.onClick(operation)} type="button">
-						<svg
-							width={20}
-							height={18}
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-						>
-							{operation.icon}
-						</svg>
-					</button>
-				</Hint>
-			</div>
+			<button
+				className={styles.button}
+				onClick={this.handleClick(operation)} type="button">
+				<svg
+					width={20}
+					height={18}
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none">
+					{operation.icon}
+				</svg>
+			</button>
 		)
 	}
 
@@ -44,11 +48,12 @@ class MarkdownButtons extends Component {
 				{markup}
 				<span className={styles.white}>{description}</span>
 				{markup}<br />
-				<span className={styles.lightYellow}>{hotkey.asText}</span>
+				{!window.matchMedia("(max-width: 767px)").matches &&
+				<span className={styles.lightYellow}>{hotkey.asText}</span>}
 			</span>)
 	};
 
-	onClick = (operation) => () => {
+	handleClick = (operation) => () => {
 		this.props.onClick(operation);
 	};
 }
