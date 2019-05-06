@@ -20,11 +20,13 @@ class Comment extends Component {
 	constructor(props) {
 		super(props);
 
-		 this.state = {
-		 	isApproved: props.comment.isApproved,
-		 }
+		this.state = {
+			isApproved: props.comment.isApproved
+		};
+
+		this.ref = React.createRef();
 	}
-	ref = React.createRef();
+
 
 	componentDidMount() {
 		if (window.location.hash === `#comment-${this.props.comment.id}`) {
@@ -39,8 +41,8 @@ class Comment extends Component {
 		const profileUrl = `${window.location.origin}/Account/Profile?userId=${comment.author.id}`;
 
 		return (
-			<div className={`${styles.comment} ${!this.state.isApproved ? styles.isNotApproved : ''}`} ref={this.ref}>
-				<span className={styles.commentAnchor}  id={`comment-${this.props.comment.id}`} />
+			<div className={`${styles.comment} ${!this.state.isApproved ? styles.isNotApproved : ""}`} ref={this.ref}>
+				<span className={styles.commentAnchor} id={`comment-${this.props.comment.id}`} />
 				{canViewProfiles ? <Link href={profileUrl}><Avatar user={comment.author} size="big" /></Link> :
 					<Avatar user={comment.author} size="big" />}
 				<div className={styles.content}>
@@ -60,7 +62,7 @@ class Comment extends Component {
 	}
 
 	renderHeader(profileUrl, canViewProfiles) {
-		const {actions, comment, userRoles, user, slideType, getUserSolutionsUrl} = this.props;
+		const {actions, comment, userRoles, user, slideType, getUserSolutionsUrl, courseId} = this.props;
 		const canSeeKebabActions = user.id && (user.id === comment.author.id ||
 			this.canModerateComments(userRoles, ACCESSES.editPinAndRemoveComments) ||
 			this.canModerateComments(userRoles, ACCESSES.viewAllStudentsSubmissions));
@@ -76,6 +78,8 @@ class Comment extends Component {
 					count={comment.likesCount}
 					onClick={() => actions.handleLikeClick(comment.id, comment.isLiked)} />
 				<Marks
+					authorGroups={comment.authorGroups}
+					courseId={courseId}
 					canViewStudentsGroup={this.canViewStudentsGroup}
 					comment={comment} />
 				{canSeeKebabActions &&
@@ -89,7 +93,7 @@ class Comment extends Component {
 					actions={actions}
 					handleCommentBackGround={this.handleCommentBackground} />}
 			</Header>
-		)
+		);
 	}
 
 	renderComment() {
@@ -99,7 +103,8 @@ class Comment extends Component {
 		return (
 			<>
 				<p className={styles.text}>
-					<span className={styles.textFromServer} dangerouslySetInnerHTML={{__html: comment.renderedText}} />
+					<span className={styles.textFromServer}
+						  dangerouslySetInnerHTML={{ __html: comment.renderedText }} />
 				</p>
 				{user.id &&
 				<CommentActions
@@ -113,7 +118,7 @@ class Comment extends Component {
 					actions={actions}
 					canModerateComments={this.canModerateComments} />}
 			</>
-		)
+		);
 	}
 
 	renderEditCommentForm() {
@@ -129,17 +134,17 @@ class Comment extends Component {
 				submitTitle={"Сохранить"}
 				sending={commentEditing.sending}
 				handleCancel={() => actions.handleShowEditForm(null)} />
-		)
+		);
 	}
 
 	canModerateComments = (role, accesses) => {
 		return role.isSystemAdministrator || role.courseRole === ROLES.courseAdmin ||
-			(role.courseRole === ROLES.instructor && role.courseAccesses.includes(accesses))
+			(role.courseRole === ROLES.instructor && role.courseAccesses.includes(accesses));
 	};
 
 	canReply = (role) => {
 		const {commentPolicy} = this.props;
-		return 	(commentPolicy.areCommentsEnabled && ((role.courseRole === ROLES.student || role.courseRole === null ||
+		return (commentPolicy.areCommentsEnabled && ((role.courseRole === ROLES.student || role.courseRole === null ||
 			role.courseRole.length === 0) || role.isSystemAdministrator || role.courseRole === ROLES.courseAdmin ||
 			role.courseRole === ROLES.instructor));
 	};
@@ -170,6 +175,7 @@ Comment.propTypes = {
 	commentPolicy: commentPolicy,
 	hasReplyAction: PropTypes.bool,
 	slideType: PropTypes.string,
+	courseId: PropTypes.string,
 };
 
 export default Comment;

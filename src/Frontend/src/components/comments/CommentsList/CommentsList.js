@@ -39,6 +39,7 @@ class CommentsList extends Component {
 		};
 
 		this.lastThreadRef = React.createRef();
+		this.commentsListRef = React.createRef();
 
 		this.debouncedSendData = debounce(this.sendData, 300);
 	}
@@ -83,14 +84,14 @@ class CommentsList extends Component {
 			return;
 		}
 
-		this.setState({
+		this.setStateIfMounted({
 			loadingComments: true,
 		});
 
 		 const commentsApiRequest = this.props.commentsApi.getComments(courseId, slideId, forInstructors)
 			.then(json => {
 				const comments = json.topLevelComments;
-				this.setState({
+				this.setStateIfMounted({
 					threads: comments,
 					loadingComments: false,
 				});
@@ -99,18 +100,24 @@ class CommentsList extends Component {
 
 		 commentsApiRequest
 			.catch(() => {
-				this.setState({
+				this.setStateIfMounted({
 					status: "error",
 				});
 			})
 			.finally(() => {
-				this.setState({
+				this.setStateIfMounted({
 					loadingComments: false,
 				});
 			});
 
 		 return commentsApiRequest;
 	};
+
+	setStateIfMounted(updater, callback) {
+		if (this.commentsListRef.current) {
+			this.setState(updater, callback);
+		}
+	}
 
 	handleScrollToCommentByHashFormUrl = () => {
 		const {courseId, slideId, forInstructors, handleTabChange} = this.props;
@@ -142,7 +149,7 @@ class CommentsList extends Component {
 		}
 
 		return (
-			<>
+			<div ref={this.commentsListRef}>
 				{loadingComments ? <div className={styles.spacer}><Loader type="big" active={loadingComments} /></div> :
 					<>
 						{!user.id && <Stub hasThreads={threads.length > 0} courseId={courseId} slideId={slideId} />}
@@ -155,7 +162,7 @@ class CommentsList extends Component {
 					<Icon name="CommentLite" color="#3072C4" />
 					<span className={styles.sendButtonText}>Оставить комментарий</span>
 				</button>}
-			</>
+			</div>
 		)
 	}
 
@@ -188,7 +195,7 @@ class CommentsList extends Component {
 
 	renderThreads() {
 		const {threads, commentEditing, reply, animation} = this.state;
-		const {user, userRoles, slideType, commentPolicy} = this.props;
+		const {user, userRoles, slideType, courseId, commentPolicy} = this.props;
 		const transitionStyles = {
 			enter: styles.enter,
 			exit: styles.exit,
@@ -230,6 +237,7 @@ class CommentsList extends Component {
 								user={user}
 								userRoles={userRoles}
 								slideType={slideType}
+								courseId={courseId}
 								animation={animation}
 								comment={comment}
 								commentPolicy={commentPolicy}
