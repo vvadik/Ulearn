@@ -54,6 +54,7 @@
         </ObjectGroup>
       </Objects>
     </PublishDatabaseSettings>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -63,6 +64,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PublishDatabases>false</PublishDatabases>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AjaxMin, Version=5.14.5506.26196, Culture=neutral, PublicKeyToken=21ef50ce11b5d80f, processorArchitecture=MSIL">
@@ -1574,6 +1576,10 @@
     <ProjectReference Include="..\Database\Database.csproj">
       <Project>{95510835-0b21-4d99-a4d2-b8fc87761a3c}</Project>
       <Name>Database</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GitCourseUpdater\GitCourseUpdater.csproj">
+      <Project>{add8b9ba-7d5b-42d8-bfbd-3d60fb766e33}</Project>
+      <Name>GitCourseUpdater</Name>
     </ProjectReference>
     <ProjectReference Include="..\Metrics\Metrics.csproj">
       <Project>{b6b60d19-c6bd-4d66-95da-14480a18770c}</Project>

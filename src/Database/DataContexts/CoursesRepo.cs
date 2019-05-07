@@ -37,7 +37,8 @@ namespace Database.DataContexts
 			return db.CourseVersions.Where(v => v.CourseId == courseId).OrderByDescending(v => v.LoadingTime);
 		}
 
-		public async Task<CourseVersion> AddCourseVersion(string courseId, Guid versionId, string authorId)
+		public async Task<CourseVersion> AddCourseVersion(string courseId, Guid versionId, string authorId,
+			string pathToCourseXml, string repoUrl, string commitHash, string description)
 		{
 			var courseVersion = new CourseVersion
 			{
@@ -46,6 +47,10 @@ namespace Database.DataContexts
 				LoadingTime = DateTime.Now,
 				PublishTime = null,
 				AuthorId = authorId,
+				PathToCourseXml = pathToCourseXml,
+				CommitHash = commitHash,
+				Description = description,
+				RepoUrl = repoUrl
 			};
 			db.CourseVersions.Add(courseVersion);
 			await db.SaveChangesAsync();

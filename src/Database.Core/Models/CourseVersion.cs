@@ -29,5 +29,7 @@ namespace Database.Models
 		public string CommitHash { get; set; }
 
 		public string Description { get; set; }
+
+		public string PathToCourseXml { get; set; }
 	}
 }

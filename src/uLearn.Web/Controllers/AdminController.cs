@@ -15,12 +15,16 @@ using Database;
 using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
+using GitCourseUpdater;
+using JetBrains.Annotations;
 using Microsoft.VisualBasic.FileIO;
+using Serilog;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
+using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
@@ -51,6 +55,12 @@ namespace uLearn.Web.Controllers
 		private readonly SystemAccessesRepo systemAccessesRepo;
 		private readonly StyleErrorsRepo styleErrorsRepo;
 		private readonly CertificateGenerator certificateGenerator;
+		
+		private readonly DirectoryInfo reposDirectory;
+		private readonly FileInfo publicKeyFileInfo;
+		private readonly FileInfo privateKeyFileInfo;
+		private readonly string passphrase;
+		private readonly ILogger serilogLogger;
 
 		public AdminController()
 		{
@@ -71,6 +81,14 @@ namespace uLearn.Web.Controllers
 			styleErrorsRepo = new StyleErrorsRepo(db);
 			
 			certificateGenerator = new CertificateGenerator(db, courseManager);
+			
+			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
+			reposDirectory = CourseManager.GetCoursesDirectory().GetSubdirectory("Repos");
+			var keysDirectory = new DirectoryInfo(Path.Combine(Utils.GetAppPath(), @"\..\git_deploy_keys\"));
+			publicKeyFileInfo = keysDirectory.GetFile("git_deploy_key.pub");
+			privateKeyFileInfo = keysDirectory.GetFile("git_deploy_key");
+			passphrase = configuration.Git.DeployKeyPassphrase;
+			serilogLogger = new LoggerConfiguration().WriteTo.Log4Net().CreateLogger();
 		}
 
 		public ActionResult Courses(string courseId = null, string courseTitle = null)
@@ -188,30 +206,91 @@ namespace uLearn.Web.Controllers
 			if (fileName == null || !fileName.ToLower().EndsWith(".zip"))
 				return RedirectToAction("Packages", new { courseId });
 
-			var versionId = Guid.NewGuid();
-
-			var destinationFile = courseManager.GetCourseVersionFile(versionId);
-			file.SaveAs(destinationFile.FullName);
-
-			try
+			var course = courseManager.GetCourse(courseId);
+			var (versionId, error) = await UploadCourse(courseId, file.InputStream.ToArray(), course.Settings.RepoUrl).ConfigureAwait(false);
+			if (error != null)
 			{
-				/* Load version and put it into LRU-cache */
-				courseManager.GetVersion(versionId);
-			}
-			catch (Exception e)
-			{
-				var errorMessage = e.Message.ToLowerFirstLetter();
-				while (e.InnerException != null)
+				var errorMessage = error.Message.ToLowerFirstLetter();
+				while (error.InnerException != null)
 				{
-					errorMessage += $"\n\n{e.InnerException.Message}";
-					e = e.InnerException;
+					errorMessage += $"\n\n{error.InnerException.Message}";
+					error = error.InnerException;
 				}
 
 				return RedirectToAction("Packages", new { courseId, error=errorMessage });
 			}
 			
+			return RedirectToAction("Diagnostics", new { courseId, versionId });
+		}
+		
+		public async Task UploadCourse(string repoUrl)
+		{
+			var courses = courseManager.GetCourses().Where(c => c.Settings.RepoUrl == repoUrl).ToList();
+			if (courses.Count == 0)
+			{
+				log.Warn($"Course with '{repoUrl}' is not expected");
+				return;
+			}
+
+			using (IGitRepo git = new GitRepo(repoUrl, reposDirectory, publicKeyFileInfo, privateKeyFileInfo, passphrase, serilogLogger))
+			{
+				foreach (var course in courses)
+				{
+					var zip = git.GetCurrentStateAsZip(course.Settings.PathToCourseXml);
+					var commitInfo = git.GetCurrentCommitInfo();
+					var hasChanges = true;
+					if (courses.Count > 1)
+					{
+						var publishedVersion = coursesRepo.GetPublishedCourseVersion(course.Id);
+						if (publishedVersion?.CommitHash != null)
+						{
+							var changedFiles = git.GetChangedFiles(publishedVersion.CommitHash, commitInfo.Hash, course.Settings.PathToCourseXml);
+							hasChanges = changedFiles?.Any() ?? true;
+						}
+					}
+					if(hasChanges)
+						await UploadCourse(course.Id, zip.ToArray(), repoUrl, commitInfo).ConfigureAwait(false);
+				}
+			}
+		}
+		
+		[HttpPost]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
+		public async Task UploadCourse(string courseId, string repoUrl, [CanBeNull]string commitHashOrBranchName)
+		{
+			var course = courseManager.GetCourse(courseId);
+			using (IGitRepo git = new GitRepo(repoUrl, reposDirectory, publicKeyFileInfo, privateKeyFileInfo, passphrase, serilogLogger))
+			{
+				if(!string.IsNullOrEmpty(commitHashOrBranchName))
+					git.Checkout(commitHashOrBranchName);
+				var zip = git.GetCurrentStateAsZip(course.Settings.PathToCourseXml);
+				var commitInfo = git.GetCurrentCommitInfo();
+				await UploadCourse(course.Id, zip.ToArray(), repoUrl, commitInfo).ConfigureAwait(false);
+			}
+		}
+
+		private async Task<(Guid versionId, Exception error)> UploadCourse(string courseId, byte[] content,
+			string repoUrl = null, CommitInfo commitInfo = null)
+		{
+			var versionId = Guid.NewGuid();
+
+			var destinationFile = courseManager.GetCourseVersionFile(versionId);
+			System.IO.File.WriteAllBytes(destinationFile.FullName, content);
+
+			Course updatedCourse;
+			try
+			{
+				/* Load version and put it into LRU-cache */
+				updatedCourse = courseManager.GetVersion(versionId);
+			}
+			catch (Exception e)
+			{
+				return (versionId, e);
+			}
+			
 			var userId = User.Identity.GetUserId();
-			await coursesRepo.AddCourseVersion(courseId, versionId, userId);
+			await coursesRepo.AddCourseVersion(courseId, versionId, userId,
+				updatedCourse.Settings.PathToCourseXml, updatedCourse.Settings.RepoUrl ?? repoUrl, commitInfo?.Hash, commitInfo?.Message);
 			await NotifyAboutCourseVersion(courseId, versionId, userId);
 
 			try
@@ -226,7 +305,7 @@ namespace uLearn.Web.Controllers
 				log.Warn("Error during delete previous unpublished versions", ex);
 			}
 
-			return RedirectToAction("Diagnostics", new { courseId, versionId });
+			return (versionId, null);
 		}
 
 		[HttpPost]
@@ -241,7 +320,7 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("Courses", new { courseId = courseId, courseTitle = courseTitle });
 
 			var userId = User.Identity.GetUserId();
-			await coursesRepo.AddCourseVersion(courseId, versionId, userId).ConfigureAwait(false);
+			await coursesRepo.AddCourseVersion(courseId, versionId, userId, null, null, null, null).ConfigureAwait(false);
 			await coursesRepo.MarkCourseVersionAsPublished(versionId).ConfigureAwait(false);
 			var courseFile = courseManager.GetStagingCourseFile(courseId);
 			await coursesRepo.AddCourseFile(courseId, versionId, courseFile.ReadAllContent()).ConfigureAwait(false);

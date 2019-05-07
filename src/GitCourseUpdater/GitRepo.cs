@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using JetBrains.Annotations;
 using LibGit2Sharp;
@@ -16,10 +17,11 @@ namespace GitCourseUpdater
 {
 	public interface IGitRepo : IDisposable
 	{
-		MemoryStream GetCurrentStateAsZip();
-		CommitInfo GetMasterLastCommitInfo();
+		MemoryStream GetCurrentStateAsZip(string courseSubdirectoryInRepo = null);
+		CommitInfo GetCurrentCommitInfo();
 		CommitInfo GetCommitInfo(string hash);
-		List<string> GetChangedFiles(string fromHash, string toHash);
+		IEnumerable<string> GetChangedFiles(string fromHash, string toHash, string courseSubdirectoryInRepo = null);
+		void Checkout(string commitHashOrBranchName);
 		void CheckoutCommit(string hash);
 		void CheckoutBranchAndPull(string name);
 	}
@@ -28,21 +30,20 @@ namespace GitCourseUpdater
 	{
 		private string url;
 		private CredentialsHandler credentialsHandler;
-		private string reposBaseDir;
+		private DirectoryInfo reposBaseDir;
 		private string repoDirName; 
 		private Repository repo;
 		private ILogger logger;
 		private static object @lock = new object(); // Потокобезопасность не гарантируется библиотекой libgit2
 
 		// url example ssh://git@github.com:user/myrepo.git
-		public GitRepo(string url, string reposBaseDir, FileInfo publicKeyPath, FileInfo privateKeyPath, string privateKeyPassphrase, ILogger logger)
+		public GitRepo(string url, DirectoryInfo reposBaseDir, FileInfo publicKeyPath, FileInfo privateKeyPath, string privateKeyPassphrase, ILogger logger)
 		{
 			this.url = url;
 			this.reposBaseDir = reposBaseDir;
 			this.logger = logger;
-			var reposFolderInfo = new DirectoryInfo(reposBaseDir);
-			if (!reposFolderInfo.Exists)
-				reposFolderInfo.Create();
+			if (!reposBaseDir.Exists)
+				reposBaseDir.Create();
 			credentialsHandler = (_, __, ___) => new SshUserKeyCredentials
 			{
 				Username = "git",
@@ -63,19 +64,20 @@ namespace GitCourseUpdater
 			}
 		}
 		
-		public MemoryStream GetCurrentStateAsZip()
+		public MemoryStream GetCurrentStateAsZip(string courseSubdirectoryInRepo = null)
 		{
 			logger.Information($"Start load '{repoDirName}' to zip");
-			var zip = ZipHelper.CreateFromDirectory(Path.Combine(reposBaseDir, repoDirName), CompressionLevel.Optimal, false, Encoding.UTF8,
+			var dir = reposBaseDir.GetSubdirectory(repoDirName).FullName;
+			dir = courseSubdirectoryInRepo == null ? dir : Path.Combine(dir, courseSubdirectoryInRepo);
+			var zip = ZipHelper.CreateFromDirectory(dir, CompressionLevel.Optimal, false, Encoding.UTF8,
 				s => s.StartsWith(".git"));
 			logger.Information($"Successfully load '{repoDirName}' to zip");
 			return zip;
 		}
 		
-		public CommitInfo GetMasterLastCommitInfo()
+		public CommitInfo GetCurrentCommitInfo()
 		{
-			var originMaster = repo.Branches["origin/master"];
-			var lastCommit = originMaster.Tip;
+			var lastCommit = repo.Commits.First();
 			return ToCommitInfo(lastCommit);
 		}
 		
@@ -93,17 +95,28 @@ namespace GitCourseUpdater
 		}
 		
 
-		// null, если коммит не найден
+		// null, если коммит не найден. Возвращает полные пути в репозитории
 		[CanBeNull]
-		public List<string> GetChangedFiles(string fromHash, string toHash)
+		public IEnumerable<string> GetChangedFiles(string fromHash, string toHash, string courseSubdirectoryInRepo = null)
 		{
 			var commitFrom = repo.Lookup<Commit>(fromHash);
 			var commitTo = repo.Lookup<Commit>(toHash);
 			if (commitFrom == null || commitTo == null)
-				
 				return null;
 			var treeChanges = repo.Diff.Compare<TreeChanges>(commitFrom.Tree, commitTo.Tree);
-			return treeChanges.Select(c => c.Path).ToList();
+			var paths = treeChanges.Select(c => c.Path);
+			if (courseSubdirectoryInRepo != null)
+				paths = paths.Where(p => p.StartsWith(courseSubdirectoryInRepo));
+			return paths;
+		}
+
+		private static readonly Regex Sha1Regex = new Regex("[a-f0-9]{40}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		public void Checkout(string commitHashOrBranchName)
+		{
+			if (Sha1Regex.IsMatch(commitHashOrBranchName))
+				CheckoutCommit(commitHashOrBranchName);
+			else
+				CheckoutBranchAndPull(commitHashOrBranchName);
 		}
 		
 		public void CheckoutCommit(string hash)
@@ -154,8 +167,8 @@ namespace GitCourseUpdater
 				repoDirName = GetExistingRepoFolderName();
 				if (repoDirName == null)
 					return false;
-				var repoPath = Path.Combine(reposBaseDir, repoDirName);
-				repo = new Repository(repoPath);
+				var repoPath = reposBaseDir.GetSubdirectory(repoDirName);
+				repo = new Repository(repoPath.FullName);
 				if(HasUncommittedChanges())
 					throw new LibGit2SharpException($"Has uncommited changes in '{repoDirName}'");
 				FetchAll();
@@ -171,7 +184,7 @@ namespace GitCourseUpdater
 		
 		private string GetExistingRepoFolderName()
 		{
-			var names = new DirectoryInfo(reposBaseDir).GetDirectories(Url2Name() + "@*").Select(d => d.Name).ToList();
+			var names = reposBaseDir.GetDirectories(Url2Name() + "@*").Select(d => d.Name).ToList();
 			if (names.Count == 0)
 				return null;
 			return names.Max();
@@ -181,10 +194,10 @@ namespace GitCourseUpdater
 		private void Clone()
 		{
 			repoDirName = Url2Name() + "@" + DateTime.Now.ToSortable();
-			var repoPath = Path.Combine(reposBaseDir, repoDirName);
+			var repoPath = reposBaseDir.GetSubdirectory(repoDirName);
 			logger.Information($"Start clone '{url}' into '{repoDirName}'");
-			Repository.Clone(url, repoPath, new CloneOptions { CredentialsProvider = credentialsHandler });
-			repo = new Repository(repoPath);
+			Repository.Clone(url, repoPath.FullName, new CloneOptions { CredentialsProvider = credentialsHandler });
+			repo = new Repository(repoPath.FullName);
 			logger.Information($"Successfully clone '{url}' into '{repoDirName}'");
 		}
 

@@ -754,6 +754,10 @@
     <Compile Include="Migrations\201904250906053_CourseVersionGit.Designer.cs">
       <DependentUpon>201904250906053_CourseVersionGit.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201904260821479_CourseVersion_PathToCourseXml.cs" />
+    <Compile Include="Migrations\201904260821479_CourseVersion_PathToCourseXml.Designer.cs">
+      <DependentUpon>201904260821479_CourseVersion_PathToCourseXml.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -1179,6 +1183,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201904250906053_CourseVersionGit.resx">
       <DependentUpon>201904250906053_CourseVersionGit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201904260821479_CourseVersion_PathToCourseXml.resx">
+      <DependentUpon>201904260821479_CourseVersion_PathToCourseXml.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

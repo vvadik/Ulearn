@@ -67,6 +67,8 @@ namespace Ulearn.Core.Configuration
 		public string ExerciseStudentZipsDirectory { get; set; }
 		
 		public CertificateConfiguration Certificates { get; set; }
+		
+		public string CourseReposDirectory { get; set; }
 
 		public string GraphiteServiceName { get; set; }
 		
@@ -93,6 +95,7 @@ namespace Ulearn.Core.Configuration
 	public class GitConfiguration
 	{
 		public GitWebhookConfiguration Webhook { get; set; }
+		public string DeployKeyPassphrase { get; set; }
 	}
 
 	public class GitWebhookConfiguration

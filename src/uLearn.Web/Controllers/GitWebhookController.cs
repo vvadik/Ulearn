@@ -6,10 +6,11 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Web.Http;
 using System.Threading.Tasks;
-using System.Web.Configuration;
 using System.Web.Mvc;
+using Database;
 using log4net;
 using Newtonsoft.Json;
+using Ulearn.Core;
 using Ulearn.Core.Configuration;
 
 namespace uLearn.Web.Controllers
@@ -19,11 +20,18 @@ namespace uLearn.Web.Controllers
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(GitWebhookController));
 		
+		private readonly CourseManager courseManager;
 		private readonly string githubSecret;
 		private readonly string gitlabSecret;
 		
 		public GitWebhookController()
+			: this(WebCourseManager.Instance)
 		{
+		}
+		
+		public GitWebhookController(CourseManager courseManager)
+		{
+			this.courseManager = courseManager;
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 			githubSecret = configuration.Git.Webhook.Github.Secret;
 			gitlabSecret = configuration.Git.Webhook.Gitlab.Secret;
@@ -86,7 +94,8 @@ namespace uLearn.Web.Controllers
 		private async Task UpdateRepo(string url)
 		{
 			log.Info($"Git webhook push event url '{url}'");
-			throw new NotImplementedException();
+			var adminController = new AdminController();
+			await adminController.UploadCourse(url).ConfigureAwait(false);
 		}
 		
 		private bool IsValidGithubRequest(string payload, string eventName, string signatureWithPrefix)
@@ -127,7 +136,7 @@ namespace uLearn.Web.Controllers
 			return false;
 		}
 
-		public static string ToHexString(byte[] bytes)
+		private static string ToHexString(byte[] bytes)
 		{
 			var builder = new StringBuilder(bytes.Length * 2);
 			foreach (byte b in bytes)
