@@ -24,7 +24,7 @@ class CommentsView extends Component {
 	}
 
 	static defaultProps = {
-		commentsApi: api.comments
+		commentsApi: api.comments,
 	};
 
 	componentDidMount() {
@@ -68,6 +68,7 @@ class CommentsView extends Component {
 					<CommentsList
 						slideType={slideType}
 						handleInstructorsCommentCount={this.handleInstructorsCommentCount}
+						handleTabChange={this.handleTabChange}
 						headerRef={this.headerRef}
 						forInstructors={this.state.activeTab === TABS.instructorsComments}
 						commentsApi={commentsApi}
@@ -93,7 +94,7 @@ class CommentsView extends Component {
 				</div>
 				{this.isInstructor(userRoles) &&
 				<div className={styles.tabs}>
-					<Tabs value={activeTab} onChange={this.handleTabChange}>
+					<Tabs value={activeTab} onChange={(e, id)=> this.handleTabChange(id, true)}>
 						<Tabs.Tab id={TABS.allComments}>К слайду</Tabs.Tab>
 						<Tabs.Tab id={TABS.instructorsComments}>
 							Для преподавателей
@@ -120,14 +121,15 @@ class CommentsView extends Component {
 			userRoles.courseRole === ROLES.instructor;
 	}
 
-	handleTabChange = (_, id) => {
+	handleTabChange = (id, isUserAction) => {
 		if (id !== this.state.activeTab) {
 			this.setState({
 				activeTab: id,
 			});
+		}
 
-			window.history.pushState ? window.history.pushState({}, "", window.location.pathname) :
-				window.location.hash = "";
+		if (isUserAction) {
+			window.history.pushState("", document.title, window.location.pathname + window.location.search);
 		}
 	};
 

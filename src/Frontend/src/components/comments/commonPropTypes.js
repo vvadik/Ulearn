@@ -33,10 +33,18 @@ export const commentPolicy = shape({
 	status: string,
 });
 
+export const group = shape({
+	id: number,
+	name: string,
+	apiUrl: string,
+	isArchived: bool,
+});
+
 export const comment = shape({
 	id: number.isRequired,
 	author: userType.isRequired,
 	text: string,
+	authorGroups: arrayOf(group),
 	renderedText: string,
 	publishTime: string,
 	isApproved: bool,

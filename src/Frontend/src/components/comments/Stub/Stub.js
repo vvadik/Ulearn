@@ -22,10 +22,10 @@ function Stub(props) {
 				Оставлять комментарии могут только зарегистрированные пользователи
 			</span>
 			<Gapped gap={10} vertical>
-				<Link href={urlToEnter}>Войти</Link>
+				<Link href={urlToEnter}>Зарегистрироваться</Link>
 				<Link href={urlToRegister}>
 					<Button width={200} use="primary" size="large" type="button" align="center">
-						Зарегистрироваться</Button>
+						Войти</Button>
 				</Link>
 			</Gapped>
 		</div>
