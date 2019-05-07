@@ -55,7 +55,8 @@ const GroupMark = ({url, groups}) => (
 					{groups.map(group =>
 						<div key={group.id} className={`${styles.mark} ${styles.group} ${group.isArchived && styles.archiveGroup}`}>
 							<Icon name="People" size={15} />
-							<a href={`${url}${group.apiUrl}`} className={`${styles.text} ${styles.groupName}`}>
+							<a href={group.apiUrl && `${url}${group.apiUrl}`}
+							   className={`${styles.text} ${styles.groupName}`}>
 								{group.name}
 							</a>
 						</div>)}
@@ -71,10 +72,18 @@ const GroupMark = ({url, groups}) => (
 					<MenuHeader>Группы</MenuHeader>
 					<MenuSeparator />
 					{groups.map(group => !group.isArchived &&
-						<MenuItem key={group.id} link href={`${url}${group.apiUrl}`}>{group.name}</MenuItem>)}
+						<MenuItem
+							key={group.id}
+							href={group.apiUrl && `${url}${group.apiUrl}`}>
+							{group.name}
+						</MenuItem>)}
 					<MenuSeparator />
 					{groups.map(group => group.isArchived &&
-						<MenuItem key={group.id} link href={`${url}${group.apiUrl}`}>{group.name}</MenuItem>)}
+						<MenuItem
+							key={group.id}
+							href={group.apiUrl && `${url}${group.apiUrl}`}>
+							{group.name}
+						</MenuItem>)}
 				</TooltipMenu>
 			</div>
 		</>
