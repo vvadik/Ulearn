@@ -84,11 +84,20 @@ namespace uLearn.Web.Controllers
 			
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 			reposDirectory = CourseManager.GetCoursesDirectory().GetSubdirectory("Repos");
-			var keysDirectory = new DirectoryInfo(Path.Combine(Utils.GetAppPath(), @"\..\git_deploy_keys\"));
+			var keysDirectory = GetKeysDirectory(configuration);
 			publicKeyFileInfo = keysDirectory.GetFile("git_deploy_key.pub");
 			privateKeyFileInfo = keysDirectory.GetFile("git_deploy_key");
 			passphrase = configuration.Git.DeployKeyPassphrase;
 			serilogLogger = new LoggerConfiguration().WriteTo.Log4Net().CreateLogger();
+		}
+		
+		private static DirectoryInfo GetKeysDirectory(UlearnConfiguration configuration)
+		{
+			var keysDirectory = configuration.KeysDirectory;
+			if (string.IsNullOrEmpty(keysDirectory))
+				keysDirectory = Utils.GetAppPath() + @"\..\git_deploy_keys\";
+
+			return new DirectoryInfo(keysDirectory);
 		}
 
 		public ActionResult Courses(string courseId = null, string courseTitle = null)
@@ -223,7 +232,7 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Diagnostics", new { courseId, versionId });
 		}
 		
-		public async Task UploadCourse(string repoUrl)
+		public async Task UploadCourseWithGit(string repoUrl)
 		{
 			var courses = courseManager.GetCourses().Where(c => c.Settings.RepoUrl == repoUrl).ToList();
 			if (courses.Count == 0)
@@ -236,7 +245,7 @@ namespace uLearn.Web.Controllers
 			{
 				foreach (var course in courses)
 				{
-					var zip = git.GetCurrentStateAsZip(course.Settings.PathToCourseXml);
+					var zip = git.GetCurrentStateAsZip(course.Settings.PathToCourseXmlInRepo);
 					var commitInfo = git.GetCurrentCommitInfo();
 					var hasChanges = true;
 					if (courses.Count > 1)
@@ -244,7 +253,7 @@ namespace uLearn.Web.Controllers
 						var publishedVersion = coursesRepo.GetPublishedCourseVersion(course.Id);
 						if (publishedVersion?.CommitHash != null)
 						{
-							var changedFiles = git.GetChangedFiles(publishedVersion.CommitHash, commitInfo.Hash, course.Settings.PathToCourseXml);
+							var changedFiles = git.GetChangedFiles(publishedVersion.CommitHash, commitInfo.Hash, course.Settings.PathToCourseXmlInRepo);
 							hasChanges = changedFiles?.Any() ?? true;
 						}
 					}
@@ -255,18 +264,35 @@ namespace uLearn.Web.Controllers
 		}
 		
 		[HttpPost]
+		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
-		public async Task UploadCourse(string courseId, string repoUrl, [CanBeNull]string commitHashOrBranchName)
+		public async Task<ActionResult> UploadCourseWithGit(string courseId, string repoUrl, [CanBeNull]string commitHashOrBranchName)
 		{
 			var course = courseManager.GetCourse(courseId);
+			byte[] zip;
+			CommitInfo commitInfo;
 			using (IGitRepo git = new GitRepo(repoUrl, reposDirectory, publicKeyFileInfo, privateKeyFileInfo, passphrase, serilogLogger))
 			{
 				if(!string.IsNullOrEmpty(commitHashOrBranchName))
 					git.Checkout(commitHashOrBranchName);
-				var zip = git.GetCurrentStateAsZip(course.Settings.PathToCourseXml);
-				var commitInfo = git.GetCurrentCommitInfo();
-				await UploadCourse(course.Id, zip.ToArray(), repoUrl, commitInfo).ConfigureAwait(false);
+				zip = git.GetCurrentStateAsZip(course.Settings.PathToCourseXmlInRepo).ToArray();
+				commitInfo = git.GetCurrentCommitInfo();
 			}
+			var (versionId, error) = await UploadCourse(course.Id, zip, repoUrl, commitInfo).ConfigureAwait(false);
+			if (error != null)
+			{
+				var errorMessage = error.Message.ToLowerFirstLetter();
+				while (error.InnerException != null)
+				{
+					errorMessage += $"\n\n{error.InnerException.Message}";
+					error = error.InnerException;
+				}
+
+				return RedirectToAction("Packages", new { courseId, error=errorMessage });
+			}
+			
+			return RedirectToAction("Diagnostics", new { courseId, versionId });
 		}
 
 		private async Task<(Guid versionId, Exception error)> UploadCourse(string courseId, byte[] content,
@@ -290,7 +316,7 @@ namespace uLearn.Web.Controllers
 			
 			var userId = User.Identity.GetUserId();
 			await coursesRepo.AddCourseVersion(courseId, versionId, userId,
-				updatedCourse.Settings.PathToCourseXml, updatedCourse.Settings.RepoUrl ?? repoUrl, commitInfo?.Hash, commitInfo?.Message);
+				updatedCourse.Settings.PathToCourseXmlInRepo, updatedCourse.Settings.RepoUrl ?? repoUrl, commitInfo?.Hash, commitInfo?.Message);
 			await NotifyAboutCourseVersion(courseId, versionId, userId);
 
 			try

@@ -7,10 +7,8 @@ using System.Text;
 using System.Web.Http;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using Database;
 using log4net;
 using Newtonsoft.Json;
-using Ulearn.Core;
 using Ulearn.Core.Configuration;
 
 namespace uLearn.Web.Controllers
@@ -20,18 +18,11 @@ namespace uLearn.Web.Controllers
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(GitWebhookController));
 		
-		private readonly CourseManager courseManager;
 		private readonly string githubSecret;
 		private readonly string gitlabSecret;
 		
 		public GitWebhookController()
-			: this(WebCourseManager.Instance)
 		{
-		}
-		
-		public GitWebhookController(CourseManager courseManager)
-		{
-			this.courseManager = courseManager;
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 			githubSecret = configuration.Git.Webhook.Github.Secret;
 			gitlabSecret = configuration.Git.Webhook.Gitlab.Secret;
@@ -95,7 +86,7 @@ namespace uLearn.Web.Controllers
 		{
 			log.Info($"Git webhook push event url '{url}'");
 			var adminController = new AdminController();
-			await adminController.UploadCourse(url).ConfigureAwait(false);
+			await adminController.UploadCourseWithGit(url).ConfigureAwait(false);
 		}
 		
 		private bool IsValidGithubRequest(string payload, string eventName, string signatureWithPrefix)

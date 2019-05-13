@@ -68,7 +68,7 @@ namespace Ulearn.Core.Extensions
 			if (course.Settings.DictionaryFile == null)
 				return null;
 			
-			var file = Path.Combine(course.Directory.FullName, course.Settings.DictionaryFile);
+			var file = Path.Combine(course.CourseXmlDirectory.FullName, course.Settings.DictionaryFile);
 			return File.Exists(file) ? file : null;
 		}
 	}

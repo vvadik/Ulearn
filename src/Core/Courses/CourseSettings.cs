@@ -42,9 +42,8 @@ namespace Ulearn.Core.Courses
 		[XmlElement("repoUrl")]
 		public string RepoUrl { get; set; } // Адрес репозитория по аналогии с git@github.com:vorkulsky/git_test.git
 
-		
-		[XmlElement("pathToCourseXml")]
-		public string PathToCourseXml { get; set; } // Путь внутри репозитория до course
+		[XmlElement("pathToCourseXmlInRepo")]
+		public string PathToCourseXmlInRepo { get; set; } // Путь внутри репозитория до course
 		
 		public static CourseSettings DefaultSettings => new CourseSettings(
 			null,

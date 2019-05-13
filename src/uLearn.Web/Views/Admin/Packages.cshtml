@@ -1,5 +1,6 @@
 ﻿@using uLearn.Web.Extensions
 @using Ulearn.Common.Extensions
+@using GitCourseUpdater
 @model uLearn.Web.Controllers.PackagesViewModel
 
 @{
@@ -35,6 +36,13 @@
 		<input type="file" data-filename-placement="inside" class="btn" name="file" title="Выбрать архив с курсом" />
 		<input type="submit" class="btn btn-success" value="Загрузить"/>
 	}
+	@using (Html.BeginForm("UploadCourseWithGit", "Admin", new { Model.CourseId }, FormMethod.Post, new { @class = "form-inline" }))
+	{
+		@Html.AntiForgeryToken()
+		<input type="text" class="form-control" name="repoUrl" value="@(Model.PublishedVersion.RepoUrl)" placeholder="@("git@*.git")"/>
+		<input type="text" class="form-control" name="commitHashOrBranchName" value="master" placeholder="Ветка или hash"/>
+		<input type="submit" class="btn btn-success" value="загрузить"/>
+	}
 
 	@if (Model.Versions.Count > 0)
 	{
@@ -59,6 +67,11 @@
 						</div>
 
 						<div class="courses-versions__actions">
+							@if (version.RepoUrl != null && version.CommitHash != null) {
+								<a href="@GitUtils.RepoUrlToBrowserLink(version.RepoUrl, version.CommitHash)" target="_blank">
+									<span class="glyphicon glyphicon-list-alt"></span>
+								</a>
+							}
 							<a href="@Url.Action("DownloadVersion", new { Model.CourseId, versionId = version.Id })">
 								<span class="glyphicon glyphicon-download-alt"></span>
 							</a>

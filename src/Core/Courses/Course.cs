@@ -11,18 +11,18 @@ namespace Ulearn.Core.Courses
 {
 	public class Course : ICourse
 	{
-		public Course(string id, List<Unit> units, CourseSettings settings, DirectoryInfo directory)
+		public Course(string id, List<Unit> units, CourseSettings settings, DirectoryInfo courseXmlDirectory)
 		{
 			Id = id;
 			Units = units;
 			Settings = settings;
-			Directory = directory;
+			CourseXmlDirectory = courseXmlDirectory;
 		}
 
 		public string Id { get; set; }
 		public string Title => Settings.Title;
 		public CourseSettings Settings { get; private set; }
-		public DirectoryInfo Directory { get; private set; }
+		public DirectoryInfo CourseXmlDirectory { get; private set; }
 		public List<Unit> Units { get; private set; }
 
 		private List<Slide> slidesCache { get; set; }

@@ -68,8 +68,8 @@ namespace Ulearn.Core.Configuration
 		
 		public CertificateConfiguration Certificates { get; set; }
 		
-		public string CourseReposDirectory { get; set; }
-
+		public string KeysDirectory { get; set; }
+		
 		public string GraphiteServiceName { get; set; }
 		
 		public GitConfiguration Git { get; set; }

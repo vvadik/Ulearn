@@ -36,7 +36,7 @@ namespace GitCourseUpdater
 		private ILogger logger;
 		private static object @lock = new object(); // Потокобезопасность не гарантируется библиотекой libgit2
 
-		// url example ssh://git@github.com:user/myrepo.git
+		// url example git@github.com:user/myrepo.git
 		public GitRepo(string url, DirectoryInfo reposBaseDir, FileInfo publicKeyPath, FileInfo privateKeyPath, string privateKeyPassphrase, ILogger logger)
 		{
 			this.url = url;
@@ -70,7 +70,7 @@ namespace GitCourseUpdater
 			var dir = reposBaseDir.GetSubdirectory(repoDirName).FullName;
 			dir = courseSubdirectoryInRepo == null ? dir : Path.Combine(dir, courseSubdirectoryInRepo);
 			var zip = ZipHelper.CreateFromDirectory(dir, CompressionLevel.Optimal, false, Encoding.UTF8,
-				s => s.StartsWith(".git"));
+				s => !s.StartsWith(".git"));
 			logger.Information($"Successfully load '{repoDirName}' to zip");
 			return zip;
 		}
