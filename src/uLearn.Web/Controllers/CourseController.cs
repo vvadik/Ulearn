@@ -1,6 +1,7 @@
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using Elmah;
+using GitCourseUpdater;
 using log4net;
 using LtiLibrary.Owin.Security.Lti;
 using uLearn.Web.Extensions;
@@ -21,7 +23,6 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
-using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Courses.Slides.Quizzes;
@@ -293,9 +294,20 @@ namespace uLearn.Web.Controllers
 				ManualChecking = manualChecking,
 				ContextManualCheckingUserGroups = manualChecking != null ? groupsRepo.GetUserGroupsNamesAsString(course.Id, manualChecking.UserId, User) : "",
 				ContextManualCheckingUserArchivedGroups = manualChecking != null ? groupsRepo.GetUserGroupsNamesAsString(course.Id, manualChecking.UserId, User, onlyArchived: true) : "",
-				IsGuest = false
+				IsGuest = false,
+				SlideEditUrl = GetGitEditLink(course, slide.Info.SlideFile)
 			};
 			return model;
+		}
+
+		// returns null if user can't edit git
+		private string GetGitEditLink(Course course, FileInfo pageFile)
+		{
+			var canEditGit = User.HasAccessFor(course.Id, CourseRole.CourseAdmin);
+			if (!canEditGit || course.Settings.RepoUrl == null)
+				return null;
+			var pathRelative2CourseXml = pageFile.FullName.Substring(course.CourseXmlDirectory.FullName.Length + 1);
+			return GitUtils.GetSlideEditLink(course.Settings.RepoUrl, course.Settings.PathToCourseXmlInRepo, pathRelative2CourseXml);
 		}
 
 		private int GetMaxSlideScoreForUser(Course course, Slide slide, string userId)
@@ -456,7 +468,8 @@ namespace uLearn.Web.Controllers
 			var instructorNote = course.GetUnitById(unitId).InstructorNote;
 			if (instructorNote == null)
 				return HttpNotFound("No instructor note for this unit");
-			return View(new IntructorNoteModel(courseId, instructorNote));
+			var gitEditUrl = GetGitEditLink(course, instructorNote.File);
+			return View(new IntructorNoteModel(courseId, instructorNote, gitEditUrl));
 		}
 
 		[HttpPost]

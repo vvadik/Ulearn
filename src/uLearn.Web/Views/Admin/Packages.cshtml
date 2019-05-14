@@ -68,7 +68,7 @@
 
 						<div class="courses-versions__actions">
 							@if (version.RepoUrl != null && version.CommitHash != null) {
-								<a href="@GitUtils.RepoUrlToBrowserLink(version.RepoUrl, version.CommitHash)" target="_blank">
+								<a href="@GitUtils.RepoUrlToCommitLink(version.RepoUrl, version.CommitHash)" target="_blank">
 									<span class="glyphicon glyphicon-list-alt"></span>
 								</a>
 							}

@@ -17,5 +17,6 @@ namespace uLearn.Web.Models
 		public string ContextManualCheckingUserArchivedGroups { get; set; }		
 		public bool IsGuest { get; set; }
 		public string Error { get; set; }
+		public string SlideEditUrl { get; set; }
 	}
 }
