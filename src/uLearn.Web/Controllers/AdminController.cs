@@ -204,13 +204,14 @@ namespace uLearn.Web.Controllers
 			await notificationsRepo.AddNotification(courseId, notification, userId);
 		}
 		
-		private async Task NotifyAboutCourseUploadFromRepoError(string courseId, string commitHash, string userId)
+		private async Task NotifyAboutCourseUploadFromRepoError(string courseId, string commitHash)
 		{
 			var notification = new NotUploadedPackageNotification
 			{
 				CommitHash = commitHash,
 			};
-			await notificationsRepo.AddNotification(courseId, notification, userId);
+			var bot = usersRepo.GetUlearnBotUser();
+			await notificationsRepo.AddNotification(courseId, notification, bot.Id);
 		}
 
 		[HttpPost]
@@ -271,7 +272,7 @@ namespace uLearn.Web.Controllers
 					{
 						var (_, error) = await UploadCourse(course.Id, zip.ToArray(), repoUrl, commitInfo).ConfigureAwait(false);
 						if (error != null)
-							await NotifyAboutCourseUploadFromRepoError(course.Id, commitInfo.Hash, User.Identity.GetUserId());
+							await NotifyAboutCourseUploadFromRepoError(course.Id, commitInfo.Hash);
 					}
 				}
 			}
