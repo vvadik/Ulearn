@@ -203,6 +203,15 @@ namespace uLearn.Web.Controllers
 			};
 			await notificationsRepo.AddNotification(courseId, notification, userId);
 		}
+		
+		private async Task NotifyAboutCourseUploadFromRepoError(string courseId, string commitHash, string userId)
+		{
+			var notification = new NotUploadedPackageNotification
+			{
+				CommitHash = commitHash,
+			};
+			await notificationsRepo.AddNotification(courseId, notification, userId);
+		}
 
 		[HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
@@ -257,8 +266,13 @@ namespace uLearn.Web.Controllers
 							hasChanges = changedFiles?.Any() ?? true;
 						}
 					}
-					if(hasChanges)
-						await UploadCourse(course.Id, zip.ToArray(), repoUrl, commitInfo).ConfigureAwait(false);
+
+					if (hasChanges)
+					{
+						var (_, error) = await UploadCourse(course.Id, zip.ToArray(), repoUrl, commitInfo).ConfigureAwait(false);
+						if (error != null)
+							await NotifyAboutCourseUploadFromRepoError(course.Id, commitInfo.Hash, User.Identity.GetUserId());
+					}
 				}
 			}
 		}

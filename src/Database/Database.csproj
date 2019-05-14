@@ -758,6 +758,10 @@
     <Compile Include="Migrations\201904260821479_CourseVersion_PathToCourseXml.Designer.cs">
       <DependentUpon>201904260821479_CourseVersion_PathToCourseXml.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201905140908335_AddNotUploadedPackageNotification.cs" />
+    <Compile Include="Migrations\201905140908335_AddNotUploadedPackageNotification.Designer.cs">
+      <DependentUpon>201905140908335_AddNotUploadedPackageNotification.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -1186,6 +1190,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201904260821479_CourseVersion_PathToCourseXml.resx">
       <DependentUpon>201904260821479_CourseVersion_PathToCourseXml.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905140908335_AddNotUploadedPackageNotification.resx">
+      <DependentUpon>201905140908335_AddNotUploadedPackageNotification.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

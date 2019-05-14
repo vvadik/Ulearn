@@ -254,6 +254,11 @@ namespace Database.Models
 		[MinCourseRole(CourseRoleType.CourseAdmin)]
 		[IsEnabledByDefault(true)]
 		CourseExportedToStepik = 205,
+
+		[Display(Name = @"Ошибка загрузки новой версии курса", GroupName = @"Ошибки загрузки новых версиий курса")]
+		[MinCourseRole(CourseRoleType.CourseAdmin)]
+		[IsEnabledByDefault(true)]
+		NotUploadedPackage = 206,
 	}
 
 	public static class NotificationTypeExtensions
@@ -1442,11 +1447,6 @@ namespace Database.Models
 
 	public abstract class AbstractPackageNotification : Notification
 	{
-		[Required]
-		public Guid CourseVersionId { get; set; }
-
-		public virtual CourseVersion CourseVersion { get; set; }
-		
 		protected static string GetPackagesUrl(Course course, string baseUrl)
 		{
 			return baseUrl + $"/Admin/Packages?courseId={course.Id.EscapeHtml()}";
@@ -1461,6 +1461,11 @@ namespace Database.Models
 	[NotificationType(NotificationType.UploadedPackage)]
 	public class UploadedPackageNotification : AbstractPackageNotification
 	{
+		[Required]
+		public Guid CourseVersionId { get; set; }
+
+		public virtual CourseVersion CourseVersion { get; set; }
+		
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
 			return $"Загружена новая версия курса <b>«{course.Title.EscapeHtml()}»</b>. Теперь её можно опубликовать.";
@@ -1482,10 +1487,44 @@ namespace Database.Models
 			return true;
 		}
 	}
+	
+	[NotificationType(NotificationType.NotUploadedPackage)]
+	public class NotUploadedPackageNotification : AbstractPackageNotification
+	{
+		[Required]
+		[Column("NotUploadedPackageNotification_CommitHash")]
+		public string CommitHash { get; set; }
+
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
+		{
+			return $"Ошибка загрузки новой версии курса <b>«{course.Title.EscapeHtml()}»</b>. Коммит {CommitHash}.";
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
+		{
+			return $"Ошибка загрузки новой версии курса «{course.Title.EscapeHtml()}». Коммит {CommitHash}.";
+		}
+
+		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
+		{
+			var courseRoleUsersFilter = serviceProvider.GetService<ICourseRoleUsersFilter>();
+			return courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.CourseAdmin, CourseId);
+		}
+
+		public override bool IsActual()
+		{
+			return true;
+		}
+	}
 
 	[NotificationType(NotificationType.PublishedPackage)]
 	public class PublishedPackageNotification : AbstractPackageNotification
 	{
+		[Required]
+		public Guid CourseVersionId { get; set; }
+
+		public virtual CourseVersion CourseVersion { get; set; }
+		
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
 			return $"Опубликована новая версия курса <b>«{course.Title.EscapeHtml()}»</b>.<br/><br/>" +

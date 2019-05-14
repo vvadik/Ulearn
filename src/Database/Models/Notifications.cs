@@ -260,6 +260,11 @@ namespace Database.Models
 		[MinCourseRole(CourseRole.CourseAdmin)]
 		[IsEnabledByDefault(true)]
 		CourseExportedToStepik = 205,
+		
+		[Display(Name = @"Ошибка загрузки новой версии курса", GroupName = @"Ошибки загрузки новых версиий курса")]
+		[MinCourseRole(CourseRole.CourseAdmin)]
+		[IsEnabledByDefault(true)]
+		NotUploadedPackage = 206,
 	}
 
 	public static class NotificationTypeExtensions
@@ -1446,6 +1451,34 @@ namespace Database.Models
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
 			return $"Загружена новая версия курса «{course.Title.EscapeHtml()}». Теперь её можно опубликовать.";
+		}
+
+		public override List<string> GetRecipientsIds(ULearnDb db)
+		{
+			return new UserRolesRepo(db).GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, CourseId);
+		}
+
+		public override bool IsActual()
+		{
+			return true;
+		}
+	}
+	
+	[NotificationType(NotificationType.NotUploadedPackage)]
+	public class NotUploadedPackageNotification : AbstractPackageNotification
+	{
+		[Required]
+		[Column("NotUploadedPackageNotification_CommitHash")]
+		public string CommitHash { get; set; }
+
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
+		{
+			return $"Ошибка загрузки новой версии курса <b>«{course.Title.EscapeHtml()}»</b>. Коммит {CommitHash}.";
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
+		{
+			return $"Ошибка загрузки новой версии курса «{course.Title.EscapeHtml()}». Коммит {CommitHash}.";
 		}
 
 		public override List<string> GetRecipientsIds(ULearnDb db)

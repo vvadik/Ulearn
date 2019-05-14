@@ -51,4 +51,5 @@ VALUES
 ('20190311111649_AddCourseFiles', '2.2.0-rtm-35687'),
 ('20190329125346_AddCertificateTemplateArchive', '2.2.0-rtm-35687'),
 ('20190425091311_CourseVersionGit', '2.2.0-rtm-35687'),
-('20190426082348_CourseVersion_PathToCourseXml', '2.2.0-rtm-35687')
+('20190426082348_CourseVersion_PathToCourseXml', '2.2.0-rtm-35687'),
+('20190514091028_AddNotUploadedPackageNotification', '2.2.0-rtm-35687')
