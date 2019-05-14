@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { userType, userRoles, commentPolicy } from "../commonPropTypes";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
+import { TABS } from "../../../consts/general";
 import * as debounce from "debounce";
 import Icon from "@skbkontur/react-icons";
 import Loader from "@skbkontur/react-ui/components/Loader/Loader";
@@ -38,48 +39,106 @@ class CommentsList extends Component {
 		};
 
 		this.lastThreadRef = React.createRef();
+		this.commentsListRef = React.createRef();
 
 		this.debouncedSendData = debounce(this.sendData, 300);
 	}
 
 	componentDidMount() {
-		const {courseId, slideId, forInstructors} = this.props;
+		const { courseId, slideId, forInstructors } = this.props;
+		this.loadComments(courseId, slideId, forInstructors)
+			.then(() => {
+				if (window.location.hash.includes("#comment")) {
+					this.handleScrollToCommentByHashFormUrl();
+				}
+			});
 
-		this.loadComments(courseId, slideId, forInstructors);
+		window.addEventListener("hashchange", this.handleScrollToCommentByHashFormUrl);
 	};
+
+	componentWillUnmount() {
+		window.removeEventListener("hashchange", this.handleScrollToCommentByHashFormUrl);
+	}
+
+	get commentIds() {
+		const {threads} = this.state;
+		const commentIds = [];
+
+		for (let i = 0; i < threads.length; i++) {
+			const thread = threads[i];
+			commentIds.push(thread.id);
+
+			if (!thread.replies) continue;
+
+			for (let j = 0; j < thread.replies.length; j++) {
+				const reply = thread.replies[j];
+				commentIds.push(reply.id);
+			}
+		}
+
+		return commentIds;
+	}
 
 	loadComments = (courseId, slideId, forInstructors) => {
 		if (this.state.loadingComments) {
 			return;
 		}
 
-		this.setState({
+		this.setStateIfMounted({
 			loadingComments: true,
 		});
 
-		this.props.commentsApi.getComments(courseId, slideId, forInstructors)
+		 const commentsApiRequest = this.props.commentsApi.getComments(courseId, slideId, forInstructors)
 			.then(json => {
 				const comments = json.topLevelComments;
-				this.setState({
+				this.setStateIfMounted({
 					threads: comments,
 					loadingComments: false,
 				});
-			})
+				return comments;
+			});
+
+		 commentsApiRequest
 			.catch(() => {
-				this.setState({
+				this.setStateIfMounted({
 					status: "error",
 				});
 			})
 			.finally(() => {
-				this.setState({
+				this.setStateIfMounted({
 					loadingComments: false,
-				})
+				});
 			});
+
+		 return commentsApiRequest;
+	};
+
+	setStateIfMounted(updater, callback) {
+		if (this.commentsListRef.current) {
+			this.setState(updater, callback);
+		}
+	}
+
+	handleScrollToCommentByHashFormUrl = () => {
+		const {courseId, slideId, forInstructors, handleTabChange} = this.props;
+
+		if (window.location.hash.includes("#comment")) {
+			const startIndex = window.location.hash.indexOf('-') + 1;
+			const commentIdFromHash = +window.location.hash.slice(startIndex);
+			const nameChangesTab = forInstructors ? TABS.allComments : TABS.instructorsComments;
+
+			if (!this.commentIds.includes(commentIdFromHash)) {
+				this.loadComments(courseId, slideId, forInstructors);
+				if (!this.commentIds.includes(commentIdFromHash))
+					handleTabChange(nameChangesTab, false);
+			}
+		}
 	};
 
 	render() {
 		const {threads, loadingComments} = this.state;
 		const {user, courseId, slideId, commentPolicy} = this.props;
+		const replies = threads.reduce((sum, current) => sum + current.replies.length, 0);
 
 		if (this.state.status === "error") {
 			return <Error404 />;
@@ -90,7 +149,7 @@ class CommentsList extends Component {
 		}
 
 		return (
-			<>
+			<div ref={this.commentsListRef}>
 				{loadingComments ? <div className={styles.spacer}><Loader type="big" active={loadingComments} /></div> :
 					<>
 						{!user.id && <Stub hasThreads={threads.length > 0} courseId={courseId} slideId={slideId} />}
@@ -98,12 +157,12 @@ class CommentsList extends Component {
 						{this.renderSendForm()}
 						{this.renderThreads()}
 					</>}
-				{(commentPolicy.areCommentsEnabled && user.id && threads.length > 7) &&
+				{(commentPolicy.areCommentsEnabled && user.id && (threads.length + replies) > 7) &&
 				<button className={styles.sendButton} onClick={this.handleShowSendForm}>
 					<Icon name="CommentLite" color="#3072C4" />
 					<span className={styles.sendButtonText}>Оставить комментарий</span>
 				</button>}
-			</>
+			</div>
 		)
 	}
 
@@ -136,7 +195,7 @@ class CommentsList extends Component {
 
 	renderThreads() {
 		const {threads, commentEditing, reply, animation} = this.state;
-		const {user, userRoles, slideType, commentPolicy} = this.props;
+		const {user, userRoles, slideType, courseId, commentPolicy} = this.props;
 		const transitionStyles = {
 			enter: styles.enter,
 			exit: styles.exit,
@@ -178,6 +237,7 @@ class CommentsList extends Component {
 								user={user}
 								userRoles={userRoles}
 								slideType={slideType}
+								courseId={courseId}
 								animation={animation}
 								comment={comment}
 								commentPolicy={commentPolicy}

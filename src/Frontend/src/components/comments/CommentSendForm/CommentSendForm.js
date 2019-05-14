@@ -50,8 +50,7 @@ class CommentSendForm extends Component {
 						hasError={error !== null}
 						text={text}
 						handleChange={this.handleChange}
-						handleSubmit={this.handleSubmit}
-					>
+						handleSubmit={this.handleSubmit}>
 						<div className={styles.buttons}>
 							{this.renderSubmitButton()}
 							{this.renderCancelButton()}
