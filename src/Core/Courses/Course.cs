@@ -22,7 +22,7 @@ namespace Ulearn.Core.Courses
 		public string Id { get; set; }
 		public string Title => Settings.Title;
 		public CourseSettings Settings { get; private set; }
-		public DirectoryInfo CourseXmlDirectory { get; private set; }
+		public DirectoryInfo CourseXmlDirectory { get; set; } 
 		public List<Unit> Units { get; private set; }
 
 		private List<Slide> slidesCache { get; set; }
