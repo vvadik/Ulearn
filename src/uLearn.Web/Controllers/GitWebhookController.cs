@@ -30,7 +30,7 @@ namespace uLearn.Web.Controllers
 		
 		[System.Web.Http.HttpPost]
 		[System.Web.Http.Route("CoursesWebhook")]
-		public async Task<ActionResult> GithubWebhook()
+		public async Task<ActionResult> CoursesWebhook()
 		{
 			string githubEventName = null;
 			if (Request.Headers.TryGetValues("X-GitHub-Event", out var githubEventNames))
@@ -55,10 +55,14 @@ namespace uLearn.Web.Controllers
 				signature = signatures.FirstOrDefault();
 			var jsonContent = await Request.Content.ReadAsStringAsync().ConfigureAwait(false);
 			if (!IsValidGithubRequest(jsonContent, eventName, signature))
+			{
+				log.Warn($"Invalid github request eventName: '{eventName}' signature: '{signature}' jsonContent: {jsonContent}");
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+			}
 			var content = JsonConvert.DeserializeObject<GithubPushData>(jsonContent);
 			if (content.Ref != "refs/heads/master")
 				return new HttpStatusCodeResult(HttpStatusCode.OK);
+			log.Info("Json content of webhook request: " + jsonContent);
 			var url = content.Repository.SshUrl;
 			await UpdateRepo(url).ConfigureAwait(false);
 			return new HttpStatusCodeResult(HttpStatusCode.OK);
@@ -71,12 +75,16 @@ namespace uLearn.Web.Controllers
 			string token = null;
 			if (Request.Headers.TryGetValues("X-Gitlab-Token", out var signatures))
 				token = signatures.FirstOrDefault();
-			if (token != gitlabSecret)
-				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 			var jsonContent = await Request.Content.ReadAsStringAsync().ConfigureAwait(false);
+			if (token != gitlabSecret)
+			{
+				log.Warn($"Invalid gitlab request eventName: '{eventName}' token: '{token}' jsonContent: {jsonContent}");
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+			}
 			var content = JsonConvert.DeserializeObject<GitlabPushData>(jsonContent);
 			if (content.Ref != "refs/heads/master")
 				return new HttpStatusCodeResult(HttpStatusCode.OK);
+			log.Info("Json content of webhook request: " + jsonContent);
 			var url = content.Repository.SshUrl;
 			await UpdateRepo(url).ConfigureAwait(false);
 			return new HttpStatusCodeResult(HttpStatusCode.OK);

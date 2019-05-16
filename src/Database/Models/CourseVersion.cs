@@ -28,6 +28,7 @@ namespace Database.Models
 
 		public virtual ApplicationUser Author { get; set; }
 		
+		// Репозиторий, откуда взята эта версия, по аналогии с git@github.com:vorkulsky/git_test.git
 		public string RepoUrl { get; set; }
 
 		[StringLength(40)]

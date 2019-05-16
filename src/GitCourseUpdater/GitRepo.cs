@@ -10,6 +10,8 @@ using JetBrains.Annotations;
 using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
 using LibGit2Sharp.Ssh;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Serilog;
 using Ulearn.Common.Extensions;
 
@@ -78,7 +80,9 @@ namespace GitCourseUpdater
 		public CommitInfo GetCurrentCommitInfo()
 		{
 			var lastCommit = repo.Commits.First();
-			return ToCommitInfo(lastCommit);
+			var commitInfo = ToCommitInfo(lastCommit);
+			logger.Information($"GetCurrentCommitInfo '{repoDirName}': {JsonConvert.SerializeObject(commitInfo)}");
+			return commitInfo;
 		}
 		
 		[CanBeNull]

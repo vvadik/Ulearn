@@ -50,7 +50,7 @@
             <xs:element name="repoUrl" type="NonEmptyString" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">In `git@*.git` format. Enables autoloading of the course when pushing to the master of this repository</xs:documentation>
-                    <xs:documentation xml:lang="ru">В формате `git@*.git`. Если задан, включает автозагрузку курса на при push в master этого репозитория</xs:documentation>
+                    <xs:documentation xml:lang="ru">В формате `git@*.git`. Если задан, включает автозагрузку курса при push в master этого репозитория</xs:documentation>
                 </xs:annotation>
             </xs:element>
             <xs:element name="pathToCourseXmlInRepo" type="NonEmptyString" minOccurs="0" maxOccurs="1">

@@ -15,8 +15,8 @@
 		<div style="margin-bottom: 10px">
 			Текущая версия загружена <b title="@Model.LastUpdate.ToPrettyString()">@Model.LastUpdate.ToAgoPrettyString()</b>
 
-			@Html.ActionLink("Скачать опубликованную версию", "DownloadPackage", new { Model.CourseId }, new { @class = "btn btn-xs btn-primary", style = "margin-left: 10px" })
-			@Html.ActionLink("Скопировать курс на Степик", "ExportCourse", "Stepik", new { courseId = Model.CourseId }, new { @class = "btn btn-xs btn-warning" })
+			@Html.ActionLink("Скачать опубликованную версию", "DownloadPackage", new { courseId = Model.Course.Id }, new { @class = "btn btn-xs btn-primary", style = "margin-left: 10px" })
+			@Html.ActionLink("Скопировать курс на Степик", "ExportCourse", "Stepik", new { courseId = Model.Course.Id }, new { @class = "btn btn-xs btn-warning" })
 		</div>
 	}
 
@@ -31,15 +31,15 @@
             </p>
         </div>
     }
-    @using (Html.BeginForm("UploadCourse", "Admin", new { Model.CourseId }, FormMethod.Post, new { enctype = "multipart/form-data", style = "margin-bottom: 10px" }))
+    @using (Html.BeginForm("UploadCourse", "Admin", new { courseId = Model.Course.Id }, FormMethod.Post, new { enctype = "multipart/form-data", style = "margin-bottom: 10px" }))
 	{
 		<input type="file" data-filename-placement="inside" class="btn" name="file" title="Выбрать архив с курсом" />
 		<input type="submit" class="btn btn-success" value="Загрузить"/>
 	}
-	@using (Html.BeginForm("UploadCourseWithGit", "Admin", new { Model.CourseId }, FormMethod.Post, new { @class = "form-inline" }))
+	@using (Html.BeginForm("UploadCourseWithGit", "Admin", new { courseId = Model.Course.Id }, FormMethod.Post, new { @class = "form-inline" }))
 	{
 		@Html.AntiForgeryToken()
-		<input type="text" class="form-control" name="repoUrl" value="@(Model.PublishedVersion.RepoUrl)" placeholder="@("git@*.git")"/>
+		<input type="text" class="form-control" name="repoUrl" value="@(Model.Course.Settings.RepoUrl)" placeholder="@("git@*.git")"/>
 		<input type="text" class="form-control" name="commitHashOrBranchName" value="master" placeholder="Ветка или hash"/>
 		<input type="submit" class="btn btn-success" value="загрузить"/>
 	}
@@ -52,7 +52,7 @@
 			@foreach (var version in Model.Versions)
 			{
 				var isCurrentVersion = Model.PublishedVersion != null && version.Id == Model.PublishedVersion.Id;
-				<a href="@Url.Action("Diagnostics", new { Model.CourseId, versionId = version.Id })" class="no-underline @(isCurrentVersion ? "current" : "")">
+				<a href="@Url.Action("Diagnostics", new { courseId = Model.Course.Id, versionId = version.Id })" class="no-underline @(isCurrentVersion ? "current" : "")">
 					<div class="courses-versions__version @(isCurrentVersion ? "current" : "")">
 						@if (isCurrentVersion)
 						{
@@ -72,12 +72,12 @@
 									<span class="glyphicon glyphicon-list-alt"></span>
 								</a>
 							}
-							<a href="@Url.Action("DownloadVersion", new { Model.CourseId, versionId = version.Id })">
+							<a href="@Url.Action("DownloadVersion", new { courseId = Model.Course.Id, versionId = version.Id })">
 								<span class="glyphicon glyphicon-download-alt"></span>
 							</a>
 							@if (!isCurrentVersion)
 							{
-								using (Html.BeginForm("DeleteVersion", "Admin", new { Model.CourseId, versionId = version.Id }, FormMethod.Post))
+								using (Html.BeginForm("DeleteVersion", "Admin", new { courseId = Model.Course.Id, versionId = version.Id }, FormMethod.Post))
 								{
 									@Html.Hidden("__RequestVerificationToken")
 									<input type="submit" class="btn btn-xs btn-danger" value="&times;" title="Удалить"/>

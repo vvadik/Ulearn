@@ -225,8 +225,7 @@ namespace uLearn.Web.Controllers
 			if (fileName == null || !fileName.ToLower().EndsWith(".zip"))
 				return RedirectToAction("Packages", new { courseId });
 
-			var course = courseManager.GetCourse(courseId);
-			var (versionId, error) = await UploadCourse(courseId, file.InputStream.ToArray(), course.Settings.RepoUrl).ConfigureAwait(false);
+			var (versionId, error) = await UploadCourse(courseId, file.InputStream.ToArray(), User.Identity.GetUserId()).ConfigureAwait(false);
 			if (error != null)
 			{
 				var errorMessage = error.Message.ToLowerFirstLetter();
@@ -247,16 +246,19 @@ namespace uLearn.Web.Controllers
 			var courses = courseManager.GetCourses().Where(c => c.Settings.RepoUrl == repoUrl).ToList();
 			if (courses.Count == 0)
 			{
-				log.Warn($"Course with '{repoUrl}' is not expected");
+				log.Warn($"Repo '{repoUrl}' is not expected");
 				return;
 			}
 
+			log.Info($"Start update repo '{repoUrl}'");
+			var userId = usersRepo.GetUlearnBotUser().Id;
+			var infoForUpload = new List<(string, byte[], CommitInfo)>();
 			using (IGitRepo git = new GitRepo(repoUrl, reposDirectory, publicKeyFileInfo, privateKeyFileInfo, passphrase, serilogLogger))
 			{
+				var commitInfo = git.GetCurrentCommitInfo();
 				foreach (var course in courses)
 				{
 					var zip = git.GetCurrentStateAsZip(course.Settings.PathToCourseXmlInRepo);
-					var commitInfo = git.GetCurrentCommitInfo();
 					var hasChanges = true;
 					if (courses.Count > 1)
 					{
@@ -270,11 +272,21 @@ namespace uLearn.Web.Controllers
 
 					if (hasChanges)
 					{
-						var (_, error) = await UploadCourse(course.Id, zip.ToArray(), repoUrl, commitInfo).ConfigureAwait(false);
-						if (error != null)
-							await NotifyAboutCourseUploadFromRepoError(course.Id, commitInfo.Hash);
+						log.Info($"Course '{course.Id}' '{course.Title}' has changes in '{repoUrl}'");
+						infoForUpload.Add((course.Id, zip.ToArray(), commitInfo));
+					}
+					else
+					{
+						log.Info($"Course '{course.Id}' '{course.Title}' has changes in '{repoUrl}'");
 					}
 				}
+			}
+			foreach (var info in infoForUpload)
+			{
+				var (courseId, zip, commitInfo) = info;
+				var (_, error) = await UploadCourse(courseId, zip, userId, repoUrl, commitInfo).ConfigureAwait(false);
+				if (error != null)
+					await NotifyAboutCourseUploadFromRepoError(courseId, commitInfo.Hash).ConfigureAwait(false);
 			}
 		}
 		
@@ -294,7 +306,7 @@ namespace uLearn.Web.Controllers
 				zip = git.GetCurrentStateAsZip(course.Settings.PathToCourseXmlInRepo).ToArray();
 				commitInfo = git.GetCurrentCommitInfo();
 			}
-			var (versionId, error) = await UploadCourse(course.Id, zip, repoUrl, commitInfo).ConfigureAwait(false);
+			var (versionId, error) = await UploadCourse(course.Id, zip, User.Identity.GetUserId(), repoUrl, commitInfo).ConfigureAwait(false);
 			if (error != null)
 			{
 				var errorMessage = error.Message.ToLowerFirstLetter();
@@ -310,14 +322,14 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Diagnostics", new { courseId, versionId });
 		}
 
-		private async Task<(Guid versionId, Exception error)> UploadCourse(string courseId, byte[] content,
+		private async Task<(Guid versionId, Exception error)> UploadCourse(string courseId, byte[] content, string userId,
 			string repoUrl = null, CommitInfo commitInfo = null)
 		{
+			log.Info($"Start upload course '{courseId}'");
 			var versionId = Guid.NewGuid();
 
 			var destinationFile = courseManager.GetCourseVersionFile(versionId);
 			System.IO.File.WriteAllBytes(destinationFile.FullName, content);
-
 			Course updatedCourse;
 			try
 			{
@@ -326,14 +338,13 @@ namespace uLearn.Web.Controllers
 			}
 			catch (Exception e)
 			{
+				log.Info($"Upload course exception '{courseId}'", e);
 				return (versionId, e);
 			}
-			
-			var userId = User.Identity.GetUserId();
+			log.Info($"Successfully update course files '{courseId}'");
 			await coursesRepo.AddCourseVersion(courseId, versionId, userId,
-				updatedCourse.Settings.PathToCourseXmlInRepo, updatedCourse.Settings.RepoUrl ?? repoUrl, commitInfo?.Hash, commitInfo?.Message);
+				updatedCourse.Settings.PathToCourseXmlInRepo, repoUrl, commitInfo?.Hash, commitInfo?.Message);
 			await NotifyAboutCourseVersion(courseId, versionId, userId);
-
 			try
 			{
 				var courseVersions = coursesRepo.GetCourseVersions(courseId);
@@ -345,7 +356,6 @@ namespace uLearn.Web.Controllers
 			{
 				log.Warn("Error during delete previous unpublished versions", ex);
 			}
-
 			return (versionId, null);
 		}
 
@@ -376,11 +386,12 @@ namespace uLearn.Web.Controllers
 		{
 			var hasPackage = courseManager.HasPackageFor(courseId);
 			var lastUpdate = courseManager.GetLastWriteTime(courseId);
+			var course = courseManager.GetCourse(courseId);
 			var courseVersions = coursesRepo.GetCourseVersions(courseId).ToList();
 			var publishedVersion = coursesRepo.GetPublishedCourseVersion(courseId);
 			return View(model: new PackagesViewModel
 			{
-				CourseId = courseId,
+				Course = course,
 				HasPackage = hasPackage,
 				LastUpdate = lastUpdate,
 				Versions = courseVersions,
@@ -1434,7 +1445,7 @@ namespace uLearn.Web.Controllers
 
 	public class PackagesViewModel
 	{
-		public string CourseId { get; set; }
+		public Course Course { get; set; }
 		public bool HasPackage { get; set; }
 		public DateTime LastUpdate { get; set; }
 		public List<CourseVersion> Versions { get; set; }

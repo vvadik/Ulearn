@@ -40,7 +40,7 @@ namespace Ulearn.Core.Courses
 		public string DictionaryFile { get; set; }
 		
 		[XmlElement("repoUrl")]
-		public string RepoUrl { get; set; } // Адрес репозитория по аналогии с git@github.com:vorkulsky/git_test.git
+		public string RepoUrl { get; set; } // Репозиторий для вебхука по аналогии с git@github.com:vorkulsky/git_test.git
 
 		[XmlElement("pathToCourseXmlInRepo")]
 		public string PathToCourseXmlInRepo { get; set; } // Путь внутри репозитория до course
