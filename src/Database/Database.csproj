@@ -762,6 +762,10 @@
     <Compile Include="Migrations\201905140908335_AddNotUploadedPackageNotification.Designer.cs">
       <DependentUpon>201905140908335_AddNotUploadedPackageNotification.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201905160845235_AddRepoUrl2NotUploadedPackageNotification.cs" />
+    <Compile Include="Migrations\201905160845235_AddRepoUrl2NotUploadedPackageNotification.Designer.cs">
+      <DependentUpon>201905160845235_AddRepoUrl2NotUploadedPackageNotification.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -1193,6 +1197,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201905140908335_AddNotUploadedPackageNotification.resx">
       <DependentUpon>201905140908335_AddNotUploadedPackageNotification.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905160845235_AddRepoUrl2NotUploadedPackageNotification.resx">
+      <DependentUpon>201905160845235_AddRepoUrl2NotUploadedPackageNotification.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

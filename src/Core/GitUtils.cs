@@ -1,6 +1,6 @@
 using System;
 
-namespace GitCourseUpdater
+namespace Ulearn.Core
 {
 	public class GitUtils
 	{

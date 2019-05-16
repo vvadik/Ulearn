@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using uLearn;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Units;
@@ -1494,21 +1495,30 @@ namespace Database.Models
 		[Required]
 		[Column("NotUploadedPackageNotification_CommitHash")]
 		public string CommitHash { get; set; }
+		
+		[Required]
+		[Column("NotUploadedPackageNotification_RepoUrl")]
+		public string RepoUrl { get; set; }
 
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			return $"Ошибка загрузки новой версии курса <b>«{course.Title.EscapeHtml()}»</b>. Коммит {CommitHash}.";
+			return $"Ошибка автоматической загрузки новой версии курса <b>«{course.Title.EscapeHtml()}»</b>. Коммит {CommitHash.Substring(0, 8)}.";
 		}
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
-			return $"Ошибка загрузки новой версии курса «{course.Title.EscapeHtml()}». Коммит {CommitHash}.";
+			return $"Ошибка автоматической загрузки новой версии курса «{course.Title.EscapeHtml()}». Коммит {CommitHash.Substring(0, 8)}.";
 		}
 
 		public override Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider)
 		{
 			var courseRoleUsersFilter = serviceProvider.GetService<ICourseRoleUsersFilter>();
 			return courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.CourseAdmin, CourseId);
+		}
+		
+		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
+		{
+			return new NotificationButton("Перейти к коммиту", GitUtils.RepoUrlToCommitLink(RepoUrl, CommitHash));
 		}
 
 		public override bool IsActual()
