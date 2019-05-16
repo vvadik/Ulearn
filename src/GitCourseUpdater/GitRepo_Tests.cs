@@ -28,7 +28,7 @@ namespace GitCourseUpdater
 				Assert.AreEqual(info.Message, "Initial commit");
 				var files = repo.GetChangedFiles("37d6b0857fd3ae6135dcd2cec6899c1e318f9040", "bd2f024b57ea7b603447c5dd6e650d0e72a8c6d0");
 				CollectionAssert.AreEqual(files, new[] {"test.txt"});
-				repo.CheckoutBranchAndPull("test_branch");
+				repo.Checkout("test_branch");
 			}
 		}
 	}

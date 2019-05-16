@@ -11,7 +11,6 @@ using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
 using LibGit2Sharp.Ssh;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using Serilog;
 using Ulearn.Common.Extensions;
 
@@ -24,8 +23,6 @@ namespace GitCourseUpdater
 		CommitInfo GetCommitInfo(string hash);
 		IEnumerable<string> GetChangedFiles(string fromHash, string toHash, string courseSubdirectoryInRepo = null);
 		void Checkout(string commitHashOrBranchName);
-		void CheckoutCommit(string hash);
-		void CheckoutBranchAndPull(string name);
 	}
 	
 	public class GitRepo : IGitRepo
@@ -120,17 +117,17 @@ namespace GitCourseUpdater
 			if (Sha1Regex.IsMatch(commitHashOrBranchName))
 				CheckoutCommit(commitHashOrBranchName);
 			else
-				CheckoutBranchAndPull(commitHashOrBranchName);
+				CheckoutBranchAndResetToOrigin(commitHashOrBranchName);
 		}
 		
-		public void CheckoutCommit(string hash)
+		private void CheckoutCommit(string hash)
 		{
 			logger.Information($"Start checkout '{url}' commit '{hash}' in '{repoDirName}'");
 			Commands.Checkout(repo, hash);
 			logger.Information($"Successfully checkout '{url}' commit '{hash}' in '{repoDirName}'");
 		}
 
-		public void CheckoutBranchAndPull(string name)
+		public void CheckoutBranchAndResetToOrigin(string name)
 		{
 			name = name.Replace("origin/", "");
 			var remoteBranch = repo.Branches[$"origin/{name}"];
@@ -148,7 +145,8 @@ namespace GitCourseUpdater
 			logger.Information($"Start checkout '{url}' branch '{name}' in '{repoDirName}'");
 			Commands.Checkout(repo, name);
 			logger.Information($"Successfully checkout '{url}' branch '{name}' in '{repoDirName}'");
-			Pull();
+			repo.Reset(ResetMode.Hard, remoteBranch.Tip);
+			logger.Information($"Successfully reset '{url}' branch '{name}' in '{repoDirName}' to commit '{repo.Branches[name].Tip.Sha}'");
 		}
 		
 		private static CommitInfo ToCommitInfo(Commit commit)
@@ -176,7 +174,7 @@ namespace GitCourseUpdater
 				if(HasUncommittedChanges())
 					throw new LibGit2SharpException($"Has uncommited changes in '{repoDirName}'");
 				FetchAll();
-				CheckoutBranchAndPull("master");
+				CheckoutBranchAndResetToOrigin("master");
 			}
 			catch (Exception ex)
 			{
@@ -231,19 +229,6 @@ namespace GitCourseUpdater
 			logger.Information($"Successfully fetch all '{url}' in '{repoDirName}'");
 		}
 
-		private void Pull()
-		{
-			var options = new PullOptions { FetchOptions = new FetchOptions { CredentialsProvider = credentialsHandler } };
-			// мерджа не должно случиться
-			var signature = new Signature(new Identity("MERGE_USER_NAME", "MERGE_USER_EMAIL"), DateTimeOffset.Now);
-			logger.Information($"Start pull '{url}' in '{repoDirName}'");
-			var result = Commands.Pull(repo, signature, options);
-			logger.Information($"Successfully pull '{url}' in '{repoDirName}' with status {result.Status}");
-			if (result.Status == MergeStatus.Conflicts)
-				throw new LibGit2SharpException($"Pull status is {result.Status} for '{repoDirName}'");
-		}
-
-		
 		public bool HasUncommittedChanges()
 		{
 			var status = repo.RetrieveStatus();
