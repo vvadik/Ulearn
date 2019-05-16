@@ -304,10 +304,13 @@ namespace uLearn.Web.Controllers
 		private string GetGitEditLink(Course course, FileInfo pageFile)
 		{
 			var canEditGit = User.HasAccessFor(course.Id, CourseRole.CourseAdmin);
-			if (!canEditGit || course.Settings.RepoUrl == null)
+			var publishedCourseVersion = coursesRepo.GetPublishedCourseVersion(course.Id);
+			if (!canEditGit || publishedCourseVersion.RepoUrl == null)
 				return null;
 			var pathRelative2CourseXml = pageFile.FullName.Substring(course.CourseXmlDirectory.FullName.Length + 1);
-			return GitUtils.GetSlideEditLink(course.Settings.RepoUrl, course.Settings.PathToCourseXmlInRepo, pathRelative2CourseXml);
+			if (publishedCourseVersion.PathToCourseXml == null)
+				return null;
+			return GitUtils.GetSlideEditLink(publishedCourseVersion.RepoUrl, publishedCourseVersion.PathToCourseXml, pathRelative2CourseXml);
 		}
 
 		private int GetMaxSlideScoreForUser(Course course, Slide slide, string userId)
