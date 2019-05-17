@@ -33,30 +33,40 @@ namespace GitCourseUpdater
 		private string repoDirName; 
 		private Repository repo;
 		private ILogger logger;
+		private string privateKeyPath;
+		private string publicKeyPath;
 		private static object @lock = new object(); // Потокобезопасность не гарантируется библиотекой libgit2
 
 		// url example git@github.com:user/myrepo.git
-		public GitRepo(string url, DirectoryInfo reposBaseDir, FileInfo publicKeyPath, FileInfo privateKeyPath, string privateKeyPassphrase, ILogger logger)
+		public GitRepo(string url, DirectoryInfo reposBaseDir, string publicKey, string privateKey, DirectoryInfo keysTempDirectory, ILogger logger)
 		{
 			this.url = url;
 			this.reposBaseDir = reposBaseDir;
 			this.logger = logger;
 			if (!reposBaseDir.Exists)
 				reposBaseDir.Create();
+
+			Monitor.Enter(@lock);
+
+			var filenameGuid = Guid.NewGuid().ToString();
+			privateKeyPath = Path.Combine(keysTempDirectory.FullName, filenameGuid);
+			publicKeyPath = privateKeyPath + ".pub";
+			File.WriteAllText(privateKeyPath, privateKey);
+			File.WriteAllText(publicKeyPath, publicKey);
 			credentialsHandler = (_, __, ___) => new SshUserKeyCredentials
 			{
 				Username = "git",
-				Passphrase = privateKeyPassphrase,
-				PublicKey = publicKeyPath.ToString(),
-				PrivateKey = privateKeyPath.ToString(),
+				Passphrase = "",
+				PublicKey = publicKeyPath,
+				PrivateKey = privateKeyPath,
 			};
-			Monitor.Enter(@lock);
+
 			try
 			{
 				if (!TryUpdateExistingRepo())
 					Clone();
 			}
-			catch(Exception)
+			catch(Exception ex)
 			{
 				Dispose(); // Если объект не создан, извне Dispose не вызовут
 				throw;
@@ -111,10 +121,10 @@ namespace GitCourseUpdater
 			return paths;
 		}
 
-		private static readonly Regex Sha1Regex = new Regex("[a-f0-9]{40}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private static readonly Regex sha1Regex = new Regex("[a-f0-9]{40}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 		public void Checkout(string commitHashOrBranchName)
 		{
-			if (Sha1Regex.IsMatch(commitHashOrBranchName))
+			if (sha1Regex.IsMatch(commitHashOrBranchName))
 				CheckoutCommit(commitHashOrBranchName);
 			else
 				CheckoutBranchAndResetToOrigin(commitHashOrBranchName);
@@ -127,7 +137,7 @@ namespace GitCourseUpdater
 			logger.Information($"Successfully checkout '{url}' commit '{hash}' in '{repoDirName}'");
 		}
 
-		public void CheckoutBranchAndResetToOrigin(string name)
+		private void CheckoutBranchAndResetToOrigin(string name)
 		{
 			name = name.Replace("origin/", "");
 			var remoteBranch = repo.Branches[$"origin/{name}"];
@@ -229,7 +239,7 @@ namespace GitCourseUpdater
 			logger.Information($"Successfully fetch all '{url}' in '{repoDirName}'");
 		}
 
-		public bool HasUncommittedChanges()
+		private bool HasUncommittedChanges()
 		{
 			var status = repo.RetrieveStatus();
 			return status.IsDirty;
@@ -238,8 +248,20 @@ namespace GitCourseUpdater
 
 		public void Dispose()
 		{
-			repo?.Dispose();
-			Monitor.Exit(@lock);
+			try
+			{
+				repo?.Dispose();
+				var privateKeyFileInfo = new FileInfo(privateKeyPath);
+				var publicKeyFileInfo = new FileInfo(publicKeyPath);
+				if(privateKeyFileInfo.Exists)
+					privateKeyFileInfo.Delete();
+				if(publicKeyFileInfo.Exists)
+					publicKeyFileInfo.Delete();
+			}
+			finally
+			{
+				Monitor.Exit(@lock);
+			}
 		}
 	}
 }

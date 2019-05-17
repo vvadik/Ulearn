@@ -95,7 +95,6 @@ namespace Ulearn.Core.Configuration
 	public class GitConfiguration
 	{
 		public GitWebhookConfiguration Webhook { get; set; }
-		public string DeployKeyPassphrase { get; set; }
 	}
 
 	public class GitWebhookConfiguration

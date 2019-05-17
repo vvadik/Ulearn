@@ -59,7 +59,6 @@ namespace uLearn.Web.Controllers
 		private readonly DirectoryInfo reposDirectory;
 		private readonly FileInfo publicKeyFileInfo;
 		private readonly FileInfo privateKeyFileInfo;
-		private readonly string passphrase;
 		private readonly ILogger serilogLogger;
 
 		public AdminController()
@@ -87,7 +86,6 @@ namespace uLearn.Web.Controllers
 			var keysDirectory = GetKeysDirectory(configuration);
 			publicKeyFileInfo = keysDirectory.GetFile("git_deploy_key.pub");
 			privateKeyFileInfo = keysDirectory.GetFile("git_deploy_key");
-			passphrase = configuration.Git.DeployKeyPassphrase;
 			serilogLogger = new LoggerConfiguration().WriteTo.Log4Net().CreateLogger();
 		}
 		
@@ -254,7 +252,7 @@ namespace uLearn.Web.Controllers
 			log.Info($"Start update repo '{repoUrl}'");
 			var userId = usersRepo.GetUlearnBotUser().Id;
 			var infoForUpload = new List<(string, byte[], CommitInfo, string)>();
-			using (IGitRepo git = new GitRepo(repoUrl, reposDirectory, publicKeyFileInfo, privateKeyFileInfo, passphrase, serilogLogger))
+			using (IGitRepo git = new GitRepo(repoUrl, reposDirectory, publicKeyFileInfo, privateKeyFileInfo, serilogLogger))
 			{
 				var commitInfo = git.GetCurrentCommitInfo();
 				foreach (var course in courses)

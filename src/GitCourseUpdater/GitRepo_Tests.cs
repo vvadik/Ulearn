@@ -15,10 +15,12 @@ namespace GitCourseUpdater
 			var url = "git@github.com:vorkulsky/git_test.git";
 			var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 			var reposBaseDir = Path.Combine(assemblyPath, "repos");
-			var privateKeyPassphrase = "test";
 			var privateKeyPath = new FileInfo(Path.Combine(assemblyPath, "../../../TestResources/test_key"));
-			var publicKeyPath = new FileInfo(Path.Combine(assemblyPath, "../../../TestResources/test_pub_key.pub"));
-			using (IGitRepo repo = new GitRepo(url, new DirectoryInfo(reposBaseDir), publicKeyPath, privateKeyPath, privateKeyPassphrase, log))
+			var publicKeyPath = new FileInfo(Path.Combine(assemblyPath, "../../../TestResources/test_key.pub"));
+			var keysTempDirectory = new DirectoryInfo(Path.Combine(assemblyPath, "../../../TestResources/"));
+			var privateKey = File.ReadAllText(privateKeyPath.FullName);
+			var publicKey = File.ReadAllText(publicKeyPath.FullName);
+			using (IGitRepo repo = new GitRepo(url, new DirectoryInfo(reposBaseDir), publicKey, privateKey, keysTempDirectory, log))
 			{
 				var zip = repo.GetCurrentStateAsZip();
 				File.WriteAllBytes(Path.Combine(assemblyPath, "result.zip"), zip.ToArray());
