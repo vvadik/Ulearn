@@ -18,6 +18,7 @@ class CommentsView extends Component {
 			activeTab: TABS.allComments,
 			openModal: false,
 			instructorsCommentCount: 0,
+			tabHasAutomaticallyChanged: false,
 		};
 
 		this.headerRef = React.createRef();
@@ -122,14 +123,24 @@ class CommentsView extends Component {
 	}
 
 	handleTabChange = (id, isUserAction) => {
-		if (id !== this.state.activeTab) {
-			this.setState({
-				activeTab: id,
-			});
-		}
+		if (this.isInstructor(this.props.userRoles)) {
+			if (!isUserAction && this.state.tabHasAutomaticallyChanged) {
+				return;
+			}
+			
+			if (id !== this.state.activeTab) {
+				this.setState({
+					activeTab: id,
+				});
+			}
 
-		if (isUserAction) {
-			window.history.pushState("", document.title, window.location.pathname + window.location.search);
+			if (isUserAction) {
+				window.history.pushState("", document.title, window.location.pathname + window.location.search);
+			} else {
+				this.setState({
+					tabHasAutomaticallyChanged: true
+				});
+			}
 		}
 	};
 
