@@ -205,5 +205,10 @@ namespace Ulearn.Common.Extensions
 		{
 			return text.Replace(@"\", @"\\").Replace(@"""", @"\""").Replace("'", @"\'");
 		}
+		
+		public static string NullIfEmptyOrWhitespace(this string str)
+		{
+			return string.IsNullOrWhiteSpace(str) ? null : str;
+		}
 	}
 }

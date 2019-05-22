@@ -9,7 +9,6 @@ using Database.Models;
 using JetBrains.Annotations;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
-using Ulearn.Core;
 
 namespace Database.DataContexts
 {
@@ -166,6 +165,39 @@ namespace Database.DataContexts
 		public List<CourseFile> GetCourseFiles(IEnumerable<string> existingOnDiskCourseIds)
 		{
 			return db.CourseFiles.Where(a => !existingOnDiskCourseIds.Contains(a.CourseId)).ToList();
+		}
+
+		[CanBeNull]
+		public CourseGit GetCourseRepoSettings(string courseId)
+		{
+			return db.CourseGitRepos.Where(v => v.CourseId == courseId).OrderByDescending(v => v.CreateTime).FirstOrDefault();
+		}
+		
+		public async Task SetCourseRepoSettings(CourseGit courseGit)
+		{
+			courseGit.CreateTime = DateTime.Now;
+			db.CourseGitRepos.Add(courseGit);
+			await db.SaveChangesAsync();
+		}
+
+		public List<CourseGit> FindCoursesByRepoUrl(string repoUrl)
+		{
+			return db.CourseGitRepos.GroupBy(r => r.CourseId).Select(g => g.OrderByDescending(r => r.CreateTime).FirstOrDefault()).Where(r => r.RepoUrl == repoUrl).ToList();
+		}
+
+		public async Task UpdateKeysByRepoUrl(string repoUrl, string publicKey, string privateKey)
+		{
+			using (var transaction = db.Database.BeginTransaction())
+			{
+				var repos = FindCoursesByRepoUrl(repoUrl);
+				foreach (var repo in repos)
+				{
+					repo.PublicKey = publicKey;
+					repo.PrivateKey = privateKey;
+					await SetCourseRepoSettings(repo).ConfigureAwait(false);
+				}
+				transaction.Commit();
+			}
 		}
 	}
 }

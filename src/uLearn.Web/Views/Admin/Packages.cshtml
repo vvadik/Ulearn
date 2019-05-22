@@ -36,14 +36,55 @@
 		<input type="file" data-filename-placement="inside" class="btn" name="file" title="Выбрать архив с курсом" />
 		<input type="submit" class="btn btn-success" value="Загрузить"/>
 	}
-	@using (Html.BeginForm("UploadCourseWithGit", "Admin", new { courseId = Model.Course.Id }, FormMethod.Post, new { @class = "form-inline" }))
+	@if (Model.CourseGit?.RepoUrl != null && Model.CourseGit?.PublicKey != null)
 	{
-		@Html.AntiForgeryToken()
-		<input type="text" class="form-control" name="repoUrl" value="@(Model.Course.Settings.RepoUrl)" placeholder="@("git@*.git")"/>
-		<input type="text" class="form-control" name="commitHashOrBranchName" value="master" placeholder="Ветка или hash"/>
-		<input type="submit" class="btn btn-success" value="загрузить"/>
+		using (Html.BeginForm("UploadCourseWithGit", "Admin", new { courseId = Model.Course.Id }, FormMethod.Post, new { @class = "form-inline", style = "margin-bottom: 10px" }))
+		{
+			@Html.AntiForgeryToken()
+			<input type="text" class="form-control" name="commitHashOrBranchName" value="master" placeholder="Ветка или hash"/>
+			<input type="submit" class="btn btn-success" value="Загрузить"/>
+			<div class="spoiler_links btn btn-primary">Настройки</div>
+		}
 	}
-
+	else
+	{
+		<div class="spoiler_links btn btn-xs btn-primary" style="margin-bottom: 10px">Настройки репозитория</div>
+	}
+	<div class="spoiler_body @(Model.CourseGit?.RepoUrl != null && Model.CourseGit?.PublicKey == null ? "" : "collapse")">
+		@using (Html.BeginForm("SaveCourseRepoSettings", "Admin", new { courseId = Model.Course.Id }, FormMethod.Post, new { @class = "form-inline", style = "margin-bottom: 10px; display: inline-block" }))
+		{
+			@Html.AntiForgeryToken()
+			<input type="text" class="form-control" name="repoUrl" value="@(Model.CourseGit?.RepoUrl)" placeholder="@("git@*.git")"/>
+			<input type="text" class="form-control" name="pathToCourseXml" value="@(Model.CourseGit?.PathToCourseXml)" placeholder="Путь до course.xml"/>
+			<div class="form-group hidden-xs">
+				<div class="checkbox checkbox-default" style="padding-left:0">
+					@Html.CheckBox("isWebhookEnabled", (Model.CourseGit?.IsWebhookEnabled ?? false));
+					<label for="isWebhookEnabled">Включить вебхук</label>
+				</div>
+			</div>
+			<input type="submit" class="btn btn-success" value="Сохранить"/>
+		}
+		@if (Model.CourseGit?.RepoUrl != null) {
+			using (Html.BeginForm("GenerateCourseRepoKey", "Admin", new { courseId = Model.Course.Id, repoUrl = Model.CourseGit?.RepoUrl }, FormMethod.Post, new { @class = "form-inline", style = "margin-bottom: 10px; display: inline-block" }))
+			{
+				@Html.AntiForgeryToken()
+				<input type="submit" class="btn @(Model.CourseGit?.PublicKey == null ? "btn-warning" : "btn-danger")" value="@(Model.CourseGit?.PublicKey == null ? "Получить ключ" : "Получить новый ключ")"/>
+			}
+		}
+		<script type="text/javascript">
+			$(document).ready(function(){
+				$('.spoiler_links').click(function(){
+					$('.spoiler_body').toggle('normal');
+					return false;
+				});
+			});
+		</script>
+	</div>
+    @if (Model.ShowPublicGitKey && Model.CourseGit?.PublicKey != null)
+    {
+        <textarea class="form-control" readonly style="height: 96px">@(Model.CourseGit?.PublicKey)</textarea>
+    }
+	
 	@if (Model.Versions.Count > 0)
 	{
 		<h1>Загруженные версии</h1>

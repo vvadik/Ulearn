@@ -24,7 +24,6 @@ using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
-using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
@@ -57,8 +56,6 @@ namespace uLearn.Web.Controllers
 		private readonly CertificateGenerator certificateGenerator;
 		
 		private readonly DirectoryInfo reposDirectory;
-		private readonly FileInfo publicKeyFileInfo;
-		private readonly FileInfo privateKeyFileInfo;
 		private readonly ILogger serilogLogger;
 
 		public AdminController()
@@ -78,26 +75,11 @@ namespace uLearn.Web.Controllers
 			notificationsRepo = new NotificationsRepo(db);
 			systemAccessesRepo = new SystemAccessesRepo(db);
 			styleErrorsRepo = new StyleErrorsRepo(db);
-			
 			certificateGenerator = new CertificateGenerator(db, courseManager);
-			
-			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 			reposDirectory = CourseManager.GetCoursesDirectory().GetSubdirectory("Repos");
-			var keysDirectory = GetKeysDirectory(configuration);
-			publicKeyFileInfo = keysDirectory.GetFile("git_deploy_key.pub");
-			privateKeyFileInfo = keysDirectory.GetFile("git_deploy_key");
 			serilogLogger = new LoggerConfiguration().WriteTo.Log4Net().CreateLogger();
 		}
 		
-		private static DirectoryInfo GetKeysDirectory(UlearnConfiguration configuration)
-		{
-			var keysDirectory = configuration.KeysDirectory;
-			if (string.IsNullOrEmpty(keysDirectory))
-				keysDirectory = Utils.GetAppPath() + @"\..\git_deploy_keys\";
-
-			return new DirectoryInfo(keysDirectory);
-		}
-
 		public ActionResult Courses(string courseId = null, string courseTitle = null)
 		{
 			var controllableCourses = new HashSet<string>(User.GetControllableCoursesId());
@@ -212,7 +194,44 @@ namespace uLearn.Web.Controllers
 			var bot = usersRepo.GetUlearnBotUser();
 			await notificationsRepo.AddNotification(courseId, notification, bot.Id);
 		}
-
+		
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
+		public async Task<ActionResult> SaveCourseRepoSettings(string courseId, string repoUrl, string pathToCourseXml, bool isWebhookEnabled)
+		{
+			repoUrl = repoUrl.NullIfEmptyOrWhitespace();
+			pathToCourseXml = pathToCourseXml.NullIfEmptyOrWhitespace();
+			var oldRepoSettings = coursesRepo.GetCourseRepoSettings(courseId);
+			var settings = oldRepoSettings != null && oldRepoSettings.RepoUrl == repoUrl ? oldRepoSettings : new CourseGit {CourseId = courseId};
+			settings.RepoUrl = repoUrl;
+			settings.PathToCourseXml = pathToCourseXml;
+			settings.IsWebhookEnabled = isWebhookEnabled;
+			if (settings.PrivateKey == null && repoUrl != null)
+			{
+				var coursesWithSameRepo = coursesRepo.FindCoursesByRepoUrl(repoUrl);
+				if (coursesWithSameRepo.Any())
+				{
+					settings.PrivateKey = coursesWithSameRepo[0].PrivateKey;
+					settings.PublicKey = coursesWithSameRepo[0].PublicKey;
+				}
+			}
+			await coursesRepo.SetCourseRepoSettings(settings).ConfigureAwait(false);
+			return RedirectToAction("Packages", new { courseId });
+		}
+		
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
+		public async Task<ActionResult> GenerateCourseRepoKey(string courseId, string repoUrl)
+		{
+			var keys = SshKeyGenerator.Generate();
+			await coursesRepo.UpdateKeysByRepoUrl(repoUrl, keys.PublicSSH, keys.PrivatePEM).ConfigureAwait(false);
+			return PackagesInternal(courseId, showPublicGitKey: true);
+		}
+		
 		[HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public async Task<ActionResult> UploadCourse(string courseId, HttpPostedFileBase file)
@@ -242,7 +261,7 @@ namespace uLearn.Web.Controllers
 		
 		public async Task UploadCourseWithGit(string repoUrl)
 		{
-			var courses = courseManager.GetCourses().Where(c => c.Settings.RepoUrl == repoUrl).ToList();
+			var courses = coursesRepo.FindCoursesByRepoUrl(repoUrl).Where(r => r.IsWebhookEnabled).ToList();
 			if (courses.Count == 0)
 			{
 				log.Warn($"Repo '{repoUrl}' is not expected");
@@ -251,32 +270,34 @@ namespace uLearn.Web.Controllers
 
 			log.Info($"Start update repo '{repoUrl}'");
 			var userId = usersRepo.GetUlearnBotUser().Id;
+			var publicKey = courses[0].PublicKey; // у всех курсов одинаковый repoUrl и ключ
+			var privateKey = courses[0].PrivateKey;
 			var infoForUpload = new List<(string, byte[], CommitInfo, string)>();
-			using (IGitRepo git = new GitRepo(repoUrl, reposDirectory, publicKeyFileInfo, privateKeyFileInfo, serilogLogger))
+			using (IGitRepo git = new GitRepo(repoUrl, reposDirectory, publicKey, privateKey, new DirectoryInfo(Path.GetTempPath()), serilogLogger))
 			{
 				var commitInfo = git.GetCurrentCommitInfo();
-				foreach (var course in courses)
+				foreach (var courseRepo in courses)
 				{
-					var zip = git.GetCurrentStateAsZip(course.Settings.PathToCourseXmlInRepo);
+					var zip = git.GetCurrentStateAsZip(courseRepo.PathToCourseXml);
 					var hasChanges = true;
 					if (courses.Count > 1)
 					{
-						var publishedVersion = coursesRepo.GetPublishedCourseVersion(course.Id);
+						var publishedVersion = coursesRepo.GetPublishedCourseVersion(courseRepo.CourseId);
 						if (publishedVersion?.CommitHash != null)
 						{
-							var changedFiles = git.GetChangedFiles(publishedVersion.CommitHash, commitInfo.Hash, course.Settings.PathToCourseXmlInRepo);
+							var changedFiles = git.GetChangedFiles(publishedVersion.CommitHash, commitInfo.Hash, courseRepo.PathToCourseXml);
 							hasChanges = changedFiles?.Any() ?? true;
 						}
 					}
 
 					if (hasChanges)
 					{
-						log.Info($"Course '{course.Id}' '{course.Title}' has changes in '{repoUrl}'");
-						infoForUpload.Add((course.Id, zip.ToArray(), commitInfo, course.Settings.PathToCourseXmlInRepo));
+						log.Info($"Course '{courseRepo.Id}' has changes in '{repoUrl}'");
+						infoForUpload.Add((courseRepo.CourseId, zip.ToArray(), commitInfo, courseRepo.PathToCourseXml));
 					}
 					else
 					{
-						log.Info($"Course '{course.Id}' '{course.Title}' has changes in '{repoUrl}'");
+						log.Info($"Course '{courseRepo.Id}' has changes in '{repoUrl}'");
 					}
 				}
 			}
@@ -293,19 +314,24 @@ namespace uLearn.Web.Controllers
 		[ValidateAntiForgeryToken]
 		[HandleHttpAntiForgeryException]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
-		public async Task<ActionResult> UploadCourseWithGit(string courseId, string repoUrl, [CanBeNull]string commitHashOrBranchName)
+		public async Task<ActionResult> UploadCourseWithGit(string courseId, [CanBeNull]string commitHashOrBranchName)
 		{
-			var course = courseManager.GetCourse(courseId);
+			var courseRepo = coursesRepo.GetCourseRepoSettings(courseId);
+			if(courseRepo == null)
+				return RedirectToAction("Packages", new { courseId, error="Course repo settings not found" });
 			byte[] zip;
 			CommitInfo commitInfo;
-			using (IGitRepo git = new GitRepo(repoUrl, reposDirectory, publicKeyFileInfo, privateKeyFileInfo, passphrase, serilogLogger))
+			
+			var publicKey = courseRepo.PublicKey; // у всех курсов одинаковый repoUrl и ключ
+			var privateKey = courseRepo.PrivateKey;
+			using (IGitRepo git = new GitRepo(courseRepo.RepoUrl, reposDirectory, publicKey, privateKey, new DirectoryInfo(Path.GetTempPath()), serilogLogger))
 			{
 				if(!string.IsNullOrEmpty(commitHashOrBranchName))
 					git.Checkout(commitHashOrBranchName);
-				zip = git.GetCurrentStateAsZip(course.Settings.PathToCourseXmlInRepo).ToArray();
+				zip = git.GetCurrentStateAsZip(courseRepo.PathToCourseXml).ToArray();
 				commitInfo = git.GetCurrentCommitInfo();
 			}
-			var (versionId, error) = await UploadCourse(course.Id, zip, User.Identity.GetUserId(), repoUrl, commitInfo, course.Settings.PathToCourseXmlInRepo).ConfigureAwait(false);
+			var (versionId, error) = await UploadCourse(courseId, zip, User.Identity.GetUserId(), courseRepo.RepoUrl, commitInfo, courseRepo.PathToCourseXml).ConfigureAwait(false);
 			if (error != null)
 			{
 				var errorMessage = error.Message.ToLowerFirstLetter();
@@ -390,18 +416,26 @@ namespace uLearn.Web.Controllers
 		[ValidateInput(false)]
 		public ActionResult Packages(string courseId, string error="")
 		{
+			return PackagesInternal(courseId, error);
+		}
+		
+		private ActionResult PackagesInternal(string courseId, string error="", bool showPublicGitKey = false)
+		{
 			var hasPackage = courseManager.HasPackageFor(courseId);
 			var lastUpdate = courseManager.GetLastWriteTime(courseId);
 			var course = courseManager.GetCourse(courseId);
 			var courseVersions = coursesRepo.GetCourseVersions(courseId).ToList();
 			var publishedVersion = coursesRepo.GetPublishedCourseVersion(courseId);
-			return View(model: new PackagesViewModel
+			var courseRepo = coursesRepo.GetCourseRepoSettings(courseId);
+			return View("Packages", model: new PackagesViewModel
 			{
 				Course = course,
 				HasPackage = hasPackage,
 				LastUpdate = lastUpdate,
 				Versions = courseVersions,
 				PublishedVersion = publishedVersion,
+				CourseGit = courseRepo,
+				ShowPublicGitKey = showPublicGitKey,
 				Error = error,
 			});
 		}
@@ -1456,6 +1490,8 @@ namespace uLearn.Web.Controllers
 		public DateTime LastUpdate { get; set; }
 		public List<CourseVersion> Versions { get; set; }
 		public CourseVersion PublishedVersion { get; set; }
+		public CourseGit CourseGit { get; set; }
+		public bool ShowPublicGitKey { get; set; }
 		public string Error { get; set; }
 	}
 
