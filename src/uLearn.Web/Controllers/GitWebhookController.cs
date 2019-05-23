@@ -117,8 +117,8 @@ namespace uLearn.Web.Controllers
 				return false;
 			
 			var signature = signatureWithPrefix.Substring(sha1Prefix.Length);
-			var secret = Encoding.ASCII.GetBytes(githubSecret);
-			var payloadBytes = Encoding.ASCII.GetBytes(payload);
+			var secret = Encoding.UTF8.GetBytes(githubSecret);
+			var payloadBytes = Encoding.UTF8.GetBytes(payload);
 
 			using (var hmSha1 = new HMACSHA1(secret))
 			{
