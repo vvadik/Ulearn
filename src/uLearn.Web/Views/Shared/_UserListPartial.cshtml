@@ -1,5 +1,6 @@
 ﻿@using Database.Models
 @using Ulearn.Common.Extensions
+@using FormMethod = System.Web.Mvc.FormMethod
 @model UserListModel
 
 @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "AntiForgeryTokenContainer" }))
