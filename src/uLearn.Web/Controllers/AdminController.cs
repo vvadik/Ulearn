@@ -16,7 +16,6 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using GitCourseUpdater;
-using JetBrains.Annotations;
 using Microsoft.VisualBasic.FileIO;
 using Serilog;
 using uLearn.Web.Extensions;
@@ -199,14 +198,16 @@ namespace uLearn.Web.Controllers
 		[ValidateAntiForgeryToken]
 		[HandleHttpAntiForgeryException]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
-		public async Task<ActionResult> SaveCourseRepoSettings(string courseId, string repoUrl, string pathToCourseXml, bool isWebhookEnabled)
+		public async Task<ActionResult> SaveCourseRepoSettings(string courseId, string repoUrl, string branch, string pathToCourseXml, bool isWebhookEnabled)
 		{
 			repoUrl = repoUrl.NullIfEmptyOrWhitespace();
 			pathToCourseXml = pathToCourseXml.NullIfEmptyOrWhitespace();
+			branch = branch.NullIfEmptyOrWhitespace() ?? "master";
 			var oldRepoSettings = coursesRepo.GetCourseRepoSettings(courseId);
 			var settings = oldRepoSettings != null && oldRepoSettings.RepoUrl == repoUrl ? oldRepoSettings : new CourseGit {CourseId = courseId};
 			settings.RepoUrl = repoUrl;
 			settings.PathToCourseXml = pathToCourseXml;
+			settings.Branch = branch;
 			settings.IsWebhookEnabled = isWebhookEnabled;
 			if (settings.PrivateKey == null && repoUrl != null)
 			{
@@ -259,9 +260,9 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Diagnostics", new { courseId, versionId });
 		}
 		
-		public async Task UploadCourseWithGit(string repoUrl)
+		public async Task UploadCoursesWithGit(string repoUrl, string branch)
 		{
-			var courses = coursesRepo.FindCoursesByRepoUrl(repoUrl).Where(r => r.IsWebhookEnabled).ToList();
+			var courses = coursesRepo.FindCoursesByRepoUrl(repoUrl).Where(r => r.IsWebhookEnabled && r.Branch == branch || branch == "master" && r.Branch == null).ToList();
 			if (courses.Count == 0)
 			{
 				log.Warn($"Repo '{repoUrl}' is not expected");
@@ -314,7 +315,7 @@ namespace uLearn.Web.Controllers
 		[ValidateAntiForgeryToken]
 		[HandleHttpAntiForgeryException]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
-		public async Task<ActionResult> UploadCourseWithGit(string courseId, [CanBeNull]string commitHashOrBranchName)
+		public async Task<ActionResult> UploadCourseWithGit(string courseId)
 		{
 			var courseRepo = coursesRepo.GetCourseRepoSettings(courseId);
 			if(courseRepo == null)
@@ -326,8 +327,7 @@ namespace uLearn.Web.Controllers
 			var privateKey = courseRepo.PrivateKey;
 			using (IGitRepo git = new GitRepo(courseRepo.RepoUrl, reposDirectory, publicKey, privateKey, new DirectoryInfo(Path.GetTempPath()), serilogLogger))
 			{
-				if(!string.IsNullOrEmpty(commitHashOrBranchName))
-					git.Checkout(commitHashOrBranchName);
+				git.Checkout(courseRepo.Branch);
 				zip = git.GetCurrentStateAsZip(courseRepo.PathToCourseXml).ToArray();
 				commitInfo = git.GetCurrentCommitInfo();
 			}

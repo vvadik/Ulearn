@@ -39,11 +39,10 @@
 	}
 	@if (Model.CourseGit?.RepoUrl != null && Model.CourseGit?.PublicKey != null)
 	{
-		using (Html.BeginForm("UploadCourseWithGit", "Admin", new { courseId = Model.Course.Id }, FormMethod.Post, new { @class = "form-inline", style = "margin-bottom: 10px" }))
+		using (Html.BeginForm("UploadCoursesWithGit", "Admin", new { courseId = Model.Course.Id }, FormMethod.Post, new { @class = "form-inline", style = "margin-bottom: 10px" }))
 		{
 			@Html.AntiForgeryToken()
-			<input type="text" class="form-control" name="commitHashOrBranchName" value="master" placeholder="Ветка или hash"/>
-			<input type="submit" class="btn btn-success" value="Загрузить"/>
+			<input type="submit" class="btn btn-success" value="Загрузить из git"/>
 			<div class="spoiler_links btn btn-primary">Настройки</div>
 		}
 	}
@@ -56,6 +55,7 @@
 		{
 			@Html.AntiForgeryToken()
 			<input type="text" class="form-control" name="repoUrl" value="@(Model.CourseGit?.RepoUrl)" placeholder="@("git@*.git")"/>
+			<input type="text" class="form-control" name="branch" value="master" placeholder="Ветка или hash"/>
 			<input type="text" class="form-control" name="pathToCourseXml" value="@(Model.CourseGit?.PathToCourseXml)" placeholder="Путь до course.xml"/>
 			<div class="form-group hidden-xs">
 				<div class="checkbox checkbox-default" style="padding-left:0">

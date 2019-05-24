@@ -16,6 +16,8 @@ namespace Database.Models
 		
 		public string RepoUrl { get; set; }
 		
+		public string Branch { get; set; } // Или хэш коммита
+		
 		public string PublicKey { get; set; }
 		
 		public string PrivateKey { get; set; }

@@ -19,6 +19,9 @@ namespace Database.Models
 		public string RepoUrl { get; set; }
 		
 		[CanBeNull]
+		public string Branch { get; set; } // Или хэш коммита
+		
+		[CanBeNull]
 		public string PublicKey { get; set; }
 		
 		[CanBeNull]

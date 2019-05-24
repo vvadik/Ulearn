@@ -770,6 +770,10 @@
     <Compile Include="Migrations\201905221027183_AddCourseGitRepos.Designer.cs">
       <DependentUpon>201905221027183_AddCourseGitRepos.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201905241421585_AddCourseGitBranchField.cs" />
+    <Compile Include="Migrations\201905241421585_AddCourseGitBranchField.Designer.cs">
+      <DependentUpon>201905241421585_AddCourseGitBranchField.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -1208,6 +1212,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201905221027183_AddCourseGitRepos.resx">
       <DependentUpon>201905221027183_AddCourseGitRepos.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905241421585_AddCourseGitBranchField.resx">
+      <DependentUpon>201905241421585_AddCourseGitBranchField.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

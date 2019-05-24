@@ -60,11 +60,10 @@ namespace uLearn.Web.Controllers
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 			}
 			var content = JsonConvert.DeserializeObject<GithubPushData>(jsonContent);
-			if (content.Ref != "refs/heads/master")
-				return new HttpStatusCodeResult(HttpStatusCode.OK);
+			var branch = content.Ref.Replace("refs/heads/", "");
 			log.Info("Json content of webhook request: " + jsonContent);
 			var url = content.Repository.SshUrl;
-			await UpdateRepo(url).ConfigureAwait(false);
+			await UpdateRepo(url, branch).ConfigureAwait(false);
 			return new HttpStatusCodeResult(HttpStatusCode.OK);
 		}
 
@@ -82,19 +81,18 @@ namespace uLearn.Web.Controllers
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 			}
 			var content = JsonConvert.DeserializeObject<GitlabPushData>(jsonContent);
-			if (content.Ref != "refs/heads/master")
-				return new HttpStatusCodeResult(HttpStatusCode.OK);
+			var branch = content.Ref.Replace("refs/heads/", "");
 			log.Info("Json content of webhook request: " + jsonContent);
 			var url = content.Repository.SshUrl;
-			await UpdateRepo(url).ConfigureAwait(false);
+			await UpdateRepo(url, branch).ConfigureAwait(false);
 			return new HttpStatusCodeResult(HttpStatusCode.OK);
 		}
 
-		private async Task UpdateRepo(string url)
+		private async Task UpdateRepo(string url, string branch)
 		{
 			log.Info($"Git webhook push event url '{url}'");
 			var adminController = new AdminController();
-			await adminController.UploadCourseWithGit(url).ConfigureAwait(false);
+			await adminController.UploadCoursesWithGit(url, branch).ConfigureAwait(false);
 		}
 		
 		private bool IsValidGithubRequest(string payload, string eventName, string signatureWithPrefix)
