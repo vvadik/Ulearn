@@ -97,12 +97,6 @@ namespace Ulearn.Core.Configuration
 
 	public class GitWebhookConfiguration
 	{
-		public GitServerConfiguration Github { get; set; }
-		public GitServerConfiguration Gitlab { get; set; }
-	}
-
-	public class GitServerConfiguration
-	{
 		public string Secret { get; set; }
 	}
 }

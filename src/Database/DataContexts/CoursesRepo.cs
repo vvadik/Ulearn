@@ -170,7 +170,10 @@ namespace Database.DataContexts
 		[CanBeNull]
 		public CourseGit GetCourseRepoSettings(string courseId)
 		{
-			return db.CourseGitRepos.Where(v => v.CourseId == courseId).OrderByDescending(v => v.CreateTime).FirstOrDefault();
+			var data = db.CourseGitRepos.Where(v => v.CourseId == courseId).OrderByDescending(v => v.CreateTime).FirstOrDefault();
+			if (data?.RepoUrl == null)
+				return null;
+			return data;
 		}
 		
 		public async Task SetCourseRepoSettings(CourseGit courseGit)
@@ -178,6 +181,12 @@ namespace Database.DataContexts
 			courseGit.CreateTime = DateTime.Now;
 			db.CourseGitRepos.Add(courseGit);
 			await db.SaveChangesAsync();
+		}
+
+		public async Task RemoveCourseRepoSettings(string courseId)
+		{
+			var courseGit = new CourseGit { CourseId = courseId };
+			await SetCourseRepoSettings(courseGit).ConfigureAwait(false);
 		}
 
 		public List<CourseGit> FindCoursesByRepoUrl(string repoUrl)

@@ -18,14 +18,12 @@ namespace uLearn.Web.Controllers
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(GitWebhookController));
 		
-		private readonly string githubSecret;
-		private readonly string gitlabSecret;
+		private readonly string gitSecret;
 		
 		public GitWebhookController()
 		{
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
-			githubSecret = configuration.Git.Webhook.Github.Secret;
-			gitlabSecret = configuration.Git.Webhook.Gitlab.Secret;
+			gitSecret = configuration.Git.Webhook.Secret;
 		}
 		
 		[System.Web.Http.HttpPost]
@@ -75,7 +73,7 @@ namespace uLearn.Web.Controllers
 			if (Request.Headers.TryGetValues("X-Gitlab-Token", out var signatures))
 				token = signatures.FirstOrDefault();
 			var jsonContent = await Request.Content.ReadAsStringAsync().ConfigureAwait(false);
-			if (token != gitlabSecret)
+			if (token != gitSecret)
 			{
 				log.Warn($"Invalid gitlab request eventName: '{eventName}' token: '{token}' jsonContent: {jsonContent}");
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
@@ -115,7 +113,7 @@ namespace uLearn.Web.Controllers
 				return false;
 			
 			var signature = signatureWithPrefix.Substring(sha1Prefix.Length);
-			var secret = Encoding.UTF8.GetBytes(githubSecret);
+			var secret = Encoding.UTF8.GetBytes(gitSecret);
 			var payloadBytes = Encoding.UTF8.GetBytes(payload);
 
 			using (var hmSha1 = new HMACSHA1(secret))
