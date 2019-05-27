@@ -24,6 +24,15 @@ namespace GitCourseUpdater
 		IEnumerable<string> GetChangedFiles(string fromHash, string toHash, string courseSubdirectoryInRepo = null);
 		void Checkout(string commitHashOrBranchName);
 	}
+
+	public class GitException : Exception
+	{
+		public bool MayBeSSHException;
+		
+		public GitException(string massage, Exception innerException)
+			: base(massage, innerException)
+		{ }
+	}
 	
 	public class GitRepo : IGitRepo
 	{
@@ -65,6 +74,13 @@ namespace GitCourseUpdater
 			{
 				if (!TryUpdateExistingRepo())
 					Clone();
+			}
+			catch (LibGit2SharpException ex)
+			{
+				Dispose(); // Если объект не создан, извне Dispose не вызовут
+				if(ex.Message.Contains("SSH"))
+					throw new GitException(ex.Message, ex) {MayBeSSHException = true};
+				throw;
 			}
 			catch(Exception ex)
 			{

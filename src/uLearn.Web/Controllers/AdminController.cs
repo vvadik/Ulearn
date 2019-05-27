@@ -337,18 +337,34 @@ namespace uLearn.Web.Controllers
 			var courseRepo = coursesRepo.GetCourseRepoSettings(courseId);
 			if(courseRepo == null)
 				return RedirectToAction("Packages", new { courseId, error="Course repo settings not found" });
-			byte[] zip;
-			CommitInfo commitInfo;
+			byte[] zip = null;
+			CommitInfo commitInfo = null;
 			
 			var publicKey = courseRepo.PublicKey; // у всех курсов одинаковый repoUrl и ключ
 			var privateKey = courseRepo.PrivateKey;
-			using (IGitRepo git = new GitRepo(courseRepo.RepoUrl, reposDirectory, publicKey, privateKey, new DirectoryInfo(Path.GetTempPath()), serilogLogger))
+			Exception error = null;
+			try
 			{
-				git.Checkout(courseRepo.Branch);
-				zip = git.GetCurrentStateAsZip(courseRepo.PathToCourseXml).ToArray();
-				commitInfo = git.GetCurrentCommitInfo();
+				using (IGitRepo git = new GitRepo(courseRepo.RepoUrl, reposDirectory, publicKey, privateKey, new DirectoryInfo(Path.GetTempPath()), serilogLogger))
+				{
+					git.Checkout(courseRepo.Branch);
+					zip = git.GetCurrentStateAsZip(courseRepo.PathToCourseXml).ToArray();
+					commitInfo = git.GetCurrentCommitInfo();
+				}
 			}
-			var (versionId, error) = await UploadCourse(courseId, zip, User.Identity.GetUserId(), courseRepo.RepoUrl, commitInfo, courseRepo.PathToCourseXml).ConfigureAwait(false);
+			catch (GitException ex)
+			{
+				if (ex.MayBeSSHException)
+				{
+					log.Error(ex.InnerException);
+					error = new Exception("не удалось получить данные из репозитория. Вероятно не настроен деплой ключ. Исходный текст ошибки:", ex.InnerException);
+				}
+				else
+					throw;
+			}
+			var versionId = new Guid();
+			if(error == null)
+				(versionId, error) = await UploadCourse(courseId, zip, User.Identity.GetUserId(), courseRepo.RepoUrl, commitInfo, courseRepo.PathToCourseXml).ConfigureAwait(false);
 			if (error != null)
 			{
 				var errorMessage = error.Message.ToLowerFirstLetter();
