@@ -45,14 +45,14 @@
 			@Html.AntiForgeryToken()
 			<input type="submit" class="btn btn-success" style="width: 180px" value="Загрузить из git"/>
 			<a href="" class="spoiler_links" style="vertical-align: middle; margin-left: 5px;">Настроить</a>
-			<a target="_blank" style="vertical-align: middle; margin-left: 5px;" href="https://docs.google.com/document/d/1ND3oOuoivJa93YKeDriBQHfsgCdfy6ss6Vho6H4S7bs/edit?usp=sharing">Справка</a>
+			<a target="_blank" style="vertical-align: middle; margin-left: 5px;" href="@Model.HelpUrl">Справка</a>
 			<div><small>Будет загружен курс из репоз. @(Model.CourseGit?.RepoUrl) из ветки @(Model.CourseGit.Branch ?? "master")</small></div>
 		}
 	}
 	else
 	{
 		<div class="spoiler_links btn btn-xs btn-primary" style="margin-bottom: 10px">Настроить интеграцию с git</div>
-		<a target="_blank" href="https://docs.google.com/document/d/1tL_D2SGIv163GpVVr5HrZTBEgcMk5shCKN5J6le4pTc/edit?usp=sharing" class="btn btn-link" style="vertical-align:4px">Cправка</a>
+		<a target="_blank" href="@Model.HelpUrl" class="btn btn-link" style="vertical-align:4px">Cправка</a>
 	}
 	<div class="spoiler_body @(Model.OpenStep1 ? "" : "collapse")">
 		@using (Html.BeginForm("SaveCourseRepoSettings", "Admin", new { courseId = Model.Course.Id }, FormMethod.Post))
@@ -92,7 +92,7 @@
 				<div class="panel panel-default">
 					<div class="panel-heading">Шаг 2 из 2</div>
 					<div class="panel-body">
-						<label for="public-key">Добавьте этот deploy key в настройки репозитория, даже если ваш репозиторий публичный.</label> <a target="_blank" href="https://docs.google.com/document/d/1tL_D2SGIv163GpVVr5HrZTBEgcMk5shCKN5J6le4pTc/edit?usp=sharing">(справка)</a>
+						<label for="public-key">Добавьте этот deploy key в настройки репозитория, даже если ваш репозиторий публичный.</label> <a target="_blank" href="@Model.HelpUrl">(справка)</a>
 						<textarea id="public-key" class="form-control" readonly style="height: 96px">@(Model.CourseGit?.PublicKey)</textarea>
 						<input type="submit" class="btn btn-xs btn-link" style="max-width: none; padding-left: 0" value="Перегенерировать ключ (старый перестанет работать)"/>
 					</div>

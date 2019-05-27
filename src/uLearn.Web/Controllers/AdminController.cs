@@ -1530,6 +1530,7 @@ namespace uLearn.Web.Controllers
 		public bool OpenStep2 { get; set; }
 		public string GitSecret { get; set; }
 		public string Error { get; set; }
+		public string HelpUrl { get; set; } = "https://docs.google.com/document/d/1tL_D2SGIv163GpVVr5HrZTBEgcMk5shCKN5J6le4pTc/edit?usp=sharing";
 	}
 
 	public class AdminCommentsViewModel
