@@ -73,11 +73,11 @@
 						<label for="pathToCourseXml">Путь до директории с course.xml</label>
 						<input type="text" class="form-control" id="pathToCourseXml" name="pathToCourseXml" value="@(Model.CourseGit?.PathToCourseXml)"/>
 					</div>
-					<div class="form-group hidden-xs">
+					<div class="form-group">
 						<div class="checkbox checkbox-default">
 							@Html.CheckBox("isWebhookEnabled", (Model.CourseGit?.IsWebhookEnabled ?? false))
 							<label for="isWebhookEnabled">Загружать новые версии автоматически
-								<div class="form-text text-muted"><small>Webhook secret: @Model.GitSecret</small></div></label>
+								<div class="form-text text-muted"><small>Включите webhook в настройках репозитория, укажите url https://dev.ulearn.me/CoursesWebhook и secret @Model.GitSecret</small></div></label>
 						</div>
 					</div>
 					<button type="submit" name="submitButton" class="btn btn-success" value="Save">Сохранить</button>
