@@ -73,6 +73,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Api", "Common.Api\Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoAnnotations.Api", "VideoAnnotations.Api\VideoAnnotations.Api.csproj", "{8DBF67FC-F88E-4F33-BF81-8033FF597C91}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitCourseUpdater", "GitCourseUpdater\GitCourseUpdater.csproj", "{ADD8B9BA-7D5B-42D8-BFBD-3D60FB766E33}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -199,6 +201,10 @@ Global
 		{B6B60D19-C6BD-4D66-95DA-14480A18770C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6B60D19-C6BD-4D66-95DA-14480A18770C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6B60D19-C6BD-4D66-95DA-14480A18770C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADD8B9BA-7D5B-42D8-BFBD-3D60FB766E33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADD8B9BA-7D5B-42D8-BFBD-3D60FB766E33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADD8B9BA-7D5B-42D8-BFBD-3D60FB766E33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADD8B9BA-7D5B-42D8-BFBD-3D60FB766E33}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

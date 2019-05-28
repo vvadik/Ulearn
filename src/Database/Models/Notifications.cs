@@ -8,6 +8,7 @@ using System.Reflection;
 using Database.DataContexts;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Units;
@@ -260,6 +261,11 @@ namespace Database.Models
 		[MinCourseRole(CourseRole.CourseAdmin)]
 		[IsEnabledByDefault(true)]
 		CourseExportedToStepik = 205,
+		
+		[Display(Name = @"Ошибка загрузки новой версии курса", GroupName = @"Ошибки загрузки новых версиий курса")]
+		[MinCourseRole(CourseRole.CourseAdmin)]
+		[IsEnabledByDefault(true)]
+		NotUploadedPackage = 206,
 	}
 
 	public static class NotificationTypeExtensions
@@ -1451,6 +1457,43 @@ namespace Database.Models
 		public override List<string> GetRecipientsIds(ULearnDb db)
 		{
 			return new UserRolesRepo(db).GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, CourseId);
+		}
+
+		public override bool IsActual()
+		{
+			return true;
+		}
+	}
+	
+	[NotificationType(NotificationType.NotUploadedPackage)]
+	public class NotUploadedPackageNotification : AbstractPackageNotification
+	{
+		[Required]
+		[Column("NotUploadedPackageNotification_CommitHash")]
+		public string CommitHash { get; set; }
+
+		[Required]
+		[Column("NotUploadedPackageNotification_RepoUrl")]
+		public string RepoUrl { get; set; }
+
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
+		{
+			return $"Ошибка автоматической загрузки новой версии курса <b>«{course.Title.EscapeHtml()}»</b>. Коммит {CommitHash.Substring(0, 8)}.";
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
+		{
+			return $"Ошибка автоматической загрузки новой версии курса «{course.Title.EscapeHtml()}». Коммит {CommitHash.Substring(0, 8)}.";
+		}
+
+		public override List<string> GetRecipientsIds(ULearnDb db)
+		{
+			return new UserRolesRepo(db).GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, CourseId);
+		}
+		
+		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
+		{
+			return new NotificationButton("Перейти к коммиту", GitUtils.RepoUrlToCommitLink(RepoUrl, CommitHash));
 		}
 
 		public override bool IsActual()
