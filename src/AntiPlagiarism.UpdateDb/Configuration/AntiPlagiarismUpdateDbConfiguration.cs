@@ -9,6 +9,8 @@ namespace AntiPlagiarism.UpdateDb.Configuration
 		
 		public HostLogConfiguration HostLog { get; set; }
 		
+		public string GraphiteServiceName { get; set; }
+		
 		public AntiPlagiarismConfiguration AntiPlagiarism { get; set; }
 	}
 }
