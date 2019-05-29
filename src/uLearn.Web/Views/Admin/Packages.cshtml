@@ -77,7 +77,7 @@
 						<div class="checkbox checkbox-default">
 							@Html.CheckBox("isWebhookEnabled", (Model.CourseGit?.IsWebhookEnabled ?? false))
 							<label for="isWebhookEnabled">Загружать новые версии автоматически
-								<div class="form-text text-muted"><small>Включите webhook в настройках репозитория, укажите url https://dev.ulearn.me/CoursesWebhook и secret @Model.GitSecret</small></div></label>
+								<div class="form-text text-muted"><small>Включите webhook в настройках репозитория, укажите url https://dev.ulearn.me/CoursesWebhook, сontent type json и secret @Model.GitSecret</small></div></label>
 						</div>
 					</div>
 					<button type="submit" name="submitButton" class="btn btn-success" value="Save">Сохранить</button>
