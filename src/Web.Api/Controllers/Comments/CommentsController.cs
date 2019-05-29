@@ -75,7 +75,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			var likedByUserCommentsIds = (await commentLikesRepo.GetCommentsLikedByUserAsync(courseId, parameters.SlideId, UserId).ConfigureAwait(false)).ToHashSet();
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(User.GetUserId(), courseId, CourseRoleType.Instructor).ConfigureAwait(false);
 			var canViewAllGroupMembers = isInstructor && await groupAccessesRepo.CanUserSeeAllCourseGroupsAsync(User.GetUserId(), courseId).ConfigureAwait(false);
-			var userAvailableGroupsIds = !isInstructor ? null : (await groupAccessesRepo.GetAvailableForUserGroupsAsync(User.GetUserId(), true, true).ConfigureAwait(false)).Select(g => g.Id).ToHashSet();
+			var userAvailableGroupsIds = !isInstructor ? null : (await groupAccessesRepo.GetAvailableForUserGroupsAsync(User.GetUserId(), false, true, true).ConfigureAwait(false)).Select(g => g.Id).ToHashSet();
 			var authorsIds = allComments.Select(c => c.Author.Id).Distinct().ToList();
 			var authors2Groups = !isInstructor ? null : await groupMembersRepo.GetUsersGroupsAsync(courseId, authorsIds, true).ConfigureAwait(false);
 

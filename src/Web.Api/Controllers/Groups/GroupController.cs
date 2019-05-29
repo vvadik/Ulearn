@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -91,6 +90,12 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		[ProducesResponseType((int) HttpStatusCode.OK)]
 		public async Task<ActionResult<GroupInfo>> UpdateGroup(int groupId, [FromBody] UpdateGroupParameters parameters)
 		{
+			var hasEditAccess = await groupAccessesRepo.HasUserEditAccessToGroupAsync(groupId, UserId).ConfigureAwait(false);
+			if (!hasEditAccess)
+			{
+				return StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse("You have no edit access to this group"));
+			}
+			
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
 			
 			var newName = parameters.Name ?? group.Name;
@@ -123,6 +128,11 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		[ProducesResponseType((int) HttpStatusCode.OK)]
 		public async Task<IActionResult> DeleteGroup(int groupId)
 		{
+			var hasEditAccess = await groupAccessesRepo.HasUserEditAccessToGroupAsync(groupId, UserId).ConfigureAwait(false);
+			if (!hasEditAccess)
+			{
+				return StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse("You have no edit access to this group"));
+			}
 			await groupsRepo.DeleteGroupAsync(groupId).ConfigureAwait(false);
 			return Ok(new SuccessResponseWithMessage($"Group {groupId} has been deleted"));
 		}
@@ -221,6 +231,12 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		[HttpPost("scores")]
 		public async Task<IActionResult> SetScoringGroups(int groupId, SetScoringGroupsParameters parameters)
 		{
+			var hasEditAccess = await groupAccessesRepo.HasUserEditAccessToGroupAsync(groupId, UserId).ConfigureAwait(false);
+			if (!hasEditAccess)
+			{
+				return StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse("You have no edit access to this group"));
+			}
+			
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
 			var course = courseManager.FindCourse(group.CourseId);
 			if (course == null)
@@ -322,6 +338,12 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		[SwaggerResponse((int) HttpStatusCode.NotFound, Description = "Can't find user or user is not a student of this group")]
 		public async Task<IActionResult> RemoveStudent(int groupId, string studentId)
 		{
+			var hasEditAccess = await groupAccessesRepo.HasUserEditAccessToGroupAsync(groupId, UserId).ConfigureAwait(false);
+			if (!hasEditAccess)
+			{
+				return StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse("You have no edit access to this group"));
+			}
+			
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
 			
 			var user = await usersRepo.FindUserByIdAsync(studentId).ConfigureAwait(false);
@@ -348,6 +370,12 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		[ProducesResponseType((int) HttpStatusCode.OK)]
 		public async Task<IActionResult> RemoveStudents(int groupId, RemoveStudentsParameters parameters)
 		{
+			var hasEditAccess = await groupAccessesRepo.HasUserEditAccessToGroupAsync(groupId, UserId).ConfigureAwait(false);
+			if (!hasEditAccess)
+			{
+				return StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse("You have no edit access to this group"));
+			}
+			
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
 
 			var members = await groupMembersRepo.RemoveUsersFromGroupAsync(groupId, parameters.StudentIds).ConfigureAwait(false);
@@ -372,9 +400,9 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			if (destinationGroup == null)
 				return NotFound(new ErrorResponse($"Group {groupId} not found"));
 			
-			var isDestinationGroupVisible = await groupAccessesRepo.IsGroupVisibleForUserAsync(destinationGroup, UserId).ConfigureAwait(false);
-			if (!isDestinationGroupVisible)
-				return StatusCode((int) HttpStatusCode.Forbidden, new ErrorResponse($"You have no access to group {groupId}"));
+			var hasDestinationGroupEditAccess = await groupAccessesRepo.HasUserEditAccessToGroupAsync(destinationGroup.Id, UserId).ConfigureAwait(false);
+			if (!hasDestinationGroupEditAccess)
+				return StatusCode((int) HttpStatusCode.Forbidden, new ErrorResponse($"You have no edit access to group {groupId}"));
 
 			var membersOfAllGroupsAvailableForUser = (await groupAccessesRepo.GetMembersOfAllGroupsAvailableForUserAsync(UserId).ConfigureAwait(false))
 				.Select(gm => gm.UserId);
@@ -416,13 +444,19 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/* TODO (andgein): We don't check that userId is Instructor of course. Should we check it? Or not? */
 		public async Task<IActionResult> GrantAccess(int groupId, string userId)
 		{
+			var hasEditAccess = await groupAccessesRepo.HasUserEditAccessToGroupAsync(groupId, UserId).ConfigureAwait(false);
+			if (!hasEditAccess)
+			{
+				return StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse("You have no edit access to this group"));
+			}
+			
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
 			
 			var user = await usersRepo.FindUserByIdAsync(userId).ConfigureAwait(false);
 			if (user == null)
 				return NotFound(new ErrorResponse($"User {userId} not found"));
 
-			var alreadyHasAccess = await groupAccessesRepo.HasUserAccessToGroupAsync(groupId, userId).ConfigureAwait(false);
+			var alreadyHasAccess = await groupAccessesRepo.HasUserGrantedAccessToGroupOrIsOwnerAsync(groupId, userId).ConfigureAwait(false);
 			if (alreadyHasAccess)
 				return Conflict(new ErrorResponse($"User {userId} already has access to group {groupId}"));
 
@@ -446,7 +480,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			if (!canRevokeAccess)
 				return Forbid();
 
-			var hasAccess = await groupAccessesRepo.HasUserAccessToGroupAsync(groupId, userId).ConfigureAwait(false);
+			var hasAccess = await groupAccessesRepo.HasUserGrantedAccessToGroupOrIsOwnerAsync(groupId, userId).ConfigureAwait(false);
 			if (!hasAccess)
 				return NotFound(new ErrorResponse($"User {userId} has no access to group {groupId}"));
 

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Database.Models;
 using Database.Repos.CourseRoles;
 using Database.Repos.SystemAccessesRepo;
+using Database.Repos.Users;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -22,12 +23,14 @@ namespace Database.Repos.Groups
 		private readonly ICoursesRepo coursesRepo;
 		private readonly IGroupMembersRepo groupMembersRepo;
 		private readonly ICourseRolesRepo courseRolesRepo;
+		private readonly IUsersRepo usersRepo;
 		private readonly WebCourseManager courseManager;
 		private readonly ILogger logger;
 
 		public GroupAccessesRepo(
 			UlearnDb db,
 			IGroupsRepo groupsRepo, ISystemAccessesRepo systemAccessesRepo, ICoursesRepo coursesRepo, IGroupMembersRepo groupMembersRepo,
+			IUsersRepo usersRepo,
 			ICourseRolesRepo courseRolesRepo,
 			WebCourseManager courseManager,
 			ILogger logger
@@ -39,6 +42,7 @@ namespace Database.Repos.Groups
 			this.coursesRepo = coursesRepo;
 			this.groupMembersRepo = groupMembersRepo;
 			this.courseRolesRepo = courseRolesRepo;
+			this.usersRepo = usersRepo;
 			this.courseManager = courseManager;
 			this.logger = logger;
 		}
@@ -105,7 +109,15 @@ namespace Database.Repos.Groups
 				.ToDefaultDictionary();
 		}
 		
-		public async Task<bool> HasUserAccessToGroupAsync(int groupId, string userId)
+		public async Task<bool> HasUserEditAccessToGroupAsync(int groupId, string userId)
+		{
+			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false) ?? throw new ArgumentNullException($"Can't find group with id={groupId}");
+			if ((await GetCoursesWhereUserCanEditAllGroupsAsync(userId).ConfigureAwait(false)).Contains(group.CourseId))
+				return true;
+			return await HasUserGrantedAccessToGroupOrIsOwnerAsync(groupId, userId).ConfigureAwait(false);
+		}
+		
+		public async Task<bool> HasUserGrantedAccessToGroupOrIsOwnerAsync(int groupId, string userId)
 		{
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false) ?? throw new ArgumentNullException($"Can't find group with id={groupId}");
 			
@@ -130,17 +142,26 @@ namespace Database.Repos.Groups
 			if (! await courseRolesRepo.HasUserAccessToCourseAsync(userId, group.CourseId, CourseRoleType.Instructor).ConfigureAwait(false))
 				return false;
 
-			return await HasUserAccessToGroupAsync(group.Id, userId).ConfigureAwait(false);
+			return await HasUserGrantedAccessToGroupOrIsOwnerAsync(group.Id, userId).ConfigureAwait(false);
 		}
 
-		private async Task<List<Group>> InternalGetAvailableForUserGroupsAsync([CanBeNull] List<string> coursesIds, string userId, bool includeNonarchived, bool includeArchived)
+		private async Task<List<Group>> InternalGetAvailableForUserGroupsAsync([CanBeNull] List<string> coursesIds, string userId, bool needEditAccess, bool includeNonarchived, bool includeArchived)
 		{
-			List<string> coursesWhereUserCanSeeAllGroups;
-			if (coursesIds == null)
-				coursesWhereUserCanSeeAllGroups = await GetCoursesWhereUserCanSeeAllGroupsAsync(userId).ConfigureAwait(false);
+			List<string> coursesWhereUserCanSeeAllGroups = null;
+			List<string> coursesWhereUserCanEditAllGroups = null;
+			if (!needEditAccess)
+			{
+				if (coursesIds == null)
+					coursesWhereUserCanSeeAllGroups = await GetCoursesWhereUserCanSeeAllGroupsAsync(userId).ConfigureAwait(false);
+				else
+					coursesWhereUserCanSeeAllGroups = await GetCoursesWhereUserCanSeeAllGroupsAsync(userId, coursesIds).ConfigureAwait(false);
+			}
 			else
-				coursesWhereUserCanSeeAllGroups = await GetCoursesWhereUserCanSeeAllGroupsAsync(userId, coursesIds).ConfigureAwait(false);
-			
+			{
+				coursesWhereUserCanEditAllGroups = (await GetCoursesWhereUserCanEditAllGroupsAsync(userId).ConfigureAwait(false))
+					.Where(с => coursesIds == null || coursesIds.Contains(с)).ToList();
+			}
+
 			var groupsWithAccess = new HashSet<int>(db.GroupAccesses.Where(a => a.UserId == userId && a.IsEnabled).Select(a => a.GroupId));
 			var groups = db.Groups
 				.Include(g => g.Owner)
@@ -149,7 +170,8 @@ namespace Database.Repos.Groups
 							(coursesIds == null || coursesIds.Contains(g.CourseId)) &&
 							(
 								/* Course admins can see all groups */
-								coursesWhereUserCanSeeAllGroups.Contains(g.CourseId) ||
+								!needEditAccess && coursesWhereUserCanSeeAllGroups.Contains(g.CourseId) ||
+								needEditAccess && coursesWhereUserCanEditAllGroups.Contains(g.CourseId) ||
 								/* Other instructor can see only own groups */
 								g.OwnerId == userId || groupsWithAccess.Contains(g.Id)
 							)
@@ -163,22 +185,22 @@ namespace Database.Repos.Groups
 				.ConfigureAwait(false);
 		}
 		
-		public async Task<List<Group>> GetAvailableForUserGroupsAsync(string courseId, string userId, bool includeNonarchived=true, bool includeArchived=false)
+		public async Task<List<Group>> GetAvailableForUserGroupsAsync(string courseId, string userId, bool needEditAccess, bool includeNonarchived=true, bool includeArchived=false)
 		{
 			if (!await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.Instructor).ConfigureAwait(false))
 				return new List<Group>();
 
-			return await InternalGetAvailableForUserGroupsAsync(new List<string> { courseId }, userId, includeNonarchived, includeArchived).ConfigureAwait(false);
+			return await InternalGetAvailableForUserGroupsAsync(new List<string> { courseId }, userId, needEditAccess, includeNonarchived, includeArchived).ConfigureAwait(false);
 		}		
 		
-		public Task<List<Group>> GetAvailableForUserGroupsAsync(List<string> coursesIds, string userId, bool includeNonarchived=true, bool includeArchived=false)
+		public Task<List<Group>> GetAvailableForUserGroupsAsync(List<string> coursesIds, string userId, bool needEditAccess, bool includeNonarchived=true, bool includeArchived=false)
 		{
-			return InternalGetAvailableForUserGroupsAsync(coursesIds, userId, includeNonarchived, includeArchived);
+			return InternalGetAvailableForUserGroupsAsync(coursesIds, userId, needEditAccess, includeNonarchived, includeArchived);
 		}		
 
-		public Task<List<Group>> GetAvailableForUserGroupsAsync(string userId, bool includeNonarchived=true, bool includeArchived=false)
+		public Task<List<Group>> GetAvailableForUserGroupsAsync(string userId, bool needEditAccess, bool includeNonarchived=true, bool includeArchived=false)
 		{
-			return InternalGetAvailableForUserGroupsAsync(null, userId, includeNonarchived, includeArchived);
+			return InternalGetAvailableForUserGroupsAsync(null, userId, needEditAccess, includeNonarchived, includeArchived);
 		}
 
 		/* Instructor can view student if he is a course admin or if student is member of one of accessible for instructor group */
@@ -188,7 +210,7 @@ namespace Database.Repos.Groups
 				return true;
 
 			var coursesIds = courseManager.GetCourses().Select(c => c.Id).ToList();
-			var groups = await GetAvailableForUserGroupsAsync(coursesIds, instructorId).ConfigureAwait(false);
+			var groups = await GetAvailableForUserGroupsAsync(coursesIds, instructorId, false).ConfigureAwait(false);
 			var members = await groupMembersRepo.GetGroupsMembersAsync(groups.Select(g => g.Id).ToList()).ConfigureAwait(false);
 			return members.Select(m => m.UserId).Contains(studentId);
 		}
@@ -206,13 +228,13 @@ namespace Database.Repos.Groups
 		
 		public async Task<List<GroupMember>> GetMembersOfAllGroupsAvailableForUserAsync(string userId)
 		{
-			var groups = await GetAvailableForUserGroupsAsync(userId).ConfigureAwait(false);
+			var groups = await GetAvailableForUserGroupsAsync(userId, false).ConfigureAwait(false);
 			return await groupMembersRepo.GetGroupsMembersAsync(groups.Select(g => g.Id).ToList()).ConfigureAwait(false);
 		}
 
 		public async Task<List<ApplicationUser>> GetInstructorsOfAllGroupsAvailableForUserAsync(string userId)
 		{
-			var groups = await GetAvailableForUserGroupsAsync(userId).ConfigureAwait(false);
+			var groups = await GetAvailableForUserGroupsAsync(userId, false).ConfigureAwait(false);
 			var accesses = await GetGroupAccessesAsync(groups.Select(g => g.Id)).ConfigureAwait(false);
 			return accesses.SelectMany(a => a.Value).Select(a => a.User).ToList();
 		}
@@ -238,6 +260,16 @@ namespace Database.Repos.Groups
 			var coursesWithCourseAccess = await coursesRepo.GetCoursesUserHasAccessTo(userId, CourseAccessType.ViewAllGroupMembers).ConfigureAwait(false);
 
 			return new HashSet<string>(coursesAsCourseAdmin).Concat(coursesWithCourseAccess).ToList();
+		}
+		
+		private async Task<List<string>> GetCoursesWhereUserCanEditAllGroupsAsync(string userId)
+		{
+			if ((await usersRepo.GetSysAdminsIdsAsync().ConfigureAwait(false)).Contains(userId))
+				return await coursesRepo.GetPublishedCourseIdsAsync().ConfigureAwait(false);
+
+			var coursesAsCourseAdmin = await courseRolesRepo.GetCoursesWhereUserIsInRoleAsync(userId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
+
+			return new HashSet<string>(coursesAsCourseAdmin).ToList();
 		}
 
 		public async Task<bool> CanUserSeeAllCourseGroupsAsync(string userId, string courseId)
