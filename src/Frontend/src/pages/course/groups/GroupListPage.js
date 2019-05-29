@@ -174,15 +174,17 @@ class GroupListPage extends Component {
 
 	deleteGroup = (group, groupsName) => {
 		api.groups.deleteGroup(group.id)
-		.catch(console.error)
 		.then(() => {
 			Toast.push(`Группа «${group.name}» удалена`);
-		});
 
-		const updateGroups = this.state[groupsName].filter(g => group.id !== g.id);
+			const updateGroups = this.state[groupsName].filter(g => group.id !== g.id);
 
-		this.setState({
-			[groupsName]: updateGroups,
+			this.setState({
+				[groupsName]: updateGroups,
+			});
+		})
+		.catch((error) => {
+			error.showToast();
 		});
 	};
 
@@ -192,18 +194,20 @@ class GroupListPage extends Component {
 		};
 
 		api.groups.saveGroupSettings(group.id, newSettings)
-		.catch(console.error)
 		.then(() => {
-			Toast.push(isArchived ? `Группа «${group.name}» заархивирована` : `Группа «${group.name}» восстановлена`)
+			Toast.push(isArchived ? `Группа «${group.name}» заархивирована` : `Группа «${group.name}» восстановлена`);
+
+			group = {...group, ...newSettings};
+
+			if (isArchived) {
+				this.moveGroup(group, 'groups', 'archiveGroups');
+			} else {
+				this.moveGroup(group, 'archiveGroups', 'groups');
+			}
+		})
+		.catch((error) => {
+			error.showToast();
 		});
-
-		group = {...group, ...newSettings};
-
-		if (isArchived) {
-			this.moveGroup(group, 'groups', 'archiveGroups');
-		} else {
-			this.moveGroup(group, 'archiveGroups', 'groups');
-		}
 	};
 
 	moveGroup = (group, moveFrom, moveTo) => {

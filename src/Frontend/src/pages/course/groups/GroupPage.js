@@ -244,24 +244,24 @@ class GroupPage extends Component {
 
 		e.preventDefault();
 
-		this.setState({
-			loadingAllSettings: true,
-			group: {
-				...group,
-				name: updatedFields.name,
-			}
-		});
-
 		const saveGroup = api.groups.saveGroupSettings(group.id, updatedFields);
 		const saveScores = api.groups.saveScoresSettings(group.id, scoresId);
 
 		Promise
 		.all([saveGroup, saveScores])
 		.then(([group, scores]) => {
-			this.setState({group});
+			this.setState({
+				loadingAllSettings: true,
+				group: {
+					...group,
+					name: updatedFields.name === undefined ? group.name : updatedFields.name,
+				}
+			});
 			Toast.push('Настройки группы сохранены');
 		})
-		.catch(console.error)
+		.catch((error) => {
+			error.showToast();
+		})
 		.finally(() => {
 			this.setState({loadingAllSettings: false});
 		});
