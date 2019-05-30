@@ -62,11 +62,26 @@ namespace Database.Repos
 		{
 			return db.ManualQuizCheckings.AnyAsync(c => c.CourseId == courseId && c.SlideId == slideId && c.UserId == userId && !c.IsChecked);
 		}
+		
+		public Task<List<Guid>> GetSlideIdsWaitingForManualCheckAsync(string courseId, string userId)
+		{
+			return db.ManualQuizCheckings
+				.Where(c => c.CourseId == courseId && c.UserId == userId && !c.IsChecked)
+				.Select(c => c.SlideId).Distinct().ToListAsync();
+		}
 
-		public Task<int> GetUsedAttemptsCountAsync(string courseId, string userId, Guid slideId)
+		public Task<int> GetUsedAttemptCountsAsync(string courseId, string userId, Guid slideId)
 		{
 			return db.UserQuizSubmissions
 				.CountAsync(s => s.CourseId == courseId && s.UserId == userId && s.SlideId == slideId);
+		}
+		
+		public Task<Dictionary<Guid, int>> GetUsedAttemptCountsAsync(string courseId, string userId)
+		{
+			return db.UserQuizSubmissions
+				.Where(s => s.CourseId == courseId && s.UserId == userId)
+				.GroupBy(s => s.SlideId)
+				.ToDictionaryAsync(g => g.Key, g => g.Count());
 		}
 
 		public async Task<HashSet<Guid>> GetPassedSlideIdsAsync(string courseId, string userId)

@@ -15,11 +15,13 @@ using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Authorization;
+using Ulearn.Web.Api.Models.Parameters;
 using Ulearn.Web.Api.Models.Responses.Account;
 using Web.Api.Configuration;
 
@@ -35,7 +37,8 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly ISystemAccessesRepo systemAccessesRepo;
 		private readonly WebApiConfiguration configuration;
 
-		public AccountController(ILogger logger, IOptions<WebApiConfiguration> options, WebCourseManager courseManager, UlearnDb db, UlearnUserManager userManager, SignInManager<ApplicationUser> signInManager,
+		public AccountController(ILogger logger, IOptions<WebApiConfiguration> options, WebCourseManager courseManager, UlearnDb db,
+			UlearnUserManager userManager, SignInManager<ApplicationUser> signInManager,
 			ICourseRolesRepo courseRolesRepo, ICoursesRepo coursesRepo, IUsersRepo usersRepo, ISystemAccessesRepo systemAccessesRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
@@ -100,7 +103,7 @@ namespace Ulearn.Web.Api.Controllers
 			var expires = DateTime.Now.AddHours(configuration.Web.Authentication.Jwt.LifeTimeHours);
 			return GetTokenInternal(expires, claims);
 		}
-		
+
 		/// <summary>
 		/// Получить ключ на пользователя на заданныей срок в днях
 		/// </summary>
@@ -127,6 +130,34 @@ namespace Ulearn.Web.Api.Controllers
 				configuration.Web.Authentication.Jwt.Issuer,
 				configuration.Web.Authentication.Jwt.Audience,
 				claims,
+				expires: expires,
+				signingCredentials: signingCredentials
+			);
+			var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+			return new TokenResponse
+			{
+				Token = tokenString,
+			};
+		}
+
+		/// <summary>
+		/// Получить JWT-токен по логину-паролю
+		/// </summary>
+		[HttpPost("login")]
+		public async Task<ActionResult<TokenResponse>> Login([FromBody] LoginPasswordParameters loginPassword)
+		{
+			var appUser = await db.Users.FirstAsync(u => u.UserName == loginPassword.Login);
+			var result = await signInManager.UserManager.CheckPasswordAsync(appUser, loginPassword.Password);
+			if (!result) return Forbid();
+
+			var key = JwtBearerHelpers.CreateSymmetricSecurityKey(configuration.Web.Authentication.Jwt.IssuerSigningKey);
+			var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+			var expires = DateTime.Now.AddHours(configuration.Web.Authentication.Jwt.LifeTimeHours);
+
+			var token = new JwtSecurityToken(
+				configuration.Web.Authentication.Jwt.Issuer,
+				configuration.Web.Authentication.Jwt.Audience,
+				new[]{new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", appUser.Id), },
 				expires: expires,
 				signingCredentials: signingCredentials
 			);

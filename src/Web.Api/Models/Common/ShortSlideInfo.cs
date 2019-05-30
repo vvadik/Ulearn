@@ -27,5 +27,11 @@ namespace Ulearn.Web.Api.Models.Common
 
 		[DataMember]
 		public string ApiUrl { get; set; }
+
+		/// <summary>
+		/// Количество вопросов в quiz
+		/// </summary>
+		[DataMember]
+		public int QuestionsCount { get; set; }
 	}
 }

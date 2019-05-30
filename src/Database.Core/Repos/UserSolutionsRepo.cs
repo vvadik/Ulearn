@@ -534,6 +534,14 @@ namespace Database.Repos
 				await Task.Delay(TimeSpan.FromMilliseconds(100));
 			}
 		}
+		
+		// public Task<IList<ManualExerciseChecking>> GetSlideIdsWaitingForManualCheckAsync(string courseId, string userId)
+		// {
+		// 	// return db.UserExerciseSubmissions
+		// 	// 	.Where(c => c.CourseId == courseId && c.UserId == userId)
+		// 	// 	.Select(c => c.ManualCheckings)
+		// 	// 	.ToListAsync();
+		// }
 
 		private static void ClearHandleDictionaries()
 		{

@@ -32,11 +32,10 @@ namespace Database.Repos
 			return course.Units.Where(u => visibleUnitsIds.Contains(u.Id)).ToList();
 		}
 
-		public DateTime GetNextUnitPublishTime(string courseId)
+		public DateTime? GetNextUnitPublishTime(string courseId)
 		{
 			return db.UnitAppearances.Where(u => u.CourseId == courseId && u.PublishTime > DateTime.Now)
-				.Select(u => u.PublishTime)
-				.Concat(new[] { DateTime.MaxValue }).Min();
+				.Select(u => (DateTime?)u.PublishTime).OrderBy(t => t).FirstOrDefault();
 		}
 	}
 }

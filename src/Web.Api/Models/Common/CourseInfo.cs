@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Ulearn.Web.Api.Models.Common
@@ -13,6 +14,12 @@ namespace Ulearn.Web.Api.Models.Common
 		public string Title { get; set; }
 		
 		[DataMember]
+		public string Description { get; set; }
+	
+		[DataMember]
 		public List<UnitInfo> Units { get; set; }
+
+		[DataMember]
+		public DateTime? NextUnitPublishTime { get; set; }
 	}
 }

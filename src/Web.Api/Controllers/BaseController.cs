@@ -12,6 +12,7 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Quizzes;
+using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
 using Ulearn.Core.Courses.Units;
 using Ulearn.Web.Api.Models.Common;
 using Ulearn.Web.Api.Models.Responses.Notifications;
@@ -85,7 +86,10 @@ namespace Ulearn.Web.Api.Controllers
 				Slug = slide.Url,
 				ApiUrl = Url.Action(nameof(SlidesController.SlideInfo), "Slides", new { courseId = courseId, slideId = slide.Id }),
 				MaxScore = slide.MaxScore,
-				Type = GetSlideType(slide)
+				Type = GetSlideType(slide),
+				QuestionsCount = slide.Blocks.OfType<AbstractQuestionBlock>().Count(),
+				
+				// TODO: кол-во попыток
 			};
 		}
 
