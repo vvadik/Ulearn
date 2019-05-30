@@ -1,5 +1,5 @@
 export const itemTypes = {
-	theory: 'theory',
+	lesson: 'lesson',
 	quiz: 'quiz',
-	task: 'task',
+	exercise: 'exercise',
 };

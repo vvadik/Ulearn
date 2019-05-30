@@ -24,10 +24,10 @@ storiesOf("Navigation", module)
 			<NavigationItem text='Пункт меню со счетом и описанием' description='Задание' score={ 0 } />
 			<NavigationItem text='Пункт меню с метро' metro={{
 				complete: true,
-				type: itemTypes.theory,
+				type: itemTypes.lesson,
 				connectToPrev: true,
 			}} />
-			<NavigationItem text='Пункт меню с метро' metro={{complete: false, type: itemTypes.theory}} />
+			<NavigationItem text='Пункт меню с метро' metro={{complete: false, type: itemTypes.lesson}} />
 			<NavigationItem text='Пункт меню с иконкой' metro={{complete: false, type: itemTypes.quiz}} />
 			<NavigationItem text='Пункт меню с иконкой и описанием и счетом'
 							hasMetro
@@ -35,7 +35,7 @@ storiesOf("Navigation", module)
 							description='Ждет код-ревью • 3 попытки осталось'
 							isActive
 							metro={{complete: false, type: itemTypes.quiz}} />
-			<NavigationItem text='Пункт меню с иконкой' metro={{complete: false, type: itemTypes.task}} />
+			<NavigationItem text='Пункт меню с иконкой' metro={{complete: false, type: itemTypes.exercise}} />
 			<NavigationItem text='Пункт меню с иконкой' metro={{
 				complete: true,
 				type: itemTypes.quiz,
@@ -43,7 +43,7 @@ storiesOf("Navigation", module)
 			}} />
 			<NavigationItem text='Пункт меню с иконкой' metro={{
 				complete: true,
-				type: itemTypes.task,
+				type: itemTypes.exercise,
 				connectToPrev: true,
 				isLastItem: true,
 			}} />

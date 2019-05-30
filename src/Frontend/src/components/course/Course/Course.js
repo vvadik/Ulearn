@@ -11,6 +11,7 @@ class Course extends Component {
 		super(props);
 
 		this.state = {
+			progressLoad: false,
 			showCourseNav: false,
 		};
 	}
@@ -24,14 +25,12 @@ class Course extends Component {
 
 		if (progress) {
 			this.setState({
-				showCourseNav: Boolean(Object.keys(progress).length),
+				showCourseNav: Object.keys(progress).length > 0,
 			});
 		}
 
 		if (isAuthenticated && !progress) {
 			loadUserProgress(courseId);
-
-
 		}
 
 		if (!isAuthenticated) {
@@ -39,6 +38,14 @@ class Course extends Component {
 		}
 	}
 
+	static getDerivedStateFromProps (props, state) {
+		if (!state.progressLoad && props.progress) {
+			return {
+				progressLoad: true,
+				showCourseNav: Object.keys(props.progress).length > 0,
+			};
+		}
+	}
 
 	render () {
 		const { courseInfo, progress } = this.props;
@@ -50,11 +57,10 @@ class Course extends Component {
 		return (
 			<div className={ styles.root }>
 				<Navigation
-					isCourseNavigation
-					progress={0}
-					title={ courseInfo.title }
-					description={ courseInfo.description }
-					items={ courseInfo.units } />
+					progress={0.5}
+					courseName={ courseInfo.title }
+					title={ courseInfo.units[0].title }
+					items={ courseInfo.units[0].slides } />
 				<div>
 					<AnyPage />
 				</div>

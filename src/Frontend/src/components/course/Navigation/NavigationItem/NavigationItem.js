@@ -7,7 +7,7 @@ import { itemTypes } from '../constants';
 
 const icons = {
 	[itemTypes.quiz]: '?',
-	[itemTypes.task]: '{}',
+	[itemTypes.exercise]: '{}',
 };
 
 class NavigationItem extends Component {
@@ -83,7 +83,7 @@ class NavigationItem extends Component {
 	renderPointer() {
 		const { complete, type } = this.props.metro;
 
-		if (type === itemTypes.theory) {
+		if (type === itemTypes.lesson) {
 			return (
 				<span className={ classnames(styles.pointer, {[styles.complete]: complete}) } />
 			);
