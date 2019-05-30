@@ -114,20 +114,11 @@ namespace Database.DataContexts
 			await db.SaveChangesAsync();
 		}
 
+		[Obsolete]
 		public async Task SetAntiPlagiarismSubmissionId(UserExerciseSubmission submission, int antiPlagiarismSubmissionId)
 		{
 			submission.AntiPlagiarismSubmissionId = antiPlagiarismSubmissionId;
 			await db.SaveChangesAsync();
-		}
-
-		public UserExerciseSubmission FindSubmissionByAntiPlagiarismSubmissionId(int antiPlagiarismSubmissionId)
-		{
-			return db.UserExerciseSubmissions.FirstOrDefault(s => s.AntiPlagiarismSubmissionId == antiPlagiarismSubmissionId);
-		}
-
-		public List<UserExerciseSubmission> GetSubmissionsByAntiPlagiarismSubmissionsIds(IEnumerable<int> antiPlagiarismSubmissionsIds)
-		{
-			return db.UserExerciseSubmissions.Where(s => s.AntiPlagiarismSubmissionId.HasValue && antiPlagiarismSubmissionsIds.Contains(s.AntiPlagiarismSubmissionId.Value)).ToList();
 		}
 
 		///<returns>(likesCount, isLikedByThisUsed)</returns>
