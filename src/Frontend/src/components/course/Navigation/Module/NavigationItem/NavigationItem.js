@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import PropTypes from 'prop-types';
 import styles from './NavigationItem.less';
 import classnames from 'classnames';
-import ProgressBar from '../ProgressBar';
-import { itemTypes } from '../constants';
+import ProgressBar from '../../ProgressBar';
+import { itemTypes } from '../../constants';
 
 const icons = {
 	[itemTypes.quiz]: '?',

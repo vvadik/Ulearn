@@ -1,86 +1,14 @@
-import React from "react";
-import { storiesOf } from "@storybook/react";
-import Navigation from './Navigation';
-import { itemTypes } from './constants';
+import React from 'react';
+import { storiesOf } from '@storybook/react';
+import NavigationContent from './NavigationContent';
+import { itemTypes } from '../../constants';
 
 
-storiesOf("Navigation", module)
-	.add("Главный компонент навигации по курсу", () => (
-		<Navigation title='Основы программирования'
-					isCourseNavigation
-					description={ getDescription() }
-					progress={ 0.4 }
-					items={getCourseNav()}
-		/>
-	))
-	.add("Главный компонент навигации по модулю", () => (
-		<Navigation title='Первое знакомство с C#'
-					courseName='Основы программирования'
-					courseUrl='https://ulearn.me/Course/BasicProgramming'
-					items={getModuleNav()}
-		/>
+
+storiesOf('ModuleNavigation', module)
+	.add('Навигация по модулю', () => (
+		<NavigationContent items={getModuleNav()}/>
 	));
-
-function getDescription () {
-	return `Знакомство с основами синтаксиса C#, 
-	стандартными классами .NET, 
-	с основами ООП и базовыми алгоритмами.`;
-}
-
-function getCourseNav () {
-	return [
-		{
-			title: 'Первое знакомство с C#',
-			url: 'https://ulearn.me/Course/BasicProgramming/Ob_yavlenie_struktury_2f0b0caa-ce22-4068-93bb-e5c1a0f8a2a4#N0',
-			progress: 0.84,
-		}, {
-			title: 'Ошибки',
-			url: 'https://ulearn.me/Course/BasicProgramming/Ob_yavlenie_struktury_2f0b0caa-ce22-4068-93bb-e5c1a0f8a2a4#N1',
-			progress: 1,
-		}, {
-			title: 'Ветвления',
-			url: 'https://ulearn.me/Course/BasicProgramming/Ob_yavlenie_struktury_2f0b0caa-ce22-4068-93bb-e5c1a0f8a2a4#N2',
-			progress: 1,
-		}, {
-			title: 'Циклы',
-			url: 'https://ulearn.me/Course/BasicProgramming/Ob_yavlenie_struktury_2f0b0caa-ce22-4068-93bb-e5c1a0f8a2a4#N3',
-			progress: 0.45,
-		}, {
-			title: 'Массивы',
-			url: 'https://ulearn.me/Course/BasicProgramming/Ob_yavlenie_struktury_2f0b0caa-ce22-4068-93bb-e5c1a0f8a2a4#N4',
-		}, {
-			title: 'Коллекции, строки, файлы',
-			url: 'https://ulearn.me/Course/BasicProgramming/Ob_yavlenie_struktury_2f0b0caa-ce22-4068-93bb-e5c1a0f8a2a4#N5',
-		}, {
-			title: 'Тестирование',
-			url: 'https://ulearn.me/Course/BasicProgramming/Ob_yavlenie_struktury_2f0b0caa-ce22-4068-93bb-e5c1a0f8a2a4#N6',
-		}, {
-			title: 'Сложность алгоритмов',
-			url: 'https://ulearn.me/Course/BasicProgramming/Ob_yavlenie_struktury_2f0b0caa-ce22-4068-93bb-e5c1a0f8a2a4#N7',
-		}, {
-			title: 'Рекурсивные алгоритмы',
-			url: 'https://ulearn.me/Course/BasicProgramming/Ob_yavlenie_struktury_2f0b0caa-ce22-4068-93bb-e5c1a0f8a2a4#N8',
-		}, {
-			title: 'Поиск и сортировка',
-			url: 'https://ulearn.me/Course/BasicProgramming/Ob_yavlenie_struktury_2f0b0caa-ce22-4068-93bb-e5c1a0f8a2a4#N9',
-		}, {
-			title: 'Практикум',
-			url: 'https://ulearn.me/Course/BasicProgramming/Ob_yavlenie_struktury_2f0b0caa-ce22-4068-93bb-e5c1a0f8a2a4#N10',
-		}, {
-			title: 'Основы ООП',
-			url: 'https://ulearn.me/Course/BasicProgramming/Ob_yavlenie_struktury_2f0b0caa-ce22-4068-93bb-e5c1a0f8a2a4#N11',
-		}, {
-			title: 'Наследование',
-			url: 'https://ulearn.me/Course/BasicProgramming/Ob_yavlenie_struktury_2f0b0caa-ce22-4068-93bb-e5c1a0f8a2a4#N12',
-		}, {
-			title: 'Целостность данных',
-			url: 'https://ulearn.me/Course/BasicProgramming/Ob_yavlenie_struktury_2f0b0caa-ce22-4068-93bb-e5c1a0f8a2a4#N13',
-		}, {
-			title: 'Структуры',
-			url: 'https://ulearn.me/Course/BasicProgramming/Ob_yavlenie_struktury_2f0b0caa-ce22-4068-93bb-e5c1a0f8a2a4#N14',
-		},
-	];
-}
 
 function getModuleNav () {
 	return [

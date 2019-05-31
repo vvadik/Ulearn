@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Navigation from "../Navigation";
+import Navigation from "../Navigation/Module/ModuleNavigation";
 import AnyPage from '../../../pages/AnyPage'
 import styles from "./Course.less"
 

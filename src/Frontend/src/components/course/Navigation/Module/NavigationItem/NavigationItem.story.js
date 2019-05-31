@@ -1,25 +1,14 @@
 import React from "react";
 import { storiesOf } from "@storybook/react";
 import NavigationItem from './NavigationItem';
-import { itemTypes } from '../constants';
+import { itemTypes } from '../../constants';
 
 
 
 
-storiesOf("Navigation", module)
+storiesOf("ModuleNavigation", module)
 	.add("NavigationItem", () => (
 		<nav>
-			<NavigationItem text='Первое знакомство с C#' />
-			<NavigationItem text='Ошибки' />
-			<NavigationItem text='Тут много текста в одном пункте. Надеюсь, таких длинных текстов у нас не будет, но на всякий случай их нужно учесть' />
-			<NavigationItem text='Тутдлинноесловобезпробеловкакжесложноегонабиратьононедолжноничеголоматьвидимолучшийвариантегообрезатьмноготочием' />
-			<NavigationItem text='Текущий модуль' isActive />
-			<NavigationItem text='Модуль с прогресс-баром' progress={ 0.45 } />
-			<NavigationItem text='Модуль с заполненным прогресс-баром' progress={ 1 } />
-			<NavigationItem text='Тут много текста в одном пункте. Надеюсь, таких длинных текстов у нас не будет, но на всякий случай их нужно учесть' progress={ 0.45 } />
-			<NavigationItem text='Тутдлинноесловобезпробеловкакжесложноегонабиратьононедолжноничеголоматьвидимолучшийвариантегообрезатьмноготочием'
-				progress={ 0.45 }
-			/>
 			<NavigationItem text='Пункт меню со счетом' score={ 0.45 } />
 			<NavigationItem text='Пункт меню со счетом и описанием' description='Задание' score={ 0 } />
 			<NavigationItem text='Пункт меню с метро' metro={{
