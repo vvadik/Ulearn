@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-import PropTypes from 'prop-types';
-import styles from './CourseNavigationItem.less';
-import classnames from 'classnames';
-import ProgressBar from '../../ProgressBar';
+import styles from "./CourseNavigationItem.less";
+import classnames from "classnames";
+import ProgressBar from "../../ProgressBar";
+import { courseMenuItemType } from "../../types"
 
 
 class CourseNavigationItem extends Component {
@@ -39,11 +39,7 @@ class CourseNavigationItem extends Component {
 	}
 }
 
-CourseNavigationItem.propTypes ={
-	text: PropTypes.string.isRequired,
-	url: PropTypes.string,
-	progress: PropTypes.number,
-};
+CourseNavigationItem.propTypes = courseMenuItemType;
 
 export default CourseNavigationItem
 

@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import styles from './CourseNavigation.less';
 import CourseNavigationHeader from "../CourseNavigationHeader";
 import CourseNavigationContent from "../CourseNavigationContent"
-import {menuItemType} from "../../types";
+import { courseMenuItemType } from "../../types";
 
 class CourseNavigation extends Component {
 	render () {
@@ -23,7 +23,7 @@ CourseNavigation.propTypes ={
 	title: PropTypes.string,
 	description: PropTypes.string,
 	progress: PropTypes.number,
-	items: PropTypes.arrayOf(menuItemType),
+	items: PropTypes.arrayOf(courseMenuItemType),
 };
 
 export default CourseNavigation

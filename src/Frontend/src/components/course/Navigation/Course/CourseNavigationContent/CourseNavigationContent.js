@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from 'prop-types';
 import CourseNavigationItem from '../CourseNavigationItem';
 import styles from './CourseNavigationContent.less';
-import { menuItemType } from '../../types';
+import { courseMenuItemType } from '../../types';
 
 
 class CourseNavigationContent extends Component {
@@ -28,7 +28,7 @@ class CourseNavigationContent extends Component {
 }
 
 CourseNavigationContent.propTypes ={
-	items: PropTypes.arrayOf(menuItemType)
+	items: PropTypes.arrayOf(courseMenuItemType)
 };
 
 export default CourseNavigationContent

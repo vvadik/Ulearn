@@ -1,9 +1,9 @@
 import React, { Component } from "react";
-import PropTypes from 'prop-types';
 import styles from './NavigationItem.less';
 import classnames from 'classnames';
-import ProgressBar from '../../ProgressBar';
 import { itemTypes } from '../../constants';
+import { menuItemType } from '../../types';
+
 
 const icons = {
 	[itemTypes.quiz]: '?',
@@ -26,7 +26,7 @@ class NavigationItem extends Component {
 					{ metro && this.renderMetro() }
 					<div className={ styles.firstLine }>
 						<span className={ styles.text }>{ text }</span>
-						{ this.renderRightPart() }
+						{ this.renderScore() }
 					</div>
 					{ description &&
 						<div className={ styles.description }>{description}</div>
@@ -36,16 +36,8 @@ class NavigationItem extends Component {
 		);
 	}
 
-	renderRightPart() {
-		const { progress, score } = this.props;
-
-		if (progress) {
-			return (
-				<span className={ styles.progressWrapper }>
-					<ProgressBar value={ progress } small color={ progress >= 1 ? 'green' : 'blue' } />
-				</span>
-			);
-		}
+	renderScore() {
+		const { score } = this.props;
 
 		if (typeof score === 'number') {
 			return (
@@ -95,22 +87,7 @@ class NavigationItem extends Component {
 	}
 }
 
-NavigationItem.propTypes ={
-	text: PropTypes.string.isRequired,
-	url: PropTypes.string,
-	isActive: PropTypes.bool,
-	progress: PropTypes.number,
-	score: PropTypes.number,
-	description: PropTypes.string,
-	metro: PropTypes.shape({
-		complete: PropTypes.bool,
-		type: PropTypes.oneOf(Object.values(itemTypes)),
-		isFirstItem: PropTypes.bool,
-		isLastItem: PropTypes.bool,
-		connectToPrev: PropTypes.bool,
-		connectToNext: PropTypes.bool,
-	})
-};
+NavigationItem.propTypes = menuItemType;
 
 export default NavigationItem
 
