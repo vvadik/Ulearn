@@ -15,11 +15,11 @@ const buildTests = () => {
   const commands = []
 
   if (hasUiTests) {
-    commands.push(execAsync('npm run build-ui && npm run build-ui-tests'))
+    commands.push(execAsync('yarn build-ui && yarn build-ui-tests'))
   }
 
   if (hasUnitTests) {
-    commands.push(execAsync('npm run build-unit-tests'))
+    commands.push(execAsync('yarn build-unit-tests'))
   }
 
   return Promise.all(commands)
@@ -43,6 +43,7 @@ const runUiTests = async () => {
       '--disable-translate',
       '--disable-extensions',
       '--no-sandbox',
+      '--disable-dev-shm-usage',
     ],
   })
 

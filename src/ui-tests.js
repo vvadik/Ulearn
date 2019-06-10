@@ -25,6 +25,7 @@ const runTests = async () => {
       '--disable-gpu',
       '--disable-translate',
       '--disable-extensions',
+      '--disable-dev-shm-usage',
     ],
   })
 

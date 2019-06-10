@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
   mode: 'development',
-  entry: ['@babel/polyfill', './src/index.js'],
+  entry: ['regenerator-runtime/runtime', 'core-js/stable', './src/index.js'],
   output: {
     path: path.resolve(__dirname, 'dist', 'ui'),
     filename: '[name].js',
@@ -21,7 +21,7 @@ module.exports = {
               [
                 '@babel/preset-env',
                 {
-                  targets: { browsers: 'chrome 68' },
+                  targets: { browsers: 'chrome 73' },
                 },
               ],
               '@babel/preset-react',
