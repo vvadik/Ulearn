@@ -22,10 +22,10 @@ namespace uLearn.CourseTool.Validating
 	{
 		private readonly CsProjectExerciseBlock ex;
 		private readonly ExerciseSlide slide;
-		private readonly SandboxRunnerSettings settings;
+		private readonly CsSandboxRunnerSettings settings;
 		private readonly ExerciseStudentZipBuilder exerciseStudentZipBuilder = new ExerciseStudentZipBuilder();
 
-		public ProjectExerciseValidator(BaseValidator baseValidator, SandboxRunnerSettings settings, ExerciseSlide slide, CsProjectExerciseBlock exercise)
+		public ProjectExerciseValidator(BaseValidator baseValidator, CsSandboxRunnerSettings settings, ExerciseSlide slide, CsProjectExerciseBlock exercise)
 			: base(baseValidator)
 		{
 			this.settings = settings;
@@ -83,7 +83,7 @@ namespace uLearn.CourseTool.Validating
 		{
 			var solutionCode = ex.CorrectSolutionFile.ContentAsUtf8();
 			var submission = ex.CreateSubmission(ex.CsprojFileName, solutionCode);
-			var result = SandboxRunner.Run(submission, new SandboxRunnerSettings());
+			var result = CsSandboxRunner.Run(submission, new CsSandboxRunnerSettings());
 
 			if (!IsCompiledAndExecuted(result))
 				ReportSlideError(slide, $"Correct solution file {ex.CorrectSolutionFileName} verdict is not OK. RunResult = {result}");
@@ -109,7 +109,7 @@ namespace uLearn.CourseTool.Validating
 
 			foreach (var waFile in filesWithWrongAnswer)
 			{
-				var result = SandboxRunner.Run(ex.CreateSubmission(waFile.Name, waFile.ContentAsUtf8()));
+				var result = CsSandboxRunner.Run(ex.CreateSubmission(waFile.Name, waFile.ContentAsUtf8()));
 
 				ReportWarningIfWrongAnswerVerdictIsNotOk(waFile.Name, result);
 				ReportWarningIfWrongAnswerIsSolution(waFile.Name, result);
@@ -132,7 +132,7 @@ namespace uLearn.CourseTool.Validating
 		{
 			var initialCode = ex.UserCodeFile.ContentAsUtf8();
 			var submission = ex.CreateSubmission(ex.CsprojFileName, initialCode);
-			var result = SandboxRunner.Run(submission);
+			var result = CsSandboxRunner.Run(submission);
 
 			if (ex.StudentZipIsCompilable)
 				ReportErrorIfInitialCodeVerdictIsNotOk(result);

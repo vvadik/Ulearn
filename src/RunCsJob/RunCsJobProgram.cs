@@ -8,6 +8,7 @@ using System.Threading;
 using log4net;
 using log4net.Config;
 using Metrics;
+using RunCheckerJob;
 using RunCheckerJob.Api;
 using Ulearn.Core;
 
@@ -24,7 +25,7 @@ namespace RunCsJob
 		private readonly List<Thread> threads = new List<Thread>();
 		
 		private static readonly ILog log = LogManager.GetLogger(typeof(RunCsJobProgram));
-		public readonly SandboxRunnerSettings Settings;
+		public readonly CsSandboxRunnerSettings Settings;
 
 		public RunCsJobProgram(ManualResetEvent externalShutdownEvent = null)
 		{
@@ -37,7 +38,7 @@ namespace RunCsJob
 				token = ConfigurationManager.AppSettings["runnerToken"];
 				sleep = TimeSpan.FromSeconds(int.Parse(ConfigurationManager.AppSettings["sleepSeconds"] ?? "1"));
 				var deleteSubmissions = bool.Parse(ConfigurationManager.AppSettings["ulearn.runcsjob.deleteSubmissions"] ?? "true");
-				Settings = new SandboxRunnerSettings
+				Settings = new CsSandboxRunnerSettings
 				{
 					DeleteSubmissionsAfterFinish = deleteSubmissions,
 				};
@@ -172,7 +173,7 @@ namespace RunCsJob
 
 				if (newUnhandled.Any())
 				{
-					var results = newUnhandled.Select(unhandled => SandboxRunner.Run(unhandled, Settings)).ToList();
+					var results = newUnhandled.Select(unhandled => CsSandboxRunner.Run(unhandled, Settings)).ToList();
 					log.Info($"Результаты проверки: [{string.Join(", ", results.Select(r => r.Verdict))}]");
 					try
 					{
@@ -190,7 +191,7 @@ namespace RunCsJob
 
 		private void SelfCheck()
 		{
-			var res = SandboxRunner.Run(new FileRunnerSubmission
+			var res = CsSandboxRunner.Run(new FileRunnerSubmission
 			{
 				Id = Utils.NewNormalizedGuid(),
 				NeedRun = true,

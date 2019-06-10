@@ -18,9 +18,9 @@ namespace uLearn.CourseTool.Validating
 	public class CourseValidator : BaseValidator
 	{
 		private readonly List<Slide> slides;
-		private readonly SandboxRunnerSettings settings;
+		private readonly CsSandboxRunnerSettings settings;
 
-		public CourseValidator(List<Slide> slides, SandboxRunnerSettings settings)
+		public CourseValidator(List<Slide> slides, CsSandboxRunnerSettings settings)
 		{
 			this.slides = slides;
 			this.settings = settings;
@@ -91,7 +91,7 @@ namespace uLearn.CourseTool.Validating
 				ReportSlideWarning(slide, "Style issue(s): " + errorMessages);
 			}
 
-			var result = SandboxRunner.Run(exercise.CreateSubmission(slide.Id.ToString(), ethalon), settings);
+			var result = CsSandboxRunner.Run(exercise.CreateSubmission(slide.Id.ToString(), ethalon), settings);
 
 			var output = result.GetOutput().NormalizeEoln();
 

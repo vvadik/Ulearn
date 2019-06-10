@@ -31,7 +31,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 				Console.WriteLine("Only slide " + SlideId);
 			}
 
-			var validator = new CourseValidator(slides, new SandboxRunnerSettings());
+			var validator = new CourseValidator(slides, new CsSandboxRunnerSettings());
 			validator.InfoMessage += m => Write(ConsoleColor.Gray, m);
 			var errors = new List<string>();
 			validator.Error += m =>

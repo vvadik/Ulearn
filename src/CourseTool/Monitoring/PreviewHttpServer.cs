@@ -264,7 +264,7 @@ namespace uLearn.CourseTool.Monitoring
 			var buildResult = exercise.BuildSolution(code);
 			if (buildResult.HasErrors)
 				return new RunSolutionResult { IsCompileError = true, ErrorMessage = buildResult.ErrorMessage, ExecutionServiceName = "uLearn" };
-			var result = SandboxRunner.Run(exercise.CreateSubmission(Utils.NewNormalizedGuid(), code));
+			var result = CsSandboxRunner.Run(exercise.CreateSubmission(Utils.NewNormalizedGuid(), code));
 			var runSolutionResult = new RunSolutionResult
 			{
 				IsRightAnswer = exercise.IsCorrectRunResult(result),

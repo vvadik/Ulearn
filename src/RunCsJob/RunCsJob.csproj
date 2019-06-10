@@ -314,9 +314,8 @@
     <Compile Include="SubmitionSerialization_Test.cs" />
     <Compile Include="MsBuildRunner.cs" />
     <Compile Include="Tests.cs" />
-    <Compile Include="SandboxRunner.cs" />
+    <Compile Include="CsSandboxRunner.cs" />
     <Compile Include="RunningResultsExtensions.cs" />
-    <Compile Include="Client.cs" />
     <Compile Include="RunCsJobProgram.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -355,6 +354,10 @@
     <ProjectReference Include="..\RunCheckerJob.Api\RunCheckerJob.Api.csproj">
       <Project>{26580595-f4dc-41ee-ba66-0ef4692243af}</Project>
       <Name>RunCheckerJob.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RunCheckerJob\RunCheckerJob.csproj">
+      <Project>{650fe5bd-4345-41b9-800e-d00ca4cef51f}</Project>
+      <Name>RunCheckerJob</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

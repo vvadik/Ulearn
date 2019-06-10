@@ -11,9 +11,9 @@ using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 
-namespace RunCsJob
+namespace RunCheckerJob
 {
-	internal class Client
+	public class Client
 	{
 		private readonly string token;
 		private readonly HttpClient httpClient;
@@ -97,7 +97,7 @@ namespace RunCsJob
 
 		private string GetUri(string path, params string[][] parameters)
 		{
-			var query = HttpUtility.ParseQueryString(string.Empty);
+			var query = WebUtils.ParseQueryString(string.Empty);
 			query["token"] = token;
 			query["agent"] = agentName;
 			foreach (var parameter in parameters)

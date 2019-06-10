@@ -11,24 +11,24 @@ using System.Threading;
 using log4net;
 using Metrics;
 using Newtonsoft.Json;
+using RunCheckerJob;
 using RunCheckerJob.Api;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
-using Ulearn.Core.Configuration;
 
 namespace RunCsJob
 {
-	public class SandboxRunnerSettings
+	public class CsSandboxRunnerSettings : ISandboxRunnerSettings
 	{
-		public SandboxRunnerSettings()
+		public CsSandboxRunnerSettings()
 		{
 			var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 			WorkingDirectory = new DirectoryInfo(Path.Combine(baseDirectory, "submissions"));
 		}
 
 		public TimeSpan CompilationTimeLimit = TimeSpan.FromSeconds(10);
-		private const int timeLimitInSeconds = 10;		
+		private const int timeLimitInSeconds = 10;
 		public TimeSpan TimeLimit = TimeSpan.FromSeconds(timeLimitInSeconds);
 		public TimeSpan IdleTimeLimit = TimeSpan.FromSeconds(2 * timeLimitInSeconds);
 		public int MemoryLimit = 64 * 1024 * 1024;
@@ -39,21 +39,29 @@ namespace RunCsJob
 		public bool DeleteSubmissionsAfterFinish;
 	}
 
-	public class SandboxRunner
+	public class CsSandboxRunnerClient
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(SandboxRunner));
+		RunningResults Run(RunnerSubmission submission, CsSandboxRunnerSettings settings = null)
+		{
+			return CsSandboxRunner.Run(submission, settings);
+		}
+	}
+
+	public class CsSandboxRunner
+	{
+		private static readonly ILog log = LogManager.GetLogger(typeof(CsSandboxRunner));
 		private readonly MetricSender metricSender = new MetricSender("runcsjob");
 
 		private readonly RunnerSubmission submission;
-		private readonly SandboxRunnerSettings settings;
+		private readonly CsSandboxRunnerSettings settings;
 
 		private bool hasTimeLimit;
 		private bool hasMemoryLimit;
 		private bool hasOutputLimit;
 
-		public static RunningResults Run(RunnerSubmission submission, SandboxRunnerSettings settings = null)
+		public static RunningResults Run(RunnerSubmission submission, CsSandboxRunnerSettings settings = null)
 		{
-			settings = settings ?? new SandboxRunnerSettings();
+			settings = settings ?? new CsSandboxRunnerSettings();
 			var workingDirectory = settings.WorkingDirectory;
 			if (!workingDirectory.Exists)
 			{
@@ -84,7 +92,7 @@ namespace RunCsJob
 			try
 			{
 				RunningResults result;
-				var instance = new SandboxRunner(submission, settings);
+				var instance = new CsSandboxRunner(submission, settings);
 				if (submission is ProjRunnerSubmission)
 					result = instance.RunMsBuild(submissionCompilationDirectory.FullName);
 				else
@@ -107,10 +115,10 @@ namespace RunCsJob
 			}
 		}
 
-		public SandboxRunner(RunnerSubmission submission, SandboxRunnerSettings settings = null)
+		public CsSandboxRunner(RunnerSubmission submission, CsSandboxRunnerSettings settings = null)
 		{
 			this.submission = submission;
-			this.settings = settings ?? new SandboxRunnerSettings();
+			this.settings = settings ?? new CsSandboxRunnerSettings();
 		}
 
 		private RunningResults RunMsBuild(string submissionCompilationDirectory)
