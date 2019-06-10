@@ -39,7 +39,7 @@
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Database.Core\Database.Core.csproj" />
     <ProjectReference Include="..\Metrics\Metrics.csproj" />
-    <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj" />
+    <ProjectReference Include="..\RunCheckerJob.Api\RunCheckerJob.Api.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Configuration" />

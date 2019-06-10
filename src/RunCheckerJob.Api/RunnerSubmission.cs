@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace RunCsJob.Api
+namespace RunCheckerJob.Api
 {
 	public abstract class RunnerSubmission
 	{

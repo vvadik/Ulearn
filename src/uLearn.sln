@@ -53,7 +53,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stepik.Api", "Stepik.Api\Stepik.Api.csproj", "{60247C0A-B6EE-46E2-AB66-C7285F5F1345}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RunCsJob.Api", "RunCsJob.Api\RunCsJob.Api.csproj", "{26580595-F4DC-41EE-BA66-0EF4692243AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RunCheckerJob.Api", "RunCheckerJob.Api\RunCheckerJob.Api.csproj", "{26580595-F4DC-41EE-BA66-0EF4692243AF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.Api", "Web.Api\Web.Api.csproj", "{0EF1C1C2-1DA1-4C53-B581-3BAC8A51C177}"
 EndProject

@@ -1234,9 +1234,9 @@
       <Project>{b6b60d19-c6bd-4d66-95da-14480a18770c}</Project>
       <Name>Metrics</Name>
     </ProjectReference>
-    <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj">
+    <ProjectReference Include="..\RunCheckerJob.Api\RunCheckerJob.Api.csproj">
       <Project>{26580595-f4dc-41ee-ba66-0ef4692243af}</Project>
-      <Name>RunCsJob.Api</Name>
+      <Name>RunCheckerJob.Api</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

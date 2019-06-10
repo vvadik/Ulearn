@@ -8,7 +8,7 @@ using System.Threading;
 using log4net;
 using log4net.Config;
 using Metrics;
-using RunCsJob.Api;
+using RunCheckerJob.Api;
 using Ulearn.Core;
 
 namespace RunCsJob

@@ -1,4 +1,4 @@
-﻿namespace RunCsJob.Api
+﻿namespace RunCheckerJob.Api
 {
 	public enum Verdict
 	{

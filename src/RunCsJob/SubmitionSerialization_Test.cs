@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using FluentAssertions;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using RunCsJob.Api;
+using RunCheckerJob.Api;
 using Ulearn.Core;
 
 namespace RunCsJob
