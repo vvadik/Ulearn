@@ -1,0 +1,1 @@
+docker run -it --privileged -v c:/git/sample/output:/app/output -v c:/git/sample/src:/app/src -v c:/git/sample/tests:/app/tests js-sandbox sh
