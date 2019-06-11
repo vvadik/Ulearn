@@ -150,11 +150,6 @@ namespace uLearn.Web.Controllers
 				UsersArchivedGroups = usersArchivedGroups,
 				AntiPlagiarismResponse = antiPlagiarismsResult,
 			};
-			var json = JsonConvert.SerializeObject(details, Formatting.None, new JsonSerializerSettings()
-			{
-				NullValueHandling = NullValueHandling.Ignore,
-				ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-			});
 			return View(details);
 		}
 		
