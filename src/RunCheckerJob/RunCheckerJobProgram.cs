@@ -14,7 +14,7 @@ namespace RunCheckerJob
 		public RunCheckerJobProgram(ManualResetEvent externalShutdownEvent = null)
 			: base(serviceName, externalShutdownEvent)
 		{
-			sandboxRunnerClient = new CheckerSandboxRunnerClient(new CheckerSandboxRunnerSettings(serviceName));
+			sandboxRunnerClient = new CheckerSandboxRunnerClient(new DockerSandboxRunnerSettings(serviceName, "js-sandbox"));
 		}
 
 		protected override ISandboxRunnerClient SandboxRunnerClient => sandboxRunnerClient;

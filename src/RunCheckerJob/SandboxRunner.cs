@@ -12,9 +12,9 @@ namespace RunCheckerJob
 {
 	public class CheckerSandboxRunnerClient : ISandboxRunnerClient
 	{
-		private readonly CheckerSandboxRunnerSettings settings;
+		private readonly DockerSandboxRunnerSettings settings;
 		
-		public CheckerSandboxRunnerClient(CheckerSandboxRunnerSettings settings)
+		public CheckerSandboxRunnerClient(DockerSandboxRunnerSettings settings)
 		{
 			this.settings = settings;
 		}
@@ -32,16 +32,16 @@ namespace RunCheckerJob
 		private readonly MetricSender metricSender;
 
 		private readonly RunnerSubmission submission;
-		private readonly SandboxRunnerSettings settings;
+		private readonly DockerSandboxRunnerSettings settings;
 
 		// todo сделать с этим что-то
 		private bool hasTimeLimit;
 		private bool hasMemoryLimit;
 		private bool hasOutputLimit;
 
-		public static RunningResults Run(RunnerSubmission submission, string serviceName, CheckerSandboxRunnerSettings settings = null)
+		public static RunningResults Run(RunnerSubmission submission, string serviceName, DockerSandboxRunnerSettings settings = null)
 		{
-			settings = settings ?? new CheckerSandboxRunnerSettings(serviceName);
+			settings = settings ?? new DockerSandboxRunnerSettings(serviceName, "js-sandbox");
 			var workingDirectory = settings.WorkingDirectory;
 			if (!workingDirectory.Exists)
 			{
@@ -100,11 +100,11 @@ namespace RunCheckerJob
 			}
 		}
 
-		public SandboxRunner(RunnerSubmission submission, string serviceName, CheckerSandboxRunnerSettings settings = null)
+		public SandboxRunner(RunnerSubmission submission, string serviceName, DockerSandboxRunnerSettings settings = null)
 		{
 			this.submission = submission;
 			metricSender = new MetricSender(serviceName);
-			this.settings = settings ?? new CheckerSandboxRunnerSettings(serviceName);
+			this.settings = settings ?? new DockerSandboxRunnerSettings(serviceName, "js-sandbox");
 		}
 
 		private RunningResults RunJsBuild(string submissionCompilationDirectory)
@@ -125,7 +125,10 @@ namespace RunCheckerJob
 
 			log.Info($"Запускаю Docker для решения {jsSubmission.Id} в папке {dir.FullName}");
 
-			return JsRunner.Run(settings, dir);
+			var dockerResult = DockerRunner.Run(settings, dir);
+			if (dockerResult.Verdict != Verdict.Ok)
+				return dockerResult;
+			return JsResultParser.Run(dockerResult.Output);
 		}
 
 		private static void SafeRemoveDirectory(string path)

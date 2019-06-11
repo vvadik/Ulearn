@@ -1,22 +1,21 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using log4net;
-using Newtonsoft.Json;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.RunCheckerJobApi;
 
 namespace RunCheckerJob
 {
-	public class JsRunner
+	public class DockerRunner
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(JsRunner));
+		private static readonly ILog log = LogManager.GetLogger(typeof(DockerRunner));
+		private const string defaultSeccompFilename = "chrome-seccomp.json";
 
-		public static RunningResults Run(SandboxRunnerSettings settings, DirectoryInfo dir)
+		public static RunningResults Run(DockerSandboxRunnerSettings settings, DirectoryInfo dir)
 		{
 			var outputDirectory = dir.GetSubdirectory("output");
 			try
@@ -32,7 +31,7 @@ namespace RunCheckerJob
 			return RunDocker(settings, dir);
 		}
 
-		private static RunningResults RunDocker(SandboxRunnerSettings settings, DirectoryInfo dir)
+		private static RunningResults RunDocker(DockerSandboxRunnerSettings settings, DirectoryInfo dir)
 		{
 			{
 				var name = Guid.NewGuid();
@@ -58,9 +57,7 @@ namespace RunCheckerJob
 				}
 			}
 
-			var result = LoadResult(dir);
-
-			return MakeVerdict(result);
+			return LoadResult(dir, settings);
 		}
 
 		private static void GracefullyShutdownDocker(Process dockerShellProcess, Guid name, SandboxRunnerSettings settings)
@@ -106,57 +103,26 @@ namespace RunCheckerJob
 			};
 		}
 
-		private static RunningResults MakeVerdict(JsTestResult result)
-		{
-			if (result is null)
-				return new RunningResults(Verdict.SandboxError);
-
-			var hasUiTests = result.ui.stats != null;
-			var hasUnitTests = result.unit.stats != null;
-
-			if (hasUiTests && result.ui.stats.failures != 0)
-			{
-				return new RunningResults(Verdict.RuntimeError, error: result.ui.failures.First().err.message);
-			}
-
-			if (hasUnitTests && result.unit.stats.failures != 0)
-			{
-				return new RunningResults(Verdict.RuntimeError, error: result.unit.failures.First().err.message);
-			}
-
-			return new RunningResults(Verdict.Ok);
-		}
-
-		private static JsTestResult LoadResult(DirectoryInfo dir)
+		private static RunningResults LoadResult(DirectoryInfo dir, DockerSandboxRunnerSettings settings)
 		{
 			try
 			{
 				var resultPath = Path.Combine(dir.GetSubdirectory("output").FullName, "result.json");
-				using (StreamReader r = new StreamReader(resultPath))
-				{
-					var json = r.ReadToEnd();
-					try
-					{
-						var result = JsonConvert.DeserializeObject<JsTestResult>(json);
-						return result;
-					}
-					catch (Exception)
-					{
-						log.Info($"Не удалось распарсить результат тестов в папке {dir.FullName}");
-						throw;
-					}
-				}
+				if (new FileInfo(resultPath).Length > settings.OutputLimit)
+					return new RunningResults(Verdict.OutputLimit);
+				var output = File.ReadAllText(resultPath);
+				return new RunningResults(Verdict.Ok, output: output);
 			}
 			catch (Exception)
 			{
 				log.Info($"Не удалось прочитать результат тестов в папке {dir.FullName}");
-				return null;
+				return new RunningResults(Verdict.SandboxError);
 			}
 		}
 
-		private static string BuildDockerCommand(SandboxRunnerSettings settings, DirectoryInfo dir, Guid name)
+		private static string BuildDockerCommand(DockerSandboxRunnerSettings settings, DirectoryInfo dir, Guid name)
 		{
-			var seccompPath = ConvertToUnixPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DockerConfig", "chrome-seccomp.json"));
+			var seccompPath = ConvertToUnixPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DockerConfig", settings.SeccompFileName ?? defaultSeccompFilename));
 			var parts = new List<string>
 			{
 				"docker run",
@@ -170,7 +136,7 @@ namespace RunCheckerJob
 				$"--name {name}",
 				"-it",
 				$"-m {settings.MemoryLimit}b",
-				"js-sandbox",
+				settings.SandBoxName,
 			};
 			return string.Join(" ", parts);
 		}
@@ -179,47 +145,5 @@ namespace RunCheckerJob
 			$"-v {ConvertToUnixPath(rootDirectory.GetSubdirectory(subdirectory).FullName)}:/app/{subdirectory}";
 
 		private static string ConvertToUnixPath(string path) => path.Replace(@"\", "/");
-	}
-
-	public class JsTestResult
-	{
-		public MochaResult ui;
-		public MochaResult unit;
-	}
-
-	public class MochaResult
-	{
-		public List<MochaTest> failures;
-		public List<MochaTest> passes;
-		public List<MochaTest> pending;
-		public MochaStats stats;
-		public List<MochaTest> tests;
-	}
-
-	public class MochaTest
-	{
-		public int currentRetry;
-		public int duration;
-		public JsError err;
-		public string fullTitle;
-		public string title;
-	}
-
-	public class JsError
-	{
-		public string message;
-		public string stack;
-	}
-
-	public class MochaStats
-	{
-		public int duration;
-		public DateTime end;
-		public int failures;
-		public int passes;
-		public int pending;
-		public DateTime start;
-		public int suites;
-		public int tests;
 	}
 }
