@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -19,31 +20,39 @@ using Ulearn.Core;
 
 namespace RunCsJob
 {
-	public class CsSandboxRunnerSettings : ISandboxRunnerSettings
+	public class CsSandboxRunnerSettings : SandboxRunnerSettings
 	{
-		public CsSandboxRunnerSettings()
+		public DirectoryInfo WorkingDirectory;
+		public bool DeleteSubmissionsAfterFinish;
+		public MsBuildSettings MsBuildSettings;
+
+		public CsSandboxRunnerSettings(DirectoryInfo сompilerDirectory = null)
 		{
 			var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 			WorkingDirectory = new DirectoryInfo(Path.Combine(baseDirectory, "submissions"));
+			var deleteSubmissions = bool.Parse(ConfigurationManager.AppSettings["ulearn.runcsjob.deleteSubmissions"] ?? "true");
+			DeleteSubmissionsAfterFinish = deleteSubmissions;
+			var workingDirectory = ConfigurationManager.AppSettings["ulearn.runcsjob.submissionsWorkingDirectory"];
+			if (!string.IsNullOrWhiteSpace(workingDirectory))
+				WorkingDirectory = new DirectoryInfo(workingDirectory);
+			MsBuildSettings = new MsBuildSettings();
+			if (сompilerDirectory != null)
+				MsBuildSettings.CompilerDirectory = сompilerDirectory;
 		}
-
-		public TimeSpan CompilationTimeLimit = TimeSpan.FromSeconds(10);
-		private const int timeLimitInSeconds = 10;
-		public TimeSpan TimeLimit = TimeSpan.FromSeconds(timeLimitInSeconds);
-		public TimeSpan IdleTimeLimit = TimeSpan.FromSeconds(2 * timeLimitInSeconds);
-		public int MemoryLimit = 64 * 1024 * 1024;
-		public int OutputLimit = 10 * 1024 * 1024;
-		public TimeSpan WaitSandboxAfterKilling = TimeSpan.FromSeconds(5);
-		public MsBuildSettings MsBuildSettings = new MsBuildSettings();
-		public DirectoryInfo WorkingDirectory;
-		public bool DeleteSubmissionsAfterFinish;
 	}
 
-	public class CsSandboxRunnerClient
+	public class CsSandboxRunnerClient : ISandboxRunnerClient
 	{
-		RunningResults Run(RunnerSubmission submission, CsSandboxRunnerSettings settings = null)
+		private CsSandboxRunnerSettings Settings { get; }
+		
+		public CsSandboxRunnerClient(CsSandboxRunnerSettings settings = null)
 		{
-			return CsSandboxRunner.Run(submission, settings);
+			Settings = settings;
+		}
+
+		public RunningResults Run(RunnerSubmission submission)
+		{
+			return CsSandboxRunner.Run(submission, Settings);
 		}
 	}
 

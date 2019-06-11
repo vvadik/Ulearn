@@ -310,6 +310,7 @@
     <Compile Include="AssemblyCreator.cs" />
     <Compile Include="AsyncReader.cs" />
     <Compile Include="MSBuildResult.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="ProjectExtensions.cs" />
     <Compile Include="SubmitionSerialization_Test.cs" />
     <Compile Include="MsBuildRunner.cs" />
