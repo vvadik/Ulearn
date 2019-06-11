@@ -382,9 +382,9 @@ namespace Database.DataContexts
 			return db.UserExerciseSubmissions.FirstOrDefault(s => s.Id.ToString() == id);
 		}
 
-		public List<UserExerciseSubmission> FindSubmissionsByIds(List<string> checkingsIds)
+		public List<UserExerciseSubmission> FindSubmissionsByIds(IEnumerable<int> checkingsIds)
 		{
-			return db.UserExerciseSubmissions.Where(c => checkingsIds.Contains(c.Id.ToString())).ToList();
+			return db.UserExerciseSubmissions.Where(c => checkingsIds.Contains(c.Id)).ToList();
 		}
 
 		private void UpdateIsRightAnswerForSubmission(AutomaticExerciseChecking checking)
