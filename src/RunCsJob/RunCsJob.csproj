@@ -317,7 +317,7 @@
     <Compile Include="Tests.cs" />
     <Compile Include="CsSandboxRunner.cs" />
     <Compile Include="RunningResultsExtensions.cs" />
-    <Compile Include="RunCsJobProgram.cs" />
+    <Compile Include="RunCsJobProgramBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

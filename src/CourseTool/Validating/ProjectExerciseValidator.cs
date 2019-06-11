@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using Microsoft.Build.Evaluation;
 using Microsoft.VisualBasic.FileIO;
-using RunCheckerJob.Api;
 using RunCsJob;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
@@ -14,6 +13,7 @@ using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Helpers;
+using Ulearn.Core.RunCheckerJobApi;
 using SearchOption = Microsoft.VisualBasic.FileIO.SearchOption;
 
 namespace uLearn.CourseTool.Validating

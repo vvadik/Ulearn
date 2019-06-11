@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
 using NHttp;
-using RunCheckerJob.Api;
 using RunCsJob;
 using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
@@ -21,6 +20,7 @@ using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Helpers;
+using Ulearn.Core.RunCheckerJobApi;
 
 namespace uLearn.CourseTool.Monitoring
 {

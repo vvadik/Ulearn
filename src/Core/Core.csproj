@@ -39,7 +39,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\Metrics\Metrics.csproj" />
-    <ProjectReference Include="..\RunCheckerJob.Api\RunCheckerJob.Api.csproj" />
     <ProjectReference Include="..\Ulearn.CSharpAttributes\Ulearn.CSharpAttributes.csproj" />
   </ItemGroup>
   <ItemGroup>

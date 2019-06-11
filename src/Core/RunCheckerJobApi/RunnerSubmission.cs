@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace RunCheckerJob.Api
+namespace Ulearn.Core.RunCheckerJobApi
 {
 	public abstract class RunnerSubmission
 	{
@@ -25,5 +25,14 @@ namespace RunCheckerJob.Api
 	{
 		public byte[] ZipFileData;
 		public string ProjectFileName;
+	}
+
+	[DisplayName("zip")]
+	public class ZipRunnerSubmission : RunnerSubmission
+	{
+		public byte[] ZipFileData;
+		public string LangId;
+
+		public bool IsJs => LangId == "javascript";
 	}
 }

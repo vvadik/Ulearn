@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
-using RunCheckerJob.Api;
 using uLearn;
 using Ulearn.Core;
+using Ulearn.Core.RunCheckerJobApi;
 
 namespace Database.Repos
 {

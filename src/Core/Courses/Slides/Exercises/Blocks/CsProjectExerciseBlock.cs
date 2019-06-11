@@ -8,7 +8,6 @@ using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using log4net;
 using Microsoft.Build.Evaluation;
-using RunCheckerJob.Api;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Blocks;
@@ -16,6 +15,7 @@ using Ulearn.Core.Extensions;
 using Ulearn.Core.Helpers;
 using Ulearn.Core.NUnitTestRunning;
 using Ulearn.Core.Properties;
+using Ulearn.Core.RunCheckerJobApi;
 
 namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 {

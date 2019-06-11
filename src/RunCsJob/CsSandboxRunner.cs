@@ -13,28 +13,19 @@ using log4net;
 using Metrics;
 using Newtonsoft.Json;
 using RunCheckerJob;
-using RunCheckerJob.Api;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
+using Ulearn.Core.RunCheckerJobApi;
 
 namespace RunCsJob
 {
 	public class CsSandboxRunnerSettings : SandboxRunnerSettings
 	{
-		public DirectoryInfo WorkingDirectory;
-		public bool DeleteSubmissionsAfterFinish;
 		public MsBuildSettings MsBuildSettings;
-
 		public CsSandboxRunnerSettings(DirectoryInfo сompilerDirectory = null)
+			: base("runcsjob")
 		{
-			var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-			WorkingDirectory = new DirectoryInfo(Path.Combine(baseDirectory, "submissions"));
-			var deleteSubmissions = bool.Parse(ConfigurationManager.AppSettings["ulearn.runcsjob.deleteSubmissions"] ?? "true");
-			DeleteSubmissionsAfterFinish = deleteSubmissions;
-			var workingDirectory = ConfigurationManager.AppSettings["ulearn.runcsjob.submissionsWorkingDirectory"];
-			if (!string.IsNullOrWhiteSpace(workingDirectory))
-				WorkingDirectory = new DirectoryInfo(workingDirectory);
 			MsBuildSettings = new MsBuildSettings();
 			if (сompilerDirectory != null)
 				MsBuildSettings.CompilerDirectory = сompilerDirectory;

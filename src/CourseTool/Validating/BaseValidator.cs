@@ -1,7 +1,7 @@
 using System;
-using RunCheckerJob.Api;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.RunCheckerJobApi;
 
 namespace uLearn.CourseTool.Validating
 {

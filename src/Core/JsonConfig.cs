@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
-using RunCheckerJob.Api;
+using Ulearn.Core.RunCheckerJobApi;
 
 namespace Ulearn.Core
 {

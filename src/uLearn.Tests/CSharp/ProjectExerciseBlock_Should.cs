@@ -7,7 +7,6 @@ using FluentAssertions;
 using Microsoft.Build.Evaluation;
 using Microsoft.VisualBasic.FileIO;
 using NUnit.Framework;
-using RunCheckerJob.Api;
 using RunCsJob;
 using test;
 using Ulearn.Common.Extensions;
@@ -19,6 +18,7 @@ using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Courses.Units;
 using Ulearn.Core.Helpers;
+using Ulearn.Core.RunCheckerJobApi;
 using SearchOption = System.IO.SearchOption;
 
 namespace uLearn.CSharp

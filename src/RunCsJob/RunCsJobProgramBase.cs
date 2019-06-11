@@ -3,18 +3,19 @@ using System.IO;
 using System.Threading;
 using log4net;
 using RunCheckerJob;
-using RunCheckerJob.Api;
 using Ulearn.Core;
+using Ulearn.Core.RunCheckerJobApi;
 
 namespace RunCsJob
 {
-	public class RunCsJobProgram : RunCheckerJobProgram
+	public class RunCsJobProgramBase : RunCheckerJobProgramBase
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(RunCsJobProgram));
+		private static readonly ILog log = LogManager.GetLogger(typeof(RunCsJobProgramBase));
+		private const string serviceName = "runscjob";
 		private readonly CsSandboxRunnerClient csSandboxRunnerClient;
 
-		public RunCsJobProgram(DirectoryInfo сompilerDirectory, ManualResetEvent externalShutdownEvent = null)
-			: base("runscjob", externalShutdownEvent)
+		public RunCsJobProgramBase(DirectoryInfo сompilerDirectory, ManualResetEvent externalShutdownEvent = null)
+			: base(serviceName, externalShutdownEvent)
 		{
 			if (!сompilerDirectory.Exists)
 			{

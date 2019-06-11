@@ -1,6 +1,4 @@
-using System.IO;
-
-namespace RunCheckerJob.Api
+namespace Ulearn.Core.RunCheckerJobApi
 {
 	public interface ISandboxRunnerClient
 	{

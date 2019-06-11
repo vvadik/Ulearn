@@ -19,7 +19,7 @@ namespace RunCsJob
 			}
 			var isSelfCheck = args.Contains("--selfcheck");
 			
-			var program = new RunCsJobProgram(сompilerDirectory);
+			var program = new RunCsJobProgramBase(сompilerDirectory);
 			if (isSelfCheck)
 				program.SelfCheck();
 			else

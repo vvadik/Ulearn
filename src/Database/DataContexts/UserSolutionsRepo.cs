@@ -13,12 +13,12 @@ using System.Threading.Tasks;
 using Database.Models;
 using EntityFramework.Functions;
 using log4net;
-using RunCheckerJob.Api;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
+using Ulearn.Core.RunCheckerJobApi;
 
 namespace Database.DataContexts
 {

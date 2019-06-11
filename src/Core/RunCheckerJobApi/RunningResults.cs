@@ -1,4 +1,4 @@
-﻿namespace RunCheckerJob.Api
+﻿namespace Ulearn.Core.RunCheckerJobApi
 {
 	public class RunningResults
 	{
