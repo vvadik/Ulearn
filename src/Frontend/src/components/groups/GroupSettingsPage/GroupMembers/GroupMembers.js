@@ -222,28 +222,36 @@ class GroupMembers extends Component {
 	onChangeOwner = (user) => {
 		const { accesses } = this.state;
 		const { group } = this.props;
-		const updatedAccesses = accesses.map(item =>
-			item.user.id === user.id ? {...item, user: group.owner, grantTime: new Date()} : item);
-		this.setState({
-			accesses: updatedAccesses,
-		});
-
-		this.props.onChangeGroupOwner(user, updatedAccesses);
 
 		api.groups.changeGroupOwner(group.id, user.id)
-			.catch(console.error);
+			.then(() => {
+				const updatedAccesses = accesses.map(item =>
+					item.user.id === user.id ? {...item, user: group.owner, grantTime: new Date()} : item);
+				this.setState({
+					accesses: updatedAccesses,
+				});
+
+				this.props.onChangeGroupOwner(user, updatedAccesses);
+			})
+			.catch((error) => {
+				error.showToast();
+			});
 	};
 
 	onRemoveTeacher = (user) => {
 		const { accesses } = this.state;
-		const updatedAccesses = accesses
-			.filter(item => item.user.id !== user.id);
-		this.setState({
-			accesses: updatedAccesses,
-		});
 
 		api.groups.removeAccess(this.props.group.id, user.id)
-			.catch(console.error);
+			.then(() => {
+				const updatedAccesses = accesses
+				.filter(item => item.user.id !== user.id);
+				this.setState({
+					accesses: updatedAccesses,
+				});
+			})
+			.catch((error) => {
+				error.showToast();
+			});
 	};
 
 	onAddTeacher = (item) => {
@@ -257,35 +265,42 @@ class GroupMembers extends Component {
 	onLoadTeacher = (item) => {
 		const { accesses } = this.state;
 		const { group } = this.props;
-		const updatedAccesses = accesses
-			.filter(i => i.user.id !== item.value)
-			.concat({
-				user: item,
-				grantedBy: group.owner,
-				grantTime: new Date(),
-			});
-
-		this.setState({
-			accesses: updatedAccesses,
-			selected: null,
-		});
 
 		api.groups.addGroupAccesses(group.id, item.value)
-			.catch(console.error);
+			.then(() => {
+				const updatedAccesses = accesses
+					.filter(i => i.user.id !== item.value)
+					.concat({
+						user: item,
+						grantedBy: group.owner,
+						grantTime: new Date(),
+					});
+
+				this.setState({
+					accesses: updatedAccesses,
+					selected: null,
+				});
+			})
+			.catch((error) => {
+				error.showToast();
+			});
 	};
 
 	onDeleteStudents = (students) => {
 		const { group } = this.props;
-		const updatedStudents = this.state.students.filter((item) => !students.includes(item.user.id));
-
-		this.setState({
-			students: updatedStudents,
-		});
 
 		api.groups.deleteStudents(group.id, students)
-			.catch(console.error)
 			.then(() => {
+				const updatedStudents = this.state.students.filter((item) => !students.includes(item.user.id));
+
+				this.setState({
+					students: updatedStudents,
+				});
+
 				Toast.push("Студенты исключены из группы");
+			})
+			.catch((error) => {
+				error.showToast();
 			});
 	};
 }

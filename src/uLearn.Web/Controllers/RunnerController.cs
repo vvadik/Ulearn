@@ -152,7 +152,7 @@ namespace uLearn.Web.Controllers
 				), 3).ConfigureAwait(false);
 
 			var submissionsByIds = userSolutionsRepo
-				.FindSubmissionsByIds(results.Select(result => result.Id).ToList())
+				.FindSubmissionsByIds(results.Select(result => int.TryParse(result.Id, out var parsed) ? parsed : -1).Where(i => i != -1).Distinct().ToList())
 				.ToDictionary(s => s.Id.ToString());
 
 			foreach (var result in results)

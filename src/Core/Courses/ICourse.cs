@@ -11,7 +11,7 @@ namespace Ulearn.Core.Courses
 		string Id { get; set; }
 		string Title { get; }
 		CourseSettings Settings { get; }
-		DirectoryInfo Directory { get; }
+		DirectoryInfo CourseXmlDirectory { get; }
 		List<Unit> Units { get; }
 		List<Slide> Slides { get; }
 		

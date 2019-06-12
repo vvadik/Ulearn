@@ -14,6 +14,7 @@ using AntiPlagiarism.Api.Models.Results;
 using Database;
 using Database.DataContexts;
 using Database.Models;
+using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Serilog;
@@ -33,7 +34,7 @@ namespace uLearn.Web.Controllers
 		private readonly ULearnDb db;
 		private readonly UserSolutionsRepo userSolutionsRepo;
 		private readonly GroupsRepo groupsRepo;
-		private readonly CourseManager courseManager;		
+		private readonly CourseManager courseManager;
 		private static readonly IAntiPlagiarismClient antiPlagiarismClient;
 
 		static AntiPlagiarismController()
@@ -118,14 +119,16 @@ namespace uLearn.Web.Controllers
 
 			var antiPlagiarismsResult = await GetAuthorPlagiarismsAsync(submission);
 
-			var antiPlagiarismSubmissionsIds = antiPlagiarismsResult.ResearchedSubmissions.Select(s => s.SubmissionInfo.Id);
-			var plagiarismsSubmissionsIds = antiPlagiarismsResult.ResearchedSubmissions
-				.SelectMany(s => s.Plagiarisms)
-				.Select(s => s.SubmissionInfo.Id);
+			var antiPlagiarismSubmissionInfos = antiPlagiarismsResult.ResearchedSubmissions.Select(s => s.SubmissionInfo);
+			var plagiarismsSubmissionInfos = antiPlagiarismsResult.ResearchedSubmissions
+				.SelectMany(s => s.Plagiarisms).Select(p => p.SubmissionInfo);
 
-			var submissions = userSolutionsRepo.GetSubmissionsByAntiPlagiarismSubmissionsIds(
-					antiPlagiarismSubmissionsIds.Concat(plagiarismsSubmissionsIds)
-				)
+			var submissionsIds = antiPlagiarismSubmissionInfos.Concat(plagiarismsSubmissionInfos)
+				.Select(si => JsonConvert.DeserializeObject<AdditionalInfo>(si.AdditionalInfo).SubmissionId)
+				.Distinct()
+				.ToList();
+
+			var submissions = userSolutionsRepo.FindSubmissionsByIds(submissionsIds)
 				.ToDictionary(s => s.Id);
 			submissions[submissionId] = submission;
 
@@ -137,7 +140,7 @@ namespace uLearn.Web.Controllers
 
 			var course = courseManager.FindCourse(courseId);
 			var slide = course?.FindSlideById(submission.SlideId);
-			return View(new AntiPlagiarismDetailsModel
+			var details = new AntiPlagiarismDetailsModel
 			{
 				Course = course,
 				Slide = slide,
@@ -146,7 +149,8 @@ namespace uLearn.Web.Controllers
 				UsersGroups = usersGroups,
 				UsersArchivedGroups = usersArchivedGroups,
 				AntiPlagiarismResponse = antiPlagiarismsResult,
-			});
+			};
+			return View(details);
 		}
 		
 		public ActionResult SubmissionsPanel(int submissionId, Dictionary<int, double> submissionWeights)

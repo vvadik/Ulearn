@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AntiPlagiarism.UpdateDb.Configuration;
@@ -100,12 +101,19 @@ namespace AntiPlagiarism.UpdateDb
 			var pathFormat = configuration.HostLog.PathFormat;
 			if (!Enum.TryParse<LogEventLevel>(configuration.HostLog.MinimumLevel, true, out var minimumLevel))
 				minimumLevel = LogEventLevel.Debug;
+			if (Path.IsPathRooted(pathFormat))
+			{
+				var directory = Path.GetDirectoryName(pathFormat);
+				var fileName = Path.GetFileName(pathFormat);
+				pathFormat = Path.Combine(directory, configuration.GraphiteServiceName, fileName);
+			}
 			
 			loggerConfiguration = loggerConfiguration
 				.WriteTo.RollingFile(
 					pathFormat,
 					outputTemplate: "{Timestamp:HH:mm:ss.fff} {Level:u3} [{Thread}] {Message:l}{NewLine}{Exception}",
-					restrictedToMinimumLevel: minimumLevel  
+					restrictedToMinimumLevel: minimumLevel,
+					fileSizeLimitBytes: 4 * 1073741824L
 				);
 			
 			return loggerConfiguration.CreateLogger();

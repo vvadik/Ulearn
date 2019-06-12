@@ -2,6 +2,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
+using JetBrains.Annotations;
 using Ulearn.Common.Extensions;
 
 namespace Ulearn.Core.Courses
@@ -37,7 +38,7 @@ namespace Ulearn.Core.Courses
 
 		[XmlElement("dictionaryFile")]
 		public string DictionaryFile { get; set; }
-		
+
 		public static CourseSettings DefaultSettings => new CourseSettings(
 			null,
 			null,

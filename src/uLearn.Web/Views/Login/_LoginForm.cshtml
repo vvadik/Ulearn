@@ -1,4 +1,5 @@
-﻿@model LoginViewModel
+﻿@using FormMethod = System.Web.Mvc.FormMethod
+@model LoginViewModel
 
 <section class="login-and-registration-form">
 	@using (Html.BeginForm("Index", "Login", new { ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))

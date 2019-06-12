@@ -6,8 +6,8 @@ window.documentReadyFunctions.push(function () {
     var $nextSolutions = $("#next_solutions_button");
     var $nextButtons = $(".next_button");
     
-    window.slideNavigation = {        
-        update: function (hasNext, hasPrev, isAccepted) {            
+    window.slideNavigation = {
+        update: function (hasNext, hasPrev, isAccepted, hideNextSolutions) {
             $next.toggle(hasNext);
             if (!hasNext) {
                 $nextButtons.toggle(false);
@@ -17,17 +17,19 @@ window.documentReadyFunctions.push(function () {
                 $prev.toggle(false);
             }
             $nextSolutions.toggle(false);
-            if (isAccepted) {
+            if (isAccepted && !hideNextSolutions) {
                 $nextSolutions.toggle(true);
                 $next.toggle(false);
             }
         },
         makeShowSolutionsNext: function () {
-            $next.toggle(false);
-            $nextSolutions.toggle(true);
+            if(!$("#nav_arrows").data("hide")) {
+                $next.toggle(false);
+                $nextSolutions.toggle(true);
+            }
         }
-    };    
+    };
     
     var $parent = $("#nav_arrows");
-    window.slideNavigation.update($parent.data("hasnext"), !!$parent.data("hasprev"), $parent.data("isaccepted"));
+    window.slideNavigation.update($parent.data("hasnext"), $parent.data("hasprev"), $parent.data("isaccepted"), $parent.data("hide"));
 });

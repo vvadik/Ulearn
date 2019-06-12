@@ -117,7 +117,7 @@ namespace uLearn.Web.Controllers
 			Gender? loginGender = null;
 			loginInfo.ExternalIdentity.FindFirstValue(ClaimTypes.Gender)?.TryParseToNullableEnum(out loginGender);
 			return View("ExternalLoginConfirmation",
-				new ExternalLoginConfirmationViewModel { UserName = loginInfo.DefaultUserName, Email = loginInfo.Email, Gender = loginGender });
+				new ExternalLoginConfirmationViewModel { UserName = null, Email = loginInfo.Email, Gender = loginGender });
 		}
 
 		[HttpPost]

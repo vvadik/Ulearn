@@ -55,21 +55,19 @@ namespace Notifications
 			}
 			catch (Exception e)
 			{
-				log.Error($"Can\'t send message to telegram chat {chatId}", e);
-
 				metricSender.SendCount("send_to_telegram.fail");
 				metricSender.SendCount($"send_to_telegram.fail.to.{chatId}");
 
-				if (e is ApiRequestException)
+				var isBotBlockedByUser = (e as ApiRequestException)?.Message.Contains("bot was blocked by the user") ?? false;
+				if (isBotBlockedByUser)
 				{
-					var apiRequestException = (ApiRequestException)e;
-					var isBotBlockedByUser = apiRequestException.Message.Contains("bot was blocked by the user");
-					if (isBotBlockedByUser)
-					{
-						metricSender.SendCount("send_to_telegram.fail.blocked_by_user");
-						metricSender.SendCount($"send_to_telegram.fail.blocked_by_user.to.{chatId}");
-					}
+					metricSender.SendCount("send_to_telegram.fail.blocked_by_user");
+					metricSender.SendCount($"send_to_telegram.fail.blocked_by_user.to.{chatId}");
+					log.Warn($"Can\'t send message to telegram chat {chatId}", e);
 				}
+				else
+					log.Error($"Can\'t send message to telegram chat {chatId}", e);
+				
 				throw;
 			}
 			metricSender.SendCount("send_to_telegram.success");

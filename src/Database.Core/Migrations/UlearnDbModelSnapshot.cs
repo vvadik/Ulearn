@@ -465,6 +465,34 @@ namespace Database.Migrations
                     b.ToTable("CourseFiles");
                 });
 
+            modelBuilder.Entity("Database.Models.CourseGit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Branch");
+
+                    b.Property<string>("CourseId")
+                        .HasMaxLength(64);
+
+                    b.Property<DateTime>("CreateTime");
+
+                    b.Property<bool>("IsWebhookEnabled");
+
+                    b.Property<string>("PathToCourseXml");
+
+                    b.Property<string>("PrivateKey");
+
+                    b.Property<string>("PublicKey");
+
+                    b.Property<string>("RepoUrl");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CourseGitRepos");
+                });
+
             modelBuilder.Entity("Database.Models.CourseRole", b =>
                 {
                     b.Property<int>("Id")
@@ -495,13 +523,22 @@ namespace Database.Migrations
                         .IsRequired()
                         .HasMaxLength(64);
 
+                    b.Property<string>("CommitHash")
+                        .HasMaxLength(40);
+
                     b.Property<string>("CourseId")
                         .IsRequired()
                         .HasMaxLength(64);
 
+                    b.Property<string>("Description");
+
                     b.Property<DateTime>("LoadingTime");
 
+                    b.Property<string>("PathToCourseXml");
+
                     b.Property<DateTime?>("PublishTime");
+
+                    b.Property<string>("RepoUrl");
 
                     b.HasKey("Id");
 
@@ -1890,6 +1927,18 @@ namespace Database.Migrations
                     b.HasDiscriminator().HasValue("NewCommentForInstructorsOnlyNotification");
                 });
 
+            modelBuilder.Entity("Database.Models.NewCommentFromYourGroupStudentNotification", b =>
+                {
+                    b.HasBaseType("Database.Models.Notification");
+
+                    b.Property<int>("CommentId")
+                        .HasColumnName("CommentId1");
+
+                    b.HasIndex("CommentId");
+
+                    b.HasDiscriminator().HasValue("NewCommentFromYourGroupStudentNotification");
+                });
+
             modelBuilder.Entity("Database.Models.NewCommentNotification", b =>
                 {
                     b.HasBaseType("Database.Models.Notification");
@@ -1900,6 +1949,21 @@ namespace Database.Migrations
                     b.HasIndex("CommentId");
 
                     b.HasDiscriminator().HasValue("NewCommentNotification");
+                });
+
+            modelBuilder.Entity("Database.Models.NotUploadedPackageNotification", b =>
+                {
+                    b.HasBaseType("Database.Models.Notification");
+
+                    b.Property<string>("CommitHash")
+                        .IsRequired()
+                        .HasColumnName("NotUploadedPackageNotification_CommitHash");
+
+                    b.Property<string>("RepoUrl")
+                        .IsRequired()
+                        .HasColumnName("NotUploadedPackageNotification_RepoUrl");
+
+                    b.HasDiscriminator().HasValue("NotUploadedPackageNotification");
                 });
 
             modelBuilder.Entity("Database.Models.PassedManualExerciseCheckingNotification", b =>
@@ -2641,6 +2705,14 @@ namespace Database.Migrations
                         .HasForeignKey("CommentId")
                         .HasConstraintName("FK_Notifications_Comments_CommentId11")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Database.Models.NewCommentFromYourGroupStudentNotification", b =>
+                {
+                    b.HasOne("Database.Models.Comments.Comment", "Comment")
+                        .WithMany()
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("Database.Models.NewCommentNotification", b =>

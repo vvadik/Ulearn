@@ -130,6 +130,7 @@ namespace uLearn.Web.Controllers
 				course,
 				slide.Id,
 				nextIsAcceptedSolutions,
+				(slide as ExerciseSlide)?.Exercise.HideShowSolutionsButton ?? false,
 				nextSlide,
 				prevSlide,
 				!User.Identity.IsAuthenticated);
