@@ -80,7 +80,7 @@ namespace Ulearn.Core.Courses
 			AddDefaultScoringGroupIfNeeded(units, slides, settings);
 			CalculateScoringGroupScores(units, settings);
 
-			return new Course(courseId, units, settings, dir);
+			return new Course(courseId, units, settings, context.CourseXml.Directory);
 		}
 
 		private static void CalculateScoringGroupScores(IEnumerable<Unit> units, CourseSettings settings)

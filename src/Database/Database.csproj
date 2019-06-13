@@ -53,8 +53,9 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
-    <Reference Include="JetBrains.Annotations, Version=10.4.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-      <HintPath>..\packages\JetBrains.Annotations.10.4.0\lib\net\JetBrains.Annotations.dll</HintPath>
+    <Reference Include="JetBrains.Annotations, Version=11.1.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325">
+      <HintPath>..\packages\JetBrains.Annotations.11.1.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
@@ -749,6 +750,30 @@
     <Compile Include="Migrations\201903291321473_AddCertificateTemplateArchive.Designer.cs">
       <DependentUpon>201903291321473_AddCertificateTemplateArchive.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201904250906053_CourseVersionGit.cs" />
+    <Compile Include="Migrations\201904250906053_CourseVersionGit.Designer.cs">
+      <DependentUpon>201904250906053_CourseVersionGit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201904260821479_CourseVersion_PathToCourseXml.cs" />
+    <Compile Include="Migrations\201904260821479_CourseVersion_PathToCourseXml.Designer.cs">
+      <DependentUpon>201904260821479_CourseVersion_PathToCourseXml.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201905140908335_AddNotUploadedPackageNotification.cs" />
+    <Compile Include="Migrations\201905140908335_AddNotUploadedPackageNotification.Designer.cs">
+      <DependentUpon>201905140908335_AddNotUploadedPackageNotification.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201905160845235_AddRepoUrl2NotUploadedPackageNotification.cs" />
+    <Compile Include="Migrations\201905160845235_AddRepoUrl2NotUploadedPackageNotification.Designer.cs">
+      <DependentUpon>201905160845235_AddRepoUrl2NotUploadedPackageNotification.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201905221027183_AddCourseGitRepos.cs" />
+    <Compile Include="Migrations\201905221027183_AddCourseGitRepos.Designer.cs">
+      <DependentUpon>201905221027183_AddCourseGitRepos.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201905241421585_AddCourseGitBranchField.cs" />
+    <Compile Include="Migrations\201905241421585_AddCourseGitBranchField.Designer.cs">
+      <DependentUpon>201905241421585_AddCourseGitBranchField.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -759,6 +784,7 @@
     <Compile Include="Models\CommentLike.cs" />
     <Compile Include="Models\CommentPolicy.cs" />
     <Compile Include="Models\CourseAccess.cs" />
+    <Compile Include="Models\CourseGit.cs" />
     <Compile Include="Models\CourseVersion.cs" />
     <Compile Include="Models\EnabledAdditionalScoringGroup.cs" />
     <Compile Include="Models\ExerciseCodeReview.cs" />
@@ -1171,6 +1197,24 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201903291321473_AddCertificateTemplateArchive.resx">
       <DependentUpon>201903291321473_AddCertificateTemplateArchive.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201904250906053_CourseVersionGit.resx">
+      <DependentUpon>201904250906053_CourseVersionGit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201904260821479_CourseVersion_PathToCourseXml.resx">
+      <DependentUpon>201904260821479_CourseVersion_PathToCourseXml.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905140908335_AddNotUploadedPackageNotification.resx">
+      <DependentUpon>201905140908335_AddNotUploadedPackageNotification.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905160845235_AddRepoUrl2NotUploadedPackageNotification.resx">
+      <DependentUpon>201905160845235_AddRepoUrl2NotUploadedPackageNotification.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905221027183_AddCourseGitRepos.resx">
+      <DependentUpon>201905221027183_AddCourseGitRepos.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905241421585_AddCourseGitBranchField.resx">
+      <DependentUpon>201905241421585_AddCourseGitBranchField.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

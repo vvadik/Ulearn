@@ -6,6 +6,7 @@ import * as notifications from "./notifications"
 import * as groups from "./groups"
 import * as users from "./users"
 import * as comments from "./comments"
+import Toast from "@skbkontur/react-ui/Toast";
 
 const API_JWT_TOKEN_UPDATED = "API_JWT_TOKEN_UPDATED";
 let apiJwtToken = "";
@@ -82,7 +83,7 @@ function request(url, options, isRetry) {
 		if (response.status >= 500)
 			serverErrorHandler();
 
-		throw new Error(`HTTP response code: ${response.status}`);
+		throw new RequestError(response.status);
 	})
 	.then(value => {
 		if (value === API_JWT_TOKEN_UPDATED)
@@ -129,6 +130,22 @@ function createRequestParams(body) {
 			"Content-Type": "application/json",
 		},
 		body: JSON.stringify(body)
+	}
+}
+
+export class RequestError extends Error {
+	constructor(status) {
+		const massage = `HTTP response code: ${status}`;
+		super(massage);
+		this.status = status;
+	}
+	showToast() {
+		console.error(this);
+		if (this.status === 403) {
+			Toast.push("У вас нет прав для совершения операции");
+		} else {
+			Toast.push(`Ошибка с кодом ${this.error.status}`);
+		}
 	}
 }
 

@@ -67,13 +67,25 @@ class InviteBlock extends Component {
 		const {group} = this.props;
 		const isInviteLinkEnabled = this.state.isInviteLinkEnabled;
 
-		this.setState({
-			isInviteLinkEnabled: !isInviteLinkEnabled,
-		});
-		this.props.group.isInviteLinkEnabled = !isInviteLinkEnabled;
+		const update = () => {
+			this.setState({
+				isInviteLinkEnabled: !isInviteLinkEnabled,
+			});
+			this.props.group.isInviteLinkEnabled = !isInviteLinkEnabled;
+		};
+		const revert = () => {
+			this.setState({
+				isInviteLinkEnabled: isInviteLinkEnabled,
+			});
+			this.props.group.isInviteLinkEnabled = isInviteLinkEnabled;
+		};
+		update();
 
 		api.groups.saveGroupSettings(group.id, {'isInviteLinkEnabled': !isInviteLinkEnabled})
-		.catch(console.error);
+		.catch((error) => {
+			error.showToast();
+			revert();
+		});
 	};
 }
 

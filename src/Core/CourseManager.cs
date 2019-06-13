@@ -483,19 +483,23 @@ namespace Ulearn.Core
 
 			foreach (var slide in course.Slides)
 			{
-				slide.Info.SlideFile = (FileInfo )GetNewPathForFileAfterMoving(slide.Info.SlideFile, sourceDirectory, destinationDirectory);
+				slide.Info.SlideFile = (FileInfo) GetNewPathForFileAfterMoving(slide.Info.SlideFile, sourceDirectory, destinationDirectory);
 
 				foreach (var exerciseBlock in slide.Blocks.OfType<CsProjectExerciseBlock>())
 					exerciseBlock.SlideFolderPath = (DirectoryInfo) GetNewPathForFileAfterMoving(exerciseBlock.SlideFolderPath, sourceDirectory, destinationDirectory);
-				
+
 				slide.Meta?.FixPaths(slide.Info.SlideFile);
 			}
+
+			course.CourseXmlDirectory = (DirectoryInfo) GetNewPathForFileAfterMoving(course.CourseXmlDirectory, sourceDirectory, destinationDirectory);
 		}
 
 		private static FileSystemInfo GetNewPathForFileAfterMoving(FileSystemInfo file, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)
 		{
 			if (!file.IsInDirectory(sourceDirectory))
 				return file;
+			if (sourceDirectory.FullName == file.FullName)
+				return destinationDirectory;
 
 			var relativePath = file.GetRelativePath(sourceDirectory.FullName);
 			var newPath = Path.Combine(destinationDirectory.FullName, relativePath);

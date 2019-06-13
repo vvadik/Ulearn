@@ -67,8 +67,10 @@ namespace Ulearn.Core.Configuration
 		public string ExerciseStudentZipsDirectory { get; set; }
 		
 		public CertificateConfiguration Certificates { get; set; }
-
+		
 		public string GraphiteServiceName { get; set; }
+		
+		public GitConfiguration Git { get; set; }
 	}
 
 	public class TelegramConfiguration
@@ -86,5 +88,15 @@ namespace Ulearn.Core.Configuration
 	public class CertificateConfiguration
 	{
 		public string Directory { get; set; }
+	}
+
+	public class GitConfiguration
+	{
+		public GitWebhookConfiguration Webhook { get; set; }
+	}
+
+	public class GitWebhookConfiguration
+	{
+		public string Secret { get; set; }
 	}
 }

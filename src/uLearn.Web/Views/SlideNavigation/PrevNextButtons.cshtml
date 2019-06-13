@@ -3,7 +3,8 @@
 <div class="btn-group-justified ctrl-group full-width" id="nav_arrows"
 	data-hasnext="@(Model.HasNextSlide ? "true" : "")"
 	data-hasprev="@(Model.HasPrevSlide ? "true" : "")"
-	data-isaccepted="@(Model.NextIsAcceptedSolutions ? "true" : "")">
+	data-isaccepted="@(Model.NextIsAcceptedSolutions ? "true" : "")"
+	data-hide="@(Model.HideShowSolutionsButton ? "true" : "")">
 	<a class="btn btn-default no-rounds ctrl-group"
 		id="prev_slide_button"
 		href="@Url.RouteUrl("Course.SlideById", new { courseId = Model.CourseId, slideId = Model.PrevSlide != null ? Model.PrevSlide.Url : "" })">
