@@ -71,8 +71,14 @@ namespace Ulearn.Common.Api
 
 			if (settings.LogRequestsAndResponses)
 			{
-				var logResult = jsonResult.Length <= 8 * 1024 ? jsonResult : result.GetShortLogString();
-				logger.Information("Received response from {serviceName}: {result}", settings.ServiceName, logResult);
+				var shortened = false;
+				var logResult = jsonResult;
+				if (jsonResult.Length > 8 * 1024)
+				{
+					logResult = result.GetShortLogString();
+					shortened = true;
+				}
+				logger.Information("Received response from {serviceName}{shortened}: {result}", settings.ServiceName, shortened ? " (сокращенный)" : "", logResult);
 			}
 
 			return result;

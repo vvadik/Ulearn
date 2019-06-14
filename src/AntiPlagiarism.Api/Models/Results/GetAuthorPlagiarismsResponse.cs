@@ -27,11 +27,11 @@ namespace AntiPlagiarism.Api.Models.Results
 				{
 					return new ResearchedSubmission
 					{
-						SubmissionInfo = s.SubmissionInfo,
+						SubmissionInfo = s.SubmissionInfo.CloneWithoutCode(),
 						Plagiarisms = s.Plagiarisms.Select(p => new Plagiarism
 						{
 							Weight = p.Weight,
-							SubmissionInfo = p.SubmissionInfo,
+							SubmissionInfo = p.SubmissionInfo.CloneWithoutCode(),
 						}).ToList()
 					};
 				}).ToList(),

@@ -40,6 +40,13 @@ namespace AntiPlagiarism.Api.Models.Results
 
 		[DataMember(Name = "additional_info")] // Должно включать данные класса AdditionalInfo
 		public string AdditionalInfo { get; set; }
+
+		public SubmissionInfo CloneWithoutCode()
+		{
+			var r = (SubmissionInfo)MemberwiseClone();
+			r.Code = null;
+			return r;
+		}
 	}
 
 	[DataContract]

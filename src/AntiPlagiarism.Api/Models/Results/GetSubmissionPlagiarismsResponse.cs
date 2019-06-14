@@ -32,12 +32,12 @@ namespace AntiPlagiarism.Api.Models.Results
 		{
 			return new GetSubmissionPlagiarismsResponse
 			{
-				SubmissionInfo = SubmissionInfo,
+				SubmissionInfo = SubmissionInfo.CloneWithoutCode(),
 				SuspicionLevels = SuspicionLevels,
 				Plagiarisms = Plagiarisms.Select(p => new Plagiarism
 				{
 					Weight = p.Weight,
-					SubmissionInfo = p.SubmissionInfo,
+					SubmissionInfo = p.SubmissionInfo.CloneWithoutCode(),
 				}).ToList()
 			}.ToString();
 		}
