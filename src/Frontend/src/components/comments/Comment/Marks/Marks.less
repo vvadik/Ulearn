@@ -53,14 +53,19 @@
   letter-spacing: 0.2px;
 }
 
+.groupName,
+.groupName:hover {
+  color: @accentColor;
+}
+
 .archiveGroup {
   border: 1px solid @disabledColor;
   color: @disabledColor;
 }
 
-.groupName,
-.groupName:hover {
-  color: @accentColor;
+.archiveGroupName,
+.archiveGroupName:hover {
+  color: @disabledColor;
 }
 
 .groupMarkOnPhone {
@@ -74,4 +79,15 @@
 .text {
   margin-left: 4px;
   letter-spacing: 0.2px;
+}
+
+.visibleOnDesktopAndTablet {
+  @media (min-width: @maxPhoneWidth) {
+    overflow: hidden;
+  }
+}
+.visibleOnPhone {
+  @media (max-width: @maxPhoneWidth) {
+    overflow: hidden;
+  }
 }
