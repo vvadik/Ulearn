@@ -310,14 +310,13 @@
     <Compile Include="AssemblyCreator.cs" />
     <Compile Include="AsyncReader.cs" />
     <Compile Include="MSBuildResult.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="ProjectExtensions.cs" />
     <Compile Include="SubmitionSerialization_Test.cs" />
     <Compile Include="MsBuildRunner.cs" />
     <Compile Include="Tests.cs" />
     <Compile Include="CsSandboxRunner.cs" />
     <Compile Include="RunningResultsExtensions.cs" />
-    <Compile Include="RunCsJobProgramBase.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

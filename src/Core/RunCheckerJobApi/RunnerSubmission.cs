@@ -31,8 +31,6 @@ namespace Ulearn.Core.RunCheckerJobApi
 	public class ZipRunnerSubmission : RunnerSubmission
 	{
 		public byte[] ZipFileData;
-		public string LangId;
-
-		public bool IsJs => LangId == "javascript";
+		public Language Language;
 	}
 }

@@ -1,19 +1,15 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
 using System.Security;
 using System.Text;
-using System.Threading;
 using log4net;
 using Metrics;
 using Newtonsoft.Json;
 using RunCheckerJob;
-using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.RunCheckerJobApi;
@@ -22,28 +18,24 @@ namespace RunCsJob
 {
 	public class CsSandboxRunnerSettings : SandboxRunnerSettings
 	{
-		public MsBuildSettings MsBuildSettings;
-		public CsSandboxRunnerSettings(DirectoryInfo сompilerDirectory = null)
-			: base("runcsjob")
-		{
-			MsBuildSettings = new MsBuildSettings();
-			if (сompilerDirectory != null)
-				MsBuildSettings.CompilerDirectory = сompilerDirectory;
-		}
+		public static MsBuildSettings MsBuildSettings;
 	}
 
 	public class CsSandboxRunnerClient : ISandboxRunnerClient
 	{
-		private CsSandboxRunnerSettings Settings { get; }
-		
-		public CsSandboxRunnerClient(CsSandboxRunnerSettings settings = null)
-		{
-			Settings = settings;
-		}
-
 		public RunningResults Run(RunnerSubmission submission)
 		{
-			return CsSandboxRunner.Run(submission, Settings);
+			return SandboxRunHelper.WithSubmissionWorkingDirectory(submission, this, SandboxRunnerSettings.WorkingDirectory, SandboxRunnerSettings.DeleteSubmissionsAfterFinish);
+		}
+
+		public RunningResults RunContainerAndGetResultInternal(RunnerSubmission submission, DirectoryInfo submissionWorkingDirectory)
+		{
+			var instance = new CsSandboxRunner(submission, new CsSandboxRunnerSettings());
+			var result = submission is ProjRunnerSubmission
+				? instance.RunMsBuild(submissionWorkingDirectory.FullName)
+				: instance.RunCsc(submissionWorkingDirectory.FullName);
+			result.Id = submission.Id;
+			return result;
 		}
 	}
 
@@ -59,69 +51,13 @@ namespace RunCsJob
 		private bool hasMemoryLimit;
 		private bool hasOutputLimit;
 
-		public static RunningResults Run(RunnerSubmission submission, CsSandboxRunnerSettings settings = null)
-		{
-			settings = settings ?? new CsSandboxRunnerSettings();
-			var workingDirectory = settings.WorkingDirectory;
-			if (!workingDirectory.Exists)
-			{
-				try
-				{
-					workingDirectory.Create();
-				}
-				catch (Exception e)
-				{
-					log.Error($"Не могу создать директорию для компиляции решений: {workingDirectory}", e);
-					return new RunningResults(submission.Id, Verdict.SandboxError, error: e.ToString());
-				}
-			}
-
-			var randomSuffix = Guid.NewGuid().ToString("D");
-			randomSuffix = randomSuffix.Substring(randomSuffix.Length - 8);
-			var submissionCompilationDirectory = workingDirectory.GetSubdirectory($"{submission.Id}-{randomSuffix}");
-			try
-			{
-				submissionCompilationDirectory.Create();
-			}
-			catch (Exception e)
-			{
-				log.Error($"Не могу создать директорию для компиляции решения: {submissionCompilationDirectory.FullName}", e);
-				return new RunningResults(submission.Id, Verdict.SandboxError, error: e.ToString());
-			}
-
-			try
-			{
-				RunningResults result;
-				var instance = new CsSandboxRunner(submission, settings);
-				if (submission is ProjRunnerSubmission)
-					result = instance.RunMsBuild(submissionCompilationDirectory.FullName);
-				else
-					result = instance.RunCsc(submissionCompilationDirectory.FullName);
-				result.Id = submission.Id;
-				return result;
-			}
-			catch (Exception ex)
-			{
-				log.Error(ex.Message, ex);
-				return new RunningResults(submission.Id, Verdict.SandboxError, error: ex.ToString());
-			}
-			finally
-			{
-				if (settings.DeleteSubmissionsAfterFinish)
-				{
-					log.Info($"Удаляю папку с решением: {submissionCompilationDirectory}");
-					SafeRemoveDirectory(submissionCompilationDirectory.FullName);
-				}
-			}
-		}
-
 		public CsSandboxRunner(RunnerSubmission submission, CsSandboxRunnerSettings settings = null)
 		{
 			this.submission = submission;
 			this.settings = settings ?? new CsSandboxRunnerSettings();
 		}
 
-		private RunningResults RunMsBuild(string submissionCompilationDirectory)
+		public RunningResults RunMsBuild(string submissionCompilationDirectory)
 		{
 			var projSubmission = (ProjRunnerSubmission)submission;
 			log.Info($"Запускаю проверку C#-решения {projSubmission.Id}, компилирую с помощью MsBuild");
@@ -139,7 +75,7 @@ namespace RunCsJob
 
 			log.Info($"Компилирую решение {submission.Id}: {projSubmission.ProjectFileName} в папке {dir.FullName}");
 
-			var builderResult = MsBuildRunner.BuildProject(settings.MsBuildSettings, projSubmission.ProjectFileName, dir);
+			var builderResult = MsBuildRunner.BuildProject(CsSandboxRunnerSettings.MsBuildSettings, projSubmission.ProjectFileName, dir);
 
 			if (!builderResult.Success)
 			{
@@ -176,36 +112,6 @@ namespace RunCsJob
 			finally
 			{
 				SafeRemoveFile(res.PathToAssembly);
-			}
-		}
-
-		private static void SafeCopyFileIfNotExists(string sourceFilePath, string destFilePath)
-		{
-			try
-			{
-				if (!File.Exists(destFilePath))
-					File.Copy(sourceFilePath, destFilePath);
-			}
-			catch (Exception e)
-			{
-				log.Warn($"Произошла ошибка при копировании файла {sourceFilePath} в {destFilePath}, но я её проигнорирую", e);
-			}
-		}
-
-		private static void SafeRemoveDirectory(string path)
-		{
-			try
-			{
-				/* Sometimes we can't remove directory after Time Limit Exceeded, because process is alive yet. Just wait some seconds before directory removing */ 
-				FuncUtils.TrySeveralTimes(() =>
-				{
-					Directory.Delete(path, true);
-					return true;
-				}, 3, () => Thread.Sleep(TimeSpan.FromSeconds(1)));
-			}
-			catch (Exception e)
-			{
-				log.Warn($"Произошла ошибка при удалении директории {path}, но я её проигнорирую", e);
 			}
 		}
 
@@ -317,7 +223,7 @@ namespace RunCsJob
 				return;
 
 			if (!sandbox.HasExited)
-				throw new SandboxErrorException($"Песочница не ответила «Ready» через {settings.TimeLimit.TotalSeconds} секунд после запуска, убиваю её");
+				throw new SandboxException($"Песочница не ответила «Ready» через {settings.TimeLimit.TotalSeconds} секунд после запуска, убиваю её");
 
 			if (sandbox.ExitCode != 0)
 			{
@@ -326,10 +232,10 @@ namespace RunCsJob
 				var stderrData = stderrReader.GetData();
 				log.Warn($"Вывод песочницы в stderr:\n{stderrData}");
 				var result = GetResultForNonZeroExitCode(stderrData, sandbox.ExitCode);
-				throw new SandboxErrorException(result.Error);
+				throw new SandboxException(result.Error);
 			}
 
-			throw new SandboxErrorException("Sandbox unexpectedly exited before respond");
+			throw new SandboxException("Sandbox unexpectedly exited before respond");
 		}
 
 		private Process StartSandboxProcess(string sandboxArguments)
@@ -356,11 +262,11 @@ namespace RunCsJob
 			}
 			catch (Exception e)
 			{
-				throw new SandboxErrorException("Не смог запустить C#-песочницу", e);
+				throw new SandboxException("Не смог запустить C#-песочницу", e);
 			}
 
 			if (sandbox == null)
-				throw new SandboxErrorException("Не смог запустить C#-песочницу. Process.Start() вернул NULL");
+				throw new SandboxException("Не смог запустить C#-песочницу. Process.Start() вернул NULL");
 
 			return sandbox;
 		}
@@ -548,28 +454,6 @@ namespace RunCsJob
 		private static RunningResults HandleInnerException(Exception ex)
 		{
 			return new RunningResults(Verdict.RuntimeError, output: ex.ToString());
-		}
-	}
-
-	internal class SandboxErrorException : Exception
-	{
-		public SandboxErrorException()
-		{
-		}
-
-		public SandboxErrorException(string message)
-			: base(message)
-		{
-		}
-
-		public SandboxErrorException(string message, Exception innerException)
-			: base(message, innerException)
-		{
-		}
-
-		protected SandboxErrorException(SerializationInfo info, StreamingContext context)
-			: base(info, context)
-		{
 		}
 	}
 }

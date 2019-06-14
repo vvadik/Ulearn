@@ -10,7 +10,7 @@ using Ulearn.Core.RunCheckerJobApi;
 
 namespace RunCheckerJob
 {
-	public abstract class RunCheckerJobProgramBase
+	public abstract class ProgramBase
 	{
 		private readonly string address;
 		private readonly string token;
@@ -20,11 +20,11 @@ namespace RunCheckerJob
 		private readonly ManualResetEvent shutdownEvent = new ManualResetEvent(false);
 		private readonly List<Thread> threads = new List<Thread>();
 		
-		private static readonly ILog log = LogManager.GetLogger(typeof(RunCheckerJobProgramBase));
+		private static readonly ILog log = LogManager.GetLogger(typeof(ProgramBase));
 		protected abstract ISandboxRunnerClient SandboxRunnerClient { get; }
 		private readonly string serviceName;
 
-		protected RunCheckerJobProgramBase(string serviceName, ManualResetEvent externalShutdownEvent = null)
+		protected ProgramBase(string serviceName, ManualResetEvent externalShutdownEvent = null)
 		{
 			this.serviceName = serviceName;
 			if (externalShutdownEvent != null)

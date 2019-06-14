@@ -91,7 +91,7 @@ namespace uLearn.CourseTool.Validating
 				ReportSlideWarning(slide, "Style issue(s): " + errorMessages);
 			}
 
-			var result = CsSandboxRunner.Run(exercise.CreateSubmission(slide.Id.ToString(), ethalon), settings);
+			var result = new CsSandboxRunnerClient().Run(exercise.CreateSubmission(slide.Id.ToString(), ethalon));
 
 			var output = result.GetOutput().NormalizeEoln();
 

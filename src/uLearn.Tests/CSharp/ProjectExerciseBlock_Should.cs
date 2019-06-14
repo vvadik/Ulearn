@@ -156,7 +156,7 @@ namespace uLearn.CSharp
 				ProjectFileName = "test.csproj",
 				ZipFileData = studentExerciseZipFilePath.ReadAllContent()
 			};
-			var result = CsSandboxRunner.Run(submission);
+			var result = new CsSandboxRunnerClient().Run(submission);
 
 			result.CompilationOutput.Should().Be("");
 			result.Error.Should().Be("");

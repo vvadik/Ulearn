@@ -6,17 +6,31 @@ using System.IO;
 using System.Threading.Tasks;
 using log4net;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
 using Ulearn.Core.RunCheckerJobApi;
 
 namespace RunCheckerJob
 {
-	public class DockerRunner
+	internal class DockerProcessRunner
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(DockerRunner));
+		private static readonly ILog log = LogManager.GetLogger(typeof(DockerProcessRunner));
 		private const string defaultSeccompFilename = "chrome-seccomp.json";
 
-		public static RunningResults Run(DockerSandboxRunnerSettings settings, DirectoryInfo dir)
+		public static RunningResults Run(ZipRunnerSubmission submission, DockerSandboxRunnerSettings settings, string submissionDirectory)
 		{
+			log.Info($"Запускаю проверку решения {submission.Id}");
+			var dir = new DirectoryInfo(submissionDirectory);
+
+			try
+			{
+				Utils.UnpackZip(submission.ZipFileData, dir.FullName);
+			}
+			catch (Exception ex)
+			{
+				log.Error("Не могу распаковать решение", ex);
+				return new RunningResults(submission.Id, Verdict.SandboxError, error: ex.ToString());
+			}
+			
 			var outputDirectory = dir.GetSubdirectory("output");
 			try
 			{
@@ -28,9 +42,11 @@ namespace RunCheckerJob
 				return new RunningResults(Verdict.SandboxError, error: e.ToString());
 			}
 
+			log.Info($"Запускаю Docker для решения {submission.Id} в папке {dir.FullName}");
+
 			return RunDocker(settings, dir);
 		}
-
+		
 		private static RunningResults RunDocker(DockerSandboxRunnerSettings settings, DirectoryInfo dir)
 		{
 			{

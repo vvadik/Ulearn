@@ -83,7 +83,7 @@ namespace uLearn.CourseTool.Validating
 		{
 			var solutionCode = ex.CorrectSolutionFile.ContentAsUtf8();
 			var submission = ex.CreateSubmission(ex.CsprojFileName, solutionCode);
-			var result = CsSandboxRunner.Run(submission, new CsSandboxRunnerSettings());
+			var result = new CsSandboxRunnerClient().Run(submission);
 
 			if (!IsCompiledAndExecuted(result))
 				ReportSlideError(slide, $"Correct solution file {ex.CorrectSolutionFileName} verdict is not OK. RunResult = {result}");
@@ -109,7 +109,7 @@ namespace uLearn.CourseTool.Validating
 
 			foreach (var waFile in filesWithWrongAnswer)
 			{
-				var result = CsSandboxRunner.Run(ex.CreateSubmission(waFile.Name, waFile.ContentAsUtf8()));
+				var result = new CsSandboxRunnerClient().Run(ex.CreateSubmission(waFile.Name, waFile.ContentAsUtf8()));
 
 				ReportWarningIfWrongAnswerVerdictIsNotOk(waFile.Name, result);
 				ReportWarningIfWrongAnswerIsSolution(waFile.Name, result);
@@ -132,7 +132,7 @@ namespace uLearn.CourseTool.Validating
 		{
 			var initialCode = ex.UserCodeFile.ContentAsUtf8();
 			var submission = ex.CreateSubmission(ex.CsprojFileName, initialCode);
-			var result = CsSandboxRunner.Run(submission);
+			var result = new CsSandboxRunnerClient().Run(submission);
 
 			if (ex.StudentZipIsCompilable)
 				ReportErrorIfInitialCodeVerdictIsNotOk(result);
@@ -177,7 +177,7 @@ namespace uLearn.CourseTool.Validating
 				if (!ex.StudentZipIsCompilable)
 					return;
 
-				var buildResult = MsBuildRunner.BuildProject(settings.MsBuildSettings, ex.CsprojFile.Name, tempExFolder);
+				var buildResult = MsBuildRunner.BuildProject(CsSandboxRunnerSettings.MsBuildSettings, ex.CsprojFile.Name, tempExFolder);
 				ReportErrorIfStudentsZipNotBuilding(buildResult);
 			}
 			finally
