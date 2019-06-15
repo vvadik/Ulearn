@@ -8,6 +8,7 @@ import MenuSeparator from "@skbkontur/react-ui/components/MenuSeparator/MenuSepa
 import MenuHeader from "@skbkontur/react-ui/components/MenuHeader/MenuHeader";
 
 import styles from "./Marks.less";
+import Hint from "@skbkontur/react-ui/components/Hint/Hint";
 
 export default function Marks({courseId, comment, canViewStudentsGroup, authorGroups}) {
 	const windowUrl = `${window.location.origin}/${courseId}`;
@@ -53,13 +54,17 @@ const GroupMark = ({url, groups}) => (
 			<div className={styles.visibleOnDesktopAndTablet}>
 				<div className={styles.groupList}>
 					{groups.map(group =>
-						<div key={group.id} className={`${styles.mark} ${styles.group} ${group.isArchived && styles.archiveGroup}`}>
-							<Icon name="People" size={15} />
-							<a href={group.apiUrl && `${url}${group.apiUrl}`}
-							   className={`${styles.text} ${styles.groupName}`}>
-								{group.name}
-							</a>
-						</div>)}
+						<Hint pos="right middle" text={group.name}>
+							<div
+								key={group.id}
+								 className={`${styles.mark} ${styles.group} ${group.isArchived && styles.archiveGroup}`}>
+									<Icon name="People" size={15} />
+									<a href={group.apiUrl && `${url}${group.apiUrl}`}
+									   className={`${styles.text} ${styles.groupName}`}>
+										{group.name}
+									</a>
+							</div>
+						</Hint>)}
 				</div>
 			</div>
 			<div className={styles.visibleOnPhone}>

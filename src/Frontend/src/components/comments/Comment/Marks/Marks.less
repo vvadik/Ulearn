@@ -61,11 +61,11 @@
 .archiveGroup {
   border: 1px solid @disabledColor;
   color: @disabledColor;
-}
 
-.archiveGroupName,
-.archiveGroupName:hover {
-  color: @disabledColor;
+  .groupName,
+  .groupName:hover {
+    color: @disabledColor;
+  }
 }
 
 .groupMarkOnPhone {
@@ -83,11 +83,14 @@
 
 .visibleOnDesktopAndTablet {
   @media (min-width: @maxPhoneWidth) {
-    overflow: hidden;
+    overflow-y: hidden;
+    overflow-x: scroll;
   }
 }
 .visibleOnPhone {
   @media (max-width: @maxPhoneWidth) {
-    overflow: hidden;
+    overflow-y: hidden;
+    overflow-x: scroll;
+    overflow-scrolling: auto;
   }
 }
