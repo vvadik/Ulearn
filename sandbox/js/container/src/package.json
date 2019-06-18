@@ -1,0 +1,35 @@
+{
+  "scripts": {
+    "test": "node ulearn-test-runner.js",
+    "build-ui": "webpack --config webpack.ui-config.js",
+    "build-ui-tests": "webpack --config webpack.ui-tests-config.js",
+    "build-unit-tests": "webpack --config webpack.unit-tests-config.js",
+    "precommit": "pretty-quick --staged"
+  },
+  "dependencies": {
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6"
+  },
+  "devDependencies": {
+    "@babel/core": "7.4.5",
+    "@babel/plugin-proposal-class-properties": "7.4.4",
+    "@babel/preset-env": "7.4.5",
+    "@babel/preset-react": "7.0.0",
+    "babel-loader": "8.0.6",
+    "chai": "4.2.0",
+    "core-js": "3.1.3",
+    "css-loader": "2.1.1",
+    "html-webpack-plugin": "3.2.0",
+    "husky": "2.4.0",
+    "mocha": "6.1.4",
+    "prettier": "1.18.2",
+    "pretty-quick": "1.11.0",
+    "puppeteer": "1.17.0",
+    "regenerator-runtime": "0.13.2",
+    "style-loader": "0.23.1",
+    "webpack": "4.33.0",
+    "webpack-cli": "3.3.3",
+    "webpack-glob-entries": "1.0.1",
+    "webpack-node-externals": "1.7.2"
+  }
+}
