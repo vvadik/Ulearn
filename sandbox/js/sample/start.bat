@@ -1,1 +1,2 @@
-docker run -it --privileged -v c:/git/sample/output:/app/output -v c:/git/sample/src:/app/src -v c:/git/sample/tests:/app/tests js-sandbox sh
+if not exist "%~dp0\output\" mkdir %~dp0\output\
+docker run -it --privileged -v c:/git/ulearn/sandbox/js/sample/output:/app/output -v c:/git/ulearn/sandbox/js/sample/src:/app/src -v c:/git/ulearn/sandbox/js/sample/tests:/app/tests js-sandbox sh

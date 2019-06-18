@@ -27,23 +27,26 @@ namespace RunCheckerJob.Js
 
 		private static RunningResults MakeVerdict(JsTestResult result)
 		{
-			var hasUiTests = result.ui.stats != null;
 			var hasUnitTests = result.unit.stats != null;
-
-			if (hasUiTests && result.ui.stats.failures != 0)
-			{
-				return new RunningResults(Verdict.RuntimeError, error: result.ui.failures.First().err.message);
-			}
-
 			if (hasUnitTests && result.unit.stats.failures != 0)
 			{
-				return new RunningResults(Verdict.RuntimeError, error: result.unit.failures.First().err.message);
+				var failure = result.unit.failures.First();
+				return new RunningResults(Verdict.RuntimeError, error: $"{failure.fullTitle}: {failure.err.message}");
+			}
+			
+			var hasUiTests = result.ui.stats != null;
+			if (hasUiTests && result.ui.stats.failures != 0)
+			{
+				var failure = result.ui.failures.First();
+				return new RunningResults(Verdict.RuntimeError, error: $"{failure.fullTitle}: {failure.err.message}");
 			}
 
 			return new RunningResults(Verdict.Ok);
 		}
-		
-		private class JsTestResult
+
+#pragma warning disable 649
+// ReSharper disable ClassNeverInstantiated.Local, CollectionNeverUpdated.Local
+private class JsTestResult
 		{
 			public MochaResult ui;
 			public MochaResult unit;

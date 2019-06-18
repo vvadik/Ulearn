@@ -36,7 +36,8 @@
 
 		public override string ToString()
 		{
-			return $"Id: {Id}, Verdict: {Verdict}: {(Verdict == Verdict.SandboxError ? Error : Verdict == Verdict.CompilationError ? CompilationOutput : Output)}";
+			var message = Verdict == Verdict.SandboxError || Verdict == Verdict.RuntimeError ? Error : Verdict == Verdict.CompilationError ? CompilationOutput : Output;
+			return $"Id: {Id}, Verdict: {Verdict}: {message}";
 		}
 
 		public string GetOutput()

@@ -1,8 +1,6 @@
-using System;
 using System.Threading;
 using log4net;
 using System.Linq;
-using RunCheckerJob.Js;
 using Ulearn.Core.RunCheckerJobApi;
 
 namespace RunCheckerJob
@@ -32,17 +30,9 @@ namespace RunCheckerJob
 		
 		protected override ISandboxRunnerClient SandboxRunnerClient => sandboxRunner;
 		
-		// TODO собрать тестовый архив и реализовать
-		internal void SelfCheck()
+		private void SelfCheck()
 		{
-			throw new NotImplementedException();
-			// var res = SandboxRunner.Run(new FileRunnerSubmission
-			// {
-			// 	Id = Utils.NewNormalizedGuid(),
-			// 	NeedRun = true,
-			// 	Code = "console.log('Привет мир')",
-			// }, Settings);
-			// log.Info(res);
+			new SelfChecker(sandboxRunner).JsSelfCheck();
 		}
 	}
 }

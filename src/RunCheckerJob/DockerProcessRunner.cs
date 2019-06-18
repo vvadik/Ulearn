@@ -49,28 +49,26 @@ namespace RunCheckerJob
 		
 		private static RunningResults RunDocker(DockerSandboxRunnerSettings settings, DirectoryInfo dir)
 		{
+			var name = Guid.NewGuid();
+			var dockerCommand = BuildDockerCommand(settings, dir, name);
+			var dockerShellProcess = BuildShellProcess(dockerCommand);
+
+			dockerShellProcess.Start();
+			var isFinished = dockerShellProcess.WaitForExit((int)settings.IdleTimeLimit.TotalMilliseconds);
+
+			if (!isFinished)
 			{
-				var name = Guid.NewGuid();
-				var dockerCommand = BuildDockerCommand(settings, dir, name);
-				var dockerShellProcess = BuildShellProcess(dockerCommand);
+				log.Info($"Не хватило времени на работу Docker в папке {dir.FullName}");
+				GracefullyShutdownDocker(dockerShellProcess, name, settings);
+				return new RunningResults(Verdict.TimeLimit);
+			}
 
-				dockerShellProcess.Start();
-				var isFinished = dockerShellProcess.WaitForExit((int)settings.IdleTimeLimit.TotalMilliseconds);
+			log.Info($"Docker закончил работу и написал: {dockerShellProcess.StandardOutput.ReadToEnd()}");
 
-				if (!isFinished)
-				{
-					log.Info($"Не хватило времени на работу Docker в папке {dir.FullName}");
-					GracefullyShutdownDocker(dockerShellProcess, name, settings);
-					return new RunningResults(Verdict.TimeLimit);
-				}
-
-				log.Info($"Docker закончил работу и написал: {dockerShellProcess.StandardOutput.ReadToEnd()}");
-
-				if (dockerShellProcess.ExitCode != 0)
-				{
-					log.Info($"Упал docker в папке {dir.FullName}");
-					return new RunningResults(Verdict.SandboxError, error: dockerShellProcess.StandardError.ReadToEnd());
-				}
+			if (dockerShellProcess.ExitCode != 0)
+			{
+				log.Info($"Упал docker в папке {dir.FullName}");
+				return new RunningResults(Verdict.SandboxError, error: dockerShellProcess.StandardError.ReadToEnd());
 			}
 
 			return LoadResult(dir, settings);
@@ -150,7 +148,7 @@ namespace RunCheckerJob
 				"--restart no",
 				"--rm",
 				$"--name {name}",
-				"-it",
+				//"-it",
 				$"-m {settings.MemoryLimit}b",
 				settings.SandBoxName,
 			};

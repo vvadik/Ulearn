@@ -6,9 +6,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="NUnit" Version="3.10.1" />
       <ProjectReference Include="..\Common\Common.csproj" />
       <ProjectReference Include="..\Core\Core.csproj" />
       <PackageReference Include="log4net" Version="2.0.8" />
+      <None Include="DockerConfig\*.*">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>
