@@ -83,14 +83,11 @@
 
 .visibleOnDesktopAndTablet {
   @media (min-width: @maxPhoneWidth) {
-    overflow-y: hidden;
-    overflow-x: scroll;
+    overflow: hidden;
   }
 }
 .visibleOnPhone {
   @media (max-width: @maxPhoneWidth) {
-    overflow-y: hidden;
-    overflow-x: scroll;
-    overflow-scrolling: auto;
+    overflow: hidden;
   }
 }
