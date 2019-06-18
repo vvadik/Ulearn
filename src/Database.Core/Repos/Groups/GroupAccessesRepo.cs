@@ -228,7 +228,7 @@ namespace Database.Repos.Groups
 		
 		public async Task<List<GroupMember>> GetMembersOfAllGroupsAvailableForUserAsync(string userId)
 		{
-			var groups = await GetAvailableForUserGroupsAsync(userId, false).ConfigureAwait(false);
+			var groups = await GetAvailableForUserGroupsAsync(userId, false, includeArchived: true).ConfigureAwait(false);
 			return await groupMembersRepo.GetGroupsMembersAsync(groups.Select(g => g.Id).ToList()).ConfigureAwait(false);
 		}
 
