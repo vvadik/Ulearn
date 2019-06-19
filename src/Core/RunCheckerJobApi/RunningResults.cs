@@ -1,7 +1,10 @@
-﻿namespace Ulearn.Core.RunCheckerJobApi
+﻿using System.Linq;
+
+namespace Ulearn.Core.RunCheckerJobApi
 {
 	public class RunningResults
 	{
+		// TODO что куда пишется в каком случае?
 		public string Id { get; set; }
 
 		public Verdict Verdict { get; set; }
@@ -36,15 +39,19 @@
 
 		public override string ToString()
 		{
-			var message = Verdict == Verdict.SandboxError || Verdict == Verdict.RuntimeError ? Error : Verdict == Verdict.CompilationError ? CompilationOutput : Output;
+			string message;
+			if (Verdict == Verdict.CompilationError)
+				message = CompilationOutput;
+			else if (Verdict == Verdict.SandboxError)
+				message = Error;
+			else
+				message = string.Join("\n", new[] { Output, Error }.Where(s => !string.IsNullOrWhiteSpace(s)));
 			return $"Id: {Id}, Verdict: {Verdict}: {message}";
 		}
 
 		public string GetOutput()
 		{
-			var output = Output;
-			if (!string.IsNullOrEmpty(Error))
-				output += "\n" + Error;
+			var output = string.Join("\n", new[] { Output, Error }.Where(s => !string.IsNullOrWhiteSpace(s)));
 
 			switch (Verdict)
 			{

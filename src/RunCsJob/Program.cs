@@ -46,7 +46,7 @@ namespace RunCsJob
 			}
 			log.Info($"Путь до компиляторов: {сompilerDirectory}");
 
-			CsSandboxRunnerSettings.MsBuildSettings = new MsBuildSettings {CompilerDirectory = сompilerDirectory};
+			CsSandboxRunnerSettings.MsBuildSettings.CompilerDirectory = сompilerDirectory;
 			csSandboxRunnerClient = new CsSandboxRunnerClient();
 		}
 

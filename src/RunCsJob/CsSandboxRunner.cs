@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Text;
+using JetBrains.Annotations;
 using log4net;
 using Metrics;
 using Newtonsoft.Json;
@@ -18,7 +19,7 @@ namespace RunCsJob
 {
 	public class CsSandboxRunnerSettings : SandboxRunnerSettings
 	{
-		public static MsBuildSettings MsBuildSettings;
+		public static MsBuildSettings MsBuildSettings = new MsBuildSettings();
 	}
 
 	public class CsSandboxRunnerClient : ISandboxRunnerClient
@@ -51,10 +52,10 @@ namespace RunCsJob
 		private bool hasMemoryLimit;
 		private bool hasOutputLimit;
 
-		public CsSandboxRunner(RunnerSubmission submission, CsSandboxRunnerSettings settings = null)
+		public CsSandboxRunner(RunnerSubmission submission, [NotNull]CsSandboxRunnerSettings settings)
 		{
 			this.submission = submission;
-			this.settings = settings ?? new CsSandboxRunnerSettings();
+			this.settings = settings;
 		}
 
 		public RunningResults RunMsBuild(string submissionCompilationDirectory)
