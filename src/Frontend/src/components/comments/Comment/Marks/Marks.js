@@ -74,16 +74,17 @@ export function GroupMark({url, groups}) {
 	)
 };
 
-const GroupsMenu = ({url, groups, label = "Все группы"}) => (
+const GroupsMenu = ({url, groups}) => (
 	<TooltipMenu
 		menuWidth="150px"
 		positions={["bottom right"]}
 		caption={
 			<div className={styles.groupMarkOnPhone}>
 				<Icon name="People" color="#fff" size={15} />
-				{label}
+				<span className={`${styles.text} ${styles.visibleOnDesktopAndTablet}`}>
+					Все группы
+				</span>
 			</div>}>
-		<MenuHeader>Группы</MenuHeader>
 		{groups.map(group => !group.isArchived &&
 			<MenuItem
 				key={group.id}

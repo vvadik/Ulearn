@@ -6,12 +6,12 @@
   justify-content: flex-start;
   width: inherit;
   align-items: baseline;
-  word-break: break-word;
 
-  & > a {
+  > a {
     flex: 0 0 auto;
+    
     @media (max-width: @maxPhoneWidth) {
-      max-width: 110px;
+      flex-basis: 50px;
     }
   }
 }
