@@ -1,51 +1,51 @@
 ﻿using System.Linq;
+using JetBrains.Annotations;
+using Newtonsoft.Json;
 
 namespace Ulearn.Core.RunCheckerJobApi
 {
 	public class RunningResults
 	{
-		// TODO что куда пишется в каком случае?
 		public string Id { get; set; }
+		public readonly Verdict Verdict;
+		[NotNull] public readonly string CompilationOutput;
+		// TODO что куда пишется в каком случае?
+		[NotNull] public readonly string Output;
+		[NotNull] public readonly string Error;
 
-		public Verdict Verdict { get; set; }
-
-		public string CompilationOutput { get; set; }
-
-		public string Output { get; set; }
-
-		public string Error { get; set; }
-
-		public RunningResults()
-		{
-			/* It's need to be here for model unpacking in API queries */
-		}
-
+		[JsonConstructor]
 		public RunningResults(string id, Verdict verdict, string compilationOutput = "", string output = "", string error = "")
 		{
 			Id = id;
 			Verdict = verdict;
-			CompilationOutput = compilationOutput;
-			Output = output;
-			Error = error;
+			CompilationOutput = compilationOutput ?? "";
+			Output = output ?? "";
+			Error = error ?? "";
 		}
 
 		public RunningResults(Verdict verdict, string compilationOutput = "", string output = "", string error = "")
 		{
 			Verdict = verdict;
-			CompilationOutput = compilationOutput;
-			Output = output;
-			Error = error;
+			CompilationOutput = compilationOutput ?? "";
+			Output = output ?? "";
+			Error = error ?? "";
 		}
 
 		public override string ToString()
 		{
 			string message;
-			if (Verdict == Verdict.CompilationError)
-				message = CompilationOutput;
-			else if (Verdict == Verdict.SandboxError)
-				message = Error;
-			else
-				message = string.Join("\n", new[] { Output, Error }.Where(s => !string.IsNullOrWhiteSpace(s)));
+			switch (Verdict)
+			{
+				case Verdict.CompilationError:
+					message = CompilationOutput;
+					break;
+				case Verdict.SandboxError:
+					message = Error;
+					break;
+				default:
+					message = string.Join("\n", new[] { Output, Error }.Where(s => !string.IsNullOrWhiteSpace(s)));
+					break;
+			}
 			return $"Id: {Id}, Verdict: {Verdict}: {message}";
 		}
 

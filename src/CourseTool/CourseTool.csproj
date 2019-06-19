@@ -594,10 +594,6 @@
       <Project>{b6b60d19-c6bd-4d66-95da-14480a18770c}</Project>
       <Name>Metrics</Name>
     </ProjectReference>
-    <ProjectReference Include="..\RunCheckerJob.Api\RunCheckerJob.Api.csproj">
-      <Project>{26580595-f4dc-41ee-ba66-0ef4692243af}</Project>
-      <Name>RunCheckerJob.Api</Name>
-    </ProjectReference>
     <ProjectReference Include="..\RunCsJob\RunCsJob.csproj">
       <Project>{77B16F9D-3CDF-4CC6-BE5F-B6BADFAC5394}</Project>
       <Name>RunCsJob</Name>

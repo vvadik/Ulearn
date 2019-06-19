@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading;
+using JetBrains.Annotations;
 using log4net;
 using log4net.Config;
 using RunCheckerJob;
@@ -36,23 +37,23 @@ namespace RunCsJob
 				program.Run();
 		}
 
-		private Program(DirectoryInfo сompilerDirectory, ManualResetEvent externalShutdownEvent = null)
+		private Program([CanBeNull]DirectoryInfo сompilerDirectory, ManualResetEvent externalShutdownEvent = null)
 			: base(serviceName, externalShutdownEvent)
 		{
-			if (!сompilerDirectory.Exists)
+			if(сompilerDirectory != null)
+				CsSandboxRunnerSettings.MsBuildSettings.CompilerDirectory = сompilerDirectory;
+			if (!CsSandboxRunnerSettings.MsBuildSettings.CompilerDirectory.Exists)
 			{
 				log.Error($"Не найдена папка с компиляторами: {сompilerDirectory}");
 				Environment.Exit(1);
 			}
 			log.Info($"Путь до компиляторов: {сompilerDirectory}");
-
-			CsSandboxRunnerSettings.MsBuildSettings.CompilerDirectory = сompilerDirectory;
 			csSandboxRunnerClient = new CsSandboxRunnerClient();
 		}
 
 		protected override ISandboxRunnerClient SandboxRunnerClient => csSandboxRunnerClient;
 
-		internal void SelfCheck()
+		private void SelfCheck()
 		{
 			var res = SandboxRunnerClient.Run(new FileRunnerSubmission
 			{
