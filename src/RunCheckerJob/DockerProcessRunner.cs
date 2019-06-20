@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using log4net;
 using Ulearn.Common.Extensions;
@@ -15,6 +16,12 @@ namespace RunCheckerJob
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(DockerProcessRunner));
 		private const string defaultSeccompFilename = "chrome-seccomp.json";
+
+		static DockerProcessRunner()
+		{
+			/* We should register encoding provider for Encoding.GetEncoding(1251) works */
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+		}
 
 		public static RunningResults Run(ZipRunnerSubmission submission, DockerSandboxRunnerSettings settings, string submissionDirectory)
 		{
@@ -54,7 +61,9 @@ namespace RunCheckerJob
 			var dockerShellProcess = BuildShellProcess(dockerCommand);
 
 			dockerShellProcess.Start();
-			var isFinished = dockerShellProcess.WaitForExit((int)settings.IdleTimeLimit.TotalMilliseconds);
+			var readErrTask = dockerShellProcess.StandardError.ReadToEndAsync();
+			var readOutTask = dockerShellProcess.StandardOutput.ReadToEndAsync();
+			var isFinished = Task.WaitAll(new Task[] { readErrTask, readOutTask }, (int)settings.IdleTimeLimit.TotalMilliseconds);
 
 			if (!isFinished)
 			{
@@ -63,12 +72,12 @@ namespace RunCheckerJob
 				return new RunningResults(Verdict.TimeLimit);
 			}
 
-			log.Info($"Docker закончил работу и написал: {dockerShellProcess.StandardOutput.ReadToEnd()}");
+			log.Info($"Docker закончил работу и написал: {readOutTask.Result}");
 
 			if (dockerShellProcess.ExitCode != 0)
 			{
 				log.Info($"Упал docker в папке {dir.FullName}");
-				return new RunningResults(Verdict.SandboxError, error: dockerShellProcess.StandardError.ReadToEnd());
+				return new RunningResults(Verdict.SandboxError, error: readErrTask.Result);
 			}
 
 			return LoadResult(dir, settings);
