@@ -248,7 +248,7 @@ namespace uLearn.Web.Controllers
 			if (result.Verdict != Verdict.SandboxError)
 				return;
 
-			var output = result.Output;
+			var output = result.GetOutput();
 			await bot.PostToChannelAsync(
 				$"<b>Решение #{submission.Id} не запустилось в песочнице (SandboxError).</b>\n" +
 				(string.IsNullOrEmpty(output) ? "" : $"Вывод:\n<pre>{output.EscapeHtml()}</pre>"), 

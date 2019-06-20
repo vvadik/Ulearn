@@ -9,9 +9,9 @@ namespace Ulearn.Core.RunCheckerJobApi
 		public string Id { get; set; }
 		public readonly Verdict Verdict;
 		[NotNull] public readonly string CompilationOutput;
-		// TODO что куда пишется в каком случае?
-		[NotNull] public readonly string Output;
-		[NotNull] public readonly string Error;
+		// Для вывода пользователю используется GetOutput()
+		[NotNull] public readonly string Output; // Для C# это stdout
+		[NotNull] public readonly string Error; // Для C# это stderr
 
 		[JsonConstructor]
 		public RunningResults(string id, Verdict verdict, string compilationOutput = "", string output = "", string error = "")

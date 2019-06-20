@@ -39,7 +39,9 @@ const report = async () => {
     : null
 
   const unitCommand = hasUnitTests
-    ? read(path.join(__dirname, 'dist', 'tests', 'unit', 'unit-tests-result.json'))
+    ? read(
+        path.join(__dirname, 'dist', 'tests', 'unit', 'unit-tests-result.json')
+      )
     : null
 
   const result = {
@@ -49,13 +51,10 @@ const report = async () => {
 
   const output = path.join(__dirname, 'output', 'result.json')
   await writeFileAsync(output, JSON.stringify(result))
-
-  console.log('test runner finished')
 }
 
 const fail = err => {
-  console.error('test runner failed')
-  console.error(err)
+  console.error(err.stdout)
   process.exit(1)
 }
 

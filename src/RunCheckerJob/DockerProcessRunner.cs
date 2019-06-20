@@ -15,7 +15,6 @@ namespace RunCheckerJob
 	internal class DockerProcessRunner
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(DockerProcessRunner));
-		private const string defaultSeccompFilename = "chrome-seccomp.json";
 
 		static DockerProcessRunner()
 		{
@@ -145,14 +144,14 @@ namespace RunCheckerJob
 
 		private static string BuildDockerCommand(DockerSandboxRunnerSettings settings, DirectoryInfo dir, Guid name)
 		{
-			var seccompPath = ConvertToUnixPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DockerConfig", settings.SeccompFileName ?? defaultSeccompFilename));
+			var seccompPath = settings.SeccompFileName == null ? null : ConvertToUnixPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DockerConfig", settings.SeccompFileName));
 			var parts = new List<string>
 			{
 				"docker run",
 				LinkDirectory(dir, "src"),
 				LinkDirectory(dir, "tests"),
 				LinkDirectory(dir, "output"),
-				$"--security-opt seccomp={seccompPath}", //"--privileged",
+				seccompPath == null ? "" : $"--security-opt seccomp={seccompPath}", //"--privileged",
 				"--network none",
 				"--restart no",
 				"--rm",
