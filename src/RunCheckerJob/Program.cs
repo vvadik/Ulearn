@@ -1,3 +1,5 @@
+using System;
+using System.Configuration;
 using System.IO;
 using System.Threading;
 using log4net;
@@ -28,7 +30,8 @@ namespace RunCheckerJob
 		private static void ConfigureLog4Net()
 		{
 			var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
-			XmlConfigurator.Configure(logRepository, new FileInfo("App.config"));
+			var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+			XmlConfigurator.Configure(logRepository, new FileInfo(config.FilePath));
 		}
 		
 		private Program(ManualResetEvent externalShutdownEvent = null)

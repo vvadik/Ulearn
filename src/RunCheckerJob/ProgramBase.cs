@@ -49,9 +49,8 @@ namespace RunCheckerJob
 			}
 		}
 
-		public void Run(bool joinAllThreads=true)
+		protected void Run(bool joinAllThreads=true)
 		{
-			AppDomain.MonitoringIsEnabled = true;
 			log.Info($"Отправляю запросы на {address} для получения новых решений");
 			
 			var threadsCount = int.Parse(ConfigurationManager.AppSettings[$"ulearn.{serviceName}.threadsCount"] ?? "1");
