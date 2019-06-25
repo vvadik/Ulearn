@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Configuration;
 using System.Web.Http;
@@ -296,12 +297,9 @@ namespace uLearn.Web.Controllers
 				AuthorId = Guid.Parse(submission.UserId),
 				AdditionalInfo = new AntiPlagiarismAdditionalInfo { SubmissionId = submission.Id }.ToJsonString(),
 			};
-			var antiPlagiarismResult = await antiPlagiarismClient.AddSubmissionAsync(parameters).ConfigureAwait(false);
-			
-			log.Info($"Получил ответ от сервиса антиплагиата: {antiPlagiarismResult}");
-			
-			var userSolutionsRepo = new UserSolutionsRepo(db, WebCourseManager.Instance);
-			await userSolutionsRepo.SetAntiPlagiarismSubmissionId(submission, antiPlagiarismResult.SubmissionId).ConfigureAwait(false);
+			antiPlagiarismClient.AddSubmissionAsync(parameters).ConfigureAwait(false).GetAwaiter().OnCompleted(() =>
+			{
+			});
 		}
 	}
 }
