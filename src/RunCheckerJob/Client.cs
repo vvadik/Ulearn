@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -41,9 +42,9 @@ namespace RunCheckerJob
 			this.agentName = agentName;
 		}
 
-		public async Task<List<RunnerSubmission>> TryGetSubmission()
+		public async Task<List<RunnerSubmission>> TryGetSubmission(IEnumerable<Language> languages)
 		{
-			var uri = GetUri("GetSubmissions", new [] {"language", Language.CSharp.GetName()});
+			var uri = GetUri("GetSubmissions", new [] {"language", string.Join(",", languages.Select(l => l.GetName()))});
 			try
 			{
 				log.Info($"Отправляю запрос на {uri}");

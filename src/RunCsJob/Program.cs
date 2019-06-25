@@ -16,7 +16,7 @@ namespace RunCsJob
 		private static readonly ILog log = LogManager.GetLogger(typeof(Program));
 		private const string serviceName = "runscjob";
 		private readonly CsSandboxRunnerClient csSandboxRunnerClient;
-		
+
 		public static void Main(string[] args)
 		{
 			XmlConfigurator.Configure();
@@ -52,6 +52,7 @@ namespace RunCsJob
 		}
 
 		protected override ISandboxRunnerClient SandboxRunnerClient => csSandboxRunnerClient;
+		protected override Language[] SupportedLanguages { get; } = {Language.CSharp};
 
 		private void SelfCheck()
 		{

@@ -1,4 +1,3 @@
-using System;
 using System.Configuration;
 using System.IO;
 using System.Threading;
@@ -6,6 +5,7 @@ using log4net;
 using System.Linq;
 using System.Reflection;
 using log4net.Config;
+using Ulearn.Core;
 using Ulearn.Core.RunCheckerJobApi;
 
 namespace RunCheckerJob
@@ -14,7 +14,8 @@ namespace RunCheckerJob
 	{
 		private const string serviceName = "runcheckerjob";
 		private readonly DockerSandboxRunner sandboxRunner;
-		
+		protected override Language[] SupportedLanguages { get; } = {Language.JavaScript};
+
 		public static void Main(string[] args)
 		{
 			ConfigureLog4Net();
@@ -41,7 +42,7 @@ namespace RunCheckerJob
 		}
 		
 		protected override ISandboxRunnerClient SandboxRunnerClient => sandboxRunner;
-		
+
 		private void SelfCheck()
 		{
 			new SelfChecker(sandboxRunner).JsSelfCheck();

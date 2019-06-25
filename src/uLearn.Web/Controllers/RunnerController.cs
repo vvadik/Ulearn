@@ -72,16 +72,21 @@ namespace uLearn.Web.Controllers
 		[System.Web.Http.Route("GetSubmissions")]
 		public async Task<List<RunnerSubmission>> GetSubmissions([FromUri] string token, [FromUri] string language, [FromUri] string agent = "")
 		{
-			CheckRunner(token);			
-			
-			if (!LanguageHelpers.TryParseByName(language, out var submissionLanguage))
-				throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
+			CheckRunner(token);
+
+			var languageNames = language.Split(',');
+			var languages = new List<Language>();
+			foreach (var languageName in languageNames)
+			{
+				if (LanguageHelpers.TryParseByName(languageName, out var submissionLanguage))
+					languages.Add(submissionLanguage);
+			}
 			
 			var sw = Stopwatch.StartNew();
 			while (true)
 			{
 				var repo = new UserSolutionsRepo(new ULearnDb(), courseManager);
-				var submission = await repo.GetUnhandledSubmission(agent, submissionLanguage).ConfigureAwait(false);
+				var submission = await repo.GetUnhandledSubmission(agent, languages).ConfigureAwait(false);
 				if (submission != null || sw.Elapsed > TimeSpan.FromSeconds(15))
 				{
 					if (submission != null)

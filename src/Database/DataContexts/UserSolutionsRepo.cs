@@ -307,7 +307,7 @@ namespace Database.DataContexts
 
 		private static volatile SemaphoreSlim getSubmissionSemaphore = new SemaphoreSlim(1);
 
-		public async Task<UserExerciseSubmission> GetUnhandledSubmission(string agentName, Language language)
+		public async Task<UserExerciseSubmission> GetUnhandledSubmission(string agentName, IEnumerable<Language> languages)
 		{
 			log.Info("GetUnhandledSubmission(): trying to acquire semaphore");
 			var semaphoreLocked = await getSubmissionSemaphore.WaitAsync(TimeSpan.FromSeconds(2));
@@ -320,7 +320,7 @@ namespace Database.DataContexts
 
 			try
 			{
-				return await TryGetExerciseSubmission(agentName, language);
+				return await TryGetExerciseSubmission(agentName, languages);
 			}
 			catch (Exception e)
 			{
@@ -335,7 +335,7 @@ namespace Database.DataContexts
 			}
 		}
 
-		private async Task<UserExerciseSubmission> TryGetExerciseSubmission(string agentName, Language language)
+		private async Task<UserExerciseSubmission> TryGetExerciseSubmission(string agentName, IEnumerable<Language> language)
 		{
 			var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
 			UserExerciseSubmission submission;
@@ -346,7 +346,7 @@ namespace Database.DataContexts
 					.Where(s =>
 						s.Timestamp > notSoLongAgo
 						&& s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting
-						&& s.Language == language);
+						&& language.Contains(s.Language));
 				
 				if (!submissionsQueryable.Any())
 					return null;

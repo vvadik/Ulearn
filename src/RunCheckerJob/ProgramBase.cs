@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using log4net;
 using Metrics;
+using Ulearn.Core;
 using Ulearn.Core.RunCheckerJobApi;
 
 namespace RunCheckerJob
@@ -22,6 +23,7 @@ namespace RunCheckerJob
 		
 		private static readonly ILog log = LogManager.GetLogger(typeof(ProgramBase));
 		protected abstract ISandboxRunnerClient SandboxRunnerClient { get; }
+		protected abstract Language[] SupportedLanguages { get; }
 		private readonly string serviceName;
 
 		protected ProgramBase(string serviceName, ManualResetEvent externalShutdownEvent = null)
@@ -121,10 +123,10 @@ namespace RunCheckerJob
 			var keepAliveInterval = TimeSpan.FromSeconds(keepAliveIntervalSeconds);
 			while (!shutdownEvent.WaitOne(0))
 			{
-				List<RunnerSubmission> newUnhandled;
+				var newUnhandled = new List<RunnerSubmission>();
 				try
 				{
-					newUnhandled = client.TryGetSubmission().Result;
+					newUnhandled.AddRange(client.TryGetSubmission(SupportedLanguages).Result);
 				}
 				catch (Exception e)
 				{
@@ -148,6 +150,7 @@ namespace RunCheckerJob
 						log.Error("Не могу отправить результаты проверки на ulearn", e);
 					}
 				}
+
 				serviceKeepAliver.Ping(keepAliveInterval);
 				Thread.Sleep(sleep);
 			}
