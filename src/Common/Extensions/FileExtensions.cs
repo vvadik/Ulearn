@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Serialization;
 using Ionic.Zip;
 using Newtonsoft.Json;
 
@@ -65,16 +64,20 @@ namespace Ulearn.Common.Extensions
 		}
 
 		/// <param name="excludeCriterias"><see cref="M:Ionic.Zip.ZipFile.AddSelectedFiles(System.String)" /></param>
-		public static byte[] ToZip(this DirectoryInfo dirInfo, IEnumerable<string> excludeCriterias, IEnumerable<FileContent> toUpdate = null)
+		public static byte[] ToZip(this DirectoryInfo dirInfo, IEnumerable<string> excludeCriterias, IEnumerable<FileContent> toUpdate = null,
+			IEnumerable<DirectoryInfo> toUpdateDirectories = null, string directoryPathInArchive = null)
 		{
 			using (var zip = new ZipFile())
 			{
-				zip.AddDirectory(dirInfo.FullName);
+				zip.AddDirectory(dirInfo.FullName, directoryPathInArchive);
 				var entriesToRemove = excludeCriterias
 					.Select(zip.SelectEntries)
 					.SelectMany(x => x)
 					.ToList();
 				zip.RemoveEntries(entriesToRemove);
+				if(toUpdateDirectories != null)
+					foreach (var dir in toUpdateDirectories)
+						zip.AddDirectory(dir.FullName);
 				foreach (var zipUpdateData in toUpdate ?? new List<FileContent>())
 					zip.UpdateEntry(zipUpdateData.Path, zipUpdateData.Data);
 				using (var ms = new MemoryStream())
@@ -85,6 +88,7 @@ namespace Ulearn.Common.Extensions
 			}
 		}
 
+		
 		public static bool IsInDirectory(this FileSystemInfo fileOrDirectory, DirectoryInfo directory)
 		{
 			return fileOrDirectory.FullName.ToLower().StartsWith(directory.FullName.ToLower());

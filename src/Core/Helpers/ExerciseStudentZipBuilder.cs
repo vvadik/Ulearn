@@ -16,25 +16,32 @@ namespace Ulearn.Core.Helpers
 	public class ExerciseStudentZipBuilder
 	{
 		private static readonly Regex anySolutionNameRegex = new Regex("(.+)\\.Solution\\.cs", RegexOptions.IgnoreCase);
-		private static readonly Regex anyWrongAnswerNameRegex = new Regex("(.+)\\.WrongAnswer\\.(.+)\\.cs", RegexOptions.IgnoreCase);
+		private static readonly Regex anyWrongAnswerNameRegex = new Regex("(.+)\\.(WrongAnswer|WA)\\.(.+)\\.cs", RegexOptions.IgnoreCase);
 
 		public static bool IsAnyWrongAnswerOrAnySolution(string name) => anyWrongAnswerNameRegex.IsMatch(name) || anySolutionNameRegex.IsMatch(name);
 		public static bool IsAnySolution(string name) => anySolutionNameRegex.IsMatch(name);		
 		
 		public void BuildStudentZip(Slide slide, FileInfo zipFile)
 		{
-			var block = (slide as ExerciseSlide)?.Exercise as CsProjectExerciseBlock;
-			if (block == null)
-				throw new InvalidOperationException($"Can't generate student zip for non-project exercise block: slide \"{slide.Title}\" ({slide.Id})");
-			
-			var zip = new LazilyUpdatingZip(
-				block.ExerciseFolder,
-				new[] { "checking", "bin", "obj" },
-				file => NeedExcludeFromStudentZip(block, file),
-				file => GetFileContentInStudentZip(block, file),
-				ResolveCsprojLinks(block),
-				zipFile);
-			zip.UpdateZip();
+			if ((slide as ExerciseSlide)?.Exercise is CsProjectExerciseBlock csBlock)
+			{
+				var zip = new LazilyUpdatingZip(
+					csBlock.ExerciseFolder,
+					new[] { "checking", "bin", "obj" },
+					file => NeedExcludeFromStudentZip(csBlock, file),
+					file => GetFileContentInStudentZip(csBlock, file),
+					ResolveCsprojLinks(csBlock),
+					zipFile);
+				zip.UpdateZip();
+			}
+			var block = (slide as ExerciseSlide)?.Exercise as UniversalExerciseBlock;
+			if (block != null)
+			{
+				var studentZipBytes = block.GetZipBytesForStudent();
+				using (var fs = zipFile.OpenWrite())
+					fs.Write(studentZipBytes, 0, studentZipBytes.Length);
+			}
+			throw new InvalidOperationException($"Can't generate student zip for non-project exercise block: slide \"{slide.Title}\" ({slide.Id})");
 		}
 		
 		private static bool NeedExcludeFromStudentZip(CsProjectExerciseBlock block, FileInfo file)

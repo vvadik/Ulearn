@@ -7,6 +7,7 @@ namespace Ulearn.Core.RunCheckerJobApi
 	public class RunningResults
 	{
 		public string Id { get; set; }
+		[JsonProperty(Required = Required.Always)]
 		public readonly Verdict Verdict;
 		[NotNull] public readonly string CompilationOutput;
 		// Для вывода пользователю используется GetOutput()

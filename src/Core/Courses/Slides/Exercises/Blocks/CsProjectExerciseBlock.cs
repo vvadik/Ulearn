@@ -90,7 +90,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 
 		public string CorrectSolutionPath => CorrectSolutionFile.GetRelativePath(ExerciseFolder.FullName);
 
-		private Regex WrongAnswersAndSolutionNameRegex => new Regex(new Regex("^") + UserCodeFileNameWithoutExt + new Regex("\\.(.+)\\.cs"));
+		private Regex WrongAnswersAndSolutionNameRegex => new Regex(new Regex("^") + UserCodeFileNameWithoutExt + new Regex("\\.(.+)\\.cs"), RegexOptions.IgnoreCase);
 
 		[XmlIgnore]
 		public DirectoryInfo SlideFolderPath { get; set; }

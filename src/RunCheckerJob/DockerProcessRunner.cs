@@ -22,7 +22,7 @@ namespace RunCheckerJob
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 		}
 
-		public static RunningResults Run(ZipRunnerSubmission submission, DockerSandboxRunnerSettings settings, string submissionDirectory)
+		public static RunningResults Run(CommandRunnerSubmission submission, DockerSandboxRunnerSettings settings, string submissionDirectory)
 		{
 			log.Info($"Запускаю проверку решения {submission.Id}");
 			var dir = new DirectoryInfo(submissionDirectory);
@@ -60,11 +60,19 @@ namespace RunCheckerJob
 			var dockerShellProcess = BuildShellProcess(dockerCommand);
 
 			dockerShellProcess.Start();
-			var readErrTask = dockerShellProcess.StandardError.ReadToEndAsync();
-			var readOutTask = dockerShellProcess.StandardOutput.ReadToEndAsync();
-			var isFinished = Task.WaitAll(new Task[] { readErrTask, readOutTask }, (int)settings.IdleTimeLimit.TotalMilliseconds);
+			var readErrTask = new AsyncReader(dockerShellProcess.StandardError, settings.OutputLimit).GetDataAsync();
+			var readOutTask = new AsyncReader(dockerShellProcess.StandardOutput, settings.OutputLimit).GetDataAsync();
+			var isFinished = Task.WaitAll(new Task[] { readErrTask, readOutTask }, (int)(settings.MaintenanceTimeLimit + settings.TestingTimeLimit).TotalMilliseconds);
 
-			if (!isFinished)
+			if (readErrTask.Result.Length > settings.OutputLimit || readOutTask.Result.Length > settings.OutputLimit)
+			{
+				log.Warn("Программа вывела слишком много");
+				if(!dockerShellProcess.HasExited)
+					GracefullyShutdownDocker(dockerShellProcess, name, settings);
+				return new RunningResults(Verdict.OutputLimit);
+			}
+			
+			if (!isFinished || !dockerShellProcess.HasExited)
 			{
 				log.Info($"Не хватило времени на работу Docker в папке {dir.FullName}");
 				GracefullyShutdownDocker(dockerShellProcess, name, settings);
@@ -75,11 +83,12 @@ namespace RunCheckerJob
 
 			if (dockerShellProcess.ExitCode != 0)
 			{
-				log.Info($"Упал docker в папке {dir.FullName}");
+				log.Info($"Упал в папке {dir.FullName}");
+				log.Warn($"Docker написал в stderr:\n{readErrTask.Result}");
 				return new RunningResults(Verdict.SandboxError, error: readErrTask.Result);
 			}
 
-			return LoadResult(dir, settings);
+			return new RunningResults(Verdict.Ok, output: readOutTask.Result, error: readErrTask.Result);
 		}
 
 		private static void GracefullyShutdownDocker(Process dockerShellProcess, Guid name, SandboxRunnerSettings settings)
@@ -123,23 +132,6 @@ namespace RunCheckerJob
 					UseShellExecute = false
 				}
 			};
-		}
-
-		private static RunningResults LoadResult(DirectoryInfo dir, DockerSandboxRunnerSettings settings)
-		{
-			try
-			{
-				var resultPath = Path.Combine(dir.GetSubdirectory("output").FullName, "result.json");
-				if (new FileInfo(resultPath).Length > settings.OutputLimit)
-					return new RunningResults(Verdict.OutputLimit);
-				var output = File.ReadAllText(resultPath);
-				return new RunningResults(Verdict.Ok, output: output);
-			}
-			catch (Exception)
-			{
-				log.Info($"Не удалось прочитать результат тестов в папке {dir.FullName}");
-				return new RunningResults(Verdict.SandboxError);
-			}
 		}
 
 		private static string BuildDockerCommand(DockerSandboxRunnerSettings settings, DirectoryInfo dir, Guid name)

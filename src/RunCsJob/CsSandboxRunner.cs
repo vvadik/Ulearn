@@ -20,18 +20,20 @@ namespace RunCsJob
 	public class CsSandboxRunnerSettings : SandboxRunnerSettings
 	{
 		public static MsBuildSettings MsBuildSettings = new MsBuildSettings();
+		public TimeSpan CompilationTimeLimit => TimeSpan.FromSeconds(10);
+		public TimeSpan IdleTimeLimit => TimeSpan.FromSeconds(TestingTimeLimit.TotalSeconds * 2);
 	}
 
 	public class CsSandboxRunnerClient : ISandboxRunnerClient
 	{
 		public RunningResults Run(RunnerSubmission submission)
 		{
-			return SandboxRunHelper.WithSubmissionWorkingDirectory(submission, this, SandboxRunnerSettings.WorkingDirectory, SandboxRunnerSettings.DeleteSubmissionsAfterFinish);
+			return SandboxRunHelper.WithSubmissionWorkingDirectory((CsRunnerSubmission)submission, this, SandboxRunnerSettings.WorkingDirectory, SandboxRunnerSettings.DeleteSubmissionsAfterFinish);
 		}
 
 		public RunningResults RunContainerAndGetResultInternal(RunnerSubmission submission, DirectoryInfo submissionWorkingDirectory)
 		{
-			var instance = new CsSandboxRunner(submission, new CsSandboxRunnerSettings());
+			var instance = new CsSandboxRunner((CsRunnerSubmission)submission, new CsSandboxRunnerSettings());
 			var result = submission is ProjRunnerSubmission
 				? instance.RunMsBuild(submissionWorkingDirectory.FullName)
 				: instance.RunCsc(submissionWorkingDirectory.FullName);
@@ -45,14 +47,14 @@ namespace RunCsJob
 		private static readonly ILog log = LogManager.GetLogger(typeof(CsSandboxRunner));
 		private readonly MetricSender metricSender = new MetricSender("runcsjob");
 
-		private readonly RunnerSubmission submission;
+		private readonly CsRunnerSubmission submission;
 		private readonly CsSandboxRunnerSettings settings;
 
 		private bool hasTimeLimit;
 		private bool hasMemoryLimit;
 		private bool hasOutputLimit;
 
-		public CsSandboxRunner(RunnerSubmission submission, [NotNull]CsSandboxRunnerSettings settings)
+		public CsSandboxRunner(CsRunnerSubmission submission, [NotNull]CsSandboxRunnerSettings settings)
 		{
 			this.submission = submission;
 			this.settings = settings;
@@ -205,8 +207,8 @@ namespace RunCsJob
 			if (!hasTimeLimit && !hasMemoryLimit && !hasOutputLimit)
 			{
 				/* Read all data to the end of streams */
-				sandboxError = stderrReader.GetData();
-				sandboxOutput = stdoutReader.GetData();
+				sandboxError = stderrReader.GetDataAsync().Result;
+				sandboxOutput = stdoutReader.GetDataAsync().Result;
 				hasOutputLimit = CheckIsOutputLimit(stdoutReader);
 				hasOutputLimit = CheckIsOutputLimit(stderrReader);
 			}
@@ -220,17 +222,17 @@ namespace RunCsJob
 		private void WaitUntilSandboxIsReady(Process sandbox)
 		{
 			var readyLineReadTask = sandbox.StandardOutput.ReadLineAsync();
-			if (readyLineReadTask.Wait(settings.TimeLimit) && readyLineReadTask.Result == "Ready")
+			if (readyLineReadTask.Wait(settings.MaintenanceTimeLimit) && readyLineReadTask.Result == "Ready")
 				return;
 
 			if (!sandbox.HasExited)
-				throw new SandboxException($"Песочница не ответила «Ready» через {settings.TimeLimit.TotalSeconds} секунд после запуска, убиваю её");
+				throw new SandboxException($"Песочница не ответила «Ready» через {settings.MaintenanceTimeLimit.TotalSeconds} секунд после запуска, убиваю её");
 
 			if (sandbox.ExitCode != 0)
 			{
 				log.Warn($"Песочница не ответила «Ready», а вышла с кодом {sandbox.ExitCode}");
 				var stderrReader = new AsyncReader(sandbox.StandardError, settings.OutputLimit + 1);
-				var stderrData = stderrReader.GetData();
+				var stderrData = stderrReader.GetDataAsync().Result;
 				log.Warn($"Вывод песочницы в stderr:\n{stderrData}");
 				var result = GetResultForNonZeroExitCode(stderrData, sandbox.ExitCode);
 				throw new SandboxException(result.Error);
@@ -320,7 +322,7 @@ namespace RunCsJob
 		private bool CheckIsTimeLimitExceeded(Process sandbox, DateTime startTime, TimeSpan startUsedTime)
 		{
 			return hasTimeLimit = hasTimeLimit
-								|| settings.TimeLimit.Add(startUsedTime).CompareTo(sandbox.TotalProcessorTime) < 0
+								|| settings.TestingTimeLimit.Add(startUsedTime).CompareTo(sandbox.TotalProcessorTime) < 0
 								|| startTime.Add(settings.IdleTimeLimit).CompareTo(DateTime.Now) < 0;
 		}
 

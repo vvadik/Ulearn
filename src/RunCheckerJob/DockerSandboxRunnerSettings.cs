@@ -1,3 +1,4 @@
+using System;
 using JetBrains.Annotations;
 
 namespace RunCheckerJob
@@ -6,11 +7,15 @@ namespace RunCheckerJob
 	{
 		[NotNull]public string SandBoxName;
 		[CanBeNull]public string SeccompFileName;
+		[NotNull]public string RunCommand;
 		
-		protected DockerSandboxRunnerSettings(string sandBoxName)
+		public DockerSandboxRunnerSettings(string sandBoxName, string runCommand)
 		{
 			SandBoxName = sandBoxName;
+			RunCommand = runCommand;
 			MemoryLimit = 256 * 1024 * 1024;
+			TestingTimeLimit = TimeSpan.FromSeconds(10);
+			MaintenanceTimeLimit = TimeSpan.FromSeconds(10);
 		}
 	}
 }

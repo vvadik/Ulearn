@@ -24,10 +24,9 @@ namespace RunCheckerJob
 		{
 			var directory = Path.Combine(baseDirectory, "../../../../../sandbox/js/sample");
 			var bytes = ZipHelper.CreateFromDirectory(directory, CompressionLevel.Fastest, false, Encoding.UTF8, null).ToArray();
-			var res = sandboxRunner.Run(new ZipRunnerSubmission
+			var res = sandboxRunner.Run(new CommandRunnerSubmission
 			{
 				Id = Utils.NewNormalizedGuid(),
-				NeedRun = true,
 				Language = Language.JavaScript,
 				ZipFileData = bytes
 			});

@@ -11,5 +11,6 @@
 		OutputLimit = 6,
 		TimeLimit = 7,
 		MemoryLimit = 8,
+		UndefinedError
 	}
 }

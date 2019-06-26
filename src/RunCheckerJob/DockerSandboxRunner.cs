@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using RunCheckerJob.Js;
 using Ulearn.Core;
 using Ulearn.Core.RunCheckerJobApi;
 
@@ -13,23 +12,18 @@ namespace RunCheckerJob
 			return SandboxRunHelper.WithSubmissionWorkingDirectory(submission, this, SandboxRunnerSettings.WorkingDirectory, SandboxRunnerSettings.DeleteSubmissionsAfterFinish);
 		}
 
-		private (IResultParser, DockerSandboxRunnerSettings) GetLanguageSpecific(RunnerSubmission submission)
+		private DockerSandboxRunnerSettings GetSpecificSettings(CommandRunnerSubmission submission)
 		{
-			switch (submission)
-			{
-				case ZipRunnerSubmission s when s.Language == Language.JavaScript:
-					return (new JsResultParser(), new JsSandboxRunnerSettings());
-				default:
-					throw new NotSupportedException($"Submission {submission} is not supported");
-			}
+			return new DockerSandboxRunnerSettings(submission.DockerImageName, submission.RunCommand);
 		} 
 
 		public RunningResults RunContainerAndGetResultInternal(RunnerSubmission submission, DirectoryInfo submissionWorkingDirectory)
 		{
-			var (resultParser, settings) = GetLanguageSpecific(submission);
-			var result = DockerProcessRunner.Run((ZipRunnerSubmission)submission, settings, submissionWorkingDirectory.FullName);
+			var commandRunnerSubmission = (CommandRunnerSubmission)submission;
+			var settings = GetSpecificSettings(commandRunnerSubmission);
+			var result = DockerProcessRunner.Run((CommandRunnerSubmission)submission, settings, submissionWorkingDirectory.FullName);
 			if (result.Verdict == Verdict.Ok)
-				result = resultParser.Parse(result.Output);
+				result = ResultParser.Parse(result.Output, result.Error);
 			result.Id = submission.Id;
 			return result;
 		}

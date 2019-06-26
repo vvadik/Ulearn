@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 
-namespace RunCsJob
+namespace RunCheckerJob
 {
 	public class AsyncReader
 	{
@@ -14,10 +14,10 @@ namespace RunCsJob
 			readerTask = reader.ReadBlockAsync(buffer, 0, length);
 		}
 
-		public string GetData()
+		public async Task<string> GetDataAsync()
 		{
-			readerTask.Wait();
-			return new string(buffer, 0, readerTask.Result);
+			var length = await readerTask;
+			return new string(buffer, 0, length);
 		}
 
 		private bool IsCompleted => readerTask.IsCompleted;
