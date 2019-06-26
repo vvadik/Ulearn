@@ -3,9 +3,9 @@ const glob = require('webpack-glob-entries')
 
 module.exports = {
   mode: 'development',
-  entry: glob(path.resolve(__dirname, 'tests', 'unit', '*.test.js')),
+  entry: glob(path.resolve(__dirname, 'src', '*.test.js')),
   output: {
-    path: path.resolve(__dirname, 'dist', 'tests', 'unit'),
+    path: path.resolve(__dirname, 'dist', 'src'),
     filename: '[name].js',
   },
   node: false,

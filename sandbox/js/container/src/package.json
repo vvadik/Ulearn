@@ -6,10 +6,7 @@
     "build-unit-tests": "webpack --config webpack.unit-tests-config.js",
     "precommit": "pretty-quick --staged"
   },
-  "dependencies": {
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@babel/core": "7.4.5",
     "@babel/plugin-proposal-class-properties": "7.4.4",

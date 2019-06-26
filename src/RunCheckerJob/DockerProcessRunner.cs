@@ -148,9 +148,7 @@ namespace RunCheckerJob
 			var parts = new List<string>
 			{
 				"docker run",
-				LinkDirectory(dir, "src"),
-				LinkDirectory(dir, "tests"),
-				LinkDirectory(dir, "output"),
+				$"-v {ConvertToUnixPath(dir.FullName)}:/app/src",
 				seccompPath == null ? "" : $"--security-opt seccomp={seccompPath}", //"--privileged",
 				"--network none",
 				"--restart no",
@@ -162,9 +160,6 @@ namespace RunCheckerJob
 			};
 			return string.Join(" ", parts);
 		}
-
-		private static string LinkDirectory(DirectoryInfo rootDirectory, string subdirectory) =>
-			$"-v {ConvertToUnixPath(rootDirectory.GetSubdirectory(subdirectory).FullName)}:/app/{subdirectory}";
 
 		private static string ConvertToUnixPath(string path) => path.Replace(@"\", "/");
 	}
