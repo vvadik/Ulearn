@@ -82,7 +82,7 @@ const GroupsMenu = ({url, groups}) => (
 			<div className={styles.groupMarkOnPhone}>
 				<Icon name="People" color="#fff" size={15} />
 				<span className={`${styles.text} ${styles.visibleOnDesktopAndTablet}`}>
-					Все группы
+					Группы
 				</span>
 			</div>}>
 		{groups.map(group => !group.isArchived &&
