@@ -20,9 +20,14 @@
 }
 
 .timeSinceAdded {
+  margin-top: -5px;
   color: @disabledColor;
   font-size: 14px;
   cursor: default;
+
+  @media(max-width: @maxPhoneWidth) {
+    margin-top: 0;
+  }
 }
 
 .text {
