@@ -279,7 +279,7 @@ namespace uLearn.Web.Controllers
 		
 		public async Task UploadCoursesWithGit(string repoUrl, string branch)
 		{
-			var courses = coursesRepo.FindCoursesByRepoUrl(repoUrl).Where(r => r.IsWebhookEnabled && r.Branch == branch || branch == "master" && r.Branch == null).ToList();
+			var courses = coursesRepo.FindCoursesByRepoUrl(repoUrl).Where(r => r.IsWebhookEnabled && (r.Branch == branch || branch == "master" && r.Branch == null)).ToList();
 			if (courses.Count == 0)
 			{
 				log.Warn($"Repo '{repoUrl}' is not expected");
@@ -293,6 +293,7 @@ namespace uLearn.Web.Controllers
 			var infoForUpload = new List<(string, byte[], CommitInfo, string)>();
 			using (IGitRepo git = new GitRepo(repoUrl, reposDirectory, publicKey, privateKey, new DirectoryInfo(Path.GetTempPath()), serilogLogger))
 			{
+				git.Checkout(branch);
 				var commitInfo = git.GetCurrentCommitInfo();
 				foreach (var courseRepo in courses)
 				{

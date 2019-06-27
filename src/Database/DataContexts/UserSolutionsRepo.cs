@@ -309,14 +309,14 @@ namespace Database.DataContexts
 
 		public async Task<UserExerciseSubmission> GetUnhandledSubmission(string agentName, Language language)
 		{
-			log.Info("GetUnhandledSubmission(): trying to acquire semaphore");
+			//log.Info("GetUnhandledSubmission(): trying to acquire semaphore");
 			var semaphoreLocked = await getSubmissionSemaphore.WaitAsync(TimeSpan.FromSeconds(2));
 			if (!semaphoreLocked)
 			{
 				log.Error("GetUnhandledSubmission(): Can't lock semaphore for 2 seconds");
 				return null;
 			}
-			log.Info("GetUnhandledSubmission(): semaphore acquired!");
+			//log.Info("GetUnhandledSubmission(): semaphore acquired!");
 
 			try
 			{
@@ -329,9 +329,9 @@ namespace Database.DataContexts
 			}
 			finally
 			{
-				log.Info("GetUnhandledSubmission(): trying to release semaphore");
+				//log.Info("GetUnhandledSubmission(): trying to release semaphore");
 				getSubmissionSemaphore.Release();
-				log.Info("GetUnhandledSubmission(): semaphore released");
+				//log.Info("GetUnhandledSubmission(): semaphore released");
 			}
 		}
 

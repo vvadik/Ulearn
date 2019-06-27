@@ -51,7 +51,7 @@ namespace RunCsJob
 				var response = await httpClient.GetAsync(uri).ConfigureAwait(false);
 				log.Info($"Получил ответ, код {(int) response.StatusCode} {response.StatusCode}, читаю содержимое");
 				if (response.IsSuccessStatusCode)
-					return await response.Content.ReadAsJsonAsync<List<RunnerSubmission>>(JsonConfig.GetSettings()).ConfigureAwait(false);
+					return (await response.Content.ReadAsJsonAsync<List<RunnerSubmission>>(JsonConfig.GetSettings()).ConfigureAwait(false)).Item1;
 				else
 				{
 					var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
