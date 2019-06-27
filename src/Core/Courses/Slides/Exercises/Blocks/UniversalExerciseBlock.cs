@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -39,11 +40,15 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		[XmlElement("correctSolutionFileName")]
 		public string CorrectSolutionFileName { get; set; }
 		
-		[XmlElement("dockerImageName")]
+		[XmlElement("dockerImageName")] // см. DockerImageNameRegex
 		public string DockerImageName { get; set; }
+
+		public Regex DockerImageNameRegex = new Regex("^[-_a-z.]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 		
 		[XmlElement("run")]
-		public string RunCommand { get; set; }
+		public string RunCommand { get; set; } // см. RunCommandRegex
+		
+		public Regex RunCommandRegex = new Regex("^[-_a-z. ;|>]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 		
 		[XmlIgnore]
 		public DirectoryInfo SlideDirectoryPath { get; set; }
@@ -72,6 +77,10 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			if (!Language.HasValue)
 				Language = LanguageHelpers.GuessByExtension(new FileInfo(UserCodeFilePath));
 			SlideDirectoryPath = context.UnitDirectory;
+			if(!DockerImageNameRegex.Match(DockerImageName).Success)
+				throw new ArgumentException($"{nameof(DockerImageName)} {DockerImageName}");
+			if(!RunCommandRegex.Match(RunCommand).Success)
+				throw new ArgumentException($"{nameof(RunCommand)} {RunCommand}");
 			ExerciseInitialCode = ExerciseInitialCode ?? "// Вставьте сюда финальное содержимое файла " + UserCodeFilePath;
 			yield return this;
 			

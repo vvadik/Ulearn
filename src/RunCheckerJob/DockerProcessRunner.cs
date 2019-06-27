@@ -149,6 +149,7 @@ namespace RunCheckerJob
 				//"-it",
 				$"-m {settings.MemoryLimit}b",
 				settings.SandBoxName,
+				$"sh -c \"{settings.RunCommand}\""
 			};
 			return string.Join(" ", parts);
 		}
