@@ -3,7 +3,7 @@
 	public enum Verdict
 	{
 		NA = 0,
-		Ok = 1,
+		Ok = 1, // Означает, что всё штатно протестировалось. Возвращается в том числе если тесты не прошли
 		CompilationError = 2,
 		RuntimeError = 3,
 		SecurityException = 4,

@@ -62,6 +62,9 @@ namespace Ulearn.Core.Courses.Slides
 		
 		[XmlEnum("question.match")]
 		MatchQuestion,
+		
+		[XmlEnum("exercise.universal")]
+		UniversalExercise,
 	}
 
 	public static class BlockTypeHelpers
@@ -89,6 +92,7 @@ namespace Ulearn.Core.Courses.Slides
 				
 				case CsProjectExerciseBlock _: return BlockType.CsProjectExercise;
 				case SingleFileExerciseBlock _: return BlockType.SingleFileExercise;
+				case UniversalExerciseBlock _: return BlockType.UniversalExercise;
 				
 				default: throw new Exception("Unknown slide block " + block);
 			}

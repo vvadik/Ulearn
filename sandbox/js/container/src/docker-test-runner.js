@@ -41,13 +41,13 @@ const report = async () => {
   if (testsResult.failures.length > 0) {
     const failure = testsResult.failures[0]
     result = {
-      verdict: 'RuntimeError',
+      verdict: 'Ok',
       compilationOutput: '',
       output: `${failure.fullTitle}: ${failure.err.message}`,
       error: '',
     }
   }
-  console.info(JSON.stringify(result), {}, 2)
+  console.info(JSON.stringify(result))
 }
 
 const fail = err => {

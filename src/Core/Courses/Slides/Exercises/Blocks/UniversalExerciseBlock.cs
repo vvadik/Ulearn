@@ -36,19 +36,16 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		
 		[XmlElement("studentZipIsCompilable")]
 		public bool StudentZipIsCompilable { get; set; } = true;
-		
-		[XmlElement("correctSolutionFileName")]
-		public string CorrectSolutionFileName { get; set; }
-		
+
 		[XmlElement("dockerImageName")] // см. DockerImageNameRegex
 		public string DockerImageName { get; set; }
 
-		public Regex DockerImageNameRegex = new Regex("^[-_a-z.]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		public static readonly Regex DockerImageNameRegex = new Regex("^[-_a-z.]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 		
 		[XmlElement("run")]
 		public string RunCommand { get; set; } // см. RunCommandRegex
 		
-		public Regex RunCommandRegex = new Regex("^[-_a-z. ;|>]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		public static readonly Regex RunCommandRegex = new Regex("^[-_a-z. ;|>]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 		
 		[XmlIgnore]
 		public DirectoryInfo SlideDirectoryPath { get; set; }
@@ -59,7 +56,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		
 		public DirectoryInfo UserCodeFileParentDirectory => UserCodeFile.Directory;
 		
-		public FileInfo CorrectSolutionFile => UserCodeFileParentDirectory.GetFile(CorrectSolutionFileName);
+		public FileInfo CorrectSolutionFile => UserCodeFile;
 		
 		public string UserCodeFileNameWithoutExt => Path.GetFileNameWithoutExtension(UserCodeFilePath);
 		
@@ -74,13 +71,14 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 
 		public override IEnumerable<SlideBlock> BuildUp(SlideBuildingContext context, IImmutableSet<string> filesInProgress)
 		{
-			if (!Language.HasValue)
+			if(!Language.HasValue)
 				Language = LanguageHelpers.GuessByExtension(new FileInfo(UserCodeFilePath));
 			SlideDirectoryPath = context.UnitDirectory;
 			if(!DockerImageNameRegex.Match(DockerImageName).Success)
 				throw new ArgumentException($"{nameof(DockerImageName)} {DockerImageName}");
 			if(!RunCommandRegex.Match(RunCommand).Success)
 				throw new ArgumentException($"{nameof(RunCommand)} {RunCommand}");
+			ExpectedOutput = ExpectedOutput ?? "";
 			ExerciseInitialCode = ExerciseInitialCode ?? "// Вставьте сюда финальное содержимое файла " + UserCodeFilePath;
 			yield return this;
 			
@@ -140,6 +138,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			var toUpdate = ReplaceWithInitialFiles().ToList();
 			
 			var zipBytes = ExerciseDirectory.ToZip(excluded, toUpdate);
+
 			log.Info($"Собираю zip-архив для студента: zip-архив собран, {zipBytes.Length} байтов");
 			return zipBytes;
 		}

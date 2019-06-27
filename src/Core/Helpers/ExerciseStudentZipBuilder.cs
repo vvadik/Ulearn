@@ -23,25 +23,30 @@ namespace Ulearn.Core.Helpers
 		
 		public void BuildStudentZip(Slide slide, FileInfo zipFile)
 		{
-			if ((slide as ExerciseSlide)?.Exercise is CsProjectExerciseBlock csBlock)
+			switch ((slide as ExerciseSlide)?.Exercise)
 			{
-				var zip = new LazilyUpdatingZip(
-					csBlock.ExerciseFolder,
-					new[] { "checking", "bin", "obj" },
-					file => NeedExcludeFromStudentZip(csBlock, file),
-					file => GetFileContentInStudentZip(csBlock, file),
-					ResolveCsprojLinks(csBlock),
-					zipFile);
-				zip.UpdateZip();
+				case CsProjectExerciseBlock csBlock:
+				{
+					var zip = new LazilyUpdatingZip(
+						csBlock.ExerciseFolder,
+						new[] { "checking", "bin", "obj" },
+						file => NeedExcludeFromStudentZip(csBlock, file),
+						file => GetFileContentInStudentZip(csBlock, file),
+						ResolveCsprojLinks(csBlock),
+						zipFile);
+					zip.UpdateZip();
+					return;
+				}
+				case UniversalExerciseBlock block:
+				{
+					var studentZipBytes = block.GetZipBytesForStudent();
+					using (var fs = zipFile.OpenWrite())
+						fs.Write(studentZipBytes, 0, studentZipBytes.Length);
+					return;
+				}
+				default:
+					throw new InvalidOperationException($"Can't generate student zip for non-project exercise block: slide \"{slide.Title}\" ({slide.Id})");
 			}
-			var block = (slide as ExerciseSlide)?.Exercise as UniversalExerciseBlock;
-			if (block != null)
-			{
-				var studentZipBytes = block.GetZipBytesForStudent();
-				using (var fs = zipFile.OpenWrite())
-					fs.Write(studentZipBytes, 0, studentZipBytes.Length);
-			}
-			throw new InvalidOperationException($"Can't generate student zip for non-project exercise block: slide \"{slide.Title}\" ({slide.Id})");
 		}
 		
 		private static bool NeedExcludeFromStudentZip(CsProjectExerciseBlock block, FileInfo file)

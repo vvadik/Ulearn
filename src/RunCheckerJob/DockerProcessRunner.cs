@@ -59,11 +59,13 @@ namespace RunCheckerJob
 			var dockerCommand = BuildDockerCommand(settings, dir, name);
 			var dockerShellProcess = BuildShellProcess(dockerCommand);
 
+			var sw = Stopwatch.StartNew();
 			dockerShellProcess.Start();
 			var readErrTask = new AsyncReader(dockerShellProcess.StandardError, settings.OutputLimit).GetDataAsync();
 			var readOutTask = new AsyncReader(dockerShellProcess.StandardOutput, settings.OutputLimit).GetDataAsync();
 			var isFinished = Task.WaitAll(new Task[] { readErrTask, readOutTask }, (int)(settings.MaintenanceTimeLimit + settings.TestingTimeLimit).TotalMilliseconds);
-
+			var ms = sw.ElapsedMilliseconds;
+			
 			if (readErrTask.Result.Length > settings.OutputLimit || readOutTask.Result.Length > settings.OutputLimit)
 			{
 				log.Warn("Программа вывела слишком много");
@@ -79,7 +81,7 @@ namespace RunCheckerJob
 				return new RunningResults(Verdict.TimeLimit);
 			}
 
-			log.Info($"Docker закончил работу и написал: {readOutTask.Result}");
+			log.Info($"Docker закончил работу за {ms} ms и написал: {readOutTask.Result}");
 
 			if (dockerShellProcess.ExitCode != 0)
 			{
@@ -140,7 +142,7 @@ namespace RunCheckerJob
 			var parts = new List<string>
 			{
 				"docker run",
-				$"-v {ConvertToUnixPath(dir.FullName)}:/app/src",
+				$"-v {ConvertToUnixPath(dir.FullName)}:/source",
 				seccompPath == null ? "" : $"--security-opt seccomp={seccompPath}", //"--privileged",
 				"--network none",
 				"--restart no",
@@ -149,7 +151,7 @@ namespace RunCheckerJob
 				//"-it",
 				$"-m {settings.MemoryLimit}b",
 				settings.SandBoxName,
-				$"sh -c \"{settings.RunCommand}\""
+				$"sh -c \"cp -R /source/* /app/ ; {settings.RunCommand}\""
 			};
 			return string.Join(" ", parts);
 		}
