@@ -51,6 +51,9 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public DirectoryInfo SlideDirectoryPath { get; set; }
 		
 		public DirectoryInfo ExerciseDirectory => new DirectoryInfo(Path.Combine(SlideDirectoryPath.FullName, ExerciseDirName));
+
+		[XmlIgnore]
+		public DirectoryInfo CourseDirectory { get; set; }
 		
 		public FileInfo UserCodeFile => ExerciseDirectory.GetFile(UserCodeFilePath);
 		
@@ -74,10 +77,8 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			if(!Language.HasValue)
 				Language = LanguageHelpers.GuessByExtension(new FileInfo(UserCodeFilePath));
 			SlideDirectoryPath = context.UnitDirectory;
-			if(!DockerImageNameRegex.Match(DockerImageName).Success)
-				throw new ArgumentException($"{nameof(DockerImageName)} {DockerImageName}");
-			if(!RunCommandRegex.Match(RunCommand).Success)
-				throw new ArgumentException($"{nameof(RunCommand)} {RunCommand}");
+			CourseDirectory = context.CourseDirectory;
+			Validate();
 			ExpectedOutput = ExpectedOutput ?? "";
 			ExerciseInitialCode = ExerciseInitialCode ?? "// Вставьте сюда финальное содержимое файла " + UserCodeFilePath;
 			yield return this;
@@ -87,6 +88,44 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 				yield return new MarkdownBlock("### Решение") { Hide = true };
 				yield return new CodeBlock(CorrectSolutionFile.ContentAsUtf8(), Language) { Hide = true };
 			}
+		}
+
+		private void Validate()
+		{
+			if (DockerImageName == null)
+				throw new ArgumentException("dockerImageName not specified");
+			if (DockerImageName == null)
+				throw new ArgumentException("run not specified");
+			if(!DockerImageNameRegex.Match(DockerImageName).Success)
+				throw new ArgumentException($"dockerImageName {DockerImageName}");
+			if(!RunCommandRegex.Match(RunCommand).Success)
+				throw new ArgumentException($"run {RunCommand}");
+			if(!ExerciseDirectory.Exists)
+				throw new ArgumentException($"exerciseDirName '{ExerciseDirName}' not exists");
+			if(!UserCodeFile.Exists)
+				throw new ArgumentException($"userCodeFile '{UserCodeFilePath}' not exists");
+			foreach (var pathToIncludeForChecker in PathsToIncludeForChecker)
+			{
+				var di = new DirectoryInfo(Path.Combine(ExerciseDirectory.FullName, pathToIncludeForChecker));
+				if(!IsDirectoryInside(CourseDirectory, di))
+					throw new ArgumentException($"includePathForChecker '{pathToIncludeForChecker}' is not in subtree of directory with course.xml");
+				if(!di.Exists)
+					throw new ArgumentException($"includePathForChecker '{pathToIncludeForChecker}' not exists");
+			}
+		}
+
+		public static bool IsDirectoryInside(DirectoryInfo baseDir, DirectoryInfo subDir)
+		{
+			var nBaseDir = NormalizePath(baseDir.FullName);
+			var nSubDir = NormalizePath(subDir.FullName);
+			return nSubDir.StartsWith(nBaseDir);
+		}
+		
+		public static string NormalizePath(string path)
+		{
+			return Path.GetFullPath(new Uri(path).LocalPath)
+				.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+				.ToUpperInvariant();
 		}
 
 		public override SolutionBuildResult BuildSolution(string userWrittenCode)

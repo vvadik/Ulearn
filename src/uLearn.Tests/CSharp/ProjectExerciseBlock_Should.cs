@@ -66,7 +66,7 @@ namespace uLearn.CSharp
 			};
 
 			var unit = new Unit(null, ex.SlideFolderPath);
-			var ctx = new SlideBuildingContext("Test", unit, CourseSettings.DefaultSettings, null);
+			var ctx = new SlideBuildingContext("Test", unit, CourseSettings.DefaultSettings, unit.Directory, null);
 			exBlocks = ex.BuildUp(ctx, ImmutableHashSet<string>.Empty).ToList();
 			
 			var builder = new ExerciseStudentZipBuilder();
