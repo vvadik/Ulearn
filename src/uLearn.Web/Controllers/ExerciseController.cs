@@ -581,6 +581,8 @@ namespace uLearn.Web.Controllers
 			var exerciseSlide = slide as ExerciseSlide;
 			if (exerciseSlide.Exercise is SingleFileExerciseBlock)
 				return HttpNotFound();
+			if ((exerciseSlide.Exercise as UniversalExerciseBlock)?.NoStudentZip ?? false)
+				return HttpNotFound();
 
 			var zipFile = exerciseStudentZipsCache.GenerateOrFindZip(courseId, exerciseSlide);
 			

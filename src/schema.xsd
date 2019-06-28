@@ -489,12 +489,26 @@
 							</xs:documentation>
 						</xs:annotation>
 					</xs:element>
+					<xs:element name="region" type="NonEmptyString" minOccurs="1" maxOccurs="1" >
+						<xs:annotation>
+							<xs:documentation>
+								Метка региона файла, с которым работает студент. [prefix]region [label] ... [prefix]endregion [label] Разрешен при установленом noStudentZip
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
 				</xs:sequence>
 				<xs:attribute name="exerciseDirName" type="NonEmptyString" use="required">
 					<xs:annotation>
 						<xs:documentation>
 							Путь до папки с задачей относительно директории с xml-файлом описания слайда.
 							Если в этой директории нет поддиректории src и архив собирается для проверки, содержимое будет обернуто в папку src.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="noStudentZip" type="xs:boolean" use="optional">
+					<xs:annotation>
+						<xs:documentation>
+							Не отдавать zip-файл проекта студенту
 						</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
