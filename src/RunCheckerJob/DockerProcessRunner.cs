@@ -36,17 +36,6 @@ namespace RunCheckerJob
 				log.Error("Не могу распаковать решение", ex);
 				return new RunningResults(submission.Id, Verdict.SandboxError, error: ex.ToString());
 			}
-			
-			var outputDirectory = dir.GetSubdirectory("output");
-			try
-			{
-				outputDirectory.Create();
-			}
-			catch (Exception e)
-			{
-				log.Error($"Не могу создать директорию для результатов решения: {dir.FullName}", e);
-				return new RunningResults(Verdict.SandboxError, error: e.ToString());
-			}
 
 			log.Info($"Запускаю Docker для решения {submission.Id} в папке {dir.FullName}");
 

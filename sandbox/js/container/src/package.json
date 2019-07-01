@@ -1,12 +1,4 @@
 {
-  "scripts": {
-    "test": "node ulearn-test-runner.js",
-    "build-ui": "webpack --config webpack.ui-config.js",
-    "build-ui-tests": "webpack --config webpack.ui-tests-config.js",
-    "build-unit-tests": "webpack --config webpack.unit-tests-config.js",
-    "precommit": "pretty-quick --staged"
-  },
-  "dependencies": {},
   "devDependencies": {
     "@babel/core": "7.4.5",
     "@babel/plugin-proposal-class-properties": "7.4.4",

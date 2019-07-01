@@ -23,7 +23,7 @@ namespace Ulearn.Core.Model
 			return code.Substring(region.dataStart, region.dataLength).RemoveCommonNesting();
 		}
 		
-		public string ReplaceRegionContent(string code, Label label, string regionContent)
+		public string ReplaceRegionContent(Label label, string regionContent)
 		{
 			var region = regions.GetOrDefault(label.Name, null);
 			var prefix = code.Substring(0, region.dataStart);

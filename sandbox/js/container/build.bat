@@ -1,1 +1,1 @@
-docker build -t js-sandbox ./src
+docker build -t js-sandbox .

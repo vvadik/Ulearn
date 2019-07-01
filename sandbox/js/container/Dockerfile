@@ -4,7 +4,7 @@ FROM node:current-alpine
 RUN addgroup -S student && adduser -S -g student student \
     && chown -R student:student /home/student
 
-COPY . /app/
+COPY ./src/ /app/
 
 RUN mkdir -p /source \
     && chown -R student:student /app

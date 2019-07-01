@@ -21,7 +21,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		private static readonly ILog log = LogManager.GetLogger(typeof(UniversalExerciseBlock));
 		
 		[XmlAttribute("exerciseDirName")]
-		public string ExerciseDirName { get; set; } // Если нет поддиректории src, содержимое для чекера помещается в архив в папку src, в архиве дял студента такого не происходит
+		public string ExerciseDirName { get; set; }
 		
 		[XmlElement("userCodeFile")]
 		public string UserCodeFilePath { get; set; }
@@ -99,7 +99,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		{
 			if(!Language.HasValue)
 				Language = LanguageHelpers.GuessByExtension(new FileInfo(UserCodeFilePath));
-			SlideDirectoryPath = context.UnitDirectory; // TODO: портится директория после первыкладывания курса
+			SlideDirectoryPath = context.UnitDirectory;
 			CourseDirectory = context.CourseDirectory;
 			SolutionRegionContent = new Lazy<string>(() => Region == null ? null : new CommonSingleRegionExtractor(UserCodeFile.ContentAsUtf8()).GetRegion(new Label{Name = Region}));
 			InitialRegionContent = new Lazy<string>(() =>  Region == null ? null : new CommonSingleRegionExtractor(InitialUserCodeFile.ContentAsUtf8()).GetRegion(new Label{Name = Region}));
@@ -188,9 +188,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 				.Select(pathToInclude => new DirectoryInfo(Path.Combine(ExerciseDirectory.FullName, pathToInclude)));
 
 			var toUpdate = GetCodeFile(code).ToList();
-			var hasSrcDir = ExerciseDirectory.EnumerateDirectories("src").Any();
-			var zipBytes = ExerciseDirectory.ToZip(excluded, toUpdate, toUpdateDirectories, hasSrcDir ? null : "src");
-
+			var zipBytes = ExerciseDirectory.ToZip(excluded, toUpdate, toUpdateDirectories);
 			log.Info($"Собираю zip-архив для проверки: zip-архив собран, {zipBytes.Length} байтов");
 			return zipBytes;
 		}
@@ -201,8 +199,8 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 				yield return new FileContent { Path = UserCodeFilePath, Data = Encoding.UTF8.GetBytes(code) };
 			else
 			{
-				var fullCode = new CommonSingleRegionExtractor(UserCodeFile.ContentAsUtf8())
-					.ReplaceRegionContent(UserCodeFile.ContentAsUtf8(), new Label{Name = Region}, code);
+				var fullCode = new CommonSingleRegionExtractor((InitialUserCodeFile.Exists ? InitialUserCodeFile : UserCodeFile).ContentAsUtf8())
+					.ReplaceRegionContent(new Label{Name = Region}, code);
 				yield return new FileContent { Path = UserCodeFilePath, Data = Encoding.UTF8.GetBytes(fullCode) };
 			}
 		}

@@ -28,8 +28,8 @@ namespace RunCheckerJob
 			var exerciseDirectory = new DirectoryInfo(Path.Combine(baseDirectory, "../../../../../sandbox/js/sample/src"));
 			var toUpdateDirectories = new []{"../../container/src"}
 				.Select(pathToInclude => new DirectoryInfo(Path.Combine(exerciseDirectory.FullName, pathToInclude)));
-			var hasSrcDir = exerciseDirectory.EnumerateDirectories("src").Any();
-			var zipBytes = exerciseDirectory.ToZip(new []{"node_modules", ".idea"}, null, toUpdateDirectories, hasSrcDir ? null : "src");
+			var zipBytes = exerciseDirectory.ToZip(new []{"node_modules", ".idea"}, null, toUpdateDirectories);
+			File.WriteAllBytes("D://temp.zip", zipBytes);
 			var res = sandboxRunner.Run(new CommandRunnerSubmission
 			{
 				Id = Utils.NewNormalizedGuid(),
@@ -51,8 +51,8 @@ namespace RunCheckerJob
 		{
 			var res = new SelfChecker(new DockerSandboxRunner())
 				.JsSelfCheck();
-			Assert.AreEqual(Verdict.RuntimeError, res.Verdict);
-			Assert.AreEqual("sum might fail: expected true to equal false", res.Output);
+			Assert.AreEqual(Verdict.Ok, res.Verdict);
+			Assert.AreEqual("sum: should sum \"2\" and \"2\": expected 4 to equal '22'", res.Output);
 		}
 	}
 }

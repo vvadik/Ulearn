@@ -65,11 +65,11 @@ namespace Ulearn.Common.Extensions
 
 		/// <param name="excludeCriterias"><see cref="M:Ionic.Zip.ZipFile.AddSelectedFiles(System.String)" /></param>
 		public static byte[] ToZip(this DirectoryInfo dirInfo, IEnumerable<string> excludeCriterias, IEnumerable<FileContent> toUpdate = null,
-			IEnumerable<DirectoryInfo> toUpdateDirectories = null, string directoryPathInArchive = null)
+			IEnumerable<DirectoryInfo> toUpdateDirectories = null)
 		{
 			using (var zip = new ZipFile())
 			{
-				zip.AddDirectory(dirInfo.FullName, directoryPathInArchive);
+				zip.AddDirectory(dirInfo.FullName);
 				var entriesToRemove = excludeCriterias
 					.Select(zip.SelectEntries)
 					.SelectMany(x => x)
