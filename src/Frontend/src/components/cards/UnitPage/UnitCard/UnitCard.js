@@ -14,22 +14,30 @@ class UnitCard extends Component {
 	}
 
 	render() {
-		let unitStyle = classNames(styles.unitCard, {
-			[styles.successColor]: this.props.isCompleted
+		const {cards, title, isCompleted} = this.props;
+		const unitStyle = classNames(styles.unitCard, {
+			[styles.successColor]: isCompleted
 		});
+		const cardsCount = cards.length;
 		return (
-			<div className={unitStyle}>
-				<div className={styles.unitCardTextContent}>
-					<h3 className={styles.unitCardTitle}>
-						{this.props.title}
-					</h3>
-					<span className={styles.unitCardBody}>
-						{UnitCard.countCards(this.props.cards.length)}
-					</span>
+			<div className={styles.unitCardContainer}>
+				<div className={unitStyle}>
+					<div className={styles.unitCardTextContent}>
+						<h3 className={styles.unitCardTitle}>
+							{title}
+						</h3>
+						<span className={styles.unitCardBody}>
+							{UnitCard.countCards(cardsCount)}
+						</span>
+					</div>
+					<Button align={'center'} size={'large'}>
+						Начать проверку
+					</Button>
 				</div>
-				<Button align={'center'} size={'large'}>
-					Начать проверку
-				</Button>
+				{cardsCount > 1 &&
+				<div className={classNames(unitStyle, styles.unitCardNext, {[styles.successNextColor]: isCompleted})}/>}
+				{cardsCount > 2 &&
+				<div className={classNames(unitStyle, styles.unitCardLast, {[styles.successLastColor]: isCompleted})}/>}
 			</div>
 		);
 	}

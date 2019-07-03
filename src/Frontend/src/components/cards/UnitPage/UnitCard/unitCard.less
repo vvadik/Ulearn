@@ -1,23 +1,66 @@
 @import "../../../../variables.less";
 
+.unitCardContainer {
+  width: 700px;
+  height: 349px;
+
+  position: relative;
+}
+
 .unitCard {
+  width: 700px;
+  height: 340px;
+
+  position: absolute;
+  top: 20px;
+
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  width: 700px;
-  height: 340px;
+  align-items: baseline;
   border-radius: 10px;
   padding: 4%;
   background: @blue;
 }
 
-.successColor{
+.unitCardNext {
+  width: 656px;
+  height: 301px;
+
+  z-index: -2;
+  top: 11px;
+  left: 22px;
+
+  background: darken(@blue, 10%);
+}
+
+.unitCardLast {
+  width: 608px;
+  height: 279px;
+
+  z-index: -3;
+  top: 4px;
+  left: 46px;
+
+  background: darken(@blue, 15%);
+}
+
+.successColor {
   background: @successColor;
+}
+
+.successNextColor {
+  background: darken(@successColor, 10%);
+}
+
+.successLastColor {
+  background: darken(@successColor, 15%);
 }
 
 .unitCardTextContent {
   font-family: Segoe UI, serif;
   color: @whiteSmoke;
+  align-self: normal;
 }
 
 .unitCardTitle {
