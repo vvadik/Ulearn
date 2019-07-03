@@ -1,6 +1,5 @@
 ﻿@using Database.Extensions
 @using Database.Models
-@using uLearn.Web.Controllers
 @using uLearn.Web.Extensions
 @using uLearn.Web.Views.Shared
 @using Ulearn.Common.Extensions
@@ -12,9 +11,7 @@
 	ViewBag.Title = "Проверка на списывание";
 
 	var submission = Model.Submissions[Model.SubmissionId];
-	var submissionsByAntiPlagiarismIds = Model.Submissions.Values
-		.Where(s => s.AntiPlagiarismSubmissionId != null)
-		.ToDictionary(s => s.AntiPlagiarismSubmissionId);
+	var submissionsByIds = Model.Submissions.Values.ToDictionary(s => s.Id);
 }
 
 @helper PrintUserGroups(string userId)
@@ -42,9 +39,9 @@
 
                 @{
 	                var submissionWeights = Model.AntiPlagiarismResponse.ResearchedSubmissions
-		                .Where(s => submissionsByAntiPlagiarismIds.ContainsKey(s.SubmissionInfo.Id))
+		                .Where(s => submissionsByIds.ContainsKey(s.SubmissionInfo.SubmissionId))
 		                .ToDictionary(
-                            s => submissionsByAntiPlagiarismIds[s.SubmissionInfo.Id].Id,
+                            s => s.SubmissionInfo.SubmissionId,
                             s => s.Plagiarisms.Select(p => p.Weight).DefaultIfEmpty(0).Max()
                         );
                 }
@@ -63,7 +60,7 @@
             </div>
         </div>
         
-	    var researchedSubmission = Model.AntiPlagiarismResponse.ResearchedSubmissions.FirstOrDefault(s => s.SubmissionInfo.Id == submission.AntiPlagiarismSubmissionId);
+	    var researchedSubmission = Model.AntiPlagiarismResponse.ResearchedSubmissions.FirstOrDefault(s => s.SubmissionInfo.SubmissionId == submission.Id);
 	    const int maxPlagiarismsShown = 10;
 	    if (researchedSubmission != null && researchedSubmission.Plagiarisms.Count > 0)
 	    {
@@ -75,7 +72,7 @@
 		    var wasStrongSuspicion = false;
 		    foreach (var plagiarism in plagiarisms.Take(maxPlagiarismsShown))
 		    {
-			    if (!submissionsByAntiPlagiarismIds.ContainsKey(plagiarism.SubmissionInfo.Id))
+			    if (!submissionsByIds.ContainsKey(plagiarism.SubmissionInfo.SubmissionId))
 			    {
 				    continue;
 			    }
@@ -108,7 +105,7 @@
                     </div>
 			    }
 			    
-			    var plagiarismSubmission = submissionsByAntiPlagiarismIds[plagiarism.SubmissionInfo.Id];
+			    var plagiarismSubmission = submissionsByIds[plagiarism.SubmissionInfo.SubmissionId];
 			    <div class="antiplagiarism row">
                     <div class="original-submission col-xs-6">
                         <div class="antiplagiarism__author">

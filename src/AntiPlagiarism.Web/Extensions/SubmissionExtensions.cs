@@ -11,7 +11,7 @@ namespace AntiPlagiarism.Web.Extensions
 			   We can remove it after migrating to new, React-based frontend. */
 			return new SubmissionInfo
 			{
-				Id = submission.Id,
+				AntiplagiarismId = submission.Id,
 				TaskId = submission.TaskId,
 				AuthorId = submission.AuthorId,
 				Code = submission.ProgramText.TrimStart(),

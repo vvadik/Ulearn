@@ -51,6 +51,7 @@ namespace Database.Models
 
 		public virtual IList<ManualExerciseChecking> ManualCheckings { get; set; }
 		
+		[Obsolete] // YT: ULEARN-217
 		public int? AntiPlagiarismSubmissionId { get; set; }
 		
 		public virtual IList<ExerciseCodeReview> Reviews { get; set; }
