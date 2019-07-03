@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 import styles from "./CourseNavigationItem.less";
 import classnames from "classnames";
 import ProgressBar from "../../ProgressBar";
@@ -7,7 +8,7 @@ import { courseMenuItemType } from "../../types"
 
 class CourseNavigationItem extends Component {
 	render () {
-		const { text, url, isActive } = this.props;
+		const { title, isActive } = this.props;
 
 		const classes = {
 			[styles.itemLink]: true,
@@ -15,13 +16,11 @@ class CourseNavigationItem extends Component {
 		};
 
 		return (
-			<li className={ styles.root }>
-				<a href={ url } className={ classnames(classes) }>
-					<div className={ styles.firstLine }>
-						<span className={ styles.text }>{ text }</span>
-						{ this.renderProgress() }
-					</div>
-				</a>
+			<li className={ styles.root } onClick={ this.clickHandle }>
+				<div className={ classnames(classes) }>
+					<span className={ styles.text }>{ title }</span>
+					{ this.renderProgress() }
+				</div>
 			</li>
 		);
 	}
@@ -37,6 +36,10 @@ class CourseNavigationItem extends Component {
 			);
 		}
 	}
+
+	clickHandle = () => {
+		this.props.onClick(this.props.id);
+	};
 }
 
 CourseNavigationItem.propTypes = courseMenuItemType;

@@ -1,27 +1,27 @@
 import PropTypes from 'prop-types';
 import { itemTypes } from './constants';
 
-export const menuItemType = PropTypes.shape({
-	text: PropTypes.string.isRequired,
+export const menuItemType = {
+	title: PropTypes.string,
 	url: PropTypes.string,
-	score: PropTypes.number,
 	type: PropTypes.oneOf(Object.values(itemTypes)),
+	score: PropTypes.number,
+	maxScore: PropTypes.number,
 	description: PropTypes.string,
 	isActive: PropTypes.bool,
 	metro: PropTypes.shape({
 		complete: PropTypes.bool,
-		type: PropTypes.oneOf(Object.values(itemTypes)),
 		isFirstItem: PropTypes.bool,
 		isLastItem: PropTypes.bool,
 		connectToPrev: PropTypes.bool,
 		connectToNext: PropTypes.bool,
 	})
-});
+};
 
 
-export const courseMenuItemType = PropTypes.shape({
-	text: PropTypes.string.isRequired,
-	url: PropTypes.string,
+export const courseMenuItemType = {
+	id: PropTypes.string,
+	title: PropTypes.string,
 	progress: PropTypes.number,
 	isActive: PropTypes.bool,
-});
+};

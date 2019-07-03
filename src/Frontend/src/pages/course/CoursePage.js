@@ -6,11 +6,14 @@ import Course from '../../components/course/Course';
 
 const mapStateToProps = (state, {match}) => {
 	const courseId = match.params.courseId;
+	const slideId = match.params.slideId;
+	const courseInfo = state.courses.fullCoursesInfo[courseId];
 	return {
 		courseId,
+		slideId,
+		courseInfo,
+		units: mapCourseInfoToUnits(courseInfo),
 		isAuthenticated: state.account.isAuthenticated,
-		slideId: match.params.slideId,
-		courseInfo: state.courses.fullCoursesInfo[courseId],
 		progress: state.user.progress[courseId],
 	};
 };
@@ -22,3 +25,14 @@ const mapDispatchToProps = (dispatch) => ({
 
 const connected = connect(mapStateToProps, mapDispatchToProps)(Course);
 export default connected;
+
+
+function mapCourseInfoToUnits(courseInfo) {
+	if (!courseInfo || !courseInfo.units) {
+		return null;
+	}
+	return courseInfo.units.reduce((acc, item) => {
+		acc[item.id] = item;
+		return acc;
+	}, {});
+}

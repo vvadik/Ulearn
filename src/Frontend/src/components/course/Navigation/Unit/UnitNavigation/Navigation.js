@@ -20,10 +20,10 @@ class Navigation extends Component {
 
 Navigation.propTypes ={
 	title: PropTypes.string.isRequired,
-	items: PropTypes.arrayOf(menuItemType),
+	items: PropTypes.arrayOf(PropTypes.shape(menuItemType)),
 
 	courseName: PropTypes.string,
-	courseUrl: PropTypes.string,
+	onCourseClick: PropTypes.func,
 };
 
 export default Navigation

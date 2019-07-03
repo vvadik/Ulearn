@@ -19,16 +19,13 @@ class CourseNavigationContent extends Component {
 	renderItem(menuItem) {
 		return (
 			<CourseNavigationItem
-				key={ menuItem.url }
-				text={ menuItem.title }
-				url={ menuItem.url }
-				progress={ menuItem.progress } />
+				key={ menuItem.id } { ...menuItem } />
 		);
 	}
 }
 
 CourseNavigationContent.propTypes ={
-	items: PropTypes.arrayOf(courseMenuItemType)
+	items: PropTypes.arrayOf(PropTypes.shape(courseMenuItemType)),
 };
 
 export default CourseNavigationContent

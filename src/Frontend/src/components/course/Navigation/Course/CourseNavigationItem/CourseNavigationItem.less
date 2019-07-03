@@ -10,7 +10,8 @@
 
 .itemLink {
   position: relative;
-  display: block;
+  display: flex;
+  justify-content: space-between;
   padding: 10px 19px 10px 24px;
   color: @linkColor;
   text-decoration: none;
@@ -27,12 +28,10 @@
   background-color: @backgroundGray;
 }
 
-.firstLine {
-  display: flex;
-  justify-content: space-between;
-}
 
 .text {
+  font-size: 18px;
+  line-height: 24px;
   overflow: hidden;
   text-overflow: ellipsis;
 

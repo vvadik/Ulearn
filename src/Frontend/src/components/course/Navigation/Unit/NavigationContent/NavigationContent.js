@@ -31,7 +31,6 @@ class NavigationContent extends Component {
 
 		const metroSettings = {
 			complete: menuItem.complete,
-			type: menuItem.type,
 			isFirstItem: isFirstItem,
 			isLastItem: isLastItem,
 			connectToPrev: menuItem.complete && (isFirstItem || items[index - 1].complete),
@@ -40,10 +39,13 @@ class NavigationContent extends Component {
 
 		return (
 			<NavigationItem
-				key={ menuItem.url }
+				key={ menuItem.id }
 				text={ menuItem.title }
 				url={ menuItem.url }
-				score={ menuItem.progress }
+				type={ menuItem.type }
+				score={ menuItem.score }
+				maxScore={ menuItem.maxScore }
+				isActive={ menuItem.isActive }
 				metro={ metroSettings }
 			/>
 		);
@@ -53,7 +55,7 @@ class NavigationContent extends Component {
 }
 
 NavigationContent.propTypes ={
-	items: PropTypes.arrayOf(menuItemType)
+	items: PropTypes.arrayOf(PropTypes.shape(menuItemType)),
 };
 
 export default NavigationContent

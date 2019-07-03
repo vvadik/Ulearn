@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
 import styles from './NavigationItem.less';
 import classnames from 'classnames';
 import { itemTypes } from '../../constants';
@@ -20,9 +21,10 @@ class NavigationItem extends Component {
 			[styles.withMetro]: metro
 		};
 
+
 		return (
 			<li className={ styles.root }>
-				<a href={ url } className={ classnames(classes) }>
+				<Link to={ url } className={ classnames(classes) }>
 					{ metro && this.renderMetro() }
 					<div className={ styles.firstLine }>
 						<span className={ styles.text }>{ text }</span>
@@ -31,18 +33,20 @@ class NavigationItem extends Component {
 					{ description &&
 						<div className={ styles.description }>{description}</div>
 					}
-				</a>
+				</Link>
 			</li>
 		);
 	}
 
 	renderScore() {
-		const { score } = this.props;
+		const { score, maxScore, type } = this.props;
 
-		if (typeof score === 'number') {
+		console.log(type, type === itemTypes.exercise || type === itemTypes.quiz);
+
+		if (type === itemTypes.exercise || type === itemTypes.quiz) {
 			return (
 				<div className={ styles.scoreWrapper }>
-					<span className={ styles.score }>{ Math.round(score * 100) }%</span>
+					<span className={ styles.score }>{ score }/{ maxScore }</span>
 				</div>
 			);
 		}
@@ -73,7 +77,8 @@ class NavigationItem extends Component {
 	}
 
 	renderPointer() {
-		const { complete, type } = this.props.metro;
+		const { type } = this.props;
+		const { complete } = this.props.metro;
 
 		if (type === itemTypes.lesson) {
 			return (

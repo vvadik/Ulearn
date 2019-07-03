@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Link from '@skbkontur/react-ui/Link';
+import Button from "@skbkontur/react-ui/Button";
 import LeftIcon from '@skbkontur/react-icons/ArrowChevron2Left';
 import styles from './NavigationHeader.less';
 
@@ -15,14 +15,15 @@ class NavigationHeader extends Component {
 	}
 
 	renderBreadcrumb() {
-		const { courseName, courseUrl } = this.props;
+		const { courseName, onCourseClick } = this.props;
 
 
 		return (
 			<nav className={ styles.breadcrumbs }>
-				<Link
+				<Button
+					use="link"
 				  	icon={ <LeftIcon /> }
-				  	href={ courseUrl }>{ courseName }</Link>
+				  	onClick={ onCourseClick }>{ courseName }</Button>
 			</nav>
 		);
 	}
@@ -30,14 +31,14 @@ class NavigationHeader extends Component {
 	renderTitle() {
 		const { title } = this.props;
 
-		return <h2 className={ styles.h2 }>{ title }</h2>;
+		return <h2 className={ styles.h2 } title={ title }>{ title }</h2>;
 	}
 }
 
 NavigationHeader.propTypes ={
 	title: PropTypes.string.isRequired,
 	courseName: PropTypes.string,
-	courseUrl: PropTypes.string,
+	onCourseClick: PropTypes.func,
 };
 
 export default NavigationHeader

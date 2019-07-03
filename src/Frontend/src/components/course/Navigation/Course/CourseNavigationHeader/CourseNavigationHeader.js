@@ -12,7 +12,7 @@ class CourseNavigationHeader extends Component {
 			<header className={ styles.root }>
 				{ this.renderBreadcrumb() }
 
-				<h1 className={ styles.h1 }>{ title }</h1>
+				<h1 className={ styles.h1 } title={ title }>{ title }</h1>
 
 				{ description && <p className={ styles.description }>{ description }</p> }
 

@@ -200,3 +200,5 @@ private.settings
 .idea/
 
 src/uLearn\.Web/Courses
+
+*/.DS_Store/

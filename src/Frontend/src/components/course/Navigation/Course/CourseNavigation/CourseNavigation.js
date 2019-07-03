@@ -12,7 +12,7 @@ class CourseNavigation extends Component {
 		return (
 			<aside className={ styles.root }>
 				<CourseNavigationHeader title={ title } description={ description } progress={ progress } />
-				<CourseNavigationContent items={ items } />
+				{ items && items.length && <CourseNavigationContent items={ items } /> }
 			</aside>
 		);
 	}
@@ -23,7 +23,7 @@ CourseNavigation.propTypes ={
 	title: PropTypes.string,
 	description: PropTypes.string,
 	progress: PropTypes.number,
-	items: PropTypes.arrayOf(courseMenuItemType),
+	items: PropTypes.arrayOf(PropTypes.shape(courseMenuItemType)),
 };
 
 export default CourseNavigation
