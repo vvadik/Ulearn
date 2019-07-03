@@ -5,7 +5,7 @@ using Ulearn.Core.RunCheckerJobApi;
 
 namespace RunCheckerJob
 {
-	internal class DockerSandboxRunner : ISandboxRunnerClient
+	public class DockerSandboxRunner : ISandboxRunnerClient
 	{
 		public RunningResults Run(RunnerSubmission submission)
 		{

@@ -67,7 +67,7 @@ namespace uLearn.CSharp
 
 		public static CourseValidator BuildValidator(ExerciseSlide slide, StringBuilder valOut)
 		{
-			var v = new CourseValidator(new List<Slide> { slide }, new CsSandboxRunnerSettings());
+			var v = new CourseValidator(new List<Slide> { slide });
 			v.Warning += msg => { valOut.Append(msg); };
 			v.Error += msg => { valOut.Append(msg); };
 			return v;

@@ -47,23 +47,28 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		[XmlElement("dockerImageName")] // см. DockerImageNameRegex
 		public string DockerImageName { get; set; }
 
+		[XmlIgnore]
 		public static readonly Regex DockerImageNameRegex = new Regex("^[-_a-z.]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 		
 		[XmlElement("run")]
 		public string RunCommand { get; set; } // см. RunCommandRegex
 		
+		[XmlIgnore]
 		public static readonly Regex RunCommandRegex = new Regex("^[-_a-z. ;|>]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 		
 		[XmlIgnore]
 		public DirectoryInfo SlideDirectoryPath { get; set; }
 		
+		[XmlIgnore]
 		public DirectoryInfo ExerciseDirectory => new DirectoryInfo(Path.Combine(SlideDirectoryPath.FullName, ExerciseDirName));
 
 		[XmlIgnore]
 		public DirectoryInfo CourseDirectory { get; set; }
 		
+		[XmlIgnore]
 		public FileInfo UserCodeFile => ExerciseDirectory.GetFile(UserCodeFilePath);
 		
+		[XmlIgnore]
 		public string InitialUserCodeFilePath
 		{
 			get
@@ -73,17 +78,38 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			}
 		}
 
+		[XmlIgnore]
 		public FileInfo InitialUserCodeFile => ExerciseDirectory.GetFile(InitialUserCodeFilePath);
-		public DirectoryInfo UserCodeFileParentDirectory => UserCodeFile.Directory;
-		
+
+		[XmlIgnore]
 		public FileInfo CorrectSolutionFile => UserCodeFile;
 		
-		public string UserCodeFileNameWithoutExt => Path.GetFileNameWithoutExtension(UserCodeFilePath);
+		[XmlIgnore]
+		public string CorrectSolutionFilePath => UserCodeFilePath;
+
+		[XmlIgnore]
+		private static readonly string[] wrongAnswerPatterns = { "*.WrongAnswer.*", "*.WA.*" };
 		
-		private Regex WrongAnswersAndSolutionNameRegex => new Regex(new Regex("^") + UserCodeFileNameWithoutExt + new Regex("\\.(WrongAnswer|WA)\\..+"));
+		[XmlIgnore]
+		private static readonly string[] initialPatterns = { "*.Initial.*" };
+		
+		[XmlIgnore]
+		public List<FileInfo> WrongAnswerFiles => 
+			wrongAnswerPatterns.SelectMany(p => ExerciseDirectory.GetFiles(p, SearchOption.AllDirectories))
+				.ToList();
+		
+		[XmlIgnore]
+		private List<FileInfo> InitialFiles => 
+			initialPatterns.SelectMany(p => ExerciseDirectory.GetFiles(p, SearchOption.AllDirectories))
+				.ToList();
 
-		public bool IsWrongAnswer(string name) => WrongAnswersAndSolutionNameRegex.IsMatch(name);
-
+		private string InitialFilePathToNotInitial(string path)
+		{
+			var notInitial = path;
+			initialPatterns.ForEach(p => notInitial = notInitial.Replace(p.Replace(".*", "").Replace("*", ""), ""));
+			return notInitial;
+		}
+		
 		[XmlIgnore]
 		public Lazy<string> SolutionRegionContent;
 
@@ -101,63 +127,46 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 				Language = LanguageHelpers.GuessByExtension(new FileInfo(UserCodeFilePath));
 			SlideDirectoryPath = context.UnitDirectory;
 			CourseDirectory = context.CourseDirectory;
-			SolutionRegionContent = new Lazy<string>(() => Region == null ? null : new CommonSingleRegionExtractor(UserCodeFile.ContentAsUtf8()).GetRegion(new Label{Name = Region}));
-			InitialRegionContent = new Lazy<string>(() =>  Region == null ? null : new CommonSingleRegionExtractor(InitialUserCodeFile.ContentAsUtf8()).GetRegion(new Label{Name = Region}));
-			Validate();
 			ExpectedOutput = ExpectedOutput ?? "";
-			if (NoStudentZip)
-			{
-				ExerciseInitialCode
-					= InitialRegionContent.Value
-						?? (InitialUserCodeFile.Exists ? InitialUserCodeFile.ContentAsUtf8() : null)
-						?? ExerciseInitialCode;
-			}
-			else
-			{
-				ExerciseInitialCode = ExerciseInitialCode ?? "// Вставьте сюда финальное содержимое файла " + UserCodeFilePath;
-			}
+			SolutionRegionContent = new Lazy<string>(() => GetRegionContent(UserCodeFile));
+			InitialRegionContent = new Lazy<string>(() => GetRegionContent(InitialUserCodeFile));
+			ExerciseInitialCode = NoStudentZip
+				? GetNoStudentZipInitialCode()
+				: ExerciseInitialCode ?? "// Вставьте сюда финальное содержимое файла " + UserCodeFilePath;
 			yield return this;
-			
-			if (CorrectSolutionFile.Exists)
+
+			var correctSolution = GetCorrectSolution();
+			if (correctSolution != null)
 			{
 				yield return new MarkdownBlock("### Решение") { Hide = true };
-				yield return new CodeBlock(SolutionRegionContent.Value ?? CorrectSolutionFile.ContentAsUtf8(), Language) { Hide = true };
+				yield return new CodeBlock(GetCorrectSolution(), Language) { Hide = true };
 			}
 		}
 
-		private void Validate()
+		public string GetCorrectSolution()
 		{
-			if (DockerImageName == null)
-				throw new ArgumentException("dockerImageName not specified");
-			if (DockerImageName == null)
-				throw new ArgumentException("run not specified");
-			if (!DockerImageNameRegex.Match(DockerImageName).Success)
-				throw new ArgumentException($"dockerImageName {DockerImageName}");
-			if (!RunCommandRegex.Match(RunCommand).Success)
-				throw new ArgumentException($"run {RunCommand}");
-			if (!ExerciseDirectory.Exists)
-				throw new ArgumentException($"exerciseDirName '{ExerciseDirName}' not exists");
-			if (!UserCodeFile.Exists)
-				throw new ArgumentException($"userCodeFile '{UserCodeFilePath}' not exists");
-			if (Region != null && !NoStudentZip)
-				throw new ArgumentException($"Region works only if StudentZipIsDisabled true");
-			if (!InitialUserCodeFile.Exists && (!NoStudentZip || NoStudentZip && ExerciseInitialCode == null))
-				throw new ArgumentException($"'{InitialUserCodeFilePath}' file not exists");
-			foreach (var pathToIncludeForChecker in PathsToIncludeForChecker)
-			{
-				var di = new DirectoryInfo(Path.Combine(ExerciseDirectory.FullName, pathToIncludeForChecker));
-				if (!CourseDirectory.IsInside(di))
-					throw new ArgumentException($"includePathForChecker '{pathToIncludeForChecker}' is not in subtree of directory with course.xml");
-				if (!di.Exists)
-					throw new ArgumentException($"includePathForChecker '{pathToIncludeForChecker}' not exists");
-			}
-			if (Region != null)
-			{
-				if(SolutionRegionContent.Value == null)
-					throw new ArgumentException($"Region '{Region}' not exists in file '{UserCodeFilePath}'");
-				if(ExerciseInitialCode == null && InitialRegionContent.Value == null)
-					throw new ArgumentException($"Region '{Region}' not exists in file '{InitialUserCodeFilePath}'");
-			}
+			return SolutionRegionContent.Value ?? (CorrectSolutionFile.Exists ? CorrectSolutionFile.ContentAsUtf8() : null);
+		}
+		
+		public string GetInitialCode()
+		{
+			return NoStudentZip ? GetNoStudentZipInitialCode() : InitialUserCodeFile.ContentAsUtf8();
+		}
+
+		private string GetNoStudentZipInitialCode()
+		{
+			return ExerciseInitialCode
+				= InitialRegionContent.Value
+					?? (InitialUserCodeFile.Exists ? InitialUserCodeFile.ContentAsUtf8() : null)
+					?? ExerciseInitialCode;
+		}
+		
+
+		public string GetRegionContent(FileInfo file)
+		{
+			return Region == null || !file.Exists
+				? null
+				: new CommonSingleRegionExtractor(file.ContentAsUtf8()).GetRegion(new Label { Name = Region });
 		}
 
 		public override SolutionBuildResult BuildSolution(string userWrittenCode)
@@ -181,7 +190,8 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		private byte[] GetZipBytesForChecker(string code)
 		{
 			var excluded = (PathsToExcludeForChecker ?? new string[0])
-				.Concat(new[] { "*.Initial.*", "*.WrongAnswer.*", "*.WA.*" })
+				.Concat(initialPatterns)
+				.Concat(wrongAnswerPatterns)
 				.ToList();
 
 			var toUpdateDirectories = PathsToIncludeForChecker
@@ -208,7 +218,9 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public byte[] GetZipBytesForStudent()
 		{
 			var excluded = (PathsToExcludeForStudent ?? new string[0])
-				.Concat(new[] { "*.Initial.*", "*.WrongAnswer.*", "*.WA.*", "checking/*" })
+				.Concat(initialPatterns)
+				.Concat(wrongAnswerPatterns)
+				.Concat(new[] { "checking/*" })
 				.ToList();
 			
 			var toUpdate = ReplaceWithInitialFiles().ToList();
@@ -221,11 +233,10 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 
 		private IEnumerable<FileContent> ReplaceWithInitialFiles()
 		{
-			var initialFiles = ExerciseDirectory.GetFiles("*.Initial.*", SearchOption.AllDirectories);
-			foreach (var initialFile in initialFiles)
+			foreach (var initialFile in InitialFiles)
 			{
 				var relativeFilePath = initialFile.GetRelativePath(ExerciseDirectory.FullName);
-				var notInitial = relativeFilePath.Replace(".Initial", "");
+				var notInitial = InitialFilePathToNotInitial(relativeFilePath);
 				yield return new FileContent { Path = notInitial, Data = initialFile.ReadAllContent() };
 			}
 		}

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
 using NHttp;
+using RunCheckerJob;
 using RunCsJob;
 using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
@@ -264,17 +265,35 @@ namespace uLearn.CourseTool.Monitoring
 			var buildResult = exercise.BuildSolution(code);
 			if (buildResult.HasErrors)
 				return new RunSolutionResult { IsCompileError = true, ErrorMessage = buildResult.ErrorMessage, ExecutionServiceName = "uLearn" };
-			var result = new CsSandboxRunnerClient().Run(exercise.CreateSubmission(Utils.NewNormalizedGuid(), code));
-			var runSolutionResult = new RunSolutionResult
+			RunSolutionResult runSolutionResult;
+			if (exercise is UniversalExerciseBlock)
 			{
-				IsRightAnswer = exercise.IsCorrectRunResult(result),
-				ActualOutput = result.GetOutput()?.NormalizeEoln() ?? "",
-				ErrorMessage = result.CompilationOutput,
-				ExecutionServiceName = "course.exe",
-				IsCompileError = result.Verdict == Verdict.CompilationError,
-				ExpectedOutput = exercise.ExpectedOutput?.NormalizeEoln() ?? "",
-				SubmissionId = 0,
-			};
+				var result = new DockerSandboxRunner().Run(exercise.CreateSubmission(Utils.NewNormalizedGuid(), code));
+				runSolutionResult = new RunSolutionResult
+				{
+					IsRightAnswer = exercise.IsCorrectRunResult(result),
+					ActualOutput = result.GetOutput()?.NormalizeEoln() ?? "",
+					ErrorMessage = result.CompilationOutput,
+					ExecutionServiceName = "course.exe",
+					IsCompileError = result.Verdict == Verdict.CompilationError,
+					ExpectedOutput = exercise.ExpectedOutput?.NormalizeEoln() ?? "",
+					SubmissionId = 0,
+				};
+			}
+			else
+			{
+				var result = new CsSandboxRunnerClient().Run(exercise.CreateSubmission(Utils.NewNormalizedGuid(), code));
+				runSolutionResult = new RunSolutionResult
+				{
+					IsRightAnswer = exercise.IsCorrectRunResult(result),
+					ActualOutput = result.GetOutput()?.NormalizeEoln() ?? "",
+					ErrorMessage = result.CompilationOutput,
+					ExecutionServiceName = "course.exe",
+					IsCompileError = result.Verdict == Verdict.CompilationError,
+					ExpectedOutput = exercise.ExpectedOutput?.NormalizeEoln() ?? "",
+					SubmissionId = 0,
+				};
+			}
 			if (buildResult.HasStyleErrors)
 			{
 				runSolutionResult.IsStyleViolation = true;
