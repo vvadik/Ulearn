@@ -79,7 +79,7 @@ class Course extends Component {
 
 	renderUnitNavigation () {
 		const { openUnit } = this.state;
-		const { courseInfo, courseId, slideId } = this.props;
+		const { courseInfo, courseId, slideId, progress } = this.props;
 
 		return (
 			<UnitNavigation
@@ -92,8 +92,10 @@ class Course extends Component {
 					type: item.type,
 					url: constructPathToSlide(courseId, item.slug),
 					isActive: item.slug === slideId,
+					score: (progress && progress[item.id] && progress[item.id].score) || 0,
 					maxScore: item.maxScore,
-					score: 0, // TODO: настоящий счет
+					questionsCount: item.questionsCount,
+					visited: progress && progress[item.id],
 				})) }
 			/>
 		);

@@ -9,6 +9,7 @@ export const menuItemType = {
 	maxScore: PropTypes.number,
 	description: PropTypes.string,
 	isActive: PropTypes.bool,
+	visited: PropTypes.bool,
 	metro: PropTypes.shape({
 		complete: PropTypes.bool,
 		isFirstItem: PropTypes.bool,
