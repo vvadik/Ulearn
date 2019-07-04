@@ -7,18 +7,15 @@ import Button from "@skbkontur/react-ui/Button";
 const classNames = require('classnames');
 
 class UnitCard extends Component {
-	static countCards(count) {
-		return (
-			`${count} ${getPluralForm(count, 'карточка', 'карточки', 'карточек')}`
-		);
-	}
-
 	render() {
-		const {cards, title, isCompleted} = this.props;
+		const {unitTitle, haveProgress, total} = this.props;
+		const title = unitTitle !== undefined
+			? unitTitle
+			: "";
 		const unitStyle = classNames(styles.unitCard, {
-			[styles.successColor]: isCompleted
+			[styles.successColor]: haveProgress
 		});
-		const cardsCount = cards.length;
+
 		return (
 			<div className={styles.unitCardContainer}>
 				<div className={unitStyle}>
@@ -27,26 +24,37 @@ class UnitCard extends Component {
 							{title}
 						</h3>
 						<span className={styles.unitCardBody}>
-							{UnitCard.countCards(cardsCount)}
+							{UnitCard.countCards(total)}
 						</span>
 					</div>
 					<Button align={'center'} size={'large'}>
 						Начать проверку
 					</Button>
 				</div>
-				{cardsCount > 1 &&
-				<div className={classNames(unitStyle, styles.unitCardNext, {[styles.successNextColor]: isCompleted})}/>}
-				{cardsCount > 2 &&
-				<div className={classNames(unitStyle, styles.unitCardLast, {[styles.successLastColor]: isCompleted})}/>}
+				{total > 1 &&
+				<div
+					className={classNames(unitStyle, styles.unitCardNext, {[styles.successNextColor]: haveProgress})}/>}
+				{total > 2 &&
+				<div
+					className={classNames(unitStyle, styles.unitCardLast, {[styles.successLastColor]: haveProgress})}/>}
 			</div>
+		);
+	}
+
+	static countCards(count) {
+		if (count === undefined) {
+			count = 0;
+		}
+		return (
+			`${count} ${getPluralForm(count, 'карточка', 'карточки', 'карточек')}`
 		);
 	}
 }
 
 UnitCard.propTypes = {
-	title: PropTypes.string,
-	cards: PropTypes.array,
-	isCompleted: PropTypes.bool
+	unitTitle: PropTypes.string.isRequired,
+	total: PropTypes.number.isRequired,
+	haveProgress: PropTypes.bool.isRequired
 };
 
 export default UnitCard;

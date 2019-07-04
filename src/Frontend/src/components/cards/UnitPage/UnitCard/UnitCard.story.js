@@ -2,29 +2,30 @@ import React from 'react';
 import {storiesOf} from '@storybook/react';
 import UnitCard from './UnitCard';
 
-const unitCardsData = {
-	title: "Первое знакомство с C#",
-	cards13: [
-		'1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13'
-	],
-	cards1: [
-		'1'
-	],
-	cards2: [
-		'1', '2'
-	],
-};
+const unitTitle= "Первое знакомство с C#";
 
 storiesOf('Cards/UnitPage/UnitCard', module)
-	.add('13 cards with success', () => (
-		<UnitCard title={unitCardsData.title} cards={unitCardsData.cards13} isCompleted={true}/>
+	.add('3 cards with success', () => (
+		<UnitCard haveProgress={true} total={3} unitTitle={unitTitle}/>
 	))
-	.add('1 card', () => (
-		<UnitCard title={unitCardsData.title} cards={unitCardsData.cards1}/>
+	.add('3 cards', () => (
+		<UnitCard haveProgress={false} total={3} unitTitle={unitTitle}/>
+	))
+	.add('2 cards with success', () => (
+		<UnitCard haveProgress={true} total={2} unitTitle={unitTitle}/>
 	))
 	.add('2 cards', () => (
-		<UnitCard title={unitCardsData.title} cards={unitCardsData.cards2}/>
+		<UnitCard haveProgress={false} total={2} unitTitle={unitTitle}/>
 	))
-	.add('Long title', () => (
-		<UnitCard title={"Большое название, которое все ломает совсем-совсем, не люблю такие, да кто любит? - НИКТО... вооот.фыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыы"} cards={unitCardsData.cards2}/>
+	.add('1 cards with success', () => (
+		<UnitCard haveProgress={true} total={1} unitTitle={unitTitle}/>
+	))
+	.add('1 card', () => (
+		<UnitCard haveProgress={false} total={1} unitTitle={unitTitle}/>
+	))
+	.add('Long title with undefinde total', () => (
+		<UnitCard unitTitle={"Большое название, которое все ломает совсем-совсем, не люблю такие, да кто любит? - НИКТО... вооот.фыыdfvbg34tgf4fsdaf23rfewf23ыы"}/>
+	))
+	.add('Undefined all', () => (
+		<UnitCard />
 	));
