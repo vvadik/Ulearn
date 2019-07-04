@@ -1,14 +1,10 @@
-using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace Ulearn.Web.Api.Models.Common
+namespace Ulearn.Web.Api.Models.Responses.FlashCards
 {
 	[DataContract]
-	public class FlashCardsStat
+	public class ScoreResponse
 	{
-		[DataMember]
-		public int Total;
-
 		[DataMember]
 		public int One;
 
@@ -26,5 +22,6 @@ namespace Ulearn.Web.Api.Models.Common
 
 		[DataMember]
 		public int NotViewed;
+		
 	}
 }

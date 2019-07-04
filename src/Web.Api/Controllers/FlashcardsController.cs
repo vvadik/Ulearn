@@ -2,42 +2,48 @@ using System;
 using System.Net;
 using System.Threading.Tasks;
 using Database;
+using Database.Models;
+using Database.Repos.Flashcards;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Ulearn.Web.Api.Models.Common;
+using Ulearn.Web.Api.Models.Responses.FlashCards;
+using Score = Database.Models.Score;
 
 namespace Ulearn.Web.Api.Controllers
 {
+	public enum FlashcardOrder
+	{
+		Original,
+		Smart
+	}
+	
 	[Route("/courses")]
 	public class FlashcardsController : BaseController
 	{
-		public FlashcardsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo)
+		private IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo;
+
+		public FlashcardsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo, IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
+			this.usersFlashcardsVisitsRepo = usersFlashcardsVisitsRepo;
 		}
 
 		/// <summary>
 		/// Статистика по последним результатам
 		/// </summary>
-		/// <param name="unitId"></param>
-		/// <returns></returns>
 		[HttpGet("{courseId}/flashcards/stat")]
-		public ActionResult<FlashCardsStat> FlashcardsStat([FromQuery] Guid? unitId = null)
+		public ActionResult<FlashCardsStatResponse> FlashcardsStat([FromQuery] Guid? unitId = null)
 		{
-			return new FlashCardsStat();
+			return new FlashCardsStatResponse();
 		}
 
 		/// <summary>
 		/// Коллекция карточек
 		/// </summary>
-		/// <param name="count"></param>
-		/// <param name="unitId"></param>
-		/// <param name="status"></param>
-		/// <param name="order"></param>
-		/// <returns></returns>
 		[HttpGet("{courseId}/flashcards")]
-		public ActionResult<FlashCardsList> Flashcards([FromQuery] int count, [FromQuery] Guid unitId, [FromQuery] string status, [FromQuery] Order order)
+		public ActionResult<FlashCardsList> Flashcards([FromQuery] int count, [FromQuery] Guid unitId, [FromQuery] string status, [FromQuery] FlashcardOrder flashcardOrder)
 		{
 			return new FlashCardsList();
 		}
@@ -45,7 +51,6 @@ namespace Ulearn.Web.Api.Controllers
 		/// <summary>
 		/// Информация о всех карточках по курсу
 		/// </summary>
-		/// <returns></returns>
 		[HttpGet("{courseId}/flashcards-info")]
 		public ActionResult<FlashcardInfoList> FlashcardsInfo()
 		{
@@ -55,12 +60,20 @@ namespace Ulearn.Web.Api.Controllers
 		/// <summary>
 		/// Изменить оценку для флеш-карты
 		/// </summary>
-		/// <param name="status"></param>
-		/// <returns></returns>
 		[HttpPut("{courseId}/flashcards/{flashcardId}/status")]
 		[ProducesResponseType((int)HttpStatusCode.NoContent)]
-		public async Task<IActionResult> Status([FromBody] Enum status)
+		public async Task<IActionResult> Status([FromRoute] string courseId, [FromRoute] string flashcardId, [FromBody] Score score)
 		{
+			return NoContent();
+			var course = courseManager.FindCourse(courseId);
+			if (course is null)
+				return BadRequest($"course with id {courseId} does not exist");
+			
+			var unit = course.Units.Find(x => x.GetFlashcardById(flashcardId) != null);
+			if (unit is null) 
+				return BadRequest($"flashcard with id {flashcardId} does not exist");
+
+			await usersFlashcardsVisitsRepo.AddFlashcardVisit(UserId, courseId, unit.Id, flashcardId, score, DateTime.Now);
 			return NoContent();
 		}
 	}
