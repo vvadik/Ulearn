@@ -1,0 +1,66 @@
+@import "../../../../variables.less";
+
+@containerWidth: 100%;
+@questionsContainerWidth: 83%;
+@toggleContainerWidth: 17%;
+@questionFontSize: 18px;
+@answerFontSize: @questionFontSize - 2px;
+
+.questionsContainer {
+  display: flex;
+  width: @containerWidth;
+  position: relative;
+  top: 10px;
+}
+
+.questionsTextContainer {
+  margin: 0;
+}
+
+.questionText {
+  list-style: none;
+  font-size: @questionFontSize;
+  font-family: @defaultFonts;
+  line-height: 24px;
+  margin-bottom: 10px;
+}
+
+.questionText::before {
+  width: 20px;
+  height: 20px;
+
+  position: absolute;
+
+  content: '?';
+  color: #fff;
+  font-family: Kontur-Iconic, sans-serif;
+  text-align: center;
+  font-size: 16px;
+  line-height: 18px;
+
+  display: inline-block;
+  background: #C4C4C4;
+  border-radius: 50%;
+  box-sizing: border-box;
+  margin-left: -40px;
+  margin-top: 3px;
+  padding-top: 1px;
+
+}
+
+.answer {
+  color: #717171;
+  font-size: @answerFontSize;
+}
+
+.toggleContainer {
+  width: @toggleContainerWidth;
+  overflow: hidden;
+  height: 20px;
+  line-height: 20px;
+}
+
+.toggleText {
+  position: relative;
+  left: 10px;
+}
