@@ -54,7 +54,7 @@ namespace GiftsGranter
 
 		public JObject GetUserGifts(int staffUserId)
 		{
-			return Get($"feed/user_{staffUserId}?filter=gift");
+			return Get($"/users/{staffUserId}/gifts");
 		}
 
 		public JObject GrantGift(int staffUserId, int score, CourseSettings courseSettings)
