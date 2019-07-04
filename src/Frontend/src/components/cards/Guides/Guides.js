@@ -6,7 +6,7 @@ class Guides extends Component {
 	render() {
 		return (
 			<ol className={styles.guidesList}>
-				{this.props.data.map((guide, index) =>
+				{this.props.guides.map((guide, index) =>
 					<li className={styles.guidesElement} key={index}>
 						{guide}
 					</li>
@@ -17,7 +17,7 @@ class Guides extends Component {
 }
 
 Guides.propTypes = {
-	data: PropTypes.array
+	guides: PropTypes.array.isRequired
 };
 
 export default Guides;
