@@ -1,6 +1,5 @@
 @import "../../../../variables.less";
 
-@containerWidth: 100%;
 @questionsContainerWidth: 83%;
 @toggleContainerWidth: 17%;
 @questionFontSize: 18px;
@@ -8,13 +7,11 @@
 
 .questionsContainer {
   display: flex;
-  width: @containerWidth;
-  position: relative;
-  top: 10px;
 }
 
 .questionsTextContainer {
   margin: 0;
+  width: @questionsContainerWidth;
 }
 
 .questionText {
@@ -22,7 +19,7 @@
   font-size: @questionFontSize;
   font-family: @defaultFonts;
   line-height: 24px;
-  margin-bottom: 10px;
+  margin-bottom: 18px;
 }
 
 .questionText::before {
@@ -48,7 +45,8 @@
 
 }
 
-.answer {
+.answerText {
+  margin-top: 10px;
   color: #717171;
   font-size: @answerFontSize;
 }

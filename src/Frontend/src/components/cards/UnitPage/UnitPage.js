@@ -30,8 +30,8 @@ class UnitPage extends Component {
 		if (haveProgress) {
 			return (
 				<div>
-					<UnitProgressBar byScore={byScore} total={total}/>
-					<ShortQuestions questions={questions} answers={answers}/>
+					<UnitProgressBar className={styles.progressBar} byScore={byScore} total={total}/>
+					<ShortQuestions className={styles.shortQuestions} questions={questions} answers={answers}/>
 				</div>
 			);
 		} else {
