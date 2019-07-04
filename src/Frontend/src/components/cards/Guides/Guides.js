@@ -1,23 +1,21 @@
-import React, {Component} from 'react'
+import React from 'react';
 import PropTypes from "prop-types";
-import styles from './guides.less'
+import styles from './guides.less';
 
-class Guides extends Component {
-	render() {
-		return (
-			<ol className={styles.guidesList}>
-				{this.props.guides.map((guide, index) =>
-					<li className={styles.guidesElement} key={index}>
-						{guide}
-					</li>
-				)}
-			</ol>
-		);
-	}
-}
+const Guides = ({guides}) => {
+	return (
+		<ol className={styles.guidesList}>
+			{guides.map((guide, index) =>
+				<li className={styles.guidesElement} key={index}>
+					{guide}
+				</li>
+			)}
+		</ol>
+	)
+};
 
 Guides.propTypes = {
-	guides: PropTypes.array.isRequired
+	guides: PropTypes.arrayOf(PropTypes.string).isRequired
 };
 
 export default Guides;

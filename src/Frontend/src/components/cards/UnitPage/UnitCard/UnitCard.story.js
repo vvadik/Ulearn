@@ -2,8 +2,6 @@ import React from 'react';
 import {storiesOf} from '@storybook/react';
 import UnitCard from './UnitCard';
 
-const unitTitle= "Первое знакомство с C#";
-
 storiesOf('Cards/UnitPage/UnitCard', module)
 	.add('3 cards with success', () => (
 		<UnitCard haveProgress={true} total={3} unitTitle={unitTitle}/>
@@ -24,8 +22,15 @@ storiesOf('Cards/UnitPage/UnitCard', module)
 		<UnitCard haveProgress={false} total={1} unitTitle={unitTitle}/>
 	))
 	.add('Long title with undefinde total', () => (
-		<UnitCard unitTitle={"Большое название, которое все ломает совсем-совсем, не люблю такие, да кто любит? - НИКТО... вооот.фыыdfvbg34tgf4fsdaf23rfewf23ыы"}/>
+		<UnitCard
+			unitTitle={getBigTitle()}/>
 	))
 	.add('Undefined all', () => (
-		<UnitCard />
+		<UnitCard/>
 	));
+
+const unitTitle = "Первое знакомство с C#";
+
+const getBigTitle =
+	() => "Большое название, которое все ломает совсем-совсем, " +
+		"не люблю такие, да кто любит? - НИКТО... вооот.фыыdfvbg34tgf4fsdaf23rfewf23ыы";

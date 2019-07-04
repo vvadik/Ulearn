@@ -1,15 +1,20 @@
 @import "../../../../variables.less";
 
+@cardsContainerWidth: 700px;
+@cardsContainerHeight: 349px;
+@cardWidth: @cardsContainerWidth;
+@cardHeight: @cardsContainerHeight - 9px;
+
 .unitCardContainer {
-  width: 700px;
-  height: 349px;
+  width: @cardsContainerWidth;
+  height: @cardsContainerHeight;
 
   position: relative;
 }
 
 .unitCard {
-  width: 700px;
-  height: 340px;
+  width: @cardWidth;
+  height: @cardHeight;
 
   position: absolute;
   top: 20px;
@@ -19,13 +24,13 @@
   justify-content: space-between;
   align-items: baseline;
   border-radius: 10px;
-  padding: 4%;
+  padding: 22px;
   background: @blue;
 }
 
 .unitCardNext {
-  width: 656px;
-  height: 301px;
+  width: @cardWidth - 44px;
+  height: @cardHeight - 48px;
 
   z-index: -2;
   top: 11px;
@@ -35,8 +40,8 @@
 }
 
 .unitCardLast {
-  width: 608px;
-  height: 279px;
+  width: @cardWidth - 92px;
+  height: @cardHeight - 70px;
 
   z-index: -3;
   top: 4px;
@@ -49,16 +54,16 @@
   background: @successColor;
 }
 
-.successNextColor {
+.successColor.unitCardNext {
   background: darken(@successColor, 10%);
 }
 
-.successLastColor {
+.successColor.unitCardLast {
   background: darken(@successColor, 15%);
 }
 
 .unitCardTextContent {
-  font-family: Segoe UI, serif;
+  font-family: @defaultFonts;
   color: @whiteSmoke;
   align-self: normal;
 }

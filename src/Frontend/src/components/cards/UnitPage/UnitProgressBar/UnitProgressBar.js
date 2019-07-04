@@ -1,31 +1,30 @@
 import React, {Component} from 'react'
 import PropTypes from "prop-types";
 import styles from './unitProgressBar.less'
+import classNames from 'classnames';
 
-const classNames = require('classnames');
-
-const mapStatusToStyle = Object.freeze({
-	0: styles.statusUnseen,
+const mapStatusToStyle = {
+	unseen: styles.statusUnseen,
 	1: styles.statusVeryBad,
 	2: styles.statusBad,
 	3: styles.statusAverage,
 	4: styles.statusGood,
 	5: styles.statusExcellent,
-});
+};
 
-const mapStatusToText = Object.freeze({
-	0: 'непросмотрено',
+const mapStatusToText = {
+	unseen: 'непросмотрено',
 	1: 'плохо',
 	5: 'отлично'
-});
+};
 
 class UnitProgressBar extends Component {
 	render() {
 		return (
 			<div>
-				<span className={styles.progressBarTitle}>
+				<p className={styles.progressBarTitle}>
 					Результаты последнего прохождения
-				</span>
+				</p>
 				<div className={styles.progressBarContainer}>
 					{this.renderResults()}
 				</div>
@@ -34,17 +33,16 @@ class UnitProgressBar extends Component {
 	}
 
 	renderResults() {
-		const {byScore} = this.props;
-		const cardsCount = byScore.reduce((accumulator, currentValue) => accumulator + currentValue);
+		const {byScore, total} = this.props;
 
 		return Object
 			.keys(byScore)
 			.filter(key => byScore[key] > 0)
-			.map(key => UnitProgressBar.convertToBarElement(key, byScore[key], cardsCount));
+			.map(key => UnitProgressBar.convertToBarElement(key, byScore[key], total));
 	}
 
 	static convertToBarElement(status, count, cardsCount) {
-		const elementWidth = `${100 * count / cardsCount}%`;
+		const elementWidth = `${count / cardsCount * 100}%`;
 
 		return (
 			<span
@@ -59,7 +57,15 @@ class UnitProgressBar extends Component {
 }
 
 UnitProgressBar.propTypes = {
-	byScore: PropTypes.array.isRequired
+	byScore: PropTypes.shape({
+		unseen: PropTypes.number,
+		1: PropTypes.number,
+		2: PropTypes.number,
+		3: PropTypes.number,
+		4: PropTypes.number,
+		5: PropTypes.number
+	}).isRequired,
+	total: PropTypes.number.isRequired
 };
 
 export default UnitProgressBar;
