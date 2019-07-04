@@ -1,0 +1,50 @@
+@import "./../../../../variables";
+
+.progressBarContainer {
+  display: flex;
+  height: 27px;
+  align-items: stretch;
+}
+
+.progressBarElement {
+  color: white;
+  overflow: hidden;
+  font-family: Segoe UI, serif;
+  text-align: center;
+  font-size: 14px;
+  line-height: 30px;
+}
+
+.statusUnseen {
+  order: 1;
+  background: @statusUnseenColor;
+}
+
+.statusVeryBad {
+  background: @statusVeryBadColor;
+}
+
+.statusBad {
+  background: @statusBadColor
+}
+
+.statusAverage {
+  background: @statusAverageColor
+}
+
+.statusGood {
+  background: @statusGoodColor
+}
+
+.statusExcellent {
+  background: @statusExcellentColor
+}
+
+.progressBarTitle {
+  color: #808080;
+  font-family: Segoe UI;
+  font-size: 10px;
+  line-height: 30px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
