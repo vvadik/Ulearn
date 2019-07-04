@@ -774,6 +774,10 @@
     <Compile Include="Migrations\201905241421585_AddCourseGitBranchField.Designer.cs">
       <DependentUpon>201905241421585_AddCourseGitBranchField.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201907040654351_AddUserFlashcardsVisits.cs" />
+    <Compile Include="Migrations\201907040654351_AddUserFlashcardsVisits.Designer.cs">
+      <DependentUpon>201907040654351_AddUserFlashcardsVisits.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -816,6 +820,7 @@
     <Compile Include="Models\TextBlob.cs" />
     <Compile Include="Models\UnitAppearance.cs" />
     <Compile Include="Models\UserExerciseSubmission.cs" />
+    <Compile Include="Models\UserFlashcardsVisit.cs" />
     <Compile Include="Models\UserQuestion.cs" />
     <Compile Include="Models\UserQuizAnswer.cs" />
     <Compile Include="Models\UserQuizSubmission.cs" />
@@ -1215,6 +1220,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201905241421585_AddCourseGitBranchField.resx">
       <DependentUpon>201905241421585_AddCourseGitBranchField.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201907040654351_AddUserFlashcardsVisits.resx">
+      <DependentUpon>201907040654351_AddUserFlashcardsVisits.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

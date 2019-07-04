@@ -239,6 +239,8 @@ namespace Database.DataContexts
 		public DbSet<SystemAccess> SystemAccesses { get; set; }
 		
 		public DbSet<StyleErrorSettings> StyleErrorSettings { get; set; }
+		
+		public DbSet<UserFlashcardsVisit> UserFlashcardsVisits { get; set; }
 	}
 }
  
