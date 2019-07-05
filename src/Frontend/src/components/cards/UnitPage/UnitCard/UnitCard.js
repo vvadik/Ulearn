@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import PropTypes from "prop-types";
-import getPluralForm from "../../../../utils/getPluralForm";
 import styles from './unitCard.less';
 import Button from "@skbkontur/react-ui/Button";
 import classNames from "classnames";
+import getCardsPluralForm from "../../../../utils/getCardsPluralForm";
 
 class UnitCard extends Component {
 	render() {
@@ -22,7 +22,7 @@ class UnitCard extends Component {
 							{unitTitle}
 						</h3>
 						<span className={styles.unitCardBody}>
-							{UnitCard.countCards(total)}
+							{getCardsPluralForm(total)}
 						</span>
 					</div>
 					<Button size={'large'}>
@@ -36,12 +36,6 @@ class UnitCard extends Component {
 				<div
 					className={stylesForCardLast}/>}
 			</div>
-		);
-	}
-
-	static countCards(count = 0) {
-		return (
-			`${count} ${getPluralForm(count, 'карточка', 'карточки', 'карточек')}`
 		);
 	}
 }

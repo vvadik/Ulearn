@@ -1,7 +1,7 @@
 import React from 'react';
 import {storiesOf} from '@storybook/react';
 import UnitPage from './UnitPage';
-import ShortQuestions from "./ShortQuestions/ShortQuestions";
+import shortQuestionsExample from "./ShortQuestions/shortQuestionsExample";
 
 storiesOf('Cards/UnitPage', module)
 	.add('3 cards with success', () => (
@@ -10,7 +10,7 @@ storiesOf('Cards/UnitPage', module)
 			unitTitle={threeCardsWithSuccess.unitTitle}
 			total={threeCardsWithSuccess.total}
 			byScore={threeCardsWithSuccess.byScore}
-			shortQuestions={defaultShortQuestions}
+			questionsWithAnswers={shortQuestionsExample}
 		/>
 	))
 	.add('3 cards', () => (
@@ -19,7 +19,7 @@ storiesOf('Cards/UnitPage', module)
 			unitTitle={threeCards.unitTitle}
 			total={threeCards.total}
 			byScore={threeCards.byScore}
-			shortQuestions={defaultShortQuestions}
+			questionsWithAnswers={shortQuestionsExample}
 		/>
 	))
 	.add('2 cards with success', () => (
@@ -28,7 +28,7 @@ storiesOf('Cards/UnitPage', module)
 			unitTitle={twoCardsWithSuccess.unitTitle}
 			total={twoCardsWithSuccess.total}
 			byScore={twoCardsWithSuccess.byScore}
-			shortQuestions={defaultShortQuestions}
+			questionsWithAnswers={shortQuestionsExample}
 		/>
 	))
 	.add('2 cards', () => (
@@ -37,7 +37,7 @@ storiesOf('Cards/UnitPage', module)
 			unitTitle={twoCards.unitTitle}
 			total={twoCards.total}
 			byScore={twoCards.byScore}
-			shortQuestions={defaultShortQuestions}
+			questionsWithAnswers={shortQuestionsExample}
 		/>
 	))
 	.add('1 card with success', () => (
@@ -46,7 +46,7 @@ storiesOf('Cards/UnitPage', module)
 			unitTitle={oneCardWithSuccess.unitTitle}
 			total={oneCardWithSuccess.total}
 			byScore={oneCardWithSuccess.byScore}
-			shortQuestions={defaultShortQuestions}
+			questionsWithAnswers={shortQuestionsExample}
 		/>
 	))
 	.add('1 card', () => (
@@ -55,20 +55,9 @@ storiesOf('Cards/UnitPage', module)
 			unitTitle={oneCard.unitTitle}
 			total={oneCard.total}
 			byScore={oneCard.byScore}
-			shortQuestions={defaultShortQuestions}
+			questionsWithAnswers={shortQuestionsExample}
 		/>
 	));
-
-const getLongQuestion =
-	() => 'Если я спрошу очень большой вопрос, то сломается ли верстка? Если да, то почему? Как это поправить? Или не стоит? как думаешь? Почему?';
-
-const getLongAnswer =
-	() => 'Большой ответ также может сломать все, что захочет, должно быть стоит лучше приглядываться к стилям. И так же надо написать ещё 5 слов чтобы было побольше слов.';
-
-const defaultShortQuestions ={
-	questions :['Почему 1 больше 2?', 'Это так?', getLongQuestion()],
-	answers:['Потому что 2 меньше 1... наверное', 'Нет, не так', getLongAnswer()]
-};
 
 const threeCardsWithSuccess = {
 	unitTitle: "Основы программирования 1, знакомство с С#",

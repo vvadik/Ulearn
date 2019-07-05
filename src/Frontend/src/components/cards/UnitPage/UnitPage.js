@@ -24,14 +24,13 @@ class UnitPage extends Component {
 	}
 
 	renderFooter(haveProgress) {
-		const {guides, byScore, total} = this.props;
-		const {questions, answers} = this.props.shortQuestions;
+		const {guides, byScore, total, questionsWithAnswers} = this.props;
 
 		if (haveProgress) {
 			return (
 				<div>
 					<UnitProgressBar className={styles.progressBar} byScore={byScore} total={total}/>
-					<ShortQuestions className={styles.shortQuestions} questions={questions} answers={answers}/>
+					<ShortQuestions className={styles.shortQuestions} questionsWithAnswers={questionsWithAnswers}/>
 				</div>
 			);
 		} else {
@@ -43,9 +42,9 @@ class UnitPage extends Component {
 UnitPage.propTypes = {
 	unitTitle: PropTypes.string.isRequired,
 	guides: PropTypes.arrayOf(PropTypes.string).isRequired,
-	shortQuestions: PropTypes.shape({
-		questions: PropTypes.arrayOf(PropTypes.string),
-		answers: PropTypes.arrayOf(PropTypes.string)
+	questionsWithAnswers: PropTypes.shape({
+		question: PropTypes.string,
+		answer: PropTypes.string
 	}).isRequired,
 	total: PropTypes.number.isRequired,
 	byScore: PropTypes.shape({

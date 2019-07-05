@@ -7,9 +7,18 @@ import classNames from 'classnames';
 class ShortQuestions extends Component {
 	constructor(props) {
 		super(props);
+
+		const questionsWithAnswers = this.props.questionsWithAnswers
+			.map((questionWithAnswer) => {
+				return {
+					...questionWithAnswer,
+					showAnswer: false
+				}
+			});
+
 		this.state = {
 			showAllAnswers: false,
-			indexesOfAnswersToShow: []
+			questionsWithAnswers: questionsWithAnswers
 		};
 	}
 
@@ -32,12 +41,10 @@ class ShortQuestions extends Component {
 	}
 
 	renderQuestions() {
-		const {questions, answers} = this.props;
-		const {showAllAnswers, indexesOfAnswersToShow} = this.state;
-		const shouldAnswerBeRendered = (index) => showAllAnswers || indexesOfAnswersToShow.some(i => i === index);
+		const {showAllAnswers, questionsWithAnswers} = this.state;
 
 		return (
-			questions.map((question, index) =>
+			questionsWithAnswers.map(({question, answer, showAnswer}, index) =>
 				<li
 					className={styles.questionText}
 					key={index}
@@ -46,41 +53,46 @@ class ShortQuestions extends Component {
 						{question}
 					</div>
 					{
-						shouldAnswerBeRendered(index) &&
+						(showAllAnswers || showAnswer) &&
 						<div className={styles.answerText}>
-							{answers[index]}
+							{answer}
 						</div>
 					}
 				</li>)
 		);
 	}
 
-	handleQuestionClick = (i) => {
-		const {indexesOfAnswersToShow} = this.state;
-		const index = indexesOfAnswersToShow.indexOf(i);
 
-		if (index !== -1) {
-			indexesOfAnswersToShow.splice(index, 1);
-		} else {
-			indexesOfAnswersToShow.push(i);
-		}
+	handleQuestionClick = (questionIndex) => {
+		const {questionsWithAnswers} = this.state;
+		const questionWithAnswer = questionsWithAnswers[questionIndex];
+
+		questionWithAnswer.showAnswer = !questionWithAnswer.showAnswer;
 
 		this.setState({
-			indexesOfAnswersToShow: indexesOfAnswersToShow
+			questionsWithAnswers: questionsWithAnswers
 		})
 	};
 
 	handleToggleChange = () => {
+		const {questionsWithAnswers} = this.state;
+
+		for (let questionElement of questionsWithAnswers) {
+			questionElement.showAnswer = false;
+		}
+
 		this.setState({
 			showAllAnswers: !this.state.showAllAnswers,
-			indexesOfAnswersToShow: []
+			questionsWithAnswers: questionsWithAnswers
 		});
 	}
 }
 
 ShortQuestions.propTypes = {
-	questions: PropTypes.arrayOf(PropTypes.string).isRequired,
-	answers: PropTypes.arrayOf(PropTypes.string).isRequired,
+	questionsWithAnswers: PropTypes.arrayOf(PropTypes.shape({
+		question: PropTypes.string,
+		answer: PropTypes.string
+	})).isRequired,
 	className: PropTypes.string
 };
 
