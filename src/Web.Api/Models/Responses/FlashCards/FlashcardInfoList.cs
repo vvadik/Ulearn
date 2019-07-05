@@ -8,6 +8,11 @@ namespace Ulearn.Web.Api.Models.Common
 	public class FlashcardInfoList
 	{
 		[DataMember]
-		public List<FlashcardsInfo> FlashcardsInfos;
+		public List<FlashcardsInfo> FlashcardsInfos = new List<FlashcardsInfo>();
+
+		public void Add(FlashcardsInfo flashcardsInfo)
+		{
+			FlashcardsInfos.Add(flashcardsInfo);
+		}
 	}
 }
