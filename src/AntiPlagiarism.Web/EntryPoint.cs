@@ -25,6 +25,9 @@ namespace AntiPlagiarism.Web
                     configurationBuilder.AddCommandLine(args);
                     configurationBuilder.AddEnvironmentVariables();
                     configurationBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+					var environmentName = Environment.GetEnvironmentVariable("UlearnEnvironmentName");
+					if(environmentName != null && environmentName.ToLower().Contains("local"))
+						configurationBuilder.AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true);
                 })
                 .ConfigureHost((context, hostConfigurator) =>
                 {

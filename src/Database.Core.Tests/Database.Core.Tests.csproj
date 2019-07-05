@@ -18,8 +18,12 @@
     <ProjectReference Include="..\Database.Core\Database.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="appsettings.json">
+    <None Update="appsettings.local.json">
+      <DependentUpon>appsettings.json</DependentUpon>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </None>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

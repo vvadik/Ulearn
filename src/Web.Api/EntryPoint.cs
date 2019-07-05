@@ -21,11 +21,14 @@ namespace Ulearn.Web.Api
             return new VostokHostBuilder<WebApplication>()
                 .SetServiceInfo("ulearn", "Web.Api")
                 .ConfigureAppConfiguration(configurationBuilder =>
-                {
-                    configurationBuilder.AddCommandLine(args);
-                    configurationBuilder.AddEnvironmentVariables();
-                    configurationBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-                })
+				{
+					configurationBuilder.AddCommandLine(args);
+					configurationBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+					var environmentName = Environment.GetEnvironmentVariable("UlearnEnvironmentName");
+					if(environmentName != null && environmentName.ToLower().Contains("local"))
+						configurationBuilder.AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true);
+					configurationBuilder.AddEnvironmentVariables();
+				})
                 .ConfigureHost((context, hostConfigurator) =>
                 {
                     var loggerConfiguration = new LoggerConfiguration().MinimumLevel.Information();

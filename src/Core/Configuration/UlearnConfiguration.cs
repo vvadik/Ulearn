@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 
@@ -22,13 +23,14 @@ namespace Ulearn.Core.Configuration
 			var applicationPath = string.IsNullOrEmpty(Utils.WebApplicationPhysicalPath)
 				? Directory.GetCurrentDirectory()
 				: Utils.WebApplicationPhysicalPath;
-			var configuration = new ConfigurationBuilder()
+			var configurationBuilder = new ConfigurationBuilder()
 				.AddInMemoryCollection(initialData)
 				.SetBasePath(applicationPath)
-				.AddJsonFile("appsettings.json", optional: isAppsettingsJsonOptional, reloadOnChange: true)
-				.Build();
-
-			return configuration;
+				.AddJsonFile("appsettings.json", optional: isAppsettingsJsonOptional, reloadOnChange: true);
+			var environmentName = Environment.GetEnvironmentVariable("UlearnEnvironmentName");
+			if(environmentName != null && environmentName.ToLower().Contains("local"))
+				configurationBuilder.AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true);
+			return configurationBuilder.Build();
 		}
 		
 		public static IConfiguration GetConfiguration(bool isAppsettingsJsonOptional=false)

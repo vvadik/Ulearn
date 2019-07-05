@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -27,9 +28,13 @@ namespace Database
 
 		private static IConfigurationRoot GetConfiguration()
 		{
-			return new ConfigurationBuilder()
+			var configurationBuilder = new ConfigurationBuilder()
 				.AddJsonFile("appsettings.json", optional: false)
-				.Build();
+				.AddEnvironmentVariables();
+			var environmentName = Environment.GetEnvironmentVariable("UlearnEnvironmentName");
+			if(environmentName != null && environmentName.ToLower().Contains("local"))
+				configurationBuilder.AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true);
+			return configurationBuilder.Build();
 		}
 	}
 }
