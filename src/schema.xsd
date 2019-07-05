@@ -124,6 +124,8 @@
 	<xs:element name="slide" type="Slide"/>
 	<xs:element name="slide.quiz" type="QuizSlide"/>
 	<xs:element name="slide.exercise" type="ExerciseSlide"/>	
+	<xs:element name="slide.flashcards" type="FlashcardSlide"/>	
+	
 
     <xs:complexType name="Slide">
         <xs:group ref="SlideInternals" />
@@ -150,8 +152,34 @@
         </xs:sequence>
         <xs:attributeGroup ref="SlideAttributes" />
     </xs:complexType>
-    
-    <xs:group name="SlideInternals">
+	
+	
+	<xs:complexType name="FlashcardSlide">
+		<xs:sequence>
+			<xs:element name="question" type="FlashcardInternals" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Quiz scoring settings</xs:documentation>
+					<xs:documentation xml:lang="ru">Настройки оценивания теста: количество попыток, ручная проверка и так далее...</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="answer" type="FlashcardInternals" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Quiz scoring settings</xs:documentation>
+					<xs:documentation xml:lang="ru">Настройки оценивания теста: количество попыток, ручная проверка и так далее...</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		
+	</xs:complexType>
+
+	<xs:complexType name="FlashcardInternals">
+		<xs:sequence>
+			<xs:group ref="FlashCardBlocks" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+
+
+	<xs:group name="SlideInternals">
         <xs:sequence>
             <xs:element name="meta" type="SlideMeta" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
@@ -254,6 +282,16 @@
 			<xs:element name="includeBlocks" type="Include" />
 			<xs:element name="html" type="Html" />
 			<xs:element name="spoiler" type="Spoiler" />
+		</xs:choice>
+	</xs:group>
+
+	<xs:group name="FlashCardBlocks">
+		<xs:choice>
+			<xs:element name="tex" type="Tex" />
+			<xs:element name="markdown" type="MarkdownBlock" />
+			<xs:element name="code" type="Code" />
+			<xs:element name="includeMarkdown" type="Include" />
+			<xs:element name="html" type="Html" />
 		</xs:choice>
 	</xs:group>
 
@@ -694,5 +732,5 @@
                 <xs:attribute name="enableForEveryone" type="xs:boolean" use="optional" />
             </xs:extension>
         </xs:simpleContent>
-    </xs:complexType>    
+    </xs:complexType>
 </xs:schema>
