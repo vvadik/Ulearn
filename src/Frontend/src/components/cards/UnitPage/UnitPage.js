@@ -42,10 +42,10 @@ class UnitPage extends Component {
 UnitPage.propTypes = {
 	unitTitle: PropTypes.string.isRequired,
 	guides: PropTypes.arrayOf(PropTypes.string).isRequired,
-	questionsWithAnswers: PropTypes.shape({
+	questionsWithAnswers: PropTypes.arrayOf(PropTypes.shape({
 		question: PropTypes.string,
 		answer: PropTypes.string
-	}).isRequired,
+	})).isRequired,
 	total: PropTypes.number.isRequired,
 	byScore: PropTypes.shape({
 		unseen: PropTypes.number,
