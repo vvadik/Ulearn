@@ -8,6 +8,8 @@ using Database.Repos.Flashcards;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Serilog;
 using Ulearn.Web.Api.Models.Common;
 using Ulearn.Web.Api.Models.Responses.FlashCards;
@@ -15,11 +17,12 @@ using Score = Database.Models.Score;
 
 namespace Ulearn.Web.Api.Controllers
 {
+	[JsonConverter(typeof(StringEnumConverter), true)]
 	public enum FlashcardOrder
 	{
-		Original,
-		Smart
-	}
+		Smart,
+		Original
+     	}
 
 	[Route("/courses")]
 	public class FlashcardsController : BaseController
@@ -73,22 +76,22 @@ namespace Ulearn.Web.Api.Controllers
 			{
 				switch (flashcardVisit.Score)
 				{
-					case Score.NotViewed:
+					case Score.NotRated:
 						scoreResponse.NotViewed++;
 						break;
-					case Score.One:
+					case Score.Rate1:
 						scoreResponse.One++;
 						break;
-					case Score.Two:
+					case Score.Rate2:
 						scoreResponse.Two++;
 						break;
-					case Score.Three:
+					case Score.Rate3:
 						scoreResponse.Three++;
 						break;
-					case Score.Four:
+					case Score.Rate4:
 						scoreResponse.Four++;
 						break;
-					case Score.Five:
+					case Score.Rate5:
 						scoreResponse.Five++;
 						break;
 				}
@@ -101,7 +104,7 @@ namespace Ulearn.Web.Api.Controllers
 		/// Коллекция карточек
 		/// </summary>
 		[HttpGet("{courseId}/flashcards")]
-		public ActionResult<FlashCardsList> Flashcards([FromQuery] int count, [FromQuery] Guid unitId, [FromQuery] string status, [FromQuery] FlashcardOrder flashcardOrder)
+		public ActionResult<FlashCardsList> Flashcards([FromQuery] int count, [FromQuery] Guid unitId, [FromQuery] Score rate, [FromQuery] FlashcardOrder flashcardOrder = FlashcardOrder.Smart)
 		{
 			return new FlashCardsList();
 		}

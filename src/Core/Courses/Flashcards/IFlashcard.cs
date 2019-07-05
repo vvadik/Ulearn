@@ -8,7 +8,7 @@ namespace Ulearn.Core.Courses.Flashcards
 		string Id { get; }
 
 		//todo использовать другие блоки?
-		MarkdownBlock[] QuestionBlocks { get; }
-		MarkdownBlock[] AnswerBlocks { get; }
+		FlashcardBlock[] QuestionBlocks { get; }
+		FlashcardBlock[] AnswerBlocks { get; }
 	}
 }

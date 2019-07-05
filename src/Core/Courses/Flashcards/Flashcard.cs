@@ -6,7 +6,7 @@ namespace Ulearn.Core.Courses.Flashcards
 	{
 		public string Id { get; }
 		
-		public MarkdownBlock[] QuestionBlocks { get; }
-		public MarkdownBlock[] AnswerBlocks { get; }
+		public FlashcardBlock[] QuestionBlocks { get; }
+		public FlashcardBlock[] AnswerBlocks { get; }
 	}
 }

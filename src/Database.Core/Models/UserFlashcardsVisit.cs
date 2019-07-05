@@ -1,5 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Database.Models
 {
@@ -29,14 +31,14 @@ namespace Database.Models
 		[Required]
 		public DateTime Timestamp { get; set; }
 	}
-
+	[JsonConverter(typeof(StringEnumConverter), true)]
 	public enum Score
 	{
-		NotViewed,
-		One,
-		Two,
-		Three,
-		Four,
-		Five
+		NotRated,
+		Rate1,
+		Rate2,
+		Rate3,
+		Rate4,
+		Rate5
 	}
 }
