@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -98,7 +98,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 			var errrorInVariable = CheckIdentifierNameForSpellingErrors(variableDeclaratorSyntax.Identifier, variableTypeInfo.Type.Name);
 			if (errrorInVariable != null)
 				errors.Add(errrorInVariable);
-			return new List<SolutionStyleError>();
+			return errors;
 		}
 
 		private IEnumerable<SolutionStyleError> InspectPropertiesNames(PropertyDeclarationSyntax propertyDeclaration)
