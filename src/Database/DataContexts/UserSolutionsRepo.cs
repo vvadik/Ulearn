@@ -114,13 +114,6 @@ namespace Database.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		[Obsolete]
-		public async Task SetAntiPlagiarismSubmissionId(UserExerciseSubmission submission, int antiPlagiarismSubmissionId)
-		{
-			submission.AntiPlagiarismSubmissionId = antiPlagiarismSubmissionId;
-			await db.SaveChangesAsync();
-		}
-
 		///<returns>(likesCount, isLikedByThisUsed)</returns>
 		public async Task<Tuple<int, bool>> Like(int solutionId, string userId)
 		{

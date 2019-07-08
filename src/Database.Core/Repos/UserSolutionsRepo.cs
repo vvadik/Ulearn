@@ -105,17 +105,6 @@ namespace Database.Repos
 			await db.SaveChangesAsync();
 		}
 		
-		public async Task SetAntiPlagiarismSubmissionId(UserExerciseSubmission submission, int antiPlagiarismSubmissionId)
-		{
-			submission.AntiPlagiarismSubmissionId = antiPlagiarismSubmissionId;
-			await db.SaveChangesAsync();
-		}
-
-		public UserExerciseSubmission FindSubmissionByAntiPlagiarismSubmissionId(int antiPlagiarismSubmissionId)
-		{
-			return db.UserExerciseSubmissions.FirstOrDefault(s => s.AntiPlagiarismSubmissionId == antiPlagiarismSubmissionId);
-		}
-
 		///<returns>(likesCount, isLikedByThisUsed)</returns>
 		public async Task<Tuple<int, bool>> Like(int solutionId, string userId)
 		{

@@ -78,7 +78,7 @@ namespace Ulearn.Common.Api
 					logResult = result.GetShortLogString();
 					shortened = true;
 				}
-				logger.Information("Received response from {serviceName}{shortened}: {result}", settings.ServiceName, shortened ? " (сокращенный)" : "", logResult);
+				logger.Information($"Received response from \"{settings.ServiceName}\"{(shortened ? " (сокращенный)" : "")}: {logResult}");
 			}
 
 			return result;

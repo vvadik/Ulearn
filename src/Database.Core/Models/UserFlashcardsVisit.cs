@@ -26,7 +26,7 @@ namespace Database.Models
 		public string FlashcardId { get; set; }
 
 		[Required]
-		public Score Score { get; set; }
+		public Score Rate { get; set; }
 
 		[Required]
 		public DateTime Timestamp { get; set; }

@@ -21,7 +21,7 @@ namespace Ulearn.Core.Courses.Units
 
 		public List<Slide> Slides { get; set; }
 
-		public Dictionary<string, Flashcard> Flashcards { get; set; }
+		public Dictionary<string, Flashcards.Flashcards> Flashcards { get; set; }
 		
 		public DirectoryInfo Directory { get; set; }
 
@@ -42,7 +42,7 @@ namespace Ulearn.Core.Courses.Units
 			}
 		}
 		
-		public Flashcard GetFlashcardById(string id)
+		public Flashcards.Flashcards GetFlashcardById(string id)
 		{
 			Flashcards.TryGetValue(id, out var flashcard);
 			return flashcard;

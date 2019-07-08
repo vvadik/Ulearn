@@ -1,27 +1,27 @@
 using System.Runtime.Serialization;
 
-namespace Ulearn.Web.Api.Models.Responses.FlashCards
+namespace Ulearn.Web.Api.Models.Responses.Flashcards
 {
 	[DataContract]
 	public class ScoreResponse
 	{
 		[DataMember]
-		public int One;
+		public int Rate1;
 
 		[DataMember]
-		public int Two;
+		public int Rate2;
 
 		[DataMember]
-		public int Three;
+		public int Rate3;
 
 		[DataMember]
-		public int Four;
+		public int Rate4;
 
 		[DataMember]
-		public int Five;
+		public int Rate5;
 
 		[DataMember]
-		public int NotViewed;
+		public int NotRated;
 		
 	}
 }

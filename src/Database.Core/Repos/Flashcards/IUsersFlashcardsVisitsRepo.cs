@@ -9,8 +9,7 @@ namespace Database.Repos.Flashcards
 	public interface IUsersFlashcardsVisitsRepo
 	{
 		Task AddFlashcardVisitAsync(string userId, string courseId, Guid unitId, string flashcardId, Score score, DateTime timestamp);
-		Task<List<UserFlashcardsVisit>> GetUserFlashcardsVisitsAsync(string userId);
-		Task<List<UserFlashcardsVisit>> GetUserFlashcardsVisitsAsync(string userId, Guid unitId);
+		Task<List<UserFlashcardsVisit>> GetUserFlashcardsVisitsAsync(string userId,string courseId ,Guid unitId);
 		Task<List<UserFlashcardsVisit>> GetUserFlashcardsVisitsAsync(string userId, string courseId);
 	}
 }

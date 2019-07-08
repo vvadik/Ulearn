@@ -8,6 +8,7 @@ using Database.DataContexts;
 using log4net;
 using log4net.Config;
 using Newtonsoft.Json.Linq;
+using Ulearn.Core.Configuration;
 
 namespace GiftsGranter
 {
@@ -142,7 +143,7 @@ namespace GiftsGranter
 			var gifts = staffClient.GetUserGifts(staffUserId);
 			var giftImagePath = courseSettings.giftImagePath;
 
-			bool hasComplexityGift = gifts["entries"].Children().Any(gift => gift["giftImagePath"].Value<string>() == giftImagePath);
+			bool hasComplexityGift = gifts["gifts"].Children().Any(gift => gift["imagePath"].Value<string>() == giftImagePath);
 			if (!hasComplexityGift)
 			{
 				log.Info($"NoGiftYet\t{entry.Score}\t{entry.User.VisibleName}");

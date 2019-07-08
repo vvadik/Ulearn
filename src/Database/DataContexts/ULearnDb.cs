@@ -9,6 +9,7 @@ using Database.Models;
 using EntityFramework.Functions;
 using log4net;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Ulearn.Core.Configuration;
 
 namespace Database.DataContexts
 {
@@ -16,7 +17,7 @@ namespace Database.DataContexts
 	{
 		private readonly ILog log = LogManager.GetLogger(typeof(ULearnDb));
 		public ULearnDb()
-			: base("DefaultConnection", throwIfV1Schema: false)
+			: base(ApplicationConfiguration.Read<UlearnConfiguration>().Database, throwIfV1Schema: false)
 		{
 			System.Data.Entity.Database.SetInitializer(new MigrateDatabaseToLatestVersion<ULearnDb, Configuration>());
 			if(log.IsDebugEnabled)

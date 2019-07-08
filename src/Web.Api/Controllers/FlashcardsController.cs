@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Serilog;
 using Ulearn.Web.Api.Models.Common;
-using Ulearn.Web.Api.Models.Responses.FlashCards;
+using Ulearn.Web.Api.Models.Responses.Flashcards;
 using Score = Database.Models.Score;
 
 namespace Ulearn.Web.Api.Controllers
@@ -22,12 +22,12 @@ namespace Ulearn.Web.Api.Controllers
 	{
 		Smart,
 		Original
-     	}
+	}
 
 	[Route("/courses")]
 	public class FlashcardsController : BaseController
 	{
-		private IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo;
+		private readonly IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo;
 
 		public FlashcardsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo, IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo)
 			: base(logger, courseManager, db, usersRepo)
@@ -36,18 +36,19 @@ namespace Ulearn.Web.Api.Controllers
 		}
 
 		/// <summary>
-		/// Статистика по последним результатам
+		/// Статистика по оценкам карточек пользователя 
 		/// </summary>
 		[Authorize]
 		[HttpGet("{courseId}/flashcards/stat")]
-		public async Task<ActionResult<FlashCardsStatResponse>> FlashcardsStat([FromRoute] string courseId, [FromQuery] Guid? unitId = null)
+		public async Task<ActionResult<FlashcardsStatResponse>> FlashcardsStat([FromRoute] string courseId, [FromQuery] Guid? unitId = null)
 		{
+			courseId = courseId.ToLower();
 			var course = courseManager.FindCourse(courseId);
 			if (course == null)
 				return BadRequest($"course with id {courseId} does not exist");
 			if (unitId != null)
 			{
-				var unit = course.FindUnitById((Guid)unitId);
+				var unit = course.FindUnitById(unitId.Value);
 				if (unit == null)
 				{
 					return BadRequest($"unit with {unitId} does not exist");
@@ -57,56 +58,66 @@ namespace Ulearn.Web.Api.Controllers
 			List<UserFlashcardsVisit> userFlashcardsVisits;
 			if (unitId != null)
 			{
-				userFlashcardsVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, (Guid)unitId);
+				userFlashcardsVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, courseId, unitId.Value);
 			}
 			else
 			{
-				userFlashcardsVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId);
+				userFlashcardsVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, courseId);
 			}
 
-			var flashCardsStatResponse = FormFlashCardsStatResponse(userFlashcardsVisits);
+			var flashCardsStatResponse = ToFlashCardsStatResponse(userFlashcardsVisits);
 
 			return flashCardsStatResponse;
 		}
 
-		private FlashCardsStatResponse FormFlashCardsStatResponse(List<UserFlashcardsVisit> userFlashcardsVisits)
+		private FlashcardsStatResponse ToFlashCardsStatResponse(List<UserFlashcardsVisit> userFlashcardsVisits)
 		{
 			var scoreResponse = new ScoreResponse();
 			foreach (var flashcardVisit in userFlashcardsVisits)
 			{
-				switch (flashcardVisit.Score)
+				switch (flashcardVisit.Rate)
 				{
 					case Score.NotRated:
-						scoreResponse.NotViewed++;
+						scoreResponse.NotRated++;
 						break;
 					case Score.Rate1:
-						scoreResponse.One++;
+						scoreResponse.Rate1++;
 						break;
 					case Score.Rate2:
-						scoreResponse.Two++;
+						scoreResponse.Rate2++;
 						break;
 					case Score.Rate3:
-						scoreResponse.Three++;
+						scoreResponse.Rate3++;
 						break;
 					case Score.Rate4:
-						scoreResponse.Four++;
+						scoreResponse.Rate4++;
 						break;
 					case Score.Rate5:
-						scoreResponse.Five++;
+						scoreResponse.Rate5++;
 						break;
 				}
 			}
 
-			return new FlashCardsStatResponse() { ScoreResponse = scoreResponse, Total = userFlashcardsVisits.Count };
+			return new FlashcardsStatResponse() { ScoreResponse = scoreResponse, TotalFlashcardsCount = userFlashcardsVisits.Count };
 		}
 
 		/// <summary>
-		/// Коллекция карточек
+		/// Коллекция объектов карточек с оценками
 		/// </summary>
+		/// <param name="count">
+		/// Если не указать, то придут все карточки, соответствующие остальным фильтрам
+		/// </param>
+		/// <param name="unitId"></param>
+		/// <param name="rate"></param>
+		/// <param name="flashcardOrder">
+		/// original - карточки в исходном порядке
+		/// smart - карточки в порядке, определяемом логикой показывания карточек
+		/// </param>
+		/// <returns></returns>
 		[HttpGet("{courseId}/flashcards")]
-		public ActionResult<FlashCardsList> Flashcards([FromQuery] int count, [FromQuery] Guid unitId, [FromQuery] Score rate, [FromQuery] FlashcardOrder flashcardOrder = FlashcardOrder.Smart)
+		public ActionResult<FlashcardsResponse> Flashcards([FromQuery] int? count, [FromQuery] Guid? unitId, [FromQuery] Score? rate, [FromQuery] FlashcardOrder flashcardOrder = FlashcardOrder.Smart)
 		{
-			return new FlashCardsList();
+			return new FlashcardsResponse();
 		}
 
 		/// <summary>
@@ -114,18 +125,20 @@ namespace Ulearn.Web.Api.Controllers
 		/// </summary>
 		[Authorize]
 		[HttpGet("{courseId}/flashcards-info")]
-		public async Task<ActionResult<FlashcardInfoList>> FlashcardsInfo([FromRoute] string courseId)
+		public async Task<ActionResult<FlashcardInfoResponse>> FlashcardsInfo([FromRoute] string courseId)
 		{
+			courseId = courseId.ToLower();
+
 			var course = courseManager.FindCourse(courseId);
 			if (course is null)
 				return BadRequest($"course with id {courseId} does not exist");
 			var userFlashcardsVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, courseId);
-			return FormFlashcardInfoList(userFlashcardsVisits);
+			return ToFlashcardInfoResponse(userFlashcardsVisits);
 		}
 
-		private FlashcardInfoList FormFlashcardInfoList(List<UserFlashcardsVisit> userFlashcardsVisits)
+		private FlashcardInfoResponse ToFlashcardInfoResponse(List<UserFlashcardsVisit> userFlashcardsVisits)
 		{
-			var result = new FlashcardInfoList();
+			var result = new FlashcardInfoResponse();
 			foreach (var visit in userFlashcardsVisits)
 			{
 				var info = new FlashcardsInfo();
@@ -143,6 +156,7 @@ namespace Ulearn.Web.Api.Controllers
 		[ProducesResponseType((int)HttpStatusCode.NoContent)]
 		public async Task<IActionResult> Status([FromRoute] string courseId, [FromRoute] string flashcardId, [FromBody] Score score)
 		{
+			courseId = courseId.ToLower();
 			var course = courseManager.FindCourse(courseId);
 			if (course is null)
 				return BadRequest($"course with id {courseId} does not exist");

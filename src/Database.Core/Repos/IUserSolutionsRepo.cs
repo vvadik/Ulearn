@@ -18,8 +18,6 @@ namespace Database.Repos
 			AutomaticExerciseCheckingStatus status = AutomaticExerciseCheckingStatus.Waiting);
 
 		Task RemoveSubmission(UserExerciseSubmission submission);
-		Task SetAntiPlagiarismSubmissionId(UserExerciseSubmission submission, int antiPlagiarismSubmissionId);
-		UserExerciseSubmission FindSubmissionByAntiPlagiarismSubmissionId(int antiPlagiarismSubmissionId);
 
 		///<returns>(likesCount, isLikedByThisUsed)</returns>
 		Task<Tuple<int, bool>> Like(int solutionId, string userId);
