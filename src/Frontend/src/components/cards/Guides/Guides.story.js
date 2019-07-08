@@ -2,7 +2,7 @@ import React from 'react';
 import {storiesOf} from '@storybook/react';
 import Guides from './Guides';
 
-storiesOf('Cards/UnitPage/Guides', module)
+storiesOf('Cards/Guides', module)
 	.add('standard guides', () => (
 		<Guides guides={["Подумайте над вопросом, перед тем как смотреть ответ.",
 			"Оцените, на сколько хорошо вы знали ответ. Карточки, которые вы знаете плохо, будут показываться чаще",

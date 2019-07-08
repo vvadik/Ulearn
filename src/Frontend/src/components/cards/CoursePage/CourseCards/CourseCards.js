@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import PropTypes from "prop-types";
 import styles from './courseCards.less';
 import classNames from 'classnames';
@@ -6,23 +6,19 @@ import getCardsPluralForm from "../../../../utils/getCardsPluralForm";
 import LockClosed from '@skbkontur/react-icons/LockClosed';
 import Button from "@skbkontur/react-ui/Button";
 
-class CourseCards extends Component {
-	render() {
-		const {cardsByUnits} = this.props;
-
-		return (
-			<div className={styles.cardsContainer}>
-				{cardsByUnits.map(CourseCards.convertToUnitCard)}
-				<div className={styles.emptyUnitCard}>
-					<span className={styles.emptyUnitCardText}>
-						Новые вопросы для самопроверки открываются по мере прохождения курса
-					</span>
-				</div>
+function CourseCards({cardsByUnits}) {
+	return (
+		<div className={styles.cardsContainer}>
+			{cardsByUnits.map(convertToUnitCard)}
+			<div className={styles.emptyUnitCard}>
+				<span className={styles.emptyUnitCardText}>
+					Новые вопросы для самопроверки открываются по мере прохождения курса
+				</span>
 			</div>
-		)
-	}
+		</div>
+	);
 
-	static convertToUnitCard({unitTitle, unlocked, cardsCount, unitId}) {
+	function convertToUnitCard({unitTitle, unlocked, cardsCount, unitId}) {
 		const unitCardStyle = classNames(styles.unitCard, {[styles.unitCardLocked]: !unlocked});
 
 		return (
@@ -36,9 +32,10 @@ class CourseCards extends Component {
 					</div>
 				</div>
 				<div className={styles.unitCardButton}>
+					{!unlocked &&
 					<Button size={'medium'}>
-						{unlocked ? 'Начать' : 'Открыть модуль'}
-					</Button>
+						Открыть модуль
+					</Button>}
 				</div>
 				{!unlocked && <LockClosed className={styles.unitCardLockerIcon} size={22}/>}
 			</div>

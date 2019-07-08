@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React from 'react'
 import PropTypes from "prop-types";
 import styles from './unitProgressBar.less'
 import classNames from 'classnames';
@@ -18,30 +18,26 @@ const mapStatusToText = {
 	5: 'отлично'
 };
 
-class UnitProgressBar extends Component {
-	render() {
-		return (
-			<div>
-				<p className={styles.progressBarTitle}>
-					Результаты последнего прохождения
-				</p>
-				<div className={styles.progressBarContainer}>
-					{this.renderResults()}
-				</div>
+function UnitProgressBar({byScore, total}) {
+	return (
+		<div>
+			<p className={styles.progressBarTitle}>
+				Результаты последнего прохождения
+			</p>
+			<div className={styles.progressBarContainer}>
+				{renderResults()}
 			</div>
-		);
-	}
+		</div>
+	);
 
-	renderResults() {
-		const {byScore, total} = this.props;
-
+	function renderResults() {
 		return Object
 			.keys(byScore)
 			.filter(key => byScore[key] > 0)
-			.map(key => UnitProgressBar.convertToBarElement(key, byScore[key], total));
+			.map(key => convertToBarElement(key, byScore[key], total));
 	}
 
-	static convertToBarElement(status, count, cardsCount) {
+	function convertToBarElement(status, count, cardsCount) {
 		const elementWidth = `${count / cardsCount * 100}%`;
 
 		return (
@@ -53,7 +49,6 @@ class UnitProgressBar extends Component {
 			</span>
 		);
 	}
-
 }
 
 UnitProgressBar.propTypes = {
