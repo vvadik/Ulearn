@@ -3,6 +3,7 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Events;
+using Ulearn.Core.Configuration;
 using Vostok.Hosting;
 using Vostok.Logging;
 using Vostok.Logging.Serilog;
@@ -24,10 +25,7 @@ namespace Ulearn.VideoAnnotations.Web
                 {
                     configurationBuilder.AddCommandLine(args);
                     configurationBuilder.AddEnvironmentVariables();
-                    configurationBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-					var environmentName = Environment.GetEnvironmentVariable("UlearnEnvironmentName");
-					if(environmentName != null && environmentName.ToLower().Contains("local"))
-						configurationBuilder.AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true);
+					ApplicationConfiguration.BuildAppsettingsConfiguration(configurationBuilder);
                 })
                 .ConfigureHost((context, hostConfigurator) =>
                 {
