@@ -1,7 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ApprovalTests;
+using ApprovalTests.Namers;
+using ApprovalTests.Reporters;
 using ApprovalUtilities.Utilities;
 using FluentAssertions;
 using NUnit.Framework;
@@ -40,13 +43,19 @@ namespace uLearn.CSharp.SpellingValidation
 		
 		private readonly SpellingValidator validator = new SpellingValidator();
 
+		[Test]
 		[TestCaseSource(nameof(IncorrectFiles))]
+		[UseReporter(typeof(DiffReporter))]
 		public void FindErrors(FileInfo file)
 		{
 			var code = file.ContentAsUtf8();
 			var errors = validator.FindErrors(code);
+			var errorMessages = errors.Select(e => e.GetMessageWithPositions());
 
-			errors.Should().NotBeNullOrEmpty();
+			using (ApprovalResults.ForScenario(file.Name))
+			{
+				Approvals.Verify(string.Join(Environment.NewLine, errorMessages));
+			}
 		}
 
 		[TestCaseSource(nameof(CorrectFiles))]

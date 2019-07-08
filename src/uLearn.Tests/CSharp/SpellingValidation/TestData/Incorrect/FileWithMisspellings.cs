@@ -1,12 +1,14 @@
-﻿namespace uLearn.CSharp.SpellingValidation.TestData.Incorrect
+namespace uLearn.CSharp.SpellingValidation.TestData.Incorrect
 {
 	public class FileWithMisspellings
 	{
 		public int Coutn => 1;
+		public int Colunm => 1;
 		public int GetLenght()
 		{
-			var lentch = 1;
+			var lenght = 1;
 			var mispell = 0;
+			var colunm = 1;
 			return 1;
 		}
 
