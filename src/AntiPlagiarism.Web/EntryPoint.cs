@@ -3,6 +3,7 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Events;
+using Ulearn.Core.Configuration;
 using Vostok.Hosting;
 using Vostok.Logging;
 using Vostok.Logging.Serilog;
@@ -24,8 +25,8 @@ namespace AntiPlagiarism.Web
                 {
                     configurationBuilder.AddCommandLine(args);
                     configurationBuilder.AddEnvironmentVariables();
-                    configurationBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-                })
+					ApplicationConfiguration.BuildAppsettingsConfiguration(configurationBuilder);
+				})
                 .ConfigureHost((context, hostConfigurator) =>
                 {
                     var loggerConfiguration = new LoggerConfiguration().MinimumLevel.Debug();
