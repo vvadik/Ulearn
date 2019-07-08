@@ -1,0 +1,79 @@
+@import "./../../../../variables";
+
+.flashcardContainer {
+  font-family: @defaultFonts;
+}
+
+.headerText {
+  font-size: 16px;
+  line-height: 25px;
+}
+
+.footer {
+  color: @additionalColor;
+  font-size: 10px;
+  line-height: 30px;
+  text-transform: uppercase;
+}
+
+.footerLine {
+  width: 313px;
+  height: 0;
+
+  opacity: 0.2;
+  border: 2px solid #000000;
+}
+
+.resultsElement {
+  width: 70px;
+  height: 70px;
+
+  color: #fff;
+  border-radius: 50%;
+  box-sizing: border-box;
+  box-shadow: inset 0 0 0 2px #fff;
+
+  text-align: center;
+  font-size: 36px;
+  line-height: 25px;
+}
+
+.resultsElement:focus {
+  outline: none;
+}
+
+.resultsElement:hover span {
+  display: none;
+}
+
+.resultsElement:hover:before {
+  content: '✓';
+  cursor: pointer;
+  font-family: Kontur-Iconic, @defaultFonts;
+  font-weight: normal;
+}
+
+.resultsVeryBad {
+  background: @statusVeryBadColor;
+  border: 1px solid @statusVeryBadColor;
+}
+
+.resultsBad {
+  background: @statusBadColor;
+  border: 1px solid @statusBadColor;
+}
+
+.resultsAverage {
+  background: @statusAverageColor;
+  border: 1px solid @statusAverageColor;
+}
+
+.resultsGood {
+  background: @statusGoodColor;
+  border: 1px solid @statusGoodColor;
+}
+
+.resultsExcellent {
+  background: @statusExcellentColor;
+  border: 1px solid @statusExcellentColor;
+}
