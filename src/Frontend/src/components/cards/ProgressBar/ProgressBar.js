@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from "prop-types";
-import styles from './unitProgressBar.less'
+import styles from './progressBar.less'
 import classNames from 'classnames';
 
 const mapStatusToStyle = {
@@ -18,15 +18,10 @@ const mapStatusToText = {
 	5: 'отлично'
 };
 
-function UnitProgressBar({byScore, total}) {
+function ProgressBar({byScore, total, className}) {
 	return (
-		<div>
-			<p className={styles.progressBarTitle}>
-				Результаты последнего прохождения
-			</p>
-			<div className={styles.progressBarContainer}>
-				{renderResults()}
-			</div>
+		<div className={classNames(styles.progressBarContainer, className)}>
+			{renderResults()}
 		</div>
 	);
 
@@ -51,7 +46,7 @@ function UnitProgressBar({byScore, total}) {
 	}
 }
 
-UnitProgressBar.propTypes = {
+ProgressBar.propTypes = {
 	byScore: PropTypes.shape({
 		unseen: PropTypes.number,
 		1: PropTypes.number,
@@ -63,4 +58,4 @@ UnitProgressBar.propTypes = {
 	total: PropTypes.number.isRequired
 };
 
-export default UnitProgressBar;
+export default ProgressBar;

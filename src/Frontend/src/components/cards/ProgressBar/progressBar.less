@@ -1,9 +1,9 @@
-@import "./../../../../variables";
+@import "../../../variables";
 
 .progressBarContainer {
   display: flex;
-  height: 27px;
   align-items: stretch;
+  max-height: 32px;
 }
 
 .progressBarElement {
@@ -38,13 +38,4 @@
 
 .statusExcellent {
   background: @statusExcellentColor
-}
-
-.progressBarTitle {
-  color: @additionalColor;
-  font-family: @defaultFonts;
-  font-size: 10px;
-  line-height: 30px;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
 }

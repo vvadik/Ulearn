@@ -4,7 +4,7 @@ import UnitCard from "./UnitCard/UnitCard";
 import Guides from "../Guides/Guides";
 import styles from './unitPage.less'
 import Gapped from "@skbkontur/react-ui/Gapped";
-import UnitProgressBar from "./UnitProgressBar/UnitProgressBar";
+import ProgressBar from "../ProgressBar/ProgressBar";
 import ShortQuestions from "./ShortQuestions/ShortQuestions";
 
 function UnitPage({unitTitle, byScore, total, guides, questionsWithAnswers}) {
@@ -24,7 +24,10 @@ function UnitPage({unitTitle, byScore, total, guides, questionsWithAnswers}) {
 		if (haveProgress) {
 			return (
 				<div>
-					<UnitProgressBar className={styles.progressBar} byScore={byScore} total={total}/>
+					<p className={styles.progressBarTitle}>
+						Результаты последнего прохождения
+					</p>
+					<ProgressBar byScore={byScore} total={total}/>
 					<ShortQuestions className={styles.shortQuestions} questionsWithAnswers={questionsWithAnswers}/>
 				</div>
 			);

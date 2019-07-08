@@ -1,10 +1,10 @@
 import React from 'react';
 import {storiesOf} from '@storybook/react';
-import UnitProgressBar from "./UnitProgressBar";
+import ProgressBar from "./ProgressBar";
 
-storiesOf('Cards/UnitPage/UnitProgressBar', module)
+storiesOf('Cards/ProgressBar', module)
 	.add('scores: 1,1,2,5,10,18', () => (
-		<UnitProgressBar
+		<ProgressBar
 			byScore={{
 				unseen: 1,
 				1: 1,
@@ -16,7 +16,7 @@ storiesOf('Cards/UnitPage/UnitProgressBar', module)
 			total={37}/>
 	))
 	.add('scores: 10,0,0,0,0,0', () => (
-		<UnitProgressBar
+		<ProgressBar
 			byScore={{
 				unseen: 10,
 				1: 0,
@@ -28,7 +28,7 @@ storiesOf('Cards/UnitPage/UnitProgressBar', module)
 			total={10}/>
 	))
 	.add('scores: 2,2,2,2,2,2', () => (
-		<UnitProgressBar
+		<ProgressBar
 			byScore={{
 				unseen: 2,
 				1: 2,
