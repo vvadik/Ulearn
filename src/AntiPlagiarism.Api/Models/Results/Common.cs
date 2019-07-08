@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace AntiPlagiarism.Api.Models.Results
 {
@@ -27,7 +28,7 @@ namespace AntiPlagiarism.Api.Models.Results
 	public class SubmissionInfo
 	{
 		[DataMember(Name = "id")]
-		public int Id { get; set; }
+		public int AntiplagiarismId { get; set; }
 	
 		[DataMember(Name = "code")]
 		public string Code { get; set; }
@@ -40,6 +41,9 @@ namespace AntiPlagiarism.Api.Models.Results
 
 		[DataMember(Name = "additional_info")] // Должно включать данные класса AdditionalInfo
 		public string AdditionalInfo { get; set; }
+		
+		[IgnoreDataMember]
+		public int SubmissionId => JsonConvert.DeserializeObject<AdditionalInfo>(AdditionalInfo).SubmissionId;
 
 		public SubmissionInfo CloneWithoutCode()
 		{
