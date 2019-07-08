@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 
@@ -22,13 +23,20 @@ namespace Ulearn.Core.Configuration
 			var applicationPath = string.IsNullOrEmpty(Utils.WebApplicationPhysicalPath)
 				? Directory.GetCurrentDirectory()
 				: Utils.WebApplicationPhysicalPath;
-			var configuration = new ConfigurationBuilder()
+			var configurationBuilder = new ConfigurationBuilder()
 				.AddInMemoryCollection(initialData)
-				.SetBasePath(applicationPath)
-				.AddJsonFile("appsettings.json", optional: isAppsettingsJsonOptional, reloadOnChange: true)
-				.Build();
+				.SetBasePath(applicationPath);
+			configurationBuilder.AddEnvironmentVariables();
+			BuildAppsettingsConfiguration(configurationBuilder);
+			return configurationBuilder.Build();
+		}
 
-			return configuration;
+		public static void BuildAppsettingsConfiguration(IConfigurationBuilder configurationBuilder)
+		{
+			configurationBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+			var environmentName = Environment.GetEnvironmentVariable("UlearnEnvironmentName");
+			if(environmentName != null && environmentName.ToLower().Contains("local"))
+				configurationBuilder.AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true);
 		}
 		
 		public static IConfiguration GetConfiguration(bool isAppsettingsJsonOptional=false)
@@ -69,6 +77,8 @@ namespace Ulearn.Core.Configuration
 		public CertificateConfiguration Certificates { get; set; }
 		
 		public string GraphiteServiceName { get; set; }
+		
+		public string Database { get; set; }
 		
 		public GitConfiguration Git { get; set; }
 	}

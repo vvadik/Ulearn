@@ -58,19 +58,29 @@ namespace Ulearn.Common.Api
 			}
 
 			TResult result;
+			string jsonResult;
 			try
 			{
-				result = await response.Content.ReadAsJsonAsync<TResult>().ConfigureAwait(false);
+				(result, jsonResult) = await response.Content.ReadAsJsonAsync<TResult>().ConfigureAwait(false);
 			}
 			catch (Exception e)
 			{
 				logger.Error(e, "Can't parse response from {serviceName}: {message}", settings.ServiceName, e.Message);
 				throw new ApiClientException($"Can't parse response from {settings.ServiceName}: {e.Message}", e);
 			}
-			
+
 			if (settings.LogRequestsAndResponses)
-				logger.Information("Received response from {serviceName}: {result}", settings.ServiceName, result);
-			
+			{
+				var shortened = false;
+				var logResult = jsonResult;
+				if (jsonResult.Length > 8 * 1024)
+				{
+					logResult = result.GetShortLogString();
+					shortened = true;
+				}
+				logger.Information($"Received response from \"{settings.ServiceName}\"{(shortened ? " (сокращенный)" : "")}: {logResult}");
+			}
+
 			return result;
 		}
 

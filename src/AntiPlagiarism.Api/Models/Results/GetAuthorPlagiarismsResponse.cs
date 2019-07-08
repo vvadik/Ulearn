@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 using Ulearn.Common.Api.Models.Responses;
 
@@ -11,11 +12,31 @@ namespace AntiPlagiarism.Api.Models.Results
 		public List<ResearchedSubmission> ResearchedSubmissions { get; set; }
 		
 		[DataMember(Name = "suspicion_levels")]
-		public SuspicionLevels SuspicionLevels { get; set; }		
+		public SuspicionLevels SuspicionLevels { get; set; }
 
 		public GetAuthorPlagiarismsResponse()
 		{
 			ResearchedSubmissions = new List<ResearchedSubmission>();
+		}
+		
+		public override string GetShortLogString()
+		{
+			return new GetAuthorPlagiarismsResponse
+			{
+				ResearchedSubmissions = ResearchedSubmissions.Select(s =>
+				{
+					return new ResearchedSubmission
+					{
+						SubmissionInfo = s.SubmissionInfo.CloneWithoutCode(),
+						Plagiarisms = s.Plagiarisms.Select(p => new Plagiarism
+						{
+							Weight = p.Weight,
+							SubmissionInfo = p.SubmissionInfo.CloneWithoutCode(),
+						}).ToList()
+					};
+				}).ToList(),
+				SuspicionLevels = SuspicionLevels,
+			}.ToString();
 		}
 	}
 

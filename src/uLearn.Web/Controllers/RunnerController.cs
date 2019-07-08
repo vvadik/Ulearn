@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Configuration;
 using System.Web.Http;
@@ -157,7 +158,7 @@ namespace uLearn.Web.Controllers
 				), 3).ConfigureAwait(false);
 
 			var submissionsByIds = userSolutionsRepo
-				.FindSubmissionsByIds(results.Select(result => result.Id).ToList())
+				.FindSubmissionsByIds(results.Select(result => int.TryParse(result.Id, out var parsed) ? parsed : -1).Where(i => i != -1).Distinct().ToList())
 				.ToDictionary(s => s.Id.ToString());
 
 			foreach (var result in results)
@@ -301,12 +302,9 @@ namespace uLearn.Web.Controllers
 				AuthorId = Guid.Parse(submission.UserId),
 				AdditionalInfo = new AntiPlagiarismAdditionalInfo { SubmissionId = submission.Id }.ToJsonString(),
 			};
-			var antiPlagiarismResult = await antiPlagiarismClient.AddSubmissionAsync(parameters).ConfigureAwait(false);
-			
-			log.Info($"Получил ответ от сервиса антиплагиата: {antiPlagiarismResult}");
-			
-			var userSolutionsRepo = new UserSolutionsRepo(db, WebCourseManager.Instance);
-			await userSolutionsRepo.SetAntiPlagiarismSubmissionId(submission, antiPlagiarismResult.SubmissionId).ConfigureAwait(false);
+			antiPlagiarismClient.AddSubmissionAsync(parameters).ConfigureAwait(false).GetAwaiter().OnCompleted(() =>
+			{
+			});
 		}
 	}
 }

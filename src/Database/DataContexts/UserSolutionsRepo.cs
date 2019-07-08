@@ -114,13 +114,6 @@ namespace Database.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		[Obsolete]
-		public async Task SetAntiPlagiarismSubmissionId(UserExerciseSubmission submission, int antiPlagiarismSubmissionId)
-		{
-			submission.AntiPlagiarismSubmissionId = antiPlagiarismSubmissionId;
-			await db.SaveChangesAsync();
-		}
-
 		///<returns>(likesCount, isLikedByThisUsed)</returns>
 		public async Task<Tuple<int, bool>> Like(int solutionId, string userId)
 		{
@@ -309,14 +302,14 @@ namespace Database.DataContexts
 
 		public async Task<UserExerciseSubmission> GetUnhandledSubmission(string agentName, IEnumerable<Language> languages)
 		{
-			log.Info("GetUnhandledSubmission(): trying to acquire semaphore");
+			//log.Info("GetUnhandledSubmission(): trying to acquire semaphore");
 			var semaphoreLocked = await getSubmissionSemaphore.WaitAsync(TimeSpan.FromSeconds(2));
 			if (!semaphoreLocked)
 			{
 				log.Error("GetUnhandledSubmission(): Can't lock semaphore for 2 seconds");
 				return null;
 			}
-			log.Info("GetUnhandledSubmission(): semaphore acquired!");
+			//log.Info("GetUnhandledSubmission(): semaphore acquired!");
 
 			try
 			{
@@ -329,9 +322,9 @@ namespace Database.DataContexts
 			}
 			finally
 			{
-				log.Info("GetUnhandledSubmission(): trying to release semaphore");
+				//log.Info("GetUnhandledSubmission(): trying to release semaphore");
 				getSubmissionSemaphore.Release();
-				log.Info("GetUnhandledSubmission(): semaphore released");
+				//log.Info("GetUnhandledSubmission(): semaphore released");
 			}
 		}
 
@@ -382,9 +375,9 @@ namespace Database.DataContexts
 			return db.UserExerciseSubmissions.FirstOrDefault(s => s.Id.ToString() == id);
 		}
 
-		public List<UserExerciseSubmission> FindSubmissionsByIds(List<string> checkingsIds)
+		public List<UserExerciseSubmission> FindSubmissionsByIds(IEnumerable<int> checkingsIds)
 		{
-			return db.UserExerciseSubmissions.Where(c => checkingsIds.Contains(c.Id.ToString())).ToList();
+			return db.UserExerciseSubmissions.Where(c => checkingsIds.Contains(c.Id)).ToList();
 		}
 
 		private void UpdateIsRightAnswerForSubmission(AutomaticExerciseChecking checking)
