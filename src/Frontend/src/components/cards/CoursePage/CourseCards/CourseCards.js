@@ -11,9 +11,9 @@ function CourseCards({cardsByUnits}) {
 		<div className={styles.cardsContainer}>
 			{cardsByUnits.map(convertToUnitCard)}
 			<div className={styles.emptyUnitCard}>
-					<span className={styles.emptyUnitCardText}>
-						Новые вопросы для самопроверки открываются по мере прохождения курса
-					</span>
+				<span className={styles.emptyUnitCardText}>
+					Новые вопросы для самопроверки открываются по мере прохождения курса
+				</span>
 			</div>
 		</div>
 	);
@@ -32,9 +32,10 @@ function CourseCards({cardsByUnits}) {
 					</div>
 				</div>
 				<div className={styles.unitCardButton}>
+					{!unlocked &&
 					<Button size={'medium'}>
-						{unlocked ? 'Начать' : 'Открыть модуль'}
-					</Button>
+						Открыть модуль
+					</Button>}
 				</div>
 				{!unlocked && <LockClosed className={styles.unitCardLockerIcon} size={22}/>}
 			</div>

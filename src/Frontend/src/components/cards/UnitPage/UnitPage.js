@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React from 'react'
 import PropTypes from "prop-types";
 import UnitCard from "./UnitCard/UnitCard";
 import Guides from "../Guides/Guides";
@@ -7,25 +7,20 @@ import Gapped from "@skbkontur/react-ui/Gapped";
 import UnitProgressBar from "./UnitProgressBar/UnitProgressBar";
 import ShortQuestions from "./ShortQuestions/ShortQuestions";
 
-class UnitPage extends Component {
-	render() {
-		const {unitTitle, byScore, total} = this.props;
-		const haveProgress = byScore.unseen !== total;
+function UnitPage({unitTitle, byScore, total, guides, questionsWithAnswers}) {
+	const haveProgress = byScore.unseen !== total;
 
-		return (
-			<Gapped gap={8} vertical={true}>
-				<h3 className={styles.title}>
-					Вопросы для самопроверки
-				</h3>
-				<UnitCard haveProgress={haveProgress} total={total} unitTitle={unitTitle}/>
-				{this.renderFooter(haveProgress)}
-			</Gapped>
-		);
-	}
+	return (
+		<Gapped gap={8} vertical={true}>
+			<h3 className={styles.title}>
+				Вопросы для самопроверки
+			</h3>
+			<UnitCard haveProgress={haveProgress} total={total} unitTitle={unitTitle}/>
+			{renderFooter()}
+		</Gapped>
+	);
 
-	renderFooter(haveProgress) {
-		const {guides, byScore, total, questionsWithAnswers} = this.props;
-
+	function renderFooter() {
 		if (haveProgress) {
 			return (
 				<div>
