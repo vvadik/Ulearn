@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Ulearn.Web.Api.Models.Common
 {
 	[DataContract]
-	public class FlashCard
+	public class FlashcardResponse
 	{
 		[DataMember]
 		public Guid Id;
@@ -19,7 +19,7 @@ namespace Ulearn.Web.Api.Models.Common
 		public string UnitTitle;
 		
 		[DataMember]
-		public string Status;
+		public string Rate;
 		
 		[DataMember]
 		public Guid UnitId;

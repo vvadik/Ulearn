@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 namespace Ulearn.Web.Api.Models.Common
 {
 	[DataContract]
-	public class FlashcardInfoList
+	public class FlashcardInfoResponse
 	{
 		[DataMember]
 		public List<FlashcardsInfo> FlashcardsInfos = new List<FlashcardsInfo>();
