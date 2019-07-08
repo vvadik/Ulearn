@@ -2,10 +2,12 @@ import React from 'react';
 import { storiesOf } from '@storybook/react';
 import NavigationContent from './NavigationContent';
 import { itemTypes } from '../../constants';
+import StoryRouter from 'storybook-react-router';
 
 
 
 storiesOf('ModuleNavigation', module)
+	.addDecorator(StoryRouter())
 	.add('Навигация по модулю', () => (
 		<NavigationContent items={getModuleNav()}/>
 	));

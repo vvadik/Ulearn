@@ -41,11 +41,14 @@ class NavigationItem extends Component {
 	renderScore() {
 		const { score, maxScore, type } = this.props;
 
+		if (!maxScore) {
+			return;
+		}
 
 		if (type === itemTypes.exercise || type === itemTypes.quiz) {
 			return (
 				<div className={ styles.scoreWrapper }>
-					<span className={ styles.score }>{ score }/{ maxScore }</span>
+					<span className={ styles.score }>{ score || 0 }/{ maxScore }</span>
 				</div>
 			);
 		}

@@ -14,6 +14,7 @@ class Course extends Component {
 			onCourseNavigation: true,
 			openUnit: null,
 			highlightedUnit: Course.findActiveUnit(props.slideId, props.courseInfo),
+			unitWasOpen: false,
 		};
 	}
 
@@ -30,10 +31,24 @@ class Course extends Component {
 	}
 
 	static getDerivedStateFromProps(props, state) {
+		const res = {};
+
+		if (!state.unitWasOpen && props.progress && Object.keys(props.progress).length && props.courseInfo) {
+			const openUnit = props.units[Course.findActiveUnit(props.slideId, props.courseInfo)];
+			if (!openUnit) {
+				return null;
+			}
+			res.openUnit = openUnit;
+			res.unitWasOpen = true;
+			res.onCourseNavigation = false;
+		}
+
 		if (!state.highlightedUnit && props.courseInfo) {
-			return {
-				highlightedUnit: Course.findActiveUnit(props.slideId, props.courseInfo)
-			};
+			res.highlightedUnit = Course.findActiveUnit(props.slideId, props.courseInfo);
+		}
+
+		if (Object.keys(res).length) {
+			return res;
 		}
 
 		return null;
@@ -119,6 +134,8 @@ class Course extends Component {
 
 		return  null;
 	}
+
+
 
 	unitClickHandle = (id) => {
 		const { units } = this.props;
