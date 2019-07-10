@@ -1,6 +1,6 @@
 using System;
 
-namespace Ulearn.Core.Courses.Flashcards
+namespace Ulearn.Core.Courses.Slides.Flashcards
 {
 	public interface IFlashcards
 	{

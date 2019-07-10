@@ -123,6 +123,13 @@ namespace Ulearn.Core.Tests.Courses.Slides
 			Assert.IsTrue(firstBlock.Content.Contains("<br>"));
 			Assert.IsTrue(firstBlock.Content.Contains("Second text"));
 		}
+		
+		[Test]
+		public void LoadFlashcardSlide()
+		{
+			var slide = LoadSlideFromXmlFile("SimpleFlashcards.xml");
+			
+		}
 
 		[Test]
 		public void LoadSlideWithSpoilerBlock()
@@ -137,5 +144,7 @@ namespace Ulearn.Core.Tests.Courses.Slides
 			Assert.IsAssignableFrom<CodeBlock>(firstBlock.Blocks[0]);
 			Assert.IsAssignableFrom<YoutubeBlock>(firstBlock.Blocks[1]);
 		}
+		
+
     }
 }

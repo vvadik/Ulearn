@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using Ulearn.Common.Extensions;
-using Ulearn.Core.Courses.Flashcards;
 using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Flashcards;
 
 namespace Ulearn.Core.Courses.Units
 {
@@ -13,6 +13,7 @@ namespace Ulearn.Core.Courses.Units
 		{
 			Settings = settings;
 			Directory = directory;
+			Flashcards = new Dictionary<string, Flashcard>();
 		}
 
 		public UnitSettings Settings { get; set; }
@@ -21,7 +22,7 @@ namespace Ulearn.Core.Courses.Units
 
 		public List<Slide> Slides { get; set; }
 
-		public Dictionary<string, Flashcards.Flashcards> Flashcards { get; set; }
+		public Dictionary<string, Flashcard> Flashcards { get; set; }
 		
 		public DirectoryInfo Directory { get; set; }
 
@@ -42,7 +43,7 @@ namespace Ulearn.Core.Courses.Units
 			}
 		}
 		
-		public Flashcards.Flashcards GetFlashcardById(string id)
+		public Flashcard GetFlashcardById(string id)
 		{
 			Flashcards.TryGetValue(id, out var flashcard);
 			return flashcard;

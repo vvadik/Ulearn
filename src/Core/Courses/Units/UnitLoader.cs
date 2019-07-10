@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Flashcards;
 
 namespace Ulearn.Core.Courses.Units
 {
@@ -15,13 +16,13 @@ namespace Ulearn.Core.Courses.Units
 		{
 			this.slideLoader = slideLoader;
 		}
-		
+
 		public Unit Load(FileInfo unitFile, CourseLoadingContext context, int firstSlideIndex)
 		{
 			var unitDirectory = unitFile.Directory;
 			if (unitDirectory == null)
 				throw new CourseLoadingException($"Не могу загрузить модуль из {unitFile.GetRelativePath(context.CourseDirectory)}: не могу определить, из какой папки читать файлы со слайдами.");
-			
+
 			UnitSettings unitSettings;
 			if (unitFile.Exists)
 				unitSettings = UnitSettings.Load(unitFile, context.CourseSettings);
@@ -47,10 +48,20 @@ namespace Ulearn.Core.Courses.Units
 				.Distinct()
 				/* Don't load slide from unit file! Even accidentally */
 				.Where(f => f != unitFile);
-				
+
 			unit.Slides = slideFiles
 				.Select((f, internalIndex) => LoadSlide(f, unit, firstSlideIndex + internalIndex, context))
 				.ToList();
+			
+			var flashcardSlide = unit.Slides.FirstOrDefault(x => x.GetType() == typeof(FlashcardSlide));
+			if (flashcardSlide != default(Slide))
+			{
+				var fl = flashcardSlide as FlashcardSlide;
+				foreach (var flashcard in fl.FlashcardsList)
+				{
+					unit.Flashcards[flashcard.Id] = flashcard;
+				}
+			}
 
 			unit.LoadInstructorNote();
 
