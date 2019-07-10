@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Database;
@@ -40,37 +42,27 @@ namespace Ulearn.Web.Api.Controllers
 		/// </summary>
 		[Authorize]
 		[HttpGet("{courseId}/flashcards/stat")]
-		public async Task<ActionResult<FlashcardsStatResponse>> FlashcardsStat([FromRoute] string courseId, [FromQuery] Guid? unitId = null)
+		public async Task<ActionResult<FlashcardsStatResponse>> FlashcardsStat([FromRoute] string courseId, [FromQuery] [Required] Guid unitId)
 		{
 			courseId = courseId.ToLower();
 			var course = courseManager.FindCourse(courseId);
 			if (course == null)
 				return BadRequest($"course with id {courseId} does not exist");
-			if (unitId != null)
+
+			var unit = course.FindUnitById(unitId);
+			if (unit == null)
 			{
-				var unit = course.FindUnitById(unitId.Value);
-				if (unit == null)
-				{
-					return BadRequest($"unit with {unitId} does not exist");
-				}
+				return BadRequest($"unit with {unitId} does not exist");
 			}
 
-			List<UserFlashcardsVisit> userFlashcardsVisits;
-			if (unitId != null)
-			{
-				userFlashcardsVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, courseId, unitId.Value);
-			}
-			else
-			{
-				userFlashcardsVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, courseId);
-			}
+			var userFlashcardsVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, courseId, unitId);
 
-			var flashCardsStatResponse = ToFlashCardsStatResponse(userFlashcardsVisits);
+			var scoreResponse = ToScoreResponse(userFlashcardsVisits);
 
-			return flashCardsStatResponse;
+			return new FlashcardsStatResponse { ScoreResponse = scoreResponse, TotalFlashcardsCount = unit.Flashcards.Count };
 		}
 
-		private FlashcardsStatResponse ToFlashCardsStatResponse(List<UserFlashcardsVisit> userFlashcardsVisits)
+		private ScoreResponse ToScoreResponse(List<UserFlashcardsVisit> userFlashcardsVisits)
 		{
 			var scoreResponse = new ScoreResponse();
 			foreach (var flashcardVisit in userFlashcardsVisits)
@@ -98,7 +90,7 @@ namespace Ulearn.Web.Api.Controllers
 				}
 			}
 
-			return new FlashcardsStatResponse() { ScoreResponse = scoreResponse, TotalFlashcardsCount = userFlashcardsVisits.Count };
+			return scoreResponse;
 		}
 
 		/// <summary>
