@@ -1,6 +1,6 @@
 @import "./../../../../variables";
 
-.flashcardContainer {
+.resultsContainer {
   font-family: @defaultFonts;
 }
 
@@ -17,7 +17,7 @@
 }
 
 .footerLine {
-  width: 313px;
+  width: 310px;
   height: 0;
 
   opacity: 0.2;
@@ -36,21 +36,48 @@
   text-align: center;
   font-size: 36px;
   line-height: 25px;
+
+  margin-right: 15px;
+}
+
+.resultsElement:hover,
+.resultsElement:focus {
+  cursor: pointer;
 }
 
 .resultsElement:focus {
-  outline: none;
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, .5);
 }
 
-.resultsElement:hover span {
+.resultsElement:hover span,
+.resultsElement:focus span {
   display: none;
 }
 
-.resultsElement:hover:before {
-  content: '✓';
-  cursor: pointer;
-  font-family: Kontur-Iconic, @defaultFonts;
-  font-weight: normal;
+.resultsVeryBad:hover:before,
+.resultsVeryBad:focus:before {
+  content: ':\'(';
+}
+
+.resultsBad:hover:before,
+.resultsBad:focus:before {
+  content: ':(';
+}
+
+.resultsAverage:hover:before,
+.resultsAverage:focus:before {
+  content: ':|';
+}
+
+.resultsGood:hover:before,
+.resultsGood:focus:before {
+  content: ':)';
+}
+
+.resultsExcellent:hover:before,
+.resultsExcellent:focus:before {
+  content: ';D';
 }
 
 .resultsVeryBad {
