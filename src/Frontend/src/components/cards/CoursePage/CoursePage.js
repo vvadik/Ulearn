@@ -13,9 +13,9 @@ function CoursePage({flashcardsInfos, guides}) {
 				<h2 className={styles.title}>
 					Флеш-карты для самопроверки
 				</h2>
-				<span className={styles.description}>
+				<p className={styles.description}>
 					Помогут лучше запомнить материал курса и подготовиться к экзаменам
-				</span>
+				</p>
 				<div className={styles.launchAllButtonContainer}>
 					<Button use="primary" size='large' onClick={() => handleLaunchAllClick()}>
 						Проверить себя

@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import PropTypes from "prop-types";
 import styles from './results.less';
 import classNames from 'classnames';

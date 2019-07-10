@@ -8,26 +8,26 @@ import getCardsPluralForm from "../../../../utils/getCardsPluralForm";
 class UnitCard extends Component {
 	render() {
 		const {unitTitle = "", haveProgress = false, totalFlashcardsCount = 0} = this.props;
-		const unitStyle = classNames(styles.unitCard, {
+		const unitCardStyle = classNames(styles.unitCard, {
 			[styles.successColor]: haveProgress
 		});
-		const stylesForCardNext = classNames(unitStyle, styles.unitCardNext);
-		const stylesForCardLast = classNames(unitStyle, styles.unitCardLast);
+		const stylesForCardNext = classNames(unitCardStyle, styles.unitCardNext);
+		const stylesForCardLast = classNames(unitCardStyle, styles.unitCardLast);
 
 		return (
 			<div className={styles.unitCardContainer}>
-				<div className={unitStyle}>
-					<div className={styles.unitCardTextContent}>
-						<h3 className={styles.unitCardTitle}>
-							{unitTitle}
-						</h3>
-						<span className={styles.unitCardBody}>
-							{getCardsPluralForm(totalFlashcardsCount)}
-						</span>
+				<div className={unitCardStyle}>
+					<h3 className={styles.unitCardTitle}>
+						{unitTitle}
+					</h3>
+					<p className={styles.unitCardBody}>
+						{getCardsPluralForm(totalFlashcardsCount)}
+					</p>
+					<div className={styles.startButtonContainer}>
+						<Button size={'large'} onClick={() => this.handleStartButton()}>
+							Начать проверку
+						</Button>
 					</div>
-					<Button size={'large'} onClick={() => this.handleStartButton()}>
-						Начать проверку
-					</Button>
 				</div>
 				{totalFlashcardsCount > 1 &&
 				<div

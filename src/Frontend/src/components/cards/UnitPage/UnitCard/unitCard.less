@@ -9,6 +9,9 @@
   width: @cardsContainerWidth;
   height: @cardsContainerHeight;
 
+  font-family: @defaultFonts;
+  color: @whiteSmoke;
+
   position: relative;
 }
 
@@ -19,10 +22,6 @@
   position: absolute;
   top: 20px;
 
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: baseline;
   border-radius: 10px;
   padding: 22px;
   background: @blue;
@@ -62,22 +61,26 @@
   background: darken(@successColor, 15%);
 }
 
-.unitCardTextContent {
-  font-family: @defaultFonts;
-  color: @whiteSmoke;
-  align-self: normal;
-}
-
 .unitCardTitle {
-  font-size: 40px;
-  line-height: 1.2;
-  font-weight: normal;
+  max-height: @cardHeight - 140px;
+
   margin: 0;
+
+  font-size: 40px;
+  line-height: 42px;
+  font-weight: normal;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .unitCardBody {
+  margin-bottom: 0;
   font-size: 18px;
   line-height: 1.2;
+}
+
+.startButtonContainer {
+  position: absolute;
+  bottom: 30px;
+  left: 28px;
 }

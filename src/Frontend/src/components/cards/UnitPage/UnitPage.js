@@ -7,7 +7,7 @@ import Gapped from "@skbkontur/react-ui/Gapped";
 import ProgressBar from "../ProgressBar/ProgressBar";
 import ShortQuestions from "./ShortQuestions/ShortQuestions";
 
-function UnitPage({unitTitle,statistics,totalFlashcardsCount, guides, questionsWithAnswers}) {
+function UnitPage({unitTitle, statistics, totalFlashcardsCount, guides, questionsWithAnswers}) {
 	const haveProgress = statistics.notRated !== totalFlashcardsCount;
 
 	return (

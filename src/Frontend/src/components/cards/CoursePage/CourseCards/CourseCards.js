@@ -11,9 +11,7 @@ function CourseCards({flashcardsInfos}) {
 		<div className={styles.cardsContainer}>
 			{flashcardsInfos.map(convertToUnitCard)}
 			<div className={styles.emptyUnitCard}>
-				<span className={styles.emptyUnitCardText}>
-					Новые вопросы для самопроверки открываются по мере прохождения курса
-				</span>
+				Новые вопросы для самопроверки открываются по мере прохождения курса
 			</div>
 		</div>
 	);
@@ -27,9 +25,9 @@ function CourseCards({flashcardsInfos}) {
 					<h3 className={styles.unitCardTitle}>
 						{unitTitle}
 					</h3>
-					<div className={styles.unitCardBody}>
+					<p className={styles.unitCardBody}>
 						{getCardsPluralForm(cardsCount)}
-					</div>
+					</p>
 				</div>
 				<div className={styles.unitCardButton}>
 					{!unlocked &&

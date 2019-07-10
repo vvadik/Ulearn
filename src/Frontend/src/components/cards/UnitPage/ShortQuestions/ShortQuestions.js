@@ -2,36 +2,25 @@ import React, {Component} from 'react';
 import PropTypes from "prop-types";
 import styles from './shortQuestions.less';
 import Toggle from "@skbkontur/react-ui/Toggle";
-import classNames from 'classnames';
 
 class ShortQuestions extends Component {
 	constructor(props) {
 		super(props);
 
-		const questionsWithAnswers = this.props.questionsWithAnswers
-			.map((questionWithAnswer) => {
-				return {
-					...questionWithAnswer,
-					showAnswer: false
-				}
-			});
-
 		this.state = {
 			showAllAnswers: false,
-			questionsWithAnswers: questionsWithAnswers
+			questionsWithAnswers: this.props.questionsWithAnswers
 		};
 	}
 
 	render() {
-		const shortQuestionsStyle = classNames(this.props.className, styles.questionsContainer);
+		const {showAllAnswers} = this.state;
 
 		return (
-			<div className={shortQuestionsStyle}>
-				<ol className={styles.questionsTextContainer}>
-					{this.renderQuestions()}
-				</ol>
+			<div className={styles.questionsContainer}>
+				{this.renderQuestions()}
 				<div className={styles.toggleContainer}>
-					<Toggle onChange={this.handleToggleChange} checked={this.state.showAllAnswers}/>
+					<Toggle onChange={this.handleToggleChange} checked={showAllAnswers}/>
 					<span className={styles.toggleText}>
 						Показать ответы
 					</span>
@@ -44,22 +33,23 @@ class ShortQuestions extends Component {
 		const {showAllAnswers, questionsWithAnswers} = this.state;
 
 		return (
-			questionsWithAnswers.map(({question, answer, showAnswer}, index) =>
-				<li
-					className={styles.questionText}
-					key={index}
-					onClick={() => this.handleQuestionClick(index)}>
-					<div>
-						{question}
-					</div>
-					{
-						(showAllAnswers || showAnswer) &&
-						<div className={styles.answerText}>
-							{answer}
-						</div>
-					}
-				</li>)
-		);
+			<ol className={styles.questionsTextContainer}>
+				{
+					questionsWithAnswers.map(({question, answer, showAnswer}, index) =>
+						<li
+							className={styles.questionText}
+							key={index}
+							onClick={() => this.handleQuestionClick(index)}>
+							{question}
+							{
+								(showAllAnswers || showAnswer) &&
+								<p className={styles.answerText}>
+									{answer}
+								</p>
+							}
+						</li>)
+				}
+			</ol>);
 	}
 
 
@@ -75,11 +65,7 @@ class ShortQuestions extends Component {
 	};
 
 	handleToggleChange = () => {
-		const {questionsWithAnswers} = this.state;
-
-		for (let questionElement of questionsWithAnswers) {
-			questionElement.showAnswer = false;
-		}
+		const {questionsWithAnswers} = this.props;
 
 		this.setState({
 			showAllAnswers: !this.state.showAllAnswers,

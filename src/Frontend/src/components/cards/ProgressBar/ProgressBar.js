@@ -18,11 +18,11 @@ const mapStatusToText = {
 	rate5: 'отлично'
 };
 
-function ProgressBar({statistics, totalFlashcardsCount, className}) {
+function ProgressBar({statistics, totalFlashcardsCount}) {
 	return (
-		<div className={classNames(styles.progressBarContainer, className)}>
+		<ol className={styles.progressBarContainer}>
 			{renderResults()}
-		</div>
+		</ol>
 	);
 
 	function renderResults() {

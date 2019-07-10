@@ -5,7 +5,7 @@ import cardsByUnitExample from "./cardsByUnitExample";
 
 storiesOf('Cards/CoursePage/CourseCards', module)
 	.add('def', () => (
-		<CourseCards cardsByUnits={cardsByUnitExample}/>
+		<CourseCards flashcardsInfos={cardsByUnitExample}/>
 	));
 
 
