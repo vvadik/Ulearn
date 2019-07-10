@@ -7,15 +7,15 @@ import Gapped from "@skbkontur/react-ui/Gapped";
 import ProgressBar from "../ProgressBar/ProgressBar";
 import ShortQuestions from "./ShortQuestions/ShortQuestions";
 
-function UnitPage({unitTitle, byScore, total, guides, questionsWithAnswers}) {
-	const haveProgress = byScore.unseen !== total;
+function UnitPage({unitTitle,statistics,totalFlashcardsCount, guides, questionsWithAnswers}) {
+	const haveProgress = statistics.notRated !== totalFlashcardsCount;
 
 	return (
 		<Gapped gap={8} vertical={true}>
 			<h3 className={styles.title}>
 				Вопросы для самопроверки
 			</h3>
-			<UnitCard haveProgress={haveProgress} total={total} unitTitle={unitTitle}/>
+			<UnitCard haveProgress={haveProgress} totalFlashcardsCount={totalFlashcardsCount} unitTitle={unitTitle}/>
 			{renderFooter()}
 		</Gapped>
 	);
@@ -27,7 +27,7 @@ function UnitPage({unitTitle, byScore, total, guides, questionsWithAnswers}) {
 					<p className={styles.progressBarTitle}>
 						Результаты последнего прохождения
 					</p>
-					<ProgressBar byScore={byScore} total={total}/>
+					<ProgressBar statistics={statistics} totalFlashcardsCount={totalFlashcardsCount}/>
 					<ShortQuestions className={styles.shortQuestions} questionsWithAnswers={questionsWithAnswers}/>
 				</div>
 			);
@@ -44,14 +44,14 @@ UnitPage.propTypes = {
 		question: PropTypes.string,
 		answer: PropTypes.string
 	})).isRequired,
-	total: PropTypes.number.isRequired,
-	byScore: PropTypes.shape({
-		unseen: PropTypes.number,
-		1: PropTypes.number,
-		2: PropTypes.number,
-		3: PropTypes.number,
-		4: PropTypes.number,
-		5: PropTypes.number
+	totalFlashcardsCount: PropTypes.number.isRequired,
+	statistics: PropTypes.shape({
+		notRated: PropTypes.number,
+		rate1: PropTypes.number,
+		rate2: PropTypes.number,
+		rate3: PropTypes.number,
+		rate4: PropTypes.number,
+		rate5: PropTypes.number
 	}).isRequired
 };
 

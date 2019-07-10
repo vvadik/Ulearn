@@ -7,7 +7,7 @@ import getCardsPluralForm from "../../../../utils/getCardsPluralForm";
 
 class UnitCard extends Component {
 	render() {
-		const {unitTitle = "", haveProgress = false, total = 0} = this.props;
+		const {unitTitle = "", haveProgress = false, totalFlashcardsCount = 0} = this.props;
 		const unitStyle = classNames(styles.unitCard, {
 			[styles.successColor]: haveProgress
 		});
@@ -22,27 +22,31 @@ class UnitCard extends Component {
 							{unitTitle}
 						</h3>
 						<span className={styles.unitCardBody}>
-							{getCardsPluralForm(total)}
+							{getCardsPluralForm(totalFlashcardsCount)}
 						</span>
 					</div>
-					<Button size={'large'}>
+					<Button size={'large'} onClick={() => this.handleStartButton()}>
 						Начать проверку
 					</Button>
 				</div>
-				{total > 1 &&
+				{totalFlashcardsCount > 1 &&
 				<div
 					className={stylesForCardNext}/>}
-				{total > 2 &&
+				{totalFlashcardsCount > 2 &&
 				<div
 					className={stylesForCardLast}/>}
 			</div>
 		);
 	}
+
+	handleStartButton() {
+		console.log(`Starting`);
+	}
 }
 
 UnitCard.propTypes = {
 	unitTitle: PropTypes.string.isRequired,
-	total: PropTypes.number.isRequired,
+	totalFlashcardsCount: PropTypes.number.isRequired,
 	haveProgress: PropTypes.bool
 };
 

@@ -3,22 +3,22 @@ import PropTypes from "prop-types";
 import styles from './progressBar.less'
 import classNames from 'classnames';
 
-const mapStatusToStyle = {
-	unseen: styles.statusUnseen,
-	1: styles.statusVeryBad,
-	2: styles.statusBad,
-	3: styles.statusAverage,
-	4: styles.statusGood,
-	5: styles.statusExcellent,
+const mapRateToStyle = {
+	notRated: styles.notRated,
+	rate1: styles.rate1,
+	rate2: styles.rate2,
+	rate3: styles.rate3,
+	rate4: styles.rate4,
+	rate5: styles.rate5
 };
 
 const mapStatusToText = {
-	unseen: 'непросмотрено',
-	1: 'плохо',
-	5: 'отлично'
+	notRated: 'непросмотрено',
+	rate1: 'плохо',
+	rate5: 'отлично'
 };
 
-function ProgressBar({byScore, total, className}) {
+function ProgressBar({statistics, totalFlashcardsCount, className}) {
 	return (
 		<div className={classNames(styles.progressBarContainer, className)}>
 			{renderResults()}
@@ -27,9 +27,9 @@ function ProgressBar({byScore, total, className}) {
 
 	function renderResults() {
 		return Object
-			.keys(byScore)
-			.filter(key => byScore[key] > 0)
-			.map(key => convertToBarElement(key, byScore[key], total));
+			.keys(statistics)
+			.filter(key => statistics[key] > 0)
+			.map(key => convertToBarElement(key, statistics[key], totalFlashcardsCount));
 	}
 
 	function convertToBarElement(status, count, cardsCount) {
@@ -38,7 +38,7 @@ function ProgressBar({byScore, total, className}) {
 		return (
 			<span
 				key={status}
-				className={classNames(styles.progressBarElement, mapStatusToStyle[status])}
+				className={classNames(styles.progressBarElement, mapRateToStyle[status])}
 				style={{width: elementWidth}}>
 				{count} {mapStatusToText[status]}
 			</span>
@@ -47,15 +47,15 @@ function ProgressBar({byScore, total, className}) {
 }
 
 ProgressBar.propTypes = {
-	byScore: PropTypes.shape({
-		unseen: PropTypes.number,
-		1: PropTypes.number,
-		2: PropTypes.number,
-		3: PropTypes.number,
-		4: PropTypes.number,
-		5: PropTypes.number
+	statistics: PropTypes.shape({
+		notRated: PropTypes.number,
+		rate1: PropTypes.number,
+		rate2: PropTypes.number,
+		rate3: PropTypes.number,
+		rate4: PropTypes.number,
+		rate5: PropTypes.number
 	}).isRequired,
-	total: PropTypes.number.isRequired
+	totalFlashcardsCount: PropTypes.number.isRequired
 };
 
 export default ProgressBar;

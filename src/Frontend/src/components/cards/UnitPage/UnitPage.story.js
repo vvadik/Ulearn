@@ -8,8 +8,8 @@ storiesOf('Cards/UnitPage', module)
 		<UnitPage
 			guides={guides}
 			unitTitle={threeCardsWithSuccess.unitTitle}
-			total={threeCardsWithSuccess.total}
-			byScore={threeCardsWithSuccess.byScore}
+			totalFlashcardsCount={threeCardsWithSuccess.totalFlashcardsCount}
+			statistics={threeCardsWithSuccess.statistics}
 			questionsWithAnswers={shortQuestionsExample}
 		/>
 	))
@@ -17,8 +17,8 @@ storiesOf('Cards/UnitPage', module)
 		<UnitPage
 			guides={guides}
 			unitTitle={threeCards.unitTitle}
-			total={threeCards.total}
-			byScore={threeCards.byScore}
+			totalFlashcardsCount={threeCards.totalFlashcardsCount}
+			statistics={threeCards.statistics}
 			questionsWithAnswers={shortQuestionsExample}
 		/>
 	))
@@ -26,8 +26,8 @@ storiesOf('Cards/UnitPage', module)
 		<UnitPage
 			guides={guides}
 			unitTitle={twoCardsWithSuccess.unitTitle}
-			total={twoCardsWithSuccess.total}
-			byScore={twoCardsWithSuccess.byScore}
+			totalFlashcardsCount={twoCardsWithSuccess.totalFlashcardsCount}
+			statistics={twoCardsWithSuccess.statistics}
 			questionsWithAnswers={shortQuestionsExample}
 		/>
 	))
@@ -35,8 +35,8 @@ storiesOf('Cards/UnitPage', module)
 		<UnitPage
 			guides={guides}
 			unitTitle={twoCards.unitTitle}
-			total={twoCards.total}
-			byScore={twoCards.byScore}
+			totalFlashcardsCount={twoCards.totalFlashcardsCount}
+			statistics={twoCards.statistics}
 			questionsWithAnswers={shortQuestionsExample}
 		/>
 	))
@@ -44,8 +44,8 @@ storiesOf('Cards/UnitPage', module)
 		<UnitPage
 			guides={guides}
 			unitTitle={oneCardWithSuccess.unitTitle}
-			total={oneCardWithSuccess.total}
-			byScore={oneCardWithSuccess.byScore}
+			totalFlashcardsCount={oneCardWithSuccess.totalFlashcardsCount}
+			statistics={oneCardWithSuccess.statistics}
 			questionsWithAnswers={shortQuestionsExample}
 		/>
 	))
@@ -53,86 +53,63 @@ storiesOf('Cards/UnitPage', module)
 		<UnitPage
 			guides={guides}
 			unitTitle={oneCard.unitTitle}
-			total={oneCard.total}
-			byScore={oneCard.byScore}
+			totalFlashcardsCount={oneCard.totalFlashcardsCount}
+			statistics={oneCard.statistics}
 			questionsWithAnswers={shortQuestionsExample}
 		/>
 	));
 
-const threeCardsWithSuccess = {
-	unitTitle: "Основы программирования 1, знакомство с С#",
-	total: 3,
-	byScore: {
-		unseen: 0,
-		1: 0,
-		2: 0,
-		3: 1,
-		4: 1,
-		5: 1
+function createCard(unitTitle, {notRated = 0, rate1 = 0, rate2 = 0, rate3 = 0, rate4 = 0, rate5 = 0}) {
+	return {
+		unitTitle: unitTitle,
+		totalFlashcardsCount: notRated + rate1 + rate2 + rate3 + rate4 + rate5,
+		statistics: {
+			notRated: notRated,
+			rate1: rate1,
+			rate2: rate2,
+			rate3: rate3,
+			rate4: rate4,
+			rate5: rate5
+		}
 	}
-};
+}
 
-const threeCards = {
-	...threeCardsWithSuccess,
-	byScore: {
-		unseen: 3,
-		1: 0,
-		2: 0,
-		3: 0,
-		4: 0,
-		5: 0
+const threeCardsWithSuccess = createCard(
+	"Основы программирования 1, знакомство с С#", {
+		rate3: 1,
+		rate4: 1,
+		rate5: 1
 	}
-};
+);
 
-const twoCardsWithSuccess = {
-	unitTitle: "Основы программирования 2",
-	total: 2,
-	byScore: {
-		unseen: 0,
-		1: 0,
-		2: 1,
-		3: 1,
-		4: 0,
-		5: 0
-	}
-};
+const threeCards = createCard(
+	"Основы программирования 1, знакомство с С#", {notRated: 3}
+);
 
-const twoCards = {
-	...twoCardsWithSuccess,
-	byScore: {
-		unseen: 2,
-		1: 0,
-		2: 0,
-		3: 0,
-		4: 0,
-		5: 0
+const twoCardsWithSuccess = createCard(
+	"Основы программирования 2", {
+		rate2: 1,
+		rate3: 1
 	}
-};
+);
 
-const oneCardWithSuccess = {
-	unitTitle: "Основы программирования 3, знакомство с JS, принципы agile",
-	total: 1,
-	byScore: {
-		unseen: 0,
-		1: 1,
-		2: 0,
-		3: 0,
-		4: 0,
-		5: 0
+const twoCards = createCard(
+	"Основы программирования 2", {
+		notRated: 2
 	}
-};
+);
 
-const oneCard = {
-	...oneCardWithSuccess,
-	byScore: {
-		unseen: 1,
-		1: 0,
-		2: 0,
-		3: 0,
-		4: 0,
-		5: 0
+const oneCardWithSuccess = createCard(
+	"Основы программирования 3, знакомство с JS, принципы agile", {
+		rate1: 1
 	}
-};
+);
+
+const oneCard = createCard(
+	"Основы программирования 3, знакомство с JS, принципы agile", {
+		notRated: 1
+	}
+);
 
 const guides = [
 	"Подумайте над вопросом, перед тем как смотреть ответ.",

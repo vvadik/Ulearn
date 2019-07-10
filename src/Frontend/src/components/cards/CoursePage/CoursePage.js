@@ -6,7 +6,7 @@ import styles from './coursePage.less'
 import Gapped from "@skbkontur/react-ui/Gapped";
 import Button from "@skbkontur/react-ui/Button";
 
-function CoursePage({cardsByUnits, guides}) {
+function CoursePage({flashcardsInfos, guides}) {
 	return (
 		<Gapped gap={15} vertical={true}>
 			<div className={styles.textContainer}>
@@ -17,19 +17,23 @@ function CoursePage({cardsByUnits, guides}) {
 					Помогут лучше запомнить материал курса и подготовиться к экзаменам
 				</span>
 				<div className={styles.launchAllButtonContainer}>
-					<Button use="primary" size='large'>
+					<Button use="primary" size='large' onClick={() => handleLaunchAllClick()}>
 						Проверить себя
 					</Button>
 				</div>
 			</div>
-			<CourseCards cardsByUnits={cardsByUnits}/>
+			<CourseCards flashcardsInfos={flashcardsInfos}/>
 			<Guides guides={guides}/>
 		</Gapped>
 	);
+
+	function handleLaunchAllClick() {
+		console.log(`Launching all...`);
+	}
 }
 
 CoursePage.propTypes = {
-	cardsByUnits: PropTypes.arrayOf(PropTypes.shape({
+	flashcardsInfos: PropTypes.arrayOf(PropTypes.shape({
 		unitTitle: PropTypes.string,
 		unlocked: PropTypes.bool,
 		cardsCount: PropTypes.number,

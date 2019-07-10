@@ -7,7 +7,7 @@ storiesOf('Cards/CoursePage', module)
 	.add('default', () => (
 		<CoursePage
 			guides={guides}
-			cardsByUnits={cardsByUnitExample}
+			flashcardsInfos={cardsByUnitExample}
 		/>
 	));
 

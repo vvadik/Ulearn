@@ -5,37 +5,37 @@ import ProgressBar from "./ProgressBar";
 storiesOf('Cards/ProgressBar', module)
 	.add('scores: 1,1,2,5,10,18', () => (
 		<ProgressBar
-			byScore={{
-				unseen: 1,
-				1: 1,
-				2: 2,
-				3: 5,
-				4: 10,
-				5: 18
+			statistics={{
+				notRated: 1,
+				rate1: 1,
+				rate2: 2,
+				rate3: 5,
+				rate4: 10,
+				rate5: 18
 			}}
-			total={37}/>
+			totalFlashcardsCount={37}/>
 	))
 	.add('scores: 10,0,0,0,0,0', () => (
 		<ProgressBar
-			byScore={{
-				unseen: 10,
-				1: 0,
-				2: 0,
-				3: 0,
-				4: 0,
-				5: 0
+			statistics={{
+				notRated: 10,
+				rate1: 0,
+				rate2: 0,
+				rate3: 0,
+				rate4: 0,
+				rate5: 0
 			}}
-			total={10}/>
+			totalFlashcardsCount={10}/>
 	))
 	.add('scores: 2,2,2,2,2,2', () => (
 		<ProgressBar
-			byScore={{
-				unseen: 2,
-				1: 2,
-				2: 2,
-				3: 2,
-				4: 2,
-				5: 2
+			statistics={{
+				notRated: 2,
+				rate1: 2,
+				rate2: 2,
+				rate3: 2,
+				rate4: 2,
+				rate5: 2
 			}}
-			total={12}/>
+			totalFlashcardsCount={12}/>
 	));

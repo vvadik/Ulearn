@@ -6,10 +6,10 @@ import getCardsPluralForm from "../../../../utils/getCardsPluralForm";
 import LockClosed from '@skbkontur/react-icons/LockClosed';
 import Button from "@skbkontur/react-ui/Button";
 
-function CourseCards({cardsByUnits}) {
+function CourseCards({flashcardsInfos}) {
 	return (
 		<div className={styles.cardsContainer}>
-			{cardsByUnits.map(convertToUnitCard)}
+			{flashcardsInfos.map(convertToUnitCard)}
 			<div className={styles.emptyUnitCard}>
 				<span className={styles.emptyUnitCardText}>
 					Новые вопросы для самопроверки открываются по мере прохождения курса
@@ -22,7 +22,7 @@ function CourseCards({cardsByUnits}) {
 		const unitCardStyle = classNames(styles.unitCard, {[styles.unitCardLocked]: !unlocked});
 
 		return (
-			<div key={unitId} className={unitCardStyle}>
+			<div key={unitId} className={unitCardStyle} onClick={() => handleUnitCardClick(unitTitle)}>
 				<div>
 					<h3 className={styles.unitCardTitle}>
 						{unitTitle}
@@ -41,10 +41,14 @@ function CourseCards({cardsByUnits}) {
 			</div>
 		);
 	}
+
+	function handleUnitCardClick(unitTitle) {
+		console.log(`clicked on ${unitTitle}`);
+	}
 }
 
 CourseCards.propTypes = {
-	cardsByUnits: PropTypes.arrayOf(PropTypes.shape({
+	flashcardsInfos: PropTypes.arrayOf(PropTypes.shape({
 		unitTitle: PropTypes.string,
 		unlocked: PropTypes.bool,
 		cardsCount: PropTypes.number,
