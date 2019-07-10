@@ -6,7 +6,7 @@ using System.Xml.Serialization;
 
 namespace Ulearn.Core.Courses.Slides.Flashcards
 {
-	[XmlRoot("slide.flashcards", IsNullable = false, Namespace = "https://ulearn.me/schema/v2")]
+	[XmlRoot("slide.flashcards", IsNullable = false, Namespace = "http://ulearn-test-01.dev.kontur.ru/schema/v2")]
 	public class FlashcardSlide : Slide
 	{
 		[XmlElement(ElementName = "flashcard")]
@@ -19,6 +19,11 @@ namespace Ulearn.Core.Courses.Slides.Flashcards
 			foreach (var flashcard in FlashcardsList)
 			{
 				flashcard.BuildUp(context, this);
+			}
+
+			if (Title is null)
+			{
+				Title = "Флеш-карты";
 			}
 
 			base.BuildUp(context);

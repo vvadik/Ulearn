@@ -13,6 +13,7 @@ namespace Ulearn.Core.Courses.Units
 		{
 			Settings = settings;
 			Directory = directory;
+			Flashcards = new Dictionary<string, Flashcard>();
 		}
 
 		public UnitSettings Settings { get; set; }
