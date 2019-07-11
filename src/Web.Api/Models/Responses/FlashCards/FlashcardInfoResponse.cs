@@ -1,18 +1,17 @@
-using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace Ulearn.Web.Api.Models.Common
+namespace Ulearn.Web.Api.Models.Responses.FlashCards
 {
 	[DataContract]
 	public class FlashcardInfoResponse
 	{
 		[DataMember]
-		public List<FlashcardsInfo> FlashcardsInfos = new List<FlashcardsInfo>();
+		public List<FlashcardsUnitInfo> FlashcardsInfo = new List<FlashcardsUnitInfo>();
 
-		public void Add(FlashcardsInfo flashcardsInfo)
+		public void Add(FlashcardsUnitInfo flashcardsUnitInfo)
 		{
-			FlashcardsInfos.Add(flashcardsInfo);
+			FlashcardsInfo.Add(flashcardsUnitInfo);
 		}
 	}
 }

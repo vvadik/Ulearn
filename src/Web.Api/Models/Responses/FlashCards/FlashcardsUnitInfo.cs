@@ -1,10 +1,10 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Ulearn.Web.Api.Models.Common
+namespace Ulearn.Web.Api.Models.Responses.FlashCards
 {
 	[DataContract]
-	public class FlashcardsInfo
+	public class FlashcardsUnitInfo
 	{
 		[DataMember]
 		public string UnitTitle;

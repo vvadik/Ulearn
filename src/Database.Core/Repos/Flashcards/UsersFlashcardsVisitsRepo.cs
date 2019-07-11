@@ -18,6 +18,7 @@ namespace Database.Repos.Flashcards
 
 		public async Task AddFlashcardVisitAsync(string userId, string courseId, Guid unitId, string flashcardId, Rate rate, DateTime timestamp)
 		{
+			courseId = courseId.ToLower();
 			var existingRecord = db.UserFlashcardsVisits.FirstOrDefault(c => c.UserId == userId && c.CourseId == courseId && c.UnitId == unitId && c.FlashcardId == flashcardId);
 
 			if (existingRecord != null)
@@ -36,11 +37,13 @@ namespace Database.Repos.Flashcards
 
 		public async Task<List<UserFlashcardsVisit>> GetUserFlashcardsVisitsAsync(string userId, string courseId, Guid unitId)
 		{
+			courseId = courseId.ToLower();
 			return await db.UserFlashcardsVisits.Where(c => c.UserId == userId && c.CourseId == courseId && c.UnitId == unitId).ToListAsync();
 		}
 
 		public async Task<List<UserFlashcardsVisit>> GetUserFlashcardsVisitsAsync(string userId, string courseId)
 		{
+			courseId = courseId.ToLower();
 			return await db.UserFlashcardsVisits.Where(c => c.UserId == userId && c.CourseId == courseId).ToListAsync();
 		}
 	}

@@ -10,6 +10,6 @@ namespace Ulearn.Web.Api.Models.Responses.Flashcards
 		public int TotalFlashcardsCount;
 
 		[DataMember(Name = "statistics")]
-		public ScoreResponse ScoreResponse;
+		public TotalRateResponse TotalRateResponse;
 	}
 }
