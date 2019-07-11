@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using Microsoft.Extensions.Configuration;
 
 namespace Ulearn.Core.Configuration
@@ -21,7 +20,7 @@ namespace Ulearn.Core.Configuration
 		public static IConfiguration GetConfiguration(IDictionary<string, string> initialData, bool isAppsettingsJsonOptional=false)
 		{
 			var applicationPath = string.IsNullOrEmpty(Utils.WebApplicationPhysicalPath)
-				? Directory.GetCurrentDirectory()
+				? AppDomain.CurrentDomain.BaseDirectory
 				: Utils.WebApplicationPhysicalPath;
 			var configurationBuilder = new ConfigurationBuilder()
 				.AddInMemoryCollection(initialData)
