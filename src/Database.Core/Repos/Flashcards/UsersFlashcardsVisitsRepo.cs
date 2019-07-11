@@ -16,19 +16,19 @@ namespace Database.Repos.Flashcards
 			this.db = db;
 		}
 
-		public async Task AddFlashcardVisitAsync(string userId, string courseId, Guid unitId, string flashcardId, Score score, DateTime timestamp)
+		public async Task AddFlashcardVisitAsync(string userId, string courseId, Guid unitId, string flashcardId, Rate rate, DateTime timestamp)
 		{
 			var existingRecord = db.UserFlashcardsVisits.FirstOrDefault(c => c.UserId == userId && c.CourseId == courseId && c.UnitId == unitId && c.FlashcardId == flashcardId);
 
 			if (existingRecord != null)
 			{
-				existingRecord.Rate = score;
+				existingRecord.Score = rate;
 				existingRecord.Timestamp = timestamp;
 			}
 			else
 			{
 				db.UserFlashcardsVisits.Add(new UserFlashcardsVisit
-					{ UserId = userId, CourseId = courseId, UnitId = unitId, FlashcardId = flashcardId, Rate = score, Timestamp = timestamp });
+					{ UserId = userId, CourseId = courseId, UnitId = unitId, FlashcardId = flashcardId, Score = rate, Timestamp = timestamp });
 			}
 
 			await db.SaveChangesAsync();

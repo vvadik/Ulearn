@@ -26,13 +26,13 @@ namespace Database.Models
 		public string FlashcardId { get; set; }
 
 		[Required]
-		public Score Rate { get; set; }
+		public Rate Score { get; set; }
 
 		[Required]
 		public DateTime Timestamp { get; set; }
 	}
 	[JsonConverter(typeof(StringEnumConverter), true)]
-	public enum Score
+	public enum Rate
 	{
 		NotRated,
 		Rate1,

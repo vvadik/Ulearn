@@ -6,7 +6,7 @@ using System.Xml.Serialization;
 
 namespace Ulearn.Core.Courses.Slides.Flashcards
 {
-	[XmlRoot("slide.flashcards", IsNullable = false, Namespace = "http://ulearn-test-01.dev.kontur.ru/schema/v2")]
+	[XmlRoot("slide.flashcards", IsNullable = false, Namespace = "https://ulearn.me/schema/v2")]
 	public class FlashcardSlide : Slide
 	{
 		[XmlElement(ElementName = "flashcard")]

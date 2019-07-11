@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.Serialization;
+using Database.Models;
 
 namespace Ulearn.Web.Api.Models.Common
 {
@@ -7,7 +8,7 @@ namespace Ulearn.Web.Api.Models.Common
 	public class FlashcardResponse
 	{
 		[DataMember]
-		public Guid Id;
+		public string Id;
 
 		[DataMember]
 		public string Question;
@@ -19,7 +20,7 @@ namespace Ulearn.Web.Api.Models.Common
 		public string UnitTitle;
 		
 		[DataMember]
-		public string Rate;
+		public Rate Rate;
 		
 		[DataMember]
 		public Guid UnitId;

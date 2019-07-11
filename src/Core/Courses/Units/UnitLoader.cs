@@ -59,7 +59,7 @@ namespace Ulearn.Core.Courses.Units
 				var fl = flashcardSlide as FlashcardSlide;
 				foreach (var flashcard in fl.FlashcardsList)
 				{
-					unit.Flashcards[flashcard.Id] = flashcard;
+					unit.Flashcards.Add(flashcard);
 				}
 			}
 
