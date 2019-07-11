@@ -16,21 +16,21 @@ namespace Ulearn.Core.Courses.Slides.Flashcards
 		public Guid[] TheorySlidesIds { get; set; }
 
 		[XmlElement(ElementName = "question")]
-		public FlashcardInternals Question { get; set; }
+		public FlashcardContent Question { get; set; }
 
 		[XmlElement(ElementName = "answer")]
-		public FlashcardInternals Answer { get; set; }
+		public FlashcardContent Answer { get; set; }
 
 		public void BuildUp(SlideLoadingContext context, Slide flashcardSlide)
 		{
 			if (Answer is null)
 			{
-				Answer = new FlashcardInternals();
+				Answer = new FlashcardContent();
 			}
 
 			if (Question is null)
 			{
-				Question = new FlashcardInternals();
+				Question = new FlashcardContent();
 			}
 
 			if (Answer.Blocks is null)

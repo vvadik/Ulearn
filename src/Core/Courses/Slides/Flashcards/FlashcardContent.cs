@@ -5,7 +5,7 @@ namespace Ulearn.Core.Courses.Slides.Flashcards
 {
 
 	[XmlType(TypeName = "FlashcardInternals", Namespace = "https://ulearn.me/schema/v2")]
-	public class FlashcardInternals
+	public class FlashcardContent
 	{
 		[XmlElement("markdown", typeof(MarkdownBlock))]
 		[XmlElement(typeof(CodeBlock))]
