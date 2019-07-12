@@ -80,7 +80,22 @@ module.exports = function(proxy, allowedHost) {
       disableDotRule: true,
     },
     public: allowedHost,
-	proxy,
+	proxy : [
+	  {
+		  target: "http://ulearn-test-01.dev.kontur.ru:8000",
+		  context: function (pathname, request) {
+			  return /^\/api/.test(pathname);
+		  },
+		  pathRewrite: {'/api': ''}
+	  },
+	  {
+		  target: "http://ulearn-test-01.dev.kontur.ru",
+		  context: function (pathname, request) {
+			  let accept = request.headers['accept'] || '';
+			  return accept.indexOf("text/html") < 0;
+		  }
+	  }
+	],
     before(app) {
       // This lets us open files from the runtime error overlay.
       app.use(errorOverlayMiddleware());

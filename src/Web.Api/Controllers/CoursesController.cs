@@ -21,12 +21,15 @@ namespace Ulearn.Web.Api.Controllers
 	{
 		private readonly ICoursesRepo coursesRepo;
 		private readonly ICourseRolesRepo courseRolesRepo;
+		private readonly IUnitsRepo unitsRepo;
 
-		public CoursesController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, ICoursesRepo coursesRepo, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo)
+		public CoursesController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, ICoursesRepo coursesRepo,
+			IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, IUnitsRepo unitsRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.coursesRepo = coursesRepo;
 			this.courseRolesRepo = courseRolesRepo;
+			this.unitsRepo = unitsRepo;
 		}
 
 		/// <summary>
@@ -79,11 +82,15 @@ namespace Ulearn.Web.Api.Controllers
 			if (course == null)
 				return Json(new { status = "error", message = "Course not found" });
 			
+			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
+			
 			return new CourseInfo
 			{
 				Id = course.Id,
 				Title = course.Title,
-				Units = course.Units.Select(unit => BuildUnitInfo(course.Id, unit)).ToList()
+				Description = "TODO: Напиши описание!",
+				NextUnitPublishTime = unitsRepo.GetNextUnitPublishTime(course.Id),
+				Units = visibleUnits.Select(unit => BuildUnitInfo(course.Id, unit)).ToList()
 			};
 		}
 	}

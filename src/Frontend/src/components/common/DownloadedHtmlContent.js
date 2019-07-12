@@ -5,6 +5,7 @@ import * as PropTypes from "prop-types";
 import { saveAs } from "file-saver";
 import { connect } from "react-redux"
 import api from "../../api"
+import { COURSES__COURSE_ENTERED } from "../../consts/actions";
 import { getQueryStringParameter } from "../../utils";
 
 
@@ -349,7 +350,7 @@ class DownloadedHtmlContent extends Component {
 	static mapDispatchToProps(dispatch) {
 		return {
 			enterToCourse: (courseId) => dispatch({
-				type: 'COURSES__COURSE_ENTERED',
+				type: COURSES__COURSE_ENTERED,
 				courseId: courseId
 			}),
 			updateUserInformation: () => dispatch(api.account.getCurrentUser()),
