@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import PropTypes from 'prop-types';
-import classnames from 'classnames';
 import styles from './NextUnit.less';
 
 
@@ -9,6 +8,7 @@ class NextUnit extends Component {
 		const { title } = this.props.unit;
 		return (
 			<button className={ styles.root }>
+				<h5 className={ styles.header }>Следующий модуль</h5>
 				{ title }
 			</button>
 		);

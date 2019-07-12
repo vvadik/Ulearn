@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import PropTypes from 'prop-types';
-import classnames from 'classnames';
 import NavigationItem from '../NavigationItem';
 import styles from './NavigationContent.less';
 import { menuItemType } from '../../types';
@@ -21,7 +20,7 @@ class NavigationContent extends Component {
 
 	renderTitle () {
 		return (
-			<h5 className={ classnames(styles.header ) }>Программа модуля</h5>
+			<h5 className={ styles.header }>Программа модуля</h5>
 		);
 	}
 
