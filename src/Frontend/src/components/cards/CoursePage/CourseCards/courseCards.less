@@ -21,11 +21,18 @@
   border-radius: 10px;
   margin-bottom: 20px;
   margin-right: 20px;
-  padding: 12px;
+  padding: 12px 18px;
   background: @blue;
 
   font-family: @defaultFonts;
   color: @whiteSmoke;
+}
+
+
+.unitCard:hover{
+  cursor: pointer;
+  color: @whiteSmoke;
+  text-decoration: none;
 }
 
 .emptyUnitCard{
@@ -46,12 +53,12 @@
   line-height: 25px;
 }
 
-.unitCard:hover{
-  cursor: pointer;
-}
-
 .unitCardLocked {
   background: @lightGrey;
+  color: @disabledColor;
+}
+
+.unitCardLocked:hover{
   color: @disabledColor;
 }
 

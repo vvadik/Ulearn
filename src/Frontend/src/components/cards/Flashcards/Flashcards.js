@@ -5,6 +5,8 @@ import classNames from 'classnames';
 import Button from "@skbkontur/react-ui/Button";
 import Results from "./Results/Results";
 import ProgressBar from "../ProgressBar/ProgressBar";
+import api from "../../../api";
+import {withRouter} from "react-router-dom";
 
 const modalsStyles = {
 	first: classNames(styles.modal),
@@ -25,13 +27,8 @@ const defaultStatistics = {
 class Flashcards extends Component {
 	constructor(props) {
 		super(props);
-
-		const {flashcards} = this.props;
-		const statistics = {...defaultStatistics};
-
-		for (const card of flashcards) {
-			statistics[card.rate]++;
-		}
+		const flashcards = this.props.flashcards;
+		const statistics = Flashcards.countStatistics(flashcards);
 
 		this.state = {
 			showAnswer: false,
@@ -41,27 +38,48 @@ class Flashcards extends Component {
 		}
 	}
 
+	componentDidMount() {
+		document.getElementsByTagName('body')[0].classList.add(styles.overflow);
+		document.addEventListener('keypress', this.handleKeyPress);
+	}
+
+	static countStatistics(flashcards) {
+		const statistics = {...defaultStatistics};
+
+		for (const card of flashcards) {
+			statistics[card.rate]++;
+		}
+
+		return statistics;
+	}
+
+	componentWillUnmount() {
+		document.removeEventListener('keypress', this.handleKeyPress);
+		document.getElementsByTagName('body')[0].classList.remove(styles.overflow);
+	}
+
 	render() {
 		const {flashcards, showAnswer, currentIndex, statistics} = this.state;
+		const totalFlashcardsCount = flashcards.length;
 
 		return (
 			<div className={styles.overlay}>
-				<div id={'modal'} className={modalsStyles.first}>
-					{this.renderFlashcard(flashcards[currentIndex], showAnswer)}
+				<div ref={(ref) => this.firstModal = ref} className={modalsStyles.first}>
+					{flashcards && this.renderFlashcard(flashcards[currentIndex], showAnswer)}
 				</div>
-				<div id={'secondModal'} className={modalsStyles.second}/>
-				<div id={'thirdModal'} className={modalsStyles.third}/>
-				<div id={'fourthModal'} className={modalsStyles.fourth}/>
+				<div ref={(ref) => this.secondModal = ref} className={modalsStyles.second}/>
+				<div ref={(ref) => this.thirdModal = ref} className={modalsStyles.third}/>
+				<div className={modalsStyles.fourth}/>
 				{Flashcards.renderControlGuides()}
 				<div className={styles.progressBarContainer}>
-					<ProgressBar statistics={statistics} totalFlashcardsCount={flashcards.length}/>
+					<ProgressBar statistics={statistics} totalFlashcardsCount={totalFlashcardsCount}/>
 				</div>
 			</div>
 		)
 	}
 
-	componentDidMount() {
-		document.addEventListener('keypress', this.handleKeyPress);
+	get courseId() {
+		return this.props.match.params.courseId.toLowerCase();
 	}
 
 	handleKeyPress = (e) => {
@@ -75,18 +93,15 @@ class Flashcards extends Component {
 		}
 	};
 
-	componentWillUnmount() {
-		document.removeEventListener('keypress', this.handleKeyPress);
-	}
 
 	renderFlashcard({unitTitle = '', question = '', answer = ''}, showAnswer) {
 		return (
 			<div>
-				<button tabIndex={1} className={styles.closeButton}>
+				<button tabIndex={1} className={styles.closeButton} onClick={this.props.onClose}>
 					&times;
 				</button>
 				<h5 className={styles.unitTitle}>
-					{unitTitle}
+					{unitTitle ? unitTitle : 'unknown'}
 				</h5>
 				{!showAnswer && this.renderFrontFlashcard(question)}
 				{showAnswer && this.renderBackFlashcard(question, answer)}
@@ -97,9 +112,7 @@ class Flashcards extends Component {
 	renderFrontFlashcard(question) {
 		return (
 			<div className={styles.frontTextContainer}>
-				<h4 className={styles.questionFront}>
-					{question}
-				</h4>
+				<div className={styles.questionFront} dangerouslySetInnerHTML={{__html: question}}/>
 				<div className={styles.showAnswerButtonContainer}>
 					<Button size='large' use='primary' onClick={() => this.showAnswer()}>
 						Показать ответ
@@ -110,7 +123,7 @@ class Flashcards extends Component {
 	}
 
 	showAnswer() {
-		Flashcards.resetAnimation();
+		this.resetAnimation();
 		this.setState({
 			showAnswer: true
 		});
@@ -120,10 +133,8 @@ class Flashcards extends Component {
 		return (
 			<div>
 				<div className={styles.backTextContainer}>
-					<p className={styles.questionBack}>
-						{question}
-					</p>
-					{answer}
+					<div className={styles.questionBack} dangerouslySetInnerHTML={{__html: question}}/>
+					<div dangerouslySetInnerHTML={{__html: answer}}/>
 				</div>
 				<Results handleClick={this.handleResultsClick}/>
 			</div>
@@ -132,7 +143,7 @@ class Flashcards extends Component {
 
 	static renderControlGuides() {
 		return (
-			<div className={styles.controlGuideContainer}>
+			<p className={styles.controlGuideContainer}>
 				Используйте клавиатуру:
 				<span>пробел</span> — показать ответ,
 				<span>1</span>
@@ -140,7 +151,7 @@ class Flashcards extends Component {
 				<span>3</span>
 				<span>4</span>
 				<span>5</span> — поставить оценку
-			</div>
+			</p>
 		);
 	}
 
@@ -148,6 +159,8 @@ class Flashcards extends Component {
 		const {currentIndex, flashcards, statistics} = this.state;
 		const currentCard = flashcards[currentIndex];
 		const newRate = `rate${rate}`;
+
+		api.cards.putFlashcardStatus(this.courseId, currentCard.id, newRate);
 
 		statistics[currentCard.rate]--;
 		statistics[newRate]++;
@@ -177,28 +190,24 @@ class Flashcards extends Component {
 	}
 
 	animateCards() {
+		const {firstModal, secondModal, thirdModal} = this;
 		const animationDuration = 700;
-		const first = document.getElementById('modal');
-		const second = document.getElementById('secondModal');
-		const third = document.getElementById('thirdModal');
 
-		first.className = classNames(modalsStyles.second, styles.move);
-		second.className = classNames(modalsStyles.third, styles.move);
-		third.className = classNames(modalsStyles.fourth, styles.move);
+		firstModal.className = classNames(modalsStyles.second, styles.move);
+		secondModal.className = classNames(modalsStyles.third, styles.move);
+		thirdModal.className = classNames(modalsStyles.fourth, styles.move);
 
 		setTimeout(() => {
-			Flashcards.resetAnimation();
+			this.resetAnimation();
 		}, animationDuration - animationDuration / 10);
 	}
 
-	static resetAnimation() {
-		const first = document.getElementById('modal');
-		const second = document.getElementById('secondModal');
-		const third = document.getElementById('thirdModal');
+	resetAnimation() {
+		const {firstModal, secondModal, thirdModal} = this;
 
-		first.className = classNames(modalsStyles.first);
-		second.className = classNames(modalsStyles.second);
-		third.className = classNames(modalsStyles.third);
+		firstModal.className = classNames(modalsStyles.first);
+		secondModal.className = classNames(modalsStyles.second);
+		thirdModal.className = classNames(modalsStyles.third);
 	}
 }
 
@@ -211,7 +220,9 @@ Flashcards.propTypes = {
 		unitTitle: PropTypes.string,
 		rate: PropTypes.string,
 		unitId: PropTypes.string
-	})).isRequired
+	})).isRequired,
+	match: PropTypes.object,
+	onClose: PropTypes.func
 };
 
-export default Flashcards;
+export default withRouter(Flashcards);

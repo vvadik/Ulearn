@@ -65,7 +65,11 @@ class ShortQuestions extends Component {
 	};
 
 	handleToggleChange = () => {
-		const {questionsWithAnswers} = this.props;
+		const {questionsWithAnswers} = this.state;
+
+		for (const question of questionsWithAnswers) {
+			question.showAnswer = false;
+		}
 
 		this.setState({
 			showAllAnswers: !this.state.showAllAnswers,

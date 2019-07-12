@@ -5,8 +5,9 @@ import classNames from 'classnames';
 import getCardsPluralForm from "../../../../utils/getCardsPluralForm";
 import LockClosed from '@skbkontur/react-icons/LockClosed';
 import Button from "@skbkontur/react-ui/Button";
+import {Link} from 'react-router-dom';
 
-function CourseCards({flashcardsInfos}) {
+function CourseCards({flashcardsInfos, courseId}) {
 	return (
 		<div className={styles.cardsContainer}>
 			{flashcardsInfos.map(convertToUnitCard)}
@@ -18,9 +19,13 @@ function CourseCards({flashcardsInfos}) {
 
 	function convertToUnitCard({unitTitle, unlocked, cardsCount, unitId}) {
 		const unitCardStyle = classNames(styles.unitCard, {[styles.unitCardLocked]: !unlocked});
+		const url = unlocked
+			? `/${courseId.toLowerCase()}/flashcards/${unitId}`
+			: `/Course/${courseId.toLowerCase()}/${unitId}/`; 		//TODO(rozentor) change to correct unit URL
 
 		return (
-			<div key={unitId} className={unitCardStyle} onClick={() => handleUnitCardClick(unitTitle)}>
+			<Link key={unitId} className={unitCardStyle}
+				  to={url}>
 				<div>
 					<h3 className={styles.unitCardTitle}>
 						{unitTitle}
@@ -36,12 +41,8 @@ function CourseCards({flashcardsInfos}) {
 					</Button>}
 				</div>
 				{!unlocked && <LockClosed className={styles.unitCardLockerIcon} size={22}/>}
-			</div>
+			</Link>
 		);
-	}
-
-	function handleUnitCardClick(unitTitle) {
-		console.log(`clicked on ${unitTitle}`);
 	}
 }
 
@@ -51,7 +52,8 @@ CourseCards.propTypes = {
 		unlocked: PropTypes.bool,
 		cardsCount: PropTypes.number,
 		unitId: PropTypes.string
-	}))
+	})),
+	courseId: PropTypes.string.isRequired
 };
 
 export default CourseCards;

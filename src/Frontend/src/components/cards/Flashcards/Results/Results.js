@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from "prop-types";
 import styles from './results.less';
 import classNames from 'classnames';
-import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
 
 const resultsStyles = [
 	classNames(styles.resultsElement, styles.resultsVeryBad),
@@ -15,7 +14,7 @@ const resultsStyles = [
 function Results({handleClick}) {
 	return (
 		<div className={styles.resultsContainer}>
-			<p>
+			<p className={styles.headerText}>
 				Оцените, на сколько хорошо вы знали ответ?
 			</p>
 			{resultsStyles.map(convertToResultIcon)}
@@ -35,17 +34,11 @@ function Results({handleClick}) {
 
 	function renderFooter() {
 		return (
-			<footer className={styles.footer}>
-				<Gapped vertical={false} gap={15}>
-					<span>
-						плохо
-					</span>
-					<div className={styles.footerLine}/>
-					<span>
-						отлично
-					</span>
-				</Gapped>
-			</footer>
+			<div className={styles.footer}>
+				плохо
+				<hr className={styles.footerLine}/>
+				отлично
+			</div>
 		);
 	}
 }

@@ -4,6 +4,7 @@
 @modalHeight: 500px;
 @moveAnimationDuration: 0.7s;
 @textAppearAnimationDuration: 0.3s;
+@modalBackgroundColor: #fff;
 
 .unitTitle {
   font-family: @defaultFonts;
@@ -30,7 +31,6 @@
 
   font-size: 32px;
   font-family: @defaultFonts;
-  font-weight: 400;
   overflow: auto;
   margin: 0;
 }
@@ -42,8 +42,22 @@
   font-size: 20px;
   line-height: 24px;
   overflow: auto;
+
+  animation: appear 300ms;
 }
 
+.appear {
+  animation: appear 300ms;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1.0;
+  }
+}
 
 .questionBack {
   font-family: @defaultFonts;
@@ -82,7 +96,7 @@
   z-index: 0;
   transform: translate(-50%, -50%);
 
-  background-color: #fff;
+  background-color: @modalBackgroundColor;
   padding: 36px 56px;
   border-radius: 10px;
   margin-top: -30px;
@@ -95,10 +109,11 @@
   top: 50%;
   transform: translate(0, @modalHeight/2);
 
-  color: #FFF0BC;
+  margin: 0;
+  color: @lightYellow;
   text-align: center;
   font-size: 14px;
-  line-height: 40px;
+  line-height: 28px;
 }
 
 .controlGuideContainer > span {
@@ -141,40 +156,15 @@
 }
 
 .secondModal {
-  width: @modalWidth - 40px;
-  height: @modalHeight - 32px;
-
-  transform: translate(-50%, -57%);
+  transform: translate(-50%, -56%) scale(0.95);
   z-index: -1;
-
-  background: darken(#fff, 10%);
-}
-
-.thirdModal {
-  width: @modalWidth - 92px;
-  height: @modalHeight - 64px;
-
-  transform: translate(-50%, -65%);
-  z-index: -2;
-
-  background: darken(#fff, 15%);
-}
-
-.fourthModal {
-  width: @modalWidth - 142px;
-  height: @modalHeight - 148px;
-
-  transform: translate(-50%, -85%);
-  z-index: -3;
-
-  background: darken(#fff, 18%);
+  background: darken(@modalBackgroundColor, 10%);
 }
 
 @keyframes moveFromSecondToFirst {
   from {
     .secondModal;
   }
-
   to {
     .modal;
   }
@@ -185,11 +175,16 @@
   animation-name: moveFromSecondToFirst;
 }
 
+.thirdModal {
+  transform: translate(-50%, -62%) scale(0.90);
+  z-index: -2;
+  background: darken(@modalBackgroundColor, 15%);
+}
+
 @keyframes moveFromThirdToSecond {
   from {
     .thirdModal
   }
-
   to {
     .secondModal
   }
@@ -200,11 +195,16 @@
   animation-name: moveFromThirdToSecond;
 }
 
+.fourthModal {
+  transform: translate(-50%, -68%) scale(0.85);
+  z-index: -3;
+  background: darken(@modalBackgroundColor, 18%);
+}
+
 @keyframes moveFromFourthToThird {
   from {
     .fourthModal
   }
-
   to {
     .thirdModal
   }
@@ -213,4 +213,8 @@
 .fourthModal.move {
   animation-duration: @moveAnimationDuration;
   animation-name: moveFromFourthToThird;
+}
+
+.overflow {
+  overflow: hidden;
 }
