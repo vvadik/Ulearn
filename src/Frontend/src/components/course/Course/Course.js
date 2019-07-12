@@ -66,7 +66,7 @@ class Course extends Component {
 		return (
 			<div className={ styles.root }>
 				{ onCourseNavigation ? this.renderCourseNavigation() : this.renderUnitNavigation()}
-				<div>
+				<div className={styles.pageWrapper}>
 					<AnyPage />
 				</div>
 			</div>
@@ -112,6 +112,7 @@ class Course extends Component {
 					questionsCount: item.questionsCount,
 					visited: progress && progress[item.id],
 				})) }
+				nextUnit={Course.findNextUnit(openUnit, courseInfo)}
 			/>
 		);
 	}
@@ -135,7 +136,20 @@ class Course extends Component {
 		return  null;
 	}
 
+	static findNextUnit(activeUnit, courseInfo) {
+		const units = courseInfo.units;
+		const activeUnitId = activeUnit.id;
 
+		const indexOfActiveUnit = units.findIndex(item => item.id === activeUnitId);
+
+
+		if (indexOfActiveUnit < 0 || indexOfActiveUnit === units.length - 1) {
+			return null;
+		}
+
+
+		return units[indexOfActiveUnit + 1];
+	}
 
 	unitClickHandle = (id) => {
 		const { units } = this.props;
