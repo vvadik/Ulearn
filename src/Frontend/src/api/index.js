@@ -6,6 +6,7 @@ import * as notifications from "./notifications"
 import * as groups from "./groups"
 import * as users from "./users"
 import * as comments from "./comments"
+import * as cards from "./cards"
 import Toast from "@skbkontur/react-ui/Toast";
 
 const API_JWT_TOKEN_UPDATED = "API_JWT_TOKEN_UPDATED";
@@ -169,6 +170,7 @@ let api = {
 	groups: groups,
 	users: users,
 	comments: comments,
+	cards: cards
 };
 
 export default api;
