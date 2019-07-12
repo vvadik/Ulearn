@@ -6,6 +6,7 @@ using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Flashcards;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
 using Ulearn.Core.Courses.Units;
@@ -125,11 +126,22 @@ namespace Ulearn.Core.Tests.Courses.Slides
 		}
 		
 		[Test]
-		public void LoadFlashcardSlide()
+		public void LoadEmptyFlashcardSlide()
 		{
-			var slide = LoadSlideFromXmlFile("SimpleFlashcards.xml");
-			
+			var slide = LoadSlideFromXmlFile("EmptyFlashcardsSlide.xml");
+			Assert.AreEqual(slide.GetType(),typeof(FlashcardSlide));
 		}
+		
+		
+		[Test]
+		public void LoadSimpleFlashcardSlideWithMarkdownBlocks()
+		{
+			var slide = LoadSlideFromXmlFile("SimpleFlashcardSlide.xml");
+			Assert.AreEqual(slide.Id,Guid.Parse("a7a73125-2434-4b5d-9f31-4ef687fc8bcc"));
+		}
+
+		
+		
 
 		[Test]
 		public void LoadSlideWithSpoilerBlock()
