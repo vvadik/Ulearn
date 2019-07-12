@@ -236,12 +236,6 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="title" type="NonEmptyString" use="required">
-			<xs:annotation>
-				<xs:documentation xml:lang="en">Slide's title</xs:documentation>
-				<xs:documentation xml:lang="ru">Заголовок слайда</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
 	</xs:attributeGroup>
 
 	<xs:complexType name="SlideMeta">
