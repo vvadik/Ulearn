@@ -1,4 +1,5 @@
-﻿using System.Text;
+using System.Linq;
+using System.Text;
 using Ulearn.Common.Extensions;
 
 namespace uLearn.CSharp
@@ -7,14 +8,7 @@ namespace uLearn.CSharp
 	{
 		public static string MakeTypeNameAbbreviation(this string typeName)
 		{
-			var abbreviationBuilder = new StringBuilder();
-			var wordsFromTypeName = typeName.SplitByCamelCase();
-			foreach (var word in wordsFromTypeName)
-			{
-				abbreviationBuilder.Append(word[0]);
-			}
-
-			return abbreviationBuilder.ToString();
+			return string.Join("", typeName.SplitByCamelCase().Select(word => word[0]));
 		}
 	}
 }
