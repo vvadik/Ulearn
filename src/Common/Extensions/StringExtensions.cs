@@ -70,19 +70,20 @@ namespace Ulearn.Common.Extensions
 
 		public static IEnumerable<string> SplitByCamelCase(this string text)
 		{
-			var word = "";
+			var sb = new StringBuilder();
 			foreach (var letter in text)
 			{
-				if ((char.IsUpper(letter) || !char.IsLetter(letter)) && word != "")
+				if ((char.IsUpper(letter) || !char.IsLetter(letter)) && sb.Length != 0)
 				{
-					yield return word;
-					word = "";
+					yield return sb.ToString();
+					sb.Clear();
 				}
 				if (char.IsLetter(letter))
-					word += letter;
+					sb.Append(letter);
 			}
-			if (word != "")
-				yield return word;
+			if (sb.Length != 0)
+				yield return sb.ToString();
+
 		}
 
 		public static string RemoveCommonNesting(this string text)
