@@ -210,6 +210,7 @@ namespace Ulearn.Web.Api.Controllers
 						content.Append($"\n<textarea class=\"code code-sample\" data-lang=\"{codeBlock.Language.GetName()}\" data-code=\"{codeBlock.Code}\"></textarea>");
 						break;
 					}
+
 					case TexBlock texBlock:
 						content.Append(texBlock.TryGetText().RenderTex());
 						break;
@@ -244,19 +245,16 @@ namespace Ulearn.Web.Api.Controllers
 		public async Task<ActionResult<FlashcardInfoResponse>> FlashcardsInfo([FromRoute] Course course)
 		{
 			var userFlashcardsVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, course.Id);
-			return ToFlashcardInfoResponse(userFlashcardsVisits);
-		}
+			var info = new FlashcardInfoResponse();
 
-		private FlashcardInfoResponse ToFlashcardInfoResponse(List<UserFlashcardsVisit> userFlashcardsVisits)
-		{
-			var result = new FlashcardInfoResponse();
-			foreach (var visit in userFlashcardsVisits)
+			foreach (var unit in course.Units)
 			{
-				var info = new FlashcardsUnitInfo();
+				info.Add(new FlashcardsUnitInfo { UnitId = unit.Id, UnitTitle = unit.Title, CardsCount = unit.Flashcards.Count, Unlocked = false });
 			}
 
-			return result;
+			return info;
 		}
+
 
 		/// <summary>
 		/// Изменить оценку для флеш-карты
