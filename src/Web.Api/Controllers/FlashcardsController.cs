@@ -153,13 +153,14 @@ namespace Ulearn.Web.Api.Controllers
 			}
 
 			var flashcardsResponse = new FlashcardsResponse();
+			var flashcardResponsesIenumerable = GetFlashcardResponses(rate, unitId, course, flashcards, userFlashcardsVisits);
 			if (count is null)
 			{
-				flashcardsResponse.Flashcards = GetFlashcardResponses(rate, unitId, course, flashcards, userFlashcardsVisits).ToList();
+				flashcardsResponse.Flashcards = flashcardResponsesIenumerable.ToList();
 			}
 			else
 			{
-				flashcardsResponse.Flashcards = GetFlashcardResponses(rate, unitId, course, flashcards, userFlashcardsVisits).Take(count.Value).ToList();
+				flashcardsResponse.Flashcards = flashcardResponsesIenumerable.Take(count.Value).ToList();
 			}
 
 			return flashcardsResponse;
@@ -167,7 +168,7 @@ namespace Ulearn.Web.Api.Controllers
 
 		private IEnumerable<FlashcardResponse> GetFlashcardResponses(Rate? rate, Guid? unitId, Course course, List<Flashcard> flashcards, List<UserFlashcardsVisit> userFlashcardsVisits)
 		{
-			var userFlashcardsVisitsDictionary = GetUsersFlashcardsVisitsDictionary(userFlashcardsVisits, flashcards);
+			var userFlashcardsVisitsDictionary = GetFlashcardsFullUsersVisitsDictionary(userFlashcardsVisits, flashcards);
 
 			foreach (var flashcard in flashcards)
 			{
@@ -210,7 +211,6 @@ namespace Ulearn.Web.Api.Controllers
 						content.Append($"\n<textarea class=\"code code-sample\" data-lang=\"{codeBlock.Language.GetName()}\" data-code=\"{codeBlock.Code}\"></textarea>");
 						break;
 					}
-
 					case TexBlock texBlock:
 						content.Append(texBlock.TryGetText().RenderTex());
 						break;
@@ -223,7 +223,7 @@ namespace Ulearn.Web.Api.Controllers
 			return content.ToString();
 		}
 
-		private Dictionary<string, UserFlashcardsVisit> GetUsersFlashcardsVisitsDictionary(List<UserFlashcardsVisit> userFlashcardsVisits, List<Flashcard> flashcards)
+		private Dictionary<string, UserFlashcardsVisit> GetFlashcardsFullUsersVisitsDictionary(List<UserFlashcardsVisit> userFlashcardsVisits, List<Flashcard> flashcards)
 		{
 			var result = userFlashcardsVisits.ToDictionary(x => x.FlashcardId);
 			foreach (var flashcard in flashcards)
@@ -268,11 +268,6 @@ namespace Ulearn.Web.Api.Controllers
 			var unit = course.Units.Find(x => x.GetFlashcardById(flashcardId) != null);
 			if (unit is null)
 				return BadRequest($"flashcard with id {flashcardId} does not exist");
-			if ((int)rate < 0 || (int)rate > 5)
-			{
-				return BadRequest($"value {rate} of score is invalid");
-			}
-
 			await usersFlashcardsVisitsRepo.AddFlashcardVisitAsync(UserId, course.Id, unit.Id, flashcardId, rate, DateTime.Now);
 			return NoContent();
 		}

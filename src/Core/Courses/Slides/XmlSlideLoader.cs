@@ -35,7 +35,7 @@ namespace Ulearn.Core.Courses.Slides
 
 			slide = (Slide)fileContent.DeserializeXml(slideType);
 
-			slide.BuildUp(context);
+			slide.BuildUp(context); 
 
 			slide.Validate(context);
 
