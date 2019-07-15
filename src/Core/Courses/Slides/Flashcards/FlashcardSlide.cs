@@ -28,7 +28,7 @@ namespace Ulearn.Core.Courses.Slides.Flashcards
 				Title = "Флеш-карты";
 			}
 
-			CheckBlockTypes();
+			//CheckBlockTypes();
 
 			base.BuildUp(context);
 		}
@@ -54,7 +54,7 @@ namespace Ulearn.Core.Courses.Slides.Flashcards
 			typeof(HtmlBlock),
 		};
 
-		public void CheckBlockTypes()
+		/*public new void CheckBlockTypes()
 		{
 			var blocks = FlashcardsList.Select(x => x.Answer.Blocks).Concat(FlashcardsList.Select(x => x.Question.Blocks));
 			foreach (var block in blocks)
@@ -65,6 +65,6 @@ namespace Ulearn.Core.Courses.Slides.Flashcards
 						$"В этом слайде разрешены только следующие блоки: {string.Join(", ", AllowedBlockTypes.Select(t => $"<{t.GetXmlType()}>"))}"
 					);
 			}
-		}
+		}*/
 	}
 }
