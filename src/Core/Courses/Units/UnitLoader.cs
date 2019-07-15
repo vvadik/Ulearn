@@ -52,14 +52,15 @@ namespace Ulearn.Core.Courses.Units
 			unit.Slides = slideFiles
 				.Select((f, internalIndex) => LoadSlide(f, unit, firstSlideIndex + internalIndex, context))
 				.ToList();
-			
-			var flashcardSlide = unit.Slides.FirstOrDefault(x => x.GetType() == typeof(FlashcardSlide));
-			if (flashcardSlide != default(Slide))
+
+			var flashcardSlides = unit.Slides.OfType<FlashcardSlide>();
+			foreach (var flashcardSlide in flashcardSlides)
 			{
-				var fl = flashcardSlide as FlashcardSlide;
-				foreach (var flashcard in fl.FlashcardsList)
 				{
-					unit.Flashcards.Add(flashcard);
+					foreach (var flashcard in flashcardSlide.FlashcardsList)
+					{
+						unit.Flashcards.Add(flashcard);
+					}
 				}
 			}
 

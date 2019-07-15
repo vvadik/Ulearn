@@ -174,8 +174,8 @@ namespace Ulearn.Web.Api.Controllers
 				if (rate != null && userFlashcardsVisitsDictionary[flashcard.Id].Score != rate.Value)
 					continue;
 
-				var question = GetRenderedRequest(flashcard.Question.Blocks);
-				var answer = GetRenderedRequest(flashcard.Answer.Blocks);
+				var question = GetRenderedContent(flashcard.Question.Blocks);
+				var answer = GetRenderedContent(flashcard.Answer.Blocks);
 
 				var rateResponse = userFlashcardsVisitsDictionary.TryGetValue(flashcard.Id, out var visit) ? visit.Score : Rate.NotRated;
 				Unit unit;
@@ -195,18 +195,31 @@ namespace Ulearn.Web.Api.Controllers
 		}
 
 
-		private static string GetRenderedRequest(SlideBlock[] blocks)
+		private static string GetRenderedContent(SlideBlock[] blocks)
 		{
-			var question = new StringBuilder();
-			foreach (var answerBlock in blocks)
+			var content = new StringBuilder();
+			foreach (var block in blocks)
 			{
-				if (answerBlock.GetType() == typeof(MarkdownBlock))
+				switch (block)
 				{
-					question.Append(answerBlock.TryGetText().RenderMarkdown());
+					case MarkdownBlock markdownBlock:
+						content.Append(markdownBlock.TryGetText().RenderMarkdown());
+						break;
+					case CodeBlock codeBlock:
+					{
+						content.Append($"\n<textarea class=\"code code-sample\" data-lang=\"{codeBlock.Language.GetName()}\" data-code=\"{codeBlock.Code}\"></textarea>");
+						break;
+					}
+					case TexBlock texBlock:
+						content.Append(texBlock.TryGetText().RenderTex());
+						break;
+					default:
+						content.Append(block.TryGetText());
+						break;
 				}
 			}
 
-			return question.ToString();
+			return content.ToString();
 		}
 
 		private Dictionary<string, UserFlashcardsVisit> GetUsersFlashcardsVisitsDictionary(List<UserFlashcardsVisit> userFlashcardsVisits, List<Flashcard> flashcards)

@@ -170,15 +170,19 @@
 			<xs:element name="flashcard" type="Flashcard" minOccurs="0" maxOccurs="unbounded">
 			</xs:element>
 		</xs:sequence>
+		<xs:attributeGroup ref="SlideAttributes"/>
 	</xs:complexType>
 
 	<xs:complexType name="Flashcard">
-		<xs:sequence >
+
+		<xs:sequence>
 			<xs:element name="question" type="FlashcardInternals">
 			</xs:element>
 			<xs:element name="answer" type="FlashcardInternals">
 			</xs:element>
 		</xs:sequence>
+		<xs:attributeGroup ref="FlashcardAttributes"/>
+
 	</xs:complexType>
 
 
@@ -220,6 +224,16 @@
 			<xs:annotation>
 				<xs:documentation xml:lang="en">Slide's title</xs:documentation>
 				<xs:documentation xml:lang="ru">Заголовок слайда</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:attributeGroup>
+
+	<xs:attributeGroup name="FlashcardAttributes">
+		<xs:attribute name="id" type="NonEmptyString" use="required">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">Flashcard's id, should be course-unique string</xs:documentation>
+				<xs:documentation xml:lang="ru">Идентификатор флеш-карты, должен быть уникальной для курса строкой
+				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 	</xs:attributeGroup>

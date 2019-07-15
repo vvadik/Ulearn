@@ -16,7 +16,7 @@ namespace Database.Repos.Flashcards
 			this.db = db;
 		}
 
-		public async Task AddFlashcardVisitAsync(string userId, string courseId, Guid unitId, string flashcardId, Rate rate, DateTime timestamp)
+		public async Task<UserFlashcardsVisit> AddFlashcardVisitAsync(string userId, string courseId, Guid unitId, string flashcardId, Rate rate, DateTime timestamp)
 		{
 			courseId = courseId.ToLower();
 			var existingRecord = db.UserFlashcardsVisits.FirstOrDefault(c => c.UserId == userId && c.CourseId == courseId && c.UnitId == unitId && c.FlashcardId == flashcardId);
@@ -28,17 +28,26 @@ namespace Database.Repos.Flashcards
 			}
 			else
 			{
-				db.UserFlashcardsVisits.Add(new UserFlashcardsVisit
-					{ UserId = userId, CourseId = courseId, UnitId = unitId, FlashcardId = flashcardId, Score = rate, Timestamp = timestamp });
+				var record = new UserFlashcardsVisit
+					{ UserId = userId, CourseId = courseId, UnitId = unitId, FlashcardId = flashcardId, Score = rate, Timestamp = timestamp };
+				db.UserFlashcardsVisits.Add(record);
 			}
 
 			await db.SaveChangesAsync();
+
+			return await GetUserFlashcardVisitAsync(userId, courseId, unitId, flashcardId);
 		}
 
 		public async Task<List<UserFlashcardsVisit>> GetUserFlashcardsVisitsAsync(string userId, string courseId, Guid unitId)
 		{
 			courseId = courseId.ToLower();
 			return await db.UserFlashcardsVisits.Where(c => c.UserId == userId && c.CourseId == courseId && c.UnitId == unitId).ToListAsync();
+		}
+
+		public async Task<UserFlashcardsVisit> GetUserFlashcardVisitAsync(string userId, string courseId, Guid unitId, string flashcardId)
+		{
+			courseId = courseId.ToLower();
+			return await db.UserFlashcardsVisits.FirstOrDefaultAsync(c => c.UserId == userId && c.CourseId == courseId && c.UnitId == unitId && c.FlashcardId == flashcardId);
 		}
 
 		public async Task<List<UserFlashcardsVisit>> GetUserFlashcardsVisitsAsync(string userId, string courseId)
