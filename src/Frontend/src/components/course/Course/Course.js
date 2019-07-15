@@ -14,6 +14,7 @@ class Course extends Component {
 			onCourseNavigation: true,
 			openUnit: null,
 			highlightedUnit: Course.findActiveUnit(props.slideId, props.courseInfo),
+			unitWasOpen: false,
 		};
 	}
 
@@ -30,10 +31,24 @@ class Course extends Component {
 	}
 
 	static getDerivedStateFromProps(props, state) {
+		const res = {};
+
+		if (!state.unitWasOpen && props.progress && Object.keys(props.progress).length && props.courseInfo) {
+			const openUnit = props.units[Course.findActiveUnit(props.slideId, props.courseInfo)];
+			if (!openUnit) {
+				return null;
+			}
+			res.openUnit = openUnit;
+			res.unitWasOpen = true;
+			res.onCourseNavigation = false;
+		}
+
 		if (!state.highlightedUnit && props.courseInfo) {
-			return {
-				highlightedUnit: Course.findActiveUnit(props.slideId, props.courseInfo)
-			};
+			res.highlightedUnit = Course.findActiveUnit(props.slideId, props.courseInfo);
+		}
+
+		if (Object.keys(res).length) {
+			return res;
 		}
 
 		return null;
@@ -51,7 +66,7 @@ class Course extends Component {
 		return (
 			<div className={ styles.root }>
 				{ onCourseNavigation ? this.renderCourseNavigation() : this.renderUnitNavigation()}
-				<div>
+				<div className={styles.pageWrapper}>
 					<AnyPage />
 				</div>
 			</div>
@@ -79,7 +94,7 @@ class Course extends Component {
 
 	renderUnitNavigation () {
 		const { openUnit } = this.state;
-		const { courseInfo, courseId, slideId } = this.props;
+		const { courseInfo, courseId, slideId, progress } = this.props;
 
 		return (
 			<UnitNavigation
@@ -92,9 +107,12 @@ class Course extends Component {
 					type: item.type,
 					url: constructPathToSlide(courseId, item.slug),
 					isActive: item.slug === slideId,
+					score: (progress && progress[item.id] && progress[item.id].score) || 0,
 					maxScore: item.maxScore,
-					score: 0, // TODO: настоящий счет
+					questionsCount: item.questionsCount,
+					visited: progress && progress[item.id],
 				})) }
+				nextUnit={Course.findNextUnit(openUnit, courseInfo)}
 			/>
 		);
 	}
@@ -116,6 +134,21 @@ class Course extends Component {
 		}
 
 		return  null;
+	}
+
+	static findNextUnit(activeUnit, courseInfo) {
+		const units = courseInfo.units;
+		const activeUnitId = activeUnit.id;
+
+		const indexOfActiveUnit = units.findIndex(item => item.id === activeUnitId);
+
+
+		if (indexOfActiveUnit < 0 || indexOfActiveUnit === units.length - 1) {
+			return null;
+		}
+
+
+		return units[indexOfActiveUnit + 1];
 	}
 
 	unitClickHandle = (id) => {

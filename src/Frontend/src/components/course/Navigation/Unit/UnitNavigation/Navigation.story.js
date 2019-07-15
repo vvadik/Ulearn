@@ -2,9 +2,11 @@ import React from "react";
 import { storiesOf } from "@storybook/react";
 import Navigation from './Navigation';
 import { itemTypes } from '../../constants';
+import StoryRouter from "storybook-react-router";
 
 
 storiesOf("ModuleNavigation", module)
+	.addDecorator(StoryRouter())
 	.add("Главный компонент навигации по модулю", () => (
 		<Navigation title='Первое знакомство с C#'
 					courseName='Основы программирования'
@@ -116,11 +118,12 @@ function getModuleNav () {
 		},
 	].map(item => {
 		if (Math.random() > 0.5) {
-			item.complete = true;
+			item.visited = true;
 		}
 
-		if (item.complete && item.type !== itemTypes.lesson) {
-			item.progress = Math.random();
+		if (item.visited && item.type !== itemTypes.lesson) {
+			item.maxScore = Math.round(Math.random() * 10);
+			item.score = Math.round(Math.random() * item.maxScore);
 		}
 
 		return item;

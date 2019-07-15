@@ -41,12 +41,14 @@ class NavigationItem extends Component {
 	renderScore() {
 		const { score, maxScore, type } = this.props;
 
-		console.log(type, type === itemTypes.exercise || type === itemTypes.quiz);
+		if (!maxScore) {
+			return;
+		}
 
 		if (type === itemTypes.exercise || type === itemTypes.quiz) {
 			return (
 				<div className={ styles.scoreWrapper }>
-					<span className={ styles.score }>{ score }/{ maxScore }</span>
+					<span className={ styles.score }>{ score || 0 }/{ maxScore }</span>
 				</div>
 			);
 		}
@@ -77,17 +79,16 @@ class NavigationItem extends Component {
 	}
 
 	renderPointer() {
-		const { type } = this.props;
-		const { complete } = this.props.metro;
+		const { type, visited } = this.props;
 
 		if (type === itemTypes.lesson) {
 			return (
-				<span className={ classnames(styles.pointer, {[styles.complete]: complete}) } />
+				<span className={ classnames(styles.pointer, {[styles.complete]: visited}) } />
 			);
 		}
 
 		return (
-			<span className={ classnames(styles.icon, {[styles.complete]: complete}) }>{icons[type]}</span>
+			<span className={ classnames(styles.icon, {[styles.complete]: visited}) }>{icons[type]}</span>
 		);
 	}
 }

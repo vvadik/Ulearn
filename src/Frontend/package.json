@@ -87,6 +87,7 @@
     "moment-timezone": "0.5.23",
     "postcss-loader": "3.0.0",
     "prettier": "1.16.4",
+    "storybook-react-router": "^1.0.5",
     "uglifyjs-webpack-plugin": "latest"
   },
   "eslintConfig": {
