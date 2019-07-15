@@ -159,7 +159,7 @@ module.exports = {
           },
           // See https://github.com/webpack-contrib/mini-css-extract-plugin for details
           {
-            test: /\.(sc|le)ss$/,
+            test: /\.less$/,
 			  use: [
 				  {
 					  loader: MiniCssExtractPlugin.loader,
@@ -172,14 +172,8 @@ module.exports = {
 							  safe: true
 						  },
 						  sourceMap: shouldUseSourceMap,
-	    				  localIdentName: '[name]__[local]--[hash:base64:5]',
+	    				  localIdentName: '[hash:base64:5]',
                           modules: true,
-					  }
-				  },
-				  {
-				  	  loader: 'less-loader',
-					  options: {
-				  	  	  sourceMap: shouldUseSourceMap,
 					  }
 				  },
 				  {
@@ -198,6 +192,12 @@ module.exports = {
 							  autoprefixer
 						  ]
 					  },
+				  },
+				  {
+				  	  loader: 'less-loader',
+					  options: {
+				  	  	  sourceMap: shouldUseSourceMap,
+					  }
 				  },
 			  ],
           },
