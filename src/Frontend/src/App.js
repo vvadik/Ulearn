@@ -118,10 +118,10 @@ class InternalUlearnApp extends Component {
 			<BrowserRouter>
 				<ErrorBoundary>
 					{isHeaderVisible &&
-						<React.Fragment>
-							<Header initializing={this.state.initializing} />
-							<div className={styles.headerContentDivider} id='headerContentDivider' />
-						</React.Fragment>
+					<React.Fragment>
+						<Header initializing={this.state.initializing}/>
+						<div className={styles.headerContentDivider} id='headerContentDivider'/>
+					</React.Fragment>
 					}
 					<NotFoundErrorBoundary>
 						{!this.state.initializing && // Avoiding bug: don't show page while initializing.
@@ -130,13 +130,12 @@ class InternalUlearnApp extends Component {
 						<Switch>
 							<Route path="/Admin/Groups" component={redirectLegacyPage("/:courseId/groups")}/>
 
-							<Route path="/course/:courseId/" component={Course} exact />
-							<Route path="/course/:courseId/:slideId" component={Course} exact />
+							<Route path="/course/:courseId/" component={Course} exact/>
+							<Route path="/course/:courseId/:slideId" component={Course} exact/>
 
-							<Route path="/:courseId/groups/" component={GroupListPage} exact />
-							<Route path="/:courseId/groups/:groupId/" component={GroupPage} exact />
-							<Route path="/:courseId/groups/:groupId/:groupPage" component={GroupPage} exact />
-
+							<Route path="/:courseId/groups/" component={GroupListPage} exact/>
+							<Route path="/:courseId/groups/:groupId/" component={GroupPage} exact/>
+							<Route path="/:courseId/groups/:groupId/:groupPage" component={GroupPage} exact/>
 
 							<Route exact path="/:courseId/flashcards/"
 								   render={(props) => <CoursePage {...props} guides={guides}/>}/>

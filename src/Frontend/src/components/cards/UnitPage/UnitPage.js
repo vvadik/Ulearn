@@ -13,17 +13,23 @@ class UnitPage extends Component {
 	constructor(props) {
 		super(props);
 		const {statistics = {}, totalFlashcardsCount = 0} = this.props;
-		this.haveProgress = statistics.notRated !== totalFlashcardsCount;
+		const haveProgress = statistics.notRated !== totalFlashcardsCount;
 
 		this.state = {
+			haveProgress: haveProgress,
 			isFlashcardsVisible: false
 		}
 	}
 
+	get courseId() {
+		return this.props.match.params.courseId.toLowerCase();
+	}
+
 	componentDidMount() {
-		const courseId = this.props.match.params.courseId.toLowerCase();
+		const courseId = this.courseId;
+
 		api.cards
-			.getFlashcards(courseId, 0) //TODO change 0 to correct unitId
+			.getFlashcards(courseId, 0)
 			.then(r => this.flashcards = r.flashcards);
 	}
 
@@ -39,12 +45,12 @@ class UnitPage extends Component {
 				<UnitCard haveProgress={this.haveProgress}
 						  totalFlashcardsCount={totalFlashcardsCount}
 						  unitTitle={unitTitle}
-						  handleStartButton={() => this.setFlashcardsVisibility(true)}
+						  handleStartButton={() => this.openFlashcards()}
 				/>
 				{this.renderFooter()}
 				{isFlashcardsVisible &&
 				<Flashcards
-					onClose={() => this.setFlashcardsVisibility(false)}
+					onClose={() => this.closeFlashcards()}
 					flashcards={this.flashcards}
 				/>}
 			</Gapped>
@@ -69,10 +75,39 @@ class UnitPage extends Component {
 		}
 	}
 
-	setFlashcardsVisibility = (isVisible) => {
+	loadStatistics() {
+		api.cards
+			.getUnitFlashcardsStat(this.courseId)
+			.then(r => r.json())
+			.then(r => {
+				this.props.statistics = r.statistics;
+				this.props.totalFlashcardsCount = r.totalFlashcardsCount;
+			});
+	}
+
+	openFlashcards() {
 		this.setState({
-			isFlashcardsVisible: isVisible
-		})
+			isFlashcardsVisible: true
+		});
+	}
+
+	closeFlashcards() {
+		const courseId = this.courseId;
+
+		api.cards
+			.getUnitFlashcardsStat(courseId)
+			.then(r => r.json())
+			.then(r => {
+				this.props.statistics = r.statistics;
+				this.props.totalFlashcardsCount = r.totalFlashcardsCount;
+				this.setState({
+					isFlashcardsVisible: false
+				});
+			})
+	}
+
+	mapFlashcardsToQuestionWithAnswers() {
+		return this.flashcards.map
 	}
 }
 

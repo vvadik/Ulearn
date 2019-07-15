@@ -6,7 +6,6 @@ import Button from "@skbkontur/react-ui/Button";
 import Results from "./Results/Results";
 import ProgressBar from "../ProgressBar/ProgressBar";
 import api from "../../../api";
-import {withRouter} from "react-router-dom";
 
 const modalsStyles = {
 	first: classNames(styles.modal),
@@ -27,7 +26,7 @@ const defaultStatistics = {
 class Flashcards extends Component {
 	constructor(props) {
 		super(props);
-		const flashcards = this.props.flashcards;
+		const {flashcards} = this.props;
 		const statistics = Flashcards.countStatistics(flashcards);
 
 		this.state = {
@@ -40,7 +39,7 @@ class Flashcards extends Component {
 
 	componentDidMount() {
 		document.getElementsByTagName('body')[0].classList.add(styles.overflow);
-		document.addEventListener('keypress', this.handleKeyPress);
+		document.addEventListener('keyup', this.handleKeyUp);
 	}
 
 	static countStatistics(flashcards) {
@@ -54,18 +53,19 @@ class Flashcards extends Component {
 	}
 
 	componentWillUnmount() {
-		document.removeEventListener('keypress', this.handleKeyPress);
+		document.removeEventListener('keyup', this.handleKeyUp);
 		document.getElementsByTagName('body')[0].classList.remove(styles.overflow);
 	}
 
 	render() {
 		const {flashcards, showAnswer, currentIndex, statistics} = this.state;
 		const totalFlashcardsCount = flashcards.length;
+		const flashcard = flashcards[currentIndex];
 
 		return (
 			<div className={styles.overlay}>
 				<div ref={(ref) => this.firstModal = ref} className={modalsStyles.first}>
-					{flashcards && this.renderFlashcard(flashcards[currentIndex], showAnswer)}
+					{flashcard && this.renderFlashcard(flashcard, showAnswer)}
 				</div>
 				<div ref={(ref) => this.secondModal = ref} className={modalsStyles.second}/>
 				<div ref={(ref) => this.thirdModal = ref} className={modalsStyles.third}/>
@@ -82,7 +82,7 @@ class Flashcards extends Component {
 		return this.props.match.params.courseId.toLowerCase();
 	}
 
-	handleKeyPress = (e) => {
+	handleKeyUp = (e) => {
 		const code = e.key;
 		const spaceChar = ' ';
 
@@ -90,11 +90,12 @@ class Flashcards extends Component {
 			this.showAnswer();
 		} else if (code >= 1 && code <= 5 && this.state.showAnswer) {
 			this.handleResultsClick(code);
+		} else if (code === 'Escape') {
+			this.props.onClose();
 		}
 	};
 
-
-	renderFlashcard({unitTitle = '', question = '', answer = ''}, showAnswer) {
+	renderFlashcard({unitTitle, question, answer}, showAnswer) {
 		return (
 			<div>
 				<button tabIndex={1} className={styles.closeButton} onClick={this.props.onClose}>
@@ -123,7 +124,7 @@ class Flashcards extends Component {
 	}
 
 	showAnswer() {
-		this.resetAnimation();
+		this.resetCardsAnimation();
 		this.setState({
 			showAnswer: true
 		});
@@ -198,11 +199,11 @@ class Flashcards extends Component {
 		thirdModal.className = classNames(modalsStyles.fourth, styles.move);
 
 		setTimeout(() => {
-			this.resetAnimation();
+			this.resetCardsAnimation();
 		}, animationDuration - animationDuration / 10);
 	}
 
-	resetAnimation() {
+	resetCardsAnimation() {
 		const {firstModal, secondModal, thirdModal} = this;
 
 		firstModal.className = classNames(modalsStyles.first);
@@ -225,4 +226,4 @@ Flashcards.propTypes = {
 	onClose: PropTypes.func
 };
 
-export default withRouter(Flashcards);
+export default Flashcards;

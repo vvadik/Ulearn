@@ -30,18 +30,20 @@ class CoursePage extends Component {
 
 		//TODO(rozentor)  await for backend implementation and uncomment lines with parsing
 		api.cards.getCourseFlashcardsStat(courseId)
-		//.then(r => r.json())
 		//	.then(r => this.setState({flashcardsInfos: r.flashcardsInfos}));
-			.then(_ => this.setState({flashcardsInfos: cardsByUnitExample}));
+			.then(_ => this.setState({flashcardsInfos: cardsByUnitExample}))
+			.catch(er => console.log(er));
 		api.cards
 			.getFlashcards(courseId)
 			.then(r => {
 				this.flashcards = r.flashcards;
-			});
+			})
+			.catch(er => console.log(er));
 	}
 
 	render() {
 		const {flashcardsInfos, guides, isFlashcardsVisible} = this.state;
+		const flashcards = this.flashcards;
 
 		return (
 			<Gapped gap={15} vertical={true}>
@@ -62,7 +64,7 @@ class CoursePage extends Component {
 				<Guides guides={guides}/>
 				{isFlashcardsVisible &&
 				<Flashcards
-					flashcards={this.flashcards}
+					flashcards={flashcards}
 					match={this.props.match}
 					onClose={() => this.setFlashcardsVisibility(false)}
 				/>}
@@ -71,9 +73,13 @@ class CoursePage extends Component {
 	}
 
 	setFlashcardsVisibility = (isVisible) => {
-		this.setState({
-			isFlashcardsVisible: isVisible
-		});
+		if (this.flashcards.length === 0) {
+
+		} else {
+			this.setState({
+				isFlashcardsVisible: isVisible
+			});
+		}
 	}
 }
 
