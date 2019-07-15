@@ -98,11 +98,31 @@ namespace Ulearn.Core.Tests.Courses.Slides
 		{
 			var slide = DeserializeFlashcardSlideFromXmlFile("SimpleFlashcardSlide.xml");
 			var flashcard = slide.FlashcardsList[0];
+			
 			var questionBlock = flashcard.Question.Blocks[0];
 			var answerBlock = flashcard.Answer.Blocks[0];
+			foreach (var block in flashcard.Answer.Blocks)
+				Assert.AreEqual(typeof (MarkdownBlock), block.GetType());
+			foreach (var block in flashcard.Question.Blocks)
+				Assert.AreEqual(typeof (MarkdownBlock), block.GetType());
 			Assert.AreEqual("\r\nI am question markdown block!",questionBlock.TryGetText());
 			Assert.AreEqual("\r\nI am answer markdown block!",answerBlock.TryGetText());
 		}
+		
+		
+		[Test]
+		public void DeserializeFlashcardSlideWithDifferentBlocks()
+		{
+			var slide = DeserializeFlashcardSlideFromXmlFile("SimpleFlashcardsSlideWithDifferentBlocks.xml");
+			var flashcard = slide.FlashcardsList[0];
+
+			var questionBlocks = flashcard.Question.Blocks;
+			var answerBlocks = flashcard.Answer.Blocks;
+			Assert.AreEqual(typeof (MarkdownBlock), questionBlocks[0].GetType());
+			Assert.AreEqual(typeof (TexBlock), questionBlocks[1].GetType());
+			Assert.AreEqual(typeof (CodeBlock), questionBlocks[2].GetType());
+		}
+
 
         [Test]
         public void DeserializeSlideWithDifferentBlocks()

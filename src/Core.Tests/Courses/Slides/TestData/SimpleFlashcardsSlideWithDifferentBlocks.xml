@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<slide.flashcards xmlns="https://ulearn.me/schema/v2" id="a7a73125-2434-4b5d-9f31-4ef687fc8bcc">
+	<flashcard>
+		<question>
+			<markdown>
+				I am question markdown block!
+				<code>
+					some code
+				</code>
+			</markdown>
+			<tex>
+				I am question tex block!
+			</tex>
+			<code>
+				I am(CodeBlock codeBlock(){
+				...code
+				} 
+			</code>
+			
+		</question>
+		<answer>
+			<markdown>
+				I am answer markdown block!
+			</markdown>
+		</answer>
+	</flashcard>
+
+</slide.flashcards>
