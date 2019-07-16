@@ -211,6 +211,7 @@ namespace Ulearn.Web.Api.Controllers
 						content.Append($"\n<textarea class=\"code code-sample\" data-lang=\"{codeBlock.Language.GetName()}\" data-code=\"{codeBlock.Code}\"></textarea>");
 						break;
 					}
+
 					case TexBlock texBlock:
 						content.Append(texBlock.TryGetText().RenderTex());
 						break;
@@ -244,12 +245,15 @@ namespace Ulearn.Web.Api.Controllers
 		[HttpGet("{courseId}/flashcards-info")]
 		public async Task<ActionResult<FlashcardInfoResponse>> FlashcardsInfo([FromRoute] Course course)
 		{
-			var userFlashcardsVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, course.Id);
 			var info = new FlashcardInfoResponse();
 
 			foreach (var unit in course.Units)
 			{
-				info.Add(new FlashcardsUnitInfo { UnitId = unit.Id, UnitTitle = unit.Title, CardsCount = unit.Flashcards.Count, Unlocked = false });
+				var userFlashcardsVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, course.Id, unit.Id);
+				var unlocked = userFlashcardsVisits.All(x => x.Score == Rate.NotRated);
+				var cardsCount = unit.Flashcards.Count;
+				if (cardsCount != 0)
+					info.Add(new FlashcardsUnitInfo { UnitId = unit.Id, UnitTitle = unit.Title, CardsCount = unit.Flashcards.Count, Unlocked = unlocked });
 			}
 
 			return info;
