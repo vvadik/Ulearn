@@ -2,6 +2,7 @@ using System;
 using RunCsJob.Api;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Flashcards;
 
 namespace uLearn.CourseTool.Validating
 {
@@ -26,10 +27,23 @@ namespace uLearn.CourseTool.Validating
 		{
 			return $"{slide.Info.Unit.Title}: {slide.Info.SlideFile?.Name} ({slide.Title})\n{warning}";
 		}
+		private static string FormatFlashcardIssueMessage(Flashcard flashcard, Slide slide, string warning)
+		{
+			return $" flashcard id {flashcard.Id} in slide {slide.Info.Unit.Title}: {slide.Info.SlideFile?.Name} ({slide.Title})\n{warning}";
+		}
 
 		protected void ReportSlideWarning(Slide slide, string warning)
 		{
 			ReportWarning(FormatSlideIssueMessage(slide, warning));
+		}
+
+		protected void ReportFlashcardWarning(Flashcard flashcard, Slide slide, string warning)
+		{
+			ReportWarning(FormatFlashcardIssueMessage(flashcard,slide, warning));
+		}
+		protected void ReportFlashcardError(Flashcard flashcard, Slide slide, string warning)
+		{
+			ReportError(FormatFlashcardIssueMessage(flashcard,slide, warning));
 		}
 
 		protected void ReportSlideError(Slide slide, string error)

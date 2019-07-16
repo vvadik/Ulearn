@@ -11,6 +11,7 @@ using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
+using Ulearn.Core.Courses.Slides.Flashcards;
 using Ulearn.Core.Extensions;
 
 namespace uLearn.CourseTool.Validating
@@ -41,10 +42,56 @@ namespace uLearn.CourseTool.Validating
 			}
 		}
 
+		public void ValidateFlashcardSlides()
+		{
+			foreach (var slide in slides.OfType<FlashcardSlide>())
+			{
+				LogSlideProcessing("Validate flashcard slide", slide);
+				foreach (var flashcard in slide.FlashcardsList)
+				{
+					ValidateFlashcard(flashcard, slide);
+				}
+			}
+		}
+
+		private void ValidateFlashcard(Flashcard flashcard, Slide flashcardSlide)
+		{
+			LogFlashcardProcessing("Validate flashcard", flashcard);
+			if (flashcard.Answer.Blocks.Length == 0)
+			{
+				ReportFlashcardWarning(flashcard, flashcardSlide, "Answer is empty");
+			}
+
+			if (flashcard.Question.Blocks.Length == 0)
+			{
+				ReportFlashcardWarning(flashcard, flashcardSlide, "Question is empty");
+			}
+
+			if (flashcard.Id == string.Empty)
+			{
+				ReportFlashcardError(flashcard,flashcardSlide,"Flashcard id is empty");
+			}
+
+			foreach (var slideId in flashcard.TheorySlidesIds)
+			{
+				if (slides.FirstOrDefault(x => x.Id == slideId) == default(Slide))
+				{
+					ReportFlashcardError(flashcard, flashcardSlide, $"Wrong theorySlideId. Slide with id {slideId} doesn't exist");
+				}
+			}
+		}
+
+
 		private void LogSlideProcessing(string prefix, Slide slide)
 		{
 			LogInfoMessage(prefix + " " + slide.Info.Unit.Title + " - " + slide.Title);
 		}
+
+		private void LogFlashcardProcessing(string prefix, Flashcard flashcard)
+		{
+			LogInfoMessage(prefix + " " + flashcard.Id);
+		}
+
 
 		public void ValidateVideos()
 		{
@@ -85,6 +132,7 @@ namespace uLearn.CourseTool.Validating
 				FailOnError(slide, solution, ethalon);
 				return;
 			}
+
 			if (solution.HasStyleErrors)
 			{
 				var errorMessages = string.Join("\n", solution.StyleErrors.Select(e => e.GetMessageWithPositions()));
@@ -126,6 +174,7 @@ ERROR:
 			{
 				ReportError("Spelling: " + error);
 			}
+
 			LogInfoMessage($"Spell checking done in {sw.ElapsedMilliseconds} ms");
 		}
 	}

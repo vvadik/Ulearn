@@ -5,6 +5,7 @@ using System.Linq;
 using Remotion.Linq.Clauses;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Flashcards;
 using Ulearn.Core.Courses.Units;
 using Ulearn.Core.Extensions;
 
@@ -76,7 +77,9 @@ namespace Ulearn.Core.Courses
 
 			var units = LoadUnits(context).ToList();
 			var slides = units.SelectMany(u => u.Slides).ToList();
+			var flashcards = slides.OfType<FlashcardSlide>().SelectMany(x => x.FlashcardsList);
 			CheckDuplicateSlideIds(slides);
+			CheckDuplicateFlashcardIds(flashcards);
 			AddDefaultScoringGroupIfNeeded(units, slides, settings);
 			CalculateScoringGroupScores(units, settings);
 
@@ -154,7 +157,7 @@ namespace Ulearn.Core.Courses
 		}
 
 		private static void CheckDuplicateSlideIds(IEnumerable<Slide> slides)
-		{
+         		{
 			var badSlides =
 				slides.GroupBy(x => x.Id)
 					.Where(x => x.Count() != 1)
@@ -165,6 +168,20 @@ namespace Ulearn.Core.Courses
 					"Идентификаторы слайдов (SlideId) должны быть уникальными.\n" +
 					"Слайды с повторяющимися идентификаторами:\n" +
 					string.Join("\n", badSlides.Select(x => string.Join("\n", x))));
+		}
+		
+		private static void CheckDuplicateFlashcardIds(IEnumerable<Flashcard> flashcards)
+		{
+			var badFlashcards =
+				flashcards.GroupBy(x => x.Id)
+					.Where(x => x.Count() != 1)
+					.Select(x => x.Select(y => y.Id))
+					.ToList();
+			if (badFlashcards.Any())
+				throw new CourseLoadingException(
+					"Идентификаторы флеш-карт (FlashcardId) должны быть уникальными.\n" +
+					"Флеш-карты с повторяющимися идентификаторами:\n" +
+					string.Join("\n", badFlashcards.Select(x => string.Join("\n", x))));
 		}
 	}
 
