@@ -24,5 +24,9 @@ namespace Ulearn.Web.Api.Models.Common
 		
 		[DataMember]
 		public Guid UnitId;
+		
+		[DataMember]
+		public Guid[] TheorySlidesIds;
+		
 	}
 }

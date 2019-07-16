@@ -43,6 +43,11 @@ namespace Ulearn.Core.Courses.Slides.Flashcards
 				Question.Blocks = new SlideBlock[0];
 			}
 
+			if (TheorySlidesIds is null)
+			{
+				TheorySlidesIds = new Guid[0];
+			}
+
 			var slideLoadingContext = new SlideBuildingContext(context, flashcardSlide);
 			Answer.Blocks = Answer.Blocks
 				.SelectMany(x => x.BuildUp(slideLoadingContext, ImmutableHashSet<string>.Empty))

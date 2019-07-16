@@ -149,18 +149,18 @@ namespace Ulearn.Web.Api.Controllers
 			else
 			{
 				userFlashcardsVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, course.Id);
-				flashcards = course.Units.SelectMany(x => x.Flashcards).ToList();
+				flashcards = flashcardOrder == FlashcardOrder.Smart ? await GetFlashcardsInSmartOrder(course) : course.Units.SelectMany(x => x.Flashcards).ToList();
 			}
 
 			var flashcardsResponse = new FlashcardsResponse();
-			var flashcardResponsesIenumerable = GetFlashcardResponses(rate, unitId, course, flashcards, userFlashcardsVisits);
+			var flashcardResponsesEnumerable = GetFlashcardResponses(rate, unitId, course, flashcards, userFlashcardsVisits);
 			if (count is null)
 			{
-				flashcardsResponse.Flashcards = flashcardResponsesIenumerable.ToList();
+				flashcardsResponse.Flashcards = flashcardResponsesEnumerable.ToList();
 			}
 			else
 			{
-				flashcardsResponse.Flashcards = flashcardResponsesIenumerable.Take(count.Value).ToList();
+				flashcardsResponse.Flashcards = flashcardResponsesEnumerable.Take(count.Value).ToList();
 			}
 
 			return flashcardsResponse;
@@ -190,9 +190,19 @@ namespace Ulearn.Web.Api.Controllers
 				}
 
 				var unitIdResponse = unit.Id;
-				var flashcardResponse = new FlashcardResponse { Answer = answer, Question = question, Rate = rateResponse, Id = flashcard.Id, UnitId = unitIdResponse, UnitTitle = unit.Title };
+
+				var flashcardResponse = new FlashcardResponse { Answer = answer, Question = question, Rate = rateResponse, Id = flashcard.Id, UnitId = unitIdResponse, UnitTitle = unit.Title, TheorySlidesIds = flashcard.TheorySlidesIds };
 				yield return flashcardResponse;
 			}
+		}
+
+		private async Task<List<Flashcard>> GetFlashcardsInSmartOrder(Course course)
+		{
+			var flashcards = course.Units.SelectMany(x => x.Flashcards);
+			var flashcardsDict = flashcards.ToDictionary(x => x.Id);
+			var userFlashcardsVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, course.Id);
+			var orderedFlashcardsVisits = userFlashcardsVisits.OrderBy(x => x.Timestamp).ThenBy(x => x.Score); //Иная логика?
+			return orderedFlashcardsVisits.Where(x => flashcardsDict.ContainsKey(x.FlashcardId)).Select(x => flashcardsDict[x.FlashcardId]).ToList();
 		}
 
 
