@@ -7,10 +7,10 @@ import LockClosed from '@skbkontur/react-icons/LockClosed';
 import Button from "@skbkontur/react-ui/Button";
 import {Link} from 'react-router-dom';
 
-function CourseCards({flashcardsInfos, courseId}) {
+function CourseCards({flashcardsInfo, courseId, unitsInfo}) {
 	return (
 		<div className={styles.cardsContainer}>
-			{flashcardsInfos.map(convertToUnitCard)}
+			{flashcardsInfo.map(convertToUnitCard)}
 			<div className={styles.emptyUnitCard}>
 				Новые вопросы для самопроверки открываются по мере прохождения курса
 			</div>
@@ -19,9 +19,14 @@ function CourseCards({flashcardsInfos, courseId}) {
 
 	function convertToUnitCard({unitTitle, unlocked, cardsCount, unitId}) {
 		const unitCardStyle = classNames(styles.unitCard, {[styles.unitCardLocked]: !unlocked});
+		const slideUrl = unitsInfo
+			.find(unit => unit.id === unitId)
+			.slides[0]
+			.id;
+
 		const url = unlocked
-			? `/${courseId.toLowerCase()}/flashcards/${unitId}`
-			: `/Course/${courseId.toLowerCase()}/${unitId}/`; 		//TODO(rozentor) change to correct unit URL
+			? `/Course/${courseId}/flashcards/${unitId}`
+			: `/Course/${courseId}/${slideUrl}/`;
 
 		return (
 			<Link key={unitId} className={unitCardStyle}
@@ -47,13 +52,18 @@ function CourseCards({flashcardsInfos, courseId}) {
 }
 
 CourseCards.propTypes = {
-	flashcardsInfos: PropTypes.arrayOf(PropTypes.shape({
+	flashcardsInfo: PropTypes.arrayOf(PropTypes.shape({
 		unitTitle: PropTypes.string,
 		unlocked: PropTypes.bool,
 		cardsCount: PropTypes.number,
 		unitId: PropTypes.string
 	})),
-	courseId: PropTypes.string.isRequired
+	courseId: PropTypes.string.isRequired,
+	unitsInfo: PropTypes.arrayOf(PropTypes.shape({
+		id: PropTypes.string,
+		slides: PropTypes.array,
+		title: PropTypes.string,
+	})),
 };
 
 export default CourseCards;

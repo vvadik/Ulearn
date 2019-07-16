@@ -8,3 +8,11 @@ export function getQueryStringParameter(name, url) {
 	if (!results[2]) return '';
 	return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
+
+export function buildQuery(params) {
+	const esc = encodeURIComponent;
+	return '?' + Object.keys(params)
+		.filter(key => params[key] !== undefined)
+		.map(key => esc(key) + '=' + esc(params[key]))
+		.join('&');
+}

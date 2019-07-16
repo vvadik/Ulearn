@@ -40,12 +40,10 @@ class ShortQuestions extends Component {
 							className={styles.questionText}
 							key={index}
 							onClick={() => this.handleQuestionClick(index)}>
-							{question}
+							<div dangerouslySetInnerHTML={{__html: question}}/>
 							{
 								(showAllAnswers || showAnswer) &&
-								<p className={styles.answerText}>
-									{answer}
-								</p>
+								<div className={styles.answerText} dangerouslySetInnerHTML={{__html: answer}}/>
 							}
 						</li>)
 				}

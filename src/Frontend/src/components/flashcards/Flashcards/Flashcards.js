@@ -5,7 +5,6 @@ import classNames from 'classnames';
 import Button from "@skbkontur/react-ui/Button";
 import Results from "./Results/Results";
 import ProgressBar from "../ProgressBar/ProgressBar";
-import api from "../../../api";
 
 const modalsStyles = {
 	first: classNames(styles.modal),
@@ -63,7 +62,7 @@ class Flashcards extends Component {
 		const flashcard = flashcards[currentIndex];
 
 		return (
-			<div className={styles.overlay}>
+			<div ref={(ref) => this.overlay = ref} className={styles.overlay} onClick={this.handleOverlayClick}>
 				<div ref={(ref) => this.firstModal = ref} className={modalsStyles.first}>
 					{flashcard && this.renderFlashcard(flashcard, showAnswer)}
 				</div>
@@ -78,9 +77,11 @@ class Flashcards extends Component {
 		)
 	}
 
-	get courseId() {
-		return this.props.match.params.courseId.toLowerCase();
-	}
+	handleOverlayClick = (e) => {
+		if (e.target === this.overlay) {
+			this.props.onClose();
+		}
+	};
 
 	handleKeyUp = (e) => {
 		const code = e.key;
@@ -158,10 +159,11 @@ class Flashcards extends Component {
 
 	handleResultsClick = (rate) => {
 		const {currentIndex, flashcards, statistics} = this.state;
+		const {courseId, sendFlashcardRate} = this.props;
 		const currentCard = flashcards[currentIndex];
 		const newRate = `rate${rate}`;
 
-		api.cards.putFlashcardStatus(this.courseId, currentCard.id, newRate);
+		sendFlashcardRate(courseId, currentCard.id, newRate);
 
 		statistics[currentCard.rate]--;
 		statistics[newRate]++;
@@ -221,9 +223,10 @@ Flashcards.propTypes = {
 		unitTitle: PropTypes.string,
 		rate: PropTypes.string,
 		unitId: PropTypes.string
-	})).isRequired,
-	match: PropTypes.object,
-	onClose: PropTypes.func
+	})),
+	courseId: PropTypes.string,
+	onClose: PropTypes.func,
+	sendFlashcardRate: PropTypes.func,
 };
 
 export default Flashcards;

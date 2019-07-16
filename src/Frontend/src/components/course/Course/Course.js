@@ -66,9 +66,9 @@ class Course extends Component {
 		return (
 			<div className={ styles.root }>
 				{ onCourseNavigation ? this.renderCourseNavigation() : this.renderUnitNavigation()}
-				<div className={styles.pageWrapper}>
-					<AnyPage />
-				</div>
+				<main className={styles.pageWrapper}>
+					{this.props.children}
+				</main>
 			</div>
 		);
 	}

@@ -1,21 +1,13 @@
 import api from "./index";
+import {buildQuery} from "../utils";
 
-function buildQuery(params) {
-	const esc = encodeURIComponent;
-	return '?' + Object
-		.keys(params)
-		.filter(key => params[key] !== undefined)
-		.map(key => esc(key) + '=' + esc(params[key]))
-		.join('&');
-}
-
-export function getUnitFlashcardsStat(courseId, unitId) {
+export function getFlashcardsStatistics(courseId, unitId) {
 	const query = buildQuery({unitId});
 
 	return api.get(`courses/${courseId}/flashcards/stat` + query);
 }
 
-export function getFlashcards(courseId, unitId, count, flashcardOrder, rate) {
+export function getFlashcardsPack(courseId, unitId, count, flashcardOrder, rate) {
 	let query = buildQuery({
 		courseId: courseId,
 		unitId: unitId,
@@ -32,6 +24,6 @@ export function putFlashcardStatus(courseId, cardId, rate) {
 		api.createRequestParams(rate));
 }
 
-export function getCourseFlashcardsStat(courseId) {
+export function getCourseFlashcardsInfo(courseId) {
 	return api.get(`courses/${courseId}/flashcards-info`);
 }
