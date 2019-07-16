@@ -37,7 +37,7 @@ namespace Database.Core.Tests.Repos.Flashcards
 			Assert.AreEqual(courseId.ToLower(), userFlashcardVisit.CourseId);
 			Assert.AreEqual(userId, userFlashcardVisit.UserId);
 			Assert.AreEqual(timestamp, userFlashcardVisit.Timestamp);
-			Assert.AreEqual(rate, userFlashcardVisit.Score);
+			Assert.AreEqual(rate, userFlashcardVisit.Rate);
 			Assert.AreEqual(unitId, userFlashcardVisit.UnitId);
 		}
 

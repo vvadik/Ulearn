@@ -23,13 +23,13 @@ namespace Database.Repos.Flashcards
 
 			if (existingRecord != null)
 			{
-				existingRecord.Score = rate;
+				existingRecord.Rate = rate;
 				existingRecord.Timestamp = timestamp;
 			}
 			else
 			{
 				var record = new UserFlashcardsVisit
-					{ UserId = userId, CourseId = courseId, UnitId = unitId, FlashcardId = flashcardId, Score = rate, Timestamp = timestamp };
+					{ UserId = userId, CourseId = courseId, UnitId = unitId, FlashcardId = flashcardId, Rate = rate, Timestamp = timestamp };
 				db.UserFlashcardsVisits.Add(record);
 			}
 
