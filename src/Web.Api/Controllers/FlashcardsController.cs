@@ -260,7 +260,7 @@ namespace Ulearn.Web.Api.Controllers
 			foreach (var unit in course.Units)
 			{
 				var userFlashcardsVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, course.Id, unit.Id);
-				var unlocked = userFlashcardsVisits.All(x => x.Rate == Rate.NotRated);
+				var unlocked = userFlashcardsVisits.Any(x => x.Rate != Rate.NotRated);
 				var cardsCount = unit.Flashcards.Count;
 				if (cardsCount != 0)
 					info.Add(new FlashcardsUnitInfo { UnitId = unit.Id, UnitTitle = unit.Title, CardsCount = unit.Flashcards.Count, Unlocked = unlocked });
