@@ -234,13 +234,18 @@ namespace Ulearn.Core
 		public Course LoadCourseFromZip(FileInfo zipFile)
 		{
 			var courseDir = UnzipCourseFile(zipFile);
+			log.Info($"Распаковал архив с курсом из {zipFile.FullName} в {courseDir.FullName}");
 			return LoadCourseFromDirectory(courseDir);
 		}
 
 		public Course LoadCourseFromDirectory(DirectoryInfo dir)
 		{
+			log.Info($"WaitWhileCourseIsLocked {dir.Name}");
 			WaitWhileCourseIsLocked(GetCourseId(dir.Name));
-			return loader.Load(dir);
+			log.Info($"Course is not locked {dir.Name}");
+			var l = loader.Load(dir);
+			log.Info($"Course is loaded {dir.Name}");
+			return l;
 		}
 
 		public static string GetCourseId(string packageName)
@@ -443,7 +448,9 @@ namespace Ulearn.Core
 		public void WaitWhileCourseIsLocked(string courseId)
 		{
 			LockCourse(courseId);
+			log.Info($"Course is locked {courseId}");
 			ReleaseCourse(courseId);
+			log.Info($"Course lock released {courseId}");
 		}
 
 		public void MoveCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)
