@@ -115,8 +115,8 @@ namespace RunCheckerJob
 			{
 				StartInfo =
 				{
-					Arguments = $"/C {shellCommand}",
-					FileName = "cmd.exe",
+					Arguments = shellCommand,
+					FileName = "docker",
 					RedirectStandardOutput = true,
 					RedirectStandardError = true,
 					CreateNoWindow = true,
@@ -130,7 +130,7 @@ namespace RunCheckerJob
 			var seccompPath = settings.SeccompFileName == null ? null : ConvertToUnixPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DockerConfig", settings.SeccompFileName));
 			var parts = new List<string>
 			{
-				"docker run",
+				"run",
 				$"-v {ConvertToUnixPath(dir.FullName)}:/source",
 				seccompPath == null ? "" : $"--security-opt seccomp={seccompPath}", //"--privileged",
 				"--network none",

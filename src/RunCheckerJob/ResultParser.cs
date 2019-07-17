@@ -16,12 +16,14 @@ namespace RunCheckerJob
 			try
 			{
 				var result = JsonConvert.DeserializeObject<RunningResults>(output);
+				if(result == null)
+					throw new Exception();
 				return result;
 			}
 			catch (Exception)
 			{
 				log.Info("Не удалось распарсить результат");
-				return new RunningResults(Verdict.UndefinedError, error: error, output: output);
+				return new RunningResults(Verdict.RuntimeError, error: error, output: output);
 			}
 		}
 	}
