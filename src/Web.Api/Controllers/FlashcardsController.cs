@@ -223,7 +223,7 @@ namespace Ulearn.Web.Api.Controllers
 					}
 
 					case TexBlock texBlock:
-						content.Append(texBlock.TryGetText().RenderTex());
+						content.Append(texBlock.TryGetText().RenderTex().Value);
 						break;
 					default:
 						content.Append(block.TryGetText());

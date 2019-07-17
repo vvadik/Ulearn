@@ -40,6 +40,15 @@ namespace Ulearn.Core.Courses.Slides.Flashcards
 				flashcard.Validate(context, this);
 			}
 
+			var emptyIdFlashcards = FlashcardsList.Where(x => string.IsNullOrEmpty(x.Id)).ToList();
+			if (emptyIdFlashcards.Any())
+			{
+				throw new CourseLoadingException(
+					"Идентификаторы флеш-карт должны быть заполненными.\n" +
+					"Модуль с флешкартами с пустыми идентификаторами:\n" +
+					$"{Title}");
+			}
+
 			base.Validate(context);
 		}
 
@@ -49,14 +58,12 @@ namespace Ulearn.Core.Courses.Slides.Flashcards
 			typeof(MarkdownBlock),
 			typeof(CodeBlock),
 			typeof(TexBlock),
-			typeof(IncludeCodeBlock),
-			typeof(IncludeMarkdownBlock),
 			typeof(HtmlBlock),
 		};
 
 		public new void CheckBlockTypes()
 		{
-			var blocks = FlashcardsList.SelectMany(x => x.Answer.Blocks).Concat(FlashcardsList.SelectMany(x=>x.Question.Blocks));
+			var blocks = FlashcardsList.SelectMany(x => x.Answer.Blocks).Concat(FlashcardsList.SelectMany(x => x.Question.Blocks));
 			foreach (var block in blocks)
 			{
 				if (!AllowedBlockTypes.Any(type => type.IsInstanceOfType(block)))
@@ -65,7 +72,6 @@ namespace Ulearn.Core.Courses.Slides.Flashcards
 						$"В этом слайде разрешены только следующие блоки: {string.Join(", ", AllowedBlockTypes.Select(t => $"<{t.GetXmlType()}>"))}"
 					);
 			}
-			
 		}
 	}
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.EntityFrameworkCore.Internal;
 using Remotion.Linq.Clauses;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
@@ -80,6 +81,7 @@ namespace Ulearn.Core.Courses
 
 			var flashcards = slides.OfType<FlashcardSlide>().SelectMany(x => x.FlashcardsList);
 			CheckDuplicateSlideIds(slides);
+			CheckEmptySlideIds(slides);
 			CheckDuplicateFlashcardIds(flashcards);
 			AddDefaultScoringGroupIfNeeded(units, slides, settings);
 			CalculateScoringGroupScores(units, settings);
@@ -148,7 +150,7 @@ namespace Ulearn.Core.Courses
 				if (unit.Slides.OfType<FlashcardSlide>().Count() > 1)
 				{
 					throw new CourseLoadingException($"Ошибка в курсе \"{context.CourseSettings.Title}\" при загрузке модуля \"{unit.Title}\" из {unitFile.FullName}. " +
-													$"Обнаружено более одного слайда с флеш-картами. Слайд с флеш-картами может быть только один");
+													$"Обнаружено более одного слайда с флеш-картами. Слайд с флеш-картами должен быть только один");
 				}
 
 				yield return unit;
@@ -175,6 +177,19 @@ namespace Ulearn.Core.Courses
 					"Слайды с повторяющимися идентификаторами:\n" +
 					string.Join("\n", badSlides.Select(x => string.Join("\n", x))));
 		}
+
+		private static void CheckEmptySlideIds(IEnumerable<Slide> slides)
+		{
+			var emptyIdSlides = slides.Where(x => x.Id == Guid.Empty).Select(x => x.Title).ToList();
+			if (emptyIdSlides.Any())
+			{
+				throw new CourseLoadingException(
+					"Идентификаторы слайдов (SlideId) должны быть заполненными.\n" +
+					"Слайды с пустыми идентификаторами:\n" +
+					string.Join("\n", emptyIdSlides.Select(x => string.Join("\n", x))));
+			}
+		}
+
 
 		private static void CheckDuplicateFlashcardIds(IEnumerable<Flashcard> flashcards)
 		{

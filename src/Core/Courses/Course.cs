@@ -5,7 +5,6 @@ using System.Linq;
 using JetBrains.Annotations;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
-using Ulearn.Core.Courses.Slides.Flashcards;
 using Ulearn.Core.Courses.Units;
 
 namespace Ulearn.Core.Courses
@@ -32,7 +31,6 @@ namespace Ulearn.Core.Courses
 		{
 			get { return slidesCache ?? (slidesCache = Units.SelectMany(u => u.Slides).ToList()); }
 		}
-
 
 		[CanBeNull]
 		public Slide FindSlideById(Guid slideId)
