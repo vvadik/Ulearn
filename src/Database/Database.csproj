@@ -778,6 +778,10 @@
     <Compile Include="Migrations\201907040654351_AddUserFlashcardsVisits.Designer.cs">
       <DependentUpon>201907040654351_AddUserFlashcardsVisits.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201907161247301_AddUserFlashcardsVisits1.cs" />
+    <Compile Include="Migrations\201907161247301_AddUserFlashcardsVisits1.Designer.cs">
+      <DependentUpon>201907161247301_AddUserFlashcardsVisits1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -1223,6 +1227,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201907040654351_AddUserFlashcardsVisits.resx">
       <DependentUpon>201907040654351_AddUserFlashcardsVisits.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201907161247301_AddUserFlashcardsVisits1.resx">
+      <DependentUpon>201907161247301_AddUserFlashcardsVisits1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

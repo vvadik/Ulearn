@@ -87,7 +87,7 @@ namespace Ulearn.Web.Api.Controllers
 			{
 				if (!flashcardsDict.ContainsKey(flashcardVisit.FlashcardId))
 					continue;
-				switch (flashcardVisit.Score)
+				switch (flashcardVisit.Rate)
 				{
 					case Rate.NotRated:
 						scoreResponse.NotRated++;
@@ -172,13 +172,13 @@ namespace Ulearn.Web.Api.Controllers
 
 			foreach (var flashcard in flashcards)
 			{
-				if (rate != null && userFlashcardsVisitsDictionary[flashcard.Id].Score != rate.Value)
+				if (rate != null && userFlashcardsVisitsDictionary[flashcard.Id].Rate != rate.Value)
 					continue;
 
 				var question = GetRenderedContent(flashcard.Question.Blocks);
 				var answer = GetRenderedContent(flashcard.Answer.Blocks);
 
-				var rateResponse = userFlashcardsVisitsDictionary.TryGetValue(flashcard.Id, out var visit) ? visit.Score : Rate.NotRated;
+				var rateResponse = userFlashcardsVisitsDictionary.TryGetValue(flashcard.Id, out var visit) ? visit.Rate : Rate.NotRated;
 				Unit unit;
 				if (unitId is null)
 				{
@@ -201,7 +201,7 @@ namespace Ulearn.Web.Api.Controllers
 			var flashcards = course.Units.SelectMany(x => x.Flashcards);
 			var flashcardsDict = flashcards.ToDictionary(x => x.Id);
 			var userFlashcardsVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, course.Id);
-			var orderedFlashcardsVisits = userFlashcardsVisits.OrderBy(x => x.Timestamp).ThenBy(x => x.Score); //Иная логика?
+			var orderedFlashcardsVisits = userFlashcardsVisits.OrderBy(x => x.Timestamp).ThenBy(x => x.Rate); //Иная логика?
 			return orderedFlashcardsVisits.Where(x => flashcardsDict.ContainsKey(x.FlashcardId)).Select(x => flashcardsDict[x.FlashcardId]).ToList();
 		}
 
@@ -241,7 +241,7 @@ namespace Ulearn.Web.Api.Controllers
 			{
 				if (!result.ContainsKey(flashcard.Id))
 				{
-					result[flashcard.Id] = new UserFlashcardsVisit { FlashcardId = flashcard.Id, Score = Rate.NotRated };
+					result[flashcard.Id] = new UserFlashcardsVisit { FlashcardId = flashcard.Id, Rate = Rate.NotRated };
 				}
 			}
 
@@ -260,7 +260,7 @@ namespace Ulearn.Web.Api.Controllers
 			foreach (var unit in course.Units)
 			{
 				var userFlashcardsVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, course.Id, unit.Id);
-				var unlocked = userFlashcardsVisits.All(x => x.Score == Rate.NotRated);
+				var unlocked = userFlashcardsVisits.Any(x => x.Rate != Rate.NotRated);
 				var cardsCount = unit.Flashcards.Count;
 				if (cardsCount != 0)
 					info.Add(new FlashcardsUnitInfo { UnitId = unit.Id, UnitTitle = unit.Title, CardsCount = unit.Flashcards.Count, Unlocked = unlocked });
