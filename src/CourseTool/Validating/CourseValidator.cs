@@ -47,6 +47,10 @@ namespace uLearn.CourseTool.Validating
 			foreach (var slide in slides.OfType<FlashcardSlide>())
 			{
 				LogSlideProcessing("Validate flashcard slide", slide);
+				if (slide.FlashcardsList.Length == 0)
+				{
+					ReportSlideWarning(slide,"Flashcard slide contains no flashcards");
+				}
 				foreach (var flashcard in slide.FlashcardsList)
 				{
 					ValidateFlashcard(flashcard, slide);

@@ -25,7 +25,7 @@ namespace Ulearn.Core.Courses
 			: this(new UnitLoader(new XmlSlideLoader()))
 		{
 		}
-		
+
 		public Course Load(DirectoryInfo dir)
 		{
 			try
@@ -77,6 +77,7 @@ namespace Ulearn.Core.Courses
 
 			var units = LoadUnits(context).ToList();
 			var slides = units.SelectMany(u => u.Slides).ToList();
+
 			var flashcards = slides.OfType<FlashcardSlide>().SelectMany(x => x.FlashcardsList);
 			CheckDuplicateSlideIds(slides);
 			CheckDuplicateFlashcardIds(flashcards);
@@ -134,8 +135,8 @@ namespace Ulearn.Core.Courses
 
 				if (unitIds.Contains(unit.Id))
 					throw new CourseLoadingException($"Ошибка в курсе \"{context.CourseSettings.Title}\" при загрузке модуля \"{unit.Title}\" из {unitFile.FullName}. " +
-													 $"Повторяющийся идентификатор модуля: {unit.Id}. Идентификаторы модулей должны быть уникальными. " +
-													 $"К этому времени загружены модули {string.Join(", ", unitIds)}");
+													$"Повторяющийся идентификатор модуля: {unit.Id}. Идентификаторы модулей должны быть уникальными. " +
+													$"К этому времени загружены модули {string.Join(", ", unitIds)}");
 				unitIds.Add(unit.Id);
 
 				if (unitUrls.Contains(unit.Url))
@@ -144,6 +145,11 @@ namespace Ulearn.Core.Courses
 						$"Повторяющийся url-адрес модуля: {unit.Url}. Url-адреса модулей должны быть уникальными"
 					);
 				unitUrls.Add(unit.Url);
+				if (unit.Slides.OfType<FlashcardSlide>().Count() > 1)
+				{
+					throw new CourseLoadingException($"Ошибка в курсе \"{context.CourseSettings.Title}\" при загрузке модуля \"{unit.Title}\" из {unitFile.FullName}. " +
+													$"Обнаружено более одного слайда с флеш-картами. Слайд с флеш-картами может быть только один");
+				}
 
 				yield return unit;
 
@@ -157,7 +163,7 @@ namespace Ulearn.Core.Courses
 		}
 
 		private static void CheckDuplicateSlideIds(IEnumerable<Slide> slides)
-         		{
+		{
 			var badSlides =
 				slides.GroupBy(x => x.Id)
 					.Where(x => x.Count() != 1)
@@ -169,7 +175,7 @@ namespace Ulearn.Core.Courses
 					"Слайды с повторяющимися идентификаторами:\n" +
 					string.Join("\n", badSlides.Select(x => string.Join("\n", x))));
 		}
-		
+
 		private static void CheckDuplicateFlashcardIds(IEnumerable<Flashcard> flashcards)
 		{
 			var badFlashcards =
