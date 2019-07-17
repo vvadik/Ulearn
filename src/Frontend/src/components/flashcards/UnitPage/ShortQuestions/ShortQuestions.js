@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import PropTypes from "prop-types";
 import styles from './shortQuestions.less';
 import Toggle from "@skbkontur/react-ui/Toggle";
+import translateTextareaToCode from "../../../../codemirror/codemirror";
 
 class ShortQuestions extends Component {
 	constructor(props) {
@@ -11,6 +12,22 @@ class ShortQuestions extends Component {
 			showAllAnswers: false,
 			questionsWithAnswers: this.props.questionsWithAnswers
 		};
+	}
+
+	// componentDidMount() {
+	// 	this.representTextAsCode();
+	// }
+
+	// componentDidUpdate(prevProps, prevState, snapshot) { //TODO ROZENTOR implement compDidUpdate and DidMount using codeMirror
+	// 	const {showAllanswers, questionsWithAnswers} = this.state;
+	//
+	// 	this.representTextAsCode();
+	// }
+
+	representTextAsCode() {
+		for (const textarea of this.firstModal.querySelectorAll('textarea')) {
+			translateTextareaToCode(textarea, {readOnly: true});
+		}
 	}
 
 	render() {

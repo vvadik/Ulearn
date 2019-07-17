@@ -12,7 +12,7 @@ const mapRateToStyle = {
 	rate5: styles.rate5,
 };
 
-const mapStatusToText = {
+const mapRateToText = {
 	notRated: 'непросмотрено',
 	rate1: 'плохо',
 	rate2: 'удовлетворительно',
@@ -29,21 +29,34 @@ function ProgressBar({statistics, totalFlashcardsCount}) {
 	);
 
 	function renderResults() {
-		return Object
-			.keys(statistics)
-			.filter(key => statistics[key] > 0)
-			.map((key, index, array) => convertToBarElement(key, statistics[key], totalFlashcardsCount, index, array.length - 1));
+		const rates = Object.keys(statistics)
+			.filter(key => statistics[key] > 0);
+		const lowestOrderIndex = rates['notRated']
+			? 1
+			: 0;
+		const highestOrderIndex = rates.length - 1;
+
+		return rates.map((key, index) => convertToBarElement(
+			key,
+			statistics[key],
+			totalFlashcardsCount,
+			index, {
+				lowestOrderIndex,
+				highestOrderIndex
+			}));
 	}
 
-	function convertToBarElement(status, count, cardsCount, index, lastIndex) {
-		const elementWidth = `${count / cardsCount * 100}%`;
+	function convertToBarElement(rate, count, totalCardsCount, index, {lowestOrderIndex, highestOrderIndex}) {
+		const elementWidth = `${count / totalCardsCount * 100}%`;
+
+		const statusText = (index === lowestOrderIndex || index === highestOrderIndex || rate === 'notRated') && mapRateToText[rate];
 
 		return (
 			<span
-				key={status}
-				className={classNames(styles.progressBarElement, mapRateToStyle[status])}
+				key={rate}
+				className={classNames(styles.progressBarElement, mapRateToStyle[rate])}
 				style={{width: elementWidth}}>
-				{count} {(index === 0 || index === lastIndex) && mapStatusToText[status]}
+				{count} {statusText}
 			</span>
 		);
 	}

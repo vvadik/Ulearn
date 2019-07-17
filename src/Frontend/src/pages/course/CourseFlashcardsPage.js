@@ -5,12 +5,13 @@ import CourseFlashcards from "../../components/flashcards/CoursePage/CoursePage"
 
 const mapStateToProps = (state, {match}) => {
 	const {courseId} = match.params;
+	const data = state.courses;
 
 	return {
 		courseId,
-		flashcardsInfo: state.courses.flashcardsInfo[courseId],
-		flashcardsPack: state.courses.flashcardsPackByCourses[courseId],
-		unitsInfo: state.courses.fullCoursesInfo[courseId].units,
+		flashcardsInfo: data.flashcardsInfo[courseId],
+		flashcardsPack: data.flashcardsPackByCourses[courseId],
+		unitsInfo: data.fullCoursesInfo[courseId].units,
 	}
 };
 const mapDispatchToProps = (dispatch) => ({

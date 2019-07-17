@@ -7,25 +7,25 @@ const mapStateToProps = (state, {match}) => {
 	const {courseId, unitId} = match.params;
 	const data = state.courses;
 
-	const statistics = data.flashcardsStatisticsByUnits[unitId]
+	const statistics = unitId in data.flashcardsStatisticsByUnits
 		? data.flashcardsStatisticsByUnits[unitId].statistics
 		: undefined;
-	const totalFlashcardsCount = data.flashcardsStatisticsByUnits[unitId]
+	const totalFlashcardsCount = unitId in data.flashcardsStatisticsByUnits
 		? data.flashcardsStatisticsByUnits[unitId].totalFlashcardsCount
 		: undefined;
-	const flashcardsPack = data.flashcardsPackByCourses[courseId]
+	const flashcardsPack = courseId in data.flashcardsPackByCourses
 		? data.flashcardsPackByCourses[courseId].filter(flashcard => flashcard.unitId === unitId)
 		: undefined;
-
+	const unitTitle = data.fullCoursesInfo[courseId].units.find(unit => unit.id === unitId).title;
 
 	return {
-		unitTitle: data.fullCoursesInfo[courseId].units.find(unit => unit.id === unitId).title,
+		unitTitle,
 		courseId,
 		unitId,
 		statisticsLoading: data.flashcardsStatisticsByUnitsLoading,
-		statistics: statistics,
-		totalFlashcardsCount: totalFlashcardsCount,
-		flashcardsPack: flashcardsPack,
+		statistics,
+		totalFlashcardsCount,
+		flashcardsPack,
 	}
 };
 const mapDispatchToProps = (dispatch) => ({

@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import Button from "@skbkontur/react-ui/Button";
 import Results from "./Results/Results";
 import ProgressBar from "../ProgressBar/ProgressBar";
+import translateTextareaToCode from "../../../codemirror/codemirror";
 
 const modalsStyles = {
 	first: classNames(styles.modal),
@@ -32,13 +33,14 @@ class Flashcards extends Component {
 			showAnswer: false,
 			currentIndex: 0,
 			statistics: statistics,
-			flashcards: flashcards
+			flashcards: flashcards,
 		}
 	}
 
 	componentDidMount() {
 		document.getElementsByTagName('body')[0].classList.add(styles.overflow);
 		document.addEventListener('keyup', this.handleKeyUp);
+		this.representTextAsCode();
 	}
 
 	static countStatistics(flashcards) {
@@ -54,6 +56,23 @@ class Flashcards extends Component {
 	componentWillUnmount() {
 		document.removeEventListener('keyup', this.handleKeyUp);
 		document.getElementsByTagName('body')[0].classList.remove(styles.overflow);
+	}
+
+	componentDidUpdate(prevProps, prevState, snapshot) {
+		const {showAnswer} = this.state;
+
+		if (prevState.showAnswer === showAnswer) {
+			return;
+		}
+
+		this.representTextAsCode();
+		//<textarea class="code code-sample" data-lang="csharp" data-code="double.Parse"></textarea>
+	}
+
+	representTextAsCode() {
+		for (const textarea of this.firstModal.querySelectorAll('textarea')) {
+			translateTextareaToCode(textarea, {readOnly: true});
+		}
 	}
 
 	render() {
@@ -103,7 +122,7 @@ class Flashcards extends Component {
 					&times;
 				</button>
 				<h5 className={styles.unitTitle}>
-					{unitTitle ? unitTitle : 'unknown'}
+					{unitTitle}
 				</h5>
 				{!showAnswer && this.renderFrontFlashcard(question)}
 				{showAnswer && this.renderBackFlashcard(question, answer)}
@@ -114,7 +133,8 @@ class Flashcards extends Component {
 	renderFrontFlashcard(question) {
 		return (
 			<div className={styles.frontTextContainer}>
-				<div className={styles.questionFront} dangerouslySetInnerHTML={{__html: question}}/>
+				<div className={styles.questionFront}
+					 dangerouslySetInnerHTML={{__html: question}}/>
 				<div className={styles.showAnswerButtonContainer}>
 					<Button size='large' use='primary' onClick={() => this.showAnswer()}>
 						Показать ответ
@@ -135,7 +155,8 @@ class Flashcards extends Component {
 		return (
 			<div>
 				<div className={styles.backTextContainer}>
-					<div className={styles.questionBack} dangerouslySetInnerHTML={{__html: question}}/>
+					<div className={styles.questionBack}
+						 dangerouslySetInnerHTML={{__html: question}}/>
 					<div dangerouslySetInnerHTML={{__html: answer}}/>
 				</div>
 				<Results handleClick={this.handleResultsClick}/>
