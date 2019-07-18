@@ -218,12 +218,13 @@ namespace Ulearn.Web.Api.Controllers
 						break;
 					case CodeBlock codeBlock:
 					{
-						content.Append($"\n<textarea class=\"code code-sample\" data-lang=\"{codeBlock.Language.GetName()}\" data-code=\"{codeBlock.Code}\"></textarea>");
+						content.Append($"\n<textarea class=\"code code-sample\" data-lang=\"{codeBlock.Language.GetName()}\">{codeBlock.Code}</textarea>");
 						break;
 					}
 
 					case TexBlock texBlock:
-						content.Append(texBlock.TryGetText().RenderTex());
+						var lines = texBlock.TexLines.Select(x => $"<div class=\"tex\">{x.Trim()}</div>");
+						content.Append(string.Join("\n", lines));
 						break;
 					default:
 						content.Append(block.TryGetText());
