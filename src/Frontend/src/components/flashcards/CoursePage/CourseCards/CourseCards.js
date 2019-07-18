@@ -1,17 +1,22 @@
 import React from 'react';
 import PropTypes from "prop-types";
-import styles from './courseCards.less';
-import classNames from 'classnames';
-import getCardsPluralForm from "../../../../utils/getCardsPluralForm";
+
 import LockClosed from '@skbkontur/react-icons/LockClosed';
 import Button from "@skbkontur/react-ui/Button";
 import {Link} from 'react-router-dom';
+
+import styles from './courseCards.less';
+import classNames from 'classnames';
+import getCardsPluralForm from "../../../../utils/getCardsPluralForm";
+
+
+const emptyUnitCardStyle = classNames(styles.unitCard, styles.emptyUnitCard);
 
 function CourseCards({flashcardsInfo, courseId, unitsInfo}) {
 	return (
 		<div className={styles.cardsContainer}>
 			{flashcardsInfo.map(convertToUnitCard)}
-			<div className={styles.emptyUnitCard}>
+			<div className={emptyUnitCardStyle}>
 				Новые вопросы для самопроверки открываются по мере прохождения курса
 			</div>
 		</div>

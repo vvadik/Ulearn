@@ -2,7 +2,8 @@ import React, {Component} from 'react';
 import PropTypes from "prop-types";
 import styles from './shortQuestions.less';
 import Toggle from "@skbkontur/react-ui/Toggle";
-import translateTextareaToCode from "../../../../codemirror/codemirror";
+import translateTextareaToCode from "../../../../codeTranslators/codemirror";
+import translateCode from "../../../../codeTranslator/translateCode";
 
 class ShortQuestions extends Component {
 	constructor(props) {
@@ -10,24 +11,16 @@ class ShortQuestions extends Component {
 
 		this.state = {
 			showAllAnswers: false,
-			questionsWithAnswers: this.props.questionsWithAnswers
+			questionsWithAnswers: this.props.questionsWithAnswers,
 		};
 	}
 
-	// componentDidMount() {
-	// 	this.representTextAsCode();
-	// }
+	componentDidMount() {
+		translateCode(this.list);
+	}
 
-	// componentDidUpdate(prevProps, prevState, snapshot) { //TODO ROZENTOR implement compDidUpdate and DidMount using codeMirror
-	// 	const {showAllanswers, questionsWithAnswers} = this.state;
-	//
-	// 	this.representTextAsCode();
-	// }
-
-	representTextAsCode() {
-		for (const textarea of this.firstModal.querySelectorAll('textarea')) {
-			translateTextareaToCode(textarea, {readOnly: true});
-		}
+	componentDidUpdate(prevProps, prevState, snapshot) {
+		translateCode(this.list);
 	}
 
 	render() {
@@ -50,19 +43,18 @@ class ShortQuestions extends Component {
 		const {showAllAnswers, questionsWithAnswers} = this.state;
 
 		return (
-			<ol className={styles.questionsTextContainer}>
-				{
-					questionsWithAnswers.map(({question, answer, showAnswer}, index) =>
-						<li
-							className={styles.questionText}
-							key={index}
-							onClick={() => this.handleQuestionClick(index)}>
-							<div dangerouslySetInnerHTML={{__html: question}}/>
-							{
-								(showAllAnswers || showAnswer) &&
-								<div className={styles.answerText} dangerouslySetInnerHTML={{__html: answer}}/>
-							}
-						</li>)
+			<ol ref={(ref) => this.list = ref} className={styles.questionsTextContainer}>
+				{questionsWithAnswers.map(({question, answer, showAnswer}, index) =>
+					<li
+						className={styles.questionText}
+						key={index}
+						onClick={() => this.handleQuestionClick(index)}>
+						<div dangerouslySetInnerHTML={{__html: question}}/>
+						{
+							(showAllAnswers || showAnswer) &&
+							<div className={styles.answerText} dangerouslySetInnerHTML={{__html: answer}}/>
+						}
+					</li>)
 				}
 			</ol>);
 	}

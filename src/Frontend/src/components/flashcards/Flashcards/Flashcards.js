@@ -2,10 +2,8 @@ import React, {Component} from 'react';
 import PropTypes from "prop-types";
 import styles from './flashcards.less';
 import classNames from 'classnames';
-import Button from "@skbkontur/react-ui/Button";
-import Results from "./Results/Results";
 import ProgressBar from "../ProgressBar/ProgressBar";
-import translateTextareaToCode from "../../../codemirror/codemirror";
+import FrontFlashcard from "./FrontFlashcard/FrontFlashcard";
 
 const modalsStyles = {
 	first: classNames(styles.modal),
@@ -14,76 +12,42 @@ const modalsStyles = {
 	fourth: classNames(styles.modal, styles.fourthModal)
 };
 
-const defaultStatistics = {
-	notRated: 0,
-	rate1: 0,
-	rate2: 0,
-	rate3: 0,
-	rate4: 0,
-	rate5: 0
-};
-
 class Flashcards extends Component {
 	constructor(props) {
 		super(props);
-		const {flashcards} = this.props;
-		const statistics = Flashcards.countStatistics(flashcards);
+		const {flashcards, statistics} = this.props;
 
 		this.state = {
-			showAnswer: false,
 			currentIndex: 0,
-			statistics: statistics,
-			flashcards: flashcards,
+			statistics: {...statistics},
+			flashcards: [...flashcards],
 		}
 	}
 
 	componentDidMount() {
 		document.getElementsByTagName('body')[0].classList.add(styles.overflow);
-		document.addEventListener('keyup', this.handleKeyUp);
-		this.representTextAsCode();
-	}
-
-	static countStatistics(flashcards) {
-		const statistics = {...defaultStatistics};
-
-		for (const card of flashcards) {
-			statistics[card.rate]++;
-		}
-
-		return statistics;
 	}
 
 	componentWillUnmount() {
-		document.removeEventListener('keyup', this.handleKeyUp);
 		document.getElementsByTagName('body')[0].classList.remove(styles.overflow);
 	}
 
-	componentDidUpdate(prevProps, prevState, snapshot) {
-		const {showAnswer} = this.state;
-
-		if (prevState.showAnswer === showAnswer) {
-			return;
-		}
-
-		this.representTextAsCode();
-		//<textarea class="code code-sample" data-lang="csharp" data-code="double.Parse"></textarea>
-	}
-
-	representTextAsCode() {
-		for (const textarea of this.firstModal.querySelectorAll('textarea')) {
-			translateTextareaToCode(textarea, {readOnly: true});
-		}
-	}
-
 	render() {
-		const {flashcards, showAnswer, currentIndex, statistics} = this.state;
-		const totalFlashcardsCount = flashcards.length;
-		const flashcard = flashcards[currentIndex];
+		const {flashcards, currentIndex, statistics} = this.state;
+		const {totalFlashcardsCount} = this.props;
+		const {question, answer, unitTitle} = flashcards[currentIndex];
 
 		return (
 			<div ref={(ref) => this.overlay = ref} className={styles.overlay} onClick={this.handleOverlayClick}>
 				<div ref={(ref) => this.firstModal = ref} className={modalsStyles.first}>
-					{flashcard && this.renderFlashcard(flashcard, showAnswer)}
+					<FrontFlashcard
+						onShowAnswer={() => this.resetCardsAnimation()}
+						question={question}
+						answer={answer}
+						unitTitle={unitTitle}
+						onHandlingResultsClick={this.handleResultsClick}
+						onClose={this.props.onClose}
+					/>
 				</div>
 				<div ref={(ref) => this.secondModal = ref} className={modalsStyles.second}/>
 				<div ref={(ref) => this.thirdModal = ref} className={modalsStyles.third}/>
@@ -97,72 +61,12 @@ class Flashcards extends Component {
 	}
 
 	handleOverlayClick = (e) => {
+		const {onClose} = this.props;
+
 		if (e.target === this.overlay) {
-			this.props.onClose();
+			onClose();
 		}
 	};
-
-	handleKeyUp = (e) => {
-		const code = e.key;
-		const spaceChar = ' ';
-
-		if (code === spaceChar) {
-			this.showAnswer();
-		} else if (code >= 1 && code <= 5 && this.state.showAnswer) {
-			this.handleResultsClick(code);
-		} else if (code === 'Escape') {
-			this.props.onClose();
-		}
-	};
-
-	renderFlashcard({unitTitle, question, answer}, showAnswer) {
-		return (
-			<div>
-				<button tabIndex={1} className={styles.closeButton} onClick={this.props.onClose}>
-					&times;
-				</button>
-				<h5 className={styles.unitTitle}>
-					{unitTitle}
-				</h5>
-				{!showAnswer && this.renderFrontFlashcard(question)}
-				{showAnswer && this.renderBackFlashcard(question, answer)}
-			</div>
-		);
-	}
-
-	renderFrontFlashcard(question) {
-		return (
-			<div className={styles.frontTextContainer}>
-				<div className={styles.questionFront}
-					 dangerouslySetInnerHTML={{__html: question}}/>
-				<div className={styles.showAnswerButtonContainer}>
-					<Button size='large' use='primary' onClick={() => this.showAnswer()}>
-						Показать ответ
-					</Button>
-				</div>
-			</div>
-		);
-	}
-
-	showAnswer() {
-		this.resetCardsAnimation();
-		this.setState({
-			showAnswer: true
-		});
-	}
-
-	renderBackFlashcard(question, answer) {
-		return (
-			<div>
-				<div className={styles.backTextContainer}>
-					<div className={styles.questionBack}
-						 dangerouslySetInnerHTML={{__html: question}}/>
-					<div dangerouslySetInnerHTML={{__html: answer}}/>
-				</div>
-				<Results handleClick={this.handleResultsClick}/>
-			</div>
-		);
-	}
 
 	static renderControlGuides() {
 		return (
@@ -197,17 +101,16 @@ class Flashcards extends Component {
 	};
 
 	takeNextFlashcard() {
-		let {currentIndex, flashcards} = this.state;
+		const {currentIndex, flashcards} = this.state;
+		let newIndex = currentIndex + 1;
 
-		currentIndex++;
-
-		if (currentIndex === flashcards.length) {
-			currentIndex = 0;
+		console.log(newIndex, flashcards.length);
+		if (newIndex === flashcards.length) {
+			newIndex = 0;
 		}
 
 		this.setState({
-			currentIndex: currentIndex,
-			showAnswer: false
+			currentIndex: newIndex,
 		});
 
 		this.animateCards();
@@ -245,6 +148,15 @@ Flashcards.propTypes = {
 		rate: PropTypes.string,
 		unitId: PropTypes.string
 	})),
+	totalFlashcardsCount: PropTypes.number,
+	statistics: PropTypes.shape({
+		notRated: PropTypes.number,
+		rate1: PropTypes.number,
+		rate2: PropTypes.number,
+		rate3: PropTypes.number,
+		rate4: PropTypes.number,
+		rate5: PropTypes.number
+	}),
 	courseId: PropTypes.string,
 	onClose: PropTypes.func,
 	sendFlashcardRate: PropTypes.func,

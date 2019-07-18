@@ -7,7 +7,7 @@ export function getFlashcardsStatistics(courseId, unitId) {
 	return api.get(`courses/${courseId}/flashcards/stat` + query);
 }
 
-export function getFlashcardsPack(courseId, unitId, count, flashcardOrder, rate) {
+export function getFlashcardsPack(courseId, unitId, count, flashcardOrder = 'original', rate) {
 	let query = buildQuery({
 		courseId: courseId,
 		unitId: unitId,

@@ -7,6 +7,7 @@ const mapStateToProps = (state, {match}) => {
 	const {courseId, unitId} = match.params;
 	const data = state.courses;
 
+	console.log(data);
 	const statistics = unitId in data.flashcardsStatisticsByUnits
 		? data.flashcardsStatisticsByUnits[unitId].statistics
 		: undefined;

@@ -21,7 +21,7 @@ class CoursePage extends Component {
 	}
 
 	componentDidMount() {
-		const {courseId, loadFlashcardsInfo, flashcardsPack, loadFlashcardsPack} = this.props;
+		const {courseId, loadFlashcardsInfo, flashcardsPack, loadFlashcardsPack, loadStatistics} = this.props;
 
 		document.getElementsByTagName('main')[0].classList.add(styles.pageContainer);
 
@@ -29,6 +29,7 @@ class CoursePage extends Component {
 			loadFlashcardsPack(courseId);
 		}
 
+		loadStatistics(courseId);
 		loadFlashcardsInfo(courseId);
 	}
 
@@ -38,10 +39,10 @@ class CoursePage extends Component {
 
 	render() {
 		const {showFlashcards} = this.state;
-		const {flashcardsInfo, courseId, flashcardsPack, unitsInfo, sendFlashcardRate} = this.props;
+		const {flashcardsInfoLoading, flashcardsInfo, courseId, flashcardsPack, unitsInfo, sendFlashcardRate, statistics, totalFlashcardsCount} = this.props;
 
 		return (
-			<Loader active={!flashcardsInfo} type="big">
+			<Loader active={flashcardsInfoLoading} type="big">
 				<Gapped gap={15} vertical={true}>
 
 					{this.renderHeader()}
@@ -57,6 +58,8 @@ class CoursePage extends Component {
 
 					{showFlashcards &&
 					<Flashcards
+						totalFlashcardsCount={totalFlashcardsCount}
+						statistics={statistics}
 						flashcards={flashcardsPack}
 						courseId={courseId}
 						onClose={() => this.hideFlashcards()}
@@ -69,18 +72,18 @@ class CoursePage extends Component {
 
 	renderHeader() {
 		return (
-			<div className={styles.textContainer}>
-				<h2 className={styles.title}>
-					Флеш-карты для самопроверки
-				</h2>
-				<p className={styles.description}>
-					Помогут лучше запомнить материал курса и подготовиться к экзаменам
-				</p>
-				<div className={styles.launchAllButtonContainer}>
-					<Button use="primary" size='large' onClick={() => this.showFlashcards()}>
-						Проверить себя
-					</Button>
+			<div className={styles.header}>
+				<div>
+					<h2 className={styles.title}>
+						Флеш-карты для самопроверки
+					</h2>
+					<p className={styles.description}>
+						Помогут лучше запомнить материал курса и подготовиться к экзаменам
+					</p>
 				</div>
+				<Button use="primary" size='large' onClick={() => this.showFlashcards()}>
+					Проверить себя
+				</Button>
 			</div>
 		);
 	}
@@ -92,6 +95,10 @@ class CoursePage extends Component {
 	};
 
 	hideFlashcards = () => {
+		const {loadFlashcardsInfo, courseId} = this.props;
+
+		loadFlashcardsInfo(courseId);
+
 		this.setState({
 			showFlashcards: false,
 		});
@@ -106,6 +113,7 @@ CoursePage.propTypes = {
 		cardsCount: PropTypes.number,
 		unitId: PropTypes.string,
 	})),
+	flashcardsInfoLoading: PropTypes.bool,
 	flashcardsPack: PropTypes.arrayOf(PropTypes.shape({
 		id: PropTypes.string,
 		question: PropTypes.string,
@@ -119,10 +127,20 @@ CoursePage.propTypes = {
 		slides: PropTypes.array,
 		title: PropTypes.string,
 	})),
+	totalFlashcardsCount: PropTypes.number,
+	statistics: PropTypes.shape({
+		notRated: PropTypes.number,
+		rate1: PropTypes.number,
+		rate2: PropTypes.number,
+		rate3: PropTypes.number,
+		rate4: PropTypes.number,
+		rate5: PropTypes.number
+	}),
 
 	loadFlashcardsInfo: PropTypes.func,
 	loadFlashcardsPack: PropTypes.func,
 	sendFlashcardRate: PropTypes.func,
+	loadStatistics: PropTypes.func,
 };
 
 export default CoursePage;

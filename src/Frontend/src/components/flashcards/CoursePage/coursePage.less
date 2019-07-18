@@ -1,8 +1,18 @@
 @import "./../../../variables";
 
-.textContainer {
+.header {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+
   font-family: @defaultFonts;
-  position: relative;
+}
+
+@media (max-width: @maxPhoneWidth) {
+  .header {
+    flex-direction: column;
+    flex-wrap: wrap;
+  }
 }
 
 .title {
@@ -17,12 +27,6 @@
   margin-top: 8px;
   font-size: 16px;
   line-height: 25px;
-}
-
-.launchAllButtonContainer {
-  position: absolute;
-  right: 28px;
-  top: 14px;
 }
 
 .pageContainer {

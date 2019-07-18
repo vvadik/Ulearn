@@ -17,19 +17,16 @@ class UnitPage extends Component {
 		super(props);
 
 		this.state = {
-			haveProgress: false,
-			showFlashcards: false
+			showFlashcards: false,
 		}
 	}
 
 	componentDidMount() {
-		const {courseId, unitId, flashcardsPack, loadFlashcardsPack, loadStatistics} = this.props;
+		const {courseId, unitId, loadFlashcardsPack, loadStatistics} = this.props;
 
 		document.getElementsByTagName('main')[0].classList.add(styles.pageContainer);
 
-		if (!flashcardsPack) {
-			loadFlashcardsPack(courseId, unitId);
-		}
+		loadFlashcardsPack(courseId); //TODO ROZENTOR set unitId value
 
 		loadStatistics(courseId, unitId);
 	}
@@ -39,7 +36,7 @@ class UnitPage extends Component {
 	}
 
 	render() {
-		const {unitTitle, totalFlashcardsCount, flashcardsPack, courseId, statistics, sendFlashcardRate, statisticsLoading} = this.props;
+		const {totalFlashcardsCount, statistics, unitTitle, flashcardsPack, courseId, sendFlashcardRate, statisticsLoading} = this.props;
 		const haveProgress = statistics && statistics.notRated !== totalFlashcardsCount;
 		const dataLoaded = statistics && flashcardsPack && !statisticsLoading;
 		const {showFlashcards} = this.state;
@@ -49,7 +46,7 @@ class UnitPage extends Component {
 				<h3 className={styles.title}>
 					Вопросы для самопроверки
 				</h3>
-				{dataLoaded &&
+				{unitTitle &&
 				<UnitCard
 					haveProgress={haveProgress}
 					totalFlashcardsCount={totalFlashcardsCount}
@@ -59,6 +56,8 @@ class UnitPage extends Component {
 				{this.renderFooter(haveProgress && dataLoaded)}
 				{showFlashcards &&
 				<Flashcards
+					statistics={statistics}
+					totalFlashcardsCount={totalFlashcardsCount}
 					onClose={() => this.hideFlashcards()}
 					flashcards={flashcardsPack}
 					courseId={courseId}

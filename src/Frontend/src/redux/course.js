@@ -57,12 +57,12 @@ export default function courses(state = initialCoursesState, action) {
 		case COURSES__FLASHCARDS_INFO + START:
 			return {
 				...state,
-				flashcardsLoading: true,
+				flashcardsInfoLoading: true,
 			};
 		case COURSES__FLASHCARDS_INFO + SUCCESS:
 			return {
 				...state,
-				flashcardsLoading: false,
+				flashcardsInfoLoading: false,
 				flashcardsInfo: {
 					...state.flashcardsInfo,
 					[action.courseId]: action.result,
@@ -71,7 +71,7 @@ export default function courses(state = initialCoursesState, action) {
 		case COURSES__FLASHCARDS_INFO + FAIL:
 			return {
 				...state,
-				flashcardsLoading: false,
+				flashcardsInfoLoading: false,
 			};
 		case COURSES_FLASHCARDS_PACK + START:
 			return {
@@ -84,8 +84,8 @@ export default function courses(state = initialCoursesState, action) {
 				flashcardsPackByCoursesLoading: false,
 				flashcardsPackByCourses: {
 					...state.flashcardsPackByCourses,
-					[action.courseId]: action.result,
-				}
+					[action.courseId]: action.result
+				},
 			};
 		case COURSES_FLASHCARDS_PACK + FAIL:
 			return {
@@ -98,12 +98,22 @@ export default function courses(state = initialCoursesState, action) {
 				flashcardsStatisticsByUnitsLoading: true,
 			};
 		case COURSES_FLASHCARDS_STATISTICS + SUCCESS:
+			if (action.unitId) {
+				return {
+					...state,
+					flashcardsStatisticsByUnitsLoading: false,
+					flashcardsStatisticsByUnits: {
+						...state.flashcardsStatisticsByUnits,
+						[action.unitId]: action.result,
+					}
+				};
+			}
 			return {
 				...state,
 				flashcardsStatisticsByUnitsLoading: false,
 				flashcardsStatisticsByUnits: {
 					...state.flashcardsStatisticsByUnits,
-					[action.unitId]: action.result,
+					[action.courseId]: action.result,
 				}
 			};
 		case COURSES_FLASHCARDS_STATISTICS + FAIL:

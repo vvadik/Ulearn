@@ -5,6 +5,7 @@
 @moveAnimationDuration: 0.7s;
 @textAppearAnimationDuration: 0.3s;
 @modalBackgroundColor: #fff;
+@modalZIndex: 10;
 
 .unitTitle {
   font-family: @defaultFonts;
@@ -73,7 +74,7 @@
 
 .overlay {
   position: fixed;
-  z-index: 1;
+  z-index: 3;
   left: 0;
   top: 0;
   bottom: 0;
@@ -91,7 +92,7 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  z-index: 0;
+  z-index: @modalZIndex;
   transform: translate(-50%, -50%);
 
   background-color: @modalBackgroundColor;
@@ -155,18 +156,18 @@
 
 .secondModal {
   transform: translate(-50%, -56%) scale(0.95);
-  z-index: -1;
+  z-index: @modalZIndex - 1;
   background: darken(@modalBackgroundColor, 10%);
 }
 
 @keyframes moveFromSecondToFirst {
   from {
     transform: translate(-50%, -56%) scale(0.95);
-    z-index: -1;
+    z-index: @modalZIndex - 1;
     background: darken(@modalBackgroundColor, 10%);
   }
   to {
-    z-index: 0;
+    z-index: @modalZIndex;
     transform: translate(-50%, -50%);
     background: @modalBackgroundColor;
   }
@@ -179,19 +180,19 @@
 
 .thirdModal {
   transform: translate(-50%, -62%) scale(0.90);
-  z-index: -2;
+  z-index: @modalZIndex - 2;
   background: darken(@modalBackgroundColor, 15%);
 }
 
 @keyframes moveFromThirdToSecond {
   from {
     transform: translate(-50%, -62%) scale(0.90);
-    z-index: -2;
+    z-index: @modalZIndex - 2;
     background: darken(@modalBackgroundColor, 15%);
   }
   to {
     transform: translate(-50%, -56%) scale(0.95);
-    z-index: -1;
+    z-index: @modalZIndex - 1;
     background: darken(@modalBackgroundColor, 10%);
   }
 }
@@ -203,19 +204,19 @@
 
 .fourthModal {
   transform: translate(-50%, -68%) scale(0.85);
-  z-index: -3;
+  z-index: @modalZIndex - 3;
   background: darken(@modalBackgroundColor, 18%);
 }
 
 @keyframes moveFromFourthToThird {
   from {
     transform: translate(-50%, -68%) scale(0.85);
-    z-index: -3;
+    z-index: @modalZIndex - 3;
     background: darken(@modalBackgroundColor, 18%);
   }
   to {
     transform: translate(-50%, -62%) scale(0.90);
-    z-index: -2;
+    z-index: @modalZIndex - 2;
     background: darken(@modalBackgroundColor, 15%);
   }
 }

@@ -5,7 +5,7 @@ import Button from "@skbkontur/react-ui/Button";
 import classNames from "classnames";
 import getCardsPluralForm from "../../../../utils/getCardsPluralForm";
 
-function UnitCard({unitTitle = "", haveProgress = false, totalFlashcardsCount = 0, handleStartButton}) {
+function UnitCard({unitTitle, haveProgress = false, totalFlashcardsCount = 0, handleStartButton}) {
 	const unitCardStyle = classNames(styles.unitCard, {
 		[styles.successColor]: haveProgress
 	});
@@ -39,10 +39,9 @@ function UnitCard({unitTitle = "", haveProgress = false, totalFlashcardsCount = 
 
 UnitCard.propTypes = {
 	unitTitle: PropTypes.string.isRequired,
-	totalFlashcardsCount: PropTypes.number.isRequired,
-	haveProgress: PropTypes.bool.isRequired,
-	handleStartButton: PropTypes.func.isRequired,
-	match: PropTypes.object
+	totalFlashcardsCount: PropTypes.number,
+	haveProgress: PropTypes.bool,
+	handleStartButton: PropTypes.func,
 };
 
 export default UnitCard;

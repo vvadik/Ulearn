@@ -11,12 +11,6 @@
 .unitCard {
   width: @unitCardWidth;
   height: @unitCardHeight;
-  position: relative;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: baseline;
 
   border-radius: 10px;
   margin-bottom: 20px;
@@ -28,29 +22,34 @@
   color: @whiteSmoke;
 }
 
+@media (max-width: @maxPhoneWidth) {
+  .unitCard {
+    width: 100%;
+    margin-right: 0;
+  }
+}
 
-.unitCard:hover{
+.unitCard:hover {
   cursor: pointer;
   color: @whiteSmoke;
   text-decoration: none;
 }
 
-.emptyUnitCard{
-  width: @unitCardWidth;
-  height: @unitCardHeight;
-
-  border-radius: 10px;
-  margin-bottom: 20px;
-  margin-right: 20px;
+.emptyUnitCard {
   border: 1px dashed rgba(0, 0, 0, 0.3);
-  box-sizing: border-box;
   padding: 32px;
 
   text-align: center;
+  background: none;
   font-family: @defaultFonts;
   color: @additionalColor;
   font-size: 16px;
   line-height: 25px;
+}
+
+.emptyUnitCard:hover {
+  color: @additionalColor;
+  cursor: default;
 }
 
 .unitCardLocked {
@@ -58,7 +57,7 @@
   color: @disabledColor;
 }
 
-.unitCardLocked:hover{
+.unitCardLocked:hover {
   color: @disabledColor;
 }
 
@@ -86,10 +85,10 @@
   line-height: 1.4;
 }
 
-.unitCardButton{
+.unitCardButton {
   display: none;
 }
 
-.unitCard:hover .unitCardButton{
+.unitCard:hover .unitCardButton {
   display: block;
 }
