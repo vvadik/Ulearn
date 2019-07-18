@@ -223,8 +223,8 @@ namespace Ulearn.Web.Api.Controllers
 					}
 
 					case TexBlock texBlock:
-						var lines = texBlock.TexLines.Select(x => $"<div class=\"tex\">\\displaystyle {x.Trim()}</div>");
-						content.Append(string.Join("\n",lines));
+						var lines = texBlock.TexLines.Select(x => $"<div class=\"tex\">{x.Trim()}</div>");
+						content.Append(string.Join("\n", lines));
 						break;
 					default:
 						content.Append(block.TryGetText());
