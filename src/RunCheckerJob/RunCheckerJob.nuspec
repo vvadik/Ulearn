@@ -14,4 +14,8 @@
     <copyright>Copyright 2014–2019 SKB Kontur</copyright>
     <tags>ulearn education mooc</tags>
   </metadata>
+  <files>
+    <file src="bin\*\*.config"/>
+    <file src="deploy\*" target="deploy\"/>
+  </files>
 </package>

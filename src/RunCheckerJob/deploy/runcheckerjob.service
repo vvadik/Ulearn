@@ -1,0 +1,15 @@
+[Unit]
+Description=RunCheckerJob Service
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=ulearn
+Group=ulearn
+WorkingDirectory=/ulearn/
+ExecStart=%ExecStart%
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
