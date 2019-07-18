@@ -217,8 +217,11 @@ namespace Ulearn.Core
 		{
 			using (var zip = ZipFile.Read(zipFile.FullName, new ReadOptions { Encoding = Encoding.GetEncoding(866) }))
 			{
+				log.Info($"Очищаю директорию {unpackDirectory.FullName}");
 				unpackDirectory.ClearDirectory();
+				log.Info($"Директория {unpackDirectory.FullName} очищена");
 				zip.ExtractAll(unpackDirectory.FullName, ExtractExistingFileAction.OverwriteSilently);
+				log.Info($"Архив {zipFile.FullName} распакован");
 			}
 		}
 
@@ -228,24 +231,20 @@ namespace Ulearn.Core
 			var courseDir = coursesDirectory.CreateSubdirectory(courseOrVersionId);
 			log.Info($"Распаковываю архив с курсом из {zipFile.FullName} в {courseDir.FullName}");
 			UnzipFile(zipFile, courseDir);
+			log.Info($"Распаковал архив с курсом из {zipFile.FullName} в {courseDir.FullName}");
 			return courseDir;
 		}
 
 		public Course LoadCourseFromZip(FileInfo zipFile)
 		{
 			var courseDir = UnzipCourseFile(zipFile);
-			log.Info($"Распаковал архив с курсом из {zipFile.FullName} в {courseDir.FullName}");
 			return LoadCourseFromDirectory(courseDir);
 		}
 
 		public Course LoadCourseFromDirectory(DirectoryInfo dir)
 		{
-			log.Info($"WaitWhileCourseIsLocked {dir.Name}");
 			WaitWhileCourseIsLocked(GetCourseId(dir.Name));
-			log.Info($"Course is not locked {dir.Name}");
-			var l = loader.Load(dir);
-			log.Info($"Course is loaded {dir.Name}");
-			return l;
+			return loader.Load(dir);
 		}
 
 		public static string GetCourseId(string packageName)
