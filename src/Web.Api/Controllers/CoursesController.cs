@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides.Flashcards;
 using Ulearn.Web.Api.Models.Common;
 using Ulearn.Web.Api.Models.Responses.Courses;
 
@@ -83,14 +84,16 @@ namespace Ulearn.Web.Api.Controllers
 				return Json(new { status = "error", message = "Course not found" });
 			
 			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
-			
+			var containsFlashcards = course.Units.Any(x => x.Slides.OfType<FlashcardSlide>().Any());
+
 			return new CourseInfo
 			{
 				Id = course.Id,
 				Title = course.Title,
 				Description = "TODO: Напиши описание!",
 				NextUnitPublishTime = unitsRepo.GetNextUnitPublishTime(course.Id),
-				Units = visibleUnits.Select(unit => BuildUnitInfo(course.Id, unit)).ToList()
+				Units = visibleUnits.Select(unit => BuildUnitInfo(course.Id, unit)).ToList(),
+				ContainsFlashcards = containsFlashcards
 			};
 		}
 	}

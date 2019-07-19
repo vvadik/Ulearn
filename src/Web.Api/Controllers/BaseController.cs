@@ -11,6 +11,7 @@ using Serilog;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Flashcards;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
 using Ulearn.Core.Courses.Units;
@@ -44,7 +45,7 @@ namespace Ulearn.Web.Api.Controllers
 		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
 		{
 			DisableEfChangesTrackingForGetRequests(context);
-			
+
 			await next().ConfigureAwait(false);
 		}
 
@@ -88,7 +89,7 @@ namespace Ulearn.Web.Api.Controllers
 				MaxScore = slide.MaxScore,
 				Type = GetSlideType(slide),
 				QuestionsCount = slide.Blocks.OfType<AbstractQuestionBlock>().Count(),
-				
+
 				// TODO: кол-во попыток
 			};
 		}
@@ -101,12 +102,14 @@ namespace Ulearn.Web.Api.Controllers
 					return SlideType.Exercise;
 				case QuizSlide _:
 					return SlideType.Quiz;
+				case FlashcardSlide _:
+					return SlideType.Flashcards;
 				default:
 					return SlideType.Lesson;
 			}
 		}
 
-		protected ShortUserInfo BuildShortUserInfo(ApplicationUser user, bool discloseLogin=false, bool discloseEmail=false)
+		protected ShortUserInfo BuildShortUserInfo(ApplicationUser user, bool discloseLogin = false, bool discloseEmail = false)
 		{
 			return new ShortUserInfo
 			{
@@ -119,13 +122,13 @@ namespace Ulearn.Web.Api.Controllers
 				AvatarUrl = user.AvatarUrl,
 				Gender = user.Gender,
 			};
-		}		
+		}
 
 		protected NotificationCommentInfo BuildNotificationCommentInfo(Comment comment)
 		{
 			if (comment == null)
 				return null;
-			
+
 			return new NotificationCommentInfo
 			{
 				Id = comment.Id,
