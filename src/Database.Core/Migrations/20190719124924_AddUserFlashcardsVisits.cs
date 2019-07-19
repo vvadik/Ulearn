@@ -18,7 +18,7 @@ namespace Database.Migrations
                     CourseId = table.Column<string>(maxLength: 64, nullable: false),
                     UnitId = table.Column<Guid>(nullable: false),
                     FlashcardId = table.Column<string>(maxLength: 64, nullable: false),
-                    Score = table.Column<int>(nullable: false),
+                    Rate = table.Column<int>(nullable: false),
                     Timestamp = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>

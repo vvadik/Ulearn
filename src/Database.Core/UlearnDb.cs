@@ -341,7 +341,7 @@ namespace Database
 			AddIndex<Visit>(modelBuilder, c => new { c.CourseId, c.SlideId, c.UserId });
 			AddIndex<Visit>(modelBuilder, c => new { c.SlideId, c.Timestamp });
 			
-			AddIndex<UserFlashcardsVisit>(modelBuilder, c => new { c.UserId, c.CourseId, c.UnitId, c.FlashcardId });
+			AddIndex<UserFlashcardsVisit>(modelBuilder, c => new { c.UserId, c.CourseId, c.UnitId, c.FlashcardId },false);
 		}
 
 		private void AddIndex<TEntity>(ModelBuilder modelBuilder, Expression<Func<TEntity, object>> indexFunction, bool isUnique=false) where TEntity : class

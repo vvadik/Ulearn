@@ -13,7 +13,7 @@ namespace Database.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201907040654351_AddUserFlashcardsVisits"; }
+            get { return "201907191247514_AddUserFlashcardsVisits"; }
         }
         
         string IMigrationMetadata.Source
