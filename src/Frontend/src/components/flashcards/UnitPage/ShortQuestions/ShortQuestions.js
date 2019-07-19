@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import PropTypes from "prop-types";
 import styles from './shortQuestions.less';
 import Toggle from "@skbkontur/react-ui/Toggle";
-import translateTextareaToCode from "../../../../codeTranslators/codemirror";
 import translateCode from "../../../../codeTranslator/translateCode";
 
 class ShortQuestions extends Component {
