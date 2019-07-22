@@ -342,6 +342,7 @@ namespace Database
 			AddIndex<Visit>(modelBuilder, c => new { c.SlideId, c.Timestamp });
 			
 			AddIndex<UserFlashcardsVisit>(modelBuilder, c => new { c.UserId, c.CourseId, c.UnitId, c.FlashcardId },false);
+			AddIndex<UserFlashcardsUnlocking>(modelBuilder, c => new { c.UserId, c.CourseId, c.UnitId },false);
 		}
 
 		private void AddIndex<TEntity>(ModelBuilder modelBuilder, Expression<Func<TEntity, object>> indexFunction, bool isUnique=false) where TEntity : class
@@ -443,6 +444,7 @@ namespace Database
 		public DbSet<SystemAccess> SystemAccesses { get; set; }
 		
 		public DbSet<UserFlashcardsVisit> UserFlashcardsVisits { get; set; }
+		public DbSet<UserFlashcardsUnlocking> UserFlashcardsUnlocking { get; set; }
 	}
 }
  

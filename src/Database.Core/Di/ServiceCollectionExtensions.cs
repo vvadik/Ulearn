@@ -63,6 +63,7 @@ namespace Database.Di
 			
 			/*Flashcards*/
 			services.AddScoped<IUsersFlashcardsVisitsRepo, UsersFlashcardsVisitsRepo>();
+			services.AddScoped<IUserFlashcardsUnlockingRepo, UserFlashcardsUnlockingRepo>();
 			
 			/* Others */
 			services.AddScoped<ICourseRolesRepo, CourseRolesRepo>();

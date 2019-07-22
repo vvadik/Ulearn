@@ -38,24 +38,59 @@ namespace Ulearn.Web.Api.Controllers
 	public class FlashcardsController : BaseController
 	{
 		private readonly IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo;
+		private readonly IUserFlashcardsUnlockingRepo userFlashcardsUnlockingRepo;
 
-		public FlashcardsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo, IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo)
+
+		public FlashcardsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
+			IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo,
+			IUserFlashcardsUnlockingRepo userFlashcardsUnlockingRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.usersFlashcardsVisitsRepo = usersFlashcardsVisitsRepo;
+			this.userFlashcardsUnlockingRepo = userFlashcardsUnlockingRepo;
 		}
 
 		[HttpGet("{courseId}/flashcards")]
-		public async Task<ActionResult<FlashcardsResponse>> Flashcards([FromRoute] Course course)
+		public async Task<ActionResult<FlashcardResponseByUnits>> Flashcards([FromRoute] Course course)
 		{
 			var userFlashcardsVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, course.Id);
-			var flashcards = course.Units.SelectMany(x => x.Flashcards).ToList();
+			var flashcardResponseByUnits = new FlashcardResponseByUnits();
+			foreach (var unit in course.Units)
+			{
+				var unitFlashcardsResponse = new UnitFlashcardsResponse();
+				var flashcards = unit.Flashcards;
+				if (flashcards.Count == 0)
+					continue;
 
-			var flashcardsResponse = new FlashcardsResponse();
-			var flashcardResponsesEnumerable = GetFlashcardResponses(course, flashcards, userFlashcardsVisits);
-			flashcardsResponse.Flashcards = flashcardResponsesEnumerable.ToList();
+				var flashcardResponsesEnumerable = GetFlashcardResponses(course, flashcards, userFlashcardsVisits);
 
-			return flashcardsResponse;
+				unitFlashcardsResponse.Flashcards.AddRange(flashcardResponsesEnumerable);
+				unitFlashcardsResponse.UnitId = unit.Id;
+				unitFlashcardsResponse.UnitTitle = unit.Title;
+				unitFlashcardsResponse.Unlocked = await IsUnlocked(course, unit);
+				flashcardResponseByUnits.Units.Add(unitFlashcardsResponse);
+			}
+
+			return flashcardResponseByUnits;
+		}
+
+		private async Task<bool> IsUnlocked(Course course, Unit unit)
+		{
+			var unlocking = await userFlashcardsUnlockingRepo.GetUserFlashcardsUnlocking(UserId, course, unit);
+			if (unlocking != null)
+				return true;
+			var flashcards = unit.Flashcards;
+			var userVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, course.Id, unit.Id);
+			var userVisitsDict = new Dictionary<string, UserFlashcardsVisit>();
+			foreach (var visit in userVisits)
+			{
+				userVisitsDict[visit.FlashcardId] = visit;
+			}
+
+			if (!flashcards.All(x => userVisitsDict.ContainsKey(x.Id)))
+				return false;
+			await userFlashcardsUnlockingRepo.AddUserFlashcardsUnlocking(UserId, course, unit);
+			return true;
 		}
 
 		private IEnumerable<FlashcardResponse> GetFlashcardResponses(Course course, List<Flashcard> flashcards, List<UserFlashcardsVisit> userFlashcardsVisits)
