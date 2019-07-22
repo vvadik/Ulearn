@@ -18,7 +18,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Core\Core.csproj" />
-      <ProjectReference Include="..\Metrics\Metrics.csproj" />
     </ItemGroup>
 
     <ItemGroup>

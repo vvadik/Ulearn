@@ -9,8 +9,8 @@ using Database.Models;
 using Graphite;
 using log4net;
 using log4net.Config;
-using Metrics;
 using Ulearn.Core.Configuration;
+using Ulearn.Core.Metrics;
 
 namespace Notifications
 {

@@ -10,10 +10,10 @@ using Database.DataContexts;
 using Graphite;
 using log4net;
 using log4net.Config;
-using Metrics;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Configuration;
+using Ulearn.Core.Metrics;
 using XQueue;
 using XQueue.Models;
 

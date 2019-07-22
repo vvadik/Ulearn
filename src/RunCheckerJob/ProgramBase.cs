@@ -5,8 +5,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using log4net;
-using Metrics;
 using Ulearn.Core;
+using Ulearn.Core.Metrics;
 using Ulearn.Core.RunCheckerJobApi;
 
 namespace RunCheckerJob

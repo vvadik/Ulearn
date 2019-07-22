@@ -2,13 +2,13 @@
 using System.Configuration;
 using System.Threading.Tasks;
 using log4net;
-using Metrics;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
+using Ulearn.Core.Metrics;
 
 namespace Notifications
 {

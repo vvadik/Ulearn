@@ -1,7 +1,7 @@
 ﻿using Graphite.Web;
 using System.Web.Configuration;
-using Metrics;
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
+using Ulearn.Core.Metrics;
 using uLearn.Web;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(GraphiteMetricsPipeStart), "PreStart")]

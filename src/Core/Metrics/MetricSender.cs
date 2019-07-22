@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Configuration;
 using System.Linq;
 using log4net;
 using StatsdClient;
+using Ulearn.Core.Configuration;
 
-namespace Metrics
+namespace Ulearn.Core.Metrics
 {
 	public class MetricSender
 	{
@@ -18,7 +18,7 @@ namespace Metrics
 
 		public MetricSender(string service)
 		{
-			var connectionString = ConfigurationManager.ConnectionStrings["statsd"]?.ConnectionString;
+			var connectionString = ApplicationConfiguration.Read<UlearnConfiguration>().CoursesDirectory;
 			if (string.IsNullOrEmpty(connectionString))
 				return;
 

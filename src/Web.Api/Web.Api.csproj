@@ -30,7 +30,6 @@
     <ProjectReference Include="..\Common.Api\Common.Api.csproj" />
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Database.Core\Database.Core.csproj" />
-    <ProjectReference Include="..\Metrics\Metrics.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Configuration" />
