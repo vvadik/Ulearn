@@ -6,6 +6,7 @@ import AnyPage from '../../../pages/AnyPage';
 import UnitFlashcadsPage from '../../../pages/course/UnitFlashcardsPage';
 import CourseFlashcardsPage from '../../../pages/course/CourseFlashcardsPage';
 import { flashcards, constructPathToSlide } from '../../../consts/routes';
+import { SLIDETYPE } from '../../../consts/general';
 import styles from "./Course.less"
 
 class Course extends Component {
@@ -142,14 +143,9 @@ class Course extends Component {
 			}
 		}
 
-		// if (currentSlide && currentSlide.type === 'flashcards') {
-		// 	return UnitFlashcadsPage;
-		// }
-
-		if (currentSlide && slideId.toLowerCase().startsWith('flesh_karty')) { // TODO: Убрать, когда сервер будет тип слайда отдавать правильно
+		if (currentSlide && currentSlide.type === SLIDETYPE.flashcards) {
 			return UnitFlashcadsPage;
 		}
-
 
 		return AnyPage;
 	}

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import NavigationItem from '../NavigationItem';
 import styles from './NavigationContent.less';
 import { menuItemType } from '../../types';
-import { itemTypes } from '../../constants';
+import { SLIDETYPE } from '../../../../../consts/general';
 import getPluralForm from '../../../../../utils/getPluralForm'
 
 
@@ -56,7 +56,7 @@ class NavigationContent extends Component {
 	}
 
 	createDescription(item) {
-		if (item.type === itemTypes.quiz && item.questionsCount) {
+		if (item.type === SLIDETYPE.quiz && item.questionsCount) {
 			const count = item.questionsCount;
 			return `${count} ${getPluralForm(count, 'вопрос', 'вопроса', 'вопросов')}`;
 		}

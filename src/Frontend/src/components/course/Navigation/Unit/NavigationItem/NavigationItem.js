@@ -2,13 +2,14 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import styles from './NavigationItem.less';
 import classnames from 'classnames';
-import { itemTypes } from '../../constants';
+import { SLIDETYPE } from '../../../../../consts/general';
 import { menuItemType } from '../../types';
 
 
 const icons = {
-	[itemTypes.quiz]: '?',
-	[itemTypes.exercise]: '{}',
+	[SLIDETYPE.quiz]: '?',
+	[SLIDETYPE.exercise]: '{}',
+	[SLIDETYPE.flashcards]: '🃝',
 };
 
 class NavigationItem extends Component {
@@ -45,7 +46,7 @@ class NavigationItem extends Component {
 			return;
 		}
 
-		if (type === itemTypes.exercise || type === itemTypes.quiz) {
+		if (type === SLIDETYPE.exercise || type === SLIDETYPE.quiz) {
 			return (
 				<div className={ styles.scoreWrapper }>
 					<span className={ styles.score }>{ score || 0 }/{ maxScore }</span>
@@ -81,7 +82,7 @@ class NavigationItem extends Component {
 	renderPointer() {
 		const { type, visited } = this.props;
 
-		if (type === itemTypes.lesson) {
+		if (type === SLIDETYPE.lesson) {
 			return (
 				<span className={ classnames(styles.pointer, {[styles.complete]: visited}) } />
 			);

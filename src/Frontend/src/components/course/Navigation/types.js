@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
-import { itemTypes } from './constants';
+import { SLIDETYPE } from '../../../consts/general';
 
 export const menuItemType = {
 	title: PropTypes.string,
 	url: PropTypes.string,
-	type: PropTypes.oneOf(Object.values(itemTypes)),
+	type: PropTypes.oneOf(Object.values(SLIDETYPE)),
 	score: PropTypes.number,
 	maxScore: PropTypes.number,
 	description: PropTypes.string,
