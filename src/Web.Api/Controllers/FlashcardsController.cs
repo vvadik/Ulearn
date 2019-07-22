@@ -49,6 +49,11 @@ namespace Ulearn.Web.Api.Controllers
 			this.usersFlashcardsVisitsRepo = usersFlashcardsVisitsRepo;
 			this.userFlashcardsUnlockingRepo = userFlashcardsUnlockingRepo;
 		}
+		/// <summary>
+		/// Коллекция объектов флешкарт с оценками, сгруппированных по модулям по курсу
+		/// </summary>
+		/// <param name="course"></param>
+		/// <returns></returns>
 
 		[HttpGet("{courseId}/flashcards")]
 		public async Task<ActionResult<FlashcardResponseByUnits>> Flashcards([FromRoute] Course course)
