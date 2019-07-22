@@ -80,6 +80,14 @@ namespace Ulearn.Core.Configuration
 		public string Database { get; set; }
 		
 		public GitConfiguration Git { get; set; }
+		
+		public string StatsdConnectionString { get; set; } // ConnectionString для подключения к Graphite-relay в формате "address=graphite-relay.com;port=8125;prefixKey=ulearn.local". Можно оставить пустой, чтобы не отправлять метрики
+		
+		public string SubmissionsUrl { get; set; } // Url to Ulearn.Web instance. I.E. https://ulearn.me
+		
+		public string RunnerToken { get; set; } // Must be equal on Ulearn.Web and RunC***Job instance
+
+		public int? KeepAliveInterval { get; set; }
 	}
 
 	public class TelegramConfiguration

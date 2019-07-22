@@ -177,7 +177,7 @@ namespace uLearn.Web.Controllers
 
 		private void CheckRunner(string token)
 		{
-			var expectedToken = ConfigurationManager.AppSettings["runnerToken"];
+			var expectedToken = ApplicationConfiguration.Read<UlearnConfiguration>().RunnerToken;
 			if (expectedToken != token)
 				throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Forbidden));
 		}

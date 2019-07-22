@@ -1,6 +1,6 @@
 using System;
-using System.Configuration;
 using System.IO;
+using Ulearn.Core.Configuration;
 
 namespace RunCheckerJob
 {
@@ -17,11 +17,12 @@ namespace RunCheckerJob
 
 		static SandboxRunnerSettings()
 		{
+			var configuration = ApplicationConfiguration.Read<RunCheckerJobConfiguration>().RunCheckerJob;
 			var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 			WorkingDirectory = new DirectoryInfo(Path.Combine(baseDirectory, "submissions"));
-			var deleteSubmissions = bool.Parse(ConfigurationManager.AppSettings["ulearn.checker.deleteSubmissions"] ?? "true");
+			var deleteSubmissions = configuration.DeleteSubmissions ?? true;
 			DeleteSubmissionsAfterFinish = deleteSubmissions;
-			var workingDirectory = ConfigurationManager.AppSettings["ulearn.checker.submissionsWorkingDirectory"];
+			var workingDirectory = configuration.SubmissionsWorkingDirectory;
 			if (!string.IsNullOrWhiteSpace(workingDirectory))
 				WorkingDirectory = new DirectoryInfo(workingDirectory);
 		}

@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using log4net;
 using Ulearn.Core;
+using Ulearn.Core.Configuration;
 using Ulearn.Core.Metrics;
 using Ulearn.Core.RunCheckerJobApi;
 
@@ -34,14 +34,16 @@ namespace RunCheckerJob
 
 			try
 			{
-				address = ConfigurationManager.AppSettings["submissionsUrl"];
-				token = ConfigurationManager.AppSettings["runnerToken"];
-				sleep = TimeSpan.FromSeconds(int.Parse(ConfigurationManager.AppSettings["sleepSeconds"] ?? "1"));
-				agentName = ConfigurationManager.AppSettings[$"ulearn.{serviceName}.agentName"];
+				var ulearnConfiguration = ApplicationConfiguration.Read<UlearnConfiguration>();
+				address = ulearnConfiguration.SubmissionsUrl;
+				token = ulearnConfiguration.RunnerToken;
+				var runCheckerJobConfiguration = ApplicationConfiguration.Read<RunCheckerJobConfiguration>().RunCheckerJob;
+				sleep = TimeSpan.FromSeconds(runCheckerJobConfiguration.SleepSeconds ?? 1);
+				agentName = runCheckerJobConfiguration.AgentName;
 				if (string.IsNullOrEmpty(agentName))
 				{
 					agentName = Environment.MachineName;
-					log.Info($"Автоопределённое имя клиента: {agentName}. Его можно переопределить в настройках (appSettings/ulearn.{serviceName}.agentName)");					
+					log.Info($"Автоопределённое имя клиента: {agentName}. Его можно переопределить в настройках (runcheckerjob:agentName)");
 				}
 			}
 			catch (Exception e)
@@ -55,11 +57,12 @@ namespace RunCheckerJob
 		{
 			log.Info($"Отправляю запросы на {address} для получения новых решений");
 			
-			var threadsCount = int.Parse(ConfigurationManager.AppSettings[$"ulearn.{serviceName}.threadsCount"] ?? "1");
+			var runCheckerJobConfiguration = ApplicationConfiguration.Read<RunCheckerJobConfiguration>().RunCheckerJob;
+			var threadsCount = runCheckerJobConfiguration.ThreadsCount ?? 1;
 			if (threadsCount < 1)
 			{
 				log.Error($"Не могу определить количество потоков для запуска из конфигурации: ${threadsCount}. Количество потоков должно быть положительно");
-				throw new ArgumentOutOfRangeException(nameof(threadsCount), $"Number of threads (appSettings/ulearn.{serviceName}.threadsCount) should be positive");
+				throw new ArgumentOutOfRangeException(nameof(threadsCount), $"Number of threads (runcheckerjob:threadsCount) should be positive");
 			}
 			
 			log.Info($"Запускаю {threadsCount} потока(ов)");
@@ -118,9 +121,8 @@ namespace RunCheckerJob
 		private void MainLoop(Client client)
 		{
 			var serviceKeepAliver = new ServiceKeepAliver(serviceName);
-			if (!int.TryParse(ConfigurationManager.AppSettings[$"ulearn.{serviceName}.keepAlive.interval"], out var keepAliveIntervalSeconds))
-				keepAliveIntervalSeconds = 30;
-			var keepAliveInterval = TimeSpan.FromSeconds(keepAliveIntervalSeconds);
+			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
+			var keepAliveInterval = TimeSpan.FromSeconds(configuration.KeepAliveInterval ?? 30);
 			while (!shutdownEvent.WaitOne(0))
 			{
 				var newUnhandled = new List<RunnerSubmission>();

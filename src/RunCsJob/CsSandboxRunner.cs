@@ -8,11 +8,11 @@ using System.Security;
 using System.Text;
 using JetBrains.Annotations;
 using log4net;
-using Metrics;
 using Newtonsoft.Json;
 using RunCheckerJob;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
+using Ulearn.Core.Metrics;
 using Ulearn.Core.RunCheckerJobApi;
 
 namespace RunCsJob

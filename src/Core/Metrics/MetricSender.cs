@@ -18,7 +18,7 @@ namespace Ulearn.Core.Metrics
 
 		public MetricSender(string service)
 		{
-			var connectionString = ApplicationConfiguration.Read<UlearnConfiguration>().CoursesDirectory;
+			var connectionString = ApplicationConfiguration.Read<UlearnConfiguration>().StatsdConnectionString;
 			if (string.IsNullOrEmpty(connectionString))
 				return;
 
