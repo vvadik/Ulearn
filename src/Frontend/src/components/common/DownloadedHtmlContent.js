@@ -217,9 +217,9 @@ class DownloadedHtmlContent extends Component {
 
 	_getCourseIdFromUrl() {
 		/* 1. Extract courseId from urls like /Course/<courseId/... */
-		const pathname = window.location.pathname;
-		if (pathname.startsWith('/Course/')) {
-			const regex = new RegExp('/Course/([^/]+)(/|$)');
+		const pathname = window.location.pathname.toLowerCase();
+		if (pathname.startsWith('/course/')) {
+			const regex = new RegExp('/course/([^/]+)(/|$)');
 			const results = regex.exec(pathname);
 			return results[1].toLowerCase();
 		}

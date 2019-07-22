@@ -26,5 +26,6 @@ export const SLIDETYPE = {
 	exercise: 'exercise',
 	quiz: 'quiz',
 	lesson: 'lesson',
+	flashcards: 'flashcards',
 };
 

@@ -1,6 +1,6 @@
 import { connect } from "react-redux";
 import { loadCourse } from "../../actions/course";
-import { loadUserProgress } from "../../actions/user";
+import { loadUserProgress, userProgressUpdate } from "../../actions/user";
 
 import Course from '../../components/course/Course';
 
@@ -20,6 +20,7 @@ const mapStateToProps = (state, {match}) => {
 const mapDispatchToProps = (dispatch) => ({
 	loadCourse: (courseId) => dispatch(loadCourse(courseId)),
 	loadUserProgress: (courseId) => dispatch(loadUserProgress(courseId)),
+	updateVisitedSlide: (courseId, slideId) => dispatch(userProgressUpdate(courseId, slideId)),
 });
 
 

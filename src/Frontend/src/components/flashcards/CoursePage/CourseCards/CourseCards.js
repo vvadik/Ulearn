@@ -24,14 +24,12 @@ function CourseCards({flashcardsInfo, courseId, unitsInfo}) {
 
 	function convertToUnitCard({unitTitle, unlocked, cardsCount, unitId}) {
 		const unitCardStyle = classNames(styles.unitCard, {[styles.unitCardLocked]: !unlocked});
-		const slideUrl = unitsInfo
+		const slides = unitsInfo
 			.find(unit => unit.id === unitId)
-			.slides[0]
-			.id;
+			.slides;
+		const slideId = slides[slides.length - 1].slug;
 
-		const url = unlocked
-			? `/Course/${courseId}/flashcards/${unitId}`
-			: `/Course/${courseId}/${slideUrl}/`;
+		const url = `/course/${courseId}/${slideId}/`;
 
 		return (
 			<Link key={unitId} className={unitCardStyle}

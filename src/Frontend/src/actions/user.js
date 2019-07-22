@@ -1,5 +1,6 @@
 import {
 	USER__PROGRESS_LOAD,
+	USER__PROGRESS_UPDATE,
 	START, SUCCESS, FAIL,
 } from '../consts/actions';
 
@@ -18,6 +19,18 @@ const loadUserProgressSuccess = (courseId, result) => ({
 const loadUserProgressFail = () => ({
 	type: USER__PROGRESS_LOAD + FAIL,
 });
+
+const userProgressUpdateAction = (courseId, slideId) => ({
+	type: USER__PROGRESS_UPDATE,
+	courseId,
+	slideId,
+});
+
+export const userProgressUpdate = (courseId, slideId) => {
+	return (dispatch) => {
+		dispatch(userProgressUpdateAction(courseId, slideId));
+	};
+};
 
 export const loadUserProgress = (courseId) => {
 	return (dispatch) => {

@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import UnitNavigation from "../Navigation/Unit/UnitNavigation";
 import CourseNavigation from "../Navigation/Course/CourseNavigation";
 import AnyPage from '../../../pages/AnyPage';
-import UnitFlashcadsPage from '../../../pages/course/UnitFlashcardsPage';
+import UnitFlashcardsPage from '../../../pages/course/UnitFlashcardsPage';
 import CourseFlashcardsPage from '../../../pages/course/CourseFlashcardsPage';
 import { flashcards, constructPathToSlide } from '../../../consts/routes';
 import { SLIDETYPE } from '../../../consts/general';
@@ -40,8 +40,13 @@ class Course extends Component {
 		}
 
 		if (state.currentCourseId !== props.courseId || state.currentSlideId !== props.slideId) {
-			const openUnitId = Course.findActiveUnitId(props.slideId, props.courseInfo);
+			const openUnitId = Course.findUnitIdBySlide(props.slideId, props.courseInfo);
 			const openUnit = props.units[openUnitId];
+
+			const slide = Course.findSlideBySlug(props.slideId, props.courseInfo);
+			if (slide) {
+				props.updateVisitedSlide(props.courseId, slide.id);
+			}
 
 			return {
 				currentSlideId: props.slideId,
@@ -91,6 +96,7 @@ class Course extends Component {
 					isActive: highlightedUnit === item.id,
 					onClick: this.unitClickHandle,
 				})) }
+				containsFlashcards={courseInfo.containsFlashcards}
 			/>
 		);
 	}
@@ -144,13 +150,13 @@ class Course extends Component {
 		}
 
 		if (currentSlide && currentSlide.type === SLIDETYPE.flashcards) {
-			return UnitFlashcadsPage;
+			return UnitFlashcardsPage;
 		}
 
 		return AnyPage;
 	}
 
-	static findActiveUnitId(slideId, courseInfo) {
+	static findUnitIdBySlide(slideId, courseInfo) {
 		if (!courseInfo || !courseInfo.units) {
 			return null;
 		}
@@ -162,6 +168,25 @@ class Course extends Component {
 			for (const slide of unit.slides) {
 				if (slideId === slide.slug) {
 					return unit.id;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	static findSlideBySlug(slideSlug, courseInfo) {
+		if (!courseInfo || !courseInfo.units) {
+			return null;
+		}
+
+		const units = courseInfo.units;
+
+
+		for (const unit of units) {
+			for (const slide of unit.slides) {
+				if (slideSlug === slide.slug) {
+					return slide;
 				}
 			}
 		}
@@ -211,6 +236,7 @@ Course.propTypes = {
 	units: PropTypes.object,
 	loadCourse: PropTypes.func,
 	loadUserProgress: PropTypes.func,
+	updateVisitedSlide: PropTypes.func,
 };
 
 export default Course;

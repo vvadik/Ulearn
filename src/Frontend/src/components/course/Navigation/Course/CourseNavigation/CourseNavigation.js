@@ -1,22 +1,22 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import styles from './CourseNavigation.less';
 import CourseNavigationHeader from "../CourseNavigationHeader";
 import CourseNavigationContent from "../CourseNavigationContent"
-import {courseMenuItemType} from "../../types";
+import { courseMenuItemType } from "../../types";
 import Flashcards from "../Flashcards";
-import {flashcards} from "../../../../../consts/routes";
+import { flashcards } from "../../../../../consts/routes";
 
 class CourseNavigation extends Component {
 	render() {
-		const {title, description, items, courseId, slideId} = this.props;
+		const { title, description, items, courseId, slideId, containsFlashcards } = this.props;
 
 		return (
-			<aside className={styles.root}>
-				<div className={styles.contentWrapper}>
-					<CourseNavigationHeader title={title} description={description}/>
-					{items && items.length && <CourseNavigationContent items={items}/>}
-					<Flashcards courseId={courseId} isActive={slideId === flashcards}/>
+			<aside className={ styles.root }>
+				<div className={ styles.contentWrapper }>
+					<CourseNavigationHeader title={ title } description={ description }/>
+					{ items && items.length && <CourseNavigationContent items={ items }/> }
+					{ containsFlashcards && <Flashcards courseId={ courseId } isActive={ slideId === flashcards }/> }
 				</div>
 			</aside>
 		);
@@ -30,6 +30,7 @@ CourseNavigation.propTypes = {
 	items: PropTypes.arrayOf(PropTypes.shape(courseMenuItemType)),
 	courseId: PropTypes.string,
 	slideId: PropTypes.string,
+	containsFlashcards: PropTypes.bool,
 };
 
 export default CourseNavigation

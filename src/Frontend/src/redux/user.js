@@ -1,5 +1,6 @@
 import {
 	USER__PROGRESS_LOAD,
+	USER__PROGRESS_UPDATE,
 	START, SUCCESS, FAIL,
 } from '../consts/actions';
 
@@ -28,6 +29,20 @@ export default function user(state = initialState, action) {
 			return {
 				...state,
 				loading: false,
+			};
+		case USER__PROGRESS_UPDATE :
+			return {
+				...state,
+				progress: {
+					...state.progress,
+					[action.courseId]: {
+						...state.progress[action.courseId],
+						[action.slideId]: {
+							...state.progress[action.courseId][action.slideId],
+							visited: true,
+						},
+					},
+				}
 			};
 		default:
 			return state;
