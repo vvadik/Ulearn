@@ -1,11 +1,11 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import UnitNavigation from "../Navigation/Unit/UnitNavigation";
 import CourseNavigation from "../Navigation/Course/CourseNavigation";
 import AnyPage from '../../../pages/AnyPage';
 import UnitFlashcadsPage from '../../../pages/course/UnitFlashcardsPage';
 import CourseFlashcardsPage from '../../../pages/course/CourseFlashcardsPage';
-import {flashcards, constructPathToSlide} from '../../../consts/routes';
+import { flashcards, constructPathToSlide } from '../../../consts/routes';
 import styles from "./Course.less"
 
 class Course extends Component {
@@ -15,13 +15,14 @@ class Course extends Component {
 		this.state = {
 			onCourseNavigation: true,
 			openUnit: null,
-			highlightedUnit: Course.findActiveUnitId(props.slideId, props.courseInfo),
-			unitWasOpen: false,
+			highlightedUnit: null,
+			currentSlideId: null,
+			currentCourseId: null,
 		};
 	}
 
 	componentDidMount() {
-		const {loadCourse, loadUserProgress, isAuthenticated, courseId, courseInfo, progress} = this.props;
+		const { loadCourse, loadUserProgress, isAuthenticated, courseId, courseInfo, progress } = this.props;
 
 		if (!courseInfo) {
 			loadCourse(courseId);
@@ -33,32 +34,29 @@ class Course extends Component {
 	}
 
 	static getDerivedStateFromProps(props, state) {
-		const res = {};
+		if (!props.units) {
+			return null;
+		}
 
-		if (!state.unitWasOpen && props.progress && Object.keys(props.progress).length && props.courseInfo) {
-			const openUnit = props.units[Course.findActiveUnitId(props.slideId, props.courseInfo)];
-			if (!openUnit) {
-				return null;
+		if (state.currentCourseId !== props.courseId || state.currentSlideId !== props.slideId) {
+			const openUnitId = Course.findActiveUnitId(props.slideId, props.courseInfo);
+			const openUnit = props.units[openUnitId];
+
+			return {
+				currentSlideId: props.slideId,
+				currentCourseId: props.courseId,
+				highlightedUnit: openUnitId || null,
+				onCourseNavigation: openUnit ? false : state.onCourseNavigation,
+				openUnit: openUnit || state.openUnit,
 			}
-			res.openUnit = openUnit;
-			res.unitWasOpen = true;
-			res.onCourseNavigation = false;
-		}
-
-		if (!state.highlightedUnit && props.courseInfo) {
-			res.highlightedUnit = Course.findActiveUnitId(props.slideId, props.courseInfo);
-		}
-
-		if (Object.keys(res).length) {
-			return res;
 		}
 
 		return null;
 	}
 
 	render() {
-		const {courseInfo} = this.props;
-		const {onCourseNavigation} = this.state;
+		const { courseInfo } = this.props;
+		const { onCourseNavigation } = this.state;
 
 		if (!courseInfo) {
 			return null;
@@ -67,45 +65,45 @@ class Course extends Component {
 		const Page = this.findOpenedSlideType();
 
 		return (
-			<div className={styles.root}>
-				{onCourseNavigation ? this.renderCourseNavigation() : this.renderUnitNavigation()}
-				<main className={styles.pageWrapper}>
-					<Page match={this.props.match}/>
+			<div className={ styles.root }>
+				{ onCourseNavigation ? this.renderCourseNavigation() : this.renderUnitNavigation() }
+				<main className={ styles.pageWrapper }>
+					<Page match={ this.props.match }/>
 				</main>
 			</div>
 		);
 	}
 
 	renderCourseNavigation() {
-		const {courseInfo, slideId} = this.props;
-		const {highlightedUnit} = this.state;
+		const { courseInfo, slideId } = this.props;
+		const { highlightedUnit } = this.state;
 
 		return (
 			<CourseNavigation
-				slideId={slideId}
-				courseId={courseInfo.id}
-				title={courseInfo.title}
-				description={courseInfo.description}
-				items={courseInfo.units.map(item => ({
+				slideId={ slideId }
+				courseId={ courseInfo.id }
+				title={ courseInfo.title }
+				description={ courseInfo.description }
+				items={ courseInfo.units.map(item => ({
 					title: item.title,
 					id: item.id,
 					isActive: highlightedUnit === item.id,
 					onClick: this.unitClickHandle,
-				}))}
+				})) }
 			/>
 		);
 	}
 
 	renderUnitNavigation() {
-		const {openUnit} = this.state;
-		const {courseInfo, courseId, slideId, progress} = this.props;
+		const { openUnit } = this.state;
+		const { courseInfo, courseId, slideId, progress } = this.props;
 
 		return (
 			<UnitNavigation
-				title={openUnit.title}
-				courseName={courseInfo.title}
-				onCourseClick={this.returnInUnitsMenu}
-				items={openUnit.slides.map(item => ({
+				title={ openUnit.title }
+				courseName={ courseInfo.title }
+				onCourseClick={ this.returnInUnitsMenu }
+				items={ openUnit.slides.map(item => ({
 					id: item.id,
 					title: item.title,
 					type: item.type,
@@ -115,14 +113,14 @@ class Course extends Component {
 					maxScore: item.maxScore,
 					questionsCount: item.questionsCount,
 					visited: Boolean(progress && progress[item.id]),
-				}))}
-				nextUnit={Course.findNextUnit(openUnit, courseInfo)}
+				})) }
+				nextUnit={ Course.findNextUnit(openUnit, courseInfo) }
 			/>
 		);
 	}
 
 	findOpenedSlideType() {
-		const {slideId, courseInfo} = this.props;
+		const { slideId, courseInfo } = this.props;
 
 		if (slideId === flashcards) {
 			return CourseFlashcardsPage;
@@ -191,7 +189,7 @@ class Course extends Component {
 	}
 
 	unitClickHandle = (id) => {
-		const {units} = this.props;
+		const { units } = this.props;
 
 		this.setState({
 			openUnit: units[id],
