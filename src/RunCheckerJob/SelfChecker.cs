@@ -29,7 +29,6 @@ namespace RunCheckerJob
 			var toUpdateDirectories = new []{"../../container/src"}
 				.Select(pathToInclude => new DirectoryInfo(Path.Combine(exerciseDirectory.FullName, pathToInclude)));
 			var zipBytes = exerciseDirectory.ToZip(new []{"node_modules", ".idea"}, null, toUpdateDirectories);
-			File.WriteAllBytes("D://temp.zip", zipBytes);
 			var res = sandboxRunner.Run(new CommandRunnerSubmission
 			{
 				Id = Utils.NewNormalizedGuid(),
