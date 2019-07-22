@@ -58,16 +58,16 @@ namespace Ulearn.Web.Api.Controllers
 		[HttpGet("{courseId}/flashcards")]
 		public async Task<ActionResult<FlashcardResponseByUnits>> Flashcards([FromRoute] Course course)
 		{
-			var userFlashcardsVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, course.Id);
+			var userFlashcardsVisitsByCourse = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, course.Id);
 			var flashcardResponseByUnits = new FlashcardResponseByUnits();
 			foreach (var unit in course.Units)
 			{
 				var unitFlashcardsResponse = new UnitFlashcardsResponse();
-				var flashcards = unit.Flashcards;
-				if (flashcards.Count == 0)
+				var unitFlashcards = unit.Flashcards;
+				if (unitFlashcards.Count == 0)
 					continue;
 
-				var flashcardResponsesEnumerable = GetFlashcardResponses(course, flashcards, userFlashcardsVisits);
+				var flashcardResponsesEnumerable = GetFlashcardResponses(course, unitFlashcards, userFlashcardsVisitsByCourse);
 
 				unitFlashcardsResponse.Flashcards.AddRange(flashcardResponsesEnumerable);
 				unitFlashcardsResponse.UnitId = unit.Id;

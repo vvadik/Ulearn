@@ -90,7 +90,7 @@ namespace Ulearn.Web.Api.Controllers
 			{
 				Id = course.Id,
 				Title = course.Title,
-				Description = "TODO: Напиши описание!",
+				Description = course.Settings.Description,
 				NextUnitPublishTime = unitsRepo.GetNextUnitPublishTime(course.Id),
 				Units = visibleUnits.Select(unit => BuildUnitInfo(course.Id, unit)).ToList(),
 				ContainsFlashcards = containsFlashcards

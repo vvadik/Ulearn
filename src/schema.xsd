@@ -49,6 +49,7 @@
 			<xs:element name="scoring" type="ScoringGroups" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="units" type="CourseUnits" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="dictionaryFile" type="NonEmptyString" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="description" type="NonEmptyString" minOccurs="0" maxOccurs="1"/>
 		</xs:all>
 		<xs:attribute name="title" type="NonEmptyString" use="required"/>
 	</xs:complexType>
