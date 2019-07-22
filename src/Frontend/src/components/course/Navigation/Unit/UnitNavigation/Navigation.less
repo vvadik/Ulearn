@@ -4,15 +4,17 @@
   position: relative;
   width: 360px;
   max-width: 360px;
-  max-height: calc(100vh - @headerHeight - @headerDivider - 10px);
+  max-height: calc(100vh - @headerHeight - @headerDivider);
   flex-shrink: 0;
 }
 
 .contentWrapper {
   position: fixed;
+
+  width: 360px;
+
   overflow-y: auto;
   top: calc(@headerHeight + @headerDivider);
-  left: 10px;
-  max-height: calc(100vh - @headerHeight - @headerDivider - 10px);
+  max-height: calc(100vh - @headerHeight - @headerDivider);
 
 }

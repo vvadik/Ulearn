@@ -1,9 +1,11 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 import PropTypes from "prop-types";
 import UnitNavigation from "../Navigation/Unit/UnitNavigation";
 import CourseNavigation from "../Navigation/Course/CourseNavigation";
-import AnyPage from '../../../pages/AnyPage'
-import { constructPathToSlide } from '../../../consts/routes';
+import AnyPage from '../../../pages/AnyPage';
+import UnitFlashcadsPage from '../../../pages/course/UnitFlashcardsPage';
+import CourseFlashcardsPage from '../../../pages/course/CourseFlashcardsPage';
+import {flashcards, constructPathToSlide} from '../../../consts/routes';
 import styles from "./Course.less"
 
 class Course extends Component {
@@ -13,13 +15,13 @@ class Course extends Component {
 		this.state = {
 			onCourseNavigation: true,
 			openUnit: null,
-			highlightedUnit: Course.findActiveUnit(props.slideId, props.courseInfo),
+			highlightedUnit: Course.findActiveUnitId(props.slideId, props.courseInfo),
 			unitWasOpen: false,
 		};
 	}
 
-	componentDidMount () {
-		const { loadCourse, loadUserProgress, isAuthenticated, courseId, courseInfo, progress } = this.props;
+	componentDidMount() {
+		const {loadCourse, loadUserProgress, isAuthenticated, courseId, courseInfo, progress} = this.props;
 
 		if (!courseInfo) {
 			loadCourse(courseId);
@@ -34,7 +36,7 @@ class Course extends Component {
 		const res = {};
 
 		if (!state.unitWasOpen && props.progress && Object.keys(props.progress).length && props.courseInfo) {
-			const openUnit = props.units[Course.findActiveUnit(props.slideId, props.courseInfo)];
+			const openUnit = props.units[Course.findActiveUnitId(props.slideId, props.courseInfo)];
 			if (!openUnit) {
 				return null;
 			}
@@ -44,7 +46,7 @@ class Course extends Component {
 		}
 
 		if (!state.highlightedUnit && props.courseInfo) {
-			res.highlightedUnit = Course.findActiveUnit(props.slideId, props.courseInfo);
+			res.highlightedUnit = Course.findActiveUnitId(props.slideId, props.courseInfo);
 		}
 
 		if (Object.keys(res).length) {
@@ -54,34 +56,36 @@ class Course extends Component {
 		return null;
 	}
 
-	render () {
-		const { courseInfo } = this.props;
-		const { onCourseNavigation } = this.state;
+	render() {
+		const {courseInfo} = this.props;
+		const {onCourseNavigation} = this.state;
 
 		if (!courseInfo) {
 			return null;
 		}
 
+		const Page = this.findOpenedSlideType();
 
 		return (
-			<div className={ styles.root }>
-				{ onCourseNavigation ? this.renderCourseNavigation() : this.renderUnitNavigation()}
+			<div className={styles.root}>
+				{onCourseNavigation ? this.renderCourseNavigation() : this.renderUnitNavigation()}
 				<main className={styles.pageWrapper}>
-					{this.props.children}
+					<Page match={this.props.match}/>
 				</main>
 			</div>
 		);
 	}
 
-	renderCourseNavigation () {
-		const { courseInfo } = this.props;
-		const { highlightedUnit } = this.state;
+	renderCourseNavigation() {
+		const {courseInfo, slideId} = this.props;
+		const {highlightedUnit} = this.state;
 
 		return (
 			<CourseNavigation
-				title={ courseInfo.title }
-				description={ courseInfo.description }
-				progress={ 0.4 } // TODO: считать реальный
+				slideId={slideId}
+				courseId={courseInfo.id}
+				title={courseInfo.title}
+				description={courseInfo.description}
 				items={courseInfo.units.map(item => ({
 					title: item.title,
 					id: item.id,
@@ -92,16 +96,16 @@ class Course extends Component {
 		);
 	}
 
-	renderUnitNavigation () {
-		const { openUnit } = this.state;
-		const { courseInfo, courseId, slideId, progress } = this.props;
+	renderUnitNavigation() {
+		const {openUnit} = this.state;
+		const {courseInfo, courseId, slideId, progress} = this.props;
 
 		return (
 			<UnitNavigation
-				title={ openUnit.title }
-				courseName={ courseInfo.title}
-				onCourseClick={ this.returnInUnitsMenu }
-				items={ openUnit.slides.map(item => ({
+				title={openUnit.title}
+				courseName={courseInfo.title}
+				onCourseClick={this.returnInUnitsMenu}
+				items={openUnit.slides.map(item => ({
 					id: item.id,
 					title: item.title,
 					type: item.type,
@@ -110,14 +114,49 @@ class Course extends Component {
 					score: (progress && progress[item.id] && progress[item.id].score) || 0,
 					maxScore: item.maxScore,
 					questionsCount: item.questionsCount,
-					visited: progress && progress[item.id],
-				})) }
+					visited: Boolean(progress && progress[item.id]),
+				}))}
 				nextUnit={Course.findNextUnit(openUnit, courseInfo)}
 			/>
 		);
 	}
 
-	static findActiveUnit(slideId, courseInfo) {
+	findOpenedSlideType() {
+		const {slideId, courseInfo} = this.props;
+
+		if (slideId === flashcards) {
+			return CourseFlashcardsPage;
+		}
+
+
+		if (!courseInfo || !courseInfo.units) {
+			return AnyPage;
+		}
+
+		let currentSlide;
+		const units = courseInfo.units;
+
+		for (const unit of units) {
+			for (const slide of unit.slides) {
+				if (slideId === slide.slug) {
+					currentSlide = slide;
+				}
+			}
+		}
+
+		// if (currentSlide && currentSlide.type === 'flashcards') {
+		// 	return UnitFlashcadsPage;
+		// }
+
+		if (currentSlide && slideId.toLowerCase().startsWith('flesh_karty')) { // TODO: Убрать, когда сервер будет тип слайда отдавать правильно
+			return UnitFlashcadsPage;
+		}
+
+
+		return AnyPage;
+	}
+
+	static findActiveUnitId(slideId, courseInfo) {
 		if (!courseInfo || !courseInfo.units) {
 			return null;
 		}
@@ -133,7 +172,7 @@ class Course extends Component {
 			}
 		}
 
-		return  null;
+		return null;
 	}
 
 	static findNextUnit(activeUnit, courseInfo) {
@@ -152,7 +191,7 @@ class Course extends Component {
 	}
 
 	unitClickHandle = (id) => {
-		const { units } = this.props;
+		const {units} = this.props;
 
 		this.setState({
 			openUnit: units[id],

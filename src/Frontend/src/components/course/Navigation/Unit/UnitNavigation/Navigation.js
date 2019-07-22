@@ -27,7 +27,6 @@ Navigation.propTypes ={
 	items: PropTypes.arrayOf(PropTypes.shape(menuItemType)),
 	nextUnit: PropTypes.object, // TODO: описать нормально
 
-
 	courseName: PropTypes.string,
 	onCourseClick: PropTypes.func,
 };

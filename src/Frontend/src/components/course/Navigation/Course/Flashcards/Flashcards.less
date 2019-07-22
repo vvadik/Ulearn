@@ -1,22 +1,17 @@
 @import "../../../../../variables.less";
 
 .root {
-  width: 360px;
-
   position: fixed;
-  display: flex;
   bottom: 0;
-  left:0;
+  left: 0;
   z-index: 10;
-
-  justify-content: space-between;
-  align-items: center;
-  padding: 13px 18px 14px 24px;
-  background: #fff;
+  width: 360px;
+  background: #ffffff;
   border: none;
   border-top: 1px solid @borderColor;
   box-shadow: none;
   text-align: left;
+  padding: 13px 12px 20px 24px;
   cursor: pointer;
 
   &:hover {
@@ -36,8 +31,9 @@
   }
 }
 
-.wrapper {
-  overflow: hidden;
+.isActive {
+  background: @backgroundGray;
+  font-weight: 500;
 }
 
 .header {
@@ -50,17 +46,8 @@
   color: @additionalColor;
 }
 
-.title {
-  margin: 0;
-  font-weight: normal;
+.text {
+  color: @linkColor;
   font-size: 18px;
   line-height: 24px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.arrow {
-  color: @geinsboro;
-  flex-shrink: 0;
 }
