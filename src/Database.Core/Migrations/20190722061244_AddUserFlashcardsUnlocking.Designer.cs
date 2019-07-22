@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Database.Migrations
 {
     [DbContext(typeof(UlearnDb))]
-    [Migration("20190704065744_AddUserFlashcardsVisits")]
-    partial class AddUserFlashcardsVisits
+    [Migration("20190722061244_AddUserFlashcardsUnlocking")]
+    partial class AddUserFlashcardsUnlocking
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -1520,6 +1520,28 @@ namespace Database.Migrations
                     b.ToTable("UserExerciseSubmissions");
                 });
 
+            modelBuilder.Entity("Database.Models.UserFlashcardsUnlocking", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CourseId")
+                        .IsRequired()
+                        .HasMaxLength(64);
+
+                    b.Property<Guid>("UnitId");
+
+                    b.Property<string>("UserId")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "CourseId", "UnitId");
+
+                    b.ToTable("UserFlashcardsUnlocking");
+                });
+
             modelBuilder.Entity("Database.Models.UserFlashcardsVisit", b =>
                 {
                     b.Property<int>("Id")
@@ -1534,7 +1556,7 @@ namespace Database.Migrations
                         .IsRequired()
                         .HasMaxLength(64);
 
-                    b.Property<int>("Score");
+                    b.Property<int>("Rate");
 
                     b.Property<DateTime>("Timestamp");
 
@@ -2557,6 +2579,14 @@ namespace Database.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Database.Models.UserFlashcardsUnlocking", b =>
+                {
+                    b.HasOne("Database.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Database.Models.UserFlashcardsVisit", b =>

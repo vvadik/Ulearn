@@ -16,12 +16,12 @@
                         CourseId = c.String(nullable: false, maxLength: 64),
                         UnitId = c.Guid(nullable: false),
                         FlashcardId = c.String(nullable: false, maxLength: 64),
-                        Score = c.Int(nullable: false),
+                        Rate = c.Int(nullable: false),
                         Timestamp = c.DateTime(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.AspNetUsers", t => t.UserId, cascadeDelete: true)
-                .Index(t => new { t.UserId, t.CourseId, t.UnitId, t.FlashcardId }, unique: true, name: "IDX_UserFlashcardsVisits_ByUserIdAndCourseIdAndUnitIdAndFlashcardId");
+                .Index(t => new { t.UserId, t.CourseId, t.UnitId, t.FlashcardId }, name: "IDX_UserFlashcardsVisits_ByUserIdAndCourseIdAndUnitIdAndFlashcardId");
             
         }
         

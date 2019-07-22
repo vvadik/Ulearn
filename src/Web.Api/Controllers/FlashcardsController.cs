@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NUnit.Framework;
+using Remotion.Linq.Parsing.ExpressionVisitors.MemberBindings;
 using Serilog;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
@@ -37,12 +38,179 @@ namespace Ulearn.Web.Api.Controllers
 	public class FlashcardsController : BaseController
 	{
 		private readonly IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo;
+		private readonly IUserFlashcardsUnlockingRepo userFlashcardsUnlockingRepo;
 
-		public FlashcardsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo, IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo)
+
+		public FlashcardsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
+			IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo,
+			IUserFlashcardsUnlockingRepo userFlashcardsUnlockingRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.usersFlashcardsVisitsRepo = usersFlashcardsVisitsRepo;
+			this.userFlashcardsUnlockingRepo = userFlashcardsUnlockingRepo;
 		}
+		/// <summary>
+		/// Коллекция объектов флешкарт с оценками, сгруппированных по модулям по курсу
+		/// </summary>
+		/// <param name="course"></param>
+		/// <returns></returns>
+
+		[HttpGet("{courseId}/flashcards")]
+		public async Task<ActionResult<FlashcardResponseByUnits>> Flashcards([FromRoute] Course course)
+		{
+			var userFlashcardsVisitsByCourse = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, course.Id);
+			var flashcardResponseByUnits = new FlashcardResponseByUnits();
+			foreach (var unit in course.Units)
+			{
+				var unitFlashcardsResponse = new UnitFlashcardsResponse();
+				var unitFlashcards = unit.Flashcards;
+				if (unitFlashcards.Count == 0)
+					continue;
+
+				var flashcardResponsesEnumerable = GetFlashcardResponses(course, unitFlashcards, userFlashcardsVisitsByCourse);
+
+				unitFlashcardsResponse.Flashcards.AddRange(flashcardResponsesEnumerable);
+				unitFlashcardsResponse.UnitId = unit.Id;
+				unitFlashcardsResponse.UnitTitle = unit.Title;
+				unitFlashcardsResponse.Unlocked = await IsUnlocked(course, unit);
+				flashcardResponseByUnits.Units.Add(unitFlashcardsResponse);
+			}
+
+			return flashcardResponseByUnits;
+		}
+
+		private async Task<bool> IsUnlocked(Course course, Unit unit)
+		{
+			var unlocking = await userFlashcardsUnlockingRepo.GetUserFlashcardsUnlocking(UserId, course, unit);
+			if (unlocking != null)
+				return true;
+			var flashcards = unit.Flashcards;
+			var userVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, course.Id, unit.Id);
+			var userVisitsDict = new Dictionary<string, UserFlashcardsVisit>();
+			foreach (var visit in userVisits)
+			{
+				userVisitsDict[visit.FlashcardId] = visit;
+			}
+
+			if (!flashcards.All(x => userVisitsDict.ContainsKey(x.Id)))
+				return false;
+			await userFlashcardsUnlockingRepo.AddUserFlashcardsUnlocking(UserId, course, unit);
+			return true;
+		}
+
+		private IEnumerable<FlashcardResponse> GetFlashcardResponses(Course course, List<Flashcard> flashcards, List<UserFlashcardsVisit> userFlashcardsVisits)
+		{
+			var userFlashcardsVisitsDictionary = GetFlashcardsFullUsersVisitsDictionary(userFlashcardsVisits, flashcards);
+			var tLasts = GetFlashcardsTLasts(flashcards, userFlashcardsVisits);
+
+			foreach (var flashcard in flashcards)
+			{
+				var question = GetRenderedContent(flashcard.Question.Blocks);
+				var answer = GetRenderedContent(flashcard.Answer.Blocks);
+
+				var rateResponse = userFlashcardsVisitsDictionary.TryGetValue(flashcard.Id, out var visit) ? visit.Rate : Rate.NotRated;
+
+				var unit = course.Units.FirstOrDefault(x => x.GetFlashcardById(flashcard.Id) != default(Flashcard));
+
+				var unitIdResponse = unit.Id;
+				var tLast = tLasts[flashcard.Id];
+
+				var flashcardResponse = new FlashcardResponse { Answer = answer, Question = question, Rate = rateResponse, Id = flashcard.Id, UnitId = unitIdResponse, UnitTitle = unit.Title, TheorySlidesIds = flashcard.TheorySlidesIds, TLast = tLast };
+				yield return flashcardResponse;
+			}
+		}
+
+		private Dictionary<string, int> GetFlashcardsTLasts(List<Flashcard> flashcards, List<UserFlashcardsVisit> userFlashcardsVisits)
+		{
+			var result = new Dictionary<string, int>();
+			foreach (var flashcard in flashcards)
+			{
+				result[flashcard.Id] = 0;
+			}
+
+			foreach (var visit in userFlashcardsVisits)
+			{
+				var id = visit.FlashcardId;
+				foreach (var flashcard in flashcards)
+				{
+					result[flashcard.Id]++;
+				}
+
+				if (result.ContainsKey(id))
+				{
+					result[id] = 0;
+				}
+			}
+
+			return result;
+		}
+
+		private static string GetRenderedContent(SlideBlock[] blocks)
+		{
+			var content = new StringBuilder();
+			foreach (var block in blocks)
+			{
+				switch (block)
+				{
+					case MarkdownBlock markdownBlock:
+						content.Append(markdownBlock.TryGetText().RenderMarkdown());
+						break;
+					case CodeBlock codeBlock:
+					{
+						content.Append($"\n<textarea class=\"code code-sample\" data-lang=\"{codeBlock.Language.GetName()}\">{codeBlock.Code}</textarea>");
+						break;
+					}
+
+					case TexBlock texBlock:
+						var lines = texBlock.TexLines.Select(x => $"<div class=\"tex\">{x.Trim()}</div>");
+						content.Append(string.Join("\n", lines));
+						break;
+					default:
+						content.Append(block.TryGetText());
+						break;
+				}
+			}
+
+			return content.ToString();
+		}
+
+		private Dictionary<string, UserFlashcardsVisit> GetFlashcardsFullUsersVisitsDictionary(List<UserFlashcardsVisit> userFlashcardsVisits, List<Flashcard> flashcards)
+		{
+			var result = new Dictionary<string, UserFlashcardsVisit>();
+			foreach (var userFlashcardsVisit in userFlashcardsVisits)
+			{
+				result[userFlashcardsVisit.FlashcardId] = userFlashcardsVisit;
+			}
+
+			foreach (var flashcard in flashcards)
+			{
+				if (!result.ContainsKey(flashcard.Id))
+				{
+					result[flashcard.Id] = new UserFlashcardsVisit { FlashcardId = flashcard.Id, Rate = Rate.NotRated };
+				}
+			}
+
+			return result;
+		}
+
+		/// <summary>
+		/// Изменить оценку для флеш-карты
+		/// </summary>
+		///
+		[Authorize]
+		[HttpPut("{courseId}/flashcards/{flashcardId}/status")]
+		[ProducesResponseType((int)HttpStatusCode.NoContent)]
+		public async Task<IActionResult> Status([FromRoute] Course course, [FromRoute] string flashcardId, [FromBody] Rate rate)
+		{
+			var unit = course.Units.FirstOrDefault(x => x.GetFlashcardById(flashcardId) != null);
+			if (unit is null)
+				return BadRequest($"flashcard with id {flashcardId} does not exist");
+			await usersFlashcardsVisitsRepo.AddFlashcardVisitAsync(UserId, course.Id, unit.Id, flashcardId, rate, DateTime.Now);
+			return NoContent();
+		}
+
+		/*
+
 
 		/// <summary>
 		/// Статистика по оценкам карточек пользователя 
@@ -129,73 +297,7 @@ namespace Ulearn.Web.Api.Controllers
 		/// smart - карточки в порядке, определяемом логикой показывания карточек
 		/// </param>
 		/// <returns></returns>
-		[HttpGet("{courseId}/flashcards")]
-		public async Task<ActionResult<FlashcardsResponse>> Flashcards([FromRoute] Course course, [FromQuery] int? count, [FromQuery] Guid? unitId, [FromQuery] Rate? rate, [FromQuery] FlashcardOrder flashcardOrder = FlashcardOrder.Smart)
-		{
-			List<UserFlashcardsVisit> userFlashcardsVisits;
-			List<Flashcard> flashcards;
-
-			if (unitId != null)
-			{
-				var unit = course.FindUnitById(unitId.Value);
-				if (unit is null)
-				{
-					return BadRequest($"unit with {unitId} does not exist");
-				}
-
-				userFlashcardsVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, course.Id, unitId.Value);
-				flashcards = unit.Flashcards;
-			}
-			else
-			{
-				userFlashcardsVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, course.Id);
-				flashcards = flashcardOrder == FlashcardOrder.Smart ? await GetFlashcardsInSmartOrder(course) : course.Units.SelectMany(x => x.Flashcards).ToList();
-			}
-
-			var flashcardsResponse = new FlashcardsResponse();
-			var flashcardResponsesEnumerable = GetFlashcardResponses(rate, unitId, course, flashcards, userFlashcardsVisits);
-			if (count is null)
-			{
-				flashcardsResponse.Flashcards = flashcardResponsesEnumerable.ToList();
-			}
-			else
-			{
-				flashcardsResponse.Flashcards = flashcardResponsesEnumerable.Take(count.Value).ToList();
-			}
-
-			return flashcardsResponse;
-		}
-
-		private IEnumerable<FlashcardResponse> GetFlashcardResponses(Rate? rate, Guid? unitId, Course course, List<Flashcard> flashcards, List<UserFlashcardsVisit> userFlashcardsVisits)
-		{
-			var userFlashcardsVisitsDictionary = GetFlashcardsFullUsersVisitsDictionary(userFlashcardsVisits, flashcards);
-
-			foreach (var flashcard in flashcards)
-			{
-				if (rate != null && userFlashcardsVisitsDictionary[flashcard.Id].Rate != rate.Value)
-					continue;
-
-				var question = GetRenderedContent(flashcard.Question.Blocks);
-				var answer = GetRenderedContent(flashcard.Answer.Blocks);
-
-				var rateResponse = userFlashcardsVisitsDictionary.TryGetValue(flashcard.Id, out var visit) ? visit.Rate : Rate.NotRated;
-				Unit unit;
-				if (unitId is null)
-				{
-					unit = course.Units.FirstOrDefault(x => x.GetFlashcardById(flashcard.Id) != default(Flashcard));
-				}
-				else
-				{
-					unit = course.FindUnitById(unitId.Value);
-				}
-
-				var unitIdResponse = unit.Id;
-
-				var flashcardResponse = new FlashcardResponse { Answer = answer, Question = question, Rate = rateResponse, Id = flashcard.Id, UnitId = unitIdResponse, UnitTitle = unit.Title, TheorySlidesIds = flashcard.TheorySlidesIds };
-				yield return flashcardResponse;
-			}
-		}
-
+		
 		private async Task<List<Flashcard>> GetFlashcardsInSmartOrder(Course course)
 		{
 			var flashcards = course.Units.SelectMany(x => x.Flashcards);
@@ -205,49 +307,14 @@ namespace Ulearn.Web.Api.Controllers
 			return orderedFlashcardsVisits.Where(x => flashcardsDict.ContainsKey(x.FlashcardId)).Select(x => flashcardsDict[x.FlashcardId]).ToList();
 		}
 
-
-		private static string GetRenderedContent(SlideBlock[] blocks)
+		private async Task<List<Flashcard>> GetFlashcardsInSmartOrder(Course course, Unit unit)
 		{
-			var content = new StringBuilder();
-			foreach (var block in blocks)
-			{
-				switch (block)
-				{
-					case MarkdownBlock markdownBlock:
-						content.Append(markdownBlock.TryGetText().RenderMarkdown());
-						break;
-					case CodeBlock codeBlock:
-					{
-						content.Append($"\n<textarea class=\"code code-sample\" data-lang=\"{codeBlock.Language.GetName()}\">{codeBlock.Code}</textarea>");
-						break;
-					}
-
-					case TexBlock texBlock:
-						var lines = texBlock.TexLines.Select(x => $"<div class=\"tex\">{x.Trim()}</div>");
-						content.Append(string.Join("\n", lines));
-						break;
-					default:
-						content.Append(block.TryGetText());
-						break;
-				}
-			}
-
-			return content.ToString();
+			var flashcards = unit.Flashcards;
+			
 		}
 
-		private Dictionary<string, UserFlashcardsVisit> GetFlashcardsFullUsersVisitsDictionary(List<UserFlashcardsVisit> userFlashcardsVisits, List<Flashcard> flashcards)
-		{
-			var result = userFlashcardsVisits.ToDictionary(x => x.FlashcardId);
-			foreach (var flashcard in flashcards)
-			{
-				if (!result.ContainsKey(flashcard.Id))
-				{
-					result[flashcard.Id] = new UserFlashcardsVisit { FlashcardId = flashcard.Id, Rate = Rate.NotRated };
-				}
-			}
 
-			return result;
-		}
+		
 
 		/// <summary>
 		/// Информация о всех карточках по курсу
@@ -257,10 +324,13 @@ namespace Ulearn.Web.Api.Controllers
 		public async Task<ActionResult<FlashcardInfoResponse>> FlashcardsInfo([FromRoute] Course course)
 		{
 			var info = new FlashcardInfoResponse();
+			var statResponse = new  FlashcardsStatResponse();
 
 			foreach (var unit in course.Units)
 			{
+				
 				var userFlashcardsVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, course.Id, unit.Id);
+				//var userFlashcardsVisit
 				var unlocked = userFlashcardsVisits.Any(x => x.Rate != Rate.NotRated);
 				var cardsCount = unit.Flashcards.Count;
 				if (cardsCount != 0)
@@ -268,23 +338,6 @@ namespace Ulearn.Web.Api.Controllers
 			}
 
 			return info;
-		}
-
-
-		/// <summary>
-		/// Изменить оценку для флеш-карты
-		/// </summary>
-		///
-		[Authorize]
-		[HttpPut("{courseId}/flashcards/{flashcardId}/status")]
-		[ProducesResponseType((int)HttpStatusCode.NoContent)]
-		public async Task<IActionResult> Status([FromRoute] Course course, [FromRoute] string flashcardId, [FromBody] Rate rate)
-		{
-			var unit = course.Units.Find(x => x.GetFlashcardById(flashcardId) != null);
-			if (unit is null)
-				return BadRequest($"flashcard with id {flashcardId} does not exist");
-			await usersFlashcardsVisitsRepo.AddFlashcardVisitAsync(UserId, course.Id, unit.Id, flashcardId, rate, DateTime.Now);
-			return NoContent();
-		}
+		}*/
 	}
 }

@@ -7,13 +7,13 @@ namespace Database.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class AddUserFlashcardsVisits1 : IMigrationMetadata
+    public sealed partial class AddUserFlashcardsUnlocking : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddUserFlashcardsVisits1));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddUserFlashcardsUnlocking));
         
         string IMigrationMetadata.Id
         {
-            get { return "201907161247301_AddUserFlashcardsVisits1"; }
+            get { return "201907220607352_AddUserFlashcardsUnlocking"; }
         }
         
         string IMigrationMetadata.Source

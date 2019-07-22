@@ -10,22 +10,22 @@ namespace Database.Models
 		public int Id { get; set; }
 
 		[Required]
-		[Index("IDX_UserFlashcardsVisits_ByUserIdAndCourseIdAndUnitIdAndFlashcardId", 1, IsUnique = true)]
+		[Index("IDX_UserFlashcardsVisits_ByUserIdAndCourseIdAndUnitIdAndFlashcardId", 1, IsUnique = false)]
 		public string UserId { get; set; }
 		public virtual ApplicationUser User { get; set; }
 		
 		[Required]
 		[StringLength(64)]
-		[Index("IDX_UserFlashcardsVisits_ByUserIdAndCourseIdAndUnitIdAndFlashcardId", 2, IsUnique = true)]
+		[Index("IDX_UserFlashcardsVisits_ByUserIdAndCourseIdAndUnitIdAndFlashcardId", 2, IsUnique = false)]
 		public string CourseId { get; set; }
 
 		[Required]
-		[Index("IDX_UserFlashcardsVisits_ByUserIdAndCourseIdAndUnitIdAndFlashcardId", 3, IsUnique = true)]
+		[Index("IDX_UserFlashcardsVisits_ByUserIdAndCourseIdAndUnitIdAndFlashcardId", 3, IsUnique = false)]
 		public Guid UnitId { get; set; }
 
 		[Required]
 		[StringLength(64)]
-		[Index("IDX_UserFlashcardsVisits_ByUserIdAndCourseIdAndUnitIdAndFlashcardId", 4, IsUnique = true)]
+		[Index("IDX_UserFlashcardsVisits_ByUserIdAndCourseIdAndUnitIdAndFlashcardId", 4, IsUnique = false)]
 		public string FlashcardId { get; set; }
 
 		[Required]

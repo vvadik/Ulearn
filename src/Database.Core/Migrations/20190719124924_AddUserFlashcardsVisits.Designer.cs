@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Database.Migrations
 {
     [DbContext(typeof(UlearnDb))]
-    [Migration("20190716125035_AddUsersFlashcardsVisits")]
-    partial class AddUsersFlashcardsVisits
+    [Migration("20190719124924_AddUserFlashcardsVisits")]
+    partial class AddUserFlashcardsVisits
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

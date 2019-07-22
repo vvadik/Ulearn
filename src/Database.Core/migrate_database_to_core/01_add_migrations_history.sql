@@ -56,5 +56,5 @@ VALUES
 ('20190516084642_AddRepoUrl2NotUploadedPackageNotification', '2.2.0-rtm-35687'),
 ('20190522102812_AddCourseGitRepos', '2.2.0-rtm-35687'),
 ('20190524142331_AddGitCourseBranchField', '2.2.0-rtm-35687'),
-('20190704065744_AddUserFlashcardsVisits', '2.2.0-rtm-35687'),
-('20190716125035_AddUsersFlashcardsVisits', '2.2.0-rtm-35687')
+('20190719124924_AddUserFlashcardsVisits', '2.2.0-rtm-35687'),
+('20190722061244_AddUserFlashcardsUnlocking', '2.2.0-rtm-35687')

@@ -220,6 +220,8 @@ namespace Ulearn.Core
 				log.Info($"Очищаю директорию {unpackDirectory.FullName}");
 				unpackDirectory.ClearDirectory();
 				log.Info($"Директория {unpackDirectory.FullName} очищена");
+				zip.BufferSize = 1000000; https://stackoverflow.com/a/19634920/6800354
+				zip.CodecBufferSize = 1000000;
 				zip.ExtractAll(unpackDirectory.FullName, ExtractExistingFileAction.OverwriteSilently);
 				log.Info($"Архив {zipFile.FullName} распакован");
 			}

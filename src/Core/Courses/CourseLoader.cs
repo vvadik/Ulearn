@@ -74,6 +74,11 @@ namespace Ulearn.Core.Courses
 				}
 			}
 
+			if (string.IsNullOrEmpty(settings.Description))
+			{
+				settings.Description = "";
+			}
+
 			var context = new CourseLoadingContext(courseId, settings, dir, loadFromDirectory.GetFile("course.xml"));
 
 			var units = LoadUnits(context).ToList();
