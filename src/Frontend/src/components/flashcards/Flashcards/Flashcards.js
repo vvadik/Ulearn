@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import PropTypes from "prop-types";
 import styles from './flashcards.less';
 import classNames from 'classnames';
@@ -15,12 +15,9 @@ const modalsStyles = {
 class Flashcards extends Component {
 	constructor(props) {
 		super(props);
-		const {flashcards, statistics} = this.props;
 
 		this.state = {
 			currentIndex: 0,
-			statistics: {...statistics},
-			flashcards: [...flashcards],
 		}
 	}
 
@@ -33,35 +30,35 @@ class Flashcards extends Component {
 	}
 
 	render() {
-		const {flashcards, currentIndex, statistics} = this.state;
-		const {totalFlashcardsCount} = this.props;
-		const {question, answer, unitTitle} = flashcards[currentIndex];
+		const { currentIndex } = this.state;
+		const { totalFlashcardsCount, flashcards, statistics } = this.props;
+		const { question, answer, unitTitle } = flashcards[currentIndex];
 
 		return (
-			<div ref={(ref) => this.overlay = ref} className={styles.overlay} onClick={this.handleOverlayClick}>
-				<div ref={(ref) => this.firstModal = ref} className={modalsStyles.first}>
+			<div ref={ (ref) => this.overlay = ref } className={ styles.overlay } onClick={ this.handleOverlayClick }>
+				<div ref={ (ref) => this.firstModal = ref } className={ modalsStyles.first }>
 					<FrontFlashcard
-						onShowAnswer={() => this.resetCardsAnimation()}
-						question={question}
-						answer={answer}
-						unitTitle={unitTitle}
-						onHandlingResultsClick={this.handleResultsClick}
-						onClose={this.props.onClose}
+						onShowAnswer={ () => this.resetCardsAnimation() }
+						question={ question }
+						answer={ answer }
+						unitTitle={ unitTitle }
+						onHandlingResultsClick={ (rate) => this.handleResultsClick(rate) }
+						onClose={ this.props.onClose }
 					/>
 				</div>
-				<div ref={(ref) => this.secondModal = ref} className={modalsStyles.second}/>
-				<div ref={(ref) => this.thirdModal = ref} className={modalsStyles.third}/>
-				<div className={modalsStyles.fourth}/>
-				{Flashcards.renderControlGuides()}
-				<div className={styles.progressBarContainer}>
-					<ProgressBar statistics={statistics} totalFlashcardsCount={totalFlashcardsCount}/>
+				<div ref={ (ref) => this.secondModal = ref } className={ modalsStyles.second }/>
+				<div ref={ (ref) => this.thirdModal = ref } className={ modalsStyles.third }/>
+				<div className={ modalsStyles.fourth }/>
+				{ Flashcards.renderControlGuides() }
+				<div className={ styles.progressBarContainer }>
+					<ProgressBar statistics={ statistics } totalFlashcardsCount={ totalFlashcardsCount }/>
 				</div>
 			</div>
 		)
 	}
 
 	handleOverlayClick = (e) => {
-		const {onClose} = this.props;
+		const { onClose } = this.props;
 
 		if (e.target === this.overlay) {
 			onClose();
@@ -70,7 +67,7 @@ class Flashcards extends Component {
 
 	static renderControlGuides() {
 		return (
-			<p className={styles.controlGuideContainer}>
+			<p className={ styles.controlGuideContainer }>
 				Используйте клавиатуру:
 				<span>пробел</span> — показать ответ,
 				<span>1</span>
@@ -83,28 +80,25 @@ class Flashcards extends Component {
 	}
 
 	handleResultsClick = (rate) => {
-		const {currentIndex, flashcards, statistics} = this.state;
-		const {courseId, sendFlashcardRate} = this.props;
+		const { currentIndex } = this.state;
+		const { courseId, sendFlashcardRate, flashcards, statistics } = this.props;
 		const currentCard = flashcards[currentIndex];
-		const newRate = `rate${rate}`;
+		const newRate = `rate${ rate }`;
 
-		sendFlashcardRate(courseId, currentCard.id, newRate);
+		sendFlashcardRate(courseId, currentCard.unitId, currentCard.id, newRate);
 
 		statistics[currentCard.rate]--;
 		statistics[newRate]++;
 		currentCard.rate = newRate;
 
-		this.setState({
-			statistics: statistics
-		});
 		this.takeNextFlashcard();
 	};
 
 	takeNextFlashcard() {
-		const {currentIndex, flashcards} = this.state;
+		const { currentIndex } = this.state;
+		const { flashcards } = this.props;
 		let newIndex = currentIndex + 1;
 
-		console.log(newIndex, flashcards.length);
 		if (newIndex === flashcards.length) {
 			newIndex = 0;
 		}
@@ -117,7 +111,7 @@ class Flashcards extends Component {
 	}
 
 	animateCards() {
-		const {firstModal, secondModal, thirdModal} = this;
+		const { firstModal, secondModal, thirdModal } = this;
 		const animationDuration = 700;
 
 		firstModal.className = classNames(modalsStyles.second, styles.move);
@@ -130,7 +124,7 @@ class Flashcards extends Component {
 	}
 
 	resetCardsAnimation() {
-		const {firstModal, secondModal, thirdModal} = this;
+		const { firstModal, secondModal, thirdModal } = this;
 
 		firstModal.className = classNames(modalsStyles.first);
 		secondModal.className = classNames(modalsStyles.second);

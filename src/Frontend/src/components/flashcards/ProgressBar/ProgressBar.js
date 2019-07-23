@@ -31,32 +31,37 @@ function ProgressBar({statistics, totalFlashcardsCount}) {
 	function renderResults() {
 		const rates = Object.keys(statistics)
 			.filter(key => statistics[key] > 0);
-		const lowestOrderIndex = rates['notRated']
-			? 1
-			: 0;
-		const highestOrderIndex = rates.length - 1;
 
-		return rates.map((key, index) => convertToBarElement(
-			key,
-			statistics[key],
-			totalFlashcardsCount,
-			index, {
-				lowestOrderIndex,
-				highestOrderIndex
-			}));
+		const ratesWithText = [
+			'notRated'
+		];
+		//TODO ROZENTOR implement better algorithm for selecting rates with text
+		if (rates[0] === 'notRated') {
+			ratesWithText.push(rates[1]);
+		} else {
+			ratesWithText.push(rates[0]);
+		}
+
+		if (rates[rates.length - 1] === 'notRated') {
+			ratesWithText.push(rates[rates.length - 2]);
+		} else {
+			ratesWithText.push(rates[rates.length - 1]);
+		}
+
+		return rates.map(rate => convertToBarElement(
+			rate,
+			`${statistics[rate] / totalFlashcardsCount * 100}%`,
+			`${statistics[rate]} ${ratesWithText.some(r => r === rate) ? mapRateToText[rate] : ''}`,
+		));
 	}
 
-	function convertToBarElement(rate, count, totalCardsCount, index, {lowestOrderIndex, highestOrderIndex}) {
-		const elementWidth = `${count / totalCardsCount * 100}%`;
-
-		const statusText = (index === lowestOrderIndex || index === highestOrderIndex || rate === 'notRated') && mapRateToText[rate];
-
+	function convertToBarElement(rate, elementWidth, text) {
 		return (
 			<span
 				key={rate}
 				className={classNames(styles.progressBarElement, mapRateToStyle[rate])}
 				style={{width: elementWidth}}>
-				{count} {statusText}
+				{text}
 			</span>
 		);
 	}

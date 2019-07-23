@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import PropTypes from "prop-types";
 
 import CourseCards from "./CourseCards/CourseCards";
@@ -9,7 +9,7 @@ import Loader from "@skbkontur/react-ui/Loader";
 import Flashcards from "../Flashcards/Flashcards";
 
 import styles from './coursePage.less';
-import {guides} from '../consts';
+import { guides } from '../consts';
 
 class CoursePage extends Component {
 	constructor(props) {
@@ -21,16 +21,13 @@ class CoursePage extends Component {
 	}
 
 	componentDidMount() {
-		const {courseId, loadFlashcardsInfo, flashcardsPack, loadFlashcardsPack, loadStatistics} = this.props;
+		const { courseId, flashcards, loadFlashcards } = this.props;
 
 		document.getElementsByTagName('main')[0].classList.add(styles.pageContainer);
 
-		if (!flashcardsPack) {
-			loadFlashcardsPack(courseId);
+		if (flashcards.length === 0) {
+			loadFlashcards(courseId);
 		}
-
-		loadStatistics(courseId);
-		loadFlashcardsInfo(courseId);
 	}
 
 	componentWillUnmount() {
@@ -38,33 +35,32 @@ class CoursePage extends Component {
 	}
 
 	render() {
-		const {showFlashcards} = this.state;
-		const {flashcardsInfoLoading, flashcardsInfo, courseId, flashcardsPack, unitsInfo, sendFlashcardRate, statistics, totalFlashcardsCount} = this.props;
+		const { showFlashcards } = this.state;
+		const { courseId, flashcardsLoading, flashcards, infoByUnits, sendFlashcardRate, statistics, totalFlashcardsCount } = this.props;
 
 		return (
-			<Loader active={flashcardsInfoLoading} type="big">
-				<Gapped gap={15} vertical={true}>
+			<Loader active={ flashcardsLoading } type="big">
+				<Gapped gap={ 15 } vertical={ true }>
 
-					{this.renderHeader()}
+					{ this.renderHeader() }
 
-					{flashcardsInfo &&
+					{ infoByUnits &&
 					<CourseCards
-						flashcardsInfo={flashcardsInfo}
-						courseId={courseId}
-						unitsInfo={unitsInfo}
-					/>}
+						infoByUnits={ infoByUnits }
+						courseId={ courseId }
+					/> }
 
-					<Guides guides={guides}/>
+					<Guides guides={ guides }/>
 
-					{showFlashcards &&
+					{ showFlashcards &&
 					<Flashcards
-						totalFlashcardsCount={totalFlashcardsCount}
-						statistics={statistics}
-						flashcards={flashcardsPack}
-						courseId={courseId}
-						onClose={() => this.hideFlashcards()}
-						sendFlashcardRate={sendFlashcardRate}
-					/>}
+						totalFlashcardsCount={ totalFlashcardsCount }
+						statistics={ statistics }
+						flashcards={ flashcards }
+						courseId={ courseId }
+						onClose={ () => this.hideFlashcards() }
+						sendFlashcardRate={ sendFlashcardRate }
+					/> }
 				</Gapped>
 			</Loader>
 		);
@@ -72,16 +68,16 @@ class CoursePage extends Component {
 
 	renderHeader() {
 		return (
-			<div className={styles.header}>
+			<div className={ styles.header }>
 				<div>
-					<h2 className={styles.title}>
+					<h2 className={ styles.title }>
 						Флеш-карты для самопроверки
 					</h2>
-					<p className={styles.description}>
+					<p className={ styles.description }>
 						Помогут лучше запомнить материал курса и подготовиться к экзаменам
 					</p>
 				</div>
-				<Button use="primary" size='large' onClick={() => this.showFlashcards()}>
+				<Button use="primary" size='large' onClick={ () => this.showFlashcards() }>
 					Проверить себя
 				</Button>
 			</div>
@@ -95,10 +91,6 @@ class CoursePage extends Component {
 	};
 
 	hideFlashcards = () => {
-		const {loadFlashcardsInfo, courseId} = this.props;
-
-		loadFlashcardsInfo(courseId);
-
 		this.setState({
 			showFlashcards: false,
 		});
@@ -107,25 +99,20 @@ class CoursePage extends Component {
 
 CoursePage.propTypes = {
 	courseId: PropTypes.string,
-	flashcardsInfo: PropTypes.arrayOf(PropTypes.shape({
+	infoByUnits: PropTypes.arrayOf(PropTypes.shape({
 		unitTitle: PropTypes.string,
 		unlocked: PropTypes.bool,
 		cardsCount: PropTypes.number,
 		unitId: PropTypes.string,
+		flashcardsSlideSlug: PropTypes.string,
 	})),
-	flashcardsInfoLoading: PropTypes.bool,
-	flashcardsPack: PropTypes.arrayOf(PropTypes.shape({
+	flashcards: PropTypes.arrayOf(PropTypes.shape({
 		id: PropTypes.string,
 		question: PropTypes.string,
 		answer: PropTypes.string,
 		unitTitle: PropTypes.string,
 		rate: PropTypes.string,
 		unitId: PropTypes.string
-	})),
-	unitsInfo: PropTypes.arrayOf(PropTypes.shape({
-		id: PropTypes.string,
-		slides: PropTypes.array,
-		title: PropTypes.string,
 	})),
 	totalFlashcardsCount: PropTypes.number,
 	statistics: PropTypes.shape({
@@ -137,10 +124,8 @@ CoursePage.propTypes = {
 		rate5: PropTypes.number
 	}),
 
-	loadFlashcardsInfo: PropTypes.func,
-	loadFlashcardsPack: PropTypes.func,
+	loadFlashcards: PropTypes.func,
 	sendFlashcardRate: PropTypes.func,
-	loadStatistics: PropTypes.func,
 };
 
 export default CoursePage;

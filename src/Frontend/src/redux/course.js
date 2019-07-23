@@ -2,9 +2,9 @@ import {
 	COURSES__COURSE_ENTERED,
 	COURSES__UPDATED,
 	COURSES__COURSE_LOAD,
-	COURSES__FLASHCARDS_INFO,
-	COURSES_FLASHCARDS_PACK,
-	START, SUCCESS, FAIL, COURSES_FLASHCARDS_STATISTICS, COURSES_FLASHCARDS_RATE,
+	COURSES__FLASHCARDS,
+	COURSES__FLASHCARDS_RATE,
+	START, SUCCESS, FAIL,
 } from '../consts/actions';
 
 const initialCoursesState = {
@@ -13,14 +13,8 @@ const initialCoursesState = {
 	fullCoursesInfo: {},
 	courseLoading: false,
 
-	flashcardsInfo: {},
-	flashcardsInfoLoading: false,
-
-	flashcardsPackByCourses: {},
-	flashcardsPackByCoursesLoading: false,
-
-	flashcardsStatisticsByUnits: {},
-	flashcardsStatisticsByUnitsLoading: false,
+	flashcards: {},
+	flashcardsLoading: false,
 };
 
 export default function courses(state = initialCoursesState, action) {
@@ -54,80 +48,44 @@ export default function courses(state = initialCoursesState, action) {
 				...state,
 				courseLoading: false,
 			};
-		case COURSES__FLASHCARDS_INFO + START:
+		case COURSES__FLASHCARDS + START:
 			return {
 				...state,
-				flashcardsInfoLoading: true,
+				flashcardsLoading: true,
 			};
-		case COURSES__FLASHCARDS_INFO + SUCCESS:
+		case COURSES__FLASHCARDS + SUCCESS:
 			return {
 				...state,
-				flashcardsInfoLoading: false,
-				flashcardsInfo: {
-					...state.flashcardsInfo,
+				flashcardsLoading: false,
+				flashcards: {
+					...state.flashcards,
 					[action.courseId]: action.result,
 				},
 			};
-		case COURSES__FLASHCARDS_INFO + FAIL:
+		case COURSES__FLASHCARDS + FAIL:
 			return {
 				...state,
-				flashcardsInfoLoading: false,
+				flashcardsLoading: false,
 			};
-		case COURSES_FLASHCARDS_PACK + START:
-			return {
-				...state,
-				flashcardsPackByCoursesLoading: true,
-			};
-		case COURSES_FLASHCARDS_PACK + SUCCESS:
-			return {
-				...state,
-				flashcardsPackByCoursesLoading: false,
-				flashcardsPackByCourses: {
-					...state.flashcardsPackByCourses,
-					[action.courseId]: action.result
-				},
-			};
-		case COURSES_FLASHCARDS_PACK + FAIL:
-			return {
-				...state,
-				flashcardsPackByCoursesLoading: false,
-			};
-		case COURSES_FLASHCARDS_STATISTICS + START:
-			return {
-				...state,
-				flashcardsStatisticsByUnitsLoading: true,
-			};
-		case COURSES_FLASHCARDS_STATISTICS + SUCCESS:
-			if (action.unitId) {
-				return {
-					...state,
-					flashcardsStatisticsByUnitsLoading: false,
-					flashcardsStatisticsByUnits: {
-						...state.flashcardsStatisticsByUnits,
-						[action.unitId]: action.result,
-					}
-				};
+		case COURSES__FLASHCARDS_RATE + SUCCESS:
+			const units = { ...state.flashcards[action.courseId] };
+			const unitInfo = units.find(unit => unit.unitId === action.unitId);
+			unitInfo.flashcards.find(f => f.id === action.flashcardId)
+				.rate = action.rate;
+
+			if (unitInfo.flashcards.all(fc => fc.rate !== 'notRated')) {
+				unitInfo.unlocked = true;
 			}
-			return {
-				...state,
-				flashcardsStatisticsByUnitsLoading: false,
-				flashcardsStatisticsByUnits: {
-					...state.flashcardsStatisticsByUnits,
-					[action.courseId]: action.result,
-				}
-			};
-		case COURSES_FLASHCARDS_STATISTICS + FAIL:
-			return {
-				...state,
-				flashcardsStatisticsByUnitsLoading: false,
-			};
 
-		case COURSES_FLASHCARDS_RATE + SUCCESS:
 			return {
 				...state,
-				flashcardsStatisticsByUnitsLoading: false,
+				flashcards: {
+					...state.flashcards,
+					[action.courseId]: {
+						...units,
+					},
+				},
 			};
-
 		default:
 			return state;
 	}

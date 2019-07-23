@@ -1,39 +1,47 @@
-import {connect} from "react-redux";
-import {loadFlashcardsInfo, loadFlashcardsPack, sendFlashcardResult, loadStatistics} from '../../actions/course';
+import { connect } from "react-redux";
+import { sendFlashcardResult, loadFlashcards } from '../../actions/course';
 
 import UnitFlashcards from "../../components/flashcards/UnitPage/UnitPage";
+import Course from "../../components/course/Course";
 
-const mapStateToProps = (state, {match}) => {
-	const {courseId, unitId} = match.params;
+const mapStateToProps = (state, { match }) => {
+	const { courseId, slideId } = match.params;
+
 	const data = state.courses;
+	const courseInfo = data.fullCoursesInfo[courseId];
+	const unitId = Course.findUnitIdBySlide(slideId, courseInfo);
 
-	console.log(data);
-	const statistics = unitId in data.flashcardsStatisticsByUnits
-		? data.flashcardsStatisticsByUnits[unitId].statistics
-		: undefined;
-	const totalFlashcardsCount = unitId in data.flashcardsStatisticsByUnits
-		? data.flashcardsStatisticsByUnits[unitId].totalFlashcardsCount
-		: undefined;
-	const flashcardsPack = courseId in data.flashcardsPackByCourses
-		? data.flashcardsPackByCourses[courseId].filter(flashcard => flashcard.unitId === unitId)
-		: undefined;
-	const unitTitle = data.fullCoursesInfo[courseId].units.find(unit => unit.id === unitId).title;
+	const flashcardsByUnits = data.flashcards[courseId] || [];
+	const unitWithFlashcards = flashcardsByUnits.find(unit => unit.unitId === unitId);
+	const flashcards = unitWithFlashcards ? unitWithFlashcards.flashcards : [];
+	const unitTitle = unitWithFlashcards ? unitWithFlashcards.unitTitle : null;
+	const totalFlashcardsCount = flashcards ? flashcards.length : 0;
+
+	const statistics = {
+		notRated: 0,
+		rate1: 0,
+		rate2: 0,
+		rate3: 0,
+		rate4: 0,
+		rate5: 0,
+	};
+
+	for (const flashcard of flashcards) {
+		statistics[flashcard.rate]++;
+	}
 
 	return {
-		unitTitle,
 		courseId,
-		unitId,
-		statisticsLoading: data.flashcardsStatisticsByUnitsLoading,
-		statistics,
+		unitTitle,
+		flashcards,
+		flashcardsLoading: data.flashcardsLoading,
 		totalFlashcardsCount,
-		flashcardsPack,
+		statistics,
 	}
 };
 const mapDispatchToProps = (dispatch) => ({
-	loadFlashcardsInfo: (courseId) => dispatch(loadFlashcardsInfo(courseId)),
-	loadFlashcardsPack: (courseId, unitId, count, flashcardOrder, rate) => dispatch(loadFlashcardsPack(courseId, unitId, count, flashcardOrder, rate)),
-	loadStatistics: (courseId, unitId) => dispatch(loadStatistics(courseId, unitId)),
-	sendFlashcardRate: (courseId, flashcardId, rate) => dispatch(sendFlashcardResult(courseId, flashcardId, rate)),
+	loadFlashcards: (courseId) => dispatch(loadFlashcards(courseId)),
+	sendFlashcardRate: (courseId, unitId, flashcardId, rate) => dispatch(sendFlashcardResult(courseId, unitId, flashcardId, rate)),
 });
 
 

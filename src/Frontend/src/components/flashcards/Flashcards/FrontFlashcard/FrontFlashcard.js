@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import Button from "@skbkontur/react-ui/Button";
@@ -32,8 +32,8 @@ class FrontFlashcard extends Component {
 	}
 
 	handleKeyUp = (e) => {
-		const {onClose} = this.props;
-		const {showAnswer} = this.state;
+		const { onClose } = this.props;
+		const { showAnswer } = this.state;
 		const code = e.key;
 		const spaceChar = ' ';
 
@@ -47,7 +47,7 @@ class FrontFlashcard extends Component {
 	};
 
 	handleResultsClick = (rate) => {
-		const {onHandlingResultsClick} = this.props;
+		const { onHandlingResultsClick } = this.props;
 
 		onHandlingResultsClick(rate);
 
@@ -57,29 +57,29 @@ class FrontFlashcard extends Component {
 	};
 
 	render() {
-		const {unitTitle, question, answer, onClose} = this.props;
-		const {showAnswer} = this.state;
+		const { unitTitle, question, answer, onClose } = this.props;
+		const { showAnswer } = this.state;
 
 		return (
-			<div ref={ref => this.modal = ref}>
-				<button tabIndex={1} className={styles.closeButton} onClick={onClose}>
+			<div ref={ ref => this.modal = ref }>
+				<button tabIndex={ 1 } className={ styles.closeButton } onClick={ onClose }>
 					&times;
 				</button>
-				<h5 className={styles.unitTitle}>
-					{unitTitle}
+				<h5 className={ styles.unitTitle }>
+					{ unitTitle }
 				</h5>
-				{showAnswer ? this.renderBackFlashcard(question, answer) : this.renderFrontFlashcard(question)}
+				{ showAnswer ? this.renderBackFlashcard(question, answer) : this.renderFrontFlashcard(question) }
 			</div>
 		);
 	}
 
 	renderFrontFlashcard(question) {
 		return (
-			<div className={styles.frontTextContainer}>
-				<div className={styles.questionFront}
-					 dangerouslySetInnerHTML={{__html: question}}/>
-				<div className={styles.showAnswerButtonContainer}>
-					<Button size='large' use='primary' onClick={() => this.showAnswer()}>
+			<div className={ styles.frontTextContainer }>
+				<div className={ styles.questionFront }
+					 dangerouslySetInnerHTML={ { __html: question } }/>
+				<div className={ styles.showAnswerButtonContainer }>
+					<Button size='large' use='primary' onClick={ () => this.showAnswer() }>
 						Показать ответ
 					</Button>
 				</div>
@@ -97,11 +97,11 @@ class FrontFlashcard extends Component {
 	renderBackFlashcard(question, answer) {
 		return (
 			<div>
-				<div className={styles.backTextContainer}>
-					<div className={styles.questionBack} dangerouslySetInnerHTML={{__html: question}}/>
-					<div dangerouslySetInnerHTML={{__html: answer}}/>
+				<div className={ styles.backTextContainer }>
+					<div className={ styles.questionBack } dangerouslySetInnerHTML={ { __html: question } }/>
+					<div dangerouslySetInnerHTML={ { __html: answer } }/>
 				</div>
-				<Results handleClick={this.handleResultsClick}/>
+				<Results handleClick={ this.handleResultsClick }/>
 			</div>
 		);
 	}
