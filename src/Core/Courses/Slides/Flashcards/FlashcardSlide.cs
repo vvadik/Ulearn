@@ -25,7 +25,7 @@ namespace Ulearn.Core.Courses.Slides.Flashcards
 
 			if (Title is null)
 			{
-				Title = "Флеш-карты";
+				Title = "Вопросы для самопроверки";
 			}
 
 			CheckBlockTypes();

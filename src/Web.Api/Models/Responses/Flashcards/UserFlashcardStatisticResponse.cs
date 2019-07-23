@@ -9,10 +9,10 @@ namespace Ulearn.Web.Api.Models.Responses.Flashcards
 
 		public UserFlashcardStatisticResponse()
 		{
-			UsersFlashcardsStatistics = new List<UserFlashcardsStatistics>();
+			UsersFlashcardsStatistics = new List<UserFlashcardStatistics>();
 		}
 		[DataMember]
-		public List<UserFlashcardsStatistics> UsersFlashcardsStatistics;
+		public List<UserFlashcardStatistics> UsersFlashcardsStatistics;
 
 	}
 }
