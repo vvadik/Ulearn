@@ -9,6 +9,7 @@ namespace Database.Repos.Flashcards
 	{
 		Task<UserFlashcardsVisit> AddFlashcardVisitAsync(string userId, string courseId, Guid unitId, string flashcardId, Rate rate, DateTime timestamp);
 		Task<List<UserFlashcardsVisit>> GetUserFlashcardsVisitsAsync(string userId, string courseId, Guid unitId);
+		Task<List<UserFlashcardsVisit>> GetUserFlashcardsVisitsAsync(string courseId);
 		Task<UserFlashcardsVisit> GetUserFlashcardVisitAsync(string userId, string courseId, Guid unitId, string flashcardId);
 		Task<List<UserFlashcardsVisit>> GetUserFlashcardsVisitsAsync(string userId, string courseId);
 	}

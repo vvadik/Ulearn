@@ -6,7 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Database;
 using Database.Models;
+using Database.Repos.CourseRoles;
 using Database.Repos.Flashcards;
+using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -38,15 +40,20 @@ namespace Ulearn.Web.Api.Controllers
 	{
 		private readonly IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo;
 		private readonly IUserFlashcardsUnlockingRepo userFlashcardsUnlockingRepo;
+		private readonly ICourseRolesRepo courseRolesRepo;
+		private readonly IGroupAccessesRepo groupAccessesRepo;
 
 
 		public FlashcardsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
 			IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo,
-			IUserFlashcardsUnlockingRepo userFlashcardsUnlockingRepo)
+			IUserFlashcardsUnlockingRepo userFlashcardsUnlockingRepo,
+			ICourseRolesRepo courseRolesRepo, IGroupAccessesRepo groupAccessesRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.usersFlashcardsVisitsRepo = usersFlashcardsVisitsRepo;
 			this.userFlashcardsUnlockingRepo = userFlashcardsUnlockingRepo;
+			this.courseRolesRepo = courseRolesRepo;
+			this.groupAccessesRepo = groupAccessesRepo;
 		}
 
 		/// <summary>
@@ -206,6 +213,90 @@ namespace Ulearn.Web.Api.Controllers
 				return BadRequest($"flashcard with id {flashcardId} does not exist");
 			await usersFlashcardsVisitsRepo.AddFlashcardVisitAsync(UserId, course.Id, unit.Id, flashcardId, rate, DateTime.Now);
 			return NoContent();
+		}
+
+		/// <summary>
+		/// Статистика по всем флеш-картам в курсе
+		/// </summary>
+		/// <param name="course"></param>
+		/// <returns></returns>
+		[HttpGet("{courseId}/flashcards/statistics")]
+		public async Task<ActionResult<FlashcardsStatistics>> FlashcardsStatistics([FromRoute] Course course)
+		{
+			var hasUserAccessToCourse = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, course.Id, CourseRoleType.Instructor);
+			if (!hasUserAccessToCourse)
+			{
+				return BadRequest($"You don't have access to course with id {course.Id}");
+			}
+
+			var flashcardVisitsByCourse = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(course.Id);
+			var flashcards = course.Units.SelectMany(x => x.Flashcards).ToList();
+			var statistics = ToFlashcardsStatistics(flashcardVisitsByCourse, flashcards);
+
+			return statistics;
+		}
+
+		private FlashcardsStatistics ToFlashcardsStatistics(List<UserFlashcardsVisit> userFlashcardsVisits, List<Flashcard> flashcards)
+		{
+			var result = new FlashcardsStatistics();
+
+			var groupedByFlashcard = userFlashcardsVisits.GroupBy(x => x.FlashcardId).ToDictionary(x => x.Key);
+			foreach (var flashcard in flashcards)
+			{
+				var flashcardStat = new FlashcardStatistic();
+
+				flashcardStat.FlashcardId = flashcard.Id;
+				if (groupedByFlashcard.TryGetValue(flashcard.Id, out var group))
+				{
+					foreach (var e in group)
+					{
+						flashcardStat.Statistics.Add(e.Rate);
+					}
+
+					flashcardStat.VisitCount = group.Count();
+				}
+
+				result.Statistics.Add(flashcardStat);
+			}
+
+			return result;
+		}
+
+		/// <summary>
+		/// Статистика флеш-карт по пользователям доступных групп
+		/// </summary>
+		/// <param name="course"></param>
+		/// <returns></returns>
+		[HttpGet("{courseId}/flashcards/users-statistics")]
+		public async Task<ActionResult<UserFlashcardStatisticResponse>> UserFlashcardStatistics([FromRoute] Course course)
+		{
+			var result = new UserFlashcardStatisticResponse();
+			var groups = await groupAccessesRepo.GetAvailableForUserGroupsAsync(UserId, true);
+			if (groups.Count == 0)
+			{
+				return BadRequest("You don't have access to any group in course");
+			}
+
+			var flashcards = course.Units.SelectMany(x => x.Flashcards).ToList();
+
+			foreach (var group in groups)
+			{
+				foreach (var member in group.Members)
+				{
+					var userVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(member.UserId, course.Id);
+					var flashcardStat = ToFlashcardsStatistics(userVisits, flashcards);
+					var userStat = new UserFlashcardsStatistics
+					{
+						UserId = member.UserId,
+						FlashcardsStatistics = flashcardStat,
+						UserName = member.User.VisibleNameWithLastNameFirst,
+						TotalFlashcardsVisits = flashcardStat.Statistics.Sum(x => x.VisitCount)
+					};
+					result.UsersFlashcardsStatistics.Add(userStat);
+				}
+			}
+
+			return result;
 		}
 	}
 }

@@ -42,6 +42,12 @@ namespace Database.Repos.Flashcards
 			return await db.UserFlashcardsVisits.Where(c => c.UserId == userId && c.CourseId == courseId && c.UnitId == unitId).ToListAsync();
 		}
 
+		public async Task<List<UserFlashcardsVisit>> GetUserFlashcardsVisitsAsync(string courseId)
+		{
+			courseId = courseId.ToLower();
+			return await db.UserFlashcardsVisits.Where(c => c.CourseId == courseId).ToListAsync();
+		}
+
 		public async Task<UserFlashcardsVisit> GetUserFlashcardVisitAsync(string userId, string courseId, Guid unitId, string flashcardId)
 		{
 			courseId = courseId.ToLower();
