@@ -35,7 +35,7 @@ class Course extends Component {
 	}
 
 	static getDerivedStateFromProps(props, state) {
-		if (!props.units || !props.progress) {
+		if (!props.units) {
 			return null;
 		}
 
@@ -44,7 +44,7 @@ class Course extends Component {
 			const openUnit = props.units[openUnitId];
 
 			const slide = Course.findSlideBySlug(props.slideId, props.courseInfo);
-			if (slide) {
+			if (slide && props.progress) {
 				props.updateVisitedSlide(props.courseId, slide.id);
 			}
 
