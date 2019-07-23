@@ -35,7 +35,7 @@ class Course extends Component {
 	}
 
 	static getDerivedStateFromProps(props, state) {
-		if (!props.units) {
+		if (!props.units || !props.progress) {
 			return null;
 		}
 
@@ -96,7 +96,7 @@ class Course extends Component {
 					isActive: highlightedUnit === item.id,
 					onClick: this.unitClickHandle,
 				})) }
-				containsFlashcards={courseInfo.containsFlashcards}
+				containsFlashcards={ courseInfo.containsFlashcards }
 			/>
 		);
 	}
