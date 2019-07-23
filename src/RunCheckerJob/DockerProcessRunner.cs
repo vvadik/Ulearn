@@ -46,6 +46,7 @@ namespace RunCheckerJob
 		{
 			var name = Guid.NewGuid();
 			var dockerCommand = BuildDockerCommand(settings, dir, name);
+			log.Info($"Start process command: {dockerCommand}");
 			var dockerShellProcess = BuildShellProcess(dockerCommand);
 
 			var sw = Stopwatch.StartNew();
