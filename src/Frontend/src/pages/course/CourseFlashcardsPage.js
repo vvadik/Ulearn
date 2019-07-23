@@ -1,7 +1,9 @@
 import { connect } from "react-redux";
-import { sendFlashcardResult, loadFlashcards } from '../../actions/course';
 
 import CourseFlashcards from "../../components/flashcards/CoursePage/CoursePage";
+
+import { sendFlashcardResult, loadFlashcards } from '../../actions/course';
+import { rateTypes } from "../../consts/rateTypes";
 
 const mapStateToProps = (state, { match }) => {
 	const { courseId } = match.params;
@@ -12,12 +14,12 @@ const mapStateToProps = (state, { match }) => {
 	const infoByUnits = [],
 		allFlashcards = [],
 		statistics = {
-			notRated: 0,
-			rate1: 0,
-			rate2: 0,
-			rate3: 0,
-			rate4: 0,
-			rate5: 0,
+			[rateTypes.notRated]: 0,
+			[rateTypes.rate1]: 0,
+			[rateTypes.rate2]: 0,
+			[rateTypes.rate3]: 0,
+			[rateTypes.rate4]: 0,
+			[rateTypes.rate5]: 0,
 		};
 
 	const courseUnits = data.fullCoursesInfo[courseId].units;

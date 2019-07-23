@@ -1,48 +1,49 @@
 import React from 'react'
 import PropTypes from "prop-types";
-import styles from './progressBar.less'
+
 import classNames from 'classnames';
+import { rateTypes } from '../../../consts/rateTypes';
+
+import styles from './progressBar.less'
 
 const mapRateToStyle = {
-	notRated: styles.notRated,
-	rate1: styles.rate1,
-	rate2: styles.rate2,
-	rate3: styles.rate3,
-	rate4: styles.rate4,
-	rate5: styles.rate5,
+	[rateTypes.notRated]: styles.notRated,
+	[rateTypes.rate1]: styles.rate1,
+	[rateTypes.rate2]: styles.rate2,
+	[rateTypes.rate3]: styles.rate3,
+	[rateTypes.rate4]: styles.rate4,
+	[rateTypes.rate5]: styles.rate5,
 };
 
 const mapRateToText = {
-	notRated: 'непросмотрено',
-	rate1: 'плохо',
-	rate2: 'удовлетворительно',
-	rate3: 'средне',
-	rate4: 'хорошо',
-	rate5: 'отлично',
+	[rateTypes.notRated]: 'непросмотрено',
+	[rateTypes.rate1]: 'плохо',
+	[rateTypes.rate2]: 'удовлетворительно',
+	[rateTypes.rate3]: 'средне',
+	[rateTypes.rate4]: 'хорошо',
+	[rateTypes.rate5]: 'отлично',
 };
 
-function ProgressBar({statistics, totalFlashcardsCount}) {
+function ProgressBar({ statistics, totalFlashcardsCount }) {
 	return (
-		<ol className={styles.progressBarContainer}>
-			{renderResults()}
+		<ol className={ styles.progressBarContainer }>
+			{ renderResults() }
 		</ol>
 	);
 
 	function renderResults() {
 		const rates = Object.keys(statistics)
-			.filter(key => statistics[key] > 0);
+			.filter(rateType => statistics[rateType] > 0);
 
-		const ratesWithText = [
-			'notRated'
-		];
+		const ratesWithText = [rateTypes.notRated];
 		//TODO ROZENTOR implement better algorithm for selecting rates with text
-		if (rates[0] === 'notRated') {
+		if (rates[0] === rateTypes.notRated) {
 			ratesWithText.push(rates[1]);
 		} else {
 			ratesWithText.push(rates[0]);
 		}
 
-		if (rates[rates.length - 1] === 'notRated') {
+		if (rates[rates.length - 1] === rateTypes.notRated) {
 			ratesWithText.push(rates[rates.length - 2]);
 		} else {
 			ratesWithText.push(rates[rates.length - 1]);
@@ -50,18 +51,18 @@ function ProgressBar({statistics, totalFlashcardsCount}) {
 
 		return rates.map(rate => convertToBarElement(
 			rate,
-			`${statistics[rate] / totalFlashcardsCount * 100}%`,
-			`${statistics[rate]} ${ratesWithText.some(r => r === rate) ? mapRateToText[rate] : ''}`,
+			`${ statistics[rate] / totalFlashcardsCount * 100 }%`,
+			`${ statistics[rate] } ${ ratesWithText.some(r => r === rate) ? mapRateToText[rate] : '' }`,
 		));
 	}
 
 	function convertToBarElement(rate, elementWidth, text) {
 		return (
 			<span
-				key={rate}
-				className={classNames(styles.progressBarElement, mapRateToStyle[rate])}
-				style={{width: elementWidth}}>
-				{text}
+				key={ rate }
+				className={ classNames(styles.progressBarElement, mapRateToStyle[rate]) }
+				style={ { width: elementWidth } }>
+				{ text }
 			</span>
 		);
 	}
@@ -69,14 +70,14 @@ function ProgressBar({statistics, totalFlashcardsCount}) {
 
 ProgressBar.propTypes = {
 	statistics: PropTypes.shape({
-		notRated: PropTypes.number,
-		rate1: PropTypes.number,
-		rate2: PropTypes.number,
-		rate3: PropTypes.number,
-		rate4: PropTypes.number,
-		rate5: PropTypes.number
-	}).isRequired,
-	totalFlashcardsCount: PropTypes.number.isRequired
+		[rateTypes.notRated]: PropTypes.number,
+		[rateTypes.rate1]: PropTypes.number,
+		[rateTypes.rate2]: PropTypes.number,
+		[rateTypes.rate3]: PropTypes.number,
+		[rateTypes.rate4]: PropTypes.number,
+		[rateTypes.rate5]: PropTypes.number,
+	}),
+	totalFlashcardsCount: PropTypes.number,
 };
 
 export default ProgressBar;

@@ -6,13 +6,15 @@ export default function translateCode(element) {
 		if (codeMirrorElement.style.display === 'none') {
 			continue;
 		}
+
 		translateTextareaToCode(codeMirrorElement);
 	}
 
-	for (const katexElement of element.querySelectorAll('span.tex,div.tex')) {
+	for (const katexElement of element.querySelectorAll('span.tex, div.tex')) {
 		if (katexElement.style.display === 'none') {
 			continue;
 		}
+
 		translateTextToKatex(katexElement);
 	}
 }

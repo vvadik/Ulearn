@@ -1,8 +1,11 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import PropTypes from "prop-types";
-import styles from './shortQuestions.less';
+
 import Toggle from "@skbkontur/react-ui/Toggle";
+
 import translateCode from "../../../../codeTranslator/translateCode";
+
+import styles from './shortQuestions.less';
 
 class ShortQuestions extends Component {
 	constructor(props) {
@@ -23,14 +26,14 @@ class ShortQuestions extends Component {
 	}
 
 	render() {
-		const {showAllAnswers} = this.state;
+		const { showAllAnswers } = this.state;
 
 		return (
-			<div className={styles.questionsContainer}>
-				{this.renderQuestions()}
-				<div className={styles.toggleContainer}>
-					<Toggle onChange={this.handleToggleChange} checked={showAllAnswers}/>
-					<span className={styles.toggleText}>
+			<div className={ styles.questionsContainer }>
+				{ this.renderQuestions() }
+				<div className={ styles.toggleContainer }>
+					<Toggle onChange={ this.handleToggleChange } checked={ showAllAnswers }/>
+					<span className={ styles.toggleText }>
 						Показать ответы
 					</span>
 				</div>
@@ -39,19 +42,19 @@ class ShortQuestions extends Component {
 	}
 
 	renderQuestions() {
-		const {showAllAnswers, questionsWithAnswers} = this.state;
+		const { showAllAnswers, questionsWithAnswers } = this.state;
 
 		return (
-			<ol ref={(ref) => this.list = ref} className={styles.questionsTextContainer}>
-				{questionsWithAnswers.map(({question, answer, showAnswer}, index) =>
+			<ol ref={ (ref) => this.list = ref } className={ styles.questionsTextContainer }>
+				{ questionsWithAnswers.map(({ question, answer, showAnswer }, index) =>
 					<li
-						className={styles.questionText}
-						key={index}
-						onClick={() => this.handleQuestionClick(index)}>
-						<div dangerouslySetInnerHTML={{__html: question}}/>
+						className={ styles.questionText }
+						key={ index }
+						onClick={ () => this.handleQuestionClick(index) }>
+						<div dangerouslySetInnerHTML={ { __html: question } }/>
 						{
 							(showAllAnswers || showAnswer) &&
-							<div className={styles.answerText} dangerouslySetInnerHTML={{__html: answer}}/>
+							<div className={ styles.answerText } dangerouslySetInnerHTML={ { __html: answer } }/>
 						}
 					</li>)
 				}
@@ -60,7 +63,7 @@ class ShortQuestions extends Component {
 
 
 	handleQuestionClick = (questionIndex) => {
-		const {questionsWithAnswers} = this.state;
+		const { questionsWithAnswers } = this.state;
 		const questionWithAnswer = questionsWithAnswers[questionIndex];
 
 		questionWithAnswer.showAnswer = !questionWithAnswer.showAnswer;
@@ -71,7 +74,7 @@ class ShortQuestions extends Component {
 	};
 
 	handleToggleChange = () => {
-		const {questionsWithAnswers} = this.state;
+		const { questionsWithAnswers } = this.state;
 
 		for (const question of questionsWithAnswers) {
 			question.showAnswer = false;
@@ -87,9 +90,9 @@ class ShortQuestions extends Component {
 ShortQuestions.propTypes = {
 	questionsWithAnswers: PropTypes.arrayOf(PropTypes.shape({
 		question: PropTypes.string,
-		answer: PropTypes.string
-	})).isRequired,
-	className: PropTypes.string
+		answer: PropTypes.string,
+	})),
+	className: PropTypes.string,
 };
 
 export default ShortQuestions;

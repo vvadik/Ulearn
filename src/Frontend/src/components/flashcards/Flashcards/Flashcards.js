@@ -4,6 +4,7 @@ import styles from './flashcards.less';
 import classNames from 'classnames';
 import ProgressBar from "../ProgressBar/ProgressBar";
 import FrontFlashcard from "./FrontFlashcard/FrontFlashcard";
+import { rateTypes } from "../../../consts/rateTypes";
 
 const modalsStyles = {
 	first: classNames(styles.modal),
@@ -140,16 +141,16 @@ Flashcards.propTypes = {
 		answer: PropTypes.string,
 		unitTitle: PropTypes.string,
 		rate: PropTypes.string,
-		unitId: PropTypes.string
+		unitId: PropTypes.string,
 	})),
 	totalFlashcardsCount: PropTypes.number,
 	statistics: PropTypes.shape({
-		notRated: PropTypes.number,
-		rate1: PropTypes.number,
-		rate2: PropTypes.number,
-		rate3: PropTypes.number,
-		rate4: PropTypes.number,
-		rate5: PropTypes.number
+		[rateTypes.notRated]: PropTypes.number,
+		[rateTypes.rate1]: PropTypes.number,
+		[rateTypes.rate2]: PropTypes.number,
+		[rateTypes.rate3]: PropTypes.number,
+		[rateTypes.rate4]: PropTypes.number,
+		[rateTypes.rate5]: PropTypes.number,
 	}),
 	courseId: PropTypes.string,
 	onClose: PropTypes.func,

@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from "prop-types";
-import styles from './results.less';
+
 import classNames from 'classnames';
+
+import styles from './results.less';
 
 const resultsStyles = [
 	classNames(styles.resultsElement, styles.resultsVeryBad),
@@ -11,22 +13,22 @@ const resultsStyles = [
 	classNames(styles.resultsElement, styles.resultsExcellent)
 ];
 
-function Results({handleClick}) {
+function Results({ handleClick }) {
 	return (
-		<div className={styles.resultsContainer}>
-			<p className={styles.headerText}>
+		<div className={ styles.resultsContainer }>
+			<p className={ styles.headerText }>
 				Оцените, на сколько хорошо вы знали ответ?
 			</p>
-			{resultsStyles.map(convertToResultIcon)}
-			{renderFooter()}
+			{ resultsStyles.map(convertToResultIcon) }
+			{ renderFooter() }
 		</div>
 	);
 
 	function convertToResultIcon(style, index) {
 		return (
-			<button key={index} className={style} onClick={() => handleClick(index + 1)}>
+			<button key={ index } className={ style } onClick={ () => handleClick(index + 1) }>
 				<span>
-					{index + 1}
+					{ index + 1 }
 				</span>
 			</button>
 		)
@@ -34,9 +36,9 @@ function Results({handleClick}) {
 
 	function renderFooter() {
 		return (
-			<div className={styles.footer}>
+			<div className={ styles.footer }>
 				плохо
-				<hr className={styles.footerLine}/>
+				<hr className={ styles.footerLine }/>
 				отлично
 			</div>
 		);
@@ -44,7 +46,7 @@ function Results({handleClick}) {
 }
 
 Results.propTypes = {
-	handleClick: PropTypes.func.isRequired
+	handleClick: PropTypes.func,
 };
 
 export default Results;

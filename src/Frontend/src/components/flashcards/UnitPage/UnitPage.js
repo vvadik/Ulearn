@@ -10,6 +10,7 @@ import Flashcards from "../Flashcards/Flashcards";
 import styles from './unitPage.less';
 import { guides } from '../consts';
 import Loader from "@skbkontur/react-ui/Loader";
+import { rateTypes } from "../../../consts/rateTypes";
 
 
 class UnitPage extends Component {
@@ -37,8 +38,8 @@ class UnitPage extends Component {
 
 	render() {
 		const { courseId, unitTitle, flashcards, flashcardsLoading, totalFlashcardsCount, statistics, sendFlashcardRate } = this.props;
-		const haveProgress = flashcards && statistics.notRated !== totalFlashcardsCount;
-		const completedUnit = flashcards && statistics.notRated === 0;
+		const haveProgress = flashcards && statistics[rateTypes.notRated] !== totalFlashcardsCount;
+		const completedUnit = flashcards && statistics[rateTypes.notRated] === 0;
 		const dataLoaded = flashcards && !flashcardsLoading;
 		const { showFlashcards } = this.state;
 
@@ -108,7 +109,7 @@ class UnitPage extends Component {
 		const { flashcards } = this.props;
 
 		return flashcards
-			.filter(flashcard => flashcard.rate !== 'notRated')
+			.filter(flashcard => flashcard.rate !== rateTypes.notRated)
 			.map(flashcard => {
 				return {
 					question: flashcard.question,
@@ -131,12 +132,12 @@ UnitPage.propTypes = {
 	})),
 	totalFlashcardsCount: PropTypes.number,
 	statistics: PropTypes.shape({
-		notRated: PropTypes.number,
-		rate1: PropTypes.number,
-		rate2: PropTypes.number,
-		rate3: PropTypes.number,
-		rate4: PropTypes.number,
-		rate5: PropTypes.number
+		[rateTypes.notRated]: PropTypes.number,
+		[rateTypes.rate1]: PropTypes.number,
+		[rateTypes.rate2]: PropTypes.number,
+		[rateTypes.rate3]: PropTypes.number,
+		[rateTypes.rate4]: PropTypes.number,
+		[rateTypes.rate5]: PropTypes.number,
 	}),
 
 	loadFlashcards: PropTypes.func,

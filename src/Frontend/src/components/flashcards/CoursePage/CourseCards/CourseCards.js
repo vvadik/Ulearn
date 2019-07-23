@@ -51,7 +51,7 @@ function CourseCards({ infoByUnits, courseId }) {
 }
 
 CourseCards.propTypes = {
-	courseId: PropTypes.string.isRequired,
+	courseId: PropTypes.string,
 	infoByUnits: PropTypes.arrayOf(PropTypes.shape({
 		unitTitle: PropTypes.string,
 		unlocked: PropTypes.bool,
