@@ -55,23 +55,26 @@ namespace RunCheckerJob
 			var readOutTask = new AsyncReader(dockerShellProcess.StandardOutput, settings.OutputLimit).GetDataAsync();
 			var isFinished = Task.WaitAll(new Task[] { readErrTask, readOutTask }, (int)(settings.MaintenanceTimeLimit + settings.TestingTimeLimit).TotalMilliseconds);
 			var ms = sw.ElapsedMilliseconds;
-			
+
+			RunningResults unsuccessfulResult = null;
 			if (readErrTask.Result.Length > settings.OutputLimit || readOutTask.Result.Length > settings.OutputLimit)
 			{
 				log.Warn("Программа вывела слишком много");
-				if(!dockerShellProcess.HasExited)
-					GracefullyShutdownDocker(dockerShellProcess, name, settings);
-				return new RunningResults(Verdict.OutputLimit);
+				unsuccessfulResult = new RunningResults(Verdict.OutputLimit);
 			}
-			
-			if (!isFinished || !dockerShellProcess.HasExited)
+			else if (!isFinished)
 			{
-				log.Info($"Не хватило времени на работу Docker в папке {dir.FullName}");
-				GracefullyShutdownDocker(dockerShellProcess, name, settings);
-				return new RunningResults(Verdict.TimeLimit);
+				log.Warn($"Не хватило времени ({ms} ms) на работу Docker в папке {dir.FullName}");
+				unsuccessfulResult = new RunningResults(Verdict.TimeLimit);
 			}
+			else
+				log.Info($"Docker закончил работу за {ms} ms и написал: {readOutTask.Result}");
 
-			log.Info($"Docker закончил работу за {ms} ms и написал: {readOutTask.Result}");
+			if(!dockerShellProcess.HasExited)
+				GracefullyShutdownDocker(dockerShellProcess, name, settings);
+
+			if(unsuccessfulResult != null)
+				return unsuccessfulResult;
 
 			if (dockerShellProcess.ExitCode != 0)
 			{
