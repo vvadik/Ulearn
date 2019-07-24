@@ -64,7 +64,7 @@ namespace uLearn.Web.Controllers
 				IsSlideHidden = s => s is QuizSlide && ((QuizSlide)s).ManualChecking
 			};
 			var toc = builder.CreateTocModel();
-			toc.NextUnitTime = unitsRepo.GetNextUnitPublishTime(course.Id);
+			toc.NextUnitTime = unitsRepo.GetLowestPublishTimeOfUnpublishedUnit(course.Id);
 			return toc;
 		}
 
@@ -112,7 +112,7 @@ namespace uLearn.Web.Controllers
 				StatisticsUrl = Url.Action("CourseStatistics", "Analytics", new { courseId = course.Id, group = g.Id })
 			});
 			var toc = builder.CreateTocModel(tocGroupsForStatistics.ToList());
-			toc.NextUnitTime = unitsRepo.GetNextUnitPublishTime(course.Id);
+			toc.NextUnitTime = unitsRepo.GetLowestPublishTimeOfUnpublishedUnit(course.Id);
 			return toc;
 		}
 

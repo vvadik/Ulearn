@@ -2,7 +2,7 @@ using System;
 using System.Runtime.Serialization;
 using Database.Models;
 
-namespace Ulearn.Web.Api.Models.Common
+namespace Ulearn.Web.Api.Models.Responses.Flashcards
 {
 	[DataContract]
 	public class FlashcardResponse
@@ -29,7 +29,7 @@ namespace Ulearn.Web.Api.Models.Common
 		public Guid[] TheorySlidesIds;
 		
 		[DataMember]
-		public int TLast;
+		public int LastRateIndex;
 		
 	}
 }

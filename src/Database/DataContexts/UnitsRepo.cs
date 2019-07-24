@@ -35,7 +35,7 @@ namespace Database.DataContexts
 			return db.UnitAppearances.Any(u => u.UnitId == unitId && u.CourseId == course.Id && u.PublishTime <= DateTime.Now);
 		}
 
-		public DateTime GetNextUnitPublishTime(string courseId)
+		public DateTime GetLowestPublishTimeOfUnpublishedUnit(string courseId)
 		{
 			return db.UnitAppearances.Where(u => u.CourseId == courseId && u.PublishTime > DateTime.Now)
 				.Select(u => u.PublishTime)

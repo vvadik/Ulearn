@@ -4,16 +4,17 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Castle.Core.Internal;
 using Database;
 using Database.Models;
+using Database.Repos.CourseRoles;
 using Database.Repos.Flashcards;
+using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using NUnit.Framework;
-using Remotion.Linq.Parsing.ExpressionVisitors.MemberBindings;
 using Serilog;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
@@ -21,9 +22,7 @@ using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Slides.Flashcards;
 using Ulearn.Core.Courses.Units;
-using Ulearn.Web.Api.Models.Common;
 using Ulearn.Web.Api.Models.Responses.Flashcards;
-using Ulearn.Web.Api.Models.Responses.FlashCards;
 
 namespace Ulearn.Web.Api.Controllers
 {
@@ -39,23 +38,28 @@ namespace Ulearn.Web.Api.Controllers
 	{
 		private readonly IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo;
 		private readonly IUserFlashcardsUnlockingRepo userFlashcardsUnlockingRepo;
+		private readonly ICourseRolesRepo courseRolesRepo;
+		private readonly IGroupAccessesRepo groupAccessesRepo;
 
 
 		public FlashcardsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
 			IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo,
-			IUserFlashcardsUnlockingRepo userFlashcardsUnlockingRepo)
+			IUserFlashcardsUnlockingRepo userFlashcardsUnlockingRepo,
+			ICourseRolesRepo courseRolesRepo, IGroupAccessesRepo groupAccessesRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.usersFlashcardsVisitsRepo = usersFlashcardsVisitsRepo;
 			this.userFlashcardsUnlockingRepo = userFlashcardsUnlockingRepo;
+			this.courseRolesRepo = courseRolesRepo;
+			this.groupAccessesRepo = groupAccessesRepo;
 		}
+
 		/// <summary>
 		/// Коллекция объектов флешкарт с оценками, сгруппированных по модулям по курсу
 		/// </summary>
 		/// <param name="course"></param>
 		/// <returns></returns>
-
-		[HttpGet("{courseId}/flashcards")]
+		[HttpGet("{courseId}/flashcards-by-units")]
 		public async Task<ActionResult<FlashcardResponseByUnits>> Flashcards([FromRoute] Course course)
 		{
 			var userFlashcardsVisitsByCourse = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, course.Id);
@@ -100,8 +104,8 @@ namespace Ulearn.Web.Api.Controllers
 
 		private IEnumerable<FlashcardResponse> GetFlashcardResponses(Course course, List<Flashcard> flashcards, List<UserFlashcardsVisit> userFlashcardsVisits)
 		{
-			var userFlashcardsVisitsDictionary = GetFlashcardsFullUsersVisitsDictionary(userFlashcardsVisits, flashcards);
-			var tLasts = GetFlashcardsTLasts(flashcards, userFlashcardsVisits);
+			var userFlashcardsVisitsDictionary = GetFlashcardsUsersVisitsDictionaryIncludingNotRated(userFlashcardsVisits, flashcards);
+			var lastRateIndexes = GetFlashcardsLastRateIndexes(flashcards, userFlashcardsVisits);
 
 			foreach (var flashcard in flashcards)
 			{
@@ -113,33 +117,38 @@ namespace Ulearn.Web.Api.Controllers
 				var unit = course.Units.FirstOrDefault(x => x.GetFlashcardById(flashcard.Id) != default(Flashcard));
 
 				var unitIdResponse = unit.Id;
-				var tLast = tLasts[flashcard.Id];
+				var lastRateIndex = lastRateIndexes[flashcard.Id];
 
-				var flashcardResponse = new FlashcardResponse { Answer = answer, Question = question, Rate = rateResponse, Id = flashcard.Id, UnitId = unitIdResponse, UnitTitle = unit.Title, TheorySlidesIds = flashcard.TheorySlidesIds, TLast = tLast };
+				var flashcardResponse = new FlashcardResponse
+				{
+					Answer = answer,
+					Question = question,
+					Rate = rateResponse,
+					Id = flashcard.Id,
+					UnitId = unitIdResponse,
+					UnitTitle = unit.Title,
+					TheorySlidesIds = flashcard.TheorySlidesIds,
+					LastRateIndex = lastRateIndex
+				};
 				yield return flashcardResponse;
 			}
 		}
 
-		private Dictionary<string, int> GetFlashcardsTLasts(List<Flashcard> flashcards, List<UserFlashcardsVisit> userFlashcardsVisits)
+		private Dictionary<string, int> GetFlashcardsLastRateIndexes(List<Flashcard> flashcards, List<UserFlashcardsVisit> userFlashcardsVisits)
 		{
+			userFlashcardsVisits = userFlashcardsVisits.ToList();
+
 			var result = new Dictionary<string, int>();
+
 			foreach (var flashcard in flashcards)
 			{
 				result[flashcard.Id] = 0;
 			}
 
-			foreach (var visit in userFlashcardsVisits)
+			for (var i = 0; i < userFlashcardsVisits.Count; i++)
 			{
-				var id = visit.FlashcardId;
-				foreach (var flashcard in flashcards)
-				{
-					result[flashcard.Id]++;
-				}
-
-				if (result.ContainsKey(id))
-				{
-					result[id] = 0;
-				}
+				var visit = userFlashcardsVisits[i];
+				result[visit.FlashcardId] = i + 1;
 			}
 
 			return result;
@@ -174,7 +183,7 @@ namespace Ulearn.Web.Api.Controllers
 			return content.ToString();
 		}
 
-		private Dictionary<string, UserFlashcardsVisit> GetFlashcardsFullUsersVisitsDictionary(List<UserFlashcardsVisit> userFlashcardsVisits, List<Flashcard> flashcards)
+		private Dictionary<string, UserFlashcardsVisit> GetFlashcardsUsersVisitsDictionaryIncludingNotRated(List<UserFlashcardsVisit> userFlashcardsVisits, List<Flashcard> flashcards)
 		{
 			var result = new Dictionary<string, UserFlashcardsVisit>();
 			foreach (var userFlashcardsVisit in userFlashcardsVisits)
@@ -208,136 +217,5 @@ namespace Ulearn.Web.Api.Controllers
 			await usersFlashcardsVisitsRepo.AddFlashcardVisitAsync(UserId, course.Id, unit.Id, flashcardId, rate, DateTime.Now);
 			return NoContent();
 		}
-
-		/*
-
-
-		/// <summary>
-		/// Статистика по оценкам карточек пользователя 
-		/// </summary>
-		[Authorize]
-		[HttpGet("{courseId}/flashcards/stat")]
-		public async Task<ActionResult<FlashcardsStatResponse>> FlashcardsStat([FromRoute] Course course, [FromQuery] Guid? unitId = null)
-		{
-			var courseId = course.Id;
-			List<UserFlashcardsVisit> userFlashcardsVisits;
-			int totalFlashcardsCount;
-			List<Flashcard> flashcards;
-
-			if (unitId != null)
-			{
-				var unit = course.FindUnitById(unitId.Value);
-				if (unit == null)
-				{
-					return BadRequest($"unit with {unitId} does not exist");
-				}
-
-				userFlashcardsVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, courseId, unitId.Value);
-				totalFlashcardsCount = unit.Flashcards.Count;
-				flashcards = unit.Flashcards;
-			}
-
-			else
-			{
-				userFlashcardsVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, courseId);
-				totalFlashcardsCount = course.Units.Sum(x => x.Flashcards.Count);
-				flashcards = course.Units.SelectMany(x => x.Flashcards).ToList();
-			}
-
-			return ToFlashCardsStatResponse(userFlashcardsVisits, totalFlashcardsCount, flashcards);
-		}
-
-		private FlashcardsStatResponse ToFlashCardsStatResponse(List<UserFlashcardsVisit> userFlashcardsVisits, int totalFlashcardsCount, List<Flashcard> flashcards)
-		{
-			var flashcardsDict = flashcards.ToDictionary(x => x.Id);
-			var scoreResponse = new TotalRateResponse();
-			foreach (var flashcardVisit in userFlashcardsVisits)
-			{
-				if (!flashcardsDict.ContainsKey(flashcardVisit.FlashcardId))
-					continue;
-				switch (flashcardVisit.Rate)
-				{
-					case Rate.NotRated:
-						scoreResponse.NotRated++;
-						break;
-					case Rate.Rate1:
-						scoreResponse.Rate1++;
-						break;
-					case Rate.Rate2:
-						scoreResponse.Rate2++;
-						break;
-					case Rate.Rate3:
-						scoreResponse.Rate3++;
-						break;
-					case Rate.Rate4:
-						scoreResponse.Rate4++;
-						break;
-					case Rate.Rate5:
-						scoreResponse.Rate5++;
-						break;
-				}
-			}
-
-			var ratedCount = scoreResponse.Rate1 + scoreResponse.Rate2 + scoreResponse.Rate3 + scoreResponse.Rate4 + scoreResponse.Rate5;
-			scoreResponse.NotRated = totalFlashcardsCount - ratedCount;
-
-			return new FlashcardsStatResponse() { TotalRateResponse = scoreResponse, TotalFlashcardsCount = totalFlashcardsCount };
-		}
-
-		/// <summary>
-		/// Коллекция объектов карточек с оценками
-		/// </summary>
-		/// <param name="count">
-		/// Если не указать, то придут все карточки, соответствующие остальным фильтрам
-		/// </param>
-		/// <param name="unitId"></param>
-		/// <param name="rate"></param>
-		/// <param name="flashcardOrder">
-		/// original - карточки в исходном порядке
-		/// smart - карточки в порядке, определяемом логикой показывания карточек
-		/// </param>
-		/// <returns></returns>
-		
-		private async Task<List<Flashcard>> GetFlashcardsInSmartOrder(Course course)
-		{
-			var flashcards = course.Units.SelectMany(x => x.Flashcards);
-			var flashcardsDict = flashcards.ToDictionary(x => x.Id);
-			var userFlashcardsVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, course.Id);
-			var orderedFlashcardsVisits = userFlashcardsVisits.OrderBy(x => x.Timestamp).ThenBy(x => x.Rate); //Иная логика?
-			return orderedFlashcardsVisits.Where(x => flashcardsDict.ContainsKey(x.FlashcardId)).Select(x => flashcardsDict[x.FlashcardId]).ToList();
-		}
-
-		private async Task<List<Flashcard>> GetFlashcardsInSmartOrder(Course course, Unit unit)
-		{
-			var flashcards = unit.Flashcards;
-			
-		}
-
-
-		
-
-		/// <summary>
-		/// Информация о всех карточках по курсу
-		/// </summary>
-		[Authorize]
-		[HttpGet("{courseId}/flashcards-info")]
-		public async Task<ActionResult<FlashcardInfoResponse>> FlashcardsInfo([FromRoute] Course course)
-		{
-			var info = new FlashcardInfoResponse();
-			var statResponse = new  FlashcardsStatResponse();
-
-			foreach (var unit in course.Units)
-			{
-				
-				var userFlashcardsVisits = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, course.Id, unit.Id);
-				//var userFlashcardsVisit
-				var unlocked = userFlashcardsVisits.Any(x => x.Rate != Rate.NotRated);
-				var cardsCount = unit.Flashcards.Count;
-				if (cardsCount != 0)
-					info.Add(new FlashcardsUnitInfo { UnitId = unit.Id, UnitTitle = unit.Title, CardsCount = unit.Flashcards.Count, Unlocked = unlocked });
-			}
-
-			return info;
-		}*/
 	}
 }

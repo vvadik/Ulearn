@@ -1,4 +1,5 @@
 using System.Runtime.Serialization;
+using Database.Models;
 
 namespace Ulearn.Web.Api.Models.Responses.Flashcards
 {
@@ -20,8 +21,27 @@ namespace Ulearn.Web.Api.Models.Responses.Flashcards
 		[DataMember]
 		public int Rate5;
 
-		[DataMember]
-		public int NotRated;
-		
+
+		public void Add(Rate rate)
+		{
+			switch (rate)
+			{
+				case Rate.Rate1:
+					Rate1++;
+					break;
+				case Rate.Rate2:
+					Rate2++;
+					break;
+				case Rate.Rate3:
+					Rate3++;
+					break;
+				case Rate.Rate4:
+					Rate4++;
+					break;
+				case Rate.Rate5:
+					Rate5++;
+					break;
+			}
+		}
 	}
 }

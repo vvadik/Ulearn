@@ -49,6 +49,5 @@ namespace Database.Repos
 		Dictionary<int, string> GetSolutionsForSubmissions(IEnumerable<int> submissionsIds);
 		Task WaitAnyUnhandledSubmissions(TimeSpan timeout);
 		Task WaitUntilSubmissionHandled(TimeSpan timeout, int submissionId);
-		// Task<List<ManualExerciseChecking>> GetSlideIdsWaitingForManualCheckAsync(string courseId, string userId);
 	}
 }
