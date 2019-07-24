@@ -23,7 +23,7 @@ namespace RunCheckerJob
 		
 		private static readonly ILog log = LogManager.GetLogger(typeof(ProgramBase));
 		protected abstract ISandboxRunnerClient SandboxRunnerClient { get; }
-		protected abstract Language[] SupportedLanguages { get; }
+		private readonly Language[] supportedLanguages;
 		private readonly string serviceName;
 
 		protected ProgramBase(string serviceName, ManualResetEvent externalShutdownEvent = null)
@@ -40,6 +40,7 @@ namespace RunCheckerJob
 				var runCheckerJobConfiguration = ApplicationConfiguration.Read<RunCheckerJobConfiguration>().RunCheckerJob;
 				sleep = TimeSpan.FromSeconds(runCheckerJobConfiguration.SleepSeconds ?? 1);
 				agentName = runCheckerJobConfiguration.AgentName;
+				supportedLanguages = runCheckerJobConfiguration.SupportedLanguages.Select(s => (Language)Enum.Parse(typeof(Language), s, true)).ToArray();
 				if (string.IsNullOrEmpty(agentName))
 				{
 					agentName = Environment.MachineName;
@@ -128,7 +129,7 @@ namespace RunCheckerJob
 				var newUnhandled = new List<RunnerSubmission>();
 				try
 				{
-					newUnhandled.AddRange(client.TryGetSubmission(SupportedLanguages).Result);
+					newUnhandled.AddRange(client.TryGetSubmission(supportedLanguages).Result);
 				}
 				catch (Exception e)
 				{

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Xml;
 using log4net.Config;
+using Microsoft.EntityFrameworkCore.Internal;
 using Ulearn.Core;
 using Ulearn.Core.RunCheckerJobApi;
 
@@ -15,16 +16,16 @@ namespace RunCheckerJob
 	{
 		private const string serviceName = "runcheckerjob";
 		private readonly DockerSandboxRunner sandboxRunner;
-		protected override Language[] SupportedLanguages { get; } = {Language.JavaScript};
 
 		public static void Main(string[] args)
 		{
 			ConfigureLog4Net();
-			var isSelfCheck = args.Contains("--selfcheck");
+			var selfCheckIndex = args.IndexOf("--selfcheck");
 
 			var program = new Program();
-			if (isSelfCheck)
-				program.SelfCheck();
+			var hasNextArg = args.Length > selfCheckIndex + 1;
+			if (selfCheckIndex >= 0 && hasNextArg)
+				program.SelfCheck(args[selfCheckIndex + 1]);
 			else
 				program.Run();
 		}
@@ -45,9 +46,15 @@ namespace RunCheckerJob
 		
 		protected override ISandboxRunnerClient SandboxRunnerClient => sandboxRunner;
 
-		private void SelfCheck()
+		private void SelfCheck(string sandboxesDirectoryPath)
 		{
-			new SelfChecker(sandboxRunner).JsSelfCheck();
+			var sandboxesDirectory = new DirectoryInfo(sandboxesDirectoryPath);
+			foreach (var dir in sandboxesDirectory.GetDirectories())
+			{
+				var res = new SelfChecker(new DockerSandboxRunner())
+					.SelfCheck(dir);
+				Console.WriteLine($"Verdict is {res.Verdict} for {dir.Name}");
+			}
 		}
 	}
 }

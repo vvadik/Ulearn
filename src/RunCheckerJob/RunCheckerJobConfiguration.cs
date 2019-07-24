@@ -14,5 +14,6 @@ namespace RunCheckerJob
 		public string AgentName { get; set; } // By default agentName is computer name
 		public string SubmissionsWorkingDirectory { get; set; } // Directory for compiling msbuild solutions. By default it's ./submissions in current directory
 		public bool? DeleteSubmissions { get; set; } // Delete submissions after checking
+		public string[] SupportedLanguages { get; set; }
 	}
 }

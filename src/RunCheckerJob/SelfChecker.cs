@@ -1,8 +1,8 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Text;
 using log4net;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
@@ -13,7 +13,7 @@ namespace RunCheckerJob
 	internal class SelfChecker
 	{
 		private readonly DockerSandboxRunner sandboxRunner;
-		private static readonly string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+		
 		private static readonly ILog log = LogManager.GetLogger(typeof(SelfChecker));
 
 		public SelfChecker(DockerSandboxRunner sandboxRunner)
@@ -21,19 +21,18 @@ namespace RunCheckerJob
 			this.sandboxRunner = sandboxRunner;
 		}
 		
-		public RunningResults JsSelfCheck()
+		public RunningResults SelfCheck(DirectoryInfo sandboxDir)
 		{
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-			var exerciseDirectory = new DirectoryInfo(Path.GetFullPath(Path.Combine(baseDirectory, "../../../../../sandboxes/js-sandbox/sample/src")));
-			var zipBytes = exerciseDirectory.ToZip(new []{"node_modules", ".idea"});
-			var res = sandboxRunner.Run(new CommandRunnerSubmission
-			{
-				Id = Utils.NewNormalizedGuid(),
-				Language = Language.JavaScript,
-				ZipFileData = zipBytes,
-				DockerImageName = "js-sandbox",
-				RunCommand = "node docker-test-runner.js"
-			});
+			var imageName = sandboxDir.Name;
+			var srcDirectory = new DirectoryInfo(Path.GetFullPath(Path.Combine(sandboxDir.FullName, "sample/src/")));
+			var zipBytes = srcDirectory.ToZip(new []{"node_modules", ".idea"});
+			var submissionFile = new FileInfo(Path.GetFullPath(Path.Combine(sandboxDir.FullName, "sample/submission.json")));
+			var submission = JsonConvert.DeserializeObject<CommandRunnerSubmission>(File.ReadAllText(submissionFile.FullName));
+			submission.Id = Utils.NewNormalizedGuid();
+			submission.ZipFileData = zipBytes;
+			submission.DockerImageName = imageName;
+			var res = sandboxRunner.Run(submission);
 			log.Info(res);
 			return res;
 		}
@@ -42,12 +41,18 @@ namespace RunCheckerJob
 	[TestFixture, Explicit]
 	internal class SelfCheckerTests
 	{
+		private static readonly string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+		
 		[Test, Explicit]
 		public void JsSelfCheckTest()
 		{
-			var res = new SelfChecker(new DockerSandboxRunner())
-				.JsSelfCheck();
-			Assert.AreEqual(Verdict.Ok, res.Verdict);
+			var sandboxesDirectory = new DirectoryInfo(Path.GetFullPath(Path.Combine(baseDirectory, "../../../../../sandboxes/")));
+			foreach (var dir in sandboxesDirectory.GetDirectories())
+			{
+				var res = new SelfChecker(new DockerSandboxRunner())
+					.SelfCheck(dir);
+				Assert.AreEqual(Verdict.Ok, res.Verdict);
+			}
 		}
 	}
 }

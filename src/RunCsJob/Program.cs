@@ -52,7 +52,6 @@ namespace RunCsJob
 		}
 
 		protected override ISandboxRunnerClient SandboxRunnerClient => csSandboxRunnerClient;
-		protected override Language[] SupportedLanguages { get; } = {Language.CSharp};
 
 		private void SelfCheck()
 		{
