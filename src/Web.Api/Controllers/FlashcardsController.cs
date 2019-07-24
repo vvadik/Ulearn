@@ -105,7 +105,7 @@ namespace Ulearn.Web.Api.Controllers
 		private IEnumerable<FlashcardResponse> GetFlashcardResponses(Course course, List<Flashcard> flashcards, List<UserFlashcardsVisit> userFlashcardsVisits)
 		{
 			var userFlashcardsVisitsDictionary = GetFlashcardsUsersVisitsDictionaryIncludingNotRated(userFlashcardsVisits, flashcards);
-			var tLasts = GetFlashcardsTLasts(flashcards, userFlashcardsVisits);
+			var lastRateIndexes = GetFlashcardsLastRateIndexes(flashcards, userFlashcardsVisits);
 
 			foreach (var flashcard in flashcards)
 			{
@@ -117,7 +117,7 @@ namespace Ulearn.Web.Api.Controllers
 				var unit = course.Units.FirstOrDefault(x => x.GetFlashcardById(flashcard.Id) != default(Flashcard));
 
 				var unitIdResponse = unit.Id;
-				var tLast = tLasts[flashcard.Id];
+				var lastRateIndex = lastRateIndexes[flashcard.Id];
 
 				var flashcardResponse = new FlashcardResponse
 				{
@@ -128,37 +128,27 @@ namespace Ulearn.Web.Api.Controllers
 					UnitId = unitIdResponse,
 					UnitTitle = unit.Title,
 					TheorySlidesIds = flashcard.TheorySlidesIds,
-					FlashcardsRatesCountAfterLastRepeat = tLast
+					LastRateIndex = lastRateIndex
 				};
 				yield return flashcardResponse;
 			}
 		}
 
-		private Dictionary<string, int> GetFlashcardsTLasts(List<Flashcard> flashcards, List<UserFlashcardsVisit> userFlashcardsVisits)
+		private Dictionary<string, int> GetFlashcardsLastRateIndexes(List<Flashcard> flashcards, List<UserFlashcardsVisit> userFlashcardsVisits)
 		{
 			userFlashcardsVisits = userFlashcardsVisits.ToList();
-			userFlashcardsVisits.Reverse();
 
 			var result = new Dictionary<string, int>();
+
 			foreach (var flashcard in flashcards)
 			{
-				result[flashcard.Id] = userFlashcardsVisits.Count;
+				result[flashcard.Id] = 0;
 			}
 
-			var notFoundFlashcardsIds = flashcards.Select(x => x.Id).ToHashSet();
 			for (var i = 0; i < userFlashcardsVisits.Count; i++)
 			{
-				if (notFoundFlashcardsIds.IsNullOrEmpty())
-				{
-					break;
-				}
-
-				var flashcardId = userFlashcardsVisits[i].FlashcardId;
-				if (notFoundFlashcardsIds.Contains(flashcardId))
-				{
-					result[flashcardId] = i;
-					notFoundFlashcardsIds.Remove(flashcardId);
-				}
+				var visit = userFlashcardsVisits[i];
+				result[visit.FlashcardId] = i + 1;
 			}
 
 			return result;

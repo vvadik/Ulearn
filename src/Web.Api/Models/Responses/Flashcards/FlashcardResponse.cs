@@ -29,7 +29,7 @@ namespace Ulearn.Web.Api.Models.Responses.Flashcards
 		public Guid[] TheorySlidesIds;
 		
 		[DataMember]
-		public int FlashcardsRatesCountAfterLastRepeat;
+		public int LastRateIndex;
 		
 	}
 }
