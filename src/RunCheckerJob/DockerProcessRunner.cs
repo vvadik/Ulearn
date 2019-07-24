@@ -102,13 +102,13 @@ namespace RunCheckerJob
 				/* If process has already terminated */
 			}
 
-			var remainingTimeout = 3000;
+			var remainingTimeoutMs = 3000;
 			while (!dockerShellProcess.HasExited)
 			{
-				const int time = 100;
+				const int time = 10;
 				Thread.Sleep(time);
-				remainingTimeout -= time;
-				if(remainingTimeout <= 0)
+				remainingTimeoutMs -= time;
+				if(remainingTimeoutMs <= 0)
 					throw new Exception($"process {dockerShellProcess.Id} is not completed after kill");
 			}
 
