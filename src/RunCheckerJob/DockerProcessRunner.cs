@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using log4net;
 using Ulearn.Common.Extensions;
@@ -70,7 +71,7 @@ namespace RunCheckerJob
 			else
 				log.Info($"Docker закончил работу за {ms} ms и написал: {readOutTask.Result}");
 
-			if(!dockerShellProcess.HasExited)
+			if (!dockerShellProcess.HasExited)
 				GracefullyShutdownDocker(dockerShellProcess, name, settings);
 
 			if(unsuccessfulResult != null)
@@ -99,6 +100,16 @@ namespace RunCheckerJob
 			catch (InvalidOperationException)
 			{
 				/* If process has already terminated */
+			}
+
+			var remainingTimeout = 3000;
+			while (!dockerShellProcess.HasExited)
+			{
+				const int time = 100;
+				Thread.Sleep(time);
+				remainingTimeout -= time;
+				if(remainingTimeout <= 0)
+					throw new Exception($"process {dockerShellProcess.Id} is not completed after kill");
 			}
 
 			Task.Run(() =>
