@@ -26,8 +26,10 @@
       <Content Include="log4net.Kontur.config">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
-      <Content Include="deploy/runcheckerjob.service">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Content Include="deploy\**">
+        <Link>deploy\%(RecursiveDir)%(Filename)%(Extension)</Link>
+        <CopyToOutputDirectory>None</CopyToOutputDirectory>
+        <CopyToPublishDirectory>Always</CopyToPublishDirectory>
       </Content>
       <Content Include="..\..\sandboxes\**">
         <Link>sandboxes\%(RecursiveDir)%(Filename)%(Extension)</Link>
