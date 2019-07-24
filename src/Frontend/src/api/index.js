@@ -20,7 +20,7 @@ function setServerErrorHandler(handler) {
 }
 
 function refreshApiJwtToken() {
-	return fetch(config.api.endpoint + "account/token", {credentials: "include", method: "POST"})
+	return fetch(config.api.endpoint + "account/token", { credentials: "include", method: "POST" })
 		.then(response => {
 			if (response.status !== 200) {
 				let error = new Error(response.statusText || response.status);
@@ -89,8 +89,11 @@ function request(url, options, isRetry) {
 		.then(value => {
 			if (value === API_JWT_TOKEN_UPDATED)
 				return request(url, options, true);
-			if (value.status >= 200 && value.status < 300)
-				return value.json();
+			if (value.status >= 200 && value.status < 300) {
+				if (value.status !== 204) {
+					return value.json();
+				}
+			}
 			return value;
 		}).finally(_ => {
 			refreshApiJwtTokenPromise = undefined;
@@ -136,7 +139,7 @@ function createRequestParams(body) {
 
 export class RequestError extends Error {
 	constructor(status) {
-		const massage = `HTTP response code: ${status}`;
+		const massage = `HTTP response code: ${ status }`;
 		super(massage);
 		this.status = status;
 	}
@@ -146,7 +149,7 @@ export class RequestError extends Error {
 		if (this.status === 403) {
 			Toast.push("У вас нет прав для совершения операции");
 		} else {
-			Toast.push(`Ошибка с кодом ${this.error.status}`);
+			Toast.push(`Ошибка с кодом ${ this.error.status }`);
 		}
 	}
 }

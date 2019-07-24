@@ -45,12 +45,22 @@ const loadFlashcardsFail = () => ({
 	type: COURSES__FLASHCARDS_RATE + FAIL,
 });
 
-const sendFlashcardResultSuccess = (courseId, unitId, flashcardId, rate) => ({
-	type: COURSES__FLASHCARDS_RATE + SUCCESS,
+const sendFlashcardResultStart = (courseId, unitId, flashcardId, rate, newTLast) => ({
+	type: COURSES__FLASHCARDS_RATE + START,
 	courseId,
 	unitId,
 	flashcardId,
 	rate,
+	newTLast,
+});
+
+const sendFlashcardResultFail = (courseId, unitId, flashcardId, rate, newTLast) => ({
+	type: COURSES__FLASHCARDS_RATE + FAIL,
+	courseId,
+	unitId,
+	flashcardId,
+	rate,
+	newTLast,
 });
 
 export const loadCourse = (courseId) => {
@@ -81,13 +91,12 @@ export const loadFlashcards = (courseId) => {
 	}
 };
 
-export const sendFlashcardResult = (courseId, unitId, flashcardId, rate) => {
+export const sendFlashcardResult = (courseId, unitId, flashcardId, rate, newTLast) => {
 	return (dispatch) => {
+		dispatch(sendFlashcardResultStart(courseId, unitId, flashcardId, rate, newTLast));
 		putFlashcardStatus(courseId, flashcardId, rate)
-			.then(_ => {
-			})
 			.catch(err => {
-				dispatch(sendFlashcardResultSuccess(courseId, unitId, flashcardId, rate))
+				dispatch(sendFlashcardResultFail(courseId, unitId, flashcardId, rate, newTLast));
 			});
 	}
 };

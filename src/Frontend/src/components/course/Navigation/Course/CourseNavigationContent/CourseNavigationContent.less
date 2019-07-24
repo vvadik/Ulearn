@@ -7,7 +7,7 @@
 }
 
 .header {
-  margin: 0 19px 14px 23px;
+  margin: 0 19px 10px 14px;
   text-transform: uppercase;
   font-size: 10px;
   font-weight: lighter;
@@ -16,6 +16,9 @@
   color: @additionalColor;
 }
 
-.module {
-  margin-left: 57px;
+
+@media (min-width: @maxLaptopWidth) {
+  .header {
+    margin: 0 19px 14px 23px;
+  }
 }

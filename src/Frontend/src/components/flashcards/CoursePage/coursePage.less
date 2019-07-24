@@ -30,9 +30,13 @@
 }
 
 .pageContainer {
-  width: 100%;
-  max-width: 862px;
-
   margin-left: 32px;
   margin-top: 40px;
+}
+
+@media (max-width: @maxPhoneWidth) {
+  .pageContainer {
+    margin-left: 20px;
+    margin-top: 20px;
+  }
 }

@@ -25,9 +25,23 @@
 }
 
 .pageContainer {
-  width: 100%;
-  max-width: 862px;
-
   margin-left: 32px;
   margin-top: 20px;
+}
+
+@media (max-width: @maxPhoneWidth) {
+  .pageContainer {
+    margin-left: 10px;
+    margin-right: 5px;
+  }
+
+  .progressBarTitle{
+    margin-top: 5px;
+  }
+
+  .title {
+    margin-top: 5px;
+    font-size: 26px;
+    line-height: 30px;
+  }
 }

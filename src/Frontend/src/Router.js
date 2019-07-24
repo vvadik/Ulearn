@@ -16,8 +16,7 @@ function Router() {
 		<Switch>
 			<Route path="/Admin/Groups" component={redirectLegacyPage("/:courseId/groups")}/>
 
-			<Route path="/course/:courseId/:slideId"
-				   component={Course}/>
+			<Route path="/course/:courseId/:slideId" component={Course}/>
 
 			<Route path="/:courseId/groups/" component={GroupListPage} exact/>
 			<Route path="/:courseId/groups/:groupId/" component={GroupPage} exact/>

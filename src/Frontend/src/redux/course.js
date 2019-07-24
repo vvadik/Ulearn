@@ -6,6 +6,7 @@ import {
 	COURSES__FLASHCARDS_RATE,
 	START, SUCCESS, FAIL,
 } from '../consts/actions';
+import { rateTypes } from "../consts/rateTypes";
 
 const initialCoursesState = {
 	courseById: {},
@@ -13,8 +14,9 @@ const initialCoursesState = {
 	fullCoursesInfo: {},
 	courseLoading: false,
 
-	flashcards: {},
 	flashcardsLoading: false,
+	flashcardsByCourses: {},
+	flashcardsByUnits: {},
 };
 
 export default function courses(state = initialCoursesState, action) {
@@ -54,12 +56,47 @@ export default function courses(state = initialCoursesState, action) {
 				flashcardsLoading: true,
 			};
 		case COURSES__FLASHCARDS + SUCCESS:
+			const courseFlashcards = {},
+				flashcardsByUnits = {};
+			const courseUnits = state.fullCoursesInfo[action.courseId].units;
+
+			for (const unit of action.result) {
+				const { unitId, unitTitle, unlocked, flashcards } = unit;
+				const flashcardsIds = [];
+				const unitSlides = courseUnits
+					.find(unit => unit.id === unitId)
+					.slides;
+				let unratedFlashcardsCount = 0;
+
+				for (const flashcard of flashcards) {
+					courseFlashcards[flashcard.id] = flashcard;
+					flashcardsIds.push(flashcard.id);
+					if (flashcard.rate === rateTypes.notRated) {
+						unratedFlashcardsCount++;
+					}
+				}
+
+				flashcardsByUnits[unitId] = {
+					unitId,
+					unitTitle,
+					unlocked,
+					flashcardsIds,
+					unratedFlashcardsCount,
+					cardsCount: flashcards.length,
+					flashcardsSlideSlug: unitSlides[unitSlides.length - 1].slug,
+				}
+			}
+
 			return {
 				...state,
 				flashcardsLoading: false,
-				flashcards: {
-					...state.flashcards,
-					[action.courseId]: action.result,
+				flashcardsByCourses: {
+					...state.flashcardsByCourses,
+					[action.courseId]: courseFlashcards,
+				},
+				flashcardsByUnits: {
+					...state.flashcardsByUnits,
+					...flashcardsByUnits,
 				},
 			};
 		case COURSES__FLASHCARDS + FAIL:
@@ -67,25 +104,34 @@ export default function courses(state = initialCoursesState, action) {
 				...state,
 				flashcardsLoading: false,
 			};
-		case COURSES__FLASHCARDS_RATE + SUCCESS:
-			const units = { ...state.flashcards[action.courseId] };
-			const unitInfo = units.find(unit => unit.unitId === action.unitId);
-			unitInfo.flashcards.find(f => f.id === action.flashcardId)
-				.rate = action.rate;
+		case COURSES__FLASHCARDS_RATE + START:
+			const flashcard = { ...state.flashcardsByCourses[action.courseId][action.flashcardId] };
 
-			if (unitInfo.flashcards.all(fc => fc.rate !== 'notRated')) {
-				unitInfo.unlocked = true;
-			}
+			flashcard.rate = action.rate;
+			flashcard.lastRateIndex = action.newTLast;
 
-			return {
+			const newState = {
 				...state,
-				flashcards: {
-					...state.flashcards,
+				flashcardsByCourses: {
+					...state.flashcardsByCourses,
 					[action.courseId]: {
-						...units,
+						...state.flashcardsByCourses[action.courseId],
+						[action.flashcardId]: flashcard
 					},
 				},
 			};
+
+			const unitInfo = newState.flashcardsByUnits[action.unitId];
+
+			if (unitInfo.unratedFlashcardsCount > 0) {
+				unitInfo.unratedFlashcardsCount--;
+			}
+
+			if (unitInfo.unratedFlashcardsCount === 0) {
+				unitInfo.unlocked = true;
+			}
+
+			return newState;
 		default:
 			return state;
 	}

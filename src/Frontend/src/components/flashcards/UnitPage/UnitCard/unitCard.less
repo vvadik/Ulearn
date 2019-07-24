@@ -1,12 +1,13 @@
 @import "../../../../variables.less";
 
-@cardsContainerWidth: 700px;
-@cardsContainerHeight: 349px;
-@cardWidth: @cardsContainerWidth;
-@cardHeight: @cardsContainerHeight - 9px;
+@cardsContainerMaxWidth: 700px;
+@cardsContainerHeight: 380px;
+@cardWidth: 100%;
+@cardHeight: @cardsContainerHeight - 40px;
 
 .unitCardContainer {
-  width: @cardsContainerWidth;
+  width: 100%;
+  max-width: @cardsContainerMaxWidth;
   height: @cardsContainerHeight;
 
   font-family: @defaultFonts;
@@ -19,8 +20,9 @@
   width: @cardWidth;
   height: @cardHeight;
 
+  transform: translateY(@cardsContainerHeight - @cardHeight);
+
   position: absolute;
-  top: 20px;
 
   border-radius: 10px;
   padding: 22px;
@@ -28,23 +30,15 @@
 }
 
 .unitCardNext {
-  width: @cardWidth - 44px;
-  height: @cardHeight - 48px;
-
+  transform: translateY((@cardsContainerHeight - @cardHeight)/2) scale(0.95, 0.95);
   z-index: -2;
-  top: 11px;
-  left: 22px;
 
   background: darken(@blue, 10%);
 }
 
 .unitCardLast {
-  width: @cardWidth - 92px;
-  height: @cardHeight - 70px;
-
+  transform: scale(0.90, 0.90);
   z-index: -3;
-  top: 4px;
-  left: 46px;
 
   background: darken(@blue, 15%);
 }

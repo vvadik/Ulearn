@@ -1,7 +1,5 @@
 @import "../../../../variables.less";
 
-@questionsContainerWidth: 83%;
-@toggleContainerWidth: 17%;
 @questionFontSize: 18px;
 @answerFontSize: @questionFontSize - 2px;
 
@@ -13,10 +11,9 @@
 
 .questionsTextContainer {
   margin: 0;
-  width: @questionsContainerWidth;
 }
 
-.questionText {
+.listElement {
   list-style: none;
   font-size: @questionFontSize;
   font-family: @defaultFonts;
@@ -24,11 +21,15 @@
   margin-bottom: 18px;
 }
 
-.questionText:hover {
+.listElement p {
+  margin: 0;
+}
+
+.listElement:hover {
   cursor: pointer;
 }
 
-.questionText::before {
+.listElement::before {
   width: 20px;
   height: 20px;
 
@@ -48,22 +49,51 @@
   margin-left: -40px;
   margin-top: 3px;
   padding-top: 1px;
-
 }
 
 .answerText {
-  color: #717171;
+  color: @grey;
   font-size: @answerFontSize;
 }
 
 .toggleContainer {
-  width: @toggleContainerWidth;
+  flex-shrink: 0;
+  white-space: nowrap;
   overflow: hidden;
-  height: 20px;
-  line-height: 20px;
+  text-overflow: ellipsis;
 }
 
 .toggleText {
-  position: relative;
-  left: 10px;
+  margin-left: 10px;
+}
+
+:global div.tex  {
+  display: inline-block;
+
+  max-width: 100%;
+  overflow-y: auto;
+}
+
+@media (max-width: @maxPhoneWidth) {
+  .questionsContainer {
+    flex-direction: column-reverse;
+    margin-top: 10px;
+  }
+
+  .questionsTextContainer {
+    padding-left: 25px;
+    margin-top: 10px;
+  }
+
+  .listElement {
+    margin-bottom: 14px;
+  }
+
+  .listElement::before {
+    margin-left: -25px;
+  }
+
+  .toggleText {
+    font-size: 18px;
+  }
 }

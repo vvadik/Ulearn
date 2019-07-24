@@ -9,10 +9,7 @@ const mapStateToProps = (state, { match }) => {
 	const { courseId } = match.params;
 	const data = state.courses;
 
-	const flashcardsByUnits = data.flashcards[courseId] || [];
-
-	const infoByUnits = [],
-		allFlashcards = [],
+	const allFlashcards = [],
 		statistics = {
 			[rateTypes.notRated]: 0,
 			[rateTypes.rate1]: 0,
@@ -22,29 +19,17 @@ const mapStateToProps = (state, { match }) => {
 			[rateTypes.rate5]: 0,
 		};
 
-	const courseUnits = data.fullCoursesInfo[courseId].units;
-	for (const unit of flashcardsByUnits) {
-		const { unitId, unitTitle, unlocked, flashcards } = unit;
+	const infoByUnits = Object.values(data.flashcardsByUnits);
 
-		const unitSlides = courseUnits
-			.find(unit => unit.id === unitId)
-			.slides;
-
-		infoByUnits.push({
-			unitId,
-			unitTitle,
-			unlocked,
-			cardsCount: flashcards.length,
-			flashcardsSlideSlug: unitSlides[unitSlides.length - 1].slug,
-		});
-
+	infoByUnits.forEach(({ unlocked, flashcardsIds }) => {
 		if (unlocked) {
-			allFlashcards.push(...flashcards);
-			for (const flashcard of flashcards) {
+			for (const id of flashcardsIds) {
+				const flashcard = data.flashcardsByCourses[courseId][id];
+				allFlashcards.push(flashcard);
 				statistics[flashcard.rate]++;
 			}
 		}
-	}
+	});
 
 	return {
 		courseId,
@@ -57,7 +42,7 @@ const mapStateToProps = (state, { match }) => {
 };
 const mapDispatchToProps = (dispatch) => ({
 	loadFlashcards: (courseId) => dispatch(loadFlashcards(courseId)),
-	sendFlashcardRate: (courseId, unitId, flashcardId, rate) => dispatch(sendFlashcardResult(courseId, unitId, flashcardId, rate)),
+	sendFlashcardRate: (courseId, unitId, flashcardId, rate, newTLast) => dispatch(sendFlashcardResult(courseId, unitId, flashcardId, rate, newTLast)),
 });
 
 const connected = connect(mapStateToProps, mapDispatchToProps)(CourseFlashcards);

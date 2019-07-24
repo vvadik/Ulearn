@@ -61,7 +61,7 @@ class FrontFlashcard extends Component {
 		const { showAnswer } = this.state;
 
 		return (
-			<div ref={ ref => this.modal = ref }>
+			<div className={ styles.wrapper } ref={ ref => this.modal = ref }>
 				<button tabIndex={ 1 } className={ styles.closeButton } onClick={ onClose }>
 					&times;
 				</button>
@@ -96,10 +96,10 @@ class FrontFlashcard extends Component {
 
 	renderBackFlashcard(question, answer) {
 		return (
-			<div>
+			<div className={ styles.backWrapper }>
 				<div className={ styles.backTextContainer }>
 					<div className={ styles.questionBack } dangerouslySetInnerHTML={ { __html: question } }/>
-					<div dangerouslySetInnerHTML={ { __html: answer } }/>
+					<div className={ styles.answerBack } dangerouslySetInnerHTML={ { __html: answer } }/>
 				</div>
 				<Results handleClick={ this.handleResultsClick }/>
 			</div>

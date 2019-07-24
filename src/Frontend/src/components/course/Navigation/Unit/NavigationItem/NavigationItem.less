@@ -11,7 +11,7 @@
 .itemLink {
   position: relative;
   display: block;
-  padding: 10px 19px 10px 24px;
+  padding: 8px 12px 8px 14px;
   color: @linkColor;
   text-decoration: none;
   font-weight: 300;
@@ -28,7 +28,7 @@
 }
 
 .withMetro {
-  padding-left: 57px;
+  padding-left: 33px;
 }
 
 .firstLine {
@@ -93,7 +93,7 @@
 
 .metroWrapper {
   position: absolute;
-  left: 30px;
+  left: 14px;
   top: 0;
   bottom: 0;
 
@@ -113,7 +113,7 @@
     display: block;
     position: absolute;
     width: 4px;
-    top: 21px;
+    top: 19px;
     left: 0;
     bottom: 0;
     background-color: @metroDefault;
@@ -141,7 +141,7 @@
   position: absolute;
   width: 9px;
   height: 4px;
-  top: 17px;
+  top: 15px;
   left: 0;
   background-color: @metroDefault;
   z-index: 2;
@@ -167,4 +167,27 @@
 .complete {
   background-color: @progressBarGreen;
   color: #ffffff;
+}
+
+
+@media (min-width: @maxLaptopWidth) {
+  .itemLink {
+    padding: 10px 19px 10px 24px;
+  }
+
+  .withMetro {
+    padding-left: 57px;
+  }
+
+  .metroWrapper {
+    left: 30px;
+
+    &:after {
+      top: 21px;
+    }
+  }
+
+  .pointer {
+    top: 17px;
+  }
 }

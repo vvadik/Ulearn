@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import ProgressBar from "../ProgressBar/ProgressBar";
 import FrontFlashcard from "./FrontFlashcard/FrontFlashcard";
 import { rateTypes } from "../../../consts/rateTypes";
+import mixFlashcards from "./flashcardsStirrer";
 
 const modalsStyles = {
 	first: classNames(styles.modal),
@@ -13,17 +14,31 @@ const modalsStyles = {
 	fourth: classNames(styles.modal, styles.fourthModal)
 };
 
+const mapRateToRateType = {
+	1: rateTypes.rate1,
+	2: rateTypes.rate2,
+	3: rateTypes.rate3,
+	4: rateTypes.rate4,
+	5: rateTypes.rate5,
+};
+
 class Flashcards extends Component {
 	constructor(props) {
 		super(props);
 
+		let maxTLast = Math.max(...this.props.flashcards.reduce((acc, fc) => [...acc, fc.lastRateIndex], []));
+
 		this.state = {
-			currentIndex: 0,
+			currentFlashcard: null,
+			nextFlashcard: null,
+			maxTLast: maxTLast,
 		}
 	}
 
 	componentDidMount() {
 		document.getElementsByTagName('body')[0].classList.add(styles.overflow);
+
+		this.takeNextFlashcard(this.state.maxTLast);
 	}
 
 	componentWillUnmount() {
@@ -31,21 +46,21 @@ class Flashcards extends Component {
 	}
 
 	render() {
-		const { currentIndex } = this.state;
-		const { totalFlashcardsCount, flashcards, statistics } = this.props;
-		const { question, answer, unitTitle } = flashcards[currentIndex];
+		const flashcard = this.state.currentFlashcard;
+		const { totalFlashcardsCount, statistics } = this.props;
 
 		return (
 			<div ref={ (ref) => this.overlay = ref } className={ styles.overlay } onClick={ this.handleOverlayClick }>
 				<div ref={ (ref) => this.firstModal = ref } className={ modalsStyles.first }>
+					{ flashcard &&
 					<FrontFlashcard
 						onShowAnswer={ () => this.resetCardsAnimation() }
-						question={ question }
-						answer={ answer }
-						unitTitle={ unitTitle }
+						question={ flashcard.question }
+						answer={ flashcard.answer }
+						unitTitle={ flashcard.unitTitle }
 						onHandlingResultsClick={ (rate) => this.handleResultsClick(rate) }
 						onClose={ this.props.onClose }
-					/>
+					/> }
 				</div>
 				<div ref={ (ref) => this.secondModal = ref } className={ modalsStyles.second }/>
 				<div ref={ (ref) => this.thirdModal = ref } className={ modalsStyles.third }/>
@@ -81,32 +96,25 @@ class Flashcards extends Component {
 	}
 
 	handleResultsClick = (rate) => {
-		const { currentIndex } = this.state;
-		const { courseId, sendFlashcardRate, flashcards, statistics } = this.props;
-		const currentCard = flashcards[currentIndex];
-		const newRate = `rate${ rate }`;
+		const { currentFlashcard, maxTLast } = this.state;
+		const { courseId, sendFlashcardRate } = this.props;
+		const newTLast = maxTLast + 1;
 
-		sendFlashcardRate(courseId, currentCard.unitId, currentCard.id, newRate);
-
-		statistics[currentCard.rate]--;
-		statistics[newRate]++;
-		currentCard.rate = newRate;
-
-		this.takeNextFlashcard();
-	};
-
-	takeNextFlashcard() {
-		const { currentIndex } = this.state;
-		const { flashcards } = this.props;
-		let newIndex = currentIndex + 1;
-
-		if (newIndex === flashcards.length) {
-			newIndex = 0;
-		}
+		sendFlashcardRate(courseId, currentFlashcard.unitId, currentFlashcard.id, mapRateToRateType[rate], newTLast);
 
 		this.setState({
-			currentIndex: newIndex,
+			maxTLast: newTLast,
 		});
+
+		this.takeNextFlashcard(newTLast);
+	};
+
+	takeNextFlashcard(tLast) {
+		const { flashcards } = this.props;
+
+		const newSequence = mixFlashcards(flashcards, tLast);
+
+		this.setState({ currentFlashcard: newSequence[0] });
 
 		this.animateCards();
 	}
@@ -142,6 +150,7 @@ Flashcards.propTypes = {
 		unitTitle: PropTypes.string,
 		rate: PropTypes.string,
 		unitId: PropTypes.string,
+		lastRateIndex: PropTypes.number,
 	})),
 	totalFlashcardsCount: PropTypes.number,
 	statistics: PropTypes.shape({

@@ -1,7 +1,7 @@
 @import "../../../../../variables.less";
 
 .root {
-  padding: 19px 17px 21px 23px;
+  padding: 12px 15px 15px 14px;
   border-bottom: 1px solid @borderColor;
 }
 
@@ -13,9 +13,9 @@
 .h1 {
   overflow: hidden;
   text-overflow: ellipsis;
-  margin: 0 0 16px;
-  font-size: 32px;
-  line-height: 34px;
+  margin: 0 0 8px;
+  font-size: 26px;
+  line-height: 1.06;
 }
 
 .description {
@@ -28,4 +28,16 @@
 .progressBarWrapper {
   width: 75%;
   margin-bottom: 11px;
+}
+
+
+@media (min-width: @maxLaptopWidth) {
+  .root {
+    padding: 19px 17px 21px 23px;
+  }
+
+  .h1 {
+    margin: 0 0 16px;
+    font-size: 32px;
+  }
 }

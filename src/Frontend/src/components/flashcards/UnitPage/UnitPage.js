@@ -128,7 +128,8 @@ UnitPage.propTypes = {
 		answer: PropTypes.string,
 		unitTitle: PropTypes.string,
 		rate: PropTypes.string,
-		unitId: PropTypes.string
+		unitId: PropTypes.string,
+		lastRateIndex: PropTypes.number,
 	})),
 	totalFlashcardsCount: PropTypes.number,
 	statistics: PropTypes.shape({

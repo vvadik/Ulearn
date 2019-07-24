@@ -5,7 +5,7 @@ export default function translateTextToKatex(element, additionalSettings) {
 
 	if (text && element.title !== tranformedTitle) {
 		element.title = tranformedTitle;
-		katex.render(text, element, {...additionalSettings, ...defaultSetting});
+		katex.render(text, element, { ...additionalSettings, ...defaultSetting });
 	}
 }
 

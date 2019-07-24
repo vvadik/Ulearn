@@ -4,3 +4,21 @@
   display: flex;
   max-width: calc(100vw - 20px);
 }
+
+.pageWrapper {
+  width: 100%;
+  max-width: 100%;
+}
+
+
+@media (min-width: @maxPhoneWidth) {
+  .pageWrapper {
+    max-width: calc(100vw - 20px - 250px);
+  }
+}
+
+@media (min-width: @maxLaptopWidth) {
+  .pageWrapper {
+    max-width: 862px;
+  }
+}

@@ -48,7 +48,7 @@ class ShortQuestions extends Component {
 			<ol ref={ (ref) => this.list = ref } className={ styles.questionsTextContainer }>
 				{ questionsWithAnswers.map(({ question, answer, showAnswer }, index) =>
 					<li
-						className={ styles.questionText }
+						className={ styles.listElement }
 						key={ index }
 						onClick={ () => this.handleQuestionClick(index) }>
 						<div dangerouslySetInnerHTML={ { __html: question } }/>

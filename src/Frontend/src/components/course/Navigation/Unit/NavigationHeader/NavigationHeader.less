@@ -1,7 +1,7 @@
 @import "../../../../../variables.less";
 
 .root {
-  padding: 19px 17px 21px 23px;
+  padding: 12px 15px 15px 14px;
   border-bottom: 1px solid @borderColor;
 }
 
@@ -14,8 +14,19 @@
   overflow: hidden;
   text-overflow: ellipsis;
   margin: 0;
-  font-size: 24px;
-  line-height: 34px;
+  font-size: 20px;
+  line-height: 1.4;
   color: #000;
   font-weight: normal;
+}
+
+@media (min-width: @maxLaptopWidth) {
+  .root {
+    padding: 19px 17px 21px 23px;
+  }
+
+  .h2 {
+    margin: 0 0 16px;
+    font-size: 24px;
+  }
 }
