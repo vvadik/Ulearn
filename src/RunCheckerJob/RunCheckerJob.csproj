@@ -29,6 +29,10 @@
       <Content Include="deploy/runcheckerjob.service">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
+      <Content Include="..\..\sandboxes\**">
+        <Link>sandboxes\%(RecursiveDir)%(Filename)%(Extension)</Link>
+        <CopyToOutputDirectory>None</CopyToOutputDirectory>
+        <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+      </Content>
     </ItemGroup>
-
 </Project>
