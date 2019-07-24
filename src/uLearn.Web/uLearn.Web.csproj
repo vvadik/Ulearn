@@ -90,8 +90,8 @@
     <Reference Include="Bitrium.Http.Extensions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=43390f7aed073600, processorArchitecture=MSIL">
       <HintPath>..\packages\Bitrium.Http.Extensions.1.1.0\lib\portable-net45+sl50\Bitrium.Http.Extensions.dll</HintPath>
     </Reference>
-    <Reference Include="DotNetZip, Version=1.11.0.0, Culture=neutral, PublicKeyToken=6583c7c814667745">
-      <HintPath>..\packages\DotNetZip.1.11.0\lib\net20\DotNetZip.dll</HintPath>
+    <Reference Include="DotNetZip, Version=1.13.3.0, Culture=neutral, PublicKeyToken=6583c7c814667745">
+      <HintPath>..\packages\DotNetZip.1.13.3\lib\net40\DotNetZip.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Elmah, Version=1.2.14706.0, Culture=neutral, processorArchitecture=MSIL">
