@@ -40,17 +40,15 @@ namespace Ulearn.Web.Api.Controllers.User
 		public async Task<ActionResult<UserProgressResponse>> UserProgress(Course course)
 		{
 			var scores = visitsRepo.GetScoresForSlides(course.Id, UserId);
-			var attempts = userQuizzesRepo.GetUsedAttemptCountsAsync(course.Id, UserId);
-			var waitingSlides = userQuizzesRepo.GetSlideIdsWaitingForManualCheckAsync(course.Id, UserId);
-
-			await Task.WhenAll(attempts, waitingSlides).ConfigureAwait(false);
+			var attempts = await userQuizzesRepo.GetUsedAttemptCountsAsync(course.Id, UserId).ConfigureAwait(false);
+			var waitingSlides = await userQuizzesRepo.GetSlideIdsWaitingForManualCheckAsync(course.Id, UserId).ConfigureAwait(false);
 
 			var slidesResults = scores.Select(s => new
 			{
 				Key = s.Key,
 				Score = s.Value,
-				UsedAttempts = attempts.Result.ContainsKey(s.Key) ? attempts.Result[s.Key] : 0,
-				IsWaitingForManualChecking = waitingSlides.Result.Contains(s.Key),
+				UsedAttempts = attempts.GetValueOrDefault(s.Key),
+				IsWaitingForManualChecking = waitingSlides.Contains(s.Key),
 			}).ToDictionary(s => s.Key, s => new UserSlideResult
 			{
 				Visited = true,

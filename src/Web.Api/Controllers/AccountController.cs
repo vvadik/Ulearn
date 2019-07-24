@@ -146,7 +146,7 @@ namespace Ulearn.Web.Api.Controllers
 		[HttpPost("login")]
 		public async Task<ActionResult<TokenResponse>> Login([FromBody] LoginPasswordParameters loginPassword)
 		{
-			var appUser = await db.Users.FirstAsync(u => u.UserName == loginPassword.Login);
+			var appUser = await db.Users.FirstAsync(u => u.UserName == loginPassword.Login && !u.IsDeleted);
 			var result = await signInManager.UserManager.CheckPasswordAsync(appUser, loginPassword.Password);
 			if (!result) return Forbid();
 
