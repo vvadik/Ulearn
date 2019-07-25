@@ -48,43 +48,44 @@ namespace RunCheckerJob
 			var name = Guid.NewGuid();
 			var dockerCommand = BuildDockerCommand(settings, dir, name);
 			log.Info($"Start process command: {dockerCommand}");
-			var dockerShellProcess = BuildShellProcess(dockerCommand);
-
-			var sw = Stopwatch.StartNew();
-			dockerShellProcess.Start();
-			var readErrTask = new AsyncReader(dockerShellProcess.StandardError, settings.OutputLimit).GetDataAsync();
-			var readOutTask = new AsyncReader(dockerShellProcess.StandardOutput, settings.OutputLimit).GetDataAsync();
-			var isFinished = Task.WaitAll(new Task[] { readErrTask, readOutTask }, (int)(settings.MaintenanceTimeLimit + settings.TestingTimeLimit).TotalMilliseconds);
-			var ms = sw.ElapsedMilliseconds;
-
-			RunningResults unsuccessfulResult = null;
-			if (readErrTask.Result.Length > settings.OutputLimit || readOutTask.Result.Length > settings.OutputLimit)
+			using (var dockerShellProcess = BuildShellProcess(dockerCommand))
 			{
-				log.Warn("Программа вывела слишком много");
-				unsuccessfulResult = new RunningResults(Verdict.OutputLimit);
+				var sw = Stopwatch.StartNew();
+				dockerShellProcess.Start();
+				var readErrTask = new AsyncReader(dockerShellProcess.StandardError, settings.OutputLimit).GetDataAsync();
+				var readOutTask = new AsyncReader(dockerShellProcess.StandardOutput, settings.OutputLimit).GetDataAsync();
+				var isFinished = Task.WaitAll(new Task[] { readErrTask, readOutTask }, (int)(settings.MaintenanceTimeLimit + settings.TestingTimeLimit).TotalMilliseconds);
+				var ms = sw.ElapsedMilliseconds;
+
+				RunningResults unsuccessfulResult = null;
+				if (readErrTask.Result.Length > settings.OutputLimit || readOutTask.Result.Length > settings.OutputLimit)
+				{
+					log.Warn("Программа вывела слишком много");
+					unsuccessfulResult = new RunningResults(Verdict.OutputLimit);
+				}
+				else if (!isFinished)
+				{
+					log.Warn($"Не хватило времени ({ms} ms) на работу Docker в папке {dir.FullName}");
+					unsuccessfulResult = new RunningResults(Verdict.TimeLimit);
+				}
+				else
+					log.Info($"Docker закончил работу за {ms} ms и написал: {readOutTask.Result}");
+
+				if (!dockerShellProcess.HasExited)
+					GracefullyShutdownDocker(dockerShellProcess, name, settings);
+
+				if (unsuccessfulResult != null)
+					return unsuccessfulResult;
+
+				if (dockerShellProcess.ExitCode != 0)
+				{
+					log.Info($"Упал в папке {dir.FullName}");
+					log.Warn($"Docker написал в stderr:\n{readErrTask.Result}");
+					return new RunningResults(Verdict.SandboxError, error: readErrTask.Result);
+				}
+
+				return new RunningResults(Verdict.Ok, output: readOutTask.Result, error: readErrTask.Result);
 			}
-			else if (!isFinished)
-			{
-				log.Warn($"Не хватило времени ({ms} ms) на работу Docker в папке {dir.FullName}");
-				unsuccessfulResult = new RunningResults(Verdict.TimeLimit);
-			}
-			else
-				log.Info($"Docker закончил работу за {ms} ms и написал: {readOutTask.Result}");
-
-			if (!dockerShellProcess.HasExited)
-				GracefullyShutdownDocker(dockerShellProcess, name, settings);
-
-			if(unsuccessfulResult != null)
-				return unsuccessfulResult;
-
-			if (dockerShellProcess.ExitCode != 0)
-			{
-				log.Info($"Упал в папке {dir.FullName}");
-				log.Warn($"Docker написал в stderr:\n{readErrTask.Result}");
-				return new RunningResults(Verdict.SandboxError, error: readErrTask.Result);
-			}
-
-			return new RunningResults(Verdict.Ok, output: readOutTask.Result, error: readErrTask.Result);
 		}
 
 		private static void GracefullyShutdownDocker(Process dockerShellProcess, Guid name, SandboxRunnerSettings settings)

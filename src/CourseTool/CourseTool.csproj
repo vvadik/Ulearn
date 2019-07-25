@@ -365,6 +365,7 @@
   <ItemGroup>
     <Compile Include="CmdLineOptions\AbstractOptions.cs" />
     <Compile Include="ArchiveManager.cs" />
+    <Compile Include="CmdLineOptions\BuildDockerContainerOptions.cs" />
     <Compile Include="CmdLineOptions\GenerateEmptyVideoAnnotations.cs" />
     <Compile Include="Validating\BaseValidator.cs" />
     <Compile Include="CmdLineOptions\OlxDesquashChaptersOptions.cs" />
@@ -424,6 +425,7 @@
       <Link>renderer\scripts\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="CourseTool.nuspec" />
     <Content Include="Hunspellx64.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -576,6 +578,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="static\ulearn-auto.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\sandboxes\**">
+      <Link>sandboxes\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
