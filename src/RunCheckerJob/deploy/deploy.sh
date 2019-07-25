@@ -16,16 +16,9 @@ sudo systemctl daemon-reload
 # Перезапустим или стартанем задачу
 sudo systemctl restart runcheckerjob
 
-# Выполним build.sh всех docker-контейнеров
-for filename in sandboxes/*/container/build.sh
-do
-	# Путь до файла скрипта без имени файла
-	container_dir=$(dirname $filename)
-	echo Start build container with $filename
-    # В скобках временно сменим рабочую директорию, после выхода из скобок она вернется на старую
-	# Рабочая директория должна быть директорией с файлом build.sh, чтобы пути в нем были относительно неё
-    (
-		cd $container_dir
-		sh build.sh
-	)
-done
+(
+	# Временно sandboxes - рабочая папка
+	cd sandboxes/
+	# Выполним build.sh всех docker-контейнеров
+	sh build.sh
+)
