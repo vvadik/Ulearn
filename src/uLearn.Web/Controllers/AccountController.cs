@@ -239,7 +239,7 @@ namespace uLearn.Web.Controllers
 			if (!isCourseAdmin && role == CourseRole.CourseAdmin)
 				return Json(new { status = "error", message = "Вы не можете назначать администраторов курса. Это могут делать только другие администраторы курса." });
 
-			var enabledRole = await userRolesRepo.ToggleRole(courseId, userId, role);
+			var enabledRole = await userRolesRepo.ToggleRole(courseId, userId, role, currentUserId);
 
 			if (enabledRole && (role == CourseRole.Instructor || role == CourseRole.CourseAdmin))
 				await NotifyAboutNewInstructor(courseId, userId, currentUserId);

@@ -1,5 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using JetBrains.Annotations;
 
 namespace Database.Models
 {
@@ -20,5 +22,17 @@ namespace Database.Models
 
 		[Required]
 		public CourseRoleType Role { get; set; }
+		
+		[CanBeNull]
+		public string GrantedById { get; set; }
+
+		[CanBeNull]
+		public DateTime? GrantTime { get; set; }
+
+		[CanBeNull]
+		public bool? IsEnabled { get; set; }
+
+		[CanBeNull]
+		public string Comment { get; set; }
 	}
 }

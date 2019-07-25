@@ -773,13 +773,8 @@ namespace uLearn.Web.Controllers
 
 		private UserListModel GetUserListModel(IEnumerable<UserRolesInfo> userRoles, string courseId)
 		{
-			var rolesForUsers = db.UserRoles
-				.Where(role => role.CourseId == courseId)
-				.GroupBy(role => role.UserId)
-				.ToDictionary(
-					g => g.Key,
-					g => g.Select(role => role.Role).Distinct().ToList()
-				);
+			var rolesForUsers = userRolesRepo.GetRolesByUsers(courseId);
+			
 
 			var currentUserId = User.Identity.GetUserId();			
 			

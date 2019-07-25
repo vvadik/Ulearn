@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
+using Ulearn.Core.Extensions;
 
 namespace Database.DataContexts
 {
@@ -19,30 +21,90 @@ namespace Database.DataContexts
 			: this(new ULearnDb())
 		{
 		}
-			
+
+		private IQueryable<UserRole> ToQueryableUserRoles()
+		{
+			var all = db.UserRoles
+				.GroupBy(x => x.UserId)
+				.Select(gr => gr.GroupBy(x => x.Role).Select(x => x.OrderByDescending(e => e.Id).FirstOrDefault()))
+				.SelectMany(x => x)
+				.Where(x => x != null && (!x.IsEnabled.HasValue || x.IsEnabled.Value));
+			return all;
+		}
+
+		private IEnumerable<UserRole> ToOriginalUserRoles()
+		{
+			var userRolesByUsers = new Dictionary<string, Dictionary<CourseRole, UserRole>>();
+			var userRoles = db.UserRoles.ToList();
+			userRoles.Reverse();
+			foreach (var userRole in userRoles)
+			{
+				if (!userRolesByUsers.ContainsKey(userRole.UserId))
+				{
+					userRolesByUsers[userRole.UserId] = new Dictionary<CourseRole, UserRole>();
+				}
+
+				var roles = userRolesByUsers[userRole.UserId];
+				if (!roles.ContainsKey(userRole.Role))
+				{
+					roles[userRole.Role] = userRole;
+				}
+			}
+
+			var result = new List<UserRole>();
+			foreach (var pair in userRolesByUsers)
+			{
+				var currentUserRoles = pair.Value;
+				result.AddRange(currentUserRoles
+					.Select(x => x.Value)
+					.Where(x => !x.IsEnabled.HasValue || x.IsEnabled.Value));
+			}
+
+			return result;
+		}
+
+		public Dictionary<string, List<CourseRole>> GetRolesByUsers(string courseId)
+		{
+			var userRoles = ToQueryableUserRoles();
+			return userRoles
+				.Where(role => role.CourseId == courseId)
+				.GroupBy(role => role.UserId)
+				.ToDictionary(
+					g => g.Key,
+					g => g.Select(role => role.Role).Distinct().ToList()
+				);
+		}
+
 		public Dictionary<string, CourseRole> GetRoles(string userId)
 		{
-			return db.UserRoles
+			var userRoles = ToQueryableUserRoles();
+			return userRoles
 				.Where(role => role.UserId == userId)
 				.GroupBy(role => role.CourseId)
 				.ToDictionary(g => g.Key, g => g.Select(role => role.Role).Min(), StringComparer.OrdinalIgnoreCase);
 		}
 
-		public async Task<bool> ToggleRole(string courseId, string userId, CourseRole role)
+		public async Task<bool> ToggleRole(string courseId, string userId, CourseRole role, string grantedById)
 		{
-			var userRole = db.UserRoles.FirstOrDefault(u => u.UserId == userId && u.Role == role && u.CourseId == courseId);
-			if (userRole == null)
-				db.UserRoles.Add(new UserRole
-				{
-					UserId = userId,
-					CourseId = courseId,
-					Role = role
-				});
+			var userRole = db.UserRoles.Where(x => x.UserId == userId && x.Role == role && x.CourseId == courseId).MaxBy(x => x.Id);
+			bool isEnabled;
+			if (userRole != null && (!userRole.IsEnabled.HasValue || userRole.IsEnabled.Value))
+				isEnabled = false;
 			else
-				db.UserRoles.Remove(userRole);
+				isEnabled = true;
+			db.UserRoles.Add(new UserRole
+			{
+				UserId = userId,
+				CourseId = courseId,
+				Role = role,
+				IsEnabled = isEnabled,
+				GrantedById = grantedById,
+				GrantTime = DateTime.Now
+			});
+
 			await db.SaveChangesAsync();
 
-			return userRole == null;
+			return isEnabled;
 		}
 
 		public List<string> GetListOfUsersWithCourseRole(CourseRole? courseRole, string courseId, bool includeHighRoles = false)
@@ -50,7 +112,7 @@ namespace Database.DataContexts
 			if (!courseRole.HasValue)
 				return null;
 
-			var usersQuery = (IQueryable<UserRole>)db.UserRoles;
+			var usersQuery = ToQueryableUserRoles();
 			usersQuery = includeHighRoles
 				? usersQuery.Where(userRole => userRole.Role <= courseRole)
 				: usersQuery.Where(userRole => userRole.Role == courseRole);
@@ -65,7 +127,7 @@ namespace Database.DataContexts
 			if (!onlyPrivileged)
 				return null;
 
-			IQueryable<UserRole> usersQuery = db.UserRoles;
+			var usersQuery = ToQueryableUserRoles();
 			if (courseId != null)
 				usersQuery = usersQuery.Where(userRole => userRole.CourseId == courseId);
 			return usersQuery.Select(userRole => userRole.UserId).Distinct().ToList();
