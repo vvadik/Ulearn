@@ -1,15 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
+using Microsoft.Extensions.FileProviders;
 
 namespace Ulearn.Core.Configuration
 {
 	public static class ApplicationConfiguration
 	{
-		public static T Read<T>(IDictionary<string, string> initialData, bool isAppsettingsJsonOptional=false) where T : AbstractConfiguration
+		private static T Read<T>(IDictionary<string, string> initialData, bool isAppsettingsJsonOptional=false) where T : AbstractConfiguration
 		{
 			var configuration = GetConfiguration(initialData, isAppsettingsJsonOptional);
-			return configuration.Get<T>();
+			var result = configuration.Get<T>();
+			DisposeConfiguration(configuration); // https://github.com/aspnet/Extensions/issues/786
+			return result;
+		}
+
+		private static void DisposeConfiguration(IConfigurationRoot configuration)
+		{
+			foreach (var provider in configuration.Providers.OfType<JsonConfigurationProvider>())
+				if (provider.Source.FileProvider is PhysicalFileProvider pfp)
+					pfp.Dispose();
 		}
 		
 		public static T Read<T>(bool isAppsettingsJsonOptional=false) where T : AbstractConfiguration
@@ -17,7 +29,7 @@ namespace Ulearn.Core.Configuration
 			return Read<T>(new Dictionary<string, string>(), isAppsettingsJsonOptional);
 		}
 
-		public static IConfiguration GetConfiguration(IDictionary<string, string> initialData, bool isAppsettingsJsonOptional=false)
+		private static IConfigurationRoot GetConfiguration(IDictionary<string, string> initialData, bool isAppsettingsJsonOptional=false)
 		{
 			var applicationPath = string.IsNullOrEmpty(Utils.WebApplicationPhysicalPath)
 				? AppDomain.CurrentDomain.BaseDirectory
