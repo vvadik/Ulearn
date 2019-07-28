@@ -32,10 +32,10 @@ namespace Ulearn.Core.Configuration
 
 		public static void BuildAppsettingsConfiguration(IConfigurationBuilder configurationBuilder)
 		{
-			configurationBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+			configurationBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: false);
 			var environmentName = Environment.GetEnvironmentVariable("UlearnEnvironmentName");
 			if(environmentName != null && environmentName.ToLower().Contains("local"))
-				configurationBuilder.AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true);
+				configurationBuilder.AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: false);
 		}
 		
 		public static IConfiguration GetConfiguration(bool isAppsettingsJsonOptional=false)
