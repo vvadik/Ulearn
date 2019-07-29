@@ -30,19 +30,23 @@ let accountPropTypes = PropTypes.shape({
 	accountProblems: PropTypes.arrayOf(PropTypes.object)
 }).isRequired;
 
-const LinkComponent = ({href, ...rest}) => (<Link to={href} {...rest} />);
+const LinkComponent = ({ href, ...rest }) => (<Link to={ href } { ...rest } />);
 
 class Header extends Component {
 	render() {
 		if (this.props.initializing) {
 			return (
-				<div className={styles["header"] + " header"}>
+				<div className={ styles["header"] + " header" }>
 					<Logo>
-						<span className={styles["visible-only-phone"]}><Icon name="Home" /></span>
-						<span className={styles["visible-at-least-tablet"]}>Ulearn.me</span>
+						<span className={ styles["visible-only-phone"] } onClick={ this.handleMenuClick }>
+							<Icon size={ 22 } name="Menu"/>
+						</span>
+						<span className={ styles["visible-at-least-tablet"] }>
+							Ulearn.me
+						</span>
 					</Logo>
 
-					<TocMenu />
+					{/*<TocMenu/>*/ }
 				</div>
 			)
 		}
@@ -73,38 +77,52 @@ class Header extends Component {
 
 		/* Div should have class .header because some legacy javascript code uses $('.header') for calculating header height */
 		return (
-			<div className={styles["header"] + " header"} id="header">
+			<div className={ styles["header"] + " header" } id="header">
 				<Logo>
-					<span className={styles["visible-only-phone"]}><Icon name="Home" /></span>
-					<span className={styles["visible-at-least-tablet"]}>Ulearn.me</span>
+					<span className={ styles["visible-only-phone"] } onClick={ this.handleMenuClick }>
+						<Icon size={ 22 } name="Menu"/>
+					</span>
+					<span className={ styles["visible-at-least-tablet"] }>
+						Ulearn.me
+					</span>
 				</Logo>
 
-				<TocMenu />
+				{/*<TocMenu/>*/ }
 
-				<div className={styles["visible-at-least-tablet"]}>
-					{this.props.account.isSystemAdministrator &&
-					<SysAdminMenu controllableCourseIds={controllableCourseIds} />}
-					{!this.props.account.isSystemAdministrator && controllableCourseIds.length > 0 &&
-					<MyCoursesMenu controllableCourseIds={controllableCourseIds} />}
-					{isCourseMenuVisible &&
-					<CourseMenu courseId={this.props.courses.currentCourseId} role={courseRole}
-								accesses={courseAccesses} />}
+				<div className={ styles["visible-at-least-tablet"] }>
+					{ this.props.account.isSystemAdministrator &&
+					<SysAdminMenu controllableCourseIds={ controllableCourseIds }/> }
+					{ !this.props.account.isSystemAdministrator && controllableCourseIds.length > 0 &&
+					<MyCoursesMenu controllableCourseIds={ controllableCourseIds }/> }
+					{ isCourseMenuVisible &&
+					<CourseMenu courseId={ this.props.courses.currentCourseId } role={ courseRole }
+								accesses={ courseAccesses }/> }
 				</div>
-				<div className={styles["visible-only-phone"]}>
+				<div className={ styles["visible-only-phone"] }>
 					<MobileCourseMenu
-						isSystemAdministrator={this.props.account.isSystemAdministrator}
-						controllableCourseIds={controllableCourseIds}
-						isCourseMenuVisible={isCourseMenuVisible}
-						courseId={isCourseMenuVisible ? this.props.courses.currentCourseId : ""}
-						role={courseRole}
-						accesses={courseAccesses}
+						isSystemAdministrator={ this.props.account.isSystemAdministrator }
+						controllableCourseIds={ controllableCourseIds }
+						isCourseMenuVisible={ isCourseMenuVisible }
+						courseId={ isCourseMenuVisible ? this.props.courses.currentCourseId : "" }
+						role={ courseRole }
+						accesses={ courseAccesses }
 					/>
 				</div>
 
-				<Menu account={this.props.account} />
+				<Menu account={ this.props.account }/>
 			</div>
 		)
 	}
+
+	handleMenuClick = () => {
+		const root = document.getElementById('courseRoot');
+
+		if (root.classList.contains('open')) {
+			root.classList.remove('open');
+		} else {
+			root.classList.add('open');
+		}
+	};
 
 	static mapStateToProps(state) {
 		return {
@@ -124,10 +142,10 @@ export default connect(Header.mapStateToProps)(Header);
 class Logo extends Component {
 	render() {
 		return (
-			<div className={styles["header__logo"]}>
-				<Link to="/">
-					{this.props.children}
-				</Link>
+			<div className={ styles["header__logo"] }>
+				<div className={ styles.headerElement }>
+					{ this.props.children }
+				</div>
 			</div>
 		)
 	}
@@ -148,12 +166,12 @@ class TocMenu extends Component {
 	render() {
 		const isInsideCourse = this.isInsideCourse();
 		return (
-			<div className={styles["visible-only-phone"]}>
+			<div className={ styles["visible-only-phone"] }>
 				{
 					isInsideCourse &&
-					<div className={styles["header__toc-menu"]}>
-                        <span className={styles["icon"]} onClick={this.onClick}>
-                            <Icon name="StructureTree" />
+					<div className={ styles["header__toc-menu"] }>
+                        <span className={ styles["icon"] } onClick={ this.onClick }>
+                            <Icon name="StructureTree"/>
                         </span>
 					</div>
 				}
@@ -169,12 +187,17 @@ class AbstractMyCoursesMenu extends Component {
 		courseIds = courseIds.filter(item => courseById[item] !== undefined);
 		let visibleCourseIds = courseIds.slice(0, AbstractMyCoursesMenu.VISIBLE_COURSES_COUNT);
 		let items = visibleCourseIds.filter(courseId => courseById.hasOwnProperty(courseId)).map(courseId =>
-			<MenuItem href={"/Course/" + courseId} key={courseId}
-					  component={LinkComponent}>{courseById[courseId].title}</MenuItem>
+			<MenuItem
+				href={ "/Course/" + courseId }
+				key={ courseId }
+				component={ LinkComponent }>{ courseById[courseId].title }
+			</MenuItem>
 		);
 		if (courseIds.length > visibleCourseIds.length || isSystemAdministrator)
-			items.push(<MenuItem href="/Admin/Courses" key="-course-list" component={LinkComponent}><strong>Все
-				курсы</strong></MenuItem>);
+			items.push(
+				<MenuItem href="/Admin/Courses" key="-course-list" component={ LinkComponent }>
+					<strong>Все курсы</strong>
+				</MenuItem>);
 		return items;
 	}
 
@@ -192,33 +215,49 @@ class AbstractMyCoursesMenu extends Component {
 class SysAdminMenu extends AbstractMyCoursesMenu {
 	static menuItems(courseIds, courseById) {
 		return [
-			<MenuItem href="/Account/List?role=sysAdmin" component={LinkComponent}
-					  key="Users">Пользователи</MenuItem>,
-			<MenuItem href="/Analytics/SystemStatistics" component={LinkComponent}
-					  key="Statistics">Статистика</MenuItem>,
-			<MenuItem href="/Sandbox" component={LinkComponent} key="Sandbox">Песочница C#</MenuItem>,
-			<MenuItem href="/Admin/StyleValidations" component={LinkComponent} key="StyleValidations">Стилевые ошибки
-				C#</MenuItem>,
-			<MenuSeparator key="SysAdminMenuSeparator" />,
-			<MenuHeader key="Courses">Курсы</MenuHeader>
+			<MenuItem href="/Account/List?role=sysAdmin" component={ LinkComponent } key="Users">
+				Пользователи
+			</MenuItem>,
+
+			<MenuItem href="/Analytics/SystemStatistics" component={ LinkComponent } key="Statistics">
+				Статистика
+			</MenuItem>,
+
+			<MenuItem href="/Sandbox" component={ LinkComponent } key="Sandbox">
+				Песочница C#
+			</MenuItem>,
+
+			<MenuItem href="/Admin/StyleValidations" component={ LinkComponent } key="StyleValidations">
+				Стилевые ошибки C#
+			</MenuItem>,
+
+			<MenuSeparator key="SysAdminMenuSeparator"/>,
+
+			<MenuHeader key="Courses">
+				Курсы
+			</MenuHeader>,
 		].concat(AbstractMyCoursesMenu._getCourseMenuItems(courseIds, courseById, true));
 	}
 
 	render() {
 		return (
-			<div className={styles["header__sysadmin-menu"]}>
+			<div className={ styles["header__sysadmin-menu"] }>
 				<DropdownMenu
 					caption={
 						<div>
-							<span className={styles["visible-only-phone"]}><span className={styles["icon"]}><Icon
-								name="DocumentGroup" /></span></span>
-							<span
-								className={`${styles["caption"]} ${styles["visible-at-least-tablet"]}`}>Администрирование <span
-								className={styles["caret"]} /></span>
+							<span className={ styles["visible-only-phone"] }>
+								<span className={ styles["icon"] }>
+									<Icon name="DocumentGroup"/>
+								</span>
+							</span>
+							<span className={ `${ styles["caption"] } ${ styles["visible-at-least-tablet"] }` }>
+								Администрирование
+								<span className={ styles["caret"] }/>
+							</span>
 						</div>
 					}
 				>
-					{SysAdminMenu.menuItems(this.props.controllableCourseIds, this.props.courses.courseById)}
+					{ SysAdminMenu.menuItems(this.props.controllableCourseIds, this.props.courses.courseById) }
 				</DropdownMenu>
 			</div>
 		)
@@ -234,19 +273,23 @@ class MyCoursesMenu extends AbstractMyCoursesMenu {
 
 	render() {
 		return (
-			<div className={styles["header__my-courses-menu"]}>
+			<div className={ styles["header__my-courses-menu"] }>
 				<DropdownMenu
 					caption={
 						<div>
-							<span className={styles["visible-only-phone"]}><span className={styles["icon"]}><Icon
-								name="DocumentGroup" /></span></span>
-							<span
-								className={`${styles["caption"]} ${styles["visible-at-least-tablet"]}`}>Мои курсы <span
-								className={styles["caret"]} /></span>
+							<span className={ styles["visible-only-phone"] }>
+								<span className={ styles["icon"] }>
+									<Icon name="DocumentGroup"/>
+								</span>
+							</span>
+							<span className={ `${ styles["caption"] } ${ styles["visible-at-least-tablet"] }` }>
+								Мои курсы
+								<span className={ styles["caret"] }/>
+							</span>
 						</div>
 					}
 				>
-					{MyCoursesMenu.menuItems(this.props.controllableCourseIds, this.props.courses.courseById)}
+					{ MyCoursesMenu.menuItems(this.props.controllableCourseIds, this.props.courses.courseById) }
 				</DropdownMenu>
 			</div>
 		)
@@ -258,68 +301,107 @@ MyCoursesMenu = connect(MyCoursesMenu.mapStateToProps)(MyCoursesMenu);
 class CourseMenu extends Component {
 	static menuItems(courseId, role, accesses) {
 		let items = [
-			<MenuItem href={"/Course/" + courseId} key="Course" component={LinkComponent}>Просмотр курса</MenuItem>,
-			<MenuSeparator key="CourseMenuSeparator1" />,
-			<MenuItem href={`/${courseId}/groups`} key="Groups" component={LinkComponent}>Группы</MenuItem>,
-			<MenuItem href={"/Analytics/CourseStatistics?courseId=" + courseId} key="CourseStatistics"
-					  component={LinkComponent}>Ведомость курса</MenuItem>,
-			<MenuItem href={"/Analytics/UnitStatistics?courseId=" + courseId} key="UnitStatistics"
-					  component={LinkComponent}>Ведомость модуля</MenuItem>,
-			<MenuItem href={"/Admin/Certificates?courseId=" + courseId} key="Certificates"
-					  component={LinkComponent}>Сертификаты</MenuItem>,
+			<MenuItem href={ "/Course/" + courseId } key="Course" component={ LinkComponent }>
+				Просмотр курса
+			</MenuItem>,
+
+			<MenuSeparator key="CourseMenuSeparator1"/>,
+
+			<MenuItem href={ `/${ courseId }/groups` } key="Groups" component={ LinkComponent }>
+				Группы
+			</MenuItem>,
+
+			<MenuItem href={ "/Analytics/CourseStatistics?courseId=" + courseId } key="CourseStatistics"
+					  component={ LinkComponent }>
+				Ведомость курса
+			</MenuItem>,
+
+			<MenuItem href={ "/Analytics/UnitStatistics?courseId=" + courseId } key="UnitStatistics"
+					  component={ LinkComponent }>
+				Ведомость модуля
+			</MenuItem>,
+
+			<MenuItem href={ "/Admin/Certificates?courseId=" + courseId } key="Certificates"
+					  component={ LinkComponent }>
+				Сертификаты
+			</MenuItem>,
 		];
 
 		let hasUsersMenuItem = role === 'courseAdmin' || accesses.indexOf('addAndRemoveInstructors') !== -1;
 		let hasCourseAdminMenuItems = role === 'courseAdmin';
 
 		if (hasUsersMenuItem || hasCourseAdminMenuItems)
-			items.push(<MenuSeparator key="CourseMenuSeparator2" />);
+			items.push(<MenuSeparator key="CourseMenuSeparator2"/>);
+
 		if (hasUsersMenuItem)
-			items.push(<MenuItem href={"/Admin/Users?courseId=" + courseId} key="Users" component={LinkComponent}>Студенты
-				и преподаватели</MenuItem>);
+			items.push(
+				<MenuItem href={ "/Admin/Users?courseId=" + courseId } key="Users" component={ LinkComponent }>
+					Студенты и преподаватели
+				</MenuItem>);
+
 		if (hasCourseAdminMenuItems)
 			items = items.concat([
-				<MenuItem href={"/Admin/Packages?courseId=" + courseId} key="Packages" component={LinkComponent}>Экспорт
-					и импорт курса</MenuItem>,
-				<MenuItem href={"/Admin/Units?courseId=" + courseId} key="Units"
-						  component={LinkComponent}>Модули</MenuItem>,
-				<MenuItem href={"/Grader/Clients?courseId=" + courseId} key="GraderClients"
-						  component={LinkComponent}>Клиенты
-					грейдера</MenuItem>
+				<MenuItem href={ "/Admin/Packages?courseId=" + courseId } key="Packages"
+						  component={ LinkComponent }>
+					Экспорт и импорт курса
+				</MenuItem>,
+
+				<MenuItem href={ "/Admin/Units?courseId=" + courseId } key="Units"
+						  component={ LinkComponent }>
+					Модули
+				</MenuItem>,
+
+				<MenuItem href={ "/Grader/Clients?courseId=" + courseId } key="GraderClients"
+						  component={ LinkComponent }>
+					Клиенты грейдера
+				</MenuItem>
 			]);
 
 		items = items.concat([
-			<MenuSeparator key="CourseMenuSeparator3" />,
-			<MenuItem href={"/Admin/Comments?courseId=" + courseId} key="Comments"
-					  component={LinkComponent}>Комментарии</MenuItem>,
-			<MenuItem href={"/Admin/CheckingQueue?courseId=" + courseId} key="ManualCheckingQueue"
-					  component={LinkComponent}>Код-ревью и проверка тестов</MenuItem>,
+			<MenuSeparator key="CourseMenuSeparator3"/>,
+
+			<MenuItem href={ "/Admin/Comments?courseId=" + courseId } key="Comments"
+					  component={ LinkComponent }>
+				Комментарии
+			</MenuItem>,
+
+			<MenuItem href={ "/Admin/CheckingQueue?courseId=" + courseId } key="ManualCheckingQueue"
+					  component={ LinkComponent }>
+				Код-ревью и проверка тестов
+			</MenuItem>,
 		]);
 
 		return items;
 	}
 
 	render() {
-		const {courseId, role, accesses} = this.props;
+		const { courseId, role, accesses } = this.props;
 		const courseById = this.props.courses.courseById;
 		const course = courseById[courseId];
-		if (typeof course === 'undefined')
+		if (typeof course === 'undefined') {
 			return null;
+		}
 
 		return (
-			<div className={styles["header__course-menu"]}>
+			<div className={ styles["header__course-menu"] }>
 				<DropdownMenu
-					caption={<div>
-						<span className={styles["visible-only-phone"]}><span className={styles["icon"]}><Icon
-							name="DocumentSolid" /></span></span>
-						<span className={`${styles["caption"]} ${styles["visible-at-least-tablet"]}`}
-							  title={course.title}><span
-							className={styles["courseName"]}>{course.title}</span> <span
-							className={styles["caret"]} /></span>
-					</div>}
-					menuWidth={300}
+					menuWidth={ 300 }
+					caption={
+						<div>
+						<span className={ styles["visible-only-phone"] }>
+							<span className={ styles["icon"] }>
+								<Icon name="DocumentSolid"/>
+							</span>
+						</span>
+							<span className={ `${ styles["caption"] } ${ styles["visible-at-least-tablet"] }` }
+								  title={ course.title }>
+							<span className={ styles["courseName"] }>{ course.title }
+							</span>
+							<span className={ styles["caret"] }/>
+						</span>
+						</div> }
 				>
-					{CourseMenu.menuItems(courseId, role, accesses)}
+					{ CourseMenu.menuItems(courseId, role, accesses) }
 				</DropdownMenu>
 			</div>
 		)
@@ -344,13 +426,16 @@ CourseMenu = connect(CourseMenu.mapStateToProps)(CourseMenu);
 class MobileCourseMenu extends AbstractMyCoursesMenu {
 	render() {
 		return (
-			<div className={styles["header__course-menu"]}>
+			<div className={ styles["header__course-menu"] }>
 				<DropdownMenu
-					caption={<span className={styles["icon"]}><Icon name="DocumentSolid" /></span>}
-					menuWidth={250}
+					menuWidth={ 250 }
+					caption={
+						<span className={ styles["icon"] }>
+							<Icon name="DocumentSolid"/>
+						</span> }
 				>
-					{this.props.isCourseMenuVisible ? CourseMenu.menuItems(this.props.courseId, this.props.role, this.props.accesses) : null}
-					{this.props.isCourseMenuVisible ? <MenuSeparator /> : null}
+					{ this.props.isCourseMenuVisible ? CourseMenu.menuItems(this.props.courseId, this.props.role, this.props.accesses) : null }
+					{ this.props.isCourseMenuVisible ? <MenuSeparator/> : null }
 					{
 						this.props.isSystemAdministrator
 							? SysAdminMenu.menuItems(this.props.controllableCourseIds, this.props.courses.courseById)
@@ -383,19 +468,19 @@ class Menu extends Component {
 
 		if (this.props.account.isAuthenticated) {
 			return (
-				<div className={styles["header__menu"]}>
-					<NotificationsMenu />
-					<ProfileLink account={this.props.account} />
-					<Separator />
-					<LogoutLink />
+				<div className={ styles["header__menu"] }>
+					<NotificationsMenu/>
+					<ProfileLink account={ this.props.account }/>
+					<Separator/>
+					<LogoutLink/>
 				</div>
 			)
 		} else {
 			return (
-				<div className={styles["header__menu"]}>
-					<RegistrationLink returnUrl={returnUrl} />
-					<Separator />
-					<LoginLink returnUrl={returnUrl} />
+				<div className={ styles["header__menu"] }>
+					<RegistrationLink returnUrl={ returnUrl }/>
+					<Separator/>
+					<LoginLink returnUrl={ returnUrl }/>
 				</div>
 			)
 		}
@@ -442,7 +527,7 @@ class NotificationsMenu extends Component {
 	}
 
 	_handleWindowSizeChange = () => {
-		this.setState({windowWidth: window.innerWidth});
+		this.setState({ windowWidth: window.innerWidth });
 	};
 
 	_handleClickOutside = (event) => {
@@ -474,7 +559,7 @@ class NotificationsMenu extends Component {
 	};
 
 	static _loadNotifications() {
-		return fetch("/Feed/NotificationsPartial", {credentials: "include"}).then(
+		return fetch("/Feed/NotificationsPartial", { credentials: "include" }).then(
 			response => response.text()
 		)
 	}
@@ -501,18 +586,18 @@ class NotificationsMenu extends Component {
 	}
 
 	render() {
-		const {windowWidth, isOpened, counter, isLoading, notificationsHtml} = this.state;
+		const { windowWidth, isOpened, counter, isLoading, notificationsHtml } = this.state;
 		const isMobile = windowWidth <= 767;
 		return (
-			<div className={isOpened ? styles["opened"] : ""} ref={node => this.ref = node}>
-				<NotificationsIcon counter={counter} onClick={this.onClick} />
+			<div className={ isOpened ? styles["opened"] : "" } ref={ node => this.ref = node }>
+				<NotificationsIcon counter={ counter } onClick={ this.onClick }/>
 				{
 					isOpened &&
-					<DropdownContainer getParent={() => findDOMNode(this)} offsetY={0} align="right"
-									   offsetX={isMobile ? -112 : 0}>
-						<div className={styles["dropdown-container"]}
-							 ref={node => this.dropdownContainerRef = node}>
-							<Notifications isLoading={isLoading} notifications={notificationsHtml} />
+					<DropdownContainer getParent={ () => findDOMNode(this) } offsetY={ 0 } align="right"
+									   offsetX={ isMobile ? -112 : 0 }>
+						<div className={ styles["dropdown-container"] }
+							 ref={ node => this.dropdownContainerRef = node }>
+							<Notifications isLoading={ isLoading } notifications={ notificationsHtml }/>
 						</div>
 					</DropdownContainer>
 				}
@@ -541,15 +626,15 @@ class NotificationsIcon extends Component {
 	render() {
 		return (
 			<div
-				className={`${styles["header__notifications-icon"]} ${this.props.counter === 0 ? styles["without-counter"] : ""}`}
-				onClick={this.props.onClick}>
-                <span className={styles["icon"]}>
-                    <Icon name="NotificationBell" />
+				className={ `${ styles["header__notifications-icon"] } ${ this.props.counter === 0 ? styles["without-counter"] : "" }` }
+				onClick={ this.props.onClick }>
+                <span className={ styles["icon"] }>
+                    <Icon name="NotificationBell"/>
                 </span>
 				{
 					this.props.counter > 0 &&
-					<span className={styles["counter"]}>
-                        {this.props.counter > 99 ? "99+" : this.props.counter}
+					<span className={ styles["counter"] }>
+                        { this.props.counter > 99 ? "99+" : this.props.counter }
                     </span>
 				}
 			</div>
@@ -568,16 +653,16 @@ class NotificationsIcon extends Component {
 
 class Notifications extends Component {
 	render() {
-		const {isLoading, notifications} = this.props;
+		const { isLoading, notifications } = this.props;
 		if (isLoading)
 			return (
-				<div className={styles["notifications__dropdown"]}>
-					<Loader type="normal" active={true} />
+				<div className={ styles["notifications__dropdown"] }>
+					<Loader type="normal" active={ true }/>
 				</div>
 			);
 		else
-			return <div className={styles["notifications__dropdown"]}
-						dangerouslySetInnerHTML={{__html: notifications}} />;
+			return <div className={ styles["notifications__dropdown"] }
+						dangerouslySetInnerHTML={ { __html: notifications } }/>;
 	}
 
 	static propTypes = {
@@ -609,30 +694,30 @@ class ProfileLink extends Component {
 	}
 
 	render() {
-		let icon = <Icon name="User" />;
+		let icon = <Icon name="User"/>;
 		let isProblem = this.props.account.accountProblems.length > 0;
 		if (isProblem) {
 			let firstProblem = this.props.account.accountProblems[0];
 			icon = (
-				<Tooltip trigger={this.state.tooltipTrigger} pos="bottom center" render={() => (
-					<div style={{width: '250px'}}>
-						{firstProblem.description}
+				<Tooltip trigger={ this.state.tooltipTrigger } pos="bottom center" render={ () => (
+					<div style={ { width: '250px' } }>
+						{ firstProblem.description }
 					</div>
-				)} onCloseClick={this.closeTooltip}>
-                    <span onMouseOver={this.openTooltip}>
-                        <Icon name="Warning" color="#f77" />
+				) } onCloseClick={ this.closeTooltip }>
+                    <span onMouseOver={ this.openTooltip }>
+                        <Icon name="Warning" color="#f77"/>
                     </span>
 				</Tooltip>
 			)
 		}
 
-		return (<div className={styles["header__profile-link"]}>
+		return (<div className={ styles["header__profile-link"] }>
 			<Link to="/Account/Manage">
-                <span className={styles["icon"]}>
-                    {icon}
+                <span className={ styles["icon"] }>
+                    { icon }
                 </span>
-				<span className={styles["username"]}>
-                    {this.props.account.visibleName || 'Профиль'}
+				<span className={ styles["username"] }>
+                    { this.props.account.visibleName || 'Профиль' }
                 </span>
 			</Link>
 		</div>)
@@ -645,7 +730,7 @@ class ProfileLink extends Component {
 
 class Separator extends Component {
 	render() {
-		return <div className={styles["header__separator"]} />
+		return <div className={ styles["header__separator"] }/>
 	}
 }
 
@@ -661,7 +746,12 @@ class LogoutLink extends Component {
 	}
 
 	render() {
-		return <div className={styles["header__logout-link"]}><button className={styles["header__logout-button"]} onClick={this.onClick}>Выйти</button></div>
+		return (
+			<div className={ styles["header__logout-link"] }>
+				<button className={ styles["header__logout-button"] } onClick={ this.onClick }>
+					Выйти
+				</button>
+			</div>)
 	}
 
 	static mapStateToProps(state) {
@@ -680,8 +770,8 @@ LogoutLink = connect(LogoutLink.mapStateToProps, LogoutLink.mapDispatchToProps)(
 class RegistrationLink extends Component {
 	render() {
 		return (
-			<div className={styles["header__registration-link"]}>
-				<Link to={"/Account/Register?returnUrl=" + (this.props.returnUrl || "/")}>Зарегистрироваться</Link>
+			<div className={ styles["header__registration-link"] }>
+				<Link to={ "/Account/Register?returnUrl=" + (this.props.returnUrl || "/") }>Зарегистрироваться</Link>
 			</div>
 		)
 	}
@@ -694,8 +784,8 @@ class RegistrationLink extends Component {
 class LoginLink extends Component {
 	render() {
 		return (
-			<div className={styles["header__login-link"]}>
-				<Link to={"/Login?returnUrl=" + (this.props.returnUrl || "/")}>Войти</Link>
+			<div className={ styles["header__login-link"] }>
+				<Link to={ "/Login?returnUrl=" + (this.props.returnUrl || "/") }>Войти</Link>
 			</div>
 		)
 	}

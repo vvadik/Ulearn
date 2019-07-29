@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+
 import UnitNavigation from "../Navigation/Unit/UnitNavigation";
 import CourseNavigation from "../Navigation/Course/CourseNavigation";
 import AnyPage from '../../../pages/AnyPage';
@@ -7,6 +8,7 @@ import UnitFlashcardsPage from '../../../pages/course/UnitFlashcardsPage';
 import CourseFlashcardsPage from '../../../pages/course/CourseFlashcardsPage';
 import { flashcards, constructPathToSlide } from '../../../consts/routes';
 import { SLIDETYPE } from '../../../consts/general';
+
 import styles from "./Course.less"
 
 class Course extends Component {
@@ -71,7 +73,7 @@ class Course extends Component {
 		const Page = this.findOpenedSlideType();
 
 		return (
-			<div className={ styles.root }>
+			<div id={ 'courseRoot' } className={ styles.root }>
 				{ onCourseNavigation ? this.renderCourseNavigation() : this.renderUnitNavigation() }
 				<main className={ styles.pageWrapper }>
 					<Page match={ this.props.match }/>
@@ -224,6 +226,7 @@ class Course extends Component {
 			onCourseNavigation: true,
 		});
 	};
+
 
 }
 
