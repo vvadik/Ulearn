@@ -1,9 +1,9 @@
 import { rateTypes } from "../../../consts/rateTypes";
 
-export default function mixFlashcards(sequence, maxTLast) {
-	return sequence.sort((first, second) => {
-		return calculateProbability(second) - calculateProbability(first);
-	});
+export default function getNextFlashcard(sequence, maxTLast) {
+	const probabilities = sequence.map(calculateProbability);
+	const indexOfHighestProbability = probabilities.indexOf(Math.max(...probabilities));
+	return sequence[indexOfHighestProbability];
 
 	function calculateProbability(flashcard) {
 		const f = mapRateTypeToNumber[flashcard.rate];

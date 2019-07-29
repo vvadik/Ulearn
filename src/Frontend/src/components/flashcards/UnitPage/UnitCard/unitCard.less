@@ -26,33 +26,33 @@
 
   border-radius: 10px;
   padding: 22px;
-  background: @blue;
+  background: @flashcardUnitBackgroundBlue;
 }
 
 .unitCardNext {
   transform: translateY((@cardsContainerHeight - @cardHeight)/2) scale(0.95, 0.95);
   z-index: -2;
 
-  background: darken(@blue, 10%);
+  background: darken(@flashcardUnitBackgroundBlue, 10%);
 }
 
 .unitCardLast {
   transform: scale(0.90, 0.90);
   z-index: -3;
 
-  background: darken(@blue, 15%);
+  background: darken(@flashcardUnitBackgroundBlue, 15%);
 }
 
 .successColor {
-  background: @successColor;
+  background: @flashcardUnitBackgroundGreen;
 }
 
 .successColor.unitCardNext {
-  background: darken(@successColor, 10%);
+  background: darken(@flashcardUnitBackgroundGreen, 10%);
 }
 
 .successColor.unitCardLast {
-  background: darken(@successColor, 15%);
+  background: darken(@flashcardUnitBackgroundGreen, 15%);
 }
 
 .unitCardTitle {

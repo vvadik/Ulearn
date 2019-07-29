@@ -16,17 +16,10 @@
   margin-bottom: 20px;
   margin-right: 20px;
   padding: 12px 18px;
-  background: @blue;
+  background: @flashcardUnitBackgroundBlue;
 
   font-family: @defaultFonts;
   color: @whiteSmoke;
-}
-
-@media (max-width: @maxPhoneWidth) {
-  .unitCard {
-    width: 100%;
-    margin-right: 0;
-  }
 }
 
 .unitCard:hover {
@@ -97,4 +90,15 @@
 
 .unitCard:hover .unitCardButton {
   display: block;
+}
+
+@media (max-width: @maxPhoneWidth) {
+  .unitCard {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .emptyUnitCard {
+    font-size: 20px;
+  }
 }

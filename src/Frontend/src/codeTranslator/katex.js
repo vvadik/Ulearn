@@ -5,6 +5,7 @@ export default function translateTextToKatex(element, additionalSettings) {
 
 	if (text && element.title !== tranformedTitle) {
 		element.title = tranformedTitle;
+		element.maxWidth = '90%';
 		katex.render(text, element, { ...additionalSettings, ...defaultSetting });
 	}
 }

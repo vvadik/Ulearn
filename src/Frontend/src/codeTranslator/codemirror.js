@@ -1,7 +1,7 @@
 import CodeMirror from 'codemirror';
 
 import 'codemirror/lib/codemirror';
-import 'codemirror/lib/codemirror.css';
+import '../codeTranslator/codemirror.less';
 
 import 'codemirror/mode/clike/clike';
 import 'codemirror/mode/javascript/javascript';
@@ -9,7 +9,7 @@ import 'codemirror/mode/javascript/javascript';
 export default function translateTextareaToCode(textarea, additionalSettings) {
 	const cm = CodeMirror.fromTextArea(textarea, { ...additionalSettings, ...defaultSettings });
 
-	cm.setSize('100%', '100%');
+	cm.setSize('auto', 'auto');
 	cm.setOption('lineNumbers', cm.lineCount() > 1);
 }
 

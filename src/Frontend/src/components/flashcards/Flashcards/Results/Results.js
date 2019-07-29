@@ -15,11 +15,13 @@ const resultsStyles = [
 
 function Results({ handleClick }) {
 	return (
-		<div className={ styles.resultsContainer }>
+		<div className={ styles.root }>
 			<p className={ styles.headerText }>
 				Оцените, на сколько хорошо вы знали ответ?
 			</p>
-			{ resultsStyles.map(convertToResultIcon) }
+			<div className={styles.resultsContainer}>
+				{ resultsStyles.map(convertToResultIcon) }
+			</div>
 			{ renderFooter() }
 		</div>
 	);

@@ -1,7 +1,7 @@
 @import "./../../../variables";
 
-@modalWidth: 1100px;
-@modalHeight: 600px;
+@modalMaxWidth: 1100px;
+@modalMaxHeight: 600px;
 @moveAnimationDuration: 0.7s;
 @textAppearAnimationDuration: 0.3s;
 @modalBackgroundColor: #fff;
@@ -20,73 +20,43 @@
   background-color: rgba(51, 51, 51, 0.8);
 }
 
-.frontTextContainer {
-  height: 90%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .questionFront {
   width: 100%;
-  max-height: 85%;
 
   font-size: 32px;
   font-family: @defaultFonts;
   text-align: center;
-  overflow: auto;
-  margin: 0;
+  margin: auto;
+
+  overflow-y: auto;
 }
 
 .showAnswerButtonContainer {
-  position: absolute;
-  bottom: 49px;
-  left: 57px;
-}
-
-.backWrapper {
-  height: 96%;
-
-  display: flex;
-  flex-direction: column;
+  position: relative;
 }
 
 .backTextContainer {
-  height: 95%;
+  max-width: 100%;
 
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-
-  margin-bottom: 10px;
+  margin: auto;
 
   font-family: @defaultFonts;
   font-size: 20px;
-  line-height: 24px;
+  line-height: 1.2;
   overflow: auto;
 
   animation: appear 300ms;
 }
 
 .questionBack {
-  width: 100%;
-  max-height: 100%;
-
-  margin-top: 15px;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
 
   text-align: center;
 
   font-family: @defaultFonts;
   font-size: 24px;
-  line-height: 24px;
+  line-height: 1.2;
   font-weight: 400;
-}
-
-.answerBack{
-  width: 100%;
-  max-height: 100%;
 }
 
 @keyframes appear {
@@ -109,10 +79,12 @@
 }
 
 .modal {
-  width: @modalWidth;
-  height: @modalHeight;
+  width: @modalMaxWidth;
+  height: @modalMaxHeight;
   max-width: 100%;
   max-height: 100%;
+
+  display: flex;
 
   position: absolute;
   top: 50%;
@@ -226,7 +198,9 @@
 }
 
 .wrapper {
-  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .controlGuideContainer {
@@ -234,9 +208,10 @@
 
   position: absolute;
   top: 50%;
-  transform: translate(0, @modalHeight/2);
+  transform: translate(0, @modalMaxHeight/2);
 
   margin: 0;
+
   color: @lightYellow;
   text-align: center;
   font-size: 14px;
@@ -246,10 +221,11 @@
 .controlGuideContainer > span {
   padding: 3px 9px;
   margin: 5px;
+  border-radius: 2px;
+  box-sizing: border-box;
+
   background: rgba(0, 0, 0, 0.5);
   border: 1px solid @lightYellow;
-  box-sizing: border-box;
-  border-radius: 2px;
   text-transform: uppercase;
 }
 
@@ -260,56 +236,49 @@
 }
 
 @media (max-width: @maxPhoneWidth) {
-  .controlGuideContainer {
-    display: none;
+  .closeButton {
+    top: 13px;
+    right: 8px;
   }
 
-  .textContainer {
-    height: 85%;
+  .showAnswerButtonContainer {
+    display: flex;
+    justify-content: center;
   }
 
   .modal {
-    height: 88%;
-    transform: translate(-50%, -44%);
+    height: calc(98vh - 40px - 30px);
+    transform: translate(-50%, -50%) translateY(40px);
     padding: 26px 10px;
+    border-radius: 0;
   }
 
   .secondModal {
-    transform: translate(-50%, -48%) scale(0.95);
+    transform: translate(-50%, -50%) translateY(40px) scale(0.95);
   }
 
   .thirdModal {
-    transform: translate(-50%, -52%) scale(0.9);
+    display: none;
   }
 
   .fourthModal {
     display: none;
   }
 
-  @keyframes moveFromSecondToFirst {
-    from {
-      transform: translate(-50%, -48%) scale(0.95);
-      z-index: @modalZIndex - 1;
-      background: darken(@modalBackgroundColor, 10%);
-    }
-    to {
-      transform: translate(-50%, -44%);
-      z-index: @modalZIndex;
-      background: @modalBackgroundColor;
-
-    }
+  .controlGuideContainer {
+    display: none;
   }
 
-  @keyframes moveFromThirdToSecond {
+  @keyframes moveFromSecondToFirst {
     from {
-      transform: translate(-50%, -52%) scale(0.9);
-      z-index: @modalZIndex - 3;
-      background: darken(@modalBackgroundColor, 18%);
-    }
-    to {
-      transform: translate(-50%, -48%) scale(0.95);
+      transform: translate(-50%, -50%) translateY(35px) scale(0.95);
       z-index: @modalZIndex - 1;
       background: darken(@modalBackgroundColor, 10%);
+    }
+    to {
+      transform: translate(-50%, -50%) translateY(40px);
+      z-index: @modalZIndex;
+      background: @modalBackgroundColor;
     }
   }
 }

@@ -47,8 +47,7 @@ class ShortQuestions extends Component {
 		return (
 			<ol ref={ (ref) => this.list = ref } className={ styles.questionsTextContainer }>
 				{ questionsWithAnswers.map(({ question, answer, showAnswer }, index) =>
-					<li
-						className={ styles.listElement }
+					<li className={ styles.listElement }
 						key={ index }
 						onClick={ () => this.handleQuestionClick(index) }>
 						<div dangerouslySetInnerHTML={ { __html: question } }/>
@@ -69,7 +68,9 @@ class ShortQuestions extends Component {
 		questionWithAnswer.showAnswer = !questionWithAnswer.showAnswer;
 
 		this.setState({
-			questionsWithAnswers: questionsWithAnswers
+			questionsWithAnswers: {
+				questionsWithAnswers,
+			}
 		})
 	};
 
@@ -82,7 +83,7 @@ class ShortQuestions extends Component {
 
 		this.setState({
 			showAllAnswers: !this.state.showAllAnswers,
-			questionsWithAnswers: questionsWithAnswers
+			questionsWithAnswers: questionsWithAnswers,
 		});
 	}
 }

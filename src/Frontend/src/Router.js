@@ -5,8 +5,6 @@ import AnyPage from "./pages/AnyPage";
 import GroupListPage from "./pages/course/groups/GroupListPage";
 import GroupPage from "./pages/course/groups/GroupPage";
 import Course from './pages/course/CoursePage';
-import UnitFlashcardsPage from "./pages/course/UnitFlashcardsPage";
-import CourseFlashcardsPage from "./pages/course/CourseFlashcardsPage";
 
 import {getQueryStringParameter} from "./utils";
 

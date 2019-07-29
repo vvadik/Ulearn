@@ -36,12 +36,13 @@ class FrontFlashcard extends Component {
 		const { showAnswer } = this.state;
 		const code = e.key;
 		const spaceChar = ' ';
+		const escapeChar = 'Escape';
 
 		if (code === spaceChar) {
 			this.showAnswer();
 		} else if (code >= 1 && code <= 5 && showAnswer) {
 			this.handleResultsClick(code);
-		} else if (code === 'Escape') {
+		} else if (code === escapeChar) {
 			onClose();
 		}
 	};
@@ -60,6 +61,16 @@ class FrontFlashcard extends Component {
 		const { unitTitle, question, answer, onClose } = this.props;
 		const { showAnswer } = this.state;
 
+		let content, control;
+
+		if (showAnswer) {
+			content = FrontFlashcard.renderBackContent(question, answer);
+			control = this.renderBackControl();
+		} else {
+			content = FrontFlashcard.renderFrontContent(question);
+			control = this.renderFrontControl();
+		}
+
 		return (
 			<div className={ styles.wrapper } ref={ ref => this.modal = ref }>
 				<button tabIndex={ 1 } className={ styles.closeButton } onClick={ onClose }>
@@ -68,21 +79,26 @@ class FrontFlashcard extends Component {
 				<h5 className={ styles.unitTitle }>
 					{ unitTitle }
 				</h5>
-				{ showAnswer ? this.renderBackFlashcard(question, answer) : this.renderFrontFlashcard(question) }
+				{ content }
+				{ control }
 			</div>
 		);
 	}
 
-	renderFrontFlashcard(question) {
+	static renderFrontContent(question) {
 		return (
-			<div className={ styles.frontTextContainer }>
-				<div className={ styles.questionFront }
-					 dangerouslySetInnerHTML={ { __html: question } }/>
-				<div className={ styles.showAnswerButtonContainer }>
-					<Button size='large' use='primary' onClick={ () => this.showAnswer() }>
-						Показать ответ
-					</Button>
-				</div>
+			<div className={ styles.questionFront }
+				 dangerouslySetInnerHTML={ { __html: question } }
+			/>
+		);
+	}
+
+	renderFrontControl() {
+		return (
+			<div className={ styles.showAnswerButtonContainer }>
+				<Button size='large' use='primary' onClick={ () => this.showAnswer() }>
+					Показать ответ
+				</Button>
 			</div>
 		);
 	}
@@ -94,15 +110,18 @@ class FrontFlashcard extends Component {
 		});
 	}
 
-	renderBackFlashcard(question, answer) {
+	static renderBackContent(question, answer) {
 		return (
-			<div className={ styles.backWrapper }>
-				<div className={ styles.backTextContainer }>
-					<div className={ styles.questionBack } dangerouslySetInnerHTML={ { __html: question } }/>
-					<div className={ styles.answerBack } dangerouslySetInnerHTML={ { __html: answer } }/>
-				</div>
-				<Results handleClick={ this.handleResultsClick }/>
+			<div className={ styles.backTextContainer }>
+				<div className={ styles.questionBack } dangerouslySetInnerHTML={ { __html: question } }/>
+				<div dangerouslySetInnerHTML={ { __html: answer } }/>
 			</div>
+		);
+	}
+
+	renderBackControl() {
+		return (
+			<Results handleClick={ this.handleResultsClick }/>
 		);
 	}
 }

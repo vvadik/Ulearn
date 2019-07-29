@@ -35,7 +35,7 @@ const mapStateToProps = (state, { match }) => {
 	return {
 		courseId,
 		unitTitle: unitInfo ? unitInfo.unitTitle : null,
-		flashcards: flashcards || null,
+		flashcards: flashcards,
 		flashcardsLoading: data.flashcardsLoading,
 		totalFlashcardsCount: flashcards.length,
 		statistics,

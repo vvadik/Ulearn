@@ -45,7 +45,7 @@ class CoursePage extends Component {
 
 					{ this.renderHeader() }
 
-					{ infoByUnits &&
+					{ !flashcardsLoading &&
 					<CourseCards
 						infoByUnits={ infoByUnits }
 						courseId={ courseId }

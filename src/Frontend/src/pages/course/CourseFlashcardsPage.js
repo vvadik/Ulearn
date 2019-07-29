@@ -9,7 +9,7 @@ const mapStateToProps = (state, { match }) => {
 	const { courseId } = match.params;
 	const data = state.courses;
 
-	const allFlashcards = [],
+	const flashcards = [],
 		statistics = {
 			[rateTypes.notRated]: 0,
 			[rateTypes.rate1]: 0,
@@ -25,7 +25,7 @@ const mapStateToProps = (state, { match }) => {
 		if (unlocked) {
 			for (const id of flashcardsIds) {
 				const flashcard = data.flashcardsByCourses[courseId][id];
-				allFlashcards.push(flashcard);
+				flashcards.push(flashcard);
 				statistics[flashcard.rate]++;
 			}
 		}
@@ -34,10 +34,10 @@ const mapStateToProps = (state, { match }) => {
 	return {
 		courseId,
 		infoByUnits,
-		flashcards: allFlashcards,
+		flashcards,
 		flashcardsLoading: data.flashcardsLoading,
 		statistics,
-		totalFlashcardsCount: allFlashcards.length,
+		totalFlashcardsCount: flashcards.length,
 	}
 };
 const mapDispatchToProps = (dispatch) => ({
