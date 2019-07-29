@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
@@ -9,33 +8,20 @@ namespace Ulearn.Core.Configuration
 {
 	public static class ApplicationConfiguration
 	{
-		private static T Read<T>(IDictionary<string, string> initialData, bool isAppsettingsJsonOptional=false) where T : AbstractConfiguration
+		private static readonly Lazy<IConfigurationRoot> configuration = new Lazy<IConfigurationRoot>(GetConfiguration);
+
+		public static T Read<T>() where T : AbstractConfiguration
 		{
-			var configuration = GetConfiguration(initialData, isAppsettingsJsonOptional);
-			var result = configuration.Get<T>();
-			DisposeConfiguration(configuration); // https://github.com/aspnet/Extensions/issues/786
-			return result;
+			var r = configuration.Value.Get<T>();
+			return r;
 		}
 
-		private static void DisposeConfiguration(IConfigurationRoot configuration)
-		{
-			foreach (var provider in configuration.Providers.OfType<JsonConfigurationProvider>())
-				if (provider.Source.FileProvider is PhysicalFileProvider pfp)
-					pfp.Dispose();
-		}
-		
-		public static T Read<T>(bool isAppsettingsJsonOptional=false) where T : AbstractConfiguration
-		{
-			return Read<T>(new Dictionary<string, string>(), isAppsettingsJsonOptional);
-		}
-
-		private static IConfigurationRoot GetConfiguration(IDictionary<string, string> initialData, bool isAppsettingsJsonOptional=false)
+		public static IConfigurationRoot GetConfiguration()
 		{
 			var applicationPath = string.IsNullOrEmpty(Utils.WebApplicationPhysicalPath)
 				? AppDomain.CurrentDomain.BaseDirectory
 				: Utils.WebApplicationPhysicalPath;
 			var configurationBuilder = new ConfigurationBuilder()
-				.AddInMemoryCollection(initialData)
 				.SetBasePath(applicationPath);
 			configurationBuilder.AddEnvironmentVariables();
 			BuildAppsettingsConfiguration(configurationBuilder);
@@ -44,17 +30,18 @@ namespace Ulearn.Core.Configuration
 
 		public static void BuildAppsettingsConfiguration(IConfigurationBuilder configurationBuilder)
 		{
-			configurationBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: false);
+			configurationBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 			var environmentName = Environment.GetEnvironmentVariable("UlearnEnvironmentName");
 			if(environmentName != null && environmentName.ToLower().Contains("local"))
-				configurationBuilder.AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: false);
+				configurationBuilder.AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true);
 		}
 		
-		public static IConfiguration GetConfiguration(bool isAppsettingsJsonOptional=false)
+		private static void DisposeConfiguration(IConfigurationRoot configuration) // https://github.com/aspnet/Extensions/issues/786
 		{
-			return GetConfiguration(new Dictionary<string, string>(), isAppsettingsJsonOptional);
+			foreach (var provider in configuration.Providers.OfType<JsonConfigurationProvider>())
+				if (provider.Source.FileProvider is PhysicalFileProvider pfp)
+					pfp.Dispose();
 		}
-		
 	}
 	
 	public abstract class AbstractConfiguration
