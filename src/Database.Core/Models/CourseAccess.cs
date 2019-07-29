@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -33,6 +34,9 @@ namespace Database.Models
 
 		[Required]
 		public bool IsEnabled { get; set; }
+		
+		[CanBeNull]
+		public string Comment { get; set; }
 	}
 
 	[JsonConverter(typeof(StringEnumConverter), true)]

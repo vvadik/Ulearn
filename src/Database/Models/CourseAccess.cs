@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using JetBrains.Annotations;
 
 namespace Database.Models
 {
@@ -39,6 +40,9 @@ namespace Database.Models
 		[Index("IDX_CourseAccess_ByCourseAndIsEnabled", 2)]
 		[Index("IDX_CourseAccess_ByCourseUserAndIsEnabled", 3)]
 		public bool IsEnabled { get; set; }
+
+		[CanBeNull]
+		public string Comment { get; set; }
 	}
 
 	public enum CourseAccessType : short

@@ -23,43 +23,13 @@ namespace Database.Repos.CourseRoles
 		{
 			var all = db.CourseRoles
 				.Where(x => x.UserId == userId)
-				.OrderByDescending(e => e.Id)
-				.GroupBy(x => x.Role)
+				.GroupBy(x => x.Role + x.CourseId)
+				.Select(gr=>gr.OrderByDescending(x=>x.Id))
 				.Select(x => x.FirstOrDefault())
 				.Where(x => x != null && (!x.IsEnabled.HasValue || x.IsEnabled.Value));
 			return all;
 		}
-		private IEnumerable<CourseRole> ToOriginalCourseRoles()
-		{
-			var userRolesByUsers = new Dictionary<string, Dictionary<CourseRoleType, CourseRole>>();
-			var userRoles = db.CourseRoles.ToList();
-			userRoles.Reverse();
-			foreach (var userRole in userRoles)
-			{
-				if (!userRolesByUsers.ContainsKey(userRole.UserId))
-				{
-					userRolesByUsers[userRole.UserId] = new Dictionary<CourseRoleType, CourseRole>();
-				}
 
-				var roles = userRolesByUsers[userRole.UserId];
-				if (!roles.ContainsKey(userRole.Role))
-				{
-					roles[userRole.Role] = userRole;
-				}
-			}
-
-			var result = new List<CourseRole>();
-			foreach (var pair in userRolesByUsers)
-			{
-				var currentUserRoles = pair.Value;
-				result.AddRange(currentUserRoles
-					.Select(x => x.Value)
-					.Where(x => !x.IsEnabled.HasValue || x.IsEnabled.Value));
-			}
-
-			return result;
-		}
-			
 		public async Task<Dictionary<string, CourseRoleType>> GetRolesAsync(string userId)
 		{
 			return await ToQueryableUserRoles(userId)
@@ -71,7 +41,7 @@ namespace Database.Repos.CourseRoles
 		{
 			var userRoles = await db.CourseRoles.ToListAsync();
 
-			var userRole = userRoles.LastOrDefault(u =>  u.Role == roleType && u.CourseId == courseId);
+			var userRole = userRoles.LastOrDefault(u =>  u.UserId==userId && u.Role == roleType && u.CourseId == courseId);
 			bool isEnabled;
 			if (userRole != null && (!userRole.IsEnabled.HasValue || userRole.IsEnabled.Value))
 				isEnabled = false;

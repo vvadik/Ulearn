@@ -25,9 +25,9 @@ namespace Database.DataContexts
 		private IQueryable<UserRole> ToQueryableUserRoles()
 		{
 			var all = db.UserRoles
-				.GroupBy(x => x.UserId)
-				.Select(gr => gr.GroupBy(x => x.Role).Select(x => x.OrderByDescending(e => e.Id).FirstOrDefault()))
-				.SelectMany(x => x)
+				.GroupBy(x => x.UserId + x.CourseId + x.Role)
+				.Select(gr => gr.OrderByDescending(x => x.Id))
+				.Select(x => x.FirstOrDefault())
 				.Where(x => x != null && (!x.IsEnabled.HasValue || x.IsEnabled.Value));
 			return all;
 		}
@@ -86,7 +86,7 @@ namespace Database.DataContexts
 
 		public async Task<bool> ToggleRole(string courseId, string userId, CourseRole role, string grantedById)
 		{
-			var userRole = db.UserRoles.Where(x => x.UserId == userId && x.Role == role && x.CourseId == courseId).MaxBy(x => x.Id);
+			var userRole = db.UserRoles.Where(x => x.UserId == userId && x.Role == role && x.CourseId == courseId).ToList().LastOrDefault();
 			bool isEnabled;
 			if (userRole != null && (!userRole.IsEnabled.HasValue || userRole.IsEnabled.Value))
 				isEnabled = false;
@@ -131,6 +131,34 @@ namespace Database.DataContexts
 			if (courseId != null)
 				usersQuery = usersQuery.Where(userRole => userRole.CourseId == courseId);
 			return usersQuery.Select(userRole => userRole.UserId).Distinct().ToList();
+		}
+
+		public Dictionary<string, Dictionary<CourseRole, List<string>>> GetCoursesForUsers()
+		{
+			return ToQueryableUserRoles().GroupBy(userRole => userRole.UserId)
+				.ToDictionary(
+					g => g.Key,
+					g => g
+						.GroupBy(userRole => userRole.Role)
+						.ToDictionary(
+							gg => gg.Key,
+							gg => gg
+								.Select(userRole => userRole.CourseId.ToLower())
+								.ToList()
+						)
+				);
+		}
+
+		public async Task<Dictionary<string, List<UserRole>>> GetUserRolesHistoryByCourseIds(string userId)
+		{
+			var result = new Dictionary<string, List<UserRole>>();
+			var groupedByCourseId = db.UserRoles.Where(x => x.UserId == userId).GroupBy(x => x.CourseId);
+			foreach (var userRoles in groupedByCourseId)
+			{
+				result[userRoles.Key] = userRoles.ToList();
+			}
+
+			return result;
 		}
 	}
 }

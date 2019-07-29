@@ -778,6 +778,10 @@
     <Compile Include="Migrations\201907250812064_UpdateUserRoles.Designer.cs">
       <DependentUpon>201907250812064_UpdateUserRoles.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201907290705298_UpdateCourseAccess.cs" />
+    <Compile Include="Migrations\201907290705298_UpdateCourseAccess.Designer.cs">
+      <DependentUpon>201907290705298_UpdateCourseAccess.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -1222,6 +1226,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201907250812064_UpdateUserRoles.resx">
       <DependentUpon>201907250812064_UpdateUserRoles.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201907290705298_UpdateCourseAccess.resx">
+      <DependentUpon>201907290705298_UpdateCourseAccess.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
