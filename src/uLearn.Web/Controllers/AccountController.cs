@@ -12,6 +12,7 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using Microsoft.AspNet.Identity;
+using Microsoft.VisualBasic.ApplicationServices;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
@@ -37,7 +38,7 @@ namespace uLearn.Web.Controllers
 		private readonly SystemAccessesRepo systemAccessesRepo;
 
 		private readonly string telegramSecret;
-		private static readonly WebApiConfiguration configuration;		
+		private static readonly WebApiConfiguration configuration;
 
 		private static readonly List<string> hijackCookies = new List<string>();
 
@@ -83,19 +84,7 @@ namespace uLearn.Web.Controllers
 
 		private UserListModel GetUserListModel(IEnumerable<UserRolesInfo> users)
 		{
-			var coursesForUsers = db.UserRoles
-				.GroupBy(userRole => userRole.UserId)
-				.ToDictionary(
-					g => g.Key,
-					g => g
-						.GroupBy(userRole => userRole.Role)
-						.ToDictionary(
-							gg => gg.Key,
-							gg => gg
-								.Select(userRole => userRole.CourseId.ToLower())
-								.ToList()
-						)
-				);
+			var coursesForUsers = userRolesRepo.GetCoursesForUsers();
 
 			var courses = User.GetControllableCoursesId().ToList();
 			var usersList = users.ToList();
@@ -113,7 +102,7 @@ namespace uLearn.Web.Controllers
 				CanViewAndToogleSystemAccesses = User.IsSystemAdministrator(),
 				CanViewProfiles = systemAccessesRepo.HasSystemAccess(currentUserId, SystemAccessType.ViewAllProfiles) || User.IsSystemAdministrator(),
 			};
-			
+
 			return model;
 		}
 
@@ -188,7 +177,7 @@ namespace uLearn.Web.Controllers
 			if (Request.HttpMethod == "POST")
 			{
 				var alreadyInGroup = await groupsRepo.AddUserToGroup(group.Id, User.Identity.GetUserId()) == null;
-				if (! alreadyInGroup)
+				if (!alreadyInGroup)
 					await NotifyAboutUserJoinedToGroup(group, User.Identity.GetUserId());
 
 				var courseId = group.CourseId;
@@ -258,9 +247,10 @@ namespace uLearn.Web.Controllers
 			{
 				/* Log out user everywhere: https://msdn.microsoft.com/en-us/library/dn497579%28v=vs.108%29.aspx?f=255&MSPPError=-2147217396 */
 				await userManager.UpdateSecurityStampAsync(userId);
-				
+
 				await usersRepo.DeleteUserAsync(user);
 			}
+
 			return RedirectToAction("List");
 		}
 
@@ -268,7 +258,7 @@ namespace uLearn.Web.Controllers
 		/* Now we use AccountController.Profile and don't use AccountController.Info, but this method exists for back compatibility */
 		public ActionResult Info(string userName)
 		{
-			var user = db.Users.FirstOrDefault(u => (u.Id == userName || u.UserName == userName) && ! u.IsDeleted);
+			var user = db.Users.FirstOrDefault(u => (u.Id == userName || u.UserName == userName) && !u.IsDeleted);
 			if (user == null)
 				return HttpNotFound();
 
@@ -286,15 +276,26 @@ namespace uLearn.Web.Controllers
 			return View(new UserCourseModel(course, user, db));
 		}
 
+		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
+		public async Task<ActionResult> CourseRightsHistory(string userId, string courseId)
+		{
+			var user = usersRepo.FindUserById(userId);
+			if (user == null)
+				return RedirectToAction("List");
+
+			var course = courseManager.GetCourse(courseId);
+			return View(new UserCourseHistoryModel(user, course, ToRolesHistoryModel(await userRolesRepo.GetUserRolesHistoryByCourseIds(userId))));
+		}
+
 		public async Task<ActionResult> Profile(string userId)
 		{
 			var user = usersRepo.FindUserById(userId);
 			if (user == null)
 				return HttpNotFound();
 
-			if (!systemAccessesRepo.HasSystemAccess(User.Identity.GetUserId(), SystemAccessType.ViewAllProfiles) && ! User.IsSystemAdministrator())
+			if (!systemAccessesRepo.HasSystemAccess(User.Identity.GetUserId(), SystemAccessType.ViewAllProfiles) && !User.IsSystemAdministrator())
 				return HttpNotFound();
-			
+
 			var logins = await userManager.GetLoginsAsync(userId);
 
 			var userCoursesIds = visitsRepo.GetUserCourses(user.Id).Select(s => s.ToLower());
@@ -305,6 +306,7 @@ namespace uLearn.Web.Controllers
 
 			var courseGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, maxCount: 10));
 			var courseArchivedGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, maxCount: 10, onlyArchived: true));
+			var courseRolesHistory = ToRolesHistoryModel(await userRolesRepo.GetUserRolesHistoryByCourseIds(userId));
 
 			return View(new ProfileModel
 			{
@@ -315,8 +317,32 @@ namespace uLearn.Web.Controllers
 				CourseArchivedGroups = courseArchivedGroups,
 				Certificates = certificates,
 				AllCourses = allCourses,
+				RolesHistory = courseRolesHistory
 			});
 		}
+
+		private Dictionary<string, List<RoleGrantModel>> ToRolesHistoryModel(Dictionary<string, List<UserRole>> historyByCourseIds)
+		{
+			var result = new Dictionary<string, List<RoleGrantModel>>();
+			foreach (var courseHistory in historyByCourseIds)
+			{
+				result[courseHistory.Key] = new List<RoleGrantModel>();
+				foreach (var a in courseHistory.Value)
+				{
+					result[courseHistory.Key].Add(new RoleGrantModel()
+					{
+						IsEnabled = a.IsEnabled ?? true,
+						GrantedBy = usersRepo.FindUserById(a.GrantedById).VisibleName,
+						Comment = a.Comment,
+						Timestamp = a.GrantTime ?? DateTime.MinValue,
+						Role = a.Role.ToString()
+					});
+				}
+			}
+
+			return result;
+		}
+
 
 		[AllowAnonymous]
 		public ActionResult Register(string returnUrl = null)
@@ -341,7 +367,7 @@ namespace uLearn.Web.Controllers
 					ModelState.AddModelError("Email", ManageMessageId.EmailAlreadyTaken.GetDisplayName());
 					return View(model);
 				}
-					
+
 				var user = new ApplicationUser { UserName = model.UserName, Email = model.Email, Gender = model.Gender };
 				var result = await userManager.CreateAsync(user, model.Password);
 				if (result.Succeeded)
@@ -379,7 +405,7 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Manage", new { Message = message });
 		}
 
-		public async Task<ActionResult> Manage(ManageMessageId? message, string provider="", string otherUserId="")
+		public async Task<ActionResult> Manage(ManageMessageId? message, string provider = "", string otherUserId = "")
 		{
 			ViewBag.StatusMessage = message?.GetAttribute<DisplayAttribute>().GetName();
 			ViewBag.IsStatusMessageAboutSocialLogins = message == ManageMessageId.LoginAdded || message == ManageMessageId.LoginRemoved;
@@ -388,6 +414,7 @@ namespace uLearn.Web.Controllers
 				var otherUser = await userManager.FindByIdAsync(otherUserId);
 				ViewBag.StatusMessage += $" {provider ?? ""}. Аккаунт уже привязан к пользователю {otherUser?.UserName ?? ""}.";
 			}
+
 			ViewBag.IsStatusError = message?.GetAttribute<IsErrorAttribute>()?.IsError ?? IsErrorAttribute.DefaultValue;
 			ViewBag.HasLocalPassword = ControllerUtils.HasPassword(userManager, User);
 			ViewBag.ReturnUrl = Url.Action("Manage");
@@ -412,6 +439,7 @@ namespace uLearn.Web.Controllers
 					{
 						return RedirectToAction("Manage", new { Message = ManageMessageId.PasswordChanged });
 					}
+
 					this.AddErrors(result);
 				}
 				else
@@ -432,6 +460,7 @@ namespace uLearn.Web.Controllers
 					{
 						return RedirectToAction("Manage", new { Message = ManageMessageId.PasswordSet });
 					}
+
 					this.AddErrors(result);
 				}
 				else
@@ -477,10 +506,10 @@ namespace uLearn.Web.Controllers
 		{
 			var linkedAccounts = userManager.GetLogins(User.Identity.GetUserId());
 			var user = userManager.FindById(User.Identity.GetUserId());
-			
+
 			ViewBag.User = user;
 			ViewBag.ShowRemoveButton = ControllerUtils.HasPassword(userManager, User) || linkedAccounts.Count > 1;
-			
+
 			return PartialView("_RemoveAccountPartial", linkedAccounts);
 		}
 
@@ -491,6 +520,7 @@ namespace uLearn.Web.Controllers
 				userManager.Dispose();
 				userManager = null;
 			}
+
 			base.Dispose(disposing);
 		}
 
@@ -535,7 +565,7 @@ namespace uLearn.Web.Controllers
 			[Display(Name = "Это имя уже занято, выберите другое")]
 			[IsError(true)]
 			NameAlreadyTaken,
-			
+
 			[Display(Name = "Этот адрес электронной почты уже используется другим пользователем")]
 			[IsError(true)]
 			EmailAlreadyTaken,
@@ -571,10 +601,10 @@ namespace uLearn.Web.Controllers
 			if (userModel.Render)
 			{
 				ModelState.Clear();
-				
+
 				return ChangeDetailsPartial();
 			}
-			
+
 			if (string.IsNullOrEmpty(userModel.Name))
 			{
 				return RedirectToAction("Manage", new { Message = ManageMessageId.NotAllFieldsFilled });
@@ -586,6 +616,7 @@ namespace uLearn.Web.Controllers
 				AuthenticationManager.Logout(HttpContext);
 				return RedirectToAction("Index", "Login");
 			}
+
 			var nameChanged = user.UserName != userModel.Name;
 			if (nameChanged && await userManager.FindByNameAsync(userModel.Name) != null)
 			{
@@ -617,16 +648,18 @@ namespace uLearn.Web.Controllers
 				await userManager.RemovePasswordAsync(user.Id);
 				await userManager.AddPasswordAsync(user.Id, userModel.Password);
 			}
+
 			await userManager.UpdateAsync(user);
 
 			if (emailChanged)
 				await ChangeEmail(user, user.Email).ConfigureAwait(false);
-			
+
 			if (nameChanged)
 			{
 				AuthenticationManager.Logout(HttpContext);
 				return RedirectToAction("Index", "Login");
 			}
+
 			return RedirectToAction("Manage");
 		}
 
@@ -678,7 +711,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[AllowAnonymous]
-		public async Task<ActionResult> ConfirmEmail(string email, string signature, string userId="")
+		public async Task<ActionResult> ConfirmEmail(string email, string signature, string userId = "")
 		{
 			metricSender.SendCount("email_confirmation.go_by_link_from_email");
 
@@ -691,7 +724,7 @@ namespace uLearn.Web.Controllers
 			{
 				await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: false).ConfigureAwait(false);
 			}
-			
+
 			if (user.Email != email || user.EmailConfirmed)
 				return RedirectToAction("Manage", new { Message = ManageMessageId.EmailAlreadyConfirmed });
 
@@ -701,7 +734,7 @@ namespace uLearn.Web.Controllers
 				log.Warn($"Invalid signature in confirmation email link, expected \"{correctSignature}\", actual \"{signature}\". Email is \"{email}\",");
 				return RedirectToAction("Manage", new { Message = ManageMessageId.ErrorOccured });
 			}
-			
+
 			/* Is there are exist other users with same confirmed email, then un-confirm their emails */
 			var usersWithSameEmail = usersRepo.FindUsersByEmail(email);
 			foreach (var otherUser in usersWithSameEmail)
@@ -767,7 +800,7 @@ namespace uLearn.Web.Controllers
 			var user = usersRepo.FindUserById(userId);
 			if (user == null)
 				return new HttpNotFoundResult();
-			
+
 			if (user.EmailConfirmed || !user.LastConfirmationEmailTime.HasValue)
 				return new HttpStatusCodeResult(HttpStatusCode.OK);
 
@@ -799,13 +832,13 @@ namespace uLearn.Web.Controllers
 			var user = await userManager.FindByIdAsync(userId);
 			if (user == null)
 				return HttpNotFound("User not found");
-			
+
 			CopyHijackedCookies(HttpContext.Request, HttpContext.Response, s => s, s => s + ".hijack", removeOld: false);
 			await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: false);
 
 			return Redirect("/");
 		}
-		
+
 		[HttpPost]
 		[AllowAnonymous]
 		public ActionResult ReturnHijack()
@@ -827,9 +860,9 @@ namespace uLearn.Web.Controllers
 				{
 					HttpOnly = true,
 					Domain = configuration.Web.CookieDomain,
-					Secure = configuration.Web.CookieSecure 
+					Secure = configuration.Web.CookieSecure
 				});
-				
+
 				if (removeOld)
 					response.Cookies.Add(new HttpCookie(actualCookie(cookieName), "")
 					{
@@ -848,6 +881,7 @@ namespace uLearn.Web.Controllers
 				if (request.Cookies.Get(cookieName + ".hijack") != null)
 					return true;
 			}
+
 			return false;
 		}
 	}
@@ -861,6 +895,17 @@ namespace uLearn.Web.Controllers
 		public Dictionary<string, Course> AllCourses { get; set; }
 		public Dictionary<string, string> CourseGroups { get; set; }
 		public Dictionary<string, string> CourseArchivedGroups { get; set; }
+
+		public Dictionary<string, List<RoleGrantModel>> RolesHistory;
+	}
+
+	public class RoleGrantModel
+	{
+		public string GrantedBy { get; set; }
+		public string Role { get; set; }
+		public DateTime Timestamp { get; set; }
+		public bool IsEnabled { get; set; }
+		public string Comment { get; set; }
 	}
 
 	public class IsErrorAttribute : Attribute

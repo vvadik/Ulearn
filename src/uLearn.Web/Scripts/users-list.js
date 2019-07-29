@@ -1,6 +1,7 @@
 ﻿function ToggleRoleOrCourseAccess(event, target, toggleClass) {
 	event.stopPropagation();
 	var $object = $(target);
+	
 	var url = $object.data("toggleUrl");
 	var token = $('#AntiForgeryTokenContainer input[name="__RequestVerificationToken"]').val();
 	$.ajax({

@@ -4,6 +4,7 @@
 @using uLearn.Web.Microsoft.Owin.Security.VK
 @using uLearn.Web.Views.Shared
 @using Ulearn.Common
+@using Ulearn.Core
 @using FormMethod = System.Web.Mvc.FormMethod
 @model uLearn.Web.Controllers.ProfileModel
 
@@ -13,7 +14,7 @@
 
 <div class="container">
 	<h2>@Model.User.VisibleName</h2>
-	
+
 	<div class="user-profile__info">
 		<div class="pull-left user-profile__avatar">
 			@UserAvatar.LargeAvatar(Model.User)
@@ -24,24 +25,26 @@
 				var vkLogin = Model.Logins.FirstOrDefault(l => l.LoginProvider == VkAuthenticationConstants.AuthenticationType);
 				if (vkLogin != null)
 				{
-					<div><b>ВКонтакте:</b> <a href="https://vk.com/id@(vkLogin.ProviderKey)" target="_blank" title="Откроется в новой вкладке">id@(vkLogin.ProviderKey)</a></div>
+					<div>
+						<b>ВКонтакте:</b> <a href="https://vk.com/id@(vkLogin.ProviderKey)" target="_blank" title="Откроется в новой вкладке">id@(vkLogin.ProviderKey)</a>
+					</div>
 				}
 
 				var konturPassportLogin = Model.Logins.FirstOrDefault(l => l.LoginProvider == KonturPassportConstants.AuthenticationType);
 				if (konturPassportLogin != null)
 				{
 					<div>
-                        <b>Контур.Паспорт:</b>
-                        @if (!string.IsNullOrEmpty(Model.User.KonturLogin))
-                        {
-	                        <a href="https://staff.skbkontur.ru/profile/@Model.User.KonturLogin" target="_blank" title="Откроется в новой вкладке">@Model.User.KonturLogin</a>
-	                        <span class="text-muted small">@konturPassportLogin.ProviderKey</span>
-                        }
-                        else
-                        {
-	                        <span class="text-muted small">@konturPassportLogin.ProviderKey</span>
-                        }
-                    </div>
+						<b>Контур.Паспорт:</b>
+						@if (!string.IsNullOrEmpty(Model.User.KonturLogin))
+						{
+							<a href="https://staff.skbkontur.ru/profile/@Model.User.KonturLogin" target="_blank" title="Откроется в новой вкладке">@Model.User.KonturLogin</a>
+							<span class="text-muted small">@konturPassportLogin.ProviderKey</span>
+						}
+						else
+						{
+							<span class="text-muted small">@konturPassportLogin.ProviderKey</span>
+						}
+					</div>
 				}
 
 				if (Model.User.HasTelegram)
@@ -59,20 +62,20 @@
 					</div>
 				}
 			}
-            
-            @if (User.IsSystemAdministrator())
-            {
-	            <div class="hijack__enter">
-                    @using (Html.BeginForm("Hijack", "Account", new { userId = Model.User.Id }, FormMethod.Post))
-                    {
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-warning btn-xs">Войти как @Model.User.VisibleName</button>
-                    }
-                </div>
-            }
-        </div>
+
+			@if (User.IsSystemAdministrator())
+			{
+				<div class="hijack__enter">
+					@using (Html.BeginForm("Hijack", "Account", new { userId = Model.User.Id }, FormMethod.Post))
+					{
+						@Html.AntiForgeryToken()
+						<button type="submit" class="btn btn-warning btn-xs">Войти как @Model.User.VisibleName</button>
+					}
+				</div>
+			}
+		</div>
 	</div>
-	
+
 	<div class="user-profile__courses">
 		<h2>Статистика по&nbsp;курсам</h2>
 		@if (Model.UserCourses.Count == 0)
@@ -90,18 +93,35 @@
 							Группы: @Model.CourseGroups[course.Id]
 						</div>
 					}
-                    @if (!string.IsNullOrEmpty(Model.CourseArchivedGroups[course.Id]))
-                    {
-	                    <div title="Архивные группы, в которых состоит студент" class="text-muted">
-                            Архивные: @Model.CourseArchivedGroups[course.Id]
-                        </div>
-                    }
-					
+					@if (!string.IsNullOrEmpty(Model.CourseArchivedGroups[course.Id]))
+					{
+						<div title="Архивные группы, в которых состоит студент" class="text-muted">
+							Архивные: @Model.CourseArchivedGroups[course.Id]
+						</div>
+					}
+
 				</li>
 			}
 		</ol>
 	</div>
-	
+
+	<div class="user-profile__rights-history">
+		<h2>История назначений ролей и прав</h2>
+		@if (Model.RolesHistory.Count == 0)
+		{
+			<p class="help-block">Нет курсов</p>
+		}
+		<ol>
+			@foreach (var hist in Model.RolesHistory)
+			{
+				var course = Model.AllCourses[hist.Key];
+				<li>
+					@Html.ActionLink(course.Title, "CourseRightsHistory", new { userId = Model.User.Id, courseId = course.Id })
+				</li>
+			}
+		</ol>
+	</div>
+
 	<div class="user-profile__certificates">
 		<h2>
 			@Html.ActionLink("Сертификаты", "Index", "Certificates", new { userId = Model.User.Id }, new { })
@@ -114,14 +134,14 @@
 			@foreach (var certificate in Model.Certificates)
 			{
 				<li>
-                    @Html.RouteLink(Model.AllCourses[certificate.Template.CourseId].Title, "Certificate", new { certificateId = certificate.Id }),
-                    выдал@(certificate.Instructor.Gender.ChooseEnding()) @certificate.Instructor.VisibleName
+					@Html.RouteLink(Model.AllCourses[certificate.Template.CourseId].Title, "Certificate", new { certificateId = certificate.Id }),
+					выдал@(certificate.Instructor.Gender.ChooseEnding()) @certificate.Instructor.VisibleName
 					@certificate.Timestamp.ToAgoPrettyString()
 				</li>
 			}
 		</ol>
 	</div>
-	
+
 	<div class="user-profile__password-reset">
 		@if (User.IsSystemAdministrator())
 		{

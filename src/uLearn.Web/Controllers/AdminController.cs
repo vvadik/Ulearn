@@ -1399,9 +1399,9 @@ namespace uLearn.Web.Controllers
 				return Json(new { status = "error", message = errorMessage });
 
 			if (isEnabled)
-				await coursesRepo.GrantAccess(courseId, userId, accessType, currentUserId);
+				await coursesRepo.GrantAccess(courseId, userId, accessType, currentUserId, "");
 			else
-				await coursesRepo.RevokeAccess(courseId, userId, accessType);
+				await coursesRepo.RevokeAccess(courseId, userId, accessType, currentUserId, "");
 
 			return Json(new { status = "ok" });
 		}

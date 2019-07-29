@@ -1,0 +1,31 @@
+@model UserCourseHistoryModel
+
+@{
+	ViewBag.Title = "User Course Stats";
+}
+
+<div class="container">
+	<h2 class="space-after">@Model.User.VisibleName — @Model.Course.Title</h2>
+
+	<table class="table">
+		<tr>
+			<th style="text-align: center !important">Кем выданы</th>
+			<th style="text-align: center !important">Роль</th>
+			<th style="text-align: center !important">Комментарий</th>
+			<th style="text-align: center !important">Назначена/отозвана</th>
+			<th style="text-align: center !important">Дата</th>
+		</tr>
+		@foreach (var grant in Model.UserRightsHistory[Model.Course.Id])
+		{
+			var enabled = grant.IsEnabled ? "Выдана" : "Отозвана";
+			<tr style="text-align: center">
+				<td style="text-align: left">"@grant.GrantedBy"</td>
+				<td title="@grant.Role.ToString()">"@grant.Role.ToString()"</td>
+				<td title="title">@grant.Comment</td>
+				<td title="Title">@enabled</td>
+				<td title="Title">@grant.Timestamp</td>
+			</tr>
+		}
+
+	</table>
+</div>
