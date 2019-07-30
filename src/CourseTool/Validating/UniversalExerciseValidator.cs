@@ -37,7 +37,7 @@ namespace uLearn.CourseTool.Validating
 			
 			ReportErrorIfWrongAnswerExistsButNotBuildingOrPassesTests();
 			
-			if (ex.StudentZipIsCompilable)
+			if (ex.CheckInitialSolution)
 				ReportErrorIfInitialCodeIsSolutionOrVerdictNotOk();
 		}
 		
@@ -113,7 +113,7 @@ namespace uLearn.CourseTool.Validating
 		private void CheckBuildAndTests(string code, string fileDescription, bool shouldPassTests)
 		{
 			var result = new DockerSandboxRunner().Run(ex.CreateSubmission(Utils.NewNormalizedGuid(), code));
-			if (!ReportSlideError(result.Verdict != Verdict.Ok, $"{fileDescription} verdict is not OK. RunResult = {result}"))
+			if (!ReportSlideError(ex.ExerciseType == ExerciseType.CheckOutput && result.Verdict != Verdict.Ok, $"{fileDescription} verdict is not OK. RunResult = {result}"))
 			{
 				var not = shouldPassTests ? "not " : "";
 				ReportSlideError(shouldPassTests ^ ex.IsCorrectRunResult(result), $"{fileDescription} is {not}solution. RunResult = {result}. " +

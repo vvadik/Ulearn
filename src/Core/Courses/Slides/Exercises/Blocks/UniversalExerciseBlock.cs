@@ -38,8 +38,8 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		[XmlElement("excludePathForStudent")]
 		public string[] PathsToExcludeForStudent { get; set; } // Шаблоны путей до файлов внутри ExerciseDirName. Нужно вручную учитывать папку src, если путь от корня
 		
-		[XmlElement("studentZipIsCompilable")]
-		public bool StudentZipIsCompilable { get; set; } = true;
+		[XmlElement("checkInitialSolution")]
+		public bool CheckInitialSolution { get; set; } = true;
 		
 		[XmlAttribute("noStudentZip")] // Не отдавать zip студенту
 		public bool NoStudentZip { get; set; }
@@ -133,6 +133,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			ExerciseInitialCode = NoStudentZip
 				? GetNoStudentZipInitialCode()
 				: ExerciseInitialCode ?? "// Вставьте сюда финальное содержимое файла " + UserCodeFilePath;
+			CheckForPlagiarism = false;
 			yield return this;
 
 			var correctSolution = GetCorrectSolution();
