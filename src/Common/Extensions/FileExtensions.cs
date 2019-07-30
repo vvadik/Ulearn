@@ -63,32 +63,6 @@ namespace Ulearn.Common.Extensions
 			throw new Exception("Can't find file " + filepath + " in " + di.FullName);
 		}
 
-		/// <param name="excludeCriterias"><see cref="M:Ionic.Zip.ZipFile.AddSelectedFiles(System.String)" /></param>
-		public static byte[] ToZip(this DirectoryInfo dirInfo, IEnumerable<string> excludeCriterias, IEnumerable<FileContent> toUpdate = null,
-			IEnumerable<DirectoryInfo> toUpdateDirectories = null)
-		{
-			using (var zip = new ZipFile())
-			{
-				zip.AddDirectory(dirInfo.FullName);
-				var entriesToRemove = excludeCriterias
-					.Select(zip.SelectEntries)
-					.SelectMany(x => x)
-					.ToList();
-				zip.RemoveEntries(entriesToRemove);
-				if(toUpdateDirectories != null)
-					foreach (var dir in toUpdateDirectories)
-						zip.AddDirectory(dir.FullName);
-				foreach (var zipUpdateData in toUpdate ?? new List<FileContent>())
-					zip.UpdateEntry(zipUpdateData.Path, zipUpdateData.Data);
-				using (var ms = new MemoryStream())
-				{
-					zip.Save(ms);
-					return ms.ToArray();
-				}
-			}
-		}
-
-		
 		public static bool IsInDirectory(this FileSystemInfo fileOrDirectory, DirectoryInfo directory)
 		{
 			return fileOrDirectory.FullName.ToLower().StartsWith(directory.FullName.ToLower());

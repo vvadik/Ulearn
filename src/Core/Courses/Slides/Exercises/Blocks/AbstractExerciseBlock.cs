@@ -5,6 +5,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
+using Ionic.Zip;
+using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Model.Edx.EdxComponents;
@@ -152,6 +154,31 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			}
 
 			throw new InvalidOperationException($"Unknown exercise type for checking: {ExerciseType}");
+		}
+		
+		/// <param name="excludeCriterias"><see cref="M:Ionic.Zip.ZipFile.AddSelectedFiles(System.String)" /></param>
+		public static byte[] ToZip(DirectoryInfo exerciseDirectory, IEnumerable<string> excludeCriterias, IEnumerable<FileContent> filesToUpdate = null,
+			IEnumerable<DirectoryInfo> directoriesToInclude = null)
+		{
+			using (var zip = new ZipFile())
+			{
+				if(directoriesToInclude != null)
+					foreach (var dir in directoriesToInclude)
+						zip.AddDirectory(dir.FullName);
+				zip.AddDirectory(exerciseDirectory.FullName);
+				var entriesToRemove = excludeCriterias
+					.Select(zip.SelectEntries)
+					.SelectMany(x => x)
+					.ToList();
+				zip.RemoveEntries(entriesToRemove);
+				foreach (var zipUpdateData in filesToUpdate ?? new List<FileContent>())
+					zip.UpdateEntry(zipUpdateData.Path, zipUpdateData.Data);
+				using (var ms = new MemoryStream())
+				{
+					zip.Save(ms);
+					return ms.ToArray();
+				}
+			}
 		}
 	}
 

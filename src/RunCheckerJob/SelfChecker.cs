@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
+using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.RunCheckerJobApi;
 
 namespace RunCheckerJob
@@ -26,7 +27,7 @@ namespace RunCheckerJob
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 			var imageName = sandboxDir.Name;
 			var srcDirectory = new DirectoryInfo(Path.GetFullPath(Path.Combine(sandboxDir.FullName, "sample/src/")));
-			var zipBytes = srcDirectory.ToZip(new []{"node_modules", ".idea"});
+			var zipBytes = AbstractExerciseBlock.ToZip(srcDirectory, new []{"node_modules", ".idea"});
 			var submissionFile = new FileInfo(Path.GetFullPath(Path.Combine(sandboxDir.FullName, "sample/submission.json")));
 			var submission = JsonConvert.DeserializeObject<CommandRunnerSubmission>(File.ReadAllText(submissionFile.FullName));
 			submission.Id = Utils.NewNormalizedGuid();

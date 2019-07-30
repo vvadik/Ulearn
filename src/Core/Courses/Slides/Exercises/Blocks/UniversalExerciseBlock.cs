@@ -199,7 +199,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 				.Select(pathToInclude => new DirectoryInfo(Path.Combine(ExerciseDirectory.FullName, pathToInclude)));
 
 			var toUpdate = GetCodeFile(code).ToList();
-			var zipBytes = ExerciseDirectory.ToZip(excluded, toUpdate, toUpdateDirectories);
+			var zipBytes = ToZip(ExerciseDirectory, excluded, toUpdate, toUpdateDirectories);
 			log.Info($"Собираю zip-архив для проверки: zip-архив собран, {zipBytes.Length} байтов");
 			return zipBytes;
 		}
@@ -226,7 +226,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			
 			var toUpdate = ReplaceWithInitialFiles().ToList();
 			
-			var zipBytes = ExerciseDirectory.ToZip(excluded, toUpdate);
+			var zipBytes = ToZip(ExerciseDirectory, excluded, toUpdate);
 
 			log.Info($"Собираю zip-архив для студента: zip-архив собран, {zipBytes.Length} байтов");
 			return zipBytes;
