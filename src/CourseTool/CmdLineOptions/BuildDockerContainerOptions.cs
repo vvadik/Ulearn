@@ -1,7 +1,9 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using CommandLine;
+using Ulearn.Common;
 
 namespace uLearn.CourseTool.CmdLineOptions
 {
@@ -10,6 +12,17 @@ namespace uLearn.CourseTool.CmdLineOptions
 	{
 		public override void DoExecute()
 		{
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				Console.WriteLine("You need to run sandboxes/build.sh on non-Windows");
+				return;
+			}
+			var dockerExistsOnPath = EnvironmentVariablesUtils.ExistsOnPath("docker.exe");
+			if (dockerExistsOnPath)
+			{
+				Console.WriteLine("Docker not found in PATH");
+				return;
+			}
 			var pathToBuildBat = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetAssembly(typeof(BuildDockerContainerOptions)).Location), "sandboxes/build.bat");
 			var process = new Process
 			{

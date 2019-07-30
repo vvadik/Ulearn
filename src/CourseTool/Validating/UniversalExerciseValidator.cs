@@ -1,5 +1,7 @@
 using System.IO;
+using System.Runtime.InteropServices;
 using RunCheckerJob;
+using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses.Slides.Exercises;
@@ -32,11 +34,17 @@ namespace uLearn.CourseTool.Validating
 				return;
 			
 			ReportErrorsInRegion();
-			
+
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && !EnvironmentVariablesUtils.ExistsOnPath("docker.exe"))
+			{
+				ReportWarning("Docker not found in PATH");
+				return;
+			}
+
 			ReportErrorIfSolutionNotBuildingOrNotPassesTests();
-			
+
 			ReportErrorIfWrongAnswerExistsButNotBuildingOrPassesTests();
-			
+
 			if (ex.CheckInitialSolution)
 				ReportErrorIfInitialCodeIsSolutionOrVerdictNotOk();
 		}
