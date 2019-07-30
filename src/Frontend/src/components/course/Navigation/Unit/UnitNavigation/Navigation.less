@@ -1,5 +1,9 @@
 @import "../../../../../variables.less";
 
+@rootZIndex: 10;
+@contentZIndex: 3;
+@overlayZIndex: @contentZIndex - 1;
+
 .root {
   position: fixed;
   width: 250px;
@@ -16,7 +20,29 @@
     .root {
       left: 0;
     }
+
+    .overlay {
+      opacity: 1;
+      left: 0;
+      right: 0;
+    }
   }
+}
+
+.overlay {
+  position: fixed;
+  z-index: @overlayZIndex;
+
+  left: 100vw;
+  top: 0;
+  bottom: 0;
+  right: 0;
+
+  opacity: 0;
+
+  transition: opacity 300ms ease-in-out;
+
+  background-color: rgba(51, 51, 51, 0.8);
 }
 
 .contentWrapper {
@@ -29,10 +55,14 @@
   bottom: 0;
   max-height: calc(100vh - @headerHeight);
   background: #ffffff;
-  z-index: 3;
+  z-index: @contentZIndex;
 }
 
 @media (min-width: @maxPhoneWidth) {
+  .overlay {
+    display: none;
+  }
+
   .root {
     position: relative;
     left: 0;

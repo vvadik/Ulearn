@@ -1,6 +1,7 @@
 import { combineReducers } from "redux";
 import courseReducer from "./course";
 import userReducer from "./user";
+import navigationReducer from "./navigation";
 
 const initialAccountState = {
 	isAuthenticated: false,
@@ -14,7 +15,7 @@ const initialAccountState = {
 function account(state = initialAccountState, action) {
 	switch (action.type) {
 		case 'ACCOUNT__USER_INFO_UPDATED':
-			let newState = {...state};
+			let newState = { ...state };
 			newState.isAuthenticated = action.isAuthenticated;
 			if (newState.isAuthenticated) {
 				newState.id = action.id;
@@ -66,7 +67,8 @@ const rootReducer = combineReducers({
 	account,
 	courses: courseReducer,
 	user: userReducer,
-	notifications
+	notifications,
+	navigation: navigationReducer,
 });
 
 export default rootReducer;

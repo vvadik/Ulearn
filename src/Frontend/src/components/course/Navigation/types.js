@@ -16,7 +16,9 @@ export const menuItemType = {
 		isLastItem: PropTypes.bool,
 		connectToPrev: PropTypes.bool,
 		connectToNext: PropTypes.bool,
-	})
+	}),
+
+	toggleNavigation: PropTypes.func,
 };
 
 

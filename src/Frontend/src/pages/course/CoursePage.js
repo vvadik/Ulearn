@@ -4,7 +4,7 @@ import { loadUserProgress, userProgressUpdate } from "../../actions/user";
 
 import Course from '../../components/course/Course';
 
-const mapStateToProps = (state, {match}) => {
+const mapStateToProps = (state, { match }) => {
 	const courseId = match.params.courseId;
 	const slideId = match.params.slideId;
 	const courseInfo = state.courses.fullCoursesInfo[courseId];
@@ -15,6 +15,7 @@ const mapStateToProps = (state, {match}) => {
 		units: mapCourseInfoToUnits(courseInfo),
 		isAuthenticated: state.account.isAuthenticated,
 		progress: state.user.progress[courseId],
+		navigationOpened: state.navigation.opened,
 	};
 };
 const mapDispatchToProps = (dispatch) => ({

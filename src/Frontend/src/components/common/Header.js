@@ -14,6 +14,7 @@ import { findDOMNode } from "react-dom"
 import styles from './Header.less';
 
 import { getQueryStringParameter } from "../../utils";
+import { toggleNavigation } from "../../actions/navigation";
 
 import api from "../../api"
 
@@ -38,7 +39,7 @@ class Header extends Component {
 			return (
 				<div className={ styles["header"] + " header" }>
 					<Logo>
-						<span className={ styles["visible-only-phone"] } onClick={ this.handleMenuClick }>
+						<span className={ styles["visible-only-phone"] }>
 							<Icon size={ 22 } name="Menu"/>
 						</span>
 						<span className={ styles["visible-at-least-tablet"] }>
@@ -79,9 +80,7 @@ class Header extends Component {
 		return (
 			<div className={ styles["header"] + " header" } id="header">
 				<Logo>
-					<span className={ styles["visible-only-phone"] } onClick={ this.handleMenuClick }>
-						<Icon size={ 22 } name="Menu"/>
-					</span>
+					{ isInsideCourse() && <NavMenuComponent/> }
 					<span className={ styles["visible-at-least-tablet"] }>
 						Ulearn.me
 					</span>
@@ -114,16 +113,6 @@ class Header extends Component {
 		)
 	}
 
-	handleMenuClick = () => {
-		const root = document.getElementById('courseRoot');
-
-		if (root.classList.contains('open')) {
-			root.classList.remove('open');
-		} else {
-			root.classList.add('open');
-		}
-	};
-
 	static mapStateToProps(state) {
 		return {
 			account: state.account,
@@ -131,13 +120,20 @@ class Header extends Component {
 		}
 	}
 
+	static mapDispatchToProps(dispatch) {
+		return {
+			toggleNavigation: () => dispatch(toggleNavigation()),
+		}
+	}
+
 	static propTypes = {
 		account: accountPropTypes,
-		initializing: PropTypes.bool.isRequired
+		initializing: PropTypes.bool.isRequired,
+		toggleNavigation: PropTypes.func,
 	}
 }
 
-export default connect(Header.mapStateToProps)(Header);
+export default connect(Header.mapStateToProps, Header.mapDispatchToProps)(Header);
 
 class Logo extends Component {
 	render() {
@@ -151,34 +147,40 @@ class Logo extends Component {
 	}
 }
 
-class TocMenu extends Component {
-	onClick() {
-		const $ = window.jQuery;
-		$('.side-bar').collapse('toggle');
-	}
+const isInsideCourse = () => {
+	const pathname = window.location.pathname;
+	return pathname
+		.toLowerCase()
+		.startsWith('/course/');
+};
 
-	isInsideCourse() {
-		/* Is current url is like /Course/<courseId/... */
-		const pathname = window.location.pathname;
-		return pathname.startsWith('/Course/');
-	}
-
-	render() {
-		const isInsideCourse = this.isInsideCourse();
-		return (
-			<div className={ styles["visible-only-phone"] }>
-				{
-					isInsideCourse &&
-					<div className={ styles["header__toc-menu"] }>
-                        <span className={ styles["icon"] } onClick={ this.onClick }>
-                            <Icon name="StructureTree"/>
-                        </span>
-					</div>
-				}
+function NavMenu({ toggleNavigation }) {
+	return (
+		<div className={ styles["visible-only-phone"] }>
+			<div className={ styles["header__toc-menu"] }>
+				<span className={ styles["visible-only-phone"] } onClick={ toggleNavigation }>
+					<Icon size={ 22 } name="Menu"/>
+				</span>
 			</div>
-		)
-	}
+		</div>
+	)
 }
+
+NavMenu.propTypes = {
+	toggleNavigation: PropTypes.func,
+};
+
+const mapStateToNavMenuProps = (state) => {
+	return {};
+};
+
+const mapDispatchToNavMenuProps = (dispatch) => {
+	return {
+		toggleNavigation: () => dispatch(toggleNavigation()),
+	};
+};
+
+const NavMenuComponent = connect(mapStateToNavMenuProps, mapDispatchToNavMenuProps)(NavMenu);
 
 class AbstractMyCoursesMenu extends Component {
 	static VISIBLE_COURSES_COUNT = 10;

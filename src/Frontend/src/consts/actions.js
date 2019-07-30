@@ -13,3 +13,6 @@ export const USER__PROGRESS_UPDATE = "USER__PROGRESS_UPDATE";
 export const START = "_START";
 export const SUCCESS = "_SUCCESS";
 export const FAIL = "_FAIL";
+
+//navigation
+export const NAVIGATION__TOGGLE = 'NAVIGATION__TOGGLE';

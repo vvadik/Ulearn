@@ -4,6 +4,8 @@ import styles from './NavigationItem.less';
 import classnames from 'classnames';
 import { SLIDETYPE } from '../../../../../consts/general';
 import { menuItemType } from '../../types';
+import { toggleNavigation } from "../../../../../actions/navigation";
+import { connect } from "react-redux";
 
 
 const icons = {
@@ -13,7 +15,7 @@ const icons = {
 };
 
 class NavigationItem extends Component {
-	render () {
+	render() {
 		const { text, url, isActive, description, metro } = this.props;
 
 		const classes = {
@@ -25,19 +27,20 @@ class NavigationItem extends Component {
 
 		return (
 			<li className={ styles.root }>
-				<Link to={ url } className={ classnames(classes) }>
+				<Link to={ url } className={ classnames(classes) } onClick={ this.props.toggleNavigation }>
 					{ metro && this.renderMetro() }
 					<div className={ styles.firstLine }>
 						<span className={ styles.text }>{ text }</span>
 						{ this.renderScore() }
 					</div>
 					{ description &&
-						<div className={ styles.description }>{description}</div>
+					<div className={ styles.description }>{ description }</div>
 					}
 				</Link>
 			</li>
 		);
 	}
+
 
 	renderScore() {
 		const { score, maxScore, type } = this.props;
@@ -73,7 +76,7 @@ class NavigationItem extends Component {
 		};
 
 		return (
-			<div className={ classnames(classes)}>
+			<div className={ classnames(classes) }>
 				{ this.renderPointer() }
 			</div>
 		);
@@ -84,17 +87,25 @@ class NavigationItem extends Component {
 
 		if (type === SLIDETYPE.lesson) {
 			return (
-				<span className={ classnames(styles.pointer, {[styles.complete]: visited}) } />
+				<span className={ classnames(styles.pointer, { [styles.complete]: visited }) }/>
 			);
 		}
 
 		return (
-			<span className={ classnames(styles.icon, {[styles.complete]: visited}) }>{icons[type]}</span>
+			<span className={ classnames(styles.icon, { [styles.complete]: visited }) }>{ icons[type] }</span>
 		);
 	}
 }
 
 NavigationItem.propTypes = menuItemType;
 
-export default NavigationItem
+const mapStateToProps = (state) => {
+	return {};
+};
+
+const mapDispatchToProps = (dispatch) => ({
+	toggleNavigation: () => dispatch(toggleNavigation()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(NavigationItem);
 

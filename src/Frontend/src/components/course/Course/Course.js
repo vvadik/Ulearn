@@ -9,6 +9,8 @@ import CourseFlashcardsPage from '../../../pages/course/CourseFlashcardsPage';
 import { flashcards, constructPathToSlide } from '../../../consts/routes';
 import { SLIDETYPE } from '../../../consts/general';
 
+import classnames from 'classnames';
+
 import styles from "./Course.less"
 
 class Course extends Component {
@@ -21,6 +23,7 @@ class Course extends Component {
 			highlightedUnit: null,
 			currentSlideId: null,
 			currentCourseId: null,
+			navigationOpened: this.props.navigationOpened,
 		};
 	}
 
@@ -37,8 +40,10 @@ class Course extends Component {
 	}
 
 	static getDerivedStateFromProps(props, state) {
+		const defaultState = { navigationOpened: props.navigationOpened };
+
 		if (!props.units) {
-			return null;
+			return defaultState;
 		}
 
 		if (state.currentCourseId !== props.courseId || state.currentSlideId !== props.slideId) {
@@ -56,15 +61,17 @@ class Course extends Component {
 				highlightedUnit: openUnitId || null,
 				onCourseNavigation: openUnit ? false : state.onCourseNavigation,
 				openUnit: openUnit || state.openUnit,
+				navigationOpened: props.navigationOpened,
+				...defaultState,
 			}
 		}
 
-		return null;
+		return defaultState;
 	}
 
 	render() {
 		const { courseInfo } = this.props;
-		const { onCourseNavigation } = this.state;
+		const { onCourseNavigation, navigationOpened } = this.state;
 
 		if (!courseInfo) {
 			return null;
@@ -73,7 +80,7 @@ class Course extends Component {
 		const Page = this.findOpenedSlideType();
 
 		return (
-			<div id={ 'courseRoot' } className={ styles.root }>
+			<div className={ classnames(styles.root, { 'open': navigationOpened }) }>
 				{ onCourseNavigation ? this.renderCourseNavigation() : this.renderUnitNavigation() }
 				<main className={ styles.pageWrapper }>
 					<Page match={ this.props.match }/>
@@ -227,7 +234,15 @@ class Course extends Component {
 		});
 	};
 
+	toggleNavigation() {
+		/*
+		TODO (ROZENTOR) this used in header.js, courseNavigation.js,
+		 navigation(unit nav).js, navigationItem.js, nextUnit.js
+		  exchange it with state change using redux or smth else
+		  */
 
+		//root.classList.toggle('open');
+	}
 }
 
 Course.propTypes = {
@@ -240,6 +255,7 @@ Course.propTypes = {
 	loadCourse: PropTypes.func,
 	loadUserProgress: PropTypes.func,
 	updateVisitedSlide: PropTypes.func,
+	navigationOpened: PropTypes.bool,
 };
 
 export default Course;
