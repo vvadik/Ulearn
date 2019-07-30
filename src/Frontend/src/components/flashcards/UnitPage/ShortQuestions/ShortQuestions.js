@@ -10,10 +10,11 @@ import styles from './shortQuestions.less';
 class ShortQuestions extends Component {
 	constructor(props) {
 		super(props);
+		const { questionsWithAnswers } = this.props;
 
 		this.state = {
 			showAllAnswers: false,
-			questionsWithAnswers: this.props.questionsWithAnswers,
+			questionsWithAnswers: [...questionsWithAnswers],
 		};
 	}
 
@@ -22,7 +23,14 @@ class ShortQuestions extends Component {
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
+		const { questionsWithAnswers } = this.props;
+
 		translateCode(this.list);
+
+
+		if (this.state.questionsWithAnswers.length !== questionsWithAnswers.length) {
+			this.setState({ questionsWithAnswers, });
+		}
 	}
 
 	render() {
@@ -46,7 +54,7 @@ class ShortQuestions extends Component {
 
 		return (
 			<ol ref={ (ref) => this.list = ref } className={ styles.questionsTextContainer }>
-				{ questionsWithAnswers.map(({ question, answer, showAnswer }, index) =>
+				{ questionsWithAnswers.map(({ question, answer, showAnswer, }, index) =>
 					<li className={ styles.listElement }
 						key={ index }
 						onClick={ () => this.handleQuestionClick(index) }>
@@ -63,14 +71,13 @@ class ShortQuestions extends Component {
 
 	handleQuestionClick = (questionIndex) => {
 		const { questionsWithAnswers } = this.state;
-		const questionWithAnswer = questionsWithAnswers[questionIndex];
+		const newQuestionsWithAnswers = [...questionsWithAnswers];
+		const questionWithAnswer = newQuestionsWithAnswers[questionIndex];
 
 		questionWithAnswer.showAnswer = !questionWithAnswer.showAnswer;
 
 		this.setState({
-			questionsWithAnswers: {
-				questionsWithAnswers,
-			}
+			questionsWithAnswers: newQuestionsWithAnswers,
 		})
 	};
 

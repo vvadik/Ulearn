@@ -109,13 +109,10 @@ class UnitPage extends Component {
 		const { flashcards } = this.props;
 
 		return flashcards
-			.filter(flashcard => flashcard.rate !== rateTypes.notRated)
-			.map(flashcard => {
-				return {
-					question: flashcard.question,
-					answer: flashcard.answer,
-				}
-			})
+			.filter(({ rate }) => rate !== rateTypes.notRated)
+			.map(({ question, answer, }) => {
+				return { question, answer, }
+			});
 	}
 }
 
