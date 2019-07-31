@@ -31,14 +31,14 @@ const report = async () => {
     ? read(path.join(__dirname, 'dist', 'unit-tests-result.json'))
     : null
 
-  const testsResult = (await unitCommand) || {}
+  const testsResult = await unitCommand
   let result = {
     verdict: 'Ok',
     compilationOutput: '',
     output: '',
     error: '',
   }
-  if (testsResult.failures.length > 0) {
+  if (testsResult && testsResult.failures && testsResult.failures.length > 0) {
     const failure = testsResult.failures[0]
     result = {
       verdict: 'Ok',
