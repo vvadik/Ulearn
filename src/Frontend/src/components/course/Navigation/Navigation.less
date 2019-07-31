@@ -29,12 +29,16 @@
   }
 }
 
+.overflow {
+  overflow: hidden;
+}
+
 .overlay {
   position: fixed;
   z-index: @overlayZIndex;
 
   left: 100vw;
-  top: 0;
+  top: @headerHeight;
   bottom: 0;
   right: 0;
 

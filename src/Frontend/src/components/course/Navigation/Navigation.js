@@ -16,31 +16,24 @@ import { toggleNavigation } from "../../../actions/navigation";
 
 import styles from './Navigation.less';
 
-const overflow = {
-	hidden: 'hidden',
-	auto: 'auto',
-};
-
 class Navigation extends Component {
 	componentDidMount() {
 		this.bodyElement = document.getElementsByTagName('body')[0];
 
 		this.bodyElement
-			.style.overflow = overflow.hidden;
+			.classList.add(styles.overflow);
 	}
 
 	componentWillUnmount() {
 		this.bodyElement
-			.style.overflow = overflow.auto;
+			.classList.remove(styles.overflow);
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
 		const { navigationOpened } = this.props;
 
 		this.bodyElement
-			.style.overflow = navigationOpened
-			? overflow.hidden
-			: overflow.auto;
+			.classList.toggle(styles.overflow, navigationOpened);
 	}
 
 	render() {
@@ -107,7 +100,10 @@ Navigation.propTypes = {
 
 	unitTitle: PropTypes.string,
 	unitItems: PropTypes.arrayOf(PropTypes.shape(menuItemType)),
-	nextUnit: PropTypes.object, // TODO: описать нормально
+	nextUnit: PropTypes.shape({
+		title: PropTypes.string,
+		slug: PropTypes.string,
+	}),
 
 	onCourseClick: PropTypes.func,
 
