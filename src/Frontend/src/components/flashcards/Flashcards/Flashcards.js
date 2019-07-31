@@ -1,11 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
-import styles from './flashcards.less';
-import classNames from 'classnames';
+
 import ProgressBar from "../ProgressBar/ProgressBar";
 import FrontFlashcard from "./FrontFlashcard/FrontFlashcard";
+
 import { rateTypes } from "../../../consts/rateTypes";
+
 import getNextFlashcard from "./flashcardsStirrer";
+import classNames from 'classnames';
+
+import styles from './flashcards.less';
 
 const modalsStyles = {
 	first: classNames(styles.modal),
@@ -145,14 +149,17 @@ class Flashcards extends Component {
 			return;
 		}
 
-		firstModal.className = classNames(modalsStyles.first);
-		secondModal.className = classNames(modalsStyles.second);
-		thirdModal.className = classNames(modalsStyles.third);
+		firstModal.className = modalsStyles.first;
+		secondModal.className = modalsStyles.second;
+		thirdModal.className = modalsStyles.third;
 	}
 }
 
 
 Flashcards.propTypes = {
+	courseId: PropTypes.string,
+	unitId: PropTypes.string,
+
 	flashcards: PropTypes.arrayOf(PropTypes.shape({
 		id: PropTypes.string,
 		question: PropTypes.string,
@@ -163,6 +170,7 @@ Flashcards.propTypes = {
 		lastRateIndex: PropTypes.number,
 	})),
 	totalFlashcardsCount: PropTypes.number,
+
 	statistics: PropTypes.shape({
 		[rateTypes.notRated]: PropTypes.number,
 		[rateTypes.rate1]: PropTypes.number,
@@ -171,7 +179,7 @@ Flashcards.propTypes = {
 		[rateTypes.rate4]: PropTypes.number,
 		[rateTypes.rate5]: PropTypes.number,
 	}),
-	courseId: PropTypes.string,
+
 	onClose: PropTypes.func,
 	sendFlashcardRate: PropTypes.func,
 };
