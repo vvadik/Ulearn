@@ -1,5 +1,7 @@
 FROM node:current-alpine
 
+RUN apk update && apk upgrade
+
 # Add new user for sandbox
 RUN addgroup -S student && adduser -S -g student student \
     && chown -R student:student /home/student
