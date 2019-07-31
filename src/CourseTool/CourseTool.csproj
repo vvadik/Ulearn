@@ -607,10 +607,6 @@
       <Project>{c2f55118-2422-4043-96af-016ebb8ec965}</Project>
       <Name>CsSandboxer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Metrics\Metrics.csproj">
-      <Project>{b6b60d19-c6bd-4d66-95da-14480a18770c}</Project>
-      <Name>Metrics</Name>
-    </ProjectReference>
     <ProjectReference Include="..\RunCheckerJob\RunCheckerJob.csproj">
       <Project>{650fe5bd-4345-41b9-800e-d00ca4cef51f}</Project>
       <Name>RunCheckerJob</Name>
