@@ -39,15 +39,10 @@ class Header extends Component {
 			return (
 				<div className={ styles["header"] + " header" }>
 					<Logo>
-						<span className={ styles["visible-only-phone"] }>
-							<Icon size={ 22 } name="Menu"/>
-						</span>
 						<span className={ styles["visible-at-least-tablet"] }>
 							Ulearn.me
 						</span>
 					</Logo>
-
-					{/*<TocMenu/>*/ }
 				</div>
 			)
 		}
@@ -81,12 +76,12 @@ class Header extends Component {
 			<div className={ styles["header"] + " header" } id="header">
 				<Logo>
 					{ isInsideCourse() && <NavMenuComponent/> }
-					<span className={ styles["visible-at-least-tablet"] }>
-						Ulearn.me
-					</span>
+					<div className={ styles["visible-at-least-tablet"] }>
+						<Link to={ '/' }>
+							Ulearn.me
+						</Link>
+					</div>
 				</Logo>
-
-				{/*<TocMenu/>*/ }
 
 				<div className={ styles["visible-at-least-tablet"] }>
 					{ this.props.account.isSystemAdministrator &&
@@ -157,11 +152,9 @@ const isInsideCourse = () => {
 function NavMenu({ toggleNavigation }) {
 	return (
 		<div className={ styles["visible-only-phone"] }>
-			<div className={ styles["header__toc-menu"] }>
-				<span className={ styles["visible-only-phone"] } onClick={ toggleNavigation }>
-					<Icon size={ 22 } name="Menu"/>
-				</span>
-			</div>
+			<button className={ styles.navMenuButton } onClick={ toggleNavigation }>
+				<Icon size={ 22 } name="Menu"/>
+			</button>
 		</div>
 	)
 }
