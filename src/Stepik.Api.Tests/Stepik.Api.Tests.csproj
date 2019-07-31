@@ -62,10 +62,6 @@
       <Project>{803c067a-5553-467d-9470-116fe2430255}</Project>
       <Name>Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Metrics\Metrics.csproj">
-      <Project>{b6b60d19-c6bd-4d66-95da-14480a18770c}</Project>
-      <Name>Metrics</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Stepik.Api\Stepik.Api.csproj">
       <Project>{60247C0A-B6EE-46E2-AB66-C7285F5F1345}</Project>
       <Name>Stepik.Api.Core</Name>

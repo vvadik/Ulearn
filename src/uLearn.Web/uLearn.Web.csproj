@@ -1616,14 +1616,6 @@
       <Project>{add8b9ba-7d5b-42d8-bfbd-3d60fb766e33}</Project>
       <Name>GitCourseUpdater</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Metrics\Metrics.csproj">
-      <Project>{b6b60d19-c6bd-4d66-95da-14480a18770c}</Project>
-      <Name>Metrics</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj">
-      <Project>{26580595-f4dc-41ee-ba66-0ef4692243af}</Project>
-      <Name>RunCsJob.Api</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Stepik.Api\Stepik.Api.csproj">
       <Project>{60247c0a-b6ee-46e2-ab66-c7285f5f1345}</Project>
       <Name>Stepik.Api</Name>

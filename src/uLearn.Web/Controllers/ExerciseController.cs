@@ -579,13 +579,16 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 
 			var exerciseSlide = slide as ExerciseSlide;
-			if (!(exerciseSlide.Exercise is CsProjectExerciseBlock))
+			if (exerciseSlide.Exercise is SingleFileExerciseBlock)
+				return HttpNotFound();
+			if ((exerciseSlide.Exercise as UniversalExerciseBlock)?.NoStudentZip ?? false)
 				return HttpNotFound();
 
-			var block = (CsProjectExerciseBlock) exerciseSlide.Exercise;
 			var zipFile = exerciseStudentZipsCache.GenerateOrFindZip(courseId, exerciseSlide);
 			
-			return File(zipFile.FullName, "application/zip", block.CsprojFile.Name + ".zip");
+			var block = exerciseSlide.Exercise;
+			var fileName = (block as CsProjectExerciseBlock)?.CsprojFile.Name ?? (block as UniversalExerciseBlock).ExerciseDirName;
+			return File(zipFile.FullName, "application/zip", fileName + ".zip");
 		}
 	}
 

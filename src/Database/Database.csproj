@@ -1230,14 +1230,6 @@
       <Project>{803c067a-5553-467d-9470-116fe2430255}</Project>
       <Name>Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Metrics\Metrics.csproj">
-      <Project>{b6b60d19-c6bd-4d66-95da-14480a18770c}</Project>
-      <Name>Metrics</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj">
-      <Project>{26580595-f4dc-41ee-ba66-0ef4692243af}</Project>
-      <Name>RunCsJob.Api</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="appsettings.json">

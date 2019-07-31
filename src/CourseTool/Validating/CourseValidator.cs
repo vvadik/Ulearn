@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using RunCheckerJob;
 using RunCsJob;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
@@ -18,12 +19,10 @@ namespace uLearn.CourseTool.Validating
 	public class CourseValidator : BaseValidator
 	{
 		private readonly List<Slide> slides;
-		private readonly SandboxRunnerSettings settings;
 
-		public CourseValidator(List<Slide> slides, SandboxRunnerSettings settings)
+		public CourseValidator(List<Slide> slides)
 		{
 			this.slides = slides;
-			this.settings = settings;
 		}
 
 		public void ValidateExercises() // todo логирование log4net в файл (ошибки отдельно) и на консоль
@@ -34,10 +33,18 @@ namespace uLearn.CourseTool.Validating
 
 				if (slide.Exercise is CsProjectExerciseBlock exercise)
 				{
+					var settings = new CsSandboxRunnerSettings();
 					new ProjectExerciseValidator(this, settings, slide, exercise).ValidateExercises();
 				}
-				else
+				else if (slide.Exercise is SingleFileExerciseBlock)
+				{
 					ReportIfEthalonSolutionHasErrorsOrIssues(slide);
+				}
+				else if (slide.Exercise is UniversalExerciseBlock universalExercise)
+				{
+					var settings = new DockerSandboxRunnerSettings(universalExercise.DockerImageName, universalExercise.RunCommand);
+					new UniversalExerciseValidator(this, settings, slide, universalExercise).ValidateExercises();
+				}
 			}
 		}
 
@@ -78,6 +85,12 @@ namespace uLearn.CourseTool.Validating
 		private void ReportIfEthalonSolutionHasErrorsOrIssues(ExerciseSlide slide)
 		{
 			var exercise = (SingleFileExerciseBlock)slide.Exercise;
+			if (exercise.EthalonSolution == null)
+			{
+				ReportSlideWarning(slide, "Ethalon solution not specified");
+				return;
+			}
+
 			var ethalon = exercise.EthalonSolution.RemoveCommonNesting();
 			var solution = exercise.BuildSolution(ethalon);
 			if (solution.HasErrors)
@@ -91,7 +104,7 @@ namespace uLearn.CourseTool.Validating
 				ReportSlideWarning(slide, "Style issue(s): " + errorMessages);
 			}
 
-			var result = SandboxRunner.Run(exercise.CreateSubmission(slide.Id.ToString(), ethalon), settings);
+			var result = new CsSandboxRunnerClient().Run(exercise.CreateSubmission(slide.Id.ToString(), ethalon));
 
 			var output = result.GetOutput().NormalizeEoln();
 

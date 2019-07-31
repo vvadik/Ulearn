@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 using Database.Models;
 using log4net;
 using Microsoft.EntityFrameworkCore;
-using RunCsJob.Api;
 using uLearn;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.RunCheckerJobApi;
 
 namespace Database.Repos
 {

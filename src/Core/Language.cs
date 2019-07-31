@@ -108,8 +108,7 @@ namespace Ulearn.Core
 	{
 		public static bool HasAutomaticChecking(this Language language)
 		{
-			/* For a while only C# has automatic checking on ulearn */
-			return language == Language.CSharp;
+			return language == Language.CSharp || language == Language.JavaScript;
 		}
 
 		public static string GetName(this Language language)

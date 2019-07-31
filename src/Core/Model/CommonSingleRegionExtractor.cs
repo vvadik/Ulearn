@@ -22,5 +22,13 @@ namespace Ulearn.Core.Model
 				return null;
 			return code.Substring(region.dataStart, region.dataLength).RemoveCommonNesting();
 		}
+		
+		public string ReplaceRegionContent(Label label, string regionContent)
+		{
+			var region = regions.GetOrDefault(label.Name, null);
+			var prefix = code.Substring(0, region.dataStart);
+			var suffix = code.Substring(region.dataStart + region.dataLength);
+			return prefix + regionContent + suffix;
+		}
 	}
 }

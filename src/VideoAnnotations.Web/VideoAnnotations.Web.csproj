@@ -52,7 +52,6 @@
     <ItemGroup>
       <ProjectReference Include="..\Common.Api\Common.Api.csproj" />
       <ProjectReference Include="..\Core\Core.csproj" />
-      <ProjectReference Include="..\Metrics\Metrics.csproj" />
       <ProjectReference Include="..\VideoAnnotations.Api\VideoAnnotations.Api.csproj" />
     </ItemGroup>
 

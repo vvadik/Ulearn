@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using Database;
@@ -9,8 +8,8 @@ using Database.Models;
 using Graphite;
 using log4net;
 using log4net.Config;
-using Metrics;
 using Ulearn.Core.Configuration;
+using Ulearn.Core.Metrics;
 
 namespace Notifications
 {
@@ -31,11 +30,9 @@ namespace Notifications
 		{
 			this.courseManager = courseManager;
 			notificationSender = new NotificationSender(courseManager);
-			keepAliver = new ServiceKeepAliver(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName);
-
-			if (!int.TryParse(ConfigurationManager.AppSettings["ulearn.notifications.keepAlive.interval"], out var keepAliveIntervalSeconds))
-				keepAliveIntervalSeconds = 30;
-			keepAliveInterval = TimeSpan.FromSeconds(keepAliveIntervalSeconds);
+			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
+			keepAliver = new ServiceKeepAliver(configuration.GraphiteServiceName);
+			keepAliveInterval = TimeSpan.FromSeconds(configuration.KeepAliveInterval ?? 30);
 		}
 
 		public Program()

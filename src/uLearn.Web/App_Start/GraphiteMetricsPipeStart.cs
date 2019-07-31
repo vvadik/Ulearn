@@ -1,7 +1,7 @@
 ﻿using Graphite.Web;
-using System.Web.Configuration;
-using Metrics;
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
+using Ulearn.Core.Configuration;
+using Ulearn.Core.Metrics;
 using uLearn.Web;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(GraphiteMetricsPipeStart), "PreStart")]
@@ -12,7 +12,7 @@ namespace uLearn.Web
 	{
 		public static void PreStart()
 		{
-			var connectionString = WebConfigurationManager.ConnectionStrings["statsd"]?.ConnectionString;
+			var connectionString = ApplicationConfiguration.Read<UlearnConfiguration>().StatsdConnectionString;
 			var isGraphiteSendingEnabled = !string.IsNullOrEmpty(connectionString);
 			
 			if (!isGraphiteSendingEnabled)
