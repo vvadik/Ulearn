@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-import UnitNavigation from "../Navigation/Unit/UnitNavigation";
-import CourseNavigation from "../Navigation/Course/CourseNavigation";
+import Navigation from "../Navigation";
 import AnyPage from '../../../pages/AnyPage';
 import UnitFlashcardsPage from '../../../pages/course/UnitFlashcardsPage';
 import CourseFlashcardsPage from '../../../pages/course/CourseFlashcardsPage';
@@ -71,7 +70,7 @@ class Course extends Component {
 
 	render() {
 		const { courseInfo } = this.props;
-		const { onCourseNavigation, navigationOpened } = this.state;
+		const { navigationOpened } = this.state;
 
 		if (!courseInfo) {
 			return null;
@@ -81,7 +80,7 @@ class Course extends Component {
 
 		return (
 			<div className={ classnames(styles.root, { 'open': navigationOpened }) }>
-				{ onCourseNavigation ? this.renderCourseNavigation() : this.renderUnitNavigation() }
+				{ this.renderNavigation() }
 				<main className={ styles.pageWrapper }>
 					<Page match={ this.props.match }/>
 				</main>
@@ -89,37 +88,31 @@ class Course extends Component {
 		);
 	}
 
-	renderCourseNavigation() {
-		const { courseInfo, slideId } = this.props;
-		const { highlightedUnit } = this.state;
+	renderNavigation() {
+		const { courseInfo, slideId, courseId, progress } = this.props;
+		const { highlightedUnit, openUnit, onCourseNavigation, navigationOpened } = this.state;
 
-		return (
-			<CourseNavigation
-				slideId={ slideId }
-				courseId={ courseInfo.id }
-				title={ courseInfo.title }
-				description={ courseInfo.description }
-				items={ courseInfo.units.map(item => ({
+		const defaultProps = {
+			navigationOpened,
+			courseTitle: courseInfo.title,
+		};
+
+		const additionalProps = onCourseNavigation
+			? {
+				slideId: slideId,
+				courseId: courseInfo.id,
+				description: courseInfo.description,
+				courseItems: courseInfo.units.map(item => ({
 					title: item.title,
 					id: item.id,
 					isActive: highlightedUnit === item.id,
 					onClick: this.unitClickHandle,
-				})) }
-				containsFlashcards={ courseInfo.containsFlashcards }
-			/>
-		);
-	}
-
-	renderUnitNavigation() {
-		const { openUnit } = this.state;
-		const { courseInfo, courseId, slideId, progress } = this.props;
-
-		return (
-			<UnitNavigation
-				title={ openUnit.title }
-				courseName={ courseInfo.title }
-				onCourseClick={ this.returnInUnitsMenu }
-				items={ openUnit.slides.map(item => ({
+				})),
+				containsFlashcards: courseInfo.containsFlashcards,
+			} : {
+				unitTitle: openUnit.title,
+				onCourseClick: this.returnInUnitsMenu,
+				unitItems: openUnit.slides.map(item => ({
 					id: item.id,
 					title: item.title,
 					type: item.type,
@@ -129,10 +122,11 @@ class Course extends Component {
 					maxScore: item.maxScore,
 					questionsCount: item.questionsCount,
 					visited: Boolean(progress && progress[item.id]),
-				})) }
-				nextUnit={ Course.findNextUnit(openUnit, courseInfo) }
-			/>
-		);
+				})),
+				nextUnit: Course.findNextUnit(openUnit, courseInfo),
+			};
+
+		return <Navigation { ...defaultProps } { ...additionalProps }/>;
 	}
 
 	findOpenedSlideType() {
@@ -233,16 +227,6 @@ class Course extends Component {
 			onCourseNavigation: true,
 		});
 	};
-
-	toggleNavigation() {
-		/*
-		TODO (ROZENTOR) this used in header.js, courseNavigation.js,
-		 navigation(unit nav).js, navigationItem.js, nextUnit.js
-		  exchange it with state change using redux or smth else
-		  */
-
-		//root.classList.toggle('open');
-	}
 }
 
 Course.propTypes = {

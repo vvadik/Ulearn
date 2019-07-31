@@ -1,7 +1,7 @@
 import React from "react";
 import { storiesOf } from "@storybook/react";
 import Navigation from './Navigation';
-import { SLIDETYPE } from '../../../../../consts/general';
+import { SLIDETYPE } from '../../../consts/general';
 import StoryRouter from "storybook-react-router";
 
 

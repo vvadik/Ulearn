@@ -1,4 +1,4 @@
-@import "../../../../../variables.less";
+@import "../../../variables.less";
 
 @rootZIndex: 10;
 @contentZIndex: 3;
@@ -11,7 +11,7 @@
   max-height: calc(100vh - @headerHeight - @headerDivider);
   left: -500px;
   flex-shrink: 0;
-  z-index: @rootZIndex;
+  z-index: 10;
   transition: left 300ms ease-in-out;
 }
 
@@ -47,7 +47,9 @@
 
 .contentWrapper {
   position: fixed;
+
   width: 250px;
+
   overflow-y: auto;
   top: @headerHeight;
   bottom: 0;
@@ -55,7 +57,6 @@
   background: #ffffff;
   z-index: @contentZIndex;
 }
-
 
 @media (min-width: @maxPhoneWidth) {
   .overlay {
