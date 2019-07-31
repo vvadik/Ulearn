@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using System.Web;
 using log4net;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
@@ -26,7 +25,7 @@ namespace uLearn.Web.Kontur.Passport
 			this.passportClient = passportClient;
 			this.log = log;
 		}
-
+		
 		/// <summary>
 		/// The core authentication logic which must be provided by the handler. Will be invoked at most
 		/// once per request. Do not call directly, call the wrapping Authenticate method instead.
@@ -36,7 +35,7 @@ namespace uLearn.Web.Kontur.Passport
 		{
 			try
 			{
-				var queryString = HttpUtility.ParseQueryString(Request.QueryString.Value).ToDictionary();
+				var queryString = await Request.GetRequestParameters().ConfigureAwait(false);
 
 				var state = Request.Cookies[konturStateCookieName];
 				if (state == null)
