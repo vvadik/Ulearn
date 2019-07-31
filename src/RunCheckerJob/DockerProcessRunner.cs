@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using log4net;
-using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.RunCheckerJobApi;
 
@@ -148,13 +147,14 @@ namespace RunCheckerJob
 			{
 				"run",
 				$"-v {ConvertToUnixPath(dir.FullName)}:/source",
-				seccompPath == null ? "" : $"--security-opt seccomp={seccompPath}", //"--privileged",
+				seccompPath == null ? "" : $"--security-opt seccomp={seccompPath}",
 				"--network none",
 				"--restart no",
 				"--rm",
 				$"--name {name}",
-				//"-it",
 				$"-m {settings.MemoryLimit}b",
+				$"--memory-swap {settings.MemorySwapLimit}b",
+				"--cpus 1",
 				settings.SandBoxName,
 				$"sh -c \"cp -R /source/* /app/ ; {settings.RunCommand}\""
 			};
