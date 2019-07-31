@@ -1,4 +1,5 @@
 ﻿@using Database.Extensions
+@using Microsoft.EntityFrameworkCore.Internal
 @using uLearn.Web.Extensions
 @using uLearn.Web.Kontur.Passport
 @using uLearn.Web.Microsoft.Owin.Security.VK
@@ -107,17 +108,22 @@
 
 	<div class="user-profile__rights-history">
 		<h2>История назначений ролей и прав</h2>
-		@if (Model.RolesHistory.Count == 0)
+		@if (Model.RolesHistory.Count == 0 || Model.AccessesHistory.Count == 0)
 		{
-			<p class="help-block">Нет курсов</p>
+			<p class="help-block">Нет курсов и историей назначений</p>
 		}
 		<ol>
-			@foreach (var hist in Model.RolesHistory)
+			@{
+				var courseIds = Model.AccessesHistory.Select(x => x.Key).Concat(Model.RolesHistory.Select(x => x.Key)).Distinct();
+			}
+			@foreach (var courseId in courseIds)
 			{
-				var course = Model.AllCourses[hist.Key];
-				<li>
-					@Html.ActionLink(course.Title, "CourseRightsHistory", new { userId = Model.User.Id, courseId = course.Id })
-				</li>
+				if (Model.AllCourses.TryGetValue(courseId, out var course))
+				{
+					<li>
+						@Html.ActionLink(course.Title, "CourseRightsHistory", new { userId = Model.User.Id, courseId = course.Id })
+					</li>
+				}
 			}
 		</ol>
 	</div>

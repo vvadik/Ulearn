@@ -39,6 +39,7 @@ namespace Database.Models
 		[Required]
 		[Index("IDX_CourseAccess_ByCourseAndIsEnabled", 2)]
 		[Index("IDX_CourseAccess_ByCourseUserAndIsEnabled", 3)]
+		
 		public bool IsEnabled { get; set; }
 
 		[CanBeNull]

@@ -136,7 +136,7 @@ namespace uLearn.Web.Controllers
 							CourseId = s,
 							CourseTitle = courseManager.GetCourse(s).Title,
 							HasAccess = coursesForUser.ContainsKey(role) && coursesForUser[role].Contains(s.ToLower()),
-							ToggleUrl = Url.Action("ToggleRole", new { courseId = s, userId = user.UserId, role })
+							ToggleUrl = Url.Action("ToggleRole", new { courseId = s, userId = user.UserId, role } )
 						})
 						.OrderBy(s => s.CourseTitle, StringComparer.InvariantCultureIgnoreCase)
 						.ToList()
@@ -216,6 +216,7 @@ namespace uLearn.Web.Controllers
 		[HandleHttpAntiForgeryException]
 		public async Task<ActionResult> ToggleRole(string courseId, string userId, CourseRole role)
 		{
+			var comment = Request.Form["comment"];
 			var currentUserId = User.Identity.GetUserId();
 			var isCourseAdmin = User.HasAccessFor(courseId, CourseRole.CourseAdmin);
 			if ((userManager.FindById(userId) == null || userId == currentUserId) && (!isCourseAdmin || role == CourseRole.CourseAdmin) && !User.IsSystemAdministrator())
@@ -228,7 +229,7 @@ namespace uLearn.Web.Controllers
 			if (!isCourseAdmin && role == CourseRole.CourseAdmin)
 				return Json(new { status = "error", message = "Вы не можете назначать администраторов курса. Это могут делать только другие администраторы курса." });
 
-			var enabledRole = await userRolesRepo.ToggleRole(courseId, userId, role, currentUserId);
+			var enabledRole = await userRolesRepo.ToggleRole(courseId, userId, role, currentUserId, comment);
 
 			if (enabledRole && (role == CourseRole.Instructor || role == CourseRole.CourseAdmin))
 				await NotifyAboutNewInstructor(courseId, userId, currentUserId);
@@ -284,7 +285,9 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("List");
 
 			var course = courseManager.GetCourse(courseId);
-			return View(new UserCourseHistoryModel(user, course, ToRolesHistoryModel(await userRolesRepo.GetUserRolesHistoryByCourseIds(userId))));
+			return View(new UserCourseHistoryModel(user, course,
+				ToRolesHistoryModel(await userRolesRepo.GetUserRolesHistoryByCourseIds(userId)),
+				ToCourseAccessHistoryModel(coursesRepo.GetUserAccessHistoryByCourseIds(userId))));
 		}
 
 		public async Task<ActionResult> Profile(string userId)
@@ -307,6 +310,7 @@ namespace uLearn.Web.Controllers
 			var courseGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, maxCount: 10));
 			var courseArchivedGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, maxCount: 10, onlyArchived: true));
 			var courseRolesHistory = ToRolesHistoryModel(await userRolesRepo.GetUserRolesHistoryByCourseIds(userId));
+			var courseAccessHistory = ToCourseAccessHistoryModel(coursesRepo.GetUserAccessHistoryByCourseIds(userId));
 
 			return View(new ProfileModel
 			{
@@ -317,8 +321,31 @@ namespace uLearn.Web.Controllers
 				CourseArchivedGroups = courseArchivedGroups,
 				Certificates = certificates,
 				AllCourses = allCourses,
-				RolesHistory = courseRolesHistory
+				RolesHistory = courseRolesHistory,
+				AccessesHistory = courseAccessHistory
 			});
+		}
+
+		private Dictionary<string, List<AccessGrantModel>> ToCourseAccessHistoryModel(Dictionary<string, List<CourseAccess>> historyByCourseIds)
+		{
+			var result = new Dictionary<string, List<AccessGrantModel>>();
+			foreach (var courseHistory in historyByCourseIds)
+			{
+				result[courseHistory.Key] = new List<AccessGrantModel>();
+				foreach (var a in courseHistory.Value)
+				{
+					result[courseHistory.Key].Add(new AccessGrantModel()
+					{
+						IsEnabled = a.IsEnabled,
+						GrantedBy = usersRepo.FindUserById(a.GrantedById).VisibleName,
+						Comment = a.Comment,
+						GrantTimeUtc = a.GrantTime,
+						CourseAccess = a.AccessType.GetDisplayName()
+					});
+				}
+			}
+
+			return result;
 		}
 
 		private Dictionary<string, List<RoleGrantModel>> ToRolesHistoryModel(Dictionary<string, List<UserRole>> historyByCourseIds)
@@ -332,10 +359,10 @@ namespace uLearn.Web.Controllers
 					result[courseHistory.Key].Add(new RoleGrantModel()
 					{
 						IsEnabled = a.IsEnabled ?? true,
-						GrantedBy = usersRepo.FindUserById(a.GrantedById).VisibleName,
+						GrantedBy = a.GrantedById == null? "" : usersRepo.FindUserById(a.GrantedById).VisibleName,
 						Comment = a.Comment,
-						Timestamp = a.GrantTime ?? DateTime.MinValue,
-						Role = a.Role.ToString()
+						GrantTimeUtc = a.GrantTime ?? DateTime.MinValue,
+						Role = a.Role.GetDisplayName()
 					});
 				}
 			}
@@ -897,15 +924,52 @@ namespace uLearn.Web.Controllers
 		public Dictionary<string, string> CourseArchivedGroups { get; set; }
 
 		public Dictionary<string, List<RoleGrantModel>> RolesHistory;
+
+		public Dictionary<string, List<AccessGrantModel>> AccessesHistory;
 	}
 
 	public class RoleGrantModel
 	{
 		public string GrantedBy { get; set; }
 		public string Role { get; set; }
-		public DateTime Timestamp { get; set; }
+		public DateTime GrantTimeUtc { get; set; }
 		public bool IsEnabled { get; set; }
 		public string Comment { get; set; }
+
+		public UserGrantModel ToUserGrantModel()
+		{
+			return new UserGrantModel()
+			{
+				GrantedBy = GrantedBy,
+				Grant = Role,
+				GrantTimeUtc = GrantTimeUtc,
+				IsEnabled = IsEnabled,
+				Comment = Comment,
+				GrantType = typeof(RoleGrantModel)
+			};
+		}
+	}
+
+	public class AccessGrantModel
+	{
+		public string GrantedBy { get; set; }
+		public string CourseAccess { get; set; }
+		public DateTime GrantTimeUtc { get; set; }
+		public bool IsEnabled { get; set; }
+		public string Comment { get; set; }
+
+		public UserGrantModel ToUserGrantModel()
+		{
+			return new UserGrantModel()
+			{
+				GrantedBy = GrantedBy,
+				Grant = CourseAccess,
+				GrantTimeUtc = GrantTimeUtc,
+				IsEnabled = IsEnabled,
+				Comment = Comment,
+				GrantType = typeof(AccessGrantModel)
+			};
+		}
 	}
 
 	public class IsErrorAttribute : Attribute

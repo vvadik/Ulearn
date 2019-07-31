@@ -86,7 +86,7 @@ namespace Database.DataContexts
 		{
 			return db.CourseAccesses
 				.GroupBy(x => x.CourseId + x.UserId + x.AccessType.ToString())
-				.Select(gr=>gr.OrderByDescending(x=>x.Id))
+				.Select(gr => gr.OrderByDescending(x => x.Id))
 				.Select(gr => gr.FirstOrDefault());
 		}
 
@@ -101,8 +101,9 @@ namespace Database.DataContexts
 				UserId = userId,
 				AccessType = accessType,
 				GrantedById = grantedById,
-				GrantTime = DateTime.Now,
-				IsEnabled = true
+				GrantTime = DateTime.Now.ToUniversalTime(),
+				IsEnabled = true,
+				Comment = comment
 			};
 			db.CourseAccesses.Add(currentAccess);
 
@@ -117,22 +118,20 @@ namespace Database.DataContexts
 
 		public async Task<List<CourseAccess>> RevokeAccess(string courseId, string userId, CourseAccessType accessType, string grantedById, string comment)
 		{
-			
 			var revoke = new CourseAccess
 			{
 				UserId = userId,
-				GrantTime = DateTime.Now,
+				GrantTime = DateTime.Now.ToUniversalTime(),
 				GrantedById = grantedById,
 				Comment = comment,
 				IsEnabled = false,
 				CourseId = courseId,
 				AccessType = accessType
-				
 			};
 			db.CourseAccesses.Add(revoke);
 
 			await db.SaveChangesAsync();
-			return new List<CourseAccess> {revoke};
+			return new List<CourseAccess> { revoke };
 		}
 
 		public List<CourseAccess> GetCourseAccesses(string courseId)
@@ -142,10 +141,8 @@ namespace Database.DataContexts
 
 		public List<CourseAccess> GetCourseAccesses(string courseId, string userId)
 		{
-			var acceses = GetQueryableCourseAccesses().Where(x => x.UserId == userId).ToList();
-			var A = GetQueryableCourseAccesses().Include(a => a.User).Where(x => x.UserId == userId).ToList();
 			var courseAccesses = GetQueryableCourseAccesses().Include(a => a.User).Where(a => a.CourseId == courseId && a.UserId == userId && a.IsEnabled).ToList();
-			
+
 			return courseAccesses;
 		}
 
@@ -161,6 +158,18 @@ namespace Database.DataContexts
 		public bool HasCourseAccess(string userId, string courseId, CourseAccessType accessType)
 		{
 			return GetQueryableCourseAccesses().Any(a => a.CourseId == courseId && a.UserId == userId && a.AccessType == accessType && a.IsEnabled);
+		}
+
+		public Dictionary<string, List<CourseAccess>> GetUserAccessHistoryByCourseIds(string userId)
+		{
+			var groupedByCourseId = db.CourseAccesses.Where(x => x.UserId == userId).GroupBy(x => x.CourseId);
+			var result = new Dictionary<string, List<CourseAccess>>();
+			foreach (var group in groupedByCourseId)
+			{
+				result[group.Key] = group.ToList();
+			}
+
+			return result;
 		}
 
 		// Add new and remove old course file

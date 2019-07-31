@@ -1,31 +1,52 @@
+@using uLearn.Web.Controllers
 @model UserCourseHistoryModel
 
 @{
 	ViewBag.Title = "User Course Stats";
 }
-
 <div class="container">
-	<h2 class="space-after">@Model.User.VisibleName — @Model.Course.Title</h2>
+	<h2 class="space-after">
+		@Html.ActionLink(Model.User.VisibleName, "Profile", "Account", new { userId = Model.User.Id }, new { title = Model.User.UserName })
+		— "@Model.Course.Title". Роли и права.
+	</h2>
 
 	<table class="table">
 		<tr>
-			<th style="text-align: center !important">Кем выданы</th>
-			<th style="text-align: center !important">Роль</th>
+			<th style="text-align: center !important">Роль или права</th>
+			<th style="text-align: center !important">Выданы или отозваны</th>
+			<th style="text-align: center !important">Выданы пользователем</th>
+			<th style="text-align: center !important">Дата (UTC)</th>
 			<th style="text-align: center !important">Комментарий</th>
-			<th style="text-align: center !important">Назначена/отозвана</th>
-			<th style="text-align: center !important">Дата</th>
 		</tr>
-		@foreach (var grant in Model.UserRightsHistory[Model.Course.Id])
+		@if (Model.UserGrantsHistory.ContainsKey(Model.Course.Id))
 		{
-			var enabled = grant.IsEnabled ? "Выдана" : "Отозвана";
-			<tr style="text-align: center">
-				<td style="text-align: left">"@grant.GrantedBy"</td>
-				<td title="@grant.Role.ToString()">"@grant.Role.ToString()"</td>
-				<td title="title">@grant.Comment</td>
-				<td title="Title">@enabled</td>
-				<td title="Title">@grant.Timestamp</td>
-			</tr>
+			foreach (var grant in Model.UserGrantsHistory[Model.Course.Id])
+			{
+				var timestamp = grant.GrantTimeUtc == DateTime.MinValue ? "Неизвестно" : grant.GrantTimeUtc.ToString();
+				var grantedBy = string.IsNullOrEmpty(grant.GrantedBy) ? "Неизвестно" : grant.GrantedBy;
+				var comment = string.IsNullOrEmpty(grant.Comment) ? "Без комментария" : grant.Comment;
+
+				var bgColor = grant.GrantType == typeof(RoleGrantModel) ? "#fffcdd" : "white";
+				var enabled = grant.IsEnabled ? "Выданы" : "Отозваны";
+				<tr style="text-align: center" bgcolor=@bgColor>
+					<td style="text-align: left;"> @grant.Grant</td>
+					<td style="text-align: center;">@enabled</td>
+					<td style="text-align: left;">@grantedBy </td>
+					<td class="grantTime" style="text-align: center;">@timestamp</td>
+					<td style="white-space: pre-wrap; text-align: left;">@comment</td>
+				</tr>
+			}
 		}
 
 	</table>
+	
+	<script>
+	$(document).ready(function($) {
+               
+            
+                 
+		$(".grantTime").innerText = "";
+		})
+	</script>
+
 </div>

@@ -1390,7 +1390,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> ToggleCourseAccess(string courseId, string userId, CourseAccessType accessType, bool isEnabled)
 		{
 			var currentUserId = User.Identity.GetUserId();
-
+			var comment = Request.Form["comment"];
 			var userRoles = userRolesRepo.GetRoles(userId);
 			var errorMessage = "Выдавать дополнительные права можно только преподавателям. Сначала назначьте пользователя администратором курса или преподавателем";
 			if (!userRoles.ContainsKey(courseId))
@@ -1399,9 +1399,9 @@ namespace uLearn.Web.Controllers
 				return Json(new { status = "error", message = errorMessage });
 
 			if (isEnabled)
-				await coursesRepo.GrantAccess(courseId, userId, accessType, currentUserId, "");
+				await coursesRepo.GrantAccess(courseId, userId, accessType, currentUserId, comment);
 			else
-				await coursesRepo.RevokeAccess(courseId, userId, accessType, currentUserId, "");
+				await coursesRepo.RevokeAccess(courseId, userId, accessType, currentUserId, comment);
 
 			return Json(new { status = "ok" });
 		}

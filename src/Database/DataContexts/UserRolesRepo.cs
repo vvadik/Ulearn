@@ -84,7 +84,7 @@ namespace Database.DataContexts
 				.ToDictionary(g => g.Key, g => g.Select(role => role.Role).Min(), StringComparer.OrdinalIgnoreCase);
 		}
 
-		public async Task<bool> ToggleRole(string courseId, string userId, CourseRole role, string grantedById)
+		public async Task<bool> ToggleRole(string courseId, string userId, CourseRole role, string grantedById, string comment)
 		{
 			var userRole = db.UserRoles.Where(x => x.UserId == userId && x.Role == role && x.CourseId == courseId).ToList().LastOrDefault();
 			bool isEnabled;
@@ -92,15 +92,17 @@ namespace Database.DataContexts
 				isEnabled = false;
 			else
 				isEnabled = true;
-			db.UserRoles.Add(new UserRole
+			var record = new UserRole
 			{
 				UserId = userId,
 				CourseId = courseId,
 				Role = role,
 				IsEnabled = isEnabled,
 				GrantedById = grantedById,
-				GrantTime = DateTime.Now
-			});
+				GrantTime = DateTime.Now.ToUniversalTime(),
+				Comment = comment
+			};
+			db.UserRoles.Add(record);
 
 			await db.SaveChangesAsync();
 
