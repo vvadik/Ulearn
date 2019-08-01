@@ -14,7 +14,7 @@ namespace RunCsJob
 	public class Program : ProgramBase
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(Program));
-		private const string serviceName = "runscjob";
+		private const string serviceName = "runcsjob";
 		private readonly CsSandboxRunnerClient csSandboxRunnerClient;
 
 		public static void Main(string[] args)
