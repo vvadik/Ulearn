@@ -297,20 +297,10 @@ namespace Database.DataContexts
 			
 			return submission;
 		}
-
-		private static volatile SemaphoreSlim getSubmissionSemaphore = new SemaphoreSlim(1);
-
-		public async Task<UserExerciseSubmission> GetUnhandledSubmission(string agentName, IEnumerable<Language> languages)
+		
+		// NOTE: Раньше в этом методе был лок. Но, похоже, он защищал только от дедлока в TryGetExerciseSubmission внутри базы в serializable-транзакции, что устарело
+		public async Task<UserExerciseSubmission> GetUnhandledSubmission(string agentName, List<Language> languages)
 		{
-			//log.Info("GetUnhandledSubmission(): trying to acquire semaphore");
-			var semaphoreLocked = await getSubmissionSemaphore.WaitAsync(TimeSpan.FromSeconds(2));
-			if (!semaphoreLocked)
-			{
-				log.Error("GetUnhandledSubmission(): Can't lock semaphore for 2 seconds");
-				return null;
-			}
-			//log.Info("GetUnhandledSubmission(): semaphore acquired!");
-
 			try
 			{
 				return await TryGetExerciseSubmission(agentName, languages);
@@ -320,33 +310,39 @@ namespace Database.DataContexts
 				log.Error("GetUnhandledSubmission() error", e);
 				return null;
 			}
-			finally
-			{
-				//log.Info("GetUnhandledSubmission(): trying to release semaphore");
-				getSubmissionSemaphore.Release();
-				//log.Info("GetUnhandledSubmission(): semaphore released");
-			}
 		}
 
-		private async Task<UserExerciseSubmission> TryGetExerciseSubmission(string agentName, IEnumerable<Language> language)
+		private async Task<UserExerciseSubmission> TryGetExerciseSubmission(string agentName, IEnumerable<Language> languages)
 		{
 			var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
+
+			var submissionsQueryable = db.UserExerciseSubmissions
+				.AsNoTracking()
+				.Where(s =>
+					s.Timestamp > notSoLongAgo
+					&& s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting
+					&& languages.Contains(s.Language));
+			
+			var maxId = submissionsQueryable.Select(s => s.Id).DefaultIfEmpty(-1).Max();
+			if (maxId == -1)
+				return null;
+
+			// NOTE: Если транзакция здесь, а не в начале метода, может возникнуть ситуация, что maxId только что кто-то взял, и мы тоже взяли.
+			// То, что мы не обработаем дважды, защищает проверка на Waiting внутри транзакции ниже.
+			// Мы можем не взять из-за этого другой solution. Не стращно, попробуем снова сразу же с помощью WaitAnyUnhandledSubmissions (см. RunnerController.GetSubmissions).
+			// RepeatableRead блокирует от изменения те строки, которые видел.
+			// Serializable отличается от него только тем, что другая транзакция не добавит другую строку, которая тоже будет подходить под запрос, даже после того, как запрос совершен.
+			// Нам важно только, чтобы не менялись виденные в транзакции строки, поэтому подходит RepeatableRead.
+			// Хотя, здесь делается запрос просто по Id, поэтому в любом случае заблокированных строк мало.
+			// Малое количество затронутых строк должно уменьшить возможность дедлоков. Теоретически, если обе прочитают одно и то же и заходят записать, должна сработать одна транзакция и одна откатиться.
 			UserExerciseSubmission submission;
-			using (var transaction = db.Database.BeginTransaction(IsolationLevel.Serializable))
+			using (var transaction = db.Database.BeginTransaction(IsolationLevel.RepeatableRead))
 			{
-				var submissionsQueryable = db.UserExerciseSubmissions
-					.AsNoTracking()
-					.Where(s =>
-						s.Timestamp > notSoLongAgo
-						&& s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting
-						&& language.Contains(s.Language));
-				
-				if (!submissionsQueryable.Any())
-					return null;
-				
-				var maxId = submissionsQueryable.Select(s => s.Id).DefaultIfEmpty(-1).Max();
-				submission = submissionsQueryable.FirstOrDefault(s => s.Id == maxId);
+				submission = db.UserExerciseSubmissions.AsNoTracking().FirstOrDefault(s => s.Id == maxId);
 				if (submission == null)
+					return null;
+
+				if (submission.AutomaticChecking.Status != AutomaticExerciseCheckingStatus.Waiting)
 					return null;
 				
 				/* Mark submission as "running" */
