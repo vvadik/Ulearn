@@ -1,5 +1,7 @@
-﻿function ToggleRoleOrCourseAccess(event, target, toggleClass, comment) {
-	event.stopPropagation();
+﻿window.toggleRoleOrCourseAccess = function ToggleRoleOrCourseAccess(comment) {
+	var target = window.toggleRoles.target;
+	var toggleClass = window.toggleRoles.toggleClass;
+	
 	var $object = $(target);
 
 	var url = $object.data("toggleUrl");
@@ -25,7 +27,35 @@
 			$object.data('hasAccess', !$object.data('hasAccess'));
 			toggleClass($object);
 		});
-}
+};
+
+function ToggleSystemRoleOrAccess(target, toggleClass) {
+
+	var $object = $(target);
+
+	var url = $object.data("toggleUrl");
+
+	var token = $('#AntiForgeryTokenContainer input[name="__RequestVerificationToken"]').val();
+
+
+	$.ajax({
+		url: url,
+		method: "POST",
+		data: {
+			__RequestVerificationToken: token,
+			isEnabled: !$object.data('hasAccess'),
+		},
+		dataType: 'json',
+	})
+		.done(function (result) {
+			if (result.status !== 'ok') {
+				console.error(result.message);
+				return;
+			}
+			$object.data('hasAccess', !$object.data('hasAccess'));
+			toggleClass($object);
+		});
+};
 
 function ToggleButtonClass(button) {
 	button.toggleClass(button.data("css-class"));
@@ -48,21 +78,26 @@ function ToggleDropDownClass(dropdownElement) {
 	}
 }
 
-function OpenPopup(event, target, toggleClass) {
+function openPopup(target, toggleClass) {
+
 	if (($(target)).data("css-class") === "btn-danger") {
-		ToggleRoleOrCourseAccess(event, target, toggleClass, "");
+		ToggleSystemRoleOrAccess(target, toggleClass);
 		return;
 	}
-	$('.grantCommentField').val("");
-	$('.popup-fade').fadeIn();
-	$('.popup-fade').data["event"] = event;
-	$('.popup-fade').data["target"] = target;
-	$('.popup-fade').data["toggleClass"] = toggleClass;
 
 
+	var root = document.querySelector('.react-rendered');
+	
+	root.setAttribute('modalOpened', true);
+
+	window.toggleRoles = {
+		target: target,
+		toggleClass: toggleClass,
+	};
 }
 
 function SubmitComment(targ) {
+	closePopup();
 
 	var event = $('.popup-fade').data["event"];
 	var target = $('.popup-fade').data["target"];
@@ -71,35 +106,18 @@ function SubmitComment(targ) {
 	if (comment.length !== 0) {
 		var lineLength = $('.grantCommentField').attr('cols');
 
-		
+
 		//comment = GetFormattedStringLines(lineLength,comment);
 		console.log(comment);
 		ToggleRoleOrCourseAccess(event, target, toggleClass, comment);
-		ClosePopup()
+		closePopup()
 	}
 
 
 }
 
-function ClosePopup() {
-
-	$("div").parents('.popup-fade').fadeOut();
-
-
+function closePopup() {
+	var root = document.querySelector('.react-rendered');
+	root.setAttribute('modalOpened', false);
 }
 
-function GetFormattedStringLines(lineLength, str) {
-	var array = str.match(/[^\s]+/g);
-	var result = "";
-	var current = 0;
-	for (var e in array) {
-		current += array[e].length;
-		if (current > lineLength) {
-			result += '\n';
-			current = 0;
-		}
-		result += array[e] + ' ';
-	}
-	return result;
-
-}

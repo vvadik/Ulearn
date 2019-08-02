@@ -113,7 +113,7 @@
 			class="btn btn-sm btn-default @( courseRoles.HasAccess ? buttonClass : "")"
 			data-css-class="@buttonClass"
 			data-toggle-url="@courseRoles.ToggleUrl"
-			onclick="OpenPopup(event, this, ToggleButtonClass)">
+			onclick="openPopup(this, ToggleButtonClass)">
 		@role
 		
 	</button>
@@ -140,7 +140,7 @@
 			{
 				<li class="@( course.HasAccess ? liClass : "")"
 					data-toggle-url="@course.ToggleUrl"
-					onclick="OpenPopup(event, this, ToggleDropDownClass)">
+					onclick="openPopup(this, ToggleDropDownClass)">
 					<a>@course.CourseTitle</a>
 				</li>
 			}
@@ -170,7 +170,7 @@
 						data-toggle-url="@courseAccess.ToggleUrl"
 						data-css-class="li-info"
 						data-has-access="@( courseAccess.HasAccess ? "true" : "false" )"
-						onclick="OpenPopup(event, this, ToggleButtonClass)">
+						onclick="openPopup(this, ToggleButtonClass)">
 						<a>@courseAccessType.GetDisplayName()</a>
 					</li>
 				}
@@ -197,7 +197,7 @@
                     data-toggle-url="@systemAccess.ToggleUrl"
                     data-css-class="li-info"
                     data-has-access="@( systemAccess.HasAccess ? "true" : "false" )"
-                    onclick="ToggleRoleOrCourseAccess(event, this, ToggleButtonClass, '')">
+                    onclick="ToggleSystemRoleOrAccess(this, ToggleButtonClass, '')">
                     <a>@systemAccessType.GetDisplayName()</a>
                 </li>
             }

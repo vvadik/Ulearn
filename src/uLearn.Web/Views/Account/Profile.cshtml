@@ -108,9 +108,9 @@
 
 	<div class="user-profile__rights-history">
 		<h2>История назначений ролей и прав</h2>
-		@if (Model.RolesHistory.Count == 0 || Model.AccessesHistory.Count == 0)
+		@if (Model.RolesHistory.Count == 0 && Model.AccessesHistory.Count == 0)
 		{
-			<p class="help-block">Нет курсов и историей назначений</p>
+			<p class="help-block">Отсуствует</p>
 		}
 		<ol>
 			@{

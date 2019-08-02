@@ -1,4 +1,5 @@
 @using uLearn.Web.Controllers
+@using uLearn.Web.Extensions
 @model UserCourseHistoryModel
 
 @{
@@ -15,14 +16,16 @@
 			<th style="text-align: center !important">Роль или права</th>
 			<th style="text-align: center !important">Выданы или отозваны</th>
 			<th style="text-align: center !important">Выданы пользователем</th>
-			<th style="text-align: center !important">Дата (UTC)</th>
+			<th style="text-align: center !important">Дата и время</th>
 			<th style="text-align: center !important">Комментарий</th>
 		</tr>
 		@if (Model.UserGrantsHistory.ContainsKey(Model.Course.Id))
 		{
 			foreach (var grant in Model.UserGrantsHistory[Model.Course.Id])
 			{
-				var timestamp = grant.GrantTimeUtc == DateTime.MinValue ? "Неизвестно" : grant.GrantTimeUtc.ToString();
+				//var d = grant.GrantTimeUtc.ToString("MM/dd/yyyy") + " "+grant.GrantTimeUtc.ToString("HH:mm:ss")+ " UTC";
+				var date = $"{grant.GrantTimeUtc.Month}/{grant.GrantTimeUtc.Day}/{grant.GrantTimeUtc.Year} {grant.GrantTimeUtc.TimeOfDay.Hours}:{grant.GrantTimeUtc.TimeOfDay.Minutes}:{grant.GrantTimeUtc.TimeOfDay.Seconds} UTC";
+				var timestamp = grant.GrantTimeUtc == DateTime.MinValue ? "Неизвестно" : date;
 				var grantedBy = string.IsNullOrEmpty(grant.GrantedBy) ? "Неизвестно" : grant.GrantedBy;
 				var comment = string.IsNullOrEmpty(grant.Comment) ? "Без комментария" : grant.Comment;
 
@@ -42,11 +45,13 @@
 	
 	<script>
 	$(document).ready(function($) {
-               
-            
-                 
-		$(".grantTime").innerText = "";
+			   
+		var allTimes = document.getElementsByClassName("grantTime");
+		for (var time in allTimes){
+			allTimes[time].innerHTML = new Date(allTimes[time].innerHTML).toLocaleString();
+		} 
 		})
 	</script>
 
 </div>
+
