@@ -40,7 +40,6 @@ namespace Database.Repos
 		HashSet<Guid> GetIdOfPassedSlides(string courseId, string userId);
 		IQueryable<UserExerciseSubmission> GetAllSubmissions(int max, int skip);
 		UserExerciseSubmission FindNoTrackingSubmission(int id);
-		Task<UserExerciseSubmission> GetUnhandledSubmission(string agentName, Language language);
 		UserExerciseSubmission FindSubmissionById(int id);
 		UserExerciseSubmission FindSubmissionById(string id);
 		List<UserExerciseSubmission> FindSubmissionsByIds(List<string> checkingsIds);

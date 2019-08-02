@@ -87,7 +87,7 @@ namespace uLearn.Web.Controllers
 			{
 				var repo = new UserSolutionsRepo(new ULearnDb(), courseManager);
 				var submission = await repo.GetUnhandledSubmission(agent, languages).ConfigureAwait(false);
-				if (submission != null || sw.Elapsed > TimeSpan.FromSeconds(15))
+				if (submission != null || sw.Elapsed > TimeSpan.FromSeconds(10))
 				{
 					if (submission != null)
 						log.Info($"Отдаю на проверку решение: [{submission.Id}], агент {agent}, только сначала соберу их");
@@ -99,7 +99,7 @@ namespace uLearn.Web.Controllers
 					return builtSubmissions;
 				}
 
-				await repo.WaitAnyUnhandledSubmissions(TimeSpan.FromSeconds(10)).ConfigureAwait(false);
+				await repo.WaitAnyUnhandledSubmissions(TimeSpan.FromSeconds(8)).ConfigureAwait(false);
 			}
 		}
 
