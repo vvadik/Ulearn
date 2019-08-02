@@ -17,12 +17,12 @@ namespace uLearn.Web
 			
 			if (!isGraphiteSendingEnabled)
 				return;
-			
+
 			// Make sure MetricsPipe handles BeginRequest and EndRequest
 			DynamicModuleUtility.RegisterModule(typeof(MetricsPipeStartupModule));
 
 			MetricsPipeStartupModule.Settings.ReportRequestTime = true;
-			// The prefix is added elsewhere. If you specify here, there will be duplication
+			// The prefix is added in GraphiteConfiguration with ConfigurationManager.GetSection("graphite"). If you specify here, there will be duplication
 			MetricsPipeStartupModule.Settings.RequestTimePrefix = MetricSender.BuildKey(null, "web", "request.time");
 		}
 	}
