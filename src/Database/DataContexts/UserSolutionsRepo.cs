@@ -298,7 +298,6 @@ namespace Database.DataContexts
 			return submission;
 		}
 		
-		// NOTE: Раньше в этом методе был лок. Но, похоже, он защищал только от дедлока в TryGetExerciseSubmission внутри базы в serializable-транзакции, что устарело
 		public async Task<UserExerciseSubmission> GetUnhandledSubmission(string agentName, List<Language> languages)
 		{
 			try
@@ -312,6 +311,7 @@ namespace Database.DataContexts
 			}
 		}
 
+		private static volatile SemaphoreSlim getSubmissionSemaphore = new SemaphoreSlim(1);
 		private async Task<UserExerciseSubmission> TryGetExerciseSubmission(string agentName, IEnumerable<Language> languages)
 		{
 			var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
@@ -335,30 +335,53 @@ namespace Database.DataContexts
 			// Нам важно только, чтобы не менялись виденные в транзакции строки, поэтому подходит RepeatableRead.
 			// Хотя, здесь делается запрос просто по Id, поэтому в любом случае заблокированных строк мало.
 			// Малое количество затронутых строк должно уменьшить возможность дедлоков. Теоретически, если обе прочитают одно и то же и заходят записать, должна сработать одна транзакция и одна откатиться.
-			UserExerciseSubmission submission;
-			using (var transaction = db.Database.BeginTransaction(IsolationLevel.RepeatableRead))
+			// Дедлоки всё-таки есть в большом количестве, поэтому поставил Semaphore
+			log.Debug("GetUnhandledSubmission(): trying to acquire semaphore");
+			var semaphoreLocked = await getSubmissionSemaphore.WaitAsync(TimeSpan.FromSeconds(2));
+			if (!semaphoreLocked)
 			{
-				submission = db.UserExerciseSubmissions.AsNoTracking().FirstOrDefault(s => s.Id == maxId);
-				if (submission == null)
-					return null;
-
-				if (submission.AutomaticChecking.Status != AutomaticExerciseCheckingStatus.Waiting)
-					return null;
-				
-				/* Mark submission as "running" */
-				submission.AutomaticChecking.Status = AutomaticExerciseCheckingStatus.Running;
-				submission.AutomaticChecking.CheckingAgentName = agentName;
-
-				await SaveAll(new List<AutomaticExerciseChecking> { submission.AutomaticChecking }).ConfigureAwait(false);
-
-				transaction.Commit();
-
-				db.ObjectContext().AcceptAllChanges();
+				log.Error("TryGetExerciseSubmission(): Can't lock semaphore for 2 seconds");
+				return null;
 			}
+			log.Debug("GetUnhandledSubmission(): semaphore acquired!");
+			try
+			{
+				UserExerciseSubmission submission;
+				using (var transaction = db.Database.BeginTransaction(IsolationLevel.RepeatableRead))
+				{
+					submission = db.UserExerciseSubmissions.AsNoTracking().FirstOrDefault(s => s.Id == maxId);
+					if (submission == null)
+						return null;
 
-			unhandledSubmissions.TryRemove(submission.Id, out _);
+					if (submission.AutomaticChecking.Status != AutomaticExerciseCheckingStatus.Waiting)
+						return null;
+					
+					/* Mark submission as "running" */
+					submission.AutomaticChecking.Status = AutomaticExerciseCheckingStatus.Running;
+					submission.AutomaticChecking.CheckingAgentName = agentName;
 
-			return submission;
+					await SaveAll(new List<AutomaticExerciseChecking> { submission.AutomaticChecking }).ConfigureAwait(false);
+
+					transaction.Commit();
+
+					db.ObjectContext().AcceptAllChanges();
+				}
+				
+				unhandledSubmissions.TryRemove(submission.Id, out _);
+ 
+				return submission;
+			}
+			catch (Exception e)
+			{
+				log.Error("TryGetExerciseSubmission() error", e);
+				return null;
+			}
+			finally
+			{
+				log.Debug("GetUnhandledSubmission(): trying to release semaphore");
+				getSubmissionSemaphore.Release();
+				log.Debug("GetUnhandledSubmission(): semaphore released");
+			}
 		}
 
 		public UserExerciseSubmission FindSubmissionById(int id)

@@ -99,6 +99,7 @@ namespace uLearn.Web.Controllers
 					return builtSubmissions;
 				}
 
+				await Task.Delay(TimeSpan.FromMilliseconds(50));
 				await repo.WaitAnyUnhandledSubmissions(TimeSpan.FromSeconds(8)).ConfigureAwait(false);
 			}
 		}
