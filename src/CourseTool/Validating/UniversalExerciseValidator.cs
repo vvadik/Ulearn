@@ -87,7 +87,7 @@ namespace uLearn.CourseTool.Validating
 			{
 				if (!doNotFindNextErrors)
 				{
-					var di = new DirectoryInfo(Path.Combine(ex.ExerciseDirectory.FullName, pathToIncludeForChecker));
+					var di = new DirectoryInfo(Path.Combine(ex.UnitDirectory.FullName, pathToIncludeForChecker));
 					doNotFindNextErrors =
 						ReportSlideError(!ex.CourseDirectory.IsInside(di),
 							$"includePathForChecker '{pathToIncludeForChecker}' is not in subtree of directory with course.xml")

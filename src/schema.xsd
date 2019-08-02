@@ -456,7 +456,7 @@
 					<xs:element name="includePathForChecker" type="NonEmptyString" minOccurs="0" maxOccurs="unbounded">
 						<xs:annotation>
 							<xs:documentation>
-								Путь относительно директории с задачей до директории, содержимое которой нужно включить в архив при сборке для проверки.
+								Путь относительно директории c xml-файлом описания юнита до директории, содержимое которой нужно включить в архив при сборке для проверки.
 							</xs:documentation>
 						</xs:annotation>
 					</xs:element>
@@ -500,7 +500,7 @@
 				<xs:attribute name="exerciseDirName" type="NonEmptyString" use="required">
 					<xs:annotation>
 						<xs:documentation>
-							Путь до папки с задачей относительно директории с xml-файлом описания слайда.
+							Путь до папки с задачей относительно директории с xml-файлом описания юнита.
 						</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>

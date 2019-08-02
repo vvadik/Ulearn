@@ -33,7 +33,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public string[] PathsToExcludeForChecker { get; set; }
 		
 		[XmlElement("includePathForChecker")]
-		public string[] PathsToIncludeForChecker { get; set; } // Пути до папок относительно ExerciseDir, что содержимое нужно включить в архив. Перетирают файлы из ExerciseDir
+		public string[] PathsToIncludeForChecker { get; set; } // Пути до директорий относительно директории с Unit, чьё содержимое нужно включить в архив. Перетирают файлы из ExerciseDir в архиве
 
 		[XmlElement("excludePathForStudent")]
 		public string[] PathsToExcludeForStudent { get; set; } // Шаблоны путей до файлов внутри ExerciseDir.
@@ -57,10 +57,10 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public static readonly Regex RunCommandRegex = new Regex("^[-_a-z. ;|>]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 		
 		[XmlIgnore]
-		public DirectoryInfo SlideDirectoryPath { get; set; }
+		public DirectoryInfo UnitDirectory { get; set; }
 		
 		[XmlIgnore]
-		public DirectoryInfo ExerciseDirectory => new DirectoryInfo(Path.Combine(SlideDirectoryPath.FullName, ExerciseDirPath));
+		public DirectoryInfo ExerciseDirectory => new DirectoryInfo(Path.Combine(UnitDirectory.FullName, ExerciseDirPath));
 
 		[XmlIgnore]
 		public DirectoryInfo CourseDirectory { get; set; }
@@ -125,7 +125,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		{
 			if(!Language.HasValue)
 				Language = LanguageHelpers.GuessByExtension(new FileInfo(UserCodeFilePath));
-			SlideDirectoryPath = context.UnitDirectory;
+			UnitDirectory = context.UnitDirectory;
 			CourseDirectory = context.CourseDirectory;
 			ExpectedOutput = ExpectedOutput ?? "";
 			SolutionRegionContent = new Lazy<string>(() => GetRegionContent(UserCodeFile));
@@ -196,7 +196,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 				.ToList();
 
 			var toUpdateDirectories = PathsToIncludeForChecker
-				.Select(pathToInclude => new DirectoryInfo(Path.Combine(ExerciseDirectory.FullName, pathToInclude)));
+				.Select(pathToInclude => new DirectoryInfo(Path.Combine(UnitDirectory.FullName, pathToInclude)));
 
 			var toUpdate = GetCodeFile(code).ToList();
 			var zipBytes = ToZip(ExerciseDirectory, excluded, toUpdate, toUpdateDirectories);
