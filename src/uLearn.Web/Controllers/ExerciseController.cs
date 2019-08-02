@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.Serialization;
@@ -587,7 +588,7 @@ namespace uLearn.Web.Controllers
 			var zipFile = exerciseStudentZipsCache.GenerateOrFindZip(courseId, exerciseSlide);
 			
 			var block = exerciseSlide.Exercise;
-			var fileName = (block as CsProjectExerciseBlock)?.CsprojFile.Name ?? (block as UniversalExerciseBlock).ExerciseDirName;
+			var fileName = (block as CsProjectExerciseBlock)?.CsprojFile.Name ?? new DirectoryInfo((block as UniversalExerciseBlock).ExerciseDirPath).Name;
 			return File(zipFile.FullName, "application/zip", fileName + ".zip");
 		}
 	}

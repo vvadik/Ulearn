@@ -150,8 +150,10 @@ namespace uLearn.CourseTool.Monitoring
 			
 			var zipBytes = GenerateExerciseStudentZip(slide);
 			context.Response.Headers.Add("Content-Type", "application/zip");
-			var projectExerciseBlock = ((slide as ExerciseSlide).Exercise as CsProjectExerciseBlock);
-			context.Response.Headers.Add("Content-Disposition", $"attachment; filename=\"{projectExerciseBlock?.ExerciseDirName.ToLatin()}.zip\"");
+			var exerciseSlide = slide as ExerciseSlide;
+			var block = exerciseSlide.Exercise;
+			var fileName = (block as CsProjectExerciseBlock)?.CsprojFile.Name ?? new DirectoryInfo((block as UniversalExerciseBlock).ExerciseDirPath).Name;
+			context.Response.Headers.Add("Content-Disposition", $"attachment; filename=\"{fileName}\"");
 			
 			return zipBytes;
 		}

@@ -20,8 +20,8 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(UniversalExerciseBlock));
 		
-		[XmlAttribute("exerciseDirName")]
-		public string ExerciseDirName { get; set; }
+		[XmlAttribute("exerciseDirName")] // Путь до директории с упражнением
+		public string ExerciseDirPath { get; set; }
 		
 		[XmlElement("userCodeFile")]
 		public string UserCodeFilePath { get; set; }
@@ -33,10 +33,10 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public string[] PathsToExcludeForChecker { get; set; }
 		
 		[XmlElement("includePathForChecker")]
-		public string[] PathsToIncludeForChecker { get; set; } // Пути до папок относительно ExerciseDirName. Перетирают файлы из exerciseDirName
+		public string[] PathsToIncludeForChecker { get; set; } // Пути до папок относительно ExerciseDir, что содержимое нужно включить в архив. Перетирают файлы из ExerciseDir
 
 		[XmlElement("excludePathForStudent")]
-		public string[] PathsToExcludeForStudent { get; set; } // Шаблоны путей до файлов внутри ExerciseDirName. Нужно вручную учитывать папку src, если путь от корня
+		public string[] PathsToExcludeForStudent { get; set; } // Шаблоны путей до файлов внутри ExerciseDir.
 		
 		[XmlElement("checkInitialSolution")]
 		public bool CheckInitialSolution { get; set; } = true;
@@ -60,7 +60,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public DirectoryInfo SlideDirectoryPath { get; set; }
 		
 		[XmlIgnore]
-		public DirectoryInfo ExerciseDirectory => new DirectoryInfo(Path.Combine(SlideDirectoryPath.FullName, ExerciseDirName));
+		public DirectoryInfo ExerciseDirectory => new DirectoryInfo(Path.Combine(SlideDirectoryPath.FullName, ExerciseDirPath));
 
 		[XmlIgnore]
 		public DirectoryInfo CourseDirectory { get; set; }

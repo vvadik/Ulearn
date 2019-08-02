@@ -78,11 +78,11 @@ namespace uLearn.CourseTool.Validating
 		{
 			var doNotFindNextErrors =
 				ReportSlideError(!ex.ExerciseDirectory.Exists,
-					$"Exercise directory '{ex.ExerciseDirName}' doesn't exist")
+					$"Exercise directory '{ex.ExerciseDirPath}' doesn't exist")
 				|| ReportSlideError(!ex.UserCodeFile.Exists,
-					$"User code file '{ex.UserCodeFilePath}' doesn't exist in exercise directory '{ex.ExerciseDirName}")
+					$"User code file '{ex.UserCodeFilePath}' doesn't exist in exercise directory '{ex.ExerciseDirPath}")
 				|| ReportSlideError(!ex.InitialUserCodeFile.Exists && (!ex.NoStudentZip || ex.NoStudentZip && ex.ExerciseInitialCode == null),
-					$"Exercise directory '{ex.ExerciseDirName}' doesn't contain '{ex.InitialUserCodeFilePath}'");
+					$"Exercise directory '{ex.ExerciseDirPath}' doesn't contain '{ex.InitialUserCodeFilePath}'");
 			foreach (var pathToIncludeForChecker in ex.PathsToIncludeForChecker)
 			{
 				if (!doNotFindNextErrors)
