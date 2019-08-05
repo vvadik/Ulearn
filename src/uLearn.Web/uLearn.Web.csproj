@@ -1412,7 +1412,6 @@
     <Content Include="Views\Exercise\StudentSubmissions.cshtml" />
     <Content Include="Views\Exercise\StudentSubmissionsTable.cshtml" />
     <Content Include="Views\Exercise\_ExerciseReviewComment.cshtml" />
-    <Content Include="Views\GrantCommentPopup\Popup.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\Popup.cshtml" />
     <Content Include="Views\Shared\_Retargeting.cshtml" />

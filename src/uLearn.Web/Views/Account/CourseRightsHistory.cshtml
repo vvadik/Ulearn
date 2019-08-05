@@ -1,3 +1,4 @@
+@using System.Globalization
 @using uLearn.Web.Controllers
 @using uLearn.Web.Extensions
 @model UserCourseHistoryModel
@@ -11,7 +12,7 @@
 		— "@Model.Course.Title". Роли и права.
 	</h2>
 
-	<table class="table">
+	<table class="table" >
 		<tr>
 			<th style="text-align: center !important">Роль или права</th>
 			<th style="text-align: center !important">Выданы или отозваны</th>
@@ -23,9 +24,9 @@
 		{
 			foreach (var grant in Model.UserGrantsHistory[Model.Course.Id])
 			{
-				//var d = grant.GrantTimeUtc.ToString("MM/dd/yyyy") + " "+grant.GrantTimeUtc.ToString("HH:mm:ss")+ " UTC";
-				var date = $"{grant.GrantTimeUtc.Month}/{grant.GrantTimeUtc.Day}/{grant.GrantTimeUtc.Year} {grant.GrantTimeUtc.TimeOfDay.Hours}:{grant.GrantTimeUtc.TimeOfDay.Minutes}:{grant.GrantTimeUtc.TimeOfDay.Seconds} UTC";
-				var timestamp = grant.GrantTimeUtc == DateTime.MinValue ? "Неизвестно" : date;
+				var dateCulture = CultureInfo.CreateSpecificCulture("en-US");
+				var d = grant.GrantTimeUtc.ToString("G", dateCulture ) + " UTC";
+				var timestamp = grant.GrantTimeUtc == DateTime.MinValue ? "Неизвестно" : d;
 				var grantedBy = string.IsNullOrEmpty(grant.GrantedBy) ? "Неизвестно" : grant.GrantedBy;
 				var comment = string.IsNullOrEmpty(grant.Comment) ? "Без комментария" : grant.Comment;
 
@@ -35,8 +36,8 @@
 					<td style="text-align: left;"> @grant.Grant</td>
 					<td style="text-align: center;">@enabled</td>
 					<td style="text-align: left;">@grantedBy </td>
-					<td class="grantTime" style="text-align: center;">@timestamp</td>
-					<td style="white-space: pre-wrap; text-align: left;">@comment</td>
+					<td class="grantTime" style="text-align: center; white-space: pre-wrap;">@timestamp</td>
+					<td style="table-layout: fixed; white-space: pre-wrap; word-wrap: break-word; word-break: break-word ;text-align: left; width:30%">@comment</td>
 				</tr>
 			}
 		}
@@ -48,7 +49,11 @@
 			   
 		var allTimes = document.getElementsByClassName("grantTime");
 		for (var time in allTimes){
-			allTimes[time].innerHTML = new Date(allTimes[time].innerHTML).toLocaleString();
+			var localDate = new Date(allTimes[time].innerHTML);
+			if (!isNaN(localDate.getTime())){
+				allTimes[time].innerHTML = localDate.toLocaleString().replace(',','\r\n');
+			}
+			
 		} 
 		})
 	</script>

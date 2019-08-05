@@ -82,7 +82,7 @@ namespace Database.DataContexts
 
 		/* Course accesses */
 
-		private IQueryable<CourseAccess> GetQueryableCourseAccesses()
+		private IQueryable<CourseAccess> GetActualCourseAccessesQueryable()
 		{
 			return db.CourseAccesses
 				.GroupBy(x => x.CourseId + x.UserId + x.AccessType.ToString())
@@ -93,8 +93,6 @@ namespace Database.DataContexts
 
 		public async Task<CourseAccess> GrantAccess(string courseId, string userId, CourseAccessType accessType, string grantedById, string comment)
 		{
-			//var currentAccess = db.CourseAccesses.FirstOrDefault(a => a.CourseId == courseId && a.UserId == userId && a.AccessType == accessType);
-
 			var currentAccess = new CourseAccess
 			{
 				CourseId = courseId,
@@ -107,7 +105,7 @@ namespace Database.DataContexts
 			};
 			db.CourseAccesses.Add(currentAccess);
 
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 			return db.CourseAccesses.Include(a => a.GrantedBy).Single(a => a.Id == currentAccess.Id);
 		}
 
@@ -130,25 +128,25 @@ namespace Database.DataContexts
 			};
 			db.CourseAccesses.Add(revoke);
 
-			await db.SaveChangesAsync();
+			await db.SaveChangesAsync().ConfigureAwait(false);
 			return new List<CourseAccess> { revoke };
 		}
 
 		public List<CourseAccess> GetCourseAccesses(string courseId)
 		{
-			return GetQueryableCourseAccesses().Include(a => a.User).Where(a => a.CourseId == courseId && a.IsEnabled).ToList();
+			return GetActualCourseAccessesQueryable().Include(a => a.User).Where(a => a.CourseId == courseId && a.IsEnabled).ToList();
 		}
 
 		public List<CourseAccess> GetCourseAccesses(string courseId, string userId)
 		{
-			var courseAccesses = GetQueryableCourseAccesses().Include(a => a.User).Where(a => a.CourseId == courseId && a.UserId == userId && a.IsEnabled).ToList();
+			var courseAccesses = GetActualCourseAccessesQueryable().Include(a => a.User).Where(a => a.CourseId == courseId && a.UserId == userId && a.IsEnabled).ToList();
 
 			return courseAccesses;
 		}
 
 		public DefaultDictionary<string, List<CourseAccess>> GetCoursesAccesses(IEnumerable<string> coursesIds)
 		{
-			return GetQueryableCourseAccesses().Include(a => a.User)
+			return GetActualCourseAccessesQueryable().Include(a => a.User)
 				.Where(a => coursesIds.Contains(a.CourseId) && a.IsEnabled)
 				.GroupBy(a => a.CourseId)
 				.ToDictionary(g => g.Key, g => g.ToList())
@@ -157,12 +155,12 @@ namespace Database.DataContexts
 
 		public bool HasCourseAccess(string userId, string courseId, CourseAccessType accessType)
 		{
-			return GetQueryableCourseAccesses().Any(a => a.CourseId == courseId && a.UserId == userId && a.AccessType == accessType && a.IsEnabled);
+			return GetActualCourseAccessesQueryable().Any(a => a.CourseId == courseId && a.UserId == userId && a.AccessType == accessType && a.IsEnabled);
 		}
 
-		public Dictionary<string, List<CourseAccess>> GetUserAccessHistoryByCourseIds(string userId)
+		public async Task<Dictionary<string, List<CourseAccess>>> GetUserAccessHistoryByCourseIds(string userId)
 		{
-			var groupedByCourseId = db.CourseAccesses.Where(x => x.UserId == userId).GroupBy(x => x.CourseId);
+			var groupedByCourseId = await db.CourseAccesses.Where(x => x.UserId == userId).GroupBy(x => x.CourseId).ToListAsync();
 			var result = new Dictionary<string, List<CourseAccess>>();
 			foreach (var group in groupedByCourseId)
 			{

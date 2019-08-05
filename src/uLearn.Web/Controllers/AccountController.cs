@@ -287,7 +287,7 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.GetCourse(courseId);
 			return View(new UserCourseHistoryModel(user, course,
 				ToRolesHistoryModel(await userRolesRepo.GetUserRolesHistoryByCourseIds(userId)),
-				ToCourseAccessHistoryModel(coursesRepo.GetUserAccessHistoryByCourseIds(userId))));
+				ToCourseAccessHistoryModel(await coursesRepo.GetUserAccessHistoryByCourseIds(userId))));
 		}
 
 		public async Task<ActionResult> Profile(string userId)
@@ -310,7 +310,7 @@ namespace uLearn.Web.Controllers
 			var courseGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, maxCount: 10));
 			var courseArchivedGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, maxCount: 10, onlyArchived: true));
 			var courseRolesHistory = ToRolesHistoryModel(await userRolesRepo.GetUserRolesHistoryByCourseIds(userId));
-			var courseAccessHistory = ToCourseAccessHistoryModel(coursesRepo.GetUserAccessHistoryByCourseIds(userId));
+			var courseAccessHistory = ToCourseAccessHistoryModel(await coursesRepo.GetUserAccessHistoryByCourseIds(userId));
 
 			return View(new ProfileModel
 			{

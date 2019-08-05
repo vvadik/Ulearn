@@ -88,10 +88,11 @@ class ToggleRolesModal extends Component {
 		const regex = /(?!\b\s+\b)\s+/g;
 
 		const trimmedComment = comment
-			? comment.replace(regex, '')
+			? comment.replace(regex, ' ')
 			: '';
 
-		if (!trimmedComment || trimmedComment.length === 0) {
+
+		if (!trimmedComment || trimmedComment.length=== 0 || trimmedComment ===' ' ) {
 			this.setState({
 				error: 'Комментарий не может быть пустым',
 			});
