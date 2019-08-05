@@ -25,7 +25,7 @@ function CourseCards({ infoByUnits, courseId }) {
 	function convertToUnitCard({ unitTitle, unlocked, cardsCount, unitId, flashcardsSlideSlug }) {
 		const unitCardStyle = classNames(styles.unitCard, { [styles.unitCardLocked]: !unlocked });
 
-		const url = `/course/${ courseId }/${ flashcardsSlideSlug }/`;
+		const url = `/course/${ courseId }/${ flashcardsSlideSlug }`;
 
 		return (
 			<Link key={ unitId } className={ unitCardStyle }

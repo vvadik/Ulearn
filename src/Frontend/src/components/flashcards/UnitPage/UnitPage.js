@@ -11,19 +11,40 @@ import styles from './unitPage.less';
 import { guides } from '../consts';
 import Loader from "@skbkontur/react-ui/Loader";
 import { rateTypes } from "../../../consts/rateTypes";
+import countFlashcardsStatistics from "../../../utils/countFlashcardsStatistics";
 
 
 class UnitPage extends Component {
 	constructor(props) {
 		super(props);
+		const { flashcards, unitId } = this.props;
+
+		const unitFlashcards = flashcards.filter(fc => fc.unitId === unitId);
 
 		this.state = {
+			unitFlashcards,
 			showFlashcards: false,
+			statistics: countFlashcardsStatistics(unitFlashcards),
+			totalFlashcardsCount: unitFlashcards.length,
 		}
+	}
+
+	componentWillReceiveProps(nextProps, nextContext) {
+		const { flashcards, unitId } = nextProps;
+
+		const unitFlashcards = flashcards.filter(fc => fc.unitId === unitId);
+
+		this.setState({
+			unitFlashcards,
+			statistics: countFlashcardsStatistics(unitFlashcards),
+			totalFlashcardsCount: unitFlashcards.length,
+		});
 	}
 
 	componentDidMount() {
 		const { courseId, flashcards, loadFlashcards } = this.props;
+
+		window.scrollTo(0, 0);
 
 		document.getElementsByTagName('main')[0].classList.add(styles.pageContainer);
 
@@ -37,7 +58,8 @@ class UnitPage extends Component {
 	}
 
 	render() {
-		const { courseId, unitTitle, flashcards, flashcardsLoading, totalFlashcardsCount, statistics, sendFlashcardRate } = this.props;
+		const { courseId, unitTitle, flashcards, flashcardsLoading, sendFlashcardRate, unitId } = this.props;
+		const { statistics, totalFlashcardsCount } = this.state;
 		const haveProgress = flashcards && statistics[rateTypes.notRated] !== totalFlashcardsCount;
 		const completedUnit = flashcards && statistics[rateTypes.notRated] === 0;
 		const dataLoaded = flashcards && !flashcardsLoading;
@@ -58,8 +80,7 @@ class UnitPage extends Component {
 				{ this.renderFooter(haveProgress && dataLoaded) }
 				{ showFlashcards &&
 				<Flashcards
-					statistics={ statistics }
-					totalFlashcardsCount={ totalFlashcardsCount }
+					unitId={ unitId }
 					onClose={ () => this.hideFlashcards() }
 					flashcards={ flashcards }
 					courseId={ courseId }
@@ -70,7 +91,7 @@ class UnitPage extends Component {
 	}
 
 	renderFooter(shouldRenderProgress) {
-		const { statistics, totalFlashcardsCount } = this.props;
+		const { statistics, totalFlashcardsCount } = this.state;
 
 		if (shouldRenderProgress) {
 			return (
@@ -106,9 +127,9 @@ class UnitPage extends Component {
 	}
 
 	mapFlashcardsToQuestionWithAnswers() {
-		const { flashcards } = this.props;
+		const { unitFlashcards } = this.state;
 
-		return flashcards
+		return unitFlashcards
 			.filter(({ rate }) => rate !== rateTypes.notRated)
 			.map(({ question, answer, }) => {
 				return { question, answer, }
@@ -119,6 +140,7 @@ class UnitPage extends Component {
 UnitPage.propTypes = {
 	courseId: PropTypes.string,
 	unitTitle: PropTypes.string,
+	unitId: PropTypes.string,
 	flashcards: PropTypes.arrayOf(PropTypes.shape({
 		id: PropTypes.string,
 		question: PropTypes.string,
@@ -127,16 +149,13 @@ UnitPage.propTypes = {
 		rate: PropTypes.string,
 		unitId: PropTypes.string,
 		lastRateIndex: PropTypes.number,
+		theorySlides: PropTypes.arrayOf(
+			PropTypes.shape({
+				slug: PropTypes.string,
+				title: PropTypes.string,
+			}),
+		),
 	})),
-	totalFlashcardsCount: PropTypes.number,
-	statistics: PropTypes.shape({
-		[rateTypes.notRated]: PropTypes.number,
-		[rateTypes.rate1]: PropTypes.number,
-		[rateTypes.rate2]: PropTypes.number,
-		[rateTypes.rate3]: PropTypes.number,
-		[rateTypes.rate4]: PropTypes.number,
-		[rateTypes.rate5]: PropTypes.number,
-	}),
 
 	loadFlashcards: PropTypes.func,
 	sendFlashcardRate: PropTypes.func,

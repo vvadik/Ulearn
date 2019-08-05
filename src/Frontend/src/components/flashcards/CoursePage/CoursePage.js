@@ -10,7 +10,6 @@ import Flashcards from "../Flashcards/Flashcards";
 
 import styles from './coursePage.less';
 import { guides } from '../consts';
-import { rateTypes } from "../../../consts/rateTypes";
 
 class CoursePage extends Component {
 	constructor(props) {
@@ -25,6 +24,7 @@ class CoursePage extends Component {
 		const { courseId, flashcards, loadFlashcards } = this.props;
 
 		document.getElementsByTagName('main')[0].classList.add(styles.pageContainer);
+		window.scrollTo(0, 0);
 
 		if (flashcards.length === 0) {
 			loadFlashcards(courseId);
@@ -37,7 +37,7 @@ class CoursePage extends Component {
 
 	render() {
 		const { showFlashcards } = this.state;
-		const { courseId, flashcardsLoading, flashcards, infoByUnits, sendFlashcardRate, statistics, totalFlashcardsCount } = this.props;
+		const { courseId, flashcardsLoading, flashcards, infoByUnits, sendFlashcardRate } = this.props;
 
 		return (
 			<Loader active={ flashcardsLoading } type="big">
@@ -55,8 +55,6 @@ class CoursePage extends Component {
 
 					{ showFlashcards &&
 					<Flashcards
-						totalFlashcardsCount={ totalFlashcardsCount }
-						statistics={ statistics }
 						flashcards={ flashcards }
 						courseId={ courseId }
 						onClose={ () => this.hideFlashcards() }
@@ -68,6 +66,9 @@ class CoursePage extends Component {
 	}
 
 	renderHeader() {
+		const anyUnitAvailable = this.props.infoByUnits
+			.some(unit => unit.unlocked);
+
 		return (
 			<div className={ styles.header }>
 				<div>
@@ -78,7 +79,11 @@ class CoursePage extends Component {
 						Помогут лучше запомнить материал курса и подготовиться к экзаменам
 					</p>
 				</div>
-				<Button use="primary" size='large' onClick={ () => this.showFlashcards() }>
+				<Button disabled={ !anyUnitAvailable }
+						use="primary"
+						size='large'
+						onClick={ () => this.showFlashcards()
+						}>
 					Проверить себя
 				</Button>
 			</div>
@@ -115,16 +120,13 @@ CoursePage.propTypes = {
 		rate: PropTypes.string,
 		unitId: PropTypes.string,
 		lastRateIndex: PropTypes.number,
+		theorySlides: PropTypes.arrayOf(
+			PropTypes.shape({
+				slug: PropTypes.string,
+				title: PropTypes.string,
+			}),
+		),
 	})),
-	totalFlashcardsCount: PropTypes.number,
-	statistics: PropTypes.shape({
-		[rateTypes.notRated]: PropTypes.number,
-		[rateTypes.rate1]: PropTypes.number,
-		[rateTypes.rate2]: PropTypes.number,
-		[rateTypes.rate3]: PropTypes.number,
-		[rateTypes.rate4]: PropTypes.number,
-		[rateTypes.rate5]: PropTypes.number,
-	}),
 
 	loadFlashcards: PropTypes.func,
 	sendFlashcardRate: PropTypes.func,

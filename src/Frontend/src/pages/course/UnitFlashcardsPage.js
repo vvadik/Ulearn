@@ -3,42 +3,51 @@ import { sendFlashcardResult, loadFlashcards } from '../../actions/course';
 
 import UnitFlashcards from "../../components/flashcards/UnitPage/UnitPage";
 import Course from "../../components/course/Course";
-import { rateTypes } from "../../consts/rateTypes";
 
 const mapStateToProps = (state, { match }) => {
 	const { courseId, slideId } = match.params;
 
 	const data = state.courses;
 	const courseInfo = data.fullCoursesInfo[courseId];
+	const infoByUnits = Object.values(data.flashcardsByUnits);
 	const unitId = Course.findUnitIdBySlide(slideId, courseInfo);
-
-	const statistics = {
-		[rateTypes.notRated]: 0,
-		[rateTypes.rate1]: 0,
-		[rateTypes.rate2]: 0,
-		[rateTypes.rate3]: 0,
-		[rateTypes.rate4]: 0,
-		[rateTypes.rate5]: 0,
-	};
-
 	const unitInfo = data.flashcardsByUnits[unitId];
+
+	const courseSlides = courseInfo.units.reduce((slides, unit) => {
+		return [...slides, ...unit.slides];
+	}, []);
+
 	const flashcards = [];
 
-	if (unitInfo) {
-		for (const id of unitInfo.flashcardsIds) {
+	for (const { flashcardsIds } of infoByUnits) {
+		for (const id of flashcardsIds) {
 			const flashcard = data.flashcardsByCourses[courseId][id];
-			statistics[flashcard.rate]++;
-			flashcards.push(flashcard);
+			const { theorySlidesIds } = flashcard;
+			const theorySlides = [];
+
+			for (const slideId of theorySlidesIds) {
+				const courseSlide = courseSlides.find(slide => slide.id === slideId);
+				if (courseSlide) {
+					theorySlides.push({
+						slug: courseSlide.slug,
+						title: courseSlide.title,
+					});
+				}
+			}
+
+			flashcards.push({
+				...flashcard,
+				theorySlides,
+			});
 		}
 	}
 
 	return {
 		courseId,
 		unitTitle: unitInfo ? unitInfo.unitTitle : null,
-		flashcards: flashcards,
+		unitId,
+		flashcards,
 		flashcardsLoading: data.flashcardsLoading,
-		totalFlashcardsCount: flashcards.length,
-		statistics,
 	}
 };
 const mapDispatchToProps = (dispatch) => ({

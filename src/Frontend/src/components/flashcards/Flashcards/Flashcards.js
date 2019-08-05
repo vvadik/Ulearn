@@ -10,6 +10,8 @@ import getNextFlashcard from "./flashcardsStirrer";
 import classNames from 'classnames';
 
 import styles from './flashcards.less';
+import countFlashcardsStatistics from "../../../utils/countFlashcardsStatistics";
+import Toast from "@skbkontur/react-ui/Toast";
 
 const modalsStyles = {
 	first: classNames(styles.modal),
@@ -29,15 +31,26 @@ const mapRateToRateType = {
 class Flashcards extends Component {
 	constructor(props) {
 		super(props);
-		const { flashcards } = this.props;
+		const { flashcards, unitId } = this.props;
 
-		const lastRateIndexes = flashcards.reduce((lastRateIndexes, flashcard) => [...lastRateIndexes, flashcard.lastRateIndex], []);
+		let sessionFlashcards = [...flashcards];
+
+		if (unitId) {
+			sessionFlashcards = sessionFlashcards.filter(fc => fc.unitId === unitId);
+		}
+
+		const lastRateIndexes = sessionFlashcards.reduce(
+			(lastRateIndexes, flashcard) => [...lastRateIndexes, flashcard.lastRateIndex]
+			, []);
 		const maxTLast = Math.max(...lastRateIndexes);
 
 		this.state = {
+			onUnit: unitId !== null,
 			currentFlashcard: null,
 			maxTLast: maxTLast,
-			onRepeating: false,
+			ratedFlashcardsCount: 0,
+			sessionFlashcards,
+			statistics: countFlashcardsStatistics(sessionFlashcards),
 		}
 	}
 
@@ -54,19 +67,19 @@ class Flashcards extends Component {
 	}
 
 	render() {
-		const flashcard = this.state.currentFlashcard;
-		const { totalFlashcardsCount, statistics } = this.props;
+		const { statistics, sessionFlashcards, currentFlashcard } = this.state;
 
 		return (
 			<div ref={ (ref) => this.overlay = ref } className={ styles.overlay } onClick={ this.handleOverlayClick }>
 
 				<div className={ modalsStyles.first } ref={ (ref) => this.firstModal = ref }>
-					{ flashcard &&
+					{ currentFlashcard &&
 					<FrontFlashcard
 						onShowAnswer={ () => this.resetCardsAnimation() }
-						question={ flashcard.question }
-						answer={ flashcard.answer }
-						unitTitle={ flashcard.unitTitle }
+						question={ currentFlashcard.question }
+						answer={ currentFlashcard.answer }
+						unitTitle={ currentFlashcard.unitTitle }
+						theorySlides={ currentFlashcard.theorySlides }
 						onHandlingResultsClick={ (rate) => this.handleResultsClick(rate) }
 						onClose={ this.props.onClose }
 					/> }
@@ -79,7 +92,7 @@ class Flashcards extends Component {
 				{ Flashcards.renderControlGuides() }
 
 				<div className={ styles.progressBarContainer }>
-					<ProgressBar statistics={ statistics } totalFlashcardsCount={ totalFlashcardsCount }/>
+					<ProgressBar statistics={ statistics } totalFlashcardsCount={ sessionFlashcards.length }/>
 				</div>
 			</div>
 		)
@@ -108,25 +121,63 @@ class Flashcards extends Component {
 	}
 
 	handleResultsClick = async (rate) => {
-		const { currentFlashcard, maxTLast } = this.state;
+		const { currentFlashcard, maxTLast, statistics } = this.state;
 		const { courseId, sendFlashcardRate } = this.props;
+
+		const newStatistics = { ...statistics };
+		const newRate = mapRateToRateType[rate];
 		const newTLast = maxTLast + 1;
 
-		await sendFlashcardRate(courseId, currentFlashcard.unitId, currentFlashcard.id, mapRateToRateType[rate], newTLast);
+		newStatistics[currentFlashcard.rate]--;
+		newStatistics[newRate]++;
+
+		currentFlashcard.rate = newRate;
+		currentFlashcard.lastRateIndex = newTLast;
+
+		await sendFlashcardRate(courseId, currentFlashcard.unitId, currentFlashcard.id, newRate, newTLast);
 
 		this.setState({
 			maxTLast: newTLast,
+			statistics: newStatistics,
 		});
 
 		this.takeNextFlashcard(newTLast);
 	};
 
 	takeNextFlashcard(tLast) {
-		const { flashcards } = this.props;
+		const { ratedFlashcardsCount, sessionFlashcards, onUnit } = this.state;
 
-		this.setState({ currentFlashcard: getNextFlashcard(flashcards, tLast) });
+		if (onUnit && Flashcards.hasFinishedUnit(sessionFlashcards, ratedFlashcardsCount)) {
+			this.startRepeating(tLast);
+		} else {
+			this.setState({
+				currentFlashcard: getNextFlashcard(sessionFlashcards, tLast),
+			})
+		}
+
+		this.setState({
+			ratedFlashcardsCount: ratedFlashcardsCount + 1,
+		});
 
 		this.animateCards();
+	}
+
+	static hasFinishedUnit(unitFlashcards, ratedFlashcardsCount) {
+		return unitFlashcards.every(fc => fc.rate !== rateTypes.notRated)
+			&& ratedFlashcardsCount >= unitFlashcards.length;
+	}
+
+	startRepeating(tLast) {
+		const filteredFlashcards = [...this.props.flashcards.filter(fc => fc.rate !== rateTypes.notRated)];
+
+		Toast.push('Переход к повторению по курсу');
+
+		this.setState({
+			onUnit: false,
+			sessionFlashcards: filteredFlashcards,
+			statistics: countFlashcardsStatistics(filteredFlashcards),
+			currentFlashcard: getNextFlashcard(filteredFlashcards, tLast),
+		});
 	}
 
 	animateCards() {
@@ -168,17 +219,13 @@ Flashcards.propTypes = {
 		rate: PropTypes.string,
 		unitId: PropTypes.string,
 		lastRateIndex: PropTypes.number,
+		theorySlides: PropTypes.arrayOf(
+			PropTypes.shape({
+				slug: PropTypes.string,
+				title: PropTypes.string,
+			}),
+		),
 	})),
-	totalFlashcardsCount: PropTypes.number,
-
-	statistics: PropTypes.shape({
-		[rateTypes.notRated]: PropTypes.number,
-		[rateTypes.rate1]: PropTypes.number,
-		[rateTypes.rate2]: PropTypes.number,
-		[rateTypes.rate3]: PropTypes.number,
-		[rateTypes.rate4]: PropTypes.number,
-		[rateTypes.rate5]: PropTypes.number,
-	}),
 
 	onClose: PropTypes.func,
 	sendFlashcardRate: PropTypes.func,

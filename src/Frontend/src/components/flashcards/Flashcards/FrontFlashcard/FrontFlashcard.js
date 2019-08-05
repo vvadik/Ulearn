@@ -7,6 +7,7 @@ import Results from "../Results/Results";
 import styles from "../flashcards.less";
 
 import translateCode from "../../../../codeTranslator/translateCode";
+import Link from "react-router-dom/es/Link";
 
 
 class FrontFlashcard extends Component {
@@ -64,7 +65,7 @@ class FrontFlashcard extends Component {
 		let content, control;
 
 		if (showAnswer) {
-			content = FrontFlashcard.renderBackContent(question, answer);
+			content = FrontFlashcard.renderBackContent(question, answer, this.renderLinksToTheorySlides());
 			control = this.renderBackControl();
 		} else {
 			content = FrontFlashcard.renderFrontContent(question);
@@ -73,6 +74,7 @@ class FrontFlashcard extends Component {
 
 		return (
 			<div className={ styles.wrapper } ref={ ref => this.modal = ref }>
+
 				<button tabIndex={ 1 } className={ styles.closeButton } onClick={ onClose }>
 					&times;
 				</button>
@@ -83,6 +85,28 @@ class FrontFlashcard extends Component {
 				{ control }
 			</div>
 		);
+	}
+
+	renderLinksToTheorySlides() {
+		const { theorySlides } = this.props;
+		const slidesCount = theorySlides.length;
+
+		if (slidesCount === 0) {
+			return;
+		}
+
+		const sourcePluralForm = slidesCount > 1
+			? 'Источники'
+			: 'Источник';
+
+		return (
+			<p className={ styles.theoryLinks }>{ sourcePluralForm }: {
+				theorySlides.map(({ slug, title }, index) =>
+					<Link to={ slug }
+						  key={ slug }>
+						{ title }{ index < slidesCount - 1 && ', ' }
+					</Link>) }
+			</p>)
 	}
 
 	static renderFrontContent(question) {
@@ -110,11 +134,12 @@ class FrontFlashcard extends Component {
 		});
 	}
 
-	static renderBackContent(question, answer) {
+	static renderBackContent(question, answer, linksToTheorySlides) {
 		return (
 			<div className={ styles.backTextContainer }>
 				<div className={ styles.questionBack } dangerouslySetInnerHTML={ { __html: question } }/>
 				<div dangerouslySetInnerHTML={ { __html: answer } }/>
+				{ linksToTheorySlides }
 			</div>
 		);
 	}
@@ -130,6 +155,13 @@ FrontFlashcard.propTypes = {
 	question: PropTypes.string,
 	answer: PropTypes.string,
 	unitTitle: PropTypes.string,
+	theorySlides: PropTypes.arrayOf(
+		PropTypes.shape({
+			slug: PropTypes.string,
+			title: PropTypes.string,
+		}),
+	),
+
 	onClose: PropTypes.func,
 	onShowAnswer: PropTypes.func,
 	onHandlingResultsClick: PropTypes.func,
