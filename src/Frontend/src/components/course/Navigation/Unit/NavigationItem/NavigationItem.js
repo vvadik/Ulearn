@@ -6,12 +6,12 @@ import { SLIDETYPE } from '../../../../../consts/general';
 import { menuItemType } from '../../types';
 import { toggleNavigation } from "../../../../../actions/navigation";
 import { connect } from "react-redux";
-
+import Copy from "@skbkontur/react-icons/Copy";
 
 const icons = {
 	[SLIDETYPE.quiz]: '?',
-	[SLIDETYPE.exercise]: '{}',
-	[SLIDETYPE.flashcards]: '🃝',
+	[SLIDETYPE.exercise]: <div className={ styles.exerciseIcon }>{ '<>' }</div>,
+	[SLIDETYPE.flashcards]: <Copy/>,
 };
 
 class NavigationItem extends Component {
