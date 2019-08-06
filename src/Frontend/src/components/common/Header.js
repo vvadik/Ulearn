@@ -39,9 +39,12 @@ class Header extends Component {
 			return (
 				<div className={ styles["header"] + " header" }>
 					<Logo>
-						<span className={ styles["visible-at-least-tablet"] }>
-							Ulearn.me
-						</span>
+						{ isInsideCourse() && <NavMenuComponent/> }
+						<div className={ styles["visible-at-least-tablet"] }>
+							<Link to={ '/' }>
+								Ulearn.me
+							</Link>
+						</div>
 					</Logo>
 				</div>
 			)
