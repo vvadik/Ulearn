@@ -104,7 +104,7 @@ class FrontFlashcard extends Component {
 				theorySlides.map(({ slug, title }, index) =>
 					<Link to={ slug }
 						  key={ slug }>
-						{ title }{ index < slidesCount - 1 && ', ' }
+						Слайд «{ title }»{ index < slidesCount - 1 && ', ' }
 					</Link>) }
 			</p>)
 	}

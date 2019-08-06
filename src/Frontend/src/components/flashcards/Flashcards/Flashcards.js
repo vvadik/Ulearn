@@ -36,7 +36,7 @@ class Flashcards extends Component {
 		let sessionFlashcards = [...flashcards];
 
 		if (unitId) {
-			sessionFlashcards = sessionFlashcards.filter(fc => fc.unitId === unitId);
+			sessionFlashcards = sessionFlashcards.filter(flashcard => flashcard.unitId === unitId);
 		}
 
 		const lastRateIndexes = sessionFlashcards.reduce(
@@ -163,12 +163,12 @@ class Flashcards extends Component {
 	}
 
 	static hasFinishedUnit(unitFlashcards, ratedFlashcardsCount) {
-		return unitFlashcards.every(fc => fc.rate !== rateTypes.notRated)
+		return unitFlashcards.every(flashcard => flashcard.rate !== rateTypes.notRated)
 			&& ratedFlashcardsCount >= unitFlashcards.length;
 	}
 
 	startRepeating(tLast) {
-		const filteredFlashcards = [...this.props.flashcards.filter(fc => fc.rate !== rateTypes.notRated)];
+		const filteredFlashcards = [...this.props.flashcards.filter(flashcard => flashcard.rate !== rateTypes.notRated)];
 
 		Toast.push('Переход к повторению по курсу');
 
