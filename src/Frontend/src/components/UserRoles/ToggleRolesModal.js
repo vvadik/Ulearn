@@ -1,10 +1,9 @@
 import React, {Component} from 'react';
+
 import Modal from '@skbkontur/react-ui/components/Modal/Modal';
 import Button from '@skbkontur/react-ui/components/Button/Button';
-
 import Textarea from '@skbkontur/react-ui/components/Textarea/Textarea';
-
-import styles from './ToggleRolesModal.less';
+import Tooltip from "@skbkontur/react-ui/components/Tooltip/Tooltip";
 
 class ToggleRolesModal extends Component {
 	constructor(props) {
@@ -14,6 +13,7 @@ class ToggleRolesModal extends Component {
 			comment: null,
 			modalOpened: null,
 			error: null,
+			toggleRoles: {},
 		};
 	}
 
@@ -24,6 +24,13 @@ class ToggleRolesModal extends Component {
 			mutations.forEach((mutation) => {
 				this.setState({
 					modalOpened: this.root.getAttribute(mutation.attributeName) === 'true',
+					toggleRoles: {
+						role: window.toggleRoles.role,
+						userName: window.toggleRoles.userName,
+						isRole: window.toggleRoles.isRole === 'True',
+						courseTitle: window.toggleRoles.courseTitle,
+						isGrant: window.toggleRoles.isGrant,
+					}
 				});
 			});
 		});
@@ -46,30 +53,101 @@ class ToggleRolesModal extends Component {
 		this.observer.disconnect();
 	}
 
+	renderTooltip = () => {
+		if (this.state.error) {
+			return <span>Комментарий не может быть пустым</span>
+		}
+
+		return null;
+	};
+
+	renderModalHeader(isRole, isGrant) {
+		return (
+			<Modal.Header>
+				{isRole && isGrant && 'Назначение роли'}
+				{isRole && !isGrant && 'Удаление роли'}
+				{!isRole && isGrant && 'Назначение прав'}
+				{!isRole && !isGrant && 'Удаление прав'}
+			</Modal.Header>
+		)
+	}
+
+	renderModalBodyContent(isRole, isGrant, role, userName, courseTitle) {
+		if (isRole && isGrant) {
+			return (<div>Будет назначена роль <i>«{role}»</i> пользователю <i>«{userName}»</i> в
+				курсе <i>«{courseTitle}»</i> <br/>
+				Укажите причину назначения роли:
+			</div>)
+		}
+		if (isRole && !isGrant)
+			return (
+				<div>Будет удалена роль <i>«{role}»</i> у пользователя <i>«{userName}»</i> в
+					курсе <i>«{courseTitle}»</i> <br/>
+					Укажите причину удаления роли:
+				</div>)
+		if (!isRole && isGrant) {
+			return (<div>Будут назначены права <i>«role}»</i> пользователю <i>«{userName}»</i> в
+				курсе <i>«{courseTitle}»</i> <br/>
+				Укажите причину назначения прав:
+			</div>)
+		}
+		if (!isRole && !isGrant) {
+			return (<div>Будут удалены права <i>«{role}»</i> у пользователя <i>«{userName}»</i> в
+				курсе <i>«{courseTitle}»</i> <br/>
+				Укажите причину удаления прав:
+			</div>)
+		}
+
+	}
+
+	getSubmitButtonText(isRole, isGrant) {
+		if (isRole && isGrant) {
+			return 'Назначить роль'
+		}
+		if (isRole && !isGrant) {
+			return 'Удалить роль'
+		}
+		if (!isRole && isGrant) {
+			return 'Назначить права'
+		}
+		if (!isRole && !isGrant) {
+			return 'Удалить права'
+		}
+
+	}
+
+
 	render() {
-		const {modalOpened, error} = this.state;
+		const {modalOpened, error, toggleRoles} = this.state;
+		const {role, userName, isRole, courseTitle, isGrant} = toggleRoles;
 
 		return (
 			<div>
 				{modalOpened &&
-				<Modal onClose={this.onClose}>
-					<Modal.Header>
-						Оставьте комментарий
-					</Modal.Header>
+				<Modal onClose={this.onClose} width='600px'>
+					{this.renderModalHeader(isRole, isGrant)}
 					<Modal.Body>
-						<p className={styles.errorMessage}> {error && error} </p>
-						<Textarea
-							width='100%'
-							onChange={this.onTextareaChange}
-							autoResize
-							placeholder="Укажите причину назначения прав"
-							error={error !== null}
-						/>
+						{this.renderModalBodyContent(isRole, isGrant, role, userName, courseTitle)}
+						<Tooltip render={this.renderTooltip} pos="right middle" tab-index={0}
+								 trigger='hover&focus'>
+							<Textarea
+								ref={(ref) => {
+									this.textarea = ref
+								}}
+								width='100%'
+								onChange={this.onTextareaChange}
+								autoResize
+								placeholder={isGrant ? "Например, в 2019-2020 учебном году преподает в УрФУ" : "Например, закончил преподавать в 2019 году"}
+								error={error !== null}
+							/>
+						</Tooltip>
+						<div  style={{marginTop: '10px'}}>
 						<Button use='primary' onClick={() => {
 							this.onSubmit()
 						}}>
-							Сохранить
+							{this.getSubmitButtonText(isRole, isGrant)}
 						</Button>
+						</div>
 					</Modal.Body>
 				</Modal>}
 			</div>
@@ -85,14 +163,16 @@ class ToggleRolesModal extends Component {
 	onSubmit = () => {
 		const {comment} = this.state;
 
+		this.textarea.focus();
+
 		const regex = /(?!\b\s+\b)\s+/g;
 
 		const trimmedComment = comment
-			? comment.replace(regex, ' ')
+			? comment.replace(regex, ' ').trim()
 			: '';
 
 
-		if (!trimmedComment || trimmedComment.length=== 0 || trimmedComment ===' ' ) {
+		if (!trimmedComment || trimmedComment.length === 0 || trimmedComment === ' ') {
 			this.setState({
 				error: 'Комментарий не может быть пустым',
 			});

@@ -805,7 +805,11 @@ namespace uLearn.Web.Controllers
 						courseRole => (ICoursesRolesListModel)new SingleCourseRolesModel
 						{
 							HasAccess = roles.Contains(courseRole),
-							ToggleUrl = Url.Action("ToggleRole", "Account", new { courseId, userId = user.UserId, role = courseRole })
+							ToggleUrl = Url.Action("ToggleRole", "Account", new { courseId, userId = user.UserId, role = courseRole }),
+							UserName = user.UserVisibleName,
+							Role = courseRole,
+							CourseTitle = courseManager.FindCourse(courseId)?.Title
+							
 						});
 
 				var courseAccesses = coursesRepo.GetCourseAccesses(courseId, user.UserId).Select(a => a.AccessType).ToList();
@@ -817,7 +821,11 @@ namespace uLearn.Web.Controllers
 						{
 							CourseId = courseId,
 							HasAccess = courseAccesses.Contains(a),
-							ToggleUrl = Url.Action("ToggleCourseAccess", "Admin", new { courseId = courseId, userId = user.UserId, accessType = a })
+							ToggleUrl = Url.Action("ToggleCourseAccess", "Admin", new { courseId = courseId, userId = user.UserId, accessType = a }),
+							UserName = user.UserVisibleName,
+							AccessType=a,
+							CourseTitle = courseManager.FindCourse(courseId)?.Title
+							
 						}
 					);
 

@@ -117,7 +117,7 @@ namespace uLearn.Web.Controllers
 						new SingleCourseRolesModel
 						{
 							HasAccess = userRoles.Roles.Contains(LmsRoles.SysAdmin.ToString()),
-							ToggleUrl = Url.Action("ToggleSystemRole", new { userId = userRoles.UserId, role = LmsRoles.SysAdmin })
+							ToggleUrl = Url.Action("ToggleSystemRole", new { userId = userRoles.UserId, role = LmsRoles.SysAdmin }),
 						}
 					}
 				}
@@ -136,7 +136,8 @@ namespace uLearn.Web.Controllers
 							CourseId = s,
 							CourseTitle = courseManager.GetCourse(s).Title,
 							HasAccess = coursesForUser.ContainsKey(role) && coursesForUser[role].Contains(s.ToLower()),
-							ToggleUrl = Url.Action("ToggleRole", new { courseId = s, userId = user.UserId, role } )
+							ToggleUrl = Url.Action("ToggleRole", new { courseId = s, userId = user.UserId, role }),
+							UserName = user.UserVisibleName
 						})
 						.OrderBy(s => s.CourseTitle, StringComparer.InvariantCultureIgnoreCase)
 						.ToList()
@@ -151,7 +152,8 @@ namespace uLearn.Web.Controllers
 					a => new SystemAccessModel
 					{
 						HasAccess = systemAccesses.Contains(a),
-						ToggleUrl = Url.Action("ToggleSystemAccess", "Account", new { userId = user.UserId, accessType = a })
+						ToggleUrl = Url.Action("ToggleSystemAccess", "Account", new { userId = user.UserId, accessType = a }),
+						UserName = user.UserVisibleName,
 					}
 				);
 
@@ -278,16 +280,17 @@ namespace uLearn.Web.Controllers
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public async Task<ActionResult> CourseRightsHistory(string userId, string courseId)
+		public async Task<ActionResult> ToggleRolesHistory(string userId, string courseId)
 		{
 			var user = usersRepo.FindUserById(userId);
 			if (user == null)
 				return RedirectToAction("List");
 
 			var course = courseManager.GetCourse(courseId);
-			return View(new UserCourseHistoryModel(user, course,
-				ToRolesHistoryModel(await userRolesRepo.GetUserRolesHistoryByCourseIds(userId)),
-				ToCourseAccessHistoryModel(await coursesRepo.GetUserAccessHistoryByCourseIds(userId))));
+			var model = new UserCourseHistoryModel(user, course,
+				ToSingleCourseRolesHistoryModel(await userRolesRepo.GetUserRolesHistoryByCourseId(userId,courseId)),
+				ToSingleCourseAccessHistoryModel(await coursesRepo.GetUserAccessHistoryByCourseId(userId,courseId)));
+			return View(model);
 		}
 
 		public async Task<ActionResult> Profile(string userId)
@@ -309,8 +312,8 @@ namespace uLearn.Web.Controllers
 
 			var courseGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, maxCount: 10));
 			var courseArchivedGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, maxCount: 10, onlyArchived: true));
-			var courseRolesHistory = ToRolesHistoryModel(await userRolesRepo.GetUserRolesHistoryByCourseIds(userId));
-			var courseAccessHistory = ToCourseAccessHistoryModel(await coursesRepo.GetUserAccessHistoryByCourseIds(userId));
+			var courseRolesHistory = ToManyCoursesRolesHistoryModel(await userRolesRepo.GetUserRolesHistoryByCourseIds(userId));
+			var courseAccessHistory = ToManyCourseAccessHistoryModel(await coursesRepo.GetUserAccessHistoryByCourseIds(userId));
 
 			return View(new ProfileModel
 			{
@@ -326,7 +329,7 @@ namespace uLearn.Web.Controllers
 			});
 		}
 
-		private Dictionary<string, List<AccessGrantModel>> ToCourseAccessHistoryModel(Dictionary<string, List<CourseAccess>> historyByCourseIds)
+		private Dictionary<string, List<AccessGrantModel>> ToManyCourseAccessHistoryModel(Dictionary<string, List<CourseAccess>> historyByCourseIds)
 		{
 			var result = new Dictionary<string, List<AccessGrantModel>>();
 			foreach (var courseHistory in historyByCourseIds)
@@ -348,7 +351,19 @@ namespace uLearn.Web.Controllers
 			return result;
 		}
 
-		private Dictionary<string, List<RoleGrantModel>> ToRolesHistoryModel(Dictionary<string, List<UserRole>> historyByCourseIds)
+		private List<AccessGrantModel> ToSingleCourseAccessHistoryModel(List<CourseAccess> historyByCourse)
+		{
+			return historyByCourse.Select(a => new AccessGrantModel()
+			{
+				IsEnabled = a.IsEnabled,
+				GrantedBy = usersRepo.FindUserById(a.GrantedById).VisibleName,
+				Comment = a.Comment,
+				GrantTimeUtc = a.GrantTime,
+				CourseAccess = a.AccessType.GetDisplayName()
+			}).ToList();
+		}
+
+		private Dictionary<string, List<RoleGrantModel>> ToManyCoursesRolesHistoryModel(Dictionary<string, List<UserRole>> historyByCourseIds)
 		{
 			var result = new Dictionary<string, List<RoleGrantModel>>();
 			foreach (var courseHistory in historyByCourseIds)
@@ -359,7 +374,7 @@ namespace uLearn.Web.Controllers
 					result[courseHistory.Key].Add(new RoleGrantModel()
 					{
 						IsEnabled = a.IsEnabled ?? true,
-						GrantedBy = a.GrantedById == null? "" : usersRepo.FindUserById(a.GrantedById).VisibleName,
+						GrantedBy = a.GrantedById == null ? "" : usersRepo.FindUserById(a.GrantedById).VisibleName,
 						Comment = a.Comment,
 						GrantTimeUtc = a.GrantTime ?? DateTime.MinValue,
 						Role = a.Role.GetDisplayName()
@@ -368,6 +383,18 @@ namespace uLearn.Web.Controllers
 			}
 
 			return result;
+		}
+
+		private List<RoleGrantModel> ToSingleCourseRolesHistoryModel(List<UserRole> historyByCourse)
+		{
+			return historyByCourse.Select(a => new RoleGrantModel()
+			{
+				IsEnabled = a.IsEnabled ?? true,
+				GrantedBy = a.GrantedById == null ? "" : usersRepo.FindUserById(a.GrantedById).VisibleName,
+				Comment = a.Comment,
+				GrantTimeUtc = a.GrantTime ?? DateTime.MinValue,
+				Role = a.Role.GetDisplayName()
+			}).ToList();
 		}
 
 

@@ -170,6 +170,12 @@ namespace Database.DataContexts
 			return result;
 		}
 
+		public async Task<List<CourseAccess>> GetUserAccessHistoryByCourseId(string userId, string courseId)
+		{
+			courseId = courseId.ToLower();
+			return await db.CourseAccesses.Where(x => x.UserId == userId && x.CourseId == courseId).ToListAsync();
+		}
+
 		// Add new and remove old course file
 		public async Task AddCourseFile(string courseId, Guid versionId, byte[] content)
 		{

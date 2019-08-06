@@ -121,7 +121,7 @@
 				if (Model.AllCourses.TryGetValue(courseId, out var course))
 				{
 					<li>
-						@Html.ActionLink(course.Title, "CourseRightsHistory", new { userId = Model.User.Id, courseId = course.Id })
+						@Html.ActionLink(course.Title, "ToggleRolesHistory", new { userId = Model.User.Id, courseId = course.Id })
 					</li>
 				}
 			}

@@ -106,6 +106,7 @@ namespace Database.Repos
 
 		public async Task<CourseAccess> GrantAccessAsync(string courseId, string userId, CourseAccessType accessType, string grantedById, string comment)
 		{
+			courseId = courseId.ToLower();
 			var currentAccess = new CourseAccess
 			{
 				CourseId = courseId,
@@ -129,6 +130,7 @@ namespace Database.Repos
 
 		public async Task<List<CourseAccess>> RevokeAccessAsync(string courseId, string userId, CourseAccessType accessType, string grantedById, string comment)
 		{
+			courseId = courseId.ToLower();
 			var revoke = new CourseAccess
 			{
 				UserId = userId,

@@ -1,7 +1,7 @@
 ﻿window.toggleRoleOrCourseAccess = function ToggleRoleOrCourseAccess(comment) {
 	var target = window.toggleRoles.target;
 	var toggleClass = window.toggleRoles.toggleClass;
-	
+
 	var $object = $(target);
 
 	var url = $object.data("toggleUrl");
@@ -85,36 +85,36 @@ function openPopup(target, toggleClass) {
 		return;
 	}
 
-
-	var root = document.querySelector('.react-rendered');
-	
-	root.setAttribute('modalOpened', true);
+	var $object = $(target);
+	var userName = $object.data("toggleUsername");
+	var role = $object.data("toggleRole");
+	var isRole = $object.data("toggleIsrole");
+	var courseTitle = $object.data("toggleCoursetitle");
+	var isGrant = true;
+	var className = ((target)).className;
+	console.log(className)
+	if (className.indexOf("btn-success") > -1 || className.indexOf("btn-warning") > -1 || className.indexOf("btn-info") > -1) {
+		isGrant = false;
+	}
+	if (className === "li-info" || className === "li-warning") {
+		isGrant = false;
+	}
 
 	window.toggleRoles = {
 		target: target,
 		toggleClass: toggleClass,
+		userName: userName,
+		role: role,
+		isRole: isRole,
+		courseTitle: courseTitle,
+		isGrant: isGrant
 	};
+
+
+	var root = document.querySelector('.react-rendered');
+	root.setAttribute('modalOpened', true);
 }
 
-function SubmitComment(targ) {
-	closePopup();
-
-	var event = $('.popup-fade').data["event"];
-	var target = $('.popup-fade').data["target"];
-	var toggleClass = $('.popup-fade').data["toggleClass"];
-	var comment = $('.grantCommentField').val();
-	if (comment.length !== 0) {
-		var lineLength = $('.grantCommentField').attr('cols');
-
-
-		//comment = GetFormattedStringLines(lineLength,comment);
-		console.log(comment);
-		ToggleRoleOrCourseAccess(event, target, toggleClass, comment);
-		closePopup()
-	}
-
-
-}
 
 function closePopup() {
 	var root = document.querySelector('.react-rendered');

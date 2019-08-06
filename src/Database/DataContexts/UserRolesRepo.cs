@@ -55,6 +55,7 @@ namespace Database.DataContexts
 
 		public async Task<bool> ToggleRole(string courseId, string userId, CourseRole role, string grantedById, string comment)
 		{
+			courseId = courseId.ToLower();
 			var userRole = db.UserRoles.Where(x => x.UserId == userId && x.Role == role && x.CourseId == courseId).ToList().LastOrDefault();
 			bool isEnabled;
 			if (userRole != null && (!userRole.IsEnabled.HasValue || userRole.IsEnabled.Value))
@@ -130,6 +131,12 @@ namespace Database.DataContexts
 			}
 
 			return result;
+		}
+		
+		public async Task<List<UserRole>> GetUserRolesHistoryByCourseId(string userId, string courseId)
+		{
+			courseId = courseId.ToLower();
+			return await db.UserRoles.Where(x => x.UserId == userId && x.CourseId == courseId).ToListAsync();
 		}
 	}
 }
