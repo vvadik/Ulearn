@@ -27,7 +27,7 @@ class ToggleRolesModal extends Component {
 					toggleRoles: {
 						role: window.toggleRoles.role,
 						userName: window.toggleRoles.userName,
-						isRole: window.toggleRoles.isRole === 'True',
+						isRole: window.toggleRoles.isRole,
 						courseTitle: window.toggleRoles.courseTitle,
 						isGrant: window.toggleRoles.isGrant,
 					}

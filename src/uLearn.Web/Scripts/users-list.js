@@ -87,12 +87,11 @@ function openPopup(target, toggleClass) {
 
 	var $object = $(target);
 	var userName = $object.data("toggleUsername");
-	var role = $object.data("toggleRole");
-	var isRole = $object.data("toggleIsrole");
+	var roleOrAccess = $object.data("toggleRole");
+	var isRole = $object.data("toggleIsrole") === 'True';
 	var courseTitle = $object.data("toggleCoursetitle");
 	var isGrant = true;
 	var className = ((target)).className;
-	console.log(className)
 	if (className.indexOf("btn-success") > -1 || className.indexOf("btn-warning") > -1 || className.indexOf("btn-info") > -1) {
 		isGrant = false;
 	}
@@ -104,7 +103,7 @@ function openPopup(target, toggleClass) {
 		target: target,
 		toggleClass: toggleClass,
 		userName: userName,
-		role: role,
+		role: roleOrAccess,
 		isRole: isRole,
 		courseTitle: courseTitle,
 		isGrant: isGrant
