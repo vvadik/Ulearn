@@ -7,38 +7,43 @@ using uLearn.Web.Controllers;
 
 namespace uLearn.Web.Models
 {
-	public class UserCourseHistoryModel
+	public class UserCourseToggleHistoryModel
 	{
 		public ApplicationUser User { get; set; }
 		public Course Course;
-		public List<UserGrantModel> UserGrantsHistory;
+		public List<UserToggleModel> UserGrantsHistory;
 
 
-		public UserCourseHistoryModel(ApplicationUser user, Course course,  List<RoleGrantModel> rolesHistory, List<AccessGrantModel> accessesHistory)
+		public UserCourseToggleHistoryModel(ApplicationUser user, Course course, List<UserToggleModel> rolesHistory, List<UserToggleModel> accessesHistory)
 		{
 			User = user;
 			Course = course;
 			UserGrantsHistory = MergeUserRolesAndAccessesGrants(rolesHistory, accessesHistory);
 		}
 
-		private List<UserGrantModel> MergeUserRolesAndAccessesGrants( List<RoleGrantModel> rolesHistory, List<AccessGrantModel> accessesHistory)
+		private List<UserToggleModel> MergeUserRolesAndAccessesGrants(List<UserToggleModel> rolesHistory, List<UserToggleModel> accessesHistory)
 		{
 			return rolesHistory
-				.Select(x => x.ToUserGrantModel())
-				.Concat(accessesHistory.Select(x => x.ToUserGrantModel()))
-				.OrderByDescending(x=>x.GrantTimeUtc)
+				.Concat(accessesHistory)
+				.OrderByDescending(x => x.GrantTimeUtc)
 				.ToList();
 		}
 	}
 
 
-	public class UserGrantModel
+	public class UserToggleModel
 	{
 		public string GrantedBy { get; set; }
 		public string Grant { get; set; }
-		public Type GrantType { get; set; }
+		public GrantType GrantType { get; set; }
 		public DateTime GrantTimeUtc { get; set; }
 		public bool IsEnabled { get; set; }
 		public string Comment { get; set; }
+	}
+
+	public enum GrantType
+	{
+		Role,
+		Access
 	}
 }

@@ -93,6 +93,7 @@ namespace Database.DataContexts
 
 		public async Task<CourseAccess> GrantAccess(string courseId, string userId, CourseAccessType accessType, string grantedById, string comment)
 		{
+			courseId = courseId.ToLower();
 			var currentAccess = new CourseAccess
 			{
 				CourseId = courseId,
@@ -116,6 +117,7 @@ namespace Database.DataContexts
 
 		public async Task<List<CourseAccess>> RevokeAccess(string courseId, string userId, CourseAccessType accessType, string grantedById, string comment)
 		{
+			courseId = courseId.ToLower();
 			var revoke = new CourseAccess
 			{
 				UserId = userId,
@@ -158,16 +160,9 @@ namespace Database.DataContexts
 			return GetActualCourseAccessesQueryable().Any(a => a.CourseId == courseId && a.UserId == userId && a.AccessType == accessType && a.IsEnabled);
 		}
 
-		public async Task<Dictionary<string, List<CourseAccess>>> GetUserAccessHistoryByCourseIds(string userId)
+		public async Task<List<CourseAccess>> GetUserAccessHistory(string userId)
 		{
-			var groupedByCourseId = await db.CourseAccesses.Where(x => x.UserId == userId).GroupBy(x => x.CourseId).ToListAsync();
-			var result = new Dictionary<string, List<CourseAccess>>();
-			foreach (var group in groupedByCourseId)
-			{
-				result[group.Key] = group.ToList();
-			}
-
-			return result;
+			return await db.CourseAccesses.Where(x => x.UserId == userId).ToListAsync();
 		}
 
 		public async Task<List<CourseAccess>> GetUserAccessHistoryByCourseId(string userId, string courseId)

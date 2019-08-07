@@ -1,6 +1,6 @@
 @using System.Globalization
 @using uLearn.Web.Controllers
-@model UserCourseHistoryModel
+@model UserCourseToggleHistoryModel
 
 @{
 	ViewBag.Title = "User Course Roles History";
@@ -32,7 +32,7 @@
 			var grantedBy = string.IsNullOrEmpty(grant.GrantedBy) ? "Неизвестно" : grant.GrantedBy;
 			var comment = string.IsNullOrEmpty(grant.Comment) ? "Без комментария" : grant.Comment;
 
-			//var bgColor = grant.GrantType == typeof(RoleGrantModel) ? "#fffcdd" : "white";
+			//var bgColor = grant.GrantType == GrantType.Role ? "#fffcdd" : "white";
 			var enabled = grant.IsEnabled ? "Выданы" : "Отозваны";
 			<tr style="text-align: center">
 				<td style="text-align: left;"> @grant.Grant</td>

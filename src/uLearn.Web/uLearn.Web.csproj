@@ -760,7 +760,7 @@
     <Compile Include="Models\SwitchablePanelModel.cs" />
     <Compile Include="Models\TocModel.cs" />
     <Compile Include="Models\TocModelBuilder.cs" />
-    <Compile Include="Models\UserCourseHistoryModel.cs" />
+    <Compile Include="Models\UserCourseToggleHistoryModel.cs" />
     <Compile Include="Models\UserCourseModel.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Models\UsersStatsPageModel.cs" />

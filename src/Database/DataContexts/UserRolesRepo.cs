@@ -121,16 +121,9 @@ namespace Database.DataContexts
 				);
 		}
 
-		public async Task<Dictionary<string, List<UserRole>>> GetUserRolesHistoryByCourseIds(string userId)
+		public async  Task<List<UserRole>> GetUserRolesHistory(string userId)
 		{
-			var result = new Dictionary<string, List<UserRole>>();
-			var groupedByCourseId = db.UserRoles.Where(x => x.UserId == userId).GroupBy(x => x.CourseId);
-			foreach (var userRoles in groupedByCourseId)
-			{
-				result[userRoles.Key] = userRoles.ToList();
-			}
-
-			return result;
+			return await db.UserRoles.Where(x => x.UserId == userId).ToListAsync();
 		}
 		
 		public async Task<List<UserRole>> GetUserRolesHistoryByCourseId(string userId, string courseId)

@@ -86,7 +86,7 @@ class ToggleRolesModal extends Component {
 					Укажите причину удаления роли:
 				</div>)
 		if (!isRole && isGrant) {
-			return (<div>Будут назначены права <i>«role}»</i> пользователю <i>«{userName}»</i> в
+			return (<div>Будут назначены права <i>«{role}»</i> пользователю <i>«{userName}»</i> в
 				курсе <i>«{courseTitle}»</i> <br/>
 				Укажите причину назначения прав:
 			</div>)

@@ -287,7 +287,7 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("List");
 
 			var course = courseManager.GetCourse(courseId);
-			var model = new UserCourseHistoryModel(user, course,
+			var model = new UserCourseToggleHistoryModel(user, course,
 				ToSingleCourseRolesHistoryModel(await userRolesRepo.GetUserRolesHistoryByCourseId(userId,courseId)),
 				ToSingleCourseAccessHistoryModel(await coursesRepo.GetUserAccessHistoryByCourseId(userId,courseId)));
 			return View(model);
@@ -312,8 +312,8 @@ namespace uLearn.Web.Controllers
 
 			var courseGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, maxCount: 10));
 			var courseArchivedGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, maxCount: 10, onlyArchived: true));
-			var courseRolesHistory = ToManyCoursesRolesHistoryModel(await userRolesRepo.GetUserRolesHistoryByCourseIds(userId));
-			var courseAccessHistory = ToManyCourseAccessHistoryModel(await coursesRepo.GetUserAccessHistoryByCourseIds(userId));
+			var coursesWithRoles = (await userRolesRepo.GetUserRolesHistory(userId)).Select(x=>x.CourseId.ToLower()).Distinct().ToList();
+			var coursesWithAccess = (await coursesRepo.GetUserAccessHistory(userId)).Select(x=>x.CourseId.ToLower()).Distinct().ToList();
 
 			return View(new ProfileModel
 			{
@@ -324,76 +324,34 @@ namespace uLearn.Web.Controllers
 				CourseArchivedGroups = courseArchivedGroups,
 				Certificates = certificates,
 				AllCourses = allCourses,
-				RolesHistory = courseRolesHistory,
-				AccessesHistory = courseAccessHistory
+				CoursesWithRoles = coursesWithRoles,
+				CoursesWithAccess = coursesWithAccess
 			});
 		}
 
-		private Dictionary<string, List<AccessGrantModel>> ToManyCourseAccessHistoryModel(Dictionary<string, List<CourseAccess>> historyByCourseIds)
+		private List<UserToggleModel> ToSingleCourseAccessHistoryModel(List<CourseAccess> historyByCourse)
 		{
-			var result = new Dictionary<string, List<AccessGrantModel>>();
-			foreach (var courseHistory in historyByCourseIds)
-			{
-				result[courseHistory.Key] = new List<AccessGrantModel>();
-				foreach (var a in courseHistory.Value)
-				{
-					result[courseHistory.Key].Add(new AccessGrantModel()
-					{
-						IsEnabled = a.IsEnabled,
-						GrantedBy = usersRepo.FindUserById(a.GrantedById).VisibleName,
-						Comment = a.Comment,
-						GrantTimeUtc = a.GrantTime,
-						CourseAccess = a.AccessType.GetDisplayName()
-					});
-				}
-			}
-
-			return result;
-		}
-
-		private List<AccessGrantModel> ToSingleCourseAccessHistoryModel(List<CourseAccess> historyByCourse)
-		{
-			return historyByCourse.Select(a => new AccessGrantModel()
+			return historyByCourse.Select(a => new UserToggleModel()
 			{
 				IsEnabled = a.IsEnabled,
 				GrantedBy = usersRepo.FindUserById(a.GrantedById).VisibleName,
 				Comment = a.Comment,
 				GrantTimeUtc = a.GrantTime,
-				CourseAccess = a.AccessType.GetDisplayName()
+				Grant = a.AccessType.GetDisplayName(),
+				GrantType = GrantType.Access
 			}).ToList();
 		}
 
-		private Dictionary<string, List<RoleGrantModel>> ToManyCoursesRolesHistoryModel(Dictionary<string, List<UserRole>> historyByCourseIds)
+		private List<UserToggleModel> ToSingleCourseRolesHistoryModel(List<UserRole> historyByCourse)
 		{
-			var result = new Dictionary<string, List<RoleGrantModel>>();
-			foreach (var courseHistory in historyByCourseIds)
-			{
-				result[courseHistory.Key] = new List<RoleGrantModel>();
-				foreach (var a in courseHistory.Value)
-				{
-					result[courseHistory.Key].Add(new RoleGrantModel()
-					{
-						IsEnabled = a.IsEnabled ?? true,
-						GrantedBy = a.GrantedById == null ? "" : usersRepo.FindUserById(a.GrantedById).VisibleName,
-						Comment = a.Comment,
-						GrantTimeUtc = a.GrantTime ?? DateTime.MinValue,
-						Role = a.Role.GetDisplayName()
-					});
-				}
-			}
-
-			return result;
-		}
-
-		private List<RoleGrantModel> ToSingleCourseRolesHistoryModel(List<UserRole> historyByCourse)
-		{
-			return historyByCourse.Select(a => new RoleGrantModel()
+			return historyByCourse.Select(a => new UserToggleModel()
 			{
 				IsEnabled = a.IsEnabled ?? true,
 				GrantedBy = a.GrantedById == null ? "" : usersRepo.FindUserById(a.GrantedById).VisibleName,
 				Comment = a.Comment,
 				GrantTimeUtc = a.GrantTime ?? DateTime.MinValue,
-				Role = a.Role.GetDisplayName()
+				Grant = a.Role.GetDisplayName(),
+				GrantType = GrantType.Role
 			}).ToList();
 		}
 
@@ -950,54 +908,12 @@ namespace uLearn.Web.Controllers
 		public Dictionary<string, string> CourseGroups { get; set; }
 		public Dictionary<string, string> CourseArchivedGroups { get; set; }
 
-		public Dictionary<string, List<RoleGrantModel>> RolesHistory;
+		public List<string> CoursesWithRoles; 
 
-		public Dictionary<string, List<AccessGrantModel>> AccessesHistory;
+		public List<string> CoursesWithAccess; 
 	}
 
-	public class RoleGrantModel
-	{
-		public string GrantedBy { get; set; }
-		public string Role { get; set; }
-		public DateTime GrantTimeUtc { get; set; }
-		public bool IsEnabled { get; set; }
-		public string Comment { get; set; }
-
-		public UserGrantModel ToUserGrantModel()
-		{
-			return new UserGrantModel()
-			{
-				GrantedBy = GrantedBy,
-				Grant = Role,
-				GrantTimeUtc = GrantTimeUtc,
-				IsEnabled = IsEnabled,
-				Comment = Comment,
-				GrantType = typeof(RoleGrantModel)
-			};
-		}
-	}
-
-	public class AccessGrantModel
-	{
-		public string GrantedBy { get; set; }
-		public string CourseAccess { get; set; }
-		public DateTime GrantTimeUtc { get; set; }
-		public bool IsEnabled { get; set; }
-		public string Comment { get; set; }
-
-		public UserGrantModel ToUserGrantModel()
-		{
-			return new UserGrantModel()
-			{
-				GrantedBy = GrantedBy,
-				Grant = CourseAccess,
-				GrantTimeUtc = GrantTimeUtc,
-				IsEnabled = IsEnabled,
-				Comment = Comment,
-				GrantType = typeof(AccessGrantModel)
-			};
-		}
-	}
+	
 
 	public class IsErrorAttribute : Attribute
 	{
