@@ -22,6 +22,7 @@ namespace Database.Repos
 
 		public async Task AddVisit(string courseId, Guid slideId, string userId, string ipAddress)
 		{
+			courseId = courseId.ToLower();
 			var visit = FindVisit(courseId, slideId, userId);
 			if (visit == null)
 			{

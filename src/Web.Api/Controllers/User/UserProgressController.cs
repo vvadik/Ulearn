@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using Database;
 using Database.Models;
@@ -8,7 +11,9 @@ using Database.Repos;
 using Database.Repos.CourseRoles;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Internal;
 using Serilog;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Core;
@@ -31,12 +36,14 @@ namespace Ulearn.Web.Api.Controllers.User
 		{
 			this.visitsRepo = visitsRepo;
 			this.userQuizzesRepo = userQuizzesRepo;
+			
 		}
 
 		/// <summary>
 		/// Прогресс пользователя в курсе 
 		/// </summary>
 		[HttpGet("{courseId}")]
+		[Authorize]
 		public async Task<ActionResult<UserProgressResponse>> UserProgress(Course course)
 		{
 			var scores = visitsRepo.GetScoresForSlides(course.Id, UserId);
@@ -57,11 +64,33 @@ namespace Ulearn.Web.Api.Controllers.User
 				IsWaitingForManualChecking = s.IsWaitingForManualChecking,
 			});
 
-			
 			return new UserProgressResponse
 			{
-				VisitedSlides = slidesResults, 
+				VisitedSlides = slidesResults,
 			};
+		}
+
+		/// <summary>
+		/// Отметить посещение слайда в курсе
+		/// </summary>
+		/// <returns></returns>
+		[HttpPost("{courseId}")]
+		[Authorize]
+		public async Task<ActionResult<UserProgressResponse>> Visit([FromRoute] Course course, [FromQuery] Guid slideId)
+		{
+			await visitsRepo.AddVisit(course.Id, slideId, UserId, GetRealClientIp());
+			return await UserProgress(course);
+		}
+
+		protected string GetRealClientIp()
+		{
+			var ip = HttpContext.Connection.RemoteIpAddress;
+			if (ip.IsIPv4MappedToIPv6)
+				return ip
+					.MapToIPv4()
+					.GetAddressBytes()
+					.Select(x => ((int)x).ToString()).Join(".");
+			return ip.ToString();
 		}
 	}
 }
