@@ -1587,21 +1587,7 @@ address {
   margin-right: auto;
   margin-left: auto;
 }
-@media (min-width: 768px) {
-  .legacy-page .container {
-    width: 750px;
-  }
-}
-@media (min-width: 992px) {
-  .legacy-page .container {
-    width: 970px;
-  }
-}
-@media (min-width: 1200px) {
-  .legacy-page .container {
-    width: 1170px;
-  }
-}
+
 .legacy-page .container-fluid {
   padding-right: 15px;
   padding-left: 15px;
