@@ -4,7 +4,7 @@ import {
 	START, SUCCESS, FAIL,
 } from '../consts/actions';
 
-import { getUserProgressInCourse } from '../api/user';
+import { getUserProgressInCourse, updateUserProgressInCourse } from '../api/user';
 
 const loadUserProgressStart = () => ({
 	type: USER__PROGRESS_LOAD + START,
@@ -29,6 +29,10 @@ const userProgressUpdateAction = (courseId, slideId) => ({
 export const userProgressUpdate = (courseId, slideId) => {
 	return (dispatch) => {
 		dispatch(userProgressUpdateAction(courseId, slideId));
+		updateUserProgressInCourse(courseId, slideId)
+			.catch(err => {
+				console.error(err); // TODO rozentor handle error
+			})
 	};
 };
 
