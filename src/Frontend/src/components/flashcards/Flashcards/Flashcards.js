@@ -5,7 +5,7 @@ import ProgressBar from "../ProgressBar/ProgressBar";
 import FrontFlashcard from "./FrontFlashcard/FrontFlashcard";
 import Toast from "@skbkontur/react-ui/Toast";
 
-import { sortFlashcardsInAuthorsOrder, getNextFlashcardRandomly } from "./flashcardsStirrer";
+import { sortFlashcardsInAuthorsOrder, getNextFlashcardRandomly } from "./flashcardsStirrer/flashcardsStirrer";
 import countFlashcardsStatistics from "../../../utils/countFlashcardsStatistics";
 import classNames from 'classnames';
 

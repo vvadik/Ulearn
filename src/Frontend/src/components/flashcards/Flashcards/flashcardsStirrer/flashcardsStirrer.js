@@ -1,15 +1,9 @@
-import { rateTypes } from "../../../consts/rateTypes";
+import { rateTypes } from "../../../../consts/rateTypes";
 
 export function sortFlashcardsInAuthorsOrder(flashcards) {
-	return flashcards.sort((left, right) => {
-		const rateLeft = mapRateTypeToNumber[left.rate],
-			rateRight = mapRateTypeToNumber[right.rate];
-
-		if (rateLeft === rateRight) {
-			return -1;
-		}
-
-		return rateRight - rateLeft;
+	const copy = [...flashcards];
+	return copy.sort((left, right) => {
+		return mapRateTypeToNumber[right.rate] - mapRateTypeToNumber[left.rate];
 	});
 }
 
