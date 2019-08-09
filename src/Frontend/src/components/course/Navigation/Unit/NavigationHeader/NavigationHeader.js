@@ -5,9 +5,10 @@ import LeftIcon from '@skbkontur/react-icons/ArrowChevron2Left';
 import styles from './NavigationHeader.less';
 
 class NavigationHeader extends Component {
-	render () {
+	render() {
+		const { createRef } = this.props;
 		return (
-			<header className={ styles.root }>
+			<header ref={ (ref) => createRef(ref) } className={ styles.root }>
 				{ this.renderBreadcrumb() }
 				{ this.renderTitle() }
 			</header>
@@ -22,8 +23,8 @@ class NavigationHeader extends Component {
 			<nav className={ styles.breadcrumbs }>
 				<Button
 					use="link"
-				  	icon={ <LeftIcon /> }
-				  	onClick={ onCourseClick }>{ courseName }</Button>
+					icon={ <LeftIcon/> }
+					onClick={ onCourseClick }>{ courseName }</Button>
 			</nav>
 		);
 	}
@@ -35,7 +36,7 @@ class NavigationHeader extends Component {
 	}
 }
 
-NavigationHeader.propTypes ={
+NavigationHeader.propTypes = {
 	title: PropTypes.string.isRequired,
 	courseName: PropTypes.string,
 	onCourseClick: PropTypes.func,

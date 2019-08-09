@@ -4,18 +4,15 @@ import styles from './NextUnit.less';
 import { Link } from "react-router-dom";
 import Icon from "@skbkontur/react-icons";
 
-import { toggleNavigation } from "../../../../../actions/navigation";
-import { connect } from "react-redux";
-
-
 class NextUnit extends Component {
 	render() {
-		const { title, slides } = this.props.unit;
+		const { toggleNavigation, unit } = this.props;
+		const { title, slides } = unit;
 
 		const slideId = slides[0].slug;
 
 		return (
-			<Link to={ slideId } className={ styles.root } onClick={ this.props.toggleNavigation }>
+			<Link to={ slideId } className={ styles.root } onClick={ toggleNavigation }>
 				<div className={ styles.wrapper }>
 					<h5 className={ styles.header }>Следующий модуль</h5>
 					<h4 className={ styles.title } title={ title }>{ title }</h4>
@@ -36,12 +33,4 @@ NextUnit.propTypes = {
 	toggleNavigation: PropTypes.func,
 };
 
-const mapStateToProps = (state) => {
-	return {};
-};
-
-const mapDispatchToProps = (dispatch) => ({
-	toggleNavigation: () => dispatch(toggleNavigation()),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(NextUnit);
+export default NextUnit;

@@ -16,7 +16,7 @@ const icons = {
 
 class NavigationItem extends Component {
 	render() {
-		const { text, url, isActive, description, metro } = this.props;
+		const { text, url, isActive, description, metro, toggleNavigation } = this.props;
 
 		const classes = {
 			[styles.itemLink]: true,
@@ -27,7 +27,7 @@ class NavigationItem extends Component {
 
 		return (
 			<li className={ styles.root }>
-				<Link to={ url } className={ classnames(classes) } onClick={ this.props.toggleNavigation }>
+				<Link to={ url } className={ classnames(classes) } onClick={ toggleNavigation }>
 					{ metro && this.renderMetro() }
 					<div className={ styles.firstLine }>
 						<span className={ styles.text }>{ text }</span>

@@ -37,52 +37,46 @@ class Navigation extends Component {
 	}
 
 	render() {
-		const {
-			courseItems, courseTitle, description, courseId, slideId, containsFlashcards,
-			unitItems, unitTitle, nextUnit, onCourseClick,
-		} = this.props;
+		const { unitTitle, toggleNavigation, } = this.props;
 
 		return (
 			<aside className={ styles.root }>
-				<div className={ styles.overlay } onClick={ this.props.toggleNavigation }/>
+				<div className={ styles.overlay } onClick={ toggleNavigation }/>
 				{ unitTitle
-
-					? Navigation.renderUnitNavigation(
-						unitTitle,
-						courseTitle,
-						onCourseClick,
-						unitItems,
-						nextUnit)
-
-					: Navigation.renderCourseNavigation(
-						courseTitle,
-						description,
-						courseItems,
-						containsFlashcards,
-						courseId,
-						slideId)
+					? this.renderUnitNavigation()
+					: this.renderCourseNavigation()
 				}
 			</aside>
 		);
 	}
 
-	static renderUnitNavigation(title, courseName, onCourseClick, items, nextUnit) {
+	renderUnitNavigation() {
+		const { unitTitle, courseName, onCourseClick, unitItems, nextUnit, toggleNavigation } = this.props;
+
 		return (
 			<div className={ styles.contentWrapper }>
-				< NavigationHeader title={ title } courseName={ courseName } onCourseClick={ onCourseClick }/>
-				< NavigationContent items={ items }/>
-				{ nextUnit && <NextUnit unit={ nextUnit }/> }
+				< NavigationHeader createRef={ (ref) => this.unitHeaderRef = ref } title={ unitTitle } courseName={ courseName }
+								   onCourseClick={ onCourseClick }/>
+				< NavigationContent items={ unitItems }/>
+				{ nextUnit && <NextUnit unit={ nextUnit } toggleNavigation={ () => {
+					this.unitHeaderRef.scrollIntoView();
+					toggleNavigation();
+				} }
+				/> }
 			</div>
 		)
 	}
 
-	static renderCourseNavigation(title, description, items, containsFlashcards, courseId, slideId) {
+	renderCourseNavigation() {
+		const { courseTitle, description, courseItems, containsFlashcards, courseId, slideId, toggleNavigation } = this.props;
+
 		return (
 			<div className={ styles.contentWrapper }>
-				<CourseNavigationHeader title={ title } description={ description }/>
-				{ items && items.length && <CourseNavigationContent items={ items }/> }
+				<CourseNavigationHeader title={ courseTitle } description={ description }/>
+				{ courseItems && courseItems.length && <CourseNavigationContent items={ courseItems }/> }
 				{ containsFlashcards &&
-				<Flashcards courseId={ courseId } isActive={ slideId === flashcards }/> }
+				<Flashcards toggleNavigation={ toggleNavigation } courseId={ courseId }
+							isActive={ slideId === flashcards }/> }
 			</div>
 		)
 	}
