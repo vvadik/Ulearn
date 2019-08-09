@@ -17,11 +17,12 @@ namespace uLearn.CourseTool
 					OlxUnpackTarGzOptions, OlxUnpackTarOptions, 
 					OlxPackTarGzOptions, OlxPackTarOptions,
 					OlxSetChapterStartDatesOptions, 
-					OlxPatchVideoOptions, 
+					OlxPatchVideoOptions,
 					MonitorOptions, 
 					ULearnOptions, 
 					TestCourseOptions,
-					GenerateEmptyVideoAnnotations
+					GenerateEmptyVideoAnnotations,
+					BuildDockerContainerOptions
 				>(args)
 				.MapResult(
 					(AbstractOptions options) => ExecuteOption(options),

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.Serialization;
@@ -579,13 +580,16 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 
 			var exerciseSlide = slide as ExerciseSlide;
-			if (!(exerciseSlide.Exercise is CsProjectExerciseBlock))
+			if (exerciseSlide.Exercise is SingleFileExerciseBlock)
+				return HttpNotFound();
+			if ((exerciseSlide.Exercise as UniversalExerciseBlock)?.NoStudentZip ?? false)
 				return HttpNotFound();
 
-			var block = (CsProjectExerciseBlock) exerciseSlide.Exercise;
 			var zipFile = exerciseStudentZipsCache.GenerateOrFindZip(courseId, exerciseSlide);
 			
-			return File(zipFile.FullName, "application/zip", block.CsprojFile.Name + ".zip");
+			var block = exerciseSlide.Exercise;
+			var fileName = (block as CsProjectExerciseBlock)?.CsprojFile.Name ?? new DirectoryInfo((block as UniversalExerciseBlock).ExerciseDirPath).Name;
+			return File(zipFile.FullName, "application/zip", fileName + ".zip");
 		}
 	}
 

@@ -7,10 +7,10 @@ using Database.DataContexts;
 using Database.Models;
 using Kontur.Spam.Client;
 using log4net;
-using Metrics;
 using Microsoft.AspNet.Identity;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
+using Ulearn.Core.Metrics;
 
 namespace uLearn.Web.Controllers
 {

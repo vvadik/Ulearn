@@ -285,10 +285,6 @@
       <Project>{95510835-0b21-4d99-a4d2-b8fc87761a3c}</Project>
       <Name>Database</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Metrics\Metrics.csproj">
-      <Project>{b6b60d19-c6bd-4d66-95da-14480a18770c}</Project>
-      <Name>Metrics</Name>
-    </ProjectReference>
     <ProjectReference Include="..\XQueue\XQueue.csproj">
       <Project>{4b227920-6eb6-476f-95c7-1cdbe02dae3f}</Project>
       <Name>XQueue</Name>

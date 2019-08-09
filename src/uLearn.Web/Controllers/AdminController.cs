@@ -923,6 +923,7 @@ namespace uLearn.Web.Controllers
 
 			log.Info($"Обновляю курс {courseId} в оперативной памяти");
 			courseManager.UpdateCourseVersion(courseId, versionId);
+			courseManager.ReloadCourse(courseId);
 
 			var courseDiff = new CourseDiff(oldCourse, version);
 

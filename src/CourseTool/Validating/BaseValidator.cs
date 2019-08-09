@@ -1,7 +1,7 @@
 using System;
-using RunCsJob.Api;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.RunCheckerJobApi;
 using Ulearn.Core.Courses.Slides.Flashcards;
 
 namespace uLearn.CourseTool.Validating

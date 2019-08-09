@@ -3,7 +3,6 @@ using System.Linq;
 using System.Web.Hosting;
 using Elmah;
 using log4net;
-using Metrics;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Telegram;

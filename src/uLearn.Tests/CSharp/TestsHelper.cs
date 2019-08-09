@@ -62,12 +62,12 @@ namespace uLearn.CSharp
 		public static ProjectExerciseValidator BuildProjectExerciseValidator(CsProjectExerciseBlock exBlock, StringBuilder valOut)
 		{
 			var slide = BuildSlide(exBlock);
-			return new ProjectExerciseValidator(BuildValidator(slide, valOut), new SandboxRunnerSettings(), slide, exBlock);
+			return new ProjectExerciseValidator(BuildValidator(slide, valOut), new CsSandboxRunnerSettings(), slide, exBlock);
 		}
 
 		public static CourseValidator BuildValidator(ExerciseSlide slide, StringBuilder valOut)
 		{
-			var v = new CourseValidator(new List<Slide> { slide }, new SandboxRunnerSettings());
+			var v = new CourseValidator(new List<Slide> { slide });
 			v.Warning += msg => { valOut.Append(msg); };
 			v.Error += msg => { valOut.Append(msg); };
 			return v;

@@ -1,29 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
+using Microsoft.Extensions.FileProviders;
 
 namespace Ulearn.Core.Configuration
 {
 	public static class ApplicationConfiguration
 	{
-		public static T Read<T>(IDictionary<string, string> initialData, bool isAppsettingsJsonOptional=false) where T : AbstractConfiguration
+		private static readonly Lazy<IConfigurationRoot> configuration = new Lazy<IConfigurationRoot>(GetConfiguration);
+
+		public static T Read<T>() where T : AbstractConfiguration
 		{
-			var configuration = GetConfiguration(initialData, isAppsettingsJsonOptional);
-			return configuration.Get<T>();
-		}
-		
-		public static T Read<T>(bool isAppsettingsJsonOptional=false) where T : AbstractConfiguration
-		{
-			return Read<T>(new Dictionary<string, string>(), isAppsettingsJsonOptional);
+			var r = configuration.Value.Get<T>();
+			return r;
 		}
 
-		public static IConfiguration GetConfiguration(IDictionary<string, string> initialData, bool isAppsettingsJsonOptional=false)
+		public static IConfigurationRoot GetConfiguration()
 		{
 			var applicationPath = string.IsNullOrEmpty(Utils.WebApplicationPhysicalPath)
 				? AppDomain.CurrentDomain.BaseDirectory
 				: Utils.WebApplicationPhysicalPath;
 			var configurationBuilder = new ConfigurationBuilder()
-				.AddInMemoryCollection(initialData)
 				.SetBasePath(applicationPath);
 			configurationBuilder.AddEnvironmentVariables();
 			BuildAppsettingsConfiguration(configurationBuilder);
@@ -38,11 +36,12 @@ namespace Ulearn.Core.Configuration
 				configurationBuilder.AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true);
 		}
 		
-		public static IConfiguration GetConfiguration(bool isAppsettingsJsonOptional=false)
+		private static void DisposeConfiguration(IConfigurationRoot configuration) // https://github.com/aspnet/Extensions/issues/786
 		{
-			return GetConfiguration(new Dictionary<string, string>(), isAppsettingsJsonOptional);
+			foreach (var provider in configuration.Providers.OfType<JsonConfigurationProvider>())
+				if (provider.Source.FileProvider is PhysicalFileProvider pfp)
+					pfp.Dispose();
 		}
-		
 	}
 	
 	public abstract class AbstractConfiguration
@@ -80,6 +79,14 @@ namespace Ulearn.Core.Configuration
 		public string Database { get; set; }
 		
 		public GitConfiguration Git { get; set; }
+		
+		public string StatsdConnectionString { get; set; } // ConnectionString для подключения к Graphite-relay в формате "address=graphite-relay.com;port=8125;prefixKey=ulearn.local". Можно оставить пустой, чтобы не отправлять метрики
+		
+		public string SubmissionsUrl { get; set; } // Url to Ulearn.Web instance. I.E. https://ulearn.me
+		
+		public string RunnerToken { get; set; } // Must be equal on Ulearn.Web and RunC***Job instance
+
+		public int? KeepAliveInterval { get; set; }
 	}
 
 	public class TelegramConfiguration
