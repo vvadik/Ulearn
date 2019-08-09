@@ -180,6 +180,11 @@ namespace Database.DataContexts
 		{
 			return db.Users.Where(u => u.Email == email && u.EmailConfirmed).ToList();
 		}
+		
+		public List<ApplicationUser> FindUsersByConfirmedEmails(IEnumerable<string> emails)
+		{
+			return db.Users.Where(u => emails.Contains(u.Email) && u.EmailConfirmed).ToList();
+		}
 
 		public IEnumerable<ApplicationUser> GetUsersByIds(IEnumerable<string> usersIds)
 		{
