@@ -51,11 +51,11 @@ class Navigation extends Component {
 	}
 
 	renderUnitNavigation() {
-		const { unitTitle, courseName, onCourseClick, unitItems, nextUnit, toggleNavigation } = this.props;
+		const { unitTitle, courseTitle, onCourseClick, unitItems, nextUnit, toggleNavigation } = this.props;
 
 		return (
 			<div className={ styles.contentWrapper }>
-				< NavigationHeader createRef={ (ref) => this.unitHeaderRef = ref } title={ unitTitle } courseName={ courseName }
+				< NavigationHeader createRef={ (ref) => this.unitHeaderRef = ref } title={ unitTitle } courseName={ courseTitle }
 								   onCourseClick={ onCourseClick }/>
 				< NavigationContent items={ unitItems }/>
 				{ nextUnit && <NextUnit unit={ nextUnit } toggleNavigation={ () => {
