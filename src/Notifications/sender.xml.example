@@ -2,7 +2,6 @@
 <sender>
     <email>andgein@yandex.ru</email>
     <email>andgein+2@yandex.ru</email>
-    <courseId>BasicProgramming</courseId>
     <subject>Test email</subject>
     <text>
         Hello everybody!

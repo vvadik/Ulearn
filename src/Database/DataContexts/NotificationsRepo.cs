@@ -149,7 +149,7 @@ namespace Database.DataContexts
 			return db.NotificationTransportSettings
 				.Where(s => s.CourseId == courseId && s.NotificationType == type && transportIds.Contains(s.NotificationTransportId))
 				.ToDictionary(s => s.NotificationTransportId, s => s)
-				.ToDefaultDictionary(() => null);
+				.ToDefaultDictionary();
 		}
 
 		// Dictionary<(notificationTransportId, NotificationType), NotificationTransportSettings>
