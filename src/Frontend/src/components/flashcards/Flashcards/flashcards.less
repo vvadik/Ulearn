@@ -20,48 +20,8 @@
   background-color: rgba(51, 51, 51, 0.8);
 }
 
-.questionFront {
-  width: 100%;
-
-  font-size: 32px;
-  font-family: @defaultFonts;
-  text-align: center;
-  margin: auto;
-
-  overflow-y: auto;
-}
-
-.showAnswerButtonContainer {
-  position: relative;
-}
-
-.backTextContainer {
-  max-width: 100%;
-
-  margin: auto;
-
-  font-family: @defaultFonts;
-  font-size: 20px;
-  line-height: 1.2;
-  overflow: auto;
-
-  animation: appear 300ms;
-}
-
-.questionBack {
-  margin-bottom: 25px;
-
-  text-align: center;
-
-  font-family: @defaultFonts;
-  font-size: 24px;
-  line-height: 1.2;
-  font-weight: 400;
-}
-
-.theoryLinks {
-  margin-top:20px;
-  color: #888;
+.overflow {
+  overflow: hidden;
 }
 
 @keyframes appear {
@@ -71,24 +31,6 @@
   to {
     opacity: 1.0;
   }
-}
-
-.titleContainer {
-  width: fit-content;
-}
-
-.titleContainer:hover {
-  cursor: default;
-}
-
-.unitTitle {
-  font-family: @defaultFonts;
-  font-size: 10px;
-  line-height: 30px;
-  text-transform: uppercase;
-  color: @additionalColor;
-
-  margin: 0;
 }
 
 .modal {
@@ -111,33 +53,15 @@
   margin-top: -30px;
 }
 
-.closeButton {
-  position: absolute;
-  top: 8px;
-  right: 18px;
-
-  font-size: 32px;
-  opacity: 0.54;
-
-  border: none;
-  background: initial;
-}
-
-.closeButton:hover,
-.closeButton:focus {
-  opacity: 1;
-  cursor: pointer;
-}
-
-.closeButton:focus {
-  outline: 0;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, .5);
-}
-
 .secondModal {
   transform: translate(-50%, -56%) scale(0.95);
   z-index: @modalZIndex - 1;
   background: darken(@modalBackgroundColor, 10%);
+
+  &.move{
+    animation-duration: @moveAnimationDuration;
+    animation-name: moveFromSecondToFirst;
+  }
 }
 
 @keyframes moveFromSecondToFirst {
@@ -153,15 +77,15 @@
   }
 }
 
-.secondModal.move {
-  animation-duration: @moveAnimationDuration;
-  animation-name: moveFromSecondToFirst;
-}
-
 .thirdModal {
   transform: translate(-50%, -62%) scale(0.90);
   z-index: @modalZIndex - 2;
   background: darken(@modalBackgroundColor, 15%);
+
+  &.move{
+    animation-duration: @moveAnimationDuration;
+    animation-name: moveFromThirdToSecond;
+  }
 }
 
 @keyframes moveFromThirdToSecond {
@@ -177,15 +101,15 @@
   }
 }
 
-.thirdModal.move {
-  animation-duration: @moveAnimationDuration;
-  animation-name: moveFromThirdToSecond;
-}
-
 .fourthModal {
   transform: translate(-50%, -68%) scale(0.85);
   z-index: @modalZIndex - 3;
   background: darken(@modalBackgroundColor, 18%);
+
+  &.move {
+    animation-duration: @moveAnimationDuration;
+    animation-name: moveFromFourthToThird;
+  }
 }
 
 @keyframes moveFromFourthToThird {
@@ -201,21 +125,6 @@
   }
 }
 
-.fourthModal.move {
-  animation-duration: @moveAnimationDuration;
-  animation-name: moveFromFourthToThird;
-}
-
-.overflow {
-  overflow: hidden;
-}
-
-.wrapper {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
 .controlGuideContainer {
   width: 100%;
 
@@ -229,17 +138,17 @@
   text-align: center;
   font-size: 14px;
   line-height: 28px;
-}
 
-.controlGuideContainer > span {
-  padding: 3px 9px;
-  margin: 5px;
-  border-radius: 2px;
-  box-sizing: border-box;
+  & > span{
+    padding: 3px 9px;
+    margin: 5px;
+    border-radius: 2px;
+    box-sizing: border-box;
 
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px solid @lightYellow;
-  text-transform: uppercase;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid @lightYellow;
+    text-transform: uppercase;
+  }
 }
 
 .progressBarContainer {
@@ -249,20 +158,6 @@
 }
 
 @media (max-width: @maxPhoneWidth) {
-  .questionFront {
-    font-size: 26px;
-  }
-
-  .closeButton {
-    top: 13px;
-    right: 8px;
-  }
-
-  .showAnswerButtonContainer {
-    display: flex;
-    justify-content: center;
-  }
-
   .modal {
     height: calc(98vh - 40px - 30px);
     transform: translate(-50%, -50%) translateY(40px);

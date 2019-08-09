@@ -55,6 +55,7 @@ class CoursePage extends Component {
 
 					{ showFlashcards &&
 					<Flashcards
+						infoByUnits={ infoByUnits }
 						flashcards={ flashcards }
 						courseId={ courseId }
 						onClose={ () => this.hideFlashcards() }

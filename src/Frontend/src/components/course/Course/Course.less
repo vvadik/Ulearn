@@ -2,25 +2,30 @@
 
 .root {
   display: flex;
-  max-width: calc(100vw - 20px);
+  max-width: 100vw;
 }
 
 .pageWrapper {
   width: 100%;
   max-width: calc(100vw - 40px);
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
 
 @media (min-width: @maxPhoneWidth) {
   .pageWrapper {
     max-width: calc(100vw - 40px - 250px);
-    padding-right: 20px;
   }
 }
 
 @media (min-width: @maxLaptopWidth) {
   .pageWrapper {
     max-width: 862px;
-    padding-right: 20px;
+    margin-left: 32px;
+  }
+
+  .root {
+    max-width: calc(100vw - 20px);
   }
 }

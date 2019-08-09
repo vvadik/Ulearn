@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import Button from "@skbkontur/react-ui/Button";
 import Results from "../Results/Results";
 
-import styles from "../flashcards.less";
+import styles from "./frontFlashcard.less";
 
 import translateCode from "../../../../codeTranslator/translateCode";
 import Link from "react-router-dom/es/Link";
@@ -129,6 +129,7 @@ class FrontFlashcard extends Component {
 
 	showAnswer() {
 		this.props.onShowAnswer();
+
 		this.setState({
 			showAnswer: true
 		});

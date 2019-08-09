@@ -3,17 +3,17 @@ import PropTypes from "prop-types";
 
 import ProgressBar from "../ProgressBar/ProgressBar";
 import FrontFlashcard from "./FrontFlashcard/FrontFlashcard";
+import Toast from "@skbkontur/react-ui/Toast";
+
+import { sortFlashcardsInAuthorsOrder, getNextFlashcardRandomly } from "./flashcardsStirrer";
+import countFlashcardsStatistics from "../../../utils/countFlashcardsStatistics";
+import classNames from 'classnames';
 
 import { rateTypes } from "../../../consts/rateTypes";
 
-import getNextFlashcard from "./flashcardsStirrer";
-import classNames from 'classnames';
-
 import styles from './flashcards.less';
-import countFlashcardsStatistics from "../../../utils/countFlashcardsStatistics";
-import Toast from "@skbkontur/react-ui/Toast";
 
-const modalsStyles = {
+const modalsClassNames = {
 	first: classNames(styles.modal),
 	second: classNames(styles.modal, styles.secondModal),
 	third: classNames(styles.modal, styles.thirdModal),
@@ -31,25 +31,28 @@ const mapRateToRateType = {
 class Flashcards extends Component {
 	constructor(props) {
 		super(props);
-		const { flashcards, unitId } = this.props;
+		const { flashcards, unitId, infoByUnits } = this.props;
 
-		let sessionFlashcards = [...flashcards];
+		const onUnit = unitId !== undefined;
+		let sessionFlashcards;
+		let maxTLast = -1;
 
-		if (unitId) {
-			sessionFlashcards = sessionFlashcards.filter(flashcard => flashcard.unitId === unitId);
+		if (onUnit) {
+			sessionFlashcards = sortFlashcardsInAuthorsOrder(
+				flashcards.filter(flashcard => flashcard.unitId === unitId)
+			);
+		} else {
+			sessionFlashcards = Flashcards.getUnlockedCourseFlashcards(flashcards, infoByUnits);
+			maxTLast = Flashcards.findMaxTLast(sessionFlashcards);
 		}
 
-		const lastRateIndexes = sessionFlashcards.reduce(
-			(lastRateIndexes, flashcard) => [...lastRateIndexes, flashcard.lastRateIndex]
-			, []);
-		const maxTLast = Math.max(...lastRateIndexes);
-
 		this.state = {
-			onUnit: unitId !== null,
+			onUnit,
+			onUnitRepeating: false,
 			currentFlashcard: null,
-			maxTLast: maxTLast,
-			ratedFlashcardsCount: 0,
+			maxTLast,
 			sessionFlashcards,
+			totalFlashcardsCount: sessionFlashcards.length,
 			statistics: countFlashcardsStatistics(sessionFlashcards),
 		}
 	}
@@ -67,32 +70,23 @@ class Flashcards extends Component {
 	}
 
 	render() {
-		const { statistics, sessionFlashcards, currentFlashcard } = this.state;
+		const { statistics, totalFlashcardsCount, currentFlashcard } = this.state;
 
 		return (
 			<div ref={ (ref) => this.overlay = ref } className={ styles.overlay } onClick={ this.handleOverlayClick }>
 
-				<div className={ modalsStyles.first } ref={ (ref) => this.firstModal = ref }>
-					{ currentFlashcard &&
-					<FrontFlashcard
-						onShowAnswer={ () => this.resetCardsAnimation() }
-						question={ currentFlashcard.question }
-						answer={ currentFlashcard.answer }
-						unitTitle={ currentFlashcard.unitTitle }
-						theorySlides={ currentFlashcard.theorySlides }
-						onHandlingResultsClick={ (rate) => this.handleResultsClick(rate) }
-						onClose={ this.props.onClose }
-					/> }
+				<div className={ modalsClassNames.first } ref={ (ref) => this.firstModal = ref }>
+					{ currentFlashcard && this.renderFrontFlashcard() }
 				</div>
 
-				<div className={ modalsStyles.second } ref={ (ref) => this.secondModal = ref }/>
-				<div className={ modalsStyles.third } ref={ (ref) => this.thirdModal = ref }/>
-				<div className={ modalsStyles.fourth }/>
+				<div className={ modalsClassNames.second } ref={ (ref) => this.secondModal = ref }/>
+				<div className={ modalsClassNames.third } ref={ (ref) => this.thirdModal = ref }/>
+				<div className={ modalsClassNames.fourth }/>
 
 				{ Flashcards.renderControlGuides() }
 
 				<div className={ styles.progressBarContainer }>
-					<ProgressBar statistics={ statistics } totalFlashcardsCount={ sessionFlashcards.length }/>
+					<ProgressBar statistics={ statistics } totalFlashcardsCount={ totalFlashcardsCount }/>
 				</div>
 			</div>
 		)
@@ -105,6 +99,23 @@ class Flashcards extends Component {
 			onClose();
 		}
 	};
+
+	renderFrontFlashcard() {
+		const { currentFlashcard } = this.state;
+		const { onClose } = this.props;
+
+		return (
+			<FrontFlashcard
+				onShowAnswer={ () => this.resetCardsAnimation() }
+				question={ currentFlashcard.question }
+				answer={ currentFlashcard.answer }
+				unitTitle={ currentFlashcard.unitTitle }
+				theorySlides={ currentFlashcard.theorySlides }
+				onHandlingResultsClick={ (rate) => this.handleResultsClick(rate) }
+				onClose={ onClose }
+			/>
+		);
+	}
 
 	static renderControlGuides() {
 		return (
@@ -120,7 +131,7 @@ class Flashcards extends Component {
 		);
 	}
 
-	handleResultsClick = async (rate) => {
+	handleResultsClick = (rate) => {
 		const { currentFlashcard, maxTLast, statistics } = this.state;
 		const { courseId, sendFlashcardRate } = this.props;
 
@@ -134,59 +145,113 @@ class Flashcards extends Component {
 		currentFlashcard.rate = newRate;
 		currentFlashcard.lastRateIndex = newTLast;
 
-		await sendFlashcardRate(courseId, currentFlashcard.unitId, currentFlashcard.id, newRate, newTLast);
+		sendFlashcardRate(courseId, currentFlashcard.unitId, currentFlashcard.id, newRate, newTLast);
 
 		this.setState({
 			maxTLast: newTLast,
 			statistics: newStatistics,
-		});
-
-		this.takeNextFlashcard(newTLast);
+		}, this.takeNextFlashcard);
 	};
 
-	takeNextFlashcard(tLast) {
-		const { ratedFlashcardsCount, sessionFlashcards, onUnit } = this.state;
+	takeNextFlashcard() {
+		const { sessionFlashcards, onUnit, onUnitRepeating, maxTLast } = this.state;
 
-		if (onUnit && Flashcards.hasFinishedUnit(sessionFlashcards, ratedFlashcardsCount)) {
-			this.startRepeating(tLast);
+		if (onUnit) {
+			if (sessionFlashcards.length === 0) {
+				if (onUnitRepeating) {
+					this.startCourseRepeating();
+				} else {
+					this.startUnitRepeating();
+				}
+			} else {
+				this.setState({ currentFlashcard: sessionFlashcards.shift(), })
+			}
 		} else {
 			this.setState({
-				currentFlashcard: getNextFlashcard(sessionFlashcards, tLast),
+				currentFlashcard: getNextFlashcardRandomly(sessionFlashcards, maxTLast),
 			})
 		}
-
-		this.setState({
-			ratedFlashcardsCount: ratedFlashcardsCount + 1,
-		});
 
 		this.animateCards();
 	}
 
-	static hasFinishedUnit(unitFlashcards, ratedFlashcardsCount) {
-		return unitFlashcards.every(flashcard => flashcard.rate !== rateTypes.notRated)
-			&& ratedFlashcardsCount >= unitFlashcards.length;
+	startUnitRepeating() {
+		const { flashcards, unitId } = this.props;
+
+		const failedUnitFlashcards = sortFlashcardsInAuthorsOrder(Flashcards.getUnitFlashcards(flashcards, unitId, true));
+
+		if (failedUnitFlashcards.length > 0) {
+			const firstFlashcard = failedUnitFlashcards.shift();
+
+			this.setState({
+				onUnitRepeating: true,
+				currentFlashcard: firstFlashcard,
+				sessionFlashcards: failedUnitFlashcards,
+			})
+		} else {
+			this.startCourseRepeating();
+		}
 	}
 
-	startRepeating(tLast) {
-		const filteredFlashcards = [...this.props.flashcards.filter(flashcard => flashcard.rate !== rateTypes.notRated)];
+	static getUnitFlashcards(courseFlashcards, unitId, onlyFailedFlashcards = false) {
+		const unitFilter = onlyFailedFlashcards
+			? (flashcard) => {
+				return flashcard.unitId === unitId
+					&& (flashcard.rate === rateTypes.rate1 || flashcard.rate === rateTypes.rate2)
+			}
+			: (flashcard) => {
+				return flashcard.unitId === unitId
+			};
+
+		return courseFlashcards.filter(unitFilter);
+	}
+
+	startCourseRepeating() {
+		const { flashcards, infoByUnits } = this.props;
+
+		const unlockedCourseFlashcards = Flashcards.getUnlockedCourseFlashcards(flashcards, infoByUnits);
+		const maxTLast = Flashcards.findMaxTLast(unlockedCourseFlashcards);
 
 		Toast.push('Переход к повторению по курсу');
 
 		this.setState({
 			onUnit: false,
-			sessionFlashcards: filteredFlashcards,
-			statistics: countFlashcardsStatistics(filteredFlashcards),
-			currentFlashcard: getNextFlashcard(filteredFlashcards, tLast),
+			onUnitRepeating: false,
+			sessionFlashcards: unlockedCourseFlashcards,
+			totalFlashcardsCount: unlockedCourseFlashcards.length,
+			maxTLast,
+			statistics: countFlashcardsStatistics(unlockedCourseFlashcards),
+			currentFlashcard: getNextFlashcardRandomly(unlockedCourseFlashcards, maxTLast),
 		});
+	}
+
+	static getUnlockedCourseFlashcards(flashcards, infoByUnits) {
+		const unlocksByUnits = {};
+		infoByUnits.forEach(({ unitId, unlocked }) => unlocksByUnits[unitId] = unlocked);
+
+		return flashcards
+			.filter(({ rate, unitId }) => rate !== rateTypes.notRated && unlocksByUnits[unitId]);
+	}
+
+	static findMaxTLast(flashcards) {
+		let maxTLast = -1;
+
+		for (const { lastRateIndex } of flashcards) {
+			if (maxTLast < lastRateIndex) {
+				maxTLast = lastRateIndex;
+			}
+		}
+
+		return maxTLast;
 	}
 
 	animateCards() {
 		const { firstModal, secondModal, thirdModal } = this;
 		const animationDuration = 700;
 
-		firstModal.className = classNames(modalsStyles.second, styles.move);
-		secondModal.className = classNames(modalsStyles.third, styles.move);
-		thirdModal.className = classNames(modalsStyles.fourth, styles.move);
+		firstModal.className = classNames(modalsClassNames.second, styles.move);
+		secondModal.className = classNames(modalsClassNames.third, styles.move);
+		thirdModal.className = classNames(modalsClassNames.fourth, styles.move);
 
 		setTimeout(() => {
 			this.resetCardsAnimation();
@@ -200,9 +265,9 @@ class Flashcards extends Component {
 			return;
 		}
 
-		firstModal.className = modalsStyles.first;
-		secondModal.className = modalsStyles.second;
-		thirdModal.className = modalsStyles.third;
+		firstModal.className = modalsClassNames.first;
+		secondModal.className = modalsClassNames.second;
+		thirdModal.className = modalsClassNames.third;
 	}
 }
 
@@ -225,6 +290,11 @@ Flashcards.propTypes = {
 				title: PropTypes.string,
 			}),
 		),
+	})),
+
+	infoByUnits: PropTypes.arrayOf(PropTypes.shape({
+		unlocked: PropTypes.bool,
+		unitId: PropTypes.string,
 	})),
 
 	onClose: PropTypes.func,

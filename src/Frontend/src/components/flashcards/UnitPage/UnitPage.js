@@ -32,7 +32,7 @@ class UnitPage extends Component {
 	componentWillReceiveProps(nextProps, nextContext) {
 		const { flashcards, unitId } = nextProps;
 
-		const unitFlashcards = flashcards.filter(fc => fc.unitId === unitId);
+		const unitFlashcards = flashcards.filter(flashcard => flashcard.unitId === unitId);
 
 		this.setState({
 			unitFlashcards,
@@ -46,24 +46,17 @@ class UnitPage extends Component {
 
 		window.scrollTo(0, 0);
 
-		document.getElementsByTagName('main')[0].classList.add(styles.pageContainer);
-
 		if (flashcards.length === 0) {
 			loadFlashcards(courseId);
 		}
 	}
 
-	componentWillUnmount() {
-		document.getElementsByTagName('main')[0].classList.remove(styles.pageContainer);
-	}
-
 	render() {
-		const { courseId, unitTitle, flashcards, flashcardsLoading, sendFlashcardRate, unitId } = this.props;
-		const { statistics, totalFlashcardsCount } = this.state;
+		const { courseId, unitTitle, flashcards, flashcardsLoading, sendFlashcardRate, unitId, infoByUnits } = this.props;
+		const { statistics, totalFlashcardsCount, showFlashcards } = this.state;
 		const haveProgress = flashcards && statistics[rateTypes.notRated] !== totalFlashcardsCount;
 		const completedUnit = flashcards && statistics[rateTypes.notRated] === 0;
 		const dataLoaded = flashcards && !flashcardsLoading;
-		const { showFlashcards } = this.state;
 
 		return (
 			<Loader active={ flashcardsLoading } type={ 'big' }>
@@ -80,6 +73,7 @@ class UnitPage extends Component {
 				{ this.renderFooter(haveProgress && dataLoaded) }
 				{ showFlashcards &&
 				<Flashcards
+					infoByUnits={ infoByUnits }
 					unitId={ unitId }
 					onClose={ () => this.hideFlashcards() }
 					flashcards={ flashcards }
@@ -155,6 +149,13 @@ UnitPage.propTypes = {
 				title: PropTypes.string,
 			}),
 		),
+	})),
+	infoByUnits: PropTypes.arrayOf(PropTypes.shape({
+		unitTitle: PropTypes.string,
+		unlocked: PropTypes.bool,
+		cardsCount: PropTypes.number,
+		unitId: PropTypes.string,
+		flashcardsSlideSlug: PropTypes.string,
 	})),
 
 	loadFlashcards: PropTypes.func,

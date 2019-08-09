@@ -48,6 +48,7 @@ const mapStateToProps = (state, { match }) => {
 		unitId,
 		flashcards,
 		flashcardsLoading: data.flashcardsLoading,
+		infoByUnits,
 	}
 };
 const mapDispatchToProps = (dispatch) => ({
