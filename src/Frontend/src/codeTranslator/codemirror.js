@@ -6,11 +6,14 @@ import '../codeTranslator/codemirror.less';
 import 'codemirror/mode/clike/clike';
 import 'codemirror/mode/javascript/javascript';
 
-export default function translateTextareaToCode(textarea, additionalSettings) {
+export default function translateTextareaToCode(textarea, additionalSettings, withMarginAuto) {
 	const cm = CodeMirror.fromTextArea(textarea, { ...additionalSettings, ...defaultSettings });
 
-	cm.setSize('auto', 'auto');
-	cm.setOption('lineNumbers', cm.lineCount() > 1);
+	if (withMarginAuto) {
+		cm.setSize('50%', 'auto');
+	} else {
+		cm.setSize('auto', 'auto');
+	}
 }
 
 const defaultSettings = {

@@ -21,7 +21,7 @@ class FrontFlashcard extends Component {
 
 	componentDidMount() {
 		document.addEventListener('keyup', this.handleKeyUp);
-		translateCode(this.modal);
+		translateCode(this.modal, { codeMirror: { withMarginAuto: true } });
 	}
 
 	componentWillUnmount() {
@@ -29,7 +29,7 @@ class FrontFlashcard extends Component {
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
-		translateCode(this.modal);
+		translateCode(this.modal, { codeMirror: { withMarginAuto: true } });
 	}
 
 	handleKeyUp = (e) => {
