@@ -1,19 +1,17 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using log4net;
-using log4net.Config;
-using Metrics;
-using RunCsJob.Api;
 using Ulearn.Core;
+using Ulearn.Core.Configuration;
+using Ulearn.Core.Metrics;
+using Ulearn.Core.RunCheckerJobApi;
 
-namespace RunCsJob
+namespace RunCheckerJob
 {
-	public class RunCsJobProgram
+	public abstract class ProgramBase
 	{
 		private readonly string address;
 		private readonly string token;
@@ -23,33 +21,30 @@ namespace RunCsJob
 		private readonly ManualResetEvent shutdownEvent = new ManualResetEvent(false);
 		private readonly List<Thread> threads = new List<Thread>();
 		
-		private static readonly ILog log = LogManager.GetLogger(typeof(RunCsJobProgram));
-		public readonly SandboxRunnerSettings Settings;
+		private static readonly ILog log = LogManager.GetLogger(typeof(ProgramBase));
+		protected abstract ISandboxRunnerClient SandboxRunnerClient { get; }
+		private readonly Language[] supportedLanguages;
+		private readonly string serviceName;
 
-		public RunCsJobProgram(ManualResetEvent externalShutdownEvent = null)
+		protected ProgramBase(string serviceName, ManualResetEvent externalShutdownEvent = null)
 		{
+			this.serviceName = serviceName;
 			if (externalShutdownEvent != null)
 				shutdownEvent = externalShutdownEvent;
 
 			try
 			{
-				address = ConfigurationManager.AppSettings["submissionsUrl"];
-				token = ConfigurationManager.AppSettings["runnerToken"];
-				sleep = TimeSpan.FromSeconds(int.Parse(ConfigurationManager.AppSettings["sleepSeconds"] ?? "1"));
-				var deleteSubmissions = bool.Parse(ConfigurationManager.AppSettings["ulearn.runcsjob.deleteSubmissions"] ?? "true");
-				Settings = new SandboxRunnerSettings
-				{
-					DeleteSubmissionsAfterFinish = deleteSubmissions,
-				};
-				var workingDirectory = ConfigurationManager.AppSettings["ulearn.runcsjob.submissionsWorkingDirectory"];
-				if (!string.IsNullOrWhiteSpace(workingDirectory))
-					Settings.WorkingDirectory = new DirectoryInfo(workingDirectory);
-
-				agentName = ConfigurationManager.AppSettings["ulearn.runcsjob.agentName"];
+				var ulearnConfiguration = ApplicationConfiguration.Read<UlearnConfiguration>();
+				address = ulearnConfiguration.SubmissionsUrl;
+				token = ulearnConfiguration.RunnerToken;
+				var runCheckerJobConfiguration = ApplicationConfiguration.Read<RunCheckerJobConfiguration>().RunCheckerJob;
+				sleep = TimeSpan.FromSeconds(runCheckerJobConfiguration.SleepSeconds ?? 1);
+				agentName = runCheckerJobConfiguration.AgentName;
+				supportedLanguages = runCheckerJobConfiguration.SupportedLanguages.Select(s => (Language)Enum.Parse(typeof(Language), s, true)).ToArray();
 				if (string.IsNullOrEmpty(agentName))
 				{
 					agentName = Environment.MachineName;
-					log.Info($"Автоопределённое имя клиента: {agentName}. Его можно переопределить в настройках (appSettings/ulearn.runcsjob.agentName)");					
+					log.Info($"Автоопределённое имя клиента: {agentName}. Его можно переопределить в настройках (runcheckerjob:agentName)");
 				}
 			}
 			catch (Exception e)
@@ -59,40 +54,16 @@ namespace RunCsJob
 			}
 		}
 
-		public static void Main(string[] args)
+		protected void Run(bool joinAllThreads=true)
 		{
-			XmlConfigurator.Configure();
-
-			var program = new RunCsJobProgram();
-			if (args.Any(x => x.StartsWith("-p:")))
-			{
-				var path = args.FirstOrDefault(x => x.StartsWith("-p:"))?.Substring(3);
-				if (path != null)
-					program.Settings.MsBuildSettings.CompilerDirectory = new DirectoryInfo(path);
-			}
-			if (args.Contains("--selfcheck"))
-				program.SelfCheck();
-			else
-				program.Run();
-		}
-
-		public void Run(bool joinAllThreads=true)
-		{
-			if (!Settings.MsBuildSettings.CompilerDirectory.Exists)
-			{
-				log.Error($"Не найдена папка с компиляторами: {Settings.MsBuildSettings.CompilerDirectory}");
-				Environment.Exit(1);
-			}
-			log.Info($"Путь до компиляторов: {Settings.MsBuildSettings.CompilerDirectory}");
-
-			AppDomain.MonitoringIsEnabled = true;
 			log.Info($"Отправляю запросы на {address} для получения новых решений");
 			
-			var threadsCount = int.Parse(ConfigurationManager.AppSettings["ulearn.runcsjob.threadsCount"] ?? "1");
+			var runCheckerJobConfiguration = ApplicationConfiguration.Read<RunCheckerJobConfiguration>().RunCheckerJob;
+			var threadsCount = runCheckerJobConfiguration.ThreadsCount ?? 1;
 			if (threadsCount < 1)
 			{
 				log.Error($"Не могу определить количество потоков для запуска из конфигурации: ${threadsCount}. Количество потоков должно быть положительно");
-				throw new ArgumentOutOfRangeException(nameof(threadsCount), "Number of threads (appSettings/ulearn.runcsjob.threadsCount) should be positive");
+				throw new ArgumentOutOfRangeException(nameof(threadsCount), $"Number of threads (runcheckerjob:threadsCount) should be positive");
 			}
 			
 			log.Info($"Запускаю {threadsCount} потока(ов)");
@@ -100,7 +71,7 @@ namespace RunCsJob
 			{
 				threads.Add(new Thread(WorkerThread)
 				{
-					Name = $"RunCsJob Worker #{i}",
+					Name = $"Worker #{i}",
 					IsBackground = true
 				});
 			}
@@ -150,16 +121,15 @@ namespace RunCsJob
 
 		private void MainLoop(Client client)
 		{
-			var serviceKeepAliver = new ServiceKeepAliver("runcsjob");
-			if (!int.TryParse(ConfigurationManager.AppSettings["ulearn.runcsjob.keepAlive.interval"], out var keepAliveIntervalSeconds))
-				keepAliveIntervalSeconds = 30;
-			var keepAliveInterval = TimeSpan.FromSeconds(keepAliveIntervalSeconds);
+			var serviceKeepAliver = new ServiceKeepAliver(serviceName);
+			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
+			var keepAliveInterval = TimeSpan.FromSeconds(configuration.KeepAliveInterval ?? 30);
 			while (!shutdownEvent.WaitOne(0))
 			{
-				List<RunnerSubmission> newUnhandled;
+				var newUnhandled = new List<RunnerSubmission>();
 				try
 				{
-					newUnhandled = client.TryGetSubmission().Result;
+					newUnhandled.AddRange(client.TryGetSubmission(supportedLanguages).Result);
 				}
 				catch (Exception e)
 				{
@@ -172,7 +142,7 @@ namespace RunCsJob
 
 				if (newUnhandled.Any())
 				{
-					var results = newUnhandled.Select(unhandled => SandboxRunner.Run(unhandled, Settings)).ToList();
+					var results = newUnhandled.Select(unhandled => SandboxRunnerClient.Run(unhandled)).ToList();
 					log.Info($"Результаты проверки: [{string.Join(", ", results.Select(r => r.Verdict))}]");
 					try
 					{
@@ -183,20 +153,10 @@ namespace RunCsJob
 						log.Error("Не могу отправить результаты проверки на ulearn", e);
 					}
 				}
+
 				serviceKeepAliver.Ping(keepAliveInterval);
 				Thread.Sleep(sleep);
 			}
-		}
-
-		private void SelfCheck()
-		{
-			var res = SandboxRunner.Run(new FileRunnerSubmission
-			{
-				Id = Utils.NewNormalizedGuid(),
-				NeedRun = true,
-				Code = "class C { static void Main(){ System.Console.WriteLine(\"Привет мир!\");}}"
-			}, Settings);
-			log.Info(res);
 		}
 	}
 }

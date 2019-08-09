@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
@@ -10,10 +9,10 @@ using Database.DataContexts;
 using Graphite;
 using log4net;
 using log4net.Config;
-using Metrics;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Configuration;
+using Ulearn.Core.Metrics;
 using XQueue;
 using XQueue.Models;
 
@@ -40,9 +39,7 @@ namespace XQueueWatcher
 			XmlConfigurator.Configure();
 			StaticMetricsPipeProvider.Instance.Start();
 			
-			if (!int.TryParse(ConfigurationManager.AppSettings["ulearn.xqueuewatcher.keepAlive.interval"], out var keepAliveIntervalSeconds))
-				keepAliveIntervalSeconds = 30;
-			var keepAliveInterval = TimeSpan.FromSeconds(keepAliveIntervalSeconds);
+			var keepAliveInterval = TimeSpan.FromSeconds(ApplicationConfiguration.Read<UlearnConfiguration>().KeepAliveInterval ?? 30);
 
 			while (true)
 			{

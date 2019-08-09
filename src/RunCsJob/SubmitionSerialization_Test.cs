@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using FluentAssertions;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using RunCsJob.Api;
 using Ulearn.Core;
+using Ulearn.Core.RunCheckerJobApi;
 
 namespace RunCsJob
 {
@@ -52,7 +52,7 @@ namespace RunCsJob
 			};
 
 			var json = JsonConvert.SerializeObject(list, JsonConfig.GetSettings());
-			Assert.That(json, Is.EqualTo("[{\"$type\":\"proj\",\"ZipFileData\":\"AQIDBAU9FwQD\",\"ProjectFileName\":\"proj\",\"Id\":\"E26C2109-F074-4117-B53F-0799E4140DEF\",\"Input\":\"\",\"NeedRun\":true}]"));
+			Assert.That(json, Is.EqualTo("[{\"$type\":\"proj\",\"ZipFileData\":\"AQIDBAU9FwQD\",\"ProjectFileName\":\"proj\",\"Input\":\"\",\"NeedRun\":true,\"Id\":\"E26C2109-F074-4117-B53F-0799E4140DEF\"}]"));
 		}
 
 		[Test]

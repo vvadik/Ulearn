@@ -2,24 +2,45 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
+using Ionic.Zip;
+using JetBrains.Annotations;
 
-namespace GitCourseUpdater
+namespace Ulearn.Core
 {
 	public class ZipHelper
 	{
+		public static void UnpackZip(byte[] data, string pathToExtractDir)
+		{
+			using (var ms = new MemoryStream(data))
+			{
+				using (var zip = Ionic.Zip.ZipFile.Read(ms))
+				{
+					foreach (var file in zip)
+						try
+						{
+							file.Extract(pathToExtractDir, ExtractExistingFileAction.OverwriteSilently);
+						}
+						catch (Exception e)
+						{
+							throw new IOException("File " + file.FileName, e);
+						}
+				}
+			}
+		}
+		
 		public static MemoryStream CreateFromDirectory(
 			string sourceDirectoryName,
 			CompressionLevel compressionLevel,
 			bool includeBaseDirectory,
 			Encoding entryNameEncoding,
-			Predicate<string> filter
+			[CanBeNull]Predicate<string> filter
 		) {
 			var filesToAdd = Directory.GetFiles(sourceDirectoryName, "*", SearchOption.AllDirectories);
 			var entryNames = GetEntryNames(filesToAdd, sourceDirectoryName, includeBaseDirectory);
 			var zipFileStream = new MemoryStream();
 			using (var archive = new ZipArchive(zipFileStream, ZipArchiveMode.Create)) {
 				for (var i = 0; i < filesToAdd.Length; i++) {
-					if (!filter(filesToAdd[i])) {
+					if (filter != null && !filter(filesToAdd[i])) {
 						continue;
 					}
 					archive.CreateEntryFromFile(filesToAdd[i], entryNames[i], compressionLevel);

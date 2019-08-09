@@ -4,9 +4,9 @@ using System.Configuration;
 using System.Threading.Tasks;
 using Kontur.Spam.Client;
 using log4net;
-using Metrics;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
+using Ulearn.Core.Metrics;
 
 namespace Notifications
 {

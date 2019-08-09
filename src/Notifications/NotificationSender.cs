@@ -6,10 +6,10 @@ using Database;
 using Database.DataContexts;
 using Database.Models;
 using log4net;
-using Metrics;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Configuration;
+using Ulearn.Core.Metrics;
 
 namespace Notifications
 {

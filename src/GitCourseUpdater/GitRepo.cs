@@ -13,6 +13,7 @@ using LibGit2Sharp.Ssh;
 using Newtonsoft.Json;
 using Serilog;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
 
 namespace GitCourseUpdater
 {
