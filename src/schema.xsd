@@ -165,7 +165,7 @@
                     <xs:documentation xml:lang="ru">Путь по умолчанию для блоков &lt;includeCode&gt;, &lt;exercise.file&gt;, &lt;exercise.csproj&gt;</xs:documentation>
                 </xs:annotation>
             </xs:element>            
-            <xs:group ref="Blocks" minOccurs="0" maxOccurs="unbounded"/>            
+            <xs:group ref="Blocks" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:group>
     
@@ -238,6 +238,7 @@
             <!-- Exercise blocks -->
             <xs:element name="exercise.csproj" type="ProjectExercise" />
             <xs:element name="exercise.file" type="SingleFileExercise" />
+            <xs:element name="exercise.universal" type="UniversalExercise" />
         </xs:choice>
     </xs:group>
 	
@@ -433,6 +434,86 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+
+	<xs:complexType name="UniversalExercise">
+		<xs:complexContent>
+			<xs:extension base="AbstractExercise">
+				<xs:sequence>
+					<xs:element name="userCodeFile" type="NonEmptyString">
+						<xs:annotation>
+							<xs:documentation>
+								Путь относительно директории, в которой лежит задача.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="excludePathForChecker" type="NonEmptyString" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>
+								Путь относительно директории с задачей. Файлы по этому шаблону будут исключены из проекта при сборке для проверки.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="includePathForChecker" type="NonEmptyString" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>
+								Путь относительно директории c xml-файлом описания юнита до директории, содержимое которой нужно включить в архив при сборке для проверки.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="excludePathForStudent" type="NonEmptyString" minOccurs="0" maxOccurs="unbounded" >
+						<xs:annotation>
+							<xs:documentation>
+								Путь относительно директори с задачей. Этот файл будет исключён из проекта при сборке для студента.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="checkInitialSolution" type="xs:boolean" minOccurs="0" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>
+								Нужно ли проверять, что initial-решение при отправке в чеккер для type="check-output" возвращает Ok, но output не пуст,
+								а для "check-exit-code" возвращает не Ok. По умолчанию true.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="dockerImageName" type="NonEmptyString" minOccurs="1" maxOccurs="1" >
+						<xs:annotation>
+							<xs:documentation>
+								Имя docker-контейнера
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="run" type="NonEmptyString" minOccurs="1" maxOccurs="1" >
+						<xs:annotation>
+							<xs:documentation>
+								Команда, выполняемая в docker-контейнере
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="region" type="NonEmptyString" minOccurs="1" maxOccurs="1" >
+						<xs:annotation>
+							<xs:documentation>
+								Метка региона файла, с которым работает студент. [prefix]region [label] ... [prefix]endregion [label] Разрешен только при noStudentZip=true
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="exerciseDirName" type="NonEmptyString" use="required">
+					<xs:annotation>
+						<xs:documentation>
+							Путь до папки с задачей относительно директории с xml-файлом описания юнита.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="noStudentZip" type="xs:boolean" use="optional">
+					<xs:annotation>
+						<xs:documentation>
+							Не отдавать zip-файл проекта студенту
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
 
 	<xs:complexType name="AbstractQuestion">
 		<xs:sequence minOccurs="1" maxOccurs="1">

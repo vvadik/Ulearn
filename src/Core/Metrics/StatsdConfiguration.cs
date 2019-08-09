@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Metrics
+namespace Ulearn.Core.Metrics
 {
 	public class StatsdConfiguration
 	{

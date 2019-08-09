@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net47;netcoreapp2.2</TargetFrameworks>
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="NUnit" Version="3.10.1" />
+      <PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.0" />
+      <ProjectReference Include="..\Common\Common.csproj" />
+      <ProjectReference Include="..\Core\Core.csproj" />
+      <PackageReference Include="log4net" Version="2.0.8" />
+      <None Include="DockerConfig\*.*">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="appsettings.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="log4net.config">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="log4net.Kontur.config">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="deploy\**">
+        <Link>deploy\%(RecursiveDir)%(Filename)%(Extension)</Link>
+        <CopyToOutputDirectory>None</CopyToOutputDirectory>
+        <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+      </Content>
+      <Content Include="..\..\sandboxes\**">
+        <Link>sandboxes\%(RecursiveDir)%(Filename)%(Extension)</Link>
+        <CopyToOutputDirectory>None</CopyToOutputDirectory>
+        <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+      </Content>
+    </ItemGroup>
+</Project>

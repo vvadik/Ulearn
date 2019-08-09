@@ -51,7 +51,7 @@ namespace uLearn.CSharp
 			if (File.Exists(studentZipFilepath))
 				File.Delete(studentZipFilepath);
 
-			var context = new SlideBuildingContext("Test", new Unit(null, exerciseBlock.SlideFolderPath), CourseSettings.DefaultSettings, null);
+			var context = new SlideBuildingContext("Test", new Unit(null, exerciseBlock.SlideFolderPath), CourseSettings.DefaultSettings, exerciseBlock.SlideFolderPath, null);
 			// ReSharper disable once ReturnValueOfPureMethodIsNotUsed
 			exerciseBlock.BuildUp(context, ImmutableHashSet<string>.Empty).ToList();
 		}

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Metrics
+namespace Ulearn.Core.Metrics
 {
 	public class ServiceKeepAliver
 	{

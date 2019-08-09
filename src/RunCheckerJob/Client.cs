@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using System.Web;
 using log4net;
-using RunCsJob.Api;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
+using Ulearn.Core.RunCheckerJobApi;
 
-namespace RunCsJob
+namespace RunCheckerJob
 {
-	internal class Client
+	public class Client
 	{
 		private readonly string token;
 		private readonly HttpClient httpClient;
@@ -42,9 +42,9 @@ namespace RunCsJob
 			this.agentName = agentName;
 		}
 
-		public async Task<List<RunnerSubmission>> TryGetSubmission()
+		public async Task<List<RunnerSubmission>> TryGetSubmission(IEnumerable<Language> languages)
 		{
-			var uri = GetUri("GetSubmissions", new [] {"language", Language.CSharp.GetName()});
+			var uri = GetUri("GetSubmissions", new [] {"language", string.Join(",", languages.Select(l => l.GetName()))});
 			try
 			{
 				log.Info($"Отправляю запрос на {uri}");
@@ -97,7 +97,7 @@ namespace RunCsJob
 
 		private string GetUri(string path, params string[][] parameters)
 		{
-			var query = HttpUtility.ParseQueryString(string.Empty);
+			var query = WebUtils.ParseQueryString(string.Empty);
 			query["token"] = token;
 			query["agent"] = agentName;
 			foreach (var parameter in parameters)

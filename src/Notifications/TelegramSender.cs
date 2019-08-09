@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Configuration;
 using System.Threading.Tasks;
 using log4net;
-using Metrics;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
+using Ulearn.Core.Metrics;
 
 namespace Notifications
 {
@@ -22,7 +21,8 @@ namespace Notifications
 
 		public TelegramSender()
 		{
-			var botToken = ConfigurationManager.AppSettings["ulearn.telegram.botToken"];
+			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
+			var botToken = configuration.Telegram.BotToken;
 			try
 			{
 				bot = new TelegramBotClient(botToken);
@@ -35,7 +35,7 @@ namespace Notifications
 
 			log.Info($"Initialized telegram bot with token \"{botToken.MaskAsSecret()}\"");
 
-			metricSender = new MetricSender(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName);
+			metricSender = new MetricSender(configuration.GraphiteServiceName);
 		}
 
 		public async Task SendMessageAsync(long chatId, string html, TelegramButton button = null)

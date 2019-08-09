@@ -365,6 +365,7 @@
   <ItemGroup>
     <Compile Include="CmdLineOptions\AbstractOptions.cs" />
     <Compile Include="ArchiveManager.cs" />
+    <Compile Include="CmdLineOptions\BuildDockerContainerOptions.cs" />
     <Compile Include="CmdLineOptions\GenerateEmptyVideoAnnotations.cs" />
     <Compile Include="Validating\BaseValidator.cs" />
     <Compile Include="CmdLineOptions\OlxDesquashChaptersOptions.cs" />
@@ -399,6 +400,7 @@
     <Compile Include="CmdLineOptions\ULearnOptions.cs" />
     <Compile Include="CmdLineOptions\OlxPatchFromUlearnOptions.cs" />
     <Compile Include="CmdLineOptions\OlxPatchVideoOptions.cs" />
+    <Compile Include="Validating\UniversalExerciseValidator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -423,6 +425,16 @@
       <Link>renderer\scripts\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+    <Content Include="appsettings.local.json">
+      <DependentUpon>appsettings.json</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Newer</CopyToPublishDirectory>
+    </Content>
+    <Content Include="CourseTool.nuspec" />
     <Content Include="Hunspellx64.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -577,6 +589,10 @@
     <Content Include="static\ulearn-auto.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\..\sandboxes\**">
+      <Link>sandboxes\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">
@@ -591,13 +607,9 @@
       <Project>{c2f55118-2422-4043-96af-016ebb8ec965}</Project>
       <Name>CsSandboxer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Metrics\Metrics.csproj">
-      <Project>{b6b60d19-c6bd-4d66-95da-14480a18770c}</Project>
-      <Name>Metrics</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj">
-      <Project>{26580595-f4dc-41ee-ba66-0ef4692243af}</Project>
-      <Name>RunCsJob.Api</Name>
+    <ProjectReference Include="..\RunCheckerJob\RunCheckerJob.csproj">
+      <Project>{650fe5bd-4345-41b9-800e-d00ca4cef51f}</Project>
+      <Name>RunCheckerJob</Name>
     </ProjectReference>
     <ProjectReference Include="..\RunCsJob\RunCsJob.csproj">
       <Project>{77B16F9D-3CDF-4CC6-BE5F-B6BADFAC5394}</Project>

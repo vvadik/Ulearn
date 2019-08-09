@@ -174,7 +174,7 @@ namespace Ulearn.Core
 			// NONE
 		} 
 
-		protected Course ReloadCourse(string courseId)
+		public Course ReloadCourse(string courseId)
 		{
 			/* First try load course from directory */
 			var courseDir = GetExtractedCourseDirectory(courseId);

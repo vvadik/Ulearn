@@ -8,7 +8,6 @@ using Microsoft.Build.Evaluation;
 using Microsoft.VisualBasic.FileIO;
 using NUnit.Framework;
 using RunCsJob;
-using RunCsJob.Api;
 using test;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
@@ -19,6 +18,7 @@ using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Courses.Units;
 using Ulearn.Core.Helpers;
+using Ulearn.Core.RunCheckerJobApi;
 using SearchOption = System.IO.SearchOption;
 
 namespace uLearn.CSharp
@@ -66,7 +66,7 @@ namespace uLearn.CSharp
 			};
 
 			var unit = new Unit(null, ex.SlideFolderPath);
-			var ctx = new SlideBuildingContext("Test", unit, CourseSettings.DefaultSettings, null);
+			var ctx = new SlideBuildingContext("Test", unit, CourseSettings.DefaultSettings, unit.Directory, null);
 			exBlocks = ex.BuildUp(ctx, ImmutableHashSet<string>.Empty).ToList();
 			
 			var builder = new ExerciseStudentZipBuilder();
@@ -156,7 +156,7 @@ namespace uLearn.CSharp
 				ProjectFileName = "test.csproj",
 				ZipFileData = studentExerciseZipFilePath.ReadAllContent()
 			};
-			var result = SandboxRunner.Run(submission);
+			var result = new CsSandboxRunnerClient().Run(submission);
 
 			result.CompilationOutput.Should().Be("");
 			result.Error.Should().Be("");
