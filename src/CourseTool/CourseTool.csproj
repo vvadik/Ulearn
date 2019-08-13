@@ -421,6 +421,10 @@
       <Link>renderer\styles\main.css</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\uLearn.Web\Scripts\js.cookie.js">
+      <Link>renderer\scripts\js.cookie.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\uLearn.Web\Scripts\slide-*.js">
       <Link>renderer\scripts\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -447,12 +451,8 @@
     <Content Include="renderer\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="renderer\fonts\glyphicons-halflings-regular.woff" />
     <Content Include="renderer\fonts\glyphicons-halflings-regular.woff2" />
-    <Content Include="renderer\scripts\htmlembedded.js" />
-    <Content Include="renderer\scripts\javascript.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\scripts\slide-*.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="renderer\scripts\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="examples\video.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -638,6 +638,8 @@
   </Target>
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
   <Import Project="..\packages\OctoPack.3.6.3\build\OctoPack.targets" Condition="Exists('..\packages\OctoPack.3.6.3\build\OctoPack.targets')" />
+  <PropertyGroup>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
 			 Other similar extension points exist, see Microsoft.Common.targets.
 	<Target Name="BeforeBuild">

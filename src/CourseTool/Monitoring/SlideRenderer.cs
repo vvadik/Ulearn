@@ -63,8 +63,8 @@ namespace uLearn.CourseTool.Monitoring
 		private string RenderSlide(Slide slide)
 		{
 			var page = StandaloneLayout.Page(course, slide, CreateToc(slide), GetCssFiles(), GetJsFiles());
-			foreach (var block in slide.Blocks.OfType<MarkdownBlock>())
-				CopyLocalFiles(block.Markdown, slide.Info.Directory.FullName);
+			//foreach (var block in slide.Blocks.OfType<MarkdownBlock>())
+			//	CopyLocalFiles(block.Markdown, slide.Info.Directory.FullName);
 			return "<!DOCTYPE html>\n" + page.ToHtmlString();
 		}
 
@@ -86,12 +86,12 @@ namespace uLearn.CourseTool.Monitoring
 			var slide = new Slide(new MarkdownBlock(note.Markdown))
 			{
 				Id = Guid.NewGuid(),
-				Title = "Заметки преподавателю", 
+				Title = "Заметки преподавателю",
 				Info = new SlideInfo(unit, similarSlide.Info.SlideFile, -1),
 			};
 			var page = StandaloneLayout.Page(course, slide, CreateToc(slide), GetCssFiles(), GetJsFiles());
 
-			CopyLocalFiles(note.Markdown, similarSlide.Info.Directory.FullName);
+			//CopyLocalFiles(note.Markdown, similarSlide.Info.Directory.FullName);
 			return "<!DOCTYPE html>\n" + page.ToHtmlString();
 		}
 
@@ -119,41 +119,66 @@ namespace uLearn.CourseTool.Monitoring
 
 		private IEnumerable<string> GetCssFiles()
 		{
-			yield return "styles/bootstrap.css";
-			yield return "styles/awesome-bootstrap-checkbox.css";
-			yield return "styles/codemirror.css";
-			yield return "styles/cobalt.css";
-			yield return "styles/flexslider.css";
-			yield return "styles/font-awesome.css";
-			yield return "styles/jsdifflib.css";
-			yield return "styles/katex.min.css";
-			yield return "styles/show-hint.css";
-			yield return "styles/main.css";
-			yield return "styles/ulearn.css";
+			yield return "renderer/styles/bootstrap.css";
+			yield return "renderer/styles/awesome-bootstrap-checkbox.css";
+			yield return "renderer/styles/codemirror.css";
+			yield return "renderer/styles/cobalt.css";
+			yield return "renderer/styles/flexslider.css";
+			yield return "renderer/styles/font-awesome.css";
+			yield return "renderer/styles/jsdifflib.css";
+			yield return "renderer/styles/katex.min.css";
+			yield return "renderer/styles/show-hint.css";
+			yield return "renderer/styles/main.css";
+			yield return "renderer/styles/ulearn.css";
 		}
+
+		private string bundleJs = null;
+
+		private IEnumerable<string> GetJsFilesCollection()
+		{
+			yield return "renderer/scripts/jquery-1.10.2.min.js";
+			yield return "renderer/scripts/jquery-ui.min.js";
+			yield return "renderer/scripts/js.cookie.js";
+			yield return "renderer/scripts/bootstrap.min.js";
+			yield return "renderer/scripts/katex.min.js";
+			yield return "renderer/scripts/jsdifflib.js";
+			yield return "renderer/scripts/jquery.flexslider-min.js";
+			yield return "renderer/scripts/codemirror.js";
+			yield return "renderer/scripts/clike.js";
+			yield return "renderer/scripts/javascript.js";
+			yield return "renderer/scripts/python.js";
+			yield return "renderer/scripts/xml.js";
+			yield return "renderer/scripts/show-hint.js";
+			yield return "renderer/scripts/cscompleter.js";
+			yield return "renderer/scripts/csharp-hint.js";
+			yield return "renderer/scripts/closebrackets.js";
+			yield return "renderer/scripts/matchbrackets.js";
+			yield return "renderer/scripts/active-line.js";
+			foreach (var slideJs in new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory)
+				.EnumerateFiles(@"renderer/scripts/slide*.js"))
+				yield return @"renderer/scripts/" + slideJs.Name;
+		}
+
+		private void GetBundle()
+		{
+			var bundle = GetJsFilesCollection().SelectMany(x => File.ReadAllBytes(AppDomain.CurrentDomain.BaseDirectory + $"/{x}")).ToArray();
+			using (var fs = new FileStream(AppDomain.CurrentDomain.BaseDirectory + $"/renderer/scripts/bundle.js", FileMode.Create, FileAccess.Write))
+			{
+				fs.Write(bundle, 0, bundle.Length);
+			}
+
+			bundleJs = "renderer/scripts/bundle.js";
+		}
+
 
 		private IEnumerable<string> GetJsFiles()
 		{
-			yield return "scripts/jquery-1.10.2.min.js";
-			yield return "scripts/jquery-ui.min.js";
-			yield return "scripts/bootstrap.min.js";
-			yield return "scripts/katex.min.js";
-			yield return "scripts/jsdifflib.js";
-			yield return "scripts/jquery.flexslider-min.js";
-			yield return "scripts/codemirror.js";
-			yield return "scripts/clike.js";
-			yield return "scripts/javascript.js";
-			yield return "scripts/python.js";
-			yield return "scripts/xml.js";
-			yield return "scripts/htmlembedded.js";
-			yield return "scripts/show-hint.js";
-			yield return "scripts/cscompleter.js";
-			yield return "scripts/csharp-hint.js";
-			yield return "scripts/closebrackets.js";
-			yield return "scripts/matchbrackets.js";
-			yield return "scripts/active-line.js";
-			foreach (var slideJs in htmlDirectory.EnumerateFiles(@"scripts/slide*.js"))
-				yield return @"scripts/" + slideJs.Name;
+			if (bundleJs is null)
+			{
+				GetBundle();
+			}
+
+			yield return "renderer/scripts/bundle.js";
 		}
 	}
 }
