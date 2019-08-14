@@ -81,7 +81,7 @@ export const loadFlashcards = (courseId) => {
 	return (dispatch) => {
 		dispatch(loadFlashcardsStart());
 
-		getFlashcards(courseId)
+		getFlashcards(courseId.toLowerCase())
 			.then(result => {
 				dispatch(loadFlashcardsSuccess(courseId, result.units));
 			})
