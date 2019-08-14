@@ -27,9 +27,13 @@ class ShortQuestions extends Component {
 
 		translateCode(this.list);
 
+		if (prevProps.questionsWithAnswers !== questionsWithAnswers) {
+			this.setState({ showAllAnswers: false, });
+		}
+
 
 		if (this.state.questionsWithAnswers.length !== questionsWithAnswers.length) {
-			this.setState({ questionsWithAnswers, });
+			this.setState({ questionsWithAnswers, showAllAnswers: false, });
 		}
 	}
 
