@@ -1,6 +1,6 @@
 @import "../../../variables.less";
 
-@rootZIndex: 10;
+@rootZIndex: 3;
 @contentZIndex: 3;
 @overlayZIndex: @contentZIndex - 1;
 
@@ -11,7 +11,7 @@
   max-height: calc(100vh - @headerHeight - @headerDivider);
   left: -500px;
   flex-shrink: 0;
-  z-index: 10;
+  z-index: @rootZIndex;
   transition: left 300ms ease-in-out;
 }
 
