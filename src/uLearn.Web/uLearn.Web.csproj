@@ -1278,9 +1278,7 @@
     <Content Include="Scripts\jquery.validate.date.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
-    <Content Include="Scripts\js.cookie.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Scripts\js.cookie.js" />
     <Content Include="Scripts\likely.js" />
     <Content Include="Scripts\likely.README.txt" />
     <Content Include="Scripts\modals.js" />

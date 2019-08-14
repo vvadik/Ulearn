@@ -413,18 +413,6 @@
     <None Include="static\flexslider-icon.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Content Include="..\uLearn.Web\Content\ulearn.css">
-      <Link>renderer\styles\ulearn.css</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\uLearn.Web\Content\main.css">
-      <Link>renderer\styles\main.css</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\uLearn.Web\Scripts\js.cookie.js">
-      <Link>renderer\scripts\js.cookie.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\uLearn.Web\Scripts\slide-*.js">
       <Link>renderer\scripts\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -510,31 +498,7 @@
     <Content Include="renderer\scripts\xml.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="renderer\styles\awesome-bootstrap-checkbox.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\styles\bootstrap.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\styles\cobalt.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\styles\codemirror.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\styles\flexslider.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\styles\font-awesome.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\styles\jsdifflib.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\styles\katex.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\styles\show-hint.css">
+    <Content Include="renderer\styles\bundle.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="static\htmlembedded.js">
@@ -639,6 +603,24 @@
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
   <Import Project="..\packages\OctoPack.3.6.3\build\OctoPack.targets" Condition="Exists('..\packages\OctoPack.3.6.3\build\OctoPack.targets')" />
   <PropertyGroup>
+		<PreBuildEvent>
+			set outfile="..\..\renderer\styles\bundle.css"
+			del %outfile%
+			FOR /f  "tokens=*" %%f in (..\..\..\uLearn.Web\UlearnStyles.txt) DO (
+			type "..\..\..\uLearn.Web\%%f" &gt;&gt; %outfile%
+			echo.&gt;&gt;%outfile%
+			)
+			set outfile="..\..\renderer\scripts\bundle.js"
+			del %outfile%
+			FOR /f  "tokens=*" %%f in (..\..\..\uLearn.Web\LibrariesScripts.txt) DO (
+			type "..\..\..\uLearn.Web\%%f" &gt;&gt; %outfile%
+			echo.&gt;&gt;%outfile%
+			)
+			FOR /f  "tokens=*" %%f in (..\..\..\uLearn.Web\UlearnScripts.txt) DO (
+			type "..\..\..\uLearn.Web\%%f" &gt;&gt; %outfile%
+			echo.&gt;&gt;%outfile%
+			)
+		</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
 			 Other similar extension points exist, see Microsoft.Common.targets.

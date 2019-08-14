@@ -119,65 +119,12 @@ namespace uLearn.CourseTool.Monitoring
 
 		private IEnumerable<string> GetCssFiles()
 		{
-			yield return "renderer/styles/bootstrap.css";
-			yield return "renderer/styles/awesome-bootstrap-checkbox.css";
-			yield return "renderer/styles/codemirror.css";
-			yield return "renderer/styles/cobalt.css";
-			yield return "renderer/styles/flexslider.css";
-			yield return "renderer/styles/font-awesome.css";
-			yield return "renderer/styles/jsdifflib.css";
-			yield return "renderer/styles/katex.min.css";
-			yield return "renderer/styles/show-hint.css";
-			yield return "renderer/styles/main.css";
-			yield return "renderer/styles/ulearn.css";
-		}
-
-		private string bundleJs = null;
-
-		private IEnumerable<string> GetJsFilesCollection()
-		{
-			yield return "renderer/scripts/jquery-1.10.2.min.js";
-			yield return "renderer/scripts/jquery-ui.min.js";
-			yield return "renderer/scripts/js.cookie.js";
-			yield return "renderer/scripts/bootstrap.min.js";
-			yield return "renderer/scripts/katex.min.js";
-			yield return "renderer/scripts/jsdifflib.js";
-			yield return "renderer/scripts/jquery.flexslider-min.js";
-			yield return "renderer/scripts/codemirror.js";
-			yield return "renderer/scripts/clike.js";
-			yield return "renderer/scripts/javascript.js";
-			yield return "renderer/scripts/python.js";
-			yield return "renderer/scripts/xml.js";
-			yield return "renderer/scripts/show-hint.js";
-			yield return "renderer/scripts/cscompleter.js";
-			yield return "renderer/scripts/csharp-hint.js";
-			yield return "renderer/scripts/closebrackets.js";
-			yield return "renderer/scripts/matchbrackets.js";
-			yield return "renderer/scripts/active-line.js";
-			foreach (var slideJs in new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory)
-				.EnumerateFiles(@"renderer/scripts/slide*.js"))
-				yield return @"renderer/scripts/" + slideJs.Name;
-		}
-
-		private void GetBundle()
-		{
-			var bundle = GetJsFilesCollection().SelectMany(x => File.ReadAllBytes(AppDomain.CurrentDomain.BaseDirectory + $"/{x}")).ToArray();
-			using (var fs = new FileStream(AppDomain.CurrentDomain.BaseDirectory + $"/renderer/scripts/bundle.js", FileMode.Create, FileAccess.Write))
-			{
-				fs.Write(bundle, 0, bundle.Length);
-			}
-
-			bundleJs = "renderer/scripts/bundle.js";
+			yield return "renderer/styles/bundle.css";
 		}
 
 
 		private IEnumerable<string> GetJsFiles()
 		{
-			if (bundleJs is null)
-			{
-				GetBundle();
-			}
-
 			yield return "renderer/scripts/bundle.js";
 		}
 	}
