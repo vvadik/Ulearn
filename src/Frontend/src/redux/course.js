@@ -55,12 +55,14 @@ export default function courses(state = initialCoursesState, action) {
 				...state,
 				flashcardsLoading: true,
 			};
-		case COURSES__FLASHCARDS + SUCCESS:
+		case COURSES__FLASHCARDS + SUCCESS: {
+			let { courseId, result } = action;
+			courseId = courseId.toLowerCase();
 			const courseFlashcards = {},
 				flashcardsByUnits = {};
-			const courseUnits = state.fullCoursesInfo[action.courseId].units;
+			const courseUnits = state.fullCoursesInfo[courseId].units;
 
-			for (const unit of action.result) {
+			for (const unit of result) {
 				const { unitId, unitTitle, unlocked, flashcards } = unit;
 				const flashcardsIds = [];
 				const unitSlides = courseUnits
@@ -99,6 +101,7 @@ export default function courses(state = initialCoursesState, action) {
 					...flashcardsByUnits,
 				},
 			};
+		}
 		case COURSES__FLASHCARDS + FAIL:
 			return {
 				...state,
