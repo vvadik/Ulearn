@@ -1,4 +1,4 @@
-﻿using System.Web.Mvc;
+using System.Web.Mvc;
 using System.Web.Routing;
 
 namespace uLearn.Web
@@ -8,7 +8,11 @@ namespace uLearn.Web
 		public static void RegisterRoutes(RouteCollection routes)
 		{
 			routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
-
+			routes.MapRoute(
+				name: "Course.Flashcards",
+				url: "Course/{courseId}/flashcards",
+				defaults: new { controller = "Spa", action = "IndexHtml" }
+			);
 			routes.MapRoute(
 				name: "Course.Slide",
 				url: "Course/{courseId}/{slideIndex}",
