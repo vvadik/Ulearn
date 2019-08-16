@@ -4,7 +4,7 @@
            elementFormDefault="qualified"
            targetNamespace="https://ulearn.me/schema/v2">
 
-    <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/XML/1998/namespace" />
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace"  />
     
     <!-- Course -->
 
