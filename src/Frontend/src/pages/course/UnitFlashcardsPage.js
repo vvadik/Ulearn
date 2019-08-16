@@ -5,7 +5,8 @@ import UnitFlashcards from "../../components/flashcards/UnitPage/UnitPage";
 import Course from "../../components/course/Course";
 
 const mapStateToProps = (state, { match }) => {
-	const { courseId, slideId } = match.params;
+	let { courseId, slideId } = match.params;
+	courseId = courseId.toLowerCase();
 
 	const data = state.courses;
 	const courseInfo = data.fullCoursesInfo[courseId];

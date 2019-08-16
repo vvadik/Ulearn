@@ -34,112 +34,167 @@ let accountPropTypes = PropTypes.shape({
 const LinkComponent = ({ href, ...rest }) => (<Link to={ href } { ...rest } />);
 
 class Header extends Component {
-	render() {
-		if (this.props.initializing) {
-			return (
-				<div className={ styles["header"] + " header" }>
-					<Logo>
-						{ isInsideCourse() && <NavMenuComponent/> }
-						<div className={ styles["visible-at-least-tablet"] }>
-							<Link to={ '/' }>
-								Ulearn.me
-							</Link>
-						</div>
-					</Logo>
-				</div>
-			)
-		}
+	constructor(props) {
+		super(props);
 
-		let roleByCourse = this.props.account.roleByCourse;
-		let accessesByCourse = this.props.account.accessesByCourse;
+		this.state = Header.mapPropsToState(props);
+	}
 
-		let controllableCourseIds = Object.keys(roleByCourse).filter(courseId => roleByCourse[courseId] !== 'tester');
-		controllableCourseIds = controllableCourseIds.map(s => s.toLowerCase());
-		if (this.props.account.isSystemAdministrator)
-			controllableCourseIds = Object.keys(this.props.courses.courseById);
-		let isCourseMenuVisible = (
-			this.props.courses !== undefined &&
-			this.props.courses.currentCourseId !== undefined &&
-			controllableCourseIds.indexOf(this.props.courses.currentCourseId) !== -1
+	static mapPropsToState(props) {
+		const { account, courses } = props;
+		const { currentCourseId } = courses;
+		const { roleByCourse, accessesByCourse, isSystemAdministrator } = account;
+
+		const controllableCourseIds =
+			isSystemAdministrator
+				? Object.keys(courses.courseById)
+				: Object.keys(roleByCourse)
+					.filter(courseId => roleByCourse[courseId] !== 'tester')
+					.map(s => s.toLowerCase());
+
+		const isCourseMenuVisible = (
+			courses !== undefined &&
+			currentCourseId !== undefined &&
+			controllableCourseIds.indexOf(currentCourseId) !== -1
 		);
 
 		let courseRole = "";
-		let courseAccesses = [];
+		const courseAccesses = isCourseMenuVisible
+			? accessesByCourse[currentCourseId] || []
+			: [];
+
 		if (isCourseMenuVisible) {
-			let courseId = this.props.courses.currentCourseId;
-			if (this.props.account.isSystemAdministrator)
+			if (isSystemAdministrator) {
 				courseRole = 'courseAdmin';
-			else
-				courseRole = roleByCourse[courseId];
-			courseAccesses = accessesByCourse[courseId] || [];
+			} else {
+				courseRole = roleByCourse[currentCourseId];
+			}
 		}
+
+		return {
+			isSystemAdministrator,
+			controllableCourseIds,
+			isCourseMenuVisible,
+			courseRole,
+			courseAccesses,
+			currentCourseId
+		};
+	}
+
+	componentWillReceiveProps(nextProps, nextContext) {
+		this.setState(Header.mapPropsToState(nextProps));
+	}
+
+	render() {
+		const { initializing } = this.props;
 
 		/* Div should have class .header because some legacy javascript code uses $('.header') for calculating header height */
 		return (
 			<div className={ styles["header"] + " header" } id="header">
-				<Logo>
-					{ isInsideCourse() && <NavMenuComponent/> }
-					<div className={ styles["visible-at-least-tablet"] }>
-						<Link to={ '/' }>
-							Ulearn.me
-						</Link>
-					</div>
-				</Logo>
-
-				<div className={ styles["visible-at-least-tablet"] }>
-					{ this.props.account.isSystemAdministrator &&
-					<SysAdminMenu controllableCourseIds={ controllableCourseIds }/> }
-					{ !this.props.account.isSystemAdministrator && controllableCourseIds.length > 0 &&
-					<MyCoursesMenu controllableCourseIds={ controllableCourseIds }/> }
-					{ isCourseMenuVisible &&
-					<CourseMenu courseId={ this.props.courses.currentCourseId } role={ courseRole }
-								accesses={ courseAccesses }/> }
-				</div>
-				<div className={ styles["visible-only-phone"] }>
-					<MobileCourseMenu
-						isSystemAdministrator={ this.props.account.isSystemAdministrator }
-						controllableCourseIds={ controllableCourseIds }
-						isCourseMenuVisible={ isCourseMenuVisible }
-						courseId={ isCourseMenuVisible ? this.props.courses.currentCourseId : "" }
-						role={ courseRole }
-						accesses={ courseAccesses }
-					/>
-				</div>
-
-				<Menu account={ this.props.account }/>
+				{ Header.renderPhoneHeader() }
+				{ Header.renderDefaultHeader() }
+				{ !initializing && this.renderUserRoleMenu() }
 			</div>
 		)
 	}
 
-	static mapStateToProps(state) {
-		return {
-			account: state.account,
-			courses: state.courses,
-		}
+	static renderDefaultHeader() {
+		return (
+			<div className={ styles["visible-at-least-tablet"] }>
+				<Logo>
+					<LinkComponent href={ '/' }>
+						Ulearn.me
+					</LinkComponent>
+				</Logo>
+			</div>
+		)
 	}
 
-	static mapDispatchToProps(dispatch) {
-		return {
-			toggleNavigation: () => dispatch(toggleNavigation()),
-		}
+	static renderPhoneHeader() {
+		return (
+			<div className={ styles.phoneHeaderElementsContainer }>
+				<div className={ styles.phoneHeaderElement }>
+					<LinkComponent href={ '/' }>
+						U.me
+					</LinkComponent>
+				</div>
+				{ isInsideCourse() &&
+				<div className={ styles.phoneHeaderElement }>
+					<NavMenuComponent/>
+				</div> }
+			</div>
+		);
 	}
 
-	static propTypes = {
-		account: accountPropTypes,
-		initializing: PropTypes.bool.isRequired,
-		toggleNavigation: PropTypes.func,
+	renderUserRoleMenu() {
+		const { account } = this.props;
+
+		return (
+			<div>
+				{ this.renderDefaultUserRoleMenu() }
+				{ this.renderPhoneUserRoleMenu() }
+				<Menu account={ account }/>
+			</div>
+		)
+	}
+
+	renderDefaultUserRoleMenu() {
+		const { isSystemAdministrator, controllableCourseIds, isCourseMenuVisible, courseRole, courseAccesses, currentCourseId } = this.state;
+
+		return (
+			<div className={ styles["visible-at-least-tablet"] }>
+				{ isSystemAdministrator &&
+				<SysAdminMenu controllableCourseIds={ controllableCourseIds }/> }
+				{ !isSystemAdministrator && controllableCourseIds.length > 0 &&
+				<MyCoursesMenu controllableCourseIds={ controllableCourseIds }/> }
+				{ isCourseMenuVisible &&
+				<CourseMenu courseId={ currentCourseId } role={ courseRole } accesses={ courseAccesses }/> }
+			</div>
+		);
+	}
+
+	renderPhoneUserRoleMenu() {
+		const { isSystemAdministrator, controllableCourseIds, isCourseMenuVisible, courseRole, courseAccesses, currentCourseId } = this.state;
+
+		return (
+			<div className={ styles["visible-only-phone"] }>
+				<MobileCourseMenu
+					isSystemAdministrator={ isSystemAdministrator }
+					controllableCourseIds={ controllableCourseIds }
+					isCourseMenuVisible={ isCourseMenuVisible }
+					courseId={ isCourseMenuVisible ? currentCourseId : "" }
+					role={ courseRole }
+					accesses={ courseAccesses }
+				/>
+			</div>
+		);
 	}
 }
 
-export default connect(Header.mapStateToProps, Header.mapDispatchToProps)(Header);
+const mapStateToHeaderProps = ({ account, courses }) => {
+	return { account, courses, }
+};
+
+const mapDispatchToHeaderProps = (dispatch) => {
+	return {
+		toggleNavigation: () => dispatch(toggleNavigation()),
+	}
+};
+
+Header.propTypes = {
+	account: accountPropTypes,
+	initializing: PropTypes.bool.isRequired,
+	toggleNavigation: PropTypes.func,
+};
+
+
+export default connect(mapStateToHeaderProps, mapDispatchToHeaderProps)(Header);
 
 class Logo extends Component {
 	render() {
 		return (
 			<div className={ styles["header__logo"] }>
-				<div className={ styles.headerElement }>
-					{ this.props.children }
-				</div>
+				{ this.props.children }
 			</div>
 		)
 	}
@@ -154,11 +209,9 @@ const isInsideCourse = () => {
 
 function NavMenu({ toggleNavigation }) {
 	return (
-		<div className={ styles["visible-only-phone"] }>
-			<button className={ styles.navMenuButton } onClick={ toggleNavigation }>
-				<Icon size={ 22 } name="Menu"/>
-			</button>
-		</div>
+		<button className={ styles.navMenuButton } onClick={ toggleNavigation }>
+			<Icon size={ 22 } name="Menu"/>
+		</button>
 	)
 }
 

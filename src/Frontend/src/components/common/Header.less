@@ -15,7 +15,7 @@
   box-shadow: 0 0 7px 4px #ccc;
 
   > * {
-    display: inline-block;
+    display: inline-flex;
     vertical-align: top;
     height: @headerHeight;
   }
@@ -294,8 +294,27 @@
   outline: none;
 }
 
+.phoneHeaderElementsContainer {
+  display: none;
+
+  height: 100%;
+
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.phoneHeaderElement {
+  width: 40px;
+
+  display: flex;
+  align-items: center;
+
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
 @media (max-width: @maxPhoneWidth) {
-  .headerElement {
-    padding: 9px 10px 10px 10px;
+  .phoneHeaderElementsContainer {
+    display: inline-flex;
   }
 }
