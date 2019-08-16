@@ -5,7 +5,8 @@ import CourseFlashcards from "../../components/flashcards/CoursePage/CoursePage"
 import { sendFlashcardResult, loadFlashcards } from '../../actions/course';
 
 const mapStateToProps = (state, { match }) => {
-	const { courseId } = match.params;
+	let { courseId } = match.params;
+	courseId = courseId.toLowerCase();
 
 	const data = state.courses;
 	const courseInfo = data.fullCoursesInfo[courseId];
