@@ -121,6 +121,7 @@ namespace uLearn.Web
 				"~/codemirror/theme/xq-dark.css",
 				"~/codemirror/addon/hint/show-hint.css",
 				"~/codemirror/addon/merge/merge.css",
+				"~/katex/katex.min.css",
 				"~/Content/tablesorter.css",
 				"~/tablesorter-master/css/widget.grouping.css",
 				"~/Content/ulearn.css",
