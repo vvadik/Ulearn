@@ -1,6 +1,6 @@
 @import "../../../variables.less";
 
-@rootZIndex: 3;
+@rootZIndex: @asideZIndex;
 @contentZIndex: 3;
 @overlayZIndex: @contentZIndex - 1;
 
@@ -71,7 +71,6 @@
     position: relative;
     left: 0;
     transition: none;
-    z-index: 1;
   }
 
   .contentWrapper {
