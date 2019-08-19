@@ -153,8 +153,6 @@ class DownloadedHtmlContent extends Component {
 			this.processNewHtmlContent(url, data);
 		}).catch(function (error) {
 			console.error(error);
-			/* Retry after timeout */
-			setTimeout(() => self.fetchContentFromServer(url), 5000);
 		});
 	}
 
