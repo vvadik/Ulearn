@@ -27,6 +27,8 @@ const userProgressUpdateAction = (courseId, slideId) => ({
 });
 
 export const userProgressUpdate = (courseId, slideId) => {
+	courseId = courseId.toLowerCase();
+
 	return (dispatch) => {
 		dispatch(userProgressUpdateAction(courseId, slideId));
 		updateUserProgressInCourse(courseId, slideId)
@@ -37,6 +39,8 @@ export const userProgressUpdate = (courseId, slideId) => {
 };
 
 export const loadUserProgress = (courseId) => {
+	courseId = courseId.toLowerCase();
+
 	return (dispatch) => {
 		dispatch(loadUserProgressStart());
 
