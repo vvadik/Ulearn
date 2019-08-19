@@ -14,7 +14,7 @@ class ShortQuestions extends Component {
 
 		this.state = {
 			showAllAnswers: false,
-			questionsWithAnswers: [...questionsWithAnswers],
+			questionsWithAnswers: questionsWithAnswers.map(el => ({ ...el })),
 		};
 	}
 
@@ -75,7 +75,7 @@ class ShortQuestions extends Component {
 
 	handleQuestionClick = (questionIndex) => {
 		const { questionsWithAnswers } = this.state;
-		const newQuestionsWithAnswers = [...questionsWithAnswers];
+		const newQuestionsWithAnswers = questionsWithAnswers.map(el => ({ ...el }));
 		const questionWithAnswer = newQuestionsWithAnswers[questionIndex];
 
 		questionWithAnswer.showAnswer = !questionWithAnswer.showAnswer;
@@ -86,20 +86,18 @@ class ShortQuestions extends Component {
 	};
 
 	handleToggleChange = () => {
-		const { questionsWithAnswers } = this.state;
-
-		for (const question of questionsWithAnswers) {
-			question.showAnswer = false;
-		}
+		const { showAllAnswers } = this.state;
+		const { questionsWithAnswers } = this.props;
 
 		this.setState({
-			showAllAnswers: !this.state.showAllAnswers,
-			questionsWithAnswers: questionsWithAnswers,
+			showAllAnswers: !showAllAnswers,
+			questionsWithAnswers: questionsWithAnswers.map(el => ({ ...el })),
 		});
 	}
 }
 
-ShortQuestions.propTypes = {
+ShortQuestions
+	.propTypes = {
 	questionsWithAnswers: PropTypes.arrayOf(PropTypes.shape({
 		question: PropTypes.string,
 		answer: PropTypes.string,

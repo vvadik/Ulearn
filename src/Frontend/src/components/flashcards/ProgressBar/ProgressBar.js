@@ -36,18 +36,13 @@ function ProgressBar({ statistics, totalFlashcardsCount }) {
 			.filter(rateType => statistics[rateType] > 0);
 
 		const ratesWithText = [rateTypes.notRated];
-		//TODO ROZENTOR implement better algorithm for selecting rates with text
+
 		if (rates[0] === rateTypes.notRated) {
 			ratesWithText.push(rates[1]);
 		} else {
 			ratesWithText.push(rates[0]);
 		}
-
-		if (rates[rates.length - 1] === rateTypes.notRated) {
-			ratesWithText.push(rates[rates.length - 2]);
-		} else {
-			ratesWithText.push(rates[rates.length - 1]);
-		}
+		ratesWithText.push(rates[rates.length - 1]);
 
 		return rates.map(rate => convertToBarElement(
 			rate,

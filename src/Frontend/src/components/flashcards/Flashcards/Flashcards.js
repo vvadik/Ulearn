@@ -131,26 +131,41 @@ class Flashcards extends Component {
 		);
 	}
 
-	handleResultsClick = (rate) => {
-		const { currentFlashcard, maxTLast, statistics } = this.state;
+	handleResultsClick	 = (rate) => {
+		const { sessionFlashcards, currentFlashcard, maxTLast, statistics } = this.state;
 		const { courseId, sendFlashcardRate } = this.props;
 
 		const newStatistics = { ...statistics };
 		const newRate = mapRateToRateType[rate];
 		const newTLast = maxTLast + 1;
-
-		newStatistics[currentFlashcard.rate]--;
-		newStatistics[newRate]++;
-
-		currentFlashcard.rate = newRate;
-		currentFlashcard.lastRateIndex = newTLast;
+		const indexOfCard = sessionFlashcards.indexOf(currentFlashcard);
 
 		sendFlashcardRate(courseId, currentFlashcard.unitId, currentFlashcard.id, newRate, newTLast);
 
-		this.setState({
-			maxTLast: newTLast,
-			statistics: newStatistics,
-		}, this.takeNextFlashcard);
+		if (indexOfCard > -1) {
+			const newSessionFlashcards = Array.from(sessionFlashcards);
+			const flashcard = newSessionFlashcards[indexOfCard];
+
+			newStatistics[flashcard.rate]--;
+			newStatistics[newRate]++;
+
+			flashcard.rate = newRate;
+			flashcard.lastRateIndex = newTLast;
+
+			this.setState({
+				maxTLast: newTLast,
+				statistics: newStatistics,
+				sessionFlashcards: newSessionFlashcards,
+			}, this.takeNextFlashcard);
+		} else {
+			newStatistics[currentFlashcard.rate]--;
+			newStatistics[newRate]++;
+
+			this.setState({
+				maxTLast: newTLast,
+				statistics: newStatistics,
+			}, this.takeNextFlashcard);
+		}
 	};
 
 	takeNextFlashcard() {
@@ -164,7 +179,12 @@ class Flashcards extends Component {
 					this.startUnitRepeating();
 				}
 			} else {
-				this.setState({ currentFlashcard: sessionFlashcards.shift(), })
+				const newSessionFlashcards = Array.from(sessionFlashcards);
+
+				this.setState({
+					currentFlashcard: newSessionFlashcards.shift(),
+					sessionFlashcards: newSessionFlashcards,
+				})
 			}
 		} else {
 			this.setState({
@@ -229,8 +249,8 @@ class Flashcards extends Component {
 		const unlocksByUnits = {};
 		infoByUnits.forEach(({ unitId, unlocked }) => unlocksByUnits[unitId] = unlocked);
 
-		return flashcards
-			.filter(({ rate, unitId }) => rate !== rateTypes.notRated && unlocksByUnits[unitId]);
+		return Array.from(flashcards
+			.filter(({ rate, unitId }) => rate !== rateTypes.notRated && unlocksByUnits[unitId]));
 	}
 
 	static findMaxTLast(flashcards) {
