@@ -2,6 +2,7 @@ using log4net;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using System.Globalization;
 using System.IO;
@@ -269,7 +270,9 @@ namespace uLearn.Web.Controllers
 				{
 					errorMessage += $"\n\n{error.InnerException.Message}";
 					error = error.InnerException;
-				}
+				} 
+				return Packages(courseId, errorMessage);
+
 
 				return RedirectToAction("Packages", new { courseId, error=errorMessage });
 			}
@@ -375,11 +378,14 @@ namespace uLearn.Web.Controllers
 					error = error.InnerException;
 				}
 
+				return Packages(courseId, errorMessage);
 				return RedirectToAction("Packages", new { courseId, error=errorMessage });
 			}
 			
 			return RedirectToAction("Diagnostics", new { courseId, versionId });
 		}
+		
+		
 
 		private async Task<(Guid versionId, Exception error)> UploadCourse(string courseId, byte[] content, string userId,
 			string uploadedFromRepoUrl = null, CommitInfo commitInfo = null, string pathToCourseXmlInRepo = null)
@@ -1531,6 +1537,7 @@ namespace uLearn.Web.Controllers
 		public bool OpenStep1 { get; set; }
 		public bool OpenStep2 { get; set; }
 		public string GitSecret { get; set; }
+		
 		public string Error { get; set; }
 		public string HelpUrl { get; set; } = "https://docs.google.com/document/d/1tL_D2SGIv163GpVVr5HrZTBEgcMk5shCKN5J6le4pTc/edit?usp=sharing";
 	}

@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
+using System.Xml.Schema;
 using System.Xml.Serialization;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Exercises;
@@ -21,6 +22,7 @@ namespace Ulearn.Core.Courses.Slides
 		public Slide Load(SlideLoadingContext context)
 		{
 			var fileContent = context.SlideFile.ReadAllContent();
+			
 
 			return Load(fileContent, context);
 		}
@@ -30,14 +32,14 @@ namespace Ulearn.Core.Courses.Slides
 			var slideFile = context.SlideFile ?? new FileInfo("<internal>");
 
 			var slideType = DetectSlideType(fileContent, slideFile.Name);
-			var deserializedXml = fileContent.DeserializeXml(slideType);
-			Slide slide;
-
-			slide = (Slide)fileContent.DeserializeXml(slideType);
+			
+			var slide = (Slide)fileContent.DeserializeXml(slideType);
 
 			slide.BuildUp(context); 
 
 			slide.Validate(context);
+			
+			
 
 			return slide;
 		}

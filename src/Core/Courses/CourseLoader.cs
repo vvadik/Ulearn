@@ -83,15 +83,20 @@ namespace Ulearn.Core.Courses
 
 			var units = LoadUnits(context).ToList();
 			var slides = units.SelectMany(u => u.Slides).ToList();
-
-			var flashcards = slides.OfType<FlashcardSlide>().SelectMany(x => x.FlashcardsList);
-			CheckDuplicateSlideIds(slides);
-			CheckFlashcards(units.Where(x=>x.Flashcards.Count>0).ToList());
-			CheckEmptySlideIds(slides);
+			
+			Validate(units);
 			AddDefaultScoringGroupIfNeeded(units, slides, settings);
 			CalculateScoringGroupScores(units, settings);
 
 			return new Course(courseId, units, settings, context.CourseXml.Directory);
+		}
+
+		private static void Validate(List<Unit> units)
+		{
+			var slides = units.SelectMany(x => x.Slides).ToList();
+			CheckEmptySlideIds(slides);
+			CheckDuplicateSlideIds(slides);
+			CheckFlashcards(units.Where(x => x.Flashcards.Count > 0).ToList());
 		}
 
 		private static void CalculateScoringGroupScores(IEnumerable<Unit> units, CourseSettings settings)
@@ -183,22 +188,84 @@ namespace Ulearn.Core.Courses
 					string.Join("\n", badSlides.Select(x => string.Join("\n", x))));
 		}
 
-		private static void CheckEmptySlideIds(IEnumerable<Slide> slides)
+		private static string CheckEmptySlideIds(IEnumerable<Slide> slides)
 		{
 			var emptyIdSlides = slides.Where(x => x.Id == Guid.Empty).Select(x => x.Title).ToList();
 			if (emptyIdSlides.Any())
 			{
-				throw new CourseLoadingException(
-					"Идентификаторы слайдов (SlideId) должны быть заполненными.\n" +
-					"Слайды с пустыми идентификаторами:\n" +
-					string.Join("\n", emptyIdSlides.Select(x => string.Join("\n", x))));
+				return "Идентификаторы слайдов (SlideId) должны быть заполненными.\n" +
+						"Слайды с пустыми идентификаторами:\n" +
+						string.Join("\n", emptyIdSlides.Select(x => string.Join("\n", x)));
 			}
+
+			return null;
 		}
 
 		private static void CheckFlashcards(List<Unit> units)
 		{
-			//CheckEmptyFlashcards(units);
+			CheckEmptyFlashcards(units);
 			CheckDuplicateFlashcardIds(units);
+		}
+
+
+		private static void CheckEmptyFlashcards(List<Unit> units)
+		{
+			var unitTitlesByFlashcardsIds = GetUnitTitlesByFlashcardsIdsDictionary(units);
+			var noQuestionFlashcards = units
+				.SelectMany(x => x.Flashcards)
+				.Where(x => x.Question.Blocks.Length == 0)
+				.Select(x => x.Id)
+				.GroupBy(x => unitTitlesByFlashcardsIds[x])
+				.ToList();
+			var noAnswerFlashcards = units
+				.SelectMany(x => x.Flashcards)
+				.Where(x => x.Answer.Blocks.Length == 0)
+				.Select(x => x.Id)
+				.GroupBy(x => unitTitlesByFlashcardsIds[x])
+				.ToList();
+			string errorMessage = "";
+			var noQuestionFlashcardMessage = "Во всех флеш-картах должны быть заполнены блоки вопросов (question).\n" +
+											"Флеш-карты с пустыми вопросами:\n" +
+											string.Join("\n", noQuestionFlashcards.Select(x => "В теме" + x.Key + ":\n" + string.Join("\n", x)));
+			var noAnswerFlashcardMessage = "Во всех флеш-картах должны быть заполнены блоки ответов (answer).\n" +
+											"Флеш-карты с пустыми ответами:\n" +
+											string.Join("\n", noAnswerFlashcards.Select(x => "В теме" + x.Key + ":\n" + string.Join("\n", x)));
+			if (noQuestionFlashcards.Any())
+				errorMessage += noQuestionFlashcardMessage + "\n";
+			if (noAnswerFlashcards.Any())
+				errorMessage += noAnswerFlashcardMessage;
+			if (noQuestionFlashcards.Concat(noAnswerFlashcards).Any())
+			{
+				throw new CourseLoadingException(errorMessage);
+			}
+		}
+
+
+		private static void CheckDuplicateFlashcardIds(List<Unit> units)
+		{
+			var unitsContainsFlashcardsId = new Dictionary<string, List<string>>();
+			foreach (var unit in units)
+			{
+				foreach (var unitFlashcard in unit.Flashcards)
+				{
+					if (unitsContainsFlashcardsId.ContainsKey(unitFlashcard.Id))
+						unitsContainsFlashcardsId[unitFlashcard.Id].Add(unit.Title);
+					else
+						unitsContainsFlashcardsId[unitFlashcard.Id] = new List<string>() { unit.Title };
+				}
+			}
+
+			var badFlashcards =
+				units.SelectMany(x => x.Flashcards)
+					.Where(x => unitsContainsFlashcardsId[x.Id].Count > 1).Select(x => x.Id).Distinct().ToList();
+			if (badFlashcards.Any())
+				throw new CourseLoadingException(
+					"Идентификаторы флеш-карт (FlashcardId) должны быть уникальными.\n" +
+					"Флеш-карты с повторяющимися идентификаторами:\n" +
+					string.Join(
+						"\n",
+						badFlashcards.Select(x => "Флеш-карта с ID " + x + " в темах:\n" + string.Join(",\n", unitsContainsFlashcardsId[x])))
+				);
 		}
 
 		private static Dictionary<string, string> GetUnitTitlesByFlashcardsIdsDictionary(List<Unit> units)
@@ -213,62 +280,6 @@ namespace Ulearn.Core.Courses
 			}
 
 			return result;
-		}
-
-		private static void CheckEmptyFlashcards(List<Unit> units)
-		{
-			var unitTitlesByFlashcardsIds = GetUnitTitlesByFlashcardsIdsDictionary(units);
-			var noQuestionFlashcards = units
-				.SelectMany(x => x.Flashcards)
-				.Where(x => x.Question.Blocks.Length == 0)
-				.Select(x=>x.Id)
-				.GroupBy(x=>unitTitlesByFlashcardsIds[x]);
-			var noAnswerFlashcards = units
-				.SelectMany(x => x.Flashcards)
-				.Where(x => x.Answer.Blocks.Length == 0)
-				.Select(x=>x.Id)
-				.GroupBy(x=>unitTitlesByFlashcardsIds[x]);
-			string errorMessage = "";
-			var noQuestionFlashcardMessage = "Во всех флеш-картах должны быть заполнены блоки вопросов (question).\n" +
-											"Флеш-карты с пустыми вопросами:\n" +
-											string.Join("\n", noQuestionFlashcards.Select(x => "В теме"+x.Key+":\n" + string.Join("\n", x)));
-			var noAnswerFlashcardMessage = "Во всех флеш-картах должны быть заполнены блоки ответов (answer).\n" +
-											"Флеш-карты с пустыми ответами:\n" +
-											string.Join("\n", noQuestionFlashcards.Select(x => "В теме"+x.Key +":\n"+ string.Join("\n", x)));
-			if (noQuestionFlashcards.Any())
-				errorMessage += noQuestionFlashcardMessage+"\n";
-			if (noAnswerFlashcards.Any())
-				errorMessage += noAnswerFlashcardMessage;
-			if (noQuestionFlashcards.Concat(noAnswerFlashcards).Any())
-			{
-				throw new CourseLoadingException(errorMessage);
-			}
-		}	
-
-
-		private static void CheckDuplicateFlashcardIds(List<Unit> units)
-		{
-			var unitTitlesByFlashcardsIds = GetUnitTitlesByFlashcardsIdsDictionary(units);
-			var unitsContainsFlashcardsId = new Dictionary<string,List<string>>();
-			units.SelectMany(x => x.Flashcards).Select(x => unitsContainsFlashcardsId[x.Id] = new List<string>());
-			foreach (var unit in units)
-			{
-				foreach (var unitFlashcard in unit.Flashcards)
-				{
-					unitsContainsFlashcardsId[unitFlashcard.Id].Add(unit.Title);
-				}
-			}
-
-			var badFlashcards =
-				units.SelectMany(x => x.Flashcards).Where(x => unitsContainsFlashcardsId[x.Id].Count > 1);
-			if (badFlashcards.Any())
-				throw new CourseLoadingException(
-					"Идентификаторы флеш-карт (FlashcardId) должны быть уникальными.\n" +
-					"Флеш-карты с повторяющимися идентификаторами:\n" +
-					string.Join(
-						"\n", 
-						badFlashcards.Select(x=>"Флеш-карта с ID "+x.Id+" в темах:"+ string.Join(", ",unitsContainsFlashcardsId[x.Id])))
-					);
 		}
 	}
 
