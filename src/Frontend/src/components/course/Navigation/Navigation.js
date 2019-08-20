@@ -17,23 +17,41 @@ import { toggleNavigation } from "../../../actions/navigation";
 import styles from './Navigation.less';
 
 class Navigation extends Component {
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			windowWidth: window.innerWidth,
+		}
+	}
+
 	componentDidMount() {
+		window.addEventListener('resize', this.handleWindowSizeChange);
 		this.bodyElement = document.getElementsByTagName('body')[0];
 
 		this.bodyElement
 			.classList.add(styles.overflow);
 	}
 
+	handleWindowSizeChange = () => {
+		this.setState({ windowWidth: window.innerWidth });
+	};
+
 	componentWillUnmount() {
+		window.removeEventListener('resize', this.handleWindowSizeChange);
 		this.bodyElement
 			.classList.remove(styles.overflow);
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
 		const { navigationOpened } = this.props;
+		const { windowWidth } = this.state;
+		const isMobile = windowWidth <= 767;
 
-		this.bodyElement
-			.classList.toggle(styles.overflow, navigationOpened);
+		if (isMobile && prevProps.navigationOpened !== navigationOpened) {
+			this.bodyElement
+				.classList.toggle(styles.overflow, navigationOpened);
+		}
 	}
 
 	render() {
@@ -55,7 +73,8 @@ class Navigation extends Component {
 
 		return (
 			<div className={ styles.contentWrapper }>
-				< NavigationHeader createRef={ (ref) => this.unitHeaderRef = ref } title={ unitTitle } courseName={ courseTitle }
+				< NavigationHeader createRef={ (ref) => this.unitHeaderRef = ref } title={ unitTitle }
+								   courseName={ courseTitle }
 								   onCourseClick={ onCourseClick }/>
 				< NavigationContent items={ unitItems }/>
 				{ nextUnit && <NextUnit unit={ nextUnit } toggleNavigation={ () => {
