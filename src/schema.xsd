@@ -181,7 +181,7 @@
 	</xs:complexType>
 
 
-	<!-- The copypaste in "SlideInternals" is required. It's allow write blocks in any order -->
+	<!-- The copypaste in "SlideInternals" is required. It's allow to write blocks in any order -->
 	
 	<xs:group name="SlideInternals">
 		<xs:sequence>

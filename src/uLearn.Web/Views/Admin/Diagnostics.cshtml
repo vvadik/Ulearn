@@ -70,7 +70,7 @@
 		</div>
 		if (!string.IsNullOrEmpty(Model.Warnings))
 		{
-			<div style="white-space: pre-wrap">@Model.Warnings</div>
+			<div class="alert alert-warning" style="white-space: pre-wrap">@Model.Warnings</div>
 		}
 
 		if (Model.IsDiagnosticsForVersion)

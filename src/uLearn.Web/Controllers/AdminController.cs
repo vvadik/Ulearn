@@ -1583,13 +1583,10 @@ namespace uLearn.Web.Controllers
 	public class DiagnosticsModel
 	{
 		public string CourseId { get; set; }
-
 		public bool IsDiagnosticsForVersion { get; set; }
 		public bool IsVersionPublished { get; set; }
 		public Guid VersionId { get; set; }
 		public CourseDiff CourseDiff { get; set; }
 		public string Warnings { get; set; }
-		
-		
 	}
 }
