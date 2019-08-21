@@ -124,6 +124,7 @@
 	<xs:element name="slide" type="Slide"/>
 	<xs:element name="slide.quiz" type="QuizSlide"/>
 	<xs:element name="slide.exercise" type="ExerciseSlide"/>	
+	<xs:element name="slide.flashcards" type="FlashcardSlide"/>	
 
     <xs:complexType name="Slide">
         <xs:group ref="SlideInternals" />
@@ -180,25 +181,30 @@
 	</xs:complexType>
 
 
+	<!-- The copypaste in "SlideInternals" is required. It's allow write blocks in any order -->
+	
 	<xs:group name="SlideInternals">
 		<xs:sequence>
-			<xs:element name="meta" type="SlideMeta" minOccurs="0" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation xml:lang="en">Slide's meta: keywords, description, image</xs:documentation>
-					<xs:documentation xml:lang="ru">Мета-информация о слайде, попадёт на итоговую страницу в виде тегов
-						keywords, description, image
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="defaultIncludeCodeFile" type="NonEmptyString" minOccurs="0" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation xml:lang="en">Default path for &lt;includeCode&gt;, &lt;exercise.file&gt;, &lt;exercise.csproj&gt;</xs:documentation>
-					<xs:documentation xml:lang="ru">Путь по умолчанию для блоков &lt;includeCode&gt;, &lt;exercise.file&gt;,
-						&lt;exercise.csproj&gt;
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:group ref="Blocks" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:group ref="Blocks" minOccurs="0" maxOccurs="unbounded"/>
+				
+				<xs:element name="meta" type="SlideMeta" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation xml:lang="en">Slide's meta: keywords, description, image</xs:documentation>
+						<xs:documentation xml:lang="ru">Мета-информация о слайде, попадёт на итоговую страницу в виде тегов
+							keywords, description, image
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:group ref="Blocks" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="defaultIncludeCodeFile" type="NonEmptyString" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation xml:lang="en">Default path for &lt;includeCode&gt;, &lt;exercise.file&gt;, &lt;exercise.csproj&gt;</xs:documentation>
+						<xs:documentation xml:lang="ru">Путь по умолчанию для блоков &lt;includeCode&gt;, &lt;exercise.file&gt;,
+							&lt;exercise.csproj&gt;
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:group ref="Blocks" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:group>
 
@@ -322,8 +328,6 @@
 			<xs:element name="tex" type="Tex"/>
 			<xs:element name="markdown" type="MarkdownBlock"/>
 			<xs:element name="code" type="Code"/>
-			<xs:element name="includeMarkdown" type="Include"/>
-			<xs:element name="html" type="Html"/>
 		</xs:choice>
 	</xs:group>
 
@@ -342,7 +346,7 @@
     <xs:complexType name="Code">
         <xs:simpleContent>
             <xs:extension base="StringWithXmlSpaces">
-                <xs:attribute name="language" type="NonEmptyString" use="required" />
+                <xs:attribute name="language" type="NonEmptyString" use="optional" />
                 <xs:attribute name="hide" type="xs:boolean" />
             </xs:extension>
         </xs:simpleContent>
@@ -373,10 +377,11 @@
         <xs:sequence minOccurs="0" maxOccurs="unbounded">
             <xs:choice>
                 <xs:element name="note" type="NonEmptyString" />
-                <xs:element name="code" type="NonEmptyString" />
+                <xs:element name="code" type="StringWithXmlSpaces" />
             </xs:choice>
         </xs:sequence>
-        <xs:attribute name="hide" type="xs:boolean" />
+		<xs:attribute ref="xml:space"/>
+		<xs:attribute name="hide" type="xs:boolean" />
     </xs:complexType>
 
     <xs:complexType name="IncludeCodeBlock">
@@ -508,7 +513,7 @@
 		<xs:complexContent>
 			<xs:extension base="AbstractExercise">
 				<xs:sequence>
-					<xs:element name="userCodeFile" type="NonEmptyString">
+					<xs:element name="userCodeFile" type="NonEmptyString" >
 						<xs:annotation>
 							<xs:documentation>
 								Путь относительно директории, в которой лежит задача.

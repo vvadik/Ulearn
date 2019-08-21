@@ -859,6 +859,8 @@ namespace uLearn.Web.Controllers
 			var version = courseManager.GetVersion(versionIdGuid);
 
 			var courseDiff = new CourseDiff(course, version);
+			var validator = new XmlValidator();
+			var warnings = validator.ValidateSlidesFiles(version.Slides.Select(x => x.Info.SlideFile).ToList());
 
 			return View(new DiagnosticsModel
 			{
@@ -866,6 +868,7 @@ namespace uLearn.Web.Controllers
 				IsDiagnosticsForVersion = true,
 				VersionId = versionIdGuid,
 				CourseDiff = courseDiff,
+				Warnings = warnings
 			});
 		}
 
@@ -1585,5 +1588,8 @@ namespace uLearn.Web.Controllers
 		public bool IsVersionPublished { get; set; }
 		public Guid VersionId { get; set; }
 		public CourseDiff CourseDiff { get; set; }
+		public string Warnings { get; set; }
+		
+		
 	}
 }
