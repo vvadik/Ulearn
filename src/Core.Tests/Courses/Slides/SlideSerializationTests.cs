@@ -30,7 +30,6 @@ namespace Ulearn.Core.Tests.Courses.Slides
 			var slideFile = new DirectoryInfo(testDataDirectory).GetFile(filename);
 			return slideFile.DeserializeXml<FlashcardSlide>();
 		}
-		
 
         [Test]
         public void DeserializeEmptySlide()
@@ -109,7 +108,6 @@ namespace Ulearn.Core.Tests.Courses.Slides
 			Assert.AreEqual("\r\nI am answer markdown block!",answerBlock.TryGetText());
 		}
 		
-		
 		[Test]
 		public void DeserializeFlashcardSlideWithDifferentBlocks()
 		{
@@ -122,7 +120,6 @@ namespace Ulearn.Core.Tests.Courses.Slides
 			Assert.AreEqual(typeof (TexBlock), questionBlocks[1].GetType());
 			Assert.AreEqual(typeof (CodeBlock), questionBlocks[2].GetType());
 		}
-
 
         [Test]
         public void DeserializeSlideWithDifferentBlocks()

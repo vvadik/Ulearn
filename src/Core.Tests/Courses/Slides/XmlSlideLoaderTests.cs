@@ -132,16 +132,12 @@ namespace Ulearn.Core.Tests.Courses.Slides
 			Assert.AreEqual(slide.GetType(),typeof(FlashcardSlide));
 		}
 		
-		
 		[Test]
 		public void LoadSimpleFlashcardSlideWithMarkdownBlocks()
 		{
 			var slide = LoadSlideFromXmlFile("SimpleFlashcardSlide.xml");
 			Assert.AreEqual(slide.Id,Guid.Parse("a7a73125-2434-4b5d-9f31-4ef687fc8bcc"));
 		}
-
-		
-		
 
 		[Test]
 		public void LoadSlideWithSpoilerBlock()
@@ -156,7 +152,5 @@ namespace Ulearn.Core.Tests.Courses.Slides
 			Assert.IsAssignableFrom<CodeBlock>(firstBlock.Blocks[0]);
 			Assert.IsAssignableFrom<YoutubeBlock>(firstBlock.Blocks[1]);
 		}
-		
-
     }
 }
