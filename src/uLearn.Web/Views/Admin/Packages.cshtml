@@ -24,9 +24,10 @@
     @if (! string.IsNullOrEmpty(Model.Error))
     {
 	    <div class="course-loading-error">
-            <p class="text-danger">
-                <b>Ошибка:</b> @Html.Raw(Model.Error.EscapeHtml().LineEndingsToBrTags())
-            </p>
+            <div class="text-danger" >
+				<b>Ошибка:</b> 
+				<p style="white-space: pre-wrap">@Html.Raw(Model.Error.EscapeHtml().LineEndingsToBrTags())</p>
+			</div>
             <p class="text-muted">
                 Непонятно, что произошло? Напишите нам на&nbsp;<a href="mailto:support@ulearn.me">support@ulearn.me</a>.
             </p>
