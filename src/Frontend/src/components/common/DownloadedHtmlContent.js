@@ -191,9 +191,6 @@ class DownloadedHtmlContent extends Component {
 			fetch(url).then(r => r.text()).then(safeEval);
 		});
 
-		/* Scroll to top */
-		window.scrollTo(0, 0);
-
 		this.loadContentByClass();
 		this.setPostFormSubmitHandler();
 

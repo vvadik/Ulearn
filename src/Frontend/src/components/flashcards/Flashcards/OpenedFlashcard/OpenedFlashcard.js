@@ -4,13 +4,14 @@ import PropTypes from "prop-types";
 import Button from "@skbkontur/react-ui/Button";
 import Results from "../Results/Results";
 
-import styles from "./frontFlashcard.less";
+import styles from "./openedFlashcard.less";
 
 import translateCode from "../../../../codeTranslator/translateCode";
 import Link from "react-router-dom/es/Link";
 
+const codeMirrorSettings = { codeMirror: { withMarginAuto: true } };
 
-class FrontFlashcard extends Component {
+class OpenedFlashcard extends Component {
 	constructor(props) {
 		super(props);
 
@@ -21,7 +22,7 @@ class FrontFlashcard extends Component {
 
 	componentDidMount() {
 		document.addEventListener('keyup', this.handleKeyUp);
-		translateCode(this.modal, { codeMirror: { withMarginAuto: true } });
+		translateCode(this.modal, codeMirrorSettings);
 	}
 
 	componentWillUnmount() {
@@ -29,7 +30,7 @@ class FrontFlashcard extends Component {
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
-		translateCode(this.modal, { codeMirror: { withMarginAuto: true } });
+		translateCode(this.modal, codeMirrorSettings);
 	}
 
 	handleKeyUp = (e) => {
@@ -65,10 +66,10 @@ class FrontFlashcard extends Component {
 		let content, control;
 
 		if (showAnswer) {
-			content = FrontFlashcard.renderBackContent(question, answer, this.renderLinksToTheorySlides());
+			content = OpenedFlashcard.renderBackContent(question, answer, this.renderLinksToTheorySlides());
 			control = this.renderBackControl();
 		} else {
-			content = FrontFlashcard.renderFrontContent(question);
+			content = OpenedFlashcard.renderFrontContent(question);
 			control = this.renderFrontControl();
 		}
 
@@ -100,13 +101,28 @@ class FrontFlashcard extends Component {
 			: 'Источник';
 
 		return (
-			<p className={ styles.theoryLinks }>{ sourcePluralForm }: {
-				theorySlides.map(({ slug, title }, index) =>
-					<Link to={ slug }
-						  key={ slug }>
-						Слайд «{ title }»{ index < slidesCount - 1 && ', ' }
-					</Link>) }
+			<p className={ styles.theoryLinks }>
+				{ sourcePluralForm }: { OpenedFlashcard.mapTheorySlidesToLinks(theorySlides, slidesCount) }
 			</p>)
+	}
+
+	static mapTheorySlidesToLinks(theorySlides, slidesCount) {
+		const links = [];
+
+		for (let i = 0; i < slidesCount; i++) {
+			const { slug, title } = theorySlides[i];
+
+			links.push(
+				<Link to={ slug } key={ slug }>
+					Слайд «{ title }»
+				</Link>);
+
+			if (i < slidesCount - 1) {
+				links.push(', ');
+			}
+		}
+
+		return links;
 	}
 
 	static renderFrontContent(question) {
@@ -120,20 +136,20 @@ class FrontFlashcard extends Component {
 	renderFrontControl() {
 		return (
 			<div className={ styles.showAnswerButtonContainer }>
-				<Button size='large' use='primary' onClick={ () => this.showAnswer() }>
+				<Button size='large' use='primary' onClick={ this.showAnswer }>
 					Показать ответ
 				</Button>
 			</div>
 		);
 	}
 
-	showAnswer() {
+	showAnswer = () => {
 		this.props.onShowAnswer();
 
 		this.setState({
 			showAnswer: true
 		});
-	}
+	};
 
 	static renderBackContent(question, answer, linksToTheorySlides) {
 		return (
@@ -152,7 +168,7 @@ class FrontFlashcard extends Component {
 	}
 }
 
-FrontFlashcard.propTypes = {
+OpenedFlashcard.propTypes = {
 	question: PropTypes.string,
 	answer: PropTypes.string,
 	unitTitle: PropTypes.string,
@@ -168,4 +184,4 @@ FrontFlashcard.propTypes = {
 	onHandlingResultsClick: PropTypes.func,
 };
 
-export default FrontFlashcard;
+export default OpenedFlashcard;

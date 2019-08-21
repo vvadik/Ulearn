@@ -1,11 +1,11 @@
 import React from 'react';
 import {storiesOf} from '@storybook/react';
-import CoursePage from "./CoursePage";
+import FlashcardsByUnitsPage from "./CoursePage";
 import cardsByUnitExample from "./CourseCards/cardsByUnitExample";
 
 storiesOf('Cards/CoursePage', module)
 	.add('default', () => (
-		<CoursePage
+		<FlashcardsByUnitsPage
 			guides={guides}
 			flashcardsInfos={cardsByUnitExample}
 		/>

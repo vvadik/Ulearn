@@ -1,17 +1,19 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
 
+import Loader from "@skbkontur/react-ui/Loader";
 import UnitCard from "./UnitCard/UnitCard";
 import Guides from "../Guides/Guides";
 import ProgressBar from "../ProgressBar/ProgressBar";
 import ShortQuestions from "./ShortQuestions/ShortQuestions";
 import Flashcards from "../Flashcards/Flashcards";
 
-import styles from './unitPage.less';
 import { guides } from '../consts';
-import Loader from "@skbkontur/react-ui/Loader";
 import { rateTypes } from "../../../consts/rateTypes";
-import countFlashcardsStatistics from "../../../utils/countFlashcardsStatistics";
+
+import countFlashcardsStatistics from "../countFlashcardsStatistics";
+
+import styles from './unitPage.less';
 
 
 class UnitPage extends Component {
@@ -44,8 +46,6 @@ class UnitPage extends Component {
 	componentDidMount() {
 		const { courseId, flashcards, loadFlashcards } = this.props;
 
-		window.scrollTo(0, 0);
-
 		if (flashcards.length === 0) {
 			loadFlashcards(courseId);
 		}
@@ -68,14 +68,14 @@ class UnitPage extends Component {
 					haveProgress={ completedUnit }
 					totalFlashcardsCount={ totalFlashcardsCount }
 					unitTitle={ unitTitle }
-					handleStartButton={ () => this.showFlashcards() }
+					handleStartButton={ this.showFlashcards }
 				/> }
-				{ this.renderFooter(haveProgress && dataLoaded) }
+				{ unitTitle && this.renderFooter(haveProgress && dataLoaded) }
 				{ showFlashcards &&
 				<Flashcards
 					infoByUnits={ infoByUnits }
 					unitId={ unitId }
-					onClose={ () => this.hideFlashcards() }
+					onClose={ this.hideFlashcards }
 					flashcards={ flashcards }
 					courseId={ courseId }
 					sendFlashcardRate={ sendFlashcardRate }
@@ -85,49 +85,45 @@ class UnitPage extends Component {
 	}
 
 	renderFooter(shouldRenderProgress) {
-		const { statistics, totalFlashcardsCount } = this.state;
+		const { statistics, totalFlashcardsCount, unitFlashcards } = this.state;
 
-		if (shouldRenderProgress) {
-			return (
-				<div>
-					<p className={ styles.progressBarTitle }>
-						Результаты последнего прохождения
-					</p>
-					<ProgressBar
-						statistics={ statistics }
-						totalFlashcardsCount={ totalFlashcardsCount }
-					/>
-					<ShortQuestions
-						className={ styles.shortQuestions }
-						questionsWithAnswers={ this.mapFlashcardsToQuestionWithAnswers() }
-					/>
-				</div>
-			);
+		if (!shouldRenderProgress) {
+			return <Guides guides={ guides }/>;
 		}
 
-		return <Guides guides={ guides }/>;
+		return (
+			<footer>
+				<p className={ styles.progressBarTitle }>
+					Результаты последнего прохождения
+				</p>
+				<ProgressBar
+					statistics={ statistics }
+					totalFlashcardsCount={ totalFlashcardsCount }
+				/>
+				<ShortQuestions
+					className={ styles.shortQuestions }
+					questionsWithAnswers={ UnitPage.mapFlashcardsToQuestionWithAnswers(unitFlashcards) }
+				/>
+			</footer>
+		);
 	}
 
-	showFlashcards() {
+	showFlashcards = () => {
 		this.setState({
 			showFlashcards: true
 		});
-	}
+	};
 
-	hideFlashcards() {
+	hideFlashcards = () => {
 		this.setState({
 			showFlashcards: false
 		});
-	}
+	};
 
-	mapFlashcardsToQuestionWithAnswers() {
-		const { unitFlashcards } = this.state;
-
+	static mapFlashcardsToQuestionWithAnswers(unitFlashcards) {
 		return unitFlashcards
 			.filter(({ rate }) => rate !== rateTypes.notRated)
-			.map(({ question, answer, }) => {
-				return { question, answer, }
-			});
+			.map(({ question, answer, }) => ({ question, answer, }));
 	}
 }
 

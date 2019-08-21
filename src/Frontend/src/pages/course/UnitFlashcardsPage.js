@@ -1,8 +1,10 @@
 import { connect } from "react-redux";
-import { sendFlashcardResult, loadFlashcards } from '../../actions/course';
 
 import UnitFlashcards from "../../components/flashcards/UnitPage/UnitPage";
 import Course from "../../components/course/Course";
+
+import { sendFlashcardResult, loadFlashcards } from '../../actions/course';
+import getFlashcardsWithTheorySlides from "./getFlashcardsWithTheorySlides";
 
 const mapStateToProps = (state, { match }) => {
 	let { courseId, slideId } = match.params;
@@ -11,45 +13,33 @@ const mapStateToProps = (state, { match }) => {
 	const data = state.courses;
 	const courseInfo = data.fullCoursesInfo[courseId];
 	const infoByUnits = Object.values(data.flashcardsByUnits);
-	const unitId = Course.findUnitIdBySlide(slideId, courseInfo);
+	const unitId = Course.findUnitIdBySlug(slideId, courseInfo);
 	const unitInfo = data.flashcardsByUnits[unitId];
 
-	const courseSlides = courseInfo.units.reduce((slides, unit) => {
-		return [...slides, ...unit.slides];
-	}, []);
-
-	const flashcards = [];
-
-	for (const { flashcardsIds } of infoByUnits) {
-		for (const id of flashcardsIds) {
-			const flashcard = data.flashcardsByCourses[courseId][id];
-			const { theorySlidesIds } = flashcard;
-			const theorySlides = [];
-
-			for (const slideId of theorySlidesIds) {
-				const courseSlide = courseSlides.find(slide => slide.id === slideId);
-				if (courseSlide) {
-					theorySlides.push({
-						slug: courseSlide.slug,
-						title: courseSlide.title,
-					});
-				}
-			}
-
-			flashcards.push({
-				...flashcard,
-				theorySlides,
-			});
+	if (!courseInfo) {
+		return {
+			courseId,
+			unitId,
+			unitTitle: unitInfo ? unitInfo.unitTitle : null,
+			infoByUnits,
+			flashcards: [],
+			flashcardsLoading: data.flashcardsLoading,
 		}
 	}
 
+	const courseSlides = courseInfo.units
+		.reduce((slides, unit) => ([...slides, ...unit.slides]), []);
+
+	const courseFlashcards = data.flashcardsByCourses[courseId];
+	const flashcards = getFlashcardsWithTheorySlides(infoByUnits, courseFlashcards, courseSlides);
+
 	return {
 		courseId,
-		unitTitle: unitInfo ? unitInfo.unitTitle : null,
 		unitId,
+		unitTitle: unitInfo ? unitInfo.unitTitle : null,
+		infoByUnits,
 		flashcards,
 		flashcardsLoading: data.flashcardsLoading,
-		infoByUnits,
 	}
 };
 const mapDispatchToProps = (dispatch) => ({

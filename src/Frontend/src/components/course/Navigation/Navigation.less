@@ -6,10 +6,10 @@
 
 .root {
   position: fixed;
-  width: 250px;
-  max-width: 250px;
+  width: @navigationMenuWidth;
+  max-width: @navigationMenuWidth;
   max-height: calc(100vh - @headerHeight - @headerDivider);
-  left: -500px;
+  left: -2 * @navigationMenuWidth;
   flex-shrink: 0;
   z-index: @rootZIndex;
   transition: left 300ms ease-in-out;
@@ -52,7 +52,7 @@
 .contentWrapper {
   position: fixed;
 
-  width: 250px;
+  width: @navigationMenuWidth;
 
   overflow-y: auto;
   top: @headerHeight;
@@ -82,11 +82,11 @@
 
 @media (min-width: @maxLaptopWidth) {
   .root {
-    width: 360px;
-    max-width: 360px;
+    width: @laptopNavigationMenuWidth;
+    max-width: @laptopNavigationMenuWidth;
   }
 
   .contentWrapper {
-    width: 360px;
+    width: @laptopNavigationMenuWidth;
   }
 }

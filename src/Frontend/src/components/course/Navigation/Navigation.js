@@ -27,10 +27,6 @@ class Navigation extends Component {
 
 	componentDidMount() {
 		window.addEventListener('resize', this.handleWindowSizeChange);
-		this.bodyElement = document.getElementsByTagName('body')[0];
-
-		this.bodyElement
-			.classList.add(styles.overflow);
 	}
 
 	handleWindowSizeChange = () => {
@@ -39,8 +35,6 @@ class Navigation extends Component {
 
 	componentWillUnmount() {
 		window.removeEventListener('resize', this.handleWindowSizeChange);
-		this.bodyElement
-			.classList.remove(styles.overflow);
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
@@ -49,7 +43,7 @@ class Navigation extends Component {
 		const isMobile = windowWidth <= 767;
 
 		if (isMobile && prevProps.navigationOpened !== navigationOpened) {
-			this.bodyElement
+			document.querySelector('body')
 				.classList.toggle(styles.overflow, navigationOpened);
 		}
 	}
@@ -69,22 +63,25 @@ class Navigation extends Component {
 	}
 
 	renderUnitNavigation() {
-		const { unitTitle, courseTitle, onCourseClick, unitItems, nextUnit, toggleNavigation } = this.props;
+		const { unitTitle, courseTitle, onCourseClick, unitItems, nextUnit, toggleNavigation, } = this.props;
 
 		return (
 			<div className={ styles.contentWrapper }>
 				< NavigationHeader createRef={ (ref) => this.unitHeaderRef = ref } title={ unitTitle }
 								   courseName={ courseTitle }
 								   onCourseClick={ onCourseClick }/>
-				< NavigationContent items={ unitItems }/>
-				{ nextUnit && <NextUnit unit={ nextUnit } toggleNavigation={ () => {
-					this.unitHeaderRef.scrollIntoView();
-					toggleNavigation();
-				} }
+				< NavigationContent items={ unitItems } toggleNavigation={ toggleNavigation }/>
+				{ nextUnit && <NextUnit unit={ nextUnit } toggleNavigation={ this.handleToggleNavigation }
 				/> }
 			</div>
 		)
 	}
+
+	handleToggleNavigation = () => {
+		const { toggleNavigation, } = this.props;
+		this.unitHeaderRef.scrollIntoView();
+		toggleNavigation();
+	};
 
 	renderCourseNavigation() {
 		const { courseTitle, description, courseItems, containsFlashcards, courseId, slideId, toggleNavigation } = this.props;

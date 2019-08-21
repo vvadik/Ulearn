@@ -8,24 +8,24 @@ import getPluralForm from '../../../../../utils/getPluralForm'
 
 
 class NavigationContent extends Component {
-	render () {
+	render() {
 		const { items } = this.props;
 		return (
 			<div className={ styles.root }>
-				{ this.renderTitle() }
+				{ NavigationContent.renderTitle() }
 				{ items.map((item, index) => this.renderItem(item, index)) }
 			</div>
 		);
 	}
 
-	renderTitle () {
+	static renderTitle() {
 		return (
 			<h5 className={ styles.header }>Программа модуля</h5>
 		);
 	}
 
 	renderItem(menuItem, index) {
-		const { items } = this.props;
+		const { items, toggleNavigation } = this.props;
 
 		const isFirstItem = index === 0;
 		const isLastItem = index === items.length - 1;
@@ -47,26 +47,29 @@ class NavigationContent extends Component {
 				maxScore={ menuItem.maxScore }
 				isActive={ menuItem.isActive }
 				visited={ menuItem.visited }
-				description={ this.createDescription(menuItem) }
+				description={ NavigationContent.createDescription(menuItem) }
 				metro={ metroSettings }
+				toggleNavigation={ toggleNavigation }
 			/>
 		);
 
 
 	}
 
-	createDescription(item) {
+	static createDescription(item) {
 		if (item.type === SLIDETYPE.quiz && item.questionsCount) {
 			const count = item.questionsCount;
-			return `${count} ${getPluralForm(count, 'вопрос', 'вопроса', 'вопросов')}`;
+			return `${ count } ${ getPluralForm(count, 'вопрос', 'вопроса', 'вопросов') }`;
 		}
 
 		return null;
 	}
 }
 
-NavigationContent.propTypes ={
+NavigationContent.propTypes = {
 	items: PropTypes.arrayOf(PropTypes.shape(menuItemType)),
+
+	toggleNavigation: PropTypes.func,
 };
 
 export default NavigationContent

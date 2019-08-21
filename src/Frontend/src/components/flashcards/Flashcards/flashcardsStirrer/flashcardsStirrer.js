@@ -22,9 +22,7 @@ export function getNextFlashcardRandomly(sequence, maxTLast) {
 		.sort((a, b) => b.probability - a.probability);
 
 	const probabilitiesSum = probabilities.reduce(
-		(sum, { probability }) => sum + probability
-		, 0
-	);
+		(sum, { probability }) => sum + probability, 0);
 	const probabilityThreshold = Math.random() * probabilitiesSum;
 	let currentProbability = 0;
 
@@ -35,6 +33,8 @@ export function getNextFlashcardRandomly(sequence, maxTLast) {
 			return flashcard;
 		}
 	}
+
+	return null;
 
 	function calculateProbability(flashcard) {
 		const f = mapRateTypeToNumberInRandom[flashcard.rate];

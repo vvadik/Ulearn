@@ -99,13 +99,5 @@ class NavigationItem extends Component {
 
 NavigationItem.propTypes = menuItemType;
 
-const mapStateToProps = (state) => {
-	return {};
-};
-
-const mapDispatchToProps = (dispatch) => ({
-	toggleNavigation: () => dispatch(toggleNavigation()),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(NavigationItem);
+export default NavigationItem;
 

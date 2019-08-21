@@ -1,4 +1,4 @@
-import { rateTypes } from "../consts/rateTypes";
+import { rateTypes } from "../../consts/rateTypes";
 
 export default function countFlashcardsStatistics(flashcards) {
 	const statistics = Object.values(rateTypes)

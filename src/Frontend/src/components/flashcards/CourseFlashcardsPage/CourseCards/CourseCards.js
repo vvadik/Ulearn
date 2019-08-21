@@ -7,7 +7,8 @@ import { Link } from 'react-router-dom';
 
 import styles from './courseCards.less';
 import classNames from 'classnames';
-import getCardsPluralForm from "../../../../utils/getCardsPluralForm";
+import getCardsPluralForm from "../../getCardsPluralForm";
+import { constructPathToSlide } from "../../../../consts/routes";
 
 
 const emptyUnitCardStyle = classNames(styles.unitCard, styles.emptyUnitCard);
@@ -15,39 +16,39 @@ const emptyUnitCardStyle = classNames(styles.unitCard, styles.emptyUnitCard);
 function CourseCards({ infoByUnits, courseId }) {
 	return (
 		<div className={ styles.cardsContainer }>
-			{ infoByUnits.map(convertToUnitCard) }
+			{ infoByUnits.map(unitInfo => convertToUnitCard(unitInfo, courseId)) }
 			<div className={ emptyUnitCardStyle }>
 				Новые вопросы для самопроверки открываются по мере прохождения курса
 			</div>
 		</div>
 	);
+}
 
-	function convertToUnitCard({ unitTitle, unlocked, cardsCount, unitId, flashcardsSlideSlug }) {
-		const unitCardStyle = classNames(styles.unitCard, { [styles.unitCardLocked]: !unlocked });
+function convertToUnitCard({ unitTitle, unlocked, cardsCount, unitId, flashcardsSlideSlug }, courseId) {
+	const unitCardStyle = classNames(styles.unitCard, { [styles.unitCardLocked]: !unlocked });
 
-		const url = `/course/${ courseId }/${ flashcardsSlideSlug }`;
+	const url = constructPathToSlide(courseId, flashcardsSlideSlug);
 
-		return (
-			<Link key={ unitId } className={ unitCardStyle }
-				  to={ url }>
-				<div>
-					<h3 className={ styles.unitCardTitle }>
-						{ unitTitle }
-					</h3>
-					<p className={ styles.unitCardBody }>
-						{ getCardsPluralForm(cardsCount) }
-					</p>
-				</div>
-				<div className={ styles.unitCardButton }>
-					{ !unlocked &&
-					<Button size={ 'medium' }>
-						Открыть модуль
-					</Button> }
-				</div>
-				{ !unlocked && <LockClosed className={ styles.unitCardLockerIcon } size={ 22 }/> }
-			</Link>
-		);
-	}
+	return (
+		<Link key={ unitId } className={ unitCardStyle }
+			  to={ url }>
+			<div>
+				<h3 className={ styles.unitCardTitle }>
+					{ unitTitle }
+				</h3>
+				<p className={ styles.unitCardBody }>
+					{ getCardsPluralForm(cardsCount) }
+				</p>
+			</div>
+			<div className={ styles.unitCardButton }>
+				{ !unlocked &&
+				<Button size={ 'medium' }>
+					Открыть модуль
+				</Button> }
+			</div>
+			{ !unlocked && <LockClosed className={ styles.unitCardLockerIcon } size={ 22 }/> }
+		</Link>
+	);
 }
 
 CourseCards.propTypes = {

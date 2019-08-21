@@ -27,7 +27,7 @@ class ShortQuestions extends Component {
 
 		translateCode(this.list);
 
-		if (prevProps.questionsWithAnswers !== questionsWithAnswers) {
+		if (prevProps.questionsWithAnswers.length !== questionsWithAnswers.length) {
 			this.setState({ showAllAnswers: false, });
 		}
 
@@ -96,8 +96,7 @@ class ShortQuestions extends Component {
 	}
 }
 
-ShortQuestions
-	.propTypes = {
+ShortQuestions.propTypes = {
 	questionsWithAnswers: PropTypes.arrayOf(PropTypes.shape({
 		question: PropTypes.string,
 		answer: PropTypes.string,

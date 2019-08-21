@@ -54,15 +54,6 @@ const sendFlashcardResultStart = (courseId, unitId, flashcardId, rate, newTLast)
 	newTLast,
 });
 
-const sendFlashcardResultFail = (courseId, unitId, flashcardId, rate, newTLast) => ({
-	type: COURSES__FLASHCARDS_RATE + FAIL,
-	courseId,
-	unitId,
-	flashcardId,
-	rate,
-	newTLast,
-});
-
 export const loadCourse = (courseId) => {
 	courseId = courseId.toLowerCase();
 
@@ -102,7 +93,6 @@ export const sendFlashcardResult = (courseId, unitId, flashcardId, rate, newTLas
 		dispatch(sendFlashcardResultStart(courseId, unitId, flashcardId, rate, newTLast));
 		putFlashcardStatus(courseId, flashcardId, rate)
 			.catch(err => {
-				dispatch(sendFlashcardResultFail(courseId, unitId, flashcardId, rate, newTLast));
 			});
 	}
 };

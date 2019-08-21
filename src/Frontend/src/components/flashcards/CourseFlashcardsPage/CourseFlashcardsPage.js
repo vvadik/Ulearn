@@ -8,10 +8,10 @@ import Button from "@skbkontur/react-ui/Button";
 import Loader from "@skbkontur/react-ui/Loader";
 import Flashcards from "../Flashcards/Flashcards";
 
-import styles from './coursePage.less';
+import styles from './courseFlashcardsPage.less';
 import { guides } from '../consts';
 
-class CoursePage extends Component {
+class CourseFlashcardsPage extends Component {
 	constructor(props) {
 		super(props);
 
@@ -23,16 +23,9 @@ class CoursePage extends Component {
 	componentDidMount() {
 		const { courseId, flashcards, loadFlashcards } = this.props;
 
-		document.getElementsByTagName('main')[0].classList.add(styles.pageContainer);
-		window.scrollTo(0, 0);
-
 		if (flashcards.length === 0) {
 			loadFlashcards(courseId);
 		}
-	}
-
-	componentWillUnmount() {
-		document.getElementsByTagName('main')[0].classList.remove(styles.pageContainer);
 	}
 
 	render() {
@@ -41,7 +34,7 @@ class CoursePage extends Component {
 
 		return (
 			<Loader active={ flashcardsLoading } type="big">
-				<Gapped gap={ 15 } vertical={ true }>
+				<Gapped gap={ 15 } vertical>
 
 					{ this.renderHeader() }
 
@@ -50,15 +43,16 @@ class CoursePage extends Component {
 						infoByUnits={ infoByUnits }
 						courseId={ courseId }
 					/> }
-
+					{ !flashcardsLoading &&
 					<Guides guides={ guides }/>
+					}
 
 					{ showFlashcards &&
 					<Flashcards
 						infoByUnits={ infoByUnits }
 						flashcards={ flashcards }
 						courseId={ courseId }
-						onClose={ () => this.hideFlashcards() }
+						onClose={ this.hideFlashcards }
 						sendFlashcardRate={ sendFlashcardRate }
 					/> }
 				</Gapped>
@@ -67,11 +61,11 @@ class CoursePage extends Component {
 	}
 
 	renderHeader() {
-		const anyUnitAvailable = this.props.infoByUnits
+		const hasUnlockedUnit  = this.props.infoByUnits
 			.some(unit => unit.unlocked);
 
 		return (
-			<div className={ styles.header }>
+			<header className={ styles.header }>
 				<div>
 					<h2 className={ styles.title }>
 						Флеш-карты для самопроверки
@@ -80,14 +74,13 @@ class CoursePage extends Component {
 						Помогут лучше запомнить материал курса и подготовиться к экзаменам
 					</p>
 				</div>
-				<Button disabled={ !anyUnitAvailable }
+				<Button disabled={ !hasUnlockedUnit  }
 						use="primary"
 						size='large'
-						onClick={ () => this.showFlashcards()
-						}>
+						onClick={ this.showFlashcards }>
 					Проверить себя
 				</Button>
-			</div>
+			</header>
 		);
 	}
 
@@ -104,7 +97,7 @@ class CoursePage extends Component {
 	};
 }
 
-CoursePage.propTypes = {
+CourseFlashcardsPage.propTypes = {
 	courseId: PropTypes.string,
 	infoByUnits: PropTypes.arrayOf(PropTypes.shape({
 		unitTitle: PropTypes.string,
@@ -133,4 +126,4 @@ CoursePage.propTypes = {
 	sendFlashcardRate: PropTypes.func,
 };
 
-export default CoursePage;
+export default CourseFlashcardsPage;
