@@ -19,6 +19,8 @@ namespace Ulearn.Core
 			{
 				schemaSet.Add(XmlSchema.Read(r, null));
 			}
+			AppContext.SetSwitch("Switch.System.Xml.AllowDefaultResolver", true);
+			schemaSet.XmlResolver = new XmlUrlResolver();
 
 			schemaSet.CompilationSettings = new XmlSchemaCompilationSettings();
 			schemaSet.Compile();
@@ -38,7 +40,7 @@ namespace Ulearn.Core
 		public string ValidateSlideFile(FileInfo file)
 		{
 			var log = new List<string>();
-			log.Add(file.Directory != null ? $"Errors in slide {file.Directory.Name}/{file.Name}" : $"Errors in slide {file.FullName}");
+			log.Add(file.Directory != null ? $"Ошибки в слайде {file.Directory.Name}/{file.Name}:" : $"Ошибки в слайде {file.FullName}:");
 
 			void Action(object sender, ValidationEventArgs e)
 			{
