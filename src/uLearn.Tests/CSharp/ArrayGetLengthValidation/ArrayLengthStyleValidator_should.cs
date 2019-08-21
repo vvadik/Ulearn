@@ -21,23 +21,32 @@ namespace uLearn.CSharp.ArrayGetLengthValidation
 		private static IEnumerable<FileInfo> IncorrectFiles => IncorrectTestDataDir.EnumerateFiles();
 
 		private static DirectoryInfo BasicProgrammingDirectory =>
-			new DirectoryInfo(TestPaths.BasicProgrammingDirectoryPath);
+			new DirectoryInfo(ExplicitTestsExamplesPaths.BasicProgrammingDirectoryPath);
 
-		private static IEnumerable<FileInfo> BasicProgrammingFiles =>
-			BasicProgrammingDirectory
-				.EnumerateFiles("*.cs", SearchOption.AllDirectories)
-				.Where(f => !f.Name.Equals("Settings.Designer.cs") &&
-							!f.Name.Equals("Resources.Designer.cs") &&
-							!f.Name.Equals("AssemblyInfo.cs"));
+        private static IEnumerable<FileInfo> BasicProgrammingFiles()
+        {
+            if (!BasicProgrammingDirectory.Exists)
+                return new FileInfo[0];
+            return BasicProgrammingDirectory
+                .EnumerateFiles("*.cs", SearchOption.AllDirectories)
+                .Where(f => !f.Name.Equals("Settings.Designer.cs") &&
+                            !f.Name.Equals("Resources.Designer.cs") &&
+                            !f.Name.Equals("AssemblyInfo.cs"));
+        }
 
-		private static DirectoryInfo ULearnSubmissionsDirectory =>
-			new DirectoryInfo(TestPaths.ULearnSubmissionsDirectoryPath);
+        private static DirectoryInfo ULearnSubmissionsDirectory =>
+			new DirectoryInfo(ExplicitTestsExamplesPaths.ULearnSubmissionsDirectoryPath);
 
-		private static IEnumerable<FileInfo> SubmissionsFiles =>ULearnSubmissionsDirectory
-			.EnumerateFiles("*.cs", SearchOption.AllDirectories)
-			.Where(f => f.Name.Contains("Accepted"));
-		
-		private readonly ArrayLengthStyleValidator validator = new ArrayLengthStyleValidator();
+        private static IEnumerable<FileInfo> SubmissionsFiles()
+        {
+            if(!ULearnSubmissionsDirectory.Exists)
+                return new FileInfo[0];
+            return ULearnSubmissionsDirectory
+                .EnumerateFiles("*.cs", SearchOption.AllDirectories)
+                .Where(f => f.Name.Contains("Accepted"));
+        }
+
+        private readonly ArrayLengthStyleValidator validator = new ArrayLengthStyleValidator();
 
 		[TestCaseSource(nameof(IncorrectFiles))]
 		public void FindErrors(FileInfo file)
