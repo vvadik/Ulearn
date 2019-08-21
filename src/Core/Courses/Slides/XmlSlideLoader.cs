@@ -38,8 +38,6 @@ namespace Ulearn.Core.Courses.Slides
 			slide.BuildUp(context); 
 
 			slide.Validate(context);
-			
-			
 
 			return slide;
 		}
