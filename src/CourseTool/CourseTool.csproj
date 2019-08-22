@@ -445,6 +445,8 @@
     <Content Include="renderer\favicon.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="renderer\scripts\.gitkeep" />
+    <Content Include="renderer\styles\.gitkeep" />
     
     <Content Include="renderer\styles\bundle.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
