@@ -409,7 +409,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Compile Include="CSharp\VarInVariableDeclarationValidator_should.cs" />
-    <Compile Include="CSharp\TestPaths.cs" />
+    <Compile Include="CSharp\ExplicitTestsExamplesPaths.cs" />
     <Compile Include="CSharp\VerbInMethodNameValidator_should.cs" />
     <Compile Include="CSharp\testProject\projDir\inner-dir-1\inner-dir-2\ExcludeMeForStudent.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
