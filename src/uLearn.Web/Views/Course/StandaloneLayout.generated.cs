@@ -135,7 +135,7 @@ WriteLiteralTo(__razor_helper_writer, "\r\n");
 
 					
                       
-						var baseUrl = "http://localhost:1337/"+slide.Info.Directory.FullName;
+						var baseUrl = "/"+slide.Info.Directory.FullName;
 					
 WriteLiteralTo(__razor_helper_writer, "\r\n");
 

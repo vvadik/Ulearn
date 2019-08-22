@@ -43,7 +43,7 @@
 							).ToArray();
 					}
 					@{
-						var baseUrl = "http://localhost:1337/"+slide.Info.Directory.FullName;
+						var baseUrl = "/"+slide.Info.Directory.FullName;
 					}
 					@SlideHtml.Slide(new BlockRenderContext(course, slide, baseUrl, 
 						blockData,
