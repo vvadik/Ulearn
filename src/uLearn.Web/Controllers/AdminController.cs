@@ -273,8 +273,6 @@ namespace uLearn.Web.Controllers
 				} 
 				return Packages(courseId, errorMessage);
 
-
-				return RedirectToAction("Packages", new { courseId, error=errorMessage });
 			}
 			
 			return RedirectToAction("Diagnostics", new { courseId, versionId });
@@ -859,7 +857,8 @@ namespace uLearn.Web.Controllers
 			var version = courseManager.GetVersion(versionIdGuid);
 
 			var courseDiff = new CourseDiff(course, version);
-			var validator = new XmlValidator();
+			var schemaPath = AppDomain.CurrentDomain.BaseDirectory + "../" + "schema.xsd";
+			var validator = new XmlValidator(schemaPath);
 			var warnings = validator.ValidateSlidesFiles(version.Slides.Select(x => x.Info.SlideFile).ToList());
 
 			return View(new DiagnosticsModel

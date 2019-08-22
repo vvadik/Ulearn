@@ -29,13 +29,13 @@ namespace Database.Models
 		public string FlashcardId { get; set; }
 
 		[Required]
-		public Score Rate { get; set; }
+		public Rate Rate { get; set; }
 
 		[Required]
 		public DateTime Timestamp { get; set; }
 	}
 
-	public enum Score
+	public enum Rate
 	{
 		NotViewed,
 		One,

@@ -11,11 +11,11 @@ namespace Ulearn.Core
 	{
 		private readonly XmlReaderSettings settings;
 
-		public XmlValidator()
+		public XmlValidator(string schemaPath)
 		{
 			var schemaSet = new XmlSchemaSet();
-
-			using (var r = XmlReader.Create(AppDomain.CurrentDomain.BaseDirectory + "../" + "schema.xsd"))
+			
+			using (var r = XmlReader.Create(schemaPath))
 			{
 				schemaSet.Add(XmlSchema.Read(r, null));
 			}

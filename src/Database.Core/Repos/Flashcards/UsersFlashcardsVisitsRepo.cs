@@ -19,14 +19,6 @@ namespace Database.Repos.Flashcards
 		public async Task<UserFlashcardsVisit> AddFlashcardVisitAsync(string userId, string courseId, Guid unitId, string flashcardId, Rate rate, DateTime timestamp)
 		{
 			courseId = courseId.ToLower();
-			/*var existingRecord = db.UserFlashcardsVisits.FirstOrDefault(c => c.UserId == userId && c.CourseId == courseId && c.UnitId == unitId && c.FlashcardId == flashcardId);
-
-			if (existingRecord != null)
-			{
-				existingRecord.Rate = rate;
-				existingRecord.Timestamp = timestamp;
-			}
-			else*/
 			var record = new UserFlashcardsVisit
 				{ UserId = userId, CourseId = courseId, UnitId = unitId, FlashcardId = flashcardId, Rate = rate, Timestamp = timestamp };
 			db.UserFlashcardsVisits.Add(record);

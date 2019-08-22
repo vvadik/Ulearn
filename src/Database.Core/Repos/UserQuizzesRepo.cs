@@ -70,13 +70,13 @@ namespace Database.Repos
 				.Select(c => c.SlideId).Distinct().ToListAsync();
 		}
 
-		public Task<int> GetUsedAttemptCountsAsync(string courseId, string userId, Guid slideId)
+		public Task<int> GetUsedAttemptsCountAsync(string courseId, string userId, Guid slideId)
 		{
 			return db.UserQuizSubmissions
 				.CountAsync(s => s.CourseId == courseId && s.UserId == userId && s.SlideId == slideId);
 		}
 		
-		public Task<Dictionary<Guid, int>> GetUsedAttemptCountsAsync(string courseId, string userId)
+		public Task<Dictionary<Guid, int>> GetUsedAttemptsCountAsync(string courseId, string userId)
 		{
 			return db.UserQuizSubmissions
 				.Where(s => s.CourseId == courseId && s.UserId == userId)

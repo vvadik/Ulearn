@@ -16,6 +16,10 @@
 		<div>
 			@Html.ActionLink("Скопировать на Степик", "ExportCourse", "Stepik", new { courseId = Model.CourseId }, new { @class = "btn btn-warning" })
 		</div>
+		if (!string.IsNullOrEmpty(Model.Warnings))
+		{
+			<div class="alert alert-warning" style="white-space: pre-wrap">@Model.Warnings</div>
+		}
 
 		if (Model.CourseDiff.SlideDiffs.Count > 0)
 		{
@@ -52,7 +56,7 @@
 	else
 	{
 		<h1>
-			Диагностики
+			Диагностика
 			@if (Model.IsDiagnosticsForVersion)
 			{
 				using (Html.BeginForm("PublishVersion", "Admin", new { Model.CourseId, Model.VersionId }, FormMethod.Post))

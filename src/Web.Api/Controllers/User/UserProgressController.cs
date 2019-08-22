@@ -47,7 +47,7 @@ namespace Ulearn.Web.Api.Controllers.User
 		public async Task<ActionResult<UserProgressResponse>> UserProgress(Course course)
 		{
 			var scores = visitsRepo.GetScoresForSlides(course.Id, UserId);
-			var attempts = await userQuizzesRepo.GetUsedAttemptCountsAsync(course.Id, UserId).ConfigureAwait(false);
+			var attempts = await userQuizzesRepo.GetUsedAttemptsCountAsync(course.Id, UserId).ConfigureAwait(false);
 			var waitingSlides = await userQuizzesRepo.GetSlideIdsWaitingForManualCheckAsync(course.Id, UserId).ConfigureAwait(false);
 
 			var slidesResults = scores.Select(s => new
@@ -84,13 +84,11 @@ namespace Ulearn.Web.Api.Controllers.User
 
 		protected string GetRealClientIp()
 		{
-			var ip = HttpContext.Connection.RemoteIpAddress;
-			if (ip.IsIPv4MappedToIPv6)
-				return ip
-					.MapToIPv4()
-					.GetAddressBytes()
-					.Select(x => ((int)x).ToString()).Join(".");
-			return ip.ToString();
+			var xForwardedFor = Request.Headers["X-Forwarded-For"].ToString();
+			if (string.IsNullOrEmpty(xForwardedFor))
+				return Request.Host.Host;
+			return xForwardedFor.Split(',').FirstOrDefault() ?? "";
 		}
+		
 	}
 }
