@@ -1,7 +1,9 @@
 import { sortFlashcardsInAuthorsOrder, getNextFlashcardRandomly } from "./flashcardsStirrer";
 import { rateTypes } from "../../../../consts/rateTypes";
 
-const { notRated, rate1, rate2, rate3, rate4, rate5 } = rateTypes;
+import Flashcard from "./flashcardsStirres.test.base";
+
+const { rate1, rate2, rate3, rate4, rate5 } = rateTypes;
 
 describe('flashcardsStirrer unit sorting should', () => {
 	test('sort unseen flashcards in authors order', () => {
@@ -26,12 +28,11 @@ describe('flashcardsStirrer unit sorting should', () => {
 			new Flashcard(),
 			new Flashcard(rate1),
 		];
-		const answer = [notRated, notRated, notRated, rate1, rate4];
+		const answer = [sequence[0], sequence[1], sequence[3], sequence[4], sequence[2]];
 
 		const result = sortFlashcardsInAuthorsOrder(sequence);
 
-		const resultRates = result.reduce((rates, flashcard) => [...rates, flashcard.rate], []);
-		expect(resultRates).toEqual(answer);
+		expect(result).toStrictEqual(answer);
 	});
 
 	test('sort rated flashcards from worst rate to best rate', () => {
@@ -72,10 +73,11 @@ describe('flashcardsStirrer unit sorting should', () => {
 			new Flashcard(rate1),
 			new Flashcard(rate1),
 		];
+		const answer = [sequence[2], sequence[3], sequence[4], sequence[0], sequence[1]];
 
 		const result = sortFlashcardsInAuthorsOrder(sequence);
 
-		expect(result).toEqual([sequence[2], sequence[3], sequence[4], sequence[0], sequence[1]]);
+		expect(result).toStrictEqual(answer);
 	});
 });
 
@@ -90,13 +92,13 @@ describe('flashcardsStirrer course flashcards getter should', () => {
 		];
 
 		const first = getNextFlashcardRandomly(sequence, 5);
-		sequence.find(fc => fc.id === first.id).lastRateIndex = 6;
+		first.lastRateIndex = 6;
 		const second = getNextFlashcardRandomly(sequence, 6);
 
 		expect(first).not.toBe(second);
 	});
 
-	test('get random flashcard(1 of 100 iterations)', () => {
+	test('get random flashcard(100 iterations for 5 cards)', () => {
 		const sequence = [
 			new Flashcard(rate2, 1),
 			new Flashcard(rate3, 4),
@@ -105,69 +107,52 @@ describe('flashcardsStirrer course flashcards getter should', () => {
 			new Flashcard(rate4, 3),
 		];
 
-		let allSame = true,
-			maxTLast = 5,
-			previousFlashcard;
+		let meetedIds = new Set(),
+			maxTLast = 5;
 
 		for (let i = 0; i < 100; i++) {
 			const flashcard = getNextFlashcardRandomly(sequence, maxTLast);
-			if (flashcard !== previousFlashcard) {
-				allSame = false;
-				break;
+			if (!meetedIds.has(flashcard.id)) {
+				meetedIds.add(flashcard.id);
 			}
 			maxTLast++;
 			sequence.find(fc => fc.id === flashcard.id).lastRateIndex = maxTLast;
-			previousFlashcard = flashcard;
 		}
 
-		expect(allSame).toBeFalsy();
+		expect(meetedIds.size).toBe(sequence.length);
 	});
 
-	test('built good sequence ( !!!NOT AUTO VALIDATION, NEEDS MANUAL CHECK!!! )', () => {
-		const mapNumberToRateType = {
-			1: rate1,
-			2: rate2,
-			3: rate3,
-			4: rate4,
-			5: rate5,
-		};
-		const getRandomRate = () => mapNumberToRateType[Math.ceil(Math.random() * 5)];
+	test('return null when sequence is empty', () => {
+		const result = getNextFlashcardRandomly([], 0);
+
+		expect(result).toBeNull();
+	});
+
+	test('return card once when sequence contains 1 card', () => {
 		const sequence = [
-			new Flashcard(getRandomRate(), 1),
-			new Flashcard(getRandomRate(), 4),
-			new Flashcard(getRandomRate(), 5),
-			new Flashcard(getRandomRate(), 2),
-			new Flashcard(getRandomRate(), 3),
+			new Flashcard(rate1, 1),
 		];
 
-		console.log(sequence);
-		let maxTLast = 5;
-		const builtedSequenceHistory = [];
+		const first = getNextFlashcardRandomly(sequence, 2);
+		first.lastRateIndex = 3;
+		const second = getNextFlashcardRandomly(sequence, 3);
 
-		for (let i = 0; i < 15; i++) {
-			const flashcard = getNextFlashcardRandomly(sequence, maxTLast);
-			const historyInfo = { ...flashcard };
-			const flashcardInSequence = sequence.find(fc => fc.id === flashcard.id);
+		expect(first).toBe(sequence[0]);
+		expect(second).toBeNull();
+	});
 
-			maxTLast++;
+	test('return both card when sequence contains 2 card', () => {
+		const sequence = [
+			new Flashcard(rate2, 1),
+			new Flashcard(rate1, 2),
+		];
 
-			flashcardInSequence.lastRateIndex = maxTLast;
-			flashcardInSequence.rate = getRandomRate();
+		const first = getNextFlashcardRandomly(sequence, 2);
+		first.lastRateIndex = 3;
+		const second = getNextFlashcardRandomly(sequence, 3);
 
-			historyInfo.newRate = flashcardInSequence.rate;
-			historyInfo.newRateIndex = flashcardInSequence.lastRateIndex;
-
-			builtedSequenceHistory.push(historyInfo);
-		}
-
-		console.log(builtedSequenceHistory);
+		expect(first).not.toBe(second);
+		expect(sequence).toContain(first);
+		expect(sequence).toContain(second);
 	});
 });
-
-let idCounter = 0;
-
-function Flashcard(rate = notRated, lastRateIndex = 0) {
-	this.id = idCounter++;
-	this.rate = rate;
-	this.lastRateIndex = lastRateIndex;
-}

@@ -46,8 +46,9 @@ class Course extends Component {
 		}
 
 		if (state.currentCourseId !== props.courseId || state.currentSlideId !== props.slideId) {
-			const openUnitId = Course.findUnitIdBySlide(props.slideId, props.courseInfo);
+			const openUnitId = Course.findUnitIdBySlug(props.slideId, props.courseInfo);
 			const openUnit = props.units[openUnitId];
+			window.scrollTo(0, 0);
 
 			const slide = Course.findSlideBySlug(props.slideId, props.courseInfo);
 			if (slide && props.progress) {
@@ -60,7 +61,6 @@ class Course extends Component {
 				highlightedUnit: openUnitId || null,
 				onCourseNavigation: openUnit ? false : state.onCourseNavigation,
 				openUnit: openUnit || state.openUnit,
-				navigationOpened: props.navigationOpened,
 				...defaultState,
 			}
 		}
@@ -76,7 +76,7 @@ class Course extends Component {
 			return null;
 		}
 
-		const Page = this.findOpenedSlideType();
+		const Page = this.getOpenedPage();
 
 		return (
 			<div className={ classnames(styles.root, { 'open': navigationOpened }) }>
@@ -89,8 +89,8 @@ class Course extends Component {
 	}
 
 	renderNavigation() {
-		const { courseInfo, slideId, courseId, progress } = this.props;
-		const { highlightedUnit, openUnit, onCourseNavigation, navigationOpened } = this.state;
+		const { courseInfo } = this.props;
+		const { onCourseNavigation, navigationOpened } = this.state;
 
 		const defaultProps = {
 			navigationOpened,
@@ -98,59 +98,68 @@ class Course extends Component {
 		};
 
 		const additionalProps = onCourseNavigation
-			? {
-				slideId: slideId,
-				courseId: courseInfo.id,
-				description: courseInfo.description,
-				courseItems: courseInfo.units.map(item => ({
-					title: item.title,
-					id: item.id,
-					isActive: highlightedUnit === item.id,
-					onClick: this.unitClickHandle,
-				})),
-				containsFlashcards: courseInfo.containsFlashcards,
-			} : {
-				unitTitle: openUnit.title,
-				onCourseClick: this.returnInUnitsMenu,
-				unitItems: openUnit.slides.map(item => ({
-					id: item.id,
-					title: item.title,
-					type: item.type,
-					url: constructPathToSlide(courseId, item.slug),
-					isActive: item.slug === slideId,
-					score: (progress && progress[item.id] && progress[item.id].score) || 0,
-					maxScore: item.maxScore,
-					questionsCount: item.questionsCount,
-					visited: Boolean(progress && progress[item.id]),
-				})),
-				nextUnit: Course.findNextUnit(openUnit, courseInfo),
-			};
+			? this.createCourseSettings()
+			: this.createUnitSettings();
 
 		return <Navigation { ...defaultProps } { ...additionalProps }/>;
 	}
 
-	findOpenedSlideType() {
+	createCourseSettings() {
+		const { courseInfo, slideId, } = this.props;
+		const { highlightedUnit, } = this.state;
+
+		return {
+			slideId: slideId,
+			courseId: courseInfo.id,
+			description: courseInfo.description,
+			courseItems: courseInfo.units.map(item => ({
+				title: item.title,
+				id: item.id,
+				isActive: highlightedUnit === item.id,
+				onClick: this.unitClickHandle,
+			})),
+			containsFlashcards: courseInfo.containsFlashcards,
+		};
+	}
+
+	createUnitSettings() {
+		const { courseInfo, slideId, courseId, progress } = this.props;
+		const { openUnit, } = this.state;
+
+		return {
+			unitTitle: openUnit.title,
+			onCourseClick: this.returnInUnitsMenu,
+			unitItems: Course.mapUnitItems(openUnit.slides, progress, courseId, slideId,),
+			nextUnit: Course.findNextUnit(openUnit, courseInfo),
+		};
+	}
+
+	static mapUnitItems(unitSlides, progress, courseId, slideId) {
+		return unitSlides.map(item => ({
+			id: item.id,
+			title: item.title,
+			type: item.type,
+			url: constructPathToSlide(courseId, item.slug),
+			isActive: item.slug === slideId,
+			score: (progress && progress[item.id] && progress[item.id].score) || 0,
+			maxScore: item.maxScore,
+			questionsCount: item.questionsCount,
+			visited: Boolean(progress && progress[item.id]),
+		}));
+	}
+
+	getOpenedPage() {
 		const { slideId, courseInfo } = this.props;
 
 		if (slideId === flashcards) {
 			return CourseFlashcardsPage;
 		}
 
-
 		if (!courseInfo || !courseInfo.units) {
 			return AnyPage;
 		}
 
-		let currentSlide;
-		const units = courseInfo.units;
-
-		for (const unit of units) {
-			for (const slide of unit.slides) {
-				if (slideId === slide.slug) {
-					currentSlide = slide;
-				}
-			}
-		}
+		const currentSlide = Course.findSlideBySlug(slideId, courseInfo);
 
 		if (currentSlide && currentSlide.type === SLIDETYPE.flashcards) {
 			return UnitFlashcardsPage;
@@ -159,17 +168,16 @@ class Course extends Component {
 		return AnyPage;
 	}
 
-	static findUnitIdBySlide(slideId, courseInfo) {
+	static findUnitIdBySlug(slideSlug, courseInfo) {
 		if (!courseInfo || !courseInfo.units) {
 			return null;
 		}
 
 		const units = courseInfo.units;
 
-
 		for (const unit of units) {
 			for (const slide of unit.slides) {
-				if (slideId === slide.slug) {
+				if (slideSlug === slide.slug) {
 					return unit.id;
 				}
 			}
@@ -184,7 +192,6 @@ class Course extends Component {
 		}
 
 		const units = courseInfo.units;
-
 
 		for (const unit of units) {
 			for (const slide of unit.slides) {
@@ -229,7 +236,8 @@ class Course extends Component {
 	};
 }
 
-Course.propTypes = {
+Course
+	.propTypes = {
 	isAuthenticated: PropTypes.bool,
 	courseId: PropTypes.string,
 	slideId: PropTypes.string,

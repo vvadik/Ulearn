@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import Button from "@skbkontur/react-ui/Button";
 
 import classNames from "classnames";
-import getCardsPluralForm from "../../../../utils/getCardsPluralForm";
+import getCardsPluralForm from "../../getCardsPluralForm";
 
 import styles from './unitCard.less';
 
@@ -17,7 +17,7 @@ function UnitCard({ unitTitle, haveProgress = false, totalFlashcardsCount = 0, h
 
 	return (
 		<div className={ styles.unitCardContainer }>
-			<div className={ unitCardStyle }>
+			<header className={ unitCardStyle }>
 				<h3 className={ styles.unitCardTitle }>
 					{ unitTitle }
 				</h3>
@@ -29,13 +29,15 @@ function UnitCard({ unitTitle, haveProgress = false, totalFlashcardsCount = 0, h
 						Начать проверку
 					</Button>
 				</div>
-			</div>
+			</header>
 			{ totalFlashcardsCount > 1 &&
 			<div
-				className={ stylesForCardNext }/> }
+				className={ stylesForCardNext }/>
+			}
 			{ totalFlashcardsCount > 2 &&
 			<div
-				className={ stylesForCardLast }/> }
+				className={ stylesForCardLast }/>
+			}
 		</div>
 	);
 }

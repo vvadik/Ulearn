@@ -5,7 +5,7 @@ import { loadUserProgress, userProgressUpdate } from "../../actions/user";
 import Course from '../../components/course/Course';
 
 const mapStateToProps = (state, { match }) => {
-	const courseId = match.params.courseId;
+	const courseId = match.params.courseId.toLowerCase();
 	const slideId = match.params.slideId;
 	const courseInfo = state.courses.fullCoursesInfo[courseId];
 	return {

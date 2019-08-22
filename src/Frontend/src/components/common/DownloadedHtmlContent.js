@@ -153,8 +153,6 @@ class DownloadedHtmlContent extends Component {
 			this.processNewHtmlContent(url, data);
 		}).catch(function (error) {
 			console.error(error);
-			/* Retry after timeout */
-			setTimeout(() => self.fetchContentFromServer(url), 5000);
 		});
 	}
 
@@ -192,9 +190,6 @@ class DownloadedHtmlContent extends Component {
 		allScriptTags.filter(s => s.src).map(s => s.src).forEach(url => {
 			fetch(url).then(r => r.text()).then(safeEval);
 		});
-
-		/* Scroll to top */
-		window.scrollTo(0, 0);
 
 		this.loadContentByClass();
 		this.setPostFormSubmitHandler();

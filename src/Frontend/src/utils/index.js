@@ -10,9 +10,19 @@ export function getQueryStringParameter(name, url) {
 }
 
 export function buildQuery(params) {
+	if (!params) {
+		return null;
+	}
+
 	const esc = encodeURIComponent;
-	return '?' + Object.keys(params)
-		.filter(key => params[key] !== undefined)
+	const notUndefinedParams = Object.keys(params)
+		.filter(key => params[key] !== undefined);
+
+	if (notUndefinedParams.length === 0) {
+		return null;
+	}
+
+	return '?' + notUndefinedParams
 		.map(key => esc(key) + '=' + esc(params[key]))
 		.join('&');
 }

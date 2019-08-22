@@ -111,8 +111,6 @@ namespace uLearn.Web
 
 				using (var zip = ZipFile.Read(certificateArchive.FullName, new ReadOptions { Encoding = Encoding.UTF8 }))
 				{
-					zip.BufferSize = 1000000; https://stackoverflow.com/a/19634920/6800354
-					zip.CodecBufferSize = 1000000;
 					zip.ExtractAll(certificateDirectory.FullName, ExtractExistingFileAction.OverwriteSilently);
 				}
 			}

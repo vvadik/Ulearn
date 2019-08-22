@@ -17,9 +17,9 @@ function Results({ handleClick }) {
 	return (
 		<div className={ styles.root }>
 			<p className={ styles.headerText }>
-				Оцените, на сколько хорошо вы знали ответ?
+				Оцените, насколько хорошо вы знали ответ
 			</p>
-			<div className={styles.resultsContainer}>
+			<div className={ styles.resultsContainer }>
 				{ resultsStyles.map(convertToResultIcon) }
 			</div>
 			{ renderFooter() }
@@ -29,9 +29,7 @@ function Results({ handleClick }) {
 	function convertToResultIcon(style, index) {
 		return (
 			<button key={ index } className={ style } onClick={ () => handleClick(index + 1) }>
-				<span>
-					{ index + 1 }
-				</span>
+				{ index + 1 }
 			</button>
 		)
 	}

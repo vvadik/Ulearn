@@ -17,23 +17,35 @@ import { toggleNavigation } from "../../../actions/navigation";
 import styles from './Navigation.less';
 
 class Navigation extends Component {
-	componentDidMount() {
-		this.bodyElement = document.getElementsByTagName('body')[0];
+	constructor(props) {
+		super(props);
 
-		this.bodyElement
-			.classList.add(styles.overflow);
+		this.state = {
+			windowWidth: window.innerWidth,
+		}
 	}
 
+	componentDidMount() {
+		window.addEventListener('resize', this.handleWindowSizeChange);
+	}
+
+	handleWindowSizeChange = () => {
+		this.setState({ windowWidth: window.innerWidth });
+	};
+
 	componentWillUnmount() {
-		this.bodyElement
-			.classList.remove(styles.overflow);
+		window.removeEventListener('resize', this.handleWindowSizeChange);
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
 		const { navigationOpened } = this.props;
+		const { windowWidth } = this.state;
+		const isMobile = windowWidth <= 767;
 
-		this.bodyElement
-			.classList.toggle(styles.overflow, navigationOpened);
+		if (isMobile && prevProps.navigationOpened !== navigationOpened) {
+			document.querySelector('body')
+				.classList.toggle(styles.overflow, navigationOpened);
+		}
 	}
 
 	render() {
@@ -51,21 +63,25 @@ class Navigation extends Component {
 	}
 
 	renderUnitNavigation() {
-		const { unitTitle, courseTitle, onCourseClick, unitItems, nextUnit, toggleNavigation } = this.props;
+		const { unitTitle, courseTitle, onCourseClick, unitItems, nextUnit, toggleNavigation, } = this.props;
 
 		return (
 			<div className={ styles.contentWrapper }>
-				< NavigationHeader createRef={ (ref) => this.unitHeaderRef = ref } title={ unitTitle } courseName={ courseTitle }
+				< NavigationHeader createRef={ (ref) => this.unitHeaderRef = ref } title={ unitTitle }
+								   courseName={ courseTitle }
 								   onCourseClick={ onCourseClick }/>
-				< NavigationContent items={ unitItems }/>
-				{ nextUnit && <NextUnit unit={ nextUnit } toggleNavigation={ () => {
-					this.unitHeaderRef.scrollIntoView();
-					toggleNavigation();
-				} }
+				< NavigationContent items={ unitItems } toggleNavigation={ toggleNavigation }/>
+				{ nextUnit && <NextUnit unit={ nextUnit } toggleNavigation={ this.handleToggleNavigation }
 				/> }
 			</div>
 		)
 	}
+
+	handleToggleNavigation = () => {
+		const { toggleNavigation, } = this.props;
+		this.unitHeaderRef.scrollIntoView();
+		toggleNavigation();
+	};
 
 	renderCourseNavigation() {
 		const { courseTitle, description, courseItems, containsFlashcards, courseId, slideId, toggleNavigation } = this.props;

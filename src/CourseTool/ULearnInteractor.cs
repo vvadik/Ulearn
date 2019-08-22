@@ -60,8 +60,6 @@ namespace uLearn.CourseTool
 				var courseDir = dir.CreateSubdirectory(config.ULearnCourseId);
 				Directory.Delete(courseDir.FullName, force);
 				courseDir.Create();
-				zip.BufferSize = 1000000; https://stackoverflow.com/a/19634920/6800354
-				zip.CodecBufferSize = 1000000;
 				zip.ExtractAll(courseDir.FullName, ExtractExistingFileAction.OverwriteSilently);
 			}
 
