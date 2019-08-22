@@ -773,16 +773,8 @@ namespace uLearn.Web.Controllers
 
 		private UserListModel GetUserListModel(IEnumerable<UserRolesInfo> userRoles, string courseId)
 		{
-			var rolesForUsers = db.UserRoles
-				.Where(role => role.CourseId == courseId)
-				.GroupBy(role => role.UserId)
-				.ToDictionary(
-					g => g.Key,
-					g => g.Select(role => role.Role).Distinct().ToList()
-				);
-
+			var rolesForUsers = userRolesRepo.GetRolesByUsers(courseId);
 			var currentUserId = User.Identity.GetUserId();			
-			
 			var isCourseAdmin = User.HasAccessFor(courseId, CourseRole.CourseAdmin);
 			var canAddInstructors = coursesRepo.HasCourseAccess(currentUserId, courseId, CourseAccessType.AddAndRemoveInstructors);
 			var model = new UserListModel
@@ -810,7 +802,11 @@ namespace uLearn.Web.Controllers
 						courseRole => (ICoursesRolesListModel)new SingleCourseRolesModel
 						{
 							HasAccess = roles.Contains(courseRole),
-							ToggleUrl = Url.Action("ToggleRole", "Account", new { courseId, userId = user.UserId, role = courseRole })
+							ToggleUrl = Url.Action("ToggleRole", "Account", new { courseId, userId = user.UserId, role = courseRole }),
+							UserName = user.UserVisibleName,
+							Role = courseRole,
+							CourseTitle = courseManager.FindCourse(courseId)?.Title
+							
 						});
 
 				var courseAccesses = coursesRepo.GetCourseAccesses(courseId, user.UserId).Select(a => a.AccessType).ToList();
@@ -822,7 +818,10 @@ namespace uLearn.Web.Controllers
 						{
 							CourseId = courseId,
 							HasAccess = courseAccesses.Contains(a),
-							ToggleUrl = Url.Action("ToggleCourseAccess", "Admin", new { courseId = courseId, userId = user.UserId, accessType = a })
+							ToggleUrl = Url.Action("ToggleCourseAccess", "Admin", new { courseId = courseId, userId = user.UserId, accessType = a }),
+							UserName = user.UserVisibleName,
+							AccessType=a,
+							CourseTitle = courseManager.FindCourse(courseId)?.Title 
 						}
 					);
 
@@ -1396,7 +1395,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> ToggleCourseAccess(string courseId, string userId, CourseAccessType accessType, bool isEnabled)
 		{
 			var currentUserId = User.Identity.GetUserId();
-
+			var comment = Request.Form["comment"];
 			var userRoles = userRolesRepo.GetRoles(userId);
 			var errorMessage = "Выдавать дополнительные права можно только преподавателям. Сначала назначьте пользователя администратором курса или преподавателем";
 			if (!userRoles.ContainsKey(courseId))
@@ -1405,9 +1404,9 @@ namespace uLearn.Web.Controllers
 				return Json(new { status = "error", message = errorMessage });
 
 			if (isEnabled)
-				await coursesRepo.GrantAccess(courseId, userId, accessType, currentUserId);
+				await coursesRepo.GrantAccess(courseId, userId, accessType, currentUserId, comment);
 			else
-				await coursesRepo.RevokeAccess(courseId, userId, accessType);
+				await coursesRepo.RevokeAccess(courseId, userId, accessType, currentUserId, comment);
 
 			return Json(new { status = "ok" });
 		}

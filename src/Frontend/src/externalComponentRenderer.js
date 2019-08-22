@@ -21,6 +21,7 @@ import CommentsView from "./components/comments/CommentsView/CommentsView";
 import CommentsList from "./components/comments/CommentsList/CommentsList";
 import Comment from "./components/comments/Comment/Comment";
 import CommentSendForm from "./components/comments/CommentSendForm/CommentSendForm";
+import ToggleRolesModal from "./components/UserRoles/ToggleRolesModal";
 
 /* Define names for all components you want to use */
 const components = {
@@ -28,6 +29,7 @@ const components = {
 	"CommentsList": CommentsList,
 	"Comment": Comment,
 	"CommentSendForm": CommentSendForm,
+	"ToggleRoles" : ToggleRolesModal,
 };
 
 window.renderReactComponent = function (componentType, element, props) {

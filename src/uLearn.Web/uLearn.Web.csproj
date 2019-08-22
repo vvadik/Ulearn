@@ -778,6 +778,7 @@
     <Compile Include="Models\SwitchablePanelModel.cs" />
     <Compile Include="Models\TocModel.cs" />
     <Compile Include="Models\TocModelBuilder.cs" />
+    <Compile Include="Models\UserCourseToggleHistoryModel.cs" />
     <Compile Include="Models\UserCourseModel.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Models\UsersStatsPageModel.cs" />
@@ -1422,7 +1423,9 @@
     </Content>
     <Content Include="UlearnScripts.txt" />
     <Content Include="UlearnStyles.txt" />
+    <Content Include="Views\Account\CourseRightsHistory.cshtml" />
     <Content Include="Views\Account\JoinedToGroup.cshtml" />
+    <Content Include="Views\Account\ToggleRolesHistory.cshtml" />
     <Content Include="Views\Admin\StyleValidations.cshtml" />
     <Content Include="Views\AntiPlagiarism\Details.cshtml" />
     <Content Include="Views\Certificates\ListPartial.cshtml" />
