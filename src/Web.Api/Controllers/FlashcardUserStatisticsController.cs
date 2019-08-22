@@ -28,19 +28,18 @@ namespace Ulearn.Web.Api.Controllers
 		}
 
 		[HttpGet]
-		public async Task<ActionResult<UserFlashcardStatisticResponse>> UserFlashcardStatistics([FromQuery(Name = "course_id")] [BindRequired]
-			string courseId)
+		public async Task<ActionResult<UserFlashcardStatisticResponse>> UserFlashcardStatistics([FromQuery(Name = "course_id")] [BindRequired] string courseId)
 		{
 			var course = courseManager.FindCourse(courseId);
 			if (course == null)
 				return NotFound();
-			var result = new UserFlashcardStatisticResponse();
 			var groups = await groupAccessesRepo.GetAvailableForUserGroupsAsync(course.Id, UserId, true);
 			if (groups.Count == 0)
 			{
 				return BadRequest("You don't have access to any group in course");
 			}
 
+			var result = new UserFlashcardStatisticResponse();
 			foreach (var group in groups)
 			{
 				foreach (var member in group.Members)

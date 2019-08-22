@@ -82,13 +82,12 @@ namespace Ulearn.Web.Api.Controllers.User
 			return await UserProgress(course);
 		}
 
-		protected string GetRealClientIp()
+		private string GetRealClientIp()
 		{
 			var xForwardedFor = Request.Headers["X-Forwarded-For"].ToString();
 			if (string.IsNullOrEmpty(xForwardedFor))
 				return Request.Host.Host;
 			return xForwardedFor.Split(',').FirstOrDefault() ?? "";
 		}
-		
 	}
 }

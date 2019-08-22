@@ -37,11 +37,11 @@ namespace Database.Models
 
 	public enum Rate
 	{
-		NotViewed,
-		One,
-		Two,
-		Three,
-		Four,
-		Five
+		NotRated,
+		Rate1,
+		Rate2,
+		Rate3,
+		Rate4,
+		Rate5
 	}
 }

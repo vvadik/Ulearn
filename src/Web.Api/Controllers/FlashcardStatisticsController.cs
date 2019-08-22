@@ -54,7 +54,7 @@ namespace Ulearn.Web.Api.Controllers
 		{
 			var result = new FlashcardsStatistics();
 
-			var groupedByFlashcard = userFlashcardsVisits.GroupBy(x => x.FlashcardId).ToDictionary(x => x.Key);
+			var visitsGroupedByFlashcard = userFlashcardsVisits.GroupBy(x => x.FlashcardId).ToDictionary(x => x.Key);
 
 			foreach (var unit in course.Units)
 			{
@@ -63,7 +63,7 @@ namespace Ulearn.Web.Api.Controllers
 				{
 					var flashcardStat = new FlashcardStatistic { FlashcardId = flashcard.Id, UnitId = unit.Id, UnitTitle = unit.Title };
 
-					if (groupedByFlashcard.TryGetValue(flashcard.Id, out var group))
+					if (visitsGroupedByFlashcard.TryGetValue(flashcard.Id, out var group))
 					{
 						var uniqueUsers = new HashSet<string>();
 						foreach (var e in group)
