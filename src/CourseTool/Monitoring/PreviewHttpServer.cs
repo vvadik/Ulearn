@@ -49,16 +49,6 @@ namespace uLearn.CourseTool.Monitoring
 			this.port = port;
 		}
 
-		private void CopyStaticToHtmlDir()
-		{
-			if (!Directory.Exists(htmlDir))
-				Directory.CreateDirectory(htmlDir);
-			var staticDir = Path.Combine(htmlDir, "static");
-			if (!Directory.Exists(staticDir))
-				Directory.CreateDirectory(staticDir);
-			Utils.DirectoryCopy(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "renderer"), htmlDir, true);
-		}
-
 		public string FindLastChangedSlideHtmlPath()
 		{
 			var files = Directory.GetFiles(htmlDir, "*.html");
@@ -146,7 +136,7 @@ namespace uLearn.CourseTool.Monitoring
 			var slide = course.FindSlideById(slideIdGuid);
 			if (!(slide is ExerciseSlide))
 				return Encoding.UTF8.GetBytes("Invalid slide id");
-
+			
 			var zipBytes = GenerateExerciseStudentZip(slide);
 			context.Response.Headers.Add("Content-Type", "application/zip");
 			var exerciseSlide = slide as ExerciseSlide;
@@ -156,7 +146,7 @@ namespace uLearn.CourseTool.Monitoring
 
 			return zipBytes;
 		}
-
+		
 		private byte[] GenerateExerciseStudentZip(Slide slide)
 		{
 			var tempZipFile = Path.GetRandomFileName();
@@ -213,7 +203,6 @@ namespace uLearn.CourseTool.Monitoring
 			}
 
 			lessonOrQuiz.DefineBlockTypes();
-
 			var serializer = new XmlSerializer(typeof(TSlide));
 			var newFile = GenerateSlideFilename<TSlide>(prevSlide);
 			using (var s = new FileStream(Path.Combine(prevSlide.Info.Directory.FullName, newFile), FileMode.OpenOrCreate))
@@ -226,7 +215,6 @@ namespace uLearn.CourseTool.Monitoring
 		private static string GenerateSlideFilename<T>(Slide prevSlide)
 		{
 			var filename = prevSlide.Info.SlideFile.Name;
-
 			var match = Regex.Match(filename, @"^(\w?)([0-9]+)(.+)$");
 			if (!match.Success)
 				return filename.Remove(filename.Length - prevSlide.Info.SlideFile.Extension.Length) + "_next.xml";
