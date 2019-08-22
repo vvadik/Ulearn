@@ -6,7 +6,6 @@
 }
 
 <div class="container">
-
 	<h2 class="space-after">
 		@Html.ActionLink(Model.User.VisibleName, "Profile", "Account", new { userId = Model.User.Id }, new { title = "" })
 		— «@Model.Course.Title». Роли и права
@@ -30,8 +29,6 @@
 			var timestamp = grant.GrantTimeUtc == DateTime.MinValue ? "Неизвестно" : date;
 			var grantedBy = string.IsNullOrEmpty(grant.GrantedBy) ? "Неизвестно" : grant.GrantedBy;
 			var comment = string.IsNullOrEmpty(grant.Comment) ? "Без комментария" : grant.Comment;
-
-			//var bgColor = grant.GrantType == GrantType.Role ? "#fffcdd" : "white";
 			var enabled = grant.IsEnabled ? "Выданы" : "Отозваны";
 			<tr style="text-align: center">
 				<td style="text-align: left;"> @grant.Grant</td>
@@ -41,7 +38,6 @@
 				<td style="table-layout: fixed; white-space: pre-wrap; word-wrap: break-word; word-break: break-word ;text-align: left; width:30%">@comment</td>
 			</tr>
 		}
-
 	</table>
 
 	<script>
@@ -53,9 +49,7 @@
 			if (!isNaN(localDate.getTime())){
 				allTimes[time].innerHTML = localDate.toLocaleString().replace(',','\r\n');
 			}
-			
 		} 
 		})
 	</script>
-
 </div>

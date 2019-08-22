@@ -60,7 +60,6 @@ namespace uLearn.Web.Models
 		public string ToggleUrl { get; set; }
 		public string UserName { get; set; }
 		public CourseRole Role { get; set; }
-		
 	}
 
 	public class ManyCourseRolesModel : ICoursesRolesListModel
@@ -76,7 +75,6 @@ namespace uLearn.Web.Models
 		public string UserName { get; set; }
 		public CourseAccessType AccessType { get; set; }
 		public string CourseTitle { get; set; }
-		
 	}
 
 	public class CourseAccessModel : AccessModel

@@ -1,14 +1,9 @@
 ﻿window.toggleRoleOrCourseAccess = function ToggleRoleOrCourseAccess(comment) {
 	var target = window.toggleRoles.target;
 	var toggleClass = window.toggleRoles.toggleClass;
-
 	var $object = $(target);
-
 	var url = $object.data("toggleUrl");
-
 	var token = $('#AntiForgeryTokenContainer input[name="__RequestVerificationToken"]').val();
-
-
 	$.ajax({
 		url: url,
 		method: "POST",
@@ -30,14 +25,9 @@
 };
 
 function ToggleSystemRoleOrAccess(target, toggleClass) {
-
 	var $object = $(target);
-
 	var url = $object.data("toggleUrl");
-
 	var token = $('#AntiForgeryTokenContainer input[name="__RequestVerificationToken"]').val();
-
-
 	$.ajax({
 		url: url,
 		method: "POST",
@@ -79,7 +69,6 @@ function ToggleDropDownClass(dropdownElement) {
 }
 
 function openPopup(target, toggleClass) {
-
 	if (($(target)).data("css-class") === "btn-danger") {
 		ToggleSystemRoleOrAccess(target, toggleClass);
 		return;
@@ -95,6 +84,7 @@ function openPopup(target, toggleClass) {
 	if (className.indexOf("btn-success") > -1 || className.indexOf("btn-warning") > -1 || className.indexOf("btn-info") > -1) {
 		isGrant = false;
 	}
+
 	if (className === "li-info" || className === "li-warning") {
 		isGrant = false;
 	}
@@ -109,11 +99,9 @@ function openPopup(target, toggleClass) {
 		isGrant: isGrant
 	};
 
-
 	var root = document.querySelector('.react-rendered');
 	root.setAttribute('modalOpened', true);
 }
-
 
 function closePopup() {
 	var root = document.querySelector('.react-rendered');

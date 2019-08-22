@@ -121,11 +121,11 @@ namespace Database.DataContexts
 				);
 		}
 
-		public async  Task<List<UserRole>> GetUserRolesHistory(string userId)
+		public async Task<List<UserRole>> GetUserRolesHistory(string userId)
 		{
 			return await db.UserRoles.Where(x => x.UserId == userId).ToListAsync();
 		}
-		
+
 		public async Task<List<UserRole>> GetUserRolesHistoryByCourseId(string userId, string courseId)
 		{
 			courseId = courseId.ToLower();

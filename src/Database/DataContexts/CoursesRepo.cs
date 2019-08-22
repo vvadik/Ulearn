@@ -90,7 +90,6 @@ namespace Database.DataContexts
 				.Select(gr => gr.FirstOrDefault());
 		}
 
-
 		public async Task<CourseAccess> GrantAccess(string courseId, string userId, CourseAccessType accessType, string grantedById, string comment)
 		{
 			courseId = courseId.ToLower();

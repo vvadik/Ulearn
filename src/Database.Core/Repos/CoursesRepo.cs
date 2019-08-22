@@ -100,7 +100,7 @@ namespace Database.Repos
 		{
 			return db.CourseAccesses
 				.GroupBy(x => x.CourseId + x.UserId + x.AccessType.ToString())
-				.Select(gr=>gr.OrderByDescending(x=>x.Id))
+				.Select(gr => gr.OrderByDescending(x => x.Id))
 				.Select(gr => gr.FirstOrDefault());
 		}
 
@@ -140,12 +140,11 @@ namespace Database.Repos
 				IsEnabled = false,
 				CourseId = courseId,
 				AccessType = accessType
-				
 			};
 			db.CourseAccesses.Add(revoke);
 
 			await db.SaveChangesAsync();
-			return new List<CourseAccess> {revoke};
+			return new List<CourseAccess> { revoke };
 		}
 
 		public Task<List<CourseAccess>> GetCourseAccessesAsync(string courseId)

@@ -3,7 +3,6 @@
 @using FormMethod = System.Web.Mvc.FormMethod
 @model UserListModel
 
-
 @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "AntiForgeryTokenContainer" }))
 {
 	@Html.AntiForgeryToken()
@@ -30,8 +29,6 @@
 			<th>Удаление</th>
 		}
 	</tr>
-	
-
 	
 	@foreach (var user in Model.Users)
 	{
@@ -124,8 +121,6 @@
 		@role
 		
 	</button>
-	
-	
 }
 
 @helper RoleButton(ManyCourseRolesModel coursesRoles, string role, string cssClass)
@@ -145,7 +140,6 @@
 		<ul class="dropdown-menu" data-css-class="li-@cssClass">
 			@foreach (var course in coursesRoles.CourseRoles)
 			{
-				
 				<li class="@( course.HasAccess ? liClass : "")"
 					data-toggle-url="@course.ToggleUrl"
 					data-toggle-userName="@course.UserName"
@@ -160,8 +154,6 @@
 		</ul>
 	</div>
 }
-
-
 
 @helper CourseAccessButtons(UserModel user)
 {
@@ -220,6 +212,5 @@
                 </li>
             }
         </ul>
-    </div>	
+    </div>
 }
-

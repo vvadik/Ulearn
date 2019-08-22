@@ -774,10 +774,7 @@ namespace uLearn.Web.Controllers
 		private UserListModel GetUserListModel(IEnumerable<UserRolesInfo> userRoles, string courseId)
 		{
 			var rolesForUsers = userRolesRepo.GetRolesByUsers(courseId);
-			
-
 			var currentUserId = User.Identity.GetUserId();			
-			
 			var isCourseAdmin = User.HasAccessFor(courseId, CourseRole.CourseAdmin);
 			var canAddInstructors = coursesRepo.HasCourseAccess(currentUserId, courseId, CourseAccessType.AddAndRemoveInstructors);
 			var model = new UserListModel
@@ -824,8 +821,7 @@ namespace uLearn.Web.Controllers
 							ToggleUrl = Url.Action("ToggleCourseAccess", "Admin", new { courseId = courseId, userId = user.UserId, accessType = a }),
 							UserName = user.UserVisibleName,
 							AccessType=a,
-							CourseTitle = courseManager.FindCourse(courseId)?.Title
-							
+							CourseTitle = courseManager.FindCourse(courseId)?.Title 
 						}
 					);
 

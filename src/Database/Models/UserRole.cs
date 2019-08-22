@@ -32,6 +32,5 @@ namespace Database.Models
 
 		[CanBeNull]
 		public string Comment { get; set; }
-		
 	}
 }
