@@ -12,13 +12,13 @@ namespace uLearn.CourseTool.CmdLineOptions
 	{
 		public override void DoExecute()
 		{
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				Console.WriteLine("You need to run sandboxes/build.sh on non-Windows");
 				return;
 			}
 			var dockerExistsOnPath = EnvironmentVariablesUtils.ExistsOnPath("docker.exe");
-			if (dockerExistsOnPath)
+			if (!dockerExistsOnPath)
 			{
 				Console.WriteLine("Docker not found in PATH");
 				return;
