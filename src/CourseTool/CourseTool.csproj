@@ -452,6 +452,7 @@
 		<Content Include="renderer\scripts\bundle.js">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
+		<Content Include="schema.xsd" />
    
     <Content Include="templates\code.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

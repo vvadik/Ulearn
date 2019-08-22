@@ -20,10 +20,21 @@ namespace uLearn.CourseTool.Validating
 	public class CourseValidator : BaseValidator
 	{
 		private readonly List<Slide> slides;
+		private readonly XmlValidator xmlValidator;
 
 		public CourseValidator(List<Slide> slides)
 		{
 			this.slides = slides;
+			string schemaPath = AppDomain.CurrentDomain.BaseDirectory + "schema.xsd";
+			xmlValidator = new XmlValidator(schemaPath);
+		}
+
+		public void ValidateSlidesXml()
+		{
+			
+			var error = xmlValidator.ValidateSlidesFiles(slides.Select(x => x.Info.SlideFile).ToList());
+			if (!string.IsNullOrEmpty(error))
+				ReportError(error);
 		}
 
 		public void ValidateExercises() // todo логирование log4net в файл (ошибки отдельно) и на консоль
@@ -56,8 +67,9 @@ namespace uLearn.CourseTool.Validating
 				LogSlideProcessing("Validate flashcard slide", slide);
 				if (slide.FlashcardsList.Length == 0)
 				{
-					ReportSlideWarning(slide,"Flashcard slide contains no flashcards");
+					ReportSlideWarning(slide, "Flashcard slide contains no flashcards");
 				}
+
 				foreach (var flashcard in slide.FlashcardsList)
 				{
 					ValidateFlashcard(flashcard, slide);
@@ -68,20 +80,6 @@ namespace uLearn.CourseTool.Validating
 		private void ValidateFlashcard(Flashcard flashcard, Slide flashcardSlide)
 		{
 			LogFlashcardProcessing("Validate flashcard", flashcard);
-			if (flashcard.Answer.Blocks.Length == 0)
-			{
-				ReportFlashcardWarning(flashcard, flashcardSlide, "Answer is empty");
-			}
-
-			if (flashcard.Question.Blocks.Length == 0)
-			{
-				ReportFlashcardWarning(flashcard, flashcardSlide, "Question is empty");
-			}
-
-			if (flashcard.Id == string.Empty)
-			{
-				ReportFlashcardError(flashcard,flashcardSlide,"Flashcard id is empty");
-			}
 
 			foreach (var slideId in flashcard.TheorySlidesIds)
 			{

@@ -48,6 +48,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 			validator.ValidateExercises();
 			validator.ValidateVideos();
 			validator.ValidateFlashcardSlides();
+			validator.ValidateSlidesXml();
 			if (errors.Any())
 			{
 				Console.WriteLine("Done! There are errors:");
