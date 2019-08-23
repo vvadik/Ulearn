@@ -1234,7 +1234,18 @@
     <EmbeddedResource Include="Migrations\201905241421585_AddCourseGitBranchField.resx">
       <DependentUpon>201905241421585_AddCourseGitBranchField.cs</DependentUpon>
     </EmbeddedResource>
-
+    <EmbeddedResource Include="Migrations\201907191247514_AddUserFlashcardsVisits.resx">
+      <DependentUpon>201907191247514_AddUserFlashcardsVisits.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201907220607352_AddUserFlashcardsUnlocking.resx">
+      <DependentUpon>201907220607352_AddUserFlashcardsUnlocking.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201907250812064_UpdateUserRoles.resx">
+      <DependentUpon>201907250812064_UpdateUserRoles.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201907290705298_UpdateCourseAccess.resx">
+      <DependentUpon>201907290705298_UpdateCourseAccess.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
