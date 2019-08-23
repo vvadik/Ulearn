@@ -82,24 +82,30 @@ namespace Database.DataContexts
 
 		/* Course accesses */
 
-		public async Task<CourseAccess> GrantAccess(string courseId, string userId, CourseAccessType accessType, string grantedById)
+		private IQueryable<CourseAccess> GetActualCourseAccessesQueryable()
 		{
-			var currentAccess = db.CourseAccesses.FirstOrDefault(a => a.CourseId == courseId && a.UserId == userId && a.AccessType == accessType);
-			if (currentAccess == null)
-			{
-				currentAccess = new CourseAccess
-				{
-					CourseId = courseId,
-					UserId = userId,
-					AccessType = accessType,
-				};
-				db.CourseAccesses.Add(currentAccess);
-			}
-			currentAccess.GrantedById = grantedById;
-			currentAccess.GrantTime = DateTime.Now;
-			currentAccess.IsEnabled = true;
+			return db.CourseAccesses
+				.GroupBy(x => x.CourseId + x.UserId + x.AccessType.ToString())
+				.Select(gr => gr.OrderByDescending(x => x.Id))
+				.Select(gr => gr.FirstOrDefault());
+		}
 
-			await db.SaveChangesAsync();
+		public async Task<CourseAccess> GrantAccess(string courseId, string userId, CourseAccessType accessType, string grantedById, string comment)
+		{
+			courseId = courseId.ToLower();
+			var currentAccess = new CourseAccess
+			{
+				CourseId = courseId,
+				UserId = userId,
+				AccessType = accessType,
+				GrantedById = grantedById,
+				GrantTime = DateTime.Now.ToUniversalTime(),
+				IsEnabled = true,
+				Comment = comment
+			};
+			db.CourseAccesses.Add(currentAccess);
+
+			await db.SaveChangesAsync().ConfigureAwait(false);
 			return db.CourseAccesses.Include(a => a.GrantedBy).Single(a => a.Id == currentAccess.Id);
 		}
 
@@ -108,29 +114,40 @@ namespace Database.DataContexts
 			return revokedBy.HasAccessFor(courseId, CourseRole.CourseAdmin);
 		}
 
-		public async Task<List<CourseAccess>> RevokeAccess(string courseId, string userId, CourseAccessType accessType)
+		public async Task<List<CourseAccess>> RevokeAccess(string courseId, string userId, CourseAccessType accessType, string grantedById, string comment)
 		{
-			var accesses = db.CourseAccesses.Where(a => a.CourseId == courseId && a.UserId == userId && a.AccessType == accessType).ToList();
-			foreach (var access in accesses)
-				access.IsEnabled = false;
+			courseId = courseId.ToLower();
+			var revoke = new CourseAccess
+			{
+				UserId = userId,
+				GrantTime = DateTime.Now.ToUniversalTime(),
+				GrantedById = grantedById,
+				Comment = comment,
+				IsEnabled = false,
+				CourseId = courseId,
+				AccessType = accessType
+			};
+			db.CourseAccesses.Add(revoke);
 
-			await db.SaveChangesAsync();
-			return accesses;
+			await db.SaveChangesAsync().ConfigureAwait(false);
+			return new List<CourseAccess> { revoke };
 		}
 
 		public List<CourseAccess> GetCourseAccesses(string courseId)
 		{
-			return db.CourseAccesses.Include(a => a.User).Where(a => a.CourseId == courseId && a.IsEnabled).ToList();
+			return GetActualCourseAccessesQueryable().Include(a => a.User).Where(a => a.CourseId == courseId && a.IsEnabled).ToList();
 		}
 
 		public List<CourseAccess> GetCourseAccesses(string courseId, string userId)
 		{
-			return db.CourseAccesses.Include(a => a.User).Where(a => a.CourseId == courseId && a.UserId == userId && a.IsEnabled).ToList();
+			var courseAccesses = GetActualCourseAccessesQueryable().Include(a => a.User).Where(a => a.CourseId == courseId && a.UserId == userId && a.IsEnabled).ToList();
+
+			return courseAccesses;
 		}
 
 		public DefaultDictionary<string, List<CourseAccess>> GetCoursesAccesses(IEnumerable<string> coursesIds)
 		{
-			return db.CourseAccesses.Include(a => a.User)
+			return GetActualCourseAccessesQueryable().Include(a => a.User)
 				.Where(a => coursesIds.Contains(a.CourseId) && a.IsEnabled)
 				.GroupBy(a => a.CourseId)
 				.ToDictionary(g => g.Key, g => g.ToList())
@@ -139,9 +156,20 @@ namespace Database.DataContexts
 
 		public bool HasCourseAccess(string userId, string courseId, CourseAccessType accessType)
 		{
-			return db.CourseAccesses.Any(a => a.CourseId == courseId && a.UserId == userId && a.AccessType == accessType && a.IsEnabled);
+			return GetActualCourseAccessesQueryable().Any(a => a.CourseId == courseId && a.UserId == userId && a.AccessType == accessType && a.IsEnabled);
 		}
-		
+
+		public async Task<List<CourseAccess>> GetUserAccessHistory(string userId)
+		{
+			return await db.CourseAccesses.Where(x => x.UserId == userId).ToListAsync();
+		}
+
+		public async Task<List<CourseAccess>> GetUserAccessHistoryByCourseId(string userId, string courseId)
+		{
+			courseId = courseId.ToLower();
+			return await db.CourseAccesses.Where(x => x.UserId == userId && x.CourseId == courseId).ToListAsync();
+		}
+
 		// Add new and remove old course file
 		public async Task AddCourseFile(string courseId, Guid versionId, byte[] content)
 		{
@@ -161,7 +189,7 @@ namespace Database.DataContexts
 		{
 			return db.CourseFiles.FirstOrDefault(f => f.CourseId.Equals(courseId, StringComparison.OrdinalIgnoreCase));
 		}
-		
+
 		public List<CourseFile> GetCourseFiles(IEnumerable<string> existingOnDiskCourseIds)
 		{
 			return db.CourseFiles.Where(a => !existingOnDiskCourseIds.Contains(a.CourseId)).ToList();
@@ -175,7 +203,7 @@ namespace Database.DataContexts
 				return null;
 			return data;
 		}
-		
+
 		public async Task SetCourseRepoSettings(CourseGit courseGit)
 		{
 			courseGit.CreateTime = DateTime.Now;
@@ -205,6 +233,7 @@ namespace Database.DataContexts
 					repo.PrivateKey = privateKey;
 					await SetCourseRepoSettings(repo).ConfigureAwait(false);
 				}
+
 				transaction.Commit();
 			}
 		}

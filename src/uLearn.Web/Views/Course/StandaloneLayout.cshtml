@@ -14,7 +14,7 @@
 	<html>
 	<head>
 		<title>Preview: @course.Title — @slide.Title</title>
-		<link rel="shortcut icon" href="favicon.ico?v=1"/>
+		<link rel="shortcut icon" href="renderer/favicon.ico?v=1"/>
 		<meta charset='UTF-8'>
 		@foreach (var cssFile in cssFiles)
 		{
@@ -42,7 +42,10 @@
 									: (dynamic)null
 							).ToArray();
 					}
-					@SlideHtml.Slide(new BlockRenderContext(course, slide, "/static/",
+					@{
+						var baseUrl = "/"+slide.Info.Directory.FullName;
+					}
+					@SlideHtml.Slide(new BlockRenderContext(course, slide, baseUrl, 
 						blockData,
 						isGuest: false,
 						revealHidden: true

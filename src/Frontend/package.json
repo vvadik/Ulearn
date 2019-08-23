@@ -13,7 +13,7 @@
     "@babel/plugin-proposal-class-properties": "7.0.0",
     "@babel/runtime": "7.0.0",
     "@skbkontur/react-icons": "3.1.5",
-    "@skbkontur/react-ui": "0.44.2",
+    "@skbkontur/react-ui": "^1.1.1",
     "array-from": "2.1.1",
     "autoprefixer": "9.1.5",
     "babel-core": "7.0.0-bridge.0",

@@ -202,3 +202,5 @@ private.settings
 src/uLearn\.Web/Courses
 
 */.DS_Store/
+/src/CourseTool/renderer/scripts/bundle.js
+/src/CourseTool/renderer/styles/bundle.css
