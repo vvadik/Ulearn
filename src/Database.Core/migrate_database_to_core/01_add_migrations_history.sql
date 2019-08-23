@@ -58,6 +58,5 @@ VALUES
 ('20190524142331_AddGitCourseBranchField', '2.2.0-rtm-35687'),
 ('20190719124924_AddUserFlashcardsVisits', '2.2.0-rtm-35687'),
 ('20190722061244_AddUserFlashcardsUnlocking', '2.2.0-rtm-35687'),
-('20190524142331_AddGitCourseBranchField', '2.2.0-rtm-35687'),
 ('20190725081250_UpdateUserRoles', '2.2.0-rtm-35687'),
 ('20190729070622_UpdateCourseAccess', '2.2.0-rtm-35687')
