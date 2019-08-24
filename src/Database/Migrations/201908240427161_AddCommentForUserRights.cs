@@ -1,12 +1,13 @@
-﻿namespace Database.Migrations
+namespace Database.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class UpdateUserRoles : DbMigration
+    public partial class AddCommentForUserRights : DbMigration
     {
         public override void Up()
         {
+            AddColumn("dbo.CourseAccesses", "Comment", c => c.String());
             AddColumn("dbo.UserRoles", "GrantedById", c => c.String());
             AddColumn("dbo.UserRoles", "GrantTime", c => c.DateTime());
             AddColumn("dbo.UserRoles", "IsEnabled", c => c.Boolean());
@@ -19,6 +20,7 @@
             DropColumn("dbo.UserRoles", "IsEnabled");
             DropColumn("dbo.UserRoles", "GrantTime");
             DropColumn("dbo.UserRoles", "GrantedById");
+            DropColumn("dbo.CourseAccesses", "Comment");
         }
     }
 }

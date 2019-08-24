@@ -782,13 +782,9 @@
     <Compile Include="Migrations\201907220607352_AddUserFlashcardsUnlocking.Designer.cs">
       <DependentUpon>201907220607352_AddUserFlashcardsUnlocking.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201907250812064_UpdateUserRoles.cs" />
-    <Compile Include="Migrations\201907250812064_UpdateUserRoles.Designer.cs">
-      <DependentUpon>201907250812064_UpdateUserRoles.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201907290705298_UpdateCourseAccess.cs" />
-    <Compile Include="Migrations\201907290705298_UpdateCourseAccess.Designer.cs">
-      <DependentUpon>201907290705298_UpdateCourseAccess.cs</DependentUpon>
+    <Compile Include="Migrations\201908240427161_AddCommentForUserRights.cs" />
+    <Compile Include="Migrations\201908240427161_AddCommentForUserRights.Designer.cs">
+      <DependentUpon>201908240427161_AddCommentForUserRights.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
@@ -1240,11 +1236,8 @@
     <EmbeddedResource Include="Migrations\201907220607352_AddUserFlashcardsUnlocking.resx">
       <DependentUpon>201907220607352_AddUserFlashcardsUnlocking.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201907250812064_UpdateUserRoles.resx">
-      <DependentUpon>201907250812064_UpdateUserRoles.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201907290705298_UpdateCourseAccess.resx">
-      <DependentUpon>201907290705298_UpdateCourseAccess.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201908240427161_AddCommentForUserRights.resx">
+      <DependentUpon>201908240427161_AddCommentForUserRights.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

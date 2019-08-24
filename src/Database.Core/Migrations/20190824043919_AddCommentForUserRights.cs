@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Database.Migrations
 {
-    public partial class UpdateUserRoles : Migration
+    public partial class AddCommentForUserRights : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -26,6 +26,11 @@ namespace Database.Migrations
                 name: "IsEnabled",
                 table: "UserRoles",
                 nullable: true);
+
+            migrationBuilder.AddColumn<string>(
+                name: "Comment",
+                table: "CourseAccesses",
+                nullable: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -45,6 +50,10 @@ namespace Database.Migrations
             migrationBuilder.DropColumn(
                 name: "IsEnabled",
                 table: "UserRoles");
+
+            migrationBuilder.DropColumn(
+                name: "Comment",
+                table: "CourseAccesses");
         }
     }
 }
