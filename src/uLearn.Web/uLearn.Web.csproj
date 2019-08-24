@@ -1207,6 +1207,7 @@
     <Content Include="Jsdifflib\jsdifflib.css" />
     <Content Include="katex\*.css" />
     <Content Include="katex\katex.js" />
+    <Content Include="katex\katex.min.js" />
     <Content Include="LibrariesScripts.txt" />
     <Content Include="Scripts\activate-clipboard.js" />
     <Content Include="Scripts\analytics-highcharts.js" />
