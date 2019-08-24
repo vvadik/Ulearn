@@ -1,41 +1,47 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System;
+using System.Linq;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
+using Microsoft.Extensions.FileProviders;
 
 namespace Ulearn.Core.Configuration
 {
 	public static class ApplicationConfiguration
 	{
-		public static T Read<T>(IDictionary<string, string> initialData, bool isAppsettingsJsonOptional=false) where T : AbstractConfiguration
+		private static readonly Lazy<IConfigurationRoot> configuration = new Lazy<IConfigurationRoot>(GetConfiguration);
+
+		public static T Read<T>() where T : AbstractConfiguration
 		{
-			var configuration = GetConfiguration(initialData, isAppsettingsJsonOptional);
-			return configuration.Get<T>();
-		}
-		
-		public static T Read<T>(bool isAppsettingsJsonOptional=false) where T : AbstractConfiguration
-		{
-			return Read<T>(new Dictionary<string, string>(), isAppsettingsJsonOptional);
+			var r = configuration.Value.Get<T>();
+			return r;
 		}
 
-		public static IConfiguration GetConfiguration(IDictionary<string, string> initialData, bool isAppsettingsJsonOptional=false)
+		public static IConfigurationRoot GetConfiguration()
 		{
 			var applicationPath = string.IsNullOrEmpty(Utils.WebApplicationPhysicalPath)
-				? Directory.GetCurrentDirectory()
+				? AppDomain.CurrentDomain.BaseDirectory
 				: Utils.WebApplicationPhysicalPath;
-			var configuration = new ConfigurationBuilder()
-				.AddInMemoryCollection(initialData)
-				.SetBasePath(applicationPath)
-				.AddJsonFile("appsettings.json", optional: isAppsettingsJsonOptional, reloadOnChange: true)
-				.Build();
+			var configurationBuilder = new ConfigurationBuilder()
+				.SetBasePath(applicationPath);
+			configurationBuilder.AddEnvironmentVariables();
+			BuildAppsettingsConfiguration(configurationBuilder);
+			return configurationBuilder.Build();
+		}
 
-			return configuration;
-		}
-		
-		public static IConfiguration GetConfiguration(bool isAppsettingsJsonOptional=false)
+		public static void BuildAppsettingsConfiguration(IConfigurationBuilder configurationBuilder)
 		{
-			return GetConfiguration(new Dictionary<string, string>(), isAppsettingsJsonOptional);
+			configurationBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+			var environmentName = Environment.GetEnvironmentVariable("UlearnEnvironmentName");
+			if(environmentName != null && environmentName.ToLower().Contains("local"))
+				configurationBuilder.AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true);
 		}
 		
+		private static void DisposeConfiguration(IConfigurationRoot configuration) // https://github.com/aspnet/Extensions/issues/786
+		{
+			foreach (var provider in configuration.Providers.OfType<JsonConfigurationProvider>())
+				if (provider.Source.FileProvider is PhysicalFileProvider pfp)
+					pfp.Dispose();
+		}
 	}
 	
 	public abstract class AbstractConfiguration
@@ -70,7 +76,17 @@ namespace Ulearn.Core.Configuration
 		
 		public string GraphiteServiceName { get; set; }
 		
+		public string Database { get; set; }
+		
 		public GitConfiguration Git { get; set; }
+		
+		public string StatsdConnectionString { get; set; } // ConnectionString для подключения к Graphite-relay в формате "address=graphite-relay.com;port=8125;prefixKey=ulearn.local". Можно оставить пустой, чтобы не отправлять метрики
+		
+		public string SubmissionsUrl { get; set; } // Url to Ulearn.Web instance. I.E. https://ulearn.me
+		
+		public string RunnerToken { get; set; } // Must be equal on Ulearn.Web and RunC***Job instance
+
+		public int? KeepAliveInterval { get; set; }
 	}
 
 	public class TelegramConfiguration

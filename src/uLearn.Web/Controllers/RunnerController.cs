@@ -15,8 +15,6 @@ using Database.DataContexts;
 using Database.Models;
 using log4net;
 using LtiLibrary.Core.Extensions;
-using Metrics;
-using RunCsJob.Api;
 using Serilog;
 using Telegram.Bot.Types.Enums;
 using uLearn.Web.AntiPlagiarismUsage;
@@ -25,6 +23,8 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Metrics;
+using Ulearn.Core.RunCheckerJobApi;
 using Ulearn.Core.Telegram;
 using XQueue;
 using XQueue.Models;
@@ -72,17 +72,22 @@ namespace uLearn.Web.Controllers
 		[System.Web.Http.Route("GetSubmissions")]
 		public async Task<List<RunnerSubmission>> GetSubmissions([FromUri] string token, [FromUri] string language, [FromUri] string agent = "")
 		{
-			CheckRunner(token);			
-			
-			if (!LanguageHelpers.TryParseByName(language, out var submissionLanguage))
-				throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest));
+			CheckRunner(token);
+
+			var languageNames = language.Split(',');
+			var languages = new List<Language>();
+			foreach (var languageName in languageNames)
+			{
+				if (LanguageHelpers.TryParseByName(languageName, out var submissionLanguage))
+					languages.Add(submissionLanguage);
+			}
 			
 			var sw = Stopwatch.StartNew();
 			while (true)
 			{
 				var repo = new UserSolutionsRepo(new ULearnDb(), courseManager);
-				var submission = await repo.GetUnhandledSubmission(agent, submissionLanguage).ConfigureAwait(false);
-				if (submission != null || sw.Elapsed > TimeSpan.FromSeconds(15))
+				var submission = await repo.GetUnhandledSubmission(agent, languages).ConfigureAwait(false);
+				if (submission != null || sw.Elapsed > TimeSpan.FromSeconds(10))
 				{
 					if (submission != null)
 						log.Info($"Отдаю на проверку решение: [{submission.Id}], агент {agent}, только сначала соберу их");
@@ -94,7 +99,8 @@ namespace uLearn.Web.Controllers
 					return builtSubmissions;
 				}
 
-				await repo.WaitAnyUnhandledSubmissions(TimeSpan.FromSeconds(10)).ConfigureAwait(false);
+				await Task.Delay(TimeSpan.FromMilliseconds(50));
+				await repo.WaitAnyUnhandledSubmissions(TimeSpan.FromSeconds(8)).ConfigureAwait(false);
 			}
 		}
 
@@ -152,7 +158,7 @@ namespace uLearn.Web.Controllers
 				), 3).ConfigureAwait(false);
 
 			var submissionsByIds = userSolutionsRepo
-				.FindSubmissionsByIds(results.Select(result => result.Id).ToList())
+				.FindSubmissionsByIds(results.Select(result => int.TryParse(result.Id, out var parsed) ? parsed : -1).Where(i => i != -1).Distinct().ToList())
 				.ToDictionary(s => s.Id.ToString());
 
 			foreach (var result in results)
@@ -172,7 +178,7 @@ namespace uLearn.Web.Controllers
 
 		private void CheckRunner(string token)
 		{
-			var expectedToken = ConfigurationManager.AppSettings["runnerToken"];
+			var expectedToken = ApplicationConfiguration.Read<UlearnConfiguration>().RunnerToken;
 			if (expectedToken != token)
 				throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Forbidden));
 		}
@@ -248,7 +254,7 @@ namespace uLearn.Web.Controllers
 			if (result.Verdict != Verdict.SandboxError)
 				return;
 
-			var output = result.Output;
+			var output = result.GetOutput();
 			await bot.PostToChannelAsync(
 				$"<b>Решение #{submission.Id} не запустилось в песочнице (SandboxError).</b>\n" +
 				(string.IsNullOrEmpty(output) ? "" : $"Вывод:\n<pre>{output.EscapeHtml()}</pre>"), 
@@ -296,12 +302,9 @@ namespace uLearn.Web.Controllers
 				AuthorId = Guid.Parse(submission.UserId),
 				AdditionalInfo = new AntiPlagiarismAdditionalInfo { SubmissionId = submission.Id }.ToJsonString(),
 			};
-			var antiPlagiarismResult = await antiPlagiarismClient.AddSubmissionAsync(parameters).ConfigureAwait(false);
-			
-			log.Info($"Получил ответ от сервиса антиплагиата: {antiPlagiarismResult}");
-			
-			var userSolutionsRepo = new UserSolutionsRepo(db, WebCourseManager.Instance);
-			await userSolutionsRepo.SetAntiPlagiarismSubmissionId(submission, antiPlagiarismResult.SubmissionId).ConfigureAwait(false);
+			antiPlagiarismClient.AddSubmissionAsync(parameters).ConfigureAwait(false).GetAwaiter().OnCompleted(() =>
+			{
+			});
 		}
 	}
 }

@@ -27,23 +27,32 @@ namespace uLearn.CSharp.RedundantElseValidation
 		private static string[] incorrectFilenames => IncorrectTestDataDir.GetFiles().Select(f => f.Name).ToArray();
 		
 		private static DirectoryInfo BasicProgrammingDirectory =>
-        			new DirectoryInfo(TestPaths.BasicProgrammingDirectoryPath);
-        
-        		private static IEnumerable<FileInfo> BasicProgrammingFiles =>
-        			BasicProgrammingDirectory
-        				.EnumerateFiles("*.cs", SearchOption.AllDirectories)
-        				.Where(f => !f.Name.Equals("Settings.Designer.cs") &&
-        							!f.Name.Equals("Resources.Designer.cs") &&
-        							!f.Name.Equals("AssemblyInfo.cs"));
+        			new DirectoryInfo(ExplicitTestsExamplesPaths.BasicProgrammingDirectoryPath);
 
-		private static DirectoryInfo ULearnSubmissionsDirectory =>
-			new DirectoryInfo(TestPaths.ULearnSubmissionsDirectoryPath);
+        private static IEnumerable<FileInfo> BasicProgrammingFiles()
+        {
+            if (!BasicProgrammingDirectory.Exists)
+                return new FileInfo[0];
+            return BasicProgrammingDirectory
+                .EnumerateFiles("*.cs", SearchOption.AllDirectories)
+                .Where(f => !f.Name.Equals("Settings.Designer.cs") &&
+                            !f.Name.Equals("Resources.Designer.cs") &&
+                            !f.Name.Equals("AssemblyInfo.cs"));
+        }
 
-		private static IEnumerable<FileInfo> SubmissionsFiles => ULearnSubmissionsDirectory
-			.EnumerateFiles("*.cs", SearchOption.AllDirectories)
-			.Where(f => f.Name.Contains("Accepted"));
-		
-		[Test]
+        private static DirectoryInfo ULearnSubmissionsDirectory =>
+			new DirectoryInfo(ExplicitTestsExamplesPaths.ULearnSubmissionsDirectoryPath);
+
+        private static IEnumerable<FileInfo> SubmissionsFiles()
+        {
+            if(!ULearnSubmissionsDirectory.Exists)
+                return new FileInfo[0];
+            return ULearnSubmissionsDirectory
+                .EnumerateFiles("*.cs", SearchOption.AllDirectories)
+                .Where(f => f.Name.Contains("Accepted"));
+        }
+
+        [Test]
 		[TestCaseSource(nameof(incorrectFilenames))]
 		[UseReporter(typeof(DiffReporter))]
 		public void FindErrors(string filename)

@@ -1,10 +1,10 @@
 using System;
 using System.Threading.Tasks;
 using log4net;
-using Metrics;
 using Telegram.Bot.Types.Enums;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
+using MetricSender = Ulearn.Core.Metrics.MetricSender;
 
 namespace Ulearn.Core.Telegram
 {

@@ -412,6 +412,8 @@ namespace Database.Migrations
 
                     b.Property<short>("AccessType");
 
+                    b.Property<string>("Comment");
+
                     b.Property<string>("CourseId")
                         .IsRequired()
                         .HasMaxLength(64);
@@ -499,8 +501,16 @@ namespace Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("Comment");
+
                     b.Property<string>("CourseId")
                         .IsRequired();
+
+                    b.Property<DateTime?>("GrantTime");
+
+                    b.Property<string>("GrantedById");
+
+                    b.Property<bool?>("IsEnabled");
 
                     b.Property<int>("Role");
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 using Ulearn.Common.Api.Models.Responses;
 
@@ -25,6 +26,20 @@ namespace AntiPlagiarism.Api.Models.Results
 		public GetSubmissionPlagiarismsResponse()
 		{
 			Plagiarisms = new List<Plagiarism>();
+		}
+
+		public override string GetShortLogString()
+		{
+			return new GetSubmissionPlagiarismsResponse
+			{
+				SubmissionInfo = SubmissionInfo.CloneWithoutCode(),
+				SuspicionLevels = SuspicionLevels,
+				Plagiarisms = Plagiarisms.Select(p => new Plagiarism
+				{
+					Weight = p.Weight,
+					SubmissionInfo = p.SubmissionInfo.CloneWithoutCode(),
+				}).ToList()
+			}.ToString();
 		}
 	}
 }

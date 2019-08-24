@@ -5,6 +5,7 @@ using Owin;
 using Telegram.Bot;
 using uLearn.Web;
 using Ulearn.Core;
+using Ulearn.Core.Configuration;
 
 [assembly: OwinStartup(typeof(Startup))]
 
@@ -23,7 +24,7 @@ namespace uLearn.Web
 
 		public void InitTelegramBot()
 		{
-			var botToken = WebConfigurationManager.AppSettings["ulearn.telegram.botToken"] ?? "";
+			var botToken = ApplicationConfiguration.Read<UlearnConfiguration>().Telegram.BotToken ?? "";
 			if (string.IsNullOrEmpty(botToken))
 				return;
 

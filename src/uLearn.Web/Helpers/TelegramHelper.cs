@@ -2,6 +2,7 @@
 using System.Web.Configuration;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
+using Ulearn.Core.Configuration;
 
 namespace uLearn.Web.Helpers
 {
@@ -16,7 +17,7 @@ namespace uLearn.Web.Helpers
 				if (telegramBot != null)
 					return telegramBot;
 
-				var botToken = WebConfigurationManager.AppSettings["ulearn.telegram.botToken"];
+				var botToken = ApplicationConfiguration.Read<UlearnConfiguration>().Telegram.BotToken;
 				return telegramBot = new TelegramBotClient(botToken);
 			}
 		}

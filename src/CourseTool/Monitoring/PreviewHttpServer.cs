@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
 using NHttp;
+using RunCheckerJob;
 using RunCsJob;
-using RunCsJob.Api;
 using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
@@ -21,6 +21,7 @@ using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Helpers;
+using Ulearn.Core.RunCheckerJobApi;
 
 namespace uLearn.CourseTool.Monitoring
 {
@@ -46,17 +47,6 @@ namespace uLearn.CourseTool.Monitoring
 			this.courseDir = courseDir;
 			this.htmlDir = htmlDir;
 			this.port = port;
-			CopyStaticToHtmlDir();
-		}
-
-		private void CopyStaticToHtmlDir()
-		{
-			if (!Directory.Exists(htmlDir))
-				Directory.CreateDirectory(htmlDir);
-			var staticDir = Path.Combine(htmlDir, "static");
-			if (!Directory.Exists(staticDir))
-				Directory.CreateDirectory(staticDir);
-			Utils.DirectoryCopy(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "renderer"), htmlDir, true);
 		}
 
 		public string FindLastChangedSlideHtmlPath()
@@ -111,7 +101,7 @@ namespace uLearn.CourseTool.Monitoring
 			if (!new[] { ".js", ".css", ".png", ".jpg", ".woff" }.Any(ext => path.EndsWith(ext)))
 				Console.WriteLine($"{requestTime:T} {context.Request.HttpMethod} {context.Request.Url}");
 
-			byte[] responseBytes;			
+			byte[] responseBytes;
 			/* Serve exercise student zips */
 			if (path == exerciseStudentZipPath)
 				responseBytes = ServeExerciseStudentZip(context, context.Request.QueryString["slideId"]);
@@ -149,12 +139,14 @@ namespace uLearn.CourseTool.Monitoring
 			
 			var zipBytes = GenerateExerciseStudentZip(slide);
 			context.Response.Headers.Add("Content-Type", "application/zip");
-			var projectExerciseBlock = ((slide as ExerciseSlide).Exercise as CsProjectExerciseBlock);
-			context.Response.Headers.Add("Content-Disposition", $"attachment; filename=\"{projectExerciseBlock?.ExerciseDirName.ToLatin()}.zip\"");
-			
+			var exerciseSlide = slide as ExerciseSlide;
+			var block = exerciseSlide.Exercise;
+			var fileName = (block as CsProjectExerciseBlock)?.CsprojFile.Name ?? new DirectoryInfo((block as UniversalExerciseBlock).ExerciseDirPath).Name;
+			context.Response.Headers.Add("Content-Disposition", $"attachment; filename=\"{fileName}\"");
+
 			return zipBytes;
 		}
-
+		
 		private byte[] GenerateExerciseStudentZip(Slide slide)
 		{
 			var tempZipFile = Path.GetRandomFileName();
@@ -211,7 +203,6 @@ namespace uLearn.CourseTool.Monitoring
 			}
 
 			lessonOrQuiz.DefineBlockTypes();
-			
 			var serializer = new XmlSerializer(typeof(TSlide));
 			var newFile = GenerateSlideFilename<TSlide>(prevSlide);
 			using (var s = new FileStream(Path.Combine(prevSlide.Info.Directory.FullName, newFile), FileMode.OpenOrCreate))
@@ -224,7 +215,6 @@ namespace uLearn.CourseTool.Monitoring
 		private static string GenerateSlideFilename<T>(Slide prevSlide)
 		{
 			var filename = prevSlide.Info.SlideFile.Name;
-			
 			var match = Regex.Match(filename, @"^(\w?)([0-9]+)(.+)$");
 			if (!match.Success)
 				return filename.Remove(filename.Length - prevSlide.Info.SlideFile.Extension.Length) + "_next.xml";
@@ -244,6 +234,7 @@ namespace uLearn.CourseTool.Monitoring
 					Console.WriteLine($@"needRefresh:{reloaded}, LastChanged:{lastChangeTime}");
 					return Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(reloaded));
 				}
+
 				await Task.Delay(1000).ConfigureAwait(false);
 				reloaded = ReloadCourseIfChanged(requestTime);
 			}
@@ -264,27 +255,64 @@ namespace uLearn.CourseTool.Monitoring
 			var buildResult = exercise.BuildSolution(code);
 			if (buildResult.HasErrors)
 				return new RunSolutionResult { IsCompileError = true, ErrorMessage = buildResult.ErrorMessage, ExecutionServiceName = "uLearn" };
-			var result = SandboxRunner.Run(exercise.CreateSubmission(Utils.NewNormalizedGuid(), code));
-			var runSolutionResult = new RunSolutionResult
+			RunSolutionResult runSolutionResult;
+			if (exercise is UniversalExerciseBlock)
 			{
-				IsRightAnswer = exercise.IsCorrectRunResult(result),
-				ActualOutput = result.GetOutput()?.NormalizeEoln() ?? "",
-				ErrorMessage = result.CompilationOutput,
-				ExecutionServiceName = "course.exe",
-				IsCompileError = result.Verdict == Verdict.CompilationError,
-				ExpectedOutput = exercise.ExpectedOutput?.NormalizeEoln() ?? "",
-				SubmissionId = 0,
-			};
+				var result = new DockerSandboxRunner().Run(exercise.CreateSubmission(Utils.NewNormalizedGuid(), code));
+				runSolutionResult = new RunSolutionResult
+				{
+					IsRightAnswer = exercise.IsCorrectRunResult(result),
+					ActualOutput = result.GetOutput()?.NormalizeEoln() ?? "",
+					ErrorMessage = result.CompilationOutput,
+					ExecutionServiceName = "course.exe",
+					IsCompileError = result.Verdict == Verdict.CompilationError,
+					ExpectedOutput = exercise.ExpectedOutput?.NormalizeEoln() ?? "",
+					SubmissionId = 0,
+				};
+			}
+			else
+			{
+				var result = new CsSandboxRunnerClient().Run(exercise.CreateSubmission(Utils.NewNormalizedGuid(), code));
+				runSolutionResult = new RunSolutionResult
+				{
+					IsRightAnswer = exercise.IsCorrectRunResult(result),
+					ActualOutput = result.GetOutput()?.NormalizeEoln() ?? "",
+					ErrorMessage = result.CompilationOutput,
+					ExecutionServiceName = "course.exe",
+					IsCompileError = result.Verdict == Verdict.CompilationError,
+					ExpectedOutput = exercise.ExpectedOutput?.NormalizeEoln() ?? "",
+					SubmissionId = 0,
+				};
+			}
+
 			if (buildResult.HasStyleErrors)
 			{
 				runSolutionResult.IsStyleViolation = true;
 				runSolutionResult.StyleMessage = string.Join("\n", buildResult.StyleErrors.Select(e => e.GetMessageWithPositions()));
 			}
+
 			return runSolutionResult;
 		}
 
 		private byte[] ServeStatic(HttpRequestEventArgs context, string path)
 		{
+			string dirPath;
+			if (new[] { ".html" }.Any(ext => path.EndsWith(ext)))
+			{
+				dirPath = htmlDir + "/" + path;
+			}
+			else
+			{
+				dirPath = path;
+				if (dirPath[0] == '/')
+				{
+					string basePath = AppDomain.CurrentDomain.BaseDirectory;
+					dirPath = Path.Combine(basePath, dirPath.Substring(1));
+				}
+			}
+			
+			
+
 			try
 			{
 				context.Response.ContentType = null;
@@ -301,10 +329,12 @@ namespace uLearn.CourseTool.Monitoring
 				resource. If the media type remains unknown, the recipient SHOULD
 				treat it as type "application/octet-stream"»
 				*/
-				return File.ReadAllBytes(htmlDir + "/" + path);
+				var bytes = File.ReadAllBytes(dirPath);
+				return bytes;
 			}
 			catch (IOException e)
 			{
+				Console.WriteLine(e.Message + " " + path);
 				context.Response.StatusCode = 404;
 				context.Response.ContentType = "text/plain; charset=utf-8";
 				return Encoding.UTF8.GetBytes(e.ToString());
@@ -342,6 +372,7 @@ namespace uLearn.CourseTool.Monitoring
 					course = ReloadCourse();
 					Console.WriteLine($"Course reloaded. LastChangeTime: {lastChangeTime}");
 				}
+
 				return needReload;
 			}
 		}

@@ -5,7 +5,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
-    <ProjectReference Include="..\Metrics\Metrics.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="LtiLibrary.NetCore" Version="3.1.1" />
@@ -30,12 +29,29 @@
     <Folder Include="Migrations" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <Content Update="appsettings.local.json">
+      <DependentUpon>appsettings.json</DependentUpon>
+      <CopyToPublishDirectory>Newer</CopyToPublishDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Update="appsettings.json">
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <ContentWithTargetPath Include="migrate_database_to_core/01_add_migrations_history.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>add_migrations_history.sql</TargetPath>
     </ContentWithTargetPath>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="appsettings.local.json">
+      <DependentUpon>appsettings.json</DependentUpon>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

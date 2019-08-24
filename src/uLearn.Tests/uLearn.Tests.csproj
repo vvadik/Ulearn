@@ -54,8 +54,8 @@
     <Reference Include="dotMemory.Unit, Version=103.0.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>..\packages\JetBrains.dotMemoryUnit.2.3.20160517.113140\lib\dotMemory.Unit.dll</HintPath>
     </Reference>
-    <Reference Include="DotNetZip, Version=1.11.0.0, Culture=neutral, PublicKeyToken=6583c7c814667745">
-      <HintPath>..\packages\DotNetZip.1.11.0\lib\net20\DotNetZip.dll</HintPath>
+    <Reference Include="DotNetZip, Version=1.13.3.0, Culture=neutral, PublicKeyToken=6583c7c814667745">
+      <HintPath>..\packages\DotNetZip.1.13.3\lib\net40\DotNetZip.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="FluentAssertions, Version=4.19.2.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
@@ -421,7 +421,7 @@
     <Compile Include="CSharp\SpellingValidation\TestData\Correct\FileWithWordsStartingWithCapitalLetter.cs" />
     <Compile Include="CSharp\SpellingValidation\TestData\Incorrect\FileWithMisspellings.cs" />
     <Compile Include="CSharp\VarInVariableDeclarationValidator_should.cs" />
-    <Compile Include="CSharp\TestPaths.cs" />
+    <Compile Include="CSharp\ExplicitTestsExamplesPaths.cs" />
     <Compile Include="CSharp\VerbInMethodNameValidator_should.cs" />
     <Compile Include="CSharp\testProject\projDir\inner-dir-1\inner-dir-2\ExcludeMeForStudent.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -598,14 +598,6 @@
     <ProjectReference Include="..\CsSandboxer\CsSandboxer.csproj">
       <Project>{c2f55118-2422-4043-96af-016ebb8ec965}</Project>
       <Name>CsSandboxer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Metrics\Metrics.csproj">
-      <Project>{b6b60d19-c6bd-4d66-95da-14480a18770c}</Project>
-      <Name>Metrics</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj">
-      <Project>{26580595-f4dc-41ee-ba66-0ef4692243af}</Project>
-      <Name>RunCsJob.Api</Name>
     </ProjectReference>
     <ProjectReference Include="..\RunCsJob\RunCsJob.csproj">
       <Project>{77B16F9D-3CDF-4CC6-BE5F-B6BADFAC5394}</Project>

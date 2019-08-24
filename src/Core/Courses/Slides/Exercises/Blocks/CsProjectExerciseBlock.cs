@@ -8,7 +8,6 @@ using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using log4net;
 using Microsoft.Build.Evaluation;
-using RunCsJob.Api;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Blocks;
@@ -16,6 +15,7 @@ using Ulearn.Core.Extensions;
 using Ulearn.Core.Helpers;
 using Ulearn.Core.NUnitTestRunning;
 using Ulearn.Core.Properties;
+using Ulearn.Core.RunCheckerJobApi;
 
 namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 {
@@ -90,7 +90,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 
 		public string CorrectSolutionPath => CorrectSolutionFile.GetRelativePath(ExerciseFolder.FullName);
 
-		private Regex WrongAnswersAndSolutionNameRegex => new Regex(new Regex("^") + UserCodeFileNameWithoutExt + new Regex("\\.(.+)\\.cs"));
+		private Regex WrongAnswersAndSolutionNameRegex => new Regex(new Regex("^") + UserCodeFileNameWithoutExt + new Regex("\\.(.+)\\.cs"), RegexOptions.IgnoreCase);
 
 		[XmlIgnore]
 		public DirectoryInfo SlideFolderPath { get; set; }
@@ -164,7 +164,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			var toUpdate = GetAdditionalFiles(code, excluded).ToList();
 			log.Info($"Собираю zip-архив для проверки: дополнительные файлы [{string.Join(", ", toUpdate.Select(c => c.Path))}]");
 			
-			var zipBytes = ExerciseFolder.ToZip(excluded, toUpdate);
+			var zipBytes = ToZip(ExerciseFolder, excluded, toUpdate);
 			log.Info($"Собираю zip-архив для проверки: zip-архив собран, {zipBytes.Length} байтов");
 			return zipBytes;
 		}

@@ -55,4 +55,6 @@ VALUES
 ('20190514091028_AddNotUploadedPackageNotification', '2.2.0-rtm-35687'),
 ('20190516084642_AddRepoUrl2NotUploadedPackageNotification', '2.2.0-rtm-35687'),
 ('20190522102812_AddCourseGitRepos', '2.2.0-rtm-35687'),
-('20190524142331_AddGitCourseBranchField', '2.2.0-rtm-35687')
+('20190524142331_AddGitCourseBranchField', '2.2.0-rtm-35687'),
+('20190725081250_UpdateUserRoles', '2.2.0-rtm-35687'),
+('20190729070622_UpdateCourseAccess', '2.2.0-rtm-35687')

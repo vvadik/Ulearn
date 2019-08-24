@@ -48,12 +48,13 @@
     <Reference Include="Common.Logging.Core, Version=3.3.1.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
       <HintPath>..\packages\Common.Logging.Core.3.3.1\lib\net40\Common.Logging.Core.dll</HintPath>
     </Reference>
-    <Reference Include="DotNetZip, Version=1.11.0.0, Culture=neutral, PublicKeyToken=6583c7c814667745">
-      <HintPath>..\packages\DotNetZip.1.11.0\lib\net20\DotNetZip.dll</HintPath>
+    <Reference Include="DotNetZip, Version=1.13.3.0, Culture=neutral, PublicKeyToken=6583c7c814667745">
+      <HintPath>..\packages\DotNetZip.1.13.3\lib\net40\DotNetZip.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=1.1.0.145, Culture=neutral, PublicKeyToken=1b03e6acf1164f73">
+      <HintPath>..\packages\SharpZipLib.1.1.0\lib\net45\ICSharpCode.SharpZipLib.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="MarkdownDeep.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\packages\MarkdownDeep.NET.Core.1.5.0.4\lib\netstandard2.0\MarkdownDeep.Core.dll</HintPath>
@@ -364,6 +365,7 @@
   <ItemGroup>
     <Compile Include="CmdLineOptions\AbstractOptions.cs" />
     <Compile Include="ArchiveManager.cs" />
+    <Compile Include="CmdLineOptions\BuildDockerContainerOptions.cs" />
     <Compile Include="CmdLineOptions\GenerateEmptyVideoAnnotations.cs" />
     <Compile Include="Validating\BaseValidator.cs" />
     <Compile Include="CmdLineOptions\OlxDesquashChaptersOptions.cs" />
@@ -398,6 +400,7 @@
     <Compile Include="CmdLineOptions\ULearnOptions.cs" />
     <Compile Include="CmdLineOptions\OlxPatchFromUlearnOptions.cs" />
     <Compile Include="CmdLineOptions\OlxPatchVideoOptions.cs" />
+    <Compile Include="Validating\UniversalExerciseValidator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -410,18 +413,17 @@
     <None Include="static\flexslider-icon.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Content Include="..\uLearn.Web\Content\ulearn.css">
-      <Link>renderer\styles\ulearn.css</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+   
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
-    <Content Include="..\uLearn.Web\Content\main.css">
-      <Link>renderer\styles\main.css</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <Content Include="appsettings.local.json">
+      <DependentUpon>appsettings.json</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Newer</CopyToPublishDirectory>
     </Content>
-    <Content Include="..\uLearn.Web\Scripts\slide-*.js">
-      <Link>renderer\scripts\%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="CourseTool.nuspec" />
     <Content Include="Hunspellx64.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -434,13 +436,7 @@
     <Content Include="renderer\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="renderer\fonts\glyphicons-halflings-regular.woff" />
     <Content Include="renderer\fonts\glyphicons-halflings-regular.woff2" />
-    <Content Include="renderer\scripts\htmlembedded.js" />
-    <Content Include="renderer\scripts\javascript.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\scripts\slide-*.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+   
     <Content Include="examples\video.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -449,88 +445,16 @@
     <Content Include="renderer\favicon.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="renderer\scripts\active-line.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\scripts\bootstrap.min.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\scripts\clike.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\scripts\closebrackets.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\scripts\codemirror.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\scripts\CsCompleter.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\scripts\csharp-hint.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\scripts\jquery-1.10.2.min.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\scripts\jquery-ui.min.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\scripts\jquery.flexslider-min.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\scripts\jsdifflib.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\scripts\katex.min.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\scripts\matchbrackets.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\scripts\python.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\scripts\show-hint.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\scripts\xml.js">
+    <Content Include="renderer\scripts\.gitkeep" />
+    <Content Include="renderer\styles\.gitkeep" />
+    
+    <Content Include="renderer\styles\bundle.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="renderer\styles\awesome-bootstrap-checkbox.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\styles\bootstrap.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\styles\cobalt.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\styles\codemirror.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\styles\flexslider.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\styles\font-awesome.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\styles\jsdifflib.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\styles\katex.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\styles\show-hint.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="static\htmlembedded.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="static\javascript.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="static\xml.js" />
+		<Content Include="renderer\scripts\bundle.js">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+   
     <Content Include="templates\code.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -543,37 +467,9 @@
     <Content Include="templates\iframe.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="static\clike.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="static\codemirror.css">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="static\codemirror.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="static\flexslider.css">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="static\jquery-1.10.2.min.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="static\jquery.flexslider-min.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="static\matchbrackets.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="static\python.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="static\slide-editor.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="static\slide-gallery.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="static\ulearn-auto.css">
+   
+    <Content Include="..\..\sandboxes\**">
+      <Link>sandboxes\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -590,13 +486,9 @@
       <Project>{c2f55118-2422-4043-96af-016ebb8ec965}</Project>
       <Name>CsSandboxer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Metrics\Metrics.csproj">
-      <Project>{b6b60d19-c6bd-4d66-95da-14480a18770c}</Project>
-      <Name>Metrics</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\RunCsJob.Api\RunCsJob.Api.csproj">
-      <Project>{26580595-f4dc-41ee-ba66-0ef4692243af}</Project>
-      <Name>RunCsJob.Api</Name>
+    <ProjectReference Include="..\RunCheckerJob\RunCheckerJob.csproj">
+      <Project>{650fe5bd-4345-41b9-800e-d00ca4cef51f}</Project>
+      <Name>RunCheckerJob</Name>
     </ProjectReference>
     <ProjectReference Include="..\RunCsJob\RunCsJob.csproj">
       <Project>{77B16F9D-3CDF-4CC6-BE5F-B6BADFAC5394}</Project>
@@ -625,11 +517,11 @@
   </Target>
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
   <Import Project="..\packages\OctoPack.3.6.3\build\OctoPack.targets" Condition="Exists('..\packages\OctoPack.3.6.3\build\OctoPack.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-			 Other similar extension points exist, see Microsoft.Common.targets.
+	
 	<Target Name="BeforeBuild">
+		<Exec Command="powershell -NonInteractive -executionpolicy Unrestricted &quot; $A = cat $(SolutionDir)uLearn.Web\LibrariesScripts.txt;$B = cat $(SolutionDir)uLearn.Web\UlearnScripts.txt;$A = $A+$B;for ($i = 0; $i -le ($A.length - 1); $i += 1) {$A[$i]='$(SolutionDir)ulearn.Web\'+$A[$i]};cat $A | Out-File -Encoding 'UTF8' -FilePath $(ProjectDir)renderer\scripts\bundle.js; &quot;" />
+		<Exec Command="powershell -NonInteractive -executionpolicy Unrestricted &quot; $A = cat $(SolutionDir)uLearn.Web\UlearnStyles.txt;for ($i = 0; $i -le ($A.length - 1); $i += 1) {$A[$i]='$(SolutionDir)ulearn.Web\'+$A[$i]};cat $A | Out-File -Encoding 'UTF8' -FilePath $(ProjectDir)renderer\styles\bundle.css; &quot;" />
 	</Target>
 	<Target Name="AfterBuild">
 	</Target>
-	-->
 </Project>

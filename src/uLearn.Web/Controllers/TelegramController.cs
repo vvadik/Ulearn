@@ -11,6 +11,7 @@ using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Configuration;
 
 namespace uLearn.Web.Controllers
 {
@@ -30,7 +31,7 @@ namespace uLearn.Web.Controllers
 			notificationsRepo = new NotificationsRepo(db);
 
 			webhookSecret = WebConfigurationManager.AppSettings["ulearn.telegram.webhook.secret"] ?? "";
-			var botToken = WebConfigurationManager.AppSettings["ulearn.telegram.botToken"];
+			var botToken = ApplicationConfiguration.Read<UlearnConfiguration>().Telegram.BotToken;
 			if (botToken != null)
 				telegramBot = new TelegramBotClient(botToken);
 

@@ -7,7 +7,7 @@
 {
 	@Html.AntiForgeryToken()
 }
-
+<div class="react-render" data-component="ToggleRoles"> </div>
 <table class="table table-condensed">
 	<tr>
 		<th>Пользователь</th>
@@ -20,15 +20,16 @@
 		{
 			<th>Права преподавателей</th>
 		}
-        @if (Model.CanViewAndToogleSystemAccesses)
-        {
-	        <th>Системные права</th>
-        }
+		@if (Model.CanViewAndToogleSystemAccesses)
+		{
+			<th>Системные права</th>
+		}
 		@if (Model.ShowDangerEntities)
 		{
 			<th>Удаление</th>
 		}
 	</tr>
+	
 	@foreach (var user in Model.Users)
 	{
 		<tr data-userid="@user.UserId">
@@ -106,13 +107,19 @@
 
 @helper RoleButton(SingleCourseRolesModel courseRoles, string role, string cssClass)
 {
+	
 	var buttonClass = "btn-" + cssClass;
 	<button type="button"
 			class="btn btn-sm btn-default @( courseRoles.HasAccess ? buttonClass : "")"
 			data-css-class="@buttonClass"
 			data-toggle-url="@courseRoles.ToggleUrl"
-			onclick="ToggleRoleOrCourseAccess(event, this, ToggleButtonClass)">
+			data-toggle-userName = "@courseRoles.UserName"
+			data-toggle-role = "@courseRoles.Role.GetDisplayName()"
+			data-toggle-isRole = "@true"
+			data-toggle-courseTitle = "@courseRoles.CourseTitle"
+			onclick="openPopup(this, ToggleButtonClass)">
 		@role
+		
 	</button>
 }
 
@@ -135,7 +142,12 @@
 			{
 				<li class="@( course.HasAccess ? liClass : "")"
 					data-toggle-url="@course.ToggleUrl"
-					onclick="ToggleRoleOrCourseAccess(event, this, ToggleDropDownClass)">
+					data-toggle-userName="@course.UserName"
+					data-toggle-role="@course.Role"
+					data-toggle-isRole="@true"
+					data-toggle-courseTitle = "@course.CourseTitle"
+					onclick="openPopup(this, ToggleDropDownClass)">
+					
 					<a>@course.CourseTitle</a>
 				</li>
 			}
@@ -161,9 +173,14 @@
 					var courseAccess = user.CourseAccesses[courseId][courseAccessType];
 					<li class="@( courseAccess.HasAccess ? "li-info" : "")"
 						data-toggle-url="@courseAccess.ToggleUrl"
+						data-toggle-userName="@courseAccess.UserName"
+                        data-toggle-role = "@courseAccess.AccessType.GetDisplayName()"
+						data-toggle-isRole = "@false"
+						data-toggle-courseTitle = "@courseAccess.CourseTitle"
 						data-css-class="li-info"
 						data-has-access="@( courseAccess.HasAccess ? "true" : "false" )"
-						onclick="ToggleRoleOrCourseAccess(event, this, ToggleButtonClass)">
+						
+						onclick="openPopup(this, ToggleButtonClass)">
 						<a>@courseAccessType.GetDisplayName()</a>
 					</li>
 				}
@@ -190,10 +207,10 @@
                     data-toggle-url="@systemAccess.ToggleUrl"
                     data-css-class="li-info"
                     data-has-access="@( systemAccess.HasAccess ? "true" : "false" )"
-                    onclick="ToggleRoleOrCourseAccess(event, this, ToggleButtonClass)">
+                    onclick="ToggleSystemRoleOrAccess(this, ToggleButtonClass, '')">
                     <a>@systemAccessType.GetDisplayName()</a>
                 </li>
             }
         </ul>
-    </div>	
+    </div>
 }

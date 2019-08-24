@@ -3,6 +3,7 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Events;
+using Ulearn.Core.Configuration;
 using Vostok.Hosting;
 using Vostok.Logging;
 using Vostok.Logging.Serilog;
@@ -21,11 +22,11 @@ namespace Ulearn.Web.Api
             return new VostokHostBuilder<WebApplication>()
                 .SetServiceInfo("ulearn", "Web.Api")
                 .ConfigureAppConfiguration(configurationBuilder =>
-                {
-                    configurationBuilder.AddCommandLine(args);
-                    configurationBuilder.AddEnvironmentVariables();
-                    configurationBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-                })
+				{
+					configurationBuilder.AddCommandLine(args);
+					configurationBuilder.AddEnvironmentVariables();
+					ApplicationConfiguration.BuildAppsettingsConfiguration(configurationBuilder);
+				})
                 .ConfigureHost((context, hostConfigurator) =>
                 {
                     var loggerConfiguration = new LoggerConfiguration().MinimumLevel.Information();

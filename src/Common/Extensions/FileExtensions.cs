@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Serialization;
 using Ionic.Zip;
 using Newtonsoft.Json;
 
@@ -62,27 +61,6 @@ namespace Ulearn.Common.Extensions
 			if (fileInfo.Exists)
 				return File.ReadAllBytes(fileInfo.FullName);
 			throw new Exception("Can't find file " + filepath + " in " + di.FullName);
-		}
-
-		/// <param name="excludeCriterias"><see cref="M:Ionic.Zip.ZipFile.AddSelectedFiles(System.String)" /></param>
-		public static byte[] ToZip(this DirectoryInfo dirInfo, IEnumerable<string> excludeCriterias, IEnumerable<FileContent> toUpdate = null)
-		{
-			using (var zip = new ZipFile())
-			{
-				zip.AddDirectory(dirInfo.FullName);
-				var entriesToRemove = excludeCriterias
-					.Select(zip.SelectEntries)
-					.SelectMany(x => x)
-					.ToList();
-				zip.RemoveEntries(entriesToRemove);
-				foreach (var zipUpdateData in toUpdate ?? new List<FileContent>())
-					zip.UpdateEntry(zipUpdateData.Path, zipUpdateData.Data);
-				using (var ms = new MemoryStream())
-				{
-					zip.Save(ms);
-					return ms.ToArray();
-				}
-			}
 		}
 
 		public static bool IsInDirectory(this FileSystemInfo fileOrDirectory, DirectoryInfo directory)

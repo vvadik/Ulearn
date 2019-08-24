@@ -13,7 +13,6 @@ using Database.Extensions;
 using Database.Models;
 using JetBrains.Annotations;
 using log4net;
-using Metrics;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.LTI;
@@ -26,6 +25,7 @@ using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
 using Ulearn.Core.Extensions;
+using Ulearn.Core.Metrics;
 
 namespace uLearn.Web.Controllers
 {

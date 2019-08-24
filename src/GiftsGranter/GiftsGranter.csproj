@@ -263,9 +263,6 @@
       <DependentUpon>App.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
-    <None Include="appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -281,12 +278,11 @@
       <Project>{95510835-0b21-4d99-a4d2-b8fc87761a3c}</Project>
       <Name>Database</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Metrics\Metrics.csproj">
-      <Project>{b6b60d19-c6bd-4d66-95da-14480a18770c}</Project>
-      <Name>Metrics</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="deploy\GiftsGranter.Task.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

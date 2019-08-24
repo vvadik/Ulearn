@@ -37,8 +37,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DotNetZip, Version=1.11.0.0, Culture=neutral, PublicKeyToken=6583c7c814667745">
-      <HintPath>..\packages\DotNetZip.1.11.0\lib\net20\DotNetZip.dll</HintPath>
+    <Reference Include="DotNetZip, Version=1.13.3.0, Culture=neutral, PublicKeyToken=6583c7c814667745">
+      <HintPath>..\packages\DotNetZip.1.13.3\lib\net40\DotNetZip.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
@@ -293,14 +293,25 @@
       <Project>{95510835-0b21-4d99-a4d2-b8fc87761a3c}</Project>
       <Name>Database</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Metrics\Metrics.csproj">
-      <Project>{b6b60d19-c6bd-4d66-95da-14480a18770c}</Project>
-      <Name>Metrics</Name>
-    </ProjectReference>
   </ItemGroup>
+	<ItemGroup>
+		<Content Update="appsettings.local.json">
+			<DependentUpon>appsettings.json</DependentUpon>
+			<CopyToPublishDirectory>Newer</CopyToPublishDirectory>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Update="appsettings.json">
+			<CopyToPublishDirectory>Always</CopyToPublishDirectory>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
   <ItemGroup>
     <Content Include="appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="appsettings.local.json">
+      <DependentUpon>appsettings.json</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="sender.xml.example">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

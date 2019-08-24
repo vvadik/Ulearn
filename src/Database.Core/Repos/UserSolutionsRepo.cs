@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 using Database.Models;
 using log4net;
 using Microsoft.EntityFrameworkCore;
-using RunCsJob.Api;
 using uLearn;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.RunCheckerJobApi;
 
 namespace Database.Repos
 {
@@ -105,17 +105,6 @@ namespace Database.Repos
 			await db.SaveChangesAsync();
 		}
 		
-		public async Task SetAntiPlagiarismSubmissionId(UserExerciseSubmission submission, int antiPlagiarismSubmissionId)
-		{
-			submission.AntiPlagiarismSubmissionId = antiPlagiarismSubmissionId;
-			await db.SaveChangesAsync();
-		}
-
-		public UserExerciseSubmission FindSubmissionByAntiPlagiarismSubmissionId(int antiPlagiarismSubmissionId)
-		{
-			return db.UserExerciseSubmissions.FirstOrDefault(s => s.AntiPlagiarismSubmissionId == antiPlagiarismSubmissionId);
-		}
-
 		///<returns>(likesCount, isLikedByThisUsed)</returns>
 		public async Task<Tuple<int, bool>> Like(int solutionId, string userId)
 		{
@@ -296,73 +285,6 @@ namespace Database.Repos
 			submission.SolutionCode = textsRepo.GetText(submission.SolutionCodeHash);
 			submission.AutomaticChecking.Output = textsRepo.GetText(submission.AutomaticChecking.OutputHash);
 			submission.AutomaticChecking.CompilationError = textsRepo.GetText(submission.AutomaticChecking.CompilationErrorHash);
-			return submission;
-		}
-
-		private static volatile SemaphoreSlim getSubmissionSemaphore = new SemaphoreSlim(1);
-
-		public async Task<UserExerciseSubmission> GetUnhandledSubmission(string agentName, Language language)
-		{
-			log.Info("GetUnhandledSubmission(): trying to acquire semaphore");
-			var semaphoreLocked = await getSubmissionSemaphore.WaitAsync(TimeSpan.FromSeconds(2)).ConfigureAwait(false);
-			if (!semaphoreLocked)
-			{
-				log.Error("GetUnhandledSubmission(): Can't lock semaphore for 2 seconds");
-				return null;
-			}
-			log.Info("GetUnhandledSubmission(): semaphore acquired!");
-
-			try
-			{
-				return await TryGetExerciseSubmission(agentName, language).ConfigureAwait(false);
-			}
-			catch (Exception e)
-			{
-				log.Error("GetUnhandledSubmission() error", e);
-				return null;
-			}
-			finally
-			{
-				log.Info("GetUnhandledSubmission(): trying to release semaphore");
-				getSubmissionSemaphore.Release();
-				log.Info("GetUnhandledSubmission(): semaphore released");
-			}
-		}
-
-		private async Task<UserExerciseSubmission> TryGetExerciseSubmission(string agentName, Language language)
-		{
-			var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
-			UserExerciseSubmission submission;
-			using (var transaction = db.Database.BeginTransaction(IsolationLevel.Serializable))
-			{
-				var submissionsQueryable = db.UserExerciseSubmissions
-					.AsNoTracking()
-					.Where(s =>
-						s.Timestamp > notSoLongAgo
-						&& s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting
-						&& s.Language == language);
-				
-				if (!submissionsQueryable.Any())
-					return null;
-				
-				var maxId = submissionsQueryable.Select(s => s.Id).DefaultIfEmpty(-1).Max();
-				submission = submissionsQueryable.FirstOrDefault(s => s.Id == maxId);
-				if (submission == null)
-					return null;
-				
-				/* Mark submission as "running" */
-				submission.AutomaticChecking.Status = AutomaticExerciseCheckingStatus.Running;
-				submission.AutomaticChecking.CheckingAgentName = agentName;
-
-				await SaveAll(new List<AutomaticExerciseChecking> { submission.AutomaticChecking }).ConfigureAwait(false);
-
-				transaction.Commit();
-
-				db.ChangeTracker.AcceptAllChanges();
-			}
-
-			unhandledSubmissions.TryRemove(submission.Id, out _);
-
 			return submission;
 		}
 

@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Configuration;
 using System.Threading.Tasks;
 using log4net;
-using Metrics;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
+using Ulearn.Core.Metrics;
 
 namespace Notifications
 {
@@ -22,7 +21,8 @@ namespace Notifications
 
 		public TelegramSender()
 		{
-			var botToken = ConfigurationManager.AppSettings["ulearn.telegram.botToken"];
+			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
+			var botToken = configuration.Telegram.BotToken;
 			try
 			{
 				bot = new TelegramBotClient(botToken);
@@ -35,7 +35,7 @@ namespace Notifications
 
 			log.Info($"Initialized telegram bot with token \"{botToken.MaskAsSecret()}\"");
 
-			metricSender = new MetricSender(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName);
+			metricSender = new MetricSender(configuration.GraphiteServiceName);
 		}
 
 		public async Task SendMessageAsync(long chatId, string html, TelegramButton button = null)
@@ -55,21 +55,19 @@ namespace Notifications
 			}
 			catch (Exception e)
 			{
-				log.Error($"Can\'t send message to telegram chat {chatId}", e);
-
 				metricSender.SendCount("send_to_telegram.fail");
 				metricSender.SendCount($"send_to_telegram.fail.to.{chatId}");
 
-				if (e is ApiRequestException)
+				var isBotBlockedByUser = (e as ApiRequestException)?.Message.Contains("bot was blocked by the user") ?? false;
+				if (isBotBlockedByUser)
 				{
-					var apiRequestException = (ApiRequestException)e;
-					var isBotBlockedByUser = apiRequestException.Message.Contains("bot was blocked by the user");
-					if (isBotBlockedByUser)
-					{
-						metricSender.SendCount("send_to_telegram.fail.blocked_by_user");
-						metricSender.SendCount($"send_to_telegram.fail.blocked_by_user.to.{chatId}");
-					}
+					metricSender.SendCount("send_to_telegram.fail.blocked_by_user");
+					metricSender.SendCount($"send_to_telegram.fail.blocked_by_user.to.{chatId}");
+					log.Warn($"Can\'t send message to telegram chat {chatId}", e);
 				}
+				else
+					log.Error($"Can\'t send message to telegram chat {chatId}", e);
+				
 				throw;
 			}
 			metricSender.SendCount("send_to_telegram.success");

@@ -4,8 +4,8 @@ using System.Globalization;
 using System.IO;
 using System.Threading;
 using NUnit.Framework;
-using RunCsJob.Api;
 using Ulearn.Core;
+using Ulearn.Core.RunCheckerJobApi;
 
 namespace RunCsJob
 {
@@ -276,7 +276,7 @@ for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
 				NeedRun = true
 			};
 
-			var result = new SandboxRunner(model).RunCsc(".");
+			var result = new CsSandboxRunner(model, new CsSandboxRunnerSettings()).RunCsc(".");
 			Assert.IsNotNull(result);
 			Console.WriteLine(result);
 			return result;

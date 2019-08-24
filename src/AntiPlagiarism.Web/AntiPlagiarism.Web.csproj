@@ -19,10 +19,16 @@
     <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <Content Update="appsettings.json">
+    <Content Include="deploy\AntiPlagiarism.Web.Task.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="deploy\AntiPlagiarism.Web.Task.xml">
+    <Content Update="appsettings.local.json">
+      <DependentUpon>appsettings.json</DependentUpon>
+      <CopyToPublishDirectory>Newer</CopyToPublishDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="appsettings.json">
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -31,12 +37,11 @@
     <ProjectReference Include="..\Common.Api\Common.Api.csproj" />
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\Core\Core.csproj" />
-    <ProjectReference Include="..\Metrics\Metrics.csproj" />
   </ItemGroup>
 
-	<!-- See https://docs.microsoft.com/ru-ru/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-2.1&tabs=visual-studio%2Cvisual-studio-xml -->
-	<PropertyGroup>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<NoWarn>$(NoWarn);1591</NoWarn>
-	</PropertyGroup>
+  <!-- See https://docs.microsoft.com/ru-ru/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-2.1&tabs=visual-studio%2Cvisual-studio-xml -->
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
 </Project>
