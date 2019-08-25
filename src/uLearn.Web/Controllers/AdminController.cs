@@ -856,7 +856,7 @@ namespace uLearn.Web.Controllers
 			var version = courseManager.GetVersion(versionIdGuid);
 
 			var courseDiff = new CourseDiff(course, version);
-			var schemaPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "schema.xsd");
+			var schemaPath = Path.Combine(HttpRuntime.BinDirectory, "schema.xsd");
 			var validator = new XmlValidator(schemaPath);
 			var warnings = validator.ValidateSlidesFiles(version.Slides.Select(x => x.Info.SlideFile).ToList());
 

@@ -1420,7 +1420,7 @@
     <Content Include="tablesorter-master\tablesorter.jquery.json" />
     <Content Include="tablesorter-master\test.html" />
     <Content Include="..\schema.xsd">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="UlearnScripts.txt" />
     <Content Include="UlearnStyles.txt" />
