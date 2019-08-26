@@ -5,7 +5,7 @@ import ProgressBar from "../ProgressBar/ProgressBar";
 import OpenedFlashcard from "./OpenedFlashcard/OpenedFlashcard";
 import Toast from "@skbkontur/react-ui/Toast";
 
-import { sortFlashcardsInAuthorsOrder, getNextFlashcardRandomly } from "./flashcardsStirrer/flashcardsStirrer";
+import { sortFlashcardsInAuthorsOrderWithRate, getNextFlashcardRandomly } from "./flashcardsStirrer/flashcardsStirrer";
 import countFlashcardsStatistics from "../countFlashcardsStatistics";
 import classNames from 'classnames';
 
@@ -39,7 +39,7 @@ class Flashcards extends Component {
 
 		if (onUnit) {
 			const unitFlashcards = flashcards.filter(flashcard => flashcard.unitId === unitId);
-			sessionFlashcards = sortFlashcardsInAuthorsOrder(unitFlashcards);
+			sessionFlashcards = sortFlashcardsInAuthorsOrderWithRate(unitFlashcards);
 		} else {
 			sessionFlashcards = Flashcards.getUnlockedCourseFlashcards(flashcards, infoByUnits);
 			maxTLast = Flashcards.findMaxTLast(sessionFlashcards);
@@ -181,7 +181,7 @@ class Flashcards extends Component {
 	startUnitRepeating() {
 		const { flashcards, unitId } = this.props;
 
-		const failedUnitFlashcards = sortFlashcardsInAuthorsOrder(Flashcards.getUnitFlashcards(flashcards, unitId, true));
+		const failedUnitFlashcards = sortFlashcardsInAuthorsOrderWithRate(Flashcards.getUnitFlashcards(flashcards, unitId, true));
 
 		if (failedUnitFlashcards.length > 0) {
 			const firstFlashcard = failedUnitFlashcards.shift();

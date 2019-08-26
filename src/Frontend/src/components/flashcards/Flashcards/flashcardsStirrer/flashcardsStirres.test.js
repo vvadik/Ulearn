@@ -1,4 +1,4 @@
-import { sortFlashcardsInAuthorsOrder, getNextFlashcardRandomly } from "./flashcardsStirrer";
+import { sortFlashcardsInAuthorsOrderWithRate, getNextFlashcardRandomly } from "./flashcardsStirrer";
 import { rateTypes } from "../../../../consts/rateTypes";
 
 import Flashcard from "./flashcardsStirres.test.base";
@@ -15,7 +15,7 @@ describe('flashcardsStirrer unit sorting should', () => {
 			new Flashcard(),
 		];
 
-		const result = sortFlashcardsInAuthorsOrder(sequence);
+		const result = sortFlashcardsInAuthorsOrderWithRate(sequence);
 
 		expect(result).toEqual(sequence);
 	});
@@ -30,7 +30,7 @@ describe('flashcardsStirrer unit sorting should', () => {
 		];
 		const answer = [sequence[0], sequence[1], sequence[3], sequence[4], sequence[2]];
 
-		const result = sortFlashcardsInAuthorsOrder(sequence);
+		const result = sortFlashcardsInAuthorsOrderWithRate(sequence);
 
 		expect(result).toStrictEqual(answer);
 	});
@@ -45,7 +45,7 @@ describe('flashcardsStirrer unit sorting should', () => {
 		];
 		const answer = [rate1, rate2, rate3, rate4, rate5];
 
-		const result = sortFlashcardsInAuthorsOrder(sequence);
+		const result = sortFlashcardsInAuthorsOrderWithRate(sequence);
 
 		const resultRates = result.reduce((rates, flashcard) => [...rates, flashcard.rate], []);
 		expect(resultRates).toEqual(answer);
@@ -60,7 +60,7 @@ describe('flashcardsStirrer unit sorting should', () => {
 			new Flashcard(rate1),
 		];
 
-		const result = sortFlashcardsInAuthorsOrder(sequence);
+		const result = sortFlashcardsInAuthorsOrderWithRate(sequence);
 
 		expect(result).toEqual(sequence);
 	});
@@ -75,7 +75,7 @@ describe('flashcardsStirrer unit sorting should', () => {
 		];
 		const answer = [sequence[2], sequence[3], sequence[4], sequence[0], sequence[1]];
 
-		const result = sortFlashcardsInAuthorsOrder(sequence);
+		const result = sortFlashcardsInAuthorsOrderWithRate(sequence);
 
 		expect(result).toStrictEqual(answer);
 	});
@@ -112,9 +112,7 @@ describe('flashcardsStirrer course flashcards getter should', () => {
 
 		for (let i = 0; i < 100; i++) {
 			const flashcard = getNextFlashcardRandomly(sequence, maxTLast);
-			if (!meetedIds.has(flashcard.id)) {
-				meetedIds.add(flashcard.id);
-			}
+			meetedIds.add(flashcard.id);
 			maxTLast++;
 			sequence.find(fc => fc.id === flashcard.id).lastRateIndex = maxTLast;
 		}
@@ -122,10 +120,10 @@ describe('flashcardsStirrer course flashcards getter should', () => {
 		expect(meetedIds.size).toBe(sequence.length);
 	});
 
-	test('return null when sequence is empty', () => {
+	test('return empty string when sequence is empty', () => {
 		const result = getNextFlashcardRandomly([], 0);
 
-		expect(result).toBeNull();
+		expect(result).toBe('');
 	});
 
 	test('return card once when sequence contains 1 card', () => {
@@ -138,7 +136,7 @@ describe('flashcardsStirrer course flashcards getter should', () => {
 		const second = getNextFlashcardRandomly(sequence, 3);
 
 		expect(first).toBe(sequence[0]);
-		expect(second).toBeNull();
+		expect(second).toBe('');
 	});
 
 	test('return both card when sequence contains 2 card', () => {
