@@ -14,7 +14,7 @@ namespace GiftsGranter
 	{
 		private readonly string clientAuth;
 		private string authToken;
-		private string passportUri = "https://passport.skbkontur.ru/authz/staff/oauth/token";
+		private string passportUri = "https://passport.skbkontur.ru/v3/connect/token";
 
 		/// <param name="clientAuth">format: "clientId:clientSecret"</param>
 		public StaffClient(string clientAuth)
@@ -70,7 +70,7 @@ namespace GiftsGranter
 				{ "grant_type", "password" },
 				{ "username", username },
 				{ "password", password },
-				{ "scope", "profiles"},
+				{ "scope", "profiles offline_access" },
 			});
 			var client = new HttpClient();
 			AddClientAuthorizationHeader(client);
