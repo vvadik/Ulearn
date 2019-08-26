@@ -4,7 +4,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
-using Ulearn.Core.Extensions;
+using Ulearn.Common.Extensions;
 
 namespace Database.DataContexts
 {
@@ -22,10 +22,15 @@ namespace Database.DataContexts
 		{
 		}
 
-		private IQueryable<UserRole> GetActualUserRolesQueryable()
+		private IEnumerable<UserRole> GetActualUserRoles(string userId = null, string courseId = null)
 		{
-			var all = db.UserRoles
-				.GroupBy(x => x.UserId + x.CourseId + x.Role)
+			IQueryable<UserRole> queryable = db.UserRoles;
+			if (userId != null)
+				queryable = queryable.Where(x => x.UserId == userId);
+			if (courseId != null)
+				queryable = queryable.Where(x => x.CourseId == courseId);
+			var all = queryable.ToList()
+				.GroupBy(x => x.UserId + x.CourseId + x.Role, StringComparer.OrdinalIgnoreCase)
 				.Select(gr => gr.OrderByDescending(x => x.Id))
 				.Select(x => x.FirstOrDefault())
 				.Where(x => x != null && (!x.IsEnabled.HasValue || x.IsEnabled.Value));
@@ -34,9 +39,8 @@ namespace Database.DataContexts
 
 		public Dictionary<string, List<CourseRole>> GetRolesByUsers(string courseId)
 		{
-			var userRoles = GetActualUserRolesQueryable();
+			var userRoles = GetActualUserRoles(courseId: courseId);
 			return userRoles
-				.Where(role => role.CourseId == courseId)
 				.GroupBy(role => role.UserId)
 				.ToDictionary(
 					g => g.Key,
@@ -46,10 +50,9 @@ namespace Database.DataContexts
 
 		public Dictionary<string, CourseRole> GetRoles(string userId)
 		{
-			var userRoles = GetActualUserRolesQueryable();
+			var userRoles = GetActualUserRoles(userId: userId);
 			return userRoles
-				.Where(role => role.UserId == userId)
-				.GroupBy(role => role.CourseId)
+				.GroupBy(role => role.CourseId, StringComparer.OrdinalIgnoreCase)
 				.ToDictionary(g => g.Key, g => g.Select(role => role.Role).Min(), StringComparer.OrdinalIgnoreCase);
 		}
 
@@ -84,14 +87,11 @@ namespace Database.DataContexts
 			if (!courseRole.HasValue)
 				return null;
 
-			var usersQuery = GetActualUserRolesQueryable();
-			usersQuery = includeHighRoles
-				? usersQuery.Where(userRole => userRole.Role <= courseRole)
-				: usersQuery.Where(userRole => userRole.Role == courseRole);
-
-			if (!string.IsNullOrEmpty(courseId))
-				usersQuery = usersQuery.Where(userRole => userRole.CourseId == courseId);
-			return usersQuery.Select(user => user.UserId).Distinct().ToList();
+			var usersRoles = GetActualUserRoles(courseId: courseId.NullIfEmptyOrWhitespace());
+			usersRoles = includeHighRoles
+				? usersRoles.Where(userRole => userRole.Role <= courseRole)
+				: usersRoles.Where(userRole => userRole.Role == courseRole);
+			return usersRoles.Select(user => user.UserId).Distinct().ToList();
 		}
 
 		public List<string> GetListOfUsersByPrivilege(bool onlyPrivileged, string courseId)
@@ -99,15 +99,13 @@ namespace Database.DataContexts
 			if (!onlyPrivileged)
 				return null;
 
-			var usersQuery = GetActualUserRolesQueryable();
-			if (courseId != null)
-				usersQuery = usersQuery.Where(userRole => userRole.CourseId == courseId);
-			return usersQuery.Select(userRole => userRole.UserId).Distinct().ToList();
+			var usersRoles = GetActualUserRoles(courseId: courseId);
+			return usersRoles.Select(userRole => userRole.UserId).Distinct().ToList();
 		}
 
 		public Dictionary<string, Dictionary<CourseRole, List<string>>> GetCoursesForUsers()
 		{
-			return GetActualUserRolesQueryable().ToList()
+			return GetActualUserRoles()
 				.GroupBy(userRole => userRole.UserId)
 				.ToDictionary(
 					g => g.Key,
