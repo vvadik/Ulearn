@@ -107,7 +107,8 @@ namespace Database.DataContexts
 
 		public Dictionary<string, Dictionary<CourseRole, List<string>>> GetCoursesForUsers()
 		{
-			return GetActualUserRolesQueryable().GroupBy(userRole => userRole.UserId)
+			return GetActualUserRolesQueryable().ToList()
+				.GroupBy(userRole => userRole.UserId)
 				.ToDictionary(
 					g => g.Key,
 					g => g
