@@ -55,24 +55,20 @@ namespace Ulearn.VideoAnnotations.Web.Annotations
 					logger.Warning("Not found time-codes for slide \"{title}\". I will skip it", title);
 					continue;
 				}
-				if (annotationLines.Count(line => !line.Trim().StartsWith("*")) == 0)
+				var hasAbstract = true;
+				if (annotationLines.Skip(1).Count(line => !line.Trim().StartsWith("*")) == 0)
 				{
-					logger.Warning("Not found abstract for slide \"{title}\". I will skip it", title);
-					continue;
+					logger.Warning("Not found abstract for slide \"{title}\"", title);
+					hasAbstract = false;
 				}
-				if (annotationLines.TakeWhile(line => !line.Trim().StartsWith("*")).Count() != 2)
+				if (annotationLines.Skip(1).TakeWhile(line => !line.Trim().StartsWith("*")).Count() > 1)
 				{
 					logger.Warning("Abstract can not be multiline. I will skip slide \"{title}\"", title);
 					continue;
 				}
-				if (annotationLines.Count(line => line.Trim().StartsWith("*")) == annotationLines.Count - 1)
-				{
-					logger.Warning("Bad annotation for slide \"{title}\". I will skip it", title);
-					continue;
-				}
 
-				var text = annotationLines[1];
-				var fragments = annotationLines.Skip(2).Select(ParseFragment).ToList();
+				var text = hasAbstract ? annotationLines[1] : null;
+				var fragments = annotationLines.Skip(hasAbstract ? 2 : 1).Select(ParseFragment).ToList();
 				if (fragments.Any(f => f == null))
 					continue;
 

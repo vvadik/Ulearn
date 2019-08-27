@@ -101,12 +101,12 @@
 			}
 		}
 		<script type="text/javascript">
-			$(document).ready(function(e){
-				$('.spoiler_links').click(function(){
+			$(document).ready(function(){
+				$('.spoiler_links').click(function(e){
 					$('.spoiler_body').toggle('normal');
+					e.preventDefault();
 					return false;
 				});
-				e.preventDefault();
 			});
 		</script>
 	</div>
