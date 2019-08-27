@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Ulearn.Common.Api.Models.Responses;
@@ -24,12 +25,19 @@ namespace Ulearn.VideoAnnotations.Web.Controllers
 		[HttpGet(Api.Urls.Annotations)]
 		public async Task<ActionResult<AnnotationsResponse>> Annotations([FromQuery] AnnotationsParameters parameters)
 		{
-			if (! annotationsCache.TryGet(parameters.GoogleDocId, out var annotations))
+			Dictionary<string, Annotation> annotations;
+			if (!annotationsCache.TryGet(parameters.GoogleDocId, out annotations))
 			{
-				var googleDocContent = await googleDocApiClient.GetGoogleDocContentAsync(parameters.GoogleDocId).ConfigureAwait(false);
-				annotations = annotationsParser.ParseAnnotations(googleDocContent);
-			
-				annotationsCache.Add(parameters.GoogleDocId, annotations);
+				lock (annotationsCache)
+				{
+					if (!annotationsCache.TryGet(parameters.GoogleDocId, out annotations))
+					{
+						var googleDocContent = googleDocApiClient.GetGoogleDocContentAsync(parameters.GoogleDocId).Result;
+						annotations = annotationsParser.ParseAnnotations(googleDocContent);
+
+						annotationsCache.Add(parameters.GoogleDocId, annotations);
+					}
+				}
 			}
 
 			if (!annotations.TryGetValue(parameters.VideoId, out var annotation))

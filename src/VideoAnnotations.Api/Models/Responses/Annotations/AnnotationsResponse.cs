@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using JetBrains.Annotations;
 using Ulearn.Common.Api.Models.Responses;
 
 namespace Ulearn.VideoAnnotations.Api.Models.Responses.Annotations
@@ -16,7 +17,7 @@ namespace Ulearn.VideoAnnotations.Api.Models.Responses.Annotations
 	public class Annotation
 	{
 		[DataMember(Name = "text")]
-		public string Text { get; set; }
+		[CanBeNull]public string Text { get; set; }
 
 		[DataMember(Name = "fragments")]
 		public List<AnnotationFragment> Fragments { get; set; }

@@ -8,7 +8,6 @@ using Database.DataContexts;
 using log4net;
 using log4net.Config;
 using Newtonsoft.Json.Linq;
-using Ulearn.Core.Configuration;
 
 namespace GiftsGranter
 {
