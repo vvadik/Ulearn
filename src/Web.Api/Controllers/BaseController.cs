@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Database;
@@ -68,13 +69,16 @@ namespace Ulearn.Web.Api.Controllers
 			return usersRepo.IsSystemAdministrator(user);
 		}
 
-		protected UnitInfo BuildUnitInfo(string courseId, Unit unit)
+		protected UnitInfo BuildUnitInfo(string courseId, Unit unit, bool showInstructorsSlides)
 		{
+			var slides = unit.Slides.Select(slide => BuildSlideInfo(courseId, slide));
+			if (showInstructorsSlides && unit.InstructorNote != null)
+				slides = slides.Concat(new List<ShortSlideInfo> { BuildSlideInfo(courseId, unit.InstructorNote.Slide) });
 			return new UnitInfo
 			{
 				Id = unit.Id,
 				Title = unit.Title,
-				Slides = unit.Slides.Select(slide => BuildSlideInfo(courseId, slide)).ToList()
+				Slides = slides.ToList()
 			};
 		}
 

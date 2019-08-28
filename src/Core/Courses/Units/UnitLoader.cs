@@ -62,7 +62,7 @@ namespace Ulearn.Core.Courses.Units
 				}
 			}
 
-			unit.LoadInstructorNote();
+			unit.LoadInstructorNote(context, firstSlideIndex + unit.Slides.Count);
 
 			return unit;
 		}

@@ -21,5 +21,6 @@ namespace Ulearn.Core.Courses
 		Unit FindUnitById(Guid unitId);
 		Unit GetUnitById(Guid unitId);
 		Unit FindUnitBySlideId(Guid slideId);
+		InstructorNote FindInstructorNoteById(Guid slideId);
 	}
 }
