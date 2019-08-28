@@ -4,6 +4,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 }
 
 .closeButton {
@@ -30,24 +31,32 @@
 }
 
 .unitTitle {
-  margin: 0;
+  margin: 0 0 20px;
 
   font-family: @defaultFonts;
   font-size: 10px;
-  line-height: 30px;
+  line-height: 1.2;
   text-transform: uppercase;
+  font-weight: lighter;
   color: @additionalColor;
 }
 
 .questionFront {
   width: 100%;
+  flex-grow: 6;
 
-  margin: auto;
+  margin: 20px 0;
 
   overflow-y: auto;
-  text-align: center;
   font-size: 32px;
+  line-height: 1.2;
   font-family: @defaultFonts;
+}
+
+.questionFront :global {
+  .tex {
+    font-size: 24px;
+  }
 }
 
 .showAnswerButtonContainer {
@@ -57,7 +66,9 @@
 .backTextContainer {
   max-width: 100%;
 
-  margin: auto;
+  margin: 20px 0;
+
+  flex-grow: 6;
 
   font-family: @defaultFonts;
   font-size: 20px;
@@ -70,8 +81,6 @@
 .questionBack {
   margin-bottom: 25px;
 
-  text-align: center;
-
   font-family: @defaultFonts;
   font-size: 24px;
   line-height: 1.2;
@@ -79,7 +88,7 @@
 }
 
 .theoryLinks {
-  margin-top:20px;
+  margin-top: 20px;
   color: @additionalColor;
 }
 

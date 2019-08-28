@@ -6,14 +6,9 @@ import '../codeTranslator/codemirror.less';
 import 'codemirror/mode/clike/clike';
 import 'codemirror/mode/javascript/javascript';
 
-export default function translateTextareaToCode(textarea, additionalSettings, withMarginAuto) {
+export default function translateTextareaToCode(textarea, additionalSettings) {
 	const cm = CodeMirror.fromTextArea(textarea, { ...additionalSettings, ...defaultSettings });
-
-	if (withMarginAuto) {
-		cm.setSize('50%', 'auto');
-	} else {
-		cm.setSize('auto', 'auto');
-	}
+	cm.setSize('auto', 'auto');
 }
 
 const defaultSettings = {

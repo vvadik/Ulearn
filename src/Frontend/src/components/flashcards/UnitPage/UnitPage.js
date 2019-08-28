@@ -88,20 +88,24 @@ class UnitPage extends Component {
 		const { statistics, totalFlashcardsCount, unitFlashcards } = this.state;
 
 		if (!shouldRenderProgress) {
-			return <Guides guides={ guides }/>;
+			return (
+				<div className={ styles.guidesContainer }>
+					<Guides guides={ guides }/>
+				</div>);
 		}
 
 		return (
 			<footer>
-				<p className={ styles.progressBarTitle }>
-					Результаты последнего прохождения
-				</p>
-				<ProgressBar
-					statistics={ statistics }
-					totalFlashcardsCount={ totalFlashcardsCount }
-				/>
+				<div className={ styles.progressBarContainer }>
+					<p className={ styles.progressBarTitle }>
+						Результаты последнего прохождения
+					</p>
+					<ProgressBar
+						statistics={ statistics }
+						totalFlashcardsCount={ totalFlashcardsCount }
+					/>
+				</div>
 				<ShortQuestions
-					className={ styles.shortQuestions }
 					questionsWithAnswers={ UnitPage.mapFlashcardsToQuestionWithAnswers(unitFlashcards) }
 				/>
 			</footer>

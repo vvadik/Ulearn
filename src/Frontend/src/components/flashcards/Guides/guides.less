@@ -2,11 +2,16 @@
 
 .guidesList {
   counter-reset: guidesCounter;
+  padding-left: 32px;
 }
 
 .guidesElement {
+  max-width: 572px;
+
+  padding: 10px 10px 10px 14px;
+  margin-bottom: 12px;
+
   list-style: none;
-  margin-top: 30px;
 }
 
 .guidesElement::before {
@@ -16,7 +21,7 @@
   position: absolute;
 
   margin-top: -5px;
-  margin-left: -40px;
+  margin-left: -46px;
   padding-top: 4px;
 
   counter-increment: guidesCounter;

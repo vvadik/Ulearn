@@ -3,27 +3,30 @@
 .title {
   font-family: @defaultFonts;
   font-size: 32px;
-  line-height: 40px;
+  line-height: 1.2;
   font-weight: normal;
 
   margin-top: 0;
 }
 
-.shortQuestions {
-  position: relative;
-  top: 25px;
+.progressBarContainer {
+  margin-bottom: 30px;
 }
 
 .progressBarTitle {
-  margin-top: 35px;
-  margin-bottom: 5px;
+  margin-bottom: 13px;
 
   color: @additionalColor;
   font-family: @defaultFonts;
   font-size: 10px;
-  line-height: 30px;
+  line-height: 1.2;
   letter-spacing: 1.2px;
   text-transform: uppercase;
+  font-weight: lighter;
+}
+
+.guidesContainer {
+  margin-left: 28px;
 }
 
 @media (max-width: @maxPhoneWidth) {
@@ -36,5 +39,9 @@
     margin-bottom: 0;
     font-size: 25px;
     line-height: 30px;
+  }
+
+  .guidesContainer {
+    margin-left: 0;
   }
 }
