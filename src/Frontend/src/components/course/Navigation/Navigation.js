@@ -133,7 +133,7 @@ const mapStateToProps = (state) => {
 	const courseId = state.courses.currentCourseId.toLowerCase();
 	const groupsAsStudent = state.account.groupAsStudent;
 	const courseGroupsAsStudent = groupsAsStudent
-		? groupsAsStudent.filter(group => group.courseId === courseId && !group.isArchived)
+		? groupsAsStudent.filter(group => group.courseId.toLowerCase() === courseId && !group.isArchived)
 		: [];
 
 	return { groupsAsStudent: courseGroupsAsStudent, };
