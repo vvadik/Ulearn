@@ -13,7 +13,8 @@ export default function renderLinkToGroupStatement(groupsAsStudent) {
 	const groupsLinks = ['Ведомость '];
 
 	for (let i = 0; i < groupsAsStudent.length; i++) {
-		const { id, courseId, name, } = groupsAsStudent[i];
+		let { id, courseId, name, } = groupsAsStudent[i];
+		courseId = courseId.toLowerCase();
 
 		groupsLinks.push(
 			<Link
