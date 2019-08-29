@@ -6,6 +6,7 @@ import AnyPage from '../../../pages/AnyPage';
 import UnitFlashcardsPage from '../../../pages/course/UnitFlashcardsPage';
 import CourseFlashcardsPage from '../../../pages/course/CourseFlashcardsPage';
 import { flashcards, constructPathToSlide } from '../../../consts/routes';
+import { changeCurrentCourseAction } from "../../../actions/course";
 import { SLIDETYPE } from '../../../consts/general';
 
 import classnames from 'classnames';
@@ -28,6 +29,8 @@ class Course extends Component {
 
 	componentDidMount() {
 		const { loadCourse, loadUserProgress, isAuthenticated, courseId, courseInfo, progress } = this.props;
+
+		changeCurrentCourseAction(courseId);
 
 		if (!courseInfo) {
 			loadCourse(courseId);

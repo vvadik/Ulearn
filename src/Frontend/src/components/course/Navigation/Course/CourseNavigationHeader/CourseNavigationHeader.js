@@ -6,7 +6,7 @@ import LeftIcon from '@skbkontur/react-icons/ArrowChevron2Left';
 
 import { groupAsStudentType } from './../../types';
 
-import renderLinksToGroupsStatements from "../../renderLinksToGroupsStatements";
+import LinksToGroupsStatements from "../../LinksToGroupsStatements/LinksToGroupsStatements";
 
 import styles from './CourseNavigationHeader.less';
 
@@ -21,7 +21,7 @@ class CourseNavigationHeader extends Component {
 
 				{ description && <p className={ styles.description }>{ description }</p> }
 
-				{ renderLinksToGroupsStatements(groupsAsStudent) }
+				{ groupsAsStudent.length > 0 && <LinksToGroupsStatements groupsAsStudent={ groupsAsStudent }/> }
 			</header>
 		);
 	}

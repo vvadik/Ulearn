@@ -29,8 +29,8 @@ export const courseMenuItemType = {
 	isActive: PropTypes.bool,
 };
 
-export const groupAsStudentType ={
-	id: PropTypes.string,
+export const groupAsStudentType = {
+	id: PropTypes.number,
 	courseId: PropTypes.string,
 	name: PropTypes.string,
 	isArchived: PropTypes.bool,

@@ -110,7 +110,7 @@ class Navigation extends Component {
 Navigation.propTypes = {
 	navigationOpened: PropTypes.bool,
 	courseTitle: PropTypes.string,
-	groupAsStudent: PropTypes.arrayOf(PropTypes.shape(groupAsStudentType)),
+	groupsAsStudent: PropTypes.arrayOf(PropTypes.shape(groupAsStudentType)),
 
 	courseId: PropTypes.string,
 	description: PropTypes.string,
@@ -130,8 +130,11 @@ Navigation.propTypes = {
 };
 
 const mapStateToProps = (state) => {
-	const courseId = state.courses.currentCourseId.toLowerCase();
-	const groupsAsStudent = state.account.groupAsStudent;
+	const { currentCourseId } = state.courses;
+	const courseId = currentCourseId
+		? currentCourseId.toLowerCase()
+		: null;
+	const groupsAsStudent = state.account.groupsAsStudent;
 	const courseGroupsAsStudent = groupsAsStudent
 		? groupsAsStudent.filter(group => group.courseId.toLowerCase() === courseId && !group.isArchived)
 		: [];

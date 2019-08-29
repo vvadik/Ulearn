@@ -5,7 +5,7 @@ import Button from "@skbkontur/react-ui/Button";
 import LeftIcon from '@skbkontur/react-icons/ArrowChevron2Left';
 
 import { groupAsStudentType } from "../../types";
-import renderLinksToGroupsStatements from "../../renderLinksToGroupsStatements";
+import LinksToGroupsStatements from "../../LinksToGroupsStatements/LinksToGroupsStatements";
 
 import styles from './NavigationHeader.less';
 
@@ -16,7 +16,7 @@ class NavigationHeader extends Component {
 			<header ref={ (ref) => createRef(ref) } className={ styles.root }>
 				{ this.renderBreadcrumb() }
 				{ this.renderTitle() }
-				{ renderLinksToGroupsStatements(groupsAsStudent) }
+				{ groupsAsStudent.length > 0 && <LinksToGroupsStatements groupsAsStudent={ groupsAsStudent }/> }
 			</header>
 		);
 	}
