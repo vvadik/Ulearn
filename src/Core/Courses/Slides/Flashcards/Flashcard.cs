@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Text;
 using System.Xml.Serialization;
 using Ulearn.Core.Courses.Slides.Blocks;
 
@@ -68,6 +69,49 @@ namespace Ulearn.Core.Courses.Slides.Flashcards
 			foreach (var block in Answer.Blocks)
 			{
 				block.Validate(slideBuildingContext);
+			}
+		}
+
+		public string RenderQuestion()
+		{
+			var content = new StringBuilder();
+			foreach (var block in Question.Blocks)
+			{
+				content.Append(RenderBlock(block));
+			}
+
+			return content.ToString();
+		}
+
+		public string RenderAnswer()
+		{
+			
+			var content = new StringBuilder();
+			foreach (var block in Answer.Blocks)
+			{
+				content.Append(RenderBlock(block));
+			}
+
+			return content.ToString();
+		}
+
+		private string RenderBlock(SlideBlock block)
+		{
+			switch (block)
+			{
+				case MarkdownBlock markdownBlock:
+					return markdownBlock.TryGetText().RenderMarkdown();
+				case CodeBlock codeBlock:
+				{
+					return $"\n<textarea class=\"code code-sample\" data-lang=\"{codeBlock.Language.GetName()}\">{codeBlock.Code}</textarea>";
+				}
+
+				case TexBlock texBlock:
+					var lines = texBlock.TexLines.Select(x => $"<div class=\"tex\">{x.Trim()}</div>");
+					return string.Join("\n", lines);
+					break;
+				default:
+					return block.TryGetText();
 			}
 		}
 	}

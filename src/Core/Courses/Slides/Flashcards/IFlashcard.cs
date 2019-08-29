@@ -12,5 +12,8 @@ namespace Ulearn.Core.Courses.Slides.Flashcards
 		void BuildUp(SlideLoadingContext context, Slide flashcardSlide);
 
 		void Validate(SlideLoadingContext context, Slide flashcardSlide);
+
+		string RenderQuestion();
+		string RenderAnswer();
 	}
 }
