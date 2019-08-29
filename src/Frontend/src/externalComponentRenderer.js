@@ -21,15 +21,15 @@ import CommentsView from "./components/comments/CommentsView/CommentsView";
 import CommentsList from "./components/comments/CommentsList/CommentsList";
 import Comment from "./components/comments/Comment/Comment";
 import CommentSendForm from "./components/comments/CommentSendForm/CommentSendForm";
-
+import CourseToolUnitPage from "./components/flashcards/UnitPage/CourseToolUnitPage";
 /* Define names for all components you want to use */
 const components = {
 	"CommentsView": CommentsView,
 	"CommentsList": CommentsList,
 	"Comment": Comment,
 	"CommentSendForm": CommentSendForm,
+	"CourseToolUnitPage": CourseToolUnitPage
 };
-
 window.renderReactComponent = function (componentType, element, props) {
 	if (components[componentType] === undefined) {
 		throw new Error("Unknown component type: " + componentType + ". Allowed types are: [" + Object.keys(components).join(", ") + "]");
