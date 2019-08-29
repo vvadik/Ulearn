@@ -439,9 +439,6 @@
 		<Content Include="renderer\reactBuild\static\css\main.css">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
-		<Content Include="renderer\reactBuild\static\*">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
 		<Content Include="renderer\reactBuild\static\js\main.js">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
@@ -458,11 +455,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
 		
-    <Content Include="renderer\reactBuild\static\media\*">
-		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
-    
-    <Content Include="renderer\styles\bundle.css">
+		<Content Include="renderer\styles\bundle.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 		<Content Include="renderer\scripts\bundle.js">
@@ -540,5 +533,6 @@
 		<Exec Command="npm run  courseToolBuild" WorkingDirectory="..\Frontend" />
 	</Target>
 	<Target Name="AfterBuild">
+		<Exec Command="powershell -NonInteractive -executionpolicy Unrestricted &quot; Copy-Item -Path '$(ProjectDir)renderer\reactBuild\static\media' -Destination '$(TargetDir)renderer\reactBuild\static\media' -recurse -Force &quot;" />
 	</Target>
 </Project>
