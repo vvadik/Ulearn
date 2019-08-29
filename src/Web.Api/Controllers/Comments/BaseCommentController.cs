@@ -20,6 +20,7 @@ using Ulearn.Web.Api.Controllers.Groups;
 using Ulearn.Web.Api.Models.Common;
 using Ulearn.Web.Api.Models.Responses.Comments;
 using Ulearn.Web.Api.Models.Responses.Groups;
+using ShortGroupInfo = Ulearn.Web.Api.Models.Common.ShortGroupInfo;
 
 namespace Ulearn.Web.Api.Controllers.Comments
 {
@@ -104,17 +105,6 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			}
 
 			return commentInfo;
-		}
-
-		private ShortGroupInfo BuildShortGroupInfo(Group g)
-		{
-			return new ShortGroupInfo
-			{
-				Id = g.Id,
-				Name = g.Name,
-				IsArchived = g.IsArchived,
-				ApiUrl = Url.Action(new UrlActionContext { Action = nameof(GroupController.Group), Controller = "Group", Values = new { groupId = g.Id }})
-			};
 		}
 
 		private string RenderCommentTextToHtml(string commentText)

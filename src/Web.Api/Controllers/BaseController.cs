@@ -8,6 +8,7 @@ using Database.Models.Comments;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Serilog;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
@@ -16,6 +17,7 @@ using Ulearn.Core.Courses.Slides.Flashcards;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
 using Ulearn.Core.Courses.Units;
+using Ulearn.Web.Api.Controllers.Groups;
 using Ulearn.Web.Api.Models.Common;
 using Ulearn.Web.Api.Models.Responses.Notifications;
 
@@ -141,6 +143,17 @@ namespace Ulearn.Web.Api.Controllers
 				PublishTime = comment.PublishTime,
 				Author = BuildShortUserInfo(comment.Author),
 				Text = comment.Text,
+			};
+		}
+		
+		protected ShortGroupInfo BuildShortGroupInfo(Group g)
+		{
+			return new ShortGroupInfo
+			{
+				Id = g.Id,
+				Name = g.Name,
+				IsArchived = g.IsArchived,
+				ApiUrl = Url.Action(new UrlActionContext { Action = nameof(GroupController.Group), Controller = "Group", Values = new { groupId = g.Id }})
 			};
 		}
 	}
