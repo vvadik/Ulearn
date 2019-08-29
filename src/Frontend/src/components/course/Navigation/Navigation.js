@@ -4,12 +4,13 @@ import { connect } from "react-redux";
 
 import NavigationHeader from './Unit/NavigationHeader';
 import NavigationContent from './Unit/NavigationContent';
-import { courseMenuItemType, menuItemType } from './types';
 import NextUnit from "./Unit/NextUnit";
 
 import CourseNavigationHeader from "./Course/CourseNavigationHeader";
 import CourseNavigationContent from "./Course/CourseNavigationContent";
 import Flashcards from "./Course/Flashcards/Flashcards";
+
+import { courseMenuItemType, menuItemType, groupAsStudentType } from './types';
 import { flashcards } from "../../../consts/routes";
 
 import { toggleNavigation } from "../../../actions/navigation";
@@ -63,13 +64,17 @@ class Navigation extends Component {
 	}
 
 	renderUnitNavigation() {
-		const { unitTitle, courseTitle, onCourseClick, unitItems, nextUnit, toggleNavigation, } = this.props;
+		const { unitTitle, courseTitle, onCourseClick, unitItems, nextUnit, toggleNavigation, groupsAsStudent, } = this.props;
 
 		return (
 			<div className={ styles.contentWrapper }>
-				< NavigationHeader createRef={ (ref) => this.unitHeaderRef = ref } title={ unitTitle }
-								   courseName={ courseTitle }
-								   onCourseClick={ onCourseClick }/>
+				< NavigationHeader
+					createRef={ (ref) => this.unitHeaderRef = ref }
+					title={ unitTitle }
+					courseName={ courseTitle }
+					onCourseClick={ onCourseClick }
+					groupsAsStudent={ groupsAsStudent }
+				/>
 				< NavigationContent items={ unitItems } toggleNavigation={ toggleNavigation }/>
 				{ nextUnit && <NextUnit unit={ nextUnit } toggleNavigation={ this.handleToggleNavigation }
 				/> }
@@ -84,11 +89,15 @@ class Navigation extends Component {
 	};
 
 	renderCourseNavigation() {
-		const { courseTitle, description, courseItems, containsFlashcards, courseId, slideId, toggleNavigation } = this.props;
+		const { courseTitle, description, courseItems, containsFlashcards, courseId, slideId, toggleNavigation, groupsAsStudent } = this.props;
 
 		return (
 			<div className={ styles.contentWrapper }>
-				<CourseNavigationHeader title={ courseTitle } description={ description }/>
+				<CourseNavigationHeader
+					title={ courseTitle }
+					description={ description }
+					groupsAsStudent={ groupsAsStudent }
+				/>
 				{ courseItems && courseItems.length && <CourseNavigationContent items={ courseItems }/> }
 				{ containsFlashcards &&
 				<Flashcards toggleNavigation={ toggleNavigation } courseId={ courseId }
@@ -101,6 +110,7 @@ class Navigation extends Component {
 Navigation.propTypes = {
 	navigationOpened: PropTypes.bool,
 	courseTitle: PropTypes.string,
+	groupAsStudent: PropTypes.arrayOf(PropTypes.shape(groupAsStudentType)),
 
 	courseId: PropTypes.string,
 	description: PropTypes.string,
@@ -116,12 +126,17 @@ Navigation.propTypes = {
 	}),
 
 	onCourseClick: PropTypes.func,
-
 	toggleNavigation: PropTypes.func,
 };
 
 const mapStateToProps = (state) => {
-	return {};
+	const courseId = state.courses.currentCourseId;
+	const groupsAsStudent = state.account.groupAsStudent;
+	const courseGroupsAsStudent = groupsAsStudent
+		? groupsAsStudent.filter(group => group.courseId === courseId && !group.isArchived)
+		: [];
+
+	return { groupsAsStudent: courseGroupsAsStudent, };
 };
 
 const mapDispatchToProps = (dispatch) => ({

@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import styles from './NavigationItem.less';
-import classnames from 'classnames';
+
+import Copy from "@skbkontur/react-icons/Copy";
+
 import { SLIDETYPE } from '../../../../../consts/general';
 import { menuItemType } from '../../types';
-import { toggleNavigation } from "../../../../../actions/navigation";
-import { connect } from "react-redux";
-import Copy from "@skbkontur/react-icons/Copy";
+import classnames from 'classnames';
+
+import styles from './NavigationItem.less';
 
 const icons = {
 	[SLIDETYPE.quiz]: '?',
