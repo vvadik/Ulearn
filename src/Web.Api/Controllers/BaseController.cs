@@ -152,6 +152,7 @@ namespace Ulearn.Web.Api.Controllers
 			{
 				Id = g.Id,
 				Name = g.Name,
+				CourseId = g.CourseId,
 				IsArchived = g.IsArchived,
 				ApiUrl = Url.Action(new UrlActionContext { Action = nameof(GroupController.Group), Controller = "Group", Values = new { groupId = g.Id }})
 			};
