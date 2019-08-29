@@ -421,7 +421,15 @@
                     <xs:element name="hideSolutions" type="xs:boolean" minOccurs="1" maxOccurs="1" />
                     <xs:element name="checkForPlagiarism" type="xs:boolean" minOccurs="0" maxOccurs="1" />
                     <xs:element name="hideExpectedOutput" type="xs:boolean" minOccurs="1" maxOccurs="1" />
-                    <xs:element name="validator" type="NonEmptyString" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="validator" minOccurs="1" maxOccurs="1" >
+						<xs:complexType>
+							<xs:simpleContent>
+								<xs:extension base="xs:string">
+									<xs:attribute name="removeDefaults" type="xs:boolean" use="optional" />
+								</xs:extension>
+							</xs:simpleContent>
+						</xs:complexType>
+                    </xs:element>
                 </xs:choice>
                 <xs:attribute name="type" use="optional">
                     <xs:simpleType>
