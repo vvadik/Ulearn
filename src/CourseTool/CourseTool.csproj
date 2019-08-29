@@ -436,11 +436,17 @@
     <Content Include="renderer\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="renderer\fonts\glyphicons-halflings-regular.woff" />
     <Content Include="renderer\fonts\glyphicons-halflings-regular.woff2" />
-		<Content Include="renderer\reactBuild\static\css\*">
+		<Content Include="renderer\reactBuild\static\css\main.css">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="renderer\reactBuild\static\*">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
-		<Content Include="renderer\reactBuild\static\js\*">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		<Content Include="renderer\reactBuild\static\js\main.js">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="renderer\reactBuild\static\js\oldBrowser.js">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
    
     <Content Include="examples\video.json">
@@ -451,7 +457,11 @@
     <Content Include="renderer\favicon.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-   
+		
+    <Content Include="renderer\reactBuild\static\media\*">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+    
     <Content Include="renderer\styles\bundle.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -524,9 +534,10 @@
   <Import Project="..\packages\OctoPack.3.6.3\build\OctoPack.targets" Condition="Exists('..\packages\OctoPack.3.6.3\build\OctoPack.targets')" />
 	
 	<Target Name="BeforeBuild">
+		<Message Text="### BeforeBuild ###" Importance="high" />
 		<Exec Command="powershell -NonInteractive -executionpolicy Unrestricted &quot; $A = cat $(SolutionDir)uLearn.Web\LibrariesScripts.txt;$B = cat $(SolutionDir)uLearn.Web\UlearnScripts.txt;$A = $A+$B;for ($i = 0; $i -le ($A.length - 1); $i += 1) {$A[$i]='$(SolutionDir)ulearn.Web\'+$A[$i]};cat $A | Out-File -Encoding 'UTF8' -FilePath $(ProjectDir)renderer\scripts\bundle.js; &quot;" />
 		<Exec Command="powershell -NonInteractive -executionpolicy Unrestricted &quot; $A = cat $(SolutionDir)uLearn.Web\UlearnStyles.txt;for ($i = 0; $i -le ($A.length - 1); $i += 1) {$A[$i]='$(SolutionDir)ulearn.Web\'+$A[$i]};cat $A | Out-File -Encoding 'UTF8' -FilePath $(ProjectDir)renderer\styles\bundle.css; &quot;" />
-		<Exec Command="npm run courseToolBuild" WorkingDirectory="..\Frontend" />
+		<Exec Command="npm run  courseToolBuild" WorkingDirectory="..\Frontend" />
 	</Target>
 	<Target Name="AfterBuild">
 	</Target>

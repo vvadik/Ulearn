@@ -215,6 +215,8 @@ WriteAttributeTo(__razor_helper_writer, "src", Tuple.Create(" src=\'", 2900), Tu
 , 2906), false)
 );
 
+WriteLiteralTo(__razor_helper_writer, " type=\'application/javascript\'");
+
 WriteLiteralTo(__razor_helper_writer, "></script>\r\n");
 
 		}
