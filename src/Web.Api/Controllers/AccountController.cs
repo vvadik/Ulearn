@@ -200,7 +200,7 @@ namespace Ulearn.Web.Api.Controllers
 					Role = kvp.Value,
 				}).ToList(),
 				CourseAccesses = courseAccessesByCourseId,
-				GroupsAsStudent = groupsWhereIAmStudent.Select(BuildShortGroupInfo).ToList()
+				GroupsAsStudent = groupsWhereIAmStudent.Where(g => g.CanUsersSeeGroupProgress).Select(BuildShortGroupInfo).ToList()
 			};
 		}
 
