@@ -1,0 +1,35 @@
+@import "../../../variables";
+
+.root {
+  display: flex;
+  max-width: 100vw;
+}
+
+.pageWrapper {
+  position: relative;
+
+  width: 100%;
+  max-width: 100vw;
+
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+@media (min-width: @maxPhoneWidth) {
+  .pageWrapper {
+    max-width: calc(100vw - 40px - 250px);
+    padding-top: 28px;
+  }
+}
+
+@media (min-width: @maxLaptopWidth) {
+  .pageWrapper {
+    max-width: 862px;
+    padding-left: 32px;
+    padding-top: 40px;
+  }
+
+  .root {
+    max-width: calc(100vw - 20px);
+  }
+}

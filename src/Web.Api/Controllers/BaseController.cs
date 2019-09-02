@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Database;
@@ -7,12 +8,16 @@ using Database.Models.Comments;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Serilog;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Flashcards;
 using Ulearn.Core.Courses.Slides.Quizzes;
+using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
 using Ulearn.Core.Courses.Units;
+using Ulearn.Web.Api.Controllers.Groups;
 using Ulearn.Web.Api.Models.Common;
 using Ulearn.Web.Api.Models.Responses.Notifications;
 
@@ -43,7 +48,7 @@ namespace Ulearn.Web.Api.Controllers
 		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
 		{
 			DisableEfChangesTrackingForGetRequests(context);
-			
+
 			await next().ConfigureAwait(false);
 		}
 
@@ -66,13 +71,16 @@ namespace Ulearn.Web.Api.Controllers
 			return usersRepo.IsSystemAdministrator(user);
 		}
 
-		protected UnitInfo BuildUnitInfo(string courseId, Unit unit)
+		protected UnitInfo BuildUnitInfo(string courseId, Unit unit, bool showInstructorsSlides)
 		{
+			var slides = unit.Slides.Select(slide => BuildSlideInfo(courseId, slide));
+			if (showInstructorsSlides && unit.InstructorNote != null)
+				slides = slides.Concat(new List<ShortSlideInfo> { BuildSlideInfo(courseId, unit.InstructorNote.Slide) });
 			return new UnitInfo
 			{
 				Id = unit.Id,
 				Title = unit.Title,
-				Slides = unit.Slides.Select(slide => BuildSlideInfo(courseId, slide)).ToList()
+				Slides = slides.ToList()
 			};
 		}
 
@@ -85,7 +93,10 @@ namespace Ulearn.Web.Api.Controllers
 				Slug = slide.Url,
 				ApiUrl = Url.Action(nameof(SlidesController.SlideInfo), "Slides", new { courseId = courseId, slideId = slide.Id }),
 				MaxScore = slide.MaxScore,
-				Type = GetSlideType(slide)
+				Type = GetSlideType(slide),
+				QuestionsCount = slide.Blocks.OfType<AbstractQuestionBlock>().Count(),
+
+				// TODO: кол-во попыток
 			};
 		}
 
@@ -97,12 +108,14 @@ namespace Ulearn.Web.Api.Controllers
 					return SlideType.Exercise;
 				case QuizSlide _:
 					return SlideType.Quiz;
+				case FlashcardSlide _:
+					return SlideType.Flashcards;
 				default:
 					return SlideType.Lesson;
 			}
 		}
 
-		protected ShortUserInfo BuildShortUserInfo(ApplicationUser user, bool discloseLogin=false, bool discloseEmail=false)
+		protected ShortUserInfo BuildShortUserInfo(ApplicationUser user, bool discloseLogin = false, bool discloseEmail = false)
 		{
 			return new ShortUserInfo
 			{
@@ -115,13 +128,13 @@ namespace Ulearn.Web.Api.Controllers
 				AvatarUrl = user.AvatarUrl,
 				Gender = user.Gender,
 			};
-		}		
+		}
 
 		protected NotificationCommentInfo BuildNotificationCommentInfo(Comment comment)
 		{
 			if (comment == null)
 				return null;
-			
+
 			return new NotificationCommentInfo
 			{
 				Id = comment.Id,
@@ -130,6 +143,18 @@ namespace Ulearn.Web.Api.Controllers
 				PublishTime = comment.PublishTime,
 				Author = BuildShortUserInfo(comment.Author),
 				Text = comment.Text,
+			};
+		}
+		
+		protected ShortGroupInfo BuildShortGroupInfo(Group g)
+		{
+			return new ShortGroupInfo
+			{
+				Id = g.Id,
+				Name = g.Name,
+				CourseId = g.CourseId,
+				IsArchived = g.IsArchived,
+				ApiUrl = Url.Action(new UrlActionContext { Action = nameof(GroupController.Group), Controller = "Group", Values = new { groupId = g.Id }})
 			};
 		}
 	}

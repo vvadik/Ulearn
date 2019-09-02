@@ -305,7 +305,10 @@ namespace Ulearn.Core.Courses.Slides
 		Quiz,
 		
 		[XmlEnum("exercise")]
-		Exercise
+		Exercise,
+		
+		[XmlEnum("flashcards")]
+		Flashcards
 	}
 
 	class EdxScoringGroupsHack

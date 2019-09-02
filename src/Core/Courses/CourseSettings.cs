@@ -38,6 +38,9 @@ namespace Ulearn.Core.Courses
 
 		[XmlElement("dictionaryFile")]
 		public string DictionaryFile { get; set; }
+		
+		[XmlElement("description")]
+		public string Description { get; set; }
 
 		public static CourseSettings DefaultSettings => new CourseSettings(
 			null,

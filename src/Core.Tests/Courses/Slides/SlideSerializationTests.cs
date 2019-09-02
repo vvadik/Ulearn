@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.IO;
 using NUnit.Framework;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Courses.Slides.Flashcards;
 
 namespace Ulearn.Core.Tests.Courses.Slides
 {
@@ -22,6 +23,12 @@ namespace Ulearn.Core.Tests.Courses.Slides
 		{
 			var slideFile = new DirectoryInfo(testDataDirectory).GetFile(filename);
 			return slideFile.DeserializeXml<Slide>();
+		}
+		
+		private static FlashcardSlide DeserializeFlashcardSlideFromXmlFile(string filename)
+		{
+			var slideFile = new DirectoryInfo(testDataDirectory).GetFile(filename);
+			return slideFile.DeserializeXml<FlashcardSlide>();
 		}
 
         [Test]
@@ -84,6 +91,35 @@ namespace Ulearn.Core.Tests.Courses.Slides
             Assert.AreEqual(3, ((MarkdownBlock) slide.Blocks[3]).InnerBlocks.Length);
             Assert.AreEqual("\r\nПривет, это маркдаун блок.", ((MarkdownBlock) slide.Blocks[0]).Markdown);
         }
+		
+		[Test]
+		public void DeserializeFlashcardSlideWithMarkdownBlocks()
+		{
+			var slide = DeserializeFlashcardSlideFromXmlFile("SimpleFlashcardSlide.xml");
+			var flashcard = slide.FlashcardsList[0];
+			
+			var questionBlock = flashcard.Question.Blocks[0];
+			var answerBlock = flashcard.Answer.Blocks[0];
+			foreach (var block in flashcard.Answer.Blocks)
+				Assert.AreEqual(typeof (MarkdownBlock), block.GetType());
+			foreach (var block in flashcard.Question.Blocks)
+				Assert.AreEqual(typeof (MarkdownBlock), block.GetType());
+			Assert.AreEqual("\r\nI am question markdown block!",questionBlock.TryGetText());
+			Assert.AreEqual("\r\nI am answer markdown block!",answerBlock.TryGetText());
+		}
+		
+		[Test]
+		public void DeserializeFlashcardSlideWithDifferentBlocks()
+		{
+			var slide = DeserializeFlashcardSlideFromXmlFile("SimpleFlashcardsSlideWithDifferentBlocks.xml");
+			var flashcard = slide.FlashcardsList[0];
+
+			var questionBlocks = flashcard.Question.Blocks;
+			var answerBlocks = flashcard.Answer.Blocks;
+			Assert.AreEqual(typeof (MarkdownBlock), questionBlocks[0].GetType());
+			Assert.AreEqual(typeof (TexBlock), questionBlocks[1].GetType());
+			Assert.AreEqual(typeof (CodeBlock), questionBlocks[2].GetType());
+		}
 
         [Test]
         public void DeserializeSlideWithDifferentBlocks()

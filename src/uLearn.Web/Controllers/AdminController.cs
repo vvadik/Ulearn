@@ -2,6 +2,7 @@ using log4net;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using System.Globalization;
 using System.IO;
@@ -269,9 +270,9 @@ namespace uLearn.Web.Controllers
 				{
 					errorMessage += $"\n\n{error.InnerException.Message}";
 					error = error.InnerException;
-				}
+				} 
+				return Packages(courseId, errorMessage);
 
-				return RedirectToAction("Packages", new { courseId, error=errorMessage });
 			}
 			
 			return RedirectToAction("Diagnostics", new { courseId, versionId });
@@ -375,11 +376,14 @@ namespace uLearn.Web.Controllers
 					error = error.InnerException;
 				}
 
+				return Packages(courseId, errorMessage);
 				return RedirectToAction("Packages", new { courseId, error=errorMessage });
 			}
 			
 			return RedirectToAction("Diagnostics", new { courseId, versionId });
 		}
+		
+		
 
 		private async Task<(Guid versionId, Exception error)> UploadCourse(string courseId, byte[] content, string userId,
 			string uploadedFromRepoUrl = null, CommitInfo commitInfo = null, string pathToCourseXmlInRepo = null)
@@ -852,6 +856,9 @@ namespace uLearn.Web.Controllers
 			var version = courseManager.GetVersion(versionIdGuid);
 
 			var courseDiff = new CourseDiff(course, version);
+			var schemaPath = Path.Combine(HttpRuntime.BinDirectory, "schema.xsd");
+			var validator = new XmlValidator(schemaPath);
+			var warnings = validator.ValidateSlidesFiles(version.Slides.Select(x => x.Info.SlideFile).ToList());
 
 			return View(new DiagnosticsModel
 			{
@@ -859,6 +866,7 @@ namespace uLearn.Web.Controllers
 				IsDiagnosticsForVersion = true,
 				VersionId = versionIdGuid,
 				CourseDiff = courseDiff,
+				Warnings = warnings
 			});
 		}
 
@@ -1530,6 +1538,7 @@ namespace uLearn.Web.Controllers
 		public bool OpenStep1 { get; set; }
 		public bool OpenStep2 { get; set; }
 		public string GitSecret { get; set; }
+		
 		public string Error { get; set; }
 		public string HelpUrl { get; set; } = "https://docs.google.com/document/d/1tL_D2SGIv163GpVVr5HrZTBEgcMk5shCKN5J6le4pTc/edit?usp=sharing";
 	}
@@ -1572,10 +1581,10 @@ namespace uLearn.Web.Controllers
 	public class DiagnosticsModel
 	{
 		public string CourseId { get; set; }
-
 		public bool IsDiagnosticsForVersion { get; set; }
 		public bool IsVersionPublished { get; set; }
 		public Guid VersionId { get; set; }
 		public CourseDiff CourseDiff { get; set; }
+		public string Warnings { get; set; }
 	}
 }

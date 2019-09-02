@@ -46,7 +46,10 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult SlideComments(string courseId, Guid slideId, bool showOnlyInstructorsOnlyComments=false)
 		{
-			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
+			var course = courseManager.GetCourse(courseId);
+			var slide = course.FindSlideById(slideId);
+			if (slide == null)
+				return Content("");
 			var comments = commentsRepo.GetSlideComments(courseId, slideId).ToList();
 			var commentsPolicy = commentsRepo.GetCommentsPolicy(courseId);
 

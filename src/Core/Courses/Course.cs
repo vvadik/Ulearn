@@ -5,6 +5,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Units;
 
 namespace Ulearn.Core.Courses
@@ -46,6 +47,13 @@ namespace Ulearn.Core.Courses
 				throw new NotFoundException($"No slide with id {slideId}");
 			return slide;
 		}
+		
+		[CanBeNull]
+		public InstructorNote FindInstructorNoteById(Guid slideId)
+		{
+			var unitWithId = FindUnitById(slideId);
+			return unitWithId?.InstructorNote;
+		}
 
 		[CanBeNull]
 		public Unit FindUnitById(Guid unitId)
@@ -82,20 +90,29 @@ namespace Ulearn.Core.Courses
 
 	public class InstructorNote
 	{
-		public InstructorNote(string markdown, Unit unit, FileInfo file)
+		public InstructorNote(string markdown, Unit unit, FileInfo file, CourseLoadingContext courseLoadingContext, int slideIndex)
 		{
 			Markdown = markdown;
 			Unit = unit;
 			File = file;
+			Slide = new Slide(new MarkdownBlock(Markdown) { Hide = true })
+			{
+				Id = Unit.Id,
+				Title = "Заметки преподавателю"
+			};
+			var slideLoadingContext = new SlideLoadingContext(courseLoadingContext, unit, file, slideIndex);
+			Slide.BuildUp(slideLoadingContext);
+			Slide.Validate(slideLoadingContext);
 		}
 
-		public static InstructorNote Load(FileInfo file, Unit unit)
+		public static InstructorNote Load(CourseLoadingContext context, FileInfo file, Unit unit, int slideIndex)
 		{
-			return new InstructorNote(file.ContentAsUtf8(), unit, file);
+			return new InstructorNote(file.ContentAsUtf8(), unit, file, context, slideIndex);
 		}
 
 		public string Markdown;
 		public Unit Unit;
 		public FileInfo File;
+		public Slide Slide;
 	}
 }

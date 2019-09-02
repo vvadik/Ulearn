@@ -1528,6 +1528,58 @@ namespace Database.Migrations
                     b.ToTable("UserExerciseSubmissions");
                 });
 
+            modelBuilder.Entity("Database.Models.UserFlashcardsUnlocking", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CourseId")
+                        .IsRequired()
+                        .HasMaxLength(64);
+
+                    b.Property<Guid>("UnitId");
+
+                    b.Property<string>("UserId")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "CourseId", "UnitId");
+
+                    b.ToTable("UserFlashcardsUnlocking");
+                });
+
+            modelBuilder.Entity("Database.Models.UserFlashcardsVisit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CourseId")
+                        .IsRequired()
+                        .HasMaxLength(64);
+
+                    b.Property<string>("FlashcardId")
+                        .IsRequired()
+                        .HasMaxLength(64);
+
+                    b.Property<int>("Rate");
+
+                    b.Property<DateTime>("Timestamp");
+
+                    b.Property<Guid>("UnitId");
+
+                    b.Property<string>("UserId")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "CourseId", "UnitId", "FlashcardId");
+
+                    b.ToTable("UserFlashcardsVisits");
+                });
+
             modelBuilder.Entity("Database.Models.UserQuestion", b =>
                 {
                     b.Property<int>("QuestionId")
@@ -2535,6 +2587,22 @@ namespace Database.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Database.Models.UserFlashcardsUnlocking", b =>
+                {
+                    b.HasOne("Database.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Database.Models.UserFlashcardsVisit", b =>
+                {
+                    b.HasOne("Database.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Database.Models.UserQuestion", b =>

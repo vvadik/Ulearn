@@ -21,10 +21,9 @@
 @if (Model.ManualChecking == null)
 {
 	mainDivClass = "slide-container";
-	@Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId, slideId = Model.Slide.Id })
 }
 
-<div class="@mainDivClass">
+<div class="@mainDivClass" >
 	<div class="container body-content">
 		<div class="row">
 			<div class="slide">

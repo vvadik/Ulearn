@@ -47,7 +47,8 @@ export function getRoles() {
 				type: 'ACCOUNT__USER_ROLES_UPDATED',
 				isSystemAdministrator: json.isSystemAdministrator,
 				roleByCourse: courseRolesObject,
-				accessesByCourse: courseAccessesObject
+				accessesByCourse: courseAccessesObject,
+				groupsAsStudent: json.groupsAsStudent,
 			})
 		})
 	}

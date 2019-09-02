@@ -10,7 +10,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Ulearn.Common.Api.Models.Responses;
+using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides.Flashcards;
 using Ulearn.Web.Api.Models.Common;
 using Ulearn.Web.Api.Models.Responses.Courses;
 
@@ -21,12 +23,15 @@ namespace Ulearn.Web.Api.Controllers
 	{
 		private readonly ICoursesRepo coursesRepo;
 		private readonly ICourseRolesRepo courseRolesRepo;
+		private readonly IUnitsRepo unitsRepo;
 
-		public CoursesController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, ICoursesRepo coursesRepo, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo)
+		public CoursesController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, ICoursesRepo coursesRepo,
+			IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, IUnitsRepo unitsRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.coursesRepo = coursesRepo;
 			this.courseRolesRepo = courseRolesRepo;
+			this.unitsRepo = unitsRepo;
 		}
 
 		/// <summary>
@@ -74,16 +79,24 @@ namespace Ulearn.Web.Api.Controllers
 		/// Информация о курсе
 		/// </summary>
 		[HttpGet("{courseId}")]
-		public ActionResult<CourseInfo> CourseInfo(Course course)
+		public async Task<ActionResult<CourseInfo>> CourseInfo(Course course)
 		{
 			if (course == null)
 				return Json(new { status = "error", message = "Course not found" });
 			
+			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
+			var containsFlashcards = course.Units.Any(x => x.Slides.OfType<FlashcardSlide>().Any());
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(User.GetUserId(), course.Id, CourseRoleType.Instructor).ConfigureAwait(false);
+			var showInstructorsSlides = isInstructor;
+
 			return new CourseInfo
 			{
 				Id = course.Id,
 				Title = course.Title,
-				Units = course.Units.Select(unit => BuildUnitInfo(course.Id, unit)).ToList()
+				Description = course.Settings.Description,
+				NextUnitPublishTime = unitsRepo.GetNextUnitPublishTime(course.Id),
+				Units = visibleUnits.Select(unit => BuildUnitInfo(course.Id, unit, showInstructorsSlides)).ToList(),
+				ContainsFlashcards = containsFlashcards
 			};
 		}
 	}

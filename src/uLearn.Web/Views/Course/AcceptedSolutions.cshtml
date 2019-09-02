@@ -6,8 +6,6 @@
 }
 @if (!Model.IsLti)
 {
-	@Html.Action("TableOfContents", "SlideNavigation", new { courseId = Model.CourseId })
-
 	<div class="slide-container">
 		<div class="container body-content">
 			<div class="row">

@@ -1,4 +1,7 @@
-import { combineReducers } from "redux"
+import { combineReducers } from "redux";
+import courseReducer from "./course";
+import userReducer from "./user";
+import navigationReducer from "./navigation";
 
 const initialAccountState = {
 	isAuthenticated: false,
@@ -6,13 +9,14 @@ const initialAccountState = {
 	accountProblems: [],
 	systemAccesses: [],
 	roleByCourse: {},
-	accessesByCourse: {}
+	accessesByCourse: {},
+	groupsAsStudent: [],
 };
 
 function account(state = initialAccountState, action) {
 	switch (action.type) {
 		case 'ACCOUNT__USER_INFO_UPDATED':
-			let newState = {...state};
+			let newState = { ...state };
 			newState.isAuthenticated = action.isAuthenticated;
 			if (newState.isAuthenticated) {
 				newState.id = action.id;
@@ -30,29 +34,8 @@ function account(state = initialAccountState, action) {
 				...state,
 				isSystemAdministrator: action.isSystemAdministrator,
 				roleByCourse: action.roleByCourse,
-				accessesByCourse: action.accessesByCourse
-			};
-		default:
-			return state;
-	}
-}
-
-const initialCoursesState = {
-	courseById: {},
-	currentCourseId: undefined,
-};
-
-function courses(state = initialCoursesState, action) {
-	switch (action.type) {
-		case 'COURSES__UPDATED':
-			return {
-				...state,
-				courseById: action.courseById
-			};
-		case 'COURSES__COURSE_ENTERED':
-			return {
-				...state,
-				currentCourseId: action.courseId
+				accessesByCourse: action.accessesByCourse,
+				groupsAsStudent: action.groupsAsStudent,
 			};
 		default:
 			return state;
@@ -84,8 +67,10 @@ function notifications(state = initialNotificationsState, action) {
 
 const rootReducer = combineReducers({
 	account,
-	courses,
-	notifications
+	courses: courseReducer,
+	user: userReducer,
+	notifications,
+	navigation: navigationReducer,
 });
 
 export default rootReducer;

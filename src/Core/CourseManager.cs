@@ -217,8 +217,11 @@ namespace Ulearn.Core
 		{
 			using (var zip = ZipFile.Read(zipFile.FullName, new ReadOptions { Encoding = Encoding.GetEncoding(866) }))
 			{
+				log.Info($"Очищаю директорию {unpackDirectory.FullName}");
 				unpackDirectory.ClearDirectory();
+				log.Info($"Директория {unpackDirectory.FullName} очищена");
 				zip.ExtractAll(unpackDirectory.FullName, ExtractExistingFileAction.OverwriteSilently);
+				log.Info($"Архив {zipFile.FullName} распакован");
 			}
 		}
 
@@ -228,6 +231,7 @@ namespace Ulearn.Core
 			var courseDir = coursesDirectory.CreateSubdirectory(courseOrVersionId);
 			log.Info($"Распаковываю архив с курсом из {zipFile.FullName} в {courseDir.FullName}");
 			UnzipFile(zipFile, courseDir);
+			log.Info($"Распаковал архив с курсом из {zipFile.FullName} в {courseDir.FullName}");
 			return courseDir;
 		}
 
@@ -443,7 +447,9 @@ namespace Ulearn.Core
 		public void WaitWhileCourseIsLocked(string courseId)
 		{
 			LockCourse(courseId);
+			log.Info($"Course is locked {courseId}");
 			ReleaseCourse(courseId);
+			log.Info($"Course lock released {courseId}");
 		}
 
 		public void MoveCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)

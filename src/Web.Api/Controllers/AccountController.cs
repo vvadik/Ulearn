@@ -10,16 +10,19 @@ using Database.Extensions;
 using Database.Models;
 using Database.Repos;
 using Database.Repos.CourseRoles;
+using Database.Repos.Groups;
 using Database.Repos.SystemAccessesRepo;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Authorization;
+using Ulearn.Web.Api.Models.Parameters;
 using Ulearn.Web.Api.Models.Responses.Account;
 using Web.Api.Configuration;
 
@@ -33,10 +36,12 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly ICoursesRepo coursesRepo;
 		private readonly ISystemAccessesRepo systemAccessesRepo;
+		private readonly IGroupMembersRepo groupMembersRepo;
 		private readonly WebApiConfiguration configuration;
 
-		public AccountController(ILogger logger, IOptions<WebApiConfiguration> options, WebCourseManager courseManager, UlearnDb db, UlearnUserManager userManager, SignInManager<ApplicationUser> signInManager,
-			ICourseRolesRepo courseRolesRepo, ICoursesRepo coursesRepo, IUsersRepo usersRepo, ISystemAccessesRepo systemAccessesRepo)
+		public AccountController(ILogger logger, IOptions<WebApiConfiguration> options, WebCourseManager courseManager, UlearnDb db,
+			UlearnUserManager userManager, SignInManager<ApplicationUser> signInManager,
+			ICourseRolesRepo courseRolesRepo, ICoursesRepo coursesRepo, IUsersRepo usersRepo, ISystemAccessesRepo systemAccessesRepo, IGroupMembersRepo groupMembersRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.userManager = userManager;
@@ -44,6 +49,7 @@ namespace Ulearn.Web.Api.Controllers
 			this.courseRolesRepo = courseRolesRepo;
 			this.coursesRepo = coursesRepo;
 			this.systemAccessesRepo = systemAccessesRepo;
+			this.groupMembersRepo = groupMembersRepo;
 			this.configuration = options.Value;
 		}
 
@@ -100,7 +106,7 @@ namespace Ulearn.Web.Api.Controllers
 			var expires = DateTime.Now.AddHours(configuration.Web.Authentication.Jwt.LifeTimeHours);
 			return GetTokenInternal(expires, claims);
 		}
-		
+
 		/// <summary>
 		/// Получить ключ на пользователя на заданныей срок в днях
 		/// </summary>
@@ -138,6 +144,34 @@ namespace Ulearn.Web.Api.Controllers
 		}
 
 		/// <summary>
+		/// Получить JWT-токен по логину-паролю
+		/// </summary>
+		[HttpPost("login")]
+		public async Task<ActionResult<TokenResponse>> Login([FromBody] LoginPasswordParameters loginPassword)
+		{
+			var appUser = await db.Users.FirstAsync(u => u.UserName == loginPassword.Login && !u.IsDeleted);
+			var result = await signInManager.UserManager.CheckPasswordAsync(appUser, loginPassword.Password);
+			if (!result) return Forbid();
+
+			var key = JwtBearerHelpers.CreateSymmetricSecurityKey(configuration.Web.Authentication.Jwt.IssuerSigningKey);
+			var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+			var expires = DateTime.Now.AddHours(configuration.Web.Authentication.Jwt.LifeTimeHours);
+
+			var token = new JwtSecurityToken(
+				configuration.Web.Authentication.Jwt.Issuer,
+				configuration.Web.Authentication.Jwt.Audience,
+				new[]{new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", appUser.Id), },
+				expires: expires,
+				signingCredentials: signingCredentials
+			);
+			var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+			return new TokenResponse
+			{
+				Token = tokenString,
+			};
+		}
+
+		/// <summary>
 		/// Список ролей («курс-админ», «преподаватель», «тестер») текущего пользователя
 		/// </summary>
 		[HttpGet("roles")]
@@ -156,7 +190,7 @@ namespace Ulearn.Web.Api.Controllers
 					Accesses = g.Select(a => a.AccessType).ToList()
 				}
 			).ToList();
-			
+			var groupsWhereIAmStudent = await groupMembersRepo.GetUserGroupsAsync(userId).ConfigureAwait(false);
 			return new CourseRolesResponse
 			{
 				IsSystemAdministrator = isSystemAdministrator,
@@ -166,6 +200,7 @@ namespace Ulearn.Web.Api.Controllers
 					Role = kvp.Value,
 				}).ToList(),
 				CourseAccesses = courseAccessesByCourseId,
+				GroupsAsStudent = groupsWhereIAmStudent.Select(BuildShortGroupInfo).ToList()
 			};
 		}
 

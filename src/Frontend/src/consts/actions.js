@@ -1,1 +1,18 @@
-export const COURSES__COURSE_ENTERED = 'COURSES__COURSE_ENTERED';
+// Courses
+export const COURSES__COURSE_ENTERED = "COURSES__COURSE_ENTERED";
+export const COURSES__COURSE_LOAD = "COURSES__COURSE_LOAD";
+export const COURSES__UPDATED = "COURSES__UPDATED";
+export const COURSES__FLASHCARDS = "COURSES__FLASHCARDS";
+export const COURSES__FLASHCARDS_RATE = "COURSES__FLASHCARDS_RATE";
+
+// User
+export const USER__PROGRESS_LOAD = "USER__PROGRESS_LOAD";
+export const USER__PROGRESS_UPDATE = "USER__PROGRESS_UPDATE";
+
+// common
+export const START = "_START";
+export const SUCCESS = "_SUCCESS";
+export const FAIL = "_FAIL";
+
+//navigation
+export const NAVIGATION__TOGGLE = 'NAVIGATION__TOGGLE';

@@ -37,7 +37,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		}
 
 		/// <summary>
-		/// Список неархивных групп в курсе
+		/// Список групп в курсе
 		/// </summary>
 		[HttpGet]
 		[Authorize(Policy = "Instructors")]

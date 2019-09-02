@@ -1,0 +1,97 @@
+@import "../../../../../variables.less";
+
+.root {
+  width: 250px;
+
+  position: fixed;
+  display: flex;
+  bottom: 0;
+  left: -500px;
+  z-index: 10;
+
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px 20px 14px;
+  background: #fff;
+  border: none;
+  border-top: 1px solid @borderColor;
+  box-shadow: none;
+  text-align: left;
+  cursor: pointer;
+  transition: left 300ms ease-in-out;
+
+  &:hover {
+    color: #ffffff;
+    background-color: @linkColor;
+    text-decoration: none;
+
+    & .header,
+    & .text {
+      color: #ffffff;
+    }
+  }
+
+  &:active,
+  &:focus {
+    text-decoration: none;
+  }
+}
+
+:global {
+  .open :local {
+    .root {
+      left: 0;
+    }
+  }
+}
+
+.wrapper {
+  overflow: hidden;
+}
+
+.header {
+  margin: 0;
+  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: lighter;
+  line-height: 1.2;
+  letter-spacing: 1.2px;
+  color: @additionalColor;
+}
+
+.title {
+  margin: 0;
+  font-weight: normal;
+  font-size: 16px;
+  line-height: 1.33;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.arrow {
+  position: relative;
+  top: 5px;
+
+  color: @geinsboro;
+  flex-shrink: 0;
+}
+
+@media (min-width: @maxPhoneWidth) {
+  .root {
+    left: 0;
+    transition: none;
+  }
+}
+
+
+@media (min-width: @maxLaptopWidth) {
+  .root {
+    width: 360px;
+    padding: 13px 12px 20px 24px;
+  }
+
+  .text {
+    font-size: 18px;
+  }
+}

@@ -1,22 +1,27 @@
+root=true
 # stop looking for other EditorConfig files upward in directory tree
-root = true
 
 [*]
-indent_style = tab
+indent_style=tab
+
+# ReSharper properties
+resharper_csharp_indent_style=tab
 
 # code files
 [*.cs]
-indent_size = 4
-charset = utf-8
+indent_size=tab
+charset=utf-8
+indent_style=tab
+tab_width=4
 
 # xml project files
 [*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,projitems,shproj}]
-indent_size = 2
+indent_size=2
 
 # xml config files
 [*.{props,targets,ruleset,config,nuspec,resx,vsixmanifest,vsct}]
-indent_size = 2
+indent_size=2
 
 # json files
 [*.json]
-indent_size = 2
+indent_size=2

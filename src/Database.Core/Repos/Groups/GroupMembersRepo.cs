@@ -145,6 +145,11 @@ namespace Database.Repos.Groups
 			return groupsRepo.GetCourseGroupsQueryable(courseId, includeArchived).Where(g => userGroupsIds.Contains(g.Id)).ToList();
 		}
 		
+		public async Task<List<Group>> GetUserGroupsAsync(string userId)
+		{
+			return await db.GroupMembers.Where(m => m.UserId == userId && !m.Group.IsDeleted).Select(m => m.Group).ToListAsync();
+		}
+		
 		public async Task<Dictionary<string, List<Group>>> GetUsersGroupsAsync(string courseId, List<string> usersIds, bool includeArchived = false)
 		{
 			var userGroupsIds = await GetUsersGroupsIdsAsync(courseId, usersIds, includeArchived).ConfigureAwait(false);

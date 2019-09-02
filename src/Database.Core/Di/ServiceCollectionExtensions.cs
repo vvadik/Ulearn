@@ -2,6 +2,7 @@ using Database.Models;
 using Database.Repos;
 using Database.Repos.Comments;
 using Database.Repos.CourseRoles;
+using Database.Repos.Flashcards;
 using Database.Repos.Groups;
 using Database.Repos.SystemAccessesRepo;
 using Database.Repos.Users;
@@ -60,6 +61,10 @@ namespace Database.Di
 			services.AddScoped<ISearcher, SearcherByEmail>();
 			services.AddScoped<ISearcher, SearcherBySocialLogin>();
 			
+			/*Flashcards*/
+			services.AddScoped<IUsersFlashcardsVisitsRepo, UsersFlashcardsVisitsRepo>();
+			services.AddScoped<IUserFlashcardsUnlockingRepo, UserFlashcardsUnlockingRepo>();
+			
 			/* Others */
 			services.AddScoped<ICourseRolesRepo, CourseRolesRepo>();
 			services.AddScoped<ICourseRoleUsersFilter, CourseRoleUsersFilter>();
@@ -72,6 +77,7 @@ namespace Database.Di
 			services.AddScoped<INotificationsRepo, NotificationsRepo>();
 			services.AddScoped<IFeedRepo, FeedRepo>();
 			services.AddScoped<ISystemAccessesRepo, SystemAccessesRepo>();
+			services.AddScoped<IUnitsRepo, UnitsRepo>();
 
 			return services;
 		}

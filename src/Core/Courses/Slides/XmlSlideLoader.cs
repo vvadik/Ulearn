@@ -3,9 +3,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
+using System.Xml.Schema;
 using System.Xml.Serialization;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Flashcards;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Courses.Units;
 
@@ -20,6 +22,7 @@ namespace Ulearn.Core.Courses.Slides
 		public Slide Load(SlideLoadingContext context)
 		{
 			var fileContent = context.SlideFile.ReadAllContent();
+			
 
 			return Load(fileContent, context);
 		}
@@ -27,9 +30,9 @@ namespace Ulearn.Core.Courses.Slides
 		public Slide Load(byte[] fileContent, SlideLoadingContext context)
 		{
 			var slideFile = context.SlideFile ?? new FileInfo("<internal>");
-			
-			var slideType = DetectSlideType(fileContent, slideFile.Name);
 
+			var slideType = DetectSlideType(fileContent, slideFile.Name);
+			
 			var slide = (Slide)fileContent.DeserializeXml(slideType);
 
 			slide.BuildUp(context);
@@ -62,11 +65,11 @@ namespace Ulearn.Core.Courses.Slides
 			if (xmlDocument.DocumentElement == null)
 				throw new CourseLoadingException($"Не могу определить, что за слайд лежит в {filename}. Возможно, там некорректный XML или он не начинается с тега <slide>, <slide.quiz> или <slide.exercise>?");
 
-			var knownTypes = new[] { typeof(Slide), typeof(QuizSlide), typeof(ExerciseSlide) };
+			var knownTypes = new[] { typeof(Slide), typeof(QuizSlide), typeof(ExerciseSlide), typeof(Flashcards.FlashcardSlide) };
 			foreach (var type in knownTypes)
 				if (xmlDocument.DocumentElement.Name == type.GetCustomAttribute<XmlRootAttribute>().ElementName)
 					return type;
-			
+
 			var allowedTags = string.Join(", ", knownTypes.Select(t => t.GetCustomAttribute<XmlRootAttribute>().ElementName).Select(t => $"<{t}>"));
 			throw new CourseLoadingException(
 				$"Не могу определить, что за слайд лежит в {filename}. " +

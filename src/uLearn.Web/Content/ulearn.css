@@ -462,11 +462,6 @@
 	padding-left: 10px;
 }
 
-@media (min-width: 768px) {
-	.legacy-page .slide-container {
-		padding-left: 350px;
-	}
-}
 
 .legacy-page .ask-bar {
 	max-width: none;

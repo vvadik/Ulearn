@@ -5,6 +5,7 @@ import * as PropTypes from "prop-types";
 import { saveAs } from "file-saver";
 import { connect } from "react-redux"
 import api from "../../api"
+import { COURSES__COURSE_ENTERED } from "../../consts/actions";
 import { getQueryStringParameter } from "../../utils";
 
 
@@ -152,8 +153,6 @@ class DownloadedHtmlContent extends Component {
 			this.processNewHtmlContent(url, data);
 		}).catch(function (error) {
 			console.error(error);
-			/* Retry after timeout */
-			setTimeout(() => self.fetchContentFromServer(url), 5000);
 		});
 	}
 
@@ -192,9 +191,6 @@ class DownloadedHtmlContent extends Component {
 			fetch(url).then(r => r.text()).then(safeEval);
 		});
 
-		/* Scroll to top */
-		window.scrollTo(0, 0);
-
 		this.loadContentByClass();
 		this.setPostFormSubmitHandler();
 
@@ -216,9 +212,9 @@ class DownloadedHtmlContent extends Component {
 
 	_getCourseIdFromUrl() {
 		/* 1. Extract courseId from urls like /Course/<courseId/... */
-		const pathname = window.location.pathname;
-		if (pathname.startsWith('/Course/')) {
-			const regex = new RegExp('/Course/([^/]+)(/|$)');
+		const pathname = window.location.pathname.toLowerCase();
+		if (pathname.startsWith('/course/')) {
+			const regex = new RegExp('/course/([^/]+)(/|$)');
 			const results = regex.exec(pathname);
 			return results[1].toLowerCase();
 		}
@@ -234,8 +230,7 @@ class DownloadedHtmlContent extends Component {
 
 	downloadFile(blob, filename) {
 		saveAs(blob, filename, false);
-		if (this.lastRenderedUrl)
-			window.history.replaceState({}, '', this.lastRenderedUrl);
+		window.history.back();
 	}
 
 	render() {
@@ -349,7 +344,7 @@ class DownloadedHtmlContent extends Component {
 	static mapDispatchToProps(dispatch) {
 		return {
 			enterToCourse: (courseId) => dispatch({
-				type: 'COURSES__COURSE_ENTERED',
+				type: COURSES__COURSE_ENTERED,
 				courseId: courseId
 			}),
 			updateUserInformation: () => dispatch(api.account.getCurrentUser()),

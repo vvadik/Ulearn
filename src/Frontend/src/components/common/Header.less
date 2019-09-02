@@ -5,7 +5,7 @@
   top: 0;
   left: 0;
   right: 0;
-  z-index: 100;
+  z-index: @headerZIndex;
   background-color: white;
   margin-bottom: 10px;
   font-family: "Segoe UI", "Helvetica Neue", sans-serif;
@@ -15,7 +15,7 @@
   box-shadow: 0 0 7px 4px #ccc;
 
   > * {
-    display: inline-block;
+    display: inline-flex;
     vertical-align: top;
     height: @headerHeight;
   }
@@ -47,7 +47,6 @@
     }
   }
 
-  .header__toc-menu,
   .header__course-menu,
   .header__sysadmin-menu,
   .header__my-courses-menu {
@@ -283,5 +282,39 @@
     & {
       display: none !important;
     }
+  }
+}
+
+.navMenuButton {
+  border: none;
+  background: initial;
+}
+
+.navMenuButton:focus, .navMenuButton:active {
+  outline: none;
+}
+
+.phoneHeaderElementsContainer {
+  display: none;
+
+  height: 100%;
+
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.phoneHeaderElement {
+  width: 40px;
+
+  display: flex;
+  align-items: center;
+
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+@media (max-width: @maxPhoneWidth) {
+  .phoneHeaderElementsContainer {
+    display: inline-flex;
   }
 }

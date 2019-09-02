@@ -4,7 +4,7 @@
            elementFormDefault="qualified"
            targetNamespace="https://ulearn.me/schema/v2">
 
-    <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/XML/1998/namespace" />
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace"  />
     
     <!-- Course -->
 
@@ -124,6 +124,7 @@
 	<xs:element name="slide" type="Slide"/>
 	<xs:element name="slide.quiz" type="QuizSlide"/>
 	<xs:element name="slide.exercise" type="ExerciseSlide"/>	
+	<xs:element name="slide.flashcards" type="FlashcardSlide"/>	
 
     <xs:complexType name="Slide">
         <xs:group ref="SlideInternals" />
@@ -143,71 +144,135 @@
         <xs:attributeGroup ref="SlideAttributes" />
     </xs:complexType>
 
-    <xs:complexType name="ExerciseSlide" >
-        <xs:sequence>
-            <xs:element name="scoring" type="ExerciseScoring" minOccurs="0" maxOccurs="1" />
-            <xs:group ref="SlideInternals" />            
-        </xs:sequence>
-        <xs:attributeGroup ref="SlideAttributes" />
-    </xs:complexType>
-    
-    <xs:group name="SlideInternals">
-        <xs:sequence>
-            <xs:element name="meta" type="SlideMeta" minOccurs="0" maxOccurs="1">
-                <xs:annotation>
-                    <xs:documentation xml:lang="en">Slide's meta: keywords, description, image</xs:documentation>
-                    <xs:documentation xml:lang="ru">Мета-информация о слайде, попадёт на итоговую страницу в виде тегов keywords, description, image</xs:documentation>
-                </xs:annotation>
-            </xs:element>
-            <xs:element name="defaultIncludeCodeFile" type="NonEmptyString" minOccurs="0" maxOccurs="1">
-                <xs:annotation>
-                    <xs:documentation xml:lang="en">Default path for &lt;includeCode&gt;, &lt;exercise.file&gt;, &lt;exercise.csproj&gt;</xs:documentation>
-                    <xs:documentation xml:lang="ru">Путь по умолчанию для блоков &lt;includeCode&gt;, &lt;exercise.file&gt;, &lt;exercise.csproj&gt;</xs:documentation>
-                </xs:annotation>
-            </xs:element>            
-            <xs:group ref="Blocks" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:group>
-    
-    <xs:attributeGroup name="SlideAttributes">
-        <xs:attribute name="id" type="NonEmptyString" use="required">
-            <xs:annotation>
-                <xs:documentation xml:lang="en">Slide's id, should be guid</xs:documentation>
-                <xs:documentation xml:lang="ru">Идентификатор слайда, должен быть гуидом</xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="title" type="NonEmptyString" use="required">
-            <xs:annotation>
-                <xs:documentation xml:lang="en">Slide's title</xs:documentation>
-                <xs:documentation xml:lang="ru">Заголовок слайда</xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
-    </xs:attributeGroup>
+	<xs:complexType name="ExerciseSlide">
+		<xs:sequence>
+			<xs:element name="scoring" type="ExerciseScoring" minOccurs="0" maxOccurs="1"/>
+			<xs:group ref="SlideInternals"/>
+		</xs:sequence>
+		<xs:attributeGroup ref="SlideAttributes"/>
+	</xs:complexType>
 
-    <xs:complexType name="SlideMeta">
-        <xs:sequence>
-            <xs:element name="image" type="NonEmptyString" minOccurs="0" maxOccurs="1">
-                <xs:annotation>
-                    <xs:documentation xml:lang="en">Image for slide. Will be used i.e. on social network posting</xs:documentation>
-                    <xs:documentation xml:lang="ru">Изображение для слайда. Будет использовано, например, при постинге в соцсети</xs:documentation>
-                </xs:annotation>
-            </xs:element>
-            <xs:element name="keywords" type="NonEmptyString" minOccurs="0" maxOccurs="1">
-                <xs:annotation>
-                    <xs:documentation xml:lang="en">Keywords for slide. Used by search engines</xs:documentation>
-                    <xs:documentation xml:lang="ru">Ключевые слова для слайда. Используются, например, поисковыми роботами</xs:documentation>
-                </xs:annotation>
-            </xs:element>
-            <xs:element name="description" type="NonEmptyString" minOccurs="0" maxOccurs="1">
-                <xs:annotation>
-                    <xs:documentation xml:lang="en">Description for slide. Used by search engines</xs:documentation>
-                    <xs:documentation xml:lang="ru">Описание для слайда. Используются, например, поисковыми роботами, выводится в результатах поиска</xs:documentation>
-                </xs:annotation>
-            </xs:element>
-        </xs:sequence>
-    </xs:complexType>
-    
-    <!-- Blocks -->
+
+	<xs:complexType name="FlashcardSlide">
+		<xs:sequence>
+			<xs:element name="flashcard" type="Flashcard" minOccurs="0" maxOccurs="unbounded">
+			</xs:element>
+		</xs:sequence>
+		<xs:attributeGroup ref="FlashcardSlideAttributes"/>
+	</xs:complexType>
+
+	<xs:complexType name="Flashcard">
+
+		<xs:sequence>
+			<xs:element name="theorySlideId" type="xs:string" maxOccurs="unbounded" minOccurs="0">
+			</xs:element>
+			<xs:element name="question" type="FlashcardInternals">
+			</xs:element>
+			<xs:element name="answer" type="FlashcardInternals">
+			</xs:element>
+		</xs:sequence>
+		<xs:attributeGroup ref="FlashcardAttributes"/>
+
+	</xs:complexType>
+
+
+	<xs:complexType name="FlashcardInternals">
+		<xs:group ref="FlashCardBlocks" minOccurs="0" maxOccurs="unbounded"/>
+	</xs:complexType>
+
+
+	<!-- The copypaste in "SlideInternals" is required. It's allow to write blocks in any order -->
+	
+	<xs:group name="SlideInternals">
+		<xs:sequence>
+				<xs:group ref="Blocks" minOccurs="0" maxOccurs="unbounded"/>
+				
+				<xs:element name="meta" type="SlideMeta" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation xml:lang="en">Slide's meta: keywords, description, image</xs:documentation>
+						<xs:documentation xml:lang="ru">Мета-информация о слайде, попадёт на итоговую страницу в виде тегов
+							keywords, description, image
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:group ref="Blocks" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="defaultIncludeCodeFile" type="NonEmptyString" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation xml:lang="en">Default path for &lt;includeCode&gt;, &lt;exercise.file&gt;, &lt;exercise.csproj&gt;</xs:documentation>
+						<xs:documentation xml:lang="ru">Путь по умолчанию для блоков &lt;includeCode&gt;, &lt;exercise.file&gt;,
+							&lt;exercise.csproj&gt;
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:group ref="Blocks" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:group>
+
+	<xs:attributeGroup name="SlideAttributes">
+		<xs:attribute name="id" type="NonEmptyString" use="required">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">Slide's id, should be guid</xs:documentation>
+				<xs:documentation xml:lang="ru">Идентификатор слайда, должен быть гуидом</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="title" type="NonEmptyString" use="required">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">Slide's title</xs:documentation>
+				<xs:documentation xml:lang="ru">Заголовок слайда</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:attributeGroup>
+	
+	<xs:attributeGroup name="FlashcardSlideAttributes">
+		<xs:attribute name="id" type="NonEmptyString" use="required">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">Slide's id, should be guid</xs:documentation>
+				<xs:documentation xml:lang="ru">Идентификатор слайда, должен быть гуидом</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:attributeGroup>
+
+	<xs:attributeGroup name="FlashcardAttributes">
+		<xs:attribute name="id" type="NonEmptyString" use="required">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">Flashcard's id, should be course-unique string</xs:documentation>
+				<xs:documentation xml:lang="ru">Идентификатор флеш-карты, должен быть уникальной для курса строкой
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:attributeGroup>
+
+	<xs:complexType name="SlideMeta">
+		<xs:sequence>
+			<xs:element name="image" type="NonEmptyString" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Image for slide. Will be used i.e. on social network posting
+					</xs:documentation>
+					<xs:documentation xml:lang="ru">Изображение для слайда. Будет использовано, например, при постинге в
+						соцсети
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="keywords" type="NonEmptyString" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Keywords for slide. Used by search engines</xs:documentation>
+					<xs:documentation xml:lang="ru">Ключевые слова для слайда. Используются, например, поисковыми
+						роботами
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="description" type="NonEmptyString" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Description for slide. Used by search engines</xs:documentation>
+					<xs:documentation xml:lang="ru">Описание для слайда. Используются, например, поисковыми роботами,
+						выводится в результатах поиска
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<!-- Blocks -->
 
     <xs:group name="Blocks">
         <xs:choice>
@@ -258,11 +323,19 @@
 		</xs:choice>
 	</xs:group>
 
-    <xs:complexType name="GalleryImages">
-        <xs:sequence maxOccurs="unbounded">
-            <xs:element name="image" type="NonEmptyString" />
-        </xs:sequence>
-    </xs:complexType>
+	<xs:group name="FlashCardBlocks">
+		<xs:choice>
+			<xs:element name="tex" type="Tex"/>
+			<xs:element name="markdown" type="MarkdownBlock"/>
+			<xs:element name="code" type="Code"/>
+		</xs:choice>
+	</xs:group>
+
+	<xs:complexType name="GalleryImages">
+		<xs:sequence maxOccurs="unbounded">
+			<xs:element name="image" type="NonEmptyString"/>
+		</xs:sequence>
+	</xs:complexType>
 
     <xs:complexType name="Tex">
         <xs:sequence maxOccurs="unbounded">
@@ -273,7 +346,7 @@
     <xs:complexType name="Code">
         <xs:simpleContent>
             <xs:extension base="StringWithXmlSpaces">
-                <xs:attribute name="language" type="NonEmptyString" use="required" />
+                <xs:attribute name="language" type="NonEmptyString" use="optional" />
                 <xs:attribute name="hide" type="xs:boolean" />
             </xs:extension>
         </xs:simpleContent>
@@ -304,10 +377,11 @@
         <xs:sequence minOccurs="0" maxOccurs="unbounded">
             <xs:choice>
                 <xs:element name="note" type="NonEmptyString" />
-                <xs:element name="code" type="NonEmptyString" />
+                <xs:element name="code" type="StringWithXmlSpaces" />
             </xs:choice>
         </xs:sequence>
-        <xs:attribute name="hide" type="xs:boolean" />
+		<xs:attribute ref="xml:space"/>
+		<xs:attribute name="hide" type="xs:boolean" />
     </xs:complexType>
 
     <xs:complexType name="IncludeCodeBlock">
@@ -347,7 +421,15 @@
                     <xs:element name="hideSolutions" type="xs:boolean" minOccurs="1" maxOccurs="1" />
                     <xs:element name="checkForPlagiarism" type="xs:boolean" minOccurs="0" maxOccurs="1" />
                     <xs:element name="hideExpectedOutput" type="xs:boolean" minOccurs="1" maxOccurs="1" />
-                    <xs:element name="validator" type="NonEmptyString" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="validator" minOccurs="1" maxOccurs="1" >
+						<xs:complexType>
+							<xs:simpleContent>
+								<xs:extension base="xs:string">
+									<xs:attribute name="removeDefaults" type="xs:boolean" use="optional" />
+								</xs:extension>
+							</xs:simpleContent>
+						</xs:complexType>
+                    </xs:element>
                 </xs:choice>
                 <xs:attribute name="type" use="optional">
                     <xs:simpleType>
@@ -439,7 +521,7 @@
 		<xs:complexContent>
 			<xs:extension base="AbstractExercise">
 				<xs:sequence>
-					<xs:element name="userCodeFile" type="NonEmptyString">
+					<xs:element name="userCodeFile" type="NonEmptyString" >
 						<xs:annotation>
 							<xs:documentation>
 								Путь относительно директории, в которой лежит задача.

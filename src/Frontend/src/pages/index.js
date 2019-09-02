@@ -3,10 +3,6 @@ import React from "react";
 import styles from "./pages.less"
 
 export class Page extends Component {
-	componentDidMount() {
-		window.scrollTo(0, 0);
-	}
-
 	render() {
 		return (
 			<div className={styles.wrapper}>

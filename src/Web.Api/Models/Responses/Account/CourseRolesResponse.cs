@@ -2,6 +2,7 @@
 using System.Runtime.Serialization;
 using Database.Models;
 using Ulearn.Common.Api.Models.Responses;
+using Ulearn.Web.Api.Models.Common;
 
 namespace Ulearn.Web.Api.Models.Responses.Account
 {
@@ -16,6 +17,9 @@ namespace Ulearn.Web.Api.Models.Responses.Account
 
 		[DataMember]
 		public List<CourseAccessResponse> CourseAccesses { get; set; }
+		
+		[DataMember]
+		public List<ShortGroupInfo> GroupsAsStudent { get; set; }
 	}
 
 	[DataContract]

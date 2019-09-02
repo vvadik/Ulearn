@@ -64,7 +64,7 @@ namespace uLearn.Web.Controllers
 				IsSlideHidden = s => s is QuizSlide && ((QuizSlide)s).ManualChecking
 			};
 			var toc = builder.CreateTocModel();
-			toc.NextUnitTime = unitsRepo.GetNextUnitPublishTime(course.Id);
+			toc.NextUnitTime = unitsRepo.GetLowestPublishTimeOfUnpublishedUnit(course.Id);
 			return toc;
 		}
 
@@ -112,14 +112,16 @@ namespace uLearn.Web.Controllers
 				StatisticsUrl = Url.Action("CourseStatistics", "Analytics", new { courseId = course.Id, group = g.Id })
 			});
 			var toc = builder.CreateTocModel(tocGroupsForStatistics.ToList());
-			toc.NextUnitTime = unitsRepo.GetNextUnitPublishTime(course.Id);
+			toc.NextUnitTime = unitsRepo.GetLowestPublishTimeOfUnpublishedUnit(course.Id);
 			return toc;
 		}
 
 		public ActionResult PrevNextButtons(string courseId, Guid slideId, bool onSolutionsSlide)
 		{
 			var course = courseManager.GetCourse(courseId);
-			var slide = course.GetSlideById(slideId);
+			var slide = course.FindSlideById(slideId);
+			if (slide == null)
+				return Content("");
 			var userId = User.Identity.GetUserId();
 			var nextIsAcceptedSolutions = !onSolutionsSlide && slide is ExerciseSlide && visitsRepo.IsSkippedOrPassed(courseId, slide.Id, userId) && !((ExerciseSlide)slide).Exercise.HideShowSolutionsButton;
 			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
