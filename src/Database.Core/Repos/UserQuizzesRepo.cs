@@ -183,5 +183,10 @@ namespace Database.Repos
 				.ToDictionaryAsync(p => p.Key, p => p.Count.PercentsOf(totalTries))
 				.ConfigureAwait(false);
 		}
+		
+		public HashSet<Guid> GetPassedSlideIds(string courseId, string userId)
+		{
+			return new HashSet<Guid>(db.UserQuizSubmissions.Where(x => x.CourseId == courseId && x.UserId == userId).Select(x => x.SlideId).Distinct());
+		}
 	}
 }
