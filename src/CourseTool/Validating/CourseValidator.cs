@@ -31,7 +31,6 @@ namespace uLearn.CourseTool.Validating
 
 		public void ValidateSlidesXml()
 		{
-			
 			var error = xmlValidator.ValidateSlidesFiles(slides.Select(x => x.Info.SlideFile).ToList());
 			if (!string.IsNullOrEmpty(error))
 				ReportError(error);
@@ -90,7 +89,6 @@ namespace uLearn.CourseTool.Validating
 			}
 		}
 
-
 		private void LogSlideProcessing(string prefix, Slide slide)
 		{
 			LogInfoMessage(prefix + " " + slide.Info.Unit.Title + " - " + slide.Title);
@@ -100,7 +98,6 @@ namespace uLearn.CourseTool.Validating
 		{
 			LogInfoMessage(prefix + " " + flashcard.Id);
 		}
-
 
 		public void ValidateVideos()
 		{

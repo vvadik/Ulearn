@@ -76,22 +76,15 @@ namespace Ulearn.Core.Courses.Slides.Flashcards
 		{
 			var content = new StringBuilder();
 			foreach (var block in Question.Blocks)
-			{
 				content.Append(RenderBlock(block));
-			}
-
 			return content.ToString();
 		}
 
 		public string RenderAnswer()
 		{
-			
 			var content = new StringBuilder();
 			foreach (var block in Answer.Blocks)
-			{
 				content.Append(RenderBlock(block));
-			}
-
 			return content.ToString();
 		}
 
@@ -102,14 +95,10 @@ namespace Ulearn.Core.Courses.Slides.Flashcards
 				case MarkdownBlock markdownBlock:
 					return markdownBlock.TryGetText().RenderMarkdown();
 				case CodeBlock codeBlock:
-				{
 					return $"\n<textarea class=\"code code-sample\" data-lang=\"{codeBlock.Language.GetName()}\">{codeBlock.Code}</textarea>";
-				}
-
 				case TexBlock texBlock:
 					var lines = texBlock.TexLines.Select(x => $"<div class=\"tex\">{x.Trim()}</div>");
 					return string.Join("\n", lines);
-					break;
 				default:
 					return block.TryGetText();
 			}
