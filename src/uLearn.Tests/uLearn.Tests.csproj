@@ -405,9 +405,21 @@
     <Compile Include="CSharp\RefArgumentsValidation\TestData\Correct\RefArgumentsValidationTestDataClass.cs" />
     <Compile Include="CSharp\RefArgumentsValidation\TestData\Incorrect\RefArgumentsValidationTestDataClass.cs" />
     <Compile Include="CSharp\RefArgumentsValidation\RefArgumentsValidator_should.cs" />
+    <Compile Include="CSharp\SpellingValidation\CodeElementSpellChecking\CodeElementSpellChecker_should.cs" />
+    <Compile Include="CSharp\SpellingValidation\SpellingValidator_should.cs" />
+    <Compile Include="CSharp\SpellingValidation\TestData\Correct\FileWithAmeticanVariantOfEnglish.cs" />
+    <Compile Include="CSharp\SpellingValidation\TestData\Correct\FileWithBritishVariantOfEnglish.cs" />
+    <Compile Include="CSharp\SpellingValidation\TestData\Correct\FileWithConcatenatedWords.cs" />
+    <Compile Include="CSharp\SpellingValidation\TestData\Correct\FileWithExceptions.cs" />
     <Content Include="CSharp\testProject\Prelude.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Compile Include="CSharp\SpellingValidation\TestData\Correct\FileWithLatinNames.cs" />
+    <Compile Include="CSharp\SpellingValidation\TestData\Correct\FileWithoutMisspellings.cs" />
+    <Compile Include="CSharp\SpellingValidation\TestData\Correct\FileWithRussianNames.cs" />
+    <Compile Include="CSharp\SpellingValidation\TestData\Correct\FileWithShortNamesOrAbbreviations.cs" />
+    <Compile Include="CSharp\SpellingValidation\TestData\Correct\FileWithWordsStartingWithCapitalLetter.cs" />
+    <Compile Include="CSharp\SpellingValidation\TestData\Incorrect\FileWithMisspellings.cs" />
     <Compile Include="CSharp\VarInVariableDeclarationValidator_should.cs" />
     <Compile Include="CSharp\ExplicitTestsExamplesPaths.cs" />
     <Compile Include="CSharp\VerbInMethodNameValidator_should.cs" />
