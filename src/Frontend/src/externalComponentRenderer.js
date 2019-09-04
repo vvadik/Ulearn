@@ -22,6 +22,7 @@ import CommentsList from "./components/comments/CommentsList/CommentsList";
 import Comment from "./components/comments/Comment/Comment";
 import CommentSendForm from "./components/comments/CommentSendForm/CommentSendForm";
 import ToggleRolesModal from "./components/UserRoles/ToggleRolesModal";
+import CourseToolUnitPage from "./components/flashcards/UnitPage/CourseToolUnitPage";
 
 /* Define names for all components you want to use */
 const components = {
@@ -30,6 +31,7 @@ const components = {
 	"Comment": Comment,
 	"CommentSendForm": CommentSendForm,
 	"ToggleRoles" : ToggleRolesModal,
+	"CourseToolUnitPage": CourseToolUnitPage
 };
 
 window.renderReactComponent = function (componentType, element, props) {

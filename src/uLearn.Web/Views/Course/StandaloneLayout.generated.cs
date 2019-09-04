@@ -28,10 +28,13 @@ namespace uLearn.Web.Views.Course
     using System.Web.UI;
     using System.Web.WebPages;
     using Database.Models;
+    using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
+    using Ulearn.Common.Extensions;
     using Ulearn.Core.Courses;
     using Ulearn.Core.Courses.Slides;
     using Ulearn.Core.Courses.Slides.Exercises;
     using Ulearn.Core.Courses.Slides.Exercises.Blocks;
+    using Ulearn.Core.Courses.Slides.Flashcards;
     using Ulearn.Core.Courses.Slides.Quizzes;
     using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
     using uLearn.Web;
@@ -78,9 +81,9 @@ WriteLiteralTo(__razor_helper_writer, ">\r\n");
 
 WriteLiteralTo(__razor_helper_writer, "\t\t\t<link");
 
-WriteAttributeTo(__razor_helper_writer, "href", Tuple.Create(" href=\'", 763), Tuple.Create("\'", 778)
-, Tuple.Create(Tuple.Create("", 770), Tuple.Create<System.Object, System.Int32>(cssFile
-, 770), false)
+WriteAttributeTo(__razor_helper_writer, "href", Tuple.Create(" href=\'", 900), Tuple.Create("\'", 915)
+, Tuple.Create(Tuple.Create("", 907), Tuple.Create<System.Object, System.Int32>(cssFile
+, 907), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, " rel=\'stylesheet\'");
@@ -106,6 +109,8 @@ WriteTo(__razor_helper_writer, TableOfContents.Toc(toc));
 WriteLiteralTo(__razor_helper_writer, "\r\n\t\t</div>\r\n\r\n\t\t<div");
 
 WriteLiteralTo(__razor_helper_writer, " class=\"slide-container\"");
+
+WriteLiteralTo(__razor_helper_writer, " style=\"padding-left: 365px\"");
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t<div");
 
@@ -148,28 +153,51 @@ WriteTo(__razor_helper_writer, SlideHtml.Slide(new BlockRenderContext(course, sl
 						),
 						null));
 
-WriteLiteralTo(__razor_helper_writer, "\r\n\t\t\t\t\t<div");
+WriteLiteralTo(__razor_helper_writer, "\r\n");
+
+					
+                     if (slide is FlashcardSlide)
+					{
+						var flashcards = ((FlashcardSlide)slide).FlashcardsList.Select(x => new { answer = x.RenderAnswer(), question = x.RenderQuestion(), unitTitle = slide.Info.Unit.Title }).ToArray();
+
+WriteLiteralTo(__razor_helper_writer, "\t\t\t\t\t\t<div");
+
+WriteLiteralTo(__razor_helper_writer, " class=\"react-render\"");
+
+WriteLiteralTo(__razor_helper_writer, " data-component=\"CourseToolUnitPage\"");
+
+WriteLiteralTo(__razor_helper_writer, " data-props=\"");
+
+                                                                     WriteTo(__razor_helper_writer,  new {flashcards= flashcards}.JsonSerialize());
+
+WriteLiteralTo(__razor_helper_writer, "\"");
+
+WriteLiteralTo(__razor_helper_writer, "></div>\r\n");
+
+					}
+
+WriteLiteralTo(__razor_helper_writer, "\t\t\t\t\t<div");
 
 WriteLiteralTo(__razor_helper_writer, " style=\"margin-bottom: 40px;\"");
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t\t\t\t<a");
 
-WriteAttributeTo(__razor_helper_writer, "href", Tuple.Create(" href=\"", 2063), Tuple.Create("\"", 2122)
-, Tuple.Create(Tuple.Create("", 2070), Tuple.Create("/", 2070), true)
-, Tuple.Create(Tuple.Create("", 2071), Tuple.Create<System.Object, System.Int32>(slide.Index.ToString("000")
-, 2071), false)
-, Tuple.Create(Tuple.Create("", 2101), Tuple.Create(".html?query=addLesson", 2101), true)
+WriteAttributeTo(__razor_helper_writer, "href", Tuple.Create(" href=\"", 2584), Tuple.Create("\"", 2643)
+, Tuple.Create(Tuple.Create("", 2591), Tuple.Create("/", 2591), true)
+, Tuple.Create(Tuple.Create("", 2592), Tuple.Create<System.Object, System.Int32>(slide.Index.ToString("000")
+, 2592), false)
+, Tuple.Create(Tuple.Create("", 2622), Tuple.Create(".html?query=addLesson", 2622), true)
 );
 
 WriteLiteralTo(__razor_helper_writer, " class=\"btn btn-default\"");
 
 WriteLiteralTo(__razor_helper_writer, ">Добавить слайд</a>\r\n\t\t\t\t\t\t<a");
 
-WriteAttributeTo(__razor_helper_writer, "href", Tuple.Create(" href=\"", 2176), Tuple.Create("\"", 2233)
-, Tuple.Create(Tuple.Create("", 2183), Tuple.Create("/", 2183), true)
-, Tuple.Create(Tuple.Create("", 2184), Tuple.Create<System.Object, System.Int32>(slide.Index.ToString("000")
-, 2184), false)
-, Tuple.Create(Tuple.Create("", 2214), Tuple.Create(".html?query=addQuiz", 2214), true)
+WriteAttributeTo(__razor_helper_writer, "href", Tuple.Create(" href=\"", 2697), Tuple.Create("\"", 2754)
+, Tuple.Create(Tuple.Create("", 2704), Tuple.Create("/", 2704), true)
+, Tuple.Create(Tuple.Create("", 2705), Tuple.Create<System.Object, System.Int32>(slide.Index.ToString("000")
+, 2705), false)
+, Tuple.Create(Tuple.Create("", 2735), Tuple.Create(".html?query=addQuiz", 2735), true)
 );
 
 WriteLiteralTo(__razor_helper_writer, " class=\"btn btn-default\"");
@@ -182,10 +210,12 @@ WriteLiteralTo(__razor_helper_writer, ">Добавить тест</a>\r\n\t\t\t\
 
 WriteLiteralTo(__razor_helper_writer, "\t\t\t<script");
 
-WriteAttributeTo(__razor_helper_writer, "src", Tuple.Create(" src=\'", 2379), Tuple.Create("\'", 2392)
-, Tuple.Create(Tuple.Create("", 2385), Tuple.Create<System.Object, System.Int32>(jsFile
-, 2385), false)
+WriteAttributeTo(__razor_helper_writer, "src", Tuple.Create(" src=\'", 2900), Tuple.Create("\'", 2913)
+, Tuple.Create(Tuple.Create("", 2906), Tuple.Create<System.Object, System.Int32>(jsFile
+, 2906), false)
 );
+
+WriteLiteralTo(__razor_helper_writer, " type=\'application/javascript\'");
 
 WriteLiteralTo(__razor_helper_writer, "></script>\r\n");
 

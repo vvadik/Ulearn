@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using Castle.Core.Internal;
 using Database;
 using Database.Models;
 using Database.Repos.CourseRoles;
@@ -16,10 +15,8 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Serilog;
-using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
-using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Slides.Flashcards;
 using Ulearn.Core.Courses.Units;
 using Ulearn.Web.Api.Models.Responses.Flashcards;
@@ -158,28 +155,7 @@ namespace Ulearn.Web.Api.Controllers
 		{
 			var content = new StringBuilder();
 			foreach (var block in blocks)
-			{
-				switch (block)
-				{
-					case MarkdownBlock markdownBlock:
-						content.Append(markdownBlock.TryGetText().RenderMarkdown());
-						break;
-					case CodeBlock codeBlock:
-					{
-						content.Append($"\n<textarea class=\"code code-sample\" data-lang=\"{codeBlock.Language.GetName()}\">{codeBlock.Code}</textarea>");
-						break;
-					}
-
-					case TexBlock texBlock:
-						var lines = texBlock.TexLines.Select(x => $"<div class=\"tex\">{x.Trim()}</div>");
-						content.Append(string.Join("\n", lines));
-						break;
-					default:
-						content.Append(block.TryGetText());
-						break;
-				}
-			}
-
+				content.Append(Flashcard.RenderBlock(block));
 			return content.ToString();
 		}
 

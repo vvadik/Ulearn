@@ -97,11 +97,14 @@ namespace uLearn.CourseTool.Monitoring
 		private IEnumerable<string> GetCssFiles()
 		{
 			yield return "renderer/styles/bundle.css";
+			yield return "renderer/reactBuild/static/css/main.css";
 		}
 
 
 		private IEnumerable<string> GetJsFiles()
 		{
+			yield return "renderer/reactBuild/static/js/main.js";
+			yield return "renderer/reactBuild/static/js/oldBrowser.js";
 			yield return "renderer/scripts/bundle.js";
 		}
 	}

@@ -10,9 +10,14 @@ import "moment-timezone";
 
 moment.tz.setDefault(DEFAULT_TIMEZONE);
 
-ReactDOM.render((
-	<UlearnApp />
-), document.getElementById('root'));
+const root = document.getElementById('root');
+
+if (root) {
+	ReactDOM.render((
+		<UlearnApp />
+	), root);
+}
+
 
 
 /* TODO (andgein):

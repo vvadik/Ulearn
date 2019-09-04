@@ -138,7 +138,7 @@ namespace uLearn.CourseTool.Monitoring
 			var slide = course.FindSlideById(slideIdGuid);
 			if (!(slide is ExerciseSlide))
 				return Encoding.UTF8.GetBytes("Invalid slide id");
-			
+
 			var zipBytes = GenerateExerciseStudentZip(slide);
 			context.Response.Headers.Add("Content-Type", "application/zip");
 			var exerciseSlide = slide as ExerciseSlide;
@@ -148,7 +148,7 @@ namespace uLearn.CourseTool.Monitoring
 
 			return zipBytes;
 		}
-		
+
 		private byte[] GenerateExerciseStudentZip(Slide slide)
 		{
 			var tempZipFile = Path.GetRandomFileName();
@@ -299,21 +299,23 @@ namespace uLearn.CourseTool.Monitoring
 		private byte[] ServeStatic(HttpRequestEventArgs context, string path)
 		{
 			string dirPath;
+			string basePath = AppDomain.CurrentDomain.BaseDirectory;
 			if (new[] { ".html" }.Any(ext => path.EndsWith(ext)))
 			{
 				dirPath = htmlDir + "/" + path;
+			}
+			else if (path.StartsWith("/static/media"))
+			{
+				dirPath = basePath + "/renderer/reactBuild" + path;
 			}
 			else
 			{
 				dirPath = path;
 				if (dirPath[0] == '/')
 				{
-					string basePath = AppDomain.CurrentDomain.BaseDirectory;
 					dirPath = Path.Combine(basePath, dirPath.Substring(1));
 				}
 			}
-			
-			
 
 			try
 			{
