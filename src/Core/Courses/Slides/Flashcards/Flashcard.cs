@@ -88,7 +88,7 @@ namespace Ulearn.Core.Courses.Slides.Flashcards
 			return content.ToString();
 		}
 
-		private string RenderBlock(SlideBlock block)
+		public static string RenderBlock(SlideBlock block)
 		{
 			switch (block)
 			{
