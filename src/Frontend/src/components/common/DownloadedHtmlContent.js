@@ -230,8 +230,7 @@ class DownloadedHtmlContent extends Component {
 
 	downloadFile(blob, filename) {
 		saveAs(blob, filename, false);
-		if (this.lastRenderedUrl)
-			window.history.replaceState({}, '', this.lastRenderedUrl);
+		window.history.back();
 	}
 
 	render() {

@@ -24,8 +24,8 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 		public SnippetsExtractor(SnippetsExtractorOptions options)
 		{
 			Options = options;
-		}
 
+		}
 		public SnippetsExtractor()
 			: this(SnippetsExtractorOptions.Default)
 		{

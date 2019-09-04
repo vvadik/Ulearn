@@ -1,20 +1,27 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Models.Comments;
+using Database.Repos;
+using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Serilog;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Flashcards;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
 using Ulearn.Core.Courses.Units;
+using Ulearn.Web.Api.Controllers.Groups;
 using Ulearn.Web.Api.Models.Common;
 using Ulearn.Web.Api.Models.Responses.Notifications;
 
@@ -68,17 +75,20 @@ namespace Ulearn.Web.Api.Controllers
 			return usersRepo.IsSystemAdministrator(user);
 		}
 
-		protected UnitInfo BuildUnitInfo(string courseId, Unit unit)
+		protected UnitInfo BuildUnitInfo(string courseId, Unit unit, bool showInstructorsSlides, Func<Slide, int> getSlideMaxScoreFunc)
 		{
+			var slides = unit.Slides.Select(slide => BuildSlideInfo(courseId, slide, getSlideMaxScoreFunc));
+			if (showInstructorsSlides && unit.InstructorNote != null)
+				slides = slides.Concat(new List<ShortSlideInfo> { BuildSlideInfo(courseId, unit.InstructorNote.Slide, getSlideMaxScoreFunc) });
 			return new UnitInfo
 			{
 				Id = unit.Id,
 				Title = unit.Title,
-				Slides = unit.Slides.Select(slide => BuildSlideInfo(courseId, slide)).ToList()
+				Slides = slides.ToList()
 			};
 		}
 
-		protected ShortSlideInfo BuildSlideInfo(string courseId, Slide slide)
+		protected ShortSlideInfo BuildSlideInfo(string courseId, Slide slide, Func<Slide, int> getSlideMaxScoreFunc)
 		{
 			return new ShortSlideInfo
 			{
@@ -86,7 +96,7 @@ namespace Ulearn.Web.Api.Controllers
 				Title = slide.Title,
 				Slug = slide.Url,
 				ApiUrl = Url.Action(nameof(SlidesController.SlideInfo), "Slides", new { courseId = courseId, slideId = slide.Id }),
-				MaxScore = slide.MaxScore,
+				MaxScore = getSlideMaxScoreFunc(slide),
 				Type = GetSlideType(slide),
 				QuestionsCount = slide.Blocks.OfType<AbstractQuestionBlock>().Count(),
 
@@ -138,6 +148,59 @@ namespace Ulearn.Web.Api.Controllers
 				Author = BuildShortUserInfo(comment.Author),
 				Text = comment.Text,
 			};
+		}
+		
+		protected ShortGroupInfo BuildShortGroupInfo(Group g)
+		{
+			return new ShortGroupInfo
+			{
+				Id = g.Id,
+				Name = g.Name,
+				CourseId = g.CourseId,
+				IsArchived = g.IsArchived,
+				ApiUrl = Url.Action(new UrlActionContext { Action = nameof(GroupController.Group), Controller = "Group", Values = new { groupId = g.Id }})
+			};
+		}
+		
+		public static async Task<Func<Slide, int>> BuildGetSlideMaxScoreFunc(IUserSolutionsRepo solutionsRepo, IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo,
+			Course course, string userId)
+		{
+			var solvedSlidesIds = GetSolvedSlides(solutionsRepo, userQuizzesRepo, course, userId);
+			var slidesWithUsersManualChecking = visitsRepo.GetSlidesWithUsersManualChecking(course.Id, userId).ToImmutableHashSet();
+			var enabledManualCheckingForUser = await groupsRepo.IsManualCheckingEnabledForUserAsync(course, userId).ConfigureAwait(false);
+			return s => GetMaxScoreForUsersSlide(s, solvedSlidesIds.Contains(s.Id), slidesWithUsersManualChecking.Contains(s.Id), enabledManualCheckingForUser);
+		}
+		
+		public static HashSet<Guid> GetSolvedSlides(IUserSolutionsRepo solutionsRepo, IUserQuizzesRepo userQuizzesRepo, Course course, string userId)
+		{
+			var solvedSlides = solutionsRepo.GetIdOfPassedSlides(course.Id, userId);
+			solvedSlides.UnionWith(userQuizzesRepo.GetPassedSlideIds(course.Id, userId));
+			return solvedSlides;
+		}
+		
+		public static int GetMaxScoreForUsersSlide(Slide slide, bool isSolved, bool hasManualChecking, bool enabledManualCheckingForUser)
+		{
+			var isExerciseOrQuiz = slide is ExerciseSlide || slide is QuizSlide;
+
+			if (!isExerciseOrQuiz)
+				return slide.MaxScore;
+
+			if (isSolved)
+				return hasManualChecking ? slide.MaxScore : GetMaxScoreWithoutManualChecking(slide);
+			return enabledManualCheckingForUser ? slide.MaxScore : GetMaxScoreWithoutManualChecking(slide);
+		}
+		
+		public static int GetMaxScoreWithoutManualChecking(Slide slide)
+		{
+			switch (slide)
+			{
+				case ExerciseSlide exerciseSlide:
+					return exerciseSlide.Scoring.PassedTestsScore;
+				case QuizSlide quizSlide:
+					return quizSlide.ManualChecking ? 0 : quizSlide.MaxScore;
+				default:
+					return slide.MaxScore;
+			}
 		}
 	}
 }

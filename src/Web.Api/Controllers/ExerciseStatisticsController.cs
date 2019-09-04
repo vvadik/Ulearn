@@ -3,11 +3,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database;
 using Database.Repos;
+using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Web.Api.Models.Responses.ExerciseStatistics;
 
@@ -17,11 +19,20 @@ namespace Ulearn.Web.Api.Controllers
 	public class ExerciseStatisticsController : BaseController
 	{
 		private readonly IUserSolutionsRepo userSolutionsRepo;
+		private readonly IUserSolutionsRepo solutionsRepo;
+		private readonly IUserQuizzesRepo userQuizzesRepo;
+		private readonly IVisitsRepo visitsRepo;
+		private readonly IGroupsRepo groupsRepo;
 
-		public ExerciseStatisticsController(ILogger logger, WebCourseManager courseManager, IUserSolutionsRepo userSolutionsRepo, UlearnDb db, IUsersRepo usersRepo)
+		public ExerciseStatisticsController(ILogger logger, WebCourseManager courseManager, IUserSolutionsRepo userSolutionsRepo, UlearnDb db, IUsersRepo usersRepo,
+			IUserSolutionsRepo solutionsRepo, IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.userSolutionsRepo = userSolutionsRepo;
+			this.solutionsRepo = solutionsRepo;
+			this.userQuizzesRepo = userQuizzesRepo;
+			this.visitsRepo = visitsRepo;
+			this.groupsRepo = groupsRepo;
 		}
 
 		/// <summary>
@@ -51,8 +62,11 @@ namespace Ulearn.Web.Api.Controllers
 				.Take(count)
 				.Select(s => Tuple.Create(s.SlideId, s.AutomaticCheckingIsRightAnswer, s.Timestamp))
 				.ToListAsync().ConfigureAwait(false);
+			
+			var getSlideMaxScoreFunc = await BuildGetSlideMaxScoreFunc(solutionsRepo, userQuizzesRepo, visitsRepo, groupsRepo, course, User.GetUserId());
 
 			const int daysLimit = 30;
+			
 			var result = new CourseExercisesStatisticsResponse
 			{
 				AnalyzedSubmissionsCount = submissions.Count,
@@ -63,7 +77,7 @@ namespace Ulearn.Web.Api.Controllers
 						var exerciseSubmissions = submissions.Where(s => s.Item1 == slide.Id).ToList();
 						return new OneExerciseStatistics
 						{
-							Exercise = BuildSlideInfo(course.Id, slide),
+							Exercise = BuildSlideInfo(course.Id, slide, getSlideMaxScoreFunc),
 							SubmissionsCount = exerciseSubmissions.Count,
 							AcceptedCount = exerciseSubmissions.Count(s => s.Item2),
 							/* Select last 30 (`datesLimit`) dates */

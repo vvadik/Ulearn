@@ -1,10 +1,11 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
-import styles from "./CourseNavigationItem.less";
-import classnames from "classnames";
+
 import ProgressBar from "../../ProgressBar";
+
+import classnames from "classnames";
 import { courseMenuItemType } from "../../types"
 
+import styles from "./CourseNavigationItem.less";
 
 class CourseNavigationItem extends Component {
 	render () {

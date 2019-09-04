@@ -7,6 +7,7 @@ import {
 	START, SUCCESS, FAIL,
 } from '../consts/actions';
 import { rateTypes } from "../consts/rateTypes";
+import { flashcards as flashcardsSlideType } from "../consts/routes";
 
 const initialCoursesState = {
 	courseById: {},
@@ -68,6 +69,8 @@ export default function courses(state = initialCoursesState, action) {
 				const unitSlides = courseUnits
 					.find(unit => unit.id === unitId)
 					.slides;
+				const flashcardsSlide = unitSlides.find(slide => slide.type === flashcardsSlideType);
+				const flashcardsSlideSlug = flashcardsSlide ? flashcardsSlide.slug : "";
 				let unratedFlashcardsCount = 0;
 
 				for (const flashcard of flashcards) {
@@ -85,7 +88,7 @@ export default function courses(state = initialCoursesState, action) {
 					flashcardsIds,
 					unratedFlashcardsCount,
 					cardsCount: flashcards.length,
-					flashcardsSlideSlug: unitSlides[unitSlides.length - 1].slug,
+					flashcardsSlideSlug,
 				}
 			}
 

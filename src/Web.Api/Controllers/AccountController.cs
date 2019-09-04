@@ -10,6 +10,7 @@ using Database.Extensions;
 using Database.Models;
 using Database.Repos;
 using Database.Repos.CourseRoles;
+using Database.Repos.Groups;
 using Database.Repos.SystemAccessesRepo;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
@@ -35,11 +36,12 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly ICoursesRepo coursesRepo;
 		private readonly ISystemAccessesRepo systemAccessesRepo;
+		private readonly IGroupMembersRepo groupMembersRepo;
 		private readonly WebApiConfiguration configuration;
 
 		public AccountController(ILogger logger, IOptions<WebApiConfiguration> options, WebCourseManager courseManager, UlearnDb db,
 			UlearnUserManager userManager, SignInManager<ApplicationUser> signInManager,
-			ICourseRolesRepo courseRolesRepo, ICoursesRepo coursesRepo, IUsersRepo usersRepo, ISystemAccessesRepo systemAccessesRepo)
+			ICourseRolesRepo courseRolesRepo, ICoursesRepo coursesRepo, IUsersRepo usersRepo, ISystemAccessesRepo systemAccessesRepo, IGroupMembersRepo groupMembersRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.userManager = userManager;
@@ -47,6 +49,7 @@ namespace Ulearn.Web.Api.Controllers
 			this.courseRolesRepo = courseRolesRepo;
 			this.coursesRepo = coursesRepo;
 			this.systemAccessesRepo = systemAccessesRepo;
+			this.groupMembersRepo = groupMembersRepo;
 			this.configuration = options.Value;
 		}
 
@@ -187,7 +190,7 @@ namespace Ulearn.Web.Api.Controllers
 					Accesses = g.Select(a => a.AccessType).ToList()
 				}
 			).ToList();
-			
+			var groupsWhereIAmStudent = await groupMembersRepo.GetUserGroupsAsync(userId).ConfigureAwait(false);
 			return new CourseRolesResponse
 			{
 				IsSystemAdministrator = isSystemAdministrator,
@@ -197,6 +200,7 @@ namespace Ulearn.Web.Api.Controllers
 					Role = kvp.Value,
 				}).ToList(),
 				CourseAccesses = courseAccessesByCourseId,
+				GroupsAsStudent = groupsWhereIAmStudent.Where(g => g.CanUsersSeeGroupProgress).Select(BuildShortGroupInfo).ToList()
 			};
 		}
 

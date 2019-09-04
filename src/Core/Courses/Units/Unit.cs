@@ -35,12 +35,12 @@ namespace Ulearn.Core.Courses.Units
 
 		public ScoringSettings Scoring => Settings.Scoring;
 
-		public void LoadInstructorNote()
+		public void LoadInstructorNote(CourseLoadingContext context, int slideIndex)
 		{
 			var instructorNoteFile = Directory.GetFile("InstructorNotes.md");
 			if (instructorNoteFile.Exists)
 			{
-				InstructorNote = InstructorNote.Load(instructorNoteFile, this);
+				InstructorNote = InstructorNote.Load(context, instructorNoteFile, this, slideIndex);
 			}
 		}
 

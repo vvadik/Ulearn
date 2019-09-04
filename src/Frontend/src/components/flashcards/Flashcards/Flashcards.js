@@ -5,7 +5,7 @@ import ProgressBar from "../ProgressBar/ProgressBar";
 import OpenedFlashcard from "./OpenedFlashcard/OpenedFlashcard";
 import Toast from "@skbkontur/react-ui/Toast";
 
-import { sortFlashcardsInAuthorsOrder, getNextFlashcardRandomly } from "./flashcardsStirrer/flashcardsStirrer";
+import { sortFlashcardsInAuthorsOrderWithRate, getNextFlashcardRandomly } from "./flashcardsStirrer/flashcardsStirrer";
 import countFlashcardsStatistics from "../countFlashcardsStatistics";
 import classNames from 'classnames';
 
@@ -35,21 +35,20 @@ class Flashcards extends Component {
 
 		const onUnit = unitId !== undefined;
 		let sessionFlashcards;
-		let maxTLast = -1;
+		const maxLastRateIndex = Flashcards.findMaxLastRateIndex(flashcards);
 
 		if (onUnit) {
 			const unitFlashcards = flashcards.filter(flashcard => flashcard.unitId === unitId);
-			sessionFlashcards = sortFlashcardsInAuthorsOrder(unitFlashcards);
+			sessionFlashcards = sortFlashcardsInAuthorsOrderWithRate(unitFlashcards);
 		} else {
 			sessionFlashcards = Flashcards.getUnlockedCourseFlashcards(flashcards, infoByUnits);
-			maxTLast = Flashcards.findMaxTLast(sessionFlashcards);
 		}
 
 		this.state = {
 			onUnit,
 			onUnitRepeating: false,
 			currentFlashcard: null,
-			maxTLast,
+			maxLastRateIndex,
 			sessionFlashcards,
 			totalFlashcardsCount: sessionFlashcards.length,
 			statistics: countFlashcardsStatistics(sessionFlashcards),
@@ -60,7 +59,7 @@ class Flashcards extends Component {
 		document.querySelector('body')
 			.classList.add(styles.overflow);
 
-		this.takeNextFlashcard(this.state.maxTLast);
+		this.takeNextFlashcard(this.state.maxLastRateIndex);
 	}
 
 	componentWillUnmount() {
@@ -131,28 +130,28 @@ class Flashcards extends Component {
 	}
 
 	handleResultsClick = (rate) => {
-		const { sessionFlashcards, currentFlashcard, maxTLast, statistics } = this.state;
+		const { sessionFlashcards, currentFlashcard, maxLastRateIndex, statistics } = this.state;
 		const { courseId, sendFlashcardRate } = this.props;
 
 		const newStatistics = { ...statistics };
 		const newRate = mapRateToRateType[rate];
-		const newTLast = maxTLast + 1;
+		const newLastRateIndex = maxLastRateIndex + 1;
 		const indexOfCard = sessionFlashcards.indexOf(currentFlashcard);
 		const newSessionFlashcards = sessionFlashcards.map(flashcard => ({ ...flashcard }));
 
-		sendFlashcardRate(courseId, currentFlashcard.unitId, currentFlashcard.id, newRate, newTLast);
+		sendFlashcardRate(courseId, currentFlashcard.unitId, currentFlashcard.id, newRate, newLastRateIndex);
 
 		if (indexOfCard > -1) {
 			const flashcard = newSessionFlashcards[indexOfCard];
 			flashcard.rate = newRate;
-			flashcard.lastRateIndex = newTLast;
+			flashcard.lastRateIndex = newLastRateIndex;
 		}
 
 		newStatistics[currentFlashcard.rate]--;
 		newStatistics[newRate]++;
 
 		this.setState({
-			maxTLast: newTLast,
+			maxLastRateIndex: newLastRateIndex,
 			statistics: newStatistics,
 			sessionFlashcards: newSessionFlashcards,
 		}, this.takeNextFlashcard);
@@ -181,7 +180,7 @@ class Flashcards extends Component {
 	startUnitRepeating() {
 		const { flashcards, unitId } = this.props;
 
-		const failedUnitFlashcards = sortFlashcardsInAuthorsOrder(Flashcards.getUnitFlashcards(flashcards, unitId, true));
+		const failedUnitFlashcards = sortFlashcardsInAuthorsOrderWithRate(Flashcards.getUnitFlashcards(flashcards, unitId, true));
 
 		if (failedUnitFlashcards.length > 0) {
 			const firstFlashcard = failedUnitFlashcards.shift();
@@ -214,9 +213,9 @@ class Flashcards extends Component {
 
 	startCourseRepeating() {
 		const { flashcards, infoByUnits } = this.props;
-		const { maxTLast } = this.state;
 
 		const unlockedCourseFlashcards = Flashcards.getUnlockedCourseFlashcards(flashcards, infoByUnits);
+		const maxLastRateIndex = Flashcards.findMaxLastRateIndex(unlockedCourseFlashcards);
 
 		Toast.push('Переход к повторению по курсу');
 
@@ -225,9 +224,9 @@ class Flashcards extends Component {
 			onUnitRepeating: false,
 			sessionFlashcards: unlockedCourseFlashcards,
 			totalFlashcardsCount: unlockedCourseFlashcards.length,
-			maxTLast,
+			maxLastRateIndex,
 			statistics: countFlashcardsStatistics(unlockedCourseFlashcards),
-			currentFlashcard: getNextFlashcardRandomly(unlockedCourseFlashcards, maxTLast),
+			currentFlashcard: getNextFlashcardRandomly(unlockedCourseFlashcards, maxLastRateIndex),
 		});
 	}
 
@@ -240,16 +239,16 @@ class Flashcards extends Component {
 			.map(flashcard => ({ ...flashcard }));
 	}
 
-	static findMaxTLast(flashcards) {
-		let maxTLast = -1;
+	static findMaxLastRateIndex(flashcards) {
+		let maxLastRateIndex = -1;
 
 		for (const { lastRateIndex } of flashcards) {
-			if (maxTLast < lastRateIndex) {
-				maxTLast = lastRateIndex;
+			if (maxLastRateIndex < lastRateIndex) {
+				maxLastRateIndex = lastRateIndex;
 			}
 		}
 
-		return maxTLast;
+		return maxLastRateIndex;
 	}
 
 	getNextCardInUnit() {
@@ -265,10 +264,10 @@ class Flashcards extends Component {
 	}
 
 	getNextCardInCourse() {
-		const { sessionFlashcards, maxTLast } = this.state;
+		const { sessionFlashcards, maxLastRateIndex } = this.state;
 
 		this.setState({
-			currentFlashcard: getNextFlashcardRandomly(sessionFlashcards, maxTLast),
+			currentFlashcard: getNextFlashcardRandomly(sessionFlashcards, maxLastRateIndex),
 		})
 	}
 

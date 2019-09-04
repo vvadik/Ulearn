@@ -47,6 +47,8 @@ namespace uLearn.CourseTool.Monitoring
 			this.courseDir = courseDir;
 			this.htmlDir = htmlDir;
 			this.port = port;
+			if (!Directory.Exists(htmlDir))
+				Directory.CreateDirectory(htmlDir);
 		}
 
 		public string FindLastChangedSlideHtmlPath()

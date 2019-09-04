@@ -1,5 +1,4 @@
 using System.Runtime.Serialization;
-using JetBrains.Annotations;
 
 namespace Ulearn.Web.Api.Models.Common
 {
@@ -8,6 +7,9 @@ namespace Ulearn.Web.Api.Models.Common
 	{
 		[DataMember]
 		public int Id { get; set; }
+		
+		[DataMember]
+		public string CourseId { get; set; }
 		
 		[DataMember]
 		public string Name { get; set; }

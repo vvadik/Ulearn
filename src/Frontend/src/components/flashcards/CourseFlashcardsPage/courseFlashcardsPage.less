@@ -5,14 +5,9 @@
   flex-wrap: nowrap;
   justify-content: space-between;
 
-  font-family: @defaultFonts;
-}
+  margin-bottom: 25px;
 
-@media (max-width: @maxPhoneWidth) {
-  .header {
-    flex-direction: column;
-    flex-wrap: wrap;
-  }
+  font-family: @defaultFonts;
 }
 
 .title {
@@ -27,4 +22,11 @@
   margin-top: 8px;
   font-size: 16px;
   line-height: 25px;
+}
+
+@media (max-width: @maxPhoneWidth) {
+  .header {
+    flex-direction: column;
+    flex-wrap: wrap;
+  }
 }

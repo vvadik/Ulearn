@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
+using Ulearn.Common.Extensions;
 
 namespace Database.DataContexts
 {
@@ -19,30 +21,65 @@ namespace Database.DataContexts
 			: this(new ULearnDb())
 		{
 		}
-			
+
+		private IEnumerable<UserRole> GetActualUserRoles(string userId = null, string courseId = null)
+		{
+			IQueryable<UserRole> queryable = db.UserRoles;
+			if (userId != null)
+				queryable = queryable.Where(x => x.UserId == userId);
+			if (courseId != null)
+				queryable = queryable.Where(x => x.CourseId == courseId);
+			var all = queryable.ToList()
+				.GroupBy(x => x.UserId + x.CourseId + x.Role, StringComparer.OrdinalIgnoreCase)
+				.Select(gr => gr.OrderByDescending(x => x.Id))
+				.Select(x => x.FirstOrDefault())
+				.Where(x => x != null && (!x.IsEnabled.HasValue || x.IsEnabled.Value));
+			return all;
+		}
+
+		public Dictionary<string, List<CourseRole>> GetRolesByUsers(string courseId)
+		{
+			var userRoles = GetActualUserRoles(courseId: courseId);
+			return userRoles
+				.GroupBy(role => role.UserId)
+				.ToDictionary(
+					g => g.Key,
+					g => g.Select(role => role.Role).Distinct().ToList()
+				);
+		}
+
 		public Dictionary<string, CourseRole> GetRoles(string userId)
 		{
-			return db.UserRoles
-				.Where(role => role.UserId == userId)
-				.GroupBy(role => role.CourseId)
+			var userRoles = GetActualUserRoles(userId: userId);
+			return userRoles
+				.GroupBy(role => role.CourseId, StringComparer.OrdinalIgnoreCase)
 				.ToDictionary(g => g.Key, g => g.Select(role => role.Role).Min(), StringComparer.OrdinalIgnoreCase);
 		}
 
-		public async Task<bool> ToggleRole(string courseId, string userId, CourseRole role)
+		public async Task<bool> ToggleRole(string courseId, string userId, CourseRole role, string grantedById, string comment)
 		{
-			var userRole = db.UserRoles.FirstOrDefault(u => u.UserId == userId && u.Role == role && u.CourseId == courseId);
-			if (userRole == null)
-				db.UserRoles.Add(new UserRole
-				{
-					UserId = userId,
-					CourseId = courseId,
-					Role = role
-				});
+			courseId = courseId.ToLower();
+			var userRole = db.UserRoles.Where(x => x.UserId == userId && x.Role == role && x.CourseId == courseId).ToList().LastOrDefault();
+			bool isEnabled;
+			if (userRole != null && (!userRole.IsEnabled.HasValue || userRole.IsEnabled.Value))
+				isEnabled = false;
 			else
-				db.UserRoles.Remove(userRole);
+				isEnabled = true;
+			var record = new UserRole
+			{
+				UserId = userId,
+				CourseId = courseId,
+				Role = role,
+				IsEnabled = isEnabled,
+				GrantedById = grantedById,
+				GrantTime = DateTime.Now.ToUniversalTime(),
+				Comment = comment
+			};
+			db.UserRoles.Add(record);
+
 			await db.SaveChangesAsync();
 
-			return userRole == null;
+			return isEnabled;
 		}
 
 		public List<string> GetListOfUsersWithCourseRole(CourseRole? courseRole, string courseId, bool includeHighRoles = false)
@@ -50,14 +87,11 @@ namespace Database.DataContexts
 			if (!courseRole.HasValue)
 				return null;
 
-			var usersQuery = (IQueryable<UserRole>)db.UserRoles;
-			usersQuery = includeHighRoles
-				? usersQuery.Where(userRole => userRole.Role <= courseRole)
-				: usersQuery.Where(userRole => userRole.Role == courseRole);
-
-			if (!string.IsNullOrEmpty(courseId))
-				usersQuery = usersQuery.Where(userRole => userRole.CourseId == courseId);
-			return usersQuery.Select(user => user.UserId).Distinct().ToList();
+			var usersRoles = GetActualUserRoles(courseId: courseId.NullIfEmptyOrWhitespace());
+			usersRoles = includeHighRoles
+				? usersRoles.Where(userRole => userRole.Role <= courseRole)
+				: usersRoles.Where(userRole => userRole.Role == courseRole);
+			return usersRoles.Select(user => user.UserId).Distinct().ToList();
 		}
 
 		public List<string> GetListOfUsersByPrivilege(bool onlyPrivileged, string courseId)
@@ -65,10 +99,36 @@ namespace Database.DataContexts
 			if (!onlyPrivileged)
 				return null;
 
-			IQueryable<UserRole> usersQuery = db.UserRoles;
-			if (courseId != null)
-				usersQuery = usersQuery.Where(userRole => userRole.CourseId == courseId);
-			return usersQuery.Select(userRole => userRole.UserId).Distinct().ToList();
+			var usersRoles = GetActualUserRoles(courseId: courseId);
+			return usersRoles.Select(userRole => userRole.UserId).Distinct().ToList();
+		}
+
+		public Dictionary<string, Dictionary<CourseRole, List<string>>> GetCoursesForUsers()
+		{
+			return GetActualUserRoles()
+				.GroupBy(userRole => userRole.UserId)
+				.ToDictionary(
+					g => g.Key,
+					g => g
+						.GroupBy(userRole => userRole.Role)
+						.ToDictionary(
+							gg => gg.Key,
+							gg => gg
+								.Select(userRole => userRole.CourseId.ToLower())
+								.ToList()
+						)
+				);
+		}
+
+		public async Task<List<UserRole>> GetUserRolesHistory(string userId)
+		{
+			return await db.UserRoles.Where(x => x.UserId == userId).ToListAsync();
+		}
+
+		public async Task<List<UserRole>> GetUserRolesHistoryByCourseId(string userId, string courseId)
+		{
+			courseId = courseId.ToLower();
+			return await db.UserRoles.Where(x => x.UserId == userId && x.CourseId == courseId).ToListAsync();
 		}
 	}
 }

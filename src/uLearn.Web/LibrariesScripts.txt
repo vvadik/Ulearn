@@ -17,7 +17,7 @@ tablesorter-master\js\jquery.tablesorter.widgets.js
 tablesorter-master\js\widgets\widget-grouping.js
 Scripts\table-configurator.js
 flexslider\jquery.flexslider.js
-katex\katex.js
+katex\katex.min.js
 codemirror\lib\codemirror.js
 codemirror\mode\clike\clike.js
 codemirror\mode\javascript\javascript.js

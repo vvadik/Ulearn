@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 
 import CourseCards from "./CourseCards/CourseCards";
 import Guides from "../Guides/Guides";
-import Gapped from "@skbkontur/react-ui/Gapped";
 import Button from "@skbkontur/react-ui/Button";
 import Loader from "@skbkontur/react-ui/Loader";
 import Flashcards from "../Flashcards/Flashcards";
@@ -34,34 +33,31 @@ class CourseFlashcardsPage extends Component {
 
 		return (
 			<Loader active={ flashcardsLoading } type="big">
-				<Gapped gap={ 15 } vertical>
+				{ this.renderHeader() }
 
-					{ this.renderHeader() }
+				{ !flashcardsLoading &&
+				<CourseCards
+					infoByUnits={ infoByUnits }
+					courseId={ courseId }
+				/> }
+				{ !flashcardsLoading &&
+				<Guides guides={ guides }/>
+				}
 
-					{ !flashcardsLoading &&
-					<CourseCards
-						infoByUnits={ infoByUnits }
-						courseId={ courseId }
-					/> }
-					{ !flashcardsLoading &&
-					<Guides guides={ guides }/>
-					}
-
-					{ showFlashcards &&
-					<Flashcards
-						infoByUnits={ infoByUnits }
-						flashcards={ flashcards }
-						courseId={ courseId }
-						onClose={ this.hideFlashcards }
-						sendFlashcardRate={ sendFlashcardRate }
-					/> }
-				</Gapped>
+				{ showFlashcards &&
+				<Flashcards
+					infoByUnits={ infoByUnits }
+					flashcards={ flashcards }
+					courseId={ courseId }
+					onClose={ this.hideFlashcards }
+					sendFlashcardRate={ sendFlashcardRate }
+				/> }
 			</Loader>
 		);
 	}
 
 	renderHeader() {
-		const hasUnlockedUnit  = this.props.infoByUnits
+		const hasUnlockedUnit = this.props.infoByUnits
 			.some(unit => unit.unlocked);
 
 		return (
@@ -74,7 +70,7 @@ class CourseFlashcardsPage extends Component {
 						Помогут лучше запомнить материал курса и подготовиться к экзаменам
 					</p>
 				</div>
-				<Button disabled={ !hasUnlockedUnit  }
+				<Button disabled={ !hasUnlockedUnit }
 						use="primary"
 						size='large'
 						onClick={ this.showFlashcards }>

@@ -23,6 +23,7 @@ Content\notification_settings.css
 Content\bootstrap.ulearn.css
 Content\bounce.css
 flexslider\flexslider.css
+katex\katex.min.css
 Content\jquery-ui.min.css
 Content\main.css
 Content\buttons.css

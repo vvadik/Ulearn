@@ -9,7 +9,8 @@ const initialAccountState = {
 	accountProblems: [],
 	systemAccesses: [],
 	roleByCourse: {},
-	accessesByCourse: {}
+	accessesByCourse: {},
+	groupsAsStudent: [],
 };
 
 function account(state = initialAccountState, action) {
@@ -33,7 +34,8 @@ function account(state = initialAccountState, action) {
 				...state,
 				isSystemAdministrator: action.isSystemAdministrator,
 				roleByCourse: action.roleByCourse,
-				accessesByCourse: action.accessesByCourse
+				accessesByCourse: action.accessesByCourse,
+				groupsAsStudent: action.groupsAsStudent,
 			};
 		default:
 			return state;

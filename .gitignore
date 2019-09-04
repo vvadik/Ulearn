@@ -200,9 +200,8 @@ private.settings
 .idea/
 
 src/uLearn\.Web/Courses
-/src/CourseTool/renderer/scripts/bundle.js
-/src/CourseTool/renderer/styles/bundle.css
 
 */.DS_Store/
-
+/src/CourseTool/renderer/scripts/bundle.js
+/src/CourseTool/renderer/styles/bundle.css
 /src/CourseTool/renderer/reactBuild

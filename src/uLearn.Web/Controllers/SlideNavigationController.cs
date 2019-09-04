@@ -119,7 +119,9 @@ namespace uLearn.Web.Controllers
 		public ActionResult PrevNextButtons(string courseId, Guid slideId, bool onSolutionsSlide)
 		{
 			var course = courseManager.GetCourse(courseId);
-			var slide = course.GetSlideById(slideId);
+			var slide = course.FindSlideById(slideId);
+			if (slide == null)
+				return Content("");
 			var userId = User.Identity.GetUserId();
 			var nextIsAcceptedSolutions = !onSolutionsSlide && slide is ExerciseSlide && visitsRepo.IsSkippedOrPassed(courseId, slide.Id, userId) && !((ExerciseSlide)slide).Exercise.HideShowSolutionsButton;
 			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);

@@ -1,12 +1,13 @@
 @import "./../../../variables";
 
-@modalMaxWidth: 1100px;
-@modalMaxHeight: 600px;
+@modalMaxWidth: @maxPhoneWidth;
+@modalMaxHeight: 504px;
 @moveAnimationDuration: 0.7s;
 @textAppearAnimationDuration: 0.3s;
 @modalBackgroundColor: #fff;
 @modalZIndex: 10;
 @overlayZIndex: @flashcardsOverlayZIndex;
+@progressBarHeight: 30px;
 
 .overlay {
   position: fixed;
@@ -43,19 +44,19 @@
   display: flex;
 
   position: absolute;
-  top: 50%;
+  top: 24%;
   left: 50%;
   z-index: @modalZIndex;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, 0);
 
   background-color: @modalBackgroundColor;
-  padding: 36px 56px;
+  padding: 37px 57px 48px;
   border-radius: 10px;
   margin-top: -30px;
 }
 
 .secondModal {
-  transform: translate(-50%, -56%) scale(0.95);
+  transform: translate(-50%, -6%) scale(0.95);
   z-index: @modalZIndex - 1;
   background: darken(@modalBackgroundColor, 10%);
 
@@ -67,19 +68,19 @@
 
 @keyframes moveFromSecondToFirst {
   from {
-    transform: translate(-50%, -56%) scale(0.95);
+    transform: translate(-50%, -6%) scale(0.95);
     z-index: @modalZIndex - 1;
     background: darken(@modalBackgroundColor, 10%);
   }
   to {
     z-index: @modalZIndex;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, 0);
     background: @modalBackgroundColor;
   }
 }
 
 .thirdModal {
-  transform: translate(-50%, -62%) scale(0.90);
+  transform: translate(-50%, -12%) scale(0.90);
   z-index: @modalZIndex - 2;
   background: darken(@modalBackgroundColor, 15%);
 
@@ -91,19 +92,19 @@
 
 @keyframes moveFromThirdToSecond {
   from {
-    transform: translate(-50%, -62%) scale(0.90);
+    transform: translate(-50%, -12%) scale(0.90);
     z-index: @modalZIndex - 2;
     background: darken(@modalBackgroundColor, 15%);
   }
   to {
-    transform: translate(-50%, -56%) scale(0.95);
+    transform: translate(-50%, -6%) scale(0.95);
     z-index: @modalZIndex - 1;
     background: darken(@modalBackgroundColor, 10%);
   }
 }
 
 .fourthModal {
-  transform: translate(-50%, -68%) scale(0.85);
+  transform: translate(-50%, -18%) scale(0.85);
   z-index: @modalZIndex - 3;
   background: darken(@modalBackgroundColor, 18%);
 
@@ -115,12 +116,12 @@
 
 @keyframes moveFromFourthToThird {
   from {
-    transform: translate(-50%, -68%) scale(0.85);
+    transform: translate(-50%, -18%) scale(0.85);
     z-index: @modalZIndex - 3;
     background: darken(@modalBackgroundColor, 18%);
   }
   to {
-    transform: translate(-50%, -62%) scale(0.90);
+    transform: translate(-50%, -12%) scale(0.90);
     z-index: @modalZIndex - 2;
     background: darken(@modalBackgroundColor, 15%);
   }
@@ -131,14 +132,15 @@
 
   position: absolute;
   top: 50%;
-  transform: translate(0, @modalMaxHeight/2);
+  transform: translate(0, @modalMaxHeight/2 + 10px);
 
   margin: 0;
 
   color: @lightYellow;
   text-align: center;
   font-size: 14px;
-  line-height: 28px;
+  line-height: 1.2;
+  font-weight: lighter;
 
   & > span {
     padding: 3px 9px;
@@ -154,14 +156,16 @@
 
 .progressBarContainer {
   position: absolute;
+  height: @progressBarHeight;
   bottom: 0;
   width: 100%;
 }
 
 @media (max-width: @maxPhoneWidth) {
   .modal {
-    height: calc(98vh - 40px - 30px);
-    transform: translate(-50%, -50%) translateY(40px);
+    height: calc(100vh - @headerHeight - @progressBarHeight);
+    top: 0;
+    transform: translate(-50%, @headerHeight + @progressBarHeight);
     padding: 26px 10px;
     border-radius: 0;
   }
@@ -171,7 +175,7 @@
   }
 
   .secondModal {
-    transform: translate(-50%, -50%) translateY(40px) scale(0.95);
+    transform: translate(-50%, @headerHeight + @progressBarHeight) scale(0.95);
   }
 
   .thirdModal {
@@ -188,12 +192,12 @@
 
   @keyframes moveFromSecondToFirst {
     from {
-      transform: translate(-50%, -50%) translateY(35px) scale(0.95);
+      transform: translate(-50%, @headerHeight + @progressBarHeight) scale(0.95);
       z-index: @modalZIndex - 1;
       background: darken(@modalBackgroundColor, 10%);
     }
     to {
-      transform: translate(-50%, -50%) translateY(40px);
+      transform: translate(-50%, @headerHeight + @progressBarHeight);
       z-index: @modalZIndex;
       background: @modalBackgroundColor;
     }

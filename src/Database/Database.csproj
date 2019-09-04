@@ -782,6 +782,10 @@
     <Compile Include="Migrations\201907220607352_AddUserFlashcardsUnlocking.Designer.cs">
       <DependentUpon>201907220607352_AddUserFlashcardsUnlocking.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201908240427161_AddCommentForUserRights.cs" />
+    <Compile Include="Migrations\201908240427161_AddCommentForUserRights.Designer.cs">
+      <DependentUpon>201908240427161_AddCommentForUserRights.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -1231,6 +1235,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201907220607352_AddUserFlashcardsUnlocking.resx">
       <DependentUpon>201907220607352_AddUserFlashcardsUnlocking.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201908240427161_AddCommentForUserRights.resx">
+      <DependentUpon>201908240427161_AddCommentForUserRights.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

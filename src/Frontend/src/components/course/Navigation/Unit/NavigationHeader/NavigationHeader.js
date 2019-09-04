@@ -1,23 +1,28 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+
 import Button from "@skbkontur/react-ui/Button";
 import LeftIcon from '@skbkontur/react-icons/ArrowChevron2Left';
+
+import { groupAsStudentType } from "../../types";
+import LinksToGroupsStatements from "../../LinksToGroupsStatements/LinksToGroupsStatements";
+
 import styles from './NavigationHeader.less';
 
 class NavigationHeader extends Component {
 	render() {
-		const { createRef } = this.props;
+		const { createRef, groupsAsStudent } = this.props;
 		return (
 			<header ref={ (ref) => createRef(ref) } className={ styles.root }>
 				{ this.renderBreadcrumb() }
 				{ this.renderTitle() }
+				{ groupsAsStudent.length > 0 && <LinksToGroupsStatements groupsAsStudent={ groupsAsStudent }/> }
 			</header>
-		); // TODO: Еще ссылка на "Ведомость модуля" у тех, у кого права есть
+		);
 	}
 
 	renderBreadcrumb() {
 		const { courseName, onCourseClick } = this.props;
-
 
 		return (
 			<nav className={ styles.breadcrumbs }>
@@ -39,6 +44,7 @@ class NavigationHeader extends Component {
 NavigationHeader.propTypes = {
 	title: PropTypes.string.isRequired,
 	courseName: PropTypes.string,
+	groupsAsStudent: PropTypes.arrayOf(PropTypes.shape(groupAsStudentType)),
 	onCourseClick: PropTypes.func,
 };
 

@@ -28,3 +28,11 @@ export const courseMenuItemType = {
 	progress: PropTypes.number,
 	isActive: PropTypes.bool,
 };
+
+export const groupAsStudentType = {
+	id: PropTypes.number,
+	courseId: PropTypes.string,
+	name: PropTypes.string,
+	isArchived: PropTypes.bool,
+	apiUrl: PropTypes.string,
+};

@@ -4,7 +4,7 @@ import translateTextToKatex from '../../src/codeTranslator/katex';
 export default function translateCode(element, settings = {}) {
 	for (const { id, selector, translateFunction } of translators) {
 		const elements = selector(element);
-		
+
 		for (const element of elements) {
 			if (element.style.display === 'none') {
 				continue;
@@ -19,8 +19,8 @@ const translators = [
 	{
 		id: 'codeMirror',
 		selector: (element) => element.querySelectorAll('.code'),
-		translateFunction: (element, settings = { additionalSettings: {}, withMarginAuto: false }) => {
-			translateTextareaToCode(element, settings.additionalSettings, settings.withMarginAuto)
+		translateFunction: (element, settings = { additionalSettings: {} }) => {
+			translateTextareaToCode(element, settings.additionalSettings)
 		},
 	},
 	{

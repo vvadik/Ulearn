@@ -9,8 +9,6 @@ import styles from "./openedFlashcard.less";
 import translateCode from "../../../../codeTranslator/translateCode";
 import Link from "react-router-dom/es/Link";
 
-const codeMirrorSettings = { codeMirror: { withMarginAuto: true } };
-
 class OpenedFlashcard extends Component {
 	constructor(props) {
 		super(props);
@@ -22,7 +20,7 @@ class OpenedFlashcard extends Component {
 
 	componentDidMount() {
 		document.addEventListener('keyup', this.handleKeyUp);
-		translateCode(this.modal, codeMirrorSettings);
+		translateCode(this.modal);
 	}
 
 	componentWillUnmount() {
@@ -30,7 +28,7 @@ class OpenedFlashcard extends Component {
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
-		translateCode(this.modal, codeMirrorSettings);
+		translateCode(this.modal);
 	}
 
 	handleKeyUp = (e) => {

@@ -778,9 +778,9 @@
     <Compile Include="Models\SwitchablePanelModel.cs" />
     <Compile Include="Models\TocModel.cs" />
     <Compile Include="Models\TocModelBuilder.cs" />
+    <Compile Include="Models\UserCourseToggleHistoryModel.cs" />
     <Compile Include="Models\UserCourseModel.cs" />
     <Compile Include="Models\UserModel.cs" />
-    <Compile Include="Models\UsersStatsPageModel.cs" />
     <Compile Include="Extensions\ControllerExtensions.cs" />
     <Compile Include="Controllers\AuthenticationManager.cs" />
     <Compile Include="Controllers\CommentsController.cs" />
@@ -1206,6 +1206,7 @@
     <Content Include="Jsdifflib\jsdifflib.css" />
     <Content Include="katex\*.css" />
     <Content Include="katex\katex.js" />
+    <Content Include="katex\katex.min.js" />
     <Content Include="LibrariesScripts.txt" />
     <Content Include="Scripts\activate-clipboard.js" />
     <Content Include="Scripts\analytics-highcharts.js" />
@@ -1418,11 +1419,13 @@
     <Content Include="tablesorter-master\tablesorter.jquery.json" />
     <Content Include="tablesorter-master\test.html" />
     <Content Include="..\schema.xsd">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="UlearnScripts.txt" />
     <Content Include="UlearnStyles.txt" />
+    <Content Include="Views\Account\CourseRightsHistory.cshtml" />
     <Content Include="Views\Account\JoinedToGroup.cshtml" />
+    <Content Include="Views\Account\ToggleRolesHistory.cshtml" />
     <Content Include="Views\Admin\StyleValidations.cshtml" />
     <Content Include="Views\AntiPlagiarism\Details.cshtml" />
     <Content Include="Views\Certificates\ListPartial.cshtml" />
@@ -1458,7 +1461,6 @@
     <Content Include="Views\Course\Slide.cshtml" />
     <Content Include="Views\SlideNavigation\PrevNextButtons.cshtml" />
     <Content Include="Views\Course\AcceptedSolutions.cshtml" />
-    <Content Include="Views\Analytics\UsersStatistics.cshtml" />
     <Content Include="Views\SlideNavigation\TableOfContents.cshtml">
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>TableOfContents.generated.cs</LastGenOutput>

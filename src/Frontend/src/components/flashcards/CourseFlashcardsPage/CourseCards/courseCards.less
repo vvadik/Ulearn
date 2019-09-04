@@ -6,6 +6,8 @@
 .cardsContainer {
   display: flex;
   flex-wrap: wrap;
+
+  margin-bottom: 15px;
 }
 
 .unitCard {
@@ -22,10 +24,12 @@
   color: @whiteSmoke;
 }
 
-.unitCard:hover {
+.unitCard:hover, .unitCard:focus {
   cursor: pointer;
   color: @whiteSmoke;
   text-decoration: none;
+
+  box-shadow: 0 8px 15px rgba(97, 114, 157, 0.3);
 }
 
 .emptyUnitCard {
@@ -43,6 +47,7 @@
 .emptyUnitCard:hover {
   color: @additionalColor;
   cursor: default;
+  box-shadow: none;
 }
 
 .unitCardLocked {

@@ -88,8 +88,15 @@ namespace uLearn.Web.Controllers
 			var isGuest = !User.Identity.IsAuthenticated;
 
 			var slide = slideGuid == Guid.Empty ? GetInitialSlideForStartup(courseId, visibleUnits) : course.FindSlideById(slideGuid);
-
+			
 			if (slide == null)
+			{
+				var instructorNote = course.FindInstructorNoteById(slideGuid);
+				if(instructorNote != null && User.HasAccessFor(course.Id, CourseRole.Instructor))
+					slide = instructorNote.Slide;
+			}
+			
+			if(slide == null)
 				return HttpNotFound();
 
 			AbstractManualSlideChecking queueItem = null;

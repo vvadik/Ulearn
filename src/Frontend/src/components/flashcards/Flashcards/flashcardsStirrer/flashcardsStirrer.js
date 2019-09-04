@@ -1,13 +1,13 @@
 import { rateTypes } from "../../../../consts/rateTypes";
 
-export function sortFlashcardsInAuthorsOrder(flashcards) {
+export function sortFlashcardsInAuthorsOrderWithRate(flashcards) {
 	const copy = [...flashcards];
 	return copy.sort((left, right) => {
-		return mapRateTypeToNumber[right.rate] - mapRateTypeToNumber[left.rate];
+		return mapRateTypeToSortingCoefficient[right.rate] - mapRateTypeToSortingCoefficient[left.rate];
 	});
 }
 
-const mapRateTypeToNumber = {
+const mapRateTypeToSortingCoefficient = {
 	[rateTypes.notRated]: 6,
 	[rateTypes.rate1]: 5,
 	[rateTypes.rate2]: 4,
@@ -16,13 +16,15 @@ const mapRateTypeToNumber = {
 	[rateTypes.rate5]: 1,
 };
 
-export function getNextFlashcardRandomly(sequence, maxTLast) {
+export function getNextFlashcardRandomly(sequence, maxLastRateIndex) {
 	const probabilities = sequence
 		.map(calculateProbability)
 		.sort((a, b) => b.probability - a.probability);
 
 	const probabilitiesSum = probabilities.reduce(
 		(sum, { probability }) => sum + probability, 0);
+
+	//A randomizer is used to select a card.
 	const probabilityThreshold = Math.random() * probabilitiesSum;
 	let currentProbability = 0;
 
@@ -34,19 +36,24 @@ export function getNextFlashcardRandomly(sequence, maxTLast) {
 		}
 	}
 
-	return null;
+	return '';
 
 	function calculateProbability(flashcard) {
-		const f = mapRateTypeToNumberInRandom[flashcard.rate];
-		const g = maxTLast - flashcard.lastRateIndex;
+		const ratingCoefficient = mapRateTypeToProbabilityCoefficient[flashcard.rate];
+		const timeCoefficient = maxLastRateIndex - flashcard.lastRateIndex;
 
-		const probability = f * (g * g * g);
+		// For each card, the probability with which it will be shown next is considered.
+		// This probability depends on:
+		// Card rating;
+		// The time that the card did not show ( priority );
+
+		const probability = ratingCoefficient * timeCoefficient * timeCoefficient * timeCoefficient;
 
 		return { probability, flashcard };
 	}
 }
 
-const mapRateTypeToNumberInRandom = {
+const mapRateTypeToProbabilityCoefficient = {
 	[rateTypes.rate1]: 16,
 	[rateTypes.rate2]: 8,
 	[rateTypes.rate3]: 4,

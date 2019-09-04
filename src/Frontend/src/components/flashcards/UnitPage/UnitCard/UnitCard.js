@@ -24,12 +24,12 @@ function UnitCard({ unitTitle, haveProgress = false, totalFlashcardsCount = 0, h
 				<p className={ styles.unitCardBody }>
 					{ getCardsPluralForm(totalFlashcardsCount) }
 				</p>
-				<div className={ styles.startButtonContainer }>
-					<Button size={ 'large' } onClick={ handleStartButton }>
-						Начать проверку
-					</Button>
-				</div>
 			</header>
+			<div className={ styles.startButtonContainer }>
+				<Button size={ 'large' } onClick={ handleStartButton }>
+					Начать проверку
+				</Button>
+			</div>
 			{ totalFlashcardsCount > 1 &&
 			<div
 				className={ stylesForCardNext }/>

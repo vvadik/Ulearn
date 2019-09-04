@@ -15,9 +15,9 @@ namespace Database.Repos
 		Task MarkCourseVersionAsPublishedAsync(Guid versionId);
 		Task DeleteCourseVersionAsync(string courseId, Guid versionId);
 		Task<List<CourseVersion>> GetPublishedCourseVersionsAsync();
-		Task<CourseAccess> GrantAccessAsync(string courseId, string userId, CourseAccessType accessType, string grantedById);
+		Task<CourseAccess> GrantAccessAsync(string courseId, string userId, CourseAccessType accessType, string grantedById, string comment);
 		bool CanRevokeAccess(string courseId, string userId, IPrincipal revokedBy);
-		Task<List<CourseAccess>> RevokeAccessAsync(string courseId, string userId, CourseAccessType accessType);
+		Task<List<CourseAccess>> RevokeAccessAsync(string courseId, string userId, CourseAccessType accessType, string grantedById, string comment);
 		Task<List<CourseAccess>> GetCourseAccessesAsync(string courseId);
 		Task<List<CourseAccess>> GetCourseAccessesAsync(string courseId, string userId);
 		Task<DefaultDictionary<string, List<CourseAccess>>> GetCoursesAccessesAsync(IEnumerable<string> coursesIds);
