@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using RunCheckerJob;
@@ -25,7 +26,7 @@ namespace uLearn.CourseTool.Validating
 		public CourseValidator(List<Slide> slides)
 		{
 			this.slides = slides;
-			string schemaPath = AppDomain.CurrentDomain.BaseDirectory + "schema.xsd";
+			string schemaPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "schema.xsd");
 			xmlValidator = new XmlValidator(schemaPath);
 		}
 
