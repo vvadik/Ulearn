@@ -103,7 +103,8 @@ namespace Ulearn.Core.Properties {
         ///биграммной
         ///биграммные
         ///биграммный:полный
-        ///биграммных        /// [rest of string was truncated]&quot;;.
+        ///биграммных
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         public static string customDictionary {
             get {
@@ -158,6 +159,46 @@ namespace Ulearn.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        public static byte[] en_GB_aff {
+            get {
+                object obj = ResourceManager.GetObject("en_GB_aff", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        public static byte[] en_GB_dic {
+            get {
+                object obj = ResourceManager.GetObject("en_GB_dic", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        public static byte[] en_US_aff {
+            get {
+                object obj = ResourceManager.GetObject("en_US_aff", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        public static byte[] en_US_dic {
+            get {
+                object obj = ResourceManager.GetObject("en_US_dic", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Is
         ///Are
         ///Africanize
@@ -205,6 +246,26 @@ namespace Ulearn.Core.Properties {
         public static string englishVerbs {
             get {
                 return ResourceManager.GetString("englishVerbs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        public static byte[] la_aff {
+            get {
+                object obj = ResourceManager.GetObject("la_aff", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        public static byte[] la_dic {
+            get {
+                object obj = ResourceManager.GetObject("la_dic", resourceCulture);
+                return ((byte[])(obj));
             }
         }
         
@@ -291,6 +352,28 @@ namespace Ulearn.Core.Properties {
         public static string ru_RU_dic {
             get {
                 return ResourceManager.GetString("ru_RU_dic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to func
+        ///arg
+        ///pos
+        ///bmp
+        ///prev
+        ///next
+        ///rnd
+        ///autocomplete
+        ///tuple
+        ///len
+        ///api
+        ///tuples
+        ///ptr
+        ///btn.
+        /// </summary>
+        public static string spelling_exceptions {
+            get {
+                return ResourceManager.GetString("spelling_exceptions", resourceCulture);
             }
         }
     }

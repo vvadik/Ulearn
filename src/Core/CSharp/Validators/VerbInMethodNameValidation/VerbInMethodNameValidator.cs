@@ -31,7 +31,7 @@ namespace Ulearn.Core.CSharp.Validators.VerbInMethodNameValidation
             if (exceptionsMethodNames.Contains(syntaxToken.ValueText))
                 yield break;
 
-            var wordsInName = SplitMethodName(syntaxToken.ValueText).ToList();
+            var wordsInName = syntaxToken.ValueText.SplitByCamelCase().ToList();
 
             if (exceptionsPreposition.Contains(wordsInName.First()))
                 yield break;
@@ -44,23 +44,7 @@ namespace Ulearn.Core.CSharp.Validators.VerbInMethodNameValidation
 
 			yield return new SolutionStyleError(StyleErrorType.VerbInMethod01, syntaxToken);
         }
-
-        private IEnumerable<string> SplitMethodName(string methodName)
-        {
-            var word = "";
-            foreach (var letter in methodName)
-            {
-                if ((char.IsUpper(letter) || !char.IsLetter(letter)) && word != "")
-                {
-                    yield return word;
-                    word = "";
-                }
-				if (char.IsLetter(letter))
-					word += letter;
-            }
-            yield return word;
-        }
-
+		
         private readonly HashSet<string> exceptionsMethodNames;
         private readonly HashSet<string> exceptionsPreposition;
     }
