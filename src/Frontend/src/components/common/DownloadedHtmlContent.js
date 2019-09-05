@@ -65,7 +65,7 @@ class DownloadedHtmlContent extends Component {
 			body: '',
 			bodyClassName: '',
 			meta: {},
-			links: []
+			links: [],
 		};
 	}
 
@@ -97,61 +97,62 @@ class DownloadedHtmlContent extends Component {
 	}
 
 	fetchContentFromServer(url) {
-		const self = this;
-
 		let courseId = this._getCourseIdFromUrl();
 		this.props.enterToCourse(courseId);
 
-		fetch(this.BASE_URL + url, {credentials: 'include'})
-		.then(response => {
-			if (response.redirected) {
-				/* If it was a redirect from external login callback, then update user information */
-				const oldUrlPathname = getUrlParts(url).pathname;
-				if (oldUrlPathname.startsWith("/Login/ExternalLoginCallback")) {
-					this.props.updateUserInformation();
-					this.props.updateCourses();
+		fetch(this.BASE_URL + url, { credentials: 'include' })
+			.then(response => {
+				if (url !== this.props.url) {
+					return;
 				}
+				if (response.redirected) {
+					/* If it was a redirect from external login callback, then update user information */
+					const oldUrlPathname = getUrlParts(url).pathname;
+					if (oldUrlPathname.startsWith("/Login/ExternalLoginCallback")) {
+						this.props.updateUserInformation();
+						this.props.updateCourses();
+					}
 
-				let newUrl = getUrlParts(response.url);
-				if(oldUrlPathname.startsWith('/Account/ReturnHijack') || oldUrlPathname.startsWith('/Account/Hijack')) {
-					localStorage.removeItem('exercise_solutions');
-					window.location.href = newUrl.pathname + newUrl.search;
-				} else {
-					this.context.router.history.replace(newUrl.pathname + newUrl.search);
-					return Promise.resolve(undefined);
-				}
-			}
-			/* Process attaches: download them and return url back */
-			if (response.headers.has('Content-Disposition')) {
-				let contentDisposition = response.headers.get('Content-Disposition');
-				if (contentDisposition.indexOf('attachment') !== -1) {
-					const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-					let matches = filenameRegex.exec(contentDisposition);
-					if (matches != null && matches[1]) {
-						let filename = matches[1].replace(/['"]/g, '');
-						response.blob().then(blob => this.downloadFile(blob, filename));
+					let newUrl = getUrlParts(response.url);
+					if (oldUrlPathname.startsWith('/Account/ReturnHijack') || oldUrlPathname.startsWith('/Account/Hijack')) {
+						localStorage.removeItem('exercise_solutions');
+						window.location.href = newUrl.pathname + newUrl.search;
+					} else {
+						this.context.router.history.replace(newUrl.pathname + newUrl.search);
 						return Promise.resolve(undefined);
 					}
 				}
-			}
-			/* Process content files: also download them and return url back */
-			if (url.startsWith('/Content/') || url.startsWith('/Certificates/')) {
-				response.blob().then(blob => this.downloadFile(blob, url));
-				return Promise.resolve(undefined);
-			}
-			this.setState(s => {
-				s.loading = true;
-				return s;
-			});
-			return response.text();
-		})
-		.then(data => {
-			if (data === undefined) {
-				return;
-			}
+				/* Process attaches: download them and return url back */
+				if (response.headers.has('Content-Disposition')) {
+					let contentDisposition = response.headers.get('Content-Disposition');
+					if (contentDisposition.indexOf('attachment') !== -1) {
+						const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+						let matches = filenameRegex.exec(contentDisposition);
+						if (matches != null && matches[1]) {
+							let filename = matches[1].replace(/['"]/g, '');
+							response.blob().then(blob => this.downloadFile(blob, filename));
+							return Promise.resolve(undefined);
+						}
+					}
+				}
+				/* Process content files: also download them and return url back */
+				if (url.startsWith('/Content/') || url.startsWith('/Certificates/')) {
+					response.blob().then(blob => this.downloadFile(blob, url));
+					return Promise.resolve(undefined);
+				}
+				this.setState(s => {
+					s.loading = true;
+					return s;
+				});
+				return response.text();
+			})
+			.then(data => {
+				if (data === undefined) {
+					return;
+				}
 
-			this.processNewHtmlContent(url, data);
-		}).catch(function (error) {
+				this.processNewHtmlContent(url, data);
+			}).catch(function (error) {
 			console.error(error);
 		});
 	}
@@ -237,7 +238,7 @@ class DownloadedHtmlContent extends Component {
 		if (this.state.loading) {
 			return (
 				<Loader type="big" active>
-					{this.getContent()}
+					{ this.getContent() }
 				</Loader>
 			)
 		}
@@ -251,8 +252,8 @@ class DownloadedHtmlContent extends Component {
 		let bodyClassName = this.state.bodyClassName;
 		return (
 			<div className="legacy-page">
-				<Meta meta={meta} links={links} bodyClassName={bodyClassName} />
-				<Content body={this.state.body} />
+				<Meta meta={ meta } links={ links } bodyClassName={ bodyClassName }/>
+				<Content body={ this.state.body }/>
 			</div>
 		)
 	}
@@ -262,7 +263,7 @@ class DownloadedHtmlContent extends Component {
 		let elements = Array.from(document.body.getElementsByClassName(className));
 		elements.forEach(e => {
 			let url = e.dataset.url;
-			fetch(url, {credentials: 'include'}).then(r => r.text()).then(data => {
+			fetch(url, { credentials: 'include' }).then(r => r.text()).then(data => {
 				e.innerHTML = data;
 				let scripts = Array.from(e.getElementsByTagName('script'));
 				scripts.filter(s => !s.src).forEach(s => safeEval(s.innerHTML));
@@ -315,11 +316,10 @@ class DownloadedHtmlContent extends Component {
 						if (!isUrlChanged)
 							newUrlParts.search += (newUrlParts.search === '' ? '?' : '&') + 'rnd=' + Math.random();
 
-						if(formUrlParts.startsWith('/Account/ReturnHijack') || formUrlParts.startsWith('/Account/Hijack')) {
+						if (formUrlParts.startsWith('/Account/ReturnHijack') || formUrlParts.startsWith('/Account/Hijack')) {
 							localStorage.removeItem('exercise_solutions');
 							window.location.href = newUrlParts.pathname + newUrlParts.search;
-						}
-						else {
+						} else {
 							this.context.router.history.replace(newUrlParts.pathname + newUrlParts.search);
 							return Promise.resolve(undefined);
 						}
@@ -365,7 +365,7 @@ class DownloadedHtmlContent extends Component {
 
 class Content extends PureComponent {
 	render() {
-		return (<div dangerouslySetInnerHTML={{__html: this.props.body}} />)
+		return (<div dangerouslySetInnerHTML={ { __html: this.props.body } }/>)
 	}
 }
 
@@ -377,26 +377,26 @@ class Meta extends Component {
 		let renderedLinks = [];
 		for (let i = 0; i < links.length; i++) {
 			let link = links[i];
-			renderedLinks.push(<link rel={link.rel} type={link.type} href={link.href} key={i} />);
+			renderedLinks.push(<link rel={ link.rel } type={ link.type } href={ link.href } key={ i }/>);
 		}
 		meta.title = decodeHtmlEntities(meta.title);
 		meta.description = decodeHtmlEntities(meta.description);
 		meta.keywords = decodeHtmlEntities(meta.keywords);
 		return (
-			<Helmet defer={false}>
-				<title>{meta.title}</title>
-				<meta name="title" content={meta.title} />
-				<meta property="og:title" content={meta.title} />
-				<meta property="og:image" content={meta.imageUrl} />
-				<meta property="og:image:alt" content={meta.description} />
-				<meta property="og:description" content={meta.description} />
-				<meta property="og:locale" content="ru_RU" />
-				<meta property="og:site_name" content="Ulearn" />
-				<meta name="description" content={meta.description} />
-				<meta name="keywords" content={meta.keywords} />
-				<link rel="image_src" href={meta.imageUrl} />
-				<body className={bodyClassName} />
-				{renderedLinks}
+			<Helmet defer={ false }>
+				<title>{ meta.title }</title>
+				<meta name="title" content={ meta.title }/>
+				<meta property="og:title" content={ meta.title }/>
+				<meta property="og:image" content={ meta.imageUrl }/>
+				<meta property="og:image:alt" content={ meta.description }/>
+				<meta property="og:description" content={ meta.description }/>
+				<meta property="og:locale" content="ru_RU"/>
+				<meta property="og:site_name" content="Ulearn"/>
+				<meta name="description" content={ meta.description }/>
+				<meta name="keywords" content={ meta.keywords }/>
+				<link rel="image_src" href={ meta.imageUrl }/>
+				<body className={ bodyClassName }/>
+				{ renderedLinks }
 			</Helmet>
 		)
 	}
