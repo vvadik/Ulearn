@@ -17,6 +17,10 @@ class Course extends Component {
 	constructor(props) {
 		super(props);
 
+		let pathname = window.location.pathname.toLowerCase();
+		let isLti = pathname.endsWith('/ltislide') || pathname.endsWith('/acceptedalert'); //TODO remove this flag,that hiding nav menu
+		let isNavMenuVisible = !isLti;
+
 		this.state = {
 			onCourseNavigation: true,
 			openUnit: null,
@@ -24,6 +28,7 @@ class Course extends Component {
 			currentSlideId: null,
 			currentCourseId: null,
 			navigationOpened: this.props.navigationOpened,
+			isNavMenuVisible,
 		};
 	}
 
@@ -37,6 +42,14 @@ class Course extends Component {
 		}
 
 		if (isAuthenticated && !progress) {
+			loadUserProgress(courseId);
+		}
+	}
+
+	componentDidUpdate(prevProps) {
+		const { loadUserProgress, isAuthenticated, courseId, slideId } = this.props;
+
+		if (isAuthenticated !== prevProps.isAuthenticated || slideId !== prevProps.slideId) {
 			loadUserProgress(courseId);
 		}
 	}
@@ -73,7 +86,7 @@ class Course extends Component {
 
 	render() {
 		const { courseInfo } = this.props;
-		const { navigationOpened } = this.state;
+		const { navigationOpened, isNavMenuVisible } = this.state;
 
 		if (!courseInfo) {
 			return null;
@@ -83,7 +96,7 @@ class Course extends Component {
 
 		return (
 			<div className={ classnames(styles.root, { 'open': navigationOpened }) }>
-				{ this.renderNavigation() }
+				{ isNavMenuVisible && this.renderNavigation() }
 				<main className={ styles.pageWrapper }>
 					<Page match={ this.props.match }/>
 				</main>
