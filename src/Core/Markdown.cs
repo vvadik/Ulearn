@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -32,9 +32,16 @@ namespace Ulearn.Core
 			};
 
 			markdownObject.FormatCodeBlock += FormatCodePrettyPrint;
-
 			var html = markdownObject.Transform(texReplacer.ReplacedText);
-			return texReplacer.PlaceTexInsertsBack(html);
+			var htmlWithTex = texReplacer.PlaceTexInsertsBack(html);
+			return htmlWithTex.WithTableStyles();
+		}
+
+		public static readonly Regex rxTable = new Regex("<table>", RegexOptions.Compiled);
+
+		public static string WithTableStyles(this string html)
+		{
+			return rxTable.Replace(html, "<table class=\"table table-bordered\" style=\"width:auto\">");
 		}
 
 		public static HtmlString RenderTex(this string textWithTex)
