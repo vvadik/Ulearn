@@ -73,11 +73,11 @@ namespace System.Linq
 		}
 
 		[NotNull]
-		public static List<T> EmptyIfNull<T>([CanBeNull]this List<T> items)
+		public static List<T> EmptyIfNull<T>([CanBeNull] this List<T> items)
 		{
 			return items ?? new List<T>();
 		}
-		
+
 		public static Dictionary<TKey, TElement> ToDictSafe<TSource, TKey, TElement>(
 			this IEnumerable<TSource> source,
 			Func<TSource, TKey> keySelector,

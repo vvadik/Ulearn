@@ -79,7 +79,7 @@ namespace uLearn.Web.Controllers
 			var selectedUnit = course.FindUnitById(unitId.Value);
 			if (selectedUnit == null)
 				return HttpNotFound();
-			
+
 			var slides = selectedUnit.Slides;
 			var slidesIds = slides.Select(s => s.Id).ToList();
 			var quizzes = slides.OfType<QuizSlide>();
@@ -195,13 +195,14 @@ namespace uLearn.Web.Controllers
 				if (!usersIds.Contains(userId))
 					return false;
 			}
+
 			return true;
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult ExportCourseStatisticsAsJson(CourseStatisticsParams param)
 		{
-			if(param.CourseId == null)
+			if (param.CourseId == null)
 				return HttpNotFound();
 
 			var model = GetCourseStatisticsModel(param, 3000);
@@ -215,9 +216,9 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult ExportCourseStatisticsAsXml(CourseStatisticsParams param)
 		{
-			if(param.CourseId == null)
+			if (param.CourseId == null)
 				return HttpNotFound();
-			
+
 			var model = GetCourseStatisticsModel(param, 3000);
 
 			var filename = model.Course.Id + ".xml";
@@ -229,9 +230,9 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult ExportCourseStatisticsAsXlsx(CourseStatisticsParams param)
 		{
-			if(param.CourseId == null)
+			if (param.CourseId == null)
 				return HttpNotFound();
-			
+
 			var model = GetCourseStatisticsModel(param, 3000);
 
 			var package = new ExcelPackage();
@@ -274,8 +275,10 @@ namespace uLearn.Web.Controllers
 					if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)
 						colspan++;
 				}
+
 				builder.AddCell(unit.Title, colspan);
 			}
+
 			builder.PopStyleRule(); // Border.Left
 			builder.GoToNewLine();
 
@@ -302,6 +305,7 @@ namespace uLearn.Web.Controllers
 					builder.PopStyleRule();
 				}
 			}
+
 			builder.GoToNewLine();
 
 			builder.AddStyleRule(s => s.Border.Bottom.Style = ExcelBorderStyle.Thin);
@@ -326,6 +330,7 @@ namespace uLearn.Web.Controllers
 						builder.AddCell(scoringGroup.MaxAdditionalScore);
 				}
 			}
+
 			builder.PopStyleRule(); // Bottom.Border
 			builder.GoToNewLine();
 
@@ -343,6 +348,7 @@ namespace uLearn.Web.Controllers
 					var scoringGroupOnlyFullScore = model.Course.Units.Sum(unit => model.GetTotalOnlyFullScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup));
 					builder.AddCell(onlyFullScores ? scoringGroupOnlyFullScore : scoringGroupScore);
 				}
+
 				foreach (var unit in model.Course.Units)
 				{
 					builder.AddStyleRuleForOneCell(s => s.Border.Left.Style = ExcelBorderStyle.Thin);
@@ -357,10 +363,12 @@ namespace uLearn.Web.Controllers
 							var slideScore = model.ScoreByUserAndSlide[Tuple.Create(user.UserId, slide.Id)];
 							builder.AddCell(onlyFullScores ? model.GetOnlyFullScore(slideScore, slide) : slideScore);
 						}
+
 						if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)
 							builder.AddCell(model.AdditionalScores[Tuple.Create(user.UserId, unit.Id, scoringGroup.Id)]);
 					}
 				}
+
 				builder.GoToNewLine();
 			}
 
@@ -369,11 +377,11 @@ namespace uLearn.Web.Controllers
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Student)]
-		public ActionResult CourseStatistics(CourseStatisticsParams param, int max=200)
+		public ActionResult CourseStatistics(CourseStatisticsParams param, int max = 200)
 		{
-			if(param.CourseId == null)
+			if (param.CourseId == null)
 				return HttpNotFound();
-			
+
 			var usersLimit = max;
 			if (usersLimit > 300)
 				usersLimit = 300;
@@ -423,7 +431,7 @@ namespace uLearn.Web.Controllers
 
 			var totalScoreByUserAllTime = visitsRepo.GetVisitsInPeriod(filterOptions.WithPeriodStart(DateTime.MinValue).WithPeriodFinish(DateTime.MaxValue))
 				.GroupBy(v => v.UserId)
-				.Select(g => new { g.Key, Sum = g.Sum(v => v.Score)})
+				.Select(g => new { g.Key, Sum = g.Sum(v => v.Score) })
 				.ToDictionary(g => g.Key, g => g.Sum)
 				.ToDefaultDictionary();
 
@@ -507,7 +515,7 @@ namespace uLearn.Web.Controllers
 			var unit = course.FindUnitById(unitId);
 			if (unit == null)
 				return HttpNotFound();
-			
+
 			var slides = unit.Slides;
 			var exercises = slides.OfType<ExerciseSlide>().ToList();
 			var acceptedSubmissions = userSolutionsRepo
@@ -550,7 +558,7 @@ namespace uLearn.Web.Controllers
 			var unit = course.FindUnitById(unitId);
 			if (unit == null)
 				return HttpNotFound();
-			
+
 			var slides = unit.Slides.ToArray();
 			var model = GetSlideRateStats(course, slides);
 			return PartialView(model);
@@ -569,6 +577,7 @@ namespace uLearn.Web.Controllers
 					return HttpNotFound();
 				slides = unit.Slides.ToArray();
 			}
+
 			var model = GetDailyStatistics(slides);
 			return PartialView(model);
 		}
@@ -749,12 +758,12 @@ namespace uLearn.Web.Controllers
 			var user = db.Users.Find(userId);
 			if (user == null || user.IsDeleted)
 				return HttpNotFound();
-			
+
 			var course = courseManager.GetCourse(courseId);
 			var slide = course.FindSlideById(slideId) as ExerciseSlide;
 			if (slide == null)
 				return RedirectToAction("CourseInfo", "Account", new { userId = userId, courseId });
-			
+
 			var model = new UserSolutionsViewModel
 			{
 				User = user,

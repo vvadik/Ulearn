@@ -34,8 +34,10 @@ namespace Ulearn.Core
 					if (subValidator == "verbinmethod")
 						validator.AddValidator(new VerbInMethodNameValidator(pp.Skip(1).ToArray()));
 				}
+
 				return validator;
 			}
+
 			return new NullValidator();
 		}
 	}

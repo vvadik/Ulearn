@@ -9,11 +9,14 @@
 	<div class="container body-content">
 		<div class="row">
 			<div class='slide'>
-				<h1>Заметки преподавателю
+				<h1>
+					Заметки преподавателю
 					<small>
 						@if (Model.NoteEditUrl != null)
 						{
-							<a href="@Model.NoteEditUrl" target="_blank" style="margin-right: 5px"><span class="glyphicon glyphicon-pencil"></span></a>
+							<a href="@Model.NoteEditUrl" target="_blank" style="margin-right: 5px">
+								<span class="glyphicon glyphicon-pencil"></span>
+							</a>
 						}
 						@Model.Note.Unit.Title
 					</small>

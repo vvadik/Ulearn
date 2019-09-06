@@ -11,7 +11,7 @@ namespace Ulearn.Web.Api.Models.Responses.CodeReviewStatistics
 	{
 		[DataMember]
 		public List<CodeReviewInstructorStatistics> Instructors { get; set; }
-		
+
 		[DataMember]
 		public int AnalyzedCodeReviewsCount { get; set; }
 	}
@@ -21,7 +21,7 @@ namespace Ulearn.Web.Api.Models.Responses.CodeReviewStatistics
 	{
 		[DataMember]
 		public ShortUserInfo Instructor { get; set; }
-		
+
 		[DataMember]
 		public List<CodeReviewExerciseStatistics> Exercises { get; set; }
 	}
@@ -31,13 +31,13 @@ namespace Ulearn.Web.Api.Models.Responses.CodeReviewStatistics
 	{
 		[DataMember]
 		public Guid SlideId { get; set; }
-		
+
 		[DataMember]
 		public int ReviewedSubmissionsCount { get; set; }
-		
+
 		[DataMember]
 		public int QueueSize { get; set; }
-		
+
 		[DataMember]
 		public int CommentsCount { get; set; }
 	}

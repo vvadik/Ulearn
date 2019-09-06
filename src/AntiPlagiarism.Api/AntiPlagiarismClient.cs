@@ -39,11 +39,11 @@ namespace AntiPlagiarism.Api
 			return builder.Uri;
 		}
 
-		private static Uri BuildUrl(string baseUrl, string token, NameValueCollection parameters=null)
+		private static Uri BuildUrl(string baseUrl, string token, NameValueCollection parameters = null)
 		{
 			if (parameters == null)
 				parameters = new NameValueCollection();
-			
+
 			var builder = new UriBuilder(baseUrl);
 			var queryString = WebUtils.ParseQueryString(builder.Query);
 			queryString["token"] = token;
@@ -63,7 +63,7 @@ namespace AntiPlagiarism.Api
 		{
 			return MakeRequestAsync<GetSubmissionPlagiarismsParameters, GetSubmissionPlagiarismsResponse>(HttpMethod.Get, Urls.GetSubmissionPlagiarisms, parameters);
 		}
-		
+
 		public Task<GetAuthorPlagiarismsResponse> GetAuthorPlagiarismsAsync(GetAuthorPlagiarismsParameters parameters)
 		{
 			return MakeRequestAsync<GetAuthorPlagiarismsParameters, GetAuthorPlagiarismsResponse>(HttpMethod.Get, Urls.GetAuthorPlagiarisms, parameters);

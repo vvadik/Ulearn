@@ -11,7 +11,7 @@ namespace Ulearn.Web.Api.Models.Responses.Groups
 	public class GroupAccessesResponse : SuccessResponse
 	{
 		[DataMember]
-		public List<GroupAccessesInfo> Accesses { get; set; } 
+		public List<GroupAccessesInfo> Accesses { get; set; }
 	}
 
 	[DataContract]
@@ -22,10 +22,10 @@ namespace Ulearn.Web.Api.Models.Responses.Groups
 
 		[DataMember]
 		public GroupAccessType AccessType { get; set; }
-		
+
 		[DataMember(EmitDefaultValue = false)]
 		public ShortUserInfo GrantedBy { get; set; }
-		
+
 		[DataMember]
 		public DateTime GrantTime { get; set; }
 	}

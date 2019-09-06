@@ -62,6 +62,7 @@ namespace Database.DataContexts
 					throw;
 				db.Entry(blob).State = EntityState.Unchanged;
 			}
+
 			return blob;
 		}
 

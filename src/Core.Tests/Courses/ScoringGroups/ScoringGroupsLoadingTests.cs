@@ -12,7 +12,7 @@ namespace Ulearn.Core.Tests.Courses.ScoringGroups
 	public class ScoringGroupsLoadingTests
 	{
 		private const string testDataDirectory = "Courses/ScoringGroups/TestData/";
-		
+
 		private CourseLoader loader;
 
 		[OneTimeSetUp]
@@ -39,19 +39,19 @@ namespace Ulearn.Core.Tests.Courses.ScoringGroups
 			var course = LoadCourseFromDirectory("SetAdditionalScoreInUnit");
 			var unit1 = course.Units.First();
 			var unit2 = course.Units.Last();
-			
+
 			Assert.AreEqual(false, course.Settings.Scoring.Groups["ScoringGroup1"].IsMaxAdditionalScoreSpecified);
 			Assert.AreEqual(false, course.Settings.Scoring.Groups["ScoringGroup1"].CanBeSetByInstructor);
-			
+
 			Assert.AreEqual(true, unit1.Settings.Scoring.Groups["ScoringGroup1"].IsMaxAdditionalScoreSpecified);
 			Assert.AreEqual(10, unit1.Settings.Scoring.Groups["ScoringGroup1"].MaxAdditionalScore);
 			Assert.AreEqual(true, unit1.Settings.Scoring.Groups["ScoringGroup1"].CanBeSetByInstructor);
-			
+
 			Assert.AreEqual(false, unit2.Settings.Scoring.Groups["ScoringGroup1"].IsMaxAdditionalScoreSpecified);
 			Assert.AreEqual(0, unit2.Settings.Scoring.Groups["ScoringGroup1"].MaxAdditionalScore);
 			Assert.AreEqual(false, unit2.Settings.Scoring.Groups["ScoringGroup1"].CanBeSetByInstructor);
 		}
-		
+
 		[Test]
 		public void TestInheritAdditionalScore()
 		{
@@ -59,15 +59,15 @@ namespace Ulearn.Core.Tests.Courses.ScoringGroups
 			var unit1 = course.Units[0];
 			var unit2 = course.Units[1];
 			var unit3 = course.Units[2];
-			
+
 			Assert.AreEqual(10, course.Settings.Scoring.Groups["ScoringGroup1"].MaxAdditionalScore);
 			Assert.AreEqual(true, course.Settings.Scoring.Groups["ScoringGroup1"].CanBeSetByInstructor);
-			
+
 			Assert.AreEqual(false, unit1.Settings.Scoring.Groups["ScoringGroup1"].CanBeSetByInstructor);
-			
+
 			Assert.AreEqual(true, unit2.Settings.Scoring.Groups["ScoringGroup1"].CanBeSetByInstructor);
 			Assert.AreEqual(20, unit2.Settings.Scoring.Groups["ScoringGroup1"].MaxAdditionalScore);
-			
+
 			Assert.AreEqual(true, unit3.Settings.Scoring.Groups["ScoringGroup1"].CanBeSetByInstructor);
 			Assert.AreEqual(10, unit3.Settings.Scoring.Groups["ScoringGroup1"].MaxAdditionalScore);
 		}

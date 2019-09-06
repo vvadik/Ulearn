@@ -63,6 +63,7 @@ namespace uLearn.Web.Controllers
 				var isLiked = slideHintRepo.IsHintLiked(courseId, exerciseSlide.Id, User.Identity.GetUserId(), i);
 				ans[i] = await MakeExerciseHint(exerciseSlide.Exercise.HintsMd[i].RenderMarkdown(exerciseSlide.Info.SlideFile), i, courseId, exerciseSlide.Id, isLiked);
 			}
+
 			return ans;
 		}
 

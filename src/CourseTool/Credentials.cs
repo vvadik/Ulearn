@@ -67,6 +67,7 @@ namespace uLearn.CourseTool
 				credentials = GetCredentialsFromIo(profile, service);
 				File.WriteAllText(dir + "/credentials.xml", new CredentialsArray { Credentials = new[] { credentials } }.XmlSerialize());
 			}
+
 			return credentials;
 		}
 

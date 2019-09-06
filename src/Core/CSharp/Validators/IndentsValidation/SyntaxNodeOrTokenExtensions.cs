@@ -73,12 +73,14 @@ namespace Ulearn.Core.CSharp.Validators.IndentsValidation
 				{
 					currentTabSpaces++;
 				}
+
 				if (currentTabSpaces == 4)
 				{
 					count += 4;
 					currentTabSpaces = 0;
 				}
 			}
+
 			return count + currentTabSpaces;
 		}
 	}

@@ -11,19 +11,19 @@ namespace Ulearn.Core.Courses.Slides
 	{
 		public string CourseId { get; private set; }
 		public CourseSettings CourseSettings { get; private set; }
-		
+
 		public DirectoryInfo UnitDirectory { get; }
 		public DirectoryInfo CourseDirectory { get; }
 		public Slide Slide { get; set; }
-		
+
 		public Unit Unit { get; }
-		
+
 		private List<RegionsExtractor> Extractors { get; }
 
 		public SlideBuildingContext(string courseId, Unit unit, CourseSettings courseSettings, DirectoryInfo courseDirectory, Slide slide)
 		{
 			CourseId = courseId;
-			
+
 			Unit = unit;
 			UnitDirectory = unit.Directory;
 			CourseDirectory = courseDirectory;
@@ -33,7 +33,7 @@ namespace Ulearn.Core.Courses.Slides
 		}
 
 		public SlideBuildingContext(SlideLoadingContext slideContext, Slide slide)
-			:this(slideContext.CourseId, slideContext.Unit, slideContext.CourseSettings, slideContext.CourseDirectory, slide)
+			: this(slideContext.CourseId, slideContext.Unit, slideContext.CourseSettings, slideContext.CourseDirectory, slide)
 		{
 		}
 

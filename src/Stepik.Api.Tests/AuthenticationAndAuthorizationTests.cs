@@ -8,28 +8,28 @@ namespace Stepik.Api.Tests
 {
 	[TestFixture]
 	[Explicit("Set `myFullName` before running this test")]
-    public class AuthenticationAndAuthorizationTests : StepikApiTests
+	public class AuthenticationAndAuthorizationTests : StepikApiTests
 	{
 		private const int correctAccessTokenLength = 30;
 		private const string myFullName = "Андрей Гейн";
 
 		private static readonly ILog log = LogManager.GetLogger(typeof(AuthenticationAndAuthorizationTests));
-		
-	    [SetUp]
-	    public async Task SetUp()
-	    {
-		    BasicConfigurator.Configure();
 
-		    await InitializeClient();
-	    }
+		[SetUp]
+		public async Task SetUp()
+		{
+			BasicConfigurator.Configure();
+
+			await InitializeClient();
+		}
 
 		[Test]
-	    public void CheckAccessToken()
+		public void CheckAccessToken()
 		{
 			var token = client.AccessToken;
 			Assert.IsNotNull(token);
 			Assert.AreEqual(token.Length, correctAccessTokenLength);
-	    }
+		}
 
 		[Test]
 		public async Task GetUserInfo()
@@ -50,7 +50,7 @@ namespace Stepik.Api.Tests
 			};
 			stepSource.Block.Text = "Hello from API";
 			stepSource.Block.Name = "text";
-			
+
 			var uploadedStepSource = await client.UploadStep(stepSource);
 			log.Info($"Uploaded step source: {uploadedStepSource.JsonSerialize()}");
 		}

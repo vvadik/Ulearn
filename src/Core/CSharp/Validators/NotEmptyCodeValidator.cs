@@ -15,7 +15,7 @@ namespace Ulearn.Core.CSharp.Validators
 				{
 					new SolutionStyleError(StyleErrorType.NotEmpty01, userSolution.GetRoot())
 				};
-			
+
 			return new List<SolutionStyleError>();
 		}
 	}

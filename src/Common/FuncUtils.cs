@@ -33,6 +33,7 @@ namespace Ulearn.Common
 					log.Info($"На попытке {tryIndex + 1} произошло исключение {e.Message}");
 					throw;
 				}
+
 			throw new Exception($"Can\'t run function {func} for {triesCount} times");
 		}
 
@@ -79,7 +80,7 @@ namespace Ulearn.Common
 		{
 			return TrySeveralTimes(func, triesCount, () => { });
 		}
-		
+
 		public static void TrySeveralTimes(Action func, int triesCount)
 		{
 			TrySeveralTimes(() =>
@@ -102,7 +103,7 @@ namespace Ulearn.Common
 				disposable.Dispose();
 			}
 		}
-		
+
 		public static TOut Using<TDisposable, TOut>(TDisposable disposable, Func<TDisposable, TOut> body, Action<TDisposable> additionalDisposeAction = null)
 			where TDisposable : IDisposable
 		{
@@ -116,14 +117,14 @@ namespace Ulearn.Common
 				disposable.Dispose();
 			}
 		}
-		
+
 		public static IEnumerable<TOut> Using<TDisposable, TOut>(TDisposable disposable, Func<TDisposable, IEnumerable<TOut>> body, Action<TDisposable> additionalDisposeAction = null)
 			where TDisposable : IDisposable
 		{
 			try
 			{
 				foreach (var result in body(disposable))
-				yield return result;
+					yield return result;
 			}
 			finally
 			{

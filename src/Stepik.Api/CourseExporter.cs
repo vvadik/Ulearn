@@ -131,7 +131,7 @@ namespace Stepik.Api
 		}
 
 		public CourseExporter(string accessToken)
-			:this(
+			: this(
 				ConfigurationManager.AppSettings["stepik.clientId"],
 				ConfigurationManager.AppSettings["stepik.clientSecret"],
 				ConfigurationManager.AppSettings["ulearn.baseUrl"],
@@ -152,6 +152,7 @@ namespace Stepik.Api
 				results.Error(e.Message);
 				results.Exception = e;
 			}
+
 			return results;
 		}
 
@@ -257,6 +258,7 @@ namespace Stepik.Api
 			{
 				results.Exception = e;
 			}
+
 			return results;
 		}
 
@@ -271,7 +273,7 @@ namespace Stepik.Api
 			// TODO (andgein): download multiple sections in one request
 			foreach (var sectionId in stepikCourse.SectionsIds)
 				stepikSections[sectionId] = await client.GetSection(sectionId).ConfigureAwait(false);
-				
+
 			var stepikUnitsIds = stepikSections.SelectMany(kvp => kvp.Value.UnitsIds).ToList();
 			results.Info($"Downloading stepik units ({string.Join(", ", stepikUnitsIds)}) and lessons for them");
 			var stepikUnits = new Dictionary<int, StepikApiUnit>();
@@ -285,7 +287,7 @@ namespace Stepik.Api
 
 			var sectionIndex = stepikCourse.SectionsIds.Count;
 			foreach (var slideUpdateOptions in updateOptions.SlidesUpdateOptions)
-			{ 
+			{
 				var slideId = slideUpdateOptions.SlideId;
 				var slide = course.FindSlideById(slideId);
 				if (slide == null)
@@ -293,6 +295,7 @@ namespace Stepik.Api
 					results.Error($"Unable to find slide {slideId}, continue without it");
 					continue;
 				}
+
 				results.Info($"Updating slide «{slide.Title}» with id {slide.Id}");
 				var stepId = slideUpdateOptions.InsertAfterStep;
 				StepikApiLesson lesson;
@@ -413,6 +416,7 @@ namespace Stepik.Api
 						stepikBlocks.Add(stepikBlock);
 				}
 			}
+
 			if (!string.IsNullOrEmpty(previousTextBlock.Text) && !attachTextBlocksToInteractiveContent)
 				stepikBlocks.Add(previousTextBlock);
 
@@ -454,7 +458,7 @@ namespace Stepik.Api
 					{
 						Name = "external-grader",
 						Text = lastTextBlock.Text,
-						Cost = ((ExerciseSlide) slide).Scoring.PassedTestsScore,
+						Cost = ((ExerciseSlide)slide).Scoring.PassedTestsScore,
 						Source = new StepikApiExternalGraderBlockSource(courseId, slide.Id, options.XQueueName, exerciseBlock.ExerciseInitialCode, stepikCSharpLanguageName)
 					};
 				case ChoiceBlock choiceBlock:

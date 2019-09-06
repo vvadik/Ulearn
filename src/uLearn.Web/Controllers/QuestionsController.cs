@@ -62,6 +62,7 @@ namespace uLearn.Web.Controllers
 					}
 				}
 			}
+
 			db.SaveChanges();
 			return Content("Fixed:\n" + string.Join("\n", fixedQuestions) + "\n\n" + "Removed:\n" + string.Join("\n", removedQuestions));
 		}

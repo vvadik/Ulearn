@@ -38,7 +38,8 @@
 		}
 		if (!string.IsNullOrEmpty(Model.LastTryCourseId))
 		{
-			<div style="margin: 10px">Что-то пошло не так. Вероятно, в CourseId присутствуют недопустимы символы: <pre style="display: inline-block">@Model.InvalidCharacters</pre>
+			<div style="margin: 10px">
+				Что-то пошло не так. Вероятно, в CourseId присутствуют недопустимы символы: <pre style="display: inline-block">@Model.InvalidCharacters</pre>
 			</div>
 		}
 	}

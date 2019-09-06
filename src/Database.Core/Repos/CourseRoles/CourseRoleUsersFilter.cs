@@ -16,7 +16,7 @@ namespace Database.Repos.CourseRoles
 			this.db = db;
 		}
 
-		public Task<List<string>> GetListOfUsersWithCourseRoleAsync(CourseRoleType? courseRoleType, string courseId, bool includeHighRoles=false)
+		public Task<List<string>> GetListOfUsersWithCourseRoleAsync(CourseRoleType? courseRoleType, string courseId, bool includeHighRoles = false)
 		{
 			if (!courseRoleType.HasValue)
 				return null;
@@ -30,7 +30,7 @@ namespace Database.Repos.CourseRoles
 				courseRoles = courseRoles.Where(userRole => userRole.CourseId == courseId);
 			return courseRoles.Select(user => user.UserId).Distinct().ToListAsync();
 		}
-		
+
 		public Task<List<string>> GetListOfUsersByPrivilegeAsync(bool onlyPrivileged, string courseId)
 		{
 			if (!onlyPrivileged)

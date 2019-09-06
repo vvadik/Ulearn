@@ -36,7 +36,7 @@ namespace Database.Repos.Comments
 				await db.CommentsPolicies.Where(x => x.CourseId == policy.CourseId).DeleteAsync().ConfigureAwait(false);
 				db.CommentsPolicies.Add(policy);
 				await db.SaveChangesAsync().ConfigureAwait(false);
-				
+
 				transaction.Commit();
 			}
 		}

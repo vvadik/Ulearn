@@ -9,7 +9,7 @@ namespace Ulearn.Common.Extensions
 		{
 			return Encoding.UTF8.GetString(inputStream.ToArray());
 		}
-		
+
 		public static byte[] ToArray(this Stream inputStream)
 		{
 			var codeBytes = new MemoryStream();

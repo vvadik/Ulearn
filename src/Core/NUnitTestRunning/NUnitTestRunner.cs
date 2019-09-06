@@ -77,7 +77,7 @@ namespace Ulearn.Core.NUnitTestRunning
 				results.Add(result);
 
 				if (result.ResultState.Status == TestStatus.Failed && result.ResultState.Site != FailureSite.Child
-					&& result.ResultState.Label != "Cancelled")
+																	&& result.ResultState.Label != "Cancelled")
 				{
 					Console.WriteLine($"Как минимум один из тестов не пройден!\nНазвание теста: {result.Name}\nСообщение:\n{result.Message}\nСтек вызовов:\n{result.StackTrace}");
 				}
@@ -120,7 +120,7 @@ namespace Ulearn.Core.NUnitTestRunning
 				tnode.AddAttribute("re", "1");
 			return tnode;
 		}
-		
+
 		/// <summary>Match the input provided by the derived class</summary>
 		/// <param name="input">The value to be matched</param>
 		/// <returns>True for a match, false otherwise.</returns>
@@ -132,7 +132,7 @@ namespace Ulearn.Core.NUnitTestRunning
 				return new Regex(ExpectedValue).IsMatch(input);
 			return false;
 		}
-		
+
 		/// <inheritdoc />
 		/// <summary>Match a test against a single value.</summary>
 		public override bool Match(ITest test)

@@ -14,20 +14,20 @@ namespace RunCheckerJob
 	internal class SelfChecker
 	{
 		private readonly DockerSandboxRunner sandboxRunner;
-		
+
 		private static readonly ILog log = LogManager.GetLogger(typeof(SelfChecker));
 
 		public SelfChecker(DockerSandboxRunner sandboxRunner)
 		{
 			this.sandboxRunner = sandboxRunner;
 		}
-		
+
 		public RunningResults SelfCheck(DirectoryInfo sandboxDir)
 		{
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 			var imageName = sandboxDir.Name;
 			var srcDirectory = new DirectoryInfo(Path.GetFullPath(Path.Combine(sandboxDir.FullName, "sample/src/")));
-			var zipBytes = AbstractExerciseBlock.ToZip(srcDirectory, new []{"node_modules", ".idea"});
+			var zipBytes = AbstractExerciseBlock.ToZip(srcDirectory, new[] { "node_modules", ".idea" });
 			var submissionFile = new FileInfo(Path.GetFullPath(Path.Combine(sandboxDir.FullName, "sample/submission.json")));
 			var submission = JsonConvert.DeserializeObject<CommandRunnerSubmission>(File.ReadAllText(submissionFile.FullName));
 			submission.Id = Utils.NewNormalizedGuid();
@@ -43,7 +43,7 @@ namespace RunCheckerJob
 	internal class SelfCheckerTests
 	{
 		private static readonly string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-		
+
 		[Test, Explicit]
 		public void JsSelfCheckTest()
 		{

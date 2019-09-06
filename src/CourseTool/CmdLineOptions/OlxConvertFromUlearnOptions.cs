@@ -44,6 +44,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 						return;
 				}
 			}
+
 			var video = LoadVideoInfo();
 			VideoHistory.UpdateHistory(Dir, video);
 

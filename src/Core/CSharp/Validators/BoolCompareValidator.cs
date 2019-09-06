@@ -23,7 +23,7 @@ namespace Ulearn.Core.CSharp.Validators
 			var rightNodeTypeInfo = semanticModel.GetTypeInfo(binaryExpression.Right);
 			var rightNodeTree = binaryExpression.Right as LiteralExpressionSyntax;
 			if (IsBooleanType(rightNodeTypeInfo) && IsBooleanType(leftNodeTypeInfo)
-				&& (IsBoolLiteral(leftNodeTree) || IsBoolLiteral(rightNodeTree)))
+												&& (IsBoolLiteral(leftNodeTree) || IsBoolLiteral(rightNodeTree)))
 				yield return new SolutionStyleError(StyleErrorType.BoolCompare01, binaryExpression);
 		}
 

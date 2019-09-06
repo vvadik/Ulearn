@@ -13,10 +13,10 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing.CSharp
 	public class CodeUnitsExtractor_should
 	{
 		private CodeUnitsExtractor extractor;
-		
+
 		/* TODO (andgein): make this code more straighted and clear? */
 		private static DirectoryInfo TestDataDir => new DirectoryInfo(
-			Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", 
+			Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..",
 				"CodeAnalyzing", "CSharp", "TestData")
 		);
 
@@ -30,7 +30,7 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing.CSharp
 		public void ExtractCodeUnits()
 		{
 			var codeUnits = extractor.Extract(CommonTestData.SimpleProgramWithMethodAndProperty);
-			
+
 			Assert.AreEqual(3, codeUnits.Count);
 			CollectionAssert.AreEqual(new List<int> { 31, 45, 51 }, codeUnits.Select(u => u.FirstTokenIndex));
 
@@ -56,18 +56,18 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing.CSharp
 		{
 			var syntaxTree = CSharpSyntaxTree.ParseText(CommonTestData.SimpleProgramWithMethodAndProperty);
 			var syntaxTreeRoot = syntaxTree.GetRoot();
-			
+
 			Assert.AreEqual("ROOT", CodeUnitsExtractor.GetNodeName(syntaxTreeRoot));
-			
+
 			var namespaceDeclaration = syntaxTreeRoot.ChildNodes().First(n => n.Kind() == SyntaxKind.NamespaceDeclaration);
 			Assert.AreEqual("HelloWorld.Namespace", CodeUnitsExtractor.GetNodeName(namespaceDeclaration));
-			
+
 			var classDeclaration = namespaceDeclaration.ChildNodes().First(n => n.Kind() == SyntaxKind.ClassDeclaration);
 			Assert.AreEqual("Program", CodeUnitsExtractor.GetNodeName(classDeclaration));
-			
+
 			var methodDeclaration = classDeclaration.ChildNodes().First(n => n.Kind() == SyntaxKind.MethodDeclaration);
 			Assert.AreEqual("Main", CodeUnitsExtractor.GetNodeName(methodDeclaration));
-			
+
 			var propertyDeclaration = classDeclaration.ChildNodes().First(n => n.Kind() == SyntaxKind.PropertyDeclaration);
 			Assert.AreEqual("A", CodeUnitsExtractor.GetNodeName(propertyDeclaration));
 		}
@@ -76,7 +76,7 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing.CSharp
 		public void ExtractInnerClass()
 		{
 			var codeUnits = ExtractCodeUnitsFromTestFile("NestedClasses.cs");
-			
+
 			/* At least one code unit is inside InnerClass */
 			Assert.IsTrue(codeUnits.Any(u => u.Path.Parts.Any(p => p.Name == "InnerClass")));
 		}
@@ -85,9 +85,9 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing.CSharp
 		public void ExtractConstructors()
 		{
 			var codeUnits = ExtractCodeUnitsFromTestFile("Constructors.cs");
-			
+
 			Assert.AreEqual(5, codeUnits.Count);
-			
+
 			/* One code unit should be ThisConstructorInitializer */
 			Assert.AreEqual(1, codeUnits.Count(u => u.Path.Parts.Any(p => p.Name == "ThisConstructorInitializer")));
 		}
@@ -96,7 +96,7 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing.CSharp
 		public void ExtractOperators()
 		{
 			var codeUnits = ExtractCodeUnitsFromTestFile("Operators.cs");
-			
+
 			Assert.AreEqual(4, codeUnits.Count(u => u.Path.Parts.Any(p => p.Name.StartsWith("Operator"))));
 			Assert.AreEqual(3, codeUnits.Count(u => u.Path.Parts.Any(p => p.Name.StartsWith("Conversion-"))));
 		}

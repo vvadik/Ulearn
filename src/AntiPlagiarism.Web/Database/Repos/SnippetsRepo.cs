@@ -69,25 +69,22 @@ namespace AntiPlagiarism.Web.Database.Repos
 				FirstTokenIndex = firstTokenIndex,
 			};
 			logger.Information($"Добавляю в базу объект {snippetOccurence}");
-			
-			
+
 			DisableAutoDetectChanges();
-			
+
 			/* ...and use non-async Add() here because of perfomance issues with async versions */
 			db.SnippetsOccurences.Add(snippetOccurence);
 			db.Entry(snippetOccurence).State = EntityState.Added;
 			await db.SaveChangesAsync().ConfigureAwait(false);
 			db.Entry(snippetOccurence).State = EntityState.Unchanged;
-		
+
 			EnableAutoDetectChanges();
-			
-			
+
 			logger.Information($"Добавил. Пересчитываю статистику сниппета (количество авторов, у которых он встречается)");
 			var snippetStatistics = await GetOrAddSnippetStatisticsAsync(foundSnippet, submission.TaskId, submission.ClientId);
-			
-			
+
 			DisableAutoDetectChanges();
-			
+
 			logger.Information($"Старая статистика сниппета {foundSnippet}: {snippetStatistics}");
 			/* Use non-async Add() here because of performance issues with async versions */
 			snippetStatistics.AuthorsCount = db.SnippetsOccurences.Include(o => o.Submission)
@@ -101,10 +98,9 @@ namespace AntiPlagiarism.Web.Database.Repos
 			logger.Information($"Количество авторов, у которых встречается сниппет {foundSnippet} — {snippetStatistics.AuthorsCount}");
 			await db.SaveChangesAsync().ConfigureAwait(false);
 			db.Entry(snippetStatistics).State = EntityState.Unchanged;
-		
+
 			EnableAutoDetectChanges();
 
-			
 			logger.Information($"Закончил сохранение в базу информации о сниппете {foundSnippet} в решении #{submission.Id} в позиции {firstTokenIndex}");
 			return snippetOccurence;
 		}
@@ -129,7 +125,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 					TaskId = taskId,
 				});
 				addedStatistics.State = EntityState.Added;
-				
+
 				try
 				{
 					await db.SaveChangesAsync().ConfigureAwait(false);
@@ -146,8 +142,8 @@ namespace AntiPlagiarism.Web.Database.Repos
 					).ConfigureAwait(false);
 					if (foundStatistics != null)
 						return foundStatistics;
-					
-					throw;				
+
+					throw;
 				}
 
 				return addedStatistics.Entity;
@@ -220,7 +216,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 		{
 			if (maxCount == 0)
 				return await db.SnippetsOccurences.Where(o => o.SubmissionId == submission.Id).ToListAsync().ConfigureAwait(false);
-			
+
 			var selectedSnippetsStatistics = db.SnippetsStatistics.Where(s => s.TaskId == submission.TaskId && s.ClientId == submission.ClientId);
 			return (await db.SnippetsOccurences.Include(o => o.Snippet)
 					.Join(selectedSnippetsStatistics, o => o.SnippetId, s => s.SnippetId, (occurence, statistics) => new { occurence, statistics })
@@ -273,14 +269,14 @@ namespace AntiPlagiarism.Web.Database.Repos
 				.GroupBy(o => o.SubmissionId)
 				.ToDictionary(kvp => kvp.Key, kvp => kvp.Count())
 				.ToList();
-			
+
 			if (!submissionsWithSnippetsCount.Any())
 				return new List<int>();
-			
+
 			/* Sort by occurrences count descendants */
 			submissionsWithSnippetsCount.Sort((first, second) => second.Value.CompareTo(first.Value));
 			var maxOccurrencesCount = submissionsWithSnippetsCount[0].Value;
-			
+
 			/* Take at least maxSubmissionsCount submissions, but also take submissions while it's occurencesCount is greater than 0.9 * maxOccurencesCount */
 			return submissionsWithSnippetsCount.TakeWhile((kvp, index) => index < maxSubmissionsCount || kvp.Value >= 0.9 * maxOccurrencesCount).Select(kvp => kvp.Key).ToList();
 		}

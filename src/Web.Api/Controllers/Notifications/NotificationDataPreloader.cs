@@ -23,7 +23,7 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 				CommentsByIds = await LoadCommentsAsync(notifications).ConfigureAwait(false)
 			};
 		}
-		
+
 		private async Task<Dictionary<int, Comment>> LoadCommentsAsync(IEnumerable<Notification> notifications)
 		{
 			/* Preload comments */

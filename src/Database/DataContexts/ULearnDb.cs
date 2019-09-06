@@ -16,11 +16,12 @@ namespace Database.DataContexts
 	public class ULearnDb : IdentityDbContext<ApplicationUser>
 	{
 		private readonly ILog log = LogManager.GetLogger(typeof(ULearnDb));
+
 		public ULearnDb()
 			: base(ApplicationConfiguration.Read<UlearnConfiguration>().Database, throwIfV1Schema: false)
 		{
 			System.Data.Entity.Database.SetInitializer(new MigrateDatabaseToLatestVersion<ULearnDb, Configuration>());
-			if(log.IsDebugEnabled)
+			if (log.IsDebugEnabled)
 				Database.Log = log.Debug;
 		}
 
@@ -56,19 +57,19 @@ namespace Database.DataContexts
 				.WithMany(n => n.Deliveries)
 				.HasForeignKey(d => d.NotificationId)
 				.WillCascadeOnDelete(true);
-			
+
 			modelBuilder.Entity<UserQuizSubmission>()
 				.HasOptional(s => s.AutomaticChecking)
 				.WithRequired(c => c.Submission)
 				.WillCascadeOnDelete(false);
-			
+
 			modelBuilder.Entity<UserQuizSubmission>()
 				.HasOptional(s => s.ManualChecking)
 				.WithRequired(c => c.Submission)
 				.WillCascadeOnDelete(false);
-			
+
 			modelBuilder.Entity<UserRole>().HasRequired(r => r.User).WithMany().HasForeignKey(r => r.UserId).WillCascadeOnDelete();
-			
+
 			CancelCascaseDeleting<ExerciseCodeReview, ApplicationUser, string>(modelBuilder, c => c.Author, c => c.AuthorId);
 
 			CancelCascaseDeleting<UserExerciseSubmission, ApplicationUser, string>(modelBuilder, c => c.User, c => c.UserId);
@@ -100,19 +101,19 @@ namespace Database.DataContexts
 			CancelCascaseDeleting<PassedManualExerciseCheckingNotification, ManualExerciseChecking, int>(modelBuilder, c => c.Checking, c => c.CheckingId);
 			CancelCascaseDeleting<PassedManualQuizCheckingNotification, ManualQuizChecking, int>(modelBuilder, c => c.Checking, c => c.CheckingId);
 			CancelCascaseDeleting<ReceivedAdditionalScoreNotification, AdditionalScore, int?>(modelBuilder, c => c.Score, c => c.ScoreId, isRequired: false);
-			
+
 			CancelCascaseDeleting<NewCommentNotification, Comment, int>(modelBuilder, c => c.Comment, c => c.CommentId);
 			CancelCascaseDeleting<NewCommentFromYourGroupStudentNotification, Comment, int>(modelBuilder, c => c.Comment, c => c.CommentId);
 			CancelCascaseDeleting<LikedYourCommentNotification, Comment, int>(modelBuilder, c => c.Comment, c => c.CommentId);
 			CancelCascaseDeleting<RepliedToYourCommentNotification, Comment, int>(modelBuilder, c => c.Comment, c => c.CommentId);
 			CancelCascaseDeleting<RepliedToYourCommentNotification, Comment, int>(modelBuilder, c => c.ParentComment, c => c.ParentCommentId);
 			CancelCascaseDeleting<NewCommentForInstructorsOnlyNotification, Comment, int>(modelBuilder, c => c.Comment, c => c.CommentId);
-			
+
 			CancelCascaseDeleting<UploadedPackageNotification, CourseVersion, Guid>(modelBuilder, c => c.CourseVersion, c => c.CourseVersionId);
 			CancelCascaseDeleting<PublishedPackageNotification, CourseVersion, Guid>(modelBuilder, c => c.CourseVersion, c => c.CourseVersionId);
 
 			CancelCascaseDeleting<CourseExportedToStepikNotification, StepikExportProcess, int>(modelBuilder, c => c.Process, c => c.ProcessId);
-			
+
 			CancelCascaseDeleting<XQueueWatcher, ApplicationUser, string>(modelBuilder, c => c.User, c => c.UserId);
 
 			CancelCascaseDeleting<StepikExportProcess, ApplicationUser, string>(modelBuilder, c => c.Owner, c => c.OwnerId);
@@ -121,15 +122,15 @@ namespace Database.DataContexts
 
 			CancelCascaseDeleting<GroupAccess, ApplicationUser, string>(modelBuilder, c => c.User, c => c.UserId);
 			CancelCascaseDeleting<GroupAccess, ApplicationUser, string>(modelBuilder, c => c.GrantedBy, c => c.GrantedById);
-			
+
 			CancelCascaseDeleting<LabelOnGroup, Group, int>(modelBuilder, c => c.Group, c => c.GroupId);
 			CancelCascaseDeleting<GroupLabel, ApplicationUser, string>(modelBuilder, c => c.Owner, c => c.OwnerId);
 			CancelCascaseDeleting<LabelOnGroup, GroupLabel, int>(modelBuilder, c => c.Label, c => c.LabelId);
-			
+
 			CancelCascaseDeleting<SystemAccess, ApplicationUser, string>(modelBuilder, c => c.GrantedBy, c => c.GrantedById);
 		}
 
-		private static void CancelCascaseDeleting<T1, T2, T3>(DbModelBuilder modelBuilder, Expression<Func<T1, T2>> oneWay, Expression<Func<T1, T3>> secondWay, bool isRequired=true)
+		private static void CancelCascaseDeleting<T1, T2, T3>(DbModelBuilder modelBuilder, Expression<Func<T1, T2>> oneWay, Expression<Func<T1, T3>> secondWay, bool isRequired = true)
 			where T1 : class
 			where T2 : class
 		{
@@ -238,10 +239,9 @@ namespace Database.DataContexts
 
 		public DbSet<CourseAccess> CourseAccesses { get; set; }
 		public DbSet<SystemAccess> SystemAccesses { get; set; }
-		
+
 		public DbSet<StyleErrorSettings> StyleErrorSettings { get; set; }
-		
+
 		public DbSet<UserFlashcardsVisit> UserFlashcardsVisits { get; set; }
 	}
 }
- 

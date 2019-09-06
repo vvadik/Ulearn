@@ -9,6 +9,7 @@
 
 @functions {
 	/* Returns css class from grade-0 to grade-15 */
+
 	private string GradeCssClass(int score, int maxScore, bool zerosWithoutClass = true)
 	{
 		if (score > maxScore)
@@ -18,10 +19,12 @@
 	}
 
 	/* Returns css class from only-full__grade-0 to only-full__grade-15 */
+
 	private string OnlyFullGradeCssClass(int score, int maxScore)
 	{
 		return "only-full__" + GradeCssClass(score, maxScore, false);
 	}
+
 }
 
 @{
@@ -60,27 +63,27 @@
 				Groups = Model.Groups,
 			})
 
-            <div class="form-group">
-                <button role="button" class="btn btn-primary" data-replace-action="@Url.Action("CourseStatistics")">Показать ведомость</button>
-                
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Скачать <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a href="@Url.Action("ExportCourseStatisticsAsXlsx")" data-replace-action="@Url.Action("ExportCourseStatisticsAsXlsx")">Скачать xlsx</a>
-                        </li>
-                        <li>
-                            <a href="@Url.Action("ExportCourseStatisticsAsJson")" data-replace-action="@Url.Action("ExportCourseStatisticsAsJson")">Скачать json</a>
-                        </li>
-                        <li>
-                            <a href="@Url.Action("ExportCourseStatisticsAsXml")" data-replace-action="@Url.Action("ExportCourseStatisticsAsXml")">Скачать xml</a>
-                        </li>
-                    </ul>
-                </div>
-                
-            </div>
+			<div class="form-group">
+				<button role="button" class="btn btn-primary" data-replace-action="@Url.Action("CourseStatistics")">Показать ведомость</button>
+
+				<div class="btn-group" role="group">
+					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						Скачать <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li>
+							<a href="@Url.Action("ExportCourseStatisticsAsXlsx")" data-replace-action="@Url.Action("ExportCourseStatisticsAsXlsx")">Скачать xlsx</a>
+						</li>
+						<li>
+							<a href="@Url.Action("ExportCourseStatisticsAsJson")" data-replace-action="@Url.Action("ExportCourseStatisticsAsJson")">Скачать json</a>
+						</li>
+						<li>
+							<a href="@Url.Action("ExportCourseStatisticsAsXml")" data-replace-action="@Url.Action("ExportCourseStatisticsAsXml")">Скачать xml</a>
+						</li>
+					</ul>
+				</div>
+
+			</div>
 		</div>
 	}
 }
@@ -309,7 +312,7 @@
 			<td title="@(Model.IsInstructor ? user.UserName : user.UserVisibleName)" class="student-name">
 				@if (User.HasAccess(CourseRole.CourseAdmin))
 				{
-					@Html.ActionLink(user.UserVisibleName.TruncateWithEllipsis(30), "Profile", "Account", new { userId = user.UserId }, new {})
+					@Html.ActionLink(user.UserVisibleName.TruncateWithEllipsis(30), "Profile", "Account", new { userId = user.UserId }, new { })
 				}
 				else
 				{
@@ -330,7 +333,7 @@
 				<td class="score scoring-group-score scoring-group-sum-score"
 					data-unit-id="sum" data-scoring-group="@scoringGroup.Id"
 					data-not-only-full-value="@scoringGroupScore">
-                    @scoringGroupOnlyFullScore
+					@scoringGroupOnlyFullScore
 				</td>
 			}
 
@@ -343,7 +346,7 @@
 					var onlyFullScore = Model.GetTotalOnlyFullScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup);
 					var maxScore = Model.GetMaxScoreForUnitByScoringGroup(unit, scoringGroup);
 					<td class="score scoring-group-score @GradeCssClass(scoringGroupScore, maxScore) @OnlyFullGradeCssClass(onlyFullScore, maxScore)"
-                        data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id"
+						data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id"
 						data-not-only-full-value="@scoringGroupScore">
 						@onlyFullScore
 					</td>
@@ -354,7 +357,7 @@
 						<td class="score slide-score @GradeCssClass(slideScore, slide.MaxScore) @OnlyFullGradeCssClass(Model.GetOnlyFullScore(slideScore, slide), slide.MaxScore)"
 							data-slide-id="@slide.Id" data-unit-id="@unit.Id" data-scoring-group="@scoringGroup.Id"
 							data-not-only-full-value="@slideScore">
-                            @Model.GetOnlyFullScore(slideScore, slide)
+							@Model.GetOnlyFullScore(slideScore, slide)
 						</td>
 					}
 					if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)

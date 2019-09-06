@@ -57,13 +57,13 @@ namespace uLearn.Web
 		}
 
 		public CertificateGenerator(ULearnDb db, CourseManager courseManager)
-		: this(new UserQuizzesRepo(db),
-			new UserSolutionsRepo(db, courseManager),
-			new SlideCheckingsRepo(db),
-			new VisitsRepo(db))
+			: this(new UserQuizzesRepo(db),
+				new UserSolutionsRepo(db, courseManager),
+				new SlideCheckingsRepo(db),
+				new VisitsRepo(db))
 		{
 		}
-		
+
 		public FileInfo GetTemplateArchivePath(CertificateTemplate template)
 		{
 			return GetTemplateArchivePath(template.ArchiveName);
@@ -275,8 +275,7 @@ namespace uLearn.Web
 		{
 			var codeReviewsCount = slideCheckingsRepo.GetUsersPassedManualExerciseCheckings(course.Id, certificate.UserId).Count();
 			var exercisesMaxReviewScores = course.Slides
-				.OfType<ExerciseSlide>().
-				ToDictionary(s => s.Id, s => s.Scoring.CodeReviewScore);
+				.OfType<ExerciseSlide>().ToDictionary(s => s.Id, s => s.Scoring.CodeReviewScore);
 			var codeReviewsFullCount = slideCheckingsRepo
 				.GetUsersPassedManualExerciseCheckings(course.Id, certificate.UserId)
 				.Count(s => s.Score == exercisesMaxReviewScores.GetOrDefault(s.SlideId, -1));

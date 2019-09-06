@@ -28,8 +28,8 @@ using Ulearn.Web.Api.Models.Responses.Comments;
 
 namespace Ulearn.Web.Api.Controllers.Comments
 {
-	[ProducesResponseType((int) HttpStatusCode.OK)]
-	[SwaggerResponse((int) HttpStatusCode.Forbidden, "You don't have access to this comment")]
+	[ProducesResponseType((int)HttpStatusCode.OK)]
+	[SwaggerResponse((int)HttpStatusCode.Forbidden, "You don't have access to this comment")]
 	[Route("/comments/{commentId:int:min(0)}")]
 	public class CommentController : BaseCommentController
 	{
@@ -42,7 +42,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 
 		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
 		{
-			var commentId = (int) context.ActionArguments["commentId"];
+			var commentId = (int)context.ActionArguments["commentId"];
 			var comment = await commentsRepo.FindCommentByIdAsync(commentId, includeDeleted: true).ConfigureAwait(false);
 
 			var isPatchRequest = context.HttpContext.Request.Method.Equals("PATCH", StringComparison.InvariantCultureIgnoreCase);
@@ -51,7 +51,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 				context.Result = NotFound(new ErrorResponse($"Comment {commentId} not found"));
 				return;
 			}
-			
+
 			if (!comment.IsApproved)
 			{
 				var isAuthenticated = User.Identity.IsAuthenticated;
@@ -74,10 +74,10 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			}
 
 			context.ActionArguments["comment"] = comment;
-			
+
 			await base.OnActionExecutionAsync(context, next).ConfigureAwait(false);
 		}
-		
+
 		/// <summary>
 		/// Информация о комментарии
 		/// </summary>
@@ -88,7 +88,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			if (comment == null)
 				return NotFound(new ErrorResponse($"Comment {commentId} not found"));
 			var canUserSeeNotApprovedComments = await CanUserSeeNotApprovedCommentsAsync(UserId, comment.CourseId).ConfigureAwait(false);
-			
+
 			DefaultDictionary<int, int> likesCount;
 			var likedByUserCommentsIds = (await commentLikesRepo.GetCommentsLikedByUserAsync(comment.CourseId, comment.SlideId, UserId).ConfigureAwait(false)).ToHashSet();
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(User.GetUserId(), comment.CourseId, CourseRoleType.Instructor).ConfigureAwait(false);
@@ -97,7 +97,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			if (isInstructor)
 			{
 				canViewAllGroupMembers = await groupAccessesRepo.CanUserSeeAllCourseGroupsAsync(User.GetUserId(), comment.CourseId).ConfigureAwait(false);
-				userAvailableGroupsIds = (await groupAccessesRepo.GetAvailableForUserGroupsAsync(User.GetUserId(),  false, true, true).ConfigureAwait(false)).Select(g => g.Id).ToHashSet();
+				userAvailableGroupsIds = (await groupAccessesRepo.GetAvailableForUserGroupsAsync(User.GetUserId(), false, true, true).ConfigureAwait(false)).Select(g => g.Id).ToHashSet();
 			}
 
 			if (parameters.WithReplies)
@@ -109,15 +109,18 @@ namespace Ulearn.Web.Api.Controllers.Comments
 				var authors2Groups = !isInstructor ? null : await groupMembersRepo.GetUsersGroupsAsync(comment.CourseId, authorsIds, true).ConfigureAwait(false);
 				return BuildCommentResponse(
 					comment,
-					canUserSeeNotApprovedComments, new DefaultDictionary<int, List<Comment>> { {commentId, replies }}, likesCount, likedByUserCommentsIds,
+					canUserSeeNotApprovedComments, new DefaultDictionary<int, List<Comment>> { { commentId, replies } }, likesCount, likedByUserCommentsIds,
 					authors2Groups, userAvailableGroupsIds, canViewAllGroupMembers, addCourseIdAndSlideId: true, addParentCommentId: true, addReplies: true
 				);
 			}
-			
-			likesCount = await commentLikesRepo.GetLikesCountsAsync(new [] { commentId }).ConfigureAwait(false);
-			var author2Groups = !isInstructor ? null : new Dictionary<string, List<Group>>{
-				{comment.Author.Id,
-				await groupMembersRepo.GetUserGroupsAsync(comment.CourseId, comment.Author.Id).ConfigureAwait(false)}
+
+			likesCount = await commentLikesRepo.GetLikesCountsAsync(new[] { commentId }).ConfigureAwait(false);
+			var author2Groups = !isInstructor ? null : new Dictionary<string, List<Group>>
+			{
+				{
+					comment.Author.Id,
+					await groupMembersRepo.GetUserGroupsAsync(comment.CourseId, comment.Author.Id).ConfigureAwait(false)
+				}
 			};
 			return BuildCommentResponse(
 				comment,
@@ -134,7 +137,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		public async Task<IActionResult> DeleteComment(int commentId)
 		{
 			var comment = await commentsRepo.FindCommentByIdAsync(commentId).ConfigureAwait(false);
-			
+
 			var canEditOrDeleteComment = await CanEditOrDeleteCommentAsync(comment, UserId).ConfigureAwait(false);
 			if (!canEditOrDeleteComment)
 				return StatusCode((int)HttpStatusCode.Forbidden, "You can not delete this comment. Only author, course admin or user with special privileges can do it.");
@@ -163,7 +166,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			parameters.Text?.TrimEnd();
 			if (!string.IsNullOrEmpty(parameters.Text))
 				await UpdateCommentTextAsync(comment, parameters.Text).ConfigureAwait(false);
-				
+
 			if (parameters.IsApproved.HasValue)
 				await UpdateCommentIsApprovedAsync(comment, parameters.IsApproved.Value).ConfigureAwait(false);
 
@@ -184,10 +187,10 @@ namespace Ulearn.Web.Api.Controllers.Comments
 
 			if (text.Length > CommentsPolicy.MaxCommentLength)
 				throw new StatusCodeException((int)HttpStatusCode.RequestEntityTooLarge, $"Your comment is too large. Max allowed length is {CommentsPolicy.MaxCommentLength} chars");
-			
+
 			await commentsRepo.EditCommentTextAsync(comment.Id, text).ConfigureAwait(false);
 		}
-		
+
 		private async Task UpdateCommentIsApprovedAsync([NotNull] Comment comment, bool isApproved)
 		{
 			var canModerateComments = await CanModerateCommentsInCourseAsync(comment.CourseId, UserId).ConfigureAwait(false);
@@ -198,7 +201,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			if (!comment.IsApproved && isApproved)
 				await NotifyAboutNewCommentAsync(comment).ConfigureAwait(false);
 		}
-		
+
 		private async Task UpdateCommentIsPinnedAsync([NotNull] Comment comment, bool isPinned)
 		{
 			var canModerateComments = await CanModerateCommentsInCourseAsync(comment.CourseId, UserId).ConfigureAwait(false);
@@ -207,7 +210,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 
 			await commentsRepo.PinCommentAsync(comment.Id, isPinned).ConfigureAwait(false);
 		}
-		
+
 		private async Task UpdateCommentIsCorrectAnswerAsync([NotNull] Comment comment, bool isCorrectAnswer)
 		{
 			var canModerateComments = await CanModerateCommentsInCourseAsync(comment.CourseId, UserId).ConfigureAwait(false);
@@ -258,16 +261,16 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		/// </summary>
 		[HttpPost("like")]
 		[Authorize]
-		[SwaggerResponse((int) HttpStatusCode.Conflict, "You have liked the comment already")]
+		[SwaggerResponse((int)HttpStatusCode.Conflict, "You have liked the comment already")]
 		public async Task<IActionResult> Like(int commentId)
 		{
 			if (await commentLikesRepo.DidUserLikeComment(commentId, UserId).ConfigureAwait(false))
 				return Ok(new SuccessResponseWithMessage($"You have liked the comment {commentId} already"));
-					
+
 			await commentLikesRepo.LikeAsync(commentId, UserId).ConfigureAwait(false);
 
 			await NotifyAboutLikedComment(commentId).ConfigureAwait(false);
-			
+
 			return Ok(new SuccessResponseWithMessage($"You have liked the comment {commentId}"));
 		}
 
@@ -276,17 +279,17 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		/// </summary>
 		[HttpDelete("like")]
 		[Authorize]
-		[SwaggerResponse((int) HttpStatusCode.NotFound, "You don't have like for the comment")]
+		[SwaggerResponse((int)HttpStatusCode.NotFound, "You don't have like for the comment")]
 		public async Task<IActionResult> Unlike(int commentId)
 		{
 			if (!await commentLikesRepo.DidUserLikeComment(commentId, UserId).ConfigureAwait(false))
 				return Ok(new SuccessResponseWithMessage($"You don't have like for the comment {commentId}"));
-			
+
 			await commentLikesRepo.UnlikeAsync(commentId, UserId).ConfigureAwait(false);
-			
+
 			return Ok(new SuccessResponseWithMessage($"You have unliked the comment {commentId}"));
 		}
-		
+
 		private async Task NotifyAboutLikedComment(int commentId)
 		{
 			var comment = await commentsRepo.FindCommentByIdAsync(commentId).ConfigureAwait(false);

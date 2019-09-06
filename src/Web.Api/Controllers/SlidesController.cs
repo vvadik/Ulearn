@@ -22,7 +22,7 @@ namespace Ulearn.Web.Api.Controllers
 		protected readonly IUserQuizzesRepo UserQuizzesRepo;
 		protected readonly IVisitsRepo VisitsRepo;
 		protected readonly IGroupsRepo GroupsRepo;
-		
+
 		public SlidesController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo,
 			IUserSolutionsRepo solutionsRepo, IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo)
 			: base(logger, courseManager, db, usersRepo)
@@ -48,7 +48,7 @@ namespace Ulearn.Web.Api.Controllers
 					slide = instructorNote.Slide;
 			}
 
-			if(slide == null)
+			if (slide == null)
 				return NotFound(new { status = "error", message = "Course or slide not found" });
 
 			var getSlideMaxScoreFunc = await BuildGetSlideMaxScoreFunc(SolutionsRepo, UserQuizzesRepo, VisitsRepo, GroupsRepo, course, User.GetUserId());

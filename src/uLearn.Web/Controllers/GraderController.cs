@@ -47,6 +47,7 @@ namespace uLearn.Web.Controllers
 			{
 				return Json(new ApiResult { Status = "error", Message = $"Can\'t decode solution from BASE64: {e.Message}" });
 			}
+
 			if (code.Length > TextsRepo.MaxTextSize)
 				return Json(new ApiResult { Status = "error", Message = $"Too large solution. Max allowed size is {TextsRepo.MaxTextSize} bytes" });
 

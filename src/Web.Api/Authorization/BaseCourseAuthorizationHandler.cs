@@ -27,7 +27,7 @@ namespace Ulearn.Web.Api.Authorization
 		{
 			throw new System.NotImplementedException();
 		}
-		
+
 		/* Find `course_id` arguments in request. Try to get course_id in following order:
 		 * route data (/groups/<course_id>/)
 		 * query string (/groups/?course_id=<course_id>)

@@ -115,7 +115,7 @@ namespace Stepik.Api
 
 		[DataMember(Name = "lesson")]
 		public int LessonId;
-		
+
 		[DataMember(Name = "position")]
 		public int Position;
 
@@ -139,7 +139,7 @@ namespace Stepik.Api
 		[DataMember(Name = "steps")]
 		public List<int> StepsIds;
 
-		[DataMember(Name= "title")]
+		[DataMember(Name = "title")]
 		public string Title;
 	}
 
@@ -232,7 +232,7 @@ namespace Stepik.Api
 		[DataMember(Name = "url")]
 		public string Url;
 	}
-	
+
 	[DataContract]
 	public class StepikApiBlockSource
 	{
@@ -300,7 +300,7 @@ namespace Stepik.Api
 		}
 
 		public StepikApiChoiceBlockSource(IEnumerable<StepikApiChoiceOption> options)
-		 : this()
+			: this()
 		{
 			Options = options.ToList();
 			SampleSize = Options.Count;
@@ -343,7 +343,7 @@ namespace Stepik.Api
 		public StepikApiExternalGraderPayload()
 		{
 		}
-	
+
 		public StepikApiExternalGraderPayload(string courseId, Guid slideId)
 		{
 			CourseId = courseId;
@@ -356,7 +356,7 @@ namespace Stepik.Api
 		[DataMember(Name = "slide_id")]
 		public Guid SlideId;
 	}
-	
+
 	[DataContract]
 	[StepikApiEndpoint("step-sources")]
 	[StepikApiPut("stepSource")]
@@ -469,5 +469,4 @@ namespace Stepik.Api
 			return attribute.JsonKeyName;
 		}
 	}
-
 }

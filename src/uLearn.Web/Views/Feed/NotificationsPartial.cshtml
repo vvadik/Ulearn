@@ -8,7 +8,7 @@
 {
 	foreach (var notification in notifications)
 	{
-		<li class="notifications__notification @(notification.CreateTime >= lastViewTimestamp ? "unread" : "")">
+		<li class="notifications__notification @( notification.CreateTime >= lastViewTimestamp ? "unread" : "")">
 
 			@try
 			{
@@ -38,7 +38,8 @@
 		<a href="#important" data-feed="important" class="active">
 			Уведомления
 			@UnreadCountLabel(Model.ImportantNotifications, Model.ImportantLastViewTimestamp)
-		</a><a href="#comments" data-feed="comments" data-update-timestamp-url="@Url.Action("UpdateLastViewTimestamp", new { transportId = Model.CommentsNotificationsTransportId, timestamp = DateTime.Now })">
+		</a>
+		<a href="#comments" data-feed="comments" data-update-timestamp-url="@Url.Action("UpdateLastViewTimestamp", new { transportId = Model.CommentsNotificationsTransportId, timestamp = DateTime.Now })">
 			Комментарии
 			@UnreadCountLabel(Model.CommentsNotifications, Model.CommentsLastViewTimestamp)
 		</a>

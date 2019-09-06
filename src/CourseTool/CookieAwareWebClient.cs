@@ -25,6 +25,7 @@ namespace uLearn.CourseTool
 				httpRequest.Headers["X-CSRFToken"] = CsrfToken;
 				return httpRequest;
 			}
+
 			return request;
 		}
 
@@ -39,6 +40,7 @@ namespace uLearn.CourseTool
 				if (csrfToken != null)
 					CsrfToken = csrfToken.Value;
 			}
+
 			return response;
 		}
 

@@ -28,7 +28,7 @@ namespace uLearn.Web
 		public static void RegisterGlobalFilters(GlobalFilterCollection filters)
 		{
 			filters.Add(new HandleErrorAttribute());
-			
+
 			/* Next filter serves built index.html from ../Frontend/build/ (appSettings/ulearn.react.index.html).
 			   Before running this code build Frontend project via `yarn build` or `npm run build` */
 			var indexHtmlPath = WebConfigurationManager.AppSettings["ulearn.react.index.html"];
@@ -41,7 +41,7 @@ namespace uLearn.Web
 				"/Exercise/StudentZip",
 				"/Content/"
 			}));
-			
+
 			var requireHttps = Convert.ToBoolean(WebConfigurationManager.AppSettings["ulearn.requireHttps"] ?? "true");
 			if (requireHttps)
 				filters.Add(new RequireHttpsForCloudFlareAttribute());
@@ -53,6 +53,7 @@ namespace uLearn.Web
 	public class AntiForgeryTokenFilter : FilterAttribute, IExceptionFilter
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(AntiForgeryTokenFilter));
+
 		public void OnException(ExceptionContext filterContext)
 		{
 			if (!(filterContext.Exception is HttpAntiForgeryException))
@@ -67,10 +68,11 @@ namespace uLearn.Web
 			filterContext.ExceptionHandled = true;
 		}
 	}
-	
+
 	public class HandleHttpAntiForgeryException : ActionFilterAttribute, IExceptionFilter
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(HandleHttpAntiForgeryException));
+
 		public void OnException(ExceptionContext filterContext)
 		{
 			if (!(filterContext.Exception is HttpAntiForgeryException))
@@ -118,6 +120,7 @@ namespace uLearn.Web
 				filterContext.Result = new HttpStatusCodeResult(HttpStatusCode.Forbidden, "SSL required"); // 403.4 - SSL required
 				return;
 			}
+
 			var url = "https://" + filterContext.HttpContext.Request.Url?.Host + filterContext.HttpContext.Request.RawUrl;
 			filterContext.Result = new RedirectResult(url);
 		}
@@ -127,7 +130,7 @@ namespace uLearn.Web
 	{
 		private readonly List<string> excludedPrefixes;
 		private readonly byte[] content;
-		
+
 		public ServeStaticFileForEveryNonAjaxRequest(FileInfo file, List<string> excludedPrefixes)
 		{
 			this.excludedPrefixes = excludedPrefixes;
@@ -149,11 +152,11 @@ namespace uLearn.Web
 		public override void OnActionExecuting(ActionExecutingContext filterContext)
 		{
 			var httpContext = filterContext.RequestContext.HttpContext;
-			
+
 			foreach (var prefix in excludedPrefixes)
 				if (httpContext.Request.Url != null && httpContext.Request.Url.LocalPath.StartsWith(prefix))
 					return;
-			
+
 			var acceptHeader = httpContext.Request.Headers["Accept"] ?? "";
 			var cspHeader = WebConfigurationManager.AppSettings["ulearn.web.cspHeader"] ?? "";
 			if (acceptHeader.Contains("text/html") && httpContext.Request.HttpMethod == "GET")
@@ -165,14 +168,14 @@ namespace uLearn.Web
 
 		public override void OnResultExecuting(ResultExecutingContext filterContext)
 		{
-			/* Add no-cache headers for correct working of react application (otherwise clicking on `back` button in browsers loads cached not-reacted version) */			
+			/* Add no-cache headers for correct working of react application (otherwise clicking on `back` button in browsers loads cached not-reacted version) */
 			var cache = filterContext.HttpContext.Response.Cache;
 			cache.SetExpires(DateTime.UtcNow.AddDays(-1));
 			cache.SetValidUntilExpires(false);
 			cache.SetRevalidation(HttpCacheRevalidation.AllCaches);
 			cache.SetCacheability(HttpCacheability.NoCache);
 			cache.SetNoStore();
-			
+
 			base.OnResultExecuting(filterContext);
 		}
 	}

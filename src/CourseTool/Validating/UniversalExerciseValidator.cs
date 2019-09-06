@@ -25,14 +25,14 @@ namespace uLearn.CourseTool.Validating
 			this.slide = slide;
 			ex = exercise;
 		}
-		
+
 		public void ValidateExercises()
 		{
 			ReportErrorIfDockerImageSettingsIsWrong();
-			
+
 			if (ReportErrorIfExerciseFolderMissesRequiredFiles())
 				return;
-			
+
 			ReportErrorsInRegion();
 
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && !EnvironmentVariablesUtils.ExistsOnPath("docker.exe"))
@@ -48,7 +48,7 @@ namespace uLearn.CourseTool.Validating
 			if (ex.CheckInitialSolution)
 				ReportErrorIfInitialCodeIsSolutionOrVerdictNotOk();
 		}
-		
+
 		private void ReportErrorIfDockerImageSettingsIsWrong()
 		{
 			if (ex.DockerImageName == null)
@@ -67,9 +67,9 @@ namespace uLearn.CourseTool.Validating
 				ReportSlideError(slide, "Region works only if StudentZipIsDisabled is true");
 			if (ex.Region != null)
 			{
-				if(ex.SolutionRegionContent.Value == null)
+				if (ex.SolutionRegionContent.Value == null)
 					ReportSlideError(slide, $"Region '{ex.Region}' not exists in file '{ex.UserCodeFilePath}'");
-				if(ex.ExerciseInitialCode == null && ex.InitialRegionContent.Value == null)
+				if (ex.ExerciseInitialCode == null && ex.InitialRegionContent.Value == null)
 					ReportSlideError(slide, $"Region '{ex.Region}' not exists in file '{ex.InitialUserCodeFilePath}'");
 			}
 		}
@@ -95,6 +95,7 @@ namespace uLearn.CourseTool.Validating
 							$"includePathForChecker '{pathToIncludeForChecker}' doesn't exist");
 				}
 			}
+
 			return doNotFindNextErrors;
 		}
 
@@ -129,7 +130,7 @@ namespace uLearn.CourseTool.Validating
 																				$"RealOutput = {result.GetOutput().NormalizeEoln()}");
 			}
 		}
-		
+
 		private bool ReportSlideError(bool ifCondIsTrue, string withMessage)
 		{
 			if (!ifCondIsTrue)

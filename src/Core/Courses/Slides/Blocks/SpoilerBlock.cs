@@ -13,10 +13,10 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 	{
 		[XmlAttribute("text")]
 		public string Text { get; set; }
-		
+
 		[XmlAttribute("hideQuizButton")]
 		public bool HideQuizButton { get; set; }
-		
+
 		[XmlElement(typeof(YoutubeBlock))]
 		[XmlElement("markdown", typeof(MarkdownBlock))]
 		[XmlElement(typeof(CodeBlock))]
@@ -28,7 +28,7 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		[XmlElement("html", typeof(HtmlBlock))]
 		[XmlChoiceIdentifier(nameof(DefineBlockType))]
 		public SlideBlock[] Blocks { get; set; }
-		
+
 		[XmlIgnore]
 		public BlockType[] DefineBlockType;
 
@@ -41,11 +41,11 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		{
 			if (Blocks == null)
 				Blocks = new SlideBlock[0];
-			
+
 			Blocks = Blocks.SelectMany(b => b.BuildUp(context, filesInProgress)).ToArray();
-			
+
 			DefineBlockTypes();
-			
+
 			return base.BuildUp(context, filesInProgress);
 		}
 
@@ -54,13 +54,13 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 			if (Blocks != null)
 				DefineBlockType = Blocks.Select(BlockTypeHelpers.GetBlockType).ToArray();
 		}
-		
+
 		public override void Validate(SlideBuildingContext slideBuildingContext)
 		{
 			if (HideQuizButton && !(slideBuildingContext.Slide is QuizSlide))
 				throw new CourseLoadingException("У блока <spoiler> указан атрибут hideQuizButton=\"true\", хотя слайд не является тестом. Этот атрибут можно использовать только внутри <slide.quiz>");
-		}		
-		
+		}
+
 		public override Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot)
 		{
 			throw new System.NotImplementedException();

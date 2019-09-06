@@ -95,7 +95,7 @@ namespace Database
 				loadedCourseVersions[courseId.ToLower()] = versionId;
 			}
 		}
-		
+
 		private void ReloadCourseIfLoadedAndPublishedVersionsAreDifferent(string courseId, CourseVersion publishedVersion)
 		{
 			lock (@lock)

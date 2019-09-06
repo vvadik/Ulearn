@@ -9,12 +9,12 @@ namespace Database.Models
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int Id { get; set; }
-		
+
 		[Index("IDX_ExerciseCodeReviewComment_ByReviewAndIsDeleted", 1)]
-		public int ReviewId { get; set;  }
-		
+		public int ReviewId { get; set; }
+
 		public virtual ExerciseCodeReview Review { get; set; }
-		
+
 		[Required]
 		public string Text { get; set; }
 
@@ -27,7 +27,7 @@ namespace Database.Models
 		[Required]
 		[Index("IDX_ExerciseCodeReviewComment_ByReviewAndIsDeleted", 2)]
 		public bool IsDeleted { get; set; }
-		
+
 		[Required]
 		[Index("IDX_ExerciseCodeReview_ByAddingTime")]
 		public DateTime AddingTime { get; set; }

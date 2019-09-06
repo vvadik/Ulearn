@@ -11,13 +11,13 @@ namespace Ulearn.Web.Api.Models.Responses.Account
 	{
 		[DataMember]
 		public bool IsAuthenticated { get; set; }
-		
+
 		[DataMember(EmitDefaultValue = false)]
 		public ShortUserInfo User { get; set; }
 
 		[DataMember(EmitDefaultValue = false)]
 		public List<AccountProblem> AccountProblems { get; set; }
-		
+
 		[DataMember]
 		public List<SystemAccessType> SystemAccesses { get; set; }
 	}
@@ -27,14 +27,14 @@ namespace Ulearn.Web.Api.Models.Responses.Account
 	{
 		[DataMember]
 		public string Title { get; set; }
-		
+
 		[DataMember]
 		public string Description { get; set; }
 
 		public AccountProblem()
 		{
 		}
-		
+
 		public AccountProblem(string title, string description)
 		{
 			Title = title;

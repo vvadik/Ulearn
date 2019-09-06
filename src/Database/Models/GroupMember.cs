@@ -15,7 +15,7 @@ namespace Database.Models
 		public int GroupId { get; set; }
 
 		public virtual Group Group { get; set; }
-	
+
 		[Required]
 		[StringLength(64)]
 		[Index("IDX_GroupMember_GroupByMember")]

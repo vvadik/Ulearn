@@ -5,14 +5,14 @@ namespace AntiPlagiarism.Web.CodeAnalyzing.Hashers
 {
 	public class PolynomialSequenceHasher : ISequenceHasher
 	{
-		private readonly IObjectHasher hasher;	
+		private readonly IObjectHasher hasher;
 		private readonly int polynomBase;
-		
+
 		private int currentHash;
 		private readonly Queue<int> objectsHashes = new Queue<int>();
 		private int[] basePowers;
 
-		public PolynomialSequenceHasher(int polynomBase, IObjectHasher hasher=null, int defaultCapacity=10000)
+		public PolynomialSequenceHasher(int polynomBase, IObjectHasher hasher = null, int defaultCapacity = 10000)
 		{
 			this.polynomBase = polynomBase;
 			this.hasher = hasher ?? new DefaultObjectHasher();
@@ -23,7 +23,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing.Hashers
 		public void Enqueue(object obj)
 		{
 			var objectHashCode = hasher.GetHashCode(obj);
-			currentHash = unchecked(currentHash * polynomBase + objectHashCode);	
+			currentHash = unchecked(currentHash * polynomBase + objectHashCode);
 			objectsHashes.Enqueue(objectHashCode);
 		}
 
@@ -45,7 +45,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing.Hashers
 			currentHash = 0;
 			objectsHashes.Clear();
 		}
-		
+
 		private void InitBasePowers(int capacity)
 		{
 			basePowers = new int[capacity];
@@ -53,7 +53,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing.Hashers
 			for (var i = 1; i < capacity; i++)
 				basePowers[i] = unchecked(basePowers[i - 1] * polynomBase);
 		}
-		
+
 		private int GetBasePower(int power)
 		{
 			var result = 1;
@@ -62,8 +62,8 @@ namespace AntiPlagiarism.Web.CodeAnalyzing.Hashers
 				result = unchecked(result * basePowers[basePowers.Length - 1]);
 				power -= basePowers.Length - 1;
 			}
+
 			return unchecked(result * basePowers[power]);
 		}
-
 	}
 }

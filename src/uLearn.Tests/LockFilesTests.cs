@@ -24,6 +24,7 @@ namespace uLearn
 			catch (IOException)
 			{
 			}
+
 			File.ReadAllText(lockFileName).ShouldBeEquivalentTo("test");
 		}
 

@@ -66,7 +66,7 @@ namespace Notifications
 		{
 			/* Email signature is disabled from 2018.02.11 */
 			return "";
-			
+
 			/*
 				var courseId = delivery.Notification.CourseId;
 				var courseTitle = courseManager.GetCourse(courseId).Title;

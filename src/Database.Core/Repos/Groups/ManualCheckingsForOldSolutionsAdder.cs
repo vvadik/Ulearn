@@ -39,7 +39,7 @@ namespace Database.Repos.Groups
 			logger.Information($"Создаю ручные проверки для всех решения пользователя {userId} в курсе {courseId}");
 
 			var course = courseManager.GetCourse(courseId);
-			
+
 			/* For exercises */
 			var acceptedSubmissionsBySlide = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, userId)
 				.GroupBy(s => s.SlideId)
@@ -68,7 +68,7 @@ namespace Database.Repos.Groups
 				var slide = course.FindSlideById(quizSlideId) as QuizSlide;
 				if (slide == null || !slide.ManualChecking)
 					continue;
-				if (! await userQuizzesRepo.IsWaitingForManualCheckAsync(courseId, quizSlideId, userId).ConfigureAwait(false))
+				if (!await userQuizzesRepo.IsWaitingForManualCheckAsync(courseId, quizSlideId, userId).ConfigureAwait(false))
 				{
 					logger.Information($"Создаю ручную проверку для теста {slide.Id}");
 					await slideCheckingsRepo.AddQuizAttemptForManualChecking(courseId, quizSlideId, userId).ConfigureAwait(false);

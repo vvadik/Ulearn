@@ -36,7 +36,7 @@
 						Value = kvp.Key.ToString(),
 						HtmlAttributes = kvp.Key == Guid.Empty
 							? new { data_divider = "true", data_exclusive = "true" }
-							: (object) new { data_subtext = kvp.Value is QuizSlide ? "тест" : "код-ревью"}
+							: (object)new { data_subtext = kvp.Value is QuizSlide ? "тест" : "код-ревью" }
 					}
 					)
 				);
@@ -68,7 +68,7 @@
 
 	<div class="form-group manual-checking-queue-filter-form__done-filter hidden-xs">
 		<div class="checkbox checkbox-default">
-			@Html.CheckBox("done__desktop", Model.AlreadyChecked, new { data_connect_checkbox="done" });
+			@Html.CheckBox("done__desktop", Model.AlreadyChecked, new { data_connect_checkbox = "done" });
 			<label for="done__desktop">
 				Уже проверенные работы
 			</label>

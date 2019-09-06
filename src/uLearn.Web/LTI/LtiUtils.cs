@@ -39,6 +39,7 @@ namespace uLearn.Web.LTI
 				log.Error($"Неверный адрес отправки результатов по LTI: {ltiRequest.LisOutcomeServiceUrl}", e);
 				throw;
 			}
+
 			if (uri.Host == "localhost")
 			{
 				uri.Host = "192.168.33.10";

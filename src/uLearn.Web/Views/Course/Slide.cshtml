@@ -23,11 +23,11 @@
 	mainDivClass = "slide-container";
 }
 
-<div class="@mainDivClass" >
+<div class="@mainDivClass">
 	<div class="container body-content">
 		<div class="row">
 			<div class="slide">
-                <h1>
+				<h1>
 					<span class="slide__title">
 						@if (Model.ManualChecking != null)
 						{
@@ -37,12 +37,17 @@
 						{
 							@Model.Slide.Title
 						}
-						@if(Model.SlideEditUrl != null) {
-							<small><a href="@Model.SlideEditUrl" target="_blank" style="margin-right: 5px"><span class="glyphicon glyphicon-pencil"></span></a></small>
+						@if (Model.SlideEditUrl != null)
+						{
+							<small>
+								<a href="@Model.SlideEditUrl" target="_blank" style="margin-right: 5px">
+									<span class="glyphicon glyphicon-pencil"></span>
+								</a>
+							</small>
 						}
 					</span>
-                    <span class="score">@ShowScore(Model.Score)</span>
-                </h1>
+					<span class="score">@ShowScore(Model.Score)</span>
+				</h1>
 				@if (!string.IsNullOrEmpty(Model.Error))
 				{
 					<p class="alert alert-danger">@Model.Error</p>
@@ -63,30 +68,39 @@
 					if (Model.ManualChecking != null)
 					{
 						<p class="exercise-status">
-                            @Model.ManualChecking.User.VisibleName
-                            @if (Model.ContextManualCheckingUserGroups + Model.ContextManualCheckingUserArchivedGroups != "")
-                            {
-	                            @* These comments are dirty hack for removing spaces between words *@
-	                            <span>
-                                (@*												 
-							      *@@if (Model.ContextManualCheckingUserGroups != "")
-                                    {
-	                                    @Model.ContextManualCheckingUserGroups@*												 
-							      *@}@*												 
-							      *@@if (Model.ContextManualCheckingUserGroups != "" && Model.ContextManualCheckingUserArchivedGroups != "")
-                                    {@*												 
-							           *@<text>;</text>
-                                    }@*												 
-                                  *@@if (Model.ContextManualCheckingUserArchivedGroups != "")
-                                    {
-	                                    <text>архивные группы: @Model.ContextManualCheckingUserArchivedGroups</text>@*												 
-							      *@}@*												 
-							   *@),
-                                </span>
-                            }
-                            else
+							@Model.ManualChecking.User.VisibleName
+							@if (Model.ContextManualCheckingUserGroups + Model.ContextManualCheckingUserArchivedGroups != "")
 							{
-							    <span>,</span>
+	                            @* These comments are dirty hack for removing spaces between words *@
+								<span>
+									(@*												 
+							      *@
+									@if (Model.ContextManualCheckingUserGroups != "")
+									{
+										@Model.ContextManualCheckingUserGroups@*												 
+							      *@
+									}
+									@*												 
+							      *@
+									@if (Model.ContextManualCheckingUserGroups != "" && Model.ContextManualCheckingUserArchivedGroups != "")
+									{
+@*												 
+							           *@<text>;</text>
+									}
+									@*												 
+                                  *@
+									@if (Model.ContextManualCheckingUserArchivedGroups != "")
+									{
+										<text>архивные группы: @Model.ContextManualCheckingUserArchivedGroups</text> @*												 
+							      *@
+									}
+									@*												 
+							   *@),
+								</span>
+							}
+							else
+							{
+								<span>,</span>
 							}
 							@Model.ManualChecking.Timestamp.ToPrettyString()
 						</p>
@@ -109,13 +123,14 @@
 			else
 			{
 				@* On code review show instructors-only comments *@
-				@Html.Action("SlideComments", "Comments", new { courseId = Model.CourseId, slideId = Model.Slide.Id, showOnlyInstructorsOnlyComments = true})
+				@Html.Action("SlideComments", "Comments", new { courseId = Model.CourseId, slideId = Model.Slide.Id, showOnlyInstructorsOnlyComments = true })
 			}
-			
+
 			@Html.Partial("~/Views/Shared/_Footer.cshtml")
 		</div>
 	</div>
 </div>
+
 @section scripts{
 	@if (!Model.IsGuest)
 	{
@@ -150,4 +165,4 @@
 }
 
 @helper ShowScore(Tuple<int, int> score)
-{ @(score.Item2 == 0 ? "" : string.Format("{0} из {1}", score.Item1.PluralizeInRussian(RussianPluralizationOptions.Score), score.Item2)) }
+{ @( score.Item2 == 0 ? "" : string.Format("{0} из {1}", score.Item1.PluralizeInRussian(RussianPluralizationOptions.Score), score.Item2)) }

@@ -7,7 +7,7 @@ namespace Database.Repos.CourseRoles
 {
 	public interface ICourseRoleUsersFilter
 	{
-		Task<List<string>> GetListOfUsersWithCourseRoleAsync(CourseRoleType? courseRoleType, [CanBeNull]string courseId, bool includeHighRoles=false);
+		Task<List<string>> GetListOfUsersWithCourseRoleAsync(CourseRoleType? courseRoleType, [CanBeNull] string courseId, bool includeHighRoles = false);
 		Task<List<string>> GetListOfUsersByPrivilegeAsync(bool onlyPrivileged, string courseId);
 	}
 }

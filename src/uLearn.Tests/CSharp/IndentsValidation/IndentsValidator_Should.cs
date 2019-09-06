@@ -55,6 +55,7 @@ namespace uLearn.CSharp.IndentsValidation
 			{
 				Console.WriteLine(errors);
 			}
+
 			errors.Should().BeNullOrEmpty();
 		}
 
@@ -79,6 +80,7 @@ namespace uLearn.CSharp.IndentsValidation
 					Console.WriteLine();
 				}
 			}
+
 			if (failed)
 				Assert.Fail();
 		}
@@ -130,14 +132,17 @@ namespace uLearn.CSharp.IndentsValidation
 							? $"{spanStart}{codeLines[line]}{spanEnd}"
 							: $"{codeLines[line]}");
 					}
+
 					if (!badCodesWithErrors.ContainsKey(errorLines.Key))
 					{
 						badCodesWithErrors[errorLines.Key] = new List<string>();
 					}
+
 					highlightenedCode.AppendLine("</pre></code>");
 					badCodesWithErrors[errorLines.Key].Add(highlightenedCode.ToString());
 				}
 			}
+
 			var i = 0;
 			foreach (var badCodesByError in badCodesWithErrors)
 			{
@@ -159,7 +164,7 @@ namespace uLearn.CSharp.IndentsValidation
 						error => error.Message,
 						error =>
 						{
-							var result = new List<int> { error.Span.StartLinePosition.Line }; 
+							var result = new List<int> { error.Span.StartLinePosition.Line };
 							if (error.Message.Contains("Парные фигурные скобки"))
 								result.AddRange(new[]
 								{

@@ -16,58 +16,58 @@ using Ulearn.Core.RunCheckerJobApi;
 namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 {
 	[XmlType("exercise.universal")]
-	public class UniversalExerciseBlock: AbstractExerciseBlock
+	public class UniversalExerciseBlock : AbstractExerciseBlock
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(UniversalExerciseBlock));
-		
+
 		[XmlAttribute("exerciseDirName")] // Путь до директории с упражнением
 		public string ExerciseDirPath { get; set; }
-		
+
 		[XmlElement("userCodeFile")]
 		public string UserCodeFilePath { get; set; }
-		
+
 		[XmlElement("region")]
 		public string Region { get; set; } // Студент видит в консоли и редактирует регион с этим именем. <prefix>region label <...> <prefix>rendregion label. Должен быть как в решении, так и в файле заглушке.
-		
+
 		[XmlElement("excludePathForChecker")]
 		public string[] PathsToExcludeForChecker { get; set; }
-		
+
 		[XmlElement("includePathForChecker")]
 		public string[] PathsToIncludeForChecker { get; set; } // Пути до директорий относительно директории с Unit, чьё содержимое нужно включить в архив. Перетирают файлы из ExerciseDir в архиве
 
 		[XmlElement("excludePathForStudent")]
 		public string[] PathsToExcludeForStudent { get; set; } // Шаблоны путей до файлов внутри ExerciseDir.
-		
+
 		[XmlElement("checkInitialSolution")]
 		public bool CheckInitialSolution { get; set; } = true;
-		
+
 		[XmlAttribute("noStudentZip")] // Не отдавать zip студенту
 		public bool NoStudentZip { get; set; }
-		
+
 		[XmlElement("dockerImageName")] // см. DockerImageNameRegex
 		public string DockerImageName { get; set; }
 
 		[XmlIgnore]
 		public static readonly Regex DockerImageNameRegex = new Regex("^[-_a-z.]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-		
+
 		[XmlElement("run")]
 		public string RunCommand { get; set; } // см. RunCommandRegex
-		
+
 		[XmlIgnore]
 		public static readonly Regex RunCommandRegex = new Regex("^[-_a-z. ;|>]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-		
+
 		[XmlIgnore]
 		public DirectoryInfo UnitDirectory { get; set; }
-		
+
 		[XmlIgnore]
 		public DirectoryInfo ExerciseDirectory => new DirectoryInfo(Path.Combine(UnitDirectory.FullName, ExerciseDirPath));
 
 		[XmlIgnore]
 		public DirectoryInfo CourseDirectory { get; set; }
-		
+
 		[XmlIgnore]
 		public FileInfo UserCodeFile => ExerciseDirectory.GetFile(UserCodeFilePath);
-		
+
 		[XmlIgnore]
 		public string InitialUserCodeFilePath
 		{
@@ -83,23 +83,23 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 
 		[XmlIgnore]
 		public FileInfo CorrectSolutionFile => UserCodeFile;
-		
+
 		[XmlIgnore]
 		public string CorrectSolutionFilePath => UserCodeFilePath;
 
 		[XmlIgnore]
 		private static readonly string[] wrongAnswerPatterns = { "*.WrongAnswer.*", "*.WA.*" };
-		
+
 		[XmlIgnore]
 		private static readonly string[] initialPatterns = { "*.Initial.*" };
-		
+
 		[XmlIgnore]
-		public List<FileInfo> WrongAnswerFiles => 
+		public List<FileInfo> WrongAnswerFiles =>
 			wrongAnswerPatterns.SelectMany(p => ExerciseDirectory.GetFiles(p, SearchOption.AllDirectories))
 				.ToList();
-		
+
 		[XmlIgnore]
-		private List<FileInfo> InitialFiles => 
+		private List<FileInfo> InitialFiles =>
 			initialPatterns.SelectMany(p => ExerciseDirectory.GetFiles(p, SearchOption.AllDirectories))
 				.ToList();
 
@@ -109,7 +109,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			initialPatterns.ForEach(p => notInitial = notInitial.Replace(p.Replace(".*", "").Replace("*", ""), ""));
 			return notInitial;
 		}
-		
+
 		[XmlIgnore]
 		public Lazy<string> SolutionRegionContent;
 
@@ -123,7 +123,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 
 		public override IEnumerable<SlideBlock> BuildUp(SlideBuildingContext context, IImmutableSet<string> filesInProgress)
 		{
-			if(!Language.HasValue)
+			if (!Language.HasValue)
 				Language = LanguageHelpers.GuessByExtension(new FileInfo(UserCodeFilePath));
 			UnitDirectory = context.UnitDirectory;
 			CourseDirectory = context.CourseDirectory;
@@ -148,7 +148,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		{
 			return SolutionRegionContent.Value ?? (CorrectSolutionFile.Exists ? CorrectSolutionFile.ContentAsUtf8() : null);
 		}
-		
+
 		public string GetInitialCode()
 		{
 			return NoStudentZip ? GetNoStudentZipInitialCode() : InitialUserCodeFile.ContentAsUtf8();
@@ -158,10 +158,10 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		{
 			return ExerciseInitialCode
 				= InitialRegionContent.Value
-					?? (InitialUserCodeFile.Exists ? InitialUserCodeFile.ContentAsUtf8() : null)
-					?? ExerciseInitialCode;
+				?? (InitialUserCodeFile.Exists ? InitialUserCodeFile.ContentAsUtf8() : null)
+				?? ExerciseInitialCode;
 		}
-		
+
 
 		public string GetRegionContent(FileInfo file)
 		{
@@ -203,7 +203,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			log.Info($"Собираю zip-архив для проверки: zip-архив собран, {zipBytes.Length} байтов");
 			return zipBytes;
 		}
-		
+
 		private IEnumerable<FileContent> GetCodeFile(string code)
 		{
 			if (Region == null)
@@ -211,11 +211,11 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			else
 			{
 				var fullCode = new CommonSingleRegionExtractor((InitialUserCodeFile.Exists ? InitialUserCodeFile : UserCodeFile).ContentAsUtf8())
-					.ReplaceRegionContent(new Label{Name = Region}, code);
+					.ReplaceRegionContent(new Label { Name = Region }, code);
 				yield return new FileContent { Path = UserCodeFilePath, Data = Encoding.UTF8.GetBytes(fullCode) };
 			}
 		}
-		
+
 		public byte[] GetZipBytesForStudent()
 		{
 			var excluded = (PathsToExcludeForStudent ?? new string[0])
@@ -223,9 +223,9 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 				.Concat(wrongAnswerPatterns)
 				.Concat(new[] { "checking/*" })
 				.ToList();
-			
+
 			var toUpdate = ReplaceWithInitialFiles().ToList();
-			
+
 			var zipBytes = ToZip(ExerciseDirectory, excluded, toUpdate);
 
 			log.Info($"Собираю zip-архив для студента: zip-архив собран, {zipBytes.Length} байтов");

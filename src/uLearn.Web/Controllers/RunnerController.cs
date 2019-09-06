@@ -81,7 +81,7 @@ namespace uLearn.Web.Controllers
 				if (LanguageHelpers.TryParseByName(languageName, out var submissionLanguage))
 					languages.Add(submissionLanguage);
 			}
-			
+
 			var sw = Stopwatch.StartNew();
 			while (true)
 			{
@@ -149,11 +149,12 @@ namespace uLearn.Web.Controllers
 				log.Error($"Не могу принять от RunCsJob результаты проверки решений, ошибки: {string.Join(", ", errors)}");
 				throw new HttpResponseException(HttpStatusCode.BadRequest);
 			}
+
 			CheckRunner(token);
 			log.Info($"Получил от RunCsJob результаты проверки решений: [{string.Join(", ", results.Select(r => r.Id))}] от агента {agent}");
 
 			foreach (var result in results)
-				await FuncUtils.TrySeveralTimesAsync(() => userSolutionsRepo.SaveResult(result, 
+				await FuncUtils.TrySeveralTimesAsync(() => userSolutionsRepo.SaveResult(result,
 					submission => BaseExerciseController.SendToReviewAndUpdateScore(submission, courseManager, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender, false)
 				), 3).ConfigureAwait(false);
 
@@ -168,7 +169,7 @@ namespace uLearn.Web.Controllers
 				await SendResultToObservers(submissionsByIds[result.Id], result).ConfigureAwait(false);
 			}
 		}
-		
+
 
 		private Task SendResultToObservers(UserExerciseSubmission submission, RunningResults result)
 		{
@@ -201,7 +202,7 @@ namespace uLearn.Web.Controllers
 			var xQueueSubmission = xQueueRepo.FindXQueueSubmission(submission);
 			if (xQueueSubmission == null)
 				return;
-				
+
 			var watcher = xQueueSubmission.Watcher;
 			var client = new XQueueClient(watcher.BaseUrl, watcher.UserName, watcher.Password);
 			await client.Login().ConfigureAwait(false);
@@ -257,7 +258,7 @@ namespace uLearn.Web.Controllers
 			var output = result.GetOutput();
 			await bot.PostToChannelAsync(
 				$"<b>Решение #{submission.Id} не запустилось в песочнице (SandboxError).</b>\n" +
-				(string.IsNullOrEmpty(output) ? "" : $"Вывод:\n<pre>{output.EscapeHtml()}</pre>"), 
+				(string.IsNullOrEmpty(output) ? "" : $"Вывод:\n<pre>{output.EscapeHtml()}</pre>"),
 				ParseMode.Html
 			).ConfigureAwait(false);
 		}
@@ -274,18 +275,18 @@ namespace uLearn.Web.Controllers
 			isEnabled = Convert.ToBoolean(WebConfigurationManager.AppSettings["ulearn.antiplagiarism.enabled"] ?? "false");
 			if (!isEnabled)
 				return;
-			
+
 			var serilogLogger = new LoggerConfiguration().WriteTo.Log4Net().CreateLogger();
 			var antiPlagiarismEndpointUrl = WebConfigurationManager.AppSettings["ulearn.antiplagiarism.endpoint"];
 			var antiPlagiarismToken = WebConfigurationManager.AppSettings["ulearn.antiplagiarism.token"];
 			antiPlagiarismClient = new AntiPlagiarismClient(antiPlagiarismEndpointUrl, antiPlagiarismToken, serilogLogger);
 		}
-		
+
 		public async Task ProcessResult(ULearnDb db, UserExerciseSubmission submission, RunningResults result)
 		{
 			if (!isEnabled)
 				return;
-			
+
 			if (result.Verdict != Verdict.Ok)
 				return;
 
@@ -302,9 +303,7 @@ namespace uLearn.Web.Controllers
 				AuthorId = Guid.Parse(submission.UserId),
 				AdditionalInfo = new AntiPlagiarismAdditionalInfo { SubmissionId = submission.Id }.ToJsonString(),
 			};
-			antiPlagiarismClient.AddSubmissionAsync(parameters).ConfigureAwait(false).GetAwaiter().OnCompleted(() =>
-			{
-			});
+			antiPlagiarismClient.AddSubmissionAsync(parameters).ConfigureAwait(false).GetAwaiter().OnCompleted(() => { });
 		}
 	}
 }

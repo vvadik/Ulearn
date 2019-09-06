@@ -37,6 +37,7 @@ namespace uLearn.Web.Controllers
 					Timestamp = visit.Value
 				});
 			}
+
 			await visitsRepo.AddVisits(visits);
 			return null;
 		}

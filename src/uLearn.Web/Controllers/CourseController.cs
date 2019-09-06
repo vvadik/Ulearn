@@ -88,15 +88,15 @@ namespace uLearn.Web.Controllers
 			var isGuest = !User.Identity.IsAuthenticated;
 
 			var slide = slideGuid == Guid.Empty ? GetInitialSlideForStartup(courseId, visibleUnits) : course.FindSlideById(slideGuid);
-			
+
 			if (slide == null)
 			{
 				var instructorNote = course.FindInstructorNoteById(slideGuid);
-				if(instructorNote != null && User.HasAccessFor(course.Id, CourseRole.Instructor))
+				if (instructorNote != null && User.HasAccessFor(course.Id, CourseRole.Instructor))
 					slide = instructorNote.Slide;
 			}
-			
-			if(slide == null)
+
+			if (slide == null)
 				return HttpNotFound();
 
 			AbstractManualSlideChecking queueItem = null;
@@ -111,7 +111,7 @@ namespace uLearn.Web.Controllers
 				if (queueItem == null)
 				{
 					/* It's possible when checking has not been fully checked, lock has been released, but after it user re-send his solution and we removed old waiting checking */
-					var fakeQueueItem = slide is QuizSlide ? (AbstractManualSlideChecking) new ManualQuizChecking() : new ManualExerciseChecking();
+					var fakeQueueItem = slide is QuizSlide ? (AbstractManualSlideChecking)new ManualQuizChecking() : new ManualExerciseChecking();
 					return RedirectToAction("CheckingQueue", "Admin", new
 					{
 						courseId = courseId,
@@ -246,6 +246,7 @@ namespace uLearn.Web.Controllers
 				else
 					return lastVisitedSlide;
 			}
+
 			return lastVisitedSlide;
 		}
 
@@ -330,8 +331,8 @@ namespace uLearn.Web.Controllers
 			return maxSlideScore;
 		}
 
-		private BlockRenderContext CreateRenderContext(Course course, Slide slide, 
-			AbstractManualSlideChecking manualChecking = null, 
+		private BlockRenderContext CreateRenderContext(Course course, Slide slide,
+			AbstractManualSlideChecking manualChecking = null,
 			int? exerciseSubmissionId = null, List<string> groupsIds = null, bool isLti = false,
 			bool autoplay = false, bool isManualCheckingReadonly = false, bool defaultProhibitFurtherReview = true,
 			int manualCheckingsLeft = 0)
@@ -495,6 +496,7 @@ namespace uLearn.Web.Controllers
 				var slide = course.GetSlideById(slideId);
 				await visitsRepo.UpdateScoreForVisit(courseId, submission.SlideId, slide.MaxScore, submission.UserId);
 			}
+
 			return RedirectToAction("AcceptedSolutions", new { courseId, slideId });
 		}
 

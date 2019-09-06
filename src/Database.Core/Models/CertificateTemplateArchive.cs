@@ -10,13 +10,13 @@ namespace Database.Models
 		[StringLength(128)]
 		[DatabaseGenerated(DatabaseGeneratedOption.None)]
 		public string Id { get; set; }
-		
+
 		[Required]
 		public byte[] Content { get; set; }
 
 		[Required]
 		public Guid CertificateTemplateId { get; set; }
-		
+
 		[Required]
 		public virtual CertificateTemplate CertificateTemplate { get; set; }
 	}

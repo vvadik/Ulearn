@@ -29,11 +29,11 @@ namespace Database.Repos.Groups
 			string courseId,
 			string name,
 			string ownerId,
-			bool isManualCheckingEnabled=false,
-			bool isManualCheckingEnabledForOldSolutions=false,
-			bool canUsersSeeGroupProgress=true,
-			bool defaultProhibitFurtherReview=true,
-			bool isInviteLinkEnabled=true)
+			bool isManualCheckingEnabled = false,
+			bool isManualCheckingEnabledForOldSolutions = false,
+			bool canUsersSeeGroupProgress = true,
+			bool defaultProhibitFurtherReview = true,
+			bool isInviteLinkEnabled = true)
 		{
 			logger.Information($"Создаю новую группу в курсе {courseId}: «{name}»");
 			var group = new Group
@@ -42,12 +42,12 @@ namespace Database.Repos.Groups
 				Name = name,
 				OwnerId = ownerId,
 				CreateTime = DateTime.Now,
-				
+
 				IsManualCheckingEnabled = isManualCheckingEnabled,
 				IsManualCheckingEnabledForOldSolutions = isManualCheckingEnabledForOldSolutions,
 				CanUsersSeeGroupProgress = canUsersSeeGroupProgress,
 				DefaultProhibitFutherReview = defaultProhibitFurtherReview,
-				
+
 				InviteHash = Guid.NewGuid(),
 				IsInviteLinkEnabled = isInviteLinkEnabled,
 			};
@@ -56,12 +56,12 @@ namespace Database.Repos.Groups
 
 			return group;
 		}
-		
+
 		/* Copy group from one course to another. Replace owner only if newOwnerId is not empty */
-		public async Task<Group> CopyGroupAsync(Group group, string courseId, string newOwnerId=null)
+		public async Task<Group> CopyGroupAsync(Group group, string courseId, string newOwnerId = null)
 		{
 			logger.Information($"Копирую группу «{group.Name}» (id={group.Id}) в курс {courseId}");
-			
+
 			var newGroup = await CopyGroupWithoutMembersAsync(group, courseId, newOwnerId).ConfigureAwait(false);
 			await CopyGroupMembersAsync(group, newGroup).ConfigureAwait(false);
 			await CopyGroupAccessesAsync(group, newGroup).ConfigureAwait(false);
@@ -120,7 +120,7 @@ namespace Database.Repos.Groups
 			var courseInstructorsIds = await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, newGroup.CourseId, includeHighRoles: true).ConfigureAwait(false);
 			foreach (var access in accesses)
 			{
-				if (! courseInstructorsIds.Contains(access.UserId))
+				if (!courseInstructorsIds.Contains(access.UserId))
 					continue;
 				if (newGroup.OwnerId == access.UserId)
 					continue;
@@ -137,17 +137,17 @@ namespace Database.Repos.Groups
 
 			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
-		
+
 		private async Task CopyEnabledAdditionalScoringGroupsAsync(Group group, Group newGroup)
 		{
 			logger.Information($"Копирую включенные scoring-group-ы из группы «{group.Name}» (id={group.Id}) в группу «{newGroup.Name}» (id={newGroup.Id})");
-			
+
 			var enabledAdditionalScoringGroups = await db.EnabledAdditionalScoringGroups
 				.Where(s => s.GroupId == group.Id)
 				.Select(s => s.ScoringGroupId)
 				.ToListAsync()
 				.ConfigureAwait(false);
-			
+
 			foreach (var scoringGroupId in enabledAdditionalScoringGroups)
 				db.EnabledAdditionalScoringGroups.Add(new EnabledAdditionalScoringGroup
 				{

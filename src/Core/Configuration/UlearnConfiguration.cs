@@ -32,10 +32,10 @@ namespace Ulearn.Core.Configuration
 		{
 			configurationBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 			var environmentName = Environment.GetEnvironmentVariable("UlearnEnvironmentName");
-			if(environmentName != null && environmentName.ToLower().Contains("local"))
+			if (environmentName != null && environmentName.ToLower().Contains("local"))
 				configurationBuilder.AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true);
 		}
-		
+
 		private static void DisposeConfiguration(IConfigurationRoot configuration) // https://github.com/aspnet/Extensions/issues/786
 		{
 			foreach (var provider in configuration.Providers.OfType<JsonConfigurationProvider>())
@@ -43,47 +43,46 @@ namespace Ulearn.Core.Configuration
 					pfp.Dispose();
 		}
 	}
-	
+
 	public abstract class AbstractConfiguration
 	{
-		 
 	}
-	
+
 	public class HostLogConfiguration
 	{
 		public bool Console { get; set; }
-		
+
 		public string PathFormat { get; set; }
-		
+
 		public string MinimumLevel { get; set; }
-		
+
 		public bool EnableEntityFrameworkLogging { get; set; }
 	}
-	
+
 	public class UlearnConfiguration : AbstractConfiguration
 	{
 		public TelegramConfiguration Telegram { get; set; }
-		
+
 		public string BaseUrl { get; set; }
-		
+
 		public string CoursesDirectory { get; set; }
-		
+
 		public bool BuildExerciseStudentZips { get; set; }
-		
+
 		public string ExerciseStudentZipsDirectory { get; set; }
-		
+
 		public CertificateConfiguration Certificates { get; set; }
-		
+
 		public string GraphiteServiceName { get; set; }
-		
+
 		public string Database { get; set; }
-		
+
 		public GitConfiguration Git { get; set; }
-		
+
 		public string StatsdConnectionString { get; set; } // ConnectionString для подключения к Graphite-relay в формате "address=graphite-relay.com;port=8125;prefixKey=ulearn.local". Можно оставить пустой, чтобы не отправлять метрики
-		
+
 		public string SubmissionsUrl { get; set; } // Url to Ulearn.Web instance. I.E. https://ulearn.me
-		
+
 		public string RunnerToken { get; set; } // Must be equal on Ulearn.Web and RunC***Job instance
 
 		public int? KeepAliveInterval { get; set; }
@@ -92,7 +91,7 @@ namespace Ulearn.Core.Configuration
 	public class TelegramConfiguration
 	{
 		public string BotToken { get; set; }
-		
+
 		public ErrorsTelegramConfiguration Errors { get; set; }
 	}
 
@@ -100,7 +99,7 @@ namespace Ulearn.Core.Configuration
 	{
 		public string Channel { get; set; }
 	}
-	
+
 	public class CertificateConfiguration
 	{
 		public string Directory { get; set; }

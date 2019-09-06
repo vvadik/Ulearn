@@ -51,6 +51,7 @@ namespace uLearn.CSharp.BoolCompareValidation
 			{
 				Console.WriteLine(errors);
 			}
+
 			errors.Should().BeNullOrEmpty();
 		}
 	}

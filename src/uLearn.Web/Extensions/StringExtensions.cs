@@ -28,14 +28,16 @@ namespace uLearn.Web.Extensions
 					isClosingTag = false;
 					continue;
 				}
+
 				if (s[i] == '>' && inTag)
 				{
 					if (isClosingTag && tags.Count > 0)
 						tags.Pop();
-					if (! isClosingTag)
+					if (!isClosingTag)
 						tags.Push(currentTag);
 					inTag = false;
 				}
+
 				if (inTag)
 				{
 					if (s[i] == '/' && s[i - 1] == '<')
@@ -44,6 +46,7 @@ namespace uLearn.Web.Extensions
 						currentTag += s[i];
 					continue;
 				}
+
 				// Ignore HTML entities. HTML entity is all between & and ;
 				if (s[i] == '&')
 				{
@@ -97,6 +100,7 @@ namespace uLearn.Web.Extensions
 				if (currentIndex == 0)
 					return 0;
 			}
+
 			return currentIndex;
 		}
 

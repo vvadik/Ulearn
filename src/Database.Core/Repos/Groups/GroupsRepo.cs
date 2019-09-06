@@ -29,11 +29,11 @@ namespace Database.Repos.Groups
 			string courseId,
 			string name,
 			string ownerId,
-			bool isManualCheckingEnabled=false,
-			bool isManualCheckingEnabledForOldSolutions=false,
-			bool canUsersSeeGroupProgress=true,
-			bool defaultProhibitFurtherReview=true,
-			bool isInviteLinkEnabled=true)
+			bool isManualCheckingEnabled = false,
+			bool isManualCheckingEnabledForOldSolutions = false,
+			bool canUsersSeeGroupProgress = true,
+			bool defaultProhibitFurtherReview = true,
+			bool isInviteLinkEnabled = true)
 		{
 			return groupsCreatorAndCopier.CreateGroupAsync(
 				courseId,
@@ -62,7 +62,7 @@ namespace Database.Repos.Groups
 			bool newCanUsersSeeGroupProgress)
 		{
 			var group = await FindGroupByIdAsync(groupId).ConfigureAwait(false) ?? throw new ArgumentNullException($"Can't find group with id={groupId}");
-				
+
 			group.Name = newName;
 			group.IsManualCheckingEnabled = newIsManualCheckingEnabled;
 
@@ -75,7 +75,7 @@ namespace Database.Repos.Groups
 			group.IsManualCheckingEnabledForOldSolutions = newIsManualCheckingEnabledForOldSolutions;
 			group.DefaultProhibitFutherReview = newDefaultProhibitFurtherReview;
 			group.CanUsersSeeGroupProgress = newCanUsersSeeGroupProgress;
-			
+
 			await db.SaveChangesAsync().ConfigureAwait(false);
 
 			return group;
@@ -93,34 +93,34 @@ namespace Database.Repos.Groups
 		{
 			var group = await FindGroupByIdAsync(groupId).ConfigureAwait(false) ?? throw new ArgumentNullException($"Can't find group with id={groupId}");
 			group.IsArchived = isArchived;
-			
+
 			await db.SaveChangesAsync().ConfigureAwait(false);
 			return group;
 		}
-		
+
 		public async Task EnableInviteLinkAsync(int groupId, bool isEnabled)
 		{
 			var group = await FindGroupByIdAsync(groupId).ConfigureAwait(false) ?? throw new ArgumentNullException($"Can't find group with id={groupId}");
 			group.IsInviteLinkEnabled = isEnabled;
-			
+
 			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
 		public async Task DeleteGroupAsync(int groupId)
 		{
 			var group = await FindGroupByIdAsync(groupId).ConfigureAwait(false);
-			
+
 			/* Maybe group is already deleted */
 			if (group == null)
 				return;
-			
+
 			group.IsDeleted = true;
-			
+
 			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
 		[ItemCanBeNull]
-		public Task<Group> FindGroupByIdAsync(int groupId, bool noTracking=false)
+		public Task<Group> FindGroupByIdAsync(int groupId, bool noTracking = false)
 		{
 			var groups = db.Groups.AsQueryable();
 			if (noTracking)
@@ -129,7 +129,7 @@ namespace Database.Repos.Groups
 		}
 
 		[ItemCanBeNull]
-		public Task<Group> FindGroupByInviteHashAsync(Guid hash, bool noTracking=false)
+		public Task<Group> FindGroupByInviteHashAsync(Guid hash, bool noTracking = false)
 		{
 			var groups = db.Groups.AsQueryable();
 			if (noTracking)
@@ -137,7 +137,7 @@ namespace Database.Repos.Groups
 			return groups.FirstOrDefaultAsync(g => g.InviteHash == hash && !g.IsDeleted && g.IsInviteLinkEnabled);
 		}
 
-		public IQueryable<Group> GetCourseGroupsQueryable(string courseId, bool includeArchived=false)
+		public IQueryable<Group> GetCourseGroupsQueryable(string courseId, bool includeArchived = false)
 		{
 			var groups = db.Groups.Where(g => g.CourseId == courseId && !g.IsDeleted);
 			if (!includeArchived)
@@ -145,7 +145,7 @@ namespace Database.Repos.Groups
 			return groups;
 		}
 
-		public Task<List<Group>> GetCourseGroupsAsync(string courseId, bool includeArchived=false)
+		public Task<List<Group>> GetCourseGroupsAsync(string courseId, bool includeArchived = false)
 		{
 			return GetCourseGroupsQueryable(courseId, includeArchived).ToListAsync();
 		}
@@ -185,7 +185,7 @@ namespace Database.Repos.Groups
 				.ToListAsync()
 				.ConfigureAwait(false);
 
-			var accessibleGroupsIds = accessibleGroups.Select(g => g.Id);			
+			var accessibleGroupsIds = accessibleGroups.Select(g => g.Id);
 			/* Return true if exists at least one group with enabled DefaultProhibitFurtherReview */
 			return await db.Groups.AnyAsync(
 				g => accessibleGroupsIds.Contains(g.Id) &&

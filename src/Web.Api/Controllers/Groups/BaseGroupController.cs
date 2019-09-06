@@ -16,12 +16,12 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			: base(logger, courseManager, db, usersRepo)
 		{
 		}
-		
+
 		protected GroupInfo BuildGroupInfo(Group group,
-			int? membersCount=null,
-			IEnumerable<GroupAccess> accesses=null,
-			bool addGroupApiUrl=false,
-			bool? isUserMemberOfGroup=null)
+			int? membersCount = null,
+			IEnumerable<GroupAccess> accesses = null,
+			bool addGroupApiUrl = false,
+			bool? isUserMemberOfGroup = null)
 		{
 			if (group == null)
 				throw new ArgumentNullException(nameof(group));
@@ -36,24 +36,24 @@ namespace Ulearn.Web.Api.Controllers.Groups
 				IsInviteLinkEnabled = group.IsInviteLinkEnabled,
 				IsArchived = group.IsArchived,
 				AreYouStudent = isUserMemberOfGroup,
-				
+
 				IsManualCheckingEnabled = group.IsManualCheckingEnabled,
 				IsManualCheckingEnabledForOldSolutions = group.IsManualCheckingEnabledForOldSolutions,
 				DefaultProhibitFurtherReview = group.DefaultProhibitFutherReview,
 				CanStudentsSeeGroupProgress = group.CanUsersSeeGroupProgress,
-				
+
 				StudentsCount = membersCount,
 				Accesses = accesses?.Select(BuildGroupAccessesInfo).ToList(),
-				
-				ApiUrl = addGroupApiUrl ? Url.Action(new UrlActionContext { Action = nameof(GroupController.Group), Controller = "Group", Values = new { groupId = group.Id }}) : null, 
+
+				ApiUrl = addGroupApiUrl ? Url.Action(new UrlActionContext { Action = nameof(GroupController.Group), Controller = "Group", Values = new { groupId = group.Id } }) : null,
 			};
 		}
-		
+
 		protected GroupAccessesInfo BuildGroupAccessesInfo(GroupAccess access)
 		{
 			if (access == null)
 				throw new ArgumentNullException(nameof(access));
-			
+
 			return new GroupAccessesInfo
 			{
 				User = BuildShortUserInfo(access.User),

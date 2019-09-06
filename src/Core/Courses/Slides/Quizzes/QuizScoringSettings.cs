@@ -10,7 +10,7 @@ namespace Ulearn.Core.Courses.Slides.Quizzes
 
 		[XmlAttribute("manualCheck")]
 		public bool ManualChecking { get; set; } = false;
-		
+
 		[XmlAttribute("group")]
 		public string ScoringGroup { get; set; }
 	}

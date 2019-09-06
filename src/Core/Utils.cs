@@ -95,14 +95,14 @@ namespace Ulearn.Core
 				}
 			}
 		}
-		
+
 		public static bool IsInside(this DirectoryInfo baseDir, FileSystemInfo subElement)
 		{
 			var nBaseDir = NormalizePath(baseDir.FullName);
 			var nSubDir = NormalizePath(subElement.FullName);
 			return nSubDir.StartsWith(nBaseDir);
 		}
-		
+
 		private static string NormalizePath(string path)
 		{
 			return Path.GetFullPath(new Uri(path).LocalPath)

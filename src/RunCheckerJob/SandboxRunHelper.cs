@@ -11,6 +11,7 @@ namespace RunCheckerJob
 	public class SandboxRunHelper
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(SandboxRunHelper));
+
 		public static RunningResults WithSubmissionWorkingDirectory(RunnerSubmission submission, ISandboxRunnerClient runnerClient,
 			DirectoryInfo workingDirectory, bool deleteSubmissionsAfterFinish)
 		{
@@ -58,7 +59,7 @@ namespace RunCheckerJob
 				}
 			}
 		}
-		
+
 		private static void SafeRemoveDirectory(string path)
 		{
 			try

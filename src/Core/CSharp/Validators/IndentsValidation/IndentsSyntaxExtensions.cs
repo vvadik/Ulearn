@@ -42,6 +42,7 @@ namespace Ulearn.Core.CSharp.Validators.IndentsValidation
 				case WhileStatementSyntax whileStatement:
 					return SyntaxNodeOrToken.Create(syntaxNode.SyntaxTree, whileStatement.Condition);
 			}
+
 			return null;
 		}
 
@@ -101,11 +102,13 @@ namespace Ulearn.Core.CSharp.Validators.IndentsValidation
 			{
 				return openbrace.Parent.GetFirstToken();
 			}
+
 			if (openbrace.Parent is InitializerExpressionSyntax ||
 				openbrace.Parent is BlockSyntax && !(openbrace.Parent.Parent is BlockSyntax))
 			{
 				return openbrace.Parent.Parent.GetFirstToken();
 			}
+
 			return default(SyntaxToken);
 		}
 	}

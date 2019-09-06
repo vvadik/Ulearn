@@ -14,7 +14,7 @@ namespace Ulearn.Web.Api.Models.Parameters.Groups
 
 		[FromQuery(Name = "archived")]
 		public bool Archived { get; set; } = false;
-		
+
 		[FromQuery(Name = "offset")]
 		[MinValue(0, ErrorMessage = "Offset should be non-negative")]
 		public int Offset { get; set; } = 0;

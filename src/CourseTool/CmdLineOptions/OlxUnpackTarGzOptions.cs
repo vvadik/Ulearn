@@ -11,7 +11,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 
 		public override void DoExecute()
 		{
-			EdxInteraction.ExtractEdxCourseArchive(Dir, Dir.GetSingleFile(CourseArchiveFile ?? "*.tar.gz"), gzipped:true);
+			EdxInteraction.ExtractEdxCourseArchive(Dir, Dir.GetSingleFile(CourseArchiveFile ?? "*.tar.gz"), gzipped: true);
 		}
 	}
 

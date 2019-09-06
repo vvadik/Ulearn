@@ -27,7 +27,7 @@ namespace Stepik.Api.Tests
 
 			courseExporter = new CourseExporter(client.AccessToken);
 		}
-		
+
 		[Test]
 		//[TestCase(@"..\..\..\..\courses\Linq")]
 		[TestCase(@"..\..\..\..\..\courses\BasicProgramming\OOP\OOP\Slides\")]

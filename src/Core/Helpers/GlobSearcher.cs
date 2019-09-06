@@ -8,7 +8,7 @@ namespace Ulearn.Core.Helpers
 	public static class GlobSearcher
 	{
 		static readonly char DirSep = Path.DirectorySeparatorChar;
-		
+
 		/// <summary>
 		/// return a list of files that matches some wildcard pattern, e.g. 
 		/// C:\p4\software\dotnet\tools\*\*.sln to get all tool solution files
@@ -19,7 +19,7 @@ namespace Ulearn.Core.Helpers
 		{
 			return Glob(PathHead(glob) + DirSep, PathTail(glob));
 		}
-	
+
 		/// <summary>
 		/// Uses 'head' and 'tail' — 'head' has already been pattern-expanded
 		/// and 'tail' has not.
@@ -34,10 +34,10 @@ namespace Ulearn.Core.Helpers
 					yield return path;
 			else
 				foreach (var dir in Directory.GetDirectories(head, PathHead(tail)).OrderBy(s => s))
-					foreach (var path in Glob(Path.Combine(head, dir), PathTail(tail)))
-						yield return path;
+				foreach (var path in Glob(Path.Combine(head, dir), PathTail(tail)))
+					yield return path;
 		}
-	
+
 		/// <summary>
 		/// Return the first element of a file path
 		/// </summary>
@@ -50,13 +50,13 @@ namespace Ulearn.Core.Helpers
 			// TODO check behavior on Linux to see if this blows up — I don't think so
 			if (path.StartsWith("" + DirSep + DirSep))
 				return path.Substring(0, 2) + path.Substring(2).Split(DirSep)[0] + DirSep + path.Substring(2).Split(DirSep)[1];
-			
+
 			if (!path.Contains(DirSep))
 				return ".";
-	
+
 			return path.Split(DirSep)[0];
 		}
-	
+
 		/// <summary>
 		/// Return everything but the first element of a file path
 		/// e.g. PathTail("C:\TEMP\foo.txt") = "TEMP\foo.txt"
@@ -67,7 +67,7 @@ namespace Ulearn.Core.Helpers
 		{
 			if (!path.Contains(DirSep))
 				return path;
-	
+
 			return path.Substring(1 + PathHead(path).Length);
 		}
 	}

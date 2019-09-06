@@ -12,8 +12,8 @@ namespace Ulearn.Core.Helpers
 	{
 		public bool IsEnabled { get; private set; }
 
-		private static readonly ILog log = LogManager.GetLogger(typeof(ExerciseStudentZipsCache)); 
-		
+		private static readonly ILog log = LogManager.GetLogger(typeof(ExerciseStudentZipsCache));
+
 		private readonly DirectoryInfo cacheDirectory;
 		private readonly ExerciseStudentZipBuilder builder;
 		private static readonly UlearnConfiguration configuration;
@@ -22,7 +22,7 @@ namespace Ulearn.Core.Helpers
 		{
 			configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 		}
-		
+
 		public ExerciseStudentZipsCache()
 		{
 			//IsEnabled = Convert.ToBoolean(ConfigurationManager.AppSettings["ulearn.buildExerciseStudentZips"] ?? "false");
@@ -48,9 +48,9 @@ namespace Ulearn.Core.Helpers
 
 		public FileInfo GenerateOrFindZip(string courseId, Slide slide)
 		{
-			if (! IsEnabled)
+			if (!IsEnabled)
 				throw new InvalidOperationException("ExerciseStudentZipsCache is disabled: can not generate zip archive with exercise");
-			
+
 			var courseDirectory = cacheDirectory.GetSubdirectory(courseId);
 			var zipFile = courseDirectory.GetFile($"{slide.Id}.zip");
 			if (!zipFile.Exists)
@@ -65,11 +65,11 @@ namespace Ulearn.Core.Helpers
 
 		public void DeleteCourseZips(string courseId)
 		{
-			if (! IsEnabled)
+			if (!IsEnabled)
 				throw new InvalidOperationException("ExerciseStudentZipsCache is disabled: can not delete course's zips");
-			
+
 			log.Info($"Очищаю папку со сгенерированными zip-архивами для упражнений из курса {courseId}");
-			
+
 			var courseDirectory = cacheDirectory.GetSubdirectory(courseId);
 			courseDirectory.EnsureExists();
 

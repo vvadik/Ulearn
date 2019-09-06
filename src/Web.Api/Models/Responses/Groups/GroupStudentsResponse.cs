@@ -18,7 +18,7 @@ namespace Ulearn.Web.Api.Models.Responses.Groups
 	{
 		[DataMember]
 		public ShortUserInfo User { get; set; }
-		
+
 		[DataMember]
 		public DateTime? AddingTime { get; set; }
 	}

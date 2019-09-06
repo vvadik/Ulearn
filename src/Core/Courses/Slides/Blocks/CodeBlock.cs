@@ -21,13 +21,13 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 			get => code;
 			set => code = value.RemoveCommonNesting().TrimEnd();
 		}
-		
+
 		/* .NET XML Serializer doesn't understand nullable fields, so we use this hack to make Language? field */
 		[XmlIgnore]
 		public Language? Language { get; set; }
 
 		#region NullableLanguageHack
-		
+
 		[XmlAttribute("language")]
 		[Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
 		public Language LanguageSerialized
@@ -45,8 +45,9 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		{
 			return Language.HasValue;
 		}
+
 		#endregion
-		
+
 		[XmlIgnore]
 		public List<Label> SourceCodeLabels { get; set; } = new List<Label>();
 
@@ -62,7 +63,7 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 
 		public override IEnumerable<SlideBlock> BuildUp(SlideBuildingContext context, IImmutableSet<string> filesInProgress)
 		{
-			if (! Language.HasValue)
+			if (!Language.HasValue)
 				Language = context.CourseSettings.DefaultLanguage;
 			yield return this;
 		}

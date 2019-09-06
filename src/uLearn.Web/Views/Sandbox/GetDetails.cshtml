@@ -12,17 +12,17 @@
 }
 
 <div style="margin-bottom: 20px">
-    Id: @Html.Encode(Model.Id) <br/>
-    Язык: @Model.Language.ToString("g") <br/>
-    Время отправки: @Model.Timestamp.ToPrettyString() <br/>
-    Статус: @(Model.AutomaticChecking != null ? Model.AutomaticChecking.Status.ToString() : "Не проверяется автоматичеки")<br/>
-    @if (Model.AutomaticChecking != null)
-    {
-	    <text>
-	        Проверяющий сервер: @(Model.AutomaticChecking.CheckingAgentName ?? "Неизвестно")<br/>	    
-            Результат: <b>@Model.AutomaticChecking.GetVerdict()</b> <br/>
-	    </text>
-    }
+	Id: @Html.Encode(Model.Id) <br/>
+	Язык: @Model.Language.ToString("g") <br/>
+	Время отправки: @Model.Timestamp.ToPrettyString() <br/>
+	Статус: @(Model.AutomaticChecking != null ? Model.AutomaticChecking.Status.ToString() : "Не проверяется автоматичеки")<br/>
+	@if (Model.AutomaticChecking != null)
+	{
+		<text>
+			Проверяющий сервер: @(Model.AutomaticChecking.CheckingAgentName ?? "Неизвестно")<br/>
+			Результат: <b>@Model.AutomaticChecking.GetVerdict()</b> <br/>
+		</text>
+	}
 </div>
 
 @foreach (var text in texts)

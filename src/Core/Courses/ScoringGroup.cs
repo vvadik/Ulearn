@@ -21,7 +21,7 @@ namespace Ulearn.Core.Courses
 
 		[XmlAttribute("maxAdditionalScore")]
 		public string _maxAdditionalScore { get; set; }
-		
+
 		[XmlIgnore]
 		public int MaxAdditionalScore
 		{
@@ -35,7 +35,7 @@ namespace Ulearn.Core.Courses
 			}
 			set => _maxAdditionalScore = value.ToString();
 		}
-		
+
 		[XmlIgnore]
 		public bool IsMaxAdditionalScoreSpecified => !string.IsNullOrEmpty(_maxAdditionalScore);
 

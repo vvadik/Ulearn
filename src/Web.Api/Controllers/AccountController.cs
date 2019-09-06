@@ -79,19 +79,19 @@ namespace Ulearn.Web.Api.Controllers
 					"Не указана эл. почта",
 					"Укажите в профиле электронную почту, чтобы получать уведомления и восстановить доступ в случае утери пароля"
 				));
-			if (!string.IsNullOrEmpty(user.Email)  && ! user.EmailConfirmed)
+			if (!string.IsNullOrEmpty(user.Email) && !user.EmailConfirmed)
 				problems.Add(new AccountProblem(
 					"Эл. почта не подтверждена",
 					"Подтвердите в профиле электронную почту, чтобы получать уведомления и восстановить доступ в случае утери пароля"
 				));
-			
+
 			var isInstructor = await courseRolesRepo.HasUserAccessToAnyCourseAsync(user.Id, CourseRoleType.Instructor).ConfigureAwait(false);
 			if (isInstructor && (string.IsNullOrEmpty(user.FirstName) || string.IsNullOrEmpty(user.LastName)))
 				problems.Add(new AccountProblem(
 					"Не указаны имя или фамилия",
 					"Укажите в профиле имя и фамилию, чтобы студентам было проще с вами работать"
 				));
-			
+
 			return problems;
 		}
 
@@ -116,9 +116,9 @@ namespace Ulearn.Web.Api.Controllers
 		public async Task<ActionResult<TokenResponse>> ApiToken([FromQuery] int days)
 		{
 			var isInstructor = await courseRolesRepo.HasUserAccessToAnyCourseAsync(User.GetUserId(), CourseRoleType.Instructor).ConfigureAwait(false);
-			if(!isInstructor)
+			if (!isInstructor)
 				return StatusCode((int)HttpStatusCode.Forbidden, "You should be at least instructor");
-			
+
 			var expires = DateTime.Now.AddDays(days);
 			var claims = User.Claims.ToList();
 			return GetTokenInternal(expires, claims);
@@ -160,7 +160,7 @@ namespace Ulearn.Web.Api.Controllers
 			var token = new JwtSecurityToken(
 				configuration.Web.Authentication.Jwt.Issuer,
 				configuration.Web.Authentication.Jwt.Audience,
-				new[]{new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", appUser.Id), },
+				new[] { new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", appUser.Id), },
 				expires: expires,
 				signingCredentials: signingCredentials
 			);
@@ -178,9 +178,9 @@ namespace Ulearn.Web.Api.Controllers
 		[Authorize]
 		public async Task<ActionResult<CourseRolesResponse>> CourseRoles()
 		{
-			var userId = User.GetUserId();	
+			var userId = User.GetUserId();
 			var isSystemAdministrator = User.IsSystemAdministrator();
-			
+
 			var rolesByCourse = await courseRolesRepo.GetRolesAsync(userId).ConfigureAwait(false);
 			var courseAccesses = await coursesRepo.GetUserAccessesAsync(userId).ConfigureAwait(false);
 			var courseAccessesByCourseId = courseAccesses.GroupBy(a => a.CourseId).Select(
@@ -212,7 +212,7 @@ namespace Ulearn.Web.Api.Controllers
 		public async Task<ActionResult<LogoutResponse>> Logout()
 		{
 			await signInManager.SignOutAsync().ConfigureAwait(false);
-			
+
 			return new LogoutResponse
 			{
 				Logout = true

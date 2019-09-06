@@ -22,8 +22,8 @@ namespace Database.DataContexts
 		public UserQuizSubmission FindLastUserSubmission(string courseId, Guid slideId, string userId)
 		{
 			return db.UserQuizSubmissions.Where(s => s.CourseId == courseId && s.UserId == userId && s.SlideId == slideId).OrderByDescending(s => s.Timestamp).FirstOrDefault();
-		}		
-		
+		}
+
 		public async Task<UserQuizSubmission> AddSubmission(string courseId, Guid slideId, string userId, DateTime timestamp)
 		{
 			var submission = new UserQuizSubmission
@@ -37,7 +37,7 @@ namespace Database.DataContexts
 			await db.SaveChangesAsync().ConfigureAwait(false);
 			return submission;
 		}
-		
+
 		public async Task<UserQuizAnswer> AddUserQuizAnswer(int submissionId, bool isRightAnswer, string blockId, string itemId, string text, int quizBlockScore, int quizBlockMaxScore)
 		{
 			var answer = new UserQuizAnswer
@@ -83,14 +83,14 @@ namespace Database.DataContexts
 			return passedQuizzes;
 		}
 
-		public Dictionary<string, List<UserQuizAnswer>> GetAnswersForShowingOnSlide(string courseId, QuizSlide slide, string userId, UserQuizSubmission submission=null)
+		public Dictionary<string, List<UserQuizAnswer>> GetAnswersForShowingOnSlide(string courseId, QuizSlide slide, string userId, UserQuizSubmission submission = null)
 		{
 			if (slide == null)
 				return null;
-			
+
 			if (submission == null)
 				submission = FindLastUserSubmission(courseId, slide.Id, userId);
-			
+
 			var answer = new Dictionary<string, List<UserQuizAnswer>>();
 			foreach (var block in slide.Blocks.OfType<AbstractQuestionBlock>())
 			{
@@ -105,11 +105,11 @@ namespace Database.DataContexts
 				}
 				else
 					answer[block.Id] = new List<UserQuizAnswer>();
-				
 			}
+
 			return answer;
 		}
-		
+
 		public Dictionary<string, int> GetUserScores(string courseId, Guid slideId, string userId, UserQuizSubmission submission = null)
 		{
 			if (submission == null)
@@ -131,7 +131,7 @@ namespace Database.DataContexts
 			var submission = FindLastUserSubmission(courseId, slideId, userId);
 			if (submission == null)
 				return false;
-			
+
 			return db.UserQuizAnswers
 				.Where(q => q.SubmissionId == submission.Id)
 				.All(q => q.QuizBlockScore == q.QuizBlockMaxScore);
@@ -144,7 +144,7 @@ namespace Database.DataContexts
 				.ForEach(q => q.QuizBlockScore = score);
 			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
-		
+
 		public Dictionary<string, int> GetAnswersFrequencyForChoiceBlock(string courseId, Guid slideId, string quizId)
 		{
 			var answers = db.UserQuizAnswers.Include(q => q.SubmissionId).Where(q => q.Submission.CourseId == courseId && q.Submission.SlideId == slideId && q.BlockId == quizId);

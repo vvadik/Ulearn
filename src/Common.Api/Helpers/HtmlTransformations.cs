@@ -51,7 +51,7 @@ namespace Ulearn.Common.Api.Helpers
 										   ";
 
 		public static readonly Regex urlRegex = new Regex(urlRegexS, RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
-		
+
 		public static string EncodeMultiLineText(string text, bool keepFirstSpaces = false)
 		{
 			if (string.IsNullOrEmpty(text))
@@ -64,7 +64,7 @@ namespace Ulearn.Common.Api.Helpers
 
 			return text.Replace("\n", "<br/>").Replace("\r", "");
 		}
-		
+
 		private static bool IsEmailUrl(string url)
 		{
 			return url.Contains("@") && !url.Contains("/");
@@ -80,6 +80,7 @@ namespace Ulearn.Common.Api.Helpers
 				else
 					fullUrl = "http://" + url;
 			}
+
 			return $"<a href=\"{EncodeAttribute(WebUtility.HtmlDecode(fullUrl))}\">{url}</a>";
 		}
 

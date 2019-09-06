@@ -40,7 +40,7 @@ namespace uLearn.Web.Controllers
 			exerciseStudentZipsCache = new ExerciseStudentZipsCache();
 			userManager = new ULearnUserManager(db);
 		}
-		
+
 		[System.Web.Mvc.HttpPost]
 		public async Task<ActionResult> RunSolution(string courseId, Guid slideId, bool isLti = false)
 		{
@@ -64,6 +64,7 @@ namespace uLearn.Web.Controllers
 					ErrorMessage = "Слишком большой код"
 				});
 			}
+
 			var exerciseSlide = courseManager.FindCourse(courseId)?.FindSlideById(slideId) as ExerciseSlide;
 			if (exerciseSlide == null)
 				return HttpNotFound();
@@ -130,7 +131,7 @@ namespace uLearn.Web.Controllers
 		{
 			var review = slideCheckingsRepo.FindExerciseCodeReviewById(reviewId);
 			var reviewCourseId = review.ExerciseCheckingId.HasValue ? review.ExerciseChecking.CourseId : review.Submission.CourseId;
-			if (! reviewCourseId.EqualsIgnoreCase(courseId))
+			if (!reviewCourseId.EqualsIgnoreCase(courseId))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 			if (review.AuthorId != User.Identity.GetUserId() && !User.HasAccessFor(courseId, CourseRole.CourseAdmin))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
@@ -183,7 +184,7 @@ namespace uLearn.Web.Controllers
 			var comments = slideCheckingsRepo.GetLastYearReviewComments(courseId, slideId);
 			return PartialView("_SlideCodeReviewComments", comments);
 		}
-		
+
 		[System.Web.Mvc.HttpPost]
 		[ValidateInput(false)]
 		public async Task<ActionResult> AddExerciseCodeReviewComment(int reviewId, string text)
@@ -194,13 +195,13 @@ namespace uLearn.Web.Controllers
 			var submissionUserId = review.ExerciseCheckingId.HasValue ? review.ExerciseChecking.UserId : review.Submission.UserId;
 			var submissionCourseId = review.ExerciseCheckingId.HasValue ? review.ExerciseChecking.CourseId : review.Submission.CourseId;
 			var isInstructor = User.HasAccessFor(submissionCourseId, CourseRole.Instructor);
-			if (submissionUserId != currentUserId && ! isInstructor)
+			if (submissionUserId != currentUserId && !isInstructor)
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-			
+
 			var canReply = isInstructor || !review.Author.IsUlearnBot() || review.NotDeletedComments.Any(c => !c.Author.IsUlearnBot());
 			if (!canReply)
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-				
+
 			var comment = await slideCheckingsRepo.AddExerciseCodeReviewComment(currentUserId, reviewId, text).ConfigureAwait(false);
 
 			if (review.ExerciseCheckingId.HasValue && review.ExerciseChecking.IsChecked)
@@ -221,10 +222,10 @@ namespace uLearn.Web.Controllers
 			var comment = slideCheckingsRepo.FindExerciseCodeReviewCommentById(commentId);
 			if (comment == null)
 				return HttpNotFound();
-			
+
 			var currentUserId = User.Identity.GetUserId();
 			var courseId = comment.Review.ExerciseCheckingId.HasValue ? comment.Review.ExerciseChecking.CourseId : comment.Review.Submission.CourseId;
-			if (comment.AuthorId != currentUserId && ! User.HasAccessFor(courseId, CourseRole.CourseAdmin))
+			if (comment.AuthorId != currentUserId && !User.HasAccessFor(courseId, CourseRole.CourseAdmin))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
 			await slideCheckingsRepo.DeleteExerciseCodeReviewComment(comment).ConfigureAwait(false);
@@ -232,12 +233,12 @@ namespace uLearn.Web.Controllers
 			return Json(new CodeReviewOperationResult { Status = "ok" });
 		}
 
-		
+
 		/* Call NotifyAboutCodeReviewComment() only for checking's comment, not for submission's ones */
 		private async Task NotifyAboutCodeReviewComment(ExerciseCodeReviewComment comment)
 		{
 			var courseId = comment.Review.ExerciseCheckingId.HasValue ? comment.Review.ExerciseChecking.CourseId : comment.Review.Submission.CourseId;
-			await notificationsRepo.AddNotification(courseId, new ReceivedCommentToCodeReviewNotification 
+			await notificationsRepo.AddNotification(courseId, new ReceivedCommentToCodeReviewNotification
 			{
 				CommentId = comment.Id,
 			}, comment.AuthorId).ConfigureAwait(false);
@@ -275,7 +276,7 @@ namespace uLearn.Web.Controllers
 				transaction.Commit();
 
 				var unit = course.FindUnitBySlideId(checking.SlideId);
-				if(unit != null && unitsRepo.IsUnitVisibleForStudents(course, unit.Id))
+				if (unit != null && unitsRepo.IsUnitVisibleForStudents(course, unit.Id))
 					await NotifyAboutManualExerciseChecking(checking).ConfigureAwait(false);
 			}
 
@@ -347,7 +348,7 @@ namespace uLearn.Web.Controllers
 			/* 100%-score sets ProhibitFurtherChecking to true */
 			if (exerciseScore == slide.Scoring.CodeReviewScore)
 				await slideCheckingsRepo.ProhibitFurtherExerciseManualChecking(checking).ConfigureAwait(false);
-			
+
 			await visitsRepo.UpdateScoreForVisit(courseId, slideId, slide.MaxScore, userId).ConfigureAwait(false);
 
 			await NotifyAboutManualExerciseChecking(checking).ConfigureAwait(false);
@@ -400,7 +401,7 @@ namespace uLearn.Web.Controllers
 			var hasCheckedReview = submission?.ManualCheckings.Any(c => c.IsChecked) ?? false;
 			var reviewState = hasCheckedReview ? ExerciseReviewState.Reviewed :
 				hasUncheckedReview ? ExerciseReviewState.WaitingForReview :
-					ExerciseReviewState.NotReviewed;
+				ExerciseReviewState.NotReviewed;
 
 			var submissions = onlyAccepted ?
 				userSolutionsRepo.GetAllAcceptedSubmissionsByUser(course.Id, slide.Id, userId) :
@@ -467,6 +468,7 @@ namespace uLearn.Web.Controllers
 			{
 				manualChecking = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(manualCheckingId.Value);
 			}
+
 			if (manualChecking != null && !submissionId.HasValue)
 				submission = manualChecking.Submission;
 
@@ -486,7 +488,7 @@ namespace uLearn.Web.Controllers
 
 			return PartialView(model);
 		}
-		
+
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		[ChildActionOnly]
 		public ActionResult StudentSubmissions(string courseId, Guid slideId)
@@ -501,7 +503,7 @@ namespace uLearn.Web.Controllers
 			model.ShowAll = true;
 			return PartialView(model);
 		}
-		
+
 		private StudentSubmissionsModel GetStudentSubmissionsModel(string courseId, Guid slideId, string name)
 		{
 			const int maxUsersCount = 30;
@@ -514,7 +516,7 @@ namespace uLearn.Web.Controllers
 
 			var canViewAllSubmissions = User.HasAccessFor(courseId, CourseRole.CourseAdmin) || User.HasCourseAccess(courseId, CourseAccessType.ViewAllStudentsSubmissions);
 			var hasFilterByName = !string.IsNullOrEmpty(name);
-			
+
 			/* By default show members of `my` groups, but if filter is enabled then course admin's and users with special access can view any student's submissions */
 
 			SubmissionsFilterOptions filterOptions;
@@ -546,7 +548,7 @@ namespace uLearn.Web.Controllers
 				var filteredUserIds = usersRepo.FilterUsersByNamePrefix(name);
 				filterOptions.UserIds = filterOptions.UserIds.Intersect(filteredUserIds).ToList();
 			}
-			
+
 			filterOptions.UserIds = filterOptions.UserIds.Take(maxUsersCount).ToList();
 
 			var submissions = userSolutionsRepo.GetAllSubmissionsByUsers(filterOptions);
@@ -570,7 +572,7 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-        [System.Web.Mvc.AllowAnonymous]
+		[System.Web.Mvc.AllowAnonymous]
 		public ActionResult StudentZip(string courseId, Guid? slideId)
 		{
 			if (!slideId.HasValue)
@@ -586,7 +588,7 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 
 			var zipFile = exerciseStudentZipsCache.GenerateOrFindZip(courseId, exerciseSlide);
-			
+
 			var block = exerciseSlide.Exercise;
 			var fileName = (block as CsProjectExerciseBlock)?.CsprojFile.Name ?? new DirectoryInfo((block as UniversalExerciseBlock).ExerciseDirPath).Name;
 			return File(zipFile.FullName, "application/zip", fileName + ".zip");
@@ -663,11 +665,10 @@ namespace uLearn.Web.Controllers
 
 		[CanBeNull]
 		public Func<UserExerciseSubmission, string> GetSubmissionDescription { get; set; }
-		
+
 		/* By default it's Url.RouteUrl("Course.SlideById", new { Model.CourseId, slideId = Model.Slide.Url }) */
 		[CanBeNull]
 		public string FormUrl { get; set; }
-
 	}
 
 	public class ExerciseControlsModel
@@ -707,7 +708,7 @@ namespace uLearn.Web.Controllers
 			IsCurrentSubmissionChecking = isCurrentSubmissionChecking;
 			DefaultProhibitFurtherReview = defaultProhibitFurtherReview;
 		}
-		
+
 		public string CourseId { get; set; }
 		public ExerciseSlide Slide { get; set; }
 		public ManualExerciseChecking Checking { get; set; }
@@ -722,18 +723,18 @@ namespace uLearn.Web.Controllers
 	{
 		public string CourseId { get; set; }
 		public ExerciseSlide Slide { get; set; }
-		
+
 		public Dictionary<string, ApplicationUser> Users { get; set; }
-		
+
 		public DefaultDictionary<string, List<UserExerciseSubmission>> SubmissionsByUser { get; set; }
-		
+
 		public Dictionary<string, int> AutomaticCheckingScores { get; set; }
 		public Dictionary<string, int> ManualCheckingScores { get; set; }
-		
+
 		public bool HasFilterByName { get; set; }
-		
+
 		public DefaultDictionary<string, string> UserGroups { get; set; }
-		
+
 		public bool ShowAll { get; set; }
 	}
 }

@@ -13,7 +13,7 @@ namespace RunCheckerJob
 		private DockerSandboxRunnerSettings GetSpecificSettings(CommandRunnerSubmission submission)
 		{
 			return new DockerSandboxRunnerSettings(submission.DockerImageName, submission.RunCommand);
-		} 
+		}
 
 		public RunningResults RunContainerAndGetResultInternal(RunnerSubmission submission, DirectoryInfo submissionWorkingDirectory)
 		{

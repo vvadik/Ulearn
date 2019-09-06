@@ -12,6 +12,7 @@ namespace uLearn.Web.Kontur.Passport
 			{
 				throw new ArgumentNullException(nameof(app));
 			}
+
 			if (options == null)
 			{
 				throw new ArgumentNullException(nameof(options));

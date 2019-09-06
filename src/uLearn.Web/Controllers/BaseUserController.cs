@@ -107,6 +107,7 @@ namespace uLearn.Web.Controllers
 				log.Error($"Не могу отправить письмо для подтверждения адреса на {user.Email}", e);
 				return false;
 			}
+
 			metricSender.SendCount("email_confirmation.send_confirmation_email.success");
 
 			await usersRepo.UpdateLastConfirmationEmailTime(user).ConfigureAwait(false);
@@ -119,7 +120,7 @@ namespace uLearn.Web.Controllers
 			var users = usersRepo.FindUsersByConfirmedEmail(email);
 			return users.All(u => u.Id == user.Id);
 		}
-		
+
 		protected bool CanNewUserSetThisEmail(string email)
 		{
 			var users = usersRepo.FindUsersByConfirmedEmail(email);

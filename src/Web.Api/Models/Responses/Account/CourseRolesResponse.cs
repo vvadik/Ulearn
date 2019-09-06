@@ -10,14 +10,15 @@ namespace Ulearn.Web.Api.Models.Responses.Account
 	public class CourseRolesResponse : SuccessResponse
 	{
 		[DataMember]
-		
+
 		public bool IsSystemAdministrator { get; set; }
+
 		[DataMember]
 		public List<CourseRoleResponse> CourseRoles { get; set; }
 
 		[DataMember]
 		public List<CourseAccessResponse> CourseAccesses { get; set; }
-		
+
 		[DataMember]
 		public List<ShortGroupInfo> GroupsAsStudent { get; set; }
 	}
@@ -27,7 +28,7 @@ namespace Ulearn.Web.Api.Models.Responses.Account
 	{
 		[DataMember]
 		public string CourseId { get; set; }
-		
+
 		[DataMember]
 		public CourseRoleType Role { get; set; }
 	}
@@ -37,7 +38,7 @@ namespace Ulearn.Web.Api.Models.Responses.Account
 	{
 		[DataMember]
 		public string CourseId { get; set; }
-		
+
 		[DataMember]
 		public List<CourseAccessType> Accesses { get; set; }
 	}

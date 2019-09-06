@@ -9,7 +9,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 		string Convert(SyntaxToken token);
 		SnippetType SnippetType { get; }
 	}
-	
+
 	public class TokensKindsOnlyConverter : ITokenInSnippetConverter
 	{
 		public string Convert(SyntaxToken token)

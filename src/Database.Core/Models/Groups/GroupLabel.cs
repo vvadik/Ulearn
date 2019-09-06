@@ -41,7 +41,7 @@ namespace Database.Models
 
 		[Required]
 		public int LabelId { get; set; }
-		
+
 		public virtual GroupLabel Label { get; set; }
 	}
 }

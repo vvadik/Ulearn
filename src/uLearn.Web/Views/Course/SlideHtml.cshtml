@@ -24,10 +24,10 @@
 @functions
 {
 
-	private static bool IsBlockCorrect(QuizBlockData model, AbstractQuestionBlock block) 
+	private static bool IsBlockCorrect(QuizBlockData model, AbstractQuestionBlock block)
 	{
 		int blockScore;
-		var isBlockCorrect = model.QuizModel != null && model.QuizModel.UserScores != null && 
+		var isBlockCorrect = model.QuizModel != null && model.QuizModel.UserScores != null &&
 							model.QuizModel.UserScores.TryGetValue(block.Id, out blockScore) && blockScore == block.MaxScore;
 		return isBlockCorrect;
 	}
@@ -63,16 +63,16 @@
 		else if (context.RevealHidden)
 		{
 			<div class="revealed">
-                @if (firstHiddenBlock)
-                {
-	                firstHiddenBlock = false;
-	                <div class="revealed__description">Студенты не&nbsp;видят @(countHiddenBlocks > 1 ? "синие блоки" : "этот блок")</div>
-                }
-                @foreach (var block in blockRange)
-                {
-	                @Block((dynamic)block, context, Html)
-                }
-            </div>
+				@if (firstHiddenBlock)
+				{
+					firstHiddenBlock = false;
+					<div class="revealed__description">Студенты не&nbsp;видят @( countHiddenBlocks > 1 ? "синие блоки" : "этот блок")</div>
+				}
+				@foreach (var block in blockRange)
+				{
+					@Block((dynamic)block, context, Html)
+				}
+			</div>
 		}
 	}
 }
@@ -95,50 +95,48 @@
 		style = "color: " + (isBlockCorrect ? "green" : "red");
 	}
 	<div class="quiz-block__is-question">
-        <h4 class="quiz-block__is-question__title @(string.IsNullOrEmpty(mark) || model.DebugView ? "" : "with-mark")">
-            @if (!model.DebugView)
-            {
-	            <i class="@mark" style="@style"></i>
-            }
-            <span class="quiz-block__text">
-                @block.QuestionIndex. @block.Text.RenderTex().ToLegacyHtmlString()
-            </span>
-            <span class="quiz-block__score">
-                @if (blockScore >= 0)
-                {
-                    <nobr>@blockScore из @block.MaxScore балл@( block.MaxScore == 1 ? "а" : "ов" )</nobr>
-                }
-                else
-                {
-                    <nobr>@block.MaxScore.PluralizeInRussian(RussianPluralizationOptions.Score)</nobr>
-                }
-            </span>
-        </h4>
-    
-        @QuizBlock((dynamic)block, context)
-		
-        @if (context.ManualChecking != null)
-        {
-            <h4>Оцените от 0 до @block.MaxScore</h4>
-            <div>
+		<h4 class="quiz-block__is-question__title @( string.IsNullOrEmpty(mark) || model.DebugView ? "" : "with-mark")">
+			@if (!model.DebugView)
+			{
+				<i class="@mark" style="@style"></i>
+			}
+			<span class="quiz-block__text">
+				@block.QuestionIndex. @block.Text.RenderTex().ToLegacyHtmlString()
+			</span>
+			<span class="quiz-block__score">
+				@if (blockScore >= 0)
+				{
+					<nobr>@blockScore из @block.MaxScore балл@( block.MaxScore == 1 ? "а" : "ов")</nobr>
+				}
+				else
+				{
+					<nobr>@block.MaxScore.PluralizeInRussian(RussianPluralizationOptions.Score)</nobr>
+				}
+			</span>
+		</h4>
+
+		@QuizBlock((dynamic)block, context)
+
+		@if (context.ManualChecking != null)
+		{
+			<h4>Оцените от 0 до @block.MaxScore</h4>
+			<div>
 				<input type="number" class="form-control" min="0" max="@block.MaxScore" name="quiz__score__@( block.Id)"
-						value="@(context.ManualChecking.IsChecked ? context.UserScores.GetOrDefault(block.Id).ToString() : "")"/>
-            </div>
-        }
-    </div>
+						value="@( context.ManualChecking.IsChecked ? context.UserScores.GetOrDefault(block.Id).ToString() : "")"/>
+			</div>
+		}
+	</div>
 }
 
 
 @helper ShowScore(int currentScore, int maxScore)
-{ @(maxScore == 0 ? "" : string.Format("{0}/{1}", currentScore, maxScore)) }
+{ @( maxScore == 0 ? "" : string.Format("{0}/{1}", currentScore, maxScore)) }
 
 @helper ShowScoreWithWords(int currentScore, int maxScore)
-{ @(maxScore == 0 ? "" : string.Format("{0} из {1}", currentScore.PluralizeInRussian(RussianPluralizationOptions.Score), maxScore)) }
+{ @( maxScore == 0 ? "" : string.Format("{0} из {1}", currentScore.PluralizeInRussian(RussianPluralizationOptions.Score), maxScore)) }
 
 @helper Block(MarkdownBlock block, BlockRenderContext context, HtmlHelper Html)
-{
-	@MvcHtmlString.Create(block.RenderMarkdown(context.Course.Id, context.Slide.Id, context.BaseUrl))
-}
+{ @MvcHtmlString.Create(block.RenderMarkdown(context.Course.Id, context.Slide.Id, context.BaseUrl)) }
 
 @helper Block(CodeBlock block, BlockRenderContext context, HtmlHelper Html)
 {
@@ -148,7 +146,7 @@
 	}
 	else
 	{
-		<textarea class="code code-sample" data-lang="@(block.Language.GetName())">@block.Code</textarea>
+		<textarea class="code code-sample" data-lang="@( block.Language.GetName())">@block.Code</textarea>
 	}
 }
 
@@ -157,15 +155,15 @@
 	var linesCount = block.Code.SplitToLines().Length;
 	var linesCountToShow = linesCount <= 20 ? linesCount : 5;
 	var visibleLines = block.Code.SplitToLinesWithEoln().Take(linesCountToShow).Join("");
-	<div class="expandable-code @(linesCount > linesCountToShow ? "collapsed" : "expanded")">
-        <textarea class="code code-sample" data-lang="@block.Language.GetName()" data-code="@block.Code">@visibleLines</textarea>
-        @if (linesCount > linesCountToShow)
-        {
-	        <div class="expandable-code__button-wrapper">
-                <button class="expandable-code__button">Показать код полностью</button>
-            </div>    
-        }
-    </div>
+	<div class="expandable-code @( linesCount > linesCountToShow ? "collapsed" : "expanded")">
+		<textarea class="code code-sample" data-lang="@block.Language.GetName()" data-code="@block.Code">@visibleLines</textarea>
+		@if (linesCount > linesCountToShow)
+		{
+			<div class="expandable-code__button-wrapper">
+				<button class="expandable-code__button">Показать код полностью</button>
+			</div>
+		}
+	</div>
 }
 
 @helper Block(TexBlock block, BlockRenderContext context, HtmlHelper Html)
@@ -226,10 +224,10 @@
 		{
 			<div class="fragment">
 				<span class="offset">@fragment.Offset.ToString(@"mm\:ss")</span> — @fragment.Text
-			</div>	 
+			</div>
 		}
 	</div>
- 
+
 	var googleDocLink = context.Course.Settings.VideoAnnotationsGoogleDoc;
 	if (!string.IsNullOrEmpty(googleDocLink))
 	{
@@ -264,9 +262,7 @@
 }
 
 @helper Block(HtmlBlock block, BlockRenderContext context, HtmlHelper Html)
-{
-	@Html.Raw(block.Content)
-}
+{ @Html.Raw(block.Content) }
 
 @helper Block(SpoilerBlock block, BlockRenderContext context, HtmlHelper Html)
 {
@@ -330,19 +326,19 @@
 		{
 			<div>
 				<h3>Подсказки</h3>
-                <ol>
-                    @foreach (var hint in data.Block.HintsMd)
-                    {
-	                    <li>
-                            @MvcHtmlString.Create(hint.RenderMarkdown(context.BaseUrl))
-                        </li>
-                    }
-                </ol>
-                @if (! string.IsNullOrEmpty(data.Block.CommentAfterExerciseIsSolved))
-                {
-	                <h3>Комментарий после решения</h3>
-	                <p>@data.Block.CommentAfterExerciseIsSolved</p>
-                }
+				<ol>
+					@foreach (var hint in data.Block.HintsMd)
+					{
+						<li>
+							@MvcHtmlString.Create(hint.RenderMarkdown(context.BaseUrl))
+						</li>
+					}
+				</ol>
+				@if (!string.IsNullOrEmpty(data.Block.CommentAfterExerciseIsSolved))
+				{
+					<h3>Комментарий после решения</h3>
+					<p>@data.Block.CommentAfterExerciseIsSolved</p>
+				}
 			</div>
 		}
 
@@ -383,7 +379,7 @@
 			var itemClass = "";
 			var title = "";
 			var readonlyAttr = context.CanUserFillQuiz ? "" : "disabled";
-			
+
 			var isItemCorrect = item.IsCorrect == ChoiceItemCorrectness.True || item.IsCorrect == ChoiceItemCorrectness.Maybe && itemChecked;
 			var isUserAnswerCorrect = (itemChecked && isItemCorrect) || (!itemChecked && !isItemCorrect) || model.DebugView;
 			mistakesCount.CheckedUnnecessary += itemChecked && !isItemCorrect ? 1 : 0;
@@ -401,7 +397,7 @@
 					{
 						className = "";
 					}
-					<div class="quiz__statistics @className" title="Этот вариант выбирают в @(model.QuestionAnswersFrequency[item.Id])% случаев">@(model.QuestionAnswersFrequency[item.Id])%</div>
+					<div class="quiz__statistics @className" title="Этот вариант выбирают в @( model.QuestionAnswersFrequency[item.Id])% случаев">@( model.QuestionAnswersFrequency[item.Id])%</div>
 				}
 				<input @ans autocomplete="off" id='@( block.Id + "quizBlock" + item.Id)' name=@( "group" + id) type="@inputType" @GetGuestDisable(context.IsGuest) @readonlyAttr>
 				<label class="@itemClass" title="@title" for="@( block.Id + "quizBlock" + item.Id)" @GetGuestOnclick(context.IsGuest)>
@@ -455,7 +451,7 @@
 	<div class="quiz-mistakes-explanation">
 		<strong>@text.</strong>
 		Нестрашно, в этом вопросе это допустимо. Вы все равно получаете полный балл!
-    </div>
+	</div>
 }
 
 @helper QuizBlock(FillInBlock block, BlockRenderContext context)
@@ -482,7 +478,7 @@
 					autocomplete="off"
 					class="form-control"
 					value="@value"
-					id='@(block.Id + "quizBlock")'
+					id='@( block.Id + "quizBlock")'
 					maxlength="@QuizController.MaxFillInBlockSize"
 					size="68"
 					@GetGuestDisable(context.IsGuest)
@@ -490,14 +486,14 @@
 			}
 		</label>
 	</div>
-    if (model.ShowCorrectAnswers)
-    {
-        <div>Правильный ответ: @sample</div>
-    }
-    if (model.ShowExplanations && !string.IsNullOrEmpty(block.Explanation))
-    {
-        <p class="quiz__explanation">@block.Explanation</p>
-    }
+	if (model.ShowCorrectAnswers)
+	{
+		<div>Правильный ответ: @sample</div>
+	}
+	if (model.ShowExplanations && !string.IsNullOrEmpty(block.Explanation))
+	{
+		<p class="quiz__explanation">@block.Explanation</p>
+	}
 }
 
 @helper QuizBlock(IsTrueBlock block, BlockRenderContext context)
@@ -540,7 +536,9 @@
 	</div>
 	if (model.DebugView)
 	{
-		<p class="quiz__explanation"><span class="quiz__explanation__correct">Правильный ответ:</span> @(block.Answer ? "Верно" : "Неверно")</p>
+		<p class="quiz__explanation">
+			<span class="quiz__explanation__correct">Правильный ответ:</span> @( block.Answer ? "Верно" : "Неверно")
+		</p>
 	}
 	if (model.ShowExplanations && !string.IsNullOrEmpty(block.Explanation))
 	{
@@ -620,26 +618,26 @@
 		@if (model.QuizState.Status == QuizStatus.ReadyToSend)
 		{
 			<div class="quiz-block-matching__description text-muted">
-                <span class="visible-xs">
-                    Нажмите сначала на&nbsp;блоке из&nbsp;правого столбца, а&nbsp;затем на&nbsp;свободном месте в&nbsp;левом.
-                </span>
-                <span class="hidden-xs">
-                    Перетащите блоки из&nbsp;правого столбца на&nbsp;свободные места.
-                </span>
-            </div>
+				<span class="visible-xs">
+					Нажмите сначала на&nbsp;блоке из&nbsp;правого столбца, а&nbsp;затем на&nbsp;свободном месте в&nbsp;левом.
+				</span>
+				<span class="hidden-xs">
+					Перетащите блоки из&nbsp;правого столбца на&nbsp;свободные места.
+				</span>
+			</div>
 		}
 		@if (model.QuizState.Status == QuizStatus.Sent)
 		{
 			<div class="quiz-block-matching__correct-description row">
-                @if (!model.DebugView)
-                {
-	                <div class="text-muted col-sm-3 col-sm-offset-3">Ваш вариант</div>
-                }
-                @if (model.ShowCorrectAnswers)
-                {
-	                <div class="text-success col-sm-3 @(model.DebugView ? "col-xs-offset-4" : "col-xs-offset-1")">Правильный вариант</div>
-                }
-            </div>
+				@if (!model.DebugView)
+				{
+					<div class="text-muted col-sm-3 col-sm-offset-3">Ваш вариант</div>
+				}
+				@if (model.ShowCorrectAnswers)
+				{
+					<div class="text-success col-sm-3 @( model.DebugView ? "col-xs-offset-4" : "col-xs-offset-1")">Правильный вариант</div>
+				}
+			</div>
 		}
 		<ul>
 			@for (var itemIndex = 0; itemIndex < fixedItems.Count; itemIndex++)
@@ -666,9 +664,9 @@
 						{
 							if (!model.DebugView)
 							{
-							    <div class="quiz-block-matching__droppable col-xs-3 added" data-block-id="@block.Id" data-item-id="@fixedItem.GetHashForFixedItem()" data-movable-item-id="@movableItem.GetHashForMovableItem()">
-                                     <div class="quiz-block-matching__movable-item" data-block-id="@block.Id" data-item-id="@movableItem.GetHashForMovableItem()">@movableItem.MovableItem.RenderTex().ToLegacyHtmlString()</div>
-                                </div>
+								<div class="quiz-block-matching__droppable col-xs-3 added" data-block-id="@block.Id" data-item-id="@fixedItem.GetHashForFixedItem()" data-movable-item-id="@movableItem.GetHashForMovableItem()">
+									<div class="quiz-block-matching__movable-item" data-block-id="@block.Id" data-item-id="@movableItem.GetHashForMovableItem()">@movableItem.MovableItem.RenderTex().ToLegacyHtmlString()</div>
+								</div>
 							}
 							if (model.ShowCorrectAnswers)
 							{
@@ -783,20 +781,20 @@
 			if (item.IsCorrect == ChoiceItemCorrectness.Maybe)
 			{
 				<span class="quiz__explanation__correct" title="Этот вариант можно было как выбрать, так и не выбирать">
-					@(model.DebugView ? "Допустимый ответ" : "Допустимо")@dotIfHasExplanation
-                </span>
+					@( model.DebugView ? "Допустимый ответ" : "Допустимо")@dotIfHasExplanation
+				</span>
 			}
 			else if (isUserAnswerCorrect && item.IsCorrect == ChoiceItemCorrectness.True)
 			{
 				<span class="quiz__explanation__correct">
-                    @(model.DebugView ? ("Правильный ответ" + dotIfHasExplanation) : "Правильно!")
-                </span>
+					@( model.DebugView ? ("Правильный ответ" + dotIfHasExplanation) : "Правильно!")
+				</span>
 			}
 			else if (!isUserAnswerCorrect)
 			{
-                if (!block.Multiple && item.IsCorrect == ChoiceItemCorrectness.True)
-                {
-                    <span class="quiz__explanation__correct">Этот ответ был правильным@(dotIfHasExplanation)</span>						
+				if (!block.Multiple && item.IsCorrect == ChoiceItemCorrectness.True)
+				{
+					<span class="quiz__explanation__correct">Этот ответ был правильным@( dotIfHasExplanation)</span>
 				}
 				else if (!hasExplanation && block.Multiple && item.IsCorrect == ChoiceItemCorrectness.True)
 				{
@@ -805,11 +803,11 @@
 				}
 				else if (block.Multiple)
 				{
-	                <span class="quiz__explanation__incorrect">Вы ошиблись@(dotIfHasExplanation)</span>
+					<span class="quiz__explanation__incorrect">Вы ошиблись@( dotIfHasExplanation)</span>
 				}
 				else
 				{
-					<span class="quiz__explanation__incorrect">Неправильно@(dotIfHasExplanation)</span>
+					<span class="quiz__explanation__incorrect">Неправильно@( dotIfHasExplanation)</span>
 				}
 			}
 		}

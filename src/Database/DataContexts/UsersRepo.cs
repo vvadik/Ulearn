@@ -33,7 +33,7 @@ namespace Database.DataContexts
 		}
 
 		/* Pass limit=0 to disable limiting */
-		public List<UserRolesInfo> FilterUsers(UserSearchQueryModel query, UserManager<ApplicationUser> userManager, int limit=100)
+		public List<UserRolesInfo> FilterUsers(UserSearchQueryModel query, UserManager<ApplicationUser> userManager, int limit = 100)
 		{
 			var role = db.Roles.FirstOrDefault(r => r.Name == query.Role);
 			var users = db.Users.Where(u => !u.IsDeleted);
@@ -42,6 +42,7 @@ namespace Database.DataContexts
 				var usersIds = GetUsersByNamePrefix(query.NamePrefix).Select(u => u.Id);
 				users = users.Where(u => usersIds.Contains(u.Id));
 			}
+
 			return users
 				.FilterByRole(role, userManager)
 				.FilterByUserIds(
@@ -61,7 +62,7 @@ namespace Database.DataContexts
 		public List<UserRolesInfo> GetCourseInstructors(string courseId, UserManager<ApplicationUser> userManager, int limit = 50)
 		{
 			return db.Users
-				.Where(u => ! u.IsDeleted)
+				.Where(u => !u.IsDeleted)
 				.FilterByUserIds(userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.Instructor, courseId, includeHighRoles: true))
 				.GetUserRolesInfo(limit, userManager);
 		}
@@ -70,7 +71,7 @@ namespace Database.DataContexts
 		public List<UserRolesInfo> GetCourseAdmins(string courseId, UserManager<ApplicationUser> userManager, int limit = 50)
 		{
 			return db.Users
-				.Where(u => ! u.IsDeleted)
+				.Where(u => !u.IsDeleted)
 				.FilterByUserIds(userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, courseId, includeHighRoles: true))
 				.GetUserRolesInfo(limit, userManager);
 		}
@@ -113,7 +114,7 @@ namespace Database.DataContexts
 		{
 			if (string.IsNullOrEmpty(name))
 				return db.Users.Where(u => !u.IsDeleted).Select(u => new UserIdWrapper(u.Id));
-			
+
 			var splittedName = name.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
 			var nameQuery = string.Join(" & ", splittedName.Select(s => "\"" + s.Trim().Replace("\"", "\\\"") + "*\""));
 			var nameParameter = new ObjectParameter("name", nameQuery);
@@ -150,7 +151,7 @@ namespace Database.DataContexts
 
 		public void CreateUlearnBotUserIfNotExists()
 		{
-			if (! db.Users.Any(u => u.UserName == UlearnBotUsername))
+			if (!db.Users.Any(u => u.UserName == UlearnBotUsername))
 			{
 				var user = new ApplicationUser
 				{
@@ -170,17 +171,17 @@ namespace Database.DataContexts
 		{
 			return db.Users.Where(u => u.UserName == usernameOrEmail || u.Email == usernameOrEmail).ToList();
 		}
-		
+
 		public List<ApplicationUser> FindUsersByEmail(string email)
 		{
 			return db.Users.Where(u => u.Email == email).ToList();
 		}
-		
+
 		public List<ApplicationUser> FindUsersByConfirmedEmail(string email)
 		{
 			return db.Users.Where(u => u.Email == email && u.EmailConfirmed).ToList();
 		}
-		
+
 		public List<ApplicationUser> FindUsersByConfirmedEmails(IEnumerable<string> emails)
 		{
 			return db.Users.Where(u => emails.Contains(u.Email) && u.EmailConfirmed).ToList();
@@ -196,7 +197,7 @@ namespace Database.DataContexts
 			user.IsDeleted = true;
 			/* Change name to make creating new user with same name possible */
 			user.UserName = user.UserName + "__deleted__" + (new Random().Next(100000));
-            await db.SaveChangesAsync();
+			await db.SaveChangesAsync();
 		}
 	}
 

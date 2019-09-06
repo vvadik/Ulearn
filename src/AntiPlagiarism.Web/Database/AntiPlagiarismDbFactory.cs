@@ -9,10 +9,10 @@ namespace AntiPlagiarism.Web.Database
 		{
 			var host = EntryPoint.BuildVostokHost();
 			var hostingEnvironment = host.HostingEnvironment;
-			
+
 			var optionsBuilder = new DbContextOptionsBuilder<AntiPlagiarismDb>();
 			optionsBuilder.UseSqlServer(hostingEnvironment.Configuration["database"]);
-			
+
 			return new AntiPlagiarismDb(optionsBuilder.Options);
 		}
 	}

@@ -15,7 +15,7 @@ namespace Database.Models
 		[StringLength(100)]
 		[Index(SlideUserIndexName, 1)]
 		public string CourseId { get; set; }
-		
+
 		[Required]
 		[Index(SlideUserIndexName, 2)]
 		public Guid SlideId { get; set; }

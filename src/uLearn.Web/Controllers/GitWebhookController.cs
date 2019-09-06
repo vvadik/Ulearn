@@ -13,19 +13,18 @@ using Ulearn.Core.Configuration;
 
 namespace uLearn.Web.Controllers
 {
-
 	public class GitWebhookController : ApiController
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(GitWebhookController));
-		
+
 		private readonly string gitSecret;
-		
+
 		public GitWebhookController()
 		{
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 			gitSecret = configuration.Git.Webhook.Secret;
 		}
-		
+
 		[System.Web.Http.HttpPost]
 		[System.Web.Http.Route("CoursesWebhook")]
 		public async Task<ActionResult> CoursesWebhook()
@@ -46,7 +45,7 @@ namespace uLearn.Web.Controllers
 
 		public async Task<ActionResult> ProcessGithubRequest(string eventName)
 		{
-			if(eventName != "push")
+			if (eventName != "push")
 				return new HttpStatusCodeResult(HttpStatusCode.OK);
 			string signature = null;
 			if (Request.Headers.TryGetValues("X-Hub-Signature", out var signatures))
@@ -57,6 +56,7 @@ namespace uLearn.Web.Controllers
 				log.Warn($"Invalid github request eventName: '{eventName}' signature: '{signature}' jsonContent: {jsonContent}");
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 			}
+
 			var content = JsonConvert.DeserializeObject<GithubPushData>(jsonContent);
 			var branch = content.Ref.Replace("refs/heads/", "");
 			log.Info("Json content of webhook request: " + jsonContent);
@@ -67,7 +67,7 @@ namespace uLearn.Web.Controllers
 
 		public async Task<ActionResult> ProcessGitlabRequest(string eventName)
 		{
-			if(eventName != "Push Hook")
+			if (eventName != "Push Hook")
 				return new HttpStatusCodeResult(HttpStatusCode.OK);
 			string token = null;
 			if (Request.Headers.TryGetValues("X-Gitlab-Token", out var signatures))
@@ -78,6 +78,7 @@ namespace uLearn.Web.Controllers
 				log.Warn($"Invalid gitlab request eventName: '{eventName}' token: '{token}' jsonContent: {jsonContent}");
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 			}
+
 			var content = JsonConvert.DeserializeObject<GitlabPushData>(jsonContent);
 			var branch = content.Ref.Replace("refs/heads/", "");
 			log.Info("Json content of webhook request: " + jsonContent);
@@ -92,17 +93,19 @@ namespace uLearn.Web.Controllers
 			var adminController = new AdminController();
 			await adminController.UploadCoursesWithGit(url, branch).ConfigureAwait(false);
 		}
-		
+
 		private bool IsValidGithubRequest(string payload, string eventName, string signatureWithPrefix)
 		{
 			if (string.IsNullOrWhiteSpace(payload))
 			{
 				throw new ArgumentNullException(nameof(payload));
 			}
+
 			if (string.IsNullOrWhiteSpace(eventName))
 			{
 				throw new ArgumentNullException(nameof(eventName));
 			}
+
 			if (string.IsNullOrWhiteSpace(signatureWithPrefix))
 			{
 				throw new ArgumentNullException(nameof(signatureWithPrefix));
@@ -111,7 +114,7 @@ namespace uLearn.Web.Controllers
 			const string sha1Prefix = "sha1=";
 			if (!signatureWithPrefix.StartsWith(sha1Prefix, StringComparison.OrdinalIgnoreCase))
 				return false;
-			
+
 			var signature = signatureWithPrefix.Substring(sha1Prefix.Length);
 			var secret = Encoding.UTF8.GetBytes(gitSecret);
 			var payloadBytes = Encoding.UTF8.GetBytes(payload);
@@ -142,7 +145,7 @@ namespace uLearn.Web.Controllers
 			return builder.ToString();
 		}
 	}
-	
+
 	[DataContract]
 	internal class GithubPushData
 	{
@@ -155,14 +158,14 @@ namespace uLearn.Web.Controllers
 	{
 		[DataMember(Name = "ssh_url")] public string SshUrl;
 	}
-	
+
 	[DataContract]
 	internal class GitlabPushData
 	{
 		[DataMember(Name = "ref")] public string Ref;
 		[DataMember(Name = "repository")] public GitlabRepository Repository;
 	}
-	
+
 	[DataContract]
 	internal class GitlabRepository
 	{

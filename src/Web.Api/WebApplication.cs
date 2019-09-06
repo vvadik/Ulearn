@@ -40,24 +40,24 @@ using ILogger = Serilog.ILogger;
 
 namespace Ulearn.Web.Api
 {
-    public class WebApplication : BaseApiWebApplication
-    {
+	public class WebApplication : BaseApiWebApplication
+	{
 		private readonly WebApiConfiguration configuration;
 
 		public WebApplication()
 		{
 			configuration = ApplicationConfiguration.Read<WebApiConfiguration>();
 		}
-		
+
 		protected override void OnStarted(IVostokHostingEnvironment hostingEnvironment)
-        {
-            hostingEnvironment.MetricScope.SystemMetrics(1.Minutes());
-			
+		{
+			hostingEnvironment.MetricScope.SystemMetrics(1.Minutes());
+
 #if DEBUG
 			/* Initialize EntityFramework Profiler. See https://www.hibernatingrhinos.com/products/efprof/learn for details */
 			HibernatingRhinos.Profiler.Appender.EntityFramework.EntityFrameworkProfiler.Initialize();
 #endif
-        }
+		}
 
 		protected override IApplicationBuilder ConfigureCors(IApplicationBuilder app)
 		{
@@ -78,23 +78,23 @@ namespace Ulearn.Web.Api
 			database.MigrateToLatestVersion();
 			var initialDataCreator = app.ApplicationServices.GetService<InitialDataCreator>();
 			database.CreateInitialDataAsync(initialDataCreator);
-			
+
 			return app;
 		}
 
 		protected override void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment, ILogger logger)
 		{
 			base.ConfigureServices(services, hostingEnvironment, logger);
-			
+
 			/* TODO (andgein): use UlearnDbFactory here */
 			services.AddDbContextPool<UlearnDb>(
 				options => options
 					.UseLazyLoadingProxies()
 					.UseSqlServer(hostingEnvironment.Configuration["database"])
 			);
-			
+
 			services.Configure<WebApiConfiguration>(options => hostingEnvironment.Configuration.Bind(options));
-			
+
 			/* Add CORS */
 			services.AddCors();
 
@@ -107,19 +107,19 @@ namespace Ulearn.Web.Api
 		{
 			/* Asp.NET Core MVC */
 			services.AddMvc(options =>
-				{
-					/* Add binder for passing Course object to actions */
-					options.ModelBinderProviders.Insert(0, new CourseBinderProvider());
+					{
+						/* Add binder for passing Course object to actions */
+						options.ModelBinderProviders.Insert(0, new CourseBinderProvider());
 
-					/* Disable model checking because in other case stack overflow raised on course model binding.
-					   See https://github.com/aspnet/Mvc/issues/7357 for details */
-					options.ModelMetadataDetailsProviders.Add(new SuppressChildValidationMetadataProvider(typeof(Course)));
-					options.ModelMetadataDetailsProviders.Add(new SuppressChildValidationMetadataProvider(typeof(ICourse)));
-				}
-			).AddApplicationPart(GetType().Assembly)
+						/* Disable model checking because in other case stack overflow raised on course model binding.
+							See https://github.com/aspnet/Mvc/issues/7357 for details */
+						options.ModelMetadataDetailsProviders.Add(new SuppressChildValidationMetadataProvider(typeof(Course)));
+						options.ModelMetadataDetailsProviders.Add(new SuppressChildValidationMetadataProvider(typeof(ICourse)));
+					}
+				).AddApplicationPart(GetType().Assembly)
 				.AddControllersAsServices()
 				.AddXmlSerializerFormatters()
-				.AddJsonOptions(opt => 
+				.AddJsonOptions(opt =>
 					opt.SerializerSettings.ContractResolver = new ApiHeaderJsonContractResolver(new ApiHeaderJsonNamingStrategyOptions
 					{
 						DefaultStrategy = new CamelCaseNamingStrategy(),
@@ -127,8 +127,8 @@ namespace Ulearn.Web.Api
 						HttpContextAccessorProvider = services.BuildServiceProvider().GetService<IHttpContextAccessor>,
 						NamingStrategies = new Dictionary<string, NamingStrategy>
 						{
-							{"camelcase", new CamelCaseNamingStrategy() },
-							{"snakecase", new SnakeCaseNamingStrategy() }
+							{ "camelcase", new CamelCaseNamingStrategy() },
+							{ "snakecase", new SnakeCaseNamingStrategy() }
 						}
 					}, services.BuildServiceProvider().GetService<IMemoryCache>)
 				);
@@ -142,7 +142,7 @@ namespace Ulearn.Web.Api
 		public override void ConfigureDi(IServiceCollection services, ILogger logger)
 		{
 			base.ConfigureDi(services, logger);
-			
+
 			services.AddScoped<IAuthorizationHandler, CourseRoleAuthorizationHandler>();
 			services.AddScoped<IAuthorizationHandler, CourseAccessAuthorizationHandler>();
 			services.AddScoped<INotificationDataPreloader, NotificationDataPreloader>();
@@ -192,7 +192,7 @@ namespace Ulearn.Web.Api
 					ValidateAudience = true,
 					ValidateLifetime = true,
 					ValidateIssuerSigningKey = true,
-					
+
 					ValidIssuer = configuration.Web.Authentication.Jwt.Issuer,
 					ValidAudience = configuration.Web.Authentication.Jwt.Audience,
 					IssuerSigningKey = JwtBearerHelpers.CreateSymmetricSecurityKey(configuration.Web.Authentication.Jwt.IssuerSigningKey)

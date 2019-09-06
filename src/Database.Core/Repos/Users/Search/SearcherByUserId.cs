@@ -34,7 +34,7 @@ namespace Database.Repos.Users.Search
 			/* Don't search by userId by first 1..4 symbols */
 			if (term.Length < 5)
 				return Task.FromResult(Enumerable.Empty<ApplicationUser>().AsQueryable());
-			
+
 			if (strict)
 				return Task.FromResult(users.Where(u => u.Id == term));
 

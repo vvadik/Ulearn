@@ -32,7 +32,7 @@ namespace Database.DataContexts
 		public GraderClient FindGraderClient(string courseId, Guid clientId)
 		{
 			var client = db.GraderClients.Find(clientId);
-			if (client == null || ! client.CourseId.EqualsIgnoreCase(courseId))
+			if (client == null || !client.CourseId.EqualsIgnoreCase(courseId))
 				return null;
 			return client;
 		}

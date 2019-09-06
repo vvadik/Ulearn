@@ -14,10 +14,10 @@ namespace Ulearn.Common.Api.Models.Responses
 	{
 		[DataMember]
 		public int Offset { get; set; }
-		
+
 		[DataMember]
 		public int Count { get; set; }
-		
+
 		[DataMember(EmitDefaultValue = false)]
 		public int? TotalCount { get; set; }
 	}

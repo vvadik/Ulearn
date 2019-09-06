@@ -12,14 +12,14 @@ namespace Ulearn.Web.Api.Models.Parameters.Comments
 		[FromQuery(Name = "course_id")]
 		[BindRequired]
 		public string CourseId { get; set; }
-		
+
 		[FromQuery(Name = "slide_id")]
 		[BindRequired]
 		public Guid SlideId { get; set; }
-		
+
 		[FromQuery(Name = "for_instructors")]
 		public bool ForInstructors { get; set; }
-		
+
 		[FromQuery(Name = "offset")]
 		[MinValue(0, ErrorMessage = "Offset should be non-negative")]
 		public int Offset { get; set; }

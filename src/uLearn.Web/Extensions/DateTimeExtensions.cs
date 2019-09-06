@@ -46,6 +46,7 @@ namespace uLearn.Web.Extensions
 					var minutesAgo = secondsAgo / 60;
 					return $"{minutesAgo.PluralizeInRussian(RussianPluralizationOptions.MinuteDative)} назад";
 				}
+
 				if (secondsAgo < secondsInDay)
 				{
 					var hoursAgo = secondsAgo / secondsInHour;

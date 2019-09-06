@@ -20,10 +20,10 @@ namespace Database.Di
 			var courseManager = new WebCourseManager(logger);
 			services.AddSingleton<WebCourseManager>(courseManager);
 			services.AddSingleton<IWebCourseManager>(courseManager);
-			
+
 			services.AddScoped<UlearnUserManager>();
 			services.AddScoped<InitialDataCreator>();
-			
+
 			services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 				{
 					options.Password.RequireDigit = false;
@@ -34,21 +34,21 @@ namespace Database.Di
 				})
 				.AddEntityFrameworkStores<UlearnDb>()
 				.AddDefaultTokenProviders();
-			
+
 			/* DI for database repos: */
-			
+
 			/* Groups */
 			services.AddScoped<IGroupsRepo, GroupsRepo>();
 			services.AddScoped<IGroupMembersRepo, GroupMembersRepo>();
 			services.AddScoped<IGroupAccessesRepo, GroupAccessesRepo>();
 			services.AddScoped<IManualCheckingsForOldSolutionsAdder, ManualCheckingsForOldSolutionsAdder>();
 			services.AddScoped<IGroupsCreatorAndCopier, GroupsCreatorAndCopier>();
-			
+
 			/* Comments */
 			services.AddScoped<ICommentsRepo, CommentsRepo>();
 			services.AddScoped<ICommentLikesRepo, CommentLikesRepo>();
 			services.AddScoped<ICommentPoliciesRepo, CommentPoliciesRepo>();
-			
+
 			/* Users */
 			services.AddScoped<IUsersRepo, UsersRepo>();
 			services.AddScoped<IUserSearcher, UserSearcher>();
@@ -60,11 +60,11 @@ namespace Database.Di
 			services.AddScoped<ISearcher, SearcherByLogin>();
 			services.AddScoped<ISearcher, SearcherByEmail>();
 			services.AddScoped<ISearcher, SearcherBySocialLogin>();
-			
+
 			/*Flashcards*/
 			services.AddScoped<IUsersFlashcardsVisitsRepo, UsersFlashcardsVisitsRepo>();
 			services.AddScoped<IUserFlashcardsUnlockingRepo, UserFlashcardsUnlockingRepo>();
-			
+
 			/* Others */
 			services.AddScoped<ICourseRolesRepo, CourseRolesRepo>();
 			services.AddScoped<ICourseRoleUsersFilter, CourseRoleUsersFilter>();

@@ -8,7 +8,7 @@ namespace Ulearn.Common
 	{
 		private readonly int capacity;
 		private readonly TimeSpan maxLifeTime;
-		
+
 		private readonly Dictionary<TKey, LinkedListNode<LruCacheItem<TKey, TValue>>> cache = new Dictionary<TKey, LinkedListNode<LruCacheItem<TKey, TValue>>>();
 		private readonly LinkedList<LruCacheItem<TKey, TValue>> lastUsedItems = new LinkedList<LruCacheItem<TKey, TValue>>();
 
@@ -19,7 +19,7 @@ namespace Ulearn.Common
 		}
 
 		public LruCache(int capacity)
-			:this(capacity, TimeSpan.MaxValue)
+			: this(capacity, TimeSpan.MaxValue)
 		{
 		}
 
@@ -37,7 +37,7 @@ namespace Ulearn.Common
 				cache.Remove(key);
 				return false;
 			}
-			
+
 			value = node.Value.Value;
 			lastUsedItems.Remove(node);
 			lastUsedItems.AddLast(node);
@@ -61,7 +61,7 @@ namespace Ulearn.Common
 			lastUsedItems.AddLast(node);
 			cache.Add(key, node);
 		}
-		
+
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public void Clear()
 		{

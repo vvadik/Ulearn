@@ -16,26 +16,26 @@ namespace Ulearn.Web.Api.Models.Responses.Groups
 	{
 		[DataMember]
 		public string Id { get; set; }
-		
+
 		[DataMember]
 		public string Name { get; set; }
-		
+
 		[DataMember]
 		public string Abbreviation { get; set; }
-		
+
 		[DataMember]
 		public string Description { get; set; }
 	}
-	
+
 	[DataContract]
 	public class GroupScoringGroupInfo : AbstractScoringGroupInfo
 	{
 		[DataMember]
 		public bool AreAdditionalScoresEnabledForAllGroups { get; set; }
-		
+
 		[DataMember]
 		public bool CanInstructorSetAdditionalScoreInSomeUnit { get; set; }
-		
+
 		[DataMember]
 		public bool? AreAdditionalScoresEnabledInThisGroup { get; set; }
 	}
@@ -45,7 +45,7 @@ namespace Ulearn.Web.Api.Models.Responses.Groups
 	{
 		[DataMember]
 		public bool CanInstructorSetAdditionalScore { get; set; }
-		
+
 		[DataMember]
 		public int MaxAdditionalScore { get; set; }
 	}

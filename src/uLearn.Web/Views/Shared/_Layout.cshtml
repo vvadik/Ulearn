@@ -2,8 +2,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-    @Scripts.Render("~/modernizr.bundle.js")
-    @Html.Partial("_Retargeting")
+	@Scripts.Render("~/modernizr.bundle.js")
+	@Html.Partial("_Retargeting")
 </head>
 <body>
 
@@ -15,12 +15,21 @@
 
 	if (ViewBag.Meta != null)
 	{
-		if (!string.IsNullOrEmpty(ViewBag.Meta.AbsoluteImageUrl)) { metaImageUrl = ViewBag.Meta.AbsoluteImageUrl; }
-		if (!string.IsNullOrEmpty(ViewBag.Meta.Description)) { metaDescription = ViewBag.Meta.Description; }
-		if (!string.IsNullOrEmpty(ViewBag.Meta.Keywords)) { metaKeywords = ViewBag.Meta.Keywords; }
+		if (!string.IsNullOrEmpty(ViewBag.Meta.AbsoluteImageUrl))
+		{
+			metaImageUrl = ViewBag.Meta.AbsoluteImageUrl;
+		}
+		if (!string.IsNullOrEmpty(ViewBag.Meta.Description))
+		{
+			metaDescription = ViewBag.Meta.Description;
+		}
+		if (!string.IsNullOrEmpty(ViewBag.Meta.Keywords))
+		{
+			metaKeywords = ViewBag.Meta.Keywords;
+		}
 	}
 }
-    
+
 <script>
 	window.meta = {
 		title: "@(metaTitle)",

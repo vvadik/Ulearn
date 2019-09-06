@@ -29,13 +29,13 @@ namespace uLearn
 		{
 			Assert.That("hello\nworld\n".SplitToLinesWithEoln(), Is.EqualTo(new[] { "hello\n", "world\n" }).AsCollection);
 		}
-		
+
 		[Test]
 		public void left_empty_lines()
 		{
 			Assert.That("hello\r\n\r\nworld\r\n".SplitToLinesWithEoln(), Is.EqualTo(new[] { "hello\r\n", "\r\n", "world\r\n" }).AsCollection);
 		}
-		
+
 		[Test]
 		public void left_empty_lines_with_unix_line_endings()
 		{

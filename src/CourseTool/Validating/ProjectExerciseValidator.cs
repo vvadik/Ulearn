@@ -156,7 +156,7 @@ namespace uLearn.CourseTool.Validating
 		{
 			var tempExZipFilePath = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory).GetFile($"{slide.Id}.exercise.zip");
 			var tempExFolder = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ExerciseFolder_From_StudentZip"));
-			
+
 			exerciseStudentZipBuilder.BuildStudentZip(slide, tempExZipFilePath);
 			Utils.UnpackZip(tempExZipFilePath.ReadAllContent(), tempExFolder.FullName);
 			try
@@ -171,7 +171,7 @@ namespace uLearn.CourseTool.Validating
 						var csproj = new Project(csprojFile.FullName, null, null, projectCollection);
 						ReportErrorIfCsprojHasUserCodeOfNotCompileType(tempExFolder, csproj);
 						ReportErrorIfCsprojHasWrongAnswerOrSolutionItems(tempExFolder, csproj);
-					}, 
+					},
 					projectCollection => projectCollection.UnloadAllProjects());
 
 				if (!ex.StudentZipIsCompilable)

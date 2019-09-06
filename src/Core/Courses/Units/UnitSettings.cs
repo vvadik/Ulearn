@@ -25,7 +25,7 @@ namespace Ulearn.Core.Courses.Units
 
 		[XmlElement("defaultIncludeCodeFile")]
 		public string DefaultIncludeCodeFile { get; set; }
-		
+
 		[XmlArray("slides")]
 		[XmlArrayItem("add")]
 		public string[] SlidesPaths { get; set; } = new string[0];
@@ -70,7 +70,7 @@ namespace Ulearn.Core.Courses.Units
 		{
 			/* We should register encoding provider for Encoding.GetEncoding(1251) works */
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-			
+
 			var unitSettings = new UnitSettings
 			{
 				/* We use Win1251 only for back compatibility.
@@ -78,7 +78,7 @@ namespace Ulearn.Core.Courses.Units
 				Id = title.ToDeterministicGuid(Encoding.GetEncoding(1251)),
 				Url = title.ToLatin(),
 				Title = title,
-				SlidesPaths = new [] { "S*.xml" } /* For backward compatibility with old automatic slide's xml detection */
+				SlidesPaths = new[] { "S*.xml" } /* For backward compatibility with old automatic slide's xml detection */
 			};
 
 			unitSettings.Scoring.CopySettingsFrom(courseSettings.Scoring);

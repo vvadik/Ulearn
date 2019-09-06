@@ -33,6 +33,7 @@ namespace Ulearn.Core.CSharp
 					return body.Statements;
 				return new SyntaxList<SyntaxNode>();
 			}
+
 			var type = node as TypeDeclarationSyntax;
 			if (type != null)
 				return type.Members;
@@ -61,6 +62,7 @@ namespace Ulearn.Core.CSharp
 			{
 				return fieldDeclarationSyntax.Declaration.Variables.FirstOrDefault().Identifier;
 			}
+
 			return ((dynamic)syntax).Identifier;
 		}
 

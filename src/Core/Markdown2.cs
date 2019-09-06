@@ -22,10 +22,11 @@ namespace Ulearn.Core
 			if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
 			{
 				RelativeUrl?.Invoke(url);
-				
+
 				if (!checkUrl)
 					url = url.Replace("/", "_");
 			}
+
 			if (baseUrl != null && !url.StartsWith("/") && !url.Contains(":"))
 				url = baseUrl + url;
 			return base.OnQualifyUrl(url);

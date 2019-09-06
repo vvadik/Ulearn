@@ -47,7 +47,7 @@ namespace uLearn.Web
 			var lines = File.ReadAllLines(Path.Combine(dir, "UlearnStyles.txt"));
 			return new StyleBundle("~/ulearn.bundle.css").Include(
 				lines.Select(x => x.Replace('\\', '/')).Select(x => "~/" + x).ToArray()
-				);
+			);
 		}
 	}
 }

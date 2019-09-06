@@ -12,7 +12,7 @@ namespace uLearn.Web.Models
 		public readonly bool IsCourseAdmin;
 		public readonly bool DebugView;
 
-		public QuizBlockData(QuizModel model, int index, QuizState quizState, DefaultDictionary<string, int> questionAnswersFrequency=null, bool isInstructor=false, bool debugView=false, bool isCourseAdmin=false)
+		public QuizBlockData(QuizModel model, int index, QuizState quizState, DefaultDictionary<string, int> questionAnswersFrequency = null, bool isInstructor = false, bool debugView = false, bool isCourseAdmin = false)
 		{
 			QuizModel = model;
 			BlockIndex = index;
@@ -23,7 +23,7 @@ namespace uLearn.Web.Models
 			DebugView = debugView;
 		}
 
-		private bool AttemptsLimitExceeded => QuizModel.QuizState.UsedAttemptsCount + 1 > QuizModel.MaxAttemptsCount; 
+		private bool AttemptsLimitExceeded => QuizModel.QuizState.UsedAttemptsCount + 1 > QuizModel.MaxAttemptsCount;
 
 		public bool ShowCorrectAnswers
 		{
@@ -44,7 +44,7 @@ namespace uLearn.Web.Models
 				if (QuizState.Status == QuizStatus.ReadyToSend)
 					/* Show previous user's answers in slides with enabled manual checking */
 					return QuizModel.Slide.ManualChecking;
-				
+
 				return true;
 			}
 		}

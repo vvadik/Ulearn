@@ -21,21 +21,21 @@
 		</div>
 	}
 
-    @if (! string.IsNullOrEmpty(Model.Error))
-    {
-	    <div class="course-loading-error">
-            <div class="text-danger" >
-				<b>Ошибка:</b> 
+	@if (!string.IsNullOrEmpty(Model.Error))
+	{
+		<div class="course-loading-error">
+			<div class="text-danger">
+				<b>Ошибка:</b>
 				<p style="white-space: pre-wrap">@Html.Raw(Model.Error.EscapeHtml().LineEndingsToBrTags())</p>
 			</div>
-            <p class="text-muted">
-                Непонятно, что произошло? Напишите нам на&nbsp;<a href="mailto:support@ulearn.me">support@ulearn.me</a>.
-            </p>
-        </div>
-    }
-    @using (Html.BeginForm("UploadCourse", "Admin", new { courseId = Model.Course.Id }, FormMethod.Post, new { enctype = "multipart/form-data", style = "margin-bottom: 8px" }))
+			<p class="text-muted">
+				Непонятно, что произошло? Напишите нам на&nbsp;<a href="mailto:support@ulearn.me">support@ulearn.me</a>.
+			</p>
+		</div>
+	}
+	@using (Html.BeginForm("UploadCourse", "Admin", new { courseId = Model.Course.Id }, FormMethod.Post, new { enctype = "multipart/form-data", style = "margin-bottom: 8px" }))
 	{
-		<input type="file" data-filename-placement="inside" class="btn" name="file" title="Выбрать архив с курсом" />
+		<input type="file" data-filename-placement="inside" class="btn" name="file" title="Выбрать архив с курсом"/>
 		<input type="submit" class="btn btn-success" value="Загрузить"/>
 	}
 	@if (Model.CourseGit?.RepoUrl != null && Model.CourseGit?.PublicKey != null)
@@ -47,7 +47,9 @@
 			<input type="submit" class="btn btn-success" style="width: 180px" value="Загрузить из git"/>
 			<a href="" class="spoiler_links" style="vertical-align: middle; margin-left: 5px;">Настроить</a>
 			<a target="_blank" style="vertical-align: middle; margin-left: 5px;" href="@Model.HelpUrl">Справка</a>
-			<div><small>Будет загружен курс из репоз. @(Model.CourseGit?.RepoUrl) из ветки @(Model.CourseGit.Branch ?? "master")</small></div>
+			<div>
+				<small>Будет загружен курс из репоз. @(Model.CourseGit?.RepoUrl) из ветки @(Model.CourseGit.Branch ?? "master")</small>
+			</div>
 		}
 	}
 	else
@@ -77,8 +79,12 @@
 					<div class="form-group">
 						<div class="checkbox checkbox-default">
 							@Html.CheckBox("isWebhookEnabled", (Model.CourseGit?.IsWebhookEnabled ?? false))
-							<label for="isWebhookEnabled">Загружать новые версии автоматически
-								<div class="form-text text-muted"><small>Включите webhook в настройках репозитория, укажите url https://dev.ulearn.me/CoursesWebhook, сontent type json и secret @Model.GitSecret</small></div></label>
+							<label for="isWebhookEnabled">
+								Загружать новые версии автоматически
+								<div class="form-text text-muted">
+									<small>Включите webhook в настройках репозитория, укажите url https://dev.ulearn.me/CoursesWebhook, сontent type json и secret @Model.GitSecret</small>
+								</div>
+							</label>
 						</div>
 					</div>
 					<button type="submit" name="submitButton" class="btn btn-success" value="Save">Сохранить</button>
@@ -86,7 +92,8 @@
 				</div>
 			</div>
 		}
-		@if (Model.OpenStep2) {
+		@if (Model.OpenStep2)
+		{
 			using (Html.BeginForm("GenerateCourseRepoKey", "Admin", new { courseId = Model.Course.Id, repoUrl = Model.CourseGit?.RepoUrl }, FormMethod.Post))
 			{
 				@Html.AntiForgeryToken()
@@ -134,7 +141,8 @@
 						</div>
 
 						<div class="courses-versions__actions">
-							@if (version.RepoUrl != null && version.CommitHash != null) {
+							@if (version.RepoUrl != null && version.CommitHash != null)
+							{
 								<a href="@GitUtils.RepoUrlToCommitLink(version.RepoUrl, version.CommitHash)" target="_blank">
 									<span class="glyphicon glyphicon-list-alt"></span>
 								</a>

@@ -73,7 +73,8 @@
 	var courseRoleString = courseRole == null ? null : courseRole.Value.ToString("G");
 	courseRoleString = courseRole == null ? null : char.ToLowerInvariant(courseRoleString[0]) + courseRoleString.Substring(1);
 	var courseAccesses = Model.CourseAccesses.Select(a => a.AccessType.ToString("G")).Select(a => char.ToLowerInvariant(a[0]) + a.Substring(1)).ToList();
-	var commentsWrapperUserRoles = User == null ? null : new {
+	var commentsWrapperUserRoles = User == null ? null : new
+	{
 		isSystemAdministrator = User.IsSystemAdministrator(),
 		courseRole = courseRoleString,
 		courseAccesses = courseAccesses

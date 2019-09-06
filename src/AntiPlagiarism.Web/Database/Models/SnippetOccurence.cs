@@ -8,13 +8,13 @@ namespace AntiPlagiarism.Web.Database.Models
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int Id { get; set; }
-		
+
 		public int SubmissionId { get; set; }
 		public virtual Submission Submission { get; set; }
-		
+
 		public int SnippetId { get; set; }
 		public virtual Snippet Snippet { get; set; }
-		
+
 		public int FirstTokenIndex { get; set; }
 
 		public override string ToString()

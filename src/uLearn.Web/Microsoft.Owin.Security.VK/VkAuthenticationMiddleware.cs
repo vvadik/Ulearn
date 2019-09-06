@@ -30,6 +30,7 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 			{
 				Options.Provider = new VkAuthenticationProvider();
 			}
+
 			if (Options.StateDataFormat == null)
 			{
 				var dataProtector = app.CreateDataProtector(
@@ -67,6 +68,7 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 				{
 					throw new InvalidOperationException(Resources.Exception_ValidatorHandlerMismatch);
 				}
+
 				webRequestHandler.ServerCertificateValidationCallback = options.BackchannelCertificateValidator.Validate;
 			}
 

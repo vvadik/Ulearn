@@ -19,7 +19,7 @@ namespace Database
 			: base(options)
 		{
 		}
-		
+
 		public void MigrateToLatestVersion()
 		{
 			Database.Migrate();
@@ -33,7 +33,7 @@ namespace Database
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
-			
+
 			/* IdentityUser.Id is guid in ASP.NET Core, so we can limit it by 64 chars.
 			   If we will not do it, foreign keys to AspNetUsers.Id will fail in ASP.NET Core
 			 */
@@ -42,7 +42,7 @@ namespace Database
 			/* Customize the ASP.NET Identity model and override the defaults if needed.
 			 * See https://docs.microsoft.com/en-us/aspnet/core/migration/1x-to-2x/identity-2x#add-identityuser-poco-navigation-properties
 			 * for details */
-			
+
 			modelBuilder.Entity<ApplicationUser>()
 				.HasMany(e => e.Claims)
 				.WithOne()
@@ -89,12 +89,11 @@ namespace Database
 			modelBuilder.Entity<GroupMembersHaveBeenRemovedNotification>().Property(n => n.GroupId).HasColumnName("GroupId");
 			modelBuilder.Entity<GroupMembersHaveBeenRemovedNotification>().Property(n => n.UserDescriptions).HasColumnName("UserDescriptions");
 			modelBuilder.Entity<GroupMembersHaveBeenRemovedNotification>().Property(n => n.UserIds).HasColumnName("UserIds");
-			
+
 			modelBuilder.Entity<GroupMembersHaveBeenAddedNotification>().Property(n => n.GroupId).HasColumnName("GroupId");
 			modelBuilder.Entity<GroupMembersHaveBeenAddedNotification>().Property(n => n.UserDescriptions).HasColumnName("UserDescriptions");
 			modelBuilder.Entity<GroupMembersHaveBeenAddedNotification>().Property(n => n.UserIds).HasColumnName("UserIds");
-			
-			
+
 			modelBuilder.Entity<CommentLike>()
 				.HasOne(x => x.Comment)
 				.WithMany(x => x.Likes)
@@ -118,7 +117,7 @@ namespace Database
 				.WithMany(n => n.Deliveries)
 				.HasForeignKey(d => d.NotificationId)
 				.OnDelete(DeleteBehavior.Cascade);
-			
+
 			modelBuilder.Entity<UserQuizSubmission>()
 				.HasOne(s => s.AutomaticChecking)
 				.WithOne(c => c.Submission)
@@ -129,7 +128,7 @@ namespace Database
 				.HasOne(s => s.ManualChecking)
 				.WithOne(c => c.Submission)
 				.HasForeignKey<ManualQuizChecking>(p => p.Id)
-				.OnDelete(DeleteBehavior.Restrict);			
+				.OnDelete(DeleteBehavior.Restrict);
 
 			SetDeleteBehavior<CourseRole, ApplicationUser>(modelBuilder, r => r.User, r => r.UserId, DeleteBehavior.Cascade);
 
@@ -165,12 +164,12 @@ namespace Database
 			SetDeleteBehavior<LikedYourCommentNotification, Comment>(modelBuilder, c => c.Comment, c => c.CommentId);
 			SetDeleteBehavior<RepliedToYourCommentNotification, Comment>(modelBuilder, c => c.Comment, c => c.CommentId);
 			SetDeleteBehavior<RepliedToYourCommentNotification, Comment>(modelBuilder, c => c.ParentComment, c => c.ParentCommentId);
-			
+
 			SetDeleteBehavior<UploadedPackageNotification, CourseVersion>(modelBuilder, c => c.CourseVersion, c => c.CourseVersionId);
 			SetDeleteBehavior<PublishedPackageNotification, CourseVersion>(modelBuilder, c => c.CourseVersion, c => c.CourseVersionId);
 
 			SetDeleteBehavior<CourseExportedToStepikNotification, StepikExportProcess>(modelBuilder, c => c.Process, c => c.ProcessId);
-			
+
 			SetDeleteBehavior<XQueueWatcher, ApplicationUser>(modelBuilder, c => c.User, c => c.UserId);
 
 			SetDeleteBehavior<StepikExportProcess, ApplicationUser>(modelBuilder, c => c.Owner, c => c.OwnerId);
@@ -179,18 +178,17 @@ namespace Database
 
 			SetDeleteBehavior<GroupAccess, ApplicationUser>(modelBuilder, c => c.User, c => c.UserId, DeleteBehavior.Cascade);
 			SetDeleteBehavior<GroupAccess, ApplicationUser>(modelBuilder, c => c.GrantedBy, c => c.GrantedById, DeleteBehavior.Cascade);
-			
+
 			SetDeleteBehavior<LabelOnGroup, Group>(modelBuilder, c => c.Group, c => c.GroupId);
 			SetDeleteBehavior<GroupLabel, ApplicationUser>(modelBuilder, c => c.Owner, c => c.OwnerId);
 			SetDeleteBehavior<LabelOnGroup, GroupLabel>(modelBuilder, c => c.Label, c => c.LabelId);
-			
-			SetDeleteBehavior<SystemAccess, ApplicationUser>(modelBuilder, c => c.GrantedBy, c => c.GrantedById);
 
+			SetDeleteBehavior<SystemAccess, ApplicationUser>(modelBuilder, c => c.GrantedBy, c => c.GrantedById);
 
 			CreateIndexes(modelBuilder);
 		}
 
-		private static void SetDeleteBehavior<T1, T2>(ModelBuilder modelBuilder, Expression<Func<T1, T2>> oneWay, Expression<Func<T1, object>> secondWay, DeleteBehavior deleteBehavior=DeleteBehavior.Restrict)
+		private static void SetDeleteBehavior<T1, T2>(ModelBuilder modelBuilder, Expression<Func<T1, T2>> oneWay, Expression<Func<T1, object>> secondWay, DeleteBehavior deleteBehavior = DeleteBehavior.Restrict)
 			where T1 : class
 			where T2 : class
 		{
@@ -200,7 +198,7 @@ namespace Database
 				.HasForeignKey(secondWay)
 				.OnDelete(deleteBehavior);
 		}
-		
+
 		private void CreateIndexes(ModelBuilder modelBuilder)
 		{
 			AddIndex<AdditionalScore>(modelBuilder, c => new { c.CourseId, c.UserId });
@@ -230,7 +228,7 @@ namespace Database
 			AddIndex<CourseVersion>(modelBuilder, c => new { c.CourseId, c.LoadingTime });
 
 			AddIndex<EnabledAdditionalScoringGroup>(modelBuilder, c => c.GroupId);
-			
+
 			AddIndex<ExerciseCodeReview>(modelBuilder, c => c.ExerciseCheckingId);
 
 			AddIndex<FeedViewTimestamp>(modelBuilder, c => c.UserId);
@@ -248,7 +246,7 @@ namespace Database
 			AddIndex<GroupAccess>(modelBuilder, c => c.GrantTime);
 
 			AddIndex<GroupLabel>(modelBuilder, c => c.OwnerId);
-			AddIndex<GroupLabel>(modelBuilder, c => new { c.OwnerId, c.IsDeleted});
+			AddIndex<GroupLabel>(modelBuilder, c => new { c.OwnerId, c.IsDeleted });
 
 			AddIndex<LabelOnGroup>(modelBuilder, c => c.GroupId);
 			AddIndex<LabelOnGroup>(modelBuilder, c => c.LabelId);
@@ -336,16 +334,16 @@ namespace Database
 			AddIndex<UserQuizSubmission>(modelBuilder, c => new { c.CourseId, c.SlideId });
 			AddIndex<UserQuizSubmission>(modelBuilder, c => new { c.CourseId, c.SlideId, c.UserId });
 			AddIndex<UserQuizSubmission>(modelBuilder, c => new { c.CourseId, c.SlideId, c.Timestamp });
-			
+
 			AddIndex<Visit>(modelBuilder, c => new { c.SlideId, c.UserId });
 			AddIndex<Visit>(modelBuilder, c => new { c.CourseId, c.SlideId, c.UserId });
 			AddIndex<Visit>(modelBuilder, c => new { c.SlideId, c.Timestamp });
-			
-			AddIndex<UserFlashcardsVisit>(modelBuilder, c => new { c.UserId, c.CourseId, c.UnitId, c.FlashcardId },false);
-			AddIndex<UserFlashcardsUnlocking>(modelBuilder, c => new { c.UserId, c.CourseId, c.UnitId },false);
+
+			AddIndex<UserFlashcardsVisit>(modelBuilder, c => new { c.UserId, c.CourseId, c.UnitId, c.FlashcardId }, false);
+			AddIndex<UserFlashcardsUnlocking>(modelBuilder, c => new { c.UserId, c.CourseId, c.UnitId }, false);
 		}
 
-		private void AddIndex<TEntity>(ModelBuilder modelBuilder, Expression<Func<TEntity, object>> indexFunction, bool isUnique=false) where TEntity : class
+		private void AddIndex<TEntity>(ModelBuilder modelBuilder, Expression<Func<TEntity, object>> indexFunction, bool isUnique = false) where TEntity : class
 		{
 			modelBuilder.Entity<TEntity>().HasIndex(indexFunction).IsUnique(isUnique);
 		}
@@ -353,7 +351,7 @@ namespace Database
 		private static List<Type> GetNonAbstractSubclasses(Type type)
 		{
 			return type.Assembly.GetTypes().Where(t => t.IsSubclassOf(type) && !t.IsAbstract && t != type).ToList();
-		}		
+		}
 
 		public override int SaveChanges()
 		{
@@ -442,9 +440,8 @@ namespace Database
 
 		public DbSet<CourseAccess> CourseAccesses { get; set; }
 		public DbSet<SystemAccess> SystemAccesses { get; set; }
-		
+
 		public DbSet<UserFlashcardsVisit> UserFlashcardsVisits { get; set; }
 		public DbSet<UserFlashcardsUnlocking> UserFlashcardsUnlocking { get; set; }
 	}
 }
- 

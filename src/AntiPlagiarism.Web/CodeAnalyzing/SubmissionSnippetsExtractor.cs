@@ -15,7 +15,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 		private readonly SnippetsExtractor snippetsExtractor;
 		private readonly ILogger logger;
 		private readonly AntiPlagiarismConfiguration configuration;
-		
+
 		private readonly List<ITokenInSnippetConverter> tokenConverters = new List<ITokenInSnippetConverter>
 		{
 			new TokensKindsOnlyConverter(),
@@ -29,7 +29,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			this.logger = logger;
 			configuration = options.Value;
 		}
-		
+
 		public IEnumerable<Tuple<int, Snippet>> ExtractSnippetsFromSubmission(Submission submission)
 		{
 			logger.Information("Достаю сниппеты из решения {submissionId}, длина сниппетов: {tokensCount} токенов", submission.Id, configuration.SnippetTokensCount);

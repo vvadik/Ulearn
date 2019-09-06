@@ -149,7 +149,7 @@ namespace Ulearn.Web.Api.Controllers
 				Text = comment.Text,
 			};
 		}
-		
+
 		protected ShortGroupInfo BuildShortGroupInfo(Group g)
 		{
 			return new ShortGroupInfo
@@ -158,10 +158,10 @@ namespace Ulearn.Web.Api.Controllers
 				Name = g.Name,
 				CourseId = g.CourseId,
 				IsArchived = g.IsArchived,
-				ApiUrl = Url.Action(new UrlActionContext { Action = nameof(GroupController.Group), Controller = "Group", Values = new { groupId = g.Id }})
+				ApiUrl = Url.Action(new UrlActionContext { Action = nameof(GroupController.Group), Controller = "Group", Values = new { groupId = g.Id } })
 			};
 		}
-		
+
 		public static async Task<Func<Slide, int>> BuildGetSlideMaxScoreFunc(IUserSolutionsRepo solutionsRepo, IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo,
 			Course course, string userId)
 		{
@@ -170,14 +170,14 @@ namespace Ulearn.Web.Api.Controllers
 			var enabledManualCheckingForUser = await groupsRepo.IsManualCheckingEnabledForUserAsync(course, userId).ConfigureAwait(false);
 			return s => GetMaxScoreForUsersSlide(s, solvedSlidesIds.Contains(s.Id), slidesWithUsersManualChecking.Contains(s.Id), enabledManualCheckingForUser);
 		}
-		
+
 		public static HashSet<Guid> GetSolvedSlides(IUserSolutionsRepo solutionsRepo, IUserQuizzesRepo userQuizzesRepo, Course course, string userId)
 		{
 			var solvedSlides = solutionsRepo.GetIdOfPassedSlides(course.Id, userId);
 			solvedSlides.UnionWith(userQuizzesRepo.GetPassedSlideIds(course.Id, userId));
 			return solvedSlides;
 		}
-		
+
 		public static int GetMaxScoreForUsersSlide(Slide slide, bool isSolved, bool hasManualChecking, bool enabledManualCheckingForUser)
 		{
 			var isExerciseOrQuiz = slide is ExerciseSlide || slide is QuizSlide;
@@ -189,7 +189,7 @@ namespace Ulearn.Web.Api.Controllers
 				return hasManualChecking ? slide.MaxScore : GetMaxScoreWithoutManualChecking(slide);
 			return enabledManualCheckingForUser ? slide.MaxScore : GetMaxScoreWithoutManualChecking(slide);
 		}
-		
+
 		public static int GetMaxScoreWithoutManualChecking(Slide slide)
 		{
 			switch (slide)

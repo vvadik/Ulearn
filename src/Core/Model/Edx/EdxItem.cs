@@ -45,6 +45,7 @@ namespace Ulearn.Core.Model.Edx
 					converted = convertedXDoc.ToString();
 				}
 			}
+
 			File.WriteAllText(filename, converted);
 			if (withAdditionals)
 				SaveAdditional(folderName);
@@ -69,6 +70,7 @@ namespace Ulearn.Core.Model.Edx
 						return null;
 					}
 				}
+
 				var component = fileInfo.DeserializeXml<TComponent>();
 				component.UrlName = urlName;
 				loadInner?.Invoke(component);

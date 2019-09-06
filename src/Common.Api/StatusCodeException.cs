@@ -6,7 +6,8 @@ namespace Ulearn.Common.Api
 	{
 		public int Code { get; }
 
-		public StatusCodeException(int code, string message) : base(message)
+		public StatusCodeException(int code, string message)
+			: base(message)
 		{
 			Code = code;
 		}

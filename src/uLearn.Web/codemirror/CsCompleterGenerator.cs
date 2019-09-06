@@ -148,6 +148,7 @@ namespace uLearn.Web.codemirror
 					ToArrayString(returnTypeDictionary[type].Distinct()));
 				totalWordCount += returnTypeDictionary[type].Distinct().Count();
 			}
+
 			Console.WriteLine();
 		}
 
@@ -160,6 +161,7 @@ namespace uLearn.Web.codemirror
 				totalWordCount += collection.Count();
 				Console.WriteLine("this.{0}['{1}'] = [{2}];", dictName, ToPrettyString(myType), collection.Any() ? ToArrayString(collection) : "");
 			}
+
 			Console.WriteLine();
 		}
 
@@ -171,6 +173,7 @@ namespace uLearn.Web.codemirror
 				if (type == prettyName.Item1)
 					return prettyName.Item2;
 			}
+
 			return type;
 		}
 
@@ -201,6 +204,7 @@ namespace uLearn.Web.codemirror
 					returnTypeDictionary[returnType.Key].AddRange(returnType.Select(tuple => tuple.Item1));
 				}
 			}
+
 			return res.Distinct().OrderBy(s => s);
 		}
 
@@ -225,6 +229,7 @@ namespace uLearn.Web.codemirror
 					returnTypeDictionary[type] = new List<string>();
 				returnTypeDictionary[type].Add(methodInfo.Name);
 			}
+
 			return methods.Select(x => x.Name).Distinct();
 		}
 
@@ -238,6 +243,7 @@ namespace uLearn.Web.codemirror
 					returnTypeDictionary[type] = new List<string>();
 				returnTypeDictionary[type].Add(propertyInfo.Name);
 			}
+
 			return properties.Select(x => x.Name).Distinct();
 		}
 
@@ -251,6 +257,7 @@ namespace uLearn.Web.codemirror
 					returnTypeDictionary[type] = new List<string>();
 				returnTypeDictionary[type].Add(fieldInfo.Name);
 			}
+
 			return fields.Select(x => x.Name).Distinct();
 		}
 	}

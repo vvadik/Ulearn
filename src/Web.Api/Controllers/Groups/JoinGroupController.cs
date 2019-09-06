@@ -15,7 +15,7 @@ using Ulearn.Web.Api.Models.Responses.Groups;
 namespace Ulearn.Web.Api.Controllers.Groups
 {
 	[Route("/groups/{inviteHash:guid}")]
-	[ProducesResponseType((int) HttpStatusCode.NotFound)]
+	[ProducesResponseType((int)HttpStatusCode.NotFound)]
 	[Authorize]
 	public class JoinGroupController : BaseGroupController
 	{
@@ -30,11 +30,11 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			this.groupsRepo = groupsRepo;
 			this.groupMembersRepo = groupMembersRepo;
 		}
-		
+
 		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
 		{
-			var groupInviteHash = (Guid) context.ActionArguments["inviteHash"];
-			
+			var groupInviteHash = (Guid)context.ActionArguments["inviteHash"];
+
 			var group = await groupsRepo.FindGroupByInviteHashAsync(groupInviteHash).ConfigureAwait(false);
 			if (group == null)
 			{
@@ -46,7 +46,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 
 			await base.OnActionExecutionAsync(context, next).ConfigureAwait(false);
 		}
-		
+
 		/// <summary>
 		/// Найти группу по инвайт-хешу.
 		/// Группа должна быть не удалена, а инвайт-ссылка в ней — включена.
@@ -66,16 +66,16 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// </summary>
 		/// <param name="inviteHash">Инвайт-хеш группы</param>
 		[HttpPost("join")]
-		[ProducesResponseType((int) HttpStatusCode.Conflict)]
-		[SwaggerResponse((int) HttpStatusCode.Conflict, Description = "User is already a student of this group")]
+		[ProducesResponseType((int)HttpStatusCode.Conflict)]
+		[SwaggerResponse((int)HttpStatusCode.Conflict, Description = "User is already a student of this group")]
 		public async Task<IActionResult> Join(Guid inviteHash)
 		{
 			var group = await groupsRepo.FindGroupByInviteHashAsync(inviteHash).ConfigureAwait(false);
-			
+
 			var groupMember = await groupMembersRepo.AddUserToGroupAsync(group.Id, UserId).ConfigureAwait(false);
 			if (groupMember == null)
 				return StatusCode((int)HttpStatusCode.Conflict, new ErrorResponse($"User {UserId} is already a student of group {group.Id}"));
-			
+
 			return Ok(new SuccessResponseWithMessage($"Student {UserId} is added to group {group.Id}"));
 		}
 	}

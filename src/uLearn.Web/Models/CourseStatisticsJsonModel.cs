@@ -48,6 +48,7 @@ namespace uLearn.Web.Models
 				};
 				students.Add(studentInfo);
 			}
+
 			Students = students.ToArray();
 		}
 

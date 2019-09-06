@@ -23,7 +23,7 @@ namespace Ulearn.Core.Courses
 		public string Id { get; set; }
 		public string Title => Settings.Title;
 		public CourseSettings Settings { get; private set; }
-		public DirectoryInfo CourseXmlDirectory { get; set; } 
+		public DirectoryInfo CourseXmlDirectory { get; set; }
 		public List<Unit> Units { get; private set; }
 
 		private List<Slide> slidesCache { get; set; }
@@ -47,7 +47,7 @@ namespace Ulearn.Core.Courses
 				throw new NotFoundException($"No slide with id {slideId}");
 			return slide;
 		}
-		
+
 		[CanBeNull]
 		public InstructorNote FindInstructorNoteById(Guid slideId)
 		{
@@ -69,7 +69,7 @@ namespace Ulearn.Core.Courses
 				throw new NotFoundException($"No unit with id {unitId}");
 			return unit;
 		}
-		
+
 		[CanBeNull]
 		public Unit FindUnitBySlideId(Guid slideId)
 		{

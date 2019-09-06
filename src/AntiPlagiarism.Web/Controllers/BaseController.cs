@@ -33,31 +33,32 @@ namespace AntiPlagiarism.Web.Controllers
 			var token = context.HttpContext.Request.Query["token"].ToString();
 			if (string.IsNullOrEmpty(token))
 			{
-				context.HttpContext.Response.StatusCode = (int) HttpStatusCode.Forbidden;
+				context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 				context.Result = new JsonResult(new ErrorResponse("Not authenticated request. Pass 'token' parameter to query string."));
 				return;
 			}
-			if (! Guid.TryParse(token, out var tokenGuid))
+
+			if (!Guid.TryParse(token, out var tokenGuid))
 			{
-				context.HttpContext.Response.StatusCode = (int) HttpStatusCode.Forbidden;
+				context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 				context.Result = new JsonResult(new ErrorResponse("Not authenticated request. Pass correct GUID as 'token' parameter to query string."));
 				return;
 			}
-			
-			logger.Debug($"Token in request is {token}", token);			
+
+			logger.Debug($"Token in request is {token}", token);
 			client = await clientsRepo.FindClientByTokenAsync(tokenGuid).ConfigureAwait(false);
 			if (client == null)
 			{
-				context.HttpContext.Response.StatusCode = (int) HttpStatusCode.Forbidden;
+				context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 				context.Result = new JsonResult(new ErrorResponse("Not authenticated request. Token is invalid or disabled for a while."));
 				return;
 			}
-			
+
 			DisableEfChangesTrackingForGetRequests(context);
 
 			await base.OnActionExecutionAsync(context, next).ConfigureAwait(false);
 		}
-		
+
 		private void DisableEfChangesTrackingForGetRequests(ActionContext context)
 		{
 			/* Disable change tracking in EF Core for GET requests due to performance issues */

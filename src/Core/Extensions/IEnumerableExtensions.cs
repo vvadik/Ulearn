@@ -16,10 +16,10 @@ namespace Ulearn.Core.Extensions
 
 			using (var iterator = source.GetEnumerator())
 			{
-				if (!iterator.MoveNext())            
+				if (!iterator.MoveNext())
 					throw new InvalidOperationException();
 
-				var max = iterator.Current; 
+				var max = iterator.Current;
 				var maxValue = selector(max);
 
 				while (iterator.MoveNext())

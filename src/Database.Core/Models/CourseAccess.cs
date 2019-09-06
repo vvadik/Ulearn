@@ -12,7 +12,7 @@ namespace Database.Models
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int Id { get; set; }
-		
+
 		[Required]
 		[StringLength(64)]
 		public string CourseId { get; set; }
@@ -34,7 +34,7 @@ namespace Database.Models
 
 		[Required]
 		public bool IsEnabled { get; set; }
-		
+
 		[CanBeNull]
 		public string Comment { get; set; }
 	}
@@ -53,14 +53,14 @@ namespace Database.Models
 		/* Назначать людей преподавателями */
 		[Display(Name = "Назначать преподавателей")]
 		AddAndRemoveInstructors = 3,
-		
+
 		[Display(Name = "Видеть, в каких группах состоят все студенты")]
-		ViewAllGroupMembers = 4,		
-		
+		ViewAllGroupMembers = 4,
+
 		[Display(Name = "Получать в АПИ статистику по код-ревью (/codereveiew/statistics)")]
 		ApiViewCodeReviewStatistics = 101,
-		
-		
+
+
 		/*
 		// Antiplagiarism service is enabled for everyone now. But don't use value 1001 for another features to avoid collissions.		
 		[Display(Name = "Фича: антиплагиат")]

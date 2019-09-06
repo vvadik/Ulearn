@@ -44,12 +44,14 @@ namespace Ulearn.Core
 					else
 						zip.AddEntry(f.GetRelativePath(dir.FullName), newContent);
 				}
+
 				foreach (var fileToAdd in filesToAdd)
 				{
 					var directoriesList = GetDirectoriesList(fileToAdd.Path);
 					if (!excludedDirs.Intersect(directoriesList).Any())
 						zip.UpdateEntry(fileToAdd.Path, fileToAdd.Data);
 				}
+
 				zip.Save(zipFile.FullName);
 			}
 		}
@@ -78,8 +80,8 @@ namespace Ulearn.Core
 					yield return f;
 			var dirs = aDir.GetDirectories().Where(d => !excludedDirs.Contains(d.Name));
 			foreach (var subdir in dirs)
-				foreach (var f in EnumerateFiles(subdir))
-					yield return f;
+			foreach (var f in EnumerateFiles(subdir))
+				yield return f;
 		}
 	}
 

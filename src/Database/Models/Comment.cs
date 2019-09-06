@@ -44,7 +44,7 @@ namespace Database.Models
 
 		[Required]
 		public bool IsPinnedToTop { get; set; }
-		
+
 		[Required]
 		public bool IsForInstructorsOnly { get; set; }
 

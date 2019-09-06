@@ -11,7 +11,7 @@ namespace Database
 		{
 			return CreateDbContext(args, null);
 		}
-		
+
 		public UlearnDb CreateDbContext(string[] args, ILoggerFactory loggerFactory)
 		{
 			var optionsBuilder = new DbContextOptionsBuilder<UlearnDb>();
@@ -19,7 +19,7 @@ namespace Database
 			optionsBuilder.UseSqlServer(ApplicationConfiguration.Read<UlearnConfiguration>().Database);
 			if (loggerFactory != null)
 				optionsBuilder.UseLoggerFactory(loggerFactory);
-			
+
 			return new UlearnDb(optionsBuilder.Options);
 		}
 	}

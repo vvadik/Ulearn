@@ -14,7 +14,7 @@ namespace uLearn.Web
 		{
 			var connectionString = ApplicationConfiguration.Read<UlearnConfiguration>().StatsdConnectionString;
 			var isGraphiteSendingEnabled = !string.IsNullOrEmpty(connectionString);
-			
+
 			if (!isGraphiteSendingEnabled)
 				return;
 

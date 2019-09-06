@@ -11,7 +11,7 @@ namespace AntiPlagiarism.Api.Models.Parameters
 		[BindRequired]
 		[FromQuery(Name = "author_id")]
 		public Guid AuthorId { get; set; }
-		
+
 		[BindRequired]
 		[FromQuery(Name = "task_id")]
 		public Guid TaskId { get; set; }

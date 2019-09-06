@@ -13,7 +13,7 @@ namespace Ulearn.Core.Courses.Slides.Quizzes
 	public class QuizSlide : Slide
 	{
 		private static readonly Regex questionIdRegex = new Regex("^[0-9a-z_]+$", RegexOptions.IgnoreCase);
-		
+
 		[XmlElement("scoring")]
 		public QuizScoringSettings Scoring { get; set; } = new QuizScoringSettings
 		{
@@ -26,7 +26,7 @@ namespace Ulearn.Core.Courses.Slides.Quizzes
 		public override bool ShouldBeSolved => true;
 
 		public override string ScoringGroup => Scoring.ScoringGroup;
-		
+
 		public override int MaxScore => Blocks.OfType<AbstractQuestionBlock>().Sum(b => b.MaxScore);
 
 		/* TODO (andgein): remove MaxTriesCount and ManualChecking and use Scoring's fields implicitly */
@@ -45,7 +45,7 @@ namespace Ulearn.Core.Courses.Slides.Quizzes
 				throw new CourseLoadingException(
 					$"Неизвестная группа оценки у теста «{Title}»: {ScoringGroup}\n" +
 					"Возможные значения: " + string.Join(", ", scoringGroupsIds));
-			
+
 			var questionBlocks = Blocks.OfType<AbstractQuestionBlock>().ToList();
 			var questionIds = questionBlocks.Select(b => b.Id).ToImmutableHashSet();
 			var questionIdsCount = questionIds.ToDictionary(id => id, id => questionBlocks.Count(b => b.Id == id));
@@ -64,7 +64,7 @@ namespace Ulearn.Core.Courses.Slides.Quizzes
 					$"Идентификатор «{badQuestionId}» в тесте «{Title}» не удовлетворяет формату. " +
 					"Идентификаторы вопросов (параметры id) должны состоять из латинских букв, цифр и символа подчёркивания. Идентификатор не может быть пустым.");
 			}
-			
+
 			base.Validate(context);
 		}
 
@@ -74,17 +74,17 @@ namespace Ulearn.Core.Courses.Slides.Quizzes
 				Scoring.ScoringGroup = context.CourseSettings.Scoring.DefaultScoringGroupForQuiz;
 
 			base.BuildUp(context);
-			
+
 			InitQuestionIndices();
 		}
-		
+
 		private void InitQuestionIndices()
 		{
 			var index = 1;
 			foreach (var b in Blocks.OfType<AbstractQuestionBlock>())
 				b.QuestionIndex = index++;
 		}
-		
+
 		public bool HasEqualStructureWith(QuizSlide other)
 		{
 			if (Blocks.Length != other.Blocks.Length)
@@ -105,6 +105,7 @@ namespace Ulearn.Core.Courses.Slides.Quizzes
 				if (!questionBlock.HasEqualStructureWith(otherQuestionBlock))
 					return false;
 			}
+
 			return true;
 		}
 	}

@@ -17,7 +17,7 @@ namespace Ulearn.Core.Extensions
 			/* Replace slashes / to backslashes \ on Windows */
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 				mask = mask.Replace('/', '\\');
-			
+
 			return GlobSearcher.Glob(Path.Combine(directory.FullName, mask)).Select(path => new FileInfo(path));
 		}
 	}

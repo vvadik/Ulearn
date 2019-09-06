@@ -103,6 +103,7 @@ namespace Database.Repos
 					SlideXml = exportedSlideXml,
 				});
 			}
+
 			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 

@@ -25,34 +25,34 @@ namespace uLearn.CSharp.RedundantElseValidation
 
 		private static string[] correctFilenames => CorrectTestDataDir.GetFiles().Select(f => f.Name).ToArray();
 		private static string[] incorrectFilenames => IncorrectTestDataDir.GetFiles().Select(f => f.Name).ToArray();
-		
+
 		private static DirectoryInfo BasicProgrammingDirectory =>
-        			new DirectoryInfo(ExplicitTestsExamplesPaths.BasicProgrammingDirectoryPath);
+			new DirectoryInfo(ExplicitTestsExamplesPaths.BasicProgrammingDirectoryPath);
 
-        private static IEnumerable<FileInfo> BasicProgrammingFiles()
-        {
-            if (!BasicProgrammingDirectory.Exists)
-                return new FileInfo[0];
-            return BasicProgrammingDirectory
-                .EnumerateFiles("*.cs", SearchOption.AllDirectories)
-                .Where(f => !f.Name.Equals("Settings.Designer.cs") &&
-                            !f.Name.Equals("Resources.Designer.cs") &&
-                            !f.Name.Equals("AssemblyInfo.cs"));
-        }
+		private static IEnumerable<FileInfo> BasicProgrammingFiles()
+		{
+			if (!BasicProgrammingDirectory.Exists)
+				return new FileInfo[0];
+			return BasicProgrammingDirectory
+				.EnumerateFiles("*.cs", SearchOption.AllDirectories)
+				.Where(f => !f.Name.Equals("Settings.Designer.cs") &&
+							!f.Name.Equals("Resources.Designer.cs") &&
+							!f.Name.Equals("AssemblyInfo.cs"));
+		}
 
-        private static DirectoryInfo ULearnSubmissionsDirectory =>
+		private static DirectoryInfo ULearnSubmissionsDirectory =>
 			new DirectoryInfo(ExplicitTestsExamplesPaths.ULearnSubmissionsDirectoryPath);
 
-        private static IEnumerable<FileInfo> SubmissionsFiles()
-        {
-            if(!ULearnSubmissionsDirectory.Exists)
-                return new FileInfo[0];
-            return ULearnSubmissionsDirectory
-                .EnumerateFiles("*.cs", SearchOption.AllDirectories)
-                .Where(f => f.Name.Contains("Accepted"));
-        }
+		private static IEnumerable<FileInfo> SubmissionsFiles()
+		{
+			if (!ULearnSubmissionsDirectory.Exists)
+				return new FileInfo[0];
+			return ULearnSubmissionsDirectory
+				.EnumerateFiles("*.cs", SearchOption.AllDirectories)
+				.Where(f => f.Name.Contains("Accepted"));
+		}
 
-        [Test]
+		[Test]
 		[TestCaseSource(nameof(incorrectFilenames))]
 		[UseReporter(typeof(DiffReporter))]
 		public void FindErrors(string filename)
@@ -75,9 +75,10 @@ namespace uLearn.CSharp.RedundantElseValidation
 			{
 				Console.WriteLine(errors.Select(e => e.GetMessageWithPositions().ToList()));
 			}
+
 			errors.Should().BeNullOrEmpty();
 		}
-		
+
 		[Explicit]
 		[TestCaseSource(nameof(BasicProgrammingFiles))]
 		public void NotFindErrors_InBasicProgramming(FileInfo file)
@@ -98,7 +99,7 @@ namespace uLearn.CSharp.RedundantElseValidation
 			}
 		}
 
-        [Explicit]
+		[Explicit]
 		[TestCaseSource(nameof(SubmissionsFiles))]
 		public void NotFindErrors_InCheckAcceptedFiles(FileInfo file)
 		{

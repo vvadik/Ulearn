@@ -84,7 +84,7 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 				LastTimestamp = unreadCountAndLastTimestamp.Item2,
 			};
 		}
-		
+
 		private async Task<Tuple<int, DateTime?>> GetUnreadNotificationsCountAndLastTimestampAsync(string userId, FeedNotificationTransport transport, DateTime? from = null)
 		{
 			var realFrom = from ?? await feedRepo.GetFeedViewTimestampAsync(userId, transport.Id).ConfigureAwait(false) ?? DateTime.MinValue;
@@ -96,7 +96,7 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 
 			return Tuple.Create(unreadCount, from);
 		}
-		
+
 		private async Task<(NotificationList, NotificationList)> GetNotificationListsAsync(string userId)
 		{
 			var notificationTransport = await feedRepo.GetUsersFeedNotificationTransportAsync(userId).ConfigureAwait(false);
@@ -108,20 +108,21 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 					.Select(d => d.Notification)
 					.ToList();
 			}
+
 			var commentsNotifications = (await feedRepo.GetFeedNotificationDeliveriesAsync(userId, n => n.Notification.InitiatedBy, transports: commentsFeedNotificationTransport).ConfigureAwait(false))
 				.Select(d => d.Notification)
 				.ToList();
-			
+
 			logger.Information($"[GetNotificationList] Step 1 done: found {importantNotifications.Count} important notifications and {commentsNotifications.Count} comment notifications");
 
 			importantNotifications = RemoveBlockedNotifications(importantNotifications).ToList();
 			commentsNotifications = RemoveBlockedNotifications(commentsNotifications, importantNotifications).ToList();
-			
+
 			logger.Information($"[GetNotificationList] Step 2 done, removed blocked notifications: left {importantNotifications.Count} important notifications and {commentsNotifications.Count} comment notifications");
 
 			importantNotifications = RemoveNotActualNotifications(importantNotifications).ToList();
 			commentsNotifications = RemoveNotActualNotifications(commentsNotifications).ToList();
-			
+
 			logger.Information($"[GetNotificationList] Step 3 done, removed not actual notifications: left {importantNotifications.Count} important notifications and {commentsNotifications.Count} comment notifications");
 
 			var importantLastViewTimestamp = await feedRepo.GetFeedViewTimestampAsync(userId, notificationTransport?.Id ?? -1).ConfigureAwait(false);
@@ -131,7 +132,7 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 
 			var allNotifications = importantNotifications.Concat(commentsNotifications).ToList();
 			var notificationsData = await notificationDataPreloader.LoadAsync(allNotifications).ConfigureAwait(false);
-			
+
 			var importantNotificationList = new NotificationList
 			{
 				LastViewTimestamp = importantLastViewTimestamp,
@@ -142,16 +143,16 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 				LastViewTimestamp = commentsLastViewTimestamp,
 				Notifications = commentsNotifications.Select(notification => BuildNotificationInfo(notification, notificationsData)).ToList(),
 			};
-			
+
 			return (importantNotificationList, commentsNotificationList);
 		}
 
-		private IEnumerable<Notification> RemoveBlockedNotifications(IReadOnlyCollection<Notification> notifications, IReadOnlyCollection<Notification> searchBlockersAlsoIn=null)
+		private IEnumerable<Notification> RemoveBlockedNotifications(IReadOnlyCollection<Notification> notifications, IReadOnlyCollection<Notification> searchBlockersAlsoIn = null)
 		{
 			var allNotifications = notifications.ToList();
 			if (searchBlockersAlsoIn != null)
 				allNotifications = allNotifications.Concat(searchBlockersAlsoIn).ToList();
-			
+
 			foreach (var notification in notifications)
 			{
 				if (notification.IsBlockedByAnyNotificationFrom(serviceProvider, allNotifications))
@@ -159,7 +160,7 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 				yield return notification;
 			}
 		}
-		
+
 		private IEnumerable<Notification> RemoveNotActualNotifications(IEnumerable<Notification> notifications)
 		{
 			return notifications.Where(notification =>
@@ -167,8 +168,8 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 				logger.Information($"Checking actuality of notification #{notification.Id}: {notification} ({notification.GetNotificationType().ToString()})");
 				return notification.IsActual();
 			});
-		}		
-		
+		}
+
 		private NotificationInfo BuildNotificationInfo(Notification notification, NotificationDataStorage notificationsData)
 		{
 			return new NotificationInfo

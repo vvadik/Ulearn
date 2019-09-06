@@ -44,12 +44,12 @@ namespace RunCheckerJob
 
 		public async Task<List<RunnerSubmission>> TryGetSubmission(IEnumerable<Language> languages)
 		{
-			var uri = GetUri("GetSubmissions", new [] {"language", string.Join(",", languages.Select(l => l.GetName()))});
+			var uri = GetUri("GetSubmissions", new[] { "language", string.Join(",", languages.Select(l => l.GetName())) });
 			try
 			{
 				log.Info($"Отправляю запрос на {uri}");
 				var response = await httpClient.GetAsync(uri).ConfigureAwait(false);
-				log.Info($"Получил ответ, код {(int) response.StatusCode} {response.StatusCode}, читаю содержимое");
+				log.Info($"Получил ответ, код {(int)response.StatusCode} {response.StatusCode}, читаю содержимое");
 				if (response.IsSuccessStatusCode)
 					return (await response.Content.ReadAsJsonAsync<List<RunnerSubmission>>(JsonConfig.GetSettings()).ConfigureAwait(false)).Item1;
 				else
@@ -64,6 +64,7 @@ namespace RunCheckerJob
 				if (e.InnerException != null)
 					log.Error(e.InnerException.Message);
 			}
+
 			return new List<RunnerSubmission>();
 		}
 
@@ -83,7 +84,7 @@ namespace RunCheckerJob
 			{
 				log.Error($"Не могу отправить результаты проверки (они ниже) на сервер. Произошла ошибка {e.Message}");
 			}
-			
+
 			foreach (var result in results)
 			{
 				log.Info($"Результат: {result}");
@@ -104,6 +105,7 @@ namespace RunCheckerJob
 			{
 				query[parameter[0]] = parameter[1];
 			}
+
 			return $"{path}/?{query}";
 		}
 	}

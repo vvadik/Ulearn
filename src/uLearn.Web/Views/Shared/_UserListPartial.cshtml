@@ -29,29 +29,29 @@
 			<th>Удаление</th>
 		}
 	</tr>
-	
+
 	@foreach (var user in Model.Users)
 	{
 		<tr data-userid="@user.UserId">
-            <td>
-                @if (Model.CanViewProfiles)
-                {
-	                <span title="@user.UserName">
-                        @Html.ActionLink(user.UserVisibleName, "Profile", "Account", new { userId = user.UserId }, new { })
-                    </span>
-                }
-                else
-                {
-	                <span title="@user.UserName">@user.UserVisibleName</span>
-                }
-            </td>
-            <td>
-                @Model.UsersGroups.GetOrDefault(user.UserId, "")
-                @if (Model.UsersArchivedGroups.ContainsKey(user.UserId) && !string.IsNullOrEmpty(Model.UsersArchivedGroups[user.UserId]))
-                {
-	                <div class="text-muted">Архив: @Model.UsersArchivedGroups[user.UserId]</div>
-                }
-             </td>
+			<td>
+				@if (Model.CanViewProfiles)
+				{
+					<span title="@user.UserName">
+						@Html.ActionLink(user.UserVisibleName, "Profile", "Account", new { userId = user.UserId }, new { })
+					</span>
+				}
+				else
+				{
+					<span title="@user.UserName">@user.UserVisibleName</span>
+				}
+			</td>
+			<td>
+				@Model.UsersGroups.GetOrDefault(user.UserId, "")
+				@if (Model.UsersArchivedGroups.ContainsKey(user.UserId) && !string.IsNullOrEmpty(Model.UsersArchivedGroups[user.UserId]))
+				{
+					<div class="text-muted">Архив: @Model.UsersArchivedGroups[user.UserId]</div>
+				}
+			</td>
 			@if (Model.CanToggleRoles)
 			{
 				<td>
@@ -72,19 +72,21 @@
 					@CourseAccessButtons(user)
 				</td>
 			}
-            @if (Model.CanViewAndToogleSystemAccesses)
-            {
-	            <td>
-                    @SystemAccessButtons(user)
-                </td>
-            }
+			@if (Model.CanViewAndToogleSystemAccesses)
+			{
+				<td>
+					@SystemAccessButtons(user)
+				</td>
+			}
 			@if (Model.ShowDangerEntities)
 			{
 				<td>
 					@using (Html.BeginForm("DeleteUser", "Account", new { userId = user.UserId }, FormMethod.Post))
 					{
 						@Html.AntiForgeryToken()
-						<button type="submit" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-trash"></span></button>
+						<button type="submit" class="btn btn-sm btn-danger">
+							<span class="glyphicon glyphicon-trash"></span>
+						</button>
 					}
 				</td>
 			}
@@ -93,11 +95,9 @@
 </table>
 
 @helper RoleButton(UserModel user, CourseRole role, string cssClass)
-{
-	@RoleButton(user, role.ToString(), role.GetDisplayName(), cssClass)
-}
+{ @RoleButton(user, role.ToString(), role.GetDisplayName(), cssClass) }
 
-@helper RoleButton(UserModel user, string role, string roleName ,string cssClass)
+@helper RoleButton(UserModel user, string role, string roleName, string cssClass)
 {
 	if (user.CourseRoles.ContainsKey(role))
 	{
@@ -107,19 +107,18 @@
 
 @helper RoleButton(SingleCourseRolesModel courseRoles, string role, string cssClass)
 {
-	
 	var buttonClass = "btn-" + cssClass;
 	<button type="button"
 			class="btn btn-sm btn-default @( courseRoles.HasAccess ? buttonClass : "")"
 			data-css-class="@buttonClass"
 			data-toggle-url="@courseRoles.ToggleUrl"
-			data-toggle-userName = "@courseRoles.UserName"
-			data-toggle-role = "@courseRoles.Role.GetDisplayName()"
-			data-toggle-isRole = "@true"
-			data-toggle-courseTitle = "@courseRoles.CourseTitle"
+			data-toggle-userName="@courseRoles.UserName"
+			data-toggle-role="@courseRoles.Role.GetDisplayName()"
+			data-toggle-isRole="@true"
+			data-toggle-courseTitle="@courseRoles.CourseTitle"
 			onclick="openPopup(this, ToggleButtonClass)">
 		@role
-		
+
 	</button>
 }
 
@@ -145,9 +144,9 @@
 					data-toggle-userName="@course.UserName"
 					data-toggle-role="@course.Role"
 					data-toggle-isRole="@true"
-					data-toggle-courseTitle = "@course.CourseTitle"
+					data-toggle-courseTitle="@course.CourseTitle"
 					onclick="openPopup(this, ToggleDropDownClass)">
-					
+
 					<a>@course.CourseTitle</a>
 				</li>
 			}
@@ -168,18 +167,18 @@
 		<ul class="dropdown-menu" data-css-class="li-primary">
 			@foreach (var courseId in user.CourseAccesses.Keys)
 			{
-			 	foreach (var courseAccessType in user.CourseAccesses[courseId].Keys)
+				foreach (var courseAccessType in user.CourseAccesses[courseId].Keys)
 				{
 					var courseAccess = user.CourseAccesses[courseId][courseAccessType];
 					<li class="@( courseAccess.HasAccess ? "li-info" : "")"
 						data-toggle-url="@courseAccess.ToggleUrl"
 						data-toggle-userName="@courseAccess.UserName"
-                        data-toggle-role = "@courseAccess.AccessType.GetDisplayName()"
-						data-toggle-isRole = "@false"
-						data-toggle-courseTitle = "@courseAccess.CourseTitle"
+						data-toggle-role="@courseAccess.AccessType.GetDisplayName()"
+						data-toggle-isRole="@false"
+						data-toggle-courseTitle="@courseAccess.CourseTitle"
 						data-css-class="li-info"
-						data-has-access="@( courseAccess.HasAccess ? "true" : "false" )"
-						
+						data-has-access="@( courseAccess.HasAccess ? "true" : "false")"
+
 						onclick="openPopup(this, ToggleButtonClass)">
 						<a>@courseAccessType.GetDisplayName()</a>
 					</li>
@@ -192,25 +191,25 @@
 @helper SystemAccessButtons(UserModel user)
 {
 	<div class="btn-group">
-        <button type="button"
-                class="btn btn-sm  btn-default dropdown-toggle"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false">
-            Выберите права <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu" data-css-class="li-primary">
-            @foreach (var systemAccessType in user.SystemAccesses.Keys)
-            {
-                var systemAccess = user.SystemAccesses[systemAccessType];
-                <li class="@( systemAccess.HasAccess ? "li-info" : "")"
-                    data-toggle-url="@systemAccess.ToggleUrl"
-                    data-css-class="li-info"
-                    data-has-access="@( systemAccess.HasAccess ? "true" : "false" )"
-                    onclick="ToggleSystemRoleOrAccess(this, ToggleButtonClass, '')">
-                    <a>@systemAccessType.GetDisplayName()</a>
-                </li>
-            }
-        </ul>
-    </div>
+		<button type="button"
+				class="btn btn-sm  btn-default dropdown-toggle"
+				data-toggle="dropdown"
+				aria-haspopup="true"
+				aria-expanded="false">
+			Выберите права <span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu" data-css-class="li-primary">
+			@foreach (var systemAccessType in user.SystemAccesses.Keys)
+			{
+				var systemAccess = user.SystemAccesses[systemAccessType];
+				<li class="@( systemAccess.HasAccess ? "li-info" : "")"
+					data-toggle-url="@systemAccess.ToggleUrl"
+					data-css-class="li-info"
+					data-has-access="@( systemAccess.HasAccess ? "true" : "false")"
+					onclick="ToggleSystemRoleOrAccess(this, ToggleButtonClass, '')">
+					<a>@systemAccessType.GetDisplayName()</a>
+				</li>
+			}
+		</ul>
+	</div>
 }

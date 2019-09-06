@@ -98,7 +98,8 @@
 			else
 			{
 				@Model.User.Email.TruncateWithEllipsis(25)
-			}</a>&nbsp;<span class="glyphicon glyphicon-pencil glyphicon-sm"></span>
+			}
+		</a>&nbsp;<span class="glyphicon glyphicon-pencil glyphicon-sm"></span>
 		@ShowNotificationsTransportSettings(Model.MailTransport, "на почту")
 	</div>
 }
@@ -174,16 +175,16 @@ else
 
 <script>
 	window.notificationTypesByCourse = @Html.Raw(
-		                                Model.NotificationTypesByCourse.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Select(t => (int)t)).JsonSerialize()
-		                                );
+		                                   Model.NotificationTypesByCourse.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Select(t => (int)t)).JsonSerialize()
+		                                   );
 
 	window.notificationTransportsSettings = @Html.Raw(Model.NotificationTransportsSettings.Select(
-		                                     kvp => new
-		                                     {
-			                                     courseId = kvp.Key.Item1,
-			                                     transportId = kvp.Key.Item2,
-			                                     notificationType = kvp.Key.Item3,
-			                                     isEnabled = kvp.Value,
-		                                     }
-		                                     ).JsonSerialize());
+		                                        kvp => new
+		                                        {
+			                                        courseId = kvp.Key.Item1,
+			                                        transportId = kvp.Key.Item2,
+			                                        notificationType = kvp.Key.Item3,
+			                                        isEnabled = kvp.Value,
+		                                        }
+		                                        ).JsonSerialize());
 </script>

@@ -29,7 +29,7 @@ namespace RunCheckerJob
 			else
 				program.Run();
 		}
-		
+
 		private static void ConfigureLog4Net()
 		{
 			var log4NetConfig = new XmlDocument();
@@ -37,13 +37,13 @@ namespace RunCheckerJob
 			var repo = LogManager.CreateRepository(Assembly.GetEntryAssembly(), typeof(log4net.Repository.Hierarchy.Hierarchy));
 			XmlConfigurator.Configure(repo, log4NetConfig["configuration"]["log4net"]);
 		}
-		
+
 		private Program(ManualResetEvent externalShutdownEvent = null)
 			: base(serviceName, externalShutdownEvent)
 		{
 			sandboxRunner = new DockerSandboxRunner();
 		}
-		
+
 		protected override ISandboxRunnerClient SandboxRunnerClient => sandboxRunner;
 
 		private void SelfCheck(string sandboxesDirectoryPath)

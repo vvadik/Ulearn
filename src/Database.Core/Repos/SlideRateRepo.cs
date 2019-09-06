@@ -32,12 +32,14 @@ namespace Database.Repos
 				await db.SaveChangesAsync();
 				return "success";
 			}
+
 			if (lastRate.Rate == rate)
 			{
 				lastRate.Rate = SlideRates.NotWatched;
 				await db.SaveChangesAsync();
 				return "cancel";
 			}
+
 			lastRate.Rate = rate;
 			await db.SaveChangesAsync();
 			return "success";
@@ -66,6 +68,7 @@ namespace Database.Repos
 				if (rate.Rate == SlideRates.Trivial)
 					rates.AddTrivial();
 			}
+
 			return rates;
 		}
 

@@ -187,7 +187,7 @@ namespace Database.Models
 		[Display(Name = @"Преподаватель выставил дополнительные баллы", GroupName = @"Дополнительные баллы, выставленные преподавателем")]
 		[IsEnabledByDefault(true)]
 		ReceivedAdditionalScore = 9,
-		
+
 		[Display(Name = @"Ответ на комментарий в код-ревью", GroupName = "Ответы на комментарии в код-ревью")]
 		[IsEnabledByDefault(true)]
 		ReceivedCommentToCodeReview = 10,
@@ -215,22 +215,22 @@ namespace Database.Models
 		[IsEnabledByDefault(true)]
 		GroupMemberHasBeenRemoved = 104,
 		*/
-		
+
 		[Display(Name = @"Преподаватель удалил студентов из вашей группы", GroupName = @"Преподаватель удалил студентов из ваших групп")]
 		[MinCourseRole(CourseRole.Instructor)]
 		[IsEnabledByDefault(true)]
 		GroupMembersHaveBeenRemoved = 105,
-		
+
 		[Display(Name = @"Преподаватель добавил студентов в вашу группу", GroupName = @"Преподаватель добавил студентов в ваши группы")]
 		[MinCourseRole(CourseRole.Instructor)]
 		[IsEnabledByDefault(true)]
 		GroupMembersHaveBeenAdded = 106,
-		
+
 		[Display(Name = @"Новый комментарий для преподавателей", GroupName = @"Новые комментарии для преподавателей")]
 		[MinCourseRole(CourseRole.Instructor)]
 		[IsEnabledByDefault(true)]
 		NewCommentForInstructorsOnly = 107,
-		
+
 		[Display(Name = @"Новый комментарий от студента вашей группы", GroupName = @"Новый комментарий от студента вашей группы")]
 		[MinCourseRole(CourseRole.Instructor)]
 		[IsEnabledByDefault(true)]
@@ -261,7 +261,7 @@ namespace Database.Models
 		[MinCourseRole(CourseRole.CourseAdmin)]
 		[IsEnabledByDefault(true)]
 		CourseExportedToStepik = 205,
-		
+
 		[Display(Name = @"Ошибка загрузки новой версии курса", GroupName = @"Ошибки загрузки новых версиий курса")]
 		[MinCourseRole(CourseRole.CourseAdmin)]
 		[IsEnabledByDefault(true)]
@@ -307,7 +307,7 @@ namespace Database.Models
 		}
 
 		public string Link { get; private set; }
-		
+
 		public string Text { get; private set; }
 	}
 
@@ -488,12 +488,12 @@ namespace Database.Models
 			return new NotificationButton("Перейти к комментарию", GetCommentUrl(course, slide, baseUrl));
 		}
 
-		protected string GetHtmlCommentText(bool isCitation=false)
+		protected string GetHtmlCommentText(bool isCitation = false)
 		{
 			return GetHtmlCommentText(Comment, isCitation);
 		}
 
-		protected string GetHtmlCommentText(Comment comment, bool isCitation=false)
+		protected string GetHtmlCommentText(Comment comment, bool isCitation = false)
 		{
 			var html = comment.Text.Trim()
 				.EscapeHtml()
@@ -580,7 +580,7 @@ namespace Database.Models
 			return new List<string> { ParentComment.AuthorId };
 		}
 	}
-	
+
 	[NotificationType(NotificationType.NewCommentFromYourGroupStudent)]
 	public class NewCommentFromYourGroupStudentNotification : AbstractCommentNotification
 	{
@@ -666,7 +666,7 @@ namespace Database.Models
 			if (html)
 			{
 				reviewText += $"<b>{reviewPosition}</b>";
-				
+
 				var codeFragment = GetSolutionCodeFragments(solutionCodeLines, review).EscapeHtml().LineEndingsToBrTags();
 				var reviewCommentHtml = review.Comment.EscapeHtml().RenderSimpleMarkdown(isHtml: false, telegramMode: true).LineEndingsToBrTags();
 				reviewText += $"<br/><pre>{codeFragment}</pre>";
@@ -677,7 +677,7 @@ namespace Database.Models
 					if (withAuthorsNames)
 						reviewText += $"<i>{review.Author.VisibleName.EscapeHtml()}:</i><br/>";
 					reviewText += reviewCommentHtml;
-					
+
 					foreach (var comment in comments)
 					{
 						reviewText += "<br/><br/>";
@@ -691,7 +691,7 @@ namespace Database.Models
 				}
 				else
 				{
-					reviewText += $"Комментарий: {reviewCommentHtml}<br/><br/>";	
+					reviewText += $"Комментарий: {reviewCommentHtml}<br/><br/>";
 				}
 			}
 			else
@@ -709,7 +709,7 @@ namespace Database.Models
 
 			return reviewText;
 		}
-		
+
 		protected string GetReviewsText(ManualExerciseChecking checking, bool html)
 		{
 			var commentsText = "";
@@ -723,6 +723,7 @@ namespace Database.Models
 					commentsText += $"{++reviewIndex}. {GetReviewText(review, solutionCodeLines, html, withAuthorsNames: false)}";
 				}
 			}
+
 			return commentsText;
 		}
 
@@ -945,15 +946,15 @@ namespace Database.Models
 	public class ReceivedCommentToCodeReviewNotification : AbstractCodeReviewNotification
 	{
 		public int? CommentId { get; set; }
-		
+
 		public virtual ExerciseCodeReviewComment Comment { get; set; }
-		
+
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
 			var checking = Comment?.Review?.ExerciseChecking;
 			if (checking == null)
 				return null;
-			
+
 			var slide = course.FindSlideById(checking.SlideId);
 			if (slide == null)
 				return null;
@@ -981,7 +982,7 @@ namespace Database.Models
 			var checking = Comment?.Review?.ExerciseChecking;
 			if (checking == null)
 				return null;
-			
+
 			var slide = course.FindSlideById(checking.SlideId);
 			if (slide == null)
 				return null;
@@ -994,7 +995,7 @@ namespace Database.Models
 
 				return messagePrefix + commentsText;
 			}
-			
+
 			if (transport is TelegramNotificationTransport)
 			{
 				return messagePrefix + Comment.Text;
@@ -1034,7 +1035,7 @@ namespace Database.Models
 		{
 			return CommentId != null && Comment != null;
 		}
-		
+
 		public override List<Notification> GetBlockerNotifications(ULearnDb db)
 		{
 			var reviewId = Comment.ReviewId;
@@ -1050,7 +1051,7 @@ namespace Database.Models
 			var slide = course.FindSlideById(Comment?.Review?.ExerciseChecking?.SlideId ?? Guid.Empty);
 			if (slide == null)
 				return null;
-			
+
 			var isStudent = currentUserId == Comment.Review.ExerciseChecking.UserId;
 			var url = GetSlideUrl(course, slide, baseUrl);
 			if (!isStudent)
@@ -1165,7 +1166,7 @@ namespace Database.Models
 
 		public override bool IsActual()
 		{
-			return Access != null && ! Access.IsEnabled;
+			return Access != null && !Access.IsEnabled;
 		}
 	}
 
@@ -1201,12 +1202,12 @@ namespace Database.Models
 		{
 			var groupsRepo = new GroupsRepo(db, WebCourseManager.Instance);
 			var accesses = groupsRepo.GetGroupAccesses(GroupId);
-			return accesses.Select(a => a.UserId).Concat(new [] { Group.OwnerId }).ToList();
+			return accesses.Select(a => a.UserId).Concat(new[] { Group.OwnerId }).ToList();
 		}
 
 		public override bool IsActual()
 		{
-			return User != null && ! Group.IsDeleted;
+			return User != null && !Group.IsDeleted;
 		}
 	}
 
@@ -1215,7 +1216,7 @@ namespace Database.Models
 		protected AbstractMassGroupOperationNotification()
 		{
 		}
-		
+
 		protected AbstractMassGroupOperationNotification(int groupId, List<string> userIds, UsersRepo usersRepo)
 		{
 			GroupId = groupId;
@@ -1238,7 +1239,7 @@ namespace Database.Models
 
 		/* Comma-separeted */
 		public string UserIds { get; set; }
-		
+
 		public string UserDescriptions { get; set; }
 
 		[Required]
@@ -1258,7 +1259,7 @@ namespace Database.Models
 		{
 			var groupsRepo = new GroupsRepo(db, WebCourseManager.Instance);
 			var accesses = groupsRepo.GetGroupAccesses(GroupId);
-			return accesses.Select(a => a.UserId).Concat(new [] { Group.OwnerId }).ToList();
+			return accesses.Select(a => a.UserId).Concat(new[] { Group.OwnerId }).ToList();
 		}
 
 		public override bool IsActual()
@@ -1266,7 +1267,7 @@ namespace Database.Models
 			return UserIds.Length > 0;
 		}
 	}
-	
+
 	[NotificationType(NotificationType.GroupMembersHaveBeenRemoved)]
 	public class GroupMembersHaveBeenRemovedNotification : AbstractMassGroupOperationNotification
 	{
@@ -1274,7 +1275,7 @@ namespace Database.Models
 			: base()
 		{
 		}
-		
+
 		public GroupMembersHaveBeenRemovedNotification(int groupId, List<string> userIds, UsersRepo usersRepo)
 			: base(groupId, userIds, usersRepo)
 		{
@@ -1284,7 +1285,7 @@ namespace Database.Models
 		{
 			var usersCount = UserIds.Split(',').Length;
 			return $"<b>{InitiatedBy.VisibleName.EscapeHtml()}</b> удалил{InitiatedBy.Gender.ChooseEnding()} " +
-				   $"{usersCount.PluralizeInRussian(RussianPluralizationOptions.StudentsDative)} из группы <b>«{Group.Name.EscapeHtml()}»</b> (курс «{course.Title.EscapeHtml()}»): {UserDescriptions.EscapeHtml()}.";
+					$"{usersCount.PluralizeInRussian(RussianPluralizationOptions.StudentsDative)} из группы <b>«{Group.Name.EscapeHtml()}»</b> (курс «{course.Title.EscapeHtml()}»): {UserDescriptions.EscapeHtml()}.";
 		}
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
@@ -1294,14 +1295,14 @@ namespace Database.Models
 					$"{usersCount.PluralizeInRussian(RussianPluralizationOptions.StudentsDative)} из группы «{Group.Name}» (курс «{course.Title}»): {UserDescriptions}.";
 		}
 	}
-	
+
 	[NotificationType(NotificationType.GroupMembersHaveBeenAdded)]
 	public class GroupMembersHaveBeenAddedNotification : AbstractMassGroupOperationNotification
 	{
 		public GroupMembersHaveBeenAddedNotification()
 		{
 		}
-		
+
 		public GroupMembersHaveBeenAddedNotification(int groupId, List<string> userIds, UsersRepo usersRepo)
 			: base(groupId, userIds, usersRepo)
 		{
@@ -1319,7 +1320,7 @@ namespace Database.Models
 					$"{UsersCount.PluralizeInRussian(RussianPluralizationOptions.StudentsDative)} в группу «{Group.Name}» (курс «{course.Title}»): {UserDescriptions}.";
 		}
 	}
-	
+
 	[NotificationType(NotificationType.NewCommentForInstructorsOnly)]
 	public class NewCommentForInstructorsOnlyNotification : AbstractCommentNotification
 	{
@@ -1464,7 +1465,7 @@ namespace Database.Models
 			return true;
 		}
 	}
-	
+
 	[NotificationType(NotificationType.NotUploadedPackage)]
 	public class NotUploadedPackageNotification : AbstractPackageNotification
 	{
@@ -1490,7 +1491,7 @@ namespace Database.Models
 		{
 			return new UserRolesRepo(db).GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, CourseId);
 		}
-		
+
 		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
 			return new NotificationButton("Перейти к коммиту", GitUtils.RepoUrlToCommitLink(RepoUrl, CommitHash));
@@ -1538,6 +1539,7 @@ namespace Database.Models
 	{
 		[Required]
 		public int ProcessId { get; set; }
+
 		public virtual StepikExportProcess Process { get; set; }
 
 		/* TODO (andgein): Process.UlearnCourseId should be safely urlized */

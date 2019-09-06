@@ -14,7 +14,7 @@ namespace Ulearn.Core.Courses
 		DirectoryInfo CourseXmlDirectory { get; }
 		List<Unit> Units { get; }
 		List<Slide> Slides { get; }
-		
+
 		Slide FindSlideById(Guid slideId);
 		Slide GetSlideById(Guid slideId);
 		Slide FindSlideByIndex(int index);

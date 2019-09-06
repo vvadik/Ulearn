@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Ulearn.Core.CSharp.Validators
 {
-	public class ArrayLengthStyleValidator: BaseStyleValidator
+	public class ArrayLengthStyleValidator : BaseStyleValidator
 	{
 		public override List<SolutionStyleError> FindErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
@@ -22,7 +22,7 @@ namespace Ulearn.Core.CSharp.Validators
 				.ToList();
 		}
 
-		private IEnumerable<SolutionStyleError> InspectMethod<TCycle>(TCycle cycleStatement, SemanticModel semanticModel) where TCycle: StatementSyntax
+		private IEnumerable<SolutionStyleError> InspectMethod<TCycle>(TCycle cycleStatement, SemanticModel semanticModel) where TCycle : StatementSyntax
 		{
 			var forStatement = cycleStatement as ForStatementSyntax;
 			var methodInvocations = (forStatement != null
@@ -39,7 +39,7 @@ namespace Ulearn.Core.CSharp.Validators
 					|| argumentExpression == null
 					|| !argumentExpression.IsKind(SyntaxKind.NumericLiteralExpression))
 					continue;
-				
+
 				var variable = methodInvocation
 					.Expression
 					.DescendantNodes()

@@ -16,7 +16,7 @@ namespace RunCheckerJob
 			try
 			{
 				var result = JsonConvert.DeserializeObject<RunningResults>(output);
-				if(result == null)
+				if (result == null)
 					throw new Exception();
 				return result;
 			}

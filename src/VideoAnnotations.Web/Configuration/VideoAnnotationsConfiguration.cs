@@ -11,9 +11,9 @@ namespace Ulearn.VideoAnnotations.Web.Configuration
 	public class VideoAnnotationsServiceConfiguration
 	{
 		public string GoogleDocsApiKey { get; set; }
-		
+
 		public TimeSpan Timeout { get; set; }
-		
+
 		public CacheConfiguration Cache { get; set; } = new CacheConfiguration();
 	}
 

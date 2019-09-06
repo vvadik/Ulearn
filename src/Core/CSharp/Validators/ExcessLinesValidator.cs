@@ -78,7 +78,7 @@ namespace Ulearn.Core.CSharp.Validators
 		{
 			SyntaxNode[] statements;
 			SyntaxNode target;
-			if (syntaxNode.Parent is MethodDeclarationSyntax 
+			if (syntaxNode.Parent is MethodDeclarationSyntax
 				|| syntaxNode.Parent is StatementSyntax
 				|| syntaxNode.Parent is ConstructorDeclarationSyntax)
 			{
@@ -90,6 +90,7 @@ namespace Ulearn.Core.CSharp.Validators
 				statements = GetStatements(syntaxNode.Parent);
 				target = syntaxNode;
 			}
+
 			if (statements.Length == 0)
 				return null;
 
@@ -139,6 +140,7 @@ namespace Ulearn.Core.CSharp.Validators
 				case CompilationUnitSyntax compilationUnitSyntax:
 					return compilationUnitSyntax.Members.Cast<SyntaxNode>().ToArray();
 			}
+
 			return new SyntaxNode[0];
 		}
 

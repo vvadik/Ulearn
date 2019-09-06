@@ -80,6 +80,7 @@ namespace uLearn.Web.Models
 				var slideScore = ScoreByUserAndSlide[Tuple.Create(userId, slide.Id)];
 				onlyFullScore += GetOnlyFullScore(slideScore, slide);
 			}
+
 			return onlyFullScore + AdditionalScores[Tuple.Create(userId, unit.Id, scoringGroup.Id)];
 		}
 
@@ -89,7 +90,7 @@ namespace uLearn.Web.Models
 		public int GetOnlyFullScore(int score, Slide slide)
 		{
 			var isExercise = slide is ExerciseSlide;
-			if (! isExercise)
+			if (!isExercise)
 				return score;
 			return score == slide.MaxScore ? score : 0;
 		}
@@ -135,7 +136,7 @@ namespace uLearn.Web.Models
 		public string UserVisibleName { get; private set; }
 		public string UserName { get; private set; }
 		public string UserFirstName { get; private set; }
-		public string UserLastName { get; private set; }		
+		public string UserLastName { get; private set; }
 		public string UserEmail { get; private set; }
 	}
 

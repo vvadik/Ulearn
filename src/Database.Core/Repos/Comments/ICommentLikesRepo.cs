@@ -14,9 +14,10 @@ namespace Database.Repos.Comments
 
 		Task<List<CommentLike>> GetLikesAsync(int commentId);
 		Task<List<ApplicationUser>> GetUsersLikedComment(int commentId);
-		
+
 		/// <returns>{commentId => likesCount}</returns>
 		Task<DefaultDictionary<int, int>> GetLikesCountsAsync(IEnumerable<int> commentIds);
+
 		Task<int> GetLikesCountAsync(int commentId);
 
 		Task<List<int>> GetCommentsLikedByUserAsync(string courseId, Guid slideId, string userId);

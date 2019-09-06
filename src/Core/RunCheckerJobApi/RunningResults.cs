@@ -7,9 +7,12 @@ namespace Ulearn.Core.RunCheckerJobApi
 	public class RunningResults
 	{
 		public string Id { get; set; }
+
 		[JsonProperty(Required = Required.Always)]
 		public readonly Verdict Verdict;
+
 		[NotNull] public readonly string CompilationOutput;
+
 		// Для вывода пользователю используется GetOutput()
 		[NotNull] public readonly string Output; // Для C# это stdout
 		[NotNull] public readonly string Error; // Для C# это stderr
@@ -47,6 +50,7 @@ namespace Ulearn.Core.RunCheckerJobApi
 					message = string.Join("\n", new[] { Output, Error }.Where(s => !string.IsNullOrWhiteSpace(s)));
 					break;
 			}
+
 			return $"Id: {Id}, Verdict: {Verdict}: {message}";
 		}
 

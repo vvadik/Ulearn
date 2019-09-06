@@ -18,13 +18,14 @@ namespace Ulearn.Web.Api.Authorization
 			this.minCourseRoleType = minCourseRoleType;
 		}
 	}
-	
+
 	public class CourseRoleAuthorizationHandler : BaseCourseAuthorizationHandler<CourseRoleRequirement>
 	{
 		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IUsersRepo usersRepo;
 
-		public CourseRoleAuthorizationHandler(ICourseRolesRepo courseRolesRepo, IUsersRepo usersRepo, ILogger logger) : base(logger)
+		public CourseRoleAuthorizationHandler(ICourseRolesRepo courseRolesRepo, IUsersRepo usersRepo, ILogger logger)
+			: base(logger)
 		{
 			this.courseRolesRepo = courseRolesRepo;
 			this.usersRepo = usersRepo;
@@ -46,7 +47,7 @@ namespace Ulearn.Web.Api.Authorization
 				context.Fail();
 				return;
 			}
-			
+
 			if (!context.User.Identity.IsAuthenticated)
 			{
 				context.Fail();

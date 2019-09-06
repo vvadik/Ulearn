@@ -18,13 +18,14 @@ namespace Notifications
 
 			Text = text;
 		}
-		
-		public EmailButton(NotificationButton notificationButton) : this(notificationButton.Link, notificationButton.Text)
+
+		public EmailButton(NotificationButton notificationButton)
+			: this(notificationButton.Link, notificationButton.Text)
 		{
 		}
 
 		public string Link { get; private set; }
-		
+
 		public string Text { get; private set; }
 	}
 }

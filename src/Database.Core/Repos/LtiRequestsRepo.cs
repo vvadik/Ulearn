@@ -21,7 +21,7 @@ namespace Database.Repos
 			this.db = db;
 			serializer = new JsonSerializer();
 		}
-		
+
 		public Task Update(string courseId, string userId, Guid slideId, string ltiRequestJson)
 		{
 			return FuncUtils.TrySeveralTimesAsync(() => TryUpdate(courseId, slideId, userId, ltiRequestJson), 3);

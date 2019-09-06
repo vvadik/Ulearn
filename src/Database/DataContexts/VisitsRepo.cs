@@ -11,7 +11,7 @@ namespace Database.DataContexts
 	public class VisitsRepo
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(VisitsRepo));
-		
+
 		private readonly ULearnDb db;
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
 
@@ -37,6 +37,7 @@ namespace Database.DataContexts
 			}
 			else if (visit.IpAddress != ipAddress)
 				visit.IpAddress = ipAddress;
+
 			return db.SaveChangesAsync();
 		}
 
@@ -44,17 +45,17 @@ namespace Database.DataContexts
 		{
 			return db.Visits.Count(x => x.CourseId == courseId && x.SlideId == slideId);
 		}
-		
+
 		public Visit FindVisit(string courseId, Guid slideId, string userId)
 		{
 			return db.Visits.FirstOrDefault(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId);
 		}
-		
+
 		public bool IsUserVisitedSlide(string courseId, Guid slideId, string userId)
 		{
 			return FindVisit(courseId, slideId, userId) != null;
 		}
-		
+
 		public HashSet<Guid> GetIdOfVisitedSlides(string courseId, string userId)
 		{
 			return new HashSet<Guid>(db.Visits.Where(v => v.UserId == userId && v.CourseId == courseId).Select(x => x.SlideId));
@@ -72,7 +73,7 @@ namespace Database.DataContexts
 			newScore = Math.Min(newScore, maxSlideScore);
 			var isPassed = slideCheckingsRepo.IsSlidePassed(courseId, slideId, userId);
 			log.Info($"Обновляю количество баллов пользователя {userId} за слайд {slideId} в курсе \"{courseId}\". " +
-					 $"Новое количество баллов: {newScore}, слайд пройден: {isPassed}");
+					$"Новое количество баллов: {newScore}, слайд пройден: {isPassed}");
 			return UpdateAttempts(courseId, slideId, userId, visit =>
 			{
 				visit.Score = newScore;
@@ -122,7 +123,7 @@ namespace Database.DataContexts
 
 		public Task MarkVisitsAsWithManualChecking(string courseId, Guid slideId, string userId)
 		{
-			 return UpdateAttempts(courseId, slideId, userId, visit => { visit.HasManualChecking = true; });
+			return UpdateAttempts(courseId, slideId, userId, visit => { visit.HasManualChecking = true; });
 		}
 
 		public int GetScore(string courseId, Guid slideId, string userId)
@@ -175,6 +176,7 @@ namespace Database.DataContexts
 					continue;
 				db.Visits.Add(visit);
 			}
+
 			await db.SaveChangesAsync();
 		}
 
@@ -202,6 +204,7 @@ namespace Database.DataContexts
 				else
 					filteredVisits = filteredVisits.Where(v => options.UserIds.Contains(v.UserId));
 			}
+
 			return filteredVisits;
 		}
 
@@ -248,7 +251,7 @@ namespace Database.DataContexts
 		{
 			return db.Visits.Where(v => v.CourseId == courseId).Select(v => v.UserId).Distinct().ToList();
 		}
-		
+
 		public List<RatingEntry> GetCourseRating(string courseId, int minScore, List<Guid> requiredSlides)
 		{
 			var grouppedVisits = db.Visits.Where(v => v.CourseId == courseId)

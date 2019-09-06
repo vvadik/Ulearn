@@ -21,7 +21,7 @@ namespace Ulearn.Core.CSharp.Validators
 			SolutionStyleError error = null;
 			if (requireRecursion && !recursiveMethods.Any())
 			{
-			 	error = new SolutionStyleError(StyleErrorType.Recursion01, userSolution.GetRoot());
+				error = new SolutionStyleError(StyleErrorType.Recursion01, userSolution.GetRoot());
 			}
 
 			if (!requireRecursion && recursiveMethods.Any())
@@ -36,8 +36,8 @@ namespace Ulearn.Core.CSharp.Validators
 		private static bool IsRecursive(MethodDeclarationSyntax method)
 		{
 			return method.Body != null && method.Body.DescendantNodes()
-					.OfType<SimpleNameSyntax>()
-					.Any(n => n.Identifier.ValueText == method.Identifier.ValueText);
+						.OfType<SimpleNameSyntax>()
+						.Any(n => n.Identifier.ValueText == method.Identifier.ValueText);
 		}
 	}
 }

@@ -34,6 +34,7 @@ namespace uLearn.CourseTool
 	{
 		[XmlAttribute("name")]
 		public string Name;
+
 		public string UlearnUrl;
 	}
 }

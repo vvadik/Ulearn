@@ -14,7 +14,7 @@ namespace uLearn.Web.Models
 		public BlockRenderContext BlockRenderContext { get; set; }
 		public AbstractManualSlideChecking ManualChecking { get; set; }
 		public string ContextManualCheckingUserGroups { get; set; }
-		public string ContextManualCheckingUserArchivedGroups { get; set; }		
+		public string ContextManualCheckingUserArchivedGroups { get; set; }
 		public bool IsGuest { get; set; }
 		public string Error { get; set; }
 		public string SlideEditUrl { get; set; }

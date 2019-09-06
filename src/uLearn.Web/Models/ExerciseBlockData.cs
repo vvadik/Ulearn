@@ -25,7 +25,7 @@ namespace uLearn.Web.Models
 		public string CourseId { get; set; }
 		public ExerciseSlide Slide { get; set; }
 		public AbstractExerciseBlock Block => Slide.Exercise;
-		
+
 		public ApplicationUser CurrentUser { get; set; }
 
 		public bool IsLti { get; set; }

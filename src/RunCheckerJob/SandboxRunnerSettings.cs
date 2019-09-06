@@ -11,7 +11,7 @@ namespace RunCheckerJob
 		public int MemoryLimit = 64 * 1024 * 1024;
 		public int OutputLimit = 10 * 1024 * 1024;
 		public TimeSpan WaitSandboxAfterKilling = TimeSpan.FromSeconds(5);
-		
+
 		public static readonly DirectoryInfo WorkingDirectory;
 		public static readonly bool DeleteSubmissionsAfterFinish;
 

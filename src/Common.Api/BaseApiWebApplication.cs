@@ -153,7 +153,7 @@ namespace Ulearn.Common.Api
 				var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
 				if (new FileInfo(xmlPath).Exists)
 					c.IncludeXmlComments(xmlPath);
-				
+
 				ConfigureSwaggerDocumentationGeneration(c);
 			});
 		}

@@ -27,8 +27,8 @@ namespace Web.Api.Tests.Controllers
 {
 	public class BaseControllerTests
 	{
-		private WebApplication application;		
-		
+		private WebApplication application;
+
 		protected Logger logger;
 		protected UlearnDb db;
 		protected IServiceProvider serviceProvider;
@@ -56,7 +56,7 @@ namespace Web.Api.Tests.Controllers
 			application = new WebApplication();
 		}
 
-		public async Task SetupTestInfrastructureAsync(Action<IServiceCollection> addServices=null)
+		public async Task SetupTestInfrastructureAsync(Action<IServiceCollection> addServices = null)
 		{
 			logger = new LoggerConfiguration()
 				.MinimumLevel.Information()
@@ -68,14 +68,14 @@ namespace Web.Api.Tests.Controllers
 			db = CreateDbContext(loggerFactory);
 
 			serviceProvider = ConfigureServices(addServices);
-			
+
 			await CreateInitialDataInDatabaseAsync().ConfigureAwait(false);
 			await CreateTestUsersAsync().ConfigureAwait(false);
-			
+
 			/* Configuring Z.EntityFramework.Plus for working with In-Memory database
 			   See https://entityframework-plus.net/batch-delete for details */
 			BatchDeleteManager.InMemoryDbContextFactory = () => CreateDbContext(loggerFactory);
-			
+
 			/* Cache Manager is not working with In-Memory database.
 			   See https://github.com/zzzprojects/EntityFramework-Plus/issues/391 for details. */
 			QueryCacheManager.IsEnabled = false;
@@ -95,14 +95,14 @@ namespace Web.Api.Tests.Controllers
 			optionsBuilder.UseInMemoryDatabase("ulearn_test_database");
 			if (loggerFactory != null)
 				optionsBuilder.UseLoggerFactory(loggerFactory);
-			
+
 			return new UlearnDb(optionsBuilder.Options);
 		}
 
-		private IServiceProvider ConfigureServices(Action<IServiceCollection> addServices=null)
+		private IServiceProvider ConfigureServices(Action<IServiceCollection> addServices = null)
 		{
 			var services = new ServiceCollection();
-			
+
 			services.AddSingleton(db);
 			services.AddLogging(builder => builder.AddSerilog(logger));
 			application.ConfigureDi(services, logger);
@@ -117,9 +117,9 @@ namespace Web.Api.Tests.Controllers
 		private async Task CreateTestUsersAsync(UlearnUserManager userManager)
 		{
 			var result = await userManager.CreateAsync(TestUsers.Admin, TestUsers.AdminPassword).ConfigureAwait(false);
-			if (! result.Succeeded)
+			if (!result.Succeeded)
 				throw new InvalidOperationException($"Can't create admin user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-			
+
 			TestUsers.Admin = await userManager.FindByNameAsync(TestUsers.Admin.UserName).ConfigureAwait(false);
 			logger.Information($"Created user {TestUsers.Admin.UserName} with password {TestUsers.AdminPassword}, id = {TestUsers.Admin.Id}");
 			await userManager.AddToRoleAsync(TestUsers.Admin, LmsRoleType.SysAdmin.ToString()).ConfigureAwait(false);

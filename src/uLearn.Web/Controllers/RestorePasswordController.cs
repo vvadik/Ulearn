@@ -109,7 +109,7 @@ namespace uLearn.Web.Controllers
 			var user = await userManager.FindByNameAsync(info);
 			if (user != null)
 				return new List<ApplicationUser> { user };
-			return db.Users.Where(u => u.Email == info && ! u.IsDeleted).ToList();
+			return db.Users.Where(u => u.Email == info && !u.IsDeleted).ToList();
 		}
 
 		private async Task SendRestorePasswordEmail(string requestId, ApplicationUser user)
@@ -193,6 +193,7 @@ namespace uLearn.Web.Controllers
 				answer.Errors = result.Errors.ToArray();
 				return View(answer);
 			}
+
 			metricSender.SendCount("restore_password.set_new_password");
 
 			await requestRepo.DeleteRequest(model.RequestId);
@@ -203,6 +204,7 @@ namespace uLearn.Web.Controllers
 				answer.Errors = new[] { "Пользователь был удалён администраторами" };
 				return View(answer);
 			}
+
 			await AuthenticationManager.LoginAsync(HttpContext, user, false);
 
 			return RedirectToAction("Index", "Home");

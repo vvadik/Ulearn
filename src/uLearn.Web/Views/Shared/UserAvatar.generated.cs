@@ -163,12 +163,10 @@ public static System.Web.WebPages.HelperResult SmallAvatar(ApplicationUser user,
 #line default
 #line hidden
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
- 
-	
+  
 WriteTo(__razor_helper_writer, Avatar(user, "small " + classes));
 
-                                     
-
+                                    
 });
 
 #line default
@@ -184,12 +182,10 @@ public static System.Web.WebPages.HelperResult ExtraSmallAvatar(ApplicationUser 
 #line default
 #line hidden
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
- 
-	
+  
 WriteTo(__razor_helper_writer, Avatar(user, "xsmall " + classes));
 
-                                      
-
+                                     
 });
 
 #line default
@@ -205,12 +201,10 @@ public static System.Web.WebPages.HelperResult LargeAvatar(ApplicationUser user,
 #line default
 #line hidden
 return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
- 
-	
+  
 WriteTo(__razor_helper_writer, Avatar(user, "large " + classes));
 
-                                     
-
+                                    
 });
 
 #line default

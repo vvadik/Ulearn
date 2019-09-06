@@ -17,7 +17,7 @@ namespace Ulearn.Core.CSharp
 		{
 			var degree = argumentListSyntax.Arguments[1].ToString();
 			return double.TryParse(degree, out var degreeValue) &&
-				forbiddenDegrees.Contains(degreeValue);
+					forbiddenDegrees.Contains(degreeValue);
 		}
 
 		private static bool IsMathPowMethodName(string methodName)

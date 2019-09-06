@@ -31,14 +31,14 @@ namespace Ulearn.Core.Courses
 		[XmlArray("units")]
 		[XmlArrayItem("add")]
 		public string[] UnitPaths { get; set; } = new string[0];
-		
+
 		[XmlArray("preludes")]
 		[XmlArrayItem("prelude")]
 		public PreludeFile[] Preludes { get; set; }
 
 		[XmlElement("dictionaryFile")]
 		public string DictionaryFile { get; set; }
-		
+
 		[XmlElement("description")]
 		public string Description { get; set; }
 
@@ -123,7 +123,7 @@ namespace Ulearn.Core.Courses
 		public string File { get; set; }
 
 		#region Equals
-		
+
 		protected bool Equals(PreludeFile other)
 		{
 			return Language == other.Language && string.Equals(File, other.File);
@@ -147,7 +147,7 @@ namespace Ulearn.Core.Courses
 				return ((int)Language * 397) ^ (File != null ? File.GetHashCode() : 0);
 			}
 		}
-		
+
 		#endregion
 	}
 }

@@ -99,6 +99,7 @@ namespace uLearn.Web.Controllers
 					var groupUsersIds = groupsRepo.GetGroupMembersAsUsers(accessableGroupId).Select(u => u.Id);
 					usersIds.AddAll(groupUsersIds);
 				}
+
 				result.UserIds = usersIds.ToList();
 				return result;
 			}
@@ -120,6 +121,7 @@ namespace uLearn.Web.Controllers
 						usersIds.AddAll(groupMembersIds);
 				}
 			}
+
 			result.UserIds = usersIds.ToList();
 			return result;
 		}
@@ -147,6 +149,7 @@ namespace uLearn.Web.Controllers
 				if (int.TryParse(groupId, out groupIdInt))
 					result.AddRange(enabledAdditionalScoringGroupsForGroups.GetOrDefault(groupIdInt, new List<string>()));
 			}
+
 			return result;
 		}
 
@@ -178,19 +181,19 @@ namespace uLearn.Web.Controllers
 				return (slide as QuizSlide).ManualChecking ? 0 : slide.MaxScore;
 			return slide.MaxScore;
 		}
-		
+
 		public static int GetManualCheckingsCountInQueue(SlideCheckingsRepo slideCheckingsRepo, GroupsRepo groupsRepo, IPrincipal user, string courseId, Slide slide, List<string> groupsIds)
 		{
 			var filterOptions = GetFilterOptionsByGroup<ManualCheckingQueueFilterOptions>(groupsRepo, user, courseId, groupsIds);
 			if (filterOptions.UserIds == null)
 				groupsIds = new List<string> { "all" };
 			filterOptions.SlidesIds = new List<Guid> { slide.Id };
-			
+
 			if (slide is ExerciseSlide)
 				return slideCheckingsRepo.GetManualCheckingQueue<ManualExerciseChecking>(filterOptions).Count();
 			if (slide is QuizSlide)
 				return slideCheckingsRepo.GetManualCheckingQueue<ManualQuizChecking>(filterOptions).Count();
-			
+
 			throw new ArgumentException("Slide should be quiz or exercise", nameof(slide));
 		}
 	}

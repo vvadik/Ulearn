@@ -44,6 +44,7 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 				{
 					code = values[0];
 				}
+
 				values = query.GetValues("state");
 				if (values != null && values.Count == 1)
 				{
@@ -99,11 +100,13 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 					context.Identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, context.Id, XmlSchemaString,
 						Options.AuthenticationType));
 				}
+
 				if (!string.IsNullOrEmpty(context.UserName))
 				{
 					context.Identity.AddClaim(new Claim(ClaimsIdentity.DefaultNameClaimType, context.UserName, XmlSchemaString,
 						Options.AuthenticationType));
 				}
+
 				if (!string.IsNullOrEmpty(context.FirstName))
 					context.Identity.AddClaim(new Claim(ClaimTypes.GivenName, context.FirstName));
 				if (!string.IsNullOrEmpty(context.LastName))
@@ -121,6 +124,7 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 			{
 				_logger.WriteError(ex.Message);
 			}
+
 			return new AuthenticationTicket(null, properties);
 		}
 
@@ -207,6 +211,7 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 						grantIdentity = new ClaimsIdentity(grantIdentity.Claims, context.SignInAsAuthenticationType,
 							grantIdentity.NameClaimType, grantIdentity.RoleClaimType);
 					}
+
 					Context.Authentication.SignIn(context.Properties, grantIdentity);
 				}
 
@@ -219,6 +224,7 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 
 				return context.IsRequestCompleted;
 			}
+
 			return false;
 		}
 	}

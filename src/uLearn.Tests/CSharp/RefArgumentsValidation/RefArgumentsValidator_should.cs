@@ -46,6 +46,7 @@ namespace uLearn.CSharp.RefArgumentsValidation
 			{
 				Console.WriteLine(errors);
 			}
+
 			errors.Should().BeNullOrEmpty();
 		}
 	}

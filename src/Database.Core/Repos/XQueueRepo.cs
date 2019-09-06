@@ -82,9 +82,9 @@ namespace Database.Repos
 		public List<XQueueExerciseSubmission> GetXQueueSubmissionsReadyToSentResults(XQueueWatcher watcher)
 		{
 			return db.XQueueExerciseSubmissions
-					.Include(s => s.Submission.AutomaticChecking)
-					.Where(s => s.WatcherId == watcher.Id && !s.IsResultSent && s.Submission.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Done)
-					.ToList();
+				.Include(s => s.Submission.AutomaticChecking)
+				.Where(s => s.WatcherId == watcher.Id && !s.IsResultSent && s.Submission.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Done)
+				.ToList();
 		}
 	}
 }

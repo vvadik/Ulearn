@@ -2,7 +2,7 @@
 
 namespace Database.Models
 {
-	public enum LmsRoles 
+	public enum LmsRoles
 	{
 		[Display(Name = "Сис. админ")]
 		SysAdmin

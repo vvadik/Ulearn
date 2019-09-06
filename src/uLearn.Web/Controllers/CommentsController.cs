@@ -27,7 +27,7 @@ namespace uLearn.Web.Controllers
 		private readonly CommentsRepo commentsRepo;
 		private readonly NotificationsRepo notificationsRepo;
 		private readonly CoursesRepo coursesRepo;
-		private readonly SystemAccessesRepo systemAccessesRepo;		
+		private readonly SystemAccessesRepo systemAccessesRepo;
 		private readonly UserManager<ApplicationUser> userManager;
 
 		public CommentsController(ULearnDb db)
@@ -44,7 +44,7 @@ namespace uLearn.Web.Controllers
 		{
 		}
 
-		public ActionResult SlideComments(string courseId, Guid slideId, bool showOnlyInstructorsOnlyComments=false)
+		public ActionResult SlideComments(string courseId, Guid slideId, bool showOnlyInstructorsOnlyComments = false)
 		{
 			var course = courseManager.GetCourse(courseId);
 			var slide = course.FindSlideById(slideId);
@@ -79,7 +79,7 @@ namespace uLearn.Web.Controllers
 			var systemAccesses = systemAccessesRepo.GetSystemAccesses(userId);
 			var courseAccesses = coursesRepo.GetCourseAccesses(courseId, userId);
 			var slideType = GetSlideType(slide);
-			
+
 			var model = new SlideCommentsModel
 			{
 				CourseId = courseId,
@@ -104,7 +104,7 @@ namespace uLearn.Web.Controllers
 			};
 			return PartialView(model);
 		}
-		
+
 		private static SlideType GetSlideType(Slide slide)
 		{
 			switch (slide)
@@ -240,7 +240,7 @@ namespace uLearn.Web.Controllers
 					await notificationsRepo.AddNotification(courseId, replyNotification, comment.AuthorId);
 				}
 			}
-			
+
 			/* Create NewCommentFromStudentFormYourGroupNotification later than RepliedToYourCommentNotification, because the last one is blocker for the first one.
 			 * We don't send NewCommentNotification if there is a RepliedToYouCommentNotification */
 			var commentFromYourGroupStudentNotification = new NewCommentFromYourGroupStudentNotification { Comment = comment };
@@ -249,7 +249,7 @@ namespace uLearn.Web.Controllers
 			/* Create NewCommentNotification later than RepliedToYourCommentNotification and NewCommentFromYourGroupStudentNotification, because the last one is blocker for the first one.
 			 * We don't send NewCommentNotification if there is a RepliedToYouCommentNotification or NewCommentFromYourGroupStudentNotification */
 			var notification = comment.IsForInstructorsOnly
-				? (Notification) new NewCommentForInstructorsOnlyNotification { Comment = comment } 
+				? (Notification)new NewCommentForInstructorsOnlyNotification { Comment = comment }
 				: new NewCommentNotification { Comment = comment };
 			await notificationsRepo.AddNotification(courseId, notification, comment.AuthorId);
 		}
@@ -292,7 +292,7 @@ namespace uLearn.Web.Controllers
 			if (comment == null)
 				return HttpNotFound();
 
-			if (! CanModerateComments(User, comment.CourseId))
+			if (!CanModerateComments(User, comment.CourseId))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
 			await commentsRepo.ApproveComment(commentId, isApproved);

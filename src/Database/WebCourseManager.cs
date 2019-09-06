@@ -36,6 +36,7 @@ namespace Database
 			{
 				course = null;
 			}
+
 			if (IsCourseVersionWasUpdatedRecent(courseId))
 				return course ?? throw new KeyNotFoundException($"Key {courseId} not found");
 
@@ -54,8 +55,10 @@ namespace Database
 					log.Info($"Загруженная версия курса {courseId} отличается от актуальной ({loadedVersionId.ToString()} != {publishedVersion.Id}). Обновляю курс.");
 					course = ReloadCourse(courseId);
 				}
+
 				loadedCourseVersions[courseId.ToLower()] = publishedVersion.Id;
 			}
+
 			return course ?? throw new KeyNotFoundException($"Key {courseId} not found");
 		}
 
@@ -73,7 +76,7 @@ namespace Database
 				loadedCourseVersions[courseId.ToLower()] = versionId;
 			}
 		}
-		
+
 		protected override void LoadCourseZipsToDiskFromExternalStorage(IEnumerable<string> existingOnDiskCourseIds)
 		{
 			log.Info($"Загружаю курсы из БД");
@@ -89,7 +92,7 @@ namespace Database
 					if (!versionCourseFile.Exists)
 						File.WriteAllBytes(versionCourseFile.FullName, zipFile.File);
 				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
 					log.Error($"Не смог загрузить {zipFile.CourseId} из базы данных", ex);
 				}

@@ -11,14 +11,14 @@ namespace Ulearn.Core
 {
 	public static class Markdown
 	{
-		public static string RenderMarkdown(this string markdown, FileInfo sourceFile, string baseUrl="")
+		public static string RenderMarkdown(this string markdown, FileInfo sourceFile, string baseUrl = "")
 		{
 			var relativeUrl = CourseUnitUtils.GetDirectoryRelativeWebPath(sourceFile);
 			baseUrl = baseUrl + relativeUrl;
 			return markdown.RenderMarkdown(baseUrl);
 		}
 
-		public static string RenderMarkdown(this string markdown, string baseUrlForRelativeLinks=null)
+		public static string RenderMarkdown(this string markdown, string baseUrlForRelativeLinks = null)
 		{
 			var texReplacer = new TexReplacer(markdown);
 

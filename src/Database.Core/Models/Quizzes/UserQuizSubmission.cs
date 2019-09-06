@@ -26,9 +26,9 @@ namespace Database.Models.Quizzes
 
 		[Required]
 		public DateTime Timestamp { get; set; }
-		
+
 		public virtual AutomaticQuizChecking AutomaticChecking { get; set; }
-		
+
 		public virtual ManualQuizChecking ManualChecking { get; set; }
 	}
 }

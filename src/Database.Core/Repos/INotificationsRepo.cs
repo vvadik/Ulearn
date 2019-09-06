@@ -33,8 +33,8 @@ namespace Database.Repos
 		Task MarkDeliveryAsFailedAsync(NotificationDelivery delivery);
 		string GetSecretHashForTelegramTransport(long chatId, string chatTitle, string key);
 		List<NotificationType> GetNotificationTypes(IPrincipal user, string courseId);
-		Task<List<T>> FindNotificationsAsync<T>(Expression<Func<T, bool>> func, Expression<Func<T, object>> includePath=null) where T : Notification;
-		List<T> FindNotifications<T>(Expression<Func<T, bool>> func, Expression<Func<T, object>> includePath=null) where T : Notification;
+		Task<List<T>> FindNotificationsAsync<T>(Expression<Func<T, bool>> func, Expression<Func<T, object>> includePath = null) where T : Notification;
+		List<T> FindNotifications<T>(Expression<Func<T, bool>> func, Expression<Func<T, object>> includePath = null) where T : Notification;
 		IQueryable<NotificationDelivery> GetTransportDeliveriesQueryable(NotificationTransport notificationTransport, DateTime from);
 		IQueryable<NotificationDelivery> GetTransportsDeliveriesQueryable(List<int> notificationTransportsIds, DateTime from);
 		Task<DateTime?> GetLastDeliveryTimestampAsync(NotificationTransport notificationTransport);

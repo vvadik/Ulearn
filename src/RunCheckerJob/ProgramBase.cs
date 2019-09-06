@@ -16,11 +16,11 @@ namespace RunCheckerJob
 		private readonly string address;
 		private readonly string token;
 		private readonly TimeSpan sleep;
-		private readonly string agentName; 
+		private readonly string agentName;
 
 		private readonly ManualResetEvent shutdownEvent = new ManualResetEvent(false);
 		private readonly List<Thread> threads = new List<Thread>();
-		
+
 		private static readonly ILog log = LogManager.GetLogger(typeof(ProgramBase));
 		protected abstract ISandboxRunnerClient SandboxRunnerClient { get; }
 		private readonly Language[] supportedLanguages;
@@ -54,10 +54,10 @@ namespace RunCheckerJob
 			}
 		}
 
-		protected void Run(bool joinAllThreads=true)
+		protected void Run(bool joinAllThreads = true)
 		{
 			log.Info($"Отправляю запросы на {address} для получения новых решений");
-			
+
 			var runCheckerJobConfiguration = ApplicationConfiguration.Read<RunCheckerJobConfiguration>().RunCheckerJob;
 			var threadsCount = runCheckerJobConfiguration.ThreadsCount ?? 1;
 			if (threadsCount < 1)
@@ -65,7 +65,7 @@ namespace RunCheckerJob
 				log.Error($"Не могу определить количество потоков для запуска из конфигурации: ${threadsCount}. Количество потоков должно быть положительно");
 				throw new ArgumentOutOfRangeException(nameof(threadsCount), $"Number of threads (runcheckerjob:threadsCount) should be positive");
 			}
-			
+
 			log.Info($"Запускаю {threadsCount} потока(ов)");
 			for (var i = 0; i < threadsCount; i++)
 			{
@@ -75,12 +75,13 @@ namespace RunCheckerJob
 					IsBackground = true
 				});
 			}
+
 			threads.ForEach(t => t.Start());
-			
+
 			if (joinAllThreads)
 				threads.ForEach(t => t.Join());
 		}
-		
+
 		private void WorkerThread()
 		{
 			log.Info($"Поток {Thread.CurrentThread.Name} запускается");
@@ -116,6 +117,7 @@ namespace RunCheckerJob
 				log.Error("Не могу создать HTTP-клиента для отправки запроса на ulearn", e);
 				throw;
 			}
+
 			MainLoop(client);
 		}
 

@@ -1,24 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>net47;netcoreapp2.2</TargetFrameworks>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="AspNetCore.Http.Extensions" Version="1.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <PackageReference Include="Serilog" Version="2.7.1" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Common.Api\Common.Api.csproj" />
-    <ProjectReference Include="..\Common\Common.csproj">
-      <Project>{3CC038A1-6AA0-49B0-9485-DB9589626BC3}</Project>
-      <Name>Common</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <PropertyGroup>
-    <!-- Temporary workaround for getting Microsoft.AspNetCore.Mvc.Code.dll in the output folder
+	<PropertyGroup>
+		<TargetFrameworks>net47;netcoreapp2.2</TargetFrameworks>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="AspNetCore.Http.Extensions" Version="1.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+		<PackageReference Include="Serilog" Version="2.7.1" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Common.Api\Common.Api.csproj" />
+		<ProjectReference Include="..\Common\Common.csproj">
+			<Project>{3CC038A1-6AA0-49B0-9485-DB9589626BC3}</Project>
+			<Name>Common</Name>
+		</ProjectReference>
+	</ItemGroup>
+	<PropertyGroup>
+		<!-- Temporary workaround for getting Microsoft.AspNetCore.Mvc.Code.dll in the output folder
          (for Ulearn.Web, which is .NET Framework project, not .NET Core) -->
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-  </PropertyGroup>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	</PropertyGroup>
 </Project>

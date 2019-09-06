@@ -26,25 +26,25 @@ namespace Ulearn.Core.Courses.Slides
 	{
 		[XmlAttribute("id")]
 		public Guid Id { get; set; }
-		
+
 		[XmlIgnore]
 		public string NormalizedGuid => Id.GetNormalizedGuid();
-		
+
 		[XmlAttribute("title")]
 		public string Title { get; set; }
-		
+
 		[XmlElement("meta")]
 		public SlideMetaDescription Meta { get; set; }
-		
+
 		[XmlElement("defaultIncludeCodeFile")]
 		public string DefaultIncludeCodeFile { get; set; }
-		
+
 		/* If you add new block type, don't forget to:
 		 * 1. Add it to AllowedBlockTypes of Slide, QuizSlide or ExerciseSlide
 		 * 2. If it's a common block, add it inside of SpoilerBlock tags too
 		 * 3. Add definition for new block type in BlockType.cs
 		 */
-		
+
 		/* Common blocks */
 		[XmlElement(typeof(YoutubeBlock))]
 		[XmlElement("markdown", typeof(MarkdownBlock))]
@@ -56,21 +56,19 @@ namespace Ulearn.Core.Courses.Slides
 		[XmlElement(typeof(IncludeImageGalleryBlock))]
 		[XmlElement("html", typeof(HtmlBlock))]
 		[XmlElement(typeof(SpoilerBlock))]
-		
 		/* Quiz blocks */
 		[XmlElement(typeof(IsTrueBlock))]
 		[XmlElement(typeof(ChoiceBlock))]
 		[XmlElement(typeof(FillInBlock))]
 		[XmlElement(typeof(OrderingBlock))]
 		[XmlElement(typeof(MatchingBlock))]
-		
 		/* Exercise blocks */
 		[XmlElement(typeof(CsProjectExerciseBlock))]
 		[XmlElement(typeof(SingleFileExerciseBlock))]
 		[XmlElement(typeof(UniversalExerciseBlock))]
 		[XmlChoiceIdentifier(nameof(DefineBlockType))]
 		public SlideBlock[] Blocks { get; set; }
-		
+
 		[XmlIgnore]
 		public BlockType[] DefineBlockType;
 
@@ -89,16 +87,16 @@ namespace Ulearn.Core.Courses.Slides
 			typeof(HtmlBlock),
 			typeof(SpoilerBlock)
 		};
-		
+
 		[XmlIgnore]
 		public SlideInfo Info { get; set; }
-		
+
 		public int Index => Info.Index;
-		
+
 		public virtual bool ShouldBeSolved => false;
 
 		public virtual int MaxScore => 0;
-		
+
 		[XmlIgnore]
 		public string LatinTitle => Title.ToLatin();
 
@@ -117,7 +115,7 @@ namespace Ulearn.Core.Courses.Slides
 		{
 			Blocks = blocks;
 		}
-		
+
 		/// <summary>
 		/// Validate slide. We guarantee that Validate() will be called after BuildUp() 
 		/// </summary>
@@ -137,14 +135,14 @@ namespace Ulearn.Core.Courses.Slides
 			Info = new SlideInfo(context.Unit, context.SlideFile, context.SlideIndex);
 			if (Blocks == null)
 				Blocks = new SlideBlock[0];
-			
+
 			/* Validate block types. We should do it before building up blocks */
 			CheckBlockTypes();
-			
+
 			/* ... and build blocks */
 			var slideLoadingContext = new SlideBuildingContext(context, this);
 			Blocks = Blocks.SelectMany(b => b.BuildUp(slideLoadingContext, ImmutableHashSet<string>.Empty)).ToArray();
-			
+
 			DefineBlockTypes();
 		}
 
@@ -165,7 +163,7 @@ namespace Ulearn.Core.Courses.Slides
 					);
 			}
 		}
-		
+
 		public AbstractQuestionBlock FindBlockById(string id)
 		{
 			return Blocks.OfType<AbstractQuestionBlock>().FirstOrDefault(block => block.Id == id);
@@ -175,7 +173,7 @@ namespace Ulearn.Core.Courses.Slides
 		{
 			return $"Title: {Title}, Id: {NormalizedGuid}, MaxScore: {MaxScore}";
 		}
-	
+
 		public IEnumerable<SlideBlock[]> GetBlockRangesWithSameVisibility()
 		{
 			if (Blocks.Length == 0)
@@ -188,13 +186,15 @@ namespace Ulearn.Core.Courses.Slides
 					yield return range.ToArray();
 					range.Clear();
 				}
+
 				range.Add(block);
 			}
+
 			yield return range.ToArray();
 		}
-		
+
 		#region ExportToEdx
-		
+
 		private static IEnumerable<Vertical> OrdinarySlideToVerticals(string courseId, Slide slide, string ulearnBaseUrl, Dictionary<string, string> videoGuids, string ltiId, DirectoryInfo coursePackageRoot)
 		{
 			var componentIndex = 0;
@@ -212,6 +212,7 @@ namespace Ulearn.Core.Courses.Slides
 							var component = block.ToEdxComponent("", courseId, slide, componentIndex, ulearnBaseUrl, coursePackageRoot);
 							innerComponents.Add(component);
 						}
+
 						componentIndex++;
 					}
 
@@ -230,9 +231,10 @@ namespace Ulearn.Core.Courses.Slides
 						components.Add(slideComponent);
 					}
 				}
+
 				if (componentIndex >= slide.Blocks.Length)
 					break;
-				
+
 				var exerciseBlock = slide.Blocks[componentIndex] as AbstractExerciseBlock;
 				var otherComponent = exerciseBlock != null
 					? ((ExerciseSlide)slide).GetExerciseComponent(componentIndex == 0 ? slide.Title : "Упражнение", slide, componentIndex, string.Format(ulearnBaseUrl + SlideUrlFormat, courseId, slide.Id), ltiId)
@@ -254,6 +256,7 @@ namespace Ulearn.Core.Courses.Slides
 				components.Add(comp);
 				//yield return new Vertical(slide.NormalizedGuid + "0", "Решения", new[] { comp });
 			}
+
 			var exBlock = slide.Blocks.OfType<AbstractExerciseBlock>().FirstOrDefault();
 			if (exBlock == null)
 				yield return new Vertical(slide.NormalizedGuid, slide.Title, components.ToArray());
@@ -284,6 +287,7 @@ namespace Ulearn.Core.Courses.Slides
 				{
 					return QuizToVerticals(courseId, quizSlide, slideUrl, ltiId).ToList();
 				}
+
 				return OrdinarySlideToVerticals(courseId, this, ulearnBaseUrl, videoGuids, ltiId, coursePackageRoot).ToList();
 			}
 			catch (Exception e)
@@ -291,7 +295,7 @@ namespace Ulearn.Core.Courses.Slides
 				throw new Exception($"Slide {this}. {e.Message}", e);
 			}
 		}
-		
+
 		#endregion
 	}
 
@@ -300,13 +304,13 @@ namespace Ulearn.Core.Courses.Slides
 	{
 		[XmlEnum("lesson")]
 		Lesson,
-		
+
 		[XmlEnum("quiz")]
 		Quiz,
-		
+
 		[XmlEnum("exercise")]
 		Exercise,
-		
+
 		[XmlEnum("flashcards")]
 		Flashcards
 	}

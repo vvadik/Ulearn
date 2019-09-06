@@ -6,10 +6,10 @@ namespace Ulearn.Core.Courses.Slides.Quizzes.Blocks
 	{
 		[XmlEnum("true")]
 		True,
-		
+
 		[XmlEnum("false")]
 		False,
-		
+
 		[XmlEnum("maybe")]
 		Maybe,
 	}

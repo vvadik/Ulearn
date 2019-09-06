@@ -9,13 +9,13 @@ namespace Ulearn.Core.Courses.Slides
 	{
 		[XmlElement("image")]
 		public string Image { get; set; }
-		
+
 		[XmlIgnore]
 		public string AbsoluteImageUrl { get; private set; }
 
 		[XmlElement("keywords")]
 		public string Keywords { get; set; }
-		
+
 		[XmlElement("description")]
 		public string Description { get; set; }
 
@@ -38,7 +38,7 @@ namespace Ulearn.Core.Courses.Slides
 				Console.WriteLine("It's ok if you are using course.exe tool, but it's not ok if you are using ulearn web server.");
 				relativeUrl = "";
 			}
-			
+
 			var imagePath = Path.Combine(relativeUrl, Image);
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 

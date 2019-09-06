@@ -39,6 +39,7 @@ namespace Ulearn.Core.Model.Edx
 						{
 							displayName = component.DisplayName;
 						}
+
 						component.DisplayName = displayName;
 						component.Save(OlxPath);
 					}
@@ -46,6 +47,7 @@ namespace Ulearn.Core.Model.Edx
 				else
 					newVerticals.Add(new Vertical(Utils.NewNormalizedGuid(), component.DisplayName, new[] { component }));
 			}
+
 			Add(course, newVerticals.ToArray());
 		}
 
@@ -73,6 +75,7 @@ namespace Ulearn.Core.Model.Edx
 				else
 					newVerticals.AddRange(subverticals);
 			}
+
 			Add(course, newVerticals.ToArray());
 		}
 

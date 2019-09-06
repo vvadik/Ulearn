@@ -10,10 +10,10 @@ namespace Ulearn.Web.Api.Models.Responses.Comments
 	{
 		[DataMember]
 		public bool AreCommentsEnabled { get; set; }
-		
+
 		[DataMember]
 		public CommentModerationPolicy ModerationPolicy { get; set; }
-		
+
 		[DataMember]
 		public bool OnlyInstructorsCanReply { get; set; }
 	}

@@ -25,7 +25,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 			foreach (var chapter in edxCourse.CourseWithChapters.Chapters)
 			{
 				chapter.Start = curDate;
-				chapter.Save(olxDir, withAdditionals:false);
+				chapter.Save(olxDir, withAdditionals: false);
 				Console.WriteLine($"Patched start date of {chapter.UrlName} to " + curDate);
 				if (!prequelChapterIds.Contains(chapter.UrlName, StringComparer.InvariantCultureIgnoreCase))
 					curDate += TimeSpan.FromDays(7); // next week

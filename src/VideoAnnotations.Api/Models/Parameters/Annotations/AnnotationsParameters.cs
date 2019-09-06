@@ -11,7 +11,7 @@ namespace Ulearn.VideoAnnotations.Api.Models.Parameters.Annotations
 		[Required]
 		[NotEmpty]
 		public string GoogleDocId { get; set; }
-		
+
 		[FromQuery(Name = "video_id")]
 		[Required]
 		[NotEmpty]

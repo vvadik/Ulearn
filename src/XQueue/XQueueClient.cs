@@ -65,12 +65,13 @@ namespace XQueue
 			};
 
 			var response = await client.PostAsync(loginUrl, new FormUrlEncodedContent(loginData));
-			if (! response.IsSuccessStatusCode)
+			if (!response.IsSuccessStatusCode)
 			{
 				log.Info($"I tried to login in xqueue {loginUrl} with username \"{username}\" and password \"{password.MaskAsSecret()}\"");
 				log.Warn($"Unexpected response status code for login: {response.StatusCode}");
 				throw new Exception($"Unexpected response status code for login: {response.StatusCode}");
 			}
+
 			return response.StatusCode == HttpStatusCode.OK;
 		}
 
@@ -82,7 +83,7 @@ namespace XQueue
 			urlParams.Add("queue_name", queueName);
 			urlParams.Add("block", "true");
 			uriBuilder.Query = urlParams.ToString();
-			
+
 			HttpResponseMessage response;
 			try
 			{
@@ -93,7 +94,7 @@ namespace XQueue
 				log.Warn($"Can't get submission from xqueue {queueName}: {e.Message}", e.InnerException);
 				return null;
 			}
-			
+
 			if (response.StatusCode == HttpStatusCode.Moved || response.StatusCode == HttpStatusCode.Found)
 			{
 				log.Warn("Redirected to the login page. Try to authorize again");
@@ -118,7 +119,6 @@ namespace XQueue
 				}
 			}
 
-
 			return null;
 		}
 
@@ -131,7 +131,7 @@ namespace XQueue
 		{
 			var content = JsonConvert.SerializeObject(result);
 			log.Info($"Try to put submission checking result into xqueue. Url: {putResultUrl}, content: {content}");
-			var formContent = new Dictionary<string, string> {{"xqueue_header", result.header}, {"xqueue_body", result.body}};
+			var formContent = new Dictionary<string, string> { { "xqueue_header", result.header }, { "xqueue_body", result.body } };
 			var response = await client.PostAsync(putResultUrl, new FormUrlEncodedContent(formContent));
 
 			if (response.StatusCode == HttpStatusCode.Moved || response.StatusCode == HttpStatusCode.Found)
@@ -141,7 +141,7 @@ namespace XQueue
 				throw new Exception("Redirected to the login page. Try to authorize again");
 			}
 
-			if (! response.IsSuccessStatusCode)
+			if (!response.IsSuccessStatusCode)
 			{
 				log.Warn($"Unexpected response status code while putting results to xqueue: {response.StatusCode}");
 				throw new Exception($"Unexpected response status code while putting results to xqueue: {response.StatusCode}");

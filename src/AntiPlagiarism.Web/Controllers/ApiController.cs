@@ -55,7 +55,7 @@ namespace AntiPlagiarism.Web.Controllers
 			this.serviceScopeFactory = serviceScopeFactory;
 			this.configuration = configuration.Value;
 		}
-		
+
 		[HttpPost(Api.Urls.AddSubmission)]
 		public async Task<ActionResult<AddSubmissionResponse>> AddSubmission(AddSubmissionParameters parameters)
 		{
@@ -83,12 +83,12 @@ namespace AntiPlagiarism.Web.Controllers
 				parameters.AuthorId,
 				parameters.Language,
 				parameters.AdditionalInfo
-				);
+			);
 
 			await ExtractSnippetsFromSubmissionAsync(submission).ConfigureAwait(false);
 			if (await NeedToRecalculateTaskStatistics(client.Id, submission.TaskId).ConfigureAwait(false))
 				await CalculateTaskStatisticsParametersAsync(client.Id, submission.TaskId).ConfigureAwait(false);
-			
+
 			return new AddSubmissionResponse
 			{
 				SubmissionId = submission.Id,
@@ -132,6 +132,7 @@ namespace AntiPlagiarism.Web.Controllers
 			{
 				await ExtractSnippetsFromSubmissionAsync(submission).ConfigureAwait(false);
 			}
+
 			await CalculateTaskStatisticsParametersAsync(client.Id, parameters.TaskId).ConfigureAwait(false);
 
 			return Json(new RebuildSnippetsForTaskResponse
@@ -145,7 +146,7 @@ namespace AntiPlagiarism.Web.Controllers
 		{
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
-			
+
 			var taskIds = await tasksRepo.GetTaskIds().ConfigureAwait(false);
 
 			if (parameters.FromTaskId.HasValue && parameters.TaskId.HasValue)
@@ -162,7 +163,7 @@ namespace AntiPlagiarism.Web.Controllers
 				weights[taskId].Sort();
 
 				logger.Information($"RecalculateTaskStatistics: обработано {index.PluralizeInRussian(RussianPluralizationOptions.Tasks)} из {taskIds.Count}");
-				
+
 				GC.Collect();
 			}
 
@@ -178,24 +179,24 @@ namespace AntiPlagiarism.Web.Controllers
 		{
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
-			
+
 			var submission = await submissionsRepo.FindSubmissionByIdAsync(parameters.SubmissionId).ConfigureAwait(false);
 			if (submission == null || submission.ClientId != client.Id)
 				return NotFound(new ErrorResponse("Invalid submission id"));
 
 			var suspicionLevels = await GetSuspicionLevelsAsync(submission.TaskId).ConfigureAwait(false);
 			if (suspicionLevels == null)
-				return Ok(new ErrorResponse("Not enough statistics for defining suspicion levels"));				
-				
+				return Ok(new ErrorResponse("Not enough statistics for defining suspicion levels"));
+
 			var result = new GetSubmissionPlagiarismsResponse
 			{
 				SubmissionInfo = submission.GetSubmissionInfoForApi(),
 				Plagiarisms = await plagiarismDetector.GetPlagiarismsAsync(submission, suspicionLevels).ConfigureAwait(false),
 				TokensPositions = plagiarismDetector.GetNeededTokensPositions(submission.ProgramText),
-				SuspicionLevels = suspicionLevels, 
+				SuspicionLevels = suspicionLevels,
 				AnalyzedCodeUnits = GetAnalyzedCodeUnits(submission),
 			};
-			
+
 			return Json(result);
 		}
 
@@ -213,7 +214,7 @@ namespace AntiPlagiarism.Web.Controllers
 			if (suspicionLevels == null)
 				return Ok(new ErrorResponse("Not enough statistics for defining suspicion levels"));
 
-			var submissions = await submissionsRepo.GetSubmissionsByAuthorAndTaskAsync(client.Id, parameters.AuthorId, parameters.TaskId, parameters.LastSubmissionsCount).ConfigureAwait(false);			
+			var submissions = await submissionsRepo.GetSubmissionsByAuthorAndTaskAsync(client.Id, parameters.AuthorId, parameters.TaskId, parameters.LastSubmissionsCount).ConfigureAwait(false);
 			var result = new GetAuthorPlagiarismsResponse
 			{
 				SuspicionLevels = suspicionLevels,
@@ -224,7 +225,7 @@ namespace AntiPlagiarism.Web.Controllers
 				{
 					/* Create internal plagiarismDetector for preventing memory leaks */
 					var internalPlagiarismDetector = scope.ServiceProvider.GetService<PlagiarismDetector>();
-					
+
 					result.ResearchedSubmissions.Add(new ResearchedSubmission
 					{
 						SubmissionInfo = submission.GetSubmissionInfoForApi(),
@@ -255,7 +256,7 @@ namespace AntiPlagiarism.Web.Controllers
 			foreach (var (firstTokenIndex, snippet) in submissionSnippetsExtractor.ExtractSnippetsFromSubmission(submission))
 				await snippetsRepo.AddSnippetOccurenceAsync(submission, snippet, firstTokenIndex).ConfigureAwait(false);
 		}
-		
+
 		/// <returns>List of weights (numbers from [0, 1)) used for calculating mean and deviation for this task</returns>
 		private async Task<List<double>> CalculateTaskStatisticsParametersAsync(int clientId, Guid taskId)
 		{
@@ -263,31 +264,31 @@ namespace AntiPlagiarism.Web.Controllers
 			using (var scope = serviceScopeFactory.CreateScope())
 			{
 				db.DisableAutoDetectChanges();
-				
+
 				var localSubmissionsRepo = scope.ServiceProvider.GetService<ISubmissionsRepo>();
 
 				logger.Information($"Пересчитываю статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId}");
 				var lastAuthorsIds = await localSubmissionsRepo.GetLastAuthorsByTaskAsync(clientId, taskId, configuration.StatisticsAnalyzing.CountOfLastAuthorsForCalculatingMeanAndDeviation).ConfigureAwait(false);
 				var lastSubmissions = await localSubmissionsRepo.GetLastSubmissionsByAuthorsForTaskAsync(clientId, taskId, lastAuthorsIds).ConfigureAwait(false);
 				var currentSubmissionsCount = await localSubmissionsRepo.GetSubmissionsCountAsync(clientId, taskId).ConfigureAwait(false);
-				
+
 				var (weights, statisticsParameters) = await statisticsParametersFinder.FindStatisticsParametersAsync(lastSubmissions).ConfigureAwait(false);
 				logger.Information($"Новые статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId}: Mean={statisticsParameters.Mean}, Deviation={statisticsParameters.Deviation}");
 				statisticsParameters.TaskId = taskId;
 				statisticsParameters.SubmissionsCount = currentSubmissionsCount;
-				
+
 				await tasksRepo.SaveTaskStatisticsParametersAsync(statisticsParameters).ConfigureAwait(false);
-				
+
 				return weights;
 			}
 		}
-		
+
 		private async Task<SuspicionLevels> GetSuspicionLevelsAsync(Guid taskId)
 		{
 			var taskStatisticsParameters = await tasksRepo.FindTaskStatisticsParametersAsync(taskId).ConfigureAwait(false);
 			if (taskStatisticsParameters == null)
 				return null;
-			
+
 			var faintSuspicionCoefficient = configuration.StatisticsAnalyzing.FaintSuspicionCoefficient;
 			var strongSuspicionCoefficient = configuration.StatisticsAnalyzing.StrongSuspicionCoefficient;
 			var minFaintSuspicionLevel = configuration.StatisticsAnalyzing.MinFaintSuspicionLevel;

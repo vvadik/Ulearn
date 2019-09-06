@@ -48,14 +48,14 @@ namespace Ulearn.Web.Api.Controllers
 		/// Список курсов
 		/// </summary>
 		[HttpGet]
-		public async Task<ActionResult<CoursesListResponse>> CoursesList([FromQuery] CourseRoleType? role=null)
+		public async Task<ActionResult<CoursesListResponse>> CoursesList([FromQuery] CourseRoleType? role = null)
 		{
 			if (role.HasValue && !IsAuthenticated)
 				return Unauthorized();
-			
+
 			if (role == CourseRoleType.Student)
 				return NotFound(new ErrorResponse("Role can not be student. Specify tester, instructor or courseAdmin"));
-			
+
 			var courses = await courseManager.GetCoursesAsync(coursesRepo).ConfigureAwait(false);
 
 			var isSystemAdministrator = await IsSystemAdministratorAsync().ConfigureAwait(false);
@@ -84,7 +84,7 @@ namespace Ulearn.Web.Api.Controllers
 				).ToList()
 			};
 		}
-		
+
 		/// <summary>
 		/// Информация о курсе
 		/// </summary>
@@ -93,7 +93,7 @@ namespace Ulearn.Web.Api.Controllers
 		{
 			if (course == null)
 				return Json(new { status = "error", message = "Course not found" });
-			
+
 			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
 			var containsFlashcards = course.Units.Any(x => x.Slides.OfType<FlashcardSlide>().Any());
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(User.GetUserId(), course.Id, CourseRoleType.Instructor).ConfigureAwait(false);

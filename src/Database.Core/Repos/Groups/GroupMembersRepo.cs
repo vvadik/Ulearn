@@ -23,7 +23,7 @@ namespace Database.Repos.Groups
 			this.groupsRepo = groupsRepo;
 			this.logger = logger;
 		}
-		
+
 		public Task<List<ApplicationUser>> GetGroupMembersAsUsersAsync(int groupId)
 		{
 			return db.GroupMembers.Include(m => m.User).Where(m => m.GroupId == groupId && !m.User.IsDeleted).Select(m => m.User).ToListAsync();
@@ -33,22 +33,22 @@ namespace Database.Repos.Groups
 		{
 			return db.GroupMembers.Include(m => m.User).Where(m => m.GroupId == groupId && !m.User.IsDeleted).ToListAsync();
 		}
-		
+
 		public Task<List<GroupMember>> GetGroupsMembersAsync(ICollection<int> groupsIds)
 		{
 			return db.GroupMembers.Include(m => m.User).Where(m => groupsIds.Contains(m.GroupId) && !m.User.IsDeleted).ToListAsync();
 		}
-		
+
 		public Task<bool> IsUserMemberOfGroup(int groupId, string userId)
 		{
 			return db.GroupMembers.AnyAsync(m => m.GroupId == groupId && m.UserId == userId);
 		}
-		
+
 		public async Task<GroupMember> AddUserToGroupAsync(int groupId, string userId)
 		{
 			logger.Information($"Пытаюсь добавить пользователя {userId} в группу {groupId}");
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false) ?? throw new ArgumentNullException($"Can't find group with id={groupId}");
-			
+
 			var groupMember = new GroupMember
 			{
 				GroupId = groupId,
@@ -69,10 +69,10 @@ namespace Database.Repos.Groups
 				await db.SaveChangesAsync().ConfigureAwait(false);
 
 				transaction.Commit();
-				
+
 				logger.Information($"Пользователь {userId} добавлен в группу {groupId}");
 			}
-			
+
 			if (group.IsManualCheckingEnabledForOldSolutions)
 				await manualCheckingsForOldSolutionsAdder.AddManualCheckingsForOldSolutionsAsync(group.CourseId, userId).ConfigureAwait(false);
 
@@ -82,7 +82,7 @@ namespace Database.Repos.Groups
 		public async Task<GroupMember> RemoveUserFromGroupAsync(int groupId, string userId)
 		{
 			logger.Information($"Удаляю пользователя {userId} из группы {groupId}");
-			
+
 			var member = db.GroupMembers.FirstOrDefault(m => m.GroupId == groupId && m.UserId == userId);
 			if (member != null)
 				db.GroupMembers.Remove(member);
@@ -90,33 +90,33 @@ namespace Database.Repos.Groups
 				logger.Information($"Пользователь {userId} не состоит в группе {groupId}");
 
 			await db.SaveChangesAsync().ConfigureAwait(false);
-			
+
 			return member;
 		}
-		
+
 		public async Task<List<GroupMember>> RemoveUsersFromGroupAsync(int groupId, List<string> userIds)
 		{
 			logger.Information($"Удаляю пользователей {string.Join(", ", userIds)} из группы {groupId}");
-			
+
 			var members = db.GroupMembers.Where(m => m.GroupId == groupId && userIds.Contains(m.UserId)).ToList();
 			db.GroupMembers.RemoveRange(members);
 
 			await db.SaveChangesAsync().ConfigureAwait(false);
-			
+
 			return members;
 		}
-		
+
 		public async Task<List<GroupMember>> AddUsersToGroupAsync(int toGroupId, ICollection<string> userIds)
 		{
 			logger.Information($"Добавляю пользователей {string.Join(", ", userIds)} в группу {toGroupId}");
-			
+
 			var newMembers = new List<GroupMember>();
 			foreach (var memberUserId in userIds)
 				newMembers.Add(await AddUserToGroupAsync(toGroupId, memberUserId).ConfigureAwait(false));
-			
+
 			return newMembers;
 		}
-		
+
 		public Task<List<string>> GetUsersIdsForAllCourseGroupsAsync(string courseId, bool includeArchived = false)
 		{
 			var groupsIds = groupsRepo.GetCourseGroupsQueryable(courseId, includeArchived).Select(g => g.Id);
@@ -144,12 +144,12 @@ namespace Database.Repos.Groups
 			var userGroupsIds = await GetUserGroupsIdsAsync(courseId, userId).ConfigureAwait(false);
 			return groupsRepo.GetCourseGroupsQueryable(courseId, includeArchived).Where(g => userGroupsIds.Contains(g.Id)).ToList();
 		}
-		
+
 		public async Task<List<Group>> GetUserGroupsAsync(string userId)
 		{
 			return await db.GroupMembers.Where(m => m.UserId == userId && !m.Group.IsDeleted).Select(m => m.Group).ToListAsync();
 		}
-		
+
 		public async Task<Dictionary<string, List<Group>>> GetUsersGroupsAsync(string courseId, List<string> usersIds, bool includeArchived = false)
 		{
 			var userGroupsIds = await GetUsersGroupsIdsAsync(courseId, usersIds, includeArchived).ConfigureAwait(false);

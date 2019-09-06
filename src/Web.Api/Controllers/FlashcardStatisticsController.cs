@@ -33,7 +33,8 @@ namespace Ulearn.Web.Api.Controllers
 		/// <param name="course"></param>
 		/// <returns></returns>
 		[HttpGet]
-		public async Task<ActionResult<FlashcardsStatistics>> FlashcardsStatistics([FromQuery(Name = "course_id")] [BindRequired] string courseId)
+		public async Task<ActionResult<FlashcardsStatistics>> FlashcardsStatistics([FromQuery(Name = "course_id")] [BindRequired]
+			string courseId)
 		{
 			var course = courseManager.FindCourse(courseId);
 			if (course == null)

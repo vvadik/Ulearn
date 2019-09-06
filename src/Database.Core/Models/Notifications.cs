@@ -181,7 +181,7 @@ namespace Database.Models
 		[Display(Name = @"Преподаватель выставил дополнительные баллы", GroupName = @"Дополнительные баллы, выставленные преподавателем")]
 		[IsEnabledByDefault(true)]
 		ReceivedAdditionalScore = 9,
-		
+
 		[Display(Name = @"Ответ на комментарий в код-ревью", GroupName = "Ответы на комментарии в код-ревью")]
 		[IsEnabledByDefault(true)]
 		ReceivedCommentToCodeReview = 10,
@@ -209,22 +209,22 @@ namespace Database.Models
 		[IsEnabledByDefault(true)]
 		GroupMemberHasBeenRemoved = 104,
 		*/
-		
+
 		[Display(Name = @"Преподаватель удалил студентов из вашей группы", GroupName = @"Преподаватель удалил студентов из ваших групп")]
 		[MinCourseRole(CourseRoleType.Instructor)]
 		[IsEnabledByDefault(true)]
 		GroupMembersHaveBeenRemoved = 105,
-		
+
 		[Display(Name = @"Преподаватель добавил студентов в вашу группу", GroupName = @"Преподаватель добавил студентов в ваши группы")]
 		[MinCourseRole(CourseRoleType.Instructor)]
 		[IsEnabledByDefault(true)]
 		GroupMembersHaveBeenAdded = 106,
-		
+
 		[Display(Name = @"Новый комментарий для преподавателей", GroupName = @"Новые комментарии для преподавателей")]
 		[MinCourseRole(CourseRoleType.Instructor)]
 		[IsEnabledByDefault(true)]
 		NewCommentForInstructorsOnly = 107,
-		
+
 		[Display(Name = @"Новый комментарий от студента вашей группы", GroupName = @"Новый комментарий от студента вашей группы")]
 		[MinCourseRole(CourseRoleType.Instructor)]
 		[IsEnabledByDefault(true)]
@@ -343,7 +343,7 @@ namespace Database.Models
 		{
 			return new List<Notification>();
 		}
-		
+
 		/* Override this method together with GetBlockerNotifications() */
 		public virtual bool IsBlockedByAnyNotificationFrom(IServiceProvider serviceProvider, List<Notification> notifications)
 		{
@@ -390,11 +390,11 @@ namespace Database.Models
 		public static NotificationType GetNotificationType(this Notification notification)
 		{
 			var notificationType = ((dynamic)notification).GetType();
-			
+
 			/* `notification` can be an instance of Castle.Proxies.* (Lazy-Loading proxy on EF Core), so we should to find real instance class */
 			if (notification.GetType().FullName.EndsWith("Proxy"))
 				notificationType = notification.GetType().BaseType;
-			
+
 			return GetNotificationType(notificationType);
 		}
 	}
@@ -491,12 +491,12 @@ namespace Database.Models
 			return new NotificationButton("Перейти к комментарию", GetCommentUrl(course, slide, baseUrl));
 		}
 
-		protected string GetHtmlCommentText(bool isCitation=false)
+		protected string GetHtmlCommentText(bool isCitation = false)
 		{
 			return GetHtmlCommentText(Comment, isCitation);
 		}
 
-		protected string GetHtmlCommentText(Comment comment, bool isCitation=false)
+		protected string GetHtmlCommentText(Comment comment, bool isCitation = false)
 		{
 			var html = comment.Text.Trim()
 				.EscapeHtml()
@@ -542,16 +542,16 @@ namespace Database.Models
 
 		public override List<Notification> GetBlockerNotifications(IServiceProvider serviceProvider)
 		{
-			var notificationsRepo = serviceProvider.GetService<INotificationsRepo>(); 
+			var notificationsRepo = serviceProvider.GetService<INotificationsRepo>();
 			var repliedNotifications = notificationsRepo.FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId);
 			var yourGroupNotifications = notificationsRepo.FindNotifications<NewCommentFromYourGroupStudentNotification>(n => n.CommentId == CommentId);
 			return repliedNotifications.Cast<Notification>().Concat(yourGroupNotifications).ToList();
 		}
-		
+
 		public override bool IsBlockedByAnyNotificationFrom(IServiceProvider serviceProvider, List<Notification> notifications)
 		{
 			return notifications.OfType<RepliedToYourCommentNotification>().Any(n => n.CommentId == CommentId)
-				|| notifications.OfType<NewCommentFromYourGroupStudentNotification>().Any(n => n.CommentId == CommentId);
+					|| notifications.OfType<NewCommentFromYourGroupStudentNotification>().Any(n => n.CommentId == CommentId);
 		}
 	}
 
@@ -590,7 +590,7 @@ namespace Database.Models
 			return Task.FromResult(new List<string> { ParentComment.AuthorId });
 		}
 	}
-	
+
 	[NotificationType(NotificationType.NewCommentFromYourGroupStudent)]
 	public class NewCommentFromYourGroupStudentNotification : AbstractCommentNotification
 	{
@@ -621,11 +621,11 @@ namespace Database.Models
 
 		public override List<Notification> GetBlockerNotifications(IServiceProvider serviceProvider)
 		{
-			var notificationsRepo = serviceProvider.GetService<INotificationsRepo>(); 
+			var notificationsRepo = serviceProvider.GetService<INotificationsRepo>();
 			var repliedToYourCommentNotifications = notificationsRepo.FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId);
 			return repliedToYourCommentNotifications.Cast<Notification>().ToList();
 		}
-		
+
 		public override bool IsBlockedByAnyNotificationFrom(IServiceProvider serviceProvider, List<Notification> notifications)
 		{
 			return notifications.OfType<RepliedToYourCommentNotification>().Any(n => n.CommentId == CommentId);
@@ -680,7 +680,7 @@ namespace Database.Models
 			if (html)
 			{
 				reviewText += $"<b>{reviewPosition}</b>";
-				
+
 				var codeFragment = GetSolutionCodeFragments(solutionCodeLines, review).EscapeHtml().LineEndingsToBrTags();
 				var reviewCommentHtml = review.Comment.EscapeHtml().RenderSimpleMarkdown(isHtml: false, telegramMode: true).LineEndingsToBrTags();
 				reviewText += $"<br/><pre>{codeFragment}</pre>";
@@ -691,7 +691,7 @@ namespace Database.Models
 					if (withAuthorsNames)
 						reviewText += $"<i>{review.Author.VisibleName.EscapeHtml()}:</i><br/>";
 					reviewText += reviewCommentHtml;
-					
+
 					foreach (var comment in comments)
 					{
 						reviewText += "<br/><br/>";
@@ -705,7 +705,7 @@ namespace Database.Models
 				}
 				else
 				{
-					reviewText += $"Комментарий: {reviewCommentHtml}<br/><br/>";	
+					reviewText += $"Комментарий: {reviewCommentHtml}<br/><br/>";
 				}
 			}
 			else
@@ -723,7 +723,7 @@ namespace Database.Models
 
 			return reviewText;
 		}
-		
+
 		protected string GetReviewsText(ManualExerciseChecking checking, bool html)
 		{
 			var commentsText = "";
@@ -737,6 +737,7 @@ namespace Database.Models
 					commentsText += $"{++reviewIndex}. {GetReviewText(review, solutionCodeLines, html, withAuthorsNames: false)}";
 				}
 			}
+
 			return commentsText;
 		}
 
@@ -752,7 +753,7 @@ namespace Database.Models
 			return startLineStub + startLineEnding + "\n" + mediumLines + "\n" + finishLineBeginning;
 		}
 	}
-	
+
 	[NotificationType(NotificationType.PassedManualExerciseChecking)]
 	public class PassedManualExerciseCheckingNotification : AbstractCodeReviewNotification
 	{
@@ -952,15 +953,15 @@ namespace Database.Models
 	public class ReceivedCommentToCodeReviewNotification : AbstractCodeReviewNotification
 	{
 		public int? CommentId { get; set; }
-		
+
 		public virtual ExerciseCodeReviewComment Comment { get; set; }
-		
+
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
 			var checking = Comment?.Review?.ExerciseChecking;
 			if (checking == null)
 				return null;
-			
+
 			var slide = course.FindSlideById(checking.SlideId);
 			if (slide == null)
 				return null;
@@ -988,7 +989,7 @@ namespace Database.Models
 			var checking = Comment?.Review?.ExerciseChecking;
 			if (checking == null)
 				return null;
-			
+
 			var slide = course.FindSlideById(checking.SlideId);
 			if (slide == null)
 				return null;
@@ -1001,7 +1002,7 @@ namespace Database.Models
 
 				return messagePrefix + commentsText;
 			}
-			
+
 			if (transport is TelegramNotificationTransport)
 			{
 				return messagePrefix + Comment.Text;
@@ -1042,18 +1043,18 @@ namespace Database.Models
 		{
 			return CommentId != null && Comment != null;
 		}
-		
+
 		public override List<Notification> GetBlockerNotifications(IServiceProvider serviceProvider)
 		{
 			var notificationsRepo = serviceProvider.GetService<INotificationsRepo>();
 			var reviewId = Comment.ReviewId;
-			return notificationsRepo 
+			return notificationsRepo
 				.FindNotifications<ReceivedCommentToCodeReviewNotification>(n => n.Comment.ReviewId == reviewId, n => n.Comment)
 				.Cast<Notification>()
 				.Where(n => n.CreateTime < CreateTime && n.CreateTime >= CreateTime - NotificationsRepo.sendNotificationsDelayAfterCreating)
 				.ToList();
 		}
-		
+
 		public override bool IsBlockedByAnyNotificationFrom(IServiceProvider serviceProvider, List<Notification> notifications)
 		{
 			var reviewId = Comment.ReviewId;
@@ -1062,13 +1063,13 @@ namespace Database.Models
 					&& n.CreateTime < CreateTime && n.CreateTime >= CreateTime - NotificationsRepo.sendNotificationsDelayAfterCreating
 			);
 		}
-		
+
 		public string GetUrl(Course course, string baseUrl, string currentUserId)
 		{
 			var slide = course.FindSlideById(Comment?.Review?.ExerciseChecking?.SlideId ?? Guid.Empty);
 			if (slide == null)
 				return null;
-			
+
 			var isStudent = currentUserId == Comment.Review.ExerciseChecking.UserId;
 			var url = GetSlideUrl(course, slide, baseUrl);
 			if (!isStudent)
@@ -1076,7 +1077,7 @@ namespace Database.Models
 			return url;
 		}
 	}
-	
+
 	[NotificationType(NotificationType.JoinedToYourGroup)]
 	public class JoinedToYourGroupNotification : Notification
 	{
@@ -1181,7 +1182,7 @@ namespace Database.Models
 
 		public override bool IsActual()
 		{
-			return Access != null && ! Access.IsEnabled;
+			return Access != null && !Access.IsEnabled;
 		}
 	}
 
@@ -1216,21 +1217,21 @@ namespace Database.Models
 		{
 			var groupAccessesRepo = serviceProvider.GetService<IGroupAccessesRepo>();
 			var accesses = await groupAccessesRepo.GetGroupAccessesAsync(GroupId).ConfigureAwait(false);
-			return accesses.Select(a => a.UserId).Concat(new [] { Group.OwnerId }).ToList();
+			return accesses.Select(a => a.UserId).Concat(new[] { Group.OwnerId }).ToList();
 		}
 
 		public override bool IsActual()
 		{
-			return User != null && ! Group.IsDeleted;
+			return User != null && !Group.IsDeleted;
 		}
 	}
-	
+
 	public abstract class AbstractMassGroupOperationNotification : Notification
 	{
 		protected AbstractMassGroupOperationNotification()
 		{
 		}
-		
+
 		protected AbstractMassGroupOperationNotification(int groupId, List<string> userIds, IUsersRepo usersRepo)
 		{
 			GroupId = groupId;
@@ -1253,7 +1254,7 @@ namespace Database.Models
 
 		/* Comma-separeted */
 		public string UserIds { get; set; }
-		
+
 		public string UserDescriptions { get; set; }
 
 		[Required]
@@ -1273,7 +1274,7 @@ namespace Database.Models
 		{
 			var groupAccessesRepo = serviceProvider.GetService<IGroupAccessesRepo>();
 			var accesses = await groupAccessesRepo.GetGroupAccessesAsync(GroupId).ConfigureAwait(false);
-			return accesses.Select(a => a.UserId).Concat(new [] { Group.OwnerId }).ToList();
+			return accesses.Select(a => a.UserId).Concat(new[] { Group.OwnerId }).ToList();
 		}
 
 		public override bool IsActual()
@@ -1281,7 +1282,7 @@ namespace Database.Models
 			return UserIds.Length > 0;
 		}
 	}
-	
+
 	[NotificationType(NotificationType.GroupMembersHaveBeenRemoved)]
 	public class GroupMembersHaveBeenRemovedNotification : AbstractMassGroupOperationNotification
 	{
@@ -1289,7 +1290,7 @@ namespace Database.Models
 			: base()
 		{
 		}
-		
+
 		public GroupMembersHaveBeenRemovedNotification(int groupId, List<string> userIds, IUsersRepo usersRepo)
 			: base(groupId, userIds, usersRepo)
 		{
@@ -1299,7 +1300,7 @@ namespace Database.Models
 		{
 			var usersCount = UserIds.Split(',').Length;
 			return $"<b>{InitiatedBy.VisibleName.EscapeHtml()}</b> удалил{InitiatedBy.Gender.ChooseEnding()} " +
-				   $"{usersCount.PluralizeInRussian(RussianPluralizationOptions.StudentsDative)} из группы <b>«{Group.Name.EscapeHtml()}»</b> (курс «{course.Title.EscapeHtml()}»): {UserDescriptions.EscapeHtml()}.";
+					$"{usersCount.PluralizeInRussian(RussianPluralizationOptions.StudentsDative)} из группы <b>«{Group.Name.EscapeHtml()}»</b> (курс «{course.Title.EscapeHtml()}»): {UserDescriptions.EscapeHtml()}.";
 		}
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
@@ -1309,14 +1310,14 @@ namespace Database.Models
 					$"{usersCount.PluralizeInRussian(RussianPluralizationOptions.StudentsDative)} из группы «{Group.Name}» (курс «{course.Title}»): {UserDescriptions}.";
 		}
 	}
-	
+
 	[NotificationType(NotificationType.GroupMembersHaveBeenAdded)]
 	public class GroupMembersHaveBeenAddedNotification : AbstractMassGroupOperationNotification
 	{
 		public GroupMembersHaveBeenAddedNotification()
 		{
 		}
-		
+
 		public GroupMembersHaveBeenAddedNotification(int groupId, List<string> userIds, IUsersRepo usersRepo)
 			: base(groupId, userIds, usersRepo)
 		{
@@ -1334,7 +1335,7 @@ namespace Database.Models
 					$"{UsersCount.PluralizeInRussian(RussianPluralizationOptions.StudentsDative)} в группу «{Group.Name}» (курс «{course.Title}»): {UserDescriptions}.";
 		}
 	}
-	
+
 	[NotificationType(NotificationType.NewCommentForInstructorsOnly)]
 	public class NewCommentForInstructorsOnlyNotification : AbstractCommentNotification
 	{
@@ -1466,7 +1467,7 @@ namespace Database.Models
 		public Guid CourseVersionId { get; set; }
 
 		public virtual CourseVersion CourseVersion { get; set; }
-		
+
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
 			return $"Загружена новая версия курса <b>«{course.Title.EscapeHtml()}»</b>. Теперь её можно опубликовать.";
@@ -1488,14 +1489,14 @@ namespace Database.Models
 			return true;
 		}
 	}
-	
+
 	[NotificationType(NotificationType.NotUploadedPackage)]
 	public class NotUploadedPackageNotification : AbstractPackageNotification
 	{
 		[Required]
 		[Column("NotUploadedPackageNotification_CommitHash")]
 		public string CommitHash { get; set; }
-		
+
 		[Required]
 		[Column("NotUploadedPackageNotification_RepoUrl")]
 		public string RepoUrl { get; set; }
@@ -1515,7 +1516,7 @@ namespace Database.Models
 			var courseRoleUsersFilter = serviceProvider.GetService<ICourseRoleUsersFilter>();
 			return courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.CourseAdmin, CourseId);
 		}
-		
+
 		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
 			return new NotificationButton("Перейти к коммиту", GitUtils.RepoUrlToCommitLink(RepoUrl, CommitHash));
@@ -1534,7 +1535,7 @@ namespace Database.Models
 		public Guid CourseVersionId { get; set; }
 
 		public virtual CourseVersion CourseVersion { get; set; }
-		
+
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
 			return $"Опубликована новая версия курса <b>«{course.Title.EscapeHtml()}»</b>.<br/><br/>" +
@@ -1564,7 +1565,7 @@ namespace Database.Models
 	{
 		[Required]
 		public int ProcessId { get; set; }
-		
+
 		public virtual StepikExportProcess Process { get; set; }
 
 		/* TODO (andgein): Process.UlearnCourseId should be safely urlized */

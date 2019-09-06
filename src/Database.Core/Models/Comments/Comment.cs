@@ -41,7 +41,7 @@ namespace Database.Models.Comments
 
 		[Required]
 		public bool IsPinnedToTop { get; set; }
-		
+
 		[Required]
 		public bool IsForInstructorsOnly { get; set; }
 

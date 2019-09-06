@@ -19,7 +19,7 @@ namespace Ulearn.Core.CSharp.Validators
 			var longLines = text.Lines.Where(line => line.End - line.Start > maxLineLen).ToList();
 			if (longLines.Count == 0)
 				return new List<SolutionStyleError>();
-			
+
 			var position = userSolution.GetLineSpan(longLines.First().Span);
 
 			return new List<SolutionStyleError>

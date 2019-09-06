@@ -5,7 +5,7 @@ namespace AntiPlagiarism.Web.Database
 {
 	public class AntiPlagiarismDb : DbContext
 	{
-		public AntiPlagiarismDb(DbContextOptions<AntiPlagiarismDb> options) 
+		public AntiPlagiarismDb(DbContextOptions<AntiPlagiarismDb> options)
 			: base(options)
 		{
 		}
@@ -13,7 +13,7 @@ namespace AntiPlagiarism.Web.Database
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			modelBuilder.HasDefaultSchema("antiplagiarism");
-			
+
 			modelBuilder.Entity<Client>()
 				.HasIndex(c => c.Token)
 				.IsUnique();
@@ -23,7 +23,7 @@ namespace AntiPlagiarism.Web.Database
 			modelBuilder.Entity<SnippetOccurence>()
 				.HasIndex(c => new { c.SubmissionId, c.FirstTokenIndex })
 				.IsUnique(false);
-			
+
 			modelBuilder.Entity<SnippetOccurence>()
 				.HasIndex(c => new { c.SubmissionId, c.SnippetId })
 				.IsUnique(false);
@@ -46,7 +46,7 @@ namespace AntiPlagiarism.Web.Database
 		{
 			Database.Migrate();
 		}
-		
+
 		/* We stands with perfomance issue on EF Core: https://github.com/aspnet/EntityFrameworkCore/issues/11680
   		   So we decided to disable AutoDetectChangesEnabled temporary for some queries */
 		public void DisableAutoDetectChanges()

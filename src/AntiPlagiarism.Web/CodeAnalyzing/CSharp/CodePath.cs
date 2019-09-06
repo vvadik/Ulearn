@@ -18,12 +18,12 @@ namespace AntiPlagiarism.Web.CodeAnalyzing.CSharp
 			return string.Join(".", Parts.Select(p => p.ToString()));
 		}
 	}
-	
+
 	public class CodePathPart
 	{
 		public string Name { get; private set; }
 		public Type ContainingType { get; private set; }
-		
+
 		public CodePathPart(object obj, string name)
 		{
 			Name = name;

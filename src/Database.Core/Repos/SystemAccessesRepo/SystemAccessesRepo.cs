@@ -19,7 +19,7 @@ namespace Database.Repos.SystemAccessesRepo
 			this.db = db;
 			this.usersRepo = usersRepo;
 		}
-		
+
 		public async Task<SystemAccess> GrantAccessAsync(string userId, SystemAccessType accessType, string grantedById)
 		{
 			var currentAccess = await db.SystemAccesses.FirstOrDefaultAsync(a => a.UserId == userId && a.AccessType == accessType).ConfigureAwait(false);
@@ -32,6 +32,7 @@ namespace Database.Repos.SystemAccessesRepo
 				};
 				db.SystemAccesses.Add(currentAccess);
 			}
+
 			currentAccess.GrantedById = grantedById;
 			currentAccess.GrantTime = DateTime.Now;
 			currentAccess.IsEnabled = true;

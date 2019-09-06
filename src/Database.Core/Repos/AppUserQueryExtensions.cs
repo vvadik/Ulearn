@@ -38,7 +38,7 @@ namespace Database.Repos
 			if (count > 0)
 				users = users.Take(count);
 
-			var userRolesInfos = new List<UserRolesInfo>(); 
+			var userRolesInfos = new List<UserRolesInfo>();
 			foreach (var user in users.ToList())
 			{
 				userRolesInfos.Append(new UserRolesInfo

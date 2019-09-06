@@ -160,7 +160,7 @@ namespace uLearn.Web.Controllers
 			return notifications.Where(notification => notification.IsActual());
 		}
 
-		private IEnumerable<Notification> RemoveBlockedNotifications(IReadOnlyCollection<Notification> notifications, IReadOnlyCollection<Notification> searchBlockersAlsoIn=null)
+		private IEnumerable<Notification> RemoveBlockedNotifications(IReadOnlyCollection<Notification> notifications, IReadOnlyCollection<Notification> searchBlockersAlsoIn = null)
 		{
 			var notificationsIds = notifications.Select(n => n.Id).ToList();
 			var searchBlockersAlsoInIds = searchBlockersAlsoIn?.Select(n => n.Id).ToList();

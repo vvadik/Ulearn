@@ -24,7 +24,7 @@ namespace Database.Repos.Comments
 			this.commentPoliciesRepo = commentPoliciesRepo;
 			this.courseRolesRepo = courseRolesRepo;
 		}
-		
+
 		public async Task<Comment> AddCommentAsync(string authorId, string courseId, Guid slideId, int parentCommentId, bool isForInstructorsOnly, string commentText)
 		{
 			var commentsPolicy = await commentPoliciesRepo.GetCommentsPolicyAsync(courseId).ConfigureAwait(false);
@@ -34,7 +34,7 @@ namespace Database.Repos.Comments
 			/* Instructors' replies are automatically correct */
 			var isReply = parentCommentId != -1;
 			var isCorrectAnswer = isReply && isInstructor && !isForInstructorsOnly;
-			
+
 			var comment = new Comment
 			{
 				AuthorId = authorId,
@@ -53,7 +53,7 @@ namespace Database.Repos.Comments
 			return await FindCommentByIdAsync(comment.Id).ConfigureAwait(false);
 		}
 
-		public async Task<Comment> FindCommentByIdAsync(int commentId, bool includeDeleted=false)
+		public async Task<Comment> FindCommentByIdAsync(int commentId, bool includeDeleted = false)
 		{
 			var comment = await db.Comments.FindAsync(commentId).ConfigureAwait(false);
 			if (comment == null || (!includeDeleted && comment.IsDeleted))
@@ -86,7 +86,7 @@ namespace Database.Repos.Comments
 				.ThenBy(c => c.PublishTime)
 				.ToListAsync();
 		}
-		
+
 		public Task<List<Comment>> GetSlideTopLevelCommentsAsync(string courseId, Guid slideId)
 		{
 			return db.Comments
@@ -116,7 +116,7 @@ namespace Database.Repos.Comments
 				.ToListAsync();
 		}
 
-		public async Task<Comment> ModifyCommentAsync(int commentId, Action<Comment> modifyAction, bool includeDeleted=false)
+		public async Task<Comment> ModifyCommentAsync(int commentId, Action<Comment> modifyAction, bool includeDeleted = false)
 		{
 			var comment = await FindCommentByIdAsync(commentId, includeDeleted).ConfigureAwait(false) ?? throw new ArgumentException($"Can't find comment with id {commentId}");
 			modifyAction(comment);
@@ -161,11 +161,11 @@ namespace Database.Repos.Comments
 				.OrderByDescending(x => x.PublishTime)
 				.Take(maxCount)
 				.OrderBy(x => x.PublishTime);
-			
+
 			var commentsCount = await lastComments.CountAsync().ConfigureAwait(false);
 			if (commentsCount < maxCount || maxCount <= 0)
 				return false;
-			
+
 			var boundComment = await lastComments.FirstOrDefaultAsync().ConfigureAwait(false);
 			return boundComment == null || boundComment.PublishTime >= DateTime.Now - lastTime;
 		}

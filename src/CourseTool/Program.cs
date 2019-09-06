@@ -10,16 +10,16 @@ namespace uLearn.CourseTool
 		{
 			return Parser.Default
 				.ParseArguments<
-					OlxConvertFromUlearnOptions, 
-					OlxPatchFromUlearnOptions, 
-					OlxSquashChaptersOptions, OlxDesquashChaptersOptions, 
-					OlxGcOptions, 
-					OlxUnpackTarGzOptions, OlxUnpackTarOptions, 
+					OlxConvertFromUlearnOptions,
+					OlxPatchFromUlearnOptions,
+					OlxSquashChaptersOptions, OlxDesquashChaptersOptions,
+					OlxGcOptions,
+					OlxUnpackTarGzOptions, OlxUnpackTarOptions,
 					OlxPackTarGzOptions, OlxPackTarOptions,
-					OlxSetChapterStartDatesOptions, 
+					OlxSetChapterStartDatesOptions,
 					OlxPatchVideoOptions,
-					MonitorOptions, 
-					ULearnOptions, 
+					MonitorOptions,
+					ULearnOptions,
 					TestCourseOptions,
 					GenerateEmptyVideoAnnotations,
 					BuildDockerContainerOptions

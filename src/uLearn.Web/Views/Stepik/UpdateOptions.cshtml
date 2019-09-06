@@ -13,9 +13,9 @@
 <div class="container">
 	<h2>Обновление курса на&nbsp;Степике</h2>
 	<p class="help-block">
-		Выберите слайды для&nbsp;обновления. <br />@Model.Course.Title → @Model.StepikCourse.Title.
+		Выберите слайды для&nbsp;обновления. <br/>@Model.Course.Title → @Model.StepikCourse.Title.
 	</p>
-	
+
 	@{
 		var allStepikStepsIds = Model.StepikLessons.Values.SelectMany(l => l.StepsIds).ToList();
 		var stepikStepsBySlide = Model.SlideStepMaps
@@ -64,7 +64,7 @@
 								@Html.Hidden(
 									"stepik__course-update__export-slide-after__" + slide.NormalizedGuid,
 									isExported ? (lastStepId = slideStepMaps[0].StepId) : lastStepId
-								)
+									)
 								@slide.Title
 								@if (isChanged)
 								{

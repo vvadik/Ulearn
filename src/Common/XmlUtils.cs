@@ -12,14 +12,14 @@ namespace Ulearn.Common
 
 			return xmlDocumentWithoutNs.ToString();
 		}
-		
+
 		private static XElement RemoveAllNamespaces(XElement xmlElement)
 		{
 			var child = xmlElement.Nodes().Select(node => node is XElement element ? RemoveAllNamespaces(element) : node);
 			var attributes = xmlElement.HasAttributes
 				? xmlElement.Attributes().Where(a => !a.IsNamespaceDeclaration).Select(a => new XAttribute(a.Name.LocalName, a.Value))
 				: null;
-			
+
 			return new XElement(xmlElement.Name.LocalName, child, attributes);
 		}
 
@@ -29,7 +29,4 @@ namespace Ulearn.Common
 			return xElement.XmlSerialize(expandEmptyTags: true);
 		}
 	}
-	
-	
-	
 }

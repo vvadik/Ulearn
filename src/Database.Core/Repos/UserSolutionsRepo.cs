@@ -20,7 +20,7 @@ using Ulearn.Core.RunCheckerJobApi;
 namespace Database.Repos
 {
 	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
-	
+
 	public class UserSolutionsRepo : IUserSolutionsRepo
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(UserSolutionsRepo));
@@ -35,7 +35,7 @@ namespace Database.Repos
 
 		public UserSolutionsRepo(
 			UlearnDb db,
-			ITextsRepo textsRepo, IVisitsRepo visitsRepo, 
+			ITextsRepo textsRepo, IVisitsRepo visitsRepo,
 			WebCourseManager courseManager)
 		{
 			this.db = db;
@@ -104,7 +104,7 @@ namespace Database.Repos
 			db.UserExerciseSubmissions.Remove(submission);
 			await db.SaveChangesAsync();
 		}
-		
+
 		///<returns>(likesCount, isLikedByThisUsed)</returns>
 		public async Task<Tuple<int, bool>> Like(int solutionId, string userId)
 		{
@@ -131,15 +131,16 @@ namespace Database.Repos
 					db.SolutionLikes.Add(new Like { SubmissionId = solutionId, Timestamp = DateTime.Now, UserId = userId });
 					likesCount++;
 				}
+
 				await db.SaveChangesAsync();
 
 				transaction.Commit();
-				
+
 				return Tuple.Create(likesCount, !votedAlready);
 			}
 		}
 
-		public IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId, bool includeManualCheckings=true)
+		public IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId, bool includeManualCheckings = true)
 		{
 			var query = db.UserExerciseSubmissions.AsQueryable();
 			if (includeManualCheckings)
@@ -195,12 +196,12 @@ namespace Database.Repos
 		{
 			return GetAllSubmissions(courseId, new List<Guid> { slideId }).Where(s => s.UserId == userId);
 		}
-		
+
 		public IQueryable<UserExerciseSubmission> GetAllSubmissionsByUsers(SubmissionsFilterOptions filterOptions)
 		{
 			var submissions = GetAllSubmissions(filterOptions.CourseId, filterOptions.SlideIds);
 			if (filterOptions.IsUserIdsSupplement)
-				submissions = submissions.Where(s => ! filterOptions.UserIds.Contains(s.UserId));
+				submissions = submissions.Where(s => !filterOptions.UserIds.Contains(s.UserId));
 			else
 				submissions = submissions.Where(s => filterOptions.UserIds.Contains(s.UserId));
 			return submissions;
@@ -333,6 +334,7 @@ namespace Database.Repos
 				{
 					log.Warn($"Нашёл в базе данных не все решения. Искал: [{string.Join(", ", results.Select(r => r.Id))}]. Нашёл: [{string.Join(", ", submissions.Select(s => s.Id))}]");
 				}
+
 				var res = new List<AutomaticExerciseChecking>();
 				foreach (var submission in submissions)
 					res.Add(await UpdateAutomaticExerciseChecking(submission.AutomaticChecking, resultsDict[submission.Id.ToString()]).ConfigureAwait(false));
@@ -345,7 +347,7 @@ namespace Database.Repos
 				log.Info($"Есть информация о следующих проверках, которые ещё не забраны клиентом: [{string.Join(", ", handledSubmissions.Keys)}]");
 
 				transaction.Commit();
-				
+
 				db.ChangeTracker.AcceptAllChanges();
 			}
 		}
@@ -386,7 +388,7 @@ namespace Database.Repos
 
 			return newChecking;
 		}
-		
+
 		public async Task RunAutomaticChecking(UserExerciseSubmission submission, TimeSpan timeout, bool waitUntilChecked)
 		{
 			log.Info($"Запускаю проверку решения. ID посылки: {submission.Id}");
@@ -438,6 +440,7 @@ namespace Database.Repos
 					ClearHandleDictionaries();
 					return;
 				}
+
 				await Task.Delay(TimeSpan.FromMilliseconds(100));
 			}
 		}
@@ -453,6 +456,7 @@ namespace Database.Repos
 					handledSubmissions.TryRemove(submissionId, out _);
 					return;
 				}
+
 				await Task.Delay(TimeSpan.FromMilliseconds(100));
 			}
 		}

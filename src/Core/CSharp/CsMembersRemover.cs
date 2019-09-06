@@ -42,6 +42,7 @@ namespace Ulearn.Core.CSharp
 				index = -1;
 				return code;
 			}
+
 			if (label.OnlyBody)
 			{
 				var body = solution.GetBody();

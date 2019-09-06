@@ -22,7 +22,6 @@ namespace Ulearn.Core.Courses.Slides
 		public Slide Load(SlideLoadingContext context)
 		{
 			var fileContent = context.SlideFile.ReadAllContent();
-			
 
 			return Load(fileContent, context);
 		}
@@ -32,7 +31,7 @@ namespace Ulearn.Core.Courses.Slides
 			var slideFile = context.SlideFile ?? new FileInfo("<internal>");
 
 			var slideType = DetectSlideType(fileContent, slideFile.Name);
-			
+
 			var slide = (Slide)fileContent.DeserializeXml(slideType);
 
 			slide.BuildUp(context);

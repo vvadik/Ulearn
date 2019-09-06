@@ -7,7 +7,7 @@ namespace Ulearn.Web.Api.Authorization
 	{
 		string CourseId { get; set; }
 	}
-	
+
 	public class CourseAuthorizationParameters : ICourseAuthorizationParameters
 	{
 		[FromQuery(Name = "course_id")]

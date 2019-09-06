@@ -11,7 +11,7 @@ namespace Ulearn.Web.Api.Models.Responses.Notifications
 	{
 		[DataMember]
 		public NotificationList Important { get; set; }
-		
+
 		[DataMember]
 		public NotificationList Comments { get; set; }
 	}
@@ -21,7 +21,7 @@ namespace Ulearn.Web.Api.Models.Responses.Notifications
 	{
 		[DataMember]
 		public DateTime? LastViewTimestamp { get; set; }
-		
+
 		[DataMember]
 		public List<NotificationInfo> Notifications { get; set; }
 	}
@@ -31,19 +31,19 @@ namespace Ulearn.Web.Api.Models.Responses.Notifications
 	{
 		[DataMember]
 		public int Id { get; set; }
-		
+
 		[DataMember]
 		public string Type { get; set; }
-		
+
 		[DataMember]
 		public ShortUserInfo Author { get; set; }
-		
+
 		[DataMember]
 		public DateTime CreateTime { get; set; }
-		
+
 		[DataMember]
 		public string CourseId { get; set; }
-		
+
 		[DataMember]
 		public NotificationData Data { get; set; }
 	}
@@ -52,7 +52,7 @@ namespace Ulearn.Web.Api.Models.Responses.Notifications
 	public class NotificationData
 	{
 		[DataMember(EmitDefaultValue = false)]
-		public NotificationCommentInfo Comment { get; set; } 
+		public NotificationCommentInfo Comment { get; set; }
 	}
 
 	[DataContract]
@@ -60,19 +60,19 @@ namespace Ulearn.Web.Api.Models.Responses.Notifications
 	{
 		[DataMember]
 		public int Id { get; set; }
-		
+
 		[DataMember]
 		public ShortUserInfo Author { get; set; }
-		
+
 		[DataMember]
 		public string CourseId { get; set; }
-		
+
 		[DataMember]
 		public Guid SlideId { get; set; }
-		
+
 		[DataMember]
 		public string Text { get; set; }
-		
+
 		[DataMember]
 		public DateTime PublishTime { get; set; }
 	}

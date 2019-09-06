@@ -107,21 +107,21 @@
 				@foreach (var certificate in Model.Certificates.GetOrDefault(template.Id, new List<Certificate>()))
 				{
 					<li class="certificate">
-                        @UserAvatar.ExtraSmallAvatar(certificate.User)
-						
+						@UserAvatar.ExtraSmallAvatar(certificate.User)
+
 						@Html.RouteLink(certificate.User.VisibleName, "Certificate", new { certificateId = certificate.Id }),
-						
+
 						выдал@(certificate.Instructor.Gender.ChooseEnding()) @certificate.Instructor.VisibleName @certificate.Timestamp.ToAgoPrettyString()
 
 						@if (User.HasAccessFor(Model.Course.Id, CourseRole.CourseAdmin) ||
 							certificate.InstructorId == User.Identity.GetUserId())
 						{
 							<a class="remove-certificate-link"
-                                  data-certificate-id="@certificate.Id"
-                                  data-url="@Url.Action("RemoveCertificate", new { courseId = certificate.Template.CourseId, certificateId = certificate.Id })"
-                                  title="Отозвать сертификат">
-                                ×
-                            </a>
+								data-certificate-id="@certificate.Id"
+								data-url="@Url.Action("RemoveCertificate", new { courseId = certificate.Template.CourseId, certificateId = certificate.Id })"
+								title="Отозвать сертификат">
+								×
+							</a>
 						}
 					</li>
 				}
@@ -133,10 +133,10 @@
 <div class="modal fade" id="createOrUpdateCertificateTemplateModal" role="dialog">
 	<div class="modal-dialog">
 		<div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Новый шаблон</h4>
-            </div>
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Новый шаблон</h4>
+			</div>
 			<div class="modal-body">
 				@using (Html.BeginForm("CreateCertificateTemplate", "Admin", FormMethod.Post, new
 				{
@@ -179,10 +179,10 @@
 <div class="modal fade" id="multipleCertificatesGenerationModal" role="dialog">
 	<div class="modal-dialog">
 		<div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Выберите файл с данными</h4>
-            </div>
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Выберите файл с данными</h4>
+			</div>
 			<div class="modal-body">
 				@using (Html.BeginForm("PreviewCertificates", "Admin", FormMethod.Post, new
 				{

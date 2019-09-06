@@ -11,28 +11,28 @@ namespace Ulearn.Core
 	{
 		[XmlEnum("csharp")]
 		CSharp = 1,
-		
+
 		[XmlEnum("python2")]
 		Python2 = 2,
-		
+
 		[XmlEnum("python3")]
 		Python3 = 3,
-		
+
 		[XmlEnum("java")]
 		Java = 4,
-		
+
 		[XmlEnum("javascript")]
 		JavaScript = 5,
 
 		[XmlEnum("html")]
 		Html = 6,
-		
+
 		[XmlEnum("typescript")]
 		TypeScript = 7,
-		
+
 		[XmlEnum("css")]
 		Css = 8,
-		
+
 		[XmlEnum("text")]
 		Text = 100,
 	}
@@ -41,30 +41,30 @@ namespace Ulearn.Core
 	{
 		private static readonly Dictionary<string, Language> extensions = new Dictionary<string, Language>
 		{
-			{".cs", Language.CSharp},
-			
-			{".py", Language.Python3},
-			{".py2", Language.Python2},
-			{".py3", Language.Python3},
-			
-			{".html", Language.Html},
-			{".css", Language.Css},
-			
-			{".js", Language.JavaScript},
-			{".ts", Language.TypeScript},
-			
-			{".java", Language.Java},
-			
-			{".txt", Language.Text},
+			{ ".cs", Language.CSharp },
+
+			{ ".py", Language.Python3 },
+			{ ".py2", Language.Python2 },
+			{ ".py3", Language.Python3 },
+
+			{ ".html", Language.Html },
+			{ ".css", Language.Css },
+
+			{ ".js", Language.JavaScript },
+			{ ".ts", Language.TypeScript },
+
+			{ ".java", Language.Java },
+
+			{ ".txt", Language.Text },
 		};
-		
+
 		public static Language GuessByExtension(string extension)
 		{
 			if (extensions.ContainsKey(extension))
 				return extensions[extension];
-			
+
 			throw new ArgumentException(
-				$"Can't guess programming language by file extension. Unknown file extension: {extension}\n" + 
+				$"Can't guess programming language by file extension. Unknown file extension: {extension}\n" +
 				$"Known extensions are {string.Join(", ", extensions.Keys)}."
 			);
 		}
@@ -77,11 +77,11 @@ namespace Ulearn.Core
 		public static Language ParseFromXml(string language)
 		{
 			var serializer = new XmlSerializer(typeof(Language));
-			
+
 			/* XmlSerializer expects XML so wrap what you got in xml tags */
 			var xmlBytes = Encoding.ASCII.GetBytes($"<Language>{language.EscapeHtml()}</Language>");
 			using (var ms = new MemoryStream(xmlBytes))
-				return (Language) serializer.Deserialize(ms);
+				return (Language)serializer.Deserialize(ms);
 		}
 
 		public static Language ParseByName(string language)

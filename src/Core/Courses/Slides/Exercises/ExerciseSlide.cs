@@ -12,11 +12,11 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 		[XmlElement("scoring")]
 		public ExerciseScoringSettings Scoring { get; set; } = new ExerciseScoringSettings
 		{
-			PassedTestsScore = 5, 
+			PassedTestsScore = 5,
 		};
-		
+
 		protected override Type[] AllowedBlockTypes => base.AllowedBlockTypes.Concat(new[] { typeof(AbstractExerciseBlock) }).ToArray();
-		
+
 		public override bool ShouldBeSolved => true;
 
 		public override string ScoringGroup => Scoring.ScoringGroup;
@@ -24,7 +24,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 		public override int MaxScore => Scoring.PassedTestsScore + Scoring.CodeReviewScore;
 
 		[XmlIgnore]
-		public AbstractExerciseBlock Exercise => (AbstractExerciseBlock) Blocks.Single(b => b is AbstractExerciseBlock);
+		public AbstractExerciseBlock Exercise => (AbstractExerciseBlock)Blocks.Single(b => b is AbstractExerciseBlock);
 
 		public ExerciseSlide()
 		{
@@ -44,7 +44,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 		{
 			if (string.IsNullOrEmpty(ScoringGroup))
 				Scoring.ScoringGroup = context.CourseSettings.Scoring.DefaultScoringGroupForExercise;
-			
+
 			base.BuildUp(context);
 		}
 
@@ -64,16 +64,17 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 					$"Не найдено блоков с упражнениями (<exercise.file>, <exercise.csproj> или <exercise.universal>) в слайде «{Title}», " +
 					"для которого использован внешний тег <slide.exercise>. Если вы хотите создать обычный слайд без упражнения, используйте тег <slide>");
 			}
+
 			if (exerciseBlocksCount > 1)
 			{
 				throw new CourseLoadingException(
 					"Блок с упражнением (<exercise.file>, <exercise.csproj> или <exercise.universal>) может быть только один на слайде. " +
 					$"Но на слайде «{Title}» найдено {exerciseBlocksCount} таких блока.");
 			}
-			
+
 			base.Validate(context);
 		}
-		
+
 		public Component GetSolutionsComponent(string displayName, Slide slide, int componentIndex, string launchUrl,
 			string ltiId)
 		{

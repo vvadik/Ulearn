@@ -14,7 +14,7 @@ namespace Ulearn.Core
 			var unsafeUrl = RepoUrlToRepoLink(repoUrl) + "/edit/master/" + (courseXmlPath + "/" + filePathRelativeCourseXml).Replace('\\', '/');
 			return Uri.EscapeUriString(unsafeUrl);
 		}
-		
+
 		private static string RepoUrlToRepoLink(string repoUrl)
 		{
 			var link = repoUrl.Substring(4);

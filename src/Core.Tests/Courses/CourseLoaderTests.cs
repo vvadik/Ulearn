@@ -11,7 +11,7 @@ namespace Ulearn.Core.Tests.Courses
 	public class CourseLoaderTests
 	{
 		private const string testDataDirectory = "Courses/TestData/";
-		
+
 		private CourseLoader loader;
 
 		[OneTimeSetUp]
@@ -36,11 +36,11 @@ namespace Ulearn.Core.Tests.Courses
 		public void LoadSimpleCourse()
 		{
 			var course = LoadCourseFromDirectory("SimpleCourse");
-			
+
 			Assert.AreEqual(2, course.Units.Count);
 			Assert.AreEqual(Language.CSharp, course.Settings.DefaultLanguage);
 			Assert.AreEqual("Simple Course", course.Title);
-			CollectionAssert.AreEqual(new [] { new PreludeFile(Language.Html, "Prelude.html"), }, course.Settings.Preludes);
+			CollectionAssert.AreEqual(new[] { new PreludeFile(Language.Html, "Prelude.html"), }, course.Settings.Preludes);
 		}
 
 		[Test]

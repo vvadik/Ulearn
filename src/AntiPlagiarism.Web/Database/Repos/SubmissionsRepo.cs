@@ -10,7 +10,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 {
 	public interface ISubmissionsRepo
 	{
-		Task<List<Submission>> GetSubmissionsAsync(int startFromIndex, int maxCount);		
+		Task<List<Submission>> GetSubmissionsAsync(int startFromIndex, int maxCount);
 		Task<Submission> FindSubmissionByIdAsync(int submissionId);
 		Task<List<Submission>> GetSubmissionsByIdsAsync(IEnumerable<int> submissionIds);
 		Task<Submission> AddSubmissionAsync(int clientId, Guid taskId, Guid authorId, Language language, string code, int tokensCount, string additionalInfo);
@@ -18,7 +18,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 		Task<List<Submission>> GetSubmissionsByAuthorAndTaskAsync(int clientId, Guid authorId, Guid taskId, int count);
 		Task<List<Guid>> GetLastAuthorsByTaskAsync(int clientId, Guid taskId, int count);
 		Task<List<Submission>> GetLastSubmissionsByAuthorsForTaskAsync(int clientId, Guid taskId, IEnumerable<Guid> authorsIds);
-		Task<int> GetAuthorsCountAsync(int clientId, Guid taskId);		
+		Task<int> GetAuthorsCountAsync(int clientId, Guid taskId);
 		Task<List<Submission>> GetSubmissionsByTaskAsync(int clientId, Guid taskId);
 		Task<int> GetSubmissionsCountAsync(int clientId, Guid taskId);
 	}
@@ -45,13 +45,13 @@ namespace AntiPlagiarism.Web.Database.Repos
 		{
 			return db.Submissions.Include(s => s.Program).FirstOrDefaultAsync(s => s.Id == submissionId);
 		}
-		
+
 		public Task<List<Submission>> GetSubmissionsByIdsAsync(IEnumerable<int> submissionIds)
 		{
 			return db.Submissions.Include(s => s.Program).Where(s => submissionIds.Contains(s.Id)).ToListAsync();
 		}
 
-		public async Task<Submission> AddSubmissionAsync(int clientId, Guid taskId, Guid authorId, Language language, string code, int tokensCount, string additionalInfo="")
+		public async Task<Submission> AddSubmissionAsync(int clientId, Guid taskId, Guid authorId, Language language, string code, int tokensCount, string additionalInfo = "")
 		{
 			var submission = new Submission
 			{

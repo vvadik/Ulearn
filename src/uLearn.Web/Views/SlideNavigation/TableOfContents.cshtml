@@ -64,13 +64,13 @@
 
 @helper TocItem(TocPageInfo page)
 {
-	<a href="@page.Url" class="@(page.IsCurrent ? "selected" : "")">
-        <span class="slide-list-item clickable full-size" data-slide-id="@page.SlideId">
-            <i class="@GetPageIconClass(page) navbar-label" title="@GetTocPageTytle(page.PageType)"></i>
-            <span class="underline-on-parent-hover" style="margin-right: 5px">@page.Name</span>
-            <span class="score right">@SlideHtml.ShowScore(page.Score, page.MaxScore)</span>
-        </span>
-    </a>
+	<a href="@page.Url" class="@( page.IsCurrent ? "selected" : "")">
+		<span class="slide-list-item clickable full-size" data-slide-id="@page.SlideId">
+			<i class="@GetPageIconClass(page) navbar-label" title="@GetTocPageTytle(page.PageType)"></i>
+			<span class="underline-on-parent-hover" style="margin-right: 5px">@page.Name</span>
+			<span class="score right">@SlideHtml.ShowScore(page.Score, page.MaxScore)</span>
+		</span>
+	</a>
 }
 
 @helper TocAdditionalScore(ScoringGroup group, int score)

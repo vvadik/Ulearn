@@ -5,10 +5,14 @@ using RazorGenerator.Mvc;
 
 [assembly: WebActivatorEx.PostApplicationStartMethod(typeof(uLearn.Web.RazorGeneratorMvcStart), "Start")]
 
-namespace uLearn.Web {
-	public static class RazorGeneratorMvcStart {
-		public static void Start() {
-			var engine = new PrecompiledMvcEngine(typeof(RazorGeneratorMvcStart).Assembly) {
+namespace uLearn.Web
+{
+	public static class RazorGeneratorMvcStart
+	{
+		public static void Start()
+		{
+			var engine = new PrecompiledMvcEngine(typeof(RazorGeneratorMvcStart).Assembly)
+			{
 				UsePhysicalViewsIfNewer = HttpContext.Current.Request.IsLocal
 			};
 

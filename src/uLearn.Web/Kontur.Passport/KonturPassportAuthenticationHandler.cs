@@ -25,7 +25,7 @@ namespace uLearn.Web.Kontur.Passport
 			this.passportClient = passportClient;
 			this.log = log;
 		}
-		
+
 		/// <summary>
 		/// The core authentication logic which must be provided by the handler. Will be invoked at most
 		/// once per request. Do not call directly, call the wrapping Authenticate method instead.
@@ -48,6 +48,7 @@ namespace uLearn.Web.Kontur.Passport
 					log.Error(authenticationResult.ErrorMessage);
 					return null;
 				}
+
 				if (!authenticationResult.Authenticated)
 				{
 					log.Error("Kontur.Passport returned non-authenticated status");
@@ -77,9 +78,9 @@ namespace uLearn.Web.Kontur.Passport
 				/* Replace name from Kontur\andgein to andgein */
 				if (login != null && login.Contains(@"\"))
 					login = login.Substring(login.IndexOf('\\') + 1);
-				
+
 				identity.AddClaim(new Claim(ClaimTypes.Name, login, xmlSchemaForStringType, Options.AuthenticationType));
-				identity.AddClaim(new Claim("KonturLogin", login, xmlSchemaForStringType, Options.AuthenticationType));				
+				identity.AddClaim(new Claim("KonturLogin", login, xmlSchemaForStringType, Options.AuthenticationType));
 
 				var properties = Options.StateDataFormat.Unprotect(state);
 				return new AuthenticationTicket(identity, properties);
@@ -105,7 +106,7 @@ namespace uLearn.Web.Kontur.Passport
 		/// <returns></returns>
 		protected override Task ApplyResponseChallengeAsync()
 		{
-    		if (Response.StatusCode != 401)
+			if (Response.StatusCode != 401)
 			{
 				return Task.FromResult<object>(null);
 			}
@@ -167,6 +168,7 @@ namespace uLearn.Web.Kontur.Passport
 					{
 						grantIdentity = new ClaimsIdentity(grantIdentity.Claims, context.SignInAsAuthenticationType);
 					}
+
 					Context.Authentication.SignIn(context.Properties, grantIdentity);
 				}
 
@@ -179,6 +181,7 @@ namespace uLearn.Web.Kontur.Passport
 
 				return context.IsRequestCompleted;
 			}
+
 			return false;
 		}
 	}

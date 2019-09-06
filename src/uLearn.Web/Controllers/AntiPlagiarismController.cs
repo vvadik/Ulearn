@@ -53,11 +53,11 @@ namespace uLearn.Web.Controllers
 		}
 
 		public AntiPlagiarismController(ULearnDb db, CourseManager courseManager)
-			:this(db, new UserSolutionsRepo(db, courseManager), new GroupsRepo(db, courseManager))
+			: this(db, new UserSolutionsRepo(db, courseManager), new GroupsRepo(db, courseManager))
 		{
 			this.courseManager = courseManager;
 		}
-		
+
 		public AntiPlagiarismController()
 			: this(new ULearnDb(), WebCourseManager.Instance)
 		{
@@ -78,7 +78,7 @@ namespace uLearn.Web.Controllers
 				{
 					Status = "not_checked",
 				}, JsonRequestBehavior.AllowGet);
-			
+
 			var antiPlagiarismsResult = await GetAuthorPlagiarismsAsync(submission).ConfigureAwait(false);
 
 			var model = new AntiPlagiarismInfoModel
@@ -114,7 +114,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> Details(string courseId, int submissionId)
 		{
 			var submission = userSolutionsRepo.FindSubmissionById(submissionId);
-			if (! submission.CourseId.EqualsIgnoreCase(courseId))
+			if (!submission.CourseId.EqualsIgnoreCase(courseId))
 				return HttpNotFound();
 
 			var antiPlagiarismsResult = await GetAuthorPlagiarismsAsync(submission);
@@ -152,7 +152,7 @@ namespace uLearn.Web.Controllers
 			};
 			return View(details);
 		}
-		
+
 		public ActionResult SubmissionsPanel(int submissionId, Dictionary<int, double> submissionWeights)
 		{
 			var submission = userSolutionsRepo.FindSubmissionById(submissionId);
@@ -172,7 +172,7 @@ namespace uLearn.Web.Controllers
 				Submissions = submissions,
 				CurrentSubmissionId = submissionId,
 				CanTryAgain = false,
-				GetSubmissionDescription = s => GetSubmissionDescriptionForPanel(submissionWeights.ContainsKey(s.Id) ? (double?) submissionWeights[s.Id] : null),
+				GetSubmissionDescription = s => GetSubmissionDescriptionForPanel(submissionWeights.ContainsKey(s.Id) ? (double?)submissionWeights[s.Id] : null),
 				FormUrl = Url.Action("Details", new { courseId }),
 				ShowButtons = false,
 				SelectControlName = "submissionId",
@@ -231,16 +231,16 @@ namespace uLearn.Web.Controllers
 		Faint = 1,
 		Strong = 2,
 	}
-	
+
 	[DataContract]
 	public class AntiPlagiarismInfoModel
 	{
 		[DataMember(Name = "status")]
 		public string Status { get; set; }
-		
+
 		[DataMember(Name = "suspicion_level")]
 		public SuspicionLevel SuspicionLevel { get; set; }
-		
+
 		[DataMember(Name = "suspicious_authors_count")]
 		public int SuspiciousAuthorsCount { get; set; }
 	}
@@ -248,17 +248,17 @@ namespace uLearn.Web.Controllers
 	public class AntiPlagiarismDetailsModel
 	{
 		public int SubmissionId { get; set; }
-		
+
 		public Course Course { get; set; }
-		
+
 		public Slide Slide { get; set; }
-		
+
 		public DefaultDictionary<string, string> UsersGroups { get; set; }
-		
+
 		public DefaultDictionary<string, string> UsersArchivedGroups { get; set; }
-		
+
 		public GetAuthorPlagiarismsResponse AntiPlagiarismResponse { get; set; }
-		
+
 		public Dictionary<int, UserExerciseSubmission> Submissions { get; set; }
 	}
 

@@ -13,7 +13,7 @@ namespace uLearn.CSharp.ArrayGetLengthValidation
 	{
 		private readonly PortableExecutableReference mscorlib =
 			MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
-		
+
 		[Test]
 		public void ContainsAssignmentOf_Should_FindAssignmentInCycle()
 		{
@@ -46,7 +46,7 @@ namespace uLearn.CSharp.ArrayGetLengthValidation.TestData.Incorrect
 			var cycleNode = nodes.OfType<DoStatementSyntax>().First();
 			cycleNode.ContainsAssignmentOf("arr", semanticModel).Should().Be(true);
 		}
-		
+
 		[Test]
 		public void ContainsAssignmentOf_Should_FindDeclarationInCycle()
 		{

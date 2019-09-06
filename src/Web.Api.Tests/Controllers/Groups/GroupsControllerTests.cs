@@ -31,7 +31,7 @@ namespace Web.Api.Tests.Controllers.Groups
 			course.Setup(c => c.Id).Returns("courseId");
 
 			await groupsRepo.CreateGroupAsync("courseId", "Test group", TestUsers.Admin.Id).ConfigureAwait(false);
-			
+
 			await AuthenticateUserInControllerAsync(groupsController, TestUsers.Admin).ConfigureAwait(false);
 
 			var result = await groupsController.GroupsList(new GroupsListParameters { CourseId = "courseId" }).ConfigureAwait(false);

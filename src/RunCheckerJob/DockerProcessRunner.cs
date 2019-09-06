@@ -41,7 +41,7 @@ namespace RunCheckerJob
 
 			return RunDocker(settings, dir);
 		}
-		
+
 		private static RunningResults RunDocker(DockerSandboxRunnerSettings settings, DirectoryInfo dir)
 		{
 			var name = Guid.NewGuid();
@@ -108,7 +108,7 @@ namespace RunCheckerJob
 				const int time = 10;
 				Thread.Sleep(time);
 				remainingTimeoutMs -= time;
-				if(remainingTimeoutMs <= 0)
+				if (remainingTimeoutMs <= 0)
 					throw new Exception($"process {dockerShellProcess.Id} is not completed after kill");
 			}
 

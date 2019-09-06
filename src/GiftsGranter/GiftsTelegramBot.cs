@@ -10,7 +10,7 @@ namespace GiftsGranter
 	public class GiftsTelegramBot : TelegramBot
 	{
 		private static ILog log = LogManager.GetLogger(typeof(GiftsTelegramBot));
-		
+
 		public GiftsTelegramBot()
 		{
 			channel = ConfigurationManager.AppSettings["ulearn.telegram.gifts.channel"];
@@ -20,7 +20,7 @@ namespace GiftsGranter
 		{
 			if (!IsBotEnabled)
 				return;
-			
+
 			log.Info($"Отправляю в телеграм-канал {channel} сообщение об выданных призах:\n{message}");
 			try
 			{

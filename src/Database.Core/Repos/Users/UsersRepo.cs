@@ -35,13 +35,13 @@ namespace Database.Repos.Users
 			var user = await db.Users.FindAsync(userId).ConfigureAwait(false);
 			if (user == null)
 				return null;
-			
+
 			return user.IsDeleted ? null : user;
 		}
 
 		/* Pass limit=0 to disable limiting */
 		[Obsolete("Use UserSearcher instead")]
-		public async Task<List<UserRolesInfo>> FindUsers(UserSearchQuery query, int limit=100)
+		public async Task<List<UserRolesInfo>> FindUsers(UserSearchQuery query, int limit = 100)
 		{
 			var role = db.Roles.FirstOrDefault(r => r.Name == query.Role);
 			var users = db.Users.Where(u => !u.IsDeleted);
@@ -50,6 +50,7 @@ namespace Database.Repos.Users
 				var usersIds = GetUsersByNamePrefix(query.NamePrefix).Select(u => u.Id);
 				users = users.Where(u => usersIds.Contains(u.Id));
 			}
+
 			return await users
 				.FilterByRole(role, userManager)
 				.FilterByUserIds(
@@ -65,7 +66,7 @@ namespace Database.Repos.Users
 			var deletedUserIds = db.Users.Where(u => u.IsDeleted).Select(u => u.Id).ToList();
 			return GetUsersByNamePrefix(namePrefix).Where(u => !deletedUserIds.Contains(u.Id)).Select(u => u.Id).ToList();
 		}
-		
+
 		/* Pass limit=0 to disable limiting */
 		public async Task<List<UserRolesInfo>> GetCourseInstructorsAsync(string courseId, int limit = 50)
 		{
@@ -80,7 +81,7 @@ namespace Database.Repos.Users
 		public async Task<List<UserRolesInfo>> GetCourseAdminsAsync(string courseId, int limit = 50)
 		{
 			return await db.Users
-				.Where(u => !u.IsDeleted)	
+				.Where(u => !u.IsDeleted)
 				.FilterByUserIds(await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.CourseAdmin, courseId, includeHighRoles: true).ConfigureAwait(false))
 				.GetUserRolesInfoAsync(limit, userManager)
 				.ConfigureAwait(false);
@@ -96,9 +97,9 @@ namespace Database.Repos.Users
 			var role = await db.Roles.FirstOrDefaultAsync(r => r.Name == lmsRole.ToString()).ConfigureAwait(false);
 			if (role == null)
 				return new List<string>();
-			return db.Users.Where(u => ! u.IsDeleted).FilterByRole(role, userManager).Select(u => u.Id).ToList();
+			return db.Users.Where(u => !u.IsDeleted).FilterByRole(role, userManager).Select(u => u.Id).ToList();
 		}
-		
+
 		public Task<List<string>> GetSysAdminsIdsAsync()
 		{
 			return GetUserIdsWithLmsRoleAsync(LmsRoleType.SysAdmin);
@@ -129,8 +130,8 @@ namespace Database.Repos.Users
 		private IQueryable<UserIdWrapper> GetUsersByNamePrefix(string name)
 		{
 			if (string.IsNullOrEmpty(name))
-				return db.Users.Where(u => ! u.IsDeleted).Select(u => new UserIdWrapper(u.Id));
-			
+				return db.Users.Where(u => !u.IsDeleted).Select(u => new UserIdWrapper(u.Id));
+
 			var splittedName = name.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
 			var nameQuery = string.Join(" & ", splittedName.Select(s => "\"" + s.Trim().Replace("\"", "\\\"") + "*\""));
 			return db.Users
@@ -169,7 +170,7 @@ namespace Database.Repos.Users
 		public async Task CreateUlearnBotUserIfNotExistsAsync()
 		{
 			var ulearnBotFound = await db.Users.AnyAsync(u => u.UserName == UlearnBotUsername).ConfigureAwait(false);
-			if (! ulearnBotFound)
+			if (!ulearnBotFound)
 			{
 				var user = new ApplicationUser
 				{
@@ -186,14 +187,14 @@ namespace Database.Repos.Users
 
 		public List<ApplicationUser> FindUsersByUsernameOrEmail(string usernameOrEmail)
 		{
-			return db.Users.Where(u => (u.UserName == usernameOrEmail || u.Email == usernameOrEmail) && ! u.IsDeleted).ToList();
+			return db.Users.Where(u => (u.UserName == usernameOrEmail || u.Email == usernameOrEmail) && !u.IsDeleted).ToList();
 		}
 
 		public Task<List<ApplicationUser>> GetUsersByIdsAsync(IEnumerable<string> usersIds)
 		{
-			return db.Users.Where(u => usersIds.Contains(u.Id) && ! u.IsDeleted).ToListAsync();
+			return db.Users.Where(u => usersIds.Contains(u.Id) && !u.IsDeleted).ToListAsync();
 		}
-		
+
 		public Task DeleteUserAsync(ApplicationUser user)
 		{
 			user.IsDeleted = true;
@@ -206,10 +207,10 @@ namespace Database.Repos.Users
 		{
 			if (user?.Roles == null)
 				return false;
-			
+
 			if (sysAdminRole == null)
-				sysAdminRole = db.Roles.First(r => r.Name == LmsRoleType.SysAdmin.ToString());	
-			
+				sysAdminRole = db.Roles.First(r => r.Name == LmsRoleType.SysAdmin.ToString());
+
 			return user.Roles.Any(role => role.RoleId == sysAdminRole.Id);
 		}
 	}

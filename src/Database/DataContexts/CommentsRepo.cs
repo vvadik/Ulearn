@@ -107,10 +107,12 @@ namespace Database.DataContexts
 					});
 					likesCount++;
 				}
+
 				await db.SaveChangesAsync();
 
 				transaction.Commit();
 			}
+
 			return Tuple.Create(likesCount, !votedAlready);
 		}
 
@@ -170,6 +172,7 @@ namespace Database.DataContexts
 					db.CommentsPolicies.Remove(query.First());
 					await db.SaveChangesAsync();
 				}
+
 				db.CommentsPolicies.Add(policy);
 				await db.SaveChangesAsync();
 				transaction.Commit();

@@ -38,6 +38,7 @@ namespace Ulearn.Common.Extensions
 				subDirectory.ClearDirectory();
 				subDirectory.Delete();
 			}
+
 			if (deleteDirectory)
 				directory.Delete();
 		}

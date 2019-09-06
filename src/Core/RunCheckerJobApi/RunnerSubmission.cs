@@ -11,7 +11,7 @@ namespace Ulearn.Core.RunCheckerJobApi
 			return $"Id: {Id}";
 		}
 	}
-	
+
 	public abstract class CsRunnerSubmission : RunnerSubmission
 	{
 		public string Input;

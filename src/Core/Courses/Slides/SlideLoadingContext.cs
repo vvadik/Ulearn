@@ -11,7 +11,7 @@ namespace Ulearn.Core.Courses.Slides
 		public DirectoryInfo UnitDirectory { get; }
 		public FileInfo SlideFile { get; }
 		public int SlideIndex { get; private set; }
-		
+
 		public Unit Unit { get; }
 
 		public SlideLoadingContext(string courseId, Unit unit, CourseSettings courseSettings, DirectoryInfo courseDirectory, FileInfo slideFile, int slideIndex)
@@ -28,7 +28,6 @@ namespace Ulearn.Core.Courses.Slides
 		public SlideLoadingContext(CourseLoadingContext courseLoadingContext, Unit unit, FileInfo slideFile, int slideIndex)
 			: this(courseLoadingContext.CourseId, unit, courseLoadingContext.CourseSettings, courseLoadingContext.CourseDirectory, slideFile, slideIndex)
 		{
-			
 		}
 	}
 }

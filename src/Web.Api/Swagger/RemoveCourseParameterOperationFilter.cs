@@ -13,7 +13,7 @@ namespace Ulearn.Web.Api.Swagger
 				.ParameterDescriptions
 				.Where(desc => desc.ParameterDescriptor?.ParameterType == typeof(Course) || desc.ParameterDescriptor?.ParameterType == typeof(ICourse))
 				.ToList();
-				
+
 			parametersWithCourseType
 				.ForEach(param =>
 				{

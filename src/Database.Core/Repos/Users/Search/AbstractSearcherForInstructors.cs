@@ -14,7 +14,7 @@ namespace Database.Repos.Users.Search
 		protected readonly IUsersRepo usersRepo;
 		protected readonly ICourseRolesRepo courseRolesRepo;
 		protected readonly IAccessRestrictor accessRestrictor;
-		
+
 		private readonly bool hasSystemAdministratorAccess;
 		private readonly bool hasCourseAdminAccess;
 		private readonly bool hasInstructorAccessToGroupMembers;
@@ -32,16 +32,16 @@ namespace Database.Repos.Users.Search
 		{
 			if (userProperties.Length == 0)
 				throw new ArgumentException("UserProperties should be specified", nameof(userProperties));
-			
+
 			this.usersRepo = usersRepo;
 			this.courseRolesRepo = courseRolesRepo;
 			this.accessRestrictor = accessRestrictor;
-			
+
 			this.hasSystemAdministratorAccess = hasSystemAdministratorAccess;
 			this.hasCourseAdminAccess = hasCourseAdminAccess;
 			this.hasInstructorAccessToGroupMembers = hasInstructorAccessToGroupMembers;
 			this.hasInstructorAccessToCourseInstructors = hasInstructorAccessToCourseInstructors;
-			
+
 			this.searchField = searchField;
 			this.userProperties = userProperties;
 		}
@@ -66,7 +66,7 @@ namespace Database.Repos.Users.Search
 		{
 			if (usersRepo.IsSystemAdministrator(currentUser))
 				return Task.FromResult(true);
-			
+
 			return courseRolesRepo.HasUserAccessToAnyCourseAsync(currentUser.Id, CourseRoleType.Instructor);
 		}
 

@@ -19,15 +19,18 @@ namespace uLearn.CourseTool
 	{
 		private Course course;
 
-		private readonly Slide aTextSlide = new Slide(new MarkdownBlock("hello")) {
+		private readonly Slide aTextSlide = new Slide(new MarkdownBlock("hello"))
+		{
 			Id = Guid.NewGuid(),
-			Title = "title", 
+			Title = "title",
 		};
+
 		private readonly Slide exerciseSlide = new Slide(new CsProjectExerciseBlock(), new SingleFileExerciseBlock())
 		{
 			Id = slideIdFromCourse,
 			Title = "title",
 		};
+
 		private const string youtubeIdFromCourse = "GZS36w_fxdg";
 		private static readonly Guid slideIdFromCourse = Guid.Parse("108C89D9-36F0-45E3-BBEE-B93AC971063F");
 		private CourseManager courseManager;

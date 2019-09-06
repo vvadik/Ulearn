@@ -17,11 +17,11 @@ namespace Database.Models
 		public int? ExerciseCheckingId { get; set; }
 
 		public virtual ManualExerciseChecking ExerciseChecking { get; set; }
-		
+
 		[Index("IDX_ExerciseCodeReview_BySubmission")]
 		/* This field is used only for reviews not attached to specific ManualExerciseChecking */
 		public int? SubmissionId { get; set; }
-		
+
 		[CanBeNull]
 		public virtual UserExerciseSubmission Submission { get; set; }
 
@@ -52,10 +52,10 @@ namespace Database.Models
 		[Required]
 		public bool HiddenFromTopComments { get; set; }
 
-		public DateTime AddingTime { get; set; }		
-		
+		public DateTime AddingTime { get; set; }
+
 		public virtual IList<ExerciseCodeReviewComment> Comments { get; set; }
-		
+
 		[NotMapped]
 		public List<ExerciseCodeReviewComment> NotDeletedComments => Comments.Where(r => !r.IsDeleted).OrderBy(r => r.AddingTime).ToList();
 

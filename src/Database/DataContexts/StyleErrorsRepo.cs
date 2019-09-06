@@ -23,7 +23,7 @@ namespace Database.DataContexts
 			if (settingsCache.ContainsKey(errorType))
 				return settingsCache[errorType];
 
-			/* By default all style validation errors are enabled */ 
+			/* By default all style validation errors are enabled */
 			return true;
 		}
 
@@ -31,11 +31,11 @@ namespace Database.DataContexts
 		{
 			await CacheSettingsAsync();
 			var allErrorTypes = typeof(StyleErrorType).GetEnumValues().Cast<StyleErrorType>();
-			
+
 			var result = new Dictionary<StyleErrorType, bool>();
 			foreach (var errorType in allErrorTypes)
 				result[errorType] = await IsStyleErrorEnabledAsync(errorType);
-			
+
 			return result;
 		}
 

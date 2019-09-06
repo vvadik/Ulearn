@@ -140,10 +140,11 @@ namespace Database.DataContexts
 					db.SolutionLikes.Add(new Like { SubmissionId = solutionId, Timestamp = DateTime.Now, UserId = userId });
 					likesCount++;
 				}
+
 				await db.SaveChangesAsync();
 
 				transaction.Commit();
-				
+
 				return Tuple.Create(likesCount, !votedAlready);
 			}
 		}
@@ -201,12 +202,12 @@ namespace Database.DataContexts
 		{
 			return GetAllSubmissions(courseId, new List<Guid> { slideId }).Where(s => s.UserId == userId);
 		}
-		
+
 		public IQueryable<UserExerciseSubmission> GetAllSubmissionsByUsers(SubmissionsFilterOptions filterOptions)
 		{
 			var submissions = GetAllSubmissions(filterOptions.CourseId, filterOptions.SlideIds);
 			if (filterOptions.IsUserIdsSupplement)
-				submissions = submissions.Where(s => ! filterOptions.UserIds.Contains(s.UserId));
+				submissions = submissions.Where(s => !filterOptions.UserIds.Contains(s.UserId));
 			else
 				submissions = submissions.Where(s => filterOptions.UserIds.Contains(s.UserId));
 			return submissions;
@@ -288,16 +289,16 @@ namespace Database.DataContexts
 			if (submission == null)
 				return null;
 			submission.SolutionCode = textsRepo.GetText(submission.SolutionCodeHash);
-			
+
 			if (submission.AutomaticChecking != null)
 			{
 				submission.AutomaticChecking.Output = textsRepo.GetText(submission.AutomaticChecking.OutputHash);
 				submission.AutomaticChecking.CompilationError = textsRepo.GetText(submission.AutomaticChecking.CompilationErrorHash);
 			}
-			
+
 			return submission;
 		}
-		
+
 		public async Task<UserExerciseSubmission> GetUnhandledSubmission(string agentName, List<Language> languages)
 		{
 			try
@@ -312,6 +313,7 @@ namespace Database.DataContexts
 		}
 
 		private static volatile SemaphoreSlim getSubmissionSemaphore = new SemaphoreSlim(1);
+
 		private async Task<UserExerciseSubmission> TryGetExerciseSubmission(string agentName, IEnumerable<Language> languages)
 		{
 			var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
@@ -322,7 +324,7 @@ namespace Database.DataContexts
 					s.Timestamp > notSoLongAgo
 					&& s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting
 					&& languages.Contains(s.Language));
-			
+
 			var maxId = submissionsQueryable.Select(s => s.Id).DefaultIfEmpty(-1).Max();
 			if (maxId == -1)
 				return null;
@@ -343,6 +345,7 @@ namespace Database.DataContexts
 				log.Error("TryGetExerciseSubmission(): Can't lock semaphore for 2 seconds");
 				return null;
 			}
+
 			log.Debug("GetUnhandledSubmission(): semaphore acquired!");
 			try
 			{
@@ -355,7 +358,7 @@ namespace Database.DataContexts
 
 					if (submission.AutomaticChecking.Status != AutomaticExerciseCheckingStatus.Waiting)
 						return null;
-					
+
 					/* Mark submission as "running" */
 					submission.AutomaticChecking.Status = AutomaticExerciseCheckingStatus.Running;
 					submission.AutomaticChecking.CheckingAgentName = agentName;
@@ -366,9 +369,9 @@ namespace Database.DataContexts
 
 					db.ObjectContext().AcceptAllChanges();
 				}
-				
+
 				unhandledSubmissions.TryRemove(submission.Id, out _);
- 
+
 				return submission;
 			}
 			catch (Exception e)
@@ -414,6 +417,7 @@ namespace Database.DataContexts
 				db.AutomaticExerciseCheckings.AddOrUpdate(checking);
 				UpdateIsRightAnswerForSubmission(checking);
 			}
+
 			try
 			{
 				await db.ObjectContext().SaveChangesAsync(SaveOptions.DetectChangesBeforeSave).ConfigureAwait(false);
@@ -437,6 +441,7 @@ namespace Database.DataContexts
 					log.Warn($"Не нашёл в базе данных решение {result.Id}");
 					return;
 				}
+
 				var aec = await UpdateAutomaticExerciseChecking(submission.AutomaticChecking, result).ConfigureAwait(false);
 				await SaveAll(Enumerable.Repeat(aec, 1)).ConfigureAwait(false);
 
@@ -444,7 +449,7 @@ namespace Database.DataContexts
 
 				transaction.Commit();
 				db.ObjectContext().AcceptAllChanges();
-				
+
 				if (!handledSubmissions.TryAdd(submission.Id, DateTime.Now))
 					log.Warn($"Не удалось запомнить, что проверка {submission.Id} проверена, а результат сохранен в базу");
 
@@ -460,9 +465,9 @@ namespace Database.DataContexts
 
 			var isWebRunner = checking.CourseId == "web" && checking.SlideId == Guid.Empty;
 			var exerciseSlide = isWebRunner ? null : (ExerciseSlide)courseManager.GetCourse(checking.CourseId).GetSlideById(checking.SlideId);
-			
+
 			var isRightAnswer = IsRightAnswer(result, output, exerciseSlide?.Exercise);
-			var score = exerciseSlide != null && isRightAnswer ? exerciseSlide.Scoring.PassedTestsScore: 0;
+			var score = exerciseSlide != null && isRightAnswer ? exerciseSlide.Scoring.PassedTestsScore : 0;
 
 			/* For skipped slides score is always 0 */
 			if (visitsRepo.IsSkipped(checking.CourseId, checking.SlideId, checking.UserId))
@@ -492,9 +497,9 @@ namespace Database.DataContexts
 
 		private bool IsRightAnswer(RunningResults result, string output, AbstractExerciseBlock exerciseBlock)
 		{
-			if (result.Verdict != Verdict.Ok )
+			if (result.Verdict != Verdict.Ok)
 				return false;
-			
+
 			/* For sandbox runner */
 			if (exerciseBlock == null)
 				return false;
@@ -562,6 +567,7 @@ namespace Database.DataContexts
 					ClearHandleDictionaries();
 					return;
 				}
+
 				await Task.Delay(TimeSpan.FromMilliseconds(100));
 			}
 		}
@@ -578,6 +584,7 @@ namespace Database.DataContexts
 					handledSubmissions.TryRemove(submissionId, out value);
 					return;
 				}
+
 				await Task.Delay(TimeSpan.FromMilliseconds(100));
 			}
 		}

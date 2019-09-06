@@ -12,7 +12,7 @@ namespace Ulearn.Web.Api.Models.Parameters.Comments
 	{
 		[DataMember(IsRequired = true)]
 		public Guid SlideId { get; set; }
-		
+
 		[DataMember(IsRequired = true)]
 		[NotEmpty(ErrorMessage = "Text can not be empty")]
 		[MaxLength(CommentsPolicy.MaxCommentLength, ErrorMessage = "Comment is too large. Max allowed length is 10000 chars")]

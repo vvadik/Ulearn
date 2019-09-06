@@ -8,13 +8,13 @@ namespace Ulearn.Core.Telegram
 		private readonly string token;
 		protected string channel;
 		protected readonly TelegramBotClient telegramClient;
-		
+
 		protected const int MaxMessageSize = 2048;
 
 		protected TelegramBot()
 		{
 			token = ApplicationConfiguration.Read<UlearnConfiguration>().Telegram.BotToken;
-			if (! string.IsNullOrEmpty(token))
+			if (!string.IsNullOrEmpty(token))
 				telegramClient = new TelegramBotClient(token);
 		}
 

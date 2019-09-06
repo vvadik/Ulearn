@@ -8,7 +8,7 @@ namespace Ulearn.Web.Api.Models.Responses.User
 {
 	[DataContract]
 	public class UserProgressResponse : SuccessResponse
-	{	
+	{
 		[DataMember]
 		public Dictionary<Guid, UserSlideResult> VisitedSlides { get; set; }
 	}

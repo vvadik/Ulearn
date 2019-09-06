@@ -29,18 +29,19 @@ namespace GitCourseUpdater
 	public class GitException : Exception
 	{
 		public bool MayBeSSHException;
-		
+
 		public GitException(string massage, Exception innerException)
 			: base(massage, innerException)
-		{ }
+		{
+		}
 	}
-	
+
 	public class GitRepo : IGitRepo
 	{
 		private string url;
 		private CredentialsHandler credentialsHandler;
 		private DirectoryInfo reposBaseDir;
-		private string repoDirName; 
+		private string repoDirName;
 		private Repository repo;
 		private ILogger logger;
 		private string privateKeyPath;
@@ -79,17 +80,17 @@ namespace GitCourseUpdater
 			catch (LibGit2SharpException ex)
 			{
 				Dispose(); // Если объект не создан, извне Dispose не вызовут
-				if(ex.Message.Contains("SSH"))
-					throw new GitException(ex.Message, ex) {MayBeSSHException = true};
+				if (ex.Message.Contains("SSH"))
+					throw new GitException(ex.Message, ex) { MayBeSSHException = true };
 				throw;
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				Dispose(); // Если объект не создан, извне Dispose не вызовут
 				throw;
 			}
 		}
-		
+
 		public MemoryStream GetCurrentStateAsZip(string courseSubdirectoryInRepo = null)
 		{
 			logger.Information($"Start load '{repoDirName}' to zip");
@@ -100,7 +101,7 @@ namespace GitCourseUpdater
 			logger.Information($"Successfully load '{repoDirName}' to zip");
 			return zip;
 		}
-		
+
 		public CommitInfo GetCurrentCommitInfo()
 		{
 			var lastCommit = repo.Commits.First();
@@ -108,7 +109,7 @@ namespace GitCourseUpdater
 			logger.Information($"GetCurrentCommitInfo '{repoDirName}': {JsonConvert.SerializeObject(commitInfo)}");
 			return commitInfo;
 		}
-		
+
 		[CanBeNull]
 		public CommitInfo GetCommitInfo(string hash)
 		{
@@ -121,7 +122,7 @@ namespace GitCourseUpdater
 
 			return ToCommitInfo(commit);
 		}
-		
+
 
 		// null, если коммит не найден. Возвращает полные пути в репозитории
 		[CanBeNull]
@@ -139,6 +140,7 @@ namespace GitCourseUpdater
 		}
 
 		private static readonly Regex sha1Regex = new Regex("[a-f0-9]{40}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
 		public void Checkout(string commitHashOrBranchName)
 		{
 			if (sha1Regex.IsMatch(commitHashOrBranchName))
@@ -146,7 +148,7 @@ namespace GitCourseUpdater
 			else
 				CheckoutBranchAndResetToOrigin(commitHashOrBranchName);
 		}
-		
+
 		private void CheckoutCommit(string hash)
 		{
 			logger.Information($"Start checkout '{url}' commit '{hash}' in '{repoDirName}'");
@@ -169,13 +171,14 @@ namespace GitCourseUpdater
 					b.UpstreamBranch = $"refs/heads/{name}";
 				});
 			}
+
 			logger.Information($"Start checkout '{url}' branch '{name}' in '{repoDirName}'");
 			Commands.Checkout(repo, name);
 			logger.Information($"Successfully checkout '{url}' branch '{name}' in '{repoDirName}'");
 			repo.Reset(ResetMode.Hard, remoteBranch.Tip);
 			logger.Information($"Successfully reset '{url}' branch '{name}' in '{repoDirName}' to commit '{repo.Branches[name].Tip.Sha}'");
 		}
-		
+
 		private static CommitInfo ToCommitInfo(Commit commit)
 		{
 			return new CommitInfo
@@ -198,7 +201,7 @@ namespace GitCourseUpdater
 					return false;
 				var repoPath = reposBaseDir.GetSubdirectory(repoDirName);
 				repo = new Repository(repoPath.FullName);
-				if(HasUncommittedChanges())
+				if (HasUncommittedChanges())
 					throw new LibGit2SharpException($"Has uncommited changes in '{repoDirName}'");
 				FetchAll();
 				CheckoutBranchAndResetToOrigin("master");
@@ -208,9 +211,10 @@ namespace GitCourseUpdater
 				logger.Warning(ex, $"Could not update existing repository '{repoDirName}'");
 				return false;
 			}
+
 			return true;
 		}
-		
+
 		private string GetExistingRepoFolderName()
 		{
 			var names = reposBaseDir.GetDirectories(Url2Name() + "@*").Select(d => d.Name).ToList();
@@ -253,6 +257,7 @@ namespace GitCourseUpdater
 				var refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
 				Commands.Fetch(repo, remote.Name, refSpecs, options, logMessage);
 			}
+
 			logger.Information($"Successfully fetch all '{url}' in '{repoDirName}'");
 		}
 
@@ -260,7 +265,6 @@ namespace GitCourseUpdater
 		{
 			var status = repo.RetrieveStatus();
 			return status.IsDirty;
-			
 		}
 
 		public void Dispose()
@@ -270,9 +274,9 @@ namespace GitCourseUpdater
 				repo?.Dispose();
 				var privateKeyFileInfo = new FileInfo(privateKeyPath);
 				var publicKeyFileInfo = new FileInfo(publicKeyPath);
-				if(privateKeyFileInfo.Exists)
+				if (privateKeyFileInfo.Exists)
 					privateKeyFileInfo.Delete();
-				if(publicKeyFileInfo.Exists)
+				if (publicKeyFileInfo.Exists)
 					publicKeyFileInfo.Delete();
 			}
 			finally

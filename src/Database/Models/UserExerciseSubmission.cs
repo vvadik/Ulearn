@@ -53,9 +53,9 @@ namespace Database.Models
 		public virtual IList<Like> Likes { get; set; }
 
 		public int? AutomaticCheckingId { get; set; }
-		
+
 		public virtual AutomaticExerciseChecking AutomaticChecking { get; set; }
-		
+
 		[Index("IDX_UserExerciseSubmissions_ByCourseAndIsRightAnswer", 2)]
 		[Index("IDX_UserExerciseSubmissions_BySlideAndIsRightAnswer", 3)]
 		[Index("IDX_UserExerciseSubmissions_ByIsRightAnswer")]
@@ -65,7 +65,7 @@ namespace Database.Models
 		public Language Language { get; set; }
 
 		public virtual IList<ManualExerciseChecking> ManualCheckings { get; set; }
-		
+
 		[Obsolete] // YT: ULEARN-217
 		[Index("IDX_UserExerciseSubmission_ByAntiPlagiarismSubmissionId")]
 		public int? AntiPlagiarismSubmissionId { get; set; }
@@ -74,7 +74,7 @@ namespace Database.Models
 
 		[NotMapped]
 		public List<ExerciseCodeReview> NotDeletedReviews => Reviews.Where(r => !r.IsDeleted).ToList();
-		
+
 		public bool IsWebSubmission => string.Equals(CourseId, "web", StringComparison.OrdinalIgnoreCase) && SlideId == Guid.Empty;
 
 		public List<ExerciseCodeReview> GetAllReviews()

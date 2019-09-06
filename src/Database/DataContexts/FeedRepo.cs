@@ -43,6 +43,7 @@ namespace Database.DataContexts
 				};
 				db.FeedViewTimestamps.Add(currentTimestamp);
 			}
+
 			currentTimestamp.Timestamp = timestamp;
 
 			await db.SaveChangesAsync();

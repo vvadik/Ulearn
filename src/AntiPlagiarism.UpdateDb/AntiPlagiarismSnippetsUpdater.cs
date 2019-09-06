@@ -30,7 +30,7 @@ namespace AntiPlagiarism.UpdateDb
 			this.logger = logger;
 		}
 
-		public async Task UpdateAsync(int startFromIndex=0, bool updateOnlyTokensCount=false)
+		public async Task UpdateAsync(int startFromIndex = 0, bool updateOnlyTokensCount = false)
 		{
 			logger.Information("Начинаю обновлять информацию о сниппетах в базе данных");
 
@@ -40,7 +40,7 @@ namespace AntiPlagiarism.UpdateDb
 				int lastSubmissionId;
 				using (var scope = serviceScopeFactory.CreateScope())
 				{
-					/* Re-create submissions repo each time for preventing memory leaks */					
+					/* Re-create submissions repo each time for preventing memory leaks */
 					var submissionsRepo = scope.ServiceProvider.GetService<ISubmissionsRepo>();
 
 					var submissions = await submissionsRepo.GetSubmissionsAsync(startFromIndex, maxSubmissionsCount);
@@ -58,7 +58,7 @@ namespace AntiPlagiarism.UpdateDb
 						await submissionsRepo.UpdateSubmissionTokensCountAsync(submission, GetTokensCount(submission.ProgramText));
 						if (updateOnlyTokensCount)
 							continue;
-						
+
 						try
 						{
 							await UpdateSnippetsFromSubmissionAsync(snippetsRepo, submission).ConfigureAwait(false);
@@ -71,13 +71,13 @@ namespace AntiPlagiarism.UpdateDb
 				}
 
 				startFromIndex = lastSubmissionId + 1;
-				
+
 				logger.Information("Запускаю сборку мусора");
 				logger.Information($"Потребление памяти до сборки мусора: {GC.GetTotalMemory(false) / 1024}Кб. GC's Gen0: {GC.CollectionCount(0)} Gen1: {GC.CollectionCount(1)} Gen2: {GC.CollectionCount(2)}");
 				GC.Collect();
 				logger.Information($"Потребление памяти после сборки мусора: {GC.GetTotalMemory(false) / 1024}Кб. GC's Gen0: {GC.CollectionCount(0)} Gen1: {GC.CollectionCount(1)} Gen2: {GC.CollectionCount(2)}");
 			}
-			
+
 			logger.Information("AntiPlagiarismSnippetsUpdater закончил свою работу");
 		}
 
@@ -87,7 +87,7 @@ namespace AntiPlagiarism.UpdateDb
 				(await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(submission).ConfigureAwait(false))
 				.Select(o => Tuple.Create(o.SnippetId, o.FirstTokenIndex))
 			);
-			
+
 			foreach (var (firstTokenIndex, snippet) in submissionSnippetsExtractor.ExtractSnippetsFromSubmission(submission))
 			{
 				var foundSnippet = await snippetsRepo.GetOrAddSnippetAsync(snippet);
@@ -105,7 +105,7 @@ namespace AntiPlagiarism.UpdateDb
 				}
 			}
 		}
-		
+
 		private int GetTokensCount(string code)
 		{
 			var codeUnits = codeUnitsExtractor.Extract(code);

@@ -24,13 +24,13 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 
 		[XmlAttribute("type")]
 		public ExerciseType ExerciseType { get; set; } = ExerciseType.CheckOutput;
-		
+
 		/* .NET XML Serializer doesn't understand nullable fields, so we use this hack to make Language? field */
 		[XmlIgnore]
 		public Language? Language { get; set; }
 
 		#region NullableLanguageHack
-		
+
 		[XmlAttribute("language")]
 		[Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
 		public Language LanguageSerialized
@@ -48,11 +48,12 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		{
 			return Language.HasValue;
 		}
+
 		#endregion
 
 		[XmlElement("initialCode")]
 		public string ExerciseInitialCode { get; set; }
-		
+
 		[XmlElement("hint")]
 		public List<string> Hints { get; set; }
 
@@ -81,10 +82,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		[XmlIgnore]
 		public List<string> HintsMd
 		{
-			get
-			{
-				return Hints = Hints?.Select(h => h.RemoveCommonNesting()).ToList() ?? new List<string>();
-			}
+			get { return Hints = Hints?.Select(h => h.RemoveCommonNesting()).ToList() ?? new List<string>(); }
 		}
 
 		public abstract string GetSourceCode(string code);
@@ -121,7 +119,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		}
 
 		#endregion
-		
+
 		public override string ToString()
 		{
 			return $"Exercise: {ExerciseInitialCode}, Hints: {string.Join("; ", HintsMd)}";
@@ -135,8 +133,8 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public override string TryGetText()
 		{
 			return (ExerciseInitialCode ?? "") + '\n'
-					+ string.Join("\n", HintsMd) + '\n'
-					+ (CommentAfterExerciseIsSolved ?? "");
+												+ string.Join("\n", HintsMd) + '\n'
+												+ (CommentAfterExerciseIsSolved ?? "");
 		}
 
 		public bool IsCorrectRunResult(RunningResults result)
@@ -155,14 +153,14 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 
 			throw new InvalidOperationException($"Unknown exercise type for checking: {ExerciseType}");
 		}
-		
+
 		/// <param name="excludeCriterias"><see cref="M:Ionic.Zip.ZipFile.AddSelectedFiles(System.String)" /></param>
 		public static byte[] ToZip(DirectoryInfo exerciseDirectory, IEnumerable<string> excludeCriterias, IEnumerable<FileContent> filesToUpdate = null,
 			IEnumerable<DirectoryInfo> directoriesToInclude = null)
 		{
 			using (var zip = new ZipFile())
 			{
-				if(directoriesToInclude != null)
+				if (directoriesToInclude != null)
 					foreach (var dir in directoriesToInclude)
 						zip.AddDirectory(dir.FullName);
 				zip.AddDirectory(exerciseDirectory.FullName);
@@ -188,24 +186,24 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		// Например, потому что есть более новое решение.
 		[XmlElement("allTestsPassed")]
 		public string AllTestsPassed { get; set; }
-		
+
 		// «Все тесты пройдены, задача сдана». Показывается тем, у кого не бывает код-ревью. Например, вольнослушателям.
 		[XmlElement("allTestsPassedWithoutReview")]
 		public string AllTestsPassedWithoutReview { get; set; }
-		
+
 		// «Все тесты пройдены, за&nbsp;код-ревью {0} +{1}». Вместо {0} и {1} подставляются слова «получено»/«получен» и «X балл/балла/баллов». 
 		[XmlElement("codeReviewPassed")]
 		public string CodeReviewPassed { get; set; }
-		
+
 		// «Все тесты пройдены, за&nbsp;<a href=\"{0}\" title=\"Отредактировать код-ревью\">код-ревью</a> {1} +{2}».
 		// Аналогично предыдущему, только со ссылкой на редактирование код-ревью для преподавателя.
 		[XmlElement("codeReviewPassedInstructorView")]
 		public string CodeReviewPassedInstructorView { get; set; }
-		
+
 		// «Все тесты пройдены, решение ожидает код-ревью». Показывается студенту.
 		[XmlElement("waitingForCodeReview")]
 		public string WaitingForCodeReview { get; set; }
-		
+
 		// «Все тесты пройдены, решение ожидает <a href=\"{0}\" title=\"Перейти к код-ревью\">код-ревью</a>». Показывается преподавателю.
 		// Вместо {0} подставляется ссылка на код-ревью. 
 		[XmlElement("waitingForCodeReviewInstructorView")]
@@ -216,7 +214,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 	{
 		[XmlEnum("check-exit-code")]
 		CheckExitCode,
-		
+
 		[XmlEnum("check-output")]
 		CheckOutput
 	}
@@ -227,7 +225,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		{
 			ValidatorName = "";
 		}
-		
+
 		[XmlAttribute("removeDefaults")]
 		[DefaultValue(false)]
 		public bool RemoveDefaults { get; set; }

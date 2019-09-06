@@ -22,7 +22,7 @@ namespace Database.Repos
 		///<returns>(likesCount, isLikedByThisUsed)</returns>
 		Task<Tuple<int, bool>> Like(int solutionId, string userId);
 
-		IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId, bool includeManualCheckings=true);
+		IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId, bool includeManualCheckings = true);
 		IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId, IEnumerable<Guid> slidesIds);
 		IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId, IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish);
 		IQueryable<UserExerciseSubmission> GetAllAcceptedSubmissions(string courseId, IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish);

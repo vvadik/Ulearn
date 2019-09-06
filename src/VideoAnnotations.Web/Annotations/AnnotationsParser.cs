@@ -14,7 +14,7 @@ namespace Ulearn.VideoAnnotations.Web.Annotations
 		private readonly Regex fragmentRegex = new Regex(fragmentPattern);
 
 		private readonly string[] annotationOffsetFormats = { @"mm\:ss", @"m\:ss" };
-		
+
 		private readonly ILogger logger;
 
 		public AnnotationsParser(ILogger logger)
@@ -29,7 +29,7 @@ namespace Ulearn.VideoAnnotations.Web.Annotations
 				i++;
 
 			var result = new Dictionary<string, Annotation>();
-			
+
 			while (i < lines.Length)
 			{
 				var title = lines[i];
@@ -49,18 +49,20 @@ namespace Ulearn.VideoAnnotations.Web.Annotations
 
 				var videoId = annotationLines[0].Trim();
 				logger.Information("Parse slide {title}, video id is {videoId}", title, videoId);
-				
+
 				if (annotationLines.Count(line => line.Trim().StartsWith("*")) == 0)
 				{
 					logger.Warning("Not found time-codes for slide \"{title}\". I will skip it", title);
 					continue;
 				}
+
 				var hasAbstract = true;
 				if (annotationLines.Skip(1).Count(line => !line.Trim().StartsWith("*")) == 0)
 				{
 					logger.Warning("Not found abstract for slide \"{title}\"", title);
 					hasAbstract = false;
 				}
+
 				if (annotationLines.Skip(1).TakeWhile(line => !line.Trim().StartsWith("*")).Count() > 1)
 				{
 					logger.Warning("Abstract can not be multiline. I will skip slide \"{title}\"", title);
@@ -81,7 +83,7 @@ namespace Ulearn.VideoAnnotations.Web.Annotations
 
 			return result;
 		}
-		
+
 		private AnnotationFragment ParseFragment(string line)
 		{
 			var match = fragmentRegex.Match(line);
@@ -90,13 +92,13 @@ namespace Ulearn.VideoAnnotations.Web.Annotations
 
 			var text = match.Groups[3].Value;
 			var offsetString = match.Groups[1].Value;
-			
+
 			if (!TimeSpan.TryParseExact(offsetString, annotationOffsetFormats, CultureInfo.InvariantCulture, out var offset))
 			{
 				logger.Warning("Can't parse time-code {offset}, skip it", offsetString);
 				return null;
 			}
-			
+
 			return new AnnotationFragment
 			{
 				Offset = offset,

@@ -12,11 +12,12 @@ using Ulearn.Core.Properties;
 
 namespace uLearn.CSharp.Validators.SpellingValidator
 {
-	public class SpellingValidator: BaseStyleValidator
+	public class SpellingValidator : BaseStyleValidator
 	{
 		private readonly CodeElementSpellChecker spellChecker = new CodeElementSpellChecker();
+
 		public override List<SolutionStyleError> FindErrors(SyntaxTree userSolution, SemanticModel semanticModel)
-		{	
+		{
 			return InspectAll<MethodDeclarationSyntax>(userSolution, InspectMethodsNamesAndArguments) // TODO: проверять имена классов?
 				.Concat(InspectAll<VariableDeclarationSyntax>(userSolution, semanticModel, InspectVariablesNames))
 				.Concat(InspectAll<PropertyDeclarationSyntax>(userSolution, InspectPropertiesNames))
@@ -67,7 +68,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 				errors.Add(errorInName);
 			return errors;
 		}
-		
+
 		private IEnumerable<SolutionStyleError> InspectStructNames(StructDeclarationSyntax structDeclarationSyntax)
 		{
 			var errors = new List<SolutionStyleError>();
@@ -76,7 +77,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 				errors.Add(errorInName);
 			return errors;
 		}
-		
+
 		private IEnumerable<SolutionStyleError> InspectInterfaceNames(InterfaceDeclarationSyntax interfaceDeclarationSyntax)
 		{
 			var interfaceNameParts = interfaceDeclarationSyntax.Identifier.ValueText.SplitByCamelCase().ToList();
@@ -85,7 +86,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 				errors.Add(new SolutionStyleError(
 					StyleErrorType.Misspeling01,
 					interfaceDeclarationSyntax.Identifier,
-						interfaceNameParts.First(), "Имя интерфейса должно начинаться с I"));
+					interfaceNameParts.First(), "Имя интерфейса должно начинаться с I"));
 			var errorInName = CheckIdentifierNameForSpellingErrors(interfaceDeclarationSyntax.Identifier);
 			if (errorInName != null)
 				errors.Add(errorInName);
@@ -109,7 +110,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 			var errorInPropertyName = CheckIdentifierNameForSpellingErrors(propertyDeclaration.Identifier, propertyTypeAsString);
 			if (errorInPropertyName != null)
 				errors.Add(errorInPropertyName);
-			
+
 			return errors;
 		}
 

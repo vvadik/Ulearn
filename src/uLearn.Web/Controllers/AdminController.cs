@@ -82,7 +82,7 @@ namespace uLearn.Web.Controllers
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 			gitSecret = configuration.Git.Webhook.Secret;
 		}
-		
+
 		public ActionResult Courses(string courseId = null, string courseTitle = null)
 		{
 			var controllableCourses = new HashSet<string>(User.GetControllableCoursesId());
@@ -94,7 +94,7 @@ namespace uLearn.Web.Controllers
 				courses = courses.OrderBy(course => course.Id, StringComparer.InvariantCultureIgnoreCase);
 			else
 				courses = courses.OrderBy(course => course.Title, StringComparer.InvariantCultureIgnoreCase);
-			
+
 			var model = new CourseListViewModel
 			{
 				Courses = courses
@@ -159,6 +159,7 @@ namespace uLearn.Web.Controllers
 				db.UnitAppearances.Remove(unitAppearance);
 				await db.SaveChangesAsync();
 			}
+
 			return RedirectToAction("Units", new { courseId });
 		}
 
@@ -177,7 +178,7 @@ namespace uLearn.Web.Controllers
 			var packageName = courseManager.GetPackageName(courseId);
 			return File(courseManager.GetCourseVersionFile(versionId).FullName, "application/zip", packageName);
 		}
-		
+
 		private async Task NotifyAboutCourseVersion(string courseId, Guid versionId, string userId)
 		{
 			var notification = new UploadedPackageNotification
@@ -186,7 +187,7 @@ namespace uLearn.Web.Controllers
 			};
 			await notificationsRepo.AddNotification(courseId, notification, userId);
 		}
-		
+
 		private async Task NotifyAboutCourseUploadFromRepoError(string courseId, string commitHash, string repoUrl)
 		{
 			var notification = new NotUploadedPackageNotification
@@ -197,7 +198,7 @@ namespace uLearn.Web.Controllers
 			var bot = usersRepo.GetUlearnBotUser();
 			await notificationsRepo.AddNotification(courseId, notification, bot.Id);
 		}
-		
+
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		[HandleHttpAntiForgeryException]
@@ -230,16 +231,19 @@ namespace uLearn.Web.Controllers
 						settings.PublicKey = keys.PublicSSH;
 					}
 				}
+
 				await coursesRepo.SetCourseRepoSettings(settings).ConfigureAwait(false);
 				return PackagesInternal(courseId, openStep1: true, openStep2: true);
 			}
+
 			if (submitButton == "Remove")
 			{
 				await coursesRepo.RemoveCourseRepoSettings(courseId).ConfigureAwait(false);
 			}
+
 			return RedirectToAction("Packages", new { courseId });
 		}
-		
+
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		[HandleHttpAntiForgeryException]
@@ -250,7 +254,7 @@ namespace uLearn.Web.Controllers
 			await coursesRepo.UpdateKeysByRepoUrl(repoUrl, keys.PublicSSH, keys.PrivatePEM).ConfigureAwait(false);
 			return PackagesInternal(courseId, openStep1: true, openStep2: true);
 		}
-		
+
 		[HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public async Task<ActionResult> UploadCourse(string courseId, HttpPostedFileBase file)
@@ -270,14 +274,14 @@ namespace uLearn.Web.Controllers
 				{
 					errorMessage += $"\n\n{error.InnerException.Message}";
 					error = error.InnerException;
-				} 
-				return Packages(courseId, errorMessage);
+				}
 
+				return Packages(courseId, errorMessage);
 			}
-			
+
 			return RedirectToAction("Diagnostics", new { courseId, versionId });
 		}
-		
+
 		public async Task UploadCoursesWithGit(string repoUrl, string branch)
 		{
 			var courses = coursesRepo.FindCoursesByRepoUrl(repoUrl).Where(r => r.IsWebhookEnabled && (r.Branch == branch || branch == "master" && r.Branch == null)).ToList();
@@ -321,6 +325,7 @@ namespace uLearn.Web.Controllers
 					}
 				}
 			}
+
 			foreach (var info in infoForUpload)
 			{
 				var (courseId, zip, commitInfo, pathToCourseXml) = info;
@@ -329,7 +334,7 @@ namespace uLearn.Web.Controllers
 					await NotifyAboutCourseUploadFromRepoError(courseId, commitInfo.Hash, repoUrl).ConfigureAwait(false);
 			}
 		}
-		
+
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		[HandleHttpAntiForgeryException]
@@ -337,11 +342,11 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> UploadCourseWithGit(string courseId)
 		{
 			var courseRepo = coursesRepo.GetCourseRepoSettings(courseId);
-			if(courseRepo == null)
-				return RedirectToAction("Packages", new { courseId, error="Course repo settings not found" });
+			if (courseRepo == null)
+				return RedirectToAction("Packages", new { courseId, error = "Course repo settings not found" });
 			byte[] zip = null;
 			CommitInfo commitInfo = null;
-			
+
 			var publicKey = courseRepo.PublicKey; // у всех курсов одинаковый repoUrl и ключ
 			var privateKey = courseRepo.PrivateKey;
 			Exception error = null;
@@ -364,8 +369,9 @@ namespace uLearn.Web.Controllers
 				else
 					throw;
 			}
+
 			var versionId = new Guid();
-			if(error == null)
+			if (error == null)
 				(versionId, error) = await UploadCourse(courseId, zip, User.Identity.GetUserId(), courseRepo.RepoUrl, commitInfo, courseRepo.PathToCourseXml).ConfigureAwait(false);
 			if (error != null)
 			{
@@ -377,13 +383,12 @@ namespace uLearn.Web.Controllers
 				}
 
 				return Packages(courseId, errorMessage);
-				return RedirectToAction("Packages", new { courseId, error=errorMessage });
+				return RedirectToAction("Packages", new { courseId, error = errorMessage });
 			}
-			
+
 			return RedirectToAction("Diagnostics", new { courseId, versionId });
 		}
-		
-		
+
 
 		private async Task<(Guid versionId, Exception error)> UploadCourse(string courseId, byte[] content, string userId,
 			string uploadedFromRepoUrl = null, CommitInfo commitInfo = null, string pathToCourseXmlInRepo = null)
@@ -404,6 +409,7 @@ namespace uLearn.Web.Controllers
 				log.Warn($"Upload course exception '{courseId}'", e);
 				return (versionId, e);
 			}
+
 			log.Info($"Successfully update course files '{courseId}'");
 			if (pathToCourseXmlInRepo == null && uploadedFromRepoUrl != null)
 			{
@@ -412,6 +418,7 @@ namespace uLearn.Web.Controllers
 					? ""
 					: updatedCourse.CourseXmlDirectory.FullName.Substring(extractedVersionDirectory.FullName.Length + 1);
 			}
+
 			await coursesRepo.AddCourseVersion(courseId, versionId, userId,
 				pathToCourseXmlInRepo, uploadedFromRepoUrl, commitInfo?.Hash, commitInfo?.Message);
 			await NotifyAboutCourseVersion(courseId, versionId, userId);
@@ -426,6 +433,7 @@ namespace uLearn.Web.Controllers
 			{
 				log.Warn("Error during delete previous unpublished versions", ex);
 			}
+
 			return (versionId, null);
 		}
 
@@ -436,7 +444,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> CreateCourse(string courseId, string courseTitle)
 		{
 			var versionId = Guid.NewGuid();
-			
+
 			if (!courseManager.TryCreateCourse(courseId, courseTitle, versionId))
 				return RedirectToAction("Courses", new { courseId = courseId, courseTitle = courseTitle });
 
@@ -446,18 +454,18 @@ namespace uLearn.Web.Controllers
 			var courseFile = courseManager.GetStagingCourseFile(courseId);
 			await coursesRepo.AddCourseFile(courseId, versionId, courseFile.ReadAllContent()).ConfigureAwait(false);
 			await NotifyAboutPublishedCourseVersion(courseId, versionId, userId).ConfigureAwait(false);
-			
+
 			return RedirectToAction("Packages", new { courseId, onlyPrivileged = true });
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		[ValidateInput(false)]
-		public ActionResult Packages(string courseId, string error="")
+		public ActionResult Packages(string courseId, string error = "")
 		{
 			return PackagesInternal(courseId, error);
 		}
-		
-		private ActionResult PackagesInternal(string courseId, string error="", bool openStep1 = false, bool openStep2 = false)
+
+		private ActionResult PackagesInternal(string courseId, string error = "", bool openStep1 = false, bool openStep2 = false)
 		{
 			var hasPackage = courseManager.HasPackageFor(courseId);
 			var lastUpdate = courseManager.GetLastWriteTime(courseId);
@@ -483,9 +491,9 @@ namespace uLearn.Web.Controllers
 		public ActionResult Comments(string courseId)
 		{
 			const int commentsCountLimit = 500;
-			
-			var userId = User.Identity.GetUserId();			
-			
+
+			var userId = User.Identity.GetUserId();
+
 			var course = courseManager.GetCourse(courseId);
 			var commentsPolicy = commentsRepo.GetCommentsPolicy(courseId);
 
@@ -509,20 +517,20 @@ namespace uLearn.Web.Controllers
 					let slide = course.FindSlideById(c.SlideId)
 					where slide != null
 					select
-					new CommentViewModel
-					{
-						Comment = c,
-						LikesCount = commentsLikes.GetOrDefault(c.Id),
-						IsLikedByUser = commentsLikedByUser.Contains(c.Id),
-						Replies = new List<CommentViewModel>(),
-						CanEditAndDeleteComment = true,
-						CanModerateComment = true,
-						IsCommentVisibleForUser = true,
-						ShowContextInformation = true,
-						ContextSlideTitle = slide.Title,
-						ContextParentComment = c.IsTopLevel() ? null : commentsById.ContainsKey(c.ParentCommentId) ? commentsById[c.ParentCommentId].Text : null,
-						CanViewAuthorProfile = canViewProfiles,
-					}).ToList()
+						new CommentViewModel
+						{
+							Comment = c,
+							LikesCount = commentsLikes.GetOrDefault(c.Id),
+							IsLikedByUser = commentsLikedByUser.Contains(c.Id),
+							Replies = new List<CommentViewModel>(),
+							CanEditAndDeleteComment = true,
+							CanModerateComment = true,
+							IsCommentVisibleForUser = true,
+							ShowContextInformation = true,
+							ContextSlideTitle = slide.Title,
+							ContextParentComment = c.IsTopLevel() ? null : commentsById.ContainsKey(c.ParentCommentId) ? commentsById[c.ParentCommentId].Text : null,
+							CanViewAuthorProfile = canViewProfiles,
+						}).ToList()
 			});
 		}
 
@@ -578,7 +586,7 @@ namespace uLearn.Web.Controllers
 			filterOptions.OnlyChecked = null;
 			var allCheckingsSlidesIds = GetMergedCheckingQueue(filterOptions).Select(c => c.SlideId).Distinct();
 
-			var emptySlideMock = new Slide { Info = new SlideInfo(null, null, -1), Title = "", Id = Guid.Empty};
+			var emptySlideMock = new Slide { Info = new SlideInfo(null, null, -1), Title = "", Id = Guid.Empty };
 			var allCheckingsSlides = allCheckingsSlidesIds
 				.Select(s => new KeyValuePair<Guid, Slide>(s, course.FindSlideById(s)))
 				.Where(kvp => kvp.Value != null)
@@ -593,7 +601,7 @@ namespace uLearn.Web.Controllers
 				.ThenBy(s => s.Value.Index)
 				.Select(s => new KeyValuePair<Guid, Slide>(s.Key, s.Value))
 				.ToList();
-			
+
 			/* Remove divider iff it is first or last item */
 			if (allCheckingsSlides.First().Key == Guid.Empty || allCheckingsSlides.Last().Key == Guid.Empty)
 				allCheckingsSlides.RemoveAll(kvp => kvp.Key == Guid.Empty);
@@ -601,7 +609,7 @@ namespace uLearn.Web.Controllers
 			return View("CheckingQueue", new ManualCheckingQueueViewModel
 			{
 				CourseId = courseId,
-                /* TODO (andgein): Merge FindSlideById() and following GetSlideById() calls */
+				/* TODO (andgein): Merge FindSlideById() and following GetSlideById() calls */
 				Checkings = checkings.Take(maxShownQueueSize).Where(c => course.FindSlideById(c.SlideId) != null).Select(c =>
 				{
 					var slide = course.GetSlideById(c.SlideId);
@@ -639,6 +647,7 @@ namespace uLearn.Web.Controllers
 		{
 			return RedirectToAction("CheckingQueue", new { courseId = courseId, done = done, userId = userId, slideId = slideId, message = message, group = group });
 		}
+
 		public ActionResult ManualQuizCheckingQueue(string courseId, bool done = false, string userId = "", Guid? slideId = null, string message = "", string group = "")
 		{
 			return RedirectToAction("CheckingQueue", new { courseId = courseId, done = done, userId = userId, slideId = slideId, message = message, group = group });
@@ -674,7 +683,7 @@ namespace uLearn.Web.Controllers
 							message = "already_checked",
 						});
 
-				if (! recheck)
+				if (!recheck)
 					await slideCheckingsRepo.LockManualChecking(checking, User.Identity.GetUserId()).ConfigureAwait(false);
 				transaction.Commit();
 			}
@@ -758,7 +767,7 @@ namespace uLearn.Web.Controllers
 		{
 			var isCourseAdmin = User.HasAccessFor(queryModel.CourseId, CourseRole.CourseAdmin);
 			var canAddInstructors = coursesRepo.HasCourseAccess(User.Identity.GetUserId(), queryModel.CourseId, CourseAccessType.AddAndRemoveInstructors);
-			if (! isCourseAdmin && ! canAddInstructors)
+			if (!isCourseAdmin && !canAddInstructors)
 				return HttpNotFound();
 
 			if (string.IsNullOrEmpty(queryModel.CourseId))
@@ -778,7 +787,7 @@ namespace uLearn.Web.Controllers
 		private UserListModel GetUserListModel(IEnumerable<UserRolesInfo> userRoles, string courseId)
 		{
 			var rolesForUsers = userRolesRepo.GetRolesByUsers(courseId);
-			var currentUserId = User.Identity.GetUserId();			
+			var currentUserId = User.Identity.GetUserId();
 			var isCourseAdmin = User.HasAccessFor(courseId, CourseRole.CourseAdmin);
 			var canAddInstructors = coursesRepo.HasCourseAccess(currentUserId, courseId, CourseAccessType.AddAndRemoveInstructors);
 			var model = new UserListModel
@@ -810,7 +819,6 @@ namespace uLearn.Web.Controllers
 							UserName = user.UserVisibleName,
 							Role = courseRole,
 							CourseTitle = courseManager.FindCourse(courseId)?.Title
-							
 						});
 
 				var courseAccesses = coursesRepo.GetCourseAccesses(courseId, user.UserId).Select(a => a.AccessType).ToList();
@@ -824,8 +832,8 @@ namespace uLearn.Web.Controllers
 							HasAccess = courseAccesses.Contains(a),
 							ToggleUrl = Url.Action("ToggleCourseAccess", "Admin", new { courseId = courseId, userId = user.UserId, accessType = a }),
 							UserName = user.UserVisibleName,
-							AccessType=a,
-							CourseTitle = courseManager.FindCourse(courseId)?.Title 
+							AccessType = a,
+							CourseTitle = courseManager.FindCourse(courseId)?.Title
 						}
 					);
 
@@ -899,14 +907,14 @@ namespace uLearn.Web.Controllers
 			var versionFile = courseManager.GetCourseVersionFile(versionId);
 			var courseFile = courseManager.GetStagingCourseFile(courseId);
 			var oldCourse = courseManager.GetCourse(courseId);
-			
+
 			log.Info($"загружаю {versionId} курса {courseId} в таблицу {nameof(CourseFile)}");
 			await coursesRepo.AddCourseFile(courseId, versionId, courseFile.ReadAllContent()).ConfigureAwait(false);
 
 			/* First, try to load course from LRU-cache or zip file */
 			log.Info($"Загружаю версию {versionId}");
 			var version = courseManager.GetVersion(versionId);
-			
+
 			/* Copy version's zip file to course's zip archive, overwrite if need */
 			log.Info($"Копирую архив с версий в архив с курсом: {versionFile.FullName} → {courseFile.FullName}");
 			versionFile.CopyTo(courseFile.FullName, true);
@@ -950,7 +958,7 @@ namespace uLearn.Web.Controllers
 		{
 			/* Remove notifications from database */
 			await notificationsRepo.RemoveNotifications(versionId);
-			
+
 			/* Remove information from database */
 			await coursesRepo.DeleteCourseVersion(courseId, versionId);
 
@@ -981,7 +989,7 @@ namespace uLearn.Web.Controllers
 			public string value { get; set; }
 		}
 
-		public ActionResult FindUsers(string courseId, string term, bool onlyInstructors=true, bool withGroups=true)
+		public ActionResult FindUsers(string courseId, string term, bool onlyInstructors = true, bool withGroups = true)
 		{
 			/* Only sysadmins can search ordinary users */
 			// This limitation is disabled now for certificates generation. Waits for futher investigation
@@ -1065,6 +1073,7 @@ namespace uLearn.Web.Controllers
 				log.Error("Создание шаблона сертификата: не могу сохранить архив", e);
 				throw;
 			}
+
 			return archiveName;
 		}
 
@@ -1079,7 +1088,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> EditCertificateTemplate(string courseId, Guid templateId, string name, HttpPostedFileBase archive)
 		{
 			var template = certificatesRepo.FindTemplateById(templateId);
-			if (template == null || ! template.CourseId.EqualsIgnoreCase(courseId))
+			if (template == null || !template.CourseId.EqualsIgnoreCase(courseId))
 				return HttpNotFound();
 
 			log.Info($"Обновляю шаблон сертификата «{template.Name}» (Id = {template.Id}) для курса {courseId}");
@@ -1102,7 +1111,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> RemoveCertificateTemplate(string courseId, Guid templateId)
 		{
 			var template = certificatesRepo.FindTemplateById(templateId);
-			if (template == null || ! template.CourseId.EqualsIgnoreCase(courseId))
+			if (template == null || !template.CourseId.EqualsIgnoreCase(courseId))
 				return HttpNotFound();
 
 			log.Info($"Удаляю шаблон сертификата «{template.Name}» (Id = {template.Id}) для курса {courseId}");
@@ -1126,7 +1135,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> AddCertificate(string courseId, Guid templateId, string userId, bool isPreview = false)
 		{
 			var template = certificatesRepo.FindTemplateById(templateId);
-			if (template == null || ! template.CourseId.EqualsIgnoreCase(courseId))
+			if (template == null || !template.CourseId.EqualsIgnoreCase(courseId))
 				return HttpNotFound();
 
 			var certificateParameters = GetCertificateParametersFromRequest(template);
@@ -1153,6 +1162,7 @@ namespace uLearn.Web.Controllers
 					return null;
 				certificateParameters[parameter] = Request.Unvalidated.Form["parameter-" + parameter];
 			}
+
 			return certificateParameters;
 		}
 
@@ -1174,7 +1184,7 @@ namespace uLearn.Web.Controllers
 		public ActionResult DownloadCertificateTemplate(string courseId, Guid templateId)
 		{
 			var template = certificatesRepo.FindTemplateById(templateId);
-			if (template == null || ! template.CourseId.EqualsIgnoreCase(courseId))
+			if (template == null || !template.CourseId.EqualsIgnoreCase(courseId))
 				return HttpNotFound();
 
 			return RedirectPermanent($"/Certificates/{template.ArchiveName}.zip");
@@ -1185,7 +1195,7 @@ namespace uLearn.Web.Controllers
 			const string namesColumnName = "Фамилия Имя";
 
 			var template = certificatesRepo.FindTemplateById(templateId);
-			if (template == null || ! template.CourseId.EqualsIgnoreCase(courseId))
+			if (template == null || !template.CourseId.EqualsIgnoreCase(courseId))
 				return HttpNotFound();
 
 			var notBuiltinTemplateParameters = certificateGenerator.GetTemplateParametersWithoutBuiltins(template).ToList();
@@ -1224,6 +1234,7 @@ namespace uLearn.Web.Controllers
 				{
 					return View(model.WithError($"Ошибка в файле с данными: в строке {parser.ErrorLineNumber}: \"{parser.ErrorLine}\". {e}"));
 				}
+
 				var namesColumnIndex = headers.FindIndex(namesColumnName);
 				if (namesColumnIndex < 0)
 					return View(model.WithError($"Одно из полей должно иметь имя \"{namesColumnName}\", в нём должны содержаться фамилия и имя студента. Смотрите пример файла с данными"));
@@ -1247,6 +1258,7 @@ namespace uLearn.Web.Controllers
 					{
 						return View(model.WithError($"Ошибка в файле с данными: в строке {parser.ErrorLineNumber}: \"{parser.ErrorLine}\". {e}"));
 					}
+
 					if (fields.Length != headers.Length)
 					{
 						return View(model.WithError($"Ошибка в файле с данными: в строке {parser.ErrorLineNumber}: \"{parser.ErrorLine}\". Количество ячеек в строке не совпадает с количеством столбцов в заголовке"));
@@ -1277,7 +1289,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> GenerateCertificates(string courseId, Guid templateId, int maxCertificateId)
 		{
 			var template = certificatesRepo.FindTemplateById(templateId);
-			if (template == null || ! template.CourseId.EqualsIgnoreCase(courseId))
+			if (template == null || !template.CourseId.EqualsIgnoreCase(courseId))
 				return HttpNotFound();
 
 			var templateParameters = certificateGenerator.GetTemplateParametersWithoutBuiltins(template).ToList();
@@ -1319,7 +1331,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> GetBuiltinCertificateParametersForUser(string courseId, Guid templateId, string userId)
 		{
 			var template = certificatesRepo.FindTemplateById(templateId);
-			if (template == null || ! template.CourseId.EqualsIgnoreCase(courseId))
+			if (template == null || !template.CourseId.EqualsIgnoreCase(courseId))
 				return HttpNotFound();
 
 			var user = await userManager.FindByIdAsync(userId);
@@ -1368,14 +1380,14 @@ namespace uLearn.Web.Controllers
 			if (scoreInt < 0 || scoreInt > scoringGroup.MaxAdditionalScore)
 				return Json(new { status = "error", error = $"Баллы должны быть от 0 до {scoringGroup.MaxAdditionalScore}" });
 
-			var (additionalScore, oldScore) = 
+			var (additionalScore, oldScore) =
 				await additionalScoresRepo.SetAdditionalScore(courseId, unitId, userId, scoringGroupId, scoreInt, User.Identity.GetUserId()).ConfigureAwait(false);
 			if (!oldScore.HasValue || oldScore.Value != scoreInt)
 				await NotifyAboutAdditionalScore(additionalScore).ConfigureAwait(false);
 
 			return Json(new { status = "ok", score = scoreInt });
 		}
-		
+
 		[HttpPost]
 		public async Task<ActionResult> AddLabelToGroup(int groupId, int labelId)
 		{
@@ -1386,7 +1398,7 @@ namespace uLearn.Web.Controllers
 			await groupsRepo.AddLabelToGroup(groupId, labelId).ConfigureAwait(false);
 			return Json(new { status = "ok" });
 		}
-		
+
 		[HttpPost]
 		public async Task<ActionResult> RemoveLabelFromGroup(int groupId, int labelId)
 		{
@@ -1432,7 +1444,7 @@ namespace uLearn.Web.Controllers
 			await styleErrorsRepo.EnableStyleErrorAsync(errorType, isEnabled);
 			return Json(new { status = "ok" });
 		}
-		
+
 		[SysAdminsOnly]
 		[HttpPost]
 		public async Task<ActionResult> UploadPublishedCoursesToBd()
@@ -1441,12 +1453,13 @@ namespace uLearn.Web.Controllers
 			foreach (var course in courses)
 			{
 				var publishedVersion = coursesRepo.GetPublishedCourseVersion(course.Id);
-				if(publishedVersion == null)
+				if (publishedVersion == null)
 					continue;
 				var fileInfo = courseManager.GetStagingCourseFile(course.Id);
 				var content = await fileInfo.ReadAllContentAsync().ConfigureAwait(false);
 				await coursesRepo.AddCourseFile(course.Id, publishedVersion.Id, content).ConfigureAwait(false);
 			}
+
 			return Json(new { status = "ok" });
 		}
 	}
@@ -1538,7 +1551,7 @@ namespace uLearn.Web.Controllers
 		public bool OpenStep1 { get; set; }
 		public bool OpenStep2 { get; set; }
 		public string GitSecret { get; set; }
-		
+
 		public string Error { get; set; }
 		public string HelpUrl { get; set; } = "https://docs.google.com/document/d/1tL_D2SGIv163GpVVr5HrZTBEgcMk5shCKN5J6le4pTc/edit?usp=sharing";
 	}
@@ -1551,7 +1564,7 @@ namespace uLearn.Web.Controllers
 		public bool OnlyInstructorsCanReply { get; set; }
 		public List<CommentViewModel> Comments { get; set; }
 	}
-	
+
 	public class ManualCheckingQueueViewModel
 	{
 		public string CourseId { get; set; }

@@ -5,11 +5,11 @@ namespace RunCheckerJob
 {
 	public class DockerSandboxRunnerSettings : SandboxRunnerSettings
 	{
-		[NotNull]public string SandBoxName;
-		[CanBeNull]public string SeccompFileName;
-		[NotNull]public string RunCommand;
+		[NotNull] public string SandBoxName;
+		[CanBeNull] public string SeccompFileName;
+		[NotNull] public string RunCommand;
 		public int MemorySwapLimit; // The amount of combined memory and swap that can be used
-		
+
 		public DockerSandboxRunnerSettings(string sandBoxName, string runCommand)
 		{
 			SandBoxName = sandBoxName;

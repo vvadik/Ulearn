@@ -12,18 +12,18 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 
 		[XmlAttribute("passedTestsScore")]
 		public int PassedTestsScore { get; set; } = 5;
-		
+
 		/* .NET XML Serializer doesn't understand nullable fields, so we use this hack to make int? field */
 		[XmlIgnore]
 		public int CodeReviewScore => CodeReviewScoreBack ?? 0;
 
 		[XmlIgnore]
 		public bool RequireReview => CodeReviewScoreBack.HasValue;
-		
+
 		#region NullableCodeReviewScoreHack
-		
+
 		private int? CodeReviewScoreBack { get; set; }
-		
+
 		[XmlAttribute("codeReviewScore")]
 		[Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
 		public int CodeReviewScoreSerialized
@@ -41,7 +41,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 		{
 			return CodeReviewScoreBack.HasValue;
 		}
-		
-		#endregion		
+
+		#endregion
 	}
 }

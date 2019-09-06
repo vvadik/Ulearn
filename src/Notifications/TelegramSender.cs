@@ -67,9 +67,10 @@ namespace Notifications
 				}
 				else
 					log.Error($"Can\'t send message to telegram chat {chatId}", e);
-				
+
 				throw;
 			}
+
 			metricSender.SendCount("send_to_telegram.success");
 			metricSender.SendCount($"send_to_telegram.success.to.{chatId}");
 		}
@@ -77,7 +78,7 @@ namespace Notifications
 		private static string PrepareHtmlForTelegram(string html)
 		{
 			html = html.Replace("<br>", "\n").Replace("<br/>", "\n").Replace("<br />", "\n");
-			
+
 			/* https://core.telegram.org/bots/api#html-style
 			 * All numerical HTML entities are supported.
 			 * The API currently supports only the following named HTML entities: &lt;, &gt;, &amp; and &quot;. */
@@ -87,4 +88,3 @@ namespace Notifications
 		}
 	}
 }
- 

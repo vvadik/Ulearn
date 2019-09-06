@@ -9,11 +9,11 @@ namespace Database.Models
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int Id { get; set; }
-		
-		public int ReviewId { get; set;  }
-		
+
+		public int ReviewId { get; set; }
+
 		public virtual ExerciseCodeReview Review { get; set; }
-		
+
 		[Required]
 		public string Text { get; set; }
 
@@ -25,7 +25,7 @@ namespace Database.Models
 
 		[Required]
 		public bool IsDeleted { get; set; }
-		
+
 		[Required]
 		public DateTime AddingTime { get; set; }
 	}

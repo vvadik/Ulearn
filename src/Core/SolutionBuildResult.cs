@@ -8,7 +8,7 @@ namespace Ulearn.Core
 	{
 		public SolutionBuildResult(string sourceCode, string errorMessage = null, List<SolutionStyleError> styleErrors = null)
 		{
-			SourceCode = sourceCode;			
+			SourceCode = sourceCode;
 			ErrorMessage = errorMessage;
 			StyleErrors = styleErrors ?? new List<SolutionStyleError>();
 		}

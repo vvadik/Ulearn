@@ -18,7 +18,7 @@ namespace Ulearn.Web.Api.Models.Responses.Comments
 	{
 		[DataMember]
 		public ShortUserInfo User { get; set; }
-		
+
 		[DataMember]
 		public DateTime Timestamp { get; set; }
 	}

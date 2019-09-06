@@ -22,7 +22,7 @@ namespace Database.Models
 		public string AuthorId { get; set; }
 
 		public virtual ApplicationUser Author { get; set; }
-		
+
 		public string RepoUrl { get; set; }
 
 		[StringLength(40)]

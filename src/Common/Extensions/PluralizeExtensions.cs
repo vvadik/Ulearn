@@ -13,6 +13,7 @@
 				if (lastDigit >= 2 && lastDigit <= 4)
 					word = options.Two;
 			}
+
 			return word;
 		}
 
@@ -32,6 +33,7 @@
 						return $"три {options.Two}";
 				}
 			}
+
 			var word = number.SelectPluralWordInRussian(options);
 			return $"{number} {word}";
 		}
@@ -116,7 +118,7 @@
 			hideNumberOne = false,
 			smallNumbersAreWords = false
 		};
-		
+
 		public static readonly RussianPluralizationOptions StudentsDative = new RussianPluralizationOptions
 		{
 			One = "студента",
@@ -136,7 +138,7 @@
 			hideNumberOne = false,
 			smallNumbersAreWords = false,
 		};
-		
+
 		public static readonly RussianPluralizationOptions Tasks = new RussianPluralizationOptions
 		{
 			One = "задача",

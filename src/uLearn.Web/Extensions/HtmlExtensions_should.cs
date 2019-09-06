@@ -33,6 +33,5 @@ namespace uLearn.Web.Extensions
 		{
 			Assert.IsFalse(HtmlExtensions.urlRegex.IsMatch(text));
 		}
-
 	}
 }

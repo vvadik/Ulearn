@@ -54,7 +54,7 @@ namespace RunCsJob
 		private bool hasMemoryLimit;
 		private bool hasOutputLimit;
 
-		public CsSandboxRunner(CsRunnerSubmission submission, [NotNull]CsSandboxRunnerSettings settings)
+		public CsSandboxRunner(CsRunnerSubmission submission, [NotNull] CsSandboxRunnerSettings settings)
 		{
 			this.submission = submission;
 			this.settings = settings;
@@ -97,7 +97,7 @@ namespace RunCsJob
 
 			try
 			{
-				metricSender.SendTiming("exercise.compilation.csc.elapsed", (int) res.Elapsed.TotalMilliseconds);
+				metricSender.SendTiming("exercise.compilation.csc.elapsed", (int)res.Elapsed.TotalMilliseconds);
 				var diagnostics = res.EmitResult.Diagnostics;
 				var compilationOutput = diagnostics.DumpCompilationOutput();
 
@@ -151,7 +151,7 @@ namespace RunCsJob
 					}
 					catch (Win32Exception)
 					{
-						/* Sometimes we can catch Access Denied error because the process is already terminating. It's ok, we don't need to rethrow exception */	
+						/* Sometimes we can catch Access Denied error because the process is already terminating. It's ok, we don't need to rethrow exception */
 					}
 				}
 			}
@@ -361,11 +361,11 @@ namespace RunCsJob
 		private static Exception ParseNotSerializedException(string stderr)
 		{
 			stderr = stderr.Trim();
-			
+
 			const string unhandledException = "Unhandled Exception: ";
 			if (!stderr.StartsWith(unhandledException))
 				return null;
-			
+
 			log.Info($"Try to parse not-serialized and not-standard exception from following message: {stderr}");
 
 			var lines = stderr.SplitToLines();
@@ -375,7 +375,7 @@ namespace RunCsJob
 			{
 				var exceptionTypeName = exceptionLine.Substring(0, exceptionLineColonIndex);
 				var exceptionMessage = exceptionLine.Length > exceptionLineColonIndex + 2 ? exceptionLine.Substring(exceptionLineColonIndex + 2) : "";
-				
+
 				var exceptionType = typeof(Exception).Assembly.GetTypes().FirstOrDefault(t => t.FullName == exceptionTypeName);
 				if (exceptionType == null)
 					return new Exception(exceptionMessage);

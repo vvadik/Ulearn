@@ -27,15 +27,15 @@ namespace Ulearn.Common.Api
 				BaseAddress = settings.EndpointUrl
 			};
 		}
-		
+
 		protected async Task<TResult> MakeRequestAsync<TParameters, TResult>(HttpMethod method, string url, TParameters parameters)
-			where TParameters: ApiParameters
-			where TResult: ApiResponse
+			where TParameters : ApiParameters
+			where TResult : ApiResponse
 		{
 			HttpResponseMessage response;
 			if (settings.LogRequestsAndResponses)
 				logger.Information("Send {method} request to {serviceName} ({url}) with parameters: {parameters}", method.Method, settings.ServiceName, url, parameters.ToString());
-			
+
 			try
 			{
 				if (method == HttpMethod.Get)
@@ -53,7 +53,7 @@ namespace Ulearn.Common.Api
 
 			if (!response.IsSuccessStatusCode)
 			{
-				logger.Error("Bad response code from {serviceName}: {statusCode} {statusCodeDescrption}", settings.ServiceName, (int) response.StatusCode, response.StatusCode.ToString());
+				logger.Error("Bad response code from {serviceName}: {statusCode} {statusCodeDescrption}", settings.ServiceName, (int)response.StatusCode, response.StatusCode.ToString());
 				throw new ApiClientException($"Bad response code from {settings.ServiceName}: {(int)response.StatusCode} {response.StatusCode}");
 			}
 
@@ -78,17 +78,18 @@ namespace Ulearn.Common.Api
 					logResult = result.GetShortLogString();
 					shortened = true;
 				}
+
 				logger.Information($"Received response from \"{settings.ServiceName}\"{(shortened ? " (сокращенный)" : "")}: {logResult}");
 			}
 
 			return result;
 		}
 
-		private Uri BuildUrl(string url, NameValueCollection parameters=null)
+		private Uri BuildUrl(string url, NameValueCollection parameters = null)
 		{
 			if (parameters == null)
 				parameters = new NameValueCollection();
-		
+
 			var builder = new UriBuilder(url);
 			var queryString = WebUtils.ParseQueryString(builder.Query);
 			foreach (var parameterName in parameters.AllKeys)

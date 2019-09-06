@@ -27,9 +27,9 @@ namespace RunCsJob
 					MetadataReference.CreateFromFile(typeof(Point).Assembly.Location), // System.Drawing,
 					MetadataReference.CreateFromFile(typeof(ValueType).Assembly.Location), // System.Runtime
 				}, new CSharpCompilationOptions(OutputKind.ConsoleApplication));
-			
+
 			var assemblyFilename = Path.Combine(workingDirectory, assemblyName + ".exe");
-			
+
 			using (var cts = new CancellationTokenSource(compilationTimeLimit))
 			{
 				var startTime = DateTime.Now;

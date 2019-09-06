@@ -9,12 +9,12 @@ namespace Database.Repos.Groups
 			string courseId,
 			string name,
 			string ownerId,
-			bool isManualCheckingEnabled=false,
-			bool isManualCheckingEnabledForOldSolutions=false,
-			bool canUsersSeeGroupProgress=true,
-			bool defaultProhibitFurtherReview=true,
-			bool isInviteLinkEnabled=true);
+			bool isManualCheckingEnabled = false,
+			bool isManualCheckingEnabledForOldSolutions = false,
+			bool canUsersSeeGroupProgress = true,
+			bool defaultProhibitFurtherReview = true,
+			bool isInviteLinkEnabled = true);
 
-		Task<Group> CopyGroupAsync(Group group, string courseId, string newOwnerId=null);
+		Task<Group> CopyGroupAsync(Group group, string courseId, string newOwnerId = null);
 	}
 }

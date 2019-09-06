@@ -36,7 +36,6 @@ namespace Ulearn.Web.Api.Controllers.User
 		{
 			this.visitsRepo = visitsRepo;
 			this.userQuizzesRepo = userQuizzesRepo;
-			
 		}
 
 		/// <summary>

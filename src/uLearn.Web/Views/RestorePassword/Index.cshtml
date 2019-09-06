@@ -13,7 +13,9 @@
 				@using (Html.BeginForm("Index", "RestorePassword", FormMethod.Post, new { role = "form" }))
 				{
 					<div class="strike-line grey">
-						<span><i>Мы вышлем ссылку на почту</i></span>
+						<span>
+							<i>Мы вышлем ссылку на почту</i>
+						</span>
 					</div>
 
 					foreach (var message in Model.Messages)

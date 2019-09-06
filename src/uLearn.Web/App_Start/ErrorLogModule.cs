@@ -12,7 +12,7 @@ namespace uLearn.Web
 	public class ErrorLogModule : Elmah.ErrorLogModule
 	{
 		private readonly ErrorsBot errorsBot;
-		
+
 		private static readonly ILog log = LogManager.GetLogger(typeof(ErrorLogModule));
 
 		private static readonly List<string> ignorableForTelegramChannelSubstrings = new List<string>

@@ -10,6 +10,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 			EdxInteraction.CreateEdxCourseArchive(Dir, Config.ULearnCourseId, true);
 		}
 	}
+
 	[Verb("olx-pack-tar", HelpText = "Create <CourseName>.tar from olx directory")]
 	public class OlxPackTarOptions : AbstractOptions
 	{

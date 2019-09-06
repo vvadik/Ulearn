@@ -9,10 +9,10 @@ namespace AntiPlagiarism.Web.CodeAnalyzing.CSharp
 		public CodePath Path { get; private set; }
 		public List<SyntaxToken> Tokens { get; private set; }
 		public int FirstTokenIndex { get; set; }
-		
+
 		public int Position => Tokens.FirstOrDefault().SpanStart;
-		
-		public CodeUnit(CodePath path, IEnumerable<SyntaxToken> tokens, int firstTokenIndex=0)
+
+		public CodeUnit(CodePath path, IEnumerable<SyntaxToken> tokens, int firstTokenIndex = 0)
 		{
 			Path = path;
 			Tokens = tokens.ToList();

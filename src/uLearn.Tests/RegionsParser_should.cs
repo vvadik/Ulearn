@@ -25,7 +25,7 @@ namespace uLearn
 			};
 			CollectionAssert.AreEquivalent(expected, regions);
 		}
-		
+
 		[Test]
 		public void SimpleParsingWithLongRegionName()
 		{

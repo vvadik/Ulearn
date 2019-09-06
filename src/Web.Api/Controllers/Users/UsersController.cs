@@ -27,7 +27,7 @@ namespace Ulearn.Web.Api.Controllers.Users
 		private readonly IUserSearcher userSearcher;
 		private readonly ICourseRolesRepo courseRolesRepo;
 
-		public UsersController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, 
+		public UsersController(ILogger logger, IWebCourseManager courseManager, UlearnDb db,
 			IUsersRepo usersRepo, ICourseRoleUsersFilter courseRoleUsersFilter, IUserSearcher userSearcher, ICourseRolesRepo courseRolesRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
@@ -45,7 +45,7 @@ namespace Ulearn.Web.Api.Controllers.Users
 			var words = parameters.Query?.Split(' ', '\t').ToList() ?? new List<string>();
 			if (words.Count > 10)
 				return BadRequest(new ErrorResponse("Too many words in query"));
-			
+
 			var currentUser = await usersRepo.FindUserByIdAsync(UserId).ConfigureAwait(false);
 			var isSystemAdministrator = usersRepo.IsSystemAdministrator(currentUser);
 
@@ -55,23 +55,23 @@ namespace Ulearn.Web.Api.Controllers.Users
 					return BadRequest(new ErrorResponse("You should specify course_role with course_id"));
 				if (parameters.CourseRoleType == CourseRoleType.Student)
 					return BadRequest(new ErrorResponse("You can not search students by this method: there are too many students"));
-				
+
 				/* Only instructors can search by course role */
 				var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, parameters.CourseId, CourseRoleType.Instructor).ConfigureAwait(false);
 				if (!isInstructor)
-					return StatusCode((int) HttpStatusCode.Unauthorized, new ErrorResponse("Only instructors can search by course role")); 
+					return StatusCode((int)HttpStatusCode.Unauthorized, new ErrorResponse("Only instructors can search by course role"));
 			}
 			else if (parameters.CourseRoleType.HasValue)
 			{
 				/* Only sys-admins can search all instructors or all course-admins */
 				if (!isSystemAdministrator)
-					return StatusCode((int) HttpStatusCode.Unauthorized, new ErrorResponse("Only system administrator can search by course role without specified course_id"));
+					return StatusCode((int)HttpStatusCode.Unauthorized, new ErrorResponse("Only system administrator can search by course role without specified course_id"));
 			}
 
 			if (parameters.LmsRoleType.HasValue)
 			{
 				if (!isSystemAdministrator)
-					return StatusCode((int) HttpStatusCode.Unauthorized, new ErrorResponse("Only system administrator can search by lms role"));
+					return StatusCode((int)HttpStatusCode.Unauthorized, new ErrorResponse("Only system administrator can search by lms role"));
 			}
 
 			var request = new UserSearchRequest
@@ -82,13 +82,13 @@ namespace Ulearn.Web.Api.Controllers.Users
 				MinCourseRoleType = parameters.CourseRoleType,
 				LmsRole = parameters.LmsRoleType,
 			};
-			
+
 			/* Start the search!
 			 * First of all we will try to find `strict` users: users with strict match for pattern. These users will be at first place in the response.
 			 */
-			
+
 			var strictUsers = await userSearcher.SearchUsersAsync(request, strict: true, offset: 0, count: parameters.Offset + parameters.Count).ConfigureAwait(false);
-			
+
 			var users = strictUsers.ToList();
 
 			/* If strict users count is enough for answer, just take needed piece of list */
@@ -103,7 +103,7 @@ namespace Ulearn.Web.Api.Controllers.Users
 					users = users.Skip(parameters.Offset).ToList();
 				else
 					users.Clear();
-				
+
 				/*
 				 *  (strict users) (non-strict users)
 				 *  0     1    2    3    4    5    6
@@ -111,7 +111,7 @@ namespace Ulearn.Web.Api.Controllers.Users
 				 *             offset         offset+count
 				 */
 				var nonStrictUsers = await userSearcher.SearchUsersAsync(request, strict: false, offset: parameters.Offset - strictUsers.Count, count: parameters.Count - users.Count).ConfigureAwait(false);
-				
+
 				/* Add all non-strict users if there is no this user in strict users list */
 				foreach (var user in nonStrictUsers)
 				{

@@ -25,7 +25,7 @@ namespace uLearn.CSharp
 {
 	[TestFixture]
 	public class ProjectExerciseBlock_Should
-	{		
+	{
 		private CsProjectExerciseBlock ex;
 		private List<SlideBlock> exBlocks;
 
@@ -44,7 +44,7 @@ namespace uLearn.CSharp
 
 		private Project studentZipCsproj;
 		private Project checkerZipCsproj;
-		
+
 		[OneTimeSetUp]
 		public void OneTimeSetUp()
 		{
@@ -68,10 +68,10 @@ namespace uLearn.CSharp
 			var unit = new Unit(null, ex.SlideFolderPath);
 			var ctx = new SlideBuildingContext("Test", unit, CourseSettings.DefaultSettings, unit.Directory, null);
 			exBlocks = ex.BuildUp(ctx, ImmutableHashSet<string>.Empty).ToList();
-			
+
 			var builder = new ExerciseStudentZipBuilder();
 			builder.BuildStudentZip(new ExerciseSlide(exBlocks.ToArray()), studentExerciseZipFilePath);
-			
+
 			Utils.UnpackZip(studentExerciseZipFilePath.ReadAllContent(), studentExerciseFolderPath);
 
 			var zipBytes = ex.GetZipBytesForChecker("i_am_user_code");

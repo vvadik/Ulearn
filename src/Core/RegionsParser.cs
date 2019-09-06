@@ -80,6 +80,7 @@ namespace Ulearn.Core
 						regions[name] = new Region(start.Item1, current - start.Item1, start.Item2, current - start.Item2 + line.Length);
 						opened.Remove(name);
 					}
+
 					current += line.Length;
 					continue;
 				}

@@ -13,7 +13,7 @@ namespace Database.Extensions
 	public static class UserExtensions
 	{
 		private const string courseRoleClaimType = "CourseRole";
-		
+
 		public static bool HasAccessFor(this IPrincipal principal, string courseId, CourseRole minAccessLevel)
 		{
 			if (principal.IsSystemAdministrator())
@@ -101,7 +101,7 @@ namespace Database.Extensions
 			var systemAccessesRepo = new SystemAccessesRepo();
 			return systemAccessesRepo.HasSystemAccess(user.Id, accessType);
 		}
-		
+
 		public static bool HasSystemAccess(this IPrincipal User, SystemAccessType accessType)
 		{
 			var systemAccessesRepo = new SystemAccessesRepo();
@@ -113,7 +113,7 @@ namespace Database.Extensions
 			var coursesRepo = new CoursesRepo();
 			return coursesRepo.HasCourseAccess(User.Id, courseId, accessType);
 		}
-		
+
 		public static bool HasCourseAccess(this IPrincipal User, string courseId, CourseAccessType accessType)
 		{
 			var coursesRepo = new CoursesRepo();

@@ -43,7 +43,7 @@ namespace Ulearn.Common.Extensions
 				return v;
 			return defaultValue;
 		}
-		
+
 		[CanBeNull]
 		public static List<T> NullIfEmpty<T>(this List<T> items)
 		{

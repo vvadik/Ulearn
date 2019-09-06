@@ -11,10 +11,11 @@ namespace AntiPlagiarism.Web.Extensions
 			var last = node.GetLastToken();
 			while (current != last)
 			{
-				yield return current;				
+				yield return current;
 				current = current.GetNextToken();
 			}
-			yield return current;			
+
+			yield return current;
 		}
 	}
 }

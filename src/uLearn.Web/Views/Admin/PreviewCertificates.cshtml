@@ -41,7 +41,8 @@
 					@foreach (var parameter in Model.BuiltinTemplateParameters)
 					{
 						<th data-parameter="@parameter">
-							%@parameter%<nobr>
+							%@parameter%
+							<nobr>
 								<a href="#" class="remove-certificate-preview-parameter-link" title="Не показывать эту подстановку">
 									<i class="glyphicon glyphicon-remove"></i>
 								</a>

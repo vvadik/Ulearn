@@ -7,8 +7,8 @@ namespace uLearn.Web.Controllers
 {
 	public class BaseController : Controller
 	{
-		private readonly List<string> utmTags = new List<string> { "utm_source", "utm_medium", "utm_term", "utm_content", "utm_name" }; 
-		
+		private readonly List<string> utmTags = new List<string> { "utm_source", "utm_medium", "utm_term", "utm_content", "utm_name" };
+
 		protected override RedirectToRouteResult RedirectToAction(string actionName, string controllerName, RouteValueDictionary routeValues)
 		{
 			var redirectResult = base.RedirectToAction(actionName, controllerName, routeValues);
@@ -20,7 +20,7 @@ namespace uLearn.Web.Controllers
 			var redirectResult = base.RedirectToActionPermanent(actionName, controllerName, routeValues);
 			return AddUtmTagsInRedirectResult(redirectResult);
 		}
-		
+
 		protected override RedirectToRouteResult RedirectToRoute(string routeName, RouteValueDictionary routeValues)
 		{
 			var redirectResult = base.RedirectToRoute(routeName, routeValues);

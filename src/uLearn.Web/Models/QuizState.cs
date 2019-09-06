@@ -4,7 +4,7 @@
 	{
 		ReadyToSend,
 		Sent,
-		
+
 		WaitsForManualChecking,
 		IsCheckingByInstructor,
 	}
@@ -12,11 +12,11 @@
 	public class QuizState
 	{
 		public QuizStatus Status { get; set; }
-		
+
 		public int UsedAttemptsCount { get; set; }
-		
+
 		public int Score { get; set; }
-		
+
 		public int MaxScore { get; set; }
 
 		public QuizState(QuizStatus status, int usedAttemptsCount, int score, int maxScore)

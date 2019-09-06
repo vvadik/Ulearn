@@ -50,7 +50,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 
 		protected List<CommentResponse> BuildCommentsListResponse(IEnumerable<Comment> comments,
 			bool canUserSeeNotApprovedComments, DefaultDictionary<int, List<Comment>> replies, DefaultDictionary<int, int> commentLikesCount, HashSet<int> likedByUserCommentsIds,
-			[CanBeNull]Dictionary<string, List<Group>> authorId2Groups, [CanBeNull]HashSet<int> userAvailableGroups, bool canViewAllGroupMembers, bool addCourseIdAndSlideId, bool addParentCommentId, bool addReplies)
+			[CanBeNull] Dictionary<string, List<Group>> authorId2Groups, [CanBeNull] HashSet<int> userAvailableGroups, bool canViewAllGroupMembers, bool addCourseIdAndSlideId, bool addParentCommentId, bool addReplies)
 		{
 			return comments.Select(c => BuildCommentResponse(c, canUserSeeNotApprovedComments, replies, commentLikesCount, likedByUserCommentsIds, authorId2Groups, userAvailableGroups, canViewAllGroupMembers, addCourseIdAndSlideId, addParentCommentId, addReplies)).ToList();
 		}
@@ -58,7 +58,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		protected CommentResponse BuildCommentResponse(
 			Comment comment,
 			bool canUserSeeNotApprovedComments, DefaultDictionary<int, List<Comment>> replies, DefaultDictionary<int, int> commentLikesCount, HashSet<int> likedByUserCommentsIds,
-			[CanBeNull]Dictionary<string, List<Group>> authorId2Groups, [CanBeNull]HashSet<int> userAvailableGroups, bool canViewAllGroupMembers, bool addCourseIdAndSlideId, bool addParentCommentId, bool addReplies
+			[CanBeNull] Dictionary<string, List<Group>> authorId2Groups, [CanBeNull] HashSet<int> userAvailableGroups, bool canViewAllGroupMembers, bool addCourseIdAndSlideId, bool addParentCommentId, bool addReplies
 		)
 		{
 			var commentInfo = new CommentResponse
@@ -91,12 +91,12 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			if (addParentCommentId && !comment.IsTopLevel)
 				commentInfo.ParentCommentId = comment.ParentCommentId;
 
-			if (! comment.IsTopLevel)
+			if (!comment.IsTopLevel)
 			{
 				commentInfo.IsCorrectAnswer = comment.IsCorrectAnswer;
 				return commentInfo;
 			}
-			
+
 			commentInfo.IsPinnedToTop = comment.IsPinnedToTop;
 			if (addReplies)
 			{
@@ -119,7 +119,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		{
 			if (string.IsNullOrEmpty(userId))
 				return false;
-			
+
 			var hasCourseAccessForCommentEditing = await coursesRepo.HasCourseAccessAsync(userId, courseId, CourseAccessType.EditPinAndRemoveComments).ConfigureAwait(false);
 			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
 			return isCourseAdmin || hasCourseAccessForCommentEditing;
@@ -134,7 +134,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		{
 			var courseId = comment.CourseId;
 
-			if (! comment.IsTopLevel)
+			if (!comment.IsTopLevel)
 			{
 				var parentComment = await commentsRepo.FindCommentByIdAsync(comment.ParentCommentId).ConfigureAwait(false);
 				if (parentComment != null)
@@ -147,7 +147,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 					await notificationsRepo.AddNotificationAsync(courseId, replyNotification, comment.AuthorId).ConfigureAwait(false);
 				}
 			}
-			
+
 			/* Create NewCommentFromStudentFormYourGroupNotification later than RepliedToYourCommentNotification, because the last one is blocker for the first one.
 			 * We don't send NewCommentNotification if there is a RepliedToYouCommentNotification */
 			var commentFromYourGroupStudentNotification = new NewCommentFromYourGroupStudentNotification { Comment = comment };
@@ -156,7 +156,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			/* Create NewComment[ForInstructors]Notification later than RepliedToYourCommentNotification and NewCommentFromYourGroupStudentNotification, because the last one is blocker for the first one.
 			 * We don't send NewCommentNotification if there is a RepliedToYouCommentNotification or NewCommentFromYourGroupStudentNotification */
 			var notification = comment.IsForInstructorsOnly
-				? (Notification) new NewCommentForInstructorsOnlyNotification { Comment = comment } 
+				? (Notification)new NewCommentForInstructorsOnlyNotification { Comment = comment }
 				: new NewCommentNotification { Comment = comment };
 			await notificationsRepo.AddNotificationAsync(courseId, notification, comment.AuthorId).ConfigureAwait(false);
 		}

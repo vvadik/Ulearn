@@ -26,6 +26,7 @@ namespace Ulearn.Core.Model
 				regionRemovers.Add(new CsMembersRemover());
 				pragma = CsMembersRemover.Pragma;
 			}
+
 			regionRemovers.Add(new CommonRegionRemover());
 			if (pragma == null)
 				pragma = "";
@@ -38,6 +39,7 @@ namespace Ulearn.Core.Model
 				code = regionRemover.Remove(code, labels, out notRemoved);
 				labels = notRemoved;
 			}
+
 			notRemoved = labels.ToList();
 			return code.FixExtraEolns();
 		}
@@ -53,6 +55,7 @@ namespace Ulearn.Core.Model
 				index += pragma.Length;
 				return code;
 			}
+
 			index = -1;
 			return code;
 		}

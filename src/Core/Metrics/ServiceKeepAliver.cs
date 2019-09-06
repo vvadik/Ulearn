@@ -12,9 +12,9 @@ namespace Ulearn.Core.Metrics
 			this.sender = sender;
 			LastPingTime = DateTime.MinValue;
 		}
-		
+
 		public ServiceKeepAliver(string serviceName)
-			:this(new MetricSender(serviceName))
+			: this(new MetricSender(serviceName))
 		{
 		}
 

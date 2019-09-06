@@ -14,8 +14,9 @@ namespace Ulearn.VideoAnnotations.Api.Client
 	public class VideoAnnotationsClient : BaseApiClient, IVideoAnnotationsClient
 	{
 		private readonly ILogger logger;
+
 		public VideoAnnotationsClient(ILogger logger, Uri endpointUrl)
-			:base(logger, new ApiClientSettings
+			: base(logger, new ApiClientSettings
 			{
 				EndpointUrl = endpointUrl,
 				ServiceName = "video annotations service",
@@ -31,7 +32,7 @@ namespace Ulearn.VideoAnnotations.Api.Client
 			logger.Information("GetAnnotationsAsync " + sw.ElapsedMilliseconds + " ms");
 			return response;
 		}
-		
+
 		public Task ClearAsync()
 		{
 			return MakeRequestAsync<ApiParameters, ApiResponse>(HttpMethod.Post, Urls.Clear, null);

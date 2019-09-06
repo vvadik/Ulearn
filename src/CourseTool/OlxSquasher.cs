@@ -32,6 +32,7 @@ namespace uLearn.CourseTool
 				SquashElements("vertical", chapterXml, olxDir, false, toRemove);
 				SaveXml(chapterFile, chapterXml.Root);
 			}
+
 			foreach (var file in toRemove)
 				File.Delete(file);
 		}
@@ -62,6 +63,7 @@ namespace uLearn.CourseTool
 					subelement.RemoveAttributes();
 					subelement.SetAttributeValue("url_name", subUrlName);
 				}
+
 				urlNameAttr.Remove();
 				var filename = olxDir.PathCombine(elementType).PathCombine(urlName + ".xml");
 				SaveXml(filename, element);

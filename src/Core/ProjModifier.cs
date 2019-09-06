@@ -26,7 +26,7 @@ namespace Ulearn.Core
 
 	public static class ProjModifier
 	{
-		public static byte[] ModifyCsproj(FileInfo csproj, Action<Project> changingAction, string toolsVersion=null)
+		public static byte[] ModifyCsproj(FileInfo csproj, Action<Project> changingAction, string toolsVersion = null)
 		{
 			return FuncUtils.Using(
 				new ProjectCollection(),
@@ -34,7 +34,7 @@ namespace Ulearn.Core
 				{
 					var proj = new Project(csproj.FullName, null, toolsVersion, projectCollection);
 					return ModifyCsproj(proj, changingAction);
-				}, 
+				},
 				projectCollection => projectCollection.UnloadAllProjects());
 		}
 
@@ -48,7 +48,7 @@ namespace Ulearn.Core
 				return memoryStream.ToArray();
 			}
 		}
-		
+
 		public static void PrepareForStudentZip(Project proj, CsProjectExerciseBlock ex)
 		{
 			var toExclude = FindItemNames(proj, file => ExerciseStudentZipBuilder.NeedExcludeFromStudentZip(ex, file)).ToList();
@@ -58,14 +58,14 @@ namespace Ulearn.Core
 			var startupObject = proj.GetProperty("StartupObject");
 			if (startupObject != null)
 				proj.RemoveProperty(startupObject);
-			
+
 			RemoveCheckingFromCsproj(proj);
-			
+
 			var userCodeFilepathsOfOtherTasks = solutionsOfOtherTasks.Select(CsProjectExerciseBlock.SolutionFilepathToUserCodeFilepath);
 			SetFilepathItemTypeToCompile(proj, userCodeFilepathsOfOtherTasks.Concat(new[] { ex.UserCodeFilePath }));
-			
+
 			ReplaceLinksWithItems(proj);
-			
+
 			ExcludePaths(proj, toExclude);
 		}
 
@@ -150,6 +150,7 @@ namespace Ulearn.Core
 				link.item.UnevaluatedInclude = link.newPath;
 				link.item.RemoveMetadata("Link");
 			}
+
 			return copies;
 		}
 

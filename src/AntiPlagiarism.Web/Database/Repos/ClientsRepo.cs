@@ -27,5 +27,4 @@ namespace AntiPlagiarism.Web.Database.Repos
 			return await db.Clients.FirstOrDefaultAsync(c => c.Token == token && c.IsEnabled).ConfigureAwait(false);
 		}
 	}
-
 }

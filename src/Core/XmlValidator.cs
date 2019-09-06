@@ -14,11 +14,12 @@ namespace Ulearn.Core
 		public XmlValidator(string schemaPath)
 		{
 			var schemaSet = new XmlSchemaSet();
-			
+
 			using (var r = XmlReader.Create(schemaPath))
 			{
 				schemaSet.Add(XmlSchema.Read(r, null));
 			}
+
 			AppContext.SetSwitch("Switch.System.Xml.AllowDefaultResolver", true);
 			schemaSet.XmlResolver = new XmlUrlResolver();
 
@@ -54,7 +55,7 @@ namespace Ulearn.Core
 				var x = new XmlDocument();
 				x.Load(validatingReader);
 
-				while (validatingReader.Read()) 
+				while (validatingReader.Read())
 				{
 				}
 			}

@@ -87,7 +87,7 @@ namespace Database.DataContexts
 		public async Task AddNotificationTransport(NotificationTransport transport)
 		{
 			DeleteOldNotificationTransports(transport.GetType(), transport.UserId);
-			
+
 			transport.IsDeleted = false;
 			db.NotificationTransports.Add(transport);
 
@@ -180,7 +180,7 @@ namespace Database.DataContexts
 
 			await db.SaveChangesAsync();
 		}
-		
+
 		public async Task RemoveNotifications(Guid courseVersionId)
 		{
 			// Cascade delete not work: multiple cascade paths
@@ -411,6 +411,7 @@ namespace Database.DataContexts
 				delivery.FailsCount++;
 				delivery.NextTryTime = CalculateNextTryTime(delivery.CreateTime, delivery.FailsCount);
 			}
+
 			await db.SaveChangesAsync();
 		}
 
@@ -452,7 +453,7 @@ namespace Database.DataContexts
 			return $"{secret}transport={transportId}&timestamp={timestamp}{secret}".CalculateMd5();
 		}
 
-		public List<T> FindNotifications<T>(Expression<Func<T, bool>> func, Expression<Func<T, object>> includePath=null) where T : Notification
+		public List<T> FindNotifications<T>(Expression<Func<T, bool>> func, Expression<Func<T, object>> includePath = null) where T : Notification
 		{
 			var query = db.Notifications.OfType<T>();
 			if (includePath != null)

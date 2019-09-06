@@ -15,6 +15,7 @@ namespace uLearn.Web.Controllers
 			{
 				throw new ArgumentNullException(nameof(context));
 			}
+
 			if (JsonRequestBehavior == JsonRequestBehavior.DenyGet &&
 				string.Equals(context.HttpContext.Request.HttpMethod, "GET", StringComparison.OrdinalIgnoreCase))
 			{

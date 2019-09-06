@@ -9,11 +9,11 @@ namespace Database.Models.Quizzes
 		[Required]
 		[Key]
 		public int Id { get; set; }
-		
+
 		public int SubmissionId { get; set; }
-		
+
 		public virtual UserQuizSubmission Submission { get; set; }
-		
+
 		[StringLength(64)]
 		public string BlockId { get; set; }
 

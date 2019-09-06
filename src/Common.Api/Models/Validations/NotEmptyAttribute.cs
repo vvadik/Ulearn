@@ -4,8 +4,8 @@ namespace Ulearn.Common.Api.Models.Validations
 {
 	public class NotEmptyAttribute : ValidationAttribute
 	{
-		public bool CanBeNull { get; set; } = false; 
-			
+		public bool CanBeNull { get; set; } = false;
+
 		public override bool IsValid(object value)
 		{
 			var stringValue = value as string;

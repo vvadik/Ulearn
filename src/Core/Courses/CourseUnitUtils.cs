@@ -16,6 +16,7 @@ namespace Ulearn.Core.Courses
 					return path;
 				d = d.Parent;
 			}
+
 			throw new FileNotFoundException("Can't find file's relative web path because root courses folder (Courses/) " +
 											$"not found in parent directories of file {file.FullName}", file.FullName);
 		}

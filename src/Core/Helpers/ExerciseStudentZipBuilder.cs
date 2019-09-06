@@ -18,8 +18,8 @@ namespace Ulearn.Core.Helpers
 		private static readonly Regex anyWrongAnswerNameRegex = new Regex("(.+)\\.(WrongAnswer|WA)\\.(.+)\\.cs", RegexOptions.IgnoreCase);
 
 		public static bool IsAnyWrongAnswerOrAnySolution(string name) => anyWrongAnswerNameRegex.IsMatch(name) || anySolutionNameRegex.IsMatch(name);
-		public static bool IsAnySolution(string name) => anySolutionNameRegex.IsMatch(name);		
-		
+		public static bool IsAnySolution(string name) => anySolutionNameRegex.IsMatch(name);
+
 		public void BuildStudentZip(Slide slide, FileInfo zipFile)
 		{
 			switch ((slide as ExerciseSlide)?.Exercise)
@@ -47,7 +47,7 @@ namespace Ulearn.Core.Helpers
 					throw new InvalidOperationException($"Can't generate student zip for non-project exercise block: slide \"{slide.Title}\" ({slide.Id})");
 			}
 		}
-		
+
 		private static bool NeedExcludeFromStudentZip(CsProjectExerciseBlock block, FileInfo file)
 		{
 			var relativeFilePath = file.GetRelativePath(block.ExerciseFolder.FullName);
@@ -59,27 +59,27 @@ namespace Ulearn.Core.Helpers
 			return IsAnyWrongAnswerOrAnySolution(filepath) ||
 					block.PathsToExcludeForStudent != null && block.PathsToExcludeForStudent.Any(p => p == filepath);
 		}
-		
+
 		private static byte[] GetFileContentInStudentZip(CsProjectExerciseBlock block, FileInfo file)
 		{
 			if (!file.Name.Equals(block.CsprojFileName, StringComparison.InvariantCultureIgnoreCase))
 				return null;
 			return ProjModifier.ModifyCsproj(file, proj => ProjModifier.PrepareForStudentZip(proj, block));
 		}
-		
+
 		public static IEnumerable<FileContent> ResolveCsprojLinks(CsProjectExerciseBlock block)
 		{
 			return ResolveCsprojLinks(block.CsprojFile, block.BuildEnvironmentOptions.ToolsVersion);
 		}
-		
+
 		public static IEnumerable<FileContent> ResolveCsprojLinks(FileInfo csprojFile, string toolsVersion)
 		{
-			
 			return FuncUtils.Using(
 				new ProjectCollection(),
 				projectCollection =>
 				{
 					return Body();
+
 					IEnumerable<FileContent> Body()
 					{
 						var project = new Project(csprojFile.FullName, null, toolsVersion, projectCollection);
@@ -90,7 +90,7 @@ namespace Ulearn.Core.Helpers
 							yield return new FileContent { Path = fileToCopy.DestinationFile, Data = File.ReadAllBytes(fullSourcePath) };
 						}
 					}
-				}, 
+				},
 				projectCollection => projectCollection.UnloadAllProjects());
 		}
 	}

@@ -14,8 +14,8 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing
 		[Test]
 		public void ExtractSnippets()
 		{
-			const int snippetTokensCount = 12;			
-			
+			const int snippetTokensCount = 12;
+
 			var syntaxTree = CSharpSyntaxTree.ParseText(CommonTestData.SimpleProgramWithMethodAndProperty);
 			var syntaxTreeRoot = syntaxTree.GetRoot();
 			var tokens = syntaxTreeRoot.GetTokens().ToList();

@@ -27,7 +27,7 @@ namespace Database.Repos.Users.Search
 		{
 			return accessRestrictor.RestrictUsersSetAsync(
 				users, currentUser, courseId,
-				hasSystemAdministratorAccess: true, 
+				hasSystemAdministratorAccess: true,
 				hasCourseAdminAccess: false,
 				hasInstructorAccessToGroupMembers: false,
 				hasInstructorAccessToCourseInstructors: false

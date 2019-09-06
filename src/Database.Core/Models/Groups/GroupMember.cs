@@ -14,7 +14,7 @@ namespace Database.Models
 		public int GroupId { get; set; }
 
 		public virtual Group Group { get; set; }
-	
+
 		[Required]
 		[StringLength(64)]
 		public string UserId { get; set; }

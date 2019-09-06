@@ -48,6 +48,7 @@ namespace uLearn.CSharp.ExcessLinesValidation
 			{
 				Console.WriteLine(errors.Select(e => e.GetMessageWithPositions().ToList()));
 			}
+
 			errors.Should().BeNullOrEmpty();
 		}
 	}

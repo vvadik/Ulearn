@@ -17,6 +17,7 @@ namespace Ulearn.Core.CSharp.Validators.IndentsValidation.Reporters
 			{
 				return Enumerable.Empty<SolutionStyleError>();
 			}
+
 			var firstIndent = childLineIndents.First();
 			return childLineIndents
 				.Skip(1)

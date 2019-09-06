@@ -43,12 +43,12 @@ namespace Database.Core.Tests.Repos.Users
 		public async Task SearchByUserId()
 		{
 			var user = await CreateUserAsync("test").ConfigureAwait(false);
-			
+
 			var result = await SearchAsAdminAsync(user.Id.Substring(0, 5)).ConfigureAwait(false);
-			
+
 			Assert.AreEqual(1, result.Count);
 		}
-		
+
 		[Test]
 		public async Task SearchByUserIdNotFoundUnnecessary()
 		{
@@ -59,10 +59,10 @@ namespace Database.Core.Tests.Repos.Users
 				return;
 
 			var result = await SearchAsAdminAsync(user1.Id.Substring(0, 5)).ConfigureAwait(false);
-			
+
 			Assert.AreEqual(1, result.Count);
 		}
-		
+
 		[Test]
 		[Explicit("Слишком долгий тест, чтобы запускаться обязательно. Может, переписать на явное указание Id при создании пользователя?")]
 		public async Task SearchByUserIdFindsAll()
@@ -74,7 +74,7 @@ namespace Database.Core.Tests.Repos.Users
 				user2 = await CreateUserAsync("test" + StringUtils.GenerateAlphanumericString(10)).ConfigureAwait(false);
 
 			var result = await SearchAsAdminAsync(user1.Id.Substring(0, 3)).ConfigureAwait(false);
-			
+
 			Assert.AreEqual(2, result.Count);
 		}
 
@@ -100,6 +100,5 @@ namespace Database.Core.Tests.Repos.Users
 			}).ConfigureAwait(false);
 			Assert.AreEqual(0, result.Count);
 		}*/
-		
 	}
 }

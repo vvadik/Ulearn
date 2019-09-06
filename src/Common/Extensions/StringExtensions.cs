@@ -78,12 +78,13 @@ namespace Ulearn.Common.Extensions
 					yield return sb.ToString();
 					sb.Clear();
 				}
+
 				if (char.IsLetter(letter))
 					sb.Append(letter);
 			}
+
 			if (sb.Length != 0)
 				yield return sb.ToString();
-
 		}
 
 		public static string RemoveCommonNesting(this string text)
@@ -118,6 +119,7 @@ namespace Ulearn.Common.Extensions
 				var newLines = lines.Select(line => line.Length > nesting ? line.Substring(nesting) : line);
 				return newLines;
 			}
+
 			return Enumerable.Repeat("", lines.Count);
 		}
 
@@ -139,10 +141,11 @@ namespace Ulearn.Common.Extensions
 				else if (result.Length == 0 || result[result.Length - 1] != nonLatinCharsReplacement)
 					result += nonLatinCharsReplacement;
 			}
+
 			return result;
 		}
-		
-		public static Guid ToDeterministicGuid(this string arg, Encoding encoding=null)
+
+		public static Guid ToDeterministicGuid(this string arg, Encoding encoding = null)
 		{
 			encoding = encoding ?? Encoding.UTF8;
 			using (var md5 = MD5.Create())
@@ -188,7 +191,7 @@ namespace Ulearn.Common.Extensions
 			return Regex.Replace(text, "[\"»]", @"“");
 		}
 
-		public static string RenderSimpleMarkdown(this string text, bool isHtml=true, bool telegramMode=false)
+		public static string RenderSimpleMarkdown(this string text, bool isHtml = true, bool telegramMode = false)
 		{
 			text = Regex.Replace(text, @"\*\*(.+?)\*\*", @"<b>$1</b>", RegexOptions.Multiline);
 			text = Regex.Replace(text, @"__(.+?)__", @"<i>$1</i>", RegexOptions.Multiline);
@@ -223,7 +226,7 @@ namespace Ulearn.Common.Extensions
 		{
 			return text.Replace(@"\", @"\\").Replace(@"""", @"\""").Replace("'", @"\'");
 		}
-		
+
 		public static string NullIfEmptyOrWhitespace(this string str)
 		{
 			return string.IsNullOrWhiteSpace(str) ? null : str;

@@ -56,10 +56,12 @@ namespace uLearn.CourseTool.CmdLineOptions
 				{
 					Write(ConsoleColor.Red, error, true);
 				}
+
 				File.WriteAllText(course.Id + "-validation-report.html", GenerateHtmlReport(course, errors));
 			}
 			else
 				Console.WriteLine("OK! No errors found");
+
 			Console.WriteLine("Press any key...");
 			Console.WriteLine("Exit code " + Environment.ExitCode);
 			Console.ReadLine();

@@ -81,7 +81,7 @@ namespace Ulearn.Core
 			{
 				return GetCourse(courseId);
 			}
-			catch (Exception e) when (e is KeyNotFoundException || e is CourseNotFoundException) 
+			catch (Exception e) when (e is KeyNotFoundException || e is CourseNotFoundException)
 			{
 				return null;
 			}
@@ -146,7 +146,7 @@ namespace Ulearn.Core
 				var courseZips = stagedDirectory.GetFiles("*.zip");
 				var courseIdsWithZips = courseZips.Select(z => GetCourseId(z.FullName));
 				LoadCourseZipsToDiskFromExternalStorage(courseIdsWithZips);
-				
+
 				log.Info($"Загружаю курсы из {stagedDirectory.FullName}");
 				courseZips = stagedDirectory.GetFiles("*.zip");
 				foreach (var zipFile in courseZips)
@@ -165,6 +165,7 @@ namespace Ulearn.Core
 					}
 				}
 			}
+
 			if (firstException != null)
 				throw firstException;
 		}
@@ -172,7 +173,7 @@ namespace Ulearn.Core
 		protected virtual void LoadCourseZipsToDiskFromExternalStorage(IEnumerable<string> existingOnDiskCourseIds)
 		{
 			// NONE
-		} 
+		}
 
 		public Course ReloadCourse(string courseId)
 		{
@@ -286,7 +287,7 @@ namespace Ulearn.Core
 
 			var versionFile = GetCourseVersionFile(firstVersionId);
 			File.Copy(package.FullName, versionFile.FullName);
-			
+
 			return true;
 		}
 
@@ -307,7 +308,7 @@ namespace Ulearn.Core
 				zip.AddEntry("course.xml",
 					"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n" +
 					$"<course xmlns=\"https://ulearn.me/schema/v2\" title=\"{courseTitle.EncodeQuotes()}\">\n" +
-					@"<units><add>*\unit.xml</add></units>" + 
+					@"<units><add>*\unit.xml</add></units>" +
 					"</course>",
 					Encoding.UTF8);
 				zip.Save(path);
@@ -318,7 +319,7 @@ namespace Ulearn.Core
 		{
 			examplePackage.CopyTo(path, true);
 			File.SetLastWriteTime(examplePackage.FullName, DateTime.Now);
-			
+
 			var nsResolver = new XmlNamespaceManager(new NameTable());
 			nsResolver.AddNamespace("ulearn", "https://ulearn.me/schema/v2");
 			using (var zip = ZipFile.Read(path, new ReadOptions { Encoding = Encoding.GetEncoding(866) }))
@@ -354,6 +355,7 @@ namespace Ulearn.Core
 				update(element.EnsureNotNull($"no element [{selector}] in zip entry {entry.FileName}"));
 				xml.Save(output);
 			}
+
 			zip.UpdateEntry(entry.FileName, output.GetBuffer());
 			zip.Save();
 		}
@@ -377,10 +379,10 @@ namespace Ulearn.Core
 		{
 			if (!courses.ContainsKey(course.Id))
 				return;
-			
+
 			if (exerciseStudentZipsCache.IsEnabled)
 				exerciseStudentZipsCache.DeleteCourseZips(course.Id);
-			
+
 			courses[course.Id] = course;
 		}
 
@@ -471,6 +473,7 @@ namespace Ulearn.Core
 					FuncUtils.TrySeveralTimes(() => Directory.Move(tempDirectoryName.FullName, destinationDirectory.FullName), updateCourseEachOperationTriesCount);
 					throw;
 				}
+
 				FixFileReferencesInCourse(course, sourceDirectory, destinationDirectory);
 
 				UpdateCourse(course);
@@ -479,25 +482,26 @@ namespace Ulearn.Core
 			{
 				ReleaseCourse(course.Id);
 			}
+
 			FuncUtils.TrySeveralTimes(() => tempDirectoryName.ClearDirectory(true), updateCourseEachOperationTriesCount);
 		}
 
 		private void FixFileReferencesInCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)
 		{
 			foreach (var instructorNote in course.Units.Select(u => u.InstructorNote).Where(n => n != null))
-				instructorNote.File = (FileInfo) GetNewPathForFileAfterMoving(instructorNote.File, sourceDirectory, destinationDirectory);
+				instructorNote.File = (FileInfo)GetNewPathForFileAfterMoving(instructorNote.File, sourceDirectory, destinationDirectory);
 
 			foreach (var slide in course.Slides)
 			{
-				slide.Info.SlideFile = (FileInfo) GetNewPathForFileAfterMoving(slide.Info.SlideFile, sourceDirectory, destinationDirectory);
+				slide.Info.SlideFile = (FileInfo)GetNewPathForFileAfterMoving(slide.Info.SlideFile, sourceDirectory, destinationDirectory);
 
 				foreach (var exerciseBlock in slide.Blocks.OfType<CsProjectExerciseBlock>())
-					exerciseBlock.SlideFolderPath = (DirectoryInfo) GetNewPathForFileAfterMoving(exerciseBlock.SlideFolderPath, sourceDirectory, destinationDirectory);
+					exerciseBlock.SlideFolderPath = (DirectoryInfo)GetNewPathForFileAfterMoving(exerciseBlock.SlideFolderPath, sourceDirectory, destinationDirectory);
 
 				slide.Meta?.FixPaths(slide.Info.SlideFile);
 			}
 
-			course.CourseXmlDirectory = (DirectoryInfo) GetNewPathForFileAfterMoving(course.CourseXmlDirectory, sourceDirectory, destinationDirectory);
+			course.CourseXmlDirectory = (DirectoryInfo)GetNewPathForFileAfterMoving(course.CourseXmlDirectory, sourceDirectory, destinationDirectory);
 		}
 
 		private static FileSystemInfo GetNewPathForFileAfterMoving(FileSystemInfo file, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)

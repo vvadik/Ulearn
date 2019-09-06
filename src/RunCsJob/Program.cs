@@ -28,8 +28,9 @@ namespace RunCsJob
 				if (path != null)
 					сompilerDirectory = new DirectoryInfo(path);
 			}
+
 			var isSelfCheck = args.Contains("--selfcheck");
-			
+
 			var program = new Program(сompilerDirectory);
 			if (isSelfCheck)
 				program.SelfCheck();
@@ -37,16 +38,17 @@ namespace RunCsJob
 				program.Run();
 		}
 
-		private Program([CanBeNull]DirectoryInfo сompilerDirectory, ManualResetEvent externalShutdownEvent = null)
+		private Program([CanBeNull] DirectoryInfo сompilerDirectory, ManualResetEvent externalShutdownEvent = null)
 			: base(serviceName, externalShutdownEvent)
 		{
-			if(сompilerDirectory != null)
+			if (сompilerDirectory != null)
 				CsSandboxRunnerSettings.MsBuildSettings.CompilerDirectory = сompilerDirectory;
 			if (!CsSandboxRunnerSettings.MsBuildSettings.CompilerDirectory.Exists)
 			{
 				log.Error($"Не найдена папка с компиляторами: {сompilerDirectory}");
 				Environment.Exit(1);
 			}
+
 			log.Info($"Путь до компиляторов: {сompilerDirectory}");
 			csSandboxRunnerClient = new CsSandboxRunnerClient();
 		}

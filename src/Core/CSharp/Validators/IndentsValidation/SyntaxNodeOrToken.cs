@@ -78,7 +78,7 @@ namespace Ulearn.Core.CSharp.Validators.IndentsValidation
 				return SyntaxToken.LeadingTrivia;
 			return default(SyntaxTriviaList);
 		}
-		
+
 		public override string ToString()
 		{
 			if (SyntaxNode != null)

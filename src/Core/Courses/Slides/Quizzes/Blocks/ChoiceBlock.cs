@@ -19,7 +19,7 @@ namespace Ulearn.Core.Courses.Slides.Quizzes.Blocks
 
 		[XmlElement("item")]
 		public ChoiceItem[] Items;
-		
+
 		[XmlElement("allowedMistakes")]
 		public MistakesCount AllowedMistakesCount { get; set; } = new MistakesCount(0, 0);
 
@@ -56,6 +56,7 @@ namespace Ulearn.Core.Courses.Slides.Quizzes.Blocks
 				var cg = new MultipleChoiceGroup { Label = Text, Type = "MultipleChoice", Choices = items };
 				cr = new MultipleChoiceResponse { ChoiceGroup = cg };
 			}
+
 			return new MultipleChoiceComponent
 			{
 				UrlName = slide.NormalizedGuid + componentIndex,

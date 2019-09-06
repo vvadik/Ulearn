@@ -25,7 +25,7 @@ namespace Database.Models
 
 		[Required]
 		public bool IsInitialExport { get; set; }
-		
+
 		public bool IsSuccess { get; set; }
 
 		public string Log { get; set; }
@@ -39,7 +39,7 @@ namespace Database.Models
 
 		[Required]
 		public DateTime StartTime { get; set; }
-		
+
 		public DateTime? FinishTime { get; set; }
 	}
 }

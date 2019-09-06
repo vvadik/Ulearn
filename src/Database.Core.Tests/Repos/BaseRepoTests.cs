@@ -38,15 +38,15 @@ namespace Database.Core.Tests.Repos
 			db = CreateDbContext(loggerFactory);
 
 			serviceProvider = ConfigureServices();
-			
+
 			userManager = serviceProvider.GetService<UlearnUserManager>();
 			CreateInitialDataInDatabaseAsync().GetAwaiter().GetResult();
 			CreateTestUsersAsync().GetAwaiter().GetResult();
-			
+
 			/* Configuring Z.EntityFramework.Plus for working with In-Memory database
 			   See https://entityframework-plus.net/batch-delete for details. */
 			BatchDeleteManager.InMemoryDbContextFactory = () => CreateDbContext(loggerFactory);
-			
+
 			/* Cache Manager is not working with In-Memory database.
 			   See https://github.com/zzzprojects/EntityFramework-Plus/issues/391 for details. */
 			QueryCacheManager.IsEnabled = false;
@@ -55,7 +55,7 @@ namespace Database.Core.Tests.Repos
 		private IServiceProvider ConfigureServices()
 		{
 			var services = new ServiceCollection();
-			
+
 			services.AddSingleton(db);
 			services.AddSingleton(logger);
 			services.AddLogging(builder => builder.AddSerilog(logger));
@@ -72,15 +72,15 @@ namespace Database.Core.Tests.Repos
 			optionsBuilder.UseInMemoryDatabase("ulearn_test_database");
 			if (loggerFactory != null)
 				optionsBuilder.UseLoggerFactory(loggerFactory);
-			
+
 			return new UlearnDb(optionsBuilder.Options);
 		}
 
-		protected async Task<ApplicationUser> CreateUserAsync(string userName, string password=null)
+		protected async Task<ApplicationUser> CreateUserAsync(string userName, string password = null)
 		{
 			if (password == null)
 				password = StringUtils.GenerateSecureAlphanumericString(10);
-			
+
 			var user = new ApplicationUser
 			{
 				UserName = userName,
@@ -89,32 +89,32 @@ namespace Database.Core.Tests.Repos
 				Email = $"{userName}@test.ru"
 			};
 			var result = await userManager.CreateAsync(user, password).ConfigureAwait(false);
-			if (! result.Succeeded)
+			if (!result.Succeeded)
 				throw new InvalidOperationException($"Can't create user {userName} with password {password}:\n{string.Join("\n", result.Errors.Select(e => e.Description))}");
-			
+
 			logger.Information($"User {userName} with password {password} successfully created");
 
 			return await userManager.FindByNameAsync(userName).ConfigureAwait(false);
 		}
-		
+
 		private async Task CreateInitialDataInDatabaseAsync()
 		{
 			var initialDataCreator = serviceProvider.GetService<InitialDataCreator>();
 			await initialDataCreator.CreateRolesAsync().ConfigureAwait(false);
 		}
-		
+
 		private async Task CreateTestUsersAsync()
 		{
 			var result = await userManager.CreateAsync(TestUsers.Admin, TestUsers.AdminPassword).ConfigureAwait(false);
-			if (! result.Succeeded)
+			if (!result.Succeeded)
 				throw new InvalidOperationException($"Can't create admin user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-			
+
 			TestUsers.Admin = await userManager.FindByNameAsync(TestUsers.Admin.UserName).ConfigureAwait(false);
 			logger.Information($"Created user {TestUsers.Admin.UserName} with password {TestUsers.AdminPassword}, id = {TestUsers.Admin.Id}");
 			await userManager.AddToRoleAsync(TestUsers.Admin, LmsRoleType.SysAdmin.ToString()).ConfigureAwait(false);
 		}
 	}
-	
+
 	public static class TestUsers
 	{
 		public static ApplicationUser Admin = new ApplicationUser

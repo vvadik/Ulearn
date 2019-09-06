@@ -25,14 +25,14 @@ namespace Database.Models
 		public string OwnerId { get; set; }
 
 		public virtual ApplicationUser Owner { get; set; }
-		
+
 		[Required]
 		public bool IsDeleted { get; set; }
 
 		[Required]
 		/* Архивная группа не учитываются в фильтрах «Мои группы» и всегда показывается позже неархивных */
 		public bool IsArchived { get; set; }
-		
+
 		[Required]
 		public Guid InviteHash { get; set; }
 
@@ -50,7 +50,7 @@ namespace Database.Models
 		[Required]
 		/* Могут ли студенты этой группы видеть сводную таблицу прогресса по курсу всех студентов группы */
 		public bool CanUsersSeeGroupProgress { get; set; }
-		
+
 		[Required]
 		/* Значение по умолчанию для галочки «Не принимать больше код-ревью у этого студента по этой задаче» */
 		public bool DefaultProhibitFutherReview { get; set; }

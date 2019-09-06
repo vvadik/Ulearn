@@ -7,7 +7,7 @@ using Ulearn.Core.CSharp.Validators;
 
 namespace uLearn.CSharp.Validators
 {
-	public class RedundantElseValidator: BaseStyleValidator
+	public class RedundantElseValidator : BaseStyleValidator
 	{
 		public override List<SolutionStyleError> FindErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
@@ -24,7 +24,7 @@ namespace uLearn.CSharp.Validators
 
 			var correspondingElseClause = childNodes[2];
 			var statementUnderIf = childNodes[1];
-			
+
 			switch (statementUnderIf)
 			{
 				case ReturnStatementSyntax _:
@@ -34,7 +34,7 @@ namespace uLearn.CSharp.Validators
 						.ToList();
 					if (elseChildNodes.Count > 0 && elseChildNodes[0] is BlockSyntax)
 						yield return new SolutionStyleError(StyleErrorType.RedundantElse01, correspondingElseClause);
-					
+
 					break;
 			}
 		}

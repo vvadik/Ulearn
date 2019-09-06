@@ -22,16 +22,16 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		public IncludeCodeBlock()
 		{
 		}
-		
+
 		[XmlAttribute("file")]
 		public string CodeFile { get; set; }
-		
+
 		/* .NET XML Serializer doesn't understand nullable fields, so we use this hack to make Language? field */
 		[XmlIgnore]
 		public Language? Language { get; set; }
 
 		#region NullableLanguageHack
-		
+
 		[XmlAttribute("language")]
 		[Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
 		public Language LanguageSerialized
@@ -49,17 +49,18 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		{
 			return Language.HasValue;
 		}
+
 		#endregion
 
 		[XmlElement("display")]
 		public Label[] DisplayLabels { get; set; }
-		
+
 		protected void FillProperties(SlideBuildingContext context)
 		{
 			CodeFile = CodeFile ?? context.Slide.DefaultIncludeCodeFile ?? context.Unit.Settings?.DefaultIncludeCodeFile;
 			if (CodeFile == null)
 				throw new CourseLoadingException($"У блока <include-code> не указан атрибут file.");
-				
+
 			if (!Language.HasValue)
 				Language = LanguageHelpers.GuessByExtension(new FileInfo(CodeFile));
 		}

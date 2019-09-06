@@ -288,8 +288,8 @@ namespace uLearn.Web.Controllers
 
 			var course = courseManager.GetCourse(courseId);
 			var model = new UserCourseToggleHistoryModel(user, course,
-				ToSingleCourseRolesHistoryModel(await userRolesRepo.GetUserRolesHistoryByCourseId(userId,courseId)),
-				ToSingleCourseAccessHistoryModel(await coursesRepo.GetUserAccessHistoryByCourseId(userId,courseId)));
+				ToSingleCourseRolesHistoryModel(await userRolesRepo.GetUserRolesHistoryByCourseId(userId, courseId)),
+				ToSingleCourseAccessHistoryModel(await coursesRepo.GetUserAccessHistoryByCourseId(userId, courseId)));
 			return View(model);
 		}
 
@@ -312,8 +312,8 @@ namespace uLearn.Web.Controllers
 
 			var courseGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, maxCount: 10));
 			var courseArchivedGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, maxCount: 10, onlyArchived: true));
-			var coursesWithRoles = (await userRolesRepo.GetUserRolesHistory(userId)).Select(x=>x.CourseId.ToLower()).Distinct().ToList();
-			var coursesWithAccess = (await coursesRepo.GetUserAccessHistory(userId)).Select(x=>x.CourseId.ToLower()).Distinct().ToList();
+			var coursesWithRoles = (await userRolesRepo.GetUserRolesHistory(userId)).Select(x => x.CourseId.ToLower()).Distinct().ToList();
+			var coursesWithAccess = (await coursesRepo.GetUserAccessHistory(userId)).Select(x => x.CourseId.ToLower()).Distinct().ToList();
 
 			return View(new ProfileModel
 			{
@@ -908,12 +908,11 @@ namespace uLearn.Web.Controllers
 		public Dictionary<string, string> CourseGroups { get; set; }
 		public Dictionary<string, string> CourseArchivedGroups { get; set; }
 
-		public List<string> CoursesWithRoles; 
+		public List<string> CoursesWithRoles;
 
-		public List<string> CoursesWithAccess; 
+		public List<string> CoursesWithAccess;
 	}
 
-	
 
 	public class IsErrorAttribute : Attribute
 	{

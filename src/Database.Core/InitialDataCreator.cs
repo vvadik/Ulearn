@@ -13,7 +13,7 @@ namespace Database
 		private readonly RoleManager<IdentityRole> roleManager;
 		private readonly UlearnUserManager userManager;
 		private readonly IUsersRepo usersRepo;
-		
+
 		private readonly string sysAdminRole = LmsRoleType.SysAdmin.ToString();
 
 		public InitialDataCreator(
@@ -31,27 +31,29 @@ namespace Database
 
 		public async Task CreateRolesAsync()
 		{
-			if (! await db.Roles.AnyAsync(r => r.Name == sysAdminRole).ConfigureAwait(false))
+			if (!await db.Roles.AnyAsync(r => r.Name == sysAdminRole).ConfigureAwait(false))
 			{
 				await roleManager.CreateAsync(new IdentityRole(sysAdminRole)).ConfigureAwait(false);
 			}
+
 			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
 		public async Task CreateUsersAsync()
 		{
-			if (! await db.Users.AnyAsync(u => u.UserName == "user").ConfigureAwait(false))
+			if (!await db.Users.AnyAsync(u => u.UserName == "user").ConfigureAwait(false))
 			{
 				var user = new ApplicationUser { UserName = "user", FirstName = "User", LastName = "" };
 				await userManager.CreateAsync(user, "asdasd").ConfigureAwait(false);
 			}
-			if (! await db.Users.AnyAsync(u => u.UserName == "admin").ConfigureAwait(false))
+
+			if (!await db.Users.AnyAsync(u => u.UserName == "admin").ConfigureAwait(false))
 			{
 				var user = new ApplicationUser { UserName = "admin", FirstName = "System Administrator", LastName = "" };
 				await userManager.CreateAsync(user, "fullcontrol").ConfigureAwait(false);
 				await userManager.AddToRoleAsync(user, sysAdminRole).ConfigureAwait(false);
 			}
-			
+
 			await CreateRolesAsync().ConfigureAwait(false);
 		}
 

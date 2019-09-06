@@ -37,7 +37,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 				context.Result = NotFound(new ErrorResponse($"Course {courseId} not found"));
 				return Task.CompletedTask;
 			}
-			
+
 			return base.OnActionExecutionAsync(context, next);
 		}
 
@@ -45,7 +45,8 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		/// Политика комментариев в курсе
 		/// </summary>
 		[HttpGet]
-		public async Task<ActionResult<CommentPolicyResponse>> Policy([FromQuery(Name = "course_id")][BindRequired]string courseId)
+		public async Task<ActionResult<CommentPolicyResponse>> Policy([FromQuery(Name = "course_id")] [BindRequired]
+			string courseId)
 		{
 			var policy = await commentPoliciesRepo.GetCommentsPolicyAsync(courseId).ConfigureAwait(false);
 			return new CommentPolicyResponse
@@ -61,10 +62,11 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		/// </summary>
 		[HttpPatch]
 		[Authorize(Policy = "CourseAdmins")]
-		public async Task<IActionResult> UpdatePolicy([FromQuery(Name = "course_id")][BindRequired]string courseId, [FromBody] UpdatePolicyParameters parameters)
+		public async Task<IActionResult> UpdatePolicy([FromQuery(Name = "course_id")] [BindRequired]
+			string courseId, [FromBody] UpdatePolicyParameters parameters)
 		{
 			var policy = await commentPoliciesRepo.GetCommentsPolicyAsync(courseId).ConfigureAwait(false);
-			
+
 			if (parameters.AreCommentsEnabled.HasValue)
 				policy.IsCommentsEnabled = parameters.AreCommentsEnabled.Value;
 			if (parameters.ModerationPolicy.HasValue)

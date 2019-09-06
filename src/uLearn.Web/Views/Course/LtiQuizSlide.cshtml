@@ -12,17 +12,17 @@
 	@Styles.Render("~/katex/katex.min.css")
 </head>
 <body class="lti-component">
-	@if (Model != null)
+@if (Model != null)
+{
+	@Html.Action("Quiz", "Quiz", new
 	{
-		@Html.Action("Quiz", "Quiz", new
-		{
-			slide = Model.Slide,
-			courseId = Model.CourseId,
-			userId = Model.UserId,
-			isLti = true,
-			isGuest = false,
-			manualQuizCheckQueueItem = (ManualQuizChecking)null,
-		})
-	}
+		slide = Model.Slide,
+		courseId = Model.CourseId,
+		userId = Model.UserId,
+		isLti = true,
+		isGuest = false,
+		manualQuizCheckQueueItem = (ManualQuizChecking)null,
+	})
+}
 </body>
 </html>

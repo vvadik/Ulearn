@@ -68,6 +68,7 @@ namespace Database.DataContexts
 				await db.SaveChangesAsync();
 				return "cancel";
 			}
+
 			hint.IsHintHelped = true;
 			await db.SaveChangesAsync();
 			return "success";
@@ -90,7 +91,7 @@ namespace Database.DataContexts
 
 		public int GetUsedHintsCount(string courseId, Guid slideId, string userId)
 		{
-			return db.Hints.Count(x => x.CourseId == courseId && x.SlideId == slideId && x.UserId == userId );
+			return db.Hints.Count(x => x.CourseId == courseId && x.SlideId == slideId && x.UserId == userId);
 		}
 	}
 }

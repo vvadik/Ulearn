@@ -28,13 +28,15 @@ namespace GitCourseUpdater
 				result.PublicPEM = writer.ToString();
 				result.PublicPEM = result.PublicPEM.Replace("\r\n", "\n");
 			}
+
 			using (var writer = new StringWriter())
 			{
 				var pemWriter = new PemWriter(writer);
-				pemWriter.WriteObject(rsaKeyPair.Private/*, "DES-EDE3-CBC", passphrase.ToCharArray(), new SecureRandom()*/);
+				pemWriter.WriteObject(rsaKeyPair.Private /*, "DES-EDE3-CBC", passphrase.ToCharArray(), new SecureRandom()*/);
 				result.PrivatePEM = writer.ToString();
 				result.PrivatePEM = result.PrivatePEM.Replace("\r\n", "\n");
 			}
+
 			result.PublicSSH = ConvertToOpenSshPublicKey(rsa);
 			return result;
 		}
@@ -51,15 +53,16 @@ namespace GitCourseUpdater
 				ms.Write(sshrsaBytes, 0, sshrsaBytes.Length);
 				ms.Write(ToBytes(e.Length), 0, 4);
 				ms.Write(e, 0, e.Length);
-				ms.Write(ToBytes(n.Length+1), 0, 4); //Remove the +1 if not Emulating Putty Gen
+				ms.Write(ToBytes(n.Length + 1), 0, 4); //Remove the +1 if not Emulating Putty Gen
 				ms.Write(new byte[] { 0 }, 0, 1); //Add a 0 to Emulate PuttyGen
 				ms.Write(n, 0, n.Length);
 				ms.Flush();
 				buffer64 = Convert.ToBase64String(ms.ToArray());
 			}
+
 			return $"ssh-rsa {buffer64} generated-key";
 		}
-		
+
 		private static byte[] ToBytes(int i)
 		{
 			var bts = BitConverter.GetBytes(i);
@@ -67,6 +70,7 @@ namespace GitCourseUpdater
 			{
 				Array.Reverse(bts);
 			}
+
 			return bts;
 		}
 	}

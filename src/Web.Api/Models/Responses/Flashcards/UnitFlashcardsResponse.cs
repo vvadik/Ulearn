@@ -14,13 +14,13 @@ namespace Ulearn.Web.Api.Models.Responses.Flashcards
 
 		[DataMember]
 		public Guid UnitId;
-		
+
 		[DataMember]
 		public string UnitTitle;
-		
+
 		[DataMember]
 		public bool Unlocked;
-		
+
 		[DataMember]
 		public List<FlashcardResponse> Flashcards;
 	}

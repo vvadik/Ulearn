@@ -84,6 +84,7 @@ namespace uLearn.Web.Extensions
 				else
 					fullUrl = "http://" + url;
 			}
+
 			return $"<a href=\"{helper.AttributeEncode(HttpUtility.HtmlDecode(fullUrl))}\">{url}</a>";
 		}
 

@@ -11,7 +11,7 @@ namespace Database.Core.Tests.Repos.Comments
 	public class CommentsRepoTests : BaseRepoTests
 	{
 		private ICommentsRepo commentsRepo;
-		
+
 		[SetUp]
 		public override void SetUp()
 		{
@@ -24,9 +24,9 @@ namespace Database.Core.Tests.Repos.Comments
 		public async Task AddComment()
 		{
 			var userId = Guid.NewGuid().ToString();
-			
+
 			var comment = await commentsRepo.AddCommentAsync(userId, "courseId", Guid.NewGuid(), -1, false, "Comment text").ConfigureAwait(false);
-			
+
 			Assert.AreEqual("Comment text", comment.Text);
 			Assert.AreEqual(-1, comment.ParentCommentId);
 			Assert.IsTrue(comment.IsTopLevel);
@@ -40,10 +40,10 @@ namespace Database.Core.Tests.Repos.Comments
 		public async Task AddAndFindComment()
 		{
 			var user = await CreateUserAsync("test").ConfigureAwait(false);
-			
+
 			var comment = await commentsRepo.AddCommentAsync(user.Id, "courseId", Guid.NewGuid(), -1, false, "Comment text").ConfigureAwait(false);
 			var foundComment = await commentsRepo.FindCommentByIdAsync(comment.Id).ConfigureAwait(false);
-			
+
 			Assert.AreEqual(comment, foundComment);
 		}
 
@@ -52,14 +52,14 @@ namespace Database.Core.Tests.Repos.Comments
 		{
 			var user = await CreateUserAsync("test").ConfigureAwait(false);
 			var slideId = Guid.NewGuid();
-			
+
 			var comment = await commentsRepo.AddCommentAsync(user.Id, "courseId", slideId, -1, false, "Comment text").ConfigureAwait(false);
 			var comments = await commentsRepo.GetSlideCommentsAsync("courseId", slideId).ConfigureAwait(false);
-			
+
 			Assert.AreEqual(1, comments.Count);
 			CollectionAssert.AreEqual(new List<Comment> { comment }, comments);
 		}
-		
+
 		[Test]
 		public async Task AddAndGetMultipleCommentsFromOneSlide()
 		{
@@ -73,12 +73,13 @@ namespace Database.Core.Tests.Repos.Comments
 				var comment = await commentsRepo.AddCommentAsync(user.Id, "courseId", slideId, -1, false, "Comment text").ConfigureAwait(false);
 				comments.Add(comment);
 			}
+
 			var foundComments = await commentsRepo.GetSlideCommentsAsync("courseId", slideId).ConfigureAwait(false);
 
 			Assert.AreEqual(commentsCount, foundComments.Count);
 			CollectionAssert.AreEqual(comments, foundComments);
 		}
-		
+
 		[Test]
 		public async Task AddAndGetMultipleCommentsFromDifferentSlides()
 		{
@@ -91,6 +92,7 @@ namespace Database.Core.Tests.Repos.Comments
 				var comment = await commentsRepo.AddCommentAsync(user.Id, "courseId", slideId, -1, false, "Comment text").ConfigureAwait(false);
 				comments.Add(comment);
 			}
+
 			var foundComments = await commentsRepo.GetCourseCommentsAsync("courseId").ConfigureAwait(false);
 
 			Assert.AreEqual(commentsCount, foundComments.Count);

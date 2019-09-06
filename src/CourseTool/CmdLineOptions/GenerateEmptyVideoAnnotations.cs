@@ -35,6 +35,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 						writer.WriteLine($"<span class='videoId'>{videoBlock.VideoId.EscapeHtml()}</span>");
 					}
 				}
+
 				writer.WriteLine("</body></html>");
 			}
 

@@ -9,8 +9,8 @@ namespace Web.Api.Configuration
 	public class WebApiConfiguration : UlearnConfiguration
 	{
 		public UlearnWebConfiguration Web { get; set; }
-		
-		public FrontendConfiguration Frontend { get; set; } 
+
+		public FrontendConfiguration Frontend { get; set; }
 	}
 
 	public class UlearnWebConfiguration
@@ -19,9 +19,9 @@ namespace Web.Api.Configuration
 		public string CookieName { get; set; }
 		public string CookieDomain { get; set; }
 		public bool CookieSecure { get; set; }
-		
+
 		public CorsConfiguration Cors { get; set; }
-		
+
 		public AuthenticationConfiguration Authentication { get; set; }
 	}
 
@@ -53,12 +53,12 @@ namespace Web.Api.Configuration
 	{
 		[DataMember(Name = "api")]
 		public ApiConfiguration Api { get; set; }
-	} 
-	
+	}
+
 	[DataContract]
 	public class ApiConfiguration
 	{
 		[DataMember(Name = "endpoint")]
-		public string Endpoint { get; set; }	
+		public string Endpoint { get; set; }
 	}
 }

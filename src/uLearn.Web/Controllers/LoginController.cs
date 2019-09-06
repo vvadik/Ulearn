@@ -40,7 +40,7 @@ namespace uLearn.Web.Controllers
 					/* If user with this username is not exists then try to find user with this email.
 					   It allows to login not only with username/password, but with email/password */
 					var usersWithEmail = usersRepo.FindUsersByEmail(model.UserName);
-					
+
 					/* For signing in via email/password we need to be sure that email is confirmed */
 					user = usersWithEmail.FirstOrDefault(u => u.EmailConfirmed);
 
@@ -50,13 +50,14 @@ namespace uLearn.Web.Controllers
 							user = null;
 					}
 				}
-				
+
 				if (user != null)
 				{
 					await AuthenticationManager.LoginAsync(HttpContext, user, model.RememberMe).ConfigureAwait(false);
 					await SendConfirmationEmailAfterLogin(user).ConfigureAwait(false);
 					return Redirect(this.FixRedirectUrl(returnUrl));
 				}
+
 				ModelState.AddModelError("", @"Неверное имя пользователя или пароль");
 			}
 
@@ -130,24 +131,25 @@ namespace uLearn.Web.Controllers
 			{
 				return RedirectToAction("Manage", "Account");
 			}
+
 			var info = await AuthenticationManager.GetExternalLoginInfoAsync(HttpContext);
 			if (info == null)
 			{
 				return View("ExternalLoginFailure");
 			}
-			
+
 			ViewBag.LoginProvider = info.Login.LoginProvider;
 			ViewBag.ReturnUrl = returnUrl;
-			
+
 			if (ModelState.IsValid)
 			{
 				var userAvatarUrl = info.ExternalIdentity.FindFirstValue("AvatarUrl");
 				var firstName = info.ExternalIdentity.FindFirstValue(ClaimTypes.GivenName);
 				var lastName = info.ExternalIdentity.FindFirstValue(ClaimTypes.Surname);
-				
+
 				/* Some users enter email with trailing whitespaces. Remove them (not users, but spaces!) */
 				model.Email = (model.Email ?? "").Trim();
-				
+
 				if (!CanNewUserSetThisEmail(model.Email))
 				{
 					ModelState.AddModelError("Email", AccountController.ManageMessageId.EmailAlreadyTaken.GetDisplayName());
@@ -186,9 +188,10 @@ namespace uLearn.Web.Controllers
 						return Redirect(this.FixRedirectUrl(returnUrl));
 					}
 				}
+
 				this.AddErrors(result);
 			}
-			
+
 			return View(model);
 		}
 
@@ -212,14 +215,14 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize]
 		[ValidateAntiForgeryToken]
 		[HandleHttpAntiForgeryException]
-		public ActionResult DoLinkLogin(string provider, string returnUrl="")
+		public ActionResult DoLinkLogin(string provider, string returnUrl = "")
 		{
 			// Request a redirect to the external login provider to link a login for the current user
 			return new ChallengeResult(provider, Url.Action("LinkLoginCallback", new { returnUrl = returnUrl }), User.Identity.GetUserId());
 		}
 
 		[ULearnAuthorize]
-		public async Task<ActionResult> LinkLoginCallback(string returnUrl="")
+		public async Task<ActionResult> LinkLoginCallback(string returnUrl = "")
 		{
 			var userId = User.Identity.GetUserId();
 			var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(HttpContext, XsrfKey, userId);
@@ -228,16 +231,18 @@ namespace uLearn.Web.Controllers
 				log.Warn("LinkLoginCallback: GetExternalLoginInfoAsync() returned null");
 				return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.ErrorOccured });
 			}
+
 			var result = await userManager.AddLoginAsync(userId, loginInfo.Login);
 			if (result.Succeeded)
 			{
 				await UpdateUserFieldsFromExternalLoginInfo(userId, loginInfo);
-				
+
 				if (!string.IsNullOrEmpty(returnUrl))
 					return Redirect(this.FixRedirectUrl(returnUrl));
 
 				return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.LoginAdded });
 			}
+
 			var otherUser = await userManager.FindAsync(loginInfo.Login);
 			return RedirectToAction("Manage", "Account", new { Message = AccountController.ManageMessageId.AlreadyLinkedToOtherUser, Provider = loginInfo.Login.LoginProvider, OtherUserId = otherUser?.Id ?? "" });
 		}
@@ -247,7 +252,7 @@ namespace uLearn.Web.Controllers
 			var user = await userManager.FindByIdAsync(userId);
 			if (user == null)
 				return;
-			
+
 			var avatarUrl = loginInfo.ExternalIdentity.FindFirstValue("AvatarUrl");
 			var konturLogin = loginInfo.ExternalIdentity.FindFirstValue("KonturLogin");
 			var sex = loginInfo.ExternalIdentity.FindFirstValue(ClaimTypes.Gender);
@@ -261,7 +266,7 @@ namespace uLearn.Web.Controllers
 				user.KonturLogin = konturLogin;
 			if (userSex != null && user.Gender == null)
 				user.Gender = userSex;
-			
+
 			await userManager.UpdateAsync(user);
 		}
 
@@ -282,6 +287,7 @@ namespace uLearn.Web.Controllers
 				var user = userManager.FindById(userId);
 				model.UserLogins = user.Logins.ToList();
 			}
+
 			return PartialView(model);
 		}
 
@@ -326,6 +332,7 @@ namespace uLearn.Web.Controllers
 				{
 					properties.Dictionary[XsrfKey] = UserId;
 				}
+
 				context.HttpContext.GetOwinContext().Authentication.Challenge(properties, LoginProvider);
 			}
 		}

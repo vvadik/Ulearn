@@ -28,13 +28,14 @@ namespace Database.Migrations
 				var user = new ApplicationUser { UserName = "user", FirstName = "User", LastName = "" };
 				manager.Create(user, "asdasd");
 			}
+
 			if (!db.Users.Any(u => u.UserName == "admin"))
 			{
 				var user = new ApplicationUser { UserName = "admin", FirstName = "System Administrator", LastName = "" };
 				manager.Create(user, "fullcontrol");
 				manager.AddToRole(user.Id, LmsRoles.SysAdmin.ToString());
 			}
-			
+
 			var usersRepo = new UsersRepo(db);
 			usersRepo.CreateUlearnBotUserIfNotExists();
 

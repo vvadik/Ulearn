@@ -35,7 +35,7 @@ namespace Stepik.Api
 		 * Available options for `videoType` are "video/mp4", "video/webm" and "video/gpp"
 		 * TODO (andgein): make enums for quaility and videoType
 		 */
-		public Task<string> GetVideoUrl(string youtubeUrl, string quality="hd720", string videoType="video/mp4")
+		public Task<string> GetVideoUrl(string youtubeUrl, string quality = "hd720", string videoType = "video/mp4")
 		{
 			return FuncUtils.TrySeveralTimesAsync(
 				() => TryGetVideoUrl(youtubeUrl, quality, videoType),
@@ -71,8 +71,8 @@ namespace Stepik.Api
 			var youtubePageResponse = await httpClient.GetAsync(youtubeUrl);
 			var youtubePageContent = await youtubePageResponse.Content.ReadAsStringAsync();
 
-			if (! youtubePageResponse.IsSuccessStatusCode)
-				throw new YoutubeVideoUrlExtractException($"Can't download youtube's page. HTTP status code is {(int) youtubePageResponse.StatusCode} {youtubePageResponse.StatusCode}. HTTP content: {youtubePageContent}");
+			if (!youtubePageResponse.IsSuccessStatusCode)
+				throw new YoutubeVideoUrlExtractException($"Can't download youtube's page. HTTP status code is {(int)youtubePageResponse.StatusCode} {youtubePageResponse.StatusCode}. HTTP content: {youtubePageContent}");
 
 			var regex = new Regex("url_encoded_fmt_stream_map\":\\s*\"(.*)\"", RegexOptions.IgnoreCase);
 			var matches = regex.Matches(youtubePageContent);

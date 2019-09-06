@@ -45,7 +45,7 @@ namespace Database.Models
 		[Index("IDX_LabelOnGroup_ByLabel")]
 		[Index("IDX_LabelOnGroup_ByGroupAndLabel", 2, IsUnique = true)]
 		public int LabelId { get; set; }
-		
+
 		public virtual GroupLabel Label { get; set; }
 	}
 }

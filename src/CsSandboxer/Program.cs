@@ -84,20 +84,20 @@ namespace CsSandboxer
 			permSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.PathDiscovery, assemblyPath));
 			permSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.PathDiscovery, Environment.CurrentDirectory));
 			permSet.AddPermission(new EnvironmentPermission(EnvironmentPermissionAccess.Read, "InsideSandbox"));
-			
+
 			/*
 			 * Permissions for NUnit: see https://github.com/nunit/nunit/blob/master/src/NUnitFramework/tests/Assertions/LowTrustFixture.cs#L166
 			 * and https://github.com/nunit/nunit/issues/2792 for details
 			 */
 			permSet.AddPermission(new ReflectionPermission(
-				ReflectionPermissionFlag.MemberAccess));            // Required to instantiate classes that contain test code and to get cross-appdomain communication to work.
+				ReflectionPermissionFlag.MemberAccess)); // Required to instantiate classes that contain test code and to get cross-appdomain communication to work.
 			permSet.AddPermission(new SecurityPermission(
-				SecurityPermissionFlag.Execution |                  // Required to execute test code
-				SecurityPermissionFlag.SerializationFormatter       // Required to support cross-appdomain test result formatting by NUnit TestContext
+				SecurityPermissionFlag.Execution | // Required to execute test code
+				SecurityPermissionFlag.SerializationFormatter // Required to support cross-appdomain test result formatting by NUnit TestContext
 			));
 			/* In .NET <= 3.5 add following EnvironmentPermission:
 			permSet.AddPermission(new EnvironmentPermission(PermissionState.Unrestricted)); // Required for NUnit.Framework.Assert.GetStackTrace()
-			*/ 
+			*/
 
 			var evidence = new Evidence();
 			evidence.AddHostEvidence(new Zone(SecurityZone.Untrusted));

@@ -20,7 +20,7 @@ namespace AntiPlagiarism.Api.ModelBinders
 		{
 			if (bindingContext == null)
 				throw new ArgumentNullException(nameof(bindingContext));
-			
+
 			var request = bindingContext.HttpContext.Request;
 			if (!request.ContentType.StartsWith("application/json", StringComparison.OrdinalIgnoreCase))
 			{
@@ -49,7 +49,7 @@ namespace AntiPlagiarism.Api.ModelBinders
 				bindingContext.ModelState.TryAddModelError(bindingContext.ModelName, e.Message);
 				return;
 			}
-			
+
 			bindingContext.Result = ModelBindingResult.Success(model);
 		}
 	}

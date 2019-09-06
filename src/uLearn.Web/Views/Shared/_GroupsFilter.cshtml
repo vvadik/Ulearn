@@ -46,7 +46,7 @@
 			Model.Groups.Select(
 				group => new SelectListItemWithAttributes
 				{
-					Text = group.Name.TruncateWithEllipsis(40),    
+					Text = group.Name.TruncateWithEllipsis(40),
 					Value = group.Id.ToString(),
 					Selected = Model.SelectedGroupsIds.Contains(group.Id.ToString())
 				})
@@ -66,4 +66,3 @@
 			data_count_selected_text = "Выбрано {0} групп(ы)",
 		})
 </div>
-

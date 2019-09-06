@@ -52,7 +52,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 				.GroupBy(o => o.SnippetId)
 				.ToDictionary(g => g.Key, g => g.ToList())
 				.ToDefaultDictionary();
-			
+
 			var tokensMatchedInFirstSubmission = new DefaultDictionary<SnippetType, HashSet<int>>();
 			var tokensMatchedInSecondSubmission = new DefaultDictionary<SnippetType, HashSet<int>>();
 			foreach (var snippetOccurence in snippetsOccurrencesOfFirstSubmission)
@@ -68,6 +68,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 					}
 				}
 			}
+
 			logger.Debug("Закончил поиск совпадающих сниппетов");
 
 			var unionLength = 0;
@@ -76,18 +77,18 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			{
 				if (!tokensMatchedInFirstSubmission.ContainsKey(snippetType))
 					continue;
-					
+
 				unionLength += tokensMatchedInFirstSubmission[snippetType].Count;
 				unionLength += tokensMatchedInSecondSubmission[snippetType].Count;
 			}
-			
-			var totalLength = GetTokensCountFromSnippetOccurrences(snippetsOccurrencesOfFirstSubmission) + 
+
+			var totalLength = GetTokensCountFromSnippetOccurrences(snippetsOccurrencesOfFirstSubmission) +
 							GetTokensCountFromSnippetOccurrences(snippetsOccurrencesOfSecondSubmission);
 			var weight = totalLength == 0 ? 0 : ((double)unionLength) / totalLength;
 
 			/* Normalize weight */
 			weight /= allSnippetTypes.Count;
-			
+
 			logger.Information($"Совпавших токенов {unionLength}, всего токенов {totalLength}, итоговый коэффициент {weight}");
 			return weight;
 		}
@@ -109,13 +110,12 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			/* Dictionaries by submission id and snippet type */
 			var tokensMatchedInThisSubmission = new DefaultDictionary<Tuple<int, SnippetType>, HashSet<int>>();
 			var tokensMatchedInOtherSubmissions = new DefaultDictionary<Tuple<int, SnippetType>, HashSet<int>>();
-		
+
 			var maxSnippetsCountFirstSearch = configuration.PlagiarismDetector.CountOfColdestSnippetsUsedToFirstSearch;
 			var maxSnippetsCountSecondSearch = configuration.PlagiarismDetector.CountOfColdestSnippetsUsedToSecondSearch;
 			var maxSubmissionsAfterFirstSearch = configuration.PlagiarismDetector.MaxSubmissionsAfterFirstSearch;
 			var authorsCountThreshold = configuration.PlagiarismDetector.SnippetAuthorsCountThreshold;
 
-			
 			/* We make two queries for finding suspicion submissions: first query is more limited by snippets count (`maxSnippetsCountFirstSearch` from configuration).
 			   For the first query we are looking for all submissions which are similar to our submission and filter only top-`maxSubmissionsAfterFirstSearch` by matched snippets count */
 			var snippetsOccurrencesFirstSearch = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(
@@ -139,7 +139,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 
 			var snippetsOccurrences = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(submission, maxSnippetsCountSecondSearch, 0, authorsCountThreshold).ConfigureAwait(false);
 			var snippetsIds = new HashSet<int>(snippetsOccurrences.Select(o => o.SnippetId));
-			
+
 			var allOtherOccurrences = snippetsRepo.GetSnippetsOccurrences(
 				snippetsIds,
 				/* Filter only snippet occurences in submissions BY THIS client, THIS task, THIS language and NOT BY THIS author */
@@ -150,15 +150,15 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 					/* ... and only in submissions filterer by first query */
 					suspicionSubmissionIds.Contains(o.SubmissionId)
 			).GroupBy(o => o.SnippetId).ToDictionary(kvp => kvp.Key, kvp => kvp.ToList());
-			
+
 			var snippetsStatistics = await snippetsRepo.GetSnippetsStatisticsAsync(submission.ClientId, submission.TaskId, snippetsIds).ConfigureAwait(false);
-			
+
 			var matchedSnippets = new DefaultDictionary<int, List<MatchedSnippet>>();
-			var authorsCount = await submissionsRepo.GetAuthorsCountAsync(submission.ClientId, submission.TaskId).ConfigureAwait(false);			
+			var authorsCount = await submissionsRepo.GetAuthorsCountAsync(submission.ClientId, submission.TaskId).ConfigureAwait(false);
 			foreach (var snippetOccurrence in snippetsOccurrences)
 			{
 				var otherOccurrences = allOtherOccurrences.GetOrDefault(snippetOccurrence.SnippetId, new List<SnippetOccurence>());
-				
+
 				var snippet = snippetOccurrence.Snippet;
 				var snippetType = snippet.SnippetType;
 
@@ -187,7 +187,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			var plagiarismSubmissions = await submissionsRepo.GetSubmissionsByIdsAsync(plagiarismSubmissionIds).ConfigureAwait(false);
 
 			var plagiarisms = new List<Plagiarism>();
-			
+
 			var allSnippetTypes = GetAllSnippetTypes();
 			var thisSubmissionLength = submission.TokensCount;
 			foreach (var plagiarismSubmission in plagiarismSubmissions)
@@ -198,7 +198,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 					var submissionIdWithSnippetType = Tuple.Create(plagiarismSubmission.Id, snippetType);
 					if (!tokensMatchedInThisSubmission.ContainsKey(submissionIdWithSnippetType))
 						continue;
-					
+
 					unionLength += tokensMatchedInThisSubmission[submissionIdWithSnippetType].Count;
 					unionLength += tokensMatchedInOtherSubmissions[submissionIdWithSnippetType].Count;
 				}
@@ -208,12 +208,12 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 				var weight = totalLength == 0 ? 0 : ((double)unionLength) / totalLength;
 				/* Normalize weight */
 				weight /= allSnippetTypes.Count;
-				
+
 				logger.Information($"Link weight between submisions {submission.Id} and {plagiarismSubmission.Id} is {weight}. Union length is {unionLength}.");
 
 				if (weight < suspicionLevels.FaintSuspicion)
 					continue;
-				
+
 				plagiarisms.Add(BuildPlagiarismInfo(plagiarismSubmission, weight, matchedSnippets[plagiarismSubmission.Id]));
 			}
 
@@ -252,7 +252,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 						TokensCount = u.Tokens.Count,
 					}).ToList(),
 				TokensPositions = GetNeededTokensPositions(codeUnits),
-				MatchedSnippets = matchedSnippets, 
+				MatchedSnippets = matchedSnippets,
 			};
 		}
 
@@ -260,10 +260,10 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 		{
 			return Enum.GetValues(typeof(SnippetType)).Cast<SnippetType>().ToList();
 		}
-		
+
 		private static double GetSnippetFrequency(SnippetStatistics snippet, int authorsCount)
 		{
-			return (double) snippet.AuthorsCount / (authorsCount == 0 ? 1 : authorsCount);
+			return (double)snippet.AuthorsCount / (authorsCount == 0 ? 1 : authorsCount);
 		}
 	}
 }

@@ -25,54 +25,54 @@
 		}
 	</head>
 	<body class="without-topbar legacy-page">
-		<div class='side-bar navbar-collapse collapse navbar-nav container'>
-			@TableOfContents.Toc(toc)
-		</div>
+	<div class='side-bar navbar-collapse collapse navbar-nav container'>
+		@TableOfContents.Toc(toc)
+	</div>
 
-		<div class="slide-container" style="padding-left: 365px">
-			<div class="container body-content">
-				<div class="row">
-					@{
-						var blockData = slide.Blocks.Select(
-							(b, i) => b is AbstractExerciseBlock
-								? new ExerciseBlockData(course.Id, (ExerciseSlide)slide) { RunSolutionUrl = "/" + slide.Index.ToString("000") + ".html?query=submit", DebugView = true, IsGuest = false }
-								: b is AbstractQuestionBlock
-									? new QuizBlockData(new QuizModel
-									{
-										AnswersToQuizzes = slide.Blocks.OfType<AbstractQuestionBlock>().ToDictionary(x => x.Id, x => new List<UserQuizAnswer>()),
-										Slide = (QuizSlide)slide
-									}, i, new QuizState(QuizStatus.ReadyToSend, 0, 0, slide.MaxScore), debugView: true)
-									: (dynamic)null
-							).ToArray();
-					}
-					@{
-						var baseUrl = "/"+slide.Info.Directory.FullName;
-					}
-					@SlideHtml.Slide(new BlockRenderContext(course, slide, baseUrl, 
-						blockData,
-						isGuest: false,
-						revealHidden: true
-						),
-						null)
-					@if (slide is FlashcardSlide)
-					{
-						var flashcards = ((FlashcardSlide)slide).FlashcardsList.Select(x => new { answer = x.RenderAnswer(), question = x.RenderQuestion(), unitTitle = slide.Info.Unit.Title }).ToArray();
-						<div class="react-render" data-component="CourseToolUnitPage" data-props="@( new {flashcards= flashcards}.JsonSerialize())"></div>
-					}
-					<div style="margin-bottom: 40px;">
-						<a href="/@(slide.Index.ToString("000")).html?query=addLesson" class="btn btn-default">Добавить слайд</a>
-						<a href="/@(slide.Index.ToString("000")).html?query=addQuiz" class="btn btn-default">Добавить тест</a>
-					</div>
+	<div class="slide-container" style="padding-left: 365px">
+		<div class="container body-content">
+			<div class="row">
+				@{
+					var blockData = slide.Blocks.Select(
+						(b, i) => b is AbstractExerciseBlock
+							? new ExerciseBlockData(course.Id, (ExerciseSlide)slide) { RunSolutionUrl = "/" + slide.Index.ToString("000") + ".html?query=submit", DebugView = true, IsGuest = false }
+							: b is AbstractQuestionBlock
+								? new QuizBlockData(new QuizModel
+								{
+									AnswersToQuizzes = slide.Blocks.OfType<AbstractQuestionBlock>().ToDictionary(x => x.Id, x => new List<UserQuizAnswer>()),
+									Slide = (QuizSlide)slide
+								}, i, new QuizState(QuizStatus.ReadyToSend, 0, 0, slide.MaxScore), debugView: true)
+								: (dynamic)null
+						).ToArray();
+				}
+				@{
+					var baseUrl = "/" + slide.Info.Directory.FullName;
+				}
+				@SlideHtml.Slide(new BlockRenderContext(course, slide, baseUrl,
+					blockData,
+					isGuest: false,
+					revealHidden: true
+					),
+					null)
+				@if (slide is FlashcardSlide)
+				{
+					var flashcards = ((FlashcardSlide)slide).FlashcardsList.Select(x => new { answer = x.RenderAnswer(), question = x.RenderQuestion(), unitTitle = slide.Info.Unit.Title }).ToArray();
+					<div class="react-render" data-component="CourseToolUnitPage" data-props="@( new { flashcards = flashcards }.JsonSerialize())"></div>
+				}
+				<div style="margin-bottom: 40px;">
+					<a href="/@( slide.Index.ToString("000")).html?query=addLesson" class="btn btn-default">Добавить слайд</a>
+					<a href="/@( slide.Index.ToString("000")).html?query=addQuiz" class="btn btn-default">Добавить тест</a>
 				</div>
 			</div>
 		</div>
+	</div>
 
 
-		@foreach (var jsFile in jsFiles)
-		{
-			<script src='@jsFile' type='application/javascript'></script>
-		}
-        <script>
+	@foreach (var jsFile in jsFiles)
+	{
+		<script src='@jsFile' type='application/javascript'></script>
+	}
+	<script>
             for (var i = 0; i < window.documentReadyFunctions.length; i++) {
                 var f = window.documentReadyFunctions[i];
                 f();

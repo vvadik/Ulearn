@@ -20,9 +20,9 @@ namespace Notifications
 		public volatile bool Stopped;
 		private readonly WebCourseManager courseManager;
 		private readonly NotificationSender notificationSender;
-		
+
 		private readonly ServiceKeepAliver keepAliver;
-		private readonly TimeSpan keepAliveInterval;		
+		private readonly TimeSpan keepAliveInterval;
 
 		private static readonly ILog log = LogManager.GetLogger(typeof(Program));
 
@@ -51,7 +51,7 @@ namespace Notifications
 				sender.SendEmailsAsync().Wait();
 				return;
 			}
-			
+
 			new Program().MainLoop().Wait();
 		}
 

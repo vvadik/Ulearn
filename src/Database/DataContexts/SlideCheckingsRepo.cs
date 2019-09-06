@@ -36,7 +36,7 @@ namespace Database.DataContexts
 			};
 			db.ManualQuizCheckings.Add(manualChecking);
 			await db.SaveChangesAsync().ConfigureAwait(false);
-			
+
 			return manualChecking;
 		}
 
@@ -61,7 +61,7 @@ namespace Database.DataContexts
 		{
 			return db.ManualExerciseCheckings.Where(c => c.CourseId == courseId && c.UserId == userId && c.IsChecked).DistinctBy(c => c.SlideId);
 		}
-		
+
 		public bool HasManualExerciseChecking(string courseId, Guid slideId, string userId, int submissionId)
 		{
 			return db.ManualExerciseCheckings.Any(c => c.CourseId == courseId && c.UserId == userId && c.SlideId == slideId && c.SubmissionId == submissionId);
@@ -103,12 +103,12 @@ namespace Database.DataContexts
 			}
 		}
 
-		private IQueryable<T> GetSlideCheckingsByUser<T>(string courseId, Guid slideId, string userId, bool noTracking=true) where T : AbstractSlideChecking
+		private IQueryable<T> GetSlideCheckingsByUser<T>(string courseId, Guid slideId, string userId, bool noTracking = true) where T : AbstractSlideChecking
 		{
 			return GetSlideCheckingsByUsers<T>(courseId, slideId, new List<string> { userId }, noTracking);
 		}
 
-		private IQueryable<T> GetSlideCheckingsByUsers<T>(string courseId, Guid slideId, IEnumerable<string> userIds, bool noTracking=true) where T : AbstractSlideChecking
+		private IQueryable<T> GetSlideCheckingsByUsers<T>(string courseId, Guid slideId, IEnumerable<string> userIds, bool noTracking = true) where T : AbstractSlideChecking
 		{
 			IQueryable<T> dbRef = db.Set<T>();
 			if (noTracking)
@@ -135,9 +135,9 @@ namespace Database.DataContexts
 					GetSlideCheckingsByUser<AutomaticExerciseChecking>(courseId, slideId, userId).Any(c => c.Score > 0);
 		}
 
-		
+
 		#region Slide Score Calculating
-		
+
 		private int GetUserScoreForSlide<T>(string courseId, Guid slideId, string userId) where T : AbstractSlideChecking
 		{
 			return GetSlideCheckingsByUser<T>(courseId, slideId, userId).Select(c => c.Score).DefaultIfEmpty(0).Max();
@@ -158,7 +158,7 @@ namespace Database.DataContexts
 
 			return Math.Max(quizScore, exerciseScore);
 		}
-		
+
 		public Dictionary<string, int> GetManualScoresForSlide(string courseId, Guid slideId, List<string> userIds)
 		{
 			var quizScore = GetUserScoresForSlide<ManualQuizChecking>(courseId, slideId, userIds);
@@ -177,7 +177,7 @@ namespace Database.DataContexts
 
 			return Math.Max(quizScore, exerciseScore);
 		}
-		
+
 		public Dictionary<string, int> GetAutomaticScoresForSlide(string courseId, Guid slideId, List<string> userIds)
 		{
 			var quizScore = GetUserScoresForSlide<AutomaticQuizChecking>(courseId, slideId, userIds);
@@ -188,10 +188,10 @@ namespace Database.DataContexts
 				userId => Math.Max(quizScore.GetOrDefault(userId, 0), exerciseScore.GetOrDefault(userId, 0))
 			);
 		}
-		
+
 		#endregion
 
-		
+
 		public IEnumerable<T> GetManualCheckingQueue<T>(ManualCheckingQueueFilterOptions options) where T : AbstractManualSlideChecking
 		{
 			var query = db.Set<T>().Where(c => c.CourseId == options.CourseId);
@@ -206,6 +206,7 @@ namespace Database.DataContexts
 				else
 					query = query.Where(c => options.UserIds.Contains(c.UserId));
 			}
+
 			query = query.OrderByDescending(c => c.Timestamp);
 			if (options.Count > 0)
 				query = query.Take(options.Count);
@@ -264,13 +265,13 @@ namespace Database.DataContexts
 			/* Extract review from database to fill review.Author by EF's DynamicProxy */
 			return db.ExerciseCodeReviews.AsNoTracking().FirstOrDefault(r => r.Id == review.Id);
 		}
-		
-		public Task<ExerciseCodeReview> AddExerciseCodeReview(ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime=true)
+
+		public Task<ExerciseCodeReview> AddExerciseCodeReview(ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime = true)
 		{
 			return AddExerciseCodeReview(null, checking, userId, startLine, startPosition, finishLine, finishPosition, comment, setAddingTime);
 		}
 
-		public Task<ExerciseCodeReview> AddExerciseCodeReview(UserExerciseSubmission submission, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime=false)
+		public Task<ExerciseCodeReview> AddExerciseCodeReview(UserExerciseSubmission submission, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime = false)
 		{
 			return AddExerciseCodeReview(submission, null, userId, startLine, startPosition, finishLine, finishPosition, comment, setAddingTime);
 		}
@@ -392,7 +393,7 @@ namespace Database.DataContexts
 		{
 			return db.ExerciseCodeReviewComments.Find(commentId);
 		}
-		
+
 		public async Task DeleteExerciseCodeReviewComment(ExerciseCodeReviewComment comment)
 		{
 			comment.IsDeleted = true;

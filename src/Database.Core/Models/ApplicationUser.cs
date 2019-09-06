@@ -14,11 +14,11 @@ namespace Database.Models
 		{
 			Registered = DateTime.Now;
 		}
-		
+
 		/* Navigation properties which have been removed from Identity 2.0.
 		   See https://docs.microsoft.com/en-us/aspnet/core/migration/1x-to-2x/identity-2x#add-identityuser-poco-navigation-properties
 		   for details */
-		
+
 		/// <summary>
 		/// Navigation property for the roles this user belongs to.
 		/// </summary>
@@ -51,16 +51,16 @@ namespace Database.Models
 
 		[StringLength(200)]
 		public string TelegramChatTitle { get; set; }
-		
+
 		[StringLength(200)]
 		public string KonturLogin { get; set; }
 
 		public DateTime? LastConfirmationEmailTime { get; set; }
 
 		public Gender? Gender { get; set; }
-		
+
 		public bool IsDeleted { get; set; }
-		
+
 		[DatabaseGenerated(DatabaseGeneratedOption.Computed)]
 		public string Names
 		{
@@ -91,7 +91,7 @@ namespace Database.Models
 					return (LastName + " " + FirstName).Trim();
 				if (!string.IsNullOrEmpty(UserName))
 					return UserName.Trim();
-				return "Пользователь";	
+				return "Пользователь";
 			}
 		}
 	}

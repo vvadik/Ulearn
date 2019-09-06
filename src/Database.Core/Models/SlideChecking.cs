@@ -75,8 +75,8 @@ namespace Database.Models
 	{
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		public override int Id { get; set; }		
-		
+		public override int Id { get; set; }
+
 		public AutomaticExerciseCheckingStatus Status { get; set; }
 
 		public TimeSpan? Elapsed { get; set; }
@@ -101,7 +101,7 @@ namespace Database.Models
 
 		[StringLength(40)]
 		public string ExecutionServiceName { get; set; }
-		
+
 		[StringLength(256)]
 		public string CheckingAgentName { get; set; }
 
@@ -123,7 +123,7 @@ namespace Database.Models
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public override int Id { get; set; }
-		
+
 		[Required]
 		public int SubmissionId { get; set; }
 
@@ -144,7 +144,7 @@ namespace Database.Models
 		[Key]
 		public override int Id { get; set; }
 
-		public virtual UserQuizSubmission Submission { get; set; }		
+		public virtual UserQuizSubmission Submission { get; set; }
 	}
 
 	public class ManualQuizChecking : AbstractManualSlideChecking
@@ -153,6 +153,6 @@ namespace Database.Models
 		[Key]
 		public override int Id { get; set; }
 
-		public virtual UserQuizSubmission Submission { get; set; }		
+		public virtual UserQuizSubmission Submission { get; set; }
 	}
 }

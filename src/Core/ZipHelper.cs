@@ -27,29 +27,34 @@ namespace Ulearn.Core
 				}
 			}
 		}
-		
+
 		public static MemoryStream CreateFromDirectory(
 			string sourceDirectoryName,
 			CompressionLevel compressionLevel,
 			bool includeBaseDirectory,
 			Encoding entryNameEncoding,
-			[CanBeNull]Predicate<string> filter
-		) {
+			[CanBeNull] Predicate<string> filter
+		)
+		{
 			var filesToAdd = Directory.GetFiles(sourceDirectoryName, "*", SearchOption.AllDirectories);
 			var entryNames = GetEntryNames(filesToAdd, sourceDirectoryName, includeBaseDirectory);
 			var zipFileStream = new MemoryStream();
-			using (var archive = new ZipArchive(zipFileStream, ZipArchiveMode.Create)) {
-				for (var i = 0; i < filesToAdd.Length; i++) {
-					if (filter != null && !filter(filesToAdd[i])) {
+			using (var archive = new ZipArchive(zipFileStream, ZipArchiveMode.Create))
+			{
+				for (var i = 0; i < filesToAdd.Length; i++)
+				{
+					if (filter != null && !filter(filesToAdd[i]))
+					{
 						continue;
 					}
+
 					archive.CreateEntryFromFile(filesToAdd[i], entryNames[i], compressionLevel);
 				}
 			}
 
 			return zipFileStream;
 		}
-		
+
 		private static string[] GetEntryNames(string[] names, string sourceFolder, bool includeBaseName)
 		{
 			if (names == null || names.Length == 0)

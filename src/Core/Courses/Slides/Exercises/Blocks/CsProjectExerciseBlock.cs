@@ -26,8 +26,8 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public const string BuildingTargetNetCoreFrameworkVersion = "2.0";
 		public const string BuildingToolsVersion = "15.0";
 
-		private static readonly ILog log = LogManager.GetLogger(typeof(CsProjectExerciseBlock)); 
-		
+		private static readonly ILog log = LogManager.GetLogger(typeof(CsProjectExerciseBlock));
+
 		public static string SolutionFilepathToUserCodeFilepath(string solutionFilepath)
 		{
 			// cut .solution.cs
@@ -100,14 +100,14 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public bool IsWrongAnswer(string name) => WrongAnswersAndSolutionNameRegex.IsMatch(name) && !IsCorrectSolution(name);
 
 		public bool IsCorrectSolution(string name) => name.Equals(CorrectSolutionFileName, StringComparison.InvariantCultureIgnoreCase);
-		
+
 		public BuildEnvironmentOptions BuildEnvironmentOptions { get; set; }
 
 		public override IEnumerable<SlideBlock> BuildUp(SlideBuildingContext context, IImmutableSet<string> filesInProgress)
 		{
 			if (!Language.HasValue)
 				Language = context.CourseSettings.DefaultLanguage;
-			
+
 			ExerciseInitialCode = ExerciseInitialCode ?? "// Вставьте сюда финальное содержимое файла " + UserCodeFilePath;
 			ExpectedOutput = ExpectedOutput ?? "";
 			Validator.ValidatorName = string.Join(" ", Language.GetName(), Validator.ValidatorName ?? "");
@@ -159,11 +159,11 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			var excluded = (PathsToExcludeForChecker ?? new string[0])
 				.Concat(new[] { "bin/*", "obj/*" })
 				.ToList();
-			
+
 			log.Info("Собираю zip-архив для проверки: получаю список дополнительных файлов");
 			var toUpdate = GetAdditionalFiles(code, excluded).ToList();
 			log.Info($"Собираю zip-архив для проверки: дополнительные файлы [{string.Join(", ", toUpdate.Select(c => c.Path))}]");
-			
+
 			var zipBytes = ToZip(ExerciseFolder, excluded, toUpdate);
 			log.Info($"Собираю zip-архив для проверки: zip-архив собран, {zipBytes.Length} байтов");
 			return zipBytes;
@@ -189,7 +189,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			foreach (var fileContent in ExerciseStudentZipBuilder.ResolveCsprojLinks(this))
 				yield return fileContent;
 		}
-	
+
 		private static string GetNUnitTestRunnerFilename()
 		{
 			return nameof(NUnitTestRunner) + ".cs";
@@ -202,7 +202,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 				ProjModifier.PrepareForCheckingUserCode(proj, this, excluded);
 				if (addNUnitLauncher)
 					proj.AddItem("Compile", GetNUnitTestRunnerFilename());
-				
+
 				ProjModifier.SetBuildEnvironmentOptions(proj, BuildEnvironmentOptions);
 			};
 		}
@@ -210,13 +210,13 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		private byte[] CreateTestLauncherFile()
 		{
 			var data = Resources.NUnitTestRunner;
-			
+
 			var oldTestFilter = "\"SHOULD_BE_REPLACED\"";
 			var newTestFilter = string.Join(",", NUnitTestClasses.Select(x => $"\"{x}\""));
 			var newData = data.Replace(oldTestFilter, newTestFilter);
-			
+
 			newData = newData.Replace("WillBeMain", "Main");
-			
+
 			return Encoding.UTF8.GetBytes(newData);
 		}
 	}

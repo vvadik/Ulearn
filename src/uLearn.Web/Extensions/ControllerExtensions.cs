@@ -12,6 +12,7 @@ namespace uLearn.Web.Extensions
 			{
 				vd.Add(item, controller.ViewData[item]);
 			}
+
 			vd.Model = model;
 			using (var sw = new StringWriter())
 			{
@@ -31,6 +32,7 @@ namespace uLearn.Web.Extensions
 				var redirectUrl = requestUrl + "/";
 				return redirectUrl;
 			}
+
 			return null;
 		}
 	}

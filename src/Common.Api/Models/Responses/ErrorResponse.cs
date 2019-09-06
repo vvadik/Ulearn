@@ -9,7 +9,7 @@ namespace Ulearn.Common.Api.Models.Responses
 	{
 		[DataMember(Name = "status")]
 		public ResponseStatus Status { get; } = ResponseStatus.Error;
-		
+
 		[DataMember(Name = "message")]
 		public string Message { get; set; }
 
@@ -17,7 +17,7 @@ namespace Ulearn.Common.Api.Models.Responses
 		public Guid TraceId { get; } = TraceContext.Current.TraceId;
 
 		[DataMember(Name = "timestamp")]
-		public DateTime Timestamp { get; } = DateTime.Now; 
+		public DateTime Timestamp { get; } = DateTime.Now;
 
 		public ErrorResponse(string message)
 		{

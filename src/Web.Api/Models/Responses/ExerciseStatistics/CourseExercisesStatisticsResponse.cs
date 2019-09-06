@@ -11,7 +11,7 @@ namespace Ulearn.Web.Api.Models.Responses.ExerciseStatistics
 	{
 		[DataMember]
 		public List<OneExerciseStatistics> Exercises { get; set; }
-		
+
 		[DataMember]
 		public int AnalyzedSubmissionsCount { get; set; }
 	}
@@ -24,10 +24,10 @@ namespace Ulearn.Web.Api.Models.Responses.ExerciseStatistics
 
 		[DataMember]
 		public int SubmissionsCount { get; set; }
-		
+
 		[DataMember]
 		public int AcceptedCount { get; set; }
-		
+
 		[DataMember]
 		public Dictionary<DateTime, OneExerciseStatisticsForDate> LastDates { get; set; }
 	}
@@ -37,7 +37,7 @@ namespace Ulearn.Web.Api.Models.Responses.ExerciseStatistics
 	{
 		[DataMember]
 		public int SubmissionsCount { get; set; }
-		
+
 		[DataMember]
 		public int AcceptedCount { get; set; }
 	}

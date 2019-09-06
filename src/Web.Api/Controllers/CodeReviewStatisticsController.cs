@@ -49,22 +49,23 @@ namespace Ulearn.Web.Api.Controllers
 		/// </summary>
 		[HttpGet]
 		[CourseAccessAuthorize(CourseAccessType.ApiViewCodeReviewStatistics)]
-		public async Task<ActionResult<CodeReviewInstructorsStatisticsResponse>> InstructorsStatistics([FromQuery(Name = "course_id")][BindRequired]string courseId, int count=10000, DateTime? from=null, DateTime? to=null)
+		public async Task<ActionResult<CodeReviewInstructorsStatisticsResponse>> InstructorsStatistics([FromQuery(Name = "course_id")] [BindRequired]
+			string courseId, int count = 10000, DateTime? from = null, DateTime? to = null)
 		{
 			var course = courseManager.FindCourse(courseId);
 			if (course == null)
 				return NotFound();
-			
-			if (! from.HasValue)
+
+			if (!from.HasValue)
 				from = DateTime.MinValue;
-			if (! to.HasValue)
+			if (!to.HasValue)
 				to = DateTime.MaxValue;
-			
+
 			count = Math.Min(count, 10000);
-			
+
 			var instructorIds = await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, course.Id).ConfigureAwait(false);
 			var instructors = await usersRepo.GetUsersByIdsAsync(instructorIds).ConfigureAwait(false);
-			
+
 			var exerciseSlides = course.Slides.OfType<ExerciseSlide>().ToList();
 
 			var allSlideCheckings = await slideCheckingsRepo.GetManualCheckingQueueAsync<ManualExerciseChecking>(new ManualCheckingQueueFilterOptions
@@ -92,16 +93,16 @@ namespace Ulearn.Web.Api.Controllers
 				{
 					Instructor = BuildShortUserInfo(instructor, discloseLogin: true),
 					Exercises = exerciseSlides.Select(
-						slide => new CodeReviewExerciseStatistics
-						{
-							SlideId = slide.Id,
-							ReviewedSubmissionsCount = checkingsCheckedByInstructor.Where(c => c.SlideId == slide.Id).DistinctBy(c => c.SubmissionId).Count(),
-							QueueSize = checkingQueue.Count(c => c.SlideId == slide.Id),
-							CommentsCount = comments.Count(c => c.ExerciseChecking.SlideId == slide.Id),
-						}
-					)
-					.Where(s => s.ReviewedSubmissionsCount + s.QueueSize + s.CommentsCount > 0) // Ignore empty (zeros) records
-					.ToList()
+							slide => new CodeReviewExerciseStatistics
+							{
+								SlideId = slide.Id,
+								ReviewedSubmissionsCount = checkingsCheckedByInstructor.Where(c => c.SlideId == slide.Id).DistinctBy(c => c.SubmissionId).Count(),
+								QueueSize = checkingQueue.Count(c => c.SlideId == slide.Id),
+								CommentsCount = comments.Count(c => c.ExerciseChecking.SlideId == slide.Id),
+							}
+						)
+						.Where(s => s.ReviewedSubmissionsCount + s.QueueSize + s.CommentsCount > 0) // Ignore empty (zeros) records
+						.ToList()
 				};
 				result.Instructors.Add(instructorStatistics);
 			}

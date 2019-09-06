@@ -17,7 +17,7 @@ namespace Ulearn.VideoAnnotations.Api.Models.Responses.Annotations
 	public class Annotation
 	{
 		[DataMember(Name = "text")]
-		[CanBeNull]public string Text { get; set; }
+		[CanBeNull] public string Text { get; set; }
 
 		[DataMember(Name = "fragments")]
 		public List<AnnotationFragment> Fragments { get; set; }
@@ -28,7 +28,7 @@ namespace Ulearn.VideoAnnotations.Api.Models.Responses.Annotations
 	{
 		[DataMember(Name = "offset")]
 		public TimeSpan Offset { get; set; }
-		
+
 		[DataMember(Name = "text")]
 		public string Text { get; set; }
 	}

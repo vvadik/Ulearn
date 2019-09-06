@@ -54,16 +54,16 @@ namespace AntiPlagiarism.UpdateDb
 		private ServiceProvider GetServiceProvider()
 		{
 			var configuration = ApplicationConfiguration.Read<AntiPlagiarismUpdateDbConfiguration>();
-			
+
 			var services = new ServiceCollection();
 
 			services.AddOptions();
-			
+
 			services.Configure<AntiPlagiarismUpdateDbConfiguration>(ApplicationConfiguration.GetConfiguration());
 			services.Configure<AntiPlagiarismConfiguration>(ApplicationConfiguration.GetConfiguration().GetSection("antiplagiarism"));
 
 			var logger = GetLogger(configuration);
-			services.AddSingleton(logger);	
+			services.AddSingleton(logger);
 			services.AddScoped(_ => GetDatabase(configuration, logger));
 			services.AddScoped<AntiPlagiarismSnippetsUpdater>();
 			services.AddScoped<ISnippetsRepo, SnippetsRepo>();
@@ -71,7 +71,7 @@ namespace AntiPlagiarism.UpdateDb
 			services.AddSingleton<CodeUnitsExtractor>();
 			services.AddSingleton<SnippetsExtractor>();
 			services.AddSingleton<SubmissionSnippetsExtractor>();
-			
+
 			return services.BuildServiceProvider();
 		}
 
@@ -91,10 +91,10 @@ namespace AntiPlagiarism.UpdateDb
 				.Enrich.With<ThreadEnricher>()
 				.Enrich.With<FlowContextEnricher>()
 				.MinimumLevel.Debug();
-			
+
 			if (configuration.HostLog.Console)
 				loggerConfiguration = loggerConfiguration.WriteTo.Console(
-					outputTemplate: "{Timestamp:HH:mm:ss.fff} {Level:u3} [{Thread}] {Message:l}{NewLine}{Exception}", 
+					outputTemplate: "{Timestamp:HH:mm:ss.fff} {Level:u3} [{Thread}] {Message:l}{NewLine}{Exception}",
 					restrictedToMinimumLevel: LogEventLevel.Information
 				);
 
@@ -107,7 +107,7 @@ namespace AntiPlagiarism.UpdateDb
 				var fileName = Path.GetFileName(pathFormat);
 				pathFormat = Path.Combine(directory, configuration.GraphiteServiceName, fileName);
 			}
-			
+
 			loggerConfiguration = loggerConfiguration
 				.WriteTo.RollingFile(
 					pathFormat,
@@ -115,16 +115,16 @@ namespace AntiPlagiarism.UpdateDb
 					restrictedToMinimumLevel: minimumLevel,
 					fileSizeLimitBytes: 4 * 1073741824L
 				);
-			
+
 			return loggerConfiguration.CreateLogger();
 		}
 	}
-	
+
 	internal class SerilogLoggerFactory : ILoggerFactory, IDisposable
 	{
 		private readonly SerilogLoggerProvider provider;
 
-		public SerilogLoggerFactory(ILogger logger=null, bool dispose=false)
+		public SerilogLoggerFactory(ILogger logger = null, bool dispose = false)
 		{
 			provider = new SerilogLoggerProvider(logger, dispose);
 		}

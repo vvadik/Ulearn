@@ -45,7 +45,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		{
 			return await GetGroupsListResponseAsync(parameters).ConfigureAwait(false);
 		}
-		
+
 		private async Task<GroupsListResponse> GetGroupsListResponseAsync(GroupsListParameters parameters)
 		{
 			var groups = await groupAccessesRepo.GetAvailableForUserGroupsAsync(parameters.CourseId, UserId, false, !parameters.Archived, parameters.Archived).ConfigureAwait(false);
@@ -68,7 +68,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 				groupAccessesByGroup[g.Id],
 				addGroupApiUrl: true
 			)).ToList();
-			
+
 			return new GroupsListResponse
 			{
 				Groups = groupInfos,
@@ -87,13 +87,13 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		/// <param name="parameters">Название новой группы</param>
 		[HttpPost]
 		[Authorize(Policy = "Instructors")]
-		[ProducesResponseType((int) HttpStatusCode.Created)]
+		[ProducesResponseType((int)HttpStatusCode.Created)]
 		public async Task<ActionResult<CreateGroupResponse>> CreateGroup([FromQuery] CourseAuthorizationParameters courseAuthorizationParameters, CreateGroupParameters parameters)
 		{
 			var ownerId = User.GetUserId();
 			var group = await groupsRepo.CreateGroupAsync(courseAuthorizationParameters.CourseId, parameters.Name, ownerId).ConfigureAwait(false);
 
-			var url = Url.Action(new UrlActionContext { Action = nameof(GroupController.Group), Controller = "Group", Values = new { groupId = group.Id }});
+			var url = Url.Action(new UrlActionContext { Action = nameof(GroupController.Group), Controller = "Group", Values = new { groupId = group.Id } });
 			return Created(url, new CreateGroupResponse
 			{
 				Id = group.Id,

@@ -57,7 +57,7 @@ namespace Ulearn.Common.Api.Models.Parameters
 				return fromQueryAttribute.Name;
 			return property.Name;
 		}
-		
+
 		private static string ConstructQueryString(NameValueCollection parameters)
 		{
 			var items = new List<string>();

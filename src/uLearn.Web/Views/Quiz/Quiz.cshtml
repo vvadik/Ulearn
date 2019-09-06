@@ -87,7 +87,7 @@
 			@status
 		</p>
 	}
-	
+
 	if (Model.Checking != null && Model.Checking.IsLocked && !Model.Checking.IsLockedBy(User.Identity))
 	{
 		<div class="alert alert-danger mt10 ">Внимание. Эта работа прямо сейчас проверяется преподавателем @Model.Checking.LockedBy.VisibleName</div>
@@ -109,7 +109,7 @@
 				questionAnswersFrequency: Model.QuestionAnswersFrequency[(block as AbstractQuestionBlock).Id],
 				isInstructor: isInstructor,
 				isCourseAdmin: isCourseAdmin
-			);
+				);
 		}
 		else
 		{
@@ -145,8 +145,8 @@
 			@Html.Hidden("nextUrl", Url.Action("CheckingQueue", "Admin", new { courseId = Model.Course.Id, group = Model.GroupsIdsJoined, done = Model.Checking.IsChecked }))
 		}
 		<div class="quiz__blocks">
-		    @SlideHtml.Blocks(context, Html)
-        </div>
+			@SlideHtml.Blocks(context, Html)
+		</div>
 	}
 
 	if (!Model.IsGuest)
@@ -156,7 +156,7 @@
 			{
 				/* This attempt should not be calculated as left checking */
 				Model.ManualCheckingsLeft--;
-				
+
 				<input type="submit" class="btn @(Model.Checking.IsChecked || Model.ManualCheckingsLeft == 0 ? "btn-primary" : "btn-default") quiz-button" form="quiz__score-form" value="Сохранить и вернуться">
 				if (!Model.Checking.IsChecked)
 				{
@@ -205,7 +205,7 @@
 						{
 							<text>Ваши попытки закончились. Вы можете попробовать пройти тест ещё раз, <strong>но ваши баллы за&nbsp;него не&nbsp;изменятся</strong>.</text>
 						}
-                        else if (!Model.QuizState.IsScoredMaximum)
+						else if (!Model.QuizState.IsScoredMaximum)
 						{
 							<text>У вас остал@(remains == 1 ? "а" : "о")сь @remains.PluralizeInRussian(RussianPluralizationOptions.Tries) из @Model.MaxAttemptsCount</text>
 						}

@@ -7,7 +7,8 @@ namespace uLearn.CSharp
 	{
 		public static string BasicProgrammingDirectoryPath => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
 			"..", "CSharp", "ExampleFiles", "BasicProgramming-master"); // TODO: при запуске ручных тестов создать папку с нужными файлами и указать правильынй путь
-        public static string ULearnSubmissionsDirectoryPath => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
+
+		public static string ULearnSubmissionsDirectoryPath => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
 			"..", "CSharp", "ExampleFiles", "submissions", "0002");
 	}
 }

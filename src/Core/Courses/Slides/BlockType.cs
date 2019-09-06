@@ -29,16 +29,16 @@ namespace Ulearn.Core.Courses.Slides
 
 		[XmlEnum("includeMarkdown")]
 		IncludeMarkdown,
-		
+
 		[XmlEnum("includeBlocks")]
 		IncludeBlocks,
 
 		[XmlEnum("gallery")]
 		IncludeImageGallery,
-		
+
 		[XmlEnum("html")]
 		Html,
-		
+
 		[XmlEnum("spoiler")]
 		Spoiler,
 
@@ -50,19 +50,19 @@ namespace Ulearn.Core.Courses.Slides
 
 		[XmlEnum("question.isTrue")]
 		IsTrueQuestion,
-		
+
 		[XmlEnum("question.choice")]
 		ChoiceQuestion,
-		
+
 		[XmlEnum("question.text")]
 		TextQuestion,
-		
+
 		[XmlEnum("question.order")]
 		OrderQuestion,
-		
+
 		[XmlEnum("question.match")]
 		MatchQuestion,
-		
+
 		[XmlEnum("exercise.universal")]
 		UniversalExercise,
 	}
@@ -80,20 +80,20 @@ namespace Ulearn.Core.Courses.Slides
 				case IncludeImageGalleryBlock _: return BlockType.IncludeImageGallery;
 				case IncludeMarkdownBlock _: return BlockType.IncludeMarkdown;
 				case MarkdownBlock _: return BlockType.Markdown;
-				case TexBlock _: return BlockType.Tex; 
+				case TexBlock _: return BlockType.Tex;
 				case HtmlBlock _: return BlockType.Html;
 				case SpoilerBlock _: return BlockType.Spoiler;
-				
+
 				case FillInBlock _: return BlockType.TextQuestion;
 				case ChoiceBlock _: return BlockType.ChoiceQuestion;
 				case MatchingBlock _: return BlockType.MatchQuestion;
 				case OrderingBlock _: return BlockType.OrderQuestion;
 				case IsTrueBlock _: return BlockType.IsTrueQuestion;
-				
+
 				case CsProjectExerciseBlock _: return BlockType.CsProjectExercise;
 				case SingleFileExerciseBlock _: return BlockType.SingleFileExercise;
 				case UniversalExerciseBlock _: return BlockType.UniversalExercise;
-				
+
 				default: throw new Exception("Unknown slide block " + block);
 			}
 		}

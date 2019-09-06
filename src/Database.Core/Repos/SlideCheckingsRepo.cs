@@ -85,7 +85,7 @@ namespace Database.Repos
 					// TODO (andgein): Now it's not retrieved via AsNoTracking(). Fix this.
 					foreach (var review in checking.Reviews.ToList())
 						db.Entry(review).State = EntityState.Deleted;
-					
+
 					db.Entry(checking).State = EntityState.Deleted;
 				}
 
@@ -94,12 +94,12 @@ namespace Database.Repos
 			}
 		}
 
-		private IQueryable<T> GetSlideCheckingsByUser<T>(string courseId, Guid slideId, string userId, bool noTracking=true) where T : AbstractSlideChecking
+		private IQueryable<T> GetSlideCheckingsByUser<T>(string courseId, Guid slideId, string userId, bool noTracking = true) where T : AbstractSlideChecking
 		{
 			return GetSlideCheckingsByUsers<T>(courseId, slideId, new List<string> { userId }, noTracking);
 		}
 
-		private IQueryable<T> GetSlideCheckingsByUsers<T>(string courseId, Guid slideId, IEnumerable<string> userIds, bool noTracking=true) where T : AbstractSlideChecking
+		private IQueryable<T> GetSlideCheckingsByUsers<T>(string courseId, Guid slideId, IEnumerable<string> userIds, bool noTracking = true) where T : AbstractSlideChecking
 		{
 			IQueryable<T> dbRef = db.Set<T>();
 			if (noTracking)
@@ -127,7 +127,7 @@ namespace Database.Repos
 		}
 
 		#region Slide Score Calculating
-		
+
 		private int GetUserScoreForSlide<T>(string courseId, Guid slideId, string userId) where T : AbstractSlideChecking
 		{
 			return GetSlideCheckingsByUser<T>(courseId, slideId, userId).Select(c => c.Score).DefaultIfEmpty(0).Max();
@@ -148,7 +148,7 @@ namespace Database.Repos
 
 			return Math.Max(quizScore, exerciseScore);
 		}
-		
+
 		public Dictionary<string, int> GetManualScoresForSlide(string courseId, Guid slideId, List<string> userIds)
 		{
 			var quizScore = GetUserScoresForSlide<ManualQuizChecking>(courseId, slideId, userIds);
@@ -167,7 +167,7 @@ namespace Database.Repos
 
 			return Math.Max(quizScore, exerciseScore);
 		}
-		
+
 		public Dictionary<string, int> GetAutomaticScoresForSlide(string courseId, Guid slideId, List<string> userIds)
 		{
 			var quizScore = GetUserScoresForSlide<AutomaticQuizChecking>(courseId, slideId, userIds);
@@ -178,7 +178,7 @@ namespace Database.Repos
 				userId => Math.Max(quizScore.GetOrDefault(userId, 0), exerciseScore.GetOrDefault(userId, 0))
 			);
 		}
-		
+
 		#endregion
 
 		public IQueryable<T> GetManualCheckingQueueAsync<T>(ManualCheckingQueueFilterOptions options) where T : AbstractManualSlideChecking
@@ -195,6 +195,7 @@ namespace Database.Repos
 				else
 					query = query.Where(c => options.UserIds.Contains(c.UserId));
 			}
+
 			query = query.OrderByDescending(c => c.Timestamp);
 			if (options.Count > 0)
 				query = query.Take(options.Count);
@@ -205,7 +206,7 @@ namespace Database.Repos
 		{
 			return db.Set<T>().Find(id);
 		}
-		
+
 		public bool IsProhibitedToSendExerciseToManualChecking(string courseId, Guid slideId, string userId)
 		{
 			return GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId).Any(c => c.ProhibitFurtherManualCheckings);
@@ -253,13 +254,13 @@ namespace Database.Repos
 			/* Extract review from database to fill review.Author by EF's DynamicProxy */
 			return await db.ExerciseCodeReviews.AsNoTracking().FirstOrDefaultAsync(r => r.Id == review.Entity.Id).ConfigureAwait(false);
 		}
-		
-		public Task<ExerciseCodeReview> AddExerciseCodeReview(ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime=true)
+
+		public Task<ExerciseCodeReview> AddExerciseCodeReview(ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime = true)
 		{
 			return AddExerciseCodeReview(null, checking, userId, startLine, startPosition, finishLine, finishPosition, comment, setAddingTime);
 		}
 
-		public Task<ExerciseCodeReview> AddExerciseCodeReview(UserExerciseSubmission submission, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime=false)
+		public Task<ExerciseCodeReview> AddExerciseCodeReview(UserExerciseSubmission submission, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime = false)
 		{
 			return AddExerciseCodeReview(submission, null, userId, startLine, startPosition, finishLine, finishPosition, comment, setAddingTime);
 		}
@@ -304,13 +305,13 @@ namespace Database.Repos
 				.Select(g => g.Key)
 				.ToList();
 		}
-		
+
 		public List<string> GetTopOtherUsersReviewComments(string courseId, Guid slideId, string userId, int count, IEnumerable<string> excludeComments)
 		{
 			return db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)
 				.Where(r => r.ExerciseChecking.CourseId == courseId &&
 							r.ExerciseChecking.SlideId == slideId &&
-							! excludeComments.Contains(r.Comment) &&
+							!excludeComments.Contains(r.Comment) &&
 							r.AuthorId != userId &&
 							!r.HiddenFromTopComments &&
 							!r.IsDeleted)

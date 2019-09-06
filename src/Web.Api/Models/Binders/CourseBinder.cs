@@ -28,25 +28,25 @@ namespace Ulearn.Web.Api.Models.Binders
 		{
 			if (bindingContext == null)
 				throw new ArgumentNullException(nameof(bindingContext));
-			
+
 			// Specify a default argument name if none is set by ModelBinderAttribute
 			var modelName = bindingContext.BinderModelName;
 			if (string.IsNullOrEmpty(modelName))
 				modelName = "courseId";
-			
+
 			// Try to fetch the value of the argument by name
 			var valueProviderResult = bindingContext.ValueProvider.GetValue(modelName);
 
 			if (valueProviderResult == ValueProviderResult.None)
 				return Task.CompletedTask;
-			
+
 			bindingContext.ModelState.SetModelValue(modelName, valueProviderResult);
 			var value = valueProviderResult.FirstValue;
 
 			// Check if the argument value is null or empty
 			if (string.IsNullOrEmpty(value))
 				return Task.CompletedTask;
-			
+
 			var model = courseManager.FindCourse(value);
 			if (model == null)
 				bindingContext.ModelState.TryAddModelError(modelName, $"Course {value} not found");
@@ -54,7 +54,7 @@ namespace Ulearn.Web.Api.Models.Binders
 			return Task.CompletedTask;
 		}
 	}
-	
+
 	public class CourseBinderProvider : IModelBinderProvider
 	{
 		public IModelBinder GetBinder(ModelBinderProviderContext context)

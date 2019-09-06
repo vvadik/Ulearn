@@ -10,7 +10,7 @@ namespace Stepik.Api
 	{
 		private const string scope = "read write";
 		private const string oAuthBaseUrl = "https://stepik.org/oauth2/authorize/";
-		
+
 		public static string GetAuthorizationUrl(string clientId, string redirectUri, string state)
 		{
 			var parameters = new NameValueCollection
@@ -37,6 +37,5 @@ namespace Stepik.Api
 			var unpacked = Convert.FromBase64String(encryptedState);
 			return Encoding.UTF8.GetString(ProtectedData.Unprotect(unpacked, null, DataProtectionScope.LocalMachine));
 		}
-
 	}
 }

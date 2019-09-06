@@ -39,19 +39,20 @@ namespace Ulearn.Web.Api.Controllers
 		/// Статистика по выполнению каждого упражнения в курсе
 		/// </summary>
 		[HttpGet]
-		public async Task<ActionResult<CourseExercisesStatisticsResponse>> CourseStatistics([FromQuery(Name = "course_id")][BindRequired]string courseId, int count=10000, DateTime? from=null, DateTime? to=null)
+		public async Task<ActionResult<CourseExercisesStatisticsResponse>> CourseStatistics([FromQuery(Name = "course_id")] [BindRequired]
+			string courseId, int count = 10000, DateTime? from = null, DateTime? to = null)
 		{
 			var course = courseManager.FindCourse(courseId);
 			if (course == null)
 				return NotFound();
-			
-			if (! from.HasValue)
+
+			if (!from.HasValue)
 				from = DateTime.MinValue;
-			if (! to.HasValue)
+			if (!to.HasValue)
 				to = DateTime.MaxValue;
 
 			count = Math.Min(count, 10000);
-			
+
 			var exerciseSlides = course.Slides.OfType<ExerciseSlide>().ToList();
 			/* TODO (andgein): I can't select all submissions because ApplicationUserId column doesn't exist in database (ApplicationUser_Id exists).
 			   We should remove this column after EF Core 2.1 release (and remove tuples here)
@@ -62,11 +63,11 @@ namespace Ulearn.Web.Api.Controllers
 				.Take(count)
 				.Select(s => Tuple.Create(s.SlideId, s.AutomaticCheckingIsRightAnswer, s.Timestamp))
 				.ToListAsync().ConfigureAwait(false);
-			
+
 			var getSlideMaxScoreFunc = await BuildGetSlideMaxScoreFunc(solutionsRepo, userQuizzesRepo, visitsRepo, groupsRepo, course, User.GetUserId());
 
 			const int daysLimit = 30;
-			
+
 			var result = new CourseExercisesStatisticsResponse
 			{
 				AnalyzedSubmissionsCount = submissions.Count,

@@ -8,7 +8,7 @@ namespace Ulearn.Web.Api.Models.Responses.Groups
 	{
 		[DataMember]
 		public int Id { get; set; }
-		
+
 		[DataMember]
 		public string ApiUrl { get; set; }
 	}

@@ -78,10 +78,10 @@ namespace Database.Repos
 			using (var transaction = db.Database.BeginTransaction())
 			{
 				await DeleteOldNotificationTransportsAsync(transport.GetType(), transport.UserId).ConfigureAwait(false);
-				
+
 				transport.IsDeleted = false;
 				db.NotificationTransports.Add(transport);
-				
+
 				await db.SaveChangesAsync().ConfigureAwait(false);
 				transaction.Commit();
 			}
@@ -109,7 +109,7 @@ namespace Database.Repos
 				transports = transports.Where(r => r.IsEnabled);
 			return transports.ToListAsync();
 		}
-		
+
 		public List<NotificationTransport> GetUsersNotificationTransports(string userId, bool includeDisabled = false)
 		{
 			var transports = db.NotificationTransports.Where(t => t.UserId == userId && !t.IsDeleted);
@@ -122,7 +122,7 @@ namespace Database.Repos
 		{
 			return (await GetUsersNotificationTransportsAsync(userId, includeDisabled).ConfigureAwait(false)).OfType<T>().FirstOrDefault();
 		}
-		
+
 		public T FindUsersNotificationTransport<T>(string userId, bool includeDisabled = false) where T : NotificationTransport
 		{
 			return GetUsersNotificationTransports(userId, includeDisabled).OfType<T>().FirstOrDefault();
@@ -146,7 +146,6 @@ namespace Database.Repos
 			else
 				settings.IsEnabled = isEnabled;
 
-			
 			db.AddOrUpdate(settings, s => s.Id == settings.Id);
 			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
@@ -393,6 +392,7 @@ namespace Database.Repos
 				delivery.FailsCount++;
 				delivery.NextTryTime = CalculateNextTryTime(delivery.CreateTime, delivery.FailsCount);
 			}
+
 			return db.SaveChangesAsync();
 		}
 
@@ -434,15 +434,15 @@ namespace Database.Repos
 			return $"{secret}transport={transportId}&timestamp={timestamp}{secret}".CalculateMd5();
 		}
 
-		public Task<List<T>> FindNotificationsAsync<T>(Expression<Func<T, bool>> func, Expression<Func<T, object>> includePath=null) where T : Notification
+		public Task<List<T>> FindNotificationsAsync<T>(Expression<Func<T, bool>> func, Expression<Func<T, object>> includePath = null) where T : Notification
 		{
 			var query = db.Notifications.OfType<T>();
 			if (includePath != null)
 				query = query.Include(includePath);
 			return query.Where(func).ToListAsync();
 		}
-		
-		public List<T> FindNotifications<T>(Expression<Func<T, bool>> func, Expression<Func<T, object>> includePath=null) where T : Notification
+
+		public List<T> FindNotifications<T>(Expression<Func<T, bool>> func, Expression<Func<T, object>> includePath = null) where T : Notification
 		{
 			var query = db.Notifications.OfType<T>();
 			if (includePath != null)

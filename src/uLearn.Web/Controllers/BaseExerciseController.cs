@@ -36,9 +36,9 @@ namespace uLearn.Web.Controllers
 		protected readonly UsersRepo usersRepo;
 		protected readonly StyleErrorsRepo styleErrorsRepo;
 		protected readonly UnitsRepo unitsRepo;
-		
+
 		private static readonly TimeSpan executionTimeout = TimeSpan.FromSeconds(45);
-		
+
 		public BaseExerciseController()
 			: this(new ULearnDb(), WebCourseManager.Instance, new MetricSender(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName))
 		{
@@ -124,20 +124,20 @@ namespace uLearn.Web.Controllers
 				metricSender.SendCount($"exercise.{exerciseMetricId}.dont_wait_result");
 				return new RunSolutionResult { SubmissionId = submission.Id };
 			}
-			
+
 			/* Update the submission */
 			submission = userSolutionsRepo.FindNoTrackingSubmission(submission.Id);
-			
+
 			if (submission.AutomaticCheckingIsRightAnswer)
 				await CreateStyleErrorsReviewsForSubmission(submission, buildResult.StyleErrors, exerciseMetricId);
-			
+
 			var automaticChecking = submission.AutomaticChecking;
 			bool sentToReview;
 			if (!submissionLanguage.HasAutomaticChecking())
 				sentToReview = await SendToReviewAndUpdateScore(submission, courseManager, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender, true).ConfigureAwait(false);
 			else
 				sentToReview = slideCheckingsRepo.HasManualExerciseChecking(courseId, exerciseSlide.Id, userId, submission.Id);
-			
+
 			var result = new RunSolutionResult
 			{
 				IsCompileError = automaticChecking?.IsCompilationError ?? false,
@@ -154,9 +154,10 @@ namespace uLearn.Web.Controllers
 				result.IsStyleViolation = true;
 				result.StyleMessage = string.Join("\n", buildResult.StyleErrors.Select(e => e.GetMessageWithPositions()));
 			}
+
 			return result;
 		}
-		
+
 		public static async Task<bool> SendToReviewAndUpdateScore(UserExerciseSubmission submission,
 			CourseManager courseManager, SlideCheckingsRepo slideCheckingsRepo, GroupsRepo groupsRepo, VisitsRepo visitsRepo, MetricSender metricSender,
 			bool startTransaction)
@@ -201,15 +202,15 @@ namespace uLearn.Web.Controllers
 				slideTitleForMetric = slideTitleForMetric.Substring(0, 25);
 			return $"{courseId.ToLower(CultureInfo.InvariantCulture)}.{exerciseSlide.Id.ToString("N").Substring(32 - 25)}.{slideTitleForMetric}";
 		}
-		
+
 		private async Task CreateStyleErrorsReviewsForSubmission(UserExerciseSubmission submission, IEnumerable<SolutionStyleError> styleErrors, string exerciseMetricId)
 		{
 			var ulearnBotUserId = usersRepo.GetUlearnBotUserId();
 			foreach (var error in styleErrors)
 			{
-				if (! await styleErrorsRepo.IsStyleErrorEnabledAsync(error.ErrorType))
+				if (!await styleErrorsRepo.IsStyleErrorEnabledAsync(error.ErrorType))
 					continue;
-				
+
 				await slideCheckingsRepo.AddExerciseCodeReview(
 					submission,
 					ulearnBotUserId,
@@ -219,7 +220,7 @@ namespace uLearn.Web.Controllers
 					error.Span.EndLinePosition.Character,
 					error.Message
 				);
-				
+
 				var errorName = Enum.GetName(typeof(StyleErrorType), error.ErrorType);
 				metricSender.SendCount("exercise.style_error");
 				metricSender.SendCount($"exercise.style_error.{errorName}");

@@ -13,11 +13,11 @@ namespace Database.Repos.Groups
 			string courseId,
 			string name,
 			string ownerId,
-			bool isManualCheckingEnabled=false,
-			bool isManualCheckingEnabledForOldSolutions=false,
-			bool canUsersSeeGroupProgress=true,
-			bool defaultProhibitFurtherReview=true,
-			bool isInviteLinkEnabled=true);
+			bool isManualCheckingEnabled = false,
+			bool isManualCheckingEnabledForOldSolutions = false,
+			bool canUsersSeeGroupProgress = true,
+			bool defaultProhibitFurtherReview = true,
+			bool isInviteLinkEnabled = true);
 
 		Task<Group> CopyGroupAsync(Group group, string courseId, string newOwnerId = "");
 
@@ -32,9 +32,9 @@ namespace Database.Repos.Groups
 		Task ChangeGroupOwnerAsync(int groupId, string newOwnerId);
 		Task<Group> ArchiveGroupAsync(int groupId, bool isArchived);
 		Task DeleteGroupAsync(int groupId);
-		Task<Group> FindGroupByIdAsync(int groupId, bool noTracking=false);
-		Task<Group> FindGroupByInviteHashAsync(Guid hash, bool noTracking=false);
-		Task<List<Group>> GetCourseGroupsAsync(string courseId, bool includeArchived=false);
+		Task<Group> FindGroupByIdAsync(int groupId, bool noTracking = false);
+		Task<Group> FindGroupByInviteHashAsync(Guid hash, bool noTracking = false);
+		Task<List<Group>> GetCourseGroupsAsync(string courseId, bool includeArchived = false);
 		Task<List<Group>> GetMyGroupsFilterAccessibleToUserAsync(string courseId, string userId, bool includeArchived = false);
 		Task EnableInviteLinkAsync(int groupId, bool isEnabled);
 		Task<bool> IsManualCheckingEnabledForUserAsync(Course course, string userId);
@@ -42,6 +42,6 @@ namespace Database.Repos.Groups
 		Task EnableAdditionalScoringGroupsForGroupAsync(int groupId, IEnumerable<string> scoringGroupsIds);
 		Task<List<EnabledAdditionalScoringGroup>> GetEnabledAdditionalScoringGroupsAsync(string courseId);
 		Task<List<EnabledAdditionalScoringGroup>> GetEnabledAdditionalScoringGroupsForGroupAsync(int groupId);
-		IQueryable<Group> GetCourseGroupsQueryable(string courseId, bool includeArchived=false);
+		IQueryable<Group> GetCourseGroupsQueryable(string courseId, bool includeArchived = false);
 	}
 }

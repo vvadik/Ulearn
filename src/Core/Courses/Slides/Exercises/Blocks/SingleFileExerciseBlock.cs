@@ -20,7 +20,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 
 		[XmlElement("prelude")]
 		public string PreludeFile { get; set; }
-		
+
 		[XmlAttribute("file")]
 		public string CodeFile { get; set; }
 
@@ -29,13 +29,13 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			CodeFile = CodeFile ?? context.Slide.DefaultIncludeCodeFile ?? context.Unit.Settings?.DefaultIncludeCodeFile;
 			if (CodeFile == null)
 				throw new CourseLoadingException($"У блока <exercise.file> не указан атрибут file.");
-			
+
 			if (ExerciseInitialCode == null)
 				throw new CourseLoadingException($"У блока <exercise.file> не указан код, который надо показывать пользователю перед началом работы. Укажите его в тэге <initialCode>");
-			
+
 			if (!Language.HasValue)
 				Language = LanguageHelpers.GuessByExtension(new FileInfo(CodeFile));
-			
+
 			RemovedLabels = RemovedLabels ?? new Label[0];
 			if (PreludeFile == null)
 			{

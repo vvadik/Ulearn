@@ -11,16 +11,16 @@
 			<tr>
 				<td>
 					@account.LoginProvider
-                    <span class="text-muted">
-                        @if (account.LoginProvider == VkAuthenticationConstants.AuthenticationType)
-                        {
-	                        <text>id@(account.ProviderKey)</text>
-                        }
-                        @if (account.LoginProvider == KonturPassportConstants.AuthenticationType)
-                        {
-	                        <text>@ViewBag.User.KonturLogin</text>
-                        }
-                    </span>
+					<span class="text-muted">
+						@if (account.LoginProvider == VkAuthenticationConstants.AuthenticationType)
+						{
+							<text>id@(account.ProviderKey)</text>
+						}
+						@if (account.LoginProvider == KonturPassportConstants.AuthenticationType)
+						{
+							<text>@ViewBag.User.KonturLogin</text>
+						}
+					</span>
 				</td>
 				<td>
 					@if (ViewBag.ShowRemoveButton)

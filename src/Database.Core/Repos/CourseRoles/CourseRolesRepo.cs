@@ -20,7 +20,7 @@ namespace Database.Repos.CourseRoles
 			this.usersRepo = usersRepo;
 		}
 
-		private async Task<List<CourseRole>>GetUserRoles(string userId)
+		private async Task<List<CourseRole>> GetUserRoles(string userId)
 		{
 			var userCourseRoles = await db.CourseRoles.Where(x => x.UserId == userId).ToListAsync().ConfigureAwait(false);
 			return userCourseRoles
@@ -90,9 +90,9 @@ namespace Database.Repos.CourseRoles
 		public async Task<List<string>> GetUsersWithRoleAsync(string courseId, CourseRoleType minCourseRoleType)
 		{
 			return (await db.CourseRoles
-				.Where(r => r.CourseId == courseId)
-				.OrderByDescending(e => e.Id)
-				.ToListAsync())
+					.Where(r => r.CourseId == courseId)
+					.OrderByDescending(e => e.Id)
+					.ToListAsync())
 				.GroupBy(x => x.UserId + x.Role)
 				.Select(gr => gr.FirstOrDefault())
 				.Where(x => x != null && (!x.IsEnabled.HasValue || x.IsEnabled.Value))

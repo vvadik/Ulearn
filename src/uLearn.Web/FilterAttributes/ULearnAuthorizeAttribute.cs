@@ -22,6 +22,7 @@ namespace uLearn.Web.FilterAttributes
 				filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { action = "Index", controller = "Login", returnUrl = request.UrlReferrer.PathAndQuery }));
 				return;
 			}
+
 			base.HandleUnauthorizedRequest(filterContext);
 		}
 
@@ -39,7 +40,7 @@ namespace uLearn.Web.FilterAttributes
 			if (usersRepo.FindUserById(userId) == null) // I.e. if user has been deleted
 				return false;
 
-			if (MinAccessLevel == CourseRole.Student && ! ShouldBeSysAdmin)
+			if (MinAccessLevel == CourseRole.Student && !ShouldBeSysAdmin)
 				return true;
 
 			if (ShouldBeSysAdmin && user.IsSystemAdministrator())

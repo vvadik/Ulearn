@@ -87,6 +87,7 @@ namespace Ulearn.Core.Courses
 			{
 				throw new CourseLoadingException(validationLog);
 			}
+
 			AddDefaultScoringGroupIfNeeded(units, slides, settings);
 			CalculateScoringGroupScores(units, settings);
 
@@ -96,13 +97,13 @@ namespace Ulearn.Core.Courses
 		private static string GetValidationLog(List<Unit> units)
 		{
 			var slides = units.SelectMany(x => x.Slides).ToList();
-			var validationLog  = new List<string>();
+			var validationLog = new List<string>();
 			validationLog.Add(CheckEmptySlideIds(slides));
 			validationLog.Add(CheckDuplicateSlideIds(slides));
 			validationLog.Add(CheckFlashcards(units.Where(x => x.Flashcards.Count > 0).ToList()));
-			return validationLog.All(x => x == string.Empty) 
-				? string.Empty 
-				: string.Join("\n", validationLog.Where(x=>x!=string.Empty));
+			return validationLog.All(x => x == string.Empty)
+				? string.Empty
+				: string.Join("\n", validationLog.Where(x => x != string.Empty));
 		}
 
 		private static void CalculateScoringGroupScores(IEnumerable<Unit> units, CourseSettings settings)
@@ -188,7 +189,7 @@ namespace Ulearn.Core.Courses
 					.Select(x => x.Select(y => y.Title))
 					.ToList();
 			if (badSlides.Any())
-				return 
+				return
 					"Идентификаторы слайдов (SlideId) должны быть уникальными.\n" +
 					"Слайды с повторяющимися идентификаторами:\n	" +
 					string.Join("\n	", badSlides.Select(x => string.Join("\n	", x)));
@@ -201,8 +202,8 @@ namespace Ulearn.Core.Courses
 			if (emptyIdSlides.Any())
 			{
 				return "Идентификаторы слайдов (SlideId) должны быть заполненными.\n" +
-												"Слайды с пустыми идентификаторами:\n	" +
-												string.Join("\n	", emptyIdSlides.Select(x => string.Join("\n", x)));
+						"Слайды с пустыми идентификаторами:\n	" +
+						string.Join("\n	", emptyIdSlides.Select(x => string.Join("\n", x)));
 			}
 
 			return string.Empty;
@@ -232,13 +233,13 @@ namespace Ulearn.Core.Courses
 				units.SelectMany(x => x.Flashcards)
 					.Where(x => unitsContainsFlashcardsId[x.Id].Count > 1).Select(x => x.Id).Distinct().ToList();
 			if (badFlashcards.Any())
-				return 
+				return
 					"Идентификаторы флеш-карт (FlashcardId) должны быть уникальными.\n" +
-					"Флеш-карты с повторяющимися идентификаторами:\n"+
+					"Флеш-карты с повторяющимися идентификаторами:\n" +
 					string.Join(
 						"\n",
 						badFlashcards.Select(x => "	Флеш-карта с ID " + x + " в темах:\n		" + string.Join(",\n		", unitsContainsFlashcardsId[x]))
-				);
+					);
 			return string.Empty;
 		}
 	}

@@ -27,6 +27,7 @@ namespace uLearn.CourseTool.Validating
 		{
 			return $"{slide.Info.Unit.Title}: {slide.Info.SlideFile?.Name} ({slide.Title})\n{warning}";
 		}
+
 		private static string FormatFlashcardIssueMessage(Flashcard flashcard, Slide slide, string warning)
 		{
 			return $" flashcard id {flashcard.Id} in slide {slide.Info.Unit.Title}: {slide.Info.SlideFile?.Name} ({slide.Title})\n{warning}";
@@ -39,11 +40,12 @@ namespace uLearn.CourseTool.Validating
 
 		protected void ReportFlashcardWarning(Flashcard flashcard, Slide slide, string warning)
 		{
-			ReportWarning(FormatFlashcardIssueMessage(flashcard,slide, warning));
+			ReportWarning(FormatFlashcardIssueMessage(flashcard, slide, warning));
 		}
+
 		protected void ReportFlashcardError(Flashcard flashcard, Slide slide, string warning)
 		{
-			ReportError(FormatFlashcardIssueMessage(flashcard,slide, warning));
+			ReportError(FormatFlashcardIssueMessage(flashcard, slide, warning));
 		}
 
 		protected void ReportSlideError(Slide slide, string error)

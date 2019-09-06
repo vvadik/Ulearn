@@ -58,7 +58,7 @@ namespace uLearn.Web.Controllers
 				CoursesTitles = coursesTitles,
 			});
 		}
-		
+
 		[Authorize]
 		public ActionResult Partial()
 		{

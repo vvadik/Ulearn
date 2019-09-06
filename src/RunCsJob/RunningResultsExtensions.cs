@@ -21,12 +21,14 @@ namespace RunCsJob
 			{
 				return "";
 			}
+
 			var sb = new StringBuilder();
 			var errors = diagnostics.Where(d => d.DefaultSeverity.IsOneOf(DiagnosticSeverity.Error, DiagnosticSeverity.Warning)).ToList();
 			foreach (var error in errors)
 			{
 				sb.Append(error);
 			}
+
 			return sb.ToString();
 		}
 	}

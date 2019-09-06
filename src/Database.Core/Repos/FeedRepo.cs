@@ -47,6 +47,7 @@ namespace Database.Repos
 				};
 				db.FeedViewTimestamps.Add(currentTimestamp);
 			}
+
 			currentTimestamp.Timestamp = timestamp;
 
 			await db.SaveChangesAsync().ConfigureAwait(false);
@@ -56,7 +57,7 @@ namespace Database.Repos
 		{
 			if (await notificationsRepo.FindUsersNotificationTransportAsync<FeedNotificationTransport>(userId, includeDisabled: true).ConfigureAwait(false) != null)
 				return;
-			
+
 			logger.Information($"Create feed notification transport for user {userId} because there is no actual one");
 
 			await notificationsRepo.AddNotificationTransportAsync(new FeedNotificationTransport
@@ -82,7 +83,7 @@ namespace Database.Repos
 
 			return transport;
 		}
-		
+
 		public FeedNotificationTransport GetCommentsFeedNotificationTransport()
 		{
 			var transport = notificationsRepo.FindUsersNotificationTransport<FeedNotificationTransport>(null);
@@ -119,7 +120,7 @@ namespace Database.Repos
 				.Take(99)
 				.ToListAsync();
 		}
-		
+
 		public Task<List<NotificationDelivery>> GetFeedNotificationDeliveriesAsync(string userId, params FeedNotificationTransport[] transports)
 		{
 			return GetFeedNotificationDeliveriesAsync<object>(userId, null, transports: transports);
@@ -130,17 +131,16 @@ namespace Database.Repos
 			var transportsIds = new List<FeedNotificationTransport>(transports).Select(t => t.Id).ToList();
 			var userCourses = visitsRepo.GetUserCourses(userId);
 			return notificationsRepo.GetTransportsDeliveriesQueryable(transportsIds, DateTime.MinValue)
-				.Where(d => userCourses.Contains(d.Notification.CourseId))
-				.Where(d => d.Notification.InitiatedById != userId)
-
-				/* TODO (andgein): bad code. we need to make these navigation properties loading via Notification' interface */
-				.Include(d => (d.Notification as AbstractCommentNotification).Comment)
-				.Include(d => (d.Notification as CourseExportedToStepikNotification).Process)
-				.Include(d => (d.Notification as ReceivedCommentToCodeReviewNotification).Comment)
-				.Include(d => (d.Notification as PassedManualExerciseCheckingNotification).Checking)
-				.Include(d => (d.Notification as UploadedPackageNotification).CourseVersion)
-				.Include(d => (d.Notification as PublishedPackageNotification).CourseVersion)
-				.Include(d => (d.Notification as CreatedGroupNotification).Group)
+					.Where(d => userCourses.Contains(d.Notification.CourseId))
+					.Where(d => d.Notification.InitiatedById != userId)
+					/* TODO (andgein): bad code. we need to make these navigation properties loading via Notification' interface */
+					.Include(d => (d.Notification as AbstractCommentNotification).Comment)
+					.Include(d => (d.Notification as CourseExportedToStepikNotification).Process)
+					.Include(d => (d.Notification as ReceivedCommentToCodeReviewNotification).Comment)
+					.Include(d => (d.Notification as PassedManualExerciseCheckingNotification).Checking)
+					.Include(d => (d.Notification as UploadedPackageNotification).CourseVersion)
+					.Include(d => (d.Notification as PublishedPackageNotification).CourseVersion)
+					.Include(d => (d.Notification as CreatedGroupNotification).Group)
 				;
 		}
 	}

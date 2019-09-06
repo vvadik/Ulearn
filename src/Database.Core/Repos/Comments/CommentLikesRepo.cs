@@ -24,21 +24,21 @@ namespace Database.Repos.Comments
 		public async Task LikeAsync(int commentId, string userId)
 		{
 			await db.CommentLikes.Where(like => like.UserId == userId && like.CommentId == commentId).DeleteAsync().ConfigureAwait(false);
-			
+
 			db.CommentLikes.Add(new CommentLike
 			{
 				UserId = userId,
 				CommentId = commentId,
 				Timestamp = DateTime.Now,
 			});
-			
+
 			try
 			{
 				await db.SaveChangesAsync().ConfigureAwait(false);
 			}
 			catch (Exception)
 			{
-				/* Somebody other have added like already. Ok, it's not a problem */	
+				/* Somebody other have added like already. Ok, it's not a problem */
 			}
 		}
 
@@ -74,7 +74,7 @@ namespace Database.Repos.Comments
 			var likesCountByComment = await db.CommentLikes
 				.Where(like => commentIds.Contains(like.CommentId))
 				.GroupBy(like => like.CommentId)
-				.Select(g => new { CommentId = g.Key, LikesCount = g.Count()})
+				.Select(g => new { CommentId = g.Key, LikesCount = g.Count() })
 				.ToListAsync()
 				.ConfigureAwait(false);
 			return likesCountByComment.ToDictionary(x => x.CommentId, x => x.LikesCount).ToDefaultDictionary();

@@ -26,7 +26,7 @@ namespace XQueueWatcher
 		private static readonly CourseManager courseManager = WebCourseManager.Instance;
 
 		private static readonly ServiceKeepAliver keepAliver = new ServiceKeepAliver(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName);
-		
+
 		private static readonly Dictionary<int, XQueueClient> clientsCache = new Dictionary<int, XQueueClient>();
 
 		static void Main(string[] args)
@@ -38,7 +38,7 @@ namespace XQueueWatcher
 		{
 			XmlConfigurator.Configure();
 			StaticMetricsPipeProvider.Instance.Start();
-			
+
 			var keepAliveInterval = TimeSpan.FromSeconds(ApplicationConfiguration.Read<UlearnConfiguration>().KeepAliveInterval ?? 30);
 
 			while (true)
@@ -47,11 +47,11 @@ namespace XQueueWatcher
 				var dbWatchers = xQueueRepo.GetXQueueWatchers();
 
 				var tasks = dbWatchers.Select(SafeGetAndProcessSubmissionFromXQueue);
-				
+
 				Task.WaitAll(tasks.ToArray(), cancellationToken);
 				if (cancellationToken.IsCancellationRequested)
 					break;
-					
+
 				Task.Delay(pauseBetweenRequests, cancellationToken).Wait(cancellationToken);
 				keepAliver.Ping(keepAliveInterval);
 			}
@@ -134,7 +134,7 @@ namespace XQueueWatcher
 				submission.Body.StudentResponse
 			);
 		}
-		
+
 		/* We need to create new database connection each time for disabling EF's caching */
 		private static XQueueRepo GetNewXQueueRepo()
 		{

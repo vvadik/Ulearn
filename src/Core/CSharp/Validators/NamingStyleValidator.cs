@@ -15,9 +15,9 @@ namespace Ulearn.Core.CSharp.Validators
 		private IEnumerable<SolutionStyleError> InspectMethod(MethodDeclarationSyntax method)
 		{
 			var name = method?.Identifier.Text;
-			if (name == null || method.AttributeLists.Any()) 
+			if (name == null || method.AttributeLists.Any())
 				yield break;
-			if (method.AttributeLists.Any()) 
+			if (method.AttributeLists.Any())
 				yield break; // Turn this check off for [Test], [TestCase] and all other special cases marked with attribute
 			if (method.IsVoidGetter() && !method.AttributeLists.Any())
 				yield return new SolutionStyleError(StyleErrorType.NamingStyle01, method.Identifier);

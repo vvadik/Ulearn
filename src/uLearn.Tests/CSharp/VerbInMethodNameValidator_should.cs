@@ -10,13 +10,13 @@ namespace uLearn.CSharp
 	public class VerbInMethodNameValidator_should
 	{
 		private VerbInMethodNameValidator validator;
-		
+
 		[OneTimeSetUp]
 		public void OneTimeSetUp()
 		{
 			validator = new VerbInMethodNameValidator();
 		}
-		
+
 		[TestCase(@"void SomeMethod(int a){}")]
 		[TestCase(@"void A(string s){}")]
 		[TestCase(@"public int DrawingPriority() => 0;")]

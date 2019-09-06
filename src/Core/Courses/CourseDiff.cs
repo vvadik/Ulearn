@@ -27,7 +27,7 @@ namespace Ulearn.Core.Courses
 			RemovedSlides = new List<Slide>();
 			InsertedSlides = new List<Slide>();
 			SlideDiffs = new List<SlideDiff>();
-			
+
 			FindDifferences();
 		}
 
@@ -72,7 +72,7 @@ namespace Ulearn.Core.Courses
 			RemovedBlocks = new List<SlideBlock>();
 			InsertedBlocks = new List<SlideBlock>();
 			SlideBlockDiffs = new List<SlideBlockDiff>();
-			
+
 			FindDifferences();
 		}
 

@@ -22,7 +22,7 @@ namespace Database.Models
 
 		[Required]
 		public CourseRoleType Role { get; set; }
-		
+
 		[CanBeNull]
 		public string GrantedById { get; set; }
 

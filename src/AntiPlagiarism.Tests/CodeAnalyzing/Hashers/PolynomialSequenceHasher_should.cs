@@ -8,7 +8,7 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing.Hashers
 	public class PolynomialSequenceHasher_should
 	{
 		/* TODO (andgein): use DefaultObjectHasher instead of GetHashCode in tests. Add tests for StableStringHasher */
-		
+
 		[Test]
 		public void WorkWithPolynomBase1()
 		{
@@ -20,7 +20,7 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing.Hashers
 			hasher.Dequeue();
 			Assert.AreEqual("second".GetHashCode(), hasher.GetCurrentHash());
 		}
-		
+
 		[TestCase(2)]
 		[TestCase(5)]
 		[TestCase(137)]
@@ -46,7 +46,7 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing.Hashers
 				hasher.Dequeue();
 			Assert.AreEqual("some_string".GetHashCode(), hasher.GetCurrentHash());
 		}
-		
+
 		[TestCase(1000, 2)]
 		[TestCase(2000, 5)]
 		[TestCase(3000, 137)]

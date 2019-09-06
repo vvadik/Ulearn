@@ -21,7 +21,7 @@ namespace uLearn
 		{
 			Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
 		}
-		
+
 		[Test]
 		public void SimpleMdBlock()
 		{
@@ -100,10 +100,9 @@ namespace uLearn
 
 		private static SlideBlock[] DeserializeBlocks(string blocksXml)
 		{
-			var buildUpContext = new SlideBuildingContext("Test", new Unit(null, new DirectoryInfo(".")), CourseSettings.DefaultSettings, new DirectoryInfo("."),  null);
+			var buildUpContext = new SlideBuildingContext("Test", new Unit(null, new DirectoryInfo(".")), CourseSettings.DefaultSettings, new DirectoryInfo("."), null);
 			var blocks = DeserializeLesson(blocksXml).Blocks;
 			return blocks.SelectMany(b => b.BuildUp(buildUpContext, ImmutableHashSet<string>.Empty)).ToArray();
 		}
 	}
-	
 }

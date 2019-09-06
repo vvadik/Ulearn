@@ -7,18 +7,18 @@ using Ulearn.Common.Api.Models.Parameters;
 namespace AntiPlagiarism.Api.Models.Parameters
 {
 	[DataContract]
-	[ModelBinder(typeof(JsonModelBinder), Name="parameters")]
+	[ModelBinder(typeof(JsonModelBinder), Name = "parameters")]
 	public class AddSubmissionParameters : ApiParameters
 	{
 		[DataMember(Name = "task_id", IsRequired = true)]
 		public Guid TaskId { get; set; }
-		
+
 		[DataMember(Name = "author_id", IsRequired = true)]
 		public Guid AuthorId { get; set; }
-		
+
 		[DataMember(Name = "code", IsRequired = true)]
 		public string Code { get; set; }
-		
+
 		[DataMember(Name = "language", IsRequired = true)]
 		public Language Language { get; set; }
 

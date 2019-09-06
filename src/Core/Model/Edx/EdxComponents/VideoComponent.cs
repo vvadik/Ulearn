@@ -15,6 +15,7 @@ namespace Ulearn.Core.Model.Edx.EdxComponents
 
 		[XmlAttribute("youtube_id_1_0")]
 		public string NormalSpeedVideoId;
+
 		[XmlAttribute("download_video")]
 		public bool DownloadVideo;
 

@@ -28,20 +28,21 @@ namespace Ulearn.Core.CSharp
 				.DescendantNodes()
 				.OfType<VariableDeclaratorSyntax>()
 				.ToList();
-			
+
 			foreach (var assignment in assignments)
 			{
 				var variable = assignment.Left;
 				if (variable.HasName(variableName, semanticModel))
 					return true;
 			}
+
 			foreach (var declaration in declarations)
 			{
 				var variable = declaration.Identifier;
 				if (variable.Text == variableName)
 					return true;
 			}
-			
+
 			return false;
 		}
 

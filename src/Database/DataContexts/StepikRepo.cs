@@ -102,6 +102,7 @@ namespace Database.DataContexts
 					SlideXml = exportedSlideXml,
 				});
 			}
+
 			await db.SaveChangesAsync();
 		}
 

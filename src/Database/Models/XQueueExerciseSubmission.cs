@@ -11,10 +11,12 @@ namespace Database.Models
 
 		[Required]
 		public int SubmissionId { get; set; }
+
 		public virtual UserExerciseSubmission Submission { get; set; }
 
 		[Required]
 		public int WatcherId { get; set; }
+
 		public virtual XQueueWatcher Watcher { get; set; }
 
 		[Required(AllowEmptyStrings = true)]

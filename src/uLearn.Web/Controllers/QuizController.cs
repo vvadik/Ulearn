@@ -80,7 +80,7 @@ namespace uLearn.Web.Controllers
 
 		private class QuizInfoForDb
 		{
-			public Type BlockType;			
+			public Type BlockType;
 			public string BlockId;
 			public string ItemId;
 			public string Text;
@@ -106,30 +106,31 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.FindCourse(courseId);
 			if (course == null)
 				return HttpNotFound();
-			
+
 			if (isGuest)
 			{
 				metricSender.SendCount("quiz.show.to.guest");
 				return PartialView(GuestQuiz(course, slide));
 			}
+
 			var slideId = slide.Id;
 			var maxAttemptsCount = GetMaxAttemptsCount(courseId, slide);
 			var userScores = GetUserScoresForBlocks(courseId, userId, slideId, manualQuizCheckQueueItem?.Submission);
 
 			var score = userScores?.AsEnumerable().Sum(res => res.Value) ?? 0;
-			
+
 			var state = GetQuizState(courseId, userId, slideId, score, slide.MaxScore, manualQuizCheckQueueItem?.Submission);
 
 			log.Info($"Показываю тест для пользователя {userId} в слайде {courseId}:{slide.Id}, isLti = {isLti}");
-			
+
 			/* If it's manual checking, change quiz state to IsChecking for correct rendering */
 			if (manualQuizCheckQueueItem != null)
 				state.Status = QuizStatus.IsCheckingByInstructor;
-			
+
 			/* For manually checked quizzes show last attempt's answers until ?attempt=true is defined in query string */
 			if (slide.ManualChecking && manualQuizCheckQueueItem == null && state.Status == QuizStatus.ReadyToSend && state.UsedAttemptsCount > 0 && !attempt)
 				state.Status = QuizStatus.Sent;
-			
+
 			/* We also want to show user's answer if user sent answers just now */
 			if (state.Status == QuizStatus.ReadyToSend && send.HasValue)
 				state.Status = QuizStatus.Sent;
@@ -187,7 +188,7 @@ namespace uLearn.Web.Controllers
 
 			var userId = User.Identity.GetUserId();
 			var maxTriesCount = GetMaxAttemptsCount(courseId, slide);
-			
+
 			/* Not it's not important what user's score is, so just pass 0 */
 			var state = GetQuizState(courseId, userId, slideId, 0, slide.MaxScore);
 			if (!CanUserFillQuiz(state.Status))
@@ -201,7 +202,6 @@ namespace uLearn.Web.Controllers
 			if (slide.ManualChecking && !groupsRepo.IsManualCheckingEnabledForUser(course, userId))
 				return new HttpStatusCodeResult(HttpStatusCode.OK, "Manual checking is disabled for you");
 
-			
 			var answers = JsonConvert.DeserializeObject<List<QuizAnswer>>(answer).GroupBy(x => x.BlockId);
 			var quizBlockWithTaskCount = slide.Blocks.Count(x => x is AbstractQuestionBlock);
 			var allQuizInfos = new List<QuizInfoForDb>();
@@ -211,6 +211,7 @@ namespace uLearn.Web.Controllers
 				if (quizInfos != null)
 					allQuizInfos.AddRange(quizInfos);
 			}
+
 			var blocksInAnswerCount = allQuizInfos.Select(x => x.BlockId).Distinct().Count();
 			if (blocksInAnswerCount != quizBlockWithTaskCount)
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden, "Has empty blocks");
@@ -239,7 +240,7 @@ namespace uLearn.Web.Controllers
 				/* If this quiz is already queued for checking for this user, remove waiting checkings */
 				if (state.Status == QuizStatus.WaitsForManualChecking)
 					await slideCheckingsRepo.RemoveWaitingManualCheckings<ManualQuizChecking>(courseId, slideId, userId).ConfigureAwait(false);
-				
+
 				await slideCheckingsRepo.AddManualQuizChecking(submission, courseId, slideId, userId).ConfigureAwait(false);
 				await visitsRepo.MarkVisitsAsWithManualChecking(courseId, slideId, userId).ConfigureAwait(false);
 			}
@@ -249,7 +250,7 @@ namespace uLearn.Web.Controllers
 				var score = allQuizInfos
 					.DistinctBy(forDb => forDb.BlockId)
 					.Sum(forDb => forDb.QuizBlockScore);
-				
+
 				metricSender.SendCount($"quiz.submit.try.{attemptNumber}.score", score);
 				metricSender.SendCount($"quiz.submit.{courseId}.try.{attemptNumber}.score", score);
 				metricSender.SendCount($"quiz.submit.{courseId}.{slideId}.try.{attemptNumber}.score", score);
@@ -266,7 +267,7 @@ namespace uLearn.Web.Controllers
 					metricSender.SendCount($"quiz.submit.{courseId}.full_passed");
 					metricSender.SendCount($"quiz.submit.{courseId}.{slideId}.full_passed");
 				}
-				
+
 				await slideCheckingsRepo.AddAutomaticQuizChecking(submission, courseId, slideId, userId, score).ConfigureAwait(false);
 				await visitsRepo.UpdateScoreForVisit(courseId, slideId, slide.MaxScore, userId).ConfigureAwait(false);
 				if (isLti)
@@ -275,7 +276,7 @@ namespace uLearn.Web.Controllers
 
 			return Json(new
 			{
-				url = Url.RouteUrl("Course.SlideById", new { courseId = courseId, slideId = slide.Url, send = 1}) 
+				url = Url.RouteUrl("Course.SlideById", new { courseId = courseId, slideId = slide.Url, send = 1 })
 			});
 		}
 
@@ -313,7 +314,7 @@ namespace uLearn.Web.Controllers
 				var quiz = course.FindSlideById(checking.SlideId);
 				if (quiz == null)
 					return Redirect(errorUrl + "Этого теста больше нет в курсе");
-						
+
 				foreach (var question in quiz.Blocks.OfType<AbstractQuestionBlock>())
 				{
 					var scoreFieldName = "quiz__score__" + question.Id;
@@ -330,7 +331,7 @@ namespace uLearn.Web.Controllers
 				}
 
 				await slideCheckingsRepo.MarkManualCheckingAsChecked(checking, totalScore).ConfigureAwait(false);
-				
+
 				await visitsRepo.UpdateScoreForVisit(checking.CourseId, checking.SlideId, slide.MaxScore, checking.UserId).ConfigureAwait(false);
 				transaction.Commit();
 
@@ -343,8 +344,8 @@ namespace uLearn.Web.Controllers
 					metricSender.SendCount($"quiz.manual_score.{checking.CourseId}.full_scored");
 					metricSender.SendCount($"quiz.manual_score.{checking.CourseId}.{checking.SlideId}.full_scored");
 				}
-				
-				if(unit != null && unitsRepo.IsUnitVisibleForStudents(course, unit.Id))
+
+				if (unit != null && unitsRepo.IsUnitVisibleForStudents(course, unit.Id))
 					await NotifyAboutManualQuizChecking(checking).ConfigureAwait(false);
 			}
 
@@ -408,6 +409,7 @@ namespace uLearn.Web.Controllers
 					}
 				};
 			}
+
 			var ans = answers.Select(x => x.ItemId).ToList()
 				.Select(x => new QuizInfoForDb
 				{
@@ -419,10 +421,10 @@ namespace uLearn.Web.Controllers
 					QuizBlockScore = 0,
 					QuizBlockMaxScore = choiceBlock.MaxScore
 				}).ToList();
-			
+
 			var mistakesCount = GetChoiceBlockMistakesCount(choiceBlock, ans);
 			var isRightQuizBlock = mistakesCount.HasNotMoreThatAllowed(choiceBlock.AllowedMistakesCount);
-			
+
 			blockScore = isRightQuizBlock ? choiceBlock.MaxScore : 0;
 			foreach (var info in ans)
 				info.QuizBlockScore = blockScore;
@@ -432,11 +434,11 @@ namespace uLearn.Web.Controllers
 		private MistakesCount GetChoiceBlockMistakesCount(ChoiceBlock choiceBlock, List<QuizInfoForDb> ans)
 		{
 			var checkedUnnecessary = ans.Count(x => !x.IsRightAnswer);
-			
+
 			var totallyTrueItemIds = choiceBlock.Items.Where(x => x.IsCorrect == ChoiceItemCorrectness.True).Select(x => x.Id);
 			var userItemIds = ans.Select(y => y.ItemId).ToImmutableHashSet();
-			var notCheckedNecessary = totallyTrueItemIds.Count(x => ! userItemIds.Contains(x));
-			
+			var notCheckedNecessary = totallyTrueItemIds.Count(x => !userItemIds.Contains(x));
+
 			return new MistakesCount(checkedUnnecessary, notCheckedNecessary);
 		}
 
@@ -469,8 +471,7 @@ namespace uLearn.Web.Controllers
 				.Select(x => new QuizInfoForDb
 				{
 					BlockId = matchingBlock.Id,
-					IsRightAnswer = matchingBlock.Matches.FirstOrDefault(m => m.GetHashForFixedItem() == x.ItemId)?.
-										GetHashForMovableItem() == x.Text,
+					IsRightAnswer = matchingBlock.Matches.FirstOrDefault(m => m.GetHashForFixedItem() == x.ItemId)?.GetHashForMovableItem() == x.Text,
 					ItemId = x.ItemId,
 					Text = x.Text,
 					BlockType = typeof(MatchingBlock),
@@ -526,6 +527,7 @@ namespace uLearn.Web.Controllers
 						LtiUtils.SubmitScore(courseId, slide, userId);
 				}
 			}
+
 			var model = new { courseId, slideId = slide.Id, isLti, attempt = true };
 			if (isLti)
 				return RedirectToAction("LtiSlide", "Course", model);
@@ -550,7 +552,7 @@ namespace uLearn.Web.Controllers
 
 			if (quizSlide == null)
 				return defaultMaxTriesCount;
-			
+
 			return quizSlide.MaxTriesCount;
 		}
 
@@ -559,30 +561,30 @@ namespace uLearn.Web.Controllers
 			return userQuizzesRepo.GetUserScores(courseId, slideId, userId, submission);
 		}
 
-		private QuizState GetQuizState(string courseId, string userId, Guid slideId, int userScore, int maxScore, UserQuizSubmission submission=null)
+		private QuizState GetQuizState(string courseId, string userId, Guid slideId, int userScore, int maxScore, UserQuizSubmission submission = null)
 		{
 			log.Info($"Ищу статус прохождения теста {courseId}:{slideId} для пользователя {userId}");
-			
+
 			var lastSubmission = userQuizzesRepo.FindLastUserSubmission(courseId, slideId, userId);
-			
+
 			var manualChecking = submission?.ManualChecking ?? lastSubmission?.ManualChecking;
 			if (manualChecking != null)
 			{
 				/* For manually checked quizzes attempts are counting by manual checkings, not by user quiz submissions
 				   (because user can resend quiz before instructor checked and score it) */
 				var manualCheckingCount = GetManualCheckingCount(courseId, userId, slideId, submission);
-				
+
 				log.Info($"Статус прохождения теста {courseId}:{slideId} для пользователя {userId}: есть ручная проверка №{manualChecking.Id}, проверяется ли сейчас: {manualChecking.IsLocked}");
 				if (manualChecking.IsChecked)
 					return new QuizState(QuizStatus.ReadyToSend, manualCheckingCount, userScore, maxScore);
 				return new QuizState(manualChecking.IsLocked ? QuizStatus.IsCheckingByInstructor : QuizStatus.WaitsForManualChecking, manualCheckingCount, userScore, maxScore);
 			}
-			
+
 			var usedAttemptsCount = userQuizzesRepo.GetUsedAttemptsCount(courseId, userId, slideId);
 			return new QuizState(QuizStatus.ReadyToSend, usedAttemptsCount, userScore, maxScore);
 		}
 
-		private int GetManualCheckingCount(string courseId, string userId, Guid slideId, UserQuizSubmission beforeSubmissions=null)
+		private int GetManualCheckingCount(string courseId, string userId, Guid slideId, UserQuizSubmission beforeSubmissions = null)
 		{
 			var queue = slideCheckingsRepo.GetManualCheckingQueue<ManualQuizChecking>(new ManualCheckingQueueFilterOptions
 			{
@@ -594,7 +596,7 @@ namespace uLearn.Web.Controllers
 
 			if (beforeSubmissions != null)
 				queue = queue.Where(s => s.Timestamp < beforeSubmissions.Timestamp).ToList();
-					
+
 			return queue.Count();
 		}
 	}

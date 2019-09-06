@@ -15,7 +15,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 		private static readonly Hunspell hunspellEnGb = new Hunspell(Resources.en_GB_aff, Resources.en_GB_dic);
 		private static readonly Hunspell hunspellLa = new Hunspell(Resources.la_aff, Resources.la_dic);
 		private static readonly HashSet<string> wordsToExcept = new HashSet<string>(Resources.spelling_exceptions.SplitToLines());
-		
+
 		public bool CheckIdentifierNameForSpellingErrors(string identifierName, string typeAsString = null)
 		{
 			var wordsInIdentifier = identifierName.SplitByCamelCase();
@@ -32,6 +32,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 						doesWordContainError = false;
 						break;
 					}
+
 					var wordContainsError = CheckConcatenatedWordsInLowerCaseForError(wordInDifferentNumber);
 					if (wordContainsError)
 						continue;
@@ -45,7 +46,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 
 			return false;
 		}
-		
+
 		private static bool CheckForSpecialCases(string word, string typeAsString = null)
 		{
 			return word.Length <= 2
@@ -69,7 +70,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 			if (word.Length > 2 && word.EndsWith("es", StringComparison.InvariantCultureIgnoreCase))
 				yield return word.Substring(0, word.Length - 2);
 		}
-		
+
 		private bool CheckConcatenatedWordsInLowerCaseForError(string concatenatedWords)
 		{
 			var currentCheckingWord = "";
@@ -83,7 +84,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 					currentCheckingWord += symbol;
 					if (!foundWords.Contains(currentCheckingWord)
 						&& (currentCheckingWord.Length == 1 && isFirstWord
-							||	currentCheckingWord.Length != 1
+							|| currentCheckingWord.Length != 1
 							&& IsWordContainedInDictionaries(currentCheckingWord)))
 					{
 						foundWords.Add(currentCheckingWord);
@@ -91,7 +92,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 						{
 							if (IsWordContainedInDictionaries(
 								concatenatedWords.Substring(currentCheckingWord.Length))) // это нужно для переменных типа dfunction b substring
-							return false;
+								return false;
 						}
 
 						currentCheckingWord = "";
@@ -105,7 +106,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 
 			return true;
 		}
-		
+
 		private bool IsWordContainedInDictionaries(string word) // есть проблема, при которой разные части одного слова проверяются в разных словарях (одна часть - в английском, вторая - в латинском)?
 		{
 			return wordsToExcept.Contains(word.ToLowerInvariant())

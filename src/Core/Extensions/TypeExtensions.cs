@@ -15,7 +15,7 @@ namespace Ulearn.Core.Extensions
 			*/
 			if (type.IsEquivalentTo(typeof(MarkdownBlock)))
 				return "markdown";
-				
+
 			var xmlTypeAttribute = type.GetCustomAttribute<XmlTypeAttribute>();
 			return xmlTypeAttribute?.TypeName;
 		}

@@ -15,7 +15,7 @@ namespace Ulearn.Core.Extensions
 			var dictionaryPath = course.TryGetDictionaryPath();
 			if (string.IsNullOrEmpty(dictionaryPath))
 				return Array.Empty<string>();
-			
+
 			using (var spellchecker = new SpellChecker(dictionaryPath))
 			{
 				return spellchecker.SpellCheckCourse(course);
@@ -67,7 +67,7 @@ namespace Ulearn.Core.Extensions
 		{
 			if (course.Settings.DictionaryFile == null)
 				return null;
-			
+
 			var file = Path.Combine(course.CourseXmlDirectory.FullName, course.Settings.DictionaryFile);
 			return File.Exists(file) ? file : null;
 		}

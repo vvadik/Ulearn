@@ -12,6 +12,5 @@ namespace Ulearn.Common.Extensions
 
 			return principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 		}
-
 	}
 }

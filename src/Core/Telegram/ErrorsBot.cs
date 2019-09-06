@@ -33,6 +33,7 @@ namespace Ulearn.Core.Telegram
 				log.Info($"Сообщение слишком длинное, отправлю только первые {MaxMessageSize} байтов");
 				message = message.Substring(0, MaxMessageSize);
 			}
+
 			try
 			{
 				await telegramClient.SendTextMessageAsync(channel, message, parseMode: parseMode, disableWebPagePreview: true).ConfigureAwait(false);

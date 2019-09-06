@@ -90,7 +90,7 @@ namespace Database.Models
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public override int Id { get; set; }
-		
+
 		public AutomaticExerciseCheckingStatus Status { get; set; }
 
 		public TimeSpan? Elapsed { get; set; }
@@ -116,7 +116,7 @@ namespace Database.Models
 
 		[StringLength(40)]
 		public string ExecutionServiceName { get; set; }
-		
+
 		[StringLength(256)]
 		public string CheckingAgentName { get; set; }
 
@@ -138,12 +138,12 @@ namespace Database.Models
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public override int Id { get; set; }
-		
+
 		[Required]
 		public int SubmissionId { get; set; }
 
 		public virtual UserExerciseSubmission Submission { get; set; }
-		
+
 		[Required]
 		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndUser", 4)]
 		public bool ProhibitFurtherManualCheckings { get; set; }
@@ -164,7 +164,7 @@ namespace Database.Models
 		/* This field is not identity and is not database-generated because EF generates Id as foreign key to UserQuizSubmission.Id */
 		[Key]
 		public override int Id { get; set; }
-		
+
 		public virtual UserQuizSubmission Submission { get; set; }
 	}
 

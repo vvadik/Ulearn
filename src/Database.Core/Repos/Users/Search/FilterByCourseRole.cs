@@ -19,7 +19,7 @@ namespace Database.Repos.Users.Search
 		{
 			if (string.IsNullOrEmpty(request.CourseId) || !request.MinCourseRoleType.HasValue)
 				return users;
-			
+
 			if (request.MinCourseRoleType == CourseRoleType.Student)
 				throw new ArgumentException($"Can't search by students, sorry: there are too many students");
 

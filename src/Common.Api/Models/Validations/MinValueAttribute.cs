@@ -13,7 +13,7 @@ namespace Ulearn.Common.Api.Models.Validations
 
 		public override bool IsValid(object value)
 		{
-			return (int) value >= minValue;
+			return (int)value >= minValue;
 		}
 	}
 }

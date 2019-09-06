@@ -30,12 +30,14 @@ namespace Database.DataContexts
 				await db.SaveChangesAsync();
 				return "success";
 			}
+
 			if (lastRate.Rate == rate)
 			{
 				lastRate.Rate = SlideRates.NotWatched;
 				await db.SaveChangesAsync();
 				return "cancel";
 			}
+
 			lastRate.Rate = rate;
 			await db.SaveChangesAsync();
 			return "success";
@@ -64,6 +66,7 @@ namespace Database.DataContexts
 				if (rate.Rate == SlideRates.Trivial)
 					rates.AddTrivial();
 			}
+
 			return rates;
 		}
 

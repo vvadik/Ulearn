@@ -43,7 +43,7 @@ namespace Database.Repos.Users
 			}
 
 			var usersFields = new DefaultDictionary<string, HashSet<SearchField>>();
-			
+
 			foreach (var word in request.Words)
 			{
 				if (string.IsNullOrEmpty(word))
@@ -63,14 +63,14 @@ namespace Database.Repos.Users
 						var searchField = searcher.GetSearchField();
 						foreach (var foundUserId in foundUserIds)
 							usersFields[foundUserId].Add(searchField);
-						
+
 						currentSet.UnionWith(foundUserIds);
 					}
 				}
 
 				result = result.Where(u => currentSet.Contains(u.Id));
 			}
-			
+
 			foreach (var filter in filters)
 				result = await filter.FilterAsync(result, request).ConfigureAwait(false);
 
@@ -95,19 +95,19 @@ namespace Database.Repos.Users
 	public class UserSearchRequest
 	{
 		/* Current user is used to define access to some searchers */
-		
+
 		public ApplicationUser CurrentUser { get; set; }
-		
+
 		/* Search by words: */
-		
+
 		public List<string> Words { get; set; }
-		
+
 		/* and filter result by course and system roles: */
-		
+
 		public string CourseId { get; set; }
-		
+
 		public CourseRoleType? MinCourseRoleType { get; set; }
-		
+
 		public LmsRoleType? LmsRole { get; set; }
 	}
 }

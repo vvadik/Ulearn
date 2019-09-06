@@ -15,14 +15,14 @@ namespace Ulearn.Core.Model
 			regions = RegionsParser.GetRegions(code);
 		}
 
-		public string GetRegion(Label label, bool withoutAttributes=false)
+		public string GetRegion(Label label, bool withoutAttributes = false)
 		{
 			var region = regions.GetOrDefault(label.Name, null);
 			if (region == null)
 				return null;
 			return code.Substring(region.dataStart, region.dataLength).RemoveCommonNesting();
 		}
-		
+
 		public string ReplaceRegionContent(Label label, string regionContent)
 		{
 			var region = regions.GetOrDefault(label.Name, null);

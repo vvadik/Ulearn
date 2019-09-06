@@ -94,10 +94,10 @@ namespace uLearn.CSharp
 
 			var unit = new Unit(UnitSettings.CreateByTitle("Unit title", courseSettings), TestsHelper.ProjSlideFolder);
 			var slideLoadingContext = new SlideLoadingContext("Test", unit, courseSettings, TestsHelper.ProjSlideFolder, exerciseXmlFile, 1);
-			var exerciseSlide = (ExerciseSlide) new XmlSlideLoader().Load(slideLoadingContext);
-			
+			var exerciseSlide = (ExerciseSlide)new XmlSlideLoader().Load(slideLoadingContext);
+
 			var validatorOut = TestsHelper.ValidateExerciseSlide(exerciseSlide);
-			
+
 			validatorOut.Should().BeNullOrEmpty();
 		}
 	}

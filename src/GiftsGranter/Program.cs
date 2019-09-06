@@ -48,8 +48,10 @@ namespace GiftsGranter
 						Console.Write("\b\0\b");
 						password.Length--;
 					}
+
 					continue;
 				}
+
 				if (!char.IsControl(keyInfo.KeyChar))
 				{
 					Console.Write('*');
@@ -75,6 +77,7 @@ namespace GiftsGranter
 				Console.WriteLine($"RefreshToken: {refreshToken}");
 				return;
 			}
+
 			var telegramBot = new GiftsTelegramBot();
 			try
 			{
@@ -129,6 +132,7 @@ namespace GiftsGranter
 					log.Info($"GiftGrantsLimitPerRunExceeded\t{maxGiftsPerRun}");
 					return;
 				}
+
 				if (GrantGiftsIfNone(ratingEntry, courseSettings, courseId))
 					granted++;
 				Thread.Sleep(delayMs);
@@ -151,6 +155,7 @@ namespace GiftsGranter
 				telegramBot.PostToChannel($"Granted gift for course {courseId}\n{entry.Score} points for user {entry.User.VisibleName} {entry.User.KonturLogin}");
 				return true;
 			}
+
 			return false;
 		}
 	}

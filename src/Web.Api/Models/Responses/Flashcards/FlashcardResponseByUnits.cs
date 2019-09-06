@@ -8,6 +8,5 @@ namespace Ulearn.Web.Api.Models.Responses.Flashcards
 	{
 		[DataMember]
 		public List<UnitFlashcardsResponse> Units = new List<UnitFlashcardsResponse>();
-
 	}
 }

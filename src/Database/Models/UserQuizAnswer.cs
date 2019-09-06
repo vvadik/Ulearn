@@ -8,12 +8,12 @@ namespace Database.Models
 		[Required]
 		[Key]
 		public int Id { get; set; }
-		
+
 		[Index("IDX_UserQuizAnswer_BySubmissionAndBlock", 1)]
 		public int SubmissionId { get; set; }
-		
+
 		public virtual UserQuizSubmission Submission { get; set; }
-		
+
 		[StringLength(64)]
 		[Index("IDX_UserQuizAnswer_BySubmissionAndBlock", 2)]
 		public string BlockId { get; set; }

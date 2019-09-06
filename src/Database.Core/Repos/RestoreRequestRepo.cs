@@ -28,6 +28,7 @@ namespace Database.Repos
 					else
 						db.RestoreRequests.Remove(previous);
 				}
+
 				if (hasRecent)
 				{
 					await db.SaveChangesAsync();

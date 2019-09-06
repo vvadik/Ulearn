@@ -7,7 +7,7 @@ namespace uLearn.Web.Clients
 {
 	public static class UlearnVideoAnnotationsClient
 	{
-		public static readonly VideoAnnotationsClient Instance = 
+		public static readonly VideoAnnotationsClient Instance =
 			string.IsNullOrEmpty(WebConfigurationManager.AppSettings["ulearn.videoAnnotations.endpoint"])
 				? null
 				: new VideoAnnotationsClient(

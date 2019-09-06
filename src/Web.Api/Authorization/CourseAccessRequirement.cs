@@ -10,7 +10,7 @@ using Ulearn.Common.Extensions;
 
 namespace Ulearn.Web.Api.Authorization
 {
-	public class CourseAccessRequirement: IAuthorizationRequirement
+	public class CourseAccessRequirement : IAuthorizationRequirement
 	{
 		public readonly CourseAccessType CourseAccessType;
 
@@ -19,14 +19,15 @@ namespace Ulearn.Web.Api.Authorization
 			CourseAccessType = courseAccessType;
 		}
 	}
-	
+
 	public class CourseAccessAuthorizationHandler : BaseCourseAuthorizationHandler<CourseAccessRequirement>
 	{
 		private readonly ICoursesRepo coursesRepo;
 		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IUsersRepo usersRepo;
 
-		public CourseAccessAuthorizationHandler(ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo, IUsersRepo usersRepo, ILogger logger) : base(logger)
+		public CourseAccessAuthorizationHandler(ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo, IUsersRepo usersRepo, ILogger logger)
+			: base(logger)
 		{
 			this.coursesRepo = coursesRepo;
 			this.courseRolesRepo = courseRolesRepo;
@@ -42,7 +43,7 @@ namespace Ulearn.Web.Api.Authorization
 				context.Fail();
 				return;
 			}
-			
+
 			var courseId = GetCourseIdFromRequestAsync(mvcContext);
 			if (string.IsNullOrEmpty(courseId))
 			{
@@ -63,7 +64,7 @@ namespace Ulearn.Web.Api.Authorization
 				context.Fail();
 				return;
 			}
-			
+
 			if (usersRepo.IsSystemAdministrator(user))
 			{
 				context.Succeed(requirement);

@@ -28,7 +28,7 @@ namespace uLearn.Web
 			app.CreatePerOwinContext(() => new ULearnUserManager(new ULearnDb()));
 
 			var configuration = ApplicationConfiguration.Read<WebApiConfiguration>();
-			
+
 			// Enable the application to use a cookie to store information for the signed in user
 			var cookieKeyRingDirectory = new DirectoryInfo(Path.Combine(Utils.GetAppPath(), configuration.Web.CookieKeyRingDirectory));
 			app.UseCookieAuthentication(new CookieAuthenticationOptions
@@ -37,7 +37,7 @@ namespace uLearn.Web
 				CookieName = configuration.Web.CookieName,
 				CookieDomain = configuration.Web.CookieDomain,
 				CookieSecure = configuration.Web.CookieSecure ? CookieSecureOption.Always : CookieSecureOption.Never,
-				
+
 				LoginPath = new PathString("/Login"),
 				Provider = new CookieAuthenticationProvider
 				{
@@ -58,7 +58,7 @@ namespace uLearn.Web
 								// DefaultAuthenticationTypes.ApplicationCookie,
 								"v2"))),
 			});
-			
+
 			// Use a cookie to temporarily store information about a user logging in with a third party login provider
 			app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
 

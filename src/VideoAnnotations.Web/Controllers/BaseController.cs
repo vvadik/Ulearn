@@ -6,6 +6,5 @@ namespace Ulearn.VideoAnnotations.Web.Controllers
 	[Produces("application/json")]
 	public class BaseController : Controller
 	{
-		
 	}
 }

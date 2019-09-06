@@ -24,6 +24,7 @@ namespace Ulearn.Common.Extensions
 				result = localResult;
 				return true;
 			}
+
 			result = null;
 			return false;
 		}
@@ -33,7 +34,7 @@ namespace Ulearn.Common.Extensions
 		{
 			return type.GetAttribute<DisplayAttribute>().GetName();
 		}
-		
+
 		/* Mark you enum value with [XmlEnum(Name = "any text")] and retrieve Name via this method */
 		public static string GetXmlEnumName(this Enum type)
 		{

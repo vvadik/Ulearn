@@ -14,16 +14,15 @@ namespace uLearn.Web.Controllers
 {
 	public class ErrorsController : Controller
 	{
-	
 		private static string IndexHtmlPath => WebConfigurationManager.AppSettings["ulearn.react.index.html"];
 		private static DirectoryInfo AppDirectory => new DirectoryInfo(Utils.GetAppPath());
-		
+
 		private readonly List<string> excludedPrefixes;
 		private readonly byte[] content;
 
-		
+
 		public ErrorsController()
-			:this(excludedPrefixes: new List<string>
+			: this(excludedPrefixes: new List<string>
 			{
 				"/elmah/",
 				"/Certificate/",
@@ -31,17 +30,18 @@ namespace uLearn.Web.Controllers
 				"/Exercise/StudentZip",
 				"/Content/"
 			})
-		{}
-		
+		{
+		}
+
 		public ErrorsController(List<string> excludedPrefixes)
 		{
 			var file = AppDirectory.GetFile(IndexHtmlPath);
-			
+
 			this.excludedPrefixes = excludedPrefixes;
 			content = System.IO.File.ReadAllBytes(file.FullName);
 			content = InsertFrontendConfiguration(content);
 		}
-		
+
 		private static byte[] InsertFrontendConfiguration(byte[] content)
 		{
 			var configuration = ApplicationConfiguration.Read<WebApiConfiguration>();
@@ -52,15 +52,15 @@ namespace uLearn.Web.Controllers
 
 			return Encoding.UTF8.GetBytes(contentWithConfig);
 		}
-		
+
 		public ActionResult Error404()
 		{
 			var httpContext = HttpContext;
-			
+
 			foreach (var prefix in excludedPrefixes)
 				if (httpContext.Request.Url != null && httpContext.Request.Url.LocalPath.StartsWith(prefix))
 					return Real404();
-			
+
 			var acceptHeader = httpContext.Request.Headers["Accept"] ?? "";
 			var cspHeader = WebConfigurationManager.AppSettings["ulearn.web.cspHeader"] ?? "";
 			if (acceptHeader.Contains("text/html") && httpContext.Request.HttpMethod == "GET")
@@ -76,7 +76,7 @@ namespace uLearn.Web.Controllers
 		{
 			return View("404");
 		}
-		
+
 		public ActionResult Error500()
 		{
 			return View("Error");

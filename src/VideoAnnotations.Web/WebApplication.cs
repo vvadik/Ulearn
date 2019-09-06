@@ -10,8 +10,8 @@ using ILogger = Serilog.ILogger;
 
 namespace Ulearn.VideoAnnotations.Web
 {
-    public class WebApplication : BaseApiWebApplication
-    {
+	public class WebApplication : BaseApiWebApplication
+	{
 		private readonly VideoAnnotationsConfiguration configuration;
 
 		public WebApplication()
@@ -22,9 +22,9 @@ namespace Ulearn.VideoAnnotations.Web
 		protected override void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment, ILogger logger)
 		{
 			base.ConfigureServices(services, hostingEnvironment, logger);
-			
+
 			services.Configure<VideoAnnotationsConfiguration>(options => hostingEnvironment.Configuration.Bind(options));
-			
+
 			services.AddSwaggerExamplesFromAssemblyOf<WebApplication>();
 		}
 

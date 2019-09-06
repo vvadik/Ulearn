@@ -14,7 +14,7 @@ namespace Ulearn.Core.CSharp.Validators
 	public class CSharpSolutionValidator : ISolutionValidator
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(CSharpSolutionValidator));
-		
+
 		private readonly List<ICSharpSolutionValidator> validators = new List<ICSharpSolutionValidator>
 		{
 			new NotEmptyCodeValidator(),
@@ -30,13 +30,13 @@ namespace Ulearn.Core.CSharp.Validators
 			new ExcessLinesValidator(),
 			new RefArgumentsValidator(),
 			new VarInVariableDeclarationValidator(),
-            new BracketValidator(),
-            new RedundantElseValidator(),
+			new BracketValidator(),
+			new RedundantElseValidator(),
 			new SpellingValidator(),
 			new IndentsValidator()
 		};
 
-		public CSharpSolutionValidator(bool removeDefaults=false)
+		public CSharpSolutionValidator(bool removeDefaults = false)
 		{
 			if (removeDefaults)
 				validators.Clear();

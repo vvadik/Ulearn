@@ -45,8 +45,10 @@ namespace uLearn.Web
 					Console.Out.WriteLine(output);
 					output = "\t";
 				}
+
 				output += str + ", ";
 			}
+
 			Console.Out.WriteLine("};");
 		}
 	}

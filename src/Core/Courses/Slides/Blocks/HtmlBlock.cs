@@ -18,7 +18,7 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		public HtmlBlock()
 		{
 		}
-		
+
 		public HtmlBlock(string content)
 		{
 			Content = content;
@@ -42,7 +42,7 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		public void ReadXml(XmlReader reader)
 		{
 			reader.MoveToContent();
-			
+
 			if (reader.IsEmptyElement)
 			{
 				reader.Read();
@@ -50,7 +50,7 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 			}
 
 			var innerXml = reader.ReadInnerXml();
-			
+
 			Content = RemoveXmlNamespacesAndAutoExpandEmptyTags(innerXml.RemoveCommonNesting());
 		}
 
@@ -60,10 +60,10 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		{
 			/* Add outer tag, otherwise XML is not correct and XmlUtils can't parse it */
 			var xml = $"<node>{innerXmlContent}</node>";
-			
+
 			var xmlWithoutNs = XmlUtils.RemoveAllNamespaces(xml);
 			var resultXml = XmlUtils.ExpandEmptyTags(xmlWithoutNs);
-			
+
 			/* Delete outer tag */
 			if (resultXml.StartsWith("<node>"))
 				resultXml = resultXml.Remove(0, "<node>".Length);

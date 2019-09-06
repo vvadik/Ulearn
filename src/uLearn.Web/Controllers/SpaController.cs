@@ -18,9 +18,9 @@ namespace uLearn.Web.Controllers
 	{
 		private static string IndexHtmlPath => WebConfigurationManager.AppSettings["ulearn.react.index.html"];
 		private static DirectoryInfo AppDirectory => new DirectoryInfo(Utils.GetAppPath());
-		
+
 		private readonly byte[] content;
-		
+
 		public SpaController()
 		{
 			content = GetSpaIndexHtml();
@@ -32,7 +32,7 @@ namespace uLearn.Web.Controllers
 			var content = System.IO.File.ReadAllBytes(file.FullName);
 			return InsertFrontendConfiguration(content);
 		}
-		
+
 		private static byte[] InsertFrontendConfiguration(byte[] content)
 		{
 			var configuration = ApplicationConfiguration.Read<WebApiConfiguration>();
@@ -43,11 +43,11 @@ namespace uLearn.Web.Controllers
 
 			return Encoding.UTF8.GetBytes(contentWithConfig);
 		}
-		
+
 		public ActionResult IndexHtml()
 		{
 			var httpContext = HttpContext;
-			
+
 			var cspHeader = WebConfigurationManager.AppSettings["ulearn.web.cspHeader"] ?? "";
 			httpContext.Response.Headers.Add("Content-Security-Policy-Report-Only", cspHeader);
 			return new FileContentResult(content, "text/html");

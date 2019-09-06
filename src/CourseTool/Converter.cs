@@ -43,6 +43,7 @@ namespace uLearn.CourseTool
 						}) { VisibleToStaffOnly = true }
 				);
 			}
+
 			return result.ToArray();
 		}
 

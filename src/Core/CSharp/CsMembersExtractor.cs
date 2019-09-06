@@ -25,7 +25,7 @@ namespace Ulearn.Core.CSharp
 				);
 		}
 
-		public string GetRegion(Label label, bool withoutAttributes=false)
+		public string GetRegion(Label label, bool withoutAttributes = false)
 		{
 			if (!members.ContainsKey(label.Name))
 				return null;

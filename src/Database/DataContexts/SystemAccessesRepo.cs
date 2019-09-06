@@ -22,7 +22,7 @@ namespace Database.DataContexts
 			: this(new ULearnDb())
 		{
 		}
-		
+
 		public async Task<SystemAccess> GrantAccess(string userId, SystemAccessType accessType, string grantedById)
 		{
 			var currentAccess = db.SystemAccesses.FirstOrDefault(a => a.UserId == userId && a.AccessType == accessType);
@@ -35,6 +35,7 @@ namespace Database.DataContexts
 				};
 				db.SystemAccesses.Add(currentAccess);
 			}
+
 			currentAccess.GrantedById = grantedById;
 			currentAccess.GrantTime = DateTime.Now;
 			currentAccess.IsEnabled = true;

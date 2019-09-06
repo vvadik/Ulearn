@@ -37,6 +37,7 @@ namespace Database.Repos
 			}
 			else if (visit.IpAddress != ipAddress)
 				visit.IpAddress = ipAddress;
+
 			await db.SaveChangesAsync();
 		}
 
@@ -167,6 +168,7 @@ namespace Database.Repos
 					continue;
 				db.Visits.Add(visit);
 			}
+
 			await db.SaveChangesAsync();
 		}
 
@@ -190,6 +192,7 @@ namespace Database.Repos
 				else
 					filteredVisits = filteredVisits.Where(v => options.UserIds.Contains(v.UserId));
 			}
+
 			return filteredVisits;
 		}
 
@@ -236,7 +239,7 @@ namespace Database.Repos
 		{
 			return db.Visits.Where(v => v.CourseId == courseId).Select(v => v.UserId).Distinct().ToListAsync();
 		}
-		
+
 		public List<RatingEntry> GetCourseRating(string courseId, int minScore)
 		{
 			return db.Visits.Where(v => v.CourseId == courseId)

@@ -90,7 +90,7 @@ namespace uLearn.CSharp
 					noExcludedDirs,
 					noExcludedFiles,
 					ResolveCsprojLink,
-					ExerciseStudentZipBuilder.ResolveCsprojLinks(csProjFile, CsProjectExerciseBlock.BuildingToolsVersion), 
+					ExerciseStudentZipBuilder.ResolveCsprojLinks(csProjFile, CsProjectExerciseBlock.BuildingToolsVersion),
 					zipWithFullProj)
 				.UpdateZip();
 

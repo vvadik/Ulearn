@@ -42,25 +42,25 @@ namespace Database.Models
 		public virtual IList<Like> Likes { get; set; }
 
 		public int? AutomaticCheckingId { get; set; }
-		
+
 		public virtual AutomaticExerciseChecking AutomaticChecking { get; set; }
-		
+
 		public bool AutomaticCheckingIsRightAnswer { get; set; }
-		
+
 		public Language Language { get; set; }
 
 		public virtual IList<ManualExerciseChecking> ManualCheckings { get; set; }
-		
+
 		[Obsolete] // YT: ULEARN-217
 		public int? AntiPlagiarismSubmissionId { get; set; }
-		
+
 		public virtual IList<ExerciseCodeReview> Reviews { get; set; }
 
 		[NotMapped]
 		public List<ExerciseCodeReview> NotDeletedReviews => Reviews.Where(r => !r.IsDeleted).ToList();
 
 		public bool IsWebSubmission => string.Equals(CourseId, "web", StringComparison.OrdinalIgnoreCase) && SlideId == Guid.Empty;
-		
+
 		public List<ExerciseCodeReview> GetAllReviews()
 		{
 			var manualCheckingReviews = ManualCheckings.SelectMany(c => c.NotDeletedReviews);

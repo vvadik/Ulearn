@@ -38,7 +38,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		public StepikController(ULearnDb db, CourseManager courseManager)
-			:this(courseManager, new StepikRepo(db), new NotificationsRepo(db), new UsersRepo(db))
+			: this(courseManager, new StepikRepo(db), new NotificationsRepo(db), new UsersRepo(db))
 		{
 		}
 
@@ -81,16 +81,15 @@ namespace uLearn.Web.Controllers
 
 			var exporter = new CourseExporter(client.AccessToken);
 			var course = courseManager.GetCourse(courseId);
-			
+
 			var exportOptions = new CourseInitialExportOptions(stepikCourseId, xQueueName, ConvertStringToGuidList(newLessonsSlidesIds).ToList())
 			{
-				VideoUploadOptions = (UploadVideoToStepikOption) Enum.Parse(typeof(UploadVideoToStepikOption), uploadVideo)
+				VideoUploadOptions = (UploadVideoToStepikOption)Enum.Parse(typeof(UploadVideoToStepikOption), uploadVideo)
 			};
 
 			var thread = new Thread(async () => await DoInitialExport(exporter, course, exportOptions));
 			thread.Start();
 			return View("ExportStarted", course);
-			
 		}
 
 		public async Task<ActionResult> UpdateOptions(string courseId, int stepikCourseId)
@@ -160,8 +159,8 @@ namespace uLearn.Web.Controllers
 					.ToList();
 				var insertSlideAfterStepId = int.Parse(Request.Form[exportSlideAfterKey + slideId.GetNormalizedGuid()]);
 				slidesUpdateOptions.Add(new SlideUpdateOptions(slideId, insertSlideAfterStepId, stepsIdsForSlide));
-
 			}
+
 			var updateOptions = new CourseUpdateOptions(
 				stepikCourseId,
 				xQueueName,
@@ -280,7 +279,7 @@ namespace uLearn.Web.Controllers
 
 		private string GetStepikOAuthRedirectUri()
 		{
-			return Url.Action("Connect", "Stepik", new {}, Request.GetRealScheme());
+			return Url.Action("Connect", "Stepik", new { }, Request.GetRealScheme());
 		}
 
 		public async Task<ActionResult> Connect(string code = null, string state = null, string error = null)
@@ -289,7 +288,7 @@ namespace uLearn.Web.Controllers
 				return View("ConnectError", error);
 
 			if (string.IsNullOrWhiteSpace(code) || string.IsNullOrEmpty(state))
-				return View("ConnectError", (object) "Неверные параметры: отсутствует `code` или `state`");
+				return View("ConnectError", (object)"Неверные параметры: отсутствует `code` или `state`");
 
 			string returnUrl;
 			try
@@ -317,7 +316,7 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 
 			var userId = User.Identity.GetUserId();
-			if (process.OwnerId != userId && ! User.IsSystemAdministrator())
+			if (process.OwnerId != userId && !User.IsSystemAdministrator())
 				return HttpNotFound();
 
 			var course = courseManager.GetCourse(process.UlearnCourseId);

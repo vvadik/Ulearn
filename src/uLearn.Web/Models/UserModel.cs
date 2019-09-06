@@ -44,12 +44,12 @@ namespace uLearn.Web.Models
 	{
 		public bool HasAccess { get; set; }
 		public string ToggleUrl { get; set; }
-		
+
 		public string CourseTitle { get; set; }
-		
+
 		public string UserName { get; set; }
-		
-		public  CourseRole Role { get; set; }
+
+		public CourseRole Role { get; set; }
 	}
 
 	public class CourseRoleModel

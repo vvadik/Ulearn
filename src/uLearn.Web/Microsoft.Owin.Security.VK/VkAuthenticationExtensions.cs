@@ -12,6 +12,7 @@ namespace uLearn.Web.Microsoft.Owin.Security.VK
 			{
 				throw new ArgumentNullException(nameof(app));
 			}
+
 			if (options == null)
 			{
 				throw new ArgumentNullException(nameof(options));

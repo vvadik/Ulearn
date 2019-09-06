@@ -7,7 +7,7 @@ namespace Database.Models
 	{
 		[Key]
 		public StyleErrorType ErrorType { get; set; }
-		
+
 		public bool IsEnabled { get; set; }
 	}
 }

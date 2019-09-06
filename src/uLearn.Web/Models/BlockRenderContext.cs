@@ -31,7 +31,7 @@ namespace uLearn.Web.Models
 
 		/* User's version of slide, i.e. for exercises */
 		public int? VersionId { get; set; }
-		
+
 		public BlockRenderContext(Course course, Slide slide, string baseUrl, dynamic[] blockData,
 			bool isGuest = false, bool revealHidden = false, AbstractManualSlideChecking manualChecking = null,
 			int manualCheckingsLeft = 0, bool canUserFillQuiz = false, List<string> groupsIds = null, bool isLti = false, bool autoplay = false,
@@ -55,7 +55,7 @@ namespace uLearn.Web.Models
 			DefaultProhibitFurtherReview = defaultProhibitFurtherReview;
 			UserScores = userScores ?? new Dictionary<string, int>();
 		}
-		
+
 		[NotNull]
 		public dynamic GetBlockData(SlideBlock block)
 		{
@@ -63,7 +63,6 @@ namespace uLearn.Web.Models
 			if (index < 0)
 				throw new ArgumentException("No block " + block + " in slide " + Slide);
 			var data = BlockData[index];
-
 
 			return data ?? GetDefaultBlockData(block);
 		}
@@ -74,7 +73,7 @@ namespace uLearn.Web.Models
 				return new QuizBlockData(new QuizModel(), 1, new QuizState(QuizStatus.ReadyToSend, 0, 0, Slide.MaxScore));
 			if (Slide is ExerciseSlide)
 				return new ExerciseBlockData(Course.Id, Slide as ExerciseSlide) { IsGuest = IsGuest, IsLti = IsLti };
-			
+
 			throw new ArgumentException($"Internal error. Unknown slide type: {Slide.GetType()}. Should be {nameof(QuizSlide)} or {nameof(ExerciseSlide)}.");
 		}
 	}

@@ -54,7 +54,7 @@ namespace Ulearn.Core.CSharp.Validators
 			bool isStatic = field.Modifiers.Any(m => m.IsKind(SyntaxKind.StaticKeyword));
 			bool isReadonly = field.Modifiers.Any(m => m.IsKind(SyntaxKind.ReadOnlyKeyword));
 			bool isConstant = field.Modifiers.Any(m => m.IsKind(SyntaxKind.ConstKeyword));
-			bool isPrivate = field.Modifiers.Any(m => m.IsKind(SyntaxKind.PrivateKeyword)) || 
+			bool isPrivate = field.Modifiers.Any(m => m.IsKind(SyntaxKind.PrivateKeyword)) ||
 							!field.Modifiers.Any(m => m.IsKind(SyntaxKind.PublicKeyword) || m.IsKind(SyntaxKind.InternalKeyword) || m.IsKind(SyntaxKind.ProtectedKeyword));
 			// статические ридонли могут быть какие угодно.
 			return isPrivate && !isConstant && !(isStatic && isReadonly);

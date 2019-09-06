@@ -30,7 +30,7 @@ namespace Ulearn.Common.Extensions
 		{
 			return File.ReadAllBytes(file.FullName);
 		}
-		
+
 		public static async Task<byte[]> ReadAllContentAsync(this FileInfo file)
 		{
 			byte[] result;
@@ -39,6 +39,7 @@ namespace Ulearn.Common.Extensions
 				result = new byte[stream.Length];
 				await stream.ReadAsync(result, 0, (int)stream.Length);
 			}
+
 			return result;
 		}
 

@@ -40,8 +40,8 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		{
 			return GetMarkdownWithReplacedLinksToStudentZips(courseId, slideId).RenderMarkdown(baseUrl);
 		}
-		
-		public string RenderMarkdown(string courseId, Guid slideId, FileInfo sourceFile, string baseUrl="")
+
+		public string RenderMarkdown(string courseId, Guid slideId, FileInfo sourceFile, string baseUrl = "")
 		{
 			return GetMarkdownWithReplacedLinksToStudentZips(courseId, slideId).RenderMarkdown(sourceFile, baseUrl);
 		}
@@ -110,6 +110,7 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 				reader.Read();
 				yield break;
 			}
+
 			reader.Read();
 			while (!(reader.NodeType == XmlNodeType.EndElement && reader.Name == tagName))
 			{
@@ -143,6 +144,7 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 				else
 					reader.Read();
 			}
+
 			reader.Read();
 		}
 

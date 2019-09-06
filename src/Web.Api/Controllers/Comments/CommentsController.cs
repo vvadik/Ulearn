@@ -45,21 +45,21 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		{
 			var courseId = parameters.CourseId;
 			var slideId = parameters.SlideId;
-			
+
 			if (parameters.ForInstructors)
 			{
 				if (!IsAuthenticated)
-					return StatusCode((int)HttpStatusCode.Unauthorized, $"You should be authenticated to view instructor comments."); 
+					return StatusCode((int)HttpStatusCode.Unauthorized, $"You should be authenticated to view instructor comments.");
 				var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
 				if (!isInstructor)
 					return StatusCode((int)HttpStatusCode.Forbidden, $"You have no access to instructor comments on {courseId}. You should be instructor or course admin.");
 			}
-			
+
 			var comments = await commentsRepo.GetSlideTopLevelCommentsAsync(courseId, slideId).ConfigureAwait(false);
 			comments = comments.Where(c => c.IsForInstructorsOnly == parameters.ForInstructors).ToList();
 			return await GetSlideCommentsResponseAsync(comments, courseId, parameters).ConfigureAwait(false);
 		}
-		
+
 		private async Task<ActionResult<CommentsListResponse>> GetSlideCommentsResponseAsync(List<Comment> comments, string courseId, SlideCommentsParameters parameters)
 		{
 			var canUserSeeNotApprovedComments = await CanUserSeeNotApprovedCommentsAsync(UserId, courseId).ConfigureAwait(false);
@@ -105,7 +105,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			var courseId = courseAuthorizationParameters.CourseId;
 			var slideId = parameters.SlideId;
 			parameters.Text.TrimEnd();
-			
+
 			if (parameters.ForInstructors)
 			{
 				var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
@@ -118,16 +118,15 @@ namespace Ulearn.Web.Api.Controllers.Comments
 				var parentComment = await commentsRepo.FindCommentByIdAsync(parameters.ParentCommentId.Value).ConfigureAwait(false);
 				if (parentComment == null || !parentComment.CourseId.EqualsIgnoreCase(courseId) || parentComment.SlideId != slideId || !parentComment.IsTopLevel)
 					return BadRequest(new ErrorResponse($"`parentCommentId` comment {parameters.ParentCommentId.Value} not found, belongs to other course, other slide or is not a top-level comment"));
-				
 
 				if (parentComment.IsForInstructorsOnly != parameters.ForInstructors)
 					return BadRequest(new ErrorResponse(
 						$"`parentCommentId` comment {parameters.ParentCommentId.Value} is {(parentComment.IsForInstructorsOnly ? "" : "not")} for instructors, but new one {(parameters.ForInstructors ? "is" : "is not")}"
 					));
 			}
-			
+
 			var commentsPolicy = await commentPoliciesRepo.GetCommentsPolicyAsync(courseId).ConfigureAwait(false);
-			
+
 			if (!await CanCommentHereAsync(UserId, courseId, parameters.ParentCommentId.HasValue, commentsPolicy).ConfigureAwait(false))
 				return StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse($"You can not create comment here by comments policy."));
 
@@ -136,10 +135,10 @@ namespace Ulearn.Web.Api.Controllers.Comments
 
 			if (parameters.Text.Length > CommentsPolicy.MaxCommentLength)
 				return StatusCode((int)HttpStatusCode.RequestEntityTooLarge, new ErrorResponse($"Your comment is too large. Max allowed length is {CommentsPolicy.MaxCommentLength} chars"));
-			
+
 			var parentCommentId = parameters.ParentCommentId ?? -1;
 			var comment = await commentsRepo.AddCommentAsync(UserId, courseId, slideId, parentCommentId, parameters.ForInstructors, parameters.Text).ConfigureAwait(false);
-			
+
 			if (comment.IsApproved)
 				await NotifyAboutNewCommentAsync(comment).ConfigureAwait(false);
 
@@ -149,13 +148,13 @@ namespace Ulearn.Web.Api.Controllers.Comments
 				null, null, false, addCourseIdAndSlideId: true, addParentCommentId: true, addReplies: false
 			);
 		}
-		
+
 		private async Task<bool> CanCommentNowAsync(string userId, string courseId, CommentsPolicy commentsPolicy)
 		{
 			/* Instructors have unlimited comments */
 			if (await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.Instructor).ConfigureAwait(false))
 				return true;
-			
+
 			var isUserAddedMaxCommentsInLastTime = await commentsRepo.IsUserAddedMaxCommentsInLastTimeAsync(
 				userId,
 				commentsPolicy.MaxCommentsCountInLastTime,
@@ -163,7 +162,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			).ConfigureAwait(false);
 			return !isUserAddedMaxCommentsInLastTime;
 		}
-		
+
 		private async Task<bool> CanCommentHereAsync(string userId, string courseId, bool isReply, CommentsPolicy commentsPolicy)
 		{
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);

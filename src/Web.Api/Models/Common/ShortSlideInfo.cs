@@ -9,7 +9,7 @@ namespace Ulearn.Web.Api.Models.Common
 	{
 		[DataMember]
 		public Guid Id { get; set; }
-		
+
 		[DataMember]
 		public string Title { get; set; }
 
@@ -21,7 +21,7 @@ namespace Ulearn.Web.Api.Models.Common
 
 		[DataMember]
 		public int MaxScore { get; set; }
-		
+
 		[DataMember]
 		public SlideType Type { get; set; }
 

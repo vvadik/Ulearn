@@ -27,7 +27,7 @@ namespace Ulearn.Common
 		{
 			DefaultSelector = defaultSelector;
 		}
-		
+
 		public new TValue this[TKey key]
 		{
 			[CollectionAccess(CollectionAccessType.UpdatedContent)]

@@ -66,7 +66,7 @@ namespace Database.Core.Tests.Repos.Comments
 				Assert.AreEqual(1, await commentsLikesRepo.GetLikesCountAsync(i).ConfigureAwait(false));
 			}
 		}
-		
+
 		[Test]
 		public async Task LikeAndUnlikeComment()
 		{
@@ -91,7 +91,7 @@ namespace Database.Core.Tests.Repos.Comments
 		{
 			var user1 = await CreateUserAsync("user1").ConfigureAwait(false);
 			var user2 = await CreateUserAsync("user2").ConfigureAwait(false);
-			
+
 			await commentsLikesRepo.LikeAsync(100, user1.Id).ConfigureAwait(false);
 			await commentsLikesRepo.LikeAsync(100, user2.Id).ConfigureAwait(false);
 			var likes = await commentsLikesRepo.GetLikesAsync(100).ConfigureAwait(false);
@@ -104,7 +104,7 @@ namespace Database.Core.Tests.Repos.Comments
 		{
 			const int usersCount = 10;
 			const int commentId = 100;
-			
+
 			var users = new List<ApplicationUser>();
 			for (var i = 0; i < usersCount; i++)
 			{

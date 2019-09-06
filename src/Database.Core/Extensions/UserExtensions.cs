@@ -11,7 +11,7 @@ namespace Database.Extensions
 	public static class UserExtensions
 	{
 		private const string courseRoleClaimType = "CourseRole";
-		
+
 		/* TODO (andgein): Refactor code: just call CourseRolesRepo's methods */
 		[Obsolete("Use CourseRolesRepo.HasUserAccessToCourseAsync() instead")]
 		public static bool HasAccessFor(this IPrincipal principal, string courseId, CourseRoleType minAccessLevel)
@@ -109,7 +109,7 @@ namespace Database.Extensions
 			return systemAccessesRepo.HasSystemAccess(User.GetUserId(), accessType);
 		}
 		*/
-		
+
 		public static bool IsUlearnBot(this ApplicationUser user)
 		{
 			return user.UserName == UsersRepo.UlearnBotUsername;
