@@ -16,7 +16,8 @@
 		var playerReady = false;
 		var initialized = false;
 		var intervalId = setInterval(function () {
-			if($("#" + elementId)[0].contentWindow != null) {
+			var element = $("#" + elementId)[0];
+			if(element && element.contentWindow != null) {
 				if(initialized) {
 					clearInterval(intervalId);
 					return;

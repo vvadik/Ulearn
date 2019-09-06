@@ -60,7 +60,7 @@ api.setServerErrorHandler((message) => Toast.push(message ? message : 'Прои�
 class UlearnApp extends Component {
 	render() {
 		let pathname = window.location.pathname.toLowerCase();
-		let isLti = pathname.endsWith('/ltislide') || pathname.endsWith('/acceptedalert');
+		let isLti = pathname.endsWith('/ltislide') || pathname.endsWith('/acceptedalert'); //TODO remove this flag,that hiding header and nav menu
 		let isHeaderVisible = !isLti;
 
 		return (
