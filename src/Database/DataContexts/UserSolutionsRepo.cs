@@ -270,6 +270,11 @@ namespace Database.DataContexts
 				.Distinct());
 		}
 
+		public bool IsSlidePassed(string courseId, string userId, Guid slideId)
+		{
+			return db.AutomaticExerciseCheckings.Any(x => x.IsRightAnswer && x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId);
+		}
+
 		public IQueryable<UserExerciseSubmission> GetAllSubmissions(int max, int skip)
 		{
 			return db.UserExerciseSubmissions

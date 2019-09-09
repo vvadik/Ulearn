@@ -324,10 +324,10 @@ namespace uLearn.Web.Controllers
 
 		private int GetMaxSlideScoreForUser(Course course, Slide slide, string userId)
 		{
-			var solvedSlidesIds = ControllerUtils.GetSolvedSlides(solutionsRepo, userQuizzesRepo, course, userId);
-			var slidesWithUsersManualChecking = new HashSet<Guid>(visitsRepo.GetSlidesWithUsersManualChecking(course.Id, userId));
+			var isSlideSolved = ControllerUtils.IsSlideSolved(solutionsRepo, userQuizzesRepo, course, userId, slide.Id);
+			var hasManualChecking = visitsRepo.HasManualChecking(course.Id, userId, slide.Id);
 			var enabledManualCheckingForUser = groupsRepo.IsManualCheckingEnabledForUser(course, userId);
-			var maxSlideScore = ControllerUtils.GetMaxScoreForUsersSlide(slide, solvedSlidesIds.Contains(slide.Id), slidesWithUsersManualChecking.Contains(slide.Id), enabledManualCheckingForUser);
+			var maxSlideScore = ControllerUtils.GetMaxScoreForUsersSlide(slide, isSlideSolved, hasManualChecking, enabledManualCheckingForUser);
 			return maxSlideScore;
 		}
 

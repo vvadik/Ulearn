@@ -71,6 +71,11 @@ namespace Database.DataContexts
 			return new HashSet<Guid>(db.UserQuizSubmissions.Where(x => x.CourseId == courseId && x.UserId == userId).Select(x => x.SlideId).Distinct());
 		}
 
+		public bool IsSlidePassed(string courseId, string userId, Guid slideId)
+		{
+			return db.UserQuizSubmissions.Any(x => x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId);
+		}
+
 		public HashSet<Guid> GetPassedSlideIdsWithMaximumScore(string courseId, string userId)
 		{
 			var passedQuizzes = GetPassedSlideIds(courseId, userId);

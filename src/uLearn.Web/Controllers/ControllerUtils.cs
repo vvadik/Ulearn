@@ -160,6 +160,11 @@ namespace uLearn.Web.Controllers
 			return solvedSlides;
 		}
 
+		public static bool IsSlideSolved(UserSolutionsRepo solutionsRepo, UserQuizzesRepo userQuizzesRepo, Course course, string userId, Guid slideId)
+		{
+			return solutionsRepo.IsSlidePassed(course.Id, userId, slideId) || userQuizzesRepo.IsSlidePassed(course.Id, userId, slideId);
+		}
+
 		public static int GetMaxScoreForUsersSlide(Slide slide, bool isSolved, bool hasManualChecking, bool enabledManualCheckingForUser)
 		{
 			var isExerciseOrQuiz = slide is ExerciseSlide || slide is QuizSlide;

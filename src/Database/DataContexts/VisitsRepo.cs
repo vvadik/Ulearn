@@ -121,6 +121,11 @@ namespace Database.DataContexts
 				.ToList();
 		}
 
+		public bool HasManualChecking(string courseId, string userId, Guid slideId)
+		{
+			return db.Visits.Any(v => v.CourseId == courseId && v.UserId == userId && v.SlideId == slideId && v.HasManualChecking);
+		}
+
 		public Task MarkVisitsAsWithManualChecking(string courseId, Guid slideId, string userId)
 		{
 			return UpdateAttempts(courseId, slideId, userId, visit => { visit.HasManualChecking = true; });
