@@ -95,7 +95,7 @@ namespace Ulearn.Web.Api.Controllers
 				Id = slide.Id,
 				Title = slide.Title,
 				Slug = slide.Url,
-				ApiUrl = Url.Action(nameof(SlidesController.SlideInfo), "Slides", new { courseId = courseId, slideId = slide.Id }),
+				ApiUrl = Url.Action("SlideInfo", "Slides", new { courseId = courseId, slideId = slide.Id }),
 				MaxScore = getSlideMaxScoreFunc(slide),
 				Type = GetSlideType(slide),
 				QuestionsCount = slide.Blocks.OfType<AbstractQuestionBlock>().Count(),

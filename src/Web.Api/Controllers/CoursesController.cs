@@ -79,7 +79,7 @@ namespace Ulearn.Web.Api.Controllers
 					{
 						Id = c.Id,
 						Title = c.Title,
-						ApiUrl = Url.Action(nameof(CourseInfo), "Courses", new { courseId = c.Id })
+						ApiUrl = Url.Action("CourseInfo", "Courses", new { courseId = c.Id })
 					}
 				).ToList()
 			};
