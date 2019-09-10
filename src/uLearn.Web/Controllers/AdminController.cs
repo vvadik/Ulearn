@@ -784,7 +784,7 @@ namespace uLearn.Web.Controllers
 			return PartialView("_UserListPartial", model);
 		}
 
-		private UserListModel GetUserListModel(IEnumerable<UserRolesInfo> userRoles, string courseId)
+		private UserListModel GetUserListModel(List<UserRolesInfo> userRoles, string courseId)
 		{
 			var rolesForUsers = userRolesRepo.GetRolesByUsers(courseId);
 			var currentUserId = User.Identity.GetUserId();
@@ -799,6 +799,10 @@ namespace uLearn.Web.Controllers
 				CanViewAndToogleSystemAccesses = false,
 				CanViewProfiles = systemAccessesRepo.HasSystemAccess(currentUserId, SystemAccessType.ViewAllProfiles) || User.IsSystemAdministrator(),
 			};
+			var userIds = new HashSet<string>(userRoles.Select(r => r.UserId));
+			var usersCourseAccesses = coursesRepo.GetCourseAccesses(courseId).Where(a => userIds.Contains(a.UserId))
+				.GroupBy(a => a.UserId)
+				.ToDictionary(g => g.Key, g => g.Select(a => a.AccessType).ToList());
 
 			foreach (var userRolesInfo in userRoles)
 			{
@@ -821,7 +825,7 @@ namespace uLearn.Web.Controllers
 							CourseTitle = courseManager.FindCourse(courseId)?.Title
 						});
 
-				var courseAccesses = coursesRepo.GetCourseAccesses(courseId, user.UserId).Select(a => a.AccessType).ToList();
+				var courseAccesses = usersCourseAccesses.ContainsKey(user.UserId) ? usersCourseAccesses[user.UserId] : null;
 				user.CourseAccesses[courseId] = Enum.GetValues(typeof(CourseAccessType))
 					.Cast<CourseAccessType>()
 					.ToDictionary(
@@ -829,7 +833,7 @@ namespace uLearn.Web.Controllers
 						a => new CourseAccessModel
 						{
 							CourseId = courseId,
-							HasAccess = courseAccesses.Contains(a),
+							HasAccess = courseAccesses?.Contains(a) ?? false,
 							ToggleUrl = Url.Action("ToggleCourseAccess", "Admin", new { courseId = courseId, userId = user.UserId, accessType = a }),
 							UserName = user.UserVisibleName,
 							AccessType = a,
@@ -840,7 +844,6 @@ namespace uLearn.Web.Controllers
 				model.Users.Add(user);
 			}
 
-			var userIds = model.Users.Select(u => u.UserId).ToList();
 			model.UsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, User);
 			model.UsersArchivedGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, User, onlyArchived: true);
 
