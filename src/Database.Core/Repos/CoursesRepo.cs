@@ -96,12 +96,20 @@ namespace Database.Repos
 
 		/* Course accesses */
 
-		private IQueryable<CourseAccess> GetQueryableCourseAccesses()
+		private async Task<List<CourseAccess>> GetActualEnabledCourseAccessesAsync(string courseId = null, string userId = null)
 		{
-			return db.CourseAccesses
-				.GroupBy(x => x.CourseId + x.UserId + x.AccessType.ToString())
+			var queryable = db.CourseAccesses
+				.Include(a => a.User)
+				.Where(a => a.IsEnabled);
+			if (courseId != null)
+				queryable = queryable.Where(x => x.CourseId == courseId);
+			if (userId != null)
+				queryable = queryable.Where(x => x.UserId == userId);
+			return (await queryable.ToListAsync().ConfigureAwait(false))
+				.GroupBy(x => x.CourseId + x.UserId + x.AccessType, StringComparer.OrdinalIgnoreCase)
 				.Select(gr => gr.OrderByDescending(x => x.Id))
-				.Select(gr => gr.FirstOrDefault());
+				.Select(gr => gr.FirstOrDefault())
+				.ToList();
 		}
 
 		public async Task<CourseAccess> GrantAccessAsync(string courseId, string userId, CourseAccessType accessType, string grantedById, string comment)
@@ -147,39 +155,42 @@ namespace Database.Repos
 			return new List<CourseAccess> { revoke };
 		}
 
-		public Task<List<CourseAccess>> GetCourseAccessesAsync(string courseId)
+		public async Task<List<CourseAccess>> GetCourseAccessesAsync(string courseId)
 		{
-			return GetQueryableCourseAccesses().Include(a => a.User).Where(a => a.CourseId == courseId && a.IsEnabled).ToListAsync();
+			return await GetActualEnabledCourseAccessesAsync(courseId: courseId);
 		}
 
-		public Task<List<CourseAccess>> GetCourseAccessesAsync(string courseId, string userId)
+		public async Task<List<CourseAccess>> GetCourseAccessesAsync(string courseId, string userId)
 		{
-			return GetQueryableCourseAccesses().Include(a => a.User).Where(a => a.CourseId == courseId && a.UserId == userId && a.IsEnabled).ToListAsync();
+			return await GetActualEnabledCourseAccessesAsync(courseId: courseId, userId: userId);
 		}
 
 		public async Task<DefaultDictionary<string, List<CourseAccess>>> GetCoursesAccessesAsync(IEnumerable<string> coursesIds)
 		{
-			var courseAccesses = await GetQueryableCourseAccesses().Include(a => a.User)
-				.Where(a => coursesIds.Contains(a.CourseId) && a.IsEnabled)
+			var courseAccesses = (await GetActualEnabledCourseAccessesAsync().ConfigureAwait(false))
+				.Where(a => coursesIds.Contains(a.CourseId, StringComparer.OrdinalIgnoreCase))
 				.GroupBy(a => a.CourseId)
-				.ToDictionaryAsync(g => g.Key, g => g.ToList())
-				.ConfigureAwait(false);
+				.ToDictionary(g => g.Key, g => g.ToList());
 			return courseAccesses.ToDefaultDictionary();
 		}
 
-		public Task<bool> HasCourseAccessAsync(string userId, string courseId, CourseAccessType accessType)
+		public async Task<bool> HasCourseAccessAsync(string userId, string courseId, CourseAccessType accessType)
 		{
-			return GetQueryableCourseAccesses().AnyAsync(a => a.CourseId == courseId && a.UserId == userId && a.AccessType == accessType && a.IsEnabled);
+			return (await GetActualEnabledCourseAccessesAsync(courseId: courseId, userId: userId).ConfigureAwait(false))
+				.Any(a => a.AccessType == accessType);
 		}
 
-		public Task<List<CourseAccess>> GetUserAccessesAsync(string userId)
+		public async Task<List<CourseAccess>> GetUserAccessesAsync(string userId)
 		{
-			return GetQueryableCourseAccesses().Where(a => a.UserId == userId && a.IsEnabled).ToListAsync();
+			return await GetActualEnabledCourseAccessesAsync(userId: userId).ConfigureAwait(false);
 		}
 
-		public Task<List<string>> GetCoursesUserHasAccessTo(string userId, CourseAccessType accessType)
+		public async Task<List<string>> GetCoursesUserHasAccessTo(string userId, CourseAccessType accessType)
 		{
-			return GetQueryableCourseAccesses().Where(a => a.UserId == userId && a.IsEnabled && a.AccessType == accessType).Select(a => a.CourseId).Distinct().ToListAsync();
+			return (await GetActualEnabledCourseAccessesAsync(userId: userId).ConfigureAwait(false))
+				.Where(a => a.AccessType == accessType)
+				.Select(a => a.CourseId)
+				.Distinct().ToList();
 		}
 
 		// Add new and remove old course file

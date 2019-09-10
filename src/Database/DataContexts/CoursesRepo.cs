@@ -82,10 +82,17 @@ namespace Database.DataContexts
 
 		/* Course accesses */
 
-		private IQueryable<CourseAccess> GetActualCourseAccessesQueryable()
+		private IEnumerable<CourseAccess> GetActualEnabledCourseAccesses(string courseId = null, string userId = null)
 		{
-			return db.CourseAccesses
-				.GroupBy(x => x.CourseId + x.UserId + x.AccessType.ToString())
+			var queryable = db.CourseAccesses
+				.Include(a => a.User)
+				.Where(a => a.IsEnabled);
+			if (courseId != null)
+				queryable = queryable.Where(x => x.CourseId == courseId);
+			if (userId != null)
+				queryable = queryable.Where(x => x.UserId == userId);
+			return queryable.ToList()
+				.GroupBy(x => x.CourseId + x.UserId + x.AccessType, StringComparer.OrdinalIgnoreCase)
 				.Select(gr => gr.OrderByDescending(x => x.Id))
 				.Select(gr => gr.FirstOrDefault());
 		}
@@ -135,20 +142,18 @@ namespace Database.DataContexts
 
 		public List<CourseAccess> GetCourseAccesses(string courseId)
 		{
-			return GetActualCourseAccessesQueryable().Include(a => a.User).Where(a => a.CourseId == courseId && a.IsEnabled).ToList();
+			return GetActualEnabledCourseAccesses(courseId: courseId).ToList();
 		}
 
 		public List<CourseAccess> GetCourseAccesses(string courseId, string userId)
 		{
-			var courseAccesses = GetActualCourseAccessesQueryable().Include(a => a.User).Where(a => a.CourseId == courseId && a.UserId == userId && a.IsEnabled).ToList();
-
-			return courseAccesses;
+			return GetActualEnabledCourseAccesses(courseId: courseId, userId: userId).ToList();
 		}
 
 		public DefaultDictionary<string, List<CourseAccess>> GetCoursesAccesses(IEnumerable<string> coursesIds)
 		{
-			return GetActualCourseAccessesQueryable().Include(a => a.User)
-				.Where(a => coursesIds.Contains(a.CourseId) && a.IsEnabled)
+			return GetActualEnabledCourseAccesses()
+				.Where(a => coursesIds.Contains(a.CourseId, StringComparer.OrdinalIgnoreCase))
 				.GroupBy(a => a.CourseId)
 				.ToDictionary(g => g.Key, g => g.ToList())
 				.ToDefaultDictionary();
@@ -156,7 +161,7 @@ namespace Database.DataContexts
 
 		public bool HasCourseAccess(string userId, string courseId, CourseAccessType accessType)
 		{
-			return GetActualCourseAccessesQueryable().Any(a => a.CourseId == courseId && a.UserId == userId && a.AccessType == accessType && a.IsEnabled);
+			return GetActualEnabledCourseAccesses(courseId: courseId, userId: userId).Any(a => a.AccessType == accessType);
 		}
 
 		public async Task<List<CourseAccess>> GetUserAccessHistory(string userId)
