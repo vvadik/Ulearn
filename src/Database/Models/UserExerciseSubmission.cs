@@ -39,6 +39,7 @@ namespace Database.Models
 
 		[Required]
 		[Index("IDX_UserExerciseSubmissions_BySlideAndTime", 3)]
+		[Index("IDX_UserExerciseSubmissions_ByTime", 1)]
 		public DateTime Timestamp { get; set; }
 
 		[Required]
