@@ -42,6 +42,7 @@ namespace Database.Repos.Groups
 
 			/* For exercises */
 			var acceptedSubmissionsBySlide = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, userId)
+				.ToList()
 				.GroupBy(s => s.SlideId)
 				.ToDictionary(g => g.Key, g => g.ToList());
 			foreach (var acceptedSubmissionsForSlide in acceptedSubmissionsBySlide.Values)

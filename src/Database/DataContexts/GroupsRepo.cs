@@ -248,6 +248,7 @@ namespace Database.DataContexts
 
 			/* For exercises */
 			var acceptedSubmissionsBySlide = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, userId)
+				.ToList()
 				.GroupBy(s => s.SlideId)
 				.ToDictionary(g => g.Key, g => g.ToList());
 			foreach (var acceptedSubmissionsForSlide in acceptedSubmissionsBySlide.Values)
@@ -426,7 +427,9 @@ namespace Database.DataContexts
 
 			var groupsWithAccess = new HashSet<int>(db.GroupAccesses.Where(a => a.UserId == currentUserId && a.IsEnabled).Select(a => a.GroupId));
 			var usersGroups = db.GroupMembers
+				.Include(m => m.Group)
 				.Where(m => userIds.Contains(m.UserId) && courseIds.Contains(m.Group.CourseId))
+				.ToList()
 				.GroupBy(m => m.UserId)
 				.ToDictionary(group => group.Key, group => group.ToList())
 				.ToDictionary(

@@ -552,7 +552,7 @@ namespace uLearn.Web.Controllers
 			filterOptions.UserIds = filterOptions.UserIds.Take(maxUsersCount).ToList();
 
 			var submissions = userSolutionsRepo.GetAllSubmissionsByUsers(filterOptions);
-			var submissionsByUser = submissions.GroupBy(s => s.UserId).ToDictionary(g => g.Key, g => g.ToList()).ToDefaultDictionary();
+			var submissionsByUser = submissions.ToList().GroupBy(s => s.UserId).ToDictionary(g => g.Key, g => g.ToList()).ToDefaultDictionary(); // NOTE: ToList because Include not work with GroupBy
 
 			var automaticCheckingScores = slideCheckingsRepo.GetAutomaticScoresForSlide(courseId, slideId, filterOptions.UserIds);
 			var manualCheckingScores = slideCheckingsRepo.GetManualScoresForSlide(courseId, slideId, filterOptions.UserIds);

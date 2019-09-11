@@ -151,7 +151,7 @@ namespace Database.DataContexts
 
 		public IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId)
 		{
-			return db.UserExerciseSubmissions.Include(s => s.ManualCheckings).Where(x => x.CourseId == courseId);
+			return db.UserExerciseSubmissions.Include(s => s.ManualCheckings).Include(s => s.AutomaticChecking).Where(x => x.CourseId == courseId);
 		}
 
 		public IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId, IEnumerable<Guid> slidesIds)

@@ -144,7 +144,7 @@ namespace Database.Repos
 		{
 			var query = db.UserExerciseSubmissions.AsQueryable();
 			if (includeManualCheckings)
-				query = query.Include(s => s.ManualCheckings);
+				query = query.Include(s => s.ManualCheckings).Include(s => s.AutomaticChecking);
 			return query.Where(x => x.CourseId == courseId);
 		}
 
