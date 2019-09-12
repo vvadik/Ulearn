@@ -102,9 +102,10 @@ namespace uLearn.Web.Controllers
 			if (buildResult.HasErrors)
 				return new RunSolutionResult { IsCompileError = true, ErrorMessage = buildResult.ErrorMessage, SubmissionId = submission.Id, ExecutionServiceName = "uLearn" };
 
+			var hasAutomaticChecking = submissionLanguage.HasAutomaticChecking() && (submissionLanguage == Language.CSharp || exerciseBlock is UniversalExerciseBlock);
 			try
 			{
-				if (submissionLanguage.HasAutomaticChecking() && (submissionLanguage == Language.CSharp || exerciseBlock is UniversalExerciseBlock))
+				if (hasAutomaticChecking)
 					await userSolutionsRepo.RunAutomaticChecking(submission, executionTimeout, waitUntilChecked);
 			}
 			catch (SubmissionCheckingTimeout)
@@ -134,7 +135,7 @@ namespace uLearn.Web.Controllers
 
 			var automaticChecking = submission.AutomaticChecking;
 			bool sentToReview;
-			if (!submissionLanguage.HasAutomaticChecking())
+			if (!hasAutomaticChecking)
 				sentToReview = await SendToReviewAndUpdateScore(submission, courseManager, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender, true).ConfigureAwait(false);
 			else
 				sentToReview = slideCheckingsRepo.HasManualExerciseChecking(courseId, exerciseSlide.Id, userId, submission.Id);

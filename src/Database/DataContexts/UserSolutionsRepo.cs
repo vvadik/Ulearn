@@ -54,9 +54,10 @@ namespace Database.DataContexts
 			var hash = (await textsRepo.AddText(code)).Hash;
 			var compilationErrorHash = (await textsRepo.AddText(compilationError)).Hash;
 			var outputHash = (await textsRepo.AddText(output)).Hash;
+			var exerciseBlock = (courseManager.FindCourse(courseId)?.FindSlideById(slideId) as ExerciseSlide)?.Exercise;
 
 			AutomaticExerciseChecking automaticChecking;
-			if (language.HasAutomaticChecking())
+			if (language.HasAutomaticChecking() && (language == Language.CSharp || exerciseBlock is UniversalExerciseBlock))
 			{
 				automaticChecking = new AutomaticExerciseChecking
 				{
