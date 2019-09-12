@@ -40,34 +40,6 @@ namespace Database.Repos.Users
 		}
 
 		/* Pass limit=0 to disable limiting */
-		[Obsolete("Use UserSearcher instead")]
-		public async Task<List<UserRolesInfo>> FindUsers(UserSearchQuery query, int limit = 100)
-		{
-			var role = db.Roles.FirstOrDefault(r => r.Name == query.Role);
-			var users = db.Users.Where(u => !u.IsDeleted);
-			if (!string.IsNullOrEmpty(query.NamePrefix))
-			{
-				var usersIds = GetUsersByNamePrefix(query.NamePrefix).Select(u => u.Id);
-				users = users.Where(u => usersIds.Contains(u.Id));
-			}
-
-			return await users
-				.FilterByRole(role, userManager)
-				.FilterByUserIds(
-					await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(query.CourseRoleType, query.CourseId, query.IncludeHighCourseRoles).ConfigureAwait(false),
-					await courseRoleUsersFilter.GetListOfUsersByPrivilegeAsync(query.OnlyPrivileged, query.CourseId).ConfigureAwait(false)
-				)
-				.GetUserRolesInfoAsync(limit, userManager).ConfigureAwait(false);
-		}
-
-		[Obsolete("Use UserSearcher instead")]
-		public List<string> FilterUsersByNamePrefix(string namePrefix)
-		{
-			var deletedUserIds = db.Users.Where(u => u.IsDeleted).Select(u => u.Id).ToList();
-			return GetUsersByNamePrefix(namePrefix).Where(u => !deletedUserIds.Contains(u.Id)).Select(u => u.Id).ToList();
-		}
-
-		/* Pass limit=0 to disable limiting */
 		public async Task<List<UserRolesInfo>> GetCourseInstructorsAsync(string courseId, int limit = 50)
 		{
 			return await db.Users
@@ -124,19 +96,6 @@ namespace Database.Repos.Users
 
 			user.EmailConfirmed = isConfirmed;
 			await db.SaveChangesAsync().ConfigureAwait(false);
-		}
-
-		[Obsolete("Use UserSearcher instead")]
-		private IQueryable<UserIdWrapper> GetUsersByNamePrefix(string name)
-		{
-			if (string.IsNullOrEmpty(name))
-				return db.Users.Where(u => !u.IsDeleted).Select(u => new UserIdWrapper(u.Id));
-
-			var splittedName = name.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-			var nameQuery = string.Join(" & ", splittedName.Select(s => "\"" + s.Trim().Replace("\"", "\\\"") + "*\""));
-			return db.Users
-				.FromSql("SELECT * FROM dbo.AspNetUsers WHERE IsDeleted = 0 AND CONTAINS([Names], {0})", nameQuery)
-				.Select(u => new UserIdWrapper(u.Id));
 		}
 
 		public Task UpdateLastConfirmationEmailTime(ApplicationUser user)

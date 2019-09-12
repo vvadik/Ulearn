@@ -10,8 +10,6 @@ namespace Database.Repos.Users
 		[ItemCanBeNull]
 		Task<ApplicationUser> FindUserByIdAsync(string userId);
 
-		Task<List<UserRolesInfo>> FindUsers(UserSearchQuery query, int limit = 100);
-		List<string> FilterUsersByNamePrefix(string namePrefix);
 		Task<List<UserRolesInfo>> GetCourseInstructorsAsync(string courseId, int limit = 50);
 		Task<List<UserRolesInfo>> GetCourseAdminsAsync(string courseId, int limit = 50);
 		Task<List<string>> GetSysAdminsIdsAsync();
