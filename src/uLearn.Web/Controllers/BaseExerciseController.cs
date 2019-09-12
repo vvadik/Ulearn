@@ -13,6 +13,7 @@ using Ulearn.Core;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.CSharp;
 using Ulearn.Core.Metrics;
 using Ulearn.Core.Telegram;
@@ -103,7 +104,7 @@ namespace uLearn.Web.Controllers
 
 			try
 			{
-				if (submissionLanguage.HasAutomaticChecking())
+				if (submissionLanguage.HasAutomaticChecking() && (submissionLanguage == Language.CSharp || exerciseBlock is UniversalExerciseBlock))
 					await userSolutionsRepo.RunAutomaticChecking(submission, executionTimeout, waitUntilChecked);
 			}
 			catch (SubmissionCheckingTimeout)
