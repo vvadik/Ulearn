@@ -525,30 +525,21 @@ namespace Database.DataContexts
 			if (course.Settings.IsManualCheckingEnabled)
 				return true;
 
-			var userGroupsIds = db.GroupMembers
-				.Where(m => m.Group.CourseId == course.Id && m.UserId == userId && !m.Group.IsDeleted)
-				.Select(m => m.GroupId)
-				.Distinct()
-				.ToList();
-			var userGroups = db.Groups.Where(g => userGroupsIds.Contains(g.Id)).ToList();
-			return userGroups.Any(g => g.IsManualCheckingEnabled);
+			return db.GroupMembers
+				.Include(m => m.Group)
+				.Any(m => m.Group.CourseId == course.Id && m.UserId == userId && !m.Group.IsDeleted && m.Group.IsManualCheckingEnabled);
 		}
 
 		public bool GetDefaultProhibitFutherReviewForUser(string courseId, string userId, IPrincipal instructor)
 		{
 			var accessibleGroupsIds = new HashSet<int>(GetMyGroupsFilterAccessibleToUser(courseId, instructor).Select(g => g.Id));
-			var userGroupsIds = db.GroupMembers
-				.Where(m => m.Group.CourseId == courseId && m.UserId == userId && !m.Group.IsDeleted)
+			var userGroupsIdsWithDefaultProhibitFutherReview = db.GroupMembers
+				.Include(m => m.Group)
+				.Where(m => m.Group.CourseId == courseId && m.UserId == userId && !m.Group.IsDeleted && m.Group.DefaultProhibitFutherReview)
 				.Select(m => m.GroupId)
 				.Distinct()
 				.ToList();
-
-			/* Return true if exists at least one group with enabled DefaultProhibitFutherReview */
-			return db.Groups.Any(
-				g => accessibleGroupsIds.Contains(g.Id) &&
-					userGroupsIds.Contains(g.Id) &&
-					g.DefaultProhibitFutherReview
-			);
+			return userGroupsIdsWithDefaultProhibitFutherReview.Any(g => accessibleGroupsIds.Contains(g));
 		}
 
 		public async Task EnableAdditionalScoringGroupsForGroup(int groupId, IEnumerable<string> scoringGroupsIds)

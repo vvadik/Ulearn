@@ -165,33 +165,23 @@ namespace Database.Repos.Groups
 			if (course.Settings.IsManualCheckingEnabled)
 				return true;
 
-			var userGroupsIds = await db.GroupMembers
-				.Where(m => m.Group.CourseId == course.Id && m.UserId == userId && !m.Group.IsDeleted)
-				.Select(m => m.GroupId)
-				.Distinct()
-				.ToListAsync()
+			return await db.GroupMembers
+				.Include(m => m.Group)
+				.AnyAsync(m => m.Group.CourseId == course.Id && m.UserId == userId && !m.Group.IsDeleted && m.Group.IsManualCheckingEnabled)
 				.ConfigureAwait(false);
-
-			return await db.Groups.AnyAsync(g => userGroupsIds.Contains(g.Id) && g.IsManualCheckingEnabled).ConfigureAwait(false);
 		}
 
 		public async Task<bool> GetDefaultProhibitFurtherReviewForUserAsync(string courseId, string userId, string instructorId)
 		{
 			var accessibleGroups = await GetMyGroupsFilterAccessibleToUserAsync(courseId, instructorId).ConfigureAwait(false);
-			var userGroupsIds = await db.GroupMembers
-				.Where(m => m.Group.CourseId == courseId && m.UserId == userId && !m.Group.IsDeleted)
+			var accessibleGroupsIds = accessibleGroups.Select(g => g.Id).ToHashSet();
+			var userGroupsIdsWithDefaultProhibitFutherReview = await db.GroupMembers
+				.Where(m => m.Group.CourseId == courseId && m.UserId == userId && !m.Group.IsDeleted && m.Group.DefaultProhibitFutherReview)
 				.Select(m => m.GroupId)
 				.Distinct()
 				.ToListAsync()
 				.ConfigureAwait(false);
-
-			var accessibleGroupsIds = accessibleGroups.Select(g => g.Id);
-			/* Return true if exists at least one group with enabled DefaultProhibitFurtherReview */
-			return await db.Groups.AnyAsync(
-				g => accessibleGroupsIds.Contains(g.Id) &&
-					userGroupsIds.Contains(g.Id) &&
-					g.DefaultProhibitFutherReview
-			).ConfigureAwait(false);
+			return userGroupsIdsWithDefaultProhibitFutherReview.Any(g => accessibleGroupsIds.Contains(g));
 		}
 
 		public async Task EnableAdditionalScoringGroupsForGroupAsync(int groupId, IEnumerable<string> scoringGroupsIds)

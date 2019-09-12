@@ -172,7 +172,7 @@ namespace Database.Repos
 
 		public async Task<Dictionary<string, int>> GetAnswersFrequencyForChoiceBlock(string courseId, Guid slideId, string quizId)
 		{
-			var answers = db.UserQuizAnswers.Include(q => q.SubmissionId).Where(q => q.Submission.CourseId == courseId && q.Submission.SlideId == slideId && q.BlockId == quizId);
+			var answers = db.UserQuizAnswers.Include(q => q.Submission).Where(q => q.Submission.CourseId == courseId && q.Submission.SlideId == slideId && q.BlockId == quizId);
 			var totalTries = await answers.Select(q => new { q.Submission.UserId, q.Submission.Timestamp }).Distinct().CountAsync().ConfigureAwait(false);
 
 			/* Due to performance issues don't call GroupBy().ToDictionary[Async](), call GroupBy().Select().ToDictionary() instead.

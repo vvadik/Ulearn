@@ -406,8 +406,6 @@ namespace uLearn.Web.Controllers
 			var submissions = onlyAccepted ?
 				userSolutionsRepo.GetAllAcceptedSubmissionsByUser(course.Id, slide.Id, userId) :
 				userSolutionsRepo.GetAllSubmissionsByUser(course.Id, slide.Id, userId);
-			var topUserReviewComments = slideCheckingsRepo.GetTopUserReviewComments(course.Id, slide.Id, currentUserId, 20);
-			var topOtherUsersReviewComments = slideCheckingsRepo.GetTopOtherUsersReviewComments(course.Id, slide.Id, currentUserId, 10, topUserReviewComments);
 
 			return new ExerciseBlockData(course.Id, (ExerciseSlide)slide, visit?.IsSkipped ?? false, solution)
 			{
@@ -417,8 +415,6 @@ namespace uLearn.Web.Controllers
 				IsGuest = string.IsNullOrEmpty(currentUserId),
 				SubmissionSelectedByUser = submission,
 				Submissions = submissions.ToList(),
-				TopUserReviewComments = topUserReviewComments,
-				TopOtherUsersReviewComments = topOtherUsersReviewComments,
 				CurrentUser = usersRepo.FindUserById(User.Identity.GetUserId())
 			};
 		}
@@ -484,6 +480,8 @@ namespace uLearn.Web.Controllers
 					model.ManualChecking = manualChecking;
 					model.Reviews = submission?.GetAllReviews() ?? new List<ExerciseCodeReview>();
 				}
+				model.TopUserReviewComments = slideCheckingsRepo.GetTopUserReviewComments(course.Id, slide.Id, currentUserId, 20);
+				model.TopOtherUsersReviewComments = slideCheckingsRepo.GetTopOtherUsersReviewComments(course.Id, slide.Id, currentUserId, 10, model.TopUserReviewComments);
 			}
 
 			return PartialView(model);

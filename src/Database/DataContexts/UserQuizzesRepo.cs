@@ -152,7 +152,7 @@ namespace Database.DataContexts
 
 		public Dictionary<string, int> GetAnswersFrequencyForChoiceBlock(string courseId, Guid slideId, string quizId)
 		{
-			var answers = db.UserQuizAnswers.Include(q => q.SubmissionId).Where(q => q.Submission.CourseId == courseId && q.Submission.SlideId == slideId && q.BlockId == quizId);
+			var answers = db.UserQuizAnswers.Include(q => q.Submission).Where(q => q.Submission.CourseId == courseId && q.Submission.SlideId == slideId && q.BlockId == quizId);
 			var totalTries = answers.Select(q => new { q.Submission.UserId, q.Submission.Timestamp }).Distinct().Count();
 			/* Don't call GroupBy().ToDictionary() because of performance issues.
 			   See http://code-ninja.org/blog/2014/07/24/entity-framework-never-call-groupby-todictionary/ for details */

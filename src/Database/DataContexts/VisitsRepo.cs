@@ -107,7 +107,6 @@ namespace Database.DataContexts
 			var visits = db.Visits.Where(v => v.CourseId == courseId && v.UserId == userId);
 			if (slidesIds != null)
 				visits = visits.Where(v => slidesIds.Contains(v.SlideId));
-			var vs = visits.Select(v => v.SlideId + " " + v.Score + " " + v.IsSkipped).ToList();
 			return visits
 				.GroupBy(v => v.SlideId, (s, v) => new { Key = s, Value = v.FirstOrDefault() })
 				.ToDictionary(g => g.Key, g => g.Value.Score);

@@ -137,7 +137,8 @@ namespace Database.DataContexts
 			var commentsIds = comments.Select(x => x.Id).ToImmutableHashSet();
 			return db.CommentLikes.Where(x => commentsIds.Contains(x.CommentId))
 				.GroupBy(x => x.CommentId)
-				.ToDictionary(x => x.Key, x => x.Count());
+				.Select(g => new { g.Key, Count = g.Count()})
+				.ToDictionary(p => p.Key, p => p.Count);
 		}
 
 		public IEnumerable<int> GetSlideCommentsLikedByUser(string courseId, Guid slideId, string userId)
