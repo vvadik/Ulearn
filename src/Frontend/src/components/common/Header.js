@@ -266,7 +266,7 @@ class AbstractMyCoursesMenu extends Component {
 class SysAdminMenu extends AbstractMyCoursesMenu {
 	static menuItems(courseIds, courseById) {
 		return [
-			<MenuItem href="/Account/List?role=sysAdmin" component={ LinkComponent } key="Users">
+			<MenuItem href="/Account/List?role=SysAdmin" component={ LinkComponent } key="Users">
 				Пользователи
 			</MenuItem>,
 
