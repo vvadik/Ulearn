@@ -778,7 +778,7 @@ namespace uLearn.Web.Controllers
 		[ChildActionOnly]
 		public ActionResult UsersPartial(UserSearchQueryModel queryModel)
 		{
-			var userRoles = usersRepo.FilterUsers(queryModel, userManager);
+			var userRoles = usersRepo.FilterUsers(queryModel);
 			var model = GetUserListModel(userRoles, queryModel.CourseId);
 
 			return PartialView("_UserListPartial", model);
@@ -1007,7 +1007,7 @@ namespace uLearn.Web.Controllers
 				query.IncludeHighCourseRoles = true;
 			}
 
-			var users = usersRepo.FilterUsers(query, userManager, 10).ToList();
+			var users = usersRepo.FilterUsers(query, 10).ToList();
 			var usersList = users.Select(ur => new UserSearchResultModel
 			{
 				id = ur.UserId,
@@ -1270,7 +1270,7 @@ namespace uLearn.Web.Controllers
 					var userNames = fields[namesColumnIndex];
 
 					var query = new UserSearchQueryModel { NamePrefix = userNames };
-					var users = usersRepo.FilterUsers(query, userManager).Take(10).ToList();
+					var users = usersRepo.FilterUsers(query).Take(10).ToList();
 
 					var exportedParameters = parametersIndeces.ToDictionary(kv => kv.Key, kv => fields[kv.Value]);
 					var certificateModel = new PreviewCertificatesCertificateModel

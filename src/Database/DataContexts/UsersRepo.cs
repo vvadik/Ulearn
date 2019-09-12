@@ -34,7 +34,7 @@ namespace Database.DataContexts
 		}
 
 		/* Pass limit=0 to disable limiting */
-		public List<UserRolesInfo> FilterUsers(UserSearchQueryModel query, UserManager<ApplicationUser> userManager, int limit = 100)
+		public List<UserRolesInfo> FilterUsers(UserSearchQueryModel query, int limit = 100)
 		{
 			var roles = db.Roles.ToList();
 			var role = string.IsNullOrEmpty(query.Role) ? null : roles.FirstOrDefault(r => r.Name == query.Role);

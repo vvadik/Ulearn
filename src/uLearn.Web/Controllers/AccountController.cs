@@ -12,7 +12,6 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using Microsoft.AspNet.Identity;
-using Microsoft.VisualBasic.ApplicationServices;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
@@ -76,26 +75,25 @@ namespace uLearn.Web.Controllers
 		[ChildActionOnly]
 		public ActionResult ListPartial(UserSearchQueryModel queryModel)
 		{
-			var userRoles = usersRepo.FilterUsers(queryModel, userManager);
+			var userRoles = usersRepo.FilterUsers(queryModel);
 			var model = GetUserListModel(userRoles);
 
 			return PartialView("_UserListPartial", model);
 		}
 
-		private UserListModel GetUserListModel(IEnumerable<UserRolesInfo> users)
+		private UserListModel GetUserListModel(List<UserRolesInfo> users)
 		{
 			var coursesForUsers = userRolesRepo.GetCoursesForUsers();
 
 			var courses = User.GetControllableCoursesId().ToList();
-			var usersList = users.ToList();
 
 			var currentUserId = User.Identity.GetUserId();
-			var userIds = usersList.Select(u => u.UserId).ToList();
+			var userIds = users.Select(u => u.UserId).ToList();
 			var model = new UserListModel
 			{
 				CanToggleRoles = User.HasAccess(CourseRole.CourseAdmin),
 				ShowDangerEntities = User.IsSystemAdministrator(),
-				Users = usersList.Select(user => GetUserModel(user, coursesForUsers, courses)).ToList(),
+				Users = users.Select(user => GetUserModel(user, coursesForUsers, courses)).ToList(),
 				UsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courses, userIds, User),
 				UsersArchivedGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courses, userIds, User, onlyArchived: true),
 				CanViewAndToggleCourseAccesses = false,
@@ -117,7 +115,7 @@ namespace uLearn.Web.Controllers
 						new SingleCourseRolesModel
 						{
 							HasAccess = userRoles.Roles.Contains(LmsRoles.SysAdmin.ToString()),
-							ToggleUrl = Url.Action("ToggleSystemRole", new { userId = userRoles.UserId, role = LmsRoles.SysAdmin }),
+							ToggleUrl = Url.Content($"~/Account/{nameof(ToggleSystemRole)}?userId={userRoles.UserId}&role={LmsRoles.SysAdmin}"), // Url.Action is slow: https://www.jitbit.com/alexblog/263-fastest-way-to-generate-urls-in-an-aspnet-mvc-app/
 						}
 					}
 				}
@@ -136,7 +134,7 @@ namespace uLearn.Web.Controllers
 							CourseId = s,
 							CourseTitle = courseManager.GetCourse(s).Title,
 							HasAccess = coursesForUser.ContainsKey(role) && coursesForUser[role].Contains(s.ToLower()),
-							ToggleUrl = Url.Action("ToggleRole", new { courseId = s, userId = user.UserId, role }),
+							ToggleUrl = Url.Content($"~/Account/{nameof(ToggleRole)}?courseId={s}&userId={user.UserId}&role={role}"),
 							UserName = user.UserVisibleName
 						})
 						.OrderBy(s => s.CourseTitle, StringComparer.InvariantCultureIgnoreCase)
@@ -152,7 +150,7 @@ namespace uLearn.Web.Controllers
 					a => new SystemAccessModel
 					{
 						HasAccess = systemAccesses.Contains(a),
-						ToggleUrl = Url.Action("ToggleSystemAccess", "Account", new { userId = user.UserId, accessType = a }),
+						ToggleUrl = Url.Content($"~/Account/{nameof(ToggleSystemAccess)}?userId={user.UserId}&accessType={a}"),
 						UserName = user.UserVisibleName,
 					}
 				);
