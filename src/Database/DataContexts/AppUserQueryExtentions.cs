@@ -8,7 +8,7 @@ namespace Database.DataContexts
 {
 	public static class AppUserQueryExtentions
 	{
-		public static IQueryable<ApplicationUser> FilterByRole(this IQueryable<ApplicationUser> applicationUsers, IdentityRole role, UserManager<ApplicationUser> userManager)
+		public static IQueryable<ApplicationUser> FilterByRole(this IQueryable<ApplicationUser> applicationUsers, IdentityRole role)
 		{
 			return role == null
 				? applicationUsers
@@ -32,7 +32,7 @@ namespace Database.DataContexts
 		}
 
 		/* Pass count=0 to disable limiting */
-		public static List<UserRolesInfo> GetUserRolesInfo(this IQueryable<ApplicationUser> applicationUsers, int count, UserManager<ApplicationUser> userManager)
+		public static List<UserRolesInfo> GetUserRolesInfo(this IQueryable<ApplicationUser> applicationUsers, int count, List<IdentityRole> roles)
 		{
 			IQueryable<ApplicationUser> users = applicationUsers.OrderBy(u => u.UserName);
 			if (count > 0)
@@ -44,7 +44,7 @@ namespace Database.DataContexts
 					UserId = user.Id,
 					UserName = user.UserName,
 					UserVisibleName = user.VisibleName,
-					Roles = userManager.GetRoles(user.Id).ToList()
+					Roles = user.Roles.Select(r => roles.FirstOrDefault(rr => rr.Id == r.RoleId)?.Name).Where(r => r != null).ToList()
 				}).ToList();
 		}
 	}

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
 using System.Linq;
 using System.Threading.Tasks;
@@ -35,8 +36,9 @@ namespace Database.DataContexts
 		/* Pass limit=0 to disable limiting */
 		public List<UserRolesInfo> FilterUsers(UserSearchQueryModel query, UserManager<ApplicationUser> userManager, int limit = 100)
 		{
-			var role = db.Roles.FirstOrDefault(r => r.Name == query.Role);
-			var users = db.Users.Where(u => !u.IsDeleted);
+			var roles = db.Roles.ToList();
+			var role = string.IsNullOrEmpty(query.Role) ? null : roles.FirstOrDefault(r => r.Name == query.Role);
+			var users = db.Users.Include(u => u.Roles).Where(u => !u.IsDeleted);
 			if (!string.IsNullOrEmpty(query.NamePrefix))
 			{
 				var usersIds = GetUsersByNamePrefix(query.NamePrefix).Select(u => u.Id);
@@ -44,12 +46,12 @@ namespace Database.DataContexts
 			}
 
 			return users
-				.FilterByRole(role, userManager)
+				.FilterByRole(role)
 				.FilterByUserIds(
 					userRolesRepo.GetListOfUsersWithCourseRole(query.CourseRole, query.CourseId, query.IncludeHighCourseRoles),
 					userRolesRepo.GetListOfUsersByPrivilege(query.OnlyPrivileged, query.CourseId)
 				)
-				.GetUserRolesInfo(limit, userManager);
+				.GetUserRolesInfo(limit, roles);
 		}
 
 		public List<string> FilterUsersByNamePrefix(string namePrefix)
@@ -64,7 +66,7 @@ namespace Database.DataContexts
 			return db.Users
 				.Where(u => !u.IsDeleted)
 				.FilterByUserIds(userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.Instructor, courseId, includeHighRoles: true))
-				.GetUserRolesInfo(limit, userManager);
+				.GetUserRolesInfo(limit, db.Roles.ToList());
 		}
 
 		/* Pass limit=0 to disable limiting */
@@ -73,15 +75,15 @@ namespace Database.DataContexts
 			return db.Users
 				.Where(u => !u.IsDeleted)
 				.FilterByUserIds(userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.CourseAdmin, courseId, includeHighRoles: true))
-				.GetUserRolesInfo(limit, userManager);
+				.GetUserRolesInfo(limit, db.Roles.ToList());
 		}
 
-		public List<string> GetSysAdminsIds(UserManager<ApplicationUser> userManager)
+		public List<string> GetSysAdminsIds()
 		{
 			var role = db.Roles.FirstOrDefault(r => r.Name == LmsRoles.SysAdmin.ToString());
 			if (role == null)
 				return new List<string>();
-			return db.Users.Where(u => !u.IsDeleted).FilterByRole(role, userManager).Select(u => u.Id).ToList();
+			return db.Users.Where(u => !u.IsDeleted).FilterByRole(role).Select(u => u.Id).ToList();
 		}
 
 		public Task ChangeTelegram(string userId, long chatId, string chatTitle)
