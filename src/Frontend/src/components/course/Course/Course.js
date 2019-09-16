@@ -47,9 +47,9 @@ class Course extends Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { loadUserProgress, isAuthenticated, courseId, slideId } = this.props;
+		const { loadUserProgress, isAuthenticated, courseId, } = this.props;
 
-		if (isAuthenticated !== prevProps.isAuthenticated || slideId !== prevProps.slideId) {
+		if (isAuthenticated !== prevProps.isAuthenticated) {
 			loadUserProgress(courseId);
 		}
 	}
@@ -93,11 +93,12 @@ class Course extends Component {
 		}
 
 		const Page = this.getOpenedPage();
+		const mainClassName = isNavMenuVisible ? styles.pageWrapper : styles.ltiPageWrapper; // TODO remove it
 
 		return (
 			<div className={ classnames(styles.root, { 'open': navigationOpened }) }>
 				{ isNavMenuVisible && this.renderNavigation() }
-				<main className={ styles.pageWrapper }>
+				<main className={ mainClassName }>
 					<Page match={ this.props.match }/>
 				</main>
 			</div>
