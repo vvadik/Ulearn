@@ -46,7 +46,7 @@ namespace RunCheckerJob
 		{
 			var name = Guid.NewGuid();
 			var dockerCommand = BuildDockerCommand(settings, dir, name);
-			log.Info($"Start process command: {dockerCommand}");
+			log.Info($"Start process command: docker {dockerCommand}");
 			using (var dockerShellProcess = BuildShellProcess(dockerCommand))
 			{
 				var sw = Stopwatch.StartNew();
@@ -57,15 +57,16 @@ namespace RunCheckerJob
 				var ms = sw.ElapsedMilliseconds;
 
 				RunningResults unsuccessfulResult = null;
-				if (readErrTask.Result.Length > settings.OutputLimit || readOutTask.Result.Length > settings.OutputLimit)
-				{
-					log.Warn("Программа вывела слишком много");
-					unsuccessfulResult = new RunningResults(Verdict.OutputLimit);
-				}
-				else if (!isFinished)
+
+				if (!isFinished)
 				{
 					log.Warn($"Не хватило времени ({ms} ms) на работу Docker в папке {dir.FullName}");
 					unsuccessfulResult = new RunningResults(Verdict.TimeLimit);
+				}
+				else if (readErrTask.Result.Length > settings.OutputLimit || readOutTask.Result.Length > settings.OutputLimit)
+				{
+					log.Warn("Программа вывела слишком много");
+					unsuccessfulResult = new RunningResults(Verdict.OutputLimit);
 				}
 				else
 					log.Info($"Docker закончил работу за {ms} ms и написал: {readOutTask.Result}");
@@ -114,13 +115,13 @@ namespace RunCheckerJob
 
 			Task.Run(() =>
 			{
-				var cleanup1 = BuildShellProcess($"docker container rm -f {name}");
+				var cleanup1 = BuildShellProcess($"container rm -f {name}");
 				cleanup1.Start();
 				var isCleanupFinished1 = cleanup1.WaitForExit((int)settings.WaitSandboxAfterKilling.TotalMilliseconds);
 				if (isCleanupFinished1)
 					log.Info($"Повисший контейнер {name} очищен");
 				else
-					log.Error($"Не удалось очистить повисший контейнер {name}");
+					log.Error($"Не удалось очистить повисший контейнер {name}. Errors {cleanup1.StandardError.ReadToEnd()}");
 			});
 		}
 
