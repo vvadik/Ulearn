@@ -6,7 +6,7 @@ import Course from '../../components/course/Course';
 
 const mapStateToProps = (state, { match }) => {
 	const courseId = match.params.courseId.toLowerCase();
-	const slideId = match.params.slideId;
+	const slideId = match.params.slideId.split('_').pop(); // TODO rename param slideId to slideSlug
 	const courseInfo = state.courses.fullCoursesInfo[courseId];
 	return {
 		courseId,
