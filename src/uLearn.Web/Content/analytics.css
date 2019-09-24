@@ -70,6 +70,10 @@
 	height: 30px;
 }
 
+.legacy-page .analytics__dashboard .student:nth-child(2n+1) {
+	background-color: #f5f5f5;
+}
+
 .legacy-page .analytics__dashboard #unit-statistics-students-table .small-table__student-progress-cell {
 	display: table-cell;
 	width: 150px;
