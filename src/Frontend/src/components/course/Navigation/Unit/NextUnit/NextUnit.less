@@ -42,6 +42,10 @@
   .open :local {
     .root {
       left: 0;
+
+      @media (min-width: @maxContentWidth) {
+          left: calc((100vw - @maxContentWidth) / 2);
+      }
     }
   }
 }
@@ -94,5 +98,13 @@
 
   .text {
     font-size: 18px;
+  }
+}
+
+@media (min-width: @maxContentWidth) {
+  .root {
+    left: calc((100vw - @maxContentWidth) / 2);
+    border-left: 1px solid @borderColor;
+    border-right: 1px solid @borderColor;
   }
 }
