@@ -50,6 +50,7 @@
     "promise": "8.0.2",
     "promise.prototype.finally": "3.1.0",
     "prop-types": "latest",
+    "query-string": "6.8.3",
     "raf": "3.4.0",
     "react": "16.8.3",
     "react-bootstrap": "0.32.4",
