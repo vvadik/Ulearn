@@ -1,5 +1,12 @@
+@import '../variables.less';
+
 :global .CodeMirror {
+  padding-right: 10px;
   background-color: inherit;
-  margin: auto;
-  text-align: left;
+}
+
+@media (max-width: @maxPhoneWidth) {
+  :global .CodeMirror {
+    padding-right: 25px;
+  }
 }

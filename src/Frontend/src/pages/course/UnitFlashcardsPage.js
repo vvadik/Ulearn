@@ -9,11 +9,12 @@ import getFlashcardsWithTheorySlides from "./getFlashcardsWithTheorySlides";
 const mapStateToProps = (state, { match }) => {
 	let { courseId, slideId } = match.params;
 	courseId = courseId.toLowerCase();
+	slideId = slideId.split('_').pop(); // TODO rename param slideId to slideSlug
 
 	const data = state.courses;
 	const courseInfo = data.fullCoursesInfo[courseId];
 	const infoByUnits = Object.values(data.flashcardsByUnits);
-	const unitId = Course.findUnitIdBySlug(slideId, courseInfo);
+	const unitId = Course.findUnitIdBySlideId(slideId, courseInfo);
 	const unitInfo = data.flashcardsByUnits[unitId];
 
 	if (!courseInfo) {

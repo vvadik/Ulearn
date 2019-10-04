@@ -16,6 +16,22 @@ const icons = {
 };
 
 class NavigationItem extends Component {
+	componentDidMount() {
+		const { ref } = this;
+
+		if (ref) {
+			ref.scrollIntoView();
+		}
+	}
+
+	createRefIfNeeded = (ref) => {
+		const { isActive } = this.props;
+
+		if (isActive) {
+			this.ref = ref;
+		}
+	};
+
 	render() {
 		const { text, url, isActive, description, metro, toggleNavigation } = this.props;
 
@@ -27,7 +43,7 @@ class NavigationItem extends Component {
 
 
 		return (
-			<li className={ styles.root }>
+			<li className={ styles.root } ref={ this.createRefIfNeeded }>
 				<Link to={ url } className={ classnames(classes) } onClick={ toggleNavigation }>
 					{ metro && this.renderMetro() }
 					<div className={ styles.firstLine }>

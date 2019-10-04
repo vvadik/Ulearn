@@ -1,4 +1,4 @@
-﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
+window.documentReadyFunctions = window.documentReadyFunctions || [];
 
 window.documentReadyFunctions.push(function () {
 	var $courseStatistics = $('.course-statistics');
@@ -114,8 +114,7 @@ window.documentReadyFunctions.push(function () {
 
 		$stickyColumn = createTableFirstColumnCopy($table);
 		$stickyColumn.hide();
-		var $legacyContainer = $('<div></div>').addClass('legacy-page').append($stickyColumn);
-		$('body').append($legacyContainer);
+		$('.wide-container').append($stickyColumn);
 
 		relocateStickyHeaderAndColumn($table, $stickyHeader, $stickyColumn, minTopOffset);
 	};
@@ -126,8 +125,7 @@ window.documentReadyFunctions.push(function () {
 
 		$stickyHeader = createTableHeaderCopy($table, minTopOffset);
 		$stickyHeader.hide();
-		var $legacyContainer = $('<div></div>').addClass('legacy-page').append($stickyHeader);
-		$('body').append($legacyContainer);
+		$('.wide-container').append($stickyHeader);
 
 		rerenderStickyColumn($table, minTopOffset);
 	};

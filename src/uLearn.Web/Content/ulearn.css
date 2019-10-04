@@ -1475,3 +1475,17 @@ body.lti-component {
 	margin-left: 50px;
 	display: inline-block;
 }
+
+/*Styling tables in slides*/
+.legacy-page .slide table {
+	width: auto;
+	border: 1px solid #ddd;
+}
+
+.legacy-page .slide table > thead > tr > th,
+.legacy-page .slide table > tbody > tr > td {
+	padding: 8px;
+	line-height: 1.42857143;
+	vertical-align: top;
+	border: 1px solid #ddd;
+}

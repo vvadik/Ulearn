@@ -47,9 +47,9 @@ class Course extends Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { loadUserProgress, isAuthenticated, courseId, slideId } = this.props;
+		const { loadUserProgress, isAuthenticated, courseId, } = this.props;
 
-		if (isAuthenticated !== prevProps.isAuthenticated || slideId !== prevProps.slideId) {
+		if (isAuthenticated !== prevProps.isAuthenticated) {
 			loadUserProgress(courseId);
 		}
 	}
@@ -62,11 +62,11 @@ class Course extends Component {
 		}
 
 		if (state.currentCourseId !== props.courseId || state.currentSlideId !== props.slideId) {
-			const openUnitId = Course.findUnitIdBySlug(props.slideId, props.courseInfo);
+			const openUnitId = Course.findUnitIdBySlideId(props.slideId, props.courseInfo);
 			const openUnit = props.units[openUnitId];
 			window.scrollTo(0, 0);
 
-			const slide = Course.findSlideBySlug(props.slideId, props.courseInfo);
+			const slide = Course.findSlideBySlideId(props.slideId, props.courseInfo);
 			if (slide && props.progress) {
 				props.updateVisitedSlide(props.courseId, slide.id);
 			}
@@ -93,11 +93,12 @@ class Course extends Component {
 		}
 
 		const Page = this.getOpenedPage();
+		const mainClassName = isNavMenuVisible ? styles.pageWrapper : styles.ltiPageWrapper; // TODO remove it
 
 		return (
 			<div className={ classnames(styles.root, { 'open': navigationOpened }) }>
 				{ isNavMenuVisible && this.renderNavigation() }
-				<main className={ styles.pageWrapper }>
+				<main className={ mainClassName }>
 					<Page match={ this.props.match }/>
 				</main>
 			</div>
@@ -156,7 +157,7 @@ class Course extends Component {
 			title: item.title,
 			type: item.type,
 			url: constructPathToSlide(courseId, item.slug),
-			isActive: item.slug === slideId,
+			isActive: item.id === slideId,
 			score: (progress && progress[item.id] && progress[item.id].score) || 0,
 			maxScore: item.maxScore,
 			questionsCount: item.questionsCount,
@@ -175,7 +176,7 @@ class Course extends Component {
 			return AnyPage;
 		}
 
-		const currentSlide = Course.findSlideBySlug(slideId, courseInfo);
+		const currentSlide = Course.findSlideBySlideId(slideId, courseInfo);
 
 		if (currentSlide && currentSlide.type === SLIDETYPE.flashcards) {
 			return UnitFlashcardsPage;
@@ -184,7 +185,7 @@ class Course extends Component {
 		return AnyPage;
 	}
 
-	static findUnitIdBySlug(slideSlug, courseInfo) {
+	static findUnitIdBySlideId(slideId, courseInfo) {
 		if (!courseInfo || !courseInfo.units) {
 			return null;
 		}
@@ -193,7 +194,7 @@ class Course extends Component {
 
 		for (const unit of units) {
 			for (const slide of unit.slides) {
-				if (slideSlug === slide.slug) {
+				if (slideId === slide.id) {
 					return unit.id;
 				}
 			}
@@ -202,7 +203,7 @@ class Course extends Component {
 		return null;
 	}
 
-	static findSlideBySlug(slideSlug, courseInfo) {
+	static findSlideBySlideId(slideId, courseInfo) {
 		if (!courseInfo || !courseInfo.units) {
 			return null;
 		}
@@ -211,7 +212,7 @@ class Course extends Component {
 
 		for (const unit of units) {
 			for (const slide of unit.slides) {
-				if (slideSlug === slide.slug) {
+				if (slideId === slide.id) {
 					return slide;
 				}
 			}

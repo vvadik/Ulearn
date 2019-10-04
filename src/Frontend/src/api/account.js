@@ -37,7 +37,9 @@ export function getRoles() {
 		.then(json => {
 			let courseRoles = json.courseRoles;
 			let courseRolesObject = {};
-			courseRoles.forEach(c => courseRolesObject[c.courseId.toLowerCase()] = c.role);
+			if(courseRoles) {
+				courseRoles.forEach(c => courseRolesObject[c.courseId.toLowerCase()] = c.role);
+			}
 
 			let courseAccesses = json.courseAccesses;
 			let courseAccessesObject = {};
