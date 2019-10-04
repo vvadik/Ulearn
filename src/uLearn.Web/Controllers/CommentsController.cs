@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
 using System.Net;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -13,7 +11,6 @@ using Database.Models;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
-using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
@@ -44,38 +41,14 @@ namespace uLearn.Web.Controllers
 		{
 		}
 
-		public ActionResult SlideComments(string courseId, Guid slideId, bool showOnlyInstructorsOnlyComments = false)
+		public ActionResult SlideComments(string courseId, Guid slideId, bool openInstructorsComments = false)
 		{
 			var course = courseManager.GetCourse(courseId);
 			var slide = course.FindSlideById(slideId);
 			if (slide == null)
 				return Content("");
-			var comments = commentsRepo.GetSlideComments(courseId, slideId).ToList();
-			var commentsPolicy = commentsRepo.GetCommentsPolicy(courseId);
-
-			var commentsByParent = comments.GroupBy(x => x.ParentCommentId)
-				.ToDictionary(x => x.Key, x => x.OrderBy(c => c.PublishTime).ToList());
-
-			/* Top-level comments (with ParentCommentId = -1)
-			   are sorting by publish time, but pinned comments are always higher */
-			List<Comment> topLevelComments;
-			if (commentsByParent.ContainsKey(-1))
-				topLevelComments = commentsByParent.Get(-1)
-					.OrderBy(x => !x.IsPinnedToTop).ThenBy(x => x.PublishTime).ToList();
-			else
-				topLevelComments = new List<Comment>();
 
 			var userId = User.Identity.GetUserId();
-			var commentsLikesCounts = commentsRepo.GetCommentsLikesCounts(comments);
-			var commentsLikedByUser = commentsRepo.GetSlideCommentsLikedByUser(courseId, slideId, userId).ToImmutableHashSet();
-
-			var isAuthorizedAndCanComment = CanAddCommentHere(User, courseId, false);
-			var canReply = CanAddCommentHere(User, courseId, true);
-			var canModerateComments = CanModerateComments(User, courseId);
-			var canSeeNotApprovedComments = canModerateComments;
-
-			var canViewAuthorSubmissions = coursesRepo.HasCourseAccess(userId, courseId, CourseAccessType.ViewAllStudentsSubmissions) || User.HasAccessFor(courseId, CourseRole.CourseAdmin);
-			var canViewProfiles = systemAccessesRepo.HasSystemAccess(userId, SystemAccessType.ViewAllProfiles) || User.IsSystemAdministrator();
 			var systemAccesses = systemAccessesRepo.GetSystemAccesses(userId);
 			var courseAccesses = coursesRepo.GetCourseAccesses(courseId, userId);
 			var slideType = GetSlideType(slide);
@@ -84,20 +57,8 @@ namespace uLearn.Web.Controllers
 			{
 				CourseId = courseId,
 				Slide = slide,
-				IsAuthorizedAndCanComment = isAuthorizedAndCanComment,
-				CanReply = canReply,
-				CanModerateComments = canModerateComments,
-				CanSeeNotApprovedComments = canSeeNotApprovedComments,
-				CanViewAuthorSubmissions = canViewAuthorSubmissions,
-				TopLevelComments = topLevelComments,
-				CommentsByParent = commentsByParent,
-				CommentsLikesCounts = commentsLikesCounts,
-				CommentsLikedByUser = commentsLikedByUser,
 				CurrentUser = User.Identity.IsAuthenticated ? userManager.FindById(userId) : null,
-				CommentsPolicy = commentsPolicy,
-				CanViewAuthorProfiles = canViewProfiles,
-				CanViewAndAddCommentsForInstructorsOnly = CanViewAndAddCommentsForInstructorsOnly(User, courseId),
-				ShowOnlyInstructorsOnlyComments = showOnlyInstructorsOnlyComments,
+				OpenInstructorsComments = openInstructorsComments,
 				CourseAccesses = courseAccesses,
 				SystemAccesses = systemAccesses,
 				SlideType = slideType
@@ -383,20 +344,8 @@ namespace uLearn.Web.Controllers
 	{
 		public string CourseId { get; set; }
 		public Slide Slide { get; set; }
-		public bool IsAuthorizedAndCanComment { get; set; }
-		public bool CanReply { get; set; }
-		public bool CanModerateComments { get; set; }
-		public bool CanSeeNotApprovedComments { get; set; }
-		public bool CanViewAuthorSubmissions { get; set; }
-		public bool CanViewAuthorProfiles { get; set; }
-		public List<Comment> TopLevelComments { get; set; }
-		public Dictionary<int, List<Comment>> CommentsByParent { get; set; }
-		public Dictionary<int, int> CommentsLikesCounts { get; set; }
-		public ImmutableHashSet<int> CommentsLikedByUser { get; set; }
 		public ApplicationUser CurrentUser { get; set; }
-		public CommentsPolicy CommentsPolicy { get; set; }
-		public bool CanViewAndAddCommentsForInstructorsOnly { get; set; }
-		public bool ShowOnlyInstructorsOnlyComments { get; set; }
+		public bool OpenInstructorsComments { get; set; }
 		public List<CourseAccess> CourseAccesses { get; set; }
 		public List<SystemAccess> SystemAccesses { get; set; }
 		public SlideType SlideType { get; set; }
