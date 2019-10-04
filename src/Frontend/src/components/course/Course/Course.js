@@ -9,7 +9,7 @@ import { flashcards, constructPathToSlide } from '../../../consts/routes';
 import { changeCurrentCourseAction } from "../../../actions/course";
 import { SLIDETYPE } from '../../../consts/general';
 
-import queryString from 'query-string';
+import queryString from 'querystring';
 import classnames from 'classnames';
 
 import styles from "./Course.less"
