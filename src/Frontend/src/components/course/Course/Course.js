@@ -9,6 +9,7 @@ import { flashcards, constructPathToSlide } from '../../../consts/routes';
 import { changeCurrentCourseAction } from "../../../actions/course";
 import { SLIDETYPE } from '../../../consts/general';
 
+import queryString from 'querystring';
 import classnames from 'classnames';
 
 import styles from "./Course.less"
@@ -16,10 +17,11 @@ import styles from "./Course.less"
 class Course extends Component {
 	constructor(props) {
 		super(props);
-
-		let pathname = window.location.pathname.toLowerCase();
-		let isLti = pathname.endsWith('/ltislide') || pathname.endsWith('/acceptedalert'); //TODO remove this flag,that hiding nav menu
-		let isNavMenuVisible = !isLti;
+		const queryProps = queryString.parse(props.location.search);
+		const pathname = window.location.pathname.toLowerCase();
+		const isLti = pathname.endsWith('/ltislide') || pathname.endsWith('/acceptedalert'); //TODO remove this flag,that hiding nav menu
+		const isReview = queryProps.CheckQueueItemId !== undefined;
+		const isNavMenuVisible = !isLti && !isReview;
 
 		this.state = {
 			onCourseNavigation: true,
@@ -93,7 +95,7 @@ class Course extends Component {
 		}
 
 		const Page = this.getOpenedPage();
-		const mainClassName = isNavMenuVisible ? styles.pageWrapper : styles.ltiPageWrapper; // TODO remove it
+		const mainClassName = classnames(styles.pageWrapper, { [styles.withoutNavigation]: !isNavMenuVisible }); // TODO remove it
 
 		return (
 			<div className={ classnames(styles.root, { 'open': navigationOpened }) }>
