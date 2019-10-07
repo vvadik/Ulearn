@@ -790,6 +790,10 @@
     <Compile Include="Migrations\201909101254539_UserExerciseSubmissions_ByTime.Designer.cs">
       <DependentUpon>201909101254539_UserExerciseSubmissions_ByTime.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201910071107387_AddLastVisits.cs" />
+    <Compile Include="Migrations\201910071107387_AddLastVisits.Designer.cs">
+      <DependentUpon>201910071107387_AddLastVisits.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AdditionalScore.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -814,6 +818,7 @@
     <Compile Include="Models\GroupLabel.cs" />
     <Compile Include="Models\GroupMember.cs" />
     <Compile Include="Models\ISlideAction.cs" />
+    <Compile Include="Models\LastVisit.cs" />
     <Compile Include="Models\Like.cs" />
     <Compile Include="Models\LmsRoles.cs" />
     <Compile Include="Models\LtiConsumer.cs" />
@@ -1245,6 +1250,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201909101254539_UserExerciseSubmissions_ByTime.resx">
       <DependentUpon>201909101254539_UserExerciseSubmissions_ByTime.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910071107387_AddLastVisits.resx">
+      <DependentUpon>201910071107387_AddLastVisits.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
