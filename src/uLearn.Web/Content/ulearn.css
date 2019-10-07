@@ -273,6 +273,29 @@
 	max-width: 864px;
 }
 
+.legacy-page .main-page .courses-grid {
+	display: grid;
+	grid-template-columns: 1fr;
+	margin-right: -15px;
+	margin-left: -15px;
+}
+
+@media (min-width: 992px) {
+	.legacy-page .main-page .courses-grid {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+.legacy-page .main-page .courses-grid .banner {
+	margin-top: 25px;
+	margin-bottom: 10px;
+}
+
+.legacy-page .main-page .courses-grid .course-tile {
+	padding-right: 15px;
+	padding-left: 15px;
+}
+
 .legacy-page .slide {
 	padding-bottom: 10px;
 }
