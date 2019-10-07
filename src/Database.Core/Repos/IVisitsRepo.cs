@@ -10,7 +10,6 @@ namespace Database.Repos
 	public interface IVisitsRepo
 	{
 		Task AddVisit(string courseId, Guid slideId, string userId, string ipAddress);
-		int GetVisitsCount(Guid slideId, string courseId);
 		Visit FindVisit(string courseId, Guid slideId, string userId);
 		bool IsUserVisitedSlide(string courseId, Guid slideId, string userId);
 		HashSet<Guid> GetIdOfVisitedSlides(string courseId, string userId);
