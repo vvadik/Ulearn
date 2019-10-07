@@ -340,6 +340,8 @@ namespace Database
 			AddIndex<Visit>(modelBuilder, c => new { c.CourseId, c.SlideId, c.UserId });
 			AddIndex<Visit>(modelBuilder, c => new { c.SlideId, c.Timestamp });
 
+			AddIndex<LastVisit>(modelBuilder, c => new { c.CourseId, c.UserId });
+
 			AddIndex<UserFlashcardsVisit>(modelBuilder, c => new { c.UserId, c.CourseId, c.UnitId, c.FlashcardId }, false);
 			AddIndex<UserFlashcardsUnlocking>(modelBuilder, c => new { c.UserId, c.CourseId, c.UnitId }, false);
 		}
@@ -382,6 +384,7 @@ namespace Database
 		public DbSet<UserQuestion> UserQuestions { get; set; }
 		public DbSet<SlideRate> SlideRates { get; set; }
 		public DbSet<Visit> Visits { get; set; }
+		public DbSet<LastVisit> LastVisits { get; set; }
 		public DbSet<SlideHint> Hints { get; set; }
 		public DbSet<Like> SolutionLikes { get; set; }
 		public DbSet<UserQuizAnswer> UserQuizAnswers { get; set; }

@@ -23,6 +23,7 @@ namespace Database.Repos
 		public async Task AddVisit(string courseId, Guid slideId, string userId, string ipAddress)
 		{
 			courseId = courseId.ToLower();
+			await SetLastVisit(courseId, slideId, userId).ConfigureAwait(false);
 			var visit = FindVisit(courseId, slideId, userId);
 			if (visit == null)
 			{
@@ -41,14 +42,35 @@ namespace Database.Repos
 			await db.SaveChangesAsync();
 		}
 
-		public int GetVisitsCount(Guid slideId, string courseId)
+		private async Task SetLastVisit(string courseId, Guid slideId, string userId)
 		{
-			return db.Visits.Count(x => x.CourseId == courseId && x.SlideId == slideId);
+			var lastVisit = FindLastVisit(courseId, userId);
+			if (lastVisit == null)
+			{
+				db.LastVisits.Add(new LastVisit
+				{
+					UserId = userId,
+					CourseId = courseId,
+					SlideId = slideId,
+					Timestamp = DateTime.Now,
+				});
+			}
+			else
+			{
+				lastVisit.SlideId = slideId;
+				lastVisit.Timestamp = DateTime.Now;
+			}
+			await db.SaveChangesAsync().ConfigureAwait(false);;
 		}
 
 		public Visit FindVisit(string courseId, Guid slideId, string userId)
 		{
 			return db.Visits.FirstOrDefault(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId);
+		}
+
+		public LastVisit FindLastVisit(string courseId, string userId)
+		{
+			return db.LastVisits.FirstOrDefault(v => v.CourseId == courseId && v.UserId == userId);
 		}
 
 		public bool IsUserVisitedSlide(string courseId, Guid slideId, string userId)

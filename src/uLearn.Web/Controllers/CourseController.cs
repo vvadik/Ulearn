@@ -86,13 +86,14 @@ namespace uLearn.Web.Controllers
 
 			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
 			var isGuest = !User.Identity.IsAuthenticated;
+			var isInstructor = !isGuest && User.HasAccessFor(course.Id, CourseRole.Instructor);
 
-			var slide = slideGuid == Guid.Empty ? GetInitialSlideForStartup(courseId, visibleUnits) : course.FindSlideById(slideGuid);
+			var slide = slideGuid == Guid.Empty ? GetInitialSlideForStartup(courseId, visibleUnits, isInstructor) : course.FindSlideById(slideGuid);
 
 			if (slide == null)
 			{
 				var instructorNote = course.FindInstructorNoteById(slideGuid);
-				if (instructorNote != null && User.HasAccessFor(course.Id, CourseRole.Instructor))
+				if (instructorNote != null && isInstructor)
 					slide = instructorNote.Slide;
 			}
 
@@ -148,7 +149,8 @@ namespace uLearn.Web.Controllers
 			if (course == null)
 				return HttpNotFound();
 			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
-			var slide = slideIndex == -1 ? GetInitialSlideForStartup(courseId, visibleUnits) : course.Slides[slideIndex];
+			var isInstructor = User.HasAccessFor(course.Id, CourseRole.Instructor);
+			var slide = slideIndex == -1 ? GetInitialSlideForStartup(courseId, visibleUnits, isInstructor) : course.Slides[slideIndex];
 			if (slide == null)
 				return HttpNotFound();
 			return RedirectToRoute("Course.SlideById", new { courseId, slideId = slide.Url });
@@ -227,27 +229,29 @@ namespace uLearn.Web.Controllers
 			return View();
 		}
 
-		private Slide GetInitialSlideForStartup(string courseId, IEnumerable<Unit> visibleUnits)
+		private Slide GetInitialSlideForStartup(string courseId, List<Unit> orderedVisibleUnits, bool isInstructor)
 		{
 			var userId = User.Identity.GetUserId();
-			var visitedIds = visitsRepo.GetIdOfVisitedSlides(courseId, userId);
-			var visibleSlides = visibleUnits.SelectMany(u => u.Slides).ToList();
-			var lastVisited = visibleSlides.LastOrDefault(slide => visitedIds.Contains(slide.Id));
-			if (lastVisited == null)
-				return visibleSlides.Any() ? visibleSlides.First() : null;
-
-			var unitSlides = lastVisited.Info.Unit.Slides.Where(s => visibleSlides.Contains(s)).ToList();
-
-			var lastVisitedSlide = unitSlides.First();
-			foreach (var slide in unitSlides)
+			var lastVisit = visitsRepo.FindLastVisit(courseId, userId);
+			var orderedVisibleSlides = orderedVisibleUnits.SelectMany(u => u.Slides).ToList();
+			if (lastVisit != null)
 			{
-				if (visitedIds.Contains(slide.Id))
-					lastVisitedSlide = slide;
-				else
+				var lastVisitedSlide = orderedVisibleSlides.FirstOrDefault(s => s.Id == lastVisit.SlideId);
+				if (lastVisitedSlide != null)
 					return lastVisitedSlide;
+				if (isInstructor)
+				{
+					var instructorNoteSlide = orderedVisibleUnits.FirstOrDefault(u => u.Id == lastVisit.SlideId)?.InstructorNote?.Slide;
+					if (instructorNoteSlide != null)
+						return instructorNoteSlide;
+				}
 			}
 
-			return lastVisitedSlide;
+			var unorderedVisitedIds = visitsRepo.GetIdOfVisitedSlides(courseId, userId);
+			var lastVisitedVisibleSlide = orderedVisibleSlides.LastOrDefault(slide => unorderedVisitedIds.Contains(slide.Id));
+			if (lastVisitedVisibleSlide != null)
+				return lastVisitedVisibleSlide;
+			return orderedVisibleSlides.Any() ? orderedVisibleSlides.First() : null;
 		}
 
 		private CoursePageModel CreateGuestCoursePageModel(Course course, Slide slide, bool autoplay)
