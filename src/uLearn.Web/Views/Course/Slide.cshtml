@@ -73,28 +73,28 @@
 							{
 	                            @* These comments are dirty hack for removing spaces between words *@
 								<span>
-									(@*												 
+									(@*
 							      *@
 									@if (Model.ContextManualCheckingUserGroups != "")
 									{
-										@Model.ContextManualCheckingUserGroups@*												 
+										@Model.ContextManualCheckingUserGroups@*
 							      *@
 									}
-									@*												 
+									@*
 							      *@
 									@if (Model.ContextManualCheckingUserGroups != "" && Model.ContextManualCheckingUserArchivedGroups != "")
 									{
-@*												 
+@*
 							           *@<text>;</text>
 									}
-									@*												 
+									@*
                                   *@
 									@if (Model.ContextManualCheckingUserArchivedGroups != "")
 									{
-										<text>архивные группы: @Model.ContextManualCheckingUserArchivedGroups</text> @*												 
+										<text>архивные группы: @Model.ContextManualCheckingUserArchivedGroups</text> @*
 							      *@
 									}
-									@*												 
+									@*
 							   *@),
 								</span>
 							}
@@ -123,7 +123,7 @@
 			else
 			{
 				@* On code review show instructors-only comments *@
-				@Html.Action("SlideComments", "Comments", new { courseId = Model.CourseId, slideId = Model.Slide.Id, showOnlyInstructorsOnlyComments = true })
+				@Html.Action("SlideComments", "Comments", new { courseId = Model.CourseId, slideId = Model.Slide.Id, openInstructorsComments = true })
 			}
 
 			@Html.Partial("~/Views/Shared/_Footer.cshtml")

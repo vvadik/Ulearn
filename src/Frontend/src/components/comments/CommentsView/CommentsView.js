@@ -15,7 +15,7 @@ class CommentsView extends Component {
 		this.state = {
 			instructorsComments: [],
 			commentPolicy: {},
-			activeTab: TABS.allComments,
+			activeTab: this.props.openInstructorsComments ? TABS.instructorsComments : TABS.allComments,
 			openModal: false,
 			instructorsCommentCount: 0,
 			tabHasAutomaticallyChanged: false,
@@ -163,6 +163,7 @@ CommentsView.propTypes = {
 	courseId: PropTypes.string.isRequired,
 	slideId: PropTypes.string.isRequired,
 	slideType: PropTypes.string.isRequired,
+	openInstructorsComments: PropTypes.bool
 };
 
 export default CommentsView;

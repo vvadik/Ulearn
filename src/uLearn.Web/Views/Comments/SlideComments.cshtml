@@ -1,61 +1,8 @@
-﻿@using System.Web.Mvc.Html
-@using Database.DataContexts
-@using Database.Extensions
-@using Database.Models
-@using Microsoft.AspNet.Identity
+﻿@using Database.Extensions
 @using uLearn.Web.Controllers
-@using uLearn.Web.Views.Shared
 @using Ulearn.Common.Extensions
-@using Ulearn.Core.Courses.Slides
-@using Ulearn.Core.Courses.Slides.Exercises
-@using FormMethod = System.Web.Mvc.FormMethod
 
 @model SlideCommentsModel
-
-@functions
-{
-
-	private CommentViewModel BuildCommentViewModel(Comment comment, Slide slide)
-	{
-		var replies = Model.CommentsByParent.GetOrDefault(comment.Id, new List<Comment>()).OrderByDescending(x => x.IsApproved).ThenBy(x => x.PublishTime);
-		var isAuthor = comment.AuthorId == User.Identity.GetUserId();
-		return new CommentViewModel
-		{
-			Comment = comment,
-			LikesCount = Model.CommentsLikesCounts.GetOrDefault(comment.Id),
-			IsLikedByUser = Model.CommentsLikedByUser.Contains(comment.Id),
-			Replies = replies.Select(r => BuildCommentViewModel(r, slide)),
-			CanReply = Model.CanReply,
-			CanModerateComment = Model.CanModerateComments,
-			IsCommentVisibleForUser = comment.IsApproved || Model.CanSeeNotApprovedComments || isAuthor,
-			CanEditAndDeleteComment = Model.CanModerateComments || isAuthor,
-			CanViewAuthorSubmissions = slide is ExerciseSlide && Model.CanViewAuthorSubmissions,
-			CurrentUser = Model.CurrentUser,
-			CanViewAuthorProfile = Model.CanViewAuthorProfiles,
-			IsCommentForInstructorsOnly = comment.IsForInstructorsOnly
-		};
-	}
-
-}
-
-@helper TopLevelReplyForm(bool forInstructorsOnly)
-{
-	<div class="reply-form media">
-		@using (Html.BeginForm("AddComment", "Comments", FormMethod.Post))
-		{
-			@Html.Hidden("courseId", Model.CourseId)
-			@Html.Hidden("slideId", Model.Slide.Id)
-			@Html.Hidden("forInstructorsOnly", forInstructorsOnly)
-			<div class="pull-left">
-				@UserAvatar.SmallAvatar(Model.CurrentUser)
-			</div>
-			<div class="media-body">
-				@Html.TextArea("commentText", "", new { placeholder = forInstructorsOnly ? "Оставить комментарий для преподавателей" : "Комментировать..." })
-				<button class="reply-form__send-button btn btn-primary" disabled="disabled">Отправить</button>
-			</div>
-		}
-	</div>
-}
 
 @* Used for ajax in addAntiForgeryToken() *@
 <form id="__AjaxAntiForgeryForm" action="#" method="post">@Html.AntiForgeryToken()</form>
@@ -80,7 +27,7 @@
 		courseAccesses = courseAccesses
 	};
 	var slideType = Model.SlideType;
-	var commentsViewModel = new { slideId = Model.Slide.Id, courseId = Model.CourseId, user = commentsWrapperUser, userRoles = commentsWrapperUserRoles, slideType = slideType }.JsonSerialize();
+	var commentsViewModel = new { slideId = Model.Slide.Id, courseId = Model.CourseId, user = commentsWrapperUser, userRoles = commentsWrapperUserRoles, slideType = slideType, openInstructorsComments = Model.OpenInstructorsComments }.JsonSerialize();
 }
 
 <div class="react-render" data-component="CommentsView" data-props="@commentsViewModel"></div>
