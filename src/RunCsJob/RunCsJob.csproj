@@ -143,6 +143,9 @@
     <None Include="run.cmd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="App.Kontur.config">
+      <DependentUpon>App.config</DependentUpon>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
@@ -173,6 +176,6 @@
     <Compile Remove="test\Program.cs" />
   </ItemGroup>
   <Target Name="CopyFiles" AfterTargets="Build">
-    <Exec Command="copy &quot;$(ProjectDir)App.Kontur.config&quot; &quot;$(TargetPath).Kontur.config&quot;"/>
+    <Exec Command="copy &quot;$(ProjectDir)App.Kontur.config&quot; &quot;$(TargetPath).Kontur.config&quot;" />
   </Target>
 </Project>

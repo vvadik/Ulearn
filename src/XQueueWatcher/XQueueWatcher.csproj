@@ -146,7 +146,12 @@
       <CopyToOutputDirectory>Newer</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup>
+    <None Update="App.Kontur.config">
+      <DependentUpon>App.config</DependentUpon>
+    </None>
+  </ItemGroup>
   <Target Name="CopyFiles" AfterTargets="Build">
-    <Exec Command="copy &quot;$(ProjectDir)App.Kontur.config&quot; &quot;$(TargetPath).Kontur.config&quot;"/>
+    <Exec Command="copy &quot;$(ProjectDir)App.Kontur.config&quot; &quot;$(TargetPath).Kontur.config&quot;" />
   </Target>
 </Project>
