@@ -7,7 +7,6 @@
     <Product>Notifications</Product>
     <Description>Notifications service for ulearn mooc platform</Description>
     <Copyright>Copyright 2014–2018 SKB Kontur</Copyright>
-    <Version>1.0.0.0</Version>
     <Authors>SKB Kontur</Authors>
     <PackageId>Kontur.Ulearn.Notifications</PackageId>
     <PackageLicenseUrl>https://ulearn.me/Home/Terms</PackageLicenseUrl>
