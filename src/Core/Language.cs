@@ -108,7 +108,7 @@ namespace Ulearn.Core
 	{
 		public static bool HasAutomaticChecking(this Language language)
 		{
-			return language == Language.CSharp || language == Language.JavaScript;
+			return language == Language.CSharp || language == Language.JavaScript || language == Language.Python3;
 		}
 
 		public static string GetName(this Language language)
