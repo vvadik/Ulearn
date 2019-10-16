@@ -113,7 +113,7 @@ namespace Database.Repos.Groups
 		public async Task<bool> HasUserEditAccessToGroupAsync(int groupId, string userId)
 		{
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false) ?? throw new ArgumentNullException($"Can't find group with id={groupId}");
-			if ((await GetCoursesWhereUserCanEditAllGroupsAsync(userId).ConfigureAwait(false)).Contains(group.CourseId))
+			if ((await GetCoursesWhereUserCanEditAllGroupsAsync(userId).ConfigureAwait(false)).Contains(group.CourseId, StringComparer.OrdinalIgnoreCase))
 				return true;
 			return await HasUserGrantedAccessToGroupOrIsOwnerAsync(groupId, userId).ConfigureAwait(false);
 		}
@@ -160,7 +160,7 @@ namespace Database.Repos.Groups
 			else
 			{
 				coursesWhereUserCanEditAllGroups = (await GetCoursesWhereUserCanEditAllGroupsAsync(userId).ConfigureAwait(false))
-					.Where(с => coursesIds == null || coursesIds.Contains(с)).ToList();
+					.Where(с => coursesIds == null || coursesIds.Contains(с, StringComparer.OrdinalIgnoreCase)).ToList();
 			}
 
 			var groupsWithAccess = new HashSet<int>(db.GroupAccesses.Where(a => a.UserId == userId && a.IsEnabled).Select(a => a.GroupId));
@@ -168,11 +168,11 @@ namespace Database.Repos.Groups
 				.Include(g => g.Owner)
 				.Where(g => !g.IsDeleted &&
 							(includeNonarchived && !g.IsArchived || includeArchived && g.IsArchived) &&
-							(coursesIds == null || coursesIds.Contains(g.CourseId)) &&
+							(coursesIds == null || coursesIds.Contains(g.CourseId, StringComparer.OrdinalIgnoreCase)) &&
 							(
 								/* Course admins can see all groups */
-								!needEditAccess && coursesWhereUserCanSeeAllGroups.Contains(g.CourseId) ||
-								needEditAccess && coursesWhereUserCanEditAllGroups.Contains(g.CourseId) ||
+								!needEditAccess && coursesWhereUserCanSeeAllGroups.Contains(g.CourseId, StringComparer.OrdinalIgnoreCase) ||
+								needEditAccess && coursesWhereUserCanEditAllGroups.Contains(g.CourseId, StringComparer.OrdinalIgnoreCase) ||
 								/* Other instructor can see only own groups */
 								g.OwnerId == userId || groupsWithAccess.Contains(g.Id)
 							)
