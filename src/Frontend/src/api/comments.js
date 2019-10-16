@@ -1,44 +1,66 @@
 import api from "./index";
+import { commentPoliciesPath, commentsPath, constructPathToComment } from "../consts/routes";
+import { buildQuery } from "../utils";
+import { convertCamelCaseToSnakeCase } from "../utils/caseConverter";
 
-export function getComments(courseId, slideId, isForInstructors) {
-	return api.get(`comments?course_id=${courseId}&slide_id=${slideId}&for_instructors=`
-		+ encodeURIComponent(isForInstructors));
+export function getComments(courseId, slideId, forInstructors, offset = 0, count = 30) {
+	const query = buildQuery({ courseId, slideId, forInstructors, count, offset });
+	const queryInSnakeCase = convertCamelCaseToSnakeCase(query);
+	const url = commentsPath + queryInSnakeCase;
+
+	return api.get(url);
 }
 
 export function getComment(commentId) {
-	return api.get(`comments/${commentId}`);
+	const url = constructPathToComment(commentId);
+
+	return api.get(url);
 }
 
 export function addComment(courseId, slideId, text, parentCommentId, forInstructors) {
-	return api.post(`comments?course_id=${courseId}`,
-		api.createRequestParams({
-			slideId,
-			text,
-			parentCommentId,
-			forInstructors,
-		})
-	);
+	const query = buildQuery({ courseId });
+	const queryInSnakeCase = convertCamelCaseToSnakeCase(query);
+	const url = commentsPath + queryInSnakeCase;
+	const params = api.createRequestParams({
+		slideId,
+		text,
+		parentCommentId,
+		forInstructors,
+	});
+
+	return api.post(url, params);
 }
 
 export function deleteComment(commentId) {
-	return api.delete(`comments/${commentId}`);
+	const url = constructPathToComment(commentId);
+
+	return api.delete(url);
 }
 
 export function updateComment(commentId, commentSettings = {}) {
-	return api.patch(`comments/${commentId}`,
-		api.createRequestParams(commentSettings)
-	);
+	const url = constructPathToComment(commentId);
+	const params = api.createRequestParams(commentSettings);
+
+	return api.patch(url, params);
 }
 
 export function likeComment(commentId) {
-	return api.post(`comments/${commentId}/like`);
+	const url = constructPathToComment(commentId, true);
+
+	return api.post(url);
 }
 
 export function dislikeComment(commentId) {
-	return api.delete(`comments/${commentId}/like`);
+	const url = constructPathToComment(commentId, true);
+
+	return api.delete(url);
 }
 
 export function getCommentPolicy(courseId) {
-	return api.get(`comment-policies?course_id=${courseId}`);
+	const query = buildQuery({ courseId });
+	const queryInSnakeCase = convertCamelCaseToSnakeCase(query);
+	const url = commentPoliciesPath + queryInSnakeCase;
+
+	return api.get(url);
 }
 
