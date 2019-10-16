@@ -418,6 +418,19 @@
 		</xs:simpleContent>
 	</xs:complexType>
 
+	<xs:complexType name="Texts">
+		<xs:sequence minOccurs="0" maxOccurs="unbounded">
+			<xs:choice>
+				<xs:element name="allTestsPassed" type="xs:string" />
+				<xs:element name="allTestsPassedWithoutReview" type="xs:string" />
+				<xs:element name="codeReviewPassed" type="xs:string" />
+				<xs:element name="codeReviewPassedInstructorView" type="xs:string" />
+				<xs:element name="waitingForCodeReview" type="xs:string" />
+				<xs:element name="waitingForCodeReviewInstructorView" type="xs:string" />
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+
 	<xs:complexType name="AbstractExercise">
 		<xs:complexContent>
 			<xs:extension base="IncludeCode">
@@ -438,6 +451,7 @@
 							</xs:simpleContent>
 						</xs:complexType>
 					</xs:element>
+					<xs:element name="texts" type="Texts" minOccurs="0" maxOccurs="1" />
 				</xs:choice>
 				<xs:attribute name="type" use="optional">
 					<xs:simpleType>
