@@ -9,10 +9,11 @@ import { groupAsStudentType } from './../../types';
 import LinksToGroupsStatements from "../../LinksToGroupsStatements/LinksToGroupsStatements";
 
 import styles from './CourseNavigationHeader.less';
+import ProgressBar from "../../ProgressBar";
 
 class CourseNavigationHeader extends Component {
 	render() {
-		const { title, description, groupsAsStudent } = this.props;
+		const { title, description, groupsAsStudent, courseProgress } = this.props;
 		return (
 			<header className={ styles.root }>
 				{ this.renderBreadcrumb() }
@@ -20,6 +21,7 @@ class CourseNavigationHeader extends Component {
 				<h1 className={ styles.h1 } title={ title }>{ title }</h1>
 
 				{ description && <p className={ styles.description }>{ description }</p> }
+				{ courseProgress && <ProgressBar value={ courseProgress } color={ courseProgress >= 1 ? 'green' : 'blue' }/> }
 
 				{ groupsAsStudent.length > 0 && <LinksToGroupsStatements groupsAsStudent={ groupsAsStudent }/> }
 			</header>
@@ -42,6 +44,7 @@ class CourseNavigationHeader extends Component {
 CourseNavigationHeader.propTypes = {
 	title: PropTypes.string.isRequired,
 	description: PropTypes.string,
+	courseProgress: PropTypes.number,
 	groupsAsStudent: PropTypes.arrayOf(PropTypes.shape(groupAsStudentType)),
 };
 

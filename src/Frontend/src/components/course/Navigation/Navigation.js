@@ -89,7 +89,7 @@ class Navigation extends Component {
 	};
 
 	renderCourseNavigation() {
-		const { courseTitle, description, courseItems, containsFlashcards, courseId, slideId, toggleNavigation, groupsAsStudent } = this.props;
+		const { courseTitle, description, courseItems, containsFlashcards, courseId, slideId, toggleNavigation, groupsAsStudent, courseProgress } = this.props;
 
 		return (
 			<div className={ styles.contentWrapper }>
@@ -97,6 +97,7 @@ class Navigation extends Component {
 					title={ courseTitle }
 					description={ description }
 					groupsAsStudent={ groupsAsStudent }
+					courseProgress={ courseProgress }
 				/>
 				{ courseItems && courseItems.length && <CourseNavigationContent items={ courseItems }/> }
 				{ containsFlashcards &&
@@ -114,6 +115,7 @@ Navigation.propTypes = {
 
 	courseId: PropTypes.string,
 	description: PropTypes.string,
+	courseProgress: PropTypes.number,
 	courseItems: PropTypes.arrayOf(PropTypes.shape(courseMenuItemType)),
 	slideId: PropTypes.string,
 	containsFlashcards: PropTypes.bool,

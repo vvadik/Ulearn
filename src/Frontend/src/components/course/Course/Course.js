@@ -124,18 +124,37 @@ class Course extends Component {
 	}
 
 	createCourseSettings() {
-		const { courseInfo, slideId, } = this.props;
+		const { courseInfo, slideId, progress, units } = this.props;
 		const { highlightedUnit, } = this.state;
+
+		let courseScore = 0, courseMaxScore = 0;
+		const scoreByUnits = {};
+		for (const unit of Object.values(units)) {
+			let unitScore = 0, unitMaxScore = 0;
+
+			for (const { maxScore, id } of unit.slides) {
+				unitMaxScore += maxScore;
+				if (progress[id]) {
+					unitScore += progress[id].score;
+				}
+			}
+
+			courseScore += unitScore;
+			courseMaxScore += unitMaxScore;
+			scoreByUnits[unit.id] = unitScore / unitMaxScore;
+		}
 
 		return {
 			slideId: slideId,
 			courseId: courseInfo.id,
 			description: courseInfo.description,
+			courseProgress: courseScore / courseMaxScore,
 			courseItems: courseInfo.units.map(item => ({
 				title: item.title,
 				id: item.id,
 				isActive: highlightedUnit === item.id,
 				onClick: this.unitClickHandle,
+				progress: scoreByUnits[item.id],
 			})),
 			containsFlashcards: courseInfo.containsFlashcards,
 		};
