@@ -108,27 +108,30 @@ class Course extends Component {
 	}
 
 	renderNavigation() {
-		const { courseInfo } = this.props;
+		const { courseInfo, units, progress } = this.props;
 		const { onCourseNavigation, navigationOpened } = this.state;
+		const { byUnits, courseProgress } = this.getCourseStatistics(units, progress);
 
 		const defaultProps = {
 			navigationOpened,
 			courseTitle: courseInfo.title,
+			courseProgress,
 		};
 
 		const additionalProps = onCourseNavigation
-			? this.createCourseSettings()
-			: this.createUnitSettings();
+			? this.createCourseSettings(byUnits)
+			: this.createUnitSettings(byUnits);
 
 		return <Navigation { ...defaultProps } { ...additionalProps }/>;
 	}
 
-	createCourseSettings() {
-		const { courseInfo, slideId, progress, units } = this.props;
-		const { highlightedUnit, } = this.state;
+	getCourseStatistics(units, progress) {
+		const courseStatistics = {
+			courseProgress: 0,
+			byUnits: {},
+		};
 
 		let courseScore = 0, courseMaxScore = 0;
-		const scoreByUnits = {};
 		for (const unit of Object.values(units)) {
 			let unitScore = 0, unitMaxScore = 0;
 
@@ -141,31 +144,39 @@ class Course extends Component {
 
 			courseScore += unitScore;
 			courseMaxScore += unitMaxScore;
-			scoreByUnits[unit.id] = unitScore / unitMaxScore;
+			courseStatistics.byUnits[unit.id] = unitScore / unitMaxScore;
 		}
+		courseStatistics.courseProgress = courseScore / courseMaxScore;
+
+		return courseStatistics;
+	}
+
+	createCourseSettings(scoresByUnits) {
+		const { courseInfo, slideId, } = this.props;
+		const { highlightedUnit, } = this.state;
 
 		return {
 			slideId: slideId,
 			courseId: courseInfo.id,
 			description: courseInfo.description,
-			courseProgress: courseScore / courseMaxScore,
 			courseItems: courseInfo.units.map(item => ({
 				title: item.title,
 				id: item.id,
 				isActive: highlightedUnit === item.id,
 				onClick: this.unitClickHandle,
-				progress: scoreByUnits[item.id],
+				progress: scoresByUnits[item.id],
 			})),
 			containsFlashcards: courseInfo.containsFlashcards,
 		};
 	}
 
-	createUnitSettings() {
+	createUnitSettings(scoresByUnits) {
 		const { courseInfo, slideId, courseId, progress } = this.props;
 		const { openUnit, } = this.state;
 
 		return {
 			unitTitle: openUnit.title,
+			unitProgress: scoresByUnits[openUnit.id],
 			onCourseClick: this.returnInUnitsMenu,
 			unitItems: Course.mapUnitItems(openUnit.slides, progress, courseId, slideId,),
 			nextUnit: Course.findNextUnit(openUnit, courseInfo),

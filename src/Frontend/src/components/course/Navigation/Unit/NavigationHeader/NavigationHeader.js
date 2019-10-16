@@ -8,14 +8,16 @@ import { groupAsStudentType } from "../../types";
 import LinksToGroupsStatements from "../../LinksToGroupsStatements/LinksToGroupsStatements";
 
 import styles from './NavigationHeader.less';
+import ProgressBar from "../../ProgressBar";
 
 class NavigationHeader extends Component {
 	render() {
-		const { createRef, groupsAsStudent } = this.props;
+		const { createRef, groupsAsStudent, progress } = this.props;
 		return (
 			<header ref={ (ref) => createRef(ref) } className={ styles.root }>
 				{ this.renderBreadcrumb() }
 				{ this.renderTitle() }
+				{ progress && <ProgressBar value={ progress } color={ progress >= 1 ? 'green' : 'blue' }/> }
 				{ groupsAsStudent.length > 0 && <LinksToGroupsStatements groupsAsStudent={ groupsAsStudent }/> }
 			</header>
 		);
@@ -44,6 +46,7 @@ class NavigationHeader extends Component {
 NavigationHeader.propTypes = {
 	title: PropTypes.string.isRequired,
 	courseName: PropTypes.string,
+	progress: PropTypes.number,
 	groupsAsStudent: PropTypes.arrayOf(PropTypes.shape(groupAsStudentType)),
 	onCourseClick: PropTypes.func,
 };

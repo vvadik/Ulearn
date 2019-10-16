@@ -64,13 +64,14 @@ class Navigation extends Component {
 	}
 
 	renderUnitNavigation() {
-		const { unitTitle, courseTitle, onCourseClick, unitItems, nextUnit, toggleNavigation, groupsAsStudent, } = this.props;
+		const { unitTitle, courseTitle, onCourseClick, unitItems, nextUnit, toggleNavigation, groupsAsStudent, unitProgress } = this.props;
 
 		return (
 			<div className={ styles.contentWrapper }>
 				< NavigationHeader
 					createRef={ (ref) => this.unitHeaderRef = ref }
 					title={ unitTitle }
+					progress={ unitProgress }
 					courseName={ courseTitle }
 					onCourseClick={ onCourseClick }
 					groupsAsStudent={ groupsAsStudent }
@@ -121,6 +122,7 @@ Navigation.propTypes = {
 	containsFlashcards: PropTypes.bool,
 
 	unitTitle: PropTypes.string,
+	unitProgress: PropTypes.number,
 	unitItems: PropTypes.arrayOf(PropTypes.shape(menuItemType)),
 	nextUnit: PropTypes.shape({
 		title: PropTypes.string,
