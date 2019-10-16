@@ -423,7 +423,7 @@
 			<xs:extension base="IncludeCode">
 				<xs:choice minOccurs="0" maxOccurs="unbounded">
 					<xs:element name="initialCode" type="StringWithXmlSpaces" minOccurs="1" maxOccurs="1" />
-					<xs:element name="hint" type="NonEmptyString" minOccurs="1" maxOccurs="1" />
+					<xs:element name="hint" type="StringWithXmlSpaces" minOccurs="1" maxOccurs="1" />
 					<xs:element name="comment" type="NonEmptyString" minOccurs="1" maxOccurs="1" />
 					<xs:element name="expected" type="StringWithXmlSpaces" minOccurs="1" maxOccurs="1" />
 					<xs:element name="hideSolutions" type="xs:boolean" minOccurs="1" maxOccurs="1" />
