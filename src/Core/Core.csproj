@@ -57,7 +57,7 @@
 			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
 	</ItemGroup>
-	<Target Name="CopyFiles" AfterTargets="Build">
+	<Target Name="CopyFiles" BeforeTargets="AfterBuild;OctoPack">
 		<Copy DestinationFolder="$(OutputPath)" SourceFiles="@(HunspellDlls)" SkipUnchangedFiles="true" />
 	</Target>
 </Project>

@@ -164,7 +164,7 @@
       <DependentUpon>App.config</DependentUpon>
     </None>
   </ItemGroup>
-  <Target Name="CopyFiles" AfterTargets="Build">
+  <Target Name="CopyFiles" BeforeTargets="AfterBuild;OctoPack">
     <Exec Command="copy &quot;$(ProjectDir)App.Kontur.config&quot; &quot;$(TargetPath).Kontur.config&quot;" />
   </Target>
 </Project>
