@@ -559,7 +559,7 @@ namespace Database.DataContexts
 				.Where(s => submissionsIds.Contains(s.Id))
 				.Select(s => new { Hash = s.SolutionCodeHash, SubmissionId = s.Id }).ToList();
 			var textsByHash = textsRepo.GetTextsByHashes(solutionsHashes.Select(s => s.Hash));
-			return solutionsHashes.ToDictionary(s => s.SubmissionId, s => textsByHash.GetOrDefault(s.Hash, ""));
+			return solutionsHashes.ToDictSafe(s => s.SubmissionId, s => textsByHash.GetOrDefault(s.Hash, ""));
 		}
 
 		public async Task WaitAnyUnhandledSubmissions(TimeSpan timeout)
