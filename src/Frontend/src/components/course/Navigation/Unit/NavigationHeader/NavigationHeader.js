@@ -17,7 +17,7 @@ class NavigationHeader extends Component {
 			<header ref={ (ref) => createRef(ref) } className={ styles.root }>
 				{ this.renderBreadcrumb() }
 				{ this.renderTitle() }
-				{ progress && <ProgressBar value={ progress } color={ progress >= 1 ? 'green' : 'blue' }/> }
+				{ this.renderProgress() }
 				{ groupsAsStudent.length > 0 && <LinksToGroupsStatements groupsAsStudent={ groupsAsStudent }/> }
 			</header>
 		);
@@ -40,6 +40,18 @@ class NavigationHeader extends Component {
 		const { title } = this.props;
 
 		return <h2 className={ styles.h2 } title={ title }>{ title }</h2>;
+	}
+
+	renderProgress() {
+		const { progress } = this.props;
+
+		if (progress) {
+			return (
+				<div className={ styles.progressBarWrapper }>
+					<ProgressBar value={ progress } color={ progress >= 1 ? 'green' : 'blue' }/>
+				</div>
+			);
+		}
 	}
 }
 

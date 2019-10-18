@@ -13,7 +13,7 @@ import ProgressBar from "../../ProgressBar";
 
 class CourseNavigationHeader extends Component {
 	render() {
-		const { title, description, groupsAsStudent, courseProgress } = this.props;
+		const { title, description, groupsAsStudent } = this.props;
 		return (
 			<header className={ styles.root }>
 				{ this.renderBreadcrumb() }
@@ -21,7 +21,7 @@ class CourseNavigationHeader extends Component {
 				<h1 className={ styles.h1 } title={ title }>{ title }</h1>
 
 				{ description && <p className={ styles.description }>{ description }</p> }
-				{ courseProgress && <ProgressBar value={ courseProgress } color={ courseProgress >= 1 ? 'green' : 'blue' }/> }
+				{ this.renderProgress() }
 
 				{ groupsAsStudent.length > 0 && <LinksToGroupsStatements groupsAsStudent={ groupsAsStudent }/> }
 			</header>
@@ -38,6 +38,18 @@ class CourseNavigationHeader extends Component {
 				</Link>
 			</nav>
 		);
+	}
+
+	renderProgress() {
+		const { courseProgress } = this.props;
+
+		if (courseProgress) {
+			return (
+				<div className={ styles.progressBarWrapper }>
+					<ProgressBar value={ courseProgress } color={ courseProgress >= 1 ? 'green' : 'blue' }/>
+				</div>
+			);
+		}
 	}
 }
 
