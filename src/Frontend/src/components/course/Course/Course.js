@@ -137,7 +137,7 @@ class Course extends Component {
 
 			for (const { maxScore, id } of unit.slides) {
 				unitMaxScore += maxScore;
-				if (progress[id] && progress[id].score) {
+				if (progress && progress[id] && progress[id].score) {
 					unitScore += progress[id].score;
 				}
 			}
