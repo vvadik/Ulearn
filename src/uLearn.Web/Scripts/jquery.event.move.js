@@ -223,7 +223,11 @@ if (!window.Symbol) {
 	}
 
 	function isIgnoreTag(e) {
-		return !!ignoreTags[e.target.tagName.toLowerCase()];
+		var tagName = e.target.tagName;
+		if (tagName) {
+			return !!ignoreTags[tagName.toLowerCase()];
+		}
+		return false;
 	}
 
 	function isPrimaryButton(e) {

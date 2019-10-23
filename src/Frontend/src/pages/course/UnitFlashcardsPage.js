@@ -7,9 +7,9 @@ import { sendFlashcardResult, loadFlashcards } from '../../actions/course';
 import getFlashcardsWithTheorySlides from "./getFlashcardsWithTheorySlides";
 
 const mapStateToProps = (state, { match }) => {
-	let { courseId, slideId } = match.params;
+	let { courseId, slideSlug } = match.params;
 	courseId = courseId.toLowerCase();
-	slideId = slideId.split('_').pop(); // TODO rename param slideId to slideSlug
+	const slideId = slideSlug.split('_').pop();
 
 	const data = state.courses;
 	const courseInfo = data.fullCoursesInfo[courseId];
