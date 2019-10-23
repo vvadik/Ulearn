@@ -3,7 +3,7 @@ import { commentPoliciesPath, commentsPath, constructPathToComment } from "../co
 import { buildQuery } from "../utils";
 import { convertCamelCaseToSnakeCase } from "../utils/caseConverter";
 
-export function getComments(courseId, slideId, forInstructors, offset = 0, count = 30) {
+export function getComments(courseId, slideId, forInstructors, offset, count) {
 	const query = buildQuery({ courseId, slideId, forInstructors, count, offset });
 	const queryInSnakeCase = convertCamelCaseToSnakeCase(query);
 	const url = commentsPath + queryInSnakeCase;
