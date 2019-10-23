@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
@@ -711,7 +710,7 @@ namespace uLearn.Web.Controllers
 			if (!periodFinish.HasValue)
 				periodFinish = DateTime.Now;
 
-			var slidesIds = slides.Select(s => s.Id).ToImmutableHashSet();
+			var slidesIds = slides.Select(s => s.Id).ToHashSet();
 
 			var dq = visitsRepo.GetVisitsInPeriod(courseId, slidesIds, periodStart, periodFinish.Value)
 				.Select(v => v.UserId)

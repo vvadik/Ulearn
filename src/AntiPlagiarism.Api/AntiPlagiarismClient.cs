@@ -9,7 +9,6 @@ using Serilog.Core;
 using Ulearn.Common;
 using Ulearn.Common.Api;
 using Ulearn.Common.Extensions;
-using HttpClientExtensions = AspNetCore.Http.Extensions.HttpClientExtensions;
 
 namespace AntiPlagiarism.Api
 {

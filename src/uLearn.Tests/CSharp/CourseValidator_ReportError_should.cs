@@ -6,6 +6,7 @@ using FluentAssertions;
 using log4net.Config;
 using Microsoft.VisualBasic.FileIO;
 using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 using test;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
@@ -147,7 +148,6 @@ namespace uLearn.CSharp
 			exerciseBlock.ReplaceStartupObjectForNUnitExercises();
 
 			var validatorOutput = TestsHelper.ValidateBlock(exerciseBlock);
-
 			validatorOutput
 				.Should()
 				.Contain(

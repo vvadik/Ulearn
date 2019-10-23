@@ -11,7 +11,7 @@ namespace RunCsJob
 {
 	public class MsBuildSettings
 	{
-		private const string compilersFolderName = "Microsoft.Net.Compilers.2.10.0";
+		private const string compilersFolderName = "Microsoft.Net.Compilers.3.3.1";
 		private const string wellKnownLibsFolderName = "WellKnownLibs";
 
 		public MsBuildSettings()
@@ -24,7 +24,7 @@ namespace RunCsJob
 		public readonly string BaseDirectory;
 		public DirectoryInfo CompilerDirectory;
 		public readonly DirectoryInfo WellKnownLibsDirectory;
-		public readonly string MsBuildToolsVersion = "15.0";
+		public readonly string MsBuildToolsVersion = "Current";
 	}
 
 	public static class MsBuildRunner

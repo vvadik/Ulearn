@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -436,7 +435,7 @@ namespace uLearn.Web.Controllers
 			var checkedUnnecessary = ans.Count(x => !x.IsRightAnswer);
 
 			var totallyTrueItemIds = choiceBlock.Items.Where(x => x.IsCorrect == ChoiceItemCorrectness.True).Select(x => x.Id);
-			var userItemIds = ans.Select(y => y.ItemId).ToImmutableHashSet();
+			var userItemIds = ans.Select(y => y.ItemId).ToHashSet();
 			var notCheckedNecessary = totallyTrueItemIds.Count(x => !userItemIds.Contains(x));
 
 			return new MistakesCount(checkedUnnecessary, notCheckedNecessary);
