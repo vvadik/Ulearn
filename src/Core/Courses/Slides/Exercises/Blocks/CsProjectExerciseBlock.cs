@@ -24,7 +24,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 	{
 		public const string BuildingTargetFrameworkVersion = "4.7.2";
 		public const string BuildingTargetNetCoreFrameworkVersion = "2.0";
-		public const string BuildingToolsVersion = "Current";
+		public const string BuildingToolsVersion = "15.0";
 
 		private static readonly ILog log = LogManager.GetLogger(typeof(CsProjectExerciseBlock));
 
