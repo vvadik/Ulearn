@@ -2,6 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>net472;netcoreapp2.2</TargetFrameworks>
+		<NoWarn>NU1701;CS0168</NoWarn>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
