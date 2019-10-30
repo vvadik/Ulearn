@@ -135,6 +135,7 @@ namespace Ulearn.Core
 				proj.SetProperty("TargetFrameworkVersion", options.TargetNetCoreFrameworkVersion);
 			else
 				proj.SetProperty("TargetFrameworkVersion", options.TargetFrameworkVersion);
+			proj.SetProperty("Features", "peverify-compat"); // https://developercommunity.visualstudio.com/content/problem/503750/operation-could-destabilize-the-runtime-and-peveri.html
 		}
 
 		public static List<FileToCopy> ReplaceLinksWithItemsAndReturnWhatToCopy(Project project)

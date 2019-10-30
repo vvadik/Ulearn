@@ -42,6 +42,11 @@ csharp_new_line_between_query_expression_clauses=false
 csharp_preferred_modifier_order=public, private, protected, internal, new, abstract, virtual, sealed, override, static, readonly, extern, unsafe, volatile, async:suggestion
 csharp_space_after_cast=false
 
+[*.csproj}]
+indent_style=spaces
+indent_size=spaces
+tab_width=2
+
 [*.{appxmanifest,asax,ascx,aspx,build,cs,cshtml,dtd,fs,fsi,fsscript,fsx,master,ml,mli,nuspec,razor,resw,resx,skin,vb,xaml,xamlx,xoml,xsd}]
 indent_style=tab
 indent_size=tab

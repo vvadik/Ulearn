@@ -2,40 +2,35 @@
 	<PropertyGroup>
 		<RootNamespace>Ulearn.Core</RootNamespace>
 		<LangVersion>7</LangVersion>
-		<TargetFrameworks>net47;netcoreapp2.2</TargetFrameworks>
+		<TargetFrameworks>net472;netcoreapp2.2</TargetFrameworks>
+		<NoWarn>NU1701;CS0168</NoWarn>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="DotNetZip" Version="1.13.3" />
-		<PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
+		<PackageReference Include="JetBrains.Annotations" Version="2019.1.3" />
 		<PackageReference Include="log4net" Version="2.0.8" />
 		<PackageReference Include="MarkdownDeep.NET.Core" Version="1.5.0.4" />
 		<PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.2" />
-		<PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
 		<PackageReference Include="Microsoft.AspNetCore.Html.Abstractions" Version="2.2.0" />
-		<PackageReference Include="Microsoft.Build" Version="15.8.166" />
-		<PackageReference Include="Microsoft.Build.Engine" Version="15.8.166" />
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.8.2" />
-		<PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.2.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.2.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="2.2.0" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.2" />
-		<PackageReference Include="Microsoft.VisualBasic" Version="10.2.0" />
-		<PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+		<PackageReference Include="Microsoft.Build" Version="16.3.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis" Version="3.3.1" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.3.1" />
+		<PackageReference Include="Microsoft.CSharp" Version="4.6.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="3.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="3.0.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
+		<PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
 		<PackageReference Include="NHunspell" Version="1.2.5554.16953" />
-		<PackageReference Include="NUnit" Version="3.10.1" />
-		<PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
+		<PackageReference Include="NUnit" Version="3.10.0" />
+		<PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
 		<PackageReference Include="StatsdClient" Version="2.0.68" />
-		<PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
-		<PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
-		<PackageReference Include="System.Core" Version="3.5.21022.801" />
-		<PackageReference Include="System.IO.Compression" Version="4.3.0" />
-		<PackageReference Include="System.IO.Compression.ZipFile" Version="4.3.0" />
-		<PackageReference Include="System.Security.Principal" Version="4.3.0" />
-		<PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.0" />
-		<PackageReference Include="Telegram.Bot" Version="14.6.0" />
+		<PackageReference Include="System.Collections.Immutable" Version="1.6.0" />
+		<PackageReference Include="System.Text.Encoding.CodePages" Version="4.6.0" />
+		<PackageReference Include="Telegram.Bot" Version="15.0.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Common\Common.csproj" />
@@ -57,7 +52,7 @@
 			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
 	</ItemGroup>
-	<Target Name="CopyFiles" AfterTargets="Build">
+	<Target Name="CopyFiles" BeforeTargets="AfterBuild;OctoPack">
 		<Copy DestinationFolder="$(OutputPath)" SourceFiles="@(HunspellDlls)" SkipUnchangedFiles="true" />
 	</Target>
 </Project>

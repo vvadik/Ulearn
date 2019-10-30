@@ -132,7 +132,7 @@ namespace Stepik.Api
 
 		public CourseExporter(string accessToken)
 			: this(
-				ConfigurationManager.AppSettings["stepik.clientId"],
+				System.Configuration.ConfigurationManager.AppSettings["stepik.clientId"],
 				ConfigurationManager.AppSettings["stepik.clientSecret"],
 				ConfigurationManager.AppSettings["ulearn.baseUrl"],
 				accessToken
@@ -304,7 +304,7 @@ namespace Stepik.Api
 				if (stepId != -1 && stepikLessons.Values.Any(l => l.StepsIds.Contains(stepId)))
 				{
 					var lessonId = stepikLessons.FirstOrDefault(kvp => kvp.Value.StepsIds.Contains(stepId)).Key;
-					// Re-download lesson because it can be changed for a while 
+					// Re-download lesson because it can be changed for a while
 					lesson = await client.GetLesson(lessonId).ConfigureAwait(false);
 					position = lesson.StepsIds.FindIndex(stepId);
 

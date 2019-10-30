@@ -16,7 +16,7 @@ namespace uLearn.CSharp.SpellingValidation
 	[TestFixture]
 	public class SpellingValidator_should
 	{
-		private static DirectoryInfo TestDataDir => new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
+		private static DirectoryInfo TestDataDir => new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..",
 			"..", "CSharp", "SpellingValidation", "TestData"));
 
 		private static DirectoryInfo IncorrectTestDataDir => TestDataDir.GetDirectories("Incorrect").Single();
@@ -91,7 +91,7 @@ namespace uLearn.CSharp.SpellingValidation
 
 			if (errors.Any())
 			{
-				File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
+				File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..",
 						"..", "CSharp", "ExampleFiles", "errors", "spelling_validation", $"{file.Name}_errors.txt"),
 					$@"{fileContent}
 
@@ -110,7 +110,7 @@ namespace uLearn.CSharp.SpellingValidation
 			var errors = validator.FindErrors(fileContent);
 			if (errors.Any())
 			{
-				File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
+				File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..",
 						"..", "CSharp", "ExampleFiles", "submissions_errors", "spelling_validation", $"{file.Name}_errors.txt"),
 					$@"{fileContent}
 

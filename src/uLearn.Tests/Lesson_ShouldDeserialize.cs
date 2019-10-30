@@ -5,6 +5,7 @@ using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Blocks;
@@ -26,42 +27,35 @@ namespace uLearn
 		public void SimpleMdBlock()
 		{
 			var blocks = DeserializeBlocks("<markdown>asd</markdown>");
-			blocks.ShouldBeEquivalentTo(new[] { new MarkdownBlock("asd") });
+			blocks.Should().BeEquivalentTo(new MarkdownBlock("asd"));
 		}
 
 		[Test]
 		public void SeveralMdBlocks()
 		{
 			var blocks = DeserializeBlocks("<markdown>1</markdown><markdown>2</markdown>");
-			blocks.ShouldBeEquivalentTo(new[] { new MarkdownBlock("1"), new MarkdownBlock("2") });
+			blocks.Should().BeEquivalentTo(new MarkdownBlock("1"), new MarkdownBlock("2"));
 		}
 
 		[Test]
 		public void MixedContentInsideMd()
 		{
-			var blocks = DeserializeBlocks("<markdown>1<code>2</code>3</markdown>");
-			blocks.ShouldBeEquivalentTo(new SlideBlock[] { new MarkdownBlock("1"), new CodeBlock("2", null), new MarkdownBlock("3") });
+			var blocks = DeserializeBlocks(@"<markdown>1<code language=""csharp"">2</code>3</markdown>");
+			blocks.Should().BeEquivalentTo(new MarkdownBlock("1"), new CodeBlock("2", Language.CSharp), new MarkdownBlock("3"));
 		}
 
 		[Test]
 		public void OtherTypesOfBlocksAreOK()
 		{
-			var blocks = DeserializeBlocks("<markdown>1</markdown><code>2</code><youtube>sdfsdfsdf</youtube>");
-			blocks.ShouldBeEquivalentTo(new SlideBlock[] { new MarkdownBlock("1"), new CodeBlock("2", null), new MarkdownBlock("3") });
+			var blocks = DeserializeBlocks(@"<markdown>1</markdown><code language=""javascript"">2</code><youtube>sdfsdfsdf</youtube>");
+			blocks.Should().BeEquivalentTo(new MarkdownBlock("1"), new CodeBlock("2", Language.JavaScript), new YoutubeBlock("sdfsdfsdf"));
 		}
 
 		[Test]
 		public void InstructorNotesInsideMd()
 		{
-			var blocks = DeserializeBlocks("<markdown>1<note>secret</note>2<code>3</code>4</markdown>");
-			blocks.ShouldBeEquivalentTo(new SlideBlock[]
-			{
-				new MarkdownBlock("1"),
-				new MarkdownBlock("secret") { Hide = true },
-				new MarkdownBlock("2"),
-				new CodeBlock("3", null),
-				new MarkdownBlock("4")
-			});
+			var blocks = DeserializeBlocks(@"<markdown>1<note>secret</note>2<code language=""javascript"">3</code>4</markdown>");
+			blocks.Should().BeEquivalentTo(new MarkdownBlock("1"), new MarkdownBlock("secret") { Hide = true }, new MarkdownBlock("2"), new CodeBlock("3", Language.JavaScript), new MarkdownBlock("4"));
 		}
 
 		[Test]
