@@ -148,7 +148,8 @@ namespace Database.DataContexts
 		{
 			return db.NotificationTransportSettings
 				.Where(s => s.CourseId == courseId && s.NotificationType == type && transportIds.Contains(s.NotificationTransportId))
-				.ToDictionary(s => s.NotificationTransportId, s => s)
+				.ToList()
+				.ToDictSafe(s => s.NotificationTransportId, s => s)
 				.ToDefaultDictionary(() => null);
 		}
 
@@ -157,7 +158,8 @@ namespace Database.DataContexts
 		{
 			return db.NotificationTransportSettings
 				.Where(s => s.CourseId == courseId && transportIds.Contains(s.NotificationTransportId))
-				.ToDictionary(s => Tuple.Create(s.NotificationTransportId, s.NotificationType), s => s)
+				.ToList()
+				.ToDictSafe(s => Tuple.Create(s.NotificationTransportId, s.NotificationType), s => s)
 				.ToDefaultDictionary(() => null);
 		}
 
@@ -167,7 +169,8 @@ namespace Database.DataContexts
 			return db.NotificationTransportSettings
 				.Include(s => s.NotificationTransport)
 				.Where(s => s.CourseId == courseId && s.NotificationTransport.UserId == userId)
-				.ToDictionary(s => Tuple.Create(s.NotificationTransportId, s.NotificationType), s => s)
+				.ToList()
+				.ToDictSafe(s => Tuple.Create(s.NotificationTransportId, s.NotificationType), s => s)
 				.ToDefaultDictionary(() => null);
 		}
 

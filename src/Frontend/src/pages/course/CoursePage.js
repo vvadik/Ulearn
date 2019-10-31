@@ -3,10 +3,12 @@ import { loadCourse } from "../../actions/course";
 import { loadUserProgress, userProgressUpdate } from "../../actions/user";
 
 import Course from '../../components/course/Course';
+import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, { match }) => {
 	const courseId = match.params.courseId.toLowerCase();
-	const slideId = match.params.slideId.split('_').pop(); // TODO rename param slideId to slideSlug
+	const slideSlug =  match.params.slideSlug;
+	const slideId = slideSlug.split('_').pop();
 	const courseInfo = state.courses.fullCoursesInfo[courseId];
 	return {
 		courseId,
@@ -26,7 +28,7 @@ const mapDispatchToProps = (dispatch) => ({
 
 
 const connected = connect(mapStateToProps, mapDispatchToProps)(Course);
-export default connected;
+export default withRouter(connected);
 
 
 function mapCourseInfoToUnits(courseInfo) {

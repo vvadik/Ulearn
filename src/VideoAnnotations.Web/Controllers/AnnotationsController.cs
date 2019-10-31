@@ -23,7 +23,9 @@ namespace Ulearn.VideoAnnotations.Web.Controllers
 		}
 
 		[HttpGet(Api.Urls.Annotations)]
+#pragma warning disable 1998
 		public async Task<ActionResult<AnnotationsResponse>> Annotations([FromQuery] AnnotationsParameters parameters)
+#pragma warning restore 1998
 		{
 			Dictionary<string, Annotation> annotations;
 			if (!annotationsCache.TryGet(parameters.GoogleDocId, out annotations))

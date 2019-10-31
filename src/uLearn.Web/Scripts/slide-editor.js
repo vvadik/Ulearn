@@ -1,4 +1,4 @@
-﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
+window.documentReadyFunctions = window.documentReadyFunctions || [];
 
 window.documentReadyFunctions.push(function () {
     initCodeEditor();
@@ -628,7 +628,10 @@ function saveExerciseCodeDraft(id) {
 	var solutions = JSON.parse(localStorage['exercise_solutions']);
 
 	if ($('.code-exercise').length > 0) {
-		solutions[id] = $('.code-exercise')[0].codeMirrorEditor.getValue();
+		var editor = $('.code-exercise')[0].codeMirrorEditor;
+		if (editor) {
+			solutions[id] = editor.getValue();
+		}
 		localStorage['exercise_solutions'] = JSON.stringify(solutions);
 	}
 }

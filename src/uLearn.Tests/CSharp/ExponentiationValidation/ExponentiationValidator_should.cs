@@ -12,7 +12,7 @@ namespace uLearn.CSharp.ExponentiationValidation
 	[TestFixture]
 	public class ExponentiationValidator_should
 	{
-		private static DirectoryInfo TestDataDir => new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
+		private static DirectoryInfo TestDataDir => new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..",
 			"..", "CSharp", "ExponentiationValidation", "TestData"));
 
 		private static DirectoryInfo IncorrectTestDataDir => TestDataDir.GetDirectories("Incorrect").Single();
@@ -81,7 +81,7 @@ namespace uLearn.CSharp.ExponentiationValidation
 
 			if (errors != null && errors.Count != 0)
 			{
-				File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
+				File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..",
 						"..", "CSharp", "ExampleFiles", "errors", $"{file.Name}_errors.txt"),
 					$@"{fileContent}
 
@@ -101,7 +101,7 @@ namespace uLearn.CSharp.ExponentiationValidation
 			var errors = validator.FindErrors(fileContent);
 			if (errors != null && errors.Count != 0)
 			{
-				File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..",
+				File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..",
 						"..", "CSharp", "ExampleFiles", "submissions_errors", $"{file.Name}_errors.txt"),
 					$@"{fileContent}
 

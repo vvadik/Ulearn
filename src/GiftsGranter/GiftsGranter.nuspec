@@ -15,7 +15,7 @@
     <tags>ulearn education mooc staff gifts</tags>
   </metadata>
   <files>
-    <file src="bin\*\*.config"/>
+    <file src="bin\*\*\*.config"/>
     <file src="deploy\*" target="deploy\"/>
   </files>
 </package>

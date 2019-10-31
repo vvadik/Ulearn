@@ -22,7 +22,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 	[XmlType("exercise.csproj")]
 	public class CsProjectExerciseBlock : AbstractExerciseBlock
 	{
-		public const string BuildingTargetFrameworkVersion = "4.7";
+		public const string BuildingTargetFrameworkVersion = "4.7.2";
 		public const string BuildingTargetNetCoreFrameworkVersion = "2.0";
 		public const string BuildingToolsVersion = "15.0";
 

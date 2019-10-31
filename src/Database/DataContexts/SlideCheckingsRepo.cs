@@ -164,7 +164,7 @@ namespace Database.DataContexts
 			var quizScore = GetUserScoresForSlide<ManualQuizChecking>(courseId, slideId, userIds);
 			var exerciseScore = GetUserScoresForSlide<ManualExerciseChecking>(courseId, slideId, userIds);
 
-			return userIds.ToDictionary(
+			return userIds.ToDictSafe(
 				userId => userId,
 				userId => Math.Max(quizScore.GetOrDefault(userId, 0), exerciseScore.GetOrDefault(userId, 0))
 			);
@@ -183,7 +183,7 @@ namespace Database.DataContexts
 			var quizScore = GetUserScoresForSlide<AutomaticQuizChecking>(courseId, slideId, userIds);
 			var exerciseScore = GetUserScoresForSlide<AutomaticExerciseChecking>(courseId, slideId, userIds);
 
-			return userIds.ToDictionary(
+			return userIds.ToDictSafe(
 				userId => userId,
 				userId => Math.Max(quizScore.GetOrDefault(userId, 0), exerciseScore.GetOrDefault(userId, 0))
 			);

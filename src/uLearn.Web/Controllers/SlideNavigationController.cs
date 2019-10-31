@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Web.Mvc;
 using Database;
@@ -75,7 +74,7 @@ namespace uLearn.Web.Controllers
 			var scoresForSlides = visitsRepo.GetScoresForSlides(course.Id, userId);
 
 			var solvedSlidesIds = ControllerUtils.GetSolvedSlides(solutionsRepo, userQuizzesRepo, course, userId);
-			var slidesWithUsersManualChecking = visitsRepo.GetSlidesWithUsersManualChecking(course.Id, userId).ToImmutableHashSet();
+			var slidesWithUsersManualChecking = visitsRepo.GetSlidesWithUsersManualChecking(course.Id, userId).ToHashSet();
 			var enabledManualCheckingForUser = groupsRepo.IsManualCheckingEnabledForUser(course, userId);
 			Func<Slide, int> getSlideMaxScoreFunc = s => ControllerUtils.GetMaxScoreForUsersSlide(s, solvedSlidesIds.Contains(s.Id), slidesWithUsersManualChecking.Contains(s.Id), enabledManualCheckingForUser);
 

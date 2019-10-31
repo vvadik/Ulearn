@@ -1,5 +1,10 @@
 @import "../../../variables";
 
+@pageWrapperMinPadding: 20px;
+@pageWrapperLaptopLeftPadding: 32px;
+@pageWrapperLaptopTopPadding: 40px;
+@maxPageWrapperWidth: calc(@maxContentWidth - @maxNavigationMenuWidth);
+
 .root {
   display: flex;
   max-width: 100vw;
@@ -21,13 +26,13 @@
   width: 100%;
   max-width: 100vw;
 
-  padding-left: 20px;
-  padding-right: 20px;
+  padding-left: @pageWrapperMinPadding;
+  padding-right: @pageWrapperMinPadding;
 }
 
 @media (min-width: @maxPhoneWidth) {
   .pageWrapper {
-    max-width: calc(100vw - 40px - 250px);
+    max-width: calc(100vw - @pageWrapperMinPadding*2 - 250px);
     padding-top: 28px;
   }
 }
@@ -35,11 +40,24 @@
 @media (min-width: @maxLaptopWidth) {
   .pageWrapper {
     max-width: 872px;
-    padding-left: 32px;
-    padding-top: 40px;
+    padding-left: @pageWrapperLaptopLeftPadding;
+    padding-top: @pageWrapperLaptopTopPadding;
   }
 
   .root {
     max-width: calc(100vw - 20px);
+  }
+}
+
+@media (min-width: @maxContentWidth) {
+  .root {
+    width: @maxContentWidth;
+    max-width: @maxContentWidth;
+    margin-left: calc((100vw - @maxContentWidth) / 2);
+  }
+
+  .pageWrapper {
+    width: @maxPageWrapperWidth;
+    max-width: @maxPageWrapperWidth;
   }
 }
