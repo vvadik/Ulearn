@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Database;
@@ -104,11 +103,14 @@ namespace Ulearn.Web.Api.Controllers
 		public async Task<ActionResult<CourseInfo>> CourseInfo(Course course)
 		{
 			if (course == null)
-				return Json(new { status = "error", message = "Course not found" });
+				return NotFound(new ErrorResponse("Course not found"));
 
 			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
-			var containsFlashcards = course.Units.Any(x => x.Slides.OfType<FlashcardSlide>().Any());
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(User.GetUserId(), course.Id, CourseRoleType.Instructor).ConfigureAwait(false);
+			if(!isInstructor && visibleUnits.Count == 0)
+				return NotFound(new ErrorResponse("Course not found"));
+
+			var containsFlashcards = course.Units.Any(x => x.Slides.OfType<FlashcardSlide>().Any());
 			var showInstructorsSlides = isInstructor;
 			var getSlideMaxScoreFunc = await BuildGetSlideMaxScoreFunc(solutionsRepo, userQuizzesRepo, visitsRepo, groupsRepo, course, User.GetUserId());
 
