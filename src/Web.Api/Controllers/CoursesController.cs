@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Database;
@@ -7,7 +8,6 @@ using Database.Repos;
 using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 using Database.Repos.Users;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Ulearn.Common.Api.Models.Responses;
@@ -47,6 +47,7 @@ namespace Ulearn.Web.Api.Controllers
 		/// <summary>
 		/// Список курсов
 		/// </summary>
+		/// <param name="role">Роль указывается, если нужно полуичить только те курсы, в которых пользователь имеет роль эту или выше</param>
 		[HttpGet]
 		public async Task<ActionResult<CoursesListResponse>> CoursesList([FromQuery] CourseRoleType? role = null)
 		{
@@ -60,12 +61,22 @@ namespace Ulearn.Web.Api.Controllers
 
 			var isSystemAdministrator = await IsSystemAdministratorAsync().ConfigureAwait(false);
 
+			// Фильтрация по роли. У администратора высшая роль.
 			if (role.HasValue && !isSystemAdministrator)
 			{
 				var courseIdsAsRole = await courseRolesRepo.GetCoursesWhereUserIsInRoleAsync(UserId, role.Value).ConfigureAwait(false);
-				courses = courses.Where(c => courseIdsAsRole.Contains(c.Id, StringComparer.InvariantCultureIgnoreCase)).OrderBy(c => c.Title);
+				courses = courses.Where(c => courseIdsAsRole.Contains(c.Id, StringComparer.InvariantCultureIgnoreCase));
 			}
 
+			// Неопубликованные курсы не покажем тем, кто не имеет роли в них.
+			if (!isSystemAdministrator)
+			{
+				var visibleCourses = unitsRepo.GetVisibleCourses();
+				var coursesInWhichUserHasAnyRole = await courseRolesRepo.GetCoursesWhereUserIsInRoleAsync(UserId, CourseRoleType.Tester).ConfigureAwait(false);
+				courses = courses.Where(c => visibleCourses.Contains(c.Id) || coursesInWhichUserHasAnyRole.Contains(c.Id, StringComparer.OrdinalIgnoreCase));
+			}
+
+			// Администратор видит все курсы. Покажем сверху те, в которых он преподаватель.
 			if (isSystemAdministrator)
 			{
 				var instructorCourseIds = await courseRolesRepo.GetCoursesWhereUserIsInRoleAsync(UserId, CourseRoleType.Instructor).ConfigureAwait(false);
@@ -74,8 +85,9 @@ namespace Ulearn.Web.Api.Controllers
 
 			return new CoursesListResponse
 			{
-				Courses = courses.Select(
-					c => new ShortCourseInfo
+				Courses = courses
+					.OrderBy(c => c.Title)
+					.Select(c => new ShortCourseInfo
 					{
 						Id = c.Id,
 						Title = c.Title,
