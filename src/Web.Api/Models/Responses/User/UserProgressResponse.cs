@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using JetBrains.Annotations;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Common;
 
@@ -16,6 +17,8 @@ namespace Ulearn.Web.Api.Models.Responses.User
 	public class UserSlideResult
 	{
 		public int Score { get; set; }
+		[CanBeNull]
+		public string ScoringGroup { get; set; }
 		public int UsedAttempts { get; set; }
 		public bool IsWaitingForManualChecking { get; set; }
 		public bool Visited { get; set; }

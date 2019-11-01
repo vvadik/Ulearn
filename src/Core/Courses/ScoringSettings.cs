@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
+using JetBrains.Annotations;
 using Ulearn.Common.Extensions;
 
 namespace Ulearn.Core.Courses
@@ -30,11 +31,13 @@ namespace Ulearn.Core.Courses
 		public string DefaultScoringGroup { get; set; } = "";
 
 		[XmlElement("group")]
+		[NotNull]
 		public ScoringGroup[] _groups { get; set; }
 
 		private SortedDictionary<string, ScoringGroup> groupsCache;
 
 		[XmlIgnore]
+		[NotNull]
 		public SortedDictionary<string, ScoringGroup> Groups
 		{
 			get { return groupsCache ?? (groupsCache = _groups.ToDictionary(g => g.Id, g => g).ToSortedDictionary()); }

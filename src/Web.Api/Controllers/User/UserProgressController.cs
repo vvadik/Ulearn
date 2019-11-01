@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
 using Serilog;
 using Ulearn.Common.Api.Models.Responses;
+using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Web.Api.Models.Common;
@@ -53,12 +54,14 @@ namespace Ulearn.Web.Api.Controllers.User
 			{
 				Key = s.Key,
 				Score = s.Value,
+				ScoringGroup = course.FindSlideById(s.Key)?.ScoringGroup ?? "",
 				UsedAttempts = attempts.GetValueOrDefault(s.Key),
 				IsWaitingForManualChecking = waitingSlides.Contains(s.Key),
 			}).ToDictionary(s => s.Key, s => new UserSlideResult
 			{
 				Visited = true,
 				Score = s.Score,
+				ScoringGroup = s.ScoringGroup,
 				UsedAttempts = s.UsedAttempts,
 				IsWaitingForManualChecking = s.IsWaitingForManualChecking,
 			});
