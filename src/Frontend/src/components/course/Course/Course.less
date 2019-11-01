@@ -5,9 +5,15 @@
 @pageWrapperLaptopTopPadding: 40px;
 @maxPageWrapperWidth: calc(@maxContentWidth - @maxNavigationMenuWidth);
 
+.rootWrapper {
+  background-color: @backgroundGray;
+  min-height: calc(100vh - @headerHeight);
+}
+
 .root {
   display: flex;
-  max-width: 100vw;
+  max-width: @maxContentWidth;
+  box-shadow: 0 0 7px 1px #ccc;
 }
 
 .pageWrapper {
@@ -15,9 +21,12 @@
 
   width: 100%;
   max-width: 100vw;
+  min-height: calc(100vh - @headerHeight);
 
   padding-left: 20px;
   padding-right: 20px;
+
+  background-color: #ffffff;
 }
 
 .withoutNavigation {
@@ -32,32 +41,19 @@
 
 @media (min-width: @maxPhoneWidth) {
   .pageWrapper {
-    max-width: calc(100vw - @pageWrapperMinPadding*2 - 250px);
     padding-top: 28px;
   }
 }
 
 @media (min-width: @maxLaptopWidth) {
   .pageWrapper {
-    max-width: 872px;
     padding-left: @pageWrapperLaptopLeftPadding;
     padding-top: @pageWrapperLaptopTopPadding;
-  }
-
-  .root {
-    max-width: calc(100vw - 20px);
   }
 }
 
 @media (min-width: @maxContentWidth) {
   .root {
-    width: @maxContentWidth;
-    max-width: @maxContentWidth;
     margin-left: calc((100vw - @maxContentWidth) / 2);
-  }
-
-  .pageWrapper {
-    width: @maxPageWrapperWidth;
-    max-width: @maxPageWrapperWidth;
   }
 }
