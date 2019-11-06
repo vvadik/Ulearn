@@ -1,17 +1,16 @@
-﻿const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i;
-const rateCookieName = 'youtube-video-rate';
-
-function onYouTubeIframeAPIReady() {
+﻿function onYouTubeIframeAPIReady() {
 	const videoBlocks = document.getElementsByClassName('youtube-video');
+	const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i;
+	const rateCookieName = 'youtube-video-rate';
 	const isMobile = mobileRegex.test(navigator.userAgent);
 	
 	for(let i =0;i<videoBlocks.length;i++){
 		const block = videoBlocks[i];
-		const width = block.getAttribute('data-width') || '390';
-		const height = block.getAttribute('data-height') || '640';
-		const videoId = block.getAttribute('data-video-id');
+		const width = block.dataset.width || '390';
+		const height = block.dataset.height || '640';
+		const videoId = block.dataset.videoId;
 		const isFirstVideoOnSlide = i === 0;
-		const dataAutoPlay = block.getAttribute('data-autoplay') === 'true';
+		const dataAutoPlay = block.dataset.autoplay === 'true';
 		const autoplay = dataAutoPlay && !isMobile && isFirstVideoOnSlide;
 		const elementId = 'youtube-video__' + videoId;
 		block.id = elementId;
