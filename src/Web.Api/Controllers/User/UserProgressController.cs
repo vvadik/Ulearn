@@ -54,14 +54,12 @@ namespace Ulearn.Web.Api.Controllers.User
 			{
 				Key = s.Key,
 				Score = s.Value,
-				ScoringGroup = course.FindSlideById(s.Key)?.ScoringGroup ?? "",
 				UsedAttempts = attempts.GetValueOrDefault(s.Key),
 				IsWaitingForManualChecking = waitingSlides.Contains(s.Key),
 			}).ToDictionary(s => s.Key, s => new UserSlideResult
 			{
 				Visited = true,
 				Score = s.Score,
-				ScoringGroup = s.ScoringGroup,
 				UsedAttempts = s.UsedAttempts,
 				IsWaitingForManualChecking = s.IsWaitingForManualChecking,
 			});
