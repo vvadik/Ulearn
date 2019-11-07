@@ -110,7 +110,7 @@ class Course extends Component {
 	renderNavigation() {
 		const { courseInfo, units, progress } = this.props;
 		const { onCourseNavigation, navigationOpened } = this.state;
-		const { byUnits, courseProgress } = this.getCourseStatistics(units, progress);
+		const { byUnits, courseProgress } = this.getCourseStatistics(units, progress, courseInfo.scoring.groups);
 
 		const defaultProps = {
 			navigationOpened,
@@ -125,26 +125,35 @@ class Course extends Component {
 		return <Navigation { ...defaultProps } { ...additionalProps }/>;
 	}
 
-	getCourseStatistics(units, progress) {
+	getCourseStatistics(units, progress, scoringGroups) {
 		const courseStatistics = {
 			courseProgress: 0,
 			byUnits: {},
 		};
 
+		if (!progress || scoringGroups.length === 0)
+			return courseStatistics;
+
 		let courseScore = 0, courseMaxScore = 0;
 		for (const unit of Object.values(units)) {
 			let unitScore = 0, unitMaxScore = 0;
 
-			for (const { maxScore, id } of unit.slides) {
-				unitMaxScore += maxScore;
-				if (progress && progress[id] && progress[id].score) {
-					unitScore += progress[id].score;
+			for (const { maxScore, id, scoringGroup } of unit.slides) {
+				const group = scoringGroups.find(gr => gr.id === scoringGroup);
+
+				if (!group) {
+					continue;
+				}
+
+				unitMaxScore += maxScore * group.weight;
+				if (progress[id]) {
+					unitScore += progress[id].score * group.weight;
 				}
 			}
 
 			courseScore += unitScore;
 			courseMaxScore += unitMaxScore;
-			courseStatistics.byUnits[unit.id] = unitScore / unitMaxScore;
+			courseStatistics.byUnits[unit.id] = unitScore > 0 ? unitScore / unitMaxScore : 0;
 		}
 		courseStatistics.courseProgress = courseScore / courseMaxScore;
 
