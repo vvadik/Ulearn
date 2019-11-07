@@ -128,11 +128,12 @@ class Header extends Component {
 
 	renderUserRoleMenu() {
 		const { account } = this.props;
+		const hasAccesses = account.isSystemAdministrator || account.courseRoles;
 
 		return (
 			<div>
 				{ this.renderDefaultUserRoleMenu() }
-				{ this.renderPhoneUserRoleMenu() }
+				{ hasAccesses && this.renderPhoneUserRoleMenu() }
 				<Menu account={ account }/>
 			</div>
 		)
