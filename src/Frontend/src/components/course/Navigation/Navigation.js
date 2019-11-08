@@ -10,7 +10,7 @@ import CourseNavigationHeader from "./Course/CourseNavigationHeader";
 import CourseNavigationContent from "./Course/CourseNavigationContent";
 import Flashcards from "./Course/Flashcards/Flashcards";
 
-import { courseMenuItemType, menuItemType, groupAsStudentType } from './types';
+import { courseMenuItemType, menuItemType, groupAsStudentType, progressType } from './types';
 import { flashcards } from "../../../consts/routes";
 
 import { toggleNavigation } from "../../../actions/navigation";
@@ -116,13 +116,13 @@ Navigation.propTypes = {
 
 	courseId: PropTypes.string,
 	description: PropTypes.string,
-	courseProgress: PropTypes.number,
+	courseProgress: PropTypes.shape(progressType),
 	courseItems: PropTypes.arrayOf(PropTypes.shape(courseMenuItemType)),
 	slideId: PropTypes.string,
 	containsFlashcards: PropTypes.bool,
 
 	unitTitle: PropTypes.string,
-	unitProgress: PropTypes.number,
+	unitProgress: PropTypes.shape(progressType),
 	unitItems: PropTypes.arrayOf(PropTypes.shape(menuItemType)),
 	nextUnit: PropTypes.shape({
 		title: PropTypes.string,

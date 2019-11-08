@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import Link from '@skbkontur/react-ui/Link';
 import LeftIcon from '@skbkontur/react-icons/ArrowChevron2Left';
 
-import { groupAsStudentType } from './../../types';
+import { groupAsStudentType, progressType } from './../../types';
 
 import LinksToGroupsStatements from "../../LinksToGroupsStatements/LinksToGroupsStatements";
 
@@ -42,11 +42,12 @@ class CourseNavigationHeader extends Component {
 
 	renderProgress() {
 		const { courseProgress } = this.props;
-
+		const percentage = courseProgress.current / courseProgress.max;
 		if (courseProgress) {
 			return (
-				<div className={ styles.progressBarWrapper }>
-					<ProgressBar value={ courseProgress } color={ courseProgress >= 1 ? 'green' : 'blue' }/>
+				<div className={ styles.progressBarWrapper }
+					 title={ `${ courseProgress.current } из ${ courseProgress.max }` }>
+					<ProgressBar value={ percentage } color={ percentage === 1 ? 'green' : 'blue' }/>
 				</div>
 			);
 		}
@@ -56,7 +57,7 @@ class CourseNavigationHeader extends Component {
 CourseNavigationHeader.propTypes = {
 	title: PropTypes.string.isRequired,
 	description: PropTypes.string,
-	courseProgress: PropTypes.number,
+	courseProgress: PropTypes.shape(progressType),
 	groupsAsStudent: PropTypes.arrayOf(PropTypes.shape(groupAsStudentType)),
 };
 

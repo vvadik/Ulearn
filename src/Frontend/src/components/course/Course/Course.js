@@ -8,11 +8,13 @@ import CourseFlashcardsPage from '../../../pages/course/CourseFlashcardsPage';
 import { flashcards, constructPathToSlide } from '../../../consts/routes';
 import { changeCurrentCourseAction } from "../../../actions/course";
 import { SLIDETYPE } from '../../../consts/general';
+import { SCORING_GROUP_IDS } from '../../../consts/scoringGroup';
 
 import queryString from 'query-string';
 import classnames from 'classnames';
 
 import styles from "./Course.less"
+import { max } from "moment";
 
 class Course extends Component {
 	constructor(props) {
@@ -127,14 +129,13 @@ class Course extends Component {
 
 	getCourseStatistics(units, progress, scoringGroups) {
 		const courseStatistics = {
-			courseProgress: 0,
+			courseProgress: { current: 0, max: 0 },
 			byUnits: {},
 		};
 
 		if (!progress || scoringGroups.length === 0)
 			return courseStatistics;
 
-		let courseScore = 0, courseMaxScore = 0;
 		for (const unit of Object.values(units)) {
 			let unitScore = 0, unitMaxScore = 0;
 
@@ -145,17 +146,23 @@ class Course extends Component {
 					continue;
 				}
 
-				unitMaxScore += maxScore * group.weight;
-				if (progress[id]) {
-					unitScore += progress[id].score * group.weight;
+				if (group.id === SCORING_GROUP_IDS.visits) {
+					unitMaxScore += group.weight;
+					if (progress[id]) {
+						unitScore += group.weight;
+					}
+				} else {
+					unitMaxScore += maxScore * group.weight;
+					if (progress[id]) {
+						unitScore += progress[id].score * group.weight;
+					}
 				}
 			}
 
-			courseScore += unitScore;
-			courseMaxScore += unitMaxScore;
-			courseStatistics.byUnits[unit.id] = unitScore > 0 ? unitScore / unitMaxScore : 0;
+			courseStatistics.courseProgress.current += unitScore;
+			courseStatistics.courseProgress.max += unitMaxScore;
+			courseStatistics.byUnits[unit.id] = { current: unitScore, max: unitMaxScore };
 		}
-		courseStatistics.courseProgress = courseScore / courseMaxScore;
 
 		return courseStatistics;
 	}

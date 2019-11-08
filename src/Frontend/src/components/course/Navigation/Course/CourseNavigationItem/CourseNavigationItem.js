@@ -28,13 +28,14 @@ class CourseNavigationItem extends Component {
 
 	renderProgress() {
 		const { progress, isActive } = this.props;
+		const percentage = progress.current / progress.max;
 
-		if (progress) {
+		if (percentage > 0) {
 			return (
-				<span className={ styles.progressWrapper }>
-					<ProgressBar value={ progress }
+				<span className={ styles.progressWrapper } title={ `${ progress.current } из ${ progress.max }` }>
+					<ProgressBar value={ percentage }
 								 small
-								 color={ progress >= 1 ? 'green' : 'blue' }
+								 color={ percentage === 1 ? 'green' : 'blue' }
 								 active={ isActive }
 					/>
 				</span>
