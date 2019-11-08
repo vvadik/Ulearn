@@ -7,7 +7,7 @@ import { withRouter } from "react-router-dom";
 
 const mapStateToProps = (state, { match }) => {
 	const courseId = match.params.courseId.toLowerCase();
-	const slideSlug =  match.params.slideSlug;
+	const slideSlug = match.params.slideSlug;
 	const slideId = slideSlug.split('_').pop();
 	const courseInfo = state.courses.fullCoursesInfo[courseId];
 	return {
@@ -18,6 +18,7 @@ const mapStateToProps = (state, { match }) => {
 		isAuthenticated: state.account.isAuthenticated,
 		progress: state.user.progress[courseId],
 		navigationOpened: state.navigation.opened,
+		courseLoadingErrorStatus: state.courses.courseLoadingErrorStatus,
 	};
 };
 const mapDispatchToProps = (dispatch) => ({

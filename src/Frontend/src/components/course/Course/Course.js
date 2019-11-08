@@ -13,6 +13,7 @@ import queryString from 'query-string';
 import classnames from 'classnames';
 
 import styles from "./Course.less"
+import Error404 from "../../common/Error/Error404";
 
 class Course extends Component {
 	constructor(props) {
@@ -49,9 +50,10 @@ class Course extends Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { loadUserProgress, isAuthenticated, courseId, } = this.props;
+		const { loadUserProgress, isAuthenticated, courseId, loadCourse, } = this.props;
 
 		if (isAuthenticated !== prevProps.isAuthenticated) {
+			loadCourse(courseId);
 			loadUserProgress(courseId);
 		}
 	}
@@ -87,8 +89,12 @@ class Course extends Component {
 	}
 
 	render() {
-		const { courseInfo } = this.props;
+		const { courseInfo, courseLoadingErrorStatus } = this.props;
 		const { navigationOpened, isNavMenuVisible } = this.state;
+
+		if(courseLoadingErrorStatus){
+			return <Error404/>;
+		}
 
 		if (!courseInfo) {
 			return null;
@@ -267,6 +273,7 @@ Course
 	loadUserProgress: PropTypes.func,
 	updateVisitedSlide: PropTypes.func,
 	navigationOpened: PropTypes.bool,
+	courseLoadingErrorStatus: PropTypes.number,
 };
 
 export default Course;
