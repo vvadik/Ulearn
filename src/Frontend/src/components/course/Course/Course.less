@@ -5,19 +5,29 @@
 @pageWrapperLaptopTopPadding: 40px;
 @maxPageWrapperWidth: calc(@maxContentWidth - @maxNavigationMenuWidth);
 
+.rootWrapper {
+  height: calc(100vh - 50px);
+  overflow: auto;
+}
+
 .root {
   display: flex;
-  max-width: 100vw;
+  max-width: @maxContentWidth;
 }
 
 .pageWrapper {
   position: relative;
 
+  z-index: 0;
+
   width: 100%;
   max-width: 100vw;
+  min-height: calc(100vh - @headerHeight);
 
   padding-left: 20px;
   padding-right: 20px;
+
+  background-color: #ffffff;
 }
 
 .withoutNavigation {
@@ -32,32 +42,26 @@
 
 @media (min-width: @maxPhoneWidth) {
   .pageWrapper {
-    max-width: calc(100vw - @pageWrapperMinPadding*2 - 250px);
     padding-top: 28px;
+    max-width: calc(100vw - @navigationMenuWidth);
+    z-index: unset;
   }
 }
 
 @media (min-width: @maxLaptopWidth) {
   .pageWrapper {
-    max-width: 872px;
     padding-left: @pageWrapperLaptopLeftPadding;
     padding-top: @pageWrapperLaptopTopPadding;
-  }
-
-  .root {
-    max-width: calc(100vw - 20px);
+    max-width: calc(100vw - @maxNavigationMenuWidth);
   }
 }
 
 @media (min-width: @maxContentWidth) {
-  .root {
-    width: @maxContentWidth;
-    max-width: @maxContentWidth;
-    margin-left: calc((100vw - @maxContentWidth) / 2);
+  .rootWrapper{
+    background-color: @backgroundGray;
   }
-
-  .pageWrapper {
-    width: @maxPageWrapperWidth;
-    max-width: @maxPageWrapperWidth;
+  .root {
+    margin-left: calc((100vw - @maxContentWidth) / 2);
+    box-shadow: 0 0 7px 1px #ccc;
   }
 }
