@@ -185,7 +185,7 @@ class Course extends Component {
 		const currentSlide = Course.findSlideBySlideId(slideId, courseInfo);
 
 		if(currentSlide === null){
-			throw new UrlError();
+			//throw new UrlError();
 		}
 
 		if (currentSlide && currentSlide.type === SLIDETYPE.flashcards) {
