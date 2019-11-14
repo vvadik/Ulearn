@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using Serilog;
@@ -40,9 +41,12 @@ namespace AntiPlagiarism.Web
 					var pathFormat = context.Configuration.GetSection("hostLog")["pathFormat"];
 					if (!string.IsNullOrEmpty(pathFormat))
 					{
-						var minimumLevelString = context.Configuration.GetSection("hostLog").GetValue<string>("minimumLevel", "debug");
+						var minimumLevelString = context.Configuration.GetSection("hostLog").GetValue("minimumLevel", "debug");
+						var dbMinimumLevelString = context.Configuration.GetSection("hostLog").GetValue("dbMinimumLevel", "");
 						if (!Enum.TryParse(minimumLevelString, true, out LogEventLevel minimumLevel) || !Enum.IsDefined(typeof(LogEventLevel), minimumLevel))
 							minimumLevel = LogEventLevel.Debug;
+						if (!Enum.TryParse(dbMinimumLevelString, true, out LogEventLevel dbMinimumLevel) || !Enum.IsDefined(typeof(LogEventLevel), dbMinimumLevel))
+							dbMinimumLevel = minimumLevel;
 						if (Path.IsPathRooted(pathFormat))
 						{
 							var directory = Path.GetDirectoryName(pathFormat);
@@ -57,6 +61,12 @@ namespace AntiPlagiarism.Web
 								restrictedToMinimumLevel: minimumLevel,
 								fileSizeLimitBytes: 4 * 1073741824L
 							);
+						
+						if (dbMinimumLevel != minimumLevel)
+						{
+							bool IsDbSource(Serilog.Events.LogEvent le) => (le.Properties.GetValueOrDefault("SourceContext") as ScalarValue)?.Value as string == "Microsoft.EntityFrameworkCore.Database";
+							loggerConfiguration = loggerConfiguration.Filter.ByIncludingOnly(le => le.Level >= dbMinimumLevel || IsDbSource(le));
+						}
 					}
 
 					var hostLog = new SerilogLog(loggerConfiguration.CreateLogger());
