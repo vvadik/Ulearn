@@ -8,7 +8,7 @@
   position: fixed;
   width: @navigationMenuWidth;
   max-width: @navigationMenuWidth;
-  max-height: calc(100vh - @headerHeight - @headerDivider);
+  max-height: calc(100vh - @headerHeight);
   left: -2 * @navigationMenuWidth;
   flex-shrink: 0;
   z-index: @rootZIndex;
@@ -74,9 +74,9 @@
   }
 
   .contentWrapper {
-    top: calc(@headerHeight + @headerDivider);
+    top: calc(@headerHeight);
     bottom: auto;
-    max-height: calc(100vh - @headerHeight - @headerDivider);
+    max-height: calc(100vh - @headerHeight);
   }
 }
 
@@ -89,7 +89,5 @@
   .contentWrapper {
     width: @maxNavigationMenuWidth;
     bottom: 0;
-    border-right: 1px solid @borderColor;
-    border-left: 1px solid @borderColor;
   }
 }

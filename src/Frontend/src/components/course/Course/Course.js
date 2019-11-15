@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 
 import Navigation from "../Navigation";
 import AnyPage from '../../../pages/AnyPage';
+import { UrlError } from "../../common/Error/NotFoundErrorBoundary";
 import UnitFlashcardsPage from '../../../pages/course/UnitFlashcardsPage';
 import CourseFlashcardsPage from '../../../pages/course/CourseFlashcardsPage';
 import { flashcards, constructPathToSlide } from '../../../consts/routes';
@@ -97,14 +98,17 @@ class Course extends Component {
 		}
 
 		const Page = this.getOpenedPage();
+
 		const mainClassName = classnames(styles.pageWrapper, { [styles.withoutNavigation]: !isNavMenuVisible }); // TODO remove it
 
 		return (
-			<div className={ classnames(styles.root, { 'open': navigationOpened }) }>
-				{ isNavMenuVisible && this.renderNavigation() }
-				<main className={ mainClassName }>
-					<Page match={ this.props.match }/>
-				</main>
+			<div className={styles.rootWrapper}>
+				<div className={ classnames(styles.root, { 'open': navigationOpened }) }>
+					{ isNavMenuVisible && this.renderNavigation() }
+					<main className={ mainClassName }>
+						<Page match={ this.props.match }/>
+					</main>
+				</div>
 			</div>
 		);
 	}
@@ -225,6 +229,10 @@ class Course extends Component {
 		}
 
 		const currentSlide = Course.findSlideBySlideId(slideId, courseInfo);
+
+		if(currentSlide === null){
+			//throw new UrlError();
+		}
 
 		if (currentSlide && currentSlide.type === SLIDETYPE.flashcards) {
 			return UnitFlashcardsPage;
