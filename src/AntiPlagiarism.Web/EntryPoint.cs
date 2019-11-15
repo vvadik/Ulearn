@@ -64,8 +64,9 @@ namespace AntiPlagiarism.Web
 						
 						if (dbMinimumLevel != minimumLevel)
 						{
-							bool IsDbSource(Serilog.Events.LogEvent le) => (le.Properties.GetValueOrDefault("SourceContext") as ScalarValue)?.Value as string == "Microsoft.EntityFrameworkCore.Database";
-							loggerConfiguration = loggerConfiguration.Filter.ByIncludingOnly(le => le.Level >= dbMinimumLevel || IsDbSource(le));
+							Func<Serilog.Events.LogEvent, bool> isDbSource = le => ((le.Properties.GetValueOrDefault("SourceContext") as ScalarValue)?.Value as string)?.StartsWith("\"Microsoft.EntityFrameworkCore.Database.Command") ?? false;
+							loggerConfiguration = loggerConfiguration.Filter.ByIncludingOnly(le =>
+								le.Level >= dbMinimumLevel || !isDbSource(le));
 						}
 					}
 
