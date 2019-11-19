@@ -136,24 +136,24 @@ class Course extends Component {
 		if (!progress || scoringGroups.length === 0)
 			return courseStatistics;
 
+		const visitsGroup = scoringGroups.find(gr => gr.id === SCORING_GROUP_IDS.visits);
+
 		for (const unit of Object.values(units)) {
 			let unitScore = 0, unitMaxScore = 0;
 
 			for (const { maxScore, id, scoringGroup } of unit.slides) {
 				const group = scoringGroups.find(gr => gr.id === scoringGroup);
 
-				if (!group) {
-					continue;
+				if (visitsGroup) {
+					unitMaxScore += visitsGroup.weight;
+					if (progress[id] && progress[id].visited) {
+						unitScore += visitsGroup.weight;
+					}
 				}
 
-				if (group.id === SCORING_GROUP_IDS.visits) {
-					unitMaxScore += group.weight;
-					if (progress[id]) {
-						unitScore += group.weight;
-					}
-				} else {
+				if (group) {
 					unitMaxScore += maxScore * group.weight;
-					if (progress[id]) {
+					if (progress[id] && progress[id].score) {
 						unitScore += progress[id].score * group.weight;
 					}
 				}
