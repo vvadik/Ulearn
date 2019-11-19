@@ -184,7 +184,7 @@ class Course extends Component {
 				id: item.id,
 				isActive: highlightedUnit === item.id,
 				onClick: this.unitClickHandle,
-				progress: scoresByUnits[item.id],
+				progress: scoresByUnits.hasOwnProperty(item.id) ? scoresByUnits[item.id] : { current: 0, max: 0 },
 			})),
 			containsFlashcards: courseInfo.containsFlashcards,
 		};
@@ -196,7 +196,7 @@ class Course extends Component {
 
 		return {
 			unitTitle: openUnit.title,
-			unitProgress: scoresByUnits[openUnit.id],
+			unitProgress: scoresByUnits.hasOwnProperty(openUnit.id) ? scoresByUnits[openUnit.id] : { current: 0, max: 0 },
 			onCourseClick: this.returnInUnitsMenu,
 			unitItems: Course.mapUnitItems(openUnit.slides, progress, courseId, slideId,),
 			nextUnit: Course.findNextUnit(openUnit, courseInfo),
