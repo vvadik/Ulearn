@@ -75,7 +75,7 @@ function initCodeEditor($parent) {
     else
         $exerciseCodeBlock = $('.code-reviewed')[0];
 
-    ﻿CodeMirror.commands.autocomplete = function (cm) {
+    CodeMirror.commands.autocomplete = function (cm) {
         var hint = cm.options.langInfo.hint;
         if (hint)
             cm.showHint({ hint: hint });

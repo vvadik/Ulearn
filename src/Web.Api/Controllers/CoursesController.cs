@@ -116,6 +116,8 @@ namespace Ulearn.Web.Api.Controllers
 		private ScoringSettingsModel GetScoringSettings(Course course)
 		{
 			var groups = course.Settings.Scoring.Groups.Values
+				.Concat(new []{course.Settings.Scoring.VisitsGroup})
+				.Where(sg => sg != null)
 				.Select(sg => new ScoringGroupModel
 				{
 					Id = sg.Id,

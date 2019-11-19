@@ -1,5 +1,4 @@
 Scripts\tooltips.js
-Scripts\clipboard.min.js
 Scripts\activate-clipboard.js
 Scripts\buttons.js
 Scripts\respond.js
@@ -8,7 +7,7 @@ Scripts\users-list.js
 Scripts\groups-editor.js
 Scripts\certificates-editor.js
 Scripts\analytics-highcharts.js
-Scripts\likely.js
+Scripts\libs\likely.js
 Scripts\analytics.js
 Scripts\course-statistics.js
 Scripts\suggest-mail-notifications.js

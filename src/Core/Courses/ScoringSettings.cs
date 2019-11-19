@@ -8,6 +8,8 @@ namespace Ulearn.Core.Courses
 {
 	public class ScoringSettings
 	{
+		public const string VisitsGroupId = "visits";
+		
 		public ScoringSettings()
 		{
 			_groups = new ScoringGroup[0];
@@ -40,8 +42,14 @@ namespace Ulearn.Core.Courses
 		[NotNull]
 		public SortedDictionary<string, ScoringGroup> Groups
 		{
-			get { return groupsCache ?? (groupsCache = _groups.ToDictionary(g => g.Id, g => g).ToSortedDictionary()); }
+			get { return groupsCache ?? (groupsCache = _groups.Where(g => g.Id != VisitsGroupId).ToDictionary(g => g.Id, g => g).ToSortedDictionary()); }
 		}
+
+		[CanBeNull]
+		public ScoringGroup VisitsGroup
+		{
+			get { return _groups.FirstOrDefault(g => g.Id == VisitsGroupId); }
+		} 
 
 		public void CopySettingsFrom(ScoringSettings otherScoringSettings)
 		{

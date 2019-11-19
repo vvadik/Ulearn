@@ -16,8 +16,6 @@ import rootReducer from "./redux/reducers";
 import api from "./api";
 import Toast from "@skbkontur/react-ui/components/Toast/Toast";
 
-import styles from "./App.less";
-
 
 let loggerMiddleware = createLogger();
 
@@ -101,7 +99,6 @@ class InternalUlearnApp extends Component {
 					{isHeaderVisible &&
 					<React.Fragment>
 						<Header initializing={this.state.initializing}/>
-						<div className={styles.headerContentDivider} id='headerContentDivider'/>
 					</React.Fragment>
 					}
 					<NotFoundErrorBoundary>

@@ -316,12 +316,12 @@ namespace uLearn.Web.Controllers
 
 					if (hasChanges)
 					{
-						log.Info($"Course '{courseRepo.Id}' has changes in '{repoUrl}'");
+						log.Info($"Course '{courseRepo.CourseId}' has changes in '{repoUrl}'");
 						infoForUpload.Add((courseRepo.CourseId, zip.ToArray(), commitInfo, courseRepo.PathToCourseXml));
 					}
 					else
 					{
-						log.Info($"Course '{courseRepo.Id}' has changes in '{repoUrl}'");
+						log.Info($"Course '{courseRepo.CourseId}' has not changes in '{repoUrl}'");
 					}
 				}
 			}

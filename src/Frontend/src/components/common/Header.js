@@ -158,14 +158,14 @@ class Header extends Component {
 
 		return (
 			<div className={ styles["visible-only-phone"] }>
-				<MobileCourseMenu
+				{controllableCourseIds.length > 0 && <MobileCourseMenu
 					isSystemAdministrator={ isSystemAdministrator }
 					controllableCourseIds={ controllableCourseIds }
 					isCourseMenuVisible={ isCourseMenuVisible }
 					courseId={ isCourseMenuVisible ? currentCourseId : "" }
 					role={ courseRole }
 					accesses={ courseAccesses }
-				/>
+				/>}
 			</div>
 		);
 	}
@@ -476,6 +476,7 @@ CourseMenu = connect(CourseMenu.mapStateToProps)(CourseMenu);
 
 class MobileCourseMenu extends AbstractMyCoursesMenu {
 	render() {
+
 		return (
 			<div className={ styles["header__course-menu"] }>
 				<DropdownMenu
