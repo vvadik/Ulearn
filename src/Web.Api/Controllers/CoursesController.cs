@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Database;
@@ -7,7 +8,6 @@ using Database.Repos;
 using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 using Database.Repos.Users;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Ulearn.Common.Api.Models.Responses;
@@ -99,16 +99,35 @@ namespace Ulearn.Web.Api.Controllers
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(User.GetUserId(), course.Id, CourseRoleType.Instructor).ConfigureAwait(false);
 			var showInstructorsSlides = isInstructor;
 			var getSlideMaxScoreFunc = await BuildGetSlideMaxScoreFunc(solutionsRepo, userQuizzesRepo, visitsRepo, groupsRepo, course, User.GetUserId());
+			var scoringSettings = GetScoringSettings(course);
 
 			return new CourseInfo
 			{
 				Id = course.Id,
 				Title = course.Title,
 				Description = course.Settings.Description,
+				Scoring = scoringSettings,
 				NextUnitPublishTime = unitsRepo.GetNextUnitPublishTime(course.Id),
 				Units = visibleUnits.Select(unit => BuildUnitInfo(course.Id, unit, showInstructorsSlides, getSlideMaxScoreFunc)).ToList(),
 				ContainsFlashcards = containsFlashcards
 			};
+		}
+
+		private ScoringSettingsModel GetScoringSettings(Course course)
+		{
+			var groups = course.Settings.Scoring.Groups.Values
+				.Concat(new []{course.Settings.Scoring.VisitsGroup})
+				.Where(sg => sg != null)
+				.Select(sg => new ScoringGroupModel
+				{
+					Id = sg.Id,
+					Name = sg.Name,
+					Abbr = sg.Abbreviation.NullIfEmptyOrWhitespace(),
+					Description = sg.Description.NullIfEmptyOrWhitespace(),
+					Weight = sg.Weight
+				})
+				.ToList();
+			return new ScoringSettingsModel { Groups = groups };
 		}
 	}
 }

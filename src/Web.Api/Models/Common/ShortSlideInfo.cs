@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using JetBrains.Annotations;
 using Ulearn.Core.Courses.Slides;
 
 namespace Ulearn.Web.Api.Models.Common
@@ -21,6 +22,10 @@ namespace Ulearn.Web.Api.Models.Common
 
 		[DataMember]
 		public int MaxScore { get; set; }
+
+		[DataMember]
+		[CanBeNull]
+		public string ScoringGroup { get; set; }
 
 		[DataMember]
 		public SlideType Type { get; set; }

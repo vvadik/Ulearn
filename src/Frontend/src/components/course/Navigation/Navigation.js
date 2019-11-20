@@ -10,7 +10,7 @@ import CourseNavigationHeader from "./Course/CourseNavigationHeader";
 import CourseNavigationContent from "./Course/CourseNavigationContent";
 import Flashcards from "./Course/Flashcards/Flashcards";
 
-import { courseMenuItemType, menuItemType, groupAsStudentType } from './types';
+import { courseMenuItemType, menuItemType, groupAsStudentType, progressType } from './types';
 import { flashcards } from "../../../consts/routes";
 
 import { toggleNavigation } from "../../../actions/navigation";
@@ -64,13 +64,14 @@ class Navigation extends Component {
 	}
 
 	renderUnitNavigation() {
-		const { unitTitle, courseTitle, onCourseClick, unitItems, nextUnit, toggleNavigation, groupsAsStudent, } = this.props;
+		const { unitTitle, courseTitle, onCourseClick, unitItems, nextUnit, toggleNavigation, groupsAsStudent, unitProgress } = this.props;
 
 		return (
 			<div className={ styles.contentWrapper }>
 				< NavigationHeader
 					createRef={ (ref) => this.unitHeaderRef = ref }
 					title={ unitTitle }
+					progress={ unitProgress }
 					courseName={ courseTitle }
 					onCourseClick={ onCourseClick }
 					groupsAsStudent={ groupsAsStudent }
@@ -89,7 +90,7 @@ class Navigation extends Component {
 	};
 
 	renderCourseNavigation() {
-		const { courseTitle, description, courseItems, containsFlashcards, courseId, slideId, toggleNavigation, groupsAsStudent } = this.props;
+		const { courseTitle, description, courseItems, containsFlashcards, courseId, slideId, toggleNavigation, groupsAsStudent, courseProgress } = this.props;
 
 		return (
 			<div className={ styles.contentWrapper }>
@@ -97,6 +98,7 @@ class Navigation extends Component {
 					title={ courseTitle }
 					description={ description }
 					groupsAsStudent={ groupsAsStudent }
+					courseProgress={ courseProgress }
 				/>
 				{ courseItems && courseItems.length && <CourseNavigationContent items={ courseItems }/> }
 				{ containsFlashcards &&
@@ -114,11 +116,13 @@ Navigation.propTypes = {
 
 	courseId: PropTypes.string,
 	description: PropTypes.string,
+	courseProgress: PropTypes.shape(progressType),
 	courseItems: PropTypes.arrayOf(PropTypes.shape(courseMenuItemType)),
 	slideId: PropTypes.string,
 	containsFlashcards: PropTypes.bool,
 
 	unitTitle: PropTypes.string,
+	unitProgress: PropTypes.shape(progressType),
 	unitItems: PropTypes.arrayOf(PropTypes.shape(menuItemType)),
 	nextUnit: PropTypes.shape({
 		title: PropTypes.string,

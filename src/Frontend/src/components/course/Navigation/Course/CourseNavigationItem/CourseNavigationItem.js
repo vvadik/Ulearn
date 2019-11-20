@@ -8,7 +8,7 @@ import { courseMenuItemType } from "../../types"
 import styles from "./CourseNavigationItem.less";
 
 class CourseNavigationItem extends Component {
-	render () {
+	render() {
 		const { title, isActive } = this.props;
 
 		const classes = {
@@ -27,12 +27,17 @@ class CourseNavigationItem extends Component {
 	}
 
 	renderProgress() {
-		const { progress } = this.props;
+		const { progress, isActive } = this.props;
+		const percentage = progress.current / progress.max;
 
-		if (progress) {
+		if (percentage > 0) {
 			return (
-				<span className={ styles.progressWrapper }>
-					<ProgressBar value={ progress } small color={ progress >= 1 ? 'green' : 'blue' } />
+				<span className={ styles.progressWrapper } title={ `${ progress.current } из ${ progress.max }` }>
+					<ProgressBar value={ percentage }
+								 small
+								 color={ percentage === 1 ? 'green' : 'blue' }
+								 active={ isActive }
+					/>
 				</span>
 			);
 		}
