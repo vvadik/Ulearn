@@ -1372,6 +1372,16 @@ body.lti-component {
 	font-family: monospace;
 }
 
+.legacy-page #exerciseTaskSpoilerButton {
+	display: block;
+	margin-top: -15px;
+	margin-bottom: -15px;
+}
+
+.legacy-page #exerciseTaskSpoiler {
+	margin-top: 20px;
+}
+
 /* Loading spinner */
 .legacy-page .loading-spinner {
 	text-align: center;

@@ -10,6 +10,7 @@
 @using Ulearn.Common.Api
 @using Ulearn.Common.Extensions
 @using Ulearn.Core
+@using Ulearn.Core.Courses.Slides
 @using Ulearn.Core.Courses.Slides.Blocks
 @using Ulearn.Core.Courses.Slides.Exercises
 @using Ulearn.Core.Courses.Slides.Exercises.Blocks
@@ -49,31 +50,59 @@
 
 @helper Blocks(BlockRenderContext context, HtmlHelper Html)
 {
-	var countHiddenBlocks = context.Slide.GetBlockRangesWithSameVisibility().Count(b => b[0].Hide);
+	var shouldSpoilerBlocksBeforeExercise = context.ManualChecking != null && context.Slide.Blocks.OfType<AbstractExerciseBlock>().Any();
+	var ranges = context.Slide.GetBlockRangesWithSameVisibility(shouldSpoilerBlocksBeforeExercise).ToList();
+	var countHiddenBlocks = ranges.Count(b => b[0].Hide);
+	var rangesInSpoilerCount = 0;
 	var firstHiddenBlock = true;
-	foreach (var blockRange in context.Slide.GetBlockRangesWithSameVisibility())
+	if (shouldSpoilerBlocksBeforeExercise)
 	{
-		if (!blockRange[0].Hide)
+		<button id="exerciseTaskSpoilerButton" class="btn btn-light" type="button" data-toggle="collapse" data-target="#exerciseTaskSpoiler" aria-expanded="false" aria-controls="exerciseTaskSpoiler">
+			Показать формулировку
+		</button>
+		<div id="exerciseTaskSpoiler" class="collapse">
+			@foreach (var blockRange in ranges.TakeWhile(blockRange => !(blockRange[0] is AbstractExerciseBlock)))
+			{
+				rangesInSpoilerCount++;
+				@Range(blockRange, countHiddenBlocks, firstHiddenBlock, context, Html)
+				if (firstHiddenBlock && blockRange[0].Hide)
+				{
+					firstHiddenBlock = false;
+				}
+			}
+		</div>
+	}
+	foreach (var blockRange in ranges.Skip(rangesInSpoilerCount))
+	{
+		@Range(blockRange, countHiddenBlocks, firstHiddenBlock, context, Html)
+		if (firstHiddenBlock && blockRange[0].Hide)
 		{
-			foreach (var block in blockRange)
+			firstHiddenBlock = false;
+		}
+	}
+}
+
+@helper Range(SlideBlock[] blockRange, int countHiddenBlocks, bool firstHiddenBlock, BlockRenderContext context, HtmlHelper Html)
+{
+	if (!blockRange[0].Hide)
+	{
+		foreach (var block in blockRange)
+		{
+			@Block((dynamic)block, context, Html)
+		}
+	}
+	else if (context.RevealHidden)
+	{
+		<div class="revealed">
+			@if (firstHiddenBlock)
+			{
+				<div class="revealed__description">Студенты не&nbsp;видят @( countHiddenBlocks > 1 ? "синие блоки" : "этот блок")</div>
+			}
+			@foreach (var block in blockRange)
 			{
 				@Block((dynamic)block, context, Html)
 			}
-		}
-		else if (context.RevealHidden)
-		{
-			<div class="revealed">
-				@if (firstHiddenBlock)
-				{
-					firstHiddenBlock = false;
-					<div class="revealed__description">Студенты не&nbsp;видят @( countHiddenBlocks > 1 ? "синие блоки" : "этот блок")</div>
-				}
-				@foreach (var block in blockRange)
-				{
-					@Block((dynamic)block, context, Html)
-				}
-			</div>
-		}
+		</div>
 	}
 }
 
