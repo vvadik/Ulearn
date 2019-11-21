@@ -294,6 +294,11 @@
 @helper Block(AbstractExerciseBlock block, BlockRenderContext context, HtmlHelper Html)
 {
 	<div class="exercise">
+		@if (context.ManualChecking != null)
+        {
+	        @Html.Action("LastReviewComments", "Exercise", new { courseId = context.Course.Id, slideId = context.Slide.Id, userId = context.ManualChecking.UserId })
+        }
+		
 		@{
 			ExerciseBlockData data = context.GetBlockData(block);
 			var manualCheckingId = context.ManualChecking != null ? (int?)context.ManualChecking.Id : null;
@@ -305,7 +310,7 @@
 			else
 			{
 				<div class="exercise__submission">
-					<textarea class="code code-exercise hidden" data-lang="@block.Language.GetName()">@( block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
+					<textarea class="code code-exercise hidden" data-lang="@block.Language.GetName()">@(block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
 					<div class="loading-spinner">
 						<img src="/Content/loading.gif"/>
 					</div>

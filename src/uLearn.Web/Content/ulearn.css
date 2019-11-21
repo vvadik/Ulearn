@@ -1387,6 +1387,10 @@ body.lti-component {
 	margin-top: 30px;
 }
 
+.legacy-page .exercise__submission {
+	margin-top: 15px;
+}
+
 .legacy-page .exercise__submission .loading-spinner {
 	position: relative;
 	top: -10px;

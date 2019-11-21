@@ -1265,6 +1265,7 @@
     <Content Include="Views\Errors\Error.cshtml" />
     <Content Include="Views\Exercise\StudentSubmissions.cshtml" />
     <Content Include="Views\Exercise\StudentSubmissionsTable.cshtml" />
+    <Content Include="Views\Exercise\_ExerciseLastReviewComments.cshtml" />
     <Content Include="Views\Exercise\_ExerciseReviewComment.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Retargeting.cshtml" />
