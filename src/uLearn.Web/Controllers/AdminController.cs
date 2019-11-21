@@ -596,8 +596,6 @@ namespace uLearn.Web.Controllers
 					new KeyValuePair<Guid, Slide>(Guid.Empty, emptySlideMock)
 				})
 				.OrderBy(s => usedSlidesIds.Contains(s.Key) ? 0 : 1)
-				/* Order slides by frequency in the queue */
-				.ThenByDescending(s => usedCheckings.Count(c => c.SlideId == s.Key))
 				.ThenBy(s => s.Value.Index)
 				.Select(s => new KeyValuePair<Guid, Slide>(s.Key, s.Value))
 				.ToList();
