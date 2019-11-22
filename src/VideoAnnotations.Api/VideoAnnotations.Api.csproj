@@ -2,11 +2,19 @@
 
 	<PropertyGroup>
 		<RootNamespace>Ulearn.VideoAnnotations.Api</RootNamespace>
-		<TargetFrameworks>net47;netcoreapp2.2</TargetFrameworks>
+		<TargetFrameworks>net472;netcoreapp2.2</TargetFrameworks>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\Common.Api\Common.Api.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="System.Net.Http" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="System.Collections.Immutable" Version="1.6.0" />
 	</ItemGroup>
 
 </Project>

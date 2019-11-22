@@ -30,7 +30,6 @@ namespace Ulearn.Web.Api.Controllers
 		/// <summary>
 		/// Статистика по всем флеш-картам в курсе
 		/// </summary>
-		/// <param name="course"></param>
 		/// <returns></returns>
 		[HttpGet]
 		public async Task<ActionResult<FlashcardsStatistics>> FlashcardsStatistics([FromQuery(Name = "course_id")] [BindRequired]

@@ -70,7 +70,7 @@
 					</div>
 					<div class="form-group">
 						<label for="branch">Ветка</label>
-						<input type="text" class="form-control" id="branch" name="branch" value="master"/>
+						<input type="text" class="form-control" id="branch" name="branch" value="@(Model.CourseGit?.Branch ?? "master")"/>
 					</div>
 					<div class="form-group">
 						<label for="pathToCourseXml">Путь до директории с course.xml</label>
@@ -78,7 +78,7 @@
 					</div>
 					<div class="form-group">
 						<div class="checkbox checkbox-default">
-							@Html.CheckBox("isWebhookEnabled", (Model.CourseGit?.IsWebhookEnabled ?? false))
+							@Html.CheckBox("isWebhookEnabled", Model.CourseGit?.IsWebhookEnabled ?? false)
 							<label for="isWebhookEnabled">
 								Загружать новые версии автоматически
 								<div class="form-text text-muted">

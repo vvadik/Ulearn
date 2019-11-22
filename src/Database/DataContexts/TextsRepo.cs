@@ -85,7 +85,7 @@ namespace Database.DataContexts
 
 		public Dictionary<string, string> GetTextsByHashes(IEnumerable<string> hashes)
 		{
-			return db.Texts.Where(t => hashes.Contains(t.Hash)).ToDictionary(t => t.Hash, t => t.Text);
+			return db.Texts.Where(t => hashes.Contains(t.Hash)).ToDictSafe(t => t.Hash, t => t.Text);
 		}
 	}
 }

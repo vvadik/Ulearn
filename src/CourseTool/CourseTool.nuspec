@@ -16,6 +16,6 @@
 		<tags>ulearn education mooc</tags>
 	</metadata>
 	<files>
-		<file src="bin\*\CourseTool.zip" />
+		<file src="bin\*\*\CourseTool.zip" />
 	</files>
 </package>

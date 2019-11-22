@@ -486,6 +486,25 @@ namespace uLearn.Web.Controllers
 
 			return PartialView(model);
 		}
+		
+		public ActionResult LastReviewComments(string courseId, Guid slideId, string userId)
+		{
+			var reviewedSubmission = userSolutionsRepo
+				.GetAllAcceptedSubmissionsByUser(courseId, new []{slideId}, userId)
+				.Where(s => s.ManualCheckings.Any(c => c.IsChecked))
+				.OrderByDescending(s => s.Timestamp)
+				.FirstOrDefault();
+			var lastManualChecking = reviewedSubmission?.ManualCheckings.LastOrDefault(c => c.IsChecked);
+
+			if (lastManualChecking == null || !lastManualChecking.NotDeletedReviews.Any())
+				return new EmptyResult();
+			return PartialView("~/Views/Exercise/_ExerciseLastReviewComments.cshtml",
+				new ExerciseLastReviewCommentModel
+				{
+					ReviewedSubmission = reviewedSubmission,
+					NotDeletedReviews = lastManualChecking.NotDeletedReviews
+				});
+		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		[ChildActionOnly]
@@ -715,6 +734,12 @@ namespace uLearn.Web.Controllers
 		public bool IsCurrentSubmissionChecking { get; set; }
 		public bool DefaultProhibitFurtherReview { get; set; }
 		public int ManualCheckingsLeft { get; set; }
+	}
+
+	public class ExerciseLastReviewCommentModel
+	{
+		public UserExerciseSubmission ReviewedSubmission { get; set; }
+		public List<ExerciseCodeReview> NotDeletedReviews { get; set; }
 	}
 
 	public class StudentSubmissionsModel

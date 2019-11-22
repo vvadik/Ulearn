@@ -33,7 +33,7 @@ namespace RunCsJob
 			};
 			var json = JsonConvert.SerializeObject(inputList, JsonConfig.GetSettings());
 			var deserializedList = JsonConvert.DeserializeObject<List<RunnerSubmission>>(json, JsonConfig.GetSettings());
-			deserializedList.ShouldAllBeEquivalentTo(inputList);
+			deserializedList.Should().BeEquivalentTo(inputList);
 		}
 
 		[Test]

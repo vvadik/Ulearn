@@ -316,12 +316,12 @@ namespace uLearn.Web.Controllers
 
 					if (hasChanges)
 					{
-						log.Info($"Course '{courseRepo.Id}' has changes in '{repoUrl}'");
+						log.Info($"Course '{courseRepo.CourseId}' has changes in '{repoUrl}'");
 						infoForUpload.Add((courseRepo.CourseId, zip.ToArray(), commitInfo, courseRepo.PathToCourseXml));
 					}
 					else
 					{
-						log.Info($"Course '{courseRepo.Id}' has changes in '{repoUrl}'");
+						log.Info($"Course '{courseRepo.CourseId}' has not changes in '{repoUrl}'");
 					}
 				}
 			}
@@ -596,8 +596,6 @@ namespace uLearn.Web.Controllers
 					new KeyValuePair<Guid, Slide>(Guid.Empty, emptySlideMock)
 				})
 				.OrderBy(s => usedSlidesIds.Contains(s.Key) ? 0 : 1)
-				/* Order slides by frequency in the queue */
-				.ThenByDescending(s => usedCheckings.Count(c => c.SlideId == s.Key))
 				.ThenBy(s => s.Value.Index)
 				.Select(s => new KeyValuePair<Guid, Slide>(s.Key, s.Value))
 				.ToList();

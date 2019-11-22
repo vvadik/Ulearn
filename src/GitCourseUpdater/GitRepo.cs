@@ -22,7 +22,7 @@ namespace GitCourseUpdater
 		MemoryStream GetCurrentStateAsZip(string courseSubdirectoryInRepo = null);
 		CommitInfo GetCurrentCommitInfo();
 		CommitInfo GetCommitInfo(string hash);
-		IEnumerable<string> GetChangedFiles(string fromHash, string toHash, string courseSubdirectoryInRepo = null);
+		List<string> GetChangedFiles(string fromHash, string toHash, string courseSubdirectoryInRepo = null);
 		void Checkout(string commitHashOrBranchName);
 	}
 
@@ -126,17 +126,28 @@ namespace GitCourseUpdater
 
 		// null, если коммит не найден. Возвращает полные пути в репозитории
 		[CanBeNull]
-		public IEnumerable<string> GetChangedFiles(string fromHash, string toHash, string courseSubdirectoryInRepo = null)
+		public List<string> GetChangedFiles(string fromHash, string toHash, string courseSubdirectoryInRepo = null)
 		{
 			var commitFrom = repo.Lookup<Commit>(fromHash);
 			var commitTo = repo.Lookup<Commit>(toHash);
 			if (commitFrom == null || commitTo == null)
 				return null;
 			var treeChanges = repo.Diff.Compare<TreeChanges>(commitFrom.Tree, commitTo.Tree);
-			var paths = treeChanges.Select(c => c.Path);
+			var paths = treeChanges.Select(c => c.Path).ToList();
+			logger.Information($"All changed files in repo '{url}' between '{commitFrom}' '{commitTo}' courseSubdirectory '{courseSubdirectoryInRepo}':");
+			foreach (var path in paths)
+				logger.Information($"Path: '{path}'");
 			if (courseSubdirectoryInRepo != null)
-				paths = paths.Where(p => p.StartsWith(courseSubdirectoryInRepo));
+			{
+				var normalisedCourseSubdirectoryInRepo = NormalizePath(courseSubdirectoryInRepo);
+				paths = paths.Where(p => NormalizePath(p).StartsWith(normalisedCourseSubdirectoryInRepo, StringComparison.OrdinalIgnoreCase)).ToList();
+			}
 			return paths;
+		}
+		
+		private static string NormalizePath(string path)
+		{
+			return path.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).Trim(Path.AltDirectorySeparatorChar);
 		}
 
 		private static readonly Regex sha1Regex = new Regex("[a-f0-9]{40}", RegexOptions.Compiled | RegexOptions.IgnoreCase);

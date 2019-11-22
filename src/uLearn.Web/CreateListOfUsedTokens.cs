@@ -4,8 +4,6 @@ using System.Linq;
 using Database;
 using Microsoft.CodeAnalysis.CSharp;
 using NUnit.Framework;
-using Ulearn.Core.Courses.Slides;
-using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 

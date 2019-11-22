@@ -422,7 +422,7 @@ namespace Database.DataContexts
 
 		public Dictionary<string, List<Group>> GetUsersGroups(List<string> courseIds, IEnumerable<string> userIds, IPrincipal currentUser, int maxCount = 3, bool onlyArchived = false)
 		{
-			var canSeeAllGroups = courseIds.ToDictionary(c => c.ToLower(), c => CanUserSeeAllCourseGroups(currentUser, c));
+			var canSeeAllGroups = courseIds.ToDictSafe(c => c.ToLower(), c => CanUserSeeAllCourseGroups(currentUser, c));
 			var currentUserId = currentUser.Identity.GetUserId();
 
 			var groupsWithAccess = new HashSet<int>(db.GroupAccesses.Where(a => a.UserId == currentUserId && a.IsEnabled).Select(a => a.GroupId));
@@ -449,7 +449,7 @@ namespace Database.DataContexts
 		public Dictionary<string, List<string>> GetUsersGroupsNames(List<string> courseIds, IEnumerable<string> userIds, IPrincipal currentUser, int maxCount = 3, bool onlyArchived = false)
 		{
 			var usersGroups = GetUsersGroups(courseIds, userIds, currentUser, maxCount + 1, onlyArchived);
-			return usersGroups.ToDictionary(
+			return usersGroups.ToDictSafe(
 				kv => kv.Key,
 				kv => kv.Value.Select((g, idx) => idx >= maxCount ? "..." : g.Name.TruncateWithEllipsis(40)).ToList());
 		}
@@ -457,7 +457,7 @@ namespace Database.DataContexts
 		public Dictionary<string, List<int>> GetUsersGroupsIds(List<string> courseIds, IEnumerable<string> userIds, IPrincipal currentUser, int maxCount = 3)
 		{
 			var usersGroups = GetUsersGroups(courseIds, userIds, currentUser, maxCount);
-			return usersGroups.ToDictionary(
+			return usersGroups.ToDictSafe(
 				kv => kv.Key,
 				kv => kv.Value.Select(g => g.Id).ToList());
 		}
@@ -465,7 +465,7 @@ namespace Database.DataContexts
 		public Dictionary<string, string> GetUsersGroupsNamesAsStrings(List<string> courseIds, IEnumerable<string> userIds, IPrincipal currentUser, int maxCount = 3, bool onlyArchived = false)
 		{
 			var usersGroups = GetUsersGroupsNames(courseIds, userIds, currentUser, maxCount, onlyArchived);
-			return usersGroups.ToDictionary(kv => kv.Key, kv => string.Join(", ", kv.Value));
+			return usersGroups.ToDictSafe(kv => kv.Key, kv => string.Join(", ", kv.Value));
 		}
 
 		public Dictionary<string, string> GetUsersGroupsNamesAsStrings(string courseId, IEnumerable<string> userIds, IPrincipal currentUser, int maxCount = 3, bool onlyArchived = false)

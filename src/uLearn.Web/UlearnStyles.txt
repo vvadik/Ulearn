@@ -1,9 +1,9 @@
-Content\bootstrap.css
-Content\font-awesome.css
+Content\libs\bootstrap.min.css
+Content\libs\font-awesome.css
 Content\awesome-bootstrap-checkbox.css
-Content\bootstrap-select.min.css
+Content\libs\bootstrap-select.min.css
 Content\bootstrap.refresh-animate.css
-Content\jquery.datetimepicker.min.css
+Content\libs\jquery.datetimepicker.min.css
 codemirror\lib\codemirror.css
 codemirror\theme\cobalt.css
 codemirror\theme\xq-dark.css
@@ -24,10 +24,10 @@ Content\bootstrap.ulearn.css
 Content\bounce.css
 flexslider\flexslider.css
 katex\katex.min.css
-Content\jquery-ui.min.css
+Content\libs\jquery-ui.min.css
 Content\main.css
 Content\buttons.css
-Content\likely.css
+Content\libs\likely.css
 Content\notifications.css
 Content\stepik.css
 Content\modals.css

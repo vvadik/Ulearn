@@ -152,30 +152,33 @@ namespace Database.Repos
 
 		public async Task<DefaultDictionary<int, NotificationTransportSettings>> GetNotificationTransportsSettingsAsync(string courseId, NotificationType type, List<int> transportIds)
 		{
-			var settings = await db.NotificationTransportSettings
-				.Where(s => s.CourseId == courseId && s.NotificationType == type && transportIds.Contains(s.NotificationTransportId))
-				.ToDictionaryAsync(s => s.NotificationTransportId, s => s)
-				.ConfigureAwait(false);
+			var settings = (await db.NotificationTransportSettings
+					.Where(s => s.CourseId == courseId && s.NotificationType == type && transportIds.Contains(s.NotificationTransportId))
+					.ToListAsync()
+					.ConfigureAwait(false))
+				.ToDictSafe(s => s.NotificationTransportId, s => s);
 			return settings.ToDefaultDictionary();
 		}
 
 		// Dictionary<(notificationTransportId, NotificationType), NotificationTransportSettings>
 		public async Task<DefaultDictionary<Tuple<int, NotificationType>, NotificationTransportSettings>> GetNotificationTransportsSettingsAsync(string courseId, List<int> transportIds)
 		{
-			var settings = await db.NotificationTransportSettings
-				.Where(s => s.CourseId == courseId && transportIds.Contains(s.NotificationTransportId))
-				.ToDictionaryAsync(s => Tuple.Create(s.NotificationTransportId, s.NotificationType), s => s)
-				.ConfigureAwait(false);
+			var settings = (await db.NotificationTransportSettings
+					.Where(s => s.CourseId == courseId && transportIds.Contains(s.NotificationTransportId))
+					.ToListAsync()
+					.ConfigureAwait(false))
+				.ToDictSafe(s => Tuple.Create(s.NotificationTransportId, s.NotificationType), s => s);
 			return settings.ToDefaultDictionary(() => null);
 		}
 
 		// Dictionary<(notificationTransportId, NotificationType), NotificationTransportSettings>
 		public async Task<DefaultDictionary<Tuple<int, NotificationType>, NotificationTransportSettings>> GetNotificationTransportsSettingsAsync(string courseId)
 		{
-			var settings = await db.NotificationTransportSettings
-				.Where(s => s.CourseId == courseId)
-				.ToDictionaryAsync(s => Tuple.Create(s.NotificationTransportId, s.NotificationType), s => s)
-				.ConfigureAwait(false);
+			var settings = (await db.NotificationTransportSettings
+					.Where(s => s.CourseId == courseId)
+					.ToListAsync()
+					.ConfigureAwait(false))
+				.ToDictSafe(s => Tuple.Create(s.NotificationTransportId, s.NotificationType), s => s);
 			return settings.ToDefaultDictionary(() => null);
 		}
 

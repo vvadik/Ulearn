@@ -26,7 +26,7 @@
 
     a {
       display: inline-block;
-      padding: 11px 20px 15px 30px;
+      padding: 11px 20px 15px 23px;
       text-decoration: none;
       color: inherit;
 
@@ -38,6 +38,11 @@
       @media (max-width: @maxPhoneWidth) {
         padding-left: 15px;
         padding-right: 15px;
+      }
+
+      @media (max-width: @maxLaptopWidth) {
+        padding-left: 14px;
+        padding-right: 14px;
       }
     }
 
@@ -99,6 +104,10 @@
     right: 0;
     color: #666;
     user-select: none;
+
+    @media (min-width: @maxContentWidth) {
+      right: calc((100vw - @maxContentWidth) / 2);
+    }
 
     > * {
       display: inline-block;
@@ -316,5 +325,11 @@
 @media (max-width: @maxPhoneWidth) {
   .phoneHeaderElementsContainer {
     display: inline-flex;
+  }
+}
+
+@media (min-width: @maxContentWidth) {
+  .header {
+    padding: 0 calc((100vw - @maxContentWidth) / 2);
   }
 }

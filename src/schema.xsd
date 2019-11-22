@@ -418,12 +418,25 @@
 		</xs:simpleContent>
 	</xs:complexType>
 
+	<xs:complexType name="Texts">
+		<xs:sequence minOccurs="0" maxOccurs="unbounded">
+			<xs:choice>
+				<xs:element name="allTestsPassed" type="xs:string" />
+				<xs:element name="allTestsPassedWithoutReview" type="xs:string" />
+				<xs:element name="codeReviewPassed" type="xs:string" />
+				<xs:element name="codeReviewPassedInstructorView" type="xs:string" />
+				<xs:element name="waitingForCodeReview" type="xs:string" />
+				<xs:element name="waitingForCodeReviewInstructorView" type="xs:string" />
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+
 	<xs:complexType name="AbstractExercise">
 		<xs:complexContent>
 			<xs:extension base="IncludeCode">
 				<xs:choice minOccurs="0" maxOccurs="unbounded">
 					<xs:element name="initialCode" type="StringWithXmlSpaces" minOccurs="1" maxOccurs="1" />
-					<xs:element name="hint" type="NonEmptyString" minOccurs="1" maxOccurs="1" />
+					<xs:element name="hint" type="StringWithXmlSpaces" minOccurs="1" maxOccurs="1" />
 					<xs:element name="comment" type="NonEmptyString" minOccurs="1" maxOccurs="1" />
 					<xs:element name="expected" type="StringWithXmlSpaces" minOccurs="1" maxOccurs="1" />
 					<xs:element name="hideSolutions" type="xs:boolean" minOccurs="1" maxOccurs="1" />
@@ -438,6 +451,7 @@
 							</xs:simpleContent>
 						</xs:complexType>
 					</xs:element>
+					<xs:element name="texts" type="Texts" minOccurs="0" maxOccurs="1" />
 				</xs:choice>
 				<xs:attribute name="type" use="optional">
 					<xs:simpleType>
@@ -863,6 +877,12 @@
 				<xs:attribute name="description" type="NonEmptyString" use="optional" />
 				<xs:attribute name="maxAdditionalScore" type="xs:integer" use="optional" />
 				<xs:attribute name="enableForEveryone" type="xs:boolean" use="optional" />
+				<xs:attribute name="weight" type="xs:decimal" use="optional">
+					<xs:annotation>
+						<xs:documentation xml:lang="en">The weight with which different ScoringGroups are summed into a number showing the overall progress. The default is 1</xs:documentation>
+						<xs:documentation xml:lang="ru">Вес, с которым разные ScoringGroup суммируются в единое число, показывающее общий прогресс. По умолчанию 1</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>

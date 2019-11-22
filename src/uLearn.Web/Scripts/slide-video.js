@@ -1,22 +1,24 @@
 ﻿function onYouTubeIframeAPIReady() {
-	var $videoBlocks = $('.youtube-video');
-	var rateCookieName = 'youtube-video-rate';
-
-	var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ? true : false;
-	$videoBlocks.each(function () {
-		var $videoBlock = $(this);
-
-		var width = $videoBlock.data('width') || '390';
-		var height = $videoBlock.data('height') || '640';
-		var videoId = $videoBlock.data('videoId');
-		var autoplay = $videoBlock.data('autoplay') && !isMobile;
-		var elementId = 'youtube-video__' + videoId;
-		$videoBlock.attr('id', elementId);
-		var frameLoaded = false;
-		var playerReady = false;
-		var initialized = false;
-		var intervalId = setInterval(function () {
-			var element = $("#" + elementId)[0];
+	const videoBlocks = document.getElementsByClassName('youtube-video');
+	const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i;
+	const rateCookieName = 'youtube-video-rate';
+	const isMobile = mobileRegex.test(navigator.userAgent);
+	
+	for(let i =0;i<videoBlocks.length;i++){
+		const block = videoBlocks[i];
+		const width = block.dataset.width || '390';
+		const height = block.dataset.height || '640';
+		const videoId = block.dataset.videoId;
+		const isFirstVideoOnSlide = i === 0;
+		const dataAutoPlay = block.dataset.autoplay === 'true';
+		const autoplay = dataAutoPlay && !isMobile && isFirstVideoOnSlide;
+		const elementId = 'youtube-video__' + videoId;
+		block.id = elementId;
+		const frameLoaded = false;
+		let playerReady = false;
+		let initialized = false;
+		const intervalId = setInterval( () => {
+			const element = document.getElementById(elementId);
 			if(element && element.contentWindow != null) {
 				if(initialized) {
 					clearInterval(intervalId);
@@ -26,13 +28,16 @@
 					return;
 				}
 				init(player);
+				if(autoplay){
+					player.playVideo();
+				}
 				clearInterval(intervalId);
 			}
 		}, 10);
-		var player = new YT.Player(elementId, {
-			height: width,
-			width: height,
-			videoId: videoId,
+		const player = new YT.Player(elementId, {
+			height,
+			width,
+			videoId,
 			events: {
 				'onReady': function (e) {
 					playerReady = true;
@@ -42,7 +47,7 @@
 					init(e.target);
 				},
 				'onPlaybackRateChange': function (e) {
-					var newRate = e.data;
+					const newRate = e.data;
 					Cookies.set(rateCookieName, newRate);
 				}
 			},
@@ -53,29 +58,27 @@
 		});
 		
 		function init(p) {
-			var rate = parseFloat(Cookies.get(rateCookieName) || '1');
+			const rate = parseFloat(Cookies.get(rateCookieName) || '1');
 			p.setPlaybackRate(rate);
-			if (autoplay)
-				p.playVideo();
 			initialized = true;
 		}
-	});
+	}
 }
 
 window.documentReadyFunctions = window.documentReadyFunctions || [];
 
 window.documentReadyFunctions.push(function () {
-	var enableYoutubeIframeApi = function() {
+	const enableYoutubeIframeApi = () => {
 		window['YT'] = undefined;
 		
-		var tag = document.createElement('script');
+		const tag = document.createElement('script');
 		tag.src = "https://www.youtube.com/iframe_api";
-		var firstScriptTag = document.getElementsByTagName('script')[0];
+		const firstScriptTag = document.getElementsByTagName('script')[0];
 		firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 	};
 
-	var $videoBlocks = $('.youtube-video');
+	const videoBlocks = document.getElementsByClassName('youtube-video');
 
-	if ($videoBlocks.length > 0)
+	if (videoBlocks.length > 0)
 		enableYoutubeIframeApi();
 });

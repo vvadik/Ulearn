@@ -52,14 +52,16 @@ namespace Database.DataContexts
 		{
 			return db.AdditionalScores
 				.Where(s => s.CourseId == courseId && s.UserId == userId)
-				.ToDictionary(s => Tuple.Create(s.UnitId, s.ScoringGroupId), s => s.Score);
+				.ToList()
+				.ToDictSafe(s => Tuple.Create(s.UnitId, s.ScoringGroupId), s => s.Score);
 		}
 
 		public Dictionary<string, AdditionalScore> GetAdditionalScoresForUser(string courseId, Guid unitId, string userId)
 		{
 			return db.AdditionalScores
 				.Where(s => s.CourseId == courseId && s.UnitId == unitId && s.UserId == userId)
-				.ToDictionary(s => s.ScoringGroupId, s => s);
+				.ToList()
+				.ToDictSafe(s => s.ScoringGroupId, s => s);
 		}
 
 		/* Dictionary<(userId, scoringGroupId), additionalScore> */
@@ -67,7 +69,8 @@ namespace Database.DataContexts
 		{
 			return db.AdditionalScores
 				.Where(s => s.CourseId == courseId && s.UnitId == unitId && usersIds.Contains(s.UserId))
-				.ToDictionary(s => Tuple.Create(s.UserId, s.ScoringGroupId), s => s);
+				.ToList()
+				.ToDictSafe(s => Tuple.Create(s.UserId, s.ScoringGroupId), s => s);
 		}
 
 		/* Dictionary<(userId, unitId, scoringGroupId), additionalScore> */
@@ -75,7 +78,8 @@ namespace Database.DataContexts
 		{
 			return db.AdditionalScores
 				.Where(s => s.CourseId == courseId && usersIds.Contains(s.UserId))
-				.ToDictionary(s => Tuple.Create(s.UserId, s.UnitId, s.ScoringGroupId), s => s);
+				.ToList()
+				.ToDictSafe(s => Tuple.Create(s.UserId, s.UnitId, s.ScoringGroupId), s => s);
 		}
 
 		public async Task RemoveAdditionalScores(string courseId, Guid unitId, string userId, string scoringGroupId)

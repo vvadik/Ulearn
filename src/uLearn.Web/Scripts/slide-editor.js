@@ -1,4 +1,4 @@
-﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
+window.documentReadyFunctions = window.documentReadyFunctions || [];
 
 window.documentReadyFunctions.push(function () {
     initCodeEditor();
@@ -50,39 +50,9 @@ window.documentReadyFunctions.push(function () {
 
     if ($('.exercise__reviews').length > 0)
         placeCodeReviews();
-    
-    if ($('.exercise__score-form-wrapper').length > 0)
-    	setScrollHandlerForExerciseScoreForm();
 });
 
 var editorLastRange, currentReviewTextMarker, reviewsTextMarkers, exerciseCodeDoc, $exerciseCodeBlock;
-
-function setScrollHandlerForExerciseScoreForm() {
-	var $wrapper = $('.exercise__score-form-wrapper');
-	var wrapperHeight = $wrapper.outerHeight();
-	var $exerciseCodeMirror = $($exerciseCodeBlock.codeMirrorEditor.display.wrapper);
-	
-	var scrollHandlerForExerciseScoreForm = function(){
-		if ($wrapper.length === 0)
-			return;
-		
-		var scrollTop = $(window).scrollTop();
-		var scrollBottom = scrollTop + $(window).height();
-		var codeMirrorOffsetTop = $exerciseCodeMirror.offset().top;
-		var codeMirrorOffsetBottom = codeMirrorOffsetTop + $exerciseCodeMirror.outerHeight();
-		
-		var isShortVersion = $wrapper.hasClass('short');
-		/* 50 and 20 are hand-picked constants for smooth fixing */
-		var fixingOffset = isShortVersion ? -50 : 20;
-		var isFixed = scrollBottom >= codeMirrorOffsetTop + wrapperHeight + 50 && scrollBottom <= codeMirrorOffsetBottom + wrapperHeight + fixingOffset;
-		$wrapper.toggleClass('fixed', isFixed);
-	};
-	
-	$(window).scroll(scrollHandlerForExerciseScoreForm);
-	$(window).resize(scrollHandlerForExerciseScoreForm);
-	/* Call handler to fix score's form layout immediately after page loading */
-	scrollHandlerForExerciseScoreForm();
-}
 
 function showTooltipAboutCopyingFromCodemirror(range) {
 	if (navigator.clipboard) {
@@ -134,8 +104,8 @@ function initCodeEditor($parent) {
         $exerciseCodeBlock = $('.code-review')[0];
     else
         $exerciseCodeBlock = $('.code-reviewed')[0];
-            
-    ﻿CodeMirror.commands.autocomplete = function (cm) {        
+
+    CodeMirror.commands.autocomplete = function (cm) {        
         var hint = cm.options.langInfo.hint;
         if (hint)
             cm.showHint({ hint: hint });
@@ -289,16 +259,6 @@ function initCodeEditor($parent) {
 						return;
 					}
 					placeAddReviewPopup($addReviewPopup, coords, $addReviewPopupInput);
-					
-					/* Scroll window to fit add-review popup in view */
-					var $wrapper = $('.exercise__score-form-wrapper');
-					var isFixed = $wrapper.hasClass('fixed');
-					if (isFixed && coords.top + $addReviewPopup.outerHeight() >= $wrapper.offset().top) {
-						var scrollTop = $(window).scrollTop();
-						var additionalMargin = 10;
-						scrollTop += (coords.top + $addReviewPopup.outerHeight()) - $wrapper.offset().top + additionalMargin;
-						window.scrollTo({ top: scrollTop, behavior: 'smooth' });
-					}					
 				});
 
 				$(editor.display.wrapper).on('mousedown', function(){
@@ -628,7 +588,10 @@ function saveExerciseCodeDraft(id) {
 	var solutions = JSON.parse(localStorage['exercise_solutions']);
 
 	if ($('.code-exercise').length > 0) {
-		solutions[id] = $('.code-exercise')[0].codeMirrorEditor.getValue();
+		var editor = $('.code-exercise')[0].codeMirrorEditor;
+		if (editor) {
+			solutions[id] = editor.getValue();
+		}
 		localStorage['exercise_solutions'] = JSON.stringify(solutions);
 	}
 }

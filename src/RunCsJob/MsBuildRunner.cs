@@ -11,7 +11,7 @@ namespace RunCsJob
 {
 	public class MsBuildSettings
 	{
-		private const string compilersFolderName = "Microsoft.Net.Compilers.2.4.0";
+		private const string compilersFolderName = "Microsoft.Net.Compilers.3.3.1";
 		private const string wellKnownLibsFolderName = "WellKnownLibs";
 
 		public MsBuildSettings()
@@ -24,7 +24,7 @@ namespace RunCsJob
 		public readonly string BaseDirectory;
 		public DirectoryInfo CompilerDirectory;
 		public readonly DirectoryInfo WellKnownLibsDirectory;
-		public readonly string MsBuildToolsVersion = "15.0";
+		public readonly string MsBuildToolsVersion = null;
 	}
 
 	public static class MsBuildRunner
@@ -53,7 +53,7 @@ namespace RunCsJob
 					project.SetProperty("AlwaysCompileMarkupFilesInSeparateDomain", "True");
 
 					/* We don't know why, but MSBuild on server set BaseIntermediateOutputPath to "\".
-					* Here we return default value "obj\". 
+					* Here we return default value "obj\".
 					*/
 					project.SetProperty("BaseIntermediateOutputPath", @"obj\");
 

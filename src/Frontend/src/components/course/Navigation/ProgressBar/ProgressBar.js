@@ -4,12 +4,13 @@ import classnames from 'classnames';
 import styles from "./ProgressBar.less";
 
 class ProgressBar extends Component {
-	render () {
-		const { value, small, color } = this.props;
+	render() {
+		const { value, small, color, active, } = this.props;
 		return (
-			<div className={ classnames(styles.wrapper, { [styles.small]: small })}>
-				<div className={ classnames(styles.value, { [styles.blue]: color === 'blue' }) }
-					 style={{width: `${ value * 100 }%`}} />
+			<div className={ classnames(styles.wrapper, { [styles.small]: small }, { [styles.active]: active }) }>
+				<div
+					className={ classnames(styles.value, { [styles.blue]: color === 'blue' }) }
+					style={ { width: `${ value * 100 }%` } }/>
 			</div>
 		);
 	}
@@ -18,7 +19,8 @@ class ProgressBar extends Component {
 ProgressBar.propTypes = {
 	value: PropTypes.number.isRequired,
 	small: PropTypes.bool,
-	color: PropTypes.oneOf(['green', 'blue'])
+	color: PropTypes.oneOf(['green', 'blue']),
+	active: PropTypes.bool,
 };
 
 ProgressBar.defaultProps = {
