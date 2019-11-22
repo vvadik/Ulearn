@@ -6,7 +6,7 @@ import AnyPage from '../../../pages/AnyPage';
 import { UrlError } from "../../common/Error/NotFoundErrorBoundary";
 import UnitFlashcardsPage from '../../../pages/course/UnitFlashcardsPage';
 import CourseFlashcardsPage from '../../../pages/course/CourseFlashcardsPage';
-import { flashcards, constructPathToSlide } from '../../../consts/routes';
+import { flashcards, acceptedSolutions, constructPathToSlide } from '../../../consts/routes';
 import { changeCurrentCourseAction } from "../../../actions/course";
 import { SLIDETYPE } from '../../../consts/general';
 import { SCORING_GROUP_IDS } from '../../../consts/scoringGroup';
@@ -15,7 +15,6 @@ import queryString from 'query-string';
 import classnames from 'classnames';
 
 import styles from "./Course.less"
-import { max } from "moment";
 
 class Course extends Component {
 	constructor(props) {
@@ -230,8 +229,8 @@ class Course extends Component {
 
 		const currentSlide = Course.findSlideBySlideId(slideId, courseInfo);
 
-		if(currentSlide === null){
-			//throw new UrlError();
+		if(currentSlide === null && slideId.toLowerCase() !== acceptedSolutions){
+			throw new UrlError();
 		}
 
 		if (currentSlide && currentSlide.type === SLIDETYPE.flashcards) {
