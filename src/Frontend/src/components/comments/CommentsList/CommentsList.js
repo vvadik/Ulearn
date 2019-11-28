@@ -79,7 +79,7 @@ class CommentsList extends Component {
 		return commentIds;
 	}
 
-	loadComments = (courseId, slideId, forInstructors) => {
+	loadComments = (courseId, slideId, forInstructors, offset, count) => {
 		if (this.state.loadingComments) {
 			return;
 		}
@@ -88,13 +88,15 @@ class CommentsList extends Component {
 			loadingComments: true,
 		});
 
-		const commentsApiRequest = this.props.commentsApi.getComments(courseId, slideId, forInstructors)
+		const commentsApiRequest = this.props.commentsApi.getComments(courseId, slideId, forInstructors, offset, count)
 			.then(json => {
 				const comments = json.topLevelComments;
+
 				this.setStateIfMounted({
-					threads: comments,
 					loadingComments: false,
 				});
+
+				this.renderCommentsContinuously(comments);
 				return comments;
 			});
 
@@ -112,6 +114,54 @@ class CommentsList extends Component {
 
 		return commentsApiRequest;
 	};
+
+	async renderCommentsContinuously(comments, iterationTimeout = 50, commentsPerIteration = 15, scrollDistance = 500) {
+		const { threads } = this.state;
+		const newThreads = [...threads];
+		const iteration = () => {
+			return new Promise(resolve => setTimeout(resolve, iterationTimeout));
+		};
+		const updateAndWaitForScrollToBottom = async () => {
+			this.setStateIfMounted({ threads: [...newThreads] });
+			let scrolled = false;
+			const element = document.documentElement;
+			let windowRelativeBottom = element.getBoundingClientRect().bottom;
+			while (!scrolled) {
+				await iteration();
+				windowRelativeBottom = element.getBoundingClientRect().bottom;
+				scrolled = windowRelativeBottom < element.clientHeight + scrollDistance;
+			}
+		};
+
+		while (comments.length > 0) {
+			let countOfCommentsToRender = 0;
+			while (countOfCommentsToRender <= commentsPerIteration) {
+				const comment = comments.shift();
+				countOfCommentsToRender++;
+				const allReplies = comment.replies;
+				const countOfCommentsLeftInIteration = commentsPerIteration - countOfCommentsToRender;
+
+				if (allReplies.length > countOfCommentsLeftInIteration) {
+					comment.replies = allReplies.splice(0, countOfCommentsLeftInIteration);
+					newThreads.push(comment);
+					await updateAndWaitForScrollToBottom();
+
+					while (allReplies.length > 0) {
+						comment.replies = [...comment.replies, ...allReplies.splice(0, commentsPerIteration)];
+						await updateAndWaitForScrollToBottom();
+					}
+					countOfCommentsToRender = 0;
+				} else {
+					countOfCommentsToRender += comment.replies;
+					newThreads.push(comment);
+				}
+
+				if(comments.length === 0)
+					return ;
+			}
+			await updateAndWaitForScrollToBottom();
+		}
+	}
 
 	setStateIfMounted(updater, callback) {
 		if (this.commentsListRef.current) {
@@ -137,7 +187,7 @@ class CommentsList extends Component {
 
 	render() {
 		const { threads, loadingComments } = this.state;
-		const { user, courseId, slideId, commentPolicy } = this.props;
+		const { user, courseId, slideId, commentPolicy, key } = this.props;
 		const replies = threads.reduce((sum, current) => sum + current.replies.length, 0);
 
 		if (this.state.status === "error") {
@@ -149,9 +199,9 @@ class CommentsList extends Component {
 		}
 
 		return (
-			<div ref={ this.commentsListRef }>
+			<div key={ key } ref={ this.commentsListRef }>
 				{ loadingComments ?
-					<div className={ styles.spacer }><Loader type="big" active={ loadingComments }/></div> :
+					<Loader className={ styles.spacer } type="big" active={ loadingComments }/> :
 					<>
 						{ !user.id &&
 						<Stub hasThreads={ threads.length > 0 } courseId={ courseId } slideId={ slideId }/> }
@@ -162,7 +212,7 @@ class CommentsList extends Component {
 				{ (commentPolicy.areCommentsEnabled && user.id && (threads.length + replies) > 7) &&
 				<button className={ styles.sendButton } onClick={ this.handleShowSendForm }>
 					<Icon name="CommentLite" color="#3072C4"/>
-					<span className={ styles.sendButtonText }>Оставить комментарий</span>
+					Оставить комментарий
 				</button> }
 			</div>
 		)
@@ -567,6 +617,7 @@ class CommentsList extends Component {
 }
 
 CommentsList.propTypes = {
+	key: PropTypes.string,
 	user: userType.isRequired,
 	userRoles: userRoles.isRequired,
 	slideId: PropTypes.string.isRequired,
