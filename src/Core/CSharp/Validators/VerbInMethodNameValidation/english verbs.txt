@@ -12307,6 +12307,7 @@ gnaw
 gnawed
 gnawn
 gnaws
+go
 go-ahead
 go-around
 go-arounds
