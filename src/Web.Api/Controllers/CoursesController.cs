@@ -47,6 +47,7 @@ namespace Ulearn.Web.Api.Controllers
 		/// <summary>
 		/// Список курсов
 		/// </summary>
+		/// <param name="role">Роль указывается, если нужно полуичить только те курсы, в которых пользователь имеет роль эту или выше</param>
 		[HttpGet]
 		public async Task<ActionResult<CoursesListResponse>> CoursesList([FromQuery] CourseRoleType? role = null)
 		{
@@ -60,12 +61,22 @@ namespace Ulearn.Web.Api.Controllers
 
 			var isSystemAdministrator = await IsSystemAdministratorAsync().ConfigureAwait(false);
 
+			// Фильтрация по роли. У администратора высшая роль.
 			if (role.HasValue && !isSystemAdministrator)
 			{
 				var courseIdsAsRole = await courseRolesRepo.GetCoursesWhereUserIsInRoleAsync(UserId, role.Value).ConfigureAwait(false);
-				courses = courses.Where(c => courseIdsAsRole.Contains(c.Id, StringComparer.InvariantCultureIgnoreCase)).OrderBy(c => c.Title);
+				courses = courses.Where(c => courseIdsAsRole.Contains(c.Id, StringComparer.InvariantCultureIgnoreCase));
 			}
 
+			// Неопубликованные курсы не покажем тем, кто не имеет роли в них.
+			if (!isSystemAdministrator)
+			{
+				var visibleCourses = unitsRepo.GetVisibleCourses();
+				var coursesInWhichUserHasAnyRole = await courseRolesRepo.GetCoursesWhereUserIsInRoleAsync(UserId, CourseRoleType.Tester).ConfigureAwait(false);
+				courses = courses.Where(c => visibleCourses.Contains(c.Id) || coursesInWhichUserHasAnyRole.Contains(c.Id, StringComparer.OrdinalIgnoreCase));
+			}
+
+			// Администратор видит все курсы. Покажем сверху те, в которых он преподаватель.
 			if (isSystemAdministrator)
 			{
 				var instructorCourseIds = await courseRolesRepo.GetCoursesWhereUserIsInRoleAsync(UserId, CourseRoleType.Instructor).ConfigureAwait(false);
@@ -74,8 +85,9 @@ namespace Ulearn.Web.Api.Controllers
 
 			return new CoursesListResponse
 			{
-				Courses = courses.Select(
-					c => new ShortCourseInfo
+				Courses = courses
+					.OrderBy(c => c.Title)
+					.Select(c => new ShortCourseInfo
 					{
 						Id = c.Id,
 						Title = c.Title,
@@ -92,11 +104,14 @@ namespace Ulearn.Web.Api.Controllers
 		public async Task<ActionResult<CourseInfo>> CourseInfo(Course course)
 		{
 			if (course == null)
-				return Json(new { status = "error", message = "Course not found" });
+				return NotFound(new ErrorResponse("Course not found"));
 
 			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
-			var containsFlashcards = course.Units.Any(x => x.Slides.OfType<FlashcardSlide>().Any());
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(User.GetUserId(), course.Id, CourseRoleType.Instructor).ConfigureAwait(false);
+			if(!isInstructor && visibleUnits.Count == 0)
+				return NotFound(new ErrorResponse("Course not found"));
+
+			var containsFlashcards = course.Units.Any(x => x.Slides.OfType<FlashcardSlide>().Any());
 			var showInstructorsSlides = isInstructor;
 			var getSlideMaxScoreFunc = await BuildGetSlideMaxScoreFunc(solutionsRepo, userQuizzesRepo, visitsRepo, groupsRepo, course, User.GetUserId());
 			var scoringSettings = GetScoringSettings(course);

@@ -32,6 +32,13 @@ namespace Database.Repos
 			return course.Units.Where(u => visibleUnitsIds.Contains(u.Id)).ToList();
 		}
 
+		public HashSet<string> GetVisibleCourses()
+		{
+			return new HashSet<string>(db.UnitAppearances
+				.Where(u => u.PublishTime <= DateTime.Now)
+				.Select(u => u.CourseId), StringComparer.OrdinalIgnoreCase);
+		}
+
 		public DateTime? GetNextUnitPublishTime(string courseId)
 		{
 			return db.UnitAppearances.Where(u => u.CourseId == courseId && u.PublishTime > DateTime.Now)
