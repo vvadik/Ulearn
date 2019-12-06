@@ -1,6 +1,7 @@
 ﻿@using uLearn.Web.Extensions
 @using Ulearn.Core.Courses.Slides.Exercises
 @using Ulearn.Core.Extensions
+@using uLearn.Web.Controllers
 @model uLearn.Web.Controllers.UserUnitStatisticsPageModel
 
 @{
@@ -92,26 +93,17 @@
 
 				@{
 					var reviewedSubmission = Model.ReviewedSubmissions.FirstOrDefault(s => s.SlideId == submission.SlideId);
-					var lastManualChecking = reviewedSubmission == null ? null : reviewedSubmission.ManualCheckings.LastOrDefault(c => c.IsChecked);
-					var solution = reviewedSubmission == null ? null : reviewedSubmission.SolutionCode.Text;
+					var lastManualChecking = reviewedSubmission?.ManualCheckings.LastOrDefault(c => c.IsChecked);
 				}
 				@if (lastManualChecking != null && lastManualChecking.NotDeletedReviews.Any())
 				{
-					<div class="last-review-comments">
-						<div>
-							<strong>Комментари@(lastManualChecking.NotDeletedReviews.Count > 1 ? "и" : "й") <a href="@Url.Action("UserSolutions", "Analytics", new { courseId = reviewedSubmission.CourseId, slideId = slide.Id, userId = reviewedSubmission.UserId, version = reviewedSubmission.Id })" target="_blank">последнего код-ревью</a>:</strong>
-						</div>
-
-						@foreach (var review in lastManualChecking.NotDeletedReviews)
+					@Html.Partial(
+						"~/Views/Exercise/_ExerciseLastReviewComments.cshtml",
+						new ExerciseLastReviewCommentModel
 						{
-							var startPosition = solution.FindPositionByLineAndCharacter(review.StartLine, review.StartPosition);
-							var finishPosition = solution.FindPositionByLineAndCharacter(review.FinishLine, review.FinishPosition);
-							<div>
-								<span class="commented-code">@solution.Substring(startPosition, finishPosition - startPosition).TruncateWithEllipsis(30)</span>
-								@review.Comment
-							</div>
-						}
-					</div>
+							ReviewedSubmission = reviewedSubmission,
+							NotDeletedReviews = lastManualChecking.NotDeletedReviews
+						})
 				}
 			</div>
 		}

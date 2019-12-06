@@ -174,14 +174,14 @@ namespace Ulearn.Core.Courses.Slides
 			return $"Title: {Title}, Id: {NormalizedGuid}, MaxScore: {MaxScore}";
 		}
 
-		public IEnumerable<SlideBlock[]> GetBlockRangesWithSameVisibility()
+		public IEnumerable<SlideBlock[]> GetBlockRangesWithSameVisibility(bool startNewRangeFromExerciseBlock)
 		{
 			if (Blocks.Length == 0)
 				yield break;
 			var range = new List<SlideBlock> { Blocks[0] };
 			foreach (var block in Blocks.Skip(1))
 			{
-				if (block.Hide != range.Last().Hide)
+				if (block.Hide != range.Last().Hide || (startNewRangeFromExerciseBlock && block is AbstractExerciseBlock))
 				{
 					yield return range.ToArray();
 					range.Clear();

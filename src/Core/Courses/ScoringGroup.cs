@@ -16,6 +16,9 @@ namespace Ulearn.Core.Courses
 		[XmlAttribute("description")]
 		public string Description { get; set; }
 
+		[XmlAttribute("weight")]
+		public decimal Weight { get; set; } = 1;
+
 		[XmlIgnore]
 		public bool CanBeSetByInstructor => MaxAdditionalScore > 0;
 

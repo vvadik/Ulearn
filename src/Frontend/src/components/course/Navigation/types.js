@@ -21,11 +21,15 @@ export const menuItemType = {
 	toggleNavigation: PropTypes.func,
 };
 
+export const progressType = {
+	current: PropTypes.number,
+	max: PropTypes.number,
+};
 
 export const courseMenuItemType = {
 	id: PropTypes.string,
 	title: PropTypes.string,
-	progress: PropTypes.number,
+	progress: PropTypes.shape(progressType),
 	isActive: PropTypes.bool,
 };
 

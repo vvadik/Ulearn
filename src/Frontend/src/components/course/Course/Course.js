@@ -3,16 +3,19 @@ import PropTypes from "prop-types";
 
 import Navigation from "../Navigation";
 import AnyPage from '../../../pages/AnyPage';
+import { UrlError } from "../../common/Error/NotFoundErrorBoundary";
 import UnitFlashcardsPage from '../../../pages/course/UnitFlashcardsPage';
 import CourseFlashcardsPage from '../../../pages/course/CourseFlashcardsPage';
 import { flashcards, constructPathToSlide } from '../../../consts/routes';
 import { changeCurrentCourseAction } from "../../../actions/course";
 import { SLIDETYPE } from '../../../consts/general';
+import { SCORING_GROUP_IDS } from '../../../consts/scoringGroup';
 
 import queryString from 'query-string';
 import classnames from 'classnames';
 
 import styles from "./Course.less"
+import { max } from "moment";
 import Error404 from "../../common/Error/Error404";
 
 class Course extends Component {
@@ -101,35 +104,80 @@ class Course extends Component {
 		}
 
 		const Page = this.getOpenedPage();
+
 		const mainClassName = classnames(styles.pageWrapper, { [styles.withoutNavigation]: !isNavMenuVisible }); // TODO remove it
 
 		return (
-			<div className={ classnames(styles.root, { 'open': navigationOpened }) }>
-				{ isNavMenuVisible && this.renderNavigation() }
-				<main className={ mainClassName }>
-					<Page match={ this.props.match }/>
-				</main>
+			<div className={styles.rootWrapper}>
+				<div className={ classnames(styles.root, { 'open': navigationOpened }) }>
+					{ isNavMenuVisible && this.renderNavigation() }
+					<main className={ mainClassName }>
+						<Page match={ this.props.match }/>
+					</main>
+				</div>
 			</div>
 		);
 	}
 
 	renderNavigation() {
-		const { courseInfo } = this.props;
+		const { courseInfo, units, progress } = this.props;
 		const { onCourseNavigation, navigationOpened } = this.state;
+		const { byUnits, courseProgress } = this.getCourseStatistics(units, progress, courseInfo.scoring.groups);
 
 		const defaultProps = {
 			navigationOpened,
 			courseTitle: courseInfo.title,
+			courseProgress,
 		};
 
 		const additionalProps = onCourseNavigation
-			? this.createCourseSettings()
-			: this.createUnitSettings();
+			? this.createCourseSettings(byUnits)
+			: this.createUnitSettings(byUnits);
 
 		return <Navigation { ...defaultProps } { ...additionalProps }/>;
 	}
 
-	createCourseSettings() {
+	getCourseStatistics(units, progress, scoringGroups) {
+		const courseStatistics = {
+			courseProgress: { current: 0, max: 0 },
+			byUnits: {},
+		};
+
+		if (!progress || scoringGroups.length === 0)
+			return courseStatistics;
+
+		const visitsGroup = scoringGroups.find(gr => gr.id === SCORING_GROUP_IDS.visits);
+
+		for (const unit of Object.values(units)) {
+			let unitScore = 0, unitMaxScore = 0;
+
+			for (const { maxScore, id, scoringGroup } of unit.slides) {
+				const group = scoringGroups.find(gr => gr.id === scoringGroup);
+
+				if (visitsGroup) {
+					unitMaxScore += visitsGroup.weight;
+					if (progress[id] && progress[id].visited) {
+						unitScore += visitsGroup.weight;
+					}
+				}
+
+				if (group) {
+					unitMaxScore += maxScore * group.weight;
+					if (progress[id] && progress[id].score) {
+						unitScore += progress[id].score * group.weight;
+					}
+				}
+			}
+
+			courseStatistics.courseProgress.current += unitScore;
+			courseStatistics.courseProgress.max += unitMaxScore;
+			courseStatistics.byUnits[unit.id] = { current: unitScore, max: unitMaxScore };
+		}
+
+		return courseStatistics;
+	}
+
+	createCourseSettings(scoresByUnits) {
 		const { courseInfo, slideId, } = this.props;
 		const { highlightedUnit, } = this.state;
 
@@ -142,17 +190,19 @@ class Course extends Component {
 				id: item.id,
 				isActive: highlightedUnit === item.id,
 				onClick: this.unitClickHandle,
+				progress: scoresByUnits.hasOwnProperty(item.id) ? scoresByUnits[item.id] : { current: 0, max: 0 },
 			})),
 			containsFlashcards: courseInfo.containsFlashcards,
 		};
 	}
 
-	createUnitSettings() {
+	createUnitSettings(scoresByUnits) {
 		const { courseInfo, slideId, courseId, progress } = this.props;
 		const { openUnit, } = this.state;
 
 		return {
 			unitTitle: openUnit.title,
+			unitProgress: scoresByUnits.hasOwnProperty(openUnit.id) ? scoresByUnits[openUnit.id] : { current: 0, max: 0 },
 			onCourseClick: this.returnInUnitsMenu,
 			unitItems: Course.mapUnitItems(openUnit.slides, progress, courseId, slideId,),
 			nextUnit: Course.findNextUnit(openUnit, courseInfo),
@@ -185,6 +235,10 @@ class Course extends Component {
 		}
 
 		const currentSlide = Course.findSlideBySlideId(slideId, courseInfo);
+
+		if(currentSlide === null){
+			//throw new UrlError();
+		}
 
 		if (currentSlide && currentSlide.type === SLIDETYPE.flashcards) {
 			return UnitFlashcardsPage;
