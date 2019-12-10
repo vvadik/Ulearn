@@ -79,7 +79,7 @@ namespace Ulearn.Web.Api.Controllers
 			// Администратор видит все курсы. Покажем сверху те, в которых он преподаватель.
 			if (isSystemAdministrator)
 			{
-				var instructorCourseIds = await courseRolesRepo.GetCoursesWhereUserIsInRoleAsync(UserId, CourseRoleType.Instructor).ConfigureAwait(false);
+				var instructorCourseIds = await courseRolesRepo.GetCoursesWhereUserIsInStrictRoleAsync(UserId, CourseRoleType.Instructor).ConfigureAwait(false);
 				courses = courses.OrderBy(c => !instructorCourseIds.Contains(c.Id, StringComparer.InvariantCultureIgnoreCase)).ThenBy(c => c.Title);
 			}
 
