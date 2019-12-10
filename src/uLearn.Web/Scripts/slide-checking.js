@@ -144,10 +144,23 @@ window.documentReadyFunctions.push(function () {
 			$otherScoreInput.show();
 			$otherScoreLink.addClass('active');
 		} else {
-			$(this).prop('disabled', true);
-			
-            // Prevent Chrome bug. See https://productforums.google.com/forum/#!topic/chrome/M7y2gZDvXAk for details
-			this.form.submit();			
+			var $button = $(this);
+			$button.prop('disabled', true);
+			var nextUrl = $(this).data('url');
+			var $form = $(".exercise__score-form");
+			var action = $form.data("action");
+			var id = $form.find('[name=id]').val();
+			var errorUrl = $form.find('[name=errorUrl]').val();
+			var exerciseScore = $form.find('[name=exerciseScore]').val();
+			var prohibitFurtherReview = $form.find('[name=prohibitFurtherReview]').val();
+			$.post(action, { id: id, nextUrl: nextUrl, errorUrl: errorUrl, exerciseScore: exerciseScore, prohibitFurtherReview: prohibitFurtherReview })
+				.done(function() {
+					window.location.href = nextUrl;
+				})
+				.fail(function() {
+					alert("Ошибка на сервере");
+					$button.prop('disabled', false);
+				});
 		}
 	});
 
