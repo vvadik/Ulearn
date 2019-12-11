@@ -82,11 +82,12 @@ namespace Ulearn.Web.Api.Controllers
 				var instructorCourseIds = await courseRolesRepo.GetCoursesWhereUserIsInStrictRoleAsync(UserId, CourseRoleType.Instructor).ConfigureAwait(false);
 				courses = courses.OrderBy(c => !instructorCourseIds.Contains(c.Id, StringComparer.InvariantCultureIgnoreCase)).ThenBy(c => c.Title);
 			}
+			else
+				courses = courses.OrderBy(c => c.Title);
 
 			return new CoursesListResponse
 			{
 				Courses = courses
-					.OrderBy(c => c.Title)
 					.Select(c => new ShortCourseInfo
 					{
 						Id = c.Id,
