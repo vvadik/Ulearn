@@ -152,10 +152,13 @@ window.documentReadyFunctions.push(function () {
 			var id = $form.find('[name=id]').val();
 			var errorUrl = $form.find('[name=errorUrl]').val();
 			var exerciseScore = $form.find('[name=exerciseScore]').val();
-			var prohibitFurtherReview = $form.find('[name=prohibitFurtherReview]').val();
+			var prohibitFurtherReview = $form.find('[name=prohibitFurtherReview]').prop('checked');
 			$.post(action, { id: id, nextUrl: nextUrl, errorUrl: errorUrl, exerciseScore: exerciseScore, prohibitFurtherReview: prohibitFurtherReview })
-				.done(function() {
-					window.location.href = nextUrl;
+				.done(function(data) {
+					if(data.status === "ok")
+						window.location.href = nextUrl;
+					else
+						window.location.href = data.redirect;
 				})
 				.fail(function() {
 					alert("Ошибка на сервере");
