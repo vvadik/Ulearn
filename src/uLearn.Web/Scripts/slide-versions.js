@@ -50,9 +50,6 @@ function setExerciseVersion(versionId, showOutput) {
 		if ($scoreForm.length > 0) {
 			var submissionId = parseInt($scoreForm.data('submissionId'));
 			$scoreForm.toggle(submissionId === versionId);
-
-			/* setScrollHandlerForExerciseScoreForm() is defined in slide-editor.js */
-			setScrollHandlerForExerciseScoreForm();
 		}
 		
 		/* placeCodeReviews() is defined in slide-editor.js */        

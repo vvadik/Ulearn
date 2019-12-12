@@ -34,7 +34,8 @@
 <div class="row exercise__score-form-wrapper @(Model.Checking.IsChecked ? "" : "short")">
 	<div class="col-xs-12">
 		<div class="exercise__score-form" style="@(Model.IsCurrentSubmissionChecking ? "" : "display: none")"
-			data-action="@Url.Action("ScoreExercise", "Exercise", new { recheck = Model.Checking.IsChecked })">
+			data-action="@Url.Action("ScoreExercise", "Exercise", new { recheck = Model.Checking.IsChecked })"
+			data-submission-id="@Model.Checking.Submission.Id">
 			<div class="exercise__review-selection-hint text-muted">Выделите участок кода, чтобы оставить комментарий</div>
 
 			<input type="hidden" name="id" value="@Model.Checking.Id"/>
