@@ -6,7 +6,7 @@ import AnyPage from '../../../pages/AnyPage';
 import { UrlError } from "../../common/Error/NotFoundErrorBoundary";
 import UnitFlashcardsPage from '../../../pages/course/UnitFlashcardsPage';
 import CourseFlashcardsPage from '../../../pages/course/CourseFlashcardsPage';
-import { flashcards, acceptedSolutions, constructPathToSlide } from '../../../consts/routes';
+import { flashcards, constructPathToSlide } from '../../../consts/routes';
 import { changeCurrentCourseAction } from "../../../actions/course";
 import { SLIDETYPE } from '../../../consts/general';
 import { SCORING_GROUP_IDS } from '../../../consts/scoringGroup';
@@ -33,6 +33,7 @@ class Course extends Component {
 			currentCourseId: null,
 			navigationOpened: this.props.navigationOpened,
 			isNavMenuVisible,
+			queryProps,
 		};
 	}
 
@@ -217,8 +218,8 @@ class Course extends Component {
 	}
 
 	getOpenedPage() {
-		const { slideId, courseInfo } = this.props;
-		const { isNavMenuVisible } = this.state;
+		let { slideId, courseInfo } = this.props;
+		const { queryProps } = this.state;
 
 		if (slideId === flashcards) {
 			return CourseFlashcardsPage;
@@ -228,9 +229,11 @@ class Course extends Component {
 			return AnyPage;
 		}
 
+		if (queryProps.slideId)
+			slideId = queryProps.slideId;
 		const currentSlide = Course.findSlideBySlideId(slideId, courseInfo);
 
-		if(currentSlide === null && slideId.toLowerCase() !== acceptedSolutions && isNavMenuVisible){
+		if (currentSlide === null) {
 			throw new UrlError();
 		}
 
