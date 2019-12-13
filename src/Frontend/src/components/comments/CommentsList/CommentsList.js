@@ -22,6 +22,16 @@ const defaultCommentsData = {
 	repliesToRender: [],
 };
 
+function throttle(fn, wait) {
+	let time = Date.now();
+	return function () {
+		if ((time + wait - Date.now()) < 0) {
+			fn();
+			time = Date.now();
+		}
+	}
+}
+
 class CommentsList extends Component {
 	constructor(props) {
 		super(props);
@@ -62,7 +72,7 @@ class CommentsList extends Component {
 				}
 			});
 
-		this.throttleScroll = debounce(this.handleScrollToBottom, 100);
+		this.throttleScroll = throttle(this.handleScrollToBottom, 100);
 
 		window.addEventListener("scroll", this.throttleScroll);
 		window.addEventListener("hashchange", this.handleScrollToCommentByHashFormUrl);
@@ -192,7 +202,7 @@ class CommentsList extends Component {
 			const nameChangesTab = forInstructors ? TABS.allComments : TABS.instructorsComments;
 
 			const { threadsToRender, repliesToRender } = this.commentsData;
-			const notRenderedComments = [...repliesToRender,...threadsToRender ];
+			const notRenderedComments = [...repliesToRender, ...threadsToRender];
 			const notRenderedCommentIds = this.getAllCommentsIds(notRenderedComments);
 			const allCommentIds = [...this.commentIds, ...notRenderedCommentIds];
 			const indexOfComment = notRenderedCommentIds.indexOf(commentIdFromHash);
