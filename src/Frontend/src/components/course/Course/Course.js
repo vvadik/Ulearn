@@ -218,6 +218,7 @@ class Course extends Component {
 
 	getOpenedPage() {
 		const { slideId, courseInfo } = this.props;
+		const { isNavMenuVisible } = this.state;
 
 		if (slideId === flashcards) {
 			return CourseFlashcardsPage;
@@ -229,7 +230,7 @@ class Course extends Component {
 
 		const currentSlide = Course.findSlideBySlideId(slideId, courseInfo);
 
-		if(currentSlide === null && slideId.toLowerCase() !== acceptedSolutions){
+		if(currentSlide === null && slideId.toLowerCase() !== acceptedSolutions && isNavMenuVisible){
 			throw new UrlError();
 		}
 
