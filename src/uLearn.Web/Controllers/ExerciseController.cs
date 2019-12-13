@@ -269,6 +269,7 @@ namespace uLearn.Web.Controllers
 
 				checking.ProhibitFurtherManualCheckings = false;
 				await slideCheckingsRepo.MarkManualCheckingAsChecked(checking, score).ConfigureAwait(false);
+				await slideCheckingsRepo.MarkManualCheckingAsCheckedBeforeThis(checking).ConfigureAwait(false);
 				if (prohibitFurtherReview.HasValue && prohibitFurtherReview.Value)
 					await slideCheckingsRepo.ProhibitFurtherExerciseManualChecking(checking).ConfigureAwait(false);
 				await visitsRepo.UpdateScoreForVisit(checking.CourseId, checking.SlideId, slide.MaxScore, checking.UserId).ConfigureAwait(false);

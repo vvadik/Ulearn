@@ -206,8 +206,14 @@ namespace Database.DataContexts
 				else
 					query = query.Where(c => options.UserIds.Contains(c.UserId));
 			}
-
+			
 			query = query.OrderByDescending(c => c.Timestamp);
+
+			// отфильтровывает неактуальное начатое ревью
+			query = query.GroupBy(g => new { g.UserId, g.SlideId }).Select(g => g.OrderByDescending(c => c.Timestamp).FirstOrDefault());
+			
+			query = query.OrderByDescending(c => c.Timestamp);
+			
 			if (options.Count > 0)
 				query = query.Take(options.Count);
 			return query;
@@ -237,6 +243,29 @@ namespace Database.DataContexts
 			queueItem.IsChecked = true;
 			queueItem.Score = score;
 			await db.SaveChangesAsync().ConfigureAwait(false);
+		}
+		
+		// Помечает оцененными посещенные но не оцененные старые ревью
+		public async Task MarkManualCheckingAsCheckedBeforeThis<T>(T queueItem) where T : AbstractManualSlideChecking
+		{
+			var itemsForMark = db.Set<T>().Where(c => c.CourseId == queueItem.CourseId && c.UserId == queueItem.UserId && c.SlideId == queueItem.SlideId && c.Timestamp < queueItem.Timestamp).ToList();
+			var score = 0;
+			var changed = false;
+			foreach (var item in itemsForMark)
+			{
+				if (item.IsChecked)
+					score = item.Score;
+				else
+				{
+					item.LockedBy = null;
+					item.LockedUntil = null;
+					item.IsChecked = true;
+					queueItem.Score = score;
+					changed = true;
+				}
+			}
+			if(changed)
+				await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
 		public async Task ProhibitFurtherExerciseManualChecking(ManualExerciseChecking checking)
