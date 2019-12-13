@@ -15,9 +15,18 @@ import scrollToView from "../../../utils/scrollToView";
 
 import styles from "./CommentsList.less";
 
+const defaultCommentsData = {
+	commentsPerPack: 15,
+	scrollDistance: 500,
+	threadsToRender: [],
+	repliesToRender: [],
+};
+
 class CommentsList extends Component {
 	constructor(props) {
 		super(props);
+
+		this.commentsData = defaultCommentsData;
 
 		this.state = {
 			newCommentId: 1,
@@ -53,15 +62,23 @@ class CommentsList extends Component {
 				}
 			});
 
+		this.throttleScroll = debounce(this.handleScrollToBottom, 100);
+
+		window.addEventListener("scroll", this.throttleScroll);
 		window.addEventListener("hashchange", this.handleScrollToCommentByHashFormUrl);
 	};
 
 	componentWillUnmount() {
+		window.removeEventListener("scroll", this.throttleScroll);
 		window.removeEventListener("hashchange", this.handleScrollToCommentByHashFormUrl);
 	}
 
 	get commentIds() {
 		const { threads } = this.state;
+		return this.getAllCommentsIds(threads);
+	}
+
+	getAllCommentsIds(threads) {
 		const commentIds = [];
 
 		for (let i = 0; i < threads.length; i++) {
@@ -95,8 +112,9 @@ class CommentsList extends Component {
 				this.setStateIfMounted({
 					loadingComments: false,
 				});
+				this.commentsData.threadsToRender = comments;
 
-				this.renderCommentsContinuously(comments);
+				this.renderPackOfComments();
 				return comments;
 			});
 
@@ -115,52 +133,38 @@ class CommentsList extends Component {
 		return commentsApiRequest;
 	};
 
-	async renderCommentsContinuously(comments, iterationTimeout = 50, commentsPerIteration = 15, scrollDistance = 500) {
+	renderPackOfComments() {
+		const { threadsToRender, repliesToRender, commentsPerPack } = this.commentsData;
 		const { threads } = this.state;
 		const newThreads = [...threads];
-		const iteration = () => {
-			return new Promise(resolve => setTimeout(resolve, iterationTimeout));
-		};
-		const updateAndWaitForScrollToBottom = async () => {
-			this.setStateIfMounted({ threads: [...newThreads] });
-			let scrolled = false;
-			const element = document.documentElement;
-			let windowRelativeBottom = element.getBoundingClientRect().bottom;
-			while (!scrolled) {
-				await iteration();
-				windowRelativeBottom = element.getBoundingClientRect().bottom;
-				scrolled = windowRelativeBottom < element.clientHeight + scrollDistance;
-			}
-		};
-
-		while (comments.length > 0) {
-			let countOfCommentsToRender = 0;
-			while (countOfCommentsToRender <= commentsPerIteration) {
-				const comment = comments.shift();
-				countOfCommentsToRender++;
-				const allReplies = comment.replies;
-				const countOfCommentsLeftInIteration = commentsPerIteration - countOfCommentsToRender;
-
-				if (allReplies.length > countOfCommentsLeftInIteration) {
-					comment.replies = allReplies.splice(0, countOfCommentsLeftInIteration);
-					newThreads.push(comment);
-					await updateAndWaitForScrollToBottom();
-
-					while (allReplies.length > 0) {
-						comment.replies = [...comment.replies, ...allReplies.splice(0, commentsPerIteration)];
-						await updateAndWaitForScrollToBottom();
-					}
-					countOfCommentsToRender = 0;
-				} else {
-					countOfCommentsToRender += comment.replies;
-					newThreads.push(comment);
-				}
-
-				if(comments.length === 0)
-					return ;
-			}
-			await updateAndWaitForScrollToBottom();
+		let countOfCommentsToRender = 0;
+		if (repliesToRender.length > 0) {
+			const lastThread = newThreads[newThreads.length - 1];
+			const newReplies = repliesToRender.splice(0, commentsPerPack);
+			countOfCommentsToRender += newReplies.length;
+			lastThread.replies = [...lastThread.replies, newReplies];
 		}
+
+		while (countOfCommentsToRender < commentsPerPack && threadsToRender.length !== 0) {
+			const thread = threadsToRender.shift();
+			countOfCommentsToRender++;
+			const threadReplies = thread.replies;
+			let countOfCommentsLeftInPack = commentsPerPack - countOfCommentsToRender;
+
+			if (threadReplies.length > countOfCommentsLeftInPack) {
+				thread.replies = threadReplies.splice(0, countOfCommentsLeftInPack);
+				countOfCommentsToRender += countOfCommentsLeftInPack;
+				newThreads.push(thread);
+				this.commentsData.repliesToRender = threadReplies;
+			} else {
+				countOfCommentsToRender += thread.replies.length;
+				newThreads.push(thread);
+			}
+		}
+
+		this.setStateIfMounted({
+			threads: newThreads,
+		});
 	}
 
 	setStateIfMounted(updater, callback) {
@@ -168,6 +172,16 @@ class CommentsList extends Component {
 			this.setState(updater, callback);
 		}
 	}
+
+	handleScrollToBottom = () => {
+		const { scrollDistance } = this.commentsData;
+
+		const element = document.documentElement;
+		const windowRelativeBottom = element.getBoundingClientRect().bottom;
+		if (windowRelativeBottom < element.clientHeight + scrollDistance) {
+			this.renderPackOfComments();
+		}
+	};
 
 	handleScrollToCommentByHashFormUrl = () => {
 		const { courseId, slideId, forInstructors, handleTabChange } = this.props;
@@ -177,9 +191,21 @@ class CommentsList extends Component {
 			const commentIdFromHash = +window.location.hash.slice(startIndex);
 			const nameChangesTab = forInstructors ? TABS.allComments : TABS.instructorsComments;
 
-			if (!this.commentIds.includes(commentIdFromHash)) {
+			const { threadsToRender, repliesToRender } = this.commentsData;
+			const notRenderedComments = [...repliesToRender,...threadsToRender ];
+			const notRenderedCommentIds = this.getAllCommentsIds(notRenderedComments);
+			const allCommentIds = [...this.commentIds, ...notRenderedCommentIds];
+			const indexOfComment = notRenderedCommentIds.indexOf(commentIdFromHash);
+			if (indexOfComment > 0) {
+				const commentsPerPack = this.commentsData.commentsPerPack;
+				this.commentsData.commentsPerPack = indexOfComment + commentsPerPack;
+				this.renderPackOfComments();
+				this.commentsData.commentsPerPack = commentsPerPack;
+			}
+
+			if (!allCommentIds.includes(commentIdFromHash)) {
 				this.loadComments(courseId, slideId, forInstructors);
-				if (!this.commentIds.includes(commentIdFromHash))
+				if (!allCommentIds.includes(commentIdFromHash))
 					handleTabChange(nameChangesTab, false);
 			}
 		}
