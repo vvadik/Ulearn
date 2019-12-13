@@ -4,9 +4,8 @@ import { buildQuery } from "../utils";
 import { convertCamelCaseToSnakeCase } from "../utils/caseConverter";
 
 export function getComments(courseId, slideId, forInstructors, offset, count) {
-	const query = buildQuery({ courseId, slideId, forInstructors, count, offset });
-	const queryInSnakeCase = convertCamelCaseToSnakeCase(query);
-	const url = commentsPath + queryInSnakeCase;
+	const query = buildQuery({ courseId, slideId, forInstructors, count, offset }, convertCamelCaseToSnakeCase);
+	const url = commentsPath + query;
 
 	return api.get(url);
 }
@@ -18,9 +17,8 @@ export function getComment(commentId) {
 }
 
 export function addComment(courseId, slideId, text, parentCommentId, forInstructors) {
-	const query = buildQuery({ courseId });
-	const queryInSnakeCase = convertCamelCaseToSnakeCase(query);
-	const url = commentsPath + queryInSnakeCase;
+	const query = buildQuery({ courseId }, convertCamelCaseToSnakeCase);
+	const url = commentsPath + query;
 	const params = api.createRequestParams({
 		slideId,
 		text,
@@ -57,10 +55,8 @@ export function dislikeComment(commentId) {
 }
 
 export function getCommentPolicy(courseId) {
-	const query = buildQuery({ courseId });
-	const queryInSnakeCase = convertCamelCaseToSnakeCase(query);
-	const url = commentPoliciesPath + queryInSnakeCase;
-
+	const query = buildQuery({ courseId }, convertCamelCaseToSnakeCase);
+	const url = commentPoliciesPath + query;
 	return api.get(url);
 }
 
