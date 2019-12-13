@@ -29,7 +29,7 @@ describe('buildQuery should', () => {
 
 		const result = buildQuery(params, convertCamelCaseToSnakeCase);
 
-		expect(result).toBe('?parameter1=a_bced');
+		expect(result).toBe('?parameter1=abced');
 	});
 
 	test('work correct with convertSnakeCaseToLowerCamelCase converter', () => {
@@ -37,7 +37,7 @@ describe('buildQuery should', () => {
 
 		const result = buildQuery(params, convertSnakeCaseToLowerCamelCase);
 
-		expect(result).toBe('?parameter1A=aBCD');
+		expect(result).toBe('?parameter1A=a_b_c_d');
 	});
 
 	test('work correct with undef converter', () => {
@@ -49,6 +49,7 @@ describe('buildQuery should', () => {
 	});
 
 	test.each([
+		[{a:'A',b:"BB"},'?a=a&b=bb'],
 		[{ a: 'a', b: 2, c: 2.5 }, '?a=a&b=2&c=2.5'],
 		[{ a: 'a', b: 'b', c: 'c' }, '?a=a&b=b&c=c'],
 		[{ a: 'parameter with spaces' }, '?a=parameter%20with%20spaces'],

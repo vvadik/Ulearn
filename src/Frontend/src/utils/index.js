@@ -26,6 +26,6 @@ export function buildQuery(params, convert) {
 	}
 
 	return '?' + notUndefinedParams
-		.map(key => convert(esc(key)) + '=' + convert(esc(params[key])))
+		.map(key => convert(esc(key)) + '=' + esc(params[key]).toLowerCase())
 		.join('&');
 }
