@@ -11,22 +11,14 @@ import { changeCurrentCourseAction } from "../../../actions/course";
 import { SLIDETYPE } from '../../../consts/general';
 import { SCORING_GROUP_IDS } from '../../../consts/scoringGroup';
 
-import queryString from 'query-string';
 import classnames from 'classnames';
 
 import styles from "./Course.less"
-import { max } from "moment";
 import Error404 from "../../common/Error/Error404";
 
 class Course extends Component {
 	constructor(props) {
 		super(props);
-		const queryProps = queryString.parse(props.location.search);
-		const pathname = window.location.pathname.toLowerCase();
-		const isLti = pathname.endsWith('/ltislide') || pathname.endsWith('/acceptedalert'); //TODO remove this flag,that hiding nav menu
-		const isReview = queryProps.CheckQueueItemId !== undefined;
-		const isNavMenuVisible = !isLti && !isReview;
-
 		this.state = {
 			onCourseNavigation: true,
 			openUnit: null,
@@ -34,7 +26,6 @@ class Course extends Component {
 			currentSlideId: null,
 			currentCourseId: null,
 			navigationOpened: this.props.navigationOpened,
-			isNavMenuVisible,
 		};
 	}
 
@@ -92,8 +83,8 @@ class Course extends Component {
 	}
 
 	render() {
-		const { courseInfo, courseLoadingErrorStatus } = this.props;
-		const { navigationOpened, isNavMenuVisible } = this.state;
+		const { courseInfo, courseLoadingErrorStatus, isNavMenuVisible } = this.props;
+		const { navigationOpened } = this.state;
 
 		if(courseLoadingErrorStatus){
 			return <Error404/>;
@@ -108,7 +99,7 @@ class Course extends Component {
 		const mainClassName = classnames(styles.pageWrapper, { [styles.withoutNavigation]: !isNavMenuVisible }); // TODO remove it
 
 		return (
-			<div className={styles.rootWrapper}>
+			<div className={ styles.rootWrapper }>
 				<div className={ classnames(styles.root, { 'open': navigationOpened }) }>
 					{ isNavMenuVisible && this.renderNavigation() }
 					<main className={ mainClassName }>
@@ -202,7 +193,10 @@ class Course extends Component {
 
 		return {
 			unitTitle: openUnit.title,
-			unitProgress: scoresByUnits.hasOwnProperty(openUnit.id) ? scoresByUnits[openUnit.id] : { current: 0, max: 0 },
+			unitProgress: scoresByUnits.hasOwnProperty(openUnit.id) ? scoresByUnits[openUnit.id] : {
+				current: 0,
+				max: 0
+			},
 			onCourseClick: this.returnInUnitsMenu,
 			unitItems: Course.mapUnitItems(openUnit.slides, progress, courseId, slideId,),
 			nextUnit: Course.findNextUnit(openUnit, courseInfo),
@@ -236,8 +230,8 @@ class Course extends Component {
 
 		const currentSlide = Course.findSlideBySlideId(slideId, courseInfo);
 
-		if(currentSlide === null){
-			//throw new UrlError();
+		if (currentSlide === null) {
+			throw new UrlError();
 		}
 
 		if (currentSlide && currentSlide.type === SLIDETYPE.flashcards) {
