@@ -35,7 +35,7 @@ class CourseNavigationItem extends Component {
 				<span className={ styles.progressWrapper } title={ `${ progress.current } из ${ progress.max }` }>
 					<ProgressBar value={ percentage }
 								 small
-								 color={ percentage === 1 ? 'green' : 'blue' }
+								 color={ percentage >= 1 ? 'green' : 'blue' }
 								 active={ isActive }
 					/>
 				</span>

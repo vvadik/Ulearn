@@ -261,11 +261,11 @@ namespace uLearn.Web.Controllers
 
 				/* Invalid form: score isn't integer */
 				if (!int.TryParse(exerciseScore, out var score))
-					return Redirect(errorUrl + "Неверное количество баллов");
+					return Json(new ScoreExerciseOperationResult { Status = "error", Redirect = errorUrl + "Неверное количество баллов"});
 
 				/* Invalid form: score isn't from range 0..MAX_SCORE */
 				if (score < 0 || score > slide.Scoring.CodeReviewScore)
-					return Redirect(errorUrl + $"Неверное количество баллов: {score}");
+					return Json(new ScoreExerciseOperationResult { Status = "error", Redirect = errorUrl + $"Неверное количество баллов: {score}"});
 
 				checking.ProhibitFurtherManualCheckings = false;
 				await slideCheckingsRepo.MarkManualCheckingAsChecked(checking, score).ConfigureAwait(false);
@@ -280,7 +280,7 @@ namespace uLearn.Web.Controllers
 					await NotifyAboutManualExerciseChecking(checking).ConfigureAwait(false);
 			}
 
-			return Redirect(nextUrl);
+			return Json(new ScoreExerciseOperationResult { Status = "ok" });
 		}
 
 		private async Task NotifyAboutManualExerciseChecking(ManualExerciseChecking checking)
@@ -617,6 +617,16 @@ namespace uLearn.Web.Controllers
 	{
 		[DataMember(Name = "status")]
 		public string Status { get; set; }
+	}
+	
+	[DataContract]
+	public class ScoreExerciseOperationResult
+	{
+		[DataMember(Name = "status")]
+		public string Status { get; set; }
+		
+		[DataMember(Name = "redirect")]
+		public string Redirect { get; set; }
 	}
 
 	[DataContract]

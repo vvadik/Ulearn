@@ -86,6 +86,12 @@ namespace Database.Repos.CourseRoles
 			var roles = (await GetUserRoles(userId)).Where(r => r.Role <= minCourseRoleType).ToList();
 			return roles.Select(r => r.CourseId).ToList();
 		}
+		
+		public async Task<List<string>> GetCoursesWhereUserIsInStrictRoleAsync(string userId, CourseRoleType courseRoleType)
+		{
+			var roles = (await GetUserRoles(userId)).Where(r => r.Role == courseRoleType).ToList();
+			return roles.Select(r => r.CourseId).ToList();
+		}
 
 		public async Task<List<string>> GetUsersWithRoleAsync(string courseId, CourseRoleType minCourseRoleType)
 		{

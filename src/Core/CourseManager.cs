@@ -222,6 +222,8 @@ namespace Ulearn.Core
 				unpackDirectory.ClearDirectory();
 				log.Info($"Директория {unpackDirectory.FullName} очищена");
 				zip.ExtractAll(unpackDirectory.FullName, ExtractExistingFileAction.OverwriteSilently);
+				foreach (var f in unpackDirectory.GetFiles("*", SearchOption.AllDirectories).Cast<FileSystemInfo>().Concat(unpackDirectory.GetDirectories("*", SearchOption.AllDirectories)))
+					f.Attributes &= ~FileAttributes.ReadOnly;
 				log.Info($"Архив {zipFile.FullName} распакован");
 			}
 		}

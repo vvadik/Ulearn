@@ -49,7 +49,7 @@ class NavigationHeader extends Component {
 		if (percentage > 0) {
 			return (
 				<div className={ styles.progressBarWrapper } title={ `${ progress.current } из ${ progress.max }` }>
-					<ProgressBar value={ percentage } color={ percentage === 1 ? 'green' : 'blue' }/>
+					<ProgressBar value={ percentage } color={ percentage >= 1 ? 'green' : 'blue' }/>
 				</div>
 			);
 		}

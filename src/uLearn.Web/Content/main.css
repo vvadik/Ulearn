@@ -11,6 +11,7 @@ body.without-topbar {
 .legacy-page .body-content {
     padding-left: 15px;
     padding-right: 15px;
+	width: unset;
 }
 
 .legacy-page {

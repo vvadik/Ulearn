@@ -47,7 +47,7 @@ class CourseNavigationHeader extends Component {
 			return (
 				<div className={ styles.progressBarWrapper }
 					 title={ `${ courseProgress.current } из ${ courseProgress.max }` }>
-					<ProgressBar value={ percentage } color={ percentage === 1 ? 'green' : 'blue' }/>
+					<ProgressBar value={ percentage } color={ percentage >= 1 ? 'green' : 'blue' }/>
 				</div>
 			);
 		}

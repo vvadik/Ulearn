@@ -25,6 +25,7 @@ const mapStateToProps = (state, { match }) => {
 		isAuthenticated: state.account.isAuthenticated,
 		progress: state.user.progress[courseId],
 		navigationOpened: state.navigation.opened,
+		courseLoadingErrorStatus: state.courses.courseLoadingErrorStatus,
 	};
 };
 const mapDispatchToProps = (dispatch) => ({

@@ -27,8 +27,9 @@ const loadCourseSuccess = (courseId, result) => ({
 	result,
 });
 
-const loadCourseFail = () => ({
+const loadCourseFail = (error) => ({
 	type: COURSES__COURSE_LOAD + FAIL,
+	error,
 });
 
 const loadFlashcardsStart = () => ({
@@ -65,7 +66,7 @@ export const loadCourse = (courseId) => {
 				dispatch(loadCourseSuccess(courseId, result));
 			})
 			.catch(err => {
-				dispatch(loadCourseFail());
+				dispatch(loadCourseFail(err.status));
 			});
 	};
 };
