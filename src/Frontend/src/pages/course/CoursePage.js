@@ -9,11 +9,20 @@ const mapStateToProps = (state, { match }) => {
 	const params = queryString.parse(window.location.search);
 	const slideIdInQuery = params.slideId;
 	const courseId = match.params.courseId.toLowerCase();
-	const slideSlug = match.params.slideSlug;
-	const slideId = slideIdInQuery ? params.slideId : slideSlug.split('_').pop();
-	const courseInfo = state.courses.fullCoursesInfo[courseId];
+	const slideSlugOrAction = match.params.slideSlugOrAction;
 
-	const isLti = slideIdInQuery === "LtiSlide";
+	let slideId;
+	let isLti = false;
+	if(slideIdInQuery) {
+		const action = slideSlugOrAction;
+		slideId = slideIdInQuery;
+		isLti = action.toUpperCase() === "LTISLIDE";
+	} else {
+		const slideSlug = slideSlugOrAction;
+		slideId = slideSlug.split('_').pop();
+	}
+
+	const courseInfo = state.courses.fullCoursesInfo[courseId];
 	const isReview = params.CheckQueueItemId !== undefined;
 	const isNavMenuVisible = !isLti && !isReview;
 	return {
