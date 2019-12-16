@@ -13,7 +13,7 @@ const mapStateToProps = (state, { match }) => {
 	const slideId = slideIdInQuery ? params.slideId : slideSlug.split('_').pop();
 	const courseInfo = state.courses.fullCoursesInfo[courseId];
 
-	const isLti = slideIdInQuery;
+	const isLti = slideIdInQuery === "LtiSlide";
 	const isReview = params.CheckQueueItemId !== undefined;
 	const isNavMenuVisible = !isLti && !isReview;
 	return {
