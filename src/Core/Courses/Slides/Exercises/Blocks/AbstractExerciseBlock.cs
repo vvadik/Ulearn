@@ -6,10 +6,9 @@ using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
 using Ionic.Zip;
+using StatsdClient;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
-using Ulearn.Core.Courses.Slides.Blocks;
-using Ulearn.Core.Model.Edx.EdxComponents;
 using Ulearn.Core.RunCheckerJobApi;
 using Component = Ulearn.Core.Model.Edx.EdxComponents.Component;
 
@@ -178,6 +177,13 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 				}
 			}
 		}
+	}
+	
+	public interface IExerciseCheckerZipBuilder
+	{
+		byte[] GetZipBytesForChecker();
+		Slide Slide { get; }
+		string CourseId { get; }
 	}
 
 	public class ExerciseTexts

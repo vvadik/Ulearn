@@ -199,8 +199,8 @@ namespace Ulearn.Core
 			var course = LoadCourseFromZip(zipFile);
 			courses[course.Id] = course;
 			log.Info($"Курс {course.Id} загружен из {zipFile.FullName} и сохранён в памяти");
-			if (exerciseStudentZipsCache.IsEnabled)
-				exerciseStudentZipsCache.DeleteCourseZips(course.Id);
+			exerciseStudentZipsCache.DeleteCourseZips(course.Id);
+			ExerciseCheckerZipsCache.DeleteCourseZips(course.Id);
 			return course;
 		}
 
@@ -209,8 +209,8 @@ namespace Ulearn.Core
 			var course = LoadCourseFromDirectory(directory);
 			courses[course.Id] = course;
 			log.Info($"Курс {course.Id} загружен из {directory.FullName} и сохранён в памяти");
-			if (exerciseStudentZipsCache.IsEnabled)
-				exerciseStudentZipsCache.DeleteCourseZips(course.Id);
+			exerciseStudentZipsCache.DeleteCourseZips(course.Id);
+			ExerciseCheckerZipsCache.DeleteCourseZips(course.Id);
 			return course;
 		}
 
@@ -381,9 +381,9 @@ namespace Ulearn.Core
 		{
 			if (!courses.ContainsKey(course.Id))
 				return;
-
-			if (exerciseStudentZipsCache.IsEnabled)
-				exerciseStudentZipsCache.DeleteCourseZips(course.Id);
+			
+			exerciseStudentZipsCache.DeleteCourseZips(course.Id);
+			ExerciseCheckerZipsCache.DeleteCourseZips(course.Id);
 
 			courses[course.Id] = course;
 		}

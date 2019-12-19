@@ -20,7 +20,7 @@ using Ulearn.Core.RunCheckerJobApi;
 namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 {
 	[XmlType("exercise.csproj")]
-	public class CsProjectExerciseBlock : AbstractExerciseBlock
+	public class CsProjectExerciseBlock : AbstractExerciseBlock, IExerciseCheckerZipBuilder
 	{
 		public const string BuildingTargetFrameworkVersion = "4.7.2";
 		public const string BuildingTargetNetCoreFrameworkVersion = "2.0";
@@ -102,12 +102,19 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public bool IsCorrectSolution(string name) => name.Equals(CorrectSolutionFileName, StringComparison.InvariantCultureIgnoreCase);
 
 		public BuildEnvironmentOptions BuildEnvironmentOptions { get; set; }
+		
+		[XmlIgnore]
+		public Slide Slide { get; private set; }
+
+		[XmlIgnore]
+		public string CourseId { get; private set; }
 
 		public override IEnumerable<SlideBlock> BuildUp(SlideBuildingContext context, IImmutableSet<string> filesInProgress)
 		{
 			if (!Language.HasValue)
 				Language = context.CourseSettings.DefaultLanguage;
-
+			Slide = context.Slide;
+			CourseId = context.CourseId;
 			ExerciseInitialCode = ExerciseInitialCode ?? "// Вставьте сюда финальное содержимое файла " + UserCodeFilePath;
 			ExpectedOutput = ExpectedOutput ?? "";
 			Validator.ValidatorName = string.Join(" ", Language.GetName(), Validator.ValidatorName ?? "");
@@ -154,14 +161,20 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			};
 		}
 
-		public byte[] GetZipBytesForChecker(string code)
+		private byte[] GetZipBytesForChecker(string code)
+		{
+			var codeFile = GetCodeFile(code);
+			return ExerciseCheckerZipsCache.GetZip(this, codeFile.Path, codeFile.Data);
+		}
+
+		public byte[] GetZipBytesForChecker()
 		{
 			var excluded = (PathsToExcludeForChecker ?? new string[0])
 				.Concat(new[] { "bin/*", "obj/*" })
 				.ToList();
 
 			log.Info("Собираю zip-архив для проверки: получаю список дополнительных файлов");
-			var toUpdate = GetAdditionalFiles(code, excluded).ToList();
+			var toUpdate = GetAdditionalFiles(excluded).ToList();
 			log.Info($"Собираю zip-архив для проверки: дополнительные файлы [{string.Join(", ", toUpdate.Select(c => c.Path))}]");
 
 			var zipBytes = ToZip(ExerciseFolder, excluded, toUpdate);
@@ -169,10 +182,13 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			return zipBytes;
 		}
 
-		private IEnumerable<FileContent> GetAdditionalFiles(string code, List<string> excluded)
+		private FileContent GetCodeFile(string code)
 		{
-			yield return new FileContent { Path = UserCodeFilePath, Data = Encoding.UTF8.GetBytes(code) };
+			return new FileContent { Path = UserCodeFilePath, Data = Encoding.UTF8.GetBytes(code) };
+		}
 
+		private IEnumerable<FileContent> GetAdditionalFiles(List<string> excluded)
+		{
 			var useNUnitLauncher = NUnitTestClasses != null;
 
 			yield return new FileContent

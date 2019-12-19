@@ -10,13 +10,14 @@ using log4net;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Blocks;
+using Ulearn.Core.Helpers;
 using Ulearn.Core.Model;
 using Ulearn.Core.RunCheckerJobApi;
 
 namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 {
 	[XmlType("exercise.universal")]
-	public class UniversalExerciseBlock : AbstractExerciseBlock
+	public class UniversalExerciseBlock : AbstractExerciseBlock, IExerciseCheckerZipBuilder
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(UniversalExerciseBlock));
 
@@ -116,6 +117,12 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		[XmlIgnore]
 		public Lazy<string> InitialRegionContent;
 
+		[XmlIgnore]
+		public Slide Slide { get; private set; }
+
+		[XmlIgnore]
+		public string CourseId { get; private set; }
+
 		public override string GetSourceCode(string code)
 		{
 			return code;
@@ -125,6 +132,8 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		{
 			if (!Language.HasValue)
 				Language = LanguageHelpers.GuessByExtension(new FileInfo(UserCodeFilePath));
+			Slide = context.Slide;
+			CourseId = context.CourseId;
 			UnitDirectory = context.UnitDirectory;
 			CourseDirectory = context.CourseDirectory;
 			ExpectedOutput = ExpectedOutput ?? "";
@@ -190,6 +199,12 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 
 		private byte[] GetZipBytesForChecker(string code)
 		{
+			var codeFile = GetCodeFile(code);
+			return ExerciseCheckerZipsCache.GetZip(this, codeFile.Path, codeFile.Data);
+		}
+
+		public byte[] GetZipBytesForChecker()
+		{
 			var excluded = (PathsToExcludeForChecker ?? new string[0])
 				.Concat(initialPatterns)
 				.Concat(wrongAnswerPatterns)
@@ -198,22 +213,18 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			var toUpdateDirectories = PathsToIncludeForChecker
 				.Select(pathToInclude => new DirectoryInfo(Path.Combine(UnitDirectory.FullName, pathToInclude)));
 
-			var toUpdate = GetCodeFile(code).ToList();
-			var zipBytes = ToZip(ExerciseDirectory, excluded, toUpdate, toUpdateDirectories);
+			var zipBytes = ToZip(ExerciseDirectory, excluded, null, toUpdateDirectories);
 			log.Info($"Собираю zip-архив для проверки: zip-архив собран, {zipBytes.Length} байтов");
 			return zipBytes;
 		}
 
-		private IEnumerable<FileContent> GetCodeFile(string code)
+		private FileContent GetCodeFile(string code)
 		{
 			if (Region == null)
-				yield return new FileContent { Path = UserCodeFilePath, Data = Encoding.UTF8.GetBytes(code) };
-			else
-			{
-				var fullCode = new CommonSingleRegionExtractor((InitialUserCodeFile.Exists ? InitialUserCodeFile : UserCodeFile).ContentAsUtf8())
-					.ReplaceRegionContent(new Label { Name = Region }, code);
-				yield return new FileContent { Path = UserCodeFilePath, Data = Encoding.UTF8.GetBytes(fullCode) };
-			}
+				return new FileContent { Path = UserCodeFilePath, Data = Encoding.UTF8.GetBytes(code) };
+			var fullCode = new CommonSingleRegionExtractor((InitialUserCodeFile.Exists ? InitialUserCodeFile : UserCodeFile).ContentAsUtf8())
+				.ReplaceRegionContent(new Label { Name = Region }, code);
+			return new FileContent { Path = UserCodeFilePath, Data = Encoding.UTF8.GetBytes(fullCode) };
 		}
 
 		public byte[] GetZipBytesForStudent()
