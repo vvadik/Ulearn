@@ -55,7 +55,7 @@ namespace Ulearn.Core.Helpers
 		{
 			var sw = Stopwatch.StartNew();
 			var ms = new MemoryStream();
-			using (var zip = ZipFile.Read(zipFile.Open(FileMode.Open, FileAccess.Read)))
+			using (var zip = ZipFile.Read(zipFile.Open(FileMode.Open, FileAccess.Read, FileShare.Read)))
 			{
 				if(zip.ContainsEntry(userCodeFilePath))
 					zip.UpdateEntry(userCodeFilePath, userCodeFileContent);
