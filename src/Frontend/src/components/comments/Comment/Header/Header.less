@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
-  width: 100%;
+  width: inherit;
   align-items: baseline;
 
   > a {
@@ -14,17 +14,11 @@
 }
 
 .author {
-  height: 50px;
-
-  flex: 0 0 auto;
+  height: 23px;
   font-size: 16px;
   margin: 0 5px 0 0;
 
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-
-  @media (max-width: @maxPhoneWidth) {
-    font-size: 16px;
-  }
 }
