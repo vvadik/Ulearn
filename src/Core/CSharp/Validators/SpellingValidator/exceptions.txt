@@ -43,3 +43,6 @@ rgx
 lgth
 vect
 vec
+neighbour
+neighbours
+isbn

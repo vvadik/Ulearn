@@ -33,14 +33,13 @@
 
 <div class="row exercise__score-form-wrapper @(Model.Checking.IsChecked ? "" : "short")">
 	<div class="col-xs-12">
-		<form method="POST" action="@Url.Action("ScoreExercise", "Exercise", new { recheck = Model.Checking.IsChecked })"
-			class="exercise__score-form" data-submission-id="@Model.Checking.Submission.Id"
-			style="@(Model.IsCurrentSubmissionChecking ? "" : "display: none")">
+		<div class="exercise__score-form" style="@(Model.IsCurrentSubmissionChecking ? "" : "display: none")"
+			data-action="@Url.Action("ScoreExercise", "Exercise", new { recheck = Model.Checking.IsChecked })"
+			data-submission-id="@Model.Checking.Submission.Id">
 			<div class="exercise__review-selection-hint text-muted">Выделите участок кода, чтобы оставить комментарий</div>
 
 			<input type="hidden" name="id" value="@Model.Checking.Id"/>
 			<input type="hidden" name="errorUrl" value="@Url.RouteUrl("Course.SlideById", new { courseId = Model.CourseId, slideId = Model.Slide.Url, CheckQueueItemId = Model.Checking.Id, group = Model.GroupsIdsJoined })&amp;error="/>
-			<input type="hidden" name="nextUrl" value="@Url.Action("CheckingQueue", "Admin", new { courseId = Model.CourseId, group = Model.GroupsIdsJoined, done = Model.Checking.IsChecked })"/>
 
 			@if (Model.Checking.IsLocked && !Model.Checking.IsLockedBy(User.Identity))
 			{
@@ -104,7 +103,8 @@
 					Model.ManualCheckingsLeft--;
 				}
 
-				<input type="submit" class="btn @(Model.Checking.IsChecked || Model.ManualCheckingsLeft == 0 ? "btn-primary" : "btn-default")" value="Сохранить и вернуться"/>
+				<input type="submit" class="btn @(Model.Checking.IsChecked || Model.ManualCheckingsLeft == 0 ? "btn-primary" : "btn-default")" value="Сохранить и вернуться"
+						data-url="@Url.Action("CheckingQueue", "Admin", new { courseId = Model.CourseId, group = Model.GroupsIdsJoined, done = Model.Checking.IsChecked })"/>
 
 				@if (!Model.Checking.IsChecked)
 				{
@@ -117,8 +117,7 @@
 					else
 					{
 						<input type="submit" class="btn btn-primary" value="Сохранить и перейти к следующему"
-								data-url="@Url.Action("CheckNextExerciseForSlide", "Admin", new { Model.CourseId, slideId = Model.Slide.Id, group = Model.GroupsIdsJoined, previous = Model.Checking.Id })"
-								onclick="$('[name=nextUrl]').val($(this).data('url'))"/>
+								data-url="@Url.Action("CheckNextExerciseForSlide", "Admin", new { Model.CourseId, slideId = Model.Slide.Id, group = Model.GroupsIdsJoined, previous = Model.Checking.Id })"/>
 						<div class="text-muted manual-checkings-left">
 							По этой задаче остал@(Model.ManualCheckingsLeft % 10 == 1 && (Model.ManualCheckingsLeft % 100 / 10 != 1) ? "ась" : "ось")
 							@Model.ManualCheckingsLeft.PluralizeInRussian(RussianPluralizationOptions.Checkings)
@@ -126,6 +125,6 @@
 					}
 				}
 			</div>
-		</form>
+		</div>
 	</div>
 </div>

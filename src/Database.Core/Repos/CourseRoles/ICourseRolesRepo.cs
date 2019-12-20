@@ -11,6 +11,7 @@ namespace Database.Repos.CourseRoles
 		Task<bool> HasUserAccessToCourseAsync(string userId, string courseId, CourseRoleType minCourseRoleType);
 		Task<bool> HasUserAccessToAnyCourseAsync(string userId, CourseRoleType minCourseRoleType);
 		Task<List<string>> GetCoursesWhereUserIsInRoleAsync(string userId, CourseRoleType minCourseRoleType);
+		Task<List<string>> GetCoursesWhereUserIsInStrictRoleAsync(string userId, CourseRoleType courseRoleType);
 		Task<List<string>> GetUsersWithRoleAsync(string courseId, CourseRoleType minCourseRoleType);
 	}
 }

@@ -11,5 +11,6 @@ namespace Database.Repos
 	{
 		List<Unit> GetVisibleUnits(Course course, IPrincipal user);
 		DateTime? GetNextUnitPublishTime(string courseId);
+		HashSet<string> GetVisibleCourses();
 	}
 }

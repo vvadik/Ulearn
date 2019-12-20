@@ -14,6 +14,7 @@ const initialCoursesState = {
 	currentCourseId: undefined,
 	fullCoursesInfo: {},
 	courseLoading: false,
+	courseLoadingErrorStatus: null,
 
 	flashcardsLoading: false,
 	flashcardsByCourses: {},
@@ -36,6 +37,7 @@ export default function courses(state = initialCoursesState, action) {
 			return {
 				...state,
 				courseLoading: true,
+				courseLoadingErrorStatus: null,
 			};
 		case COURSES__COURSE_LOAD + SUCCESS:
 			return {
@@ -50,6 +52,7 @@ export default function courses(state = initialCoursesState, action) {
 			return {
 				...state,
 				courseLoading: false,
+				courseLoadingErrorStatus: action.error,
 			};
 		case COURSES__FLASHCARDS + START:
 			return {

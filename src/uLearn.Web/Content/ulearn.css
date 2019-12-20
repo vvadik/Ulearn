@@ -269,6 +269,7 @@
 }
 
 .legacy-page .slide-container .container,
+.legacy-page .terms-container .container,
 .legacy-page .main-page .container {
 	max-width: 864px;
 }
