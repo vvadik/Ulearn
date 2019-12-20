@@ -27,8 +27,7 @@
 
   background-color: #ffffff;
 }
-
-.withoutNavigation {
+.pageWrapper.withoutNavigation {
   position: relative;
 
   width: 100%;
@@ -42,6 +41,8 @@
   .pageWrapper {
     padding-top: 28px;
     z-index: unset;
+
+    max-width: calc(100% - @navigationMenuWidth);
   }
 }
 
@@ -49,13 +50,16 @@
   .pageWrapper {
     padding-left: @pageWrapperLaptopLeftPadding;
     padding-top: @pageWrapperLaptopTopPadding;
+
+    max-width: calc(100% - @maxNavigationMenuWidth);
   }
 }
 
 @media (min-width: @maxContentWidth) {
-  .rootWrapper{
+  .rootWrapper {
     background-color: @backgroundGray;
   }
+
   .root {
     margin-left: calc((100vw - @maxContentWidth) / 2);
     box-shadow: 0 0 7px 1px #ccc;
