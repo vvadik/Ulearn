@@ -36,7 +36,7 @@ class CommentsList extends Component {
 	constructor(props) {
 		super(props);
 
-		this.commentsData = defaultCommentsData;
+		this.commentsData = {...defaultCommentsData};
 
 		this.state = {
 			newCommentId: 1,
@@ -152,7 +152,7 @@ class CommentsList extends Component {
 			const lastThread = newThreads[newThreads.length - 1];
 			const newReplies = repliesToRender.splice(0, commentsPerPack);
 			countOfCommentsToRender += newReplies.length;
-			lastThread.replies = [...lastThread.replies, newReplies];
+			lastThread.replies = [...lastThread.replies, ...newReplies];
 		}
 
 		while (countOfCommentsToRender < commentsPerPack && threadsToRender.length !== 0) {
