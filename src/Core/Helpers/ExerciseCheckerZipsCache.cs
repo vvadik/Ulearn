@@ -18,6 +18,7 @@ namespace Ulearn.Core.Helpers
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(ExerciseCheckerZipsCache));
 
+		private static readonly bool isDisabled;
 		private static readonly DirectoryInfo cacheDirectory;
 		private static readonly UlearnConfiguration configuration;
 		private static readonly HashSet<string> coursesLockedForDelete;
@@ -26,6 +27,9 @@ namespace Ulearn.Core.Helpers
 		static ExerciseCheckerZipsCache()
 		{
 			configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
+			isDisabled = configuration.ExerciseCheckerZipsCacheDisabled;
+			if (isDisabled)
+				return;
 			cacheDirectory = GetCacheDirectory();
 			coursesLockedForDelete = new HashSet<string>();
 			courseToFileLocksNumber = new ConcurrentDictionary<string, int>();
@@ -45,47 +49,51 @@ namespace Ulearn.Core.Helpers
 		{
 			var courseId = zipBuilder.CourseId;
 			var slide = zipBuilder.Slide;
-			var courseDirectory = cacheDirectory.GetSubdirectory(courseId);
-			var zipFile = courseDirectory.GetFile($"{slide.Id}.zip");
-			byte[] zipBytes = null;
-			if (!zipFile.Exists || coursesLockedForDelete.Contains(courseId))
-			{
-				courseDirectory.EnsureExists();
-				log.Info($"Собираю zip-архив с упражнением: курс {courseId}, слайд «{slide.Title}» ({slide.Id}), файл {zipFile.FullName}");
-				zipBytes = zipBuilder.GetZipBytesForChecker();
-				if(!coursesLockedForDelete.Contains(courseId))
-					WithLock(courseId, () => SaveFileOnDisk(zipFile, zipBytes));
-			}
-
-			MemoryStream zipMemoryStream = null;
-			if (zipBytes != null)
-				zipMemoryStream = new MemoryStream(zipBytes);
+			MemoryStream ms = null;
+			if(isDisabled || coursesLockedForDelete.Contains(courseId))
+				ms = zipBuilder.GetZipForChecker();
 			else
 			{
-				WithLock(courseId, () =>
+				try
 				{
-					using (var stream = zipFile.Open(FileMode.Open, FileAccess.Read, FileShare.Read))
+					WithLock(courseId, () =>
 					{
-						zipMemoryStream = new MemoryStream();
-						stream.CopyTo(zipMemoryStream);
-					}
-				});
-				zipMemoryStream.Position = 0;
+						var courseDirectory = cacheDirectory.GetSubdirectory(courseId);
+						courseDirectory.EnsureExists();
+						var zipFile = courseDirectory.GetFile($"{slide.Id}.zip");
+						if (!zipFile.Exists)
+						{
+							ms = zipBuilder.GetZipForChecker();
+							SaveFileOnDisk(zipFile, ms);
+						}
+						else
+						{
+							ms = new MemoryStream();
+							using (var stream = zipFile.Open(FileMode.Open, FileAccess.Read, FileShare.Read))
+								stream.CopyTo(ms);
+						}
+					});
+				}
+				catch (Exception ex)
+				{
+					log.Warn($"Exception in write or read checker zip from cache courseId {courseId} slideId {slide.Id}", ex);
+					ms = zipBuilder.GetZipForChecker();
+				}
 			}
 
-			return AddUserCodeToZip(zipMemoryStream, userCodeFilePath, userCodeFileContent, courseId, slide);
+			return AddUserCodeToZip(ms, userCodeFilePath, userCodeFileContent, courseId, slide);
 		}
 
-		private static void SaveFileOnDisk(FileInfo zipFile, byte[] zipBytes)
+		private static void SaveFileOnDisk(FileInfo zipFile, MemoryStream ms)
 		{
 			try
 			{
 				using (var fileStream = zipFile.Open(FileMode.CreateNew, FileAccess.Write, FileShare.None))
-					fileStream.Write(zipBytes, 0, zipBytes.Length);
+					fileStream.Write(ms.ToArray(), 0, (int)ms.Length);
 			}
 			catch (Exception ex)
 			{
-				// ignore
+				log.Warn($"Exception in SaveFileOnDisk courseId {zipFile.FullName}", ex);
 			}
 		}
 
@@ -111,6 +119,7 @@ namespace Ulearn.Core.Helpers
 		{
 			var sw = Stopwatch.StartNew();
 			var resultStream = new MemoryStream();
+			inputStream.Position = 0;
 			using (var zip = ZipFile.Read(inputStream))
 			{
 				if(zip.ContainsEntry(userCodeFilePath))
@@ -126,6 +135,9 @@ namespace Ulearn.Core.Helpers
 
 		public static void DeleteCourseZips(string courseId)
 		{
+			if (isDisabled)
+				return;
+			
 			log.Info($"Очищаю папку со сгенерированными zip-архивами для упражнений из курса {courseId}");
 
 			var courseDirectory = cacheDirectory.GetSubdirectory(courseId);

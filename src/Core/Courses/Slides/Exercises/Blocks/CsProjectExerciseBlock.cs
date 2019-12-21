@@ -167,19 +167,19 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			return ExerciseCheckerZipsCache.GetZip(this, codeFile.Path, codeFile.Data);
 		}
 
-		public byte[] GetZipBytesForChecker()
+		public MemoryStream GetZipForChecker()
 		{
+			log.Info($"Собираю zip-архив для проверки: курс {CourseId}, слайд «{Slide.Title}» ({Slide.Id})");
 			var excluded = (PathsToExcludeForChecker ?? new string[0])
 				.Concat(new[] { "bin/*", "obj/*" })
 				.ToList();
 
-			log.Info("Собираю zip-архив для проверки: получаю список дополнительных файлов");
 			var toUpdate = GetAdditionalFiles(excluded).ToList();
 			log.Info($"Собираю zip-архив для проверки: дополнительные файлы [{string.Join(", ", toUpdate.Select(c => c.Path))}]");
 
-			var zipBytes = ToZip(ExerciseFolder, excluded, toUpdate);
-			log.Info($"Собираю zip-архив для проверки: zip-архив собран, {zipBytes.Length} байтов");
-			return zipBytes;
+			var ms = ToZip(ExerciseFolder, excluded, toUpdate);
+			log.Info($"Собираю zip-архив для проверки: zip-архив собран, {ms.Length} байтов");
+			return ms;
 		}
 
 		private FileContent GetCodeFile(string code)

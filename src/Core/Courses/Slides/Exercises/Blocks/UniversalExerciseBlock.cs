@@ -203,8 +203,9 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			return ExerciseCheckerZipsCache.GetZip(this, codeFile.Path, codeFile.Data);
 		}
 
-		public byte[] GetZipBytesForChecker()
+		public MemoryStream GetZipForChecker()
 		{
+			log.Info($"Собираю zip-архив для проверки: курс {CourseId}, слайд «{Slide.Title}» ({Slide.Id})");
 			var excluded = (PathsToExcludeForChecker ?? new string[0])
 				.Concat(initialPatterns)
 				.Concat(wrongAnswerPatterns)
@@ -213,9 +214,9 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			var toUpdateDirectories = PathsToIncludeForChecker
 				.Select(pathToInclude => new DirectoryInfo(Path.Combine(UnitDirectory.FullName, pathToInclude)));
 
-			var zipBytes = ToZip(ExerciseDirectory, excluded, null, toUpdateDirectories);
-			log.Info($"Собираю zip-архив для проверки: zip-архив собран, {zipBytes.Length} байтов");
-			return zipBytes;
+			var ms = ToZip(ExerciseDirectory, excluded, null, toUpdateDirectories);
+			log.Info($"Собираю zip-архив для проверки: zip-архив собран, {ms.Length} байтов");
+			return ms;
 		}
 
 		private FileContent GetCodeFile(string code)
@@ -237,7 +238,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 
 			var toUpdate = ReplaceWithInitialFiles().ToList();
 
-			var zipBytes = ToZip(ExerciseDirectory, excluded, toUpdate);
+			var zipBytes = ToZip(ExerciseDirectory, excluded, toUpdate).ToArray();
 
 			log.Info($"Собираю zip-архив для студента: zip-архив собран, {zipBytes.Length} байтов");
 			return zipBytes;
