@@ -514,7 +514,11 @@ MobileCourseMenu = connect(MobileCourseMenu.mapStateToProps)(MobileCourseMenu);
 class Menu extends Component {
 	render() {
 		let returnUrl = this.props.location.pathname + this.props.location.search;
-		if (returnUrl.startsWith("/Login") || returnUrl.startsWith("/Account/Register")) {
+		if (returnUrl.startsWith("/Login")
+			|| returnUrl.startsWith("/Account/Register")
+			|| returnUrl.startsWith("/Login/ExternalLoginConfirmation")
+			|| returnUrl.startsWith("/Login/ExternalLoginCallback"))
+		{
 			returnUrl = getQueryStringParameter("returnUrl");
 		}
 

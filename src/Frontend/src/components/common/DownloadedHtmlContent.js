@@ -108,7 +108,7 @@ class DownloadedHtmlContent extends Component {
 				if (response.redirected) {
 					/* If it was a redirect from external login callback, then update user information */
 					const oldUrlPathname = getUrlParts(url).pathname;
-					if (oldUrlPathname.startsWith("/Login/ExternalLoginCallback")) {
+					if (oldUrlPathname.startsWith("/Login/ExternalLoginCallback") || oldUrlPathname.startsWith("/Login/ExternalLoginConfirmation")) {
 						this.props.updateUserInformation();
 						this.props.updateCourses();
 					}
@@ -278,7 +278,7 @@ class DownloadedHtmlContent extends Component {
 		let postForms = forms.filter(f => f.method.toLowerCase() === 'post' && !f.onsubmit && f.action);
 		postForms.forEach(f => {
 			let formUrl = f.action;
-			if (exceptions.some(e => getUrlParts(formUrl).pathname.startsWith(e)))
+			if (exceptions.some(e => getUrlParts(formUrl).pathname.toUpperCase() === e.toUpperCase()))
 				return;
 
 			f.addEventListener('submit', e => {
