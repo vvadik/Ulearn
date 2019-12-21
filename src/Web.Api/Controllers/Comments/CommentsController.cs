@@ -106,9 +106,9 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			var slideId = parameters.SlideId;
 			parameters.Text.TrimEnd();
 
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
 			if (parameters.ForInstructors)
 			{
-				var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
 				if (!isInstructor)
 					return StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse($"You can not create comment for instructors. You should be instructor or course admin of course {courseId}."));
 			}
@@ -141,11 +141,14 @@ namespace Ulearn.Web.Api.Controllers.Comments
 
 			if (comment.IsApproved)
 				await NotifyAboutNewCommentAsync(comment).ConfigureAwait(false);
+	
+			var userAvailableGroupsIds = !isInstructor ? null : (await groupAccessesRepo.GetAvailableForUserGroupsAsync(User.GetUserId(), false, true, true).ConfigureAwait(false)).Select(g => g.Id).ToHashSet();
+			var authors2Groups = !isInstructor ? null : await groupMembersRepo.GetUsersGroupsAsync(courseId, new List<string> {UserId}, true).ConfigureAwait(false);
 
 			return BuildCommentResponse(
 				comment,
 				false, new DefaultDictionary<int, List<Comment>>(), new DefaultDictionary<int, int>(), new HashSet<int>(), // canUserSeeNotApprovedComments not used if addReplies == false
-				null, null, false, addCourseIdAndSlideId: true, addParentCommentId: true, addReplies: false
+				authors2Groups, userAvailableGroupsIds, false, addCourseIdAndSlideId: true, addParentCommentId: true, addReplies: false
 			);
 		}
 
