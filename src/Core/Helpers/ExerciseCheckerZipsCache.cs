@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using Ionic.Zip;
+using JetBrains.Annotations;
 using log4net;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
@@ -50,7 +51,7 @@ namespace Ulearn.Core.Helpers
 			var courseId = zipBuilder.CourseId;
 			var slide = zipBuilder.Slide;
 			MemoryStream ms = null;
-			if(isDisabled || coursesLockedForDelete.Contains(courseId))
+			if(isDisabled || coursesLockedForDelete.Contains(courseId) || courseId == null || slide == null)
 				ms = zipBuilder.GetZipForChecker();
 			else
 			{
@@ -76,7 +77,7 @@ namespace Ulearn.Core.Helpers
 				}
 				catch (Exception ex)
 				{
-					log.Warn($"Exception in write or read checker zip from cache courseId {courseId} slideId {slide.Id}", ex);
+					//log.Warn($"Exception in write or read checker zip from cache courseId {courseId} slideId {slide.Id}", ex);
 					ms = zipBuilder.GetZipForChecker();
 				}
 			}
@@ -115,7 +116,7 @@ namespace Ulearn.Core.Helpers
 			}
 		}
 
-		private static byte[] AddUserCodeToZip(MemoryStream inputStream, string userCodeFilePath, byte[] userCodeFileContent, string courseId, Slide slide)
+		private static byte[] AddUserCodeToZip(MemoryStream inputStream, string userCodeFilePath, byte[] userCodeFileContent, [CanBeNull]string courseId, [CanBeNull]Slide slide)
 		{
 			var sw = Stopwatch.StartNew();
 			var resultStream = new MemoryStream();
@@ -129,7 +130,7 @@ namespace Ulearn.Core.Helpers
 				zip.Save(resultStream);
 			}
 			var result = resultStream.ToArray();
-			log.Info($"Добавил код студента в zip-архив с упражнением: курс {courseId}, слайд «{slide.Title}» ({slide.Id}) elapsed {sw.ElapsedMilliseconds} ms");
+			log.Info($"Добавил код студента в zip-архив с упражнением: курс {courseId}, слайд «{slide?.Title}» ({slide?.Id}) elapsed {sw.ElapsedMilliseconds} ms");
 			return result;
 		}
 

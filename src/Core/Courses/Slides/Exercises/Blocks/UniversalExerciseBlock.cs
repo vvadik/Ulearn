@@ -205,7 +205,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 
 		public MemoryStream GetZipForChecker()
 		{
-			log.Info($"Собираю zip-архив для проверки: курс {CourseId}, слайд «{Slide.Title}» ({Slide.Id})");
+			log.Info($"Собираю zip-архив для проверки: курс {CourseId}, слайд «{Slide?.Title}» ({Slide?.Id})");
 			var excluded = (PathsToExcludeForChecker ?? new string[0])
 				.Concat(initialPatterns)
 				.Concat(wrongAnswerPatterns)

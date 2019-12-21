@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
 using Ionic.Zip;
+using JetBrains.Annotations;
 using StatsdClient;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
@@ -181,7 +182,9 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 	public interface IExerciseCheckerZipBuilder
 	{
 		MemoryStream GetZipForChecker();
+		[CanBeNull] // Для тестов
 		Slide Slide { get; }
+		[CanBeNull] // Для тестов
 		string CourseId { get; }
 	}
 

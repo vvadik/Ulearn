@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
+using JetBrains.Annotations;
 using log4net;
 using Microsoft.Build.Evaluation;
 using Ulearn.Common;
@@ -169,7 +170,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 
 		public MemoryStream GetZipForChecker()
 		{
-			log.Info($"Собираю zip-архив для проверки: курс {CourseId}, слайд «{Slide.Title}» ({Slide.Id})");
+			log.Info($"Собираю zip-архив для проверки: курс {CourseId}, слайд «{Slide?.Title}» ({Slide?.Id})");
 			var excluded = (PathsToExcludeForChecker ?? new string[0])
 				.Concat(new[] { "bin/*", "obj/*" })
 				.ToList();
