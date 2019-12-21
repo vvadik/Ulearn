@@ -23,6 +23,7 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Helpers;
 using Ulearn.Core.Metrics;
 using Ulearn.Core.RunCheckerJobApi;
 using Ulearn.Core.Telegram;

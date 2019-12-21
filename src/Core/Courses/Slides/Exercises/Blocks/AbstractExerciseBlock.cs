@@ -6,10 +6,9 @@ using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
 using Ionic.Zip;
+using StatsdClient;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
-using Ulearn.Core.Courses.Slides.Blocks;
-using Ulearn.Core.Model.Edx.EdxComponents;
 using Ulearn.Core.RunCheckerJobApi;
 using Component = Ulearn.Core.Model.Edx.EdxComponents.Component;
 
@@ -155,7 +154,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		}
 
 		/// <param name="excludeCriterias"><see cref="M:Ionic.Zip.ZipFile.AddSelectedFiles(System.String)" /></param>
-		public static byte[] ToZip(DirectoryInfo exerciseDirectory, IEnumerable<string> excludeCriterias, IEnumerable<FileContent> filesToUpdate = null,
+		public static MemoryStream ToZip(DirectoryInfo exerciseDirectory, IEnumerable<string> excludeCriterias, IEnumerable<FileContent> filesToUpdate = null,
 			IEnumerable<DirectoryInfo> directoriesToInclude = null)
 		{
 			using (var zip = new ZipFile())
@@ -171,13 +170,19 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 				zip.RemoveEntries(entriesToRemove);
 				foreach (var zipUpdateData in filesToUpdate ?? new List<FileContent>())
 					zip.UpdateEntry(zipUpdateData.Path, zipUpdateData.Data);
-				using (var ms = new MemoryStream())
-				{
-					zip.Save(ms);
-					return ms.ToArray();
-				}
+				var ms = new MemoryStream();
+				zip.Save(ms);
+				ms.Position = 0;
+				return ms;
 			}
 		}
+	}
+	
+	public interface IExerciseCheckerZipBuilder
+	{
+		MemoryStream GetZipForChecker();
+		Slide Slide { get; }
+		string CourseId { get; }
 	}
 
 	public class ExerciseTexts

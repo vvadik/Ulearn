@@ -67,9 +67,11 @@ namespace Ulearn.Core.Configuration
 
 		public string CoursesDirectory { get; set; }
 
-		public bool BuildExerciseStudentZips { get; set; }
-
 		public string ExerciseStudentZipsDirectory { get; set; }
+		
+		public string ExerciseCheckerZipsDirectory { get; set; }
+		
+		public bool ExerciseCheckerZipsCacheDisabled { get; set; }
 
 		public CertificateConfiguration Certificates { get; set; }
 
