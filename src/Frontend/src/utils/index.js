@@ -9,10 +9,13 @@ export function getQueryStringParameter(name, url) {
 	return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
 
-export function buildQuery(params) {
+export function buildQuery(params, convert) {
 	if (!params) {
 		return null;
 	}
+
+	if (!convert)
+		convert = (str) => str;
 
 	const esc = encodeURIComponent;
 	const notUndefinedParams = Object.keys(params)
@@ -23,6 +26,6 @@ export function buildQuery(params) {
 	}
 
 	return '?' + notUndefinedParams
-		.map(key => esc(key) + '=' + esc(params[key]))
+		.map(key => convert(esc(key)) + '=' + esc(params[key]).toLowerCase())
 		.join('&');
 }

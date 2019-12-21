@@ -40,6 +40,30 @@ const actions = {
 	handleShowReplyForm: action("showReplyForm"),
 };
 
+const replies = [];
+
+for(let i=0;i<1000;i++){
+	replies.push(			{
+		id: 2 + i,
+		author: {
+			"id": "10",
+			"visibleName": "Maria",
+			"avatarUrl": "https://staff.skbkontur.ru/content/images/default-user-woman.png",
+		},
+		text: "Я **не согласна**",
+		replies: [],
+		renderedText: "Я <b>не согласна</b>",
+		publishTime: "2019-02-18T14:12:41.947",
+		isApproved: true,
+		isCorrectAnswer: false,
+		likesCount: 0,
+		isLiked: false,
+		parentCommentId: 1999
+	},)
+}
+
+const commentPolicy={areCommentsEnabled:true,moderationPolicy:"postmoderation",onlyInstructorsCanReply:false,status:"ok"};
+
 const comment = {
 	id: 1,
 	text: "Решать эти задачи **можно** прямо в браузере, а специальная проверяющая система тут же проверит ваше решение.",
@@ -54,24 +78,7 @@ const comment = {
 	isPinnedToTop: false,
 	isLiked: true,
 	likesCount: 10,
-	replies: [
-		{
-			id: 2000,
-			author: {
-				"id": "10",
-				"visibleName": "Maria",
-				"avatarUrl": "https://staff.skbkontur.ru/content/images/default-user-woman.png",
-			},
-			text: "Я **не согласна**",
-			replies: [],
-			renderedText: "Я <b>не согласна</b>",
-			publishTime: "2019-02-18T14:12:41.947",
-			isApproved: false,
-			isCorrectAnswer: false,
-			likesCount: 0,
-			parentCommentId: 1999
-		}
-	],
+	replies: replies,
 };
 
 function getUserSolutionUrl(userId) {
@@ -81,6 +88,7 @@ function getUserSolutionUrl(userId) {
 storiesOf("Comments/Thread", module)
 .add("comment with replies", () => (
 	<Thread
+		commentPolicy={commentPolicy}
 		comment={comment}
 		user={user}
 		getUserSolutionsUrl={getUserSolutionUrl}

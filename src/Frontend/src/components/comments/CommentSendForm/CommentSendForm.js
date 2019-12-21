@@ -5,6 +5,8 @@ import Button from "@skbkontur/react-ui/components/Button/Button";
 import Avatar from "../../common/Avatar/Avatar";
 import MarkdownEditor from "./MarkdownEditor/MarkdownEditor";
 
+import classNames from 'classnames'
+
 import styles from "./CommentSendForm.less";
 
 class CommentSendForm extends Component {
@@ -32,16 +34,15 @@ class CommentSendForm extends Component {
 	}
 
 	render() {
-		const {author, isForInstructors, isShowFocus} = this.props;
+		const {author, isForInstructors, isShowFocus,className} = this.props;
 		const {error, text} = this.state;
 
+		const classes = classNames(className,styles.formContainer);
+		const avatarClasses = classNames(styles.avatar,styles.visibleOnDesktopAndTablet);
+
 		return (
-			<div className={styles.formContainer}>
-				{author && (
-					<div className={`${styles.avatar} ${styles.visibleOnDesktopAndTablet}`}>
-						<Avatar user={author} size="big" />
-					</div>
-				)}
+			<div className={classes}>
+				{author && (<Avatar className={avatarClasses}  user={author} size="big" />)}
 				<form className={styles.form} onSubmit={this.handleSubmit}>
 					<MarkdownEditor
 						isShowFocus={isShowFocus}
@@ -126,6 +127,7 @@ CommentSendForm.propTypes = {
 	submitTitle: PropTypes.string,
 	handleCancel: PropTypes.func,
 	cancelTitle: PropTypes.string,
+	className: PropTypes.string,
 };
 
 export default CommentSendForm;

@@ -134,9 +134,7 @@ class CommentsView extends Component {
 				});
 			}
 
-			if (isUserAction) {
-				window.history.pushState("", document.title, window.location.pathname + window.location.search);
-			} else {
+			if (!isUserAction) {
 				this.setState({
 					tabHasAutomaticallyChanged: true
 				});

@@ -1,21 +1,22 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import colorHash from "../../../utils/colorHash";
+import classNames from 'classnames'
 
 import styles from "./avatar.less";
 
 class Avatar extends Component {
 
 	render() {
-		const {user, size} = this.props;
+		const {user, size,className} = this.props;
 		const imageUrl = user.avatarUrl;
-		let className = `${styles["photo-avatar"]} ${styles[size] || "big"}`;
+		let classes = classNames(className,styles["photo-avatar"], styles[size] || "big");
 
 		if (imageUrl) {
-			return this.renderImage(imageUrl, className)
+			return this.renderImage(imageUrl, classes)
 		}
 
-		return this.renderCircle(className)
+		return this.renderCircle(classes)
 	}
 
 	renderImage(url, className) {
@@ -49,6 +50,7 @@ Avatar.propTypes = {
 		avatarUrl: PropTypes.string,
 		visibleName: PropTypes.string.isRequired,
 	}),
+	className: PropTypes.string,
 };
 
 export default Avatar;

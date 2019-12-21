@@ -35,20 +35,17 @@ class Thread extends Component {
 				courseId={courseId}
 				user={user}
 				userRoles={userRoles}>
-				<div className={styles.replies}>
-					{this.renderReplies(comment)}
-				</div>
+				{comment.replies.length > 0 && this.renderReplies(comment)}
 				{(isParentComment && comment.id === this.props.reply.commentId) &&
-				<div className={styles.replyForm}>
 					<CommentSendForm
+						className={styles.replyForm}
 						isShowFocus={focusedReplyForm}
 						commentId={comment.id}
 						sending={reply.sending}
 						author={user}
 						submitTitle="Отправить"
 						handleCancel={() => actions.handleShowReplyForm(null)}
-						handleSubmit={actions.handleAddReplyComment} />
-				</div>}
+						handleSubmit={actions.handleAddReplyComment} /> }
 			</Comment>
 		)
 	}
