@@ -47,6 +47,8 @@ namespace Ulearn.Core
 
 		public static string FormatCodePrettyPrint(MarkdownDeep.Markdown m, string code)
 		{
+			code = code.TrimEnd();
+			
 			// Try to extract the language from the first line
 			var match = rxExtractLanguage.Match(code);
 			string language = null;
