@@ -156,9 +156,9 @@ window.documentReadyFunctions.push(function () {
 			$.post(action, { id: id, nextUrl: nextUrl, errorUrl: errorUrl, exerciseScore: exerciseScore, prohibitFurtherReview: prohibitFurtherReview })
 				.done(function(data) {
 					if(data.status === "ok")
-						window.location.href = nextUrl;
+						window.reactHistory.push(nextUrl);
 					else
-						window.location.href = data.redirect;
+						window.reactHistory.push(data.redirect);
 				})
 				.fail(function() {
 					alert("Ошибка на сервере");
