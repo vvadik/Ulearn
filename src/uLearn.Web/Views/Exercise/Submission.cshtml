@@ -181,7 +181,7 @@
 				var acceptedSolutionsUrl = Model.Url != null
 					? Model.Url.Action("AcceptedSolutions", "Course", new { courseId = Model.CourseId, slideId = Model.Slide.Id })
 					: "";
-				var acceptedSolutionsAction = Model.CanSkip ? "$('#ShowSolutionsAlert').modal('show')" : string.Format("window.location='{0}'", acceptedSolutionsUrl);
+				var acceptedSolutionsAction = Model.CanSkip ? "$('#ShowSolutionsAlert').modal('show')" : $"window.reactHistory.push('{acceptedSolutionsUrl}')";
 				@SlideHtml.ExerciseControls(new ExerciseControlsModel(Model.CourseId, Model.Slide)
 				{
 					IsLti = Model.IsLti,
