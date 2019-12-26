@@ -4,30 +4,24 @@ using AntiPlagiarism.Web.Configuration;
 using AntiPlagiarism.Web.Database;
 using AntiPlagiarism.Web.Database.Repos;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using Serilog.Events;
 using Swashbuckle.AspNetCore.Filters;
 using Ulearn.Common.Api;
-using Vostok.Commons.Extensions.UnitConvertions;
 using Vostok.Hosting;
-using Vostok.Instrumentation.AspNetCore;
-using Vostok.Logging.Serilog;
-using Vostok.Logging.Serilog.Enrichers;
-using Vostok.Metrics;
 
 namespace AntiPlagiarism.Web
 {
 	public class WebApplication : BaseApiWebApplication
 	{
+		private AddNewSubmissionWorker addNewSubmissionWorker; // держит ссылку на воркеры
 		protected override IApplicationBuilder ConfigureWebApplication(IApplicationBuilder app)
 		{
 			var database = app.ApplicationServices.GetService<AntiPlagiarismDb>();
 			database.MigrateToLatestVersion();
-
+			addNewSubmissionWorker = app.ApplicationServices.GetService<AddNewSubmissionWorker>();
 			return app;
 		}
 
@@ -54,6 +48,7 @@ namespace AntiPlagiarism.Web
 			services.AddScoped<ISubmissionsRepo, SubmissionsRepo>();
 			services.AddScoped<ISnippetsRepo, SnippetsRepo>();
 			services.AddScoped<ITasksRepo, TasksRepo>();
+			services.AddScoped<IWorkQueueRepo, WorkQueueRepo>();
 
 			/* Other services */
 			services.AddScoped<PlagiarismDetector>();
@@ -61,6 +56,8 @@ namespace AntiPlagiarism.Web
 			services.AddSingleton<CodeUnitsExtractor>();
 			services.AddScoped<SnippetsExtractor>();
 			services.AddScoped<SubmissionSnippetsExtractor>();
+			services.AddScoped<NewSubmissionHandler>();
+			services.AddSingleton<AddNewSubmissionWorker>();
 		}
 	}
 }

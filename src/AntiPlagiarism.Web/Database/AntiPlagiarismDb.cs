@@ -5,6 +5,7 @@ namespace AntiPlagiarism.Web.Database
 {
 	public class AntiPlagiarismDb : DbContext
 	{
+		public static readonly string DefaultSchema = "antiplagiarism";
 		public AntiPlagiarismDb(DbContextOptions<AntiPlagiarismDb> options)
 			: base(options)
 		{
@@ -12,7 +13,7 @@ namespace AntiPlagiarism.Web.Database
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			modelBuilder.HasDefaultSchema("antiplagiarism");
+			modelBuilder.HasDefaultSchema(DefaultSchema);
 
 			modelBuilder.Entity<Client>()
 				.HasIndex(c => c.Token)
@@ -40,6 +41,10 @@ namespace AntiPlagiarism.Web.Database
 			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId });
 			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId, c.AuthorId });
 			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId, c.Language, c.AuthorId });
+
+			modelBuilder.Entity<WorkQueueItem>()
+				.HasIndex(c => new { c.QueueId, c.TakeAfterTime })
+				.IsUnique(false);
 		}
 
 		public void MigrateToLatestVersion()
@@ -66,5 +71,6 @@ namespace AntiPlagiarism.Web.Database
 		public DbSet<SnippetStatistics> SnippetsStatistics { get; set; }
 		public DbSet<SnippetOccurence> SnippetsOccurences { get; set; }
 		public DbSet<TaskStatisticsParameters> TasksStatisticsParameters { get; set; }
+		public DbSet<WorkQueueItem> WorkQueueItems { get; set; }
 	}
 }

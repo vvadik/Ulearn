@@ -1,9 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Events;
+using Ulearn.Common.Api.Helpers;
 using Ulearn.Core.Configuration;
 using Vostok.Hosting;
 using Vostok.Logging;
@@ -63,9 +63,8 @@ namespace Ulearn.Web.Api
 
 						if (dbMinimumLevel != minimumLevel)
 						{
-							Func<Serilog.Events.LogEvent, bool> isDbSource = le => ((le.Properties.GetValueOrDefault("SourceContext") as ScalarValue)?.Value as string)?.StartsWith("\"Microsoft.EntityFrameworkCore.Database.Command") ?? false;
 							loggerConfiguration = loggerConfiguration.Filter.ByIncludingOnly(le =>
-								le.Level >= dbMinimumLevel || !isDbSource(le));
+								le.Level >= dbMinimumLevel || !LogEventHelpers.IsDbSource(le));
 						}
 					}
 
