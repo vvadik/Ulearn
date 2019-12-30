@@ -6,7 +6,6 @@ using log4net;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Infrastructure;
-using SkbKontur.Passport.Client;
 using uLearn.Web.Extensions;
 using uLearn.Web.Kontur.Passport.Provider;
 
@@ -41,8 +40,7 @@ namespace uLearn.Web.Kontur.Passport
 				if (state == null)
 					return null;
 
-				var redirectUri = GetRedirectUri(Request);
-				var authenticationResult = passportClient.Authenticate(queryString, redirectUri, state);
+				var authenticationResult = passportClient.Authenticate(queryString, state);
 				if (authenticationResult.IsError)
 				{
 					log.Error(authenticationResult.ErrorMessage);
@@ -57,7 +55,7 @@ namespace uLearn.Web.Kontur.Passport
 
 				var identity = new ClaimsIdentity(Options.AuthenticationType);
 
-				var userClaims = authenticationResult.UserClaims.ToList();
+				var userClaims = authenticationResult.Claims.ToList();
 				log.Info($"Received follow user claims from Kontur.Passport server: {string.Join(", ", userClaims.Select(c => c.Type + ": " + c.Value))}");
 				var login = userClaims.FirstOrDefault(c => c.Type == KonturPassportConstants.LoginClaimType)?.Value;
 				var sid = userClaims.FirstOrDefault(c => c.Type == KonturPassportConstants.SidClaimType)?.Value;
