@@ -79,9 +79,8 @@ namespace uLearn.Web
 			//   appSecret: "");
 
 			var konturPassportClientId = WebConfigurationManager.AppSettings["owin.konturPassport.clientId"];
-			var konturPassportClientSecret = WebConfigurationManager.AppSettings["owin.konturPassport.clientSecret"];
-			if (!string.IsNullOrEmpty(konturPassportClientSecret))
-				app.UseKonturPassportAuthentication(konturPassportClientId, konturPassportClientSecret);
+			if (!string.IsNullOrEmpty(konturPassportClientId))
+				app.UseKonturPassportAuthentication(konturPassportClientId);
 
 			//app.UseGoogleAuthentication();
 			app.UseLtiAuthentication();

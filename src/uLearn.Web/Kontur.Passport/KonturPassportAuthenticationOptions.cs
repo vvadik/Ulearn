@@ -19,8 +19,6 @@ namespace uLearn.Web.Kontur.Passport
 
 		public string ClientId { get; set; }
 
-		public string ClientSecret { get; set; }
-
 		public string Caption
 		{
 			get => Description.Caption;

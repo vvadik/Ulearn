@@ -4,8 +4,6 @@ using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.DataProtection;
 using Microsoft.Owin.Security.Infrastructure;
 using Owin;
-using SkbKontur.Passport.Client;
-using SkbKontur.Passport.Client.Configuration;
 
 namespace uLearn.Web.Kontur.Passport
 {
@@ -18,14 +16,7 @@ namespace uLearn.Web.Kontur.Passport
 			: base(next, options)
 		{
 			log = LogManager.GetLogger(typeof(KonturPassportAuthenticationMiddleware));
-			var clientConfiguration = new PassportClientConfiguration
-			{
-				ClientId = Options.ClientId,
-				ClientSecret = Options.ClientSecret,
-				Scope = "profile email",
-			};
-			var clientOptions = new ClientOptions(clientConfiguration);
-			passportClient = new PassportClient(clientOptions);
+			passportClient = new PassportClient(options.ClientId, new []{"openid", "profile", "email"});
 
 			if (Options.StateDataFormat == null)
 			{

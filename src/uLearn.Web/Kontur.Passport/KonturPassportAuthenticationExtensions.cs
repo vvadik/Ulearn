@@ -22,12 +22,11 @@ namespace uLearn.Web.Kontur.Passport
 			return app;
 		}
 
-		public static IAppBuilder UseKonturPassportAuthentication(this IAppBuilder app, string clientId, string clientSecret)
+		public static IAppBuilder UseKonturPassportAuthentication(this IAppBuilder app, string clientId)
 		{
 			return app.UseKonturPassportAuthentication(new KonturPassportAuthenticationOptions
 			{
 				ClientId = clientId,
-				ClientSecret = clientSecret,
 				SignInAsAuthenticationType = app.GetDefaultSignInAsAuthenticationType()
 			});
 		}
