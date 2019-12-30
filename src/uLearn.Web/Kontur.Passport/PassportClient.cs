@@ -14,11 +14,13 @@ namespace uLearn.Web.Kontur.Passport
 		private const string issuerUriString = "https://passport.skbkontur.ru/";
 		private const string authority = issuerUriString + "v3/";
 		private const string authorizationEndpoint = authority + "connect/authorize";
+		private readonly SigningKeysProvider signingKeysProvider;
 
 		public PassportClient(string clientId, string[] scopes)
 		{
 			this.clientId = clientId;
 			this.scopes = scopes;
+			signingKeysProvider = new SigningKeysProvider(authority);
 		}
 		
 		public AuthenticationResult Authenticate(
@@ -58,12 +60,14 @@ namespace uLearn.Web.Kontur.Passport
 
 		private JwtSecurityToken GetValidatedToken(string token)
 		{
+			var keys = signingKeysProvider.GetSigningKeysAsync().Result;
 			var securityTokenHandler = new JwtSecurityTokenHandler();
 			var validationParameters = new TokenValidationParameters
 			{
 				ValidIssuer = issuerUriString,
 				ValidAudience = clientId,
-				ValidateIssuerSigningKey = false,
+				IssuerSigningKeys = keys,
+				ValidateIssuerSigningKey = true,
 				RequireExpirationTime = true
 			};
 			try
