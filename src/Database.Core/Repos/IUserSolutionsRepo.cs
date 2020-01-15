@@ -42,7 +42,7 @@ namespace Database.Repos
 		UserExerciseSubmission FindNoTrackingSubmission(int id);
 		UserExerciseSubmission FindSubmissionById(int id);
 		UserExerciseSubmission FindSubmissionById(string id);
-		List<UserExerciseSubmission> FindSubmissionsByIds(List<string> checkingsIds);
+		List<UserExerciseSubmission> FindSubmissionsByIds(IEnumerable<string> checkingsIds);
 		Task SaveResults(List<RunningResults> results);
 		Task RunAutomaticChecking(UserExerciseSubmission submission, TimeSpan timeout, bool waitUntilChecked);
 		Dictionary<int, string> GetSolutionsForSubmissions(IEnumerable<int> submissionsIds);
