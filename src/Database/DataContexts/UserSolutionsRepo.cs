@@ -398,9 +398,9 @@ namespace Database.DataContexts
 			return db.UserExerciseSubmissions.Find(id);
 		}
 
-		public UserExerciseSubmission FindSubmissionById(string id)
+		private UserExerciseSubmission FindSubmissionById(string idString)
 		{
-			return db.UserExerciseSubmissions.FirstOrDefault(s => s.Id.ToString() == id);
+			return int.TryParse(idString, out var id) ? FindSubmissionById(id) : null;
 		}
 
 		public List<UserExerciseSubmission> FindSubmissionsByIds(IEnumerable<int> checkingsIds)

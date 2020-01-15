@@ -103,7 +103,8 @@ namespace Database
 				var isCourseLoaded = loadedCourseVersions.TryGetValue(courseId.ToLower(), out var loadedVersionId);
 				if ((isCourseLoaded && loadedVersionId != publishedVersion.Id) || !isCourseLoaded)
 				{
-					logger.Information($"Загруженная версия курса {courseId} отличается от актуальной ({loadedVersionId.ToString() ?? "<none>"} != {publishedVersion.Id}). Обновляю курс.");
+					var actual = isCourseLoaded ? loadedVersionId.ToString() : "<none>";
+					logger.Information($"Загруженная версия курса {courseId} отличается от актуальной ({actual} != {publishedVersion.Id}). Обновляю курс.");
 					ReloadCourse(courseId);
 				}
 

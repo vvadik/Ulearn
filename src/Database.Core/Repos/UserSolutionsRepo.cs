@@ -299,9 +299,10 @@ namespace Database.Repos
 			return db.UserExerciseSubmissions.Find(id);
 		}
 
-		public List<UserExerciseSubmission> FindSubmissionsByIds(List<string> checkingsIds)
+		public List<UserExerciseSubmission> FindSubmissionsByIds(IEnumerable<string> checkingsIds)
 		{
-			return db.UserExerciseSubmissions.Where(c => checkingsIds.Contains(c.Id.ToString())).ToList();
+			var intIds = checkingsIds.Select(i => int.TryParse(i, out var parsed) ? parsed : -1).Where(i => i != -1).ToList();
+			return db.UserExerciseSubmissions.Where(c => intIds.Contains(c.Id)).ToList();
 		}
 
 		private Task UpdateIsRightAnswerForSubmission(AutomaticExerciseChecking checking)
@@ -329,7 +330,7 @@ namespace Database.Repos
 			using (var transaction = db.Database.BeginTransaction())
 			{
 				log.Info($"Сохраняю информацию о проверке решений: [{string.Join(", ", results.Select(r => r.Id))}]");
-				var submissions = FindSubmissionsByIds(results.Select(result => result.Id).ToList());
+				var submissions = FindSubmissionsByIds(results.Select(result => result.Id));
 				if (submissions.Count != results.Count)
 				{
 					log.Warn($"Нашёл в базе данных не все решения. Искал: [{string.Join(", ", results.Select(r => r.Id))}]. Нашёл: [{string.Join(", ", submissions.Select(s => s.Id))}]");
