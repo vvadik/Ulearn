@@ -26,32 +26,31 @@ namespace AntiPlagiarism.Web.Controllers
 		private readonly ISubmissionsRepo submissionsRepo;
 		private readonly ISnippetsRepo snippetsRepo;
 		private readonly ITasksRepo tasksRepo;
-		private readonly StatisticsParametersFinder statisticsParametersFinder;
+		private readonly IWorkQueueRepo workQueueRepo;
 		private readonly PlagiarismDetector plagiarismDetector;
 		private readonly CodeUnitsExtractor codeUnitsExtractor;
-		private readonly SubmissionSnippetsExtractor submissionSnippetsExtractor;
 		private readonly IServiceScopeFactory serviceScopeFactory;
+		private readonly NewSubmissionHandler newSubmissionHandler;
 		private readonly AntiPlagiarismConfiguration configuration;
 
 		public ApiController(
 			AntiPlagiarismDb db,
-			ISubmissionsRepo submissionsRepo, ISnippetsRepo snippetsRepo, ITasksRepo tasksRepo, IClientsRepo clientsRepo,
-			StatisticsParametersFinder statisticsParametersFinder,
+			ISubmissionsRepo submissionsRepo, ISnippetsRepo snippetsRepo, ITasksRepo tasksRepo, IClientsRepo clientsRepo, IWorkQueueRepo workQueueRepo,
 			PlagiarismDetector plagiarismDetector,
 			CodeUnitsExtractor codeUnitsExtractor,
-			SubmissionSnippetsExtractor submissionSnippetsExtractor,
 			ILogger logger,
 			IServiceScopeFactory serviceScopeFactory,
+			NewSubmissionHandler newSubmissionHandler,
 			IOptions<AntiPlagiarismConfiguration> configuration)
 			: base(logger, clientsRepo, db)
 		{
 			this.submissionsRepo = submissionsRepo;
 			this.snippetsRepo = snippetsRepo;
 			this.tasksRepo = tasksRepo;
-			this.statisticsParametersFinder = statisticsParametersFinder;
+			this.workQueueRepo = workQueueRepo;
 			this.plagiarismDetector = plagiarismDetector;
 			this.codeUnitsExtractor = codeUnitsExtractor;
-			this.submissionSnippetsExtractor = submissionSnippetsExtractor;
+			this.newSubmissionHandler = newSubmissionHandler;
 			this.serviceScopeFactory = serviceScopeFactory;
 			this.configuration = configuration.Value;
 		}
@@ -85,35 +84,14 @@ namespace AntiPlagiarism.Web.Controllers
 				parameters.AdditionalInfo
 			);
 
-			await ExtractSnippetsFromSubmissionAsync(submission).ConfigureAwait(false);
-			if (await NeedToRecalculateTaskStatistics(client.Id, submission.TaskId).ConfigureAwait(false))
-				await CalculateTaskStatisticsParametersAsync(client.Id, submission.TaskId).ConfigureAwait(false);
+			await workQueueRepo.Add(QueueIds.NewSubmissionsQueue, submission.Id.ToString()).ConfigureAwait(false);
 
 			return new AddSubmissionResponse
 			{
 				SubmissionId = submission.Id,
 			};
 		}
-
-		/* Определяет, пора ли пересчитывать параметры Mean и Deviation для заданной задачи.
-		   В конфигурации для этого есть специальный параметр configuration.StatisticsAnalyzing.RecalculateStatisticsAfterSubmisionsCount.
-		   Если он равен, например, 1000, то параметры будут пересчитываться после каждого тысячного решения по этой задаче.
-		   Если решений пока меньше 1000, то параметры будут пересчитываться после 1-го, 2-го, 4-го, 8-го, 16-го, 32-го решения и так далее.
-		 */
-		private async Task<bool> NeedToRecalculateTaskStatistics(int clientId, Guid taskId)
-		{
-			var submissionsCount = await submissionsRepo.GetSubmissionsCountAsync(clientId, taskId).ConfigureAwait(false);
-			var oldSubmissionsCount = (await tasksRepo.FindTaskStatisticsParametersAsync(taskId).ConfigureAwait(false))?.SubmissionsCount ?? 0;
-			var recalculateStatisticsAfterSubmissionsCount = configuration.StatisticsAnalyzing.RecalculateStatisticsAfterSubmissionsCount;
-			logger.Information($"Определяю, надо ли пересчитать статистические параметры задачи (TaskStatisticsParameters, параметры Mean и Deviation), задача {taskId}. " +
-								$"Старое количество решений {oldSubmissionsCount}, новое {submissionsCount}, параметр recalculateStatisticsAfterSubmisionsCount={recalculateStatisticsAfterSubmissionsCount}.");
-
-			if (submissionsCount < recalculateStatisticsAfterSubmissionsCount)
-				return submissionsCount >= 2 * oldSubmissionsCount;
-
-			return submissionsCount - oldSubmissionsCount >= recalculateStatisticsAfterSubmissionsCount;
-		}
-
+		
 		private int GetTokensCount(string code)
 		{
 			var codeUnits = codeUnitsExtractor.Extract(code);
@@ -130,10 +108,10 @@ namespace AntiPlagiarism.Web.Controllers
 			var submissions = await submissionsRepo.GetSubmissionsByTaskAsync(client.Id, parameters.TaskId).ConfigureAwait(false);
 			foreach (var submission in submissions)
 			{
-				await ExtractSnippetsFromSubmissionAsync(submission).ConfigureAwait(false);
+				await newSubmissionHandler.ExtractSnippetsFromSubmissionAsync(submission).ConfigureAwait(false);
 			}
 
-			await CalculateTaskStatisticsParametersAsync(client.Id, parameters.TaskId).ConfigureAwait(false);
+			await newSubmissionHandler.CalculateTaskStatisticsParametersAsync(client.Id, parameters.TaskId).ConfigureAwait(false);
 
 			return Json(new RebuildSnippetsForTaskResponse
 			{
@@ -159,7 +137,7 @@ namespace AntiPlagiarism.Web.Controllers
 			var weights = new Dictionary<Guid, List<double>>();
 			foreach (var (index, taskId) in taskIds.Enumerate(start: 1))
 			{
-				weights[taskId] = await CalculateTaskStatisticsParametersAsync(client.Id, taskId).ConfigureAwait(false);
+				weights[taskId] = await newSubmissionHandler.CalculateTaskStatisticsParametersAsync(client.Id, taskId).ConfigureAwait(false);
 				weights[taskId].Sort();
 
 				logger.Information($"RecalculateTaskStatistics: обработано {index.PluralizeInRussian(RussianPluralizationOptions.Tasks)} из {taskIds.Count}");
@@ -249,38 +227,6 @@ namespace AntiPlagiarism.Web.Controllers
 					FirstTokenIndex = u.FirstTokenIndex,
 					TokensCount = u.Tokens.Count,
 				}).ToList();
-		}
-
-		private async Task ExtractSnippetsFromSubmissionAsync(Submission submission)
-		{
-			foreach (var (firstTokenIndex, snippet) in submissionSnippetsExtractor.ExtractSnippetsFromSubmission(submission))
-				await snippetsRepo.AddSnippetOccurenceAsync(submission, snippet, firstTokenIndex).ConfigureAwait(false);
-		}
-
-		/// <returns>List of weights (numbers from [0, 1)) used for calculating mean and deviation for this task</returns>
-		private async Task<List<double>> CalculateTaskStatisticsParametersAsync(int clientId, Guid taskId)
-		{
-			/* Create local submissions repo for preventing memory leaks */
-			using (var scope = serviceScopeFactory.CreateScope())
-			{
-				db.DisableAutoDetectChanges();
-
-				var localSubmissionsRepo = scope.ServiceProvider.GetService<ISubmissionsRepo>();
-
-				logger.Information($"Пересчитываю статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId}");
-				var lastAuthorsIds = await localSubmissionsRepo.GetLastAuthorsByTaskAsync(clientId, taskId, configuration.StatisticsAnalyzing.CountOfLastAuthorsForCalculatingMeanAndDeviation).ConfigureAwait(false);
-				var lastSubmissions = await localSubmissionsRepo.GetLastSubmissionsByAuthorsForTaskAsync(clientId, taskId, lastAuthorsIds).ConfigureAwait(false);
-				var currentSubmissionsCount = await localSubmissionsRepo.GetSubmissionsCountAsync(clientId, taskId).ConfigureAwait(false);
-
-				var (weights, statisticsParameters) = await statisticsParametersFinder.FindStatisticsParametersAsync(lastSubmissions).ConfigureAwait(false);
-				logger.Information($"Новые статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId}: Mean={statisticsParameters.Mean}, Deviation={statisticsParameters.Deviation}");
-				statisticsParameters.TaskId = taskId;
-				statisticsParameters.SubmissionsCount = currentSubmissionsCount;
-
-				await tasksRepo.SaveTaskStatisticsParametersAsync(statisticsParameters).ConfigureAwait(false);
-
-				return weights;
-			}
 		}
 
 		private async Task<SuspicionLevels> GetSuspicionLevelsAsync(Guid taskId)

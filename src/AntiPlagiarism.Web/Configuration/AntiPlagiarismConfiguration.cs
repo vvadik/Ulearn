@@ -13,6 +13,8 @@ namespace AntiPlagiarism.Web.Configuration
 		public PlagiarismDetectorConfiguration PlagiarismDetector { get; set; }
 
 		public ActionsConfiguration Actions { get; set; }
+		
+		public int ThreadsCount { get; set; }
 	}
 
 	public class StatisticsAnalyzingConfiguration
