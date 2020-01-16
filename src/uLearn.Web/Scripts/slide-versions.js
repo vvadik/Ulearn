@@ -1,8 +1,12 @@
 ﻿function updateExerciseVersionUrl(versionId) {
-	var newSearch = $.query.set('version', versionId).toString();
-	var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + newSearch;
-	if (history.pushState)
-		window.history.pushState({ path: newurl }, '', newurl);
+	if (window.URLSearchParams === undefined)
+		return;
+	var url = new URL(window.location.href);
+	var queryString = url.search;
+	var searchParams = new URLSearchParams(queryString);
+	searchParams.set('version', versionId);
+	url.search = searchParams.toString();
+	window.history.replaceState({}, null, url.pathname + url.search);
 }
 
 function setExerciseVersion(versionId, showOutput) {
