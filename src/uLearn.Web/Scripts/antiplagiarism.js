@@ -41,21 +41,21 @@ function fetchAntiPlagiarismStatus($plagiarismStatus) {
         $plagiarismStatus.html('Проверка на списывание: ' + message);
 		$plagiarismStatusFixedCopy.html($plagiarismStatus.html());
 		
-		if (data.suspicion_level !== 0) {			
-			$('.antiplagiarism-shame-button').tooltip({
+		if (data.suspicion_level !== 0) {
+			var $shameButton = $('.antiplagiarism-shame-button');
+			$shameButton.tooltip({
 				title: '<div class="text-left">Нажмите, если тоже думаете, что решение списано: мы поставим за него 0 баллов и оставим студенту комментарий. Все действия обратимы.</div>',
 				html: true,
 				placement: 'bottom',
 				fallbackPlacement: 'left',
 				trigger: 'hover',
 			});
-			
-			var $exerciseSubmission = $('.exercise__submission');
-			$exerciseSubmission.on('click', '.antiplagiarism-shame-button', function(e) {
+
+			$shameButton.on('click', function(e) {
 				e.preventDefault();
-				
-				$('.antiplagiarism-shame-button').tooltip('hide');
-				
+
+				$shameButton.tooltip('hide');
+
 				postExerciseCodeReview(addCodeReviewUrl, {
 					head: { line: 0, ch: 0 },
 					anchor: { line: 1, ch: 0 }
@@ -64,7 +64,7 @@ function fetchAntiPlagiarismStatus($plagiarismStatus) {
 				/* Set 0 points */
 				var $exerciseScore = $('.exercise__score');
 				$exerciseScore.find('[data-value="0"]:not(.active)').click();
-				
+
 				/* Prohibit further review */
 				var $prohibitFurtherReview = $('#prohibitFurtherReview');
 				$prohibitFurtherReview.prop('checked', true);
