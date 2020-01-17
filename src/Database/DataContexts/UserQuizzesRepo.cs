@@ -150,13 +150,14 @@ namespace Database.DataContexts
 			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
-		public async Task<Dictionary<string, Dictionary<string, int>>> GetAnswersFrequencyForChoiceBlocks(string courseId, Guid slideId, int blocksCount)
+		public async Task<Dictionary<string, Dictionary<string, int>>> GetAnswersFrequencyForChoiceBlocks(string courseId, Guid slideId, List<ChoiceBlock> choiceBlock)
 		{
+			var choiceBlockIds = choiceBlock.Select(cb => cb.Id);
 			var answers = await db.UserQuizAnswers.Include(q => q.Submission)
-				.Where(q => q.Submission.CourseId == courseId && q.Submission.SlideId == slideId)
+				.Where(q => q.Submission.CourseId == courseId && q.Submission.SlideId == slideId && choiceBlockIds.Contains(q.BlockId))
 				.OrderByDescending(q => q.Submission.Id)
 				.Select(q => new { q.Submission.UserId, q.Submission.Timestamp, q.BlockId, q.ItemId})
-				.Take(500 * blocksCount)
+				.Take(500 * choiceBlock.Count)
 				.ToListAsync().ConfigureAwait(false);
 			var tries = answers
 				.GroupBy(q => q.BlockId)

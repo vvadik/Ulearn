@@ -141,7 +141,7 @@ namespace uLearn.Web.Controllers
 			if (User.HasAccessFor(courseId, CourseRole.CourseAdmin))
 			{
 				var choiceBlocks =  slide.Blocks.OfType<ChoiceBlock>().ToList();
-				var answersFrequency = userQuizzesRepo.GetAnswersFrequencyForChoiceBlocks(courseId, slide.Id, choiceBlocks.Count).Result;
+				var answersFrequency = userQuizzesRepo.GetAnswersFrequencyForChoiceBlocks(courseId, slide.Id, choiceBlocks).Result;
 				questionAnswersFrequency = answersFrequency.Keys.ToDictionary(
 					blockId => blockId,
 					blockId => answersFrequency[blockId].ToDefaultDictionary()
