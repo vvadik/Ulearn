@@ -150,16 +150,25 @@ namespace Database.DataContexts
 			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
-		public Dictionary<string, int> GetAnswersFrequencyForChoiceBlock(string courseId, Guid slideId, string quizId)
+		public async Task<Dictionary<string, Dictionary<string, int>>> GetAnswersFrequencyForChoiceBlocks(string courseId, Guid slideId, int blocksCount)
 		{
-			var answers = db.UserQuizAnswers.Include(q => q.Submission).Where(q => q.Submission.CourseId == courseId && q.Submission.SlideId == slideId && q.BlockId == quizId);
-			var totalTries = answers.Select(q => new { q.Submission.UserId, q.Submission.Timestamp }).Distinct().Count();
-			/* Don't call GroupBy().ToDictionary() because of performance issues.
-			   See http://code-ninja.org/blog/2014/07/24/entity-framework-never-call-groupby-todictionary/ for details */
+			var answers = await db.UserQuizAnswers.Include(q => q.Submission)
+				.Where(q => q.Submission.CourseId == courseId && q.Submission.SlideId == slideId)
+				.OrderByDescending(q => q.Submission.Id)
+				.Select(q => new { q.Submission.UserId, q.Submission.Timestamp, q.BlockId, q.ItemId})
+				.Take(500 * blocksCount)
+				.ToListAsync().ConfigureAwait(false);
+			var tries = answers
+				.GroupBy(q => q.BlockId)
+				.ToDictionary(g => g.Key, g => g.Select(v => (v.UserId, v.Timestamp)).Distinct().Count());
 			return answers
-				.GroupBy(q => q.ItemId)
-				.Select(g => new { g.Key, Count = g.Count() })
-				.ToDictionary(p => p.Key, p => p.Count.PercentsOf(totalTries));
+				.GroupBy(q => q.BlockId)
+				.ToDictionary(
+					g => g.Key, 
+					g => g
+						.GroupBy(q => q.ItemId)
+						.ToDictionary(g2 => g2.Key, g2 => g2.Count().PercentsOf(tries[g.Key]))
+					);
 		}
 	}
 }
