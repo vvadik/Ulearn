@@ -23,7 +23,7 @@ namespace Database.DataContexts
 
 		public async Task AddVisit(string courseId, Guid slideId, string userId, string ipAddress)
 		{
-			await SetLastVisit(courseId, slideId, userId).ConfigureAwait(false);
+			SetLastVisit(courseId, slideId, userId);
 			var visit = FindVisit(courseId, slideId, userId);
 			if (visit == null)
 			{
@@ -41,7 +41,7 @@ namespace Database.DataContexts
 			await db.SaveChangesAsync();
 		}
 
-		private async Task SetLastVisit(string courseId, Guid slideId, string userId)
+		private void SetLastVisit(string courseId, Guid slideId, string userId)
 		{
 			var lastVisit = FindLastVisit(courseId, userId);
 			if (lastVisit == null)
@@ -59,7 +59,6 @@ namespace Database.DataContexts
 				lastVisit.SlideId = slideId;
 				lastVisit.Timestamp = DateTime.Now;
 			}
-			await db.SaveChangesAsync().ConfigureAwait(false);;
 		}
 
 		public Visit FindVisit(string courseId, Guid slideId, string userId)
