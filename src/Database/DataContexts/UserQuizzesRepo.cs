@@ -97,20 +97,24 @@ namespace Database.DataContexts
 				submission = FindLastUserSubmission(courseId, slide.Id, userId);
 
 			var answer = new Dictionary<string, List<UserQuizAnswer>>();
-			foreach (var block in slide.Blocks.OfType<AbstractQuestionBlock>())
+			if (submission == null)
 			{
-				if (submission != null)
-				{
-					var ans = db.UserQuizAnswers
-						.Where(q => q.SubmissionId == submission.Id && q.BlockId == block.Id)
-						.OrderBy(x => x.Id)
-						.ToList();
-
-					answer[block.Id] = ans;
-				}
-				else
+				foreach (var block in slide.Blocks.OfType<AbstractQuestionBlock>())
 					answer[block.Id] = new List<UserQuizAnswer>();
+				return answer;
 			}
+			
+			var blocks2Answers = db.UserQuizAnswers
+				.Where(q => q.SubmissionId == submission.Id)
+				.OrderBy(x => x.Id)
+				.AsEnumerable()
+				.GroupBy(a => a.BlockId)
+				.ToDictionary(g => g.Key, g => g.ToList());
+
+			foreach (var block in slide.Blocks.OfType<AbstractQuestionBlock>())
+				answer[block.Id] = blocks2Answers.ContainsKey(block.Id)
+					? blocks2Answers[block.Id]
+					: new List<UserQuizAnswer>();
 
 			return answer;
 		}

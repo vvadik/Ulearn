@@ -103,6 +103,7 @@ namespace Database.Repos
 			return passedQuizzes;
 		}
 
+		// TODO: переписать как в не-Core
 		public async Task<Dictionary<string, List<UserQuizAnswer>>> GetAnswersForShowingOnSlideAsync(string courseId, QuizSlide slide, string userId, UserQuizSubmission submission = null)
 		{
 			if (slide == null)
