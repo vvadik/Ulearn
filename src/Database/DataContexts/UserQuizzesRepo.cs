@@ -152,13 +152,14 @@ namespace Database.DataContexts
 
 		public async Task<Dictionary<string, Dictionary<string, int>>> GetAnswersFrequencyForChoiceBlocks(string courseId, Guid slideId, List<ChoiceBlock> choiceBlock)
 		{
-			var choiceBlockIds = choiceBlock.Select(cb => cb.Id);
 			var answers = await db.UserQuizAnswers.Include(q => q.Submission)
-				.Where(q => q.Submission.CourseId == courseId && q.Submission.SlideId == slideId && choiceBlockIds.Contains(q.BlockId))
+				.Where(q => q.Submission.CourseId == courseId && q.Submission.SlideId == slideId && q.ItemId != null)
 				.OrderByDescending(q => q.Submission.Id)
 				.Select(q => new { q.Submission.UserId, q.Submission.Timestamp, q.BlockId, q.ItemId})
 				.Take(500 * choiceBlock.Count)
 				.ToListAsync().ConfigureAwait(false);
+			var choiceBlockIds = choiceBlock.Select(cb => cb.Id);
+			answers = answers.Where(a => choiceBlockIds.Contains(a.BlockId)).ToList();
 			var tries = answers
 				.GroupBy(q => q.BlockId)
 				.ToDictionary(g => g.Key, g => g.Select(v => (v.UserId, v.Timestamp)).Distinct().Count());
