@@ -551,6 +551,13 @@ namespace uLearn.Web.Controllers
 
 			return result;
 		}
+		
+		private HashSet<Guid> GetMergedCheckingQueueSlideIds(ManualCheckingQueueFilterOptions filterOptions)
+		{
+			var result = slideCheckingsRepo.GetManualCheckingQueueSlideIds<ManualExerciseChecking>(filterOptions);
+			result.UnionWith(slideCheckingsRepo.GetManualCheckingQueueSlideIds<ManualQuizChecking>(filterOptions));
+			return result;
+		}
 
 		private ActionResult InternalCheckingQueue(string courseId, bool done, List<string> groupsIds, string userId = "", Guid? slideId = null, string message = "")
 		{
@@ -610,15 +617,15 @@ namespace uLearn.Web.Controllers
 			});
 		}
 		
+		// Возвращает слайды, по которым есть работы (проверенные или непроверенные, зависит от галочки), разделитель и оставшиеся слайды (не важно проверенные или нет).
 		private List<KeyValuePair<Guid, Slide>> GetAllCheckingsSlides(Course course, List<string> groupsIds, ManualCheckingQueueFilterOptions filterOptions)
 		{
 			filterOptions.SlidesIds = null;
-			var usedCheckings = GetMergedCheckingQueue(filterOptions);
-			var usedSlidesIds = new HashSet<Guid>(usedCheckings.Select(c => c.SlideId));
+			var usedSlidesIds = GetMergedCheckingQueueSlideIds(filterOptions);
 
 			filterOptions = GetManualCheckingFilterOptionsByGroup(course.Id, groupsIds);
 			filterOptions.OnlyChecked = null;
-			var allCheckingsSlidesIds = GetMergedCheckingQueue(filterOptions).Select(c => c.SlideId).Distinct();
+			var allCheckingsSlidesIds = GetMergedCheckingQueueSlideIds(filterOptions);
 
 			var emptySlideMock = new Slide { Info = new SlideInfo(null, null, -1), Title = "", Id = Guid.Empty };
 			var allCheckingsSlides = allCheckingsSlidesIds
@@ -645,17 +652,6 @@ namespace uLearn.Web.Controllers
 		{
 			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
 			return InternalCheckingQueue(courseId, done, groupsIds, userId, slideId, message);
-		}
-
-		/* Redirects for backward compatibility. Can be removed after February, 2019 */
-		public ActionResult ManualExerciseCheckingQueue(string courseId, bool done = false, string userId = "", Guid? slideId = null, string message = "", string group = "")
-		{
-			return RedirectToAction("CheckingQueue", new { courseId = courseId, done = done, userId = userId, slideId = slideId, message = message, group = group });
-		}
-
-		public ActionResult ManualQuizCheckingQueue(string courseId, bool done = false, string userId = "", Guid? slideId = null, string message = "", string group = "")
-		{
-			return RedirectToAction("CheckingQueue", new { courseId = courseId, done = done, userId = userId, slideId = slideId, message = message, group = group });
 		}
 
 		private async Task<ActionResult> InternalManualChecking<T>(string courseId, int queueItemId, bool ignoreLock = false, List<string> groupsIds = null, bool recheck = false) where T : AbstractManualSlideChecking

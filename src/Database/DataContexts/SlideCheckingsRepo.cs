@@ -194,6 +194,27 @@ namespace Database.DataContexts
 
 		public IEnumerable<T> GetManualCheckingQueue<T>(ManualCheckingQueueFilterOptions options) where T : AbstractManualSlideChecking
 		{
+			var query = GetManualCheckingQueueFilterQuery<T>(options);
+			query = query.OrderByDescending(c => c.Timestamp);
+
+			const int reserveForStartedReviews = 100;
+			if (options.Count > 0)
+				query = query.Take(options.Count + reserveForStartedReviews);
+
+			var enumerable = query.AsEnumerable();
+			// Отфильтровывает неактуальные начатые ревью
+			enumerable = enumerable
+				.GroupBy(g => new { g.UserId, g.SlideId })
+				.Select(g => g.Last())
+				.OrderByDescending(c => c.Timestamp);
+			if (options.Count > 0)
+				enumerable = enumerable.Take(options.Count);
+			
+			return enumerable;
+		}
+
+		private IQueryable<T> GetManualCheckingQueueFilterQuery<T>(ManualCheckingQueueFilterOptions options) where T : AbstractManualSlideChecking
+		{
 			var query = db.Set<T>().Include(c => c.User).Where(c => c.CourseId == options.CourseId);
 			if (options.OnlyChecked.HasValue)
 				query = options.OnlyChecked.Value ? query.Where(c => c.IsChecked) : query.Where(c => !c.IsChecked);
@@ -206,20 +227,13 @@ namespace Database.DataContexts
 				else
 					query = query.Where(c => options.UserIds.Contains(c.UserId));
 			}
-			
-			query = query.OrderByDescending(c => c.Timestamp);
+			return query;
+		}
 
-			const int reserveForStartedReviews = 100;
-			if (options.Count > 0)
-				query = query.Take(options.Count + reserveForStartedReviews);
-
-			var enumerable = query.AsEnumerable();
-			// отфильтровывает неактуальное начатое ревью
-			enumerable = enumerable.GroupBy(g => new { g.UserId, g.SlideId }).Select(g => g.LastOrDefault());
-			if (options.Count > 0)
-				enumerable = enumerable.Take(options.Count);
-			
-			return enumerable;
+		public HashSet<Guid> GetManualCheckingQueueSlideIds<T>(ManualCheckingQueueFilterOptions options) where T : AbstractManualSlideChecking
+		{
+			var query = GetManualCheckingQueueFilterQuery<T>(options);
+			return query.Select(c => c.SlideId).Distinct().AsEnumerable().ToHashSet();
 		}
 
 		public T FindManualCheckingById<T>(int id) where T : AbstractManualSlideChecking
