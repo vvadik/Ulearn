@@ -194,7 +194,7 @@ namespace Database.DataContexts
 
 		public IEnumerable<T> GetManualCheckingQueue<T>(ManualCheckingQueueFilterOptions options) where T : AbstractManualSlideChecking
 		{
-			var query = db.Set<T>().Where(c => c.CourseId == options.CourseId);
+			var query = db.Set<T>().Include(c => c.User).Where(c => c.CourseId == options.CourseId);
 			if (options.OnlyChecked.HasValue)
 				query = options.OnlyChecked.Value ? query.Where(c => c.IsChecked) : query.Where(c => !c.IsChecked);
 			if (options.SlidesIds != null)

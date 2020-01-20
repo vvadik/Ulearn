@@ -183,7 +183,7 @@ namespace Database.Repos
 
 		public IQueryable<T> GetManualCheckingQueueAsync<T>(ManualCheckingQueueFilterOptions options) where T : AbstractManualSlideChecking
 		{
-			var query = db.Set<T>().Where(c => c.CourseId == options.CourseId && c.Timestamp >= options.From && c.Timestamp <= options.To);
+			var query = db.Set<T>().Include(c => c.User).Where(c => c.CourseId == options.CourseId && c.Timestamp >= options.From && c.Timestamp <= options.To);
 			if (options.OnlyChecked.HasValue)
 				query = options.OnlyChecked.Value ? query.Where(c => c.IsChecked) : query.Where(c => !c.IsChecked);
 			if (options.SlidesIds != null)
