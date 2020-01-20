@@ -568,7 +568,7 @@ namespace uLearn.Web.Controllers
 
 			filterOptions.OnlyChecked = done;
 			filterOptions.Count = maxShownQueueSize + 1;
-			var checkings = GetMergedCheckingQueue(filterOptions).ToList();
+			var checkings = GetMergedCheckingQueue(filterOptions);
 
 			if (!checkings.Any() && !string.IsNullOrEmpty(message))
 				return RedirectToAction("CheckingQueue", new { courseId, group = string.Join(",", groupsIds) });
@@ -578,31 +578,7 @@ namespace uLearn.Web.Controllers
 			var submissionsIds = checkings.Select(c => (c as ManualExerciseChecking)?.SubmissionId).Where(s => s.HasValue).Select(s => s.Value);
 			var solutions = userSolutionsRepo.GetSolutionsForSubmissions(submissionsIds);
 
-			filterOptions.SlidesIds = null;
-			var usedCheckings = GetMergedCheckingQueue(filterOptions);
-			var usedSlidesIds = new HashSet<Guid>(usedCheckings.Select(c => c.SlideId));
-
-			filterOptions = GetManualCheckingFilterOptionsByGroup(courseId, groupsIds);
-			filterOptions.OnlyChecked = null;
-			var allCheckingsSlidesIds = GetMergedCheckingQueue(filterOptions).Select(c => c.SlideId).Distinct();
-
-			var emptySlideMock = new Slide { Info = new SlideInfo(null, null, -1), Title = "", Id = Guid.Empty };
-			var allCheckingsSlides = allCheckingsSlidesIds
-				.Select(s => new KeyValuePair<Guid, Slide>(s, course.FindSlideById(s)))
-				.Where(kvp => kvp.Value != null)
-				.Union(new List<KeyValuePair<Guid, Slide>>
-				{
-					/* Divider between used slides and another ones */
-					new KeyValuePair<Guid, Slide>(Guid.Empty, emptySlideMock)
-				})
-				.OrderBy(s => usedSlidesIds.Contains(s.Key) ? 0 : 1)
-				.ThenBy(s => s.Value.Index)
-				.Select(s => new KeyValuePair<Guid, Slide>(s.Key, s.Value))
-				.ToList();
-
-			/* Remove divider iff it is first or last item */
-			if (allCheckingsSlides.First().Key == Guid.Empty || allCheckingsSlides.Last().Key == Guid.Empty)
-				allCheckingsSlides.RemoveAll(kvp => kvp.Key == Guid.Empty);
+			var allCheckingsSlides = GetAllCheckingsSlides(course, groupsIds, filterOptions);
 
 			return View("CheckingQueue", new ManualCheckingQueueViewModel
 			{
@@ -632,6 +608,37 @@ namespace uLearn.Web.Controllers
 				ShowFilterForm = string.IsNullOrEmpty(userId),
 				Slides = allCheckingsSlides,
 			});
+		}
+		
+		private List<KeyValuePair<Guid, Slide>> GetAllCheckingsSlides(Course course, List<string> groupsIds, ManualCheckingQueueFilterOptions filterOptions)
+		{
+			filterOptions.SlidesIds = null;
+			var usedCheckings = GetMergedCheckingQueue(filterOptions);
+			var usedSlidesIds = new HashSet<Guid>(usedCheckings.Select(c => c.SlideId));
+
+			filterOptions = GetManualCheckingFilterOptionsByGroup(course.Id, groupsIds);
+			filterOptions.OnlyChecked = null;
+			var allCheckingsSlidesIds = GetMergedCheckingQueue(filterOptions).Select(c => c.SlideId).Distinct();
+
+			var emptySlideMock = new Slide { Info = new SlideInfo(null, null, -1), Title = "", Id = Guid.Empty };
+			var allCheckingsSlides = allCheckingsSlidesIds
+				.Select(s => new KeyValuePair<Guid, Slide>(s, course.FindSlideById(s)))
+				.Where(kvp => kvp.Value != null)
+				.Union(new List<KeyValuePair<Guid, Slide>>
+				{
+					/* Divider between used slides and another ones */
+					new KeyValuePair<Guid, Slide>(Guid.Empty, emptySlideMock)
+				})
+				.OrderBy(s => usedSlidesIds.Contains(s.Key) ? 0 : 1)
+				.ThenBy(s => s.Value.Index)
+				.Select(s => new KeyValuePair<Guid, Slide>(s.Key, s.Value))
+				.ToList();
+
+			/* Remove divider iff it is first or last item */
+			if (allCheckingsSlides.First().Key == Guid.Empty || allCheckingsSlides.Last().Key == Guid.Empty)
+				allCheckingsSlides.RemoveAll(kvp => kvp.Key == Guid.Empty);
+			
+			return allCheckingsSlides;
 		}
 
 		public ActionResult CheckingQueue(string courseId, bool done = false, string userId = "", Guid? slideId = null, string message = "")

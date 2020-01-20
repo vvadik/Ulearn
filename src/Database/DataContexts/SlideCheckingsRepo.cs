@@ -209,14 +209,17 @@ namespace Database.DataContexts
 			
 			query = query.OrderByDescending(c => c.Timestamp);
 
-			// отфильтровывает неактуальное начатое ревью
-			query = query.GroupBy(g => new { g.UserId, g.SlideId }).Select(g => g.OrderByDescending(c => c.Timestamp).FirstOrDefault());
-			
-			query = query.OrderByDescending(c => c.Timestamp);
-			
+			const int reserveForStartedReviews = 100;
 			if (options.Count > 0)
-				query = query.Take(options.Count);
-			return query;
+				query = query.Take(options.Count + reserveForStartedReviews);
+
+			var enumerable = query.AsEnumerable();
+			// отфильтровывает неактуальное начатое ревью
+			enumerable = enumerable.GroupBy(g => new { g.UserId, g.SlideId }).Select(g => g.LastOrDefault());
+			if (options.Count > 0)
+				enumerable = enumerable.Take(options.Count);
+			
+			return enumerable;
 		}
 
 		public T FindManualCheckingById<T>(int id) where T : AbstractManualSlideChecking
