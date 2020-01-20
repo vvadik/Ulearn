@@ -581,9 +581,16 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("CheckingQueue", new { courseId, group = string.Join(",", groupsIds) });
 
 			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
-			var reviews = slideCheckingsRepo.GetExerciseCodeReviewForCheckings(checkings.Select(c => c.Id));
-			var submissionsIds = checkings.Select(c => (c as ManualExerciseChecking)?.SubmissionId).Where(s => s.HasValue).Select(s => s.Value);
-			var solutions = userSolutionsRepo.GetSolutionsForSubmissions(submissionsIds);
+			
+			var alreadyChecked = done;
+			Dictionary<int, List<ExerciseCodeReview>> reviews = null;
+			Dictionary<int, string> solutions = null;
+			if (alreadyChecked)
+			{
+				reviews = slideCheckingsRepo.GetExerciseCodeReviewForCheckings(checkings.Select(c => c.Id));
+				var submissionsIds = checkings.Select(c => (c as ManualExerciseChecking)?.SubmissionId).Where(s => s.HasValue).Select(s => s.Value);
+				solutions = userSolutionsRepo.GetSolutionsForSubmissions(submissionsIds);
+			}
 
 			var allCheckingsSlides = GetAllCheckingsSlides(course, groupsIds, filterOptions);
 
@@ -601,8 +608,8 @@ namespace uLearn.Web.Controllers
 						ContextSlideTitle = slide.Title,
 						ContextMaxScore = (slide as ExerciseSlide)?.Scoring.CodeReviewScore ?? slide.MaxScore,
 						ContextTimestamp = c.Timestamp,
-						ContextReviews = reviews.GetOrDefault(c.Id, new List<ExerciseCodeReview>()),
-						ContextExerciseSolution = c is ManualExerciseChecking checking ?
+						ContextReviews = alreadyChecked ? reviews.GetOrDefault(c.Id, new List<ExerciseCodeReview>()) : new List<ExerciseCodeReview>(),
+						ContextExerciseSolution = alreadyChecked && c is ManualExerciseChecking checking ?
 							solutions.GetOrDefault(checking.SubmissionId, "") :
 							"",
 					};
@@ -610,7 +617,7 @@ namespace uLearn.Web.Controllers
 				Groups = groups,
 				SelectedGroupsIds = groupsIds,
 				Message = message,
-				AlreadyChecked = done,
+				AlreadyChecked = alreadyChecked,
 				ExistsMore = checkings.Count > maxShownQueueSize,
 				ShowFilterForm = string.IsNullOrEmpty(userId),
 				Slides = allCheckingsSlides,
