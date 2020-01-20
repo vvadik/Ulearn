@@ -181,9 +181,32 @@ namespace Database.Repos
 
 		#endregion
 
-		public IQueryable<T> GetManualCheckingQueueAsync<T>(ManualCheckingQueueFilterOptions options) where T : AbstractManualSlideChecking
+		public async Task<IEnumerable<ManualExerciseChecking>> GetManualExerciseCheckingQueueAsync(ManualCheckingQueueFilterOptions options)
 		{
-			var query = db.Set<T>().Include(c => c.User).Where(c => c.CourseId == options.CourseId && c.Timestamp >= options.From && c.Timestamp <= options.To);
+			var query = GetManualExerciseCheckingQueueFilterQuery(options);
+			query = query.OrderByDescending(c => c.Timestamp);
+
+			const int reserveForStartedReviews = 100;
+			if (options.Count > 0)
+				query = query.Take(options.Count + reserveForStartedReviews);
+
+			var enumerable = (IEnumerable<ManualExerciseChecking>)await query.ToListAsync().ConfigureAwait(false);
+			// Отфильтровывает неактуальные начатые ревью
+			enumerable = enumerable
+				.GroupBy(g => new { g.UserId, g.SlideId })
+				.Select(g => g.Last())
+				.OrderByDescending(c => c.Timestamp);
+			if (options.Count > 0)
+				enumerable = enumerable.Take(options.Count);
+			
+			return enumerable;
+		}
+
+		private IQueryable<ManualExerciseChecking> GetManualExerciseCheckingQueueFilterQuery(ManualCheckingQueueFilterOptions options)
+		{
+			var query = db.Set<ManualExerciseChecking>()
+				.Include(c => c.Reviews) // отличие от версии из Database
+				.Where(c => c.CourseId == options.CourseId);
 			if (options.OnlyChecked.HasValue)
 				query = options.OnlyChecked.Value ? query.Where(c => c.IsChecked) : query.Where(c => !c.IsChecked);
 			if (options.SlidesIds != null)
@@ -195,10 +218,6 @@ namespace Database.Repos
 				else
 					query = query.Where(c => options.UserIds.Contains(c.UserId));
 			}
-
-			query = query.OrderByDescending(c => c.Timestamp);
-			if (options.Count > 0)
-				query = query.Take(options.Count);
 			return query;
 		}
 

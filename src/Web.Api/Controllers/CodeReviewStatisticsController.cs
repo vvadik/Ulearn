@@ -68,14 +68,14 @@ namespace Ulearn.Web.Api.Controllers
 
 			var exerciseSlides = course.Slides.OfType<ExerciseSlide>().ToList();
 
-			var allSlideCheckings = await slideCheckingsRepo.GetManualCheckingQueueAsync<ManualExerciseChecking>(new ManualCheckingQueueFilterOptions
+			var allSlideCheckings = (await slideCheckingsRepo.GetManualExerciseCheckingQueueAsync(new ManualCheckingQueueFilterOptions
 			{
 				CourseId = course.Id,
 				Count = count,
 				OnlyChecked = null,
 				From = @from.Value,
 				To = to.Value,
-			}).Include(c => c.Reviews).ToListAsync().ConfigureAwait(false);
+			}).ConfigureAwait(false)).ToList();
 
 			var result = new CodeReviewInstructorsStatisticsResponse
 			{

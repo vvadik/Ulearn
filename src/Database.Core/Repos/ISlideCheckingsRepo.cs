@@ -19,7 +19,7 @@ namespace Database.Repos
 		Dictionary<string, int> GetManualScoresForSlide(string courseId, Guid slideId, List<string> userIds);
 		int GetAutomaticScoreForSlide(string courseId, Guid slideId, string userId);
 		Dictionary<string, int> GetAutomaticScoresForSlide(string courseId, Guid slideId, List<string> userIds);
-		IQueryable<T> GetManualCheckingQueueAsync<T>(ManualCheckingQueueFilterOptions options) where T : AbstractManualSlideChecking;
+		Task<IEnumerable<ManualExerciseChecking>> GetManualExerciseCheckingQueueAsync(ManualCheckingQueueFilterOptions options);
 		T FindManualCheckingById<T>(int id) where T : AbstractManualSlideChecking;
 		bool IsProhibitedToSendExerciseToManualChecking(string courseId, Guid slideId, string userId);
 		Task LockManualChecking<T>(T checkingItem, string lockedById) where T : AbstractManualSlideChecking;
