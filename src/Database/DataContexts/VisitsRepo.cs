@@ -235,6 +235,7 @@ namespace Database.DataContexts
 		public Dictionary<Guid, List<Visit>> GetVisitsInPeriodForEachSlide(VisitsFilterOptions options)
 		{
 			return GetVisitsInPeriod(options)
+				.AsEnumerable()
 				.GroupBy(v => v.SlideId)
 				.ToDictionary(g => g.Key, g => g.ToList());
 		}
