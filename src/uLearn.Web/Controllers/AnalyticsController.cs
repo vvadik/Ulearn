@@ -105,16 +105,8 @@ namespace uLearn.Web.Controllers
 					.Average()
 			);
 
-			/* Dictionary<SlideId, count (distinct by user)> */
-			var exercisesSolutionsCount = userSolutionsRepo.GetAllSubmissions(courseId, slidesIds, periodStart, realPeriodFinish)
-				.GroupBy(s => s.SlideId)
-				.Select(g => new { g.Key, Count = g.Select(s => s.UserId).Distinct().Count() })
-				.ToDictionary(g => g.Key, g => g.Count);
-
-			var exercisesAcceptedSolutionsCount = userSolutionsRepo.GetAllAcceptedSubmissions(courseId, slidesIds, periodStart, realPeriodFinish)
-				.GroupBy(s => s.SlideId)
-				.Select(g => new { g.Key, Count = g.Select(s => s.UserId).Distinct().Count() })
-				.ToDictionary(g => g.Key, g => g.Count);
+			var exercisesSolutionsCount = GetExercisesSolutionsCount(courseId, slidesIds, periodStart, realPeriodFinish);
+			var exercisesAcceptedSolutionsCount = GetExercisesAcceptedSolutionsCount(courseId, slidesIds, periodStart, realPeriodFinish);
 
 			var usersIds = visitsRepo.GetVisitsInPeriod(filterOptions).Select(v => v.UserId).Distinct().AsEnumerable();
 			/* If we filtered out users from one or several groups show them all */
@@ -124,14 +116,8 @@ namespace uLearn.Web.Controllers
 			var visitedUsers = usersRepo.GetUsersByIds(usersIds).Select(u => new UnitStatisticUserInfo(u)).ToList();
 			var isMore = visitedUsers.Count > usersLimit;
 
-			var visitedSlidesCountByUser = visitsRepo.GetVisitsInPeriod(filterOptions)
-				.GroupBy(v => v.UserId)
-				.Select(g => new { g.Key, Count = g.Count() })
-				.ToDictionary(g => g.Key, g => g.Count);
-			var visitedSlidesCountByUserAllTime = visitsRepo.GetVisitsInPeriod(filterOptions.WithPeriodStart(DateTime.MinValue).WithPeriodFinish(DateTime.MaxValue))
-				.GroupBy(v => v.UserId)
-				.Select(g => new { g.Key, Count = g.Count() })
-				.ToDictionary(g => g.Key, g => g.Count);
+			var visitedSlidesCountByUser = GetVisitedSlidesCountByUser(filterOptions);
+			var visitedSlidesCountByUserAllTime = GetVisitedSlidesCountByUserAllTime(filterOptions);
 
 			/* Get `usersLimit` best by slides count and order them by name */
 			visitedUsers = visitedUsers
@@ -142,13 +128,9 @@ namespace uLearn.Web.Controllers
 				.ToList();
 
 			var visitedUsersIds = visitedUsers.Select(v => v.UserId).ToList();
-			var additionalScores = additionalScoresRepo
-				.GetAdditionalScoresForUsers(courseId, unitId.Value, visitedUsersIds)
-				.ToDictionary(kv => kv.Key, kv => kv.Value.Score);
+			var additionalScores = GetAdditionalScores(courseId, unitId, visitedUsersIds);
 			var usersGroupsIds = groupsRepo.GetUsersGroupsIds(courseId, visitedUsersIds);
-			var enabledAdditionalScoringGroupsForGroups = groupsRepo.GetEnabledAdditionalScoringGroups(courseId)
-				.GroupBy(e => e.GroupId)
-				.ToDictionary(g => g.Key, g => g.Select(e => e.ScoringGroupId).ToList());
+			var enabledAdditionalScoringGroupsForGroups = GetEnabledAdditionalScoringGroupsForGroups(courseId);
 
 			var model = new UnitStatisticPageModel
 			{
@@ -181,6 +163,57 @@ namespace uLearn.Web.Controllers
 				EnabledAdditionalScoringGroupsForGroups = enabledAdditionalScoringGroupsForGroups,
 			};
 			return View(model);
+		}
+
+		private Dictionary<int, List<string>> GetEnabledAdditionalScoringGroupsForGroups(string courseId)
+		{
+			return groupsRepo.GetEnabledAdditionalScoringGroups(courseId)
+				.GroupBy(e => e.GroupId)
+				.ToDictionary(g => g.Key, g => g.Select(e => e.ScoringGroupId).ToList());
+		}
+
+		private Dictionary<Tuple<string, string>, int> GetAdditionalScores(string courseId, Guid? unitId, List<string> visitedUsersIds)
+		{
+			return additionalScoresRepo
+				.GetAdditionalScoresForUsers(courseId, unitId.Value, visitedUsersIds)
+				.ToDictionary(kv => kv.Key, kv => kv.Value.Score);
+		}
+
+		private Dictionary<string, int> GetVisitedSlidesCountByUserAllTime(VisitsFilterOptions filterOptions)
+		{
+			return visitsRepo.GetVisitsInPeriod(filterOptions.WithPeriodStart(DateTime.MinValue).WithPeriodFinish(DateTime.MaxValue))
+				.GroupBy(v => v.UserId)
+				.Select(g => new { g.Key, Count = g.Count() })
+				.ToDictionary(g => g.Key, g => g.Count);
+		}
+
+		private Dictionary<string, int> GetVisitedSlidesCountByUser(VisitsFilterOptions filterOptions)
+		{
+			return visitsRepo.GetVisitsInPeriod(filterOptions)
+				.GroupBy(v => v.UserId)
+				.Select(g => new { g.Key, Count = g.Count() })
+				.ToDictionary(g => g.Key, g => g.Count);
+		}
+
+		private Dictionary<Guid, int> GetExercisesAcceptedSolutionsCount(string courseId, List<Guid> slidesIds, DateTime periodStart, DateTime realPeriodFinish)
+		{
+			return userSolutionsRepo.GetAllAcceptedSubmissions(courseId, slidesIds, periodStart, realPeriodFinish)
+				.Select(s => new {s.SlideId, s.UserId})
+				.Distinct()
+				.GroupBy(s => s.SlideId)
+				.Select(g => new { g.Key, Count = g.Count() })
+				.ToDictionary(g => g.Key, g => g.Count);
+		}
+
+		private Dictionary<Guid, int> GetExercisesSolutionsCount(string courseId, List<Guid> slidesIds, DateTime periodStart, DateTime realPeriodFinish)
+		{
+			/* Dictionary<SlideId, count (distinct by user)> */
+			return userSolutionsRepo.GetAllSubmissions(courseId, slidesIds, periodStart, realPeriodFinish)
+				.Select(s => new {s.SlideId, s.UserId})
+				.Distinct()
+				.GroupBy(s => s.SlideId)
+				.Select(g => new { g.Key, Count = g.Count() })
+				.ToDictionary(g => g.Key, g => g.Count);
 		}
 
 		private bool CanStudentViewGroupsStatistics(string userId, List<string> groupsIds)
