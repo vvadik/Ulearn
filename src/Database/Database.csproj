@@ -848,5 +848,8 @@
     <EmbeddedResource Update="Migrations\201407180807286_AddQuestions.resx">
       <DependentUpon>201407180807286_AddQuestions.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Update="Migrations\202001221407437_AddIndexToVisitsWithIncludeScore.resx">
+      <DependentUpon>202001221407437_AddIndexToVisitsWithIncludeScore.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>
