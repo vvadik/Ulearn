@@ -122,14 +122,14 @@ namespace uLearn.Web.Models
 
 	public class UnitStatisticUserInfo
 	{
-		public UnitStatisticUserInfo(ApplicationUser user)
+		public UnitStatisticUserInfo(string userId, string userName, string email, string firstName, string lastName)
 		{
-			UserId = user.Id;
-			UserName = user.UserName;
-			UserEmail = user.Email ?? "";
-			UserVisibleName = user.VisibleNameWithLastNameFirst ?? "";
-			UserFirstName = user.FirstName ?? "";
-			UserLastName = user.LastName ?? "";
+			UserId = userId;
+			UserName = userName;
+			UserEmail = email ?? "";
+			UserVisibleName = ApplicationUser.ToVisibleNameWithLastNameFirst(userName, firstName, lastName) ?? "";
+			UserFirstName = firstName ?? "";
+			UserLastName = lastName ?? "";
 		}
 
 		public string UserId { get; private set; }

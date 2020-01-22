@@ -206,9 +206,9 @@ namespace Database.DataContexts
 
 		public IQueryable<Visit> GetVisitsInPeriod(string courseId, IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish, IEnumerable<string> usersIds = null)
 		{
-			var filteredVisits = db.Visits.Where(
-				v => v.CourseId == courseId && slidesIds.Contains(v.SlideId) && periodStart <= v.Timestamp && v.Timestamp <= periodFinish
-			);
+			var filteredVisits = db.Visits.Where(v => v.CourseId == courseId && slidesIds.Contains(v.SlideId));
+			if (periodStart != DateTime.MinValue || periodFinish < DateTime.Now.AddSeconds(-10))
+				filteredVisits = filteredVisits.Where(v => periodStart <= v.Timestamp && v.Timestamp <= periodFinish);
 			if (usersIds != null)
 				filteredVisits = filteredVisits.Where(v => usersIds.Contains(v.UserId));
 			return filteredVisits;
@@ -216,9 +216,10 @@ namespace Database.DataContexts
 
 		public IQueryable<Visit> GetVisitsInPeriod(VisitsFilterOptions options)
 		{
-			var filteredVisits = db.Visits.Where(
-				v => v.CourseId == options.CourseId && options.PeriodStart <= v.Timestamp && v.Timestamp <= options.PeriodFinish
-			);
+			
+			var filteredVisits = db.Visits.Where(v => v.CourseId == options.CourseId);
+			if (options.PeriodStart != DateTime.MinValue || options.PeriodFinish < DateTime.Now.AddSeconds(-10))
+				filteredVisits = filteredVisits.Where(v => options.PeriodStart <= v.Timestamp && v.Timestamp <= options.PeriodFinish);
 			if (options.SlidesIds != null)
 				filteredVisits = filteredVisits.Where(v => options.SlidesIds.Contains(v.SlideId));
 			if (options.UserIds != null)

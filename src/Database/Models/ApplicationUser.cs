@@ -68,16 +68,15 @@ namespace Database.Models
 			}
 		}
 
-		public string VisibleNameWithLastNameFirst
+		public string VisibleNameWithLastNameFirst => ToVisibleNameWithLastNameFirst(UserName, FirstName, LastName);
+
+		public static string ToVisibleNameWithLastNameFirst(string userName, string firstName, string lastName)
 		{
-			get
-			{
-				if (FirstName + LastName != "")
-					return (LastName + " " + FirstName).Trim();
-				if (!string.IsNullOrEmpty(UserName))
-					return UserName.Trim();
-				return "Пользователь";
-			}
+			if (firstName + lastName != "")
+				return (lastName + " " + firstName).Trim();
+			if (!string.IsNullOrEmpty(userName))
+				return userName.Trim();
+			return "Пользователь";
 		}
 	}
 }

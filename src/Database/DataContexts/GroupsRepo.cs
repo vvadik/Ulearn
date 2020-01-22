@@ -327,7 +327,7 @@ namespace Database.DataContexts
 			return db.Groups.FirstOrDefault(g => g.InviteHash == hash && !g.IsDeleted && g.IsInviteLinkEnabled);
 		}
 
-		public IEnumerable<Group> GetGroups(string courseId, bool includeArchived = false)
+		public IQueryable<Group> GetGroups(string courseId, bool includeArchived = false)
 		{
 			var groups = db.Groups.Where(g => g.CourseId == courseId && !g.IsDeleted);
 			if (!includeArchived)
@@ -505,6 +505,8 @@ namespace Database.DataContexts
 			var groupsIds = GetGroups(courseId).Select(g => g.Id);
 			return db.GroupMembers
 				.Where(m => groupsIds.Contains(m.GroupId) && usersIds.Contains(m.UserId))
+				.Select(m => new {m.UserId, m.GroupId})
+				.AsEnumerable()
 				.GroupBy(m => m.UserId)
 				.ToDictionary(g => g.Key, g => g.Select(m => m.GroupId).ToList());
 		}
@@ -629,6 +631,8 @@ namespace Database.DataContexts
 			var groupsIdsSet = new HashSet<int>(groupsIds);
 			return db.LabelsOnGroups
 				.Where(l => groupsIdsSet.Contains(l.GroupId))
+				.Select(m => new {m.GroupId, m.LabelId})
+				.AsEnumerable()
 				.GroupBy(l => l.GroupId)
 				.ToDictionary(g => g.Key, g => g.Select(l => l.LabelId).ToList())
 				.ToDefaultDictionary();
@@ -693,6 +697,7 @@ namespace Database.DataContexts
 		{
 			return db.GroupAccesses.Include(a => a.User)
 				.Where(a => groupsIds.Contains(a.GroupId) && a.IsEnabled && !a.User.IsDeleted)
+				.AsEnumerable()
 				.GroupBy(a => a.GroupId)
 				.ToDictionary(g => g.Key, g => g.ToList())
 				.ToDefaultDictionary();
@@ -700,7 +705,7 @@ namespace Database.DataContexts
 
 		public IEnumerable<string> GetInstructorsOfAllGroupsWhereUserIsMember(string courseId, ApplicationUser user)
 		{
-			var groupIds = GetGroups(courseId).Select(g => g.Id).ToList();
+			var groupIds = GetGroups(courseId).Select(g => g.Id);
 			var groupsWhereUserIsStudent = db.GroupMembers
 				.Include(a => a.User)
 				.Where(m => m.UserId == user.Id && !m.User.IsDeleted && groupIds.Contains(m.GroupId))
