@@ -442,10 +442,9 @@ namespace uLearn.Web.Controllers
 			var realPeriodFinish = periodFinish.Add(TimeSpan.FromDays(1));
 
 			var course = courseManager.GetCourse(courseId);
-			var slidesIds = course.Slides.Select(s => s.Id).ToList();
+			var slidesIds = course.Slides.Select(s => s.Id).ToHashSet();
 
 			var filterOptions = ControllerUtils.GetFilterOptionsByGroup<VisitsFilterOptions>(groupsRepo, User, courseId, groupsIds, allowSeeGroupForAnyMember: true);
-			filterOptions.SlidesIds = slidesIds;
 			filterOptions.PeriodStart = periodStart;
 			filterOptions.PeriodFinish = realPeriodFinish;
 
@@ -476,7 +475,7 @@ namespace uLearn.Web.Controllers
 			/* From now fetch only filtered users' statistics */
 			filterOptions.UserIds = visitedUsersIds;
 			filterOptions.IsUserIdsSupplement = false;
-			var scoreByUserUnitScoringGroup = GetScoreByUserUnitScoringGroup(filterOptions, unitBySlide, course);
+			var scoreByUserUnitScoringGroup = GetScoreByUserUnitScoringGroup(filterOptions, slidesIds, unitBySlide, course);
 
 			var shouldBeSolvedSlides = course.Slides.Where(s => s.ShouldBeSolved).ToList();
 			var shouldBeSolvedSlidesIds = shouldBeSolvedSlides.Select(s => s.Id).ToList();
@@ -558,11 +557,12 @@ namespace uLearn.Web.Controllers
 				.ToDefaultDictionary();
 		}
 
-		private DefaultDictionary<Tuple<string, Guid, string>, int> GetScoreByUserUnitScoringGroup(VisitsFilterOptions filterOptions, Dictionary<Guid, Guid> unitBySlide, Course course)
+		private DefaultDictionary<Tuple<string, Guid, string>, int> GetScoreByUserUnitScoringGroup(VisitsFilterOptions filterOptions, HashSet<Guid> slides, Dictionary<Guid, Guid> unitBySlide, Course course)
 		{
 			return visitsRepo.GetVisitsInPeriod(filterOptions)
 				.Select(v => new {v.UserId, v.SlideId, v.Score})
 				.AsEnumerable()
+				.Where(v => slides.Contains(v.SlideId))
 				.GroupBy(v => Tuple.Create(v.UserId, unitBySlide[v.SlideId], course.FindSlideById(v.SlideId)?.ScoringGroup))
 				.ToDictionary(g => g.Key, g => g.Sum(v => v.Score))
 				.ToDefaultDictionary();
