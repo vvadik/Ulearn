@@ -94,9 +94,7 @@ namespace uLearn.Web.Controllers
 			/* Dictionary<SlideId, List<Visit>> */
 			var slidesVisits = visitsRepo.GetVisitsInPeriodForEachSlide(filterOptions);
 
-			var usersVisitedAllSlidesBeforePeriodCount = visitsRepo.GetUsersVisitedAllSlides(filterOptions.WithPeriodStart(DateTime.MinValue).WithPeriodFinish(periodStart)).Count();
 			var usersVisitedAllSlidesInPeriodCount = visitsRepo.GetUsersVisitedAllSlides(filterOptions).Count();
-			var usersVisitedAllSlidesBeforePeriodFinishedCount = visitsRepo.GetUsersVisitedAllSlides(filterOptions.WithPeriodStart(DateTime.MinValue)).Count();
 
 			var quizzesAverageScore = quizzes.ToDictionary(q => q.Id,
 				q => (int)slidesVisits.GetOrDefault(q.Id, new List<Visit>())
@@ -149,9 +147,7 @@ namespace uLearn.Web.Controllers
 				Slides = slides,
 				SlidesVisits = slidesVisits,
 
-				UsersVisitedAllSlidesBeforePeriodCount = usersVisitedAllSlidesBeforePeriodCount,
 				UsersVisitedAllSlidesInPeriodCount = usersVisitedAllSlidesInPeriodCount,
-				UsersVisitedAllSlidesBeforePeriodFinishedCount = usersVisitedAllSlidesBeforePeriodFinishedCount,
 
 				QuizzesAverageScore = quizzesAverageScore,
 				ExercisesSolutionsCount = exercisesSolutionsCount,
@@ -877,8 +873,7 @@ namespace uLearn.Web.Controllers
 
 		private static DateTime GetDefaultPeriodStart()
 		{
-			var now = DateTime.Now;
-			return new DateTime(2015, 1, 1);
+			return new DateTime(DateTime.Now.Year - 2, 1, 1);
 		}
 
 		public DateTime PeriodFinishDate

@@ -105,8 +105,6 @@ namespace uLearn.Web.Models
 		public Dictionary<Guid, List<Visit>> SlidesVisits { get; set; }
 
 		public int UsersVisitedAllSlidesInPeriodCount { get; set; }
-		public int UsersVisitedAllSlidesBeforePeriodCount { get; set; }
-		public int UsersVisitedAllSlidesBeforePeriodFinishedCount { get; set; }
 
 		public Dictionary<Guid, int> QuizzesAverageScore { get; set; }
 
