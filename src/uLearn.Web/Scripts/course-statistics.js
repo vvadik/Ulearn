@@ -381,11 +381,11 @@ window.documentReadyFunctions.push(function () {
 		$self.attr('disabled', 'disabled');
 		setTimeout(function() {
 			$courseStatistics.toggleClass('only-full-scores', $self.is(':checked'));
-			$courseStatistics.find('[data-not-only-full-value]').each(function() {
+			$courseStatistics.find('[data-only-full-value]').each(function() {
 				var $self = $(this);
 				var text = $self.text();
-				$self.text($self.data('notOnlyFullValue'));
-				$self.data('notOnlyFullValue', text);
+				$self.text($self.data('onlyFullValue'));
+				$self.data('onlyFullValue', text);
 			});
 			$self.removeAttr('disabled');
 			$loadingIcon.hide();
