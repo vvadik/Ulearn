@@ -104,18 +104,20 @@ namespace uLearn.Web.Models
 		public List<Slide> Slides { get; set; }
 		public Dictionary<Guid, List<Visit>> SlidesVisits { get; set; }
 
-		public int UsersVisitedAllSlidesInPeriodCount { get; set; }
-
-		public Dictionary<Guid, int> QuizzesAverageScore { get; set; }
-
-		public Dictionary<Guid, int> ExercisesSolutionsCount { get; set; }
-		public Dictionary<Guid, int> ExercisesAcceptedSolutionsCount { get; set; }
-
 		public Dictionary<string, int> VisitedSlidesCountByUser { get; set; }
 		public Dictionary<string, int> VisitedSlidesCountByUserAllTime { get; set; }
 
 		/* Dictionary<(userId, scoringGroupId), additionalScore> */
 		public Dictionary<Tuple<string, string>, int> AdditionalScores { get; set; }
+		public UnitStatSectionModel UnitStatSectionModel { get; set; }
+	}
+
+	public class UnitStatSectionModel
+	{
+		public int UsersVisitedAllSlidesInPeriodCount { get; set; }
+		public Dictionary<Guid, int> QuizzesAverageScore { get; set; }
+		public Dictionary<Guid, int> ExercisesSolutionsCount { get; set; }
+		public Dictionary<Guid, int> ExercisesAcceptedSolutionsCount { get; set; }
 	}
 
 	public class UnitStatisticUserInfo

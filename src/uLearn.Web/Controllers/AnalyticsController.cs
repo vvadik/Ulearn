@@ -82,8 +82,6 @@ namespace uLearn.Web.Controllers
 
 			var slides = selectedUnit.Slides;
 			var slidesIds = slides.Select(s => s.Id).ToList();
-			var quizzes = slides.OfType<QuizSlide>();
-			var exersices = slides.OfType<ExerciseSlide>();
 
 			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
 			var filterOptions = ControllerUtils.GetFilterOptionsByGroup<VisitsFilterOptions>(groupsRepo, User, courseId, groupsIds);
@@ -91,23 +89,28 @@ namespace uLearn.Web.Controllers
 			filterOptions.PeriodStart = periodStart;
 			filterOptions.PeriodFinish = realPeriodFinish;
 
-			/* Dictionary<SlideId, List<Visit>> */
 			var slidesVisits = visitsRepo.GetVisitsInPeriodForEachSlide(filterOptions);
 
-			var usersVisitedAllSlidesInPeriodCount = visitsRepo.GetUsersVisitedAllSlides(filterOptions).Count();
+			UnitStatSectionModel statSectionModel = null;
+			if (param.ShowStat || User.HasAccessFor(courseId, CourseRole.CourseAdmin))
+			{
+				statSectionModel = new UnitStatSectionModel();
+				statSectionModel.UsersVisitedAllSlidesInPeriodCount = visitsRepo.GetUsersVisitedAllSlides(filterOptions).Count();
 
-			var quizzesAverageScore = quizzes.ToDictionary(q => q.Id,
-				q => (int)slidesVisits.GetOrDefault(q.Id, new List<Visit>())
-					.Where(v => v.IsPassed)
-					.Select(v => 100 * Math.Min(v.Score, q.MaxScore) / (q.MaxScore != 0 ? q.MaxScore : 1))
-					.DefaultIfEmpty(-1)
-					.Average()
-			);
+				var quizzes = slides.OfType<QuizSlide>();
+				statSectionModel.QuizzesAverageScore = quizzes.ToDictionary(q => q.Id,
+					q => (int)slidesVisits.GetOrDefault(q.Id, new List<Visit>())
+						.Where(v => v.IsPassed)
+						.Select(v => 100 * Math.Min(v.Score, q.MaxScore) / (q.MaxScore != 0 ? q.MaxScore : 1))
+						.DefaultIfEmpty(-1)
+						.Average()
+				);
 
-			var exercisesSolutionsCount = GetExercisesSolutionsCount(courseId, slidesIds, periodStart, realPeriodFinish);
-			var exercisesAcceptedSolutionsCount = GetExercisesAcceptedSolutionsCount(courseId, slidesIds, periodStart, realPeriodFinish);
+				statSectionModel.ExercisesSolutionsCount = GetExercisesSolutionsCount(courseId, slidesIds, periodStart, realPeriodFinish);
+				statSectionModel.ExercisesAcceptedSolutionsCount = GetExercisesAcceptedSolutionsCount(courseId, slidesIds, periodStart, realPeriodFinish);
+			}
 
-			List<string> usersIds; 
+			List<string> usersIds;
 			/* If we filtered out users from one or several groups show them all */
 			if (filterOptions.UserIds != null && !filterOptions.IsUserIdsSupplement)
 				usersIds = filterOptions.UserIds;
@@ -147,11 +150,8 @@ namespace uLearn.Web.Controllers
 				Slides = slides,
 				SlidesVisits = slidesVisits,
 
-				UsersVisitedAllSlidesInPeriodCount = usersVisitedAllSlidesInPeriodCount,
+				UnitStatSectionModel = statSectionModel,
 
-				QuizzesAverageScore = quizzesAverageScore,
-				ExercisesSolutionsCount = exercisesSolutionsCount,
-				ExercisesAcceptedSolutionsCount = exercisesAcceptedSolutionsCount,
 				VisitedUsers = visitedUsers,
 				VisitedUsersIsMore = isMore,
 				VisitedSlidesCountByUser = visitedSlidesCountByUser,
@@ -197,7 +197,7 @@ namespace uLearn.Web.Controllers
 		private Dictionary<Guid, int> GetExercisesAcceptedSolutionsCount(string courseId, List<Guid> slidesIds, DateTime periodStart, DateTime realPeriodFinish)
 		{
 			return userSolutionsRepo.GetAllAcceptedSubmissions(courseId, slidesIds, periodStart, realPeriodFinish)
-				.Select(s => new {s.SlideId, s.UserId})
+				.Select(s => new { s.SlideId, s.UserId })
 				.Distinct()
 				.GroupBy(s => s.SlideId)
 				.Select(g => new { g.Key, Count = g.Count() })
@@ -208,7 +208,7 @@ namespace uLearn.Web.Controllers
 		{
 			/* Dictionary<SlideId, count (distinct by user)> */
 			return userSolutionsRepo.GetAllSubmissions(courseId, slidesIds, periodStart, realPeriodFinish)
-				.Select(s => new {s.SlideId, s.UserId})
+				.Select(s => new { s.SlideId, s.UserId })
 				.Distinct()
 				.GroupBy(s => s.SlideId)
 				.Select(g => new { g.Key, Count = g.Count() })
@@ -521,7 +521,7 @@ namespace uLearn.Web.Controllers
 		private List<UnitStatisticUserInfo> GetUnitStatisticUserInfos(List<string> usersIds)
 		{
 			return db.Users.Where(u => usersIds.Contains(u.Id))
-				.Select(u => new {u.Id, u.UserName, u.Email, u.FirstName, u.LastName})
+				.Select(u => new { u.Id, u.UserName, u.Email, u.FirstName, u.LastName })
 				.AsEnumerable()
 				.Select(u => new UnitStatisticUserInfo(u.Id, u.UserName, u.Email, u.FirstName, u.LastName)).ToList();
 		}
@@ -542,7 +542,7 @@ namespace uLearn.Web.Controllers
 		private DefaultDictionary<Tuple<string, Guid>, int> GetScoreByUserAndSlide(VisitsFilterOptions filterOptions, List<Guid> shouldBeSolvedSlidesIds)
 		{
 			return visitsRepo.GetVisitsInPeriod(filterOptions.WithSlidesIds(shouldBeSolvedSlidesIds))
-				.Select(v => new {v.UserId, v.SlideId, v.Score})
+				.Select(v => new { v.UserId, v.SlideId, v.Score })
 				.AsEnumerable()
 				.GroupBy(v => Tuple.Create(v.UserId, v.SlideId))
 				.ToDictionary(g => g.Key, g => g.Sum(v => v.Score))
@@ -560,7 +560,7 @@ namespace uLearn.Web.Controllers
 		private DefaultDictionary<Tuple<string, Guid, string>, int> GetScoreByUserUnitScoringGroup(VisitsFilterOptions filterOptions, HashSet<Guid> slides, Dictionary<Guid, Guid> unitBySlide, Course course)
 		{
 			return visitsRepo.GetVisitsInPeriod(filterOptions)
-				.Select(v => new {v.UserId, v.SlideId, v.Score})
+				.Select(v => new { v.UserId, v.SlideId, v.Score })
 				.AsEnumerable()
 				.Where(v => slides.Contains(v.SlideId))
 				.GroupBy(v => Tuple.Create(v.UserId, unitBySlide[v.SlideId], course.FindSlideById(v.SlideId)?.ScoringGroup))
@@ -901,6 +901,7 @@ namespace uLearn.Web.Controllers
 	public class UnitStatisticsParams : StatisticsParams
 	{
 		public Guid? UnitId { get; set; }
+		public bool ShowStat { get; set; }
 	}
 
 	public class UserUnitStatisticsPageModel
