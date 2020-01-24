@@ -88,38 +88,30 @@ namespace uLearn.Web.Controllers
 			}
 
 			result.UserIds = new List<string>();
-			var usersIds = new HashSet<string>();
 
 			/* if groupsIds is empty, get members of all groups user has access to. Available for instructors */
 			if ((groupsIds.Count == 0 || groupsIds.Any(string.IsNullOrEmpty)) && User.HasAccessFor(courseId, CourseRole.Instructor))
 			{
-				var accessableGroupsIds = groupsRepo.GetMyGroupsFilterAccessibleToUser(courseId, User).Select(g => g.Id).ToList();
-				foreach (var accessableGroupId in accessableGroupsIds)
-				{
-					var groupUsersIds = groupsRepo.GetGroupMembersAsUsers(accessableGroupId).Select(u => u.Id);
-					usersIds.AddAll(groupUsersIds);
-				}
-
-				result.UserIds = usersIds.ToList();
+				var accessibleGroupsIds = groupsRepo.GetMyGroupsFilterAccessibleToUser(courseId, User).Select(g => g.Id).ToList();
+				var groupUsersIdsQuery = groupsRepo.GetGroupsMembersAsUserIds(accessibleGroupsIds);
+				result.UserIds = groupUsersIdsQuery.ToList();
 				return result;
 			}
 
-			foreach (var groupId in groupsIds)
+			var usersIds = new HashSet<string>();
+			var groupsIdsInts = groupsIds.Select(s => int.TryParse(s, out var i) ? i : (int?)null).Where(i => i.HasValue).Select(i => i.Value).ToList();
+			var group2GroupMembersIds = groupsRepo.GetGroupsMembersAsGroupsIdsAndUserIds(groupsIdsInts)
+				.GroupBy(u => u.GroupId)
+				.ToDictionary(g => g.Key, g => g.Select(p => p.UserId).ToList());
+			foreach (var groupIdInt in groupsIdsInts)
 			{
-				if (!int.TryParse(groupId, out int groupIdInt))
+				if (!group2GroupMembersIds.ContainsKey(groupIdInt))
 					continue;
-
-				var group = groupsRepo.FindGroupById(groupIdInt);
-				if (group != null)
-				{
-					var groupMembersIds = groupsRepo.GetGroupMembersAsUsers(group.Id).Select(u => u.Id).ToList();
-					var hasAccessToGroup = groupsRepo.IsGroupAvailableForUser(group.Id, User);
-					if (allowSeeGroupForAnyMember)
-						hasAccessToGroup |= groupMembersIds.Contains(User.Identity.GetUserId());
-
-					if (hasAccessToGroup)
-						usersIds.AddAll(groupMembersIds);
-				}
+				var hasAccessToGroup = groupsRepo.IsGroupAvailableForUser(groupIdInt, User);
+				if (allowSeeGroupForAnyMember)
+					hasAccessToGroup |= group2GroupMembersIds[groupIdInt].Contains(User.Identity.GetUserId());
+				if (hasAccessToGroup)
+					usersIds.AddAll(group2GroupMembersIds[groupIdInt]);
 			}
 
 			result.UserIds = usersIds.ToList();
