@@ -290,6 +290,8 @@ namespace uLearn.Web.Controllers
 			var defaultProhibitFurtherReview = groupsRepo.GetDefaultProhibitFutherReviewForUser(course.Id, userId, User);
 			var manualCheckingsLeft = manualChecking != null ? ControllerUtils.GetManualCheckingsCountInQueue(slideCheckingsRepo, groupsRepo, User, course.Id, slide, groupsIds) : 0;
 
+			var (notArchivedGroupNames, archivedGroupNames) = GetGroupNames(course, manualChecking);
+
 			var score = Tuple.Create(visiter.Score, maxSlideScore);
 			var model = new CoursePageModel
 			{
@@ -304,12 +306,29 @@ namespace uLearn.Web.Controllers
 					isManualCheckingReadonly: isManualCheckingReadonly,
 					defaultProhibitFurtherReview: defaultProhibitFurtherReview, manualCheckingsLeft: manualCheckingsLeft),
 				ManualChecking = manualChecking,
-				ContextManualCheckingUserGroups = manualChecking != null ? groupsRepo.GetUserGroupsNamesAsString(course.Id, manualChecking.UserId, User) : "",
-				ContextManualCheckingUserArchivedGroups = manualChecking != null ? groupsRepo.GetUserGroupsNamesAsString(course.Id, manualChecking.UserId, User, onlyArchived: true) : "",
+				ContextManualCheckingUserGroups = notArchivedGroupNames,
+				ContextManualCheckingUserArchivedGroups = archivedGroupNames,
 				IsGuest = false,
 				SlideEditUrl = GetGitEditLink(course, slide.Info.SlideFile)
 			};
 			return model;
+		}
+
+		private (string, string) GetGroupNames(Course course, AbstractManualSlideChecking manualChecking)
+		{
+			var notArchivedGroupNames = "";
+			var archivedGroupNames = "";
+			if (manualChecking != null)
+			{
+				var userGroups = groupsRepo.GetUsersGroups(new List<string> { course.Id }, new List<string> { manualChecking.UserId }, User, 100);
+				if (userGroups.ContainsKey(manualChecking.UserId))
+				{
+					notArchivedGroupNames = string.Join(", ", groupsRepo.GetUserGroupsNames(userGroups[manualChecking.UserId].Where(g => !g.IsArchived)));
+					archivedGroupNames = string.Join(", ", groupsRepo.GetUserGroupsNames(userGroups[manualChecking.UserId].Where(g => g.IsArchived)));
+				}
+			}
+
+			return (notArchivedGroupNames, archivedGroupNames);
 		}
 
 		// returns null if user can't edit git

@@ -466,6 +466,11 @@ namespace Database.DataContexts
 				kv => kv.Key,
 				kv => kv.Value.Select((g, idx) => idx >= maxCount ? "..." : g.Name.TruncateWithEllipsis(40)).ToList());
 		}
+		
+		public List<string> GetUserGroupsNames(IEnumerable<Group> usersGroups, int maxCount = 3)
+		{
+			return usersGroups.Select((g, idx) => idx >= maxCount ? "..." : g.Name.TruncateWithEllipsis(40)).ToList();
+		}
 
 		public Dictionary<string, List<int>> GetUsersGroupsIds(List<string> courseIds, IEnumerable<string> userIds, IPrincipal currentUser, int maxCount = 3)
 		{
