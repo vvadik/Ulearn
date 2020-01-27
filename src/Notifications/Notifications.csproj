@@ -68,7 +68,7 @@
   <ItemGroup>
     <Content Update="appsettings.local.json">
       <DependentUpon>appsettings.json</DependentUpon>
-      <CopyToPublishDirectory>Newer</CopyToPublishDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Update="appsettings.json">

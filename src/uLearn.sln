@@ -73,6 +73,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitCourseUpdater", "GitCour
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunCheckerJob", "RunCheckerJob\RunCheckerJob.csproj", "{650FE5BD-4345-41B9-800E-D00CA4CEF51F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManualUtils", "ManualUtils\ManualUtils.csproj", "{10CD716C-CB00-4BDC-A43D-BAD31D44959F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -199,6 +201,10 @@ Global
 		{650FE5BD-4345-41B9-800E-D00CA4CEF51F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{650FE5BD-4345-41B9-800E-D00CA4CEF51F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{650FE5BD-4345-41B9-800E-D00CA4CEF51F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10CD716C-CB00-4BDC-A43D-BAD31D44959F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10CD716C-CB00-4BDC-A43D-BAD31D44959F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10CD716C-CB00-4BDC-A43D-BAD31D44959F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10CD716C-CB00-4BDC-A43D-BAD31D44959F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
