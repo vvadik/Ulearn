@@ -3,7 +3,7 @@
     <TargetFramework>net472</TargetFramework>
     <RootNamespace>GiftsGranter</RootNamespace>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <OutputType>Exe</OutputType>
+    <OutputType>Exe</OutputType><SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>

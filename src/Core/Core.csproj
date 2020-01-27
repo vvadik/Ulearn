@@ -4,6 +4,7 @@
 		<LangVersion>7</LangVersion>
 		<TargetFrameworks>net472;netcoreapp2.2</TargetFrameworks>
 		<NoWarn>NU1701;CS0168</NoWarn>
+		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="JetBrains.Annotations" Version="2019.1.3" />
