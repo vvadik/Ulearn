@@ -751,6 +751,24 @@ namespace uLearn.Web.Controllers
 			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
 			return CheckNextManualCheckingForSlide<ManualExerciseChecking>(courseId, slideId, groupsIds, previous);
 		}
+		
+		public async Task<ActionResult> GetNextManualCheckingExerciseForSlide(string courseId, Guid slideId, int previous)
+		{
+			var action = await CheckNextExerciseForSlide(courseId, slideId, previous).ConfigureAwait(false);
+			if (!(action is RedirectToRouteResult redirect))
+				return action;
+			var url = Url.RouteUrl(redirect.RouteName, redirect.RouteValues);
+			return Json(new { url });
+		}
+		
+		public async Task<ActionResult> GetNextManualCheckingQuizForSlide(string courseId, Guid slideId, int previous)
+		{
+			var action = await CheckNextQuizForSlide(courseId, slideId, previous).ConfigureAwait(false);
+			if (!(action is RedirectToRouteResult redirect))
+				return action;
+			var url = Url.RouteUrl(redirect.RouteName, redirect.RouteValues);
+			return Json(new { url });
+		}
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]

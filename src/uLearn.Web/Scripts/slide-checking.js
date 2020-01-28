@@ -139,7 +139,7 @@ window.documentReadyFunctions.push(function () {
 		}
 	});
 
-	$exerciseScoreForm.find('input[type=submit]').click(function() {		
+	$exerciseScoreForm.find('input[type=submit]').click(function() {
 		if ($otherScoreInput.is(':invalid')) {
 			$otherScoreInput.show();
 			$otherScoreLink.addClass('active');
@@ -147,6 +147,7 @@ window.documentReadyFunctions.push(function () {
 			var $button = $(this);
 			$button.prop('disabled', true);
 			var nextUrl = $(this).data('url');
+			var buttonType = $(this).data('type');
 			var $form = $(".exercise__score-form");
 			var action = $form.data("action");
 			var id = $form.find('[name=id]').val();
@@ -155,12 +156,28 @@ window.documentReadyFunctions.push(function () {
 			var prohibitFurtherReview = $form.find('[name=prohibitFurtherReview]').prop('checked');
 			$.post(action, { id: id, nextUrl: nextUrl, errorUrl: errorUrl, exerciseScore: exerciseScore, prohibitFurtherReview: prohibitFurtherReview })
 				.done(function(data) {
-					if(data.status === "ok")
-						window.reactHistory.push(nextUrl);
-					else
+					if(data.status === "ok") {
+						if (buttonType === "next") {
+							loadNextReview();
+						} else {
+							window.reactHistory.push(nextUrl);
+						}
+					} else {
 						window.reactHistory.push(data.redirect);
+					}
 				})
 				.fail(function() {
+					alert("Ошибка на сервере");
+					$button.prop('disabled', false);
+				});
+		}
+
+		function loadNextReview() {
+			$.post(nextUrl)
+				.done(function (data) {
+					window.reactHistory.push(data.url);
+				})
+				.fail(function () {
 					alert("Ошибка на сервере");
 					$button.prop('disabled', false);
 				});
