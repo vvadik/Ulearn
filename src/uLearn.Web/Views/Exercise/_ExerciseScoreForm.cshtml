@@ -117,7 +117,8 @@
 					else
 					{
 						<input type="submit" class="btn btn-primary" value="Сохранить и перейти к следующему"
-								data-url="@Url.Action("CheckNextExerciseForSlide", "Admin", new { Model.CourseId, slideId = Model.Slide.Id, group = Model.GroupsIdsJoined, previous = Model.Checking.Id })"/>
+								data-type="next"
+								data-url="@Url.Action("GetNextManualCheckingExerciseForSlide", "Admin", new { Model.CourseId, slideId = Model.Slide.Id, group = Model.GroupsIdsJoined, previous = Model.Checking.Id })"/>
 						<div class="text-muted manual-checkings-left">
 							По этой задаче остал@(Model.ManualCheckingsLeft % 10 == 1 && (Model.ManualCheckingsLeft % 100 / 10 != 1) ? "ась" : "ось")
 							@Model.ManualCheckingsLeft.PluralizeInRussian(RussianPluralizationOptions.Checkings)
