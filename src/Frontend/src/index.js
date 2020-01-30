@@ -1,14 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import UlearnApp from './App';
-import { DEFAULT_TIMEZONE } from './consts/general';
 import "./externalComponentRenderer";
 
-import moment from "moment";
 import 'moment/locale/ru';
 import "moment-timezone";
-
-moment.tz.setDefault(DEFAULT_TIMEZONE);
 
 const root = document.getElementById('root');
 
