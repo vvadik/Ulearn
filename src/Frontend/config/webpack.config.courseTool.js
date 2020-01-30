@@ -42,15 +42,18 @@ const chunkCssFilename = 'static/css/[id].css';
 // (See https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/27)
 // However, our output is structured with css, js and media folders.
 // To have this structure working with relative paths, we have to use custom options.
-const extractTextPluginOptions = shouldUseRelativeAssetPaths
-  ? // Making sure that the publicPath goes back to to build folder.
-    { publicPath: Array(cssFilename.split('/').length).join('../') }
-  : {};
+const miniCssExtractPluginOptions = shouldUseRelativeAssetPaths
+	? // Making sure that the publicPath goes back to to build folder.
+	{ publicPath: Array(cssFilename.split('/').length).join('../') }
+	: {};
+
+let base = require('./webpack.config.base');
+const merge = require('webpack-merge');
 
 // This is the production configuration.
 // It compiles slowly and is focused on producing a fast and minimal bundle.
 // The development configuration is different and lives in a separate file.
-module.exports = {
+module.exports =  merge(base,{
   mode: 'production',
   // Don't attempt to continue if there are any errors.
   bail: true,
@@ -59,7 +62,10 @@ module.exports = {
   devtool: shouldUseSourceMap ? 'source-map' : false,
   // In production, we only want to load the polyfills and the app code.
   entry: {
-    main: [require.resolve('./polyfills'), paths.appIndexJs],
+    main: [
+    	'./config/polyfills',
+		paths.appIndexJs
+	],
     oldBrowser: [paths.oldBrowserJs]
   },
   output: {
@@ -94,12 +100,6 @@ module.exports = {
     // `web` extension prefixes have been added for better support
     // for React Native Web.
     extensions: ['.web.js', '.mjs', '.js', '.json', '.web.jsx', '.jsx'],
-    alias: {
-      
-      // Support React Native Web
-      // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
-      'react-native': 'react-native-web',
-    },
     plugins: [
       // Prevents users from importing files from outside of src/ (or node_modules/).
       // This often causes confusion because we only process files within src/ with babel.
@@ -118,21 +118,16 @@ module.exports = {
 
       // First, run the linter.
       // It's important to do this before Babel processes the JS.
-      {
-        test: /\.(js|jsx|mjs)$/,
-        enforce: 'pre',
-        use: [
-          {
-            options: {
-              formatter: eslintFormatter,
-              eslintPath: require.resolve('eslint'),
-              
-            },
-            loader: require.resolve('eslint-loader'),
-          },
-        ],
-        include: paths.appSrc,
-      },
+		{
+			test: /\.(js|jsx|mjs)$/,
+			include: paths.appSrc,
+			loader: 'eslint-loader',
+			enforce: 'pre',
+			options: {
+				formatter: eslintFormatter,
+				eslintPath: 'eslint',
+			},
+		},
       {
         // "oneOf" will traverse all following loaders until one will
         // match the requirements. When no loader matches it will fall
@@ -140,107 +135,89 @@ module.exports = {
         oneOf: [
           // "url" loader works just like "file" loader but it also embeds
           // assets smaller than specified size as data URLs to avoid requests.
-          {
-            test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
-            loader: require.resolve('url-loader'),
-            options: {
-              limit: 10000,
-              name: 'static/media/[name].[ext]',
-            },
-          },
+			{
+				test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
+				loader: 'url-loader',
+				options: {
+					limit: 10000,
+					name: 'static/media/[name].[hash:8].[ext]',
+				},
+			},
           // Process JS with Babel.
-          {
-            test: /\.(js|jsx|mjs)$/,
-            include: paths.appSrc,
-            loader: require.resolve('babel-loader'),
-            options: {
-              compact: true,
-            },
-          },
+			{
+				test: /\.(js|jsx|mjs)$/,
+				loader: 'babel-loader',
+				include: paths.appSrc,
+				options: {
+					configFile: "./babel.config.js",
+					cacheDirectory: true,
+					compact: true,
+				},
+			},
           // See https://github.com/webpack-contrib/mini-css-extract-plugin for details
-          {
-            test: /\.less$/,
-			  use: [
-				  {
-					  loader: MiniCssExtractPlugin.loader,
-					  options: extractTextPluginOptions,
-                  },
-				  {
-					  loader: "css-loader",
-					  options: {
-						  minimize: {
-							  safe: true
-						  },
-						  sourceMap: shouldUseSourceMap,
-	    				  localIdentName: '[hash:base64:5]',
-                          modules: true,
-					  }
-				  },
-				  {
-					  loader: "postcss-loader",
-					  options: {
-						  autoprefixer: {
-							  flexbox: 'no-2009'
-						  },
-						  plugins: () => [
-							  autoprefixer
-						  ]
-					  },
-				  },
-				  {
-				  	  loader: 'less-loader',
-					  options: {
-				  	  	  sourceMap: shouldUseSourceMap,
-					  }
-				  },
-			  ],
-          },
-          // "postcss" loader applies autoprefixer to our CSS.
-          // "css" loader resolves paths in CSS and adds assets as dependencies.
-          // "style" loader turns CSS into JS modules that inject <style> tags.
-          // In production, we use a plugin to extract that CSS to a file, but
-          // in development "style" loader enables hot editing of CSS.
-          {
-            test: /\.css$/,
-            use: [
-              require.resolve('style-loader'),
-              {
-                loader: require.resolve('css-loader'),
-                options: {
-                  importLoaders: 1,
-                },
-              },
-              {
-                loader: require.resolve('postcss-loader'),
-                options: {
-                  // Necessary for external CSS imports to work
-                  // https://github.com/facebookincubator/create-react-app/issues/2677
-                  ident: 'postcss',
-                  plugins: () => [
-                    require('postcss-flexbugs-fixes'),
-                    autoprefixer({
-                      flexbox: 'no-2009',
-                    }),
-                  ],
-                },
-              },
-            ],
-          },
-          // "file" loader makes sure assets end up in the `build` folder.
-          // When you `import` an asset, you get its filename.
-          // This loader doesn't use a "test" so it will catch all modules
-          // that fall through the other loaders.
-          {
-            loader: require.resolve('file-loader'),
-            // Exclude `js` files to keep "css" loader working as it injects
-            // it's runtime that would otherwise processed through "file" loader.
-            // Also exclude `html` and `json` extensions so they get processed
-            // by webpacks internal loaders.
-            exclude: [/\.(js|jsx|mjs)$/, /\.html$/, /\.json$/],
-            options: {
-              name: 'static/media/[name].[ext]',
-            },
-          },
+			{
+				test: /\.less$/,
+				use: [
+					{
+						loader: MiniCssExtractPlugin.loader,
+						options: miniCssExtractPluginOptions,
+					},
+					{
+						loader: "css-loader",
+						options: {
+							sourceMap: shouldUseSourceMap,
+							modules: {
+								mode: 'global',
+								localIdentName: '[hash:base64:5]',
+							}
+						}
+					},
+					{
+						loader: "postcss-loader",
+						options: {
+							plugins: () => [
+								autoprefixer({ flexbox: 'no-2009' })
+							]
+						},
+					},
+					{
+						loader: 'less-loader',
+						options: {
+							sourceMap: shouldUseSourceMap,
+						}
+					},
+				],
+			},
+			{
+				test: /\.css$/,
+				use: [
+					'style-loader',
+					{
+						loader: 'css-loader',
+						options: {
+							modules: true,
+							importLoaders: 1,
+						},
+					},
+					{
+						loader: 'postcss-loader',
+						options: {
+							ident: 'postcss',
+							plugins: () => [
+								require('postcss-flexbugs-fixes'),
+								autoprefixer({ flexbox: 'no-2009', }),
+							],
+						},
+					},
+				],
+			},
+			{
+				loader: 'file-loader',
+				exclude: [/\.(js|jsx|mjs)$/, /\.html$/, /\.json$/],
+				options: {
+					name: 'static/media/[name].[hash:8].[ext]',
+				},
+			},
           // ** STOP ** Are you adding a new loader?
           // Make sure to add the new loader(s) before the "file" loader.
         ],
@@ -333,13 +310,4 @@ module.exports = {
     // You can remove this if you don't use Moment.js:
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
   ],
-  // Some libraries import Node modules but don't use them in the browser.
-  // Tell Webpack to provide empty mocks for them so importing them works.
-  node: {
-    dgram: 'empty',
-    fs: 'empty',
-    net: 'empty',
-    tls: 'empty',
-    child_process: 'empty',
-  },
-};
+});
