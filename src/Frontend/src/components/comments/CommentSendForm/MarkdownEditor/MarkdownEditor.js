@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import BaseTextarea from "@skbkontur/react-ui/components/Textarea/Textarea";
+import BaseTextarea from "ui/Textarea";
 import { boldIcon, codeIcon, italicIcon } from "../../SVGIcons/SVGIcon";
 import MarkdownButtons from "../MarkdownButtons/MarkdownButtons";
 

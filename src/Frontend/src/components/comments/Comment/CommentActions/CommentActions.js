@@ -1,16 +1,18 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { comment, userRoles, userType } from "../../commonPropTypes";
-import Link from "@skbkontur/react-ui/components/Link/Link";
-import Button from "@skbkontur/react-ui/components/Button/Button";
-import Icon from "@skbkontur/react-icons";
-import { ACCESSES, SLIDETYPE } from "../../../../consts/general";
+import Link from "ui/Link";
+import Button from "ui/Button";
+import ArrowCorner1 from "icons/ArrowCorner1";
+import Edit from "icons/Edit";
+import DocumentLite from "icons/DocumentLite";
+import { ACCESSES, SLIDETYPE } from "src/consts/general";
 
 import styles from "./CommentActions.less";
 
 const ActionButton = ({onClick, icon, children}) => (
 	<div className={styles.action}>
-		<Button use="link" onClick={onClick} icon={<Icon name={icon} />}>
+		<Button use="link" onClick={onClick} icon={icon}>
 			{children}
 		</Button>
 	</div>
@@ -18,7 +20,7 @@ const ActionButton = ({onClick, icon, children}) => (
 
 const ActionLink = ({url, icon, children}) => (
 	<div className={styles.action}>
-		<Link href={url} icon={<Icon name={icon} />}>
+		<Link href={url} icon={icon}>
 			{children}
 		</Link>
 	</div>
@@ -37,7 +39,7 @@ export default function CommentActions(props) {
 			<ActionButton
 				key="Ответить"
 				onClick={() => actions.handleShowReplyForm(commentId)}
-				icon="ArrowCorner1">
+				icon={<ArrowCorner1/>}>
 				Ответить
 			</ActionButton>);
 	}
@@ -47,7 +49,7 @@ export default function CommentActions(props) {
 		<div className={styles.visibleOnDesktopAndTablet} key="Редактировать">
 			<ActionButton
 				onClick={() => actions.handleShowEditForm(comment.id)}
-				icon="Edit">
+				icon={<Edit/>}>
 				Редактировать
 			</ActionButton>
 		</div>);
@@ -58,7 +60,7 @@ export default function CommentActions(props) {
 			<div className={styles.visibleOnDesktopAndTablet}  key="Решения">
 				<ActionLink
 					url={url}
-					icon="DocumentLite">
+					icon={<DocumentLite/>}>
 					Посмотреть решения
 				</ActionLink>
 			</div>);

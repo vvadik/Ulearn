@@ -1,14 +1,16 @@
 import React, { Component } from "react";
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import Icon from "@skbkontur/react-icons";
-import Kebab from "@skbkontur/react-ui/components/Kebab/Kebab";
-import MenuItem from "@skbkontur/react-ui/components/MenuItem/MenuItem";
-import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
-import getPluralForm from "../../../../utils/getPluralForm";
+import Ok from "icons/Ok";
+import Delete from "icons/Delete";
+import ArchiveUnpack from "icons/ArchiveUnpack";
+import Kebab from "ui/Kebab";
+import MenuItem from "ui/MenuItem";
+import Gapped from "ui/Gapped";
+import getPluralForm from "src/utils/getPluralForm";
 
 import styles from "./groupInfo.less";
-import { Mobile, NotMobile } from "../../../../utils/responsive";
+import { Mobile, NotMobile } from "src/utils/responsive";
 
 class GroupInfo extends Component {
 
@@ -78,7 +80,7 @@ class GroupInfo extends Component {
 		return (
 			<div className={enabled ? styles["settings-on"] : styles["settings-off"]}>
 				<Gapped gap={5}>
-					{enabled ? <Icon name="Ok" /> : <Icon name="Delete" />}
+					{enabled ? <Ok/> : <Delete/>}
 					{enabled ? textIfEnabled : textIfDisabled}
 				</Gapped>
 			</div>
@@ -91,14 +93,14 @@ class GroupInfo extends Component {
 		let menuItems = [
 			<MenuItem onClick={() => this.props.toggleArchived(group, !group.isArchived)} key="toggleArchived">
 				<Gapped gap={5}>
-					<Icon name="ArchiveUnpack" />
+					<ArchiveUnpack/>
 					{group.isArchived ? 'Восстановить' : 'Архивировать'}
 				</Gapped>
 			</MenuItem>,
 			<MenuItem onClick={() => this.props.deleteGroup(group, group.isArchived ?
 				'archiveGroups' : 'groups')} key="delete">
 				<Gapped gap={5}>
-					<Icon name="Delete" />
+					<Delete/>
 					Удалить
 				</Gapped>
 			</MenuItem>

@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Checkbox from "@skbkontur/react-ui/components/Checkbox/Checkbox";
-import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
-import Icon from "@skbkontur/react-icons";
 import getMoment from "../../../../../utils/getMoment";
+import Checkbox from "ui/Checkbox";
+import Gapped from "ui/Gapped";
+import Copy from "icons/Copy";
+import Trash from "icons/Trash";
 import Avatar from "../../../../common/Avatar/Avatar";
 import CopyStudentsModal from "../CopyStudentsModal/CopyStudentsModal";
 import Profile from '../Profile';
@@ -53,7 +54,7 @@ class GroupStudents extends Component {
 					disabled={studentIds.size === 0}
 					onClick={this.onOpenModal}>
 					<Gapped gap={3}>
-						<Icon name="Copy" />
+						<Copy/>
 						<span className={styles["action-text"]}>Скопировать в группу...</span>
 					</Gapped>
 				</button>
@@ -63,7 +64,7 @@ class GroupStudents extends Component {
 					onClick={this.onDeleteStudents}
 				>
 					<Gapped gap={3}>
-						<Icon name="Trash" />
+						<Trash/>
 						<span className={styles["action-text"]}>Исключить из группы</span>
 					</Gapped>
 				</button>

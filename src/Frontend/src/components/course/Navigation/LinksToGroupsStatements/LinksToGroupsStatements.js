@@ -1,7 +1,7 @@
 import React from "react"
 import PropTypes from "prop-types";
 
-import Link from "@skbkontur/react-ui/Link";
+import Link from "ui/Link";
 
 import { courseStatistics } from "../../../../consts/routes";
 import { buildQuery } from "../../../../utils";

@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import Modal from "@skbkontur/react-ui/components/Modal/Modal";
-import Toggle from "@skbkontur/react-ui/components/Toggle/Toggle";
-import RadioGroup from "@skbkontur/react-ui/components/RadioGroup/RadioGroup";
-import Radio from "@skbkontur/react-ui/components/Radio/Radio";
-import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
-import Button from "@skbkontur/react-ui/components/Button/Button";
+import Modal from "ui/Modal";
+import Toggle from "ui/Toggle/Toggle";
+import RadioGroup from "ui/RadioGroup/RadioGroup";
+import Radio from "ui/Radio/Radio";
+import Gapped from "ui/Gapped";
+import Button from "ui/Button";
 
 class CommentPolicySettings extends Component {
 	render() {

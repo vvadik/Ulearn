@@ -1,8 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
-import Link from "@skbkontur/react-ui/components/Link/Link";
-import Button from "@skbkontur/react-ui/components/Button/Button";
-import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
+import Link from "ui/Link";
+import Button from "ui/Button";
+import Gapped from "ui/Gapped";
 
 import styles from "./Stub.less";
 

@@ -2,16 +2,16 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { userType, userRoles, commentPolicy } from "../commonPropTypes";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
-import { TABS } from "../../../consts/general";
-import * as debounce from "debounce";
-import Icon from "@skbkontur/react-icons";
-import Loader from "@skbkontur/react-ui/components/Loader/Loader";
-import Toast from "@skbkontur/react-ui/components/Toast/Toast";
+import { TABS } from "src/consts/general";
+import { debounce } from "debounce";
+import CommentLite from "icons/CommentLite";
+import Loader from "ui/Loader";
+import Toast from "ui/Toast";
 import Thread from "../Thread/Thread";
 import CommentSendForm from "../CommentSendForm/CommentSendForm";
 import Error404 from "../../common/Error/Error404";
 import Stub from "../Stub/Stub";
-import scrollToView from "../../../utils/scrollToView";
+import scrollToView from "src/utils/scrollToView";
 
 import styles from "./CommentsList.less";
 
@@ -247,7 +247,7 @@ class CommentsList extends Component {
 					</> }
 				{ (commentPolicy.areCommentsEnabled && user.id && (threads.length + replies) > 7) &&
 				<button className={ styles.sendButton } onClick={ this.handleShowSendForm }>
-					<Icon name="CommentLite" color="#3072C4"/>
+					<CommentLite color="#3072C4"/>
 					Оставить комментарий
 				</button> }
 			</div>

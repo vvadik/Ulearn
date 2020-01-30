@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-import Link from '@skbkontur/react-ui/Link';
-import LeftIcon from '@skbkontur/react-icons/ArrowChevron2Left';
+import Link from 'ui/Link';
+import ArrowChevron2Left from 'icons/ArrowChevron2Left';
 
 import { groupAsStudentType, progressType } from './../../types';
 
@@ -32,7 +32,7 @@ class CourseNavigationHeader extends Component {
 		return (
 			<nav className={ styles.breadcrumbs }>
 				<Link
-					icon={ <LeftIcon/> }
+					icon={ <ArrowChevron2Left/> }
 					href={ '/' }>
 					Все курсы
 				</Link>

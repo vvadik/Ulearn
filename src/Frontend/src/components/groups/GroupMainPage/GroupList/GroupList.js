@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Loader from "@skbkontur/react-ui/components/Loader/Loader";
+import Loader from "ui/Loader";
 import GroupInfo from "../GroupInfo/GroupInfo";
 
 import styles from "./groupList.less";

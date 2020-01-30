@@ -1,22 +1,31 @@
-import React, { Component } from 'react'
-import * as PropTypes from 'prop-types'
-import { MenuItem, MenuSeparator } from "@skbkontur/react-ui/components/all";
-import Icon from "@skbkontur/react-icons"
-import MenuHeader from "@skbkontur/react-ui/MenuHeader"
-import Tooltip from "@skbkontur/react-ui/Tooltip"
-import Loader from "@skbkontur/react-ui/Loader"
-import DropdownMenu from "@skbkontur/react-ui/DropdownMenu"
-import DropdownContainer from "@skbkontur/react-ui/components/DropdownContainer/DropdownContainer"
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+
+import DocumentGroup from "icons/DocumentGroup";
+import DocumentSolid from "icons/DocumentSolid";
+import NotificationBell from "icons/NotificationBell";
+import User from "icons/User";
+import Warning from "icons/Warning";
+import MenuIcon  from "icons/Menu";
+
+import MenuHeader from "ui/MenuHeader";
+import MenuItem from "ui/MenuItem";
+import MenuSeparator from "ui/MenuSeparator";
+import Tooltip from "ui/Tooltip";
+import Loader from "ui/Loader";
+import DropdownMenu from "ui/DropdownMenu";
+import DropdownContainer from "ui/DropdownContainer/DropdownContainer";
+
 import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
-import { findDOMNode } from "react-dom"
+import { findDOMNode } from "react-dom";
 
 import styles from './Header.less';
 
-import { getQueryStringParameter } from "../../utils";
-import { toggleNavigation } from "../../actions/navigation";
+import { getQueryStringParameter } from "src/utils";
+import { toggleNavigation } from "src/actions/navigation";
 
-import api from "../../api"
+import api from "src/api";
 
 
 let accountPropTypes = PropTypes.shape({
@@ -103,8 +112,12 @@ class Header extends Component {
 		};
 	}
 
-	componentWillReceiveProps(nextProps, nextContext) {
-		this.setState(Header.mapPropsToState(nextProps));
+	static getDerivedStateFromProps(props, state){
+		const {  account, courses } = props;
+		if (JSON.stringify(state.account) !== JSON.stringify(account) || JSON.stringify(state.courses) !== JSON.stringify(courses)) {
+			return Header.mapPropsToState(props);
+		}
+		return null;
 	}
 
 	render() {
@@ -232,7 +245,7 @@ const isInsideCourse = () => {
 function NavMenu({ toggleNavigation }) {
 	return (
 		<button className={ styles.navMenuButton } onClick={ toggleNavigation }>
-			<Icon size={ 22 } name="Menu"/>
+			<MenuIcon size={ 22 }/>
 		</button>
 	)
 }
@@ -320,7 +333,7 @@ class SysAdminMenu extends AbstractMyCoursesMenu {
 						<div>
 							<span className={ styles["visible-only-phone"] }>
 								<span className={ styles["icon"] }>
-									<Icon name="DocumentGroup"/>
+									<DocumentGroup/>
 								</span>
 							</span>
 							<span className={ `${ styles["caption"] } ${ styles["visible-at-least-tablet"] }` }>
@@ -352,7 +365,7 @@ class MyCoursesMenu extends AbstractMyCoursesMenu {
 						<div>
 							<span className={ styles["visible-only-phone"] }>
 								<span className={ styles["icon"] }>
-									<Icon name="DocumentGroup"/>
+									<DocumentGroup/>
 								</span>
 							</span>
 							<span className={ `${ styles["caption"] } ${ styles["visible-at-least-tablet"] }` }>
@@ -463,7 +476,7 @@ class CourseMenu extends Component {
 						<div>
 						<span className={ styles["visible-only-phone"] }>
 							<span className={ styles["icon"] }>
-								<Icon name="DocumentSolid"/>
+								<DocumentSolid/>
 							</span>
 						</span>
 							<span className={ `${ styles["caption"] } ${ styles["visible-at-least-tablet"] }` }
@@ -505,7 +518,7 @@ class MobileCourseMenu extends AbstractMyCoursesMenu {
 					menuWidth={ 250 }
 					caption={
 						<span className={ styles["icon"] }>
-							<Icon name="DocumentSolid"/>
+							<DocumentSolid/>
 						</span> }
 				>
 					{ this.props.isCourseMenuVisible ? CourseMenu.menuItems(this.props.courseId, this.props.role, this.props.accesses) : null }
@@ -585,10 +598,14 @@ class NotificationsMenu extends Component {
 		}
 	}
 
-	componentWillReceiveProps(nextProps, nextContext) {
-		this.setState({
-			counter: nextProps.notifications.count
-		});
+	static getDerivedStateFromProps(props, state){
+		const { notifications } = props;
+		if(state.counter !== notifications.count){
+			return {
+				counter: notifications.count,
+			}
+		}
+		return null;
 	}
 
 	componentDidMount() {
@@ -706,7 +723,7 @@ class NotificationsIcon extends Component {
 				className={ `${ styles["header__notifications-icon"] } ${ this.props.counter === 0 ? styles["without-counter"] : "" }` }
 				onClick={ this.props.onClick }>
                 <span className={ styles["icon"] }>
-                    <Icon name="NotificationBell"/>
+                    <NotificationBell/>
                 </span>
 				{
 					this.props.counter > 0 &&
@@ -771,7 +788,7 @@ class ProfileLink extends Component {
 	}
 
 	render() {
-		let icon = <Icon name="User"/>;
+		let icon = <User/>;
 		let isProblem = this.props.account.accountProblems.length > 0;
 		if (isProblem) {
 			let firstProblem = this.props.account.accountProblems[0];
@@ -782,7 +799,7 @@ class ProfileLink extends Component {
 					</div>
 				) } onCloseClick={ this.closeTooltip }>
                     <span onMouseOver={ this.openTooltip }>
-                        <Icon name="Warning" color="#f77"/>
+                        <Warning color="#f77"/>
                     </span>
 				</Tooltip>
 			)

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
 
-import Loader from "@skbkontur/react-ui/Loader";
+import Loader from "ui/Loader";
 import UnitCard from "./UnitCard/UnitCard";
 import Guides from "../Guides/Guides";
 import ProgressBar from "../ProgressBar/ProgressBar";

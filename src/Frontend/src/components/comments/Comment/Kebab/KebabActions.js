@@ -1,9 +1,14 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { comment, userType, userRoles } from "../../commonPropTypes";
-import Kebab from "@skbkontur/react-ui/components/Kebab/Kebab";
-import MenuItem from "@skbkontur/react-ui/components/MenuItem/MenuItem";
-import Icon from "@skbkontur/react-icons";
+import Kebab from "ui/Kebab";
+import MenuItem from "ui/MenuItem";
+import EyeClosed from "icons/EyeClosed";
+import Delete from "icons/Delete";
+import Pin from "icons/Pin";
+import Edit from "icons/Edit";
+import DocumentLite from "icons/DocumentLite";
+import Ok from "icons/Ok";
 import { ACCESSES, SLIDETYPE } from "../../../../consts/general";
 
 import styles from "./KebabActions.less";
@@ -20,7 +25,7 @@ export default function KebabActions(props) {
 			<Kebab positions={["bottom right"]} size="large" disableAnimations={true}>
 				{canModerate &&
 				<MenuItem
-					icon={<Icon.EyeClosed size="small" />}
+					icon={<EyeClosed size="small" />}
 					onClick={() => {
 						actions.handleApprovedMark(comment.id, comment.isApproved);
 						handleCommentBackGround(comment.id, comment.isApproved)}
@@ -29,19 +34,19 @@ export default function KebabActions(props) {
 				</MenuItem>}
 				{canDeleteAndEdit &&
 				<MenuItem
-					icon={<Icon.Delete size="small" />}
+					icon={<Delete size="small" />}
 					onClick={() => actions.handleDeleteComment(comment)}>
 					Удалить
 				</MenuItem>}
 				{(canModerate && !comment.parentCommentId) &&
 				<MenuItem
 					onClick={() => actions.handlePinnedToTopMark(comment.id, comment.isPinnedToTop)}
-					icon={<Icon name="Pin" size="small" />}>
+					icon={<Pin size="small" />}>
 					{comment.isPinnedToTop ? "Открепить" : "Закрепить"}
 				</MenuItem>}
 				{canDeleteAndEdit &&
 					<MenuItem
-					icon={<Icon.Edit size="small" />}
+					icon={<Edit size="small" />}
 					onClick={() => actions.handleShowEditForm(comment.id)}>
 					Редактировать
 					</MenuItem>}
@@ -49,14 +54,14 @@ export default function KebabActions(props) {
 				<div className={styles.visibleOnPhone}>
 					<MenuItem
 						href={url}
-						icon={<Icon name="DocumentLite" size="small" />}>
+						icon={<DocumentLite size="small" />}>
 						Посмотеть решения
 					</MenuItem>
 				</div>}
 				{(canModerate && comment.parentCommentId) &&
 					<MenuItem
 						onClick={() => actions.handleCorrectAnswerMark(comment.id, comment.isCorrectAnswer)}
-						icon={<Icon name="Ok" size="small" />}>
+						icon={<Ok size="small" />}>
 						{comment.isCorrectAnswer ? "Снять отметку" : "Отметить правильным"}
 					</MenuItem>}
 			</Kebab>

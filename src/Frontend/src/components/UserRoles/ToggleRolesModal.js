@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 
-import Modal from '@skbkontur/react-ui/components/Modal/Modal';
-import Button from '@skbkontur/react-ui/components/Button/Button';
-import Textarea from '@skbkontur/react-ui/components/Textarea/Textarea';
-import Tooltip from "@skbkontur/react-ui/components/Tooltip/Tooltip";
+import Modal from 'ui/Modal';
+import Button from 'ui/Button';
+import Textarea from 'ui/Textarea';
+import Tooltip from "ui/Tooltip";
 
 class ToggleRolesModal extends Component {
 	constructor(props) {

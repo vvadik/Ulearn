@@ -1,14 +1,14 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import api from "../../../../../api/index";
-import Select from "@skbkontur/react-ui/components/Select/Select";
-import Modal from "@skbkontur/react-ui/components/Modal/Modal";
-import Button from "@skbkontur/react-ui/components/Button/Button";
-import Toast from "@skbkontur/react-ui/components/Toast/Toast";
+import Select from "ui/Select";
+import Modal from "ui/Modal";
+import Button from "ui/Button";
+import Toast from "ui/Toast";
 import getPluralForm from "../../../../../utils/getPluralForm";
 
 import styles from './copyStudentsModal.less';
-import Loader from "@skbkontur/react-ui/components/Loader/Loader";
+import Loader from "ui/Loader";
 
 class CopyStudentsModal extends Component {
 

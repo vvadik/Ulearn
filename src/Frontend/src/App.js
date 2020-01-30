@@ -14,7 +14,7 @@ import Router from "./Router";
 
 import rootReducer from "./redux/reducers";
 import api from "./api";
-import Toast from "@skbkontur/react-ui/components/Toast/Toast";
+import Toast from "ui/Toast";
 
 
 let loggerMiddleware = createLogger();

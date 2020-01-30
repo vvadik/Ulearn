@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from "prop-types";
 
-import LockClosed from '@skbkontur/react-icons/LockClosed';
-import Button from "@skbkontur/react-ui/Button";
+import LockClosed from 'icons/LockClosed';
+import Button from "ui/Button";
 import { Link } from 'react-router-dom';
 
 import styles from './courseCards.less';
