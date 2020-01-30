@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
+import getMoment from "../../../../utils/getMoment";
 import {withRouter} from "react-router-dom";
-import moment from "moment";
 import api from "../../../../api";
 import Icon from "@skbkontur/react-icons";
 import Kebab from "@skbkontur/react-ui/components/Kebab/Kebab";
@@ -134,8 +134,6 @@ class GroupMembers extends Component {
 		const { group, role, userId } = this.props;
 		const owner = group.owner;
 
-		const grantTime = (grantTime) => moment(grantTime).format();
-
 		const { systemAccesses, isSysAdmin } = this.props;
 
 		return (accesses
@@ -151,7 +149,7 @@ class GroupMembers extends Component {
 								systemAccesses={systemAccesses}
 								isSysAdmin={isSysAdmin} /> <span className={styles["teacher-status"]}>
 								Полный доступ { `${getGenderForm(owner.gender, 'предоставила', 'предоставил') }
-								${item.grantedBy.visibleName} ${moment(grantTime(item.grantTime)).fromNow()}` }
+								${item.grantedBy.visibleName} ${getMoment(item.grantTime)}` }
 							</span>
 						</div>
 						<div className={styles["teacher-action"]}>
