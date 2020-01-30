@@ -80,13 +80,13 @@ class InternalUlearnApp extends Component {
 	componentDidMount() {
 		this.props.getCurrentUser();
 		this.props.getCourses();
-	}
-
-	componentWillReceiveProps(nextProps, nextState) {
 		this.setState({
 			initializing: false
 		});
-		if (!this.props.account.isAuthenticated && nextProps.account.isAuthenticated) {
+	}
+
+	componentDidUpdate(prevProps) {
+		if (!prevProps.account.isAuthenticated && this.props.account.isAuthenticated) {
 			this.props.getNotificationsCount();
 		}
 	}

@@ -15,10 +15,14 @@ class AnyPage extends Component {
 		};
 	}
 
-	componentWillReceiveProps(nextProps) {
-		this.setState({
-			href: nextProps.location.pathname + nextProps.location.search,
-		});
+	static getDerivedStateFromProps(props, state){
+		const newHref = props.location.pathname + props.location.search;
+		if (newHref !== state.href) {
+			return {
+				href: newHref,
+			};
+		}
+		return null;
 	}
 
 	render() {
