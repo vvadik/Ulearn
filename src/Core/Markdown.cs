@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Web;
+using MarkdownDeep;
 using Microsoft.AspNetCore.Html;
 using Ulearn.Core.Courses;
 
@@ -22,7 +23,7 @@ namespace Ulearn.Core
 		{
 			var texReplacer = new TexReplacer(markdown);
 
-			var markdownObject = new MarkdownDeep.Markdown
+			var markdownObject = new ExtendedMarkdownDeep
 			{
 				NewWindowForExternalLinks = true,
 				ExtraMode = true,
@@ -103,6 +104,17 @@ namespace Ulearn.Core
 			var html = markdown.Transform(texReplacer.ReplacedText);
 
 			return Tuple.Create(texReplacer.PlaceTexInsertsBack(html), relativeUrls);
+		}
+
+		private class ExtendedMarkdownDeep : MarkdownDeep.Markdown
+		{
+			public override void OnPrepareLink(HtmlTag tag)
+			{
+				base.OnPrepareLink(tag);
+				var isFileLink = tag.attributes["href"].Contains("StudentZip");
+				if (isFileLink)
+					tag.attributes["onclick"] = $"window.location.href='{tag.attributes["href"]}';return false;";
+			}
 		}
 	}
 }
