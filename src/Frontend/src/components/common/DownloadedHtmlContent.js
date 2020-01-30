@@ -1,12 +1,13 @@
 import React, { Component, PureComponent } from 'react';
 import { Helmet } from "react-helmet";
-import Loader from "@skbkontur/react-ui/Loader"
+import Loader from "ui/Loader";
 import * as PropTypes from "prop-types";
 import { saveAs } from "file-saver";
-import { connect } from "react-redux"
-import api from "../../api"
-import { COURSES__COURSE_ENTERED } from "../../consts/actions";
-import { getQueryStringParameter } from "../../utils";
+import { connect } from "react-redux";
+import api from "src/api";
+import { COURSES__COURSE_ENTERED } from "src/consts/actions";
+import { getQueryStringParameter } from "src/utils";
+import { withRouter } from "react-router-dom";
 
 
 function getUrlParts(url) {
@@ -73,9 +74,9 @@ class DownloadedHtmlContent extends Component {
 		this.fetchContentFromServer(this.props.url);
 	}
 
-	componentWillReceiveProps(nextProps) {
-		if (this.props.url !== nextProps.url || this.props.account.isAuthenticated !== nextProps.account.isAuthenticated)
-			this.fetchContentFromServer(nextProps.url);
+	componentDidUpdate(prevProps) {
+		if (this.props.url !== prevProps.url || this.props.account.isAuthenticated !== prevProps.account.isAuthenticated)
+			this.fetchContentFromServer(this.props.url);
 	}
 
 	static removeBootstrapModalBackdrop() {
@@ -118,7 +119,7 @@ class DownloadedHtmlContent extends Component {
 						localStorage.removeItem('exercise_solutions');
 						window.location.href = newUrl.pathname + newUrl.search;
 					} else {
-						this.context.router.history.replace(newUrl.pathname + newUrl.search);
+						this.props.history.replace(newUrl.pathname + newUrl.search);
 						return Promise.resolve(undefined);
 					}
 				}
@@ -231,7 +232,7 @@ class DownloadedHtmlContent extends Component {
 
 	downloadFile(blob, filename) {
 		saveAs(blob, filename, false);
-		window.history.back();
+		this.props.history.back();
 	}
 
 	render() {
@@ -320,7 +321,7 @@ class DownloadedHtmlContent extends Component {
 							localStorage.removeItem('exercise_solutions');
 							window.location.href = newUrlParts.pathname + newUrlParts.search;
 						} else {
-							this.context.router.history.replace(newUrlParts.pathname + newUrlParts.search);
+							this.props.history.replace(newUrlParts.pathname + newUrlParts.search);
 							return Promise.resolve(undefined);
 						}
 					}
@@ -352,15 +353,13 @@ class DownloadedHtmlContent extends Component {
 		}
 	}
 
-	static contextTypes = {
-		router: PropTypes.shape({
-			history: PropTypes.shape({
-				push: PropTypes.func.isRequired,
-				replace: PropTypes.func.isRequired,
-				createHref: PropTypes.func.isRequired
-			}).isRequired
-		}).isRequired
-	};
+	static propTypes = {
+		history:  PropTypes.shape({
+			push: PropTypes.func.isRequired,
+			replace: PropTypes.func.isRequired,
+			createHref: PropTypes.func.isRequired
+		}).isRequired,
+	}
 }
 
 class Content extends PureComponent {
@@ -402,4 +401,4 @@ class Meta extends Component {
 	}
 }
 
-export default connect(DownloadedHtmlContent.mapStateToProps, DownloadedHtmlContent.mapDispatchToProps)(DownloadedHtmlContent);
+export default connect(DownloadedHtmlContent.mapStateToProps, DownloadedHtmlContent.mapDispatchToProps)(withRouter(DownloadedHtmlContent));

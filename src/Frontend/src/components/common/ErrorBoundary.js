@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 import styles from './Header.less';
-import Toast from "@skbkontur/react-ui/components/Toast/Toast";
+import Toast from "ui/Toast";
 
 /* It's error boundary for React 16 and above. It supports Raven from sentry.io.
  * See https://github.com/getsentry/raven-js/blob/master/docs/integrations/react.rst and

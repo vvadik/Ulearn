@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Button from "@skbkontur/react-ui/components/Button/Button";
-import Tabs from "@skbkontur/react-ui/components/Tabs/Tabs";
-import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
+import Button from "ui/Button";
+import Tabs from "ui/Tabs";
+import Gapped from "ui/Gapped";
 import CreateGroupModal from "../CreateGroupModal/CreateGroupModal";
 import CopyGroupModal from "../CopyGroupModal/CopyGroupModal";
 

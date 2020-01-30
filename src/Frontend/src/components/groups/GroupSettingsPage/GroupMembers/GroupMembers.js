@@ -3,11 +3,12 @@ import PropTypes from "prop-types";
 import getMoment from "../../../../utils/getMoment";
 import {withRouter} from "react-router-dom";
 import api from "../../../../api";
-import Icon from "@skbkontur/react-icons";
-import Kebab from "@skbkontur/react-ui/components/Kebab/Kebab";
-import MenuItem from "@skbkontur/react-ui/components/MenuItem/MenuItem";
-import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
-import Loader from "@skbkontur/react-ui/components/Loader/Loader";
+import User from "icons/User";
+import Delete from "icons/Delete";
+import Kebab from "ui/Kebab";
+import MenuItem from "ui/MenuItem";
+import Gapped from "ui/Gapped";
+import Loader from "ui/Loader";
 import ComboboxInstructorsSearch from "./Combobox/ComboboxInstructorsSearch";
 import Avatar from "../../../common/Avatar/Avatar";
 import GroupStudents from "./GroupStudents/GroupStudents";
@@ -15,7 +16,7 @@ import InviteBlock from "./InviteBlock/InviteBlock";
 import Profile from './Profile';
 import getGenderForm from "../../../../utils/getGenderForm";
 import styles from './groupMembers.less';
-import Toast from "@skbkontur/react-ui/components/Toast/Toast";
+import Toast from "ui/Toast";
 import {Mobile, NotMobile} from "../../../../utils/responsive";
 
 class GroupMembers extends Component {
@@ -167,7 +168,7 @@ class GroupMembers extends Component {
 		let menuItems = [
 			<MenuItem onClick={() => this.onChangeOwner(item.user)} key="changeOwner">
 				<Gapped gap={5}>
-					<Icon name="User" />
+					<User/>
 					Сделать владельцем
 				</Gapped>
 			</MenuItem>
@@ -176,7 +177,7 @@ class GroupMembers extends Component {
 			menuItems.push(
 				<MenuItem onClick={() => this.onRemoveTeacher(item.user)} key="removeTeacher">
 					<Gapped gap={5}>
-						<Icon name="Delete"/>
+						<Delete/>
 						Забрать доступ
 					</Gapped>
 				</MenuItem>

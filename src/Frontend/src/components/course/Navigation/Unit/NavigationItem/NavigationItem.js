@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 
-import Copy from "@skbkontur/react-icons/Copy";
+import Copy from "icons/Copy";
 
 import { SLIDETYPE } from '../../../../../consts/general';
 import { menuItemType } from '../../types';

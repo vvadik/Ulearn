@@ -1,13 +1,13 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-import Button from "@skbkontur/react-ui/Button";
+import Button from "ui/Button";
 import Results from "../Results/Results";
 
 import styles from "./openedFlashcard.less";
 
 import translateCode from "../../../../codeTranslator/translateCode";
-import Link from "react-router-dom/es/Link";
+import { Link } from "react-router-dom";
 
 class OpenedFlashcard extends Component {
 	constructor(props) {

@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { userRoles, user } from "../commonPropTypes";
 import api from "../../../api";
 import { TABS, ROLES } from "../../../consts/general";
-import Tabs from "@skbkontur/react-ui/components/Tabs/Tabs";
+import Tabs from "ui/Tabs";
 import CommentsList from "../CommentsList/CommentsList";
 
 import styles from "./CommentsView.less";
@@ -95,7 +95,7 @@ class CommentsView extends Component {
 				</div>
 				{this.isInstructor(userRoles) &&
 				<div className={styles.tabs}>
-					<Tabs value={activeTab} onChange={(e, id)=> this.handleTabChange(id, true)}>
+					<Tabs value={activeTab} onChange={this.handleTabChangeByUser}>
 						<Tabs.Tab id={TABS.allComments}>К слайду</Tabs.Tab>
 						<Tabs.Tab id={TABS.instructorsComments}>
 							Для преподавателей
@@ -121,6 +121,9 @@ class CommentsView extends Component {
 		return this.isCourseAdmin(userRoles) ||
 			userRoles.courseRole === ROLES.instructor;
 	}
+
+	handleTabChangeByUser = (e, id) =>
+		this.handleTabChange(id, true);
 
 	handleTabChange = (id, isUserAction) => {
 		if (this.isInstructor(this.props.userRoles)) {

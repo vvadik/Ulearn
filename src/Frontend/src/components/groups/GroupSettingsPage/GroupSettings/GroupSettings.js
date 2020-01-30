@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Input from "@skbkontur/react-ui/components/Input/Input";
-import Loader from "@skbkontur/react-ui/components/Loader/Loader";
+import Input from "ui/Input";
+import Loader from "ui/Loader";
 import GroupScores from "./GroupScores/GroupScores";
 import GroupSettingsCheckbox from "./GroupSettingsCheckbox/GroupSettingsCheckbox";
 
