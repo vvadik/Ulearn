@@ -17,7 +17,7 @@
 		const frameLoaded = false;
 		let playerReady = false;
 		let initialized = false;
-		const intervalId = setInterval( () => {
+		const intervalId = setInterval( function() {
 			const element = document.getElementById(elementId);
 			if(element && element.contentWindow != null) {
 				if(initialized) {
@@ -35,9 +35,9 @@
 			}
 		}, 10);
 		const player = new YT.Player(elementId, {
-			height,
-			width,
-			videoId,
+			height:height,
+			width:width,
+			videoId:videoId,
 			events: {
 				'onReady': function (e) {
 					playerReady = true;
@@ -68,7 +68,7 @@
 window.documentReadyFunctions = window.documentReadyFunctions || [];
 
 window.documentReadyFunctions.push(function () {
-	const enableYoutubeIframeApi = () => {
+	const enableYoutubeIframeApi = function() {
 		window['YT'] = undefined;
 		
 		const tag = document.createElement('script');
