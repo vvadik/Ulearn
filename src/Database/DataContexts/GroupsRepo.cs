@@ -338,6 +338,8 @@ namespace Database.DataContexts
 		public bool IsGroupAvailableForUser(int groupId, IPrincipal user)
 		{
 			var group = FindGroupById(groupId);
+			if (group == null)
+				return false;
 			/* Course admins can see all groups */
 			if (CanUserSeeAllCourseGroups(user, group.CourseId))
 				return true;
