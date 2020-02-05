@@ -113,7 +113,7 @@ module.exports = merge(base,{
 								options: {
 									sourceMap: shouldUseSourceMap,
 									modules: {
-										mode: 'global',
+										mode: 'local',
 										localIdentName: '[hash:base64:5]',
 									}
 								}
