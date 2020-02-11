@@ -144,7 +144,7 @@ namespace uLearn.CourseTool.Monitoring
 			var exerciseSlide = slide as ExerciseSlide;
 			var block = exerciseSlide.Exercise;
 			var fileName = (block as CsProjectExerciseBlock)?.CsprojFile.Name ?? new DirectoryInfo((block as UniversalExerciseBlock).ExerciseDirPath).Name;
-			context.Response.Headers.Add("Content-Disposition", $"attachment; filename=\"{fileName}\"");
+			context.Response.Headers.Add("Content-Disposition", $"attachment; filename=\"{fileName}.zip\"");
 
 			return zipBytes;
 		}
