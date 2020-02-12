@@ -55,6 +55,13 @@ namespace Database
 
 	public class SubmissionsFilterOptions : AbstractFilterOptionByCourseAndUsers
 	{
-		public IEnumerable<Guid> SlideIds { get; set; }
+		public IEnumerable<Guid> SlidesIds { get; set; }
+		
+		public SubmissionsFilterOptions WithSlidesIds(IEnumerable<Guid> newSlidesIds)
+		{
+			var copy = (SubmissionsFilterOptions)MemberwiseClone();
+			copy.SlidesIds = newSlidesIds;
+			return copy;
+		}
 	}
 }

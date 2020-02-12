@@ -549,14 +549,14 @@ namespace uLearn.Web.Controllers
 				{
 					CourseId = courseId,
 					UserIds = visitedUserIds,
-					SlideIds = slideIdInList,
+					SlidesIds = slideIdInList,
 				};
 			}
 			else
 			{
 				/* Get members of `my` groups */
 				filterOptions = ControllerUtils.GetFilterOptionsByGroup<SubmissionsFilterOptions>(groupsRepo, User, courseId, groupsIds: new List<string>());
-				filterOptions.SlideIds = slideIdInList;
+				filterOptions.SlidesIds = slideIdInList;
 				/* Filter out only users with visits to this slide */
 				filterOptions.UserIds = filterOptions.UserIds.Intersect(visitedUserIds).ToList();
 			}

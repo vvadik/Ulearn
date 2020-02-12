@@ -206,12 +206,20 @@ namespace Database.DataContexts
 
 		public IQueryable<UserExerciseSubmission> GetAllSubmissionsByUsers(SubmissionsFilterOptions filterOptions)
 		{
-			var submissions = GetAllSubmissions(filterOptions.CourseId, filterOptions.SlideIds);
+			var submissions = GetAllSubmissions(filterOptions.CourseId, filterOptions.SlidesIds);
 			if (filterOptions.IsUserIdsSupplement)
 				submissions = submissions.Where(s => !filterOptions.UserIds.Contains(s.UserId));
 			else
 				submissions = submissions.Where(s => filterOptions.UserIds.Contains(s.UserId));
 			return submissions;
+		}
+
+		public IQueryable<AutomaticExerciseChecking> GetAutomaticExerciseCheckingsByUsers(string courseId, Guid slideId, List<string> userIds)
+		{
+			var query = db.AutomaticExerciseCheckings.Where(c => c.CourseId == courseId && c.SlideId == slideId);
+			if (userIds != null)
+				query = query.Where(v => userIds.Contains(v.UserId));
+			return query;
 		}
 
 		public List<AcceptedSolutionInfo> GetBestTrendingAndNewAcceptedSolutions(string courseId, List<Guid> slidesIds)
@@ -524,7 +532,8 @@ namespace Database.DataContexts
 			{
 				if (!result.Points.HasValue)
 					return false;
-				return exerciseBlock.SmallPointsIsBetter ? result.Points.Value <= exerciseBlock.PassingPoints : result.Points.Value >= exerciseBlock.PassingPoints;
+				const float eps = 0.00001f;
+				return exerciseBlock.SmallPointsIsBetter ? result.Points.Value < exerciseBlock.PassingPoints + eps : result.Points.Value > exerciseBlock.PassingPoints - eps;
 			}
 
 			throw new InvalidOperationException($"Unknown exercise type for checking: {exerciseBlock.ExerciseType}");

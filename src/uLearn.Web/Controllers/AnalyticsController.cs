@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using Database;
@@ -22,6 +23,7 @@ using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Courses.Units;
 
@@ -624,6 +626,116 @@ namespace uLearn.Web.Controllers
 			return View(model);
 		}
 
+		[ULearnAuthorize(MinAccessLevel = CourseRole.Student)]
+		public ActionResult RatingByPoints(string courseId, Guid slideId, int? groupId = null)
+		{
+			var course = courseManager.FindCourse(courseId);
+			if (course == null)
+				return HttpNotFound();
+			var slide = course.FindSlideById(slideId);
+			var exerciseBlock = slide?.Blocks.OfType<AbstractExerciseBlock>().FirstOrDefault();
+			if (exerciseBlock == null)
+				return HttpNotFound();
+			var smallPointsIsBetter = exerciseBlock.SmallPointsIsBetter;
+			
+			var currentUserId = User.Identity.GetUserId();
+			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
+			var isAdministrator = User.HasAccessFor(courseId, CourseRole.CourseAdmin);
+			var isStudent = !isInstructor;
+
+			Group selectedGroup = null;
+			List<Group> availableGroups = null;
+			List<ApplicationUser> users = null; // null, если все пользователи
+			var hideOtherUsersNames = false;
+			var showAllUsers = false;
+			if (groupId != null)
+			{
+				selectedGroup = groupsRepo.FindGroupById(groupId.Value);
+				if (selectedGroup == null)
+					return HttpNotFound();
+				users = groupsRepo.GetGroupMembersAsUsers(groupId.Value);
+				if (isStudent && !users.Select(u => u.Id).Contains(currentUserId))
+					return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+				if (isInstructor && !groupsRepo.IsGroupAvailableForUser(groupId.Value, User))
+					return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+			}
+			else
+			{
+				if (isInstructor)
+				{
+					availableGroups = groupsRepo.GetAvailableForUserGroups(courseId, User);
+					if (isAdministrator)
+					{
+						showAllUsers = true;
+					}
+					else
+					{
+						if (availableGroups.Count > 0)
+							users = groupsRepo.GetGroupsMembersAsUsers(availableGroups.Select(g => g.Id));
+						else
+							hideOtherUsersNames = true;
+					}
+				}
+				else
+				{
+					availableGroups = groupsRepo.GetUserGroups(courseId, currentUserId);
+					if (availableGroups.Count > 0)
+						users = groupsRepo.GetGroupsMembersAsUsers(availableGroups.Select(g => g.Id));
+					else
+						hideOtherUsersNames = true;
+				}
+			}
+			
+			var userIds = users?.Select(u => u.Id).ToList();
+			var pointsByUser = GetPointsByUser(courseId, slideId, userIds, smallPointsIsBetter);
+			var usersOrderedByPoints = GetUsersOrderedByPoints(pointsByUser, smallPointsIsBetter);
+			
+			if (showAllUsers)
+				users = usersRepo.GetUsersByIds(usersOrderedByPoints).ToList();
+			if (users == null)
+				users = usersRepo.GetUsersByIds(new[] { currentUserId }).ToList();
+			
+			var model = new ExerciseRatingByPointsModel
+			{
+				Course = course,
+				Slide = slide,
+				SelectedGroup = selectedGroup,
+				AvailableGroups = availableGroups,
+				Users = users?.ToDictionary(u => u.Id, u => u),
+				HideOtherUsersNames = hideOtherUsersNames,
+				PointsByUser = pointsByUser.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Points),
+				UsersOrderedByPoints = usersOrderedByPoints
+			};
+			return View(model);
+		}
+
+		private Dictionary<string, (float Points, DateTime Timestamp)> GetPointsByUser(string courseId, Guid slideId, List<string> userIds, bool smallPointsIsBetter)
+		{
+			return userSolutionsRepo
+				.GetAutomaticExerciseCheckingsByUsers(courseId, slideId, userIds)
+				.Where(c => c.Points != null)
+				.Select(v => new { v.UserId, Points = v.Points.Value, v.Timestamp })
+				.AsEnumerable()
+				.GroupBy(v => v.UserId)
+				.ToDictionary(
+					g => g.Key,
+					g =>
+					{
+						var value = smallPointsIsBetter
+							? g.OrderBy(v => v.Points).ThenBy(v => v.Timestamp).First()
+							: g.OrderByDescending(v => v.Points).ThenBy(v => v.Timestamp).First();
+						return (value.Points, value.Timestamp);
+					});
+		}
+
+		private List<string> GetUsersOrderedByPoints(Dictionary<string, (float Points, DateTime Timestamp)> pointsByUser, bool smallPointsIsBetter, List<ApplicationUser> users = null)
+		{
+			var ordered = smallPointsIsBetter
+				? pointsByUser.OrderBy(p => p.Value.Points).ThenBy(p => p.Value.Timestamp)
+				: pointsByUser.OrderByDescending(p => p.Value.Points).ThenBy(p => p.Value.Timestamp);
+			return ordered.Select(p => p.Key).ToList();
+		}
+
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult SlideRatings(string courseId, Guid unitId)
 		{
@@ -915,6 +1027,18 @@ namespace uLearn.Web.Controllers
 		public Dictionary<Guid, int> Scores { get; set; }
 		public Unit PreviousUnit { get; set; }
 		public Unit NextUnit { get; set; }
+	}
+	
+	public class ExerciseRatingByPointsModel
+	{
+		public Course Course { get; set; }
+		public Slide Slide { get; set; }
+		public Group SelectedGroup { get; set; }
+		public List<Group> AvailableGroups { get; set; }
+		public Dictionary<string, ApplicationUser> Users { get; set; }
+		public bool HideOtherUsersNames { get; set; }
+		public Dictionary<string, float> PointsByUser { get; set; }
+		public List<string> UsersOrderedByPoints { get; set; }
 	}
 
 	public class UserSolutionsViewModel

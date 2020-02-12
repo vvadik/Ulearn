@@ -230,3 +230,20 @@
 @media (max-width: 767px) {
 	.legacy-page .hidden-xs-table-cell { display: none !important; }
 }
+
+.legacy-page .rating-by-points-table td {
+	padding: 5px;
+	border: 1px solid black;
+}
+
+.legacy-page .rating-by-points-table thead {
+	font-weight: bold;
+}
+
+.legacy-page .rating-by-points-table__current-user-row {
+	font-weight: bold;
+}
+
+.legacy-page .rating-by-points-table__right-cell {
+	text-align: right;
+}

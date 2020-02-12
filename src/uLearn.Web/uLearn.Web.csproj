@@ -1258,6 +1258,7 @@
     <Content Include="Views\Account\JoinedToGroup.cshtml" />
     <Content Include="Views\Account\ToggleRolesHistory.cshtml" />
     <Content Include="Views\Admin\StyleValidations.cshtml" />
+    <Content Include="Views\Analytics\RatingByPoints.cshtml" />
     <Content Include="Views\AntiPlagiarism\Details.cshtml" />
     <Content Include="Views\Certificates\ListPartial.cshtml" />
     <Content Include="Views\Errors\404.cshtml" />

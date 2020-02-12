@@ -404,6 +404,14 @@ namespace Database.DataContexts
 		{
 			return db.GroupMembers.Include(m => m.User).Where(m => !m.User.IsDeleted && groupIds.Contains(m.GroupId)).Select(m => m.UserId).Distinct().ToList();
 		}
+		
+		public List<ApplicationUser> GetGroupsMembersAsUsers(IEnumerable<int> groupIds)
+		{
+		return db.GroupMembers.Include(m => m.User).Where(m => !m.User.IsDeleted && groupIds.Contains(m.GroupId)).Select(m => m.User)
+			.AsEnumerable()
+			.DistinctBy(g => g.Id)
+			.ToList();
+		}
 
 		public IEnumerable<(int GroupId, string UserId)> GetGroupsMembersAsGroupsIdsAndUserIds(IEnumerable<int> groupIds)
 		{
