@@ -1501,3 +1501,7 @@ body.lti-component {
 	vertical-align: top;
 	border: 1px solid #ddd;
 }
+
+.legacy-page img {
+	max-width: 100%;
+}
