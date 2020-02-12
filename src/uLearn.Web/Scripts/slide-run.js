@@ -51,7 +51,7 @@ function setResults(ans) {
 			else
 				setSimpleResult($success, ans.ActualOutput);
 		}
-	} else if (ans.ExpectedOutput === null)
+	} else if (ans.ExpectedOutput === null || ans.ExpectedOutput === "")
 		setSimpleResult($waErrorNoDiff, ans.ActualOutput);
 	else
 		setWA(ans.ExpectedOutput, ans.ActualOutput);

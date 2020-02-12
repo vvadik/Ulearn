@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading;
 using JetBrains.Annotations;
 using log4net;
@@ -31,10 +30,6 @@ namespace RunCsJob
 			}
 
 			var isSelfCheck = args.Contains("--selfcheck");
-
-			var environmentName = Environment.GetEnvironmentVariable("UlearnEnvironmentName");
-			if (environmentName != null && environmentName.ToLower().Contains("local"))
-				ServicePointManager.ServerCertificateValidationCallback = delegate { return true; }; // ignore the certificate check when ssl
 
 			var program = new Program(сompilerDirectory);
 			if (isSelfCheck)

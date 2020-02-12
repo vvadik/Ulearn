@@ -61,4 +61,5 @@ VALUES
 ('20190824043919_AddCommentForUserRights', '2.2.0-rtm-35687'),
 ('20190910111829_ExerciseSubmissions_ByTime', '2.2.0-rtm-35687'),
 ('20191007111619_AddLastVisits', '2.2.0-rtm-35687'),
-('20191226100835_WorkQueue', '2.2.6-servicing-10079')
+('20191226100835_WorkQueue', '2.2.6-servicing-10079'),
+('20200212080825_AutomaticExerciseCheckingPoints', '2.2.0-rtm-35687')

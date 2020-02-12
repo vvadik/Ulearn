@@ -45,6 +45,8 @@ namespace uLearn.CourseTool.Validating
 
 			ReportErrorIfWrongAnswerExistsButNotBuildingOrPassesTests();
 
+			ReportErrorsInCheckPointsSettings();
+
 			if (ex.CheckInitialSolution)
 				ReportErrorIfInitialCodeIsSolutionOrVerdictNotOk();
 		}
@@ -117,6 +119,11 @@ namespace uLearn.CourseTool.Validating
 				var code = ex.GetRegionContent(waFile) ?? waFile.ContentAsUtf8();
 				CheckBuildAndTests(code, $"Wrong answer file '{waFile.Name}'", false);
 			}
+		}
+
+		private void ReportErrorsInCheckPointsSettings()
+		{
+			ReportSlideError(ex.ExerciseType == ExerciseType.CheckPoints && ex.PassingPoints.HasValue, "Property 'passingPoints' not specified");
 		}
 
 		private void CheckBuildAndTests(string code, string fileDescription, bool shouldPassTests)

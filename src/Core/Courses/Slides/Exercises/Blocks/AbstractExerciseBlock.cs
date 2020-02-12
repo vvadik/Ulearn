@@ -63,6 +63,12 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		[XmlElement("expected")]
 		// Ожидаемый корректный вывод программы
 		public string ExpectedOutput { get; set; }
+		
+		[XmlElement("passingPoints")] // проходной балл, включительно. Для ExerciseType.CheckPoints
+		public float? PassingPoints { get; set; }
+
+		[XmlElement("smallPointsIsBetter")] // по умолчанию false. Для ExerciseType.CheckPoints
+		public bool SmallPointsIsBetter { get; set; } = false;
 
 		[XmlElement("hideExpectedOutput")]
 		public bool HideExpectedOutputOnError { get; set; }
@@ -151,6 +157,14 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 				return result.Output.NormalizeEoln().Equals(expectedOutput);
 			}
 
+			if (ExerciseType == ExerciseType.CheckPoints)
+			{
+				if (!result.Points.HasValue)
+					return false;
+				const float eps = 0.00001f;
+				return SmallPointsIsBetter ? result.Points.Value < PassingPoints + eps : result.Points.Value > PassingPoints - eps;
+			}
+
 			throw new InvalidOperationException($"Unknown exercise type for checking: {ExerciseType}");
 		}
 
@@ -224,7 +238,10 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		CheckExitCode,
 
 		[XmlEnum("check-output")]
-		CheckOutput
+		CheckOutput,
+		
+		[XmlEnum("check-points")] // Поддержиавется для UniversalExerciseBlock
+		CheckPoints
 	}
 
 	public class ValidatorDescription

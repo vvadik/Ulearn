@@ -496,6 +496,7 @@ namespace Database.DataContexts
 				IsRightAnswer = isRightAnswer,
 				Score = score,
 				CheckingAgentName = checking.CheckingAgentName,
+				Points = result.Points
 			};
 
 			return newChecking;
@@ -517,6 +518,13 @@ namespace Database.DataContexts
 			{
 				var expectedOutput = exerciseBlock.ExpectedOutput.NormalizeEoln();
 				return output.Equals(expectedOutput);
+			}
+			
+			if (exerciseBlock.ExerciseType == ExerciseType.CheckPoints)
+			{
+				if (!result.Points.HasValue)
+					return false;
+				return exerciseBlock.SmallPointsIsBetter ? result.Points.Value <= exerciseBlock.PassingPoints : result.Points.Value >= exerciseBlock.PassingPoints;
 			}
 
 			throw new InvalidOperationException($"Unknown exercise type for checking: {exerciseBlock.ExerciseType}");

@@ -120,6 +120,8 @@ namespace Database.Models
 		[StringLength(256)]
 		public string CheckingAgentName { get; set; }
 
+		public float? Points { get; set; }
+
 		public string GetVerdict()
 		{
 			if (IsCompilationError)

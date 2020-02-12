@@ -268,7 +268,7 @@ namespace uLearn.CourseTool.Monitoring
 					ErrorMessage = result.CompilationOutput,
 					ExecutionServiceName = "course.exe",
 					IsCompileError = result.Verdict == Verdict.CompilationError,
-					ExpectedOutput = exercise.ExpectedOutput?.NormalizeEoln() ?? "",
+					ExpectedOutput = exercise.ExpectedOutput?.NormalizeEoln(),
 					SubmissionId = 0,
 				};
 			}
@@ -282,7 +282,7 @@ namespace uLearn.CourseTool.Monitoring
 					ErrorMessage = result.CompilationOutput,
 					ExecutionServiceName = "course.exe",
 					IsCompileError = result.Verdict == Verdict.CompilationError,
-					ExpectedOutput = exercise.ExpectedOutput?.NormalizeEoln() ?? "",
+					ExpectedOutput = exercise.ExpectedOutput?.NormalizeEoln(),
 					SubmissionId = 0,
 				};
 			}

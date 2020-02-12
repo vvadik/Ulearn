@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Runtime.Serialization;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 
@@ -16,23 +17,26 @@ namespace Ulearn.Core.RunCheckerJobApi
 		// Для вывода пользователю используется GetOutput()
 		[NotNull] public readonly string Output; // Для C# это stdout
 		[NotNull] public readonly string Error; // Для C# это stderr
+		public readonly float? Points; 
 
 		[JsonConstructor]
-		public RunningResults(string id, Verdict verdict, string compilationOutput = "", string output = "", string error = "")
+		public RunningResults(string id, Verdict verdict, string compilationOutput = "", string output = "", string error = "", float? points = null)
 		{
 			Id = id;
 			Verdict = verdict;
 			CompilationOutput = compilationOutput ?? "";
 			Output = output ?? "";
 			Error = error ?? "";
+			Points = points;
 		}
 
-		public RunningResults(Verdict verdict, string compilationOutput = "", string output = "", string error = "")
+		public RunningResults(Verdict verdict, string compilationOutput = "", string output = "", string error = "", float? points = null)
 		{
 			Verdict = verdict;
 			CompilationOutput = compilationOutput ?? "";
 			Output = output ?? "";
 			Error = error ?? "";
+			Points = points;
 		}
 
 		public override string ToString()
@@ -51,7 +55,8 @@ namespace Ulearn.Core.RunCheckerJobApi
 					break;
 			}
 
-			return $"Id: {Id}, Verdict: {Verdict}: {message}";
+			var pointsString = Points?.ToString("#.##"); // Печатает только значимые цифры, максимум две, округляет.
+			return $"Id: {Id}, Verdict: {Verdict}: {message}" + (pointsString == null ? null : $", Points: {pointsString}");
 		}
 
 		public string GetOutput()
