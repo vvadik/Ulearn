@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
 using Ulearn.Core.Extensions;
@@ -41,7 +42,7 @@ namespace Ulearn.Web.Api.Controllers
 			this.userQuizzesRepo = userQuizzesRepo;
 		}
 
-		[HttpGet("group-members")]
+		[HttpGet("users-info-and-results")]
 		[Authorize]
 		public async Task<ActionResult> ExportGroupMembersAsTsv([Required]int groupId, Guid? quizSlideId = null)
 		{
@@ -73,16 +74,24 @@ namespace Ulearn.Web.Api.Controllers
 				extendedUserInfo = extendedUserInfo.Zip(answers, (u, a) => { u.Answers = a; return u; }).ToList();
 			}
 
+			var slides = course.Slides.Where(s => s.ShouldBeSolved).Select(s => s.Id).ToList();
+			var scores = GetScoresByScoringGroups(users.Select(u => u.Id).ToList(), slides, course);
+			var scoringGroupsWithScores = scores.Select(kvp => kvp.Key.ScoringGroup).ToHashSet();
+			var scoringGroups = course.Settings.Scoring.Groups.Values.Where(sg => scoringGroupsWithScores.Contains(sg.Id)).ToList();
+
 			var headers = new List<string> { "Id", "Login", "Email", "FirstName", "LastName", "VisibleName", "Gender", "LastVisit", "IpAddress" };
 			if (questions != null)
 				headers = headers.Concat(questions).ToList();
+			if (scoringGroups.Count > 0)
+				headers = headers.Concat(scoringGroups.Select(s => s.Abbreviation)).ToList();
 
 			var rows = new List<List<string>> { headers };
 			foreach (var i in extendedUserInfo)
 			{
 				var row = new List<string> { i.Id, i.Login, i.Email, i.FirstName, i.LastName, i.VisibleName, i.Gender.ToString(), i.LastVisit.ToSortableDate(), i.IpAddress };
-				if(i.Answers != null)
+				if (i.Answers != null)
 					row = row.Concat(i.Answers).ToList();
+				row.AddRange(scoringGroups.Select(scoringGroup => (scores.ContainsKey((i.Id, scoringGroup.Id)) ? scores[(i.Id, scoringGroup.Id)] : 0).ToString()));
 				rows.Add(row);
 			}
 			var content = CreateTsv(rows);
@@ -141,6 +150,24 @@ namespace Ulearn.Web.Api.Controllers
 				rows.Add(answerStrings);
 			}
 			return (questions, rows);
+		}
+
+		private Dictionary<(string UserId, string ScoringGroup), int> GetScoresByScoringGroups(List<string> userIds, List<Guid> slides, Course course)
+		{
+			var filterOptions = new VisitsFilterOptions
+			{
+				CourseId = course.Id,
+				UserIds = userIds,
+				SlidesIds = slides,
+				PeriodStart = DateTime.MinValue,
+				PeriodFinish = DateTime.MaxValue
+			};
+			return visitsRepo.GetVisitsInPeriod(filterOptions)
+				.Select(v => new { v.UserId, v.SlideId, v.Score })
+				.AsEnumerable()
+				.Where(v => slides.Contains(v.SlideId))
+				.GroupBy(v => (v.UserId, course.FindSlideById(v.SlideId)?.ScoringGroup))
+				.ToDictionary(g => g.Key, g => g.Sum(v => v.Score));
 		}
 
 		private static string CreateTsv(List<List<string>> table)
