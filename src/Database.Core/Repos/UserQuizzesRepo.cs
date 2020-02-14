@@ -22,9 +22,9 @@ namespace Database.Repos
 			this.db = db;
 		}
 
-		public Task<UserQuizSubmission> FindLastUserSubmissionAsync(string courseId, Guid slideId, string userId)
+		public async Task<UserQuizSubmission> FindLastUserSubmissionAsync(string courseId, Guid slideId, string userId)
 		{
-			return db.UserQuizSubmissions.Where(s => s.CourseId == courseId && s.UserId == userId && s.SlideId == slideId).OrderByDescending(s => s.Timestamp).FirstOrDefaultAsync();
+			return await db.UserQuizSubmissions.Where(s => s.CourseId == courseId && s.UserId == userId && s.SlideId == slideId).OrderByDescending(s => s.Timestamp).FirstOrDefaultAsync();
 		}
 
 		public async Task<UserQuizSubmission> AddSubmissionAsync(string courseId, Guid slideId, string userId, DateTime timestamp)
@@ -103,7 +103,6 @@ namespace Database.Repos
 			return passedQuizzes;
 		}
 
-		// TODO: переписать как в не-Core
 		public async Task<Dictionary<string, List<UserQuizAnswer>>> GetAnswersForShowingOnSlideAsync(string courseId, QuizSlide slide, string userId, UserQuizSubmission submission = null)
 		{
 			if (slide == null)
@@ -113,21 +112,24 @@ namespace Database.Repos
 				submission = await FindLastUserSubmissionAsync(courseId, slide.Id, userId).ConfigureAwait(false);
 
 			var answer = new Dictionary<string, List<UserQuizAnswer>>();
-			foreach (var block in slide.Blocks.OfType<AbstractQuestionBlock>())
+			if (submission == null)
 			{
-				if (submission != null)
-				{
-					var ans = await db.UserQuizAnswers
-						.Where(q => q.SubmissionId == submission.Id && q.BlockId == block.Id)
-						.OrderBy(x => x.Id)
-						.ToListAsync()
-						.ConfigureAwait(false);
-
-					answer[block.Id] = ans;
-				}
-				else
+				foreach (var block in slide.Blocks.OfType<AbstractQuestionBlock>())
 					answer[block.Id] = new List<UserQuizAnswer>();
+				return answer;
 			}
+			
+			var blocks2Answers = db.UserQuizAnswers
+				.Where(q => q.SubmissionId == submission.Id)
+				.OrderBy(x => x.Id)
+				.AsEnumerable()
+				.GroupBy(a => a.BlockId)
+				.ToDictionary(g => g.Key, g => g.ToList());
+
+			foreach (var block in slide.Blocks.OfType<AbstractQuestionBlock>())
+				answer[block.Id] = blocks2Answers.ContainsKey(block.Id)
+					? blocks2Answers[block.Id]
+					: new List<UserQuizAnswer>();
 
 			return answer;
 		}
