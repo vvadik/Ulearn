@@ -54,7 +54,7 @@ namespace uLearn.CourseTool.Validating
 				}
 				else if (slide.Exercise is UniversalExerciseBlock universalExercise)
 				{
-					var settings = new DockerSandboxRunnerSettings(universalExercise.DockerImageName, universalExercise.RunCommand);
+					var settings = new DockerSandboxRunnerSettings(universalExercise.DockerImageName, universalExercise.RunCommand, universalExercise.TimeLimit);
 					new UniversalExerciseValidator(this, settings, slide, universalExercise).ValidateExercises();
 				}
 			}

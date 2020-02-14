@@ -17,10 +17,11 @@ namespace Ulearn.Core.RunCheckerJobApi
 		// Для вывода пользователю используется GetOutput()
 		[NotNull] public readonly string Output; // Для C# это stdout
 		[NotNull] public readonly string Error; // Для C# это stderr
-		public readonly float? Points; 
+		public readonly float? Points;
+		public readonly int? TimeLimit;
 
 		[JsonConstructor]
-		public RunningResults(string id, Verdict verdict, string compilationOutput = "", string output = "", string error = "", float? points = null)
+		public RunningResults(string id, Verdict verdict, int? timeLimit = null, string compilationOutput = "", string output = "", string error = "", float? points = null)
 		{
 			Id = id;
 			Verdict = verdict;
@@ -28,15 +29,17 @@ namespace Ulearn.Core.RunCheckerJobApi
 			Output = output ?? "";
 			Error = error ?? "";
 			Points = points;
+			TimeLimit = timeLimit;
 		}
 
-		public RunningResults(Verdict verdict, string compilationOutput = "", string output = "", string error = "", float? points = null)
+		public RunningResults(Verdict verdict, int? timeLimit = null, string compilationOutput = "", string output = "", string error = "", float? points = null)
 		{
 			Verdict = verdict;
 			CompilationOutput = compilationOutput ?? "";
 			Output = output ?? "";
 			Error = error ?? "";
 			Points = points;
+			TimeLimit = timeLimit;
 		}
 
 		public override string ToString()
@@ -68,7 +71,7 @@ namespace Ulearn.Core.RunCheckerJobApi
 				case Verdict.Ok:
 					return output;
 				case Verdict.TimeLimit:
-					return output + "\n Ваше решение не успело пройти все тесты"; // TODO: убрать константу 10.
+					return output + "\n Ваше решение не успело пройти все тесты" + (TimeLimit == null ? null : $" за {TimeLimit} секунд"); // TODO: Окончание слова секунд сейчас рассчитано на числа, кратные 10.
 				default:
 					return output + "\n" + Verdict;
 			}

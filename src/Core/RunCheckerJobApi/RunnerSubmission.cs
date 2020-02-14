@@ -43,5 +43,6 @@ namespace Ulearn.Core.RunCheckerJobApi
 		public Language Language;
 		public string DockerImageName;
 		public string RunCommand;
+		public int TimeLimit;
 	}
 }

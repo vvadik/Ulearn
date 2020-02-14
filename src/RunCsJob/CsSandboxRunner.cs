@@ -165,7 +165,7 @@ namespace RunCsJob
 			if (hasTimeLimit)
 			{
 				log.Warn("Программа превысила ограничение по времени");
-				return new RunningResults(Verdict.TimeLimit);
+				return new RunningResults(Verdict.TimeLimit, (int)Math.Round(settings.TestingTimeLimit.TotalSeconds));
 			}
 
 			if (hasMemoryLimit)

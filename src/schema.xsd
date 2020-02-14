@@ -442,6 +442,7 @@
 					<xs:element name="passingPoints" type="xs:float" minOccurs="0" maxOccurs="1" />
 					<xs:element name="smallPointsIsBetter" type="xs:boolean" minOccurs="0" maxOccurs="1" />
 					<xs:element name="hideSolutions" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+					<xs:element name="timeLimit" type="xs:int" minOccurs="0" maxOccurs="1" />
 					<xs:element name="checkForPlagiarism" type="xs:boolean" minOccurs="0" maxOccurs="1" />
 					<xs:element name="hideExpectedOutput" type="xs:boolean" minOccurs="1" maxOccurs="1" />
 					<xs:element name="validator" minOccurs="1" maxOccurs="1">
