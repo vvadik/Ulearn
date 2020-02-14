@@ -1,26 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
 using System.Threading.Tasks;
 using Database;
-using Database.Models;
 using Database.Repos;
-using Database.Repos.CourseRoles;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Internal;
 using Serilog;
-using Ulearn.Common.Api.Models.Responses;
-using Ulearn.Common.Extensions;
-using Ulearn.Core;
 using Ulearn.Core.Courses;
-using Ulearn.Web.Api.Models.Common;
-using Ulearn.Web.Api.Models.Responses.Courses;
 using Ulearn.Web.Api.Models.Responses.User;
 
 namespace Ulearn.Web.Api.Controllers.User
