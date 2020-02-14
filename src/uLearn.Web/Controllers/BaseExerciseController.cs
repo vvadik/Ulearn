@@ -38,7 +38,7 @@ namespace uLearn.Web.Controllers
 		protected readonly StyleErrorsRepo styleErrorsRepo;
 		protected readonly UnitsRepo unitsRepo;
 
-		private static readonly TimeSpan executionTimeout = TimeSpan.FromSeconds(45);
+		private static readonly TimeSpan executionTimeout = TimeSpan.FromSeconds(120);
 
 		public BaseExerciseController()
 			: this(new ULearnDb(), WebCourseManager.Instance, new MetricSender(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName))

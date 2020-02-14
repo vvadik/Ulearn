@@ -68,7 +68,7 @@ namespace Ulearn.Core.RunCheckerJobApi
 				case Verdict.Ok:
 					return output;
 				case Verdict.TimeLimit:
-					return output + "\n Ваше решение не успело пройти все тесты за 10 секунд"; // TODO: убрать константу 10.
+					return output + "\n Ваше решение не успело пройти все тесты"; // TODO: убрать константу 10.
 				default:
 					return output + "\n" + Verdict;
 			}
