@@ -62,7 +62,7 @@ namespace uLearn.CSharp
 		public static ProjectExerciseValidator BuildProjectExerciseValidator(CsProjectExerciseBlock exBlock, StringBuilder valOut)
 		{
 			var slide = BuildSlide(exBlock);
-			return new ProjectExerciseValidator(BuildValidator(slide, valOut), new CsSandboxRunnerSettings(), slide, exBlock);
+			return new ProjectExerciseValidator(BuildValidator(slide, valOut), new CsSandboxRunnerSettings(exBlock.TimeLimit), slide, exBlock);
 		}
 
 		public static CourseValidator BuildValidator(ExerciseSlide slide, StringBuilder valOut)

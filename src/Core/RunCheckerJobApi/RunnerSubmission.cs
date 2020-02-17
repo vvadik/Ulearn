@@ -5,6 +5,7 @@ namespace Ulearn.Core.RunCheckerJobApi
 	public abstract class RunnerSubmission
 	{
 		public string Id;
+		public int TimeLimit = 10;
 
 		public override string ToString()
 		{
@@ -43,6 +44,5 @@ namespace Ulearn.Core.RunCheckerJobApi
 		public Language Language;
 		public string DockerImageName;
 		public string RunCommand;
-		public int TimeLimit;
 	}
 }
