@@ -6,13 +6,21 @@ import classNames from 'classnames'
 import styles from "./avatar.less";
 
 class Avatar extends Component {
+	constructor(props){
+		super(props);
+
+		this.state={
+			imageError: false,
+		};
+	}
 
 	render() {
 		const {user, size,className} = this.props;
+		const { imageError } = this.state;
 		const imageUrl = user.avatarUrl;
 		let classes = classNames(className,styles["photo-avatar"], styles[size] || "big");
 
-		if (imageUrl) {
+		if (imageUrl && !imageError) {
 			return this.renderImage(imageUrl, classes)
 		}
 
@@ -25,9 +33,14 @@ class Avatar extends Component {
 				alt="Аватарка"
 				className={className}
 				src={url}
+				onError={ this.onImageError }
 			/>
 		);
 	}
+
+	onImageError = () => {
+		this.setState({ imageError: true });
+	};
 
 	renderCircle(className) {
 		const userName = this.props.user.visibleName;
