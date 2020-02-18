@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
+using Database.Models.Quizzes;
 
 namespace Database.Repos
 {
 	public interface ISlideCheckingsRepo
 	{
-		Task AddQuizAttemptForManualChecking(string courseId, Guid slideId, string userId);
+		Task AddQuizAttemptForManualChecking(UserQuizSubmission submission, string courseId, Guid slideId, string userId);
 		Task AddQuizAttemptWithAutomaticChecking(string courseId, Guid slideId, string userId, int automaticScore);
 		IEnumerable<ManualExerciseChecking> GetUsersPassedManualExerciseCheckings(string courseId, string userId);
 		Task<ManualExerciseChecking> AddManualExerciseChecking(string courseId, Guid slideId, string userId, UserExerciseSubmission submission);
