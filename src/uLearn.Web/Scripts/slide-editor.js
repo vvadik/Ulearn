@@ -219,6 +219,11 @@ function initCodeEditor($parent) {
                 styleSelectedText: true,
                 autoRefresh: true, // See https://stackoverflow.com/questions/8349571/codemirror-editor-is-not-loading-content-until-clicked
             });
+            if ($el.parents("#exerciseTaskSpoiler").length > 0) {
+                $('#exerciseTaskSpoilerButton').click(function () {
+                    setTimeout(function () {editor.refresh()}, 0);
+                });
+            }
 
             if (review) {
                 var $addReviewPopup = $('.exercise__add-review').first();
