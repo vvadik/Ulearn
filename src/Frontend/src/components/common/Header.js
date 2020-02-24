@@ -43,14 +43,20 @@ class Header extends Component {
 	static mapPropsToState(props) {
 		const { account, courses } = props;
 		const { currentCourseId } = courses;
-		const { roleByCourse, accessesByCourse, isSystemAdministrator } = account;
+		const { groupsAsStudent, roleByCourse, accessesByCourse, isSystemAdministrator } = account;
 
-		const controllableCourseIds =
-			isSystemAdministrator
-				? Object.keys(courses.courseById)
-				: Object.keys(roleByCourse)
-					.filter(courseId => roleByCourse[courseId] !== 'tester')
-					.map(s => s.toLowerCase());
+		let controllableCourseIds = [];
+		if (isSystemAdministrator) {
+			controllableCourseIds = Object.keys(courses.courseById);
+		} else {
+			controllableCourseIds = Object.keys(roleByCourse)
+				.filter(courseId => roleByCourse[courseId] !== 'tester')
+				.map(s => s.toLowerCase());
+			if (groupsAsStudent) {
+				const groupsAsStudentIds = groupsAsStudent.map(g => g.courseId);
+				controllableCourseIds = controllableCourseIds.concat(groupsAsStudentIds);
+			}
+		}
 
 		const isCourseMenuVisible = (
 			courses !== undefined &&
