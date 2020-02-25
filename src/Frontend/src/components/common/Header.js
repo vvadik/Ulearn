@@ -42,19 +42,29 @@ class Header extends Component {
 
 	static mapPropsToState(props) {
 		const { account, courses } = props;
-		const { currentCourseId } = courses;
+		const { currentCourseId, courseById } = courses;
 		const { groupsAsStudent, roleByCourse, accessesByCourse, isSystemAdministrator } = account;
 
 		let controllableCourseIds = [];
 		if (isSystemAdministrator) {
-			controllableCourseIds = Object.keys(courses.courseById);
+			controllableCourseIds = Object.keys(courseById);
 		} else {
 			controllableCourseIds = Object.keys(roleByCourse)
 				.filter(courseId => roleByCourse[courseId] !== 'tester')
 				.map(s => s.toLowerCase());
 			if (groupsAsStudent) {
 				const groupsAsStudentIds = groupsAsStudent.map(g => g.courseId);
-				controllableCourseIds = controllableCourseIds.concat(groupsAsStudentIds);
+				controllableCourseIds = [
+					...new Set(controllableCourseIds.concat(groupsAsStudentIds)),
+				].sort((a, b) => {
+					const first = courseById[a].title.toLowerCase();
+					const second = courseById[b].title.toLowerCase();
+					if (first > second)
+						return 1;
+					if (first < second)
+						return -1;
+					return 0;
+				});
 			}
 		}
 
@@ -164,14 +174,14 @@ class Header extends Component {
 
 		return (
 			<div className={ styles["visible-only-phone"] }>
-				{controllableCourseIds.length > 0 && <MobileCourseMenu
+				{ controllableCourseIds.length > 0 && <MobileCourseMenu
 					isSystemAdministrator={ isSystemAdministrator }
 					controllableCourseIds={ controllableCourseIds }
 					isCourseMenuVisible={ isCourseMenuVisible }
 					courseId={ isCourseMenuVisible ? currentCourseId : "" }
 					role={ courseRole }
 					accesses={ courseAccesses }
-				/>}
+				/> }
 			</div>
 		);
 	}
@@ -523,8 +533,7 @@ class Menu extends Component {
 		if (returnUrl.startsWith("/Login")
 			|| returnUrl.startsWith("/Account/Register")
 			|| returnUrl.startsWith("/Login/ExternalLoginConfirmation")
-			|| returnUrl.startsWith("/Login/ExternalLoginCallback"))
-		{
+			|| returnUrl.startsWith("/Login/ExternalLoginCallback")) {
 			returnUrl = getQueryStringParameter("returnUrl");
 		}
 
