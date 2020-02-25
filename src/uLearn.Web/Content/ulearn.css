@@ -1502,6 +1502,6 @@ body.lti-component {
 	border: 1px solid #ddd;
 }
 
-.legacy-page img {
+.legacy-page .slide-image {
 	max-width: 100%;
 }
