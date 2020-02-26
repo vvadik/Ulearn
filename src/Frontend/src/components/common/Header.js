@@ -53,10 +53,13 @@ class Header extends Component {
 				.filter(courseId => roleByCourse[courseId] !== 'tester')
 				.map(s => s.toLowerCase());
 			if (groupsAsStudent) {
-				const groupsAsStudentIds = groupsAsStudent.map(g => g.courseId);
+				const groupsAsStudentIds = groupsAsStudent.map(g => g.courseId.toLowerCase());
+
 				controllableCourseIds = [
 					...new Set(controllableCourseIds.concat(groupsAsStudentIds)),
-				].sort((a, b) => {
+				]
+				.filter((e) => courseById.hasOwnProperty(e))
+				.sort((a, b) => {
 					const first = courseById[a].title.toLowerCase();
 					const second = courseById[b].title.toLowerCase();
 					if (first > second)
