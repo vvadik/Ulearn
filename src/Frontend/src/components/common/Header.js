@@ -71,24 +71,27 @@ class Header extends Component {
 			}
 		}
 
+		let courseRole;
+		if (isSystemAdministrator) {
+			courseRole = 'courseAdmin';
+		} else {
+			courseRole = roleByCourse[currentCourseId];
+			if (courseRole === undefined) {
+				courseRole = "";
+			}
+		}
+
 		const isCourseMenuVisible = (
 			courses !== undefined &&
 			currentCourseId !== undefined &&
-			controllableCourseIds.indexOf(currentCourseId) !== -1
+			controllableCourseIds.indexOf(currentCourseId) !== -1 &&
+			courseRole !== "" &&
+			courseRole !== 'tester'
 		);
 
-		let courseRole = "";
 		const courseAccesses = isCourseMenuVisible
 			? accessesByCourse[currentCourseId] || []
 			: [];
-
-		if (isCourseMenuVisible) {
-			if (isSystemAdministrator) {
-				courseRole = 'courseAdmin';
-			} else {
-				courseRole = roleByCourse[currentCourseId];
-			}
-		}
 
 		return {
 			isSystemAdministrator,
