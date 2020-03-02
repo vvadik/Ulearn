@@ -38,6 +38,11 @@ namespace Database.Repos.Groups
 		{
 			return db.GroupMembers.Include(m => m.User).Where(m => groupsIds.Contains(m.GroupId) && !m.User.IsDeleted).ToListAsync();
 		}
+		
+		public Task<List<string>> GetGroupsMembersIdsAsync(ICollection<int> groupsIds)
+		{
+			return db.GroupMembers.Include(m => m.User).Where(m => groupsIds.Contains(m.GroupId) && !m.User.IsDeleted).Select(u => u.UserId).ToListAsync();
+		}
 
 		public Task<bool> IsUserMemberOfGroup(int groupId, string userId)
 		{
