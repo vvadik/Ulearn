@@ -32,6 +32,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Common.Api\Common.Api.csproj" />
+		<ProjectReference Include="..\Common\Common.csproj" />
 		<ProjectReference Include="..\Core\Core.csproj" />
 		<ProjectReference Include="..\Database.Core\Database.Core.csproj" />
 	</ItemGroup>
