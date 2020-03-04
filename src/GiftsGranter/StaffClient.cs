@@ -4,6 +4,8 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using ApprovalUtilities.SimpleLogger;
+using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Ulearn.Common;
@@ -15,6 +17,7 @@ namespace GiftsGranter
 		private readonly string clientAuth;
 		private string authToken;
 		private string passportUri = "https://passport.skbkontur.ru/v3/connect/token";
+		private static readonly ILog log = LogManager.GetLogger(typeof(StaffClient));
 
 		/// <param name="clientAuth">format: "clientId:clientSecret"</param>
 		public StaffClient(string clientAuth)
@@ -83,7 +86,10 @@ namespace GiftsGranter
 		{
 			string result = response.Content.ReadAsStringAsync().Result;
 			if (response.StatusCode != HttpStatusCode.OK)
+			{
+				log.Error("Hint: If invalid_grant ask KONTUR\\pe to generate new refresh_token. It works 180 days.");
 				throw new Exception(result);
+			}
 			return JObject.Parse(result);
 		}
 

@@ -158,7 +158,8 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 				ZipFileData = GetZipBytesForChecker(code),
 				ProjectFileName = CsprojFileName,
 				Input = "",
-				NeedRun = true
+				NeedRun = true,
+				TimeLimit = TimeLimit
 			};
 		}
 

@@ -34,5 +34,6 @@ namespace Database.Repos
 		HashSet<string> GetUserCourses(string userId);
 		Task<List<string>> GetCourseUsersAsync(string courseId);
 		List<RatingEntry> GetCourseRating(string courseId, int minScore);
+		Task<Dictionary<string, Visit>> FindLastVisit(List<string> userIds);
 	}
 }

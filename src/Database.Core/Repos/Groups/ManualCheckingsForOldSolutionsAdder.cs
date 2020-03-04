@@ -72,7 +72,10 @@ namespace Database.Repos.Groups
 				if (!await userQuizzesRepo.IsWaitingForManualCheckAsync(courseId, quizSlideId, userId).ConfigureAwait(false))
 				{
 					logger.Information($"Создаю ручную проверку для теста {slide.Id}");
-					await slideCheckingsRepo.AddQuizAttemptForManualChecking(courseId, quizSlideId, userId).ConfigureAwait(false);
+					var submission = await userQuizzesRepo.FindLastUserSubmissionAsync(courseId, quizSlideId, userId).ConfigureAwait(false);
+					if (submission == null)
+						continue;
+					await slideCheckingsRepo.AddQuizAttemptForManualChecking(submission, courseId, quizSlideId, userId).ConfigureAwait(false);
 					await visitsRepo.MarkVisitsAsWithManualChecking(quizSlideId, userId).ConfigureAwait(false);
 				}
 			}

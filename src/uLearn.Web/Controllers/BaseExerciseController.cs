@@ -38,8 +38,6 @@ namespace uLearn.Web.Controllers
 		protected readonly StyleErrorsRepo styleErrorsRepo;
 		protected readonly UnitsRepo unitsRepo;
 
-		private static readonly TimeSpan executionTimeout = TimeSpan.FromSeconds(45);
-
 		public BaseExerciseController()
 			: this(new ULearnDb(), WebCourseManager.Instance, new MetricSender(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName))
 		{
@@ -103,6 +101,7 @@ namespace uLearn.Web.Controllers
 				return new RunSolutionResult { IsCompileError = true, ErrorMessage = buildResult.ErrorMessage, SubmissionId = submission.Id, ExecutionServiceName = "uLearn" };
 
 			var hasAutomaticChecking = submissionLanguage.HasAutomaticChecking() && (submissionLanguage == Language.CSharp || exerciseBlock is UniversalExerciseBlock);
+			var executionTimeout = TimeSpan.FromSeconds(exerciseBlock.TimeLimit * 2 + 5);
 			try
 			{
 				if (hasAutomaticChecking)

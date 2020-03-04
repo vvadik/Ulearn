@@ -45,7 +45,7 @@ namespace uLearn.CourseTool.Validating
 
 				if (slide.Exercise is CsProjectExerciseBlock exercise)
 				{
-					var settings = new CsSandboxRunnerSettings();
+					var settings = new CsSandboxRunnerSettings(exercise.TimeLimit);
 					new ProjectExerciseValidator(this, settings, slide, exercise).ValidateExercises();
 				}
 				else if (slide.Exercise is SingleFileExerciseBlock)
@@ -54,7 +54,7 @@ namespace uLearn.CourseTool.Validating
 				}
 				else if (slide.Exercise is UniversalExerciseBlock universalExercise)
 				{
-					var settings = new DockerSandboxRunnerSettings(universalExercise.DockerImageName, universalExercise.RunCommand);
+					var settings = new DockerSandboxRunnerSettings(universalExercise.DockerImageName, universalExercise.RunCommand, universalExercise.TimeLimit);
 					new UniversalExerciseValidator(this, settings, slide, universalExercise).ValidateExercises();
 				}
 			}

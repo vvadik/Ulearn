@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using System.Web.Http;
 using System.Web.Mvc;
 using Database;
 using Database.DataContexts;
@@ -93,7 +94,7 @@ namespace uLearn.Web.Controllers
 			return status == QuizStatus.ReadyToSend || status == QuizStatus.WaitsForManualChecking;
 		}
 
-		[AllowAnonymous]
+		[System.Web.Mvc.AllowAnonymous]
 		public ActionResult Quiz(QuizSlide slide, string courseId, string userId, bool isGuest, bool isLti = false, ManualQuizChecking manualQuizCheckQueueItem = null, int? send = null, bool attempt = false)
 		{
 			metricSender.SendCount("quiz.show");
@@ -173,9 +174,15 @@ namespace uLearn.Web.Controllers
 			return ControllerUtils.GetManualCheckingsCountInQueue(slideCheckingsRepo, groupsRepo, User, course.Id, slide, groupsIds);
 		}
 
-		[HttpPost]
-		public async Task<ActionResult> SubmitQuiz(string courseId, Guid slideId, string answer, bool isLti)
+		[System.Web.Mvc.HttpPost]
+		[ValidateInput(false)]
+		public async Task<ActionResult> SubmitQuiz([FromBody]SubmitQuizRequest request)
 		{
+			var isLti = request.IsLti;
+			var courseId = request.CourseId;
+			var slideId = request.SlideId;
+			var answer = request.Answer;
+
 			metricSender.SendCount("quiz.submit");
 			if (isLti)
 				metricSender.SendCount("quiz.submit.lti");
@@ -290,7 +297,7 @@ namespace uLearn.Web.Controllers
 			await notificationsRepo.AddNotification(checking.CourseId, notification, User.Identity.GetUserId()).ConfigureAwait(false);
 		}
 
-		[HttpPost]
+		[System.Web.Mvc.HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public async Task<ActionResult> ScoreQuiz(int id, string nextUrl, string errorUrl = "")
 		{
@@ -511,7 +518,7 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		[HttpPost]
+		[System.Web.Mvc.HttpPost]
 		public async Task<ActionResult> RestartQuiz(string courseId, Guid slideId, bool isLti)
 		{
 			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
@@ -599,6 +606,14 @@ namespace uLearn.Web.Controllers
 				queue = queue.Where(s => s.Timestamp < beforeSubmissions.Timestamp).ToList();
 
 			return queue.Count();
+		}
+		
+		public class SubmitQuizRequest
+		{
+			public string CourseId { get; set; }
+			public Guid SlideId { get; set; }
+			public string Answer { get; set; }
+			public bool IsLti { get; set; }
 		}
 	}
 }

@@ -61,7 +61,7 @@ namespace RunCheckerJob
 				if (!isFinished)
 				{
 					log.Warn($"Не хватило времени ({ms} ms) на работу Docker в папке {dir.FullName}");
-					unsuccessfulResult = new RunningResults(Verdict.TimeLimit);
+					unsuccessfulResult = new RunningResults(Verdict.TimeLimit, (int)Math.Round(settings.TestingTimeLimit.TotalSeconds));
 				}
 				else if (readErrTask.Result.Length > settings.OutputLimit || readOutTask.Result.Length > settings.OutputLimit)
 				{

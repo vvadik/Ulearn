@@ -8,5 +8,10 @@ namespace Ulearn.Common.Extensions
 		{
 			return dateTime.ToString("yyyy-MM-ddTHH.mm.ss.ff");
 		}
+		
+		public static string ToSortableDate(this DateTime dateTime)
+		{
+			return dateTime.ToString("yyyy-MM-dd");
+		}
 	}
 }

@@ -194,6 +194,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 				Language = Language.Value,
 				DockerImageName = DockerImageName,
 				RunCommand = RunCommand,
+				TimeLimit = TimeLimit
 			};
 		}
 

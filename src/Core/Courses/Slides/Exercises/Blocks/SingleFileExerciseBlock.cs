@@ -101,7 +101,8 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 				Id = submissionId,
 				Code = GetSourceCode(code),
 				Input = "",
-				NeedRun = true
+				NeedRun = true,
+				TimeLimit = TimeLimit
 			};
 		}
 	}

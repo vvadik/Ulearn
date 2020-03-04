@@ -52,7 +52,7 @@ namespace RunCsJob
 			};
 
 			var json = JsonConvert.SerializeObject(list, JsonConfig.GetSettings());
-			Assert.That(json, Is.EqualTo("[{\"$type\":\"proj\",\"ZipFileData\":\"AQIDBAU9FwQD\",\"ProjectFileName\":\"proj\",\"Input\":\"\",\"NeedRun\":true,\"Id\":\"E26C2109-F074-4117-B53F-0799E4140DEF\"}]"));
+			Assert.That(json, Is.EqualTo("[{\"$type\":\"proj\",\"ZipFileData\":\"AQIDBAU9FwQD\",\"ProjectFileName\":\"proj\",\"Input\":\"\",\"NeedRun\":true,\"Id\":\"E26C2109-F074-4117-B53F-0799E4140DEF\",\"TimeLimit\":10}]"));
 		}
 
 		[Test]

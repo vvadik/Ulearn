@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database.Extensions;
 using Database.Models;
+using Database.Models.Quizzes;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Ulearn.Common.Extensions;
@@ -20,10 +21,11 @@ namespace Database.Repos
 			this.db = db;
 		}
 
-		public async Task AddQuizAttemptForManualChecking(string courseId, Guid slideId, string userId)
+		public async Task AddQuizAttemptForManualChecking(UserQuizSubmission submission, string courseId, Guid slideId, string userId)
 		{
 			var manualChecking = new ManualQuizChecking
 			{
+				Submission = submission,
 				CourseId = courseId,
 				SlideId = slideId,
 				UserId = userId,

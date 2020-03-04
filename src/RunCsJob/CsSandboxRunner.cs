@@ -22,6 +22,11 @@ namespace RunCsJob
 		public static MsBuildSettings MsBuildSettings = new MsBuildSettings();
 		public TimeSpan CompilationTimeLimit => TimeSpan.FromSeconds(10);
 		public TimeSpan IdleTimeLimit => TimeSpan.FromSeconds(TestingTimeLimit.TotalSeconds * 2);
+
+		public CsSandboxRunnerSettings(int timeLimit)
+		{
+			TestingTimeLimit = TimeSpan.FromSeconds(Math.Min(timeLimit, 100));
+		}
 	}
 
 	public class CsSandboxRunnerClient : ISandboxRunnerClient
@@ -33,7 +38,7 @@ namespace RunCsJob
 
 		public RunningResults RunContainerAndGetResultInternal(RunnerSubmission submission, DirectoryInfo submissionWorkingDirectory)
 		{
-			var instance = new CsSandboxRunner((CsRunnerSubmission)submission, new CsSandboxRunnerSettings());
+			var instance = new CsSandboxRunner((CsRunnerSubmission)submission, new CsSandboxRunnerSettings(submission.TimeLimit));
 			var result = submission is ProjRunnerSubmission
 				? instance.RunMsBuild(submissionWorkingDirectory.FullName)
 				: instance.RunCsc(submissionWorkingDirectory.FullName);
@@ -165,7 +170,7 @@ namespace RunCsJob
 			if (hasTimeLimit)
 			{
 				log.Warn("Программа превысила ограничение по времени");
-				return new RunningResults(Verdict.TimeLimit);
+				return new RunningResults(Verdict.TimeLimit, (int)Math.Round(settings.TestingTimeLimit.TotalSeconds));
 			}
 
 			if (hasMemoryLimit)
