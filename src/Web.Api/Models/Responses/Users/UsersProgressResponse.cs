@@ -12,8 +12,7 @@ namespace Ulearn.Web.Api.Models.Responses.User
 		/* Dictionary<unitId, Dictionary<slideId, slideProgress>> */
 		public Dictionary<string, UserProgress> UsersProgress { get; set; }
 	}
-
-
+	
 	[DataContract]
 	public class UserProgress
 	{

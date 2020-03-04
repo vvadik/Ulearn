@@ -8,6 +8,7 @@ using Database.Repos;
 using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 using Database.Repos.Users;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Ulearn.Common.Api.Models.Responses;
@@ -28,7 +29,7 @@ namespace Ulearn.Web.Api.Controllers.Users
 
 		public UsersProgressController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
 			IVisitsRepo visitsRepo, IUserQuizzesRepo userQuizzesRepo, IAdditionalScoresRepo additionalScoresRepo,
-			ICourseRolesRepo courseRolesRepo, GroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo)
+			ICourseRolesRepo courseRolesRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.visitsRepo = visitsRepo;
@@ -42,11 +43,15 @@ namespace Ulearn.Web.Api.Controllers.Users
 		/// <summary>
 		/// Прогресс пользователей в курсе 
 		/// </summary>
-		[HttpGet("{courseId}")]
-		public async Task<ActionResult<UsersProgressResponse>> UsersProgress(Course course, [FromBody]List<string> userIds)
+		[HttpPost("{courseId}")]
+		public async Task<ActionResult<UsersProgressResponse>> UsersProgress([FromRoute]Course course, [FromBody]List<string> userIds)
 		{
-			if(!await IsUsersProgressVisibleForUser(course.Id, userIds))
-				return NotFound(new ErrorResponse("Some users not found"));
+			var userIdsWithProgressNotVisibleForUser = await GetUserIdsWithProgressNotVisibleForUser(course.Id, userIds);
+			if (userIdsWithProgressNotVisibleForUser?.Any() ?? false)
+			{
+				var userIdsStr = string.Join(", ", userIdsWithProgressNotVisibleForUser);
+				return NotFound(new ErrorResponse($"Users {userIdsStr} not found"));
+			}
 
 			var shouldBeSolvedSlides = course.Slides.Where(s => s.ShouldBeSolved).Select(s => s.Id);
 			var scores = await visitsRepo.GetScoresForSlides(course.Id, userIds, shouldBeSolvedSlides);
@@ -57,7 +62,7 @@ namespace Ulearn.Web.Api.Controllers.Users
 			{
 				var slidesWithScore
 					= scores[userId].ToDictionary(kvp => kvp.Key, kvp => new UserProgressSlideResult { Score = kvp.Value });
-				var userAdditionalScores = additionalScores[userId];
+				var userAdditionalScores = additionalScores.GetValueOrDefault(userId);
 				usersProgress[userId] = new UserProgress
 				{
 					SlidesWithScore = slidesWithScore,
@@ -71,18 +76,26 @@ namespace Ulearn.Web.Api.Controllers.Users
 			};
 		}
 
-		private async Task<bool> IsUsersProgressVisibleForUser(string courseId, List<string> userIds)
+		[ItemCanBeNull]
+		private async Task<List<string>> GetUserIdsWithProgressNotVisibleForUser(string courseId, List<string> userIds)
 		{
 			var isSystemAdministrator = await IsSystemAdministratorAsync().ConfigureAwait(false);
 			if (isSystemAdministrator)
-				return true;
+				return null;
 			if (await groupAccessesRepo.CanUserSeeAllCourseGroupsAsync(UserId, courseId))
-				return true;
+				return null;
 			var userRole = await courseRolesRepo.GetRoleAsync(UserId, courseId).ConfigureAwait(false);
 			var groups = userRole == CourseRoleType.Instructor ? await groupAccessesRepo.GetAvailableForUserGroupsAsync(courseId, UserId, false, true, false) : new List<Group>();
-			groups = groups.Concat(await groupMembersRepo.GetUserGroupsAsync(courseId, UserId, false)).Distinct().ToList();
-			var members = (await groupMembersRepo.GetGroupsMembersIdsAsync(groups.Select(g => g.Id).ToList())).ToHashSet();
-			return members.IsSupersetOf(userIds);
+			groups = groups
+				.Concat((await groupMembersRepo.GetUserGroupsAsync(courseId, UserId, false)).Where(g=> g.CanUsersSeeGroupProgress))
+				.Distinct().ToList();
+			var members = new []{UserId}.Concat(await groupMembersRepo.GetGroupsMembersIdsAsync(groups.Select(g => g.Id).ToList())).ToHashSet();
+			var allIdsInMembers = members.IsSupersetOf(userIds);
+			if (allIdsInMembers)
+				return null;
+			var notVisibleUserIds = userIds.ToHashSet();
+			notVisibleUserIds.ExceptWith(members);
+			return notVisibleUserIds.ToList();
 		}
 
 		private async Task<Dictionary<string, Dictionary<Guid, Dictionary<string, int>>>> GetAdditionalScores(string courseId, List<string> userIds)
