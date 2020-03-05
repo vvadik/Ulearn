@@ -1,9 +1,9 @@
 import api from "../api/"
 
 export function getUserProgressInCourse(courseId) {
-	return api.get(`user/progress/${ courseId }`);
+	return api.post(`userProgress/${ courseId }`, api.createRequestParams({}));
 }
 
 export function updateUserProgressInCourse(courseId, slideId) {
-	return api.post((`user/progress/${ courseId }?slideId=${ slideId }`));
+	return api.post(`userProgress/${ courseId }/visit/${ slideId }`);
 }

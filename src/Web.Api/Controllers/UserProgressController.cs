@@ -9,16 +9,18 @@ using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 using Database.Repos.Users;
 using JetBrains.Annotations;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Core.Courses;
+using Ulearn.Web.Api.Models.Parameters;
 using Ulearn.Web.Api.Models.Responses.User;
 
-namespace Ulearn.Web.Api.Controllers.Users
+namespace Ulearn.Web.Api.Controllers
 {
-	[Route("/users/progress")]
-	public class UsersProgressController : BaseController
+	[Route("/userProgress")]
+	public class UserProgressController : BaseController
 	{
 		private readonly IVisitsRepo visitsRepo;
 		private readonly IUserQuizzesRepo userQuizzesRepo;
@@ -27,7 +29,7 @@ namespace Ulearn.Web.Api.Controllers.Users
 		private readonly IGroupAccessesRepo groupAccessesRepo;
 		private readonly IGroupMembersRepo groupMembersRepo;
 
-		public UsersProgressController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
+		public UserProgressController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
 			IVisitsRepo visitsRepo, IUserQuizzesRepo userQuizzesRepo, IAdditionalScoresRepo additionalScoresRepo,
 			ICourseRolesRepo courseRolesRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo)
 			: base(logger, courseManager, db, usersRepo)
@@ -39,29 +41,45 @@ namespace Ulearn.Web.Api.Controllers.Users
 			this.groupAccessesRepo = groupAccessesRepo;
 			this.groupMembersRepo = groupMembersRepo;
 		}
-		
+
 		/// <summary>
-		/// Прогресс пользователей в курсе 
+		/// Прогресс пользователя в курсе 
 		/// </summary>
 		[HttpPost("{courseId}")]
-		public async Task<ActionResult<UsersProgressResponse>> UsersProgress([FromRoute]Course course, [FromBody]List<string> userIds)
+		[Authorize]
+		public async Task<ActionResult<UsersProgressResponse>> UserProgress([FromRoute]Course course, [FromBody]UserProgressParameters parameters)
 		{
-			var userIdsWithProgressNotVisibleForUser = await GetUserIdsWithProgressNotVisibleForUser(course.Id, userIds);
-			if (userIdsWithProgressNotVisibleForUser?.Any() ?? false)
+			var userIds = parameters.UserIds;
+			if (userIds == null || userIds.Count == 0)
+				userIds = new List<string> { UserId };
+			else
 			{
-				var userIdsStr = string.Join(", ", userIdsWithProgressNotVisibleForUser);
-				return NotFound(new ErrorResponse($"Users {userIdsStr} not found"));
+				var userIdsWithProgressNotVisibleForUser = await GetUserIdsWithProgressNotVisibleForUser(course.Id, userIds);
+				if (userIdsWithProgressNotVisibleForUser?.Any() ?? false)
+				{
+					var userIdsStr = string.Join(", ", userIdsWithProgressNotVisibleForUser);
+					return NotFound(new ErrorResponse($"Users {userIdsStr} not found"));
+				}
 			}
 
 			var shouldBeSolvedSlides = course.Slides.Where(s => s.ShouldBeSolved).Select(s => s.Id);
 			var scores = await visitsRepo.GetScoresForSlides(course.Id, userIds, shouldBeSolvedSlides);
 			var additionalScores = await GetAdditionalScores(course.Id, userIds).ConfigureAwait(false);
+			var attempts = await userQuizzesRepo.GetUsedAttemptsCountAsync(course.Id, userIds).ConfigureAwait(false);
+			// TODO: не только квизы
+			var waitingSlides = await userQuizzesRepo.GetSlideIdsWaitingForManualCheckAsync(course.Id, userIds).ConfigureAwait(false);
 
 			var usersProgress = new Dictionary<string, UserProgress>();
 			foreach (var userId in scores.Keys)
 			{
 				var slidesWithScore
-					= scores[userId].ToDictionary(kvp => kvp.Key, kvp => new UserProgressSlideResult { Score = kvp.Value });
+					= scores[userId].ToDictionary(kvp => kvp.Key, kvp => new UserProgressSlideResult
+					{
+						Visited = true,
+						Score = kvp.Value,
+						UsedAttempts = attempts.GetValueOrDefault(userId)?.GetValueOrDefault(kvp.Key) ?? 0,
+						IsWaitingForManualChecking = waitingSlides.GetValueOrDefault(userId)?.Contains(kvp.Key) ?? false,
+					});
 				var userAdditionalScores = additionalScores.GetValueOrDefault(userId);
 				usersProgress[userId] = new UserProgress
 				{
@@ -72,10 +90,10 @@ namespace Ulearn.Web.Api.Controllers.Users
 
 			return new UsersProgressResponse
 			{
-				UsersProgress = usersProgress,
+				UserProgress = usersProgress,
 			};
 		}
-
+		
 		[ItemCanBeNull]
 		private async Task<List<string>> GetUserIdsWithProgressNotVisibleForUser(string courseId, List<string> userIds)
 		{
@@ -97,7 +115,7 @@ namespace Ulearn.Web.Api.Controllers.Users
 			notVisibleUserIds.ExceptWith(members);
 			return notVisibleUserIds.ToList();
 		}
-
+		
 		private async Task<Dictionary<string, Dictionary<Guid, Dictionary<string, int>>>> GetAdditionalScores(string courseId, List<string> userIds)
 		{
 			return (await additionalScoresRepo.GetAdditionalScoresForUsers(courseId, userIds).ConfigureAwait(false))
@@ -111,6 +129,26 @@ namespace Ulearn.Web.Api.Controllers.Users
 								g2 =>
 									g.ToDictSafe(t => t.scoringGroupId, t => t.additionalScore));
 					});
+		}
+
+		/// <summary>
+		/// Отметить посещение слайда в курсе
+		/// </summary>
+		/// <returns></returns>
+		[HttpPost("{courseId}/visit/{slideId}")]
+		[Authorize]
+		public async Task<ActionResult<UsersProgressResponse>> Visit([FromRoute] Course course, [FromRoute] Guid slideId)
+		{
+			await visitsRepo.AddVisit(course.Id, slideId, UserId, GetRealClientIp());
+			return await UserProgress(course, new UserProgressParameters());
+		}
+
+		private string GetRealClientIp()
+		{
+			var xForwardedFor = Request.Headers["X-Forwarded-For"].ToString();
+			if (string.IsNullOrEmpty(xForwardedFor))
+				return Request.Host.Host;
+			return xForwardedFor.Split(',').FirstOrDefault() ?? "";
 		}
 	}
 }

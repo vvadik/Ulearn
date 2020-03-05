@@ -10,7 +10,7 @@ namespace Ulearn.Web.Api.Models.Responses.User
 	{
 		[DataMember]
 		/* Dictionary<unitId, Dictionary<slideId, slideProgress>> */
-		public Dictionary<string, UserProgress> UsersProgress { get; set; }
+		public Dictionary<string, UserProgress> UserProgress { get; set; }
 	}
 	
 	[DataContract]
@@ -23,10 +23,11 @@ namespace Ulearn.Web.Api.Models.Responses.User
 		public Dictionary<Guid, Dictionary<string, int>> AdditionalScores { get; set; }
 	}
 
-	[DataContract]
 	public class UserProgressSlideResult
 	{
-		[DataMember]
 		public int Score { get; set; }
+		public int UsedAttempts { get; set; }
+		public bool IsWaitingForManualChecking { get; set; }
+		public bool Visited { get; set; }
 	}
 }

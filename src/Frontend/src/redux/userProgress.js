@@ -9,7 +9,7 @@ const initialState = {
 	loading: false,
 };
 
-export default function user(state = initialState, action) {
+export default function userProgressReducer(state = initialState, action) {
 	switch (action.type) {
 		case USER__PROGRESS_LOAD + START:
 			return {

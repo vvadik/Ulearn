@@ -13,7 +13,9 @@ namespace Database.Repos
 		Task<UserQuizAnswer> AddUserQuizAnswerAsync(int submissionId, bool isRightAnswer, string blockId, string itemId, string text, int quizBlockScore, int quizBlockMaxScore);
 		Task<bool> IsWaitingForManualCheckAsync(string courseId, Guid slideId, string userId);
 		Task<List<Guid>> GetSlideIdsWaitingForManualCheckAsync(string courseId, string userId);
+		Task<Dictionary<string, List<Guid>>> GetSlideIdsWaitingForManualCheckAsync(string courseId, IEnumerable<string> userIds);
 		Task<int> GetUsedAttemptsCountAsync(string courseId, string userId, Guid slideId);
+		Task<Dictionary<string, Dictionary<Guid, int>>> GetUsedAttemptsCountAsync(string courseId, IEnumerable<string> userIds);
 		Task<Dictionary<Guid, int>> GetUsedAttemptsCountAsync(string courseId, string userId);
 		Task<HashSet<Guid>> GetPassedSlideIdsAsync(string courseId, string userId);
 		Task<HashSet<Guid>> GetPassedSlideIdsWithMaximumScoreAsync(string courseId, string userId);
