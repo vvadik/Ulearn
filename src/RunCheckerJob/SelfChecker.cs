@@ -45,11 +45,14 @@ namespace RunCheckerJob
 		private static readonly string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
 		[Test, Explicit]
-		public void JsSelfCheckTest()
+		public void SelfCheckTest()
 		{
 			var sandboxesDirectory = new DirectoryInfo(Path.GetFullPath(Path.Combine(baseDirectory, "../../../../../sandboxes/")));
 			foreach (var dir in sandboxesDirectory.GetDirectories())
 			{
+				var sampleDir = new DirectoryInfo(Path.GetFullPath(Path.Combine(dir.FullName, "sample/")));
+				if (!sampleDir.Exists)
+					continue;
 				var res = new SelfChecker(new DockerSandboxRunner())
 					.SelfCheck(dir);
 				Assert.AreEqual(Verdict.Ok, res.Verdict);
