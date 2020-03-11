@@ -88,12 +88,14 @@ namespace uLearn.Web.Controllers
 
 			var compilationErrorMessage = buildResult.HasErrors ? buildResult.ErrorMessage : null;
 			var dontRunSubmission = buildResult.HasErrors;
-			var submissionLanguage = exerciseSlide.Exercise.Language.Value;
+			var submissionLanguage = exerciseBlock.Language.Value;
+			var submissionSandbox = (exerciseBlock as UniversalExerciseBlock)?.DockerImageName;
 			var submission = await userSolutionsRepo.AddUserExerciseSubmission(
 				courseId, exerciseSlide.Id,
 				userCode, compilationErrorMessage, null,
 				userId, "uLearn", GenerateSubmissionName(exerciseSlide, userName),
 				submissionLanguage,
+				submissionSandbox,
 				dontRunSubmission ? AutomaticExerciseCheckingStatus.Done : AutomaticExerciseCheckingStatus.Waiting
 			);
 

@@ -49,6 +49,9 @@ namespace Database.Models
 
 		public Language Language { get; set; }
 
+		[StringLength(40)]
+		public string Sandbox { get; set; }
+
 		public virtual IList<ManualExerciseChecking> ManualCheckings { get; set; }
 
 		[Obsolete] // YT: ULEARN-217

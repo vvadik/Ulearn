@@ -855,5 +855,8 @@
     <EmbeddedResource Update="Migrations\202002120803203_AutomaticExerciseCheckingPoints.resx">
       <DependentUpon>202002120803203_AutomaticExerciseCheckingPoints.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Update="Migrations\202003101304581_AddSandboxToUserExerciseSubmission.resx">
+      <DependentUpon>202003101304581_AddSandboxToUserExerciseSubmission.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>
