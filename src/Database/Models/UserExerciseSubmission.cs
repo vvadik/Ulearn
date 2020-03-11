@@ -65,6 +65,10 @@ namespace Database.Models
 		[Index("IDX_UserExerciseSubmissions_ByLanguage")]
 		public Language Language { get; set; }
 
+		[StringLength(40)]
+		[Index("IDX_UserExerciseSubmissions_BySandbox")]
+		public string Sandbox { get; set; } // null if csharp sandbox
+
 		public virtual IList<ManualExerciseChecking> ManualCheckings { get; set; }
 
 		[Obsolete] // YT: ULEARN-217

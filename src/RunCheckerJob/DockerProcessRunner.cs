@@ -81,7 +81,7 @@ namespace RunCheckerJob
 				{
 					log.Info($"Упал в папке {dir.FullName}");
 					log.Warn($"Docker написал в stderr:\n{readErrTask.Result}");
-					return new RunningResults(Verdict.SandboxError, error: readErrTask.Result);
+					return new RunningResults(Verdict.SandboxError, output: readOutTask.Result, error: readErrTask.Result);
 				}
 
 				return new RunningResults(Verdict.Ok, output: readOutTask.Result, error: readErrTask.Result);
