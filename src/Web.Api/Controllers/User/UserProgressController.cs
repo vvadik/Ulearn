@@ -18,15 +18,18 @@ namespace Ulearn.Web.Api.Controllers.User
 	{
 		private readonly IVisitsRepo visitsRepo;
 		private readonly IUserQuizzesRepo userQuizzesRepo;
+		private readonly ISlideCheckingsRepo slideCheckingsRepo;
 		private readonly IAdditionalScoresRepo additionalScoresRepo;
 
 		public UserProgressController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
-			IVisitsRepo visitsRepo, IUserQuizzesRepo userQuizzesRepo, IAdditionalScoresRepo additionalScoresRepo)
+			IVisitsRepo visitsRepo, IUserQuizzesRepo userQuizzesRepo, IAdditionalScoresRepo additionalScoresRepo,
+			ISlideCheckingsRepo slideCheckingsRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.visitsRepo = visitsRepo;
 			this.userQuizzesRepo = userQuizzesRepo;
 			this.additionalScoresRepo = additionalScoresRepo;
+			this.slideCheckingsRepo = slideCheckingsRepo;
 		}
 
 		/// <summary>
@@ -38,7 +41,8 @@ namespace Ulearn.Web.Api.Controllers.User
 		{
 			var scores = visitsRepo.GetScoresForSlides(course.Id, UserId);
 			var attempts = await userQuizzesRepo.GetUsedAttemptsCountAsync(course.Id, UserId).ConfigureAwait(false);
-			var waitingSlides = await userQuizzesRepo.GetSlideIdsWaitingForManualCheckAsync(course.Id, UserId).ConfigureAwait(false);
+			var waitingQuizSlides = await userQuizzesRepo.GetSlideIdsWaitingForManualCheckAsync(course.Id, UserId).ConfigureAwait(false);
+			var waitingExerciseSlides = await slideCheckingsRepo.GetSlideIdsWaitingForManualExerciseCheckAsync(course.Id, new []{UserId}).ConfigureAwait(false);
 			var additionalScores = await GetAdditionalScores(course.Id, UserId).ConfigureAwait(false);
 
 			var slidesResults = scores.Select(s => new
@@ -46,7 +50,7 @@ namespace Ulearn.Web.Api.Controllers.User
 				Key = s.Key,
 				Score = s.Value,
 				UsedAttempts = attempts.GetValueOrDefault(s.Key),
-				IsWaitingForManualChecking = waitingSlides.Contains(s.Key),
+				IsWaitingForManualChecking = (waitingExerciseSlides.GetValueOrDefault(UserId)?.Contains(s.Key) ?? false) || waitingQuizSlides.Contains(s.Key),
 			}).ToDictionary(s => s.Key, s => new UserSlideResult
 			{
 				Visited = true,

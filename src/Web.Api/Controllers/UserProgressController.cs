@@ -28,10 +28,12 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IGroupAccessesRepo groupAccessesRepo;
 		private readonly IGroupMembersRepo groupMembersRepo;
+		private readonly ISlideCheckingsRepo slideCheckingsRepo;
 
 		public UserProgressController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
 			IVisitsRepo visitsRepo, IUserQuizzesRepo userQuizzesRepo, IAdditionalScoresRepo additionalScoresRepo,
-			ICourseRolesRepo courseRolesRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo)
+			ICourseRolesRepo courseRolesRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo,
+			ISlideCheckingsRepo slideCheckingsRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.visitsRepo = visitsRepo;
@@ -40,6 +42,7 @@ namespace Ulearn.Web.Api.Controllers
 			this.courseRolesRepo = courseRolesRepo;
 			this.groupAccessesRepo = groupAccessesRepo;
 			this.groupMembersRepo = groupMembersRepo;
+			this.slideCheckingsRepo = slideCheckingsRepo;
 		}
 
 		/// <summary>
@@ -66,8 +69,8 @@ namespace Ulearn.Web.Api.Controllers
 			var scores = await visitsRepo.GetScoresForSlides(course.Id, userIds, shouldBeSolvedSlides);
 			var additionalScores = await GetAdditionalScores(course.Id, userIds).ConfigureAwait(false);
 			var attempts = await userQuizzesRepo.GetUsedAttemptsCountAsync(course.Id, userIds).ConfigureAwait(false);
-			// TODO: не только квизы
-			var waitingSlides = await userQuizzesRepo.GetSlideIdsWaitingForManualCheckAsync(course.Id, userIds).ConfigureAwait(false);
+			var waitingQuizSlides = await userQuizzesRepo.GetSlideIdsWaitingForManualCheckAsync(course.Id, userIds).ConfigureAwait(false);
+			var waitingExerciseSlides = await slideCheckingsRepo.GetSlideIdsWaitingForManualExerciseCheckAsync(course.Id, userIds).ConfigureAwait(false);
 
 			var usersProgress = new Dictionary<string, UserProgress>();
 			foreach (var userId in scores.Keys)
@@ -78,7 +81,8 @@ namespace Ulearn.Web.Api.Controllers
 						Visited = true,
 						Score = kvp.Value,
 						UsedAttempts = attempts.GetValueOrDefault(userId)?.GetValueOrDefault(kvp.Key) ?? 0,
-						IsWaitingForManualChecking = waitingSlides.GetValueOrDefault(userId)?.Contains(kvp.Key) ?? false,
+						IsWaitingForManualChecking = (waitingExerciseSlides.GetValueOrDefault(userId)?.Contains(kvp.Key) ?? false)
+							|| (waitingQuizSlides.GetValueOrDefault(userId)?.Contains(kvp.Key) ?? false)
 					});
 				var userAdditionalScores = additionalScores.GetValueOrDefault(userId);
 				usersProgress[userId] = new UserProgress
