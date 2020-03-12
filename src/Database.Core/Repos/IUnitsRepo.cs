@@ -10,6 +10,7 @@ namespace Database.Repos
 	public interface IUnitsRepo
 	{
 		List<Unit> GetVisibleUnits(Course course, IPrincipal user);
+		List<Unit> GetVisibleUnits(Course course);
 		DateTime? GetNextUnitPublishTime(string courseId);
 		HashSet<string> GetVisibleCourses();
 	}

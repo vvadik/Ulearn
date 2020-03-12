@@ -135,8 +135,21 @@ namespace Database.Repos
 			if (slidesIds != null)
 				visits = visits.Where(v => slidesIds.Contains(v.SlideId));
 			return visits
-				.GroupBy(v => v.SlideId, (s, v) => new { Key = s, Value = v.FirstOrDefault() })
-				.ToDictionary(g => g.Key, g => g.Value.Score);
+				.GroupBy(v => v.SlideId, (s, v) => new { Key = s, Value = v.FirstOrDefault().Score })
+				.AsEnumerable()
+				.ToDictionary(g => g.Key, g => g.Value);
+		}
+		
+		public async Task<Dictionary<string, Dictionary<Guid, int>>> GetScoresForSlides(string courseId, IEnumerable<string> userIds, IEnumerable<Guid> slidesIds = null)
+		{
+			var visits = db.Visits.Where(v => v.CourseId == courseId && userIds.Contains(v.UserId));
+			if (slidesIds != null)
+				visits = visits.Where(v => slidesIds.Contains(v.SlideId));
+			return (await visits
+				.GroupBy(v => new {v.UserId, v.SlideId}, (s, v) => new { s.UserId, s.SlideId, Value = v.FirstOrDefault().Score })
+				.ToListAsync().ConfigureAwait(false))
+				.GroupBy(g => g.UserId)
+				.ToDictionary(g => g.Key, g => g.ToDictionary(k => k.SlideId, k=> k.Value));
 		}
 
 		public List<Guid> GetSlidesWithUsersManualChecking(string courseId, string userId)

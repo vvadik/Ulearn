@@ -270,12 +270,8 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		{
 			var canBeSetByInstructorInSomeUnit = scoringGroupsCanBeSetInSomeUnit.Select(g => g.Id).Contains(scoringGroup.Id);
 			var isEnabledManually = enabledScoringGroups.Select(g => g.ScoringGroupId).Contains(scoringGroup.Id);
-			return new GroupScoringGroupInfo
+			return new GroupScoringGroupInfo(scoringGroup)
 			{
-				Id = scoringGroup.Id,
-				Name = scoringGroup.Name ?? "",
-				Abbreviation = scoringGroup.Abbreviation ?? "",
-				Description = scoringGroup.Description ?? "",
 				AreAdditionalScoresEnabledForAllGroups = scoringGroup.EnabledForEveryone,
 				CanInstructorSetAdditionalScoreInSomeUnit = canBeSetByInstructorInSomeUnit,
 				AreAdditionalScoresEnabledInThisGroup = (scoringGroup.EnabledForEveryone || !canBeSetByInstructorInSomeUnit) ? (bool?)null : isEnabledManually

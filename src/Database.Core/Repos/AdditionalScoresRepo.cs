@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Database.Repos
 {
@@ -44,11 +45,11 @@ namespace Database.Repos
 
 		/* Dictionary<(unitId, scoringGroupId), additionalScore> */
 
-		public Dictionary<Tuple<Guid, string>, int> GetAdditionalScoresForUser(string courseId, string userId)
+		public async Task<Dictionary<Tuple<Guid, string>, int>> GetAdditionalScoresForUser(string courseId, string userId)
 		{
-			return db.AdditionalScores
+			return (await db.AdditionalScores
 				.Where(s => s.CourseId == courseId && s.UserId == userId)
-				.ToList()
+				.ToListAsync().ConfigureAwait(false))
 				.ToDictSafe(s => Tuple.Create(s.UnitId, s.ScoringGroupId), s => s.Score);
 		}
 
@@ -70,11 +71,11 @@ namespace Database.Repos
 		}
 
 		/* Dictionary<(userId, unitId, scoringGroupId), additionalScore> */
-		public Dictionary<Tuple<string, Guid, string>, AdditionalScore> GetAdditionalScoresForUsers(string courseId, IEnumerable<string> usersIds)
+		public async Task<Dictionary<Tuple<string, Guid, string>, AdditionalScore>> GetAdditionalScoresForUsers(string courseId, IEnumerable<string> usersIds)
 		{
-			return db.AdditionalScores
+			return (await db.AdditionalScores
 				.Where(s => s.CourseId == courseId && usersIds.Contains(s.UserId))
-				.ToList()
+				.ToListAsync().ConfigureAwait(false))
 				.ToDictSafe(s => Tuple.Create(s.UserId, s.UnitId, s.ScoringGroupId), s => s);
 		}
 
