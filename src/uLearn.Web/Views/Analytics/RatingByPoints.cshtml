@@ -41,7 +41,7 @@
 						@(Model.HideOtherUsersNames && User.Identity.GetUserId() != userId ? "***" : Model.Users[userId].VisibleName)
 					</span>
 					</td>
-					<td class="rating-by-points-table__right-cell">@(Model.PointsByUser[userId].ToString("#.##"))</td>
+					<td class="rating-by-points-table__right-cell">@(Model.PointsByUser[userId].ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))</td>
 				</tr>
 				place++;
 			}
