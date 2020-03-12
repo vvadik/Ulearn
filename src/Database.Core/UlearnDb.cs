@@ -327,6 +327,7 @@ namespace Database
 			AddIndex<UserExerciseSubmission>(modelBuilder, c => new { c.CourseId, c.SlideId, c.AutomaticCheckingIsRightAnswer });
 			AddIndex<UserExerciseSubmission>(modelBuilder, c => c.AntiPlagiarismSubmissionId);
 			AddIndex<UserExerciseSubmission>(modelBuilder, c => c.Language);
+			AddIndex<UserExerciseSubmission>(modelBuilder, c => c.Sandbox);
 			AddIndex<UserExerciseSubmission>(modelBuilder, c => c.Timestamp);
 
 			AddIndex<UserQuizAnswer>(modelBuilder, c => new { c.SubmissionId, c.BlockId });

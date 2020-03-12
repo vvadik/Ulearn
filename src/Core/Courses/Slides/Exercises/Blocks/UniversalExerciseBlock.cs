@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
+using JetBrains.Annotations;
 using log4net;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
@@ -33,6 +34,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		[XmlElement("excludePathForChecker")]
 		public string[] PathsToExcludeForChecker { get; set; }
 
+		[CanBeNull]
 		[XmlElement("includePathForChecker")]
 		public string[] PathsToIncludeForChecker { get; set; } // Пути до директорий относительно директории с Unit, чьё содержимое нужно включить в архив. Перетирают файлы из ExerciseDir в архиве
 
@@ -213,7 +215,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 				.ToList();
 
 			var toUpdateDirectories = PathsToIncludeForChecker
-				.Select(pathToInclude => new DirectoryInfo(Path.Combine(UnitDirectory.FullName, pathToInclude)));
+				?.Select(pathToInclude => new DirectoryInfo(Path.Combine(UnitDirectory.FullName, pathToInclude)));
 
 			var ms = ToZip(ExerciseDirectory, excluded, null, toUpdateDirectories);
 			log.Info($"Собираю zip-архив для проверки: zip-архив собран, {ms.Length} байтов");

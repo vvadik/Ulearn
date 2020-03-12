@@ -91,7 +91,7 @@ namespace Ulearn.Core.Courses
 			AddDefaultScoringGroupIfNeeded(units, slides, settings);
 			CalculateScoringGroupScores(units, settings);
 
-			return new Course(courseId, units, settings, context.CourseXml.Directory);
+			return new Course(courseId, units, settings, dir, context.CourseXml.Directory);
 		}
 
 		private static string GetValidationLog(List<Unit> units)
