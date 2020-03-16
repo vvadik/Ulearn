@@ -46,7 +46,7 @@ export const loadUserProgress = (courseId, userId) => {
 
 		getUserProgressInCourse(courseId)
 			.then(result => {
-				dispatch(loadUserProgressSuccess(courseId, result.userProgress[userId].slidesWithScore));
+				dispatch(loadUserProgressSuccess(courseId, result.userProgress[userId].visitedSlides));
 			})
 			.catch(err => {
 				dispatch(loadUserProgressFail());

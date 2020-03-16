@@ -17,7 +17,7 @@ namespace Ulearn.Web.Api.Models.Responses.User
 	public class UserProgress
 	{
 		[DataMember]
-		public Dictionary<Guid, UserProgressSlideResult> SlidesWithScore { get; set; }
+		public Dictionary<Guid, UserProgressSlideResult> VisitedSlides { get; set; }
 		
 		[DataMember]
 		public Dictionary<Guid, Dictionary<string, int>> AdditionalScores { get; set; }

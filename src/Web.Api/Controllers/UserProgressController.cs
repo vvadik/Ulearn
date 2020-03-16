@@ -65,8 +65,7 @@ namespace Ulearn.Web.Api.Controllers
 				}
 			}
 
-			var shouldBeSolvedSlides = course.Slides.Where(s => s.ShouldBeSolved).Select(s => s.Id);
-			var scores = await visitsRepo.GetScoresForSlides(course.Id, userIds, shouldBeSolvedSlides);
+			var scores = await visitsRepo.GetScoresForSlides(course.Id, userIds);
 			var additionalScores = await GetAdditionalScores(course.Id, userIds).ConfigureAwait(false);
 			var attempts = await userQuizzesRepo.GetUsedAttemptsCountAsync(course.Id, userIds).ConfigureAwait(false);
 			var waitingQuizSlides = await userQuizzesRepo.GetSlideIdsWaitingForManualCheckAsync(course.Id, userIds).ConfigureAwait(false);
@@ -75,7 +74,7 @@ namespace Ulearn.Web.Api.Controllers
 			var usersProgress = new Dictionary<string, UserProgress>();
 			foreach (var userId in scores.Keys)
 			{
-				var slidesWithScore
+				var visitedSlides
 					= scores[userId].ToDictionary(kvp => kvp.Key, kvp => new UserProgressSlideResult
 					{
 						Visited = true,
@@ -87,7 +86,7 @@ namespace Ulearn.Web.Api.Controllers
 				var userAdditionalScores = additionalScores.GetValueOrDefault(userId);
 				usersProgress[userId] = new UserProgress
 				{
-					SlidesWithScore = slidesWithScore,
+					VisitedSlides = visitedSlides,
 					AdditionalScores = userAdditionalScores
 				};
 			}
