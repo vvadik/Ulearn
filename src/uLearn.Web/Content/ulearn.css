@@ -1505,3 +1505,34 @@ body.lti-component {
 .legacy-page .slide-image {
 	max-width: 100%;
 }
+
+.legacy-page .slide {
+	font-size: 16px;
+	line-height: 1.5;
+}
+
+.legacy-page .slide.slide p {
+	margin-bottom: 1em;
+}
+
+.legacy-page .slide img {
+	max-width: 100%;
+}
+
+.legacy-page .slide ul {
+	margin-bottom: 1em;
+	padding: 0;
+	list-style: none;
+}
+
+.legacy-page .slide ul li {
+	position: relative;
+	padding-left: 1.5em;
+	margin-bottom: 0.5em;
+}
+
+.legacy-page .slide ul li:before {
+	content: '—';
+	position: absolute;
+	left: 0;
+}
