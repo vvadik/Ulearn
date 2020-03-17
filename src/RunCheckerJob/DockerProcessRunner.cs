@@ -57,6 +57,12 @@ namespace RunCheckerJob
 				var ms = sw.ElapsedMilliseconds;
 
 				RunningResults unsuccessfulResult = null;
+				
+				if (!dockerShellProcess.HasExited)
+					GracefullyShutdownDocker(dockerShellProcess, name, settings);
+
+				log.Info($"Docker написал в stderr: {readErrTask.Result}");
+				log.Info($"Docker написал в stdout: {readOutTask.Result}");
 
 				if (!isFinished)
 				{
@@ -69,18 +75,14 @@ namespace RunCheckerJob
 					unsuccessfulResult = new RunningResults(Verdict.OutputLimit);
 				}
 				else
-					log.Info($"Docker закончил работу за {ms} ms и написал: {readOutTask.Result}");
-
-				if (!dockerShellProcess.HasExited)
-					GracefullyShutdownDocker(dockerShellProcess, name, settings);
-
+					log.Info($"Docker закончил работу за {ms} ms");
+				
 				if (unsuccessfulResult != null)
 					return unsuccessfulResult;
 
 				if (dockerShellProcess.ExitCode != 0)
 				{
 					log.Info($"Упал в папке {dir.FullName}");
-					log.Warn($"Docker написал в stderr:\n{readErrTask.Result}");
 					return new RunningResults(Verdict.SandboxError, output: readOutTask.Result, error: readErrTask.Result);
 				}
 
