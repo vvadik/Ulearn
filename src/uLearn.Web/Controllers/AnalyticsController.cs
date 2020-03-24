@@ -687,7 +687,7 @@ namespace uLearn.Web.Controllers
 			}
 			
 			var userIds = users?.Select(u => u.Id).ToList();
-			var pointsByUser = GetPointsByUser(courseId, slideId, userIds, smallPointsIsBetter);
+			var pointsByUser = GetPointsByUser(courseId, slideId, userIds);
 			var usersOrderedByPoints = GetUsersOrderedByPoints(pointsByUser, smallPointsIsBetter);
 			
 			if (showAllUsers)
@@ -703,32 +703,27 @@ namespace uLearn.Web.Controllers
 				AvailableGroups = availableGroups,
 				Users = users?.ToDictionary(u => u.Id, u => u),
 				HideOtherUsersNames = hideOtherUsersNames,
-				PointsByUser = pointsByUser.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Points),
+				PointsByUser = pointsByUser.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
 				UsersOrderedByPoints = usersOrderedByPoints
 			};
 			return View(model);
 		}
 
-		private Dictionary<string, (float Points, DateTime Timestamp)> GetPointsByUser(string courseId, Guid slideId, List<string> userIds, bool smallPointsIsBetter)
+		private Dictionary<string, (float Points, DateTime Timestamp)> GetPointsByUser(string courseId, Guid slideId, List<string> userIds)
 		{
 			return userSolutionsRepo
 				.GetAutomaticExerciseCheckingsByUsers(courseId, slideId, userIds)
 				.Where(c => c.Points != null)
 				.Select(v => new { v.UserId, Points = v.Points.Value, v.Timestamp })
-				.AsEnumerable()
 				.GroupBy(v => v.UserId)
+				.Select(g => g.OrderByDescending(r => r.Timestamp).FirstOrDefault())
+				.AsEnumerable()
 				.ToDictionary(
-					g => g.Key,
-					g =>
-					{
-						var value = smallPointsIsBetter
-							? g.OrderBy(v => v.Points).ThenBy(v => v.Timestamp).First()
-							: g.OrderByDescending(v => v.Points).ThenBy(v => v.Timestamp).First();
-						return (value.Points, value.Timestamp);
-					});
+					g => g.UserId,
+					g => (g.Points, g.Timestamp));
 		}
 
-		private List<string> GetUsersOrderedByPoints(Dictionary<string, (float Points, DateTime Timestamp)> pointsByUser, bool smallPointsIsBetter, List<ApplicationUser> users = null)
+		private List<string> GetUsersOrderedByPoints(Dictionary<string, (float Points, DateTime Timestamp)> pointsByUser, bool smallPointsIsBetter)
 		{
 			var ordered = smallPointsIsBetter
 				? pointsByUser.OrderBy(p => p.Value.Points).ThenBy(p => p.Value.Timestamp)
@@ -1037,7 +1032,7 @@ namespace uLearn.Web.Controllers
 		public List<Group> AvailableGroups { get; set; }
 		public Dictionary<string, ApplicationUser> Users { get; set; }
 		public bool HideOtherUsersNames { get; set; }
-		public Dictionary<string, float> PointsByUser { get; set; }
+		public Dictionary<string, (float Points, DateTime Timestamp)> PointsByUser { get; set; }
 		public List<string> UsersOrderedByPoints { get; set; }
 	}
 

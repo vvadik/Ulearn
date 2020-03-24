@@ -50,6 +50,7 @@ namespace uLearn.Web.Controllers
 
 			var cspHeader = WebConfigurationManager.AppSettings["ulearn.web.cspHeader"] ?? "";
 			httpContext.Response.Headers.Add("Content-Security-Policy-Report-Only", cspHeader);
+			httpContext.Response.Headers.Add("ReactRender", "true");
 			return new FileContentResult(content, "text/html");
 		}
 	}
