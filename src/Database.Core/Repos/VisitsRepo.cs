@@ -135,8 +135,9 @@ namespace Database.Repos
 			if (slidesIds != null)
 				visits = visits.Where(v => slidesIds.Contains(v.SlideId));
 			return visits
-				.GroupBy(v => v.SlideId, (s, v) => new { Key = s, Value = v.FirstOrDefault().Score })
+				.Select(v => new {v.SlideId, v.Score})
 				.AsEnumerable()
+				.GroupBy(v => v.SlideId, (s, v) => new { Key = s, Value = v.First().Score })
 				.ToDictionary(g => g.Key, g => g.Value);
 		}
 		
@@ -146,8 +147,9 @@ namespace Database.Repos
 			if (slidesIds != null)
 				visits = visits.Where(v => slidesIds.Contains(v.SlideId));
 			return (await visits
-				.GroupBy(v => new {v.UserId, v.SlideId}, (s, v) => new { s.UserId, s.SlideId, Value = v.FirstOrDefault().Score })
+				.Select(v => new {v.UserId, v.SlideId, v.Score})
 				.ToListAsync().ConfigureAwait(false))
+				.GroupBy(v => new {v.UserId, v.SlideId}, (s, v) => new { s.UserId, s.SlideId, Value = v.First().Score })
 				.GroupBy(g => g.UserId)
 				.ToDictionary(g => g.Key, g => g.ToDictionary(k => k.SlideId, k=> k.Value));
 		}

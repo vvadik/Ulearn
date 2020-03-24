@@ -20,7 +20,7 @@ namespace RunCheckerJob
 		public static void Main(string[] args)
 		{
 			ConfigureLog4Net();
-			var selfCheckIndex = args.IndexOf("--selfcheck");
+			var selfCheckIndex = args.FindIndex("--selfcheck");
 
 			var program = new Program();
 			var hasNextArg = args.Length > selfCheckIndex + 1;

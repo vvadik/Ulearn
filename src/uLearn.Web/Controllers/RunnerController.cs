@@ -300,7 +300,7 @@ namespace uLearn.Web.Controllers
 				AuthorId = Guid.Parse(submission.UserId),
 				AdditionalInfo = new AntiPlagiarismAdditionalInfo { SubmissionId = submission.Id }.ToJsonString(),
 			};
-			antiPlagiarismClient.AddSubmissionAsync(parameters).ConfigureAwait(false).GetAwaiter().OnCompleted(() => { });
+			await antiPlagiarismClient.AddSubmissionAsync(parameters).ConfigureAwait(false);
 		}
 	}
 }

@@ -91,13 +91,20 @@ namespace AntiPlagiarism.Web.Database.Repos
 				.ToListAsync();
 		}
 
+		// https://www.thinktecture.com/en/entity-framework-core/hidden-group-by-capabilities-in-3-0-part-2/
 		public async Task<List<Submission>> GetLastSubmissionsByAuthorsForTaskAsync(int clientId, Guid taskId, IEnumerable<Guid> authorsIds)
 		{
 			var lastSubmissionByAuthor = await db.Submissions
 				.Where(s => s.ClientId == clientId && s.TaskId == taskId && authorsIds.Contains(s.AuthorId))
-				.GroupBy(s => s.AuthorId)
-				.ToDictionaryAsync(g => g.Key, g => g.Last());
-			return lastSubmissionByAuthor.Values.ToList();
+				.Select(s => s.AuthorId)
+				.Distinct()
+				.Select(authorId => db.Submissions
+					.Where(s => s.ClientId == clientId && s.TaskId == taskId && s.AuthorId == authorId)
+					.OrderByDescending(p => p.Id)
+					.FirstOrDefault()
+				)
+				.ToListAsync();
+			return lastSubmissionByAuthor.ToList();
 		}
 
 		public Task<List<Submission>> GetSubmissionsByAuthorAndTaskAsync(int clientId, Guid authorId, Guid taskId, int count)

@@ -69,7 +69,7 @@ namespace Database.Core.Tests.Repos
 		{
 			var optionsBuilder = new DbContextOptionsBuilder<UlearnDb>();
 			optionsBuilder.UseLazyLoadingProxies();
-			optionsBuilder.UseInMemoryDatabase("ulearn_test_database");
+			optionsBuilder.UseInMemoryDatabase("ulearn_test_database" + Guid.NewGuid());
 			if (loggerFactory != null)
 				optionsBuilder.UseLoggerFactory(loggerFactory);
 

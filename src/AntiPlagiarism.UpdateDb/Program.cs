@@ -39,7 +39,7 @@ namespace AntiPlagiarism.UpdateDb
 			var firstSubmissionId = 0;
 			if (args.Contains("--start"))
 			{
-				var startArgIndex = args.IndexOf("--start");
+				var startArgIndex = args.FindIndex("--start");
 				if (startArgIndex + 1 >= args.Length || !int.TryParse(args[startArgIndex + 1], out firstSubmissionId))
 					firstSubmissionId = 0;
 			}

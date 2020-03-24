@@ -136,10 +136,12 @@ namespace Database.Repos.Groups
 		public async Task<Dictionary<string, List<int>>> GetUsersGroupsIdsAsync(string courseId, List<string> usersIds, bool includeArchived = false)
 		{
 			var groupsIds = groupsRepo.GetCourseGroupsQueryable(courseId, includeArchived).Select(g => g.Id);
-			return await db.GroupMembers
+			return (await db.GroupMembers
 				.Where(m => groupsIds.Contains(m.GroupId) && usersIds.Contains(m.UserId))
+				.Select(m => new {m.UserId, m.GroupId})
+				.ToListAsync())
 				.GroupBy(m => m.UserId)
-				.ToDictionaryAsync(g => g.Key, g => g.Select(m => m.GroupId).ToList());
+				.ToDictionary(g => g.Key, g => g.Select(m => m.GroupId).ToList());
 		}
 
 		public async Task<List<int>> GetUserGroupsIdsAsync(string courseId, string userId, bool includeArchived = false)
