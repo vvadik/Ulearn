@@ -58,12 +58,12 @@ update cte SET {WorkQueueItem.TakeAfterTimeColumnName} = @timeLimit
 output inserted.*";
 			using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions { IsolationLevel = IsolationLevel.RepeatableRead }, TransactionScopeAsyncFlowOption.Enabled))
 			{
-				var taken = await db.WorkQueueItems.FromSqlRaw(
+				var taken = (await db.WorkQueueItems.FromSqlRaw(
 					sql,
 					new SqlParameter("@queueId", queueId),
 					new SqlParameter("@now", DateTime.UtcNow),
 					new SqlParameter("@timeLimit", DateTime.UtcNow + timeLimit)
-				).FirstOrDefaultAsync();
+				).ToListAsync()).FirstOrDefault();
 				scope.Complete();
 				return taken;
 			}
