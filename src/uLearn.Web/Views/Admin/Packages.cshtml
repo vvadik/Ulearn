@@ -127,20 +127,21 @@
 			{
 				var isCurrentVersion = Model.PublishedVersion != null && version.Id == Model.PublishedVersion.Id;
 				var href = Url.Action("Diagnostics", new { courseId = Model.Course.Id, versionId = version.Id });
-				<div onclick="if(arguments[0].target === this) location.href='@href';" class="courses-versions__version @(isCurrentVersion ? "current" : "")">
-					@if (isCurrentVersion)
-					{
-						<span class="glyphicon glyphicon-ok" title="Текущая версия"></span>
-					}
-					<b class="courses-versions__author">
-						@version.Author.VisibleName
-					</b>
-						загрузил(а)
-					<b class="courses-versions__time" title="@version.LoadingTime.ToPrettyString()">
-						@version.LoadingTime.ToAgoPrettyString()
-					</b>
-					<div class="courses-versions__actions">
-						@if (version.RepoUrl != null && version.CommitHash != null)
+				<div class="courses-versions__version @(isCurrentVersion ? "current" : "")">
+					<a href="@href" class="courses-versions__link">
+						@if (isCurrentVersion)
+						{
+							<span class="glyphicon glyphicon-ok" title="Текущая версия"></span>
+						}
+						<b class="courses-versions__author">
+							@version.Author.VisibleName
+						</b>
+							загрузил(а)
+						<b class="courses-versions__time" title="@version.LoadingTime.ToPrettyString()">
+							@version.LoadingTime.ToAgoPrettyString()
+						</b>
+					</a>
+					@if (version.RepoUrl != null && version.CommitHash != null)
 						{
 							<a href="@GitUtils.RepoUrlToCommitLink(version.RepoUrl, version.CommitHash)" target="_blank">
 								<span class="glyphicon glyphicon-list-alt"></span>
@@ -158,7 +159,6 @@
 							}
 						}
 					</div>
-				</div>
 			}
 		</div>
 	}
