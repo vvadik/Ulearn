@@ -69,6 +69,14 @@ namespace Database.Repos
 				.Where(c => c.CourseId == courseId && c.UserId == userId && !c.IsChecked)
 				.Select(c => c.SlideId).Distinct().ToListAsync();
 		}
+		
+		public async Task<Dictionary<string, List<Guid>>> GetSlideIdsWaitingForManualCheckAsync(string courseId, IEnumerable<string> userIds)
+		{
+			return await db.ManualQuizCheckings
+				.Where(c => c.CourseId == courseId && userIds.Contains(c.UserId) && !c.IsChecked)
+				.GroupBy(c => c.UserId)
+				.ToDictionaryAsync(g => g.Key, g => g.Select(c => c.SlideId).Distinct().ToList());
+		}
 
 		public Task<int> GetUsedAttemptsCountAsync(string courseId, string userId, Guid slideId)
 		{
@@ -82,6 +90,17 @@ namespace Database.Repos
 				.Where(s => s.CourseId == courseId && s.UserId == userId)
 				.GroupBy(s => s.SlideId)
 				.ToDictionaryAsync(g => g.Key, g => g.Count());
+		}
+		
+		public async Task<Dictionary<string, Dictionary<Guid, int>>> GetUsedAttemptsCountAsync(string courseId, IEnumerable<string> userIds)
+		{
+			return (await db.UserQuizSubmissions
+					.Where(s => s.CourseId == courseId && userIds.Contains(s.UserId))
+					.GroupBy(s => new { s.UserId, s.SlideId })
+					.Select(g => new { g.Key.UserId, g.Key.SlideId, Count = g.Count() })
+					.ToListAsync())
+				.GroupBy(s => s.UserId)
+				.ToDictionary(s => s.Key, s => s.ToDictionary(t => t.SlideId, t => t.Count));
 		}
 
 		public async Task<HashSet<Guid>> GetPassedSlideIdsAsync(string courseId, string userId)

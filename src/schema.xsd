@@ -597,7 +597,7 @@
 							</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="region" type="NonEmptyString" minOccurs="1" maxOccurs="1">
+					<xs:element name="region" type="NonEmptyString" minOccurs="0" maxOccurs="1">
 						<xs:annotation>
 							<xs:documentation>
 								Метка региона файла, с которым работает студент. [prefix]region [label] ... [prefix]endregion [label] Разрешен только при noStudentZip=true

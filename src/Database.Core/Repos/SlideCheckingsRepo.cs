@@ -344,6 +344,14 @@ namespace Database.Repos
 				.Select(g => g.Key)
 				.ToList();
 		}
+		
+		public async Task<Dictionary<string, List<Guid>>> GetSlideIdsWaitingForManualExerciseCheckAsync(string courseId, IEnumerable<string> userIds)
+		{
+			return await db.ManualExerciseCheckings
+				.Where(c => c.CourseId == courseId && userIds.Contains(c.UserId) && !c.IsChecked)
+				.GroupBy(c => c.UserId)
+				.ToDictionaryAsync(g => g.Key, g => g.Select(c => c.SlideId).Distinct().ToList());
+		}
 
 		public Task HideFromTopCodeReviewComments(string courseId, Guid slideId, string userId, string comment)
 		{

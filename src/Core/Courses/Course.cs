@@ -12,12 +12,13 @@ namespace Ulearn.Core.Courses
 {
 	public class Course : ICourse
 	{
-		public Course(string id, List<Unit> units, [NotNull]CourseSettings settings, DirectoryInfo courseXmlDirectory)
+		public Course(string id, List<Unit> units, [NotNull]CourseSettings settings, DirectoryInfo courseDirectory, DirectoryInfo courseXmlDirectory)
 		{
 			Id = id;
 			Units = units;
 			Settings = settings;
 			CourseXmlDirectory = courseXmlDirectory;
+			CourseDirectory = courseDirectory;
 		}
 
 		public string Id { get; set; }
@@ -25,6 +26,7 @@ namespace Ulearn.Core.Courses
 		[NotNull]
 		public CourseSettings Settings { get; private set; }
 		public DirectoryInfo CourseXmlDirectory { get; set; }
+		public DirectoryInfo CourseDirectory { get; set; }      
 		public List<Unit> Units { get; private set; }
 
 		private List<Slide> slidesCache { get; set; }

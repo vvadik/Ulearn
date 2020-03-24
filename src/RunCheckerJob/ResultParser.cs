@@ -11,19 +11,19 @@ namespace RunCheckerJob
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(ResultParser));
 
-		public static RunningResults Parse(string output, string error)
+		public static RunningResults Parse(RunningResults response)
 		{
 			try
 			{
-				var result = JsonConvert.DeserializeObject<RunningResults>(output);
+				var result = JsonConvert.DeserializeObject<RunningResults>(response.Output);
 				if (result == null)
 					throw new Exception();
 				return result;
 			}
 			catch (Exception)
 			{
-				log.Info("Не удалось распарсить результат");
-				return new RunningResults(Verdict.RuntimeError, error: error, output: output);
+				log.Warn("Не удалось распарсить результат");
+				return response;
 			}
 		}
 	}

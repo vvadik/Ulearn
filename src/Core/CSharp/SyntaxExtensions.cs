@@ -20,7 +20,7 @@ namespace Ulearn.Core.CSharp
 		{
 			return node.DescendantNodes()
 				.OfType<MemberDeclarationSyntax>()
-				.Where(n => n is BaseTypeDeclarationSyntax || n is MethodDeclarationSyntax);
+				.Where(n => n is BaseTypeDeclarationSyntax || n is MethodDeclarationSyntax || n is DelegateDeclarationSyntax);
 		}
 
 		public static SyntaxList<SyntaxNode> GetBody(this SyntaxNode node)

@@ -45,9 +45,9 @@ namespace RunCheckerJob
 			this.agentName = agentName;
 		}
 
-		public async Task<List<RunnerSubmission>> TryGetSubmission(IEnumerable<Language> languages)
+		public async Task<List<RunnerSubmission>> TryGetSubmission(IEnumerable<string> supportedSandboxes)
 		{
-			var uri = GetUri("GetSubmissions", new[] { "language", string.Join(",", languages.Select(l => l.GetName())) });
+			var uri = GetUri("GetSubmissions", new[] { "sandboxes", string.Join(",", supportedSandboxes) });
 			try
 			{
 				log.Info($"Отправляю запрос на {uri}");

@@ -1,6 +1,6 @@
 import { combineReducers } from "redux";
 import courseReducer from "./course";
-import userReducer from "./user";
+import userProgressReducer from "./userProgress";
 import navigationReducer from "./navigation";
 
 const initialAccountState = {
@@ -68,7 +68,7 @@ function notifications(state = initialNotificationsState, action) {
 const rootReducer = combineReducers({
 	account,
 	courses: courseReducer,
-	user: userReducer,
+	userProgress: userProgressReducer,
 	notifications,
 	navigation: navigationReducer,
 });

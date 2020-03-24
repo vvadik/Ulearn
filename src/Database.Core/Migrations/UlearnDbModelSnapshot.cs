@@ -1518,6 +1518,9 @@ namespace Database.Migrations
 
                     b.Property<short>("Language");
 
+                    b.Property<string>("Sandbox")
+                        .HasMaxLength(40);
+
                     b.Property<Guid>("SlideId");
 
                     b.Property<string>("SolutionCodeHash")
@@ -1539,6 +1542,8 @@ namespace Database.Migrations
                     b.HasIndex("AutomaticCheckingIsRightAnswer");
 
                     b.HasIndex("Language");
+
+                    b.HasIndex("Sandbox");
 
                     b.HasIndex("SolutionCodeHash");
 

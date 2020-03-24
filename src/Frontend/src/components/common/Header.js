@@ -42,34 +42,56 @@ class Header extends Component {
 
 	static mapPropsToState(props) {
 		const { account, courses } = props;
-		const { currentCourseId } = courses;
-		const { roleByCourse, accessesByCourse, isSystemAdministrator } = account;
+		const { currentCourseId, courseById } = courses;
+		const { groupsAsStudent, roleByCourse, accessesByCourse, isSystemAdministrator } = account;
 
-		const controllableCourseIds =
-			isSystemAdministrator
-				? Object.keys(courses.courseById)
-				: Object.keys(roleByCourse)
-					.filter(courseId => roleByCourse[courseId] !== 'tester')
-					.map(s => s.toLowerCase());
+		let controllableCourseIds = [];
+		if (isSystemAdministrator) {
+			controllableCourseIds = Object.keys(courseById);
+		} else {
+			controllableCourseIds = Object.keys(roleByCourse)
+				.filter(courseId => roleByCourse[courseId] !== 'tester')
+				.map(s => s.toLowerCase());
+			if (groupsAsStudent) {
+				const groupsAsStudentIds = groupsAsStudent.map(g => g.courseId.toLowerCase());
+
+				controllableCourseIds = [
+					...new Set(controllableCourseIds.concat(groupsAsStudentIds)),
+				]
+				.filter((e) => courseById.hasOwnProperty(e))
+				.sort((a, b) => {
+					const first = courseById[a].title.toLowerCase();
+					const second = courseById[b].title.toLowerCase();
+					if (first > second)
+						return 1;
+					if (first < second)
+						return -1;
+					return 0;
+				});
+			}
+		}
+
+		let courseRole;
+		if (isSystemAdministrator) {
+			courseRole = 'courseAdmin';
+		} else {
+			courseRole = roleByCourse[currentCourseId];
+			if (courseRole === undefined) {
+				courseRole = "";
+			}
+		}
 
 		const isCourseMenuVisible = (
 			courses !== undefined &&
 			currentCourseId !== undefined &&
-			controllableCourseIds.indexOf(currentCourseId) !== -1
+			controllableCourseIds.indexOf(currentCourseId) !== -1 &&
+			courseRole !== "" &&
+			courseRole !== 'tester'
 		);
 
-		let courseRole = "";
 		const courseAccesses = isCourseMenuVisible
 			? accessesByCourse[currentCourseId] || []
 			: [];
-
-		if (isCourseMenuVisible) {
-			if (isSystemAdministrator) {
-				courseRole = 'courseAdmin';
-			} else {
-				courseRole = roleByCourse[currentCourseId];
-			}
-		}
 
 		return {
 			isSystemAdministrator,
@@ -158,14 +180,14 @@ class Header extends Component {
 
 		return (
 			<div className={ styles["visible-only-phone"] }>
-				{controllableCourseIds.length > 0 && <MobileCourseMenu
+				{ controllableCourseIds.length > 0 && <MobileCourseMenu
 					isSystemAdministrator={ isSystemAdministrator }
 					controllableCourseIds={ controllableCourseIds }
 					isCourseMenuVisible={ isCourseMenuVisible }
 					courseId={ isCourseMenuVisible ? currentCourseId : "" }
 					role={ courseRole }
 					accesses={ courseAccesses }
-				/>}
+				/> }
 			</div>
 		);
 	}
@@ -517,8 +539,7 @@ class Menu extends Component {
 		if (returnUrl.startsWith("/Login")
 			|| returnUrl.startsWith("/Account/Register")
 			|| returnUrl.startsWith("/Login/ExternalLoginConfirmation")
-			|| returnUrl.startsWith("/Login/ExternalLoginCallback"))
-		{
+			|| returnUrl.startsWith("/Login/ExternalLoginCallback")) {
 			returnUrl = getQueryStringParameter("returnUrl");
 		}
 

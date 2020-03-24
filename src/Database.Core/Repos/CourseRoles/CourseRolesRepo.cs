@@ -20,9 +20,12 @@ namespace Database.Repos.CourseRoles
 			this.usersRepo = usersRepo;
 		}
 
-		private async Task<List<CourseRole>> GetUserRoles(string userId)
+		private async Task<List<CourseRole>> GetUserRoles(string userId, string courseId = null)
 		{
-			var userCourseRoles = await db.CourseRoles.Where(x => x.UserId == userId).ToListAsync().ConfigureAwait(false);
+			var query = db.CourseRoles.Where(x => x.UserId == userId);
+			if (courseId != null)
+				query = query.Where(x => x.CourseId == courseId);
+			var userCourseRoles = await query.ToListAsync().ConfigureAwait(false);
 			return userCourseRoles
 				.GroupBy(x => x.Role + x.CourseId, StringComparer.OrdinalIgnoreCase)
 				.Select(gr => gr.OrderByDescending(x => x.Id))
@@ -36,6 +39,12 @@ namespace Database.Repos.CourseRoles
 			return (await GetUserRoles(userId))
 				.GroupBy(role => role.CourseId, StringComparer.OrdinalIgnoreCase)
 				.ToDictionary(g => g.Key, g => g.Select(role => role.Role).Min());
+		}
+		
+		public async Task<CourseRoleType> GetRoleAsync(string userId, string courseId)
+		{
+			var roles = (await GetUserRoles(userId, courseId)).Select(role => role.Role).ToList();
+			return roles.Any() ? roles.Min() : CourseRoleType.Student;
 		}
 
 		public async Task<bool> ToggleRoleAsync(string courseId, string userId, CourseRoleType roleType, string grantedById)
