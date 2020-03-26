@@ -75,12 +75,16 @@ namespace Database.Repos
 		
 		public async Task<Dictionary<string, Visit>> FindLastVisit(List<string> userIds)
 		{
-			return (await db.Visits
+			return await db.Visits
 				.Where(v => userIds.Contains(v.UserId))
-				.GroupBy(v => v.UserId)
-				.Select(g => g.OrderByDescending(v => v.Timestamp).FirstOrDefault())
-				.ToListAsync().ConfigureAwait(false))
-				.ToDictionary(v => v.UserId, v => v);
+				.Select(v => v.UserId)
+				.Distinct()
+				.Select(u => db.Visits
+					.Where(v => v.UserId == u)
+					.OrderByDescending(v => v.Timestamp)
+					.FirstOrDefault()
+				)
+				.ToDictionaryAsync(v => v.UserId, v => v);
 		}
 
 		public bool IsUserVisitedSlide(string courseId, Guid slideId, string userId)

@@ -78,6 +78,7 @@ namespace Database.Repos.Users
 				result = result.OrderBy(u => u.Id).Take(maxUsersCountToFetch);
 
 			return result
+				.AsEnumerable()
 				.OrderByDescending(u => usersFields[u.Id].Count)
 				.ThenBy(u => u.LastName)
 				.ThenBy(u => u.FirstName)

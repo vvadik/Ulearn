@@ -60,8 +60,11 @@ namespace Database.Repos
 
 		public DateTime? GetNextUnitPublishTime(string courseId)
 		{
-			return db.UnitAppearances.Where(u => u.CourseId == courseId && u.PublishTime > DateTime.Now)
-				.Select(u => (DateTime?)u.PublishTime).OrderBy(t => t).FirstOrDefault();
+			return db.UnitAppearances
+				.Where(u => u.CourseId == courseId && u.PublishTime > DateTime.Now)
+				.Select(u => (DateTime?)u.PublishTime)
+				.OrderBy(t => t)
+				.FirstOrDefault();
 		}
 	}
 }
