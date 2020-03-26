@@ -18,6 +18,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -122,17 +123,20 @@ namespace Ulearn.Web.Api
 				//.AddXmlSerializerFormatters() // Can't serialize dictionaries and classes without default constructor
 				//.AddXmlDataContractSerializerFormatters()
 				.AddNewtonsoftJson(opt =>
-					opt.SerializerSettings.ContractResolver = new ApiHeaderJsonContractResolver(new ApiHeaderJsonNamingStrategyOptions
 					{
-						DefaultStrategy = new CamelCaseNamingStrategy(),
-						HeaderName = "Json-Naming-Strategy",
-						HttpContextAccessorProvider = services.BuildServiceProvider().GetService<IHttpContextAccessor>,
-						NamingStrategies = new Dictionary<string, NamingStrategy>
+						opt.SerializerSettings.ContractResolver = new ApiHeaderJsonContractResolver(new ApiHeaderJsonNamingStrategyOptions
 						{
-							{ "camelcase", new CamelCaseNamingStrategy() },
-							{ "snakecase", new SnakeCaseNamingStrategy() }
-						}
-					}, services.BuildServiceProvider().GetService<IMemoryCache>)
+							DefaultStrategy = new CamelCaseNamingStrategy(),
+							HeaderName = "Json-Naming-Strategy",
+							HttpContextAccessorProvider = services.BuildServiceProvider().GetService<IHttpContextAccessor>,
+							NamingStrategies = new Dictionary<string, NamingStrategy>
+							{
+								{ "camelcase", new CamelCaseNamingStrategy() },
+								{ "snakecase", new SnakeCaseNamingStrategy() }
+							}
+						}, services.BuildServiceProvider().GetService<IMemoryCache>);
+						opt.SerializerSettings.Converters.Add(new StringEnumConverter());
+					}
 				);
 		}
 

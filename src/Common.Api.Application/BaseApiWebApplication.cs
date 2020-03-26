@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Converters;
 using Serilog;
 using Serilog.Events;
 using Swashbuckle.AspNetCore.Filters;
@@ -110,7 +111,7 @@ namespace Ulearn.Common.Api
 			/* Asp.NET Core MVC */
 			services
 				.AddMvc(options => options.EnableEndpointRouting = false)
-				.AddNewtonsoftJson()
+				.AddNewtonsoftJson(opt => opt.SerializerSettings.Converters.Add(new StringEnumConverter()))
 				.AddApplicationPart(GetType().Assembly)
 				.AddControllersAsServices();
 		}
@@ -172,7 +173,7 @@ namespace Ulearn.Common.Api
 					c.IncludeXmlComments(xmlPath);
 
 				ConfigureSwaggerDocumentationGeneration(c);
-			});
+			}).AddSwaggerGenNewtonsoftSupport();
 		}
 
 		protected virtual void ConfigureSwaggerDocumentationGeneration(SwaggerGenOptions c)

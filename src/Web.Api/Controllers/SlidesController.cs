@@ -38,7 +38,7 @@ namespace Ulearn.Web.Api.Controllers
 		/// Информация о слайде, достаточная для отображения списка слайдов
 		/// </summary>
 		[HttpGet("{courseId}/{slideId}")]
-		public async Task<ActionResult<ShortSlideInfo>> SlideInfo(Course course, Guid slideId)
+		public async Task<ActionResult<ShortSlideInfo>> SlideInfo([FromQuery]Course course, [FromQuery]Guid slideId)
 		{
 			var slide = course?.FindSlideById(slideId);
 			if (slide == null)
