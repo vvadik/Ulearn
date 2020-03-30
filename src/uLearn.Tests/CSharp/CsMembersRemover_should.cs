@@ -13,6 +13,12 @@ namespace uLearn.CSharp
 	{
 		private readonly DirectoryInfo dir = new DirectoryInfo(TestsHelper.TestDirectory).GetSubdirectory("tests");
 
+		[OneTimeSetUp]
+		public void SetUp()
+		{
+			Approvals.RegisterDefaultNamerCreation(() => new RelativeUnitTestFrameworkNamer());
+		}
+
 		private string LoadCode(string file = "OverloadedMethods.cs")
 		{
 			return dir.GetContent(file).LineEndingsToUnixStyle();

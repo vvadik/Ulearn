@@ -10,6 +10,12 @@ namespace uLearn.CourseTool
 	[TestFixture]
 	public class Config_Test
 	{
+		[OneTimeSetUp]
+		public void SetUp()
+		{
+			Approvals.RegisterDefaultNamerCreation(() => new RelativeUnitTestFrameworkNamer());
+		}
+
 		[Test]
 		[UseReporter(typeof(DiffReporter))]
 		public void ConfigTemplate_IsOk()
