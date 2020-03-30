@@ -87,9 +87,9 @@ namespace Database.Repos
 			}
 		}
 
-		public Task<NotificationTransport> FindNotificationTransportAsync(int transportId)
+		public async Task<NotificationTransport> FindNotificationTransportAsync(int transportId)
 		{
-			return db.NotificationTransports.FindAsync(transportId);
+			return await db.NotificationTransports.FindAsync(transportId);
 		}
 
 		public async Task EnableNotificationTransport(int transportId, bool isEnabled = true)

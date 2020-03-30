@@ -4,11 +4,15 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using Community.AspNetCore.ExceptionHandling;
+using Community.AspNetCore.ExceptionHandling.Logs;
 using Community.AspNetCore.ExceptionHandling.Mvc;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Converters;
 using Serilog;
 using Serilog.Events;
 using Swashbuckle.AspNetCore.Filters;
@@ -53,7 +57,7 @@ namespace Ulearn.Common.Api
 				.UseSerilog(logger)
 				.Configure(app =>
 				{
-					var env = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();
+					var env = app.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
 					app.UseVostok();
 					if (env.IsDevelopment())
 						app.UseDeveloperExceptionPage();
@@ -106,7 +110,8 @@ namespace Ulearn.Common.Api
 		{
 			/* Asp.NET Core MVC */
 			services
-				.AddMvc()
+				.AddMvc(options => options.EnableEndpointRouting = false)
+				.AddNewtonsoftJson(opt => opt.SerializerSettings.Converters.Add(new StringEnumConverter()))
 				.AddApplicationPart(GetType().Assembly)
 				.AddControllersAsServices();
 		}
@@ -116,12 +121,12 @@ namespace Ulearn.Common.Api
 			/* Swagger API documentation generator. See https://github.com/domaindrivendev/Swashbuckle.AspNetCore for details */
 			services.AddSwaggerGen(c =>
 			{
-				c.SwaggerDoc("v1", new Info
+				c.SwaggerDoc("v1", new OpenApiInfo 
 				{
 					Title = "Ulearn API",
 					Version = "v1",
 					Description = "An API for ulearn.me",
-					Contact = new Contact
+					Contact = new OpenApiContact
 					{
 						Name = "Ulearn support",
 						Email = "support@ulearn.me"
@@ -136,16 +141,29 @@ namespace Ulearn.Common.Api
 
 				c.OperationFilter<AppendAuthorizeToSummaryOperationFilter>();
 
-				c.AddSecurityDefinition("Bearer", new ApiKeyScheme
+				c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
 				{
-					In = "header",
+					In = ParameterLocation.Header,
 					Description = "Please insert JWT with Bearer into field. Example: \"Bearer {token}\"",
 					Name = "Authorization",
-					Type = "apiKey"
+					Type = SecuritySchemeType.ApiKey
 				});
-				c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
+				c.AddSecurityRequirement(new OpenApiSecurityRequirement
 				{
-					{ "Bearer", new string[] { } }
+					{
+						new OpenApiSecurityScheme
+						{
+							Reference = new OpenApiReference
+							{
+								Type = ReferenceType.SecurityScheme,
+								Id = "Bearer"
+							},
+							Scheme = "oauth2",
+							Name = "Bearer",
+							In = ParameterLocation.Header,
+						},
+						new List<string>()
+					}
 				});
 
 				/* See https://docs.microsoft.com/ru-ru/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-2.1&tabs=visual-studio%2Cvisual-studio-xml for details */
@@ -155,7 +173,7 @@ namespace Ulearn.Common.Api
 					c.IncludeXmlComments(xmlPath);
 
 				ConfigureSwaggerDocumentationGeneration(c);
-			});
+			}).AddSwaggerGenNewtonsoftSupport();
 		}
 
 		protected virtual void ConfigureSwaggerDocumentationGeneration(SwaggerGenOptions c)
@@ -171,10 +189,9 @@ namespace Ulearn.Common.Api
 					.Response(exception => exception.Code)
 					.WithObjectResult((r, exception) => new ErrorResponse(exception.Message))
 					.Handled();
-
 				/* Ensure that all exception types are handled by adding handler for generic exception at the end. */
 				options.For<Exception>()
-					.Log(lo => { lo.Level = (context, exception) => LogLevel.Error; })
+					.Log(lo => { lo.LogAction = (l, context, exception) => l.LogError(exception, "UnhandledException"); })
 					.Response(exception => (int)HttpStatusCode.InternalServerError, ResponseAlreadyStartedBehaviour.GoToNextHandler)
 					.ClearCacheHeaders()
 					.WithObjectResult((r, exception) => new ErrorResponse("Internal error occured"

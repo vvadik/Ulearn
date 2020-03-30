@@ -61,7 +61,7 @@ namespace Database.Repos.Groups
 			var groupLabels = await db.LabelsOnGroups
 				.Where(l => groupsIdsSet.Contains(l.GroupId))
 				.GroupBy(l => l.GroupId)
-				.ToDictionaryAsync(g => g.Key, g => g.Select(l => l.LabelId).ToList())
+				.ToDictionaryAsync(g => g.Key, g => g.Select(l => l.LabelId).ToList()) // TODO: Select in ToDictionary not supported by EntityFrameworkCore
 				.ConfigureAwait(false);
 			
 			return groupLabels.ToDefaultDictionary();

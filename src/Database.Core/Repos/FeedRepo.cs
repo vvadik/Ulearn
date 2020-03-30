@@ -134,13 +134,14 @@ namespace Database.Repos
 					.Where(d => userCourses.Contains(d.Notification.CourseId))
 					.Where(d => d.Notification.InitiatedById != userId)
 					/* TODO (andgein): bad code. we need to make these navigation properties loading via Notification' interface */
-					.Include(d => (d.Notification as AbstractCommentNotification).Comment)
-					.Include(d => (d.Notification as CourseExportedToStepikNotification).Process)
-					.Include(d => (d.Notification as ReceivedCommentToCodeReviewNotification).Comment)
-					.Include(d => (d.Notification as PassedManualExerciseCheckingNotification).Checking)
-					.Include(d => (d.Notification as UploadedPackageNotification).CourseVersion)
-					.Include(d => (d.Notification as PublishedPackageNotification).CourseVersion)
-					.Include(d => (d.Notification as CreatedGroupNotification).Group)
+					// TODO (vorkulsky): Not work in EF core 3: "Eager loading of related entities now happens in a single query"
+					//.Include(d => (d.Notification as AbstractCommentNotification).Comment)
+					//.Include(d => (d.Notification as CourseExportedToStepikNotification).Process)
+					//.Include(d => (d.Notification as ReceivedCommentToCodeReviewNotification).Comment)
+					//.Include(d => (d.Notification as PassedManualExerciseCheckingNotification).Checking)
+					//.Include(d => (d.Notification as UploadedPackageNotification).CourseVersion)
+					//.Include(d => (d.Notification as PublishedPackageNotification).CourseVersion)
+					//.Include(d => (d.Notification as CreatedGroupNotification).Group)
 				;
 		}
 	}

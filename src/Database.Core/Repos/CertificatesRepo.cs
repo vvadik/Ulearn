@@ -99,6 +99,7 @@ namespace Database.Repos
 			return certificates
 				.Include(c => c.User)
 				.Include(c => c.Instructor)
+				.AsEnumerable()
 				.GroupBy(c => c.TemplateId)
 				.ToDictionary(g => g.Key, g => g.OrderBy(c => c.Timestamp).ToList());
 		}

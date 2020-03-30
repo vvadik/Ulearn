@@ -18,7 +18,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -105,9 +105,11 @@ namespace Ulearn.Web.Api
 
 		public override void ConfigureMvc(IServiceCollection services)
 		{
-			/* Asp.NET Core MVC */
+			/* Asp.NET Core MVC https://www.strathweb.com/2020/02/asp-net-core-mvc-3-x-addmvc-addmvccore-addcontrollers-and-other-bootstrapping-approaches/ */
 			services.AddMvc(options =>
 					{
+						options.EnableEndpointRouting = false;
+
 						/* Add binder for passing Course object to actions */
 						options.ModelBinderProviders.Insert(0, new CourseBinderProvider());
 
@@ -118,19 +120,23 @@ namespace Ulearn.Web.Api
 					}
 				).AddApplicationPart(GetType().Assembly)
 				.AddControllersAsServices()
-				.AddXmlSerializerFormatters()
-				.AddJsonOptions(opt =>
-					opt.SerializerSettings.ContractResolver = new ApiHeaderJsonContractResolver(new ApiHeaderJsonNamingStrategyOptions
+				//.AddXmlSerializerFormatters() // Can't serialize dictionaries and classes without default constructor
+				//.AddXmlDataContractSerializerFormatters()
+				.AddNewtonsoftJson(opt =>
 					{
-						DefaultStrategy = new CamelCaseNamingStrategy(),
-						HeaderName = "Json-Naming-Strategy",
-						HttpContextAccessorProvider = services.BuildServiceProvider().GetService<IHttpContextAccessor>,
-						NamingStrategies = new Dictionary<string, NamingStrategy>
+						opt.SerializerSettings.ContractResolver = new ApiHeaderJsonContractResolver(new ApiHeaderJsonNamingStrategyOptions
 						{
-							{ "camelcase", new CamelCaseNamingStrategy() },
-							{ "snakecase", new SnakeCaseNamingStrategy() }
-						}
-					}, services.BuildServiceProvider().GetService<IMemoryCache>)
+							DefaultStrategy = new CamelCaseNamingStrategy(),
+							HeaderName = "Json-Naming-Strategy",
+							HttpContextAccessorProvider = services.BuildServiceProvider().GetService<IHttpContextAccessor>,
+							NamingStrategies = new Dictionary<string, NamingStrategy>
+							{
+								{ "camelcase", new CamelCaseNamingStrategy() },
+								{ "snakecase", new SnakeCaseNamingStrategy() }
+							}
+						}, services.BuildServiceProvider().GetService<IMemoryCache>);
+						opt.SerializerSettings.Converters.Add(new StringEnumConverter());
+					}
 				);
 		}
 
@@ -161,7 +167,7 @@ namespace Ulearn.Web.Api
 			services.ConfigureApplicationCookie(options =>
 			{
 				options.Cookie.Name = configuration.Web.CookieName;
-				options.Cookie.Expiration = TimeSpan.FromDays(14);
+				options.ExpireTimeSpan = TimeSpan.FromDays(14);
 				options.Cookie.Domain = configuration.Web.CookieDomain;
 				options.LoginPath = "/users/login";
 				options.LogoutPath = "/users/logout";

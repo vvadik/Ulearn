@@ -37,7 +37,7 @@ namespace Ulearn.Web.Api.Controllers.User
 		/// </summary>
 		[HttpGet("{courseId}")]
 		[Authorize]
-		public async Task<ActionResult<UserProgressResponse>> UserProgress(Course course)
+		public async Task<ActionResult<UserProgressResponse>> UserProgress([FromRoute]Course course)
 		{
 			var scores = visitsRepo.GetScoresForSlides(course.Id, UserId);
 			var attempts = await userQuizzesRepo.GetUsedAttemptsCountAsync(course.Id, UserId).ConfigureAwait(false);

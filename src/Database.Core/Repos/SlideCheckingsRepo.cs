@@ -307,6 +307,7 @@ namespace Database.Repos
 		{
 			return db.ExerciseCodeReviews
 				.Where(r => r.ExerciseCheckingId.HasValue && checkingsIds.Contains(r.ExerciseCheckingId.Value) && !r.IsDeleted)
+				.AsEnumerable()
 				.GroupBy(r => r.ExerciseCheckingId)
 				.ToDictionary(g => g.Key.Value, g => g.ToList());
 		}
@@ -347,10 +348,13 @@ namespace Database.Repos
 		
 		public async Task<Dictionary<string, List<Guid>>> GetSlideIdsWaitingForManualExerciseCheckAsync(string courseId, IEnumerable<string> userIds)
 		{
-			return await db.ManualExerciseCheckings
+			return (await db.ManualExerciseCheckings
 				.Where(c => c.CourseId == courseId && userIds.Contains(c.UserId) && !c.IsChecked)
+				.Select(c => new {c.UserId, c.SlideId})
+				.Distinct()
+				.ToListAsync())
 				.GroupBy(c => c.UserId)
-				.ToDictionaryAsync(g => g.Key, g => g.Select(c => c.SlideId).Distinct().ToList());
+				.ToDictionary(g => g.Key, g => g.Select(c => c.SlideId).ToList());
 		}
 
 		public Task HideFromTopCodeReviewComments(string courseId, Guid slideId, string userId, string comment)
