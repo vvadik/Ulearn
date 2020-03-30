@@ -5,7 +5,6 @@ using System.Linq;
 using ApprovalTests;
 using ApprovalTests.Namers;
 using ApprovalTests.Reporters;
-using ApprovalUtilities.Utilities;
 using FluentAssertions;
 using NUnit.Framework;
 using uLearn.CSharp.Validators.SpellingValidator;

@@ -14,7 +14,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ApprovalUtilities" Version="3.0.13" />
+    <PackageReference Include="ApprovalUtilities" Version="4.5.2" />
     <PackageReference Include="DotNetZip" Version="1.13.4" />
     <PackageReference Include="EntityFramework" Version="6.3.0" />
     <PackageReference Include="EntityFramework.Functions" Version="1.4.1" />
