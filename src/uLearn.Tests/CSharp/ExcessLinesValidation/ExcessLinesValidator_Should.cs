@@ -18,6 +18,12 @@ namespace uLearn.CSharp.ExcessLinesValidation
 	{
 		private static readonly DirectoryInfo TestDataDir = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..",
 			"..", "CSharp", "ExcessLinesValidation", "TestData"));
+		
+		[OneTimeSetUp]
+		public void SetUp()
+		{
+			Approvals.RegisterDefaultNamerCreation(() => new RelativeUnitTestFrameworkNamer());
+		}
 
 		private static DirectoryInfo IncorrectTestDataDir => TestDataDir.GetDirectories("Incorrect").Single();
 		private static DirectoryInfo CorrectTestDataDir => TestDataDir.GetDirectories("Correct").Single();

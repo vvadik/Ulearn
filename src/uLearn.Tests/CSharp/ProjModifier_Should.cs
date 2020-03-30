@@ -13,6 +13,12 @@ namespace uLearn.CSharp
 		private Project CreateTestProject() => new Project(TestProjectFilename, null, null, new ProjectCollection());
 		private string TestProjectFilename => Path.Combine(TestsHelper.TestDirectory, "CSharp", "TestProject", "ProjDir", "test.csproj");
 
+		[OneTimeSetUp]
+		public void SetUp()
+		{
+			Approvals.RegisterDefaultNamerCreation(() => new RelativeUnitTestFrameworkNamer());
+		}
+
 		[Test]
 		public void NotChangeFile_OnModify()
 		{
