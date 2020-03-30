@@ -91,12 +91,12 @@ namespace uLearn.CSharp.SpellingValidation
 
 			if (errors.Any())
 			{
+				var joinedErrors = string.Join(Environment.NewLine, errors.Select(err => err.GetMessageWithPositions()));
 				File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..",
 						"..", "CSharp", "ExampleFiles", "errors", "spelling_validation", $"{file.Name}_errors.txt"),
 					$@"{fileContent}
 
-{errors.JoinStringsWith(err => $"{err.GetMessageWithPositions()}", Environment.NewLine)}");
-
+{joinedErrors}");
 				Assert.Fail();
 			}
 		}
@@ -110,12 +110,12 @@ namespace uLearn.CSharp.SpellingValidation
 			var errors = validator.FindErrors(fileContent);
 			if (errors.Any())
 			{
+				var joinedErrors = string.Join(Environment.NewLine, errors.Select(err => err.GetMessageWithPositions()));
 				File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..",
 						"..", "CSharp", "ExampleFiles", "submissions_errors", "spelling_validation", $"{file.Name}_errors.txt"),
 					$@"{fileContent}
 
-{errors.JoinStringsWith(err => $"{err.GetMessageWithPositions()}", Environment.NewLine)}");
-
+{joinedErrors}");
 				Assert.Fail();
 			}
 		}
