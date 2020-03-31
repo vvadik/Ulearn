@@ -39,6 +39,8 @@
 
 .legacy-page .courses-versions .courses-versions__version a {
 	padding: 7px 5px;
+	color: inherit;
+	text-decoration: none;
 }
 
 .legacy-page .courses-versions .courses-versions__version form {
