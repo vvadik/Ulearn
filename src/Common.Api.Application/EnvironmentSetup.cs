@@ -41,7 +41,7 @@ namespace Ulearn.Common.Api
 					.SetApplication(application)
 					.SetEnvironment("default")
 					.SetInstance(Environment.MachineName))
-				.SetupConfiguration(configurationBuilder => configurationBuilder.AddSource(configurationSource))
+				.SetupConfiguration(configurationBuilder => configurationBuilder.AddSecretSource(configurationSource))
 				.DisableClusterConfig()
 				.DisableServiceBeacon()
 				.DisableHercules()

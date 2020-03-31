@@ -10,7 +10,7 @@ namespace Ulearn.Core.Configuration
 	{
 		private static readonly Lazy<IConfigurationRoot> configuration = new Lazy<IConfigurationRoot>(GetConfiguration);
 
-		public static T Read<T>() where T : AbstractConfiguration
+		public static T Read<T>() where T : UlearnConfigurationBase
 		{
 			var r = configuration.Value.Get<T>();
 			return r;
@@ -44,9 +44,10 @@ namespace Ulearn.Core.Configuration
 		}
 	}
 
-	public abstract class AbstractConfiguration
+	public class UlearnConfigurationBase
 	{
-		public void SetFrom(AbstractConfiguration other)
+		// Достаточно поверхностного копирования. Потому что важно только сохранить ссылку на объект конфигурации целиком
+		public void SetFrom(UlearnConfigurationBase other)
 		{
 			var thisProperties = GetType().GetProperties();
 			var otherProperties = other.GetType().GetProperties();
@@ -78,7 +79,7 @@ namespace Ulearn.Core.Configuration
 		public bool EnableEntityFrameworkLogging { get; set; }
 	}
 
-	public class UlearnConfiguration : AbstractConfiguration
+	public class UlearnConfiguration : UlearnConfigurationBase
 	{
 		public TelegramConfiguration Telegram { get; set; }
 

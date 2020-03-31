@@ -31,14 +31,15 @@ namespace AntiPlagiarism.Web
 		protected override void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment, ILogger logger)
 		{
 			base.ConfigureServices(services, hostingEnvironment, logger);
-			
-			var configuration = hostingEnvironment.ConfigurationProvider.Get<UlearnConfiguration>(hostingEnvironment.ConfigurationSource);
+
+			var configuration = hostingEnvironment.SecretConfigurationProvider.Get<UlearnConfiguration>(hostingEnvironment.SecretConfigurationSource);
 
 			services.AddDbContext<AntiPlagiarismDb>(
 				options => options.UseSqlServer(configuration.Database)
 			);
 
-			services.Configure<AntiPlagiarismConfiguration>(options => options.SetFrom(hostingEnvironment.ConfigurationProvider.Get<AbstractConfiguration>(hostingEnvironment.ConfigurationSource)));
+			services.Configure<AntiPlagiarismConfiguration>(options =>
+				options.SetFrom(hostingEnvironment.SecretConfigurationProvider.Get<AntiPlagiarismConfiguration>(hostingEnvironment.SecretConfigurationSource)));
 
 			services.AddSwaggerExamplesFromAssemblyOf<WebApplication>();
 		}

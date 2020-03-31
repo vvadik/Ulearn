@@ -25,7 +25,7 @@ namespace Ulearn.VideoAnnotations.Web
 		{
 			base.ConfigureServices(services, hostingEnvironment, logger);
 
-			services.Configure<VideoAnnotationsConfiguration>(options => options.SetFrom(hostingEnvironment.ConfigurationProvider.Get<VideoAnnotationsConfiguration>(hostingEnvironment.ConfigurationSource)));
+			services.Configure<VideoAnnotationsConfiguration>(options => options.SetFrom(hostingEnvironment.SecretConfigurationProvider.Get<VideoAnnotationsConfiguration>(hostingEnvironment.SecretConfigurationSource)));
 
 			services.AddSwaggerExamplesFromAssemblyOf<WebApplication>();
 		}

@@ -43,7 +43,7 @@ namespace Ulearn.Common.Api
 				//.Enrich.With<ThreadEnricher>() //TODO
 				//.Enrich.With<FlowContextEnricher>() //TODO
 				.MinimumLevel.Debug()
-				.WriteTo.Sink(new VostokSink(hostingEnvironment.Log), LogEventLevel.Information); //TODO
+				.WriteTo.Sink(new VostokSink(hostingEnvironment.Log), LogEventLevel.Debug); //TODO
 			var logger = loggerConfiguration.CreateLogger(); // TODO
 
 			builder.SetupWebHost(webHostBuilder => webHostBuilder

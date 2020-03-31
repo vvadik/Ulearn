@@ -40,8 +40,8 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 		public async Task<double> GetWeightAsync(Submission firstSubmission, Submission secondSubmission)
 		{
 			logger.Information($"Вычисляю коэффициент похожести решения #{firstSubmission.Id} и #{secondSubmission.Id}");
-			var maxSnippetsCount = configuration.PlagiarismDetector.CountOfColdestSnippetsUsedToSecondSearch;
-			var authorsCountThreshold = configuration.PlagiarismDetector.SnippetAuthorsCountThreshold;
+			var maxSnippetsCount = configuration.AntiPlagiarism.PlagiarismDetector.CountOfColdestSnippetsUsedToSecondSearch;
+			var authorsCountThreshold = configuration.AntiPlagiarism.PlagiarismDetector.SnippetAuthorsCountThreshold;
 			var snippetsOccurrencesOfFirstSubmission = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(firstSubmission, maxSnippetsCount, 0, authorsCountThreshold).ConfigureAwait(false);
 			logger.Debug($"Сниппеты первого решения: [{string.Join(", ", snippetsOccurrencesOfFirstSubmission)}]");
 			var snippetsOccurrencesOfSecondSubmission = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(secondSubmission, maxSnippetsCount, 0, authorsCountThreshold).ConfigureAwait(false);
@@ -111,10 +111,10 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			var tokensMatchedInThisSubmission = new DefaultDictionary<Tuple<int, SnippetType>, HashSet<int>>();
 			var tokensMatchedInOtherSubmissions = new DefaultDictionary<Tuple<int, SnippetType>, HashSet<int>>();
 
-			var maxSnippetsCountFirstSearch = configuration.PlagiarismDetector.CountOfColdestSnippetsUsedToFirstSearch;
-			var maxSnippetsCountSecondSearch = configuration.PlagiarismDetector.CountOfColdestSnippetsUsedToSecondSearch;
-			var maxSubmissionsAfterFirstSearch = configuration.PlagiarismDetector.MaxSubmissionsAfterFirstSearch;
-			var authorsCountThreshold = configuration.PlagiarismDetector.SnippetAuthorsCountThreshold;
+			var maxSnippetsCountFirstSearch = configuration.AntiPlagiarism.PlagiarismDetector.CountOfColdestSnippetsUsedToFirstSearch;
+			var maxSnippetsCountSecondSearch = configuration.AntiPlagiarism.PlagiarismDetector.CountOfColdestSnippetsUsedToSecondSearch;
+			var maxSubmissionsAfterFirstSearch = configuration.AntiPlagiarism.PlagiarismDetector.MaxSubmissionsAfterFirstSearch;
+			var authorsCountThreshold = configuration.AntiPlagiarism.PlagiarismDetector.SnippetAuthorsCountThreshold;
 
 			/* We make two queries for finding suspicion submissions: first query is more limited by snippets count (`maxSnippetsCountFirstSearch` from configuration).
 			   For the first query we are looking for all submissions which are similar to our submission and filter only top-`maxSubmissionsAfterFirstSearch` by matched snippets count */

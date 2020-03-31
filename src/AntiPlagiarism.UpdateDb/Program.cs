@@ -59,7 +59,7 @@ namespace AntiPlagiarism.UpdateDb
 			services.AddOptions();
 
 			services.Configure<AntiPlagiarismUpdateDbConfiguration>(ApplicationConfiguration.GetConfiguration());
-			services.Configure<AntiPlagiarismConfiguration>(ApplicationConfiguration.GetConfiguration().GetSection("antiplagiarism"));
+			services.Configure<AntiPlagiarismConfiguration>(ApplicationConfiguration.GetConfiguration());
 
 			var logger = GetLogger(configuration);
 			services.AddSingleton(logger);

@@ -82,7 +82,7 @@ namespace Ulearn.Web.Api
 
 		protected override void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment, ILogger logger)
 		{
-			var configuration = hostingEnvironment.ConfigurationProvider.Get<WebApiConfiguration>(hostingEnvironment.ConfigurationSource);
+			var configuration = hostingEnvironment.SecretConfigurationProvider.Get<WebApiConfiguration>(hostingEnvironment.SecretConfigurationSource);
 			
 			base.ConfigureServices(services, hostingEnvironment, logger);
 
@@ -93,7 +93,8 @@ namespace Ulearn.Web.Api
 					.UseSqlServer(configuration.Database)
 			);
 
-			services.Configure<WebApiConfiguration>(options => options.SetFrom(hostingEnvironment.ConfigurationProvider.Get<WebApiConfiguration>(hostingEnvironment.ConfigurationSource)));
+			services.Configure<WebApiConfiguration>(options =>
+				options.SetFrom(hostingEnvironment.SecretConfigurationProvider.Get<WebApiConfiguration>(hostingEnvironment.SecretConfigurationSource)));
 
 			/* Add CORS */
 			services.AddCors();
