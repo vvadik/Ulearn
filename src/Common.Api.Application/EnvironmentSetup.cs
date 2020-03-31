@@ -1,8 +1,6 @@
 using System;
 using System.IO;
-using Serilog;
 using Serilog.Events;
-using Ulearn.Common.Api.Helpers;
 using Ulearn.Core.Configuration;
 using Vostok.Configuration;
 using Vostok.Configuration.Abstractions;
@@ -10,8 +8,11 @@ using Vostok.Configuration.Sources;
 using Vostok.Configuration.Sources.CommandLine;
 using Vostok.Configuration.Sources.Json;
 using Vostok.Hosting.Setup;
-using Vostok.Logging.Serilog;
-using Web.Api.Configuration;
+using Vostok.Logging.Abstractions;
+using Vostok.Logging.Abstractions.Values;
+using Vostok.Logging.File.Configuration;
+using Vostok.Logging.Formatting;
+using LogEvent = Vostok.Logging.Abstractions.LogEvent;
 
 namespace Ulearn.Common.Api
 {
@@ -52,53 +53,92 @@ namespace Ulearn.Common.Api
 				.SetBaseUrlPath(ulearnConfiguration.BaseUrl)
 				.SetupLog((logBuilder, context) =>
 				{
-					var loggerConfiguration = GetSerilogLoggerConfiguration(ulearnConfiguration);
-					var hostLog = new SerilogLog(loggerConfiguration.CreateLogger());
-					logBuilder.AddLog(hostLog);
+					logBuilder.SetupConsoleLog(consoleLogBuilder => consoleLogBuilder
+						.CustomizeLog(lb => lb.WithMinimumLevel(LogLevel.Info))
+						.CustomizeSettings(settings =>
+						{
+							settings.OutputTemplate = OutputTemplate.Parse("{Timestamp:HH:mm:ss.fff} {Level}{operationContext:w}{Message}{NewLine}{Exception}");
+						}));
+					
+					var pathFormat = ulearnConfiguration.HostLog.PathFormat;
+					if (!string.IsNullOrEmpty(pathFormat))
+					{
+						var minimumLevelString = ulearnConfiguration.HostLog.MinimumLevel ?? "debug";
+						var dbMinimumLevelString = ulearnConfiguration.HostLog.DbMinimumLevel ?? "";
+						if (!TryParseLogLevel(minimumLevelString, out var minimumLevel))
+							minimumLevel = LogLevel.Debug;
+						if (!TryParseLogLevel(dbMinimumLevelString, out var dbMinimumLevel))
+							dbMinimumLevel = minimumLevel;
+						pathFormat = pathFormat.Replace("{Date}", "{RollingSuffix}"); // Для совместимости с настройками appsettings.json, написанными для серилога
+						if (Path.IsPathRooted(pathFormat))
+						{
+							var directory = Path.GetDirectoryName(pathFormat);
+							var fileName = Path.GetFileName(pathFormat);
+							pathFormat = Path.Combine(directory, ulearnConfiguration.GraphiteServiceName, fileName);
+						}
+
+						logBuilder.SetupFileLog(fileLogBuilder => fileLogBuilder
+							.CustomizeLog(lb =>
+							{
+								var customized = lb.WithMinimumLevel(minimumLevel);
+								if (dbMinimumLevel != minimumLevel)
+									customized = customized.SelectEvents(le => le.Level >= dbMinimumLevel || !IsDbSource(le));
+								return customized;
+							})
+							.SetSettingsProvider(() => new FileLogSettings
+							{
+								FilePath = pathFormat,
+								RollingStrategy = new RollingStrategyOptions
+								{
+									MaxFiles = 0,
+									Type = RollingStrategyType.Hybrid,
+									Period = RollingPeriod.Day,
+									MaxSize = 4 * 1073741824L
+								},
+								OutputTemplate = OutputTemplate.Parse("{Timestamp:HH:mm:ss.fff} {Level}{operationContext:w}{Message}{NewLine}{Exception}")
+							}));
+					}
 				});
 		}
-
-		private static LoggerConfiguration GetSerilogLoggerConfiguration(UlearnConfiguration ulearnConfiguration)
+		
+		private static bool IsDbSource(LogEvent le)
 		{
-			var loggerConfiguration = new LoggerConfiguration().MinimumLevel.Information();
-			if (ulearnConfiguration.HostLog.Console)
+			//if (le.Properties.TryGetValue("SourceContext", out var sourceContextValue)
+			//	&& (sourceContextValue as ScalarValue)?.Value is string sourceContext)
+			//	return sourceContext.StartsWith("\"Microsoft.EntityFrameworkCore.Database.Command")
+			//			|| sourceContext.StartsWith("\"Microsoft.EntityFrameworkCore.Infrastructure");
+			return true;
+		}
+
+		// Для совместимости с настройками appsettings.json, написанными для серилога
+		private static bool TryParseLogLevel(string str, out LogLevel level)
+		{
+			if (Enum.TryParse(str, true, out level) && Enum.IsDefined(typeof(LogLevel), level))
+				return true;
+			str = str.ToLowerInvariant();
+			switch (str)
 			{
-				loggerConfiguration = loggerConfiguration
-					.WriteTo.Console(outputTemplate: "{Timestamp:HH:mm:ss.fff} {Level:u3} [{Thread}] {Message:l}{NewLine}{Exception}", restrictedToMinimumLevel: LogEventLevel.Information);
+				case "verbose":
+					level = LogLevel.Debug;
+					return true;
+				case "debug":
+					level = LogLevel.Debug;
+					return true;
+				case "information":
+					level = LogLevel.Info;
+					return true;
+				case "warning":
+					level = LogLevel.Warn;
+					return true;
+				case "error":
+					level = LogLevel.Error;
+					return true;
+				case "fatal":
+					level = LogLevel.Fatal;
+					return true;
+				default:
+					return false;
 			}
-
-			var pathFormat = ulearnConfiguration.HostLog.PathFormat;
-			if (!string.IsNullOrEmpty(pathFormat))
-			{
-				var minimumLevelString = ulearnConfiguration.HostLog.MinimumLevel ?? "debug";
-				var dbMinimumLevelString = ulearnConfiguration.HostLog.DbMinimumLevel ?? "";
-				if (!Enum.TryParse(minimumLevelString, true, out LogEventLevel minimumLevel) || !Enum.IsDefined(typeof(LogEventLevel), minimumLevel))
-					minimumLevel = LogEventLevel.Debug;
-				if (!Enum.TryParse(dbMinimumLevelString, true, out LogEventLevel dbMinimumLevel) || !Enum.IsDefined(typeof(LogEventLevel), dbMinimumLevel))
-					dbMinimumLevel = minimumLevel;
-				if (Path.IsPathRooted(pathFormat))
-				{
-					var directory = Path.GetDirectoryName(pathFormat);
-					var fileName = Path.GetFileName(pathFormat);
-					pathFormat = Path.Combine(directory, ulearnConfiguration.GraphiteServiceName, fileName);
-				}
-
-				loggerConfiguration = loggerConfiguration
-					.WriteTo.RollingFile(
-						pathFormat,
-						outputTemplate: "{Timestamp:HH:mm:ss.fff} {Level:u3} [{Thread}] {Message:l}{NewLine}{Exception}",
-						restrictedToMinimumLevel: minimumLevel,
-						fileSizeLimitBytes: 4 * 1073741824L
-					);
-
-				if (dbMinimumLevel != minimumLevel)
-				{
-					loggerConfiguration = loggerConfiguration.Filter.ByIncludingOnly(le =>
-						le.Level >= dbMinimumLevel || !LogEventHelpers.IsDbSource(le));
-				}
-			}
-
-			return loggerConfiguration;
 		}
 
 		private IConfigurationSource GetConfigurationSource()
