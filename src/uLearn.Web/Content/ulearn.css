@@ -1397,6 +1397,8 @@ body.lti-component {
 
 .legacy-page .exercise {
 	margin-top: 30px;
+	font-size: 14px;
+	line-height: 1.42;
 }
 
 .legacy-page .exercise__submission {
