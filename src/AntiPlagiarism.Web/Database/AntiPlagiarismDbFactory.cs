@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Ulearn.Core.Configuration;
 
 namespace AntiPlagiarism.Web.Database
 {
@@ -7,11 +8,9 @@ namespace AntiPlagiarism.Web.Database
 	{
 		public AntiPlagiarismDb CreateDbContext(string[] args)
 		{
-			var host = EntryPoint.BuildVostokHost();
-			var hostingEnvironment = host.HostingEnvironment;
-
+			var configuration = ApplicationConfiguration.GetConfiguration();
 			var optionsBuilder = new DbContextOptionsBuilder<AntiPlagiarismDb>();
-			optionsBuilder.UseSqlServer(hostingEnvironment.Configuration["database"]);
+			optionsBuilder.UseSqlServer(configuration["database"]);
 
 			return new AntiPlagiarismDb(optionsBuilder.Options);
 		}

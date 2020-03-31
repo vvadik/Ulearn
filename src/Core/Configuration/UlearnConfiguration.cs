@@ -24,11 +24,11 @@ namespace Ulearn.Core.Configuration
 			var configurationBuilder = new ConfigurationBuilder()
 				.SetBasePath(applicationPath);
 			configurationBuilder.AddEnvironmentVariables();
-			BuildAppsettingsConfiguration(configurationBuilder);
+			BuildAppSettingsConfiguration(configurationBuilder);
 			return configurationBuilder.Build();
 		}
 
-		public static void BuildAppsettingsConfiguration(IConfigurationBuilder configurationBuilder)
+		public static void BuildAppSettingsConfiguration(IConfigurationBuilder configurationBuilder)
 		{
 			configurationBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 			var environmentName = Environment.GetEnvironmentVariable("UlearnEnvironmentName");
@@ -46,6 +46,23 @@ namespace Ulearn.Core.Configuration
 
 	public abstract class AbstractConfiguration
 	{
+		public void SetFrom(AbstractConfiguration other)
+		{
+			var thisProperties = GetType().GetProperties();
+			var otherProperties = other.GetType().GetProperties();
+
+			foreach (var otherProperty in otherProperties)
+			{
+				foreach (var thisProperty in thisProperties)
+				{
+					if (otherProperty.Name == thisProperty.Name && otherProperty.PropertyType == thisProperty.PropertyType)
+					{
+						thisProperty.SetValue(this, otherProperty.GetValue(other));
+						break;
+					}
+				}
+			}
+		}
 	}
 
 	public class HostLogConfiguration
@@ -55,6 +72,8 @@ namespace Ulearn.Core.Configuration
 		public string PathFormat { get; set; }
 
 		public string MinimumLevel { get; set; }
+
+		public string DbMinimumLevel { get; set; }
 
 		public bool EnableEntityFrameworkLogging { get; set; }
 	}
@@ -88,7 +107,12 @@ namespace Ulearn.Core.Configuration
 		public string RunnerToken { get; set; } // Must be equal on Ulearn.Web and RunC***Job instance
 
 		public int? KeepAliveInterval { get; set; }
+		
+		public HostLogConfiguration HostLog { get; set; }
+
+		public int? Port;
 	}
+	
 
 	public class TelegramConfiguration
 	{

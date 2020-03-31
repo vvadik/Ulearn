@@ -5,7 +5,9 @@ using Ulearn.Common.Api;
 using Ulearn.Core.Configuration;
 using Ulearn.VideoAnnotations.Web.Annotations;
 using Ulearn.VideoAnnotations.Web.Configuration;
+using Vostok.Configuration.Extensions;
 using Vostok.Hosting;
+using Vostok.Hosting.Abstractions;
 using ILogger = Serilog.ILogger;
 
 namespace Ulearn.VideoAnnotations.Web
@@ -23,7 +25,7 @@ namespace Ulearn.VideoAnnotations.Web
 		{
 			base.ConfigureServices(services, hostingEnvironment, logger);
 
-			services.Configure<VideoAnnotationsConfiguration>(options => hostingEnvironment.Configuration.Bind(options));
+			services.Configure<VideoAnnotationsConfiguration>(options => options.SetFrom(hostingEnvironment.ConfigurationProvider.Get<VideoAnnotationsConfiguration>(hostingEnvironment.ConfigurationSource)));
 
 			services.AddSwaggerExamplesFromAssemblyOf<WebApplication>();
 		}

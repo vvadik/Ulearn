@@ -9,7 +9,6 @@ using AntiPlagiarism.Web.Configuration;
 using AntiPlagiarism.Web.Database;
 using AntiPlagiarism.Web.Database.Repos;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -17,7 +16,7 @@ using Serilog.Debugging;
 using Serilog.Events;
 using Serilog.Extensions.Logging;
 using Ulearn.Core.Configuration;
-using Vostok.Logging.Serilog.Enrichers;
+//using Vostok.Logging.Serilog.Enrichers;
 using ILogger = Serilog.ILogger;
 
 namespace AntiPlagiarism.UpdateDb
@@ -88,8 +87,8 @@ namespace AntiPlagiarism.UpdateDb
 		private ILogger GetLogger(AntiPlagiarismUpdateDbConfiguration configuration)
 		{
 			var loggerConfiguration = new LoggerConfiguration()
-				.Enrich.With<ThreadEnricher>()
-				.Enrich.With<FlowContextEnricher>()
+				//.Enrich.With<ThreadEnricher>()
+				//.Enrich.With<FlowContextEnricher>() // TODO
 				.MinimumLevel.Debug();
 
 			if (configuration.HostLog.Console)
