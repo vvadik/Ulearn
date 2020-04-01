@@ -434,6 +434,15 @@ namespace Database
 		public DbSet<NotificationDelivery> NotificationDeliveries { get; set; }
 		public DbSet<Notification> Notifications { get; set; }
 
+		// Без этого не работает Include в GetFeedNotificationDeliveriesAsync
+		public DbSet<AbstractCommentNotification> AbstractCommentNotification { get; set; }
+		public DbSet<AbstractCommentNotification> CourseExportedToStepikNotification { get; set; }
+		public DbSet<AbstractCommentNotification> ReceivedCommentToCodeReviewNotification { get; set; }
+		public DbSet<AbstractCommentNotification> PassedManualExerciseCheckingNotification { get; set; }
+		public DbSet<AbstractCommentNotification> UploadedPackageNotification { get; set; }
+		public DbSet<AbstractCommentNotification> PublishedPackageNotification { get; set; }
+		public DbSet<AbstractCommentNotification> CreatedGroupNotification { get; set; }
+
 		public DbSet<XQueueWatcher> XQueueWatchers { get; set; }
 		public DbSet<XQueueExerciseSubmission> XQueueExerciseSubmissions { get; set; }
 
