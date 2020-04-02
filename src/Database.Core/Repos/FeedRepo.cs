@@ -107,11 +107,14 @@ namespace Database.Repos
 			var nextSecond = from.AddSeconds(1);
 			var transportsIds = new List<FeedNotificationTransport>(transports).Select(t => t.Id).ToList();
 			var userCourses = visitsRepo.GetUserCourses(userId);
-			var deliveriesQueryable = notificationsRepo.GetTransportsDeliveriesQueryable(transportsIds, DateTime.MinValue)
-				.Where(d => userCourses.Contains(d.Notification.CourseId))
-				.Where(d => d.Notification.InitiatedById != userId);
+			var deliveriesQueryable = db.NotificationDeliveries
+				.Select(d => new {d.NotificationTransportId, d.Notification.CourseId, d.Notification.InitiatedById, d.CreateTime})
+				.Where(d => transportsIds.Contains(d.NotificationTransportId))
+				.Where(d => userCourses.Contains(d.CourseId))
+				.Where(d => d.InitiatedById != userId)
+				.Where(d => d.CreateTime >= nextSecond);
 
-			var totalCount = await deliveriesQueryable.CountAsync(d => d.CreateTime >= nextSecond).ConfigureAwait(false);
+			var totalCount = await deliveriesQueryable.CountAsync().ConfigureAwait(false);
 			return totalCount;
 		}
 
