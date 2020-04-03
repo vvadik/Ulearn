@@ -13,7 +13,6 @@ using Database.Models;
 using log4net;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
-using Z.EntityFramework.Plus;
 
 namespace Database.DataContexts
 {
@@ -25,6 +24,10 @@ namespace Database.DataContexts
 		private readonly ILog log = LogManager.GetLogger(typeof(NotificationsRepo));
 
 		private readonly ULearnDb db;
+		private readonly UnitsRepo unitsRepo;
+		private readonly UserRolesRepo userRolesRepo;
+		private readonly UsersRepo usersRepo;
+		private readonly WebCourseManager courseManager;
 
 		public NotificationsRepo()
 			: this(new ULearnDb())
@@ -34,6 +37,10 @@ namespace Database.DataContexts
 		public NotificationsRepo(ULearnDb db)
 		{
 			this.db = db;
+			unitsRepo = new UnitsRepo(db);
+			userRolesRepo = new UserRolesRepo(db);
+			usersRepo = new UsersRepo(db);
+			courseManager = WebCourseManager.Instance;
 		}
 
 		private static DateTime CalculateNextTryTime(DateTime createTime, int failsCount)
@@ -281,7 +288,10 @@ namespace Database.DataContexts
 				);
 			}
 
-			var recipientsIds = notification.GetRecipientsIds(db);
+			var recipientsIds = notification.GetRecipientsIds(db).ToHashSet();
+
+			recipientsIds = FilterUsersWhoNotSeeCourse(notification, recipientsIds);
+			
 			log.Info($"Recipients list for notification {notification.Id}: {recipientsIds.Count} user(s)");
 
 			if (recipientsIds.Count == 0)
@@ -400,6 +410,25 @@ namespace Database.DataContexts
 					Status = NotificationDeliveryStatus.NotSent,
 				});
 			}
+		}
+
+		private HashSet<string> FilterUsersWhoNotSeeCourse(Notification notification, HashSet<string> recipientsIds)
+		{
+			if (notification.CourseId != "")
+			{
+				var course = courseManager.FindCourse(notification.CourseId);
+				if (course != null)
+				{
+					var visibleUnits = unitsRepo.GetVisibleUnits(course);
+					if (!visibleUnits.Any())
+					{
+						var userIdsWithInstructorRoles = userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.Tester, notification.CourseId, true);
+						var sysAdminsIds = usersRepo.GetSysAdminsIds();
+						recipientsIds.IntersectWith(userIdsWithInstructorRoles.Concat(sysAdminsIds));
+					}
+				}
+			}
+			return recipientsIds;
 		}
 
 		private IQueryable<NotificationDelivery> GetNotificationsDeliveries(IEnumerable<int> notificationsIds, IEnumerable<int> transportsIds)
