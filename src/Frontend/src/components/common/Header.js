@@ -7,6 +7,7 @@ import Tooltip from "@skbkontur/react-ui/Tooltip"
 import Loader from "@skbkontur/react-ui/Loader"
 import DropdownMenu from "@skbkontur/react-ui/DropdownMenu"
 import DropdownContainer from "@skbkontur/react-ui/components/DropdownContainer/DropdownContainer"
+import HeaderComponentErrorBoundary from "./Error/HeaderComponentErrorBoundary";
 import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { findDOMNode } from "react-dom"
@@ -153,9 +154,13 @@ class Header extends Component {
 
 		return (
 			<div>
-				{ this.renderDefaultUserRoleMenu() }
-				{ this.renderPhoneUserRoleMenu() }
-				<Menu account={ account }/>
+				<HeaderComponentErrorBoundary>
+					{ this.renderDefaultUserRoleMenu() }
+					{ this.renderPhoneUserRoleMenu() }
+				</HeaderComponentErrorBoundary>
+				<HeaderComponentErrorBoundary className={ styles["header__menu"] }>
+					<Menu account={ account }/>
+				</HeaderComponentErrorBoundary>
 			</div>
 		)
 	}
