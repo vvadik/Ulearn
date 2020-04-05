@@ -34,6 +34,10 @@ namespace Ulearn.Web.Api.Controllers
 		[HttpPost("create/{courseId}")]
 		public async Task CreateCourse([FromRoute] string courseId)
 		{
+			var userId = User.Identity.GetUserId();
+
+			//ar tmpCourseId = courseId + userId;
+
 			var versionId = Guid.NewGuid();
 
 			var courseTitle = "Temp course";
@@ -41,7 +45,6 @@ namespace Ulearn.Web.Api.Controllers
 			if (!courseManager.TryCreateCourse(courseId, courseTitle, versionId))
 				throw new Exception();
 
-			var userId = User.Identity.GetUserId();
 			await coursesRepo.AddCourseVersionAsync(courseId, versionId, userId, null, null, null, null).ConfigureAwait(false);
 			await coursesRepo.MarkCourseVersionAsPublishedAsync(versionId).ConfigureAwait(false);
 			var courseFile = courseManager.GetStagingCourseFile(courseId);
@@ -86,6 +89,42 @@ namespace Ulearn.Web.Api.Controllers
 					error = error.InnerException;
 				}
 			}
+
+			await PublishVersion(courseId, versionId);
+		}
+
+		private async Task PublishVersion(string courseId, Guid versionId)
+		{
+			var versionFile = courseManager.GetCourseVersionFile(versionId);
+			var courseFile = courseManager.GetStagingCourseFile(courseId);
+			var oldCourse = courseManager.GetCourse(courseId);
+
+			await coursesRepo.AddCourseFile(courseId, versionId, courseFile.ReadAllContent()).ConfigureAwait(false);
+
+			/* First, try to load course from LRU-cache or zip file */
+			var version = courseManager.GetVersion(versionId);
+
+			/* Copy version's zip file to course's zip archive, overwrite if need */
+			versionFile.CopyTo(courseFile.FullName, true);
+			courseManager.EnsureVersionIsExtracted(versionId);
+
+			/* Replace courseId */
+			version.Id = courseId;
+
+			/* and move course from version's directory to courses's directory */
+			var extractedVersionDirectory = courseManager.GetExtractedVersionDirectory(versionId);
+			var extractedCourseDirectory = courseManager.GetExtractedCourseDirectory(courseId);
+			courseManager.MoveCourse(
+				version,
+				extractedVersionDirectory,
+				extractedCourseDirectory);
+			await coursesRepo.MarkCourseVersionAsPublishedAsync(versionId);
+			await NotifyAboutPublishedCourseVersion(courseId, versionId, User.Identity.GetUserId());
+
+			courseManager.UpdateCourseVersion(courseId, versionId);
+			courseManager.ReloadCourse(courseId);
+
+			//var courseDiff = new CourseDiff(oldCourse, version);
 		}
 
 

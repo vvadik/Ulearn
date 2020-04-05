@@ -96,6 +96,11 @@ namespace Database
 			}
 		}
 
+		public new void ReloadCourse(string courseId)
+		{
+			base.ReloadCourse(courseId);
+		}
+
 		private void ReloadCourseIfLoadedAndPublishedVersionsAreDifferent(string courseId, CourseVersion publishedVersion)
 		{
 			lock (@lock)
