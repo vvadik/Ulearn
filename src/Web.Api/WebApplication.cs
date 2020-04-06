@@ -48,8 +48,6 @@ namespace Ulearn.Web.Api
 
 		public override Task WarmupAsync(IVostokHostingEnvironment environment, IServiceProvider provider)
 		{
-			//environment.MetricScope.SystemMetrics(1.Minutes()); //TODO
-
 #if DEBUG
 			/* Initialize EntityFramework Profiler. See https://www.hibernatingrhinos.com/products/efprof/learn for details */
 			HibernatingRhinos.Profiler.Appender.EntityFramework.EntityFrameworkProfiler.Initialize();

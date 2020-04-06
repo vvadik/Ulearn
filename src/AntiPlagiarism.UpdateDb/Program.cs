@@ -87,8 +87,6 @@ namespace AntiPlagiarism.UpdateDb
 		private ILogger GetLogger(AntiPlagiarismUpdateDbConfiguration configuration)
 		{
 			var loggerConfiguration = new LoggerConfiguration()
-				//.Enrich.With<ThreadEnricher>()
-				//.Enrich.With<FlowContextEnricher>() // TODO
 				.MinimumLevel.Debug();
 
 			if (configuration.HostLog.Console)

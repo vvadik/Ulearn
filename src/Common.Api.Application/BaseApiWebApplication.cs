@@ -32,19 +32,15 @@ namespace Ulearn.Common.Api
 	{
 		public override Task WarmupAsync(IVostokHostingEnvironment environment, IServiceProvider provider)
 		{
-			//TODO
-			//environment.Metrics.Environment.Send(1.Minutes());
 			return Task.CompletedTask;
 		}
 
 		public override void Setup(IVostokAspNetCoreApplicationBuilder builder, IVostokHostingEnvironment hostingEnvironment)
 		{
 			var loggerConfiguration = new LoggerConfiguration()
-				//.Enrich.With<ThreadEnricher>() //TODO
-				//.Enrich.With<FlowContextEnricher>() //TODO
 				.MinimumLevel.Debug()
-				.WriteTo.Sink(new VostokSink(hostingEnvironment.Log), LogEventLevel.Debug); //TODO
-			var logger = loggerConfiguration.CreateLogger(); // TODO
+				.WriteTo.Sink(new VostokSink(hostingEnvironment.Log), LogEventLevel.Debug);
+			var logger = loggerConfiguration.CreateLogger();
 
 			builder.SetupWebHost(webHostBuilder => webHostBuilder
 				.UseKestrel()

@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Serilog.Events;
 using Ulearn.Core.Configuration;
 using Vostok.Configuration;
 using Vostok.Configuration.Abstractions;
@@ -9,10 +8,8 @@ using Vostok.Configuration.Sources.CommandLine;
 using Vostok.Configuration.Sources.Json;
 using Vostok.Hosting.Setup;
 using Vostok.Logging.Abstractions;
-using Vostok.Logging.Abstractions.Values;
 using Vostok.Logging.File.Configuration;
 using Vostok.Logging.Formatting;
-using LogEvent = Vostok.Logging.Abstractions.LogEvent;
 
 namespace Ulearn.Common.Api
 {
@@ -35,80 +32,100 @@ namespace Ulearn.Common.Api
 			var ulearnConfiguration = configurationProvider.Get<UlearnConfiguration>();
 // ReSharper disable once PossibleInvalidOperationException
 			var port = ulearnConfiguration.Port.Value;
+			var environment = ulearnConfiguration.Environment ?? "dev";
 
 			builder
 				.SetupApplicationIdentity(identityBuilder => identityBuilder
 					.SetProject("ulearn")
 					.SetApplication(application)
-					.SetEnvironment("default")
+					.SetEnvironment(environment)
 					.SetInstance(Environment.MachineName))
 				.SetupConfiguration(configurationBuilder => configurationBuilder.AddSecretSource(configurationSource))
+				.SetPort(port)
+				.SetBaseUrlPath(ulearnConfiguration.BaseUrl)
+				.SetupLog((logBuilder, context) => SetupLog(logBuilder, ulearnConfiguration))
+				.SetupHerculesSink(sinkBuilder => SetupHerculesSink(sinkBuilder, ulearnConfiguration))
 				.DisableClusterConfig()
 				.DisableServiceBeacon()
-				.DisableHercules()
 				.DisableZooKeeper()
 				.DisableClusterConfigLocalSettings()
 				.DisableClusterConfigRemoteSettings()
-				.SetPort(port)
-				.SetBaseUrlPath(ulearnConfiguration.BaseUrl)
-				.SetupLog((logBuilder, context) =>
-				{
-					logBuilder.SetupConsoleLog(consoleLogBuilder => consoleLogBuilder
-						.CustomizeLog(lb => lb.WithMinimumLevel(LogLevel.Info))
-						.CustomizeSettings(settings =>
-						{
-							settings.OutputTemplate = OutputTemplate.Parse("{Timestamp:HH:mm:ss.fff} {Level}{operationContext:w}{Message}{NewLine}{Exception}");
-						}));
-					
-					var pathFormat = ulearnConfiguration.HostLog.PathFormat;
-					if (!string.IsNullOrEmpty(pathFormat))
-					{
-						var minimumLevelString = ulearnConfiguration.HostLog.MinimumLevel ?? "debug";
-						var dbMinimumLevelString = ulearnConfiguration.HostLog.DbMinimumLevel ?? "";
-						if (!TryParseLogLevel(minimumLevelString, out var minimumLevel))
-							minimumLevel = LogLevel.Debug;
-						if (!TryParseLogLevel(dbMinimumLevelString, out var dbMinimumLevel))
-							dbMinimumLevel = minimumLevel;
-						pathFormat = pathFormat.Replace("{Date}", "{RollingSuffix}"); // Для совместимости с настройками appsettings.json, написанными для серилога
-						if (Path.IsPathRooted(pathFormat))
-						{
-							var directory = Path.GetDirectoryName(pathFormat);
-							var fileName = Path.GetFileName(pathFormat);
-							pathFormat = Path.Combine(directory, ulearnConfiguration.GraphiteServiceName, fileName);
-						}
-
-						logBuilder.SetupFileLog(fileLogBuilder => fileLogBuilder
-							.CustomizeLog(lb =>
-							{
-								var customized = lb.WithMinimumLevel(minimumLevel);
-								if (dbMinimumLevel != minimumLevel)
-									customized = customized.SelectEvents(le => le.Level >= dbMinimumLevel || !IsDbSource(le));
-								return customized;
-							})
-							.SetSettingsProvider(() => new FileLogSettings
-							{
-								FilePath = pathFormat,
-								RollingStrategy = new RollingStrategyOptions
-								{
-									MaxFiles = 0,
-									Type = RollingStrategyType.Hybrid,
-									Period = RollingPeriod.Day,
-									MaxSize = 4 * 1073741824L
-								},
-								OutputTemplate = OutputTemplate.Parse("{Timestamp:HH:mm:ss.fff} {Level}{operationContext:w}{Message}{NewLine}{Exception}")
-							}));
-					}
-				});
+				;
 		}
-		
+
+		private static void SetupHerculesSink(IVostokHerculesSinkBuilder sinkBuilder, UlearnConfiguration ulearnConfiguration)
+		{
+			if (ulearnConfiguration.Hercules == null || string.IsNullOrEmpty(ulearnConfiguration.Hercules.ApiKey))
+			{
+				sinkBuilder.Disable();
+				return;
+			}
+			sinkBuilder.SetApiKeyProvider(() => ulearnConfiguration.Hercules.ApiKey);
+			sinkBuilder.SetExternalUrlTopology(ulearnConfiguration.Hercules.Host);
+		}
+
+		private static void SetupLog(IVostokCompositeLogBuilder logBuilder, UlearnConfiguration ulearnConfiguration)
+		{
+			logBuilder.SetupConsoleLog(consoleLogBuilder => consoleLogBuilder
+				.CustomizeLog(lb => lb.WithMinimumLevel(LogLevel.Info))
+				.CustomizeSettings(settings => { settings.OutputTemplate = OutputTemplate.Parse("{Timestamp:HH:mm:ss.fff} {Level}{operationContext:w}{Message}{NewLine}{Exception}"); }));
+
+			var pathFormat = ulearnConfiguration.HostLog.PathFormat;
+			if (!string.IsNullOrEmpty(pathFormat))
+			{
+				var minimumLevelString = ulearnConfiguration.HostLog.MinimumLevel ?? "debug";
+				var dbMinimumLevelString = ulearnConfiguration.HostLog.DbMinimumLevel ?? "";
+				if (!TryParseLogLevel(minimumLevelString, out var minimumLevel))
+					minimumLevel = LogLevel.Debug;
+				if (!TryParseLogLevel(dbMinimumLevelString, out var dbMinimumLevel))
+					dbMinimumLevel = minimumLevel;
+				pathFormat = pathFormat.Replace("{Date}", "{RollingSuffix}"); // Для совместимости с настройками appsettings.json, написанными для серилога
+				if (Path.IsPathRooted(pathFormat))
+				{
+					var directory = Path.GetDirectoryName(pathFormat);
+					var fileName = Path.GetFileName(pathFormat);
+					pathFormat = Path.Combine(directory, ulearnConfiguration.GraphiteServiceName, fileName);
+				}
+
+				logBuilder.SetupFileLog(fileLogBuilder => fileLogBuilder
+					.CustomizeLog(lb =>
+					{
+						var customized = lb.WithMinimumLevel(minimumLevel);
+						//if (dbMinimumLevel != minimumLevel) // TODO посмотреть, будут ли лишние логи от базы
+						//customized = customized.SelectEvents(le => le.Level >= dbMinimumLevel || !IsDbSource(le));
+						return customized;
+					})
+					.SetSettingsProvider(() => new FileLogSettings
+					{
+						FilePath = pathFormat,
+						RollingStrategy = new RollingStrategyOptions
+						{
+							MaxFiles = 0,
+							Type = RollingStrategyType.Hybrid,
+							Period = RollingPeriod.Day,
+							MaxSize = 4 * 1073741824L
+						},
+						OutputTemplate = OutputTemplate.Parse("{Timestamp:HH:mm:ss.fff} {Level}{operationContext:w}{Message}{NewLine}{Exception}")
+					}));
+
+				logBuilder.SetupHerculesLog(herculesLogBuilder =>
+				{
+					herculesLogBuilder.SetStream(ulearnConfiguration.Hercules.Stream);
+					herculesLogBuilder.CustomizeLog(cl => cl.WithMinimumLevel(LogLevel.Warn));
+				});
+			}
+		}
+
+		/* Метод не тестировался с EF 3.1 и vostok
 		private static bool IsDbSource(LogEvent le)
 		{
-			//if (le.Properties.TryGetValue("SourceContext", out var sourceContextValue)
-			//	&& (sourceContextValue as ScalarValue)?.Value is string sourceContext)
-			//	return sourceContext.StartsWith("\"Microsoft.EntityFrameworkCore.Database.Command")
-			//			|| sourceContext.StartsWith("\"Microsoft.EntityFrameworkCore.Infrastructure");
-			return true;
+			if (le.Properties.TryGetValue("SourceContext", out var sourceContextValue)
+				&& (sourceContextValue as ScalarValue)?.Value is string sourceContext)
+				return sourceContext.StartsWith("\"Microsoft.EntityFrameworkCore.Database.Command")
+						|| sourceContext.StartsWith("\"Microsoft.EntityFrameworkCore.Infrastructure");
+			return false;
 		}
+		*/
 
 		// Для совместимости с настройками appsettings.json, написанными для серилога
 		private static bool TryParseLogLevel(string str, out LogLevel level)

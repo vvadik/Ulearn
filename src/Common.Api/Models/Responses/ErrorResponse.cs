@@ -1,5 +1,8 @@
 using System;
 using System.Runtime.Serialization;
+using Vostok.Context;
+using Vostok.Tracing.Abstractions;
+
 //using Vostok.Tracing;
 
 namespace Ulearn.Common.Api.Models.Responses
@@ -14,7 +17,7 @@ namespace Ulearn.Common.Api.Models.Responses
 		public string Message { get; set; }
 
 		[DataMember(Name = "trace_id")]
-		public Guid TraceId { get; } = new Guid();//TraceContext.Current.TraceId;  TODO
+		public Guid TraceId => FlowingContext.Globals.Get<TraceContext>().TraceId;
 
 		[DataMember(Name = "timestamp")]
 		public DateTime Timestamp { get; } = DateTime.Now;

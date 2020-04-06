@@ -111,9 +111,19 @@ namespace Ulearn.Core.Configuration
 		
 		public HostLogConfiguration HostLog { get; set; }
 
-		public int? Port;
+		public int? Port { get; set; }
+
+		public string Environment { get; set; }
+
+		public HerculesSinkConfiguration Hercules { get; set; }
 	}
-	
+
+	public class HerculesSinkConfiguration
+	{
+		public string ApiKey { get; set; }
+		public string Stream { get; set; }
+		public string Host { get; set; }
+	}
 
 	public class TelegramConfiguration
 	{
