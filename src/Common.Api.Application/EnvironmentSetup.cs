@@ -39,17 +39,14 @@ namespace Ulearn.Common.Api
 					.SetProject("ulearn")
 					.SetApplication(application)
 					.SetEnvironment(environment)
-					.SetInstance(Environment.MachineName))
+					.SetInstance(Environment.MachineName.Replace(".", "_").ToLower()))
 				.SetupConfiguration(configurationBuilder => configurationBuilder.AddSecretSource(configurationSource))
 				.SetPort(port)
 				.SetBaseUrlPath(ulearnConfiguration.BaseUrl)
-				.SetupLog((logBuilder, context) => SetupLog(logBuilder, ulearnConfiguration))
-				.SetupHerculesSink(sinkBuilder => SetupHerculesSink(sinkBuilder, ulearnConfiguration))
-				.DisableClusterConfig()
 				.DisableServiceBeacon()
-				.DisableZooKeeper()
-				.DisableClusterConfigLocalSettings()
-				.DisableClusterConfigRemoteSettings()
+				.SetupForKontur()
+				.SetupHerculesSink(sinkBuilder => SetupHerculesSink(sinkBuilder, ulearnConfiguration))
+				.SetupLog((logBuilder, context) => SetupLog(logBuilder, ulearnConfiguration))
 				;
 		}
 
@@ -61,7 +58,6 @@ namespace Ulearn.Common.Api
 				return;
 			}
 			sinkBuilder.SetApiKeyProvider(() => ulearnConfiguration.Hercules.ApiKey);
-			sinkBuilder.SetExternalUrlTopology(ulearnConfiguration.Hercules.Host);
 		}
 
 		private static void SetupLog(IVostokCompositeLogBuilder logBuilder, UlearnConfiguration ulearnConfiguration)
@@ -111,7 +107,7 @@ namespace Ulearn.Common.Api
 				logBuilder.SetupHerculesLog(herculesLogBuilder =>
 				{
 					herculesLogBuilder.SetStream(ulearnConfiguration.Hercules.Stream);
-					herculesLogBuilder.CustomizeLog(cl => cl.WithMinimumLevel(LogLevel.Warn));
+					herculesLogBuilder.CustomizeLog(cl => cl.WithMinimumLevel(LogLevel.Info));
 				});
 			}
 		}

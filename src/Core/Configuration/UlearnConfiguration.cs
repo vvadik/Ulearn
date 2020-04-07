@@ -122,7 +122,6 @@ namespace Ulearn.Core.Configuration
 	{
 		public string ApiKey { get; set; }
 		public string Stream { get; set; }
-		public string Host { get; set; }
 	}
 
 	public class TelegramConfiguration
