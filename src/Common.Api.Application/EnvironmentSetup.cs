@@ -62,9 +62,10 @@ namespace Ulearn.Common.Api
 
 		private static void SetupLog(IVostokCompositeLogBuilder logBuilder, UlearnConfiguration ulearnConfiguration)
 		{
+			var logTemplate = OutputTemplate.Parse("{Timestamp:HH:mm:ss.fff} {Level} {traceContext:w}{operationContext:w}{Message}{NewLine}{Exception}");
 			logBuilder.SetupConsoleLog(consoleLogBuilder => consoleLogBuilder
 				.CustomizeLog(lb => lb.WithMinimumLevel(LogLevel.Info))
-				.CustomizeSettings(settings => { settings.OutputTemplate = OutputTemplate.Parse("{Timestamp:HH:mm:ss.fff} {Level}{operationContext:w}{Message}{NewLine}{Exception}"); }));
+				.CustomizeSettings(settings => { settings.OutputTemplate = logTemplate; }));
 
 			var pathFormat = ulearnConfiguration.HostLog.PathFormat;
 			if (!string.IsNullOrEmpty(pathFormat))
@@ -101,7 +102,7 @@ namespace Ulearn.Common.Api
 							Period = RollingPeriod.Day,
 							MaxSize = 4 * 1073741824L
 						},
-						OutputTemplate = OutputTemplate.Parse("{Timestamp:HH:mm:ss.fff} {Level}{operationContext:w}{Message}{NewLine}{Exception}")
+						OutputTemplate = logTemplate
 					}));
 
 				logBuilder.SetupHerculesLog(herculesLogBuilder =>
