@@ -1,30 +1,12 @@
 ﻿using Vostok.Datacenters.Kontur.Helpers;
 using Vostok.Hosting.Setup;
 using Vostok.Logging.Abstractions;
+using Vostok.Telemetry.Kontur;
 
 namespace Ulearn.Common.Api
 {
 	internal static class VostokHostingEnvironmentBuilderExtensions
 	{
-		private static class KonturVostokConstants
-		{
-			//public const string DevEnvironment = "dev";
-			//public const string CloudEnvironment = "cloud";
-			//public const string ProdEnvironment = "prod";
-			//public const string DefaultEnvironment = "default";
-			//public const string DefaultEnvironmentNamePath = "vostok/environment/DefaultEnvironmentName";
-			//public const string HerculesSinkTopologyPath = "topology/hercules/gate.prod";
-			public const string HerculesSinkServiceDiscoveryName = "Hercules.Gate";
-			//public const string HerculesStreamApiServiceDiscoveryName = "Hercules.StreamApi";
-			//public const string HerculesSettingsPath = "vostok/hercules";
-			public const string ZooKeeperTopologyPath = "topology/zookeeper-global";
-			public const string TracingStreamNamePath = "vostok/tracing/StreamName";
-			public const string TracingPublicApiKeyPath = "vostok/tracing/PublicApiKey";
-			public const string LoggingStreamNamePath = "vostok/logging/StreamName";
-			public const string LoggingPublicApiKeyPath = "vostok/logging/PublicApiKey";
-			public const string MetricsPublicApiKeyPath = "vostok/metrics/PublicApiKey";
-		}
-
 		public static IVostokHostingEnvironmentBuilder SetupForKontur(this IVostokHostingEnvironmentBuilder builder)
 		{
 			return builder
