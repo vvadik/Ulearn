@@ -22,7 +22,7 @@ namespace AntiPlagiarism.Api
 			: base(logger, new ApiClientSettings
 			{
 				EndpointUrl = new Uri(endpointUrl),
-				ServiceName = "antiplagiarism service",
+				ServiceName = "ulearn.antiplagiarism-web",
 				DefaultTimeout = defaultTimeout
 			})
 		{
