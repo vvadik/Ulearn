@@ -1,4 +1,5 @@
-﻿using Vostok.Hosting.Setup;
+﻿using Vostok.Datacenters.Kontur.Helpers;
+using Vostok.Hosting.Setup;
 using Vostok.Logging.Abstractions;
 
 namespace Ulearn.Common.Api
@@ -33,6 +34,7 @@ namespace Ulearn.Common.Api
 				.SetupMetrics(ConfigureMetrics)
 				.SetupTracer(ConfigureTracer)
 				.SetupZooKeeperClient(ConfigureZooKeeper)
+				.SetupDatacenters(ConfigureDatacenters)
 				;
 		}
 
@@ -95,5 +97,13 @@ namespace Ulearn.Common.Api
 
 			builder.SetClusterConfigTopology(KonturVostokConstants.ZooKeeperTopologyPath);
 		}
+		
+		private static void ConfigureDatacenters(IVostokDatacentersBuilder builder, IVostokHostingEnvironmentSetupContext context)
+			=> builder
+				.SetActiveDatacentersProvider(
+					KonturActiveDatacentersProvider.Get(context.Log, context.ClusterConfigClient, context.ConfigurationProvider))
+				.SetDatacenterMapping(
+					KonturDatacenterMappingProvider.Get(context.Log, context.ClusterConfigClient, context.ConfigurationProvider));
+
 	}
 }
