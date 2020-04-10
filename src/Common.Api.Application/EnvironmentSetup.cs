@@ -6,6 +6,7 @@ using Vostok.Configuration.Abstractions;
 using Vostok.Configuration.Sources;
 using Vostok.Configuration.Sources.CommandLine;
 using Vostok.Configuration.Sources.Json;
+using Vostok.Hosting.Kontur;
 using Vostok.Hosting.Setup;
 using Vostok.Logging.Abstractions;
 using Vostok.Logging.File.Configuration;
@@ -35,6 +36,7 @@ namespace Ulearn.Common.Api
 			var environment = ulearnConfiguration.Environment ?? "dev";
 
 			builder
+				.SetupForKontur()
 				.SetupApplicationIdentity(identityBuilder => identityBuilder
 					.SetProject("ulearn")
 					.SetApplication(application)
@@ -44,7 +46,6 @@ namespace Ulearn.Common.Api
 				.SetPort(port)
 				.SetBaseUrlPath(ulearnConfiguration.BaseUrl)
 				.DisableServiceBeacon()
-				.SetupForKontur()
 				.SetupHerculesSink(sinkBuilder => SetupHerculesSink(sinkBuilder, ulearnConfiguration))
 				.SetupLog((logBuilder, context) => SetupLog(logBuilder, ulearnConfiguration))
 				;

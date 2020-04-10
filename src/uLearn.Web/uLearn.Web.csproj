@@ -134,6 +134,10 @@
     <Reference Include="JetBrains.Annotations, Version=2019.1.3.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>..\packages\JetBrains.Annotations.2019.1.3\lib\net20\JetBrains.Annotations.dll</HintPath>
     </Reference>
+    <Reference Include="Kontur.Lz4, Version=0.1.13.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Kontur.Lz4.0.1.13\lib\netstandard2.0\Kontur.Lz4.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Kontur.Spam.Client, Version=1.3.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\ThirdParty\Spam.Api.Client.1.3.2.1\lib\Kontur.Spam.Client.dll</HintPath>
     </Reference>
@@ -582,6 +586,126 @@
     </Reference>
     <Reference Include="UnidecodeSharpCore, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\UnidecodeSharpCore.2.0.1\lib\net45\UnidecodeSharpCore.dll</HintPath>
+    </Reference>
+    <Reference Include="Vostok.ClusterClient.Context, Version=0.1.4.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.ClusterClient.Context.0.1.4\lib\netstandard2.0\Vostok.ClusterClient.Context.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.ClusterClient.Core, Version=0.1.17.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.ClusterClient.Core.0.1.17\lib\netstandard2.0\Vostok.ClusterClient.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.ClusterClient.Datacenters, Version=0.1.2.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.ClusterClient.Datacenters.0.1.2\lib\netstandard2.0\Vostok.ClusterClient.Datacenters.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.ClusterClient.Topology.CC, Version=0.1.1.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.ClusterClient.Topology.CC.0.1.1\lib\netstandard2.0\Vostok.ClusterClient.Topology.CC.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.ClusterClient.Tracing, Version=0.1.1.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.ClusterClient.Tracing.0.1.1\lib\netstandard2.0\Vostok.ClusterClient.Tracing.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.ClusterClient.Transport, Version=0.1.12.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.ClusterClient.Transport.0.1.12\lib\netstandard2.0\Vostok.ClusterClient.Transport.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.ClusterConfig.Client, Version=0.1.8.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.ClusterConfig.Client.0.1.8\lib\netstandard2.0\Vostok.ClusterConfig.Client.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.ClusterConfig.Client.Abstractions, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.ClusterConfig.Client.Abstractions.0.1.0\lib\netstandard2.0\Vostok.ClusterConfig.Client.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.Configuration, Version=0.1.14.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Configuration.0.1.14\lib\netstandard2.0\Vostok.Configuration.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.Configuration.Abstractions, Version=0.1.9.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Configuration.Abstractions.0.1.9\lib\netstandard2.0\Vostok.Configuration.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.Configuration.Logging, Version=0.1.1.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Configuration.Logging.0.1.1\lib\netstandard2.0\Vostok.Configuration.Logging.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.Configuration.Sources, Version=0.1.9.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Configuration.Sources.0.1.9\lib\netstandard2.0\Vostok.Configuration.Sources.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.Configuration.Sources.ClusterConfig, Version=0.1.6.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Configuration.Sources.ClusterConfig.0.1.6\lib\netstandard2.0\Vostok.Configuration.Sources.ClusterConfig.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.Context, Version=0.1.3.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Context.0.1.3\lib\netstandard2.0\Vostok.Context.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.Datacenters, Version=0.1.4.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Datacenters.0.1.4\lib\netstandard2.0\Vostok.Datacenters.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.Datacenters.Kontur, Version=1.0.36.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Datacenters.Kontur.1.0.36\lib\netstandard2.0\Vostok.Datacenters.Kontur.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.Hercules.Client, Version=0.1.10.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Hercules.Client.0.1.10\lib\netstandard2.0\Vostok.Hercules.Client.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.Hercules.Client.Abstractions, Version=0.1.4.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Hercules.Client.Abstractions.0.1.4\lib\netstandard2.0\Vostok.Hercules.Client.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.Logging.Abstractions, Version=1.0.9.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Logging.Abstractions.1.0.9\lib\netstandard2.0\Vostok.Logging.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.Logging.Formatting, Version=1.0.4.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Logging.Formatting.1.0.4\lib\netstandard2.0\Vostok.Logging.Formatting.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.Logging.Hercules, Version=0.1.2.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Logging.Hercules.0.1.2\lib\netstandard2.0\Vostok.Logging.Hercules.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.Logging.Tracing, Version=0.1.5.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Logging.Tracing.0.1.5\lib\netstandard2.0\Vostok.Logging.Tracing.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.Metrics, Version=0.2.11.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Metrics.0.2.11\lib\netstandard2.0\Vostok.Metrics.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.Metrics.Hercules, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Metrics.Hercules.0.1.0\lib\netstandard2.0\Vostok.Metrics.Hercules.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.Telemetry.Kontur, Version=1.0.39.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Telemetry.Kontur.1.0.39\lib\netstandard2.0\Vostok.Telemetry.Kontur.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.Tracing, Version=0.1.1.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Tracing.0.1.1\lib\netstandard2.0\Vostok.Tracing.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.Tracing.Abstractions, Version=0.1.2.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Tracing.Abstractions.0.1.2\lib\netstandard2.0\Vostok.Tracing.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.Tracing.Extensions, Version=0.1.2.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Tracing.Extensions.0.1.2\lib\netstandard2.0\Vostok.Tracing.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.Tracing.Hercules, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Tracing.Hercules.0.1.0\lib\netstandard2.0\Vostok.Tracing.Hercules.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.Tracing.Kontur, Version=1.0.14.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Tracing.Kontur.1.0.14\lib\netstandard2.0\Vostok.Tracing.Kontur.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="WebActivatorEx, Version=2.0.0.0, Culture=neutral, PublicKeyToken=7b26dc2a43f6a0d4, processorArchitecture=MSIL">
       <HintPath>..\packages\WebActivatorEx.2.2.0\lib\net40\WebActivatorEx.dll</HintPath>
