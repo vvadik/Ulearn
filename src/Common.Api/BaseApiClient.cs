@@ -3,7 +3,8 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;using Serilog;
+using System.Threading.Tasks;
+using Serilog;
 using Ulearn.Common.Api.Models.Parameters;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
@@ -40,7 +41,7 @@ namespace Ulearn.Common.Api
 			{
 				config.SetupUniversalTransport();
 				config.DefaultTimeout = settings.DefaultTimeout;
-				config.SetupDistributedContext();
+				config.SetupDistributedKonturTracing();
 				config.ClusterProvider = new FixedClusterProvider(settings.EndpointUrl);
 				config.TargetServiceName = settings.ServiceName;
 				config.DefaultRequestStrategy = Strategy.SingleReplica;
