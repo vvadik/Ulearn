@@ -67,9 +67,11 @@ namespace Ulearn.Common.Api
 				}
 				else if (method == HttpMethod.Post)
 				{
-					var request = Request.Post(BuildUrl(settings.EndpointUrl + url));
 					var serializedPayload = JsonConvert.SerializeObject(parameters, Formatting.Indented);
-					request = request.WithContent(serializedPayload);
+					var request = Request
+						.Post(BuildUrl(settings.EndpointUrl + url))
+						.WithContent(serializedPayload, Encoding.UTF8)
+						.WithContentTypeHeader("application/json");
 					response = await clusterClient.SendAsync(request).ConfigureAwait(false);
 				}
 				else
