@@ -109,6 +109,7 @@ namespace Ulearn.Common.Api
 				logBuilder.SetupHerculesLog(herculesLogBuilder =>
 				{
 					herculesLogBuilder.SetStream(ulearnConfiguration.Hercules.Stream);
+					herculesLogBuilder.SetApiKeyProvider(() => ulearnConfiguration.Hercules.ApiKey);
 					herculesLogBuilder.CustomizeLog(cl => cl.WithMinimumLevel(LogLevel.Info));
 				});
 			}
@@ -163,7 +164,7 @@ namespace Ulearn.Common.Api
 				.CombineWith(new JsonFileSource("appsettings." + (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production") + ".json"));
 			var environmentName = Environment.GetEnvironmentVariable("UlearnEnvironmentName");
 			if (environmentName != null && environmentName.ToLower().Contains("local"))
-				configurationSource.CombineWith(new JsonFileSource("appsettings.local.json"));
+				configurationSource = configurationSource.CombineWith(new JsonFileSource("appsettings.local.json"));
 			return configurationSource;
 		}
 	}
