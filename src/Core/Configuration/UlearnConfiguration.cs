@@ -121,6 +121,8 @@ namespace Ulearn.Core.Configuration
 		[CanBeNull] public AntiplagiarismClientConfiguration AntiplagiarismClient { get; set; }
 
 		[CanBeNull] public VideoAnnotationsClientConfiguration VideoAnnotationsClient { get; set; }
+		
+		public bool DisableKonturServices { get; set; }
 	}
 
 	public class VideoAnnotationsClientConfiguration

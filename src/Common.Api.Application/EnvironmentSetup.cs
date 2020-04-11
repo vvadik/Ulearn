@@ -35,9 +35,10 @@ namespace Ulearn.Common.Api
 			var port = ulearnConfiguration.Port.Value;
 			var environment = ulearnConfiguration.Environment ?? "dev";
 
-			builder
-				.SetupForKontur()
-				.SetupApplicationIdentity(identityBuilder => identityBuilder
+			if (!ulearnConfiguration.DisableKonturServices)
+				builder = builder.SetupForKontur();
+			
+			builder.SetupApplicationIdentity(identityBuilder => identityBuilder
 					.SetProject("ulearn")
 					.SetApplication(application)
 					.SetEnvironment(environment)
