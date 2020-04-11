@@ -8,7 +8,6 @@ using Serilog;
 using Ulearn.Common.Api.Models.Parameters;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
-using Vostok.Clusterclient.Context;
 using Vostok.Clusterclient.Core;
 using Vostok.Clusterclient.Core.Model;
 using Vostok.Clusterclient.Transport;
@@ -148,12 +147,18 @@ namespace Ulearn.Common.Api
 
 	public class ApiClientSettings
 	{
-		public Uri EndpointUrl { get; set; }
+		public ApiClientSettings(string endpointUrl)
+		{
+			endpointUrl = endpointUrl.Replace("localhost", Environment.MachineName.ToLowerInvariant());
+			EndpointUrl = new Uri(endpointUrl);
+		}
 
-		public TimeSpan DefaultTimeout { get; set; } = TimeSpan.FromSeconds(10);
+		public readonly Uri EndpointUrl;
 
-		public string ServiceName { get; set; } = "ulearn.service";
+		public TimeSpan DefaultTimeout = TimeSpan.FromSeconds(10);
 
-		public bool LogRequestsAndResponses { get; set; } = true;
+		public string ServiceName = "ulearn.service";
+
+		public bool LogRequestsAndResponses = true;
 	}
 }

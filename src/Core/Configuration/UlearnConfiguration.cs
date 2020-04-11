@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using JetBrains.Annotations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.FileProviders;
@@ -116,6 +117,22 @@ namespace Ulearn.Core.Configuration
 		public string Environment { get; set; }
 
 		public HerculesSinkConfiguration Hercules { get; set; }
+
+		[CanBeNull] public AntiplagiarismClientConfiguration AntiplagiarismClient { get; set; }
+
+		[CanBeNull] public VideoAnnotationsClientConfiguration VideoAnnotationsClient { get; set; }
+	}
+
+	public class VideoAnnotationsClientConfiguration
+	{
+		public string Endpoint { get; set; }
+	}
+
+	public class AntiplagiarismClientConfiguration
+	{
+		public bool Enabled { get; set; }
+		public string Endpoint { get; set; }
+		public string Token { get; set; }
 	}
 
 	public class HerculesSinkConfiguration
