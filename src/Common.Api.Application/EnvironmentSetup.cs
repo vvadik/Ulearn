@@ -64,7 +64,7 @@ namespace Ulearn.Common.Api
 
 		private static void SetupLog(IVostokCompositeLogBuilder logBuilder, UlearnConfiguration ulearnConfiguration)
 		{
-			var logTemplate = OutputTemplate.Parse("{Timestamp:HH:mm:ss.fff} {Level} {traceContext:w}{operationContext:w}{Message}{NewLine}{Exception}");
+			var logTemplate = OutputTemplate.Parse("{Timestamp:HH:mm:ss.fff} {Level} {traceContext:w}{operationContext:w}{sourceContext:w}{Message}{NewLine}{Exception}");
 			logBuilder.SetupConsoleLog(consoleLogBuilder => consoleLogBuilder
 				.CustomizeLog(lb => lb.WithMinimumLevel(LogLevel.Info))
 				.CustomizeSettings(settings => { settings.OutputTemplate = logTemplate; }));
