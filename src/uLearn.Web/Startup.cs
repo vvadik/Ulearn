@@ -32,7 +32,7 @@ namespace uLearn.Web
 			var webhookSecret = WebConfigurationManager.AppSettings["ulearn.telegram.webhook.secret"] ?? "";
 			var webhookDomain = WebConfigurationManager.AppSettings["ulearn.telegram.webhook.domain"] ?? "";
 			var webhookUrl = $"https://{webhookDomain}/Telegram/Webhook?secret={webhookSecret}";
-			telegramBot.SetWebhookAsync(webhookUrl).Wait();
+			//telegramBot.SetWebhookAsync(webhookUrl).Wait();
 		}
 	}
 }

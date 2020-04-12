@@ -1,12 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using CourseToolHotReloader.Dtos;
 
-namespace CourseToolHotReloader
+namespace CourseToolHotReloader.ApiClient
 {
 	public class HttpMethods
 	{
@@ -21,10 +22,15 @@ namespace CourseToolHotReloader
 
 		public static void TestCreateCourse()
 		{
+			var task = GetJwtToken(new LoginPasswordParameters { Login = "admin", Password = "fullcontrol" });
+			task.Wait();
+			var accountTokenResponseDto = task.Result;
+			var token = accountTokenResponseDto.Token;
+
 			const string path = "C:/Projects/ulearn/Ulearn/courses/Help/Help.zip";
 
-			var task = CreateCourse(path);
-			task.Wait();
+			var task2 = UploadCourse(path, token);
+			task2.Wait();
 		}
 
 		private static async Task<AccountTokenResponseDto> GetJwtToken(LoginPasswordParameters parameters)
@@ -43,12 +49,14 @@ namespace CourseToolHotReloader
 			return JsonSerializer.Deserialize<AccountTokenResponseDto>(result);
 		}
 
-		private static async Task CreateCourse(string path)
+		private static async Task UploadCourse(string path, string token)
 		{
 			const string baseUrl = "http://localhost:8000";
-			var url = $"{baseUrl}/tempCourses/create/123";
-
+			var url = $"{baseUrl}/tempCourses/uploadCourse/123";
+			
 			using var client = new HttpClient();
+			client.DefaultRequestHeaders.Authorization =
+				new AuthenticationHeaderValue("Bearer", token);
 
 			var multiForm = new MultipartFormDataContent();
 			var fileStream = File.OpenRead(path);
@@ -59,23 +67,5 @@ namespace CourseToolHotReloader
 			var result = response.Content.ReadAsStringAsync().Result;
 		}
 
-		public class AccountTokenResponseDto
-		{
-			[JsonPropertyName("token")]
-			public string Token { get; set; }
-
-			[JsonPropertyName("status")]
-
-			public string Status { get; set; }
-		}
-
-		private class LoginPasswordParameters
-		{
-			[JsonPropertyName("login")]
-			public string Login { get; set; }
-
-			[JsonPropertyName("password")]
-			public string Password { get; set; }
-		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿﻿namespace CourseToolHotReloader
+﻿﻿namespace CourseToolHotReloader.Dtos
 {
     
     public interface ICourseUpdate

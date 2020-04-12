@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using CourseToolHotReloader.Dtos;
 
-namespace CourseToolHotReloader
+namespace CourseToolHotReloader.ApiClient
 {
     public interface IUlearnApiClient
     {

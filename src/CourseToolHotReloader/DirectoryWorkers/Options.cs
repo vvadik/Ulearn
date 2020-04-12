@@ -1,6 +1,6 @@
 ﻿﻿using CommandLine;
 
-namespace CourseToolHotReloader
+namespace CourseToolHotReloader.DirectoryWorkers
 {
         internal class Options
         {
