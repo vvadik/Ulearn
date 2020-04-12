@@ -3,8 +3,6 @@ using System.Runtime.Serialization;
 using Vostok.Context;
 using Vostok.Tracing.Abstractions;
 
-//using Vostok.Tracing;
-
 namespace Ulearn.Common.Api.Models.Responses
 {
 	[DataContract]
