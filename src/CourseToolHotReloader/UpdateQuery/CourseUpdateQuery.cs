@@ -8,24 +8,26 @@ namespace CourseToolHotReloader.UpdateQuery
 {
 	public interface ICourseUpdateQuery
 	{
-		void Push(ICourseUpdate update);
+		void RegisterUpdate(ICourseUpdate update);
+		void RegisterDelete(ICourseUpdate update);
 		IList<ICourseUpdate> GetAllCourseUpdate();
+		IList<ICourseUpdate> GetAllDeletedFiles();
 	}
 
 	public class CourseUpdateQuery : ICourseUpdateQuery
 	{
-		private ConcurrentQueue<ICourseUpdate> query;
-		private ConcurrentDictionary<string, ICourseUpdate> query1;
+		private ConcurrentDictionary<string, ICourseUpdate> updatesQuery;
+		private ConcurrentBag<ICourseUpdate> deletedFiles;
 
 		public CourseUpdateQuery()
 		{
-			query = new ConcurrentQueue<ICourseUpdate>();
-			query1 = new ConcurrentDictionary<string, ICourseUpdate>();
+			updatesQuery = new ConcurrentDictionary<string, ICourseUpdate>();
+			deletedFiles = new ConcurrentBag<ICourseUpdate>();
 		}
 
-		public void Push(ICourseUpdate update)
+		public void RegisterUpdate(ICourseUpdate update)
 		{
-			if (query1.ContainsKey(update.FullPath)) // todo remove
+			if (updatesQuery.ContainsKey(update.FullPath)) // todo remove
 			{
 				Console.WriteLine($"{update.Name} update to query");
 			}
@@ -34,13 +36,35 @@ namespace CourseToolHotReloader.UpdateQuery
 				Console.WriteLine($"{update.Name} add to query");
 			}
 
-			query1.AddOrUpdate(update.FullPath, update, (_1, _2) => update);
+			updatesQuery.AddOrUpdate(update.FullPath, update, (_1, _2) => update);
+		}
+
+		public void RegisterDelete(ICourseUpdate update)
+		{
+			if (deletedFiles.Contains(update)) // todo remove
+			{
+				Console.WriteLine($"{update.Name} error?");
+			}
+			else
+			{
+				Console.WriteLine($"{update.Name} add to delete query");
+			}
+
+			updatesQuery.TryRemove(update.FullPath, out _);
+			deletedFiles.Add(update);
 		}
 
 		public IList<ICourseUpdate> GetAllCourseUpdate()
 		{
-			var result = query1.Values.ToArray();
-			query1.Clear();
+			var result = updatesQuery.Values.ToArray();
+			updatesQuery.Clear();
+			return result;
+		}
+
+		public IList<ICourseUpdate> GetAllDeletedFiles()
+		{
+			var result = deletedFiles.ToArray();
+			deletedFiles.Clear();
 			return result;
 		}
 	}

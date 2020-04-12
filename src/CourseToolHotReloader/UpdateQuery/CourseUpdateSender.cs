@@ -21,7 +21,7 @@ namespace CourseToolHotReloader.UpdateQuery
 
 		public void SendCourseUpdates()
 		{
-			_ulearnApiClient.SendCourseUpdates(_courseUpdateQuery.GetAllCourseUpdate());
+			_ulearnApiClient.SendCourseUpdates(_courseUpdateQuery.GetAllCourseUpdate(), _courseUpdateQuery.GetAllDeletedFiles());
 		}
 	}
 }

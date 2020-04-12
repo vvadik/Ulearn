@@ -29,7 +29,7 @@ namespace CourseToolHotReloader.DirectoryWorkers
 		{
 			// todo use pathToCourse;
 			path = "C:\\Users\\holkin\\RiderProjects\\ConsoleHotReloader\\ConsoleHotReloader\\bin\\Debug\\netcoreapp3.0\\testFolder";
-			WatchDirectory(Path.GetDirectoryName(path), RegisterUpdate);
+			WatchDirectory(path, RegisterUpdate);
 		}
 
 		private void RegisterUpdate(object _, FileSystemEventArgs fileSystemEventArgs)
@@ -37,8 +37,14 @@ namespace CourseToolHotReloader.DirectoryWorkers
 			var relativePath = fileSystemEventArgs.FullPath.Replace(path, "");
 
 			var courseUpdate = CourseUpdateBuilder.Build(fileSystemEventArgs.Name, fileSystemEventArgs.FullPath, relativePath);
-
-			courseUpdateQuery.Push(courseUpdate);
+			if (fileSystemEventArgs.ChangeType == WatcherChangeTypes.Deleted)
+			{
+				courseUpdateQuery.RegisterDelete(courseUpdate);
+			}
+			else
+			{
+				courseUpdateQuery.RegisterUpdate(courseUpdate);
+			}
 
 			debouncedSendUpdates();
 		}
