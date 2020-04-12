@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using CourseToolHotReloader.DirectoryWorkers;
 using CourseToolHotReloader.Dtos;
 
 namespace CourseToolHotReloader.ApiClient
@@ -14,11 +15,9 @@ namespace CourseToolHotReloader.ApiClient
         private IUlearnApiClient _ulearnApiClientImplementation;
 
         public void SendCourseUpdates(IList<ICourseUpdate> updates)
-        {
-            foreach (var courseUpdate in updates)
-            {
-                Console.WriteLine(courseUpdate.Name);
-            }
+		{
+			var guid = ZipHelper.CreateNewZipByUpdates(updates);
+			Console.WriteLine($"{guid}.zip created");
         }
     }
 }

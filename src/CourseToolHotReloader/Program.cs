@@ -52,7 +52,7 @@ namespace CourseToolHotReloader
 		// пока нет тестов тестирую как могу
 		private static void ZipTest()
 		{
-			ZipHelper.PackZip(null);
+			//ZipHelper.CreateNewZipByUpdates();
 		}
 	}
 }

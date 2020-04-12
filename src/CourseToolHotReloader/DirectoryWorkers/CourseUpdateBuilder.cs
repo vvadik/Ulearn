@@ -5,12 +5,13 @@ namespace CourseToolHotReloader.DirectoryWorkers
 {
 	public class CourseUpdateBuilder
 	{
-		public static CourseUpdate Build(FileSystemEventArgs fileSystemEventArgs)
+		public static ICourseUpdate Build(string name, string fullPath, string relativePath)
 		{
 			var courseUpdate = new CourseUpdate
 			{
-				Name = fileSystemEventArgs.Name,
-				RelativePath = fileSystemEventArgs.FullPath
+				Name = name,
+				FullPath = fullPath,
+				RelativePath = relativePath
 			};
 			return courseUpdate;
 		}

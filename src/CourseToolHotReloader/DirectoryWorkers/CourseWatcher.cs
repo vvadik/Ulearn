@@ -15,27 +15,32 @@ namespace CourseToolHotReloader.DirectoryWorkers
 	{
 		private readonly ICourseUpdateSender courseUpdateSender;
 		private readonly ICourseUpdateQuery courseUpdateQuery;
+		private string path;
+		private readonly Action debouncedSendUpdates;
 
 		public CourseWatcher(ICourseUpdateQuery courseUpdateQuery, ICourseUpdateSender courseUpdateSender)
 		{
 			this.courseUpdateSender = courseUpdateSender;
 			this.courseUpdateQuery = courseUpdateQuery;
+			debouncedSendUpdates = Debounce(courseUpdateSender.SendCourseUpdates);
 		}
 
 		public void StartWatch(string pathToCourse)
 		{
 			// todo use pathToCourse;
-			//var path = "C:\\Users\\holkin\\RiderProjects\\ConsoleHotReloader\\ConsoleHotReloader\\bin\\Debug\\netcoreapp3.0\\testFolder";
-			WatchDirectory(Path.GetDirectoryName(pathToCourse), RegisterUpdate);
+			path = "C:\\Users\\holkin\\RiderProjects\\ConsoleHotReloader\\ConsoleHotReloader\\bin\\Debug\\netcoreapp3.0\\testFolder";
+			WatchDirectory(Path.GetDirectoryName(path), RegisterUpdate);
 		}
 
 		private void RegisterUpdate(object _, FileSystemEventArgs fileSystemEventArgs)
 		{
-			var courseUpdate = CourseUpdateBuilder.Build(fileSystemEventArgs);
+			var relativePath = fileSystemEventArgs.FullPath.Replace(path, "");
+
+			var courseUpdate = CourseUpdateBuilder.Build(fileSystemEventArgs.Name, fileSystemEventArgs.FullPath, relativePath);
 
 			courseUpdateQuery.Push(courseUpdate);
 
-			Debounce(courseUpdateSender.SendCourseUpdates)();
+			debouncedSendUpdates();
 		}
 
 
@@ -64,7 +69,7 @@ namespace CourseToolHotReloader.DirectoryWorkers
 		}
 
 
-		private static Action Debounce(Action func, int milliseconds = 1000)
+		private static Action Debounce(Action func, int milliseconds = 5000)
 		{
 			CancellationTokenSource cancelTokenSource = null;
 			return () =>
