@@ -13,6 +13,7 @@ using Vostok.Clusterclient.Core.Model;
 using Vostok.Clusterclient.Transport;
 using Vostok.Logging.Serilog;
 using Newtonsoft.Json;
+using Vostok.Clusterclient.Core.Criteria;
 using Vostok.Clusterclient.Core.Strategies;
 using Vostok.Clusterclient.Core.Topology;
 using Vostok.Logging.Abstractions;
@@ -44,6 +45,15 @@ namespace Ulearn.Common.Api
 				config.ClusterProvider = new FixedClusterProvider(settings.EndpointUrl);
 				config.TargetServiceName = settings.ServiceName;
 				config.DefaultRequestStrategy = Strategy.SingleReplica;
+				config.SetupResponseCriteria(
+					//new AcceptNonRetriableCriterion(), // Пока у нас одна реплика, используем результат, какой есть
+					//new RejectNetworkErrorsCriterion(),
+					//new RejectServerErrorsCriterion(),
+					//new RejectThrottlingErrorsCriterion(),
+					//new RejectUnknownErrorsCriterion(),
+					//new RejectStreamingErrorsCriterion(),
+					new AlwaysAcceptCriterion()
+				);
 			});
 		}
 
@@ -82,8 +92,14 @@ namespace Ulearn.Common.Api
 				log.Error(e, "Can't send request to {serviceName}: {message}", settings.ServiceName, e.Message);
 				throw new ApiClientException($"Can't send request to {settings.ServiceName}: {e.Message}", e);
 			}
-
+			
 			if (response.Status != ClusterResultStatus.Success)
+			{
+				log.Error("Bad response status from {serviceName}: {status}", settings.ServiceName, response.Status.ToString());
+				throw new ApiClientException($"Bad response status from {settings.ServiceName}: {response.Status}");
+			}
+
+			if (!response.Response.IsSuccessful)
 			{
 				log.Error("Bad response code from {serviceName}: {statusCode} {statusCodeDescrption}", settings.ServiceName, (int)response.Response.Code, response.Response.Code.ToString());
 				throw new ApiClientException($"Bad response code from {settings.ServiceName}: {(int)response.Response.Code} {response.Response.Code}");
