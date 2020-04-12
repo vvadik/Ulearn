@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Reflection;
+using System.Threading.Tasks;
 using Community.AspNetCore.ExceptionHandling;
-using Community.AspNetCore.ExceptionHandling.Logs;
 using Community.AspNetCore.ExceptionHandling.Mvc;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -16,49 +16,40 @@ using Newtonsoft.Json.Converters;
 using Serilog;
 using Serilog.Events;
 using Swashbuckle.AspNetCore.Filters;
-using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Api.Swagger;
-using Vostok.Commons.Extensions.UnitConvertions;
-using Vostok.Hosting;
-using Vostok.Instrumentation.AspNetCore;
+using Vostok.Applications.AspNetCore;
+using Vostok.Applications.AspNetCore.Builders;
+using Vostok.Applications.AspNetCore.Configuration;
+using Vostok.Hosting.Abstractions;
 using Vostok.Logging.Serilog;
-using Vostok.Logging.Serilog.Enrichers;
-using Vostok.Metrics;
 using ILogger = Serilog.ILogger;
 
 namespace Ulearn.Common.Api
 {
-	public class BaseApiWebApplication : AspNetCoreVostokApplication
+	public class BaseApiWebApplication : VostokAspNetCoreApplication
 	{
-		protected override void OnStarted(IVostokHostingEnvironment hostingEnvironment)
+		public override Task WarmupAsync(IVostokHostingEnvironment environment, IServiceProvider provider)
 		{
-			hostingEnvironment.MetricScope.SystemMetrics(1.Minutes());
+			return Task.CompletedTask;
 		}
 
-		protected override IWebHost BuildWebHost(IVostokHostingEnvironment hostingEnvironment)
+		public override void Setup(IVostokAspNetCoreApplicationBuilder builder, IVostokHostingEnvironment hostingEnvironment)
 		{
 			var loggerConfiguration = new LoggerConfiguration()
-				.Enrich.With<ThreadEnricher>()
-				.Enrich.With<FlowContextEnricher>()
 				.MinimumLevel.Debug()
-				.WriteTo.Airlock(LogEventLevel.Information);
-
-			if (hostingEnvironment.Log != null)
-				loggerConfiguration = loggerConfiguration.WriteTo.VostokLog(hostingEnvironment.Log, LogEventLevel.Information);
+				.WriteTo.Sink(new VostokSink(hostingEnvironment.Log), LogEventLevel.Debug);
 			var logger = loggerConfiguration.CreateLogger();
 
-			return new WebHostBuilder()
+			builder.SetupWebHost(webHostBuilder => webHostBuilder
 				.UseKestrel()
-				.UseUrls($"http://*:{hostingEnvironment.Configuration["port"]}/")
-				.AddVostokServices()
 				.ConfigureServices(s => ConfigureServices(s, hostingEnvironment, logger))
-				.UseSerilog(logger)
+				.UseSerilog()
+				.UseEnvironment(hostingEnvironment.ApplicationIdentity.Environment)
 				.Configure(app =>
 				{
 					var env = app.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
-					app.UseVostok();
 					if (env.IsDevelopment())
 						app.UseDeveloperExceptionPage();
 
@@ -85,7 +76,21 @@ namespace Ulearn.Common.Api
 
 					ConfigureWebApplication(app);
 				})
-				.Build();
+			).SetupLogging(s =>
+			{
+				s.LogRequests = true;
+				s.LogResponses = true;
+				s.LogRequestHeaders = false;
+				s.LogResponseCompletion = true;
+				s.LogResponseHeaders = false;
+				s.LogQueryString = new LoggingCollectionSettings(_ => true);
+			})
+			.SetupThrottling(b => b.DisableThrottling());
+		}
+
+		public class UlearnPortConfiguration
+		{
+			public string Port { get; set; }
 		}
 
 		protected virtual IApplicationBuilder ConfigureCors(IApplicationBuilder app)
