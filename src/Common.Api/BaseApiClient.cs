@@ -1,71 +1,127 @@
 using System;
 using System.Collections.Specialized;
+using System.IO;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
-using System.Web;
 using Serilog;
 using Ulearn.Common.Api.Models.Parameters;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
+using Vostok.Clusterclient.Core;
+using Vostok.Clusterclient.Core.Model;
+using Vostok.Clusterclient.Transport;
+using Vostok.Logging.Serilog;
+using Newtonsoft.Json;
+using Vostok.Clusterclient.Core.Criteria;
+using Vostok.Clusterclient.Core.Strategies;
+using Vostok.Clusterclient.Core.Topology;
+using Vostok.Logging.Abstractions;
+using Vostok.Logging.Tracing;
+using Vostok.Telemetry.Kontur;
 
 namespace Ulearn.Common.Api
 {
 	public class BaseApiClient
 	{
-		private readonly ILogger logger;
+		private readonly ILog log;
 		private readonly ApiClientSettings settings;
-		private readonly HttpClient httpClient;
+		private readonly ClusterClient clusterClient;
 
-		public BaseApiClient(ILogger logger, ApiClientSettings settings)
+		protected BaseApiClient(ILogger logger, ApiClientSettings settings)
 		{
-			this.logger = logger;
 			this.settings = settings;
 
-			httpClient = new HttpClient
+			var contextName = GetType().Name;
+			log = new SerilogLog(logger)
+				.ForContext(contextName)
+				.WithTracingProperties(KonturTracerProvider.Get());
+			
+			clusterClient = new ClusterClient(log, config =>
 			{
-				Timeout = settings.DefaultTimeout,
-				BaseAddress = settings.EndpointUrl
-			};
+				config.SetupUniversalTransport();
+				config.DefaultTimeout = settings.DefaultTimeout;
+				config.SetupDistributedKonturTracing();
+				config.ClusterProvider = new FixedClusterProvider(settings.EndpointUrl);
+				config.TargetServiceName = settings.ServiceName;
+				config.DefaultRequestStrategy = Strategy.SingleReplica;
+				config.SetupResponseCriteria(
+					//new AcceptNonRetriableCriterion(), // Пока у нас одна реплика, используем результат, какой есть
+					//new RejectNetworkErrorsCriterion(),
+					//new RejectServerErrorsCriterion(),
+					//new RejectThrottlingErrorsCriterion(),
+					//new RejectUnknownErrorsCriterion(),
+					//new RejectStreamingErrorsCriterion(),
+					new AlwaysAcceptCriterion()
+				);
+			});
 		}
 
 		protected async Task<TResult> MakeRequestAsync<TParameters, TResult>(HttpMethod method, string url, TParameters parameters)
 			where TParameters : ApiParameters
 			where TResult : ApiResponse
 		{
-			HttpResponseMessage response;
+			ClusterResult response;
 			if (settings.LogRequestsAndResponses)
-				logger.Information("Send {method} request to {serviceName} ({url}) with parameters: {parameters}", method.Method, settings.ServiceName, url, parameters.ToString());
+				log.Info("Send {method} request to {serviceName} ({url}) with parameters: {parameters}", method.Method, settings.ServiceName, url, parameters.ToString());
 
 			try
 			{
 				if (method == HttpMethod.Get)
-					response = await httpClient.GetAsync(BuildUrl(httpClient.BaseAddress + url, parameters.ToNameValueCollection())).ConfigureAwait(false);
+				{
+					var request = Request.Get(BuildUrl(settings.EndpointUrl + url));
+					var parametersNameValueCollection = parameters.ToNameValueCollection();
+					foreach (var key in parametersNameValueCollection.AllKeys)
+						request = request.WithAdditionalQueryParameter(key, parametersNameValueCollection[key]);
+					response = await clusterClient.SendAsync(request).ConfigureAwait(false);
+				}
 				else if (method == HttpMethod.Post)
-					response = await httpClient.PostAsJsonAsync(BuildUrl(httpClient.BaseAddress + url).ToString(), parameters).ConfigureAwait(false);
+				{
+					var serializedPayload = JsonConvert.SerializeObject(parameters, Formatting.Indented);
+					var request = Request
+						.Post(BuildUrl(settings.EndpointUrl + url))
+						.WithContent(serializedPayload, Encoding.UTF8)
+						.WithContentTypeHeader("application/json");
+					response = await clusterClient.SendAsync(request).ConfigureAwait(false);
+				}
 				else
 					throw new ApiClientException($"Internal error: unsupported http method: {method.Method}");
 			}
 			catch (Exception e)
 			{
-				logger.Error(e, "Can't send request to {serviceName}: {message}", settings.ServiceName, e.Message);
+				log.Error(e, "Can't send request to {serviceName}: {message}", settings.ServiceName, e.Message);
 				throw new ApiClientException($"Can't send request to {settings.ServiceName}: {e.Message}", e);
 			}
-
-			if (!response.IsSuccessStatusCode)
+			
+			if (response.Status != ClusterResultStatus.Success)
 			{
-				logger.Error("Bad response code from {serviceName}: {statusCode} {statusCodeDescrption}", settings.ServiceName, (int)response.StatusCode, response.StatusCode.ToString());
-				throw new ApiClientException($"Bad response code from {settings.ServiceName}: {(int)response.StatusCode} {response.StatusCode}");
+				log.Error("Bad response status from {serviceName}: {status}", settings.ServiceName, response.Status.ToString());
+				throw new ApiClientException($"Bad response status from {settings.ServiceName}: {response.Status}");
+			}
+
+			if (!response.Response.IsSuccessful)
+			{
+				log.Error("Bad response code from {serviceName}: {statusCode} {statusCodeDescrption}", settings.ServiceName, (int)response.Response.Code, response.Response.Code.ToString());
+				throw new ApiClientException($"Bad response code from {settings.ServiceName}: {(int)response.Response.Code} {response.Response.Code}");
 			}
 
 			TResult result;
 			string jsonResult;
 			try
 			{
-				(result, jsonResult) = await response.Content.ReadAsJsonAsync<TResult>().ConfigureAwait(false);
+				MemoryStream ms = null;
+				if (response.Response.HasStream)
+				{
+					ms = new MemoryStream();
+					response.Response.Stream.CopyTo(ms);
+				} else if (response.Response.HasContent)
+					ms = response.Response.Content.ToMemoryStream();
+				jsonResult = Encoding.UTF8.GetString(ms.ToArray());
+				result = JsonConvert.DeserializeObject<TResult>(jsonResult);
 			}
 			catch (Exception e)
 			{
-				logger.Error(e, "Can't parse response from {serviceName}: {message}", settings.ServiceName, e.Message);
+				log.Error(e, "Can't parse response from {serviceName}: {message}", settings.ServiceName, e.Message);
 				throw new ApiClientException($"Can't parse response from {settings.ServiceName}: {e.Message}", e);
 			}
 
@@ -79,7 +135,7 @@ namespace Ulearn.Common.Api
 					shortened = true;
 				}
 
-				logger.Information($"Received response from \"{settings.ServiceName}\"{(shortened ? " (сокращенный)" : "")}: {logResult}");
+				log.Info($"Received response from \"{settings.ServiceName}\"{(shortened ? " (сокращенный)" : "")}: {logResult}");
 			}
 
 			return result;
@@ -107,12 +163,18 @@ namespace Ulearn.Common.Api
 
 	public class ApiClientSettings
 	{
-		public Uri EndpointUrl { get; set; }
+		public ApiClientSettings(string endpointUrl)
+		{
+			endpointUrl = endpointUrl.Replace("localhost", Environment.MachineName.ToLowerInvariant());
+			EndpointUrl = new Uri(endpointUrl);
+		}
 
-		public TimeSpan DefaultTimeout { get; set; } = TimeSpan.FromSeconds(10);
+		public readonly Uri EndpointUrl;
 
-		public string ServiceName { get; set; } = "service";
+		public TimeSpan DefaultTimeout = TimeSpan.FromSeconds(10);
 
-		public bool LogRequestsAndResponses { get; set; } = true;
+		public string ServiceName = "ulearn.service";
+
+		public bool LogRequestsAndResponses = true;
 	}
 }

@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Converters;
@@ -31,9 +30,7 @@ using Ulearn.Web.Api.Controllers.Notifications;
 using Ulearn.Web.Api.Models;
 using Ulearn.Web.Api.Models.Binders;
 using Ulearn.Web.Api.Swagger;
-using Vostok.Commons.Extensions.UnitConvertions;
-using Vostok.Hosting;
-using Vostok.Metrics;
+using Vostok.Hosting.Abstractions;
 using Web.Api.Configuration;
 using Enum = System.Enum;
 using ILogger = Serilog.ILogger;
@@ -49,14 +46,13 @@ namespace Ulearn.Web.Api
 			configuration = ApplicationConfiguration.Read<WebApiConfiguration>();
 		}
 
-		protected override void OnStarted(IVostokHostingEnvironment hostingEnvironment)
+		public override Task WarmupAsync(IVostokHostingEnvironment environment, IServiceProvider provider)
 		{
-			hostingEnvironment.MetricScope.SystemMetrics(1.Minutes());
-
 #if DEBUG
 			/* Initialize EntityFramework Profiler. See https://www.hibernatingrhinos.com/products/efprof/learn for details */
 			HibernatingRhinos.Profiler.Appender.EntityFramework.EntityFrameworkProfiler.Initialize();
 #endif
+			return Task.CompletedTask;
 		}
 
 		protected override IApplicationBuilder ConfigureCors(IApplicationBuilder app)
@@ -84,16 +80,19 @@ namespace Ulearn.Web.Api
 
 		protected override void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment, ILogger logger)
 		{
+			var configuration = hostingEnvironment.SecretConfigurationProvider.Get<WebApiConfiguration>(hostingEnvironment.SecretConfigurationSource);
+			
 			base.ConfigureServices(services, hostingEnvironment, logger);
 
 			/* TODO (andgein): use UlearnDbFactory here */
 			services.AddDbContextPool<UlearnDb>(
 				options => options
 					.UseLazyLoadingProxies()
-					.UseSqlServer(hostingEnvironment.Configuration["database"])
+					.UseSqlServer(configuration.Database)
 			);
 
-			services.Configure<WebApiConfiguration>(options => hostingEnvironment.Configuration.Bind(options));
+			services.Configure<WebApiConfiguration>(options =>
+				options.SetFrom(hostingEnvironment.SecretConfigurationProvider.Get<WebApiConfiguration>(hostingEnvironment.SecretConfigurationSource)));
 
 			/* Add CORS */
 			services.AddCors();

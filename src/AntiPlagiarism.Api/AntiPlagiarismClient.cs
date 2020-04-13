@@ -19,10 +19,9 @@ namespace AntiPlagiarism.Api
 		private readonly string token;
 
 		public AntiPlagiarismClient(string endpointUrl, string token, Logger logger)
-			: base(logger, new ApiClientSettings
+			: base(logger, new ApiClientSettings(endpointUrl)
 			{
-				EndpointUrl = new Uri(endpointUrl),
-				ServiceName = "antiplagiarism service",
+				ServiceName = "ulearn.antiplagiarism-web",
 				DefaultTimeout = defaultTimeout
 			})
 		{

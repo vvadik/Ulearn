@@ -8,7 +8,7 @@ namespace Ulearn.VideoAnnotations.Web.Annotations
 {
 	public class GoogleDocApiClient : IGoogleDocApiClient
 	{
-		private VideoAnnotationsServiceConfiguration Configuration { get; set; }
+		private VideoAnnotationsConfigurationContent Configuration { get; set; }
 
 		public GoogleDocApiClient(IOptions<VideoAnnotationsConfiguration> options)
 		{

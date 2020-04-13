@@ -66,7 +66,7 @@ namespace Ulearn.Web.Api.Controllers
 
 			if (isRequestSafe)
 			{
-				logger.Information("Выключаю автоматическое отслеживание изменений в EF Core: db.ChangeTracker.AutoDetectChangesEnabled = false");
+				logger.Debug("Выключаю автоматическое отслеживание изменений в EF Core: db.ChangeTracker.AutoDetectChangesEnabled = false");
 			}
 		}
 
