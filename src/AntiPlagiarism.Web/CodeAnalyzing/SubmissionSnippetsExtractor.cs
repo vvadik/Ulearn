@@ -32,13 +32,13 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 
 		public IEnumerable<Tuple<int, Snippet>> ExtractSnippetsFromSubmission(Submission submission)
 		{
-			logger.Information("Достаю сниппеты из решения {submissionId}, длина сниппетов: {tokensCount} токенов", submission.Id, configuration.SnippetTokensCount);
+			logger.Information("Достаю сниппеты из решения {submissionId}, длина сниппетов: {tokensCount} токенов", submission.Id, configuration.AntiPlagiarism.SnippetTokensCount);
 			var codeUnits = codeUnitsExtractor.Extract(submission.ProgramText);
 			foreach (var codeUnit in codeUnits)
 			{
 				foreach (var tokenConverter in tokenConverters)
 				{
-					var snippets = snippetsExtractor.GetSnippets(codeUnit.Tokens, configuration.SnippetTokensCount, tokenConverter);
+					var snippets = snippetsExtractor.GetSnippets(codeUnit.Tokens, configuration.AntiPlagiarism.SnippetTokensCount, tokenConverter);
 					foreach (var (index, snippet) in snippets.Enumerate())
 					{
 						yield return Tuple.Create(codeUnit.FirstTokenIndex + index, snippet);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using JetBrains.Annotations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.FileProviders;
@@ -10,7 +11,7 @@ namespace Ulearn.Core.Configuration
 	{
 		private static readonly Lazy<IConfigurationRoot> configuration = new Lazy<IConfigurationRoot>(GetConfiguration);
 
-		public static T Read<T>() where T : AbstractConfiguration
+		public static T Read<T>() where T : UlearnConfigurationBase
 		{
 			var r = configuration.Value.Get<T>();
 			return r;
@@ -24,11 +25,11 @@ namespace Ulearn.Core.Configuration
 			var configurationBuilder = new ConfigurationBuilder()
 				.SetBasePath(applicationPath);
 			configurationBuilder.AddEnvironmentVariables();
-			BuildAppsettingsConfiguration(configurationBuilder);
+			BuildAppSettingsConfiguration(configurationBuilder);
 			return configurationBuilder.Build();
 		}
 
-		public static void BuildAppsettingsConfiguration(IConfigurationBuilder configurationBuilder)
+		public static void BuildAppSettingsConfiguration(IConfigurationBuilder configurationBuilder)
 		{
 			configurationBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 			var environmentName = Environment.GetEnvironmentVariable("UlearnEnvironmentName");
@@ -44,8 +45,26 @@ namespace Ulearn.Core.Configuration
 		}
 	}
 
-	public abstract class AbstractConfiguration
+	public class UlearnConfigurationBase
 	{
+		// Достаточно поверхностного копирования. Потому что важно только сохранить ссылку на объект конфигурации целиком
+		public void SetFrom(UlearnConfigurationBase other)
+		{
+			var thisProperties = GetType().GetProperties();
+			var otherProperties = other.GetType().GetProperties();
+
+			foreach (var otherProperty in otherProperties)
+			{
+				foreach (var thisProperty in thisProperties)
+				{
+					if (otherProperty.Name == thisProperty.Name && otherProperty.PropertyType == thisProperty.PropertyType)
+					{
+						thisProperty.SetValue(this, otherProperty.GetValue(other));
+						break;
+					}
+				}
+			}
+		}
 	}
 
 	public class HostLogConfiguration
@@ -56,10 +75,12 @@ namespace Ulearn.Core.Configuration
 
 		public string MinimumLevel { get; set; }
 
+		public string DbMinimumLevel { get; set; }
+
 		public bool EnableEntityFrameworkLogging { get; set; }
 	}
 
-	public class UlearnConfiguration : AbstractConfiguration
+	public class UlearnConfiguration : UlearnConfigurationBase
 	{
 		public TelegramConfiguration Telegram { get; set; }
 
@@ -88,6 +109,38 @@ namespace Ulearn.Core.Configuration
 		public string RunnerToken { get; set; } // Must be equal on Ulearn.Web and RunC***Job instance
 
 		public int? KeepAliveInterval { get; set; }
+		
+		public HostLogConfiguration HostLog { get; set; }
+
+		public int? Port { get; set; }
+
+		public string Environment { get; set; }
+
+		public HerculesSinkConfiguration Hercules { get; set; }
+
+		[CanBeNull] public AntiplagiarismClientConfiguration AntiplagiarismClient { get; set; }
+
+		[CanBeNull] public VideoAnnotationsClientConfiguration VideoAnnotationsClient { get; set; }
+		
+		public bool DisableKonturServices { get; set; }
+	}
+
+	public class VideoAnnotationsClientConfiguration
+	{
+		public string Endpoint { get; set; }
+	}
+
+	public class AntiplagiarismClientConfiguration
+	{
+		public bool Enabled { get; set; }
+		public string Endpoint { get; set; }
+		public string Token { get; set; }
+	}
+
+	public class HerculesSinkConfiguration
+	{
+		public string ApiKey { get; set; }
+		public string Stream { get; set; }
 	}
 
 	public class TelegramConfiguration

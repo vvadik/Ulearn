@@ -5,10 +5,10 @@ namespace Ulearn.VideoAnnotations.Web.Configuration
 {
 	public class VideoAnnotationsConfiguration : UlearnConfiguration
 	{
-		public VideoAnnotationsServiceConfiguration VideoAnnotations { get; set; }
+		public VideoAnnotationsConfigurationContent VideoAnnotations { get; set; }
 	}
 
-	public class VideoAnnotationsServiceConfiguration
+	public class VideoAnnotationsConfigurationContent
 	{
 		public string GoogleDocsApiKey { get; set; }
 

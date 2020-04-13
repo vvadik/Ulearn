@@ -61,8 +61,8 @@ namespace AntiPlagiarism.Web.Controllers
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
 
-			if (parameters.Code.Length > configuration.MaxCodeLength)
-				return BadRequest(new ErrorResponse($"Code is too long. Maximum length is {configuration.MaxCodeLength} bytes"));
+			if (parameters.Code.Length > configuration.AntiPlagiarism.MaxCodeLength)
+				return BadRequest(new ErrorResponse($"Code is too long. Maximum length is {configuration.AntiPlagiarism.MaxCodeLength} bytes"));
 
 			var tokensCount = GetTokensCount(parameters.Code);
 			var submission = await submissionsRepo.AddSubmissionAsync(
@@ -184,7 +184,7 @@ namespace AntiPlagiarism.Web.Controllers
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
 
-			var maxLastSubmissionsCount = configuration.Actions.GetAuthorPlagiarisms.MaxLastSubmissionsCount;
+			var maxLastSubmissionsCount = configuration.AntiPlagiarism.Actions.GetAuthorPlagiarisms.MaxLastSubmissionsCount;
 			if (parameters.LastSubmissionsCount <= 0 || parameters.LastSubmissionsCount > maxLastSubmissionsCount)
 				return BadRequest(new ErrorResponse($"Invalid last_submissions_count. This value should be at least 1 and at most {maxLastSubmissionsCount}"));
 
@@ -235,12 +235,12 @@ namespace AntiPlagiarism.Web.Controllers
 			if (taskStatisticsParameters == null)
 				return null;
 
-			var faintSuspicionCoefficient = configuration.StatisticsAnalyzing.FaintSuspicionCoefficient;
-			var strongSuspicionCoefficient = configuration.StatisticsAnalyzing.StrongSuspicionCoefficient;
-			var minFaintSuspicionLevel = configuration.StatisticsAnalyzing.MinFaintSuspicionLevel;
-			var minStrongSuspicionLevel = configuration.StatisticsAnalyzing.MinStrongSuspicionLevel;
-			var maxFaintSuspicionLevel = configuration.StatisticsAnalyzing.MaxFaintSuspicionLevel;
-			var maxStrongSuspicionLevel = configuration.StatisticsAnalyzing.MaxStrongSuspicionLevel;
+			var faintSuspicionCoefficient = configuration.AntiPlagiarism.StatisticsAnalyzing.FaintSuspicionCoefficient;
+			var strongSuspicionCoefficient = configuration.AntiPlagiarism.StatisticsAnalyzing.StrongSuspicionCoefficient;
+			var minFaintSuspicionLevel = configuration.AntiPlagiarism.StatisticsAnalyzing.MinFaintSuspicionLevel;
+			var minStrongSuspicionLevel = configuration.AntiPlagiarism.StatisticsAnalyzing.MinStrongSuspicionLevel;
+			var maxFaintSuspicionLevel = configuration.AntiPlagiarism.StatisticsAnalyzing.MaxFaintSuspicionLevel;
+			var maxStrongSuspicionLevel = configuration.AntiPlagiarism.StatisticsAnalyzing.MaxStrongSuspicionLevel;
 
 			return new SuspicionLevels
 			{

@@ -31,7 +31,7 @@ namespace AntiPlagiarism.Web.Database
 		
 		private void RunHandleNewSubmissionWorkerThreads()
 		{
-			var threadsCount = configuration.Value.ThreadsCount;
+			var threadsCount = configuration.Value.AntiPlagiarism.ThreadsCount;
 			if (threadsCount < 1)
 			{
 				logger.Error($"Не могу определить количество потоков для запуска из конфигурации: ${threadsCount}. Количество потоков должно быть положительно");

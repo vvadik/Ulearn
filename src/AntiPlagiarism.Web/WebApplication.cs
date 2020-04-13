@@ -10,13 +10,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Swashbuckle.AspNetCore.Filters;
 using Ulearn.Common.Api;
+using Ulearn.Core.Configuration;
 using Vostok.Hosting;
+using Vostok.Hosting.Abstractions;
 
 namespace AntiPlagiarism.Web
 {
 	public class WebApplication : BaseApiWebApplication
 	{
 		private AddNewSubmissionWorker addNewSubmissionWorker; // держит ссылку на воркеры
+		
 		protected override IApplicationBuilder ConfigureWebApplication(IApplicationBuilder app)
 		{
 			var database = app.ApplicationServices.GetService<AntiPlagiarismDb>();
@@ -29,11 +32,14 @@ namespace AntiPlagiarism.Web
 		{
 			base.ConfigureServices(services, hostingEnvironment, logger);
 
+			var configuration = hostingEnvironment.SecretConfigurationProvider.Get<UlearnConfiguration>(hostingEnvironment.SecretConfigurationSource);
+
 			services.AddDbContext<AntiPlagiarismDb>(
-				options => options.UseSqlServer(hostingEnvironment.Configuration["database"])
+				options => options.UseSqlServer(configuration.Database)
 			);
 
-			services.Configure<AntiPlagiarismConfiguration>(options => hostingEnvironment.Configuration.GetSection("antiplagiarism").Bind(options));
+			services.Configure<AntiPlagiarismConfiguration>(options =>
+				options.SetFrom(hostingEnvironment.SecretConfigurationProvider.Get<AntiPlagiarismConfiguration>(hostingEnvironment.SecretConfigurationSource)));
 
 			services.AddSwaggerExamplesFromAssemblyOf<WebApplication>();
 		}

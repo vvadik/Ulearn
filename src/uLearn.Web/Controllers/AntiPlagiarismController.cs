@@ -22,6 +22,7 @@ using uLearn.Web.FilterAttributes;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
+using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
@@ -40,9 +41,8 @@ namespace uLearn.Web.Controllers
 		static AntiPlagiarismController()
 		{
 			var serilogLogger = new LoggerConfiguration().WriteTo.Log4Net().CreateLogger();
-			var antiPlagiarismEndpointUrl = WebConfigurationManager.AppSettings["ulearn.antiplagiarism.endpoint"];
-			var antiPlagiarismToken = WebConfigurationManager.AppSettings["ulearn.antiplagiarism.token"];
-			antiPlagiarismClient = new AntiPlagiarismClient(antiPlagiarismEndpointUrl, antiPlagiarismToken, serilogLogger);
+			var antiplagiarismClientConfiguration = ApplicationConfiguration.Read<UlearnConfiguration>().AntiplagiarismClient;
+			antiPlagiarismClient = new AntiPlagiarismClient(antiplagiarismClientConfiguration.Endpoint, antiplagiarismClientConfiguration.Token, serilogLogger);
 		}
 
 		public AntiPlagiarismController(ULearnDb db, UserSolutionsRepo userSolutionsRepo, GroupsRepo groupsRepo)

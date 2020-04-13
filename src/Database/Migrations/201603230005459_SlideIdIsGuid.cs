@@ -1,5 +1,4 @@
 using System.Data.Entity.Migrations;
-using ApprovalUtilities.Utilities;
 
 namespace Database.Migrations
 {
@@ -7,7 +6,7 @@ namespace Database.Migrations
 	{
 		private void InsertHyphensIntoGuids(string tableName)
 		{
-			Sql("UPDATE {0} SET SlideId = SUBSTRING(SlideId, 1, 8) + '-' + SUBSTRING(SlideId, 9, 4) + '-' + SUBSTRING(SlideId, 13, 4) + '-' + SUBSTRING(SlideId, 17, 4) + '-' + SUBSTRING(SlideId, 21, 12) WHERE LEN(SlideId) = 32".FormatWith(tableName));
+			Sql($"UPDATE {tableName} SET SlideId = SUBSTRING(SlideId, 1, 8) + '-' + SUBSTRING(SlideId, 9, 4) + '-' + SUBSTRING(SlideId, 13, 4) + '-' + SUBSTRING(SlideId, 17, 4) + '-' + SUBSTRING(SlideId, 21, 12) WHERE LEN(SlideId) = 32");
 		}
 
 		public override void Up()
@@ -79,10 +78,10 @@ namespace Database.Migrations
 			CreateIndex("dbo.UserQuizs", new[] { "SlideId", "Timestamp" }, name: "StatisticsIndex");
 			CreateIndex("dbo.UserQuizs", new[] { "UserId", "SlideId", "isDropped", "QuizId", "ItemId" }, name: "FullIndex");
 			CreateIndex("dbo.SlideRates", new[] { "SlideId", "UserId" }, name: "SlideAndUser");
-			CreateIndex("dbo.LtiSlideRequests", new[] { "SlideId", "UserId" }, name: "IDX_LtiSlideRequest_SlideAndUser");
+			CreateIndex("dbo.LtiSliInsertHyphensIntoGuidsdeRequests", new[] { "SlideId", "UserId" }, name: "IDX_LtiSlideRequest_SlideAndUser");
 			CreateIndex("dbo.SlideHints", new[] { "SlideId", "UserId", "HintId", "IsHintHelped" }, name: "FullIndex");
 			CreateIndex("dbo.UserSolutions", new[] { "SlideId", "IsRightAnswer", "CodeHash", "Timestamp" }, name: "AcceptedList");
-			CreateIndex("dbo.Comments", "SlideId", name: "IDX_Comment_CommentBySlide");
+			CreateIndex("dbo.Comments", "SlideId", name: "IFormatWithDX_Comment_CommentBySlide");
 		}
 	}
 }
