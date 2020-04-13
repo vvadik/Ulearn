@@ -27,7 +27,7 @@ class GroupPage extends Component {
 		loadingScores: true,
 		loading: false,
 		scores: [],
-		scoresId: [],
+		checkedScoresSettingsIds: [],
 		status: '',
 	};
 
@@ -65,12 +65,12 @@ class GroupPage extends Component {
 		api.groups.getGroupScores(groupId)
 		.then(json => {
 			const scores = json.scores;
-			const scoresId = scores
+			const checkedScoresSettingsIds = scores
 				.filter(score=> score.areAdditionalScoresEnabledInThisGroup || score.areAdditionalScoresEnabledForAllGroups || false)
 				.map(score=> score.id);
 			this.setState({
 				scores,
-				scoresId,
+				checkedScoresSettingsIds,
 			});
 		})
 		.catch(console.error)
@@ -228,13 +228,13 @@ class GroupPage extends Component {
 		const updatedScores = scores
 		.map(item => item.id === key ? {...item, [field]: value} : item);
 
-		const scoresInGroup = updatedScores
+		const checkedScoresSettingsIds = updatedScores
 		.filter(item => item[field] === true)
 		.map(item => item.id);
 
 		this.setState({
 			scores: updatedScores,
-			scoresId: scoresInGroup,
+			checkedScoresSettingsIds,
 		});
 	};
 
@@ -245,11 +245,11 @@ class GroupPage extends Component {
 	};
 
 	sendSettings = (e) => {
-		const {group, updatedFields, scoresId} = this.state;
+		const {group, updatedFields, checkedScoresSettingsIds} = this.state;
 		e.preventDefault();
 
 		const saveGroup = api.groups.saveGroupSettings(group.id, updatedFields);
-		const saveScores = api.groups.saveScoresSettings(group.id, scoresId);
+		const saveScores = api.groups.saveScoresSettings(group.id, checkedScoresSettingsIds);
 
 		Promise
 		.all([saveGroup, saveScores])
