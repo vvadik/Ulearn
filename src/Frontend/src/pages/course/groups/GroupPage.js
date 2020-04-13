@@ -64,9 +64,13 @@ class GroupPage extends Component {
 	loadGroupScores = (groupId) => {
 		api.groups.getGroupScores(groupId)
 		.then(json => {
-			let scores = json.scores;
+			const scores = json.scores;
+			const scoresId = scores
+				.filter(score=> score.areAdditionalScoresEnabledInThisGroup || score.areAdditionalScoresEnabledForAllGroups || false)
+				.map(score=> score.id);
 			this.setState({
-				scores: scores,
+				scores,
+				scoresId,
 			});
 		})
 		.catch(console.error)
@@ -242,7 +246,6 @@ class GroupPage extends Component {
 
 	sendSettings = (e) => {
 		const {group, updatedFields, scoresId} = this.state;
-
 		e.preventDefault();
 
 		const saveGroup = api.groups.saveGroupSettings(group.id, updatedFields);
