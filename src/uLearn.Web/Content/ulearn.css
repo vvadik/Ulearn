@@ -864,46 +864,46 @@ body.lti-component {
 
 /* User avatars */
 /* Don't add .legacy-page in this block, because avatars are used in notifications dropdown */
-.media-left .user__avatar {
+.user__avatar {
 	width: 54px;
 	height: 54px;
 	display: inline-block;
 	border-radius: 4px;
 }
 
-.media-left .user__avatar.small {
+.user__avatar.small {
 	width: 24px;
 	height: 24px;
 }
 
-.media-left .user__avatar.xsmall {
+.user__avatar.xsmall {
 	width: 18px;
 	height: 18px;
 }
 
-.media-left .user__avatar.large {
+.user__avatar.large {
 	width: 100px;
 	height: 100px;
 }
 
-.media-left .user__avatar.user__avatar__placeholder {
+.user__avatar.user__avatar__placeholder {
 	color: white;
 	font-size: 25pt;
 	text-align: center;
 	padding-top: 3px;
 }
 
-.media-left .user__avatar.user__avatar__placeholder.small {
+.user__avatar.user__avatar__placeholder.small {
 	font-size: 12pt;
 	padding-top: 2px;
 }
 
-.media-left .user__avatar.user__avatar__placeholder.xsmall {
+.user__avatar.user__avatar__placeholder.xsmall {
 	font-size: 9pt;
 	padding-top: 1px;
 }
 
-.media-left .user__avatar.user__avatar__placeholder.large {
+.user__avatar.user__avatar__placeholder.large {
 	font-size: 40pt;
 	padding-top: 10px;
 }
@@ -1518,7 +1518,7 @@ body.lti-component {
 	margin-bottom: 1em;
 }
 
-.legacy-page .slide img {
+.legacy-page .slide img :not(.user__avatar) {
 	max-width: 100%;
 }
 
