@@ -1522,19 +1522,19 @@ body.lti-component {
 	max-width: 100%;
 }
 
-.legacy-page .slide ul {
+.legacy-page .slide ul :not(.slides) {
 	margin-bottom: 1em;
 	padding: 0;
 	list-style: none;
 }
 
-.legacy-page .slide ul li {
+.legacy-page .slide ul :not(.slides) li {
 	position: relative;
 	padding-left: 1.5em;
 	margin-bottom: 0.5em;
 }
 
-.legacy-page .slide ul li:before {
+.legacy-page .slide ul :not(.slides) li:before {
 	content: '—';
 	position: absolute;
 	left: 0;
