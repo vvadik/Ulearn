@@ -83,6 +83,17 @@ class CommentsList extends Component {
 		window.removeEventListener("hashchange", this.handleScrollToCommentByHashFormUrl);
 	}
 
+	componentDidUpdate(prevProps, prevState) {
+		if(this.props.slideId !== prevProps.slideId) {
+			this.commentsData = {...defaultCommentsData};
+			this.setStateIfMounted({
+				threads: [],
+			});
+			const { courseId, slideId, forInstructors } = this.props;
+			this.loadComments(courseId, slideId, forInstructors);
+		}
+	}
+
 	get commentIds() {
 		const { threads } = this.state;
 		return this.getAllCommentsIds(threads);

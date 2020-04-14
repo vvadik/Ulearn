@@ -31,8 +31,7 @@ const mapStateToProps = (state, { match }) => {
 		courseInfo,
 		isNavMenuVisible,
 		units: mapCourseInfoToUnits(courseInfo),
-		isAuthenticated: state.account.isAuthenticated,
-		userId: state.account.id,
+		user: state.account,
 		progress: state.userProgress.progress[courseId],
 		navigationOpened: state.navigation.opened,
 		courseLoadingErrorStatus: state.courses.courseLoadingErrorStatus,
@@ -50,7 +49,7 @@ export default withRouter(connected);
 
 
 function mapCourseInfoToUnits(courseInfo) {
-	if (!courseInfo || !courseInfo.units) {
+	if(!courseInfo || !courseInfo.units) {
 		return null;
 	}
 	return courseInfo.units.reduce((acc, item) => {

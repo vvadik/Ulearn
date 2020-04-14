@@ -77,8 +77,10 @@ class DownloadedHtmlContent extends Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		if (this.props.url !== nextProps.url || this.props.account.isAuthenticated !== nextProps.account.isAuthenticated)
+		if (this.props.url !== nextProps.url || this.props.account.isAuthenticated !== nextProps.account.isAuthenticated) {
+			this.setState({loading:true, body: '',});
 			this.fetchContentFromServer(nextProps.url);
+		}
 	}
 
 	static removeBootstrapModalBackdrop() {

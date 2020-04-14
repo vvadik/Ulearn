@@ -37,6 +37,15 @@ class CommentsView extends Component {
 			this.loadComments(courseId, slideId);
 	};
 
+	componentDidUpdate(prevProps, prevState) {
+		if(this.props.slideId !== prevProps.slideId){
+			const {courseId, slideId, userRoles} = this.props;
+			if (this.isInstructor(userRoles)) {
+				this.loadComments(courseId, slideId);
+			}
+		}
+	}
+
 	loadCommentPolicy = (courseId) => {
 		this.props.commentsApi.getCommentPolicy(courseId)
 			.then(commentPolicy => {
@@ -90,9 +99,6 @@ class CommentsView extends Component {
 
 		return (
 			<header className={styles.header} ref={this.headerRef}>
-				<div className={styles.headerRow}>
-					<h1 className={styles.headerName}>Комментарии</h1>
-				</div>
 				{this.isInstructor(userRoles) &&
 				<div className={styles.tabs}>
 					<Tabs value={activeTab} onChange={(e, id)=> this.handleTabChange(id, true)}>
@@ -127,7 +133,7 @@ class CommentsView extends Component {
 			if (!isUserAction && this.state.tabHasAutomaticallyChanged) {
 				return;
 			}
-			
+
 			if (id !== this.state.activeTab) {
 				this.setState({
 					activeTab: id,
