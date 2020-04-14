@@ -27,27 +27,12 @@
 	<div class="container body-content">
 		<div class="row">
 			<div class="slide">
-				<h1>
-					<span class="slide__title">
-						@if (Model.ManualChecking != null)
-						{
-							@Html.RouteLink(Model.Slide.Title, "Course.SlideById", new { courseId = Model.CourseId, slideId = Model.Slide.Url }, new { title = "Перейти к слайду" })
-						}
-						else
-						{
-							@Model.Slide.Title
-						}
-						@if (Model.SlideEditUrl != null)
-						{
-							<small>
-								<a href="@Model.SlideEditUrl" target="_blank" style="margin-right: 5px">
-									<span class="glyphicon glyphicon-pencil"></span>
-								</a>
-							</small>
-						}
-					</span>
-					<span class="score">@ShowScore(Model.Score)</span>
-				</h1>
+				@if (Model.Score.Item2 != 0)
+				{
+					<h1>
+						<span class="score">@ShowScore(Model.Score)</span>
+					</h1>
+				}
 				@if (!string.IsNullOrEmpty(Model.Error))
 				{
 					<p class="alert alert-danger">@Model.Error</p>
@@ -115,18 +100,7 @@
 				{
 					@Html.Partial("_LoginForContinue")
 				}
-
-				@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.CourseId, slideId = Model.Slide.Id, onSolutionsSlide = false })
-
-				@Html.Action("SlideComments", "Comments", new { courseId = Model.CourseId, slideId = Model.Slide.Id })
 			}
-			else
-			{
-				@* On code review show instructors-only comments *@
-				@Html.Action("SlideComments", "Comments", new { courseId = Model.CourseId, slideId = Model.Slide.Id, openInstructorsComments = true })
-			}
-
-			@Html.Partial("~/Views/Shared/_Footer.cshtml")
 		</div>
 	</div>
 </div>

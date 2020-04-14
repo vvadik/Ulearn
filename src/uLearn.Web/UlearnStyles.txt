@@ -12,7 +12,6 @@ codemirror\addon\merge\merge.css
 Content\tablesorter.css
 tablesorter-master\css\widget.grouping.css
 Content\ulearn.css
-Content\comments.css
 Content\login_and_registration.css
 Content\course_versions.css
 Content\analytics.css
