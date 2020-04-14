@@ -63,9 +63,6 @@ class CourseFlashcardsPage extends Component {
 		return (
 			<header className={ styles.header }>
 				<div>
-					<h2 className={ styles.title }>
-						Флеш-карты для самопроверки
-					</h2>
 					<p className={ styles.description }>
 						Помогут лучше запомнить материал курса и подготовиться к экзаменам
 					</p>

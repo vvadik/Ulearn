@@ -60,9 +60,6 @@ class UnitPage extends Component {
 
 		return (
 			<Loader active={ flashcardsLoading } type={ 'big' }>
-				<h3 className={ styles.title }>
-					Вопросы для самопроверки
-				</h3>
 				{ unitTitle &&
 				<UnitCard
 					haveProgress={ completedUnit }

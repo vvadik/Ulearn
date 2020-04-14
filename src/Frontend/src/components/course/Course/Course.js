@@ -107,13 +107,17 @@ class Course extends Component {
 
 	renderSlide() {
 		const { isNavMenuVisible, } = this.props;
-		const { Slide, slideInfo } = this.getOpenedPage();
+		const { Slide, slideInfo, title } = this.getOpenedPage();
+		let slideTitle = title;
+		if(slideInfo) {
+			slideTitle = slideInfo.current.title;
+		}
 
 		const mainClassName = classnames(styles.slideWrapper, { [styles.withoutNavigation]: !isNavMenuVisible }); // TODO remove it
 
 		return (
 			<main className={ mainClassName }>
-				{ slideInfo && <h1 className={ styles.title }> { slideInfo.current.title } </h1> }
+				{ slideTitle && <h1 className={ styles.title }> { slideTitle } </h1> }
 				<div className={ styles.slide }>
 					<Slide match={ this.props.match }/>
 				</div>
@@ -134,14 +138,14 @@ class Course extends Component {
 			<div className={ styles.navigationButtonsWrapper }>
 				{ prevSlideHref
 					? <Link className={ styles.previousSlideButton }
-							  to={ prevSlideHref }>
+							to={ prevSlideHref }>
 						Предыдущий слайд
 					</Link>
 					: <div className={ styles.disabledSlideButton }>Предыдущий слайд</div>
 				}
 				{ nextSlideHref &&
 				<Link className={ styles.nextSlideButton }
-						to={ nextSlideHref }>Следующий слайд</Link> }
+					  to={ nextSlideHref }>Следующий слайд</Link> }
 			</div>
 		);
 	}
@@ -171,7 +175,7 @@ class Course extends Component {
 	renderFooter() {
 		return (
 			<footer className={ styles.footer }>
-				<p><a href="/Home/Terms">Условия использования платформы</a></p>
+				<p><Link to="/Home/Terms">Условия использования платформы</Link></p>
 				<p>
 					Вопросы и пожеланиями пишите на <a href="mailto:support@ulearn.me">support@ulearn.me</a>
 				</p>
@@ -293,7 +297,7 @@ class Course extends Component {
 		const { slideId, courseInfo } = this.props;
 
 		if(slideId === flashcards) {
-			return { Slide: CourseFlashcardsPage };
+			return { Slide: CourseFlashcardsPage, title: "Вопросы для самопроверки", };
 		}
 
 		if(!courseInfo || !courseInfo.units) {
