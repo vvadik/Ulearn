@@ -15,6 +15,8 @@ import classnames from 'classnames';
 
 import styles from "./Course.less"
 import Error404 from "../../common/Error/Error404";
+import CommentsView from "../../comments/CommentsView/CommentsView";
+import Link from "react-router-dom/Link";
 
 class Course extends Component {
 	constructor(props) {
@@ -30,43 +32,44 @@ class Course extends Component {
 	}
 
 	componentDidMount() {
-		const { loadCourse, loadUserProgress, isAuthenticated, courseId, courseInfo, progress, userId } = this.props;
+		const { loadCourse, loadUserProgress, courseId, courseInfo, progress, user } = this.props;
+		const { isAuthenticated } = user;
 
 		changeCurrentCourseAction(courseId);
 
-		if (!courseInfo) {
+		if(!courseInfo) {
 			loadCourse(courseId);
 		}
 
-		if (isAuthenticated && !progress) {
-			loadUserProgress(courseId, userId);
+		if(isAuthenticated && !progress) {
+			loadUserProgress(courseId, user.id);
 		}
 	}
 
 	componentDidUpdate(prevProps) {
-		const { loadUserProgress, isAuthenticated, courseId, loadCourse, userId } = this.props;
+		const { loadUserProgress, isAuthenticated, courseId, loadCourse, user } = this.props;
 
-		if (isAuthenticated !== prevProps.isAuthenticated) {
+		if(isAuthenticated !== prevProps.isAuthenticated) {
 			loadCourse(courseId);
-			loadUserProgress(courseId, userId);
+			loadUserProgress(courseId, user.id);
 		}
 	}
 
 	static getDerivedStateFromProps(props, state) {
 		const defaultState = { navigationOpened: props.navigationOpened };
 
-		if (!props.units) {
+		if(!props.units) {
 			return defaultState;
 		}
 
-		if (state.currentCourseId !== props.courseId || state.currentSlideId !== props.slideId) {
+		if(state.currentCourseId !== props.courseId || state.currentSlideId !== props.slideId) {
 			const openUnitId = Course.findUnitIdBySlideId(props.slideId, props.courseInfo);
 			const openUnit = props.units[openUnitId];
 			window.scrollTo(0, 0);
 
-			const slide = Course.findSlideBySlideId(props.slideId, props.courseInfo);
-			if (slide && props.progress) {
-				props.updateVisitedSlide(props.courseId, slide.id);
+			const slideInfo = Course.findSlideBySlideId(props.slideId, props.courseInfo);
+			if(slideInfo && props.progress) {
+				props.updateVisitedSlide(props.courseId, slideInfo.current.id);
 			}
 
 			return {
@@ -83,30 +86,99 @@ class Course extends Component {
 	}
 
 	render() {
-		const { courseInfo, courseLoadingErrorStatus, isNavMenuVisible } = this.props;
+		const { courseInfo, courseLoadingErrorStatus, isNavMenuVisible, } = this.props;
 		const { navigationOpened } = this.state;
 
-		if(courseLoadingErrorStatus){
+		if(courseLoadingErrorStatus) {
 			return <Error404/>;
 		}
 
-		if (!courseInfo) {
+		if(!courseInfo) {
 			return null;
 		}
 
-		const Page = this.getOpenedPage();
+		return (
+			<div className={ classnames(styles.root, { 'open': navigationOpened }) }>
+				{ isNavMenuVisible && this.renderNavigation() }
+				{ this.renderSlide() }
+			</div>
+		);
+	}
 
-		const mainClassName = classnames(styles.pageWrapper, { [styles.withoutNavigation]: !isNavMenuVisible }); // TODO remove it
+	renderSlide() {
+		const { isNavMenuVisible, } = this.props;
+		const { Slide, slideInfo } = this.getOpenedPage();
+
+		const mainClassName = classnames(styles.slideWrapper, { [styles.withoutNavigation]: !isNavMenuVisible }); // TODO remove it
 
 		return (
-			<div className={ styles.rootWrapper }>
-				<div className={ classnames(styles.root, { 'open': navigationOpened }) }>
-					{ isNavMenuVisible && this.renderNavigation() }
-					<main className={ mainClassName }>
-						<Page match={ this.props.match }/>
-					</main>
+			<main className={ mainClassName }>
+				{ slideInfo && <h1 className={ styles.title }> { slideInfo.current.title } </h1> }
+				<div className={ styles.slide }>
+					<Slide match={ this.props.match }/>
 				</div>
+				{ slideInfo && isNavMenuVisible && this.renderNavigationButtons(slideInfo) }
+				{ slideInfo && this.renderComments(slideInfo.current) }
+				{ this.renderFooter() }
+			</main>
+		);
+	}
+
+	renderNavigationButtons(slideInfo) {
+		const { courseId, } = this.props;
+		const { previous, next } = slideInfo;
+		const prevSlideHref = previous ? constructPathToSlide(courseId, previous.slug) : null;
+		const nextSlideHref = next ? constructPathToSlide(courseId, next.slug) : null;
+
+		return (
+			<div className={ styles.navigationButtonsWrapper }>
+				{ prevSlideHref
+					? <Link className={ styles.previousSlideButton }
+							  to={ prevSlideHref }>
+						Предыдущий слайд
+					</Link>
+					: <div className={ styles.disabledSlideButton }>Предыдущий слайд</div>
+				}
+				{ nextSlideHref &&
+				<Link className={ styles.nextSlideButton }
+						to={ nextSlideHref }>Следующий слайд</Link> }
 			</div>
+		);
+	}
+
+	handleNavigationButtonClick = (href) => {
+		this.props.history.push(href);
+	};
+
+	renderComments(currentSlide) {
+		const { user, courseId, } = this.props;
+		const { isSystemAdministrator, accessesByCourse, roleByCourse } = user;
+		const courseAccesses = accessesByCourse[courseId] ? accessesByCourse[courseId] : [];
+		const userRoles = { isSystemAdministrator, courseRole: roleByCourse, courseAccesses, };
+
+		return (
+			<div className={ styles.commentsWrapper }>
+				<CommentsView user={ user }
+							  slideType={ currentSlide.type }
+							  slideId={ currentSlide.id }
+							  userRoles={ userRoles }
+							  courseId={ courseId }
+				/>
+			</div>
+		)
+	}
+
+	renderFooter() {
+		return (
+			<footer className={ styles.footer }>
+				<p><a href="/Home/Terms">Условия использования платформы</a></p>
+				<p>
+					Вопросы и пожеланиями пишите на <a href="mailto:support@ulearn.me">support@ulearn.me</a>
+				</p>
+				<p>
+					Сделано в СКБ Контур
+				</p>
+			</footer>
 		);
 	}
 
@@ -134,7 +206,7 @@ class Course extends Component {
 			byUnits: {},
 		};
 
-		if (!progress || scoringGroups.length === 0)
+		if(!progress || scoringGroups.length === 0)
 			return courseStatistics;
 
 		const visitsGroup = scoringGroups.find(gr => gr.id === SCORING_GROUP_IDS.visits);
@@ -145,16 +217,16 @@ class Course extends Component {
 			for (const { maxScore, id, scoringGroup } of unit.slides) {
 				const group = scoringGroups.find(gr => gr.id === scoringGroup);
 
-				if (visitsGroup) {
+				if(visitsGroup) {
 					unitMaxScore += visitsGroup.weight;
-					if (progress[id] && progress[id].visited) {
+					if(progress[id] && progress[id].visited) {
 						unitScore += visitsGroup.weight;
 					}
 				}
 
-				if (group) {
+				if(group) {
 					unitMaxScore += maxScore * group.weight;
-					if (progress[id] && progress[id].score) {
+					if(progress[id] && progress[id].score) {
 						unitScore += progress[id].score * group.weight;
 					}
 				}
@@ -220,29 +292,29 @@ class Course extends Component {
 	getOpenedPage() {
 		const { slideId, courseInfo } = this.props;
 
-		if (slideId === flashcards) {
-			return CourseFlashcardsPage;
+		if(slideId === flashcards) {
+			return { Slide: CourseFlashcardsPage };
 		}
 
-		if (!courseInfo || !courseInfo.units) {
-			return AnyPage;
+		if(!courseInfo || !courseInfo.units) {
+			return { Slide: AnyPage };
 		}
 
-		const currentSlide = Course.findSlideBySlideId(slideId, courseInfo);
+		const currentSlideInfo = Course.findSlideBySlideId(slideId, courseInfo);
 
-		if (currentSlide === null) {
+		if(currentSlideInfo === null) {
 			throw new UrlError();
 		}
 
-		if (currentSlide && currentSlide.type === SLIDETYPE.flashcards) {
-			return UnitFlashcardsPage;
+		if(currentSlideInfo && currentSlideInfo.current.type === SLIDETYPE.flashcards) {
+			return { Slide: UnitFlashcardsPage, slideInfo: currentSlideInfo };
 		}
 
-		return AnyPage;
+		return { Slide: AnyPage, slideInfo: currentSlideInfo };
 	}
 
 	static findUnitIdBySlideId(slideId, courseInfo) {
-		if (!courseInfo || !courseInfo.units) {
+		if(!courseInfo || !courseInfo.units) {
 			return null;
 		}
 
@@ -250,7 +322,7 @@ class Course extends Component {
 
 		for (const unit of units) {
 			for (const slide of unit.slides) {
-				if (slideId === slide.id) {
+				if(slideId === slide.id) {
 					return unit.id;
 				}
 			}
@@ -260,16 +332,34 @@ class Course extends Component {
 	}
 
 	static findSlideBySlideId(slideId, courseInfo) {
-		if (!courseInfo || !courseInfo.units) {
+		if(!courseInfo || !courseInfo.units) {
 			return null;
 		}
 
 		const units = courseInfo.units;
+		let prevSlide, nextSlide;
 
-		for (const unit of units) {
-			for (const slide of unit.slides) {
-				if (slideId === slide.id) {
-					return slide;
+		for (let i = 0; i < units.length; i++) {
+			const { slides } = units[i];
+			for (let j = 0; j < slides.length; j++) {
+				const slide = slides[j];
+
+				if(slide.id === slideId) {
+					if(j > 0) {
+						prevSlide = slides[j - 1];
+					} else if(i > 0) {
+						const prevSlides = units[i - 1].slides;
+						prevSlide = prevSlides[prevSlides.length - 1];
+					}
+
+					if(j < slides.length - 1) {
+						nextSlide = slides[j + 1];
+					} else if(i < units.length - 1) {
+						const nextSlides = units[i + 1].slides;
+						nextSlide = nextSlides[0];
+					}
+
+					return { previous: prevSlide, current: slide, next: nextSlide };
 				}
 			}
 		}
@@ -284,7 +374,7 @@ class Course extends Component {
 		const indexOfActiveUnit = units.findIndex(item => item.id === activeUnitId);
 
 
-		if (indexOfActiveUnit < 0 || indexOfActiveUnit === units.length - 1) {
+		if(indexOfActiveUnit < 0 || indexOfActiveUnit === units.length - 1) {
 			return null;
 		}
 
@@ -311,8 +401,7 @@ class Course extends Component {
 
 Course
 	.propTypes = {
-	isAuthenticated: PropTypes.bool,
-	userId: PropTypes.string,
+	user: PropTypes.object,
 	courseId: PropTypes.string,
 	slideId: PropTypes.string,
 	courseInfo: PropTypes.object, // TODO: описать

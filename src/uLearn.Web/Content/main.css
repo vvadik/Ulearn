@@ -9,13 +9,7 @@ body.without-topbar {
 
 /* Set padding to keep content from hitting the edges */
 .legacy-page .body-content {
-    padding-left: 15px;
-    padding-right: 15px;
 	width: unset;
-}
-
-.legacy-page {
-	padding-bottom: 20px;
 }
 
 /* Set width on the form input elements since they're 100% wide by default */

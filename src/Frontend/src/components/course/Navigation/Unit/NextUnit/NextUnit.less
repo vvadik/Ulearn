@@ -42,10 +42,6 @@
   .open :local {
     .root {
       left: 0;
-
-      @media (min-width: @maxContentWidth) {
-          left: calc((100vw - @maxContentWidth) / 2);
-      }
     }
   }
 }
@@ -82,7 +78,7 @@
   flex-shrink: 0;
 }
 
-@media (min-width: @maxPhoneWidth) {
+@media (min-width: @minLaptopWidth) {
   .root {
     left: 0;
     transition: none;
@@ -90,7 +86,7 @@
 }
 
 
-@media (min-width: @maxLaptopWidth) {
+@media (min-width: @navigationGrowthWidth) {
   .root {
     width: 360px;
     padding: 13px 12px 20px 24px;
@@ -103,7 +99,6 @@
 
 @media (min-width: @maxContentWidth) {
   .root {
-    left: calc((100vw - @maxContentWidth) / 2);
     border-right: 1px solid @borderColor;
   }
 }

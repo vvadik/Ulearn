@@ -268,10 +268,14 @@
 	margin: -20px 30px 0;
 }
 
-.legacy-page .slide-container .container,
 .legacy-page .terms-container .container,
 .legacy-page .main-page .container {
 	max-width: 864px;
+}
+
+.legacy-page .slide-container .container {
+	padding: 0;
+	margin: 0;
 }
 
 .legacy-page .main-page .courses-grid {
@@ -295,10 +299,6 @@
 .legacy-page .main-page .courses-grid .course-tile {
 	padding-right: 15px;
 	padding-left: 15px;
-}
-
-.legacy-page .slide {
-	padding-bottom: 10px;
 }
 
 .legacy-page .slide h1 {
@@ -482,9 +482,7 @@
 
 .legacy-page .slide-container {
 	display: inline-block !important;
-	margin-top: 10px;
 	width: 100%;
-	padding-left: 10px;
 }
 
 
@@ -1538,4 +1536,8 @@ body.lti-component {
 	content: '—';
 	position: absolute;
 	left: 0;
+}
+
+.legacy-page .row{
+	margin: 0;
 }

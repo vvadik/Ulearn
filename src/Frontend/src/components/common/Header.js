@@ -113,11 +113,14 @@ class Header extends Component {
 
 		/* Div should have class .header because some legacy javascript code uses $('.header') for calculating header height */
 		return (
-			<div className={ styles["header"] + " header" } id="header">
-				{ Header.renderPhoneHeader() }
-				{ Header.renderDefaultHeader() }
-				{ !initializing && this.renderUserRoleMenu() }
-			</div>
+			<React.Fragment>
+				<div className={ styles["header"] + " header" } id="header">
+					{ Header.renderPhoneHeader() }
+					{ Header.renderDefaultHeader() }
+					{ !initializing && this.renderUserRoleMenu() }
+				</div>
+				<div className={ styles.headerDivider }/>
+			</React.Fragment>
 		)
 	}
 

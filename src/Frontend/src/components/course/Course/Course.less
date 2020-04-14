@@ -1,67 +1,182 @@
 @import "../../../variables";
 
-@pageWrapperMinPadding: 20px;
-@pageWrapperLaptopLeftPadding: 32px;
-@pageWrapperLaptopTopPadding: 40px;
+@pageWrapperLaptopPadding: 56px;
 @maxPageWrapperWidth: calc(@maxContentWidth - @maxNavigationMenuWidth);
 
-.rootWrapper {
-  min-height: calc(100vh - 50px);
-}
-
 .root {
-  display: flex;
-  max-width: @maxContentWidth;
+  background-color: @backgroundGray;
+  min-height: calc(100vh - @headerHeight);
 }
 
-.pageWrapper {
-  position: relative;
-
+.slideWrapper {
+  width: 100vw;
+  min-height: calc(100vh - @headerHeight - @headerDividerHeight);
   z-index: 0;
 
-  width: 100%;
-  min-height: calc(100vh - @headerHeight);
+  padding: 40px 0;
 
-  padding-left: 20px;
-  padding-right: 20px;
-
-  background-color: #ffffff;
+  background-color: @backgroundGray;
 }
-.pageWrapper.withoutNavigation {
+
+.title {
+  margin-top: 0;
+  margin-bottom: 40px;
+
+  text-align: center;
+
+  font-weight: 600;
+  font-size: 40px;
+  line-height: 48px;
+}
+
+
+.slide {
+  min-height: 530px;
+
+  border-radius: 24px;
+
+  margin-bottom: 40px;
+
+  padding: 16px 24px;
+
+  background-color: @white;
+}
+
+.navigationButtonsWrapper {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 40px;
+}
+
+.slideWrapper.withoutNavigation {
   position: relative;
 
   width: 100%;
   max-width: 100vw;
 
-  padding-left: @pageWrapperMinPadding;
-  padding-right: @pageWrapperMinPadding;
+  margin: 0;
 }
 
-@media (min-width: @maxPhoneWidth) {
-  .pageWrapper {
-    padding-top: 28px;
+.slideButton {
+  padding: 10px 20px;
+
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 32px;
+
+  font-size: 18px;
+  line-height: 24px;
+  text-align: center;
+}
+
+.disabledSlideButton {
+  .slideButton;
+  background-color: @whiteSmoke;
+  color: @disabledColor;
+}
+
+.previousSlideButton {
+  .slideButton;
+  background-color: @white;
+  color: @black;
+}
+
+.previousSlideButton:hover, .previousSlideButton:focus {
+  text-decoration: none;
+  color: @black;
+  background-color: @grayWhite;
+}
+
+.previousSlideButton:active {
+  text-decoration: none;
+  color: @black;
+  background-color: @greySmoke;
+}
+
+.nextSlideButton {
+  .slideButton;
+  border: 1px solid @blueSmoke;
+  color: @white;
+  background-color: @blueSmoke;
+}
+
+.nextSlideButton:hover, .nextSlideButton:focus {
+  color: @white;
+  background-color: @grayBlue;
+  text-decoration: none;
+}
+
+.nextSlideButton:active {
+  color: @white;
+  background-color: @darkBlue;
+  text-decoration: none;
+}
+
+.commentsWrapper {
+  border-radius: 24px;
+
+  padding: 40px 56px;
+  margin-bottom: 40px;
+
+  background-color: @white;
+}
+
+.footer {
+  text-align: center;
+  font-size: 14px;
+  line-height: 14px;
+  color: @dimgray;
+}
+
+.footer :hover {
+  color: @black;
+}
+
+.footer a:hover {
+  color: @blue;
+}
+
+@media (min-width: @minTabletWidth) {
+  .slideWrapper {
+    width: @tabletSlideWidth;
+    max-width: @tabletSlideWidth;
+    margin: auto;
+
     z-index: unset;
+  }
 
-    max-width: calc(100% - @navigationMenuWidth);
+  .slide {
+    padding: 24px;
   }
 }
 
-@media (min-width: @maxLaptopWidth) {
-  .pageWrapper {
-    padding-left: @pageWrapperLaptopLeftPadding;
-    padding-top: @pageWrapperLaptopTopPadding;
+@media (min-width: @minLaptopWidth) {
+  .slideWrapper {
+    width: @laptopSlideWidth;
+    max-width: @laptopSlideWidth;
+    margin-left: calc(@navigationMenuWidth + (100vw - @navigationMenuWidth - @laptopSlideWidth) / 2);
+  }
 
-    max-width: calc(100% - @maxNavigationMenuWidth);
+  .slide {
+    padding: 40px 40px 40px 56px;
   }
 }
 
-@media (min-width: @maxContentWidth) {
-  .rootWrapper {
-    background-color: @backgroundGray;
+@media (min-width: @navigationGrowthWidth) {
+  .slideWrapper {
+    margin-left: calc(@maxNavigationMenuWidth + (100vw - @maxNavigationMenuWidth - @laptopSlideWidth) / 2);
+  }
+}
+
+@media (min-width: @minDesktopWidth) {
+  .slideWrapper {
+    width: @desktopSlideWidth;
+    max-width: @desktopSlideWidth;
+
+    margin-left: calc(@maxNavigationMenuWidth + (100vw - @maxNavigationMenuWidth - @desktopSlideWidth) / 2);
   }
 
-  .root {
-    margin-left: calc((100vw - @maxContentWidth) / 2);
-    box-shadow: 0 0 7px 1px #ccc;
+  .slide {
+    padding-left: @pageWrapperLaptopPadding;
+    padding-right: @pageWrapperLaptopPadding;
   }
 }
