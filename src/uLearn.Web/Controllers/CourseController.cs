@@ -47,6 +47,7 @@ namespace uLearn.Web.Controllers
 		private readonly GroupsRepo groupsRepo;
 		private readonly UserQuizzesRepo userQuizzesRepo;
 		private readonly CoursesRepo coursesRepo;
+		private readonly TempCoursesRepo tempCoursesRepo;
 
 		public CourseController()
 		{
@@ -59,6 +60,7 @@ namespace uLearn.Web.Controllers
 			groupsRepo = new GroupsRepo(db, courseManager);
 			userQuizzesRepo = new UserQuizzesRepo(db);
 			coursesRepo = new CoursesRepo(db);
+			tempCoursesRepo = new TempCoursesRepo(db);
 		}
 
 		[AllowAnonymous]
@@ -145,6 +147,7 @@ namespace uLearn.Web.Controllers
 		[AllowAnonymous]
 		public ActionResult Slide(string courseId, int slideIndex = -1)
 		{
+			CheckTempCourseAndReloadIfNecessary(courseId);
 			var course = courseManager.FindCourse(courseId);
 			if (course == null)
 				return HttpNotFound();
@@ -154,6 +157,14 @@ namespace uLearn.Web.Controllers
 			if (slide == null)
 				return HttpNotFound();
 			return RedirectToRoute("Course.SlideById", new { courseId, slideId = slide.Url });
+		}
+
+		private void CheckTempCourseAndReloadIfNecessary(string courseId)
+		{
+			var tempCourse = tempCoursesRepo.Find(courseId);
+			if (tempCourse is null)
+				return;
+			courseManager.ReloadCourse(courseId); // todo if necessary
 		}
 
 		[AllowAnonymous]

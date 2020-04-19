@@ -7,6 +7,7 @@ using Database;
 using Database.Models;
 using Database.Repos;
 using Database.Repos.Users;
+using JetBrains.Annotations;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -21,22 +22,25 @@ namespace Ulearn.Web.Api.Controllers
 	public class TempCourseController : BaseController
 	{
 		private readonly ICoursesRepo coursesRepo;
+		private readonly ITempCoursesRepo tempCoursesRepo;
 		private readonly INotificationsRepo notificationsRepo;
 
-		public TempCourseController(INotificationsRepo notificationsRepo, ICoursesRepo coursesRepo, ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo)
+		public TempCourseController(INotificationsRepo notificationsRepo, ICoursesRepo coursesRepo, ILogger logger, IWebCourseManager courseManager, UlearnDb db, [CanBeNull] IUsersRepo usersRepo, ITempCoursesRepo tempCoursesRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.notificationsRepo = notificationsRepo;
 			this.coursesRepo = coursesRepo;
+			this.tempCoursesRepo = tempCoursesRepo;
 		}
 
 		// todo не тестировал этот метод
 		[HttpPost("create/{courseId}")]
 		public async Task CreateCourse([FromRoute] string courseId)
 		{
+			//todo проверять права курс админа в courseId
 			var userId = User.Identity.GetUserId();
 
-			//ar tmpCourseId = courseId + userId;
+			//var tmpCourseId = courseId + userId;
 
 			var versionId = Guid.NewGuid();
 
@@ -44,9 +48,10 @@ namespace Ulearn.Web.Api.Controllers
 
 			if (!courseManager.TryCreateCourse(courseId, courseTitle, versionId))
 				throw new Exception();
-
+			
 			await coursesRepo.AddCourseVersionAsync(courseId, versionId, userId, null, null, null, null).ConfigureAwait(false);
 			await coursesRepo.MarkCourseVersionAsPublishedAsync(versionId).ConfigureAwait(false);
+			await tempCoursesRepo.AddTempCourse(courseId, userId);
 			var courseFile = courseManager.GetStagingCourseFile(courseId);
 			await coursesRepo.AddCourseFile(courseId, versionId, courseFile.ReadAllContent()).ConfigureAwait(false);
 			await NotifyAboutPublishedCourseVersion(courseId, versionId, userId).ConfigureAwait(false);
@@ -91,6 +96,7 @@ namespace Ulearn.Web.Api.Controllers
 			}
 
 			await PublishVersion(courseId, versionId);
+			await tempCoursesRepo.UpdateTempCourseLoadingTime(courseId);
 		}
 
 		private async Task PublishVersion(string courseId, Guid versionId)
@@ -99,7 +105,7 @@ namespace Ulearn.Web.Api.Controllers
 			var courseFile = courseManager.GetStagingCourseFile(courseId);
 			var oldCourse = courseManager.GetCourse(courseId);
 
-			await coursesRepo.AddCourseFile(courseId, versionId, courseFile.ReadAllContent()).ConfigureAwait(false);
+			//await coursesRepo.AddCourseFile(courseId, versionId, courseFile.ReadAllContent()).ConfigureAwait(false);
 
 			/* First, try to load course from LRU-cache or zip file */
 			var version = courseManager.GetVersion(versionId);
@@ -123,17 +129,18 @@ namespace Ulearn.Web.Api.Controllers
 
 			courseManager.UpdateCourseVersion(courseId, versionId);
 			courseManager.ReloadCourse(courseId);
+			
 
 			//var courseDiff = new CourseDiff(oldCourse, version);
 		}
 
 
-		private async Task<(Guid versionId, Exception error)> UploadCourse(string courseId, byte[] content, string userId,
-			string uploadedFromRepoUrl = null, string pathToCourseXmlInRepo = null)
+		private async Task<(Guid versionId, Exception error)> UploadCourse(string courseId, byte[] content, string userId)
 		{
 			logger.Information($"Start upload course '{courseId}'");
-			var versionId = Guid.NewGuid();
-
+			//var versionId = Guid.NewGuid();
+			//get versionId that already exist, not create new
+			var versionId = (await coursesRepo.GetCourseVersionsAsync(courseId)).Single().Id;
 			var destinationFile = courseManager.GetCourseVersionFile(versionId);
 			System.IO.File.WriteAllBytes(destinationFile.FullName, content);
 			Course updatedCourse;
@@ -149,20 +156,22 @@ namespace Ulearn.Web.Api.Controllers
 			}
 
 			logger.Information($"Successfully update course files '{courseId}'");
-			if (pathToCourseXmlInRepo == null && uploadedFromRepoUrl != null)
-			{
-				var extractedVersionDirectory = courseManager.GetExtractedVersionDirectory(versionId);
-				pathToCourseXmlInRepo = extractedVersionDirectory.FullName == updatedCourse.CourseXmlDirectory.FullName
-					? ""
-					: updatedCourse.CourseXmlDirectory.FullName.Substring(extractedVersionDirectory.FullName.Length + 1);
-			}
-
-			await coursesRepo.AddCourseVersionAsync(courseId, versionId, userId,
-				pathToCourseXmlInRepo, uploadedFromRepoUrl, null, null);
+			// if (pathToCourseXmlInRepo == null && uploadedFromRepoUrl != null)
+			// {
+			// 	var extractedVersionDirectory = courseManager.GetExtractedVersionDirectory(versionId);
+			// 	pathToCourseXmlInRepo = extractedVersionDirectory.FullName == updatedCourse.CourseXmlDirectory.FullName
+			// 		? ""
+			// 		: updatedCourse.CourseXmlDirectory.FullName.Substring(extractedVersionDirectory.FullName.Length + 1);
+			// }
+			//
+			// await coursesRepo.AddCourseVersionAsync(courseId, versionId, userId,
+			// 	pathToCourseXmlInRepo, uploadedFromRepoUrl, null, null);
 			await NotifyAboutCourseVersion(courseId, versionId, userId);
 			try
 			{
+				
 				var courseVersions = await coursesRepo.GetCourseVersionsAsync(courseId);
+				//probably always empty
 				var previousUnpublishedVersions = courseVersions.Where(v => v.PublishTime == null && v.Id != versionId).ToList();
 				foreach (var unpublishedVersion in previousUnpublishedVersions)
 					await DeleteVersion(courseId, unpublishedVersion.Id).ConfigureAwait(false);
