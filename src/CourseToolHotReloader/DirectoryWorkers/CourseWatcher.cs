@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using CourseToolHotReloader.Dtos;
 using CourseToolHotReloader.UpdateQuery;
 
 namespace CourseToolHotReloader.DirectoryWorkers
@@ -13,14 +14,12 @@ namespace CourseToolHotReloader.DirectoryWorkers
 
 	public class CourseWatcher : ICourseWatcher
 	{
-		private readonly ICourseUpdateSender courseUpdateSender;
 		private readonly ICourseUpdateQuery courseUpdateQuery;
 		private string path;
 		private readonly Action debouncedSendUpdates;
 
 		public CourseWatcher(ICourseUpdateQuery courseUpdateQuery, ICourseUpdateSender courseUpdateSender)
 		{
-			this.courseUpdateSender = courseUpdateSender;
 			this.courseUpdateQuery = courseUpdateQuery;
 			debouncedSendUpdates = Debounce(courseUpdateSender.SendCourseUpdates);
 		}
@@ -29,53 +28,79 @@ namespace CourseToolHotReloader.DirectoryWorkers
 		{
 			// todo use pathToCourse;
 			path = "C:\\Users\\holkin\\RiderProjects\\ConsoleHotReloader\\ConsoleHotReloader\\bin\\Debug\\netcoreapp3.0\\testFolder";
-			WatchDirectory(path, RegisterUpdate);
+			WatchDirectory(path);
 		}
 
-		private void RegisterUpdate(object _, FileSystemEventArgs fileSystemEventArgs)
+		private ICourseUpdate BuildCourseUpdateBuFileSystemEvent(FileSystemEventArgs fileSystemEventArgs)
 		{
 			var relativePath = fileSystemEventArgs.FullPath.Replace(path, "");
 
 			var courseUpdate = CourseUpdateBuilder.Build(fileSystemEventArgs.Name, fileSystemEventArgs.FullPath, relativePath);
-			if (fileSystemEventArgs.ChangeType == WatcherChangeTypes.Deleted)
-			{
-				courseUpdateQuery.RegisterDelete(courseUpdate);
-			}
-			else
-			{
-				courseUpdateQuery.RegisterUpdate(courseUpdate);
-			}
-
-			debouncedSendUpdates();
+			return courseUpdate;
 		}
 
-
-		private static void WatchDirectory(string directory, FileSystemEventHandler handler)
+		private void WatchDirectory(string directory)
 		{
-			Console.WriteLine(directory);
 			using var watcher = new FileSystemWatcher
 			{
 				Path = directory,
-				NotifyFilter = NotifyFilters.LastAccess
-								| NotifyFilters.LastWrite
-								| NotifyFilters.FileName
-								| NotifyFilters.DirectoryName,
+				NotifyFilter = NotifyFilters.LastWrite
+								| NotifyFilters.DirectoryName
+								| NotifyFilters.FileName,
 				Filter = "*",
 				IncludeSubdirectories = true
 			};
 
-			watcher.Changed += handler;
-			watcher.Created += handler;
-			watcher.Deleted += handler;
+			watcher.Changed += Changed;
+			watcher.Created += Created;
+			watcher.Deleted += Deleted;
+			watcher.Renamed += Renamed;
 
 			watcher.EnableRaisingEvents = true;
 
 			Console.WriteLine("Press 'q' to quit");
-			while (Console.Read() != 'q') ;
+			while (Console.Read() != 'q') // todo не могу вынести
+			{
+			}
+		}
+
+		private void Renamed(object sender, RenamedEventArgs e)
+		{
+			var relativePath = e.OldFullPath.Replace(path, "");
+			var deletedCourseUpdate = CourseUpdateBuilder.Build(e.OldName, e.OldFullPath, relativePath);
+			courseUpdateQuery.RegisterDelete(deletedCourseUpdate);
+
+			var courseUpdate = BuildCourseUpdateBuFileSystemEvent(e);
+			courseUpdateQuery.RegisterCreate(courseUpdate);
+
+			debouncedSendUpdates();
+		}
+
+		private void Deleted(object sender, FileSystemEventArgs e)
+		{
+			var courseUpdate = BuildCourseUpdateBuFileSystemEvent(e);
+			courseUpdateQuery.RegisterDelete(courseUpdate);
+			debouncedSendUpdates();
+		}
+
+		private void Created(object sender, FileSystemEventArgs e)
+		{
+			var courseUpdate = BuildCourseUpdateBuFileSystemEvent(e);
+			courseUpdateQuery.RegisterCreate(courseUpdate);
+			debouncedSendUpdates();
+		}
+
+		private void Changed(object sender, FileSystemEventArgs e)
+		{
+			if (Directory.Exists(e.FullPath))
+				return; //todo немного странно
+			var courseUpdate = BuildCourseUpdateBuFileSystemEvent(e);
+			courseUpdateQuery.RegisterUpdate(courseUpdate);
+			debouncedSendUpdates();
 		}
 
 
-		private static Action Debounce(Action func, int milliseconds = 5000)
+		private static Action Debounce(Action func, int milliseconds = 10000)
 		{
 			CancellationTokenSource cancelTokenSource = null;
 			return () =>

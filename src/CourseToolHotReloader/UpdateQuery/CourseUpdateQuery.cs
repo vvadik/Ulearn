@@ -10,48 +10,46 @@ namespace CourseToolHotReloader.UpdateQuery
 	{
 		void RegisterUpdate(ICourseUpdate update);
 		void RegisterDelete(ICourseUpdate update);
+		void RegisterCreate(ICourseUpdate courseUpdate);
 		IList<ICourseUpdate> GetAllCourseUpdate();
 		IList<ICourseUpdate> GetAllDeletedFiles();
 	}
 
 	public class CourseUpdateQuery : ICourseUpdateQuery
 	{
-		private ConcurrentDictionary<string, ICourseUpdate> updatesQuery;
-		private ConcurrentBag<ICourseUpdate> deletedFiles;
+		private readonly ConcurrentDictionary<string, ICourseUpdate> updatesQuery;
+		private readonly ConcurrentDictionary<string, ICourseUpdate> deletedFiles;
+		private readonly ConcurrentDictionary<string, ICourseUpdate> createdFiles;
 
 		public CourseUpdateQuery()
 		{
 			updatesQuery = new ConcurrentDictionary<string, ICourseUpdate>();
-			deletedFiles = new ConcurrentBag<ICourseUpdate>();
+			deletedFiles = new ConcurrentDictionary<string, ICourseUpdate>();
+			createdFiles = new ConcurrentDictionary<string, ICourseUpdate>();
 		}
 
 		public void RegisterUpdate(ICourseUpdate update)
 		{
-			if (updatesQuery.ContainsKey(update.FullPath)) // todo remove
-			{
-				Console.WriteLine($"{update.Name} update to query");
-			}
-			else
-			{
-				Console.WriteLine($"{update.Name} add to query");
-			}
-
 			updatesQuery.AddOrUpdate(update.FullPath, update, (_1, _2) => update);
+		}
+
+		public void RegisterCreate(ICourseUpdate update)
+		{
+			updatesQuery.AddOrUpdate(update.FullPath, update, (_1, _2) => update);
+
+			deletedFiles.TryRemove(update.FullPath, out _);
+			
+			createdFiles.AddOrUpdate(update.FullPath, update, (_1, _2) => update);
 		}
 
 		public void RegisterDelete(ICourseUpdate update)
 		{
-			if (deletedFiles.Contains(update)) // todo remove
-			{
-				Console.WriteLine($"{update.Name} error?");
-			}
-			else
-			{
-				Console.WriteLine($"{update.Name} add to delete query");
-			}
-
 			updatesQuery.TryRemove(update.FullPath, out _);
-			deletedFiles.Add(update);
+
+			if (!createdFiles.TryRemove(update.FullPath, out _))
+			{
+				deletedFiles.AddOrUpdate(update.FullPath, update, (_1, _2) => update);
+			}
 		}
 
 		public IList<ICourseUpdate> GetAllCourseUpdate()
@@ -63,7 +61,7 @@ namespace CourseToolHotReloader.UpdateQuery
 
 		public IList<ICourseUpdate> GetAllDeletedFiles()
 		{
-			var result = deletedFiles.ToArray();
+			var result = deletedFiles.Values.ToArray();
 			deletedFiles.Clear();
 			return result;
 		}
