@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Database.Repos
 {
-	public class TempCoursesRepo
+	public class TempCoursesRepo : ITempCoursesRepo
 	{
 		private readonly UlearnDb db;
 
