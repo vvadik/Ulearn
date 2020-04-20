@@ -13,7 +13,9 @@ namespace uLearn.Web.Models
 {
 	public class StatisticPageModel
 	{
-		public Course Course { get; set; }
+		public string CourseId { get; set; }
+		public string CourseTitle { get; set; }
+		public List<Unit> Units { get; set; }
 		public List<string> SelectedGroupsIds { get; set; }
 		public string SelectedGroupsIdsJoined => string.Join(",", SelectedGroupsIds);
 		public List<Group> Groups { get; set; }
