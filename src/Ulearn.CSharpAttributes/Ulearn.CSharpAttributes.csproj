@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<RootNamespace>Ulearn</RootNamespace>
-		<TargetFrameworks>net472;netcoreapp2.2</TargetFrameworks>
+		<TargetFrameworks>net472;netcoreapp3.1</TargetFrameworks>
 	</PropertyGroup>
 	<ItemGroup>
-	  <PackageReference Include="System.Collections.Immutable" Version="1.6.0" />
+	  <PackageReference Include="System.Collections.Immutable" Version="1.7.0" />
 	</ItemGroup>
 </Project>

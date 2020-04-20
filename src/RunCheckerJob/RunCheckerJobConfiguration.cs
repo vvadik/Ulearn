@@ -2,7 +2,7 @@ using Ulearn.Core.Configuration;
 
 namespace RunCheckerJob
 {
-	public class RunCheckerJobConfiguration : AbstractConfiguration
+	public class RunCheckerJobConfiguration : UlearnConfigurationBase
 	{
 		public RunCheckerJobConfigurationContent RunCheckerJob { get; set; }
 	}

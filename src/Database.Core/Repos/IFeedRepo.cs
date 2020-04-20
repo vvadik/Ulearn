@@ -16,7 +16,6 @@ namespace Database.Repos
 		FeedNotificationTransport GetCommentsFeedNotificationTransport();
 		Task<DateTime?> GetLastDeliveryTimestampAsync(FeedNotificationTransport notificationTransport);
 		Task<int> GetNotificationsCountAsync(string userId, DateTime from, params FeedNotificationTransport[] transports);
-		Task<List<NotificationDelivery>> GetFeedNotificationDeliveriesAsync<TProperty>(string userId, Expression<Func<NotificationDelivery, TProperty>> includePath, params FeedNotificationTransport[] transports);
-		Task<List<NotificationDelivery>> GetFeedNotificationDeliveriesAsync(string userId, params FeedNotificationTransport[] transports);
+		Task<List<Notification>> GetNotificationForFeedNotificationDeliveriesAsync<TProperty>(string userId, Expression<Func<Notification, TProperty>> includePath, params FeedNotificationTransport[] transports);
 	}
 }

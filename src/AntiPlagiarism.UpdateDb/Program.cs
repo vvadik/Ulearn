@@ -9,7 +9,6 @@ using AntiPlagiarism.Web.Configuration;
 using AntiPlagiarism.Web.Database;
 using AntiPlagiarism.Web.Database.Repos;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -17,7 +16,6 @@ using Serilog.Debugging;
 using Serilog.Events;
 using Serilog.Extensions.Logging;
 using Ulearn.Core.Configuration;
-using Vostok.Logging.Serilog.Enrichers;
 using ILogger = Serilog.ILogger;
 
 namespace AntiPlagiarism.UpdateDb
@@ -39,7 +37,7 @@ namespace AntiPlagiarism.UpdateDb
 			var firstSubmissionId = 0;
 			if (args.Contains("--start"))
 			{
-				var startArgIndex = args.IndexOf("--start");
+				var startArgIndex = args.FindIndex("--start");
 				if (startArgIndex + 1 >= args.Length || !int.TryParse(args[startArgIndex + 1], out firstSubmissionId))
 					firstSubmissionId = 0;
 			}
@@ -60,7 +58,7 @@ namespace AntiPlagiarism.UpdateDb
 			services.AddOptions();
 
 			services.Configure<AntiPlagiarismUpdateDbConfiguration>(ApplicationConfiguration.GetConfiguration());
-			services.Configure<AntiPlagiarismConfiguration>(ApplicationConfiguration.GetConfiguration().GetSection("antiplagiarism"));
+			services.Configure<AntiPlagiarismConfiguration>(ApplicationConfiguration.GetConfiguration());
 
 			var logger = GetLogger(configuration);
 			services.AddSingleton(logger);
@@ -88,8 +86,6 @@ namespace AntiPlagiarism.UpdateDb
 		private ILogger GetLogger(AntiPlagiarismUpdateDbConfiguration configuration)
 		{
 			var loggerConfiguration = new LoggerConfiguration()
-				.Enrich.With<ThreadEnricher>()
-				.Enrich.With<FlowContextEnricher>()
 				.MinimumLevel.Debug();
 
 			if (configuration.HostLog.Console)

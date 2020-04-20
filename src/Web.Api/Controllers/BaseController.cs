@@ -23,6 +23,7 @@ using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
 using Ulearn.Core.Courses.Units;
 using Ulearn.Web.Api.Controllers.Groups;
 using Ulearn.Web.Api.Models.Common;
+using Ulearn.Web.Api.Models.Responses.Groups;
 using Ulearn.Web.Api.Models.Responses.Notifications;
 
 namespace Ulearn.Web.Api.Controllers
@@ -65,7 +66,7 @@ namespace Ulearn.Web.Api.Controllers
 
 			if (isRequestSafe)
 			{
-				logger.Information("Выключаю автоматическое отслеживание изменений в EF Core: db.ChangeTracker.AutoDetectChangesEnabled = false");
+				logger.Debug("Выключаю автоматическое отслеживание изменений в EF Core: db.ChangeTracker.AutoDetectChangesEnabled = false");
 			}
 		}
 
@@ -80,12 +81,29 @@ namespace Ulearn.Web.Api.Controllers
 			var slides = unit.Slides.Select(slide => BuildSlideInfo(courseId, slide, getSlideMaxScoreFunc));
 			if (showInstructorsSlides && unit.InstructorNote != null)
 				slides = slides.Concat(new List<ShortSlideInfo> { BuildSlideInfo(courseId, unit.InstructorNote.Slide, getSlideMaxScoreFunc) });
+			return BuildUnitInfo(unit, slides);
+		}
+		
+		protected UnitInfo BuildUnitInfo(string courseId, Unit unit)
+		{
+			var slides = unit.Slides.Select(slide => BuildSlideInfo(courseId, slide));
+			return BuildUnitInfo(unit, slides);
+		}
+
+		private static UnitInfo BuildUnitInfo(Unit unit, IEnumerable<ShortSlideInfo> slides)
+		{
 			return new UnitInfo
 			{
 				Id = unit.Id,
 				Title = unit.Title,
-				Slides = slides.ToList()
+				Slides = slides.ToList(),
+				AdditionalScores = GetAdditionalScores(unit)
 			};
+		}
+
+		private static List<UnitScoringGroupInfo> GetAdditionalScores(Unit unit)
+		{
+			return unit.Settings.Scoring.Groups.Values.Where(g => g.CanBeSetByInstructor).Select(g => new UnitScoringGroupInfo(g)).ToList();
 		}
 
 		protected ShortSlideInfo BuildSlideInfo(string courseId, Slide slide, Func<Slide, int> getSlideMaxScoreFunc)
@@ -97,6 +115,23 @@ namespace Ulearn.Web.Api.Controllers
 				Slug = slide.Url,
 				ApiUrl = Url.Action("SlideInfo", "Slides", new { courseId = courseId, slideId = slide.Id }),
 				MaxScore = getSlideMaxScoreFunc(slide),
+				ScoringGroup = slide.ScoringGroup,
+				Type = GetSlideType(slide),
+				QuestionsCount = slide.Blocks.OfType<AbstractQuestionBlock>().Count(),
+
+				// TODO: кол-во попыток
+			};
+		}
+		
+		protected ShortSlideInfo BuildSlideInfo(string courseId, Slide slide)
+		{
+			return new ShortSlideInfo
+			{
+				Id = slide.Id,
+				Title = slide.Title,
+				Slug = slide.Url,
+				ApiUrl = Url.Action("SlideInfo", "Slides", new { courseId = courseId, slideId = slide.Id }),
+				MaxScore = slide.MaxScore,
 				ScoringGroup = slide.ScoringGroup,
 				Type = GetSlideType(slide),
 				QuestionsCount = slide.Blocks.OfType<AbstractQuestionBlock>().Count(),
@@ -170,6 +205,12 @@ namespace Ulearn.Web.Api.Controllers
 			var slidesWithUsersManualChecking = visitsRepo.GetSlidesWithUsersManualChecking(course.Id, userId).ToImmutableHashSet();
 			var enabledManualCheckingForUser = await groupsRepo.IsManualCheckingEnabledForUserAsync(course, userId).ConfigureAwait(false);
 			return s => GetMaxScoreForUsersSlide(s, solvedSlidesIds.Contains(s.Id), slidesWithUsersManualChecking.Contains(s.Id), enabledManualCheckingForUser);
+		}
+		
+		public static Func<Slide, int> BuildGetSlideMaxScoreFunc(Course course, Group group)
+		{
+			var enabledManualCheckingForGroup = course.Settings.IsManualCheckingEnabled || group.IsManualCheckingEnabled;
+			return s => GetMaxScoreForUsersSlide(s, false, false, enabledManualCheckingForGroup);
 		}
 
 		public static HashSet<Guid> GetSolvedSlides(IUserSolutionsRepo solutionsRepo, IUserQuizzesRepo userQuizzesRepo, Course course, string userId)

@@ -8,6 +8,8 @@ import api from "src/api";
 import { COURSES__COURSE_ENTERED } from "src/consts/actions";
 import { getQueryStringParameter } from "src/utils";
 import { withRouter } from "react-router-dom";
+import { UrlError } from "../../components/common/Error/NotFoundErrorBoundary";
+import Error404 from "../../components/common/Error/Error404";
 
 
 function getUrlParts(url) {
@@ -67,6 +69,7 @@ class DownloadedHtmlContent extends Component {
 			bodyClassName: '',
 			meta: {},
 			links: [],
+			error: null,
 		};
 	}
 
@@ -98,12 +101,19 @@ class DownloadedHtmlContent extends Component {
 	}
 
 	fetchContentFromServer(url) {
-		let courseId = this._getCourseIdFromUrl();
-		this.props.enterToCourse(courseId);
+		this.setState({
+			error: null,
+		});
 
 		fetch(this.BASE_URL + url, { credentials: 'include' })
 			.then(response => {
 				if (url !== this.props.url) {
+					return;
+				}
+				if (response.headers.has('ReactRender')) {
+					this.setState({
+						error: new UrlError(),
+					});
 					return;
 				}
 				if (response.redirected) {
@@ -236,6 +246,8 @@ class DownloadedHtmlContent extends Component {
 	}
 
 	render() {
+		if(this.state.error)
+			return <Error404/>;
 		if (this.state.loading) {
 			return (
 				<Loader type="big" active>

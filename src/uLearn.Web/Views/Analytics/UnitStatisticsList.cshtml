@@ -14,7 +14,7 @@
 	@foreach (var unit in Model.Units)
 	{
 		<div>
-			@Html.ActionLink(unit.Title, "UnitStatistics", new { courseId = Model.Course.Id, unitId = unit.Id })
+			@Html.ActionLink(unit.Title, "UnitStatistics", new { courseId = Model.CourseId, unitId = unit.Id })
 		</div>
 	}
 </div>

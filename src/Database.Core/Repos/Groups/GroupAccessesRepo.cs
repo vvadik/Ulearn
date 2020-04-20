@@ -164,26 +164,25 @@ namespace Database.Repos.Groups
 			}
 
 			var groupsWithAccess = new HashSet<int>(db.GroupAccesses.Where(a => a.UserId == userId && a.IsEnabled).Select(a => a.GroupId));
-			var groups = db.Groups
+			var groups = (await db.Groups
 				.Include(g => g.Owner)
 				.Where(g => !g.IsDeleted &&
-							(includeNonarchived && !g.IsArchived || includeArchived && g.IsArchived) &&
-							(coursesIds == null || coursesIds.Contains(g.CourseId, StringComparer.OrdinalIgnoreCase)) &&
-							(
-								/* Course admins can see all groups */
-								!needEditAccess && coursesWhereUserCanSeeAllGroups.Contains(g.CourseId, StringComparer.OrdinalIgnoreCase) ||
-								needEditAccess && coursesWhereUserCanEditAllGroups.Contains(g.CourseId, StringComparer.OrdinalIgnoreCase) ||
-								/* Other instructor can see only own groups */
-								g.OwnerId == userId || groupsWithAccess.Contains(g.Id)
-							)
+					(includeNonarchived && !g.IsArchived || includeArchived && g.IsArchived) &&
+					(coursesIds == null || coursesIds.Contains(g.CourseId)))
+				.ToListAsync().ConfigureAwait(false))
+				.Where(g =>
+					/* Course admins can see all groups */
+					!needEditAccess && coursesWhereUserCanSeeAllGroups.Contains(g.CourseId, StringComparer.OrdinalIgnoreCase) ||
+					needEditAccess && coursesWhereUserCanEditAllGroups.Contains(g.CourseId, StringComparer.OrdinalIgnoreCase) ||
+					/* Other instructor can see only own groups */
+					g.OwnerId == userId || groupsWithAccess.Contains(g.Id)
 				);
 
-			return await groups
+			return groups
 				.OrderBy(g => g.IsArchived)
 				.ThenBy(g => g.OwnerId != userId)
 				.ThenBy(g => g.Name)
-				.ToListAsync()
-				.ConfigureAwait(false);
+				.ToList();
 		}
 
 		public async Task<List<Group>> GetAvailableForUserGroupsAsync(string courseId, string userId, bool needEditAccess, bool includeNonarchived = true, bool includeArchived = false)

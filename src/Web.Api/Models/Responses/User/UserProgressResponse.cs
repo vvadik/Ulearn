@@ -12,6 +12,10 @@ namespace Ulearn.Web.Api.Models.Responses.User
 	{
 		[DataMember]
 		public Dictionary<Guid, UserSlideResult> VisitedSlides { get; set; }
+		
+		[DataMember]
+		/* Dictionary<unitId, Dictionary<scoringGroupId, additionalScore>> */
+		public Dictionary<Guid, Dictionary<string, int>> AdditionalScores { get; set; }
 	}
 
 	public class UserSlideResult

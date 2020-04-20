@@ -13,6 +13,7 @@ namespace Database.Repos
 		Task AddQuizAttemptWithAutomaticChecking(string courseId, Guid slideId, string userId, int automaticScore);
 		IEnumerable<ManualExerciseChecking> GetUsersPassedManualExerciseCheckings(string courseId, string userId);
 		Task<ManualExerciseChecking> AddManualExerciseChecking(string courseId, Guid slideId, string userId, UserExerciseSubmission submission);
+		Task<Dictionary<string, List<Guid>>> GetSlideIdsWaitingForManualExerciseCheckAsync(string courseId, IEnumerable<string> userIds);
 		Task RemoveWaitingManualExerciseCheckings(string courseId, Guid slideId, string userId);
 		Task RemoveAttempts(string courseId, Guid slideId, string userId, bool saveChanges = true);
 		bool IsSlidePassed(string courseId, Guid slideId, string userId);

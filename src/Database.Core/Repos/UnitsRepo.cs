@@ -29,6 +29,11 @@ namespace Database.Repos
 			if (canSeeEverything)
 				return course.Units;
 
+			return GetVisibleUnits(course);
+		}
+		
+		public List<Unit> GetVisibleUnits(Course course)
+		{
 			var visibleUnitsIds = new HashSet<Guid>(db.UnitAppearances
 				.Where(u => u.CourseId == course.Id && u.PublishTime <= DateTime.Now)
 				.Select(u => u.UnitId));
@@ -55,8 +60,11 @@ namespace Database.Repos
 
 		public DateTime? GetNextUnitPublishTime(string courseId)
 		{
-			return db.UnitAppearances.Where(u => u.CourseId == courseId && u.PublishTime > DateTime.Now)
-				.Select(u => (DateTime?)u.PublishTime).OrderBy(t => t).FirstOrDefault();
+			return db.UnitAppearances
+				.Where(u => u.CourseId == courseId && u.PublishTime > DateTime.Now)
+				.Select(u => (DateTime?)u.PublishTime)
+				.OrderBy(t => t)
+				.FirstOrDefault();
 		}
 	}
 }

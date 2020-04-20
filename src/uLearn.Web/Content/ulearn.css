@@ -314,6 +314,7 @@
 	height: auto;
 	margin-bottom: 15px;
 	line-height: 1.3em;
+	font-size: 14px;
 	font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
 }
 
@@ -1396,6 +1397,8 @@ body.lti-component {
 
 .legacy-page .exercise {
 	margin-top: 30px;
+	font-size: 14px;
+	line-height: 1.42;
 }
 
 .legacy-page .exercise__submission {
@@ -1504,4 +1507,54 @@ body.lti-component {
 
 .legacy-page .slide-image {
 	max-width: 100%;
+}
+
+.legacy-page .slide {
+	font-size: 16px;
+	line-height: 1.5;
+}
+
+.legacy-page .slide.slide p {
+	margin-bottom: 1em;
+}
+
+.legacy-page .slide img :not(.user__avatar) {
+	max-width: 100%;
+}
+
+.legacy-page .slide ul {
+	margin-bottom: 1em;
+	padding: 0;
+	list-style: none;
+}
+
+.legacy-page .slide ul li {
+	position: relative;
+	padding-left: 1.5em;
+	margin-bottom: 0.5em;
+}
+
+.legacy-page .slide ul li:before {
+	content: '—';
+	position: absolute;
+	left: 0;
+}
+
+/* overwriting styles for flexslider to remove bullets*/
+.legacy-page .slide .flexslider ul {
+	margin-bottom: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.legacy-page .slide .flexslider ul li {
+	position: unset;
+	padding-left: 0;
+	margin-bottom: 0;
+}
+
+.legacy-page .slide .flexslider ul li:before {
+	content: unset;
+	position: unset;
+	left: unset;
 }

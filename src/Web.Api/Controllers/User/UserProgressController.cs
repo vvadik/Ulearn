@@ -1,26 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
 using System.Threading.Tasks;
 using Database;
-using Database.Models;
 using Database.Repos;
-using Database.Repos.CourseRoles;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Internal;
 using Serilog;
-using Ulearn.Common.Api.Models.Responses;
-using Ulearn.Common.Extensions;
-using Ulearn.Core;
 using Ulearn.Core.Courses;
-using Ulearn.Web.Api.Models.Common;
-using Ulearn.Web.Api.Models.Responses.Courses;
 using Ulearn.Web.Api.Models.Responses.User;
 
 namespace Ulearn.Web.Api.Controllers.User
@@ -30,13 +18,18 @@ namespace Ulearn.Web.Api.Controllers.User
 	{
 		private readonly IVisitsRepo visitsRepo;
 		private readonly IUserQuizzesRepo userQuizzesRepo;
+		private readonly ISlideCheckingsRepo slideCheckingsRepo;
+		private readonly IAdditionalScoresRepo additionalScoresRepo;
 
 		public UserProgressController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
-			IVisitsRepo visitsRepo, IUserQuizzesRepo userQuizzesRepo)
+			IVisitsRepo visitsRepo, IUserQuizzesRepo userQuizzesRepo, IAdditionalScoresRepo additionalScoresRepo,
+			ISlideCheckingsRepo slideCheckingsRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.visitsRepo = visitsRepo;
 			this.userQuizzesRepo = userQuizzesRepo;
+			this.additionalScoresRepo = additionalScoresRepo;
+			this.slideCheckingsRepo = slideCheckingsRepo;
 		}
 
 		/// <summary>
@@ -44,18 +37,20 @@ namespace Ulearn.Web.Api.Controllers.User
 		/// </summary>
 		[HttpGet("{courseId}")]
 		[Authorize]
-		public async Task<ActionResult<UserProgressResponse>> UserProgress(Course course)
+		public async Task<ActionResult<UserProgressResponse>> UserProgress([FromRoute]Course course)
 		{
 			var scores = visitsRepo.GetScoresForSlides(course.Id, UserId);
 			var attempts = await userQuizzesRepo.GetUsedAttemptsCountAsync(course.Id, UserId).ConfigureAwait(false);
-			var waitingSlides = await userQuizzesRepo.GetSlideIdsWaitingForManualCheckAsync(course.Id, UserId).ConfigureAwait(false);
+			var waitingQuizSlides = await userQuizzesRepo.GetSlideIdsWaitingForManualCheckAsync(course.Id, UserId).ConfigureAwait(false);
+			var waitingExerciseSlides = await slideCheckingsRepo.GetSlideIdsWaitingForManualExerciseCheckAsync(course.Id, new []{UserId}).ConfigureAwait(false);
+			var additionalScores = await GetAdditionalScores(course.Id, UserId).ConfigureAwait(false);
 
 			var slidesResults = scores.Select(s => new
 			{
 				Key = s.Key,
 				Score = s.Value,
 				UsedAttempts = attempts.GetValueOrDefault(s.Key),
-				IsWaitingForManualChecking = waitingSlides.Contains(s.Key),
+				IsWaitingForManualChecking = (waitingExerciseSlides.GetValueOrDefault(UserId)?.Contains(s.Key) ?? false) || waitingQuizSlides.Contains(s.Key),
 			}).ToDictionary(s => s.Key, s => new UserSlideResult
 			{
 				Visited = true,
@@ -67,7 +62,17 @@ namespace Ulearn.Web.Api.Controllers.User
 			return new UserProgressResponse
 			{
 				VisitedSlides = slidesResults,
+				AdditionalScores = additionalScores
 			};
+		}
+		
+		private async Task<Dictionary<Guid, Dictionary<string, int>>> GetAdditionalScores(string courseId, string userId)
+		{
+			return (await additionalScoresRepo.GetAdditionalScoresForUser(courseId, userId).ConfigureAwait(false))
+				.Select(kvp => (unitId: kvp.Key.Item1, scoringGroupId: kvp.Key.Item2, additionalScore: kvp.Value))
+				.GroupBy(t => t.unitId)
+				.ToDictionary(g => g.Key,
+					g => g.ToDictSafe(t => t.scoringGroupId, t=> t.additionalScore));
 		}
 
 		/// <summary>

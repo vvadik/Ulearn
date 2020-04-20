@@ -24,24 +24,33 @@ namespace Database.Repos.Groups
 			this.logger = logger;
 		}
 
-		public Task<List<ApplicationUser>> GetGroupMembersAsUsersAsync(int groupId)
+		public async Task<List<ApplicationUser>> GetGroupMembersAsUsersAsync(int groupId)
 		{
-			return db.GroupMembers.Include(m => m.User).Where(m => m.GroupId == groupId && !m.User.IsDeleted).Select(m => m.User).ToListAsync();
+			return await db.GroupMembers.Include(m => m.User).Where(m => m.GroupId == groupId && !m.User.IsDeleted).Select(m => m.User).ToListAsync();
 		}
 
-		public Task<List<GroupMember>> GetGroupMembersAsync(int groupId)
+		public async Task<List<GroupMember>> GetGroupMembersAsync(int groupId)
 		{
-			return db.GroupMembers.Include(m => m.User).Where(m => m.GroupId == groupId && !m.User.IsDeleted).ToListAsync();
+			return await db.GroupMembers.Include(m => m.User).Where(m => m.GroupId == groupId && !m.User.IsDeleted).ToListAsync();
 		}
 
-		public Task<List<GroupMember>> GetGroupsMembersAsync(ICollection<int> groupsIds)
+		public async Task<List<GroupMember>> GetGroupsMembersAsync(ICollection<int> groupsIds)
 		{
-			return db.GroupMembers.Include(m => m.User).Where(m => groupsIds.Contains(m.GroupId) && !m.User.IsDeleted).ToListAsync();
+			if (!groupsIds.Any())
+				return new List<GroupMember>();
+			return await db.GroupMembers.Include(m => m.User).Where(m => groupsIds.Contains(m.GroupId) && !m.User.IsDeleted).ToListAsync();
+		}
+		
+		public async Task<List<string>> GetGroupsMembersIdsAsync(ICollection<int> groupsIds)
+		{
+			if (!groupsIds.Any())
+				return new List<string>();
+			return await db.GroupMembers.Include(m => m.User).Where(m => groupsIds.Contains(m.GroupId) && !m.User.IsDeleted).Select(u => u.UserId).ToListAsync();
 		}
 
-		public Task<bool> IsUserMemberOfGroup(int groupId, string userId)
+		public async Task<bool> IsUserMemberOfGroup(int groupId, string userId)
 		{
-			return db.GroupMembers.AnyAsync(m => m.GroupId == groupId && m.UserId == userId);
+			return await db.GroupMembers.AnyAsync(m => m.GroupId == groupId && m.UserId == userId);
 		}
 
 		public async Task<GroupMember> AddUserToGroupAsync(int groupId, string userId)
@@ -124,13 +133,15 @@ namespace Database.Repos.Groups
 		}
 
 		/* Return Dictionary<userId, List<groupId>> */
-		public Task<Dictionary<string, List<int>>> GetUsersGroupsIdsAsync(string courseId, List<string> usersIds, bool includeArchived = false)
+		public async Task<Dictionary<string, List<int>>> GetUsersGroupsIdsAsync(string courseId, List<string> usersIds, bool includeArchived = false)
 		{
 			var groupsIds = groupsRepo.GetCourseGroupsQueryable(courseId, includeArchived).Select(g => g.Id);
-			return db.GroupMembers
+			return (await db.GroupMembers
 				.Where(m => groupsIds.Contains(m.GroupId) && usersIds.Contains(m.UserId))
+				.Select(m => new {m.UserId, m.GroupId})
+				.ToListAsync())
 				.GroupBy(m => m.UserId)
-				.ToDictionaryAsync(g => g.Key, g => g.Select(m => m.GroupId).ToList());
+				.ToDictionary(g => g.Key, g => g.Select(m => m.GroupId).ToList());
 		}
 
 		public async Task<List<int>> GetUserGroupsIdsAsync(string courseId, string userId, bool includeArchived = false)

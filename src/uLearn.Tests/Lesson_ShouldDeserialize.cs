@@ -11,6 +11,7 @@ using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Courses.Units;
+using uLearn.CSharp;
 
 namespace uLearn
 {
@@ -20,7 +21,7 @@ namespace uLearn
 		[OneTimeSetUp]
 		public void OneTimeSetup()
 		{
-			Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
+			Directory.SetCurrentDirectory(TestsHelper.TestDirectory);
 		}
 
 		[Test]
