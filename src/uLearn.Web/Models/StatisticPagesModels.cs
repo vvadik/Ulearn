@@ -101,8 +101,6 @@ namespace uLearn.Web.Models
 	public class UnitStatisticPageModel : StatisticPageModel
 	{
 		public Unit Unit { get; set; }
-		public List<Unit> Units { get; set; }
-
 		public List<Slide> Slides { get; set; }
 		public Dictionary<Guid, List<Visit>> SlidesVisits { get; set; }
 

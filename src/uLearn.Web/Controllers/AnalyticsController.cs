@@ -65,6 +65,9 @@ namespace uLearn.Web.Controllers
 		{
 			const int usersLimit = 200;
 
+			if (param.CourseId == null)
+				return HttpNotFound();
+
 			var courseId = param.CourseId;
 			var unitId = param.UnitId;
 			var periodStart = param.PeriodStartDate;
@@ -78,6 +81,8 @@ namespace uLearn.Web.Controllers
 			if (!unitId.HasValue)
 				return View("UnitStatisticsList", new UnitStatisticPageModel
 				{
+					CourseId = courseId,
+					CourseTitle = course.Title,
 					Units = visibleUnits
 				});
 			var selectedUnit = visibleUnits.FirstOrDefault(x => x.Id == unitId);
@@ -142,6 +147,8 @@ namespace uLearn.Web.Controllers
 
 			var model = new UnitStatisticPageModel
 			{
+				CourseId = courseId,
+				CourseTitle = course.Title,
 				Units = visibleUnits,
 				Unit = selectedUnit,
 				SelectedGroupsIds = groupsIds,
