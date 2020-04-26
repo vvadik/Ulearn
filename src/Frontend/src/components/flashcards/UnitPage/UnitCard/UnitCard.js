@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from "prop-types";
 
-import Button from "ui/Button";
+import { Button } from "ui";
 
 import classNames from "classnames";
 import getCardsPluralForm from "../../getCardsPluralForm";

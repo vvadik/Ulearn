@@ -4,8 +4,8 @@ const paths = require('./paths');
 module.exports = {
 	resolve: {
 		alias: {
-			ui: path.resolve(paths.appNodeModules, '@skbkontur/react-ui/components'),
-			icons: path.resolve(paths.appNodeModules, '@skbkontur/react-icons'),
+			ui: path.resolve(paths.appNodeModules, '@skbkontur/react-ui'),
+			icons: path.resolve(paths.appNodeModules, '@skbkontur/react-icons/icons'),
 			src: path.resolve(paths.appSrc),
 		}
 	},

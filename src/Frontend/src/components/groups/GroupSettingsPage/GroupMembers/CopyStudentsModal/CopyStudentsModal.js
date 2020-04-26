@@ -1,14 +1,11 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import api from "../../../../../api/index";
-import Select from "ui/Select";
-import Modal from "ui/Modal";
-import Button from "ui/Button";
-import Toast from "ui/Toast";
+import { Select, Modal, Button, Toast } from "ui";
 import getPluralForm from "../../../../../utils/getPluralForm";
 
 import styles from './copyStudentsModal.less';
-import Loader from "ui/Loader";
+import { Loader } from "ui";
 
 class CopyStudentsModal extends Component {
 

@@ -1,10 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
 import api from "src/api";
-import Modal from 'ui/Modal';
-import Input from 'ui/Input';
-import Button from 'ui/Button';
-import Tooltip from 'ui/Tooltip';
+import { Modal, Input, Button, Tooltip } from 'ui';
 
 import styles from "./createGroupModal.less";
 

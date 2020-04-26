@@ -14,7 +14,7 @@ import Router from "./Router";
 
 import rootReducer from "./redux/reducers";
 import api from "./api";
-import Toast from "ui/Toast";
+import { Toast } from "ui";
 
 
 let loggerMiddleware = createLogger();

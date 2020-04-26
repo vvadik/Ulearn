@@ -1,14 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { comment, userType, userRoles } from "../../commonPropTypes";
-import Kebab from "ui/Kebab";
-import MenuItem from "ui/MenuItem";
-import EyeClosed from "icons/EyeClosed";
-import Delete from "icons/Delete";
-import Pin from "icons/Pin";
-import Edit from "icons/Edit";
-import DocumentLite from "icons/DocumentLite";
-import Ok from "icons/Ok";
+import { Kebab, MenuItem } from "ui";
+import { EyeClosed } from "icons/EyeClosed";
+import { Delete } from "icons/Delete";
+import { Pin } from "icons/Pin";
+import { Edit } from "icons/Edit";
+import { DocumentLite } from "icons/DocumentLite";
+import { Ok } from "icons/Ok";
 import { ACCESSES, SLIDETYPE } from "../../../../consts/general";
 
 import styles from "./KebabActions.less";

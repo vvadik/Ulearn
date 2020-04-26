@@ -1,8 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import Link from "ui/Link";
-import Button from "ui/Button";
-import Gapped from "ui/Gapped";
+import { Link, Button, Gapped } from "ui";
 
 import styles from "./Stub.less";
 

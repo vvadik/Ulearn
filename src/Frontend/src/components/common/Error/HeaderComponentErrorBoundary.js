@@ -1,11 +1,10 @@
 import React, {Component} from "react";
 
-import Warning from "@skbkontur/react-icons/Warning";
-import Toast from "@skbkontur/react-ui/Toast";
+import { Warning } from "icons/Warning";
+import { Toast } from "ui";
+import Raven from 'raven-js';
 
 import styles from './style.less';
-
-const Raven = window.Raven;
 
 class HeaderComponentErrorBoundary extends Component {
 	state = {

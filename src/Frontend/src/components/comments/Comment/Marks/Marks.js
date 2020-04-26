@@ -1,13 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { comment, group } from "../../commonPropTypes";
-import EyeClosed from "icons/EyeClosed";
-import Ok from "icons/Ok";
-import Pin from "icons/Pin";
-import People from "icons/People";
-
-import TooltipMenu from "ui/TooltipMenu";
-import MenuItem from "ui/MenuItem";
+import { EyeClosed } from "icons/EyeClosed";
+import { Ok } from "icons/Ok";
+import { Pin } from "icons/Pin";
+import { People } from "icons/People";
+import { TooltipMenu, MenuItem } from "ui";
 
 import styles from "./Marks.less";
 

@@ -1,5 +1,3 @@
-'use strict';
-
 const autoprefixer = require('autoprefixer');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -60,7 +58,9 @@ module.exports = merge(base,{
 			'./config/sentry',
 			paths.appIndexJs
 		],
-		oldBrowser: [paths.oldBrowserJs]
+		oldBrowser: [
+			paths.oldBrowserJs,
+		]
 	},
 	output: {
 		path: paths.appBuild,

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import api from "src/api";
-import ComboBox from "ui/ComboBox";
+import { ComboBox } from "ui";
 import Avatar from "src/components/common/Avatar/Avatar";
 
 import styles from './comboboxInstructorsSearch.less';

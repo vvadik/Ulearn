@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 import ProgressBar from "../ProgressBar/ProgressBar";
 import OpenedFlashcard from "./OpenedFlashcard/OpenedFlashcard";
-import Toast from "ui/Toast";
+import { Toast } from "ui";
 
 import { sortFlashcardsInAuthorsOrderWithRate, getNextFlashcardRandomly } from "./flashcardsStirrer/flashcardsStirrer";
 import countFlashcardsStatistics from "../countFlashcardsStatistics";

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-import Button from "ui/Button";
+import { Button } from "ui";
 import Results from "../Results/Results";
 
 import styles from "./openedFlashcard.less";

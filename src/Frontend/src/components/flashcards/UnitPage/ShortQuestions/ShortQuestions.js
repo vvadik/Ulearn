@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
 
-import Toggle from "ui/Toggle";
+import { Toggle } from "ui";
 
 import translateCode from "../../../../codeTranslator/translateCode";
 

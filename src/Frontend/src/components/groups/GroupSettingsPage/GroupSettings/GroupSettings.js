@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Input from "ui/Input";
-import Loader from "ui/Loader";
+import { Input, Loader } from "ui";
 import GroupScores from "./GroupScores/GroupScores";
 import GroupSettingsCheckbox from "./GroupSettingsCheckbox/GroupSettingsCheckbox";
 

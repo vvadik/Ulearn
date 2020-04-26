@@ -7,7 +7,7 @@ import * as groups from "./groups"
 import * as users from "./users"
 import * as comments from "./comments"
 import * as cards from "./flashcards"
-import Toast from "ui/Toast";
+import { Toast } from "ui";
 
 const API_JWT_TOKEN_UPDATED = "API_JWT_TOKEN_UPDATED";
 let apiJwtToken = "";

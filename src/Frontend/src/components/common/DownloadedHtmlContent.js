@@ -1,6 +1,6 @@
 import React, { Component, PureComponent } from 'react';
 import { Helmet } from "react-helmet";
-import Loader from "ui/Loader";
+import { Loader } from "ui";
 import * as PropTypes from "prop-types";
 import { saveAs } from "file-saver";
 import { connect } from "react-redux";
@@ -8,8 +8,8 @@ import api from "src/api";
 import { COURSES__COURSE_ENTERED } from "src/consts/actions";
 import { getQueryStringParameter } from "src/utils";
 import { withRouter } from "react-router-dom";
-import { UrlError } from "../../components/common/Error/NotFoundErrorBoundary";
-import Error404 from "../../components/common/Error/Error404";
+import { UrlError } from "./Error/NotFoundErrorBoundary";
+import Error404 from "./Error/Error404";
 
 
 function getUrlParts(url) {

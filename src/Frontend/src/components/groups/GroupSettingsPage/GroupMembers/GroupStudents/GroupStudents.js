@@ -1,10 +1,9 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import getMoment from "../../../../../utils/getMoment";
-import Checkbox from "ui/Checkbox";
-import Gapped from "ui/Gapped";
-import Copy from "icons/Copy";
-import Trash from "icons/Trash";
+import { Checkbox, Gapped } from "ui";
+import { Copy } from "icons/Copy";
+import { Trash } from "icons/Trash";
 import Avatar from "../../../../common/Avatar/Avatar";
 import CopyStudentsModal from "../CopyStudentsModal/CopyStudentsModal";
 import Profile from '../Profile';

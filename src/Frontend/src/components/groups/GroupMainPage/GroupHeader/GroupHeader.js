@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Button from "ui/Button";
-import Tabs from "ui/Tabs";
-import Gapped from "ui/Gapped";
+import { Button, Tabs, Gapped } from "ui";
 import CreateGroupModal from "../CreateGroupModal/CreateGroupModal";
 import CopyGroupModal from "../CopyGroupModal/CopyGroupModal";
 
@@ -68,7 +66,7 @@ class GroupHeader extends Component {
 					</div>
 				</div>
 				<div className={styles["tabs-container"]}>
-					<Tabs value={this.props.filter} onChange={this.onChange}>
+					<Tabs value={this.props.filter} onValueChange={this.onChange}>
 						<Tabs.Tab id={TABS.active}>Активные</Tabs.Tab>
 						<Tabs.Tab id={TABS.archived}>Архивные</Tabs.Tab>
 					</Tabs>
@@ -100,7 +98,7 @@ class GroupHeader extends Component {
 		})
 	};
 
-	onChange = (_, v) => {
+	onChange = (v) => {
 		this.props.onTabChange(v);
 	};
 }

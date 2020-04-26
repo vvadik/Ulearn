@@ -9,7 +9,7 @@ import { COURSES__COURSE_ENTERED } from "src/consts/actions";
 import GroupList from "src/components/groups/GroupMainPage/GroupList/GroupList";
 import GroupHeader from "src/components/groups/GroupMainPage/GroupHeader/GroupHeader";
 import Error404 from "src/components/common/Error/Error404";
-import Toast from "ui/Toast";
+import { Toast } from "ui";
 
 class GroupListPage extends Component {
 	constructor(props) {

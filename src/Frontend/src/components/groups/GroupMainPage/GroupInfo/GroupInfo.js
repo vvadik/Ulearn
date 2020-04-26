@@ -1,12 +1,10 @@
 import React, { Component } from "react";
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import Ok from "icons/Ok";
-import Delete from "icons/Delete";
-import ArchiveUnpack from "icons/ArchiveUnpack";
-import Kebab from "ui/Kebab";
-import MenuItem from "ui/MenuItem";
-import Gapped from "ui/Gapped";
+import { Ok } from "icons/Ok";
+import { Delete } from "icons/Delete";
+import { ArchiveUnpack } from "icons/ArchiveUnpack";
+import { Kebab, MenuItem, Gapped } from "ui";
 import getPluralForm from "src/utils/getPluralForm";
 
 import styles from "./groupInfo.less";

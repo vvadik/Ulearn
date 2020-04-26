@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-import Button from "ui/Button";
-import ArrowChevron2Left from 'icons/ArrowChevron2Left';
+import { Button } from "ui";
+import { ArrowChevron2Left } from 'icons/ArrowChevron2Left';
 
 import { groupAsStudentType, progressType } from "../../types";
 import LinksToGroupsStatements from "../../LinksToGroupsStatements/LinksToGroupsStatements";

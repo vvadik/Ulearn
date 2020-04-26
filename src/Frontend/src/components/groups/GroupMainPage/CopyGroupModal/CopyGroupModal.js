@@ -1,11 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
 import api from "../../../../api";
-import Modal from 'ui/Modal';
-import Select from 'ui/Select';
-import Button from 'ui/Button';
-import Checkbox from 'ui/Checkbox';
-import Loader from "ui/Loader";
+import { Modal, Select, Button, Checkbox, Loader } from 'ui';
 import getPluralForm from "../../../../utils/getPluralForm";
 
 import styles from "./copyGroupModal.less";

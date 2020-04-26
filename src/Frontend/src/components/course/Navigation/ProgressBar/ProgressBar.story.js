@@ -1,7 +1,7 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
 import ProgressBar from './ProgressBar';
-import Gapped from 'ui/Gapped';
+import { Gapped } from 'ui';
 
 storiesOf('ProgressBar', module)
 	.add('Прогресс-бары', () => (

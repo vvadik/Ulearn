@@ -6,10 +6,7 @@ import { withRouter } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import api from "src/api/index";
 import { COURSES__COURSE_ENTERED } from "src/consts/actions";
-import Tabs from "ui/Tabs";
-import Button from "ui/Button";
-import Toast from "ui/Toast";
-import Link from "ui/Link";
+import { Tabs, Button, Toast, Link } from "ui";
 import GroupMembers from "src/components/groups/GroupSettingsPage/GroupMembers/GroupMembers";
 import GroupSettings from "src/components/groups/GroupSettingsPage/GroupSettings/GroupSettings";
 import Error404 from "src/components/common/Error/Error404.js";
@@ -150,7 +147,7 @@ class GroupPage extends Component {
 				</div>
 				<h2 className={styles["group-name"]}>{group.name ? group.name : " "}</h2>
 				<div className={styles["tabs-container"]}>
-					<Tabs value={groupPage} onChange={this.onChangeTab}>
+					<Tabs value={groupPage} onValueChange={this.onChangeTab}>
 						<Tabs.Tab id="settings">Настройки</Tabs.Tab>
 						<Tabs.Tab id="members">Преподаватели и студенты</Tabs.Tab>
 					</Tabs>
@@ -183,7 +180,7 @@ class GroupPage extends Component {
 		)
 	}
 
-	onChangeTab = (_, value) => {
+	onChangeTab = (value) => {
 		const {courseId, groupId} = this.props.match.params;
 
 		this.props.history.push(`/${courseId}/groups/${groupId}/${value}`);

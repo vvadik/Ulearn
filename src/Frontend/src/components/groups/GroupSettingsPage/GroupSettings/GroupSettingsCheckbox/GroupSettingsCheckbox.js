@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Checkbox from "ui/Checkbox";
+import { Checkbox } from "ui";
 
 import styles from './groupSettingsCheckbox.less';
 

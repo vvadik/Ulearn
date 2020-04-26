@@ -1,11 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { comment, userRoles, userType } from "../../commonPropTypes";
-import Link from "ui/Link";
-import Button from "ui/Button";
-import ArrowCorner1 from "icons/ArrowCorner1";
-import Edit from "icons/Edit";
-import DocumentLite from "icons/DocumentLite";
+import { Link, Button } from "ui";
+import { ArrowCorner1 } from "icons/ArrowCorner1";
+import { Edit } from "icons/Edit";
+import { DocumentLite } from "icons/DocumentLite";
 import { ACCESSES, SLIDETYPE } from "src/consts/general";
 
 import styles from "./CommentActions.less";

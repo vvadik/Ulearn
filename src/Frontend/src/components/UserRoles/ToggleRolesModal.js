@@ -1,9 +1,6 @@
 import React, {Component} from 'react';
 
-import Modal from 'ui/Modal';
-import Button from 'ui/Button';
-import Textarea from 'ui/Textarea';
-import Tooltip from "ui/Tooltip";
+import { Modal, Button, Textarea, Tooltip } from 'ui';
 
 class ToggleRolesModal extends Component {
 	constructor(props) {

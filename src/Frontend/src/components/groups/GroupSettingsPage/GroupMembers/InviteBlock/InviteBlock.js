@@ -2,11 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import api from "src/api";
-import Toggle from "ui/Toggle";
-import Button from "ui/Button";
-import Toast from "ui/Toast";
-import Link from "icons/Link";
-import Input from "ui/Input";
+import { Toggle, Button, Toast, Link, Input } from "ui";
 
 import styles from './inviteBlock.less';
 

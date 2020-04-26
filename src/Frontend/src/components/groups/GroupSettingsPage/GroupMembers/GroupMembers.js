@@ -3,12 +3,9 @@ import PropTypes from "prop-types";
 import getMoment from "../../../../utils/getMoment";
 import {withRouter} from "react-router-dom";
 import api from "../../../../api";
-import User from "icons/User";
-import Delete from "icons/Delete";
-import Kebab from "ui/Kebab";
-import MenuItem from "ui/MenuItem";
-import Gapped from "ui/Gapped";
-import Loader from "ui/Loader";
+import { User } from "icons/User";
+import { Delete } from "icons/Delete";
+import { Kebab, MenuItem, Gapped, Loader, Toast } from "ui";
 import ComboboxInstructorsSearch from "./Combobox/ComboboxInstructorsSearch";
 import Avatar from "../../../common/Avatar/Avatar";
 import GroupStudents from "./GroupStudents/GroupStudents";
@@ -16,7 +13,6 @@ import InviteBlock from "./InviteBlock/InviteBlock";
 import Profile from './Profile';
 import getGenderForm from "../../../../utils/getGenderForm";
 import styles from './groupMembers.less';
-import Toast from "ui/Toast";
 import {Mobile, NotMobile} from "../../../../utils/responsive";
 
 class GroupMembers extends Component {

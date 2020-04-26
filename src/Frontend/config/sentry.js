@@ -1,5 +1,5 @@
-import { init } from '@sentry/browser';
+import Raven from 'raven-js';
 
-init({
-	dsn: 'https://992e1a5327ad4e48af004ae709b51aba@sentry.io/181214',
-});
+Raven
+	.config('https://62e9c6b9ae6a47399a2b79600f1cacc5@sentry.skbkontur.ru/781')
+	.install();

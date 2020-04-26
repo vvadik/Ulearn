@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { markupOperation } from "../../commonPropTypes";
-import Hint from "ui/Hint";
+import { Hint } from "ui";
 
 import styles from "./MarkdownButtons.less";
 

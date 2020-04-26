@@ -1,20 +1,14 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 
-import DocumentGroup from "icons/DocumentGroup";
-import DocumentSolid from "icons/DocumentSolid";
-import NotificationBell from "icons/NotificationBell";
-import User from "icons/User";
-import Warning from "icons/Warning";
-import MenuIcon  from "icons/Menu";
-
-import MenuHeader from "ui/MenuHeader";
-import MenuItem from "ui/MenuItem";
-import MenuSeparator from "ui/MenuSeparator";
-import Tooltip from "ui/Tooltip";
-import Loader from "ui/Loader";
-import DropdownMenu from "ui/DropdownMenu";
-import DropdownContainer from "ui/DropdownContainer/DropdownContainer";
+import { DocumentGroup } from "icons/DocumentGroup";
+import { DocumentSolid } from "icons/DocumentSolid";
+import { NotificationBell } from "icons/NotificationBell";
+import { User } from "icons/User";
+import { Warning } from "icons/Warning";
+import { Menu as MenuIcon } from "icons/Menu";
+import { MenuHeader, MenuItem, MenuSeparator, Tooltip, Loader, DropdownMenu, } from "ui";
+import { DropdownContainer } from "ui/internal/DropdownContainer";
 import HeaderComponentErrorBoundary from "./Error/HeaderComponentErrorBoundary";
 import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
@@ -55,37 +49,37 @@ class Header extends Component {
 		const { groupsAsStudent, roleByCourse, accessesByCourse, isSystemAdministrator } = account;
 
 		let controllableCourseIds = [];
-		if (isSystemAdministrator) {
+		if(isSystemAdministrator) {
 			controllableCourseIds = Object.keys(courseById);
 		} else {
 			controllableCourseIds = Object.keys(roleByCourse)
 				.filter(courseId => roleByCourse[courseId] !== 'tester')
 				.map(s => s.toLowerCase());
-			if (groupsAsStudent) {
+			if(groupsAsStudent) {
 				const groupsAsStudentIds = groupsAsStudent.map(g => g.courseId.toLowerCase());
 
 				controllableCourseIds = [
 					...new Set(controllableCourseIds.concat(groupsAsStudentIds)),
 				]
-				.filter((e) => courseById.hasOwnProperty(e))
-				.sort((a, b) => {
-					const first = courseById[a].title.toLowerCase();
-					const second = courseById[b].title.toLowerCase();
-					if (first > second)
-						return 1;
-					if (first < second)
-						return -1;
-					return 0;
-				});
+					.filter((e) => courseById.hasOwnProperty(e))
+					.sort((a, b) => {
+						const first = courseById[a].title.toLowerCase();
+						const second = courseById[b].title.toLowerCase();
+						if(first > second)
+							return 1;
+						if(first < second)
+							return -1;
+						return 0;
+					});
 			}
 		}
 
 		let courseRole;
-		if (isSystemAdministrator) {
+		if(isSystemAdministrator) {
 			courseRole = 'courseAdmin';
 		} else {
 			courseRole = roleByCourse[currentCourseId];
-			if (courseRole === undefined) {
+			if(courseRole === undefined) {
 				courseRole = "";
 			}
 		}
@@ -112,9 +106,9 @@ class Header extends Component {
 		};
 	}
 
-	static getDerivedStateFromProps(props, state){
-		const {  account, courses } = props;
-		if (JSON.stringify(state.account) !== JSON.stringify(account) || JSON.stringify(state.courses) !== JSON.stringify(courses)) {
+	static getDerivedStateFromProps(props, state) {
+		const { account, courses } = props;
+		if(JSON.stringify(state.account) !== JSON.stringify(account) || JSON.stringify(state.courses) !== JSON.stringify(courses)) {
 			return Header.mapPropsToState(props);
 		}
 		return null;
@@ -283,7 +277,7 @@ class AbstractMyCoursesMenu extends Component {
 				component={ LinkComponent }>{ courseById[courseId].title }
 			</MenuItem>
 		);
-		if (courseIds.length > visibleCourseIds.length || isSystemAdministrator)
+		if(courseIds.length > visibleCourseIds.length || isSystemAdministrator)
 			items.push(
 				<MenuItem href="/Admin/Courses" key="-course-list" component={ LinkComponent }>
 					<strong>Все курсы</strong>
@@ -420,16 +414,16 @@ class CourseMenu extends Component {
 		let hasUsersMenuItem = role === 'courseAdmin' || accesses.indexOf('addAndRemoveInstructors') !== -1;
 		let hasCourseAdminMenuItems = role === 'courseAdmin';
 
-		if (hasUsersMenuItem || hasCourseAdminMenuItems)
+		if(hasUsersMenuItem || hasCourseAdminMenuItems)
 			items.push(<MenuSeparator key="CourseMenuSeparator2"/>);
 
-		if (hasUsersMenuItem)
+		if(hasUsersMenuItem)
 			items.push(
 				<MenuItem href={ "/Admin/Users?courseId=" + courseId } key="Users" component={ LinkComponent }>
 					Студенты и преподаватели
 				</MenuItem>);
 
-		if (hasCourseAdminMenuItems)
+		if(hasCourseAdminMenuItems)
 			items = items.concat([
 				<MenuItem href={ "/Admin/Packages?courseId=" + courseId } key="Packages"
 						  component={ LinkComponent }>
@@ -468,7 +462,7 @@ class CourseMenu extends Component {
 		const { courseId, role, accesses } = this.props;
 		const courseById = this.props.courses.courseById;
 		const course = courseById[courseId];
-		if (typeof course === 'undefined') {
+		if(typeof course === 'undefined') {
 			return null;
 		}
 
@@ -553,14 +547,14 @@ MobileCourseMenu = connect(MobileCourseMenu.mapStateToProps)(MobileCourseMenu);
 class Menu extends Component {
 	render() {
 		let returnUrl = this.props.location.pathname + this.props.location.search;
-		if (returnUrl.startsWith("/Login")
+		if(returnUrl.startsWith("/Login")
 			|| returnUrl.startsWith("/Account/Register")
 			|| returnUrl.startsWith("/Login/ExternalLoginConfirmation")
 			|| returnUrl.startsWith("/Login/ExternalLoginCallback")) {
 			returnUrl = getQueryStringParameter("returnUrl");
 		}
 
-		if (this.props.account.isAuthenticated) {
+		if(this.props.account.isAuthenticated) {
 			return (
 				<div className={ styles["header__menu"] }>
 					<NotificationsMenu/>
@@ -602,9 +596,9 @@ class NotificationsMenu extends Component {
 		}
 	}
 
-	static getDerivedStateFromProps(props, state){
+	static getDerivedStateFromProps(props, state) {
 		const { notifications } = props;
-		if(state.counter !== notifications.count){
+		if(state.counter !== notifications.count) {
 			return {
 				counter: notifications.count,
 			}
@@ -629,7 +623,7 @@ class NotificationsMenu extends Component {
 	};
 
 	_handleClickOutside = (event) => {
-		if (this.ref && !this.ref.contains(event.target) && this.dropdownContainerRef &&
+		if(this.ref && !this.ref.contains(event.target) && this.dropdownContainerRef &&
 			!this.dropdownContainerRef.contains(event.target)) {
 			this.setState({
 				isOpened: false,
@@ -641,13 +635,13 @@ class NotificationsMenu extends Component {
 		let node = event.target;
 
 		while (true) {
-			if (!node || (node.classList && node.classList.contains('notifications__new-comment-notification'))) {
+			if(!node || (node.classList && node.classList.contains('notifications__new-comment-notification'))) {
 				break;
 			}
 			node = node.parentNode;
 		}
 
-		if (this.ref && this.dropdownContainerRef && (this.ref.contains(node) ||
+		if(this.ref && this.dropdownContainerRef && (this.ref.contains(node) ||
 			this.dropdownContainerRef.contains(node))) {
 			this.setState({
 				isOpened: false,
@@ -663,7 +657,7 @@ class NotificationsMenu extends Component {
 	}
 
 	onClick() {
-		if (this.state.isOpened) {
+		if(this.state.isOpened) {
 			this.setState({
 				isOpened: false,
 			});
@@ -691,7 +685,8 @@ class NotificationsMenu extends Component {
 				<NotificationsIcon counter={ counter } onClick={ this.onClick }/>
 				{
 					isOpened &&
-					<DropdownContainer getParent={ () => findDOMNode(this) } offsetY={ 0 } align="right"
+					<DropdownContainer getParent={ () => findDOMNode(this) } offsetY={ 0 }
+									   align="right"
 									   offsetX={ isMobile ? -112 : 0 }>
 						<div className={ styles["dropdown-container"] }
 							 ref={ node => this.dropdownContainerRef = node }>
@@ -752,7 +747,7 @@ class NotificationsIcon extends Component {
 class Notifications extends Component {
 	render() {
 		const { isLoading, notifications } = this.props;
-		if (isLoading)
+		if(isLoading)
 			return (
 				<div className={ styles["notifications__dropdown"] }>
 					<Loader type="normal" active={ true }/>
@@ -781,30 +776,30 @@ class ProfileLink extends Component {
 
 	openTooltip() {
 		this.setState({
-			tooltipTrigger: 'opened'
+			tooltipTrigger: 'hover'
 		})
 	}
 
 	closeTooltip() {
 		this.setState({
-			tooltipTrigger: 'closed'
+			tooltipTrigger: 'hover'
 		})
 	}
 
 	render() {
 		let icon = <User/>;
 		let isProblem = this.props.account.accountProblems.length > 0;
-		if (isProblem) {
+		if(isProblem) {
 			let firstProblem = this.props.account.accountProblems[0];
 			icon = (
-				<Tooltip trigger={ this.state.tooltipTrigger } pos="bottom center" render={ () => (
+				<Tooltip trigger={ this.state.tooltipTrigger } closeButton={ true } pos="bottom center" onCloseClick={ this.closeTooltip } render={ () => (
 					<div style={ { width: '250px' } }>
 						{ firstProblem.description }
 					</div>
-				) } onCloseClick={ this.closeTooltip }>
-                    <span onMouseOver={ this.openTooltip }>
-                        <Warning color="#f77"/>
-                    </span>
+				) }>
+					<span onMouseOver={ this.openTooltip }>
+						<Warning color="#f77"/>
+					</span>
 				</Tooltip>
 			)
 		}
