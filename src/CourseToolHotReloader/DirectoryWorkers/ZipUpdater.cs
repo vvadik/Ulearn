@@ -18,7 +18,15 @@ namespace CourseToolHotReloader.DirectoryWorkers
 			{
 				foreach (var update in courseUpdates)
 				{
-					zip.AddFile(update.FullPath, Path.GetDirectoryName(update.RelativePath));
+					if (Directory.Exists(update.FullPath))
+					{
+						zip.AddDirectory(update.FullPath, update.RelativePath);
+					}
+					
+					if (File.Exists(update.FullPath))
+					{
+						zip.AddFile(update.FullPath, Path.GetDirectoryName(update.RelativePath));
+					}
 				}
 
 				zip.AddEntry("deleted.txt", deletedFileContent);
