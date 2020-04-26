@@ -18,7 +18,7 @@ const merge = require('webpack-merge');
 
 module.exports = merge(base, {
 	mode: 'development',
-	devtool: 'cheap-module-source-map',
+	devtool: 'eval-cheap-source-map',
 	entry: {
 		main: [
 			'./config/polyfills',
