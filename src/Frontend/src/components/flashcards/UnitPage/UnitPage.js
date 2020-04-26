@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
 
-import Loader from "@skbkontur/react-ui/Loader";
+import { Loader } from "ui";
 import UnitCard from "./UnitCard/UnitCard";
 import Guides from "../Guides/Guides";
 import ProgressBar from "../ProgressBar/ProgressBar";
@@ -31,16 +31,17 @@ class UnitPage extends Component {
 		}
 	}
 
-	componentWillReceiveProps(nextProps, nextContext) {
-		const { flashcards, unitId } = nextProps;
-
+	static getDerivedStateFromProps(props, state) {
+		const { flashcards, unitId } = props;
 		const unitFlashcards = flashcards.filter(flashcard => flashcard.unitId === unitId);
-
-		this.setState({
-			unitFlashcards,
-			statistics: countFlashcardsStatistics(unitFlashcards),
-			totalFlashcardsCount: unitFlashcards.length,
-		});
+		if (JSON.stringify(unitFlashcards) !== JSON.stringify(state.unitFlashcards)) {
+			return {
+				unitFlashcards,
+				statistics: countFlashcardsStatistics(unitFlashcards),
+				totalFlashcardsCount: unitFlashcards.length,
+			};
+		}
+		return null;
 	}
 
 	componentDidMount() {

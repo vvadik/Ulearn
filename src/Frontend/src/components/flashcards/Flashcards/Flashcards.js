@@ -3,13 +3,13 @@ import PropTypes from "prop-types";
 
 import ProgressBar from "../ProgressBar/ProgressBar";
 import OpenedFlashcard from "./OpenedFlashcard/OpenedFlashcard";
-import Toast from "@skbkontur/react-ui/Toast";
+import { Toast } from "ui";
 
 import { sortFlashcardsInAuthorsOrderWithRate, getNextFlashcardRandomly } from "./flashcardsStirrer/flashcardsStirrer";
 import countFlashcardsStatistics from "../countFlashcardsStatistics";
 import classNames from 'classnames';
 
-import { rateTypes } from "../../../consts/rateTypes";
+import { rateTypes } from "src/consts/rateTypes";
 
 import styles from './flashcards.less';
 

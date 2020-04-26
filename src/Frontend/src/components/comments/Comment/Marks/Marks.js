@@ -1,10 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { comment, group } from "../../commonPropTypes";
-import Icon from "@skbkontur/react-icons";
-import TooltipMenu from "@skbkontur/react-ui/components/TooltipMenu/TooltipMenu";
-import MenuItem from "@skbkontur/react-ui/components/MenuItem/MenuItem";
-import MenuHeader from "@skbkontur/react-ui/components/MenuHeader/MenuHeader";
+import { EyeClosed } from "icons/EyeClosed";
+import { Ok } from "icons/Ok";
+import { Pin } from "icons/Pin";
+import { People } from "icons/People";
+import { TooltipMenu, MenuItem } from "ui";
 
 import styles from "./Marks.less";
 
@@ -22,7 +23,7 @@ export default function Marks({courseId, comment, canViewStudentsGroup, authorGr
 
 const HiddenMark = () => (
 	<div className={`${styles.mark} ${styles.approvedComment}`}>
-		<Icon name="EyeClosed" size={15} />
+		<EyeClosed size={15} />
 		<span className={`${styles.text} ${styles.visibleOnDesktopAndTablet}`}>
 			Скрыт
 		</span>
@@ -31,7 +32,7 @@ const HiddenMark = () => (
 
 const CorrectAnswerMark = () => (
 	<div className={`${styles.mark} ${styles.correctAnswer}`}>
-		<Icon name="Ok" size={15} />
+		<Ok size={15} />
 		<span className={`${styles.text} ${styles.visibleOnDesktopAndTablet}`}>
 			Правильный&nbsp;ответ
 		</span>
@@ -40,7 +41,7 @@ const CorrectAnswerMark = () => (
 
 const PinnedToTopMark = () => (
 	<div className={`${styles.mark} ${styles.pinnedToTop}`}>
-		<Icon name="Pin" size={15} />
+		<Pin size={15} />
 		<span className={`${styles.text} ${styles.visibleOnDesktopAndTablet}`}>
 			Закреплен
 		</span>
@@ -58,7 +59,7 @@ export function GroupMark({url, groups}) {
 						groups.map(group =>
 							<div key={group.id}
 								 className={`${styles.mark} ${styles.group} ${group.isArchived && styles.archiveGroup}`}>
-								<Icon name="People" size={15} />
+								<People size={15} />
 								<a href={group.apiUrl && `${url}${group.apiUrl}`}
 								   className={`${styles.text} ${styles.groupName}`}>
 									{group.name}
@@ -80,7 +81,7 @@ const GroupsMenu = ({url, groups}) => (
 		positions={["bottom right"]}
 		caption={
 			<div className={styles.groupMarkOnPhone}>
-				<Icon name="People" color="#fff" size={15} />
+				<People color="#fff" size={15} />
 				<span className={`${styles.text} ${styles.visibleOnDesktopAndTablet}`}>
 					Группы
 				</span>

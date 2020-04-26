@@ -1,11 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
 import api from "../../../../api";
-import Modal from '@skbkontur/react-ui/components/Modal/Modal';
-import Select from '@skbkontur/react-ui/components/Select/Select';
-import Button from '@skbkontur/react-ui/components/Button/Button';
-import Checkbox from '@skbkontur/react-ui/components/Checkbox/Checkbox';
-import Loader from "@skbkontur/react-ui/components/Loader/Loader";
+import { Modal, Select, Button, Checkbox, Loader } from 'ui';
 import getPluralForm from "../../../../utils/getPluralForm";
 
 import styles from "./copyGroupModal.less";

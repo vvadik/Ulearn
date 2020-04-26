@@ -1,5 +1,5 @@
-import translateTextareaToCode from '../../src/codeTranslator/codemirror';
-import translateTextToKatex from '../../src/codeTranslator/katex';
+import translateTextareaToCode from 'src/codeTranslator/codemirror';
+import translateTextToKatex from 'src/codeTranslator/katex';
 
 export default function translateCode(element, settings = {}) {
 	for (const { id, selector, translateFunction } of translators) {

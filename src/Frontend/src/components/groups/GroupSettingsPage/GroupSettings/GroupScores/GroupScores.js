@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Checkbox from "@skbkontur/react-ui/components/Checkbox/Checkbox";
+import { Checkbox } from "ui";
 
 import styles from './groupScores.less';
 

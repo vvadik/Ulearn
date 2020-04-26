@@ -39,6 +39,7 @@ namespace uLearn.Web.Controllers
 		private readonly UserSolutionsRepo userSolutionsRepo;
 		private readonly GroupsRepo groupsRepo;
 		private readonly UsersRepo usersRepo;
+		private readonly UnitsRepo unitsRepo;
 		private readonly AdditionalScoresRepo additionalScoresRepo;
 
 		public AnalyticsController()
@@ -56,12 +57,16 @@ namespace uLearn.Web.Controllers
 			groupsRepo = new GroupsRepo(db, courseManager);
 			usersRepo = new UsersRepo(db);
 			visitsRepo = new VisitsRepo(db);
+			unitsRepo = new UnitsRepo(db);
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult UnitStatistics(UnitStatisticsParams param)
 		{
 			const int usersLimit = 200;
+
+			if (param.CourseId == null)
+				return HttpNotFound();
 
 			var courseId = param.CourseId;
 			var unitId = param.UnitId;
@@ -72,13 +77,15 @@ namespace uLearn.Web.Controllers
 			var realPeriodFinish = periodFinish.Add(TimeSpan.FromDays(1));
 
 			var course = courseManager.GetCourse(courseId);
+			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
 			if (!unitId.HasValue)
 				return View("UnitStatisticsList", new UnitStatisticPageModel
 				{
-					Course = course,
-					Units = course.Units,
+					CourseId = courseId,
+					CourseTitle = course.Title,
+					Units = visibleUnits
 				});
-			var selectedUnit = course.FindUnitById(unitId.Value);
+			var selectedUnit = visibleUnits.FirstOrDefault(x => x.Id == unitId);
 			if (selectedUnit == null)
 				return HttpNotFound();
 
@@ -140,8 +147,9 @@ namespace uLearn.Web.Controllers
 
 			var model = new UnitStatisticPageModel
 			{
-				Course = course,
-				Units = course.Units,
+				CourseId = courseId,
+				CourseTitle = course.Title,
+				Units = visibleUnits,
 				Unit = selectedUnit,
 				SelectedGroupsIds = groupsIds,
 				Groups = groups,
@@ -240,7 +248,7 @@ namespace uLearn.Web.Controllers
 
 			var model = GetCourseStatisticsModel(param, 3000);
 
-			var filename = model.Course.Id + ".json";
+			var filename = model.CourseId + ".json";
 			Response.AddHeader("Content-Disposition", "attachment;filename=" + filename);
 
 			return Json(new CourseStatisticsModel(model), JsonRequestBehavior.AllowGet);
@@ -254,7 +262,7 @@ namespace uLearn.Web.Controllers
 
 			var model = GetCourseStatisticsModel(param, 3000);
 
-			var filename = model.Course.Id + ".xml";
+			var filename = model.CourseId + ".xml";
 			Response.AddHeader("Content-Disposition", "attachment;filename=" + filename);
 
 			return Content(new CourseStatisticsModel(model).XmlSerialize(), "text/xml");
@@ -270,7 +278,7 @@ namespace uLearn.Web.Controllers
 
 			var package = new ExcelPackage();
 			FillCourseStatisticsExcelWorksheet(
-				package.Workbook.Worksheets.Add(model.Course.Title),
+				package.Workbook.Worksheets.Add(model.CourseTitle),
 				model
 			);
 			FillCourseStatisticsExcelWorksheet(
@@ -279,7 +287,7 @@ namespace uLearn.Web.Controllers
 				onlyFullScores: true
 			);
 
-			var filename = model.Course.Id + ".xlsx";
+			var filename = model.CourseId + ".xlsx";
 			Response.AddHeader("Content-Disposition", "attachment;filename=" + filename);
 			Response.Charset = "";
 			Response.Cache.SetCacheability(HttpCacheability.NoCache);
@@ -298,7 +306,7 @@ namespace uLearn.Web.Controllers
 			builder.AddCell("", 3);
 			builder.AddCell("За весь курс", model.ScoringGroups.Count);
 			builder.AddStyleRule(s => s.Border.Left.Style = ExcelBorderStyle.Thin);
-			foreach (var unit in model.Course.Units)
+			foreach (var unit in model.Units)
 			{
 				var colspan = 0;
 				foreach (var scoringGroup in model.GetUsingUnitScoringGroups(unit, model.ScoringGroups).Values)
@@ -320,7 +328,7 @@ namespace uLearn.Web.Controllers
 			builder.AddCell("Группа");
 			foreach (var scoringGroup in model.ScoringGroups.Values)
 				builder.AddCell(scoringGroup.Abbreviation);
-			foreach (var unit in model.Course.Units)
+			foreach (var unit in model.Units)
 			{
 				builder.AddStyleRuleForOneCell(s => s.Border.Left.Style = ExcelBorderStyle.Thin);
 				foreach (var scoringGroup in model.GetUsingUnitScoringGroups(unit, model.ScoringGroups).Values)
@@ -349,8 +357,8 @@ namespace uLearn.Web.Controllers
 			});
 			builder.AddCell("Максимум:", 3);
 			foreach (var scoringGroup in model.ScoringGroups.Values)
-				builder.AddCell(model.Course.Units.Sum(unit => model.GetMaxScoreForUnitByScoringGroup(unit, scoringGroup)));
-			foreach (var unit in model.Course.Units)
+				builder.AddCell(model.Units.Sum(unit => model.GetMaxScoreForUnitByScoringGroup(unit, scoringGroup)));
+			foreach (var unit in model.Units)
 			{
 				builder.AddStyleRuleForOneCell(s => s.Border.Left.Style = ExcelBorderStyle.Thin);
 				foreach (var scoringGroup in model.GetUsingUnitScoringGroups(unit, model.ScoringGroups).Values)
@@ -377,12 +385,12 @@ namespace uLearn.Web.Controllers
 				builder.AddCell(string.Join(", ", userGroups));
 				foreach (var scoringGroup in model.ScoringGroups.Values)
 				{
-					var scoringGroupScore = model.Course.Units.Sum(unit => model.GetTotalScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup));
-					var scoringGroupOnlyFullScore = model.Course.Units.Sum(unit => model.GetTotalOnlyFullScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup));
+					var scoringGroupScore = model.Units.Sum(unit => model.GetTotalScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup));
+					var scoringGroupOnlyFullScore = model.Units.Sum(unit => model.GetTotalOnlyFullScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup));
 					builder.AddCell(onlyFullScores ? scoringGroupOnlyFullScore : scoringGroupScore);
 				}
 
-				foreach (var unit in model.Course.Units)
+				foreach (var unit in model.Units)
 				{
 					builder.AddStyleRuleForOneCell(s => s.Border.Left.Style = ExcelBorderStyle.Thin);
 					foreach (var scoringGroup in model.GetUsingUnitScoringGroups(unit, model.ScoringGroups).Values)
@@ -444,7 +452,9 @@ namespace uLearn.Web.Controllers
 			var realPeriodFinish = periodFinish.Add(TimeSpan.FromDays(1));
 
 			var course = courseManager.GetCourse(courseId);
-			var slidesIds = course.Slides.Select(s => s.Id).ToHashSet();
+			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
+
+			var slidesIds = visibleUnits.SelectMany(u => u.Slides.Select(s => s.Id)).ToHashSet();
 
 			var filterOptions = ControllerUtils.GetFilterOptionsByGroup<VisitsFilterOptions>(groupsRepo, User, courseId, groupsIds, allowSeeGroupForAnyMember: true);
 			filterOptions.PeriodStart = periodStart;
@@ -460,7 +470,7 @@ namespace uLearn.Web.Controllers
 			var visitedUsers = GetUnitStatisticUserInfos(usersIds);
 			var isMore = visitedUsers.Count > usersLimit;
 
-			var unitBySlide = course.Units.SelectMany(u => u.Slides.Select(s => Tuple.Create(u.Id, s.Id))).ToDictionary(p => p.Item2, p => p.Item1);
+			var unitBySlide = visibleUnits.SelectMany(u => u.Slides.Select(s => Tuple.Create(u.Id, s.Id))).ToDictionary(p => p.Item2, p => p.Item1);
 			var scoringGroups = course.Settings.Scoring.Groups;
 
 			var totalScoreByUserAllTime = GetTotalScoreByUserAllTime(filterOptions);
@@ -479,7 +489,7 @@ namespace uLearn.Web.Controllers
 			filterOptions.IsUserIdsSupplement = false;
 			var scoreByUserUnitScoringGroup = GetScoreByUserUnitScoringGroup(filterOptions, slidesIds, unitBySlide, course);
 
-			var shouldBeSolvedSlides = course.Slides.Where(s => s.ShouldBeSolved).ToList();
+			var shouldBeSolvedSlides = visibleUnits.SelectMany(u => u.Slides).Where(s => s.ShouldBeSolved).ToList();
 			var shouldBeSolvedSlidesIds = shouldBeSolvedSlides.Select(s => s.Id).ToList();
 			var shouldBeSolvedSlidesByUnitScoringGroup = GetShouldBeSolvedSlidesByUnitScoringGroup(shouldBeSolvedSlides, unitBySlide);
 			var scoreByUserAndSlide = GetScoreByUserAndSlide(filterOptions, shouldBeSolvedSlidesIds);
@@ -501,7 +511,9 @@ namespace uLearn.Web.Controllers
 			var model = new CourseStatisticPageModel
 			{
 				IsInstructor = isInstructor,
-				Course = course,
+				CourseId = course.Id,
+				CourseTitle = course.Title,
+				Units = visibleUnits,
 				SelectedGroupsIds = groupsIds,
 				Groups = groups,
 				PeriodStart = periodStart,
@@ -587,7 +599,9 @@ namespace uLearn.Web.Controllers
 			if (user == null)
 				return HttpNotFound();
 
-			var unit = course.FindUnitById(unitId);
+			// Здесь CourseRole.Instructor, но для единообразия я бы все-таки проверял доступ к юнитам, иначе сложно будет проверить, что нигде не забыта эта проверка
+			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
+			var unit = visibleUnits.FirstOrDefault(x => x.Id == unitId);
 			if (unit == null)
 				return HttpNotFound();
 
@@ -605,10 +619,10 @@ namespace uLearn.Web.Controllers
 				.DistinctBy(u => u.SlideId)
 				.ToList();
 			var userScores = visitsRepo.GetScoresForSlides(courseId, userId, slides.Select(s => s.Id));
-
-			var unitIndex = course.Units.FindIndex(u => u.Id == unitId);
-			var previousUnit = unitIndex == 0 ? null : course.Units[unitIndex - 1];
-			var nextUnit = unitIndex == course.Units.Count - 1 ? null : course.Units[unitIndex + 1];
+			
+			var unitIndex = visibleUnits.FindIndex(u => u.Id == unitId);
+			var previousUnit = unitIndex == 0 ? null : visibleUnits[unitIndex - 1];
+			var nextUnit = unitIndex == visibleUnits.Count - 1 ? null : visibleUnits[unitIndex + 1];
 
 			var model = new UserUnitStatisticsPageModel
 			{

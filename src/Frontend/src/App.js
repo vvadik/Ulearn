@@ -14,7 +14,7 @@ import Router from "./Router";
 
 import rootReducer from "./redux/reducers";
 import api from "./api";
-import Toast from "@skbkontur/react-ui/components/Toast/Toast";
+import { Toast } from "ui";
 
 
 let loggerMiddleware = createLogger();
@@ -80,13 +80,13 @@ class InternalUlearnApp extends Component {
 	componentDidMount() {
 		this.props.getCurrentUser();
 		this.props.getCourses();
-	}
-
-	componentWillReceiveProps(nextProps, nextState) {
 		this.setState({
 			initializing: false
 		});
-		if (!this.props.account.isAuthenticated && nextProps.account.isAuthenticated) {
+	}
+
+	componentDidUpdate(prevProps) {
+		if (!prevProps.account.isAuthenticated && this.props.account.isAuthenticated) {
 			this.props.getNotificationsCount();
 		}
 	}

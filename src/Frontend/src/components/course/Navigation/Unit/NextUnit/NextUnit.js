@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from 'prop-types';
 import styles from './NextUnit.less';
 import { Link } from "react-router-dom";
-import Icon from "@skbkontur/react-icons";
+import { ArrowChevronRight } from "icons/ArrowChevronRight";
 
 class NextUnit extends Component {
 	render() {
@@ -17,7 +17,7 @@ class NextUnit extends Component {
 					<h5 className={ styles.header }>Следующий модуль</h5>
 					<h4 className={ styles.title } title={ title }>{ title }</h4>
 				</div>
-				<Icon.ArrowChevronRight size={ 24 } className={ styles.arrow }/>
+				<ArrowChevronRight size={ 24 } className={ styles.arrow }/>
 			</Link>
 		);
 	}

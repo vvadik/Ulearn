@@ -3,8 +3,7 @@ import PropTypes from "prop-types";
 
 import CourseCards from "./CourseCards/CourseCards";
 import Guides from "../Guides/Guides";
-import Button from "@skbkontur/react-ui/Button";
-import Loader from "@skbkontur/react-ui/Loader";
+import { Button, Loader } from "ui";
 import Flashcards from "../Flashcards/Flashcards";
 
 import styles from './courseFlashcardsPage.less';

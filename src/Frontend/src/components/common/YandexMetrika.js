@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import { YMInitializer } from "react-yandex-metrika";
 import ym from 'react-yandex-metrika';
-import * as PropTypes from "prop-types";
-import withRouter from "react-router-dom/es/withRouter";
+import PropTypes from "prop-types";
+import { withRouter } from "react-router-dom";
 
 class YandexMetrika extends Component {
-	componentWillReceiveProps(nextProps, nextContext) {
-		ym('hit', nextProps.location.pathname + nextProps.location.search);
+	componentDidUpdate() {
+		ym('hit', this.props.location.pathname + this.props.location.search);
 	}
 
 	render() {
@@ -23,9 +23,7 @@ class YandexMetrika extends Component {
 	}
 
 	static propTypes = {
-		match: PropTypes.object.isRequired,
 		location: PropTypes.object.isRequired,
-		history: PropTypes.object.isRequired
 	}
 }
 

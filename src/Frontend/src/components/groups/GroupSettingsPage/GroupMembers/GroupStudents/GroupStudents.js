@@ -1,11 +1,9 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import moment from "moment";
-import 'moment/locale/ru';
-import "moment-timezone";
-import Checkbox from "@skbkontur/react-ui/components/Checkbox/Checkbox";
-import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
-import Icon from "@skbkontur/react-icons";
+import getMoment from "../../../../../utils/getMoment";
+import { Checkbox, Gapped } from "ui";
+import { Copy } from "icons/Copy";
+import { Trash } from "icons/Trash";
 import Avatar from "../../../../common/Avatar/Avatar";
 import CopyStudentsModal from "../CopyStudentsModal/CopyStudentsModal";
 import Profile from '../Profile';
@@ -55,7 +53,7 @@ class GroupStudents extends Component {
 					disabled={studentIds.size === 0}
 					onClick={this.onOpenModal}>
 					<Gapped gap={3}>
-						<Icon name="Copy" />
+						<Copy/>
 						<span className={styles["action-text"]}>Скопировать в группу...</span>
 					</Gapped>
 				</button>
@@ -65,7 +63,7 @@ class GroupStudents extends Component {
 					onClick={this.onDeleteStudents}
 				>
 					<Gapped gap={3}>
-						<Icon name="Trash" />
+						<Trash/>
 						<span className={styles["action-text"]}>Исключить из группы</span>
 					</Gapped>
 				</button>
@@ -76,7 +74,6 @@ class GroupStudents extends Component {
 	renderStudents() {
 		const {students, systemAccesses, isSysAdmin} = this.props;
 		const {studentIds} = this.state;
-		const grantTime = (grantTime) => moment(grantTime).format();
 
 		return (
 			<div>
@@ -94,7 +91,7 @@ class GroupStudents extends Component {
 								systemAccesses={systemAccesses}
 								isSysAdmin={isSysAdmin} /> {item.addingTime && <span className={styles.addingTime}>
 									{`${getGenderForm(item.user.gender, 'вступила', 'вступил')}
-									${moment(grantTime(item.addingTime)).fromNow()}`}</span>}
+									${getMoment(item.addingTime)}`}</span>}
 						</Checkbox>
 					</div>
 				)

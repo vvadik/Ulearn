@@ -4,15 +4,12 @@ import connect from "react-redux/es/connect/connect";
 import { Redirect } from 'react-router-dom';
 import { withRouter } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import api from "../../../api/index";
-import { COURSES__COURSE_ENTERED } from "../../../consts/actions";
-import Tabs from "@skbkontur/react-ui/components/Tabs/Tabs";
-import Button from "@skbkontur/react-ui/components/Button/Button";
-import Toast from "@skbkontur/react-ui/components/Toast/Toast";
-import Link from "@skbkontur/react-ui/components/Link/Link";
-import GroupMembers from "../../../components/groups/GroupSettingsPage/GroupMembers/GroupMembers";
-import GroupSettings from "../../../components/groups/GroupSettingsPage/GroupSettings/GroupSettings";
-import Error404 from "../../../components/common/Error/Error404.js";
+import api from "src/api/index";
+import { COURSES__COURSE_ENTERED } from "src/consts/actions";
+import { Tabs, Button, Toast, Link } from "ui";
+import GroupMembers from "src/components/groups/GroupSettingsPage/GroupMembers/GroupMembers";
+import GroupSettings from "src/components/groups/GroupSettingsPage/GroupSettings/GroupSettings";
+import Error404 from "src/components/common/Error/Error404.js";
 import styles from "./groupPage.less";
 import { Page } from "../../index";
 
@@ -150,7 +147,7 @@ class GroupPage extends Component {
 				</div>
 				<h2 className={styles["group-name"]}>{group.name ? group.name : " "}</h2>
 				<div className={styles["tabs-container"]}>
-					<Tabs value={groupPage} onChange={this.onChangeTab}>
+					<Tabs value={groupPage} onValueChange={this.onChangeTab}>
 						<Tabs.Tab id="settings">Настройки</Tabs.Tab>
 						<Tabs.Tab id="members">Преподаватели и студенты</Tabs.Tab>
 					</Tabs>
@@ -183,7 +180,7 @@ class GroupPage extends Component {
 		)
 	}
 
-	onChangeTab = (_, value) => {
+	onChangeTab = (value) => {
 		const {courseId, groupId} = this.props.match.params;
 
 		this.props.history.push(`/${courseId}/groups/${groupId}/${value}`);
