@@ -1,5 +1,5 @@
 import { connect } from "react-redux";
-import { loadCourse } from "../../actions/course";
+import { loadCourse, changeCurrentCourseAction } from "../../actions/course";
 import { loadUserProgress, userProgressUpdate } from "../../actions/userProgress";
 import Course from '../../components/course/Course';
 import { withRouter } from "react-router-dom";
@@ -38,6 +38,7 @@ const mapStateToProps = (state, { match }) => {
 	};
 };
 const mapDispatchToProps = (dispatch) => ({
+	enterToCourse: (courseId) => dispatch(changeCurrentCourseAction(courseId)),
 	loadCourse: (courseId) => dispatch(loadCourse(courseId)),
 	loadUserProgress: (courseId, userId) => dispatch(loadUserProgress(courseId, userId)),
 	updateVisitedSlide: (courseId, slideId) => dispatch(userProgressUpdate(courseId, slideId)),

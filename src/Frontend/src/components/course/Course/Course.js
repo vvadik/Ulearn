@@ -62,7 +62,8 @@ class Course extends Component {
 			return defaultState;
 		}
 
-		if(state.currentCourseId !== props.courseId || state.currentSlideId !== props.slideId) {
+		if (state.currentCourseId !== props.courseId || state.currentSlideId !== props.slideId) {
+			props.enterToCourse(props.courseId);
 			const openUnitId = Course.findUnitIdBySlideId(props.slideId, props.courseInfo);
 			const openUnit = props.units[openUnitId];
 			window.scrollTo(0, 0);
@@ -411,6 +412,7 @@ Course
 	courseInfo: PropTypes.object, // TODO: описать
 	progress: PropTypes.object, // TODO: описать
 	units: PropTypes.object,
+	enterToCourse: PropTypes.func,
 	loadCourse: PropTypes.func,
 	loadUserProgress: PropTypes.func,
 	updateVisitedSlide: PropTypes.func,
