@@ -49,7 +49,7 @@ class CreateGroupModal extends Component {
 						   maxLength="300"
 						   value={name || ''}
 						   error={hasError}
-						   onChange={this.onChangeInput}
+						   onValueChange={this.onChangeInput}
 						   onFocus={this.onFocus}
 						   autoFocus />
 				</Tooltip>
@@ -104,7 +104,7 @@ class CreateGroupModal extends Component {
 		});
 	};
 
-	onChangeInput = (_, value) => {
+	onChangeInput = (value) => {
 		this.setState({
 			name: value,
 		});

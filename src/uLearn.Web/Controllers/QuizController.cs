@@ -114,6 +114,7 @@ namespace uLearn.Web.Controllers
 			}
 
 			var slideId = slide.Id;
+			var isManualCheckingEnabledForUser = slide.ManualChecking && groupsRepo.IsManualCheckingEnabledForUser(course, userId);
 			var maxAttemptsCount = GetMaxAttemptsCount(courseId, slide);
 			var userScores = GetUserScoresForBlocks(courseId, userId, slideId, manualQuizCheckQueueItem?.Submission);
 
@@ -136,7 +137,7 @@ namespace uLearn.Web.Controllers
 				state.Status = QuizStatus.Sent;
 
 			var userAnswers = userQuizzesRepo.GetAnswersForShowingOnSlide(courseId, slide, userId, manualQuizCheckQueueItem?.Submission);
-			var canUserFillQuiz = CanUserFillQuiz(state.Status);
+			var canUserFillQuiz = (!slide.ManualChecking || isManualCheckingEnabledForUser) && CanUserFillQuiz(state.Status);
 
 			var questionAnswersFrequency = new DefaultDictionary<string, DefaultDictionary<string, int>>();
 			if (User.HasAccessFor(courseId, CourseRole.CourseAdmin))
@@ -163,6 +164,7 @@ namespace uLearn.Web.Controllers
 				CanUserFillQuiz = canUserFillQuiz,
 				GroupsIds = Request.GetMultipleValuesFromQueryString("group"),
 				QuestionAnswersFrequency = questionAnswersFrequency,
+				IsManualCheckingEnabledForUser = isManualCheckingEnabledForUser,
 			};
 
 			return PartialView(model);

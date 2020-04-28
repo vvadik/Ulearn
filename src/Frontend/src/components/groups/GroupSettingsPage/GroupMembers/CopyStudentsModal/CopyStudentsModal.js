@@ -86,7 +86,7 @@ class CopyStudentsModal extends Component {
 						autofocus
 						required
 						items={this.getCourseOptions()}
-						onChange={this.onCourseChange}
+						onValueChange={this.onCourseChange}
 						width="200"
 						placeholder="Курс"
 						value={courseId}
@@ -142,7 +142,7 @@ class CopyStudentsModal extends Component {
 		return item.title || item.name;
 	};
 
-	onCourseChange = (_, value) => {
+	onCourseChange = (value) => {
 		this.setState({
 			courseId: value,
 			groupId: null

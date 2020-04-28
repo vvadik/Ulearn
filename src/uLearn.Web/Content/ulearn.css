@@ -1046,7 +1046,7 @@ body.lti-component {
 	}
 }
 /* Ordering quizes */
-.legacy-page .quiz-block-ordering ul {
+.legacy-page .quiz-block-ordering .ul {
 	list-style: none; padding-left: 0;
 }
 
@@ -1086,12 +1086,12 @@ body.lti-component {
 	margin-right: 35px;
 }
 
-.legacy-page .quiz-block-ordering li.ui-sortable-placeholder {
+.legacy-page .quiz-block-ordering .li.ui-sortable-placeholder {
 	/* margin-bottom: 10px; */
 }
 
-.legacy-page .quiz-block-ordering ul li:first-child .quiz-block-ordering__item .quiz-block-ordering__item__icons .glyphicon-arrow-up{visibility:hidden}
-.legacy-page .quiz-block-ordering ul li:last-child .quiz-block-ordering__item .quiz-block-ordering__item__icons .glyphicon-arrow-down{visibility:hidden}
+.legacy-page .quiz-block-ordering .ul .li:first-child .quiz-block-ordering__item .quiz-block-ordering__item__icons .glyphicon-arrow-up{visibility:hidden}
+.legacy-page .quiz-block-ordering .ul .li:last-child .quiz-block-ordering__item .quiz-block-ordering__item__icons .glyphicon-arrow-down{visibility:hidden}
 .legacy-page .quiz-block-ordering .quiz-block-ordering__item .quiz-block-ordering__item__icons .glyphicon:hover{color:#369}
 
 /* Matching quizes */
@@ -1103,7 +1103,7 @@ body.lti-component {
 	margin-bottom: 14px;
 }
 
-.legacy-page .quiz-block-matching ul {
+.legacy-page .quiz-block-matching .ul {
 	list-style: none;
 	padding-left: 15px;
 }

@@ -104,11 +104,11 @@ window.documentReadyFunctions.push(function() {
 		});
 	};
 
-	$(".quiz-block-ordering:not(.not-movable) ul").sortable();
+	$(".quiz-block-ordering:not(.not-movable) .ul").sortable();
 
 	$(".quiz-block-ordering .quiz-block-ordering__item .quiz-block-ordering__item__icons").click(function(e) {
 		var $target = $(e.target);
-		var $item = $target.closest("li");
+		var $item = $target.closest(".li");
 		if ($target.is(".glyphicon-arrow-down"))
 			$item.moveDown();
 		if ($target.is(".glyphicon-arrow-up"))
