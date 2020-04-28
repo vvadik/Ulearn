@@ -28,7 +28,7 @@ class GroupStudents extends Component {
 				<div className={styles["actions-block"]}>
 					<Checkbox
 						checked={studentIds.size === studentsArrayOfIds.length || false}
-						onChange={this.onCheckAllStudents}>
+						onValueChange={this.onCheckAllStudents}>
 						Выбрать всех
 					</Checkbox>
 					{this.renderStudentActions()}
@@ -84,7 +84,7 @@ class GroupStudents extends Component {
 						 key={item.user.id}>
 						<Checkbox
 							checked={studentIds.has(item.user.id) || false}
-							onChange={(_, value) => this.onCheckStudent(item.user.id, _, value)}>
+							onValueChange={(value) => this.onCheckStudent(item.user.id, value)}>
 							<Avatar user={item.user} size='small' />
 							<Profile
 								user={item.user}
@@ -112,7 +112,7 @@ class GroupStudents extends Component {
 		})
 	};
 
-	onCheckAllStudents = (_, value) => {
+	onCheckAllStudents = (value) => {
 		const {students} = this.props;
 		const studentsToArrayOfIds = students.map(item => item.user.id);
 
@@ -127,7 +127,7 @@ class GroupStudents extends Component {
 		}
 	};
 
-	onCheckStudent = (id, _, value) => {
+	onCheckStudent = (id, value) => {
 		const {studentIds} = this.state;
 		const studentsCopy = new Set(studentIds);
 

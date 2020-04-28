@@ -132,7 +132,7 @@ class ToggleRolesModal extends Component {
 									this.textarea = ref
 								}}
 								width='100%'
-								onChange={this.onTextareaChange}
+								onValueChange={this.onTextareaChange}
 								autoResize
 								placeholder={isGrant ? "Например, в 2019-2020 учебном году преподает в УрФУ" : "Например, закончил преподавать в 2019 году"}
 								error={error !== null}
@@ -151,7 +151,7 @@ class ToggleRolesModal extends Component {
 		)
 	}
 
-	onTextareaChange = (event, value) => {
+	onTextareaChange = (value) => {
 		this.setState({comment: value, error: null});
 	};
 

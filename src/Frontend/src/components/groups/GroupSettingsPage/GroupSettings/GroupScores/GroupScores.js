@@ -27,7 +27,7 @@ class GroupScores extends Component {
 
 		return (
 			<React.Fragment>
-				<Checkbox checked={isChecked} disabled={isDisabled} onChange={this.onChange}>
+				<Checkbox checked={isChecked} disabled={isDisabled} onValueChange={this.onChange}>
 					{score.name}
 				</Checkbox>
 
@@ -54,7 +54,7 @@ class GroupScores extends Component {
 		);
 	}
 
-	onChange = (_, value) => {
+	onChange = (value) => {
 		const id = this.props.score.id;
 		this.props.onChangeScores(id, mapToServerName.groupScores, value);
 	};

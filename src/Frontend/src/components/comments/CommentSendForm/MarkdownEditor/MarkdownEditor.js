@@ -76,7 +76,7 @@ class MarkdownEditor extends Component {
 					error={hasError}
 					maxRows={15}
 					rows={4}
-					onChange={this.handleChange}
+					onValueChange={this.handleChange}
 					onKeyDown={this.handleKeyDown}
 					autoResize
 					placeholder={isForInstructors ? "Комментарий для преподавателей" : "Комментарий"} />
@@ -90,7 +90,7 @@ class MarkdownEditor extends Component {
 		)
 	}
 
-	handleChange = (e, value) => {
+	handleChange = (value) => {
 		const {handleChange} = this.props;
 
 		handleChange(value);

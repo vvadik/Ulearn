@@ -20,7 +20,7 @@ class ComboboxInstructorsSearch extends Component {
 				renderItem={this.renderItem}
 				renderValue={this.renderItem}
 				renderNotFound={this.renderNotFound}
-				onChange={this.onChangeItem}
+				onInputValueChange={this.onChangeItem}
 				onInputChange={query => this.setState({query})}
 				placeholder="Начните вводить имя, фамилию или логин преподавателя" />
 		);
@@ -77,7 +77,7 @@ class ComboboxInstructorsSearch extends Component {
 		return <span>{msg}</span>;
 	};
 
-	onChangeItem = (_, item) => {
+	onChangeItem = (item) => {
 		this.props.onAddTeacher(item);
 	}
 }

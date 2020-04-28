@@ -67,11 +67,11 @@ class GroupSettingsCheckbox extends Component {
 
 	renderSettings(checked, text, callback) {
 		return (
-			<Checkbox checked={checked} onChange={callback}>{text}</Checkbox>
+			<Checkbox checked={checked} onValueChange={callback}>{text}</Checkbox>
 		)
 	};
 
-	onChange = (field, _, value) => {
+	onChange = (field, value) => {
 		const {onChangeSettings} = this.props;
 		onChangeSettings(mapToServerName[field], value);
 	};
