@@ -25,6 +25,10 @@
 			Model.Checking.Timestamp.ToPrettyString()
 			);
 	}
+	else if (Model.Slide.ManualChecking && !Model.IsManualCheckingEnabledForUser)
+	{
+		status = null;
+	}
 	else if (!Model.IsGuest && Model.QuizState.Status == QuizStatus.ReadyToSend)
 	{
 		if (Model.MaxAttemptsCount == QuizController.InfinityTriesCount || Model.QuizState.UsedAttemptsCount < Model.MaxAttemptsCount)
@@ -177,6 +181,11 @@
 						</div>
 					}
 				}
+			}
+			else if (Model.Slide.ManualChecking && !Model.IsManualCheckingEnabledForUser)
+			{
+				<button class="btn btn-primary quiz-button quiz-submit-btn" disabled>Готово!</button>
+				<p>Этот тест проверяется вручную. Вы не можете отправить решение, потому что не состоите в группе или в вашей группе выключена проверка тестов преподавателем.</p>
 			}
 			else if (Model.QuizState.Status == QuizStatus.ReadyToSend)
 			{
