@@ -602,11 +602,11 @@
 				<div class="text-success col-sm-5 col-sm-offset-6">Правильный ответ</div>
 			</div>
 		}
-		<ul>
+		<div class="ul">
 			@for (var itemIndex = 0; itemIndex < items.Length; itemIndex++)
 			{
 				var item = items[itemIndex];
-				<li class="row">
+				<div class="li row">
 					<div class="quiz quiz-block-ordering__item col-xs-12 col-sm-5" data-item-id="@item.GetHash()">
 						@if (context.CanUserFillQuiz)
 						{
@@ -625,9 +625,9 @@
 							@correctItem.Text.RenderTex().ToLegacyHtmlString()
 						</div>
 					}
-				</li>
+				</div>
 			}
-		</ul>
+		</div>
 	</div>
 	if (model.ShowExplanations && !string.IsNullOrEmpty(block.Explanation))
 	{
@@ -673,7 +673,7 @@
 				}
 			</div>
 		}
-		<ul>
+		<div class="ul">
 			@for (var itemIndex = 0; itemIndex < fixedItems.Count; itemIndex++)
 			{
 				var fixedItem = fixedItems[itemIndex];
@@ -683,7 +683,7 @@
 				{
 					isRightClass = fixedItem.Id == movableItem.Id || model.DebugView ? "right" : "wrong";
 				}
-				<li>
+				<div class="li">
 					<div class="quiz quiz-block-matching__item @isRightClass row">
 						<input autocomplete="off" id='@( block.Id + "quizBlock" + fixedItem.GetHashForFixedItem())' type="hidden">
 						<div class="quiz-block-matching__fixed-item col-xs-3" data-item-id="@fixedItem.GetHashForFixedItem()">@fixedItem.FixedItem.RenderTex().ToLegacyHtmlString()</div>
@@ -716,9 +716,9 @@
 						}
 
 					</div>
-				</li>
+				</div>
 			}
-		</ul>
+		</div>
 	</div>
 	if (model.ShowExplanations && !string.IsNullOrEmpty(block.Explanation))
 	{
