@@ -78,7 +78,7 @@ namespace Ulearn.Web.Api.Controllers
 						var exerciseSubmissions = submissions.Where(s => s.Item1 == slide.Id).ToList();
 						return new OneExerciseStatistics
 						{
-							Exercise = BuildSlideInfo(course.Id, slide, getSlideMaxScoreFunc),
+							Exercise = BuildShortSlideInfo(course.Id, slide, getSlideMaxScoreFunc),
 							SubmissionsCount = exerciseSubmissions.Count,
 							AcceptedCount = exerciseSubmissions.Count(s => s.Item2),
 							/* Select last 30 (`datesLimit`) dates */

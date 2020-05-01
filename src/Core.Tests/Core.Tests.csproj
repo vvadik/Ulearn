@@ -33,6 +33,9 @@
 		<Content Include="Courses\ScoringGroups\TestData\**\*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
+		<Content Update="Courses\Slides\TestData\SlideWithSpoilerBlockAndMarkdown.xml">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 
 	<ItemGroup>

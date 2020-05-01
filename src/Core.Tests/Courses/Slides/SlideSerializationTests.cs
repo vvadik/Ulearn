@@ -25,7 +25,7 @@ namespace Ulearn.Core.Tests.Courses.Slides
 			return slideFile.DeserializeXml<Slide>();
 		}
 
-		private static FlashcardSlide DeserializeFlashcardSlideFromXmlFile(string filename)
+		public static FlashcardSlide DeserializeFlashcardSlideFromXmlFile(string filename)
 		{
 			var slideFile = new DirectoryInfo(testDataDirectory).GetFile(filename);
 			return slideFile.DeserializeXml<FlashcardSlide>();
