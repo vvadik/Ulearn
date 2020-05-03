@@ -1194,6 +1194,7 @@
     <Content Include="Content\libs\jquery-ui.min.css" />
     <Content Include="Content\libs\jquery.datetimepicker.min.css" />
     <Content Include="Content\libs\likely.css" />
+    <Content Include="Content\likely.css" />
     <Content Include="Content\loading-ring.gif" />
     <Content Include="Content\loading.gif" />
     <Content Include="Content\login_and_registration.css" />
@@ -1295,6 +1296,7 @@
     <Content Include="Scripts\libs\notify-custom.min.js" />
     <Content Include="Scripts\libs\respond.matchmedia.addListener.js" />
     <Content Include="Scripts\libs\table-configurator.js" />
+    <Content Include="Scripts\likely.js" />
     <Content Include="Scripts\modals.js" />
     <Content Include="Scripts\notifications-settings.js" />
     <Content Include="Scripts\notifications.js" />

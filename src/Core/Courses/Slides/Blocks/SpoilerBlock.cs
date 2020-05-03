@@ -2,19 +2,24 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Xml.Serialization;
+using Ulearn.Core.Courses.Slides.Blocks.Api;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Model.Edx.EdxComponents;
 
 namespace Ulearn.Core.Courses.Slides.Blocks
 {
 	[XmlType("spoiler")]
-	public class SpoilerBlock : SlideBlock
+	[DataContract]
+	public class SpoilerBlock : SlideBlock, IApiSlideBlock, IApiConvertibleSlideBlock
 	{
 		[XmlAttribute("text")]
+		[DataMember]
 		public string Text { get; set; }
 
 		[XmlAttribute("hideQuizButton")]
+		[DataMember(Name = "hideQuizButton", EmitDefaultValue = false)]
 		public bool HideQuizButton { get; set; }
 
 		[XmlElement(typeof(YoutubeBlock))]
@@ -27,14 +32,27 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		[XmlElement(typeof(IncludeImageGalleryBlock))]
 		[XmlElement("html", typeof(HtmlBlock))]
 		[XmlChoiceIdentifier(nameof(DefineBlockType))]
+		[IgnoreDataMember]
 		public SlideBlock[] Blocks { get; set; }
 
 		[XmlIgnore]
+		[DataMember(Name = "blocks")]
+		public List<IApiSlideBlock> ApiBlocks { get; set; } // Заполняется в ToApiSlideBlocks
+
+		[XmlIgnore]
+		[IgnoreDataMember]
 		public BlockType[] DefineBlockType;
 
 		public override string ToString()
 		{
 			return $"Spoiler {Text}";
+		}
+
+		IEnumerable<IApiSlideBlock> IApiConvertibleSlideBlock.ToApiSlideBlocks(ApiSlideBlockBuildingContext context)
+		{
+			var clone = (SpoilerBlock)MemberwiseClone();
+			clone.ApiBlocks = Blocks.SelectMany(b => b.ToApiSlideBlocks(context)).ToList();
+			yield return clone;
 		}
 
 		public override IEnumerable<SlideBlock> BuildUp(SlideBuildingContext context, IImmutableSet<string> filesInProgress)
@@ -65,5 +83,9 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		{
 			throw new System.NotImplementedException();
 		}
+
+		[XmlIgnore]
+		[DataMember(Name = "type")]
+		public string Type { get; set; } = "spoiler";
 	}
 }

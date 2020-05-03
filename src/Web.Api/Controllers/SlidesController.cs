@@ -35,16 +35,17 @@ namespace Ulearn.Web.Api.Controllers
 		}
 
 		/// <summary>
-		/// Информация о слайде, достаточная для отображения списка слайдов
+		/// Информация о слайде
 		/// </summary>
 		[HttpGet("{courseId}/{slideId}")]
-		public async Task<ActionResult<ShortSlideInfo>> SlideInfo([FromQuery]Course course, [FromQuery]Guid slideId)
+		public async Task<ActionResult<ShortSlideInfo>> SlideInfo([FromRoute]Course course, [FromRoute]Guid slideId)
 		{
 			var slide = course?.FindSlideById(slideId);
+			var isInstructor = await CourseRolesRepo.HasUserAccessToAnyCourseAsync(User.GetUserId(), CourseRoleType.Instructor).ConfigureAwait(false);
 			if (slide == null)
 			{
 				var instructorNote = course?.FindInstructorNoteById(slideId);
-				if (instructorNote != null && await CourseRolesRepo.HasUserAccessToAnyCourseAsync(User.GetUserId(), CourseRoleType.Instructor).ConfigureAwait(false))
+				if (instructorNote != null && isInstructor)
 					slide = instructorNote.Slide;
 			}
 
@@ -52,7 +53,7 @@ namespace Ulearn.Web.Api.Controllers
 				return NotFound(new { status = "error", message = "Course or slide not found" });
 
 			var getSlideMaxScoreFunc = await BuildGetSlideMaxScoreFunc(SolutionsRepo, UserQuizzesRepo, VisitsRepo, GroupsRepo, course, User.GetUserId());
-			return BuildSlideInfo(course.Id, slide, getSlideMaxScoreFunc);
+			return BuildSlideInfo(course.Id, slide, getSlideMaxScoreFunc, !isInstructor);
 		}
 	}
 }

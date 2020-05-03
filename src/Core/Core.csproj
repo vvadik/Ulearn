@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<RootNamespace>Ulearn.Core</RootNamespace>
-		<LangVersion>7</LangVersion>
+		<LangVersion>8</LangVersion>
 		<TargetFrameworks>net472;netcoreapp3.1</TargetFrameworks>
 		<NoWarn>NU1701;CS0168</NoWarn>
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>

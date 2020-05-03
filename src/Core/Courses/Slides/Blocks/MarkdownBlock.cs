@@ -7,13 +7,14 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Slides.Blocks.Api;
 using Ulearn.Core.Model.Edx.EdxComponents;
 
 namespace Ulearn.Core.Courses.Slides.Blocks
 {
 	// [XmlType("markdown")]
 	// [XmlRoot("markdown", Namespace = "https://ulearn.me/schema/v2")]
-	public class MarkdownBlock : SlideBlock, IXmlSerializable
+	public class MarkdownBlock : SlideBlock, IXmlSerializable, IApiConvertibleSlideBlock
 	{
 		private string markdown;
 
@@ -23,8 +24,8 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 			get => markdown;
 			set => markdown = value.RemoveCommonNesting();
 		}
-
-		public SlideBlock[] InnerBlocks { get; set; }
+		
+		public SlideBlock[] InnerBlocks { get; set; } // может содержать MarkdownBlock или CodeBlock
 
 		public MarkdownBlock(string markdown)
 		{
@@ -74,6 +75,15 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		{
 			var htmlWithUrls = Markdown.GetHtmlWithUrls("/static/" + urlName + "_");
 			return new HtmlComponent(urlName, displayName, urlName, htmlWithUrls.Item1, directoryName, htmlWithUrls.Item2);
+		}
+
+		IEnumerable<IApiSlideBlock> IApiConvertibleSlideBlock.ToApiSlideBlocks(ApiSlideBlockBuildingContext context)
+		{
+			// К этому моменту BuildUp уже вызван, для InnerBlocks созданы отдельные блоки, InnerBlocks обрабатывать не нужно
+			yield return new HtmlBlock(RenderMarkdown(context.CourseId, context.SlideId, context.BaseUrl))
+			{
+				Hide = Hide
+			};
 		}
 
 		public override IEnumerable<SlideBlock> BuildUp(SlideBuildingContext context, IImmutableSet<string> filesInProgress)

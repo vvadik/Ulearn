@@ -1,18 +1,21 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Slides.Blocks.Api;
 using Ulearn.Core.Model.Edx.EdxComponents;
 
 namespace Ulearn.Core.Courses.Slides.Blocks
 {
 	//[XmlType("html")]
-	public class HtmlBlock : SlideBlock, IXmlSerializable
+	[DataContract]
+	public class HtmlBlock : SlideBlock, IXmlSerializable, IApiSlideBlock
 	{
+		[DataMember(Name = "content")]
 		public string Content { get; private set; } = "";
 
 		public HtmlBlock()
@@ -79,5 +82,9 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 				writer.WriteAttributeString("hide", "true");
 			writer.WriteRaw(Content);
 		}
+
+		[XmlIgnore]
+		[DataMember(Name = "type")]
+		public string Type { get; set; } = "html";
 	}
 }
