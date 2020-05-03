@@ -33,7 +33,7 @@ namespace CourseToolHotReloader.ApiClient
 			task2.Wait();
 		}
 
-		private static async Task<AccountTokenResponseDto> GetJwtToken(LoginPasswordParameters parameters)
+		public static async Task<AccountTokenResponseDto> GetJwtToken(LoginPasswordParameters parameters)
 		{
 			const string baseUrl = "http://localhost:8000";
 			var url = $"{baseUrl}/account/login";
@@ -63,6 +63,23 @@ namespace CourseToolHotReloader.ApiClient
 			var streamContent = new StreamContent(fileStream);
 			multiForm.Add(streamContent, "files", Path.GetFileName(path));
 			var response = await client.PostAsync(url, multiForm);
+
+			var result = response.Content.ReadAsStringAsync().Result;
+		}
+		
+		
+		public static async Task UploadCourse(MemoryStream memoryStream, string token)
+		{
+			const string baseUrl = "http://localhost:8080";
+			var url = $"{baseUrl}/tempCourses/uploadCourse/123";
+			
+			using var client = new HttpClient();
+			client.DefaultRequestHeaders.Authorization =
+				new AuthenticationHeaderValue("Bearer", token);
+
+			var fileContent = new ByteArrayContent(memoryStream.ToArray());
+			var multiContent = new MultipartFormDataContent {{fileContent, "files", "qwe.zip"}};
+			var response = await client.PostAsync(url, multiContent);
 
 			var result = response.Content.ReadAsStringAsync().Result;
 		}

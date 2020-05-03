@@ -22,7 +22,7 @@ namespace CourseToolHotReloader.DirectoryWorkers
 					{
 						zip.AddDirectory(update.FullPath, update.RelativePath);
 					}
-					
+
 					if (File.Exists(update.FullPath))
 					{
 						zip.AddFile(update.FullPath, Path.GetDirectoryName(update.RelativePath));
@@ -35,6 +35,23 @@ namespace CourseToolHotReloader.DirectoryWorkers
 			}
 
 			return guid;
+		}
+
+		public static MemoryStream CreateZipByFolder(string pathToFolder)
+		{
+			using var zip = new ZipFile();
+			zip.AddDirectory(pathToFolder);
+
+			var ms = new MemoryStream();
+
+			zip.Save(ms);
+
+#if DEBUG
+			using var zip1 = new ZipFile();
+			zip1.AddDirectory(pathToFolder);
+			zip1.Save("../temp.zip");
+#endif
+			return ms;
 		}
 	}
 }
