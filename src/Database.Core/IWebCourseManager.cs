@@ -36,6 +36,7 @@ namespace Database
 		void ReleaseCourse(string courseId);
 		void WaitWhileCourseIsLocked(string courseId);
 		void MoveCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory);
+		void CopyTempCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory);
 		void ReloadCourse(string courseId);
 	}
 }
