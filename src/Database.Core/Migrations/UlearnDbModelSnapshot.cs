@@ -15,7 +15,7 @@ namespace Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
+                .HasAnnotation("ProductVersion", "3.1.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -23,18 +23,23 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CourseId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<Guid>("SlideId");
+                    b.Property<Guid>("SlideId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("Timestamp");
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(128)")
                         .HasMaxLength(128);
 
                     b.HasKey("Id");
@@ -50,28 +55,36 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CourseId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.Property<string>("InstructorId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<int>("Score");
+                    b.Property<int>("Score")
+                        .HasColumnType("int");
 
                     b.Property<string>("ScoringGroupId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<DateTime>("Timestamp");
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
 
-                    b.Property<Guid>("UnitId");
+                    b.Property<Guid>("UnitId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -93,67 +106,93 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<int>("AccessFailedCount");
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
 
-                    b.Property<string>("AvatarUrl");
+                    b.Property<string>("AvatarUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken();
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
+                        .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
-                    b.Property<bool>("EmailConfirmed");
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("FirstName");
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<short?>("Gender");
+                    b.Property<short?>("Gender")
+                        .HasColumnType("smallint");
 
-                    b.Property<bool>("IsDeleted");
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("KonturLogin")
+                        .HasColumnType("nvarchar(200)")
                         .HasMaxLength(200);
 
-                    b.Property<DateTime?>("LastConfirmationEmailTime");
+                    b.Property<DateTime?>("LastConfirmationEmailTime")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("LastEdit");
+                    b.Property<DateTime?>("LastEdit")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("LastName");
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("LockoutEnabled");
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
 
-                    b.Property<DateTimeOffset?>("LockoutEnd");
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Names")
-                        .ValueGeneratedOnAddOrUpdate();
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
+                        .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
                     b.Property<string>("NormalizedUserName")
+                        .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
-                    b.Property<string>("PasswordHash");
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PhoneNumber");
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("PhoneNumberConfirmed");
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
 
-                    b.Property<DateTime>("Registered");
+                    b.Property<DateTime>("Registered")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("SecurityStamp");
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("TelegramChatId");
+                    b.Property<long?>("TelegramChatId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("TelegramChatTitle")
+                        .HasColumnType("nvarchar(200)")
                         .HasMaxLength(200);
 
-                    b.Property<bool>("TwoFactorEnabled");
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
 
                     b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
                     b.HasKey("Id");
@@ -177,44 +216,60 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CheckingAgentName")
+                        .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
                     b.Property<string>("CompilationErrorHash")
+                        .HasColumnType("nvarchar(40)")
                         .HasMaxLength(40);
 
                     b.Property<string>("CourseId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<string>("DisplayName");
+                    b.Property<string>("DisplayName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<TimeSpan?>("Elapsed");
+                    b.Property<TimeSpan?>("Elapsed")
+                        .HasColumnType("time");
 
                     b.Property<string>("ExecutionServiceName")
+                        .HasColumnType("nvarchar(40)")
                         .HasMaxLength(40);
 
-                    b.Property<bool>("IsCompilationError");
+                    b.Property<bool>("IsCompilationError")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("IsRightAnswer");
+                    b.Property<bool>("IsRightAnswer")
+                        .HasColumnType("bit");
 
                     b.Property<string>("OutputHash")
+                        .HasColumnType("nvarchar(40)")
                         .HasMaxLength(40);
 
-                    b.Property<float?>("Points");
+                    b.Property<float?>("Points")
+                        .HasColumnType("real");
 
-                    b.Property<int>("Score");
+                    b.Property<int>("Score")
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("SlideId");
+                    b.Property<Guid>("SlideId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Status");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
-                    b.Property<DateTime>("Timestamp");
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -240,20 +295,26 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Database.Models.AutomaticQuizChecking", b =>
                 {
-                    b.Property<int>("Id");
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
 
                     b.Property<string>("CourseId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<int>("Score");
+                    b.Property<int>("Score")
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("SlideId");
+                    b.Property<Guid>("SlideId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("Timestamp");
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -274,25 +335,33 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.Certificate", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("InstructorId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<bool>("IsDeleted");
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("IsPreview");
+                    b.Property<bool>("IsPreview")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Parameters")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("TemplateId");
+                    b.Property<Guid>("TemplateId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("Timestamp");
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -309,22 +378,28 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.CertificateTemplate", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ArchiveName")
                         .IsRequired()
+                        .HasColumnType("nvarchar(128)")
                         .HasMaxLength(128);
 
                     b.Property<string>("CourseId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(40)")
                         .HasMaxLength(40);
 
-                    b.Property<bool>("IsDeleted");
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("Timestamp");
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -336,12 +411,15 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.CertificateTemplateArchive", b =>
                 {
                     b.Property<string>("Id")
+                        .HasColumnType("nvarchar(128)")
                         .HasMaxLength(128);
 
-                    b.Property<Guid>("CertificateTemplateId");
+                    b.Property<Guid>("CertificateTemplateId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<byte[]>("Content")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
 
                     b.HasKey("Id");
 
@@ -354,34 +432,46 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("AuthorId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.Property<string>("CourseId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<bool>("IsApproved");
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("IsCorrectAnswer");
+                    b.Property<bool>("IsCorrectAnswer")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("IsDeleted");
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("IsForInstructorsOnly");
+                    b.Property<bool>("IsForInstructorsOnly")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("IsPinnedToTop");
+                    b.Property<bool>("IsPinnedToTop")
+                        .HasColumnType("bit");
 
-                    b.Property<int>("ParentCommentId");
+                    b.Property<int>("ParentCommentId")
+                        .HasColumnType("int");
 
-                    b.Property<DateTime>("PublishTime");
+                    b.Property<DateTime>("PublishTime")
+                        .HasColumnType("datetime2");
 
-                    b.Property<Guid>("SlideId");
+                    b.Property<Guid>("SlideId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Text")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -396,14 +486,18 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("CommentId");
+                    b.Property<int>("CommentId")
+                        .HasColumnType("int");
 
-                    b.Property<DateTime>("Timestamp");
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -419,14 +513,17 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.Comments.CommentsPolicy", b =>
                 {
                     b.Property<string>("CourseId")
-                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<bool>("IsCommentsEnabled");
+                    b.Property<bool>("IsCommentsEnabled")
+                        .HasColumnType("bit");
 
-                    b.Property<int>("ModerationPolicy");
+                    b.Property<int>("ModerationPolicy")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("OnlyInstructorsCanReply");
+                    b.Property<bool>("OnlyInstructorsCanReply")
+                        .HasColumnType("bit");
 
                     b.HasKey("CourseId");
 
@@ -437,24 +534,32 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<short>("AccessType");
+                    b.Property<short>("AccessType")
+                        .HasColumnType("smallint");
 
-                    b.Property<string>("Comment");
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CourseId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<DateTime>("GrantTime");
+                    b.Property<DateTime>("GrantTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("GrantedById")
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<bool>("IsEnabled");
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("bit");
 
                     b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -478,16 +583,20 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CourseId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<Guid>("CourseVersionId");
+                    b.Property<Guid>("CourseVersionId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<byte[]>("File")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
 
                     b.HasKey("Id");
 
@@ -500,24 +609,33 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Branch");
+                    b.Property<string>("Branch")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CourseId")
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<DateTime>("CreateTime");
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsWebhookEnabled");
+                    b.Property<bool>("IsWebhookEnabled")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("PathToCourseXml");
+                    b.Property<string>("PathToCourseXml")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PrivateKey");
+                    b.Property<string>("PrivateKey")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PublicKey");
+                    b.Property<string>("PublicKey")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RepoUrl");
+                    b.Property<string>("RepoUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -528,22 +646,30 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Comment");
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CourseId")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("GrantTime");
+                    b.Property<DateTime?>("GrantTime")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("GrantedById");
+                    b.Property<string>("GrantedById")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("IsEnabled");
+                    b.Property<bool?>("IsEnabled")
+                        .HasColumnType("bit");
 
-                    b.Property<int>("Role");
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -556,28 +682,37 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.CourseVersion", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("AuthorId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.Property<string>("CommitHash")
+                        .HasColumnType("nvarchar(40)")
                         .HasMaxLength(40);
 
                     b.Property<string>("CourseId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<string>("Description");
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("LoadingTime");
+                    b.Property<DateTime>("LoadingTime")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("PathToCourseXml");
+                    b.Property<string>("PathToCourseXml")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("PublishTime");
+                    b.Property<DateTime?>("PublishTime")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("RepoUrl");
+                    b.Property<string>("RepoUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -594,12 +729,15 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("GroupId");
+                    b.Property<int>("GroupId")
+                        .HasColumnType("int");
 
                     b.Property<string>("ScoringGroupId")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -612,32 +750,44 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<DateTime>("AddingTime");
+                    b.Property<DateTime>("AddingTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("AuthorId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.Property<string>("Comment")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ExerciseCheckingId");
+                    b.Property<int?>("ExerciseCheckingId")
+                        .HasColumnType("int");
 
-                    b.Property<int>("FinishLine");
+                    b.Property<int>("FinishLine")
+                        .HasColumnType("int");
 
-                    b.Property<int>("FinishPosition");
+                    b.Property<int>("FinishPosition")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("HiddenFromTopComments");
+                    b.Property<bool>("HiddenFromTopComments")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("IsDeleted");
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
-                    b.Property<int>("StartLine");
+                    b.Property<int>("StartLine")
+                        .HasColumnType("int");
 
-                    b.Property<int>("StartPosition");
+                    b.Property<int>("StartPosition")
+                        .HasColumnType("int");
 
-                    b.Property<int?>("SubmissionId");
+                    b.Property<int?>("SubmissionId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -654,20 +804,26 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<DateTime>("AddingTime");
+                    b.Property<DateTime>("AddingTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("AuthorId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<bool>("IsDeleted");
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
-                    b.Property<int>("ReviewId");
+                    b.Property<int>("ReviewId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Text")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -684,14 +840,18 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<Guid>("ClientId");
+                    b.Property<Guid>("ClientId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ClientUserId")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SubmissionId");
+                    b.Property<int>("SubmissionId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -706,13 +866,17 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<DateTime>("Timestamp");
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int?>("TransportId");
+                    b.Property<int?>("TransportId")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -731,18 +895,22 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.GraderClient", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CourseId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -756,36 +924,49 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<bool>("CanUsersSeeGroupProgress");
+                    b.Property<bool>("CanUsersSeeGroupProgress")
+                        .HasColumnType("bit");
 
                     b.Property<string>("CourseId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<DateTime?>("CreateTime");
+                    b.Property<DateTime?>("CreateTime")
+                        .HasColumnType("datetime2");
 
-                    b.Property<bool>("DefaultProhibitFutherReview");
+                    b.Property<bool>("DefaultProhibitFutherReview")
+                        .HasColumnType("bit");
 
-                    b.Property<Guid>("InviteHash");
+                    b.Property<Guid>("InviteHash")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("IsArchived");
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("IsDeleted");
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("IsInviteLinkEnabled");
+                    b.Property<bool>("IsInviteLinkEnabled")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("IsManualCheckingEnabled");
+                    b.Property<bool>("IsManualCheckingEnabled")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("IsManualCheckingEnabledForOldSolutions");
+                    b.Property<bool>("IsManualCheckingEnabledForOldSolutions")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("nvarchar(300)")
                         .HasMaxLength(300);
 
                     b.Property<string>("OwnerId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -803,20 +984,27 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<short>("AccessType");
+                    b.Property<short>("AccessType")
+                        .HasColumnType("smallint");
 
-                    b.Property<DateTime>("GrantTime");
+                    b.Property<DateTime>("GrantTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("GrantedById")
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<int>("GroupId");
+                    b.Property<int>("GroupId")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("IsEnabled");
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("bit");
 
                     b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -840,18 +1028,23 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ColorHex")
+                        .HasColumnType("nvarchar(6)")
                         .HasMaxLength(6);
 
-                    b.Property<bool>("IsDeleted");
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
+                        .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
                     b.Property<string>("OwnerId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -867,14 +1060,18 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<DateTime?>("AddingTime");
+                    b.Property<DateTime?>("AddingTime")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int>("GroupId");
+                    b.Property<int>("GroupId")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -890,11 +1087,14 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("GroupId");
+                    b.Property<int>("GroupId")
+                        .HasColumnType("int");
 
-                    b.Property<int>("LabelId");
+                    b.Property<int>("LabelId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -912,14 +1112,18 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("SubmissionId");
+                    b.Property<int>("SubmissionId")
+                        .HasColumnType("int");
 
-                    b.Property<DateTime>("Timestamp");
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -935,18 +1139,22 @@ namespace Database.Migrations
                 {
                     b.Property<int>("ConsumerId")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Key")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.Property<string>("Secret")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("ConsumerId");
@@ -960,19 +1168,24 @@ namespace Database.Migrations
                 {
                     b.Property<int>("RequestId")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CourseId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
                     b.Property<string>("Request")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("SlideId");
+                    b.Property<Guid>("SlideId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("RequestId");
@@ -986,31 +1199,42 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CourseId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<bool>("IsChecked");
+                    b.Property<bool>("IsChecked")
+                        .HasColumnType("bit");
 
                     b.Property<string>("LockedById")
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<DateTime?>("LockedUntil");
+                    b.Property<DateTime?>("LockedUntil")
+                        .HasColumnType("datetime2");
 
-                    b.Property<bool>("ProhibitFurtherManualCheckings");
+                    b.Property<bool>("ProhibitFurtherManualCheckings")
+                        .HasColumnType("bit");
 
-                    b.Property<int>("Score");
+                    b.Property<int>("Score")
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("SlideId");
+                    b.Property<Guid>("SlideId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("SubmissionId");
+                    b.Property<int>("SubmissionId")
+                        .HasColumnType("int");
 
-                    b.Property<DateTime>("Timestamp");
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -1034,27 +1258,36 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Database.Models.ManualQuizChecking", b =>
                 {
-                    b.Property<int>("Id");
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
 
                     b.Property<string>("CourseId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<bool>("IsChecked");
+                    b.Property<bool>("IsChecked")
+                        .HasColumnType("bit");
 
                     b.Property<string>("LockedById")
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<DateTime?>("LockedUntil");
+                    b.Property<DateTime?>("LockedUntil")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int>("Score");
+                    b.Property<int>("Score")
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("SlideId");
+                    b.Property<Guid>("SlideId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("Timestamp");
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -1078,21 +1311,27 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<bool>("AreDeliveriesCreated");
+                    b.Property<bool>("AreDeliveriesCreated")
+                        .HasColumnType("bit");
 
                     b.Property<string>("CourseId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
-                    b.Property<DateTime>("CreateTime");
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Discriminator")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("InitiatedById")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -1114,19 +1353,26 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<DateTime>("CreateTime");
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int>("FailsCount");
+                    b.Property<int>("FailsCount")
+                        .HasColumnType("int");
 
-                    b.Property<DateTime?>("NextTryTime");
+                    b.Property<DateTime?>("NextTryTime")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int>("NotificationId");
+                    b.Property<int>("NotificationId")
+                        .HasColumnType("int");
 
-                    b.Property<int>("NotificationTransportId");
+                    b.Property<int>("NotificationTransportId")
+                        .HasColumnType("int");
 
-                    b.Property<byte>("Status");
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
 
                     b.HasKey("Id");
 
@@ -1145,16 +1391,21 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Discriminator")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsDeleted");
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("IsEnabled");
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("bit");
 
                     b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -1172,16 +1423,21 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CourseId")
+                        .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
-                    b.Property<bool>("IsEnabled");
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("bit");
 
-                    b.Property<int>("NotificationTransportId");
+                    b.Property<int>("NotificationTransportId")
+                        .HasColumnType("int");
 
-                    b.Property<short>("NotificationType");
+                    b.Property<short>("NotificationType")
+                        .HasColumnType("smallint");
 
                     b.HasKey("Id");
 
@@ -1200,23 +1456,31 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("BlockId")
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<bool>("IsRightAnswer");
+                    b.Property<bool>("IsRightAnswer")
+                        .HasColumnType("bit");
 
                     b.Property<string>("ItemId")
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<int>("QuizBlockMaxScore");
+                    b.Property<int>("QuizBlockMaxScore")
+                        .HasColumnType("int");
 
-                    b.Property<int>("QuizBlockScore");
+                    b.Property<int>("QuizBlockScore")
+                        .HasColumnType("int");
 
-                    b.Property<int>("SubmissionId");
+                    b.Property<int>("SubmissionId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Text")
+                        .HasColumnType("nvarchar(max)")
                         .HasMaxLength(8192);
 
                     b.HasKey("Id");
@@ -1232,18 +1496,23 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CourseId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(40)")
                         .HasMaxLength(40);
 
-                    b.Property<Guid>("SlideId");
+                    b.Property<Guid>("SlideId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("Timestamp");
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(40)")
                         .HasMaxLength(40);
 
                     b.HasKey("Id");
@@ -1262,12 +1531,14 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.RestoreRequest", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("Timestamp");
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -1281,20 +1552,26 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CourseId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<int>("HintId");
+                    b.Property<int>("HintId")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("IsHintHelped");
+                    b.Property<bool>("IsHintHelped")
+                        .HasColumnType("bit");
 
-                    b.Property<Guid>("SlideId");
+                    b.Property<Guid>("SlideId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -1310,18 +1587,23 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CourseId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<int>("Rate");
+                    b.Property<int>("Rate")
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("SlideId");
+                    b.Property<Guid>("SlideId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -1337,16 +1619,20 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("AccessToken")
                         .IsRequired()
+                        .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
-                    b.Property<DateTime>("AddedTime");
+                    b.Property<DateTime>("AddedTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -1362,31 +1648,42 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<DateTime?>("FinishTime");
+                    b.Property<DateTime?>("FinishTime")
+                        .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsFinished");
+                    b.Property<bool>("IsFinished")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("IsInitialExport");
+                    b.Property<bool>("IsInitialExport")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("IsSuccess");
+                    b.Property<bool>("IsSuccess")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("Log");
+                    b.Property<string>("Log")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("OwnerId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<DateTime>("StartTime");
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int>("StepikCourseId");
+                    b.Property<int>("StepikCourseId")
+                        .HasColumnType("int");
 
                     b.Property<string>("StepikCourseTitle")
+                        .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
                     b.Property<string>("UlearnCourseId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
                     b.HasKey("Id");
@@ -1400,19 +1697,25 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<Guid>("SlideId");
+                    b.Property<Guid>("SlideId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("SlideXml")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("StepId");
+                    b.Property<int>("StepId")
+                        .HasColumnType("int");
 
-                    b.Property<int>("StepikCourseId");
+                    b.Property<int>("StepikCourseId")
+                        .HasColumnType("int");
 
                     b.Property<string>("UlearnCourseId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
                     b.HasKey("Id");
@@ -1430,20 +1733,26 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<short>("AccessType");
+                    b.Property<short>("AccessType")
+                        .HasColumnType("smallint");
 
-                    b.Property<DateTime>("GrantTime");
+                    b.Property<DateTime>("GrantTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("GrantedById")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<bool>("IsEnabled");
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("bit");
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -1464,10 +1773,11 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.TextBlob", b =>
                 {
                     b.Property<string>("Hash")
-                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(40)")
                         .HasMaxLength(40);
 
-                    b.Property<string>("Text");
+                    b.Property<string>("Text")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Hash");
 
@@ -1478,18 +1788,23 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CourseId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<DateTime>("PublishTime");
+                    b.Property<DateTime>("PublishTime")
+                        .HasColumnType("datetime2");
 
-                    b.Property<Guid>("UnitId");
+                    b.Property<Guid>("UnitId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserName")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -1502,32 +1817,47 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("AntiPlagiarismSubmissionId");
+                    b.Property<int?>("AntiPlagiarismSubmissionId")
+                        .HasColumnType("int");
 
-                    b.Property<int?>("AutomaticCheckingId");
+                    b.Property<int?>("AutomaticCheckingId")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("AutomaticCheckingIsRightAnswer");
+                    b.Property<bool>("AutomaticCheckingIsRightAnswer")
+                        .HasColumnType("bit");
 
-                    b.Property<int>("CodeHash");
+                    b.Property<int>("CodeHash")
+                        .HasColumnType("int");
 
                     b.Property<string>("CourseId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
-                    b.Property<short>("Language");
+                    b.Property<short>("Language")
+                        .HasColumnType("smallint");
 
-                    b.Property<Guid>("SlideId");
+                    b.Property<string>("Sandbox")
+                        .HasColumnType("nvarchar(40)")
+                        .HasMaxLength(40);
+
+                    b.Property<Guid>("SlideId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("SolutionCodeHash")
                         .IsRequired()
+                        .HasColumnType("nvarchar(40)")
                         .HasMaxLength(40);
 
-                    b.Property<DateTime>("Timestamp");
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -1539,6 +1869,8 @@ namespace Database.Migrations
                     b.HasIndex("AutomaticCheckingIsRightAnswer");
 
                     b.HasIndex("Language");
+
+                    b.HasIndex("Sandbox");
 
                     b.HasIndex("SolutionCodeHash");
 
@@ -1563,16 +1895,20 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CourseId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<Guid>("UnitId");
+                    b.Property<Guid>("UnitId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserId")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(64)");
 
                     b.HasKey("Id");
 
@@ -1585,24 +1921,31 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CourseId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.Property<string>("FlashcardId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<int>("Rate");
+                    b.Property<int>("Rate")
+                        .HasColumnType("int");
 
-                    b.Property<DateTime>("Timestamp");
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
 
-                    b.Property<Guid>("UnitId");
+                    b.Property<Guid>("UnitId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserId")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(64)");
 
                     b.HasKey("Id");
 
@@ -1615,30 +1958,39 @@ namespace Database.Migrations
                 {
                     b.Property<int>("QuestionId")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CourseId")
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.Property<string>("Question")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("SlideId");
+                    b.Property<Guid>("SlideId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("SlideTitle")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("Time");
+                    b.Property<DateTime>("Time")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UnitName")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.Property<string>("UserName")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("QuestionId");
@@ -1652,30 +2004,41 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("AttemptsCount");
+                    b.Property<int>("AttemptsCount")
+                        .HasColumnType("int");
 
                     b.Property<string>("CourseId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
-                    b.Property<bool>("HasManualChecking");
+                    b.Property<bool>("HasManualChecking")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("IpAddress");
+                    b.Property<string>("IpAddress")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsPassed");
+                    b.Property<bool>("IsPassed")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("IsSkipped");
+                    b.Property<bool>("IsSkipped")
+                        .HasColumnType("bit");
 
-                    b.Property<int>("Score");
+                    b.Property<int>("Score")
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("SlideId");
+                    b.Property<Guid>("SlideId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("Timestamp");
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -1695,16 +2058,21 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<bool>("IsResultSent");
+                    b.Property<bool>("IsResultSent")
+                        .HasColumnType("bit");
 
-                    b.Property<int>("SubmissionId");
+                    b.Property<int>("SubmissionId")
+                        .HasColumnType("int");
 
-                    b.Property<int>("WatcherId");
+                    b.Property<int>("WatcherId")
+                        .HasColumnType("int");
 
                     b.Property<string>("XQueueHeader")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -1719,28 +2087,36 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("BaseUrl")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsEnabled");
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("QueueName")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.Property<string>("UserName")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -1752,15 +2128,18 @@ namespace Database.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken();
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
                     b.Property<string>("NormalizedName")
+                        .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
                     b.HasKey("Id");
@@ -1777,14 +2156,18 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ClaimType");
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ClaimValue");
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RoleId")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -1797,14 +2180,18 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ClaimType");
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ClaimValue");
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(64)");
 
                     b.HasKey("Id");
 
@@ -1815,14 +2202,18 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.Property<string>("LoginProvider");
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ProviderKey");
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ProviderDisplayName");
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(64)");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -1833,9 +2224,11 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.Property<string>("UserId");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(64)");
 
-                    b.Property<string>("RoleId");
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -1846,17 +2239,34 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.Property<string>("UserId");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(64)");
 
-                    b.Property<string>("LoginProvider");
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Value");
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
+                });
+
+            modelBuilder.Entity("Database.Models.AbstractCommentNotification", b =>
+                {
+                    b.HasBaseType("Database.Models.Notification");
+
+                    b.Property<int>("CommentId")
+                        .HasColumnName("CommentId1")
+                        .HasColumnType("int");
+
+                    b.HasIndex("CommentId");
+
+                    b.HasDiscriminator().HasValue("AbstractCommentNotification");
                 });
 
             modelBuilder.Entity("Database.Models.AddedInstructorNotification", b =>
@@ -1865,6 +2275,7 @@ namespace Database.Migrations
 
                     b.Property<string>("AddedUserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasIndex("AddedUserId");
@@ -1876,7 +2287,8 @@ namespace Database.Migrations
                 {
                     b.HasBaseType("Database.Models.Notification");
 
-                    b.Property<int>("ProcessId");
+                    b.Property<int>("ProcessId")
+                        .HasColumnType("int");
 
                     b.HasIndex("ProcessId");
 
@@ -1888,7 +2300,8 @@ namespace Database.Migrations
                     b.HasBaseType("Database.Models.Notification");
 
                     b.Property<int>("GroupId")
-                        .HasColumnName("GroupId");
+                        .HasColumnName("GroupId")
+                        .HasColumnType("int");
 
                     b.HasIndex("GroupId");
 
@@ -1899,7 +2312,8 @@ namespace Database.Migrations
                 {
                     b.HasBaseType("Database.Models.Notification");
 
-                    b.Property<int>("AccessId");
+                    b.Property<int>("AccessId")
+                        .HasColumnType("int");
 
                     b.HasIndex("AccessId");
 
@@ -1911,9 +2325,11 @@ namespace Database.Migrations
                     b.HasBaseType("Database.Models.Notification");
 
                     b.Property<int>("GroupId")
-                        .HasColumnName("GroupMemberHasBeenRemovedNotification_GroupId");
+                        .HasColumnName("GroupMemberHasBeenRemovedNotification_GroupId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("UserId");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(64)");
 
                     b.HasIndex("GroupId");
 
@@ -1927,13 +2343,16 @@ namespace Database.Migrations
                     b.HasBaseType("Database.Models.Notification");
 
                     b.Property<int>("GroupId")
-                        .HasColumnName("GroupId");
+                        .HasColumnName("GroupId")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserDescriptions")
-                        .HasColumnName("UserDescriptions");
+                        .HasColumnName("UserDescriptions")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserIds")
-                        .HasColumnName("UserIds");
+                        .HasColumnName("UserIds")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasIndex("GroupId")
                         .HasName("IX_Notifications_GroupId1");
@@ -1946,13 +2365,16 @@ namespace Database.Migrations
                     b.HasBaseType("Database.Models.Notification");
 
                     b.Property<int>("GroupId")
-                        .HasColumnName("GroupId");
+                        .HasColumnName("GroupId")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserDescriptions")
-                        .HasColumnName("UserDescriptions");
+                        .HasColumnName("UserDescriptions")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserIds")
-                        .HasColumnName("UserIds");
+                        .HasColumnName("UserIds")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasIndex("GroupId")
                         .HasName("IX_Notifications_GroupId2");
@@ -1966,7 +2388,8 @@ namespace Database.Migrations
 
                     b.Property<string>("Text")
                         .IsRequired()
-                        .HasColumnName("Text");
+                        .HasColumnName("Text")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasDiscriminator().HasValue("InstructorMessageNotification");
                 });
@@ -1976,10 +2399,12 @@ namespace Database.Migrations
                     b.HasBaseType("Database.Models.Notification");
 
                     b.Property<int>("GroupId")
-                        .HasColumnName("JoinedToYourGroupNotification_GroupId");
+                        .HasColumnName("JoinedToYourGroupNotification_GroupId")
+                        .HasColumnType("int");
 
                     b.Property<string>("JoinedUserId")
                         .IsRequired()
+                        .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
                     b.HasIndex("GroupId");
@@ -1989,72 +2414,19 @@ namespace Database.Migrations
                     b.HasDiscriminator().HasValue("JoinedToYourGroupNotification");
                 });
 
-            modelBuilder.Entity("Database.Models.LikedYourCommentNotification", b =>
-                {
-                    b.HasBaseType("Database.Models.Notification");
-
-                    b.Property<int>("CommentId")
-                        .HasColumnName("CommentId1");
-
-                    b.Property<string>("LikedUserId")
-                        .IsRequired()
-                        .HasMaxLength(64);
-
-                    b.HasIndex("CommentId");
-
-                    b.HasIndex("LikedUserId");
-
-                    b.HasDiscriminator().HasValue("LikedYourCommentNotification");
-                });
-
-            modelBuilder.Entity("Database.Models.NewCommentForInstructorsOnlyNotification", b =>
-                {
-                    b.HasBaseType("Database.Models.Notification");
-
-                    b.Property<int>("CommentId")
-                        .HasColumnName("CommentId1");
-
-                    b.HasIndex("CommentId")
-                        .HasName("IX_Notifications_CommentId11");
-
-                    b.HasDiscriminator().HasValue("NewCommentForInstructorsOnlyNotification");
-                });
-
-            modelBuilder.Entity("Database.Models.NewCommentFromYourGroupStudentNotification", b =>
-                {
-                    b.HasBaseType("Database.Models.Notification");
-
-                    b.Property<int>("CommentId")
-                        .HasColumnName("CommentId1");
-
-                    b.HasIndex("CommentId");
-
-                    b.HasDiscriminator().HasValue("NewCommentFromYourGroupStudentNotification");
-                });
-
-            modelBuilder.Entity("Database.Models.NewCommentNotification", b =>
-                {
-                    b.HasBaseType("Database.Models.Notification");
-
-                    b.Property<int>("CommentId")
-                        .HasColumnName("CommentId1");
-
-                    b.HasIndex("CommentId");
-
-                    b.HasDiscriminator().HasValue("NewCommentNotification");
-                });
-
             modelBuilder.Entity("Database.Models.NotUploadedPackageNotification", b =>
                 {
                     b.HasBaseType("Database.Models.Notification");
 
                     b.Property<string>("CommitHash")
                         .IsRequired()
-                        .HasColumnName("NotUploadedPackageNotification_CommitHash");
+                        .HasColumnName("NotUploadedPackageNotification_CommitHash")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RepoUrl")
                         .IsRequired()
-                        .HasColumnName("NotUploadedPackageNotification_RepoUrl");
+                        .HasColumnName("NotUploadedPackageNotification_RepoUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasDiscriminator().HasValue("NotUploadedPackageNotification");
                 });
@@ -2063,9 +2435,11 @@ namespace Database.Migrations
                 {
                     b.HasBaseType("Database.Models.Notification");
 
-                    b.Property<int>("CheckingId");
+                    b.Property<int>("CheckingId")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("IsRecheck");
+                    b.Property<bool>("IsRecheck")
+                        .HasColumnType("bit");
 
                     b.HasIndex("CheckingId");
 
@@ -2077,7 +2451,8 @@ namespace Database.Migrations
                     b.HasBaseType("Database.Models.Notification");
 
                     b.Property<int>("CheckingId")
-                        .HasColumnName("PassedManualQuizCheckingNotification_CheckingId");
+                        .HasColumnName("PassedManualQuizCheckingNotification_CheckingId")
+                        .HasColumnType("int");
 
                     b.HasIndex("CheckingId");
 
@@ -2088,7 +2463,8 @@ namespace Database.Migrations
                 {
                     b.HasBaseType("Database.Models.Notification");
 
-                    b.Property<Guid>("CourseVersionId");
+                    b.Property<Guid>("CourseVersionId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasIndex("CourseVersionId");
 
@@ -2099,7 +2475,8 @@ namespace Database.Migrations
                 {
                     b.HasBaseType("Database.Models.Notification");
 
-                    b.Property<int?>("ScoreId");
+                    b.Property<int?>("ScoreId")
+                        .HasColumnType("int");
 
                     b.HasIndex("ScoreId");
 
@@ -2110,7 +2487,8 @@ namespace Database.Migrations
                 {
                     b.HasBaseType("Database.Models.Notification");
 
-                    b.Property<Guid>("CertificateId");
+                    b.Property<Guid>("CertificateId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasIndex("CertificateId");
 
@@ -2122,27 +2500,12 @@ namespace Database.Migrations
                     b.HasBaseType("Database.Models.Notification");
 
                     b.Property<int?>("CommentId")
-                        .HasColumnName("CommentId");
+                        .HasColumnName("CommentId")
+                        .HasColumnType("int");
 
                     b.HasIndex("CommentId");
 
                     b.HasDiscriminator().HasValue("ReceivedCommentToCodeReviewNotification");
-                });
-
-            modelBuilder.Entity("Database.Models.RepliedToYourCommentNotification", b =>
-                {
-                    b.HasBaseType("Database.Models.Notification");
-
-                    b.Property<int>("CommentId")
-                        .HasColumnName("CommentId1");
-
-                    b.Property<int>("ParentCommentId");
-
-                    b.HasIndex("CommentId");
-
-                    b.HasIndex("ParentCommentId");
-
-                    b.HasDiscriminator().HasValue("RepliedToYourCommentNotification");
                 });
 
             modelBuilder.Entity("Database.Models.RevokedAccessToGroupNotification", b =>
@@ -2150,7 +2513,8 @@ namespace Database.Migrations
                     b.HasBaseType("Database.Models.Notification");
 
                     b.Property<int>("AccessId")
-                        .HasColumnName("RevokedAccessToGroupNotification_AccessId");
+                        .HasColumnName("RevokedAccessToGroupNotification_AccessId")
+                        .HasColumnType("int");
 
                     b.HasIndex("AccessId");
 
@@ -2163,7 +2527,8 @@ namespace Database.Migrations
 
                     b.Property<string>("Text")
                         .IsRequired()
-                        .HasColumnName("Text");
+                        .HasColumnName("Text")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasDiscriminator().HasValue("SystemMessageNotification");
                 });
@@ -2173,7 +2538,8 @@ namespace Database.Migrations
                     b.HasBaseType("Database.Models.Notification");
 
                     b.Property<Guid>("CourseVersionId")
-                        .HasColumnName("UploadedPackageNotification_CourseVersionId");
+                        .HasColumnName("UploadedPackageNotification_CourseVersionId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasIndex("CourseVersionId");
 
@@ -2201,12 +2567,60 @@ namespace Database.Migrations
                     b.HasDiscriminator().HasValue("TelegramNotificationTransport");
                 });
 
+            modelBuilder.Entity("Database.Models.LikedYourCommentNotification", b =>
+                {
+                    b.HasBaseType("Database.Models.AbstractCommentNotification");
+
+                    b.Property<string>("LikedUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(64)")
+                        .HasMaxLength(64);
+
+                    b.HasIndex("LikedUserId");
+
+                    b.HasDiscriminator().HasValue("LikedYourCommentNotification");
+                });
+
+            modelBuilder.Entity("Database.Models.NewCommentForInstructorsOnlyNotification", b =>
+                {
+                    b.HasBaseType("Database.Models.AbstractCommentNotification");
+
+                    b.HasDiscriminator().HasValue("NewCommentForInstructorsOnlyNotification");
+                });
+
+            modelBuilder.Entity("Database.Models.NewCommentFromYourGroupStudentNotification", b =>
+                {
+                    b.HasBaseType("Database.Models.AbstractCommentNotification");
+
+                    b.HasDiscriminator().HasValue("NewCommentFromYourGroupStudentNotification");
+                });
+
+            modelBuilder.Entity("Database.Models.NewCommentNotification", b =>
+                {
+                    b.HasBaseType("Database.Models.AbstractCommentNotification");
+
+                    b.HasDiscriminator().HasValue("NewCommentNotification");
+                });
+
+            modelBuilder.Entity("Database.Models.RepliedToYourCommentNotification", b =>
+                {
+                    b.HasBaseType("Database.Models.AbstractCommentNotification");
+
+                    b.Property<int>("ParentCommentId")
+                        .HasColumnType("int");
+
+                    b.HasIndex("ParentCommentId");
+
+                    b.HasDiscriminator().HasValue("RepliedToYourCommentNotification");
+                });
+
             modelBuilder.Entity("Database.LastVisit", b =>
                 {
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.AdditionalScore", b =>
@@ -2214,12 +2628,14 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "Instructor")
                         .WithMany()
                         .HasForeignKey("InstructorId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.AutomaticExerciseChecking", b =>
@@ -2235,7 +2651,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.AutomaticQuizChecking", b =>
@@ -2243,12 +2660,14 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.Quizzes.UserQuizSubmission", "Submission")
                         .WithOne("AutomaticChecking")
                         .HasForeignKey("Database.Models.AutomaticQuizChecking", "Id")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.Certificate", b =>
@@ -2256,17 +2675,20 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "Instructor")
                         .WithMany()
                         .HasForeignKey("InstructorId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Database.Models.CertificateTemplate", "Template")
                         .WithMany("Certificates")
                         .HasForeignKey("TemplateId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.CertificateTemplateArchive", b =>
@@ -2274,7 +2696,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.CertificateTemplate", "CertificateTemplate")
                         .WithMany()
                         .HasForeignKey("CertificateTemplateId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.Comments.Comment", b =>
@@ -2282,7 +2705,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "Author")
                         .WithMany()
                         .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.Comments.CommentLike", b =>
@@ -2290,12 +2714,14 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.Comments.Comment", "Comment")
                         .WithMany("Likes")
                         .HasForeignKey("CommentId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.CourseAccess", b =>
@@ -2314,7 +2740,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.CourseVersion", "CourseVersion")
                         .WithMany()
                         .HasForeignKey("CourseVersionId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.CourseRole", b =>
@@ -2330,7 +2757,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "Author")
                         .WithMany()
                         .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.EnabledAdditionalScoringGroup", b =>
@@ -2338,7 +2766,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.Group", "Group")
                         .WithMany()
                         .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.ExerciseCodeReview", b =>
@@ -2346,7 +2775,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "Author")
                         .WithMany()
                         .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Database.Models.ManualExerciseChecking", "ExerciseChecking")
                         .WithMany("Reviews")
@@ -2362,12 +2792,14 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "Author")
                         .WithMany()
                         .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Database.Models.ExerciseCodeReview", "Review")
                         .WithMany("Comments")
                         .HasForeignKey("ReviewId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.ExerciseSolutionByGrader", b =>
@@ -2375,12 +2807,14 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.GraderClient", "Client")
                         .WithMany()
                         .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Database.Models.UserExerciseSubmission", "Submission")
                         .WithMany()
                         .HasForeignKey("SubmissionId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.FeedViewTimestamp", b =>
@@ -2395,7 +2829,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.Group", b =>
@@ -2403,7 +2838,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.GroupAccess", b =>
@@ -2416,7 +2852,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.Group", "Group")
                         .WithMany()
                         .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
@@ -2429,7 +2866,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.GroupMember", b =>
@@ -2437,12 +2875,14 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.Group", "Group")
                         .WithMany("Members")
                         .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.LabelOnGroup", b =>
@@ -2450,12 +2890,14 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.Group", "Group")
                         .WithMany()
                         .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Database.Models.GroupLabel", "Label")
                         .WithMany()
                         .HasForeignKey("LabelId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.Like", b =>
@@ -2463,12 +2905,14 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.UserExerciseSubmission", "Submission")
                         .WithMany("Likes")
                         .HasForeignKey("SubmissionId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.ManualExerciseChecking", b =>
@@ -2480,12 +2924,14 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.UserExerciseSubmission", "Submission")
                         .WithMany("ManualCheckings")
                         .HasForeignKey("SubmissionId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.ManualQuizChecking", b =>
@@ -2493,7 +2939,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.Quizzes.UserQuizSubmission", "Submission")
                         .WithOne("ManualChecking")
                         .HasForeignKey("Database.Models.ManualQuizChecking", "Id")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Database.Models.ApplicationUser", "LockedBy")
                         .WithMany()
@@ -2502,7 +2949,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.Notification", b =>
@@ -2510,7 +2958,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "InitiatedBy")
                         .WithMany()
                         .HasForeignKey("InitiatedById")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.NotificationDelivery", b =>
@@ -2518,12 +2967,14 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.Notification", "Notification")
                         .WithMany("Deliveries")
                         .HasForeignKey("NotificationId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Database.Models.NotificationTransport", "NotificationTransport")
                         .WithMany()
                         .HasForeignKey("NotificationTransportId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.NotificationTransport", b =>
@@ -2539,7 +2990,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.NotificationTransport", "NotificationTransport")
                         .WithMany()
                         .HasForeignKey("NotificationTransportId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.Quizzes.UserQuizAnswer", b =>
@@ -2547,7 +2999,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.Quizzes.UserQuizSubmission", "Submission")
                         .WithMany()
                         .HasForeignKey("SubmissionId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.Quizzes.UserQuizSubmission", b =>
@@ -2555,7 +3008,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.RestoreRequest", b =>
@@ -2563,7 +3017,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.SlideHint", b =>
@@ -2571,7 +3026,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.SlideRate", b =>
@@ -2579,7 +3035,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.StepikAccessToken", b =>
@@ -2587,7 +3044,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.StepikExportProcess", b =>
@@ -2595,7 +3053,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.SystemAccess", b =>
@@ -2603,12 +3062,14 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "GrantedBy")
                         .WithMany()
                         .HasForeignKey("GrantedById")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.UserExerciseSubmission", b =>
@@ -2620,12 +3081,14 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.TextBlob", "SolutionCode")
                         .WithMany()
                         .HasForeignKey("SolutionCodeHash")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.UserFlashcardsUnlocking", b =>
@@ -2633,7 +3096,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.UserFlashcardsVisit", b =>
@@ -2641,7 +3105,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.UserQuestion", b =>
@@ -2649,7 +3114,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.Visit", b =>
@@ -2657,7 +3123,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.XQueueExerciseSubmission", b =>
@@ -2665,12 +3132,14 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.UserExerciseSubmission", "Submission")
                         .WithMany()
                         .HasForeignKey("SubmissionId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Database.Models.XQueueWatcher", "Watcher")
                         .WithMany()
                         .HasForeignKey("WatcherId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.XQueueWatcher", b =>
@@ -2678,52 +3147,68 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Database.Models.ApplicationUser")
+                    b.HasOne("Database.Models.ApplicationUser", null)
                         .WithMany("Claims")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Database.Models.ApplicationUser")
+                    b.HasOne("Database.Models.ApplicationUser", null)
                         .WithMany("Logins")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("Database.Models.ApplicationUser")
+                    b.HasOne("Database.Models.ApplicationUser", null)
                         .WithMany("Roles")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Database.Models.ApplicationUser")
+                    b.HasOne("Database.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Database.Models.AbstractCommentNotification", b =>
+                {
+                    b.HasOne("Database.Models.Comments.Comment", "Comment")
+                        .WithMany()
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.AddedInstructorNotification", b =>
@@ -2731,7 +3216,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "AddedUser")
                         .WithMany()
                         .HasForeignKey("AddedUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.CourseExportedToStepikNotification", b =>
@@ -2739,7 +3225,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.StepikExportProcess", "Process")
                         .WithMany()
                         .HasForeignKey("ProcessId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.CreatedGroupNotification", b =>
@@ -2747,7 +3234,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.Group", "Group")
                         .WithMany()
                         .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.GrantedAccessToGroupNotification", b =>
@@ -2755,7 +3243,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.GroupAccess", "Access")
                         .WithMany()
                         .HasForeignKey("AccessId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.GroupMemberHasBeenRemovedNotification", b =>
@@ -2763,7 +3252,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.Group", "Group")
                         .WithMany()
                         .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
@@ -2777,7 +3267,8 @@ namespace Database.Migrations
                         .WithMany()
                         .HasForeignKey("GroupId")
                         .HasConstraintName("FK_Notifications_Groups_GroupId1")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.GroupMembersHaveBeenRemovedNotification", b =>
@@ -2786,7 +3277,8 @@ namespace Database.Migrations
                         .WithMany()
                         .HasForeignKey("GroupId")
                         .HasConstraintName("FK_Notifications_Groups_GroupId2")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.JoinedToYourGroupNotification", b =>
@@ -2794,50 +3286,14 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.Group", "Group")
                         .WithMany()
                         .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Database.Models.ApplicationUser", "JoinedUser")
                         .WithMany()
                         .HasForeignKey("JoinedUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-                });
-
-            modelBuilder.Entity("Database.Models.LikedYourCommentNotification", b =>
-                {
-                    b.HasOne("Database.Models.Comments.Comment", "Comment")
-                        .WithMany()
-                        .HasForeignKey("CommentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Database.Models.ApplicationUser", "LikedUser")
-                        .WithMany()
-                        .HasForeignKey("LikedUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-                });
-
-            modelBuilder.Entity("Database.Models.NewCommentForInstructorsOnlyNotification", b =>
-                {
-                    b.HasOne("Database.Models.Comments.Comment", "Comment")
-                        .WithMany()
-                        .HasForeignKey("CommentId")
-                        .HasConstraintName("FK_Notifications_Comments_CommentId11")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("Database.Models.NewCommentFromYourGroupStudentNotification", b =>
-                {
-                    b.HasOne("Database.Models.Comments.Comment", "Comment")
-                        .WithMany()
-                        .HasForeignKey("CommentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-                });
-
-            modelBuilder.Entity("Database.Models.NewCommentNotification", b =>
-                {
-                    b.HasOne("Database.Models.Comments.Comment", "Comment")
-                        .WithMany()
-                        .HasForeignKey("CommentId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.PassedManualExerciseCheckingNotification", b =>
@@ -2845,7 +3301,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ManualExerciseChecking", "Checking")
                         .WithMany()
                         .HasForeignKey("CheckingId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.PassedManualQuizCheckingNotification", b =>
@@ -2853,7 +3310,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ManualQuizChecking", "Checking")
                         .WithMany()
                         .HasForeignKey("CheckingId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.PublishedPackageNotification", b =>
@@ -2861,7 +3319,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.CourseVersion", "CourseVersion")
                         .WithMany()
                         .HasForeignKey("CourseVersionId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.ReceivedAdditionalScoreNotification", b =>
@@ -2877,7 +3336,8 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.Certificate", "Certificate")
                         .WithMany()
                         .HasForeignKey("CertificateId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.ReceivedCommentToCodeReviewNotification", b =>
@@ -2887,25 +3347,13 @@ namespace Database.Migrations
                         .HasForeignKey("CommentId");
                 });
 
-            modelBuilder.Entity("Database.Models.RepliedToYourCommentNotification", b =>
-                {
-                    b.HasOne("Database.Models.Comments.Comment", "Comment")
-                        .WithMany()
-                        .HasForeignKey("CommentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Database.Models.Comments.Comment", "ParentComment")
-                        .WithMany()
-                        .HasForeignKey("ParentCommentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-                });
-
             modelBuilder.Entity("Database.Models.RevokedAccessToGroupNotification", b =>
                 {
                     b.HasOne("Database.Models.GroupAccess", "Access")
                         .WithMany()
                         .HasForeignKey("AccessId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Database.Models.UploadedPackageNotification", b =>
@@ -2913,7 +3361,26 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.CourseVersion", "CourseVersion")
                         .WithMany()
                         .HasForeignKey("CourseVersionId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Database.Models.LikedYourCommentNotification", b =>
+                {
+                    b.HasOne("Database.Models.ApplicationUser", "LikedUser")
+                        .WithMany()
+                        .HasForeignKey("LikedUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Database.Models.RepliedToYourCommentNotification", b =>
+                {
+                    b.HasOne("Database.Models.Comments.Comment", "ParentComment")
+                        .WithMany()
+                        .HasForeignKey("ParentCommentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

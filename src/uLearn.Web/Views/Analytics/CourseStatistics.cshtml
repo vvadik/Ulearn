@@ -28,16 +28,16 @@
 }
 
 @{
-	ViewBag.Title = Model.Course.Title;
+	ViewBag.Title = Model.CourseTitle;
 }
 
 <div class="wide-container">
 <h2>
 	@if (!Model.IsInstructor)
 	{
-		@Html.RouteLink("←", "Course.Slide", new { courseId = Model.Course.Id }, new { title = "Вернуться в курс" })
+		@Html.RouteLink("←", "Course.Slide", new { courseId = Model.CourseId }, new { title = "Вернуться в курс" })
 	}
-	@Model.Course.Title
+	@Model.CourseTitle
 	@if (!Model.IsInstructor)
 	{
 		var group = Model.Groups.FirstOrDefault(g => Model.SelectedGroupsIds.Contains(g.Id.ToString()));
@@ -53,12 +53,12 @@
 {
 	using (Html.BeginForm("CourseStatistics", "Analytics", FormMethod.Get, new { @class = "form-inline", id = "unit-statistics-filter-form" }))
 	{
-		@Html.Hidden("courseId", Model.Course.Id)
+		@Html.Hidden("courseId", Model.CourseId)
 
 		<div id="filters">
 			@Html.Partial("~/Views/Shared/_GroupsFilter.cshtml", new GroupsFilterViewModel
 			{
-				CourseId = Model.Course.Id,
+				CourseId = Model.CourseId,
 				SelectedGroupsIds = Model.SelectedGroupsIds,
 				Groups = Model.Groups,
 			})
@@ -156,7 +156,7 @@
 	<th colspan="@Model.ScoringGroups.Count" data-unit-id="sum">
 		<div class="unit-title" data-unit-id="sum">Сумма</div>
 	</th>
-	@foreach (var unit in Model.Course.Units)
+	@foreach (var unit in Model.Units)
 	{
 		var scoringGroupsCount = Model.GetUsingUnitScoringGroups(unit, Model.ScoringGroups).Count;
 		if (scoringGroupsCount > 0)
@@ -167,7 +167,7 @@
 				<div class="unit-title" data-unit-id="@unit.Id">
 					@if (Model.IsInstructor)
 					{
-						@Html.ActionLink(unit.Title.TruncateWithEllipsis(20), "UnitStatistics", "Analytics", new { courseId = Model.Course.Id, unitId = unit.Id, group = Model.SelectedGroupsIdsJoined }, new { })
+						@Html.ActionLink(unit.Title.TruncateWithEllipsis(20), "UnitStatistics", "Analytics", new { courseId = Model.CourseId, unitId = unit.Id, group = Model.SelectedGroupsIdsJoined }, new { })
 					}
 					else
 					{
@@ -185,7 +185,7 @@
 			data-unit-id="sum" data-scoring-group="@scoringGroup.Id">
 			@scoringGroup.Abbreviation</th>
 	}
-	@foreach (var unit in Model.Course.Units)
+	@foreach (var unit in Model.Units)
 	{
 		foreach (var scoringGroup in Model.GetUsingUnitScoringGroups(unit, Model.ScoringGroups).Values)
 		{
@@ -228,9 +228,9 @@
 	{
 		<th class="scoring-group-max-score"
 			data-unit-id="sum" data-scoring-group="@scoringGroup.Id">
-			@Model.Course.Units.Sum(unit => Model.GetMaxScoreForUnitByScoringGroup(unit, scoringGroup))</th>
+			@Model.Units.Sum(unit => Model.GetMaxScoreForUnitByScoringGroup(unit, scoringGroup))</th>
 	}
-	@foreach (var unit in Model.Course.Units)
+	@foreach (var unit in Model.Units)
 	{
 		foreach (var scoringGroup in Model.GetUsingUnitScoringGroups(unit, Model.ScoringGroups).Values)
 		{
@@ -328,8 +328,8 @@
 
 			@foreach (var scoringGroup in Model.ScoringGroups.Values)
 			{
-				var scoringGroupScore = Model.Course.Units.Sum(unit => Model.GetTotalScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup));
-				var scoringGroupOnlyFullScore = Model.Course.Units.Sum(unit => Model.GetTotalOnlyFullScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup));
+				var scoringGroupScore = Model.Units.Sum(unit => Model.GetTotalScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup));
+				var scoringGroupOnlyFullScore = Model.Units.Sum(unit => Model.GetTotalOnlyFullScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup));
 				<td class="score scoring-group-score scoring-group-sum-score"
 					data-unit-id="sum" data-scoring-group="@scoringGroup.Id"
 					data-only-full-value="@scoringGroupOnlyFullScore">
@@ -337,7 +337,7 @@
 				</td>
 			}
 
-			@foreach (var unit in Model.Course.Units)
+			@foreach (var unit in Model.Units)
 			{
 				foreach (var scoringGroup in Model.GetUsingUnitScoringGroups(unit, Model.ScoringGroups).Values)
 				{

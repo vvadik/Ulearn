@@ -1,6 +1,6 @@
 import { connect } from "react-redux";
-import { loadCourse } from "../../actions/course";
-import { loadUserProgress, userProgressUpdate } from "../../actions/user";
+import { loadCourse, changeCurrentCourseAction } from "../../actions/course";
+import { loadUserProgress, userProgressUpdate } from "../../actions/userProgress";
 import Course from '../../components/course/Course';
 import { withRouter } from "react-router-dom";
 import queryString from "query-string";
@@ -32,14 +32,16 @@ const mapStateToProps = (state, { match }) => {
 		isNavMenuVisible,
 		units: mapCourseInfoToUnits(courseInfo),
 		isAuthenticated: state.account.isAuthenticated,
-		progress: state.user.progress[courseId],
+		userId: state.account.id,
+		progress: state.userProgress.progress[courseId],
 		navigationOpened: state.navigation.opened,
 		courseLoadingErrorStatus: state.courses.courseLoadingErrorStatus,
 	};
 };
 const mapDispatchToProps = (dispatch) => ({
+	enterToCourse: (courseId) => dispatch(changeCurrentCourseAction(courseId)),
 	loadCourse: (courseId) => dispatch(loadCourse(courseId)),
-	loadUserProgress: (courseId) => dispatch(loadUserProgress(courseId)),
+	loadUserProgress: (courseId, userId) => dispatch(loadUserProgress(courseId, userId)),
 	updateVisitedSlide: (courseId, slideId) => dispatch(userProgressUpdate(courseId, slideId)),
 });
 

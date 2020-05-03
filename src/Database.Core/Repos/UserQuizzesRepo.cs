@@ -69,6 +69,17 @@ namespace Database.Repos
 				.Where(c => c.CourseId == courseId && c.UserId == userId && !c.IsChecked)
 				.Select(c => c.SlideId).Distinct().ToListAsync();
 		}
+		
+		public async Task<Dictionary<string, List<Guid>>> GetSlideIdsWaitingForManualCheckAsync(string courseId, IEnumerable<string> userIds)
+		{
+			return (await db.ManualQuizCheckings
+				.Where(c => c.CourseId == courseId && userIds.Contains(c.UserId) && !c.IsChecked)
+				.Select(c => new {c.UserId, c.SlideId})
+				.Distinct()
+				.ToListAsync())
+				.GroupBy(c => c.UserId)
+				.ToDictionary(g => g.Key, g => g.Select(c => c.SlideId).ToList());
+		}
 
 		public Task<int> GetUsedAttemptsCountAsync(string courseId, string userId, Guid slideId)
 		{
@@ -76,12 +87,25 @@ namespace Database.Repos
 				.CountAsync(s => s.CourseId == courseId && s.UserId == userId && s.SlideId == slideId);
 		}
 
-		public Task<Dictionary<Guid, int>> GetUsedAttemptsCountAsync(string courseId, string userId)
+		public async Task<Dictionary<Guid, int>> GetUsedAttemptsCountAsync(string courseId, string userId)
 		{
-			return db.UserQuizSubmissions
+			return await db.UserQuizSubmissions
 				.Where(s => s.CourseId == courseId && s.UserId == userId)
-				.GroupBy(s => s.SlideId)
-				.ToDictionaryAsync(g => g.Key, g => g.Count());
+				.Select(s => s.SlideId)
+				.GroupBy(s => s)
+				.Select(g => new {g.Key, Count = g.Count()})
+				.ToDictionaryAsync(g => g.Key, g=> g.Count);
+		}
+		
+		public async Task<Dictionary<string, Dictionary<Guid, int>>> GetUsedAttemptsCountAsync(string courseId, IEnumerable<string> userIds)
+		{
+			return (await db.UserQuizSubmissions
+					.Where(s => s.CourseId == courseId && userIds.Contains(s.UserId))
+					.GroupBy(s => new { s.UserId, s.SlideId })
+					.Select(g => new { g.Key.UserId, g.Key.SlideId, Count = g.Count() })
+					.ToListAsync())
+				.GroupBy(s => s.UserId)
+				.ToDictionary(s => s.Key, s => s.ToDictionary(t => t.SlideId, t => t.Count));
 		}
 
 		public async Task<HashSet<Guid>> GetPassedSlideIdsAsync(string courseId, string userId)
@@ -180,11 +204,11 @@ namespace Database.Repos
 
 			/* Due to performance issues don't call GroupBy().ToDictionary[Async](), call GroupBy().Select().ToDictionary() instead.
 			   See http://code-ninja.org/blog/2014/07/24/entity-framework-never-call-groupby-todictionary/ for details */
-			return await answers
-				.GroupBy(q => q.ItemId)
-				.Select(g => new { g.Key, Count = g.Count() })
-				.ToDictionaryAsync(p => p.Key, p => p.Count.PercentsOf(totalTries))
-				.ConfigureAwait(false);
+			return (await answers
+					.GroupBy(q => q.ItemId)
+					.Select(g => new { g.Key, Count = g.Count() })
+					.ToListAsync())
+				.ToDictionary(p => p.Key, p => p.Count.PercentsOf(totalTries));
 		}
 
 		public HashSet<Guid> GetPassedSlideIds(string courseId, string userId)

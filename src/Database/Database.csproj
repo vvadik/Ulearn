@@ -14,7 +14,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ApprovalUtilities" Version="3.0.13" />
+    <PackageReference Include="ApprovalUtilities" Version="4.5.2" />
     <PackageReference Include="DotNetZip" Version="1.13.4" />
     <PackageReference Include="EntityFramework" Version="6.3.0" />
     <PackageReference Include="EntityFramework.Functions" Version="1.4.1" />
@@ -22,12 +22,12 @@
     <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="LtiLibrary.Core" Version="1.6.2" />
     <PackageReference Include="MarkdownDeep.NET.Core" Version="1.5.0.4" />
-    <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.2" />
+    <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.3" />
     <PackageReference Include="Microsoft.AspNet.Identity.EntityFramework" Version="2.2.2" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="NUnit" Version="3.10.0" />
-    <PackageReference Include="System.Collections.Immutable" Version="1.6.0" />
-    <PackageReference Include="Z.EntityFramework.Plus.EF6" Version="1.12.3" />
+    <PackageReference Include="System.Collections.Immutable" Version="1.7.0" />
+    <PackageReference Include="Z.EntityFramework.Plus.EF6" Version="1.12.15" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
@@ -854,6 +854,12 @@
     </EmbeddedResource>
     <EmbeddedResource Update="Migrations\202002120803203_AutomaticExerciseCheckingPoints.resx">
       <DependentUpon>202002120803203_AutomaticExerciseCheckingPoints.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Migrations\202003101304581_AddSandboxToUserExerciseSubmission.resx">
+      <DependentUpon>202003101304581_AddSandboxToUserExerciseSubmission.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Migrations\202004020908004_AddIndexToNotificationDeliveryByTransportAndCreateTimeIncludeNotificationId.resx">
+      <DependentUpon>202004020908004_AddIndexToNotificationDeliveryByTransportAndCreateTimeIncludeNotificationId.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
 </Project>

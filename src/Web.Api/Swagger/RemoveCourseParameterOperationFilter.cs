@@ -1,5 +1,5 @@
 using System.Linq;
-using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Ulearn.Core.Courses;
 
@@ -7,7 +7,7 @@ namespace Ulearn.Web.Api.Swagger
 {
 	public class RemoveCourseParameterOperationFilter : IOperationFilter
 	{
-		public void Apply(Operation operation, OperationFilterContext context)
+		public void Apply(OpenApiOperation operation, OperationFilterContext context)
 		{
 			var parametersWithCourseType = context.ApiDescription
 				.ParameterDescriptions

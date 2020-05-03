@@ -1,5 +1,7 @@
-﻿using System.Web.Configuration;
+﻿using System;
+using System.Web.Configuration;
 using System.Web.Hosting;
+using log4net;
 using Microsoft.Owin;
 using Owin;
 using Telegram.Bot;
@@ -13,6 +15,8 @@ namespace uLearn.Web
 {
 	public partial class Startup
 	{
+		private static readonly ILog log = LogManager.GetLogger(typeof(Startup));
+
 		public void Configuration(IAppBuilder app)
 		{
 			/* TODO (andgein): remove this hack */
@@ -32,7 +36,14 @@ namespace uLearn.Web
 			var webhookSecret = WebConfigurationManager.AppSettings["ulearn.telegram.webhook.secret"] ?? "";
 			var webhookDomain = WebConfigurationManager.AppSettings["ulearn.telegram.webhook.domain"] ?? "";
 			var webhookUrl = $"https://{webhookDomain}/Telegram/Webhook?secret={webhookSecret}";
-			//telegramBot.SetWebhookAsync(webhookUrl).Wait();
+			try
+			{
+				telegramBot.SetWebhookAsync(webhookUrl).Wait();
+			}
+			catch (Exception ex)
+			{
+				log.Error(ex);
+			}
 		}
 	}
 }

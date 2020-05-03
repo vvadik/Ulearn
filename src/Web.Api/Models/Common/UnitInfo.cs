@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Ulearn.Web.Api.Models.Responses.Groups;
 
 namespace Ulearn.Web.Api.Models.Common
 {
@@ -15,5 +16,8 @@ namespace Ulearn.Web.Api.Models.Common
 
 		[DataMember]
 		public List<ShortSlideInfo> Slides { get; set; }
+		
+		[DataMember]
+		public List<UnitScoringGroupInfo> AdditionalScores { get; set; }
 	}
 }

@@ -314,6 +314,7 @@
 	height: auto;
 	margin-bottom: 15px;
 	line-height: 1.3em;
+	font-size: 14px;
 	font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
 }
 
@@ -1028,7 +1029,7 @@ body.lti-component {
 	}
 }
 /* Ordering quizes */
-.legacy-page .quiz-block-ordering ul {
+.legacy-page .quiz-block-ordering .ul {
 	list-style: none; padding-left: 0;
 }
 
@@ -1068,12 +1069,12 @@ body.lti-component {
 	margin-right: 35px;
 }
 
-.legacy-page .quiz-block-ordering li.ui-sortable-placeholder {
+.legacy-page .quiz-block-ordering .li.ui-sortable-placeholder {
 	/* margin-bottom: 10px; */
 }
 
-.legacy-page .quiz-block-ordering ul li:first-child .quiz-block-ordering__item .quiz-block-ordering__item__icons .glyphicon-arrow-up{visibility:hidden}
-.legacy-page .quiz-block-ordering ul li:last-child .quiz-block-ordering__item .quiz-block-ordering__item__icons .glyphicon-arrow-down{visibility:hidden}
+.legacy-page .quiz-block-ordering .ul .li:first-child .quiz-block-ordering__item .quiz-block-ordering__item__icons .glyphicon-arrow-up{visibility:hidden}
+.legacy-page .quiz-block-ordering .ul .li:last-child .quiz-block-ordering__item .quiz-block-ordering__item__icons .glyphicon-arrow-down{visibility:hidden}
 .legacy-page .quiz-block-ordering .quiz-block-ordering__item .quiz-block-ordering__item__icons .glyphicon:hover{color:#369}
 
 /* Matching quizes */
@@ -1085,7 +1086,7 @@ body.lti-component {
 	margin-bottom: 14px;
 }
 
-.legacy-page .quiz-block-matching ul {
+.legacy-page .quiz-block-matching .ul {
 	list-style: none;
 	padding-left: 15px;
 }
@@ -1396,6 +1397,8 @@ body.lti-component {
 
 .legacy-page .exercise {
 	margin-top: 30px;
+	font-size: 14px;
+	line-height: 1.42;
 }
 
 .legacy-page .exercise__submission {
@@ -1502,6 +1505,56 @@ body.lti-component {
 	border: 1px solid #ddd;
 }
 
-.legacy-page img {
+.legacy-page .slide-image {
 	max-width: 100%;
+}
+
+.legacy-page .slide {
+	font-size: 16px;
+	line-height: 1.5;
+}
+
+.legacy-page .slide.slide p {
+	margin-bottom: 1em;
+}
+
+.legacy-page .slide img :not(.user__avatar) {
+	max-width: 100%;
+}
+
+.legacy-page .slide ul {
+	margin-bottom: 1em;
+	padding: 0;
+	list-style: none;
+}
+
+.legacy-page .slide ul li {
+	position: relative;
+	padding-left: 1.5em;
+	margin-bottom: 0.5em;
+}
+
+.legacy-page .slide ul li:before {
+	content: '—';
+	position: absolute;
+	left: 0;
+}
+
+/* overwriting styles for flexslider to remove bullets*/
+.legacy-page .slide .flexslider ul {
+	margin-bottom: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.legacy-page .slide .flexslider ul li {
+	position: unset;
+	padding-left: 0;
+	margin-bottom: 0;
+}
+
+.legacy-page .slide .flexslider ul li:before {
+	content: unset;
+	position: unset;
+	left: unset;
 }

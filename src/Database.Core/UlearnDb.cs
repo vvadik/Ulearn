@@ -327,6 +327,7 @@ namespace Database
 			AddIndex<UserExerciseSubmission>(modelBuilder, c => new { c.CourseId, c.SlideId, c.AutomaticCheckingIsRightAnswer });
 			AddIndex<UserExerciseSubmission>(modelBuilder, c => c.AntiPlagiarismSubmissionId);
 			AddIndex<UserExerciseSubmission>(modelBuilder, c => c.Language);
+			AddIndex<UserExerciseSubmission>(modelBuilder, c => c.Sandbox);
 			AddIndex<UserExerciseSubmission>(modelBuilder, c => c.Timestamp);
 
 			AddIndex<UserQuizAnswer>(modelBuilder, c => new { c.SubmissionId, c.BlockId });
@@ -432,6 +433,15 @@ namespace Database
 		public DbSet<NotificationTransportSettings> NotificationTransportSettings { get; set; }
 		public DbSet<NotificationDelivery> NotificationDeliveries { get; set; }
 		public DbSet<Notification> Notifications { get; set; }
+
+		// Без этого не работает Include в GetFeedNotificationDeliveriesAsync
+		public DbSet<AbstractCommentNotification> AbstractCommentNotification { get; set; }
+		public DbSet<AbstractCommentNotification> CourseExportedToStepikNotification { get; set; }
+		public DbSet<AbstractCommentNotification> ReceivedCommentToCodeReviewNotification { get; set; }
+		public DbSet<AbstractCommentNotification> PassedManualExerciseCheckingNotification { get; set; }
+		public DbSet<AbstractCommentNotification> UploadedPackageNotification { get; set; }
+		public DbSet<AbstractCommentNotification> PublishedPackageNotification { get; set; }
+		public DbSet<AbstractCommentNotification> CreatedGroupNotification { get; set; }
 
 		public DbSet<XQueueWatcher> XQueueWatchers { get; set; }
 		public DbSet<XQueueExerciseSubmission> XQueueExerciseSubmissions { get; set; }

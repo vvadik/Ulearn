@@ -47,5 +47,7 @@ namespace uLearn.Web.Models
 		public int QuestionsCount => UserScores?.Count ?? 0;
 
 		public string IsLtiToString => IsLti.ToString().ToLowerInvariant();
+
+		public bool IsManualCheckingEnabledForUser;
 	}
 }

@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Database.Extensions;
 using Database.Models;
+using Database.Repos.CourseRoles;
+using Database.Repos.Users;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Ulearn.Common;
@@ -24,12 +26,21 @@ namespace Database.Repos
 		private readonly UlearnDb db;
 		private readonly ILogger logger;
 		private readonly IServiceProvider serviceProvider;
+		private readonly IUnitsRepo unitsRepo;
+		private readonly ICourseRoleUsersFilter courseRoleUsersFilter;
+		private readonly IUsersRepo usersRepo;
+		private readonly IWebCourseManager courseManager;
 
-		public NotificationsRepo(UlearnDb db, ILogger logger, IServiceProvider serviceProvider)
+		public NotificationsRepo(UlearnDb db, ILogger logger, IServiceProvider serviceProvider,
+			IUnitsRepo unitsRepo, ICourseRoleUsersFilter courseRoleUsersFilter, IUsersRepo usersRepo, IWebCourseManager courseManager)
 		{
 			this.db = db;
 			this.logger = logger;
 			this.serviceProvider = serviceProvider;
+			this.unitsRepo = unitsRepo;
+			this.usersRepo = usersRepo;
+			this.courseRoleUsersFilter = courseRoleUsersFilter;
+			this.courseManager = courseManager;
 		}
 
 		private static DateTime CalculateNextTryTime(DateTime createTime, int failsCount)
@@ -87,9 +98,9 @@ namespace Database.Repos
 			}
 		}
 
-		public Task<NotificationTransport> FindNotificationTransportAsync(int transportId)
+		public async Task<NotificationTransport> FindNotificationTransportAsync(int transportId)
 		{
-			return db.NotificationTransports.FindAsync(transportId);
+			return await db.NotificationTransports.FindAsync(transportId);
 		}
 
 		public async Task EnableNotificationTransport(int transportId, bool isEnabled = true)
@@ -276,7 +287,10 @@ namespace Database.Repos
 				);
 			}
 
-			var recipientsIds = await notification.GetRecipientsIdsAsync(serviceProvider).ConfigureAwait(false);
+			var recipientsIds = (await notification.GetRecipientsIdsAsync(serviceProvider).ConfigureAwait(false)).ToHashSet();
+
+			recipientsIds = await FilterUsersWhoNotSeeCourse(notification, recipientsIds);
+
 			logger.Information($"Recipients list for notification {notification.Id}: {recipientsIds.Count} user(s)");
 
 			if (recipientsIds.Count == 0)
@@ -381,6 +395,25 @@ namespace Database.Repos
 					Status = NotificationDeliveryStatus.NotSent,
 				});
 			}
+		}
+		
+		private async Task<HashSet<string>> FilterUsersWhoNotSeeCourse(Notification notification, HashSet<string> recipientsIds)
+		{
+			if (notification.CourseId != "")
+			{
+				var course = courseManager.FindCourse(notification.CourseId);
+				if (course != null)
+				{
+					var visibleUnits = unitsRepo.GetVisibleUnits(course);
+					if (!visibleUnits.Any())
+					{
+						var userIdsWithInstructorRoles = await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Tester, notification.CourseId, true);
+						var sysAdminsIds = await usersRepo.GetSysAdminsIdsAsync();
+						recipientsIds.IntersectWith(userIdsWithInstructorRoles.Concat(sysAdminsIds));
+					}
+				}
+			}
+			return recipientsIds;
 		}
 
 		private IQueryable<NotificationDelivery> GetNotificationsDeliveries(IEnumerable<int> notificationsIds, IEnumerable<int> transportsIds)

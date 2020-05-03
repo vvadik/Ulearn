@@ -97,7 +97,7 @@ namespace Database.Repos
 				.ToList();
 		}
 
-		private IQueryable<SubmissionIdWrapper> GetGraderSolutionByClientUserId(string clientUserId)
+		private IEnumerable<SubmissionIdWrapper> GetGraderSolutionByClientUserId(string clientUserId)
 		{
 			if (string.IsNullOrEmpty(clientUserId))
 				return db.ExerciseSolutionsByGrader.Select(s => new SubmissionIdWrapper(s.Id));
@@ -105,7 +105,8 @@ namespace Database.Repos
 			var splittedUserId = clientUserId.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
 			var query = string.Join(" & ", splittedUserId.Select(s => "\"" + s.Trim().Replace("\"", "\\\"") + "*\""));
 			return db.ExerciseSolutionsByGrader
-				.FromSql("SELECT * FROM dbo.ExerciseSolutionByGraders WHERE CONTAINS([ClientUserId], {0})", query)
+				.FromSqlInterpolated($"SELECT * FROM dbo.ExerciseSolutionByGraders WHERE CONTAINS([ClientUserId], {query})")
+				.AsEnumerable()
 				.Select(s => new SubmissionIdWrapper(s.Id));
 		}
 	}

@@ -38,10 +38,12 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly ISystemAccessesRepo systemAccessesRepo;
 		private readonly IGroupMembersRepo groupMembersRepo;
 		private readonly WebApiConfiguration configuration;
+		private readonly IUnitsRepo unitsRepo;
 
 		public AccountController(ILogger logger, IOptions<WebApiConfiguration> options, WebCourseManager courseManager, UlearnDb db,
 			UlearnUserManager userManager, SignInManager<ApplicationUser> signInManager,
-			ICourseRolesRepo courseRolesRepo, ICoursesRepo coursesRepo, IUsersRepo usersRepo, ISystemAccessesRepo systemAccessesRepo, IGroupMembersRepo groupMembersRepo)
+			ICourseRolesRepo courseRolesRepo, ICoursesRepo coursesRepo, IUsersRepo usersRepo, ISystemAccessesRepo systemAccessesRepo, IGroupMembersRepo groupMembersRepo,
+			IUnitsRepo unitsRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.userManager = userManager;
@@ -50,6 +52,7 @@ namespace Ulearn.Web.Api.Controllers
 			this.coursesRepo = coursesRepo;
 			this.systemAccessesRepo = systemAccessesRepo;
 			this.groupMembersRepo = groupMembersRepo;
+			this.unitsRepo = unitsRepo;
 			this.configuration = options.Value;
 		}
 
@@ -180,8 +183,10 @@ namespace Ulearn.Web.Api.Controllers
 		{
 			var userId = User.GetUserId();
 			var isSystemAdministrator = User.IsSystemAdministrator();
+			var visibleCourses = unitsRepo.GetVisibleCourses();
 
-			var rolesByCourse = await courseRolesRepo.GetRolesAsync(userId).ConfigureAwait(false);
+			var rolesByCourse = (await courseRolesRepo.GetRolesAsync(userId).ConfigureAwait(false))
+				.Where(kvp => kvp.Value != CourseRoleType.Student).ToList();
 			var courseAccesses = await coursesRepo.GetUserAccessesAsync(userId).ConfigureAwait(false);
 			var courseAccessesByCourseId = courseAccesses.GroupBy(a => a.CourseId).Select(
 				g => new CourseAccessResponse
@@ -190,11 +195,13 @@ namespace Ulearn.Web.Api.Controllers
 					Accesses = g.Select(a => a.AccessType).ToList()
 				}
 			).ToList();
-			var groupsWhereIAmStudent = await groupMembersRepo.GetUserGroupsAsync(userId).ConfigureAwait(false);
+			var coursesInWhichUserHasAnyRole = new HashSet<string>(rolesByCourse.Select(kvp => kvp.Key), StringComparer.OrdinalIgnoreCase);
+			var groupsWhereIAmStudent = (await groupMembersRepo.GetUserGroupsAsync(userId).ConfigureAwait(false))
+				.Where(g => visibleCourses.Contains(g.CourseId) || coursesInWhichUserHasAnyRole.Contains(g.CourseId));
 			return new CourseRolesResponse
 			{
 				IsSystemAdministrator = isSystemAdministrator,
-				CourseRoles = rolesByCourse.Where(kvp => kvp.Value != CourseRoleType.Student).Select(kvp => new CourseRoleResponse
+				CourseRoles = rolesByCourse.Select(kvp => new CourseRoleResponse
 				{
 					CourseId = kvp.Key,
 					Role = kvp.Value,

@@ -19,7 +19,7 @@ namespace uLearn.Web.Kontur.Passport
 			{
 				ValidateIssuerName = false
 			};
-			cache = new DiscoveryCache(authority, new HttpClient(), policy);
+			cache = new DiscoveryCache(authority, () => new HttpClient(), policy);
 		}
 
 		public async Task<List<SecurityKey>> GetSigningKeysAsync()

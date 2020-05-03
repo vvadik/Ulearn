@@ -4,7 +4,7 @@ import {
 	START, SUCCESS, FAIL,
 } from '../consts/actions';
 
-import { getUserProgressInCourse, updateUserProgressInCourse } from '../api/user';
+import { getUserProgressInCourse, updateUserProgressInCourse } from '../api/userProgress';
 
 const loadUserProgressStart = () => ({
 	type: USER__PROGRESS_LOAD + START,
@@ -38,7 +38,7 @@ export const userProgressUpdate = (courseId, slideId) => {
 	};
 };
 
-export const loadUserProgress = (courseId) => {
+export const loadUserProgress = (courseId, userId) => {
 	courseId = courseId.toLowerCase();
 
 	return (dispatch) => {
@@ -46,7 +46,7 @@ export const loadUserProgress = (courseId) => {
 
 		getUserProgressInCourse(courseId)
 			.then(result => {
-				dispatch(loadUserProgressSuccess(courseId, result.visitedSlides));
+				dispatch(loadUserProgressSuccess(courseId, result.userProgress[userId].visitedSlides));
 			})
 			.catch(err => {
 				dispatch(loadUserProgressFail());

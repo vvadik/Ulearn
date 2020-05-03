@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
 using AntiPlagiarism.Web.Database.Models;
 using Microsoft.EntityFrameworkCore;
+using IsolationLevel = System.Transactions.IsolationLevel;
 
 namespace AntiPlagiarism.Web.Database.Repos
 {
@@ -57,12 +58,12 @@ update cte SET {WorkQueueItem.TakeAfterTimeColumnName} = @timeLimit
 output inserted.*";
 			using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions { IsolationLevel = IsolationLevel.RepeatableRead }, TransactionScopeAsyncFlowOption.Enabled))
 			{
-				var taken = await db.WorkQueueItems.FromSql(
+				var taken = (await db.WorkQueueItems.FromSqlRaw(
 					sql,
 					new SqlParameter("@queueId", queueId),
 					new SqlParameter("@now", DateTime.UtcNow),
 					new SqlParameter("@timeLimit", DateTime.UtcNow + timeLimit)
-				).FirstOrDefaultAsync().ConfigureAwait(false);
+				).ToListAsync()).FirstOrDefault();
 				scope.Complete();
 				return taken;
 			}

@@ -205,7 +205,7 @@ namespace Database.DataContexts
 			// Отфильтровывает неактуальные начатые ревью
 			enumerable = enumerable
 				.GroupBy(g => new { g.UserId, g.SlideId })
-				.Select(g => g.Last())
+				.Select(g => g.First())
 				.OrderByDescending(c => c.Timestamp);
 			if (options.Count > 0)
 				enumerable = enumerable.Take(options.Count);

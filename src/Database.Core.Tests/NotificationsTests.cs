@@ -49,8 +49,7 @@ namespace Database.Core.Tests
 			var transport = await feedRepo.GetUsersFeedNotificationTransportAsync(userId).ConfigureAwait(false);
 			Console.WriteLine($@"Feed notification transport: {transport}");
 
-			var deliveries = await feedRepo.GetFeedNotificationDeliveriesAsync(userId, d => d.Notification, transport).ConfigureAwait(false);
-			var notifications = deliveries.Select(d => d.Notification).ToList();
+			var notifications = await feedRepo.GetNotificationForFeedNotificationDeliveriesAsync<object>(userId, null, transport).ConfigureAwait(false);
 
 			foreach (var notification in notifications)
 			{

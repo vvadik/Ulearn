@@ -115,6 +115,12 @@ namespace Ulearn.Core
 				if (isFileLink)
 					tag.attributes["onclick"] = $"window.location.href='{tag.attributes["href"]}';return false;";
 			}
+
+			public override void OnPrepareImage(HtmlTag tag, bool TitledImage)
+			{
+				base.OnPrepareImage(tag, TitledImage);
+				tag.attributes["class"] = "slide-image";
+			}
 		}
 	}
 }

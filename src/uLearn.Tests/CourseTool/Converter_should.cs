@@ -10,6 +10,7 @@ using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Model.Edx;
 using Ulearn.Core.Model.Edx.EdxComponents;
+using uLearn.CSharp;
 
 namespace uLearn.CourseTool
 {
@@ -42,7 +43,7 @@ namespace uLearn.CourseTool
 		[SetUp]
 		public void SetUp()
 		{
-			Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
+			Directory.SetCurrentDirectory(TestsHelper.TestDirectory);
 			if (!Directory.Exists(testFolderName))
 				Directory.CreateDirectory(testFolderName);
 			courseManager = new CourseManager(new DirectoryInfo("."));

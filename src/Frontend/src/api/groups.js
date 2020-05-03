@@ -43,9 +43,9 @@ export function getGroupScores(groupId) {
 	return api.get("groups/" + groupId + '/scores')
 }
 
-export function saveScoresSettings(groupId, scoresId) {
+export function saveScoresSettings(groupId, checkedScoresSettingsIds) {
 	return api.post("groups/" + groupId + '/scores',
-		api.createRequestParams({'scores': scoresId}));
+		api.createRequestParams({'scores': checkedScoresSettingsIds}));
 }
 
 // Accesses

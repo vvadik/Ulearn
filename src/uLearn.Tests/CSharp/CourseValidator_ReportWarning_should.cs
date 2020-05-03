@@ -18,7 +18,7 @@ namespace uLearn.CSharp
 	public class CourseValidator_ReportWarning_should
 	{
 		private static readonly string tempSlideFolderPath = Path.Combine(
-			TestContext.CurrentContext.TestDirectory,
+			TestsHelper.TestDirectory,
 			"ReportWarningTests_Temp_SlideFolder"
 		);
 

@@ -383,7 +383,6 @@ namespace uLearn.Web.Controllers
 				}
 
 				return Packages(courseId, errorMessage);
-				return RedirectToAction("Packages", new { courseId, error = errorMessage });
 			}
 
 			return RedirectToAction("Diagnostics", new { courseId, versionId });

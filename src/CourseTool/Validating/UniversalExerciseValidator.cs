@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using RunCheckerJob;
 using Ulearn.Common;
@@ -85,7 +86,7 @@ namespace uLearn.CourseTool.Validating
 					$"User code file '{ex.UserCodeFilePath}' doesn't exist in exercise directory '{ex.ExerciseDirPath}")
 				|| ReportSlideError(!ex.InitialUserCodeFile.Exists && (!ex.NoStudentZip || ex.NoStudentZip && ex.ExerciseInitialCode == null),
 					$"Exercise directory '{ex.ExerciseDirPath}' doesn't contain '{ex.InitialUserCodeFilePath}'");
-			foreach (var pathToIncludeForChecker in ex.PathsToIncludeForChecker)
+			foreach (var pathToIncludeForChecker in ex.PathsToIncludeForChecker.EmptyIfNull())
 			{
 				if (!doNotFindNextErrors)
 				{
