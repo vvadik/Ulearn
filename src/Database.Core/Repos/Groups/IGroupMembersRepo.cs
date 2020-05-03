@@ -9,6 +9,7 @@ namespace Database.Repos.Groups
 		Task<List<ApplicationUser>> GetGroupMembersAsUsersAsync(int groupId);
 		Task<List<GroupMember>> GetGroupMembersAsync(int groupId);
 		Task<List<GroupMember>> GetGroupsMembersAsync(ICollection<int> groupsIds);
+		Task<List<string>> GetGroupsMembersIdsAsync(ICollection<int> groupsIds);
 		Task<GroupMember> AddUserToGroupAsync(int groupId, string userId);
 		Task<List<GroupMember>> AddUsersToGroupAsync(int groupId, ICollection<string> userIds);
 		Task<GroupMember> RemoveUserFromGroupAsync(int groupId, string userId);

@@ -10,17 +10,11 @@ using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 using Database.Repos.Users;
 using JetBrains.Annotations;
-using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.AspNetCore.Rewrite.Internal.UrlMatches;
 using Serilog;
 using Ulearn.Common;
 using Ulearn.Common.Api.Helpers;
 using Ulearn.Common.Extensions;
-using Ulearn.Web.Api.Controllers.Groups;
-using Ulearn.Web.Api.Models.Common;
 using Ulearn.Web.Api.Models.Responses.Comments;
-using Ulearn.Web.Api.Models.Responses.Groups;
-using ShortGroupInfo = Ulearn.Web.Api.Models.Common.ShortGroupInfo;
 
 namespace Ulearn.Web.Api.Controllers.Comments
 {

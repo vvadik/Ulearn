@@ -21,7 +21,7 @@ namespace RunCheckerJob
 			var settings = GetSpecificSettings(commandRunnerSubmission);
 			var result = DockerProcessRunner.Run((CommandRunnerSubmission)submission, settings, submissionWorkingDirectory.FullName);
 			if (result.Verdict == Verdict.Ok)
-				result = ResultParser.Parse(result.Output, result.Error);
+				result = ResultParser.Parse(result);
 			result.Id = submission.Id;
 			return result;
 		}

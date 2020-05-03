@@ -267,7 +267,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 				.Where(o => snippetIds.Contains(o.SnippetId))
 				.Where(filterFunction)
 				.GroupBy(o => o.SubmissionId)
-				.ToDictionary(kvp => kvp.Key, kvp => kvp.Count())
+				.Select(g => new {g.Key, Value = g.Count()})
 				.ToList();
 
 			if (!submissionsWithSnippetsCount.Any())

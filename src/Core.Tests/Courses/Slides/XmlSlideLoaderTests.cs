@@ -152,5 +152,12 @@ namespace Ulearn.Core.Tests.Courses.Slides
 			Assert.IsAssignableFrom<CodeBlock>(firstBlock.Blocks[0]);
 			Assert.IsAssignableFrom<YoutubeBlock>(firstBlock.Blocks[1]);
 		}
+
+		[Test]
+		public void LoadSlideWithNoteInMarkdown()
+		{
+			var slide = LoadSlideFromXmlFile("SlideWithNoteInMarkdown.xml");
+			Assert.AreEqual(true, slide.Blocks[0].Hide);
+		}
 	}
 }

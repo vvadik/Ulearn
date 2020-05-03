@@ -15,11 +15,10 @@ namespace Ulearn.VideoAnnotations.Api.Client
 	{
 		private readonly ILogger logger;
 
-		public VideoAnnotationsClient(ILogger logger, Uri endpointUrl)
-			: base(logger, new ApiClientSettings
+		public VideoAnnotationsClient(ILogger logger, string endpointUrl)
+			: base(logger, new ApiClientSettings(endpointUrl)
 			{
-				EndpointUrl = endpointUrl,
-				ServiceName = "video annotations service",
+				ServiceName = "ulearn.videoannotations-web",
 			})
 		{
 			this.logger = logger;

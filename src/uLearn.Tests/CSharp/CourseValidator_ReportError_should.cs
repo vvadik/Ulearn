@@ -22,7 +22,7 @@ namespace uLearn.CSharp
 	[TestFixture]
 	public class CourseValidator_ReportError_should
 	{
-		private static readonly string tempSlideFolderPath = Path.Combine(TestContext.CurrentContext.TestDirectory,
+		private static readonly string tempSlideFolderPath = Path.Combine(TestsHelper.TestDirectory,
 			"ReportErrorTests_Temp_SlideFolder");
 
 		private static readonly DirectoryInfo tempSlideFolder = new DirectoryInfo(tempSlideFolderPath);

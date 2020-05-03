@@ -19,6 +19,12 @@ namespace uLearn.CSharp.RedundantElseValidation
 
 		private static readonly DirectoryInfo TestDataDir = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..",
 			"..", "CSharp", "RedundantElseValidation", "TestData"));
+		
+		[OneTimeSetUp]
+		public void SetUp()
+		{
+			Approvals.RegisterDefaultNamerCreation(() => new RelativeUnitTestFrameworkNamer());
+		}
 
 		private static DirectoryInfo IncorrectTestDataDir => TestDataDir.GetDirectories("Incorrect").Single();
 		private static DirectoryInfo CorrectTestDataDir => TestDataDir.GetDirectories("Correct").Single();

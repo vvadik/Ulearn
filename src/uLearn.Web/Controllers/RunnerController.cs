@@ -71,23 +71,19 @@ namespace uLearn.Web.Controllers
 
 		[System.Web.Http.HttpGet]
 		[System.Web.Http.Route("GetSubmissions")]
-		public async Task<List<RunnerSubmission>> GetSubmissions([FromUri] string token, [FromUri] string language, [FromUri] string agent = "")
+		public async Task<List<RunnerSubmission>> GetSubmissions([FromUri] string token, [FromUri] string sandboxes, [FromUri] string agent = "")
 		{
 			CheckRunner(token);
 
-			var languageNames = language.Split(',');
-			var languages = new List<Language>();
-			foreach (var languageName in languageNames)
-			{
-				if (LanguageHelpers.TryParseByName(languageName, out var submissionLanguage))
-					languages.Add(submissionLanguage);
-			}
+			var sandboxesImageNames = sandboxes.Split(',').ToList();
+			if(sandboxesImageNames.Contains("csharp"))
+				sandboxesImageNames.Add(null);
 
 			var sw = Stopwatch.StartNew();
 			while (true)
 			{
 				var repo = new UserSolutionsRepo(new ULearnDb(), courseManager);
-				var submission = await repo.GetUnhandledSubmission(agent, languages).ConfigureAwait(false);
+				var submission = await repo.GetUnhandledSubmission(agent, sandboxesImageNames).ConfigureAwait(false);
 				if (submission != null || sw.Elapsed > TimeSpan.FromSeconds(10))
 				{
 					if (submission != null)
@@ -273,14 +269,13 @@ namespace uLearn.Web.Controllers
 
 		static AntiPlagiarismResultObserver()
 		{
-			isEnabled = Convert.ToBoolean(WebConfigurationManager.AppSettings["ulearn.antiplagiarism.enabled"] ?? "false");
+			var antiplagiarismClientConfiguration = ApplicationConfiguration.Read<UlearnConfiguration>().AntiplagiarismClient;
+			isEnabled = antiplagiarismClientConfiguration?.Enabled ?? false;
 			if (!isEnabled)
 				return;
 
 			var serilogLogger = new LoggerConfiguration().WriteTo.Log4Net().CreateLogger();
-			var antiPlagiarismEndpointUrl = WebConfigurationManager.AppSettings["ulearn.antiplagiarism.endpoint"];
-			var antiPlagiarismToken = WebConfigurationManager.AppSettings["ulearn.antiplagiarism.token"];
-			antiPlagiarismClient = new AntiPlagiarismClient(antiPlagiarismEndpointUrl, antiPlagiarismToken, serilogLogger);
+			antiPlagiarismClient = new AntiPlagiarismClient(antiplagiarismClientConfiguration.Endpoint, antiplagiarismClientConfiguration.Token, serilogLogger);
 		}
 
 		public async Task ProcessResult(ULearnDb db, UserExerciseSubmission submission, RunningResults result)
@@ -304,7 +299,7 @@ namespace uLearn.Web.Controllers
 				AuthorId = Guid.Parse(submission.UserId),
 				AdditionalInfo = new AntiPlagiarismAdditionalInfo { SubmissionId = submission.Id }.ToJsonString(),
 			};
-			antiPlagiarismClient.AddSubmissionAsync(parameters).ConfigureAwait(false).GetAwaiter().OnCompleted(() => { });
+			await antiPlagiarismClient.AddSubmissionAsync(parameters).ConfigureAwait(false);
 		}
 	}
 }

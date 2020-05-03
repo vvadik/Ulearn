@@ -97,7 +97,11 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 			Hide = reader.GetAttribute("hide").IsOneOf("true", "1");
 			var blocks = ReadBlocks(Hide, reader).ToArray();
 			if (blocks.Length == 1 && blocks[0].GetType() == typeof(MarkdownBlock))
-				Markdown = ((MarkdownBlock)blocks[0]).Markdown;
+			{
+				var mb = (MarkdownBlock)blocks[0];
+				Markdown = mb.Markdown;
+				Hide = mb.Hide;
+			}
 			else
 				InnerBlocks = blocks;
 		}

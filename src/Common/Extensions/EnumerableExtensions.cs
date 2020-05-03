@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
-using Ulearn.Common.Extensions;
 
 // ReSharper disable once CheckNamespace
 namespace System.Linq
@@ -73,9 +72,9 @@ namespace System.Linq
 		}
 
 		[NotNull]
-		public static List<T> EmptyIfNull<T>([CanBeNull] this List<T> items)
+		public static IEnumerable<T> EmptyIfNull<T>([CanBeNull] this IEnumerable<T> items)
 		{
-			return items ?? new List<T>();
+			return items ?? Enumerable.Empty<T>();
 		}
 
 		public static Dictionary<TKey, TElement> ToDictSafe<TSource, TKey, TElement>(
