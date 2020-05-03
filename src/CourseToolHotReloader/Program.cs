@@ -16,9 +16,8 @@ namespace CourseToolHotReloader
 		private static void Main(string[] args)
 		{
 			ConfigureAutofac();
+
 			Parser.Default.ParseArguments<Options>(args).WithParsed(Process);
-			
-			
 
 			Console.WriteLine("Press 'q' to quit");
 			while (Console.Read() != 'q')
@@ -39,29 +38,30 @@ namespace CourseToolHotReloader
 
 		private static void Process(Options options)
 		{
-			container.Resolve<IConfig>().Path = Directory.GetCurrentDirectory();
-			var loginPasswordParameters = new LoginPasswordParameters()
+			var config = container.Resolve<IConfig>();
+
+			config.Path = Directory.GetCurrentDirectory();
+			config.CourseId = options.CourseId;
+
+			var loginPasswordParameters = new LoginPasswordParameters
 			{
-				Login = options.login,
-				Password = options.password
+				Login = options.Login,
+				Password = options.Password
 			};
-			var task = HttpMethods.GetJwtToken(loginPasswordParameters);
-			container.Resolve<IConfig>().JwtToken = task.Result; // todo 
+
+			var getJwtTokenTask = HttpMethods.GetJwtToken(loginPasswordParameters);
+			config.JwtToken = getJwtTokenTask.Result; // todo
+
+			if (!options.CourseIdAlreadyExist)
+			{
+				var createCourseTask = HttpMethods.CreateCourse(config.JwtToken.Token, config.CourseId);
+				createCourseTask.Wait();
+			}
+
+			container.Resolve<IUlearnApiClient>().SendFullCourse(config.Path, config.JwtToken.Token, config.CourseId);
 
 			var sendFullArchive = options.SendFullArchive;
 			container.Resolve<ICourseWatcher>().StartWatch(sendFullArchive);
-		}
-
-		// пока нет тестов тестирую как могу
-		private static void TestMain()
-		{
-			HttpMethods.TestCreateCourse();
-		}
-
-		// пока нет тестов тестирую как могу
-		private static void ZipTest()
-		{
-			//ZipHelper.CreateNewZipByUpdates();
 		}
 	}
 }

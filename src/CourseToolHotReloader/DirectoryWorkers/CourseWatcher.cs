@@ -114,7 +114,7 @@ namespace CourseToolHotReloader.DirectoryWorkers
 		}
 
 
-		private static Action Debounce(Action func, int milliseconds = 10000)
+		private static Action Debounce(Action func, int milliseconds = 5000)
 		{
 			CancellationTokenSource cancelTokenSource = null;
 			return () =>

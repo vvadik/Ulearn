@@ -35,31 +35,32 @@ namespace Ulearn.Web.Api.Controllers
 			this.tempCoursesRepo = tempCoursesRepo;
 			this.courseRolesRepo = courseRolesRepo;
 		}
+
 		[Authorize]
 		[HttpPost("create/{courseId}")]
 		public async Task<IActionResult> CreateCourse([FromRoute] string courseId)
 		{
 			var userId = User.Identity.GetUserId();
-			if (!await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin))
-				return BadRequest($"You dont have a Course Admin access to {courseId} course");
-			
+			/*if (!await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin))
+				return BadRequest($"You dont have a Course Admin access to {courseId} course");*/
+
 			var tmpCourseId = courseId + userId;
-			var tmpCourse = courseManager.FindCourse(tmpCourseId);
+			var tmpCourse = tempCoursesRepo.Find(tmpCourseId);
 			if (tmpCourse != null)
 				return BadRequest($"Your temp version of course {courseId} already exists with id {tmpCourseId}");
-			
+
 			var versionId = Guid.NewGuid();
 
 			var courseTitle = "Temp course";
 
 			if (!courseManager.TryCreateCourse(tmpCourseId, courseTitle, versionId))
 				throw new Exception();
-			
+
 			await coursesRepo.AddCourseVersionAsync(tmpCourseId, versionId, userId, null, null, null, null).ConfigureAwait(false);
 			await coursesRepo.MarkCourseVersionAsPublishedAsync(versionId).ConfigureAwait(false);
 			await tempCoursesRepo.AddTempCourse(tmpCourseId, userId);
 			var courseFile = courseManager.GetStagingCourseFile(tmpCourseId);
-			await coursesRepo.AddCourseFile(tmpCourseId, versionId, courseFile.ReadAllContent()).ConfigureAwait(false);
+			//await coursesRepo.AddCourseFile(tmpCourseId, versionId, courseFile.ReadAllContent()).ConfigureAwait(false);
 			await NotifyAboutPublishedCourseVersion(tmpCourseId, versionId, userId).ConfigureAwait(false);
 			return Ok($"course with id {tmpCourseId} successfully created");
 		}
@@ -79,17 +80,18 @@ namespace Ulearn.Web.Api.Controllers
 		public async Task<IActionResult> UploadCourse([FromRoute] string courseId, List<IFormFile> files)
 		{
 			var userId = User.Identity.GetUserId();
-			if (!await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin))
-				return BadRequest($"You dont have a Course Admin access to {courseId} course");
-			
+			/*if (!await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin))
+				return BadRequest($"You dont have a Course Admin access to {courseId} course");*/
+
 			var tmpCourseId = courseId + userId;
-			var tmpCourse = courseManager.FindCourse(tmpCourseId);
+			var tmpCourse = tempCoursesRepo.Find(tmpCourseId);
 			if (tmpCourse is null)
 				return BadRequest($"Your temp version of course {courseId} does not exists. Use create method");
 			if (files.Count != 1)
 			{
 				throw new Exception();
 			}
+
 			var file = files.Single();
 			if (file == null || file.Length <= 0)
 				throw new Exception();
@@ -118,7 +120,7 @@ namespace Ulearn.Web.Api.Controllers
 		{
 			var versionFile = courseManager.GetCourseVersionFile(versionId);
 			var courseFile = courseManager.GetStagingCourseFile(courseId);
-			var oldCourse = courseManager.GetCourse(courseId);
+			//var oldCourse = courseManager.GetCourse(courseId); //я закометил эту строчку не просто так, с ней не работает
 
 			//await coursesRepo.AddCourseFile(courseId, versionId, courseFile.ReadAllContent()).ConfigureAwait(false);
 
@@ -144,7 +146,6 @@ namespace Ulearn.Web.Api.Controllers
 
 			courseManager.UpdateCourseVersion(courseId, versionId);
 			courseManager.ReloadCourse(courseId);
-			
 
 			//var courseDiff = new CourseDiff(oldCourse, version);
 		}
@@ -184,7 +185,6 @@ namespace Ulearn.Web.Api.Controllers
 			await NotifyAboutCourseVersion(courseId, versionId, userId);
 			try
 			{
-				
 				var courseVersions = await coursesRepo.GetCourseVersionsAsync(courseId);
 				//probably always empty
 				var previousUnpublishedVersions = courseVersions.Where(v => v.PublishTime == null && v.Id != versionId).ToList();

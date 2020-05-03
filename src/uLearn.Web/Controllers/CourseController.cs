@@ -66,6 +66,7 @@ namespace uLearn.Web.Controllers
 		[AllowAnonymous]
 		public async Task<ActionResult> SlideById(string courseId, string slideId = "", int? checkQueueItemId = null, int? version = null, int autoplay = 0)
 		{
+			CheckTempCourseAndReloadIfNecessary(courseId);
 			if (slideId.Contains("_"))
 				slideId = slideId.Substring(slideId.LastIndexOf('_') + 1);
 
