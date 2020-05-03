@@ -1,10 +1,16 @@
-﻿﻿using CommandLine;
+﻿using CommandLine;
 
 namespace CourseToolHotReloader.DirectoryWorkers
 {
-        internal class Options
-        {
-            [Option('p', "path", Required = true, HelpText = "path to your course")]
-            public string Path { get; set; }
-        }
+	internal class Options
+	{
+		[Option("sendfullarchive", Required = false, HelpText = "send full archive")]
+		public bool SendFullArchive { get; set; }
+
+		[Option("login", Required = true, HelpText = "login")]
+		public string login { get; set; }
+
+		[Option("password ", Required = true, HelpText = "password")]
+		public string password { get; set; }
+	}
 }

@@ -4,6 +4,7 @@ using Autofac;
 using CommandLine;
 using CourseToolHotReloader.ApiClient;
 using CourseToolHotReloader.DirectoryWorkers;
+using CourseToolHotReloader.Dtos;
 using CourseToolHotReloader.UpdateQuery;
 
 namespace CourseToolHotReloader
@@ -14,11 +15,10 @@ namespace CourseToolHotReloader
 
 		private static void Main(string[] args)
 		{
-			//TestMain();
-			//ZipTest();
-
 			ConfigureAutofac();
 			Parser.Default.ParseArguments<Options>(args).WithParsed(Process);
+			
+			
 
 			Console.WriteLine("Press 'q' to quit");
 			while (Console.Read() != 'q')
@@ -29,8 +29,8 @@ namespace CourseToolHotReloader
 		private static void ConfigureAutofac()
 		{
 			var containerBuilder = new ContainerBuilder();
-			//containerBuilder.RegisterModule(new ControllerDependencyModule()); //todo починить модуль 
 			containerBuilder.RegisterType<CourseUpdateQuery>().As<ICourseUpdateQuery>().SingleInstance();
+			containerBuilder.RegisterType<Config>().As<IConfig>().SingleInstance();
 			containerBuilder.RegisterType<UlearnApiClient>().As<IUlearnApiClient>().SingleInstance();
 			containerBuilder.RegisterType<CourseUpdateSender>().As<ICourseUpdateSender>().SingleInstance();
 			containerBuilder.RegisterType<CourseWatcher>().As<ICourseWatcher>().SingleInstance();
@@ -39,8 +39,17 @@ namespace CourseToolHotReloader
 
 		private static void Process(Options options)
 		{
-			var patToCourse = options.Path;
-			container.Resolve<ICourseWatcher>().StartWatch(patToCourse);
+			container.Resolve<IConfig>().Path = Directory.GetCurrentDirectory();
+			var loginPasswordParameters = new LoginPasswordParameters()
+			{
+				Login = options.login,
+				Password = options.password
+			};
+			var task = HttpMethods.GetJwtToken(loginPasswordParameters);
+			container.Resolve<IConfig>().JwtToken = task.Result; // todo 
+
+			var sendFullArchive = options.SendFullArchive;
+			container.Resolve<ICourseWatcher>().StartWatch(sendFullArchive);
 		}
 
 		// пока нет тестов тестирую как могу
