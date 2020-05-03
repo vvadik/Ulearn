@@ -110,8 +110,8 @@ namespace Ulearn.Core.Helpers
 				while (true)
 				{
 					var value = courseToFileLocksNumber[courseId];
-					if(courseToFileLocksNumber.TryUpdate(courseId, value - 1, value));
-					break;
+					if(courseToFileLocksNumber.TryUpdate(courseId, value - 1, value))
+						break;
 				}
 			}
 		}

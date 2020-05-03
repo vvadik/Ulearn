@@ -47,6 +47,7 @@ namespace Database.DataContexts
 			string code, string compilationError, string output,
 			string userId, string executionServiceName, string displayName,
 			Language language,
+			string sandbox,
 			AutomaticExerciseCheckingStatus status = AutomaticExerciseCheckingStatus.Waiting)
 		{
 			if (string.IsNullOrWhiteSpace(code))
@@ -93,6 +94,7 @@ namespace Database.DataContexts
 				AutomaticChecking = automaticChecking,
 				AutomaticCheckingIsRightAnswer = automaticChecking?.IsRightAnswer ?? true,
 				Language = language,
+				Sandbox = sandbox
 			};
 
 			db.UserExerciseSubmissions.Add(submission);
@@ -313,11 +315,11 @@ namespace Database.DataContexts
 			return submission;
 		}
 
-		public async Task<UserExerciseSubmission> GetUnhandledSubmission(string agentName, List<Language> languages)
+		public async Task<UserExerciseSubmission> GetUnhandledSubmission(string agentName, List<string> sandboxes)
 		{
 			try
 			{
-				return await TryGetExerciseSubmission(agentName, languages);
+				return await TryGetExerciseSubmission(agentName, sandboxes);
 			}
 			catch (Exception e)
 			{
@@ -328,7 +330,7 @@ namespace Database.DataContexts
 
 		private static volatile SemaphoreSlim getSubmissionSemaphore = new SemaphoreSlim(1);
 
-		private async Task<UserExerciseSubmission> TryGetExerciseSubmission(string agentName, IEnumerable<Language> languages)
+		private async Task<UserExerciseSubmission> TryGetExerciseSubmission(string agentName, List<string> sandboxes)
 		{
 			var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
 
@@ -337,7 +339,7 @@ namespace Database.DataContexts
 				.Where(s =>
 					s.Timestamp > notSoLongAgo
 					&& s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting
-					&& languages.Contains(s.Language));
+					&& sandboxes.Contains(s.Sandbox));
 
 			var maxId = submissionsQueryable.Select(s => s.Id).DefaultIfEmpty(-1).Max();
 			if (maxId == -1)

@@ -104,14 +104,10 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 			var importantNotifications = new List<Notification>();
 			if (notificationTransport != null)
 			{
-				importantNotifications = (await feedRepo.GetFeedNotificationDeliveriesAsync(userId, n => n.Notification.InitiatedBy, transports: notificationTransport).ConfigureAwait(false))
-					.Select(d => d.Notification)
-					.ToList();
+				importantNotifications = (await feedRepo.GetNotificationForFeedNotificationDeliveriesAsync(userId, n => n.InitiatedBy, transports: notificationTransport).ConfigureAwait(false));
 			}
 
-			var commentsNotifications = (await feedRepo.GetFeedNotificationDeliveriesAsync(userId, n => n.Notification.InitiatedBy, transports: commentsFeedNotificationTransport).ConfigureAwait(false))
-				.Select(d => d.Notification)
-				.ToList();
+			var commentsNotifications = (await feedRepo.GetNotificationForFeedNotificationDeliveriesAsync(userId, n => n.InitiatedBy, transports: commentsFeedNotificationTransport).ConfigureAwait(false));
 
 			logger.Information($"[GetNotificationList] Step 1 done: found {importantNotifications.Count} important notifications and {commentsNotifications.Count} comment notifications");
 

@@ -16,6 +16,12 @@ namespace uLearn.CSharp.RefArgumentsValidation
 	{
 		private static readonly DirectoryInfo testDataDir = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..",
 			"..", "CSharp", "RefArgumentsValidation", "TestData"));
+		
+		[OneTimeSetUp]
+		public void SetUp()
+		{
+			Approvals.RegisterDefaultNamerCreation(() => new RelativeUnitTestFrameworkNamer());
+		}
 
 		private static DirectoryInfo IncorrectTestDataDir => testDataDir.GetDirectories("Incorrect").Single();
 		private static DirectoryInfo CorrectTestDataDir => testDataDir.GetDirectories("Correct").Single();

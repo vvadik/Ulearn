@@ -54,7 +54,7 @@
 				}
 				else if (currentSubmissionIndex == 0)
 				{
-					@Html.RouteLink("← Предыдущая версия", "Course.SlideById", new { Model.CourseId, slideId = Model.Slide.Url, version = Model.CurrentSubmissionId }, new { @class = disabledButtonClasses, disabled = "disabled" })
+					<div class="@disabledButtonClasses" disabled="disabled">← Предыдущая версия</div>
 				}
 				else
 				{
@@ -73,7 +73,7 @@
 				}
 				else
 				{
-					@Html.RouteLink("Следующая версия →", "Course.SlideById", new { Model.CourseId, slideId = Model.Slide.Url }, new { @class = disabledButtonClasses, disabled = "disabled" })
+					<div class="@disabledButtonClasses" disabled="disabled">Следующая версия →</div>
 				}
 			</div>
 		}

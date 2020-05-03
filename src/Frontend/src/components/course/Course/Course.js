@@ -30,7 +30,7 @@ class Course extends Component {
 	}
 
 	componentDidMount() {
-		const { loadCourse, loadUserProgress, isAuthenticated, courseId, courseInfo, progress } = this.props;
+		const { loadCourse, loadUserProgress, isAuthenticated, courseId, courseInfo, progress, userId } = this.props;
 
 		changeCurrentCourseAction(courseId);
 
@@ -39,16 +39,16 @@ class Course extends Component {
 		}
 
 		if (isAuthenticated && !progress) {
-			loadUserProgress(courseId);
+			loadUserProgress(courseId, userId);
 		}
 	}
 
 	componentDidUpdate(prevProps) {
-		const { loadUserProgress, isAuthenticated, courseId, loadCourse, } = this.props;
+		const { loadUserProgress, isAuthenticated, courseId, loadCourse, userId } = this.props;
 
 		if (isAuthenticated !== prevProps.isAuthenticated) {
 			loadCourse(courseId);
-			loadUserProgress(courseId);
+			loadUserProgress(courseId, userId);
 		}
 	}
 
@@ -60,6 +60,7 @@ class Course extends Component {
 		}
 
 		if (state.currentCourseId !== props.courseId || state.currentSlideId !== props.slideId) {
+			props.enterToCourse(props.courseId);
 			const openUnitId = Course.findUnitIdBySlideId(props.slideId, props.courseInfo);
 			const openUnit = props.units[openUnitId];
 			window.scrollTo(0, 0);
@@ -312,11 +313,13 @@ class Course extends Component {
 Course
 	.propTypes = {
 	isAuthenticated: PropTypes.bool,
+	userId: PropTypes.string,
 	courseId: PropTypes.string,
 	slideId: PropTypes.string,
 	courseInfo: PropTypes.object, // TODO: описать
 	progress: PropTypes.object, // TODO: описать
 	units: PropTypes.object,
+	enterToCourse: PropTypes.func,
 	loadCourse: PropTypes.func,
 	loadUserProgress: PropTypes.func,
 	updateVisitedSlide: PropTypes.func,

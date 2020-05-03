@@ -69,9 +69,12 @@ export default function courses(state = initialCoursesState, action) {
 			for (const unit of result) {
 				const { unitId, unitTitle, unlocked, flashcards } = unit;
 				const flashcardsIds = [];
-				const unitSlides = courseUnits
-					.find(unit => unit.id === unitId)
-					.slides;
+				const unitInfo = courseUnits
+					.find(unit => unit.id === unitId);
+				if(!unitInfo) {
+					continue;
+				}
+				const unitSlides = unitInfo.slides;
 				const flashcardsSlide = unitSlides.find(slide => slide.type === flashcardsSlideType);
 				const flashcardsSlideSlug = flashcardsSlide ? flashcardsSlide.slug : "";
 				let unratedFlashcardsCount = 0;
@@ -79,7 +82,7 @@ export default function courses(state = initialCoursesState, action) {
 				for (const flashcard of flashcards) {
 					courseFlashcards[flashcard.id] = flashcard;
 					flashcardsIds.push(flashcard.id);
-					if (flashcard.rate === rateTypes.notRated) {
+					if(flashcard.rate === rateTypes.notRated) {
 						unratedFlashcardsCount++;
 					}
 				}
@@ -132,11 +135,11 @@ export default function courses(state = initialCoursesState, action) {
 
 			const unitInfo = newState.flashcardsByUnits[action.unitId];
 
-			if (unitInfo.unratedFlashcardsCount > 0) {
+			if(unitInfo.unratedFlashcardsCount > 0) {
 				unitInfo.unratedFlashcardsCount--;
 			}
 
-			if (unitInfo.unratedFlashcardsCount === 0) {
+			if(unitInfo.unratedFlashcardsCount === 0) {
 				unitInfo.unlocked = true;
 			}
 

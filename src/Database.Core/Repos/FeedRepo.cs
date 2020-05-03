@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Database.Models;
+using Database.Models.Comments;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -104,44 +105,99 @@ namespace Database.Repos
 		public async Task<int> GetNotificationsCountAsync(string userId, DateTime from, params FeedNotificationTransport[] transports)
 		{
 			var nextSecond = from.AddSeconds(1);
-			var deliveriesQueryable = GetFeedNotificationDeliveriesQueryable(userId, transports);
+			var transportsIds = new List<FeedNotificationTransport>(transports).Select(t => t.Id).ToList();
+			var userCourses = visitsRepo.GetUserCourses(userId);
+			var deliveriesQueryable = db.NotificationDeliveries
+				.Select(d => new {d.NotificationTransportId, d.Notification.CourseId, d.Notification.InitiatedById, d.CreateTime})
+				.Where(d => transportsIds.Contains(d.NotificationTransportId))
+				.Where(d => userCourses.Contains(d.CourseId))
+				.Where(d => d.InitiatedById != userId)
+				.Where(d => d.CreateTime >= nextSecond);
 
-			var totalCount = await deliveriesQueryable.CountAsync(d => d.CreateTime >= nextSecond).ConfigureAwait(false);
+			var totalCount = await deliveriesQueryable.CountAsync().ConfigureAwait(false);
 			return totalCount;
 		}
 
-		public Task<List<NotificationDelivery>> GetFeedNotificationDeliveriesAsync<TProperty>(string userId, Expression<Func<NotificationDelivery, TProperty>> includePath, params FeedNotificationTransport[] transports)
-		{
-			var queryable = GetFeedNotificationDeliveriesQueryable(userId, transports);
-			if (includePath != null)
-				queryable = queryable.Include(includePath);
-			return queryable
-				.OrderByDescending(d => d.CreateTime)
-				.Take(99)
-				.ToListAsync();
-		}
-
-		public Task<List<NotificationDelivery>> GetFeedNotificationDeliveriesAsync(string userId, params FeedNotificationTransport[] transports)
-		{
-			return GetFeedNotificationDeliveriesAsync<object>(userId, null, transports: transports);
-		}
-
-		private IQueryable<NotificationDelivery> GetFeedNotificationDeliveriesQueryable(string userId, params FeedNotificationTransport[] transports)
+		public async Task<List<Notification>> GetNotificationForFeedNotificationDeliveriesAsync<TProperty>(string userId, Expression<Func<Notification, TProperty>> includePath, params FeedNotificationTransport[] transports)
 		{
 			var transportsIds = new List<FeedNotificationTransport>(transports).Select(t => t.Id).ToList();
 			var userCourses = visitsRepo.GetUserCourses(userId);
-			return notificationsRepo.GetTransportsDeliveriesQueryable(transportsIds, DateTime.MinValue)
-					.Where(d => userCourses.Contains(d.Notification.CourseId))
-					.Where(d => d.Notification.InitiatedById != userId)
-					/* TODO (andgein): bad code. we need to make these navigation properties loading via Notification' interface */
-					.Include(d => (d.Notification as AbstractCommentNotification).Comment)
-					.Include(d => (d.Notification as CourseExportedToStepikNotification).Process)
-					.Include(d => (d.Notification as ReceivedCommentToCodeReviewNotification).Comment)
-					.Include(d => (d.Notification as PassedManualExerciseCheckingNotification).Checking)
-					.Include(d => (d.Notification as UploadedPackageNotification).CourseVersion)
-					.Include(d => (d.Notification as PublishedPackageNotification).CourseVersion)
-					.Include(d => (d.Notification as CreatedGroupNotification).Group)
-				;
+			const int count = 99;
+			var notifications = await notificationsRepo.GetTransportsDeliveriesQueryable(transportsIds, DateTime.MinValue)
+				.Where(d => userCourses.Contains(d.Notification.CourseId))
+				.Where(d => d.Notification.InitiatedById != userId)
+				.OrderByDescending(d => d.CreateTime)
+				.Select(d => d.Notification)
+				.Take(count)
+				.ToListAsync();
+
+			var abstractCommentNotifications
+				= await GetNotifications<AbstractCommentNotification, Comment, TProperty>(notifications, n => n.Comment, includePath);
+			var deliveriesWithCourseExportedToStepikNotification
+				= await GetNotifications<CourseExportedToStepikNotification, StepikExportProcess, TProperty>(notifications, n => n.Process, includePath);
+			var deliveriesWithReceivedCommentToCodeReviewNotification
+				= await GetNotifications<ReceivedCommentToCodeReviewNotification, ExerciseCodeReviewComment, TProperty>(notifications, n => n.Comment, includePath);
+			var deliveriesWithPassedManualExerciseCheckingNotification
+				= await GetNotifications<PassedManualExerciseCheckingNotification, ManualExerciseChecking, TProperty>(notifications, n => n.Checking, includePath);
+			var deliveriesWithUploadedPackageNotification
+				= await GetNotifications<UploadedPackageNotification, CourseVersion, TProperty>(notifications, n => n.CourseVersion, includePath);
+			var deliveriesWithPublishedPackageNotification
+				= await GetNotifications<PublishedPackageNotification, CourseVersion, TProperty>(notifications, n => n.CourseVersion, includePath);
+			var deliveriesWithCreatedGroupNotification
+				= await GetNotifications<CreatedGroupNotification, Group, TProperty>(notifications, n => n.Group, includePath);
+
+			var notificationsWithSpecialInclude = abstractCommentNotifications.Cast<Notification>()
+				.Concat(deliveriesWithCourseExportedToStepikNotification)
+				.Concat(deliveriesWithReceivedCommentToCodeReviewNotification)
+				.Concat(deliveriesWithPassedManualExerciseCheckingNotification)
+				.Concat(deliveriesWithUploadedPackageNotification)
+				.Concat(deliveriesWithPublishedPackageNotification)
+				.Concat(deliveriesWithCreatedGroupNotification)
+				.ToDictionary(n => n.Id, n => n);
+
+			var otherNotificationsIds = notifications
+				.Select(n => n.Id)
+				.Where(id => !notificationsWithSpecialInclude.ContainsKey(id))
+				.ToList();
+			var otherNotifications = await GetNotifications(otherNotificationsIds, includePath);
+
+			return notificationsWithSpecialInclude.Values
+				.Concat(otherNotifications)
+				.OrderByDescending(d => d.CreateTime)
+				.ToList();
+		}
+
+		private async Task<List<TNotification>> GetNotifications<TNotification, TInclude, TProperty>(
+			List<Notification> notifications,
+			Expression<Func<TNotification, TInclude>> navigationPropertyPath,
+			Expression<Func<Notification, TProperty>> includePath)
+			where TNotification: Notification
+		{
+			var notificationIds = notifications.OfType<TNotification>().Select(n => n.Id).ToList();
+			if (!notificationIds.Any())
+				return new List<TNotification>();
+			var notificationQuery = db.Notifications
+				.Where(n => notificationIds.Contains(n.Id));
+			if (includePath != null)
+				notificationQuery = notificationQuery.Include(includePath);
+			var tnotificationQuery = notificationQuery
+				.OfType<TNotification>()
+				.Include(navigationPropertyPath)
+				.AsQueryable();
+			return await tnotificationQuery.ToListAsync();
+		}
+		
+		private async Task<List<Notification>> GetNotifications<TProperty>(
+			List<int> notificationIds,
+			Expression<Func<Notification, TProperty>> includePath)
+		{
+			if (!notificationIds.Any())
+				return new List<Notification>();
+			var query = db.Notifications
+				.Where(n => notificationIds.Contains(n.Id));
+			if (includePath != null)
+				query = query.Include(includePath);
+			return await query.ToListAsync();
 		}
 	}
 }

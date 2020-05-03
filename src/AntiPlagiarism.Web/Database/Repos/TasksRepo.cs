@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,9 +32,9 @@ namespace AntiPlagiarism.Web.Database.Repos
 			return db.TasksStatisticsParameters.Select(p => p.TaskId).ToListAsync();
 		}
 
-		public Task<TaskStatisticsParameters> FindTaskStatisticsParametersAsync(Guid taskId)
+		public async Task<TaskStatisticsParameters> FindTaskStatisticsParametersAsync(Guid taskId)
 		{
-			return db.TasksStatisticsParameters.FindAsync(taskId);
+			return await db.TasksStatisticsParameters.FindAsync(taskId);
 		}
 
 		/* It's very important that SaveTaskStatisticsParametersAsync() works with disabled EF's Change Tracker */

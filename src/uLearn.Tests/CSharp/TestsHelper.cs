@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Microsoft.VisualBasic.FileIO;
 using NUnit.Framework;
@@ -18,7 +19,9 @@ namespace uLearn.CSharp
 {
 	public static class TestsHelper
 	{
-		public static readonly string ProjSlideFolderPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "CSharp", "testProject");
+		public static readonly string TestDirectory = Path.GetDirectoryName(Assembly.GetAssembly(typeof(TestsHelper)).Location);
+		
+		public static readonly string ProjSlideFolderPath = Path.Combine(TestDirectory, "CSharp", "testProject");
 		public static readonly DirectoryInfo ProjSlideFolder = new DirectoryInfo(ProjSlideFolderPath);
 
 		public static readonly string ProjExerciseFolderPath = Path.Combine(ProjSlideFolderPath, "ProjDir");

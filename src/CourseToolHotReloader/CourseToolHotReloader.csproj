@@ -8,6 +8,7 @@
     <ItemGroup>
       <PackageReference Include="Autofac" Version="5.1.2" />
       <PackageReference Include="CommandLineParser" Version="2.7.82" />
+      <PackageReference Include="DotNetZip" Version="1.13.7" />
     </ItemGroup>
 
 </Project>

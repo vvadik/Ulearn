@@ -11,7 +11,13 @@ namespace uLearn.CSharp
 	[TestFixture]
 	public class CsMembersRemover_should
 	{
-		private readonly DirectoryInfo dir = new DirectoryInfo(TestContext.CurrentContext.TestDirectory).GetSubdirectory("tests");
+		private readonly DirectoryInfo dir = new DirectoryInfo(TestsHelper.TestDirectory).GetSubdirectory("tests");
+
+		[OneTimeSetUp]
+		public void SetUp()
+		{
+			Approvals.RegisterDefaultNamerCreation(() => new RelativeUnitTestFrameworkNamer());
+		}
 
 		private string LoadCode(string file = "OverloadedMethods.cs")
 		{

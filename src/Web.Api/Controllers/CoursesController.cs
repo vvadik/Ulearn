@@ -8,6 +8,7 @@ using Database.Repos;
 using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 using Database.Repos.Users;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Ulearn.Common.Api.Models.Responses;
@@ -29,10 +30,13 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly IUserQuizzesRepo userQuizzesRepo;
 		private readonly IVisitsRepo visitsRepo;
 		private readonly IGroupsRepo groupsRepo;
+		private readonly IGroupMembersRepo groupMembersRepo;
+		private readonly IGroupAccessesRepo groupAccessesRepo;
 
 		public CoursesController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, ICoursesRepo coursesRepo,
 			IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, IUnitsRepo unitsRepo, IUserSolutionsRepo solutionsRepo,
-			IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo)
+			IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo, IGroupMembersRepo groupMembersRepo,
+			IGroupAccessesRepo groupAccessesRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.coursesRepo = coursesRepo;
@@ -42,6 +46,8 @@ namespace Ulearn.Web.Api.Controllers
 			this.userQuizzesRepo = userQuizzesRepo;
 			this.visitsRepo = visitsRepo;
 			this.groupsRepo = groupsRepo;
+			this.groupMembersRepo = groupMembersRepo;
+			this.groupAccessesRepo = groupAccessesRepo;
 		}
 
 		/// <summary>
@@ -101,20 +107,47 @@ namespace Ulearn.Web.Api.Controllers
 		/// <summary>
 		/// Информация о курсе
 		/// </summary>
+		/// <param name="groupId">If null, returns data for the current user, otherwise for a group</param>
 		[HttpGet("{courseId}")]
-		public async Task<ActionResult<CourseInfo>> CourseInfo(Course course)
+		public async Task<ActionResult<CourseInfo>> CourseInfo([FromRoute]Course course, [FromQuery][CanBeNull]int? groupId = null)
 		{
 			if (course == null)
 				return NotFound(new ErrorResponse("Course not found"));
 
-			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
-			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(User.GetUserId(), course.Id, CourseRoleType.Instructor).ConfigureAwait(false);
-			if(!isInstructor && visibleUnits.Count == 0)
-				return NotFound(new ErrorResponse("Course not found"));
+			List<UnitInfo> units;
+			if (groupId == null)
+			{
+				var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
+				var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, course.Id, CourseRoleType.Instructor).ConfigureAwait(false);
+				if (!isInstructor && visibleUnits.Count == 0)
+					return NotFound(new ErrorResponse("Course not found"));
 
+				var showInstructorsSlides = isInstructor;
+				var getSlideMaxScoreFunc = await BuildGetSlideMaxScoreFunc(solutionsRepo, userQuizzesRepo, visitsRepo, groupsRepo, course, UserId);
+				units = visibleUnits.Select(unit => BuildUnitInfo(course.Id, unit, showInstructorsSlides, getSlideMaxScoreFunc)).ToList();
+			}
+			else
+			{
+				var group = await groupsRepo.FindGroupByIdAsync(groupId.Value, true).ConfigureAwait(false);
+				if (group == null)
+					return NotFound(new ErrorResponse("Group not found"));
+
+				async Task<bool> IsUserMemberOfGroup() => await groupMembersRepo.IsUserMemberOfGroup(groupId.Value, UserId).ConfigureAwait(false);
+				async Task<bool> IsGroupVisibleForUserAsync() => await groupAccessesRepo.IsGroupVisibleForUserAsync(groupId.Value, UserId).ConfigureAwait(false);
+
+				var isGroupAvailableForUser = await IsUserMemberOfGroup() || await IsGroupVisibleForUserAsync();
+				if (!isGroupAvailableForUser)
+					return NotFound(new ErrorResponse("Group not found"));
+				
+				var visibleUnits = unitsRepo.GetVisibleUnits(course);
+				if (visibleUnits.Count == 0)
+					return NotFound(new ErrorResponse("Course not found"));
+				
+				var getSlideMaxScoreFunc = BuildGetSlideMaxScoreFunc(course, group);
+				units = visibleUnits.Select(unit => BuildUnitInfo(course.Id, unit, false, getSlideMaxScoreFunc)).ToList();
+			}
+			
 			var containsFlashcards = course.Units.Any(x => x.Slides.OfType<FlashcardSlide>().Any());
-			var showInstructorsSlides = isInstructor;
-			var getSlideMaxScoreFunc = await BuildGetSlideMaxScoreFunc(solutionsRepo, userQuizzesRepo, visitsRepo, groupsRepo, course, User.GetUserId());
 			var scoringSettings = GetScoringSettings(course);
 
 			return new CourseInfo
@@ -124,7 +157,7 @@ namespace Ulearn.Web.Api.Controllers
 				Description = course.Settings.Description,
 				Scoring = scoringSettings,
 				NextUnitPublishTime = unitsRepo.GetNextUnitPublishTime(course.Id),
-				Units = visibleUnits.Select(unit => BuildUnitInfo(course.Id, unit, showInstructorsSlides, getSlideMaxScoreFunc)).ToList(),
+				Units = units,
 				ContainsFlashcards = containsFlashcards
 			};
 		}

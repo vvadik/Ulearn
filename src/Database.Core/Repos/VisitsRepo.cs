@@ -75,12 +75,16 @@ namespace Database.Repos
 		
 		public async Task<Dictionary<string, Visit>> FindLastVisit(List<string> userIds)
 		{
-			return (await db.Visits
+			return await db.Visits
 				.Where(v => userIds.Contains(v.UserId))
-				.GroupBy(v => v.UserId)
-				.Select(g => g.OrderByDescending(v => v.Timestamp).FirstOrDefault())
-				.ToListAsync().ConfigureAwait(false))
-				.ToDictionary(v => v.UserId, v => v);
+				.Select(v => v.UserId)
+				.Distinct()
+				.Select(u => db.Visits
+					.Where(v => v.UserId == u)
+					.OrderByDescending(v => v.Timestamp)
+					.FirstOrDefault()
+				)
+				.ToDictionaryAsync(v => v.UserId, v => v);
 		}
 
 		public bool IsUserVisitedSlide(string courseId, Guid slideId, string userId)
@@ -135,8 +139,23 @@ namespace Database.Repos
 			if (slidesIds != null)
 				visits = visits.Where(v => slidesIds.Contains(v.SlideId));
 			return visits
-				.GroupBy(v => v.SlideId, (s, v) => new { Key = s, Value = v.FirstOrDefault() })
-				.ToDictionary(g => g.Key, g => g.Value.Score);
+				.Select(v => new {v.SlideId, v.Score})
+				.AsEnumerable()
+				.GroupBy(v => v.SlideId, (s, v) => new { Key = s, Value = v.First().Score })
+				.ToDictionary(g => g.Key, g => g.Value);
+		}
+		
+		public async Task<Dictionary<string, Dictionary<Guid, int>>> GetScoresForSlides(string courseId, IEnumerable<string> userIds, IEnumerable<Guid> slidesIds = null)
+		{
+			var visits = db.Visits.Where(v => v.CourseId == courseId && userIds.Contains(v.UserId));
+			if (slidesIds != null)
+				visits = visits.Where(v => slidesIds.Contains(v.SlideId));
+			return (await visits
+				.Select(v => new {v.UserId, v.SlideId, v.Score})
+				.ToListAsync().ConfigureAwait(false))
+				.GroupBy(v => new {v.UserId, v.SlideId}, (s, v) => new { s.UserId, s.SlideId, Value = v.First().Score })
+				.GroupBy(g => g.UserId)
+				.ToDictionary(g => g.Key, g => g.ToDictionary(k => k.SlideId, k=> k.Value));
 		}
 
 		public List<Guid> GetSlidesWithUsersManualChecking(string courseId, string userId)

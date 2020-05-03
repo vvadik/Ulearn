@@ -6,9 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Database;
 using Database.Models;
-using Database.Repos.CourseRoles;
+using Database.Repos;
 using Database.Repos.Flashcards;
-using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -35,20 +34,18 @@ namespace Ulearn.Web.Api.Controllers
 	{
 		private readonly IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo;
 		private readonly IUserFlashcardsUnlockingRepo userFlashcardsUnlockingRepo;
-		private readonly ICourseRolesRepo courseRolesRepo;
-		private readonly IGroupAccessesRepo groupAccessesRepo;
+		private readonly IUnitsRepo unitsRepo;
 
 
 		public FlashcardsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
 			IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo,
 			IUserFlashcardsUnlockingRepo userFlashcardsUnlockingRepo,
-			ICourseRolesRepo courseRolesRepo, IGroupAccessesRepo groupAccessesRepo)
+			IUnitsRepo unitsRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.usersFlashcardsVisitsRepo = usersFlashcardsVisitsRepo;
 			this.userFlashcardsUnlockingRepo = userFlashcardsUnlockingRepo;
-			this.courseRolesRepo = courseRolesRepo;
-			this.groupAccessesRepo = groupAccessesRepo;
+			this.unitsRepo = unitsRepo;
 		}
 
 		/// <summary>
@@ -61,7 +58,8 @@ namespace Ulearn.Web.Api.Controllers
 		{
 			var userFlashcardsVisitsByCourse = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, course.Id);
 			var flashcardResponseByUnits = new FlashcardResponseByUnits();
-			foreach (var unit in course.Units)
+			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
+			foreach (var unit in visibleUnits)
 			{
 				var unitFlashcardsResponse = new UnitFlashcardsResponse();
 				var unitFlashcards = unit.Flashcards;

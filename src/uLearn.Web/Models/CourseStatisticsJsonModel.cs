@@ -18,11 +18,11 @@ namespace uLearn.Web.Models
 
 		public CourseStatisticsModel(CourseStatisticPageModel model)
 		{
-			Course = new CourseStatisticsCourseInfo(model.Course);
+			Course = new CourseStatisticsCourseInfo(model.CourseTitle, model.Units, model.ScoringGroups.Select(kvp => kvp.Value));
 			Groups = model.Groups.Select(g => new CourseStatisticsGroupInfo(g)).ToArray();
 
 			var students = new List<CourseStatisticsStudentInfo>();
-			var shouldBeSolvedSlides = model.Course.Slides.Where(s => s.ShouldBeSolved).ToList();
+			var shouldBeSolvedSlides = model.Units.SelectMany(u => u.Slides).Where(s => s.ShouldBeSolved).ToList();
 			foreach (var user in model.VisitedUsers)
 			{
 				var studentInfo = new CourseStatisticsStudentInfo
@@ -35,7 +35,7 @@ namespace uLearn.Web.Models
 						SlideId = s.Id,
 						Score = model.ScoreByUserAndSlide[Tuple.Create(user.UserId, s.Id)]
 					}).ToArray(),
-					AdditionalScores = model.Course.Units
+					AdditionalScores = model.Units
 						.SelectMany(
 							u => u.Scoring.Groups.Values.Where(g => g.CanBeSetByInstructor).Select(g => new CourseStatisticsStudentAdditionalScore
 							{
@@ -69,11 +69,11 @@ namespace uLearn.Web.Models
 		{
 		}
 
-		public CourseStatisticsCourseInfo(Course course)
+		public CourseStatisticsCourseInfo(string courseTitle, IEnumerable<Unit> units, IEnumerable<ScoringGroup> scoringGroups)
 		{
-			Title = course.Title;
-			Units = course.Units.Select(u => new CourseStatisticsUnitInfo(u)).ToArray();
-			ScoringGroups = course.Settings.Scoring.Groups.Values.Select(g => new CourseStatisticsScoringGroupInfo(g)).ToArray();
+			Title = courseTitle;
+			Units = units.Select(u => new CourseStatisticsUnitInfo(u)).ToArray();
+			ScoringGroups = scoringGroups.Select(g => new CourseStatisticsScoringGroupInfo(g)).ToArray();
 		}
 
 		[DataMember(Name = "title")]

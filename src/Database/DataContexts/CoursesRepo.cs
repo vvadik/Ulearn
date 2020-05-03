@@ -84,17 +84,15 @@ namespace Database.DataContexts
 
 		private IEnumerable<CourseAccess> GetActualEnabledCourseAccesses(string courseId = null, string userId = null)
 		{
-			var queryable = db.CourseAccesses
-				.Include(a => a.User)
-				.Where(a => a.IsEnabled);
+			var queryable = db.CourseAccesses.Include(a => a.User);
 			if (courseId != null)
 				queryable = queryable.Where(x => x.CourseId == courseId);
 			if (userId != null)
 				queryable = queryable.Where(x => x.UserId == userId);
 			return queryable.ToList()
 				.GroupBy(x => x.CourseId + x.UserId + x.AccessType, StringComparer.OrdinalIgnoreCase)
-				.Select(gr => gr.OrderByDescending(x => x.Id))
-				.Select(gr => gr.FirstOrDefault());
+				.Select(gr => gr.Last())
+				.Where(ca => ca.IsEnabled);
 		}
 
 		public async Task<CourseAccess> GrantAccess(string courseId, string userId, CourseAccessType accessType, string grantedById, string comment)
