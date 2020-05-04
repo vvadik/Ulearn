@@ -6,22 +6,30 @@ namespace CourseToolHotReloader.UpdateQuery
 	public interface ICourseUpdateSender
 	{
 		void SendCourseUpdates();
+		void SendFullCourse();
 	}
 
 	public class CourseUpdateSender : ICourseUpdateSender
 	{
-		private readonly ICourseUpdateQuery _courseUpdateQuery;
-		private readonly IUlearnApiClient _ulearnApiClient;
+		private readonly ICourseUpdateQuery courseUpdateQuery;
+		private readonly IUlearnApiClient ulearnApiClient;
+		private readonly IConfig config;
 
-		public CourseUpdateSender(ICourseUpdateQuery courseUpdateQuery, IUlearnApiClient ulearnApiClient)
+		public CourseUpdateSender(ICourseUpdateQuery courseUpdateQuery, IUlearnApiClient ulearnApiClient, IConfig config)
 		{
-			_courseUpdateQuery = courseUpdateQuery;
-			_ulearnApiClient = ulearnApiClient;
+			this.courseUpdateQuery = courseUpdateQuery;
+			this.ulearnApiClient = ulearnApiClient;
+			this.config = config;
 		}
 
 		public void SendCourseUpdates()
 		{
-			_ulearnApiClient.SendCourseUpdates(_courseUpdateQuery.GetAllCourseUpdate(), _courseUpdateQuery.GetAllDeletedFiles());
+			ulearnApiClient.SendCourseUpdates(courseUpdateQuery.GetAllCourseUpdate(), courseUpdateQuery.GetAllDeletedFiles());
+		}
+
+		public void SendFullCourse()
+		{
+			ulearnApiClient.SendFullCourse(config.Path, config.JwtToken.Token, config.CourseId);
 		}
 	}
 }

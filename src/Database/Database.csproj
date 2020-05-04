@@ -861,5 +861,8 @@
     <EmbeddedResource Update="Migrations\202004020908004_AddIndexToNotificationDeliveryByTransportAndCreateTimeIncludeNotificationId.resx">
       <DependentUpon>202004020908004_AddIndexToNotificationDeliveryByTransportAndCreateTimeIncludeNotificationId.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Update="Migrations\202005030946436_AddTempCourse.resx">
+      <DependentUpon>202005030946436_AddTempCourse.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

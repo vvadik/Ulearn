@@ -467,6 +467,71 @@ namespace Ulearn.Core
 			ReleaseCourse(courseId);
 			log.Info($"Course lock released {courseId}");
 		}
+		
+		private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
+		{
+			// Get the subdirectories for the specified directory.
+			var dir = new DirectoryInfo(sourceDirName);
+
+			if (!dir.Exists)
+				throw new DirectoryNotFoundException(
+					"Source directory does not exist or could not be found: "
+					+ sourceDirName);
+
+			var dirs = dir.GetDirectories();
+			// If the destination directory doesn't exist, create it.
+			if (!Directory.Exists(destDirName)) Directory.CreateDirectory(destDirName);
+
+			// Get the files in the directory and copy them to the new location.
+			var files = dir.GetFiles();
+			foreach (var file in files)
+			{
+				var temppath = Path.Combine(destDirName, file.Name);
+				file.CopyTo(temppath, true); // overwrite
+			}
+
+			// If copying subdirectories, copy them and their contents to new location.
+			if (!copySubDirs) return;
+			{
+				foreach (var subdir in dirs)
+				{
+					var temppath = Path.Combine(destDirName, subdir.Name);
+					DirectoryCopy(subdir.FullName, temppath, copySubDirs);
+				}
+			}
+		}
+
+		public void CopyTempCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)
+		{
+			var tempDirectoryName = coursesDirectory.GetSubdirectory(Path.GetRandomFileName());
+			LockCourse(course.Id);
+
+			try
+			{
+				FuncUtils.TrySeveralTimes(() => DirectoryCopy(destinationDirectory.FullName, tempDirectoryName.FullName,true), updateCourseEachOperationTriesCount);
+
+				try
+				{
+					FuncUtils.TrySeveralTimes(() => DirectoryCopy(sourceDirectory.FullName, destinationDirectory.FullName,true), updateCourseEachOperationTriesCount);
+				}
+				catch (IOException)
+				{
+					/* In case of any file system's error rollback previous operation */
+					FuncUtils.TrySeveralTimes(() => Directory.Move(tempDirectoryName.FullName, destinationDirectory.FullName), updateCourseEachOperationTriesCount);
+					throw;
+				}
+
+				FixFileReferencesInCourse(course, sourceDirectory, destinationDirectory);
+
+				UpdateCourse(course);
+			}
+			finally
+			{
+				ReleaseCourse(course.Id);
+			}
+
+			FuncUtils.TrySeveralTimes(() => tempDirectoryName.ClearDirectory(true), updateCourseEachOperationTriesCount);
+		}
 
 		public void MoveCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)
 		{

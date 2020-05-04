@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -11,29 +12,7 @@ namespace CourseToolHotReloader.ApiClient
 {
 	public class HttpMethods
 	{
-		public static void TestGetJWTToken()
-		{
-			var task = GetJwtToken(new LoginPasswordParameters { Login = "admin", Password = "fullcontrol" });
-			task.Wait();
-			var accountTokenResponseDto = task.Result;
-			var token = accountTokenResponseDto.Token;
-			Console.WriteLine(token);
-		}
-
-		public static void TestCreateCourse()
-		{
-			var task = GetJwtToken(new LoginPasswordParameters { Login = "admin", Password = "fullcontrol" });
-			task.Wait();
-			var accountTokenResponseDto = task.Result;
-			var token = accountTokenResponseDto.Token;
-
-			const string path = "C:/Projects/ulearn/Ulearn/courses/Help/Help.zip";
-
-			var task2 = UploadCourse(path, token);
-			task2.Wait();
-		}
-
-		private static async Task<AccountTokenResponseDto> GetJwtToken(LoginPasswordParameters parameters)
+		public static async Task<AccountTokenResponseDto> GetJwtToken(LoginPasswordParameters parameters)
 		{
 			const string baseUrl = "http://localhost:8000";
 			var url = $"{baseUrl}/account/login";
@@ -45,6 +24,12 @@ namespace CourseToolHotReloader.ApiClient
 
 			var response = await client.PostAsync(url, data);
 
+			if (response.StatusCode != HttpStatusCode.OK)
+			{
+				Console.WriteLine($"We have error: {response.Content.ReadAsStringAsync().Result}");
+				return null;
+			}
+
 			var result = response.Content.ReadAsStringAsync().Result;
 			return JsonSerializer.Deserialize<AccountTokenResponseDto>(result);
 		}
@@ -53,7 +38,7 @@ namespace CourseToolHotReloader.ApiClient
 		{
 			const string baseUrl = "http://localhost:8000";
 			var url = $"{baseUrl}/tempCourses/uploadCourse/123";
-			
+
 			using var client = new HttpClient();
 			client.DefaultRequestHeaders.Authorization =
 				new AuthenticationHeaderValue("Bearer", token);
@@ -67,5 +52,41 @@ namespace CourseToolHotReloader.ApiClient
 			var result = response.Content.ReadAsStringAsync().Result;
 		}
 
+
+		public static async Task UploadCourse(MemoryStream memoryStream, string token, string id)
+		{
+			const string baseUrl = "http://localhost:8000";
+			var url = $"{baseUrl}/tempCourses/uploadCourse/{id}";
+
+			using var client = new HttpClient();
+			client.DefaultRequestHeaders.Authorization =
+				new AuthenticationHeaderValue("Bearer", token);
+
+			var fileContent = new ByteArrayContent(memoryStream.ToArray());
+			var multiContent = new MultipartFormDataContent { { fileContent, "files", "qwe.zip" } };
+			var response = await client.PostAsync(url, multiContent);
+
+			if (response.StatusCode != HttpStatusCode.OK)
+			{
+				Console.WriteLine($"we have error {response.Content.ReadAsStringAsync().Result}");
+			}
+		}
+
+		public static async Task CreateCourse(string token, string id)
+		{
+			const string baseUrl = "http://localhost:8000";
+			var url = $"{baseUrl}/tempCourses/create/{id}";
+
+			using var client = new HttpClient();
+			client.DefaultRequestHeaders.Authorization =
+				new AuthenticationHeaderValue("Bearer", token);
+
+			var response = await client.PostAsync(url, null);
+
+			if (response.StatusCode != HttpStatusCode.OK)
+			{
+				Console.WriteLine($"We have error: {response.Content.ReadAsStringAsync().Result}");
+			}
+		}
 	}
 }

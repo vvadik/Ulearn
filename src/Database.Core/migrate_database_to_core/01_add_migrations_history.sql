@@ -65,4 +65,5 @@ VALUES
 ('20200212080825_AutomaticExerciseCheckingPoints', '2.2.0-rtm-35687'),
 ('20200310130621_AddSandboxToUserExerciseSubmission', '2.2.0-rtm-35687'),
 ('20200401132009_AfterUpdateCore31', '3.1.2'),
-('20200402091551_AddIndexToNotificationDeliveryByTransportAndCreateTimeIncludeNotificationId', '3.1.2')
+('20200402091551_AddIndexToNotificationDeliveryByTransportAndCreateTimeIncludeNotificationId', '3.1.2'),
+('20200503095839_AddTempCourse', '3.1.2')

@@ -9,37 +9,46 @@ namespace CourseToolHotReloader.DirectoryWorkers
 {
 	public interface ICourseWatcher
 	{
-		public void StartWatch(string pathToCourse);
+		public void StartWatch(bool sendFullDirectoryOnChange);
 	}
 
 	public class CourseWatcher : ICourseWatcher
 	{
 		private readonly ICourseUpdateQuery courseUpdateQuery;
-		private string path;
+		private readonly IConfig config;
 		private readonly Action debouncedSendUpdates;
+		private readonly Action debouncedSendFullCourse;
 
-		public CourseWatcher(ICourseUpdateQuery courseUpdateQuery, ICourseUpdateSender courseUpdateSender)
+		public CourseWatcher(ICourseUpdateQuery courseUpdateQuery, ICourseUpdateSender courseUpdateSender, IConfig config)
 		{
 			this.courseUpdateQuery = courseUpdateQuery;
+			this.config = config;
 			debouncedSendUpdates = Debounce(courseUpdateSender.SendCourseUpdates);
+			debouncedSendFullCourse = Debounce(courseUpdateSender.SendFullCourse);
 		}
 
-		public void StartWatch(string pathToCourse)
+		public void StartWatch(bool sendFullDirectoryOnChange)
 		{
-			// todo use pathToCourse;
-			path = "C:\\Users\\holkin\\RiderProjects\\ConsoleHotReloader\\ConsoleHotReloader\\bin\\Debug\\netcoreapp3.0\\testFolder";
-			WatchDirectory(path);
+			if (sendFullDirectoryOnChange)
+			{
+				WatchDirectory(config.Path, ChangedForSendAll, ChangedForSendAll, ChangedForSendAll, ChangedForSendAll);
+			}
+			else
+			{
+				WatchDirectory(config.Path, Changed, Created, Deleted, Renamed);
+			}
 		}
 
 		private ICourseUpdate BuildCourseUpdateBuFileSystemEvent(FileSystemEventArgs fileSystemEventArgs)
 		{
-			var relativePath = fileSystemEventArgs.FullPath.Replace(path, "");
+			var relativePath = fileSystemEventArgs.FullPath.Replace(config.Path, "");
 
 			var courseUpdate = CourseUpdateBuilder.Build(fileSystemEventArgs.Name, fileSystemEventArgs.FullPath, relativePath);
 			return courseUpdate;
 		}
 
-		private void WatchDirectory(string directory)
+		private static void WatchDirectory(string directory,
+			FileSystemEventHandler changed, FileSystemEventHandler created, FileSystemEventHandler deleted, RenamedEventHandler renamed)
 		{
 			using var watcher = new FileSystemWatcher
 			{
@@ -51,10 +60,10 @@ namespace CourseToolHotReloader.DirectoryWorkers
 				IncludeSubdirectories = true
 			};
 
-			watcher.Changed += Changed;
-			watcher.Created += Created;
-			watcher.Deleted += Deleted;
-			watcher.Renamed += Renamed;
+			watcher.Changed += changed;
+			watcher.Created += created;
+			watcher.Deleted += deleted;
+			watcher.Renamed += renamed;
 
 			watcher.EnableRaisingEvents = true;
 
@@ -66,7 +75,7 @@ namespace CourseToolHotReloader.DirectoryWorkers
 
 		private void Renamed(object sender, RenamedEventArgs e)
 		{
-			var relativePath = e.OldFullPath.Replace(path, "");
+			var relativePath = e.OldFullPath.Replace(config.Path, "");
 			var deletedCourseUpdate = CourseUpdateBuilder.Build(e.OldName, e.OldFullPath, relativePath);
 			courseUpdateQuery.RegisterDelete(deletedCourseUpdate);
 
@@ -90,6 +99,11 @@ namespace CourseToolHotReloader.DirectoryWorkers
 			debouncedSendUpdates();
 		}
 
+		private void ChangedForSendAll(object sender, FileSystemEventArgs e)
+		{
+			debouncedSendFullCourse();
+		}
+
 		private void Changed(object sender, FileSystemEventArgs e)
 		{
 			if (Directory.Exists(e.FullPath))
@@ -100,7 +114,7 @@ namespace CourseToolHotReloader.DirectoryWorkers
 		}
 
 
-		private static Action Debounce(Action func, int milliseconds = 10000)
+		private static Action Debounce(Action func, int milliseconds = 5000)
 		{
 			CancellationTokenSource cancelTokenSource = null;
 			return () =>

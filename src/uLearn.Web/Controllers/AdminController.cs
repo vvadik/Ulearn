@@ -457,28 +457,6 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Packages", new { courseId, onlyPrivileged = true });
 		}
 
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
-		[HandleHttpAntiForgeryException]
-		public async Task<ActionResult> CreateTmpCourse(string courseId, string courseTitle)
-		{
-			var userId = User.Identity.GetUserId();
-			var versionId = Guid.NewGuid();
-			var tmpCourseId = courseId + userId;
-			var course = courseManager.FindCourse(courseId);
-			if (!courseManager.TryCreateCourse(tmpCourseId, courseTitle, versionId))
-				return RedirectToAction("Courses", new { courseId = courseId, courseTitle = courseTitle });
-
-			await coursesRepo.AddCourseVersion(tmpCourseId, versionId, userId, null, null, null, null).ConfigureAwait(false);
-			await coursesRepo.MarkCourseVersionAsPublished(versionId).ConfigureAwait(false);
-			//var courseFile = courseManager.GetStagingCourseFile(courseId);
-			//await coursesRepo.AddCourseFile(courseId, versionId, courseFile.ReadAllContent()).ConfigureAwait(false);
-			await NotifyAboutPublishedCourseVersion(tmpCourseId, versionId, userId).ConfigureAwait(false);
-
-			return RedirectToAction("Packages", new { courseId, onlyPrivileged = true });
-		}
-
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		[ValidateInput(false)]
 		public ActionResult Packages(string courseId, string error = "")
