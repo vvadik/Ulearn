@@ -82,7 +82,8 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 			// К этому моменту BuildUp уже вызван, для InnerBlocks созданы отдельные блоки, InnerBlocks обрабатывать не нужно
 			yield return new HtmlBlock(RenderMarkdown(context.CourseId, context.SlideId, context.BaseUrl))
 			{
-				Hide = Hide
+				Hide = Hide,
+				FromMarkdown = true
 			};
 		}
 

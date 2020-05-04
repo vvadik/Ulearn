@@ -18,6 +18,10 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		[DataMember(Name = "content")]
 		public string Content { get; private set; } = "";
 
+		[XmlIgnore]
+		[DataMember(Name = "fromMarkdown")]
+		public bool FromMarkdown { get; set; }
+
 		public HtmlBlock()
 		{
 		}
