@@ -71,7 +71,7 @@ namespace Ulearn.Core.Tests.Courses.Slides
 
 		private static IApiSlideBlock[] GetApiSlideBlocks(Slide slide, bool removeHiddenBlocks)
 		{
-			var context = new ApiSlideBlockBuildingContext("course", slide.Id, "/TestData", removeHiddenBlocks, slide.Info.Unit.Directory);
+			var context = new ApiSlideBlockBuildingContext("course", slide.Id, "/TestData", removeHiddenBlocks);
 			return slide.Blocks
 				.SelectMany(b => b.ToApiSlideBlocks(context))
 				.ToArray();

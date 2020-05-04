@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 
 namespace Ulearn.Core.Courses.Slides.Blocks.Api
 {
@@ -9,16 +8,13 @@ namespace Ulearn.Core.Courses.Slides.Blocks.Api
 		public Guid SlideId;
 		public string BaseUrl;
 		public bool RemoveHiddenBlocks;
-		public DirectoryInfo UnitDirectory;
 
-		public ApiSlideBlockBuildingContext(string courseId, Guid slideId, string baseUrl, bool removeHiddenBlocks,
-			DirectoryInfo unitDirectory)
+		public ApiSlideBlockBuildingContext(string courseId, Guid slideId, string baseUrl, bool removeHiddenBlocks)
 		{
 			CourseId = courseId;
 			SlideId = slideId;
 			BaseUrl = baseUrl;
 			RemoveHiddenBlocks = removeHiddenBlocks;
-			UnitDirectory = unitDirectory;
 		}
 	}
 }

@@ -107,7 +107,8 @@ namespace Ulearn.Web.Api.Controllers
 		protected ApiSlideInfo BuildSlideInfo(string courseId, Slide slide, Func<Slide, int> getSlideMaxScoreFunc, bool removeHiddenBlocks)
 		{
 			var result = BuildShortSlideInfo<ApiSlideInfo>(courseId, slide, getSlideMaxScoreFunc);
-			var apiSlideBlockBuildingContext = new ApiSlideBlockBuildingContext(courseId, slide.Id, "/" + slide.Info.Directory.FullName, removeHiddenBlocks, slide.Info.Unit.Directory);
+			var baseUrl = CourseUnitUtils.GetDirectoryRelativeWebPath(slide.Info.SlideFile);
+			var apiSlideBlockBuildingContext = new ApiSlideBlockBuildingContext(courseId, slide.Id, baseUrl, removeHiddenBlocks);
 			result.Blocks = slide.Blocks
 				.SelectMany(b => b.ToApiSlideBlocks(apiSlideBlockBuildingContext))
 				.ToArray();
