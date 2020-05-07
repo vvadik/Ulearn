@@ -69,6 +69,16 @@ namespace Ulearn.Core.Tests.Courses.Slides
 			Assert.AreEqual(4, spoilerBlock.ApiBlocks.Count);
 		}
 
+		[Test]
+		public void SlideWithCodeInMarkdown()
+		{
+			var slide = TryLoadSlide("SlideWithCodeInMarkdown.xml");
+			var apiSlideBlocks = GetApiSlideBlocks(slide, true);
+			Assert.AreEqual(3, apiSlideBlocks.Length);
+			if (apiSlideBlocks.OfType<CodeBlock>().Any(cb => cb.Code.Contains("&lt;")))
+				Assert.Fail();
+		}
+
 		private static IApiSlideBlock[] GetApiSlideBlocks(Slide slide, bool removeHiddenBlocks)
 		{
 			var context = new ApiSlideBlockBuildingContext("course", slide.Id, "/TestData", removeHiddenBlocks);
