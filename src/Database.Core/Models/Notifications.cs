@@ -911,7 +911,7 @@ namespace Database.Models
 
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			var unit = course.FindUnitById(Score.UnitId);
+			var unit = course.FindUnitByIdNotSafe(Score.UnitId);
 			var scoringGroup = unit?.Scoring.Groups.GetOrDefault(Score.ScoringGroupId, null);
 			if (scoringGroup == null)
 				return null;
@@ -923,7 +923,7 @@ namespace Database.Models
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
-			var unit = course.FindUnitById(Score.UnitId);
+			var unit = course.FindUnitByIdNotSafe(Score.UnitId);
 			var scoringGroup = unit?.Scoring.Groups.GetOrDefault(Score.ScoringGroupId, null);
 			if (scoringGroup == null)
 				return null;

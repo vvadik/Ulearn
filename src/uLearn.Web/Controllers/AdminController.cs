@@ -125,7 +125,7 @@ namespace uLearn.Web.Controllers
 		{
 			var course = courseManager.GetCourse(courseId);
 			var appearances = db.UnitAppearances.Where(u => u.CourseId == course.Id).ToList();
-			var unitAppearances = course.Units
+			var unitAppearances = course.GetUnitsNotSafe()
 				.Select(unit => Tuple.Create(unit, appearances.FirstOrDefault(a => a.UnitId == unit.Id)))
 				.ToList();
 			return View(new UnitsListViewModel(course.Id, course.Title, unitAppearances, DateTime.Now));
@@ -996,15 +996,6 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Packages", new { courseId });
 		}
 
-		private static List<ScoringGroup> GetScoringGroupsCanBeSetInSomeUnit(Course course)
-		{
-			return course.Units
-				.SelectMany(u => u.Scoring.Groups.Values)
-				.Where(g => g.CanBeSetByInstructor && !g.EnabledForEveryone)
-				.DistinctBy(g => g.Id)
-				.ToList();
-		}
-
 		public ActionResult Groups(string courseId)
 		{
 			/* This action is moved to react-based frontend application */
@@ -1392,7 +1383,7 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.GetCourse(courseId);
 			if (!course.Settings.Scoring.Groups.ContainsKey(scoringGroupId))
 				return HttpNotFound();
-			var unit = course.Units.FirstOrDefault(u => u.Id == unitId);
+			var unit = course.GetUnitsNotSafe().FirstOrDefault(u => u.Id == unitId);
 			if (unit == null)
 				return HttpNotFound();
 

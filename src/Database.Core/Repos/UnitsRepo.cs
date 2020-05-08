@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
+using System.Threading.Tasks;
 using Database.Extensions;
 using Database.Models;
-using uLearn;
-using Ulearn.Core;
+using Database.Repos.CourseRoles;
+using Microsoft.AspNet.Identity;
 using Ulearn.Core.Courses;
-using Ulearn.Core.Courses.Units;
 
 namespace Database.Repos
 {
@@ -16,28 +16,30 @@ namespace Database.Repos
 	{
 		private readonly UlearnDb db;
 		private readonly WebCourseManager courseManager;
+		private readonly ICourseRolesRepo courseRolesRepo;
 
-		public UnitsRepo(UlearnDb db, WebCourseManager courseManager)
+		public UnitsRepo(UlearnDb db, WebCourseManager courseManager, ICourseRolesRepo courseRolesRepo)
 		{
 			this.db = db;
 			this.courseManager = courseManager;
+			this.courseRolesRepo = courseRolesRepo;
 		}
 
-		public List<Unit> GetVisibleUnits(Course course, IPrincipal user)
+		public async Task<IEnumerable<Guid>> GetVisibleUnitIdsAsync(Course course, string userId)
 		{
-			var canSeeEverything = user.HasAccessFor(course.Id, CourseRoleType.Tester);
+			var canSeeEverything = await courseRolesRepo.HasUserAccessToCourseAsync(userId, course.Id, CourseRoleType.Tester);
 			if (canSeeEverything)
-				return course.Units;
+				return course.GetUnitsNotSafe().Select(u => u.Id);
 
-			return GetVisibleUnits(course);
+			return GetVisibleUnitIds(course);
 		}
-		
-		public List<Unit> GetVisibleUnits(Course course)
+
+		public IEnumerable<Guid> GetVisibleUnitIds(Course course)
 		{
 			var visibleUnitsIds = new HashSet<Guid>(db.UnitAppearances
 				.Where(u => u.CourseId == course.Id && u.PublishTime <= DateTime.Now)
 				.Select(u => u.UnitId));
-			return course.Units.Where(u => visibleUnitsIds.Contains(u.Id)).ToList();
+			return course.GetUnitsNotSafe().Select(u => u.Id).Where(g => visibleUnitsIds.Contains(g));
 		}
 
 		public HashSet<string> GetVisibleCourses()
@@ -50,7 +52,7 @@ namespace Database.Repos
 				.Where(g => courseManager.FindCourse(g.Key) != null)
 				.Where(g =>
 				{
-					var units = courseManager.GetCourse(g.Key).Units.Select(u => u.Id).ToHashSet();
+					var units = courseManager.GetCourse(g.Key).GetUnitsNotSafe().Select(u => u.Id).ToHashSet();
 					units.IntersectWith(g.Select(p => p.UnitId));
 					return units.Any();
 				})

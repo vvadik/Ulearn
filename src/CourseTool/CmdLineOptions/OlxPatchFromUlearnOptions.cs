@@ -51,10 +51,10 @@ namespace uLearn.CourseTool.CmdLineOptions
 
 		private void PatchInstructorsNotes(EdxCourse edxCourse, Course ulearnCourse, string olxPath)
 		{
-			var ulearnUnits = ulearnCourse.Units;
+			var ulearnUnits = ulearnCourse.GetUnitsNotSafe();
 			foreach (var chapter in edxCourse.CourseWithChapters.Chapters)
 			{
-				var chapterUnit = ulearnCourse.Units.FirstOrDefault(u => u.Title == chapter.DisplayName);
+				var chapterUnit = ulearnCourse.GetUnitsNotSafe().FirstOrDefault(u => u.Title == chapter.DisplayName);
 				var chapterNote = chapterUnit?.InstructorNote;
 				if (chapterUnit == null || chapterNote == null)
 					continue;

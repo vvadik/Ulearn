@@ -404,7 +404,7 @@ namespace Database.Repos
 				var course = courseManager.FindCourse(notification.CourseId);
 				if (course != null)
 				{
-					var visibleUnits = unitsRepo.GetVisibleUnits(course);
+					var visibleUnits = unitsRepo.GetVisibleUnitIds(course);
 					if (!visibleUnits.Any())
 					{
 						var userIdsWithInstructorRoles = await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Tester, notification.CourseId, true);

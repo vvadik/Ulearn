@@ -84,7 +84,8 @@ namespace uLearn.Web.Controllers
 			if (course == null)
 				return HttpNotFound();
 
-			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
+			var visibleUnitIds = unitsRepo.GetVisibleUnitIds(course, User);
+			var visibleUnits = course.GetUnits(visibleUnitIds);
 			var isGuest = !User.Identity.IsAuthenticated;
 			var isInstructor = !isGuest && User.HasAccessFor(course.Id, CourseRole.Instructor);
 
@@ -148,7 +149,8 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.FindCourse(courseId);
 			if (course == null)
 				return HttpNotFound();
-			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
+			var visibleUnitIds = unitsRepo.GetVisibleUnitIds(course, User);
+			var visibleUnits = course.GetUnits(visibleUnitIds);
 			var isInstructor = User.HasAccessFor(course.Id, CourseRole.Instructor);
 			var slide = slideIndex == -1 ? GetInitialSlideForStartup(courseId, visibleUnits, isInstructor) : course.Slides[slideIndex];
 			if (slide == null)
@@ -500,7 +502,7 @@ namespace uLearn.Web.Controllers
 		public ActionResult InstructorNote(string courseId, Guid unitId)
 		{
 			var course = courseManager.GetCourse(courseId);
-			var instructorNote = course.GetUnitById(unitId).InstructorNote;
+			var instructorNote = course.GetUnitByIdNotSafe(unitId).InstructorNote;
 			if (instructorNote == null)
 				return HttpNotFound("No instructor note for this unit");
 			var gitEditUrl = GetGitEditLink(course, instructorNote.File);

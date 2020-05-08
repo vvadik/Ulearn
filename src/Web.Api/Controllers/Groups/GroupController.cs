@@ -16,6 +16,7 @@ using Serilog;
 using Swashbuckle.AspNetCore.Annotations;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Units;
 using Ulearn.Web.Api.Models.Parameters.Groups;
 using Ulearn.Web.Api.Models.Responses.Groups;
 
@@ -33,10 +34,11 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly INotificationsRepo notificationsRepo;
 		private readonly IGroupsCreatorAndCopier groupsCreatorAndCopier;
+		private readonly IUnitsRepo unitsRepo;
 
 		public GroupController(ILogger logger, WebCourseManager courseManager, UlearnDb db,
 			IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, INotificationsRepo notificationsRepo,
-			IGroupsCreatorAndCopier groupsCreatorAndCopier)
+			IGroupsCreatorAndCopier groupsCreatorAndCopier, IUnitsRepo unitsRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.groupsRepo = groupsRepo;
@@ -45,6 +47,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			this.courseRolesRepo = courseRolesRepo;
 			this.notificationsRepo = notificationsRepo;
 			this.groupsCreatorAndCopier = groupsCreatorAndCopier;
+			this.unitsRepo = unitsRepo;
 		}
 
 		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -218,7 +221,8 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			}
 
 			var scoringGroups = course.Settings.Scoring.Groups.Values.ToList();
-			var scoringGroupsCanBeSetInSomeUnit = GetScoringGroupsCanBeSetInSomeUnit(course);
+			var visibleUnitIds = await unitsRepo.GetVisibleUnitIdsAsync(course, UserId);
+			var scoringGroupsCanBeSetInSomeUnit = GetScoringGroupsCanBeSetInSomeUnit(course.GetUnits(visibleUnitIds));
 			var enabledScoringGroups = await groupsRepo.GetEnabledAdditionalScoringGroupsForGroupAsync(groupId).ConfigureAwait(false);
 			return new GroupScoringGroupsResponse
 			{
@@ -247,7 +251,8 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			}
 
 			var courseScoringGroupIds = course.Settings.Scoring.Groups.Values.Select(g => g.Id).ToList();
-			var scoringGroupsCanBeSetInSomeUnit = GetScoringGroupsCanBeSetInSomeUnit(course).Select(g => g.Id).ToList();
+			var visibleUnitIds = await unitsRepo.GetVisibleUnitIdsAsync(course, UserId);
+			var scoringGroupsCanBeSetInSomeUnit = GetScoringGroupsCanBeSetInSomeUnit(course.GetUnits(visibleUnitIds)).Select(g => g.Id).ToList();
 			foreach (var scoringGroupId in parameters.Scores)
 			{
 				if (!courseScoringGroupIds.Contains(scoringGroupId))
@@ -278,9 +283,9 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			};
 		}
 
-		private static List<ScoringGroup> GetScoringGroupsCanBeSetInSomeUnit(ICourse course)
+		private static List<ScoringGroup> GetScoringGroupsCanBeSetInSomeUnit(IEnumerable<Unit> units)
 		{
-			return course.Units
+			return units
 				.SelectMany(u => u.Scoring.Groups.Values)
 				.Where(g => g.CanBeSetByInstructor && !g.EnabledForEveryone)
 				.DistinctBy(g => g.Id)

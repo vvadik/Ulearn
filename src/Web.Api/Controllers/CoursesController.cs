@@ -115,9 +115,10 @@ namespace Ulearn.Web.Api.Controllers
 				return NotFound(new ErrorResponse("Course not found"));
 
 			List<UnitInfo> units;
+			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIdsAsync(course, UserId);
+			var visibleUnits = course.GetUnits(visibleUnitsIds);
 			if (groupId == null)
 			{
-				var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
 				var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, course.Id, CourseRoleType.Instructor).ConfigureAwait(false);
 				if (!isInstructor && visibleUnits.Count == 0)
 					return NotFound(new ErrorResponse("Course not found"));
@@ -138,16 +139,15 @@ namespace Ulearn.Web.Api.Controllers
 				var isGroupAvailableForUser = await IsUserMemberOfGroup() || await IsGroupVisibleForUserAsync();
 				if (!isGroupAvailableForUser)
 					return NotFound(new ErrorResponse("Group not found"));
-				
-				var visibleUnits = unitsRepo.GetVisibleUnits(course);
+
 				if (visibleUnits.Count == 0)
 					return NotFound(new ErrorResponse("Course not found"));
 				
 				var getSlideMaxScoreFunc = BuildGetSlideMaxScoreFunc(course, group);
 				units = visibleUnits.Select(unit => BuildUnitInfo(course.Id, unit, false, getSlideMaxScoreFunc)).ToList();
 			}
-			
-			var containsFlashcards = course.Units.Any(x => x.Slides.OfType<FlashcardSlide>().Any());
+
+			var containsFlashcards = visibleUnits.Any(x => x.Slides.OfType<FlashcardSlide>().Any());
 			var scoringSettings = GetScoringSettings(course);
 
 			return new CourseInfo
