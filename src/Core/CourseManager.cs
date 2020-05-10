@@ -508,7 +508,7 @@ namespace Ulearn.Core
 			course.CourseDirectory = (DirectoryInfo)GetNewPathForFileAfterMoving(course.CourseDirectory, sourceDirectory, destinationDirectory);
 			course.CourseXmlDirectory = (DirectoryInfo)GetNewPathForFileAfterMoving(course.CourseXmlDirectory, sourceDirectory, destinationDirectory);
 			
-			foreach (var unit in course.Units)
+			foreach (var unit in course.GetUnitsNotSafe())
 			{
 				unit.Directory = (DirectoryInfo)GetNewPathForFileAfterMoving(unit.Directory, sourceDirectory, destinationDirectory);
 				if (unit.InstructorNote != null)

@@ -5,7 +5,6 @@ using System.Security.Principal;
 using Database.Extensions;
 using Database.Models;
 using Ulearn.Core.Courses;
-using Ulearn.Core.Courses.Units;
 
 namespace Database.DataContexts
 {
@@ -18,20 +17,20 @@ namespace Database.DataContexts
 			this.db = db;
 		}
 
-		public List<Unit> GetVisibleUnits(Course course, IPrincipal user)
+		public IEnumerable<Guid> GetVisibleUnitIds(Course course, IPrincipal user)
 		{
 			var canSeeEverything = user.HasAccessFor(course.Id, CourseRole.Tester);
 			if (canSeeEverything)
-				return course.Units;
-			return GetVisibleUnits(course);
+				return course.GetUnitsNotSafe().Select(u => u.Id);
+			return GetVisibleUnitIds(course);
 		}
-		
-		public List<Unit> GetVisibleUnits(Course course)
+
+		public IEnumerable<Guid> GetVisibleUnitIds(Course course)
 		{
 			var visibleUnitsIds = new HashSet<Guid>(db.UnitAppearances
 				.Where(u => u.CourseId == course.Id && u.PublishTime <= DateTime.Now)
 				.Select(u => u.UnitId));
-			return course.Units.Where(u => visibleUnitsIds.Contains(u.Id)).ToList();
+			return course.GetUnitsNotSafe().Select(u => u.Id).Where(g => visibleUnitsIds.Contains(g)).ToList();
 		}
 
 		public bool IsUnitVisibleForStudents(Course course, Guid unitId)

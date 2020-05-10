@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
+using Database.Repos;
 using Database.Repos.CourseRoles;
 using Database.Repos.Flashcards;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -55,8 +56,8 @@ namespace Ulearn.Web.Api.Controllers
 			var result = new FlashcardsStatistics();
 
 			var visitsGroupedByFlashcard = userFlashcardsVisits.GroupBy(x => x.FlashcardId).ToDictionary(x => x.Key);
-
-			foreach (var unit in course.Units)
+			
+			foreach (var unit in course.GetUnitsNotSafe())
 			{
 				var flashcards = unit.Flashcards;
 				foreach (var flashcard in flashcards)

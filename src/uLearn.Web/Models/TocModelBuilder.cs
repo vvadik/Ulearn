@@ -49,7 +49,7 @@ namespace uLearn.Web.Models
 
 		private TocUnitModel[] CreateUnits()
 		{
-			return course.Units
+			return course.GetUnitsNotSafe()
 				.Where(u => IsUnitVisible(u) && u.Slides.Any(s => !IsSlideHidden(s)))
 				.Select(CreateUnit)
 				.ToArray();
