@@ -36,7 +36,7 @@ namespace Ulearn.Web.Api.Controllers
 		public async Task<ActionResult<FlashcardsStatistics>> FlashcardsStatistics([FromQuery(Name = "course_id")] [BindRequired]
 			string courseId)
 		{
-			var course = courseManager.FindCourse(courseId);
+			var course = await courseManager.FindCourseAsync(courseId);
 			if (course == null)
 				return NotFound();
 			var hasUserAccessToCourse = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, course.Id, CourseRoleType.Instructor);

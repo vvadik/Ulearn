@@ -59,7 +59,7 @@ namespace Ulearn.Web.Api.Controllers
 			
 			List<string> questions = null;
 			var courseId = group.CourseId;
-			var course = courseManager.GetCourse(courseId);
+			var course = await courseManager.GetCourseAsync(courseId);
 			if (quizSlideId != null)
 			{
 				var slide = course.FindSlideById(quizSlideId.Value);

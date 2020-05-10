@@ -38,7 +38,7 @@ namespace Database.Repos.Groups
 		{
 			logger.Information($"Создаю ручные проверки для всех решения пользователя {userId} в курсе {courseId}");
 
-			var course = courseManager.GetCourse(courseId);
+			var course = await courseManager.GetCourseAsync(courseId);
 
 			/* For exercises */
 			var acceptedSubmissionsBySlide = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, userId)

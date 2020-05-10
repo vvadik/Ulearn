@@ -74,14 +74,15 @@ namespace Ulearn.Web.Api
 			database.MigrateToLatestVersion();
 			var initialDataCreator = app.ApplicationServices.GetService<InitialDataCreator>();
 			database.CreateInitialDataAsync(initialDataCreator);
-
+			var courseManager = app.ApplicationServices.GetService<IWebCourseManager>();
+			courseManager.Init(app.ApplicationServices);
 			return app;
 		}
 
 		protected override void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment, ILogger logger)
 		{
 			var configuration = hostingEnvironment.SecretConfigurationProvider.Get<WebApiConfiguration>(hostingEnvironment.SecretConfigurationSource);
-			
+
 			base.ConfigureServices(services, hostingEnvironment, logger);
 
 			/* TODO (andgein): use UlearnDbFactory here */

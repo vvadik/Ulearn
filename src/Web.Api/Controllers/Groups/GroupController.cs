@@ -184,7 +184,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		public async Task<ActionResult<CopyGroupResponse>> Copy(int groupId, [FromQuery] CopyGroupParameters parameters)
 		{
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
-			if (!courseManager.HasCourse(parameters.DestinationCourseId))
+			if (!await courseManager.HasCourseAsync(parameters.DestinationCourseId))
 				return NotFound(new ErrorResponse($"Course {parameters.DestinationCourseId} not found"));
 			if (!await CanCreateGroupInCourseAsync(UserId, parameters.DestinationCourseId).ConfigureAwait(false))
 				return Forbid();
@@ -213,7 +213,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		public async Task<ActionResult<GroupScoringGroupsResponse>> ScoringGroups(int groupId)
 		{
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
-			var course = courseManager.FindCourse(group.CourseId);
+			var course = await courseManager.FindCourseAsync(@group.CourseId);
 			if (course == null)
 			{
 				logger.Error($"It's strange: group {groupId} exists, but course {group.CourseId} not. I will return 404");
@@ -243,7 +243,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			}
 
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
-			var course = courseManager.FindCourse(group.CourseId);
+			var course = await courseManager.FindCourseAsync(@group.CourseId);
 			if (course == null)
 			{
 				logger.Error($"It's strange: group {groupId} exists, but course {group.CourseId} not. I will return 404");

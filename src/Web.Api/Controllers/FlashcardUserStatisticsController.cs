@@ -36,7 +36,7 @@ namespace Ulearn.Web.Api.Controllers
 		public async Task<ActionResult<UserFlashcardStatisticResponse>> UserFlashcardStatistics([FromQuery(Name = "course_id")] [BindRequired]
 			string courseId)
 		{
-			var course = courseManager.FindCourse(courseId);
+			var course = await courseManager.FindCourseAsync(courseId);
 			if (course == null)
 				return NotFound();
 			var groups = await groupAccessesRepo.GetAvailableForUserGroupsAsync(course.Id, UserId, true);

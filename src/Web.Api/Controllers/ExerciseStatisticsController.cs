@@ -42,7 +42,7 @@ namespace Ulearn.Web.Api.Controllers
 		public async Task<ActionResult<CourseExercisesStatisticsResponse>> CourseStatistics([FromQuery(Name = "course_id")] [BindRequired]
 			string courseId, int count = 10000, DateTime? from = null, DateTime? to = null)
 		{
-			var course = courseManager.FindCourse(courseId);
+			var course = await courseManager.FindCourseAsync(courseId);
 			if (course == null)
 				return NotFound();
 
