@@ -87,15 +87,27 @@ namespace Ulearn.Core
 			{
 				return GetCourse(courseId);
 			}
-			catch (Exception e) when (e is KeyNotFoundException || e is CourseNotFoundException)
+			catch (Exception e) when (e is KeyNotFoundException || e is CourseNotFoundException || e is CourseLoadingException)
 			{
 				return null;
+			}
+			catch (AggregateException e)
+			{
+				var ie = e.InnerException;
+				if (ie is KeyNotFoundException || ie is CourseNotFoundException || ie is CourseLoadingException)
+					return null;
+				throw;
 			}
 		}
 
 		public bool HasCourse(string courseId)
 		{
 			return FindCourse(courseId) != null;
+		}
+
+		public bool CourseIsBroken(string courseId)
+		{
+			return brokenCourses.Contains(courseId);
 		}
 
 		///

@@ -46,9 +46,16 @@ namespace Database
 			{
 				return await GetCourseAsync(courseId);
 			}
-			catch (Exception e) when (e is KeyNotFoundException || e is CourseNotFoundException)
+			catch (Exception e) when (e is KeyNotFoundException || e is CourseNotFoundException || e is CourseLoadingException)
 			{
 				return null;
+			}
+			catch (AggregateException e)
+			{
+				var ie = e.InnerException;
+				if (ie is KeyNotFoundException || ie is CourseNotFoundException || ie is CourseLoadingException)
+					return null;
+				throw;
 			}
 		}
 
@@ -63,12 +70,20 @@ namespace Database
 			{
 				course = base.GetCourse(courseId);
 			}
-			catch (Exception e) when (e is KeyNotFoundException || e is CourseNotFoundException)
+			catch (Exception e) when (e is KeyNotFoundException || e is CourseNotFoundException || e is CourseLoadingException)
 			{
 				course = null;
 			}
+			catch (AggregateException e)
+			{
+				var ie = e.InnerException;
+				if (ie is KeyNotFoundException || ie is CourseNotFoundException || ie is CourseLoadingException)
+					course = null;
+				else
+					throw;
+			}
 
-			if (IsCourseVersionWasUpdatedRecent(courseId))
+			if (IsCourseVersionWasUpdatedRecent(courseId) || CourseIsBroken(courseId))
 				return course ?? throw new CourseNotFoundException(courseId);
 
 			courseVersionFetchTime[courseId] = DateTime.Now;
@@ -104,6 +119,8 @@ namespace Database
 			lastCoursesListFetchTime = DateTime.Now;
 			foreach (var courseVersion in publishedCourseVersions)
 			{
+				if (CourseIsBroken(courseVersion.CourseId))
+					continue;
 				try
 				{
 					ReloadCourseIfLoadedAndPublishedVersionsAreDifferent(courseVersion.CourseId, courseVersion);
