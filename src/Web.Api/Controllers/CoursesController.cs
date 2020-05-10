@@ -63,7 +63,7 @@ namespace Ulearn.Web.Api.Controllers
 			if (role == CourseRoleType.Student)
 				return NotFound(new ErrorResponse("Role can not be student. Specify tester, instructor or courseAdmin"));
 
-			var courses = await courseManager.GetCoursesAsync(coursesRepo).ConfigureAwait(false);
+			var courses = await courseManager.GetCoursesAsync().ConfigureAwait(false);
 
 			var isSystemAdministrator = await IsSystemAdministratorAsync().ConfigureAwait(false);
 

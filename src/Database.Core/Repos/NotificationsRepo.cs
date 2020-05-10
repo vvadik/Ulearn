@@ -401,7 +401,7 @@ namespace Database.Repos
 		{
 			if (notification.CourseId != "")
 			{
-				var course = courseManager.FindCourse(notification.CourseId);
+				var course = await courseManager.FindCourseAsync(notification.CourseId);
 				if (course != null)
 				{
 					var visibleUnits = unitsRepo.GetVisibleUnitIds(course);

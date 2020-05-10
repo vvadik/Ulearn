@@ -2,20 +2,22 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Database.Repos;
 using Ulearn.Core.Courses;
 
 namespace Database
 {
 	public interface IWebCourseManager
 	{
-		Task<Course> GetCourseAsync(CoursesRepo coursesRepo, string courseId);
-		Task<IEnumerable<Course>> GetCoursesAsync(ICoursesRepo coursesRepo);
+		void Init(IServiceProvider serviceProvider);
+		Task<Course> GetCourseAsync(string courseId);
+		Task<IEnumerable<Course>> GetCoursesAsync();
 		void UpdateCourseVersion(string courseId, Guid versionId);
 		IEnumerable<Course> GetCourses();
 		Course GetCourse(string courseId);
+		Task<Course> FindCourseAsync(string courseId);
 		Course FindCourse(string courseId);
 		bool HasCourse(string courseId);
+		Task<bool> HasCourseAsync(string courseId);
 		Course GetVersion(Guid versionId);
 		FileInfo GetStagingCourseFile(string courseId);
 		DirectoryInfo GetExtractedCourseDirectory(string courseId);

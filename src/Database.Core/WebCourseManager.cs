@@ -7,7 +7,6 @@ using Database.Models;
 using Database.Repos;
 using JetBrains.Annotations;
 using Serilog;
-using uLearn;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
 
@@ -21,6 +20,7 @@ namespace Database
 		private readonly ConcurrentDictionary<string, DateTime> courseVersionFetchTime = new ConcurrentDictionary<string, DateTime>();
 		private DateTime lastCoursesListFetchTime = DateTime.MinValue;
 		private readonly TimeSpan fetchCourseVersionEvery = TimeSpan.FromSeconds(10);
+		private IServiceProvider serviceProvider;
 
 		public WebCourseManager(ILogger logger)
 			: base(GetCoursesDirectory())
@@ -28,17 +28,42 @@ namespace Database
 			this.logger = logger;
 		}
 
+		public void Init(IServiceProvider sp)
+		{
+			serviceProvider = sp;
+		}
+
 		private readonly object @lock = new object();
 
+		public override Course GetCourse(string courseId)
+		{
+			return GetCourseAsync(courseId).Result;
+		}
+
+		public async Task<Course> FindCourseAsync(string courseId)
+		{
+			try
+			{
+				return await GetCourseAsync(courseId);
+			}
+			catch (Exception e) when (e is KeyNotFoundException || e is CourseNotFoundException)
+			{
+				return null;
+			}
+		}
+
+		///
+		/// <exception cref="CourseLoadingException"></exception>
+		///
 		[NotNull]
-		public async Task<Course> GetCourseAsync(CoursesRepo coursesRepo, string courseId)
+		public async Task<Course> GetCourseAsync(string courseId)
 		{
 			Course course;
 			try
 			{
 				course = base.GetCourse(courseId);
 			}
-			catch (KeyNotFoundException)
+			catch (Exception e) when (e is KeyNotFoundException || e is CourseNotFoundException)
 			{
 				course = null;
 			}
@@ -48,6 +73,7 @@ namespace Database
 
 			courseVersionFetchTime[courseId] = DateTime.Now;
 
+			var coursesRepo = (CoursesRepo)serviceProvider.GetService(typeof(ICoursesRepo));
 			var publishedVersion = await coursesRepo.GetPublishedCourseVersionAsync(courseId).ConfigureAwait(false);
 
 			if (publishedVersion == null)
@@ -57,11 +83,22 @@ namespace Database
 			return base.GetCourse(courseId);
 		}
 
-		public async Task<IEnumerable<Course>> GetCoursesAsync(ICoursesRepo coursesRepo)
+		public override IEnumerable<Course> GetCourses()
+		{
+			return GetCoursesAsync().Result;
+		}
+
+		public async Task<bool> HasCourseAsync(string courseId)
+		{
+			return await FindCourseAsync(courseId) != null;
+		}
+
+		public async Task<IEnumerable<Course>> GetCoursesAsync()
 		{
 			if (lastCoursesListFetchTime > DateTime.Now.Subtract(fetchCourseVersionEvery))
 				return base.GetCourses();
 
+			var coursesRepo = (CoursesRepo)serviceProvider.GetService(typeof(ICoursesRepo));
 			var publishedCourseVersions = await coursesRepo.GetPublishedCourseVersionsAsync().ConfigureAwait(false);
 
 			lastCoursesListFetchTime = DateTime.Now;

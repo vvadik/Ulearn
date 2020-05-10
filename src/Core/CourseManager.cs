@@ -69,6 +69,10 @@ namespace Ulearn.Core
 			return courses.Values.OrderBy(c => c.Title, StringComparer.OrdinalIgnoreCase);
 		}
 
+		///
+		/// <exception cref="KeyNotFoundException"></exception>
+		/// <exception cref="CourseNotFoundException"></exception>
+		///
 		[NotNull]
 		public virtual Course GetCourse(string courseId)
 		{
@@ -83,7 +87,7 @@ namespace Ulearn.Core
 			{
 				return GetCourse(courseId);
 			}
-			catch (Exception e) when (e is KeyNotFoundException || e is CourseNotFoundException || e is CourseLoadingException)
+			catch (Exception e) when (e is KeyNotFoundException || e is CourseNotFoundException)
 			{
 				return null;
 			}
@@ -178,7 +182,7 @@ namespace Ulearn.Core
 						log.Error($"Не могу загрузить курс из {zipFile.FullName}", e);
 						brokenCourses.Add(courseId);
 						if (firstException == null)
-							firstException = new Exception("Error loading course from " + zipFile.Name, e);
+							firstException = new CourseLoadingException("Error loading course from " + zipFile.Name, e);
 					}
 				}
 			}
