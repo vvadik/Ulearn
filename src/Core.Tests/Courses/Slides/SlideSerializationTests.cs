@@ -139,11 +139,13 @@ namespace Ulearn.Core.Tests.Courses.Slides
 				"x = 1",
 				"a_i = \\left{(}\\frac{n(n+1)}{2}\\right{)}"
 			}, ((TexBlock)slide.Blocks[3]).TexLines);
-			CollectionAssert.AreEqual(new string[2]
+			var imageGalleryBlock = (ImageGalleryBlock)slide.Blocks[4];
+			imageGalleryBlock.BaseUrl = "/";
+			CollectionAssert.AreEqual(new []
 			{
-				"image1.png",
-				"image2.png"
-			}, ((ImageGalleryBlock)slide.Blocks[4]).ImageUrls);
+				"/image1.png",
+				"/image2.png"
+			}, imageGalleryBlock.ImageUrls);
 		}
 	}
 }

@@ -79,6 +79,17 @@ namespace Ulearn.Core.Tests.Courses.Slides
 				Assert.Fail();
 		}
 
+		[Test]
+		public void SlideWithImageInMarkdown()
+		{
+			var slide = TryLoadSlide("SlideWithImageInMarkdown.xml");
+			var apiSlideBlocks = GetApiSlideBlocks(slide, true);
+			Assert.AreEqual(3, apiSlideBlocks.Length);
+			var img = apiSlideBlocks[1] as ImageGalleryBlock;
+			Assert.AreEqual(new []{"/TestData/manipulator.png"}, img.ImageUrls);
+			
+		}
+
 		private static IApiSlideBlock[] GetApiSlideBlocks(Slide slide, bool removeHiddenBlocks)
 		{
 			var context = new ApiSlideBlockBuildingContext("course", slide.Id, "/TestData", removeHiddenBlocks);

@@ -18,7 +18,23 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 
 		[DataMember(Name = "imageUrls")]
 		[XmlIgnore]
-		public string[] ImageUrls { get; set; }
+		public string[] ImageUrls {
+			get
+			{
+				return RelativeToUnitDirectoryImagePaths.Select(p => Path.Combine(BaseUrl, p)).ToArray();
+			}
+			set { }
+		}
+
+		[IgnoreDataMember]
+		[XmlIgnore]
+		public string BaseUrl;
+
+		public ImageGalleryBlock(string[] relativeToUnitDirectoryImagePaths, string baseUrl)
+			: this(relativeToUnitDirectoryImagePaths)
+		{
+			this.BaseUrl = baseUrl;
+		}
 
 		public ImageGalleryBlock(string[] relativeToUnitDirectoryImagePaths)
 		{
@@ -31,7 +47,7 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 
 		public override IEnumerable<SlideBlock> BuildUp(SlideBuildingContext context, IImmutableSet<string> filesInProgress)
 		{
-			ImageUrls = RelativeToUnitDirectoryImagePaths.Select(p => Path.Combine(context.Slide.Info.DirectoryRelativePath, p)).ToArray();
+			BaseUrl ??= context.Slide.Info.DirectoryRelativePath;
 			yield return this;
 		}
 
