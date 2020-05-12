@@ -1,5 +1,4 @@
 ﻿@* Generator: MvcHelper GeneratePrettyNames: true DisableLinePragmas: true *@
-@using System.Diagnostics
 @using System.Linq
 @using Database.Models
 @using uLearn.Web.Clients
@@ -283,7 +282,7 @@
 			@foreach (var imageUrl in block.ImageUrls)
 			{
 				<li>
-					<img src="@string.Format("{0}/{1}", context.BaseUrl, imageUrl)" alt="@imageUrl"/>
+					<img src="@imageUrl" alt="@imageUrl"/>
 				</li>
 			}
 		</ul>

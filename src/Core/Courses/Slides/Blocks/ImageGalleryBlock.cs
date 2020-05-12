@@ -1,4 +1,7 @@
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Xml.Serialization;
 using Ulearn.Core.Courses.Slides.Blocks.Api;
@@ -10,27 +13,37 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 	public class ImageGalleryBlock : SlideBlock, IApiSlideBlock
 	{
 		[XmlElement("image")]
+		[IgnoreDataMember]
+		public string[] RelativeToUnitDirectoryImagePaths { get; set; }
+
 		[DataMember(Name = "imageUrls")]
+		[XmlIgnore]
 		public string[] ImageUrls { get; set; }
 
-		public ImageGalleryBlock(string[] images)
+		public ImageGalleryBlock(string[] relativeToUnitDirectoryImagePaths)
 		{
-			ImageUrls = images;
+			RelativeToUnitDirectoryImagePaths = relativeToUnitDirectoryImagePaths;
 		}
 
 		public ImageGalleryBlock()
 		{
 		}
 
+		public override IEnumerable<SlideBlock> BuildUp(SlideBuildingContext context, IImmutableSet<string> filesInProgress)
+		{
+			ImageUrls = RelativeToUnitDirectoryImagePaths.Select(p => Path.Combine(context.Slide.Info.DirectoryRelativePath, p)).ToArray();
+			yield return this;
+		}
+
 		public override string ToString()
 		{
-			return $"Gallery with images:\n{string.Join("\n", ImageUrls)}";
+			return $"Gallery with images:\n{string.Join("\n", RelativeToUnitDirectoryImagePaths)}";
 		}
 
 		public override Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot)
 		{
 			var urlName = slide.NormalizedGuid + componentIndex;
-			return new GalleryComponent(urlName, displayName, urlName, slide.Info.SlideFile.Directory.FullName, ImageUrls);
+			return new GalleryComponent(urlName, displayName, urlName, ImageUrls);
 		}
 
 		[XmlIgnore]
