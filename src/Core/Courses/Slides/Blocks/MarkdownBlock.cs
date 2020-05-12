@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Net;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -77,13 +79,38 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 			return new HtmlComponent(urlName, displayName, urlName, htmlWithUrls.Item1, directoryName, htmlWithUrls.Item2);
 		}
 
+		private static readonly Regex codeTextareaRegex = new Regex("<textarea[^>]+data-lang='(?<lang>[^']*)'[^>]*>(?<code>[^<]*)</textarea>", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 		IEnumerable<IApiSlideBlock> IApiConvertibleSlideBlock.ToApiSlideBlocks(ApiSlideBlockBuildingContext context)
 		{
 			// К этому моменту BuildUp уже вызван, для InnerBlocks созданы отдельные блоки, InnerBlocks обрабатывать не нужно
-			yield return new HtmlBlock(RenderMarkdown(context.CourseId, context.SlideId, context.BaseUrl))
+			var renderedMarkdown = RenderMarkdown(context.CourseId, context.SlideId, context.BaseUrl);
+			var matches = codeTextareaRegex.Matches(renderedMarkdown);
+			var previousMatchEnd = 0;
+			foreach (var match in matches.Cast<Match>())
 			{
-				Hide = Hide
-			};
+				var markdownPart = renderedMarkdown.Substring(previousMatchEnd, match.Index - previousMatchEnd);
+				if (!string.IsNullOrWhiteSpace(markdownPart))
+					yield return new HtmlBlock(markdownPart)
+				{
+					Hide = Hide,
+					FromMarkdown = true
+				};
+				var langStr = match.Groups["lang"].Value;
+				var lang = (Language)Enum.Parse(typeof(Language), langStr, true);
+				var codeXmlEncoded = match.Groups["code"].Value;
+				var code = WebUtility.HtmlDecode(codeXmlEncoded);
+				yield return new CodeBlock(code, lang) { Hide = Hide };
+				previousMatchEnd = match.Index + match.Length;
+			}
+			var lastPart = previousMatchEnd == 0
+				? renderedMarkdown
+				: renderedMarkdown.Substring(previousMatchEnd, renderedMarkdown.Length - previousMatchEnd);
+			if (!string.IsNullOrWhiteSpace(lastPart))
+				yield return new HtmlBlock(lastPart)
+				{
+					Hide = Hide,
+					FromMarkdown = true
+				};
 		}
 
 		public override IEnumerable<SlideBlock> BuildUp(SlideBuildingContext context, IImmutableSet<string> filesInProgress)
