@@ -20,17 +20,13 @@ namespace Database
 		private readonly ConcurrentDictionary<string, DateTime> courseVersionFetchTime = new ConcurrentDictionary<string, DateTime>();
 		private DateTime lastCoursesListFetchTime = DateTime.MinValue;
 		private readonly TimeSpan fetchCourseVersionEvery = TimeSpan.FromSeconds(10);
-		private IServiceProvider serviceProvider;
+		private readonly IServiceProvider serviceProvider;
 
-		public WebCourseManager(ILogger logger)
+		public WebCourseManager(ILogger logger, IServiceProvider serviceProvider)
 			: base(GetCoursesDirectory())
 		{
 			this.logger = logger;
-		}
-
-		public void Init(IServiceProvider sp)
-		{
-			serviceProvider = sp;
+			this.serviceProvider = serviceProvider;
 		}
 
 		private readonly object @lock = new object();

@@ -27,7 +27,7 @@ namespace Database.Repos
 		private readonly UlearnDb db;
 		private readonly ITextsRepo textsRepo;
 		private readonly IVisitsRepo visitsRepo;
-		private readonly WebCourseManager courseManager;
+		private readonly IWebCourseManager courseManager;
 
 		private static volatile ConcurrentDictionary<int, DateTime> unhandledSubmissions = new ConcurrentDictionary<int, DateTime>();
 		private static volatile ConcurrentDictionary<int, DateTime> handledSubmissions = new ConcurrentDictionary<int, DateTime>();
@@ -36,7 +36,7 @@ namespace Database.Repos
 		public UserSolutionsRepo(
 			UlearnDb db,
 			ITextsRepo textsRepo, IVisitsRepo visitsRepo,
-			WebCourseManager courseManager)
+			IWebCourseManager courseManager)
 		{
 			this.db = db;
 			this.textsRepo = textsRepo;

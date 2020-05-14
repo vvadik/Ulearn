@@ -8,7 +8,6 @@ namespace Database
 {
 	public interface IWebCourseManager
 	{
-		void Init(IServiceProvider serviceProvider);
 		Task<Course> GetCourseAsync(string courseId);
 		Task<IEnumerable<Course>> GetCoursesAsync();
 		void UpdateCourseVersion(string courseId, Guid versionId);

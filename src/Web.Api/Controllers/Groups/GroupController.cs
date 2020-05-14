@@ -36,7 +36,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		private readonly IGroupsCreatorAndCopier groupsCreatorAndCopier;
 		private readonly IUnitsRepo unitsRepo;
 
-		public GroupController(ILogger logger, WebCourseManager courseManager, UlearnDb db,
+		public GroupController(ILogger logger, IWebCourseManager courseManager, UlearnDb db,
 			IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, INotificationsRepo notificationsRepo,
 			IGroupsCreatorAndCopier groupsCreatorAndCopier, IUnitsRepo unitsRepo)
 			: base(logger, courseManager, db, usersRepo)

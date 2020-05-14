@@ -27,7 +27,7 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly IGroupMembersRepo groupMembersRepo;
 		private readonly ICourseRoleUsersFilter courseRoleUsersFilter;
 
-		public CodeReviewStatisticsController(ILogger logger, WebCourseManager courseManager,
+		public CodeReviewStatisticsController(ILogger logger, IWebCourseManager courseManager,
 			ISlideCheckingsRepo slideCheckingsRepo,
 			ICourseRolesRepo courseRolesRepo,
 			IUsersRepo usersRepo,

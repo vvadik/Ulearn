@@ -17,9 +17,9 @@ namespace Ulearn.Web.Api.Models.Binders
 	 */
 	public class CourseBinder : IModelBinder
 	{
-		private readonly WebCourseManager courseManager;
+		private readonly IWebCourseManager courseManager;
 
-		public CourseBinder(WebCourseManager courseManager)
+		public CourseBinder(IWebCourseManager courseManager)
 		{
 			this.courseManager = courseManager;
 		}

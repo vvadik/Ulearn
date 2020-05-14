@@ -15,10 +15,10 @@ namespace Database.Repos
 	public class UnitsRepo : IUnitsRepo
 	{
 		private readonly UlearnDb db;
-		private readonly WebCourseManager courseManager;
+		private readonly IWebCourseManager courseManager;
 		private readonly ICourseRolesRepo courseRolesRepo;
 
-		public UnitsRepo(UlearnDb db, WebCourseManager courseManager, ICourseRolesRepo courseRolesRepo)
+		public UnitsRepo(UlearnDb db, IWebCourseManager courseManager, ICourseRolesRepo courseRolesRepo)
 		{
 			this.db = db;
 			this.courseManager = courseManager;

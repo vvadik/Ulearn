@@ -39,9 +39,6 @@ namespace Database.Core.Tests.Repos
 
 			serviceProvider = ConfigureServices();
 
-			var courseManager = serviceProvider.GetService<IWebCourseManager>();
-			courseManager.Init(serviceProvider);
-
 			userManager = serviceProvider.GetService<UlearnUserManager>();
 			CreateInitialDataInDatabaseAsync().GetAwaiter().GetResult();
 			CreateTestUsersAsync().GetAwaiter().GetResult();

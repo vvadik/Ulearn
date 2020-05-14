@@ -74,8 +74,6 @@ namespace Ulearn.Web.Api
 			//database.MigrateToLatestVersion();
 			//var initialDataCreator = app.ApplicationServices.GetService<InitialDataCreator>();
 			//database.CreateInitialDataAsync(initialDataCreator);
-			var courseManager = app.ApplicationServices.GetService<IWebCourseManager>();
-			courseManager.Init(app.ApplicationServices);
 			return app;
 		}
 
