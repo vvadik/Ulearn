@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Threading.Tasks;
 using Database;
-using Database.Extensions;
 using Database.Models;
 using Database.Models.Comments;
 using Database.Repos;
-using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
@@ -18,16 +15,10 @@ using Serilog;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
-using Ulearn.Core.Courses.Slides.Blocks;
-using Ulearn.Core.Courses.Slides.Blocks.Api;
 using Ulearn.Core.Courses.Slides.Exercises;
-using Ulearn.Core.Courses.Slides.Flashcards;
 using Ulearn.Core.Courses.Slides.Quizzes;
-using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
-using Ulearn.Core.Courses.Units;
 using Ulearn.Web.Api.Controllers.Groups;
 using Ulearn.Web.Api.Models.Common;
-using Ulearn.Web.Api.Models.Responses.Groups;
 using Ulearn.Web.Api.Models.Responses.Notifications;
 
 namespace Ulearn.Web.Api.Controllers
@@ -78,79 +69,6 @@ namespace Ulearn.Web.Api.Controllers
 		{
 			var user = await usersRepo.FindUserByIdAsync(UserId).ConfigureAwait(false);
 			return usersRepo.IsSystemAdministrator(user);
-		}
-
-		protected UnitInfo BuildUnitInfo(string courseId, Unit unit, bool showInstructorsSlides, Func<Slide, int> getSlideMaxScoreFunc)
-		{
-			var slides = unit.Slides.Select(slide => BuildShortSlideInfo(courseId, slide, getSlideMaxScoreFunc));
-			if (showInstructorsSlides && unit.InstructorNote != null)
-				slides = slides.Concat(new List<ShortSlideInfo> { BuildShortSlideInfo(courseId, unit.InstructorNote.Slide, getSlideMaxScoreFunc) });
-			return BuildUnitInfo(unit, slides);
-		}
-
-		private static UnitInfo BuildUnitInfo(Unit unit, IEnumerable<ShortSlideInfo> slides)
-		{
-			return new UnitInfo
-			{
-				Id = unit.Id,
-				Title = unit.Title,
-				Slides = slides.ToList(),
-				AdditionalScores = GetAdditionalScores(unit)
-			};
-		}
-
-		private static List<UnitScoringGroupInfo> GetAdditionalScores(Unit unit)
-		{
-			return unit.Settings.Scoring.Groups.Values.Where(g => g.CanBeSetByInstructor).Select(g => new UnitScoringGroupInfo(g)).ToList();
-		}
-
-		protected ApiSlideInfo BuildSlideInfo(string courseId, Slide slide, Func<Slide, int> getSlideMaxScoreFunc, bool removeHiddenBlocks)
-		{
-			var result = BuildShortSlideInfo<ApiSlideInfo>(courseId, slide, getSlideMaxScoreFunc);
-			var baseUrl = CourseUnitUtils.GetDirectoryRelativeWebPath(slide.Info.SlideFile);
-			var apiSlideBlockBuildingContext = new ApiSlideBlockBuildingContext(courseId, slide.Id, baseUrl, removeHiddenBlocks);
-			result.Blocks = slide.Blocks
-				.SelectMany(b => b.ToApiSlideBlocks(apiSlideBlockBuildingContext))
-				.ToArray();
-			return result;
-		}
-
-		protected ShortSlideInfo BuildShortSlideInfo(string courseId, Slide slide, Func<Slide, int> getSlideMaxScoreFunc)
-		{
-			return BuildShortSlideInfo<ShortSlideInfo>(courseId, slide, getSlideMaxScoreFunc);
-		}
-
-		protected T BuildShortSlideInfo<T>(string courseId, Slide slide, Func<Slide, int> getSlideMaxScoreFunc)
-			where T : ShortSlideInfo, new()
-		{
-			return new T
-			{
-				Id = slide.Id,
-				Title = slide.Title,
-				Slug = slide.Url,
-				ApiUrl = Url.Action("SlideInfo", "Slides", new { courseId = courseId, slideId = slide.Id }),
-				MaxScore = getSlideMaxScoreFunc(slide),
-				ScoringGroup = slide.ScoringGroup,
-				Type = GetSlideType(slide),
-				QuestionsCount = slide.Blocks.OfType<AbstractQuestionBlock>().Count(),
-
-				// TODO: кол-во попыток
-			};
-		}
-
-		protected static SlideType GetSlideType(Slide slide)
-		{
-			switch (slide)
-			{
-				case ExerciseSlide _:
-					return SlideType.Exercise;
-				case QuizSlide _:
-					return SlideType.Quiz;
-				case FlashcardSlide _:
-					return SlideType.Flashcards;
-				default:
-					return SlideType.Lesson;
-			}
 		}
 
 		protected ShortUserInfo BuildShortUserInfo(ApplicationUser user, bool discloseLogin = false, bool discloseEmail = false)

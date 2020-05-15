@@ -3,24 +3,19 @@ using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.Serialization;
 using System.Xml.Serialization;
 using Ulearn.Common.Extensions;
-using Ulearn.Core.Courses.Slides.Blocks.Api;
 using Ulearn.Core.Model.Edx.EdxComponents;
 using Component = Ulearn.Core.Model.Edx.EdxComponents.Component;
 
 namespace Ulearn.Core.Courses.Slides.Blocks
 {
 	[XmlType("code")]
-	[DataContract]
-	public class CodeBlock : SlideBlock, IApiSlideBlock
+	public class CodeBlock : SlideBlock
 	{
-		[IgnoreDataMember]
 		private string code;
 
 		[XmlText]
-		[DataMember(Name = "code")]
 		public string Code
 		{
 			get => code;
@@ -29,13 +24,11 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 
 		/* .NET XML Serializer doesn't understand nullable fields, so we use this hack to make Language? field */
 		[XmlIgnore]
-		[DataMember(Name = "language")]
 		public Language? Language { get; set; }
 
 		#region NullableLanguageHack
 
 		[XmlAttribute("language")]
-		[IgnoreDataMember]
 		[Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
 		public Language LanguageSerialized
 		{
@@ -88,9 +81,5 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		{
 			return Code;
 		}
-
-		[XmlIgnore]
-		[DataMember(Name = "type")]
-		public string Type { get; set; } = "code";
 	}
 }

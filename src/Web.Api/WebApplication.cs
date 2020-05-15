@@ -26,7 +26,9 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
 using Ulearn.Web.Api.Authorization;
+using Ulearn.Web.Api.Clients;
 using Ulearn.Web.Api.Controllers.Notifications;
+using Ulearn.Web.Api.Controllers.Slides;
 using Ulearn.Web.Api.Models;
 using Ulearn.Web.Api.Models.Binders;
 using Ulearn.Web.Api.Swagger;
@@ -151,6 +153,8 @@ namespace Ulearn.Web.Api
 			services.AddScoped<IAuthorizationHandler, CourseRoleAuthorizationHandler>();
 			services.AddScoped<IAuthorizationHandler, CourseAccessAuthorizationHandler>();
 			services.AddScoped<INotificationDataPreloader, NotificationDataPreloader>();
+			services.AddSingleton<IUlearnVideoAnnotationsClient, UlearnVideoAnnotationsClient>();
+			services.AddScoped<SlideRenderer, SlideRenderer>();
 
 			services.AddDatabaseServices(logger);
 		}

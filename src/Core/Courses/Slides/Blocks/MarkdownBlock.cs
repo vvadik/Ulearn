@@ -6,16 +6,14 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
-using AngleSharp.Html.Parser;
 using Ulearn.Common.Extensions;
-using Ulearn.Core.Courses.Slides.Blocks.Api;
 using Ulearn.Core.Model.Edx.EdxComponents;
 
 namespace Ulearn.Core.Courses.Slides.Blocks
 {
 	// [XmlType("markdown")]
 	// [XmlRoot("markdown", Namespace = "https://ulearn.me/schema/v2")]
-	public class MarkdownBlock : SlideBlock, IXmlSerializable, IApiConvertibleSlideBlock
+	public class MarkdownBlock : SlideBlock, IXmlSerializable
 	{
 		private string markdown;
 
@@ -25,7 +23,7 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 			get => markdown;
 			set => markdown = value.RemoveCommonNesting();
 		}
-		
+
 		public SlideBlock[] InnerBlocks { get; set; } // может содержать MarkdownBlock или CodeBlock
 
 		public MarkdownBlock(string markdown)
@@ -76,57 +74,6 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		{
 			var htmlWithUrls = Markdown.GetHtmlWithUrls("/static/" + urlName + "_");
 			return new HtmlComponent(urlName, displayName, urlName, htmlWithUrls.Item1, directoryName, htmlWithUrls.Item2);
-		}
-
-		IEnumerable<IApiSlideBlock> IApiConvertibleSlideBlock.ToApiSlideBlocks(ApiSlideBlockBuildingContext context)
-		{
-			// К этому моменту BuildUp уже вызван, для InnerBlocks созданы отдельные блоки, InnerBlocks обрабатывать не нужно
-			var renderedMarkdown = RenderMarkdown(context.CourseId, context.SlideId, context.BaseUrl);
-			return ParseBlocksFromMarkdown(context, renderedMarkdown);
-		}
-
-		private List<IApiSlideBlock> ParseBlocksFromMarkdown(ApiSlideBlockBuildingContext context, string renderedMarkdown)
-		{
-			var parser = new HtmlParser();
-			var document = parser.ParseDocument(renderedMarkdown);
-			var rootElements = document.Body.Children;
-			var blocks = new List<IApiSlideBlock>();
-			foreach (var element in rootElements)
-			{
-				var tagName = element.TagName.ToLower();
-				if (tagName == "textarea")
-				{
-					var langStr = element.GetAttribute("data-lang");
-					var lang = (Language)Enum.Parse(typeof(Language), langStr, true);
-					var code = element.TextContent;
-					blocks.Add(new CodeBlock(code, lang) { Hide = Hide });
-				}
-				else if (tagName == "img")
-				{
-					var href = element.GetAttribute("href");
-					blocks.Add(new ImageGalleryBlock(new[] { href }) { Hide = Hide });
-				}
-				else if (tagName == "p"
-						&& element.Children.Length == 1
-						&& string.Equals(element.Children[0].TagName, "img", StringComparison.OrdinalIgnoreCase)
-						&& string.IsNullOrWhiteSpace(element.TextContent))
-				{
-					var href = element.Children[0].GetAttribute("src");
-					blocks.Add(new ImageGalleryBlock(new[] { href }, context.BaseUrl) { Hide = Hide });
-				}
-				else
-				{
-					var htmlContent = element.OuterHtml;
-					if (blocks.Count > 0 && blocks.Last() is HtmlBlock last && last.Hide == Hide)
-					{
-						htmlContent = last.Content + "\n" + htmlContent;
-						blocks[blocks.Count - 1] = new HtmlBlock(htmlContent) { Hide = Hide, FromMarkdown = true };
-					}
-					else
-						blocks.Add(new HtmlBlock(htmlContent) { Hide = Hide, FromMarkdown = true });
-				}
-			}
-			return blocks;
 		}
 
 		public override IEnumerable<SlideBlock> BuildUp(SlideBuildingContext context, IImmutableSet<string> filesInProgress)

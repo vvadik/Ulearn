@@ -5,6 +5,7 @@
 		<RootNamespace>Ulearn.Web.Api</RootNamespace>
 	</PropertyGroup>
 	<ItemGroup>
+		<PackageReference Include="AngleSharp" Version="0.14.0" />
 		<PackageReference Include="Community.AspNetCore.ExceptionHandling.Mvc" Version="2.2.0" />
 		<PackageReference Include="EntityFrameworkProfiler.Appender" Version="5.0.5039" />
 		<PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
@@ -26,6 +27,7 @@
 		<ProjectReference Include="..\Common\Common.csproj" />
 		<ProjectReference Include="..\Core\Core.csproj" />
 		<ProjectReference Include="..\Database.Core\Database.Core.csproj" />
+		<ProjectReference Include="..\VideoAnnotations.Api\VideoAnnotations.Api.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="Microsoft.Threading.Tasks, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">

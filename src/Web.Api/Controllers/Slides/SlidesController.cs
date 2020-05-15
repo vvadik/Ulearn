@@ -12,7 +12,7 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
 using Ulearn.Web.Api.Models.Common;
 
-namespace Ulearn.Web.Api.Controllers
+namespace Ulearn.Web.Api.Controllers.Slides
 {
 	[Route("/slides")]
 	public class SlidesController : BaseController
@@ -22,9 +22,11 @@ namespace Ulearn.Web.Api.Controllers
 		protected readonly IUserQuizzesRepo UserQuizzesRepo;
 		protected readonly IVisitsRepo VisitsRepo;
 		protected readonly IGroupsRepo GroupsRepo;
+		protected readonly SlideRenderer SlideRenderer;
 
 		public SlidesController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo,
-			IUserSolutionsRepo solutionsRepo, IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo)
+			IUserSolutionsRepo solutionsRepo, IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo,
+			SlideRenderer slideRenderer)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			CourseRolesRepo = courseRolesRepo;
@@ -32,13 +34,14 @@ namespace Ulearn.Web.Api.Controllers
 			UserQuizzesRepo = userQuizzesRepo;
 			VisitsRepo = visitsRepo;
 			GroupsRepo = groupsRepo;
+			SlideRenderer = slideRenderer;
 		}
 
 		/// <summary>
 		/// Информация о слайде
 		/// </summary>
 		[HttpGet("{courseId}/{slideId}")]
-		public async Task<ActionResult<ShortSlideInfo>> SlideInfo([FromRoute]Course course, [FromRoute]Guid slideId)
+		public async Task<ActionResult<ApiSlideInfo>> SlideInfo([FromRoute]Course course, [FromRoute]Guid slideId)
 		{
 			var slide = course?.FindSlideById(slideId);
 			var isInstructor = await CourseRolesRepo.HasUserAccessToAnyCourseAsync(User.GetUserId(), CourseRoleType.Instructor).ConfigureAwait(false);
@@ -53,7 +56,10 @@ namespace Ulearn.Web.Api.Controllers
 				return NotFound(new { status = "error", message = "Course or slide not found" });
 
 			var getSlideMaxScoreFunc = await BuildGetSlideMaxScoreFunc(SolutionsRepo, UserQuizzesRepo, VisitsRepo, GroupsRepo, course, User.GetUserId());
-			return BuildSlideInfo(course.Id, slide, getSlideMaxScoreFunc, !isInstructor);
+			var baseUrl = CourseUnitUtils.GetDirectoryRelativeWebPath(slide.Info.SlideFile);
+			var slideRenderContext = new SlideRenderContext(course.Id, slide, baseUrl, !isInstructor,
+				course.Settings.VideoAnnotationsGoogleDoc, Url);
+			return await SlideRenderer.BuildSlideInfo(slideRenderContext, getSlideMaxScoreFunc);
 		}
 	}
 }
