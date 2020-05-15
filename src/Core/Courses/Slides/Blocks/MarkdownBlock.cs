@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
-using System.Net;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using AngleSharp.Html.Parser;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Blocks.Api;
 using Ulearn.Core.Model.Edx.EdxComponents;
@@ -79,38 +78,55 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 			return new HtmlComponent(urlName, displayName, urlName, htmlWithUrls.Item1, directoryName, htmlWithUrls.Item2);
 		}
 
-		private static readonly Regex codeTextareaRegex = new Regex("<textarea[^>]+data-lang='(?<lang>[^']*)'[^>]*>(?<code>[^<]*)</textarea>", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 		IEnumerable<IApiSlideBlock> IApiConvertibleSlideBlock.ToApiSlideBlocks(ApiSlideBlockBuildingContext context)
 		{
 			// К этому моменту BuildUp уже вызван, для InnerBlocks созданы отдельные блоки, InnerBlocks обрабатывать не нужно
 			var renderedMarkdown = RenderMarkdown(context.CourseId, context.SlideId, context.BaseUrl);
-			var matches = codeTextareaRegex.Matches(renderedMarkdown);
-			var previousMatchEnd = 0;
-			foreach (var match in matches.Cast<Match>())
+			return ParseBlocksFromMarkdown(context, renderedMarkdown);
+		}
+
+		private List<IApiSlideBlock> ParseBlocksFromMarkdown(ApiSlideBlockBuildingContext context, string renderedMarkdown)
+		{
+			var parser = new HtmlParser();
+			var document = parser.ParseDocument(renderedMarkdown);
+			var rootElements = document.Body.Children;
+			var blocks = new List<IApiSlideBlock>();
+			foreach (var element in rootElements)
 			{
-				var markdownPart = renderedMarkdown.Substring(previousMatchEnd, match.Index - previousMatchEnd);
-				if (!string.IsNullOrWhiteSpace(markdownPart))
-					yield return new HtmlBlock(markdownPart)
+				var tagName = element.TagName.ToLower();
+				if (tagName == "textarea")
 				{
-					Hide = Hide,
-					FromMarkdown = true
-				};
-				var langStr = match.Groups["lang"].Value;
-				var lang = (Language)Enum.Parse(typeof(Language), langStr, true);
-				var codeXmlEncoded = match.Groups["code"].Value;
-				var code = WebUtility.HtmlDecode(codeXmlEncoded);
-				yield return new CodeBlock(code, lang) { Hide = Hide };
-				previousMatchEnd = match.Index + match.Length;
+					var langStr = element.GetAttribute("data-lang");
+					var lang = (Language)Enum.Parse(typeof(Language), langStr, true);
+					var code = element.TextContent;
+					blocks.Add(new CodeBlock(code, lang) { Hide = Hide });
+				}
+				else if (tagName == "img")
+				{
+					var href = element.GetAttribute("href");
+					blocks.Add(new ImageGalleryBlock(new[] { href }) { Hide = Hide });
+				}
+				else if (tagName == "p"
+						&& element.Children.Length == 1
+						&& string.Equals(element.Children[0].TagName, "img", StringComparison.OrdinalIgnoreCase)
+						&& string.IsNullOrWhiteSpace(element.TextContent))
+				{
+					var href = element.Children[0].GetAttribute("src");
+					blocks.Add(new ImageGalleryBlock(new[] { href }, context.BaseUrl) { Hide = Hide });
+				}
+				else
+				{
+					var htmlContent = element.OuterHtml;
+					if (blocks.Count > 0 && blocks.Last() is HtmlBlock last && last.Hide == Hide)
+					{
+						htmlContent = last.Content + "\n" + htmlContent;
+						blocks[blocks.Count - 1] = new HtmlBlock(htmlContent) { Hide = Hide, FromMarkdown = true };
+					}
+					else
+						blocks.Add(new HtmlBlock(htmlContent) { Hide = Hide, FromMarkdown = true });
+				}
 			}
-			var lastPart = previousMatchEnd == 0
-				? renderedMarkdown
-				: renderedMarkdown.Substring(previousMatchEnd, renderedMarkdown.Length - previousMatchEnd);
-			if (!string.IsNullOrWhiteSpace(lastPart))
-				yield return new HtmlBlock(lastPart)
-				{
-					Hide = Hide,
-					FromMarkdown = true
-				};
+			return blocks;
 		}
 
 		public override IEnumerable<SlideBlock> BuildUp(SlideBuildingContext context, IImmutableSet<string> filesInProgress)

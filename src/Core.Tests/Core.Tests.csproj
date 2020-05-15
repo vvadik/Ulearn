@@ -39,6 +39,9 @@
 		<Content Update="Courses\Slides\TestData\SlideWithCodeInMarkdown.xml">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
+		<Content Update="Courses\Slides\TestData\SlideWithImageInMarkdown.xml">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 
 	<ItemGroup>
