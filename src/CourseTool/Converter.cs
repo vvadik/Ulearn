@@ -49,7 +49,7 @@ namespace uLearn.CourseTool
 
 		private static Chapter[] CourseToChapters(Course course, Config config, string ulearnBaseUrl, Dictionary<string, string> videoGuids, DirectoryInfo coursePackageRoot)
 		{
-			var units = course.Units;
+			var units = course.GetUnitsNotSafe();
 			return Enumerable
 				.Range(0, units.Count)
 				.Select(idx => new Chapter(

@@ -2,6 +2,7 @@
 	<PropertyGroup>
 		<RootNamespace>Ulearn</RootNamespace>
 		<TargetFrameworks>net472;netcoreapp3.1</TargetFrameworks>
+		<LangVersion>default</LangVersion>
 	</PropertyGroup>
 	<ItemGroup>
 	  <PackageReference Include="System.Collections.Immutable" Version="1.7.0" />

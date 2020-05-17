@@ -16,6 +16,7 @@
 		<PackageProjectUrl>https://ulearn.me</PackageProjectUrl>
 		<PackageTags>ulearn education mooc</PackageTags>
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+		<LangVersion>default</LangVersion>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 		<DebugType>full</DebugType>

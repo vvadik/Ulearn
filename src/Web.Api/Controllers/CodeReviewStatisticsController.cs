@@ -27,7 +27,7 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly IGroupMembersRepo groupMembersRepo;
 		private readonly ICourseRoleUsersFilter courseRoleUsersFilter;
 
-		public CodeReviewStatisticsController(ILogger logger, WebCourseManager courseManager,
+		public CodeReviewStatisticsController(ILogger logger, IWebCourseManager courseManager,
 			ISlideCheckingsRepo slideCheckingsRepo,
 			ICourseRolesRepo courseRolesRepo,
 			IUsersRepo usersRepo,
@@ -52,7 +52,7 @@ namespace Ulearn.Web.Api.Controllers
 		public async Task<ActionResult<CodeReviewInstructorsStatisticsResponse>> InstructorsStatistics([FromQuery(Name = "course_id")] [BindRequired]
 			string courseId, int count = 10000, DateTime? from = null, DateTime? to = null)
 		{
-			var course = courseManager.FindCourse(courseId);
+			var course = await courseManager.FindCourseAsync(courseId);
 			if (course == null)
 				return NotFound();
 

@@ -58,15 +58,15 @@ namespace Ulearn.Web.Api.Controllers
 		{
 			var userFlashcardsVisitsByCourse = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, course.Id);
 			var flashcardResponseByUnits = new FlashcardResponseByUnits();
-			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
-			foreach (var unit in visibleUnits)
+			var visibleUnits = await unitsRepo.GetVisibleUnitIdsAsync(course, UserId);
+			foreach (var unit in course.GetUnits(visibleUnits))
 			{
 				var unitFlashcardsResponse = new UnitFlashcardsResponse();
 				var unitFlashcards = unit.Flashcards;
 				if (unitFlashcards.Count == 0)
 					continue;
 
-				var flashcardResponsesEnumerable = GetFlashcardResponses(course, unitFlashcards, userFlashcardsVisitsByCourse);
+				var flashcardResponsesEnumerable = GetFlashcardResponses(unit, unitFlashcards, userFlashcardsVisitsByCourse);
 
 				unitFlashcardsResponse.Flashcards.AddRange(flashcardResponsesEnumerable);
 				unitFlashcardsResponse.UnitId = unit.Id;
@@ -97,7 +97,7 @@ namespace Ulearn.Web.Api.Controllers
 			return true;
 		}
 
-		private IEnumerable<FlashcardResponse> GetFlashcardResponses(Course course, List<Flashcard> flashcards, List<UserFlashcardsVisit> userFlashcardsVisits)
+		private IEnumerable<FlashcardResponse> GetFlashcardResponses(Unit unit, List<Flashcard> flashcards, List<UserFlashcardsVisit> userFlashcardsVisits)
 		{
 			var userFlashcardsVisitsDictionary = GetFlashcardsUsersVisitsDictionaryIncludingNotRated(userFlashcardsVisits, flashcards);
 			var lastRateIndexes = GetFlashcardsLastRateIndexes(flashcards, userFlashcardsVisits);
@@ -108,8 +108,6 @@ namespace Ulearn.Web.Api.Controllers
 				var answer = GetRenderedContent(flashcard.Answer.Blocks);
 
 				var rateResponse = userFlashcardsVisitsDictionary.TryGetValue(flashcard.Id, out var visit) ? visit.Rate : Rate.NotRated;
-
-				var unit = course.Units.FirstOrDefault(x => x.GetFlashcardById(flashcard.Id) != default(Flashcard));
 
 				var unitIdResponse = unit.Id;
 				var lastRateIndex = lastRateIndexes[flashcard.Id];
@@ -185,7 +183,8 @@ namespace Ulearn.Web.Api.Controllers
 		[ProducesResponseType((int)HttpStatusCode.NoContent)]
 		public async Task<IActionResult> Status([FromRoute] Course course, [FromRoute] string flashcardId, [FromBody] Rate rate)
 		{
-			var unit = course.Units.FirstOrDefault(x => x.GetFlashcardById(flashcardId) != null);
+			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIdsAsync(course, UserId);
+			var unit = course.GetUnits(visibleUnitsIds).FirstOrDefault(x => x.GetFlashcardById(flashcardId) != null);
 			if (unit is null)
 				return BadRequest($"flashcard with id {flashcardId} does not exist");
 			await usersFlashcardsVisitsRepo.AddFlashcardVisitAsync(UserId, course.Id, unit.Id, flashcardId, rate, DateTime.Now);

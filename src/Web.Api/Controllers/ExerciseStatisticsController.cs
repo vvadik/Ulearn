@@ -26,7 +26,7 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly IGroupsRepo groupsRepo;
 		private readonly SlideRenderer slideRenderer;
 
-		public ExerciseStatisticsController(ILogger logger, WebCourseManager courseManager, IUserSolutionsRepo userSolutionsRepo, UlearnDb db, IUsersRepo usersRepo,
+		public ExerciseStatisticsController(ILogger logger, IWebCourseManager courseManager, IUserSolutionsRepo userSolutionsRepo, UlearnDb db, IUsersRepo usersRepo,
 			IUserSolutionsRepo solutionsRepo, IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo,
 			SlideRenderer slideRenderer)
 			: base(logger, courseManager, db, usersRepo)
@@ -46,7 +46,7 @@ namespace Ulearn.Web.Api.Controllers
 		public async Task<ActionResult<CourseExercisesStatisticsResponse>> CourseStatistics([FromQuery(Name = "course_id")] [BindRequired]
 			string courseId, int count = 10000, DateTime? from = null, DateTime? to = null)
 		{
-			var course = courseManager.FindCourse(courseId);
+			var course = await courseManager.FindCourseAsync(courseId);
 			if (course == null)
 				return NotFound();
 

@@ -77,7 +77,8 @@ namespace uLearn.Web.Controllers
 			var realPeriodFinish = periodFinish.Add(TimeSpan.FromDays(1));
 
 			var course = courseManager.GetCourse(courseId);
-			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
+			var visibleUnitsIds = unitsRepo.GetVisibleUnitIds(course, User);
+			var visibleUnits = course.GetUnits(visibleUnitsIds);
 			if (!unitId.HasValue)
 				return View("UnitStatisticsList", new UnitStatisticPageModel
 				{
@@ -452,7 +453,8 @@ namespace uLearn.Web.Controllers
 			var realPeriodFinish = periodFinish.Add(TimeSpan.FromDays(1));
 
 			var course = courseManager.GetCourse(courseId);
-			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
+			var visibleUnitsIds = unitsRepo.GetVisibleUnitIds(course, User);
+			var visibleUnits = course.GetUnits(visibleUnitsIds);
 
 			var slidesIds = visibleUnits.SelectMany(u => u.Slides.Select(s => s.Id)).ToHashSet();
 
@@ -599,8 +601,8 @@ namespace uLearn.Web.Controllers
 			if (user == null)
 				return HttpNotFound();
 
-			// Здесь CourseRole.Instructor, но для единообразия я бы все-таки проверял доступ к юнитам, иначе сложно будет проверить, что нигде не забыта эта проверка
-			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
+			var visibleUnitsIds = unitsRepo.GetVisibleUnitIds(course, User);
+			var visibleUnits = course.GetUnits(visibleUnitsIds);
 			var unit = visibleUnits.FirstOrDefault(x => x.Id == unitId);
 			if (unit == null)
 				return HttpNotFound();
@@ -749,7 +751,7 @@ namespace uLearn.Web.Controllers
 		public ActionResult SlideRatings(string courseId, Guid unitId)
 		{
 			var course = courseManager.GetCourse(courseId);
-			var unit = course.FindUnitById(unitId);
+			var unit = course.FindUnitByIdNotSafe(unitId);
 			if (unit == null)
 				return HttpNotFound();
 
@@ -766,7 +768,7 @@ namespace uLearn.Web.Controllers
 			{
 				var course = courseManager.GetCourse(courseId);
 
-				var unit = course.FindUnitById(unitId.Value);
+				var unit = course.FindUnitByIdNotSafe(unitId.Value);
 				if (unit == null)
 					return HttpNotFound();
 				slides = unit.Slides.ToArray();
@@ -786,7 +788,7 @@ namespace uLearn.Web.Controllers
 		public ActionResult UsersProgress(string courseId, Guid unitId, DateTime periodStart)
 		{
 			var course = courseManager.GetCourse(courseId);
-			var unit = course.FindUnitById(unitId);
+			var unit = course.FindUnitByIdNotSafe(unitId);
 			if (unit == null)
 				return HttpNotFound();
 			var slides = unit.Slides.ToArray();

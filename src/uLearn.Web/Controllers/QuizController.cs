@@ -501,7 +501,7 @@ namespace uLearn.Web.Controllers
 		{
 			if (data.Length > MaxFillInBlockSize)
 				data = data.Substring(0, MaxFillInBlockSize);
-			var isRightAnswer = true;
+			var isRightAnswer = false;
 			if (fillInBlock.Regexes != null)
 				isRightAnswer = fillInBlock.Regexes.Any(regex => regex.Regex.IsMatch(data));
 			var blockScore = isRightAnswer ? fillInBlock.MaxScore : 0;

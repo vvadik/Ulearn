@@ -35,7 +35,7 @@
 			@Html.Hidden("updateSlidesIds", "")
 
 			<table>
-				@foreach (var unit in Model.Course.Units)
+				@foreach (var unit in Model.Course.GetUnitsNotSafe())
 				{
 					<tr>
 						<td colspan="3">

@@ -27,7 +27,7 @@ namespace Ulearn.Core.Extensions
 			var titleErrors = spellchecker.SpellCheckString(course.Title).Select(e => e.ToPrettyString()).ToList();
 			var titleError = ToPrettyMessage("Заголовок курса:", titleErrors);
 
-			var unitsTitlesErrors = course.Units
+			var unitsTitlesErrors = course.GetUnitsNotSafe()
 				.Select(u => u.Title)
 				.SelectMany(spellchecker.SpellCheckString)
 				.Select(e => e.ToPrettyString())

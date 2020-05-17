@@ -27,7 +27,7 @@ namespace Database.Repos
 		private readonly UlearnDb db;
 		private readonly ITextsRepo textsRepo;
 		private readonly IVisitsRepo visitsRepo;
-		private readonly WebCourseManager courseManager;
+		private readonly IWebCourseManager courseManager;
 
 		private static volatile ConcurrentDictionary<int, DateTime> unhandledSubmissions = new ConcurrentDictionary<int, DateTime>();
 		private static volatile ConcurrentDictionary<int, DateTime> handledSubmissions = new ConcurrentDictionary<int, DateTime>();
@@ -36,7 +36,7 @@ namespace Database.Repos
 		public UserSolutionsRepo(
 			UlearnDb db,
 			ITextsRepo textsRepo, IVisitsRepo visitsRepo,
-			WebCourseManager courseManager)
+			IWebCourseManager courseManager)
 		{
 			this.db = db;
 			this.textsRepo = textsRepo;
@@ -360,7 +360,7 @@ namespace Database.Repos
 			var outputHash = (await textsRepo.AddText(output)).Hash;
 
 			var isWebRunner = checking.CourseId == "web" && checking.SlideId == Guid.Empty;
-			var exerciseSlide = isWebRunner ? null : (ExerciseSlide)courseManager.GetCourse(checking.CourseId).GetSlideById(checking.SlideId);
+			var exerciseSlide = isWebRunner ? null : (ExerciseSlide)(await courseManager.GetCourseAsync(checking.CourseId)).GetSlideById(checking.SlideId);
 
 			var isRightAnswer = exerciseSlide?.Exercise?.IsCorrectRunResult(result) ?? false;
 			var score = exerciseSlide != null && isRightAnswer ? exerciseSlide.Scoring.PassedTestsScore : 0;

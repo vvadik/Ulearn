@@ -72,18 +72,17 @@ namespace Ulearn.Web.Api
 
 		protected override IApplicationBuilder ConfigureWebApplication(IApplicationBuilder app)
 		{
-			var database = app.ApplicationServices.GetService<UlearnDb>();
-			database.MigrateToLatestVersion();
-			var initialDataCreator = app.ApplicationServices.GetService<InitialDataCreator>();
-			database.CreateInitialDataAsync(initialDataCreator);
-
+			//var database = app.ApplicationServices.GetService<UlearnDb>(); // NOTE: Миграции в Api отключены пока выполняются в Web
+			//database.MigrateToLatestVersion();
+			//var initialDataCreator = app.ApplicationServices.GetService<InitialDataCreator>();
+			//database.CreateInitialDataAsync(initialDataCreator);
 			return app;
 		}
 
 		protected override void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment, ILogger logger)
 		{
 			var configuration = hostingEnvironment.SecretConfigurationProvider.Get<WebApiConfiguration>(hostingEnvironment.SecretConfigurationSource);
-			
+
 			base.ConfigureServices(services, hostingEnvironment, logger);
 
 			/* TODO (andgein): use UlearnDbFactory here */

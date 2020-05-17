@@ -419,7 +419,7 @@ namespace Database.DataContexts
 				var course = courseManager.FindCourse(notification.CourseId);
 				if (course != null)
 				{
-					var visibleUnits = unitsRepo.GetVisibleUnits(course);
+					var visibleUnits = unitsRepo.GetVisibleUnitIds(course);
 					if (!visibleUnits.Any())
 					{
 						var userIdsWithInstructorRoles = userRolesRepo.GetListOfUsersWithCourseRole(CourseRole.Tester, notification.CourseId, true);
