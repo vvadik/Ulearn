@@ -13,6 +13,7 @@
     <PackageProjectUrl>https://ulearn.me</PackageProjectUrl>
     <PackageTags>ulearn education mooc</PackageTags>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -29,8 +30,8 @@
     <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.3" />
     <PackageReference Include="Microsoft.AspNet.Identity.EntityFramework" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
-    <PackageReference Include="Microsoft.Build.Framework" Version="16.4.0" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.4.0" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="16.5.0" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.5.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.2" />
