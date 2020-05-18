@@ -16,6 +16,7 @@
   "dependencies": {
     "@skbkontur/react-icons": "4.2.0",
     "@skbkontur/react-ui": "2.1.1",
+    "@skbkontur/react-ui": "^2.2.0",
     "autoprefixer": "9.7.6",
     "babel-eslint": "10.1.0",
     "babel-loader": "8.1.0",
@@ -40,6 +41,7 @@
     "query-string": "6.12.1",
     "raf": "3.4.1",
     "raven-js": "^3.27.2",
+    "raven-js": "3.27.2",
     "react": "16.13.1",
     "react-copy-to-clipboard": "5.0.2",
     "react-dev-utils": "10.2.1",

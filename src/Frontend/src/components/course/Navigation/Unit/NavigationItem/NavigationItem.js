@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 
-import { Copy } from "icons/Copy";
+import { Copy } from "icons";
 
-import { SLIDETYPE } from '../../../../../consts/general';
+import { SLIDETYPE } from 'src/consts/general';
 import { menuItemType } from '../../types';
 import classnames from 'classnames';
 
@@ -19,7 +19,7 @@ class NavigationItem extends Component {
 	componentDidMount() {
 		const { ref } = this;
 
-		if (ref) {
+		if(ref) {
 			ref.scrollIntoView();
 		}
 	}
@@ -27,7 +27,7 @@ class NavigationItem extends Component {
 	createRefIfNeeded = (ref) => {
 		const { isActive } = this.props;
 
-		if (isActive) {
+		if(isActive) {
 			this.ref = ref;
 		}
 	};
@@ -62,11 +62,11 @@ class NavigationItem extends Component {
 	renderScore() {
 		const { score, maxScore, type } = this.props;
 
-		if (!maxScore) {
+		if(!maxScore) {
 			return;
 		}
 
-		if (type === SLIDETYPE.exercise || type === SLIDETYPE.quiz) {
+		if(type === SLIDETYPE.exercise || type === SLIDETYPE.quiz) {
 			return (
 				<div className={ styles.scoreWrapper }>
 					<span className={ styles.score }>{ score || 0 }/{ maxScore }</span>
@@ -78,7 +78,7 @@ class NavigationItem extends Component {
 	renderMetro() {
 		const { metro } = this.props;
 
-		if (!metro) {
+		if(!metro) {
 			return null;
 		}
 
@@ -102,7 +102,7 @@ class NavigationItem extends Component {
 	renderPointer() {
 		const { type, visited } = this.props;
 
-		if (type === SLIDETYPE.lesson) {
+		if(type === SLIDETYPE.lesson) {
 			return (
 				<span className={ classnames(styles.pointer, { [styles.complete]: visited }) }/>
 			);

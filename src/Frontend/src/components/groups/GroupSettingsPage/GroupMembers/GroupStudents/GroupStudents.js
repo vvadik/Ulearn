@@ -1,13 +1,12 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import getMoment from "../../../../../utils/getMoment";
+import getMoment from "src/utils/getMoment";
 import { Checkbox, Gapped } from "ui";
-import { Copy } from "icons/Copy";
-import { Trash } from "icons/Trash";
+import { Copy, Trash } from "icons";
 import Avatar from "../../../../common/Avatar/Avatar";
 import CopyStudentsModal from "../CopyStudentsModal/CopyStudentsModal";
 import Profile from '../Profile';
-import getGenderForm from "../../../../../utils/getGenderForm";
+import getGenderForm from "src/utils/getGenderForm";
 
 import styles from './groupStudents.less';
 

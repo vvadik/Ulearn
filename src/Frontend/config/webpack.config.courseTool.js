@@ -167,9 +167,10 @@ module.exports =  merge(base,{
 						options: {
 							sourceMap: shouldUseSourceMap,
 							modules: {
-								mode: 'global',
+								mode: 'local',
 								localIdentName: '[hash:base64:5]',
-							}
+							},
+							importLoaders: 2,
 						}
 					},
 					{
@@ -195,7 +196,7 @@ module.exports =  merge(base,{
 					{
 						loader: 'css-loader',
 						options: {
-							modules: true,
+							modules: 'global',
 							importLoaders: 1,
 						},
 					},

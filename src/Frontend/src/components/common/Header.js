@@ -1,12 +1,7 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 
-import { DocumentGroup } from "icons/DocumentGroup";
-import { DocumentSolid } from "icons/DocumentSolid";
-import { NotificationBell } from "icons/NotificationBell";
-import { User } from "icons/User";
-import { Warning } from "icons/Warning";
-import { Menu as MenuIcon } from "icons/Menu";
+import { DocumentGroup, DocumentSolid, NotificationBell, User, Warning, Menu as MenuIcon } from "icons";
 import { MenuHeader, MenuItem, MenuSeparator, Tooltip, Loader, DropdownMenu, } from "ui";
 import { DropdownContainer } from "ui/internal/DropdownContainer";
 import HeaderComponentErrorBoundary from "./Error/HeaderComponentErrorBoundary";

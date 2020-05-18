@@ -1,9 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { Ok } from "icons/Ok";
-import { Delete } from "icons/Delete";
-import { ArchiveUnpack } from "icons/ArchiveUnpack";
+import { Ok, Delete, ArchiveUnpack } from "icons";
 import { Kebab, MenuItem, Gapped } from "ui";
 import getPluralForm from "src/utils/getPluralForm";
 

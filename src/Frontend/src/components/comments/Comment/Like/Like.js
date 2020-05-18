@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { ThumbUp } from "icons/ThumbUp";
+import { ThumbUp } from "icons";
 
 import styles from "./Like.less";
 

@@ -2,14 +2,20 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import Navigation from "../Navigation";
-import AnyPage from '../../../pages/AnyPage';
-import { UrlError } from "../../common/Error/NotFoundErrorBoundary";
-import UnitFlashcardsPage from '../../../pages/course/UnitFlashcardsPage';
-import CourseFlashcardsPage from '../../../pages/course/CourseFlashcardsPage';
-import { flashcards, constructPathToSlide } from '../../../consts/routes';
-import { changeCurrentCourseAction } from "../../../actions/course";
-import { SLIDETYPE } from '../../../consts/general';
-import { SCORING_GROUP_IDS } from '../../../consts/scoringGroup';
+import AnyPage from 'src/pages/AnyPage';
+import UnitFlashcardsPage from 'src/pages/course/UnitFlashcardsPage';
+import CourseFlashcardsPage from 'src/pages/course/CourseFlashcardsPage';
+import { BlocksWrapper } from "src/components/course/Course/Slide/Blocks";
+import CommentsView from "src/components/comments/CommentsView/CommentsView";
+import Slide from './Slide/Slide';
+
+import { UrlError } from "src/components/common/Error/NotFoundErrorBoundary";
+import Error404 from "src/components/common/Error/Error404";
+import { Link } from "react-router-dom";
+
+import { flashcards, constructPathToSlide } from 'src/consts/routes';
+import { SLIDETYPE } from 'src/consts/general';
+import { SCORING_GROUP_IDS } from 'src/consts/scoringGroup';
 
 import classnames from 'classnames';
 

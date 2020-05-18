@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 
-import { Warning } from "icons/Warning";
+import { Warning } from "icons";
 import { Toast } from "ui";
 import Raven from 'raven-js';
 

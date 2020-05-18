@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from 'prop-types';
 import styles from './NextUnit.less';
 import { Link } from "react-router-dom";
-import { ArrowChevronRight } from "icons/ArrowChevronRight";
+import { ArrowChevronRight } from "icons";
 
 class NextUnit extends Component {
 	render() {

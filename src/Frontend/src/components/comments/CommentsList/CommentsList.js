@@ -4,7 +4,7 @@ import { userType, userRoles, commentPolicy } from "../commonPropTypes";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import { TABS } from "src/consts/general";
 import { debounce } from "debounce";
-import { CommentLite } from "icons/CommentLite";
+import { CommentLite } from "icons";
 import { Loader, Toast } from "ui";
 import Thread from "../Thread/Thread";
 import CommentSendForm from "../CommentSendForm/CommentSendForm";

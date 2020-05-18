@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import { Link } from 'ui';
-import { ArrowChevron2Left } from 'icons/ArrowChevron2Left';
+import { ArrowChevron2Left } from 'icons';
 
 import { groupAsStudentType, progressType } from '../../types';
 

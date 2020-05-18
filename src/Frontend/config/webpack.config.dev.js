@@ -80,8 +80,9 @@ module.exports = merge(base, {
 								options: {
 									modules: {
 										mode: 'local',
-										localIdentName: '[name]__[local]--[hash:base64:5]',
-									}
+										localIdentName: '[name]__[local]',
+									},
+									importLoaders: 1,
 								},
 							},
 							'less-loader',
@@ -94,7 +95,7 @@ module.exports = merge(base, {
 							{
 								loader: 'css-loader',
 								options: {
-									modules: true,
+									modules: 'global',
 									importLoaders: 1,
 								},
 							},
@@ -128,8 +129,8 @@ module.exports = merge(base, {
 			inject: true,
 			template: paths.appHtml,
 			chunksSortMode: (chunk1, chunk2) => {
-				if (chunk1 === 'oldBrowser') return -1;
-				if (chunk2 === 'oldBrowser') return 1;
+				if(chunk1 === 'oldBrowser') return -1;
+				if(chunk2 === 'oldBrowser') return 1;
 				return 0;
 			},
 		}),
