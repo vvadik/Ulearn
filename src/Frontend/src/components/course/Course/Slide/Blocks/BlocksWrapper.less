@@ -1,0 +1,155 @@
+@import "../../courseVariables";
+
+.wrapper {
+  &:first-child {
+    padding-top: 40px;
+  }
+
+  &:last-child {
+    padding-bottom: 40px;
+  }
+}
+
+
+.eyeClosedWrapper {
+  float: right;
+  font-size: 14px;
+  color: @orange;
+}
+
+.hiddenSlide {
+  &.showed {
+    background-color: @white;
+    border-right: 1px solid @lightOrange;
+    border-left: 1px solid @lightOrange;
+    border-bottom: 1px solid @lightOrange;
+  }
+}
+
+.header {
+  height: 33px;
+  padding: 8px 24px;
+  border-bottom: 1px solid @geinsboro;
+}
+
+.hiddenHeader {
+  .header;
+  border-bottom: 1px solid @lightOrange;
+  .hiddenBackgroundColor;
+
+  &.showed {
+    background-color: @white;
+    border: 1px solid @lightOrange;
+  }
+}
+
+
+.headerText {
+  color: @additionalColor;
+  font-style: italic;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.hiddenHeaderText {
+  .headerText;
+  font-size: 12px;
+  line-height: 16px;
+  color: @orange;
+  opacity: 0.7;
+}
+
+.hiddenSlideEye {
+  margin-right: 8px;
+}
+
+.hiddenBackgroundColor {
+  background-color: @lightYellow;
+}
+
+.withPaddings {
+  padding: 16px @phoneSlidePadding;
+
+  :not(:last-child)&.withoutBottomPaddigns{
+    padding-bottom: 0;
+  }
+}
+
+@media (min-width: @minTabletWidth) {
+  .headerText {
+    font-size: 16px;
+    line-height: 22px;
+  }
+
+  .withPaddings {
+    padding: @phoneSlidePadding;
+
+    :not(:last-child)&.withoutBottomPaddigns{
+      padding-bottom: 0;
+    }
+  }
+
+  .eyeClosedWrapper {
+    font-size: 16px;
+  }
+
+  .header {
+    height: 48px;
+    padding: 16px 24px;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+  }
+
+  .hiddenSlide {
+    border-bottom-left-radius: 24px;
+    border-bottom-right-radius: 24px;
+  }
+
+  .hiddenHeader {
+    border-top-right-radius: 24px;
+    border-top-left-radius: 24px;
+  }
+}
+
+@media (min-width: @minLaptopWidth) {
+  .header {
+    padding: 16px 40px;
+  }
+
+  .eyeClosedWrapper {
+    font-size: 20px;
+  }
+
+  .withPaddings {
+    padding-left: @laptopSlidePadding;
+    padding-right: @desktopSlidePadding;
+
+    &:last-child {
+      padding-bottom: @laptopSlidePadding;
+    }
+
+    :not(:last-child)&.withoutBottomPaddigns{
+      padding-bottom: 0;
+    }
+  }
+}
+
+@media (min-width: @minDesktopWidth) {
+  .header {
+    padding: 16px 56px;
+  }
+
+  .eyeClosedWrapper {
+    font-size: 22px;
+  }
+
+  .withPaddings {
+    padding-left: @desktopSlidePadding;
+    padding-right: @desktopSlidePadding;
+
+    :not(:last-child)&.withoutBottomPaddigns{
+      padding-bottom: 0;
+    }
+  }
+}

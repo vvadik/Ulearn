@@ -1,0 +1,102 @@
+@import "../../../courseVariables";
+
+.text {
+  max-width: @maxTextWidth;
+
+  font-family: @defaultFonts;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+:global {
+  div.tex {
+    font-size: 1.2em;
+    padding-bottom: 1em;
+  }
+}
+
+.text p {
+  margin: 0 0 10px;
+}
+
+.text h2 {
+  margin-top: 16px;
+  margin-bottom: 16px;
+
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 24px;
+}
+
+.text h3 {
+  margin-top: 16px;
+  margin-bottom: 16px;
+
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.text img {
+  max-width: 100%;
+}
+
+.text ol,.text ul {
+  margin-bottom: 1em;
+  padding: 0;
+  list-style: none;
+}
+
+.text li {
+  margin-bottom: 0.5em;
+  position: relative;
+  padding-left: 1.5em;
+}
+
+.text ul li:before {
+  content: '—';
+  position: absolute;
+  left: 0;
+}
+
+.text ol {
+  counter-reset: orderedList;
+}
+
+.text ol li:before {
+  counter-increment: orderedList;
+  content: counter(orderedList) '.';
+  position: absolute;
+  left: 0;
+}
+
+.text li img {
+  margin: 0.5em 0;
+}
+
+@media (min-width: @minTabletWidth) {
+  .text {
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  .text h2 {
+    margin-top: 32px;
+    margin-bottom: 16px;
+
+    font-weight: 600;
+    font-size: 32px;
+    line-height: 40px;
+  }
+
+  .text h3 {
+    margin-top: 24px;
+    margin-bottom: 16px;
+
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 28px;
+  }
+}

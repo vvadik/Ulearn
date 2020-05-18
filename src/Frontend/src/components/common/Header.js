@@ -102,10 +102,12 @@ class Header extends Component {
 	}
 
 	static getDerivedStateFromProps(props, state) {
-		const { account, courses } = props;
-		if(JSON.stringify(state.account) !== JSON.stringify(account) || JSON.stringify(state.courses) !== JSON.stringify(courses)) {
-			return Header.mapPropsToState(props);
+		const newState = Header.mapPropsToState(props);
+
+		if(JSON.stringify(newState) !== JSON.stringify(state)) {
+			return newState;
 		}
+
 		return null;
 	}
 
@@ -790,7 +792,8 @@ class ProfileLink extends Component {
 		if(isProblem) {
 			let firstProblem = this.props.account.accountProblems[0];
 			icon = (
-				<Tooltip trigger={ this.state.tooltipTrigger } closeButton={ true } pos="bottom center" onCloseClick={ this.closeTooltip } render={ () => (
+				<Tooltip trigger={ this.state.tooltipTrigger } closeButton={ true } pos="bottom center"
+						 onCloseClick={ this.closeTooltip } render={ () => (
 					<div style={ { width: '250px' } }>
 						{ firstProblem.description }
 					</div>

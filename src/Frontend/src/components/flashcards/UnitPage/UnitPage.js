@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
 
-import { Loader } from "ui";
+import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader";
 import UnitCard from "./UnitCard/UnitCard";
 import Guides from "../Guides/Guides";
 import ProgressBar from "../ProgressBar/ProgressBar";
@@ -59,8 +59,12 @@ class UnitPage extends Component {
 		const completedUnit = flashcards && statistics[rateTypes.notRated] === 0;
 		const dataLoaded = flashcards && !flashcardsLoading;
 
+		if(!dataLoaded) {
+			return (<CourseLoader/>);
+		}
+
 		return (
-			<Loader active={ flashcardsLoading } type={ 'big' }>
+			<React.Fragment>
 				{ unitTitle &&
 				<UnitCard
 					haveProgress={ completedUnit }
@@ -78,7 +82,7 @@ class UnitPage extends Component {
 					courseId={ courseId }
 					sendFlashcardRate={ sendFlashcardRate }
 				/> }
-			</Loader>
+			</React.Fragment>
 		);
 	}
 
@@ -93,7 +97,7 @@ class UnitPage extends Component {
 		}
 
 		return (
-			<footer>
+			<footer className={ styles.footer }>
 				<div className={ styles.progressBarContainer }>
 					<p className={ styles.progressBarTitle }>
 						Результаты последнего прохождения

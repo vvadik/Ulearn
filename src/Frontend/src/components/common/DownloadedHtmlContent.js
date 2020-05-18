@@ -1,6 +1,6 @@
 import React, { Component, PureComponent } from 'react';
 import { Helmet } from "react-helmet";
-import { Loader } from "ui";
+import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader";
 import * as PropTypes from "prop-types";
 import { saveAs } from "file-saver";
 import { connect } from "react-redux";
@@ -252,9 +252,7 @@ class DownloadedHtmlContent extends Component {
 			return <Error404/>;
 		if (this.state.loading) {
 			return (
-				<Loader type="big" active>
-					{ this.getContent() }
-				</Loader>
+				<CourseLoader/>
 			)
 		}
 

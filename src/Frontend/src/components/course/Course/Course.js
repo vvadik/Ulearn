@@ -146,7 +146,17 @@ class Course extends Component {
 			<main className={ wrapperClassName }>
 				{ slideTitle && <h1 className={ styles.title }> { slideTitle } </h1> }
 				<div className={ styles.slide }>
-					<Slide match={ this.props.match }/>
+					{
+						SlidePage === Slide
+							? <Slide
+								slideId={ currentSlideId }
+								courseId={ currentCourseId }
+							/>
+							: <BlocksWrapper score={ score }>
+								<SlidePage match={ this.props.match }/>
+							</BlocksWrapper>
+					}
+
 				</div>
 				{ currentSlideInfo && isNavMenuVisible && this.renderNavigationButtons(currentSlideInfo) }
 				{ currentSlideInfo && this.renderComments(currentSlideInfo.current) }
@@ -203,14 +213,14 @@ class Course extends Component {
 		const userRoles = { isSystemAdministrator, courseRole: roleByCourse, courseAccesses, };
 
 		return (
-			<div className={ styles.commentsWrapper }>
+			<BlocksWrapper className={ styles.commentsWrapper }>
 				<CommentsView user={ user }
 							  slideType={ currentSlide.type }
 							  slideId={ currentSlide.id }
 							  userRoles={ userRoles }
 							  courseId={ courseId }
 				/>
-			</div>
+			</BlocksWrapper>
 		)
 	}
 

@@ -1,0 +1,62 @@
+import React from 'react';
+
+import { UnControlled } from "react-codemirror2";
+
+import PropTypes from 'prop-types';
+import classNames from 'classnames';
+
+import 'codemirror/lib/codemirror';
+
+import styles from './CodeMirror.less';
+
+function CodeMirror({ language, code, className, }) {
+	const opts = {
+		mode: loadLanguageStyles(language),
+		lineNumbers: true,
+		readOnly: 'nocursor',
+		scrollbarStyle: 'null',
+		lineWrapping: true,
+	};
+
+	return (
+		<div className={ classNames(styles.wrapper, className) }>
+			<UnControlled
+				editorDidMount={ onEditorMount }
+				className={ styles.editor }
+				options={ opts }
+				value={ code }
+			/>
+		</div>
+	);
+
+	function onEditorMount(editor) {
+		editor.setSize('auto', 'auto');
+	}
+
+	function loadLanguageStyles(language) {
+		switch (language.toLowerCase()) {
+			case 'csharp':
+				require('codemirror/mode/clike/clike');
+				return `text/x-csharp`;
+			case 'java':
+				require('codemirror/mode/clike/clike');
+				return `text/x-java`;
+			case 'javascript':
+				require('codemirror/mode/javascript/javascript');
+				return `text/javascript`;
+			case 'jsx':
+				require('codemirror/mode/jsx/jsx');
+				return `text/jsx`;
+			default:
+				return 'text/html';
+		}
+	}
+}
+
+CodeMirror.propTypes = {
+	className: PropTypes.string,
+	language: PropTypes.string.isRequired,
+	code: PropTypes.string.isRequired,
+}
+
+export default CodeMirror;
