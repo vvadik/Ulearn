@@ -11,5 +11,6 @@ namespace Database.Repos
 		IEnumerable<Guid> GetVisibleUnitIds(Course course);
 		DateTime? GetNextUnitPublishTime(string courseId);
 		HashSet<string> GetVisibleCourses();
+		Task<bool> IsCourseVisibleForStudentsAsync(string courseId);
 	}
 }

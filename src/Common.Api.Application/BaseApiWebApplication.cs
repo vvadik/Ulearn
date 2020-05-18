@@ -61,6 +61,7 @@ namespace Ulearn.Common.Api
 					app.UseExceptionHandlingPolicies();
 
 					app.UseAuthentication();
+					app.UseAuthorization();
 					app.UseMvc();
 
 					/* Configure swagger documentation. Now it's available at /swagger/v1/swagger.json.

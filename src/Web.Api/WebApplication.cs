@@ -27,6 +27,7 @@ using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
 using Ulearn.Web.Api.Authorization;
 using Ulearn.Web.Api.Controllers.Notifications;
+using Ulearn.Web.Api.Controllers.Websockets;
 using Ulearn.Web.Api.Models;
 using Ulearn.Web.Api.Models.Binders;
 using Ulearn.Web.Api.Swagger;
@@ -52,6 +53,7 @@ namespace Ulearn.Web.Api
 			/* Initialize EntityFramework Profiler. See https://www.hibernatingrhinos.com/products/efprof/learn for details */
 			HibernatingRhinos.Profiler.Appender.EntityFramework.EntityFrameworkProfiler.Initialize();
 #endif
+			provider.GetService<WebsocketsEventSender>();
 			return Task.CompletedTask;
 		}
 
@@ -62,7 +64,9 @@ namespace Ulearn.Web.Api
 				builder
 					.WithOrigins(configuration.Web.Cors.AllowOrigins)
 					.AllowAnyMethod()
-					.WithHeaders("Authorization", "Content-Type", "Json-Naming-Strategy")
+					.WithHeaders("Authorization", "Content-Type", "Json-Naming-Strategy",
+						"X-Requested-With" // signalR
+					)
 					.WithExposedHeaders("Location")
 					.AllowCredentials();
 			});
@@ -70,11 +74,31 @@ namespace Ulearn.Web.Api
 
 		protected override IApplicationBuilder ConfigureWebApplication(IApplicationBuilder app)
 		{
-			//var database = app.ApplicationServices.GetService<UlearnDb>(); // NOTE: Миграции в Api отключены пока выполняются в Web
-			//database.MigrateToLatestVersion();
-			//var initialDataCreator = app.ApplicationServices.GetService<InitialDataCreator>();
-			//database.CreateInitialDataAsync(initialDataCreator);
+			// MigrateAndCreateInitialData(app); // NOTE: Миграции в Api отключены пока выполняются в Web
+			ConfigureWebsockets(app);
 			return app;
+		}
+
+		private static void MigrateAndCreateInitialData(IApplicationBuilder app)
+		{
+			var database = app.ApplicationServices.GetService<UlearnDb>();
+			database.MigrateToLatestVersion();
+			var initialDataCreator = app.ApplicationServices.GetService<InitialDataCreator>();
+			database.CreateInitialDataAsync(initialDataCreator);
+		}
+
+		private const string websocketsPath = "/ws";
+		private static void ConfigureWebsockets(IApplicationBuilder app)
+		{
+			
+			app.Map(
+				new PathString(websocketsPath), // Map применяет middleware только при обработке запросов по указанному префиксу пути
+				a =>
+				{
+					app.UseWebSockets();
+					app.UseRouting(); // Включает обработку UseEndpoints
+					app.UseEndpoints(endpoints => { endpoints.MapHub<WebsocketsHub>(websocketsPath); });
+				});
 		}
 
 		protected override void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment, ILogger logger)
@@ -98,6 +122,8 @@ namespace Ulearn.Web.Api
 
 			ConfigureAuthServices(services, configuration);
 
+			services.AddSignalR();
+
 			services.AddSwaggerExamplesFromAssemblyOf<WebApplication>();
 		}
 
@@ -118,8 +144,6 @@ namespace Ulearn.Web.Api
 					}
 				).AddApplicationPart(GetType().Assembly)
 				.AddControllersAsServices()
-				//.AddXmlSerializerFormatters() // Can't serialize dictionaries and classes without default constructor
-				//.AddXmlDataContractSerializerFormatters()
 				.AddNewtonsoftJson(opt =>
 					{
 						opt.SerializerSettings.ContractResolver = new ApiHeaderJsonContractResolver(new ApiHeaderJsonNamingStrategyOptions
@@ -150,6 +174,7 @@ namespace Ulearn.Web.Api
 			services.AddScoped<IAuthorizationHandler, CourseRoleAuthorizationHandler>();
 			services.AddScoped<IAuthorizationHandler, CourseAccessAuthorizationHandler>();
 			services.AddScoped<INotificationDataPreloader, NotificationDataPreloader>();
+			services.AddSingleton<WebsocketsEventSender, WebsocketsEventSender>();
 
 			services.AddDatabaseServices(logger);
 		}
@@ -200,6 +225,20 @@ namespace Ulearn.Web.Api
 					ValidIssuer = configuration.Web.Authentication.Jwt.Issuer,
 					ValidAudience = configuration.Web.Authentication.Jwt.Audience,
 					IssuerSigningKey = JwtBearerHelpers.CreateSymmetricSecurityKey(configuration.Web.Authentication.Jwt.IssuerSigningKey)
+				};
+				options.Events = new JwtBearerEvents // Jwt-токен в websocket передается через query string
+				{
+					OnMessageReceived = context =>
+					{
+						var path = context.HttpContext.Request.Path;
+						if (path.StartsWithSegments(websocketsPath))
+						{
+							var accessToken = context.Request.Query["access_token"];
+							if(!string.IsNullOrEmpty(accessToken))
+								context.Token = accessToken;
+						}
+						return Task.CompletedTask;
+					}
 				};
 			});
 

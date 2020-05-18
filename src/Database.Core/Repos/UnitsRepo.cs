@@ -7,6 +7,7 @@ using Database.Extensions;
 using Database.Models;
 using Database.Repos.CourseRoles;
 using Microsoft.AspNet.Identity;
+using Microsoft.EntityFrameworkCore;
 using Ulearn.Core.Courses;
 
 namespace Database.Repos
@@ -58,6 +59,20 @@ namespace Database.Repos
 				})
 				.Select(g => g.Key);
 			return new HashSet<string>(appearances, StringComparer.OrdinalIgnoreCase);
+		}
+
+		public async Task<bool> IsCourseVisibleForStudentsAsync(string courseId)
+		{
+			if (await courseManager.FindCourseAsync(courseId) == null)
+				return false;
+			var visibleUnitsIds = await db.UnitAppearances
+				.Where(u => u.CourseId == courseId)
+				.Where(u => u.PublishTime <= DateTime.Now)
+				.Select(u => u.UnitId)
+				.ToListAsync();
+			var units = (await courseManager.GetCourseAsync(courseId)).GetUnitsNotSafe().Select(u => u.Id).ToHashSet();
+			units.IntersectWith(visibleUnitsIds);
+			return units.Any();
 		}
 
 		public DateTime? GetNextUnitPublishTime(string courseId)

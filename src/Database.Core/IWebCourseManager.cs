@@ -6,8 +6,11 @@ using Ulearn.Core.Courses;
 
 namespace Database
 {
+	public delegate void CourseChangedEventHandler(string courseId);
+
 	public interface IWebCourseManager
 	{
+		event CourseChangedEventHandler CourseChangedEvent;
 		Task<Course> GetCourseAsync(string courseId);
 		Task<IEnumerable<Course>> GetCoursesAsync();
 		void UpdateCourseVersion(string courseId, Guid versionId);
