@@ -1,12 +1,15 @@
 import translateTextareaToCode from 'src/codeTranslator/codemirror';
 import translateTextToKatex from 'src/codeTranslator/katex';
 
-export default function translateCode(element, settings = {}) {
+export default function translateCode(element, settings = {}, excludeTranslatorsByIds = {}) {
 	for (const { id, selector, translateFunction } of translators) {
+		if(excludeTranslatorsByIds[id]) {
+			continue;
+		}
 		const elements = selector(element);
 
 		for (const element of elements) {
-			if (element.style.display === 'none') {
+			if(element.style.display === 'none') {
 				continue;
 			}
 
