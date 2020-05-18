@@ -1,20 +1,21 @@
-import React, {Component} from 'react';
-import {BrowserRouter} from 'react-router-dom';
+import React, { Component } from 'react';
+import { BrowserRouter } from 'react-router-dom';
 
 import ErrorBoundary from "./components/common/ErrorBoundary";
 import NotFoundErrorBoundary from "./components/common/Error/NotFoundErrorBoundary";
 import YandexMetrika from "./components/common/YandexMetrika";
 import Header from "./components/common/Header";
-import {Provider, connect} from "react-redux";
+import { Provider, connect } from "react-redux";
 import thunkMiddleware from "redux-thunk";
-import {createLogger} from "redux-logger";
-import {applyMiddleware, createStore} from "redux";
+import { createLogger } from "redux-logger";
+import { applyMiddleware, createStore } from "redux";
 
 import Router from "./Router";
 
 import rootReducer from "./redux/reducers";
 import api from "./api";
-import { Toast } from "ui";
+import { ThemeContext, Toast } from "ui";
+import theme from "src/uiTheme";
 
 
 let loggerMiddleware = createLogger();
@@ -49,7 +50,7 @@ let store = configureStore({
 
 // Update notifications count each minute
 setInterval(() => {
-	if (store.getState().account.isAuthenticated)
+	if(store.getState().account.isAuthenticated)
 		store.dispatch(api.notifications.getNotificationsCount(store.getState().notifications.lastTimestamp))
 }, 60 * 1000);
 
@@ -62,8 +63,8 @@ class UlearnApp extends Component {
 		let isHeaderVisible = !isLti;
 
 		return (
-			<Provider store={store}>
-				<InternalUlearnApp isHeaderVisible={isHeaderVisible}/>
+			<Provider store={ store }>
+				<InternalUlearnApp isHeaderVisible={ isHeaderVisible }/>
 			</Provider>
 		)
 	}
@@ -86,7 +87,7 @@ class InternalUlearnApp extends Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		if (!prevProps.account.isAuthenticated && this.props.account.isAuthenticated) {
+		if(!prevProps.account.isAuthenticated && this.props.account.isAuthenticated) {
 			this.props.getNotificationsCount();
 		}
 	}
@@ -95,21 +96,23 @@ class InternalUlearnApp extends Component {
 		const isHeaderVisible = this.props.isHeaderVisible;
 		return (
 			<BrowserRouter>
-				<ErrorBoundary>
-					{isHeaderVisible &&
-					<React.Fragment>
-						<Header initializing={this.state.initializing}/>
-					</React.Fragment>
-					}
-					<NotFoundErrorBoundary>
-						{!this.state.initializing && // Avoiding bug: don't show page while initializing.
-						// Otherwise we make two GET requests sequentially.
-						// Unfortunately some our GET handlers are not idempotent (i.e. /Admin/CheckNextExerciseForSlide)
-						<Router/>
+				<ThemeContext.Provider value={ theme }>
+					<ErrorBoundary>
+						{ isHeaderVisible &&
+						<React.Fragment>
+							<Header initializing={ this.state.initializing }/>
+						</React.Fragment>
 						}
-					</NotFoundErrorBoundary>
-					<YandexMetrika/>
-				</ErrorBoundary>
+						<NotFoundErrorBoundary>
+							{ !this.state.initializing && // Avoiding bug: don't show page while initializing.
+							// Otherwise we make two GET requests sequentially.
+							// Unfortunately some our GET handlers are not idempotent (i.e. /Admin/CheckNextExerciseForSlide)
+							<Router/>
+							}
+						</NotFoundErrorBoundary>
+						<YandexMetrika/>
+					</ErrorBoundary>
+				</ThemeContext.Provider>
 			</BrowserRouter>
 		);
 	}
