@@ -29,16 +29,16 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			this.commentPoliciesRepo = commentPoliciesRepo;
 		}
 
-		public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
 		{
 			var courseId = (string)context.ActionArguments["courseId"];
-			if (!courseManager.HasCourse(courseId))
+			if (!await courseManager.HasCourseAsync(courseId))
 			{
 				context.Result = NotFound(new ErrorResponse($"Course {courseId} not found"));
-				return Task.CompletedTask;
+				return;
 			}
 
-			return base.OnActionExecutionAsync(context, next);
+			await base.OnActionExecutionAsync(context, next);
 		}
 
 		/// <summary>

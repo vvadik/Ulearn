@@ -1,18 +1,14 @@
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Xml.Serialization;
-using Ulearn.Core.Courses.Slides.Blocks.Api;
 using Ulearn.Core.Model.Edx.EdxComponents;
 
 namespace Ulearn.Core.Courses.Slides.Blocks
 {
 	[XmlType("tex")]
-	[DataContract]
-	public class TexBlock : SlideBlock, IApiSlideBlock
+	public class TexBlock : SlideBlock
 	{
 		[XmlElement("line")]
-		[DataMember(Name = "lines")]
 		public string[] TexLines { get; set; }
 
 		public TexBlock(string[] texLines)
@@ -44,9 +40,5 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		{
 			return string.Join("\n", TexLines);
 		}
-
-		[XmlIgnore]
-		[DataMember(Name = "type")]
-		public string Type { get; set; } = "tex";
 	}
 }

@@ -26,7 +26,9 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
 using Ulearn.Web.Api.Authorization;
+using Ulearn.Web.Api.Clients;
 using Ulearn.Web.Api.Controllers.Notifications;
+using Ulearn.Web.Api.Controllers.Slides;
 using Ulearn.Web.Api.Models;
 using Ulearn.Web.Api.Models.Binders;
 using Ulearn.Web.Api.Swagger;
@@ -70,18 +72,17 @@ namespace Ulearn.Web.Api
 
 		protected override IApplicationBuilder ConfigureWebApplication(IApplicationBuilder app)
 		{
-			var database = app.ApplicationServices.GetService<UlearnDb>();
-			database.MigrateToLatestVersion();
-			var initialDataCreator = app.ApplicationServices.GetService<InitialDataCreator>();
-			database.CreateInitialDataAsync(initialDataCreator);
-
+			//var database = app.ApplicationServices.GetService<UlearnDb>(); // NOTE: Миграции в Api отключены пока выполняются в Web
+			//database.MigrateToLatestVersion();
+			//var initialDataCreator = app.ApplicationServices.GetService<InitialDataCreator>();
+			//database.CreateInitialDataAsync(initialDataCreator);
 			return app;
 		}
 
 		protected override void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment, ILogger logger)
 		{
 			var configuration = hostingEnvironment.SecretConfigurationProvider.Get<WebApiConfiguration>(hostingEnvironment.SecretConfigurationSource);
-			
+
 			base.ConfigureServices(services, hostingEnvironment, logger);
 
 			/* TODO (andgein): use UlearnDbFactory here */
@@ -151,6 +152,8 @@ namespace Ulearn.Web.Api
 			services.AddScoped<IAuthorizationHandler, CourseRoleAuthorizationHandler>();
 			services.AddScoped<IAuthorizationHandler, CourseAccessAuthorizationHandler>();
 			services.AddScoped<INotificationDataPreloader, NotificationDataPreloader>();
+			services.AddSingleton<IUlearnVideoAnnotationsClient, UlearnVideoAnnotationsClient>();
+			services.AddScoped<SlideRenderer, SlideRenderer>();
 
 			services.AddDatabaseServices(logger);
 		}

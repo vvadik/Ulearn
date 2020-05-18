@@ -1,16 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.Security.Principal;
-using uLearn;
+using System.Threading.Tasks;
 using Ulearn.Core.Courses;
-using Ulearn.Core.Courses.Units;
 
 namespace Database.Repos
 {
 	public interface IUnitsRepo
 	{
-		List<Unit> GetVisibleUnits(Course course, IPrincipal user);
-		List<Unit> GetVisibleUnits(Course course);
+		Task<IEnumerable<Guid>> GetVisibleUnitIdsAsync(Course course, string userId);
+		IEnumerable<Guid> GetVisibleUnitIds(Course course);
 		DateTime? GetNextUnitPublishTime(string courseId);
 		HashSet<string> GetVisibleCourses();
 	}

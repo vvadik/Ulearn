@@ -274,6 +274,7 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("List");
 
 			var course = courseManager.GetCourse(courseId);
+
 			return View(new UserCourseModel(course, user, db));
 		}
 

@@ -1,5 +1,6 @@
-﻿using System.Runtime.Serialization;
-using Ulearn.Core.Courses.Slides.Blocks.Api;
+﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
+using Ulearn.Web.Api.Models.Responses.SlideBlocks;
 
 namespace Ulearn.Web.Api.Models.Common
 {
@@ -7,6 +8,6 @@ namespace Ulearn.Web.Api.Models.Common
 	public class ApiSlideInfo : ShortSlideInfo
 	{
 		[DataMember]
-		public IApiSlideBlock[] Blocks { get; set; }
+		public List<IApiSlideBlock> Blocks { get; set; }
 	}
 }

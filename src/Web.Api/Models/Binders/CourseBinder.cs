@@ -17,14 +17,14 @@ namespace Ulearn.Web.Api.Models.Binders
 	 */
 	public class CourseBinder : IModelBinder
 	{
-		private readonly WebCourseManager courseManager;
+		private readonly IWebCourseManager courseManager;
 
-		public CourseBinder(WebCourseManager courseManager)
+		public CourseBinder(IWebCourseManager courseManager)
 		{
 			this.courseManager = courseManager;
 		}
 
-		public Task BindModelAsync(ModelBindingContext bindingContext)
+		public async Task BindModelAsync(ModelBindingContext bindingContext)
 		{
 			if (bindingContext == null)
 				throw new ArgumentNullException(nameof(bindingContext));
@@ -38,20 +38,19 @@ namespace Ulearn.Web.Api.Models.Binders
 			var valueProviderResult = bindingContext.ValueProvider.GetValue(modelName);
 
 			if (valueProviderResult == ValueProviderResult.None)
-				return Task.CompletedTask;
+				return;
 
 			bindingContext.ModelState.SetModelValue(modelName, valueProviderResult);
 			var value = valueProviderResult.FirstValue;
 
 			// Check if the argument value is null or empty
 			if (string.IsNullOrEmpty(value))
-				return Task.CompletedTask;
+				return;
 
-			var model = courseManager.FindCourse(value);
+			var model = await courseManager.FindCourseAsync(value);
 			if (model == null)
 				bindingContext.ModelState.TryAddModelError(modelName, $"Course {value} not found");
 			bindingContext.Result = model == null ? ModelBindingResult.Failed() : ModelBindingResult.Success(model);
-			return Task.CompletedTask;
 		}
 	}
 

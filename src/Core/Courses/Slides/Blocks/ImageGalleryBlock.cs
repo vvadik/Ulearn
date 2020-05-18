@@ -2,21 +2,17 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Xml.Serialization;
-using Ulearn.Core.Courses.Slides.Blocks.Api;
 using Ulearn.Core.Model.Edx.EdxComponents;
 
 namespace Ulearn.Core.Courses.Slides.Blocks
 {
 	[XmlType("galleryImages")]
-	public class ImageGalleryBlock : SlideBlock, IApiSlideBlock
+	public class ImageGalleryBlock : SlideBlock
 	{
 		[XmlElement("image")]
-		[IgnoreDataMember]
 		public string[] RelativeToUnitDirectoryImagePaths { get; set; }
-
-		[DataMember(Name = "imageUrls")]
+		
 		[XmlIgnore]
 		public string[] ImageUrls {
 			get
@@ -25,8 +21,7 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 			}
 			set { }
 		}
-
-		[IgnoreDataMember]
+		
 		[XmlIgnore]
 		public string BaseUrl;
 
@@ -61,9 +56,5 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 			var urlName = slide.NormalizedGuid + componentIndex;
 			return new GalleryComponent(urlName, displayName, urlName, ImageUrls);
 		}
-
-		[XmlIgnore]
-		[DataMember(Name = "type")]
-		public string Type { get; set; } = "imageGallery";
 	}
 }

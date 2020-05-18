@@ -1,19 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Serialization;
 using System.Xml.Serialization;
-using Ulearn.Core.Courses.Slides.Blocks.Api;
 using Ulearn.Core.Model.Edx.EdxComponents;
 
 namespace Ulearn.Core.Courses.Slides.Blocks
 {
 	[XmlType("youtube")]
-	[DataContract]
-	public class YoutubeBlock : SlideBlock, IApiSlideBlock
+	public class YoutubeBlock : SlideBlock
 	{
 		[XmlText]
-		[DataMember(Name = "videoId")]
 		public string VideoId { get; set; }
 
 		public YoutubeBlock(string videoId)
@@ -46,9 +42,5 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		{
 			return $"https://youtube.com/watch?v={VideoId}";
 		}
-
-		[XmlIgnore]
-		[DataMember(Name = "type")]
-		public string Type { get; set; } = "youtube";
 	}
 }

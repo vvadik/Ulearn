@@ -24,7 +24,7 @@ namespace Database.Repos.Groups
 		private readonly IGroupMembersRepo groupMembersRepo;
 		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IUsersRepo usersRepo;
-		private readonly WebCourseManager courseManager;
+		private readonly IWebCourseManager courseManager;
 		private readonly ILogger logger;
 
 		public GroupAccessesRepo(
@@ -32,7 +32,7 @@ namespace Database.Repos.Groups
 			IGroupsRepo groupsRepo, ISystemAccessesRepo systemAccessesRepo, ICoursesRepo coursesRepo, IGroupMembersRepo groupMembersRepo,
 			IUsersRepo usersRepo,
 			ICourseRolesRepo courseRolesRepo,
-			WebCourseManager courseManager,
+			IWebCourseManager courseManager,
 			ILogger logger
 		)
 		{

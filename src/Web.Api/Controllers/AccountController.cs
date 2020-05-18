@@ -40,7 +40,7 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly WebApiConfiguration configuration;
 		private readonly IUnitsRepo unitsRepo;
 
-		public AccountController(ILogger logger, IOptions<WebApiConfiguration> options, WebCourseManager courseManager, UlearnDb db,
+		public AccountController(ILogger logger, IOptions<WebApiConfiguration> options, IWebCourseManager courseManager, UlearnDb db,
 			UlearnUserManager userManager, SignInManager<ApplicationUser> signInManager,
 			ICourseRolesRepo courseRolesRepo, ICoursesRepo coursesRepo, IUsersRepo usersRepo, ISystemAccessesRepo systemAccessesRepo, IGroupMembersRepo groupMembersRepo,
 			IUnitsRepo unitsRepo)

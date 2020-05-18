@@ -48,7 +48,8 @@ namespace uLearn.Web.Controllers
 
 		private TocModel CreateGuestTocModel(Course course, Guid? currentSlideId)
 		{
-			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
+			var visibleUnitsIds = unitsRepo.GetVisibleUnitIds(course, User);
+			var visibleUnits = course.GetUnits(visibleUnitsIds);
 			var builder = new TocModelBuilder(
 				s => Url.RouteUrl("Course.SlideById", new { courseId = course.Id, slideId = s.Url }),
 				s => 0,
@@ -69,7 +70,8 @@ namespace uLearn.Web.Controllers
 
 		private TocModel CreateTocModel(Course course, Guid? currentSlideId, string userId)
 		{
-			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
+			var visibleUnitsIds = unitsRepo.GetVisibleUnitIds(course, User);
+			var visibleUnits = course.GetUnits(visibleUnitsIds);
 			var visited = visitsRepo.GetIdOfVisitedSlides(course.Id, userId);
 			var scoresForSlides = visitsRepo.GetScoresForSlides(course.Id, userId);
 
@@ -123,7 +125,8 @@ namespace uLearn.Web.Controllers
 				return Content("");
 			var userId = User.Identity.GetUserId();
 			var nextIsAcceptedSolutions = !onSolutionsSlide && slide is ExerciseSlide && visitsRepo.IsSkippedOrPassed(courseId, slide.Id, userId) && !((ExerciseSlide)slide).Exercise.HideShowSolutionsButton;
-			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
+			var visibleUnitsIds = unitsRepo.GetVisibleUnitIds(course, User);
+			var visibleUnits = course.GetUnits(visibleUnitsIds);
 			var nextSlide = course.Slides.FirstOrDefault(s => s.Index > slide.Index && visibleUnits.Contains(s.Info.Unit));
 			var prevSlide = course.Slides.LastOrDefault(s => s.Index < slide.Index && visibleUnits.Contains(s.Info.Unit));
 

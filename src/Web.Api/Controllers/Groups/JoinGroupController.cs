@@ -22,7 +22,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		private readonly IGroupsRepo groupsRepo;
 		private readonly IGroupMembersRepo groupMembersRepo;
 
-		public JoinGroupController(ILogger logger, WebCourseManager courseManager, UlearnDb db,
+		public JoinGroupController(ILogger logger, IWebCourseManager courseManager, UlearnDb db,
 			IUsersRepo usersRepo,
 			IGroupsRepo groupsRepo, IGroupMembersRepo groupMembersRepo)
 			: base(logger, courseManager, db, usersRepo)

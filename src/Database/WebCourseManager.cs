@@ -32,12 +32,20 @@ namespace Database
 			{
 				course = base.GetCourse(courseId);
 			}
-			catch (Exception e) when (e is KeyNotFoundException || e is CourseNotFoundException)
+			catch (Exception e) when (e is KeyNotFoundException || e is CourseNotFoundException || e is CourseLoadingException)
 			{
 				course = null;
 			}
+			catch (AggregateException e)
+			{
+				var ie = e.InnerException;
+				if (ie is KeyNotFoundException || ie is CourseNotFoundException || ie is CourseLoadingException)
+					course = null;
+				else
+					throw;
+			}
 
-			if (IsCourseVersionWasUpdatedRecent(courseId))
+			if (IsCourseVersionWasUpdatedRecent(courseId) || CourseIsBroken(courseId))
 				return course ?? throw new KeyNotFoundException($"Key {courseId} not found");
 
 			courseVersionFetchTime[courseId] = DateTime.Now;

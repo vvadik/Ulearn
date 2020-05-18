@@ -13,12 +13,12 @@ namespace Database.Repos.Groups
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
 		private readonly IVisitsRepo visitsRepo;
 		private readonly IUserQuizzesRepo userQuizzesRepo;
-		private readonly WebCourseManager courseManager;
+		private readonly IWebCourseManager courseManager;
 		private readonly ILogger logger;
 
 		public ManualCheckingsForOldSolutionsAdder(
 			IUserSolutionsRepo userSolutionsRepo, ISlideCheckingsRepo slideCheckingsRepo, IVisitsRepo visitsRepo, IUserQuizzesRepo userQuizzesRepo,
-			WebCourseManager courseManager, ILogger logger)
+			IWebCourseManager courseManager, ILogger logger)
 		{
 			this.userSolutionsRepo = userSolutionsRepo;
 			this.slideCheckingsRepo = slideCheckingsRepo;
@@ -38,7 +38,7 @@ namespace Database.Repos.Groups
 		{
 			logger.Information($"Создаю ручные проверки для всех решения пользователя {userId} в курсе {courseId}");
 
-			var course = courseManager.GetCourse(courseId);
+			var course = await courseManager.GetCourseAsync(courseId);
 
 			/* For exercises */
 			var acceptedSubmissionsBySlide = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, userId)

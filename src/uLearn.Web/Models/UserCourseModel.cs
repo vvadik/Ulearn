@@ -4,7 +4,6 @@ using System.Linq;
 using Database.DataContexts;
 using Database.Models;
 using Ulearn.Core.Courses;
-using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Courses.Units;
@@ -18,7 +17,10 @@ namespace uLearn.Web.Models
 			Course = course;
 			User = user;
 
-			var visits = db.Visits.Where(v => v.UserId == user.Id && v.CourseId == course.Id).GroupBy(v => v.SlideId).ToDictionary(g => g.Key, g => g.FirstOrDefault());
+			var visits = db.Visits
+				.Where(v => v.UserId == user.Id && v.CourseId == course.Id)
+				.GroupBy(v => v.SlideId)
+				.ToDictionary(g => g.Key, g => g.FirstOrDefault());
 			var unitResults = new Dictionary<Guid, UserCourseUnitModel>();
 			foreach (var slide in Course.Slides)
 			{
@@ -57,8 +59,8 @@ namespace uLearn.Web.Models
 					res.Quizes.Earned += score;
 				}
 			}
-
-			Units = course.Units.Select(unit => unitResults[unit.Id]).ToArray();
+			
+			Units = course.GetUnitsNotSafe().Select(unit => unitResults[unit.Id]).ToArray();
 			Total = new UserCourseUnitModel
 			{
 				Total = new ProgressModel(),

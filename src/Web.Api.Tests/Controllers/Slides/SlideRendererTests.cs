@@ -1,34 +1,42 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
 using NUnit.Framework;
+using Serilog;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
-using Ulearn.Core.Courses.Slides.Blocks;
-using Ulearn.Core.Courses.Slides.Blocks.Api;
 using Ulearn.Core.Courses.Units;
+using Ulearn.Web.Api.Clients;
+using Ulearn.Web.Api.Controllers.Slides;
+using Ulearn.Web.Api.Models.Responses.SlideBlocks;
 
-namespace Ulearn.Core.Tests.Courses.Slides
+namespace Web.Api.Tests.Controllers.Slides
 {
-	public class ApiSlideBlocksTests
+	public class ApiSlideBlocksTests : BaseControllerTests
 	{
-		private const string testDataDirectory = "Courses/Slides/TestData/";
-		private XmlSlideLoader loader;
+		private const string testDataDirectory = "Controllers/Slides/TestData/";
+		private readonly ILogger logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
+		private SlideRenderer slideRenderer;
+		private IUlearnVideoAnnotationsClient videoAnnotationsClient;
 		private CourseSettings courseSettings;
 		private Unit unit;
+		private XmlSlideLoader loader;
 
 		[OneTimeSetUp]
 		public void OneTimeSetUp()
 		{
 			Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
-
+			videoAnnotationsClient = Mock.Of<IUlearnVideoAnnotationsClient>();
+			slideRenderer = new SlideRenderer(logger, videoAnnotationsClient);
 			loader = new XmlSlideLoader();
 			courseSettings = new CourseSettings(CourseSettings.DefaultSettings);
 			courseSettings.Scoring.Groups.Add("ScoringGroup1", new ScoringGroup { Id = "ScoringGroup1" });
 			unit = new Unit(UnitSettings.CreateByTitle("Unit title", courseSettings), new DirectoryInfo(testDataDirectory));
 		}
-
+		
 		private Slide LoadSlideFromXmlFile(string filename)
 		{
 			var slideFile = new DirectoryInfo(testDataDirectory).GetFile(filename);
@@ -49,6 +57,15 @@ namespace Ulearn.Core.Tests.Courses.Slides
 			}
 		}
 
+		private IApiSlideBlock[] GetApiSlideBlocks(Slide slide, bool removeHiddenBlocks)
+		{
+			var context = new SlideRenderContext("course", slide, "/TestData", removeHiddenBlocks,
+				"googleDoc", Mock.Of<IUrlHelper>());
+			return slide.Blocks
+				.SelectMany(b => slideRenderer.ToApiSlideBlocks(b, context).Result)
+				.ToArray();
+		}
+
 		[Test]
 		[TestCase("SimpleSlideWithMarkdownBlocks.xml", false, 6)]
 		[TestCase("SimpleSlideWithMarkdownBlocks.xml", true, 4)]
@@ -65,8 +82,8 @@ namespace Ulearn.Core.Tests.Courses.Slides
 			var slide = TryLoadSlide("SlideWithSpoilerBlockAndMarkdown.xml");
 			var apiSlideBlocks = GetApiSlideBlocks(slide, true);
 			Assert.AreEqual(1, apiSlideBlocks.Length);
-			var spoilerBlock = (SpoilerBlock)apiSlideBlocks[0];
-			Assert.AreEqual(4, spoilerBlock.ApiBlocks.Count);
+			var spoilerBlock = (SpoilerBlockResponse)apiSlideBlocks[0];
+			Assert.AreEqual(4, spoilerBlock.InnerBlocks.Count);
 		}
 
 		[Test]
@@ -75,7 +92,7 @@ namespace Ulearn.Core.Tests.Courses.Slides
 			var slide = TryLoadSlide("SlideWithCodeInMarkdown.xml");
 			var apiSlideBlocks = GetApiSlideBlocks(slide, true);
 			Assert.AreEqual(3, apiSlideBlocks.Length);
-			if (apiSlideBlocks.OfType<CodeBlock>().Any(cb => cb.Code.Contains("&lt;")))
+			if (apiSlideBlocks.OfType<CodeBlockResponse>().Any(cb => cb.Code.Contains("&lt;")))
 				Assert.Fail();
 		}
 
@@ -85,17 +102,8 @@ namespace Ulearn.Core.Tests.Courses.Slides
 			var slide = TryLoadSlide("SlideWithImageInMarkdown.xml");
 			var apiSlideBlocks = GetApiSlideBlocks(slide, true);
 			Assert.AreEqual(3, apiSlideBlocks.Length);
-			var img = apiSlideBlocks[1] as ImageGalleryBlock;
+			var img = apiSlideBlocks[1] as ImageGalleryBlockResponse;
 			Assert.AreEqual(new []{"/TestData/manipulator.png"}, img.ImageUrls);
-			
-		}
-
-		private static IApiSlideBlock[] GetApiSlideBlocks(Slide slide, bool removeHiddenBlocks)
-		{
-			var context = new ApiSlideBlockBuildingContext("course", slide.Id, "/TestData", removeHiddenBlocks);
-			return slide.Blocks
-				.SelectMany(b => b.ToApiSlideBlocks(context))
-				.ToArray();
 		}
 	}
 }
