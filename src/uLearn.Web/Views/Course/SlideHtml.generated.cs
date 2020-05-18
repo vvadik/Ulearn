@@ -2409,14 +2409,13 @@ WriteLiteralTo(__razor_helper_writer, "\t\t\t<button");
 
 WriteLiteralTo(__razor_helper_writer, " type=\"button\"");
 
-WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 28263), Tuple.Create("\"", 28390)
+WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 28263), Tuple.Create("\"", 28380)
 , Tuple.Create(Tuple.Create("", 28271), Tuple.Create("try-again-button", 28271), true)
 , Tuple.Create(Tuple.Create(" ", 28287), Tuple.Create("btn", 28288), true)
 , Tuple.Create(Tuple.Create(" ", 28291), Tuple.Create("btn-primary", 28292), true)
-, Tuple.Create(Tuple.Create(" ", 28303), Tuple.Create("no-rounds", 28304), true)
-, Tuple.Create(Tuple.Create(" ", 28313), Tuple.Create("exercise-version-link", 28314), true)
-                         , Tuple.Create(Tuple.Create(" ", 28335), Tuple.Create<System.Object, System.Int32>( model.IsLti ? "exercise-controls_button-long" : ""
-, 28336), false)
+, Tuple.Create(Tuple.Create(" ", 28303), Tuple.Create("exercise-version-link", 28304), true)
+               , Tuple.Create(Tuple.Create(" ", 28325), Tuple.Create<System.Object, System.Int32>( model.IsLti ? "exercise-controls_button-long" : ""
+, 28326), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, " data-version-id=\"-1\"");
@@ -2431,18 +2430,17 @@ WriteLiteralTo(__razor_helper_writer, "\t\t\t<button");
 
 WriteLiteralTo(__razor_helper_writer, " type=\"button\"");
 
-WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 28484), Tuple.Create("\"", 28592)
-, Tuple.Create(Tuple.Create("", 28492), Tuple.Create("run-solution-button", 28492), true)
-, Tuple.Create(Tuple.Create(" ", 28511), Tuple.Create("btn", 28512), true)
-, Tuple.Create(Tuple.Create(" ", 28515), Tuple.Create("btn-primary", 28516), true)
-, Tuple.Create(Tuple.Create(" ", 28527), Tuple.Create("no-rounds", 28528), true)
-      , Tuple.Create(Tuple.Create(" ", 28537), Tuple.Create<System.Object, System.Int32>( model.IsLti ? "exercise-controls_button-long" : ""
-, 28538), false)
+WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 28474), Tuple.Create("\"", 28572)
+, Tuple.Create(Tuple.Create("", 28482), Tuple.Create("run-solution-button", 28482), true)
+, Tuple.Create(Tuple.Create(" ", 28501), Tuple.Create("btn", 28502), true)
+, Tuple.Create(Tuple.Create(" ", 28505), Tuple.Create("btn-primary", 28506), true)
+, Tuple.Create(Tuple.Create(" ", 28517), Tuple.Create<System.Object, System.Int32>( model.IsLti ? "exercise-controls_button-long" : ""
+, 28518), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, " data-url=\"");
 
-                                                                                                                            WriteTo(__razor_helper_writer,  model.RunSolutionUrl);
+                                                                                                                  WriteTo(__razor_helper_writer,  model.RunSolutionUrl);
 
 WriteLiteralTo(__razor_helper_writer, "\"");
 
@@ -2497,13 +2495,12 @@ WriteLiteralTo(__razor_helper_writer, "\t\t\t\t<button");
 
 WriteLiteralTo(__razor_helper_writer, " type=\"button\"");
 
-WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 29047), Tuple.Create("\"", 29150)
-, Tuple.Create(Tuple.Create("", 29055), Tuple.Create("show-output-button", 29055), true)
-, Tuple.Create(Tuple.Create(" ", 29073), Tuple.Create("btn", 29074), true)
-, Tuple.Create(Tuple.Create(" ", 29077), Tuple.Create("btn-default", 29078), true)
-, Tuple.Create(Tuple.Create(" ", 29089), Tuple.Create("no-rounds", 29090), true)
-         , Tuple.Create(Tuple.Create(" ", 29099), Tuple.Create<System.Object, System.Int32>( model.IsShowOutputButtonActive ? "active" : ""
-, 29100), false)
+WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 29027), Tuple.Create("\"", 29120)
+, Tuple.Create(Tuple.Create("", 29035), Tuple.Create("show-output-button", 29035), true)
+, Tuple.Create(Tuple.Create(" ", 29053), Tuple.Create("btn", 29054), true)
+, Tuple.Create(Tuple.Create(" ", 29057), Tuple.Create("btn-default", 29058), true)
+, Tuple.Create(Tuple.Create(" ", 29069), Tuple.Create<System.Object, System.Int32>( model.IsShowOutputButtonActive ? "active" : ""
+, 29070), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t\t\tПоказать вывод\r\n\t\t\t\t</button>\r\n");
@@ -2516,11 +2513,11 @@ WriteLiteralTo(__razor_helper_writer, "\t\t\t\t<button");
 
 WriteLiteralTo(__razor_helper_writer, " type=\"button\"");
 
-WriteLiteralTo(__razor_helper_writer, " class=\"btn btn-default giveup-btn no-rounds\"");
+WriteLiteralTo(__razor_helper_writer, " class=\"btn btn-default giveup-btn\"");
 
-WriteAttributeTo(__razor_helper_writer, "onclick", Tuple.Create(" onclick=\"", 29328), Tuple.Create("\"", 29371)
-            , Tuple.Create(Tuple.Create("", 29338), Tuple.Create<System.Object, System.Int32>( model.AcceptedSolutionsAction
-, 29338), false)
+WriteAttributeTo(__razor_helper_writer, "onclick", Tuple.Create(" onclick=\"", 29288), Tuple.Create("\"", 29331)
+  , Tuple.Create(Tuple.Create("", 29298), Tuple.Create<System.Object, System.Int32>( model.AcceptedSolutionsAction
+, 29298), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t\t\tЧужие решения\r\n\t\t\t\t</button>\r\n");
@@ -2533,7 +2530,7 @@ WriteLiteralTo(__razor_helper_writer, "\t\t\t\t<button");
 
 WriteLiteralTo(__razor_helper_writer, " type=\"button\"");
 
-WriteLiteralTo(__razor_helper_writer, " class=\"btn btn-default reset-btn no-rounds\"");
+WriteLiteralTo(__razor_helper_writer, " class=\"btn btn-default reset-btn\"");
 
 WriteLiteralTo(__razor_helper_writer, " onclick=\"cleanUserCode()\"");
 

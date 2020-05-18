@@ -2,7 +2,6 @@
 @using uLearn.Web.Extensions
 @using uLearn.Web.Views.Course
 @using Ulearn.Common.Extensions
-@using Ulearn.Core.Courses.Slides
 @using Ulearn.Core.Courses.Slides.Exercises
 @using Ulearn.Core.Courses.Slides.Quizzes
 @model CoursePageModel
@@ -13,97 +12,75 @@
 	ViewBag.CourseId = Model.CourseId;
 
 	ViewBag.Meta = Model.Slide.Meta;
-
-	var mainDivClass = "";
 }
 
-
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+	<p class="alert alert-danger">@Model.Error</p>
+}
+@if (Model.Slide is QuizSlide)
+{
+	@Html.Action("Quiz", "Quiz", new
+	{
+		slide = (QuizSlide)Model.Slide,
+		courseId = Model.CourseId,
+		userId = Model.UserId,
+		isGuest = Model.IsGuest,
+		manualQuizCheckQueueItem = (ManualQuizChecking)Model.ManualChecking
+	})
+}
+else
+{
+	if (Model.ManualChecking != null)
+	{
+		<p class="exercise-status">
+			@Model.ManualChecking.User.VisibleName
+			@if (Model.ContextManualCheckingUserGroups + Model.ContextManualCheckingUserArchivedGroups != "")
+			{
+                @* These comments are dirty hack for removing spaces between words *@
+				<span>
+					(@*
+			      *@
+					@if (Model.ContextManualCheckingUserGroups != "")
+					{
+						@Model.ContextManualCheckingUserGroups@*
+			      *@
+					}
+					@*
+			      *@
+					@if (Model.ContextManualCheckingUserGroups != "" && Model.ContextManualCheckingUserArchivedGroups != "")
+					{
+@*
+			           *@<text>;</text>
+					}
+					@*
+                  *@
+					@if (Model.ContextManualCheckingUserArchivedGroups != "")
+					{
+						<text>архивные группы: @Model.ContextManualCheckingUserArchivedGroups</text> @*
+			      *@
+					}
+					@*
+			   *@),
+				</span>
+			}
+			else
+			{
+				<span>,</span>
+			}
+			@Model.ManualChecking.Timestamp.ToPrettyString()
+		</p>
+	}
+	@SlideHtml.Blocks(Model.BlockRenderContext, Html)
+}
 @if (Model.ManualChecking == null)
 {
-	mainDivClass = "slide-container";
+	if (Model.IsGuest)
+	{
+		@Html.Partial("_LoginForContinue")
+	}
 }
 
-<div class="@mainDivClass">
-	<div class="container body-content">
-		<div class="row">
-			<div class="slide">
-				@if (Model.Score.Item2 != 0)
-				{
-					<h1>
-						<span class="score">@ShowScore(Model.Score)</span>
-					</h1>
-				}
-				@if (!string.IsNullOrEmpty(Model.Error))
-				{
-					<p class="alert alert-danger">@Model.Error</p>
-				}
-				@if (Model.Slide is QuizSlide)
-				{
-					@Html.Action("Quiz", "Quiz", new
-					{
-						slide = (QuizSlide)Model.Slide,
-						courseId = Model.CourseId,
-						userId = Model.UserId,
-						isGuest = Model.IsGuest,
-						manualQuizCheckQueueItem = (ManualQuizChecking)Model.ManualChecking
-					})
-				}
-				else
-				{
-					if (Model.ManualChecking != null)
-					{
-						<p class="exercise-status">
-							@Model.ManualChecking.User.VisibleName
-							@if (Model.ContextManualCheckingUserGroups + Model.ContextManualCheckingUserArchivedGroups != "")
-							{
-	                            @* These comments are dirty hack for removing spaces between words *@
-								<span>
-									(@*
-							      *@
-									@if (Model.ContextManualCheckingUserGroups != "")
-									{
-										@Model.ContextManualCheckingUserGroups@*
-							      *@
-									}
-									@*
-							      *@
-									@if (Model.ContextManualCheckingUserGroups != "" && Model.ContextManualCheckingUserArchivedGroups != "")
-									{
-@*
-							           *@<text>;</text>
-									}
-									@*
-                                  *@
-									@if (Model.ContextManualCheckingUserArchivedGroups != "")
-									{
-										<text>архивные группы: @Model.ContextManualCheckingUserArchivedGroups</text> @*
-							      *@
-									}
-									@*
-							   *@),
-								</span>
-							}
-							else
-							{
-								<span>,</span>
-							}
-							@Model.ManualChecking.Timestamp.ToPrettyString()
-						</p>
-					}
-					@SlideHtml.Blocks(Model.BlockRenderContext, Html)
-				}
-
-			</div>
-			@if (Model.ManualChecking == null)
-			{
-				if (Model.IsGuest)
-				{
-					@Html.Partial("_LoginForContinue")
-				}
-			}
-		</div>
-	</div>
-</div>
 
 @section scripts{
 	@if (!Model.IsGuest)

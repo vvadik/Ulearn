@@ -7,13 +7,8 @@
 @if (!Model.IsLti)
 {
 	<div class="slide-container">
-		<div class="container body-content">
-			<div class="row">
-				<h1 class='page-header'>Решения</h1>
-				@AcceptedSolutionsHtml.AcceptedSolutions(Model)
-				@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.CourseId, slideId = Model.Slide.Id, onSolutionsSlide = true, isGuest = false })
-			</div>
-		</div>
+		<h2 class='page-header'>Решения</h2>
+		@AcceptedSolutionsHtml.AcceptedSolutions(Model)
 	</div>
 }
 else

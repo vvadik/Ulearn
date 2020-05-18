@@ -1,4 +1,4 @@
-﻿@* Generator: MvcHelper GeneratePrettyNames: true DisableLinePragmas: true *@
+@* Generator: MvcHelper GeneratePrettyNames: true DisableLinePragmas: true *@
 @using System.Linq
 @using Database.Models
 @using uLearn.Web.Clients
@@ -766,13 +766,13 @@
 	<div class="solution-control btn-group ctrl-group">
 		@if (!model.IsCodeEditableAndSendable)
 		{
-			<button type="button" class="try-again-button btn btn-primary no-rounds exercise-version-link @( model.IsLti ? "exercise-controls_button-long" : "")" data-version-id="-1">
+			<button type="button" class="try-again-button btn btn-primary exercise-version-link @( model.IsLti ? "exercise-controls_button-long" : "")" data-version-id="-1">
 				Ещё раз
 			</button>
 		}
 		else
 		{
-			<button type="button" class="run-solution-button btn btn-primary no-rounds @( model.IsLti ? "exercise-controls_button-long" : "")" data-url="@( model.RunSolutionUrl)">
+			<button type="button" class="run-solution-button btn btn-primary @( model.IsLti ? "exercise-controls_button-long" : "")" data-url="@( model.RunSolutionUrl)">
 				Отправить
 			</button>
 		}
@@ -784,19 +784,19 @@
 			</button>
 			if (model.CanShowOutput)
 			{
-				<button type="button" class="show-output-button btn btn-default no-rounds @( model.IsShowOutputButtonActive ? "active" : "")">
+				<button type="button" class="show-output-button btn btn-default @( model.IsShowOutputButtonActive ? "active" : "")">
 					Показать вывод
 				</button>
 			}
 			if (!model.IsLti && !model.HideShowSolutionsButton)
 			{
-				<button type="button" class="btn btn-default giveup-btn no-rounds" onclick="@( model.AcceptedSolutionsAction)">
+				<button type="button" class="btn btn-default giveup-btn" onclick="@( model.AcceptedSolutionsAction)">
 					Чужие решения
 				</button>
 			}
 			if (model.IsCodeEditableAndSendable)
 			{
-				<button type="button" class="btn btn-default reset-btn no-rounds" onclick="cleanUserCode()">
+				<button type="button" class="btn btn-default reset-btn" onclick="cleanUserCode()">
 					Начать с начала
 				</button>
 			}

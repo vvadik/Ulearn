@@ -182,28 +182,8 @@
 .legacy-page .revealed {
 	background-color: #e7f1ff;
 	color: #000 !important;
-	margin: -16px -24px;
 	padding: 16px 24px;
-}
-
-@media (min-width: 800px) {
-	.legacy-page .revealed {
-		margin: -24px;
-		padding: 24px;
-		border-radius: 24px;
-	}
-}
-@media (min-width: 1280px) {
-	.legacy-page .revealed {
-		margin: -40px -40px -40px -56px;
-		padding: 40px 40px 40px 56px;
-	}
-}
-@media (min-width: 1600px) {
-	.legacy-page .revealed {
-		margin: -40px -56px -40px -56px;
-		padding: -40px -56px -40px -56px;
-	}
+	border-radius: 24px;
 }
 
 .legacy-page .revealed .CodeMirror {
@@ -330,6 +310,8 @@
 
 /* ReSharper disable Html.CssClassElementsNotFound */
 .legacy-page .CodeMirror {
+	border: 1px solid #E5E5E5;
+	border-radius: 8px;
 	height: auto;
 	margin-bottom: 15px;
 	line-height: 1.3em;
@@ -571,7 +553,6 @@
 
 .legacy-page .solution-control {
 	width: 100%;
-	margin-top: -15px;
 	margin-left: 0 !important;
 }
 
@@ -632,6 +613,7 @@
 	color: #333;
 	font-size: 13pt;
 	margin-bottom: 30px;
+	border-radius: 8px;
 }
 
 .legacy-page .exercise-block-status,
@@ -1579,4 +1561,8 @@ body.lti-component {
 
 .legacy-page .row{
 	margin: 0;
+}
+
+.legacy-page .page-header{
+	margin-top: 0;
 }
