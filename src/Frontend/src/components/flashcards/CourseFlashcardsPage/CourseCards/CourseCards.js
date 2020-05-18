@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from "prop-types";
 
-import { LockClosed } from 'icons/LockClosed';
-import { Button } from "ui";
+import { LockClosed } from 'icons';
+import { Button, } from "ui";
 import { Link } from 'react-router-dom';
 
 import styles from './courseCards.less';
 import classNames from 'classnames';
 import getCardsPluralForm from "../../getCardsPluralForm";
-import { constructPathToSlide } from "../../../../consts/routes";
+import { constructPathToSlide } from "src/consts/routes";
 
 
 const emptyUnitCardStyle = classNames(styles.unitCard, styles.emptyUnitCard);
