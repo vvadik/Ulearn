@@ -2,6 +2,7 @@
 @using uLearn.Web.Extensions
 @using uLearn.Web.Views.Course
 @using Ulearn.Common.Extensions
+@using Ulearn.Core.Courses.Slides
 @using Ulearn.Core.Courses.Slides.Exercises
 @using Ulearn.Core.Courses.Slides.Quizzes
 @model CoursePageModel
@@ -13,7 +14,7 @@
 
 	ViewBag.Meta = Model.Slide.Meta;
 }
-
+<div class="slide-container">
 @if (!string.IsNullOrEmpty(Model.Error))
 {
 	<p class="alert alert-danger">@Model.Error</p>
@@ -80,7 +81,7 @@ else
 		@Html.Partial("_LoginForContinue")
 	}
 }
-
+</div>
 
 @section scripts{
 	@if (!Model.IsGuest)
@@ -111,6 +112,3 @@ else
 		</script>
 	}
 }
-
-@helper ShowScore(Tuple<int, int> score)
-{ @( score.Item2 == 0 ? "" : string.Format("{0} из {1}", score.Item1.PluralizeInRussian(RussianPluralizationOptions.Score), score.Item2)) }

@@ -1182,6 +1182,7 @@
     <Content Include="Content\buttons.css" />
     <Content Include="Content\certificates.css" />
     <Content Include="Content\code_review.css" />
+    <Content Include="Content\comments.css" />
     <Content Include="Content\course_statistics.css" />
     <Content Include="Content\course_versions.css" />
     <Content Include="Content\exercise\student-submissions.css" />
