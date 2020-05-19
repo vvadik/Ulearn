@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Database.Models;
 using Database.Repos;
 using JetBrains.Annotations;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
@@ -20,13 +21,13 @@ namespace Database
 		private readonly ConcurrentDictionary<string, DateTime> courseVersionFetchTime = new ConcurrentDictionary<string, DateTime>();
 		private DateTime lastCoursesListFetchTime = DateTime.MinValue;
 		private readonly TimeSpan fetchCourseVersionEvery = TimeSpan.FromSeconds(10);
-		private readonly IServiceProvider serviceProvider;
+		private readonly IServiceScopeFactory serviceScopeFactory;
 
-		public WebCourseManager(ILogger logger, IServiceProvider serviceProvider)
+		public WebCourseManager(ILogger logger, IServiceScopeFactory serviceScopeFactory)
 			: base(GetCoursesDirectory())
 		{
 			this.logger = logger;
-			this.serviceProvider = serviceProvider;
+			this.serviceScopeFactory = serviceScopeFactory;
 		}
 
 		private readonly object @lock = new object();
@@ -84,14 +85,17 @@ namespace Database
 
 			courseVersionFetchTime[courseId] = DateTime.Now;
 
-			var coursesRepo = (CoursesRepo)serviceProvider.GetService(typeof(ICoursesRepo));
-			var publishedVersion = await coursesRepo.GetPublishedCourseVersionAsync(courseId).ConfigureAwait(false);
+			using (var scope = serviceScopeFactory.CreateScope())
+			{
+				var coursesRepo = (CoursesRepo)scope.ServiceProvider.GetService(typeof(ICoursesRepo));
+				var publishedVersion = await coursesRepo.GetPublishedCourseVersionAsync(courseId).ConfigureAwait(false);
 
-			if (publishedVersion == null)
-				return course ?? throw new CourseNotFoundException(courseId);
+				if (publishedVersion == null)
+					return course ?? throw new CourseNotFoundException(courseId);
 
-			ReloadCourseIfLoadedAndPublishedVersionsAreDifferent(courseId, publishedVersion);
-			return base.GetCourse(courseId);
+				ReloadCourseIfLoadedAndPublishedVersionsAreDifferent(courseId, publishedVersion);
+				return base.GetCourse(courseId);
+			}
 		}
 
 		public override IEnumerable<Course> GetCourses()
@@ -109,26 +113,29 @@ namespace Database
 			if (lastCoursesListFetchTime > DateTime.Now.Subtract(fetchCourseVersionEvery))
 				return base.GetCourses();
 
-			var coursesRepo = (CoursesRepo)serviceProvider.GetService(typeof(ICoursesRepo));
-			var publishedCourseVersions = await coursesRepo.GetPublishedCourseVersionsAsync().ConfigureAwait(false);
-
-			lastCoursesListFetchTime = DateTime.Now;
-			foreach (var courseVersion in publishedCourseVersions)
+			using (var scope = serviceScopeFactory.CreateScope())
 			{
-				if (CourseIsBroken(courseVersion.CourseId))
-					continue;
-				try
-				{
-					ReloadCourseIfLoadedAndPublishedVersionsAreDifferent(courseVersion.CourseId, courseVersion);
-				}
-				catch (FileNotFoundException)
-				{
-					/* Sometimes zip-archive with course has been deleted already. It's strange but ok */
-					logger.Warning("Это странно, что я не смог загрузить с диска курс, который, если верить базе данных, был опубликован. Но ничего, просто проигнорирую");
-				}
-			}
+				var coursesRepo = (CoursesRepo)scope.ServiceProvider.GetService(typeof(ICoursesRepo));
+				var publishedCourseVersions = await coursesRepo.GetPublishedCourseVersionsAsync().ConfigureAwait(false);
 
-			return base.GetCourses();
+				lastCoursesListFetchTime = DateTime.Now;
+				foreach (var courseVersion in publishedCourseVersions)
+				{
+					if (CourseIsBroken(courseVersion.CourseId))
+						continue;
+					try
+					{
+						ReloadCourseIfLoadedAndPublishedVersionsAreDifferent(courseVersion.CourseId, courseVersion);
+					}
+					catch (FileNotFoundException)
+					{
+						/* Sometimes zip-archive with course has been deleted already. It's strange but ok */
+						logger.Warning("Это странно, что я не смог загрузить с диска курс, который, если верить базе данных, был опубликован. Но ничего, просто проигнорирую");
+					}
+				}
+
+				return base.GetCourses();
+			}
 		}
 
 		private bool IsCourseVersionWasUpdatedRecent(string courseId)
