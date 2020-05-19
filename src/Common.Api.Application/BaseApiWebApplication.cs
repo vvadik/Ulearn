@@ -45,7 +45,7 @@ namespace Ulearn.Common.Api
 			builder.SetupWebHost(webHostBuilder => webHostBuilder
 				.UseKestrel()
 				.ConfigureServices(s => ConfigureServices(s, hostingEnvironment, logger))
-				.UseSerilog()
+				.UseSerilog(logger)
 				.UseEnvironment(hostingEnvironment.ApplicationIdentity.Environment)
 				.Configure(app =>
 				{
