@@ -1794,6 +1794,20 @@ namespace Database.Migrations
                     b.ToTable("TempCourses");
                 });
 
+            modelBuilder.Entity("Database.Models.TempCourseError", b =>
+                {
+                    b.Property<string>("CourseId")
+                        .HasColumnType("nvarchar(64)")
+                        .HasMaxLength(64);
+
+                    b.Property<string>("Error")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CourseId");
+
+                    b.ToTable("TempCourseErrors");
+                });
+
             modelBuilder.Entity("Database.Models.TextBlob", b =>
                 {
                     b.Property<string>("Hash")
