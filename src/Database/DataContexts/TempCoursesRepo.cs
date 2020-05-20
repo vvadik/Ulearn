@@ -30,7 +30,8 @@ namespace Database.DataContexts
 			{
 				CourseId = courseId,
 				AuthorId = authorId,
-				LoadingTime = DateTime.Now
+				LoadingTime = DateTime.Now,
+				LastUpdateTime = DateTime.Now
 			};
 			var result = db.TempCourses.Add(tempCourse);
 			await db.SaveChangesAsync();
@@ -44,6 +45,15 @@ namespace Database.DataContexts
 				return;
 
 			course.LoadingTime = DateTime.Now;
+			await db.SaveChangesAsync();
+		}
+		public async Task UpdateTempCourseLastUpdateTime(string courseId)
+		{
+			var course = db.TempCourses.Find(courseId);
+			if (course == null)
+				return;
+
+			course.LastUpdateTime = DateTime.Now;
 			await db.SaveChangesAsync();
 		}
 	}

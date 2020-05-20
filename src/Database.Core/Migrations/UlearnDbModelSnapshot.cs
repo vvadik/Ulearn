@@ -1781,6 +1781,9 @@ namespace Database.Migrations
                         .HasColumnType("nvarchar(64)")
                         .HasMaxLength(64);
 
+                    b.Property<DateTime>("LastUpdateTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("LoadingTime")
                         .HasColumnType("datetime2");
 

@@ -11,6 +11,8 @@ namespace Database.Models
 
 		[Required]
 		public DateTime LoadingTime { get; set; }
+		
+		public DateTime LastUpdateTime { get; set; }
 
 		[Required]
 		[StringLength(64)]
