@@ -32,31 +32,48 @@ namespace CourseToolHotReloader.DirectoryWorkers
 
 				zip.AddEntry("deleted.txt", deletedFileContent);
 
-				zip.Save($"{guid.ToString()}.zip");
+				
+				var ms = new MemoryStream();
+				zip.Save(ms);
 			}
 
+			
+#if DEBUG
+			using (var zip1 = new ZipFile())
+			{
+				foreach (var update in courseUpdates)
+				{
+					if (Directory.Exists(update.FullPath))
+					{
+						zip1.AddDirectory(update.FullPath, update.RelativePath);
+					}
+
+					if (File.Exists(update.FullPath))
+					{
+						zip1.AddFile(update.FullPath, Path.GetDirectoryName(update.RelativePath));
+					}
+				}
+				zip1.AddEntry("deleted.txt", deletedFileContent);
+				zip1.Save($"../{guid.ToString()}.zip");
+				Console.WriteLine($"DEBUG is on ../{guid.ToString()}.zip was created");
+			}
+#endif
+			
 			return guid;
 		}
 
 		public static MemoryStream CreateZipByFolder(string pathToFolder)
 		{
-
-			/*using (var zip1 = ZipFile(zipFile.FullName, new ReadOptions { Encoding = Encoding.GetEncoding(866) }))
-			{
-			}
-			*/
-
 			using var zip = new ZipFile(Encoding.UTF8);
 			zip.AddDirectory(pathToFolder);
-
 			var ms = new MemoryStream();
-
 			zip.Save(ms);
 
 #if DEBUG
 			using var zip1 = new ZipFile();
 			zip1.AddDirectory(pathToFolder);
 			zip1.Save("../temp.zip");
+			Console.WriteLine("DEBUG is on ../temp.zip was created");
 #endif
 			return ms;
 		}

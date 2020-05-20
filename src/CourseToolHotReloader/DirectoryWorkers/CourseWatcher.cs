@@ -1,9 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using CourseToolHotReloader.Dtos;
-using CourseToolHotReloader.UpdateQuery;
 
 namespace CourseToolHotReloader.DirectoryWorkers
 {
@@ -14,41 +10,30 @@ namespace CourseToolHotReloader.DirectoryWorkers
 
 	public class CourseWatcher : ICourseWatcher
 	{
-		private readonly ICourseUpdateQuery courseUpdateQuery;
+		private readonly ISendOnlyChangedStrategy sendOnlyChangedStrategy;
+		private readonly ISendFullCourseStrategy sendFullCourseStrategy;
 		private readonly IConfig config;
-		private readonly Action debouncedSendUpdates;
-		private readonly Action debouncedSendFullCourse;
 
-		public CourseWatcher(ICourseUpdateQuery courseUpdateQuery, ICourseUpdateSender courseUpdateSender, IConfig config)
+		public CourseWatcher(ISendOnlyChangedStrategy sendOnlyChangedStrategy, ISendFullCourseStrategy sendFullCourseStrategy, IConfig config)
 		{
-			this.courseUpdateQuery = courseUpdateQuery;
+			this.sendOnlyChangedStrategy = sendOnlyChangedStrategy;
+			this.sendFullCourseStrategy = sendFullCourseStrategy;
 			this.config = config;
-			debouncedSendUpdates = Debounce(courseUpdateSender.SendCourseUpdates);
-			debouncedSendFullCourse = Debounce(courseUpdateSender.SendFullCourse);
 		}
 
 		public void StartWatch(bool sendFullDirectoryOnChange)
 		{
 			if (sendFullDirectoryOnChange)
 			{
-				WatchDirectory(config.Path, ChangedForSendAll, ChangedForSendAll, ChangedForSendAll, ChangedForSendAll);
+				WatchDirectory(config.Path, sendFullCourseStrategy);
 			}
 			else
 			{
-				WatchDirectory(config.Path, Changed, Created, Deleted, Renamed);
+				WatchDirectory(config.Path, sendOnlyChangedStrategy);
 			}
 		}
 
-		private ICourseUpdate BuildCourseUpdateBuFileSystemEvent(FileSystemEventArgs fileSystemEventArgs)
-		{
-			var relativePath = fileSystemEventArgs.FullPath.Replace(config.Path, "");
-
-			var courseUpdate = CourseUpdateBuilder.Build(fileSystemEventArgs.Name, fileSystemEventArgs.FullPath, relativePath);
-			return courseUpdate;
-		}
-
-		private static void WatchDirectory(string directory,
-			FileSystemEventHandler changed, FileSystemEventHandler created, FileSystemEventHandler deleted, RenamedEventHandler renamed)
+		private static void WatchDirectory(string directory, IWatchActionStrategy strategy)
 		{
 			using var watcher = new FileSystemWatcher
 			{
@@ -60,10 +45,10 @@ namespace CourseToolHotReloader.DirectoryWorkers
 				IncludeSubdirectories = true
 			};
 
-			watcher.Changed += changed;
-			watcher.Created += created;
-			watcher.Deleted += deleted;
-			watcher.Renamed += renamed;
+			watcher.Changed += strategy.Changed;
+			watcher.Created += strategy.Created;
+			watcher.Deleted += strategy.Deleted;
+			watcher.Renamed += strategy.Renamed;
 
 			watcher.EnableRaisingEvents = true;
 
@@ -71,64 +56,6 @@ namespace CourseToolHotReloader.DirectoryWorkers
 			while (Console.Read() != 'q') // todo не могу вынести
 			{
 			}
-		}
-
-		private void Renamed(object sender, RenamedEventArgs e)
-		{
-			var relativePath = e.OldFullPath.Replace(config.Path, "");
-			var deletedCourseUpdate = CourseUpdateBuilder.Build(e.OldName, e.OldFullPath, relativePath);
-			courseUpdateQuery.RegisterDelete(deletedCourseUpdate);
-
-			var courseUpdate = BuildCourseUpdateBuFileSystemEvent(e);
-			courseUpdateQuery.RegisterCreate(courseUpdate);
-
-			debouncedSendUpdates();
-		}
-
-		private void Deleted(object sender, FileSystemEventArgs e)
-		{
-			var courseUpdate = BuildCourseUpdateBuFileSystemEvent(e);
-			courseUpdateQuery.RegisterDelete(courseUpdate);
-			debouncedSendUpdates();
-		}
-
-		private void Created(object sender, FileSystemEventArgs e)
-		{
-			var courseUpdate = BuildCourseUpdateBuFileSystemEvent(e);
-			courseUpdateQuery.RegisterCreate(courseUpdate);
-			debouncedSendUpdates();
-		}
-
-		private void ChangedForSendAll(object sender, FileSystemEventArgs e)
-		{
-			debouncedSendFullCourse();
-		}
-
-		private void Changed(object sender, FileSystemEventArgs e)
-		{
-			if (Directory.Exists(e.FullPath))
-				return; //todo немного странно
-			var courseUpdate = BuildCourseUpdateBuFileSystemEvent(e);
-			courseUpdateQuery.RegisterUpdate(courseUpdate);
-			debouncedSendUpdates();
-		}
-
-
-		private static Action Debounce(Action func, int milliseconds = 5000)
-		{
-			CancellationTokenSource cancelTokenSource = null;
-			return () =>
-			{
-				cancelTokenSource?.Cancel();
-				cancelTokenSource = new CancellationTokenSource();
-
-				Task.Delay(milliseconds, cancelTokenSource.Token)
-					.ContinueWith(t =>
-					{
-						if (t.IsCompletedSuccessfully)
-							func();
-					}, TaskScheduler.Default);
-			};
 		}
 	}
 }

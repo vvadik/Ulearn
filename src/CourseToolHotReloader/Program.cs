@@ -1,11 +1,11 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using Autofac;
 using CommandLine;
 using CourseToolHotReloader.ApiClient;
+using CourseToolHotReloader.Authorize;
 using CourseToolHotReloader.DirectoryWorkers;
-using CourseToolHotReloader.Dtos;
-using CourseToolHotReloader.UpdateQuery;
 
 namespace CourseToolHotReloader
 {
@@ -15,9 +15,9 @@ namespace CourseToolHotReloader
 
 		private static void Main(string[] args)
 		{
-			ConfigureAutofac();
+			container = ConfigureAutofac.Build();
 
-			Parser.Default.ParseArguments<Options>(args).WithParsed(Process);
+			Parser.Default.ParseArguments<Options>(args).WithParsed(ParseOption);
 
 			Console.WriteLine("Press 'q' to quit");
 			while (Console.Read() != 'q')
@@ -25,40 +25,28 @@ namespace CourseToolHotReloader
 			}
 		}
 
-		private static void ConfigureAutofac()
+
+		private static void ParseOption(Options options)
 		{
-			var containerBuilder = new ContainerBuilder();
-			containerBuilder.RegisterType<CourseUpdateQuery>().As<ICourseUpdateQuery>().SingleInstance();
-			containerBuilder.RegisterType<Config>().As<IConfig>().SingleInstance();
-			containerBuilder.RegisterType<UlearnApiClient>().As<IUlearnApiClient>().SingleInstance();
-			containerBuilder.RegisterType<CourseUpdateSender>().As<ICourseUpdateSender>().SingleInstance();
-			containerBuilder.RegisterType<CourseWatcher>().As<ICourseWatcher>().SingleInstance();
-			container = containerBuilder.Build();
+			var task = ParseOptionAsync(options);
+			task.Wait();
 		}
 
-		private static void Process(Options options)
+		private static async Task ParseOptionAsync(Options options)
 		{
+			await container.Resolve<IAuthorizer>().SignIn(); // нужно вынести
+
 			var config = container.Resolve<IConfig>();
 
 			config.Path = Directory.GetCurrentDirectory();
 			config.CourseId = options.CourseId;
 
-			var loginPasswordParameters = new LoginPasswordParameters
-			{
-				Login = options.Login,
-				Password = options.Password
-			};
-
-			var getJwtTokenTask = HttpMethods.GetJwtToken(loginPasswordParameters);
-			config.JwtToken = getJwtTokenTask.Result; // todo
-
 			if (!options.CourseIdAlreadyExist)
 			{
-				var createCourseTask = HttpMethods.CreateCourse(config.JwtToken.Token, config.CourseId);
-				createCourseTask.Wait();
+				await HttpMethods.CreateCourse(config.JwtToken.Token, config.CourseId);
 			}
 
-			container.Resolve<IUlearnApiClient>().SendFullCourse(config.Path, config.JwtToken.Token, config.CourseId);
+			await container.Resolve<IUlearnApiClient>().SendFullCourse(config.Path, config.JwtToken.Token, config.CourseId);
 
 			var sendFullArchive = options.SendFullArchive;
 			container.Resolve<ICourseWatcher>().StartWatch(sendFullArchive);

@@ -23,7 +23,6 @@ namespace CourseToolHotReloader.ApiClient
 		public async Task SendFullCourse(string path, string token, string courseId)
 		{
 			var ms = ZipUpdater.CreateZipByFolder(path);
-			Console.WriteLine($"{ms}.zip created");
 
 			await HttpMethods.UploadCourse(ms, token, courseId);
 
