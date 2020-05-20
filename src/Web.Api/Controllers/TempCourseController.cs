@@ -59,8 +59,6 @@ namespace Ulearn.Web.Api.Controllers
 			await coursesRepo.AddCourseVersionAsync(tmpCourseId, versionId, userId, null, null, null, null).ConfigureAwait(false);
 			await coursesRepo.MarkCourseVersionAsPublishedAsync(versionId).ConfigureAwait(false);
 			await tempCoursesRepo.AddTempCourse(tmpCourseId, userId);
-			var courseFile = courseManager.GetStagingCourseFile(tmpCourseId);
-			//await coursesRepo.AddCourseFile(tmpCourseId, versionId, courseFile.ReadAllContent()).ConfigureAwait(false);
 			await NotifyAboutPublishedCourseVersion(tmpCourseId, versionId, userId).ConfigureAwait(false);
 			return Ok($"course with id {tmpCourseId} successfully created");
 		}
@@ -100,29 +98,25 @@ namespace Ulearn.Web.Api.Controllers
 			if (fileName == null || !fileName.ToLower().EndsWith(".zip"))
 				throw new Exception();
 
-			var (versionId, error) = await UploadCourse(tmpCourseId, file.OpenReadStream().ToArray(), User.Identity.GetUserId()).ConfigureAwait(false);
+			var (versionId, uploadingError) = await UploadCourse(tmpCourseId, file.OpenReadStream().ToArray(), User.Identity.GetUserId()).ConfigureAwait(false);
+
+			var error = await TryPublishChanges(tmpCourseId, versionId);
 			if (error != null)
 			{
-				var errorMessage = error.Message.ToLowerFirstLetter();
-				while (error.InnerException != null)
-				{
-					errorMessage += $"\n\n{error.InnerException.Message}";
-					error = error.InnerException;
-				}
+				await tempCoursesRepo.UpdateOrAddTempCourseError(tmpCourseId, error);
+				return BadRequest(error);
 			}
 
-			await PublishVersion(tmpCourseId, versionId);
+			await tempCoursesRepo.MarkTempCourseAsNotErrored(tmpCourseId);
 			await tempCoursesRepo.UpdateTempCourseLoadingTime(tmpCourseId);
 			return Ok($"course with id {tmpCourseId} successfully updated");
 		}
 
-		private async Task PublishVersion(string courseId, Guid versionId)
+		private async Task<string> TryPublishChanges(string courseId, Guid versionId)
 		{
 			var versionFile = courseManager.GetCourseVersionFile(versionId);
 			var courseFile = courseManager.GetStagingCourseFile(courseId);
 			//var oldCourse = courseManager.GetCourse(courseId); //я закометил эту строчку не просто так, с ней не работает
-
-			//await coursesRepo.AddCourseFile(courseId, versionId, courseFile.ReadAllContent()).ConfigureAwait(false);
 
 			/* First, try to load course from LRU-cache or zip file */
 			var version = courseManager.GetVersion(versionId);
@@ -137,17 +131,40 @@ namespace Ulearn.Web.Api.Controllers
 			/* and move course from version's directory to courses's directory */
 			var extractedVersionDirectory = courseManager.GetExtractedVersionDirectory(versionId);
 			var extractedCourseDirectory = courseManager.GetExtractedCourseDirectory(courseId);
-			courseManager.MoveCourse(
-				version,
-				extractedVersionDirectory,
-				extractedCourseDirectory);
+
+			//remember what in extractedVersionDirectory and what we should delete
+			courseManager.CopyTempCourse(version, extractedVersionDirectory, extractedCourseDirectory);
+			//and delete that should be deleted
+
 			await coursesRepo.MarkCourseVersionAsPublishedAsync(versionId);
 			await NotifyAboutPublishedCourseVersion(courseId, versionId, User.Identity.GetUserId());
+			Course updated;
+			try
+			{
+				updated = courseManager.ReloadCourseFromDirectory(extractedCourseDirectory);
+				courseManager.UpdateCourseVersion(courseId, versionId);
+			}
+			catch (Exception error)
+			{
+				var errorMessage = error.Message.ToLowerFirstLetter();
+				while (error.InnerException != null)
+				{
+					errorMessage += $"\n\n{error.InnerException.Message}";
+					error = error.InnerException;
+				}
 
-			courseManager.UpdateCourseVersion(courseId, versionId);
-			courseManager.ReloadCourse(courseId);
+				RevertCourse();
+				return errorMessage;
+			}
+
 
 			//var courseDiff = new CourseDiff(oldCourse, version);
+			return null;
+		}
+
+		private void RevertCourse()
+		{
+			throw new NotImplementedException();
 		}
 
 
@@ -160,55 +177,22 @@ namespace Ulearn.Web.Api.Controllers
 			var destinationFile = courseManager.GetCourseVersionFile(versionId);
 			System.IO.File.WriteAllBytes(destinationFile.FullName, content);
 			Course updatedCourse;
-			try
-			{
-				/* Load version and put it into LRU-cache */
-				updatedCourse = courseManager.GetVersion(versionId);
-			}
-			catch (Exception e)
-			{
-				logger.Warning($"Upload course exception '{courseId}'", e);
-				return (versionId, e);
-			}
+			// try
+			// {
+			// 	/* Load version and put it into LRU-cache */
+			// 	updatedCourse = courseManager.GetVersion(versionId);
+			// }
+			// catch (Exception e)
+			// {
+			// 	logger.Warning($"Upload course exception '{courseId}'", e);
+			// 	return (versionId, e);
+			// }
 
 			logger.Information($"Successfully update course files '{courseId}'");
-			// if (pathToCourseXmlInRepo == null && uploadedFromRepoUrl != null)
-			// {
-			// 	var extractedVersionDirectory = courseManager.GetExtractedVersionDirectory(versionId);
-			// 	pathToCourseXmlInRepo = extractedVersionDirectory.FullName == updatedCourse.CourseXmlDirectory.FullName
-			// 		? ""
-			// 		: updatedCourse.CourseXmlDirectory.FullName.Substring(extractedVersionDirectory.FullName.Length + 1);
-			// }
-			//
-			// await coursesRepo.AddCourseVersionAsync(courseId, versionId, userId,
-			// 	pathToCourseXmlInRepo, uploadedFromRepoUrl, null, null);
+
 			await NotifyAboutCourseVersion(courseId, versionId, userId);
-			try
-			{
-				var courseVersions = await coursesRepo.GetCourseVersionsAsync(courseId);
-				//probably always empty
-				var previousUnpublishedVersions = courseVersions.Where(v => v.PublishTime == null && v.Id != versionId).ToList();
-				foreach (var unpublishedVersion in previousUnpublishedVersions)
-					await DeleteVersion(courseId, unpublishedVersion.Id).ConfigureAwait(false);
-			}
-			catch (Exception ex)
-			{
-				logger.Warning("Error during delete previous unpublished versions", ex);
-			}
 
 			return (versionId, null);
-		}
-
-		private async Task DeleteVersion(string courseId, Guid versionId)
-		{
-			/* Remove notifications from database */
-			//await notificationsRepo.RemoveNotifications(versionId);
-
-			/* Remove information from database */
-			await coursesRepo.DeleteCourseVersionAsync(courseId, versionId);
-
-			/* Delete zip-archive from file system */
-			courseManager.GetCourseVersionFile(versionId).Delete();
 		}
 
 		private async Task NotifyAboutCourseVersion(string courseId, Guid versionId, string userId)

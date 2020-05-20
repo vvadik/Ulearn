@@ -213,7 +213,7 @@ namespace Ulearn.Core
 			return course;
 		}
 
-		private Course ReloadCourseFromDirectory(DirectoryInfo directory)
+		public Course ReloadCourseFromDirectory(DirectoryInfo directory)
 		{
 			var course = LoadCourseFromDirectory(directory);
 			courses[course.Id] = course;

@@ -38,5 +38,6 @@ namespace Database
 		void MoveCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory);
 		void CopyTempCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory);
 		void ReloadCourse(string courseId);
+		Course ReloadCourseFromDirectory(DirectoryInfo directory);
 	}
 }
