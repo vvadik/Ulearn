@@ -13,7 +13,12 @@ const hijackCookieName = 'ulearn.auth.hijack';
 const hijackReturnControllerPath = '/Account/ReturnHijack';
 
 function Hijack({ allCookies, name, }) {
-	const isHijacked = allCookies[hijackCookieName] ? true : false;
+	let isHijacked = false;
+	for (const cookie in allCookies) {
+		if(cookie.endsWith(hijackCookieName)) {
+			isHijacked = true;
+		}
+	}
 
 	return (
 		<React.Fragment>
