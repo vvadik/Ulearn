@@ -1316,15 +1316,12 @@
     <Content Include="Scripts\slide-hints.js" />
     <Content Include="Jsdifflib\jsdifflib.js" />
     <Content Include="Scripts\slide-editor.js" />
-    <Content Include="Scripts\slide-gallery.js" />
     <Content Include="Scripts\slide-run.js" />
     <Content Include="Scripts\slide-solutions-like.js" />
-    <Content Include="Scripts\slide-nav.js" />
     <Content Include="Scripts\slide-spoilers.js" />
     <Content Include="Scripts\slide-tex.js" />
     <Content Include="Scripts\slide-utils.js" />
     <Content Include="Scripts\slide-versions.js" />
-    <Content Include="Scripts\slide-video.js" />
     <Content Include="Scripts\stepik.js" />
     <Content Include="Scripts\style-errors-settings.js" />
     <Content Include="Scripts\tooltips.js" />
@@ -1448,7 +1445,6 @@
     <Content Include="Views\Exercise\_ExerciseReviewComment.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Retargeting.cshtml" />
-    <Content Include="Views\Shared\_ReturnHijack.cshtml" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
