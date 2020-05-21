@@ -65,10 +65,5 @@
 	unregisterServiceWorker();
 </script>
 
-@if (AccountController.IsHijacked(HttpContext.Current.Request))
-{
-	@Html.Partial("_ReturnHijack")
-}
-
 </body>
 </html>

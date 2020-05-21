@@ -869,7 +869,6 @@ namespace uLearn.Web.Controllers
 
 				response.Cookies.Add(new HttpCookie(newCookie(cookieName), cookie.Value)
 				{
-					HttpOnly = true,
 					Domain = configuration.Web.CookieDomain,
 					Secure = configuration.Web.CookieSecure
 				});
@@ -877,23 +876,11 @@ namespace uLearn.Web.Controllers
 				if (removeOld)
 					response.Cookies.Add(new HttpCookie(actualCookie(cookieName), "")
 					{
-						HttpOnly = true,
 						Expires = DateTime.Now.AddDays(-1),
 						Domain = configuration.Web.CookieDomain,
 						Secure = configuration.Web.CookieSecure
 					});
 			}
-		}
-
-		public static bool IsHijacked(HttpRequest request)
-		{
-			foreach (var cookieName in hijackCookies)
-			{
-				if (request.Cookies.Get(cookieName + ".hijack") != null)
-					return true;
-			}
-
-			return false;
 		}
 	}
 

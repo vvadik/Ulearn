@@ -5,6 +5,7 @@ import { DocumentGroup, DocumentSolid, NotificationBell, User, Warning, Menu as 
 import { MenuHeader, MenuItem, MenuSeparator, Tooltip, Loader, DropdownMenu, } from "ui";
 import { DropdownContainer } from "ui/internal/DropdownContainer";
 import HeaderComponentErrorBoundary from "./Error/HeaderComponentErrorBoundary";
+import Hijack from "src/components/hijack/Hijack";
 import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { findDOMNode } from "react-dom";
@@ -112,7 +113,7 @@ class Header extends Component {
 	}
 
 	render() {
-		const { initializing } = this.props;
+		const { initializing, account, } = this.props;
 
 		/* Div should have class .header because some legacy javascript code uses $('.header') for calculating header height */
 		return (
@@ -121,6 +122,7 @@ class Header extends Component {
 					{ Header.renderPhoneHeader() }
 					{ Header.renderDefaultHeader() }
 					{ !initializing && this.renderUserRoleMenu() }
+					<Hijack name={ account.visibleName }/>
 				</div>
 				<div className={ styles.headerDivider }/>
 			</React.Fragment>
