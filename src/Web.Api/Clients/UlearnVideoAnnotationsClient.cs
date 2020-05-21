@@ -32,6 +32,7 @@ namespace Ulearn.Web.Api.Clients
 				);
 		}
 
+		[ItemCanBeNull]
 		public async Task<Annotation> GetVideoAnnotations(string videoAnnotationsGoogleDoc, string videoId)
 		{
 			if (string.IsNullOrEmpty(videoAnnotationsGoogleDoc))
