@@ -5,7 +5,8 @@ import { TransitionGroup, CSSTransition } from "react-transition-group";
 import { TABS } from "src/consts/general";
 import { debounce } from "debounce";
 import { CommentLite } from "icons";
-import { Loader, Toast } from "ui";
+import { Toast } from "ui";
+import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader";
 import Thread from "../Thread/Thread";
 import CommentSendForm from "../CommentSendForm/CommentSendForm";
 import Error404 from "../../common/Error/Error404";
@@ -247,7 +248,7 @@ class CommentsList extends Component {
 		return (
 			<div key={ key } ref={ this.commentsListRef }>
 				{ loadingComments ?
-					<Loader className={ styles.spacer } type="big" active={ loadingComments }/> :
+					<CourseLoader/> :
 					<>
 						{ !user.id &&
 						<Stub hasThreads={ threads.length > 0 } courseId={ courseId } slideId={ slideId }/> }

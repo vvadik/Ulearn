@@ -114,7 +114,7 @@
 
 @media (min-width: @minLaptopWidth) {
   .header {
-    padding: 16px 40px;
+    padding: 16px @laptopSlidePadding 16px @desktopSlidePadding;
   }
 
   .eyeClosedWrapper {
@@ -122,8 +122,8 @@
   }
 
   .withPaddings {
-    padding-left: @laptopSlidePadding;
-    padding-right: @desktopSlidePadding;
+    padding-left: @desktopSlidePadding;
+    padding-right: @laptopSlidePadding;
 
     &:last-child {
       padding-bottom: @laptopSlidePadding;

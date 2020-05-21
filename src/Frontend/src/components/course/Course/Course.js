@@ -144,7 +144,7 @@ class Course extends Component {
 
 		return (
 			<main className={ wrapperClassName }>
-				{ slideTitle && <h1 className={ styles.title }> { slideTitle } </h1> }
+				{ isNavMenuVisible && slideTitle && <h1 className={ styles.title }> { slideTitle } </h1> }
 				<div className={ styles.slide }>
 					{
 						SlidePage === Slide
@@ -159,8 +159,8 @@ class Course extends Component {
 
 				</div>
 				{ currentSlideInfo && isNavMenuVisible && this.renderNavigationButtons(currentSlideInfo) }
-				{ currentSlideInfo && this.renderComments(currentSlideInfo.current) }
-				{ this.renderFooter() }
+				{ currentSlideInfo && isNavMenuVisible && this.renderComments(currentSlideInfo.current) }
+				{ isNavMenuVisible && this.renderFooter() }
 			</main>
 		);
 	}
