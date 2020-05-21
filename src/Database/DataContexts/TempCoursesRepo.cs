@@ -23,6 +23,11 @@ namespace Database.DataContexts
 		{
 			return db.TempCourses.SingleOrDefault(course => course.CourseId == courseId);
 		}
+		
+		public TempCourseError FindError(string courseId)
+		{
+			return db.TempCourseErrors.SingleOrDefault(course => course.CourseId == courseId);
+		}
 
 		public async Task<TempCourse> AddTempCourse(string courseId, string authorId)
 		{
