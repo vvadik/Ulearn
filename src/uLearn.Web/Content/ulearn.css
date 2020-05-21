@@ -272,11 +272,6 @@
 	max-width: 864px;
 }
 
-.legacy-page .slide-container .container {
-	padding: 0;
-	margin: 0;
-}
-
 .legacy-page .main-page .courses-grid {
 	display: grid;
 	grid-template-columns: 1fr;
@@ -479,11 +474,6 @@
 		display: inline-block !important;
 		position: absolute;
 	}
-}
-
-.legacy-page .slide-container {
-	display: inline-block !important;
-	width: 100%;
 }
 
 
