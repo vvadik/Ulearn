@@ -1,6 +1,6 @@
 import { connect } from "react-redux";
-import { loadCourse, changeCurrentCourseAction } from "../../actions/course";
-import { loadUserProgress, userProgressUpdate } from "../../actions/userProgress";
+import { loadCourse, changeCurrentCourseAction } from "src/actions/course";
+import { loadUserProgress, userProgressUpdate } from "src/actions/userProgress";
 import Course from '../../components/course/Course';
 import { withRouter } from "react-router-dom";
 import queryString from "query-string";
@@ -16,7 +16,7 @@ const mapStateToProps = (state, { match }) => {
 	if(slideIdInQuery) {
 		const action = slideSlugOrAction;
 		slideId = slideIdInQuery;
-		isLti = action.toUpperCase() === "LTISLIDE";
+		isLti = action.toLowerCase() === "ltislide" || action.toLowerCase() === 'acceptedalert';
 	} else {
 		const slideSlug = slideSlugOrAction;
 		slideId = slideSlug.split('_').pop();
