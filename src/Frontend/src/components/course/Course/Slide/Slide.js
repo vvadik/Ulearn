@@ -86,12 +86,14 @@ class Slide extends React.Component {
 		const { autoplay } = queryString.parse(window.location.search);
 		const videoBlocks = slideBlocks.filter(b => b.type === blockTypes.video);
 
-		const firstVideoBlock = videoBlocks[0]; //autoplay for first video on slide
+		const firstVideoBlock = videoBlocks[0];
 		if(autoplay && firstVideoBlock) {
-			firstVideoBlock.autoplay = autoplay;
+			firstVideoBlock.autoplay = autoplay ? true : false; //autoplay for first video on slide
 		}
 
-
+		if(firstVideoBlock && slideBlocks.length === 1) {
+			firstVideoBlock.openAnnotation = true; // only video on slide => open annotation
+		}
 	}
 
 	getBlocksPack = (slideBlocks, i) => {
