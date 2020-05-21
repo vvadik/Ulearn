@@ -25,7 +25,7 @@ class Video extends React.Component {
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
-		if(this.state.showedAnnotation && !this.props.openAnnotation) {
+		if(prevProps.openAnnotation !== this.props.openAnnotation) {
 			this.setState({ showedAnnotation: this.props.openAnnotation });
 		}
 	}
