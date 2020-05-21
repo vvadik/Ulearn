@@ -58,13 +58,9 @@ api.setServerErrorHandler((message) => Toast.push(message ? message : 'Прои�
 
 class UlearnApp extends Component {
 	render() {
-		let pathname = window.location.pathname.toLowerCase();
-		let isLti = pathname.endsWith('/ltislide') || pathname.endsWith('/acceptedalert'); //TODO remove this flag,that hiding header and nav menu
-		let isHeaderVisible = !isLti;
-
 		return (
 			<Provider store={ store }>
-				<InternalUlearnApp isHeaderVisible={ isHeaderVisible }/>
+				<InternalUlearnApp/>
 			</Provider>
 		)
 	}
@@ -93,7 +89,10 @@ class InternalUlearnApp extends Component {
 	}
 
 	render() {
-		const isHeaderVisible = this.props.isHeaderVisible;
+		const pathname = window.location.pathname.toLowerCase();
+		const isLti = pathname.endsWith('/ltislide') || pathname.endsWith('/acceptedalert'); //TODO remove this flag,that hiding header and nav menu
+		const isHeaderVisible = !isLti;
+
 		return (
 			<BrowserRouter>
 				<ThemeContext.Provider value={ theme }>
