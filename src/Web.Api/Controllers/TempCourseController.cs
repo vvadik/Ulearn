@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
+using Ulearn.Web.Api.Models.Responses.TempCourses;
 
 namespace Ulearn.Web.Api.Controllers
 {
@@ -56,11 +57,37 @@ namespace Ulearn.Web.Api.Controllers
 			if (!courseManager.TryCreateCourse(tmpCourseId, courseTitle, versionId))
 				throw new Exception();
 
-			await coursesRepo.AddCourseVersionAsync(tmpCourseId, versionId, userId, null, null, null, null).ConfigureAwait(false);
-			await coursesRepo.MarkCourseVersionAsPublishedAsync(versionId).ConfigureAwait(false);
+			//await coursesRepo.AddCourseVersionAsync(tmpCourseId, versionId, userId, null, null, null, null).ConfigureAwait(false);
+			//await coursesRepo.MarkCourseVersionAsPublishedAsync(versionId).ConfigureAwait(false);
 			await tempCoursesRepo.AddTempCourse(tmpCourseId, userId);
 			await NotifyAboutPublishedCourseVersion(tmpCourseId, versionId, userId).ConfigureAwait(false);
 			return Ok($"course with id {tmpCourseId} successfully created");
+		}
+
+		[Authorize]
+		[HttpPost("hasCourse/{courseId}")]
+		public async Task<HasTempCourseResponse> HasCourse([FromRoute] string courseId)
+		{
+			var userId = User.Identity.GetUserId();
+			/*if (!await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin))
+				return BadRequest($"You dont have a Course Admin access to {courseId} course");*/
+
+			var tmpCourseId = courseId + userId;
+			var tmpCourse = tempCoursesRepo.Find(tmpCourseId);
+			var response = new HasTempCourseResponse();
+			if (tmpCourse == null)
+			{
+				response.HasTempCourse = false;
+			}
+			else
+			{
+				response.HasTempCourse = true;
+				response.LastUploadTime = tmpCourse.LoadingTime;
+				response.MainCourseId = courseId;
+				response.TempCourseId = tmpCourseId;
+			}
+
+			return response;
 		}
 
 		private async Task NotifyAboutPublishedCourseVersion(string courseId, Guid versionId, string userId)
@@ -123,7 +150,8 @@ namespace Ulearn.Web.Api.Controllers
 
 			/* Copy version's zip file to course's zip archive, overwrite if need */
 			versionFile.CopyTo(courseFile.FullName, true);
-			courseManager.EnsureVersionIsExtracted(versionId);
+
+			courseManager.EnsureVersionIsExtracted(versionId); //это здесь
 
 			/* Replace courseId */
 			version.Id = courseId;
@@ -157,7 +185,6 @@ namespace Ulearn.Web.Api.Controllers
 				return errorMessage;
 			}
 
-
 			//var courseDiff = new CourseDiff(oldCourse, version);
 			return null;
 		}
@@ -174,26 +201,39 @@ namespace Ulearn.Web.Api.Controllers
 			//var versionId = Guid.NewGuid();
 			//get versionId that already exist, not create new
 			var versionId = (await coursesRepo.GetCourseVersionsAsync(courseId)).Single().Id;
+			//courseManager.GetStagingCourseFile(courseId);
 			var destinationFile = courseManager.GetCourseVersionFile(versionId);
 			System.IO.File.WriteAllBytes(destinationFile.FullName, content);
 			Course updatedCourse;
-			// try
-			// {
-			// 	/* Load version and put it into LRU-cache */
-			// 	updatedCourse = courseManager.GetVersion(versionId);
-			// }
-			// catch (Exception e)
-			// {
-			// 	logger.Warning($"Upload course exception '{courseId}'", e);
-			// 	return (versionId, e);
-			// }
+			try
+			{
+				var extractedVersionDirectory = courseManager.GetExtractedVersionDirectory(versionId);
+
+				/* Load version and put it into LRU-cache */
+				updatedCourse = courseManager.GetVersion(versionId);
+			}
+			catch (Exception e)
+			{
+				logger.Warning($"Upload course exception '{courseId}'", e);
+				return (versionId, e);
+			}
 
 			logger.Information($"Successfully update course files '{courseId}'");
 
 			await NotifyAboutCourseVersion(courseId, versionId, userId);
+			try
+			{
+				var courseVersions = await coursesRepo.GetCourseVersionsAsync(courseId);
+				//probably always empty
+			}
+			catch (Exception ex)
+			{
+				logger.Warning("Error during delete previous unpublished versions", ex);
+			}
 
 			return (versionId, null);
 		}
+
 
 		private async Task NotifyAboutCourseVersion(string courseId, Guid versionId, string userId)
 		{
