@@ -1,5 +1,17 @@
 .wrapper {
+  width: fit-content;// do not let image to be bigger then real size
   margin-bottom: 10px;
   border-radius: 8px;
   overflow: hidden;
+}
+
+.wrapper .imageWrapper {
+  &.open {
+    z-index: 9999; // do not let elements overlap image in fullscreen mode
+
+    > :first-child {
+      width: fit-content; // do not let image to be bigger then real size in fullscreen mode
+      margin: auto;
+    }
+  }
 }
