@@ -38,8 +38,9 @@ namespace Ulearn.Common.Api
 		public override void Setup(IVostokAspNetCoreApplicationBuilder builder, IVostokHostingEnvironment hostingEnvironment)
 		{
 			var loggerConfiguration = new LoggerConfiguration()
-				.MinimumLevel.Debug()
-				.WriteTo.Sink(new VostokSink(hostingEnvironment.Log), LogEventLevel.Debug);
+				.MinimumLevel.Information()
+				.Filter.ByExcluding(FilterLogs)
+				.WriteTo.Sink(new VostokSink(hostingEnvironment.Log), LogEventLevel.Information);
 			var logger = loggerConfiguration.CreateLogger();
 
 			builder.SetupWebHost(webHostBuilder => webHostBuilder
@@ -86,6 +87,14 @@ namespace Ulearn.Common.Api
 				s.LogQueryString = new LoggingCollectionSettings(_ => true);
 			})
 			.SetupThrottling(b => b.DisableThrottling());
+		}
+
+		private static bool FilterLogs(LogEvent le)
+		{
+			return le.Properties.TryGetValue("SourceContext", out var sourceContextValue)
+				&& (sourceContextValue as ScalarValue)?.Value is string sourceContext
+				&& (sourceContext.StartsWith("Microsoft.AspNetCore.Mvc.Infrastructure")
+					|| sourceContext.StartsWith("Microsoft.AspNetCore.Hosting.Diagnostics"));
 		}
 
 		public class UlearnPortConfiguration
