@@ -57,12 +57,12 @@ namespace Ulearn.Web.Api.Controllers
 			var courseTitle = "Temp course";
 			if (!courseManager.TryCreateCourse(tmpCourseId, courseTitle, versionId))
 				throw new Exception();
-			
+
 			//--delete if everything will work fine without versions
 			//await coursesRepo.AddCourseVersionAsync(tmpCourseId, versionId, userId, null, null, null, null).ConfigureAwait(false);
 			//await coursesRepo.MarkCourseVersionAsPublishedAsync(versionId).ConfigureAwait(false);
 			//await NotifyAboutPublishedCourseVersion(tmpCourseId, versionId, userId).ConfigureAwait(false); 
-			
+
 			await tempCoursesRepo.AddTempCourse(tmpCourseId, userId);
 			return Ok($"course with id {tmpCourseId} successfully created");
 		}
@@ -129,8 +129,8 @@ namespace Ulearn.Web.Api.Controllers
 				throw new Exception();
 
 			var uploadingError = await UploadCourse(tmpCourseId, file.OpenReadStream().ToArray(), User.Identity.GetUserId()).ConfigureAwait(false);
-
-			var error = await TryPublishChanges(tmpCourseId);
+			var filesToDelete = new List<string>();
+			var error = await TryPublishChanges(tmpCourseId, filesToDelete);
 			if (error != null)
 			{
 				await tempCoursesRepo.UpdateOrAddTempCourseError(tmpCourseId, error);
@@ -142,10 +142,11 @@ namespace Ulearn.Web.Api.Controllers
 			return Ok($"course with id {tmpCourseId} successfully updated");
 		}
 
-		private async Task<string> TryPublishChanges(string courseId)
+		private async Task<string> TryPublishChanges(string courseId, List<string> filesToDelete)
 		{
-			var revertStructure = GetRevertStructure(courseId);
+			var revertStructure = GetRevertStructure(courseId, filesToDelete);
 			courseManager.ExtractTempCourseChanges(courseId);
+			DeleteFiles(revertStructure.DeletedFiles);
 			var extractedCourseDirectory = courseManager.GetExtractedCourseDirectory(courseId);
 			try
 			{
@@ -168,7 +169,15 @@ namespace Ulearn.Web.Api.Controllers
 			return null;
 		}
 
-		private RevertStructure GetRevertStructure(string courseId)
+		private void DeleteFiles(List<FileContent> filesToDelete)
+		{
+			foreach (var file in filesToDelete)
+			{
+				System.IO.File.Delete(file.Path);
+			}
+		}
+
+		private RevertStructure GetRevertStructure(string courseId, List<string> filesToDelete)
 		{
 			var revertStructure = new RevertStructure();
 			var staging = courseManager.GetStagingTempCourseFile(courseId);
@@ -189,11 +198,21 @@ namespace Ulearn.Web.Api.Controllers
 				if (courseFileRelativePaths.Contains(name))
 				{
 					var bytes = System.IO.File.ReadAllBytes(filePath);
-					revertStructure.FilesBeforeChanges[filePath] = bytes;
+					revertStructure.FilesBeforeChanges.Add(new FileContent(filePath, bytes));
 				}
 				else
 				{
 					revertStructure.AddedFiles.Add(filePath);
+				}
+			}
+
+			foreach (var fileToDeleteRelativePath in filesToDelete)
+			{
+				var filePath = pathPrefix + "\\" + fileToDeleteRelativePath;
+				if (courseFileRelativePaths.Contains(fileToDeleteRelativePath))
+				{
+					var bytes = System.IO.File.ReadAllBytes(filePath);
+					revertStructure.DeletedFiles.Add(new FileContent(filePath, bytes));
 				}
 			}
 
@@ -202,25 +221,41 @@ namespace Ulearn.Web.Api.Controllers
 
 		private class RevertStructure
 		{
-			public Dictionary<string, byte[]> FilesBeforeChanges = new Dictionary<string, byte[]>();
+			public List<FileContent> FilesBeforeChanges = new List<FileContent>();
 			public List<string> AddedFiles = new List<string>();
-			public List<string> DeletedFiles = new List<string>();
+			public List<FileContent> DeletedFiles = new List<FileContent>();
+		}
+
+		private struct FileContent
+		{
+			public FileContent(string path, byte[] content)
+			{
+				Path = path;
+				Content = content;
+			}
+
+			public string Path;
+			public byte[] Content;
 		}
 
 		private void RevertCourse(RevertStructure revertStructure, string courseId)
 		{
 			//todo lock course?
-			foreach (var beforeChange in revertStructure.FilesBeforeChanges)
+			foreach (var editedFile in revertStructure.FilesBeforeChanges)
 			{
-				var fileName = beforeChange.Key;
-				var bytes = beforeChange.Value;
-				System.IO.File.WriteAllBytes(fileName, bytes);
+				System.IO.File.WriteAllBytes(editedFile.Path, editedFile.Content);
 			}
 
 			foreach (var addedFile in revertStructure.AddedFiles)
 			{
 				System.IO.File.Delete(addedFile);
 			}
+
+			foreach (var deletedFile in revertStructure.DeletedFiles)
+			{
+				System.IO.File.WriteAllBytes(deletedFile.Path, deletedFile.Content);
+			}
+			
 		}
 
 
