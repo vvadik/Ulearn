@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Autofac;
 using CommandLine;
 using CourseToolHotReloader.ApiClient;
-using CourseToolHotReloader.Authorize;
+using CourseToolHotReloader.Authorizer;
 using CourseToolHotReloader.DirectoryWorkers;
 
 namespace CourseToolHotReloader

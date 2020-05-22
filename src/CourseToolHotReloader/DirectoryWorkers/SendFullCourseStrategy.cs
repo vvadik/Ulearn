@@ -14,7 +14,7 @@ namespace CourseToolHotReloader.DirectoryWorkers
 
 		public SendFullCourseStrategy(ICourseUpdateSender courseUpdateSender)
 		{
-			debouncedSendFullCourse = ActionHelper.Debounce(courseUpdateSender.SendFullCourse);
+			debouncedSendFullCourse = ActionHelper.Debounce(() => courseUpdateSender.SendFullCourse());
 		}
 
 		public void Renamed(object sender, RenamedEventArgs e)

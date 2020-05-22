@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using CourseToolHotReloader.ApiClient;
 using CourseToolHotReloader.Dtos;
 
-namespace CourseToolHotReloader.Authorize
+namespace CourseToolHotReloader.Authorizer
 {
 	public interface IAuthorizer
 	{
@@ -26,6 +26,8 @@ namespace CourseToolHotReloader.Authorize
 		public async Task SignIn()
 		{
 			LoginPasswordParameters loginPasswordParameters;
+			var configExist = File.Exists(path);
+
 			if (File.Exists(path))
 			{
 				loginPasswordParameters = ReadFile();
@@ -35,13 +37,27 @@ namespace CourseToolHotReloader.Authorize
 				loginPasswordParameters = new LoginPasswordParameters
 				{
 					Login = GetLogin(),
-					Password = GetPassword().ToString()
+					Password = new System.Net.NetworkCredential(string.Empty, GetPassword()).Password
 				};
 			}
 
-			config.JwtToken = await HttpMethods.GetJwtToken(loginPasswordParameters);
+			try
+			{
+				config.JwtToken = await HttpMethods.GetJwtToken(loginPasswordParameters);
+			}
+			catch (Exception e)
+			{
+				if (configExist)
+				{
+					File.Delete(path);
+				}
 
-			SavePassword(loginPasswordParameters);
+				Console.WriteLine(e);
+				throw;
+			}
+
+			if (!configExist)
+				SavePassword(loginPasswordParameters);
 		}
 
 		private SecureString GetPassword()
@@ -69,6 +85,7 @@ namespace CourseToolHotReloader.Authorize
 				}
 			}
 
+			Console.WriteLine();
 			return password;
 		}
 
@@ -80,7 +97,7 @@ namespace CourseToolHotReloader.Authorize
 
 		private void SavePassword(LoginPasswordParameters loginPasswordParameters)
 		{
-			Console.Write("Запомнить меня? д(ДА)/н(Нет) ");
+			Console.Write("Запомнить меня? д(ДА)/н(Нет):");
 			var answer = Console.ReadLine();
 			if (answer != null &&
 				(answer.Equals("д", StringComparison.OrdinalIgnoreCase)

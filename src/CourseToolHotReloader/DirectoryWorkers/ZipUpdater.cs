@@ -10,10 +10,10 @@ namespace CourseToolHotReloader.DirectoryWorkers
 {
 	public class ZipUpdater
 	{
-		public static Guid CreateZipByUpdates(IList<ICourseUpdate> courseUpdates, IList<ICourseUpdate> deletedFiles)
+		public static MemoryStream CreateZipByUpdates(IList<ICourseUpdate> courseUpdates, IList<ICourseUpdate> deletedFiles)
 		{
 			var deletedFileContent = string.Join("\r\n", deletedFiles.Select(u => u.RelativePath));
-			var guid = Guid.NewGuid();
+			var ms = new MemoryStream();
 
 			using (var zip = new ZipFile())
 			{
@@ -31,13 +31,10 @@ namespace CourseToolHotReloader.DirectoryWorkers
 				}
 
 				zip.AddEntry("deleted.txt", deletedFileContent);
-
 				
-				var ms = new MemoryStream();
 				zip.Save(ms);
 			}
-
-			
+			#region Create arhive in DEBUG
 #if DEBUG
 			using (var zip1 = new ZipFile())
 			{
@@ -53,13 +50,14 @@ namespace CourseToolHotReloader.DirectoryWorkers
 						zip1.AddFile(update.FullPath, Path.GetDirectoryName(update.RelativePath));
 					}
 				}
+				var guid = Guid.NewGuid();
 				zip1.AddEntry("deleted.txt", deletedFileContent);
 				zip1.Save($"../{guid.ToString()}.zip");
 				Console.WriteLine($"DEBUG is on ../{guid.ToString()}.zip was created");
 			}
 #endif
-			
-			return guid;
+			#endregion			
+			return ms;
 		}
 
 		public static MemoryStream CreateZipByFolder(string pathToFolder)

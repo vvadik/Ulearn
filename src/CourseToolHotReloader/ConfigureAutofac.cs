@@ -1,6 +1,6 @@
 ﻿using Autofac;
 using CourseToolHotReloader.ApiClient;
-using CourseToolHotReloader.Authorize;
+using CourseToolHotReloader.Authorizer;
 using CourseToolHotReloader.DirectoryWorkers;
 using CourseToolHotReloader.UpdateQuery;
 
@@ -18,7 +18,7 @@ namespace CourseToolHotReloader
 			containerBuilder.RegisterType<CourseWatcher>().As<ICourseWatcher>().SingleInstance();
 			containerBuilder.RegisterType<SendFullCourseStrategy>().As<ISendFullCourseStrategy>().SingleInstance();
 			containerBuilder.RegisterType<SendOnlyChangedStrategy>().As<ISendOnlyChangedStrategy>().SingleInstance();
-			containerBuilder.RegisterType<Authorizer>().As<IAuthorizer>().SingleInstance();
+			containerBuilder.RegisterType<Authorizer.Authorizer>().As<IAuthorizer>().SingleInstance();
 			return containerBuilder.Build();
 		}
 	}

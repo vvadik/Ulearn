@@ -8,16 +8,19 @@ namespace CourseToolHotReloader.ApiClient
 {
 	public interface IUlearnApiClient
 	{
-		void SendCourseUpdates(IList<ICourseUpdate> update, IList<ICourseUpdate> deletedFiles);
+		Task SendCourseUpdates(IList<ICourseUpdate> update, IList<ICourseUpdate> deletedFiles, string token, string courseId);
 		Task SendFullCourse(string path, string token, string courseId);
 	}
 
 	class UlearnApiClient : IUlearnApiClient
 	{
-		public void SendCourseUpdates(IList<ICourseUpdate> updates, IList<ICourseUpdate> deletedFiles)
+		public async Task SendCourseUpdates(IList<ICourseUpdate> updates, IList<ICourseUpdate> deletedFiles, string token, string courseId)
 		{
-			var guid = ZipUpdater.CreateZipByUpdates(updates, deletedFiles);
-			Console.WriteLine($"{guid}.zip created");
+			var ms = ZipUpdater.CreateZipByUpdates(updates, deletedFiles);
+
+			await HttpMethods.UploadCourse(ms, token, courseId);
+			
+			Console.WriteLine($"{courseId} updates only upload");
 		}
 
 		public async Task SendFullCourse(string path, string token, string courseId)

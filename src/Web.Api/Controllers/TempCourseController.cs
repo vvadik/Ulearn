@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Castle.Core.Internal;
 using Database;
 using Database.Models;
 using Database.Repos;
@@ -129,7 +130,24 @@ namespace Ulearn.Web.Api.Controllers
 				throw new Exception();
 
 			var uploadingError = await UploadCourse(tmpCourseId, file.OpenReadStream().ToArray(), User.Identity.GetUserId()).ConfigureAwait(false);
+
+			var stagingFile = courseManager.GetStagingTempCourseFile(tmpCourseId);
+
 			var filesToDelete = new List<string>();
+			using (var zip = ZipFile.Read(stagingFile.FullName))
+			{
+				var ms = new MemoryStream();
+				var e = zip["deleted.txt"];
+				e.Extract(ms);
+				using var sr = new StreamReader(ms);
+				while (!sr.EndOfStream)
+				{
+					var line = sr.ReadLine();
+					if (line != null)
+						filesToDelete.Add(line);
+				}
+			}
+
 			var error = await TryPublishChanges(tmpCourseId, filesToDelete);
 			if (error != null)
 			{
@@ -208,7 +226,7 @@ namespace Ulearn.Web.Api.Controllers
 
 			foreach (var fileToDeleteRelativePath in filesToDelete)
 			{
-				var filePath = pathPrefix + "\\" + fileToDeleteRelativePath;
+				var filePath = pathPrefix + fileToDeleteRelativePath;
 				if (courseFileRelativePaths.Contains(fileToDeleteRelativePath))
 				{
 					var bytes = System.IO.File.ReadAllBytes(filePath);
@@ -255,7 +273,6 @@ namespace Ulearn.Web.Api.Controllers
 			{
 				System.IO.File.WriteAllBytes(deletedFile.Path, deletedFile.Content);
 			}
-			
 		}
 
 

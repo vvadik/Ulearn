@@ -25,10 +25,7 @@ namespace CourseToolHotReloader.ApiClient
 			var response = await client.PostAsync(url, data);
 
 			if (response.StatusCode != HttpStatusCode.OK)
-			{
-				Console.WriteLine($"We have error: {response.Content.ReadAsStringAsync().Result}");
-				return null;
-			}
+				throw new Exception("Неправильный логин пароль");
 
 			var result = response.Content.ReadAsStringAsync().Result;
 			return JsonSerializer.Deserialize<AccountTokenResponseDto>(result);

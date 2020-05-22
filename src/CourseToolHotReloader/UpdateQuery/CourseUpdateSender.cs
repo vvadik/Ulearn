@@ -1,12 +1,13 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
 using CourseToolHotReloader.ApiClient;
 
 namespace CourseToolHotReloader.UpdateQuery
 {
 	public interface ICourseUpdateSender
 	{
-		void SendCourseUpdates();
-		void SendFullCourse();
+		Task SendCourseUpdates();
+		Task SendFullCourse();
 	}
 
 	public class CourseUpdateSender : ICourseUpdateSender
@@ -22,14 +23,14 @@ namespace CourseToolHotReloader.UpdateQuery
 			this.config = config;
 		}
 
-		public void SendCourseUpdates()
+		public async Task SendCourseUpdates()
 		{
-			ulearnApiClient.SendCourseUpdates(courseUpdateQuery.GetAllCourseUpdate(), courseUpdateQuery.GetAllDeletedFiles());
+			await ulearnApiClient.SendCourseUpdates(courseUpdateQuery.GetAllCourseUpdate(), courseUpdateQuery.GetAllDeletedFiles(), config.JwtToken.Token, config.CourseId);
 		}
 
-		public void SendFullCourse()
+		public async Task SendFullCourse()
 		{
-			ulearnApiClient.SendFullCourse(config.Path, config.JwtToken.Token, config.CourseId);
+			await ulearnApiClient.SendFullCourse(config.Path, config.JwtToken.Token, config.CourseId);
 		}
 	}
 }
