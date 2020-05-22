@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Database;
 using Database.Models;
@@ -55,16 +54,16 @@ namespace Ulearn.Web.Api.Controllers
 				return BadRequest($"Your temp version of course {courseId} already exists with id {tmpCourseId}");
 
 			var versionId = Guid.NewGuid();
-
 			var courseTitle = "Temp course";
-
 			if (!courseManager.TryCreateCourse(tmpCourseId, courseTitle, versionId))
 				throw new Exception();
-
+			
+			//--delete if everything will work fine without versions
 			//await coursesRepo.AddCourseVersionAsync(tmpCourseId, versionId, userId, null, null, null, null).ConfigureAwait(false);
 			//await coursesRepo.MarkCourseVersionAsPublishedAsync(versionId).ConfigureAwait(false);
+			//await NotifyAboutPublishedCourseVersion(tmpCourseId, versionId, userId).ConfigureAwait(false); 
+			
 			await tempCoursesRepo.AddTempCourse(tmpCourseId, userId);
-			//await NotifyAboutPublishedCourseVersion(tmpCourseId, versionId, userId).ConfigureAwait(false);
 			return Ok($"course with id {tmpCourseId} successfully created");
 		}
 
@@ -145,15 +144,13 @@ namespace Ulearn.Web.Api.Controllers
 
 		private async Task<string> TryPublishChanges(string courseId)
 		{
-			var courseFile = courseManager.GetStagingTempCourseFile(courseId);
 			var revertStructure = GetRevertStructure(courseId);
 			courseManager.ExtractTempCourseChanges(courseId);
 			var extractedCourseDirectory = courseManager.GetExtractedCourseDirectory(courseId);
-			Course updated;
 			try
 			{
-				updated = courseManager.ReloadCourseFromDirectory(extractedCourseDirectory);
-				courseManager.UpdateCourseVersion(courseId, Guid.Empty);
+				var updated = courseManager.ReloadCourseFromDirectory(extractedCourseDirectory);
+				courseManager.UpdateCourseVersion(courseId, Guid.Empty); // todo do something with version
 			}
 			catch (Exception error)
 			{
@@ -163,9 +160,11 @@ namespace Ulearn.Web.Api.Controllers
 					errorMessage += $"\n\n{error.InnerException.Message}";
 					error = error.InnerException;
 				}
-				RevertCourse(revertStructure,courseId);
+
+				RevertCourse(revertStructure, courseId);
 				return errorMessage;
 			}
+
 			return null;
 		}
 
@@ -197,6 +196,7 @@ namespace Ulearn.Web.Api.Controllers
 					revertStructure.AddedFiles.Add(filePath);
 				}
 			}
+
 			return revertStructure;
 		}
 
@@ -207,13 +207,14 @@ namespace Ulearn.Web.Api.Controllers
 			public List<string> DeletedFiles = new List<string>();
 		}
 
-		private void RevertCourse(RevertStructure revertStructure,string courseId)
+		private void RevertCourse(RevertStructure revertStructure, string courseId)
 		{
+			//todo lock course?
 			foreach (var beforeChange in revertStructure.FilesBeforeChanges)
 			{
 				var fileName = beforeChange.Key;
 				var bytes = beforeChange.Value;
-				System.IO.File.WriteAllBytes(fileName,bytes);
+				System.IO.File.WriteAllBytes(fileName, bytes);
 			}
 
 			foreach (var addedFile in revertStructure.AddedFiles)
@@ -223,7 +224,7 @@ namespace Ulearn.Web.Api.Controllers
 		}
 
 
-		private async  Task<Exception>  UploadCourse(string courseId, byte[] content, string userId)
+		private async Task<Exception> UploadCourse(string courseId, byte[] content, string userId)
 		{
 			logger.Information($"Start upload course '{courseId}'");
 			var stagingFile = courseManager.GetStagingTempCourseFile(courseId);
