@@ -32,6 +32,7 @@ namespace Ulearn.Core
 
 		private readonly DirectoryInfo stagedDirectory;
 		private readonly DirectoryInfo coursesDirectory;
+		private readonly DirectoryInfo tempCourseStaging;
 		private readonly DirectoryInfo coursesVersionsDirectory;
 
 		private readonly ConcurrentDictionary<string, Course> courses = new ConcurrentDictionary<string, Course>(StringComparer.InvariantCultureIgnoreCase);
@@ -49,15 +50,17 @@ namespace Ulearn.Core
 			: this(
 				baseDirectory.GetSubdirectory("Courses.Staging"),
 				baseDirectory.GetSubdirectory("Courses.Versions"),
-				baseDirectory.GetSubdirectory("Courses")
+				baseDirectory.GetSubdirectory("Courses"),
+				baseDirectory.GetSubdirectory("TempCourseStaging")
 			)
 		{
 		}
 
-		public CourseManager(DirectoryInfo stagedDirectory, DirectoryInfo coursesVersionsDirectory, DirectoryInfo coursesDirectory)
+		public CourseManager(DirectoryInfo stagedDirectory, DirectoryInfo coursesVersionsDirectory, DirectoryInfo coursesDirectory, DirectoryInfo tempCourseStaging)
 		{
 			this.stagedDirectory = stagedDirectory;
 			this.coursesDirectory = coursesDirectory;
+			this.tempCourseStaging = tempCourseStaging;
 			this.coursesVersionsDirectory = coursesVersionsDirectory;
 		}
 
@@ -121,11 +124,20 @@ namespace Ulearn.Core
 				throw new Exception(courseId);
 			return stagedDirectory.GetFile(packageName);
 		}
+		public FileInfo GetStagingTempCourseFile(string courseId)
+		{
+			var packageName = GetPackageName(courseId);
+			if (Path.GetInvalidFileNameChars().Any(packageName.Contains))
+				throw new Exception(courseId);
+			return tempCourseStaging.GetFile(packageName);
+		}
 
 		public DirectoryInfo GetExtractedCourseDirectory(string courseId)
 		{
 			return coursesDirectory.GetSubdirectory(courseId);
 		}
+		
+		
 
 		public DirectoryInfo GetExtractedVersionDirectory(Guid versionId)
 		{
@@ -236,6 +248,16 @@ namespace Ulearn.Core
 				log.Info($"Архив {zipFile.FullName} распакован");
 			}
 		}
+		private void UnzipWithOverwrite(FileInfo zipFile, DirectoryInfo unpackDirectory)
+		{
+			using (var zip = ZipFile.Read(zipFile.FullName, new ReadOptions { Encoding = Encoding.GetEncoding(866) }))
+			{
+				zip.ExtractAll(unpackDirectory.FullName, ExtractExistingFileAction.OverwriteSilently);
+				foreach (var f in unpackDirectory.GetFiles("*", SearchOption.AllDirectories).Cast<FileSystemInfo>().Concat(unpackDirectory.GetDirectories("*", SearchOption.AllDirectories)))
+					f.Attributes &= ~FileAttributes.ReadOnly;
+				log.Info($"Архив {zipFile.FullName} распакован");
+			}
+		}
 
 		private DirectoryInfo UnzipCourseFile(FileInfo zipFile)
 		{
@@ -313,6 +335,13 @@ namespace Ulearn.Core
 				Directory.CreateDirectory(versionDirectory.FullName);
 				UnzipFile(GetCourseVersionFile(versionId), versionDirectory);
 			}
+		}
+
+		public void ExtractTempCourseChanges(string tempCourseId)
+		{
+			var zipWithChanges = GetStagingTempCourseFile(tempCourseId);
+			var courseDirectory = GetExtractedCourseDirectory(tempCourseId);
+			UnzipWithOverwrite(zipWithChanges,courseDirectory);
 		}
 
 		private static void CreateEmptyCourse(string courseId, string courseTitle, string path)

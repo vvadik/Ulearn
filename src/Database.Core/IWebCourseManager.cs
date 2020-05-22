@@ -18,6 +18,7 @@ namespace Database
 		bool HasCourse(string courseId);
 		Course GetVersion(Guid versionId);
 		FileInfo GetStagingCourseFile(string courseId);
+		FileInfo GetStagingTempCourseFile(string courseId);
 		DirectoryInfo GetExtractedCourseDirectory(string courseId);
 		DirectoryInfo GetExtractedVersionDirectory(Guid versionId);
 		FileInfo GetCourseVersionFile(Guid versionId);
@@ -39,5 +40,6 @@ namespace Database
 		void CopyTempCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory);
 		void ReloadCourse(string courseId);
 		Course ReloadCourseFromDirectory(DirectoryInfo directory);
+		void ExtractTempCourseChanges(string tempCourseId);
 	}
 }
