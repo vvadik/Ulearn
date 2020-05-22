@@ -41,7 +41,6 @@ function setResults(ans) {
 	else if (ans.IsCompillerFailure) setSimpleResult($serviceError, ans.ErrorMessage);
 	else if (ans.IsCompileError) setSimpleResult($compileError, ans.ErrorMessage);
 	else if (ans.IsRightAnswer) {
-		window.slideNavigation.makeShowSolutionsNext();
 		if (ans.SubmissionId > 0)
 			setExerciseVersion(ans.SubmissionId, true);
 		else /* for course monitor tool */
