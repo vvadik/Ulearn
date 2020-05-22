@@ -246,5 +246,7 @@ namespace Database.DataContexts
 		public DbSet<UserFlashcardsVisit> UserFlashcardsVisits { get; set; }
 		
 		public DbSet<TempCourse> TempCourses { get; set; }
+		
+		public DbSet<TempCourseError> TempCourseErrors { get; set; }
 	}
 }

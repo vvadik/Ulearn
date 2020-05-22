@@ -101,6 +101,11 @@ namespace Database
 			base.ReloadCourse(courseId);
 		}
 
+		public new Course ReloadCourseFromDirectory(DirectoryInfo directory)
+		{
+			return base.ReloadCourseFromDirectory(directory);
+		}
+
 		private void ReloadCourseIfLoadedAndPublishedVersionsAreDifferent(string courseId, CourseVersion publishedVersion)
 		{
 			lock (@lock)

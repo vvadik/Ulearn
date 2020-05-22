@@ -4,14 +4,16 @@ using Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Database.Migrations
 {
     [DbContext(typeof(UlearnDb))]
-    partial class UlearnDbModelSnapshot : ModelSnapshot
+    [Migration("20200520133205_addLastUpdateTime")]
+    partial class addLastUpdateTime
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1792,20 +1794,6 @@ namespace Database.Migrations
                     b.HasIndex("AuthorId");
 
                     b.ToTable("TempCourses");
-                });
-
-            modelBuilder.Entity("Database.Models.TempCourseError", b =>
-                {
-                    b.Property<string>("CourseId")
-                        .HasColumnType("nvarchar(64)")
-                        .HasMaxLength(64);
-
-                    b.Property<string>("Error")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("CourseId");
-
-                    b.ToTable("TempCourseErrors");
                 });
 
             modelBuilder.Entity("Database.Models.TextBlob", b =>

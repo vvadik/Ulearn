@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Database;
 using Database.Models;
@@ -16,6 +17,9 @@ using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
+using Ulearn.Web.Api.Models.Responses.TempCourses;
+using Ionic.Zip;
+
 
 namespace Ulearn.Web.Api.Controllers
 {
@@ -50,19 +54,43 @@ namespace Ulearn.Web.Api.Controllers
 				return BadRequest($"Your temp version of course {courseId} already exists with id {tmpCourseId}");
 
 			var versionId = Guid.NewGuid();
-
 			var courseTitle = "Temp course";
-
 			if (!courseManager.TryCreateCourse(tmpCourseId, courseTitle, versionId))
 				throw new Exception();
 
-			await coursesRepo.AddCourseVersionAsync(tmpCourseId, versionId, userId, null, null, null, null).ConfigureAwait(false);
-			await coursesRepo.MarkCourseVersionAsPublishedAsync(versionId).ConfigureAwait(false);
+			//--delete if everything will work fine without versions
+			//await coursesRepo.AddCourseVersionAsync(tmpCourseId, versionId, userId, null, null, null, null).ConfigureAwait(false);
+			//await coursesRepo.MarkCourseVersionAsPublishedAsync(versionId).ConfigureAwait(false);
+			//await NotifyAboutPublishedCourseVersion(tmpCourseId, versionId, userId).ConfigureAwait(false); 
+
 			await tempCoursesRepo.AddTempCourse(tmpCourseId, userId);
-			var courseFile = courseManager.GetStagingCourseFile(tmpCourseId);
-			//await coursesRepo.AddCourseFile(tmpCourseId, versionId, courseFile.ReadAllContent()).ConfigureAwait(false);
-			await NotifyAboutPublishedCourseVersion(tmpCourseId, versionId, userId).ConfigureAwait(false);
 			return Ok($"course with id {tmpCourseId} successfully created");
+		}
+
+		[Authorize]
+		[HttpPost("hasCourse/{courseId}")]
+		public async Task<HasTempCourseResponse> HasCourse([FromRoute] string courseId)
+		{
+			var userId = User.Identity.GetUserId();
+			/*if (!await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin))
+				return BadRequest($"You dont have a Course Admin access to {courseId} course");*/
+
+			var tmpCourseId = courseId + userId;
+			var tmpCourse = tempCoursesRepo.Find(tmpCourseId);
+			var response = new HasTempCourseResponse();
+			if (tmpCourse == null)
+			{
+				response.HasTempCourse = false;
+			}
+			else
+			{
+				response.HasTempCourse = true;
+				response.LastUploadTime = tmpCourse.LoadingTime;
+				response.MainCourseId = courseId;
+				response.TempCourseId = tmpCourseId;
+			}
+
+			return response;
 		}
 
 		private async Task NotifyAboutPublishedCourseVersion(string courseId, Guid versionId, string userId)
@@ -100,8 +128,32 @@ namespace Ulearn.Web.Api.Controllers
 			if (fileName == null || !fileName.ToLower().EndsWith(".zip"))
 				throw new Exception();
 
-			var (versionId, error) = await UploadCourse(tmpCourseId, file.OpenReadStream().ToArray(), User.Identity.GetUserId()).ConfigureAwait(false);
+			var uploadingError = await UploadCourse(tmpCourseId, file.OpenReadStream().ToArray(), User.Identity.GetUserId()).ConfigureAwait(false);
+			var filesToDelete = new List<string>();
+			var error = await TryPublishChanges(tmpCourseId, filesToDelete);
 			if (error != null)
+			{
+				await tempCoursesRepo.UpdateOrAddTempCourseError(tmpCourseId, error);
+				return BadRequest(error);
+			}
+
+			await tempCoursesRepo.MarkTempCourseAsNotErrored(tmpCourseId);
+			await tempCoursesRepo.UpdateTempCourseLoadingTime(tmpCourseId);
+			return Ok($"course with id {tmpCourseId} successfully updated");
+		}
+
+		private async Task<string> TryPublishChanges(string courseId, List<string> filesToDelete)
+		{
+			var revertStructure = GetRevertStructure(courseId, filesToDelete);
+			courseManager.ExtractTempCourseChanges(courseId);
+			DeleteFiles(revertStructure.DeletedFiles);
+			var extractedCourseDirectory = courseManager.GetExtractedCourseDirectory(courseId);
+			try
+			{
+				var updated = courseManager.ReloadCourseFromDirectory(extractedCourseDirectory);
+				courseManager.UpdateCourseVersion(courseId, Guid.Empty); // todo do something with version
+			}
+			catch (Exception error)
 			{
 				var errorMessage = error.Message.ToLowerFirstLetter();
 				while (error.InnerException != null)
@@ -109,107 +161,112 @@ namespace Ulearn.Web.Api.Controllers
 					errorMessage += $"\n\n{error.InnerException.Message}";
 					error = error.InnerException;
 				}
+
+				RevertCourse(revertStructure, courseId);
+				return errorMessage;
 			}
 
-			await PublishVersion(tmpCourseId, versionId);
-			await tempCoursesRepo.UpdateTempCourseLoadingTime(tmpCourseId);
-			return Ok($"course with id {tmpCourseId} successfully updated");
+			return null;
 		}
 
-		private async Task PublishVersion(string courseId, Guid versionId)
+		private void DeleteFiles(List<FileContent> filesToDelete)
 		{
-			var versionFile = courseManager.GetCourseVersionFile(versionId);
-			var courseFile = courseManager.GetStagingCourseFile(courseId);
-			//var oldCourse = courseManager.GetCourse(courseId); //я закометил эту строчку не просто так, с ней не работает
+			foreach (var file in filesToDelete)
+			{
+				System.IO.File.Delete(file.Path);
+			}
+		}
 
-			//await coursesRepo.AddCourseFile(courseId, versionId, courseFile.ReadAllContent()).ConfigureAwait(false);
+		private RevertStructure GetRevertStructure(string courseId, List<string> filesToDelete)
+		{
+			var revertStructure = new RevertStructure();
+			var staging = courseManager.GetStagingTempCourseFile(courseId);
+			var courseDirectory = courseManager.GetExtractedCourseDirectory(courseId);
+			var pathPrefix = courseDirectory.FullName;
+			var zip = ZipFile.Read(staging.FullName, new ReadOptions { Encoding = Encoding.UTF8 });
+			var filesToChangeRelativePaths = zip.Entries
+				.Where(x => !x.IsDirectory)
+				.Select(x => x.FileName)
+				.Select(x => x.Replace('/', '\\'));
+			var courseFileRelativePaths = Directory
+				.EnumerateFiles(courseDirectory.FullName, "*.*", SearchOption.AllDirectories)
+				.Select(file => file.Substring(file.IndexOf(pathPrefix) + pathPrefix.Length + 1))
+				.ToHashSet();
+			foreach (var name in filesToChangeRelativePaths)
+			{
+				var filePath = pathPrefix + "\\" + name;
+				if (courseFileRelativePaths.Contains(name))
+				{
+					var bytes = System.IO.File.ReadAllBytes(filePath);
+					revertStructure.FilesBeforeChanges.Add(new FileContent(filePath, bytes));
+				}
+				else
+				{
+					revertStructure.AddedFiles.Add(filePath);
+				}
+			}
 
-			/* First, try to load course from LRU-cache or zip file */
-			var version = courseManager.GetVersion(versionId);
+			foreach (var fileToDeleteRelativePath in filesToDelete)
+			{
+				var filePath = pathPrefix + "\\" + fileToDeleteRelativePath;
+				if (courseFileRelativePaths.Contains(fileToDeleteRelativePath))
+				{
+					var bytes = System.IO.File.ReadAllBytes(filePath);
+					revertStructure.DeletedFiles.Add(new FileContent(filePath, bytes));
+				}
+			}
 
-			/* Copy version's zip file to course's zip archive, overwrite if need */
-			versionFile.CopyTo(courseFile.FullName, true);
-			courseManager.EnsureVersionIsExtracted(versionId);
+			return revertStructure;
+		}
 
-			/* Replace courseId */
-			version.Id = courseId;
+		private class RevertStructure
+		{
+			public List<FileContent> FilesBeforeChanges = new List<FileContent>();
+			public List<string> AddedFiles = new List<string>();
+			public List<FileContent> DeletedFiles = new List<FileContent>();
+		}
 
-			/* and move course from version's directory to courses's directory */
-			var extractedVersionDirectory = courseManager.GetExtractedVersionDirectory(versionId);
-			var extractedCourseDirectory = courseManager.GetExtractedCourseDirectory(courseId);
-			courseManager.MoveCourse(
-				version,
-				extractedVersionDirectory,
-				extractedCourseDirectory);
-			await coursesRepo.MarkCourseVersionAsPublishedAsync(versionId);
-			await NotifyAboutPublishedCourseVersion(courseId, versionId, User.Identity.GetUserId());
+		private struct FileContent
+		{
+			public FileContent(string path, byte[] content)
+			{
+				Path = path;
+				Content = content;
+			}
 
-			courseManager.UpdateCourseVersion(courseId, versionId);
-			courseManager.ReloadCourse(courseId);
+			public string Path;
+			public byte[] Content;
+		}
 
-			//var courseDiff = new CourseDiff(oldCourse, version);
+		private void RevertCourse(RevertStructure revertStructure, string courseId)
+		{
+			//todo lock course?
+			foreach (var editedFile in revertStructure.FilesBeforeChanges)
+			{
+				System.IO.File.WriteAllBytes(editedFile.Path, editedFile.Content);
+			}
+
+			foreach (var addedFile in revertStructure.AddedFiles)
+			{
+				System.IO.File.Delete(addedFile);
+			}
+
+			foreach (var deletedFile in revertStructure.DeletedFiles)
+			{
+				System.IO.File.WriteAllBytes(deletedFile.Path, deletedFile.Content);
+			}
+			
 		}
 
 
-		private async Task<(Guid versionId, Exception error)> UploadCourse(string courseId, byte[] content, string userId)
+		private async Task<Exception> UploadCourse(string courseId, byte[] content, string userId)
 		{
 			logger.Information($"Start upload course '{courseId}'");
-			//var versionId = Guid.NewGuid();
-			//get versionId that already exist, not create new
-			var versionId = (await coursesRepo.GetCourseVersionsAsync(courseId)).Single().Id;
-			var destinationFile = courseManager.GetCourseVersionFile(versionId);
-			System.IO.File.WriteAllBytes(destinationFile.FullName, content);
-			Course updatedCourse;
-			try
-			{
-				/* Load version and put it into LRU-cache */
-				updatedCourse = courseManager.GetVersion(versionId);
-			}
-			catch (Exception e)
-			{
-				logger.Warning($"Upload course exception '{courseId}'", e);
-				return (versionId, e);
-			}
-
-			logger.Information($"Successfully update course files '{courseId}'");
-			// if (pathToCourseXmlInRepo == null && uploadedFromRepoUrl != null)
-			// {
-			// 	var extractedVersionDirectory = courseManager.GetExtractedVersionDirectory(versionId);
-			// 	pathToCourseXmlInRepo = extractedVersionDirectory.FullName == updatedCourse.CourseXmlDirectory.FullName
-			// 		? ""
-			// 		: updatedCourse.CourseXmlDirectory.FullName.Substring(extractedVersionDirectory.FullName.Length + 1);
-			// }
-			//
-			// await coursesRepo.AddCourseVersionAsync(courseId, versionId, userId,
-			// 	pathToCourseXmlInRepo, uploadedFromRepoUrl, null, null);
-			await NotifyAboutCourseVersion(courseId, versionId, userId);
-			try
-			{
-				var courseVersions = await coursesRepo.GetCourseVersionsAsync(courseId);
-				//probably always empty
-				var previousUnpublishedVersions = courseVersions.Where(v => v.PublishTime == null && v.Id != versionId).ToList();
-				foreach (var unpublishedVersion in previousUnpublishedVersions)
-					await DeleteVersion(courseId, unpublishedVersion.Id).ConfigureAwait(false);
-			}
-			catch (Exception ex)
-			{
-				logger.Warning("Error during delete previous unpublished versions", ex);
-			}
-
-			return (versionId, null);
+			var stagingFile = courseManager.GetStagingTempCourseFile(courseId);
+			System.IO.File.WriteAllBytes(stagingFile.FullName, content);
+			return null;
 		}
 
-		private async Task DeleteVersion(string courseId, Guid versionId)
-		{
-			/* Remove notifications from database */
-			//await notificationsRepo.RemoveNotifications(versionId);
-
-			/* Remove information from database */
-			await coursesRepo.DeleteCourseVersionAsync(courseId, versionId);
-
-			/* Delete zip-archive from file system */
-			courseManager.GetCourseVersionFile(versionId).Delete();
-		}
 
 		private async Task NotifyAboutCourseVersion(string courseId, Guid versionId, string userId)
 		{

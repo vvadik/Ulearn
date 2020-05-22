@@ -66,7 +66,14 @@ namespace uLearn.Web.Controllers
 		[AllowAnonymous]
 		public async Task<ActionResult> SlideById(string courseId, string slideId = "", int? checkQueueItemId = null, int? version = null, int autoplay = 0)
 		{
-			CheckTempCourseAndReloadIfNecessary(courseId);
+			if (IsTempCourse(courseId))
+			{
+				if (TryGetTempCourseError(courseId, out var error))
+				{
+					//return PackagesTempCourse(courseId, error);
+				}
+				CheckTempCourseAndReloadIfNecessary(courseId); 
+			}
 			if (slideId.Contains("_"))
 				slideId = slideId.Substring(slideId.LastIndexOf('_') + 1);
 
@@ -144,11 +151,36 @@ namespace uLearn.Web.Controllers
 			var slide = course.GetSlideById(slideGuid);
 			return RedirectToRoute("Course.SlideById", new { courseId = course.Id, slideId = slide.Url });
 		}
+		
+		// private ActionResult PackagesTempCourse(string courseId, string error = "", bool openStep1 = false, bool openStep2 = false)
+		// {
+		// 	//var lastUpdate = courseManager.GetLastWriteTime(courseId);
+		// 	var course = courseManager.GetCourse(courseId);
+		// 	var publishedVersion = coursesRepo.GetPublishedCourseVersion(courseId);
+		// 	var courseRepo = coursesRepo.GetCourseRepoSettings(courseId);
+		// 	return View("Packages", model: new PackagesViewModel
+		// 	{
+		// 		Course = course,
+		// 		//LastUpdate = lastUpdate,
+		// 		PublishedVersion = publishedVersion,
+		// 		CourseGit = courseRepo,
+		// 		OpenStep1 = openStep1,
+		// 		OpenStep2 = openStep2,
+		// 		Error = error,
+		// 	});
+		// }
 
 		[AllowAnonymous]
 		public ActionResult Slide(string courseId, int slideIndex = -1)
 		{
-			CheckTempCourseAndReloadIfNecessary(courseId);
+			if (IsTempCourse(courseId))
+			{
+				if (TryGetTempCourseError(courseId, out var error))
+				{
+					//return PackagesTempCourse(courseId, error);
+				}
+				CheckTempCourseAndReloadIfNecessary(courseId); 
+			}
 			var course = courseManager.FindCourse(courseId);
 			if (course == null)
 				return HttpNotFound();
@@ -160,12 +192,34 @@ namespace uLearn.Web.Controllers
 			return RedirectToRoute("Course.SlideById", new { courseId, slideId = slide.Url });
 		}
 
+		private bool IsTempCourse(string courseId)
+		{
+			var tempCourse = tempCoursesRepo.Find(courseId);
+			return !(tempCourse is null);
+		}
+
+		private bool TryGetTempCourseError(string courseId, out string error)
+		{
+			var tmpCourseError = tempCoursesRepo.FindError(courseId);
+			if (tmpCourseError?.Error != null)
+			{
+				error = tmpCourseError.Error;
+				return true;
+			}
+			error = null;
+			return false;
+		}
+
 		private void CheckTempCourseAndReloadIfNecessary(string courseId)
 		{
 			var tempCourse = tempCoursesRepo.Find(courseId);
 			if (tempCourse is null)
 				return;
-			courseManager.ReloadCourse(courseId); // todo if necessary
+			if (tempCourse.LastUpdateTime < tempCourse.LoadingTime)
+			{
+				courseManager.ReloadCourse(courseId); 
+				tempCoursesRepo.UpdateTempCourseLastUpdateTime(courseId);
+			}
 		}
 
 		[AllowAnonymous]

@@ -459,5 +459,7 @@ namespace Database
 		public DbSet<UserFlashcardsUnlocking> UserFlashcardsUnlocking { get; set; }
 		
 		public DbSet<TempCourse> TempCourses { get; set; }
+		
+		public DbSet<TempCourseError> TempCourseErrors { get; set; }
 	}
 }
