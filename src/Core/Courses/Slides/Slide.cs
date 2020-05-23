@@ -275,12 +275,11 @@ namespace Ulearn.Core.Courses.Slides
 		}
 
 		protected const string SlideUrlFormat = "/Course/{0}/LtiSlide?slideId={1}";
-		protected const string SolutionsUrlFormat = "/Course/{0}/AcceptedAlert?slideId={1}";
+		protected const string SolutionsUrlFormat = "/Course/{0}/AcceptedAlert?slideId={1}&isLti=True";
 
 		public IEnumerable<Vertical> ToVerticals(string courseId, string ulearnBaseUrl, Dictionary<string, string> videoGuids, string ltiId, DirectoryInfo coursePackageRoot)
 		{
 			var slideUrl = ulearnBaseUrl + SlideUrlFormat;
-			var solutionsUrl = ulearnBaseUrl + SolutionsUrlFormat;
 			try
 			{
 				if (this is QuizSlide quizSlide)
