@@ -91,10 +91,15 @@ namespace Ulearn.Common.Api
 
 		private static bool FilterLogs(LogEvent le)
 		{
-			return le.Properties.TryGetValue("SourceContext", out var sourceContextValue)
+			return le.Level <= LogEventLevel.Information
+				&& le.Properties.TryGetValue("SourceContext", out var sourceContextValue)
 				&& (sourceContextValue as ScalarValue)?.Value is string sourceContext
 				&& (sourceContext.StartsWith("Microsoft.AspNetCore.Mvc.Infrastructure")
-					|| sourceContext.StartsWith("Microsoft.AspNetCore.Hosting.Diagnostics"));
+					|| sourceContext.StartsWith("Microsoft.AspNetCore.Hosting.Diagnostics")
+					|| sourceContext.StartsWith("Microsoft.AspNetCore.Cors.Infrastructure")
+					|| sourceContext.StartsWith("Microsoft.AspNetCore.Authentication")
+					|| sourceContext.StartsWith("Microsoft.AspNetCore.Authorization")
+					);
 		}
 
 		public class UlearnPortConfiguration
