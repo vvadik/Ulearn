@@ -94,14 +94,7 @@ namespace Ulearn.Web.Api.Controllers
 			return response;
 		}
 
-		private async Task NotifyAboutPublishedCourseVersion(string courseId, Guid versionId, string userId)
-		{
-			var notification = new PublishedPackageNotification
-			{
-				CourseVersionId = versionId,
-			};
-			await notificationsRepo.AddNotificationAsync(courseId, notification, userId);
-		}
+		
 
 
 		[HttpPost("uploadCourse/{courseId}")]
@@ -111,43 +104,23 @@ namespace Ulearn.Web.Api.Controllers
 			var userId = User.Identity.GetUserId();
 			/*if (!await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin))
 				return BadRequest($"You dont have a Course Admin access to {courseId} course");*/
-
 			var tmpCourseId = courseId + userId;
 			var tmpCourse = tempCoursesRepo.Find(tmpCourseId);
 			if (tmpCourse is null)
 				return BadRequest($"Your temp version of course {courseId} does not exists. Use create method");
 			if (files.Count != 1)
 			{
-				throw new Exception();
+				return BadRequest($"Expected count of files is 1, but was {files.Count}");
 			}
 
 			var file = files.Single();
 			if (file == null || file.Length <= 0)
-				throw new Exception();
-
+				return BadRequest("The file is empty");
 			var fileName = Path.GetFileName(file.FileName);
 			if (fileName == null || !fileName.ToLower().EndsWith(".zip"))
-				throw new Exception();
-
-			var uploadingError = await UploadCourse(tmpCourseId, file.OpenReadStream().ToArray(), User.Identity.GetUserId()).ConfigureAwait(false);
-
-			var stagingFile = courseManager.GetStagingTempCourseFile(tmpCourseId);
-
-			var filesToDelete = new List<string>();
-			using (var zip = ZipFile.Read(stagingFile.FullName))
-			{
-				var ms = new MemoryStream();
-				var e = zip["deleted.txt"];
-				e.Extract(ms);
-				using var sr = new StreamReader(ms);
-				while (!sr.EndOfStream)
-				{
-					var line = sr.ReadLine();
-					if (line != null)
-						filesToDelete.Add(line);
-				}
-			}
-
+				return BadRequest("The file should have .zip extension");
+			UploadChanges(tmpCourseId, file.OpenReadStream().ToArray());
+			var filesToDelete = ExtractFilesToDelete(tmpCourseId);
 			var error = await TryPublishChanges(tmpCourseId, filesToDelete);
 			if (error != null)
 			{
@@ -158,6 +131,26 @@ namespace Ulearn.Web.Api.Controllers
 			await tempCoursesRepo.MarkTempCourseAsNotErrored(tmpCourseId);
 			await tempCoursesRepo.UpdateTempCourseLoadingTime(tmpCourseId);
 			return Ok($"course with id {tmpCourseId} successfully updated");
+		}
+
+		private List<string> ExtractFilesToDelete(string tmpCourseId)
+		{
+			var stagingFile = courseManager.GetStagingTempCourseFile(tmpCourseId);
+			var filesToDelete = new List<string>();
+			using (var zip = ZipFile.Read(stagingFile.FullName))
+			{
+				var e = zip["deleted.txt"];
+				var r = e.OpenReader();
+				using var sr = new StreamReader(r);
+				while (!sr.EndOfStream)
+				{
+					var line = sr.ReadLine();
+					if (!string.IsNullOrEmpty(line))
+						filesToDelete.Add(line);
+				}
+			}
+
+			return filesToDelete.Select(x => x.Substring(1)).ToList();
 		}
 
 		private async Task<string> TryPublishChanges(string courseId, List<string> filesToDelete)
@@ -195,9 +188,8 @@ namespace Ulearn.Web.Api.Controllers
 			}
 		}
 
-		private RevertStructure GetRevertStructure(string courseId, List<string> filesToDelete)
+		private RevertStructure GetRevertStructure(string courseId, List<string> filesToDeleteRelativePaths)
 		{
-			var revertStructure = new RevertStructure();
 			var staging = courseManager.GetStagingTempCourseFile(courseId);
 			var courseDirectory = courseManager.GetExtractedCourseDirectory(courseId);
 			var pathPrefix = courseDirectory.FullName;
@@ -210,6 +202,14 @@ namespace Ulearn.Web.Api.Controllers
 				.EnumerateFiles(courseDirectory.FullName, "*.*", SearchOption.AllDirectories)
 				.Select(file => file.Substring(file.IndexOf(pathPrefix) + pathPrefix.Length + 1))
 				.ToHashSet();
+			var revertStructure = GetRevertStructure(pathPrefix, filesToDeleteRelativePaths, filesToChangeRelativePaths, courseFileRelativePaths);
+
+			return revertStructure;
+		}
+
+		private static RevertStructure GetRevertStructure(string pathPrefix, IEnumerable<string> filesToDeleteRelativePaths, IEnumerable<string> filesToChangeRelativePaths, HashSet<string> courseFileRelativePaths)
+		{
+			RevertStructure revertStructure = new RevertStructure();
 			foreach (var name in filesToChangeRelativePaths)
 			{
 				var filePath = pathPrefix + "\\" + name;
@@ -224,9 +224,9 @@ namespace Ulearn.Web.Api.Controllers
 				}
 			}
 
-			foreach (var fileToDeleteRelativePath in filesToDelete)
+			foreach (var fileToDeleteRelativePath in filesToDeleteRelativePaths)
 			{
-				var filePath = pathPrefix + fileToDeleteRelativePath;
+				var filePath = pathPrefix + "\\" + fileToDeleteRelativePath;
 				if (courseFileRelativePaths.Contains(fileToDeleteRelativePath))
 				{
 					var bytes = System.IO.File.ReadAllBytes(filePath);
@@ -276,12 +276,11 @@ namespace Ulearn.Web.Api.Controllers
 		}
 
 
-		private async Task<Exception> UploadCourse(string courseId, byte[] content, string userId)
+		private void UploadChanges(string courseId, byte[] content)
 		{
 			logger.Information($"Start upload course '{courseId}'");
 			var stagingFile = courseManager.GetStagingTempCourseFile(courseId);
 			System.IO.File.WriteAllBytes(stagingFile.FullName, content);
-			return null;
 		}
 
 
@@ -290,6 +289,14 @@ namespace Ulearn.Web.Api.Controllers
 			var notification = new UploadedPackageNotification
 			{
 				CourseVersionId = versionId
+			};
+			await notificationsRepo.AddNotificationAsync(courseId, notification, userId);
+		}
+		private async Task NotifyAboutPublishedCourseVersion(string courseId, Guid versionId, string userId)
+		{
+			var notification = new PublishedPackageNotification
+			{
+				CourseVersionId = versionId,
 			};
 			await notificationsRepo.AddNotificationAsync(courseId, notification, userId);
 		}
