@@ -38,7 +38,7 @@ namespace CourseToolHotReloader.UpdateQuery
 			updatesQuery.AddOrUpdate(update.FullPath, update, (_1, _2) => update);
 
 			deletedFiles.TryRemove(update.FullPath, out _);
-			
+
 			createdFiles.AddOrUpdate(update.FullPath, update, (_1, _2) => update);
 		}
 
@@ -63,6 +63,7 @@ namespace CourseToolHotReloader.UpdateQuery
 		{
 			var result = deletedFiles.Values.ToArray();
 			deletedFiles.Clear();
+			createdFiles.Clear();
 			return result;
 		}
 	}
