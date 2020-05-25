@@ -54,14 +54,21 @@ namespace AntiPlagiarism.Web.Database
 		private void WorkerThread()
 		{
 			logger.Information($"Поток {Thread.CurrentThread.Name} запускается");
-			
+
 			while (true)
 			{
-				bool newSubmissionHandled;
+				bool newSubmissionHandled = false;
 				using (var scope = serviceScopeFactory.CreateScope())
 				{
 					var newSubmissionHandler = scope.ServiceProvider.GetService<NewSubmissionHandler>();
-					newSubmissionHandled = newSubmissionHandler.HandleNewSubmission().Result;
+					try
+					{
+						newSubmissionHandled = newSubmissionHandler.HandleNewSubmission().Result;
+					}
+					catch (Exception ex)
+					{
+						logger.Error(ex, "Exception during HandleNewSubmission");
+					}
 				}
 				if(!newSubmissionHandled)
 					Thread.Sleep(sleep);
