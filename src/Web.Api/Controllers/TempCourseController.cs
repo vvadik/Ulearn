@@ -43,16 +43,28 @@ namespace Ulearn.Web.Api.Controllers
 
 		[Authorize]
 		[HttpPost("create/{courseId}")]
-		public async Task<IActionResult> CreateCourse([FromRoute] string courseId)
+		public async Task<TempCourseUpdateResponse> CreateCourse([FromRoute] string courseId)
 		{
 			var userId = User.Identity.GetUserId();
-			/*if (!await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin))
-				return BadRequest($"You dont have a Course Admin access to {courseId} course");*/
-
 			var tmpCourseId = courseId + userId;
+			// if (!await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin))
+			// {
+			// 	return new TempCourseUpdateResponse()
+			// 	{
+			// 		ErrorType = ErrorType.Forbidden,
+			// 		Message = $"Your temp version of course {courseId} already exists with id {tmpCourseId}"
+			// 	};
+			// }
+
 			var tmpCourse = tempCoursesRepo.Find(tmpCourseId);
 			if (tmpCourse != null)
-				return BadRequest($"Your temp version of course {courseId} already exists with id {tmpCourseId}");
+			{
+				return new TempCourseUpdateResponse()
+				{
+					ErrorType = ErrorType.Conflict,
+					Message = $"Your temp version of course {courseId} already exists with id {tmpCourseId}"
+				};
+			}
 
 			var versionId = Guid.NewGuid();
 			var courseTitle = "Temp course";
@@ -65,7 +77,12 @@ namespace Ulearn.Web.Api.Controllers
 			//await NotifyAboutPublishedCourseVersion(tmpCourseId, versionId, userId).ConfigureAwait(false); 
 
 			await tempCoursesRepo.AddTempCourse(tmpCourseId, userId);
-			return Ok($"course with id {tmpCourseId} successfully created");
+			var loadingTime = tempCoursesRepo.Find(tmpCourseId).LoadingTime;
+			return new TempCourseUpdateResponse()
+			{
+				Message = $"course with id {tmpCourseId} successfully created",
+				LastUploadTime = loadingTime
+			};
 		}
 
 		[Authorize]
@@ -94,59 +111,92 @@ namespace Ulearn.Web.Api.Controllers
 			return response;
 		}
 
-		
-
+		[HttpPost("isTempCourse/{courseId}")]
+		public async Task<bool> IsTempCourse([FromRoute] string tmpCourseId)
+		{
+			var tmpCourse = tempCoursesRepo.Find(tmpCourseId);
+			return tmpCourse != null;
+		}
 
 		[HttpPost("uploadCourse/{courseId}")]
 		[Authorize]
-		public async Task<IActionResult> UploadCourse([FromRoute] string courseId, List<IFormFile> files)
+		public async Task<TempCourseUpdateResponse> UploadCourse([FromRoute] string courseId, List<IFormFile> files)
 		{
-			var isFull = false;
+			return await UploadCourse(courseId, files, false);
+		}
+
+		[HttpPost("uploadFullCourse/{courseId}")]
+		[Authorize]
+		public async Task<TempCourseUpdateResponse> UploadFullCourse([FromRoute] string courseId, List<IFormFile> files)
+		{
+			return await UploadCourse(courseId, files, true);
+		}
+
+		public async Task<TempCourseUpdateResponse> UploadCourse(string courseId, List<IFormFile> files, bool isFull)
+		{
 			var userId = User.Identity.GetUserId();
-			/*if (!await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin))
-				return BadRequest($"You dont have a Course Admin access to {courseId} course");*/
+			// if (!await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin))
+			// {
+			// 	return new TempCourseUpdateResponse()
+			// 		{
+			// 			ErrorType = ErrorType.Forbidden,
+			// 			Message = $"You dont have a Course Admin access to {courseId} course"
+			// 		};
+			// }
 			var tmpCourseId = courseId + userId;
 			var tmpCourse = tempCoursesRepo.Find(tmpCourseId);
 			if (tmpCourse is null)
-				return BadRequest($"Your temp version of course {courseId} does not exists. Use create method");
+			{
+				return new TempCourseUpdateResponse()
+				{
+					ErrorType = ErrorType.NotFound,
+					Message = $"Your temp version of course {courseId} does not exists. Use create method"
+				};
+			}
+
 			if (files.Count != 1)
 			{
-				return BadRequest($"Expected count of files is 1, but was {files.Count}");
+				throw new Exception($"Expected count of files is 1, but was {files.Count}");
 			}
 
 			var file = files.Single();
 			if (file == null || file.Length <= 0)
-				return BadRequest("The file is empty");
+				throw new Exception("The file is empty");
 			var fileName = Path.GetFileName(file.FileName);
 			if (fileName == null || !fileName.ToLower().EndsWith(".zip"))
-				return BadRequest("The file should have .zip extension");
+				throw new Exception("The file should have .zip extension");
 			UploadChanges(tmpCourseId, file.OpenReadStream().ToArray());
-			var filesToDelete = ExtractFilesToDelete(tmpCourseId);
-			var error = await TryPublishChanges(tmpCourseId, filesToDelete,isFull);
+			var filesToDelete = ExtractFileNamesToDelete(tmpCourseId);
+			var error = await TryPublishChanges(tmpCourseId, filesToDelete, isFull);
 			if (error != null)
 			{
 				await tempCoursesRepo.UpdateOrAddTempCourseError(tmpCourseId, error);
-				return BadRequest(error);
+				return new TempCourseUpdateResponse()
+				{
+					Message = error,
+					ErrorType = ErrorType.CourseError
+				};
 			}
 
 			await tempCoursesRepo.MarkTempCourseAsNotErrored(tmpCourseId);
 			await tempCoursesRepo.UpdateTempCourseLoadingTime(tmpCourseId);
-			return Ok($"course with id {tmpCourseId} successfully updated");
+			var loadingTime = tempCoursesRepo.Find(tmpCourseId).LoadingTime;
+			return new TempCourseUpdateResponse()
+			{
+				Message = $"course with id {tmpCourseId} successfully updated",
+				LastUploadTime = loadingTime
+			};
 		}
 
-		private void AddAllFilesToDelete(string tmpCourseId, List<string> filesToDelete)
-		{
-			var courseDir = courseManager.GetExtractedCourseDirectory(tmpCourseId);
-			
-		}
-
-		private List<string> ExtractFilesToDelete(string tmpCourseId)
+		private List<string> ExtractFileNamesToDelete(string tmpCourseId)
 		{
 			var stagingFile = courseManager.GetStagingTempCourseFile(tmpCourseId);
 			var filesToDelete = new List<string>();
 			using (var zip = ZipFile.Read(stagingFile.FullName))
 			{
 				var e = zip["deleted.txt"];
+				if (e is null)
+					return new List<string>();
 				var r = e.OpenReader();
 				using var sr = new StreamReader(r);
 				while (!sr.EndOfStream)
@@ -162,10 +212,10 @@ namespace Ulearn.Web.Api.Controllers
 
 		private async Task<string> TryPublishChanges(string courseId, List<string> filesToDelete, bool isFull)
 		{
-			var revertStructure = GetRevertStructure(courseId, filesToDelete,isFull);
-			DeleteFiles(revertStructure.DeletedFiles);//delete firstly
+			var revertStructure = GetRevertStructure(courseId, filesToDelete, isFull);
+			DeleteFiles(revertStructure.DeletedFiles); //delete firstly
 			courseManager.ExtractTempCourseChanges(courseId);
-			
+
 			var extractedCourseDirectory = courseManager.GetExtractedCourseDirectory(courseId);
 			try
 			{
@@ -231,7 +281,7 @@ namespace Ulearn.Web.Api.Controllers
 					revertStructure.AddedFiles.Add(filePath);
 				}
 			}
-			
+
 			if (isFull)
 			{
 				courseFileRelativePaths.ForEach(filesToDeleteRelativePaths.Add);
@@ -247,7 +297,6 @@ namespace Ulearn.Web.Api.Controllers
 				}
 			}
 
-			
 			return revertStructure;
 		}
 
@@ -306,6 +355,7 @@ namespace Ulearn.Web.Api.Controllers
 			};
 			await notificationsRepo.AddNotificationAsync(courseId, notification, userId);
 		}
+
 		private async Task NotifyAboutPublishedCourseVersion(string courseId, Guid versionId, string userId)
 		{
 			var notification = new PublishedPackageNotification
