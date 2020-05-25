@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Net;
+using System.Reflection;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,30 +18,18 @@ namespace CourseToolHotReloader.Authorizer
 	public class Authorizer : IAuthorizer
 	{
 		private readonly IConfig config;
-		private const string path = @"c:\temp\config.txt";
+		private readonly string path;
 
 		public Authorizer(IConfig config)
 		{
 			this.config = config;
+			path = $"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\\config.txt";
 		}
 
 		public async Task SignIn()
 		{
-			LoginPasswordParameters loginPasswordParameters;
+			var loginPasswordParameters = GetLoginPasswordParameters();
 			var configExist = File.Exists(path);
-
-			if (File.Exists(path))
-			{
-				loginPasswordParameters = ReadFile();
-			}
-			else
-			{
-				loginPasswordParameters = new LoginPasswordParameters
-				{
-					Login = GetLogin(),
-					Password = new System.Net.NetworkCredential(string.Empty, GetPassword()).Password
-				};
-			}
 
 			try
 			{
@@ -48,9 +38,7 @@ namespace CourseToolHotReloader.Authorizer
 			catch (Exception e)
 			{
 				if (configExist)
-				{
 					File.Delete(path);
-				}
 
 				Console.WriteLine(e);
 				throw;
@@ -60,7 +48,24 @@ namespace CourseToolHotReloader.Authorizer
 				SavePassword(loginPasswordParameters);
 		}
 
-		private SecureString GetPassword()
+		private LoginPasswordParameters GetLoginPasswordParameters()
+		{
+			if (File.Exists(path))
+			{
+				var loginPasswordParameters = ReadFile();
+				Console.Write($"Войти под {loginPasswordParameters.Login}? д(ДА)/н(Нет):");
+				if (GetAnswer())
+					return loginPasswordParameters;
+			}
+
+			return new LoginPasswordParameters
+			{
+				Login = GetLogin(),
+				Password = new NetworkCredential(string.Empty, GetPassword()).Password
+			};
+		}
+
+		private static SecureString GetPassword()
 		{
 			Console.Write("пароль:");
 			var password = new SecureString();
@@ -89,7 +94,7 @@ namespace CourseToolHotReloader.Authorizer
 			return password;
 		}
 
-		private string GetLogin()
+		private static string GetLogin()
 		{
 			Console.Write("логин:");
 			return Console.ReadLine();
@@ -98,13 +103,13 @@ namespace CourseToolHotReloader.Authorizer
 		private void SavePassword(LoginPasswordParameters loginPasswordParameters)
 		{
 			Console.Write("Запомнить меня? д(ДА)/н(Нет):");
-			var answer = Console.ReadLine();
-			if (answer != null &&
-				(answer.Equals("д", StringComparison.OrdinalIgnoreCase)
-				|| answer.Equals("да", StringComparison.OrdinalIgnoreCase)))
-			{
-				CreateFile(loginPasswordParameters);
-			}
+
+			if (!GetAnswer())
+				return;
+
+			Console.WriteLine("Мы сохранили ваш логин и пароль в файле:");
+			Console.WriteLine(path);
+			CreateFile(loginPasswordParameters);
 		}
 
 		private void CreateFile(LoginPasswordParameters loginPasswordParameters)
@@ -131,6 +136,14 @@ namespace CourseToolHotReloader.Authorizer
 				Login = streamReader.ReadLine(),
 				Password = streamReader.ReadLine()
 			};
+		}
+
+		private static bool GetAnswer()
+		{
+			var answer = Console.ReadLine();
+			return answer != null &&
+					(answer.Equals("д", StringComparison.OrdinalIgnoreCase)
+					|| answer.Equals("да", StringComparison.OrdinalIgnoreCase));
 		}
 	}
 }
