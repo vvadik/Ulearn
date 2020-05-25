@@ -4,7 +4,7 @@ using Ulearn.Common.Api.Models.Parameters;
 
 namespace AntiPlagiarism.Api.Models.Parameters
 {
-	public class GetSubmissionPlagiarismsParameters : ApiParameters
+	public class GetSubmissionPlagiarismsParameters : AntiPlagiarismApiParameters
 	{
 		[BindRequired]
 		[FromQuery(Name = "submission_id")]
