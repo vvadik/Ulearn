@@ -12,9 +12,10 @@ namespace CourseToolHotReloader.ApiClient
 {
 	public class HttpMethods
 	{
+		private const string baseUrl = "http://localhost:8000";
+
 		public static async Task<AccountTokenResponseDto> GetJwtToken(LoginPasswordParameters parameters)
 		{
-			const string baseUrl = "http://localhost:8000";
 			var url = $"{baseUrl}/account/login";
 
 			var json = JsonSerializer.Serialize(parameters);
@@ -25,39 +26,43 @@ namespace CourseToolHotReloader.ApiClient
 			var response = await client.PostAsync(url, data);
 
 			if (response.StatusCode != HttpStatusCode.OK)
-				throw new Exception("Неправильный логин пароль");
+				throw new Exception("Неправильный логин или пароль");
 
 			var result = response.Content.ReadAsStringAsync().Result;
 			return JsonSerializer.Deserialize<AccountTokenResponseDto>(result);
 		}
 
-		private static async Task UploadCourse(string path, string token)
+		public static async Task<TempCourseUpdateResponse> UploadCourse(MemoryStream memoryStream, string token, string id)
 		{
-			const string baseUrl = "http://localhost:8000";
-			var url = $"{baseUrl}/tempCourses/uploadCourse/123";
-
-			using var client = new HttpClient();
-			client.DefaultRequestHeaders.Authorization =
-				new AuthenticationHeaderValue("Bearer", token);
-
-			var multiForm = new MultipartFormDataContent();
-			var fileStream = File.OpenRead(path);
-			var streamContent = new StreamContent(fileStream);
-			multiForm.Add(streamContent, "files", Path.GetFileName(path));
-			var response = await client.PostAsync(url, multiForm);
-
-			var result = response.Content.ReadAsStringAsync().Result;
-		}
-
-
-		public static async Task UploadCourse(MemoryStream memoryStream, string token, string id)
-		{
-			const string baseUrl = "http://localhost:8000";
 			var url = $"{baseUrl}/tempCourses/uploadCourse/{id}";
 
-			using var client = new HttpClient();
-			client.DefaultRequestHeaders.Authorization =
-				new AuthenticationHeaderValue("Bearer", token);
+			return await UpdateTempCourse(memoryStream, token, url);
+		}
+
+		public static async Task<TempCourseUpdateResponse> UploadFullCourse(MemoryStream memoryStream, string token, string id)
+		{
+			var url = $"{baseUrl}/tempCourses/uploadFullCourse/{id}";
+
+			return await UpdateTempCourse(memoryStream, token, url);
+		}
+
+		public static async Task CreateCourse(string token, string id)
+		{
+			var url = $"{baseUrl}/tempCourses/create/{id}";
+
+			using var client = HttpClient(token);
+
+			var response = await client.PostAsync(url, null);
+
+			if (response.StatusCode != HttpStatusCode.OK)
+			{
+				Console.WriteLine($"We have error: {response.Content.ReadAsStringAsync().Result}");
+			}
+		}
+
+		private static async Task<TempCourseUpdateResponse> UpdateTempCourse(MemoryStream memoryStream, string token, string url)
+		{
+			var client = HttpClient(token);
 
 			var fileContent = new ByteArrayContent(memoryStream.ToArray());
 			var multiContent = new MultipartFormDataContent { { fileContent, "files", "qwe.zip" } };
@@ -67,23 +72,17 @@ namespace CourseToolHotReloader.ApiClient
 			{
 				Console.WriteLine($"we have error {response.Content.ReadAsStringAsync().Result}");
 			}
+
+			var result = response.Content.ReadAsStringAsync().Result;
+			return JsonSerializer.Deserialize<TempCourseUpdateResponse>(result);
 		}
 
-		public static async Task CreateCourse(string token, string id)
+		private static HttpClient HttpClient(string token)
 		{
-			const string baseUrl = "http://localhost:8000";
-			var url = $"{baseUrl}/tempCourses/create/{id}";
-
 			using var client = new HttpClient();
 			client.DefaultRequestHeaders.Authorization =
 				new AuthenticationHeaderValue("Bearer", token);
-
-			var response = await client.PostAsync(url, null);
-
-			if (response.StatusCode != HttpStatusCode.OK)
-			{
-				Console.WriteLine($"We have error: {response.Content.ReadAsStringAsync().Result}");
-			}
+			return client;
 		}
 	}
 }

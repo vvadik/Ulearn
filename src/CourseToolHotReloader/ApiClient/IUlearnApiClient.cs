@@ -18,7 +18,7 @@ namespace CourseToolHotReloader.ApiClient
 		{
 			var ms = ZipUpdater.CreateZipByUpdates(updates, deletedFiles);
 
-			await HttpMethods.UploadCourse(ms, token, courseId);
+			var updateResponse = await HttpMethods.UploadCourse(ms, token, courseId);
 			
 			Console.WriteLine($"{courseId} updates only upload");
 		}
@@ -27,7 +27,7 @@ namespace CourseToolHotReloader.ApiClient
 		{
 			var ms = ZipUpdater.CreateZipByFolder(path);
 
-			await HttpMethods.UploadCourse(ms, token, courseId);
+			var updateResponse = await HttpMethods.UploadFullCourse(ms, token, courseId);
 
 			Console.WriteLine($"{courseId} upload");
 		}
