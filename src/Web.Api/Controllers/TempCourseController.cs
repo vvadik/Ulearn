@@ -101,6 +101,7 @@ namespace Ulearn.Web.Api.Controllers
 		[Authorize]
 		public async Task<IActionResult> UploadCourse([FromRoute] string courseId, List<IFormFile> files)
 		{
+			var isFull = false;
 			var userId = User.Identity.GetUserId();
 			/*if (!await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin))
 				return BadRequest($"You dont have a Course Admin access to {courseId} course");*/
@@ -121,7 +122,7 @@ namespace Ulearn.Web.Api.Controllers
 				return BadRequest("The file should have .zip extension");
 			UploadChanges(tmpCourseId, file.OpenReadStream().ToArray());
 			var filesToDelete = ExtractFilesToDelete(tmpCourseId);
-			var error = await TryPublishChanges(tmpCourseId, filesToDelete);
+			var error = await TryPublishChanges(tmpCourseId, filesToDelete,isFull);
 			if (error != null)
 			{
 				await tempCoursesRepo.UpdateOrAddTempCourseError(tmpCourseId, error);
@@ -131,6 +132,12 @@ namespace Ulearn.Web.Api.Controllers
 			await tempCoursesRepo.MarkTempCourseAsNotErrored(tmpCourseId);
 			await tempCoursesRepo.UpdateTempCourseLoadingTime(tmpCourseId);
 			return Ok($"course with id {tmpCourseId} successfully updated");
+		}
+
+		private void AddAllFilesToDelete(string tmpCourseId, List<string> filesToDelete)
+		{
+			var courseDir = courseManager.GetExtractedCourseDirectory(tmpCourseId);
+			
 		}
 
 		private List<string> ExtractFilesToDelete(string tmpCourseId)
@@ -153,11 +160,12 @@ namespace Ulearn.Web.Api.Controllers
 			return filesToDelete.Select(x => x.Substring(1)).ToList();
 		}
 
-		private async Task<string> TryPublishChanges(string courseId, List<string> filesToDelete)
+		private async Task<string> TryPublishChanges(string courseId, List<string> filesToDelete, bool isFull)
 		{
-			var revertStructure = GetRevertStructure(courseId, filesToDelete);
+			var revertStructure = GetRevertStructure(courseId, filesToDelete,isFull);
+			DeleteFiles(revertStructure.DeletedFiles);//delete firstly
 			courseManager.ExtractTempCourseChanges(courseId);
-			DeleteFiles(revertStructure.DeletedFiles);
+			
 			var extractedCourseDirectory = courseManager.GetExtractedCourseDirectory(courseId);
 			try
 			{
@@ -188,7 +196,7 @@ namespace Ulearn.Web.Api.Controllers
 			}
 		}
 
-		private RevertStructure GetRevertStructure(string courseId, List<string> filesToDeleteRelativePaths)
+		private RevertStructure GetRevertStructure(string courseId, List<string> filesToDeleteRelativePaths, bool isFull)
 		{
 			var staging = courseManager.GetStagingTempCourseFile(courseId);
 			var courseDirectory = courseManager.GetExtractedCourseDirectory(courseId);
@@ -202,14 +210,14 @@ namespace Ulearn.Web.Api.Controllers
 				.EnumerateFiles(courseDirectory.FullName, "*.*", SearchOption.AllDirectories)
 				.Select(file => file.Substring(file.IndexOf(pathPrefix) + pathPrefix.Length + 1))
 				.ToHashSet();
-			var revertStructure = GetRevertStructure(pathPrefix, filesToDeleteRelativePaths, filesToChangeRelativePaths, courseFileRelativePaths);
+			var revertStructure = GetRevertStructure(pathPrefix, filesToDeleteRelativePaths, filesToChangeRelativePaths.ToList(), courseFileRelativePaths, isFull);
 
 			return revertStructure;
 		}
 
-		private static RevertStructure GetRevertStructure(string pathPrefix, IEnumerable<string> filesToDeleteRelativePaths, IEnumerable<string> filesToChangeRelativePaths, HashSet<string> courseFileRelativePaths)
+		private static RevertStructure GetRevertStructure(string pathPrefix, List<string> filesToDeleteRelativePaths, List<string> filesToChangeRelativePaths, HashSet<string> courseFileRelativePaths, bool isFull)
 		{
-			RevertStructure revertStructure = new RevertStructure();
+			var revertStructure = new RevertStructure();
 			foreach (var name in filesToChangeRelativePaths)
 			{
 				var filePath = pathPrefix + "\\" + name;
@@ -223,6 +231,11 @@ namespace Ulearn.Web.Api.Controllers
 					revertStructure.AddedFiles.Add(filePath);
 				}
 			}
+			
+			if (isFull)
+			{
+				courseFileRelativePaths.ForEach(filesToDeleteRelativePaths.Add);
+			}
 
 			foreach (var fileToDeleteRelativePath in filesToDeleteRelativePaths)
 			{
@@ -234,6 +247,7 @@ namespace Ulearn.Web.Api.Controllers
 				}
 			}
 
+			
 			return revertStructure;
 		}
 
