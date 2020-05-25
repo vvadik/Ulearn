@@ -400,6 +400,8 @@ namespace uLearn.Web.Controllers
 		// returns null if user can't edit git
 		private string GetGitEditLink(Course course, FileInfo pageFile)
 		{
+			if (IsTempCourse(course.Id))
+				return null;
 			var courseRole = User.GetCourseRole(course.Id);
 			var canEditGit = courseRole != null && courseRole <= CourseRole.CourseAdmin;
 			var publishedCourseVersion = coursesRepo.GetPublishedCourseVersion(course.Id);
