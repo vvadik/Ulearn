@@ -52,8 +52,7 @@ namespace CourseToolHotReloader.DirectoryWorkers
 
 			watcher.EnableRaisingEvents = true;
 
-			Console.WriteLine("Press 'q' to quit");
-			while (Console.Read() != 'q') // todo не могу вынести
+			while (true)
 			{
 			}
 		}

@@ -1,11 +1,12 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Autofac;
 using CommandLine;
 using CourseToolHotReloader.ApiClient;
 using CourseToolHotReloader.Authorizer;
 using CourseToolHotReloader.DirectoryWorkers;
+using CourseToolHotReloader.Dtos;
 
 namespace CourseToolHotReloader
 {
@@ -18,11 +19,6 @@ namespace CourseToolHotReloader
 			container = ConfigureAutofac.Build();
 
 			Parser.Default.ParseArguments<Options>(args).WithParsed(ParseOption);
-
-			Console.WriteLine("Press 'q' to quit");
-			while (Console.Read() != 'q')
-			{
-			}
 		}
 
 
@@ -34,7 +30,7 @@ namespace CourseToolHotReloader
 
 		private static async Task ParseOptionAsync(Options options)
 		{
-			await container.Resolve<IAuthorizer>().SignIn(); // нужно вынести
+			await container.Resolve<IAuthorizer>().SignIn();
 
 			var config = container.Resolve<IConfig>();
 
