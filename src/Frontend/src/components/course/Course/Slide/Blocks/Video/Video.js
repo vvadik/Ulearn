@@ -81,42 +81,47 @@ class Video extends React.Component {
 		return (
 			<BlocksWrapper withoutBottomPaddigns>
 				<Text>
-					<h3 className={ classNames(styles.annotationTitle, titleClassName) }>
-						<Link onClick={ this.toggleAnnotation }>
-							Содержание видео
-							<span className={ styles.annotationArrow }>
-								{ showedAnnotation
-									? <ArrowChevronUp/>
-									: <ArrowChevronDown/> }
-							</span>
-						</Link>
-					</h3>
-					{ showedAnnotation && (annotation
-						? <React.Fragment>
-							<p>{ annotation.text }</p>
-							{ annotation.fragments.map(({ text, offset }) => {
-								const [hours, minutes, seconds] = offset.split(':');
-								const [hoursAsInt, minutesAsInt, secondsAsInt] = [hours, minutes, seconds].map(t => Number.parseInt(t));
-								const timeInSeconds = hoursAsInt * 60 * 60 + minutesAsInt * 60 + secondsAsInt;
-								return (
-									<p key={ offset }>
-										<Link onClick={ () => this.setVideoTime(timeInSeconds) }>
-											{ hoursAsInt > 0 && `${ hours }:` }
-											{ `${ minutes }:` }
-											{ seconds }
-										</Link>
-										{ ` — ${ text }` }
+					{
+						annotation
+							? <React.Fragment>
+								<h3 className={ classNames(styles.annotationTitle, titleClassName) }>
+									<Link onClick={ this.toggleAnnotation }>
+										Содержание видео
+										<span className={ styles.annotationArrow }>
+											{ showedAnnotation
+												? <ArrowChevronUp/>
+												: <ArrowChevronDown/> }
+										</span>
+									</Link>
+								</h3>
+								{ showedAnnotation &&
+								<React.Fragment>
+									<p>{ annotation.text }</p>
+									{ annotation.fragments.map(({ text, offset }) => {
+										const [hours, minutes, seconds] = offset.split(':');
+										const [hoursAsInt, minutesAsInt, secondsAsInt] = [hours, minutes, seconds].map(t => Number.parseInt(t));
+										const timeInSeconds = hoursAsInt * 60 * 60 + minutesAsInt * 60 + secondsAsInt;
+										return (
+											<p key={ offset }>
+												<Link onClick={ () => this.setVideoTime(timeInSeconds) }>
+													{ hoursAsInt > 0 && `${ hours }:` }
+													{ `${ minutes }:` }
+													{ seconds }
+												</Link>
+												{ ` — ${ text }` }
+											</p>
+										)
+									})
+									}
+									<p className={ styles.withoutMargins }>
+										Ошибка в содержании? <Link href={ googleDocLink }>Предложите исправление!</Link>
 									</p>
-								)
-							})
-							}
-							<p className={styles.withoutMargins}>
-								Ошибка в содержании? <Link href={ googleDocLink }>Предложите исправление!</Link>
+								</React.Fragment>
+								}
+							</React.Fragment>
+							: <p className={ styles.withoutMargins }>
+								Помогите написать <Link href={ googleDocLink }>текстовое содержание</Link> этого видео.
 							</p>
-						</React.Fragment>
-						: <p className={styles.withoutMargins}>
-							Помогите написать <Link href={ googleDocLink }>текстовое содержание</Link> этого видео.
-						</p>)
 					}
 				</Text>
 			</BlocksWrapper>
