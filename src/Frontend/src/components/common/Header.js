@@ -53,10 +53,9 @@ class Header extends Component {
 				.map(s => s.toLowerCase());
 			if(groupsAsStudent) {
 				const groupsAsStudentIds = groupsAsStudent.map(g => g.courseId.toLowerCase());
-
-				controllableCourseIds = [
-					...new Set(controllableCourseIds.concat(groupsAsStudentIds)),
-				]
+				const set = new Set(controllableCourseIds.concat(groupsAsStudentIds));
+				controllableCourseIds = Array.from(set);
+				controllableCourseIds = controllableCourseIds
 					.filter((e) => courseById.hasOwnProperty(e))
 					.sort((a, b) => {
 						const first = courseById[a].title.toLowerCase();
