@@ -41,12 +41,28 @@ function CodeMirror({ language, code, className, }) {
 			case 'java':
 				require('codemirror/mode/clike/clike');
 				return `text/x-java`;
+
 			case 'javascript':
 				require('codemirror/mode/javascript/javascript');
 				return `text/javascript`;
+			case 'typescript':
+				require('codemirror/mode/javascript/javascript');
+				return `text/typescript`;
 			case 'jsx':
 				require('codemirror/mode/jsx/jsx');
 				return `text/jsx`;
+
+			case 'python2':
+				require('codemirror/mode/python/python');
+				return `text/x-python`;
+			case 'python3':
+				require('codemirror/mode/python/python');
+				return `text/x-python`;
+
+			case 'css':
+				require('codemirror/mode/css/css');
+				return `text/css`;
+
 			default:
 				return 'text/html';
 		}
