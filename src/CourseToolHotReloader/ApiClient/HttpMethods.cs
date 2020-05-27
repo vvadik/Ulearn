@@ -62,7 +62,7 @@ namespace CourseToolHotReloader.ApiClient
 
 		private static async Task<TempCourseUpdateResponse> UpdateTempCourse(MemoryStream memoryStream, string token, string url)
 		{
-			var client = HttpClient(token);
+			using var client = HttpClient(token);
 
 			var fileContent = new ByteArrayContent(memoryStream.ToArray());
 			var multiContent = new MultipartFormDataContent { { fileContent, "files", "qwe.zip" } };
@@ -79,7 +79,7 @@ namespace CourseToolHotReloader.ApiClient
 
 		private static HttpClient HttpClient(string token)
 		{
-			using var client = new HttpClient();
+			var client = new HttpClient();
 			client.DefaultRequestHeaders.Authorization =
 				new AuthenticationHeaderValue("Bearer", token);
 			return client;
