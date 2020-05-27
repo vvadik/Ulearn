@@ -78,6 +78,7 @@ namespace Ulearn.Web.Api.Controllers
 
 			await tempCoursesRepo.AddTempCourse(tmpCourseId, userId);
 			var loadingTime = tempCoursesRepo.Find(tmpCourseId).LoadingTime;
+			await courseRolesRepo.ToggleRoleAsync(tmpCourseId, userId, CourseRoleType.CourseAdmin, userId);
 			return new TempCourseUpdateResponse()
 			{
 				Message = $"course with id {tmpCourseId} successfully created",
@@ -86,7 +87,7 @@ namespace Ulearn.Web.Api.Controllers
 		}
 
 		[Authorize]
-		[HttpPost("hasCourse/{courseId}")]
+		[HttpGet("hasCourse/{courseId}")]
 		public async Task<HasTempCourseResponse> HasCourse([FromRoute] string courseId)
 		{
 			var userId = User.Identity.GetUserId();
@@ -111,11 +112,19 @@ namespace Ulearn.Web.Api.Controllers
 			return response;
 		}
 
-		[HttpPost("isTempCourse/{courseId}")]
-		public async Task<bool> IsTempCourse([FromRoute] string tmpCourseId)
+
+		[HttpGet("isTempCourse/{courseId}")]
+		public async Task<bool> IsTempCourse([FromRoute] string courseId)
 		{
-			var tmpCourse = tempCoursesRepo.Find(tmpCourseId);
+			var tmpCourse = tempCoursesRepo.Find(courseId);
 			return tmpCourse != null;
+		}
+
+		[HttpGet("getError/{courseId}")]
+		public async Task<string> GetError([FromRoute] string courseId)
+		{
+			var tmpCourseError = tempCoursesRepo.GetCourseError(courseId);
+			return tmpCourseError?.Error;
 		}
 
 		[HttpPost("uploadCourse/{courseId}")]
