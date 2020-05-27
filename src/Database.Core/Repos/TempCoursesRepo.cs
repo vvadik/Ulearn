@@ -20,6 +20,11 @@ namespace Database.Repos
 			return db.TempCourses.SingleOrDefault(course => course.CourseId == courseId);
 		}
 
+		public TempCourseError GetCourseError(string courseId)
+		{
+			return db.TempCourseErrors.SingleOrDefault(error => error.CourseId == courseId);
+		}
+
 		public async Task<TempCourse> AddTempCourse(string courseId, string authorId)
 		{
 			var tempCourse = new TempCourse()
