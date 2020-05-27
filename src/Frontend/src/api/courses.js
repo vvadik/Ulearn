@@ -19,6 +19,10 @@ export function getCourse(courseId) {
 	return api.get(`courses/${courseId}`);
 }
 
+export function getCourseErrors(courseId) {
+	return api.get(`tempCourses/getError/${courseId}`);
+}
+
 export function getUserCourses() {
 	return api.get('courses?role=instructor');
 }

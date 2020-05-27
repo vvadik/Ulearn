@@ -30,12 +30,13 @@ class Course extends Component {
 	}
 
 	componentDidMount() {
-		const { loadCourse, loadUserProgress, isAuthenticated, courseId, courseInfo, progress, userId } = this.props;
+		const { loadCourse, loadCourseErrors, loadUserProgress, isAuthenticated, courseId, courseInfo, progress, userId } = this.props;
 
 		changeCurrentCourseAction(courseId);
 
 		if (!courseInfo) {
 			loadCourse(courseId);
+			loadCourseErrors(courseId);
 		}
 
 		if (isAuthenticated && !progress) {
@@ -44,10 +45,11 @@ class Course extends Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { loadUserProgress, isAuthenticated, courseId, loadCourse, userId } = this.props;
+		const { loadUserProgress, isAuthenticated, courseId, loadCourse, loadCourseErrors, userId } = this.props;
 
 		if (isAuthenticated !== prevProps.isAuthenticated) {
 			loadCourse(courseId);
+			loadCourseErrors(courseId);
 			loadUserProgress(courseId, userId);
 		}
 	}
@@ -84,7 +86,7 @@ class Course extends Component {
 	}
 
 	render() {
-		const { courseInfo, courseLoadingErrorStatus, isNavMenuVisible } = this.props;
+		const { courseInfo, courseErrors, courseLoadingErrorStatus, isNavMenuVisible } = this.props;
 		const { navigationOpened } = this.state;
 
 		if(courseLoadingErrorStatus){
@@ -104,7 +106,7 @@ class Course extends Component {
 				<div className={ classnames(styles.root, { 'open': navigationOpened }) }>
 					{ isNavMenuVisible && this.renderNavigation() }
 					<main className={ mainClassName }>
-						<Page match={ this.props.match }/>
+						{courseErrors ? <div className={ classnames(styles.errors) } >{courseErrors}</div> : <Page match={ this.props.match }/>}
 					</main>
 				</div>
 			</div>
@@ -317,10 +319,12 @@ Course
 	courseId: PropTypes.string,
 	slideId: PropTypes.string,
 	courseInfo: PropTypes.object, // TODO: описать
+	courseErrors: PropTypes.string, // TODO: описать
 	progress: PropTypes.object, // TODO: описать
 	units: PropTypes.object,
 	enterToCourse: PropTypes.func,
 	loadCourse: PropTypes.func,
+	loadCourseErrors: PropTypes.func,
 	loadUserProgress: PropTypes.func,
 	updateVisitedSlide: PropTypes.func,
 	navigationOpened: PropTypes.bool,
