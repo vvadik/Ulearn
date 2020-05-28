@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Castle.Core.Internal;
 using Database;
 using Database.Models;
 using Database.Repos;
@@ -17,7 +16,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Ulearn.Common.Extensions;
-using Ulearn.Core.Courses;
 using Ulearn.Web.Api.Models.Responses.TempCourses;
 using Ionic.Zip;
 
@@ -62,7 +60,8 @@ namespace Ulearn.Web.Api.Controllers
 				return new TempCourseUpdateResponse()
 				{
 					ErrorType = ErrorType.Conflict,
-					Message = $"Your temp version of course {courseId} already exists with id {tmpCourseId}"
+					Message = $"Ваша временная версия курса {courseId} уже существует с id {tmpCourseId}." +
+							$" \nYour temp version of course {courseId} already exists with id {tmpCourseId}"
 				};
 			}
 
@@ -81,7 +80,7 @@ namespace Ulearn.Web.Api.Controllers
 			await courseRolesRepo.ToggleRoleAsync(tmpCourseId, userId, CourseRoleType.CourseAdmin, userId);
 			return new TempCourseUpdateResponse()
 			{
-				Message = $"course with id {tmpCourseId} successfully created",
+				Message = $"Временный курс с id {tmpCourseId} успешно создан.\n Course with id {tmpCourseId} successfully created",
 				LastUploadTime = loadingTime
 			};
 		}
@@ -159,7 +158,8 @@ namespace Ulearn.Web.Api.Controllers
 				return new TempCourseUpdateResponse()
 				{
 					ErrorType = ErrorType.NotFound,
-					Message = $"Your temp version of course {courseId} does not exists. Use create method"
+					Message = $"Вашей временной версии курса {courseId} не существует. Для создания испрользуйте метод Create" +
+							$"\nYour temp version of course {courseId} does not exists. Use create method"
 				};
 			}
 
@@ -192,7 +192,7 @@ namespace Ulearn.Web.Api.Controllers
 			var loadingTime = tempCoursesRepo.Find(tmpCourseId).LoadingTime;
 			return new TempCourseUpdateResponse()
 			{
-				Message = $"course with id {tmpCourseId} successfully updated",
+				Message = $"Временный курс {tmpCourseId} успешно обновлен\n.Temp course with id {tmpCourseId} successfully updated",
 				LastUploadTime = loadingTime
 			};
 		}
@@ -222,14 +222,14 @@ namespace Ulearn.Web.Api.Controllers
 		private async Task<string> TryPublishChanges(string courseId, List<string> filesToDelete, bool isFull)
 		{
 			var revertStructure = GetRevertStructure(courseId, filesToDelete, isFull);
-			DeleteFiles(revertStructure.DeletedFiles); //delete firstly
+			DeleteFiles(revertStructure.DeletedFiles);
 			courseManager.ExtractTempCourseChanges(courseId);
 
 			var extractedCourseDirectory = courseManager.GetExtractedCourseDirectory(courseId);
 			try
 			{
-				var updated = courseManager.ReloadCourseFromDirectory(extractedCourseDirectory);
-				courseManager.UpdateCourseVersion(courseId, Guid.Empty); // todo do something with version
+				courseManager.ReloadCourseFromDirectory(extractedCourseDirectory);
+				courseManager.UpdateCourseVersion(courseId, Guid.Empty);
 			}
 			catch (Exception error)
 			{
@@ -240,7 +240,7 @@ namespace Ulearn.Web.Api.Controllers
 					error = error.InnerException;
 				}
 
-				RevertCourse(revertStructure, courseId);
+				revertStructure.Revert();
 				return errorMessage;
 			}
 
@@ -249,10 +249,7 @@ namespace Ulearn.Web.Api.Controllers
 
 		private void DeleteFiles(List<FileContent> filesToDelete)
 		{
-			foreach (var file in filesToDelete)
-			{
-				System.IO.File.Delete(file.Path);
-			}
+			filesToDelete.ForEach(file => System.IO.File.Delete(file.Path));
 		}
 
 		private RevertStructure GetRevertStructure(string courseId, List<string> filesToDeleteRelativePaths, bool isFull)
@@ -274,79 +271,38 @@ namespace Ulearn.Web.Api.Controllers
 			return revertStructure;
 		}
 
-		private static RevertStructure GetRevertStructure(string pathPrefix, List<string> filesToDeleteRelativePaths, List<string> filesToChangeRelativePaths, HashSet<string> courseFileRelativePaths, bool isFull)
+		private static RevertStructure GetRevertStructure(
+			string pathPrefix,
+			List<string> filesToDeleteRelativePaths,
+			List<string> filesToChangeRelativePaths,
+			HashSet<string> courseFileRelativePaths,
+			bool isFull)
 		{
-			var revertStructure = new RevertStructure();
-			foreach (var name in filesToChangeRelativePaths)
-			{
-				var filePath = pathPrefix + "\\" + name;
-				if (courseFileRelativePaths.Contains(name))
-				{
-					var bytes = System.IO.File.ReadAllBytes(filePath);
-					revertStructure.FilesBeforeChanges.Add(new FileContent(filePath, bytes));
-				}
-				else
-				{
-					revertStructure.AddedFiles.Add(filePath);
-				}
-			}
-
 			if (isFull)
 			{
-				courseFileRelativePaths.ForEach(filesToDeleteRelativePaths.Add);
+				filesToDeleteRelativePaths.Clear();
+				filesToDeleteRelativePaths.AddRange(courseFileRelativePaths);
 			}
 
-			foreach (var fileToDeleteRelativePath in filesToDeleteRelativePaths)
+			var deletedFiles = filesToDeleteRelativePaths
+				.Where(courseFileRelativePaths.Contains)
+				.Select(relativePath => pathPrefix + "\\" + relativePath)
+				.Select(path => new FileContent(path, System.IO.File.ReadAllBytes(path)))
+				.ToList();
+			return new RevertStructure
 			{
-				var filePath = pathPrefix + "\\" + fileToDeleteRelativePath;
-				if (courseFileRelativePaths.Contains(fileToDeleteRelativePath))
-				{
-					var bytes = System.IO.File.ReadAllBytes(filePath);
-					revertStructure.DeletedFiles.Add(new FileContent(filePath, bytes));
-				}
-			}
-
-			return revertStructure;
+				FilesBeforeChanges = filesToChangeRelativePaths
+					.Where(courseFileRelativePaths.Contains)
+					.Select(path => pathPrefix + "\\" + path)
+					.Select(path => new FileContent(path, System.IO.File.ReadAllBytes(path)))
+					.ToList(),
+				AddedFiles = filesToChangeRelativePaths
+					.Where(file => !courseFileRelativePaths.Contains(file))
+					.Select(path => pathPrefix + "\\" + path)
+					.ToList(),
+				DeletedFiles = deletedFiles
+			};
 		}
-
-		private class RevertStructure
-		{
-			public List<FileContent> FilesBeforeChanges = new List<FileContent>();
-			public List<string> AddedFiles = new List<string>();
-			public List<FileContent> DeletedFiles = new List<FileContent>();
-		}
-
-		private struct FileContent
-		{
-			public FileContent(string path, byte[] content)
-			{
-				Path = path;
-				Content = content;
-			}
-
-			public string Path;
-			public byte[] Content;
-		}
-
-		private void RevertCourse(RevertStructure revertStructure, string courseId)
-		{
-			//todo lock course?
-			foreach (var editedFile in revertStructure.FilesBeforeChanges)
-			{
-				System.IO.File.WriteAllBytes(editedFile.Path, editedFile.Content);
-			}
-
-			foreach (var addedFile in revertStructure.AddedFiles)
-			{
-				System.IO.File.Delete(addedFile);
-			}
-
-			foreach (var deletedFile in revertStructure.DeletedFiles)
-			{
-				System.IO.File.WriteAllBytes(deletedFile.Path, deletedFile.Content);
-			}
-		}
-
 
 		private void UploadChanges(string courseId, byte[] content)
 		{
@@ -373,5 +329,33 @@ namespace Ulearn.Web.Api.Controllers
 			};
 			await notificationsRepo.AddNotificationAsync(courseId, notification, userId);
 		}
+	}
+
+	internal class RevertStructure
+	{
+		public List<FileContent> FilesBeforeChanges = new List<FileContent>();
+		public List<string> AddedFiles = new List<string>();
+		public List<FileContent> DeletedFiles = new List<FileContent>();
+
+		public void Revert()
+		{
+			FilesBeforeChanges
+				.ForEach(editedFile => File.WriteAllBytes(editedFile.Path, editedFile.Content));
+			DeletedFiles
+				.ForEach(deletedFile => File.WriteAllBytes(deletedFile.Path, deletedFile.Content));
+			AddedFiles.ForEach(File.Delete);
+		}
+	}
+
+	internal struct FileContent
+	{
+		public FileContent(string path, byte[] content)
+		{
+			Path = path;
+			Content = content;
+		}
+
+		public readonly string Path;
+		public readonly byte[] Content;
 	}
 }
