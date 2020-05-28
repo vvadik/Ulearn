@@ -158,7 +158,7 @@ namespace Ulearn.Web.Api.Controllers
 				return new TempCourseUpdateResponse()
 				{
 					ErrorType = ErrorType.NotFound,
-					Message = $"Вашей временной версии курса {courseId} не существует. Для создания испрользуйте метод Create"+
+					Message = $"Вашей временной версии курса {courseId} не существует. Для создания испрользуйте метод Create" +
 							$"\nYour temp version of course {courseId} does not exists. Use create method"
 				};
 			}
@@ -222,14 +222,14 @@ namespace Ulearn.Web.Api.Controllers
 		private async Task<string> TryPublishChanges(string courseId, List<string> filesToDelete, bool isFull)
 		{
 			var revertStructure = GetRevertStructure(courseId, filesToDelete, isFull);
-			DeleteFiles(revertStructure.DeletedFiles); //delete firstly
+			DeleteFiles(revertStructure.DeletedFiles);
 			courseManager.ExtractTempCourseChanges(courseId);
 
 			var extractedCourseDirectory = courseManager.GetExtractedCourseDirectory(courseId);
 			try
 			{
-				var updated = courseManager.ReloadCourseFromDirectory(extractedCourseDirectory);
-				courseManager.UpdateCourseVersion(courseId, Guid.Empty); // todo do something with version
+				courseManager.ReloadCourseFromDirectory(extractedCourseDirectory);
+				courseManager.UpdateCourseVersion(courseId, Guid.Empty);
 			}
 			catch (Exception error)
 			{
@@ -240,7 +240,7 @@ namespace Ulearn.Web.Api.Controllers
 					error = error.InnerException;
 				}
 
-				RevertCourse(revertStructure);
+				revertStructure.Revert();
 				return errorMessage;
 			}
 
@@ -271,7 +271,12 @@ namespace Ulearn.Web.Api.Controllers
 			return revertStructure;
 		}
 
-		private static RevertStructure GetRevertStructure(string pathPrefix, List<string> filesToDeleteRelativePaths, List<string> filesToChangeRelativePaths, HashSet<string> courseFileRelativePaths, bool isFull)
+		private static RevertStructure GetRevertStructure(
+			string pathPrefix,
+			List<string> filesToDeleteRelativePaths,
+			List<string> filesToChangeRelativePaths,
+			HashSet<string> courseFileRelativePaths,
+			bool isFull)
 		{
 			if (isFull)
 			{
@@ -298,20 +303,6 @@ namespace Ulearn.Web.Api.Controllers
 				DeletedFiles = deletedFiles
 			};
 		}
-
-
-		private void RevertCourse(RevertStructure revertStructure)
-		{
-			//todo lock course?
-			revertStructure.FilesBeforeChanges
-				.ForEach(editedFile => System.IO.File.WriteAllBytes(editedFile.Path, editedFile.Content));
-
-			revertStructure.AddedFiles.ForEach(System.IO.File.Delete);
-
-			revertStructure.DeletedFiles
-				.ForEach(deletedFile => System.IO.File.WriteAllBytes(deletedFile.Path, deletedFile.Content));
-		}
-
 
 		private void UploadChanges(string courseId, byte[] content)
 		{
@@ -345,6 +336,15 @@ namespace Ulearn.Web.Api.Controllers
 		public List<FileContent> FilesBeforeChanges = new List<FileContent>();
 		public List<string> AddedFiles = new List<string>();
 		public List<FileContent> DeletedFiles = new List<FileContent>();
+
+		public void Revert()
+		{
+			FilesBeforeChanges
+				.ForEach(editedFile => File.WriteAllBytes(editedFile.Path, editedFile.Content));
+			DeletedFiles
+				.ForEach(deletedFile => File.WriteAllBytes(deletedFile.Path, deletedFile.Content));
+			AddedFiles.ForEach(File.Delete);
+		}
 	}
 
 	internal struct FileContent
