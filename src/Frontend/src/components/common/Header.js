@@ -419,7 +419,7 @@ class CourseMenu extends Component {
 				</MenuItem>);
 
 		if (hasCourseAdminMenuItems)
-			if (this.tempCourse.test(courseId))
+			if (!this.tempCourse.test(courseId))
 			{
 				items = items.concat([
 					<MenuItem href={ "/Admin/Packages?courseId=" + courseId } key="Packages"
