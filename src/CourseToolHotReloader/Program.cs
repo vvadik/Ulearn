@@ -1,12 +1,11 @@
-﻿using System.IO;
-using System.Text.Json;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Autofac;
 using CommandLine;
 using CourseToolHotReloader.ApiClient;
 using CourseToolHotReloader.Authorizer;
 using CourseToolHotReloader.DirectoryWorkers;
-using CourseToolHotReloader.Dtos;
 
 namespace CourseToolHotReloader
 {
@@ -20,7 +19,6 @@ namespace CourseToolHotReloader
 
 			Parser.Default.ParseArguments<Options>(args).WithParsed(ParseOption);
 		}
-
 
 		private static void ParseOption(Options options)
 		{

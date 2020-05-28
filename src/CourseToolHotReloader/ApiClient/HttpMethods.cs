@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using CourseToolHotReloader.Dtos;
+using CourseToolHotReloader.Log;
 
 namespace CourseToolHotReloader.ApiClient
 {
@@ -54,10 +55,8 @@ namespace CourseToolHotReloader.ApiClient
 
 			var response = await client.PostAsync(url, null);
 
-			if (response.StatusCode != HttpStatusCode.OK)
-			{
-				Console.WriteLine($"We have error: {response.Content.ReadAsStringAsync().Result}");
-			}
+			BadCodeHandler(response);
+
 		}
 
 		private static async Task<TempCourseUpdateResponse> UpdateTempCourse(MemoryStream memoryStream, string token, string url)
@@ -68,13 +67,27 @@ namespace CourseToolHotReloader.ApiClient
 			var multiContent = new MultipartFormDataContent { { fileContent, "files", "qwe.zip" } };
 			var response = await client.PostAsync(url, multiContent);
 
-			if (response.StatusCode != HttpStatusCode.OK)
-			{
-				Console.WriteLine($"we have error {response.Content.ReadAsStringAsync().Result}");
-			}
+			BadCodeHandler(response);
 
 			var result = response.Content.ReadAsStringAsync().Result;
 			return JsonSerializer.Deserialize<TempCourseUpdateResponse>(result);
+		}
+
+		private static void BadCodeHandler(HttpResponseMessage response)
+		{
+			switch (response.StatusCode)
+			{
+				case HttpStatusCode.OK:
+					return;
+				case HttpStatusCode.Unauthorized:
+					ConsoleWorker.WriteError("Срок авторизации истек, требуется повторная авторизация");
+					Environment.Exit(1);
+					return;
+				case HttpStatusCode.InternalServerError:
+					ConsoleWorker.WriteError($"На сервере произошла ошибка: {response.Content.ReadAsStringAsync().Result}");
+					Environment.Exit(1);
+					return;
+			}
 		}
 
 		private static HttpClient HttpClient(string token)

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using CourseToolHotReloader.Dtos;
+using CourseToolHotReloader.Log;
 using Ionic.Zip;
 
 namespace CourseToolHotReloader.DirectoryWorkers
@@ -53,7 +54,7 @@ namespace CourseToolHotReloader.DirectoryWorkers
 				var guid = Guid.NewGuid();
 				zip1.AddEntry("deleted.txt", deletedFileContent);
 				zip1.Save($"../{guid.ToString()}.zip");
-				Console.WriteLine($"DEBUG is on ../{guid.ToString()}.zip was created");
+				ConsoleWorker.Debug($"current updates save in ../{guid.ToString()}.zip");
 			}
 #endif
 			#endregion			
@@ -71,7 +72,7 @@ namespace CourseToolHotReloader.DirectoryWorkers
 			using var zip1 = new ZipFile();
 			zip1.AddDirectory(pathToFolder);
 			zip1.Save("../temp.zip");
-			Console.WriteLine("DEBUG is on ../temp.zip was created");
+			ConsoleWorker.Debug("foder save in ../temp.zip");
 #endif
 			return ms;
 		}

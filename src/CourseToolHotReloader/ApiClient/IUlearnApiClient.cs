@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CourseToolHotReloader.DirectoryWorkers;
 using CourseToolHotReloader.Dtos;
+using CourseToolHotReloader.Log;
 
 namespace CourseToolHotReloader.ApiClient
 {
@@ -12,15 +13,18 @@ namespace CourseToolHotReloader.ApiClient
 		Task SendFullCourse(string path, string token, string courseId);
 	}
 
-	class UlearnApiClient : IUlearnApiClient
+	internal class UlearnApiClient : IUlearnApiClient
 	{
 		public async Task SendCourseUpdates(IList<ICourseUpdate> updates, IList<ICourseUpdate> deletedFiles, string token, string courseId)
 		{
 			var ms = ZipUpdater.CreateZipByUpdates(updates, deletedFiles);
 
 			var updateResponse = await HttpMethods.UploadCourse(ms, token, courseId);
-			
-			Console.WriteLine($"{courseId} updates only upload");
+
+			if (updateResponse.ErrorType != ErrorType.NoErrors)
+			{
+				ConsoleWorker.WriteError(updateResponse.Message);
+			}
 		}
 
 		public async Task SendFullCourse(string path, string token, string courseId)
@@ -29,7 +33,10 @@ namespace CourseToolHotReloader.ApiClient
 
 			var updateResponse = await HttpMethods.UploadFullCourse(ms, token, courseId);
 
-			Console.WriteLine($"{courseId} upload");
+			if (updateResponse.ErrorType != ErrorType.NoErrors)
+			{
+				ConsoleWorker.WriteError(updateResponse.Message);
+			}
 		}
 	}
 }
