@@ -377,6 +377,7 @@ class MyCoursesMenu extends AbstractMyCoursesMenu {
 MyCoursesMenu = connect(MyCoursesMenu.mapStateToProps)(MyCoursesMenu);
 
 class CourseMenu extends Component {
+	static tempCourse = /^[\w-]*[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.compile();
 	static menuItems(courseId, role, accesses) {
 		let items = [
 			<MenuItem href={ "/Course/" + courseId } key="Course" component={ LinkComponent }>
@@ -418,17 +419,21 @@ class CourseMenu extends Component {
 				</MenuItem>);
 
 		if (hasCourseAdminMenuItems)
+			if (this.tempCourse.test(courseId))
+			{
+				items = items.concat([
+					<MenuItem href={ "/Admin/Packages?courseId=" + courseId } key="Packages"
+												component={ LinkComponent }>
+						Экспорт и импорт курса
+					</MenuItem>,
+
+					<MenuItem href={ "/Admin/Units?courseId=" + courseId } key="Units"
+							  component={ LinkComponent }>
+						Модули
+					</MenuItem>
+				]);
+			}
 			items = items.concat([
-				<MenuItem href={ "/Admin/Packages?courseId=" + courseId } key="Packages"
-						  component={ LinkComponent }>
-					Экспорт и импорт курса
-				</MenuItem>,
-
-				<MenuItem href={ "/Admin/Units?courseId=" + courseId } key="Units"
-						  component={ LinkComponent }>
-					Модули
-				</MenuItem>,
-
 				<MenuItem href={ "/Grader/Clients?courseId=" + courseId } key="GraderClients"
 						  component={ LinkComponent }>
 					Клиенты грейдера
