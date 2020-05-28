@@ -1,12 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Reflection;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using CourseToolHotReloader.ApiClient;
 using CourseToolHotReloader.Dtos;
+using CourseToolHotReloader.Log;
 
 namespace CourseToolHotReloader.Authorizer
 {
@@ -37,11 +39,17 @@ namespace CourseToolHotReloader.Authorizer
 			}
 			catch (Exception e)
 			{
+				if (e is HttpRequestException)
+				{
+					ConsoleWorker.WriteError("Отсутствует соединение с сервером ulearn");
+					Environment.Exit(1);
+				}
+
 				if (configExist)
 					File.Delete(path);
 
-				Console.WriteLine(e);
-				throw;
+				ConsoleWorker.WriteLine(e.Message); //todo
+				Environment.Exit(1);
 			}
 
 			if (!configExist)
@@ -53,62 +61,26 @@ namespace CourseToolHotReloader.Authorizer
 			if (File.Exists(path))
 			{
 				var loginPasswordParameters = ReadFile();
-				Console.Write($"Войти под {loginPasswordParameters.Login}? д(ДА)/н(Нет):");
-				if (GetAnswer())
+
+				if (ConsoleWorker.AskQuestion($"Войти под {loginPasswordParameters.Login}?"))
 					return loginPasswordParameters;
 			}
 
 			return new LoginPasswordParameters
 			{
-				Login = GetLogin(),
-				Password = new NetworkCredential(string.Empty, GetPassword()).Password
+				Login = ConsoleWorker.GetLogin(),
+				Password = new NetworkCredential(string.Empty, ConsoleWorker.GetPassword()).Password
 			};
 		}
 
-		private static SecureString GetPassword()
-		{
-			Console.Write("пароль:");
-			var password = new SecureString();
-			while (true)
-			{
-				var currentKey = Console.ReadKey(true);
-				if (currentKey.Key == ConsoleKey.Enter)
-					break;
-
-				if (currentKey.Key == ConsoleKey.Backspace)
-				{
-					if (password.Length <= 0)
-						continue;
-					password.RemoveAt(password.Length - 1);
-					Console.Write("\b \b");
-				}
-				else if (currentKey.KeyChar != '\u0000')
-					// KeyChar == '\u0000' if the key pressed does not correspond to a printable character, e.g. F1, Pause-Break, etc
-				{
-					password.AppendChar(currentKey.KeyChar);
-					Console.Write("*");
-				}
-			}
-
-			Console.WriteLine();
-			return password;
-		}
-
-		private static string GetLogin()
-		{
-			Console.Write("логин:");
-			return Console.ReadLine();
-		}
 
 		private void SavePassword(LoginPasswordParameters loginPasswordParameters)
 		{
-			Console.Write("Запомнить меня? д(ДА)/н(Нет):");
-
-			if (!GetAnswer())
+			if (!ConsoleWorker.AskQuestion("Запомнить меня?"))
 				return;
 
-			Console.WriteLine("Мы сохранили ваш логин и пароль в файле:");
-			Console.WriteLine(path);
+			ConsoleWorker.WriteLine("Мы сохранили ваш логин и пароль в файле:");
+			ConsoleWorker.WriteLine(path);
 			CreateFile(loginPasswordParameters);
 		}
 
@@ -123,7 +95,7 @@ namespace CourseToolHotReloader.Authorizer
 
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex.ToString());
+				ConsoleWorker.WriteLine(ex.ToString());
 			}
 		}
 
@@ -136,14 +108,6 @@ namespace CourseToolHotReloader.Authorizer
 				Login = streamReader.ReadLine(),
 				Password = streamReader.ReadLine()
 			};
-		}
-
-		private static bool GetAnswer()
-		{
-			var answer = Console.ReadLine();
-			return answer != null &&
-					(answer.Equals("д", StringComparison.OrdinalIgnoreCase)
-					|| answer.Equals("да", StringComparison.OrdinalIgnoreCase));
 		}
 	}
 }
