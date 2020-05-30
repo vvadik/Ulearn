@@ -12,6 +12,7 @@ namespace CourseToolHotReloader.UpdateQuery
 		void RegisterCreate(ICourseUpdate courseUpdate);
 		IList<ICourseUpdate> GetAllCourseUpdate();
 		IList<ICourseUpdate> GetAllDeletedFiles();
+		void Clear();
 	}
 
 	public class CourseUpdateQuery : ICourseUpdateQuery
@@ -53,17 +54,19 @@ namespace CourseToolHotReloader.UpdateQuery
 
 		public IList<ICourseUpdate> GetAllCourseUpdate()
 		{
-			var result = updatesQuery.Values.ToArray();
-			updatesQuery.Clear();
-			return result;
+			return updatesQuery.Values.ToArray();
 		}
 
 		public IList<ICourseUpdate> GetAllDeletedFiles()
 		{
-			var result = deletedFiles.Values.ToArray();
+			return deletedFiles.Values.ToArray();
+		}
+
+		public void Clear()
+		{
+			updatesQuery.Clear();
 			deletedFiles.Clear();
 			createdFiles.Clear();
-			return result;
 		}
 	}
 }

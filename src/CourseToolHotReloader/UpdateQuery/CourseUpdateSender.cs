@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using CourseToolHotReloader.ApiClient;
+using CourseToolHotReloader.Log;
 
 namespace CourseToolHotReloader.UpdateQuery
 {
@@ -24,7 +26,17 @@ namespace CourseToolHotReloader.UpdateQuery
 
 		public async Task SendCourseUpdates()
 		{
-			await ulearnApiClient.SendCourseUpdates(courseUpdateQuery.GetAllCourseUpdate(), courseUpdateQuery.GetAllDeletedFiles(), config.JwtToken.Token, config.CourseId);
+			var ct = ConsoleWorker.Spin();
+			
+			var courseDelivered = await ulearnApiClient.TrySendCourseUpdates(courseUpdateQuery.GetAllCourseUpdate(),
+				courseUpdateQuery.GetAllDeletedFiles(), config.JwtToken.Token, config.CourseId);
+
+			ct.Cancel();
+			
+			if (courseDelivered)
+			{
+				courseUpdateQuery.Clear();
+			}
 		}
 
 		public async Task SendFullCourse()
