@@ -50,7 +50,7 @@ namespace Ulearn.Web.Api.Controllers
 			// 	return new TempCourseUpdateResponse()
 			// 	{
 			// 		ErrorType = ErrorType.Forbidden,
-			// 		Message = $"Your temp version of course {courseId} already exists with id {tmpCourseId}"
+			// 		Message = $"Чтобы создать временн курс, необходимо иметьYou should have a course-admin access to course {courseId} to create temp version."
 			// 	};
 			// }
 
@@ -222,7 +222,7 @@ namespace Ulearn.Web.Api.Controllers
 		private async Task<string> TryPublishChanges(string courseId, List<string> filesToDelete, bool isFull)
 		{
 			var revertStructure = GetRevertStructure(courseId, filesToDelete, isFull);
-			DeleteFiles(revertStructure.DeletedFiles);
+			DeleteFiles(revertStructure.DeletedFiles, revertStructure.DeletedDirectories);
 			courseManager.ExtractTempCourseChanges(courseId);
 
 			var extractedCourseDirectory = courseManager.GetExtractedCourseDirectory(courseId);
@@ -247,9 +247,10 @@ namespace Ulearn.Web.Api.Controllers
 			return null;
 		}
 
-		private void DeleteFiles(List<FileContent> filesToDelete)
+		private void DeleteFiles(List<FileContent> filesToDelete, List<string> directoriesToDelete)
 		{
 			filesToDelete.ForEach(file => System.IO.File.Delete(file.Path));
+			directoriesToDelete.ForEach(Directory.Delete);
 		}
 
 		private RevertStructure GetRevertStructure(string courseId, List<string> filesToDeleteRelativePaths, bool isFull)
@@ -257,18 +258,35 @@ namespace Ulearn.Web.Api.Controllers
 			var staging = courseManager.GetStagingTempCourseFile(courseId);
 			var courseDirectory = courseManager.GetExtractedCourseDirectory(courseId);
 			var pathPrefix = courseDirectory.FullName;
+			var filesInDirectoriesToDelete = GetFilesInDirectoriesToDelete(filesToDeleteRelativePaths, pathPrefix);
+			filesToDeleteRelativePaths.AddRange(filesInDirectoriesToDelete);
 			var zip = ZipFile.Read(staging.FullName, new ReadOptions { Encoding = Encoding.UTF8 });
 			var filesToChangeRelativePaths = zip.Entries
 				.Where(x => !x.IsDirectory)
 				.Select(x => x.FileName)
-				.Select(x => x.Replace('/', '\\'));
+				.Select(x => x.Replace('/', '\\'))
+				.ToList();
 			var courseFileRelativePaths = Directory
 				.EnumerateFiles(courseDirectory.FullName, "*.*", SearchOption.AllDirectories)
-				.Select(file => file.Substring(file.IndexOf(pathPrefix) + pathPrefix.Length + 1))
+				.Select(file => TrimPrefix(file, pathPrefix))
 				.ToHashSet();
-			var revertStructure = GetRevertStructure(pathPrefix, filesToDeleteRelativePaths, filesToChangeRelativePaths.ToList(), courseFileRelativePaths, isFull);
-
+			var revertStructure = GetRevertStructure(pathPrefix, filesToDeleteRelativePaths, filesToChangeRelativePaths, courseFileRelativePaths, isFull);
 			return revertStructure;
+		}
+
+		private static IEnumerable<string> GetFilesInDirectoriesToDelete(List<string> filesToDeleteRelativePaths, string pathPrefix)
+		{
+			return filesToDeleteRelativePaths
+				.Select(path => pathPrefix + "\\" + path)
+				.Where(Directory.Exists)
+				.SelectMany(dir => Directory
+					.EnumerateFiles(dir, "*.*", SearchOption.AllDirectories))
+				.Select(path => TrimPrefix(path, pathPrefix));
+		}
+
+		private static string TrimPrefix(string text, string prefix)
+		{
+			return text.Substring(text.IndexOf(prefix) + prefix.Length + 1);
 		}
 
 		private static RevertStructure GetRevertStructure(
@@ -286,22 +304,33 @@ namespace Ulearn.Web.Api.Controllers
 
 			var deletedFiles = filesToDeleteRelativePaths
 				.Where(courseFileRelativePaths.Contains)
-				.Select(relativePath => pathPrefix + "\\" + relativePath)
+				.Select(relativePath => Path.Combine(pathPrefix, relativePath))
 				.Select(path => new FileContent(path, System.IO.File.ReadAllBytes(path)))
 				.ToList();
+			var deletedDirectories = GetDeletedDirs(filesToDeleteRelativePaths, pathPrefix);
 			return new RevertStructure
 			{
 				FilesBeforeChanges = filesToChangeRelativePaths
 					.Where(courseFileRelativePaths.Contains)
-					.Select(path => pathPrefix + "\\" + path)
+					.Select(path => Path.Combine(pathPrefix, path))
 					.Select(path => new FileContent(path, System.IO.File.ReadAllBytes(path)))
 					.ToList(),
 				AddedFiles = filesToChangeRelativePaths
 					.Where(file => !courseFileRelativePaths.Contains(file))
-					.Select(path => pathPrefix + "\\" + path)
+					.Select(path => Path.Combine(pathPrefix, path))
 					.ToList(),
-				DeletedFiles = deletedFiles
+				DeletedFiles = deletedFiles,
+				DeletedDirectories = deletedDirectories
 			};
+		}
+
+		private static List<string> GetDeletedDirs(List<string> filesToDeleteRelativePaths, string pathPrefix)
+		{
+			return filesToDeleteRelativePaths
+				.Where(path => Directory.Exists(Path.Combine(pathPrefix, path)) &&
+								Path.Combine(pathPrefix, path).StartsWith(pathPrefix) &&
+								!Path.Combine(pathPrefix, path).Contains(".."))
+				.ToList();
 		}
 
 		private void UploadChanges(string courseId, byte[] content)
@@ -336,9 +365,11 @@ namespace Ulearn.Web.Api.Controllers
 		public List<FileContent> FilesBeforeChanges = new List<FileContent>();
 		public List<string> AddedFiles = new List<string>();
 		public List<FileContent> DeletedFiles = new List<FileContent>();
+		public List<string> DeletedDirectories = new List<string>();
 
 		public void Revert()
 		{
+			DeletedFiles.ForEach(file => new FileInfo(file.Path).Directory.Create());
 			FilesBeforeChanges
 				.ForEach(editedFile => File.WriteAllBytes(editedFile.Path, editedFile.Content));
 			DeletedFiles
