@@ -6,6 +6,7 @@ using CommandLine;
 using CourseToolHotReloader.ApiClient;
 using CourseToolHotReloader.Authorizer;
 using CourseToolHotReloader.DirectoryWorkers;
+using CourseToolHotReloader.Log;
 
 namespace CourseToolHotReloader
 {
@@ -15,9 +16,18 @@ namespace CourseToolHotReloader
 
 		private static void Main(string[] args)
 		{
+			Logger.InitLogger();
 			container = ConfigureAutofac.Build();
 
-			Parser.Default.ParseArguments<Options>(args).WithParsed(ParseOption);
+			try
+			{
+				Parser.Default.ParseArguments<Options>(args).WithParsed(ParseOption);
+			}
+			catch (Exception e)
+			{
+				Logger.Log.Error(e);
+				throw;
+			}
 		}
 
 		private static void ParseOption(Options options)
