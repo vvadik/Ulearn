@@ -43,11 +43,11 @@ namespace CourseToolHotReloader.Authorizer
 					File.Delete(path);
 
 				ConsoleWorker.WriteLine(e.Message); //todo
+				throw;
 			}
 			finally
 			{
 				cs.Stop();
-				throw;
 			}
 
 			if (!configExist)
