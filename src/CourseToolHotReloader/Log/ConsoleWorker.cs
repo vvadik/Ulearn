@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Security;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,36 +29,21 @@ namespace CourseToolHotReloader.Log
 			Logger.Log.Info(text);
 		}
 
+		public static void WriteAlert(string alertMessage)
+		{
+			Console.ForegroundColor = ConsoleColor.DarkYellow;
+			var text = $"Внимание: {alertMessage}";
+			Console.WriteLine(text);
+			Console.ResetColor();
+			Logger.Log.Info(text);
+		}
+
 		public static void Debug(string text)
 		{
 			Console.ForegroundColor = ConsoleColor.Green;
 			Console.WriteLine($"DEBUG {text}");
 			Console.ResetColor();
 			Logger.Log.Debug(text);
-		}
-
-		public static CancellationTokenSource Spin()
-		{
-			var cancelTokenSource = new CancellationTokenSource();
-			Task.Run(async () =>
-			{
-				while (true)
-				{
-					Console.Write(".");
-					await Task.Delay(400);
-					Console.Write(".");
-					await Task.Delay(400);
-					Console.Write(".");
-					await Task.Delay(400);
-					Console.Write("\b");
-					await Task.Delay(400);
-					Console.Write("\b");
-					await Task.Delay(400);
-					Console.Write("\b");
-					await Task.Delay(400);
-				}
-			}, cancelTokenSource.Token);
-			return cancelTokenSource;
 		}
 
 		private static bool GetAnswer()
@@ -105,35 +91,76 @@ namespace CourseToolHotReloader.Log
 	}
 
 
-	public class ConsoleSpiner
+	class ConsoleSpinner
 	{
 		private int counter;
+		private readonly string[] sequence;
+		private readonly string space;
+		private CancellationTokenSource cancelTokenSource;
 
-		public ConsoleSpiner()
+		private ConsoleSpinner()
 		{
 			counter = 0;
+			sequence = new[] { " /", " -", " \\", " |" };
+			//sequence = new[] { "░", "▒", "▓" };
+			//sequence = new[] { "╚═", "═╝", "═╗", "╔═" };
+			//sequence = new[] { "█", "▄" };
+			//sequence = new[] { ".", "o", "0", "o"};
+			//sequence = new[] { "+", "x", "  +", "  x", "   +", "   x", "    +", "    x", "     +", "     x"  };
+			//sequence = new[] { "█        ", "██       ", "███      ", "████     ", "█████    ", "██████   ", "███████  ", "████████ ", "█████████", "████████ ", "███████  ", "██████   ", "█████    ", "███      ", "██       " };
+			//sequence = new[] { "█        ", " █       ", "  █      ", "   █     ", "    █    ", "     █   ", "      █  ", "       █ ", "        █", "       █ ", "      █  ", "     █   ", "    █    ", "  █      ", " █       " };
+			//sequence = new[] { "V", "<", "^", ">" };
+			//sequence = new[] { ".   ", "..  ", "... ", "...." };
+			space = "  ";                
 		}
 
-		public void Turn()
+		public static ConsoleSpinner CreateAndRunWithText(string text)
+		{
+			Console.Write(text);
+			var cs = new ConsoleSpinner();
+			cs.Start();
+			return cs;
+		}
+
+		private void Start()
+		{
+			cancelTokenSource = new CancellationTokenSource();
+			var ct = cancelTokenSource.Token;
+			Task.Run(async () =>
+			{
+				Console.CursorVisible = false;
+				while (true)
+				{
+					await Task.Delay(100);
+
+					if (ct.IsCancellationRequested)
+					{
+						Console.CursorVisible = true;
+						return;
+					}
+
+					Turn();
+				}
+			}, cancelTokenSource.Token);
+		}
+
+		public void Stop()
+		{
+			cancelTokenSource.Cancel();
+			cancelTokenSource.Dispose();
+			Console.Write(space);
+			Console.WriteLine();
+		}
+
+		private void Turn()
 		{
 			counter++;
-			switch (counter % 4)
-			{
-				case 0:
-					Console.Write("/");
-					break;
-				case 1:
-					Console.Write("-");
-					break;
-				case 2:
-					Console.Write("\\");
-					break;
-				case 3:
-					Console.Write("|");
-					break;
-			}
 
-			Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
+			if (counter >= sequence.Length)
+				counter = 0;
+
+			Console.Write(sequence[counter]);
+			Console.SetCursorPosition(Console.CursorLeft - sequence[counter].Length, Console.CursorTop);
 		}
 	}
 }

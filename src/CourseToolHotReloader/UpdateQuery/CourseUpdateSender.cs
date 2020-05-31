@@ -26,8 +26,12 @@ namespace CourseToolHotReloader.UpdateQuery
 
 		public async Task SendCourseUpdates()
 		{
+			var cs = ConsoleSpinner.CreateAndRunWithText("Загружаем изменения на ulearn");
+
 			var courseDelivered = await ulearnApiClient.TrySendCourseUpdates(courseUpdateQuery.GetAllCourseUpdate(),
 				courseUpdateQuery.GetAllDeletedFiles(), config.JwtToken.Token, config.CourseId);
+
+			cs.Stop();
 
 			if (courseDelivered)
 			{
@@ -37,7 +41,11 @@ namespace CourseToolHotReloader.UpdateQuery
 
 		public async Task SendFullCourse()
 		{
+			var cs = ConsoleSpinner.CreateAndRunWithText("Загружаем курс на ulearn");
+
 			await ulearnApiClient.SendFullCourse(config.Path, config.JwtToken.Token, config.CourseId);
+
+			cs.Stop();
 		}
 	}
 }

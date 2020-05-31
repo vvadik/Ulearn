@@ -18,7 +18,7 @@ namespace CourseToolHotReloader
 		{
 			Logger.InitLogger();
 			container = ConfigureAutofac.Build();
-
+			
 			try
 			{
 				Parser.Default.ParseArguments<Options>(args).WithParsed(ParseOption);

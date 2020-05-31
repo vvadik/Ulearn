@@ -3,7 +3,6 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
-using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using CourseToolHotReloader.ApiClient;
@@ -31,8 +30,9 @@ namespace CourseToolHotReloader.Authorizer
 		public async Task SignIn()
 		{
 			var loginPasswordParameters = GetLoginPasswordParameters();
-			var configExist = File.Exists(path);
-
+			var configExist = File.Exists(path); 
+			
+			var cs = ConsoleSpinner.CreateAndRunWithText("Попытка авторизации");
 			try
 			{
 				config.JwtToken = await HttpMethods.GetJwtToken(loginPasswordParameters);
@@ -51,10 +51,14 @@ namespace CourseToolHotReloader.Authorizer
 				ConsoleWorker.WriteLine(e.Message); //todo
 				Environment.Exit(1);
 			}
+			finally
+			{
+				cs.Stop();
+			}
 
 			if (!configExist)
 				SavePassword(loginPasswordParameters);
-			
+
 			ConsoleWorker.WriteLine("Авторизация прошла успешно!");
 		}
 
@@ -63,9 +67,9 @@ namespace CourseToolHotReloader.Authorizer
 			if (File.Exists(path))
 			{
 				var loginPasswordParameters = ReadFile();
-
-				if (ConsoleWorker.AskQuestion($"Войти под {loginPasswordParameters.Login}?"))
-					return loginPasswordParameters;
+				ConsoleWorker.WriteAlert($"Вы вошли под {loginPasswordParameters.Login}, чтобы войти под другим пользователем удалите файл {path} и перезапустите программу");
+				// todo возможно удобнее if (ConsoleWorker.AskQuestion($"Войти под {loginPasswordParameters.Login}?"))
+				return loginPasswordParameters;
 			}
 
 			return new LoginPasswordParameters
