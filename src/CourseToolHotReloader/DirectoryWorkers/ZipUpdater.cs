@@ -16,7 +16,7 @@ namespace CourseToolHotReloader.DirectoryWorkers
 			var deletedFileContent = string.Join("\r\n", deletedFiles.Select(u => u.RelativePath));
 			var ms = new MemoryStream();
 
-			using (var zip = new ZipFile())
+			using (var zip = new ZipFile(Encoding.UTF8))
 			{
 				foreach (var update in courseUpdates)
 				{
