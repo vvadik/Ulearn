@@ -26,13 +26,9 @@ namespace CourseToolHotReloader.UpdateQuery
 
 		public async Task SendCourseUpdates()
 		{
-			var ct = ConsoleWorker.Spin();
-			
 			var courseDelivered = await ulearnApiClient.TrySendCourseUpdates(courseUpdateQuery.GetAllCourseUpdate(),
 				courseUpdateQuery.GetAllDeletedFiles(), config.JwtToken.Token, config.CourseId);
 
-			ct.Cancel();
-			
 			if (courseDelivered)
 			{
 				courseUpdateQuery.Clear();

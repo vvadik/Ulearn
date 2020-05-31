@@ -10,6 +10,7 @@ namespace CourseToolHotReloader.Log
 		public static void WriteLine(string text)
 		{
 			Console.WriteLine(text);
+			Logger.Log.Info(text);
 		}
 
 		public static bool AskQuestion(string question)
@@ -38,12 +39,22 @@ namespace CourseToolHotReloader.Log
 		public static CancellationTokenSource Spin()
 		{
 			var cancelTokenSource = new CancellationTokenSource();
-			 Task.Run(() =>
+			Task.Run(async () =>
 			{
 				while (true)
 				{
-					var spin = new ConsoleSpiner();
-					spin.Turn();
+					Console.Write(".");
+					await Task.Delay(400);
+					Console.Write(".");
+					await Task.Delay(400);
+					Console.Write(".");
+					await Task.Delay(400);
+					Console.Write("\b");
+					await Task.Delay(400);
+					Console.Write("\b");
+					await Task.Delay(400);
+					Console.Write("\b");
+					await Task.Delay(400);
 				}
 			}, cancelTokenSource.Token);
 			return cancelTokenSource;

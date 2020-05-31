@@ -54,6 +54,8 @@ namespace CourseToolHotReloader.Authorizer
 
 			if (!configExist)
 				SavePassword(loginPasswordParameters);
+			
+			ConsoleWorker.WriteLine("Авторизация прошла успешно!");
 		}
 
 		private LoginPasswordParameters GetLoginPasswordParameters()
