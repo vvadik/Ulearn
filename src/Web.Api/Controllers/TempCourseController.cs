@@ -250,7 +250,25 @@ namespace Ulearn.Web.Api.Controllers
 		private void DeleteFiles(List<FileContent> filesToDelete, List<string> directoriesToDelete)
 		{
 			filesToDelete.ForEach(file => System.IO.File.Delete(file.Path));
-			directoriesToDelete.ForEach(Directory.Delete);
+			directoriesToDelete.ForEach(DeleteNotEmptyDirectory);
+		}
+		private static void DeleteNotEmptyDirectory(string dirPath)
+		{
+			string[] files = Directory.GetFiles(dirPath);
+			string[] dirs = Directory.GetDirectories(dirPath);
+
+			foreach (string file in files)
+			{
+				System.IO.File.SetAttributes(file, FileAttributes.Normal);
+				System.IO.File.Delete(file);
+			}
+
+			foreach (string dir in dirs)
+			{
+				DeleteNotEmptyDirectory(dir);
+			}
+
+			Directory.Delete(dirPath, false);
 		}
 
 		private RevertStructure GetRevertStructure(string courseId, List<string> filesToDeleteRelativePaths, bool isFull)
@@ -274,14 +292,15 @@ namespace Ulearn.Web.Api.Controllers
 			return revertStructure;
 		}
 
-		private static IEnumerable<string> GetFilesInDirectoriesToDelete(List<string> filesToDeleteRelativePaths, string pathPrefix)
+		private static List<string> GetFilesInDirectoriesToDelete(List<string> filesToDeleteRelativePaths, string pathPrefix)
 		{
 			return filesToDeleteRelativePaths
 				.Select(path => pathPrefix + "\\" + path)
 				.Where(Directory.Exists)
 				.SelectMany(dir => Directory
 					.EnumerateFiles(dir, "*.*", SearchOption.AllDirectories))
-				.Select(path => TrimPrefix(path, pathPrefix));
+				.Select(path => TrimPrefix(path, pathPrefix))
+				.ToList();
 		}
 
 		private static string TrimPrefix(string text, string prefix)
@@ -326,10 +345,10 @@ namespace Ulearn.Web.Api.Controllers
 
 		private static List<string> GetDeletedDirs(List<string> filesToDeleteRelativePaths, string pathPrefix)
 		{
-			return filesToDeleteRelativePaths
-				.Where(path => Directory.Exists(Path.Combine(pathPrefix, path)) &&
-								Path.Combine(pathPrefix, path).StartsWith(pathPrefix) &&
-								!Path.Combine(pathPrefix, path).Contains(".."))
+			return filesToDeleteRelativePaths.Select(path => Path.Combine(pathPrefix, path))
+				.Where(path => Directory.Exists(path) &&
+								path.StartsWith(pathPrefix) &&
+								!path.Contains(".."))
 				.ToList();
 		}
 

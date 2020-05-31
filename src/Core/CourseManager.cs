@@ -248,9 +248,9 @@ namespace Ulearn.Core
 				log.Info($"Архив {zipFile.FullName} распакован");
 			}
 		}
-		private void UnzipWithOverwrite(FileInfo zipFile, DirectoryInfo unpackDirectory)
+		private void UnzipTempWithOverwrite(FileInfo zipFile, DirectoryInfo unpackDirectory)
 		{
-			using (var zip = ZipFile.Read(zipFile.FullName, new ReadOptions { Encoding = Encoding.GetEncoding(866) }))
+			using (var zip = ZipFile.Read(zipFile.FullName, new ReadOptions { Encoding = Encoding.UTF8 }))
 			{
 				zip.ExtractAll(unpackDirectory.FullName, ExtractExistingFileAction.OverwriteSilently);
 				foreach (var f in unpackDirectory.GetFiles("*", SearchOption.AllDirectories).Cast<FileSystemInfo>().Concat(unpackDirectory.GetDirectories("*", SearchOption.AllDirectories)))
@@ -341,7 +341,7 @@ namespace Ulearn.Core
 		{
 			var zipWithChanges = GetStagingTempCourseFile(tempCourseId);
 			var courseDirectory = GetExtractedCourseDirectory(tempCourseId);
-			UnzipWithOverwrite(zipWithChanges,courseDirectory);
+			UnzipTempWithOverwrite(zipWithChanges,courseDirectory);
 		}
 
 		private static void CreateEmptyCourse(string courseId, string courseTitle, string path)
