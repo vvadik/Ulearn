@@ -39,21 +39,15 @@ namespace CourseToolHotReloader.Authorizer
 			}
 			catch (Exception e)
 			{
-				if (e is HttpRequestException)
-				{
-					ConsoleWorker.WriteError("Отсутствует соединение с сервером ulearn");
-					Environment.Exit(1);
-				}
-
 				if (configExist)
 					File.Delete(path);
 
 				ConsoleWorker.WriteLine(e.Message); //todo
-				Environment.Exit(1);
 			}
 			finally
 			{
 				cs.Stop();
+				throw;
 			}
 
 			if (!configExist)

@@ -24,13 +24,30 @@ namespace CourseToolHotReloader.ApiClient
 
 			using var client = new HttpClient();
 
-			var response = await client.PostAsync(url, data);
+			var response = await HttpResponseMessage(client, url, data);
 
 			if (response.StatusCode != HttpStatusCode.OK)
 				throw new Exception("Неправильный логин или пароль");
 
 			var result = response.Content.ReadAsStringAsync().Result;
 			return JsonSerializer.Deserialize<AccountTokenResponseDto>(result);
+		}
+
+		private static async Task<HttpResponseMessage> HttpResponseMessage(HttpClient client, string url, HttpContent data)
+		{
+			HttpResponseMessage response;
+
+			try
+			{
+				response = await client.PostAsync(url, data);
+			}
+			catch (HttpRequestException e)
+			{
+				ConsoleWorker.WriteError("Отсутствует соединение с сервером ulearn");
+				throw;
+			}
+
+			return response;
 		}
 
 		public static async Task<TempCourseUpdateResponse> UploadCourse(MemoryStream memoryStream, string token, string id)
@@ -53,10 +70,9 @@ namespace CourseToolHotReloader.ApiClient
 
 			using var client = HttpClient(token);
 
-			var response = await client.PostAsync(url, null);
+			var response = await HttpResponseMessage(client, url, null);
 
 			BadCodeHandler(response);
-
 		}
 
 		private static async Task<TempCourseUpdateResponse> UpdateTempCourse(MemoryStream memoryStream, string token, string url)
@@ -65,7 +81,7 @@ namespace CourseToolHotReloader.ApiClient
 
 			var fileContent = new ByteArrayContent(memoryStream.ToArray());
 			var multiContent = new MultipartFormDataContent { { fileContent, "files", "qwe.zip" } };
-			var response = await client.PostAsync(url, multiContent);
+			var response = await HttpResponseMessage(client, url, multiContent);
 
 			BadCodeHandler(response);
 
