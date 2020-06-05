@@ -45,14 +45,15 @@ namespace Ulearn.Web.Api.Controllers
 		{
 			var userId = User.Identity.GetUserId();
 			var tmpCourseId = courseId + userId;
-			// if (!await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin))
-			// {
-			// 	return new TempCourseUpdateResponse()
-			// 	{
-			// 		ErrorType = ErrorType.Forbidden,
-			// 		Message = $"Чтобы создать временн курс, необходимо иметьYou should have a course-admin access to course {courseId} to create temp version."
-			// 	};
-			// }
+
+			if (!await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin))
+			{
+				return new TempCourseUpdateResponse()
+				{
+					ErrorType = ErrorType.Forbidden,
+					Message = $"Чтобы создать временную версию курса {courseId}, необходимо быть администратором этого  курса\n You should have a course-admin access to course {courseId} to create temp version."
+				};
+			}
 
 			var tmpCourse = tempCoursesRepo.Find(tmpCourseId);
 			if (tmpCourse != null)
@@ -90,8 +91,6 @@ namespace Ulearn.Web.Api.Controllers
 		public async Task<HasTempCourseResponse> HasCourse([FromRoute] string courseId)
 		{
 			var userId = User.Identity.GetUserId();
-			/*if (!await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin))
-				return BadRequest($"You dont have a Course Admin access to {courseId} course");*/
 
 			var tmpCourseId = courseId + userId;
 			var tmpCourse = tempCoursesRepo.Find(tmpCourseId);
@@ -140,17 +139,10 @@ namespace Ulearn.Web.Api.Controllers
 			return await UploadCourse(courseId, files, true);
 		}
 
+		[NonAction]
 		public async Task<TempCourseUpdateResponse> UploadCourse(string courseId, List<IFormFile> files, bool isFull)
 		{
 			var userId = User.Identity.GetUserId();
-			// if (!await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin))
-			// {
-			// 	return new TempCourseUpdateResponse()
-			// 		{
-			// 			ErrorType = ErrorType.Forbidden,
-			// 			Message = $"You dont have a Course Admin access to {courseId} course"
-			// 		};
-			// }
 			var tmpCourseId = courseId + userId;
 			var tmpCourse = tempCoursesRepo.Find(tmpCourseId);
 			if (tmpCourse is null)
@@ -252,6 +244,7 @@ namespace Ulearn.Web.Api.Controllers
 			filesToDelete.ForEach(file => System.IO.File.Delete(file.Path));
 			directoriesToDelete.ForEach(DeleteNotEmptyDirectory);
 		}
+
 		private static void DeleteNotEmptyDirectory(string dirPath)
 		{
 			string[] files = Directory.GetFiles(dirPath);
@@ -379,6 +372,18 @@ namespace Ulearn.Web.Api.Controllers
 		}
 	}
 
+	internal struct FileContent
+	{
+		public FileContent(string path, byte[] content)
+		{
+			Path = path;
+			Content = content;
+		}
+
+		public readonly string Path;
+		public readonly byte[] Content;
+	}
+
 	internal class RevertStructure
 	{
 		public List<FileContent> FilesBeforeChanges = new List<FileContent>();
@@ -395,17 +400,5 @@ namespace Ulearn.Web.Api.Controllers
 				.ForEach(deletedFile => File.WriteAllBytes(deletedFile.Path, deletedFile.Content));
 			AddedFiles.ForEach(File.Delete);
 		}
-	}
-
-	internal struct FileContent
-	{
-		public FileContent(string path, byte[] content)
-		{
-			Path = path;
-			Content = content;
-		}
-
-		public readonly string Path;
-		public readonly byte[] Content;
 	}
 }
