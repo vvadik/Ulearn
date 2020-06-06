@@ -377,7 +377,8 @@ class MyCoursesMenu extends AbstractMyCoursesMenu {
 MyCoursesMenu = connect(MyCoursesMenu.mapStateToProps)(MyCoursesMenu);
 
 class CourseMenu extends Component {
-	static tempCourse = /^[\w-]*[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.compile();
+	//static tempCourse = /^[\w-]*[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.compile();
+	static tempCourse =/^[\w-]*[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 	static menuItems(courseId, role, accesses) {
 		let items = [
 			<MenuItem href={ "/Course/" + courseId } key="Course" component={ LinkComponent }>
