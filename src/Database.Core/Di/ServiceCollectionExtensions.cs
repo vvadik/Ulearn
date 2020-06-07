@@ -1,3 +1,4 @@
+using System.IO;
 using Database.Models;
 using Database.Repos;
 using Database.Repos.Comments;
@@ -15,9 +16,9 @@ namespace Database.Di
 {
 	public static class ServiceCollectionExtensions
 	{
-		public static IServiceCollection AddDatabaseServices(this IServiceCollection services, ILogger logger)
+		public static IServiceCollection AddDatabaseServices(this IServiceCollection services, ILogger logger, DirectoryInfo courseManagerBaseDirectory = null)
 		{
-			var courseManager = new WebCourseManager(logger);
+			var courseManager = courseManagerBaseDirectory == null ? new WebCourseManager(logger) : new WebCourseManager(logger, courseManagerBaseDirectory);
 			services.AddSingleton<WebCourseManager>(courseManager);
 			services.AddSingleton<IWebCourseManager>(courseManager);
 

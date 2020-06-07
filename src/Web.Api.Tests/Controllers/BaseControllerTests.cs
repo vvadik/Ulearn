@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
-using Database.Repos.CourseRoles;
-using Database.Repos.Users;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -105,7 +104,8 @@ namespace Web.Api.Tests.Controllers
 
 			services.AddSingleton(db);
 			services.AddLogging(builder => builder.AddSerilog(logger));
-			application.ConfigureDi(services, logger);
+			
+			application.ConfigureDi(services, logger, new DirectoryInfo(Directory.GetCurrentDirectory()+"\\CourseManager\\Courses\\"));
 			application.ConfigureAuthServices(services, FakeWebApiConfiguration);
 			application.ConfigureMvc(services);
 
@@ -119,10 +119,15 @@ namespace Web.Api.Tests.Controllers
 			var result = await userManager.CreateAsync(TestUsers.Admin, TestUsers.AdminPassword).ConfigureAwait(false);
 			if (!result.Succeeded)
 				throw new InvalidOperationException($"Can't create admin user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-
 			TestUsers.Admin = await userManager.FindByNameAsync(TestUsers.Admin.UserName).ConfigureAwait(false);
 			logger.Information($"Created user {TestUsers.Admin.UserName} with password {TestUsers.AdminPassword}, id = {TestUsers.Admin.Id}");
 			await userManager.AddToRoleAsync(TestUsers.Admin, LmsRoleType.SysAdmin.ToString()).ConfigureAwait(false);
+			
+			result = await userManager.CreateAsync(TestUsers.User, TestUsers.AdminPassword).ConfigureAwait(false);
+			if (!result.Succeeded)
+				throw new InvalidOperationException($"Can't create admin user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+			TestUsers.User = await userManager.FindByNameAsync(TestUsers.User.UserName).ConfigureAwait(false);
+			logger.Information($"Created user {TestUsers.User.UserName} with password {TestUsers.AdminPassword}, id = {TestUsers.Admin.Id}");
 		}
 
 		private Task CreateTestUsersAsync()
@@ -163,6 +168,15 @@ namespace Web.Api.Tests.Controllers
 			LastName = "Administrator",
 			Email = "admin@ulearn.me",
 			Gender = Gender.Male,
+			Registered = DateTime.Now,
+		};
+		public static ApplicationUser User = new ApplicationUser
+		{
+			UserName = "user",
+			FirstName = "Simple",
+			LastName = "User",
+			Email = "user@ulearn.me",
+			Gender = Gender.Female,
 			Registered = DateTime.Now,
 		};
 

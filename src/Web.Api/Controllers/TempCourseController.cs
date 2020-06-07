@@ -27,13 +27,11 @@ namespace Ulearn.Web.Api.Controllers
 	{
 		private readonly ICoursesRepo coursesRepo;
 		private readonly ITempCoursesRepo tempCoursesRepo;
-		private readonly INotificationsRepo notificationsRepo;
 		private readonly ICourseRolesRepo courseRolesRepo;
 
-		public TempCourseController(INotificationsRepo notificationsRepo, ICoursesRepo coursesRepo, ILogger logger, IWebCourseManager courseManager, UlearnDb db, [CanBeNull] IUsersRepo usersRepo, ITempCoursesRepo tempCoursesRepo, ICourseRolesRepo courseRolesRepo)
+		public TempCourseController(ICoursesRepo coursesRepo, ILogger logger, IWebCourseManager courseManager, UlearnDb db, [CanBeNull] IUsersRepo usersRepo, ITempCoursesRepo tempCoursesRepo, ICourseRolesRepo courseRolesRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
-			this.notificationsRepo = notificationsRepo;
 			this.coursesRepo = coursesRepo;
 			this.tempCoursesRepo = tempCoursesRepo;
 			this.courseRolesRepo = courseRolesRepo;
@@ -68,7 +66,7 @@ namespace Ulearn.Web.Api.Controllers
 
 			var versionId = Guid.NewGuid();
 			var courseTitle = "Temp course";
-			if (!courseManager.TryCreateCourse(tmpCourseId, courseTitle, versionId))
+			if (!courseManager.TryCreateTempCourse(tmpCourseId, courseTitle, versionId))
 				throw new Exception();
 
 			//--delete if everything will work fine without versions
@@ -350,25 +348,6 @@ namespace Ulearn.Web.Api.Controllers
 			logger.Information($"Start upload course '{courseId}'");
 			var stagingFile = courseManager.GetStagingTempCourseFile(courseId);
 			System.IO.File.WriteAllBytes(stagingFile.FullName, content);
-		}
-
-
-		private async Task NotifyAboutCourseVersion(string courseId, Guid versionId, string userId)
-		{
-			var notification = new UploadedPackageNotification
-			{
-				CourseVersionId = versionId
-			};
-			await notificationsRepo.AddNotificationAsync(courseId, notification, userId);
-		}
-
-		private async Task NotifyAboutPublishedCourseVersion(string courseId, Guid versionId, string userId)
-		{
-			var notification = new PublishedPackageNotification
-			{
-				CourseVersionId = versionId,
-			};
-			await notificationsRepo.AddNotificationAsync(courseId, notification, userId);
 		}
 	}
 

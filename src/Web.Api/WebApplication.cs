@@ -152,7 +152,18 @@ namespace Ulearn.Web.Api
 			services.AddScoped<IAuthorizationHandler, CourseAccessAuthorizationHandler>();
 			services.AddScoped<INotificationDataPreloader, NotificationDataPreloader>();
 
-			services.AddDatabaseServices(logger);
+			services.AddDatabaseServices(logger, null);
+		}
+
+		public void ConfigureDi(IServiceCollection services, ILogger logger, DirectoryInfo courseManagerBaseDirectory)
+		{
+			base.ConfigureDi(services, logger);
+
+			services.AddScoped<IAuthorizationHandler, CourseRoleAuthorizationHandler>();
+			services.AddScoped<IAuthorizationHandler, CourseAccessAuthorizationHandler>();
+			services.AddScoped<INotificationDataPreloader, NotificationDataPreloader>();
+
+			services.AddDatabaseServices(logger, courseManagerBaseDirectory);
 		}
 
 		public void ConfigureAuthServices(IServiceCollection services, WebApiConfiguration configuration)

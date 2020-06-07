@@ -27,6 +27,11 @@ namespace Database
 		{
 			this.logger = logger;
 		}
+		public WebCourseManager(ILogger logger,DirectoryInfo baseDirectory)
+			: base(baseDirectory)
+		{
+			this.logger = logger;
+		}
 
 		private readonly object @lock = new object();
 

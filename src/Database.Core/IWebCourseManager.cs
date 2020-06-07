@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Database.Repos;
 using Ulearn.Core.Courses;
@@ -23,7 +24,7 @@ namespace Database
 		DirectoryInfo GetExtractedVersionDirectory(Guid versionId);
 		FileInfo GetCourseVersionFile(Guid versionId);
 		string GetStagingCoursePath(string courseId);
-		Course LoadCourseFromZip(FileInfo zipFile);
+		Course LoadCourseFromZip(FileInfo zipFile, Encoding encoding);
 		Course LoadCourseFromDirectory(DirectoryInfo dir);
 		string GetPackageName(string courseId);
 		string GetPackageName(Guid versionId);
@@ -37,9 +38,9 @@ namespace Database
 		void ReleaseCourse(string courseId);
 		void WaitWhileCourseIsLocked(string courseId);
 		void MoveCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory);
-		void CopyTempCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory);
 		void ReloadCourse(string courseId);
 		Course ReloadCourseFromDirectory(DirectoryInfo directory);
 		void ExtractTempCourseChanges(string tempCourseId);
+		bool TryCreateTempCourse(string courseId, string courseTitle, Guid firstVersionId);
 	}
 }

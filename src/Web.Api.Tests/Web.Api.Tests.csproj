@@ -31,4 +31,31 @@
 		</Reference>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Controllers\TempCourses\Courses.Versions" />
+	  <Folder Include="Controllers\TempCourses\TempCourseStaging" />
+	  <Folder Include="TestData\TempCourses" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Controllers\TempCourses\Courses.Staging\NewFile1.txt">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Controllers\TempCourses\TestData\Courses\Courses.Staging\NewFile1.txt">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="CourseManager\Courses\Courses\.dummy">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="CourseManager\Courses\Courses.Staging\.dummy">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="CourseManager\Courses\Courses.Versions\.dummy">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="CourseManager\Courses\TempCourseStaging\.dummy">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 </Project>
