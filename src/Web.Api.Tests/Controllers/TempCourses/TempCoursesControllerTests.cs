@@ -1,18 +1,13 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using Database;
+﻿using System.Threading.Tasks;
 using Database.Models;
 using Database.Repos;
 using Database.Repos.CourseRoles;
-using Database.Repos.Groups;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
-using Serilog;
 using Ulearn.Core.Courses;
 using Ulearn.Web.Api.Controllers;
-using Ulearn.Web.Api.Controllers.Groups;
-using Ulearn.Web.Api.Models.Parameters.Groups;
+using Ulearn.Web.Api.Models.Responses.TempCourses;
 
 namespace Web.Api.Tests.Controllers.TempCourses
 {
@@ -23,29 +18,49 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		private ITempCoursesRepo tempCoursesRepo;
 		private ICourseRolesRepo courseRolesRepo;
 
-		[SetUp]
+		[OneTimeSetUp]
 		public void SetUp()
 		{
-			SetupTestInfrastructureAsync(services =>
-			{
-				services.AddScoped<TempCourseController>();
-				
-			}).GetAwaiter().GetResult();
+			SetupTestInfrastructureAsync(services => { services.AddScoped<TempCourseController>(); }).GetAwaiter().GetResult();
 			tempCourseController = GetController<TempCourseController>();
 			tempCoursesRepo = serviceProvider.GetService<ITempCoursesRepo>();
 			courseRolesRepo = serviceProvider.GetService<ICourseRolesRepo>();
 		}
 
 		[Test]
-		public async Task CreateTempCourse()
+		public async Task Create_ShouldSucceed_With_MainScenario()
 		{
 			var baseCourse = new Mock<ICourse>();
-			baseCourse.Setup(c => c.Id).Returns("courseId");
+			baseCourse.Setup(c => c.Id).Returns("mainScenario");
 			await courseRolesRepo.ToggleRoleAsync(baseCourse.Object.Id, TestUsers.User.Id, CourseRoleType.CourseAdmin, TestUsers.Admin.Id);
 			await AuthenticateUserInControllerAsync(tempCourseController, TestUsers.User).ConfigureAwait(false);
-
 			var result = await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
-			Assert.AreEqual(1, result);
+			Assert.AreEqual(ErrorType.NoErrors, result.ErrorType);
+			var tempCourseEntity = tempCoursesRepo.Find(baseCourse.Object.Id + TestUsers.User.Id);
+			Assert.NotNull(tempCourseEntity);
+		}
+
+		[Test]
+		public async Task Create_ShouldReturnConflict_WhenCourseAlreadyExists()
+		{
+			var baseCourse = new Mock<ICourse>();
+			baseCourse.Setup(c => c.Id).Returns("conflictScenario");
+			await courseRolesRepo.ToggleRoleAsync(baseCourse.Object.Id, TestUsers.User.Id, CourseRoleType.CourseAdmin, TestUsers.Admin.Id);
+			await AuthenticateUserInControllerAsync(tempCourseController, TestUsers.User).ConfigureAwait(false);
+			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
+			var result = await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
+			Assert.AreEqual(ErrorType.Conflict, result.ErrorType);
+		}
+
+		[Test]
+		public async Task Create_ShouldReturnForbidden_WhenUserAccessIsLowerThanCourseAdmin()
+		{
+			var baseCourse = new Mock<ICourse>();
+			baseCourse.Setup(c => c.Id).Returns("forbiddenScenario");
+			await AuthenticateUserInControllerAsync(tempCourseController, TestUsers.User).ConfigureAwait(false);
+			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
+			var result = await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
+			Assert.AreEqual(ErrorType.Forbidden, result.ErrorType);
 		}
 	}
 }
