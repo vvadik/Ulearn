@@ -1,4 +1,4 @@
-﻿using AntiPlagiarism.Web.Controllers;
+﻿using AntiPlagiarism.Web.CodeAnalyzing;
 using NUnit.Framework;
 
 namespace AntiPlagiarism.Tests.CodeAnalyzing
@@ -15,7 +15,7 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing
 			double faintSuspicionExpected, double strongSuspicionExpected)
 		{
 			var (faintSuspicion, strongSuspicion)
-				= ApiController.GetSuspicionLevels(mean, sigma, faintSuspicionCoefficient, strongSuspicionCoefficient);
+				= StatisticsParametersFinder.GetSuspicionLevels(mean, sigma, faintSuspicionCoefficient, strongSuspicionCoefficient);
 			Assert.AreEqual(faintSuspicionExpected, faintSuspicion, 1e-4);
 			Assert.AreEqual(strongSuspicionExpected, strongSuspicion, 1e-4);
 		}

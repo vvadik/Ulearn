@@ -245,7 +245,7 @@ namespace AntiPlagiarism.Web.Controllers
 			var maxStrongSuspicionLevel = configuration.AntiPlagiarism.StatisticsAnalyzing.MaxStrongSuspicionLevel;
 
 			var (faintSuspicion, strongSuspicion)
-				= GetSuspicionLevels(taskStatisticsParameters.Mean, taskStatisticsParameters.Deviation, faintSuspicionCoefficient, strongSuspicionCoefficient);
+				= StatisticsParametersFinder.GetSuspicionLevels(taskStatisticsParameters.Mean, taskStatisticsParameters.Deviation, faintSuspicionCoefficient, strongSuspicionCoefficient);
 
 			return new SuspicionLevels
 			{
@@ -254,23 +254,9 @@ namespace AntiPlagiarism.Web.Controllers
 			};
 		}
 
-		public static (double faintSuspicion, double strongSuspicion) GetSuspicionLevels(double mean, double sigma, double faintSuspicionCoefficient, double strongSuspicionCoefficient)
-		{
-			var (alpha, beta) = GetBetaParameters(mean, sigma);
-			var betaDistribution = new BetaDistribution(alpha, beta);
-			var faintSigmaToProbability = new NormalDistribution(0, 1).DistributionFunction(faintSuspicionCoefficient);
-			var strongSigmaToProbability = new NormalDistribution(0, 1).DistributionFunction(strongSuspicionCoefficient);
-			var faintSuspicion = betaDistribution.InverseDistributionFunction(faintSigmaToProbability);
-			var strongSuspicion = betaDistribution.InverseDistributionFunction(strongSigmaToProbability);
-			return (faintSuspicion, strongSuspicion);
-		}
 
-		private static (double, double) GetBetaParameters(double mean, double sigma)
-		{
-			var alpha = -mean * (sigma * sigma + mean * mean - mean) / (sigma * sigma);
-			var beta = (sigma * sigma + mean * mean - mean) * (mean - 1) / (sigma * sigma);
-			return (alpha, beta);
-		}
+
+
 
 		private static double GetSuspicionLevelWithThreshold(double value, double minValue, double maxValue)
 		{
