@@ -13,7 +13,7 @@ namespace Ulearn.Core.Telegram
 
 		protected TelegramBot()
 		{
-			token = ApplicationConfiguration.Read<UlearnConfiguration>().Telegram.BotToken;
+			token = ApplicationConfiguration.Read<UlearnConfiguration>().Telegram?.BotToken;
 			if (!string.IsNullOrEmpty(token))
 				telegramClient = new TelegramBotClient(token);
 		}
