@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.IO;
+using System.Threading.Tasks;
 using Database.Models;
 using Database.Repos;
 using Database.Repos.CourseRoles;
@@ -17,6 +19,8 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		private TempCourseController tempCourseController;
 		private ITempCoursesRepo tempCoursesRepo;
 		private ICourseRolesRepo courseRolesRepo;
+		private DirectoryInfo testCourseDirectory;
+		
 
 		[OneTimeSetUp]
 		public void SetUp()
@@ -25,6 +29,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 			tempCourseController = GetController<TempCourseController>();
 			tempCoursesRepo = serviceProvider.GetService<ITempCoursesRepo>();
 			courseRolesRepo = serviceProvider.GetService<ICourseRolesRepo>();
+			testCourseDirectory = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
 		}
 
 		[Test]

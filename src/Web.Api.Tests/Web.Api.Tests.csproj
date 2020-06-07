@@ -34,28 +34,23 @@
 	<ItemGroup>
 	  <Folder Include="Controllers\TempCourses\Courses.Versions" />
 	  <Folder Include="Controllers\TempCourses\TempCourseStaging" />
+	  <Folder Include="CourseManager\Courses\Courses" />
+	  <Folder Include="CourseManager\Courses\Courses.Staging" />
+	  <Folder Include="CourseManager\Courses\Courses.Versions" />
+	  <Folder Include="CourseManager\Courses\TempCourseStaging" />
 	  <Folder Include="TestData\TempCourses" />
+	  <Folder Include="TestData\TempCourses\Help\Properties" />
 	</ItemGroup>
-
+	
 	<ItemGroup>
-	  <None Update="Controllers\TempCourses\Courses.Staging\NewFile1.txt">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Controllers\TempCourses\TestData\Courses\Courses.Staging\NewFile1.txt">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="CourseManager\Courses\Courses\.dummy">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="CourseManager\Courses\Courses.Staging\.dummy">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="CourseManager\Courses\Courses.Versions\.dummy">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="CourseManager\Courses\TempCourseStaging\.dummy">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
+		<Content Include="TestData\**">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
-
+	
+	<ItemGroup>
+		<Content Include="CourseManager\**">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 </Project>
