@@ -38,13 +38,12 @@
 	  <Folder Include="CourseManager\Courses\Courses.Staging" />
 	  <Folder Include="CourseManager\Courses\Courses.Versions" />
 	  <Folder Include="CourseManager\Courses\TempCourseStaging" />
-	  <Folder Include="TestData\TempCourses" />
 	  <Folder Include="TestData\TempCourses\Help\Properties" />
 	</ItemGroup>
 	
 	<ItemGroup>
 		<Content Include="TestData\**">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
 	
@@ -52,5 +51,24 @@
 		<Content Include="CourseManager\**">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <None Include="TestData\TempCourses\Help\Slides\U99_Presentation\_FirstStep.cs" />
+	  <None Include="TestData\TempCourses\Help\Slides\U99_Presentation\_Code.cs" />
+	  <None Include="TestData\TempCourses\Help\Slides\Prelude.cs" />
+	  <Compile Remove="TestData\TempCourses\Help\Slides\U99_Presentation\_Code.cs" />
+	  <None Include="TestData\TempCourses\Help\Slides\U99_Presentation\_Code.cs" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <Compile Remove="TestData\TempCourses\Help\CourseTests.cs" />
+	  <None Include="TestData\TempCourses\Help\CourseTests.cs" />
+	  <Compile Remove="TestData\TempCourses\Help\Slides\U99_Presentation\_FirstStep.cs" />
+	  <None Include="TestData\TempCourses\Help\Slides\U99_Presentation\_FirstStep.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <Compile Remove="TestData\TempCourses\Help\Slides\Prelude.cs" />
+	  <None Include="TestData\TempCourses\Help\Slides\Prelude.cs" />
 	</ItemGroup>
 </Project>
