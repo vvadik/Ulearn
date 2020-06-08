@@ -42,7 +42,6 @@ namespace Web.Api.Tests.Controllers.TempCourses
 			workingCourseDirectory = new DirectoryInfo(Path.Combine(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "WorkingCourse")));
 		}
 
-
 		[SetUp]
 		public void SetUp()
 		{
@@ -58,10 +57,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		[Test]
 		public async Task Create_ShouldSucceed_With_MainCase()
 		{
-			var baseCourse = new Mock<ICourse>();
-			baseCourse.Setup(c => c.Id).Returns("create_mainCase");
-			await courseRolesRepo.ToggleRoleAsync(baseCourse.Object.Id, TestUsers.User.Id, CourseRoleType.CourseAdmin, TestUsers.Admin.Id);
-			await AuthenticateUserInControllerAsync(tempCourseController, TestUsers.User).ConfigureAwait(false);
+			var baseCourse = await CreateAndConfigureBaseCourseForUser("create_mainCase");
 			var result = await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			Assert.AreEqual(ErrorType.NoErrors, result.ErrorType);
 		}
@@ -69,10 +65,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		[Test]
 		public async Task Create_ShouldUpdateDB_With_MainCase()
 		{
-			var baseCourse = new Mock<ICourse>();
-			baseCourse.Setup(c => c.Id).Returns("create_mainCaseDB");
-			await courseRolesRepo.ToggleRoleAsync(baseCourse.Object.Id, TestUsers.User.Id, CourseRoleType.CourseAdmin, TestUsers.Admin.Id);
-			await AuthenticateUserInControllerAsync(tempCourseController, TestUsers.User).ConfigureAwait(false);
+			var baseCourse = await CreateAndConfigureBaseCourseForUser("create_mainCaseDB");
 			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			var tempCourseEntity = tempCoursesRepo.Find(baseCourse.Object.Id + TestUsers.User.Id);
 			Assert.NotNull(tempCourseEntity);
@@ -81,10 +74,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		[Test]
 		public async Task Create_ShouldReturnConflict_WhenCourseAlreadyExists()
 		{
-			var baseCourse = new Mock<ICourse>();
-			baseCourse.Setup(c => c.Id).Returns("create_conflictCase");
-			await courseRolesRepo.ToggleRoleAsync(baseCourse.Object.Id, TestUsers.User.Id, CourseRoleType.CourseAdmin, TestUsers.Admin.Id);
-			await AuthenticateUserInControllerAsync(tempCourseController, TestUsers.User).ConfigureAwait(false);
+			var baseCourse = await CreateAndConfigureBaseCourseForUser("create_conflictCase");
 			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			var result = await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			Assert.AreEqual(ErrorType.Conflict, result.ErrorType);
@@ -104,10 +94,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		[Test]
 		public async Task UploadFullCourse_ShouldSucceed_WhenCourseIsValid()
 		{
-			var baseCourse = new Mock<ICourse>();
-			baseCourse.Setup(c => c.Id).Returns("upload_successCase");
-			await courseRolesRepo.ToggleRoleAsync(baseCourse.Object.Id, TestUsers.User.Id, CourseRoleType.CourseAdmin, TestUsers.Admin.Id);
-			await AuthenticateUserInControllerAsync(tempCourseController, TestUsers.User).ConfigureAwait(false);
+			var baseCourse = await CreateAndConfigureBaseCourseForUser("upload_successCase");
 			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			var fullCourseZip = new ZipFile(Encoding.UTF8);
 			fullCourseZip.AddDirectory(testCourseDirectory.FullName);
@@ -132,10 +119,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		[Test]
 		public async Task UploadFullCourse_ShouldUpdateDB_WhenCourseIsValid()
 		{
-			var baseCourse = new Mock<ICourse>();
-			baseCourse.Setup(c => c.Id).Returns("upload_successDBCase");
-			await courseRolesRepo.ToggleRoleAsync(baseCourse.Object.Id, TestUsers.User.Id, CourseRoleType.CourseAdmin, TestUsers.Admin.Id);
-			await AuthenticateUserInControllerAsync(tempCourseController, TestUsers.User).ConfigureAwait(false);
+			var baseCourse = await CreateAndConfigureBaseCourseForUser("upload_successDBCase");
 			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			var tmpCourseId = baseCourse.Object.Id + TestUsers.User.Id;
 			var loadTimeBeforeUpload = tempCoursesRepo.Find(tmpCourseId).LoadingTime;
@@ -150,10 +134,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		[Test]
 		public async Task UploadFullCourse_ShouldOverrideCourseDirectory_WhenCourseIsValid()
 		{
-			var baseCourse = new Mock<ICourse>();
-			baseCourse.Setup(c => c.Id).Returns("upload_successDBCase");
-			await courseRolesRepo.ToggleRoleAsync(baseCourse.Object.Id, TestUsers.User.Id, CourseRoleType.CourseAdmin, TestUsers.Admin.Id);
-			await AuthenticateUserInControllerAsync(tempCourseController, TestUsers.User).ConfigureAwait(false);
+			var baseCourse = await CreateAndConfigureBaseCourseForUser("upload_courseErrorCase");
 			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			var tmpCourseId = baseCourse.Object.Id + TestUsers.User.Id;
 			var pathToExcessFile = Path.Combine(workingCourseDirectory.FullName, "excess.txt");
@@ -172,14 +153,10 @@ namespace Web.Api.Tests.Controllers.TempCourses
 			Assert.IsEmpty(diff);
 		}
 
-
 		[Test]
 		public async Task UploadFullCourse_ShouldReturnCourseError_WhenCourseIsInvalid()
 		{
-			var baseCourse = new Mock<ICourse>();
-			baseCourse.Setup(c => c.Id).Returns("upload_courseErrorCase");
-			await courseRolesRepo.ToggleRoleAsync(baseCourse.Object.Id, TestUsers.User.Id, CourseRoleType.CourseAdmin, TestUsers.Admin.Id);
-			await AuthenticateUserInControllerAsync(tempCourseController, TestUsers.User).ConfigureAwait(false);
+			var baseCourse = await CreateAndConfigureBaseCourseForUser("upload_courseErrorCase");
 			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			var fullCourseZip = new ZipFile(Encoding.UTF8);
 			BreakCourse();
@@ -192,10 +169,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		[Test]
 		public async Task UploadFullCourse_ShouldNotUpdateDB_WhenCourseIsInvalid()
 		{
-			var baseCourse = new Mock<ICourse>();
-			baseCourse.Setup(c => c.Id).Returns("upload_courseErrorCaseDB");
-			await courseRolesRepo.ToggleRoleAsync(baseCourse.Object.Id, TestUsers.User.Id, CourseRoleType.CourseAdmin, TestUsers.Admin.Id);
-			await AuthenticateUserInControllerAsync(tempCourseController, TestUsers.User).ConfigureAwait(false);
+			var baseCourse = await CreateAndConfigureBaseCourseForUser("upload_courseErrorCaseDB");
 			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			var tmpCourseId = baseCourse.Object.Id + TestUsers.User.Id;
 			var loadTimeBeforeUpload = tempCoursesRepo.Find(tmpCourseId).LoadingTime;
@@ -211,10 +185,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		[Test]
 		public async Task UploadFullCourse_ShouldNotUpdateDirectory_WhenCourseIsInvalid()
 		{
-			var baseCourse = new Mock<ICourse>();
-			baseCourse.Setup(c => c.Id).Returns("upload_courseErrorCaseDir");
-			await courseRolesRepo.ToggleRoleAsync(baseCourse.Object.Id, TestUsers.User.Id, CourseRoleType.CourseAdmin, TestUsers.Admin.Id);
-			await AuthenticateUserInControllerAsync(tempCourseController, TestUsers.User).ConfigureAwait(false);
+			var baseCourse = await CreateAndConfigureBaseCourseForUser("upload_courseErrorCaseDir");
 			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			var tmpCourseId = baseCourse.Object.Id + TestUsers.User.Id;
 			var courseDirectory = courseManager.GetExtractedCourseDirectory(tmpCourseId);
@@ -226,6 +197,15 @@ namespace Web.Api.Tests.Controllers.TempCourses
 			await tempCourseController.UploadFullCourse(baseCourse.Object.Id, new List<IFormFile>() { file });
 			var directoryContentAfterUpload = GetDirectoryContent(courseDirectory.FullName);
 			Assert.AreEqual(directoryContentAfterUpload, directoryContentBeforeUpload);
+		}
+
+		private async Task<Mock<ICourse>> CreateAndConfigureBaseCourseForUser(string courseId)
+		{
+			var baseCourse = new Mock<ICourse>();
+			baseCourse.Setup(c => c.Id).Returns(courseId);
+			await courseRolesRepo.ToggleRoleAsync(baseCourse.Object.Id, TestUsers.User.Id, CourseRoleType.CourseAdmin, TestUsers.Admin.Id);
+			await AuthenticateUserInControllerAsync(tempCourseController, TestUsers.User).ConfigureAwait(false);
+			return baseCourse;
 		}
 
 		private void BreakCourse()
