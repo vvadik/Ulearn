@@ -124,7 +124,7 @@ namespace uLearn.Web.Controllers
 				.SelectMany(s => s.Plagiarisms).Select(p => p.SubmissionInfo);
 
 			var submissionsIds = antiPlagiarismSubmissionInfos.Concat(plagiarismsSubmissionInfos)
-				.Select(si => JsonConvert.DeserializeObject<AdditionalInfo>(si.AdditionalInfo).SubmissionId)
+				.Select(si => si.SubmissionId)
 				.Distinct()
 				.ToList();
 

@@ -42,8 +42,18 @@ namespace AntiPlagiarism.Api.Models.Results
 		[DataMember(Name = "additional_info")] // Должно включать данные класса AdditionalInfo
 		public string AdditionalInfo { get; set; }
 
+		[DataMember(Name = "client_submission_id")]
+		public string ClientSubmissionId { get; set; }
+
 		[IgnoreDataMember]
-		public int SubmissionId => JsonConvert.DeserializeObject<AdditionalInfo>(AdditionalInfo).SubmissionId;
+		public int SubmissionId {
+			get
+			{
+				if (ClientSubmissionId != null && int.TryParse(ClientSubmissionId, out var parsed))
+					return parsed;
+				return JsonConvert.DeserializeObject<AdditionalInfo>(AdditionalInfo).SubmissionId;
+			}
+		}
 
 		public SubmissionInfo CloneWithoutCode()
 		{

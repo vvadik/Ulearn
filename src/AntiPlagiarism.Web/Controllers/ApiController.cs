@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Accord.Statistics.Distributions.Univariate;
 using AntiPlagiarism.Api.Models.Parameters;
 using AntiPlagiarism.Api.Models.Results;
 using AntiPlagiarism.Web.CodeAnalyzing;
@@ -12,6 +13,7 @@ using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Database.Repos;
 using AntiPlagiarism.Web.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Serilog;
@@ -72,7 +74,8 @@ namespace AntiPlagiarism.Web.Controllers
 				parameters.Language,
 				parameters.Code,
 				tokensCount,
-				parameters.AdditionalInfo
+				parameters.AdditionalInfo,
+				parameters.ClientSubmissionId
 			).ConfigureAwait(false);
 
 			logger.Information(
@@ -242,12 +245,19 @@ namespace AntiPlagiarism.Web.Controllers
 			var maxFaintSuspicionLevel = configuration.AntiPlagiarism.StatisticsAnalyzing.MaxFaintSuspicionLevel;
 			var maxStrongSuspicionLevel = configuration.AntiPlagiarism.StatisticsAnalyzing.MaxStrongSuspicionLevel;
 
+			var (faintSuspicion, strongSuspicion)
+				= StatisticsParametersFinder.GetSuspicionLevels(taskStatisticsParameters.Mean, taskStatisticsParameters.Deviation, faintSuspicionCoefficient, strongSuspicionCoefficient);
+
 			return new SuspicionLevels
 			{
-				FaintSuspicion = GetSuspicionLevelWithThreshold(taskStatisticsParameters.Mean + faintSuspicionCoefficient * taskStatisticsParameters.Deviation, minFaintSuspicionLevel, maxFaintSuspicionLevel),
-				StrongSuspicion = GetSuspicionLevelWithThreshold(taskStatisticsParameters.Mean + strongSuspicionCoefficient * taskStatisticsParameters.Deviation, minStrongSuspicionLevel, maxStrongSuspicionLevel),
+				FaintSuspicion = GetSuspicionLevelWithThreshold(faintSuspicion, minFaintSuspicionLevel, maxFaintSuspicionLevel),
+				StrongSuspicion = GetSuspicionLevelWithThreshold(strongSuspicion, minStrongSuspicionLevel, maxStrongSuspicionLevel),
 			};
 		}
+
+
+
+
 
 		private static double GetSuspicionLevelWithThreshold(double value, double minValue, double maxValue)
 		{

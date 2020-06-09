@@ -9,6 +9,7 @@ using AntiPlagiarism.Web.Database.Repos;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Serilog;
+using Ulearn.Common;
 
 namespace AntiPlagiarism.Web.CodeAnalyzing
 {
@@ -46,18 +47,33 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 		
 		public async Task<bool> HandleNewSubmission()
 		{
+			var handledSubmission = await FuncUtils.TrySeveralTimesAsync(ExtractSnippetsFromSubmissionFromQueue, 3);
+			if (handledSubmission == null)
+				return false;
+			try
+			{
+				if (await NeedToRecalculateTaskStatistics(handledSubmission.ClientId, handledSubmission.TaskId).ConfigureAwait(false))
+					await CalculateTaskStatisticsParametersAsync(handledSubmission.ClientId, handledSubmission.TaskId).ConfigureAwait(false);
+			}
+			catch (Exception ex)
+			{
+				logger.Error(ex, "Exception during CalculateTaskStatistics in HandleNewSubmission");
+			}
+			return true;
+		}
+
+		private async Task<Submission> ExtractSnippetsFromSubmissionFromQueue()
+		{
 			var queueItem = await workQueueRepo.Take(QueueIds.NewSubmissionsQueue).ConfigureAwait(false);
 			if (queueItem == null)
-				return false;
+				return null;
 			var submissionId = int.Parse(queueItem.ItemId);
 			var submission = (await submissionsRepo.GetSubmissionsByIdsAsync(new List<int> { submissionId }).ConfigureAwait(false)).First();
 			await ExtractSnippetsFromSubmissionAsync(submission).ConfigureAwait(false);
 			await workQueueRepo.Remove(queueItem.Id);
-			if (await NeedToRecalculateTaskStatistics(submission.ClientId, submission.TaskId).ConfigureAwait(false))
-				await CalculateTaskStatisticsParametersAsync(submission.ClientId, submission.TaskId).ConfigureAwait(false);
-			return true;
+			return submission;
 		}
-		
+
 		/* Определяет, пора ли пересчитывать параметры Mean и Deviation для заданной задачи.
 		   В конфигурации для этого есть специальный параметр configuration.StatisticsAnalyzing.RecalculateStatisticsAfterSubmisionsCount.
 		   Если он равен, например, 1000, то параметры будут пересчитываться после каждого тысячного решения по этой задаче.

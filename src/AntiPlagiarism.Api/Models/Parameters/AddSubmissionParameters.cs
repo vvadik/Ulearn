@@ -8,7 +8,7 @@ namespace AntiPlagiarism.Api.Models.Parameters
 {
 	[DataContract]
 	[ModelBinder(typeof(JsonModelBinder), Name = "parameters")]
-	public class AddSubmissionParameters : ApiParameters
+	public class AddSubmissionParameters : AntiPlagiarismApiParameters
 	{
 		[DataMember(Name = "task_id", IsRequired = true)]
 		public Guid TaskId { get; set; }
@@ -24,6 +24,9 @@ namespace AntiPlagiarism.Api.Models.Parameters
 
 		[DataMember(Name = "additional_info")]
 		public string AdditionalInfo { get; set; } = "";
+
+		[DataMember(Name = "client_submission_id")]
+		public string ClientSubmissionId { get; set; }
 
 		public override string ToString()
 		{

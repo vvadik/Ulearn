@@ -105,6 +105,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			return tokens.Count;
 		}
 
+		// Работа метода описана в классе PlagiarismDetectorConfiguration
 		public async Task<List<Plagiarism>> GetPlagiarismsAsync(Submission submission, SuspicionLevels suspicionLevels)
 		{
 			/* Dictionaries by submission id and snippet type */

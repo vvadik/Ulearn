@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Linq;
+using Microsoft.EntityFrameworkCore.Internal;
 using Ulearn.Core.Configuration;
 using Vostok.Configuration;
 using Vostok.Configuration.Abstractions;
@@ -9,6 +11,7 @@ using Vostok.Configuration.Sources.Json;
 using Vostok.Hosting.Kontur;
 using Vostok.Hosting.Setup;
 using Vostok.Logging.Abstractions;
+using Vostok.Logging.Abstractions.Values;
 using Vostok.Logging.File.Configuration;
 using Vostok.Logging.Formatting;
 
@@ -90,8 +93,8 @@ namespace Ulearn.Common.Api
 					.CustomizeLog(lb =>
 					{
 						var customized = lb.WithMinimumLevel(minimumLevel);
-						//if (dbMinimumLevel != minimumLevel) // TODO посмотреть, будут ли лишние логи от базы
-						//customized = customized.SelectEvents(le => le.Level >= dbMinimumLevel || !IsDbSource(le));
+						if (dbMinimumLevel != minimumLevel)
+							customized = customized.SelectEvents(le => le.Level >= dbMinimumLevel || !IsDbSource(le));
 						return customized;
 					})
 					.SetSettingsProvider(() => new FileLogSettings
@@ -111,23 +114,30 @@ namespace Ulearn.Common.Api
 				{
 					herculesLogBuilder.SetStream(ulearnConfiguration.Hercules.Stream);
 					herculesLogBuilder.SetApiKeyProvider(() => ulearnConfiguration.Hercules.ApiKey);
-					herculesLogBuilder.CustomizeLog(cl => cl.WithMinimumLevel(LogLevel.Info));
+					herculesLogBuilder.CustomizeLog(lb =>
+					{
+						var customized = lb.WithMinimumLevel(LogLevel.Info);
+						if (dbMinimumLevel >= LogLevel.Info)
+							customized = customized.SelectEvents(le => le.Level >= dbMinimumLevel || !IsDbSource(le));
+						return customized;
+					});
 				});
 			}
 		}
 
-		/* Метод не тестировался с EF 3.1 и vostok
 		private static bool IsDbSource(LogEvent le)
 		{
-			if (le.Properties.TryGetValue("SourceContext", out var sourceContextValue)
-				&& (sourceContextValue as ScalarValue)?.Value is string sourceContext)
-				return sourceContext.StartsWith("\"Microsoft.EntityFrameworkCore.Database.Command")
-						|| sourceContext.StartsWith("\"Microsoft.EntityFrameworkCore.Infrastructure");
+			if (le.Properties != null
+				&& le.Properties.TryGetValue("sourceContext", out var sourceContextValue)
+				&& sourceContextValue is SourceContextValue value)
+			{
+				return value.ToString().Contains("Microsoft.EntityFrameworkCore.Database.Command")
+					|| value.ToString().Contains("Microsoft.EntityFrameworkCore.Infrastructure");
+			}
 			return false;
 		}
-		*/
 
-		// Для совместимости с настройками appsettings.json, написанными для серилога
+// Для совместимости с настройками appsettings.json, написанными для серилога
 		private static bool TryParseLogLevel(string str, out LogLevel level)
 		{
 			if (Enum.TryParse(str, true, out level) && Enum.IsDefined(typeof(LogLevel), level))

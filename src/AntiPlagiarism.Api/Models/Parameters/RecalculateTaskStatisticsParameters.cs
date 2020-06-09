@@ -4,7 +4,7 @@ using Ulearn.Common.Api.Models.Parameters;
 
 namespace AntiPlagiarism.Api.Models.Parameters
 {
-	public class RecalculateTaskStatisticsParameters : ApiParameters
+	public class RecalculateTaskStatisticsParameters : AntiPlagiarismApiParameters
 	{
 		[FromQuery(Name = "from_task")]
 		public Guid? FromTaskId { get; set; }

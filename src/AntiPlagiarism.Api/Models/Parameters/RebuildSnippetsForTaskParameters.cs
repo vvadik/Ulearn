@@ -5,7 +5,7 @@ using Ulearn.Common.Api.Models.Parameters;
 
 namespace AntiPlagiarism.Api.Models.Parameters
 {
-	public class RebuildSnippetsForTaskParameters : ApiParameters
+	public class RebuildSnippetsForTaskParameters : AntiPlagiarismApiParameters
 	{
 		[BindRequired]
 		[FromQuery(Name = "task_id")]

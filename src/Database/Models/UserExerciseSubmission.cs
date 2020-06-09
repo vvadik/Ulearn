@@ -71,7 +71,7 @@ namespace Database.Models
 
 		public virtual IList<ManualExerciseChecking> ManualCheckings { get; set; }
 
-		[Obsolete] // YT: ULEARN-217
+		[Obsolete] // YT: ULEARN-217; Используй AntiPlagiarism.Web.Database.Models.Submission.ClientSubmissionId
 		[Index("IDX_UserExerciseSubmission_ByAntiPlagiarismSubmissionId")]
 		public int? AntiPlagiarismSubmissionId { get; set; }
 
