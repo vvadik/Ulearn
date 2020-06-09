@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.Serialization;
 using AntiPlagiarism.Web.Database;
 using Newtonsoft.Json;
@@ -16,8 +17,9 @@ namespace ManualUtils.AntiPlagiarism
 	{
 		public static void FillClientSubmissionId(AntiPlagiarismDb adb)
 		{
-			var id = 1;
-			while (true)
+			var ids = adb.Submissions.Select(s => s.Id).ToList();
+			adb.DisableAutoDetectChanges();
+			foreach (var id in ids)
 			{
 				var submission = adb.Submissions.Find(id);
 				if (submission == null)
@@ -25,8 +27,6 @@ namespace ManualUtils.AntiPlagiarism
 					Console.WriteLine($"Stop on id {id}");
 					return;
 				}
-				if (id % 1000 == 0)
-					Console.WriteLine(id);
 				try
 				{
 					submission.ClientSubmissionId = JsonConvert.DeserializeObject<AdditionalInfo>(submission.AdditionalInfo).SubmissionId.ToString();
@@ -34,10 +34,15 @@ namespace ManualUtils.AntiPlagiarism
 				}
 				catch (Exception ex)
 				{
-					Console.WriteLine($"Error on \"{submission.AdditionalInfo}\"");
+					Console.WriteLine($"Error on id {id} \"{submission.AdditionalInfo}\"");
 				}
-				id++;
+				if (id % 1000 == 0)
+				{
+					adb.SaveChanges();
+					Console.WriteLine(id);
+				}
 			}
+			adb.EnableAutoDetectChanges();
 		}
 	}
 }
