@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using CourseToolHotReloader.ApiClient;
+using CourseToolHotReloader.Dtos;
 using CourseToolHotReloader.Log;
 
 namespace CourseToolHotReloader.UpdateQuery
@@ -28,24 +29,31 @@ namespace CourseToolHotReloader.UpdateQuery
 		{
 			var cs = ConsoleSpinner.CreateAndRunWithText("Загружаем изменения на ulearn");
 
-			var courseDelivered = await ulearnApiClient.TrySendCourseUpdates(courseUpdateQuery.GetAllCourseUpdate(),
-				courseUpdateQuery.GetAllDeletedFiles(), config.JwtToken.Token, config.CourseId);
+			var errors = await ulearnApiClient.SendCourseUpdates(courseUpdateQuery.GetAllCourseUpdate(),
+				courseUpdateQuery.GetAllDeletedFiles(), config.CourseId);
 
 			cs.Stop();
 
-			if (courseDelivered)
-			{
-				courseUpdateQuery.Clear();
-			}
+			if (errors.ErrorType != ErrorType.NoErrors)
+				ConsoleWorker.WriteError(errors.Message);
+			else
+				ConsoleWorker.WriteLine("Изменения были загруженны без ошибок");
+			
+			courseUpdateQuery.Clear();
 		}
 
 		public async Task SendFullCourse()
 		{
 			var cs = ConsoleSpinner.CreateAndRunWithText("Загружаем курс на ulearn");
 
-			await ulearnApiClient.SendFullCourse(config.Path, config.JwtToken.Token, config.CourseId);
+			var errors = await ulearnApiClient.SendFullCourse(config.Path, config.CourseId);
 
 			cs.Stop();
+			
+			if (errors.ErrorType != ErrorType.NoErrors)
+				ConsoleWorker.WriteError(errors.Message);
+			else
+				ConsoleWorker.WriteLine("Курс был загружен без ошибок");
 		}
 	}
 }

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace CourseToolHotReloader.DirectoryWorkers
 {
 	public interface ICourseWatcher
 	{
-		public void StartWatch(bool sendFullDirectoryOnChange);
+		public void StartWatch();
 	}
 
 	public class CourseWatcher : ICourseWatcher
@@ -21,9 +23,9 @@ namespace CourseToolHotReloader.DirectoryWorkers
 			this.config = config;
 		}
 
-		public void StartWatch(bool sendFullDirectoryOnChange)
+		public void StartWatch()
 		{
-			if (sendFullDirectoryOnChange)
+			if (config.SendFullArchive)
 			{
 				WatchDirectory(config.Path, sendFullCourseStrategy);
 			}
@@ -52,9 +54,7 @@ namespace CourseToolHotReloader.DirectoryWorkers
 
 			watcher.EnableRaisingEvents = true;
 
-			while (true)
-			{
-			}
+			Thread.Sleep(Timeout.Infinite);
 		}
 	}
 }

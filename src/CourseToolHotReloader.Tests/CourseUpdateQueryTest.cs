@@ -7,7 +7,7 @@ using NUnit.Framework;
 
 namespace CourseToolHotReloader.Tests
 {
-	public class Tests
+	public class CourseUpdateQueryTest
 	{
 		private CourseUpdateQuery courseUpdateQuery;
 
@@ -75,7 +75,7 @@ namespace CourseToolHotReloader.Tests
 
 		private static ICourseUpdate CreateSimpleCourseUpdate(string name)
 		{
-			return CourseUpdateBuilder.Build(name, name, name);
+			return new CourseUpdate(name, name, name);
 		}
 	}
 }

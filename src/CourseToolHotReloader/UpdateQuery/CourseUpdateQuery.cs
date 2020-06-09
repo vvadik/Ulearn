@@ -1,7 +1,9 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using CourseToolHotReloader.Dtos;
+using CourseToolHotReloader.Log;
 
 namespace CourseToolHotReloader.UpdateQuery
 {
@@ -30,12 +32,17 @@ namespace CourseToolHotReloader.UpdateQuery
 
 		public void RegisterUpdate(ICourseUpdate update)
 		{
+			if (update.RelativePath.Equals("\\deleted.txt", StringComparison.OrdinalIgnoreCase))
+			{
+				ConsoleWorker.WriteError("В корне курса находиться файл deleted.txt программа не будет корректно работать, пожалуйста переименуйте его");
+			}
+			
 			updatesQuery.AddOrUpdate(update.FullPath, update, (_1, _2) => update);
 		}
 
 		public void RegisterCreate(ICourseUpdate update)
 		{
-			updatesQuery.AddOrUpdate(update.FullPath, update, (_1, _2) => update);
+			RegisterUpdate(update);
 
 			deletedFiles.TryRemove(update.FullPath, out _);
 

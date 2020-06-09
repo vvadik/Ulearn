@@ -9,6 +9,13 @@
 
 	public class CourseUpdate : ICourseUpdate
 	{
+		public CourseUpdate(string name, string relativePath, string fullPath)
+		{
+			Name = name;
+			RelativePath = relativePath;
+			FullPath = fullPath;
+		}
+
 		public string Name { get; set; }
 		public string RelativePath { get; set; }
 		public string FullPath { get; set; }

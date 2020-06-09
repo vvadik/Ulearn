@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using CourseToolHotReloader.Dtos;
-using CourseToolHotReloader.Log;
 using Ionic.Zip;
 
 namespace CourseToolHotReloader.DirectoryWorkers
@@ -21,43 +19,17 @@ namespace CourseToolHotReloader.DirectoryWorkers
 				foreach (var update in courseUpdates)
 				{
 					if (Directory.Exists(update.FullPath))
-					{
 						zip.AddDirectory(update.FullPath, update.RelativePath);
-					}
 
 					if (File.Exists(update.FullPath))
-					{
 						zip.AddFile(update.FullPath, Path.GetDirectoryName(update.RelativePath));
-					}
 				}
 
 				zip.AddEntry("deleted.txt", deletedFileContent);
-				
+
 				zip.Save(ms);
 			}
-			#region Create arhive in DEBUG
-#if DEBUG
-			using (var zip1 = new ZipFile())
-			{
-				foreach (var update in courseUpdates)
-				{
-					if (Directory.Exists(update.FullPath))
-					{
-						zip1.AddDirectory(update.FullPath, update.RelativePath);
-					}
 
-					if (File.Exists(update.FullPath))
-					{
-						zip1.AddFile(update.FullPath, Path.GetDirectoryName(update.RelativePath));
-					}
-				}
-				var guid = Guid.NewGuid();
-				zip1.AddEntry("deleted.txt", deletedFileContent);
-				zip1.Save($"../{guid.ToString()}.zip");
-				ConsoleWorker.Debug($"current updates save in ../{guid.ToString()}.zip");
-			}
-#endif
-			#endregion			
 			return ms;
 		}
 
@@ -68,12 +40,6 @@ namespace CourseToolHotReloader.DirectoryWorkers
 			var ms = new MemoryStream();
 			zip.Save(ms);
 
-#if DEBUG
-			using var zip1 = new ZipFile();
-			zip1.AddDirectory(pathToFolder);
-			zip1.Save("../temp.zip");
-			ConsoleWorker.Debug("foder save in ../temp.zip");
-#endif
 			return ms;
 		}
 	}

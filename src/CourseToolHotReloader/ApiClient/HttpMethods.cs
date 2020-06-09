@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -8,109 +9,143 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using CourseToolHotReloader.Dtos;
 using CourseToolHotReloader.Log;
+using JetBrains.Annotations;
 
 namespace CourseToolHotReloader.ApiClient
 {
-	public class HttpMethods
+	public interface IHttpMethods
 	{
-		private const string baseUrl = "http://localhost:8000";
+		Task<TokenResponseDto> GetJwtToken(LoginPasswordParameters parameters);
+		Task<TempCourseUpdateResponse> UploadCourse(MemoryStream memoryStream, string id);
+		Task<TempCourseUpdateResponse> UploadFullCourse(MemoryStream memoryStream, string id);
+		Task<TempCourseUpdateResponse> CreateCourse(string id);
+		Task<HasTempCourseResponse> HasCourse(string id);
+		Task<TokenResponseDto> RenewToken();
+	}
 
-		public static async Task<AccountTokenResponseDto> GetJwtToken(LoginPasswordParameters parameters)
+	public class HttpMethods : IHttpMethods
+	{
+		private readonly IConfig config;
+
+		public HttpMethods(IConfig config)
 		{
-			var url = $"{baseUrl}/account/login";
+			this.config = config;
+		}
+
+		[ItemCanBeNull]
+		public async Task<TokenResponseDto> GetJwtToken(LoginPasswordParameters parameters)
+		{
+			var url = $"{config.BaseUrl}/account/login";
 
 			var json = JsonSerializer.Serialize(parameters);
 			var data = new StringContent(json, Encoding.UTF8, "application/json");
 
 			using var client = new HttpClient();
 
-			var response = await HttpResponseMessage(client, url, data);
+			var response = await client.PostAsync(url, data);
 
 			if (response.StatusCode != HttpStatusCode.OK)
-				throw new Exception("Неправильный логин или пароль");
+				return null;
 
 			var result = response.Content.ReadAsStringAsync().Result;
-			return JsonSerializer.Deserialize<AccountTokenResponseDto>(result);
+			return JsonSerializer.Deserialize<TokenResponseDto>(result);
 		}
 
-		private static async Task<HttpResponseMessage> HttpResponseMessage(HttpClient client, string url, HttpContent data)
+		[ItemCanBeNull]
+		public async Task<TokenResponseDto> RenewToken()
 		{
-			HttpResponseMessage response;
+			var url = $"{config.BaseUrl}/account/api-token?days=3";
 
-			try
-			{
-				response = await client.PostAsync(url, data);
-			}
-			catch (HttpRequestException e)
-			{
-				ConsoleWorker.WriteError("Отсутствует соединение с сервером ulearn");
-				throw;
-			}
+			using var client = HttpClient();
+			var response = await client.PostAsync(url, null);
 
-			return response;
+			if (response.StatusCode != HttpStatusCode.OK)
+				return null;
+
+			var result = response.Content.ReadAsStringAsync().Result;
+			return JsonSerializer.Deserialize<TokenResponseDto>(result);
 		}
 
-		public static async Task<TempCourseUpdateResponse> UploadCourse(MemoryStream memoryStream, string token, string id)
+		public async Task<TempCourseUpdateResponse> UploadCourse(MemoryStream memoryStream, string id)
 		{
-			var url = $"{baseUrl}/tempCourses/uploadCourse/{id}";
+			var url = $"{config.BaseUrl}/tempCourses/uploadCourse/{id}";
 
-			return await UpdateTempCourse(memoryStream, token, url);
+			return await UpdateTempCourse(memoryStream, url);
 		}
 
-		public static async Task<TempCourseUpdateResponse> UploadFullCourse(MemoryStream memoryStream, string token, string id)
+		public async Task<TempCourseUpdateResponse> UploadFullCourse(MemoryStream memoryStream, string id)
 		{
-			var url = $"{baseUrl}/tempCourses/uploadFullCourse/{id}";
+			var url = $"{config.BaseUrl}/tempCourses/uploadFullCourse/{id}";
 
-			return await UpdateTempCourse(memoryStream, token, url);
+			return await UpdateTempCourse(memoryStream, url);
 		}
 
-		public static async Task CreateCourse(string token, string id)
+		public async Task<TempCourseUpdateResponse> CreateCourse(string id)
 		{
-			var url = $"{baseUrl}/tempCourses/create/{id}";
+			var url = $"{config.BaseUrl}/tempCourses/create/{id}";
 
-			using var client = HttpClient(token);
+			using var client = HttpClient();
 
-			var response = await HttpResponseMessage(client, url, null);
+			var response = await client.PostAsync(url, null);
 
 			BadCodeHandler(response);
+
+			return DeserializeResponseContent<TempCourseUpdateResponse>(response);
 		}
 
-		private static async Task<TempCourseUpdateResponse> UpdateTempCourse(MemoryStream memoryStream, string token, string url)
+		[ItemCanBeNull]
+		public async Task<HasTempCourseResponse> HasCourse(string id)
 		{
-			using var client = HttpClient(token);
+			var url = $"{config.BaseUrl}/tempCourses/hasCourse/{id}";
+
+			using var client = HttpClient();
+
+			var response = await client.GetAsync(url);
+
+			return response.StatusCode != HttpStatusCode.OK
+				? null
+				: DeserializeResponseContent<HasTempCourseResponse>(response);
+		}
+
+		private static T DeserializeResponseContent<T>(HttpResponseMessage response)
+		{
+			var result = response.Content.ReadAsStringAsync().Result;
+			return JsonSerializer.Deserialize<T>(result);
+		}
+
+		private async Task<TempCourseUpdateResponse> UpdateTempCourse(MemoryStream memoryStream, string url)
+		{
+			using var client = HttpClient();
 
 			var fileContent = new ByteArrayContent(memoryStream.ToArray());
 			var multiContent = new MultipartFormDataContent { { fileContent, "files", "qwe.zip" } };
-			var response = await HttpResponseMessage(client, url, multiContent);
+			var response = await client.PostAsync(url, multiContent);
 
 			BadCodeHandler(response);
 
-			var result = response.Content.ReadAsStringAsync().Result;
-			return JsonSerializer.Deserialize<TempCourseUpdateResponse>(result);
+			return DeserializeResponseContent<TempCourseUpdateResponse>(response);
 		}
 
-		private static void BadCodeHandler(HttpResponseMessage response)
+		private void BadCodeHandler(HttpResponseMessage response)
 		{
 			switch (response.StatusCode)
 			{
 				case HttpStatusCode.OK:
 					return;
 				case HttpStatusCode.Unauthorized:
-					ConsoleWorker.WriteError("Срок авторизации истек, требуется повторная авторизация");
-					Environment.Exit(1);
-					return;
+					throw new Exception("Срок авторизации истек, требуется повторная авторизация");
+				case HttpStatusCode.Forbidden:
+					throw new Exception("Срок авторизации истек, требуется повторная авторизация"); //todo
 				case HttpStatusCode.InternalServerError:
-					ConsoleWorker.WriteError($"На сервере произошла ошибка: {response.Content.ReadAsStringAsync().Result}");
-					Environment.Exit(1);
-					return;
+					throw new Exception($"На сервере произошла ошибка: {response.Content.ReadAsStringAsync().Result}");
 			}
 		}
 
-		private static HttpClient HttpClient(string token)
+		private HttpClient HttpClient()
 		{
 			var client = new HttpClient();
 			client.DefaultRequestHeaders.Authorization =
-				new AuthenticationHeaderValue("Bearer", token);
+				new AuthenticationHeaderValue("Bearer", config.JwtToken);
 			return client;
 		}
 	}
