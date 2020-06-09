@@ -156,7 +156,7 @@ namespace Ulearn.Web.Api.Controllers
 			
 			var containsFlashcards = course.Units.Any(x => x.Slides.OfType<FlashcardSlide>().Any());
 			var scoringSettings = GetScoringSettings(course);
-
+			var tempCourseError = tempCoursesRepo.GetCourseError(courseId)?.Error;
 			return new CourseInfo
 			{
 				Id = course.Id,
@@ -165,7 +165,9 @@ namespace Ulearn.Web.Api.Controllers
 				Scoring = scoringSettings,
 				NextUnitPublishTime = unitsRepo.GetNextUnitPublishTime(course.Id),
 				Units = units,
-				ContainsFlashcards = containsFlashcards
+				ContainsFlashcards = containsFlashcards,
+				IsTempCourse = IsTempCourse(courseId),
+				TempCourseError = tempCourseError
 			};
 		}
 
