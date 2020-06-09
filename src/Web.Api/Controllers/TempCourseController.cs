@@ -206,7 +206,13 @@ namespace Ulearn.Web.Api.Controllers
 				}
 			}
 
-			return filesToDelete.Select(x => x.Substring(1)).ToList();
+			return filesToDelete
+				.Select(x =>
+				{
+					if (x.StartsWith('\\') || x.StartsWith('/'))
+						return x.Substring(1);
+					return x;
+				}).ToList();
 		}
 
 		private async Task<string> TryPublishChanges(string courseId, List<string> filesToDelete, bool isFull)

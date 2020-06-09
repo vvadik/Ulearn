@@ -55,17 +55,17 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		}
 
 		[Test]
-		public async Task Create_ShouldSucceed_With_MainCase()
+		public async Task Create_ShouldSucceed_WithValidRequest()
 		{
-			var baseCourse = await CreateAndConfigureBaseCourseForUser("create_mainCase");
+			var baseCourse = await CreateAndConfigureBaseCourseForUser("create_response_success");
 			var result = await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			Assert.AreEqual(ErrorType.NoErrors, result.ErrorType);
 		}
 
 		[Test]
-		public async Task Create_ShouldUpdateDB_With_MainCase()
+		public async Task Create_ShouldUpdateDB_WithValidRequest()
 		{
-			var baseCourse = await CreateAndConfigureBaseCourseForUser("create_mainCaseDB");
+			var baseCourse = await CreateAndConfigureBaseCourseForUser("create_DB_success");
 			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			var tempCourseEntity = tempCoursesRepo.Find(baseCourse.Object.Id + TestUsers.User.Id);
 			Assert.NotNull(tempCourseEntity);
@@ -74,7 +74,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		[Test]
 		public async Task Create_ShouldReturnConflict_WhenCourseAlreadyExists()
 		{
-			var baseCourse = await CreateAndConfigureBaseCourseForUser("create_conflictCase");
+			var baseCourse = await CreateAndConfigureBaseCourseForUser("create_response_conflict");
 			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			var result = await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			Assert.AreEqual(ErrorType.Conflict, result.ErrorType);
@@ -84,7 +84,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		public async Task Create_ShouldReturnForbidden_WhenUserAccessIsLowerThanCourseAdmin()
 		{
 			var baseCourse = new Mock<ICourse>();
-			baseCourse.Setup(c => c.Id).Returns("create_forbiddenCase");
+			baseCourse.Setup(c => c.Id).Returns("create_response_forbidden");
 			await AuthenticateUserInControllerAsync(tempCourseController, TestUsers.User).ConfigureAwait(false);
 			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			var result = await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
@@ -94,7 +94,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		[Test]
 		public async Task UploadFullCourse_ShouldSucceed_WhenCourseIsValid()
 		{
-			var baseCourse = await CreateAndConfigureBaseCourseForUser("upload_successCase");
+			var baseCourse = await CreateAndConfigureBaseCourseForUser("upload_response_success");
 			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			var fullCourseZip = new ZipFile(Encoding.UTF8);
 			fullCourseZip.AddDirectory(testCourseDirectory.FullName);
@@ -107,7 +107,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		public async Task UploadFullCourse_ShouldReturnNotFound_WhenUserDoesNotHaveTempVersionOfCourse()
 		{
 			var baseCourse = new Mock<ICourse>();
-			baseCourse.Setup(c => c.Id).Returns("upload_successCase");
+			baseCourse.Setup(c => c.Id).Returns("upload_response_notFound");
 			await AuthenticateUserInControllerAsync(tempCourseController, TestUsers.User).ConfigureAwait(false);
 			var fullCourseZip = new ZipFile(Encoding.UTF8);
 			fullCourseZip.AddDirectory(testCourseDirectory.FullName);
@@ -119,7 +119,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		[Test]
 		public async Task UploadFullCourse_ShouldUpdateDB_WhenCourseIsValid()
 		{
-			var baseCourse = await CreateAndConfigureBaseCourseForUser("upload_successDBCase");
+			var baseCourse = await CreateAndConfigureBaseCourseForUser("upload_DB_success");
 			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			var tmpCourseId = baseCourse.Object.Id + TestUsers.User.Id;
 			var loadTimeBeforeUpload = tempCoursesRepo.Find(tmpCourseId).LoadingTime;
@@ -134,7 +134,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		[Test]
 		public async Task UploadFullCourse_ShouldOverrideCourseDirectory_WhenCourseIsValid()
 		{
-			var baseCourse = await CreateAndConfigureBaseCourseForUser("upload_courseErrorCase");
+			var baseCourse = await CreateAndConfigureBaseCourseForUser("upload_directoryState_success");
 			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			var tmpCourseId = baseCourse.Object.Id + TestUsers.User.Id;
 			var pathToExcessFile = Path.Combine(workingCourseDirectory.FullName, "excess.txt");
@@ -156,7 +156,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		[Test]
 		public async Task UploadFullCourse_ShouldReturnCourseError_WhenCourseIsInvalid()
 		{
-			var baseCourse = await CreateAndConfigureBaseCourseForUser("upload_courseErrorCase");
+			var baseCourse = await CreateAndConfigureBaseCourseForUser("upload_response_courseError");
 			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			var fullCourseZip = new ZipFile(Encoding.UTF8);
 			BreakCourse();
@@ -169,7 +169,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		[Test]
 		public async Task UploadFullCourse_ShouldNotUpdateDB_WhenCourseIsInvalid()
 		{
-			var baseCourse = await CreateAndConfigureBaseCourseForUser("upload_courseErrorCaseDB");
+			var baseCourse = await CreateAndConfigureBaseCourseForUser("upload_DB_courseError");
 			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			var tmpCourseId = baseCourse.Object.Id + TestUsers.User.Id;
 			var loadTimeBeforeUpload = tempCoursesRepo.Find(tmpCourseId).LoadingTime;
@@ -185,7 +185,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		[Test]
 		public async Task UploadFullCourse_ShouldNotUpdateDirectory_WhenCourseIsInvalid()
 		{
-			var baseCourse = await CreateAndConfigureBaseCourseForUser("upload_courseErrorCaseDir");
+			var baseCourse = await CreateAndConfigureBaseCourseForUser("upload_directoryState_courseError");
 			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			var tmpCourseId = baseCourse.Object.Id + TestUsers.User.Id;
 			var courseDirectory = courseManager.GetExtractedCourseDirectory(tmpCourseId);
@@ -199,6 +199,141 @@ namespace Web.Api.Tests.Controllers.TempCourses
 			Assert.AreEqual(directoryContentAfterUpload, directoryContentBeforeUpload);
 		}
 
+		[Test]
+		public async Task UploadCoursePartially_ShouldResponseNoErrors_WhenCourseIsValid()
+		{
+			var baseCourse = await CreateAndConfigureBaseCourseForUser("partiallyUpload_DB_success");
+			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
+			var fullCourseZip = new ZipFile(Encoding.UTF8);
+			fullCourseZip.AddDirectory(workingCourseDirectory.FullName);
+			var file = GetFormFileFromZip(fullCourseZip);
+			var response = await tempCourseController.UploadCourse(baseCourse.Object.Id, new List<IFormFile>() { file });
+			Assert.AreEqual(ErrorType.NoErrors, response.ErrorType);
+		}
+
+		[Test]
+		public async Task UploadCoursePartially_ShouldUpdateDB_WhenCourseIsValid()
+		{
+			var baseCourse = await CreateAndConfigureBaseCourseForUser("partiallyUpload_DB_success");
+			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
+			var tmpCourseId = baseCourse.Object.Id + TestUsers.User.Id;
+			var loadTimeBeforeUpload = tempCoursesRepo.Find(tmpCourseId).LoadingTime;
+			var fullCourseZip = new ZipFile(Encoding.UTF8);
+			fullCourseZip.AddDirectory(workingCourseDirectory.FullName);
+			var file = GetFormFileFromZip(fullCourseZip);
+			await tempCourseController.UploadCourse(baseCourse.Object.Id, new List<IFormFile>() { file });
+			var loadTimeAfterUpload = tempCoursesRepo.Find(tmpCourseId).LoadingTime;
+			Assert.Less(loadTimeBeforeUpload, loadTimeAfterUpload);
+		}
+
+		[Test]
+		public async Task UploadCoursePartially_ShouldUpdateDirectoryPartially_WithNewFiles()
+		{
+			var baseCourse = await CreateAndConfigureBaseCourseForUser("partiallyUpload_directoryState_newFilesSuccess");
+			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
+			var tmpCourseId = baseCourse.Object.Id + TestUsers.User.Id;
+			var courseContent = GetDirectoryContent(workingCourseDirectory.FullName).ToList();
+			var secondUploadFiles = new List<string> { "\\Slides\\U99_Presentation" };
+			var firstUploadFiles = courseContent.Except(secondUploadFiles);
+			var firstZip = AddToZip(firstUploadFiles);
+			var secondZip = AddToZip(secondUploadFiles);
+			var file = GetFormFileFromZip(firstZip);
+			await tempCourseController.UploadCourse(baseCourse.Object.Id, new List<IFormFile>() { file });
+			var courseDirectory = courseManager.GetExtractedCourseDirectory(tmpCourseId);
+			file = GetFormFileFromZip(secondZip);
+			await tempCourseController.UploadCourse(baseCourse.Object.Id, new List<IFormFile>() { file });
+			var diff = GetDirectoriesDiff(workingCourseDirectory.FullName, courseDirectory.FullName);
+			Assert.IsEmpty(diff);
+		}
+
+		[Test]
+		public async Task UploadCoursePartially_ShouldUpdateDirectoryPartially_WithDeleteFiles()
+		{
+			var baseCourse = await CreateAndConfigureBaseCourseForUser("partiallyUpload_directoryState_deleteSuccess");
+			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
+			var tmpCourseId = baseCourse.Object.Id + TestUsers.User.Id;
+			var pathToExcessFile = Path.Combine(workingCourseDirectory.FullName, "excess.txt");
+			File.WriteAllText(pathToExcessFile, "");
+			await SendFullCourseWithPartiallyUpload(baseCourse);
+			File.Delete(pathToExcessFile);
+			var zipWithDelete = GetZipWithDelete(new List<string> { "excess.txt" });
+			var file = GetFormFileFromZip(zipWithDelete);
+			await tempCourseController.UploadCourse(baseCourse.Object.Id, new List<IFormFile>() { file });
+			var courseDirectory = courseManager.GetExtractedCourseDirectory(tmpCourseId);
+			var diff = GetDirectoriesDiff(workingCourseDirectory.FullName, courseDirectory.FullName);
+			Assert.IsEmpty(diff);
+		}
+
+		[Test]
+		public async Task UploadCoursePartially_ShouldUpdateDirectoryPartially_WithValidDeleteDirectories()
+		{
+			var baseCourse = await CreateAndConfigureBaseCourseForUser("partiallyUpload_directoryState_deleteDirsSuccess");
+			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
+			var tmpCourseId = baseCourse.Object.Id + TestUsers.User.Id;
+			var relativePathToFile = Path.Combine("newDir", "newDir2", "excess.txt");
+			var pathToExcessFile = Path.Combine(workingCourseDirectory.FullName, relativePathToFile);
+			Directory.CreateDirectory(Path.Combine(workingCourseDirectory.FullName, "newDir", "newDir2"));
+			File.WriteAllText(pathToExcessFile, "");
+			await SendFullCourseWithPartiallyUpload(baseCourse);
+			DeleteNotEmptyDirectory(Path.Combine(workingCourseDirectory.FullName, "newDir"));
+			var zipWithDelete = GetZipWithDelete(new List<string> { "newDir" });
+			var file = GetFormFileFromZip(zipWithDelete);
+			await tempCourseController.UploadCourse(baseCourse.Object.Id, new List<IFormFile>() { file });
+			var courseDirectory = courseManager.GetExtractedCourseDirectory(tmpCourseId);
+			var diff = GetDirectoriesDiff(workingCourseDirectory.FullName, courseDirectory.FullName);
+			Assert.IsEmpty(diff);
+		}
+
+		[Test]
+		public async Task UploadCoursePartially_ShouldReturnCourseError_WithInvalidDeleteFiles()
+		{
+			var baseCourse = await CreateAndConfigureBaseCourseForUser("partiallyUpload_response_courseError");
+			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
+			var tmpCourseId = baseCourse.Object.Id + TestUsers.User.Id;
+			await SendFullCourseWithPartiallyUpload(baseCourse);
+			var filesToDelete = new List<string> { Path.Combine("Slides", "Prelude.cs") };
+			var zipWithDelete = GetZipWithDelete(filesToDelete);
+			var file = GetFormFileFromZip(zipWithDelete);
+			var response = tempCourseController.UploadCourse(baseCourse.Object.Id, new List<IFormFile>() { file });
+			Assert.AreEqual(ErrorType.CourseError, response.Result.ErrorType);
+		}
+
+
+		private ZipFile GetZipWithDelete(List<string> relativePaths)
+		{
+			File.WriteAllLines(Path.Combine(workingCourseDirectory.FullName, "deleted.txt"), relativePaths);
+			return AddToZip(new List<string> { "deleted.txt" });
+		}
+
+		private ZipFile AddToZip(IEnumerable<string> relativePaths)
+		{
+			var file = new ZipFile(Encoding.UTF8);
+			foreach (var relativePath in relativePaths)
+			{
+				var fullPath = Path.Combine(workingCourseDirectory.FullName, relativePath);
+				if (Directory.Exists(fullPath))
+				{
+					file.AddDirectory(fullPath, relativePath);
+				}
+
+				if (File.Exists(fullPath))
+				{
+					file.AddFile(fullPath, Path.GetDirectoryName(relativePath));
+				}
+			}
+
+			return file;
+		}
+
+		private async Task SendFullCourseWithPartiallyUpload(Mock<ICourse> baseCourse)
+		{
+			var fullCourseZip = new ZipFile(Encoding.UTF8);
+			fullCourseZip.AddDirectory(workingCourseDirectory.FullName);
+			var file = GetFormFileFromZip(fullCourseZip);
+			await tempCourseController.UploadCourse(baseCourse.Object.Id, new List<IFormFile>() { file });
+		}
+
+
 		private async Task<Mock<ICourse>> CreateAndConfigureBaseCourseForUser(string courseId)
 		{
 			var baseCourse = new Mock<ICourse>();
@@ -210,14 +345,18 @@ namespace Web.Api.Tests.Controllers.TempCourses
 
 		private void BreakCourse()
 		{
-			File.Delete(Path.Combine(workingCourseDirectory.FullName, "Slides", "Course.xml"));
+			File.Delete(Path.Combine(workingCourseDirectory.FullName, "Slides", "Prelude.cs"));
 		}
 
 		private static IEnumerable<string> GetDirectoriesDiff(string path1, string path2)
 		{
-			var firstDirFiles = GetDirectoryContent(path1);
-			var secondDirFiles = GetDirectoryContent(path2);
-			var diffs = firstDirFiles.Except(secondDirFiles).Distinct().ToArray();
+			var firstDirFiles = GetDirectoryContent(path1).ToList();
+			var secondDirFiles = GetDirectoryContent(path2).ToList();
+			var diffs = firstDirFiles
+				.Except(secondDirFiles)
+				.Concat(secondDirFiles.Except(firstDirFiles))
+				.Except(new List<string> { "course.xml" })
+				.ToList();
 			return diffs;
 		}
 
