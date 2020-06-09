@@ -32,11 +32,12 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly IGroupsRepo groupsRepo;
 		private readonly IGroupMembersRepo groupMembersRepo;
 		private readonly IGroupAccessesRepo groupAccessesRepo;
+		private readonly ITempCoursesRepo tempCoursesRepo;
 
 		public CoursesController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, ICoursesRepo coursesRepo,
 			IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, IUnitsRepo unitsRepo, IUserSolutionsRepo solutionsRepo,
 			IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo, IGroupMembersRepo groupMembersRepo,
-			IGroupAccessesRepo groupAccessesRepo)
+			IGroupAccessesRepo groupAccessesRepo, ITempCoursesRepo tempCoursesRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.coursesRepo = coursesRepo;
@@ -48,6 +49,7 @@ namespace Ulearn.Web.Api.Controllers
 			this.groupsRepo = groupsRepo;
 			this.groupMembersRepo = groupMembersRepo;
 			this.groupAccessesRepo = groupAccessesRepo;
+			this.tempCoursesRepo = tempCoursesRepo;
 		}
 
 		/// <summary>
@@ -109,11 +111,16 @@ namespace Ulearn.Web.Api.Controllers
 		/// </summary>
 		/// <param name="groupId">If null, returns data for the current user, otherwise for a group</param>
 		[HttpGet("{courseId}")]
-		public async Task<ActionResult<CourseInfo>> CourseInfo([FromRoute]Course course, [FromQuery][CanBeNull]int? groupId = null)
+		public async Task<ActionResult<CourseInfo>> CourseInfo([FromRoute]string courseId, [FromQuery][CanBeNull]int? groupId = null)
 		{
-			if (course == null)
+			if (IsTempCourse(courseId) && !courseManager.HasCourse(courseId))
+			{
+				courseManager.ReloadCourse(courseId);
+			}
+			if (!courseManager.HasCourse(courseId))
 				return NotFound(new ErrorResponse("Course not found"));
-
+			
+			var course = courseManager.FindCourse(courseId);
 			List<UnitInfo> units;
 			if (groupId == null)
 			{
@@ -177,6 +184,11 @@ namespace Ulearn.Web.Api.Controllers
 				})
 				.ToList();
 			return new ScoringSettingsModel { Groups = groups };
+		}
+
+		private bool IsTempCourse(string courseId)
+		{
+			return tempCoursesRepo.Find(courseId) != null;
 		}
 	}
 }

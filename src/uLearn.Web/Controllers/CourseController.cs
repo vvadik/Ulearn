@@ -66,14 +66,7 @@ namespace uLearn.Web.Controllers
 		[AllowAnonymous]
 		public async Task<ActionResult> SlideById(string courseId, string slideId = "", int? checkQueueItemId = null, int? version = null, int autoplay = 0)
 		{
-			if (IsTempCourse(courseId))
-			{
-				if (TryGetTempCourseError(courseId, out var error))
-				{
-					//return PackagesTempCourse(courseId, error);
-				}
-				CheckTempCourseAndReloadIfNecessary(courseId); 
-			}
+			CheckTempCourseAndReloadIfNecessary(courseId);
 			if (slideId.Contains("_"))
 				slideId = slideId.Substring(slideId.LastIndexOf('_') + 1);
 
@@ -151,7 +144,7 @@ namespace uLearn.Web.Controllers
 			var slide = course.GetSlideById(slideGuid);
 			return RedirectToRoute("Course.SlideById", new { courseId = course.Id, slideId = slide.Url });
 		}
-		
+
 		// private ActionResult PackagesTempCourse(string courseId, string error = "", bool openStep1 = false, bool openStep2 = false)
 		// {
 		// 	//var lastUpdate = courseManager.GetLastWriteTime(courseId);
@@ -173,14 +166,7 @@ namespace uLearn.Web.Controllers
 		[AllowAnonymous]
 		public ActionResult Slide(string courseId, int slideIndex = -1)
 		{
-			if (IsTempCourse(courseId))
-			{
-				if (TryGetTempCourseError(courseId, out var error))
-				{
-					//return PackagesTempCourse(courseId, error);
-				}
-				CheckTempCourseAndReloadIfNecessary(courseId); 
-			}
+			CheckTempCourseAndReloadIfNecessary(courseId);
 			var course = courseManager.FindCourse(courseId);
 			if (course == null)
 				return HttpNotFound();
@@ -206,6 +192,7 @@ namespace uLearn.Web.Controllers
 				error = tmpCourseError.Error;
 				return true;
 			}
+
 			error = null;
 			return false;
 		}
@@ -215,9 +202,21 @@ namespace uLearn.Web.Controllers
 			var tempCourse = tempCoursesRepo.Find(courseId);
 			if (tempCourse is null)
 				return;
+
+			if (!courseManager.HasCourse(tempCourse.CourseId))
+			{
+				courseManager.ReloadCourse(courseId);
+			}
+
+			var course = courseManager.FindCourse(tempCourse.CourseId);
+			if (course.Slides.Count == 0)
+			{
+				courseManager.ReloadCourse(courseId);
+			}
+
 			if (tempCourse.LastUpdateTime < tempCourse.LoadingTime)
 			{
-				courseManager.ReloadCourse(courseId); 
+				courseManager.ReloadCourse(courseId);
 				tempCoursesRepo.UpdateTempCourseLastUpdateTime(courseId);
 			}
 		}

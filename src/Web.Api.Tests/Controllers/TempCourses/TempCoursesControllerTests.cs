@@ -289,7 +289,6 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		{
 			var baseCourse = await CreateAndConfigureBaseCourseForUser("partiallyUpload_response_courseError");
 			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
-			var tmpCourseId = GetTmpCourseId(baseCourse.Object.Id, TestUsers.User.Id); 
 			await SendFullCourseWithPartiallyUpload(baseCourse);
 			var filesToDelete = new List<string> { Path.Combine("Slides", "Prelude.cs") };
 			var zipWithDelete = GetZipWithDelete(filesToDelete);
