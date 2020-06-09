@@ -1,8 +1,6 @@
 ﻿@using Database.Models
 @using uLearn.Web.Extensions
 @using uLearn.Web.Views.Course
-@using Ulearn.Common.Extensions
-@using Ulearn.Core.Courses.Slides
 @using Ulearn.Core.Courses.Slides.Exercises
 @using Ulearn.Core.Courses.Slides.Quizzes
 @model CoursePageModel
@@ -38,31 +36,23 @@ else
 			@Model.ManualChecking.User.VisibleName
 			@if (Model.ContextManualCheckingUserGroups + Model.ContextManualCheckingUserArchivedGroups != "")
 			{
-                @* These comments are dirty hack for removing spaces between words *@
 				<span>
-					(@*
-			      *@
-					@if (Model.ContextManualCheckingUserGroups != "")
-					{
-						@Model.ContextManualCheckingUserGroups@*
-			      *@
+					@{
+						var groupsStr = "";
+						if (Model.ContextManualCheckingUserGroups != "")
+						{
+							groupsStr = Model.ContextManualCheckingUserGroups;
+						}
+						if (Model.ContextManualCheckingUserGroups != "" && Model.ContextManualCheckingUserArchivedGroups != "")
+						{
+							groupsStr += "; ";
+						}
+						if (Model.ContextManualCheckingUserArchivedGroups != "")
+						{
+							groupsStr += "архивные группы: " + Model.ContextManualCheckingUserArchivedGroups;
+						}
 					}
-					@*
-			      *@
-					@if (Model.ContextManualCheckingUserGroups != "" && Model.ContextManualCheckingUserArchivedGroups != "")
-					{
-@*
-			           *@<text>;</text>
-					}
-					@*
-                  *@
-					@if (Model.ContextManualCheckingUserArchivedGroups != "")
-					{
-						<text>архивные группы: @Model.ContextManualCheckingUserArchivedGroups</text> @*
-			      *@
-					}
-					@*
-			   *@),
+					(@groupsStr),
 				</span>
 			}
 			else
