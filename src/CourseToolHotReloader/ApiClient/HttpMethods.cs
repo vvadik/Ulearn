@@ -94,7 +94,7 @@ namespace CourseToolHotReloader.ApiClient
 			return DeserializeResponseContent<TempCourseUpdateResponse>(response);
 		}
 
-		
+
 		public async Task<HasTempCourseResponse> HasCourse(string id)
 		{
 			var url = $"{config.BaseUrl}/tempCourses/hasCourse/{id}";
@@ -136,9 +136,9 @@ namespace CourseToolHotReloader.ApiClient
 				case HttpStatusCode.Unauthorized:
 					throw new UnauthorizedException("Срок авторизации истек, требуется повторная авторизация");
 				case HttpStatusCode.Forbidden:
-					throw new ForbiddenException("Срок авторизации истек, требуется повторная авторизация"); //todo
+					throw new ForbiddenException("Нет прав для действий");
 				case HttpStatusCode.InternalServerError:
-					throw new InternalServerErrorException($"На сервере произошла ошибка: {response.Content.ReadAsStringAsync().Result}");
+					throw new InternalServerErrorException($"На сервере произошла ошибка: {DeserializeResponseContent<ServerErrorDto>(response).Message}");
 			}
 		}
 
