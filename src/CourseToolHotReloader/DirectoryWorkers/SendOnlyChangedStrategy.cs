@@ -5,11 +5,10 @@ using CourseToolHotReloader.UpdateQuery;
 
 namespace CourseToolHotReloader.DirectoryWorkers
 {
-	
 	public interface ISendOnlyChangedStrategy : IWatchActionStrategy
 	{
 	}
-	
+
 	public class SendOnlyChangedStrategy : ISendOnlyChangedStrategy
 	{
 		private readonly ICourseUpdateQuery courseUpdateQuery;
@@ -57,12 +56,12 @@ namespace CourseToolHotReloader.DirectoryWorkers
 			courseUpdateQuery.RegisterUpdate(courseUpdate);
 			debouncedSendUpdates();
 		}
-		
+
 		private ICourseUpdate BuildCourseUpdateByFileSystemEvent(FileSystemEventArgs fileSystemEventArgs)
 		{
 			var relativePath = fileSystemEventArgs.FullPath.Replace(config.Path, "");
 
-			var courseUpdate = new CourseUpdate(fileSystemEventArgs.Name, fileSystemEventArgs.FullPath, relativePath);
+			var courseUpdate = new CourseUpdate(fileSystemEventArgs.Name, relativePath, fileSystemEventArgs.FullPath);
 			return courseUpdate;
 		}
 	}
