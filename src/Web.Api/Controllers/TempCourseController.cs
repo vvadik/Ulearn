@@ -42,7 +42,7 @@ namespace Ulearn.Web.Api.Controllers
 		public async Task<TempCourseUpdateResponse> CreateCourse([FromRoute] string courseId)
 		{
 			var userId = User.Identity.GetUserId();
-			var tmpCourseId = courseId + userId;
+			var tmpCourseId = GetTmpCourseId(courseId, userId);
 
 			if (!await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin))
 			{
@@ -90,7 +90,7 @@ namespace Ulearn.Web.Api.Controllers
 		{
 			var userId = User.Identity.GetUserId();
 
-			var tmpCourseId = courseId + userId;
+			var tmpCourseId =  GetTmpCourseId(courseId, userId);
 			var tmpCourse = tempCoursesRepo.Find(tmpCourseId);
 			var response = new HasTempCourseResponse();
 			if (tmpCourse == null)
@@ -141,7 +141,7 @@ namespace Ulearn.Web.Api.Controllers
 		public async Task<TempCourseUpdateResponse> UploadCourse(string courseId, List<IFormFile> files, bool isFull)
 		{
 			var userId = User.Identity.GetUserId();
-			var tmpCourseId = courseId + userId;
+			var tmpCourseId = GetTmpCourseId(courseId, userId);
 			var tmpCourse = tempCoursesRepo.Find(tmpCourseId);
 			if (tmpCourse is null)
 			{
@@ -354,6 +354,11 @@ namespace Ulearn.Web.Api.Controllers
 			logger.Information($"Start upload course '{courseId}'");
 			var stagingFile = courseManager.GetStagingTempCourseFile(courseId);
 			System.IO.File.WriteAllBytes(stagingFile.FullName, content);
+		}
+
+		private string GetTmpCourseId(string baseCourseId, string userId)
+		{
+			return $"{baseCourseId}_{userId}";
 		}
 	}
 
