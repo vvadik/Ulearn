@@ -25,10 +25,11 @@ namespace ManualUtils
 			var adb = new AntiPlagiarismDb(aOptionsBuilder.Options);
 
 			//ParsePairWeightsFromLogs();
-			GetBlackAndWhiteLabels(db, adb);
+			//GetBlackAndWhiteLabels(db, adb);
 			//ParseTaskWeightsFromLogs();
 			//CampusRegistration();
 			//GetIps();
+			FillAntiplagFields.FillClientSubmissionId(adb);
 		}
 
 		private static void GetBlackAndWhiteLabels(UlearnDb db, AntiPlagiarismDb adb)
