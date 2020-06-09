@@ -13,7 +13,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 		Task<List<Submission>> GetSubmissionsAsync(int startFromIndex, int maxCount);
 		Task<Submission> FindSubmissionByIdAsync(int submissionId);
 		Task<List<Submission>> GetSubmissionsByIdsAsync(IEnumerable<int> submissionIds);
-		Task<Submission> AddSubmissionAsync(int clientId, Guid taskId, Guid authorId, Language language, string code, int tokensCount, string additionalInfo);
+		Task<Submission> AddSubmissionAsync(int clientId, Guid taskId, Guid authorId, Language language, string code, int tokensCount, string additionalInfo, string clientSubmissionId);
 		Task UpdateSubmissionTokensCountAsync(Submission submission, int tokensCount);
 		Task<List<Submission>> GetSubmissionsByAuthorAndTaskAsync(int clientId, Guid authorId, Guid taskId, int count);
 		Task<List<Guid>> GetLastAuthorsByTaskAsync(int clientId, Guid taskId, int count);
@@ -51,7 +51,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 			return db.Submissions.Include(s => s.Program).Where(s => submissionIds.Contains(s.Id)).ToListAsync();
 		}
 
-		public async Task<Submission> AddSubmissionAsync(int clientId, Guid taskId, Guid authorId, Language language, string code, int tokensCount, string additionalInfo = "")
+		public async Task<Submission> AddSubmissionAsync(int clientId, Guid taskId, Guid authorId, Language language, string code, int tokensCount, string additionalInfo, string clientSubmissionId)
 		{
 			var submission = new Submission
 			{
@@ -66,6 +66,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 				TokensCount = tokensCount,
 				AdditionalInfo = additionalInfo,
 				AddingTime = DateTime.Now,
+				ClientSubmissionId = clientSubmissionId
 			};
 
 			db.Submissions.Add(submission);

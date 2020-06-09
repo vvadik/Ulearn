@@ -41,6 +41,7 @@ namespace AntiPlagiarism.Web.Database
 			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId });
 			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId, c.AuthorId });
 			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId, c.Language, c.AuthorId });
+			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.ClientSubmissionId });
 
 			modelBuilder.Entity<WorkQueueItem>()
 				.HasIndex(c => new { c.QueueId, c.TakeAfterTime })

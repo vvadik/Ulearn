@@ -25,6 +25,9 @@ namespace AntiPlagiarism.Api.Models.Parameters
 		[DataMember(Name = "additional_info")]
 		public string AdditionalInfo { get; set; } = "";
 
+		[DataMember(Name = "client_submission_id")]
+		public string ClientSubmissionId { get; set; }
+
 		public override string ToString()
 		{
 			return $"AddCodeParameters(TaskId={TaskId}, AuthorId={AuthorId}, Code={Code?.Substring(0, Math.Min(Code.Length, 50))?.Replace("\n", @"\\")}...)";

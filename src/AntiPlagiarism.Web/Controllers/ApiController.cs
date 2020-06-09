@@ -74,7 +74,8 @@ namespace AntiPlagiarism.Web.Controllers
 				parameters.Language,
 				parameters.Code,
 				tokensCount,
-				parameters.AdditionalInfo
+				parameters.AdditionalInfo,
+				parameters.ClientSubmissionId
 			).ConfigureAwait(false);
 
 			logger.Information(
