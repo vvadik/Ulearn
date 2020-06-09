@@ -58,6 +58,7 @@ namespace uLearn.Web.Controllers
 		private readonly string gitSecret;
 		private readonly DirectoryInfo reposDirectory;
 		private readonly ILogger serilogLogger;
+		private TempCoursesRepo tempCoursesReo;
 
 		public AdminController()
 		{
@@ -81,6 +82,7 @@ namespace uLearn.Web.Controllers
 			serilogLogger = new LoggerConfiguration().WriteTo.Log4Net().CreateLogger();
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 			gitSecret = configuration.Git.Webhook.Secret;
+			tempCoursesReo = new TempCoursesRepo();
 		}
 
 		public ActionResult Courses(string courseId = null, string courseTitle = null)
@@ -461,7 +463,14 @@ namespace uLearn.Web.Controllers
 		[ValidateInput(false)]
 		public ActionResult Packages(string courseId, string error = "")
 		{
+			if (IsTempCourse(courseId))
+				return null;
 			return PackagesInternal(courseId, error);
+		}
+
+		public bool IsTempCourse(string courseId)
+		{
+			return tempCoursesReo.Find(courseId) != null;
 		}
 
 		private ActionResult PackagesInternal(string courseId, string error = "", bool openStep1 = false, bool openStep2 = false)
