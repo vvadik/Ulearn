@@ -37,8 +37,8 @@ namespace CourseToolHotReloader.UpdateQuery
 			if (errors.ErrorType != ErrorType.NoErrors)
 				ConsoleWorker.WriteError(errors.Message);
 			else
-				ConsoleWorker.WriteLine("Изменения были загруженны без ошибок");
-			
+				ConsoleWorker.WriteLine($"Изменения были загруженны без ошибок {DateTime.Now: hh:mm}");
+
 			courseUpdateQuery.Clear();
 		}
 
@@ -49,7 +49,7 @@ namespace CourseToolHotReloader.UpdateQuery
 			var errors = await ulearnApiClient.SendFullCourse(config.Path, config.CourseId);
 
 			cs.Stop();
-			
+
 			if (errors.ErrorType != ErrorType.NoErrors)
 				ConsoleWorker.WriteError(errors.Message);
 			else

@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using CourseToolHotReloader.Dtos;
+using CourseToolHotReloader.Exceptions;
 using CourseToolHotReloader.Log;
 using JetBrains.Annotations;
 
@@ -93,7 +94,7 @@ namespace CourseToolHotReloader.ApiClient
 			return DeserializeResponseContent<TempCourseUpdateResponse>(response);
 		}
 
-		[ItemCanBeNull]
+		
 		public async Task<HasTempCourseResponse> HasCourse(string id)
 		{
 			var url = $"{config.BaseUrl}/tempCourses/hasCourse/{id}";
@@ -133,11 +134,11 @@ namespace CourseToolHotReloader.ApiClient
 				case HttpStatusCode.OK:
 					return;
 				case HttpStatusCode.Unauthorized:
-					throw new Exception("Срок авторизации истек, требуется повторная авторизация");
+					throw new UnauthorizedException("Срок авторизации истек, требуется повторная авторизация");
 				case HttpStatusCode.Forbidden:
-					throw new Exception("Срок авторизации истек, требуется повторная авторизация"); //todo
+					throw new ForbiddenException("Срок авторизации истек, требуется повторная авторизация"); //todo
 				case HttpStatusCode.InternalServerError:
-					throw new Exception($"На сервере произошла ошибка: {response.Content.ReadAsStringAsync().Result}");
+					throw new InternalServerErrorException($"На сервере произошла ошибка: {response.Content.ReadAsStringAsync().Result}");
 			}
 		}
 

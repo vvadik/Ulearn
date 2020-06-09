@@ -11,8 +11,6 @@ namespace CourseToolHotReloader
 		string Path { get; set; }
 		string CourseId { get; set; }
 		string JwtToken { get; set; }
-		public string Login { get; set; }
-		public string Password { get; set; }
 		public string BaseUrl { get; set; }
 		public bool SendFullArchive { get; set; }
 		public void Flush();
@@ -27,12 +25,10 @@ namespace CourseToolHotReloader
 			var fileConfigFormat = ReadConfig();
 			JwtToken = fileConfigFormat.JwtToken;
 			BaseUrl = fileConfigFormat.BaseUrl;
-			
+			CourseId = fileConfigFormat.CourseId;
 			Path = Directory.GetCurrentDirectory();
 		}
 
-		public string Login { get; set; }
-		public string Password { get; set; }
 		public string BaseUrl { get; set; }
 		public bool SendFullArchive { get; set; }
 		public string Path { get; set; }

@@ -35,18 +35,9 @@ namespace CourseToolHotReloader.LoginAgent
 			var login = ConsoleWorker.GetLogin();
 			var password = new NetworkCredential(string.Empty, ConsoleWorker.GetPassword()).Password;
 
-			try
-			{
-				config.JwtToken = await ulearnApiClient.Login(login, password);
-
-				config.Flush();
-
-				return true;
-			}
-			catch (Exception)
-			{
-				return false;
-			}
+			var jwtToken = await ulearnApiClient.Login(login, password);
+			
+			return TrySetJwtTokenInConfig(jwtToken);
 		}
 
 		private async Task<bool> TryLoginByConfig()
@@ -54,18 +45,20 @@ namespace CourseToolHotReloader.LoginAgent
 			if (config.JwtToken is null)
 				return false;
 
-			try
-			{
-				config.JwtToken = await ulearnApiClient.RenewToken();
+			var jwtToken = await ulearnApiClient.RenewToken();
 
-				config.Flush();
+			return TrySetJwtTokenInConfig(jwtToken);
+		}
 
-				return true;
-			}
-			catch (Exception)
-			{
+		private bool TrySetJwtTokenInConfig(string jwtToken)
+		{
+			if (jwtToken is null)
 				return false;
-			}
+
+			config.JwtToken = jwtToken;
+			config.Flush();
+
+			return true;
 		}
 	}
 }

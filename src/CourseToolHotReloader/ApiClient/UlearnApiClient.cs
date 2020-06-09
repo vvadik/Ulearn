@@ -53,6 +53,7 @@ namespace CourseToolHotReloader.ApiClient
 			return await httpMethods.HasCourse(courseId);
 		}
 
+		[ItemCanBeNull]
 		public async Task<string> Login(string login, string password)
 		{
 			var loginPasswordParameters = new LoginPasswordParameters
@@ -62,13 +63,14 @@ namespace CourseToolHotReloader.ApiClient
 			};
 
 			var accountTokenResponseDto = await httpMethods.GetJwtToken(loginPasswordParameters);
-			return accountTokenResponseDto.Token;
+			return accountTokenResponseDto?.Token;
 		}
 		
+		[ItemCanBeNull]
 		public async Task<string> RenewToken()
 		{
 			var accountTokenResponseDto = await httpMethods.RenewToken();
-			return accountTokenResponseDto.Token;
+			return accountTokenResponseDto?.Token;
 		}
 	}
 }

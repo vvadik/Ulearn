@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
 using CourseToolHotReloader.ApiClient;
 using CourseToolHotReloader.DirectoryWorkers;
+using CourseToolHotReloader.Exceptions;
 using CourseToolHotReloader.Log;
 using CourseToolHotReloader.LoginAgent;
 using ErrorType = CourseToolHotReloader.Dtos.ErrorType;
@@ -23,9 +27,29 @@ namespace CourseToolHotReloader
 			{
 				Startup().Wait();
 			}
+			catch (AggregateException e)
+			{
+				switch (e.InnerExceptions.Single())
+				{
+					case UriFormatException _:
+						ConsoleWorker.WriteError("Указанный Base Url недоступен");
+						break;
+					case IOException _:
+						ConsoleWorker.WriteError("Вероятно был добавлен файл слишком большого размера");
+						break;
+					case UnauthorizedException _:
+					case ForbiddenException _:
+						ConsoleWorker.WriteError(e.Message);
+						break;
+					default:
+						Logger.Log.Error(e);
+						break;
+				}
+			}
 			catch (Exception e)
 			{
 				Logger.Log.Error(e);
+				ConsoleWorker.WriteError("Неизвестная ошибка. Подробнее в логах");
 			}
 		}
 
@@ -58,15 +82,6 @@ namespace CourseToolHotReloader
 
 		private static async Task Login()
 		{
-			//var config = container.Resolve<IConfig>();
-			/*var loginAgent = container.Resolve<ILoginAgent>();
-			if (!await loginAgent.TryLoginByConfig())
-				if (!await loginAgent.TryLoginByConsole())
-					ConsoleWorker.WriteError("Ошибка авторизации");
-
-			ConsoleWorker.WriteLine("Авторизация прошла успешно");
-			*/
-
 			var isLoginSuccess = await container.Resolve<ILoginAgent>().SignIn();
 
 			if (isLoginSuccess)
