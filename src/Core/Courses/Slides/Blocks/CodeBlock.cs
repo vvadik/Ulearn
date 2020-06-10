@@ -19,7 +19,7 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		public string Code
 		{
 			get => code;
-			set => code = value.RemoveCommonNesting().TrimEnd();
+			set => code = value.RemoveCommonNesting().RemoveEmptyLinesFromStart().TrimEnd();
 		}
 
 		/* .NET XML Serializer doesn't understand nullable fields, so we use this hack to make Language? field */

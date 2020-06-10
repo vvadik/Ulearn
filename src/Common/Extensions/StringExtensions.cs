@@ -87,6 +87,14 @@ namespace Ulearn.Common.Extensions
 				yield return sb.ToString();
 		}
 
+		public static string RemoveEmptyLinesFromStart(this string text)
+		{
+			var lines = text
+				.SplitToLines()
+				.SkipWhile(string.IsNullOrWhiteSpace);
+			return string.Join("\r\n", lines);
+		}
+		
 		public static string RemoveCommonNesting(this string text)
 		{
 			var lines = text.SplitToLines();
