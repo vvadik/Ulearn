@@ -104,7 +104,8 @@ namespace uLearn.Web.Controllers
 					{
 						Id = course.Id,
 						Title = course.Title,
-						LastWriteTime = courseManager.GetLastWriteTime(course.Id)
+						LastWriteTime = courseManager.GetLastWriteTime(course.Id),
+						IsTemp = IsTempCourse(course.Id)
 					})
 					.ToList(),
 				LastTryCourseId = courseId,
@@ -856,7 +857,8 @@ namespace uLearn.Web.Controllers
 							ToggleUrl = Url.Action("ToggleRole", "Account", new { courseId, userId = user.UserId, role = courseRole }),
 							UserName = user.UserVisibleName,
 							Role = courseRole,
-							CourseTitle = courseManager.FindCourse(courseId)?.Title
+							CourseTitle = courseManager.FindCourse(courseId)?.Title,
+							IsTempCourse =  IsTempCourse(courseId)
 						});
 
 				var courseAccesses = usersCourseAccesses.ContainsKey(user.UserId) ? usersCourseAccesses[user.UserId] : null;
@@ -871,7 +873,8 @@ namespace uLearn.Web.Controllers
 							ToggleUrl = Url.Action("ToggleCourseAccess", "Admin", new { courseId = courseId, userId = user.UserId, accessType = a }),
 							UserName = user.UserVisibleName,
 							AccessType = a,
-							CourseTitle = courseManager.FindCourse(courseId)?.Title
+							CourseTitle = courseManager.FindCourse(courseId)?.Title,
+							IsTempCourse = IsTempCourse(courseId)
 						}
 					);
 
@@ -1499,6 +1502,7 @@ namespace uLearn.Web.Controllers
 
 			return Json(new { status = "ok" });
 		}
+	
 	}
 
 	public class CertificateRequest
@@ -1575,6 +1579,8 @@ namespace uLearn.Web.Controllers
 		public string Title { get; set; }
 		public string Id { get; set; }
 		public DateTime LastWriteTime { get; set; }
+
+		public bool IsTemp { get; set; }
 	}
 
 	public class PackagesViewModel

@@ -65,6 +65,7 @@ namespace Ulearn.Web.Api.Controllers
 			if (role == CourseRoleType.Student)
 				return NotFound(new ErrorResponse("Role can not be student. Specify tester, instructor or courseAdmin"));
 
+			LoadUserTempCoursesIfNotYet();
 			var courses = await courseManager.GetCoursesAsync(coursesRepo).ConfigureAwait(false);
 
 			var isSystemAdministrator = await IsSystemAdministratorAsync().ConfigureAwait(false);
@@ -92,18 +93,30 @@ namespace Ulearn.Web.Api.Controllers
 			}
 			else
 				courses = courses.OrderBy(c => c.Title);
-
+			
+			var tempCourseLabel =  " (временный)";
 			return new CoursesListResponse
 			{
 				Courses = courses
 					.Select(c => new ShortCourseInfo
 					{
 						Id = c.Id,
-						Title = c.Title,
-						ApiUrl = Url.Action("CourseInfo", "Courses", new { courseId = c.Id })
+						Title = IsTempCourse(c.Id)? c.Title + tempCourseLabel : c.Title,
+						ApiUrl = Url.Action("CourseInfo", "Courses", new { courseId = c.Id }),
+						IsTempCourse = IsTempCourse(c.Id)
 					}
 				).ToList()
 			};
+		}
+
+		private async void LoadUserTempCoursesIfNotYet()
+		{
+			var courses =  courseRolesRepo.GetCoursesWhereUserIsInRoleAsync(UserId, CourseRoleType.Instructor).Result;
+			foreach (var course in courses)
+			{
+				if (!courseManager.HasCourse(course))
+					courseManager.ReloadCourse(course);
+			}
 		}
 
 		/// <summary>

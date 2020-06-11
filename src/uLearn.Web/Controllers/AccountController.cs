@@ -35,6 +35,7 @@ namespace uLearn.Web.Controllers
 		private readonly NotificationsRepo notificationsRepo;
 		private readonly CoursesRepo coursesRepo;
 		private readonly SystemAccessesRepo systemAccessesRepo;
+		private readonly TempCoursesRepo tempCoursesRepo; 
 
 		private readonly string telegramSecret;
 		private static readonly WebApiConfiguration configuration;
@@ -56,6 +57,7 @@ namespace uLearn.Web.Controllers
 			notificationsRepo = new NotificationsRepo(db);
 			coursesRepo = new CoursesRepo(db);
 			systemAccessesRepo = new SystemAccessesRepo(db);
+			tempCoursesRepo = new TempCoursesRepo(db);
 
 			telegramSecret = WebConfigurationManager.AppSettings["ulearn.telegram.webhook.secret"] ?? "";
 		}
@@ -135,7 +137,8 @@ namespace uLearn.Web.Controllers
 							CourseTitle = courseManager.GetCourse(s).Title,
 							HasAccess = coursesForUser.ContainsKey(role) && coursesForUser[role].Contains(s.ToLower()),
 							ToggleUrl = Url.Content($"~/Account/{nameof(ToggleRole)}?courseId={s}&userId={user.UserId}&role={role}"),
-							UserName = user.UserVisibleName
+							UserName = user.UserVisibleName,
+							IsTempCourse = IsTempCourse(s)
 						})
 						.OrderBy(s => s.CourseTitle, StringComparer.InvariantCultureIgnoreCase)
 						.ToList()
@@ -893,6 +896,11 @@ namespace uLearn.Web.Controllers
 			}
 
 			return false;
+		}
+
+		public bool IsTempCourse(string courseId)
+		{
+			return tempCoursesRepo.Find(courseId) != null;
 		}
 	}
 
