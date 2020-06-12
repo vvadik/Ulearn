@@ -49,7 +49,7 @@ namespace Ulearn.Web.Api.Controllers
 				return new TempCourseUpdateResponse()
 				{
 					ErrorType = ErrorType.Forbidden,
-					Message = $"Чтобы создать временную версию курса {courseId}, необходимо быть администратором этого  курса\n You should have a course-admin access to course {courseId} to create temp version."
+					Message = $"Чтобы создать временную версию курса {courseId}, необходимо быть администратором этого  курса"
 				};
 			}
 
@@ -59,8 +59,7 @@ namespace Ulearn.Web.Api.Controllers
 				return new TempCourseUpdateResponse()
 				{
 					ErrorType = ErrorType.Conflict,
-					Message = $"Ваша временная версия курса {courseId} уже существует с id {tmpCourseId}." +
-							$" \nYour temp version of course {courseId} already exists with id {tmpCourseId}"
+					Message = $"Ваша временная версия курса {courseId} уже существует с id {tmpCourseId}."
 				};
 			}
 
@@ -69,17 +68,12 @@ namespace Ulearn.Web.Api.Controllers
 			if (!courseManager.TryCreateTempCourse(tmpCourseId, courseTitle, versionId))
 				throw new Exception();
 
-			//--delete if everything will work fine without versions
-			//await coursesRepo.AddCourseVersionAsync(tmpCourseId, versionId, userId, null, null, null, null).ConfigureAwait(false);
-			//await coursesRepo.MarkCourseVersionAsPublishedAsync(versionId).ConfigureAwait(false);
-			//await NotifyAboutPublishedCourseVersion(tmpCourseId, versionId, userId).ConfigureAwait(false); 
-
 			await tempCoursesRepo.AddTempCourse(tmpCourseId, userId);
 			var loadingTime = tempCoursesRepo.Find(tmpCourseId).LoadingTime;
 			await courseRolesRepo.ToggleRoleAsync(tmpCourseId, userId, CourseRoleType.CourseAdmin, userId);
 			return new TempCourseUpdateResponse()
 			{
-				Message = $"Временный курс с id {tmpCourseId} успешно создан.\n Course with id {tmpCourseId} successfully created",
+				Message = $"Временный курс с id {tmpCourseId} успешно создан.",
 				LastUploadTime = loadingTime
 			};
 		}
@@ -90,7 +84,7 @@ namespace Ulearn.Web.Api.Controllers
 		{
 			var userId = User.Identity.GetUserId();
 
-			var tmpCourseId =  GetTmpCourseId(courseId, userId);
+			var tmpCourseId = GetTmpCourseId(courseId, userId);
 			var tmpCourse = tempCoursesRepo.Find(tmpCourseId);
 			var response = new HasTempCourseResponse();
 			if (tmpCourse == null)
@@ -137,8 +131,7 @@ namespace Ulearn.Web.Api.Controllers
 			return await UploadCourse(courseId, files, true);
 		}
 
-		[NonAction]
-		public async Task<TempCourseUpdateResponse> UploadCourse(string courseId, List<IFormFile> files, bool isFull)
+		private async Task<TempCourseUpdateResponse> UploadCourse(string courseId, List<IFormFile> files, bool isFull)
 		{
 			var userId = User.Identity.GetUserId();
 			var tmpCourseId = GetTmpCourseId(courseId, userId);
@@ -148,8 +141,7 @@ namespace Ulearn.Web.Api.Controllers
 				return new TempCourseUpdateResponse()
 				{
 					ErrorType = ErrorType.NotFound,
-					Message = $"Вашей временной версии курса {courseId} не существует. Для создания испрользуйте метод Create" +
-							$"\nYour temp version of course {courseId} does not exists. Use create method"
+					Message = $"Вашей временной версии курса {courseId} не существует. Для создания испрользуйте метод Create"
 				};
 			}
 
@@ -182,7 +174,7 @@ namespace Ulearn.Web.Api.Controllers
 			var loadingTime = tempCoursesRepo.Find(tmpCourseId).LoadingTime;
 			return new TempCourseUpdateResponse()
 			{
-				Message = $"Временный курс {tmpCourseId} успешно обновлен\n.Temp course with id {tmpCourseId} successfully updated",
+				Message = $"Временный курс {tmpCourseId} успешно обновлен",
 				LastUploadTime = loadingTime
 			};
 		}
