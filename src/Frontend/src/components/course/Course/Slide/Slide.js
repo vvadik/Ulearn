@@ -17,12 +17,14 @@ const blockTypes = {
 	text: "html",
 	image: "imagegallery",
 	spoiler: "spoiler",
+	tex: 'tex',
 };
 
 const mapTypeToBlock = {
 	[blockTypes.video]: Video,
 	[blockTypes.code]: CodeMirror,
 	[blockTypes.text]: Text,
+	[blockTypes.tex]: Text,
 	[blockTypes.image]: Image,
 	[blockTypes.spoiler]: Text,//Spoiler
 };
@@ -94,6 +96,14 @@ class Slide extends React.Component {
 		if(firstVideoBlock && slideBlocks.length === 1) {
 			firstVideoBlock.openAnnotation = true; // only video on slide => open annotation
 		}
+
+		for (const texBlock of slideBlocks.filter(b => b.type === blockTypes.tex)) {
+			texBlock.content = this.getContentFromTexLines(texBlock);
+		}
+	}
+
+	getContentFromTexLines = ({ lines }) => {
+		return lines.reduce((ac, cv) => ac + `<p class="tex">${ cv }</p>`, '');
 	}
 
 	getBlocksPack = (slideBlocks, i) => {
@@ -125,7 +135,7 @@ class Slide extends React.Component {
 
 	mapBlockToComponent = ({ Block, props }, index, arr) => {
 		const className = classNames({ [styles.firstChild]: index === 0 }, { [styles.lastChild]: index === arr.length - 1 });
-		return <Block key={ index } className={ className }  { ...props }/>;
+		return <Block key={ index } className={ className }  { ...props } />;
 	}
 }
 
