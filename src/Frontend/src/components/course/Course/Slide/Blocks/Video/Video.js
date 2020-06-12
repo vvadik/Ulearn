@@ -114,13 +114,13 @@ class Video extends React.Component {
 									})
 									}
 									<p className={ styles.withoutMargins }>
-										Ошибка в содержании? <Link href={ googleDocLink }>Предложите исправление!</Link>
+										Ошибка в содержании? <Link target="_blank" href={ googleDocLink }>Предложите исправление!</Link>
 									</p>
 								</React.Fragment>
 								}
 							</React.Fragment>
 							: <p className={ styles.withoutMargins }>
-								Помогите написать <Link href={ googleDocLink }>текстовое содержание</Link> этого видео.
+								Помогите написать <Link target="_blank" href={ googleDocLink }>текстовое содержание</Link> этого видео.
 							</p>
 					}
 				</Text>
