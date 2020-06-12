@@ -186,15 +186,6 @@
 	border-radius: 24px;
 }
 
-.legacy-page .revealed .CodeMirror {
-	background-color: #e7f1ff;
-}
-
-.legacy-page .revealed .CodeMirror .CodeMirror-gutters {
-	background-color: #e7f1ff;
-	color: #333;
-}
-
 .legacy-page .revealed__description {
 	font-style: italic;
 	margin-bottom: 15px;
