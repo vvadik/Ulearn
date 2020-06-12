@@ -65,7 +65,7 @@ namespace Ulearn.Web.Api.Controllers
 			if (role == CourseRoleType.Student)
 				return NotFound(new ErrorResponse("Role can not be student. Specify tester, instructor or courseAdmin"));
 			
-			var courses = await courseManager.GetCoursesAsync(coursesRepo).ConfigureAwait(false);
+			var courses = await courseManager.GetCoursesAsync(coursesRepo, tempCoursesRepo).ConfigureAwait(false);
 
 			var isSystemAdministrator = await IsSystemAdministratorAsync().ConfigureAwait(false);
 
@@ -115,10 +115,6 @@ namespace Ulearn.Web.Api.Controllers
 		[HttpGet("{courseId}")]
 		public async Task<ActionResult<CourseInfo>> CourseInfo([FromRoute]string courseId, [FromQuery][CanBeNull]int? groupId = null)
 		{
-			if (IsTempCourse(courseId) && !courseManager.HasCourse(courseId))
-			{
-				courseManager.ReloadCourse(courseId);
-			}
 			if (!courseManager.HasCourse(courseId))
 				return NotFound(new ErrorResponse("Course not found"));
 			

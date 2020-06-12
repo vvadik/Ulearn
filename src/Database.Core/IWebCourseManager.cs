@@ -10,8 +10,8 @@ namespace Database
 {
 	public interface IWebCourseManager
 	{
-		Task<Course> GetCourseAsync(CoursesRepo coursesRepo, string courseId);
-		Task<IEnumerable<Course>> GetCoursesAsync(ICoursesRepo coursesRepo);
+		Task<Course> GetCourseAsync(CoursesRepo coursesRepo, TempCoursesRepo tempCoursesRepo, string courseId);
+		Task<IEnumerable<Course>> GetCoursesAsync(ICoursesRepo coursesRepo, ITempCoursesRepo tempCoursesRepo);
 		void UpdateCourseVersion(string courseId, Guid versionId);
 		IEnumerable<Course> GetCourses();
 		Course GetCourse(string courseId);

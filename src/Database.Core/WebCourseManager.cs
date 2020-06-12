@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using Database.Repos;
@@ -36,7 +37,7 @@ namespace Database
 		private readonly object @lock = new object();
 
 		[NotNull]
-		public async Task<Course> GetCourseAsync(CoursesRepo coursesRepo, string courseId)
+		public async Task<Course> GetCourseAsync(CoursesRepo coursesRepo, TempCoursesRepo tempCoursesRepo, string courseId)
 		{
 			Course course;
 			try
@@ -62,7 +63,7 @@ namespace Database
 			return base.GetCourse(courseId);
 		}
 
-		public async Task<IEnumerable<Course>> GetCoursesAsync(ICoursesRepo coursesRepo)
+		public async Task<IEnumerable<Course>> GetCoursesAsync(ICoursesRepo coursesRepo, ITempCoursesRepo tempCoursesRepo)
 		{
 			if (lastCoursesListFetchTime > DateTime.Now.Subtract(fetchCourseVersionEvery))
 				return base.GetCourses();
@@ -82,8 +83,18 @@ namespace Database
 					logger.Warning("Это странно, что я не смог загрузить с диска курс, который, если верить базе данных, был опубликован. Но ничего, просто проигнорирую");
 				}
 			}
+			LoadTempCoursesIfNotYet(tempCoursesRepo);
 
 			return base.GetCourses();
+		}
+
+		private void LoadTempCoursesIfNotYet(ITempCoursesRepo tempCoursesRepo)
+		{
+			var tempCourses = tempCoursesRepo.GetTempCourses();
+			tempCourses
+				.Where(tempCourse => !HasCourse(tempCourse.CourseId))
+				.ToList()
+				.ForEach(course=>ReloadCourse(course.CourseId));
 		}
 
 		private bool IsCourseVersionWasUpdatedRecent(string courseId)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Database.Models;
 using System.Linq;
@@ -18,6 +19,11 @@ namespace Database.Repos
 		public TempCourse Find(string courseId)
 		{
 			return db.TempCourses.SingleOrDefault(course => course.CourseId == courseId);
+		}
+
+		public List<TempCourse> GetTempCourses()
+		{
+			return db.TempCourses.ToList();
 		}
 
 		public TempCourseError GetCourseError(string courseId)

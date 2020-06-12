@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Database.Models;
 
 namespace Database.Repos
@@ -6,7 +7,7 @@ namespace Database.Repos
 	public interface ITempCoursesRepo
 	{
 		TempCourse Find(string courseId);
-
+		List<TempCourse> GetTempCourses();
 		TempCourseError GetCourseError(string courseId);
 		Task<TempCourse> AddTempCourse(string courseId, string authorId);
 		Task UpdateTempCourseLoadingTime(string courseId);
