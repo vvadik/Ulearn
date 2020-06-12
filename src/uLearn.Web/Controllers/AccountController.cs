@@ -309,6 +309,7 @@ namespace uLearn.Web.Controllers
 			var userCourses = courseManager.GetCourses().Where(c => userCoursesIds.Contains(c.Id.ToLower())).OrderBy(c => c.Title).ToList();
 
 			var allCourses = courseManager.GetCourses().ToDictionary(c => c.Id, c => c, StringComparer.InvariantCultureIgnoreCase);
+			var tempCourseIds = allCourses.Values.Where(course => IsTempCourse(course.Id)).Select(course=>course.Id).ToHashSet();
 			var certificates = certificatesRepo.GetUserCertificates(user.Id).OrderBy(c => allCourses.GetOrDefault(c.Template.CourseId)?.Title ?? "<курс удалён>").ToList();
 
 			var courseGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, maxCount: 10));
@@ -325,6 +326,7 @@ namespace uLearn.Web.Controllers
 				CourseArchivedGroups = courseArchivedGroups,
 				Certificates = certificates,
 				AllCourses = allCourses,
+				TempCoursesIds = tempCourseIds,
 				CoursesWithRoles = coursesWithRoles,
 				CoursesWithAccess = coursesWithAccess
 			});
@@ -913,6 +915,8 @@ namespace uLearn.Web.Controllers
 		public Dictionary<string, Course> AllCourses { get; set; }
 		public Dictionary<string, string> CourseGroups { get; set; }
 		public Dictionary<string, string> CourseArchivedGroups { get; set; }
+		
+		public HashSet<string> TempCoursesIds { get; set; }
 
 		public List<string> CoursesWithRoles;
 

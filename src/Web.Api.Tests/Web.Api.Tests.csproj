@@ -32,8 +32,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Controllers\TempCourses\Courses.Versions" />
-	  <Folder Include="Controllers\TempCourses\TempCourseStaging" />
 	  <Folder Include="CourseManager\Courses\Courses" />
 	  <Folder Include="CourseManager\Courses\Courses.Staging" />
 	  <Folder Include="CourseManager\Courses\Courses.Versions" />
