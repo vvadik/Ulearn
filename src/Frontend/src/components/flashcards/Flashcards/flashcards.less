@@ -11,6 +11,7 @@
 
 .overlay {
   position: fixed;
+  overflow: auto;
   z-index: @overlayZIndex;
   left: 0;
   top: 0;
@@ -131,8 +132,9 @@
   width: 100%;
 
   position: absolute;
-  top: 50%;
-  transform: translate(0, @modalMaxHeight/2 + 10px);
+  top: 24%;
+  transform: translate(0, calc(@modalMaxHeight + 10px));
+  padding-bottom: 50px;
 
   margin: 0;
 
@@ -155,7 +157,8 @@
 }
 
 .progressBarContainer {
-  position: absolute;
+  position: fixed;
+  z-index: @modalZIndex;
   height: @progressBarHeight;
   bottom: 0;
   width: 100%;
