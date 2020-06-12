@@ -64,6 +64,7 @@ function CodeMirror({ language, code, className, }) {
 				return `text/css`;
 
 			default:
+				require('codemirror/mode/xml/xml');
 				return 'text/html';
 		}
 	}
