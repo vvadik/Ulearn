@@ -1034,10 +1034,6 @@ body.lti-component {
 	background-color: #eee;
 }
 
-.legacy-page .quiz-block-ordering .quiz-block-ordering__item:first-child {
-	margin-left: 15px;
-}
-
 .legacy-page .quiz-block-ordering .quiz-block-ordering__item .quiz-block-ordering__item__icons {
 	float: right;
 	margin-left: 5px;
@@ -1073,7 +1069,6 @@ body.lti-component {
 
 .legacy-page .quiz-block-matching .ul {
 	list-style: none;
-	padding-left: 15px;
 }
 
 .legacy-page .quiz-block-matching .quiz-block-matching__fixed-item,
