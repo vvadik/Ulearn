@@ -1,5 +1,7 @@
+@import "../../../../../../variables";
+
 .wrapper {
-  width: fit-content;// do not let image to be bigger then real size
+  width: fit-content; // do not let image to be bigger then real size
   margin-bottom: 10px;
   border-radius: 8px;
   overflow: hidden;
@@ -12,6 +14,19 @@
     > :first-child {
       width: fit-content; // do not let image to be bigger then real size in fullscreen mode
       margin: auto;
+    }
+  }
+}
+
+:global {
+  :local(.wrapper) {
+    .image-gallery-bullets .image-gallery-bullets-container .image-gallery-bullet {
+      box-shadow: 0 0 4px 0 #1a1a1a;
+
+      &.active {
+        background: @powerBlue;
+        transform: scale(1.1);
+      }
     }
   }
 }
