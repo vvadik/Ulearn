@@ -69,21 +69,21 @@ namespace CourseToolHotReloader.ApiClient
 
 		public async Task<TempCourseUpdateResponse> UploadCourse(MemoryStream memoryStream, string id)
 		{
-			var url = $"{config.BaseUrl}/tempCourses/uploadCourse/{id}";
+			var url = $"{config.BaseUrl}/tempCourses/{id}";
 
-			return await UpdateTempCourse(memoryStream, url);
+			return await UpdateTempCourse(memoryStream, url, HttpMethod.Patch);
 		}
 
 		public async Task<TempCourseUpdateResponse> UploadFullCourse(MemoryStream memoryStream, string id)
 		{
-			var url = $"{config.BaseUrl}/tempCourses/uploadFullCourse/{id}";
+			var url = $"{config.BaseUrl}/tempCourses/{id}";
 
-			return await UpdateTempCourse(memoryStream, url);
+			return await UpdateTempCourse(memoryStream, url, HttpMethod.Put);
 		}
 
 		public async Task<TempCourseUpdateResponse> CreateCourse(string id)
 		{
-			var url = $"{config.BaseUrl}/tempCourses/create/{id}";
+			var url = $"{config.BaseUrl}/tempCourses/{id}";
 
 			using var client = HttpClient();
 
@@ -97,7 +97,7 @@ namespace CourseToolHotReloader.ApiClient
 
 		public async Task<HasTempCourseResponse> HasCourse(string id)
 		{
-			var url = $"{config.BaseUrl}/tempCourses/hasCourse/{id}";
+			var url = $"{config.BaseUrl}/tempCourses/byBaseCourseId/{id}";
 
 			using var client = HttpClient();
 
@@ -114,13 +114,14 @@ namespace CourseToolHotReloader.ApiClient
 			return JsonSerializer.Deserialize<T>(result);
 		}
 
-		private async Task<TempCourseUpdateResponse> UpdateTempCourse(MemoryStream memoryStream, string url)
+		private async Task<TempCourseUpdateResponse> UpdateTempCourse(MemoryStream memoryStream, string url, HttpMethod httpMethod)
 		{
 			using var client = HttpClient();
 
 			var fileContent = new ByteArrayContent(memoryStream.ToArray());
 			var multiContent = new MultipartFormDataContent { { fileContent, "files", "qwe.zip" } };
-			var response = await client.PostAsync(url, multiContent);
+
+			var response = httpMethod == HttpMethod.Patch ? await client.PatchAsync(url, multiContent) : await client.PutAsync(url, multiContent); 
 
 			BadCodeHandler(response);
 

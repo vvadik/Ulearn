@@ -38,7 +38,7 @@ namespace Ulearn.Web.Api.Controllers
 		}
 
 		[Authorize]
-		[HttpPost("create/{courseId}")]
+		[HttpPost("{courseId}")]
 		public async Task<TempCourseUpdateResponse> CreateCourse([FromRoute] string courseId)
 		{
 			var userId = User.Identity.GetUserId();
@@ -79,7 +79,7 @@ namespace Ulearn.Web.Api.Controllers
 		}
 
 		[Authorize]
-		[HttpGet("hasCourse/{courseId}")]
+		[HttpGet("byBaseCourseId/{courseId}")]
 		public async Task<HasTempCourseResponse> HasCourse([FromRoute] string courseId)
 		{
 			var userId = User.Identity.GetUserId();
@@ -101,30 +101,23 @@ namespace Ulearn.Web.Api.Controllers
 
 			return response;
 		}
+		
 
-
-		[HttpGet("isTempCourse/{courseId}")]
-		public async Task<bool> IsTempCourse([FromRoute] string courseId)
-		{
-			var tmpCourse = tempCoursesRepo.Find(courseId);
-			return tmpCourse != null;
-		}
-
-		[HttpGet("getError/{courseId}")]
+		[HttpGet("errors/{courseId}")]
 		public async Task<string> GetError([FromRoute] string courseId)
 		{
 			var tmpCourseError = tempCoursesRepo.GetCourseError(courseId);
 			return tmpCourseError?.Error;
 		}
 
-		[HttpPost("uploadCourse/{courseId}")]
+		[HttpPatch("{courseId}")]
 		[Authorize]
 		public async Task<TempCourseUpdateResponse> UploadCourse([FromRoute] string courseId, List<IFormFile> files)
 		{
 			return await UploadCourse(courseId, files, false);
 		}
 
-		[HttpPost("uploadFullCourse/{courseId}")]
+		[HttpPut("{courseId}")]
 		[Authorize]
 		public async Task<TempCourseUpdateResponse> UploadFullCourse([FromRoute] string courseId, List<IFormFile> files)
 		{
