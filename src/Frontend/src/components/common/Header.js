@@ -377,7 +377,7 @@ class MyCoursesMenu extends AbstractMyCoursesMenu {
 MyCoursesMenu = connect(MyCoursesMenu.mapStateToProps)(MyCoursesMenu);
 
 class CourseMenu extends Component {
-	//static tempCourse = /^[\w-]*[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.compile();
+	//todo временный курс или нет, определяется с помощью формата courseId. В courseInfo приходит флаг IsTempCourse
 	static tempCourse =/^[\w-]*[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 	static menuItems(courseId, role, accesses) {
 		let items = [
@@ -420,7 +420,15 @@ class CourseMenu extends Component {
 				</MenuItem>);
 
 		if (hasCourseAdminMenuItems)
-			if (!this.tempCourse.test(courseId))
+			if (this.tempCourse.test(courseId)){
+				items = items.concat([
+					<MenuItem href={ "/Admin/TempCourseDiagnostics?courseId=" + courseId } key="Diagnostics"
+							  component={ LinkComponent }>
+						Диагностика
+					</MenuItem>
+				]);
+			}
+			else
 			{
 				items = items.concat([
 					<MenuItem href={ "/Admin/Packages?courseId=" + courseId } key="Packages"
@@ -434,6 +442,9 @@ class CourseMenu extends Component {
 					</MenuItem>
 				]);
 			}
+
+
+
 			items = items.concat([
 				<MenuItem href={ "/Grader/Clients?courseId=" + courseId } key="GraderClients"
 						  component={ LinkComponent }>

@@ -890,11 +890,13 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public ActionResult Diagnostics(string courseId, Guid? versionId)
 		{
+			var isTempCourse = IsTempCourse(courseId);
 			if (versionId == null)
 			{
 				return View(new DiagnosticsModel
 				{
 					CourseId = courseId,
+					IsTempCourse = isTempCourse
 				});
 			}
 
@@ -914,8 +916,18 @@ namespace uLearn.Web.Controllers
 				IsDiagnosticsForVersion = true,
 				VersionId = versionIdGuid,
 				CourseDiff = courseDiff,
-				Warnings = warnings
+				Warnings = warnings,
+				IsTempCourse = isTempCourse
 			});
+		}
+
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
+		public ActionResult TempCourseDiagnostics(string courseId)
+		{
+			var authorId = tempCoursesReo.Find(courseId).AuthorId;
+			var baseCourseId = courseId.Replace($"_{authorId}", ""); // todo добавить поле baseCourseId в сущность tempCourse
+			var baseCourseVersion = coursesRepo.GetPublishedCourseVersion(baseCourseId).Id;
+			return RedirectToAction("Diagnostics", new {courseId, versionId = baseCourseVersion});
 		}
 
 		public static void CopyFilesRecursively(DirectoryInfo source, DirectoryInfo target)
@@ -1642,5 +1654,7 @@ namespace uLearn.Web.Controllers
 		public Guid VersionId { get; set; }
 		public CourseDiff CourseDiff { get; set; }
 		public string Warnings { get; set; }
+		
+		public bool IsTempCourse { get; set; }
 	}
 }
