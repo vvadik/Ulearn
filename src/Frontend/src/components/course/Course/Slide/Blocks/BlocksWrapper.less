@@ -69,11 +69,11 @@
 .withPaddings {
   padding: 16px @phoneSlidePadding;
 
-  :not(:first-child) &.withoutTopPaddings {
+  &.withoutTopPaddings :not(:first-child) {
     padding-top: 0;
   }
 
-  :not(:last-child) &.withoutBottomPaddigns {
+  &.withoutBottomPaddigns :not(:last-child) {
     padding-bottom: 0;
   }
 }
@@ -87,11 +87,11 @@
   .withPaddings {
     padding: @phoneSlidePadding;
 
-    :not(:first-child) &.withoutTopPaddings {
+    &.withoutTopPaddings :not(:first-child) {
       padding-top: 0;
     }
 
-    :not(:last-child) &.withoutBottomPaddigns {
+    .withoutBottomPaddigns :not(:last-child) {
       padding-bottom: 0;
     }
   }
@@ -134,11 +134,11 @@
       padding-bottom: @laptopSlidePadding;
     }
 
-    :not(:first-child) &.withoutTopPaddings {
+    &.withoutTopPaddings:not(:first-child) {
       padding-top: 0;
     }
 
-    :not(:last-child) &.withoutBottomPaddigns {
+    &.withoutBottomPaddigns :not(:last-child) {
       padding-bottom: 0;
     }
   }
@@ -157,11 +157,11 @@
     padding-left: @desktopSlidePadding;
     padding-right: @desktopSlidePadding;
 
-    :not(:first-child) &.withoutTopPaddings {
+    &.withoutTopPaddings:not(:first-child) {
       padding-top: 0;
     }
 
-    :not(:last-child) &.withoutBottomPaddigns {
+    &.withoutBottomPaddigns:not(:last-child) {
       padding-bottom: 0;
     }
   }
