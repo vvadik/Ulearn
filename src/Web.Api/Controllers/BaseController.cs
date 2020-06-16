@@ -6,13 +6,16 @@ using Database;
 using Database.Models;
 using Database.Models.Comments;
 using Database.Repos;
+using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 using Database.Repos.Users;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Serilog;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
@@ -122,7 +125,28 @@ namespace Ulearn.Web.Api.Controllers
 			var enabledManualCheckingForUser = await groupsRepo.IsManualCheckingEnabledForUserAsync(course, userId).ConfigureAwait(false);
 			return s => GetMaxScoreForUsersSlide(s, solvedSlidesIds.Contains(s.Id), slidesWithUsersManualChecking.Contains(s.Id), enabledManualCheckingForUser);
 		}
-		
+
+		[NotNull]
+		public static async Task<Func<Slide, string>> BuildGetGitEditLinkFunc(string userId, Course course,
+			ICourseRolesRepo courseRolesRepo, ICoursesRepo coursesRepo)
+		{
+			var courseRole = await courseRolesRepo.GetRoleAsync(userId, course.Id);
+			var canEditGit = courseRole <= CourseRoleType.CourseAdmin;
+			if (!canEditGit)
+				return s => null;
+			var publishedCourseVersion = await coursesRepo.GetPublishedCourseVersionAsync(course.Id);
+			var repoUrl = publishedCourseVersion.RepoUrl;
+			var pathToCourseXml = publishedCourseVersion.PathToCourseXml;
+			if (repoUrl == null || pathToCourseXml == null)
+				return s => null;
+			var courseXmlDirectory = course.CourseXmlDirectory;
+			return slide =>
+			{
+				var pathRelative2CourseXml = slide.Info.SlideFile.FullName.Substring(courseXmlDirectory.FullName.Length + 1);
+				return GitUtils.GetSlideEditLink(repoUrl, pathToCourseXml, pathRelative2CourseXml);
+			};
+		}
+
 		public static Func<Slide, int> BuildGetSlideMaxScoreFunc(Course course, Group group)
 		{
 			var enabledManualCheckingForGroup = course.Settings.IsManualCheckingEnabled || group.IsManualCheckingEnabled;

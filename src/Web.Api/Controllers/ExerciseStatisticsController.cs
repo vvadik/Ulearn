@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database;
 using Database.Repos;
+using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +20,8 @@ namespace Ulearn.Web.Api.Controllers
 	[Route("/exercise-statistics")]
 	public class ExerciseStatisticsController : BaseController
 	{
+		private readonly ICoursesRepo coursesRepo;
+		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IUserSolutionsRepo userSolutionsRepo;
 		private readonly IUserSolutionsRepo solutionsRepo;
 		private readonly IUserQuizzesRepo userQuizzesRepo;
@@ -28,9 +31,11 @@ namespace Ulearn.Web.Api.Controllers
 
 		public ExerciseStatisticsController(ILogger logger, IWebCourseManager courseManager, IUserSolutionsRepo userSolutionsRepo, UlearnDb db, IUsersRepo usersRepo,
 			IUserSolutionsRepo solutionsRepo, IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo,
-			SlideRenderer slideRenderer)
+			SlideRenderer slideRenderer, ICourseRolesRepo courseRolesRepo, ICoursesRepo coursesRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
+			this.coursesRepo = coursesRepo;
+			this.courseRolesRepo = courseRolesRepo;
 			this.userSolutionsRepo = userSolutionsRepo;
 			this.solutionsRepo = solutionsRepo;
 			this.userQuizzesRepo = userQuizzesRepo;
@@ -69,6 +74,7 @@ namespace Ulearn.Web.Api.Controllers
 				.ToListAsync().ConfigureAwait(false);
 
 			var getSlideMaxScoreFunc = await BuildGetSlideMaxScoreFunc(solutionsRepo, userQuizzesRepo, visitsRepo, groupsRepo, course, User.GetUserId());
+			var getGitEditLinkFunc = await BuildGetGitEditLinkFunc(User.GetUserId(), course, courseRolesRepo, coursesRepo);
 
 			const int daysLimit = 30;
 
@@ -82,7 +88,7 @@ namespace Ulearn.Web.Api.Controllers
 						var exerciseSubmissions = submissions.Where(s => s.Item1 == slide.Id).ToList();
 						return new OneExerciseStatistics
 						{
-							Exercise = slideRenderer.BuildShortSlideInfo(course.Id, slide, getSlideMaxScoreFunc, Url),
+							Exercise = slideRenderer.BuildShortSlideInfo(course.Id, slide, getSlideMaxScoreFunc, getGitEditLinkFunc, Url),
 							SubmissionsCount = exerciseSubmissions.Count,
 							AcceptedCount = exerciseSubmissions.Count(s => s.Item2),
 							/* Select last 30 (`datesLimit`) dates */
