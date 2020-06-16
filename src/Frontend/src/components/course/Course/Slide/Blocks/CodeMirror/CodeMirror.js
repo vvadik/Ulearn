@@ -13,7 +13,7 @@ function CodeMirror({ language, code, className, }) {
 	const opts = {
 		mode: loadLanguageStyles(language),
 		lineNumbers: true,
-		readOnly: 'nocursor',
+		readOnly: 'true',
 		scrollbarStyle: 'null',
 		lineWrapping: true,
 	};
