@@ -17,8 +17,6 @@ import { flashcards, constructPathToSlide } from 'src/consts/routes';
 import { SLIDETYPE } from 'src/consts/general';
 import { SCORING_GROUP_IDS } from 'src/consts/scoringGroup';
 
-import logo from './logo.png';
-
 import classnames from 'classnames';
 
 import styles from "./Course.less"
@@ -232,7 +230,7 @@ class Course extends Component {
 					Вопросы и пожеланиями пишите на <a href="mailto:support@ulearn.me">support@ulearn.me</a>
 				</p>
 				<p>
-					Сделано в <img src={ logo }/>
+					Сделано в СКБ Контур
 				</p>
 			</footer>
 		);
