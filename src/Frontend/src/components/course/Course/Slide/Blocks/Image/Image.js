@@ -15,19 +15,23 @@ class Image extends React.Component {
 
 		this.state = {
 			fullscreen: false,
+			showFullscreenButton: true,
+			width: null,
 		}
 	}
 
 	render() {
 		const { imageUrls, className, } = this.props;
-		const { fullscreen, } = this.state;
+		const { fullscreen, showFullscreenButton, width, } = this.state;
 
 		return (
-			<div className={ classNames(styles.wrapper, className) }>
+			<div className={ classNames(styles.wrapper, className) } style={ width && { width: width + 'px' } }>
 				<ImageGallery
+					onImageLoad={ this.onImageLoad }
 					additionalClass={ classNames(styles.imageWrapper, { [styles.open]: fullscreen }) }
 					useBrowserFullscreen={ false }
 					showBullets={ imageUrls.length !== 1 }
+					showFullscreenButton={ showFullscreenButton }
 					showPlayButton={ false }
 					showThumbnails={ false }
 					onScreenChange={ this.onScreenChange }
@@ -38,6 +42,15 @@ class Image extends React.Component {
 		);
 	}
 
+	onImageLoad = (event) => {
+		const img = event.target;
+
+		if(img.width > img.naturalWidth)
+			this.setState({
+				width: img.naturalWidth,
+				showFullscreenButton: false,
+			})
+	}
 
 	onScreenChange = (isFullScreen) => {
 		this.setState({
