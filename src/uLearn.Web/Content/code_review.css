@@ -23,7 +23,8 @@
 }
 
 .legacy-page .exercise__add-review .exercise__add-review__comment {
-	width: 250px;
+	resize: vertical;
+	width: 220px;
 	height: 120px;
 }
 
