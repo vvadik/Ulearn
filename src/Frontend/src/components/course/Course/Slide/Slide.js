@@ -103,7 +103,8 @@ class Slide extends React.Component {
 		}
 
 		for (const spoiler of slideBlocks.filter(b => b.type === blockTypes.spoiler)) {
-			spoiler.blocks = this.renderSlideBlocks(JSON.parse(JSON.stringify(spoiler.blocks)));
+			spoiler.blocksId = this.props.slideId; // make spoiler close content if changed slide
+			spoiler.blocks = this.renderSlideBlocks(JSON.parse(JSON.stringify(spoiler.blocks))); // prerender content
 		}
 	}
 
