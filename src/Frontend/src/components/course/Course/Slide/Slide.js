@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Video, CodeMirror, Text, Image, BlocksWrapper } from "./Blocks";
+import { Video, CodeMirror, Text, Image, BlocksWrapper, Spoiler, } from "./Blocks";
 import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader";
 
 import { loadSlide } from "src/actions/course";
@@ -26,11 +26,12 @@ const mapTypeToBlock = {
 	[blockTypes.text]: Text,
 	[blockTypes.tex]: Text,
 	[blockTypes.image]: Image,
-	[blockTypes.spoiler]: Text,//Spoiler
+	[blockTypes.spoiler]: Spoiler,
 };
 
 const fullSizeBlockTypes = {
 	[blockTypes.video]: true,
+	[blockTypes.spoiler]:true,
 };
 
 class Slide extends React.Component {
@@ -99,6 +100,10 @@ class Slide extends React.Component {
 
 		for (const texBlock of slideBlocks.filter(b => b.type === blockTypes.tex)) {
 			texBlock.content = this.getContentFromTexLines(texBlock);
+		}
+
+		for (const spoiler of slideBlocks.filter(b => b.type === blockTypes.spoiler)) {
+			spoiler.blocks = this.renderSlideBlocks(JSON.parse(JSON.stringify(spoiler.blocks)));
 		}
 	}
 

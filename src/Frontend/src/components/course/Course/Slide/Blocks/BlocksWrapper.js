@@ -23,13 +23,14 @@ class BlocksWrapper extends React.Component {
 	}
 
 	render() {
-		const { children, className, isBLock, isHidden, isContainer, score, withoutBottomPaddigns } = this.props;
+		const { children, className, isBLock, isHidden, isContainer, score, withoutBottomPaddigns, withoutTopPaddings, } = this.props;
 		const { showed, showStudentsModalOpened, } = this.state;
 		const isHiddenBlock = isBLock && isHidden;
 		const isHiddenSlide = !isBLock && isHidden;
 		const wrapperClassNames = classNames(
 			styles.wrapper,
 			styles.withPaddings,
+			{ [styles.withoutTopPaddings]: withoutTopPaddings },
 			{ [styles.withoutBottomPaddigns]: withoutBottomPaddigns },
 			{ [styles.hiddenBackgroundColor]: isHidden },
 			{ [styles.hiddenSlide]: isHiddenSlide },
@@ -167,6 +168,7 @@ BlocksWrapper.propTypes = {
 	className: PropTypes.string,
 	isBLock: PropTypes.bool,
 	withoutBottomPaddigns: PropTypes.bool,
+	withoutTopPaddings: PropTypes.bool,
 	isHidden: PropTypes.bool,
 	isContainer: PropTypes.bool,
 	score: PropTypes.object,
