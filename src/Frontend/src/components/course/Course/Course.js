@@ -22,8 +22,8 @@ import classnames from 'classnames';
 import styles from "./Course.less"
 
 const slideNavigationButtonTitles = {
-	next: "Следующий урок",
-	previous: "Предыдущий урок",
+	next: "Далее",
+	previous: "Назад",
 }
 
 
