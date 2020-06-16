@@ -189,6 +189,7 @@ body.without-topbar {
 
 .legacy-page footer {
 	margin-top: 60px;
+	margin-bottom: 20px;
 	color: #888;
 }
 
