@@ -24,8 +24,12 @@ class Image extends React.Component {
 		const { imageUrls, className, } = this.props;
 		const { fullscreen, showFullscreenButton, width, } = this.state;
 
+		const wrapperStyle = width
+			? { width: width + 'px' }
+			: { opacity: 0, height: 0, }; //prevent showing extended img
+
 		return (
-			<div className={ classNames(styles.wrapper, className) } style={ width && { width: width + 'px' } }>
+			<div className={ classNames(styles.wrapper, className) } style={ wrapperStyle }>
 				<ImageGallery
 					onImageLoad={ this.onImageLoad }
 					additionalClass={ classNames(styles.imageWrapper, { [styles.open]: fullscreen }) }
@@ -45,7 +49,7 @@ class Image extends React.Component {
 	onImageLoad = (event) => {
 		const img = event.target;
 
-		if(img.width > img.naturalWidth)
+		if(this.state.width === null && img.width > img.naturalWidth) //set all img width to real size of first img, if not bigger than slide width
 			this.setState({
 				width: img.naturalWidth,
 				showFullscreenButton: false,
