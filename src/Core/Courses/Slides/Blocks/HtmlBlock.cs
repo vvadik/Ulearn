@@ -56,15 +56,16 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 			Content = RemoveXmlNamespacesAndAutoExpandEmptyTags(innerXml.RemoveCommonNesting());
 		}
 
-		/* We need to remove xml namespaces (which are inherited from ulearn's xml) and
+		/* Андрей Гейн: We need to remove xml namespaces (which are inherited from ulearn's xml) and
 		   to expand empty tags (i.e. replace auto-collapsed <iframe ... /> to <iframe ...></iframe>) */
+		/* Антон Федоров: Не понял, чем мешают теги вида <tag/>. Браузер понимает тег <br></br> как два. */
 		private string RemoveXmlNamespacesAndAutoExpandEmptyTags(string innerXmlContent)
 		{
 			/* Add outer tag, otherwise XML is not correct and XmlUtils can't parse it */
 			var xml = $"<node>{innerXmlContent}</node>";
 
-			var xmlWithoutNs = XmlUtils.RemoveAllNamespaces(xml);
-			var resultXml = XmlUtils.ExpandEmptyTags(xmlWithoutNs);
+			var resultXml = XmlUtils.RemoveAllNamespaces(xml);
+			//resultXml = XmlUtils.ExpandEmptyTags(resultXml);
 
 			/* Delete outer tag */
 			if (resultXml.StartsWith("<node>"))
