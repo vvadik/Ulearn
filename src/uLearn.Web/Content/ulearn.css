@@ -1160,7 +1160,7 @@ body.lti-component {
 }
 
 .legacy-page .quiz.quiz-block-input .form-control {
-	max-width: none;
+	max-width: 100%;
 }
 
 /* Quiz Analytics */
