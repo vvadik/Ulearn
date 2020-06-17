@@ -49,11 +49,18 @@ class Image extends React.Component {
 	onImageLoad = (event) => {
 		const img = event.target;
 
-		if(this.state.width === null && img.width > img.naturalWidth) //set all img width to real size of first img, if not bigger than slide width
-			this.setState({
-				width: img.naturalWidth,
-				showFullscreenButton: false,
-			})
+		if(this.state.width === null) {
+			if(img.width > img.naturalWidth) { //set all img width to real size of first img, if not bigger than slide width
+				this.setState({
+					width: img.naturalWidth,
+					showFullscreenButton: false,
+				});
+			} else {
+				this.setState({
+					width: img.width,
+				});
+			}
+		}
 	}
 
 	onScreenChange = (isFullScreen) => {
