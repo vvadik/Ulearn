@@ -29,12 +29,12 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			this.videoAnnotationsClient = videoAnnotationsClient;
 		}
 
-		public ShortSlideInfo BuildShortSlideInfo(string courseId, Slide slide, Func<Slide, int> getSlideMaxScoreFunc, IUrlHelper urlHelper)
+		public ShortSlideInfo BuildShortSlideInfo(string courseId, Slide slide, Func<Slide, int> getSlideMaxScoreFunc, Func<Slide, string> getGitEditLink, IUrlHelper urlHelper)
 		{
-			return BuildShortSlideInfo<ShortSlideInfo>(courseId, slide, getSlideMaxScoreFunc, urlHelper);
+			return BuildShortSlideInfo<ShortSlideInfo>(courseId, slide, getSlideMaxScoreFunc, getGitEditLink, urlHelper);
 		}
 
-		private T BuildShortSlideInfo<T>(string courseId, Slide slide, Func<Slide, int> getSlideMaxScoreFunc, IUrlHelper urlHelper)
+		private T BuildShortSlideInfo<T>(string courseId, Slide slide, Func<Slide, int> getSlideMaxScoreFunc, Func<Slide, string> getGitEditLink, IUrlHelper urlHelper)
 			where T : ShortSlideInfo, new()
 		{
 			return new T
@@ -47,6 +47,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				ScoringGroup = slide.ScoringGroup,
 				Type = GetSlideType(slide),
 				QuestionsCount = slide.Blocks.OfType<AbstractQuestionBlock>().Count(),
+				GitEditLink = getGitEditLink(slide)
 
 				// TODO: кол-во попыток
 			};
@@ -67,9 +68,9 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			}
 		}
 
-		public async Task<ApiSlideInfo> BuildSlideInfo(SlideRenderContext slideRenderContext, Func<Slide, int> getSlideMaxScoreFunc)
+		public async Task<ApiSlideInfo> BuildSlideInfo(SlideRenderContext slideRenderContext, Func<Slide, int> getSlideMaxScoreFunc, Func<Slide, string> getGitEditLink)
 		{
-			var result = BuildShortSlideInfo<ApiSlideInfo>(slideRenderContext.CourseId, slideRenderContext.Slide, getSlideMaxScoreFunc, slideRenderContext.UrlHelper);
+			var result = BuildShortSlideInfo<ApiSlideInfo>(slideRenderContext.CourseId, slideRenderContext.Slide, getSlideMaxScoreFunc, getGitEditLink, slideRenderContext.UrlHelper);
 			result.Blocks = new List<IApiSlideBlock>();
 			foreach (var b in slideRenderContext.Slide.Blocks)
 				result.Blocks.AddRange(await ToApiSlideBlocks(b, slideRenderContext));

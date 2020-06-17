@@ -131,7 +131,8 @@ namespace Ulearn.Web.Api.Controllers
 
 				var showInstructorsSlides = isInstructor;
 				var getSlideMaxScoreFunc = await BuildGetSlideMaxScoreFunc(solutionsRepo, userQuizzesRepo, visitsRepo, groupsRepo, course, UserId);
-				units = visibleUnits.Select(unit => BuildUnitInfo(course.Id, unit, showInstructorsSlides, getSlideMaxScoreFunc)).ToList();
+				var getGitEditLinkFunc = await BuildGetGitEditLinkFunc(User.GetUserId(), course, courseRolesRepo, coursesRepo);
+				units = visibleUnits.Select(unit => BuildUnitInfo(course.Id, unit, showInstructorsSlides, getSlideMaxScoreFunc, getGitEditLinkFunc)).ToList();
 			}
 			else
 			{
@@ -148,9 +149,10 @@ namespace Ulearn.Web.Api.Controllers
 
 				if (visibleUnits.Count == 0)
 					return NotFound(new ErrorResponse("Course not found"));
-				
+
 				var getSlideMaxScoreFunc = BuildGetSlideMaxScoreFunc(course, group);
-				units = visibleUnits.Select(unit => BuildUnitInfo(course.Id, unit, false, getSlideMaxScoreFunc)).ToList();
+				var getGitEditLinkFunc = await BuildGetGitEditLinkFunc(User.GetUserId(), course, courseRolesRepo, coursesRepo);
+				units = visibleUnits.Select(unit => BuildUnitInfo(course.Id, unit, false, getSlideMaxScoreFunc, getGitEditLinkFunc)).ToList();
 			}
 
 			var containsFlashcards = visibleUnits.Any(x => x.Slides.OfType<FlashcardSlide>().Any());
@@ -185,11 +187,11 @@ namespace Ulearn.Web.Api.Controllers
 			return new ScoringSettingsModel { Groups = groups };
 		}
 
-		private UnitInfo BuildUnitInfo(string courseId, Unit unit, bool showInstructorsSlides, Func<Slide, int> getSlideMaxScoreFunc)
+		private UnitInfo BuildUnitInfo(string courseId, Unit unit, bool showInstructorsSlides, Func<Slide, int> getSlideMaxScoreFunc, Func<Slide, string> getGitEditLinkFunc)
 		{
-			var slides = unit.Slides.Select(slide => slideRenderer.BuildShortSlideInfo(courseId, slide, getSlideMaxScoreFunc, Url));
+			var slides = unit.Slides.Select(slide => slideRenderer.BuildShortSlideInfo(courseId, slide, getSlideMaxScoreFunc, getGitEditLinkFunc, Url));
 			if (showInstructorsSlides && unit.InstructorNote != null)
-				slides = slides.Concat(new List<ShortSlideInfo> { slideRenderer.BuildShortSlideInfo(courseId, unit.InstructorNote.Slide, getSlideMaxScoreFunc, Url) });
+				slides = slides.Concat(new List<ShortSlideInfo> { slideRenderer.BuildShortSlideInfo(courseId, unit.InstructorNote.Slide, getSlideMaxScoreFunc, getGitEditLinkFunc, Url) });
 			return BuildUnitInfo(unit, slides);
 		}
 
