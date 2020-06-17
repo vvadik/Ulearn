@@ -12,6 +12,7 @@ import Slide from './Slide/Slide';
 import { UrlError } from "src/components/common/Error/NotFoundErrorBoundary";
 import Error404 from "src/components/common/Error/Error404";
 import { Link } from "react-router-dom";
+import { Edit } from "icons";
 
 import { flashcards, constructPathToSlide } from 'src/consts/routes';
 import { SLIDETYPE } from 'src/consts/general';
@@ -142,7 +143,14 @@ class Course extends Component {
 
 		return (
 			<main className={ wrapperClassName }>
-				{ isNavMenuVisible && slideTitle && <h1 className={ styles.title }> { slideTitle } </h1> }
+				{ isNavMenuVisible && slideTitle &&
+				<h1 className={ styles.title }>
+					{ slideTitle }
+					{ slideInfo.gitEditLink &&
+					<a className={ styles.gitEditLink } rel='noopener noreferrer' target='_blank' href={ slideInfo.gitEditLink }>
+						<Edit/>
+					</a> }
+				</h1> }
 				<div className={ styles.slide }>
 					{
 						SlidePage === Slide
