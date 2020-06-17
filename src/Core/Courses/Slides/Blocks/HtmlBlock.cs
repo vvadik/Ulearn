@@ -48,8 +48,11 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 				return;
 			}
 
+			var name = reader.Name;
+			var hide = reader.GetAttribute("hide") == "true";
 			var innerXml = reader.ReadInnerXml();
-
+			if (name == "html")
+				Hide = hide;
 			Content = RemoveXmlNamespacesAndAutoExpandEmptyTags(innerXml.RemoveCommonNesting());
 		}
 
