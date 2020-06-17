@@ -28,6 +28,12 @@ class Video extends React.Component {
 		if(prevProps.openAnnotation !== this.props.openAnnotation) {
 			this.setState({ showedAnnotation: this.props.openAnnotation });
 		}
+
+		if(this.ytPlayer) {
+			const newVideoRate = parseFloat(this.props.cookies.get(videoCookieName) || '1');
+
+			this.ytPlayer.setPlaybackRate(newVideoRate);
+		}
 	}
 
 	render() {
@@ -114,13 +120,15 @@ class Video extends React.Component {
 									})
 									}
 									<p className={ styles.withoutMargins }>
-										Ошибка в содержании? <Link target="_blank" href={ googleDocLink }>Предложите исправление!</Link>
+										Ошибка в содержании? <Link target="_blank" href={ googleDocLink }>Предложите
+										исправление!</Link>
 									</p>
 								</React.Fragment>
 								}
 							</React.Fragment>
 							: <p className={ styles.withoutMargins }>
-								Помогите написать <Link target="_blank" href={ googleDocLink }>текстовое содержание</Link> этого видео.
+								Помогите написать <Link target="_blank" href={ googleDocLink }>текстовое
+								содержание</Link> этого видео.
 							</p>
 					}
 				</Text>
