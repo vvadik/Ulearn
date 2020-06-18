@@ -290,7 +290,7 @@
 }
 
 @helper Block(HtmlBlock block, BlockRenderContext context, HtmlHelper Html)
-{ @Html.Raw(block.Content) }
+{ @(new HtmlString(block.Content)) }
 
 @helper Block(SpoilerBlock block, BlockRenderContext context, HtmlHelper Html)
 {
