@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Error404 from "./Error404";
 
+import { withRouter } from "react-router-dom";
 
 export class UrlError extends Error {
 	constructor(message, response) {
@@ -14,22 +15,30 @@ class NotFoundErrorBoundary extends Component {
 		error: null,
 	};
 
+	componentDidUpdate(prevProps, prevState, snapshot) {
+		if(this.state.error && (prevProps.location.pathname !== this.props.location.pathname)) {
+			this.setState({
+				error: null,
+			})
+		}
+	}
+
 	componentDidCatch(error, errorInfo) {
-		if (error instanceof UrlError) {
-			this.setState({error})
+		if(error instanceof UrlError) {
+			this.setState({ error })
 		} else {
 			Error();
 		}
 	}
 
 	render() {
-		if (this.state.error) {
+		if(this.state.error) {
 			return (
-				<Error404 />
+				<Error404/>
 			);
 		}
 		return this.props.children;
 	}
 }
 
-export default NotFoundErrorBoundary;
+export default withRouter(NotFoundErrorBoundary);
