@@ -56,8 +56,10 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			return plagiarismDetector.GetWeightAsync(first, second);
 		}
 
-		public static (double faintSuspicion, double strongSuspicion) GetSuspicionLevels(double mean, double sigma, double faintSuspicionCoefficient, double strongSuspicionCoefficient)
+		public static (double faintSuspicion, double strongSuspicion) GetSuspicionLevels(double mean, double sigma, double faintSuspicionCoefficient, double strongSuspicionCoefficient, ILogger logger = null)
 		{
+			if (Math.Abs(sigma) < 1e-7)
+				return (1, 1);
 			var (alpha, beta) = GetBetaParameters(mean, sigma);
 			var betaDistribution = new BetaDistribution(alpha, beta);
 			var faintSigmaToProbability = new NormalDistribution(0, 1).DistributionFunction(faintSuspicionCoefficient);
