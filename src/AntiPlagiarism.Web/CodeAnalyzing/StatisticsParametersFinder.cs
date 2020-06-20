@@ -20,26 +20,30 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			this.plagiarismDetector = plagiarismDetector;
 		}
 
-		public async Task<(List<double>, TaskStatisticsParameters)> FindStatisticsParametersAsync(List<Submission> submissions)
+		public async Task<(List<TaskStatisticsSourceData>, TaskStatisticsParameters)> FindStatisticsParametersAsync(List<Submission> submissions)
 		{
 			var pairs = submissions.SelectMany(s => submissions, Tuple.Create).Where(pair => pair.Item1.Id < pair.Item2.Id).ToList();
 
-			var weights = new List<double>();
+			var taskStatisticsSourceData = new List<TaskStatisticsSourceData>();
 			var pairIndex = 0;
 			foreach (var (firstSubmission, secondSubmission) in pairs)
-				weights.Add(await GetLinkWeightAsync(firstSubmission, secondSubmission, pairIndex++, pairs.Count).ConfigureAwait(false));
+				taskStatisticsSourceData.Add(new TaskStatisticsSourceData {
+					Submission1Id = firstSubmission.Id,
+					Submission2Id = secondSubmission.Id,
+					Weight = await GetLinkWeightAsync(firstSubmission, secondSubmission, pairIndex++, pairs.Count).ConfigureAwait(false)
+				});
 
 			/* Remove all 1's from weights list.
 			   Ones are weights for pairs of absolutely identical solutions (i.e. copied from the internet or shared between students).
 			   They are negatively affect to the mean and standard deviation of weights. So we decided just remove them from the array before
 			   calculation mean and deviation. See https://yt.skbkontur.ru/issue/ULEARN-78 for details. */
-			weights = weights.Where(w => w < 1 - 1e-6).ToList();
-
+			taskStatisticsSourceData = taskStatisticsSourceData.Where(d => d.Weight < 1 - 1e-6).ToList();
+			var weights = taskStatisticsSourceData.Select(d => d.Weight).ToList();
 			logger.Information($"Пересчитываю статистические параметры задачи (TaskStatisticsParameters) по следующему набору весов: [{string.Join(", ", weights)}]");
 
 			var mean = weights.Mean();
 			var deviation = weights.Deviation(mean);
-			return (weights, new TaskStatisticsParameters
+			return (taskStatisticsSourceData, new TaskStatisticsParameters
 			{
 				Mean = mean,
 				Deviation = deviation,
