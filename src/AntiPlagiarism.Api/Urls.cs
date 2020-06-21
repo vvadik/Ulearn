@@ -7,5 +7,6 @@
 		public const string GetAuthorPlagiarisms = "get_author_plagiarisms";
 		public const string RebuildSnippetsForTask = "rebuild_snippets_for_task";
 		public const string RecalculateTaskStatistics = "recalculate_task_statistics";
+		public const string GetMostSimilarSubmissions = "get_most_similar_submissions";
 	}
 }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Accord.Statistics.Distributions.Univariate;
 using AntiPlagiarism.Api.Models.Parameters;
 using AntiPlagiarism.Api.Models.Results;
 using AntiPlagiarism.Web.CodeAnalyzing;
@@ -13,7 +12,6 @@ using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Database.Repos;
 using AntiPlagiarism.Web.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Serilog;
@@ -29,6 +27,7 @@ namespace AntiPlagiarism.Web.Controllers
 		private readonly ISnippetsRepo snippetsRepo;
 		private readonly ITasksRepo tasksRepo;
 		private readonly IWorkQueueRepo workQueueRepo;
+		private readonly IMostSimilarSubmissionsRepo mostSimilarSubmissionsRepo;
 		private readonly PlagiarismDetector plagiarismDetector;
 		private readonly CodeUnitsExtractor codeUnitsExtractor;
 		private readonly IServiceScopeFactory serviceScopeFactory;
@@ -37,7 +36,8 @@ namespace AntiPlagiarism.Web.Controllers
 
 		public ApiController(
 			AntiPlagiarismDb db,
-			ISubmissionsRepo submissionsRepo, ISnippetsRepo snippetsRepo, ITasksRepo tasksRepo, IClientsRepo clientsRepo, IWorkQueueRepo workQueueRepo,
+			ISubmissionsRepo submissionsRepo, ISnippetsRepo snippetsRepo, ITasksRepo tasksRepo,
+			IClientsRepo clientsRepo, IWorkQueueRepo workQueueRepo, IMostSimilarSubmissionsRepo mostSimilarSubmissionsRepo,
 			PlagiarismDetector plagiarismDetector,
 			CodeUnitsExtractor codeUnitsExtractor,
 			ILogger logger,
@@ -50,6 +50,7 @@ namespace AntiPlagiarism.Web.Controllers
 			this.snippetsRepo = snippetsRepo;
 			this.tasksRepo = tasksRepo;
 			this.workQueueRepo = workQueueRepo;
+			this.mostSimilarSubmissionsRepo = mostSimilarSubmissionsRepo;
 			this.plagiarismDetector = plagiarismDetector;
 			this.codeUnitsExtractor = codeUnitsExtractor;
 			this.newSubmissionHandler = newSubmissionHandler;
@@ -264,6 +265,25 @@ namespace AntiPlagiarism.Web.Controllers
 			if (value > maxValue)
 				return maxValue;
 			return value;
+		}
+
+		[HttpGet(Api.Urls.GetMostSimilarSubmissions)]
+		public async Task<IActionResult> GetMostSimilarSubmissions([FromQuery] GetMostSimilarSubmissionsParameters parameters)
+		{
+			if (!ModelState.IsValid)
+				return BadRequest(ModelState);
+
+			var suspicionLevels = await GetSuspicionLevelsAsync(parameters.TaskId).ConfigureAwait(false);
+			if (suspicionLevels == null)
+				return Ok(new ErrorResponse("Not enough statistics for defining suspicion levels"));
+
+			var mostSimilarSubmissions = await mostSimilarSubmissionsRepo.GetMostSimilarSubmissionsByTaskAsync(client.Id, parameters.TaskId).ConfigureAwait(false);
+			var result = new GetMostSimilarSubmissionsResponse
+			{
+				MostSimilarSubmissions = mostSimilarSubmissions,
+				SuspicionLevels = suspicionLevels
+			};
+			return Json(result);
 		}
 	}
 }
