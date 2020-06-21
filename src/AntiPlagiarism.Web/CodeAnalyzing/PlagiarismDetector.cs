@@ -220,7 +220,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 						Weight = weight,
 						SubmissionId = submission.Id,
 						SimilarSubmissionId = plagiarismSubmission.Id,
-						Timestamp = DateTime.UtcNow
+						Timestamp = DateTime.Now
 					};
 				logger.Information($"Link weight between submisions {submission.Id} and {plagiarismSubmission.Id} is {weight}. Union length is {unionLength}.");
 

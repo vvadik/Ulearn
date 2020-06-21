@@ -28,6 +28,7 @@ namespace AntiPlagiarism.Web.Controllers
 		private readonly ITasksRepo tasksRepo;
 		private readonly IWorkQueueRepo workQueueRepo;
 		private readonly IMostSimilarSubmissionsRepo mostSimilarSubmissionsRepo;
+		private readonly IManualSuspicionLevelsRepo manualSuspicionLevelsRepo;
 		private readonly PlagiarismDetector plagiarismDetector;
 		private readonly CodeUnitsExtractor codeUnitsExtractor;
 		private readonly IServiceScopeFactory serviceScopeFactory;
@@ -37,7 +38,9 @@ namespace AntiPlagiarism.Web.Controllers
 		public ApiController(
 			AntiPlagiarismDb db,
 			ISubmissionsRepo submissionsRepo, ISnippetsRepo snippetsRepo, ITasksRepo tasksRepo,
-			IClientsRepo clientsRepo, IWorkQueueRepo workQueueRepo, IMostSimilarSubmissionsRepo mostSimilarSubmissionsRepo,
+			IClientsRepo clientsRepo, IWorkQueueRepo workQueueRepo,
+			IMostSimilarSubmissionsRepo mostSimilarSubmissionsRepo,
+			IManualSuspicionLevelsRepo manualSuspicionLevelsRepo,
 			PlagiarismDetector plagiarismDetector,
 			CodeUnitsExtractor codeUnitsExtractor,
 			ILogger logger,
@@ -51,6 +54,7 @@ namespace AntiPlagiarism.Web.Controllers
 			this.tasksRepo = tasksRepo;
 			this.workQueueRepo = workQueueRepo;
 			this.mostSimilarSubmissionsRepo = mostSimilarSubmissionsRepo;
+			this.manualSuspicionLevelsRepo = manualSuspicionLevelsRepo;
 			this.plagiarismDetector = plagiarismDetector;
 			this.codeUnitsExtractor = codeUnitsExtractor;
 			this.newSubmissionHandler = newSubmissionHandler;
@@ -95,7 +99,7 @@ namespace AntiPlagiarism.Web.Controllers
 				SubmissionId = submission.Id,
 			};
 		}
-		
+
 		private int GetTokensCount(string code)
 		{
 			var codeUnits = codeUnitsExtractor.Extract(code);
@@ -236,9 +240,29 @@ namespace AntiPlagiarism.Web.Controllers
 		private async Task<SuspicionLevels> GetSuspicionLevelsAsync(Guid taskId)
 		{
 			var taskStatisticsParameters = await tasksRepo.FindTaskStatisticsParametersAsync(taskId).ConfigureAwait(false);
-			if (taskStatisticsParameters == null)
+			var manualSuspicionLevels = await manualSuspicionLevelsRepo.GetManualSuspicionLevelsAsync(taskId);
+			if (taskStatisticsParameters == null
+				&& (manualSuspicionLevels == null || manualSuspicionLevels.FaintSuspicion == null || manualSuspicionLevels.StrongSuspicion == null))
 				return null;
 
+			double? automaticFaintSuspicion = null;
+			double? automaticStrongSuspicion = null;
+			if (taskStatisticsParameters != null)
+				(automaticFaintSuspicion, automaticStrongSuspicion) = GetAutomaticSuspicionLevels(taskStatisticsParameters);
+
+			return new SuspicionLevels
+			{
+				AutomaticFaintSuspicion = automaticFaintSuspicion,
+				AutomaticStrongSuspicion = automaticStrongSuspicion,
+				ManualFaintSuspicion = manualSuspicionLevels.FaintSuspicion,
+				ManualStrongSuspicion = manualSuspicionLevels.StrongSuspicion,
+				FaintSuspicion = manualSuspicionLevels.FaintSuspicion ?? automaticFaintSuspicion.Value,
+				StrongSuspicion = manualSuspicionLevels.StrongSuspicion ?? automaticStrongSuspicion.Value,
+			};
+		}
+
+		private (double automaticFaintSuspicion, double automaticStrongSuspicion) GetAutomaticSuspicionLevels(TaskStatisticsParameters taskStatisticsParameters)
+		{
 			var faintSuspicionCoefficient = configuration.AntiPlagiarism.StatisticsAnalyzing.FaintSuspicionCoefficient;
 			var strongSuspicionCoefficient = configuration.AntiPlagiarism.StatisticsAnalyzing.StrongSuspicionCoefficient;
 			var minFaintSuspicionLevel = configuration.AntiPlagiarism.StatisticsAnalyzing.MinFaintSuspicionLevel;
@@ -249,11 +273,9 @@ namespace AntiPlagiarism.Web.Controllers
 			var (faintSuspicion, strongSuspicion)
 				= StatisticsParametersFinder.GetSuspicionLevels(taskStatisticsParameters.Mean, taskStatisticsParameters.Deviation, faintSuspicionCoefficient, strongSuspicionCoefficient, logger);
 
-			return new SuspicionLevels
-			{
-				FaintSuspicion = GetSuspicionLevelWithThreshold(faintSuspicion, minFaintSuspicionLevel, maxFaintSuspicionLevel),
-				StrongSuspicion = GetSuspicionLevelWithThreshold(strongSuspicion, minStrongSuspicionLevel, maxStrongSuspicionLevel),
-			};
+			var automaticFaintSuspicion = GetSuspicionLevelWithThreshold(faintSuspicion, minFaintSuspicionLevel, maxFaintSuspicionLevel);
+			var automaticStrongSuspicion = GetSuspicionLevelWithThreshold(strongSuspicion, minStrongSuspicionLevel, maxStrongSuspicionLevel);
+			return (automaticFaintSuspicion, automaticStrongSuspicion);
 		}
 
 		private static double GetSuspicionLevelWithThreshold(double value, double minValue, double maxValue)
@@ -273,16 +295,47 @@ namespace AntiPlagiarism.Web.Controllers
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
 
-			var suspicionLevels = await GetSuspicionLevelsAsync(parameters.TaskId).ConfigureAwait(false);
-			if (suspicionLevels == null)
-				return Ok(new ErrorResponse("Not enough statistics for defining suspicion levels"));
-
 			var mostSimilarSubmissions = await mostSimilarSubmissionsRepo.GetMostSimilarSubmissionsByTaskAsync(client.Id, parameters.TaskId).ConfigureAwait(false);
 			var result = new GetMostSimilarSubmissionsResponse
 			{
 				MostSimilarSubmissions = mostSimilarSubmissions,
-				SuspicionLevels = suspicionLevels
 			};
+			return Json(result);
+		}
+
+		[HttpGet(Api.Urls.GetSuspicionLevels)]
+		public async Task<IActionResult> GetSuspicionLevelsAsync([FromQuery] GetSuspicionLevelsParameters parameters)
+		{
+			if (!ModelState.IsValid)
+				return BadRequest(ModelState);
+
+			var suspicionLevels = await GetSuspicionLevelsAsync(parameters.TaskId).ConfigureAwait(false);
+			if (suspicionLevels == null)
+				return Ok(new ErrorResponse("Not enough statistics for defining suspicion levels"));
+
+			var result = new GetSuspicionLevelsResponse { SuspicionLevels = suspicionLevels };
+			return Json(result);
+		}
+
+		[HttpPost(Api.Urls.SetSuspicionLevels)]
+		public async Task<ActionResult<IActionResult>> SetSuspicionLevelsAsync(SetSuspicionLevelsParameters parameters)
+		{
+			if (!ModelState.IsValid)
+				return BadRequest(ModelState);
+
+			await manualSuspicionLevelsRepo.SetManualSuspicionLevelsAsync(new ManualSuspicionLevels
+			{
+				TaskId = parameters.TaskId,
+				FaintSuspicion = parameters.FaintSuspicion,
+				StrongSuspicion = parameters.StrongSuspicion,
+				Timestamp = DateTime.Now
+			});
+
+			var suspicionLevels = await GetSuspicionLevelsAsync(parameters.TaskId);
+			if (suspicionLevels == null)
+				return Ok(new ErrorResponse("Not enough statistics for defining suspicion levels"));
+
+			var result = new GetSuspicionLevelsResponse { SuspicionLevels = suspicionLevels };
 			return Json(result);
 		}
 	}

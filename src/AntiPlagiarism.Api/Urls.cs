@@ -8,5 +8,7 @@
 		public const string RebuildSnippetsForTask = "rebuild_snippets_for_task";
 		public const string RecalculateTaskStatistics = "recalculate_task_statistics";
 		public const string GetMostSimilarSubmissions = "get_most_similar_submissions";
+		public const string GetSuspicionLevels = "get_suspicion_levels";
+		public const string SetSuspicionLevels = "set_suspicion_levels";
 	}
 }

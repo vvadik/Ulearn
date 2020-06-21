@@ -123,5 +123,17 @@ namespace AntiPlagiarism.Api.Models.Results
 
 		[DataMember(Name = "strong_suspicion")]
 		public double StrongSuspicion { get; set; }
+
+		[DataMember(Name = "automatic_faint_suspicion")]
+		public double? AutomaticFaintSuspicion { get; set; }
+
+		[DataMember(Name = "automatic_strong_suspicion")]
+		public double? AutomaticStrongSuspicion { get; set; }
+
+		[DataMember(Name = "manual_faint_suspicion")]
+		public double? ManualFaintSuspicion { get; set; }
+
+		[DataMember(Name = "manual_strong_suspicion")]
+		public double? ManualStrongSuspicion { get; set; }
 	}
 }

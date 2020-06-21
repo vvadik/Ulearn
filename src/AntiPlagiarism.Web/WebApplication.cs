@@ -56,6 +56,7 @@ namespace AntiPlagiarism.Web
 			services.AddScoped<ITasksRepo, TasksRepo>();
 			services.AddScoped<IWorkQueueRepo, WorkQueueRepo>();
 			services.AddScoped<IMostSimilarSubmissionsRepo, MostSimilarSubmissionsRepo>();
+			services.AddScoped<IManualSuspicionLevelsRepo, ManualSuspicionLevelsRepo>();
 
 			/* Other services */
 			services.AddScoped<PlagiarismDetector>();

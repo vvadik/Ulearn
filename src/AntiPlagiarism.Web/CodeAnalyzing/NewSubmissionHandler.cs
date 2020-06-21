@@ -118,7 +118,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 				logger.Information($"Новые статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId}: Mean={statisticsParameters.Mean}, Deviation={statisticsParameters.Deviation}");
 				statisticsParameters.TaskId = taskId;
 				statisticsParameters.SubmissionsCount = currentSubmissionsCount;
-				statisticsParameters.Timestamp = DateTime.UtcNow;
+				statisticsParameters.Timestamp = DateTime.Now;
 
 				await tasksRepo.SaveTaskStatisticsParametersAsync(statisticsParameters, taskStatisticsSourceData).ConfigureAwait(false);
 

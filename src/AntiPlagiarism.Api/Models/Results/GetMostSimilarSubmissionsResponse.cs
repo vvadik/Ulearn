@@ -9,9 +9,6 @@ namespace AntiPlagiarism.Api.Models.Results
 	{
 		[DataMember(Name = "most_similar_submissions")]
 		public List<MostSimilarSubmissions> MostSimilarSubmissions { get; set; }
-
-		[DataMember(Name = "suspicion_levels")]
-		public SuspicionLevels SuspicionLevels { get; set; }
 	}
 
 	[DataContract]
