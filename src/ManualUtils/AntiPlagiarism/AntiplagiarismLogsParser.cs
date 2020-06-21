@@ -36,7 +36,7 @@ namespace ManualUtils.AntiPlagiarism
 
 	public static class AntiplagiarismLogsParser
 	{
-		public static IEnumerable<string> GetWeightsOfSubmisisonPairs(IEnumerable<string> lines)
+		public static IEnumerable<BestPairWeight> GetWeightsOfSubmissionPairs(IEnumerable<string> lines)
 		{
 			var submission2WithMaxWeight = new Dictionary<int, (int, double)>();
 			var weightsRegex = new Regex(@"Link weight between submisions (\d+) and (\d+) is ([0-9.]+)\.", RegexOptions.Compiled);
@@ -48,6 +48,7 @@ namespace ManualUtils.AntiPlagiarism
 					var submission = int.Parse(weightsMatch.Groups[1].Value);
 					var otherSubmission = int.Parse(weightsMatch.Groups[2].Value);
 					var weight = double.Parse(weightsMatch.Groups[3].Value, CultureInfo.InvariantCulture);
+					submission2WithMaxWeight[submission] = (otherSubmission, weight);
 					if (!submission2WithMaxWeight.ContainsKey(submission))
 						submission2WithMaxWeight[submission] = (otherSubmission, weight);
 					else
@@ -58,8 +59,7 @@ namespace ManualUtils.AntiPlagiarism
 					}
 				}
 			}
-			var result = submission2WithMaxWeight.Select(kvp => new BestPairWeight { Submission = kvp.Key, Other = kvp.Value.Item1, Weight = kvp.Value.Item2 });
-			return result.Select(JsonConvert.SerializeObject);
+			return submission2WithMaxWeight.Select(kvp => new BestPairWeight { Submission = kvp.Key, Other = kvp.Value.Item1, Weight = kvp.Value.Item2 });
 		}
 
 		public static IEnumerable<string> GetWeightsForStatistics(UlearnDb db, IEnumerable<string> lines)
