@@ -538,25 +538,25 @@
 }
 
 .legacy-page .reset-btn {
-	width: 25%;
+	flex-grow: 1;
 	white-space: inherit;
 	word-break: break-all;
 }
 
 .legacy-page .hints-btn {
-	width: 25%;
+	flex-grow: 1;
 	white-space: inherit;
 	word-break: break-all;
 }
 
 .legacy-page .giveup-btn {
-	width: 25%;
+	flex-grow: 1;
 	white-space: inherit;
 	word-break: break-all;
 }
 
 .legacy-page .run-solution-button {
-	width: 25%;
+	flex-grow: 1;
 	white-space: inherit;
 	word-break: break-all;
 }
