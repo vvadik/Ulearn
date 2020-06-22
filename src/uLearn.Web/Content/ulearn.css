@@ -539,24 +539,26 @@
 
 .legacy-page .reset-btn {
 	width: 25%;
-	margin-left: 0 !important;
-	float: right !important;
+	white-space: inherit;
+	word-break: break-all;
 }
 
 .legacy-page .hints-btn {
 	width: 25%;
-	margin-left: 0 !important;
+	white-space: inherit;
+	word-break: break-all;
 }
 
 .legacy-page .giveup-btn {
 	width: 25%;
-	margin-left: 0 !important;
+	white-space: inherit;
+	word-break: break-all;
 }
 
 .legacy-page .run-solution-button {
 	width: 25%;
-	margin-bottom: 10px;
-	margin-left: 0 !important;
+	white-space: inherit;
+	word-break: break-all;
 }
 
 .legacy-page .exercise-controls_button-long {
@@ -570,7 +572,8 @@
 
 
 .legacy-page .ctrl-group {
-	margin-left: 0 !important;
+	display: flex;
+	margin-bottom: 10px;
 }
 
 .legacy-page .full-width {
