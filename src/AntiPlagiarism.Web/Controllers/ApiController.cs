@@ -11,6 +11,7 @@ using AntiPlagiarism.Web.Database;
 using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Database.Repos;
 using AntiPlagiarism.Web.Extensions;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -63,7 +64,7 @@ namespace AntiPlagiarism.Web.Controllers
 		}
 
 		[HttpPost(Api.Urls.AddSubmission)]
-		public async Task<ActionResult<AddSubmissionResponse>> AddSubmission(AddSubmissionParameters parameters)
+		public async Task<ActionResult<AddSubmissionResponse>> AddSubmission([FromQuery]string token, AddSubmissionParameters parameters)
 		{
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
@@ -171,8 +172,6 @@ namespace AntiPlagiarism.Web.Controllers
 				return NotFound(new ErrorResponse("Invalid submission id"));
 
 			var suspicionLevels = await GetSuspicionLevelsAsync(submission.TaskId).ConfigureAwait(false);
-			if (suspicionLevels == null)
-				return Ok(new ErrorResponse("Not enough statistics for defining suspicion levels"));
 
 			var result = new GetSubmissionPlagiarismsResponse
 			{
@@ -197,8 +196,6 @@ namespace AntiPlagiarism.Web.Controllers
 				return BadRequest(new ErrorResponse($"Invalid last_submissions_count. This value should be at least 1 and at most {maxLastSubmissionsCount}"));
 
 			var suspicionLevels = await GetSuspicionLevelsAsync(parameters.TaskId).ConfigureAwait(false);
-			if (suspicionLevels == null)
-				return Ok(new ErrorResponse("Not enough statistics for defining suspicion levels"));
 
 			var submissions = await submissionsRepo.GetSubmissionsByAuthorAndTaskAsync(client.Id, parameters.AuthorId, parameters.TaskId, parameters.LastSubmissionsCount).ConfigureAwait(false);
 			var result = new GetAuthorPlagiarismsResponse
@@ -237,16 +234,14 @@ namespace AntiPlagiarism.Web.Controllers
 				}).ToList();
 		}
 
+		[ItemNotNull]
 		private async Task<SuspicionLevels> GetSuspicionLevelsAsync(Guid taskId)
 		{
 			var taskStatisticsParameters = await tasksRepo.FindTaskStatisticsParametersAsync(taskId).ConfigureAwait(false);
 			var manualSuspicionLevels = await manualSuspicionLevelsRepo.GetManualSuspicionLevelsAsync(taskId);
-			if (taskStatisticsParameters == null
-				&& (manualSuspicionLevels == null || manualSuspicionLevels.FaintSuspicion == null || manualSuspicionLevels.StrongSuspicion == null))
-				return null;
 
-			double? automaticFaintSuspicion = null;
-			double? automaticStrongSuspicion = null;
+			var automaticFaintSuspicion = configuration.AntiPlagiarism.StatisticsAnalyzing.MaxFaintSuspicionLevel;
+			var automaticStrongSuspicion = configuration.AntiPlagiarism.StatisticsAnalyzing.MaxStrongSuspicionLevel;
 			if (taskStatisticsParameters != null)
 				(automaticFaintSuspicion, automaticStrongSuspicion) = GetAutomaticSuspicionLevels(taskStatisticsParameters);
 
@@ -254,10 +249,10 @@ namespace AntiPlagiarism.Web.Controllers
 			{
 				AutomaticFaintSuspicion = automaticFaintSuspicion,
 				AutomaticStrongSuspicion = automaticStrongSuspicion,
-				ManualFaintSuspicion = manualSuspicionLevels.FaintSuspicion,
-				ManualStrongSuspicion = manualSuspicionLevels.StrongSuspicion,
-				FaintSuspicion = manualSuspicionLevels.FaintSuspicion ?? automaticFaintSuspicion.Value,
-				StrongSuspicion = manualSuspicionLevels.StrongSuspicion ?? automaticStrongSuspicion.Value,
+				ManualFaintSuspicion = manualSuspicionLevels?.FaintSuspicion,
+				ManualStrongSuspicion = manualSuspicionLevels?.StrongSuspicion,
+				FaintSuspicion = manualSuspicionLevels?.FaintSuspicion ?? automaticFaintSuspicion,
+				StrongSuspicion = manualSuspicionLevels?.StrongSuspicion ?? automaticStrongSuspicion,
 			};
 		}
 
@@ -310,15 +305,13 @@ namespace AntiPlagiarism.Web.Controllers
 				return BadRequest(ModelState);
 
 			var suspicionLevels = await GetSuspicionLevelsAsync(parameters.TaskId).ConfigureAwait(false);
-			if (suspicionLevels == null)
-				return Ok(new ErrorResponse("Not enough statistics for defining suspicion levels"));
 
 			var result = new GetSuspicionLevelsResponse { SuspicionLevels = suspicionLevels };
 			return Json(result);
 		}
 
 		[HttpPost(Api.Urls.SetSuspicionLevels)]
-		public async Task<ActionResult<IActionResult>> SetSuspicionLevelsAsync(SetSuspicionLevelsParameters parameters)
+		public async Task<IActionResult> SetSuspicionLevelsAsync([FromQuery] SetSuspicionLevelsParameters parameters)
 		{
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
@@ -332,8 +325,6 @@ namespace AntiPlagiarism.Web.Controllers
 			});
 
 			var suspicionLevels = await GetSuspicionLevelsAsync(parameters.TaskId);
-			if (suspicionLevels == null)
-				return Ok(new ErrorResponse("Not enough statistics for defining suspicion levels"));
 
 			var result = new GetSuspicionLevelsResponse { SuspicionLevels = suspicionLevels };
 			return Json(result);

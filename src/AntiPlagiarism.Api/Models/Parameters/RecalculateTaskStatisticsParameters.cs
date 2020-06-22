@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
-using Ulearn.Common.Api.Models.Parameters;
 
 namespace AntiPlagiarism.Api.Models.Parameters
 {

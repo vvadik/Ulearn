@@ -20,7 +20,7 @@ namespace AntiPlagiarism.Api.Models.Results
 		[DataMember(Name = "similar_submission_id")]
 		public string SimilarSubmissionId { get; set; }
 
-		[DataMember(Name = "similar_submission_id")]
+		[DataMember(Name = "weight")]
 		public double Weight  { get; set; }
 	}
 }
