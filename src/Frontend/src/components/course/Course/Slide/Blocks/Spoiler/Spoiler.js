@@ -28,24 +28,37 @@ class Spoiler extends React.Component {
 	}
 
 	render = () => {
-		const { text, blocks } = this.props;
-		const { contentVisible } = this.state;
+		const { text, blocks, isHidden, isPreviousBlockHidden, } = this.props;
+		const { contentVisible, } = this.state;
 
 		if(contentVisible) {
 			return this.getBlocksWithStyles(blocks);
 		}
 
 		return (
-			<BlocksWrapper withoutTopPaddings>
+			<BlocksWrapper
+				withoutTopPaddings
+				isBlock={ isPreviousBlockHidden !== undefined }
+				isHidden={ isHidden }
+				hideEyeHint={ isHidden && isPreviousBlockHidden }
+			>
 				<Button use="success" onClick={ this.showContent }>{ text }</Button>
 			</BlocksWrapper>
 		);
 	}
 
 	getBlocksWithStyles = (blocks) => {
+		const { isPreviousBlockHidden, isHidden, } = this.props;
+
 		return blocks.map((block, i) => {
 			if(i === 0 && block.type === BlocksWrapper) {
-				return <BlocksWrapper withoutTopPaddings key={ block.key } { ...block.props }/>;
+				return <BlocksWrapper
+					{ ...block.props }
+					hideEyeHint={ isHidden && isPreviousBlockHidden }
+					isBlock={ isPreviousBlockHidden !== undefined }
+					withoutTopPaddings
+					key={ block.key }
+				/>;
 			}
 			return block;
 		});
@@ -57,6 +70,8 @@ Spoiler.propTypes = {
 	text: PropTypes.string.isRequired,
 	blocks: PropTypes.arrayOf(PropTypes.object).isRequired,
 	blocksId: PropTypes.string.isRequired,
+	isPreviousBlockHidden: PropTypes.bool,
+	isHidden: PropTypes.bool,
 };
 
 export default Spoiler;

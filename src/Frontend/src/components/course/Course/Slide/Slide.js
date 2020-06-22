@@ -31,7 +31,7 @@ const mapTypeToBlock = {
 
 const fullSizeBlockTypes = {
 	[blockTypes.video]: true,
-	[blockTypes.spoiler]:true,
+	[blockTypes.spoiler]: true,
 };
 
 class Slide extends React.Component {
@@ -59,6 +59,7 @@ class Slide extends React.Component {
 		if(!slideBlocks) {
 			return (<CourseLoader/>);
 		}
+
 		return this.renderSlideBlocks(JSON.parse(JSON.stringify(slideBlocks)));
 	}
 
@@ -77,7 +78,7 @@ class Slide extends React.Component {
 			return (
 				<BlocksWrapper isContainer={ fullSizeBlocksPack }
 							   key={ i }
-							   isBLock={ blocksPacks.length !== 1 }
+							   isBlock={ blocksPacks.length !== 1 }
 							   isHidden={ hide }>
 					{ blocks.map(this.mapBlockToComponent) }
 				</BlocksWrapper>
@@ -103,7 +104,12 @@ class Slide extends React.Component {
 		}
 
 		for (const spoiler of slideBlocks.filter(b => b.type === blockTypes.spoiler)) {
-			spoiler.blocksId = this.props.slideId; // make spoiler close content if changed slide
+			const index = slideBlocks.findIndex(b => b === spoiler);
+			spoiler.blocksId = this.props.slideId; // make spoiler close content on slide change
+			spoiler.isHidden = spoiler.hide;
+			if(index !== 0) {
+				spoiler.isPreviousBlockHidden = slideBlocks[index - 1].hide;
+			}
 			spoiler.blocks = this.renderSlideBlocks(JSON.parse(JSON.stringify(spoiler.blocks))); // prerender content
 		}
 	}
@@ -124,7 +130,6 @@ class Slide extends React.Component {
 				blocks.push(otherBlock);
 			} else break;
 		}
-
 		return blocksPack;
 	}
 
