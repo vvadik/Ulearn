@@ -22,7 +22,7 @@
   }
 }
 
-:global {
+:global { //overriding styles in imageGallery
   :local(.wrapper) {
     .image-gallery-bullets .image-gallery-bullets-container .image-gallery-bullet {
       box-shadow: 0 0 4px 0 #1a1a1a;
@@ -31,6 +31,10 @@
         background: @powerBlue;
         transform: scale(1.1);
       }
+    }
+
+    .image-gallery-fullscreen-button:focus {
+      outline: none;
     }
   }
 }
