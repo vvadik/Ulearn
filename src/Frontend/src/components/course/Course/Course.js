@@ -25,6 +25,8 @@ import styles from "./Course.less"
 const slideNavigationButtonTitles = {
 	next: "Далее",
 	previous: "Назад",
+	nextModule: "Следующий модуль",
+	previousModule: "Предыдущий модуль",
 }
 
 
@@ -147,7 +149,8 @@ class Course extends Component {
 				<h1 className={ styles.title }>
 					{ slideTitle }
 					{ slideInfo.gitEditLink &&
-					<a className={ styles.gitEditLink } rel='noopener noreferrer' target='_blank' href={ slideInfo.gitEditLink }>
+					<a className={ styles.gitEditLink } rel='noopener noreferrer' target='_blank'
+					   href={ slideInfo.gitEditLink }>
 						<Edit/>
 					</a> }
 				</h1> }
@@ -173,9 +176,12 @@ class Course extends Component {
 
 	renderNavigationButtons(slideInfo) {
 		const { courseId, } = this.props;
-		const { previous, next } = slideInfo;
+		const { previous, next, current, } = slideInfo;
 		const prevSlideHref = previous ? constructPathToSlide(courseId, previous.slug) : null;
 		const nextSlideHref = next ? constructPathToSlide(courseId, next.slug) : null;
+
+		const previousButtonText = current.firstInModule ? slideNavigationButtonTitles.previousModule : slideNavigationButtonTitles.previous;
+		const nextButtonText = current.lastInModule ? slideNavigationButtonTitles.nextModule : slideNavigationButtonTitles.next;
 
 		return (
 			<div className={ styles.navigationButtonsWrapper }>
@@ -183,10 +189,10 @@ class Course extends Component {
 					prevSlideHref
 						? <Link className={ classnames(styles.slideButton, styles.previousSlideButton) }
 								to={ this.constructPathWithAutoplay(prevSlideHref) }>
-							{ slideNavigationButtonTitles.previous }
+							{ previousButtonText }
 						</Link>
 						: <div className={ classnames(styles.slideButton, styles.disabledSlideButton) }>
-							{ slideNavigationButtonTitles.previous }
+							{ previousButtonText }
 						</div>
 				}
 				{
@@ -194,10 +200,10 @@ class Course extends Component {
 						?
 						<Link className={ classnames(styles.slideButton, styles.nextSlideButton) }
 							  to={ this.constructPathWithAutoplay(nextSlideHref) }>
-							{ slideNavigationButtonTitles.next }
+							{ nextButtonText }
 						</Link>
 						: <div className={ classnames(styles.slideButton, styles.disabledSlideButton) }>
-							{ slideNavigationButtonTitles.next }
+							{ nextButtonText }
 						</div>
 				}
 			</div>
@@ -414,6 +420,7 @@ class Course extends Component {
 						prevSlide = slides[j - 1];
 					} else if(i > 0) {
 						const prevSlides = units[i - 1].slides;
+						slide.firstInModule = true;
 						prevSlide = prevSlides[prevSlides.length - 1];
 					}
 
@@ -421,6 +428,7 @@ class Course extends Component {
 						nextSlide = slides[j + 1];
 					} else if(i < units.length - 1) {
 						const nextSlides = units[i + 1].slides;
+						slide.lastInModule = true;
 						nextSlide = nextSlides[0];
 					}
 
