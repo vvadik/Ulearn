@@ -148,7 +148,7 @@ class Course extends Component {
 				{ isNavMenuVisible && slideTitle &&
 				<h1 className={ styles.title }>
 					{ slideTitle }
-					{ slideInfo.gitEditLink &&
+					{ slideInfo && slideInfo.gitEditLink &&
 					<a className={ styles.gitEditLink } rel='noopener noreferrer' target='_blank'
 					   href={ slideInfo.gitEditLink }>
 						<Edit/>
