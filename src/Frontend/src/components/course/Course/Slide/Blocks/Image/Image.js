@@ -29,8 +29,9 @@ class Image extends React.Component {
 			: { opacity: 0, height: 0, }; //prevent showing extended img
 
 		return (
-			<div className={ classNames(styles.wrapper, className) } style={ wrapperStyle }>
+			<div className={ classNames(styles.wrapper, className) } style={ wrapperStyle } onClick={ this.onClick }>
 				<ImageGallery
+					ref={ (ref) => this.gallery = ref }
 					onImageLoad={ this.onImageLoad }
 					additionalClass={ classNames(styles.imageWrapper, { [styles.open]: fullscreen }) }
 					useBrowserFullscreen={ false }
@@ -67,6 +68,12 @@ class Image extends React.Component {
 		this.setState({
 			fullscreen: isFullScreen,
 		})
+	}
+
+	onClick = (e) => {
+		if(this.gallery.imageGallery.current === e.target && this.state.fullscreen) { //if root component clicked (in fullscreen its background)
+			this.gallery.exitFullScreen();
+		}
 	}
 }
 
