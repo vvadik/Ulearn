@@ -95,6 +95,7 @@ class Image extends React.Component {
 				this.setState({
 					maxWidth: img.naturalWidth,
 					maxHeight: img.naturalHeight,
+					showFullscreenButton: false,
 				});
 			} else {
 				this.setState({
