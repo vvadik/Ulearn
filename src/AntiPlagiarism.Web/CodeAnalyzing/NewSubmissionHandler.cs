@@ -114,14 +114,15 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 				var lastSubmissions = await localSubmissionsRepo.GetLastSubmissionsByAuthorsForTaskAsync(clientId, taskId, lastAuthorsIds).ConfigureAwait(false);
 				var currentSubmissionsCount = await localSubmissionsRepo.GetSubmissionsCountAsync(clientId, taskId).ConfigureAwait(false);
 
-				var (weights, statisticsParameters) = await statisticsParametersFinder.FindStatisticsParametersAsync(lastSubmissions).ConfigureAwait(false);
+				var (taskStatisticsSourceData, statisticsParameters) = await statisticsParametersFinder.FindStatisticsParametersAsync(lastSubmissions).ConfigureAwait(false);
 				logger.Information($"Новые статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId}: Mean={statisticsParameters.Mean}, Deviation={statisticsParameters.Deviation}");
 				statisticsParameters.TaskId = taskId;
 				statisticsParameters.SubmissionsCount = currentSubmissionsCount;
+				statisticsParameters.Timestamp = DateTime.UtcNow;
 
-				await tasksRepo.SaveTaskStatisticsParametersAsync(statisticsParameters).ConfigureAwait(false);
+				await tasksRepo.SaveTaskStatisticsParametersAsync(statisticsParameters, taskStatisticsSourceData).ConfigureAwait(false);
 
-				return weights;
+				return taskStatisticsSourceData.Select(d => d.Weight).ToList();
 			}
 		}
 	}

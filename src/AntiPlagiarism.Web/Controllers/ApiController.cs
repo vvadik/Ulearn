@@ -246,7 +246,7 @@ namespace AntiPlagiarism.Web.Controllers
 			var maxStrongSuspicionLevel = configuration.AntiPlagiarism.StatisticsAnalyzing.MaxStrongSuspicionLevel;
 
 			var (faintSuspicion, strongSuspicion)
-				= StatisticsParametersFinder.GetSuspicionLevels(taskStatisticsParameters.Mean, taskStatisticsParameters.Deviation, faintSuspicionCoefficient, strongSuspicionCoefficient);
+				= StatisticsParametersFinder.GetSuspicionLevels(taskStatisticsParameters.Mean, taskStatisticsParameters.Deviation, faintSuspicionCoefficient, strongSuspicionCoefficient, logger);
 
 			return new SuspicionLevels
 			{
@@ -254,10 +254,6 @@ namespace AntiPlagiarism.Web.Controllers
 				StrongSuspicion = GetSuspicionLevelWithThreshold(strongSuspicion, minStrongSuspicionLevel, maxStrongSuspicionLevel),
 			};
 		}
-
-
-
-
 
 		private static double GetSuspicionLevelWithThreshold(double value, double minValue, double maxValue)
 		{

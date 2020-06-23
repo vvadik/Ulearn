@@ -8,6 +8,7 @@ using AntiPlagiarism.Web.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Z.EntityFramework.Plus;
 
 namespace AntiPlagiarism.Web.Database.Repos
 {
@@ -15,7 +16,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 	{
 		Task<List<Guid>> GetTaskIds();
 		Task<TaskStatisticsParameters> FindTaskStatisticsParametersAsync(Guid taskId);
-		Task SaveTaskStatisticsParametersAsync(TaskStatisticsParameters parameters);
+		Task SaveTaskStatisticsParametersAsync(TaskStatisticsParameters parameters, List<TaskStatisticsSourceData> sourceData);
 	}
 
 	public class TasksRepo : ITasksRepo
@@ -38,12 +39,12 @@ namespace AntiPlagiarism.Web.Database.Repos
 		}
 
 		/* It's very important that SaveTaskStatisticsParametersAsync() works with disabled EF's Change Tracker */
-		public Task SaveTaskStatisticsParametersAsync(TaskStatisticsParameters parameters)
+		public Task SaveTaskStatisticsParametersAsync(TaskStatisticsParameters parameters, List<TaskStatisticsSourceData> sourceData)
 		{
 			return FuncUtils.TrySeveralTimesAsync(
 				async () =>
 				{
-					await TrySaveTaskStatisticsParametersAsync(parameters).ConfigureAwait(false);
+					await TrySaveTaskStatisticsParametersAsync(parameters, sourceData).ConfigureAwait(false);
 					return true;
 				},
 				3,
@@ -52,11 +53,15 @@ namespace AntiPlagiarism.Web.Database.Repos
 			);
 		}
 
-		private async Task TrySaveTaskStatisticsParametersAsync(TaskStatisticsParameters parameters)
+		private async Task TrySaveTaskStatisticsParametersAsync(TaskStatisticsParameters parameters, List<TaskStatisticsSourceData> sourceData)
 		{
 			using (var ts = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromSeconds(30), TransactionScopeAsyncFlowOption.Enabled))
 			{
+				await db.TaskStatisticsSourceData
+					.Where(d => d.Submission1.TaskId == parameters.TaskId)
+					.DeleteAsync();
 				db.AddOrUpdate(parameters, p => p.TaskId == parameters.TaskId);
+				db.TaskStatisticsSourceData.AddRange(sourceData);
 				await db.SaveChangesAsync().ConfigureAwait(false);
 				ts.Complete();
 			}

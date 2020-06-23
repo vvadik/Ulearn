@@ -17,7 +17,7 @@ namespace ManualUtils.AntiPlagiarism
 	{
 		public static void FillClientSubmissionId(AntiPlagiarismDb adb)
 		{
-			var ids = adb.Submissions.Select(s => s.Id).ToList();
+			var ids = adb.Submissions.Where(s => s.ClientSubmissionId == null).Select(s => s.Id).ToList();
 			adb.DisableAutoDetectChanges();
 			foreach (var id in ids)
 			{
@@ -42,6 +42,7 @@ namespace ManualUtils.AntiPlagiarism
 					Console.WriteLine(id);
 				}
 			}
+			adb.SaveChanges();
 			adb.EnableAutoDetectChanges();
 		}
 	}
