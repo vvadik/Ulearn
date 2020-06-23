@@ -20,18 +20,21 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 	{
 		private readonly ISnippetsRepo snippetsRepo;
 		private readonly ISubmissionsRepo submissionsRepo;
+		private readonly IMostSimilarSubmissionsRepo mostSimilarSubmissionsRepo;
 		private readonly CodeUnitsExtractor codeUnitsExtractor;
 		private readonly ILogger logger;
 		private readonly AntiPlagiarismConfiguration configuration;
 
 		public PlagiarismDetector(
 			ISnippetsRepo snippetsRepo, ISubmissionsRepo submissionsRepo,
+			IMostSimilarSubmissionsRepo mostSimilarSubmissionsRepo,
 			CodeUnitsExtractor codeUnitsExtractor,
 			ILogger logger,
 			IOptions<AntiPlagiarismConfiguration> options)
 		{
 			this.snippetsRepo = snippetsRepo;
 			this.submissionsRepo = submissionsRepo;
+			this.mostSimilarSubmissionsRepo = mostSimilarSubmissionsRepo;
 			this.codeUnitsExtractor = codeUnitsExtractor;
 			this.logger = logger;
 			configuration = options.Value;
@@ -191,6 +194,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 
 			var allSnippetTypes = GetAllSnippetTypes();
 			var thisSubmissionLength = submission.TokensCount;
+			MostSimilarSubmission mostSimilarSubmission = null;
 			foreach (var plagiarismSubmission in plagiarismSubmissions)
 			{
 				var unionLength = 0;
@@ -210,6 +214,14 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 				/* Normalize weight */
 				weight /= allSnippetTypes.Count;
 
+				if (mostSimilarSubmission == null || mostSimilarSubmission.Weight < weight)
+					mostSimilarSubmission = new MostSimilarSubmission
+					{
+						Weight = weight,
+						SubmissionId = submission.Id,
+						SimilarSubmissionId = plagiarismSubmission.Id,
+						Timestamp = DateTime.UtcNow
+					};
 				logger.Information($"Link weight between submisions {submission.Id} and {plagiarismSubmission.Id} is {weight}. Union length is {unionLength}.");
 
 				if (weight < suspicionLevels.FaintSuspicion)
@@ -217,6 +229,9 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 
 				plagiarisms.Add(BuildPlagiarismInfo(plagiarismSubmission, weight, matchedSnippets[plagiarismSubmission.Id]));
 			}
+
+			if(mostSimilarSubmission != null)
+				await mostSimilarSubmissionsRepo.SaveMostSimilarSubmissionAsync(mostSimilarSubmission).ConfigureAwait(false);
 
 			return plagiarisms;
 		}

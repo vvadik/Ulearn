@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using AntiPlagiarism.Web.Database;
+using AntiPlagiarism.Web.Database.Models;
 using Database;
 using ManualUtils.AntiPlagiarism;
 using Microsoft.EntityFrameworkCore;
@@ -24,12 +25,45 @@ namespace ManualUtils
 				.UseSqlServer(configuration.Database);
 			var adb = new AntiPlagiarismDb(aOptionsBuilder.Options);
 
+			GetMostSimilarSubmission(adb);
 			//ParsePairWeightsFromLogs();
 			//GetBlackAndWhiteLabels(db, adb);
 			//ParseTaskWeightsFromLogs();
 			//CampusRegistration();
 			//GetIps();
-			FillAntiplagFields.FillClientSubmissionId(adb);
+			//FillAntiplagFields.FillClientSubmissionId(adb);
+		}
+		
+		private static void GetMostSimilarSubmission(AntiPlagiarismDb adb)
+		{
+			//var lines = File.ReadLines("pairweights.txt");
+			//var jsons = AntiplagiarismLogsParser.GetWeightsOfSubmissionPairs(lines).Select(JsonConvert.SerializeObject);
+			//File.WriteAllLines("result.txt", jsons);
+			var bestPairWeight = File.ReadLines("result.txt").Select(JsonConvert.DeserializeObject<BestPairWeight>);
+			var now = DateTime.UtcNow;
+			var mostSimilarSubmissions = bestPairWeight.Select(s => new MostSimilarSubmission
+			{
+				SubmissionId = s.Submission,
+				SimilarSubmissionId = s.Other,
+				Weight = s.Weight,
+				Timestamp = now
+			}).ToList();
+
+			var exist = adb.MostSimilarSubmissions.Select(s => s.SubmissionId).ToList().ToHashSet();
+			var i = 0;
+			foreach (var mostSimilarSubmission in mostSimilarSubmissions)
+			{
+				if(exist.Contains(mostSimilarSubmission.SubmissionId))
+					continue;
+				adb.MostSimilarSubmissions.Add(mostSimilarSubmission);
+				if (i % 1000 == 0)
+				{
+					adb.SaveChanges();
+					Console.WriteLine(i);
+				}
+				i++;
+			}
+			adb.SaveChanges();
 		}
 
 		private static void GetBlackAndWhiteLabels(UlearnDb db, AntiPlagiarismDb adb)
@@ -43,7 +77,7 @@ namespace ManualUtils
 		private static void ParsePairWeightsFromLogs()
 		{
 			var lines = File.ReadLines("pairweights.txt");
-			var jsons = AntiplagiarismLogsParser.GetWeightsOfSubmisisonPairs(lines);
+			var jsons = AntiplagiarismLogsParser.GetWeightsOfSubmissionPairs(lines).Select(JsonConvert.SerializeObject);
 			File.WriteAllLines("result.txt", jsons);
 		}
 

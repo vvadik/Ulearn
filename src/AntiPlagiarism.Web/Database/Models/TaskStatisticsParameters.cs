@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using JetBrains.Annotations;
 
 namespace AntiPlagiarism.Web.Database.Models
 {
@@ -14,5 +15,7 @@ namespace AntiPlagiarism.Web.Database.Models
 		public double Deviation { get; set; }
 
 		public int SubmissionsCount { get; set; }
+
+		public DateTime? Timestamp { get; set; }
 	}
 }
