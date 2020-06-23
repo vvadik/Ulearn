@@ -1074,6 +1074,14 @@ body.lti-component {
 	border: 1px solid #bbb;
 }
 
+@media(max-width:800px){
+	.legacy-page .quiz-block-matching .quiz-block-matching__fixed-item,
+	.legacy-page .quiz-block-matching .quiz-block-matching__movable-item {
+		font-size: 12px;
+		word-break: break-word;
+	}
+}
+
 .legacy-page .quiz-block-matching .quiz-block-matching__movable-item {
 	z-index: 2;
 	border-color: #58b;
