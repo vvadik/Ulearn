@@ -91,7 +91,7 @@ class Video extends React.Component {
 
 		return (
 			<BlocksWrapper
-				withoutBottomPaddigns
+				withoutBottomPaddigns={!isHidden}
 				isHidden={ isHidden }
 				isBlock
 				hideEyeHint
