@@ -88,7 +88,7 @@ class Video extends React.Component {
 	renderAnnotation = () => {
 		const { showedAnnotation } = this.state;
 		const { annotation, googleDocLink, isHidden, } = this.props;
-		const titleClassName = showedAnnotation ? styles.opened : styles.closed;
+
 		return (
 			<BlocksWrapper
 				withoutBottomPaddigns
@@ -99,43 +99,7 @@ class Video extends React.Component {
 				<Text>
 					{
 						annotation
-							? <React.Fragment>
-								<h3 className={ classNames(styles.annotationTitle, titleClassName) }>
-									<Link onClick={ this.toggleAnnotation }>
-										Содержание видео
-										<span className={ styles.annotationArrow }>
-											{ showedAnnotation
-												? <ArrowChevronUp/>
-												: <ArrowChevronDown/> }
-										</span>
-									</Link>
-								</h3>
-								{ showedAnnotation &&
-								<React.Fragment>
-									<p>{ annotation.text }</p>
-									{ annotation.fragments.map(({ text, offset }) => {
-										const [hours, minutes, seconds] = offset.split(':');
-										const [hoursAsInt, minutesAsInt, secondsAsInt] = [hours, minutes, seconds].map(t => Number.parseInt(t));
-										const timeInSeconds = hoursAsInt * 60 * 60 + minutesAsInt * 60 + secondsAsInt;
-										return (
-											<p key={ offset }>
-												<Link onClick={ () => this.setVideoTime(timeInSeconds) }>
-													{ hoursAsInt > 0 && `${ hours }:` }
-													{ `${ minutes }:` }
-													{ seconds }
-												</Link>
-												{ ` — ${ text }` }
-											</p>
-										)
-									})
-									}
-									<p>
-										Ошибка в содержании? <Link target="_blank" href={ googleDocLink }>Предложите
-										исправление!</Link>
-									</p>
-								</React.Fragment>
-								}
-							</React.Fragment>
+							? this.renderAnnotationContent(showedAnnotation, annotation, googleDocLink)
 							: <p>
 								Помогите написать <Link target="_blank" href={ googleDocLink }>текстовое
 								содержание</Link> этого видео.
@@ -143,6 +107,50 @@ class Video extends React.Component {
 					}
 				</Text>
 			</BlocksWrapper>
+		);
+	}
+
+	renderAnnotationContent = (showedAnnotation, annotation, googleDocLink) => {
+		const titleClassName = showedAnnotation ? styles.opened : styles.closed;
+
+		return (
+			<React.Fragment>
+				<h3 className={ classNames(styles.annotationTitle, titleClassName) }>
+					<Link onClick={ this.toggleAnnotation }>
+						Содержание видео
+						<span className={ styles.annotationArrow }>
+											{ showedAnnotation
+												? <ArrowChevronUp/>
+												: <ArrowChevronDown/> }
+										</span>
+					</Link>
+				</h3>
+				{ showedAnnotation &&
+				<React.Fragment>
+					<p>{ annotation.text }</p>
+					{ annotation.fragments.map(({ text, offset }) => {
+						const [hours, minutes, seconds] = offset.split(':');
+						const [hoursAsInt, minutesAsInt, secondsAsInt] = [hours, minutes, seconds].map(t => Number.parseInt(t));
+						const timeInSeconds = hoursAsInt * 60 * 60 + minutesAsInt * 60 + secondsAsInt;
+						return (
+							<p key={ offset }>
+								<Link onClick={ () => this.setVideoTime(timeInSeconds) }>
+									{ hoursAsInt > 0 && `${ hours }:` }
+									{ `${ minutes }:` }
+									{ seconds }
+								</Link>
+								{ ` — ${ text }` }
+							</p>
+						)
+					})
+					}
+					<p>
+						Ошибка в содержании? <Link target="_blank" href={ googleDocLink }>Предложите
+						исправление!</Link>
+					</p>
+				</React.Fragment>
+				}
+			</React.Fragment>
 		);
 	}
 
