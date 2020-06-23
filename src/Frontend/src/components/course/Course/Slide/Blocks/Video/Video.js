@@ -37,7 +37,7 @@ class Video extends React.Component {
 	}
 
 	render() {
-		const { videoId, className, containerClassName, autoplay, googleDocLink, } = this.props;
+		const { videoId, className, containerClassName, autoplay, googleDocLink, isHidden, } = this.props;
 
 		const containerClassNames = classNames(styles.videoContainer, { [containerClassName]: containerClassName });
 		const frameClassNames = classNames(styles.frame, { [className]: className });
@@ -52,6 +52,11 @@ class Video extends React.Component {
 
 		return (
 			<React.Fragment>
+				{ isHidden && <BlocksWrapper isHidden isBlock>
+					<Text>
+						<p>Видео ниже скрыто</p>
+					</Text>
+				</BlocksWrapper> }
 				<YouTube
 					containerClassName={ containerClassNames }
 					className={ frameClassNames }
@@ -82,10 +87,15 @@ class Video extends React.Component {
 
 	renderAnnotation = () => {
 		const { showedAnnotation } = this.state;
-		const { annotation, googleDocLink, } = this.props;
+		const { annotation, googleDocLink, isHidden, } = this.props;
 		const titleClassName = showedAnnotation ? styles.opened : styles.closed;
 		return (
-			<BlocksWrapper withoutBottomPaddigns>
+			<BlocksWrapper
+				withoutBottomPaddigns
+				isHidden={ isHidden }
+				isBlock
+				hideEyeHint
+				className={ styles.withoutBottomMargins }>
 				<Text>
 					{
 						annotation
@@ -119,14 +129,14 @@ class Video extends React.Component {
 										)
 									})
 									}
-									<p className={ styles.withoutMargins }>
+									<p>
 										Ошибка в содержании? <Link target="_blank" href={ googleDocLink }>Предложите
 										исправление!</Link>
 									</p>
 								</React.Fragment>
 								}
 							</React.Fragment>
-							: <p className={ styles.withoutMargins }>
+							: <p>
 								Помогите написать <Link target="_blank" href={ googleDocLink }>текстовое
 								содержание</Link> этого видео.
 							</p>

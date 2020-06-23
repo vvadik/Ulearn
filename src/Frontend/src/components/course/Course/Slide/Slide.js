@@ -99,6 +99,10 @@ class Slide extends React.Component {
 			firstVideoBlock.openAnnotation = true; // only video on slide => open annotation
 		}
 
+		for (const video of videoBlocks) {
+			video.isHidden = video.hide;
+		}
+
 		for (const texBlock of slideBlocks.filter(b => b.type === blockTypes.tex)) {
 			texBlock.content = this.getContentFromTexLines(texBlock);
 		}
