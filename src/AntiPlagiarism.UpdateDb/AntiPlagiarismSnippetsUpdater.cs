@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using AntiPlagiarism.Web.CodeAnalyzing;
 using AntiPlagiarism.Web.CodeAnalyzing.CSharp;
+using AntiPlagiarism.Web.Configuration;
 using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Database.Repos;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace AntiPlagiarism.UpdateDb
@@ -16,17 +18,20 @@ namespace AntiPlagiarism.UpdateDb
 		private readonly SubmissionSnippetsExtractor submissionSnippetsExtractor;
 		private readonly CodeUnitsExtractor codeUnitsExtractor;
 		private readonly IServiceScopeFactory serviceScopeFactory;
+		private readonly AntiPlagiarismConfiguration configuration;
 		private readonly ILogger logger;
 
 		public AntiPlagiarismSnippetsUpdater(
 			SubmissionSnippetsExtractor submissionSnippetsExtractor,
 			CodeUnitsExtractor codeUnitsExtractor,
 			IServiceScopeFactory serviceScopeFactory,
+			IOptions<AntiPlagiarismConfiguration> configuration,
 			ILogger logger)
 		{
 			this.submissionSnippetsExtractor = submissionSnippetsExtractor;
 			this.codeUnitsExtractor = codeUnitsExtractor;
 			this.serviceScopeFactory = serviceScopeFactory;
+			this.configuration = configuration.Value;
 			this.logger = logger;
 		}
 
@@ -96,7 +101,7 @@ namespace AntiPlagiarism.UpdateDb
 					logger.Information($"Информация о сниппете #{foundSnippet.Id} в решении #{submission.Id} не найдена, добавляю");
 					try
 					{
-						await snippetsRepo.AddSnippetOccurenceAsync(submission, foundSnippet, firstTokenIndex);
+						await snippetsRepo.AddSnippetOccurenceAsync(submission, foundSnippet, firstTokenIndex, configuration.AntiPlagiarism.SubmissionInfluenceLimitInMonths);
 					}
 					catch (Exception e)
 					{

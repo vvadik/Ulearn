@@ -3,6 +3,7 @@ using AntiPlagiarism.Web.CodeAnalyzing.CSharp;
 using AntiPlagiarism.Web.Configuration;
 using AntiPlagiarism.Web.Database;
 using AntiPlagiarism.Web.Database.Repos;
+using AntiPlagiarism.Web.Workers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -19,12 +20,14 @@ namespace AntiPlagiarism.Web
 	public class WebApplication : BaseApiWebApplication
 	{
 		private AddNewSubmissionWorker addNewSubmissionWorker; // держит ссылку на воркеры
+		private UpdateOldSubmissionsFromStatisticsWorker updateOldSubmissionsFromStatisticsWorker; // держит ссылку на воркеры
 		
 		protected override IApplicationBuilder ConfigureWebApplication(IApplicationBuilder app)
 		{
 			var database = app.ApplicationServices.GetService<AntiPlagiarismDb>();
 			database.MigrateToLatestVersion();
 			addNewSubmissionWorker = app.ApplicationServices.GetService<AddNewSubmissionWorker>();
+			updateOldSubmissionsFromStatisticsWorker = app.ApplicationServices.GetService<UpdateOldSubmissionsFromStatisticsWorker>();
 			return app;
 		}
 
@@ -66,6 +69,7 @@ namespace AntiPlagiarism.Web
 			services.AddScoped<SubmissionSnippetsExtractor>();
 			services.AddScoped<NewSubmissionHandler>();
 			services.AddSingleton<AddNewSubmissionWorker>();
+			services.AddSingleton<UpdateOldSubmissionsFromStatisticsWorker>();
 		}
 	}
 }

@@ -176,7 +176,7 @@ namespace AntiPlagiarism.Web.Controllers
 			var result = new GetSubmissionPlagiarismsResponse
 			{
 				SubmissionInfo = submission.GetSubmissionInfoForApi(),
-				Plagiarisms = await plagiarismDetector.GetPlagiarismsAsync(submission, suspicionLevels).ConfigureAwait(false),
+				Plagiarisms = await plagiarismDetector.GetPlagiarismsAsync(submission, suspicionLevels, configuration.AntiPlagiarism.SubmissionInfluenceLimitInMonths).ConfigureAwait(false),
 				TokensPositions = plagiarismDetector.GetNeededTokensPositions(submission.ProgramText),
 				SuspicionLevels = suspicionLevels,
 				AnalyzedCodeUnits = GetAnalyzedCodeUnits(submission),
@@ -212,7 +212,7 @@ namespace AntiPlagiarism.Web.Controllers
 					result.ResearchedSubmissions.Add(new ResearchedSubmission
 					{
 						SubmissionInfo = submission.GetSubmissionInfoForApi(),
-						Plagiarisms = await internalPlagiarismDetector.GetPlagiarismsAsync(submission, suspicionLevels).ConfigureAwait(false),
+						Plagiarisms = await internalPlagiarismDetector.GetPlagiarismsAsync(submission, suspicionLevels, configuration.AntiPlagiarism.SubmissionInfluenceLimitInMonths).ConfigureAwait(false),
 						TokensPositions = internalPlagiarismDetector.GetNeededTokensPositions(submission.ProgramText),
 						AnalyzedCodeUnits = GetAnalyzedCodeUnits(submission),
 					});

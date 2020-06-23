@@ -99,5 +99,6 @@ namespace AntiPlagiarism.Web.Database
 		public DbSet<TaskStatisticsSourceData> TaskStatisticsSourceData { get; set; }
 		public DbSet<MostSimilarSubmission> MostSimilarSubmissions { get; set; }
 		public DbSet<ManualSuspicionLevels> ManualSuspicionLevels { get; set; }
+		public DbSet<OldSubmissionsInfluenceBorder> OldSubmissionsInfluenceBorder { get; set; }
 	}
 }

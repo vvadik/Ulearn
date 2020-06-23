@@ -1,4 +1,5 @@
-﻿using Ulearn.Core.Configuration;
+﻿using System;
+using Ulearn.Core.Configuration;
 
 namespace AntiPlagiarism.Web.Configuration
 {
@@ -11,6 +12,9 @@ namespace AntiPlagiarism.Web.Configuration
 	{
 		/// Длина сниппета в токенах
 		public int SnippetTokensCount { get; set; }
+
+		/// Срок влияния посылки
+		public int SubmissionInfluenceLimitInMonths { get; set; }
 
 		/// При большей длине в символах не используем код для плагиата
 		public int MaxCodeLength { get; set; }
@@ -81,10 +85,17 @@ namespace AntiPlagiarism.Web.Configuration
 	public class ActionsConfiguration
 	{
 		public GetAuthorPlagiarismsConfiguration GetAuthorPlagiarisms { get; set; }
+
+		public UpdateOldSubmissionsFromStatisticsWorkerConfiguration UpdateOldSubmissionsFromStatistics { get; set; }
 	}
 
 	public class GetAuthorPlagiarismsConfiguration
 	{
 		public int MaxLastSubmissionsCount { get; set; }
+	}
+
+	public class UpdateOldSubmissionsFromStatisticsWorkerConfiguration
+	{
+		public DateTime? StartTime { get; set; }
 	}
 }

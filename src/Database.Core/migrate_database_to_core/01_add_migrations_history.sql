@@ -68,4 +68,5 @@ VALUES
 ('20200402091551_AddIndexToNotificationDeliveryByTransportAndCreateTimeIncludeNotificationId', '3.1.2'),
 ('20200609062559_AddClientSubmissionId', '3.1.2'),
 ('20200620120449_AddMostSimilarSubmissionsAndTaskStatisticsSourceData', '3.1.2'),
-('20200621163805_AddManualSuspicionLevels', '3.1.2')
+('20200621163805_AddManualSuspicionLevels', '3.1.2'),
+('20200623125306_AddOldSubmissionsInfluenceBorder', '3.1.2')
