@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
+using AntiPlagiarism.Api.Models.Results;
 using AntiPlagiarism.Web.Database.Models;
+using Microsoft.EntityFrameworkCore;
 using Ulearn.Common.Extensions;
 
 namespace AntiPlagiarism.Web.Database.Repos
@@ -9,6 +13,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 	public interface IMostSimilarSubmissionsRepo
 	{
 		Task SaveMostSimilarSubmissionAsync(MostSimilarSubmission mostSimilarSubmission);
+		Task<List<MostSimilarSubmissions>> GetMostSimilarSubmissionsByTaskAsync(int clientId, Guid taskId);
 	}
 
 	public class MostSimilarSubmissionsRepo : IMostSimilarSubmissionsRepo
@@ -28,6 +33,19 @@ namespace AntiPlagiarism.Web.Database.Repos
 				await db.SaveChangesAsync().ConfigureAwait(false);
 				ts.Complete();
 			}
+		}
+
+		public async Task<List<MostSimilarSubmissions>> GetMostSimilarSubmissionsByTaskAsync(int clientId, Guid taskId)
+		{
+			return await db.MostSimilarSubmissions
+				.Where(s => s.Submission.ClientId == clientId && s.Submission.TaskId == taskId)
+				.Select(s => new MostSimilarSubmissions
+				{
+					SubmissionId = s.Submission.ClientSubmissionId,
+					SimilarSubmissionId = s.SimilarSubmission.ClientSubmissionId,
+					Weight = s.Weight
+				})
+				.ToListAsync();
 		}
 	}
 }

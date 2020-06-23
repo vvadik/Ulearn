@@ -18,7 +18,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 		Task<List<Submission>> GetSubmissionsByAuthorAndTaskAsync(int clientId, Guid authorId, Guid taskId, int count);
 		Task<List<Guid>> GetLastAuthorsByTaskAsync(int clientId, Guid taskId, int count);
 		Task<List<Submission>> GetLastSubmissionsByAuthorsForTaskAsync(int clientId, Guid taskId, IEnumerable<Guid> authorsIds);
-		Task<int> GetAuthorsCountAsync(int clientId, Guid taskId);
+		Task<int> GetAuthorsCountAsync(int clientId, Guid taskId, int submissionInfluenceLimitInMonths);
 		Task<List<Submission>> GetSubmissionsByTaskAsync(int clientId, Guid taskId);
 		Task<int> GetSubmissionsCountAsync(int clientId, Guid taskId);
 	}
@@ -118,9 +118,12 @@ namespace AntiPlagiarism.Web.Database.Repos
 				.ToListAsync();
 		}
 
-		public Task<int> GetAuthorsCountAsync(int clientId, Guid taskId)
+		public Task<int> GetAuthorsCountAsync(int clientId, Guid taskId, int submissionInfluenceLimitInMonths)
 		{
-			return db.Submissions.Where(s => s.ClientId == clientId && s.TaskId == taskId).Select(s => s.AuthorId).Distinct().CountAsync();
+			var useSubmissionsFromDate = DateTime.Now.AddMonths(-submissionInfluenceLimitInMonths);
+			return db.Submissions
+				.Where(s => s.ClientId == clientId && s.TaskId == taskId && s.AddingTime > useSubmissionsFromDate)
+				.Select(s => s.AuthorId).Distinct().CountAsync();
 		}
 
 		public Task<List<Submission>> GetSubmissionsByTaskAsync(int clientId, Guid taskId)
