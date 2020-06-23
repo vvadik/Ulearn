@@ -1484,6 +1484,14 @@ body.lti-component {
 	border: 1px solid #ddd;
 }
 
+@media(max-width:800px){
+	.legacy-page .slide table > thead > tr > th,
+	.legacy-page .slide table > tbody > tr > td {
+		font-size: 12px;
+		padding: 2px;
+	}
+}
+
 .legacy-page .slide-image {
 	max-width: 100%;
 }
