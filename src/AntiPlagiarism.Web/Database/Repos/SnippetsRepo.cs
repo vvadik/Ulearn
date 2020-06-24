@@ -8,6 +8,7 @@ using AntiPlagiarism.Web.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Ulearn.Common;
 using Ulearn.Common.Extensions;
 
 namespace AntiPlagiarism.Web.Database.Repos
@@ -303,7 +304,9 @@ namespace AntiPlagiarism.Web.Database.Repos
 			{
 				var clientId = task.ClientId;
 				var taskId = task.TaskId;
-				await UpdateOldSnippetsStatisticsForTask(from, to, taskId, clientId, serviceScopeFactory, logger);
+				await FuncUtils.TrySeveralTimesAsync(
+					async () => await UpdateOldSnippetsStatisticsForTask(from, to, taskId, clientId, serviceScopeFactory, logger),
+					3);
 			}
 			logger.Information($"Updated snippets statistics for {tasks.Count} tasks from {from.ToSortable()} to {to.ToSortable()}");
 		}
