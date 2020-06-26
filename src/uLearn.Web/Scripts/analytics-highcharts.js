@@ -54,7 +54,7 @@ window.documentReadyFunctions.push(function () {
 			credits: {
 				enabled: false,
 			},
-		});		
+		});
 	}
 
 	showChartByDataFrom('#usersByCountVisitedSlides');

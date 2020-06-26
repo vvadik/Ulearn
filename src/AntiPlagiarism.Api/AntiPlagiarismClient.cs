@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using AntiPlagiarism.Api.Models.Parameters;
 using AntiPlagiarism.Api.Models.Results;
+using Serilog;
 using Serilog.Core;
 using Ulearn.Common;
 using Ulearn.Common.Api;
@@ -17,7 +18,7 @@ namespace AntiPlagiarism.Api
 
 		private readonly string token;
 
-		public AntiPlagiarismClient(string endpointUrl, string token, Logger logger)
+		public AntiPlagiarismClient(string endpointUrl, string token, ILogger logger)
 			: base(logger, new ApiClientSettings(endpointUrl)
 			{
 				ServiceName = "ulearn.antiplagiarism-web",
@@ -70,7 +71,7 @@ namespace AntiPlagiarism.Api
 		{
 			return MakeRequestAsync<GetMostSimilarSubmissionsParameters, GetMostSimilarSubmissionsResponse>(HttpMethod.Get, Urls.GetMostSimilarSubmissions, parameters);
 		}
-		
+
 		public Task<GetSuspicionLevelsResponse> GetSuspicionLevelsAsync(GetSuspicionLevelsParameters parameters)
 		{
 			return MakeRequestAsync<GetSuspicionLevelsParameters, GetSuspicionLevelsResponse>(HttpMethod.Get, Urls.GetSuspicionLevels, parameters);

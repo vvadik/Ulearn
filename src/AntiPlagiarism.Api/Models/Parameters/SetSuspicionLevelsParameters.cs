@@ -1,19 +1,22 @@
 ﻿using System;
+using System.Runtime.Serialization;
+using AntiPlagiarism.Api.ModelBinders;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Ulearn.Common.Api.Models.Parameters;
 
 namespace AntiPlagiarism.Api.Models.Parameters
 {
-	public class SetSuspicionLevelsParameters : AntiPlagiarismApiParameters
+	[DataContract]
+	[ModelBinder(typeof(JsonModelBinder), Name = "parameters")]
+	public class SetSuspicionLevelsParameters : ApiParameters
 	{
-		[BindRequired]
-		[FromQuery(Name = "task_id")]
+		[DataMember(Name = "task_id", IsRequired = true)]
 		public Guid TaskId { get; set; }
 
-		[FromQuery(Name = "faint_suspicion")]
+		[DataMember(Name = "faint_suspicion")]
 		public double? FaintSuspicion { get; set; }
 
-		[FromQuery(Name = "strong_suspicion")]
+		[DataMember(Name = "strong_suspicion")]
 		public double? StrongSuspicion { get; set; }
 	}
 }

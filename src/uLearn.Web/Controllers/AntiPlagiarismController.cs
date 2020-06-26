@@ -6,15 +6,14 @@ using System.Runtime.Serialization;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using System.Web.Configuration;
 using System.Web.Mvc;
 using AntiPlagiarism.Api;
 using AntiPlagiarism.Api.Models.Parameters;
 using AntiPlagiarism.Api.Models.Results;
 using Database;
 using Database.DataContexts;
+using Database.Extensions;
 using Database.Models;
-using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Serilog;
@@ -118,6 +117,9 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 
 			var antiPlagiarismsResult = await GetAuthorPlagiarismsAsync(submission);
+			var mostSimilarSubmissionsHistogramData = await GetMostSimilarSubmissionsHistogramData(submission.SlideId, 100);
+			//var mostSimilarSubmissionsHistogramData = GetMostSimilarSubmissionsHistogramDataMock(100);
+			var suspicionLevelsResponse = await antiPlagiarismClient.GetSuspicionLevelsAsync(new GetSuspicionLevelsParameters { TaskId = submission.SlideId });
 
 			var antiPlagiarismSubmissionInfos = antiPlagiarismsResult.ResearchedSubmissions.Select(s => s.SubmissionInfo);
 			var plagiarismsSubmissionInfos = antiPlagiarismsResult.ResearchedSubmissions
@@ -137,6 +139,7 @@ namespace uLearn.Web.Controllers
 			/* Use special MockUserCanSeeAllGroups() instead of User because we want to show all users groups, not only available */
 			var usersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, new MockUserCanSeeAllGroups()).ToDefaultDictionary();
 			var usersArchivedGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, new MockUserCanSeeAllGroups(), onlyArchived: true).ToDefaultDictionary();
+			var isCourseOrSysAdmin = User.HasAccessFor(courseId, CourseRole.CourseAdmin);
 
 			var course = courseManager.FindCourse(courseId);
 			var slide = course?.FindSlideById(submission.SlideId);
@@ -149,6 +152,10 @@ namespace uLearn.Web.Controllers
 				UsersGroups = usersGroups,
 				UsersArchivedGroups = usersArchivedGroups,
 				AntiPlagiarismResponse = antiPlagiarismsResult,
+				MostSimilarSubmissionsHistogramData = mostSimilarSubmissionsHistogramData,
+				CanEditSuspicionLevels = isCourseOrSysAdmin,
+				SuspicionLevels = suspicionLevelsResponse.SuspicionLevels,
+				MaxAuthorSubmissionWeight = antiPlagiarismsResult.ResearchedSubmissions.Select(s => s.Plagiarisms.Select(p => p.Weight).DefaultIfEmpty(0).Max()).Max()
 			};
 			return View(details);
 		}
@@ -210,6 +217,59 @@ namespace uLearn.Web.Controllers
 			return value;
 		}
 
+		private static async Task<MostSimilarSubmissionsHistogramData> GetMostSimilarSubmissionsHistogramData(Guid taskId, int binsCount)
+		{
+			var mostSimilarSubmissions = await antiPlagiarismClient.GetMostSimilarSubmissionsAsync(new GetMostSimilarSubmissionsParameters
+			{
+				TaskId = taskId
+			});
+			var bins = new List<MostSimilarSubmissionsBin>();
+			var step = 1.0 / binsCount;
+			for (var i = 0; i < binsCount; i += 1)
+			{
+				var left = step * i;
+				var right = left + step;
+				if (right > 1 - 0.00001)
+					right = 1.00001;
+				var count = mostSimilarSubmissions.MostSimilarSubmissions
+					.Count(s => s.Weight >= left && s.Weight < right);
+				var bin = new MostSimilarSubmissionsBin
+				{
+					BinRightBorder = (decimal)Math.Round(right, 2),
+					SubmissionsCount =  count
+				};
+				bins.Add(bin);
+			}
+			return new MostSimilarSubmissionsHistogramData
+			{
+				Bins = bins,
+			};
+		}
+
+		private static MostSimilarSubmissionsHistogramData GetMostSimilarSubmissionsHistogramDataMock(int binsCount)
+		{
+			var bins = new List<MostSimilarSubmissionsBin>();
+			var step = 1.0 / binsCount;
+			var random = new Random(12);
+			for (var i = 0; i < binsCount; i += 1)
+			{
+				var left = step * i;
+				var right = left + step;
+				if (right > 1 - 0.00001)
+					right = 1.00001;
+				var bin = new MostSimilarSubmissionsBin
+				{
+					BinRightBorder = (decimal)Math.Round(right, 2),
+					SubmissionsCount = random.Next(0, 10)
+				};
+				bins.Add(bin);
+			}
+			return new MostSimilarSubmissionsHistogramData
+			{
+				Bins = bins,
+			};
+		}
+
 		private static void RemoveOldValuesFromCache()
 		{
 			foreach (var key in plagiarismsCache.Keys.ToList())
@@ -260,6 +320,25 @@ namespace uLearn.Web.Controllers
 		public GetAuthorPlagiarismsResponse AntiPlagiarismResponse { get; set; }
 
 		public Dictionary<int, UserExerciseSubmission> Submissions { get; set; }
+
+		public MostSimilarSubmissionsHistogramData MostSimilarSubmissionsHistogramData { get; set; }
+
+		public bool CanEditSuspicionLevels { get; set; }
+
+		public SuspicionLevels SuspicionLevels { get; set; } // SuspicionLevels в AntiPlagiarismResponse кэшируются на несколько минут, а здесь актуальные
+
+		public double MaxAuthorSubmissionWeight { get; set; }
+	}
+
+	public class MostSimilarSubmissionsHistogramData
+	{
+		public List<MostSimilarSubmissionsBin> Bins { get; set; }
+	}
+
+	public class MostSimilarSubmissionsBin
+	{
+		public decimal BinRightBorder { get; set; }
+		public int SubmissionsCount { get; set; }
 	}
 
 	public class MockUserCanSeeAllGroups : IPrincipal

@@ -9,5 +9,8 @@ namespace AntiPlagiarism.Api
 		Task<AddSubmissionResponse> AddSubmissionAsync(AddSubmissionParameters parameters);
 		Task<GetSubmissionPlagiarismsResponse> GetSubmissionPlagiarismsAsync(GetSubmissionPlagiarismsParameters parameters);
 		Task<GetAuthorPlagiarismsResponse> GetAuthorPlagiarismsAsync(GetAuthorPlagiarismsParameters parameters);
+		Task<GetMostSimilarSubmissionsResponse> GetMostSimilarSubmissionsAsync(GetMostSimilarSubmissionsParameters parameters);
+		Task<GetSuspicionLevelsResponse> GetSuspicionLevelsAsync(GetSuspicionLevelsParameters parameters);
+		Task<GetSuspicionLevelsResponse> SetSuspicionLevelsAsync(SetSuspicionLevelsParameters parameters);
 	}
 }

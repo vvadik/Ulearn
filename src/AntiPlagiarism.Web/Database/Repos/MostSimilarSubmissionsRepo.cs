@@ -7,6 +7,7 @@ using AntiPlagiarism.Api.Models.Results;
 using AntiPlagiarism.Web.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Extensions;
 
 namespace AntiPlagiarism.Web.Database.Repos
 {
@@ -37,15 +38,29 @@ namespace AntiPlagiarism.Web.Database.Repos
 
 		public async Task<List<MostSimilarSubmissions>> GetMostSimilarSubmissionsByTaskAsync(int clientId, Guid taskId)
 		{
-			return await db.MostSimilarSubmissions
+			var resultsWithRepeatingAuthors = await db.MostSimilarSubmissions
 				.Where(s => s.Submission.ClientId == clientId && s.Submission.TaskId == taskId)
-				.Select(s => new MostSimilarSubmissions
+				.Select(s => new
 				{
 					SubmissionId = s.Submission.ClientSubmissionId,
 					SimilarSubmissionId = s.SimilarSubmission.ClientSubmissionId,
-					Weight = s.Weight
+					s.Weight,
+					s.Submission.AuthorId
 				})
 				.ToListAsync();
+
+			return resultsWithRepeatingAuthors
+				.GroupBy(t => t.AuthorId)
+				.Select(g =>
+				{
+					var max = g.MaxBy(s => s.Weight);
+					return new MostSimilarSubmissions
+					{
+						SubmissionId = max.SubmissionId,
+						SimilarSubmissionId = max.SimilarSubmissionId,
+						Weight = max.Weight
+					};
+				}).ToList();
 		}
 	}
 }

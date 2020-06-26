@@ -311,7 +311,7 @@ namespace AntiPlagiarism.Web.Controllers
 		}
 
 		[HttpPost(Api.Urls.SetSuspicionLevels)]
-		public async Task<IActionResult> SetSuspicionLevelsAsync([FromQuery] SetSuspicionLevelsParameters parameters)
+		public async Task<IActionResult> SetSuspicionLevelsAsync([FromQuery]string token, SetSuspicionLevelsParameters parameters)
 		{
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);

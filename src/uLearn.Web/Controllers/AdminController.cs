@@ -11,6 +11,8 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using AntiPlagiarism.Api;
+using AntiPlagiarism.Api.Models.Parameters;
 using ApprovalUtilities.Utilities;
 using Database;
 using Database.DataContexts;
@@ -57,6 +59,7 @@ namespace uLearn.Web.Controllers
 		private readonly CertificateGenerator certificateGenerator;
 		private readonly string gitSecret;
 		private readonly DirectoryInfo reposDirectory;
+		private readonly IAntiPlagiarismClient antiPlagiarismClient;
 		private readonly ILogger serilogLogger;
 
 		public AdminController()
@@ -81,6 +84,8 @@ namespace uLearn.Web.Controllers
 			serilogLogger = new LoggerConfiguration().WriteTo.Log4Net().CreateLogger();
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 			gitSecret = configuration.Git.Webhook.Secret;
+			var antiplagiarismClientConfiguration = ApplicationConfiguration.Read<UlearnConfiguration>().AntiplagiarismClient;
+			antiPlagiarismClient = new AntiPlagiarismClient(antiplagiarismClientConfiguration.Endpoint, antiplagiarismClientConfiguration.Token, serilogLogger);
 		}
 
 		public ActionResult Courses(string courseId = null, string courseTitle = null)
@@ -1480,6 +1485,48 @@ namespace uLearn.Web.Controllers
 			}
 
 			return Json(new { status = "ok" });
+		}
+
+		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
+		[HttpPost]
+		public async Task<ActionResult> SetSuspicionLevels(string courseId, Guid slideId, string faintSuspicion = null, string strongSuspicion = null)
+		{
+			var course = courseManager.GetCourse(courseId);
+			if (course.Slides.All(s => s.Id != slideId))
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden, "Course does not contain a slide");
+
+			if (!TryParseNullableDouble(faintSuspicion, out var faintSuspicionParsed)
+				|| !TryParseNullableDouble(strongSuspicion, out var strongSuspicionParsed))
+				return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "faintSuspicion or strongSuspicion not in double");
+
+			if (faintSuspicion != null && (faintSuspicionParsed < 0 || faintSuspicionParsed > 100)
+				|| strongSuspicion != null && (strongSuspicionParsed < 0 || strongSuspicionParsed > 100)
+				|| faintSuspicionParsed > strongSuspicionParsed)
+				return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "faintSuspicion < strongSuspicion and in [0, 100]");
+
+			await antiPlagiarismClient.SetSuspicionLevelsAsync(new SetSuspicionLevelsParameters
+			{
+				TaskId = slideId,
+				FaintSuspicion = faintSuspicionParsed / 100d,
+				StrongSuspicion = strongSuspicionParsed / 100d,
+			});
+			return Json(new { status = "ok" });
+		}
+
+		public static bool TryParseNullableDouble(string str, out double? result)
+		{
+			result = null;
+			if (string.IsNullOrWhiteSpace(str))
+				return true;
+			str = str.Replace(',', '.');
+			if (double.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture, out var d))
+			{
+				result = d;
+				return true;
+			}
+			return false;
 		}
 	}
 

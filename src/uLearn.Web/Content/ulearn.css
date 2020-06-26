@@ -1384,6 +1384,11 @@ body.lti-component {
 	margin-top: 20px;
 }
 
+.legacy-page #mostSimilarSubmissionsSpoilerButton {
+	display: block;
+	margin-top: 20px;
+}
+
 /* Loading spinner */
 .legacy-page .loading-spinner {
 	text-align: center;
