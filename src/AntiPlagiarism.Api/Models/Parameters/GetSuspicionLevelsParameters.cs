@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace AntiPlagiarism.Api.Models.Parameters
 {
-	public class RebuildSnippetsForTaskParameters : AntiPlagiarismApiParameters
+	public class GetSuspicionLevelsParameters : AntiPlagiarismApiParameters
 	{
 		[BindRequired]
 		[FromQuery(Name = "task_id")]

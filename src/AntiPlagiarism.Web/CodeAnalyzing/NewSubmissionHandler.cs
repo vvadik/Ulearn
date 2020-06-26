@@ -22,7 +22,6 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 		private readonly ISnippetsRepo snippetsRepo;
 		private readonly SubmissionSnippetsExtractor submissionSnippetsExtractor;
 		private readonly IServiceScopeFactory serviceScopeFactory;
-		private readonly StatisticsParametersFinder statisticsParametersFinder;
 		private readonly AntiPlagiarismConfiguration configuration;
 		private readonly ILogger logger;
 		
@@ -41,7 +40,6 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			this.workQueueRepo = workQueueRepo;
 			this.submissionSnippetsExtractor = submissionSnippetsExtractor;
 			this.serviceScopeFactory = serviceScopeFactory;
-			this.statisticsParametersFinder = statisticsParametersFinder;
 			this.configuration = configuration.Value;
 		}
 		
@@ -96,18 +94,18 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 		public async Task ExtractSnippetsFromSubmissionAsync(Submission submission)
 		{
 			foreach (var (firstTokenIndex, snippet) in submissionSnippetsExtractor.ExtractSnippetsFromSubmission(submission))
-				await snippetsRepo.AddSnippetOccurenceAsync(submission, snippet, firstTokenIndex).ConfigureAwait(false);
+				await snippetsRepo.AddSnippetOccurenceAsync(submission, snippet, firstTokenIndex, configuration.AntiPlagiarism.SubmissionInfluenceLimitInMonths).ConfigureAwait(false);
 		}
 
 		/// <returns>List of weights (numbers from [0, 1)) used for calculating mean and deviation for this task</returns>
 		public async Task<List<double>> CalculateTaskStatisticsParametersAsync(int clientId, Guid taskId)
 		{
-			/* Create local submissions repo for preventing memory leaks */
+			/* Create local repo for preventing memory leaks */
 			using (var scope = serviceScopeFactory.CreateScope())
 			{
-				db.DisableAutoDetectChanges();
-
 				var localSubmissionsRepo = scope.ServiceProvider.GetService<ISubmissionsRepo>();
+				var tasksRepo = scope.ServiceProvider.GetService<ITasksRepo>();
+				var statisticsParametersFinder = scope.ServiceProvider.GetService<StatisticsParametersFinder>();
 
 				logger.Information($"Пересчитываю статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId}");
 				var lastAuthorsIds = await localSubmissionsRepo.GetLastAuthorsByTaskAsync(clientId, taskId, configuration.AntiPlagiarism.StatisticsAnalyzing.CountOfLastAuthorsForCalculatingMeanAndDeviation).ConfigureAwait(false);
@@ -118,7 +116,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 				logger.Information($"Новые статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId}: Mean={statisticsParameters.Mean}, Deviation={statisticsParameters.Deviation}");
 				statisticsParameters.TaskId = taskId;
 				statisticsParameters.SubmissionsCount = currentSubmissionsCount;
-				statisticsParameters.Timestamp = DateTime.UtcNow;
+				statisticsParameters.Timestamp = DateTime.Now;
 
 				await tasksRepo.SaveTaskStatisticsParametersAsync(statisticsParameters, taskStatisticsSourceData).ConfigureAwait(false);
 

@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Serilog;
 
-namespace AntiPlagiarism.Web.Database
+namespace AntiPlagiarism.Web.Workers
 {
 	public class AddNewSubmissionWorker
 	{
@@ -38,12 +38,12 @@ namespace AntiPlagiarism.Web.Database
 				throw new ArgumentOutOfRangeException(nameof(threadsCount), "Number of threads (antiplagiarism:threadsCount) should be positive");
 			}
 
-			logger.Information($"Запускаю {threadsCount} потока(ов)");
+			logger.Information($"Запускаю AddNewSubmissionWorker в {threadsCount} потока(ов)");
 			for (var i = 0; i < threadsCount; i++)
 			{
 				threads.Add(new Thread(WorkerThread)
 				{
-					Name = $"Worker #{i}",
+					Name = $"AddNewSubmissionWorker #{i}",
 					IsBackground = true
 				});
 			}
