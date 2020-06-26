@@ -72,7 +72,7 @@ class Image extends React.Component {
 					additionalClass={ classNames(styles.imageWrapper, { [styles.open]: fullscreen }) }
 					useBrowserFullscreen={ false }
 					showBullets={ imageUrls.length !== 1 }
-					showFullscreenButton={ showFullscreenButton && !currentImage.error }
+					showFullscreenButton={ showFullscreenButton && (!currentImage.error || fullscreen) }
 					showPlayButton={ false }
 					showThumbnails={ false }
 					onScreenChange={ this.onScreenChange }
@@ -122,6 +122,7 @@ class Image extends React.Component {
 
 		if(maxHeight) {
 			img.style.height = this.height;
+			img.style.width = this.width;
 		}
 
 		this.addAttributeToImage(img, true);
@@ -158,9 +159,10 @@ class Image extends React.Component {
 
 	onBeforeSlide = (index) => {
 		const { images, } = this.state;
+		const currentImage = images[index];
 
 		this.setState({
-			currentImage: images[index],
+			currentImage,
 		});
 	}
 
