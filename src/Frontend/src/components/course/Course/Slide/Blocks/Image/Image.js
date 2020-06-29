@@ -53,6 +53,21 @@ class Image extends React.Component {
 		return images.filter(i => i.error).length;
 	}
 
+	setMaxWidth = (img) => {
+		if(img.width > img.naturalWidth) { //set all img width to real size of first img, if not bigger than slide width
+			this.setState({
+				maxWidth: img.naturalWidth,
+				maxHeight: img.naturalHeight,
+				showFullscreenButton: false,
+			});
+		} else {
+			this.setState({
+				maxWidth: img.width,
+				maxHeight: img.height,
+			});
+		}
+	}
+
 	render() {
 		const { imageUrls, className, } = this.props;
 		const { fullscreen, showFullscreenButton, currentImage, } = this.state;
@@ -92,18 +107,7 @@ class Image extends React.Component {
 		const { maxWidth, } = this.state;
 
 		if(!maxWidth) {
-			if(img.width > img.naturalWidth) { //set all img width to real size of first img, if not bigger than slide width
-				this.setState({
-					maxWidth: img.naturalWidth,
-					maxHeight: img.naturalHeight,
-					showFullscreenButton: false,
-				});
-			} else {
-				this.setState({
-					maxWidth: img.width,
-					maxHeight: img.height,
-				});
-			}
+			this.setMaxWidth(img);
 		}
 
 		this.addAttributeToImage(img);

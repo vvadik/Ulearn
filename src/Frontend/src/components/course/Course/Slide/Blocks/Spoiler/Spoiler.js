@@ -40,7 +40,7 @@ class Spoiler extends React.Component {
 				withoutTopPaddings
 				isBlock={ isPreviousBlockHidden !== undefined }
 				isHidden={ isHidden }
-				hideEyeHint={ isHidden && isPreviousBlockHidden }
+				eyeHintConfig={ { show: isHidden && !isPreviousBlockHidden, allowShrinkContent: true, } }
 			>
 				<Button use="success" onClick={ this.showContent }>{ text }</Button>
 			</BlocksWrapper>
@@ -54,7 +54,10 @@ class Spoiler extends React.Component {
 			if(i === 0 && block.type === BlocksWrapper) {
 				return <BlocksWrapper
 					{ ...block.props }
-					hideEyeHint={ isHidden && isPreviousBlockHidden }
+					eyeHintConfig={ {
+						show: isHidden && !isPreviousBlockHidden,
+						allowShrinkContent: block.props.eyeHintConfig.allowShrinkContent,
+					} }
 					isBlock={ isPreviousBlockHidden !== undefined }
 					withoutTopPaddings
 					key={ block.key }

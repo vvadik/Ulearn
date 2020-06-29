@@ -2,6 +2,7 @@ import React from "react";
 
 import { Video, CodeMirror, Text, Image, BlocksWrapper, Spoiler, } from "./Blocks";
 import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader";
+import blockTypes from "src/components/course/Course/Slide/blockTypes";
 
 import { loadSlide } from "src/actions/course";
 import { connect } from "react-redux";
@@ -10,15 +11,6 @@ import queryString from "query-string";
 import PropTypes from "prop-types";
 
 import styles from './Slide.less';
-
-const blockTypes = {
-	video: "youtube",
-	code: "code",
-	text: "html",
-	image: "imagegallery",
-	spoiler: "spoiler",
-	tex: 'tex',
-};
 
 const mapTypeToBlock = {
 	[blockTypes.video]: Video,
@@ -33,6 +25,11 @@ const fullSizeBlockTypes = {
 	[blockTypes.video]: true,
 	[blockTypes.spoiler]: true,
 };
+
+const fullWidthBlockTypes = {
+	[CodeMirror.name]: true,
+	[Image.name]: true,
+}
 
 class Slide extends React.Component {
 	componentDidMount() {
@@ -75,11 +72,17 @@ class Slide extends React.Component {
 		}
 
 		return blocksPacks.map(({ blocks, hide, fullSizeBlocksPack }, i) => {
+			const allowShrinkContent = !fullWidthBlockTypes[blocks[0].Block.name];
+
 			return (
 				<BlocksWrapper isContainer={ fullSizeBlocksPack }
 							   key={ i }
 							   isBlock={ blocksPacks.length !== 1 }
-							   isHidden={ hide }>
+							   isHidden={ hide }
+							   eyeHintConfig={ {
+								   show: !fullSizeBlocksPack,
+								   allowShrinkContent,
+							   } }>
 					{ blocks.map(this.mapBlockToComponent) }
 				</BlocksWrapper>
 			)

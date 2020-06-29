@@ -52,7 +52,7 @@ class Video extends React.Component {
 
 		return (
 			<React.Fragment>
-				{ isHidden && <BlocksWrapper isHidden isBlock>
+				{ !googleDocLink && isHidden && <BlocksWrapper isHidden isBlock>
 					<Text>
 						<p>Видео ниже скрыто</p>
 					</Text>
@@ -94,7 +94,7 @@ class Video extends React.Component {
 				withoutBottomPaddigns={ !isHidden }
 				isHidden={ isHidden }
 				isBlock
-				hideEyeHint
+				eyeHintConfig={ { show: false, allowShrinkContent: false, } }
 				className={ styles.withoutBottomMargins }>
 				<Text>
 					{

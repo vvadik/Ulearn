@@ -1,6 +1,8 @@
 @import "../../courseVariables";
 
 .wrapper {
+  position: relative;
+
   &:first-child {
     padding-top: 40px;
   }
@@ -13,11 +15,17 @@
 
 .eyeClosedWrapper {
   float: right;
-
   margin-left: 10px;
 
   font-size: 14px;
   color: @orange;
+
+  &.withoutShrink {
+    float: unset;
+    margin-left: 0;
+    position: absolute;
+    right: 4px;
+  }
 }
 
 .hiddenSlide {
@@ -127,6 +135,10 @@
 
   .eyeClosedWrapper {
     font-size: 20px;
+
+    &.withoutShrink {
+      right: calc((@laptopSlidePadding - 20px) / 2);
+    }
   }
 
   .withPaddings {
@@ -154,6 +166,10 @@
 
   .eyeClosedWrapper {
     font-size: 22px;
+
+    &.withoutShrink {
+      right: calc((@desktopSlidePadding - 22px) / 2);
+    }
   }
 
   .withPaddings {

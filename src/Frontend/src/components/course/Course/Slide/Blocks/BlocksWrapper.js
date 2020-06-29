@@ -23,7 +23,7 @@ class BlocksWrapper extends React.Component {
 	}
 
 	render() {
-		const { children, className, isBlock, isHidden, isContainer, score, withoutBottomPaddigns, withoutTopPaddings, hideEyeHint, } = this.props;
+		const { children, className, isBlock, isHidden, isContainer, score, withoutBottomPaddigns, withoutTopPaddings, eyeHintConfig: { show, }, } = this.props;
 		const { showed, showStudentsModalOpened, } = this.state;
 		const isHiddenBlock = isBlock && isHidden;
 		const isHiddenSlide = !isBlock && isHidden;
@@ -37,6 +37,7 @@ class BlocksWrapper extends React.Component {
 			{ [styles.showed]: showed },
 			className
 		);
+
 		return (
 			<React.Fragment>
 				{ score && score.maxScore > 0 && this.renderScoreHeader() }
@@ -45,9 +46,8 @@ class BlocksWrapper extends React.Component {
 					: <React.Fragment>
 						{ showStudentsModalOpened && this.renderModal() }
 						{ isHiddenSlide && this.renderHiddenSlideHeader() }
-						<div
-							className={ wrapperClassNames }>
-							{ !hideEyeHint && isHiddenBlock && this.renderEyeHint() }
+						<div className={ wrapperClassNames } ref={ (ref) => this.wrapper = ref }>
+							{ show && isHiddenBlock && this.renderEyeHint() }
 							{ children }
 						</div>
 					</React.Fragment>
@@ -56,8 +56,11 @@ class BlocksWrapper extends React.Component {
 	}
 
 	renderEyeHint = () => {
+		const { eyeHintConfig: { allowShrinkContent, }, } = this.props;
+		const wrapperClass = classNames(styles.eyeClosedWrapper, { [styles.withoutShrink]: !allowShrinkContent });
+
 		return (
-			<div className={ styles.eyeClosedWrapper }>
+			<div className={ wrapperClass }>
 				<Hint pos={ "top right" } text={ hiddenHintText }>
 					<EyeClosed/>
 				</Hint>
@@ -172,7 +175,17 @@ BlocksWrapper.propTypes = {
 	isHidden: PropTypes.bool,
 	isContainer: PropTypes.bool,
 	score: PropTypes.object,
-	hideEyeHint: PropTypes.bool,
+	eyeHintConfig: PropTypes.shape({
+		show: PropTypes.bool.isRequired,
+		allowShrinkContent: PropTypes.bool.isRequired,
+	}),
 }
+
+BlocksWrapper.defaultProps = {
+	eyeHintConfig: {
+		show: true,
+		allowShrinkContent: true,
+	}
+};
 
 export default BlocksWrapper;
