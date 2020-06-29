@@ -19,40 +19,10 @@ class Image extends React.Component {
 
 		this.state = {
 			fullscreen: false,
-			showFullscreenButton: true,
 			currentImage: images[0],
+			anyImageLoaded: false,
 			images,
-			maxWidth: null,
-			maxHeight: null,
 		}
-	}
-
-	get width() {
-		const { maxWidth } = this.state;
-
-		if(!maxWidth) {
-			return null;
-		}
-
-		if(typeof maxWidth === 'string') {
-			return maxWidth;
-		}
-
-		return maxWidth + 'px';
-	}
-
-	get height() {
-		const { maxHeight } = this.state;
-
-		if(!maxHeight) {
-			return null;
-		}
-
-		if(typeof maxHeight === 'string') {
-			return maxHeight;
-		}
-
-		return maxHeight + 'px';
 	}
 
 	get failedImagesCount() {
@@ -61,33 +31,19 @@ class Image extends React.Component {
 		return images.filter(i => i.error).length;
 	}
 
-	setMaxWidth = (img) => {
-		if(img.width > img.naturalWidth) { //set all img width to real size of first img, if not bigger than slide width
-			this.setState({
-				maxWidth: img.naturalWidth,
-				maxHeight: img.naturalHeight,
-				showFullscreenButton: false,
-			});
-		} else {
-			this.setState({
-				maxWidth: img.width,
-				maxHeight: img.height,
-			});
-		}
-	}
-
 	render() {
 		const { imageUrls, className, } = this.props;
-		const { fullscreen, showFullscreenButton, currentImage, } = this.state;
+		const { fullscreen, currentImage, anyImageLoaded, } = this.state;
 
-
-		const wrapperStyle = currentImage.img //first img loaded
-			? { width: this.width, height: this.height, }
-			: { opacity: 0, height: 0, }; //prevent showing extended img
-		const wrapperClass = classNames(styles.wrapper, { [styles.error]: currentImage.error }, { [styles.error]: this.failedImagesCount === imageUrls.length }, className);
+		const wrapperClass = classNames(
+			styles.wrapper,
+			{ [styles.error]: currentImage.error },
+			{ [styles.loading]: !anyImageLoaded },
+			className
+		);
 
 		return (
-			<div className={ wrapperClass } style={ wrapperStyle } onClick={ this.onClick }>
+			<div className={ wrapperClass } onClick={ this.onClick } ref={ (ref) => this.wrapper = ref }>
 				<ImageGallery
 					ref={ (ref) => this.gallery = ref }
 					onImageLoad={ this.onImageLoad }
@@ -96,7 +52,7 @@ class Image extends React.Component {
 					additionalClass={ classNames(styles.imageWrapper, { [styles.open]: fullscreen }) }
 					useBrowserFullscreen={ false }
 					showBullets={ imageUrls.length !== 1 }
-					showFullscreenButton={ showFullscreenButton && (!currentImage.error || fullscreen) }
+					showFullscreenButton={ this.shouldShowFullscreenButton(currentImage) || fullscreen }
 					showPlayButton={ false }
 					showThumbnails={ false }
 					onScreenChange={ this.onScreenChange }
@@ -111,11 +67,13 @@ class Image extends React.Component {
 	}
 
 	onImageLoad = (event) => {
+		const { anyImageLoaded, } = this.state;
 		const img = event.target;
-		const { maxWidth, } = this.state;
 
-		if(!maxWidth) {
-			this.setMaxWidth(img);
+		if(!anyImageLoaded) {
+			this.setState({
+				anyImageLoaded: true,
+			});
 		}
 
 		this.addAttributeToImage(img);
@@ -124,17 +82,11 @@ class Image extends React.Component {
 	onImageError = (event) => {
 		const img = event.target;
 		const { imageUrls, } = this.props;
-		const { maxHeight, } = this.state;
 
 		if(this.failedImagesCount === imageUrls.length - 1) {
 			this.setState({
-				showFullscreenButton: false,
+				anyImageLoaded: true,
 			});
-		}
-
-		if(maxHeight) {
-			img.style.height = this.height;
-			img.style.width = this.width;
 		}
 
 		this.addAttributeToImage(img, true);
@@ -142,25 +94,45 @@ class Image extends React.Component {
 
 	addAttributeToImage = (img, error) => {
 		const { imageUrls, } = this.props;
-		const { images, } = this.state;
+		const { images, anyImageLoaded, } = this.state;
 
 		const src = img.getAttribute("src");
 		const index = imageUrls.findIndex(url => url === src);
 		const newImages = [...images];
-		newImages[index].img = img;
 
-		if(error) {
-			newImages[index].error = true;
-			if(index === 0) {
-				this.setState({
-					currentImageError: true,
-				});
-			}
+		newImages[index].img = img;
+		newImages[index].error = error;
+
+		if(error && anyImageLoaded) {
+			const loadedImage = newImages.find(({ error }) => !error);
+			const aspectRatio = loadedImage.img.naturalHeight / loadedImage.img.naturalWidth;
+			const width = Math.min(loadedImage.img.naturalWidth, this.slideWidth);
+			const height = width * aspectRatio;
+
+			img.style.width = `${ width }px`;
+			img.style.height = `${ height }px`;
 		}
 
 		this.setState({
 			images: newImages,
 		})
+	}
+
+	get slideWidth() {
+		if(this.wrapper) {
+			const slideNode = this.wrapper.parentNode;
+			const slideStyle = getComputedStyle(slideNode);
+			return parseFloat(slideStyle.width) - parseFloat(slideStyle.paddingLeft) - parseFloat(slideStyle.paddingRight);
+		}
+		return undefined;
+	}
+
+	shouldShowFullscreenButton = ({ img, error, }) => {
+		if(this.wrapper && img) {
+			return !error && img.width >= this.slideWidth;
+		}
+
+		return false;
 	}
 
 	onScreenChange = (isFullScreen) => {

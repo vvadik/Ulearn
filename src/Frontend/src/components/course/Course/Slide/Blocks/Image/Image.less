@@ -2,14 +2,15 @@
 
 .wrapper {
   max-width: 100%;
-  width: 100%; // do not let image to be bigger then slide size
+  width: fit-content;
+  height: fit-content;
   margin-bottom: 10px;
   border-radius: 8px;
   overflow: hidden;
 
-  &.error {
-    width: fit-content;
-    height: fit-content;
+  &.loading {
+    opacity: 0;
+    height: 0;
   }
 }
 
@@ -45,6 +46,10 @@
 
     .image-gallery-fullscreen-button:focus {
       outline: none;
+    }
+
+    .image-gallery-icon.image-gallery-right-nav, .image-gallery-icon.image-gallery-left-nav {
+      outline-offset: -10px;
     }
   }
 }
