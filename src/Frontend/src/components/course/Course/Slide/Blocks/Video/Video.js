@@ -91,7 +91,7 @@ class Video extends React.Component {
 
 		return (
 			<BlocksWrapper
-				withoutBottomPaddigns={!isHidden}
+				withoutBottomPaddigns={ !isHidden }
 				isHidden={ isHidden }
 				isBlock
 				hideEyeHint
@@ -115,15 +115,13 @@ class Video extends React.Component {
 
 		return (
 			<React.Fragment>
-				<h3 className={ classNames(styles.annotationTitle, titleClassName) }>
-					<Link onClick={ this.toggleAnnotation }>
-						Содержание видео
-						<span className={ styles.annotationArrow }>
-											{ showedAnnotation
-												? <ArrowChevronUp/>
-												: <ArrowChevronDown/> }
-										</span>
-					</Link>
+				<h3 className={ classNames(styles.annotationTitle, titleClassName) } onClick={ this.toggleAnnotation }>
+					Содержание видео
+					<span className={ styles.annotationArrow }>
+						{ showedAnnotation
+							? <ArrowChevronUp/>
+							: <ArrowChevronDown/> }
+					</span>
 				</h3>
 				{ showedAnnotation &&
 				<React.Fragment>
