@@ -34,6 +34,10 @@ class Image extends React.Component {
 			return null;
 		}
 
+		if(typeof maxWidth === 'string') {
+			return maxWidth;
+		}
+
 		return maxWidth + 'px';
 	}
 
@@ -42,6 +46,10 @@ class Image extends React.Component {
 
 		if(!maxHeight) {
 			return null;
+		}
+
+		if(typeof maxHeight === 'string') {
+			return maxHeight;
 		}
 
 		return maxHeight + 'px';
@@ -74,9 +82,9 @@ class Image extends React.Component {
 
 
 		const wrapperStyle = currentImage.img //first img loaded
-			? { width: this.width, }
+			? { width: this.width, height: this.height, }
 			: { opacity: 0, height: 0, }; //prevent showing extended img
-		const wrapperClass = classNames(styles.wrapper, { [styles.error]: currentImage.error }, { [styles.error]: currentImage.error }, className);
+		const wrapperClass = classNames(styles.wrapper, { [styles.error]: currentImage.error }, { [styles.error]: this.failedImagesCount === imageUrls.length }, className);
 
 		return (
 			<div className={ wrapperClass } style={ wrapperStyle } onClick={ this.onClick }>
@@ -120,7 +128,6 @@ class Image extends React.Component {
 
 		if(this.failedImagesCount === imageUrls.length - 1) {
 			this.setState({
-				maxWidth: img.width,
 				showFullscreenButton: false,
 			});
 		}
