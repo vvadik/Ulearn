@@ -61,9 +61,10 @@ class Image extends React.Component {
 		const wrapperStyle = currentImage.img //first img loaded
 			? { width: this.width, }
 			: { opacity: 0, height: 0, }; //prevent showing extended img
+		const wrapperClass = classNames(styles.wrapper, { [styles.error]: currentImage.error }, { [styles.error]: currentImage.error }, className);
 
 		return (
-			<div className={ classNames(styles.wrapper, className) } style={ wrapperStyle } onClick={ this.onClick }>
+			<div className={ wrapperClass } style={ wrapperStyle } onClick={ this.onClick }>
 				<ImageGallery
 					ref={ (ref) => this.gallery = ref }
 					onImageLoad={ this.onImageLoad }
