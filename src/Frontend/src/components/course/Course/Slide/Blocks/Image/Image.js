@@ -34,10 +34,10 @@ class Image extends React.Component {
 	}
 
 	resizePictures = () => {
-		const { images, anyImageLoaded, } = this.state;
+		const { images, anyImageLoaded, fullscreen, } = this.state;
 
 		if(anyImageLoaded) {
-			this.setSizeForErroredImages(images);
+			this.setSizeForErroredImages(images, fullscreen);
 		}
 	}
 
@@ -133,8 +133,8 @@ class Image extends React.Component {
 
 		if(loadedImage) {
 			const aspectRatio = loadedImage.img.naturalHeight / loadedImage.img.naturalWidth;
-			const width = fullscreen ? loadedImage.img.naturalWidth : Math.min(loadedImage.img.naturalWidth, this.slideWidth);
-			const height = fullscreen ? loadedImage.img.naturalHeight : width * aspectRatio;
+			const width = Math.min(loadedImage.img.naturalWidth, fullscreen ? window.innerWidth : this.slideWidth);
+			const height = width * aspectRatio;
 
 			for (const { img } of images.filter(({ error }) => error)) {
 				img.style.width = `${ width }px`;
