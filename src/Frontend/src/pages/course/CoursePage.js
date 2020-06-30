@@ -16,7 +16,7 @@ const mapStateToProps = (state, { match }) => {
 	if(slideIdInQuery) {
 		const action = slideSlugOrAction;
 		slideId = slideIdInQuery;
-		isLti = action.toLowerCase() === "ltislide" || action.toLowerCase() === 'acceptedalert';
+		isLti = action.toLowerCase() === "ltislide" || action.toLowerCase() === 'acceptedalert' || params.isLti;
 	} else {
 		const slideSlug = slideSlugOrAction;
 		slideId = slideSlug.split('_').pop();

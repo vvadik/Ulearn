@@ -16,6 +16,7 @@ import rootReducer from "./redux/reducers";
 import api from "./api";
 import { ThemeContext, Toast } from "ui";
 import theme from "src/uiTheme";
+import queryString from "query-string";
 
 
 let loggerMiddleware = createLogger();
@@ -90,7 +91,8 @@ class InternalUlearnApp extends Component {
 
 	render() {
 		const pathname = window.location.pathname.toLowerCase();
-		const isLti = pathname.endsWith('/ltislide') || pathname.endsWith('/acceptedalert'); //TODO remove this flag,that hiding header and nav menu
+		const params = queryString.parse(window.location.search);
+		const isLti = pathname.endsWith('/ltislide') || pathname.endsWith('/acceptedalert') || params.isLti; //TODO remove this flag,that hiding header and nav menu
 		const isHeaderVisible = !isLti;
 
 		return (
