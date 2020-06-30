@@ -87,11 +87,11 @@ class Video extends React.Component {
 
 	renderAnnotation = () => {
 		const { showedAnnotation } = this.state;
-		const { annotation, googleDocLink, isHidden, } = this.props;
+		const { annotation, googleDocLink, isHidden, annotationWithoutBottomPaddigns } = this.props;
 
 		return (
 			<BlocksWrapper
-				withoutBottomPaddigns={ !isHidden }
+				withoutBottomPaddigns={ annotationWithoutBottomPaddigns }
 				isHidden={ isHidden }
 				isBlock
 				eyeHintConfig={ { show: false, allowShrinkContent: false, } }
@@ -168,6 +168,7 @@ Video.propTypes = {
 	annotation: PropTypes.object,
 	openAnnotation: PropTypes.bool,
 	googleDocLink: PropTypes.string,
+	annotationWithoutBottomPaddigns: PropTypes.bool,
 	videoId: PropTypes.string.isRequired,
 	className: PropTypes.string,
 	containerClassName: PropTypes.string,
