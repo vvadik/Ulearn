@@ -82,7 +82,7 @@ class Course extends Component {
 
 			const slideInfo = Course.getSlideInfoById(props.slideId, props.courseInfo);
 
-			if(slideInfo && props.progress) {
+			if(slideInfo && props.progress && !props.isHijacked) {
 				props.updateVisitedSlide(props.courseId, slideInfo.current.id);
 			}
 
