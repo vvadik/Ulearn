@@ -52,11 +52,6 @@ class Video extends React.Component {
 
 		return (
 			<React.Fragment>
-				{ !googleDocLink && isHidden && <BlocksWrapper isHidden isBlock>
-					<Text>
-						<p>Видео ниже скрыто</p>
-					</Text>
-				</BlocksWrapper> }
 				<YouTube
 					containerClassName={ containerClassNames }
 					className={ frameClassNames }
@@ -65,6 +60,11 @@ class Video extends React.Component {
 					onReady={ this.onReady }
 					onPlaybackRateChange={ this.onPlaybackRateChange }
 				/>
+				{ isHidden && <BlocksWrapper isHidden isBlock withoutBottomPaddigns={ googleDocLink } showEyeHint>
+					<Text className={ styles.withoutBottomMargins }>
+						<p>Видео выше скрыто</p>
+					</Text>
+				</BlocksWrapper> }
 				{ googleDocLink && this.renderAnnotation() }
 			</React.Fragment>
 		);
@@ -88,13 +88,12 @@ class Video extends React.Component {
 	renderAnnotation = () => {
 		const { showedAnnotation } = this.state;
 		const { annotation, googleDocLink, isHidden, annotationWithoutBottomPaddigns } = this.props;
-
+		
 		return (
 			<BlocksWrapper
 				withoutBottomPaddigns={ annotationWithoutBottomPaddigns }
 				isHidden={ isHidden }
 				isBlock
-				showEyeHint={ false }
 				className={ styles.withoutBottomMargins }>
 				<Text>
 					{
