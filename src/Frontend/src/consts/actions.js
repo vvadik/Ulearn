@@ -9,6 +9,7 @@ export const COURSES__SLIDE_LOAD = "COURSES__SLIDE_LOAD";
 // User
 export const USER__PROGRESS_LOAD = "USER__PROGRESS_LOAD";
 export const USER__PROGRESS_UPDATE = "USER__PROGRESS_UPDATE";
+export const USER__PROGRESS_HIJACK = "USER__PROGRESS_HIJACK";
 
 // common
 export const START = "_START";

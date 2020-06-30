@@ -1,6 +1,7 @@
 import {
 	USER__PROGRESS_LOAD,
 	USER__PROGRESS_UPDATE,
+	USER__PROGRESS_HIJACK,
 	START, SUCCESS, FAIL,
 } from '../consts/actions';
 
@@ -53,3 +54,14 @@ export const loadUserProgress = (courseId, userId) => {
 			});
 	};
 };
+
+const userProgressHijackAction = (isHijacked) => ({
+	type: USER__PROGRESS_HIJACK,
+	isHijacked,
+});
+
+export const setHijack = (isHijacked) => {
+	return (dispatch) => {
+		dispatch(userProgressHijackAction(isHijacked));
+	}
+}

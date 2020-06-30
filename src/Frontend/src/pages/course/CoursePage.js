@@ -35,6 +35,7 @@ const mapStateToProps = (state, { match }) => {
 		progress: state.userProgress.progress[courseId],
 		navigationOpened: state.navigation.opened,
 		courseLoadingErrorStatus: state.courses.courseLoadingErrorStatus,
+		isHijacked: state.userProgress.isHijacked,
 	};
 };
 const mapDispatchToProps = (dispatch) => ({
