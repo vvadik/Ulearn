@@ -25,6 +25,22 @@ class Image extends React.Component {
 		}
 	}
 
+	componentDidMount() {
+		window.addEventListener('resize', this.resizePictures);
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener('resize', this.resizePictures);
+	}
+
+	resizePictures = () => {
+		const { images, anyImageLoaded, } = this.state;
+
+		if(anyImageLoaded) {
+			this.setSizeForErroredImages(images);
+		}
+	}
+
 	get failedImagesCount() {
 		const { images, } = this.state;
 
@@ -104,18 +120,27 @@ class Image extends React.Component {
 		newImages[index].error = error;
 
 		if(error && anyImageLoaded) {
-			const loadedImage = newImages.find(({ error }) => !error);
-			const aspectRatio = loadedImage.img.naturalHeight / loadedImage.img.naturalWidth;
-			const width = Math.min(loadedImage.img.naturalWidth, this.slideWidth);
-			const height = width * aspectRatio;
-
-			img.style.width = `${ width }px`;
-			img.style.height = `${ height }px`;
+			this.setSizeForErroredImages(newImages);
 		}
 
 		this.setState({
 			images: newImages,
 		})
+	}
+
+	setSizeForErroredImages = (images, fullscreen) => {
+		const loadedImage = images.find(({ error }) => !error);
+
+		if(loadedImage) {
+			const aspectRatio = loadedImage.img.naturalHeight / loadedImage.img.naturalWidth;
+			const width = fullscreen ? loadedImage.img.naturalWidth : Math.min(loadedImage.img.naturalWidth, this.slideWidth);
+			const height = fullscreen ? loadedImage.img.naturalHeight : width * aspectRatio;
+
+			for (const { img } of images.filter(({ error }) => error)) {
+				img.style.width = `${ width }px`;
+				img.style.height = `${ height }px`;
+			}
+		}
 	}
 
 	get slideWidth() {
@@ -129,6 +154,9 @@ class Image extends React.Component {
 
 	shouldShowFullscreenButton = ({ img, error, }) => {
 		if(this.wrapper && img) {
+			console.log(img.width);
+			console.log(this.slideWidth);
+
 			return !error && img.width >= this.slideWidth;
 		}
 
@@ -136,6 +164,8 @@ class Image extends React.Component {
 	}
 
 	onScreenChange = (isFullScreen) => {
+		this.setSizeForErroredImages(this.state.images, isFullScreen);
+
 		this.setState({
 			fullscreen: isFullScreen,
 		})
