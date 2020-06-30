@@ -576,6 +576,10 @@
 	margin-bottom: 10px;
 }
 
+.legacy-page .ctrl-group  #hints-place{
+	width: 100%;
+}
+
 .legacy-page .full-width {
 	width: 100%;
 }
