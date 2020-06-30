@@ -108,9 +108,9 @@ class Slide extends React.Component {
 			const index = slideBlocks.findIndex(b => b === video);
 
 			video.annotationWithoutBottomPaddigns = !video.hide &&
-			index < slideBlocks.length - 1
-				? slideBlocks[index + 1].type !== blockTypes.video
-				: true;
+				(index < slideBlocks.length - 1
+					? slideBlocks[index + 1].type !== blockTypes.video
+					: true);
 		}
 
 		for (const texBlock of slideBlocks.filter(b => b.type === blockTypes.tex)) {
