@@ -94,7 +94,7 @@ class Video extends React.Component {
 				withoutBottomPaddigns={ annotationWithoutBottomPaddigns }
 				isHidden={ isHidden }
 				isBlock
-				eyeHintConfig={ { show: false, allowShrinkContent: false, } }
+				showEyeHint={ false }
 				className={ styles.withoutBottomMargins }>
 				<Text>
 					{

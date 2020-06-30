@@ -26,11 +26,6 @@ const fullSizeBlockTypes = {
 	[blockTypes.spoiler]: true,
 };
 
-const fullWidthBlockTypes = {
-	[CodeMirror.name]: true,
-	[Image.name]: true,
-}
-
 class Slide extends React.Component {
 	componentDidMount() {
 		const { slideBlocks, } = this.props;
@@ -72,17 +67,12 @@ class Slide extends React.Component {
 		}
 
 		return blocksPacks.map(({ blocks, hide, fullSizeBlocksPack }, i) => {
-			const allowShrinkContent = !fullWidthBlockTypes[blocks[0].Block.name];
-
 			return (
 				<BlocksWrapper isContainer={ fullSizeBlocksPack }
 							   key={ i }
 							   isBlock={ blocksPacks.length !== 1 }
 							   isHidden={ hide }
-							   eyeHintConfig={ {
-								   show: !fullSizeBlocksPack,
-								   allowShrinkContent,
-							   } }>
+							   showEyeHint={!fullSizeBlocksPack}>
 					{ blocks.map(this.mapBlockToComponent) }
 				</BlocksWrapper>
 			)

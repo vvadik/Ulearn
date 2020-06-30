@@ -23,7 +23,7 @@ class BlocksWrapper extends React.Component {
 	}
 
 	render() {
-		const { children, className, isBlock, isHidden, isContainer, score, withoutBottomPaddigns, withoutTopPaddings, eyeHintConfig: { show, }, } = this.props;
+		const { children, className, isBlock, isHidden, isContainer, score, withoutBottomPaddigns, withoutTopPaddings, showEyeHint } = this.props;
 		const { showed, showStudentsModalOpened, } = this.state;
 		const isHiddenBlock = isBlock && isHidden;
 		const isHiddenSlide = !isBlock && isHidden;
@@ -47,7 +47,7 @@ class BlocksWrapper extends React.Component {
 						{ showStudentsModalOpened && this.renderModal() }
 						{ isHiddenSlide && this.renderHiddenSlideHeader() }
 						<div className={ wrapperClassNames } ref={ (ref) => this.wrapper = ref }>
-							{ show && isHiddenBlock && this.renderEyeHint() }
+							{ showEyeHint && isHiddenBlock && this.renderEyeHint() }
 							{ children }
 						</div>
 					</React.Fragment>
@@ -56,8 +56,7 @@ class BlocksWrapper extends React.Component {
 	}
 
 	renderEyeHint = () => {
-		const { eyeHintConfig: { allowShrinkContent, }, } = this.props;
-		const wrapperClass = classNames(styles.eyeClosedWrapper, { [styles.withoutShrink]: !allowShrinkContent });
+		const wrapperClass = classNames(styles.eyeClosedWrapper);
 
 		return (
 			<div className={ wrapperClass }>
@@ -175,17 +174,7 @@ BlocksWrapper.propTypes = {
 	isHidden: PropTypes.bool,
 	isContainer: PropTypes.bool,
 	score: PropTypes.object,
-	eyeHintConfig: PropTypes.shape({
-		show: PropTypes.bool.isRequired,
-		allowShrinkContent: PropTypes.bool.isRequired,
-	}),
+	showEyeHint: PropTypes.bool,
 }
-
-BlocksWrapper.defaultProps = {
-	eyeHintConfig: {
-		show: true,
-		allowShrinkContent: true,
-	}
-};
 
 export default BlocksWrapper;

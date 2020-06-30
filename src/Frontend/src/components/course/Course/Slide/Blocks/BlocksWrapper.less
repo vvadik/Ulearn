@@ -14,18 +14,11 @@
 
 
 .eyeClosedWrapper {
-  float: right;
-  margin-left: 10px;
+  position: absolute;
+  right: calc((@phoneSlidePadding - 14px) / 2);
 
   font-size: 14px;
   color: @orange;
-
-  &.withoutShrink {
-    float: unset;
-    margin-left: 0;
-    position: absolute;
-    right: 4px;
-  }
 }
 
 .hiddenSlide {
@@ -109,6 +102,7 @@
 
   .eyeClosedWrapper {
     font-size: 16px;
+    right: calc((@phoneSlidePadding - 16px) / 2);
   }
 
   .header {
@@ -135,10 +129,7 @@
 
   .eyeClosedWrapper {
     font-size: 20px;
-
-    &.withoutShrink {
-      right: calc((@laptopSlidePadding - 20px) / 2);
-    }
+    right: calc((@laptopSlidePadding - 20px) / 2);
   }
 
   .withPaddings {
@@ -166,10 +157,7 @@
 
   .eyeClosedWrapper {
     font-size: 22px;
-
-    &.withoutShrink {
-      right: calc((@desktopSlidePadding - 22px) / 2);
-    }
+    right: calc((@desktopSlidePadding - 22px) / 2);
   }
 
   .withPaddings {
