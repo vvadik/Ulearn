@@ -63,4 +63,6 @@ const mapDispatchToProps = (dispatch) => ({
 	setHijack: (isHijacked) => dispatch(setHijack(isHijacked)),
 });
 
-export default connect(() => {}, mapDispatchToProps)(withCookies(Hijack));
+export default connect(() => {
+	return {}
+}, mapDispatchToProps)(withCookies(Hijack));
