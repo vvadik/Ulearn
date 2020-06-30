@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
 
-import Loader from "@skbkontur/react-ui/Loader";
+import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader";
 import UnitCard from "./UnitCard/UnitCard";
 import Guides from "../Guides/Guides";
 import ProgressBar from "../ProgressBar/ProgressBar";
@@ -31,16 +31,17 @@ class UnitPage extends Component {
 		}
 	}
 
-	componentWillReceiveProps(nextProps, nextContext) {
-		const { flashcards, unitId } = nextProps;
-
+	static getDerivedStateFromProps(props, state) {
+		const { flashcards, unitId } = props;
 		const unitFlashcards = flashcards.filter(flashcard => flashcard.unitId === unitId);
-
-		this.setState({
-			unitFlashcards,
-			statistics: countFlashcardsStatistics(unitFlashcards),
-			totalFlashcardsCount: unitFlashcards.length,
-		});
+		if (JSON.stringify(unitFlashcards) !== JSON.stringify(state.unitFlashcards)) {
+			return {
+				unitFlashcards,
+				statistics: countFlashcardsStatistics(unitFlashcards),
+				totalFlashcardsCount: unitFlashcards.length,
+			};
+		}
+		return null;
 	}
 
 	componentDidMount() {
@@ -58,11 +59,12 @@ class UnitPage extends Component {
 		const completedUnit = flashcards && statistics[rateTypes.notRated] === 0;
 		const dataLoaded = flashcards && !flashcardsLoading;
 
+		if(!dataLoaded) {
+			return (<CourseLoader/>);
+		}
+
 		return (
-			<Loader active={ flashcardsLoading } type={ 'big' }>
-				<h3 className={ styles.title }>
-					Вопросы для самопроверки
-				</h3>
+			<React.Fragment>
 				{ unitTitle &&
 				<UnitCard
 					haveProgress={ completedUnit }
@@ -80,7 +82,7 @@ class UnitPage extends Component {
 					courseId={ courseId }
 					sendFlashcardRate={ sendFlashcardRate }
 				/> }
-			</Loader>
+			</React.Fragment>
 		);
 	}
 
@@ -95,7 +97,7 @@ class UnitPage extends Component {
 		}
 
 		return (
-			<footer>
+			<footer className={ styles.footer }>
 				<div className={ styles.progressBarContainer }>
 					<p className={ styles.progressBarTitle }>
 						Результаты последнего прохождения

@@ -1,0 +1,64 @@
+@import "../../../courseVariables";
+
+.videoContainer {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-bottom: 56.25%; //calculated from 360/640 (height/width ratio)
+}
+
+.frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.withoutBottomMargins p&:last-child {
+  margin: 0;
+}
+
+h3.annotationTitle {
+  color: @linkColor;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &.closed {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  &.opened {
+    margin-top: 0;
+    margin-bottom: 16px;
+  }
+}
+
+.annotationArrow {
+  vertical-align: text-bottom;
+  margin-left: 5px;
+
+  font-size: 14px;
+  line-height: 20px;
+}
+
+@media (min-width: @minTabletWidth) {
+  .annotationArrow {
+    font-size: 18px;
+    line-height: 20px;
+  }
+
+  .frame {
+    border-radius: 1px; //fixing bug c
+  }
+}
+
+@media (min-width: @minDesktopWidth) {
+  .videoContainer {
+    padding-bottom: 607px; //changing from 607.5 to prevent showing dark line under video
+  }
+}

@@ -1,6 +1,6 @@
 import { connect } from "react-redux";
-import { loadCourse, changeCurrentCourseAction } from "../../actions/course";
-import { loadUserProgress, userProgressUpdate } from "../../actions/userProgress";
+import { loadCourse, changeCurrentCourseAction } from "src/actions/course";
+import { loadUserProgress, userProgressUpdate } from "src/actions/userProgress";
 import Course from '../../components/course/Course';
 import { withRouter } from "react-router-dom";
 import queryString from "query-string";
@@ -16,7 +16,7 @@ const mapStateToProps = (state, { match }) => {
 	if(slideIdInQuery) {
 		const action = slideSlugOrAction;
 		slideId = slideIdInQuery;
-		isLti = action.toUpperCase() === "LTISLIDE";
+		isLti = action.toLowerCase() === "ltislide" || action.toLowerCase() === 'acceptedalert' || params.isLti;
 	} else {
 		const slideSlug = slideSlugOrAction;
 		slideId = slideSlug.split('_').pop();
@@ -31,11 +31,11 @@ const mapStateToProps = (state, { match }) => {
 		courseInfo,
 		isNavMenuVisible,
 		units: mapCourseInfoToUnits(courseInfo),
-		isAuthenticated: state.account.isAuthenticated,
-		userId: state.account.id,
+		user: state.account,
 		progress: state.userProgress.progress[courseId],
 		navigationOpened: state.navigation.opened,
 		courseLoadingErrorStatus: state.courses.courseLoadingErrorStatus,
+		isHijacked: state.userProgress.isHijacked,
 	};
 };
 const mapDispatchToProps = (dispatch) => ({
@@ -51,7 +51,7 @@ export default withRouter(connected);
 
 
 function mapCourseInfoToUnits(courseInfo) {
-	if (!courseInfo || !courseInfo.units) {
+	if(!courseInfo || !courseInfo.units) {
 		return null;
 	}
 	return courseInfo.units.reduce((acc, item) => {

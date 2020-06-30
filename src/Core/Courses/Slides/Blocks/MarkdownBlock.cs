@@ -24,7 +24,7 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 			set => markdown = value.RemoveCommonNesting();
 		}
 
-		public SlideBlock[] InnerBlocks { get; set; }
+		public SlideBlock[] InnerBlocks { get; set; } // может содержать MarkdownBlock или CodeBlock
 
 		public MarkdownBlock(string markdown)
 		{

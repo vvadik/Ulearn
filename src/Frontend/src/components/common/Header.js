@@ -1,23 +1,21 @@
-import React, { Component } from 'react'
-import * as PropTypes from 'prop-types'
-import { MenuItem, MenuSeparator } from "@skbkontur/react-ui/components/all";
-import Icon from "@skbkontur/react-icons"
-import MenuHeader from "@skbkontur/react-ui/MenuHeader"
-import Tooltip from "@skbkontur/react-ui/Tooltip"
-import Loader from "@skbkontur/react-ui/Loader"
-import DropdownMenu from "@skbkontur/react-ui/DropdownMenu"
-import DropdownContainer from "@skbkontur/react-ui/components/DropdownContainer/DropdownContainer"
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+
+import { DocumentGroup, DocumentSolid, NotificationBell, User, Warning, Menu as MenuIcon } from "icons";
+import { MenuHeader, MenuItem, MenuSeparator, Tooltip, Loader, DropdownMenu, } from "ui";
+import { DropdownContainer } from "ui/internal/DropdownContainer";
 import HeaderComponentErrorBoundary from "./Error/HeaderComponentErrorBoundary";
+import Hijack from "src/components/hijack/Hijack";
 import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
-import { findDOMNode } from "react-dom"
+import { findDOMNode } from "react-dom";
 
 import styles from './Header.less';
 
-import { getQueryStringParameter } from "../../utils";
-import { toggleNavigation } from "../../actions/navigation";
+import { getQueryStringParameter } from "src/utils";
+import { toggleNavigation } from "src/actions/navigation";
 
-import api from "../../api"
+import api from "src/api";
 
 
 let accountPropTypes = PropTypes.shape({
@@ -47,37 +45,36 @@ class Header extends Component {
 		const { groupsAsStudent, roleByCourse, accessesByCourse, isSystemAdministrator } = account;
 
 		let controllableCourseIds = [];
-		if (isSystemAdministrator) {
+		if(isSystemAdministrator) {
 			controllableCourseIds = Object.keys(courseById);
 		} else {
 			controllableCourseIds = Object.keys(roleByCourse)
 				.filter(courseId => roleByCourse[courseId] !== 'tester')
 				.map(s => s.toLowerCase());
-			if (groupsAsStudent) {
+			if(groupsAsStudent) {
 				const groupsAsStudentIds = groupsAsStudent.map(g => g.courseId.toLowerCase());
-
-				controllableCourseIds = [
-					...new Set(controllableCourseIds.concat(groupsAsStudentIds)),
-				]
-				.filter((e) => courseById.hasOwnProperty(e))
-				.sort((a, b) => {
-					const first = courseById[a].title.toLowerCase();
-					const second = courseById[b].title.toLowerCase();
-					if (first > second)
-						return 1;
-					if (first < second)
-						return -1;
-					return 0;
-				});
+				const set = new Set(controllableCourseIds.concat(groupsAsStudentIds));
+				controllableCourseIds = Array.from(set);
+				controllableCourseIds = controllableCourseIds
+					.filter((e) => courseById.hasOwnProperty(e))
+					.sort((a, b) => {
+						const first = courseById[a].title.toLowerCase();
+						const second = courseById[b].title.toLowerCase();
+						if(first > second)
+							return 1;
+						if(first < second)
+							return -1;
+						return 0;
+					});
 			}
 		}
 
 		let courseRole;
-		if (isSystemAdministrator) {
+		if(isSystemAdministrator) {
 			courseRole = 'courseAdmin';
 		} else {
 			courseRole = roleByCourse[currentCourseId];
-			if (courseRole === undefined) {
+			if(courseRole === undefined) {
 				courseRole = "";
 			}
 		}
@@ -104,20 +101,30 @@ class Header extends Component {
 		};
 	}
 
-	componentWillReceiveProps(nextProps, nextContext) {
-		this.setState(Header.mapPropsToState(nextProps));
+	static getDerivedStateFromProps(props, state) {
+		const newState = Header.mapPropsToState(props);
+
+		if(JSON.stringify(newState) !== JSON.stringify(state)) {
+			return newState;
+		}
+
+		return null;
 	}
 
 	render() {
-		const { initializing } = this.props;
+		const { initializing, account, } = this.props;
 
 		/* Div should have class .header because some legacy javascript code uses $('.header') for calculating header height */
 		return (
-			<div className={ styles["header"] + " header" } id="header">
-				{ Header.renderPhoneHeader() }
-				{ Header.renderDefaultHeader() }
-				{ !initializing && this.renderUserRoleMenu() }
-			</div>
+			<React.Fragment>
+				<div className={ styles["header"] + " header" } id="header">
+					{ Header.renderPhoneHeader() }
+					{ Header.renderDefaultHeader() }
+					{ !initializing && this.renderUserRoleMenu() }
+					<Hijack name={ account.visibleName }/>
+				</div>
+				<div className={ styles.headerDivider }/>
+			</React.Fragment>
 		)
 	}
 
@@ -237,7 +244,7 @@ const isInsideCourse = () => {
 function NavMenu({ toggleNavigation }) {
 	return (
 		<button className={ styles.navMenuButton } onClick={ toggleNavigation }>
-			<Icon size={ 22 } name="Menu"/>
+			<MenuIcon size={ 22 }/>
 		</button>
 	)
 }
@@ -271,7 +278,7 @@ class AbstractMyCoursesMenu extends Component {
 				component={ LinkComponent }>{ courseById[courseId].title }
 			</MenuItem>
 		);
-		if (courseIds.length > visibleCourseIds.length || isSystemAdministrator)
+		if(courseIds.length > visibleCourseIds.length || isSystemAdministrator)
 			items.push(
 				<MenuItem href="/Admin/Courses" key="-course-list" component={ LinkComponent }>
 					<strong>Все курсы</strong>
@@ -325,7 +332,7 @@ class SysAdminMenu extends AbstractMyCoursesMenu {
 						<div>
 							<span className={ styles["visible-only-phone"] }>
 								<span className={ styles["icon"] }>
-									<Icon name="DocumentGroup"/>
+									<DocumentGroup/>
 								</span>
 							</span>
 							<span className={ `${ styles["caption"] } ${ styles["visible-at-least-tablet"] }` }>
@@ -357,7 +364,7 @@ class MyCoursesMenu extends AbstractMyCoursesMenu {
 						<div>
 							<span className={ styles["visible-only-phone"] }>
 								<span className={ styles["icon"] }>
-									<Icon name="DocumentGroup"/>
+									<DocumentGroup/>
 								</span>
 							</span>
 							<span className={ `${ styles["caption"] } ${ styles["visible-at-least-tablet"] }` }>
@@ -408,16 +415,16 @@ class CourseMenu extends Component {
 		let hasUsersMenuItem = role === 'courseAdmin' || accesses.indexOf('addAndRemoveInstructors') !== -1;
 		let hasCourseAdminMenuItems = role === 'courseAdmin';
 
-		if (hasUsersMenuItem || hasCourseAdminMenuItems)
+		if(hasUsersMenuItem || hasCourseAdminMenuItems)
 			items.push(<MenuSeparator key="CourseMenuSeparator2"/>);
 
-		if (hasUsersMenuItem)
+		if(hasUsersMenuItem)
 			items.push(
 				<MenuItem href={ "/Admin/Users?courseId=" + courseId } key="Users" component={ LinkComponent }>
 					Студенты и преподаватели
 				</MenuItem>);
 
-		if (hasCourseAdminMenuItems)
+		if(hasCourseAdminMenuItems)
 			items = items.concat([
 				<MenuItem href={ "/Admin/Packages?courseId=" + courseId } key="Packages"
 						  component={ LinkComponent }>
@@ -456,7 +463,7 @@ class CourseMenu extends Component {
 		const { courseId, role, accesses } = this.props;
 		const courseById = this.props.courses.courseById;
 		const course = courseById[courseId];
-		if (typeof course === 'undefined') {
+		if(typeof course === 'undefined') {
 			return null;
 		}
 
@@ -468,7 +475,7 @@ class CourseMenu extends Component {
 						<div>
 						<span className={ styles["visible-only-phone"] }>
 							<span className={ styles["icon"] }>
-								<Icon name="DocumentSolid"/>
+								<DocumentSolid/>
 							</span>
 						</span>
 							<span className={ `${ styles["caption"] } ${ styles["visible-at-least-tablet"] }` }
@@ -510,7 +517,7 @@ class MobileCourseMenu extends AbstractMyCoursesMenu {
 					menuWidth={ 250 }
 					caption={
 						<span className={ styles["icon"] }>
-							<Icon name="DocumentSolid"/>
+							<DocumentSolid/>
 						</span> }
 				>
 					{ this.props.isCourseMenuVisible ? CourseMenu.menuItems(this.props.courseId, this.props.role, this.props.accesses) : null }
@@ -541,14 +548,14 @@ MobileCourseMenu = connect(MobileCourseMenu.mapStateToProps)(MobileCourseMenu);
 class Menu extends Component {
 	render() {
 		let returnUrl = this.props.location.pathname + this.props.location.search;
-		if (returnUrl.startsWith("/Login")
+		if(returnUrl.startsWith("/Login")
 			|| returnUrl.startsWith("/Account/Register")
 			|| returnUrl.startsWith("/Login/ExternalLoginConfirmation")
 			|| returnUrl.startsWith("/Login/ExternalLoginCallback")) {
 			returnUrl = getQueryStringParameter("returnUrl");
 		}
 
-		if (this.props.account.isAuthenticated) {
+		if(this.props.account.isAuthenticated) {
 			return (
 				<div className={ styles["header__menu"] }>
 					<NotificationsMenu/>
@@ -590,10 +597,14 @@ class NotificationsMenu extends Component {
 		}
 	}
 
-	componentWillReceiveProps(nextProps, nextContext) {
-		this.setState({
-			counter: nextProps.notifications.count
-		});
+	static getDerivedStateFromProps(props, state) {
+		const { notifications } = props;
+		if(state.counter !== notifications.count) {
+			return {
+				counter: notifications.count,
+			}
+		}
+		return null;
 	}
 
 	componentDidMount() {
@@ -613,7 +624,7 @@ class NotificationsMenu extends Component {
 	};
 
 	_handleClickOutside = (event) => {
-		if (this.ref && !this.ref.contains(event.target) && this.dropdownContainerRef &&
+		if(this.ref && !this.ref.contains(event.target) && this.dropdownContainerRef &&
 			!this.dropdownContainerRef.contains(event.target)) {
 			this.setState({
 				isOpened: false,
@@ -625,13 +636,13 @@ class NotificationsMenu extends Component {
 		let node = event.target;
 
 		while (true) {
-			if (!node || (node.classList && node.classList.contains('notifications__new-comment-notification'))) {
+			if(!node || (node.classList && node.classList.contains('notifications__new-comment-notification'))) {
 				break;
 			}
 			node = node.parentNode;
 		}
 
-		if (this.ref && this.dropdownContainerRef && (this.ref.contains(node) ||
+		if(this.ref && this.dropdownContainerRef && (this.ref.contains(node) ||
 			this.dropdownContainerRef.contains(node))) {
 			this.setState({
 				isOpened: false,
@@ -647,7 +658,7 @@ class NotificationsMenu extends Component {
 	}
 
 	onClick() {
-		if (this.state.isOpened) {
+		if(this.state.isOpened) {
 			this.setState({
 				isOpened: false,
 			});
@@ -675,7 +686,8 @@ class NotificationsMenu extends Component {
 				<NotificationsIcon counter={ counter } onClick={ this.onClick }/>
 				{
 					isOpened &&
-					<DropdownContainer getParent={ () => findDOMNode(this) } offsetY={ 0 } align="right"
+					<DropdownContainer getParent={ () => findDOMNode(this) } offsetY={ 0 }
+									   align="right"
 									   offsetX={ isMobile ? -112 : 0 }>
 						<div className={ styles["dropdown-container"] }
 							 ref={ node => this.dropdownContainerRef = node }>
@@ -711,7 +723,7 @@ class NotificationsIcon extends Component {
 				className={ `${ styles["header__notifications-icon"] } ${ this.props.counter === 0 ? styles["without-counter"] : "" }` }
 				onClick={ this.props.onClick }>
                 <span className={ styles["icon"] }>
-                    <Icon name="NotificationBell"/>
+                    <NotificationBell/>
                 </span>
 				{
 					this.props.counter > 0 &&
@@ -736,7 +748,7 @@ class NotificationsIcon extends Component {
 class Notifications extends Component {
 	render() {
 		const { isLoading, notifications } = this.props;
-		if (isLoading)
+		if(isLoading)
 			return (
 				<div className={ styles["notifications__dropdown"] }>
 					<Loader type="normal" active={ true }/>
@@ -765,30 +777,31 @@ class ProfileLink extends Component {
 
 	openTooltip() {
 		this.setState({
-			tooltipTrigger: 'opened'
+			tooltipTrigger: 'hover'
 		})
 	}
 
 	closeTooltip() {
 		this.setState({
-			tooltipTrigger: 'closed'
+			tooltipTrigger: 'hover'
 		})
 	}
 
 	render() {
-		let icon = <Icon name="User"/>;
+		let icon = <User/>;
 		let isProblem = this.props.account.accountProblems.length > 0;
-		if (isProblem) {
+		if(isProblem) {
 			let firstProblem = this.props.account.accountProblems[0];
 			icon = (
-				<Tooltip trigger={ this.state.tooltipTrigger } pos="bottom center" render={ () => (
+				<Tooltip trigger={ this.state.tooltipTrigger } closeButton={ true } pos="bottom center"
+						 onCloseClick={ this.closeTooltip } render={ () => (
 					<div style={ { width: '250px' } }>
 						{ firstProblem.description }
 					</div>
-				) } onCloseClick={ this.closeTooltip }>
-                    <span onMouseOver={ this.openTooltip }>
-                        <Icon name="Warning" color="#f77"/>
-                    </span>
+				) }>
+					<span onMouseOver={ this.openTooltip }>
+						<Warning color="#f77"/>
+					</span>
 				</Tooltip>
 			)
 		}

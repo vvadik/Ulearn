@@ -1,15 +1,19 @@
 @import "../../../variables.less";
 
 @rootZIndex: @asideZIndex;
-@contentZIndex: 3;
-@overlayZIndex: @contentZIndex - 1;
+@contentHeight: calc(100vh - @headerHeight);
 
 .root {
   position: fixed;
   width: @navigationMenuWidth;
   max-width: @navigationMenuWidth;
   max-height: calc(100vh - @headerHeight);
+
+  top: calc(@headerHeight);
   left: -2 * @navigationMenuWidth;
+
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.06);
+
   flex-shrink: 0;
   z-index: @rootZIndex;
   transition: left 300ms ease-in-out;
@@ -35,7 +39,7 @@
 
 .overlay {
   position: fixed;
-  z-index: @overlayZIndex;
+  z-index: -1;
 
   left: 100vw;
   top: @headerHeight;
@@ -50,37 +54,31 @@
 }
 
 .contentWrapper {
-  position: fixed;
-
   width: @navigationMenuWidth;
 
   overflow-y: auto;
-  top: @headerHeight;
-  bottom: 0;
-  max-height: calc(100vh - @headerHeight);
+  height: @contentHeight;
+  max-height: @contentHeight;
   background: #ffffff;
-  z-index: @contentZIndex;
 }
 
-@media (min-width: @maxPhoneWidth) {
+@media (min-width: @minLaptopWidth) {
   .overlay {
     display: none;
   }
 
   .root {
-    position: relative;
     left: 0;
     transition: none;
   }
 
   .contentWrapper {
-    top: calc(@headerHeight);
     bottom: auto;
     max-height: calc(100vh - @headerHeight);
   }
 }
 
-@media (min-width: @maxLaptopWidth) {
+@media (min-width: @navigationGrowthWidth) {
   .root {
     width: @maxNavigationMenuWidth;
     max-width: @maxNavigationMenuWidth;

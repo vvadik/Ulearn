@@ -1,21 +1,6 @@
-'use strict';
-
-if (typeof Promise === 'undefined') {
-	// Rejection tracking prevents a common issue where React gets into an
-	// inconsistent state due to an error, but it gets swallowed by a Promise,
-	// and the user has no idea what causes React's erratic future behavior.
-	require('promise/lib/rejection-tracking').enable();
-	window.Promise = require('promise/lib/es6-extensions.js');
-}
-
-require('promise.prototype.finally').shim();
-
-// fetch() polyfill for making API calls.
-require('whatwg-fetch');
-
-// Object.assign() is commonly used with React.
-// It will use the native implementation if it's present and isn't buggy.
-Object.assign = require('object-assign');
+import "core-js/stable";
+import "regenerator-runtime/runtime";
+import 'whatwg-fetch';
 
 // In tests, polyfill requestAnimationFrame since jsdom doesn't provide it yet.
 // We don't polyfill it in the browser--this is user's responsibility.
@@ -23,9 +8,19 @@ if (process.env.NODE_ENV === 'test') {
 	require('raf').polyfill(global);
 }
 
-// All previous code are from create-react-app. Following code adds another polyfills needed for ulearn
-Array.from = require('array-from');
-
-require('url-polyfill');
-
-require('polyfill-array-includes');
+// Adding Element.remove() for DOM elements, suggested in the Mozilla documentation. https://developer.mozilla.org/en-US/docs/Web/API/ChildNode/remove
+(function (arr) {
+	arr.forEach(function (item) {
+		if (item.hasOwnProperty('remove')) {
+			return;
+		}
+		Object.defineProperty(item, 'remove', {
+			configurable: true,
+			enumerable: true,
+			writable: true,
+			value: function remove() {
+				this.parentNode.removeChild(this);
+			}
+		});
+	});
+})([Element.prototype, CharacterData.prototype, DocumentType.prototype]);

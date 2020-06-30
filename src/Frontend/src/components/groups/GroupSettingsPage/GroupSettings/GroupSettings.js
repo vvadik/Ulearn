@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Input from "@skbkontur/react-ui/components/Input/Input";
-import Loader from "@skbkontur/react-ui/components/Loader/Loader";
+import { Input, Loader } from "ui";
 import GroupScores from "./GroupScores/GroupScores";
 import GroupSettingsCheckbox from "./GroupSettingsCheckbox/GroupSettingsCheckbox";
 
@@ -54,7 +53,7 @@ class GroupSettings extends Component {
 						error={this.props.error}
 						value={this.inputValue}
 						placeholder="Здесь вы можете изменить название группы"
-						onChange={this.onChangeName}
+						onValueChange={this.onChangeName}
 						width="100%" />
 				</div>
 			</div>
@@ -67,7 +66,7 @@ class GroupSettings extends Component {
 		return name || '';
 	}
 
-	onChangeName = (_, value) => {
+	onChangeName = (value) => {
 		this.props.onChangeName(value);
 	};
 }

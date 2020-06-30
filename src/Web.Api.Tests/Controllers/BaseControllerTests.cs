@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
-using Database.Repos.CourseRoles;
-using Database.Repos.Users;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -33,9 +31,9 @@ namespace Web.Api.Tests.Controllers
 		protected UlearnDb db;
 		protected IServiceProvider serviceProvider;
 
-		private readonly WebApiConfiguration FakeWebApiConfiguration = new WebApiConfiguration
+		private readonly WebApiConfiguration fakeWebApiConfiguration = new WebApiConfiguration
 		{
-			Web = new UlearnWebConfiguration()
+			Web = new UlearnWebConfiguration
 			{
 				Authentication = new AuthenticationConfiguration
 				{
@@ -106,7 +104,7 @@ namespace Web.Api.Tests.Controllers
 			services.AddSingleton(db);
 			services.AddLogging(builder => builder.AddSerilog(logger));
 			application.ConfigureDi(services, logger);
-			application.ConfigureAuthServices(services, FakeWebApiConfiguration);
+			application.ConfigureAuthServices(services, fakeWebApiConfiguration);
 			application.ConfigureMvc(services);
 
 			addServices?.Invoke(services);

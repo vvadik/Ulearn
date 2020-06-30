@@ -3,10 +3,12 @@ import {
 	COURSES__COURSE_LOAD,
 	COURSES__FLASHCARDS,
 	COURSES__FLASHCARDS_RATE,
+	COURSES__SLIDE_LOAD,
 	START, SUCCESS, FAIL,
 } from "../consts/actions";
 
-import { getCourse } from '../api/courses';
+import { getCourse, } from 'src/api/courses';
+import { getSlide } from "src/api/slides";
 import {
 	getFlashcards,
 	putFlashcardStatus,
@@ -55,6 +57,22 @@ const sendFlashcardResultStart = (courseId, unitId, flashcardId, rate, newTLast)
 	newTLast,
 });
 
+const loadSlideStart = () => ({
+	type: COURSES__SLIDE_LOAD + START,
+});
+
+const loadSlideSuccess = (courseId, slideId, result) => ({
+	type: COURSES__SLIDE_LOAD + SUCCESS,
+	courseId,
+	slideId,
+	result,
+});
+
+const loadSlideFail = (error) => ({
+	type: COURSES__SLIDE_LOAD + FAIL,
+	error,
+});
+
 export const loadCourse = (courseId) => {
 	courseId = courseId.toLowerCase();
 
@@ -96,4 +114,20 @@ export const sendFlashcardResult = (courseId, unitId, flashcardId, rate, newTLas
 			.catch(err => {
 			});
 	}
+};
+
+export const loadSlide = (courseId, slideId) => {
+	courseId = courseId.toLowerCase();
+
+	return (dispatch) => {
+		dispatch(loadSlideStart());
+
+		getSlide(courseId, slideId)
+			.then(result => {
+				dispatch(loadSlideSuccess(courseId, slideId, result));
+			})
+			.catch(err => {
+				dispatch(loadSlideFail(err));
+			});
+	};
 };

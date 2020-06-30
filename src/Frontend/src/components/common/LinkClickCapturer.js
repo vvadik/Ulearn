@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import * as PropTypes from 'prop-types';
+import { withRouter } from "react-router-dom";
 
 /* Component which captures <a> clicks and, if there is a matching route defined, routes them.
    Based on https://mattdistefano.com/blog/2017/11/30/handling-static-html-links-with-react-router
@@ -65,7 +66,7 @@ class LinkClickCapturer extends Component {
 		if (isAnchorLink(anchor))
 			return;
 
-		this.context.router.history.push({
+		this.props.history.push({
 			pathname: anchor.pathname,
 			search: anchor.search
 		});
@@ -79,19 +80,14 @@ class LinkClickCapturer extends Component {
 		);
 	}
 
-	static contextTypes = {
-		router: PropTypes.shape({
-			history: PropTypes.shape({
-				push: PropTypes.func.isRequired,
-				replace: PropTypes.func.isRequired,
-				createHref: PropTypes.func.isRequired
-			}).isRequired
-		}).isRequired
-	};
-
 	static propTypes = {
-		exclude: PropTypes.arrayOf(PropTypes.string).isRequired
+		exclude: PropTypes.arrayOf(PropTypes.string).isRequired,
+		history:  PropTypes.shape({
+			push: PropTypes.func.isRequired,
+			replace: PropTypes.func.isRequired,
+			createHref: PropTypes.func.isRequired
+		}).isRequired,
 	}
 }
 
-export default LinkClickCapturer;
+export default withRouter(LinkClickCapturer);

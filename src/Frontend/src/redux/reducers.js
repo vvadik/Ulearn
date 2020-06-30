@@ -2,6 +2,7 @@ import { combineReducers } from "redux";
 import courseReducer from "./course";
 import userProgressReducer from "./userProgress";
 import navigationReducer from "./navigation";
+import slidesReducer from "./slides";
 
 const initialAccountState = {
 	isAuthenticated: false,
@@ -18,7 +19,7 @@ function account(state = initialAccountState, action) {
 		case 'ACCOUNT__USER_INFO_UPDATED':
 			let newState = { ...state };
 			newState.isAuthenticated = action.isAuthenticated;
-			if (newState.isAuthenticated) {
+			if(newState.isAuthenticated) {
 				newState.id = action.id;
 				newState.login = action.login;
 				newState.firstName = action.firstName;
@@ -71,6 +72,7 @@ const rootReducer = combineReducers({
 	userProgress: userProgressReducer,
 	notifications,
 	navigation: navigationReducer,
+	slides: slidesReducer,
 });
 
 export default rootReducer;
