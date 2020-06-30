@@ -154,9 +154,6 @@ class Image extends React.Component {
 
 	shouldShowFullscreenButton = ({ img, error, }) => {
 		if(this.wrapper && img) {
-			console.log(img.width);
-			console.log(this.slideWidth);
-
 			return !error && img.width >= this.slideWidth;
 		}
 
