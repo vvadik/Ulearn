@@ -114,7 +114,8 @@ class Course extends Component {
 		}
 
 		return (
-			<div className={ classnames(styles.root, { 'open': navigationOpened }) }>
+			<div
+				className={ classnames(styles.root, { 'open': navigationOpened }, { [styles.withoutMinHeight]: !isNavMenuVisible }) }>
 				{ isNavMenuVisible && this.renderNavigation() }
 				{ this.renderSlide() }
 			</div>
@@ -130,7 +131,10 @@ class Course extends Component {
 			slideTitle = currentSlideInfo.current.title;
 		}
 
-		const wrapperClassName = classnames(styles.rootWrapper, { [styles.withoutNavigation]: !isNavMenuVisible }); // TODO remove isNavMenuVisible flag
+		const wrapperClassName = classnames(
+			styles.rootWrapper,
+			{ [styles.withoutNavigation]: !isNavMenuVisible }, // TODO remove isNavMenuVisible flag
+		);
 
 		const slideInfo = currentSlideInfo
 			? currentSlideInfo.current
