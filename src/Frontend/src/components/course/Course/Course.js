@@ -78,7 +78,10 @@ class Course extends Component {
 			props.enterToCourse(props.courseId);
 			const openUnitId = Course.findUnitIdBySlideId(props.slideId, props.courseInfo);
 			const openUnit = props.units[openUnitId];
-			window.scrollTo(0, 0);
+			setTimeout(function () {
+				// Hide the address bar
+				window.scrollTo(0, 1);
+			}, 0);
 
 			const slideInfo = Course.getSlideInfoById(props.slideId, props.courseInfo);
 
