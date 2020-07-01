@@ -102,7 +102,9 @@ namespace CourseToolHotReloader.ApiClient
 			using var client = HttpClient();
 
 			var response = await client.GetAsync(url);
-
+//404
+			BadCodeHandler(response);
+			
 			return response.StatusCode != HttpStatusCode.OK
 				? null
 				: DeserializeResponseContent<HasTempCourseResponse>(response);
@@ -119,7 +121,7 @@ namespace CourseToolHotReloader.ApiClient
 			using var client = HttpClient();
 
 			var fileContent = new ByteArrayContent(memoryStream.ToArray());
-			var multiContent = new MultipartFormDataContent { { fileContent, "files", "qwe.zip" } };
+			var multiContent = new MultipartFormDataContent { { fileContent, "files", "course.zip" } };
 
 			var response = httpMethod == HttpMethod.Patch ? await client.PatchAsync(url, multiContent) : await client.PutAsync(url, multiContent); 
 

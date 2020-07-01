@@ -31,7 +31,9 @@ namespace CourseToolHotReloader
 			{
 				switch (e.InnerExceptions.Single())
 				{
+					case InvalidOperationException _:
 					case UriFormatException _:
+					case ArgumentException _:
 						ConsoleWorker.WriteError("Указанный Base Url недоступен");
 						break;
 					case IOException _:
@@ -64,10 +66,15 @@ namespace CourseToolHotReloader
 
 		private static async Task Startup()
 		{
-			await Login();
+			if (!await Login())
+				return;
+
+			if (!CourseIdCorrect())
+				return;
 
 			if (!await TempCourseExist())
-				await CreateCourse();
+				if (await CreateCourse())
+					return;
 
 			await SendFullCourse();
 
@@ -80,18 +87,16 @@ namespace CourseToolHotReloader
 			courseWatcher.StartWatch();
 		}
 
-		private static async Task Login()
+		private static async Task<bool> Login()
 		{
 			var isLoginSuccess = await container.Resolve<ILoginAgent>().SignIn();
 
 			if (isLoginSuccess)
-			{
 				ConsoleWorker.WriteLine("Авторизация прошла успешно");
-			}
 			else
-			{
 				ConsoleWorker.WriteError("Ошибка авторизации");
-			}
+
+			return isLoginSuccess;
 		}
 
 		private static async Task SendFullCourse()
@@ -103,12 +108,20 @@ namespace CourseToolHotReloader
 				throw new Exception(tempCourseUpdateResponse.Message);
 		}
 
+		private static bool CourseIdCorrect()
+		{
+			if (!config.CourseIds.TryGetValue(config.Path, out var courseId) || string.IsNullOrEmpty(courseId))
+			{
+				ConsoleWorker.WriteError($"CourseId для \"{config.Path}\" не задан в config.json, необходимо задать его в параметр courseIds. формат задания: \r courseIds {{ \"C:\\\\Курсы\\\\курс1\" : \"courseId1\", \"C:\\\\Курсы\\\\курс2\" : \"courseId2\" }}. config.json находится \"{config.PathToConfigFile}\"");
+				return false;
+			}
+
+			return true;
+		}
+
 		private static async Task<bool> TempCourseExist()
 		{
 			var hasTempCourseResponse = await ulearnApiClient.HasCourse(config.CourseId);
-
-			if (string.IsNullOrEmpty(hasTempCourseResponse?.MainCourseId))
-				ConsoleWorker.WriteError($"Курс с CourseId = \"{config.CourseId}\" не найден проверьте на опечатки или обратитесь к админу ulearn");
 
 			if (hasTempCourseResponse.HasTempCourse)
 				ConsoleWorker.WriteLine($"Обнаружен существующий временный курс с id {hasTempCourseResponse.TempCourseId}");
@@ -116,13 +129,15 @@ namespace CourseToolHotReloader
 			return hasTempCourseResponse.HasTempCourse;
 		}
 
-		private static async Task CreateCourse()
+		private static async Task<bool> CreateCourse()
 		{
 			var createResponse = await ulearnApiClient.CreateCourse(config.CourseId);
-			if (createResponse.ErrorType == ErrorType.NoErrors)
-				ConsoleWorker.WriteLine(createResponse.Message);
+			if (createResponse.ErrorType != ErrorType.NoErrors)
+				ConsoleWorker.WriteError(createResponse.Message);
 			else
-				throw new Exception(createResponse.Message);
+				ConsoleWorker.WriteError(createResponse.Message);
+
+			return createResponse.ErrorType == ErrorType.NoErrors;
 		}
 	}
 }

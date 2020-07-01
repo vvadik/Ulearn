@@ -1,39 +1,51 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
+using CourseToolHotReloader.Log;
 
 namespace CourseToolHotReloader
 {
 	public interface IConfig
 	{
 		string Path { get; set; }
+		Dictionary<string, string> CourseIds { get; set; }
 		string CourseId { get; set; }
 		string JwtToken { get; set; }
 		public string BaseUrl { get; set; }
 		public bool SendFullArchive { get; set; }
+		public string PathToConfigFile { get; }
 		public void Flush();
 	}
 
 	internal class Config : IConfig
 	{
-		private readonly string pathToConfigFile = $"{System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\\config.json";
+		public readonly string pathToConfigFile = $"{System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\\config.json";
 
 		public Config()
 		{
 			var fileConfigFormat = ReadConfig();
 			JwtToken = fileConfigFormat.JwtToken;
 			BaseUrl = fileConfigFormat.BaseUrl;
-			CourseId = fileConfigFormat.CourseId;
+			CourseIds = fileConfigFormat.CourseIds;
 			Path = Directory.GetCurrentDirectory();
 		}
 
 		public string BaseUrl { get; set; }
 		public bool SendFullArchive { get; set; }
 		public string Path { get; set; }
-		public string CourseId { get; set; }
+		public Dictionary<string, string> CourseIds { get; set; }
 		public string JwtToken { get; set; }
+
+		public string CourseId
+		{
+			get => CourseIds[Path];
+			set => CourseIds[Path] = value;
+		}
 
 		private FileConfigFormat ReadConfig()
 		{
@@ -44,7 +56,8 @@ namespace CourseToolHotReloader
 
 			using var streamReader = File.OpenText(pathToConfigFile);
 			var json = streamReader.ReadToEnd();
-			var fileConfigFormat = JsonSerializer.Deserialize<FileConfigFormat>(json);
+			var jsonWithCorrectFileName = Regex.Replace(json, @"[^\\|\/](\\{1}|\/)[^\\|\/]", "\\\\");
+			var fileConfigFormat = JsonSerializer.Deserialize<FileConfigFormat>(jsonWithCorrectFileName);
 			return fileConfigFormat;
 		}
 
@@ -55,6 +68,8 @@ namespace CourseToolHotReloader
 			SaveConfigFile(fileConfigFormat);
 		}
 
+		public string PathToConfigFile => pathToConfigFile;
+
 		public void Flush()
 		{
 			var fileConfigFormat = new FileConfigFormat
@@ -62,7 +77,7 @@ namespace CourseToolHotReloader
 				JwtToken = JwtToken,
 				BaseUrl = BaseUrl,
 				SendFullArchive = SendFullArchive,
-				CourseId = CourseId
+				CourseIds = CourseIds
 			};
 
 			SaveConfigFile(fileConfigFormat);
@@ -71,7 +86,10 @@ namespace CourseToolHotReloader
 		private void SaveConfigFile(FileConfigFormat fileConfigFormat)
 		{
 			using var fileStream = File.Create(pathToConfigFile);
-			var text = JsonSerializer.Serialize(fileConfigFormat);
+			var text = JsonSerializer.Serialize(fileConfigFormat, new JsonSerializerOptions
+			{
+				WriteIndented = true
+			});
 			var info = new UTF8Encoding(true).GetBytes(text);
 			fileStream.Write(info, 0, info.Length);
 		}
@@ -84,7 +102,7 @@ namespace CourseToolHotReloader
 				JwtToken = null;
 				BaseUrl = "ulearn.me";
 				SendFullArchive = false;
-				CourseId = null;
+				CourseIds = new Dictionary<string, string>();
 			}
 
 			[JsonPropertyName("jwtToken")]
@@ -97,7 +115,7 @@ namespace CourseToolHotReloader
 			public bool SendFullArchive { get; set; }
 
 			[JsonPropertyName("courseId")]
-			public string CourseId { get; set; }
+			public Dictionary<string, string> CourseIds { get; set; }
 		}
 	}
 }
