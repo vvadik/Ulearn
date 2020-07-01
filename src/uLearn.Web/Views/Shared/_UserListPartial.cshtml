@@ -116,7 +116,7 @@
 			data-toggle-userName="@courseRoles.UserName"
 			data-toggle-role="@courseRoles.Role.GetDisplayName()"
 			data-toggle-isRole="@true"
-			data-toggle-courseTitle="@courseRoles.CourseTitle@isTempLabel"
+			data-toggle-courseTitle="@isTempLabel@courseRoles.CourseTitle"
 			onclick="openPopup(this, ToggleButtonClass)">
 		@role
 
@@ -146,7 +146,7 @@
 					data-toggle-userName="@course.UserName"
 					data-toggle-role="@course.Role"
 					data-toggle-isRole="@true"
-					data-toggle-courseTitle="@course.CourseTitle@isTempLabel."
+					data-toggle-courseTitle="@isTempLabel@course.CourseTitle."
 					onclick="openPopup(this, ToggleDropDownClass)">
 
 					<a>@course.CourseTitle@isTempLabel</a>
@@ -178,7 +178,7 @@
 						data-toggle-userName="@courseAccess.UserName"
 						data-toggle-role="@courseAccess.AccessType.GetDisplayName()"
 						data-toggle-isRole="@false"
-						data-toggle-courseTitle="@courseAccess.CourseTitle@isTempLabel"
+						data-toggle-courseTitle="@isTempLabel@courseAccess.CourseTitle"
 						data-css-class="li-info"
 						data-has-access="@( courseAccess.HasAccess ? "true" : "false")"
 
