@@ -78,7 +78,7 @@
   }
 }
 
-.text ul li:before {
+.text ul > li:before {
   content: '—';
   position: absolute;
   left: 0;
@@ -88,7 +88,7 @@
   counter-reset: orderedList;
 }
 
-.text ol li:before {
+.text ol > li:before {
   counter-increment: orderedList;
   content: counter(orderedList) '.';
   position: absolute;
