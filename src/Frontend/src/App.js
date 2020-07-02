@@ -21,7 +21,7 @@ import queryString from "query-string";
 
 let loggerMiddleware = createLogger();
 
-function configureStore(preloadedState) {
+function configureStore() {
 	let env = process.env.NODE_ENV || 'development';
 	let isDevelopment = env === 'development';
 
@@ -31,23 +31,11 @@ function configureStore(preloadedState) {
 
 	return createStore(
 		rootReducer,
-		preloadedState,
 		middlewares
 	)
 }
 
-let store = configureStore({
-	account: {
-		isAuthenticated: false,
-		isSystemAdministrator: false,
-		roleByCourse: {},
-		accessesByCourse: {},
-	},
-	notifications: {
-		count: 0,
-		lastTimestamp: undefined
-	}
-});
+const store = configureStore();
 
 // Update notifications count each minute
 setInterval(() => {

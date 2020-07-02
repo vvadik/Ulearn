@@ -3,7 +3,7 @@ import React from "react";
 import { Gapped, Tooltip } from "@skbkontur/react-ui";
 import { Logout, } from "@skbkontur/react-icons";
 
-import { setHijack, } from "src/actions/userProgress";
+import { setHijack, } from "src/actions/account";
 
 import { withCookies } from 'react-cookie';
 
@@ -15,15 +15,17 @@ import { connect } from "react-redux";
 const hijackCookieName = 'ulearn.auth.hijack';
 const hijackReturnControllerPath = '/Account/ReturnHijack';
 
-function Hijack({ allCookies, name, setHijack, }) {
-	let isHijacked = false;
+function Hijack({ allCookies, name, setHijack, isHijacked, }) {
+	let isCookieContainsHijack = false;
 	for (const cookie in allCookies) {
 		if(cookie.endsWith(hijackCookieName)) {
-			isHijacked = true;
+			isCookieContainsHijack = true;
 		}
 	}
 
-	setHijack(isHijacked);
+	if(isHijacked !== isCookieContainsHijack) {
+		setHijack(isCookieContainsHijack);
+	}
 
 	return (
 		<React.Fragment>
@@ -59,10 +61,14 @@ Hijack.propTypes = {
 	name: PropTypes.string,
 }
 
+const mapStateToProps = (state) => {
+	return {
+		isHijacked: state.account.isHijacked,
+	}
+}
+
 const mapDispatchToProps = (dispatch) => ({
 	setHijack: (isHijacked) => dispatch(setHijack(isHijacked)),
 });
 
-export default connect(() => {
-	return {}
-}, mapDispatchToProps)(withCookies(Hijack));
+export default connect(mapStateToProps, mapDispatchToProps)(withCookies(Hijack));
