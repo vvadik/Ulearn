@@ -163,7 +163,7 @@ namespace Stepik.Api
 			await ClearCourse(stepikCourse).ConfigureAwait(false);
 
 			var unitIndex = 0;
-			foreach (var unit in course.Units)
+			foreach (var unit in course.GetUnitsNotSafe())
 			{
 				results.Info($"Converting ulearn unit «{unit.Title}» into stepik section");
 				var section = ConvertUlearnUnitIntoStepikSection(unit);

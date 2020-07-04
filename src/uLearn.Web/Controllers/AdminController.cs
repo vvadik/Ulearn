@@ -11,6 +11,8 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using AntiPlagiarism.Api;
+using AntiPlagiarism.Api.Models.Parameters;
 using ApprovalUtilities.Utilities;
 using Database;
 using Database.DataContexts;
@@ -57,8 +59,9 @@ namespace uLearn.Web.Controllers
 		private readonly CertificateGenerator certificateGenerator;
 		private readonly string gitSecret;
 		private readonly DirectoryInfo reposDirectory;
+		private readonly IAntiPlagiarismClient antiPlagiarismClient;
 		private readonly ILogger serilogLogger;
-		private TempCoursesRepo tempCoursesReo;
+		private readonly TempCoursesRepo tempCoursesReo;
 
 		public AdminController()
 		{
@@ -82,6 +85,8 @@ namespace uLearn.Web.Controllers
 			serilogLogger = new LoggerConfiguration().WriteTo.Log4Net().CreateLogger();
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 			gitSecret = configuration.Git.Webhook.Secret;
+			var antiplagiarismClientConfiguration = ApplicationConfiguration.Read<UlearnConfiguration>().AntiplagiarismClient;
+			antiPlagiarismClient = new AntiPlagiarismClient(antiplagiarismClientConfiguration.Endpoint, antiplagiarismClientConfiguration.Token, serilogLogger);
 			tempCoursesReo = new TempCoursesRepo();
 		}
 
@@ -128,7 +133,7 @@ namespace uLearn.Web.Controllers
 		{
 			var course = courseManager.GetCourse(courseId);
 			var appearances = db.UnitAppearances.Where(u => u.CourseId == course.Id).ToList();
-			var unitAppearances = course.Units
+			var unitAppearances = course.GetUnitsNotSafe()
 				.Select(unit => Tuple.Create(unit, appearances.FirstOrDefault(a => a.UnitId == unit.Id)))
 				.ToList();
 			return View(new UnitsListViewModel(course.Id, course.Title, unitAppearances, DateTime.Now));
@@ -1020,15 +1025,6 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Packages", new { courseId });
 		}
 
-		private static List<ScoringGroup> GetScoringGroupsCanBeSetInSomeUnit(Course course)
-		{
-			return course.Units
-				.SelectMany(u => u.Scoring.Groups.Values)
-				.Where(g => g.CanBeSetByInstructor && !g.EnabledForEveryone)
-				.DistinctBy(g => g.Id)
-				.ToList();
-		}
-
 		public ActionResult Groups(string courseId)
 		{
 			/* This action is moved to react-based frontend application */
@@ -1416,7 +1412,7 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.GetCourse(courseId);
 			if (!course.Settings.Scoring.Groups.ContainsKey(scoringGroupId))
 				return HttpNotFound();
-			var unit = course.Units.FirstOrDefault(u => u.Id == unitId);
+			var unit = course.GetUnitsNotSafe().FirstOrDefault(u => u.Id == unitId);
 			if (unit == null)
 				return HttpNotFound();
 
@@ -1514,7 +1510,48 @@ namespace uLearn.Web.Controllers
 
 			return Json(new { status = "ok" });
 		}
-	
+
+		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
+		[HttpPost]
+		public async Task<ActionResult> SetSuspicionLevels(string courseId, Guid slideId, string faintSuspicion = null, string strongSuspicion = null)
+		{
+			var course = courseManager.GetCourse(courseId);
+			if (course.Slides.All(s => s.Id != slideId))
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden, "Course does not contain a slide");
+
+			if (!TryParseNullableDouble(faintSuspicion, out var faintSuspicionParsed)
+				|| !TryParseNullableDouble(strongSuspicion, out var strongSuspicionParsed))
+				return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "faintSuspicion or strongSuspicion not in double");
+
+			if (faintSuspicion != null && (faintSuspicionParsed < 0 || faintSuspicionParsed > 100)
+				|| strongSuspicion != null && (strongSuspicionParsed < 0 || strongSuspicionParsed > 100)
+				|| faintSuspicionParsed > strongSuspicionParsed)
+				return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "faintSuspicion < strongSuspicion and in [0, 100]");
+
+			await antiPlagiarismClient.SetSuspicionLevelsAsync(new SetSuspicionLevelsParameters
+			{
+				TaskId = slideId,
+				FaintSuspicion = faintSuspicionParsed / 100d,
+				StrongSuspicion = strongSuspicionParsed / 100d,
+			});
+			return Json(new { status = "ok" });
+		}
+
+		public static bool TryParseNullableDouble(string str, out double? result)
+		{
+			result = null;
+			if (string.IsNullOrWhiteSpace(str))
+				return true;
+			str = str.Replace(',', '.');
+			if (double.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture, out var d))
+			{
+				result = d;
+				return true;
+			}
+			return false;
+		}
 	}
 
 	public class CertificateRequest
@@ -1591,7 +1628,6 @@ namespace uLearn.Web.Controllers
 		public string Title { get; set; }
 		public string Id { get; set; }
 		public DateTime LastWriteTime { get; set; }
-
 		public bool IsTemp { get; set; }
 	}
 
@@ -1654,7 +1690,6 @@ namespace uLearn.Web.Controllers
 		public Guid VersionId { get; set; }
 		public CourseDiff CourseDiff { get; set; }
 		public string Warnings { get; set; }
-		
 		public bool IsTempCourse { get; set; }
 	}
 }

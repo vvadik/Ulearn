@@ -298,6 +298,7 @@ namespace uLearn.Web.Controllers
 				Code = submission.SolutionCode.Text,
 				AuthorId = Guid.Parse(submission.UserId),
 				AdditionalInfo = new AntiPlagiarismAdditionalInfo { SubmissionId = submission.Id }.ToJsonString(),
+				ClientSubmissionId = submission.Id.ToString()
 			};
 			await antiPlagiarismClient.AddSubmissionAsync(parameters).ConfigureAwait(false);
 		}

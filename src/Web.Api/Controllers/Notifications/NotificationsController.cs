@@ -26,7 +26,7 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 
 		private static FeedNotificationTransport commentsFeedNotificationTransport;
 
-		public NotificationsController(ILogger logger, WebCourseManager courseManager, UlearnDb db,
+		public NotificationsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db,
 			IUsersRepo usersRepo,
 			INotificationsRepo notificationsRepo, IFeedRepo feedRepo,
 			IServiceProvider serviceProvider,

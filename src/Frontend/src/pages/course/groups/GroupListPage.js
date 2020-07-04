@@ -3,13 +3,13 @@ import { withRouter } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import connect from "react-redux/es/connect/connect";
 import PropTypes from 'prop-types';
-import api from "../../../api";
+import api from "src/api";
 import { Page } from "../../index";
-import { COURSES__COURSE_ENTERED } from "../../../consts/actions";
-import GroupList from "../../../components/groups/GroupMainPage/GroupList/GroupList";
-import GroupHeader from "../../../components/groups/GroupMainPage/GroupHeader/GroupHeader";
-import Error404 from "../../../components/common/Error/Error404";
-import Toast from "@skbkontur/react-ui/components/Toast/Toast";
+import { COURSES__COURSE_ENTERED } from "src/consts/actions";
+import GroupList from "src/components/groups/GroupMainPage/GroupList/GroupList";
+import GroupHeader from "src/components/groups/GroupMainPage/GroupHeader/GroupHeader";
+import Error404 from "src/components/common/Error/Error404";
+import { Toast } from "ui";
 
 class GroupListPage extends Component {
 	constructor(props) {

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database;
 using Database.Repos;
+using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Web.Api.Controllers.Slides;
 using Ulearn.Web.Api.Models.Responses.ExerciseStatistics;
 
 namespace Ulearn.Web.Api.Controllers
@@ -18,21 +20,28 @@ namespace Ulearn.Web.Api.Controllers
 	[Route("/exercise-statistics")]
 	public class ExerciseStatisticsController : BaseController
 	{
+		private readonly ICoursesRepo coursesRepo;
+		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IUserSolutionsRepo userSolutionsRepo;
 		private readonly IUserSolutionsRepo solutionsRepo;
 		private readonly IUserQuizzesRepo userQuizzesRepo;
 		private readonly IVisitsRepo visitsRepo;
 		private readonly IGroupsRepo groupsRepo;
+		private readonly SlideRenderer slideRenderer;
 
-		public ExerciseStatisticsController(ILogger logger, WebCourseManager courseManager, IUserSolutionsRepo userSolutionsRepo, UlearnDb db, IUsersRepo usersRepo,
-			IUserSolutionsRepo solutionsRepo, IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo)
+		public ExerciseStatisticsController(ILogger logger, IWebCourseManager courseManager, IUserSolutionsRepo userSolutionsRepo, UlearnDb db, IUsersRepo usersRepo,
+			IUserSolutionsRepo solutionsRepo, IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo,
+			SlideRenderer slideRenderer, ICourseRolesRepo courseRolesRepo, ICoursesRepo coursesRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
+			this.coursesRepo = coursesRepo;
+			this.courseRolesRepo = courseRolesRepo;
 			this.userSolutionsRepo = userSolutionsRepo;
 			this.solutionsRepo = solutionsRepo;
 			this.userQuizzesRepo = userQuizzesRepo;
 			this.visitsRepo = visitsRepo;
 			this.groupsRepo = groupsRepo;
+			this.slideRenderer = slideRenderer;
 		}
 
 		/// <summary>
@@ -42,7 +51,7 @@ namespace Ulearn.Web.Api.Controllers
 		public async Task<ActionResult<CourseExercisesStatisticsResponse>> CourseStatistics([FromQuery(Name = "course_id")] [BindRequired]
 			string courseId, int count = 10000, DateTime? from = null, DateTime? to = null)
 		{
-			var course = courseManager.FindCourse(courseId);
+			var course = await courseManager.FindCourseAsync(courseId);
 			if (course == null)
 				return NotFound();
 
@@ -65,6 +74,7 @@ namespace Ulearn.Web.Api.Controllers
 				.ToListAsync().ConfigureAwait(false);
 
 			var getSlideMaxScoreFunc = await BuildGetSlideMaxScoreFunc(solutionsRepo, userQuizzesRepo, visitsRepo, groupsRepo, course, User.GetUserId());
+			var getGitEditLinkFunc = await BuildGetGitEditLinkFunc(User.GetUserId(), course, courseRolesRepo, coursesRepo);
 
 			const int daysLimit = 30;
 
@@ -78,7 +88,7 @@ namespace Ulearn.Web.Api.Controllers
 						var exerciseSubmissions = submissions.Where(s => s.Item1 == slide.Id).ToList();
 						return new OneExerciseStatistics
 						{
-							Exercise = BuildSlideInfo(course.Id, slide, getSlideMaxScoreFunc),
+							Exercise = slideRenderer.BuildShortSlideInfo(course.Id, slide, getSlideMaxScoreFunc, getGitEditLinkFunc, Url),
 							SubmissionsCount = exerciseSubmissions.Count,
 							AcceptedCount = exerciseSubmissions.Count(s => s.Item2),
 							/* Select last 30 (`datesLimit`) dates */

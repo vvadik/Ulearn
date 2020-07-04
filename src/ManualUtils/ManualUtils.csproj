@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net472</TargetFramework>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
 		<GenerateBindingRedirectsOutputType>false</GenerateBindingRedirectsOutputType>
 		<AllowedReferenceRelatedFileExtensions>.pdb</AllowedReferenceRelatedFileExtensions>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -16,6 +16,7 @@
 		<PackageProjectUrl>https://ulearn.me</PackageProjectUrl>
 		<PackageTags>ulearn education mooc</PackageTags>
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+		<LangVersion>default</LangVersion>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 		<DebugType>full</DebugType>
@@ -24,8 +25,9 @@
 		<DebugType>pdbonly</DebugType>
 	</PropertyGroup>
 	<ItemGroup>
+		<ProjectReference Include="..\AntiPlagiarism.Web\AntiPlagiarism.Web.csproj" />
 		<ProjectReference Include="..\Common\Common.csproj" />
-		<ProjectReference Include="..\Database\Database.csproj" />
+		<ProjectReference Include="..\Database.Core\Database.Core.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<Content Update="appsettings.local.json">

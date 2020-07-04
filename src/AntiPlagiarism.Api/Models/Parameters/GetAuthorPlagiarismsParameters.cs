@@ -2,11 +2,10 @@
 using AntiPlagiarism.Api.Defaults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Ulearn.Common.Api.Models.Parameters;
 
 namespace AntiPlagiarism.Api.Models.Parameters
 {
-	public class GetAuthorPlagiarismsParameters : ApiParameters
+	public class GetAuthorPlagiarismsParameters : AntiPlagiarismApiParameters
 	{
 		[BindRequired]
 		[FromQuery(Name = "author_id")]

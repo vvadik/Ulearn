@@ -2,9 +2,9 @@
 using System.Collections.Specialized;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web;
 using AntiPlagiarism.Api.Models.Parameters;
 using AntiPlagiarism.Api.Models.Results;
+using Serilog;
 using Serilog.Core;
 using Ulearn.Common;
 using Ulearn.Common.Api;
@@ -18,7 +18,7 @@ namespace AntiPlagiarism.Api
 
 		private readonly string token;
 
-		public AntiPlagiarismClient(string endpointUrl, string token, Logger logger)
+		public AntiPlagiarismClient(string endpointUrl, string token, ILogger logger)
 			: base(logger, new ApiClientSettings(endpointUrl)
 			{
 				ServiceName = "ulearn.antiplagiarism-web",
@@ -65,6 +65,21 @@ namespace AntiPlagiarism.Api
 		public Task<GetAuthorPlagiarismsResponse> GetAuthorPlagiarismsAsync(GetAuthorPlagiarismsParameters parameters)
 		{
 			return MakeRequestAsync<GetAuthorPlagiarismsParameters, GetAuthorPlagiarismsResponse>(HttpMethod.Get, Urls.GetAuthorPlagiarisms, parameters);
+		}
+
+		public Task<GetMostSimilarSubmissionsResponse> GetMostSimilarSubmissionsAsync(GetMostSimilarSubmissionsParameters parameters)
+		{
+			return MakeRequestAsync<GetMostSimilarSubmissionsParameters, GetMostSimilarSubmissionsResponse>(HttpMethod.Get, Urls.GetMostSimilarSubmissions, parameters);
+		}
+
+		public Task<GetSuspicionLevelsResponse> GetSuspicionLevelsAsync(GetSuspicionLevelsParameters parameters)
+		{
+			return MakeRequestAsync<GetSuspicionLevelsParameters, GetSuspicionLevelsResponse>(HttpMethod.Get, Urls.GetSuspicionLevels, parameters);
+		}
+
+		public Task<GetSuspicionLevelsResponse> SetSuspicionLevelsAsync(SetSuspicionLevelsParameters parameters)
+		{
+			return MakeRequestAsync<SetSuspicionLevelsParameters, GetSuspicionLevelsResponse>(HttpMethod.Post, Urls.SetSuspicionLevels, parameters);
 		}
 	}
 }

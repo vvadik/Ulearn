@@ -9,13 +9,7 @@ body.without-topbar {
 
 /* Set padding to keep content from hitting the edges */
 .legacy-page .body-content {
-    padding-left: 15px;
-    padding-right: 15px;
 	width: unset;
-}
-
-.legacy-page {
-	padding-bottom: 20px;
 }
 
 /* Set width on the form input elements since they're 100% wide by default */
@@ -105,21 +99,21 @@ body.without-topbar {
 	cursor: pointer;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 800px) {
 	.legacy-page h1 {
-		font-size: 25px;
+		font-size: 20px;
 	}
 
 	.legacy-page h1 small {
-		font-size: 21px;
+		font-size: 18px;
 	}
 
 	.legacy-page h2 {
-		font-size: 19px;
+		font-size: 18px;
 	}
 
 	.legacy-page h2 small {
-		font-size: 15px;
+		font-size: 16px;
 	}
 }
 
@@ -195,6 +189,7 @@ body.without-topbar {
 
 .legacy-page footer {
 	margin-top: 60px;
+	margin-bottom: 20px;
 	color: #888;
 }
 

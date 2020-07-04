@@ -37,5 +37,8 @@ namespace AntiPlagiarism.Web.Database.Models
 
 		[NotMapped]
 		public string ProgramText => Program.Text;
+
+		[MaxLength(50)]
+		public string ClientSubmissionId { get; set; }
 	}
 }

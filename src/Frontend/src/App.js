@@ -1,25 +1,27 @@
-import React, {Component} from 'react';
-import {BrowserRouter} from 'react-router-dom';
+import React, { Component } from 'react';
+import { BrowserRouter } from 'react-router-dom';
 
 import ErrorBoundary from "./components/common/ErrorBoundary";
 import NotFoundErrorBoundary from "./components/common/Error/NotFoundErrorBoundary";
 import YandexMetrika from "./components/common/YandexMetrika";
 import Header from "./components/common/Header";
-import {Provider, connect} from "react-redux";
+import { Provider, connect } from "react-redux";
 import thunkMiddleware from "redux-thunk";
-import {createLogger} from "redux-logger";
-import {applyMiddleware, createStore} from "redux";
+import { createLogger } from "redux-logger";
+import { applyMiddleware, createStore } from "redux";
 
 import Router from "./Router";
 
 import rootReducer from "./redux/reducers";
 import api from "./api";
-import Toast from "@skbkontur/react-ui/components/Toast/Toast";
+import { ThemeContext, Toast } from "ui";
+import theme from "src/uiTheme";
+import queryString from "query-string";
 
 
 let loggerMiddleware = createLogger();
 
-function configureStore(preloadedState) {
+function configureStore() {
 	let env = process.env.NODE_ENV || 'development';
 	let isDevelopment = env === 'development';
 
@@ -29,27 +31,15 @@ function configureStore(preloadedState) {
 
 	return createStore(
 		rootReducer,
-		preloadedState,
 		middlewares
 	)
 }
 
-let store = configureStore({
-	account: {
-		isAuthenticated: false,
-		isSystemAdministrator: false,
-		roleByCourse: {},
-		accessesByCourse: {},
-	},
-	notifications: {
-		count: 0,
-		lastTimestamp: undefined
-	}
-});
+const store = configureStore();
 
 // Update notifications count each minute
 setInterval(() => {
-	if (store.getState().account.isAuthenticated)
+	if(store.getState().account.isAuthenticated)
 		store.dispatch(api.notifications.getNotificationsCount(store.getState().notifications.lastTimestamp))
 }, 60 * 1000);
 
@@ -57,13 +47,9 @@ api.setServerErrorHandler((message) => Toast.push(message ? message : 'Прои�
 
 class UlearnApp extends Component {
 	render() {
-		let pathname = window.location.pathname.toLowerCase();
-		let isLti = pathname.endsWith('/ltislide') || pathname.endsWith('/acceptedalert'); //TODO remove this flag,that hiding header and nav menu
-		let isHeaderVisible = !isLti;
-
 		return (
-			<Provider store={store}>
-				<InternalUlearnApp isHeaderVisible={isHeaderVisible}/>
+			<Provider store={ store }>
+				<InternalUlearnApp/>
 			</Provider>
 		)
 	}
@@ -80,36 +66,42 @@ class InternalUlearnApp extends Component {
 	componentDidMount() {
 		this.props.getCurrentUser();
 		this.props.getCourses();
-	}
-
-	componentWillReceiveProps(nextProps, nextState) {
 		this.setState({
 			initializing: false
 		});
-		if (!this.props.account.isAuthenticated && nextProps.account.isAuthenticated) {
+	}
+
+	componentDidUpdate(prevProps) {
+		if(!prevProps.account.isAuthenticated && this.props.account.isAuthenticated) {
 			this.props.getNotificationsCount();
 		}
 	}
 
 	render() {
-		const isHeaderVisible = this.props.isHeaderVisible;
+		const pathname = window.location.pathname.toLowerCase();
+		const params = queryString.parse(window.location.search);
+		const isLti = pathname.endsWith('/ltislide') || pathname.endsWith('/acceptedalert') || params.isLti; //TODO remove this flag,that hiding header and nav menu
+		const isHeaderVisible = !isLti;
+
 		return (
 			<BrowserRouter>
-				<ErrorBoundary>
-					{isHeaderVisible &&
-					<React.Fragment>
-						<Header initializing={this.state.initializing}/>
-					</React.Fragment>
-					}
-					<NotFoundErrorBoundary>
-						{!this.state.initializing && // Avoiding bug: don't show page while initializing.
-						// Otherwise we make two GET requests sequentially.
-						// Unfortunately some our GET handlers are not idempotent (i.e. /Admin/CheckNextExerciseForSlide)
-						<Router/>
+				<ThemeContext.Provider value={ theme }>
+					<ErrorBoundary>
+						{ isHeaderVisible &&
+						<React.Fragment>
+							<Header initializing={ this.state.initializing }/>
+						</React.Fragment>
 						}
-					</NotFoundErrorBoundary>
-					<YandexMetrika/>
-				</ErrorBoundary>
+						<NotFoundErrorBoundary>
+							{ !this.state.initializing && // Avoiding bug: don't show page while initializing.
+							// Otherwise we make two GET requests sequentially.
+							// Unfortunately some our GET handlers are not idempotent (i.e. /Admin/CheckNextExerciseForSlide)
+							<Router/>
+							}
+						</NotFoundErrorBoundary>
+						<YandexMetrika/>
+					</ErrorBoundary>
+				</ThemeContext.Provider>
 			</BrowserRouter>
 		);
 	}

@@ -15,7 +15,7 @@
 	</p>
 
 	<div class="stepik__course-export__lessons-partitions">
-		@foreach (var unit in Model.Course.Units)
+		@foreach (var unit in Model.Course.GetUnitsNotSafe())
 		{
 			<div class="stepik__course-export__lessons-partitions__unit">
 				@unit.Title

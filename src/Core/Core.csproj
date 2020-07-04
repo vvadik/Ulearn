@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<RootNamespace>Ulearn.Core</RootNamespace>
-		<LangVersion>7</LangVersion>
+		<LangVersion>default</LangVersion>
 		<TargetFrameworks>net472;netcoreapp3.1</TargetFrameworks>
 		<NoWarn>NU1701;CS0168</NoWarn>
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
@@ -13,7 +13,7 @@
 		<PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.3" />
 		<PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
 		<PackageReference Include="Microsoft.AspNetCore.Html.Abstractions" Version="2.2.0" />
-		<PackageReference Include="Microsoft.Build" Version="16.4.0" />
+		<PackageReference Include="Microsoft.Build" Version="16.5.0" />
 		<PackageReference Include="Microsoft.CodeAnalysis" Version="3.3.1" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.3.1" />
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />

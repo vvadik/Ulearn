@@ -1,14 +1,11 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import api from "../../../../../api/index";
-import Select from "@skbkontur/react-ui/components/Select/Select";
-import Modal from "@skbkontur/react-ui/components/Modal/Modal";
-import Button from "@skbkontur/react-ui/components/Button/Button";
-import Toast from "@skbkontur/react-ui/components/Toast/Toast";
+import { Select, Modal, Button, Toast } from "ui";
 import getPluralForm from "../../../../../utils/getPluralForm";
 
 import styles from './copyStudentsModal.less';
-import Loader from "@skbkontur/react-ui/components/Loader/Loader";
+import { Loader } from "ui";
 
 class CopyStudentsModal extends Component {
 
@@ -89,7 +86,7 @@ class CopyStudentsModal extends Component {
 						autofocus
 						required
 						items={this.getCourseOptions()}
-						onChange={this.onCourseChange}
+						onValueChange={this.onCourseChange}
 						width="200"
 						placeholder="Курс"
 						value={courseId}
@@ -145,7 +142,7 @@ class CopyStudentsModal extends Component {
 		return item.title || item.name;
 	};
 
-	onCourseChange = (_, value) => {
+	onCourseChange = (value) => {
 		this.setState({
 			courseId: value,
 			groupId: null

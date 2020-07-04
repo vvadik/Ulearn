@@ -37,8 +37,8 @@ namespace Ulearn.Core.Tests.Courses.ScoringGroups
 		public void TestSetAdditionalScoreInUnit()
 		{
 			var course = LoadCourseFromDirectory("SetAdditionalScoreInUnit");
-			var unit1 = course.Units.First();
-			var unit2 = course.Units.Last();
+			var unit1 = course.GetUnitsNotSafe().First();
+			var unit2 = course.GetUnitsNotSafe().Last();
 
 			Assert.AreEqual(false, course.Settings.Scoring.Groups["ScoringGroup1"].IsMaxAdditionalScoreSpecified);
 			Assert.AreEqual(false, course.Settings.Scoring.Groups["ScoringGroup1"].CanBeSetByInstructor);
@@ -56,9 +56,9 @@ namespace Ulearn.Core.Tests.Courses.ScoringGroups
 		public void TestInheritAdditionalScore()
 		{
 			var course = LoadCourseFromDirectory("InheritAdditionalScore");
-			var unit1 = course.Units[0];
-			var unit2 = course.Units[1];
-			var unit3 = course.Units[2];
+			var unit1 = course.GetUnitsNotSafe()[0];
+			var unit2 = course.GetUnitsNotSafe()[1];
+			var unit3 = course.GetUnitsNotSafe()[2];
 
 			Assert.AreEqual(10, course.Settings.Scoring.Groups["ScoringGroup1"].MaxAdditionalScore);
 			Assert.AreEqual(true, course.Settings.Scoring.Groups["ScoringGroup1"].CanBeSetByInstructor);

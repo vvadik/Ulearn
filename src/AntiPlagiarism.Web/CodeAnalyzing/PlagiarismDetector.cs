@@ -20,18 +20,21 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 	{
 		private readonly ISnippetsRepo snippetsRepo;
 		private readonly ISubmissionsRepo submissionsRepo;
+		private readonly IMostSimilarSubmissionsRepo mostSimilarSubmissionsRepo;
 		private readonly CodeUnitsExtractor codeUnitsExtractor;
 		private readonly ILogger logger;
 		private readonly AntiPlagiarismConfiguration configuration;
 
 		public PlagiarismDetector(
 			ISnippetsRepo snippetsRepo, ISubmissionsRepo submissionsRepo,
+			IMostSimilarSubmissionsRepo mostSimilarSubmissionsRepo,
 			CodeUnitsExtractor codeUnitsExtractor,
 			ILogger logger,
 			IOptions<AntiPlagiarismConfiguration> options)
 		{
 			this.snippetsRepo = snippetsRepo;
 			this.submissionsRepo = submissionsRepo;
+			this.mostSimilarSubmissionsRepo = mostSimilarSubmissionsRepo;
 			this.codeUnitsExtractor = codeUnitsExtractor;
 			this.logger = logger;
 			configuration = options.Value;
@@ -105,7 +108,8 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			return tokens.Count;
 		}
 
-		public async Task<List<Plagiarism>> GetPlagiarismsAsync(Submission submission, SuspicionLevels suspicionLevels)
+		// Работа метода описана в классе PlagiarismDetectorConfiguration
+		public async Task<List<Plagiarism>> GetPlagiarismsAsync(Submission submission, SuspicionLevels suspicionLevels, int submissionInfluenceLimitInMonths)
 		{
 			/* Dictionaries by submission id and snippet type */
 			var tokensMatchedInThisSubmission = new DefaultDictionary<Tuple<int, SnippetType>, HashSet<int>>();
@@ -126,13 +130,15 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			).ConfigureAwait(false);
 			var snippetsIdsFirstSearch = new HashSet<int>(snippetsOccurrencesFirstSearch.Select(o => o.SnippetId));
 			logger.Information($"Found following snippets after first search: {string.Join(", ", snippetsIdsFirstSearch)}");
+			var useSubmissionsFromDate = DateTime.Now.AddMonths(-submissionInfluenceLimitInMonths);
 			var suspicionSubmissionIds = snippetsRepo.GetSubmissionIdsWithSameSnippets(
 				snippetsIdsFirstSearch,
 				/* Filter only  submissions BY THIS client, THIS task, THIS language and NOT BY THIS author */
 				o => o.Submission.ClientId == submission.ClientId &&
 					o.Submission.TaskId == submission.TaskId &&
 					o.Submission.Language == submission.Language &&
-					o.Submission.AuthorId != submission.AuthorId,
+					o.Submission.AuthorId != submission.AuthorId &&
+					o.Submission.AddingTime > useSubmissionsFromDate,
 				maxSubmissionsAfterFirstSearch
 			);
 			logger.Information($"Found following submissions after first search: {string.Join(", ", suspicionSubmissionIds)}");
@@ -154,7 +160,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			var snippetsStatistics = await snippetsRepo.GetSnippetsStatisticsAsync(submission.ClientId, submission.TaskId, snippetsIds).ConfigureAwait(false);
 
 			var matchedSnippets = new DefaultDictionary<int, List<MatchedSnippet>>();
-			var authorsCount = await submissionsRepo.GetAuthorsCountAsync(submission.ClientId, submission.TaskId).ConfigureAwait(false);
+			var authorsCount = await submissionsRepo.GetAuthorsCountAsync(submission.ClientId, submission.TaskId, submissionInfluenceLimitInMonths).ConfigureAwait(false);
 			foreach (var snippetOccurrence in snippetsOccurrences)
 			{
 				var otherOccurrences = allOtherOccurrences.GetOrDefault(snippetOccurrence.SnippetId, new List<SnippetOccurence>());
@@ -190,6 +196,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 
 			var allSnippetTypes = GetAllSnippetTypes();
 			var thisSubmissionLength = submission.TokensCount;
+			MostSimilarSubmission mostSimilarSubmission = null;
 			foreach (var plagiarismSubmission in plagiarismSubmissions)
 			{
 				var unionLength = 0;
@@ -209,6 +216,14 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 				/* Normalize weight */
 				weight /= allSnippetTypes.Count;
 
+				if (mostSimilarSubmission == null || mostSimilarSubmission.Weight < weight)
+					mostSimilarSubmission = new MostSimilarSubmission
+					{
+						Weight = weight,
+						SubmissionId = submission.Id,
+						SimilarSubmissionId = plagiarismSubmission.Id,
+						Timestamp = DateTime.Now
+					};
 				logger.Information($"Link weight between submisions {submission.Id} and {plagiarismSubmission.Id} is {weight}. Union length is {unionLength}.");
 
 				if (weight < suspicionLevels.FaintSuspicion)
@@ -216,6 +231,9 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 
 				plagiarisms.Add(BuildPlagiarismInfo(plagiarismSubmission, weight, matchedSnippets[plagiarismSubmission.Id]));
 			}
+
+			if(mostSimilarSubmission != null)
+				await mostSimilarSubmissionsRepo.SaveMostSimilarSubmissionAsync(mostSimilarSubmission).ConfigureAwait(false);
 
 			return plagiarisms;
 		}

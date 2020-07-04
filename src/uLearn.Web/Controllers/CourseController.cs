@@ -87,7 +87,8 @@ namespace uLearn.Web.Controllers
 			if (course == null)
 				return HttpNotFound();
 
-			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
+			var visibleUnitIds = unitsRepo.GetVisibleUnitIds(course, User);
+			var visibleUnits = course.GetUnits(visibleUnitIds);
 			var isGuest = !User.Identity.IsAuthenticated;
 			var isInstructor = !isGuest && User.HasAccessFor(course.Id, CourseRole.Instructor);
 
@@ -170,7 +171,8 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.FindCourse(courseId);
 			if (course == null)
 				return HttpNotFound();
-			var visibleUnits = unitsRepo.GetVisibleUnits(course, User);
+			var visibleUnitIds = unitsRepo.GetVisibleUnitIds(course, User);
+			var visibleUnits = course.GetUnits(visibleUnitIds);
 			var isInstructor = User.HasAccessFor(course.Id, CourseRole.Instructor);
 			var slide = slideIndex == -1 ? GetInitialSlideForStartup(courseId, visibleUnits, isInstructor) : course.Slides[slideIndex];
 			if (slide == null)
@@ -326,7 +328,6 @@ namespace uLearn.Web.Controllers
 				CourseId = course.Id,
 				CourseTitle = course.Title,
 				Slide = slide,
-				Score = Tuple.Create(0, 0),
 				BlockRenderContext = new BlockRenderContext(
 					course,
 					slide,
@@ -350,21 +351,17 @@ namespace uLearn.Web.Controllers
 			if (manualChecking != null)
 				userId = manualChecking.UserId;
 
-			var visiter = await VisitSlide(course.Id, slide.Id, userId).ConfigureAwait(false);
-			var maxSlideScore = GetMaxSlideScoreForUser(course, slide, userId);
 			var defaultProhibitFurtherReview = groupsRepo.GetDefaultProhibitFutherReviewForUser(course.Id, userId, User);
 			var manualCheckingsLeft = manualChecking != null ? ControllerUtils.GetManualCheckingsCountInQueue(slideCheckingsRepo, groupsRepo, User, course.Id, slide, groupsIds) : 0;
 
 			var (notArchivedGroupNames, archivedGroupNames) = GetGroupNames(course, manualChecking);
 
-			var score = Tuple.Create(visiter.Score, maxSlideScore);
 			var model = new CoursePageModel
 			{
 				UserId = userId,
 				CourseId = course.Id,
 				CourseTitle = course.Title,
 				Slide = slide,
-				Score = score,
 				BlockRenderContext = CreateRenderContext(
 					course, slide, manualChecking, exerciseSubmissionId, groupsIds,
 					autoplay: autoplay,
@@ -374,7 +371,6 @@ namespace uLearn.Web.Controllers
 				ContextManualCheckingUserGroups = notArchivedGroupNames,
 				ContextManualCheckingUserArchivedGroups = archivedGroupNames,
 				IsGuest = false,
-				SlideEditUrl = GetGitEditLink(course, slide.Info.SlideFile)
 			};
 			return model;
 		}
@@ -385,7 +381,8 @@ namespace uLearn.Web.Controllers
 			var archivedGroupNames = "";
 			if (manualChecking != null)
 			{
-				var userGroups = groupsRepo.GetUsersGroups(new List<string> { course.Id }, new List<string> { manualChecking.UserId }, User, 100);
+				var userGroups = groupsRepo.GetUsersGroups(new List<string> { course.Id }, new List<string> { manualChecking.UserId }, User, 100,
+					actual: true, archived: true);
 				if (userGroups.ContainsKey(manualChecking.UserId))
 				{
 					notArchivedGroupNames = string.Join(", ", groupsRepo.GetUserGroupsNames(userGroups[manualChecking.UserId].Where(g => !g.IsArchived)));
@@ -567,7 +564,7 @@ namespace uLearn.Web.Controllers
 		public ActionResult InstructorNote(string courseId, Guid unitId)
 		{
 			var course = courseManager.GetCourse(courseId);
-			var instructorNote = course.GetUnitById(unitId).InstructorNote;
+			var instructorNote = course.GetUnitByIdNotSafe(unitId).InstructorNote;
 			if (instructorNote == null)
 				return HttpNotFound("No instructor note for this unit");
 			var gitEditUrl = GetGitEditLink(course, instructorNote.File);

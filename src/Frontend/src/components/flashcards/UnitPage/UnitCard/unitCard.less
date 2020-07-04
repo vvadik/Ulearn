@@ -1,9 +1,9 @@
 @import "../../../../variables.less";
 
-@cardsContainerMaxWidth: 700px;
-@cardsContainerHeight: 397px;
+@cardsContainerMaxWidth: @maxContentWidth;
+@cardsContainerHeight: 355px;
 @cardWidth: 100%;
-@cardHeight: @cardsContainerHeight - 59px;
+@cardHeight: @cardsContainerHeight - 17px;
 
 @secondCardWidthDecrease: 22px;
 @secondCardHeightDecrease: 8px;
@@ -28,7 +28,7 @@
   width: @cardWidth;
   height: @cardHeight;
 
-  transform: translateY(@cardsContainerHeight - @cardHeight);
+  transform: translateY(@thirdCardHeightDecrease);
 
   position: absolute;
 
@@ -41,7 +41,7 @@
   width: calc(@cardWidth - @secondCardWidthDecrease * 2);
   height: calc(@cardHeight - @secondCardHeightDecrease * 2);
 
-  transform: translate(@secondCardWidthDecrease, calc(@cardsContainerHeight - @cardHeight - @secondCardHeightDecrease));
+  transform: translate(@secondCardWidthDecrease, @secondCardHeightDecrease);
   z-index: -2;
 
   background: darken(@flashcardUnitBackgroundBlue, 10%);
@@ -51,7 +51,7 @@
   width: calc(@cardWidth - @thirdCardWidthDecrease * 2);
   height: calc(@cardHeight - @thirdCardHeightDecrease * 2);
 
-  transform: translate(@thirdCardWidthDecrease, calc(@cardsContainerHeight - @cardHeight - @thirdCardHeightDecrease));
+  transform: translate(@thirdCardWidthDecrease, 0);
   z-index: -3;
 
   background: darken(@flashcardUnitBackgroundBlue, 15%);
@@ -89,6 +89,8 @@
 }
 
 .startButtonContainer {
+  background-color: @white;
+  border-radius: 8px;
   position: absolute;
   bottom: 30px;
   left: 28px;

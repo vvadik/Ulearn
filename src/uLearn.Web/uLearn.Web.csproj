@@ -37,6 +37,7 @@
     <TargetFrameworkProfile />
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Use64BitIISExpress />
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -239,15 +240,15 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Build, Version=15.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\packages\Microsoft.Build.16.4.0\lib\net472\Microsoft.Build.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Build.16.5.0\lib\net472\Microsoft.Build.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Build.Framework, Version=15.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\packages\Microsoft.Build.Framework.16.4.0\lib\net472\Microsoft.Build.Framework.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Build.Framework.16.5.0\lib\net472\Microsoft.Build.Framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Build.Utilities.Core, Version=15.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\packages\Microsoft.Build.Utilities.Core.16.4.0\lib\net472\Microsoft.Build.Utilities.Core.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Build.Utilities.Core.16.5.0\lib\net472\Microsoft.Build.Utilities.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CodeAnalysis, Version=3.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -1315,15 +1316,12 @@
     <Content Include="Scripts\slide-hints.js" />
     <Content Include="Jsdifflib\jsdifflib.js" />
     <Content Include="Scripts\slide-editor.js" />
-    <Content Include="Scripts\slide-gallery.js" />
     <Content Include="Scripts\slide-run.js" />
     <Content Include="Scripts\slide-solutions-like.js" />
-    <Content Include="Scripts\slide-nav.js" />
     <Content Include="Scripts\slide-spoilers.js" />
     <Content Include="Scripts\slide-tex.js" />
     <Content Include="Scripts\slide-utils.js" />
     <Content Include="Scripts\slide-versions.js" />
-    <Content Include="Scripts\slide-video.js" />
     <Content Include="Scripts\stepik.js" />
     <Content Include="Scripts\style-errors-settings.js" />
     <Content Include="Scripts\tooltips.js" />
@@ -1447,7 +1445,6 @@
     <Content Include="Views\Exercise\_ExerciseReviewComment.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Retargeting.cshtml" />
-    <Content Include="Views\Shared\_ReturnHijack.cshtml" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

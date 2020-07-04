@@ -3,12 +3,12 @@ import PropTypes from "prop-types";
 
 import CourseCards from "./CourseCards/CourseCards";
 import Guides from "../Guides/Guides";
-import Button from "@skbkontur/react-ui/Button";
-import Loader from "@skbkontur/react-ui/Loader";
+import { Button, } from "ui";
 import Flashcards from "../Flashcards/Flashcards";
 
 import styles from './courseFlashcardsPage.less';
 import { guides } from '../consts';
+import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader";
 
 class CourseFlashcardsPage extends Component {
 	constructor(props) {
@@ -22,7 +22,7 @@ class CourseFlashcardsPage extends Component {
 	componentDidMount() {
 		const { courseId, flashcards, loadFlashcards } = this.props;
 
-		if (flashcards.length === 0) {
+		if(flashcards.length === 0) {
 			loadFlashcards(courseId);
 		}
 	}
@@ -31,8 +31,12 @@ class CourseFlashcardsPage extends Component {
 		const { showFlashcards } = this.state;
 		const { courseId, flashcardsLoading, flashcards, infoByUnits, sendFlashcardRate } = this.props;
 
+		if(!flashcards || flashcardsLoading) {
+			return (<CourseLoader/>);
+		}
+
 		return (
-			<Loader active={ flashcardsLoading } type="big">
+			<React.Fragment>
 				{ this.renderHeader() }
 
 				{ !flashcardsLoading &&
@@ -52,7 +56,7 @@ class CourseFlashcardsPage extends Component {
 					onClose={ this.hideFlashcards }
 					sendFlashcardRate={ sendFlashcardRate }
 				/> }
-			</Loader>
+			</React.Fragment>
 		);
 	}
 
@@ -63,9 +67,6 @@ class CourseFlashcardsPage extends Component {
 		return (
 			<header className={ styles.header }>
 				<div>
-					<h2 className={ styles.title }>
-						Флеш-карты для самопроверки
-					</h2>
 					<p className={ styles.description }>
 						Помогут лучше запомнить материал курса и подготовиться к экзаменам
 					</p>

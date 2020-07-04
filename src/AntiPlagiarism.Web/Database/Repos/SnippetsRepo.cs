@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 using AntiPlagiarism.Api.Models;
 using AntiPlagiarism.Web.Database.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Ulearn.Common;
+using Ulearn.Common.Extensions;
 
 namespace AntiPlagiarism.Web.Database.Repos
 {
@@ -14,28 +17,30 @@ namespace AntiPlagiarism.Web.Database.Repos
 	{
 		Task<Snippet> AddSnippetAsync(int tokensCount, SnippetType type, int hash);
 		Task<bool> IsSnippetExistsAsync(int tokensCount, SnippetType type, int hash);
-		Task<SnippetOccurence> AddSnippetOccurenceAsync(Submission submission, Snippet snippet, int firstTokenIndex);
+		Task<SnippetOccurence> AddSnippetOccurenceAsync(Submission submission, Snippet snippet, int firstTokenIndex, int submissionInfluenceLimitInMonths);
 		Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(Submission submission, int maxCount, int authorsCountMinThreshold, int authorsCountMaxThreshold);
 		Task<List<SnippetOccurence>> GetSnippetsOccurencesForSubmissionAsync(Submission submission);
 		Task<Dictionary<int, SnippetStatistics>> GetSnippetsStatisticsAsync(int clientId, Guid taskId, IEnumerable<int> snippetsIds);
-		Task<List<SnippetOccurence>> GetSnippetsOccurrencesAsync(int snippetId);
-		Task<List<SnippetOccurence>> GetSnippetsOccurrencesAsync(int snippetId, Expression<Func<SnippetOccurence, bool>> filterFunction);
-		Task<List<SnippetOccurence>> GetSnippetsOccurrencesAsync(IEnumerable<int> snippetIds, Expression<Func<SnippetOccurence, bool>> filterFunction);
 		List<SnippetOccurence> GetSnippetsOccurrences(IEnumerable<int> snippetIds, Expression<Func<SnippetOccurence, bool>> filterFunction);
 		List<int> GetSubmissionIdsWithSameSnippets(IEnumerable<int> snippetIds, Expression<Func<SnippetOccurence, bool>> filterFunction, int maxSubmissionsCount);
 		Task RemoveSnippetsOccurrencesForTaskAsync(Guid taskId);
 		Task<Snippet> GetOrAddSnippetAsync(Snippet snippet);
+		Task UpdateOldSnippetsStatisticsAsync(DateTime from, DateTime to);
+		Task<OldSubmissionsInfluenceBorder> GetOldSubmissionsInfluenceBorderAsync();
+		Task SetOldSubmissionsInfluenceBorderAsync(DateTime? oldSnippetsInfluenceBorder);
 	}
 
 	public class SnippetsRepo : ISnippetsRepo
 	{
 		private readonly AntiPlagiarismDb db;
+		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly ILogger logger;
 
-		public SnippetsRepo(AntiPlagiarismDb db, ILogger logger)
+		public SnippetsRepo(AntiPlagiarismDb db, IServiceScopeFactory serviceScopeFactory, ILogger logger)
 		{
 			this.db = db;
 			this.logger = logger;
+			this.serviceScopeFactory = serviceScopeFactory;
 		}
 
 		public async Task<Snippet> AddSnippetAsync(int tokensCount, SnippetType type, int hash)
@@ -56,7 +61,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 			return db.Snippets.AnyAsync(s => s.TokensCount == tokensCount && s.SnippetType == type && s.Hash == hash);
 		}
 
-		public async Task<SnippetOccurence> AddSnippetOccurenceAsync(Submission submission, Snippet snippet, int firstTokenIndex)
+		public async Task<SnippetOccurence> AddSnippetOccurenceAsync(Submission submission, Snippet snippet, int firstTokenIndex, int submissionInfluenceLimitInMonths)
 		{
 			logger.Information($"Сохраняю в базу информацию о сниппете {snippet} в решении #{submission.Id} в позиции {firstTokenIndex}");
 			logger.Information($"Ищу сниппет {snippet} в базе (или создаю новый)");
@@ -87,10 +92,12 @@ namespace AntiPlagiarism.Web.Database.Repos
 
 			logger.Information($"Старая статистика сниппета {foundSnippet}: {snippetStatistics}");
 			/* Use non-async Add() here because of performance issues with async versions */
+			var useSubmissionsFromDate = DateTime.Now.AddMonths(-submissionInfluenceLimitInMonths);
 			snippetStatistics.AuthorsCount = db.SnippetsOccurences.Include(o => o.Submission)
 				.Where(o => o.SnippetId == foundSnippet.Id &&
 							o.Submission.ClientId == submission.ClientId &&
-							o.Submission.TaskId == submission.TaskId)
+							o.Submission.TaskId == submission.TaskId &&
+							o.Submission.AddingTime > useSubmissionsFromDate)
 				.Select(o => o.Submission.AuthorId)
 				.Distinct()
 				.Count();
@@ -241,21 +248,6 @@ namespace AntiPlagiarism.Web.Database.Repos
 				.ToDictionaryAsync(s => s.SnippetId);
 		}
 
-		public Task<List<SnippetOccurence>> GetSnippetsOccurrencesAsync(int snippetId)
-		{
-			return GetSnippetsOccurrencesAsync(snippetId, o => true);
-		}
-
-		public Task<List<SnippetOccurence>> GetSnippetsOccurrencesAsync(int snippetId, Expression<Func<SnippetOccurence, bool>> filterFunction)
-		{
-			return db.SnippetsOccurences.Include(o => o.Submission).Where(o => o.SnippetId == snippetId).Where(filterFunction).ToListAsync();
-		}
-
-		public Task<List<SnippetOccurence>> GetSnippetsOccurrencesAsync(IEnumerable<int> snippetIds, Expression<Func<SnippetOccurence, bool>> filterFunction)
-		{
-			return InternalGetSnippetsOccurences(snippetIds, filterFunction).ToListAsync();
-		}
-
 		public List<SnippetOccurence> GetSnippetsOccurrences(IEnumerable<int> snippetIds, Expression<Func<SnippetOccurence, bool>> filterFunction)
 		{
 			return InternalGetSnippetsOccurences(snippetIds, filterFunction).ToList();
@@ -296,6 +288,131 @@ namespace AntiPlagiarism.Web.Database.Repos
 		public async Task<List<Snippet>> GetSnippetsForSubmission(Submission submission, int maxCount, int authorsCountThreshold)
 		{
 			return (await GetSnippetsOccurencesForSubmissionAsync(submission, maxCount, 0, authorsCountThreshold).ConfigureAwait(false)).Select(o => o.Snippet).ToList();
+		}
+
+		public async Task UpdateOldSnippetsStatisticsAsync(DateTime from, DateTime to)
+		{
+			logger.Information($"Start update old snippets statistics from {from.ToSortable()} to {to.ToSortable()}");
+			var tasks = await db.Submissions
+				.Where(s => s.AddingTime > from && s.AddingTime < to)
+				.Select(s => new {s.ClientId, s.TaskId})
+				.Distinct()
+				.ToListAsync();
+			logger.Information($"Need update snippets statistics for {tasks.Count} tasks from {from.ToSortable()} to {to.ToSortable()}");
+
+			foreach (var task in tasks)
+			{
+				var clientId = task.ClientId;
+				var taskId = task.TaskId;
+				await FuncUtils.TrySeveralTimesAsync(
+					async () => await UpdateOldSnippetsStatisticsForTask(from, to, taskId, clientId, serviceScopeFactory, logger),
+					3);
+			}
+			logger.Information($"Updated snippets statistics for {tasks.Count} tasks from {from.ToSortable()} to {to.ToSortable()}");
+		}
+
+		/// from может быть больше to. Тогда в authorsCount учтутся посылки начиная со времени to.
+		/// Операция безопасна, т.к. таблица ЫnippetsStatistics полностью основана на данных других таблиц.
+		/// Считает правильные значения, а не вычитает, так что можно запускать несколько раз.
+		private static async Task UpdateOldSnippetsStatisticsForTask(DateTime from, DateTime to, Guid taskId, int clientId,
+			IServiceScopeFactory serviceScopeFactory, ILogger logger)
+		{
+			using (var scope = serviceScopeFactory.CreateScope())
+			{
+				var db = scope.ServiceProvider.GetService<AntiPlagiarismDb>();
+				try
+				{
+					db.DisableAutoDetectChanges();
+					var minDate = from > to ? to : from;
+					var maxDate = from > to ? from : to;
+					var snippetIdsInNonInfluencingSubmissions = db.SnippetsOccurences
+						.Where(s => s.Submission.AddingTime > minDate && s.Submission.AddingTime <= maxDate
+							&& s.Submission.TaskId == taskId && s.Submission.ClientId == clientId)
+						.Select(ss => ss.SnippetId)
+						.Distinct()
+						.OrderBy(s => s);
+					var snippetIdsInNonInfluencingSubmissionsList = await snippetIdsInNonInfluencingSubmissions.ToListAsync();
+					var snippetsStatistics = await db.SnippetsStatistics
+						.Where(s =>
+							s.TaskId == taskId && s.ClientId == clientId
+							&& snippetIdsInNonInfluencingSubmissions.Contains(s.SnippetId))
+						.ToListAsync();
+					logger.Information($"Need update {snippetIdsInNonInfluencingSubmissionsList.Count} snippets statistics for task {taskId} from {from.ToSortable()} to {to.ToSortable()}");
+					if (snippetIdsInNonInfluencingSubmissionsList.Count == 0)
+						return;
+
+					const int maxBatchSize = 20000;
+					for (var i = 0; i < snippetIdsInNonInfluencingSubmissionsList.Count / maxBatchSize + (snippetIdsInNonInfluencingSubmissionsList.Count % maxBatchSize > 0 ? 1 : 0); i++)
+					{
+						var snippetIdsPart = snippetIdsInNonInfluencingSubmissionsList
+							.Skip(i * maxBatchSize)
+							.Take(Math.Min(maxBatchSize, snippetIdsInNonInfluencingSubmissionsList.Count - i * maxBatchSize))
+							.ToHashSet();
+						var snippetsStatisticsPart = snippetsStatistics
+							.Where(ss => snippetIdsPart.Contains(ss.SnippetId))
+							.ToList();
+						await UpdateOldSnippetsStatisticsForTaskBatch(@from, to, taskId, clientId, logger, db,
+							snippetIdsInNonInfluencingSubmissions.Skip(i * maxBatchSize).Take(snippetIdsPart.Count),
+							snippetsStatisticsPart,
+							$"{i * maxBatchSize + snippetIdsPart.Count}/{snippetIdsInNonInfluencingSubmissionsList.Count}");
+					}
+				}
+				finally
+				{
+					db.EnableAutoDetectChanges();
+				}
+			}
+		}
+
+		private static async Task UpdateOldSnippetsStatisticsForTaskBatch(DateTime @from, DateTime to, Guid taskId, int clientId,
+			ILogger logger, AntiPlagiarismDb db, IQueryable<int> snippetIdsInNonInfluencingSubmissions,
+			List<SnippetStatistics> snippetsStatistics, string snippetsCountLog)
+		{
+			var snippet2AuthorsCount = (await db.SnippetsOccurences
+					.Where(s =>
+						s.Submission.AddingTime > to
+						&& s.Submission.TaskId == taskId && s.Submission.ClientId == clientId
+						&& snippetIdsInNonInfluencingSubmissions.Contains(s.SnippetId))
+					.Select(s => new { s.SnippetId, s.Submission.AuthorId })
+					.Distinct()
+					.GroupBy(o => new { o.SnippetId })
+					.Select(g => new { g.Key.SnippetId, AuthorsCount = g.Count() })
+					.ToListAsync())
+				.ToDictionary(p => p.SnippetId, p => p.AuthorsCount);
+			logger.Information($"Authors counted for {snippetsCountLog} snippets for task {taskId} from {@from.ToSortable()} to {to.ToSortable()}");
+
+			await WriteNewAuthorsCounts(@from, to, taskId, logger, db, snippetsStatistics, snippet2AuthorsCount);
+		}
+
+		private static async Task WriteNewAuthorsCounts(DateTime @from, DateTime to, Guid taskId, ILogger logger, AntiPlagiarismDb db,
+			List<SnippetStatistics> snippetsStatistics, Dictionary<int, int> snippet2AuthorsCount)
+		{
+			foreach (var snippetStatistics in snippetsStatistics)
+			{
+				// snippet2AuthorsCount не содержит ключа, если с момента to не было посылок c этим сниппетом
+				snippetStatistics.AuthorsCount = snippet2AuthorsCount.GetValueOrDefault(snippetStatistics.SnippetId);
+				db.Entry(snippetStatistics).State = EntityState.Modified;
+			}
+
+			await db.SaveChangesAsync();
+			foreach (var snippetStatistics in snippetsStatistics)
+				db.Entry(snippetStatistics).State = EntityState.Unchanged;
+			logger.Information($"New authors count are written for {snippetsStatistics.Count} snippets for task {taskId} from {@from.ToSortable()} to {to.ToSortable()}");
+		}
+
+		public async Task<OldSubmissionsInfluenceBorder> GetOldSubmissionsInfluenceBorderAsync()
+		{
+			return await db.OldSubmissionsInfluenceBorder.FirstOrDefaultAsync();
+		}
+
+		public async Task SetOldSubmissionsInfluenceBorderAsync(DateTime? oldSubmissionsInfluenceBorder)
+		{
+			var border = await db.OldSubmissionsInfluenceBorder.FirstOrDefaultAsync();
+			if (border != null)
+				border.Date = oldSubmissionsInfluenceBorder;
+			else
+				db.OldSubmissionsInfluenceBorder.Add(new OldSubmissionsInfluenceBorder { Date = oldSubmissionsInfluenceBorder });
+			await db.SaveChangesAsync();
 		}
 	}
 

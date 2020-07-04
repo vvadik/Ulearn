@@ -313,7 +313,6 @@ namespace Web.Api.Tests.Controllers.TempCourses
 			Assert.IsEmpty(diff);
 		}
 
-
 		private ZipFile GetZipWithDelete(List<string> relativePaths)
 		{
 			File.WriteAllLines(Path.Combine(workingCourseDirectory.FullName, "deleted.txt"), relativePaths);

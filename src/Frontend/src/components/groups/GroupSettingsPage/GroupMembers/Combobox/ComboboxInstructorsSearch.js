@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import api from "../../../../../api/index";
-import ComboBox from "@skbkontur/react-ui/components/ComboBox/ComboBox";
-import Avatar from "../../../../common/Avatar/Avatar";
+import api from "src/api";
+import { ComboBox } from "ui";
+import Avatar from "src/components/common/Avatar/Avatar";
 
 import styles from './comboboxInstructorsSearch.less';
 
@@ -20,7 +20,7 @@ class ComboboxInstructorsSearch extends Component {
 				renderItem={this.renderItem}
 				renderValue={this.renderItem}
 				renderNotFound={this.renderNotFound}
-				onChange={this.onChangeItem}
+				onInputValueChange={this.onChangeItem}
 				onInputChange={query => this.setState({query})}
 				placeholder="Начните вводить имя, фамилию или логин преподавателя" />
 		);
@@ -77,7 +77,7 @@ class ComboboxInstructorsSearch extends Component {
 		return <span>{msg}</span>;
 	};
 
-	onChangeItem = (_, item) => {
+	onChangeItem = (item) => {
 		this.props.onAddTeacher(item);
 	}
 }

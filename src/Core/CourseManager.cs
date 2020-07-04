@@ -48,6 +48,8 @@ namespace Ulearn.Core
 		private static readonly CourseLoader loader = new CourseLoader(new UnitLoader(new XmlSlideLoader()));
 		private static readonly ErrorsBot errorsBot = new ErrorsBot();
 
+		private static readonly ConcurrentBag<string> brokenCourses = new ConcurrentBag<string>();
+
 		public CourseManager(DirectoryInfo baseDirectory)
 			: this(
 				baseDirectory.GetSubdirectory("Courses.Staging"),
@@ -58,12 +60,16 @@ namespace Ulearn.Core
 		{
 		}
 
-		public CourseManager(DirectoryInfo stagedDirectory, DirectoryInfo coursesVersionsDirectory, DirectoryInfo coursesDirectory, DirectoryInfo tempCourseStaging)
+		private CourseManager(DirectoryInfo stagedDirectory, DirectoryInfo coursesVersionsDirectory, DirectoryInfo coursesDirectory, DirectoryInfo tempCourseStaging)
 		{
 			this.stagedDirectory = stagedDirectory;
+			stagedDirectory.EnsureExists();
 			this.coursesDirectory = coursesDirectory;
+			coursesVersionsDirectory.EnsureExists();
 			this.tempCourseStaging = tempCourseStaging;
+			tempCourseStaging.EnsureExists();
 			this.coursesVersionsDirectory = coursesVersionsDirectory;
+			coursesVersionsDirectory.EnsureExists();
 		}
 
 		public virtual IEnumerable<Course> GetCourses()
@@ -72,6 +78,10 @@ namespace Ulearn.Core
 			return courses.Values.OrderBy(c => c.Title, StringComparer.OrdinalIgnoreCase);
 		}
 
+		///
+		/// <exception cref="KeyNotFoundException"></exception>
+		/// <exception cref="CourseNotFoundException"></exception>
+		///
 		[NotNull]
 		public virtual Course GetCourse(string courseId)
 		{
@@ -86,9 +96,16 @@ namespace Ulearn.Core
 			{
 				return GetCourse(courseId);
 			}
-			catch (Exception e) when (e is KeyNotFoundException || e is CourseNotFoundException)
+			catch (Exception e) when (e is KeyNotFoundException || e is CourseNotFoundException || e is CourseLoadingException)
 			{
 				return null;
+			}
+			catch (AggregateException e)
+			{
+				var ie = e.InnerException;
+				if (ie is KeyNotFoundException || ie is CourseNotFoundException || ie is CourseLoadingException)
+					return null;
+				throw;
 			}
 		}
 
@@ -97,6 +114,14 @@ namespace Ulearn.Core
 			return FindCourse(courseId) != null;
 		}
 
+		public bool CourseIsBroken(string courseId)
+		{
+			return brokenCourses.Contains(courseId);
+		}
+
+		///
+		/// <exception cref="CourseLoadingException"></exception>
+		///
 		public Course GetVersion(Guid versionId)
 		{
 			if (versionsCache.TryGet(versionId, out var version))
@@ -141,7 +166,6 @@ namespace Ulearn.Core
 			return coursesDirectory.GetSubdirectory(courseId);
 		}
 
-
 		public DirectoryInfo GetExtractedVersionDirectory(Guid versionId)
 		{
 			return GetExtractedCourseDirectory(versionId.GetNormalizedGuid());
@@ -176,22 +200,22 @@ namespace Ulearn.Core
 				foreach (var zipFile in courseZips)
 				{
 					log.Info($"Обновляю курс из {zipFile.Name}");
+					var courseId = GetCourseId(zipFile.FullName);
+					if (brokenCourses.Contains(courseId))
+						continue;
 					try
 					{
-						var courseId = GetCourseId(zipFile.FullName);
 						ReloadCourse(courseId);
 					}
 					catch (Exception e)
 					{
 						log.Error($"Не могу загрузить курс из {zipFile.FullName}", e);
+						brokenCourses.Add(courseId);
 						if (firstException == null)
-							firstException = new Exception("Error loading course from " + zipFile.Name, e);
+							firstException = new CourseLoadingException("Error loading course from " + zipFile.Name, e);
 					}
 				}
 			}
-
-			if (firstException != null)
-				throw firstException;
 		}
 
 		protected virtual void LoadCourseZipsToDiskFromExternalStorage(IEnumerable<string> existingOnDiskCourseIds)
@@ -277,9 +301,9 @@ namespace Ulearn.Core
 			return courseDir;
 		}
 
-		public Course LoadCourseFromZip(FileInfo zipFile, Encoding encoding)
+		private Course LoadCourseFromZip(FileInfo zipFile, Encoding encoding)
 		{
-			var courseDir = UnzipCourseFile(zipFile,encoding);
+			var courseDir = UnzipCourseFile(zipFile, encoding);
 			return LoadCourseFromDirectory(courseDir);
 		}
 
@@ -403,11 +427,6 @@ namespace Ulearn.Core
 			}
 		}
 
-		private static void UpdateXmlElement(ZipEntry entry, string selector, string value, ZipFile zip, IXmlNamespaceResolver nsResolver)
-		{
-			UpdateXmlEntity(entry, selector, element => element.Value = value, zip, nsResolver);
-		}
-
 		private static void UpdateXmlAttribute(ZipEntry entry, string selector, string attribute, string value, ZipFile zip, IXmlNamespaceResolver nsResolver)
 		{
 			UpdateXmlEntity(entry, selector, element =>
@@ -448,7 +467,7 @@ namespace Ulearn.Core
 			return GetCourses().FirstOrDefault(c => c.Slides.Count(s => s.Id == slideId) > 0);
 		}
 
-		public void UpdateCourse(Course course)
+		private void UpdateCourse(Course course)
 		{
 			if (!courses.ContainsKey(course.Id))
 				return;
@@ -484,7 +503,7 @@ namespace Ulearn.Core
 			}
 		}
 
-		public void LockCourse(string courseId)
+		private void LockCourse(string courseId)
 		{
 			var lockFile = GetCourseLockFile(courseId);
 			while (true)
@@ -514,7 +533,7 @@ namespace Ulearn.Core
 			}
 		}
 
-		public void ReleaseCourse(string courseId)
+		private void ReleaseCourse(string courseId)
 		{
 			GetCourseLockFile(courseId).Delete();
 		}
@@ -567,7 +586,7 @@ namespace Ulearn.Core
 			course.CourseDirectory = (DirectoryInfo)GetNewPathForFileAfterMoving(course.CourseDirectory, sourceDirectory, destinationDirectory);
 			course.CourseXmlDirectory = (DirectoryInfo)GetNewPathForFileAfterMoving(course.CourseXmlDirectory, sourceDirectory, destinationDirectory);
 
-			foreach (var unit in course.Units)
+			foreach (var unit in course.GetUnitsNotSafe())
 			{
 				unit.Directory = (DirectoryInfo)GetNewPathForFileAfterMoving(unit.Directory, sourceDirectory, destinationDirectory);
 				if (unit.InstructorNote != null)

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
+using Database.Repos;
 using Database.Repos.Flashcards;
 using Database.Repos.Groups;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -19,19 +20,23 @@ namespace Ulearn.Web.Api.Controllers
 	{
 		private readonly IGroupAccessesRepo groupAccessesRepo;
 		private readonly IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo;
+		private readonly IUnitsRepo unitsRepo;
 
-		public FlashcardUserStatisticsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo, IGroupAccessesRepo groupAccessesRepo, IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo)
+		public FlashcardUserStatisticsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db,
+			IUsersRepo usersRepo, IGroupAccessesRepo groupAccessesRepo, IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo,
+			IUnitsRepo unitsRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.groupAccessesRepo = groupAccessesRepo;
 			this.usersFlashcardsVisitsRepo = usersFlashcardsVisitsRepo;
+			this.unitsRepo = unitsRepo;
 		}
 
 		[HttpGet]
 		public async Task<ActionResult<UserFlashcardStatisticResponse>> UserFlashcardStatistics([FromQuery(Name = "course_id")] [BindRequired]
 			string courseId)
 		{
-			var course = courseManager.FindCourse(courseId);
+			var course = await courseManager.FindCourseAsync(courseId);
 			if (course == null)
 				return NotFound();
 			var groups = await groupAccessesRepo.GetAvailableForUserGroupsAsync(course.Id, UserId, true);
@@ -66,7 +71,8 @@ namespace Ulearn.Web.Api.Controllers
 
 			var visitsByUnits = userVisits.GroupBy(x => x.UnitId).ToDictionary(x => x.Key);
 
-			foreach (var unit in course.Units)
+			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIdsAsync(course, UserId);
+			foreach (var unit in course.GetUnits(visibleUnitsIds))
 			{
 				var unitStat = new UnitUserStatistic { UnitId = unit.Id, UnitTitle = unit.Title, TotalFlashcardsCount = unit.Flashcards.Count };
 				if (visitsByUnits.TryGetValue(unit.Id, out var unitGroup))

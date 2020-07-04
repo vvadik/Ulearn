@@ -11,6 +11,7 @@ using AntiPlagiarism.Web.Database;
 using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Database.Repos;
 using AntiPlagiarism.Web.Extensions;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -27,6 +28,8 @@ namespace AntiPlagiarism.Web.Controllers
 		private readonly ISnippetsRepo snippetsRepo;
 		private readonly ITasksRepo tasksRepo;
 		private readonly IWorkQueueRepo workQueueRepo;
+		private readonly IMostSimilarSubmissionsRepo mostSimilarSubmissionsRepo;
+		private readonly IManualSuspicionLevelsRepo manualSuspicionLevelsRepo;
 		private readonly PlagiarismDetector plagiarismDetector;
 		private readonly CodeUnitsExtractor codeUnitsExtractor;
 		private readonly IServiceScopeFactory serviceScopeFactory;
@@ -35,7 +38,10 @@ namespace AntiPlagiarism.Web.Controllers
 
 		public ApiController(
 			AntiPlagiarismDb db,
-			ISubmissionsRepo submissionsRepo, ISnippetsRepo snippetsRepo, ITasksRepo tasksRepo, IClientsRepo clientsRepo, IWorkQueueRepo workQueueRepo,
+			ISubmissionsRepo submissionsRepo, ISnippetsRepo snippetsRepo, ITasksRepo tasksRepo,
+			IClientsRepo clientsRepo, IWorkQueueRepo workQueueRepo,
+			IMostSimilarSubmissionsRepo mostSimilarSubmissionsRepo,
+			IManualSuspicionLevelsRepo manualSuspicionLevelsRepo,
 			PlagiarismDetector plagiarismDetector,
 			CodeUnitsExtractor codeUnitsExtractor,
 			ILogger logger,
@@ -48,6 +54,8 @@ namespace AntiPlagiarism.Web.Controllers
 			this.snippetsRepo = snippetsRepo;
 			this.tasksRepo = tasksRepo;
 			this.workQueueRepo = workQueueRepo;
+			this.mostSimilarSubmissionsRepo = mostSimilarSubmissionsRepo;
+			this.manualSuspicionLevelsRepo = manualSuspicionLevelsRepo;
 			this.plagiarismDetector = plagiarismDetector;
 			this.codeUnitsExtractor = codeUnitsExtractor;
 			this.newSubmissionHandler = newSubmissionHandler;
@@ -56,7 +64,7 @@ namespace AntiPlagiarism.Web.Controllers
 		}
 
 		[HttpPost(Api.Urls.AddSubmission)]
-		public async Task<ActionResult<AddSubmissionResponse>> AddSubmission(AddSubmissionParameters parameters)
+		public async Task<ActionResult<AddSubmissionResponse>> AddSubmission([FromQuery]string token, AddSubmissionParameters parameters)
 		{
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
@@ -72,7 +80,8 @@ namespace AntiPlagiarism.Web.Controllers
 				parameters.Language,
 				parameters.Code,
 				tokensCount,
-				parameters.AdditionalInfo
+				parameters.AdditionalInfo,
+				parameters.ClientSubmissionId
 			).ConfigureAwait(false);
 
 			logger.Information(
@@ -91,7 +100,7 @@ namespace AntiPlagiarism.Web.Controllers
 				SubmissionId = submission.Id,
 			};
 		}
-		
+
 		private int GetTokensCount(string code)
 		{
 			var codeUnits = codeUnitsExtractor.Extract(code);
@@ -163,13 +172,11 @@ namespace AntiPlagiarism.Web.Controllers
 				return NotFound(new ErrorResponse("Invalid submission id"));
 
 			var suspicionLevels = await GetSuspicionLevelsAsync(submission.TaskId).ConfigureAwait(false);
-			if (suspicionLevels == null)
-				return Ok(new ErrorResponse("Not enough statistics for defining suspicion levels"));
 
 			var result = new GetSubmissionPlagiarismsResponse
 			{
 				SubmissionInfo = submission.GetSubmissionInfoForApi(),
-				Plagiarisms = await plagiarismDetector.GetPlagiarismsAsync(submission, suspicionLevels).ConfigureAwait(false),
+				Plagiarisms = await plagiarismDetector.GetPlagiarismsAsync(submission, suspicionLevels, configuration.AntiPlagiarism.SubmissionInfluenceLimitInMonths).ConfigureAwait(false),
 				TokensPositions = plagiarismDetector.GetNeededTokensPositions(submission.ProgramText),
 				SuspicionLevels = suspicionLevels,
 				AnalyzedCodeUnits = GetAnalyzedCodeUnits(submission),
@@ -189,8 +196,6 @@ namespace AntiPlagiarism.Web.Controllers
 				return BadRequest(new ErrorResponse($"Invalid last_submissions_count. This value should be at least 1 and at most {maxLastSubmissionsCount}"));
 
 			var suspicionLevels = await GetSuspicionLevelsAsync(parameters.TaskId).ConfigureAwait(false);
-			if (suspicionLevels == null)
-				return Ok(new ErrorResponse("Not enough statistics for defining suspicion levels"));
 
 			var submissions = await submissionsRepo.GetSubmissionsByAuthorAndTaskAsync(client.Id, parameters.AuthorId, parameters.TaskId, parameters.LastSubmissionsCount).ConfigureAwait(false);
 			var result = new GetAuthorPlagiarismsResponse
@@ -207,7 +212,7 @@ namespace AntiPlagiarism.Web.Controllers
 					result.ResearchedSubmissions.Add(new ResearchedSubmission
 					{
 						SubmissionInfo = submission.GetSubmissionInfoForApi(),
-						Plagiarisms = await internalPlagiarismDetector.GetPlagiarismsAsync(submission, suspicionLevels).ConfigureAwait(false),
+						Plagiarisms = await internalPlagiarismDetector.GetPlagiarismsAsync(submission, suspicionLevels, configuration.AntiPlagiarism.SubmissionInfluenceLimitInMonths).ConfigureAwait(false),
 						TokensPositions = internalPlagiarismDetector.GetNeededTokensPositions(submission.ProgramText),
 						AnalyzedCodeUnits = GetAnalyzedCodeUnits(submission),
 					});
@@ -229,12 +234,30 @@ namespace AntiPlagiarism.Web.Controllers
 				}).ToList();
 		}
 
+		[ItemNotNull]
 		private async Task<SuspicionLevels> GetSuspicionLevelsAsync(Guid taskId)
 		{
 			var taskStatisticsParameters = await tasksRepo.FindTaskStatisticsParametersAsync(taskId).ConfigureAwait(false);
-			if (taskStatisticsParameters == null)
-				return null;
+			var manualSuspicionLevels = await manualSuspicionLevelsRepo.GetManualSuspicionLevelsAsync(taskId);
 
+			var automaticFaintSuspicion = configuration.AntiPlagiarism.StatisticsAnalyzing.MaxFaintSuspicionLevel;
+			var automaticStrongSuspicion = configuration.AntiPlagiarism.StatisticsAnalyzing.MaxStrongSuspicionLevel;
+			if (taskStatisticsParameters != null)
+				(automaticFaintSuspicion, automaticStrongSuspicion) = GetAutomaticSuspicionLevels(taskStatisticsParameters);
+
+			return new SuspicionLevels
+			{
+				AutomaticFaintSuspicion = automaticFaintSuspicion,
+				AutomaticStrongSuspicion = automaticStrongSuspicion,
+				ManualFaintSuspicion = manualSuspicionLevels?.FaintSuspicion,
+				ManualStrongSuspicion = manualSuspicionLevels?.StrongSuspicion,
+				FaintSuspicion = manualSuspicionLevels?.FaintSuspicion ?? automaticFaintSuspicion,
+				StrongSuspicion = manualSuspicionLevels?.StrongSuspicion ?? automaticStrongSuspicion,
+			};
+		}
+
+		private (double automaticFaintSuspicion, double automaticStrongSuspicion) GetAutomaticSuspicionLevels(TaskStatisticsParameters taskStatisticsParameters)
+		{
 			var faintSuspicionCoefficient = configuration.AntiPlagiarism.StatisticsAnalyzing.FaintSuspicionCoefficient;
 			var strongSuspicionCoefficient = configuration.AntiPlagiarism.StatisticsAnalyzing.StrongSuspicionCoefficient;
 			var minFaintSuspicionLevel = configuration.AntiPlagiarism.StatisticsAnalyzing.MinFaintSuspicionLevel;
@@ -242,11 +265,12 @@ namespace AntiPlagiarism.Web.Controllers
 			var maxFaintSuspicionLevel = configuration.AntiPlagiarism.StatisticsAnalyzing.MaxFaintSuspicionLevel;
 			var maxStrongSuspicionLevel = configuration.AntiPlagiarism.StatisticsAnalyzing.MaxStrongSuspicionLevel;
 
-			return new SuspicionLevels
-			{
-				FaintSuspicion = GetSuspicionLevelWithThreshold(taskStatisticsParameters.Mean + faintSuspicionCoefficient * taskStatisticsParameters.Deviation, minFaintSuspicionLevel, maxFaintSuspicionLevel),
-				StrongSuspicion = GetSuspicionLevelWithThreshold(taskStatisticsParameters.Mean + strongSuspicionCoefficient * taskStatisticsParameters.Deviation, minStrongSuspicionLevel, maxStrongSuspicionLevel),
-			};
+			var (faintSuspicion, strongSuspicion)
+				= StatisticsParametersFinder.GetSuspicionLevels(taskStatisticsParameters.Mean, taskStatisticsParameters.Deviation, faintSuspicionCoefficient, strongSuspicionCoefficient, logger);
+
+			var automaticFaintSuspicion = GetSuspicionLevelWithThreshold(faintSuspicion, minFaintSuspicionLevel, maxFaintSuspicionLevel);
+			var automaticStrongSuspicion = GetSuspicionLevelWithThreshold(strongSuspicion, minStrongSuspicionLevel, maxStrongSuspicionLevel);
+			return (automaticFaintSuspicion, automaticStrongSuspicion);
 		}
 
 		private static double GetSuspicionLevelWithThreshold(double value, double minValue, double maxValue)
@@ -258,6 +282,52 @@ namespace AntiPlagiarism.Web.Controllers
 			if (value > maxValue)
 				return maxValue;
 			return value;
+		}
+
+		[HttpGet(Api.Urls.GetMostSimilarSubmissions)]
+		public async Task<IActionResult> GetMostSimilarSubmissions([FromQuery] GetMostSimilarSubmissionsParameters parameters)
+		{
+			if (!ModelState.IsValid)
+				return BadRequest(ModelState);
+
+			var mostSimilarSubmissions = await mostSimilarSubmissionsRepo.GetMostSimilarSubmissionsByTaskAsync(client.Id, parameters.TaskId).ConfigureAwait(false);
+			var result = new GetMostSimilarSubmissionsResponse
+			{
+				MostSimilarSubmissions = mostSimilarSubmissions,
+			};
+			return Json(result);
+		}
+
+		[HttpGet(Api.Urls.GetSuspicionLevels)]
+		public async Task<IActionResult> GetSuspicionLevelsAsync([FromQuery] GetSuspicionLevelsParameters parameters)
+		{
+			if (!ModelState.IsValid)
+				return BadRequest(ModelState);
+
+			var suspicionLevels = await GetSuspicionLevelsAsync(parameters.TaskId).ConfigureAwait(false);
+
+			var result = new GetSuspicionLevelsResponse { SuspicionLevels = suspicionLevels };
+			return Json(result);
+		}
+
+		[HttpPost(Api.Urls.SetSuspicionLevels)]
+		public async Task<IActionResult> SetSuspicionLevelsAsync([FromQuery]string token, SetSuspicionLevelsParameters parameters)
+		{
+			if (!ModelState.IsValid)
+				return BadRequest(ModelState);
+
+			await manualSuspicionLevelsRepo.SetManualSuspicionLevelsAsync(new ManualSuspicionLevels
+			{
+				TaskId = parameters.TaskId,
+				FaintSuspicion = parameters.FaintSuspicion,
+				StrongSuspicion = parameters.StrongSuspicion,
+				Timestamp = DateTime.Now
+			});
+
+			var suspicionLevels = await GetSuspicionLevelsAsync(parameters.TaskId);
+
+			var result = new GetSuspicionLevelsResponse { SuspicionLevels = suspicionLevels };
+			return Json(result);
 		}
 	}
 }

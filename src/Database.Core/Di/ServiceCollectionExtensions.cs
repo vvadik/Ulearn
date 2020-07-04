@@ -16,11 +16,9 @@ namespace Database.Di
 {
 	public static class ServiceCollectionExtensions
 	{
-		public static IServiceCollection AddDatabaseServices(this IServiceCollection services, ILogger logger, DirectoryInfo courseManagerBaseDirectory = null)
+		public static IServiceCollection AddDatabaseServices(this IServiceCollection services, ILogger logger)
 		{
-			var courseManager = courseManagerBaseDirectory == null ? new WebCourseManager(logger) : new WebCourseManager(logger, courseManagerBaseDirectory);
-			services.AddSingleton<WebCourseManager>(courseManager);
-			services.AddSingleton<IWebCourseManager>(courseManager);
+			services.AddSingleton<IWebCourseManager, WebCourseManager>();
 
 			services.AddScoped<UlearnUserManager>();
 			services.AddScoped<InitialDataCreator>();

@@ -55,7 +55,7 @@ function ToggleDropDownClass(dropdownElement) {
 	var parent = $(dropdownElement.parents()[0]);
 	var cssClass = parent.data("css-class");
 	dropdownElement.toggleClass(cssClass);
-	var elements = dropdownElement.siblings().andSelf();
+	var elements = dropdownElement.siblings().addBack();
 	var button = $(parent.siblings("button")[0]);
 	var buttonCss = button.data("css-class");
 	button.removeClass(buttonCss);

@@ -2,19 +2,34 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import Navigation from "../Navigation";
-import AnyPage from '../../../pages/AnyPage';
-import { UrlError } from "../../common/Error/NotFoundErrorBoundary";
-import UnitFlashcardsPage from '../../../pages/course/UnitFlashcardsPage';
-import CourseFlashcardsPage from '../../../pages/course/CourseFlashcardsPage';
-import { flashcards, constructPathToSlide } from '../../../consts/routes';
-import { changeCurrentCourseAction } from "../../../actions/course";
-import { SLIDETYPE } from '../../../consts/general';
-import { SCORING_GROUP_IDS } from '../../../consts/scoringGroup';
+import AnyPage from 'src/pages/AnyPage';
+import UnitFlashcardsPage from 'src/pages/course/UnitFlashcardsPage';
+import CourseFlashcardsPage from 'src/pages/course/CourseFlashcardsPage';
+import { BlocksWrapper } from "src/components/course/Course/Slide/Blocks";
+import CommentsView from "src/components/comments/CommentsView/CommentsView";
+import Slide from './Slide/Slide';
+
+import { UrlError } from "src/components/common/Error/NotFoundErrorBoundary";
+import Error404 from "src/components/common/Error/Error404";
+import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet";
+import { Edit } from "icons";
+
+import { flashcards, constructPathToSlide } from 'src/consts/routes';
+import { SLIDETYPE } from 'src/consts/general';
+import { SCORING_GROUP_IDS } from 'src/consts/scoringGroup';
 
 import classnames from 'classnames';
 
 import styles from "./Course.less"
-import Error404 from "../../common/Error/Error404";
+
+const slideNavigationButtonTitles = {
+	next: "Далее",
+	previous: "Назад",
+	nextModule: "Следующий модуль",
+	previousModule: "Предыдущий модуль",
+}
+
 
 class Course extends Component {
 	constructor(props) {
@@ -24,56 +39,80 @@ class Course extends Component {
 			openUnit: null,
 			highlightedUnit: null,
 			currentSlideId: null,
+			currentSlideInfo: null,
 			currentCourseId: null,
 			navigationOpened: this.props.navigationOpened,
+			meta: {
+				title: 'Ulearn',
+				description: 'Интерактивные учебные онлайн-курсы по программированию',
+				keywords: '',
+				imageUrl: '',
+			},
 		};
 	}
 
 	componentDidMount() {
-		const { loadCourse, loadCourseErrors, loadUserProgress, isAuthenticated, courseId, courseInfo, progress, userId } = this.props;
+		const { loadCourse, loadCourseErrors, loadUserProgress, courseId, courseInfo, progress, user, } = this.props;
+		const { title } = this.state;
+		const { isAuthenticated } = user;
 
-		changeCurrentCourseAction(courseId);
-
-		if (!courseInfo) {
+		if(!courseInfo) {
 			loadCourse(courseId);
 			loadCourseErrors(courseId);
+		} else {
+			this.updateWindowMeta(title, courseInfo.title);
 		}
 
-		if (isAuthenticated && !progress) {
-			loadUserProgress(courseId, userId);
+		if(isAuthenticated && !progress) {
+			loadUserProgress(courseId, user.id);
 		}
 	}
 
-	componentDidUpdate(prevProps) {
-		const { loadUserProgress, isAuthenticated, courseId, loadCourse, loadCourseErrors, userId } = this.props;
+	componentDidUpdate(prevProps, prevState) {
+		const { loadUserProgress, courseId, loadCourse, user, courseInfo, loadCourseErrors } = this.props;
+		const { title } = this.state;
+		const { isAuthenticated } = user;
 
-		if (isAuthenticated !== prevProps.isAuthenticated) {
+		if(isAuthenticated !== prevProps.user.isAuthenticated) {
 			loadCourse(courseId);
 			loadCourseErrors(courseId);
-			loadUserProgress(courseId, userId);
+			loadUserProgress(courseId, user.id);
+		}
+
+		if(title !== prevState.title) {
+			this.updateWindowMeta(title, courseInfo.title);
+			loadCourseErrors(courseId);
+			loadUserProgress(courseId, user.id);
 		}
 	}
 
 	static getDerivedStateFromProps(props, state) {
 		const defaultState = { navigationOpened: props.navigationOpened };
+		const { courseId, slideId, units, enterToCourse, courseInfo, progress, isHijacked, updateVisitedSlide } = props;
 
-		if (!props.units) {
+		if(!units) {
 			return defaultState;
 		}
 
-		if (state.currentCourseId !== props.courseId || state.currentSlideId !== props.slideId) {
-			props.enterToCourse(props.courseId);
-			const openUnitId = Course.findUnitIdBySlideId(props.slideId, props.courseInfo);
-			const openUnit = props.units[openUnitId];
+		if(state.currentCourseId !== courseId || state.currentSlideId !== slideId) {
+			enterToCourse(courseId);
+			const openUnitId = Course.findUnitIdBySlideId(slideId, courseInfo);
+			const openUnit = units[openUnitId];
 			window.scrollTo(0, 0);
 
-			const slide = Course.findSlideBySlideId(props.slideId, props.courseInfo);
-			if (slide && props.progress) {
-				props.updateVisitedSlide(props.courseId, slide.id);
+			const slideInfo = Course.getSlideInfoById(props.slideId, props.courseInfo);
+			const Page = Course.getOpenedPage(props.slideId, props.courseInfo, slideInfo);
+			const title = Course.getTitle(slideInfo, Page);
+
+			if(slideInfo && progress && !isHijacked) {
+				updateVisitedSlide(courseId, slideInfo.current.id);
 			}
 
 			return {
-				currentSlideId: props.slideId,
+				Page,
+				title,
+				currentSlideId: slideId,
+				currentSlideInfo: slideInfo,
 				currentCourseId: props.courseId,
 				highlightedUnit: openUnitId || null,
 				onCourseNavigation: openUnit ? false : state.onCourseNavigation,
@@ -85,31 +124,201 @@ class Course extends Component {
 		return defaultState;
 	}
 
-	render() {
-		const { courseInfo, courseErrors, courseLoadingErrorStatus, isNavMenuVisible } = this.props;
-		const { navigationOpened } = this.state;
+	static getOpenedPage = (slideId, courseInfo, currentSlideInfo) => {
+		if(slideId === flashcards) {
+			return CourseFlashcardsPage;
+		}
 
-		if(courseLoadingErrorStatus){
+		if(!courseInfo || !courseInfo.units) {
+			return AnyPage;
+		}
+
+		if(currentSlideInfo === null) {
+			throw new UrlError();
+		}
+
+		if(currentSlideInfo && currentSlideInfo.current.type === SLIDETYPE.flashcards) {
+			return UnitFlashcardsPage;
+		}
+
+		if(currentSlideInfo && currentSlideInfo.current.type === SLIDETYPE.lesson) {
+			return Slide;
+		}
+
+		return AnyPage;
+	}
+
+	static getTitle = (slideInfo) => {
+		return slideInfo ? slideInfo.current.title : "Вопросы для самопроверки";
+	}
+
+	updateWindowMeta = (slideTitle, courseTitle) => {
+		if(slideTitle) {
+			this.setState({
+				meta: {
+					title: `${ courseTitle }: ${ slideTitle } на ulearn.me`,
+					description: 'Интерактивные учебные онлайн-курсы по программированию',
+					keywords: '',
+					imageUrl: '',
+				}
+			});
+		}
+	}
+
+	render() {
+		const { courseInfo, courseErrors, courseLoadingErrorStatus, isNavMenuVisible, } = this.props;
+		const { navigationOpened, meta, } = this.state;
+
+		if(courseLoadingErrorStatus) {
 			return <Error404/>;
 		}
 
-		if (!courseInfo) {
+		if(!courseInfo) {
 			return null;
 		}
 
-		const Page = this.getOpenedPage();
+		return (
+			<div
+				className={ classnames(styles.root, { 'open': navigationOpened }, { [styles.withoutMinHeight]: !isNavMenuVisible }) }>
+				{ this.renderMeta(meta) }
+				{ isNavMenuVisible && this.renderNavigation() }
+				{ courseErrors ? <div className={ classnames(styles.errors) } >{courseErrors}</div> : this.renderSlide() }
+			</div>
+		);
+	}
 
-		const mainClassName = classnames(styles.pageWrapper, { [styles.withoutNavigation]: !isNavMenuVisible }); // TODO remove it
+	renderMeta(meta) {
+		return (
+			<Helmet defer={ false }>
+				<title>{ meta.title }</title>
+			</Helmet>
+		)
+	}
+
+	renderSlide() {
+		const { isNavMenuVisible, progress, } = this.props;
+		const { currentSlideInfo, currentSlideId, currentCourseId, Page, title, } = this.state;
+
+		const wrapperClassName = classnames(
+			styles.rootWrapper,
+			{ [styles.withoutNavigation]: !isNavMenuVisible }, // TODO remove isNavMenuVisible flag
+		);
+
+		const slideInfo = currentSlideInfo
+			? currentSlideInfo.current
+			: null;
+
+		const score = slideInfo
+			? {
+				score: (progress && progress[slideInfo.id] && progress[slideInfo.id].score) || 0,
+				maxScore: slideInfo.maxScore,
+			}
+			: null;
 
 		return (
-			<div className={ styles.rootWrapper }>
-				<div className={ classnames(styles.root, { 'open': navigationOpened }) }>
-					{ isNavMenuVisible && this.renderNavigation() }
-					<main className={ mainClassName }>
-						{courseErrors ? <div className={ classnames(styles.errors) } >{courseErrors}</div> : <Page match={ this.props.match }/>}
-					</main>
+			<main className={ wrapperClassName }>
+				{ isNavMenuVisible && title &&
+				<h1 className={ styles.title }>
+					{ title }
+					{ slideInfo && slideInfo.gitEditLink &&
+					<a className={ styles.gitEditLink } rel='noopener noreferrer' target='_blank'
+					   href={ slideInfo.gitEditLink }>
+						<Edit/>
+					</a> }
+				</h1> }
+				<div className={ styles.slide }>
+					{
+						Page === Slide
+							? <Slide
+								slideId={ currentSlideId }
+								courseId={ currentCourseId }
+							/>
+							: <BlocksWrapper score={ score }>
+								<Page match={ this.props.match }/>
+							</BlocksWrapper>
+					}
+
 				</div>
+				{ currentSlideInfo && isNavMenuVisible && this.renderNavigationButtons(currentSlideInfo) }
+				{ currentSlideInfo && isNavMenuVisible && this.renderComments(currentSlideInfo.current) }
+				{ isNavMenuVisible && this.renderFooter() }
+			</main>
+		);
+	}
+
+	renderNavigationButtons(slideInfo) {
+		const { courseId, } = this.props;
+		const { previous, next, current, } = slideInfo;
+		const prevSlideHref = previous ? constructPathToSlide(courseId, previous.slug) : null;
+		const nextSlideHref = next ? constructPathToSlide(courseId, next.slug) : null;
+
+		const previousButtonText = current.firstInModule ? slideNavigationButtonTitles.previousModule : slideNavigationButtonTitles.previous;
+		const nextButtonText = current.lastInModule ? slideNavigationButtonTitles.nextModule : slideNavigationButtonTitles.next;
+
+		return (
+			<div className={ styles.navigationButtonsWrapper }>
+				{
+					prevSlideHref
+						? <Link className={ classnames(styles.slideButton, styles.previousSlideButton) }
+								to={ this.constructPathWithAutoplay(prevSlideHref) }>
+							{ previousButtonText }
+						</Link>
+						: <div className={ classnames(styles.slideButton, styles.disabledSlideButton) }>
+							{ previousButtonText }
+						</div>
+				}
+				{
+					nextSlideHref
+						?
+						<Link className={ classnames(styles.slideButton, styles.nextSlideButton) }
+							  to={ this.constructPathWithAutoplay(nextSlideHref) }>
+							{ nextButtonText }
+						</Link>
+						: <div className={ classnames(styles.slideButton, styles.disabledSlideButton) }>
+							{ nextButtonText }
+						</div>
+				}
 			</div>
+		);
+	}
+
+	constructPathWithAutoplay = (baseHref) => {
+		return baseHref + "?autoplay=true";
+	}
+
+	handleNavigationButtonClick = (href) => {
+		this.props.history.push(href);
+	};
+
+	renderComments(currentSlide) {
+		const { user, courseId, } = this.props;
+		const { isSystemAdministrator, accessesByCourse, roleByCourse } = user;
+		const courseAccesses = accessesByCourse[courseId] ? accessesByCourse[courseId] : [];
+		const userRoles = { isSystemAdministrator, courseRole: roleByCourse, courseAccesses, };
+
+		return (
+			<BlocksWrapper className={ styles.commentsWrapper }>
+				<CommentsView user={ user }
+							  slideType={ currentSlide.type }
+							  slideId={ currentSlide.id }
+							  userRoles={ userRoles }
+							  courseId={ courseId }
+				/>
+			</BlocksWrapper>
+		)
+	}
+
+	renderFooter() {
+		return (
+			<footer className={ styles.footer }>
+				<p><Link to="/Home/Terms">Условия использования платформы</Link></p>
+				<p>
+					Вопросы и пожеланиями пишите на <a href="mailto:support@ulearn.me">support@ulearn.me</a>
+				</p>
+				<p>
+					Сделано в СКБ Контур
+				</p>
+			</footer>
 		);
 	}
 
@@ -137,7 +346,7 @@ class Course extends Component {
 			byUnits: {},
 		};
 
-		if (!progress || scoringGroups.length === 0)
+		if(!progress || scoringGroups.length === 0)
 			return courseStatistics;
 
 		const visitsGroup = scoringGroups.find(gr => gr.id === SCORING_GROUP_IDS.visits);
@@ -148,16 +357,16 @@ class Course extends Component {
 			for (const { maxScore, id, scoringGroup } of unit.slides) {
 				const group = scoringGroups.find(gr => gr.id === scoringGroup);
 
-				if (visitsGroup) {
+				if(visitsGroup) {
 					unitMaxScore += visitsGroup.weight;
-					if (progress[id] && progress[id].visited) {
+					if(progress[id] && progress[id].visited) {
 						unitScore += visitsGroup.weight;
 					}
 				}
 
-				if (group) {
+				if(group) {
 					unitMaxScore += maxScore * group.weight;
-					if (progress[id] && progress[id].score) {
+					if(progress[id] && progress[id].score) {
 						unitScore += progress[id].score * group.weight;
 					}
 				}
@@ -220,32 +429,8 @@ class Course extends Component {
 		}));
 	}
 
-	getOpenedPage() {
-		const { slideId, courseInfo } = this.props;
-
-		if (slideId === flashcards) {
-			return CourseFlashcardsPage;
-		}
-
-		if (!courseInfo || !courseInfo.units) {
-			return AnyPage;
-		}
-
-		const currentSlide = Course.findSlideBySlideId(slideId, courseInfo);
-
-		if (currentSlide === null) {
-			throw new UrlError();
-		}
-
-		if (currentSlide && currentSlide.type === SLIDETYPE.flashcards) {
-			return UnitFlashcardsPage;
-		}
-
-		return AnyPage;
-	}
-
 	static findUnitIdBySlideId(slideId, courseInfo) {
-		if (!courseInfo || !courseInfo.units) {
+		if(!courseInfo || !courseInfo.units) {
 			return null;
 		}
 
@@ -253,7 +438,7 @@ class Course extends Component {
 
 		for (const unit of units) {
 			for (const slide of unit.slides) {
-				if (slideId === slide.id) {
+				if(slideId === slide.id) {
 					return unit.id;
 				}
 			}
@@ -262,17 +447,37 @@ class Course extends Component {
 		return null;
 	}
 
-	static findSlideBySlideId(slideId, courseInfo) {
-		if (!courseInfo || !courseInfo.units) {
+	static getSlideInfoById(slideId, courseInfo) {
+		if(!courseInfo || !courseInfo.units) {
 			return null;
 		}
 
 		const units = courseInfo.units;
+		let prevSlide, nextSlide;
 
-		for (const unit of units) {
-			for (const slide of unit.slides) {
-				if (slideId === slide.id) {
-					return slide;
+		for (let i = 0; i < units.length; i++) {
+			const { slides } = units[i];
+			for (let j = 0; j < slides.length; j++) {
+				const slide = slides[j];
+
+				if(slide.id === slideId) {
+					if(j > 0) {
+						prevSlide = slides[j - 1];
+					} else if(i > 0) {
+						const prevSlides = units[i - 1].slides;
+						slide.firstInModule = true;
+						prevSlide = prevSlides[prevSlides.length - 1];
+					}
+
+					if(j < slides.length - 1) {
+						nextSlide = slides[j + 1];
+					} else if(i < units.length - 1) {
+						const nextSlides = units[i + 1].slides;
+						slide.lastInModule = true;
+						nextSlide = nextSlides[0];
+					}
+
+					return { previous: prevSlide, current: slide, next: nextSlide };
 				}
 			}
 		}
@@ -287,7 +492,7 @@ class Course extends Component {
 		const indexOfActiveUnit = units.findIndex(item => item.id === activeUnitId);
 
 
-		if (indexOfActiveUnit < 0 || indexOfActiveUnit === units.length - 1) {
+		if(indexOfActiveUnit < 0 || indexOfActiveUnit === units.length - 1) {
 			return null;
 		}
 
@@ -314,8 +519,7 @@ class Course extends Component {
 
 Course
 	.propTypes = {
-	isAuthenticated: PropTypes.bool,
-	userId: PropTypes.string,
+	user: PropTypes.object,
 	courseId: PropTypes.string,
 	slideId: PropTypes.string,
 	courseInfo: PropTypes.object, // TODO: описать

@@ -190,7 +190,7 @@
 
 @helper Notification(ReceivedAdditionalScoreNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
-	var unit = course.GetUnitById(notification.Score.UnitId);
+	var unit = course.GetUnitByIdNotSafe(notification.Score.UnitId);
 	var scoringGroup = unit.Scoring.Groups[notification.Score.ScoringGroupId];
 	<div class="notifications__received-additional-score-notification without-link media">
 		<div class="media-left">

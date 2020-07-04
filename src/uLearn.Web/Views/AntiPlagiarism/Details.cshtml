@@ -1,4 +1,5 @@
-﻿@using Database.Extensions
+﻿@using System.Globalization
+@using Database.Extensions
 @using Database.Models
 @using uLearn.Web.Extensions
 @using uLearn.Web.Views.Shared
@@ -32,9 +33,88 @@
 	</span>
 }
 
+@helper MostSimilarSubmissionsTable()
+{
+	<table id="mostSimilarSubmissionsTable" class="hidden">
+		<thead>
+		<tr>
+			<th>Похожесть максимально похожего решения</th>
+			<th>Количество решений</th>
+		</tr>
+		</thead>
+		<tbody>
+		@foreach (var bin in Model.MostSimilarSubmissionsHistogramData.Bins)
+		{
+			<tr>
+				<td>@((bin.BinRightBorder * 100).ToString(CultureInfo.InvariantCulture))</td>
+				<td>@bin.SubmissionsCount</td>
+			</tr>
+		}
+		</tbody>
+	</table>
+	var suspicionLevels = Model.SuspicionLevels;
+	<input id="faintSuspicion" type="hidden" value="@((suspicionLevels.FaintSuspicion * 100).ToString(CultureInfo.InvariantCulture))"/>
+	<input id="strongSuspicion" type="hidden" value="@((suspicionLevels.StrongSuspicion * 100).ToString(CultureInfo.InvariantCulture))"/>
+	<input id="maxAuthorSubmissionWeight" type="hidden" value="@((Model.MaxAuthorSubmissionWeight * 100).ToString(CultureInfo.InvariantCulture))"/>
+}
+
+@helper SuspicionLevelsForm()
+{
+	var faintSuspicionStr = (Model.SuspicionLevels.FaintSuspicion * 100).ToString("0.0#", CultureInfo.InvariantCulture);
+	var strongSuspicionStr = (Model.SuspicionLevels.StrongSuspicion * 100).ToString("0.0#", CultureInfo.InvariantCulture);
+	using (Html.BeginForm("SetSuspicionLevels", "Admin", null, FormMethod.Post, new { id = "suspicion-levels-form" }))
+	{
+		@Html.AntiForgeryToken()
+		<input type="hidden" name="slideId" value="@Model.Slide.Id"/>
+		<input type="hidden" name="courseId" value="@Model.Course.Id"/>
+		<p>
+			<b>Желтая плашка</b> с
+			@if (Model.CanEditSuspicionLevels)
+			{
+				<input type="text" name="faintSuspicion" size="4" value="@faintSuspicionStr"/>
+			}
+			else
+			{
+				@faintSuspicionStr
+			}
+			@(Model.SuspicionLevels.ManualFaintSuspicion != null ? "(задано вручную)" : "")
+		</p>
+		<p>
+			<b>Красная плашка</b> с
+			@if (Model.CanEditSuspicionLevels)
+			{
+				<input type="text" name="strongSuspicion" size="4" value="@strongSuspicionStr"/>
+			}
+			else
+			{
+				@strongSuspicionStr
+			}
+			@(Model.SuspicionLevels.ManualStrongSuspicion != null ? "(задано вручную)" : "")
+		</p>
+		if (Model.CanEditSuspicionLevels)
+		{
+			<p>Оставь поле пустым, чтобы использовалось автоматическое значение</p>
+			<button id="suspicion-levels-form-submit" class="btn btn-primary">Сохранить</button>
+		}
+	}
+}
+
 <div class="wide-container">
 	@{
-
+		@MostSimilarSubmissionsTable()
+		<div class="row">
+			<div class="col-xs-6">
+				<button id="mostSimilarSubmissionsSpoilerButton" class="btn btn-light" type="button" data-toggle="collapse" data-target="#mostSimilarSubmissionsBlock" aria-expanded="false" aria-controls="mostSimilarSubmissionsBlock">Статистика по задаче</button>
+			</div>
+		</div>
+		<div id="mostSimilarSubmissionsBlock" class="row collapse">
+			<div class="col-xs-6">
+				<div id="mostSimilarSubmissionsChart"></div>
+			</div>
+			<div class="col-xs-6">
+				@SuspicionLevelsForm()
+			</div>
+		</div>
 		<div class="row">
 			<div class="col-xs-6">
 				<h3>

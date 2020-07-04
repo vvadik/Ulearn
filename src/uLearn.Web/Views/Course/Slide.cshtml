@@ -1,8 +1,6 @@
 ﻿@using Database.Models
 @using uLearn.Web.Extensions
 @using uLearn.Web.Views.Course
-@using Ulearn.Common.Extensions
-@using Ulearn.Core.Courses.Slides
 @using Ulearn.Core.Courses.Slides.Exercises
 @using Ulearn.Core.Courses.Slides.Quizzes
 @model CoursePageModel
@@ -13,122 +11,66 @@
 	ViewBag.CourseId = Model.CourseId;
 
 	ViewBag.Meta = Model.Slide.Meta;
-
-	var mainDivClass = "";
 }
-
-
-@if (Model.ManualChecking == null)
+<div class="slide">
+@if (!string.IsNullOrEmpty(Model.Error))
 {
-	mainDivClass = "slide-container";
+	<p class="alert alert-danger">@Model.Error</p>
 }
-
-<div class="@mainDivClass">
-	<div class="container body-content">
-		<div class="row">
-			<div class="slide">
-				<h1>
-					<span class="slide__title">
-						@if (Model.ManualChecking != null)
-						{
-							@Html.RouteLink(Model.Slide.Title, "Course.SlideById", new { courseId = Model.CourseId, slideId = Model.Slide.Url }, new { title = "Перейти к слайду" })
-						}
-						else
-						{
-							@Model.Slide.Title
-						}
-						@if (Model.SlideEditUrl != null)
-						{
-							<small>
-								<a href="@Model.SlideEditUrl" target="_blank" style="margin-right: 5px">
-									<span class="glyphicon glyphicon-pencil"></span>
-								</a>
-							</small>
-						}
-					</span>
-					<span class="score">@ShowScore(Model.Score)</span>
-				</h1>
-				@if (!string.IsNullOrEmpty(Model.Error))
-				{
-					<p class="alert alert-danger">@Model.Error</p>
-				}
-				@if (Model.Slide is QuizSlide)
-				{
-					@Html.Action("Quiz", "Quiz", new
-					{
-						slide = (QuizSlide)Model.Slide,
-						courseId = Model.CourseId,
-						userId = Model.UserId,
-						isGuest = Model.IsGuest,
-						manualQuizCheckQueueItem = (ManualQuizChecking)Model.ManualChecking
-					})
-				}
-				else
-				{
-					if (Model.ManualChecking != null)
-					{
-						<p class="exercise-status">
-							@Model.ManualChecking.User.VisibleName
-							@if (Model.ContextManualCheckingUserGroups + Model.ContextManualCheckingUserArchivedGroups != "")
-							{
-	                            @* These comments are dirty hack for removing spaces between words *@
-								<span>
-									(@*
-							      *@
-									@if (Model.ContextManualCheckingUserGroups != "")
-									{
-										@Model.ContextManualCheckingUserGroups@*
-							      *@
-									}
-									@*
-							      *@
-									@if (Model.ContextManualCheckingUserGroups != "" && Model.ContextManualCheckingUserArchivedGroups != "")
-									{
-@*
-							           *@<text>;</text>
-									}
-									@*
-                                  *@
-									@if (Model.ContextManualCheckingUserArchivedGroups != "")
-									{
-										<text>архивные группы: @Model.ContextManualCheckingUserArchivedGroups</text> @*
-							      *@
-									}
-									@*
-							   *@),
-								</span>
-							}
-							else
-							{
-								<span>,</span>
-							}
-							@Model.ManualChecking.Timestamp.ToPrettyString()
-						</p>
-					}
-					@SlideHtml.Blocks(Model.BlockRenderContext, Html)
-				}
-
-			</div>
-			@if (Model.ManualChecking == null)
+@if (Model.Slide is QuizSlide)
+{
+	@Html.Action("Quiz", "Quiz", new
+	{
+		slide = (QuizSlide)Model.Slide,
+		courseId = Model.CourseId,
+		userId = Model.UserId,
+		isGuest = Model.IsGuest,
+		manualQuizCheckQueueItem = (ManualQuizChecking)Model.ManualChecking
+	})
+}
+else
+{
+	if (Model.ManualChecking != null)
+	{
+		<p class="exercise-status">
+			@Model.ManualChecking.User.VisibleName
+			@if (Model.ContextManualCheckingUserGroups + Model.ContextManualCheckingUserArchivedGroups != "")
 			{
-				if (Model.IsGuest)
-				{
-					@Html.Partial("_LoginForContinue")
-				}
-
-				@Html.Action("PrevNextButtons", "SlideNavigation", new { courseId = Model.CourseId, slideId = Model.Slide.Id, onSolutionsSlide = false })
-
-				@Html.Action("SlideComments", "Comments", new { courseId = Model.CourseId, slideId = Model.Slide.Id })
+				<span>
+					@{
+						var groupsStr = "";
+						if (Model.ContextManualCheckingUserGroups != "")
+						{
+							groupsStr = Model.ContextManualCheckingUserGroups;
+						}
+						if (Model.ContextManualCheckingUserGroups != "" && Model.ContextManualCheckingUserArchivedGroups != "")
+						{
+							groupsStr += "; ";
+						}
+						if (Model.ContextManualCheckingUserArchivedGroups != "")
+						{
+							groupsStr += "архивные группы: " + Model.ContextManualCheckingUserArchivedGroups;
+						}
+					}
+					(@groupsStr),
+				</span>
 			}
 			else
 			{
-				@* On code review show instructors-only comments *@
-				@Html.Action("SlideComments", "Comments", new { courseId = Model.CourseId, slideId = Model.Slide.Id, openInstructorsComments = true })
+				<span>,</span>
 			}
-
-			@Html.Partial("~/Views/Shared/_Footer.cshtml")
-		</div>
-	</div>
+			@Model.ManualChecking.Timestamp.ToPrettyString()
+		</p>
+	}
+	@SlideHtml.Blocks(Model.BlockRenderContext, Html)
+}
+@if (Model.ManualChecking == null)
+{
+	if (Model.IsGuest)
+	{
+		@Html.Partial("_LoginForContinue")
+	}
+}
 </div>
 
 @section scripts{
@@ -160,6 +102,3 @@
 		</script>
 	}
 }
-
-@helper ShowScore(Tuple<int, int> score)
-{ @( score.Item2 == 0 ? "" : string.Format("{0} из {1}", score.Item1.PluralizeInRussian(RussianPluralizationOptions.Score), score.Item2)) }

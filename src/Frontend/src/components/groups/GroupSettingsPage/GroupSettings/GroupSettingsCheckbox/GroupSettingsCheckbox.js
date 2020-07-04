@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Checkbox from "@skbkontur/react-ui/components/Checkbox/Checkbox";
+import { Checkbox } from "ui";
 
 import styles from './groupSettingsCheckbox.less';
 
@@ -67,11 +67,11 @@ class GroupSettingsCheckbox extends Component {
 
 	renderSettings(checked, text, callback) {
 		return (
-			<Checkbox checked={checked} onChange={callback}>{text}</Checkbox>
+			<Checkbox checked={checked} onValueChange={callback}>{text}</Checkbox>
 		)
 	};
 
-	onChange = (field, _, value) => {
+	onChange = (field, value) => {
 		const {onChangeSettings} = this.props;
 		onChangeSettings(mapToServerName[field], value);
 	};

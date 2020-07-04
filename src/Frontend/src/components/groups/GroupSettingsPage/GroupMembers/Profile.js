@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import Link from "@skbkontur/react-ui/components/Link/Link";
+import { Link } from "ui";
 
 import styles from "./Profile.less"
 

@@ -1,10 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
-import api from "../../../../api";
-import Modal from '@skbkontur/react-ui/components/Modal/Modal';
-import Input from '@skbkontur/react-ui/components/Input/Input';
-import Button from '@skbkontur/react-ui/components/Button/Button';
-import Tooltip from '@skbkontur/react-ui/components/Tooltip/Tooltip';
+import api from "src/api";
+import { Modal, Input, Button, Tooltip } from 'ui';
 
 import styles from "./createGroupModal.less";
 
@@ -52,7 +49,7 @@ class CreateGroupModal extends Component {
 						   maxLength="300"
 						   value={name || ''}
 						   error={hasError}
-						   onChange={this.onChangeInput}
+						   onValueChange={this.onChangeInput}
 						   onFocus={this.onFocus}
 						   autoFocus />
 				</Tooltip>
@@ -107,7 +104,7 @@ class CreateGroupModal extends Component {
 		});
 	};
 
-	onChangeInput = (_, value) => {
+	onChangeInput = (value) => {
 		this.setState({
 			name: value,
 		});

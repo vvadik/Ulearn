@@ -529,3 +529,101 @@ window.documentReadyFunctions.push(function () {
         $form.submit();
     });
 });
+
+window.documentReadyFunctions.push(function () {
+	var $chart = $('#mostSimilarSubmissionsChart');
+
+	var $element = $("#mostSimilarSubmissionsTable")[0];
+	if (!$element)
+		return;
+
+	var faintSuspicion = $("#faintSuspicion")[0].value;
+	var strongSuspicion = $("#strongSuspicion")[0].value;
+	var maxAuthorSubmissionWeight = $("#maxAuthorSubmissionWeight")[0].value;
+
+	$chart.highcharts({
+		data: {
+			table: document.getElementById($element.id)
+		},
+		chart: {
+			type: 'area',
+			zoomType: 'x',
+			height: 250,
+			width: 430,
+		},
+		title: {
+			text: ''
+		},
+		legend: {
+			enabled: false
+		},
+		xAxis: {
+			type: 'float',
+			allowDecimals: false,
+			tickInterval: 10,
+			min: 0,
+			title: {
+				text: 'Похожесть максимально похожего решения'
+			},
+			plotLines: [{
+				color: 'black',
+				width: 1,
+				value: maxAuthorSubmissionWeight
+			}]
+		},
+		yAxis: {
+			allowDecimals: false,
+			min: 0,
+			title: {
+				text: 'Количество решений'
+			}
+		},
+		plotOptions: {
+			area: {
+				marker: {
+					radius: 2
+				},
+				lineWidth: 1,
+				states: {
+					hover: {
+						lineWidth: 1
+					}
+				},
+				zones: [
+				{
+					value: faintSuspicion,
+					color: '#90ed7d'
+				}, {
+					value: strongSuspicion,
+					color: '#e4d354'
+				}, {
+					value: 100,
+					color: '#f15c80'
+				}],
+				zoneAxis: 'x',
+				threshold: null
+			},
+		},
+		credits: {
+			enabled: false,
+		},
+	});
+
+	$("#suspicion-levels-form-submit").click(function(e) {
+		e.preventDefault();
+		var form = $("#suspicion-levels-form");
+		var url = form.attr('action');
+		var body = form.serialize();
+
+		$.ajax({
+			type: "POST",
+			url: url,
+			data: body
+		}).done(function() {
+			document.location.reload(true);
+		})
+		.fail(function() {
+			alert("Ошибка");
+		});
+	});
+});

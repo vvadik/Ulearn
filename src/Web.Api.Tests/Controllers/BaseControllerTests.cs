@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
+using NUnit.Framework;
 using Serilog;
 using Serilog.Core;
 using Serilog.Extensions.Logging;
@@ -24,6 +25,7 @@ using Z.EntityFramework.Plus;
 
 namespace Web.Api.Tests.Controllers
 {
+	[TestFixture]
 	public class BaseControllerTests
 	{
 		private WebApplication application;
@@ -32,9 +34,9 @@ namespace Web.Api.Tests.Controllers
 		protected UlearnDb db;
 		protected IServiceProvider serviceProvider;
 
-		private readonly WebApiConfiguration FakeWebApiConfiguration = new WebApiConfiguration
+		private readonly WebApiConfiguration fakeWebApiConfiguration = new WebApiConfiguration
 		{
-			Web = new UlearnWebConfiguration()
+			Web = new UlearnWebConfiguration
 			{
 				Authentication = new AuthenticationConfiguration
 				{
@@ -91,7 +93,7 @@ namespace Web.Api.Tests.Controllers
 		{
 			var optionsBuilder = new DbContextOptionsBuilder<UlearnDb>();
 			optionsBuilder.UseLazyLoadingProxies();
-			optionsBuilder.UseInMemoryDatabase("ulearn_test_database");
+			optionsBuilder.UseInMemoryDatabase("ulearn_test_database" + Guid.NewGuid());
 			if (loggerFactory != null)
 				optionsBuilder.UseLoggerFactory(loggerFactory);
 
@@ -104,9 +106,8 @@ namespace Web.Api.Tests.Controllers
 
 			services.AddSingleton(db);
 			services.AddLogging(builder => builder.AddSerilog(logger));
-			
-			application.ConfigureDi(services, logger, new DirectoryInfo(Directory.GetCurrentDirectory()+"\\CourseManager\\Courses\\"));
-			application.ConfigureAuthServices(services, FakeWebApiConfiguration);
+			application.ConfigureDi(services, logger);
+			application.ConfigureAuthServices(services, fakeWebApiConfiguration);
 			application.ConfigureMvc(services);
 
 			addServices?.Invoke(services);
@@ -170,6 +171,7 @@ namespace Web.Api.Tests.Controllers
 			Gender = Gender.Male,
 			Registered = DateTime.Now,
 		};
+
 		public static ApplicationUser User = new ApplicationUser
 		{
 			UserName = "user",
