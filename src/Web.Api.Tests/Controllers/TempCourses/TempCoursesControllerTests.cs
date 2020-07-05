@@ -371,6 +371,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 				.Concat(secondDirFiles.Except(firstDirFiles))
 				.Except(new List<string> { "course.xml" }) // после создания курса в папке курса на сервере создается course.xml
 				// поимимо того, который лежит в /Slides
+				.Except(new List<string> { "deleted.txt" }) 
 				.ToList();
 			return diffs;
 		}
