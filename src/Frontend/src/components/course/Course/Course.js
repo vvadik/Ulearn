@@ -65,6 +65,10 @@ class Course extends Component {
 		if(isAuthenticated && !progress) {
 			loadUserProgress(courseId, user.id);
 		}
+
+		if(isAuthenticated) {
+			window.reloadUserProgress = () => loadUserProgress(courseId, user.id); //adding hack to let legacy page scripts to reload progress,TODO(rozentor) remove it after implementing react task slides
+		}
 	}
 
 	componentDidUpdate(prevProps, prevState) {
@@ -75,6 +79,7 @@ class Course extends Component {
 		if(isAuthenticated !== prevProps.user.isAuthenticated) {
 			loadCourse(courseId);
 			loadUserProgress(courseId, user.id);
+			window.reloadUserProgress = () => loadUserProgress(courseId, user.id); //adding hack to let legacy page scripts to reload progress,TODO(rozentor) remove it after implementing react task slides
 		}
 
 		if(title !== prevState.title) {
