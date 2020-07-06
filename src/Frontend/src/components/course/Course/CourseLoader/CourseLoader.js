@@ -2,6 +2,10 @@ import React from "react";
 
 import { Loader } from "@skbkontur/react-ui";
 
+import { connect } from "react-redux";
+import { setSlideReady } from "src/actions/course";
+import PropTypes from "prop-types";
+
 import styles from "./CourseLoader.less";
 
 const showLoaderTimout = 1000;
@@ -18,12 +22,20 @@ class CourseLoader extends React.Component {
 				timeoutAwaited: true,
 			})
 		}, showLoaderTimout);
+
+		if(props.isSlideLoader) {
+			props.setSlideReady(false);
+		}
 	}
 
 	componentWillUnmount() {
 		const { timeoutAwaited } = this.state;
 		if(!timeoutAwaited) {
 			clearTimeout(this.timeout);
+		}
+
+		if(this.props.isSlideLoader) {
+			setTimeout(() => this.props.setSlideReady(true), 100);
 		}
 	}
 
@@ -36,7 +48,24 @@ class CourseLoader extends React.Component {
 				: <div className={ styles.loaderWhileLoading }/>
 		);
 	}
-
 }
 
-export default CourseLoader;
+CourseLoader.propTypes = {
+	isSlideLoader: PropTypes.bool,
+	setSlideReady: PropTypes.func,
+};
+
+CourseLoader.defaultProps = {
+	isSlideLoader: true,
+};
+
+const mapStateToProps = (state) => {
+	return {};
+};
+
+const mapDispatchToProps = (dispatch) => ({
+	setSlideReady: (courseId) => dispatch(setSlideReady(courseId)),
+});
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(CourseLoader);

@@ -234,7 +234,7 @@ class CommentsList extends Component {
 
 	render() {
 		const { threads, loadingComments } = this.state;
-		const { user, courseId, slideId, commentPolicy, key } = this.props;
+		const { user, courseId, slideId, commentPolicy, key, isSlideReady, } = this.props;
 		const replies = threads.reduce((sum, current) => sum + current.replies.length, 0);
 
 		if (this.state.status === "error") {
@@ -248,7 +248,7 @@ class CommentsList extends Component {
 		return (
 			<div key={ key } ref={ this.commentsListRef }>
 				{ loadingComments ?
-					<CourseLoader/> :
+					<CourseLoader isSlideReady={ isSlideReady }/> :
 					<>
 						{ !user.id &&
 						<Stub hasThreads={ threads.length > 0 } courseId={ courseId } slideId={ slideId }/> }
@@ -674,6 +674,7 @@ CommentsList.propTypes = {
 	commentsApi: PropTypes.objectOf(PropTypes.func),
 	commentPolicy: commentPolicy,
 	courseId: PropTypes.string.isRequired,
+	isSlideReady: PropTypes.bool,
 };
 
 export default CommentsList;

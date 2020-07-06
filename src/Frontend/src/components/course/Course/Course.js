@@ -287,7 +287,7 @@ class Course extends Component {
 	};
 
 	renderComments(currentSlide) {
-		const { user, courseId, } = this.props;
+		const { user, courseId, isSlideReady, } = this.props;
 		const { isSystemAdministrator, accessesByCourse, roleByCourse } = user;
 		const courseAccesses = accessesByCourse[courseId] ? accessesByCourse[courseId] : [];
 		const courseRole = roleByCourse[courseId] ? roleByCourse[courseId] : '';
@@ -300,6 +300,7 @@ class Course extends Component {
 							  slideId={ currentSlide.id }
 							  userRoles={ userRoles }
 							  courseId={ courseId }
+							  isSlideReady={ isSlideReady }
 				/>
 			</BlocksWrapper>
 		)

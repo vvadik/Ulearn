@@ -17,7 +17,7 @@ class Thread extends Component {
 
 	renderComment(comment, isLastChild) {
 		const {user, userRoles, reply, commentEditing, actions, slideType,
-			getUserSolutionsUrl, commentPolicy, courseId} = this.props;
+			getUserSolutionsUrl, commentPolicy, courseId, isSlideReady,} = this.props;
 		const isLastCommentInThread = isLastChild;
 		const isParentComment = !comment.parentCommentId;
 		const focusedReplyForm = {inReplyForm: isParentComment && comment.id === this.props.reply.commentId,};
@@ -34,7 +34,8 @@ class Thread extends Component {
 				slideType={slideType}
 				courseId={courseId}
 				user={user}
-				userRoles={userRoles}>
+				userRoles={userRoles}
+				isSlideReady={isSlideReady}>
 				{comment.replies.length > 0 && this.renderReplies(comment)}
 				{(isParentComment && comment.id === this.props.reply.commentId) &&
 					<CommentSendForm
@@ -99,6 +100,7 @@ Thread.propTypes = {
 	actions: PropTypes.objectOf(PropTypes.func),
 	animation: PropTypes.bool,
 	getUserSolutionsUrl: PropTypes.func,
+	isSlideReady: PropTypes.bool,
 };
 
 export default Thread;
