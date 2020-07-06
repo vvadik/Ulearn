@@ -290,7 +290,8 @@ class Course extends Component {
 		const { user, courseId, } = this.props;
 		const { isSystemAdministrator, accessesByCourse, roleByCourse } = user;
 		const courseAccesses = accessesByCourse[courseId] ? accessesByCourse[courseId] : [];
-		const userRoles = { isSystemAdministrator, courseRole: roleByCourse, courseAccesses, };
+		const courseRole = roleByCourse[courseId] ? roleByCourse[courseId] : '';
+		const userRoles = { isSystemAdministrator, courseRole, courseAccesses, };
 
 		return (
 			<BlocksWrapper className={ styles.commentsWrapper }>
