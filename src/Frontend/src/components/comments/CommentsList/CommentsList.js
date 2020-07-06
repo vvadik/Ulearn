@@ -234,7 +234,7 @@ class CommentsList extends Component {
 
 	render() {
 		const { threads, loadingComments } = this.state;
-		const { user, courseId, slideId, commentPolicy, key, isSlideReady, } = this.props;
+		const { user, courseId, slideId, commentPolicy, key, } = this.props;
 		const replies = threads.reduce((sum, current) => sum + current.replies.length, 0);
 
 		if (this.state.status === "error") {
@@ -248,7 +248,7 @@ class CommentsList extends Component {
 		return (
 			<div key={ key } ref={ this.commentsListRef }>
 				{ loadingComments ?
-					<CourseLoader isSlideReady={ isSlideReady }/> :
+					<CourseLoader isSlideLoader={ false }/> :
 					<>
 						{ !user.id &&
 						<Stub hasThreads={ threads.length > 0 } courseId={ courseId } slideId={ slideId }/> }
@@ -294,7 +294,7 @@ class CommentsList extends Component {
 
 	renderThreads() {
 		const { threads, commentEditing, reply, animation } = this.state;
-		const { user, userRoles, slideType, courseId, commentPolicy } = this.props;
+		const { user, userRoles, slideType, courseId, commentPolicy, isSlideReady, } = this.props;
 		const transitionStyles = {
 			enter: styles.enter,
 			exit: styles.exit,
@@ -343,7 +343,8 @@ class CommentsList extends Component {
 									commentEditing={ commentEditing }
 									reply={ reply }
 									actions={ actions }
-									getUserSolutionsUrl={ this.getUserSolutionsUrl }/>
+									getUserSolutionsUrl={ this.getUserSolutionsUrl }
+									isSlideReady={isSlideReady}/>
 							</section>
 						</CSSTransition>) }
 			</TransitionGroup>
