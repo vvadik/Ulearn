@@ -153,7 +153,7 @@ namespace Ulearn.Web.Api.Controllers
 		public async Task<ActionResult<TokenResponse>> Login([FromBody] LoginPasswordParameters loginPassword)
 		{
 			var appUser = await db.Users.FirstAsync(u => u.UserName == loginPassword.Login && !u.IsDeleted);
-			var result = await signInManager.UserManager.CheckPasswordAsync(appUser, loginPassword.Password);
+			var result = await userManager.CheckPasswordAsync(appUser, loginPassword.Password);
 			if (!result) return Forbid();
 
 			var key = JwtBearerHelpers.CreateSymmetricSecurityKey(configuration.Web.Authentication.Jwt.IssuerSigningKey);
