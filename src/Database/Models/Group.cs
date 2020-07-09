@@ -13,7 +13,7 @@ namespace Database.Models
 		public int Id { get; set; }
 
 		[Required]
-		[StringLength(64)]
+		[StringLength(100)]
 		[Index("IDX_Group_GroupByCourse")]
 		public string CourseId { get; set; }
 

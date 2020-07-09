@@ -15,7 +15,7 @@ namespace Database.Models
 		public string UserId { get; set; }
 
 		[Required]
-		[StringLength(64)]
+		[StringLength(100)]
 		public string CourseId { get; set; }
 
 		[Required]

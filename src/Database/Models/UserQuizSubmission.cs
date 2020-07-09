@@ -19,7 +19,7 @@ namespace Database.Models
 		public virtual ApplicationUser User { get; set; }
 
 		[Required]
-		[StringLength(40)]
+		[StringLength(100)]
 		[Index("IDX_UserQuizSubmission_BySlideAndUser", 1)]
 		[Index("IDX_UserQuizSubmission_ByCourseAndSlide", 1)]
 		[Index("IDX_UserQuizSubmission_BySlideAndTime", 1)]

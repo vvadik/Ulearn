@@ -16,7 +16,7 @@ namespace Database.Models.Comments
 	public class CommentsPolicy
 	{
 		[Key]
-		[StringLength(64)]
+		[StringLength(100)]
 		public string CourseId { get; set; }
 
 		[Required]

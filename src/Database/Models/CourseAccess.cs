@@ -12,7 +12,7 @@ namespace Database.Models
 		public int Id { get; set; }
 
 		[Required]
-		[StringLength(64)]
+		[StringLength(100)]
 		[Index("IDX_CourseAccess_ByCourse")]
 		[Index("IDX_CourseAccess_ByCourseAndIsEnabled", 1)]
 		[Index("IDX_CourseAccess_ByCourseUserAndIsEnabled", 1)]

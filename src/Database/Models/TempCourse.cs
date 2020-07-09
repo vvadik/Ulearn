@@ -6,7 +6,7 @@ namespace Database.Models
 	public class TempCourse
 	{
 		[Key]
-		[StringLength(64)]
+		[StringLength(100)]
 		public string CourseId { get; set; }
 
 		[Required]
