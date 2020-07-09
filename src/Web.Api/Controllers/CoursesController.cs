@@ -98,17 +98,20 @@ namespace Ulearn.Web.Api.Controllers
 			}
 			else
 				courses = courses.OrderBy(c => c.Title);
-			
+
 			var tempCourseLabel =  "Временный - ";
+			var tempCoursesIds = (await tempCoursesRepo.GetTempCoursesAsync())
+				.Select(t => t.CourseId)
+				.ToHashSet();
 			return new CoursesListResponse
 			{
 				Courses = courses
 					.Select(c => new ShortCourseInfo
 					{
 						Id = c.Id,
-						Title = IsTempCourse(c.Id)?  tempCourseLabel + c.Title : c.Title,
+						Title = tempCoursesIds.Contains(c.Id) ? tempCourseLabel + c.Title : c.Title,
 						ApiUrl = Url.Action("CourseInfo", "Courses", new { courseId = c.Id }),
-						IsTempCourse = IsTempCourse(c.Id)
+						IsTempCourse = tempCoursesIds.Contains(c.Id)
 					}
 				).ToList()
 			};
@@ -121,10 +124,10 @@ namespace Ulearn.Web.Api.Controllers
 		[HttpGet("{courseId}")]
 		public async Task<ActionResult<CourseInfo>> CourseInfo([FromRoute]string courseId, [FromQuery][CanBeNull]int? groupId = null)
 		{
-			if (!courseManager.HasCourse(courseId))
+			if (!await courseManager.HasCourseAsync(courseId))
 				return NotFound(new ErrorResponse("Course not found"));
-			
-			var course = courseManager.FindCourse(courseId);
+
+			var course = await courseManager.FindCourseAsync(courseId);
 			List<UnitInfo> units;
 			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIdsAsync(course, UserId);
 			var visibleUnits = course.GetUnits(visibleUnitsIds);
@@ -162,18 +165,18 @@ namespace Ulearn.Web.Api.Controllers
 
 			var containsFlashcards = visibleUnits.Any(x => x.Slides.OfType<FlashcardSlide>().Any());
 			var scoringSettings = GetScoringSettings(course);
-			var tempCourseError = tempCoursesRepo.GetCourseError(courseId)?.Error;
-			var tempCourseLabel =  "Временный - ";
+			var tempCourseError = (await tempCoursesRepo.GetCourseErrorAsync(courseId))?.Error;
+			var isTempCourse = await IsTempCourse(course.Id);
 			return new CourseInfo
 			{
 				Id = course.Id,
-				Title = IsTempCourse(course.Id)?  tempCourseLabel + course.Title : course.Title,
+				Title = isTempCourse ? "Временный - " + course.Title : course.Title,
 				Description = course.Settings.Description,
 				Scoring = scoringSettings,
 				NextUnitPublishTime = unitsRepo.GetNextUnitPublishTime(course.Id),
 				Units = units,
 				ContainsFlashcards = containsFlashcards,
-				IsTempCourse = IsTempCourse(courseId),
+				IsTempCourse = isTempCourse,
 				TempCourseError = tempCourseError
 			};
 		}
@@ -219,9 +222,9 @@ namespace Ulearn.Web.Api.Controllers
 			return unit.Settings.Scoring.Groups.Values.Where(g => g.CanBeSetByInstructor).Select(g => new UnitScoringGroupInfo(g)).ToList();
 		}
 
-		private bool IsTempCourse(string courseId)
+		private async Task<bool> IsTempCourse(string courseId)
 		{
-			return tempCoursesRepo.Find(courseId) != null;
+			return await tempCoursesRepo.FindAsync(courseId) != null;
 		}
 	}
 }

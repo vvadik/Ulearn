@@ -104,7 +104,7 @@ namespace CourseToolHotReloader.ApiClient
 			var response = await client.GetAsync(url);
 //404
 			BadCodeHandler(response);
-			
+
 			return response.StatusCode != HttpStatusCode.OK
 				? null
 				: DeserializeResponseContent<HasTempCourseResponse>(response);

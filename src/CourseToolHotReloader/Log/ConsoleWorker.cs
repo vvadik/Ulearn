@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Security;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,7 +22,7 @@ namespace CourseToolHotReloader.Log
 		public static void WriteError(string errorMessage)
 		{
 			Console.ForegroundColor = ConsoleColor.Red;
-			var text = $"Ошибка: {errorMessage}";
+			var text = errorMessage;
 			Console.WriteLine(text);
 			Console.ResetColor();
 			Logger.Log.Info(text);
@@ -32,7 +31,7 @@ namespace CourseToolHotReloader.Log
 		public static void WriteAlert(string alertMessage)
 		{
 			Console.ForegroundColor = ConsoleColor.DarkYellow;
-			var text = $"Внимание: {alertMessage}";
+			var text = alertMessage;
 			Console.WriteLine(text);
 			Console.ResetColor();
 			Logger.Log.Info(text);

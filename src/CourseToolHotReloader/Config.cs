@@ -114,7 +114,7 @@ namespace CourseToolHotReloader
 			[JsonPropertyName("sendFullArchive")]
 			public bool SendFullArchive { get; set; }
 
-			[JsonPropertyName("courseId")]
+			[JsonPropertyName("courseIds")]
 			public Dictionary<string, string> CourseIds { get; set; }
 		}
 	}

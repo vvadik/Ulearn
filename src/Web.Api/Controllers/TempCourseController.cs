@@ -37,6 +37,9 @@ namespace Ulearn.Web.Api.Controllers
 			this.courseRolesRepo = courseRolesRepo;
 		}
 
+		/// <summary>
+		/// Создать временный курс для базового курса с courseId
+		/// </summary>
 		[Authorize]
 		[HttpPost("{courseId}")]
 		public async Task<TempCourseUpdateResponse> CreateCourse([FromRoute] string courseId)
@@ -46,17 +49,17 @@ namespace Ulearn.Web.Api.Controllers
 
 			if (!await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin))
 			{
-				return new TempCourseUpdateResponse()
+				return new TempCourseUpdateResponse
 				{
 					ErrorType = ErrorType.Forbidden,
-					Message = $"Чтобы создать временную версию курса {courseId}, необходимо быть администратором этого  курса"
+					Message = $"Чтобы создать временную версию курса {courseId}, необходимо быть администратором этого курса"
 				};
 			}
 
-			var tmpCourse = tempCoursesRepo.Find(tmpCourseId);
+			var tmpCourse = await tempCoursesRepo.FindAsync(tmpCourseId);
 			if (tmpCourse != null)
 			{
-				return new TempCourseUpdateResponse()
+				return new TempCourseUpdateResponse
 				{
 					ErrorType = ErrorType.Conflict,
 					Message = $"Ваша временная версия курса {courseId} уже существует с id {tmpCourseId}."
@@ -68,10 +71,10 @@ namespace Ulearn.Web.Api.Controllers
 			if (!courseManager.TryCreateTempCourse(tmpCourseId, courseTitle, versionId))
 				throw new Exception();
 
-			await tempCoursesRepo.AddTempCourse(tmpCourseId, userId);
-			var loadingTime = tempCoursesRepo.Find(tmpCourseId).LoadingTime;
+			var result = await tempCoursesRepo.AddTempCourseAsync(tmpCourseId, userId);
+			var loadingTime = result.LoadingTime;
 			await courseRolesRepo.ToggleRoleAsync(tmpCourseId, userId, CourseRoleType.CourseAdmin, userId);
-			return new TempCourseUpdateResponse()
+			return new TempCourseUpdateResponse
 			{
 				Message = $"Временный курс с id {tmpCourseId} успешно создан.",
 				LastUploadTime = loadingTime
@@ -85,7 +88,7 @@ namespace Ulearn.Web.Api.Controllers
 			var userId = User.Identity.GetUserId();
 
 			var tmpCourseId = GetTmpCourseId(courseId, userId);
-			var tmpCourse = tempCoursesRepo.Find(tmpCourseId);
+			var tmpCourse = await tempCoursesRepo.FindAsync(tmpCourseId);
 			var response = new HasTempCourseResponse();
 			if (tmpCourse == null)
 			{
@@ -101,15 +104,20 @@ namespace Ulearn.Web.Api.Controllers
 
 			return response;
 		}
-		
 
+		/// <summary>
+		/// Ошибки при загрузке временного курса c courseId
+		/// </summary>
 		[HttpGet("errors/{courseId}")]
 		public async Task<string> GetError([FromRoute] string courseId)
 		{
-			var tmpCourseError = tempCoursesRepo.GetCourseError(courseId);
+			var tmpCourseError = await tempCoursesRepo.GetCourseErrorAsync(courseId);
 			return tmpCourseError?.Error;
 		}
 
+		/// <summary>
+		/// Загрузить изменения временного курса для базового курса с courseId
+		/// </summary>
 		[HttpPatch("{courseId}")]
 		[Authorize]
 		public async Task<TempCourseUpdateResponse> UploadCourse([FromRoute] string courseId, List<IFormFile> files)
@@ -117,6 +125,9 @@ namespace Ulearn.Web.Api.Controllers
 			return await UploadCourse(courseId, files, false);
 		}
 
+		/// <summary>
+		/// Загрузить целиком временный курс для базового курса с courseId
+		/// </summary>
 		[HttpPut("{courseId}")]
 		[Authorize]
 		public async Task<TempCourseUpdateResponse> UploadFullCourse([FromRoute] string courseId, List<IFormFile> files)
@@ -128,10 +139,10 @@ namespace Ulearn.Web.Api.Controllers
 		{
 			var userId = User.Identity.GetUserId();
 			var tmpCourseId = GetTmpCourseId(courseId, userId);
-			var tmpCourse = tempCoursesRepo.Find(tmpCourseId);
+			var tmpCourse = await tempCoursesRepo.FindAsync(tmpCourseId);
 			if (tmpCourse is null)
 			{
-				return new TempCourseUpdateResponse()
+				return new TempCourseUpdateResponse
 				{
 					ErrorType = ErrorType.NotFound,
 					Message = $"Вашей временной версии курса {courseId} не существует. Для создания испрользуйте метод Create"
@@ -154,18 +165,17 @@ namespace Ulearn.Web.Api.Controllers
 			var error = await TryPublishChanges(tmpCourseId, filesToDelete, isFull);
 			if (error != null)
 			{
-				await tempCoursesRepo.UpdateOrAddTempCourseError(tmpCourseId, error);
-				return new TempCourseUpdateResponse()
+				await tempCoursesRepo.UpdateOrAddTempCourseErrorAsync(tmpCourseId, error);
+				return new TempCourseUpdateResponse
 				{
 					Message = error,
 					ErrorType = ErrorType.CourseError
 				};
 			}
 
-			await tempCoursesRepo.MarkTempCourseAsNotErrored(tmpCourseId);
-			await tempCoursesRepo.UpdateTempCourseLoadingTime(tmpCourseId);
-			var loadingTime = tempCoursesRepo.Find(tmpCourseId).LoadingTime;
-			return new TempCourseUpdateResponse()
+			await tempCoursesRepo.MarkTempCourseAsNotErroredAsync(tmpCourseId);
+			var loadingTime = await tempCoursesRepo.UpdateTempCourseLoadingTimeAsync(tmpCourseId);
+			return new TempCourseUpdateResponse
 			{
 				Message = $"Временный курс {tmpCourseId} успешно обновлен",
 				LastUploadTime = loadingTime

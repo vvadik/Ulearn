@@ -135,18 +135,18 @@ namespace Database
 						logger.Warning("Это странно, что я не смог загрузить с диска курс, который, если верить базе данных, был опубликован. Но ничего, просто проигнорирую");
 					}
 				}
-				LoadTempCoursesIfNotYet(tempCoursesRepo);
+				await LoadTempCoursesIfNotYetAsync(tempCoursesRepo);
 				return base.GetCourses();
 			}
 		}
 
-		private void LoadTempCoursesIfNotYet(ITempCoursesRepo tempCoursesRepo)
+		private async Task LoadTempCoursesIfNotYetAsync(ITempCoursesRepo tempCoursesRepo)
 		{
-			var tempCourses = tempCoursesRepo.GetTempCourses();
+			var tempCourses = await tempCoursesRepo.GetTempCoursesAsync();
 			tempCourses
 				.Where(tempCourse => !HasCourse(tempCourse.CourseId))
 				.ToList()
-				.ForEach(course=>ReloadCourse(course.CourseId));
+				.ForEach(course => ReloadCourse(course.CourseId));
 		}
 
 		private bool IsCourseVersionWasUpdatedRecent(string courseId)
