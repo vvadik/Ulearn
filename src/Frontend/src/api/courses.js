@@ -20,7 +20,7 @@ export function getCourse(courseId) {
 }
 
 export function getCourseErrors(courseId) {
-	return api.get(`tempCourses/errors/${courseId}`);
+	return api.get(`tempCourses/${courseId}/errors`);
 }
 
 export function getUserCourses() {

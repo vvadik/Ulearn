@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
+﻿using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -9,7 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using CourseToolHotReloader.Dtos;
 using CourseToolHotReloader.Exceptions;
-using CourseToolHotReloader.Log;
+
 using JetBrains.Annotations;
 
 namespace CourseToolHotReloader.ApiClient
@@ -97,7 +95,7 @@ namespace CourseToolHotReloader.ApiClient
 
 		public async Task<HasTempCourseResponse> HasCourse(string id)
 		{
-			var url = $"{config.BaseUrl}/tempCourses/byBaseCourseId/{id}";
+			var url = $"{config.BaseUrl}/tempCourses/{id}";
 
 			using var client = HttpClient();
 

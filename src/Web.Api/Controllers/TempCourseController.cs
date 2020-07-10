@@ -81,15 +81,29 @@ namespace Ulearn.Web.Api.Controllers
 			};
 		}
 
+		/// <summary>
+		/// Ошибки при загрузке временного курса c courseId
+		/// </summary>
+		[HttpGet("{courseId}/errors")]
+		public async Task<string> GetError([FromRoute] string courseId)
+		{
+			var tmpCourseError = await tempCoursesRepo.GetCourseErrorAsync(courseId);
+			return tmpCourseError?.Error;
+		}
+
+		/// <summary>
+		/// Информация о временном курсе для базового курса с courseId
+		/// </summary>
 		[Authorize]
-		[HttpGet("byBaseCourseId/{courseId}")]
-		public async Task<HasTempCourseResponse> HasCourse([FromRoute] string courseId)
+		[HttpGet("{courseId}")]
+		public async Task<TempCourseResponse> HasCourse([FromRoute] string courseId)
 		{
 			var userId = User.Identity.GetUserId();
 
 			var tmpCourseId = GetTmpCourseId(courseId, userId);
 			var tmpCourse = await tempCoursesRepo.FindAsync(tmpCourseId);
-			var response = new HasTempCourseResponse();
+			var tmpCourseError = await tempCoursesRepo.GetCourseErrorAsync(courseId);
+			var response = new TempCourseResponse();
 			if (tmpCourse == null)
 			{
 				response.HasTempCourse = false;
@@ -100,19 +114,10 @@ namespace Ulearn.Web.Api.Controllers
 				response.LastUploadTime = tmpCourse.LoadingTime;
 				response.MainCourseId = courseId;
 				response.TempCourseId = tmpCourseId;
+				response.Errors = tmpCourseError?.Error;
 			}
 
 			return response;
-		}
-
-		/// <summary>
-		/// Ошибки при загрузке временного курса c courseId
-		/// </summary>
-		[HttpGet("errors/{courseId}")]
-		public async Task<string> GetError([FromRoute] string courseId)
-		{
-			var tmpCourseError = await tempCoursesRepo.GetCourseErrorAsync(courseId);
-			return tmpCourseError?.Error;
 		}
 
 		/// <summary>
@@ -379,10 +384,15 @@ namespace Ulearn.Web.Api.Controllers
 		public void Revert()
 		{
 			DeletedFiles.ForEach(file => new FileInfo(file.Path).Directory.Create());
-			FilesBeforeChanges
-				.ForEach(editedFile => File.WriteAllBytes(editedFile.Path, editedFile.Content));
-			DeletedFiles
-				.ForEach(deletedFile => File.WriteAllBytes(deletedFile.Path, deletedFile.Content));
+			static void WriteContent(FileContent fileContent)
+			{
+				var fInfo = new FileInfo(fileContent.Path);
+				if (fInfo.Exists && fInfo.Attributes.HasFlag(FileAttributes.Hidden))
+					fInfo.Attributes &= ~FileAttributes.Hidden; // WriteAllBytes кидает ошибку при записи в скрытый файл
+				File.WriteAllBytes(fileContent.Path, fileContent.Content);
+			}
+			FilesBeforeChanges.ForEach(WriteContent);
+			DeletedFiles.ForEach(WriteContent);
 			AddedFiles.ForEach(File.Delete);
 		}
 	}

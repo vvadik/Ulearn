@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Autofac;
 using CourseToolHotReloader.ApiClient;
@@ -29,22 +30,25 @@ namespace CourseToolHotReloader
 			}
 			catch (AggregateException e)
 			{
+				Logger.Log.Error(e);
 				switch (e.InnerExceptions.Single())
 				{
 					case InvalidOperationException _:
 					case UriFormatException _:
 					case ArgumentException _:
-						ConsoleWorker.WriteError("Указанный Base Url недоступен");
+						ConsoleWorker.WriteError("Указанный в config.json baseUrl недоступен");
 						break;
 					case IOException _:
 						ConsoleWorker.WriteError("Вероятно был добавлен файл слишком большого размера");
 						break;
 					case UnauthorizedException _:
 					case ForbiddenException _:
+					case HttpRequestException _:
+					case CourseLoadingException _:
 						ConsoleWorker.WriteError(e.Message);
 						break;
 					default:
-						Logger.Log.Error(e);
+						ConsoleWorker.WriteError("Неизвестная ошибка. Подробнее в логах");
 						break;
 				}
 			}
@@ -105,7 +109,9 @@ namespace CourseToolHotReloader
 			if (tempCourseUpdateResponse.ErrorType == ErrorType.NoErrors)
 				ConsoleWorker.WriteLine("Первоначальная полная загрузка курса прошла успешно");
 			else
-				throw new Exception(tempCourseUpdateResponse.Message);
+			{
+				throw new CourseLoadingException(tempCourseUpdateResponse.Message);
+			}
 		}
 
 		private static bool CourseIdCorrect()
@@ -138,6 +144,19 @@ namespace CourseToolHotReloader
 				ConsoleWorker.WriteError(createResponse.Message);
 
 			return createResponse.ErrorType == ErrorType.NoErrors;
+		}
+
+		public class CourseLoadingException : Exception
+		{
+			public CourseLoadingException(string message)
+				: base(message)
+			{
+			}
+
+			public CourseLoadingException(string message, Exception innerException)
+				: base(message, innerException)
+			{
+			}
 		}
 	}
 }

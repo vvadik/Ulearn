@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Database.Models;
 
 namespace Ulearn.Web.Api.Models.Responses.TempCourses
 {
 	[DataContract]
-	public class HasTempCourseResponse
+	public class TempCourseResponse
 	{
 		[DataMember]
 		public bool HasTempCourse;
@@ -18,5 +17,8 @@ namespace Ulearn.Web.Api.Models.Responses.TempCourses
 
 		[DataMember]
 		public DateTime LastUploadTime;
+
+		[DataMember]
+		public string Errors;
 	}
 }
