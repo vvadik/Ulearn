@@ -110,7 +110,7 @@ class CopyStudentsModal extends Component {
 							autofocus
 							required
 							items={this.getGroupOptions()}
-							onChange={this.onGroupChange}
+							onValueChange={this.onGroupChange}
 							width="200"
 							placeholder="Группа"
 							value={groupId}
@@ -158,7 +158,7 @@ class CopyStudentsModal extends Component {
 		${getPluralForm(group.studentsCount, 'студент', 'студента', 'студентов')}`]);
 	};
 
-	onGroupChange = (_, value) => {
+	onGroupChange = (value) => {
 		this.setState({groupId: value});
 	};
 
