@@ -212,6 +212,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			var excluded = (PathsToExcludeForChecker ?? new string[0])
 				.Concat(initialPatterns)
 				.Concat(wrongAnswerPatterns)
+				.Concat(new[] { "bin/*", "obj/*", ".idea/*", ".vs/*" })
 				.ToList();
 
 			var toUpdateDirectories = PathsToIncludeForChecker
@@ -236,7 +237,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			var excluded = (PathsToExcludeForStudent ?? new string[0])
 				.Concat(initialPatterns)
 				.Concat(wrongAnswerPatterns)
-				.Concat(new[] { "checking/*" })
+				.Concat(new[] { "checking/*", "bin/*", "obj/*", ".idea/*", ".vs/*" })
 				.ToList();
 
 			var toUpdate = ReplaceWithInitialFiles().ToList();
