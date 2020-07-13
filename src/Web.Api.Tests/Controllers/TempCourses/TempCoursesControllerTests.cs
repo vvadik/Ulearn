@@ -13,6 +13,7 @@ using Ulearn.Core.Courses;
 using Ulearn.Web.Api.Controllers;
 using Ulearn.Web.Api.Models.Responses.TempCourses;
 using System.Text;
+using System.Threading;
 using Database;
 using Ionic.Zip;
 using Microsoft.AspNetCore.Http;
@@ -35,6 +36,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		{
 			SetupTestInfrastructureAsync(services => { services.AddScoped<TempCourseController>(); }).GetAwaiter().GetResult();
 			tempCourseController = GetController<TempCourseController>();
+			tempCourseController.DontCheckBaseCourseExistsOnCreate = true;
 			tempCoursesRepo = serviceProvider.GetService<ITempCoursesRepo>();
 			courseRolesRepo = serviceProvider.GetService<ICourseRolesRepo>();
 			courseManager = serviceProvider.GetService<IWebCourseManager>();
@@ -214,14 +216,16 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		[Test]
 		public async Task UploadCoursePartially_ShouldUpdateDB_WhenCourseIsValid()
 		{
-			var baseCourse = await CreateAndConfigureBaseCourseForUser("partiallyUpload_DB_success");
+			var baseCourse = await CreateAndConfigureBaseCourseForUser("partiallyUpload_DB_update");
 			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			var tmpCourseId = GetTmpCourseId(baseCourse.Object.Id, TestUsers.User.Id); 
 			var loadTimeBeforeUpload = (await tempCoursesRepo.FindAsync(tmpCourseId)).LoadingTime;
 			var fullCourseZip = new ZipFile(Encoding.UTF8);
 			fullCourseZip.AddDirectory(workingCourseDirectory.FullName);
 			var file = GetFormFileFromZip(fullCourseZip);
-			await tempCourseController.UploadCourse(baseCourse.Object.Id, new List<IFormFile>() { file });
+			Thread.Sleep(10);
+			var result = await tempCourseController.UploadCourse(baseCourse.Object.Id, new List<IFormFile>() { file });
+			Assert.AreEqual(ErrorType.NoErrors, result.Value.ErrorType);
 			var loadTimeAfterUpload = (await tempCoursesRepo.FindAsync(tmpCourseId)).LoadingTime;
 			Assert.Less(loadTimeBeforeUpload, loadTimeAfterUpload);
 		}

@@ -27,6 +27,7 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly ICoursesRepo coursesRepo;
 		private readonly ITempCoursesRepo tempCoursesRepo;
 		private readonly ICourseRolesRepo courseRolesRepo;
+		public bool DontCheckBaseCourseExistsOnCreate = false; // Для тестрирования
 
 		public TempCourseController(ICoursesRepo coursesRepo, ILogger logger, IWebCourseManager courseManager, UlearnDb db, [CanBeNull] IUsersRepo usersRepo, ITempCoursesRepo tempCoursesRepo, ICourseRolesRepo courseRolesRepo)
 			: base(logger, courseManager, db, usersRepo)
@@ -45,7 +46,7 @@ namespace Ulearn.Web.Api.Controllers
 		{
 			var tmpCourseId = GetTmpCourseId(courseId, UserId);
 
-			if (!await courseManager.HasCourseAsync(courseId))
+			if (!DontCheckBaseCourseExistsOnCreate && !await courseManager.HasCourseAsync(courseId))
 			{
 				return new TempCourseUpdateResponse
 				{
