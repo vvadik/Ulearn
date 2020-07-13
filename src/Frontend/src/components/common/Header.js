@@ -384,9 +384,7 @@ class MyCoursesMenu extends AbstractMyCoursesMenu {
 MyCoursesMenu = connect(MyCoursesMenu.mapStateToProps)(MyCoursesMenu);
 
 class CourseMenu extends Component {
-	//todo временный курс или нет, определяется с помощью формата courseId. В courseInfo приходит флаг IsTempCourse
-	static tempCourse =/^[\w-]*[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-	static menuItems(courseId, role, accesses) {
+	static menuItems(courseId, role, accesses, isTempCourse) {
 		let items = [
 			<MenuItem href={ "/Course/" + courseId } key="Course" component={ LinkComponent }>
 				Просмотр курса
@@ -427,7 +425,7 @@ class CourseMenu extends Component {
 				</MenuItem>);
 
 		if(hasCourseAdminMenuItems) {
-			if (this.tempCourse.test(courseId)){
+			if (isTempCourse){
 				items = items.concat([
 					<MenuItem href={ "/Admin/TempCourseDiagnostics?courseId=" + courseId } key="Diagnostics"
 							  component={ LinkComponent }>
@@ -502,7 +500,7 @@ class CourseMenu extends Component {
 						</span>
 						</div> }
 				>
-					{ CourseMenu.menuItems(courseId, role, accesses) }
+					{ CourseMenu.menuItems(courseId, role, accesses, course.isTempCourse) }
 				</DropdownMenu>
 			</div>
 		)
@@ -526,7 +524,9 @@ CourseMenu = connect(CourseMenu.mapStateToProps)(CourseMenu);
 
 class MobileCourseMenu extends AbstractMyCoursesMenu {
 	render() {
-
+		const { courseId, role, accesses } = this.props;
+		const courseById = this.props.courses.courseById;
+		const course = courseById[courseId];
 		return (
 			<div className={ styles["header__course-menu"] }>
 				<DropdownMenu
@@ -536,7 +536,7 @@ class MobileCourseMenu extends AbstractMyCoursesMenu {
 							<DocumentSolid/>
 						</span> }
 				>
-					{ this.props.isCourseMenuVisible ? CourseMenu.menuItems(this.props.courseId, this.props.role, this.props.accesses) : null }
+					{ this.props.isCourseMenuVisible ? CourseMenu.menuItems(courseId, role, accesses, course.isTempCourse) : null }
 					{ this.props.isCourseMenuVisible ? <MenuSeparator/> : null }
 					{
 						this.props.isSystemAdministrator
