@@ -61,7 +61,7 @@
 
 		@if (Model.Review.Author.IsUlearnBot())
 		{
-			<span class="with-long-tooltip cursor-pointer" data-toggle="tooltip" data-placement="top" title="Код со стилевыми ошибками трудно или неприятно читать другим программистам, поэтому он может не пройти код-ревью">
+			<span class="with-long-tooltip cursor-pointer" data-toggle="tooltip" data-placement="left" title="Код со стилевыми ошибками трудно или неприятно читать другим программистам, поэтому он может не пройти код-ревью">
 				<span class="fa fa-question-circle"></span>
 			</span>
 		}
@@ -103,7 +103,7 @@
 					<button class="btn btn-primary btn-sm" data-url="@Url.Action("AddExerciseCodeReviewComment")" data-id="@Model.Review.Id" title="Работает Ctrl+Enter">Ответить</button>
 				</div>
 				<div class="pull-right">
-					<span class="markdown-formatting-helper with-long-tooltip cursor-pointer" data-toggle="tooltip" data-placement="bottom" title="**жирный текст**, __курсивный текст__, `код`, ```многострочный код```">
+					<span class="markdown-formatting-helper with-long-tooltip cursor-pointer" data-toggle="tooltip" data-placement="left" title="**жирный текст**, __курсивный текст__, `код`, ```многострочный код```">
 						<span class="fa fa-question-circle"></span> Форматирование
 					</span>
 				</div>

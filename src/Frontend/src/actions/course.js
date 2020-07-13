@@ -4,6 +4,7 @@ import {
 	COURSES__FLASHCARDS,
 	COURSES__FLASHCARDS_RATE,
 	COURSES__SLIDE_LOAD,
+	COURSES__SLIDE_READY,
 	COURSES__COURSE_LOAD_ERRORS,
 	START, SUCCESS, FAIL,
 } from "../consts/actions";
@@ -80,6 +81,11 @@ const loadSlideFail = (error) => ({
 	error,
 });
 
+const slideReadyAction = (isSlideReady) => ({
+	type: COURSES__SLIDE_READY,
+	isSlideReady,
+});
+
 export const loadCourse = (courseId) => {
 	courseId = courseId.toLowerCase();
 
@@ -152,3 +158,9 @@ export const loadSlide = (courseId, slideId) => {
 			});
 	};
 };
+
+export const setSlideReady = (isSlideReady) => {
+	return (dispapcth) => {
+		dispapcth(slideReadyAction(isSlideReady));
+	}
+}

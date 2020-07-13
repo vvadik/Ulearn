@@ -69,7 +69,7 @@ class CommentsView extends Component {
 	};
 
 	render() {
-		const {user, userRoles, courseId, slideId, slideType, commentsApi} = this.props;
+		const {user, userRoles, courseId, slideId, slideType, commentsApi, isSlideReady,} = this.props;
 
 		return (
 			<div className={styles.wrapper}>
@@ -86,7 +86,8 @@ class CommentsView extends Component {
 						user={user}
 						userRoles={userRoles}
 						slideId={slideId}
-						courseId={courseId}>
+						courseId={courseId}
+						isSlideReady={isSlideReady}>
 					</CommentsList>
 				</div>
 			</div>
@@ -170,7 +171,8 @@ CommentsView.propTypes = {
 	courseId: PropTypes.string.isRequired,
 	slideId: PropTypes.string.isRequired,
 	slideType: PropTypes.string.isRequired,
-	openInstructorsComments: PropTypes.bool
+	openInstructorsComments: PropTypes.bool,
+	isSlideReady: PropTypes.bool,
 };
 
 export default CommentsView;

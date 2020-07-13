@@ -4,6 +4,7 @@ import {
 	COURSES__COURSE_LOAD,
 	COURSES__FLASHCARDS,
 	COURSES__FLASHCARDS_RATE,
+	COURSES__SLIDE_READY,
 	START, SUCCESS, FAIL,
 	COURSES__COURSE_LOAD_ERRORS,
 } from '../consts/actions';
@@ -21,6 +22,8 @@ const initialCoursesState = {
 	flashcardsLoading: false,
 	flashcardsByCourses: {},
 	flashcardsByUnits: {},
+
+	isSlideReady: false,
 };
 
 export default function courses(state = initialCoursesState, action) {
@@ -154,6 +157,12 @@ export default function courses(state = initialCoursesState, action) {
 			}
 
 			return newState;
+		case COURSES__SLIDE_READY: {
+			return {
+				...state,
+				isSlideReady: action.isSlideReady,
+			};
+		}
 		default:
 			return state;
 	}

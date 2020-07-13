@@ -66,6 +66,10 @@ class Course extends Component {
 		if(isAuthenticated && !progress) {
 			loadUserProgress(courseId, user.id);
 		}
+
+		if(isAuthenticated) {
+			window.reloadUserProgress = () => loadUserProgress(courseId, user.id); //adding hack to let legacy page scripts to reload progress,TODO(rozentor) remove it after implementing react task slides
+		}
 	}
 
 	componentDidUpdate(prevProps, prevState) {
@@ -77,6 +81,7 @@ class Course extends Component {
 			loadCourse(courseId);
 			loadCourseErrors(courseId);
 			loadUserProgress(courseId, user.id);
+			window.reloadUserProgress = () => loadUserProgress(courseId, user.id); //adding hack to let legacy page scripts to reload progress,TODO(rozentor) remove it after implementing react task slides
 		}
 
 		if(title !== prevState.title) {
@@ -292,10 +297,11 @@ class Course extends Component {
 	};
 
 	renderComments(currentSlide) {
-		const { user, courseId, } = this.props;
+		const { user, courseId, isSlideReady, } = this.props;
 		const { isSystemAdministrator, accessesByCourse, roleByCourse } = user;
 		const courseAccesses = accessesByCourse[courseId] ? accessesByCourse[courseId] : [];
-		const userRoles = { isSystemAdministrator, courseRole: roleByCourse, courseAccesses, };
+		const courseRole = roleByCourse[courseId] ? roleByCourse[courseId] : '';
+		const userRoles = { isSystemAdministrator, courseRole, courseAccesses, };
 
 		return (
 			<BlocksWrapper className={ styles.commentsWrapper }>
@@ -304,6 +310,7 @@ class Course extends Component {
 							  slideId={ currentSlide.id }
 							  userRoles={ userRoles }
 							  courseId={ courseId }
+							  isSlideReady={ isSlideReady }
 				/>
 			</BlocksWrapper>
 		)

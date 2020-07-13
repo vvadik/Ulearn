@@ -54,6 +54,9 @@ function setResults(ans) {
 		setSimpleResult($waErrorNoDiff, ans.ActualOutput);
 	else
 		setWA(ans.ExpectedOutput, ans.ActualOutput);
+	if(window.reloadUserProgress){
+		window.reloadUserProgress();
+	}
 }
 
 window.documentReadyFunctions = window.documentReadyFunctions || [];
