@@ -80,7 +80,7 @@ namespace Ulearn.Web.Api.Controllers
 
 			var result = await tempCoursesRepo.AddTempCourseAsync(tmpCourseId, UserId);
 			var loadingTime = result.LoadingTime;
-			await courseRolesRepo.ToggleRoleAsync(tmpCourseId, UserId, CourseRoleType.CourseAdmin, UserId);
+			await courseRolesRepo.ToggleRoleAsync(tmpCourseId, UserId, CourseRoleType.CourseAdmin, UserId, "Создал временный курс");
 			return new TempCourseUpdateResponse
 			{
 				Message = $"Временный курс с id {tmpCourseId} успешно создан.",

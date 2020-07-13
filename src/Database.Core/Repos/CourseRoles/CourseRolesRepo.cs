@@ -47,7 +47,7 @@ namespace Database.Repos.CourseRoles
 			return roles.Any() ? roles.Min() : CourseRoleType.Student;
 		}
 
-		public async Task<bool> ToggleRoleAsync(string courseId, string userId, CourseRoleType roleType, string grantedById)
+		public async Task<bool> ToggleRoleAsync(string courseId, string userId, CourseRoleType roleType, string grantedById, string comment)
 		{
 			var userRoles = await db.CourseRoles.ToListAsync();
 
@@ -64,7 +64,8 @@ namespace Database.Repos.CourseRoles
 				Role = roleType,
 				IsEnabled = isEnabled,
 				GrantedById = grantedById,
-				GrantTime = DateTime.Now
+				GrantTime = DateTime.Now,
+				Comment = comment
 			});
 
 			await db.SaveChangesAsync();
