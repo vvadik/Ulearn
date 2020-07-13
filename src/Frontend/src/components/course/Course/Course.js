@@ -81,7 +81,8 @@ class Course extends Component {
 
 		if(title !== prevState.title) {
 			this.updateWindowMeta(title, courseInfo.title);
-			loadCourseErrors(courseId);
+			if(courseInfo.isTempCourse)
+				loadCourseErrors(courseId);
 			loadUserProgress(courseId, user.id);
 		}
 	}

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using CourseToolHotReloader.DirectoryWorkers;
 using CourseToolHotReloader.Dtos;
-using CourseToolHotReloader.Log;
 using JetBrains.Annotations;
 
 namespace CourseToolHotReloader.ApiClient
@@ -14,8 +14,9 @@ namespace CourseToolHotReloader.ApiClient
 		Task<TempCourseUpdateResponse> SendFullCourse(string path, string courseId);
 		Task<TempCourseUpdateResponse> CreateCourse(string courseId);
 		Task<string> Login(string login, string password);
-		Task<HasTempCourseResponse> HasCourse(string courseId);
+		Task<bool> HasCourse(string courseId);
 		Task<string> RenewToken();
+		Task<string> GetUserId();
 	}
 
 	internal class UlearnApiClient : IUlearnApiClient
@@ -47,10 +48,10 @@ namespace CourseToolHotReloader.ApiClient
 			return await httpMethods.CreateCourse(courseId);
 		}
 
-		[ItemCanBeNull]
-		public async Task<HasTempCourseResponse> HasCourse(string courseId)
+		public async Task<bool> HasCourse(string courseId)
 		{
-			return await httpMethods.HasCourse(courseId);
+			var coursesList = await httpMethods.GetCoursesList();
+			return coursesList?.Courses.Any(c => string.Compare(c.Id, courseId, StringComparison.OrdinalIgnoreCase) == 0) ?? false;
 		}
 
 		[ItemCanBeNull]
@@ -71,6 +72,12 @@ namespace CourseToolHotReloader.ApiClient
 		{
 			var accountTokenResponseDto = await httpMethods.RenewToken();
 			return accountTokenResponseDto?.Token;
+		}
+
+		public async Task<string> GetUserId()
+		{
+			var userInfo = await httpMethods.GetUserInfo();
+			return userInfo.Id;
 		}
 	}
 }

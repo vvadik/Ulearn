@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -70,14 +69,15 @@ namespace CourseToolHotReloader
 
 		private static async Task Startup()
 		{
-			if (!await Login())
+			var userId = await Login();
+			if (userId == null)
 				return;
 
 			if (!CourseIdCorrect())
 				return;
 
-			if (!await TempCourseExist())
-				if (await CreateCourse())
+			if (!await TempCourseExist(userId))
+				if (!await CreateCourse())
 					return;
 
 			await SendFullCourse();
@@ -91,16 +91,16 @@ namespace CourseToolHotReloader
 			courseWatcher.StartWatch();
 		}
 
-		private static async Task<bool> Login()
+		private static async Task<string> Login()
 		{
-			var isLoginSuccess = await container.Resolve<ILoginAgent>().SignIn();
+			var userId = await container.Resolve<ILoginAgent>().SignIn();
 
-			if (isLoginSuccess)
+			if (userId != null)
 				ConsoleWorker.WriteLine("Авторизация прошла успешно");
 			else
 				ConsoleWorker.WriteError("Ошибка авторизации");
 
-			return isLoginSuccess;
+			return userId;
 		}
 
 		private static async Task SendFullCourse()
@@ -125,14 +125,20 @@ namespace CourseToolHotReloader
 			return true;
 		}
 
-		private static async Task<bool> TempCourseExist()
+		private static async Task<bool> TempCourseExist(string userId)
 		{
-			var hasTempCourseResponse = await ulearnApiClient.HasCourse(config.CourseId);
+			var tempCourseId = GetTmpCourseId(config.CourseId, userId);
+			var hasTempCourse = await ulearnApiClient.HasCourse(config.CourseId);
 
-			if (hasTempCourseResponse.HasTempCourse)
-				ConsoleWorker.WriteLine($"Обнаружен существующий временный курс с id {hasTempCourseResponse.TempCourseId}");
+			if (hasTempCourse)
+				ConsoleWorker.WriteLine($"Обнаружен существующий временный курс с id {tempCourseId}");
 
-			return hasTempCourseResponse.HasTempCourse;
+			return hasTempCourse;
+		}
+
+		private static string GetTmpCourseId(string baseCourseId, string userId)
+		{
+			return $"{baseCourseId}_{userId}";
 		}
 
 		private static async Task<bool> CreateCourse()
@@ -141,7 +147,7 @@ namespace CourseToolHotReloader
 			if (createResponse.ErrorType != ErrorType.NoErrors)
 				ConsoleWorker.WriteError(createResponse.Message);
 			else
-				ConsoleWorker.WriteError(createResponse.Message);
+				ConsoleWorker.WriteLine(createResponse.Message);
 
 			return createResponse.ErrorType == ErrorType.NoErrors;
 		}

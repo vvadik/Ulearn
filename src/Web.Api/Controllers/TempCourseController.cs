@@ -10,7 +10,6 @@ using Database.Repos;
 using Database.Repos.CourseRoles;
 using Database.Repos.Users;
 using JetBrains.Annotations;
-using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -42,17 +41,25 @@ namespace Ulearn.Web.Api.Controllers
 		/// </summary>
 		[Authorize]
 		[HttpPost("{courseId}")]
-		public async Task<TempCourseUpdateResponse> CreateCourse([FromRoute] string courseId)
+		public async Task<ActionResult<TempCourseUpdateResponse>> CreateCourse([FromRoute] string courseId)
 		{
-			var userId = User.Identity.GetUserId();
-			var tmpCourseId = GetTmpCourseId(courseId, userId);
+			var tmpCourseId = GetTmpCourseId(courseId, UserId);
 
-			if (!await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin))
+			if (!await courseManager.HasCourseAsync(courseId))
+			{
+				return new TempCourseUpdateResponse
+				{
+					ErrorType = ErrorType.NotFound,
+					Message = $"Не существует курса {courseId}"
+				};
+			}
+
+			if (!await courseRolesRepo.HasUserAccessToCourseAsync(UserId, courseId, CourseRoleType.CourseAdmin))
 			{
 				return new TempCourseUpdateResponse
 				{
 					ErrorType = ErrorType.Forbidden,
-					Message = $"Чтобы создать временную версию курса {courseId}, необходимо быть администратором этого курса"
+					Message = $"Необходимо быть администратором курса {courseId}"
 				};
 			}
 
@@ -67,13 +74,13 @@ namespace Ulearn.Web.Api.Controllers
 			}
 
 			var versionId = Guid.NewGuid();
-			var courseTitle = "Temp course";
+			var courseTitle = "Заготовка временного курса";
 			if (!courseManager.TryCreateTempCourse(tmpCourseId, courseTitle, versionId))
 				throw new Exception();
 
-			var result = await tempCoursesRepo.AddTempCourseAsync(tmpCourseId, userId);
+			var result = await tempCoursesRepo.AddTempCourseAsync(tmpCourseId, UserId);
 			var loadingTime = result.LoadingTime;
-			await courseRolesRepo.ToggleRoleAsync(tmpCourseId, userId, CourseRoleType.CourseAdmin, userId);
+			await courseRolesRepo.ToggleRoleAsync(tmpCourseId, UserId, CourseRoleType.CourseAdmin, UserId);
 			return new TempCourseUpdateResponse
 			{
 				Message = $"Временный курс с id {tmpCourseId} успешно создан.",
@@ -84,48 +91,23 @@ namespace Ulearn.Web.Api.Controllers
 		/// <summary>
 		/// Ошибки при загрузке временного курса c courseId
 		/// </summary>
+		[Authorize(Policy = "Instructors")]
 		[HttpGet("{courseId}/errors")]
-		public async Task<string> GetError([FromRoute] string courseId)
+		public async Task<ActionResult<TempCourseErrorsResponse>> GetError([FromRoute] string courseId)
 		{
 			var tmpCourseError = await tempCoursesRepo.GetCourseErrorAsync(courseId);
-			return tmpCourseError?.Error;
-		}
-
-		/// <summary>
-		/// Информация о временном курсе для базового курса с courseId
-		/// </summary>
-		[Authorize]
-		[HttpGet("{courseId}")]
-		public async Task<TempCourseResponse> HasCourse([FromRoute] string courseId)
-		{
-			var userId = User.Identity.GetUserId();
-
-			var tmpCourseId = GetTmpCourseId(courseId, userId);
-			var tmpCourse = await tempCoursesRepo.FindAsync(tmpCourseId);
-			var tmpCourseError = await tempCoursesRepo.GetCourseErrorAsync(courseId);
-			var response = new TempCourseResponse();
-			if (tmpCourse == null)
+			return new TempCourseErrorsResponse
 			{
-				response.HasTempCourse = false;
-			}
-			else
-			{
-				response.HasTempCourse = true;
-				response.LastUploadTime = tmpCourse.LoadingTime;
-				response.MainCourseId = courseId;
-				response.TempCourseId = tmpCourseId;
-				response.Errors = tmpCourseError?.Error;
-			}
-
-			return response;
+				TempCourseError = tmpCourseError?.Error
+			};
 		}
 
 		/// <summary>
 		/// Загрузить изменения временного курса для базового курса с courseId
 		/// </summary>
-		[HttpPatch("{courseId}")]
 		[Authorize]
-		public async Task<TempCourseUpdateResponse> UploadCourse([FromRoute] string courseId, List<IFormFile> files)
+		[HttpPatch("{courseId}")]
+		public async Task<ActionResult<TempCourseUpdateResponse>> UploadCourse([FromRoute] string courseId, List<IFormFile> files)
 		{
 			return await UploadCourse(courseId, files, false);
 		}
@@ -135,15 +117,14 @@ namespace Ulearn.Web.Api.Controllers
 		/// </summary>
 		[HttpPut("{courseId}")]
 		[Authorize]
-		public async Task<TempCourseUpdateResponse> UploadFullCourse([FromRoute] string courseId, List<IFormFile> files)
+		public async Task<ActionResult<TempCourseUpdateResponse>> UploadFullCourse([FromRoute] string courseId, List<IFormFile> files)
 		{
 			return await UploadCourse(courseId, files, true);
 		}
 
 		private async Task<TempCourseUpdateResponse> UploadCourse(string courseId, List<IFormFile> files, bool isFull)
 		{
-			var userId = User.Identity.GetUserId();
-			var tmpCourseId = GetTmpCourseId(courseId, userId);
+			var tmpCourseId = GetTmpCourseId(courseId, UserId);
 			var tmpCourse = await tempCoursesRepo.FindAsync(tmpCourseId);
 			if (tmpCourse is null)
 			{
@@ -151,6 +132,15 @@ namespace Ulearn.Web.Api.Controllers
 				{
 					ErrorType = ErrorType.NotFound,
 					Message = $"Вашей временной версии курса {courseId} не существует. Для создания испрользуйте метод Create"
+				};
+			}
+
+			if (!await courseRolesRepo.HasUserAccessToCourseAsync(UserId, courseId, CourseRoleType.CourseAdmin))
+			{
+				return new TempCourseUpdateResponse
+				{
+					ErrorType = ErrorType.Forbidden,
+					Message = $"Необходимо быть администратором курса {tmpCourseId}"
 				};
 			}
 
@@ -229,7 +219,7 @@ namespace Ulearn.Web.Api.Controllers
 			}
 			catch (Exception error)
 			{
-				var errorMessage = error.Message.ToLowerFirstLetter();
+				var errorMessage = error.Message;
 				while (error.InnerException != null)
 				{
 					errorMessage += $"\n\n{error.InnerException.Message}";
@@ -243,7 +233,7 @@ namespace Ulearn.Web.Api.Controllers
 			return null;
 		}
 
-		private void DeleteFiles(List<FileContent> filesToDelete, List<string> directoriesToDelete)
+		private static void DeleteFiles(List<FileContent> filesToDelete, List<string> directoriesToDelete)
 		{
 			filesToDelete.ForEach(file => System.IO.File.Delete(file.Path));
 			directoriesToDelete.ForEach(DeleteNotEmptyDirectory);
@@ -251,10 +241,10 @@ namespace Ulearn.Web.Api.Controllers
 
 		private static void DeleteNotEmptyDirectory(string dirPath)
 		{
-			string[] files = Directory.GetFiles(dirPath);
-			string[] dirs = Directory.GetDirectories(dirPath);
+			var files = Directory.GetFiles(dirPath);
+			var dirs = Directory.GetDirectories(dirPath);
 
-			foreach (string file in files)
+			foreach (var file in files)
 			{
 				System.IO.File.SetAttributes(file, FileAttributes.Normal);
 				System.IO.File.Delete(file);
@@ -356,7 +346,7 @@ namespace Ulearn.Web.Api.Controllers
 			System.IO.File.WriteAllBytes(stagingFile.FullName, content);
 		}
 
-		private string GetTmpCourseId(string baseCourseId, string userId)
+		private static string GetTmpCourseId(string baseCourseId, string userId)
 		{
 			return $"{baseCourseId}_{userId}";
 		}

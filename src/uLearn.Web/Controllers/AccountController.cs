@@ -75,15 +75,15 @@ namespace uLearn.Web.Controllers
 		}
 
 		[ChildActionOnly]
-		public ActionResult ListPartial(UserSearchQueryModel queryModel)
+		public async Task<ActionResult> ListPartial(UserSearchQueryModel queryModel)
 		{
 			var userRoles = usersRepo.FilterUsers(queryModel);
-			var model = GetUserListModel(userRoles);
+			var model = await GetUserListModel(userRoles);
 
 			return PartialView("_UserListPartial", model);
 		}
 
-		private UserListModel GetUserListModel(List<UserRolesInfo> users)
+		private async Task<UserListModel> GetUserListModel(List<UserRolesInfo> users)
 		{
 			var coursesForUsers = userRolesRepo.GetCoursesForUsers();
 
@@ -91,11 +91,14 @@ namespace uLearn.Web.Controllers
 
 			var currentUserId = User.Identity.GetUserId();
 			var userIds = users.Select(u => u.UserId).ToList();
+			var tempCoursesIds = tempCoursesRepo.GetTempCourses()
+				.Select(t => t.CourseId)
+				.ToHashSet();
 			var model = new UserListModel
 			{
 				CanToggleRoles = User.HasAccess(CourseRole.CourseAdmin),
 				ShowDangerEntities = User.IsSystemAdministrator(),
-				Users = users.Select(user => GetUserModel(user, coursesForUsers, courses)).ToList(),
+				Users = users.Select(user => GetUserModel(user, coursesForUsers, courses, tempCoursesIds)).ToList(),
 				UsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courses, userIds, User),
 				UsersArchivedGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courses, userIds, User, onlyArchived: true),
 				CanViewAndToggleCourseAccesses = false,
@@ -106,7 +109,8 @@ namespace uLearn.Web.Controllers
 			return model;
 		}
 
-		private UserModel GetUserModel(UserRolesInfo userRoles, Dictionary<string, Dictionary<CourseRole, List<string>>> coursesForUsers, List<string> coursesIds)
+		private UserModel GetUserModel(UserRolesInfo userRoles, Dictionary<string, Dictionary<CourseRole, List<string>>> coursesForUsers,
+			List<string> coursesIds, HashSet<string> tempCoursesIds)
 		{
 			var user = new UserModel(userRoles)
 			{
@@ -138,7 +142,7 @@ namespace uLearn.Web.Controllers
 							HasAccess = coursesForUser.ContainsKey(role) && coursesForUser[role].Contains(s.ToLower()),
 							ToggleUrl = Url.Content($"~/Account/{nameof(ToggleRole)}?courseId={s}&userId={user.UserId}&role={role}"),
 							UserName = user.UserVisibleName,
-							IsTempCourse = IsTempCourse(s)
+							IsTempCourse = tempCoursesIds.Contains(s)
 						})
 						.OrderBy(s => s.CourseTitle, StringComparer.InvariantCultureIgnoreCase)
 						.ToList()
@@ -310,7 +314,10 @@ namespace uLearn.Web.Controllers
 			var userCourses = courseManager.GetCourses().Where(c => userCoursesIds.Contains(c.Id.ToLower())).OrderBy(c => c.Title).ToList();
 
 			var allCourses = courseManager.GetCourses().ToDictionary(c => c.Id, c => c, StringComparer.InvariantCultureIgnoreCase);
-			var tempCourseIds = allCourses.Values.Where(course => IsTempCourse(course.Id)).Select(course=>course.Id).ToHashSet();
+			var tempCourseIds = tempCoursesRepo.GetTempCourses()
+				.Select(c => c.CourseId)
+				.Where(c => allCourses.ContainsKey(c))
+				.ToHashSet();
 			var certificates = certificatesRepo.GetUserCertificates(user.Id).OrderBy(c => allCourses.GetOrDefault(c.Template.CourseId)?.Title ?? "<курс удалён>").ToList();
 
 			var courseGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, maxCount: 10));
@@ -886,11 +893,6 @@ namespace uLearn.Web.Controllers
 						Secure = configuration.Web.CookieSecure
 					});
 			}
-		}
-
-		public bool IsTempCourse(string courseId)
-		{
-			return tempCoursesRepo.Find(courseId) != null;
 		}
 	}
 

@@ -66,7 +66,7 @@ namespace uLearn.Web.Controllers
 		[AllowAnonymous]
 		public async Task<ActionResult> SlideById(string courseId, string slideId = "", int? checkQueueItemId = null, int? version = null, int autoplay = 0)
 		{
-			CheckTempCourseAndReloadIfNecessary(courseId);
+			await CheckTempCourseAndReloadIfNecessary(courseId).ConfigureAwait(false);
 			if (slideId.Contains("_"))
 				slideId = slideId.Substring(slideId.LastIndexOf('_') + 1);
 
@@ -146,28 +146,10 @@ namespace uLearn.Web.Controllers
 			return RedirectToRoute("Course.SlideById", new { courseId = course.Id, slideId = slide.Url });
 		}
 
-		// private ActionResult PackagesTempCourse(string courseId, string error = "", bool openStep1 = false, bool openStep2 = false)
-		// {
-		// 	//var lastUpdate = courseManager.GetLastWriteTime(courseId);
-		// 	var course = courseManager.GetCourse(courseId);
-		// 	var publishedVersion = coursesRepo.GetPublishedCourseVersion(courseId);
-		// 	var courseRepo = coursesRepo.GetCourseRepoSettings(courseId);
-		// 	return View("Packages", model: new PackagesViewModel
-		// 	{
-		// 		Course = course,
-		// 		//LastUpdate = lastUpdate,
-		// 		PublishedVersion = publishedVersion,
-		// 		CourseGit = courseRepo,
-		// 		OpenStep1 = openStep1,
-		// 		OpenStep2 = openStep2,
-		// 		Error = error,
-		// 	});
-		// }
-
 		[AllowAnonymous]
-		public ActionResult Slide(string courseId, int slideIndex = -1)
+		public async Task<ActionResult> Slide(string courseId, int slideIndex = -1)
 		{
-			CheckTempCourseAndReloadIfNecessary(courseId);
+			await CheckTempCourseAndReloadIfNecessary(courseId).ConfigureAwait(false);
 			var course = courseManager.FindCourse(courseId);
 			if (course == null)
 				return HttpNotFound();
@@ -186,20 +168,7 @@ namespace uLearn.Web.Controllers
 			return !(tempCourse is null);
 		}
 
-		private bool TryGetTempCourseError(string courseId, out string error)
-		{
-			var tmpCourseError = tempCoursesRepo.FindError(courseId);
-			if (tmpCourseError?.Error != null)
-			{
-				error = tmpCourseError.Error;
-				return true;
-			}
-
-			error = null;
-			return false;
-		}
-
-		private void CheckTempCourseAndReloadIfNecessary(string courseId)
+		private async Task CheckTempCourseAndReloadIfNecessary(string courseId)
 		{
 			var tempCourse = tempCoursesRepo.Find(courseId);
 			if (tempCourse is null)
@@ -219,7 +188,7 @@ namespace uLearn.Web.Controllers
 			if (tempCourse.LastUpdateTime < tempCourse.LoadingTime)
 			{
 				courseManager.ReloadCourse(courseId);
-				tempCoursesRepo.UpdateTempCourseLastUpdateTime(courseId);
+				await tempCoursesRepo.UpdateTempCourseLastUpdateTimeAsync(courseId).ConfigureAwait(false);
 			}
 		}
 

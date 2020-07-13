@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
 using CourseToolHotReloader.ApiClient;
 using CourseToolHotReloader.Log;
@@ -8,7 +7,7 @@ namespace CourseToolHotReloader.LoginAgent
 {
 	public interface ILoginAgent
 	{
-		Task<bool> SignIn();
+		Task<string> SignIn();
 	}
 
 	public class LoginAgent : ILoginAgent
@@ -22,12 +21,11 @@ namespace CourseToolHotReloader.LoginAgent
 			this.ulearnApiClient = ulearnApiClient;
 		}
 
-		public async Task<bool> SignIn()
+		public async Task<string> SignIn()
 		{
-			if (await TryLoginByConfig())
-				return true;
-
-			return await TryLoginByConsole();
+			var isSignInSuccess = await TryLoginByConfig()
+				|| await TryLoginByConsole();
+			return isSignInSuccess ? await ulearnApiClient.GetUserId() : null;
 		}
 
 		private async Task<bool> TryLoginByConsole()

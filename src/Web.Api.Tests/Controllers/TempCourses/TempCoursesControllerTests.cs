@@ -59,7 +59,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		{
 			var baseCourse = await CreateAndConfigureBaseCourseForUser("create_response_success");
 			var result = await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
-			Assert.AreEqual(ErrorType.NoErrors, result.ErrorType);
+			Assert.AreEqual(ErrorType.NoErrors, result.Value.ErrorType);
 		}
 
 		[Test]
@@ -77,7 +77,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 			var baseCourse = await CreateAndConfigureBaseCourseForUser("create_response_conflict");
 			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			var result = await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
-			Assert.AreEqual(ErrorType.Conflict, result.ErrorType);
+			Assert.AreEqual(ErrorType.Conflict, result.Value.ErrorType);
 		}
 
 		[Test]
@@ -88,7 +88,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 			await AuthenticateUserInControllerAsync(tempCourseController, TestUsers.User).ConfigureAwait(false);
 			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			var result = await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
-			Assert.AreEqual(ErrorType.Forbidden, result.ErrorType);
+			Assert.AreEqual(ErrorType.Forbidden, result.Value.ErrorType);
 		}
 
 		[Test]
@@ -100,7 +100,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 			fullCourseZip.AddDirectory(testCourseDirectory.FullName);
 			var file = GetFormFileFromZip(fullCourseZip);
 			var uploadResult = await tempCourseController.UploadFullCourse(baseCourse.Object.Id, new List<IFormFile>() { file });
-			Assert.AreEqual(ErrorType.NoErrors, uploadResult.ErrorType);
+			Assert.AreEqual(ErrorType.NoErrors, uploadResult.Value.ErrorType);
 		}
 
 		[Test]
@@ -113,7 +113,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 			fullCourseZip.AddDirectory(testCourseDirectory.FullName);
 			var file = GetFormFileFromZip(fullCourseZip);
 			var uploadResult = await tempCourseController.UploadFullCourse(baseCourse.Object.Id, new List<IFormFile>() { file });
-			Assert.AreEqual(ErrorType.NotFound, uploadResult.ErrorType);
+			Assert.AreEqual(ErrorType.NotFound, uploadResult.Value.ErrorType);
 		}
 
 		[Test]
@@ -163,7 +163,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 			fullCourseZip.AddDirectory(workingCourseDirectory.FullName);
 			var file = GetFormFileFromZip(fullCourseZip);
 			var result = await tempCourseController.UploadFullCourse(baseCourse.Object.Id, new List<IFormFile>() { file });
-			Assert.AreEqual(result.ErrorType, ErrorType.CourseError);
+			Assert.AreEqual(result.Value.ErrorType, ErrorType.CourseError);
 		}
 
 		[Test]
@@ -208,7 +208,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 			fullCourseZip.AddDirectory(workingCourseDirectory.FullName);
 			var file = GetFormFileFromZip(fullCourseZip);
 			var response = await tempCourseController.UploadCourse(baseCourse.Object.Id, new List<IFormFile>() { file });
-			Assert.AreEqual(ErrorType.NoErrors, response.ErrorType);
+			Assert.AreEqual(ErrorType.NoErrors, response.Value.ErrorType);
 		}
 
 		[Test]
@@ -294,7 +294,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 			var zipWithDelete = GetZipWithDelete(filesToDelete);
 			var file = GetFormFileFromZip(zipWithDelete);
 			var response = tempCourseController.UploadCourse(baseCourse.Object.Id, new List<IFormFile>() { file });
-			Assert.AreEqual(ErrorType.CourseError, response.Result.ErrorType);
+			Assert.AreEqual(ErrorType.CourseError, response.Result.Value.ErrorType);
 		}
 
 		[Test]

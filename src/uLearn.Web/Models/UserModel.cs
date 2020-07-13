@@ -62,7 +62,6 @@ namespace uLearn.Web.Models
 		public string ToggleUrl { get; set; }
 		public string UserName { get; set; }
 		public CourseRole Role { get; set; }
-		
 		public bool IsTempCourse { get; set; }
 	}
 

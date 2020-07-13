@@ -18,8 +18,9 @@ namespace CourseToolHotReloader.ApiClient
 		Task<TempCourseUpdateResponse> UploadCourse(MemoryStream memoryStream, string id);
 		Task<TempCourseUpdateResponse> UploadFullCourse(MemoryStream memoryStream, string id);
 		Task<TempCourseUpdateResponse> CreateCourse(string id);
-		Task<HasTempCourseResponse> HasCourse(string id);
+		Task<CoursesListResponse> GetCoursesList();
 		Task<TokenResponseDto> RenewToken();
+		Task<ShortUserInfo> GetUserInfo();
 	}
 
 	public class HttpMethods : IHttpMethods
@@ -93,19 +94,24 @@ namespace CourseToolHotReloader.ApiClient
 		}
 
 
-		public async Task<HasTempCourseResponse> HasCourse(string id)
+		public async Task<CoursesListResponse> GetCoursesList()
 		{
-			var url = $"{config.BaseUrl}/tempCourses/{id}";
-
+			var url = $"{config.BaseUrl}/courses";
 			using var client = HttpClient();
-
 			var response = await client.GetAsync(url);
-//404
 			BadCodeHandler(response);
-
 			return response.StatusCode != HttpStatusCode.OK
 				? null
-				: DeserializeResponseContent<HasTempCourseResponse>(response);
+				: DeserializeResponseContent<CoursesListResponse>(response);
+		}
+
+		public async Task<ShortUserInfo> GetUserInfo()
+		{
+			var url = $"{config.BaseUrl}/account";
+			using var client = HttpClient();
+			var response = await client.GetAsync(url);
+			BadCodeHandler(response);
+			return DeserializeResponseContent<AccountResponse>(response).User;
 		}
 
 		private static T DeserializeResponseContent<T>(HttpResponseMessage response)
