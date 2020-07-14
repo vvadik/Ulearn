@@ -113,6 +113,9 @@ export const loadCourseErrors = (courseId) => {
 				dispatch(loadCourseErrorsSuccess(courseId, result));
 			}
 			})
+			.catch(err => {
+				dispatch(loadCourseFail(courseId, null));
+			});
 	};
 };
 
