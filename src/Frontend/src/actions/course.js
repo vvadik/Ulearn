@@ -110,7 +110,7 @@ export const loadCourseErrors = (courseId) => {
 			if(result.status === 204) {
 				dispatch(loadCourseErrorsSuccess(courseId, null));
 			} else {
-				dispatch(loadCourseErrorsSuccess(courseId, result));
+				dispatch(loadCourseErrorsSuccess(courseId, result.tempCourseError));
 			}
 			})
 			.catch(err => {

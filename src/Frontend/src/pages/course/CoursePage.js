@@ -25,7 +25,7 @@ const mapStateToProps = (state, { match }) => {
 	const courseInfo = state.courses.fullCoursesInfo[courseId];
 	let courseErrors = state.courses.fullCoursesErrors[courseId];
 	const isReview = params.CheckQueueItemId !== undefined;
-	const isNavMenuVisible = !isLti && !isReview && courseErrors === null;
+	const isNavMenuVisible = !isLti && !isReview && courseErrors == null;
 	return {
 		courseId,
 		slideId,

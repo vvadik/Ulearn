@@ -58,7 +58,7 @@ export default function courses(state = initialCoursesState, action) {
 				...state,
 				fullCoursesErrors: {
 					...state.fullCoursesErrors,
-					[action.courseId]: action.result.tempCourseError,
+					[action.courseId]: action.result,
 				}
 			};
 		case COURSES__COURSE_LOAD + FAIL:

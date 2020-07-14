@@ -88,7 +88,6 @@ class Course extends Component {
 			this.updateWindowMeta(title, courseInfo.title);
 			if(courseInfo.isTempCourse)
 				loadCourseErrors(courseId);
-			loadUserProgress(courseId, user.id);
 		}
 	}
 
