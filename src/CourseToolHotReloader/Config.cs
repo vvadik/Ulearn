@@ -98,7 +98,7 @@ namespace CourseToolHotReloader
 			public FileConfigFormat()
 			{
 				JwtToken = null;
-				BaseUrl = "ulearn.me";
+				BaseUrl = "https://api.ulearn.me";
 				SendFullArchive = false;
 				CourseIds = new Dictionary<string, string>();
 			}
