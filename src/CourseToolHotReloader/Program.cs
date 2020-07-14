@@ -128,7 +128,7 @@ namespace CourseToolHotReloader
 		private static async Task<bool> TempCourseExist(string userId)
 		{
 			var tempCourseId = GetTmpCourseId(config.CourseId, userId);
-			var hasTempCourse = await ulearnApiClient.HasCourse(config.CourseId);
+			var hasTempCourse = await ulearnApiClient.HasCourse(tempCourseId);
 
 			if (hasTempCourse)
 				ConsoleWorker.WriteLine($"Обнаружен существующий временный курс с id {tempCourseId}");
