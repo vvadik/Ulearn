@@ -57,7 +57,7 @@
 	{
 		<h1>
 			Диагностика
-			@if (Model.IsDiagnosticsForVersion)
+			@if (Model.IsDiagnosticsForVersion && !Model.IsTempCourse)
 			{
 				using (Html.BeginForm("PublishVersion", "Admin", new { Model.CourseId, Model.VersionId }, FormMethod.Post))
 				{
@@ -81,11 +81,26 @@
 		{
 			if (Model.CourseDiff.IsEmptyChangeset)
 			{
-				<h3>Отличий от текущей версии нет</h3>
+				if (Model.IsTempCourse)
+				{
+					<h3>Отличий от основной версии курса нет</h3>
+				}
+				else
+				{
+					<h3>Отличий от текущей версии нет</h3>
+				}
 			}
 			else
 			{
-				<h3>Отличия от текущей версии</h3>
+				if (Model.IsTempCourse)
+				{
+					<h3>Отличия от основной версии курса</h3>
+				}
+				else
+				{
+					<h3>Отличия от текущей версии</h3>
+				}
+				
 			}
 			if (Model.CourseDiff.SlideDiffs.Count > 0)
 			{
@@ -136,14 +151,17 @@
 					<div>«@slide.Title»</div>
 				}
 			}
-
-			<p>
-				@using (Html.BeginForm("PublishVersion", "Admin", new { Model.CourseId, Model.VersionId }, FormMethod.Post))
-				{
-					@Html.AntiForgeryToken()
-					<button class="btn btn-success">Опубликовать →</button>
-				}
-			</p>
+			if (!Model.IsTempCourse)
+			{
+				<p>
+					@using (Html.BeginForm("PublishVersion", "Admin", new { Model.CourseId, Model.VersionId }, FormMethod.Post))
+					{
+						@Html.AntiForgeryToken()
+						<button class="btn btn-success">Опубликовать →</button>
+					}
+				</p>
+				
+			}
 		}
 	}
 </div>

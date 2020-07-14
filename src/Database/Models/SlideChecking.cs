@@ -14,7 +14,7 @@ namespace Database.Models
 		public virtual int Id { get; set; }
 
 		[Required]
-		[StringLength(64)]
+		[StringLength(100)]
 		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlide", 1)]
 		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndTime", 1)]
 		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndUser", 1)]

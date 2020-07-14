@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Database;
@@ -12,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
+using NUnit.Framework;
 using Serilog;
 using Serilog.Core;
 using Serilog.Extensions.Logging;
@@ -23,6 +25,7 @@ using Z.EntityFramework.Plus;
 
 namespace Web.Api.Tests.Controllers
 {
+	[TestFixture]
 	public class BaseControllerTests
 	{
 		private WebApplication application;
@@ -90,7 +93,7 @@ namespace Web.Api.Tests.Controllers
 		{
 			var optionsBuilder = new DbContextOptionsBuilder<UlearnDb>();
 			optionsBuilder.UseLazyLoadingProxies();
-			optionsBuilder.UseInMemoryDatabase("ulearn_test_database");
+			optionsBuilder.UseInMemoryDatabase("ulearn_test_database" + Guid.NewGuid());
 			if (loggerFactory != null)
 				optionsBuilder.UseLoggerFactory(loggerFactory);
 
@@ -117,10 +120,15 @@ namespace Web.Api.Tests.Controllers
 			var result = await userManager.CreateAsync(TestUsers.Admin, TestUsers.AdminPassword).ConfigureAwait(false);
 			if (!result.Succeeded)
 				throw new InvalidOperationException($"Can't create admin user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-
 			TestUsers.Admin = await userManager.FindByNameAsync(TestUsers.Admin.UserName).ConfigureAwait(false);
 			logger.Information($"Created user {TestUsers.Admin.UserName} with password {TestUsers.AdminPassword}, id = {TestUsers.Admin.Id}");
 			await userManager.AddToRoleAsync(TestUsers.Admin, LmsRoleType.SysAdmin.ToString()).ConfigureAwait(false);
+			
+			result = await userManager.CreateAsync(TestUsers.User, TestUsers.AdminPassword).ConfigureAwait(false);
+			if (!result.Succeeded)
+				throw new InvalidOperationException($"Can't create admin user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+			TestUsers.User = await userManager.FindByNameAsync(TestUsers.User.UserName).ConfigureAwait(false);
+			logger.Information($"Created user {TestUsers.User.UserName} with password {TestUsers.AdminPassword}, id = {TestUsers.Admin.Id}");
 		}
 
 		private Task CreateTestUsersAsync()
@@ -161,6 +169,16 @@ namespace Web.Api.Tests.Controllers
 			LastName = "Administrator",
 			Email = "admin@ulearn.me",
 			Gender = Gender.Male,
+			Registered = DateTime.Now,
+		};
+
+		public static ApplicationUser User = new ApplicationUser
+		{
+			UserName = "user",
+			FirstName = "Simple",
+			LastName = "User",
+			Email = "user@ulearn.me",
+			Gender = Gender.Female,
 			Registered = DateTime.Now,
 		};
 

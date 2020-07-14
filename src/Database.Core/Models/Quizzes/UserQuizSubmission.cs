@@ -18,7 +18,7 @@ namespace Database.Models.Quizzes
 		public virtual ApplicationUser User { get; set; }
 
 		[Required]
-		[StringLength(40)]
+		[StringLength(100)]
 		public string CourseId { get; set; }
 
 		[Required]

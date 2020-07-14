@@ -13,5 +13,8 @@ namespace Ulearn.Web.Api.Models.Common
 
 		[DataMember]
 		public string ApiUrl { get; set; }
+		
+		[DataMember]
+		public bool IsTempCourse { get; set; }
 	}
 }

@@ -6,6 +6,7 @@ import {
 	COURSES__FLASHCARDS_RATE,
 	COURSES__SLIDE_READY,
 	START, SUCCESS, FAIL,
+	COURSES__COURSE_LOAD_ERRORS,
 } from '../consts/actions';
 import { rateTypes } from "../consts/rateTypes";
 import { flashcards as flashcardsSlideType } from "../consts/routes";
@@ -14,6 +15,7 @@ const initialCoursesState = {
 	courseById: {},
 	currentCourseId: undefined,
 	fullCoursesInfo: {},
+	fullCoursesErrors: {},
 	courseLoading: false,
 	courseLoadingErrorStatus: null,
 
@@ -48,6 +50,14 @@ export default function courses(state = initialCoursesState, action) {
 				courseLoading: false,
 				fullCoursesInfo: {
 					...state.fullCoursesInfo,
+					[action.courseId]: action.result,
+				}
+			};
+			case COURSES__COURSE_LOAD_ERRORS:
+			return {
+				...state,
+				fullCoursesErrors: {
+					...state.fullCoursesErrors,
 					[action.courseId]: action.result,
 				}
 			};

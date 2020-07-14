@@ -173,7 +173,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		{
 			log.Info($"Собираю zip-архив для проверки: курс {CourseId}, слайд «{Slide?.Title}» ({Slide?.Id})");
 			var excluded = (PathsToExcludeForChecker ?? new string[0])
-				.Concat(new[] { "bin/*", "obj/*" })
+				.Concat(new[] { "bin/*", "obj/*", ".idea/*", ".vs/*" })
 				.ToList();
 
 			var toUpdate = GetAdditionalFiles(excluded).ToList();

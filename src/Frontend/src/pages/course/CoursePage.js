@@ -1,5 +1,5 @@
 import { connect } from "react-redux";
-import { loadCourse, changeCurrentCourseAction } from "src/actions/course";
+import { loadCourse, loadCourseErrors, changeCurrentCourseAction } from "src/actions/course";
 import { loadUserProgress, userProgressUpdate } from "src/actions/userProgress";
 import Course from '../../components/course/Course';
 import { withRouter } from "react-router-dom";
@@ -23,12 +23,14 @@ const mapStateToProps = (state, { match }) => {
 	}
 
 	const courseInfo = state.courses.fullCoursesInfo[courseId];
+	let courseErrors = state.courses.fullCoursesErrors[courseId];
 	const isReview = params.CheckQueueItemId !== undefined;
-	const isNavMenuVisible = !isLti && !isReview;
+	const isNavMenuVisible = !isLti && !isReview && courseErrors == null;
 	return {
 		courseId,
 		slideId,
 		courseInfo,
+		courseErrors,
 		isNavMenuVisible,
 		isSlideReady: state.courses.isSlideReady,
 		units: mapCourseInfoToUnits(courseInfo),
@@ -42,6 +44,7 @@ const mapStateToProps = (state, { match }) => {
 const mapDispatchToProps = (dispatch) => ({
 	enterToCourse: (courseId) => dispatch(changeCurrentCourseAction(courseId)),
 	loadCourse: (courseId) => dispatch(loadCourse(courseId)),
+	loadCourseErrors: (courseId) => dispatch(loadCourseErrors(courseId)),
 	loadUserProgress: (courseId, userId) => dispatch(loadUserProgress(courseId, userId)),
 	updateVisitedSlide: (courseId, slideId) => dispatch(userProgressUpdate(courseId, slideId)),
 });

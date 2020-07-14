@@ -28,6 +28,12 @@ namespace Ulearn.Web.Api.Models.Common
 
 		[DataMember]
 		public bool ContainsFlashcards { get; set; }
+		
+		[DataMember]
+		public bool IsTempCourse { get; set; }
+		
+		[DataMember]
+		public string TempCourseError { get; set; }
 	}
 
 	public class ScoringSettingsModel

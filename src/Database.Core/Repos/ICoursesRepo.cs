@@ -3,15 +3,20 @@ using System.Collections.Generic;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Database.Models;
+using JetBrains.Annotations;
 using Ulearn.Common;
 
 namespace Database.Repos
 {
 	public interface ICoursesRepo
 	{
+		[ItemCanBeNull]
 		Task<CourseVersion> GetPublishedCourseVersionAsync(string courseId);
 		Task<List<CourseVersion>> GetCourseVersionsAsync(string courseId);
-		Task<CourseVersion> AddCourseVersionAsync(string courseId, Guid versionId, string authorId);
+
+		Task<CourseVersion> AddCourseVersionAsync(string courseId, Guid versionId, string authorId,
+			string pathToCourseXml, string repoUrl, string commitHash, string description);
+
 		Task MarkCourseVersionAsPublishedAsync(Guid versionId);
 		Task DeleteCourseVersionAsync(string courseId, Guid versionId);
 		Task<List<CourseVersion>> GetPublishedCourseVersionsAsync();

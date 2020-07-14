@@ -5,10 +5,11 @@ import {
 	COURSES__FLASHCARDS_RATE,
 	COURSES__SLIDE_LOAD,
 	COURSES__SLIDE_READY,
+	COURSES__COURSE_LOAD_ERRORS,
 	START, SUCCESS, FAIL,
 } from "../consts/actions";
 
-import { getCourse, } from 'src/api/courses';
+import { getCourse, getCourseErrors } from 'src/api/courses';
 import { getSlide } from "src/api/slides";
 import {
 	getFlashcards,
@@ -26,6 +27,12 @@ const loadCourseStart = () => ({
 
 const loadCourseSuccess = (courseId, result) => ({
 	type: COURSES__COURSE_LOAD + SUCCESS,
+	courseId,
+	result,
+});
+
+const loadCourseErrorsSuccess = (courseId, result) => ({
+	type: COURSES__COURSE_LOAD_ERRORS,
 	courseId,
 	result,
 });
@@ -91,6 +98,23 @@ export const loadCourse = (courseId) => {
 			})
 			.catch(err => {
 				dispatch(loadCourseFail(err.status));
+			});
+	};
+};
+export const loadCourseErrors = (courseId) => {
+	courseId = courseId.toLowerCase();
+
+	return (dispatch) => {
+		getCourseErrors(courseId)
+			.then(result => {
+			if(result.status === 204) {
+				dispatch(loadCourseErrorsSuccess(courseId, null));
+			} else {
+				dispatch(loadCourseErrorsSuccess(courseId, result.tempCourseError));
+			}
+			})
+			.catch(err => {
+				dispatch(loadCourseFail(courseId, null));
 			});
 	};
 };

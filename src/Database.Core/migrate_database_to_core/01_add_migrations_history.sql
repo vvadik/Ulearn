@@ -69,4 +69,8 @@ VALUES
 ('20200609062559_AddClientSubmissionId', '3.1.2'),
 ('20200620120449_AddMostSimilarSubmissionsAndTaskStatisticsSourceData', '3.1.2'),
 ('20200621163805_AddManualSuspicionLevels', '3.1.2'),
-('20200623125306_AddOldSubmissionsInfluenceBorder', '3.1.2')
+('20200623125306_AddOldSubmissionsInfluenceBorder', '3.1.2'),
+('20200503095839_AddTempCourse', '3.1.2'),
+('20200520133205_addLastUpdateTime', '3.1.2'),
+('20200520141533_AddTempCourseErrors', '3.1.2'),
+('20200709131113_CourseIdLength100', '3.1.2')
