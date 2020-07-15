@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
-using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
+using System.Text.Unicode;
 
 namespace CourseToolHotReloader
 {
@@ -22,7 +23,7 @@ namespace CourseToolHotReloader
 
 	internal class Config : IConfig
 	{
-		public readonly string pathToConfigFile = $"{System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\\config.json";
+		private readonly string pathToConfigFile = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "config.json");
 
 		public Config()
 		{
@@ -54,8 +55,12 @@ namespace CourseToolHotReloader
 
 			using var streamReader = File.OpenText(pathToConfigFile);
 			var json = streamReader.ReadToEnd();
-			var jsonWithCorrectFileName = Regex.Replace(json, @"[^\\|\/](\\{1}|\/)[^\\|\/]", "\\\\");
-			var fileConfigFormat = JsonSerializer.Deserialize<FileConfigFormat>(jsonWithCorrectFileName);
+			var fileConfigFormat = JsonSerializer.Deserialize<FileConfigFormat>(json);
+			fileConfigFormat.CourseIds = fileConfigFormat.CourseIds
+				.ToDictionary(kvp => kvp.Key
+						.Replace('\\', System.IO.Path.DirectorySeparatorChar)
+						.Replace('/', System.IO.Path.DirectorySeparatorChar)
+					, kvp => kvp.Value);
 			return fileConfigFormat;
 		}
 
@@ -84,12 +89,12 @@ namespace CourseToolHotReloader
 		private void SaveConfigFile(FileConfigFormat fileConfigFormat)
 		{
 			using var fileStream = File.Create(pathToConfigFile);
-			var text = JsonSerializer.Serialize(fileConfigFormat, new JsonSerializerOptions
+			var bytes = JsonSerializer.SerializeToUtf8Bytes(fileConfigFormat, new JsonSerializerOptions
 			{
+				Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
 				WriteIndented = true
 			});
-			var info = new UTF8Encoding(true).GetBytes(text);
-			fileStream.Write(info, 0, info.Length);
+			fileStream.Write(bytes, 0, bytes.Length);
 		}
 
 

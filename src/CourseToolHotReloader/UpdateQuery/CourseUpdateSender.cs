@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CourseToolHotReloader.ApiClient;
 using CourseToolHotReloader.Dtos;
 using CourseToolHotReloader.Log;
@@ -37,7 +36,7 @@ namespace CourseToolHotReloader.UpdateQuery
 			if (errors.ErrorType != ErrorType.NoErrors)
 				ConsoleWorker.WriteError(errors.Message);
 			else
-				ConsoleWorker.WriteLine($"Изменения были загруженны без ошибок {DateTime.Now: hh:mm}");
+				ConsoleWorker.WriteLine($"Изменения были загруженны без ошибок");
 
 			courseUpdateQuery.Clear();
 		}

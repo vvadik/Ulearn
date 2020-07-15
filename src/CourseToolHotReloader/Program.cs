@@ -118,7 +118,9 @@ namespace CourseToolHotReloader
 		{
 			if (!config.CourseIds.TryGetValue(config.Path, out var courseId) || string.IsNullOrEmpty(courseId))
 			{
-				ConsoleWorker.WriteError($"CourseId для \"{config.Path}\" не задан в config.json.\r\nНужно указать в формате \"сourseIds\": {{\"C:\\\\Курсы\\\\курс1\" : \"courseId1\", \"C:\\\\Курсы\\\\курс2\" : \"courseId2\"}}\r\nconfig.json находится \"{config.PathToConfigFile}\"");
+				ConsoleWorker.WriteError($"CourseId для \"{config.Path}\" не задан в config.json.\r\n"
+					+ @"Нужно указать в формате ""сourseIds"": {""C:\\Курсы\\курс1"" : ""courseId1"", ""C:\\Курсы\\курс2"" : ""courseId2""}"
+					+ $"\r\nconfig.json находится \"{config.PathToConfigFile}\"");
 				return false;
 			}
 

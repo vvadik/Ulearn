@@ -18,7 +18,7 @@ namespace CourseToolHotReloader.Log
 		{
 			var repository = LogManager.GetRepository(Assembly.GetCallingAssembly());
 
-			var path = $"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\\log4net.config";
+			var path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "log4net.config");
 
 			ChangeLogsOutputDirectory(path);
 
@@ -42,7 +42,7 @@ namespace CourseToolHotReloader.Log
 		private static string NewPath(string oldPath)
 		{
 			var fileName= Path.GetFileName(oldPath);
-			return $"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\\logs\\{fileName}";
+			return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "logs/fileName");
 		}
 	}
 }
