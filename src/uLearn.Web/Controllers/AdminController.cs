@@ -818,8 +818,9 @@ namespace uLearn.Web.Controllers
 		[ChildActionOnly]
 		public ActionResult UsersPartial(UserSearchQueryModel queryModel)
 		{
+			var userRolesByEmail = User.IsSystemAdministrator() ? usersRepo.FilterUsersByEmail(queryModel) : null;
 			var userRoles = usersRepo.FilterUsers(queryModel);
-			var model = GetUserListModel(userRoles, queryModel.CourseId);
+			var model = GetUserListModel(userRolesByEmail.EmptyIfNull().Concat(userRoles).DistinctBy(r => r.UserId).ToList(), queryModel.CourseId);
 
 			return PartialView("_UserListPartial", model);
 		}

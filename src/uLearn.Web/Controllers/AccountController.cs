@@ -11,6 +11,7 @@ using Database;
 using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
+using JetBrains.Annotations;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
@@ -77,8 +78,9 @@ namespace uLearn.Web.Controllers
 		[ChildActionOnly]
 		public async Task<ActionResult> ListPartial(UserSearchQueryModel queryModel)
 		{
+			var userRolesByEmail = User.IsSystemAdministrator() ? usersRepo.FilterUsersByEmail(queryModel) : null;
 			var userRoles = usersRepo.FilterUsers(queryModel);
-			var model = await GetUserListModel(userRoles);
+			var model = await GetUserListModel(userRolesByEmail.EmptyIfNull().Concat(userRoles).DistinctBy(r => r.UserId).ToList());
 
 			return PartialView("_UserListPartial", model);
 		}

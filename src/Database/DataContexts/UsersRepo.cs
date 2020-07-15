@@ -36,14 +36,30 @@ namespace Database.DataContexts
 		/* Pass limit=0 to disable limiting */
 		public List<UserRolesInfo> FilterUsers(UserSearchQueryModel query, int limit = 100)
 		{
+			var usersIdsByNamePrefix = string.IsNullOrEmpty(query.NamePrefix)
+				? null
+				: GetUsersByNamePrefix(query.NamePrefix).Select(u => u.Id);
+			return FilterUsers(query, usersIdsByNamePrefix, limit);
+
+		}
+
+		[ItemCanBeNull]
+		public List<UserRolesInfo> FilterUsersByEmail(UserSearchQueryModel query, int limit = 100)
+		{
+			if (string.IsNullOrEmpty(query.NamePrefix) || !query.NamePrefix.Contains('@'))
+				return null;
+			var email = query.NamePrefix;
+			var usersIdsByEmail = db.Users.Where(u => u.Email == email).Select(u => u.Id);
+			return FilterUsers(query, usersIdsByEmail, limit);
+		}
+		
+		private List<UserRolesInfo> FilterUsers(UserSearchQueryModel query, [CanBeNull]IQueryable<string> userIds, int limit)
+		{
 			var roles = db.Roles.ToList();
 			var role = string.IsNullOrEmpty(query.Role) ? null : roles.FirstOrDefault(r => r.Name == query.Role);
 			var users = db.Users.Include(u => u.Roles).Where(u => !u.IsDeleted);
-			if (!string.IsNullOrEmpty(query.NamePrefix))
-			{
-				var usersIds = GetUsersByNamePrefix(query.NamePrefix).Select(u => u.Id);
-				users = users.Where(u => usersIds.Contains(u.Id));
-			}
+			if (userIds != null)
+				users = users.Where(u => userIds.Contains(u.Id));
 
 			return users
 				.FilterByRole(role)
