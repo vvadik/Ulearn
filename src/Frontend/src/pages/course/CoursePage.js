@@ -23,14 +23,12 @@ const mapStateToProps = (state, { match }) => {
 	}
 
 	const courseInfo = state.courses.fullCoursesInfo[courseId];
-	let courseErrors = state.courses.fullCoursesErrors[courseId];
 	const isReview = params.CheckQueueItemId !== undefined;
-	const isNavMenuVisible = !isLti && !isReview && courseErrors == null;
+	const isNavMenuVisible = !isLti && !isReview && (courseInfo == null || courseInfo.tempCourseError == null);
 	return {
 		courseId,
 		slideId,
 		courseInfo,
-		courseErrors,
 		isNavMenuVisible,
 		isSlideReady: state.courses.isSlideReady,
 		units: mapCourseInfoToUnits(courseInfo),

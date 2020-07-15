@@ -52,15 +52,16 @@ class Course extends Component {
 	}
 
 	componentDidMount() {
-		const { loadCourse, loadCourseErrors, loadUserProgress, courseId, courseInfo, progress, user, } = this.props;
+		const { loadCourse, loadUserProgress, loadCourseErrors, courseId, courseInfo, progress, user, } = this.props;
 		const { title } = this.state;
 		const { isAuthenticated } = user;
 
 		if(!courseInfo) {
 			loadCourse(courseId);
-			loadCourseErrors(courseId);
 		} else {
 			this.updateWindowMeta(title, courseInfo.title);
+			if(courseInfo.isTempCourse)
+				loadCourseErrors(courseId);
 		}
 
 		if(isAuthenticated && !progress) {
@@ -79,7 +80,6 @@ class Course extends Component {
 
 		if(isAuthenticated !== prevProps.user.isAuthenticated) {
 			loadCourse(courseId);
-			loadCourseErrors(courseId);
 			loadUserProgress(courseId, user.id);
 			window.reloadUserProgress = () => loadUserProgress(courseId, user.id); //adding hack to let legacy page scripts to reload progress,TODO(rozentor) remove it after implementing react task slides
 		}
@@ -171,7 +171,7 @@ class Course extends Component {
 	}
 
 	render() {
-		const { courseInfo, courseErrors, courseLoadingErrorStatus, isNavMenuVisible, } = this.props;
+		const { courseInfo, courseLoadingErrorStatus, isNavMenuVisible, } = this.props;
 		const { navigationOpened, meta, } = this.state;
 
 		if(courseLoadingErrorStatus) {
@@ -187,7 +187,7 @@ class Course extends Component {
 				className={ classnames(styles.root, { 'open': navigationOpened }, { [styles.withoutMinHeight]: !isNavMenuVisible }) }>
 				{ this.renderMeta(meta) }
 				{ isNavMenuVisible && this.renderNavigation() }
-				{ courseErrors ? <div className={ classnames(styles.errors) } >{courseErrors}</div> : this.renderSlide() }
+				{ courseInfo.tempCourseError ? <div className={ classnames(styles.errors) } >{courseInfo.tempCourseError}</div> : this.renderSlide() }
 			</div>
 		);
 	}
@@ -530,7 +530,6 @@ Course
 	courseId: PropTypes.string,
 	slideId: PropTypes.string,
 	courseInfo: PropTypes.object, // TODO: описать
-	courseErrors: PropTypes.string, // TODO: описать
 	progress: PropTypes.object, // TODO: описать
 	units: PropTypes.object,
 	enterToCourse: PropTypes.func,

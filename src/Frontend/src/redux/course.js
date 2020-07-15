@@ -15,7 +15,6 @@ const initialCoursesState = {
 	courseById: {},
 	currentCourseId: undefined,
 	fullCoursesInfo: {},
-	fullCoursesErrors: {},
 	courseLoading: false,
 	courseLoadingErrorStatus: null,
 
@@ -53,12 +52,15 @@ export default function courses(state = initialCoursesState, action) {
 					[action.courseId]: action.result,
 				}
 			};
-			case COURSES__COURSE_LOAD_ERRORS:
+		case COURSES__COURSE_LOAD_ERRORS:
 			return {
 				...state,
-				fullCoursesErrors: {
-					...state.fullCoursesErrors,
-					[action.courseId]: action.result,
+				fullCoursesInfo: {
+					...state.fullCoursesInfo,
+					[action.courseId]: {
+						...state.fullCoursesInfo[action.courseId],
+						tempCourseError: action.result
+					},
 				}
 			};
 		case COURSES__COURSE_LOAD + FAIL:
