@@ -114,7 +114,7 @@ export const loadCourseErrors = (courseId) => {
 			}
 			})
 			.catch(err => {
-				dispatch(loadCourseFail(courseId, null));
+				dispatch(loadCourseErrorsSuccess(courseId, null));
 			});
 	};
 };
