@@ -38,7 +38,7 @@ namespace CourseToolHotReloader
 						ConsoleWorker.WriteError("Указанный в config.json baseUrl недоступен");
 						break;
 					case IOException _:
-						ConsoleWorker.WriteError("Вероятно был добавлен файл слишком большого размера");
+						ConsoleWorker.WriteError("Ошибка ввода-вывода. Подробнее в логах. " + e.Message);
 						break;
 					case UnauthorizedException _:
 					case ForbiddenException _:
@@ -47,14 +47,14 @@ namespace CourseToolHotReloader
 						ConsoleWorker.WriteError(e.Message);
 						break;
 					default:
-						ConsoleWorker.WriteError("Неизвестная ошибка. Подробнее в логах");
+						ConsoleWorker.WriteError("Ошибка. Подробнее в логах. " + e.Message);
 						break;
 				}
 			}
 			catch (Exception e)
 			{
 				Logger.Log.Error(e);
-				ConsoleWorker.WriteError("Неизвестная ошибка. Подробнее в логах");
+				ConsoleWorker.WriteError("Ошибка. Подробнее в логах. " + e.Message);
 			}
 		}
 
