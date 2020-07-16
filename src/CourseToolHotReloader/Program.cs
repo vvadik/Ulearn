@@ -38,7 +38,7 @@ namespace CourseToolHotReloader
 						ConsoleWorker.WriteError("Указанный в config.json baseUrl недоступен");
 						break;
 					case IOException _:
-						ConsoleWorker.WriteError("Ошибка ввода-вывода. Подробнее в логах. " + e.Message);
+						ConsoleWorker.WriteError("Ошибка ввода-вывода. Подробнее в логах");
 						break;
 					case UnauthorizedException _:
 					case ForbiddenException _:
@@ -47,14 +47,14 @@ namespace CourseToolHotReloader
 						ConsoleWorker.WriteError(e.Message);
 						break;
 					default:
-						ConsoleWorker.WriteError("Ошибка. Подробнее в логах. " + e.Message);
+						ConsoleWorker.WriteError("Ошибка. Подробнее в логах");
 						break;
 				}
 			}
 			catch (Exception e)
 			{
 				Logger.Log.Error(e);
-				ConsoleWorker.WriteError("Ошибка. Подробнее в логах. " + e.Message);
+				ConsoleWorker.WriteError("Ошибка. Подробнее в логах");
 			}
 		}
 

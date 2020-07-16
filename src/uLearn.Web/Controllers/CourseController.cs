@@ -12,7 +12,6 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using Elmah;
-using GitCourseUpdater;
 using log4net;
 using LtiLibrary.Owin.Security.Lti;
 using uLearn.Web.Extensions;
@@ -47,7 +46,6 @@ namespace uLearn.Web.Controllers
 		private readonly GroupsRepo groupsRepo;
 		private readonly UserQuizzesRepo userQuizzesRepo;
 		private readonly CoursesRepo coursesRepo;
-		private readonly TempCoursesRepo tempCoursesRepo;
 
 		public CourseController()
 		{
@@ -60,13 +58,11 @@ namespace uLearn.Web.Controllers
 			groupsRepo = new GroupsRepo(db, courseManager);
 			userQuizzesRepo = new UserQuizzesRepo(db);
 			coursesRepo = new CoursesRepo(db);
-			tempCoursesRepo = new TempCoursesRepo(db);
 		}
 
 		[AllowAnonymous]
 		public async Task<ActionResult> SlideById(string courseId, string slideId = "", int? checkQueueItemId = null, int? version = null, int autoplay = 0)
 		{
-			await CheckTempCourseAndReloadIfNecessary(courseId).ConfigureAwait(false);
 			if (slideId.Contains("_"))
 				slideId = slideId.Substring(slideId.LastIndexOf('_') + 1);
 
@@ -149,7 +145,6 @@ namespace uLearn.Web.Controllers
 		[AllowAnonymous]
 		public async Task<ActionResult> Slide(string courseId, int slideIndex = -1)
 		{
-			await CheckTempCourseAndReloadIfNecessary(courseId).ConfigureAwait(false);
 			var course = courseManager.FindCourse(courseId);
 			if (course == null)
 				return HttpNotFound();
@@ -160,36 +155,6 @@ namespace uLearn.Web.Controllers
 			if (slide == null)
 				return HttpNotFound();
 			return RedirectToRoute("Course.SlideById", new { courseId, slideId = slide.Url });
-		}
-
-		private bool IsTempCourse(string courseId)
-		{
-			var tempCourse = tempCoursesRepo.Find(courseId);
-			return !(tempCourse is null);
-		}
-
-		private async Task CheckTempCourseAndReloadIfNecessary(string courseId)
-		{
-			var tempCourse = tempCoursesRepo.Find(courseId);
-			if (tempCourse is null)
-				return;
-
-			if (!courseManager.HasCourse(tempCourse.CourseId))
-			{
-				courseManager.ReloadCourse(courseId);
-			}
-
-			var course = courseManager.FindCourse(tempCourse.CourseId);
-			if (course.Slides.Count == 0)
-			{
-				courseManager.ReloadCourse(courseId);
-			}
-
-			if (tempCourse.LastUpdateTime < tempCourse.LoadingTime)
-			{
-				courseManager.ReloadCourse(courseId);
-				await tempCoursesRepo.UpdateTempCourseLastUpdateTimeAsync(courseId).ConfigureAwait(false);
-			}
 		}
 
 		[AllowAnonymous]
@@ -365,12 +330,12 @@ namespace uLearn.Web.Controllers
 		// returns null if user can't edit git
 		private string GetGitEditLink(Course course, FileInfo pageFile)
 		{
-			if (IsTempCourse(course.Id))
-				return null;
 			var courseRole = User.GetCourseRole(course.Id);
 			var canEditGit = courseRole != null && courseRole <= CourseRole.CourseAdmin;
+			if (!canEditGit)
+				return null;
 			var publishedCourseVersion = coursesRepo.GetPublishedCourseVersion(course.Id);
-			if (!canEditGit || publishedCourseVersion.RepoUrl == null)
+			if (publishedCourseVersion?.RepoUrl == null)
 				return null;
 			var pathRelative2CourseXml = pageFile.FullName.Substring(course.CourseXmlDirectory.FullName.Length + 1);
 			if (publishedCourseVersion.PathToCourseXml == null)

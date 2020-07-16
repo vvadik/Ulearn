@@ -10,9 +10,9 @@ namespace Database.Models
 		public string CourseId { get; set; }
 
 		[Required]
-		public DateTime LoadingTime { get; set; }
+		public DateTime LoadingTime { get; set; } // Время загрузки новой версии
 		
-		public DateTime LastUpdateTime { get; set; }
+		public DateTime LastUpdateTime { get; set; } // Время загрузки курса с диска в web
 
 		[Required]
 		[StringLength(64)]

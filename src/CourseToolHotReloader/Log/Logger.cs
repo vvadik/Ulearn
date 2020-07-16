@@ -42,7 +42,7 @@ namespace CourseToolHotReloader.Log
 		private static string NewPath(string oldPath)
 		{
 			var fileName= Path.GetFileName(oldPath);
-			return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "logs/fileName");
+			return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), $"logs/{fileName}");
 		}
 	}
 }

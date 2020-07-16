@@ -184,7 +184,7 @@ namespace Ulearn.Core
 
 		private static readonly object reloadLock = new object();
 
-		private void LoadCoursesIfNotYet()
+		public void LoadCoursesIfNotYet()
 		{
 			Exception firstException = null;
 			lock (reloadLock)
