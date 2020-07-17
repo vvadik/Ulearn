@@ -25,7 +25,7 @@ namespace CourseToolHotReloader.DirectoryWorkers
 		public void Renamed(object sender, RenamedEventArgs e)
 		{
 			var relativePath = e.OldFullPath.Replace(config.Path, "");
-			var deletedCourseUpdate = new CourseUpdate(e.OldName, e.OldFullPath, relativePath);
+			var deletedCourseUpdate = new CourseUpdate(e.OldName, relativePath, e.OldFullPath);
 			courseUpdateQuery.RegisterDelete(deletedCourseUpdate);
 
 			var courseUpdate = BuildCourseUpdateByFileSystemEvent(e);
