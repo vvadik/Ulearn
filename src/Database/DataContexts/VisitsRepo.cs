@@ -216,7 +216,6 @@ namespace Database.DataContexts
 
 		public IQueryable<Visit> GetVisitsInPeriod(VisitsFilterOptions options)
 		{
-			
 			var filteredVisits = db.Visits.Where(v => v.CourseId == options.CourseId);
 			if (options.PeriodStart != DateTime.MinValue || options.PeriodFinish < DateTime.Now.AddSeconds(-10))
 				filteredVisits = filteredVisits.Where(v => options.PeriodStart <= v.Timestamp && v.Timestamp <= options.PeriodFinish);
@@ -280,11 +279,11 @@ namespace Database.DataContexts
 
 		public List<RatingEntry> GetCourseRating(string courseId, int minScore, List<Guid> requiredSlides)
 		{
-			var grouppedVisits = db.Visits.Where(v => v.CourseId == courseId)
+			var groupedVisits = db.Visits.Where(v => v.CourseId == courseId)
 				.GroupBy(v => v.UserId)
 				.Where(g => g.Sum(v => v.Score) >= minScore)
 				.ToList();
-			var userIds = grouppedVisits.Select(g => g.Key).ToList();
+			var userIds = groupedVisits.Select(g => g.Key).ToList();
 
 			List<string> usersWithAllRequiredSlides;
 			if (requiredSlides.Count > 0)
@@ -302,7 +301,7 @@ namespace Database.DataContexts
 				usersWithAllRequiredSlides = userIds;
 			}
 
-			return grouppedVisits
+			return groupedVisits
 				.Where(g => usersWithAllRequiredSlides.Contains(g.Key))
 				.Select(g => new RatingEntry(g.First().User, g.Sum(v => v.Score), g.Max(v => v.Timestamp)))
 				.OrderByDescending(r => r.Score)
