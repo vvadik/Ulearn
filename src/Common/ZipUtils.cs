@@ -56,8 +56,7 @@ namespace Ulearn.Common
 			}
 			return false;
 		}
-
-		// Пути должны иметь разделитель /
+		
 		// Пути не имеют ведущего /
 		// Если / в конце, то папка, иначе файл
 		// Если / в начале, то ищем от корневой директории, иначе путь можнт начинаться в поддиректории
@@ -68,6 +67,7 @@ namespace Ulearn.Common
 			foreach (var excludeCriteria in excludeCriterias)
 			{
 				var criterion = excludeCriteria.Trim();
+				criterion = criterion.Replace('\\', '/');
 				if (criterion.Length == 0)
 					continue;
 				var isDirectory = false;
