@@ -179,7 +179,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			var toUpdate = GetAdditionalFiles(excluded).ToList();
 			log.Info($"Собираю zip-архив для проверки: дополнительные файлы [{string.Join(", ", toUpdate.Select(c => c.Path))}]");
 
-			var ms = ZipUtils.CreateZipFromDirectory(new List<string> { ExerciseFolder.FullName }, excluded, toUpdate, null);
+			var ms = ZipUtils.CreateZipFromDirectory(new List<string> { ExerciseFolder.FullName }, excluded, toUpdate, Encoding.UTF8);
 			log.Info($"Собираю zip-архив для проверки: zip-архив собран, {ms.Length} байтов");
 			return ms;
 		}

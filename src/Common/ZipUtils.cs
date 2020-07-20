@@ -16,7 +16,7 @@ namespace Ulearn.Common
 			if (excludeCriterias == null)
 				excludeCriterias = excludeCriterias.EmptyIfNull().ToList();
 			var excludeRegexps = GetExcludeRegexps(excludeCriterias).ToList();
-			using (var zip = new ZipFile(encoding))
+			using (var zip = encoding != null ? new ZipFile(encoding) : new ZipFile())
 			{
 				foreach (var pathToDirectory in directoriesToInclude)
 				{
