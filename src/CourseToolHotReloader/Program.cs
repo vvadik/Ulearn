@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Autofac;
 using CourseToolHotReloader.ApiClient;
@@ -9,6 +10,7 @@ using CourseToolHotReloader.DirectoryWorkers;
 using CourseToolHotReloader.Exceptions;
 using CourseToolHotReloader.Log;
 using CourseToolHotReloader.LoginAgent;
+using JetBrains.Annotations;
 using ErrorType = CourseToolHotReloader.Dtos.ErrorType;
 
 namespace CourseToolHotReloader
@@ -76,9 +78,17 @@ namespace CourseToolHotReloader
 			if (!CourseIdCorrect())
 				return;
 
+			config.ExcludeCriterias = ReadCourseConfig()?.CourseToolHotReloader?.ExcludeCriterias;
+
 			if (!await TempCourseExist(userId))
 				if (!await CreateCourse())
 					return;
+
+			if (File.Exists(Path.Combine(config.Path, "deleted.txt")))
+			{
+				ConsoleWorker.WriteError("В корне курса находится файл deleted.txt Программа не будет корректно работать, переименуйте его");
+				return;
+			}
 
 			await SendFullCourse();
 
@@ -105,7 +115,7 @@ namespace CourseToolHotReloader
 
 		private static async Task SendFullCourse()
 		{
-			var tempCourseUpdateResponse = await ulearnApiClient.SendFullCourse(config.Path, config.CourseId);
+			var tempCourseUpdateResponse = await ulearnApiClient.SendFullCourse(config.Path, config.CourseId, config.ExcludeCriterias);
 			if (tempCourseUpdateResponse.ErrorType == ErrorType.NoErrors)
 				ConsoleWorker.WriteLine("Первоначальная полная загрузка курса прошла успешно");
 			else
@@ -152,6 +162,16 @@ namespace CourseToolHotReloader
 				ConsoleWorker.WriteLine(createResponse.Message);
 
 			return createResponse.ErrorType == ErrorType.NoErrors;
+		}
+
+		[CanBeNull]
+		private static CourseConfig ReadCourseConfig()
+		{
+			var name = "CourseConfig.json";
+			if (!File.Exists(name))
+				return null;
+			var json = File.ReadAllText("CourseConfig.json");
+			return JsonSerializer.Deserialize<CourseConfig>(json);
 		}
 
 		public class CourseLoadingException : Exception

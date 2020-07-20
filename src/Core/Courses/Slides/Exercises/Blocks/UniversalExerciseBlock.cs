@@ -212,13 +212,16 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			var excluded = (PathsToExcludeForChecker ?? new string[0])
 				.Concat(initialPatterns)
 				.Concat(wrongAnswerPatterns)
-				.Concat(new[] { "bin/*", "obj/*", ".idea/*", ".vs/*" })
+				.Concat(new[] { "/bin/", "/obj/", ".idea/", ".vs/" })
 				.ToList();
 
 			var toUpdateDirectories = PathsToIncludeForChecker
-				?.Select(pathToInclude => new DirectoryInfo(Path.Combine(UnitDirectory.FullName, pathToInclude)));
+				.EmptyIfNull()
+				.Select(pathToInclude => new DirectoryInfo(Path.Combine(UnitDirectory.FullName, pathToInclude)))
+				.Select(d => d.FullName);
+			var directoriesToInclude = toUpdateDirectories.Append(ExerciseDirectory.FullName).ToList();
 
-			var ms = ToZip(ExerciseDirectory, excluded, null, toUpdateDirectories);
+			var ms = ZipUtils.CreateZipFromDirectory(directoriesToInclude, excluded, null, null);
 			log.Info($"Собираю zip-архив для проверки: zip-архив собран, {ms.Length} байтов");
 			return ms;
 		}
@@ -237,12 +240,12 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			var excluded = (PathsToExcludeForStudent ?? new string[0])
 				.Concat(initialPatterns)
 				.Concat(wrongAnswerPatterns)
-				.Concat(new[] { "checking/*", "bin/*", "obj/*", ".idea/*", ".vs/*" })
+				.Concat(new[] { "/checking/", "/bin/", "/obj/", ".idea/", ".vs/" })
 				.ToList();
 
 			var toUpdate = ReplaceWithInitialFiles().ToList();
 
-			var zipBytes = ToZip(ExerciseDirectory, excluded, toUpdate).ToArray();
+			var zipBytes = ZipUtils.CreateZipFromDirectory(new List<string> { ExerciseDirectory.FullName }, excluded, toUpdate, null).ToArray();
 
 			log.Info($"Собираю zip-архив для студента: zip-архив собран, {zipBytes.Length} байтов");
 			return zipBytes;

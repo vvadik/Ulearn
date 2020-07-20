@@ -28,8 +28,8 @@ namespace CourseToolHotReloader.UpdateQuery
 		{
 			var cs = ConsoleSpinner.CreateAndRunWithText("Загружаем изменения на ulearn");
 
-			var errors = await ulearnApiClient.SendCourseUpdates(courseUpdateQuery.GetAllCourseUpdate(),
-				courseUpdateQuery.GetAllDeletedFiles(), config.CourseId);
+			var errors = await ulearnApiClient.SendCourseUpdates(config.Path, courseUpdateQuery.GetAllCourseUpdate(),
+				courseUpdateQuery.GetAllDeletedFiles(), config.CourseId, config.ExcludeCriterias);
 
 			cs.Stop();
 
@@ -45,7 +45,7 @@ namespace CourseToolHotReloader.UpdateQuery
 		{
 			var cs = ConsoleSpinner.CreateAndRunWithText("Загружаем курс на ulearn");
 
-			var errors = await ulearnApiClient.SendFullCourse(config.Path, config.CourseId);
+			var errors = await ulearnApiClient.SendFullCourse(config.Path, config.CourseId, config.ExcludeCriterias);
 
 			cs.Stop();
 

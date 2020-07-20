@@ -210,6 +210,8 @@ namespace Ulearn.Web.Api.Controllers
 		{
 			var revertStructure = GetRevertStructure(courseId, filesToDelete, isFull);
 			DeleteFiles(revertStructure.DeletedFiles, revertStructure.DeletedDirectories);
+			var courseDirectory = courseManager.GetExtractedCourseDirectory(courseId);
+			DeleteEmptySubdirectories(courseDirectory.FullName);
 			courseManager.ExtractTempCourseChanges(courseId);
 
 			var extractedCourseDirectory = courseManager.GetExtractedCourseDirectory(courseId);
@@ -259,6 +261,19 @@ namespace Ulearn.Web.Api.Controllers
 			Directory.Delete(dirPath, false);
 		}
 
+		private void DeleteEmptySubdirectories(string startLocation)
+		{
+			foreach (var directory in Directory.GetDirectories(startLocation))
+			{
+				DeleteEmptySubdirectories(directory);
+				if (Directory.GetFiles(directory).Length == 0 && 
+					Directory.GetDirectories(directory).Length == 0)
+				{
+					Directory.Delete(directory, false);
+				}
+			}
+		}
+
 		private RevertStructure GetRevertStructure(string courseId, List<string> filesToDeleteRelativePaths, bool isFull)
 		{
 			var staging = courseManager.GetStagingTempCourseFile(courseId);
@@ -283,7 +298,7 @@ namespace Ulearn.Web.Api.Controllers
 		private static List<string> GetFilesInDirectoriesToDelete(List<string> filesToDeleteRelativePaths, string pathPrefix)
 		{
 			return filesToDeleteRelativePaths
-				.Select(path => pathPrefix + "\\" + path)
+				.Select(path => Path.Combine(pathPrefix, path))
 				.Where(Directory.Exists)
 				.SelectMany(dir => Directory
 					.EnumerateFiles(dir, "*.*", SearchOption.AllDirectories))

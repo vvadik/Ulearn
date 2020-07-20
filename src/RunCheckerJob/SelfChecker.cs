@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using log4net;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
@@ -27,7 +29,7 @@ namespace RunCheckerJob
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 			var imageName = sandboxDir.Name;
 			var srcDirectory = new DirectoryInfo(Path.GetFullPath(Path.Combine(sandboxDir.FullName, "sample/src/")));
-			var zipBytes = AbstractExerciseBlock.ToZip(srcDirectory, new[] { "node_modules", ".idea" }).ToArray();
+			var zipBytes = ZipUtils.CreateZipFromDirectory(new List<string> {srcDirectory.FullName}, new List<string> { "node_modules", ".idea" }, null, null).ToArray();
 			var submissionFile = new FileInfo(Path.GetFullPath(Path.Combine(sandboxDir.FullName, "sample/submission.json")));
 			var submission = JsonConvert.DeserializeObject<CommandRunnerSubmission>(File.ReadAllText(submissionFile.FullName));
 			submission.Id = Utils.NewNormalizedGuid();

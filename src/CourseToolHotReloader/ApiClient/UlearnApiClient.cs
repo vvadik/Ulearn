@@ -10,8 +10,8 @@ namespace CourseToolHotReloader.ApiClient
 {
 	public interface IUlearnApiClient
 	{
-		Task<TempCourseUpdateResponse> SendCourseUpdates(IList<ICourseUpdate> update, IList<ICourseUpdate> deletedFiles, string courseId);
-		Task<TempCourseUpdateResponse> SendFullCourse(string path, string courseId);
+		Task<TempCourseUpdateResponse> SendCourseUpdates(string path, IList<ICourseUpdate> update, IList<ICourseUpdate> deletedFiles, string courseId, List<string> excludeCriterias);
+		Task<TempCourseUpdateResponse> SendFullCourse(string path, string courseId, List<string> excludeCriterias);
 		Task<TempCourseUpdateResponse> CreateCourse(string courseId);
 		Task<string> Login(string login, string password);
 		Task<bool> HasCourse(string courseId);
@@ -28,17 +28,17 @@ namespace CourseToolHotReloader.ApiClient
 			this.httpMethods = httpMethods;
 		}
 
-		public async Task<TempCourseUpdateResponse> SendCourseUpdates(IList<ICourseUpdate> updates, IList<ICourseUpdate> deletedFiles, string courseId)
+		public async Task<TempCourseUpdateResponse> SendCourseUpdates(string path, IList<ICourseUpdate> updates, IList<ICourseUpdate> deletedFiles, string courseId, List<string> excludeCriterias)
 		{
-			var ms = ZipUpdater.CreateZipByUpdates(updates, deletedFiles);
-
+			var ms = ZipUpdater.CreateZipByUpdates(path, updates, deletedFiles, excludeCriterias);
+			
 			return await httpMethods.UploadCourse(ms, courseId);
 		}
 
 		[ItemCanBeNull]
-		public async Task<TempCourseUpdateResponse> SendFullCourse(string path, string courseId)
+		public async Task<TempCourseUpdateResponse> SendFullCourse(string path, string courseId, List<string> excludeCriterias)
 		{
-			var ms = ZipUpdater.CreateZipByFolder(path);
+			var ms = ZipUpdater.CreateZipByFolder(path, excludeCriterias);
 
 			return await httpMethods.UploadFullCourse(ms, courseId);
 		}

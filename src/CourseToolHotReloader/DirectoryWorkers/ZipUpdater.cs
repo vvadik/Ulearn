@@ -3,44 +3,39 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using CourseToolHotReloader.Dtos;
-using Ionic.Zip;
+using Ulearn.Common;
 
 namespace CourseToolHotReloader.DirectoryWorkers
 {
-	public class ZipUpdater
+	public static class ZipUpdater
 	{
-		public static MemoryStream CreateZipByUpdates(IList<ICourseUpdate> courseUpdates, IList<ICourseUpdate> deletedFiles)
+		// Могут посылаться лишние пути на удаление, пдходящие под excludeCriterias. Сервер их проигнорирует, т.к. таких файлов нет на сервере.
+		public static MemoryStream CreateZipByUpdates(string pathToFolder, IList<ICourseUpdate> courseUpdates, IList<ICourseUpdate> deletedFiles, List<string> excludeCriterias)
 		{
-			var deletedFileContent = string.Join("\r\n", deletedFiles.Select(u => u.RelativePath));
-			var ms = new MemoryStream();
-
-			using (var zip = new ZipFile(Encoding.UTF8))
+			var deletedFileContentStr = string.Join("\r\n", deletedFiles.Select(u => Path.GetRelativePath(pathToFolder, u.FullPath)));
+			var deletedFileContent = new FileContent
 			{
-				foreach (var update in courseUpdates)
+				Path = "deleted.txt",
+				Data = Encoding.UTF8.GetBytes(deletedFileContentStr)
+			};
+			var filesToUpdateOrCreate = courseUpdates
+				.Where(update => Directory.Exists(update.FullPath))
+				.SelectMany(update => Directory.GetFiles(update.FullPath, "*.*", SearchOption.AllDirectories))
+				.Concat(courseUpdates.Where(update => File.Exists(update.FullPath)).Select(u => u.FullPath))
+				.Distinct()
+				.Select(fullPath => new FileContent
 				{
-					if (Directory.Exists(update.FullPath))
-						zip.AddDirectory(update.FullPath, update.RelativePath);
-
-					if (File.Exists(update.FullPath))
-						zip.AddFile(update.FullPath, Path.GetDirectoryName(update.RelativePath));
-				}
-
-				zip.AddEntry("deleted.txt", deletedFileContent);
-
-				zip.Save(ms);
-			}
-
-			return ms;
+					Path = Path.GetRelativePath(pathToFolder, fullPath),
+					Data = File.ReadAllBytes(fullPath)
+				})
+				.Append(deletedFileContent)
+				.ToList();
+			return ZipUtils.CreateZipFromDirectory(new List<string>(), excludeCriterias, filesToUpdateOrCreate, Encoding.UTF8);
 		}
 
-		public static MemoryStream CreateZipByFolder(string pathToFolder)
+		public static MemoryStream CreateZipByFolder(string pathToFolder, List<string> excludeCriterias)
 		{
-			using var zip = new ZipFile(Encoding.UTF8);
-			zip.AddDirectory(pathToFolder);
-			var ms = new MemoryStream();
-			zip.Save(ms);
-
-			return ms;
+			return ZipUtils.CreateZipFromDirectory(new List<string> {pathToFolder}, excludeCriterias, null, Encoding.UTF8);
 		}
 	}
 }

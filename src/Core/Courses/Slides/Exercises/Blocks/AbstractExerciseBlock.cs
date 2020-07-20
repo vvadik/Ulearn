@@ -171,8 +171,9 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			throw new InvalidOperationException($"Unknown exercise type for checking: {ExerciseType}");
 		}
 
+		[Obsolete("Использует неинтуитивные excludeCriterias. Используй ZipUtils.CreateZipFromDirectory")]
 		/// <param name="excludeCriterias"><see cref="M:Ionic.Zip.ZipFile.AddSelectedFiles(System.String)" /></param>
-		public static MemoryStream ToZip(DirectoryInfo exerciseDirectory, IEnumerable<string> excludeCriterias, IEnumerable<FileContent> filesToUpdate = null,
+		protected static MemoryStream ToZip(DirectoryInfo exerciseDirectory, IEnumerable<string> excludeCriterias, IEnumerable<FileContent> filesToUpdate = null,
 			IEnumerable<DirectoryInfo> directoriesToInclude = null)
 		{
 			using (var zip = new ZipFile())

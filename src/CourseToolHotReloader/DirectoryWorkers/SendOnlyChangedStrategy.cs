@@ -24,8 +24,7 @@ namespace CourseToolHotReloader.DirectoryWorkers
 
 		public void Renamed(object sender, RenamedEventArgs e)
 		{
-			var relativePath = e.OldFullPath.Replace(config.Path, "");
-			var deletedCourseUpdate = new CourseUpdate(e.OldName, relativePath, e.OldFullPath);
+			var deletedCourseUpdate = new CourseUpdate(e.OldFullPath);
 			courseUpdateQuery.RegisterDelete(deletedCourseUpdate);
 
 			var courseUpdate = BuildCourseUpdateByFileSystemEvent(e);
@@ -59,9 +58,7 @@ namespace CourseToolHotReloader.DirectoryWorkers
 
 		private ICourseUpdate BuildCourseUpdateByFileSystemEvent(FileSystemEventArgs fileSystemEventArgs)
 		{
-			var relativePath = fileSystemEventArgs.FullPath.Replace(config.Path, "");
-
-			var courseUpdate = new CourseUpdate(fileSystemEventArgs.Name, relativePath, fileSystemEventArgs.FullPath);
+			var courseUpdate = new CourseUpdate(fileSystemEventArgs.FullPath);
 			return courseUpdate;
 		}
 	}

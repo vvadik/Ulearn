@@ -1,5 +1,5 @@
+using System.IO;
 using System.Linq;
-using CourseToolHotReloader.DirectoryWorkers;
 using CourseToolHotReloader.Dtos;
 using CourseToolHotReloader.UpdateQuery;
 using FluentAssertions;
@@ -7,6 +7,7 @@ using NUnit.Framework;
 
 namespace CourseToolHotReloader.Tests
 {
+	[TestFixture]
 	public class CourseUpdateQueryTest
 	{
 		private CourseUpdateQuery courseUpdateQuery;
@@ -69,13 +70,13 @@ namespace CourseToolHotReloader.Tests
 			courseUpdateQuery.RegisterUpdate(c);
 			courseUpdateQuery.RegisterDelete(c);
 
-			courseUpdateQuery.GetAllDeletedFiles().Single().Name.Should().Be("c");
+			Path.GetFileName(courseUpdateQuery.GetAllDeletedFiles().Single().FullPath).Should().Be("c");
 			courseUpdateQuery.GetAllCourseUpdate().Count.Should().Be(2);
 		}
 
 		private static ICourseUpdate CreateSimpleCourseUpdate(string name)
 		{
-			return new CourseUpdate(name, name, name);
+			return new CourseUpdate(name);
 		}
 	}
 }

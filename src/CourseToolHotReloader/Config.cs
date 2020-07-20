@@ -18,6 +18,7 @@ namespace CourseToolHotReloader
 		public string BaseUrl { get; set; }
 		public bool SendFullArchive { get; set; }
 		public string PathToConfigFile { get; }
+		public List<string> ExcludeCriterias { get; set; }
 		public void Flush();
 	}
 
@@ -38,6 +39,7 @@ namespace CourseToolHotReloader
 		public bool SendFullArchive { get; set; }
 		public string Path { get; set; }
 		public Dictionary<string, string> CourseIds { get; set; }
+		public List<string> ExcludeCriterias { get; set; }
 		public string JwtToken { get; set; }
 
 		public string CourseId

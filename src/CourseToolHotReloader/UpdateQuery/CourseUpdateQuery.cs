@@ -32,11 +32,6 @@ namespace CourseToolHotReloader.UpdateQuery
 
 		public void RegisterUpdate(ICourseUpdate update)
 		{
-			if (update.RelativePath.Equals("\\deleted.txt", StringComparison.OrdinalIgnoreCase))
-			{
-				ConsoleWorker.WriteError("В корне курса находиться файл deleted.txt программа не будет корректно работать, пожалуйста переименуйте его");
-			}
-			
 			updatesQuery.AddOrUpdate(update.FullPath, update, (_1, _2) => update);
 		}
 
