@@ -255,6 +255,16 @@ namespace Database.Repos
 			return db.SaveChangesAsync();
 		}
 
+		public async Task DisableProhibitFurtherManualCheckings(string courseId, string userId)
+		{
+			var checkingsWithProhibitFurther = await db.ManualExerciseCheckings
+				.Where(c => c.CourseId == courseId && c.UserId == userId && c.ProhibitFurtherManualCheckings)
+				.ToListAsync();
+			foreach (var checking in checkingsWithProhibitFurther)
+				checking.ProhibitFurtherManualCheckings = false;
+			await db.SaveChangesAsync();
+		}
+
 		private async Task<ExerciseCodeReview> AddExerciseCodeReview([CanBeNull] UserExerciseSubmission submission, [CanBeNull] ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime)
 		{
 			var review = db.ExerciseCodeReviews.Add(new ExerciseCodeReview

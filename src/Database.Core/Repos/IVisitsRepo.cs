@@ -23,6 +23,7 @@ namespace Database.Repos
 		int GetScore(string courseId, Guid slideId, string userId);
 		Task SkipSlide(string courseId, Guid slideId, string userId);
 		bool IsSkipped(string courseId, Guid slideId, string userId);
+		Task UnskipAllSlides(string courseId, string userId);
 		bool IsPassed(string courseId, Guid slideId, string userId);
 		bool IsSkippedOrPassed(string courseId, Guid slideId, string userId);
 		Task AddVisits(IEnumerable<Visit> visits);

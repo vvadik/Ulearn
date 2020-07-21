@@ -204,6 +204,14 @@ namespace Database.Repos
 			return db.Visits.Any(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId && v.IsSkipped);
 		}
 
+		public async Task UnskipAllSlides(string courseId, string userId)
+		{
+			var skippedVisits = await db.Visits.Where(v => v.CourseId == courseId && v.UserId == userId && v.IsSkipped).ToListAsync();
+			foreach (var v in skippedVisits)
+				v.IsSkipped = false;
+			await db.SaveChangesAsync();
+		}
+
 		public bool IsPassed(string courseId, Guid slideId, string userId)
 		{
 			return db.Visits.Any(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId && v.IsPassed);

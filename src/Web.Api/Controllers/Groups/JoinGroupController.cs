@@ -1,7 +1,9 @@
 using System;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Database;
+using Database.Repos;
 using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
@@ -21,14 +23,19 @@ namespace Ulearn.Web.Api.Controllers.Groups
 	{
 		private readonly IGroupsRepo groupsRepo;
 		private readonly IGroupMembersRepo groupMembersRepo;
+		private readonly ISlideCheckingsRepo slideCheckingsRepo;
+		private readonly IVisitsRepo visitsRepo;
 
 		public JoinGroupController(ILogger logger, IWebCourseManager courseManager, UlearnDb db,
 			IUsersRepo usersRepo,
-			IGroupsRepo groupsRepo, IGroupMembersRepo groupMembersRepo)
+			IGroupsRepo groupsRepo, IGroupMembersRepo groupMembersRepo,
+			ISlideCheckingsRepo slideCheckingsRepo, IVisitsRepo visitsRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.groupsRepo = groupsRepo;
 			this.groupMembersRepo = groupMembersRepo;
+			this.slideCheckingsRepo = slideCheckingsRepo;
+			this.visitsRepo = visitsRepo;
 		}
 
 		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -76,7 +83,21 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			if (groupMember == null)
 				return StatusCode((int)HttpStatusCode.Conflict, new ErrorResponse($"User {UserId} is already a student of group {group.Id}"));
 
+			await slideCheckingsRepo.DisableProhibitFurtherManualCheckings(group.CourseId, UserId);
+			//await NullifyQuizAttempts(group.CourseId);
+			//await UnskipSlidesWithAcceptedSolutions(group.CourseId);
+
 			return Ok(new SuccessResponseWithMessage($"Student {UserId} is added to group {group.Id}"));
+		}
+
+		public async Task NullifyQuizAttempts(string courseId)
+		{
+			// Not implemended
+		}
+
+		public async Task UnskipSlidesWithAcceptedSolutions(string courseId)
+		{
+			await visitsRepo.UnskipAllSlides(courseId, UserId);
 		}
 	}
 }
