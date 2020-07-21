@@ -116,9 +116,12 @@ namespace Database.Repos
 
 		private async Task UpdateAttempts(string courseId, Guid slideId, string userId, Action<Visit> action)
 		{
-			var visit = db.Visits.FirstOrDefault(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId);
+			var visit = FindVisit(courseId, slideId, userId);
 			if (visit == null)
-				return;
+			{
+				await AddVisit(courseId, slideId, userId, null);
+				visit = FindVisit(courseId, slideId, userId);
+			}
 			action(visit);
 			await db.SaveChangesAsync();
 		}
