@@ -170,7 +170,8 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			return ExerciseInitialCode
 				= InitialRegionContent.Value
 				?? (InitialUserCodeFile.Exists ? InitialUserCodeFile.ContentAsUtf8() : null)
-				?? ExerciseInitialCode;
+				?? ExerciseInitialCode
+				?? "";
 		}
 
 
