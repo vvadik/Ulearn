@@ -160,7 +160,7 @@ namespace uLearn.Web.Controllers
 				AnswersToQuizzes = userAnswers,
 				IsLti = isLti,
 				Checking = manualQuizCheckQueueItem,
-				ManualCheckingsLeft = manualQuizCheckQueueItem != null ? GetManualCheckingsCountInQueue(course, slide) : 0,
+				ManualCheckingsLeftInQueue = manualQuizCheckQueueItem != null ? GetManualCheckingsCountInQueue(course, slide) : 0,
 				CanUserFillQuiz = canUserFillQuiz,
 				GroupsIds = Request.GetMultipleValuesFromQueryString("group"),
 				QuestionAnswersFrequency = questionAnswersFrequency,

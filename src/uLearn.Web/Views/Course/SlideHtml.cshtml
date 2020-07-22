@@ -385,7 +385,7 @@
 					context.Course.Id,
 					(ExerciseSlide)context.Slide,
 					checking,
-					context.ManualCheckingsLeft,
+					context.ManualCheckingsLeftInQueue,
 					context.GroupsIds,
 					isCurrentSubmissionChecking: (context.VersionId == null || checking.Submission.Id == context.VersionId) && !context.IsManualCheckingReadonly,
 					defaultProhibitFurtherReview: context.DefaultProhibitFurtherReview

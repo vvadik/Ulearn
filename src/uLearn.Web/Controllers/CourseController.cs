@@ -66,6 +66,7 @@ namespace uLearn.Web.Controllers
 			if (slideId.Contains("_"))
 				slideId = slideId.Substring(slideId.LastIndexOf('_') + 1);
 
+			// По крайней мере одно из мест использования groupsIds: переход на следующее ревью после выполнения предыдущего.
 			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
 
 			if (!Guid.TryParse(slideId, out var slideGuid))
@@ -286,7 +287,7 @@ namespace uLearn.Web.Controllers
 				userId = manualChecking.UserId;
 
 			var defaultProhibitFurtherReview = groupsRepo.GetDefaultProhibitFutherReviewForUser(course.Id, userId, User);
-			var manualCheckingsLeft = manualChecking != null ? ControllerUtils.GetManualCheckingsCountInQueue(slideCheckingsRepo, groupsRepo, User, course.Id, slide, groupsIds) : 0;
+			var manualCheckingsLeftInQueue = manualChecking != null ? ControllerUtils.GetManualCheckingsCountInQueue(slideCheckingsRepo, groupsRepo, User, course.Id, slide, groupsIds) : 0;
 
 			var (notArchivedGroupNames, archivedGroupNames) = GetGroupNames(course, manualChecking);
 
@@ -300,7 +301,7 @@ namespace uLearn.Web.Controllers
 					course, slide, manualChecking, exerciseSubmissionId, groupsIds,
 					autoplay: autoplay,
 					isManualCheckingReadonly: isManualCheckingReadonly,
-					defaultProhibitFurtherReview: defaultProhibitFurtherReview, manualCheckingsLeft: manualCheckingsLeft),
+					defaultProhibitFurtherReview: defaultProhibitFurtherReview, manualCheckingsLeftInQueue: manualCheckingsLeftInQueue),
 				ManualChecking = manualChecking,
 				ContextManualCheckingUserGroups = notArchivedGroupNames,
 				ContextManualCheckingUserArchivedGroups = archivedGroupNames,
@@ -356,7 +357,7 @@ namespace uLearn.Web.Controllers
 			AbstractManualSlideChecking manualChecking = null,
 			int? exerciseSubmissionId = null, List<string> groupsIds = null, bool isLti = false,
 			bool autoplay = false, bool isManualCheckingReadonly = false, bool defaultProhibitFurtherReview = true,
-			int manualCheckingsLeft = 0)
+			int manualCheckingsLeftInQueue = 0)
 		{
 			/* ExerciseController will fill blockDatas later */
 			var blockData = slide.Blocks.Select(b => (dynamic)null).ToArray();
@@ -368,7 +369,7 @@ namespace uLearn.Web.Controllers
 				isGuest: false,
 				revealHidden: User.HasAccessFor(course.Id, CourseRole.Instructor),
 				manualChecking: manualChecking,
-				manualCheckingsLeft: manualCheckingsLeft,
+				manualCheckingsLeftInQueue: manualCheckingsLeftInQueue,
 				canUserFillQuiz: false,
 				groupsIds: groupsIds,
 				isLti: isLti,

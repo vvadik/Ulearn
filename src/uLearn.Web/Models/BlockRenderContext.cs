@@ -18,7 +18,7 @@ namespace uLearn.Web.Models
 		public bool IsGuest { get; set; }
 		public bool IsLti { get; set; }
 		public AbstractManualSlideChecking ManualChecking { get; set; }
-		public int ManualCheckingsLeft { get; set; }
+		public int ManualCheckingsLeftInQueue { get; set; }
 		public bool CanUserFillQuiz { get; set; }
 		public bool RevealHidden { get; private set; }
 		public bool Autoplay { get; private set; }
@@ -34,7 +34,7 @@ namespace uLearn.Web.Models
 
 		public BlockRenderContext(Course course, Slide slide, string baseUrl, dynamic[] blockData,
 			bool isGuest = false, bool revealHidden = false, AbstractManualSlideChecking manualChecking = null,
-			int manualCheckingsLeft = 0, bool canUserFillQuiz = false, List<string> groupsIds = null, bool isLti = false, bool autoplay = false,
+			int manualCheckingsLeftInQueue = 0, bool canUserFillQuiz = false, List<string> groupsIds = null, bool isLti = false, bool autoplay = false,
 			bool isManualCheckingReadonly = false, bool defaultProhibitFurtherReview = true, Dictionary<string, int> userScores = null)
 		{
 			if (blockData.Length != slide.Blocks.Length)
@@ -46,7 +46,7 @@ namespace uLearn.Web.Models
 			IsGuest = isGuest;
 			RevealHidden = revealHidden;
 			ManualChecking = manualChecking;
-			ManualCheckingsLeft = manualCheckingsLeft;
+			ManualCheckingsLeftInQueue = manualCheckingsLeftInQueue;
 			CanUserFillQuiz = canUserFillQuiz;
 			GroupsIds = groupsIds;
 			IsLti = isLti;

@@ -179,7 +179,8 @@ namespace uLearn.Web.Controllers
 			return slide.MaxScore;
 		}
 
-		public static int GetManualCheckingsCountInQueue(SlideCheckingsRepo slideCheckingsRepo, GroupsRepo groupsRepo, IPrincipal user, string courseId, Slide slide, List<string> groupsIds)
+		public static int GetManualCheckingsCountInQueue(SlideCheckingsRepo slideCheckingsRepo, GroupsRepo groupsRepo, IPrincipal user,
+			string courseId, Slide slide, List<string> groupsIds)
 		{
 			var filterOptions = GetFilterOptionsByGroup<ManualCheckingQueueFilterOptions>(groupsRepo, user, courseId, groupsIds);
 			if (filterOptions.UserIds == null)
