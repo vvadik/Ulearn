@@ -183,8 +183,6 @@ namespace uLearn.Web.Controllers
 			string courseId, Slide slide, List<string> groupsIds)
 		{
 			var filterOptions = GetFilterOptionsByGroup<ManualCheckingQueueFilterOptions>(groupsRepo, user, courseId, groupsIds);
-			if (filterOptions.UserIds == null)
-				groupsIds = new List<string> { "all" };
 			filterOptions.SlidesIds = new List<Guid> { slide.Id };
 
 			if (slide is ExerciseSlide)
