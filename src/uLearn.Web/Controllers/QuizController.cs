@@ -521,13 +521,14 @@ namespace uLearn.Web.Controllers
 		}
 
 		[System.Web.Mvc.HttpPost]
+		// Вызывается только для квизов без автопроверки
 		public async Task<ActionResult> RestartQuiz(string courseId, Guid slideId, bool isLti)
 		{
 			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
 			if (slide is QuizSlide)
 			{
 				var userId = User.Identity.GetUserId();
-				var usedAttemptsCount = userQuizzesRepo.GetUsedAttemptsCount(courseId, userId, slideId);
+				var usedAttemptsCount = userQuizzesRepo.GetUsedAttemptsCountForQuizWithAutomaticChecking(courseId, userId, slideId);
 				var maxTriesCount = GetMaxAttemptsCount(courseId, slide as QuizSlide);
 				var isQuizScoredMaximum = userQuizzesRepo.IsQuizScoredMaximum(courseId, slideId, userId);
 				if (usedAttemptsCount < maxTriesCount && !isQuizScoredMaximum)
@@ -582,7 +583,7 @@ namespace uLearn.Web.Controllers
 			{
 				/* For manually checked quizzes attempts are counting by manual checkings, not by user quiz submissions
 				   (because user can resend quiz before instructor checked and score it) */
-				var manualCheckingCount = GetManualCheckingCount(courseId, userId, slideId, submission);
+				var manualCheckingCount = slideCheckingsRepo.GetQuizManualCheckingCount(courseId, slideId, userId, submission?.Timestamp);
 
 				log.Info($"Статус прохождения теста {courseId}:{slideId} для пользователя {userId}: есть ручная проверка №{manualChecking.Id}, проверяется ли сейчас: {manualChecking.IsLocked}");
 				if (manualChecking.IsChecked)
@@ -590,26 +591,10 @@ namespace uLearn.Web.Controllers
 				return new QuizState(manualChecking.IsLocked ? QuizStatus.IsCheckingByInstructor : QuizStatus.WaitsForManualChecking, manualCheckingCount, userScore, maxScore);
 			}
 
-			var usedAttemptsCount = userQuizzesRepo.GetUsedAttemptsCount(courseId, userId, slideId);
+			var usedAttemptsCount = userQuizzesRepo.GetUsedAttemptsCountForQuizWithAutomaticChecking(courseId, userId, slideId);
 			return new QuizState(QuizStatus.ReadyToSend, usedAttemptsCount, userScore, maxScore);
 		}
 
-		private int GetManualCheckingCount(string courseId, string userId, Guid slideId, UserQuizSubmission beforeSubmissions = null)
-		{
-			var queue = slideCheckingsRepo.GetManualCheckingQueue<ManualQuizChecking>(new ManualCheckingQueueFilterOptions
-			{
-				CourseId = courseId,
-				SlidesIds = new[] { slideId },
-				UserIds = new List<string> { userId },
-				OnlyChecked = null, // For calculating not checked submissions as well as checked ones
-			}).ToList();
-
-			if (beforeSubmissions != null)
-				queue = queue.Where(s => s.Timestamp < beforeSubmissions.Timestamp).ToList();
-
-			return queue.Count();
-		}
-		
 		public class SubmitQuizRequest
 		{
 			public string CourseId { get; set; }

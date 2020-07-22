@@ -454,9 +454,8 @@ namespace uLearn.Web.Controllers
 			var userId = User.Identity.GetUserId();
 			var isSkippedOrPassed = visitsRepo.IsSkippedOrPassed(course.Id, slide.Id, userId);
 			/* TODO: It's not necessary to create ExerciseBlockData here */
-			var model = new ExerciseBlockData(course.Id, slide)
+			var model = new ExerciseBlockData(course.Id, slide, isSkippedOrPassed)
 			{
-				IsSkippedOrPassed = isSkippedOrPassed,
 				CourseId = course.Id,
 				IsGuest = !User.Identity.IsAuthenticated,
 				Url = Url,

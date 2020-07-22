@@ -10,7 +10,6 @@ using Database.Models;
 using JetBrains.Annotations;
 using log4net;
 using Ulearn.Common.Extensions;
-using Z.EntityFramework.Plus;
 
 namespace Database.DataContexts
 {
@@ -230,6 +229,19 @@ namespace Database.DataContexts
 			return query;
 		}
 
+		/// For calculating not checked submissions as well as checked ones
+		public int GetQuizManualCheckingCount(string courseId, Guid slideId, string userId, DateTime? beforeTimestamp)
+		{
+			var queue = db.ManualQuizCheckings.Where(c =>
+				c.CourseId == courseId
+				&& c.SlideId == slideId
+				&& c.UserId == userId
+				&& !c.IgnoreInAttemptsCount);
+			if (beforeTimestamp != null)
+				queue = queue.Where(s => s.Timestamp < beforeTimestamp);
+			return queue.Count();
+		}
+
 		public HashSet<Guid> GetManualCheckingQueueSlideIds<T>(ManualCheckingQueueFilterOptions options) where T : AbstractManualSlideChecking
 		{
 			var query = GetManualCheckingQueueFilterQuery<T>(options);
@@ -288,6 +300,52 @@ namespace Database.DataContexts
 		public async Task ProhibitFurtherExerciseManualChecking(ManualExerciseChecking checking)
 		{
 			checking.ProhibitFurtherManualCheckings = true;
+			await db.SaveChangesAsync().ConfigureAwait(false);
+		}
+
+		public async Task RemoveLimitsForUser(string courseId, string userId)
+		{
+			await DisableProhibitFurtherManualCheckings(courseId, userId).ConfigureAwait(false);
+			await NotCountOldAttemptsToQuizzesWithManualChecking(courseId, userId).ConfigureAwait(false);
+			//await NotCountOldAttemptsToQuizzesWithAutomaticChecking(courseId, userId).ConfigureAwait(false);
+			//await UnskipAllSlides(courseId, userId).ConfigureAwait(false);
+		}
+
+		public async Task UnskipAllSlides(string courseId, string userId)
+		{
+			var skippedVisits = db.Visits.Where(v => v.CourseId == courseId && v.UserId == userId && v.IsSkipped).ToList();
+			foreach (var v in skippedVisits)
+				v.IsSkipped = false;
+			await db.SaveChangesAsync().ConfigureAwait(false);
+		}
+
+		public async Task DisableProhibitFurtherManualCheckings(string courseId, string userId)
+		{
+			var checkingsWithProhibitFurther = db.ManualExerciseCheckings
+				.Where(c => c.CourseId == courseId && c.UserId == userId && c.ProhibitFurtherManualCheckings)
+				.ToList();
+			foreach (var checking in checkingsWithProhibitFurther)
+				checking.ProhibitFurtherManualCheckings = false;
+			await db.SaveChangesAsync().ConfigureAwait(false);
+		}
+
+		public async Task NotCountOldAttemptsToQuizzesWithManualChecking(string courseId, string userId)
+		{
+			var checkings = db.ManualQuizCheckings
+				.Where(c => c.CourseId == courseId && c.UserId == userId)
+				.ToList();
+			foreach (var checking in checkings)
+				checking.IgnoreInAttemptsCount = true;
+			await db.SaveChangesAsync().ConfigureAwait(false);
+		}
+
+		public async Task NotCountOldAttemptsToQuizzesWithAutomaticChecking(string courseId, string userId)
+		{
+			var checkings = db.AutomaticQuizCheckings
+				.Where(c => c.CourseId == courseId && c.UserId == userId)
+				.ToList();
+			foreach (var checking in checkings)
+				checking.IgnoreInAttemptsCount = true;
 			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
