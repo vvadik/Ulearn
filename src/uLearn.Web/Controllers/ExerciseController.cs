@@ -171,7 +171,7 @@ namespace uLearn.Web.Controllers
 
 			var topUserReviewComments = slideCheckingsRepo.GetTopUserReviewComments(courseId, slideId, userId, 20);
 			var topOtherUsersReviewComments = slideCheckingsRepo.GetTopOtherUsersReviewComments(courseId, slideId, userId, 10, topUserReviewComments);
-			return PartialView("_TopUserReviewComments", new ExerciseBlockData(courseId, slide)
+			return PartialView("_TopUserReviewComments", new ExerciseBlockData(courseId, slide, false)
 			{
 				TopUserReviewComments = topUserReviewComments,
 				TopOtherUsersReviewComments = topOtherUsersReviewComments,
@@ -408,7 +408,7 @@ namespace uLearn.Web.Controllers
 				userSolutionsRepo.GetAllAcceptedSubmissionsByUser(course.Id, slide.Id, userId) :
 				userSolutionsRepo.GetAllSubmissionsByUser(course.Id, slide.Id, userId);
 
-			return new ExerciseBlockData(course.Id, (ExerciseSlide)slide, visit?.IsSkipped ?? false, solution)
+			return new ExerciseBlockData(course.Id, (ExerciseSlide)slide, (visit?.IsSkipped ?? false) || (visit?.IsPassed ?? false), solution)
 			{
 				Url = Url,
 				Reviews = submissionReviews?.ToList() ?? new List<ExerciseCodeReview>(),

@@ -147,6 +147,8 @@ namespace Database.Models
 		public override int Id { get; set; }
 
 		public virtual UserQuizSubmission Submission { get; set; }
+
+		public bool IgnoreInAttemptsCount { get; set; }
 	}
 
 	public class ManualQuizChecking : AbstractManualSlideChecking
@@ -156,5 +158,7 @@ namespace Database.Models
 		public override int Id { get; set; }
 
 		public virtual UserQuizSubmission Submission { get; set; }
+
+		public bool IgnoreInAttemptsCount { get; set; }
 	}
 }

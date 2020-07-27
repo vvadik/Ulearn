@@ -279,7 +279,7 @@ namespace Database.DataContexts
 				{
 					log.Info($"Создаю ручную проверку для теста {slide.Id}");
 					var submission = userQuizzesRepo.FindLastUserSubmission(courseId, quizSlideId, userId);
-					if (submission == null)
+					if (submission == null || submission.ManualChecking != null)
 						continue;
 
 					await slideCheckingsRepo.AddManualQuizChecking(submission, courseId, quizSlideId, userId).ConfigureAwait(false);

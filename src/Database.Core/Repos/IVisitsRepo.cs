@@ -23,6 +23,7 @@ namespace Database.Repos
 		int GetScore(string courseId, Guid slideId, string userId);
 		Task SkipSlide(string courseId, Guid slideId, string userId);
 		bool IsSkipped(string courseId, Guid slideId, string userId);
+		/// Забывает, что пользователь смотрел чужие решения и дает ему получить баллы при следующей отправке.
 		Task UnskipAllSlides(string courseId, string userId);
 		bool IsPassed(string courseId, Guid slideId, string userId);
 		bool IsSkippedOrPassed(string courseId, Guid slideId, string userId);

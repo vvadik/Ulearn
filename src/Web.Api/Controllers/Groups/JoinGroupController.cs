@@ -83,21 +83,9 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			if (groupMember == null)
 				return StatusCode((int)HttpStatusCode.Conflict, new ErrorResponse($"User {UserId} is already a student of group {group.Id}"));
 
-			await slideCheckingsRepo.DisableProhibitFurtherManualCheckings(group.CourseId, UserId);
-			//await NullifyQuizAttempts(group.CourseId);
-			//await UnskipSlidesWithAcceptedSolutions(group.CourseId);
+			await slideCheckingsRepo.RemoveLimitsForUser(group.CourseId, UserId);
 
 			return Ok(new SuccessResponseWithMessage($"Student {UserId} is added to group {group.Id}"));
-		}
-
-		public async Task NullifyQuizAttempts(string courseId)
-		{
-			// Not implemended
-		}
-
-		public async Task UnskipSlidesWithAcceptedSolutions(string courseId)
-		{
-			await visitsRepo.UnskipAllSlides(courseId, UserId);
 		}
 	}
 }

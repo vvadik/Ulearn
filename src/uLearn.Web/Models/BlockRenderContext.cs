@@ -72,7 +72,7 @@ namespace uLearn.Web.Models
 			if (Slide is QuizSlide)
 				return new QuizBlockData(new QuizModel(), 1, new QuizState(QuizStatus.ReadyToSend, 0, 0, Slide.MaxScore));
 			if (Slide is ExerciseSlide)
-				return new ExerciseBlockData(Course.Id, Slide as ExerciseSlide) { IsGuest = IsGuest, IsLti = IsLti };
+				return new ExerciseBlockData(Course.Id, Slide as ExerciseSlide, false) { IsGuest = IsGuest, IsLti = IsLti };
 
 			throw new ArgumentException($"Internal error. Unknown slide type: {Slide.GetType()}. Should be {nameof(QuizSlide)} or {nameof(ExerciseSlide)}.");
 		}

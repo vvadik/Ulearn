@@ -36,7 +36,8 @@ namespace uLearn.Web.Controllers
 		private readonly NotificationsRepo notificationsRepo;
 		private readonly CoursesRepo coursesRepo;
 		private readonly SystemAccessesRepo systemAccessesRepo;
-		private readonly TempCoursesRepo tempCoursesRepo; 
+		private readonly TempCoursesRepo tempCoursesRepo;
+		private readonly SlideCheckingsRepo slideCheckingsRepo; 
 
 		private readonly string telegramSecret;
 		private static readonly WebApiConfiguration configuration;
@@ -59,6 +60,7 @@ namespace uLearn.Web.Controllers
 			coursesRepo = new CoursesRepo(db);
 			systemAccessesRepo = new SystemAccessesRepo(db);
 			tempCoursesRepo = new TempCoursesRepo(db);
+			slideCheckingsRepo = new SlideCheckingsRepo(db);
 
 			telegramSecret = WebConfigurationManager.AppSettings["ulearn.telegram.webhook.secret"] ?? "";
 		}
@@ -189,7 +191,7 @@ namespace uLearn.Web.Controllers
 				if (!alreadyInGroup)
 					await NotifyAboutUserJoinedToGroup(group, User.Identity.GetUserId());
 
-				var courseId = group.CourseId;
+				await slideCheckingsRepo.RemoveLimitsForUser(group.CourseId, User.Identity.GetUserId()).ConfigureAwait(false);
 
 				return View("JoinedToGroup", group);
 			}
