@@ -6,7 +6,7 @@ namespace CourseToolHotReloader.DirectoryWorkers
 {
 	public static class ActionHelper
 	{
-		public static Action Debounce(Action func, int milliseconds = 5000)
+		public static Action Debounce(Action func, int milliseconds = 1000)
 		{
 			CancellationTokenSource cancelTokenSource = null;
 			return () =>
