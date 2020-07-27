@@ -332,7 +332,7 @@ namespace Database.DataContexts
 		public async Task NotCountOldAttemptsToQuizzesWithManualChecking(string courseId, string userId)
 		{
 			var checkings = db.ManualQuizCheckings
-				.Where(c => c.CourseId == courseId && c.UserId == userId)
+				.Where(c => c.CourseId == courseId && c.UserId == userId && c.IsChecked)
 				.ToList();
 			foreach (var checking in checkings)
 				checking.IgnoreInAttemptsCount = true;
