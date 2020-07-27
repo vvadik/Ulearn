@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Autofac;
@@ -15,7 +16,7 @@ using ErrorType = CourseToolHotReloader.Dtos.ErrorType;
 
 namespace CourseToolHotReloader
 {
-	internal class Program
+	internal static class Program
 	{
 		private static IContainer container;
 		private static IConfig config;
@@ -34,16 +35,30 @@ namespace CourseToolHotReloader
 				Logger.Log.Error(e);
 				switch (e.InnerExceptions.Single())
 				{
-					case InvalidOperationException _:
 					case UriFormatException _:
-					case ArgumentException _:
-						ConsoleWorker.WriteError("Указанный в config.json baseUrl недоступен");
+						ConsoleWorker.WriteError("Указанный в config.json baseUrl имеет некорректный формат");
+						break;
+					case HttpRequestException ee when ee.InnerException is SocketException:
+						ConsoleWorker.WriteError($"Не удалось подключиться к {config.BaseUrl}");
+						break;
+					case HttpRequestException ee when ee.InnerException is IOException && ee.Message.Contains("SSL"):
+						ConsoleWorker.WriteError($"Не удалось использовать https при подключении к {config.BaseUrl}");
 						break;
 					case IOException _:
 						ConsoleWorker.WriteError("Ошибка ввода-вывода. Подробнее в логах");
 						break;
-					case UnauthorizedException _:
+					case InternalServerErrorException _:
+						ConsoleWorker.WriteError("Сервер вернул код 500. Это похоже на баг. Подробнее в логах");
+						break;
 					case ForbiddenException _:
+						ConsoleWorker.WriteError("Сервер вернул код 403. Нет прав на операцию. Перезапустите программу и войдите повторно");
+						break;
+					case UnauthorizedException _:
+						ConsoleWorker.WriteError("Сервер вернул код 401. Срок авторизации истек. Перезапустите программу и войдите повторно");
+						break;
+					case StatusCodeException ee:
+						ConsoleWorker.WriteError($"Сервер вернул код {ee.StatusCode}");
+						break;
 					case HttpRequestException _:
 					case CourseLoadingException _:
 						ConsoleWorker.WriteError(e.Message);
@@ -71,6 +86,12 @@ namespace CourseToolHotReloader
 
 		private static async Task Startup()
 		{
+			if (!File.Exists("course.xml"))
+			{
+				ConsoleWorker.WriteLine("В текущей папке нет course.xml. Запустите программу в папке курса с course.xml");
+				return;
+			}
+
 			var userId = await Login();
 			if (userId == null)
 				return;
@@ -103,14 +124,14 @@ namespace CourseToolHotReloader
 
 		private static async Task<string> Login()
 		{
-			var userId = await container.Resolve<ILoginAgent>().SignIn();
+			var shortUserInfo = await container.Resolve<ILoginAgent>().SignIn();
 
-			if (userId != null)
-				ConsoleWorker.WriteLine("Авторизация прошла успешно");
+			if (shortUserInfo != null)
+				ConsoleWorker.WriteLine($"Вы вошли под пользователем {shortUserInfo.Login}");
 			else
-				ConsoleWorker.WriteError("Ошибка авторизации");
+				ConsoleWorker.WriteError("Неправильный логин или пароль");
 
-			return userId;
+			return shortUserInfo?.Id;
 		}
 
 		private static async Task SendFullCourse()
@@ -172,19 +193,6 @@ namespace CourseToolHotReloader
 				return null;
 			var json = File.ReadAllText("CourseConfig.json");
 			return JsonSerializer.Deserialize<CourseConfig>(json);
-		}
-
-		public class CourseLoadingException : Exception
-		{
-			public CourseLoadingException(string message)
-				: base(message)
-			{
-			}
-
-			public CourseLoadingException(string message, Exception innerException)
-				: base(message, innerException)
-			{
-			}
 		}
 	}
 }

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -36,17 +37,18 @@ namespace CourseToolHotReloader.ApiClient
 		public async Task<TokenResponseDto> GetJwtToken(LoginPasswordParameters parameters)
 		{
 			var url = $"{config.BaseUrl}/account/login";
-
 			var json = JsonSerializer.Serialize(parameters);
 			var data = new StringContent(json, Encoding.UTF8, "application/json");
-
 			using var client = new HttpClient();
-
 			var response = await client.PostAsync(url, data);
-
-			if (response.StatusCode != HttpStatusCode.OK)
+			try
+			{
+				ThrowExceptionIfBadCode(response);
+			}
+			catch (ForbiddenException)
+			{
 				return null;
-
+			}
 			var result = response.Content.ReadAsStringAsync().Result;
 			return JsonSerializer.Deserialize<TokenResponseDto>(result);
 		}
@@ -55,13 +57,16 @@ namespace CourseToolHotReloader.ApiClient
 		public async Task<TokenResponseDto> RenewToken()
 		{
 			var url = $"{config.BaseUrl}/account/api-token?days=3";
-
 			using var client = HttpClient();
 			var response = await client.PostAsync(url, null);
-
-			if (response.StatusCode != HttpStatusCode.OK)
+			try
+			{
+				ThrowExceptionIfBadCode(response);
+			}
+			catch (ForbiddenException)
+			{
 				return null;
-
+			}
 			var result = response.Content.ReadAsStringAsync().Result;
 			return JsonSerializer.Deserialize<TokenResponseDto>(result);
 		}
@@ -69,37 +74,30 @@ namespace CourseToolHotReloader.ApiClient
 		public async Task<TempCourseUpdateResponse> UploadCourse(MemoryStream memoryStream, string id)
 		{
 			var url = $"{config.BaseUrl}/tempCourses/{id}";
-
 			return await UpdateTempCourse(memoryStream, url, HttpMethod.Patch);
 		}
 
 		public async Task<TempCourseUpdateResponse> UploadFullCourse(MemoryStream memoryStream, string id)
 		{
 			var url = $"{config.BaseUrl}/tempCourses/{id}";
-
 			return await UpdateTempCourse(memoryStream, url, HttpMethod.Put);
 		}
 
 		public async Task<TempCourseUpdateResponse> CreateCourse(string id)
 		{
 			var url = $"{config.BaseUrl}/tempCourses/{id}";
-
 			using var client = HttpClient();
-
 			var response = await client.PostAsync(url, null);
-
-			BadCodeHandler(response);
-
+			ThrowExceptionIfBadCode(response);
 			return DeserializeResponseContent<TempCourseUpdateResponse>(response);
 		}
-
 
 		public async Task<CoursesListResponse> GetCoursesList()
 		{
 			var url = $"{config.BaseUrl}/courses";
 			using var client = HttpClient();
 			var response = await client.GetAsync(url);
-			BadCodeHandler(response);
+			ThrowExceptionIfBadCode(response);
 			return response.StatusCode != HttpStatusCode.OK
 				? null
 				: DeserializeResponseContent<CoursesListResponse>(response);
@@ -110,7 +108,7 @@ namespace CourseToolHotReloader.ApiClient
 			var url = $"{config.BaseUrl}/account";
 			using var client = HttpClient();
 			var response = await client.GetAsync(url);
-			BadCodeHandler(response);
+			ThrowExceptionIfBadCode(response);
 			return DeserializeResponseContent<AccountResponse>(response).User;
 		}
 
@@ -123,29 +121,36 @@ namespace CourseToolHotReloader.ApiClient
 		private async Task<TempCourseUpdateResponse> UpdateTempCourse(MemoryStream memoryStream, string url, HttpMethod httpMethod)
 		{
 			using var client = HttpClient();
-
 			var fileContent = new ByteArrayContent(memoryStream.ToArray());
 			var multiContent = new MultipartFormDataContent { { fileContent, "files", "course.zip" } };
-
-			var response = httpMethod == HttpMethod.Patch ? await client.PatchAsync(url, multiContent) : await client.PutAsync(url, multiContent); 
-
-			BadCodeHandler(response);
-
+			var response = httpMethod == HttpMethod.Patch ? await client.PatchAsync(url, multiContent) : await client.PutAsync(url, multiContent);
+			ThrowExceptionIfBadCode(response);
 			return DeserializeResponseContent<TempCourseUpdateResponse>(response);
 		}
 
-		private void BadCodeHandler(HttpResponseMessage response)
+		private void ThrowExceptionIfBadCode(HttpResponseMessage response)
 		{
 			switch (response.StatusCode)
 			{
 				case HttpStatusCode.OK:
 					return;
 				case HttpStatusCode.Unauthorized:
-					throw new UnauthorizedException("Срок авторизации истек, требуется повторная авторизация");
+					throw new UnauthorizedException();
 				case HttpStatusCode.Forbidden:
-					throw new ForbiddenException("Нет прав для действий");
+					throw new ForbiddenException();
 				case HttpStatusCode.InternalServerError:
-					throw new InternalServerErrorException($"На сервере произошла ошибка: {DeserializeResponseContent<ServerErrorDto>(response).Message}");
+					string message = null;
+					try
+					{
+						message = DeserializeResponseContent<ServerErrorDto>(response).Message;
+					}
+					catch (Exception _)
+					{
+						// ignore
+					}
+					throw new InternalServerErrorException(message);
+				default:
+					throw new StatusCodeException(response.StatusCode);
 			}
 		}
 

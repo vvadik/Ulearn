@@ -12,5 +12,8 @@ namespace CourseToolHotReloader.Dtos
 	{
 		[JsonPropertyName("id")]
 		public string Id { get; set; }
+
+		[JsonPropertyName("login")]
+		public string Login { get; set; }
 	}
 }

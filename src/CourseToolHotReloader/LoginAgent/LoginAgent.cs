@@ -1,13 +1,14 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
 using CourseToolHotReloader.ApiClient;
+using CourseToolHotReloader.Dtos;
 using CourseToolHotReloader.Log;
 
 namespace CourseToolHotReloader.LoginAgent
 {
 	public interface ILoginAgent
 	{
-		Task<string> SignIn();
+		Task<ShortUserInfo> SignIn();
 	}
 
 	public class LoginAgent : ILoginAgent
@@ -21,21 +22,22 @@ namespace CourseToolHotReloader.LoginAgent
 			this.ulearnApiClient = ulearnApiClient;
 		}
 
-		public async Task<string> SignIn()
+		public async Task<ShortUserInfo> SignIn()
 		{
 			var isSignInSuccess = await TryLoginByConfig()
 				|| await TryLoginByConsole();
-			return isSignInSuccess ? await ulearnApiClient.GetUserId() : null;
+			return isSignInSuccess ? await ulearnApiClient.GetShortUserInfo() : null;
 		}
 
 		private async Task<bool> TryLoginByConsole()
 		{
+			ConsoleWorker.WriteLine($"Войдите на {config.BaseUrl}");
 			var login = ConsoleWorker.GetLogin();
 			var password = new NetworkCredential(string.Empty, ConsoleWorker.GetPassword()).Password;
 
 			var jwtToken = await ulearnApiClient.Login(login, password);
-			
-			return TrySetJwtTokenInConfig(jwtToken);
+
+			return TrySetJwtTokenInConfig(jwtToken, login);
 		}
 
 		private async Task<bool> TryLoginByConfig()
@@ -45,15 +47,16 @@ namespace CourseToolHotReloader.LoginAgent
 
 			var jwtToken = await ulearnApiClient.RenewToken();
 
-			return TrySetJwtTokenInConfig(jwtToken);
+			return TrySetJwtTokenInConfig(jwtToken, config.Login);
 		}
 
-		private bool TrySetJwtTokenInConfig(string jwtToken)
+		private bool TrySetJwtTokenInConfig(string jwtToken, string login)
 		{
 			if (jwtToken is null)
 				return false;
 
 			config.JwtToken = jwtToken;
+			config.Login = login;
 			config.Flush();
 
 			return true;

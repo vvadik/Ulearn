@@ -1,11 +1,9 @@
-﻿using System;
-
-namespace CourseToolHotReloader.Exceptions
+﻿namespace CourseToolHotReloader.Exceptions
 {
-	public class ForbiddenException : Exception
+	public class ForbiddenException : CourseToolHotReloaderHttpException
 	{
-		public ForbiddenException(string message)
-			: base(message)
+		public ForbiddenException()
+			: base($"Status code is 403.")
 		{ }
 	}
 }

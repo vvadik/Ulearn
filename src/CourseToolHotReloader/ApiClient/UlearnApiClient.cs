@@ -16,7 +16,7 @@ namespace CourseToolHotReloader.ApiClient
 		Task<string> Login(string login, string password);
 		Task<bool> HasCourse(string courseId);
 		Task<string> RenewToken();
-		Task<string> GetUserId();
+		Task<ShortUserInfo> GetShortUserInfo();
 	}
 
 	internal class UlearnApiClient : IUlearnApiClient
@@ -74,10 +74,9 @@ namespace CourseToolHotReloader.ApiClient
 			return accountTokenResponseDto?.Token;
 		}
 
-		public async Task<string> GetUserId()
+		public async Task<ShortUserInfo> GetShortUserInfo()
 		{
-			var userInfo = await httpMethods.GetUserInfo();
-			return userInfo.Id;
+			return await httpMethods.GetUserInfo();
 		}
 	}
 }

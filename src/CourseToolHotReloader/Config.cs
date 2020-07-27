@@ -15,6 +15,7 @@ namespace CourseToolHotReloader
 		Dictionary<string, string> CourseIds { get; set; }
 		string CourseId { get; set; }
 		string JwtToken { get; set; }
+		string Login { get; set; }
 		public string BaseUrl { get; set; }
 		public bool SendFullArchive { get; set; }
 		public string PathToConfigFile { get; }
@@ -40,6 +41,7 @@ namespace CourseToolHotReloader
 		public string Path { get; set; }
 		public Dictionary<string, string> CourseIds { get; set; }
 		public List<string> ExcludeCriterias { get; set; }
+		public string Login { get; set; }
 		public string JwtToken { get; set; }
 
 		public string CourseId
@@ -79,6 +81,7 @@ namespace CourseToolHotReloader
 		{
 			var fileConfigFormat = new FileConfigFormat
 			{
+				Login = Login,
 				JwtToken = JwtToken,
 				BaseUrl = BaseUrl,
 				SendFullArchive = SendFullArchive,
@@ -104,11 +107,15 @@ namespace CourseToolHotReloader
 		{
 			public FileConfigFormat()
 			{
+				Login = null;
 				JwtToken = null;
 				BaseUrl = "https://api.ulearn.me";
 				SendFullArchive = false;
 				CourseIds = new Dictionary<string, string>();
 			}
+
+			[JsonPropertyName("login")]
+			public string Login { get; set; }
 
 			[JsonPropertyName("jwtToken")]
 			public string JwtToken { get; set; }

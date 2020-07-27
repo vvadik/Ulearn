@@ -1,11 +1,9 @@
-﻿using System;
-
-namespace CourseToolHotReloader.Exceptions
+﻿namespace CourseToolHotReloader.Exceptions
 {
-	public class UnauthorizedException : Exception
+	public class UnauthorizedException : CourseToolHotReloaderHttpException
 	{
-		public UnauthorizedException(string message)
-			: base(message)
+		public UnauthorizedException()
+			: base($"Status code is 401.")
 		{ }
 	}
 }

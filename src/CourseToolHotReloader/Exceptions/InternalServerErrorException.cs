@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace CourseToolHotReloader.Exceptions
+﻿namespace CourseToolHotReloader.Exceptions
 {
-	public class InternalServerErrorException : Exception
+	public class InternalServerErrorException : CourseToolHotReloaderHttpException
 	{
 		public InternalServerErrorException(string message)
 			: base(message)
