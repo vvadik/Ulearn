@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -6,6 +7,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
+using CourseToolHotReloader.Log;
 
 namespace CourseToolHotReloader
 {
@@ -15,7 +17,6 @@ namespace CourseToolHotReloader
 		Dictionary<string, string> CourseIds { get; set; }
 		string CourseId { get; set; }
 		string JwtToken { get; set; }
-		string Login { get; set; }
 		public string BaseUrl { get; set; }
 		public bool SendFullArchive { get; set; }
 		public string PathToConfigFile { get; }
@@ -29,7 +30,7 @@ namespace CourseToolHotReloader
 
 		public Config()
 		{
-			var fileConfigFormat = ReadConfig();
+			var fileConfigFormat = ReadOrCreateConfig();
 			JwtToken = fileConfigFormat.JwtToken;
 			BaseUrl = fileConfigFormat.BaseUrl;
 			CourseIds = fileConfigFormat.CourseIds;
@@ -41,7 +42,6 @@ namespace CourseToolHotReloader
 		public string Path { get; set; }
 		public Dictionary<string, string> CourseIds { get; set; }
 		public List<string> ExcludeCriterias { get; set; }
-		public string Login { get; set; }
 		public string JwtToken { get; set; }
 
 		public string CourseId
@@ -50,13 +50,28 @@ namespace CourseToolHotReloader
 			set => CourseIds[Path] = value;
 		}
 
-		private FileConfigFormat ReadConfig()
+		private FileConfigFormat ReadOrCreateConfig()
 		{
 			if (!File.Exists(pathToConfigFile))
 			{
 				CreateNewConfigFile();
 			}
 
+			try
+			{
+				return ReadConfig();
+			}
+			catch (JsonException ex)
+			{
+				Logger.Log.Error(ex);
+				ConsoleWorker.WriteError("Не удалось прочитать файл с настройками CourseToolHotReloader. config.json создан с настройками по умолчанию в папке с исполнямыми файлами CourseToolHotReloader");
+				CreateNewConfigFile();
+				return ReadConfig();
+			}
+		}
+
+		private FileConfigFormat ReadConfig()
+		{
 			using var streamReader = File.OpenText(pathToConfigFile);
 			var json = streamReader.ReadToEnd();
 			var fileConfigFormat = JsonSerializer.Deserialize<FileConfigFormat>(json);
@@ -71,7 +86,6 @@ namespace CourseToolHotReloader
 		private void CreateNewConfigFile()
 		{
 			var fileConfigFormat = new FileConfigFormat();
-
 			SaveConfigFile(fileConfigFormat);
 		}
 
@@ -81,7 +95,6 @@ namespace CourseToolHotReloader
 		{
 			var fileConfigFormat = new FileConfigFormat
 			{
-				Login = Login,
 				JwtToken = JwtToken,
 				BaseUrl = BaseUrl,
 				SendFullArchive = SendFullArchive,
@@ -107,15 +120,11 @@ namespace CourseToolHotReloader
 		{
 			public FileConfigFormat()
 			{
-				Login = null;
 				JwtToken = null;
 				BaseUrl = "https://api.ulearn.me";
 				SendFullArchive = false;
 				CourseIds = new Dictionary<string, string>();
 			}
-
-			[JsonPropertyName("login")]
-			public string Login { get; set; }
 
 			[JsonPropertyName("jwtToken")]
 			public string JwtToken { get; set; }

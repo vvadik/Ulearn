@@ -144,7 +144,7 @@ namespace CourseToolHotReloader.ApiClient
 					{
 						message = DeserializeResponseContent<ServerErrorDto>(response).Message;
 					}
-					catch (Exception _)
+					catch (Exception)
 					{
 						// ignore
 					}

@@ -12,6 +12,7 @@ using CourseToolHotReloader.Exceptions;
 using CourseToolHotReloader.Log;
 using CourseToolHotReloader.LoginAgent;
 using JetBrains.Annotations;
+using Ulearn.Common.Extensions;
 using ErrorType = CourseToolHotReloader.Dtos.ErrorType;
 
 namespace CourseToolHotReloader
@@ -24,10 +25,9 @@ namespace CourseToolHotReloader
 
 		private static void Main()
 		{
-			Init();
-
 			try
 			{
+				Init();
 				Startup().Wait();
 			}
 			catch (AggregateException e)
@@ -60,6 +60,8 @@ namespace CourseToolHotReloader
 						ConsoleWorker.WriteError($"Сервер вернул код {ee.StatusCode}");
 						break;
 					case HttpRequestException _:
+						ConsoleWorker.WriteError(e.Message);
+						break;
 					case CourseLoadingException _:
 						ConsoleWorker.WriteError(e.Message);
 						break;
@@ -92,24 +94,24 @@ namespace CourseToolHotReloader
 				return;
 			}
 
-			var userId = await Login();
-			if (userId == null)
-				return;
-
-			if (!CourseIdCorrect())
-				return;
-
-			config.ExcludeCriterias = ReadCourseConfig()?.CourseToolHotReloader?.ExcludeCriterias;
-
-			if (!await TempCourseExist(userId))
-				if (!await CreateCourse())
-					return;
-
 			if (File.Exists(Path.Combine(config.Path, "deleted.txt")))
 			{
 				ConsoleWorker.WriteError("В корне курса находится файл deleted.txt Программа не будет корректно работать, переименуйте его");
 				return;
 			}
+
+			var userId = await Login();
+			if (userId == null)
+				return;
+
+			SetupCourseId();
+			var tempCourseForUserExist = await TempCourseExist(userId);
+			if (!tempCourseForUserExist)
+				if (!await CreateCourse())
+					return;
+			config.Flush();
+
+			config.ExcludeCriterias = ReadCourseConfig()?.CourseToolHotReloader?.ExcludeCriterias;
 
 			await SendFullCourse();
 
@@ -127,7 +129,7 @@ namespace CourseToolHotReloader
 			var shortUserInfo = await container.Resolve<ILoginAgent>().SignIn();
 
 			if (shortUserInfo != null)
-				ConsoleWorker.WriteLine($"Вы вошли под пользователем {shortUserInfo.Login}");
+				ConsoleWorker.WriteLine($"Вы вошли на {config.BaseUrl} под пользователем {shortUserInfo.Login}");
 			else
 				ConsoleWorker.WriteError("Неправильный логин или пароль");
 
@@ -138,24 +140,24 @@ namespace CourseToolHotReloader
 		{
 			var tempCourseUpdateResponse = await ulearnApiClient.SendFullCourse(config.Path, config.CourseId, config.ExcludeCriterias);
 			if (tempCourseUpdateResponse.ErrorType == ErrorType.NoErrors)
-				ConsoleWorker.WriteLine("Первоначальная полная загрузка курса прошла успешно");
+			{
+				ConsoleWorker.WriteLine("Первоначальная полная загрузка курса прошла успешно. Обновите страницу браузера, и вы увидете временный курс в выпадающем меню");
+				ConsoleWorker.WriteLine("Не закрывайте программу и редактируйте файлы курса у себя на компьютере. Сделанные изменения будут автоматически загружаться на ulearn");
+			}
 			else
 			{
 				throw new CourseLoadingException(tempCourseUpdateResponse.Message);
 			}
 		}
 
-		private static bool CourseIdCorrect()
+		private static void SetupCourseId()
 		{
-			if (!config.CourseIds.TryGetValue(config.Path, out var courseId) || string.IsNullOrEmpty(courseId))
-			{
-				ConsoleWorker.WriteError($"CourseId для \"{config.Path}\" не задан в config.json.\r\n"
-					+ @"Нужно указать в формате ""сourseIds"": {""C:\\Курсы\\курс1"" : ""courseId1"", ""C:\\Курсы\\курс2"" : ""courseId2""}"
-					+ $"\r\nconfig.json находится \"{config.PathToConfigFile}\"");
-				return false;
-			}
+			var courseId = config.CourseIds.GetOrDefault(config.Path);
+			if (!string.IsNullOrEmpty(courseId))
+				return;
 
-			return true;
+			courseId = ConsoleWorker.GetCourseId();
+			config.CourseIds[config.Path] = courseId;
 		}
 
 		private static async Task<bool> TempCourseExist(string userId)

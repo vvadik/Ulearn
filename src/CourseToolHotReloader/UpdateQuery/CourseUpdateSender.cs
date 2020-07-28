@@ -26,33 +26,29 @@ namespace CourseToolHotReloader.UpdateQuery
 
 		public async Task SendCourseUpdates()
 		{
-			var cs = ConsoleSpinner.CreateAndRunWithText("Загружаем изменения на ulearn");
+			ConsoleWorker.WriteLineWithTime("Загружаем изменения на ulearn");
 
 			var errors = await ulearnApiClient.SendCourseUpdates(config.Path, courseUpdateQuery.GetAllCourseUpdate(),
 				courseUpdateQuery.GetAllDeletedFiles(), config.CourseId, config.ExcludeCriterias);
 
-			cs.Stop();
-
 			if (errors.ErrorType != ErrorType.NoErrors)
-				ConsoleWorker.WriteError(errors.Message);
+				ConsoleWorker.WriteErrorWithTime("Ошибка загрузки изменений. " + errors.Message);
 			else
-				ConsoleWorker.WriteLine($"Изменения были загруженны без ошибок");
+				ConsoleWorker.WriteLineWithTime("Изменения загружены без ошибок. Обновите страницу браузера и увидите результат");
 
 			courseUpdateQuery.Clear();
 		}
 
 		public async Task SendFullCourse()
 		{
-			var cs = ConsoleSpinner.CreateAndRunWithText("Загружаем курс на ulearn");
+			ConsoleWorker.WriteLineWithTime("Загружаем курс на ulearn");
 
 			var errors = await ulearnApiClient.SendFullCourse(config.Path, config.CourseId, config.ExcludeCriterias);
 
-			cs.Stop();
-
 			if (errors.ErrorType != ErrorType.NoErrors)
-				ConsoleWorker.WriteError(errors.Message);
+				ConsoleWorker.WriteErrorWithTime("Ошибка загрузки курса. " + errors.Message);
 			else
-				ConsoleWorker.WriteLine("Курс был загружен без ошибок");
+				ConsoleWorker.WriteLineWithTime("Курс загружен без ошибок. Обновите страницу браузера и увидите результат");
 		}
 	}
 }

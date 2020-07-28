@@ -37,7 +37,7 @@ namespace CourseToolHotReloader.LoginAgent
 
 			var jwtToken = await ulearnApiClient.Login(login, password);
 
-			return TrySetJwtTokenInConfig(jwtToken, login);
+			return TrySetJwtTokenInConfig(jwtToken);
 		}
 
 		private async Task<bool> TryLoginByConfig()
@@ -47,16 +47,15 @@ namespace CourseToolHotReloader.LoginAgent
 
 			var jwtToken = await ulearnApiClient.RenewToken();
 
-			return TrySetJwtTokenInConfig(jwtToken, config.Login);
+			return TrySetJwtTokenInConfig(jwtToken);
 		}
 
-		private bool TrySetJwtTokenInConfig(string jwtToken, string login)
+		private bool TrySetJwtTokenInConfig(string jwtToken)
 		{
 			if (jwtToken is null)
 				return false;
 
 			config.JwtToken = jwtToken;
-			config.Login = login;
 			config.Flush();
 
 			return true;
