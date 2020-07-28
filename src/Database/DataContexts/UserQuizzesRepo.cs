@@ -60,10 +60,12 @@ namespace Database.DataContexts
 			return db.ManualQuizCheckings.Any(c => c.CourseId == courseId && c.SlideId == slideId && c.UserId == userId && !c.IsChecked);
 		}
 
-		public int GetUsedAttemptsCount(string courseId, string userId, Guid slideId)
+		// Автоматическая проверка не создается, если это лишняя попытка. Так лишние попытки не увеличивают число.
+		public int GetUsedAttemptsCountForQuizWithAutomaticChecking(string courseId, string userId, Guid slideId)
 		{
 			return db.UserQuizSubmissions
-				.Count(s => s.CourseId == courseId && s.UserId == userId && s.SlideId == slideId);
+				.Count(s => s.CourseId == courseId && s.UserId == userId && s.SlideId == slideId
+					&& s.AutomaticChecking != null && !s.AutomaticChecking.IgnoreInAttemptsCount);
 		}
 
 		public HashSet<Guid> GetPassedSlideIds(string courseId, string userId)

@@ -164,13 +164,13 @@ namespace Database.DataContexts
 
 		public async Task<List<CourseAccess>> GetUserAccessHistory(string userId)
 		{
-			return await db.CourseAccesses.Where(x => x.UserId == userId).ToListAsync();
+			return db.CourseAccesses.Where(x => x.UserId == userId).ToList();
 		}
 
 		public async Task<List<CourseAccess>> GetUserAccessHistoryByCourseId(string userId, string courseId)
 		{
 			courseId = courseId.ToLower();
-			return await db.CourseAccesses.Where(x => x.UserId == userId && x.CourseId == courseId).ToListAsync();
+			return db.CourseAccesses.Where(x => x.UserId == userId && x.CourseId == courseId).ToList();
 		}
 
 		// Add new and remove old course file

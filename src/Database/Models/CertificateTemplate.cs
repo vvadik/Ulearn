@@ -11,7 +11,7 @@ namespace Database.Models
 		public Guid Id { get; set; }
 
 		[Required]
-		[StringLength(40)]
+		[StringLength(100)]
 		[Index("IDX_CertificateTemplate_ByCourse")]
 		public string CourseId { get; set; }
 

@@ -22,7 +22,7 @@ namespace Database.Models
 		public virtual ApplicationUser User { get; set; }
 
 		[Required]
-		[StringLength(40)]
+		[StringLength(100)]
 		[Index("IDX_UserExerciseSubmissions_BySlideAndUser", 1)]
 		[Index("IDX_UserExerciseSubmissions_ByCourseAndSlide", 1)]
 		[Index("IDX_UserExerciseSubmissions_BySlideAndTime", 1)]

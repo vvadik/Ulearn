@@ -107,25 +107,28 @@ namespace Database.Repos
 			var newScore = slideCheckingsRepo.GetManualScoreForSlide(courseId, slideId, userId) +
 							slideCheckingsRepo.GetAutomaticScoreForSlide(courseId, slideId, userId);
 			var isPassed = slideCheckingsRepo.IsSlidePassed(courseId, slideId, userId);
-			await UpdateAttempts(slideId, userId, visit =>
+			await UpdateAttempts(courseId, slideId, userId, visit =>
 			{
 				visit.Score = newScore;
 				visit.IsPassed = isPassed;
 			});
 		}
 
-		private async Task UpdateAttempts(Guid slideId, string userId, Action<Visit> action)
+		private async Task UpdateAttempts(string courseId, Guid slideId, string userId, Action<Visit> action)
 		{
-			var visit = db.Visits.FirstOrDefault(v => v.SlideId == slideId && v.UserId == userId);
+			var visit = FindVisit(courseId, slideId, userId);
 			if (visit == null)
-				return;
+			{
+				await AddVisit(courseId, slideId, userId, null);
+				visit = FindVisit(courseId, slideId, userId);
+			}
 			action(visit);
 			await db.SaveChangesAsync();
 		}
 
-		public async Task RemoveAttempts(Guid slideId, string userId)
+		public async Task RemoveAttempts(string courseId, Guid slideId, string userId)
 		{
-			await UpdateAttempts(slideId, userId, visit =>
+			await UpdateAttempts(courseId, slideId, userId, visit =>
 			{
 				visit.AttemptsCount = 0;
 				visit.Score = 0;
@@ -166,15 +169,15 @@ namespace Database.Repos
 				.ToList();
 		}
 
-		public async Task MarkVisitsAsWithManualChecking(Guid slideId, string userId)
+		public async Task MarkVisitsAsWithManualChecking(string courseId, Guid slideId, string userId)
 		{
-			await UpdateAttempts(slideId, userId, visit => { visit.HasManualChecking = true; });
+			await UpdateAttempts(courseId, slideId, userId, visit => { visit.HasManualChecking = true; });
 		}
 
-		public int GetScore(Guid slideId, string userId)
+		public int GetScore(string courseId, Guid slideId, string userId)
 		{
 			return db.Visits
-				.Where(v => v.SlideId == slideId && v.UserId == userId)
+				.Where(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId)
 				.Select(v => v.Score)
 				.FirstOrDefault();
 		}
@@ -201,21 +204,29 @@ namespace Database.Repos
 			return db.Visits.Any(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId && v.IsSkipped);
 		}
 
-		public bool IsPassed(Guid slideId, string userId)
+		public async Task UnskipAllSlides(string courseId, string userId)
 		{
-			return db.Visits.Any(v => v.SlideId == slideId && v.UserId == userId && v.IsPassed);
+			var skippedVisits = await db.Visits.Where(v => v.CourseId == courseId && v.UserId == userId && v.IsSkipped).ToListAsync();
+			foreach (var v in skippedVisits)
+				v.IsSkipped = false;
+			await db.SaveChangesAsync();
 		}
 
-		public bool IsSkippedOrPassed(Guid slideId, string userId)
+		public bool IsPassed(string courseId, Guid slideId, string userId)
 		{
-			return db.Visits.Any(v => v.SlideId == slideId && v.UserId == userId && (v.IsPassed || v.IsSkipped));
+			return db.Visits.Any(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId && v.IsPassed);
+		}
+
+		public bool IsSkippedOrPassed(string courseId, Guid slideId, string userId)
+		{
+			return db.Visits.Any(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId && (v.IsPassed || v.IsSkipped));
 		}
 
 		public async Task AddVisits(IEnumerable<Visit> visits)
 		{
 			foreach (var visit in visits)
 			{
-				if (db.Visits.Any(x => x.UserId == visit.UserId && x.SlideId == visit.SlideId))
+				if (db.Visits.Any(x => x.UserId == visit.UserId && x.SlideId == visit.SlideId && x.CourseId == visit.CourseId))
 					continue;
 				db.Visits.Add(visit);
 			}
@@ -223,9 +234,9 @@ namespace Database.Repos
 			await db.SaveChangesAsync();
 		}
 
-		public IQueryable<Visit> GetVisitsInPeriod(IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish, IEnumerable<string> usersIds = null)
+		public IQueryable<Visit> GetVisitsInPeriod(string courseId, IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish, IEnumerable<string> usersIds = null)
 		{
-			var filteredVisits = db.Visits.Where(v => slidesIds.Contains(v.SlideId) && periodStart <= v.Timestamp && v.Timestamp <= periodFinish);
+			var filteredVisits = db.Visits.Where(v => v.CourseId == courseId && slidesIds.Contains(v.SlideId) && periodStart <= v.Timestamp && v.Timestamp <= periodFinish);
 			if (usersIds != null)
 				filteredVisits = filteredVisits.Where(v => usersIds.Contains(v.UserId));
 			return filteredVisits;
@@ -234,6 +245,8 @@ namespace Database.Repos
 		public IQueryable<Visit> GetVisitsInPeriod(VisitsFilterOptions options)
 		{
 			var filteredVisits = db.Visits.Where(v => options.PeriodStart <= v.Timestamp && v.Timestamp <= options.PeriodFinish);
+			if (options.CourseId != null)
+				filteredVisits = filteredVisits.Where(v => options.CourseId == v.CourseId);
 			if (options.SlidesIds != null)
 				filteredVisits = filteredVisits.Where(v => options.SlidesIds.Contains(v.SlideId));
 			if (options.UserIds != null)
@@ -255,11 +268,11 @@ namespace Database.Repos
 				.ToDictionary(g => g.Key, g => g.ToList());
 		}
 
-		public IEnumerable<string> GetUsersVisitedAllSlides(IImmutableSet<Guid> slidesIds, DateTime periodStart, DateTime periodFinish, IEnumerable<string> usersIds = null)
+		public IEnumerable<string> GetUsersVisitedAllSlides(string courseId, IImmutableSet<Guid> slidesIds, DateTime periodStart, DateTime periodFinish, IEnumerable<string> usersIds = null)
 		{
 			var slidesCount = slidesIds.Count;
 
-			return GetVisitsInPeriod(slidesIds, periodStart, periodFinish, usersIds)
+			return GetVisitsInPeriod(courseId, slidesIds, periodStart, periodFinish, usersIds)
 				.Select(v => new { v.UserId, v.SlideId })
 				.Distinct()
 				.GroupBy(v => v.UserId)

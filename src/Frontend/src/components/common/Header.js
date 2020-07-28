@@ -384,7 +384,7 @@ class MyCoursesMenu extends AbstractMyCoursesMenu {
 MyCoursesMenu = connect(MyCoursesMenu.mapStateToProps)(MyCoursesMenu);
 
 class CourseMenu extends Component {
-	static menuItems(courseId, role, accesses) {
+	static menuItems(courseId, role, accesses, isTempCourse) {
 		let items = [
 			<MenuItem href={ "/Course/" + courseId } key="Course" component={ LinkComponent }>
 				Просмотр курса
@@ -424,23 +424,37 @@ class CourseMenu extends Component {
 					Студенты и преподаватели
 				</MenuItem>);
 
-		if(hasCourseAdminMenuItems)
+		if(hasCourseAdminMenuItems) {
+			if (isTempCourse){
+				items = items.concat([
+					<MenuItem href={ "/Admin/TempCourseDiagnostics?courseId=" + courseId } key="Diagnostics"
+							  component={ LinkComponent }>
+						Диагностика
+					</MenuItem>
+				]);
+			}
+			else
+			{
+				items = items.concat([
+					<MenuItem href={ "/Admin/Packages?courseId=" + courseId } key="Packages"
+												component={ LinkComponent }>
+						Экспорт и импорт курса
+					</MenuItem>,
+
+					<MenuItem href={ "/Admin/Units?courseId=" + courseId } key="Units"
+							  component={ LinkComponent }>
+						Модули
+					</MenuItem>
+				]);
+			}
+
 			items = items.concat([
-				<MenuItem href={ "/Admin/Packages?courseId=" + courseId } key="Packages"
-						  component={ LinkComponent }>
-					Экспорт и импорт курса
-				</MenuItem>,
-
-				<MenuItem href={ "/Admin/Units?courseId=" + courseId } key="Units"
-						  component={ LinkComponent }>
-					Модули
-				</MenuItem>,
-
 				<MenuItem href={ "/Grader/Clients?courseId=" + courseId } key="GraderClients"
 						  component={ LinkComponent }>
 					Клиенты грейдера
 				</MenuItem>
 			]);
+		}
 
 		items = items.concat([
 			<MenuSeparator key="CourseMenuSeparator3"/>,
@@ -486,7 +500,7 @@ class CourseMenu extends Component {
 						</span>
 						</div> }
 				>
-					{ CourseMenu.menuItems(courseId, role, accesses) }
+					{ CourseMenu.menuItems(courseId, role, accesses, course.isTempCourse) }
 				</DropdownMenu>
 			</div>
 		)
@@ -510,7 +524,9 @@ CourseMenu = connect(CourseMenu.mapStateToProps)(CourseMenu);
 
 class MobileCourseMenu extends AbstractMyCoursesMenu {
 	render() {
-
+		const { courseId, role, accesses } = this.props;
+		const courseById = this.props.courses.courseById;
+		const course = courseById[courseId];
 		return (
 			<div className={ styles["header__course-menu"] }>
 				<DropdownMenu
@@ -520,7 +536,7 @@ class MobileCourseMenu extends AbstractMyCoursesMenu {
 							<DocumentSolid/>
 						</span> }
 				>
-					{ this.props.isCourseMenuVisible ? CourseMenu.menuItems(this.props.courseId, this.props.role, this.props.accesses) : null }
+					{ this.props.isCourseMenuVisible ? CourseMenu.menuItems(courseId, role, accesses, course.isTempCourse) : null }
 					{ this.props.isCourseMenuVisible ? <MenuSeparator/> : null }
 					{
 						this.props.isSystemAdministrator

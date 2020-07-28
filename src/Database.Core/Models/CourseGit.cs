@@ -11,7 +11,7 @@ namespace Database.Models
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int Id { get; set; }
 
-		[StringLength(64)]
+		[StringLength(100)]
 		public string CourseId { get; set; }
 
 		public string RepoUrl { get; set; }

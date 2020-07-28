@@ -18,7 +18,6 @@ namespace Web.Api.Tests.Controllers.Slides
 	public class ApiSlideBlocksTests : BaseControllerTests
 	{
 		private const string testDataDirectory = "Controllers/Slides/TestData/";
-		private readonly ILogger logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
 		private SlideRenderer slideRenderer;
 		private IUlearnVideoAnnotationsClient videoAnnotationsClient;
 		private CourseSettings courseSettings;

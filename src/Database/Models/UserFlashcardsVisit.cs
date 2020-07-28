@@ -16,7 +16,7 @@ namespace Database.Models
 		public virtual ApplicationUser User { get; set; }
 
 		[Required]
-		[StringLength(64)]
+		[StringLength(100)]
 		[Index("IDX_UserFlashcardsVisits_ByUserIdAndCourseIdAndUnitIdAndFlashcardId", 2, IsUnique = false)]
 		public string CourseId { get; set; }
 

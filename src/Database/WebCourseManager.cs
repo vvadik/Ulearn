@@ -30,6 +30,8 @@ namespace Database
 			Course course;
 			try
 			{
+				LoadCoursesIfNotYet();
+				CheckTempCoursesAndReloadIfNecessary(courseId);
 				course = base.GetCourse(courseId);
 			}
 			catch (Exception e) when (e is KeyNotFoundException || e is CourseNotFoundException || e is CourseLoadingException)
@@ -103,6 +105,45 @@ namespace Database
 				catch (Exception ex)
 				{
 					log.Error($"Не смог загрузить {zipFile.CourseId} из базы данных", ex);
+				}
+			}
+		}
+
+		public override IEnumerable<Course> GetCourses()
+		{
+			try
+			{
+				LoadCoursesIfNotYet();
+				CheckTempCoursesAndReloadIfNecessary(null);
+			}
+			catch (Exception e)
+			{
+				log.Error(e);
+			}
+			return base.GetCourses();
+		}
+
+		private void CheckTempCoursesAndReloadIfNecessary(string courseIdToUpdate = null)
+		{
+			var tempCoursesRepo = new TempCoursesRepo();
+			var tempCourses = tempCoursesRepo.GetTempCourses();
+			foreach (var tempCourse in tempCourses)
+			{
+				var courseId = tempCourse.CourseId;
+				Course course = null;
+				try
+				{
+					course = base.GetCourse(courseId); // Не используется FindCourse, иначе бесконечная рекурсия
+				}
+				catch (Exception ex)
+				{
+					// ignored
+				}
+				if (course == null || course.Slides.Count == 0
+					|| courseId == courseIdToUpdate && tempCourse.LastUpdateTime < tempCourse.LoadingTime)
+				{
+					ReloadCourse(courseId);
+					tempCoursesRepo.UpdateTempCourseLastUpdateTimeAsync(courseId).Wait();
 				}
 			}
 		}

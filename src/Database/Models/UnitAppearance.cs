@@ -10,7 +10,7 @@ namespace Database.Models
 		public int Id { get; set; }
 
 		[Required]
-		[StringLength(64)]
+		[StringLength(100)]
 		[Index("CourseAndTime", 1)]
 		public string CourseId { get; set; }
 

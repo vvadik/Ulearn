@@ -60,12 +60,12 @@ namespace Database.DataContexts
 
 		public IEnumerable<Comment> GetSlideComments(string courseId, Guid slideId)
 		{
-			return db.Comments.Where(x => x.SlideId == slideId && !x.IsDeleted);
+			return db.Comments.Where(x => x.CourseId == courseId && x.SlideId == slideId && !x.IsDeleted);
 		}
 
 		public IEnumerable<Comment> GetSlidesComments(string courseId, IEnumerable<Guid> slidesIds)
 		{
-			return db.Comments.Where(x => slidesIds.Contains(x.SlideId) && !x.IsDeleted);
+			return db.Comments.Where(x => x.CourseId == courseId && slidesIds.Contains(x.SlideId) && !x.IsDeleted);
 		}
 
 		public IEnumerable<Comment> GetCourseComments(string courseId)
@@ -143,7 +143,7 @@ namespace Database.DataContexts
 
 		public IEnumerable<int> GetSlideCommentsLikedByUser(string courseId, Guid slideId, string userId)
 		{
-			return db.CommentLikes.Where(x => x.UserId == userId && x.Comment.SlideId == slideId).Select(x => x.CommentId);
+			return db.CommentLikes.Where(x => x.UserId == userId && x.Comment.CourseId == courseId && x.Comment.SlideId == slideId).Select(x => x.CommentId);
 		}
 
 		public IEnumerable<int> GetCourseCommentsLikedByUser(string courseId, string userId)

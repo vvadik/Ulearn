@@ -15,13 +15,10 @@ namespace Ulearn.Core.Telegram
 
 		public ErrorsBot()
 		{
-			if (IsBotEnabled)
-			{
-				var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
-				channel = configuration.Telegram.Errors.Channel;
-				var serviceName = configuration.GraphiteServiceName ?? System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.ToLower();
-				metricSender = new MetricSender(serviceName);
-			}
+			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
+			channel = configuration.Telegram?.Errors?.Channel;
+			var serviceName = configuration.GraphiteServiceName ?? System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.ToLower();
+			metricSender = new MetricSender(serviceName);
 		}
 
 		public async Task PostToChannelAsync(string message, ParseMode parseMode = ParseMode.Default)

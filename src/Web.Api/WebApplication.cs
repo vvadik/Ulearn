@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -218,6 +219,11 @@ namespace Ulearn.Web.Api
 					var policyName = courseAccessType.GetAuthorizationPolicyName();
 					options.AddPolicy(policyName, policy => policy.Requirements.Add(new CourseAccessRequirement(courseAccessType)));
 				}
+			});
+
+			services.Configure<PasswordHasherOptions>(options =>
+			{
+				options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2;
 			});
 		}
 	}

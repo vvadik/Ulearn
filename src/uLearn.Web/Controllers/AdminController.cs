@@ -61,6 +61,7 @@ namespace uLearn.Web.Controllers
 		private readonly DirectoryInfo reposDirectory;
 		private readonly IAntiPlagiarismClient antiPlagiarismClient;
 		private readonly ILogger serilogLogger;
+		private readonly TempCoursesRepo tempCoursesReo;
 
 		public AdminController()
 		{
@@ -86,6 +87,7 @@ namespace uLearn.Web.Controllers
 			gitSecret = configuration.Git.Webhook.Secret;
 			var antiplagiarismClientConfiguration = ApplicationConfiguration.Read<UlearnConfiguration>().AntiplagiarismClient;
 			antiPlagiarismClient = new AntiPlagiarismClient(antiplagiarismClientConfiguration.Endpoint, antiplagiarismClientConfiguration.Token, serilogLogger);
+			tempCoursesReo = new TempCoursesRepo();
 		}
 
 		public ActionResult Courses(string courseId = null, string courseTitle = null)
@@ -107,7 +109,8 @@ namespace uLearn.Web.Controllers
 					{
 						Id = course.Id,
 						Title = course.Title,
-						LastWriteTime = courseManager.GetLastWriteTime(course.Id)
+						LastWriteTime = courseManager.GetLastWriteTime(course.Id),
+						IsTemp = IsTempCourse(course.Id)
 					})
 					.ToList(),
 				LastTryCourseId = courseId,
@@ -466,7 +469,14 @@ namespace uLearn.Web.Controllers
 		[ValidateInput(false)]
 		public ActionResult Packages(string courseId, string error = "")
 		{
+			if (IsTempCourse(courseId))
+				return null;
 			return PackagesInternal(courseId, error);
+		}
+
+		public bool IsTempCourse(string courseId)
+		{
+			return tempCoursesReo.Find(courseId) != null;
 		}
 
 		private ActionResult PackagesInternal(string courseId, string error = "", bool openStep1 = false, bool openStep2 = false)
@@ -808,8 +818,9 @@ namespace uLearn.Web.Controllers
 		[ChildActionOnly]
 		public ActionResult UsersPartial(UserSearchQueryModel queryModel)
 		{
+			var userRolesByEmail = User.IsSystemAdministrator() ? usersRepo.FilterUsersByEmail(queryModel) : null;
 			var userRoles = usersRepo.FilterUsers(queryModel);
-			var model = GetUserListModel(userRoles, queryModel.CourseId);
+			var model = GetUserListModel(userRolesByEmail.EmptyIfNull().Concat(userRoles).DistinctBy(r => r.UserId).ToList(), queryModel.CourseId);
 
 			return PartialView("_UserListPartial", model);
 		}
@@ -852,7 +863,8 @@ namespace uLearn.Web.Controllers
 							ToggleUrl = Url.Action("ToggleRole", "Account", new { courseId, userId = user.UserId, role = courseRole }),
 							UserName = user.UserVisibleName,
 							Role = courseRole,
-							CourseTitle = courseManager.FindCourse(courseId)?.Title
+							CourseTitle = courseManager.FindCourse(courseId)?.Title,
+							IsTempCourse =  IsTempCourse(courseId)
 						});
 
 				var courseAccesses = usersCourseAccesses.ContainsKey(user.UserId) ? usersCourseAccesses[user.UserId] : null;
@@ -867,7 +879,8 @@ namespace uLearn.Web.Controllers
 							ToggleUrl = Url.Action("ToggleCourseAccess", "Admin", new { courseId = courseId, userId = user.UserId, accessType = a }),
 							UserName = user.UserVisibleName,
 							AccessType = a,
-							CourseTitle = courseManager.FindCourse(courseId)?.Title
+							CourseTitle = courseManager.FindCourse(courseId)?.Title,
+							IsTempCourse = IsTempCourse(courseId)
 						}
 					);
 
@@ -883,11 +896,13 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public ActionResult Diagnostics(string courseId, Guid? versionId)
 		{
+			var isTempCourse = IsTempCourse(courseId);
 			if (versionId == null)
 			{
 				return View(new DiagnosticsModel
 				{
 					CourseId = courseId,
+					IsTempCourse = isTempCourse
 				});
 			}
 
@@ -907,8 +922,18 @@ namespace uLearn.Web.Controllers
 				IsDiagnosticsForVersion = true,
 				VersionId = versionIdGuid,
 				CourseDiff = courseDiff,
-				Warnings = warnings
+				Warnings = warnings,
+				IsTempCourse = isTempCourse
 			});
+		}
+
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
+		public ActionResult TempCourseDiagnostics(string courseId)
+		{
+			var authorId = tempCoursesReo.Find(courseId).AuthorId;
+			var baseCourseId = courseId.Replace($"_{authorId}", ""); // todo добавить поле baseCourseId в сущность tempCourse
+			var baseCourseVersion = coursesRepo.GetPublishedCourseVersion(baseCourseId).Id;
+			return RedirectToAction("Diagnostics", new {courseId, versionId = baseCourseVersion});
 		}
 
 		public static void CopyFilesRecursively(DirectoryInfo source, DirectoryInfo target)
@@ -1604,6 +1629,7 @@ namespace uLearn.Web.Controllers
 		public string Title { get; set; }
 		public string Id { get; set; }
 		public DateTime LastWriteTime { get; set; }
+		public bool IsTemp { get; set; }
 	}
 
 	public class PackagesViewModel
@@ -1665,5 +1691,6 @@ namespace uLearn.Web.Controllers
 		public Guid VersionId { get; set; }
 		public CourseDiff CourseDiff { get; set; }
 		public string Warnings { get; set; }
+		public bool IsTempCourse { get; set; }
 	}
 }

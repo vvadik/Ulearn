@@ -11,7 +11,7 @@ namespace Database.Models
 		public int Id { get; set; }
 
 		[Required]
-		[StringLength(64)]
+		[StringLength(100)]
 		[Index("IDX_AdditionalScore_ByCourseAndUser", 1)]
 		[Index("IDX_AdditionalScore_ByCourseUnitScoringGroupAndUser", 1, IsUnique = true)]
 		public string CourseId { get; set; }

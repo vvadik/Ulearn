@@ -135,6 +135,8 @@ namespace Ulearn.Web.Api.Controllers
 			if (!canEditGit)
 				return s => null;
 			var publishedCourseVersion = await coursesRepo.GetPublishedCourseVersionAsync(course.Id);
+			if (publishedCourseVersion == null)
+				return s => null;
 			var repoUrl = publishedCourseVersion.RepoUrl;
 			var pathToCourseXml = publishedCourseVersion.PathToCourseXml;
 			if (repoUrl == null || pathToCourseXml == null)

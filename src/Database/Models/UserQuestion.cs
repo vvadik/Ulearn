@@ -36,7 +36,7 @@ namespace Database.Models
 		[Required]
 		public Guid SlideId { get; set; }
 
-		[StringLength(64)]
+		[StringLength(100)]
 		public string CourseId { get; set; }
 
 		[Required]

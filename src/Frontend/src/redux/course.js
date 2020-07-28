@@ -6,6 +6,7 @@ import {
 	COURSES__FLASHCARDS_RATE,
 	COURSES__SLIDE_READY,
 	START, SUCCESS, FAIL,
+	COURSES__COURSE_LOAD_ERRORS,
 } from '../consts/actions';
 import { rateTypes } from "../consts/rateTypes";
 import { flashcards as flashcardsSlideType } from "../consts/routes";
@@ -49,6 +50,17 @@ export default function courses(state = initialCoursesState, action) {
 				fullCoursesInfo: {
 					...state.fullCoursesInfo,
 					[action.courseId]: action.result,
+				}
+			};
+		case COURSES__COURSE_LOAD_ERRORS:
+			return {
+				...state,
+				fullCoursesInfo: {
+					...state.fullCoursesInfo,
+					[action.courseId]: {
+						...state.fullCoursesInfo[action.courseId],
+						tempCourseError: action.result
+					},
 				}
 			};
 		case COURSES__COURSE_LOAD + FAIL:

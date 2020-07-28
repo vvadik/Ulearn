@@ -22,7 +22,7 @@ namespace Database.Models
 		public int HintId { get; set; }
 
 		[Required]
-		[StringLength(64)]
+		[StringLength(100)]
 		public string CourseId { get; set; }
 
 		[Required]

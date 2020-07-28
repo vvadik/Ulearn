@@ -84,8 +84,10 @@
 		<ol>
 			@foreach (var course in Model.UserCourses)
 			{
+				var isTempCourse = Model.TempCoursesIds.Contains(course.Id);
+				var isTempLabel = isTempCourse ? "Временный - " : "";
 				<li>
-					@Html.ActionLink(course.Title, "CourseInfo", new { userId = Model.User.Id, courseId = course.Id })
+					@Html.ActionLink(isTempLabel + course.Title, "CourseInfo", new { userId = Model.User.Id, courseId = course.Id })
 					@if (!string.IsNullOrEmpty(Model.CourseGroups[course.Id]))
 					{
 						<div title="Группы, в которых состоит студент">
@@ -116,10 +118,12 @@
 			}
 			@foreach (var courseId in courseIds)
 			{
+				var isTempCourse = Model.TempCoursesIds.Contains(courseId);
 				if (Model.AllCourses.TryGetValue(courseId, out var course))
 				{
+					var isTempLAbel = isTempCourse ? "Временный - " : "";
 					<li>
-						@Html.ActionLink(course.Title, "ToggleRolesHistory", new { userId = Model.User.Id, courseId = course.Id })
+						@Html.ActionLink(isTempLAbel + course.Title, "ToggleRolesHistory", new { userId = Model.User.Id, courseId = course.Id })
 					</li>
 				}
 			}

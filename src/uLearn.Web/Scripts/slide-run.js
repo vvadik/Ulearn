@@ -41,6 +41,9 @@ function setResults(ans) {
 	else if (ans.IsCompillerFailure) setSimpleResult($serviceError, ans.ErrorMessage);
 	else if (ans.IsCompileError) setSimpleResult($compileError, ans.ErrorMessage);
 	else if (ans.IsRightAnswer) {
+		if(window.reloadUserProgress){
+			window.reloadUserProgress();
+		}
 		if (ans.SubmissionId > 0)
 			setExerciseVersion(ans.SubmissionId, true);
 		else /* for course monitor tool */
@@ -54,9 +57,6 @@ function setResults(ans) {
 		setSimpleResult($waErrorNoDiff, ans.ActualOutput);
 	else
 		setWA(ans.ExpectedOutput, ans.ActualOutput);
-	if(window.reloadUserProgress){
-		window.reloadUserProgress();
-	}
 }
 
 window.documentReadyFunctions = window.documentReadyFunctions || [];

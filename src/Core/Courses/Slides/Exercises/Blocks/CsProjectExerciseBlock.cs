@@ -173,13 +173,13 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		{
 			log.Info($"Собираю zip-архив для проверки: курс {CourseId}, слайд «{Slide?.Title}» ({Slide?.Id})");
 			var excluded = (PathsToExcludeForChecker ?? new string[0])
-				.Concat(new[] { "bin/*", "obj/*" })
+				.Concat(new[] { "/bin/", "/obj/", ".idea/", ".vs/" })
 				.ToList();
 
 			var toUpdate = GetAdditionalFiles(excluded).ToList();
 			log.Info($"Собираю zip-архив для проверки: дополнительные файлы [{string.Join(", ", toUpdate.Select(c => c.Path))}]");
 
-			var ms = ToZip(ExerciseFolder, excluded, toUpdate);
+			var ms = ZipUtils.CreateZipFromDirectory(new List<string> { ExerciseFolder.FullName }, excluded, toUpdate, Encoding.UTF8);
 			log.Info($"Собираю zip-архив для проверки: zip-архив собран, {ms.Length} байтов");
 			return ms;
 		}

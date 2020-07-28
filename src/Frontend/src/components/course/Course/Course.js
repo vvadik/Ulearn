@@ -54,7 +54,7 @@ class Course extends Component {
 	}
 
 	componentDidMount() {
-		const { loadCourse, loadUserProgress, courseId, courseInfo, progress, user, } = this.props;
+		const { loadCourse, loadUserProgress, loadCourseErrors, courseId, courseInfo, progress, user, } = this.props;
 		const { title } = this.state;
 		const { isAuthenticated } = user;
 
@@ -62,6 +62,8 @@ class Course extends Component {
 			loadCourse(courseId);
 		} else {
 			this.updateWindowMeta(title, courseInfo.title);
+			if(courseInfo.isTempCourse)
+				loadCourseErrors(courseId);
 		}
 
 		if(isAuthenticated && !progress) {
@@ -74,7 +76,7 @@ class Course extends Component {
 	}
 
 	componentDidUpdate(prevProps, prevState) {
-		const { loadUserProgress, courseId, loadCourse, user, courseInfo, } = this.props;
+		const { loadUserProgress, courseId, loadCourse, user, courseInfo, loadCourseErrors } = this.props;
 		const { title, currentSlideInfo, showForStudents, currentSlideId, } = this.state;
 		const { isAuthenticated } = user;
 
@@ -86,6 +88,8 @@ class Course extends Component {
 
 		if(title !== prevState.title) {
 			this.updateWindowMeta(title, courseInfo.title);
+			if(courseInfo.isTempCourse)
+				loadCourseErrors(courseId);
 		}
 		if((currentSlideId !== prevState.currentSlideId || showForStudents !== prevState.showForStudents) && currentSlideInfo.current.type === SLIDETYPE.exercise) {
 			if(showForStudents) {
@@ -192,7 +196,7 @@ class Course extends Component {
 				className={ classnames(styles.root, { 'open': navigationOpened }, { [styles.withoutMinHeight]: !isNavMenuVisible }) }>
 				{ this.renderMeta(meta) }
 				{ isNavMenuVisible && this.renderNavigation() }
-				{ this.renderSlide() }
+				{ courseInfo.tempCourseError ? <div className={ classnames(styles.errors) } >{courseInfo.tempCourseError}</div> : this.renderSlide() }
 			</div>
 		);
 	}
@@ -576,6 +580,7 @@ Course
 	units: PropTypes.object,
 	enterToCourse: PropTypes.func,
 	loadCourse: PropTypes.func,
+	loadCourseErrors: PropTypes.func,
 	loadUserProgress: PropTypes.func,
 	updateVisitedSlide: PropTypes.func,
 	navigationOpened: PropTypes.bool,

@@ -46,7 +46,8 @@ namespace Database.Repos
 				.ToListAsync();
 		}
 
-		public async Task<CourseVersion> AddCourseVersionAsync(string courseId, Guid versionId, string authorId)
+		public async Task<CourseVersion> AddCourseVersionAsync(string courseId, Guid versionId, string authorId,
+			string pathToCourseXml, string repoUrl, string commitHash, string description)
 		{
 			var courseVersion = new CourseVersion
 			{
@@ -55,6 +56,10 @@ namespace Database.Repos
 				LoadingTime = DateTime.Now,
 				PublishTime = null,
 				AuthorId = authorId,
+				PathToCourseXml = pathToCourseXml,
+				CommitHash = commitHash,
+				Description = description,
+				RepoUrl = repoUrl
 			};
 			db.CourseVersions.Add(courseVersion);
 			await db.SaveChangesAsync().ConfigureAwait(false);

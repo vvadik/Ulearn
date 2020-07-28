@@ -15,7 +15,7 @@ namespace Database.Models
 		public string UserId { get; set; }
 
 		[Required]
-		[StringLength(64)]
+		[StringLength(100)]
 		public string CourseId { get; set; }
 
 		[Required]
@@ -27,6 +27,7 @@ namespace Database.Models
 
 		public int Score { get; set; }
 		public bool HasManualChecking { get; set; }
+		[Obsolete("Фактически не используется")]
 		public int AttemptsCount { get; set; }
 		public bool IsSkipped { get; set; }
 		public bool IsPassed { get; set; }

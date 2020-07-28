@@ -171,7 +171,7 @@ namespace uLearn.Web.Controllers
 
 			var topUserReviewComments = slideCheckingsRepo.GetTopUserReviewComments(courseId, slideId, userId, 20);
 			var topOtherUsersReviewComments = slideCheckingsRepo.GetTopOtherUsersReviewComments(courseId, slideId, userId, 10, topUserReviewComments);
-			return PartialView("_TopUserReviewComments", new ExerciseBlockData(courseId, slide)
+			return PartialView("_TopUserReviewComments", new ExerciseBlockData(courseId, slide, false)
 			{
 				TopUserReviewComments = topUserReviewComments,
 				TopOtherUsersReviewComments = topOtherUsersReviewComments,
@@ -408,7 +408,7 @@ namespace uLearn.Web.Controllers
 				userSolutionsRepo.GetAllAcceptedSubmissionsByUser(course.Id, slide.Id, userId) :
 				userSolutionsRepo.GetAllSubmissionsByUser(course.Id, slide.Id, userId);
 
-			return new ExerciseBlockData(course.Id, (ExerciseSlide)slide, visit?.IsSkipped ?? false, solution)
+			return new ExerciseBlockData(course.Id, (ExerciseSlide)slide, (visit?.IsSkipped ?? false) || (visit?.IsPassed ?? false), solution)
 			{
 				Url = Url,
 				Reviews = submissionReviews?.ToList() ?? new List<ExerciseCodeReview>(),
@@ -725,13 +725,13 @@ namespace uLearn.Web.Controllers
 
 	public class ExerciseScoreFormModel
 	{
-		public ExerciseScoreFormModel(string courseId, ExerciseSlide slide, ManualExerciseChecking checking, int manualCheckingsLeft, List<string> groupsIds = null,
+		public ExerciseScoreFormModel(string courseId, ExerciseSlide slide, ManualExerciseChecking checking, int manualCheckingsLeftInQueueInQueue, List<string> groupsIds = null,
 			bool isCurrentSubmissionChecking = false, bool defaultProhibitFurtherReview = true)
 		{
 			CourseId = courseId;
 			Slide = slide;
 			Checking = checking;
-			ManualCheckingsLeft = manualCheckingsLeft;
+			ManualCheckingsLeftInQueue = manualCheckingsLeftInQueueInQueue;
 			GroupsIds = groupsIds;
 			IsCurrentSubmissionChecking = isCurrentSubmissionChecking;
 			DefaultProhibitFurtherReview = defaultProhibitFurtherReview;
@@ -744,7 +744,7 @@ namespace uLearn.Web.Controllers
 		public string GroupsIdsJoined => string.Join(",", GroupsIds ?? new List<string>());
 		public bool IsCurrentSubmissionChecking { get; set; }
 		public bool DefaultProhibitFurtherReview { get; set; }
-		public int ManualCheckingsLeft { get; set; }
+		public int ManualCheckingsLeftInQueue { get; set; }
 	}
 
 	public class ExerciseLastReviewCommentModel

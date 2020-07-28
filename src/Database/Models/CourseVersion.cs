@@ -10,7 +10,7 @@ namespace Database.Models
 		public Guid Id { get; set; }
 
 		[Required]
-		[StringLength(64)]
+		[StringLength(100)]
 		[Index("IDX_CourseVersion_ByCourseAndPublishTime", 1)]
 		[Index("IDX_CourseVersion_ByCourseAndLoadingTime", 1)]
 		public string CourseId { get; set; }

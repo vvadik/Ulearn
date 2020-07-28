@@ -14,7 +14,7 @@ namespace Database.Models
 		public virtual int Id { get; set; }
 
 		[Required]
-		[StringLength(64)]
+		[StringLength(100)]
 		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlide", 1)]
 		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndTime", 1)]
 		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndUser", 1)]
@@ -168,6 +168,8 @@ namespace Database.Models
 		public override int Id { get; set; }
 
 		public virtual UserQuizSubmission Submission { get; set; }
+
+		public bool IgnoreInAttemptsCount { get; set; }
 	}
 
 	public class ManualQuizChecking : AbstractManualSlideChecking
@@ -177,5 +179,7 @@ namespace Database.Models
 		public override int Id { get; set; }
 
 		public virtual UserQuizSubmission Submission { get; set; }
+
+		public bool IgnoreInAttemptsCount { get; set; }
 	}
 }

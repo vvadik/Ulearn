@@ -121,7 +121,7 @@ namespace Ulearn.Core.Tests.Courses.Slides
 
 			var firstBlock = (HtmlBlock)slide.Blocks[0];
 			Assert.IsTrue(firstBlock.Content.Contains("Abracadabra"));
-			Assert.IsTrue(firstBlock.Content.Contains("<br>"));
+			Assert.IsTrue(firstBlock.Content.Contains("<br />"));
 			Assert.IsTrue(firstBlock.Content.Contains("Second text"));
 		}
 
