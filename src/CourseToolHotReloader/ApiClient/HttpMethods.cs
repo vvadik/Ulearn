@@ -45,6 +45,10 @@ namespace CourseToolHotReloader.ApiClient
 			{
 				ThrowExceptionIfBadCode(response);
 			}
+			catch (UnauthorizedException)
+			{
+				return null;
+			}
 			catch (ForbiddenException)
 			{
 				return null;
@@ -62,6 +66,10 @@ namespace CourseToolHotReloader.ApiClient
 			try
 			{
 				ThrowExceptionIfBadCode(response);
+			}
+			catch (UnauthorizedException)
+			{
+				return null;
 			}
 			catch (ForbiddenException)
 			{

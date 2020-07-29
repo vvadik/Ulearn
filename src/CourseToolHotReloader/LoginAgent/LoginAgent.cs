@@ -36,6 +36,11 @@ namespace CourseToolHotReloader.LoginAgent
 			var password = new NetworkCredential(string.Empty, ConsoleWorker.GetPassword()).Password;
 
 			var jwtToken = await ulearnApiClient.Login(login, password);
+			if (jwtToken != null)
+			{
+				config.JwtToken = jwtToken;
+				jwtToken = await ulearnApiClient.RenewToken(); // Чтобы получить токен на больший срок
+			}
 
 			return TrySetJwtTokenInConfig(jwtToken);
 		}
@@ -52,7 +57,7 @@ namespace CourseToolHotReloader.LoginAgent
 
 		private bool TrySetJwtTokenInConfig(string jwtToken)
 		{
-			if (jwtToken is null)
+			if (jwtToken == null)
 				return false;
 
 			config.JwtToken = jwtToken;

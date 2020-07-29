@@ -52,9 +52,13 @@ namespace CourseToolHotReloader
 						break;
 					case ForbiddenException _:
 						ConsoleWorker.WriteError("Сервер вернул код 403. Нет прав на операцию. Перезапустите программу и войдите повторно");
+						config.JwtToken = null;
+						config.Flush();
 						break;
 					case UnauthorizedException _:
 						ConsoleWorker.WriteError("Сервер вернул код 401. Срок авторизации истек. Перезапустите программу и войдите повторно");
+						config.JwtToken = null;
+						config.Flush();
 						break;
 					case StatusCodeException ee:
 						ConsoleWorker.WriteError($"Сервер вернул код {ee.StatusCode}");
