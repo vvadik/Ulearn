@@ -123,7 +123,6 @@ class Header extends Component {
 					{ !initializing && this.renderUserRoleMenu() }
 					<Hijack name={ account.visibleName }/>
 				</div>
-				<div className={ styles.headerDivider }/>
 			</React.Fragment>
 		)
 	}

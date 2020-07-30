@@ -237,6 +237,14 @@
   }
 }
 
+.header:after {
+  width: 100vw;
+  content: '';
+  display: block;
+  height: @headerDividerHeight;
+  background-color: @backgroundGray;
+}
+
 .dropdown-container {
   background-color: white;
   border: 1px solid #d5d5d5;
@@ -312,25 +320,12 @@
   padding-right: 5px;
 }
 
-.headerDivider{
-  position: fixed;
-
-  z-index: @headerZIndex;
-
-  height: @headerDividerHeight;
-  width: 100vw;
-
-  top: @headerHeight;
-
-  background-color: @backgroundGray;
-}
-
 @media (min-width: @minLaptopWidth) {
   .phoneHeaderElementsContainer {
     display: none;
   }
 
-  .visible-at-least-tablet{
+  .visible-at-least-tablet {
     display: inline-flex;
   }
 }
