@@ -34,7 +34,7 @@ namespace CourseToolHotReloader.UpdateQuery
 			if (errors.ErrorType != ErrorType.NoErrors)
 				ConsoleWorker.WriteErrorWithTime("Ошибка загрузки изменений. " + errors.Message);
 			else
-				ConsoleWorker.WriteLineWithTime("Изменения загружены без ошибок. Обновите страницу браузера и увидите результат");
+				ConsoleWorker.WriteLineWithTime("Изменения загружены без ошибок");
 
 			courseUpdateQuery.Clear();
 		}
@@ -48,7 +48,7 @@ namespace CourseToolHotReloader.UpdateQuery
 			if (errors.ErrorType != ErrorType.NoErrors)
 				ConsoleWorker.WriteErrorWithTime("Ошибка загрузки курса. " + errors.Message);
 			else
-				ConsoleWorker.WriteLineWithTime("Курс загружен без ошибок. Обновите страницу браузера и увидите результат");
+				ConsoleWorker.WriteLineWithTime("Курс загружен без ошибок");
 		}
 	}
 }

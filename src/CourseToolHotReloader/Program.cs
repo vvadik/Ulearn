@@ -145,8 +145,8 @@ namespace CourseToolHotReloader
 			var tempCourseUpdateResponse = await ulearnApiClient.SendFullCourse(config.Path, config.CourseId, config.ExcludeCriterias);
 			if (tempCourseUpdateResponse.ErrorType == ErrorType.NoErrors)
 			{
-				ConsoleWorker.WriteLine("Первоначальная полная загрузка курса прошла успешно. Обновите страницу браузера, и вы увидете временный курс в выпадающем меню");
-				ConsoleWorker.WriteLine("Не закрывайте программу и редактируйте файлы курса у себя на компьютере. Сделанные изменения будут автоматически загружаться на ulearn");
+				ConsoleWorker.WriteLine("Первоначальная полная загрузка курса прошла успешно. Обновите страницу браузера, и вы увидете временный курс в выпадающем меню Мои курсы");
+				ConsoleWorker.WriteLine("Не закрывайте программу и редактируйте файлы курса у себя на компьютере. Сделанные изменения будут автоматически загружаться на ulearn. Перезагрузите страницу браузера, чтоб увидеть результат");
 			}
 			else
 			{
