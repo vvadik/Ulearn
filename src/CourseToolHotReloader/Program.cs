@@ -119,14 +119,15 @@ namespace CourseToolHotReloader
 			config.ExcludeCriterias = ReadCourseConfig()?.CourseToolHotReloader?.ExcludeCriterias;
 
 			await SendFullCourse();
-			OpenInBrowser();
+			var tempCourseId = GetTmpCourseId(config.CourseId, userId);
+			OpenInBrowser(tempCourseId);
 
 			StartWatch();
 		}
 
-		private static void OpenInBrowser()
+		private static void OpenInBrowser(string tempCourseId)
 		{
-			var courseUrl = $"{config.SiteUrl}/Course/{config.CourseId}";
+			var courseUrl = $"{config.SiteUrl}/Course/{tempCourseId}";
 			Process.Start(new ProcessStartInfo(courseUrl) { UseShellExecute = true }); // https://stackoverflow.com/a/61035650/6800354
 		}
 
