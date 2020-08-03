@@ -244,7 +244,7 @@ class DownloadedHtmlContent extends Component {
 
 	downloadFile(blob, filename) {
 		saveAs(blob, filename, false);
-		this.props.history.back();
+		this.props.history.goBack();
 	}
 
 	render() {
