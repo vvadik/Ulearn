@@ -43,7 +43,7 @@ class Spoiler extends React.Component {
 			return (
 				<React.Fragment>
 					{ this.getBlocksWithStyles(blocks) }
-					{ true &&
+					{ closable &&
 					<BlocksWrapper
 						withoutTopPaddings
 						isBlock={ isPreviousBlockHidden !== undefined }
