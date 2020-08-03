@@ -18,7 +18,7 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 		[DataMember(Name = "hideQuizButton", EmitDefaultValue = false)]
 		public bool HideQuizButton { get; set; }
 
-		[DataMember(Name = "hideQuizButton")]
+		[DataMember(Name = "closable")]
 		public bool Closable { get; set; }
 
 		[DataMember(Name = "blocks")]
