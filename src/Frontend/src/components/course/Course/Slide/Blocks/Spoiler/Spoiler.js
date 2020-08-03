@@ -4,6 +4,8 @@ import PropTypes from "prop-types";
 import { BlocksWrapper } from "src/components/course/Course/Slide/Blocks";
 import { Button } from "@skbkontur/react-ui";
 
+const closeButtonText = "Свернуть спойлер";
+
 class Spoiler extends React.Component {
 	constructor(props) {
 		super(props);
@@ -27,12 +29,32 @@ class Spoiler extends React.Component {
 		});
 	}
 
+	hideContent = () => {
+		this.setState({
+			contentVisible: false,
+		});
+	}
+
 	render = () => {
-		const { text, blocks, isHidden, isPreviousBlockHidden, } = this.props;
+		const { text, blocks, isHidden, isPreviousBlockHidden, closable, } = this.props;
 		const { contentVisible, } = this.state;
 
 		if(contentVisible) {
-			return this.getBlocksWithStyles(blocks);
+			return (
+				<React.Fragment>
+					{ this.getBlocksWithStyles(blocks) }
+					{ true &&
+					<BlocksWrapper
+						withoutTopPaddings
+						isBlock={ isPreviousBlockHidden !== undefined }
+						isHidden={ isHidden }
+						showEyeHint={ isHidden && !isPreviousBlockHidden }
+					>
+						<Button use="success" onClick={ this.hideContent }>{ closeButtonText }</Button>
+					</BlocksWrapper>
+					}
+				</React.Fragment>
+			)
 		}
 
 		return (
@@ -72,6 +94,7 @@ Spoiler.propTypes = {
 	blocksId: PropTypes.string.isRequired,
 	isPreviousBlockHidden: PropTypes.bool,
 	isHidden: PropTypes.bool,
+	closable: PropTypes.bool,
 };
 
 export default Spoiler;
