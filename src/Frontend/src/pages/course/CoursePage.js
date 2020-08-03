@@ -26,6 +26,8 @@ const mapStateToProps = (state, { match }) => {
 	const courseInfo = state.courses.fullCoursesInfo[courseId];
 	const isReview = params.CheckQueueItemId !== undefined;
 	const isNavMenuVisible = !isLti && !isReview && (courseInfo == null || courseInfo.tempCourseError == null);
+	const isAcceptedSolutions = slideSlugOrAction.toLowerCase() === acceptedSolutions;
+
 	return {
 		courseId,
 		slideId,
@@ -38,6 +40,7 @@ const mapStateToProps = (state, { match }) => {
 		navigationOpened: state.navigation.opened,
 		courseLoadingErrorStatus: state.courses.courseLoadingErrorStatus,
 		isHijacked: state.userProgress.isHijacked,
+		isAcceptedSolutions,
 	};
 };
 const mapDispatchToProps = (dispatch) => ({

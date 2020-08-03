@@ -257,8 +257,8 @@ class Course extends Component {
 
 	renderNavigationButtons(slideInfo) {
 		const { courseId, } = this.props;
-		const { previous, next, current, } = slideInfo;
-		const prevSlideHref = previous ? constructPathToSlide(courseId, previous.slug) : null;
+		const { next, current, } = slideInfo;
+		const prevSlideHref = this.getPreviousSlideUrl(slideInfo);
 		const nextSlideHref = next ? constructPathToSlide(courseId, next.slug) : null;
 
 		const previousButtonText = current.firstInModule ? slideNavigationButtonTitles.previousModule : slideNavigationButtonTitles.previous;
@@ -289,6 +289,19 @@ class Course extends Component {
 				}
 			</div>
 		);
+	}
+
+	getPreviousSlideUrl = (slideInfo) => {
+		const { courseId, isAcceptedSolutions, } = this.props;
+		const { previous, current, } = slideInfo;
+
+		if(isAcceptedSolutions) {
+			return constructPathToSlide(courseId, current.slug);
+		}
+
+		return previous
+			? constructPathToSlide(courseId, previous.slug)
+			: null;
 	}
 
 	constructPathWithAutoplay = (baseHref) => {
@@ -543,6 +556,7 @@ Course
 	updateVisitedSlide: PropTypes.func,
 	navigationOpened: PropTypes.bool,
 	courseLoadingErrorStatus: PropTypes.number,
+	isAcceptedSolutions: PropTypes.bool,
 };
 
 export default Course;
