@@ -90,7 +90,7 @@ class Course extends Component {
 				loadCourseErrors(courseId);
 		}
 
-		if(!prevProps.progress && progress && !isHijacked) {
+		if(!prevProps.progress && progress && !isHijacked && currentSlideInfo) {
 			updateVisitedSlide(courseId, currentSlideInfo.current.id);
 		}
 	}
