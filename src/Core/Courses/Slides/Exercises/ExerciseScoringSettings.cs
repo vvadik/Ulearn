@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.Xml.Serialization;
+using Ulearn.Common;
 
 namespace Ulearn.Core.Courses.Slides.Exercises
 {

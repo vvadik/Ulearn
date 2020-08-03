@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using AntiPlagiarism.Api.Models.Parameters;
 using AntiPlagiarism.Api.Models.Results;
 using AntiPlagiarism.Web.CodeAnalyzing;
-using AntiPlagiarism.Web.CodeAnalyzing.CSharp;
 using AntiPlagiarism.Web.Configuration;
 using AntiPlagiarism.Web.Database;
 using AntiPlagiarism.Web.Database.Models;
@@ -16,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Serilog;
+using Ulearn.Common;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
 
@@ -72,7 +72,7 @@ namespace AntiPlagiarism.Web.Controllers
 			if (parameters.Code.Length > configuration.AntiPlagiarism.MaxCodeLength)
 				return BadRequest(new ErrorResponse($"Code is too long. Maximum length is {configuration.AntiPlagiarism.MaxCodeLength} bytes"));
 
-			var tokensCount = GetTokensCount(parameters.Code);
+			var tokensCount = GetTokensCount(parameters.Code, parameters.Language);
 			var submission = await submissionsRepo.AddSubmissionAsync(
 				client.Id,
 				parameters.TaskId,
@@ -101,9 +101,9 @@ namespace AntiPlagiarism.Web.Controllers
 			};
 		}
 
-		private int GetTokensCount(string code)
+		private int GetTokensCount(string code, Language language)
 		{
-			var codeUnits = codeUnitsExtractor.Extract(code);
+			var codeUnits = codeUnitsExtractor.Extract(code, language);
 			return codeUnits.Select(u => u.Tokens.Count).Sum();
 		}
 
@@ -177,7 +177,7 @@ namespace AntiPlagiarism.Web.Controllers
 			{
 				SubmissionInfo = submission.GetSubmissionInfoForApi(),
 				Plagiarisms = await plagiarismDetector.GetPlagiarismsAsync(submission, suspicionLevels, configuration.AntiPlagiarism.SubmissionInfluenceLimitInMonths).ConfigureAwait(false),
-				TokensPositions = plagiarismDetector.GetNeededTokensPositions(submission.ProgramText),
+				TokensPositions = plagiarismDetector.GetNeededTokensPositions(submission.ProgramText, submission.Language),
 				SuspicionLevels = suspicionLevels,
 				AnalyzedCodeUnits = GetAnalyzedCodeUnits(submission),
 			};
@@ -213,7 +213,7 @@ namespace AntiPlagiarism.Web.Controllers
 					{
 						SubmissionInfo = submission.GetSubmissionInfoForApi(),
 						Plagiarisms = await internalPlagiarismDetector.GetPlagiarismsAsync(submission, suspicionLevels, configuration.AntiPlagiarism.SubmissionInfluenceLimitInMonths).ConfigureAwait(false),
-						TokensPositions = internalPlagiarismDetector.GetNeededTokensPositions(submission.ProgramText),
+						TokensPositions = internalPlagiarismDetector.GetNeededTokensPositions(submission.ProgramText, submission.Language),
 						AnalyzedCodeUnits = GetAnalyzedCodeUnits(submission),
 					});
 				}
@@ -222,9 +222,10 @@ namespace AntiPlagiarism.Web.Controllers
 			return Json(result);
 		}
 
+		// TODO
 		private List<AnalyzedCodeUnit> GetAnalyzedCodeUnits(Submission submission)
 		{
-			var codeUnits = codeUnitsExtractor.Extract(submission.ProgramText);
+			var codeUnits = codeUnitsExtractor.Extract(submission.ProgramText, submission.Language);
 			return codeUnits.Select(
 				u => new AnalyzedCodeUnit
 				{

@@ -1,5 +1,4 @@
 using AntiPlagiarism.Web.CodeAnalyzing;
-using AntiPlagiarism.Web.CodeAnalyzing.CSharp;
 using AntiPlagiarism.Web.Configuration;
 using AntiPlagiarism.Web.Database;
 using AntiPlagiarism.Web.Database.Repos;
@@ -64,12 +63,14 @@ namespace AntiPlagiarism.Web
 			/* Other services */
 			services.AddScoped<PlagiarismDetector>();
 			services.AddScoped<StatisticsParametersFinder>();
-			services.AddSingleton<CodeUnitsExtractor>();
+			services.AddSingleton<CSharpCodeUnitsExtractor>();
 			services.AddScoped<SnippetsExtractor>();
 			services.AddScoped<SubmissionSnippetsExtractor>();
 			services.AddScoped<NewSubmissionHandler>();
 			services.AddSingleton<AddNewSubmissionWorker>();
 			services.AddSingleton<UpdateOldSubmissionsFromStatisticsWorker>();
+			services.AddSingleton<TokensExtractor>();
+			services.AddSingleton<CodeUnitsExtractor>();
 		}
 	}
 }

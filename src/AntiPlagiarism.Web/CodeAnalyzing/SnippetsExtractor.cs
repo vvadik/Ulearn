@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using AntiPlagiarism.Web.CodeAnalyzing.Hashers;
 using AntiPlagiarism.Web.Database.Models;
-using Microsoft.CodeAnalysis;
 
 namespace AntiPlagiarism.Web.CodeAnalyzing
 {
@@ -31,7 +30,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 		{
 		}
 
-		public IEnumerable<Snippet> GetSnippets(IEnumerable<SyntaxToken> tokens, int snippetTokensCount, ITokenInSnippetConverter converter)
+		public IEnumerable<Snippet> GetSnippets(IEnumerable<IToken> tokens, int snippetTokensCount, ITokenInSnippetConverter converter)
 		{
 			if (snippetTokensCount <= 0)
 				throw new ArgumentException("Tokens count in snippet must be positive", nameof(snippetTokensCount));

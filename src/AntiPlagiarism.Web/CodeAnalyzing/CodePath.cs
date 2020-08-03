@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AntiPlagiarism.Web.CodeAnalyzing.CSharp
+namespace AntiPlagiarism.Web.CodeAnalyzing
 {
 	public class CodePath
 	{

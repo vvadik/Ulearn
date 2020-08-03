@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.Serialization;
+using Ulearn.Common;
 using Ulearn.Core;
 using Ulearn.Core.Courses.Slides.Blocks;
 

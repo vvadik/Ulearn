@@ -3,38 +3,59 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Ulearn.Common.Extensions;
 
-namespace Ulearn.Core
+namespace Ulearn.Common
 {
+	[JsonConverter(typeof(StringEnumConverter), true)]
 	public enum Language : short
 	{
 		[XmlEnum("csharp")]
+		[Lexer("csharp")]
 		CSharp = 1,
 
 		[XmlEnum("python2")]
+		[Lexer("py2")]
 		Python2 = 2,
 
 		[XmlEnum("python3")]
+		[Lexer("py3")]
 		Python3 = 3,
 
 		[XmlEnum("java")]
+		[Lexer("java")]
 		Java = 4,
 
 		[XmlEnum("javascript")]
+		[Lexer("js")]
 		JavaScript = 5,
 
 		[XmlEnum("html")]
+		[Lexer("html")]
 		Html = 6,
 
 		[XmlEnum("typescript")]
+		[Lexer("ts")]
 		TypeScript = 7,
 
 		[XmlEnum("css")]
+		[Lexer("css")]
 		Css = 8,
 
 		[XmlEnum("text")]
+		[Lexer("text")]
 		Text = 100,
+	}
+
+	public class LexerAttribute : Attribute
+	{
+		public readonly string lexer;
+		public LexerAttribute(string lexer)  
+		{  
+			this.lexer = lexer;
+		}  
 	}
 
 	public static class LanguageHelpers

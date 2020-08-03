@@ -2,6 +2,7 @@
 using System.Collections.Immutable;
 using System.IO;
 using System.Xml.Serialization;
+using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Model;

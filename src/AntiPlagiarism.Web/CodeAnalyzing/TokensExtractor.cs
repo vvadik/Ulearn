@@ -11,22 +11,9 @@ using JetBrains.Annotations;
 using Serilog;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
-using Ulearn.Core;
 
 namespace AntiPlagiarism.Web.CodeAnalyzing
 {
-	public class Token
-	{
-		public string Type;
-		public string Value;
-		public int Position;
-
-		public override string ToString()
-		{
-			return $"{Type} {Value}";
-		}
-	}
-
 	public class TokensExtractor
 	{
 		private readonly ILogger logger;
@@ -36,14 +23,21 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			this.logger = logger;
 		}
 
-		public static IEnumerable<Token> FilterWhitespaceTokens(IEnumerable<Token> tokens)
+		private static IEnumerable<Token> FilterWhitespaceTokens(IEnumerable<Token> tokens)
 		{
 			return tokens.Where(t => !string.IsNullOrWhiteSpace(t.Value));
 		}
 
-		public static IEnumerable<Token> FilterCommentTokens(IEnumerable<Token> tokens)
+		private static IEnumerable<Token> FilterCommentTokens(IEnumerable<Token> tokens)
 		{
 			return tokens.Where(t => !t.Type.StartsWith("Comment"));
+		}
+
+		[NotNull]
+		public List<Token> GetFilteredTokensFromPygmentize(string code, Language language)
+		{
+			var tokens = GetAllTokensFromPygmentize(code, language).EmptyIfNull();
+			return FilterCommentTokens(FilterWhitespaceTokens(tokens)).ToList();
 		}
 
 		[CanBeNull]
@@ -143,7 +137,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 
 		private string GetPygmentizeResult(string code, Language language)
 		{
-			var lexer = LanguageToLexer(language);
+			var lexer = language.GetAttribute<LexerAttribute>().lexer;
 			var arguments = lexer == null ? "-g" : $"-l {lexer}";
 			arguments += " -f tokens";
 
@@ -220,33 +214,6 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 					UseShellExecute = false
 				}
 			};
-		}
-
-		private string LanguageToLexer(Language language)
-		{
-			switch (language)
-			{
-				case Language.CSharp:
-					return "csharp";
-				case Language.Python2:
-					return "py2";
-				case Language.Python3:
-					return "py3";
-				case Language.Java:
-					return "java";
-				case Language.JavaScript:
-					return "js";
-				case Language.Html:
-					return "html";
-				case Language.TypeScript:
-					return "ts";
-				case Language.Css:
-					return "css";
-				case Language.Text:
-					return "text";
-				default:
-					return null;
-			}
 		}
 	}
 }

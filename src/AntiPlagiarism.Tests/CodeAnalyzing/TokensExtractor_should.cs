@@ -1,11 +1,13 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
+using System.Collections.Generic;
 using System.Linq;
 using AntiPlagiarism.Web.CodeAnalyzing;
 using NUnit.Framework;
 using Serilog;
+using Ulearn.Common;
 using Ulearn.Common.Extensions;
-using Ulearn.Core;
 
 namespace AntiPlagiarism.Tests.CodeAnalyzing
 {
@@ -13,7 +15,7 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing
 	public class TokensExtractor_should
 	{
 		private TokensExtractor tokensExtractor;
-		
+
 		private static DirectoryInfo TestDataDir => new DirectoryInfo(
 			Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..",
 				"CodeAnalyzing", "TestData")
@@ -26,11 +28,24 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing
 			tokensExtractor = new TokensExtractor(logger);
 		}
 
+		private List<Token> SkpIfNoPygmentize(Func<List<Token>> getTokens)
+		{
+			try
+			{
+				return getTokens();
+			}
+			catch (Win32Exception ex) when (ex.Message.Contains("The system cannot find the file specified"))
+			{
+				throw new IgnoreException(ex.Message);
+			}
+		}
+
 		[Test]
 		public void CodeLengthEqualsTokensContentLengthTest()
 		{
 			const string code = CommonTestData.SimpleProgramWithMethodAndProperty;
-			var tokens = tokensExtractor.GetAllTokensFromPygmentize(code, Language.CSharp).EmptyIfNull().ToList();
+			var tokens = SkpIfNoPygmentize(() => tokensExtractor.GetAllTokensFromPygmentize(code, Language.CSharp).EmptyIfNull().ToList());
+			Assert.IsNotEmpty(tokens);
 			TokensExtractor.ThrowExceptionIfTokensNotMatchOriginalCode(code, tokens);
 		}
 
@@ -38,23 +53,23 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing
 		public void TokensFiltersTest()
 		{
 			const string code = CommonTestData.SimpleProgramWithMethodAndProperty;
-			var tokens = tokensExtractor.GetAllTokensFromPygmentize(code, Language.CSharp).EmptyIfNull().ToList();
-			var filteredTokens = TokensExtractor.FilterCommentTokens(TokensExtractor.FilterWhitespaceTokens(tokens)).ToList();
-			Assert.False(filteredTokens.Any(t => string.IsNullOrWhiteSpace(t.Value)));
-			Assert.False(filteredTokens.Any(t => t.Type.StartsWith("Comment")));
+			var tokens = SkpIfNoPygmentize(() => tokensExtractor.GetFilteredTokensFromPygmentize(code, Language.CSharp));
+			Assert.IsNotEmpty(tokens);
+			Assert.False(tokens.Any(t => string.IsNullOrWhiteSpace(t.Value)));
+			Assert.False(tokens.Any(t => t.Type.StartsWith("Comment")));
 		}
 
 		[Test]
 		[TestCase("countFlashcardsStatistics.js", Language.JavaScript)]
 		[TestCase("geoip.py", Language.Python3)]
 		[TestCase("index.html", Language.Html)]
+		[TestCase("example.java", Language.Java)]
 		public void LanguagesTest(string file, Language language)
 		{
 			var code = File.ReadAllText(TestDataDir.GetFile(file).FullName);
-			var tokens = tokensExtractor.GetAllTokensFromPygmentize(code, language).EmptyIfNull().ToList();
-			var filteredTokens = TokensExtractor.FilterCommentTokens(TokensExtractor.FilterWhitespaceTokens(tokens)).ToList();
-			Assert.IsNotEmpty(filteredTokens);
-			Assert.False(filteredTokens.Any(t => t.Type.Contains("error")));
+			var tokens = SkpIfNoPygmentize(() => tokensExtractor.GetFilteredTokensFromPygmentize(code, language));
+			Assert.IsNotEmpty(tokens);
+			Assert.False(tokens.Any(t => t.Type.Contains("error")));
 		}
 	}
 }
