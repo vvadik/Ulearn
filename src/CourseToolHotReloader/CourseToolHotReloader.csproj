@@ -19,6 +19,11 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\Common\Common.csproj" />
 	</ItemGroup>
+	<ItemGroup>
+	  <None Update="config.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
 	<Target Name="CreateCourseToolHotReloaderZip" BeforeTargets="OctoPack" Condition="$(RunOctoPack)">
 		<Exec Command="powershell -NonInteractive -executionpolicy Unrestricted &quot; Compress-Archive -Path '$(TargetDir)*' -DestinationPath '$(TargetDir)CourseToolHotReloader.zip' -Force&quot;" />
 	</Target>

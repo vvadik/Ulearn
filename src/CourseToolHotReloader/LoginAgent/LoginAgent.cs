@@ -31,7 +31,7 @@ namespace CourseToolHotReloader.LoginAgent
 
 		private async Task<bool> TryLoginByConsole()
 		{
-			ConsoleWorker.WriteLine($"Войдите на {config.BaseUrl}");
+			ConsoleWorker.WriteLine($"Войдите на {config.SiteUrl}");
 			var login = ConsoleWorker.GetLogin();
 			var password = new NetworkCredential(string.Empty, ConsoleWorker.GetPassword()).Password;
 

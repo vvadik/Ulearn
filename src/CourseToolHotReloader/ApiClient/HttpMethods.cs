@@ -36,7 +36,7 @@ namespace CourseToolHotReloader.ApiClient
 		[ItemCanBeNull]
 		public async Task<TokenResponseDto> GetJwtToken(LoginPasswordParameters parameters)
 		{
-			var url = $"{config.BaseUrl}/account/login";
+			var url = $"{config.ApiUrl}/account/login";
 			var json = JsonSerializer.Serialize(parameters);
 			var data = new StringContent(json, Encoding.UTF8, "application/json");
 			using var client = new HttpClient();
@@ -60,7 +60,7 @@ namespace CourseToolHotReloader.ApiClient
 		[ItemCanBeNull]
 		public async Task<TokenResponseDto> RenewToken()
 		{
-			var url = $"{config.BaseUrl}/account/api-token?days=3";
+			var url = $"{config.ApiUrl}/account/api-token?days=3";
 			using var client = HttpClient();
 			var response = await client.PostAsync(url, null);
 			try
@@ -81,19 +81,19 @@ namespace CourseToolHotReloader.ApiClient
 
 		public async Task<TempCourseUpdateResponse> UploadCourse(MemoryStream memoryStream, string id)
 		{
-			var url = $"{config.BaseUrl}/tempCourses/{id}";
+			var url = $"{config.ApiUrl}/tempCourses/{id}";
 			return await UpdateTempCourse(memoryStream, url, HttpMethod.Patch);
 		}
 
 		public async Task<TempCourseUpdateResponse> UploadFullCourse(MemoryStream memoryStream, string id)
 		{
-			var url = $"{config.BaseUrl}/tempCourses/{id}";
+			var url = $"{config.ApiUrl}/tempCourses/{id}";
 			return await UpdateTempCourse(memoryStream, url, HttpMethod.Put);
 		}
 
 		public async Task<TempCourseUpdateResponse> CreateCourse(string id)
 		{
-			var url = $"{config.BaseUrl}/tempCourses/{id}";
+			var url = $"{config.ApiUrl}/tempCourses/{id}";
 			using var client = HttpClient();
 			var response = await client.PostAsync(url, null);
 			ThrowExceptionIfBadCode(response);
@@ -102,7 +102,7 @@ namespace CourseToolHotReloader.ApiClient
 
 		public async Task<CoursesListResponse> GetCoursesList()
 		{
-			var url = $"{config.BaseUrl}/courses";
+			var url = $"{config.ApiUrl}/courses";
 			using var client = HttpClient();
 			var response = await client.GetAsync(url);
 			ThrowExceptionIfBadCode(response);
@@ -113,7 +113,7 @@ namespace CourseToolHotReloader.ApiClient
 
 		public async Task<ShortUserInfo> GetUserInfo()
 		{
-			var url = $"{config.BaseUrl}/account";
+			var url = $"{config.ApiUrl}/account";
 			using var client = HttpClient();
 			var response = await client.GetAsync(url);
 			ThrowExceptionIfBadCode(response);

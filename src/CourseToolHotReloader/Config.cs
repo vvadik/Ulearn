@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -17,9 +16,9 @@ namespace CourseToolHotReloader
 		Dictionary<string, string> CourseIds { get; set; }
 		string CourseId { get; set; }
 		string JwtToken { get; set; }
-		public string BaseUrl { get; set; }
+		public string ApiUrl { get; set; }
+		public string SiteUrl { get; set; }
 		public bool SendFullArchive { get; set; }
-		public string PathToConfigFile { get; }
 		public List<string> ExcludeCriterias { get; set; }
 		public void Flush();
 	}
@@ -32,12 +31,14 @@ namespace CourseToolHotReloader
 		{
 			var fileConfigFormat = ReadOrCreateConfig();
 			JwtToken = fileConfigFormat.JwtToken;
-			BaseUrl = fileConfigFormat.BaseUrl;
+			ApiUrl = fileConfigFormat.ApiUrl;
+			SiteUrl = fileConfigFormat.SiteUrl;
 			CourseIds = fileConfigFormat.CourseIds;
 			Path = Directory.GetCurrentDirectory();
 		}
 
-		public string BaseUrl { get; set; }
+		public string ApiUrl { get; set; }
+		public string SiteUrl { get; set; }
 		public bool SendFullArchive { get; set; }
 		public string Path { get; set; }
 		public Dictionary<string, string> CourseIds { get; set; }
@@ -89,14 +90,13 @@ namespace CourseToolHotReloader
 			SaveConfigFile(fileConfigFormat);
 		}
 
-		public string PathToConfigFile => pathToConfigFile;
-
 		public void Flush()
 		{
 			var fileConfigFormat = new FileConfigFormat
 			{
 				JwtToken = JwtToken,
-				BaseUrl = BaseUrl,
+				ApiUrl = ApiUrl,
+				SiteUrl = SiteUrl,
 				SendFullArchive = SendFullArchive,
 				CourseIds = CourseIds
 			};
@@ -121,7 +121,8 @@ namespace CourseToolHotReloader
 			public FileConfigFormat()
 			{
 				JwtToken = null;
-				BaseUrl = "https://api.ulearn.me";
+				ApiUrl = "https://api.ulearn.me";
+				SiteUrl = "https://ulearn.me";
 				SendFullArchive = false;
 				CourseIds = new Dictionary<string, string>();
 			}
@@ -129,8 +130,11 @@ namespace CourseToolHotReloader
 			[JsonPropertyName("jwtToken")]
 			public string JwtToken { get; set; }
 
-			[JsonPropertyName("baseUrl")]
-			public string BaseUrl { get; set; }
+			[JsonPropertyName("apiUrl")]
+			public string ApiUrl { get; set; }
+
+			[JsonPropertyName("siteUrl")]
+			public string SiteUrl { get; set; }
 
 			[JsonPropertyName("sendFullArchive")]
 			public bool SendFullArchive { get; set; }

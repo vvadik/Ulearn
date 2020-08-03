@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -39,10 +40,10 @@ namespace CourseToolHotReloader
 						ConsoleWorker.WriteError("Указанный в config.json baseUrl имеет некорректный формат");
 						break;
 					case HttpRequestException ee when ee.InnerException is SocketException:
-						ConsoleWorker.WriteError($"Не удалось подключиться к {config.BaseUrl}");
+						ConsoleWorker.WriteError($"Не удалось подключиться к {config.ApiUrl}");
 						break;
 					case HttpRequestException ee when ee.InnerException is IOException && ee.Message.Contains("SSL"):
-						ConsoleWorker.WriteError($"Не удалось использовать https при подключении к {config.BaseUrl}");
+						ConsoleWorker.WriteError($"Не удалось использовать https при подключении к {config.ApiUrl}");
 						break;
 					case IOException _:
 						ConsoleWorker.WriteError("Ошибка ввода-вывода. Подробнее в логах");
@@ -118,8 +119,15 @@ namespace CourseToolHotReloader
 			config.ExcludeCriterias = ReadCourseConfig()?.CourseToolHotReloader?.ExcludeCriterias;
 
 			await SendFullCourse();
+			OpenInBrowser();
 
 			StartWatch();
+		}
+
+		private static void OpenInBrowser()
+		{
+			var courseUrl = $"{config.SiteUrl}/Course/{config.CourseId}";
+			Process.Start(new ProcessStartInfo(courseUrl) { UseShellExecute = true }); // https://stackoverflow.com/a/61035650/6800354
 		}
 
 		private static void StartWatch()
@@ -133,7 +141,7 @@ namespace CourseToolHotReloader
 			var shortUserInfo = await container.Resolve<ILoginAgent>().SignIn();
 
 			if (shortUserInfo != null)
-				ConsoleWorker.WriteLine($"Вы вошли на {config.BaseUrl} под пользователем {shortUserInfo.Login}");
+				ConsoleWorker.WriteLine($"Вы вошли на {config.SiteUrl} под пользователем {shortUserInfo.Login}");
 			else
 				ConsoleWorker.WriteError("Неправильный логин или пароль");
 
@@ -145,7 +153,7 @@ namespace CourseToolHotReloader
 			var tempCourseUpdateResponse = await ulearnApiClient.SendFullCourse(config.Path, config.CourseId, config.ExcludeCriterias);
 			if (tempCourseUpdateResponse.ErrorType == ErrorType.NoErrors)
 			{
-				ConsoleWorker.WriteLine("Первоначальная полная загрузка курса прошла успешно. Обновите страницу браузера, и вы увидете временный курс в выпадающем меню Мои курсы");
+				ConsoleWorker.WriteLine("Первоначальная полная загрузка курса прошла успешно");
 				ConsoleWorker.WriteLine("Не закрывайте программу и редактируйте файлы курса у себя на компьютере. Сделанные изменения будут автоматически загружаться на ulearn. Перезагрузите страницу браузера, чтоб увидеть результат");
 			}
 			else
