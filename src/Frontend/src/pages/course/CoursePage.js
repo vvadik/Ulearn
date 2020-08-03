@@ -4,6 +4,7 @@ import { loadUserProgress, userProgressUpdate } from "src/actions/userProgress";
 import Course from '../../components/course/Course';
 import { withRouter } from "react-router-dom";
 import queryString from "query-string";
+import { ltiSlide, acceptedAlert, acceptedSolutions, } from "src/consts/routes";
 
 const mapStateToProps = (state, { match }) => {
 	const params = queryString.parse(window.location.search);
@@ -16,7 +17,7 @@ const mapStateToProps = (state, { match }) => {
 	if(slideIdInQuery) {
 		const action = slideSlugOrAction;
 		slideId = slideIdInQuery;
-		isLti = action.toLowerCase() === "ltislide" || action.toLowerCase() === 'acceptedalert' || params.isLti;
+		isLti = action.toLowerCase() === ltiSlide || action.toLowerCase() === acceptedAlert || params.isLti;
 	} else {
 		const slideSlug = slideSlugOrAction;
 		slideId = slideSlug.split('_').pop();
