@@ -74,8 +74,8 @@ class Course extends Component {
 	}
 
 	componentDidUpdate(prevProps, prevState) {
-		const { loadUserProgress, courseId, loadCourse, user, courseInfo, loadCourseErrors } = this.props;
-		const { title } = this.state;
+		const { loadUserProgress, courseId, loadCourse, user, courseInfo, loadCourseErrors, isHijacked, updateVisitedSlide, progress, } = this.props;
+		const { title, currentSlideInfo, } = this.state;
 		const { isAuthenticated } = user;
 
 		if(isAuthenticated !== prevProps.user.isAuthenticated) {
@@ -88,6 +88,10 @@ class Course extends Component {
 			this.updateWindowMeta(title, courseInfo.title);
 			if(courseInfo.isTempCourse)
 				loadCourseErrors(courseId);
+		}
+
+		if(!prevProps.progress && progress && !isHijacked) {
+			updateVisitedSlide(courseId, currentSlideInfo.current.id);
 		}
 	}
 
@@ -108,7 +112,6 @@ class Course extends Component {
 			const slideInfo = Course.getSlideInfoById(props.slideId, props.courseInfo);
 			const Page = Course.getOpenedPage(props.slideId, props.courseInfo, slideInfo);
 			const title = Course.getTitle(slideInfo, Page);
-
 			if(slideInfo && progress && !isHijacked) {
 				updateVisitedSlide(courseId, slideInfo.current.id);
 			}
@@ -118,7 +121,7 @@ class Course extends Component {
 				title,
 				currentSlideId: slideId,
 				currentSlideInfo: slideInfo,
-				currentCourseId: props.courseId,
+				currentCourseId: courseId,
 				highlightedUnit: openUnitId || null,
 				onCourseNavigation: openUnit ? false : state.onCourseNavigation,
 				openUnit: openUnit || state.openUnit,
@@ -187,7 +190,8 @@ class Course extends Component {
 				className={ classnames(styles.root, { 'open': navigationOpened }, { [styles.withoutMinHeight]: !isNavMenuVisible }) }>
 				{ this.renderMeta(meta) }
 				{ isNavMenuVisible && this.renderNavigation() }
-				{ courseInfo.tempCourseError ? <div className={ classnames(styles.errors) } >{courseInfo.tempCourseError}</div> : this.renderSlide() }
+				{ courseInfo.tempCourseError ? <div
+					className={ classnames(styles.errors) }>{ courseInfo.tempCourseError }</div> : this.renderSlide() }
 			</div>
 		);
 	}
