@@ -14,12 +14,14 @@ class NavigationHeader extends Component {
 	render() {
 		const { createRef, groupsAsStudent, } = this.props;
 		return (
-			<header ref={ (ref) => createRef(ref) } className={ styles.root }>
+			<React.Fragment>
 				{ this.renderBreadcrumb() }
-				{ this.renderTitle() }
-				{ this.renderProgress() }
-				{ groupsAsStudent.length > 0 && <LinksToGroupsStatements groupsAsStudent={ groupsAsStudent }/> }
-			</header>
+				<header ref={ (ref) => createRef(ref) } className={ styles.root }>
+					{ this.renderTitle() }
+					{ this.renderProgress() }
+					{ groupsAsStudent.length > 0 && <LinksToGroupsStatements groupsAsStudent={ groupsAsStudent }/> }
+				</header>
+			</React.Fragment>
 		);
 	}
 
@@ -46,7 +48,7 @@ class NavigationHeader extends Component {
 		const { progress } = this.props;
 		const percentage = progress.current / progress.max;
 
-		if (percentage > 0) {
+		if(percentage > 0) {
 			return (
 				<div className={ styles.progressBarWrapper } title={ `${ progress.current } из ${ progress.max }` }>
 					<ProgressBar value={ percentage } color={ percentage >= 1 ? 'green' : 'blue' }/>
