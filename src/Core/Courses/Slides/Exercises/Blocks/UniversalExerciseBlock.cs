@@ -28,6 +28,9 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		[XmlElement("userCodeFile")]
 		public string UserCodeFilePath { get; set; }
 
+		[XmlElement("solutionFilePath")]
+		public string SolutionFilePath { get; set; } // По умолчанию используется UserCodeFilePath
+
 		[XmlElement("region")]
 		public string Region { get; set; } // Студент видит в консоли и редактирует регион с этим именем. <prefix>region label <...> <prefix>rendregion label. Должен быть как в решении, так и в файле заглушке.
 
@@ -85,16 +88,19 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public FileInfo InitialUserCodeFile => ExerciseDirectory.GetFile(InitialUserCodeFilePath);
 
 		[XmlIgnore]
-		public FileInfo CorrectSolutionFile => UserCodeFile;
+		public FileInfo CorrectSolutionFile => SolutionFilePath == null ? UserCodeFile : ExerciseDirectory.GetFile(SolutionFilePath);
 
 		[XmlIgnore]
-		public string CorrectSolutionFilePath => UserCodeFilePath;
+		public string CorrectSolutionFilePath => SolutionFilePath ?? UserCodeFilePath;
 
 		[XmlIgnore]
 		private static readonly string[] wrongAnswerPatterns = { "*.WrongAnswer.*", "*.WA.*" };
 
 		[XmlIgnore]
 		private static readonly string[] initialPatterns = { "*.Initial.*" };
+
+		[XmlIgnore]
+		private static readonly string[] solutionPatterns = { "*.Solution.*" };
 
 		[XmlIgnore]
 		public List<FileInfo> WrongAnswerFiles =>
@@ -139,7 +145,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			UnitDirectory = context.UnitDirectory;
 			CourseDirectory = context.CourseDirectory;
 			ExpectedOutput = ExpectedOutput ?? "";
-			SolutionRegionContent = new Lazy<string>(() => GetRegionContent(UserCodeFile));
+			SolutionRegionContent = new Lazy<string>(() => GetRegionContent(CorrectSolutionFile));
 			InitialRegionContent = new Lazy<string>(() => GetRegionContent(InitialUserCodeFile));
 			ExerciseInitialCode = NoStudentZip
 				? GetNoStudentZipInitialCode()
@@ -172,7 +178,6 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 				?? ExerciseInitialCode
 				?? "";
 		}
-
 
 		public string GetRegionContent(FileInfo file)
 		{
@@ -212,6 +217,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			var excluded = (PathsToExcludeForChecker ?? new string[0])
 				.Concat(initialPatterns)
 				.Concat(wrongAnswerPatterns)
+				.Concat(solutionPatterns)
 				.Concat(new[] { "/bin/", "/obj/", ".idea/", ".vs/" })
 				.ToList();
 
@@ -240,6 +246,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			var excluded = (PathsToExcludeForStudent ?? new string[0])
 				.Concat(initialPatterns)
 				.Concat(wrongAnswerPatterns)
+				.Concat(solutionPatterns)
 				.Concat(new[] { "/checking/", "/bin/", "/obj/", ".idea/", ".vs/" })
 				.ToList();
 

@@ -493,6 +493,16 @@
 							</xs:documentation>
 						</xs:annotation>
 					</xs:element>
+					<xs:element name="solutionFile" type="NonEmptyString" minOccurs="0" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>
+								Обычно авторское решение задачи находится в userCodeFile.Solution.cs. Но бывают серии задач,
+								где студент пишет код в одном файле поэтапно. В этом теге в задачах промежуточных этапов
+								указывают путь до решения. Файл с решением должен подходить под маску *.Solution.*
+								Для полного решения должен использоваться userCodeFile.Solution.cs.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
 					<xs:element name="excludePathForChecker" type="NonEmptyString" minOccurs="0" maxOccurs="unbounded">
 						<xs:annotation>
 							<xs:documentation>
@@ -552,6 +562,16 @@
 						<xs:annotation>
 							<xs:documentation>
 								Путь относительно директории, в которой лежит задача.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="solutionFile" type="NonEmptyString" minOccurs="0" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>
+								Обычно авторское решение задачи находится в userCodeFile. Но бывают серии задач,
+								где студент пишет код в одном файле поэтапно. В этом теге в задачах промежуточных этапов
+								указывают путь до решения. Файл с решением должен подходить под маску *.Solution.*
+								Полное решение должно находиться в userCodeFile.
 							</xs:documentation>
 						</xs:annotation>
 					</xs:element>

@@ -6,7 +6,6 @@ using System.Text;
 using Microsoft.Build.Evaluation;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
-using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Helpers;
 
@@ -52,7 +51,7 @@ namespace Ulearn.Core
 		public static void PrepareForStudentZip(Project proj, CsProjectExerciseBlock ex)
 		{
 			var toExclude = FindItemNames(proj, file => ExerciseStudentZipBuilder.NeedExcludeFromStudentZip(ex, file)).ToList();
-			var solutionsOfOtherTasks = toExclude.Where(n => ExerciseStudentZipBuilder.IsAnySolution(n) && ex.CorrectSolutionPath != n).ToList();
+			var solutionsOfOtherTasks = toExclude.Where(n => ExerciseStudentZipBuilder.IsAnySolution(n) && ex.CorrectFullSolutionPath != n).ToList();
 
 			/* Remove StartupObject from csproj: it's not needed in student zip */
 			var startupObject = proj.GetProperty("StartupObject");
@@ -85,7 +84,7 @@ namespace Ulearn.Core
 		public static void PrepareForCheckingUserCode(Project proj, CsProjectExerciseBlock ex, List<string> excludedPaths)
 		{
 			var solutionRelativePath = ex.ExerciseFolder.GetRelativePathsOfFiles()
-				.SingleOrDefault(n => n.Equals(ex.CorrectSolutionPath, StringComparison.InvariantCultureIgnoreCase));
+				.SingleOrDefault(n => n.Equals(ex.CorrectFullSolutionPath, StringComparison.InvariantCultureIgnoreCase));
 
 			if (solutionRelativePath != null)
 				excludedPaths.Add(solutionRelativePath);
