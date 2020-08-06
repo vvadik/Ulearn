@@ -7,9 +7,9 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Ulearn.Common.Extensions;
 
-namespace AntiPlagiarism.Web.CodeAnalyzing.CSharp
+namespace AntiPlagiarism.Web.CodeAnalyzing
 {
-	public class CodeUnitsExtractor
+	public class CSharpCodeUnitsExtractor
 	{
 		public List<CodeUnit> Extract(string program)
 		{
@@ -25,7 +25,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing.CSharp
 
 			foreach (var unit in codeUnits)
 			{
-				unit.FirstTokenIndex = tokenIndexByPosition[unit.Tokens[0].SpanStart];
+				unit.FirstTokenIndex = tokenIndexByPosition[unit.Tokens[0].Position];
 			}
 
 			return codeUnits;
@@ -84,7 +84,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing.CSharp
 			if (entry != null)
 			{
 				var tokens = entry.GetTokens().ToList();
-				yield return new CodeUnit(codePath, tokens);
+				yield return new CodeUnit(codePath, tokens.Select(t => new CSharpToken(t)));
 			}
 
 			currentCodePath.Pop();

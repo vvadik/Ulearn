@@ -144,7 +144,6 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			ExerciseInitialCode = NoStudentZip
 				? GetNoStudentZipInitialCode()
 				: ExerciseInitialCode ?? "// Вставьте сюда финальное содержимое файла " + UserCodeFilePath;
-			CheckForPlagiarism = CheckForPlagiarism && Language == Core.Language.CSharp;
 			yield return this;
 
 			var correctSolution = GetCorrectSolution();

@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
+using Ulearn.Common;
 using Ulearn.Core.Courses.Slides.Blocks;
 
 namespace Ulearn.Core.Courses.Slides.Flashcards

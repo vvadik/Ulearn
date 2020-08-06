@@ -1,18 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Microsoft.CodeAnalysis;
 
-namespace AntiPlagiarism.Web.CodeAnalyzing.CSharp
+namespace AntiPlagiarism.Web.CodeAnalyzing
 {
 	public class CodeUnit
 	{
 		public CodePath Path { get; private set; }
-		public List<SyntaxToken> Tokens { get; private set; }
+		public List<IToken> Tokens { get; private set; }
 		public int FirstTokenIndex { get; set; }
 
-		public int Position => Tokens.FirstOrDefault().SpanStart;
+		public int Position => Tokens.FirstOrDefault()?.Position ?? 0;
 
-		public CodeUnit(CodePath path, IEnumerable<SyntaxToken> tokens, int firstTokenIndex = 0)
+		public CodeUnit(CodePath path, IEnumerable<IToken> tokens, int firstTokenIndex = 0)
 		{
 			Path = path;
 			Tokens = tokens.ToList();

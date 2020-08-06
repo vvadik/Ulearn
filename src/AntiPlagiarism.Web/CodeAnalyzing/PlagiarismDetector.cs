@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AntiPlagiarism.Api.Models;
 using AntiPlagiarism.Api.Models.Results;
-using AntiPlagiarism.Web.CodeAnalyzing.CSharp;
 using AntiPlagiarism.Web.Configuration;
 using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Database.Repos;
@@ -238,9 +237,9 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			return plagiarisms;
 		}
 
-		public List<TokenPosition> GetNeededTokensPositions(string program)
+		public List<TokenPosition> GetNeededTokensPositions(string program, Language language)
 		{
-			return GetNeededTokensPositions(codeUnitsExtractor.Extract(program));
+			return GetNeededTokensPositions(codeUnitsExtractor.Extract(program, language));
 		}
 
 		public static List<TokenPosition> GetNeededTokensPositions(IEnumerable<CodeUnit> codeUnits)
@@ -248,16 +247,16 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			return codeUnits.SelectMany(u => u.Tokens.Enumerate(start: u.FirstTokenIndex)).Select(t => new TokenPosition
 			{
 				TokenIndex = t.Index,
-				StartPosition = t.Item.SpanStart,
-				Length = t.Item.Span.Length,
+				StartPosition = t.Item.Position,
+				Length = t.Item.Value.Length,
 			}).ToList();
 		}
-
+		
 		private Plagiarism BuildPlagiarismInfo(Submission submission, double weight, List<MatchedSnippet> matchedSnippets)
 		{
 			/* We do TrimStart() because of issue in a way of passing code to codemirror on ulearn's frontend. We insert data into <textarea> which loses first spaces.
 			   We can remove it after migrating to new, React-based frontend. */
-			var codeUnits = codeUnitsExtractor.Extract(submission.ProgramText.TrimStart());
+			var codeUnits = codeUnitsExtractor.Extract(submission.ProgramText.TrimStart(), submission.Language);
 			return new Plagiarism
 			{
 				SubmissionInfo = submission.GetSubmissionInfoForApi(),

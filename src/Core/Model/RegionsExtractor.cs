@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Ulearn.Common;
 using Ulearn.Common.Extensions;
-using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.CSharp;
 
@@ -28,7 +28,7 @@ namespace Ulearn.Core.Model
 				new CommonSingleRegionExtractor(code)
 			};
 
-			if (language == Core.Language.CSharp)
+			if (language == Common.Language.CSharp)
 				extractors.Add(new CsMembersExtractor(code));
 		}
 

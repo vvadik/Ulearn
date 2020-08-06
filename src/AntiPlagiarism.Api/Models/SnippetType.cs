@@ -6,7 +6,7 @@ namespace AntiPlagiarism.Api.Models
 	[JsonConverter(typeof(StringEnumConverter), true)]
 	public enum SnippetType : short
 	{
-		TokensKindsOnly = 1,
-		TokensKindsAndValues = 2,
+		TokensKinds = 1,
+		TokensValues = 2,
 	}
 }

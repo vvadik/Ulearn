@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AntiPlagiarism.Web.CodeAnalyzing;
-using AntiPlagiarism.Web.CodeAnalyzing.CSharp;
 using AntiPlagiarism.Web.Configuration;
 using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Database.Repos;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Serilog;
+using Ulearn.Common;
 
 namespace AntiPlagiarism.UpdateDb
 {
@@ -60,7 +60,7 @@ namespace AntiPlagiarism.UpdateDb
 
 					foreach (var submission in submissions)
 					{
-						await submissionsRepo.UpdateSubmissionTokensCountAsync(submission, GetTokensCount(submission.ProgramText));
+						await submissionsRepo.UpdateSubmissionTokensCountAsync(submission, GetTokensCount(submission.ProgramText, submission.Language));
 						if (updateOnlyTokensCount)
 							continue;
 
@@ -111,9 +111,9 @@ namespace AntiPlagiarism.UpdateDb
 			}
 		}
 
-		private int GetTokensCount(string code)
+		private int GetTokensCount(string code, Language language)
 		{
-			var codeUnits = codeUnitsExtractor.Extract(code);
+			var codeUnits = codeUnitsExtractor.Extract(code, language);
 			return codeUnits.Select(u => u.Tokens.Count).Sum();
 		}
 	}

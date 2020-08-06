@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AntiPlagiarism.UpdateDb.Configuration;
 using AntiPlagiarism.Web.CodeAnalyzing;
-using AntiPlagiarism.Web.CodeAnalyzing.CSharp;
 using AntiPlagiarism.Web.Configuration;
 using AntiPlagiarism.Web.Database;
 using AntiPlagiarism.Web.Database.Repos;
@@ -66,7 +65,9 @@ namespace AntiPlagiarism.UpdateDb
 			services.AddScoped<AntiPlagiarismSnippetsUpdater>();
 			services.AddScoped<ISnippetsRepo, SnippetsRepo>();
 			services.AddScoped<ISubmissionsRepo, SubmissionsRepo>();
+			services.AddSingleton<CSharpCodeUnitsExtractor>();
 			services.AddSingleton<CodeUnitsExtractor>();
+			services.AddSingleton<TokensExtractor>();
 			services.AddSingleton<SnippetsExtractor>();
 			services.AddSingleton<SubmissionSnippetsExtractor>();
 

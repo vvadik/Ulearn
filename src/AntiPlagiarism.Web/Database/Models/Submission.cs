@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using AntiPlagiarism.Api.Models;
+using Ulearn.Common;
 
 namespace AntiPlagiarism.Web.Database.Models
 {
