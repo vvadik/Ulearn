@@ -138,7 +138,13 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		{
 			var comment = await commentsRepo.FindCommentByIdAsync(commentId).ConfigureAwait(false);
 
-			var canEditOrDeleteComment = await CanEditOrDeleteCommentAsync(comment, UserId).ConfigureAwait(false);
+			if (comment == null)
+				return NotFound(new ErrorResponse($"Comment {commentId} not found"));
+
+			var parentComment = comment.ParentCommentId == -1 ? null :  await commentsRepo.FindCommentByIdAsync(comment.ParentCommentId, includeDeleted: false).ConfigureAwait(false);
+			var parentCommentCourseId = parentComment?.CourseId;
+
+			var canEditOrDeleteComment = await CanEditOrDeleteCommentAsync(comment, UserId, parentCommentCourseId).ConfigureAwait(false);
 			if (!canEditOrDeleteComment)
 				return StatusCode((int)HttpStatusCode.Forbidden, "You can not delete this comment. Only author, course admin or user with special privileges can do it.");
 
@@ -160,28 +166,31 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			if (comment == null)
 				return NotFound(new ErrorResponse($"Comment {commentId} not found"));
 
-			if (comment.IsDeleted && await CanEditOrDeleteCommentAsync(comment, UserId).ConfigureAwait(false))
+			var parentComment = comment.ParentCommentId == -1 ? null :  await commentsRepo.FindCommentByIdAsync(comment.ParentCommentId, includeDeleted: false).ConfigureAwait(false);
+			var parentCommentCourseId = parentComment?.CourseId;
+
+			if (comment.IsDeleted && await CanEditOrDeleteCommentAsync(comment, UserId, parentCommentCourseId).ConfigureAwait(false))
 				await commentsRepo.RestoreCommentAsync(commentId).ConfigureAwait(false);
 
 			parameters.Text?.TrimEnd();
 			if (!string.IsNullOrEmpty(parameters.Text))
-				await UpdateCommentTextAsync(comment, parameters.Text).ConfigureAwait(false);
+				await UpdateCommentTextAsync(comment, parameters.Text, parentCommentCourseId).ConfigureAwait(false);
 
 			if (parameters.IsApproved.HasValue)
-				await UpdateCommentIsApprovedAsync(comment, parameters.IsApproved.Value).ConfigureAwait(false);
+				await UpdateCommentIsApprovedAsync(comment, parameters.IsApproved.Value, parentCommentCourseId).ConfigureAwait(false);
 
 			if (parameters.IsPinnedToTop.HasValue)
-				await UpdateCommentIsPinnedAsync(comment, parameters.IsPinnedToTop.Value).ConfigureAwait(false);
+				await UpdateCommentIsPinnedAsync(comment, parameters.IsPinnedToTop.Value, parentCommentCourseId).ConfigureAwait(false);
 
 			if (parameters.IsCorrectAnswer.HasValue)
-				await UpdateCommentIsCorrectAnswerAsync(comment, parameters.IsCorrectAnswer.Value).ConfigureAwait(false);
+				await UpdateCommentIsCorrectAnswerAsync(comment, parameters.IsCorrectAnswer.Value, parentCommentCourseId).ConfigureAwait(false);
 
 			return await Comment(commentId, new CommentParameters { WithReplies = false }).ConfigureAwait(false);
 		}
 
-		private async Task UpdateCommentTextAsync([NotNull] Comment comment, string text)
+		private async Task UpdateCommentTextAsync([NotNull] Comment comment, string text, string parentCommentCourseId)
 		{
-			var canEditOrDeleteComment = await CanEditOrDeleteCommentAsync(comment, UserId).ConfigureAwait(false);
+			var canEditOrDeleteComment = await CanEditOrDeleteCommentAsync(comment, UserId, parentCommentCourseId).ConfigureAwait(false);
 			if (!canEditOrDeleteComment)
 				throw new StatusCodeException((int)HttpStatusCode.Forbidden, "You can not edit this comment. Only author, course admin or user with special privileges can do it.");
 
@@ -191,9 +200,11 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			await commentsRepo.EditCommentTextAsync(comment.Id, text).ConfigureAwait(false);
 		}
 
-		private async Task UpdateCommentIsApprovedAsync([NotNull] Comment comment, bool isApproved)
+		private async Task UpdateCommentIsApprovedAsync([NotNull] Comment comment, bool isApproved, string parentCommentCourseId)
 		{
-			var canModerateComments = await CanModerateCommentsInCourseAsync(comment.CourseId, UserId).ConfigureAwait(false);
+			var canModerateComments =
+				await CanModerateCommentsInCourseAsync(comment.CourseId, UserId).ConfigureAwait(false)
+				|| parentCommentCourseId != comment.CourseId && await CanModerateCommentsInCourseAsync(parentCommentCourseId, UserId).ConfigureAwait(false);
 			if (!canModerateComments)
 				throw new StatusCodeException((int)HttpStatusCode.Forbidden, "You can not approve/disapprove this comment. Only course admin or user with special privileges can do it.");
 
@@ -202,27 +213,34 @@ namespace Ulearn.Web.Api.Controllers.Comments
 				await NotifyAboutNewCommentAsync(comment).ConfigureAwait(false);
 		}
 
-		private async Task UpdateCommentIsPinnedAsync([NotNull] Comment comment, bool isPinned)
+		private async Task UpdateCommentIsPinnedAsync([NotNull] Comment comment, bool isPinned, string parentCommentCourseId)
 		{
-			var canModerateComments = await CanModerateCommentsInCourseAsync(comment.CourseId, UserId).ConfigureAwait(false);
+			var canModerateComments =
+				await CanModerateCommentsInCourseAsync(comment.CourseId, UserId).ConfigureAwait(false)
+				|| parentCommentCourseId != comment.CourseId && await CanModerateCommentsInCourseAsync(parentCommentCourseId, UserId).ConfigureAwait(false);
 			if (!canModerateComments)
 				throw new StatusCodeException((int)HttpStatusCode.Forbidden, "You can not pin/unpin this comment. Only course admin or user with special privileges can do it.");
 
 			await commentsRepo.PinCommentAsync(comment.Id, isPinned).ConfigureAwait(false);
 		}
 
-		private async Task UpdateCommentIsCorrectAnswerAsync([NotNull] Comment comment, bool isCorrectAnswer)
+		private async Task UpdateCommentIsCorrectAnswerAsync([NotNull] Comment comment, bool isCorrectAnswer, string parentCommentCourseId)
 		{
-			var canModerateComments = await CanModerateCommentsInCourseAsync(comment.CourseId, UserId).ConfigureAwait(false);
+			var canModerateComments =
+				await CanModerateCommentsInCourseAsync(comment.CourseId, UserId).ConfigureAwait(false)
+				|| parentCommentCourseId != comment.CourseId && await CanModerateCommentsInCourseAsync(parentCommentCourseId, UserId).ConfigureAwait(false);
 			if (!canModerateComments)
 				throw new StatusCodeException((int)HttpStatusCode.Forbidden, "You can not mark this comment as correct answer or remove this mark. Only course admin or user with special privileges can do it.");
 
 			await commentsRepo.MarkCommentAsCorrectAnswerAsync(comment.Id, isCorrectAnswer).ConfigureAwait(false);
 		}
 
-		private async Task<bool> CanEditOrDeleteCommentAsync(Comment comment, string userId)
+		private async Task<bool> CanEditOrDeleteCommentAsync(Comment comment, string userId, string parentCommentCourseId)
 		{
-			return comment.AuthorId == userId || await CanModerateCommentsInCourseAsync(comment.CourseId, userId).ConfigureAwait(false);
+			return comment.AuthorId == userId
+				|| await CanModerateCommentsInCourseAsync(comment.CourseId, userId).ConfigureAwait(false)
+				// ULEARN-467
+				|| parentCommentCourseId != comment.CourseId && await CanModerateCommentsInCourseAsync(parentCommentCourseId, userId).ConfigureAwait(false);
 		}
 
 		private async Task<bool> CanModerateCommentsInCourseAsync(string courseId, string userId)

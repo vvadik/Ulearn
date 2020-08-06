@@ -15,6 +15,20 @@ namespace AntiPlagiarism.Web.Database
 		{
 			modelBuilder.HasDefaultSchema(DefaultSchema);
 
+			modelBuilder.Entity<MostSimilarSubmission>()
+				.HasOne(e => e.SimilarSubmission)
+				.WithMany()
+				.HasForeignKey(e => e.SimilarSubmissionId)
+				.IsRequired()
+				.OnDelete(DeleteBehavior.Restrict); // Introducing FOREIGN KEY constraint may cause cycles or multiple cascade paths, потому что две ссылки на одну таблицу
+
+			modelBuilder.Entity<TaskStatisticsSourceData>()
+				.HasOne(e => e.Submission2)
+				.WithMany()
+				.HasForeignKey(e => e.Submission2Id)
+				.IsRequired()
+				.OnDelete(DeleteBehavior.Restrict); // Introducing FOREIGN KEY constraint may cause cycles or multiple cascade paths, потому что две ссылки на одну таблицу
+
 			modelBuilder.Entity<Client>()
 				.HasIndex(c => c.Token)
 				.IsUnique();
@@ -36,14 +50,24 @@ namespace AntiPlagiarism.Web.Database
 			modelBuilder.Entity<SnippetStatistics>()
 				.HasIndex(c => new { c.SnippetId, c.TaskId, c.ClientId })
 				.IsUnique();
+			
+			modelBuilder.Entity<SnippetStatistics>()
+				.HasIndex(c => new { c.SnippetId, c.TaskId, c.ClientId })
+				.IsUnique();
 
 			var submissionEntityBuilder = modelBuilder.Entity<Submission>();
 			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId });
 			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId, c.AuthorId });
 			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId, c.Language, c.AuthorId });
+			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.ClientSubmissionId });
+			submissionEntityBuilder.HasIndex(c => new { c.AddingTime });
 
 			modelBuilder.Entity<WorkQueueItem>()
 				.HasIndex(c => new { c.QueueId, c.TakeAfterTime })
+				.IsUnique(false);
+
+			modelBuilder.Entity<MostSimilarSubmission>()
+				.HasIndex(c => new { c.Timestamp })
 				.IsUnique(false);
 		}
 
@@ -72,5 +96,9 @@ namespace AntiPlagiarism.Web.Database
 		public DbSet<SnippetOccurence> SnippetsOccurences { get; set; }
 		public DbSet<TaskStatisticsParameters> TasksStatisticsParameters { get; set; }
 		public DbSet<WorkQueueItem> WorkQueueItems { get; set; }
+		public DbSet<TaskStatisticsSourceData> TaskStatisticsSourceData { get; set; }
+		public DbSet<MostSimilarSubmission> MostSimilarSubmissions { get; set; }
+		public DbSet<ManualSuspicionLevels> ManualSuspicionLevels { get; set; }
+		public DbSet<OldSubmissionsInfluenceBorder> OldSubmissionsInfluenceBorder { get; set; }
 	}
 }

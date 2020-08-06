@@ -11,6 +11,8 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using AntiPlagiarism.Api;
+using AntiPlagiarism.Api.Models.Parameters;
 using ApprovalUtilities.Utilities;
 using Database;
 using Database.DataContexts;
@@ -57,7 +59,9 @@ namespace uLearn.Web.Controllers
 		private readonly CertificateGenerator certificateGenerator;
 		private readonly string gitSecret;
 		private readonly DirectoryInfo reposDirectory;
+		private readonly IAntiPlagiarismClient antiPlagiarismClient;
 		private readonly ILogger serilogLogger;
+		private readonly TempCoursesRepo tempCoursesReo;
 
 		public AdminController()
 		{
@@ -81,6 +85,9 @@ namespace uLearn.Web.Controllers
 			serilogLogger = new LoggerConfiguration().WriteTo.Log4Net().CreateLogger();
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 			gitSecret = configuration.Git.Webhook.Secret;
+			var antiplagiarismClientConfiguration = ApplicationConfiguration.Read<UlearnConfiguration>().AntiplagiarismClient;
+			antiPlagiarismClient = new AntiPlagiarismClient(antiplagiarismClientConfiguration.Endpoint, antiplagiarismClientConfiguration.Token, serilogLogger);
+			tempCoursesReo = new TempCoursesRepo();
 		}
 
 		public ActionResult Courses(string courseId = null, string courseTitle = null)
@@ -102,7 +109,8 @@ namespace uLearn.Web.Controllers
 					{
 						Id = course.Id,
 						Title = course.Title,
-						LastWriteTime = courseManager.GetLastWriteTime(course.Id)
+						LastWriteTime = courseManager.GetLastWriteTime(course.Id),
+						IsTemp = IsTempCourse(course.Id)
 					})
 					.ToList(),
 				LastTryCourseId = courseId,
@@ -461,7 +469,14 @@ namespace uLearn.Web.Controllers
 		[ValidateInput(false)]
 		public ActionResult Packages(string courseId, string error = "")
 		{
+			if (IsTempCourse(courseId))
+				return null;
 			return PackagesInternal(courseId, error);
+		}
+
+		public bool IsTempCourse(string courseId)
+		{
+			return tempCoursesReo.Find(courseId) != null;
 		}
 
 		private ActionResult PackagesInternal(string courseId, string error = "", bool openStep1 = false, bool openStep2 = false)
@@ -803,8 +818,9 @@ namespace uLearn.Web.Controllers
 		[ChildActionOnly]
 		public ActionResult UsersPartial(UserSearchQueryModel queryModel)
 		{
+			var userRolesByEmail = User.IsSystemAdministrator() ? usersRepo.FilterUsersByEmail(queryModel) : null;
 			var userRoles = usersRepo.FilterUsers(queryModel);
-			var model = GetUserListModel(userRoles, queryModel.CourseId);
+			var model = GetUserListModel(userRolesByEmail.EmptyIfNull().Concat(userRoles).DistinctBy(r => r.UserId).ToList(), queryModel.CourseId);
 
 			return PartialView("_UserListPartial", model);
 		}
@@ -847,7 +863,8 @@ namespace uLearn.Web.Controllers
 							ToggleUrl = Url.Action("ToggleRole", "Account", new { courseId, userId = user.UserId, role = courseRole }),
 							UserName = user.UserVisibleName,
 							Role = courseRole,
-							CourseTitle = courseManager.FindCourse(courseId)?.Title
+							CourseTitle = courseManager.FindCourse(courseId)?.Title,
+							IsTempCourse =  IsTempCourse(courseId)
 						});
 
 				var courseAccesses = usersCourseAccesses.ContainsKey(user.UserId) ? usersCourseAccesses[user.UserId] : null;
@@ -862,7 +879,8 @@ namespace uLearn.Web.Controllers
 							ToggleUrl = Url.Action("ToggleCourseAccess", "Admin", new { courseId = courseId, userId = user.UserId, accessType = a }),
 							UserName = user.UserVisibleName,
 							AccessType = a,
-							CourseTitle = courseManager.FindCourse(courseId)?.Title
+							CourseTitle = courseManager.FindCourse(courseId)?.Title,
+							IsTempCourse = IsTempCourse(courseId)
 						}
 					);
 
@@ -878,11 +896,13 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public ActionResult Diagnostics(string courseId, Guid? versionId)
 		{
+			var isTempCourse = IsTempCourse(courseId);
 			if (versionId == null)
 			{
 				return View(new DiagnosticsModel
 				{
 					CourseId = courseId,
+					IsTempCourse = isTempCourse
 				});
 			}
 
@@ -902,8 +922,18 @@ namespace uLearn.Web.Controllers
 				IsDiagnosticsForVersion = true,
 				VersionId = versionIdGuid,
 				CourseDiff = courseDiff,
-				Warnings = warnings
+				Warnings = warnings,
+				IsTempCourse = isTempCourse
 			});
+		}
+
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
+		public ActionResult TempCourseDiagnostics(string courseId)
+		{
+			var authorId = tempCoursesReo.Find(courseId).AuthorId;
+			var baseCourseId = courseId.Replace($"_{authorId}", ""); // todo добавить поле baseCourseId в сущность tempCourse
+			var baseCourseVersion = coursesRepo.GetPublishedCourseVersion(baseCourseId).Id;
+			return RedirectToAction("Diagnostics", new {courseId, versionId = baseCourseVersion});
 		}
 
 		public static void CopyFilesRecursively(DirectoryInfo source, DirectoryInfo target)
@@ -1481,6 +1511,48 @@ namespace uLearn.Web.Controllers
 
 			return Json(new { status = "ok" });
 		}
+
+		[ValidateAntiForgeryToken]
+		[HandleHttpAntiForgeryException]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
+		[HttpPost]
+		public async Task<ActionResult> SetSuspicionLevels(string courseId, Guid slideId, string faintSuspicion = null, string strongSuspicion = null)
+		{
+			var course = courseManager.GetCourse(courseId);
+			if (course.Slides.All(s => s.Id != slideId))
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden, "Course does not contain a slide");
+
+			if (!TryParseNullableDouble(faintSuspicion, out var faintSuspicionParsed)
+				|| !TryParseNullableDouble(strongSuspicion, out var strongSuspicionParsed))
+				return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "faintSuspicion or strongSuspicion not in double");
+
+			if (faintSuspicion != null && (faintSuspicionParsed < 0 || faintSuspicionParsed > 100)
+				|| strongSuspicion != null && (strongSuspicionParsed < 0 || strongSuspicionParsed > 100)
+				|| faintSuspicionParsed > strongSuspicionParsed)
+				return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "faintSuspicion < strongSuspicion and in [0, 100]");
+
+			await antiPlagiarismClient.SetSuspicionLevelsAsync(new SetSuspicionLevelsParameters
+			{
+				TaskId = slideId,
+				FaintSuspicion = faintSuspicionParsed / 100d,
+				StrongSuspicion = strongSuspicionParsed / 100d,
+			});
+			return Json(new { status = "ok" });
+		}
+
+		public static bool TryParseNullableDouble(string str, out double? result)
+		{
+			result = null;
+			if (string.IsNullOrWhiteSpace(str))
+				return true;
+			str = str.Replace(',', '.');
+			if (double.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture, out var d))
+			{
+				result = d;
+				return true;
+			}
+			return false;
+		}
 	}
 
 	public class CertificateRequest
@@ -1557,6 +1629,7 @@ namespace uLearn.Web.Controllers
 		public string Title { get; set; }
 		public string Id { get; set; }
 		public DateTime LastWriteTime { get; set; }
+		public bool IsTemp { get; set; }
 	}
 
 	public class PackagesViewModel
@@ -1618,5 +1691,6 @@ namespace uLearn.Web.Controllers
 		public Guid VersionId { get; set; }
 		public CourseDiff CourseDiff { get; set; }
 		public string Warnings { get; set; }
+		public bool IsTempCourse { get; set; }
 	}
 }

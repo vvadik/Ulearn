@@ -17,7 +17,7 @@ namespace Database.Models
 		public string UserId { get; set; }
 
 		[Required]
-		[StringLength(64)]
+		[StringLength(100)]
 		[Index("IDX_LastVisits_ByCourseAndUser", 1)]
 		public string CourseId { get; set; }
 

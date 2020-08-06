@@ -11,6 +11,7 @@ using Database;
 using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
+using JetBrains.Annotations;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
@@ -35,6 +36,8 @@ namespace uLearn.Web.Controllers
 		private readonly NotificationsRepo notificationsRepo;
 		private readonly CoursesRepo coursesRepo;
 		private readonly SystemAccessesRepo systemAccessesRepo;
+		private readonly TempCoursesRepo tempCoursesRepo;
+		private readonly SlideCheckingsRepo slideCheckingsRepo; 
 
 		private readonly string telegramSecret;
 		private static readonly WebApiConfiguration configuration;
@@ -56,6 +59,8 @@ namespace uLearn.Web.Controllers
 			notificationsRepo = new NotificationsRepo(db);
 			coursesRepo = new CoursesRepo(db);
 			systemAccessesRepo = new SystemAccessesRepo(db);
+			tempCoursesRepo = new TempCoursesRepo(db);
+			slideCheckingsRepo = new SlideCheckingsRepo(db);
 
 			telegramSecret = WebConfigurationManager.AppSettings["ulearn.telegram.webhook.secret"] ?? "";
 		}
@@ -73,15 +78,16 @@ namespace uLearn.Web.Controllers
 		}
 
 		[ChildActionOnly]
-		public ActionResult ListPartial(UserSearchQueryModel queryModel)
+		public async Task<ActionResult> ListPartial(UserSearchQueryModel queryModel)
 		{
+			var userRolesByEmail = User.IsSystemAdministrator() ? usersRepo.FilterUsersByEmail(queryModel) : null;
 			var userRoles = usersRepo.FilterUsers(queryModel);
-			var model = GetUserListModel(userRoles);
+			var model = await GetUserListModel(userRolesByEmail.EmptyIfNull().Concat(userRoles).DistinctBy(r => r.UserId).ToList());
 
 			return PartialView("_UserListPartial", model);
 		}
 
-		private UserListModel GetUserListModel(List<UserRolesInfo> users)
+		private async Task<UserListModel> GetUserListModel(List<UserRolesInfo> users)
 		{
 			var coursesForUsers = userRolesRepo.GetCoursesForUsers();
 
@@ -89,11 +95,14 @@ namespace uLearn.Web.Controllers
 
 			var currentUserId = User.Identity.GetUserId();
 			var userIds = users.Select(u => u.UserId).ToList();
+			var tempCoursesIds = tempCoursesRepo.GetTempCourses()
+				.Select(t => t.CourseId)
+				.ToHashSet();
 			var model = new UserListModel
 			{
 				CanToggleRoles = User.HasAccess(CourseRole.CourseAdmin),
 				ShowDangerEntities = User.IsSystemAdministrator(),
-				Users = users.Select(user => GetUserModel(user, coursesForUsers, courses)).ToList(),
+				Users = users.Select(user => GetUserModel(user, coursesForUsers, courses, tempCoursesIds)).ToList(),
 				UsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courses, userIds, User),
 				UsersArchivedGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courses, userIds, User, onlyArchived: true),
 				CanViewAndToggleCourseAccesses = false,
@@ -104,7 +113,8 @@ namespace uLearn.Web.Controllers
 			return model;
 		}
 
-		private UserModel GetUserModel(UserRolesInfo userRoles, Dictionary<string, Dictionary<CourseRole, List<string>>> coursesForUsers, List<string> coursesIds)
+		private UserModel GetUserModel(UserRolesInfo userRoles, Dictionary<string, Dictionary<CourseRole, List<string>>> coursesForUsers,
+			List<string> coursesIds, HashSet<string> tempCoursesIds)
 		{
 			var user = new UserModel(userRoles)
 			{
@@ -135,7 +145,8 @@ namespace uLearn.Web.Controllers
 							CourseTitle = courseManager.GetCourse(s).Title,
 							HasAccess = coursesForUser.ContainsKey(role) && coursesForUser[role].Contains(s.ToLower()),
 							ToggleUrl = Url.Content($"~/Account/{nameof(ToggleRole)}?courseId={s}&userId={user.UserId}&role={role}"),
-							UserName = user.UserVisibleName
+							UserName = user.UserVisibleName,
+							IsTempCourse = tempCoursesIds.Contains(s)
 						})
 						.OrderBy(s => s.CourseTitle, StringComparer.InvariantCultureIgnoreCase)
 						.ToList()
@@ -180,7 +191,7 @@ namespace uLearn.Web.Controllers
 				if (!alreadyInGroup)
 					await NotifyAboutUserJoinedToGroup(group, User.Identity.GetUserId());
 
-				var courseId = group.CourseId;
+				await slideCheckingsRepo.RemoveLimitsForUser(group.CourseId, User.Identity.GetUserId()).ConfigureAwait(false);
 
 				return View("JoinedToGroup", group);
 			}
@@ -307,6 +318,10 @@ namespace uLearn.Web.Controllers
 			var userCourses = courseManager.GetCourses().Where(c => userCoursesIds.Contains(c.Id.ToLower())).OrderBy(c => c.Title).ToList();
 
 			var allCourses = courseManager.GetCourses().ToDictionary(c => c.Id, c => c, StringComparer.InvariantCultureIgnoreCase);
+			var tempCourseIds = tempCoursesRepo.GetTempCourses()
+				.Select(c => c.CourseId)
+				.Where(c => allCourses.ContainsKey(c))
+				.ToHashSet();
 			var certificates = certificatesRepo.GetUserCertificates(user.Id).OrderBy(c => allCourses.GetOrDefault(c.Template.CourseId)?.Title ?? "<курс удалён>").ToList();
 
 			var courseGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, maxCount: 10));
@@ -323,6 +338,7 @@ namespace uLearn.Web.Controllers
 				CourseArchivedGroups = courseArchivedGroups,
 				Certificates = certificates,
 				AllCourses = allCourses,
+				TempCoursesIds = tempCourseIds,
 				CoursesWithRoles = coursesWithRoles,
 				CoursesWithAccess = coursesWithAccess
 			});
@@ -869,7 +885,6 @@ namespace uLearn.Web.Controllers
 
 				response.Cookies.Add(new HttpCookie(newCookie(cookieName), cookie.Value)
 				{
-					HttpOnly = true,
 					Domain = configuration.Web.CookieDomain,
 					Secure = configuration.Web.CookieSecure
 				});
@@ -877,23 +892,11 @@ namespace uLearn.Web.Controllers
 				if (removeOld)
 					response.Cookies.Add(new HttpCookie(actualCookie(cookieName), "")
 					{
-						HttpOnly = true,
 						Expires = DateTime.Now.AddDays(-1),
 						Domain = configuration.Web.CookieDomain,
 						Secure = configuration.Web.CookieSecure
 					});
 			}
-		}
-
-		public static bool IsHijacked(HttpRequest request)
-		{
-			foreach (var cookieName in hijackCookies)
-			{
-				if (request.Cookies.Get(cookieName + ".hijack") != null)
-					return true;
-			}
-
-			return false;
 		}
 	}
 
@@ -906,6 +909,8 @@ namespace uLearn.Web.Controllers
 		public Dictionary<string, Course> AllCourses { get; set; }
 		public Dictionary<string, string> CourseGroups { get; set; }
 		public Dictionary<string, string> CourseArchivedGroups { get; set; }
+		
+		public HashSet<string> TempCoursesIds { get; set; }
 
 		public List<string> CoursesWithRoles;
 

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { userType } from "../commonPropTypes";
-import Button from "@skbkontur/react-ui/components/Button/Button";
+import { Button } from "ui";
 import Avatar from "../../common/Avatar/Avatar";
 import MarkdownEditor from "./MarkdownEditor/MarkdownEditor";
 

@@ -28,6 +28,9 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		[XmlElement("userCodeFile")]
 		public string UserCodeFilePath { get; set; }
 
+		[XmlElement("solutionFilePath")]
+		public string SolutionFilePath { get; set; } // По умолчанию используется UserCodeFilePath
+
 		[XmlElement("region")]
 		public string Region { get; set; } // Студент видит в консоли и редактирует регион с этим именем. <prefix>region label <...> <prefix>rendregion label. Должен быть как в решении, так и в файле заглушке.
 
@@ -85,16 +88,19 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public FileInfo InitialUserCodeFile => ExerciseDirectory.GetFile(InitialUserCodeFilePath);
 
 		[XmlIgnore]
-		public FileInfo CorrectSolutionFile => UserCodeFile;
+		public FileInfo CorrectSolutionFile => SolutionFilePath == null ? UserCodeFile : ExerciseDirectory.GetFile(SolutionFilePath);
 
 		[XmlIgnore]
-		public string CorrectSolutionFilePath => UserCodeFilePath;
+		public string CorrectSolutionFilePath => SolutionFilePath ?? UserCodeFilePath;
 
 		[XmlIgnore]
 		private static readonly string[] wrongAnswerPatterns = { "*.WrongAnswer.*", "*.WA.*" };
 
 		[XmlIgnore]
 		private static readonly string[] initialPatterns = { "*.Initial.*" };
+
+		[XmlIgnore]
+		private static readonly string[] solutionPatterns = { "*.Solution.*" };
 
 		[XmlIgnore]
 		public List<FileInfo> WrongAnswerFiles =>
@@ -139,12 +145,11 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			UnitDirectory = context.UnitDirectory;
 			CourseDirectory = context.CourseDirectory;
 			ExpectedOutput = ExpectedOutput ?? "";
-			SolutionRegionContent = new Lazy<string>(() => GetRegionContent(UserCodeFile));
+			SolutionRegionContent = new Lazy<string>(() => GetRegionContent(CorrectSolutionFile));
 			InitialRegionContent = new Lazy<string>(() => GetRegionContent(InitialUserCodeFile));
 			ExerciseInitialCode = NoStudentZip
 				? GetNoStudentZipInitialCode()
 				: ExerciseInitialCode ?? "// Вставьте сюда финальное содержимое файла " + UserCodeFilePath;
-			CheckForPlagiarism = CheckForPlagiarism && Language == Core.Language.CSharp;
 			yield return this;
 
 			var correctSolution = GetCorrectSolution();
@@ -170,9 +175,9 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			return ExerciseInitialCode
 				= InitialRegionContent.Value
 				?? (InitialUserCodeFile.Exists ? InitialUserCodeFile.ContentAsUtf8() : null)
-				?? ExerciseInitialCode;
+				?? ExerciseInitialCode
+				?? "";
 		}
-
 
 		public string GetRegionContent(FileInfo file)
 		{
@@ -212,12 +217,17 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			var excluded = (PathsToExcludeForChecker ?? new string[0])
 				.Concat(initialPatterns)
 				.Concat(wrongAnswerPatterns)
+				.Concat(solutionPatterns)
+				.Concat(new[] { "/bin/", "/obj/", ".idea/", ".vs/" })
 				.ToList();
 
 			var toUpdateDirectories = PathsToIncludeForChecker
-				?.Select(pathToInclude => new DirectoryInfo(Path.Combine(UnitDirectory.FullName, pathToInclude)));
+				.EmptyIfNull()
+				.Select(pathToInclude => new DirectoryInfo(Path.Combine(UnitDirectory.FullName, pathToInclude)))
+				.Select(d => d.FullName);
+			var directoriesToInclude = toUpdateDirectories.Append(ExerciseDirectory.FullName).ToList();
 
-			var ms = ToZip(ExerciseDirectory, excluded, null, toUpdateDirectories);
+			var ms = ZipUtils.CreateZipFromDirectory(directoriesToInclude, excluded, null, Encoding.UTF8);
 			log.Info($"Собираю zip-архив для проверки: zip-архив собран, {ms.Length} байтов");
 			return ms;
 		}
@@ -236,12 +246,13 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			var excluded = (PathsToExcludeForStudent ?? new string[0])
 				.Concat(initialPatterns)
 				.Concat(wrongAnswerPatterns)
-				.Concat(new[] { "checking/*" })
+				.Concat(solutionPatterns)
+				.Concat(new[] { "/checking/", "/bin/", "/obj/", ".idea/", ".vs/" })
 				.ToList();
 
 			var toUpdate = ReplaceWithInitialFiles().ToList();
 
-			var zipBytes = ToZip(ExerciseDirectory, excluded, toUpdate).ToArray();
+			var zipBytes = ZipUtils.CreateZipFromDirectory(new List<string> { ExerciseDirectory.FullName }, excluded, toUpdate, Encoding.UTF8).ToArray();
 
 			log.Info($"Собираю zip-архив для студента: zip-архив собран, {zipBytes.Length} байтов");
 			return zipBytes;

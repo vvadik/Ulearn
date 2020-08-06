@@ -7,6 +7,7 @@ using Database.Models;
 using Database.Models.Quizzes;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Ulearn.Common.Extensions;
 
 namespace Database.Repos
@@ -15,10 +16,12 @@ namespace Database.Repos
 	public class SlideCheckingsRepo : ISlideCheckingsRepo
 	{
 		private readonly UlearnDb db;
+		private readonly Lazy<IVisitsRepo> visitsRepo;
 
-		public SlideCheckingsRepo(UlearnDb db)
+		public SlideCheckingsRepo(UlearnDb db, IServiceProvider serviceProvider)
 		{
 			this.db = db;
+			visitsRepo = new Lazy<IVisitsRepo>(serviceProvider.GetRequiredService<IVisitsRepo>);
 		}
 
 		public async Task AddQuizAttemptForManualChecking(UserQuizSubmission submission, string courseId, Guid slideId, string userId)
@@ -253,6 +256,44 @@ namespace Database.Repos
 		{
 			checking.ProhibitFurtherManualCheckings = true;
 			return db.SaveChangesAsync();
+		}
+
+		public async Task RemoveLimitsForUser(string courseId, string userId)
+		{
+			await DisableProhibitFurtherManualCheckings(courseId, userId);
+			await NotCountOldAttemptsToQuizzesWithManualChecking(courseId, userId);
+			//await NotCountOldAttemptsToQuizzesWithAutomaticChecking(courseId, userId);
+			//await visitsRepo.Value.UnskipAllSlides(courseId, userId);
+		}
+
+		public async Task DisableProhibitFurtherManualCheckings(string courseId, string userId)
+		{
+			var checkingsWithProhibitFurther = await db.ManualExerciseCheckings
+				.Where(c => c.CourseId == courseId && c.UserId == userId && c.ProhibitFurtherManualCheckings)
+				.ToListAsync();
+			foreach (var checking in checkingsWithProhibitFurther)
+				checking.ProhibitFurtherManualCheckings = false;
+			await db.SaveChangesAsync();
+		}
+
+		public async Task NotCountOldAttemptsToQuizzesWithManualChecking(string courseId, string userId)
+		{
+			var checkings = await db.ManualQuizCheckings
+				.Where(c => c.CourseId == courseId && c.UserId == userId && c.IsChecked)
+				.ToListAsync();
+			foreach (var checking in checkings)
+				checking.IgnoreInAttemptsCount = true;
+			await db.SaveChangesAsync();
+		}
+
+		public async Task NotCountOldAttemptsToQuizzesWithAutomaticChecking(string courseId, string userId)
+		{
+			var checkings = await db.AutomaticQuizCheckings
+				.Where(c => c.CourseId == courseId && c.UserId == userId)
+				.ToListAsync();
+			foreach (var checking in checkings)
+				checking.IgnoreInAttemptsCount = true;
+			await db.SaveChangesAsync();
 		}
 
 		private async Task<ExerciseCodeReview> AddExerciseCodeReview([CanBeNull] UserExerciseSubmission submission, [CanBeNull] ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime)

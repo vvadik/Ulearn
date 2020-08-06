@@ -33,7 +33,7 @@ namespace Ulearn.Web.Api.Controllers
 		public UserProgressController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
 			IVisitsRepo visitsRepo, IUserQuizzesRepo userQuizzesRepo, IAdditionalScoresRepo additionalScoresRepo,
 			ICourseRolesRepo courseRolesRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo,
-			ISlideCheckingsRepo slideCheckingsRepo)
+			ISlideCheckingsRepo slideCheckingsRepo, ITempCoursesRepo tempCoursesRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.visitsRepo = visitsRepo;
@@ -50,8 +50,11 @@ namespace Ulearn.Web.Api.Controllers
 		/// </summary>
 		[HttpPost("{courseId}")]
 		[Authorize]
-		public async Task<ActionResult<UsersProgressResponse>> UserProgress([FromRoute]Course course, [FromBody]UserProgressParameters parameters)
+		public async Task<ActionResult<UsersProgressResponse>> UserProgress([FromRoute]string courseId, [FromBody]UserProgressParameters parameters)
 		{
+			if (!courseManager.HasCourse(courseId))
+				return NotFound(new ErrorResponse($"Course {courseId} not found"));
+			var course = courseManager.FindCourse(courseId);
 			var userIds = parameters.UserIds;
 			if (userIds == null || userIds.Count == 0)
 				userIds = new List<string> { UserId };
@@ -143,7 +146,7 @@ namespace Ulearn.Web.Api.Controllers
 		public async Task<ActionResult<UsersProgressResponse>> Visit([FromRoute] Course course, [FromRoute] Guid slideId)
 		{
 			await visitsRepo.AddVisit(course.Id, slideId, UserId, GetRealClientIp());
-			return await UserProgress(course, new UserProgressParameters());
+			return await UserProgress(course.Id, new UserProgressParameters());
 		}
 
 		private string GetRealClientIp()

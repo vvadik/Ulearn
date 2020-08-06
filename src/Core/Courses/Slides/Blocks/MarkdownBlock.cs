@@ -6,6 +6,7 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Model.Edx.EdxComponents;
 
@@ -24,7 +25,7 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 			set => markdown = value.RemoveCommonNesting();
 		}
 
-		public SlideBlock[] InnerBlocks { get; set; }
+		public SlideBlock[] InnerBlocks { get; set; } // может содержать MarkdownBlock или CodeBlock
 
 		public MarkdownBlock(string markdown)
 		{

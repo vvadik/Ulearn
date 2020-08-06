@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Database.DataContexts;
+using Database;
+using Microsoft.EntityFrameworkCore;
 
 namespace ManualUtils
 {
 	public static class GetIpAddresses
 	{
 		// Шаблон для выгрузки ip-адресов студентов курсов, не состоящих ни в одной группе, заходивших за 6 месяцев.
-		public static void Run(int lastMonthCount, string[] courses, bool isNotMembersOfGroups)
+		public static void Run(UlearnDb db, int lastMonthCount, string[] courses, bool isNotMembersOfGroups)
 		{
-			var db = new ULearnDb();
 			var time = DateTime.Now.AddMonths(-lastMonthCount);
 			var membersOfGroups = new HashSet<string>(db.GroupMembers.Select(gm => gm.UserId).Distinct());
 			var visits = db.Visits

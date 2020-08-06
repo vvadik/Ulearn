@@ -17,6 +17,9 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		[XmlAttribute("hideQuizButton")]
 		public bool HideQuizButton { get; set; }
 
+		[XmlAttribute("closable")]
+		public bool Closable { get; set; }
+
 		[XmlElement(typeof(YoutubeBlock))]
 		[XmlElement("markdown", typeof(MarkdownBlock))]
 		[XmlElement(typeof(CodeBlock))]

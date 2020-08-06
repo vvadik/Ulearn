@@ -1,12 +1,13 @@
 @import "../../../../variables.less";
 
-@unitCardHeight: 168px;
-@unitCardWidth: 260px;
+@unitCardHeight: 148px;
+@unitCardWidth: 230px;
 
 .cardsContainer {
   display: grid;
+  max-width: @maxContentWidth;
   grid-template-columns: repeat(auto-fit, @unitCardWidth);
-  grid-gap: 20px 20px;
+  grid-gap: 15px 15px;
 
   margin-bottom: 15px;
 }

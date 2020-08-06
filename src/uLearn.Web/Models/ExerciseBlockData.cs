@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Web.Mvc;
 using Database.Models;
-using Ulearn.Core.Courses.Slides;
-using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 
@@ -10,12 +8,12 @@ namespace uLearn.Web.Models
 {
 	public class ExerciseBlockData
 	{
-		public ExerciseBlockData(string courseId, ExerciseSlide slide, bool isSkipped = true, string solution = null)
+		public ExerciseBlockData(string courseId, ExerciseSlide slide, bool isSkippedOrPassed, string solution = null)
 		{
 			CourseId = courseId;
 			Slide = slide;
 			Solution = solution;
-			CanSkip = !isSkipped && Solution == null;
+			IsSkippedOrPassed = isSkippedOrPassed;
 			IsGuest = true;
 			ReviewState = ExerciseReviewState.NotReviewed;
 			Submissions = new List<UserExerciseSubmission>();
@@ -37,7 +35,6 @@ namespace uLearn.Web.Models
 		public bool ShowOnlyAccepted { get; set; }
 
 		public bool ShowControls => !IsGuest;
-		public bool CanSkip { get; private set; }
 		public string Solution { get; private set; }
 
 		public UrlHelper Url { get; set; }

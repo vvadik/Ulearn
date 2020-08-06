@@ -1,12 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import api from "../../../../../api";
-import Toggle from "@skbkontur/react-ui/components/Toggle/Toggle";
-import Button from "@skbkontur/react-ui/components/Button/Button";
-import Toast from "@skbkontur/react-ui/components/Toast/Toast";
-import LinkIcon from "@skbkontur/react-icons/Link";
-import Input from "@skbkontur/react-ui/components/Input/Input";
+import api from "src/api";
+import { Toggle, Button, Toast, Link, Input } from "ui";
 
 import styles from './inviteBlock.less';
 
@@ -45,7 +41,7 @@ class InviteBlock extends Component {
 				<div className={styles["invite-link-text"]}>
 					<CopyToClipboard
 						text={`${window.location.origin}/Account/JoinGroup?hash=${group.inviteHash}`}>
-						<Button use="link" icon={<LinkIcon />} onClick={() => Toast.push('Ссылка скопирована')}>
+						<Button use="link" icon={<Link />} onClick={() => Toast.push('Ссылка скопирована')}>
 							Скопировать ссылку
 						</Button>
 					</CopyToClipboard>

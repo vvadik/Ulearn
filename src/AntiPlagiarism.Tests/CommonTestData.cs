@@ -9,9 +9,13 @@ using System.Text;
 
 namespace HelloWorld.Namespace
 {
+	/* 
+	comment
+	*/
 	class Program
 	{
-		static void Main(){ Console.WriteLine(""A"");}
+		static void Main(){ Console.WriteLine(@""
+A"");}
 
 		static int A { get { return 2; } set { Console.WriteLine(value); }}
 	}

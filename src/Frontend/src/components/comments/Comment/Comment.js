@@ -2,8 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { userRoles, userType, comment, commentStatus, commentPolicy } from "../commonPropTypes";
 import moment from "moment";
-import Link from "@skbkontur/react-ui/components/Link/Link";
-import Hint from "@skbkontur/react-ui/components/Hint/Hint";
+import { Link, Hint } from "ui";
 import Avatar from "../../common/Avatar/Avatar";
 import CommentSendForm from "../CommentSendForm/CommentSendForm";
 import Like from "./Like/Like";
@@ -12,7 +11,7 @@ import Header from "./Header/Header";
 import Marks from "./Marks/Marks";
 import CommentActions from "./CommentActions/CommentActions";
 import scrollToView from "../../../utils/scrollToView";
-import { ACCESSES, ROLES } from "../../../consts/general";
+import { ACCESSES, ROLES } from "src/consts/general";
 
 import styles from "./Comment.less";
 
@@ -29,10 +28,20 @@ class Comment extends Component {
 
 
 	componentDidMount() {
-		if (window.location.hash === `#comment-${this.props.comment.id}`) {
-			scrollToView(this.ref);
-		}
+		this.scrollToComment();
 	};
+
+	componentDidUpdate(prevProps, prevState, snapshot) {
+		if(this.props.isSlideReady && !prevProps.isSlideReady){
+			this.scrollToComment();
+		}
+	}
+
+	scrollToComment = () =>{
+		if(this.props.isSlideReady && window.location.hash === `#comment-${ this.props.comment.id }`) {
+			setTimeout(() => scrollToView(this.ref), 100); // 100ms delay to let slide render
+		}
+	}
 
 	render() {
 		const {children, commentEditing, comment, userRoles, user} = this.props;
@@ -176,6 +185,7 @@ Comment.propTypes = {
 	hasReplyAction: PropTypes.bool,
 	slideType: PropTypes.string,
 	courseId: PropTypes.string,
+	isSlideReady: PropTypes.bool,
 };
 
 export default Comment;

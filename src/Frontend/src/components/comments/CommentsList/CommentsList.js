@@ -2,16 +2,16 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { userType, userRoles, commentPolicy } from "../commonPropTypes";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
-import { TABS } from "../../../consts/general";
-import * as debounce from "debounce";
-import Icon from "@skbkontur/react-icons";
-import Loader from "@skbkontur/react-ui/components/Loader/Loader";
-import Toast from "@skbkontur/react-ui/components/Toast/Toast";
+import { TABS } from "src/consts/general";
+import { debounce } from "debounce";
+import { CommentLite } from "icons";
+import { Toast } from "ui";
+import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader";
 import Thread from "../Thread/Thread";
 import CommentSendForm from "../CommentSendForm/CommentSendForm";
 import Error404 from "../../common/Error/Error404";
 import Stub from "../Stub/Stub";
-import scrollToView from "../../../utils/scrollToView";
+import scrollToView from "src/utils/scrollToView";
 
 import styles from "./CommentsList.less";
 
@@ -81,6 +81,17 @@ class CommentsList extends Component {
 	componentWillUnmount() {
 		window.removeEventListener("scroll", this.throttleScroll);
 		window.removeEventListener("hashchange", this.handleScrollToCommentByHashFormUrl);
+	}
+
+	componentDidUpdate(prevProps, prevState) {
+		if(this.props.slideId !== prevProps.slideId) {
+			this.commentsData = {...defaultCommentsData};
+			this.setStateIfMounted({
+				threads: [],
+			});
+			const { courseId, slideId, forInstructors } = this.props;
+			this.loadComments(courseId, slideId, forInstructors);
+		}
 	}
 
 	get commentIds() {
@@ -223,7 +234,7 @@ class CommentsList extends Component {
 
 	render() {
 		const { threads, loadingComments } = this.state;
-		const { user, courseId, slideId, commentPolicy, key } = this.props;
+		const { user, courseId, slideId, commentPolicy, key, } = this.props;
 		const replies = threads.reduce((sum, current) => sum + current.replies.length, 0);
 
 		if (this.state.status === "error") {
@@ -237,7 +248,7 @@ class CommentsList extends Component {
 		return (
 			<div key={ key } ref={ this.commentsListRef }>
 				{ loadingComments ?
-					<Loader className={ styles.spacer } type="big" active={ loadingComments }/> :
+					<CourseLoader isSlideLoader={ false }/> :
 					<>
 						{ !user.id &&
 						<Stub hasThreads={ threads.length > 0 } courseId={ courseId } slideId={ slideId }/> }
@@ -247,7 +258,7 @@ class CommentsList extends Component {
 					</> }
 				{ (commentPolicy.areCommentsEnabled && user.id && (threads.length + replies) > 7) &&
 				<button className={ styles.sendButton } onClick={ this.handleShowSendForm }>
-					<Icon name="CommentLite" color="#3072C4"/>
+					<CommentLite color="#3072C4"/>
 					Оставить комментарий
 				</button> }
 			</div>
@@ -283,7 +294,7 @@ class CommentsList extends Component {
 
 	renderThreads() {
 		const { threads, commentEditing, reply, animation } = this.state;
-		const { user, userRoles, slideType, courseId, commentPolicy } = this.props;
+		const { user, userRoles, slideType, courseId, commentPolicy, isSlideReady, } = this.props;
 		const transitionStyles = {
 			enter: styles.enter,
 			exit: styles.exit,
@@ -332,7 +343,8 @@ class CommentsList extends Component {
 									commentEditing={ commentEditing }
 									reply={ reply }
 									actions={ actions }
-									getUserSolutionsUrl={ this.getUserSolutionsUrl }/>
+									getUserSolutionsUrl={ this.getUserSolutionsUrl }
+									isSlideReady={isSlideReady}/>
 							</section>
 						</CSSTransition>) }
 			</TransitionGroup>
@@ -663,6 +675,7 @@ CommentsList.propTypes = {
 	commentsApi: PropTypes.objectOf(PropTypes.func),
 	commentPolicy: commentPolicy,
 	courseId: PropTypes.string.isRequired,
+	isSlideReady: PropTypes.bool,
 };
 
 export default CommentsList;

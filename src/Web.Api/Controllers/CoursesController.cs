@@ -14,9 +14,13 @@ using Serilog;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Flashcards;
+using Ulearn.Core.Courses.Units;
+using Ulearn.Web.Api.Controllers.Slides;
 using Ulearn.Web.Api.Models.Common;
 using Ulearn.Web.Api.Models.Responses.Courses;
+using Ulearn.Web.Api.Models.Responses.Groups;
 
 namespace Ulearn.Web.Api.Controllers
 {
@@ -32,11 +36,13 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly IGroupsRepo groupsRepo;
 		private readonly IGroupMembersRepo groupMembersRepo;
 		private readonly IGroupAccessesRepo groupAccessesRepo;
+		private readonly SlideRenderer slideRenderer;
+		private readonly ITempCoursesRepo tempCoursesRepo;
 
 		public CoursesController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, ICoursesRepo coursesRepo,
 			IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, IUnitsRepo unitsRepo, IUserSolutionsRepo solutionsRepo,
 			IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo, IGroupMembersRepo groupMembersRepo,
-			IGroupAccessesRepo groupAccessesRepo)
+			IGroupAccessesRepo groupAccessesRepo, SlideRenderer slideRenderer, ITempCoursesRepo tempCoursesRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.coursesRepo = coursesRepo;
@@ -48,6 +54,8 @@ namespace Ulearn.Web.Api.Controllers
 			this.groupsRepo = groupsRepo;
 			this.groupMembersRepo = groupMembersRepo;
 			this.groupAccessesRepo = groupAccessesRepo;
+			this.slideRenderer = slideRenderer;
+			this.tempCoursesRepo = tempCoursesRepo;
 		}
 
 		/// <summary>
@@ -91,14 +99,19 @@ namespace Ulearn.Web.Api.Controllers
 			else
 				courses = courses.OrderBy(c => c.Title);
 
+			var tempCourseLabel =  "Временный - ";
+			var tempCoursesIds = (await tempCoursesRepo.GetTempCoursesAsync())
+				.Select(t => t.CourseId)
+				.ToHashSet();
 			return new CoursesListResponse
 			{
 				Courses = courses
 					.Select(c => new ShortCourseInfo
 					{
 						Id = c.Id,
-						Title = c.Title,
-						ApiUrl = Url.Action("CourseInfo", "Courses", new { courseId = c.Id })
+						Title = tempCoursesIds.Contains(c.Id) ? tempCourseLabel + c.Title : c.Title,
+						ApiUrl = Url.Action("CourseInfo", "Courses", new { courseId = c.Id }),
+						IsTempCourse = tempCoursesIds.Contains(c.Id)
 					}
 				).ToList()
 			};
@@ -109,11 +122,12 @@ namespace Ulearn.Web.Api.Controllers
 		/// </summary>
 		/// <param name="groupId">If null, returns data for the current user, otherwise for a group</param>
 		[HttpGet("{courseId}")]
-		public async Task<ActionResult<CourseInfo>> CourseInfo([FromRoute]Course course, [FromQuery][CanBeNull]int? groupId = null)
+		public async Task<ActionResult<CourseInfo>> CourseInfo([FromRoute]string courseId, [FromQuery][CanBeNull]int? groupId = null)
 		{
-			if (course == null)
+			if (!await courseManager.HasCourseAsync(courseId))
 				return NotFound(new ErrorResponse("Course not found"));
 
+			var course = await courseManager.FindCourseAsync(courseId);
 			List<UnitInfo> units;
 			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIdsAsync(course, UserId);
 			var visibleUnits = course.GetUnits(visibleUnitsIds);
@@ -125,7 +139,8 @@ namespace Ulearn.Web.Api.Controllers
 
 				var showInstructorsSlides = isInstructor;
 				var getSlideMaxScoreFunc = await BuildGetSlideMaxScoreFunc(solutionsRepo, userQuizzesRepo, visitsRepo, groupsRepo, course, UserId);
-				units = visibleUnits.Select(unit => BuildUnitInfo(course.Id, unit, showInstructorsSlides, getSlideMaxScoreFunc)).ToList();
+				var getGitEditLinkFunc = await BuildGetGitEditLinkFunc(User.GetUserId(), course, courseRolesRepo, coursesRepo);
+				units = visibleUnits.Select(unit => BuildUnitInfo(course.Id, unit, showInstructorsSlides, getSlideMaxScoreFunc, getGitEditLinkFunc)).ToList();
 			}
 			else
 			{
@@ -142,23 +157,27 @@ namespace Ulearn.Web.Api.Controllers
 
 				if (visibleUnits.Count == 0)
 					return NotFound(new ErrorResponse("Course not found"));
-				
+
 				var getSlideMaxScoreFunc = BuildGetSlideMaxScoreFunc(course, group);
-				units = visibleUnits.Select(unit => BuildUnitInfo(course.Id, unit, false, getSlideMaxScoreFunc)).ToList();
+				var getGitEditLinkFunc = await BuildGetGitEditLinkFunc(User.GetUserId(), course, courseRolesRepo, coursesRepo);
+				units = visibleUnits.Select(unit => BuildUnitInfo(course.Id, unit, false, getSlideMaxScoreFunc, getGitEditLinkFunc)).ToList();
 			}
 
 			var containsFlashcards = visibleUnits.Any(x => x.Slides.OfType<FlashcardSlide>().Any());
 			var scoringSettings = GetScoringSettings(course);
-
+			var tempCourseError = (await tempCoursesRepo.GetCourseErrorAsync(courseId))?.Error;
+			var isTempCourse = await IsTempCourse(course.Id);
 			return new CourseInfo
 			{
 				Id = course.Id,
-				Title = course.Title,
+				Title = isTempCourse ? "Временный - " + course.Title : course.Title,
 				Description = course.Settings.Description,
 				Scoring = scoringSettings,
 				NextUnitPublishTime = unitsRepo.GetNextUnitPublishTime(course.Id),
 				Units = units,
-				ContainsFlashcards = containsFlashcards
+				ContainsFlashcards = containsFlashcards,
+				IsTempCourse = isTempCourse,
+				TempCourseError = tempCourseError
 			};
 		}
 
@@ -177,6 +196,35 @@ namespace Ulearn.Web.Api.Controllers
 				})
 				.ToList();
 			return new ScoringSettingsModel { Groups = groups };
+		}
+
+		private UnitInfo BuildUnitInfo(string courseId, Unit unit, bool showInstructorsSlides, Func<Slide, int> getSlideMaxScoreFunc, Func<Slide, string> getGitEditLinkFunc)
+		{
+			var slides = unit.Slides.Select(slide => slideRenderer.BuildShortSlideInfo(courseId, slide, getSlideMaxScoreFunc, getGitEditLinkFunc, Url));
+			if (showInstructorsSlides && unit.InstructorNote != null)
+				slides = slides.Concat(new List<ShortSlideInfo> { slideRenderer.BuildShortSlideInfo(courseId, unit.InstructorNote.Slide, getSlideMaxScoreFunc, getGitEditLinkFunc, Url) });
+			return BuildUnitInfo(unit, slides);
+		}
+
+		private static UnitInfo BuildUnitInfo(Unit unit, IEnumerable<ShortSlideInfo> slides)
+		{
+			return new UnitInfo
+			{
+				Id = unit.Id,
+				Title = unit.Title,
+				Slides = slides.ToList(),
+				AdditionalScores = GetAdditionalScores(unit)
+			};
+		}
+
+		private static List<UnitScoringGroupInfo> GetAdditionalScores(Unit unit)
+		{
+			return unit.Settings.Scoring.Groups.Values.Where(g => g.CanBeSetByInstructor).Select(g => new UnitScoringGroupInfo(g)).ToList();
+		}
+
+		private async Task<bool> IsTempCourse(string courseId)
+		{
+			return await tempCoursesRepo.FindAsync(courseId) != null;
 		}
 	}
 }

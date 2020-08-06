@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-import Button from "@skbkontur/react-ui/Button";
-import LeftIcon from '@skbkontur/react-icons/ArrowChevron2Left';
+import { Button } from "ui";
+import { ArrowChevron2Left } from 'icons';
 
 import { groupAsStudentType, progressType } from "../../types";
 import LinksToGroupsStatements from "../../LinksToGroupsStatements/LinksToGroupsStatements";
@@ -14,12 +14,14 @@ class NavigationHeader extends Component {
 	render() {
 		const { createRef, groupsAsStudent, } = this.props;
 		return (
-			<header ref={ (ref) => createRef(ref) } className={ styles.root }>
+			<React.Fragment>
 				{ this.renderBreadcrumb() }
-				{ this.renderTitle() }
-				{ this.renderProgress() }
-				{ groupsAsStudent.length > 0 && <LinksToGroupsStatements groupsAsStudent={ groupsAsStudent }/> }
-			</header>
+				<header ref={ (ref) => createRef(ref) } className={ styles.root }>
+					{ this.renderTitle() }
+					{ this.renderProgress() }
+					{ groupsAsStudent.length > 0 && <LinksToGroupsStatements groupsAsStudent={ groupsAsStudent }/> }
+				</header>
+			</React.Fragment>
 		);
 	}
 
@@ -30,7 +32,7 @@ class NavigationHeader extends Component {
 			<nav className={ styles.breadcrumbs }>
 				<Button
 					use="link"
-					icon={ <LeftIcon/> }
+					icon={ <ArrowChevron2Left/> }
 					onClick={ onCourseClick }>{ courseName }</Button>
 			</nav>
 		);
@@ -46,7 +48,7 @@ class NavigationHeader extends Component {
 		const { progress } = this.props;
 		const percentage = progress.current / progress.max;
 
-		if (percentage > 0) {
+		if(percentage > 0) {
 			return (
 				<div className={ styles.progressBarWrapper } title={ `${ progress.current } из ${ progress.max }` }>
 					<ProgressBar value={ percentage } color={ percentage >= 1 ? 'green' : 'blue' }/>

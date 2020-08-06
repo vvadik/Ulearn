@@ -3,10 +3,14 @@ import {
 	COURSES__COURSE_LOAD,
 	COURSES__FLASHCARDS,
 	COURSES__FLASHCARDS_RATE,
+	COURSES__SLIDE_LOAD,
+	COURSES__SLIDE_READY,
+	COURSES__COURSE_LOAD_ERRORS,
 	START, SUCCESS, FAIL,
 } from "../consts/actions";
 
-import { getCourse } from '../api/courses';
+import { getCourse, getCourseErrors } from 'src/api/courses';
+import { getSlide } from "src/api/slides";
 import {
 	getFlashcards,
 	putFlashcardStatus,
@@ -23,6 +27,12 @@ const loadCourseStart = () => ({
 
 const loadCourseSuccess = (courseId, result) => ({
 	type: COURSES__COURSE_LOAD + SUCCESS,
+	courseId,
+	result,
+});
+
+const loadCourseErrorsSuccess = (courseId, result) => ({
+	type: COURSES__COURSE_LOAD_ERRORS,
 	courseId,
 	result,
 });
@@ -55,6 +65,27 @@ const sendFlashcardResultStart = (courseId, unitId, flashcardId, rate, newTLast)
 	newTLast,
 });
 
+const loadSlideStart = () => ({
+	type: COURSES__SLIDE_LOAD + START,
+});
+
+const loadSlideSuccess = (courseId, slideId, result) => ({
+	type: COURSES__SLIDE_LOAD + SUCCESS,
+	courseId,
+	slideId,
+	result,
+});
+
+const loadSlideFail = (error) => ({
+	type: COURSES__SLIDE_LOAD + FAIL,
+	error,
+});
+
+const slideReadyAction = (isSlideReady) => ({
+	type: COURSES__SLIDE_READY,
+	isSlideReady,
+});
+
 export const loadCourse = (courseId) => {
 	courseId = courseId.toLowerCase();
 
@@ -67,6 +98,23 @@ export const loadCourse = (courseId) => {
 			})
 			.catch(err => {
 				dispatch(loadCourseFail(err.status));
+			});
+	};
+};
+export const loadCourseErrors = (courseId) => {
+	courseId = courseId.toLowerCase();
+
+	return (dispatch) => {
+		getCourseErrors(courseId)
+			.then(result => {
+			if(result.status === 204) {
+				dispatch(loadCourseErrorsSuccess(courseId, null));
+			} else {
+				dispatch(loadCourseErrorsSuccess(courseId, result.tempCourseError));
+			}
+			})
+			.catch(err => {
+				dispatch(loadCourseErrorsSuccess(courseId, null));
 			});
 	};
 };
@@ -97,3 +145,25 @@ export const sendFlashcardResult = (courseId, unitId, flashcardId, rate, newTLas
 			});
 	}
 };
+
+export const loadSlide = (courseId, slideId) => {
+	courseId = courseId.toLowerCase();
+
+	return (dispatch) => {
+		dispatch(loadSlideStart());
+
+		getSlide(courseId, slideId)
+			.then(result => {
+				dispatch(loadSlideSuccess(courseId, slideId, result));
+			})
+			.catch(err => {
+				dispatch(loadSlideFail(err));
+			});
+	};
+};
+
+export const setSlideReady = (isSlideReady) => {
+	return (dispapcth) => {
+		dispapcth(slideReadyAction(isSlideReady));
+	}
+}

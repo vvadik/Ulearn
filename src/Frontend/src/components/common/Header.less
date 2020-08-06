@@ -7,12 +7,10 @@
   right: 0;
   z-index: @headerZIndex;
   background-color: white;
-  margin-bottom: 10px;
   font-family: "Segoe UI", "Helvetica Neue", sans-serif;
   font-size: 14px;
   color: #333;
   height: @headerHeight;
-  box-shadow: 0 0 7px 4px #ccc;
 
   > * {
     display: inline-flex;
@@ -104,10 +102,6 @@
     right: 0;
     color: #666;
     user-select: none;
-
-    @media (min-width: @maxContentWidth) {
-      right: calc((100vw - @maxContentWidth) / 2);
-    }
 
     > * {
       display: inline-block;
@@ -243,6 +237,14 @@
   }
 }
 
+.header:after {
+  width: 100vw;
+  content: '';
+  display: block;
+  height: @headerDividerHeight;
+  background-color: @backgroundGray;
+}
+
 .dropdown-container {
   background-color: white;
   border: 1px solid #d5d5d5;
@@ -277,21 +279,17 @@
 }
 
 .visible-only-phone {
-  display: none;
+  display: initial;
 
-  @media (max-width: @maxPhoneWidth) {
+  @media (min-width: @minLaptopWidth) {
     & {
-      display: initial;
+      display: none;
     }
   }
 }
 
 .visible-at-least-tablet {
-  @media (max-width: @maxPhoneWidth) {
-    & {
-      display: none !important;
-    }
-  }
+  display: none;
 }
 
 .navMenuButton {
@@ -304,7 +302,7 @@
 }
 
 .phoneHeaderElementsContainer {
-  display: none;
+  display: inline-flex;
 
   height: 100%;
 
@@ -322,14 +320,12 @@
   padding-right: 5px;
 }
 
-@media (max-width: @maxPhoneWidth) {
+@media (min-width: @minLaptopWidth) {
   .phoneHeaderElementsContainer {
-    display: inline-flex;
+    display: none;
   }
-}
 
-@media (min-width: @maxContentWidth) {
-  .header {
-    padding: 0 calc((100vw - @maxContentWidth) / 2);
+  .visible-at-least-tablet {
+    display: inline-flex;
   }
 }

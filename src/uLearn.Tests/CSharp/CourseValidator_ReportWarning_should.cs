@@ -4,6 +4,7 @@ using System.Linq;
 using FluentAssertions;
 using Microsoft.VisualBasic.FileIO;
 using NUnit.Framework;
+using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses;

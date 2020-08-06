@@ -16,6 +16,7 @@ namespace AntiPlagiarism.Web.Extensions
 				AuthorId = submission.AuthorId,
 				Code = submission.ProgramText.TrimStart(),
 				AdditionalInfo = submission.AdditionalInfo,
+				ClientSubmissionId = submission.ClientSubmissionId
 			};
 		}
 	}

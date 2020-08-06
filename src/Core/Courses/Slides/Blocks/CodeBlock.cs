@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Xml.Serialization;
+using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Model.Edx.EdxComponents;
 using Component = Ulearn.Core.Model.Edx.EdxComponents.Component;
@@ -19,7 +20,7 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		public string Code
 		{
 			get => code;
-			set => code = value.RemoveCommonNesting().TrimEnd();
+			set => code = value.RemoveCommonNesting().RemoveEmptyLinesFromStart().TrimEnd();
 		}
 
 		/* .NET XML Serializer doesn't understand nullable fields, so we use this hack to make Language? field */
@@ -47,9 +48,6 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		}
 
 		#endregion
-
-		[XmlIgnore]
-		public List<Label> SourceCodeLabels { get; set; } = new List<Label>();
 
 		public CodeBlock(string code, Language? language)
 		{

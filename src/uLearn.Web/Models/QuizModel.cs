@@ -31,7 +31,7 @@ namespace uLearn.Web.Models
 		[CanBeNull]
 		public ManualQuizChecking Checking { get; set; }
 
-		public int ManualCheckingsLeft { get; set; }
+		public int ManualCheckingsLeftInQueue { get; set; }
 		public bool CanUserFillQuiz { get; set; }
 
 		/* GroupsIds != null if instructor filtered users by group and see their works */

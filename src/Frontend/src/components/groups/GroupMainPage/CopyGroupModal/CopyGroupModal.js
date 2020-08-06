@@ -1,11 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from "prop-types";
 import api from "../../../../api";
-import Modal from '@skbkontur/react-ui/components/Modal/Modal';
-import Select from '@skbkontur/react-ui/components/Select/Select';
-import Button from '@skbkontur/react-ui/components/Button/Button';
-import Checkbox from '@skbkontur/react-ui/components/Checkbox/Checkbox';
-import Loader from "@skbkontur/react-ui/components/Loader/Loader";
+import { Modal, Select, Button, Checkbox, Loader } from 'ui';
 import getPluralForm from "../../../../utils/getPluralForm";
 
 import styles from "./copyGroupModal.less";
@@ -117,7 +113,7 @@ class CopyGroupModal extends Component {
 						autofocus
 						required
 						items={this.getCourseOptions()}
-						onChange={this.onCourseChange}
+						onValueChange={this.onCourseChange}
 						width="200"
 						placeholder="Выберите курс"
 						value={courseId}
@@ -142,7 +138,7 @@ class CopyGroupModal extends Component {
 							autofocus
 							required
 							items={this.getGroupOptions()}
-							onChange={this.onGroupChange}
+							onValueChange={this.onGroupChange}
 							width="200"
 							placeholder="Выберите группу"
 							value={groupId}
@@ -175,7 +171,7 @@ class CopyGroupModal extends Component {
 					курса <b>«{this.props.course.title}»</b>.
 					Вы можете сделать себя владельцем скопированной группы.
 				</p>
-				<Checkbox checked={changeOwner} onChange={this.onChangeOwner}>
+				<Checkbox checked={changeOwner} onValueChange={this.onChangeOwner}>
 					Сделать меня владельцем группы
 				</Checkbox>
 			</div>
@@ -198,7 +194,7 @@ class CopyGroupModal extends Component {
 		return courses.map(course => [course.id, course.title]);
 	};
 
-	onCourseChange = (_, value) => {
+	onCourseChange = (value) => {
 
 		this.setState({
 			courseId: value,
@@ -224,7 +220,7 @@ class CopyGroupModal extends Component {
 		${getPluralForm(group.studentsCount, 'студент', 'студента', 'студентов')}`]);
 	};
 
-	onGroupChange = (_, value) => {
+	onGroupChange = (value) => {
 		this.setState({groupId: value});
 	};
 
@@ -242,7 +238,7 @@ class CopyGroupModal extends Component {
 		return !(instructorsId.includes(ownerId));
 	};
 
-	onChangeOwner = (_, value) => this.setState({changeOwner: value});
+	onChangeOwner = (value) => this.setState({changeOwner: value});
 
 	onSubmit = async (e) => {
 		const {groupId, courseId, changeOwner} = this.state;

@@ -35,10 +35,11 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		private readonly INotificationsRepo notificationsRepo;
 		private readonly IGroupsCreatorAndCopier groupsCreatorAndCopier;
 		private readonly IUnitsRepo unitsRepo;
+		private readonly ISlideCheckingsRepo slideCheckingsRepo;
 
 		public GroupController(ILogger logger, IWebCourseManager courseManager, UlearnDb db,
 			IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, INotificationsRepo notificationsRepo,
-			IGroupsCreatorAndCopier groupsCreatorAndCopier, IUnitsRepo unitsRepo)
+			IGroupsCreatorAndCopier groupsCreatorAndCopier, IUnitsRepo unitsRepo, ISlideCheckingsRepo slideCheckingsRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.groupsRepo = groupsRepo;
@@ -48,6 +49,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			this.notificationsRepo = notificationsRepo;
 			this.groupsCreatorAndCopier = groupsCreatorAndCopier;
 			this.unitsRepo = unitsRepo;
+			this.slideCheckingsRepo = slideCheckingsRepo;
 		}
 
 		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -192,6 +194,10 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			var newOwnerId = parameters.ChangeOwner ? UserId : null;
 			var newGroup = await groupsCreatorAndCopier.CopyGroupAsync(group, parameters.DestinationCourseId, newOwnerId).ConfigureAwait(false);
 
+			var members = await groupMembersRepo.GetGroupMembersAsync(newGroup.Id);
+			foreach (var member in members)
+				await slideCheckingsRepo.RemoveLimitsForUser(parameters.DestinationCourseId, member.UserId);
+
 			var url = Url.Action(new UrlActionContext { Action = nameof(Group), Controller = "Group", Values = new { groupId = group.Id } });
 			return Created(url, new CopyGroupResponse
 			{
@@ -330,6 +336,8 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			if (groupMember == null)
 				return StatusCode((int)HttpStatusCode.Conflict, new ErrorResponse($"User {studentId} is already a student of group {groupId}"));
 
+			await slideCheckingsRepo.RemoveLimitsForUser(groupMember.Group.CourseId, studentId);
+
 			return Ok(new SuccessResponseWithMessage($"Student {studentId} is added to group {groupId}"));
 		}
 
@@ -414,6 +422,8 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			studentsToCopySet.IntersectWith(membersOfAllGroupsAvailableForUser);
 
 			var newMembers = await groupMembersRepo.AddUsersToGroupAsync(groupId, studentsToCopySet).ConfigureAwait(false);
+			foreach (var newMember in newMembers)
+				await slideCheckingsRepo.RemoveLimitsForUser(destinationGroup.CourseId, newMember.UserId);
 
 			await notificationsRepo.AddNotificationAsync(
 				destinationGroup.CourseId,

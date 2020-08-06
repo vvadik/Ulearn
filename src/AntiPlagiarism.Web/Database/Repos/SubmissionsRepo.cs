@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AntiPlagiarism.Api.Models;
 using AntiPlagiarism.Web.Database.Models;
 using Microsoft.EntityFrameworkCore;
+using Ulearn.Common;
 
 namespace AntiPlagiarism.Web.Database.Repos
 {
@@ -13,12 +13,12 @@ namespace AntiPlagiarism.Web.Database.Repos
 		Task<List<Submission>> GetSubmissionsAsync(int startFromIndex, int maxCount);
 		Task<Submission> FindSubmissionByIdAsync(int submissionId);
 		Task<List<Submission>> GetSubmissionsByIdsAsync(IEnumerable<int> submissionIds);
-		Task<Submission> AddSubmissionAsync(int clientId, Guid taskId, Guid authorId, Language language, string code, int tokensCount, string additionalInfo);
+		Task<Submission> AddSubmissionAsync(int clientId, Guid taskId, Guid authorId, Language language, string code, int tokensCount, string additionalInfo, string clientSubmissionId);
 		Task UpdateSubmissionTokensCountAsync(Submission submission, int tokensCount);
 		Task<List<Submission>> GetSubmissionsByAuthorAndTaskAsync(int clientId, Guid authorId, Guid taskId, int count);
 		Task<List<Guid>> GetLastAuthorsByTaskAsync(int clientId, Guid taskId, int count);
 		Task<List<Submission>> GetLastSubmissionsByAuthorsForTaskAsync(int clientId, Guid taskId, IEnumerable<Guid> authorsIds);
-		Task<int> GetAuthorsCountAsync(int clientId, Guid taskId);
+		Task<int> GetAuthorsCountAsync(int clientId, Guid taskId, int submissionInfluenceLimitInMonths);
 		Task<List<Submission>> GetSubmissionsByTaskAsync(int clientId, Guid taskId);
 		Task<int> GetSubmissionsCountAsync(int clientId, Guid taskId);
 	}
@@ -51,7 +51,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 			return db.Submissions.Include(s => s.Program).Where(s => submissionIds.Contains(s.Id)).ToListAsync();
 		}
 
-		public async Task<Submission> AddSubmissionAsync(int clientId, Guid taskId, Guid authorId, Language language, string code, int tokensCount, string additionalInfo = "")
+		public async Task<Submission> AddSubmissionAsync(int clientId, Guid taskId, Guid authorId, Language language, string code, int tokensCount, string additionalInfo, string clientSubmissionId)
 		{
 			var submission = new Submission
 			{
@@ -66,6 +66,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 				TokensCount = tokensCount,
 				AdditionalInfo = additionalInfo,
 				AddingTime = DateTime.Now,
+				ClientSubmissionId = clientSubmissionId
 			};
 
 			db.Submissions.Add(submission);
@@ -117,9 +118,12 @@ namespace AntiPlagiarism.Web.Database.Repos
 				.ToListAsync();
 		}
 
-		public Task<int> GetAuthorsCountAsync(int clientId, Guid taskId)
+		public Task<int> GetAuthorsCountAsync(int clientId, Guid taskId, int submissionInfluenceLimitInMonths)
 		{
-			return db.Submissions.Where(s => s.ClientId == clientId && s.TaskId == taskId).Select(s => s.AuthorId).Distinct().CountAsync();
+			var useSubmissionsFromDate = DateTime.Now.AddMonths(-submissionInfluenceLimitInMonths);
+			return db.Submissions
+				.Where(s => s.ClientId == clientId && s.TaskId == taskId && s.AddingTime > useSubmissionsFromDate)
+				.Select(s => s.AuthorId).Distinct().CountAsync();
 		}
 
 		public Task<List<Submission>> GetSubmissionsByTaskAsync(int clientId, Guid taskId)

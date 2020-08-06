@@ -11,11 +11,12 @@
 	<ul>
 		@foreach (var course in Model.Courses)
 		{
+			var tempLabel = course.IsTemp ? "Временный - " : "";
 			if (User.IsSystemAdministrator())
 			{
 				<li>
 					@Html.RouteLink(course.Id, "Course.Slide", new { courseId = course.Id }):
-					«@course.Title»
+					«@tempLabel@course.Title»
 				</li>
 			}
 			else

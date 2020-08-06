@@ -1,13 +1,10 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
+import getMoment from "src/utils/getMoment";
 import {withRouter} from "react-router-dom";
-import moment from "moment";
-import api from "../../../../api";
-import Icon from "@skbkontur/react-icons";
-import Kebab from "@skbkontur/react-ui/components/Kebab/Kebab";
-import MenuItem from "@skbkontur/react-ui/components/MenuItem/MenuItem";
-import Gapped from "@skbkontur/react-ui/components/Gapped/Gapped";
-import Loader from "@skbkontur/react-ui/components/Loader/Loader";
+import api from "src/api";
+import { User, Delete } from "icons";
+import { Kebab, MenuItem, Gapped, Loader, Toast } from "ui";
 import ComboboxInstructorsSearch from "./Combobox/ComboboxInstructorsSearch";
 import Avatar from "../../../common/Avatar/Avatar";
 import GroupStudents from "./GroupStudents/GroupStudents";
@@ -15,8 +12,7 @@ import InviteBlock from "./InviteBlock/InviteBlock";
 import Profile from './Profile';
 import getGenderForm from "../../../../utils/getGenderForm";
 import styles from './groupMembers.less';
-import Toast from "@skbkontur/react-ui/components/Toast/Toast";
-import {Mobile, NotMobile} from "../../../../utils/responsive";
+import {Mobile, NotMobile} from "src/utils/responsive";
 
 class GroupMembers extends Component {
 
@@ -134,8 +130,6 @@ class GroupMembers extends Component {
 		const { group, role, userId } = this.props;
 		const owner = group.owner;
 
-		const grantTime = (grantTime) => moment(grantTime).format();
-
 		const { systemAccesses, isSysAdmin } = this.props;
 
 		return (accesses
@@ -151,7 +145,7 @@ class GroupMembers extends Component {
 								systemAccesses={systemAccesses}
 								isSysAdmin={isSysAdmin} /> <span className={styles["teacher-status"]}>
 								Полный доступ { `${getGenderForm(owner.gender, 'предоставила', 'предоставил') }
-								${item.grantedBy.visibleName} ${moment(grantTime(item.grantTime)).fromNow()}` }
+								${item.grantedBy.visibleName} ${getMoment(item.grantTime)}` }
 							</span>
 						</div>
 						<div className={styles["teacher-action"]}>
@@ -169,7 +163,7 @@ class GroupMembers extends Component {
 		let menuItems = [
 			<MenuItem onClick={() => this.onChangeOwner(item.user)} key="changeOwner">
 				<Gapped gap={5}>
-					<Icon name="User" />
+					<User/>
 					Сделать владельцем
 				</Gapped>
 			</MenuItem>
@@ -178,7 +172,7 @@ class GroupMembers extends Component {
 			menuItems.push(
 				<MenuItem onClick={() => this.onRemoveTeacher(item.user)} key="removeTeacher">
 					<Gapped gap={5}>
-						<Icon name="Delete"/>
+						<Delete/>
 						Забрать доступ
 					</Gapped>
 				</MenuItem>

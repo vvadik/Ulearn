@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { userRoles, user } from "../commonPropTypes";
 import api from "../../../api";
 import { TABS, ROLES } from "../../../consts/general";
-import Tabs from "@skbkontur/react-ui/components/Tabs/Tabs";
+import { Tabs } from "ui";
 import CommentsList from "../CommentsList/CommentsList";
 
 import styles from "./CommentsView.less";
@@ -37,6 +37,15 @@ class CommentsView extends Component {
 			this.loadComments(courseId, slideId);
 	};
 
+	componentDidUpdate(prevProps, prevState) {
+		if(this.props.slideId !== prevProps.slideId){
+			const {courseId, slideId, userRoles} = this.props;
+			if (this.isInstructor(userRoles)) {
+				this.loadComments(courseId, slideId);
+			}
+		}
+	}
+
 	loadCommentPolicy = (courseId) => {
 		this.props.commentsApi.getCommentPolicy(courseId)
 			.then(commentPolicy => {
@@ -60,7 +69,7 @@ class CommentsView extends Component {
 	};
 
 	render() {
-		const {user, userRoles, courseId, slideId, slideType, commentsApi} = this.props;
+		const {user, userRoles, courseId, slideId, slideType, commentsApi, isSlideReady,} = this.props;
 
 		return (
 			<div className={styles.wrapper}>
@@ -77,7 +86,8 @@ class CommentsView extends Component {
 						user={user}
 						userRoles={userRoles}
 						slideId={slideId}
-						courseId={courseId}>
+						courseId={courseId}
+						isSlideReady={isSlideReady}>
 					</CommentsList>
 				</div>
 			</div>
@@ -90,12 +100,9 @@ class CommentsView extends Component {
 
 		return (
 			<header className={styles.header} ref={this.headerRef}>
-				<div className={styles.headerRow}>
-					<h1 className={styles.headerName}>Комментарии</h1>
-				</div>
 				{this.isInstructor(userRoles) &&
 				<div className={styles.tabs}>
-					<Tabs value={activeTab} onChange={(e, id)=> this.handleTabChange(id, true)}>
+					<Tabs value={activeTab} onValueChange={this.handleTabChangeByUser}>
 						<Tabs.Tab id={TABS.allComments}>К слайду</Tabs.Tab>
 						<Tabs.Tab id={TABS.instructorsComments}>
 							Для преподавателей
@@ -122,12 +129,15 @@ class CommentsView extends Component {
 			userRoles.courseRole === ROLES.instructor;
 	}
 
+	handleTabChangeByUser = (id) =>
+		this.handleTabChange(id, true);
+
 	handleTabChange = (id, isUserAction) => {
 		if (this.isInstructor(this.props.userRoles)) {
 			if (!isUserAction && this.state.tabHasAutomaticallyChanged) {
 				return;
 			}
-			
+
 			if (id !== this.state.activeTab) {
 				this.setState({
 					activeTab: id,
@@ -161,7 +171,8 @@ CommentsView.propTypes = {
 	courseId: PropTypes.string.isRequired,
 	slideId: PropTypes.string.isRequired,
 	slideType: PropTypes.string.isRequired,
-	openInstructorsComments: PropTypes.bool
+	openInstructorsComments: PropTypes.bool,
+	isSlideReady: PropTypes.bool,
 };
 
 export default CommentsView;

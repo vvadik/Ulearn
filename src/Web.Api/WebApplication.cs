@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -26,7 +27,9 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
 using Ulearn.Web.Api.Authorization;
+using Ulearn.Web.Api.Clients;
 using Ulearn.Web.Api.Controllers.Notifications;
+using Ulearn.Web.Api.Controllers.Slides;
 using Ulearn.Web.Api.Controllers.Websockets;
 using Ulearn.Web.Api.Models;
 using Ulearn.Web.Api.Models.Binders;
@@ -174,6 +177,8 @@ namespace Ulearn.Web.Api
 			services.AddScoped<IAuthorizationHandler, CourseRoleAuthorizationHandler>();
 			services.AddScoped<IAuthorizationHandler, CourseAccessAuthorizationHandler>();
 			services.AddScoped<INotificationDataPreloader, NotificationDataPreloader>();
+			services.AddSingleton<IUlearnVideoAnnotationsClient, UlearnVideoAnnotationsClient>();
+			services.AddScoped<SlideRenderer, SlideRenderer>();
 			services.AddSingleton<WebsocketsEventSender, WebsocketsEventSender>();
 
 			services.AddDatabaseServices(logger);
@@ -253,6 +258,11 @@ namespace Ulearn.Web.Api
 					var policyName = courseAccessType.GetAuthorizationPolicyName();
 					options.AddPolicy(policyName, policy => policy.Requirements.Add(new CourseAccessRequirement(courseAccessType)));
 				}
+			});
+
+			services.Configure<PasswordHasherOptions>(options =>
+			{
+				options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2;
 			});
 		}
 	}

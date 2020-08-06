@@ -2,6 +2,7 @@
 using System.Runtime.Serialization;
 using AntiPlagiarism.Api.ModelBinders;
 using Microsoft.AspNetCore.Mvc;
+using Ulearn.Common;
 using Ulearn.Common.Api.Models.Parameters;
 
 namespace AntiPlagiarism.Api.Models.Parameters
@@ -24,6 +25,9 @@ namespace AntiPlagiarism.Api.Models.Parameters
 
 		[DataMember(Name = "additional_info")]
 		public string AdditionalInfo { get; set; } = "";
+
+		[DataMember(Name = "client_submission_id")]
+		public string ClientSubmissionId { get; set; }
 
 		public override string ToString()
 		{

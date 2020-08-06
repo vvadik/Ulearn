@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import Icon from "@skbkontur/react-icons";
+import { ThumbUp } from "icons";
 
 import styles from "./Like.less";
 
@@ -8,7 +8,7 @@ export default function Like({isLiked, count, onClick, canLike}) {
 	return (
 		<div className={`${styles.wrapper} ${canLike ? styles.hover : ""} ${isLiked ? styles.isLiked : ""}`}>
 			<button className={styles.action} onClick={canLike ? onClick : null}>
-				<Icon name="ThumbUp" size={15} />
+				<ThumbUp size={15} />
 				<span className={styles.count}>{count}</span>
 			</button>
 		</div>

@@ -10,9 +10,6 @@ namespace Ulearn.Core.Model.Edx.EdxComponents
 		[XmlIgnore]
 		public string[] Images;
 
-		[XmlIgnore]
-		public string LocalFolder;
-
 		[XmlAttribute("filename")]
 		public string Filename;
 
@@ -23,12 +20,11 @@ namespace Ulearn.Core.Model.Edx.EdxComponents
 		{
 		}
 
-		public GalleryComponent(string urlName, string displayName, string filename, string localFolder, string[] images)
+		public GalleryComponent(string urlName, string displayName, string filename, string[] images)
 		{
 			UrlName = urlName;
 			DisplayName = displayName;
 			Filename = filename;
-			LocalFolder = localFolder;
 			Images = images;
 		}
 
@@ -41,7 +37,7 @@ namespace Ulearn.Core.Model.Edx.EdxComponents
 		public override void SaveAdditional(string folderName)
 		{
 			foreach (var image in Images)
-				File.Copy($"{LocalFolder}/{image}", $"{folderName}/static/{UrlName}_{image.Replace("/", "_")}");
+				File.Copy($"{image}", $"{folderName}/static/{UrlName}_{image.Replace("/", "_")}");
 			File.WriteAllText($"{folderName}/static/gallery_{UrlName}.html",
 				File.ReadAllText($"{Utils.GetRootDirectory()}/templates/gallery.html")
 					.Replace("{0}", string.Join("", Images.Select(x => "<li><img src='" + UrlName + "_" + x.Replace("/", "_") + "' alt=''/></li>"))));

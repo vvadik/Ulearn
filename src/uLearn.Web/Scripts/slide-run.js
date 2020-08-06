@@ -41,7 +41,9 @@ function setResults(ans) {
 	else if (ans.IsCompillerFailure) setSimpleResult($serviceError, ans.ErrorMessage);
 	else if (ans.IsCompileError) setSimpleResult($compileError, ans.ErrorMessage);
 	else if (ans.IsRightAnswer) {
-		window.slideNavigation.makeShowSolutionsNext();
+		if(window.reloadUserProgress){
+			window.reloadUserProgress();
+		}
 		if (ans.SubmissionId > 0)
 			setExerciseVersion(ans.SubmissionId, true);
 		else /* for course monitor tool */
@@ -61,12 +63,13 @@ window.documentReadyFunctions = window.documentReadyFunctions || [];
 
 window.documentReadyFunctions.push(function () {
     $('.exercise__submission').on('click', '.run-solution-button', function () {
-        var $runButton = $(this);
+        const $runButton = $(this);
         initErrorsBlocks();
-        var code = $(".code-exercise")[0].codeMirrorEditor.getValue();
+        let code = $(".code-exercise")[0].codeMirrorEditor.getValue();
         if (code.length === 0)
             code = " ";
-        $runButton.text("Выполняется...").addClass("active");
+        const href = window.location.href;
+		$runButton.text("Выполняется...").addClass("active");
         $runResults.hide();
 
         $.ajax(
@@ -75,10 +78,17 @@ window.documentReadyFunctions.push(function () {
                 contentType: "text/plain",
                 url: $runButton.data("url"),
                 data: code
-            }).done(setResults)
+            }).done(function (res) {
+				if(href === window.location.href) {
+					setResults(res);
+				}
+				return res;
+            })
             .fail(function (req) {
-                setSimpleResult($serviceError, req.status + " " + req.statusText);
-                console.log(req.responseText);
+				if(href === window.location.href) {
+					setSimpleResult($serviceError, req.status + " " + req.statusText);
+					console.log(req.responseText);
+				}
             })
             .always(function () {
                 $runButton.text("Отправить").removeClass("active");

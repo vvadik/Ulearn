@@ -18,16 +18,16 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing
 
 			var syntaxTree = CSharpSyntaxTree.ParseText(CommonTestData.SimpleProgramWithMethodAndProperty);
 			var syntaxTreeRoot = syntaxTree.GetRoot();
-			var tokens = syntaxTreeRoot.GetTokens().ToList();
+			var tokens = syntaxTreeRoot.GetTokens().Select(t => new CSharpToken(t)).ToList();
 
 			var extractor = new SnippetsExtractor();
-			var converter = new TokensKindsOnlyConverter();
+			var converter = new TokensKindsConverter();
 			var snippets = extractor.GetSnippets(tokens, snippetTokensCount, converter).ToList();
 
 			Assert.AreEqual(tokens.Count - snippetTokensCount + 1, snippets.Count);
 			foreach (var snippet in snippets)
 			{
-				Assert.AreEqual(SnippetType.TokensKindsOnly, snippet.SnippetType);
+				Assert.AreEqual(SnippetType.TokensKinds, snippet.SnippetType);
 				Assert.AreEqual(snippetTokensCount, snippet.TokensCount);
 				Console.WriteLine(snippet);
 			}

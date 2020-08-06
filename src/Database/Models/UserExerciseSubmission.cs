@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using Ulearn.Common;
 using Ulearn.Core;
 
 namespace Database.Models
@@ -22,7 +23,7 @@ namespace Database.Models
 		public virtual ApplicationUser User { get; set; }
 
 		[Required]
-		[StringLength(40)]
+		[StringLength(100)]
 		[Index("IDX_UserExerciseSubmissions_BySlideAndUser", 1)]
 		[Index("IDX_UserExerciseSubmissions_ByCourseAndSlide", 1)]
 		[Index("IDX_UserExerciseSubmissions_BySlideAndTime", 1)]
@@ -71,7 +72,7 @@ namespace Database.Models
 
 		public virtual IList<ManualExerciseChecking> ManualCheckings { get; set; }
 
-		[Obsolete] // YT: ULEARN-217
+		[Obsolete] // YT: ULEARN-217; Используй AntiPlagiarism.Web.Database.Models.Submission.ClientSubmissionId
 		[Index("IDX_UserExerciseSubmission_ByAntiPlagiarismSubmissionId")]
 		public int? AntiPlagiarismSubmissionId { get; set; }
 

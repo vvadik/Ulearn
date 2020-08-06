@@ -1,9 +1,6 @@
 import React, {Component} from 'react';
 
-import Modal from '@skbkontur/react-ui/components/Modal/Modal';
-import Button from '@skbkontur/react-ui/components/Button/Button';
-import Textarea from '@skbkontur/react-ui/components/Textarea/Textarea';
-import Tooltip from "@skbkontur/react-ui/components/Tooltip/Tooltip";
+import { Modal, Button, Textarea, Tooltip } from 'ui';
 
 class ToggleRolesModal extends Component {
 	constructor(props) {
@@ -135,7 +132,7 @@ class ToggleRolesModal extends Component {
 									this.textarea = ref
 								}}
 								width='100%'
-								onChange={this.onTextareaChange}
+								onValueChange={this.onTextareaChange}
 								autoResize
 								placeholder={isGrant ? "Например, в 2019-2020 учебном году преподает в УрФУ" : "Например, закончил преподавать в 2019 году"}
 								error={error !== null}
@@ -154,7 +151,7 @@ class ToggleRolesModal extends Component {
 		)
 	}
 
-	onTextareaChange = (event, value) => {
+	onTextareaChange = (value) => {
 		this.setState({comment: value, error: null});
 	};
 

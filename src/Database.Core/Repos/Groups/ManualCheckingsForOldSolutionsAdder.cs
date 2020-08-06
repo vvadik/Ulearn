@@ -59,7 +59,7 @@ namespace Database.Repos.Groups
 
 					logger.Information($"Создаю ручную проверку для решения {lastSubmission.Id}, слайд {slideId}");
 					await slideCheckingsRepo.AddManualExerciseChecking(courseId, slideId, userId, lastSubmission).ConfigureAwait(false);
-					await visitsRepo.MarkVisitsAsWithManualChecking(slideId, userId).ConfigureAwait(false);
+					await visitsRepo.MarkVisitsAsWithManualChecking(courseId, slideId, userId).ConfigureAwait(false);
 				}
 
 			/* For quizzes */
@@ -73,10 +73,10 @@ namespace Database.Repos.Groups
 				{
 					logger.Information($"Создаю ручную проверку для теста {slide.Id}");
 					var submission = await userQuizzesRepo.FindLastUserSubmissionAsync(courseId, quizSlideId, userId).ConfigureAwait(false);
-					if (submission == null)
+					if (submission == null || submission.ManualChecking != null)
 						continue;
 					await slideCheckingsRepo.AddQuizAttemptForManualChecking(submission, courseId, quizSlideId, userId).ConfigureAwait(false);
-					await visitsRepo.MarkVisitsAsWithManualChecking(quizSlideId, userId).ConfigureAwait(false);
+					await visitsRepo.MarkVisitsAsWithManualChecking(courseId, quizSlideId, userId).ConfigureAwait(false);
 				}
 			}
 		}

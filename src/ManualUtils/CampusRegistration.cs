@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using Database.DataContexts;
+using Database;
 using Database.Models;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace ManualUtils
@@ -12,10 +13,9 @@ namespace ManualUtils
 	[SuppressMessage("ReSharper", "InconsistentNaming")]
 	internal static class CampusRegistration
 	{
-		public static void Run(string courseId, int groupId, Guid slideWithRegistrationQuiz, bool exportCode)
+		public static void Run(UlearnDb db, string courseId, int groupId, Guid slideWithRegistrationQuiz, bool exportCode)
 		{
 			var regData = new Dictionary<string, RegistrationData>();
-			var db = new ULearnDb();
 
 			var users = db.GroupMembers
 				.Where(gm => gm.GroupId == groupId)
@@ -62,7 +62,7 @@ namespace ManualUtils
 			}
 		}
 
-		private static void SetQuizAnswers(Guid slideWithRegistrationQuiz, ULearnDb db, Dictionary<string, ApplicationUser> users, Dictionary<string, RegistrationData> regData)
+		private static void SetQuizAnswers(Guid slideWithRegistrationQuiz, UlearnDb db, Dictionary<string, ApplicationUser> users, Dictionary<string, RegistrationData> regData)
 		{
 			var submissions = db.UserQuizSubmissions.Where(qs => qs.SlideId == slideWithRegistrationQuiz)
 				.ToList()
@@ -84,7 +84,7 @@ namespace ManualUtils
 			}
 		}
 
-		private static void SetTasksCount(Guid[] slides, Dictionary<string, RegistrationData> regData, ULearnDb db)
+		private static void SetTasksCount(Guid[] slides, Dictionary<string, RegistrationData> regData, UlearnDb db)
 		{
 			foreach (var data in regData.Values)
 			{
@@ -101,7 +101,7 @@ namespace ManualUtils
 			}
 		}
 
-		private static void SetIpAddresses(string courseId, ULearnDb db, Dictionary<string, ApplicationUser> users, Dictionary<string, RegistrationData> regData)
+		private static void SetIpAddresses(string courseId, UlearnDb db, Dictionary<string, ApplicationUser> users, Dictionary<string, RegistrationData> regData)
 		{
 			var time = DateTime.Now.AddMonths(-4);
 			var visits = db.Visits
@@ -123,7 +123,7 @@ namespace ManualUtils
 			}
 		}
 
-		private static void SetCode( ULearnDb db, Guid[] slides, Dictionary<string, RegistrationData> regData)
+		private static void SetCode(UlearnDb db, Guid[] slides, Dictionary<string, RegistrationData> regData)
 		{
 			foreach (var data in regData.Values)
 			{

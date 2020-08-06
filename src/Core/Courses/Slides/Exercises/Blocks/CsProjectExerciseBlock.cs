@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
-using JetBrains.Annotations;
 using log4net;
 using Microsoft.Build.Evaluation;
 using Ulearn.Common;
@@ -59,6 +58,9 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		[XmlElement("userCodeFile")]
 		public string UserCodeFilePath { get; set; }
 
+		[XmlElement("solutionFile")]
+		public string SolutionFilePath { get; set; } // По умолчанию userCodeFile.solution.cs
+
 		[XmlElement("excludePathForChecker")]
 		public string[] PathsToExcludeForChecker { get; set; }
 
@@ -81,15 +83,20 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 
 		public DirectoryInfo UserCodeFileParentDirectory => UserCodeFile.Directory;
 
-		public FileInfo CorrectSolutionFile => UserCodeFileParentDirectory.GetFile(CorrectSolutionFileName);
+		// В отличие от CorrectFullSolutionFile, здесь может содержаться не полное, а промежуточное решение серии задач, состоящей из доработток одного файла.
+		public FileInfo CorrectSolutionFile => SolutionFilePath == null ? CorrectFullSolutionFile : ExerciseFolder.GetFile(SolutionFilePath);
+
+		public string CorrectSolutionFileName => CorrectSolutionFile.Name;
+
+		public FileInfo CorrectFullSolutionFile => UserCodeFileParentDirectory.GetFile(CorrectFullSolutionFileName);
 
 		public DirectoryInfo ExerciseFolder => new DirectoryInfo(Path.Combine(SlideFolderPath.FullName, ExerciseDirName));
 
 		public string UserCodeFileNameWithoutExt => Path.GetFileNameWithoutExtension(UserCodeFilePath);
 
-		public string CorrectSolutionFileName => $"{UserCodeFileNameWithoutExt}.Solution.cs";
+		public string CorrectFullSolutionFileName => $"{UserCodeFileNameWithoutExt}.Solution.cs";
 
-		public string CorrectSolutionPath => CorrectSolutionFile.GetRelativePath(ExerciseFolder.FullName);
+		public string CorrectFullSolutionPath => CorrectFullSolutionFile.GetRelativePath(ExerciseFolder.FullName);
 
 		private Regex WrongAnswersAndSolutionNameRegex => new Regex(new Regex("^") + UserCodeFileNameWithoutExt + new Regex("\\.(.+)\\.cs"), RegexOptions.IgnoreCase);
 
@@ -98,9 +105,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 
 		//public FileInfo StudentsZip => SlideFolderPath.GetFile(ExerciseDirName + ".exercise.zip");
 
-		public bool IsWrongAnswer(string name) => WrongAnswersAndSolutionNameRegex.IsMatch(name) && !IsCorrectSolution(name);
-
-		public bool IsCorrectSolution(string name) => name.Equals(CorrectSolutionFileName, StringComparison.InvariantCultureIgnoreCase);
+		public bool IsWrongAnswer(string name) => WrongAnswersAndSolutionNameRegex.IsMatch(name) && !name.Contains(".Solution.");
 
 		public BuildEnvironmentOptions BuildEnvironmentOptions { get; set; }
 		
@@ -173,13 +178,13 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		{
 			log.Info($"Собираю zip-архив для проверки: курс {CourseId}, слайд «{Slide?.Title}» ({Slide?.Id})");
 			var excluded = (PathsToExcludeForChecker ?? new string[0])
-				.Concat(new[] { "bin/*", "obj/*" })
+				.Concat(new[] { "/bin/", "/obj/", ".idea/", ".vs/" })
 				.ToList();
 
 			var toUpdate = GetAdditionalFiles(excluded).ToList();
 			log.Info($"Собираю zip-архив для проверки: дополнительные файлы [{string.Join(", ", toUpdate.Select(c => c.Path))}]");
 
-			var ms = ToZip(ExerciseFolder, excluded, toUpdate);
+			var ms = ZipUtils.CreateZipFromDirectory(new List<string> { ExerciseFolder.FullName }, excluded, toUpdate, Encoding.UTF8);
 			log.Info($"Собираю zip-архив для проверки: zip-архив собран, {ms.Length} байтов");
 			return ms;
 		}

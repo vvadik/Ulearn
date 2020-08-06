@@ -294,10 +294,11 @@ namespace uLearn.Web.Controllers
 			var parameters = new AddSubmissionParameters
 			{
 				TaskId = submission.SlideId,
-				Language = AntiPlagiarism.Api.Models.Language.CSharp,
+				Language = submission.Language,
 				Code = submission.SolutionCode.Text,
 				AuthorId = Guid.Parse(submission.UserId),
 				AdditionalInfo = new AntiPlagiarismAdditionalInfo { SubmissionId = submission.Id }.ToJsonString(),
+				ClientSubmissionId = submission.Id.ToString()
 			};
 			await antiPlagiarismClient.AddSubmissionAsync(parameters).ConfigureAwait(false);
 		}

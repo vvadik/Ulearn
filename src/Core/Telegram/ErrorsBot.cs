@@ -16,7 +16,7 @@ namespace Ulearn.Core.Telegram
 		public ErrorsBot()
 		{
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
-			channel = configuration.Telegram.Errors.Channel;
+			channel = configuration.Telegram?.Errors?.Channel;
 			var serviceName = configuration.GraphiteServiceName ?? System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.ToLower();
 			metricSender = new MetricSender(serviceName);
 		}

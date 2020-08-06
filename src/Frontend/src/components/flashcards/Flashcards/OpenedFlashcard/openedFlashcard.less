@@ -92,7 +92,11 @@
   color: @additionalColor;
 }
 
-@media (max-width: @maxPhoneWidth) {
+.wrapper i {
+  padding: 0 2px;//fixing bug causing italic text overlap
+}
+
+@media (max-width: @minLaptopWidth) {
   .questionFront {
     font-size: 26px;
   }

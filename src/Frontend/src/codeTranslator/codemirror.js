@@ -1,7 +1,6 @@
 import CodeMirror from 'codemirror';
 
 import 'codemirror/lib/codemirror';
-import '../codeTranslator/codemirror.less';
 
 import 'codemirror/mode/clike/clike';
 import 'codemirror/mode/javascript/javascript';

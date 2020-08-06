@@ -100,15 +100,15 @@
 
 				@{
 					/* This submissions should not be calculated as left checking */
-					Model.ManualCheckingsLeft--;
+					Model.ManualCheckingsLeftInQueue--;
 				}
 
-				<input type="submit" class="btn @(Model.Checking.IsChecked || Model.ManualCheckingsLeft == 0 ? "btn-primary" : "btn-default")" value="Сохранить и вернуться"
+				<input type="submit" class="btn @(Model.Checking.IsChecked || Model.ManualCheckingsLeftInQueue == 0 ? "btn-primary" : "btn-default")" value="Сохранить и вернуться"
 						data-url="@Url.Action("CheckingQueue", "Admin", new { courseId = Model.CourseId, group = Model.GroupsIdsJoined, done = Model.Checking.IsChecked })"/>
 
 				@if (!Model.Checking.IsChecked)
 				{
-					if (Model.ManualCheckingsLeft == 0)
+					if (Model.ManualCheckingsLeftInQueue == 0)
 					{
 						<div class="text-muted no-manual-checkings-left">
 							Это последняя работа по&nbsp;задаче
@@ -120,8 +120,8 @@
 								data-type="next"
 								data-url="@Url.Action("GetNextManualCheckingExerciseForSlide", "Admin", new { Model.CourseId, slideId = Model.Slide.Id, group = Model.GroupsIdsJoined, previous = Model.Checking.Id })"/>
 						<div class="text-muted manual-checkings-left">
-							По этой задаче остал@(Model.ManualCheckingsLeft % 10 == 1 && (Model.ManualCheckingsLeft % 100 / 10 != 1) ? "ась" : "ось")
-							@Model.ManualCheckingsLeft.PluralizeInRussian(RussianPluralizationOptions.Checkings)
+							По этой задаче остал@(Model.ManualCheckingsLeftInQueue % 10 == 1 && (Model.ManualCheckingsLeftInQueue % 100 / 10 != 1) ? "ась" : "ось")
+							@Model.ManualCheckingsLeftInQueue.PluralizeInRussian(RussianPluralizationOptions.Checkings)
 						</div>
 					}
 				}

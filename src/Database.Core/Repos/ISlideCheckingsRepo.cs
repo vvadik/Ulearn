@@ -27,6 +27,10 @@ namespace Database.Repos
 		Task LockManualChecking<T>(T checkingItem, string lockedById) where T : AbstractManualSlideChecking;
 		Task MarkManualCheckingAsChecked<T>(T queueItem, int score) where T : AbstractManualSlideChecking;
 		Task ProhibitFurtherExerciseManualChecking(ManualExerciseChecking checking);
+		Task RemoveLimitsForUser(string courseId, string userId);
+		Task DisableProhibitFurtherManualCheckings(string courseId, string userId);
+		Task NotCountOldAttemptsToQuizzesWithManualChecking(string courseId, string userId);
+		Task NotCountOldAttemptsToQuizzesWithAutomaticChecking(string courseId, string userId);
 		Task<ExerciseCodeReview> AddExerciseCodeReview(ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime = true);
 		Task<ExerciseCodeReview> AddExerciseCodeReview(UserExerciseSubmission submission, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime = false);
 		ExerciseCodeReview FindExerciseCodeReviewById(int reviewId);

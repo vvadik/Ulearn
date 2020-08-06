@@ -9,7 +9,7 @@ namespace Database.Models
 		public Guid Id { get; set; }
 
 		[Required]
-		[StringLength(64)]
+		[StringLength(100)]
 		public string CourseId { get; set; }
 
 		[Required]

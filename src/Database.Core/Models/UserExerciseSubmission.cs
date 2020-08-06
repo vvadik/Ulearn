@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using uLearn;
+using Ulearn.Common;
 using Ulearn.Core;
 
 namespace Database.Models
@@ -54,7 +55,7 @@ namespace Database.Models
 
 		public virtual IList<ManualExerciseChecking> ManualCheckings { get; set; }
 
-		[Obsolete] // YT: ULEARN-217
+		[Obsolete] // YT: ULEARN-217; Используй AntiPlagiarism.Web.Database.Models.Submission.ClientSubmissionId
 		public int? AntiPlagiarismSubmissionId { get; set; }
 
 		public virtual IList<ExerciseCodeReview> Reviews { get; set; }

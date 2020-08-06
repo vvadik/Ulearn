@@ -1,3 +1,4 @@
+using System.IO;
 using Database.Models;
 using Database.Repos;
 using Database.Repos.Comments;
@@ -68,6 +69,7 @@ namespace Database.Di
 			services.AddScoped<ICourseRolesRepo, CourseRolesRepo>();
 			services.AddScoped<ICourseRoleUsersFilter, CourseRoleUsersFilter>();
 			services.AddScoped<ICoursesRepo, CoursesRepo>();
+			services.AddScoped<ITempCoursesRepo, TempCoursesRepo>();
 			services.AddScoped<ISlideCheckingsRepo, SlideCheckingsRepo>();
 			services.AddScoped<IUserSolutionsRepo, UserSolutionsRepo>();
 			services.AddScoped<IUserQuizzesRepo, UserQuizzesRepo>();

@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using Database.Repos;
@@ -117,6 +118,7 @@ namespace Database
 			using (var scope = serviceScopeFactory.CreateScope())
 			{
 				var coursesRepo = (CoursesRepo)scope.ServiceProvider.GetService(typeof(ICoursesRepo));
+				var tempCoursesRepo = (TempCoursesRepo)scope.ServiceProvider.GetService(typeof(ITempCoursesRepo));
 				var publishedCourseVersions = await coursesRepo.GetPublishedCourseVersionsAsync().ConfigureAwait(false);
 
 				lastCoursesListFetchTime = DateTime.Now;
@@ -134,9 +136,18 @@ namespace Database
 						logger.Warning("Это странно, что я не смог загрузить с диска курс, который, если верить базе данных, был опубликован. Но ничего, просто проигнорирую");
 					}
 				}
-
+				await LoadTempCoursesIfNotYetAsync(tempCoursesRepo);
 				return base.GetCourses();
 			}
+		}
+
+		private async Task LoadTempCoursesIfNotYetAsync(ITempCoursesRepo tempCoursesRepo)
+		{
+			var tempCourses = await tempCoursesRepo.GetTempCoursesAsync();
+			tempCourses
+				.Where(tempCourse => !HasCourse(tempCourse.CourseId))
+				.ToList()
+				.ForEach(course => ReloadCourse(course.CourseId));
 		}
 
 		private bool IsCourseVersionWasUpdatedRecent(string courseId)
@@ -152,6 +163,16 @@ namespace Database
 			{
 				loadedCourseVersions[courseId.ToLower()] = versionId;
 			}
+		}
+
+		public new void ReloadCourse(string courseId)
+		{
+			base.ReloadCourse(courseId);
+		}
+
+		public new Course ReloadCourseFromDirectory(DirectoryInfo directory)
+		{
+			return base.ReloadCourseFromDirectory(directory);
 		}
 
 		private void ReloadCourseIfLoadedAndPublishedVersionsAreDifferent(string courseId, CourseVersion publishedVersion)

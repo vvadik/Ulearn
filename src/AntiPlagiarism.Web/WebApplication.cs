@@ -1,8 +1,8 @@
 using AntiPlagiarism.Web.CodeAnalyzing;
-using AntiPlagiarism.Web.CodeAnalyzing.CSharp;
 using AntiPlagiarism.Web.Configuration;
 using AntiPlagiarism.Web.Database;
 using AntiPlagiarism.Web.Database.Repos;
+using AntiPlagiarism.Web.Workers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -19,12 +19,14 @@ namespace AntiPlagiarism.Web
 	public class WebApplication : BaseApiWebApplication
 	{
 		private AddNewSubmissionWorker addNewSubmissionWorker; // держит ссылку на воркеры
+		private UpdateOldSubmissionsFromStatisticsWorker updateOldSubmissionsFromStatisticsWorker; // держит ссылку на воркеры
 		
 		protected override IApplicationBuilder ConfigureWebApplication(IApplicationBuilder app)
 		{
 			var database = app.ApplicationServices.GetService<AntiPlagiarismDb>();
 			database.MigrateToLatestVersion();
 			addNewSubmissionWorker = app.ApplicationServices.GetService<AddNewSubmissionWorker>();
+			updateOldSubmissionsFromStatisticsWorker = app.ApplicationServices.GetService<UpdateOldSubmissionsFromStatisticsWorker>();
 			return app;
 		}
 
@@ -55,15 +57,20 @@ namespace AntiPlagiarism.Web
 			services.AddScoped<ISnippetsRepo, SnippetsRepo>();
 			services.AddScoped<ITasksRepo, TasksRepo>();
 			services.AddScoped<IWorkQueueRepo, WorkQueueRepo>();
+			services.AddScoped<IMostSimilarSubmissionsRepo, MostSimilarSubmissionsRepo>();
+			services.AddScoped<IManualSuspicionLevelsRepo, ManualSuspicionLevelsRepo>();
 
 			/* Other services */
 			services.AddScoped<PlagiarismDetector>();
 			services.AddScoped<StatisticsParametersFinder>();
-			services.AddSingleton<CodeUnitsExtractor>();
+			services.AddSingleton<CSharpCodeUnitsExtractor>();
 			services.AddScoped<SnippetsExtractor>();
 			services.AddScoped<SubmissionSnippetsExtractor>();
 			services.AddScoped<NewSubmissionHandler>();
 			services.AddSingleton<AddNewSubmissionWorker>();
+			services.AddSingleton<UpdateOldSubmissionsFromStatisticsWorker>();
+			services.AddSingleton<TokensExtractor>();
+			services.AddSingleton<CodeUnitsExtractor>();
 		}
 	}
 }

@@ -28,7 +28,7 @@ namespace Ulearn.Core.Helpers
 				{
 					var zip = new LazilyUpdatingZip(
 						csBlock.ExerciseFolder,
-						new[] { "checking", "bin", "obj" },
+						new[] { "checking", "bin", "obj", ".idea", ".vs" },
 						file => NeedExcludeFromStudentZip(csBlock, file),
 						file => GetFileContentInStudentZip(csBlock, file),
 						ResolveCsprojLinks(csBlock),

@@ -60,8 +60,8 @@ namespace Database.Migrations
 
                     b.Property<string>("CourseId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(64)")
-                        .HasMaxLength(64);
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
                     b.Property<string>("InstructorId")
                         .IsRequired()
@@ -229,8 +229,8 @@ namespace Database.Migrations
 
                     b.Property<string>("CourseId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(64)")
-                        .HasMaxLength(64);
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
                     b.Property<string>("DisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -300,8 +300,11 @@ namespace Database.Migrations
 
                     b.Property<string>("CourseId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(64)")
-                        .HasMaxLength(64);
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
+
+                    b.Property<bool>("IgnoreInAttemptsCount")
+                        .HasColumnType("bit");
 
                     b.Property<int>("Score")
                         .HasColumnType("int");
@@ -388,8 +391,8 @@ namespace Database.Migrations
 
                     b.Property<string>("CourseId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(40)")
-                        .HasMaxLength(40);
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -442,8 +445,8 @@ namespace Database.Migrations
 
                     b.Property<string>("CourseId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(64)")
-                        .HasMaxLength(64);
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
                     b.Property<bool>("IsApproved")
                         .HasColumnType("bit");
@@ -513,8 +516,8 @@ namespace Database.Migrations
             modelBuilder.Entity("Database.Models.Comments.CommentsPolicy", b =>
                 {
                     b.Property<string>("CourseId")
-                        .HasColumnType("nvarchar(64)")
-                        .HasMaxLength(64);
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
                     b.Property<bool>("IsCommentsEnabled")
                         .HasColumnType("bit");
@@ -545,8 +548,8 @@ namespace Database.Migrations
 
                     b.Property<string>("CourseId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(64)")
-                        .HasMaxLength(64);
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
                     b.Property<DateTime>("GrantTime")
                         .HasColumnType("datetime2");
@@ -588,8 +591,8 @@ namespace Database.Migrations
 
                     b.Property<string>("CourseId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(64)")
-                        .HasMaxLength(64);
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
                     b.Property<Guid>("CourseVersionId")
                         .HasColumnType("uniqueidentifier");
@@ -616,8 +619,8 @@ namespace Database.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CourseId")
-                        .HasColumnType("nvarchar(64)")
-                        .HasMaxLength(64);
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
                     b.Property<DateTime>("CreateTime")
                         .HasColumnType("datetime2");
@@ -696,8 +699,8 @@ namespace Database.Migrations
 
                     b.Property<string>("CourseId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(64)")
-                        .HasMaxLength(64);
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -900,8 +903,8 @@ namespace Database.Migrations
 
                     b.Property<string>("CourseId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(64)")
-                        .HasMaxLength(64);
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -932,8 +935,8 @@ namespace Database.Migrations
 
                     b.Property<string>("CourseId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(64)")
-                        .HasMaxLength(64);
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
                     b.Property<DateTime?>("CreateTime")
                         .HasColumnType("datetime2");
@@ -1204,8 +1207,8 @@ namespace Database.Migrations
 
                     b.Property<string>("CourseId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(64)")
-                        .HasMaxLength(64);
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
                     b.Property<bool>("IsChecked")
                         .HasColumnType("bit");
@@ -1263,8 +1266,11 @@ namespace Database.Migrations
 
                     b.Property<string>("CourseId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(64)")
-                        .HasMaxLength(64);
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
+
+                    b.Property<bool>("IgnoreInAttemptsCount")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsChecked")
                         .HasColumnType("bit");
@@ -1501,8 +1507,8 @@ namespace Database.Migrations
 
                     b.Property<string>("CourseId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(40)")
-                        .HasMaxLength(40);
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
                     b.Property<Guid>("SlideId")
                         .HasColumnType("uniqueidentifier");
@@ -1557,8 +1563,8 @@ namespace Database.Migrations
 
                     b.Property<string>("CourseId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(64)")
-                        .HasMaxLength(64);
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
                     b.Property<int>("HintId")
                         .HasColumnType("int");
@@ -1592,8 +1598,8 @@ namespace Database.Migrations
 
                     b.Property<string>("CourseId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(64)")
-                        .HasMaxLength(64);
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
                     b.Property<int>("Rate")
                         .HasColumnType("int");
@@ -1770,6 +1776,44 @@ namespace Database.Migrations
                     b.ToTable("SystemAccesses");
                 });
 
+            modelBuilder.Entity("Database.Models.TempCourse", b =>
+                {
+                    b.Property<string>("CourseId")
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
+
+                    b.Property<string>("AuthorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(64)")
+                        .HasMaxLength(64);
+
+                    b.Property<DateTime>("LastUpdateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LoadingTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("CourseId");
+
+                    b.HasIndex("AuthorId");
+
+                    b.ToTable("TempCourses");
+                });
+
+            modelBuilder.Entity("Database.Models.TempCourseError", b =>
+                {
+                    b.Property<string>("CourseId")
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
+
+                    b.Property<string>("Error")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CourseId");
+
+                    b.ToTable("TempCourseErrors");
+                });
+
             modelBuilder.Entity("Database.Models.TextBlob", b =>
                 {
                     b.Property<string>("Hash")
@@ -1793,8 +1837,8 @@ namespace Database.Migrations
 
                     b.Property<string>("CourseId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(64)")
-                        .HasMaxLength(64);
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
                     b.Property<DateTime>("PublishTime")
                         .HasColumnType("datetime2");
@@ -1900,8 +1944,8 @@ namespace Database.Migrations
 
                     b.Property<string>("CourseId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(64)")
-                        .HasMaxLength(64);
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
                     b.Property<Guid>("UnitId")
                         .HasColumnType("uniqueidentifier");
@@ -1926,8 +1970,8 @@ namespace Database.Migrations
 
                     b.Property<string>("CourseId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(64)")
-                        .HasMaxLength(64);
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
                     b.Property<string>("FlashcardId")
                         .IsRequired()
@@ -1962,8 +2006,8 @@ namespace Database.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CourseId")
-                        .HasColumnType("nvarchar(64)")
-                        .HasMaxLength(64);
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
                     b.Property<string>("Question")
                         .IsRequired()
@@ -2012,8 +2056,8 @@ namespace Database.Migrations
 
                     b.Property<string>("CourseId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(64)")
-                        .HasMaxLength(64);
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
                     b.Property<bool>("HasManualChecking")
                         .HasColumnType("bit");
@@ -3068,6 +3112,15 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Database.Models.TempCourse", b =>
+                {
+                    b.HasOne("Database.Models.ApplicationUser", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
