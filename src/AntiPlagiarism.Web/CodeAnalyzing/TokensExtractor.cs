@@ -70,8 +70,6 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 					Type = tokenType,
 					Value = tokenContent
 				};
-				if (i == lines.Length - 1 && token.Value == "\n" && code.Last() != '\n')
-					yield break; // pygmentize добавляет токен перевода строки в конце кода. Убираю его, если исходно не было
 				yield return token;
 			}
 		}
@@ -93,6 +91,9 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 				var token = tokens[i];
 				if (token.Value == "\n")
 				{
+					// pygmentize добавляет токен перевода строки в конце кода. Убираю его, если исходно не было
+					if (originalLineEndings.Count == lineNumber && i == tokens.Count - 1)
+						yield break;
 					token.Value = originalLineEndings[lineNumber];
 					lineNumber++;
 					yield return token;
@@ -103,6 +104,9 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 				foreach (var part in parts.SkipLast(1))
 				{
 					sb.Append(part);
+					// pygmentize добавляет токен перевода строки в конце кода. Убираю его, если исходно не было
+					if (originalLineEndings.Count == lineNumber && i == tokens.Count - 1)
+						yield break;
 					sb.Append(originalLineEndings[lineNumber]);
 					lineNumber++;
 				}

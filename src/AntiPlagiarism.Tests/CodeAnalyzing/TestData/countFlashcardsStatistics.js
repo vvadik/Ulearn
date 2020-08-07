@@ -12,3 +12,4 @@ export default function countFlashcardsStatistics(flashcards) {
 
 	return statistics;
 }
+  
