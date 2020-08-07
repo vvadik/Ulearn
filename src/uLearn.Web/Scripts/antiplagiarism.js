@@ -363,7 +363,7 @@ window.documentReadyFunctions.push(function () {
                 
                 /* Correcting: full-matched blocks can start only from beginning of the word
                    (upper-case letter, or if previous char it not letter) or from beginnin og the number.
-                   Also full-matched blocks should have length at least 4 chars.
+                   Also full-matched blocks should have length at least 4 chars if line length at least 4 chars.
                    Bad full-matched blocks are marked with special value of diffType: -100. It means that it should be marked in both texts, but as not-matched */
                 var BAD_FULL_MATCHED = -100;
                 var badFullMatchedLength = 0;
@@ -396,7 +396,7 @@ window.documentReadyFunctions.push(function () {
                         }
                     }
                     
-                    if (diffString.length < 4) {
+                    if (diffString.length < 4 && originalLine.trim().length >= 4 && plagiarismLine.trim().length >= 4) {
                         diffType = BAD_FULL_MATCHED;
                         badFullMatchedLength = diffString.length;
                     }
