@@ -7,8 +7,7 @@ import YandexMetrika from "./components/common/YandexMetrika";
 import Header from "./components/common/Header";
 import { Provider, connect } from "react-redux";
 import thunkMiddleware from "redux-thunk";
-import { createLogger } from "redux-logger";
-import { applyMiddleware, createStore } from "redux";
+import { applyMiddleware, createStore, compose, } from "redux";
 
 import Router from "./Router";
 
@@ -19,15 +18,18 @@ import theme from "src/uiTheme";
 import queryString from "query-string";
 
 
-let loggerMiddleware = createLogger();
-
 function configureStore() {
 	let env = process.env.NODE_ENV || 'development';
 	let isDevelopment = env === 'development';
 
-	let middlewares = isDevelopment ?
-		applyMiddleware(thunkMiddleware, loggerMiddleware) :
-		applyMiddleware(thunkMiddleware);
+	let middlewares;
+	if(isDevelopment) {
+		const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+		middlewares = composeEnhancers(applyMiddleware(thunkMiddleware));
+
+	} else {
+		middlewares = applyMiddleware(thunkMiddleware);
+	}
 
 	return createStore(
 		rootReducer,
