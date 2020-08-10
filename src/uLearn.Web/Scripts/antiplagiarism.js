@@ -274,33 +274,67 @@ window.documentReadyFunctions.push(function () {
 				}
             }                
         });
-        
-        /* Search best match for each line (or return -1 if several lines has equal weight ) */
-        var result = [];
-        var reversedResult = [];
-        for (var lineId = 0; lineId < originalTokensByLines.length; lineId++) {
-            if (! (lineId in originalTokensByLines) || originalTokensByLines[lineId].length === 0) {
-                result[lineId] = -2; // -2 means "no token in this line"
-                continue;
-            } 
-            
-            var bestMatch = -1; // -1 means "can not find best matched line"
-            var bestMatchWeight = 0;
-            for (var pLineId = 0; pLineId < plagiarismTokensByLines.length; pLineId++) {
-                if (lineWeights[lineId][pLineId] > bestMatchWeight) {
-                    bestMatchWeight = lineWeights[lineId][pLineId];
-                    bestMatch = pLineId;
-                } else if (lineWeights[lineId][pLineId] === bestMatchWeight)
-                    bestMatch = -1;     
-            }
-            
-            /* Doesn't allow duplicated values in result array (except -1 or -2) */
-            if (bestMatch >= 0 && bestMatch in reversedResult)
-                bestMatch = -1;
-            
-            result[lineId] = bestMatch;
-            reversedResult[bestMatch] = lineId;
-        }            
+
+        // Есть матрица похожести строк. Хочется найти пары строк с большим весом, так чтобы концы использовались только один раз.
+        // Для этого применяется жадный алгоритм. Среди всех пар на каждом шаге выбирается пара с наибольшим весом, не противоречащая предыдущим выборам.
+		var pairWeightsSorted = [];
+		var line2Best = [];
+		var pline2Best = [];
+		for (var lineId = 0; lineId < originalTokensByLines.length; lineId++) {
+			if (!(lineId in originalTokensByLines) || originalTokensByLines[lineId].length === 0) { // means "no token in this line"
+				line2Best[lineId] = {line: -2, weight: 0};
+				continue;
+			}
+			for (var pLineId = 0; pLineId < plagiarismTokensByLines.length; pLineId++) {
+				if (!(pLineId in plagiarismTokensByLines) || plagiarismTokensByLines[pLineId].length === 0) {
+					pline2Best[pLineId] = {line: -2, weight: 0};
+					continue;
+				}
+				if	(lineWeights[lineId][pLineId] > 0)
+					pairWeightsSorted.push({lineId, pLineId, weight: lineWeights[lineId][pLineId]})
+			}
+		}
+		pairWeightsSorted.sort((a,b) => b.weight - a.weight);
+
+		var line2BestWeight = [];
+		var pline2BestWeight = [];
+		for (var i = 0; i < pairWeightsSorted.length; i++) {
+			var pair = pairWeightsSorted[i];
+			if (pair.lineId in line2BestWeight) {
+				if (line2BestWeight[pair.lineId].weight === pair.weight)
+					line2BestWeight[pair.lineId].many = true;
+			}  else
+				line2BestWeight[pair.lineId] = {weight: pair.weight, many: false};
+			if (pair.pLineId in pline2BestWeight) {
+				if (pline2BestWeight[pair.pLineId].weight === pair.weight)
+					pline2BestWeight[pair.pLineId].many = true;
+			}  else
+				pline2BestWeight[pair.pLineId] = {weight: pair.weight, many: false};
+		}
+
+		for (var i = 0; i < pairWeightsSorted.length; i++) {
+			var pair = pairWeightsSorted[i];
+			if (pair.lineId in line2Best || pair.pLineId in pline2Best)
+				continue;
+			if (line2BestWeight[pair.lineId].many || pline2BestWeight[pair.pLineId].many) {
+				line2Best[pair.lineId] = {line: -1, weight: 0};
+				pline2Best[pair.pLineId] = {line: -1, weight: 0};
+			} else {
+				line2Best[pair.lineId] = {line: pair.pLineId, weight: pair.weight};
+				pline2Best[pair.pLineId] = {line: pair.lineId, weight: pair.weight};
+			}
+		}
+
+		var result = [];
+		for (var lineId = 0; lineId < originalTokensByLines.length; lineId++) {
+			if (line2Best[lineId] === undefined)
+				result.push(-1);
+			else if (line2Best[lineId].line < 0)
+				result.push(line2Best[lineId].line);
+			else
+				result.push(line2Best[lineId].weight > 0 ? line2Best[lineId].line : -1);
+		}
+
         return result;
     }
     
@@ -363,7 +397,7 @@ window.documentReadyFunctions.push(function () {
                 
                 /* Correcting: full-matched blocks can start only from beginning of the word
                    (upper-case letter, or if previous char it not letter) or from beginnin og the number.
-                   Also full-matched blocks should have length at least 4 chars.
+                   Also full-matched blocks should have length at least 4 chars if line length at least 4 chars.
                    Bad full-matched blocks are marked with special value of diffType: -100. It means that it should be marked in both texts, but as not-matched */
                 var BAD_FULL_MATCHED = -100;
                 var badFullMatchedLength = 0;
@@ -396,7 +430,7 @@ window.documentReadyFunctions.push(function () {
                         }
                     }
                     
-                    if (diffString.length < 4) {
+                    if (diffString.length < 4 && originalLine.trim().length >= 4 && plagiarismLine.trim().length >= 4) {
                         diffType = BAD_FULL_MATCHED;
                         badFullMatchedLength = diffString.length;
                     }

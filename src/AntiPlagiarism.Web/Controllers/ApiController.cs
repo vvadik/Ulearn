@@ -117,6 +117,7 @@ namespace AntiPlagiarism.Web.Controllers
 			var submissions = await submissionsRepo.GetSubmissionsByTaskAsync(client.Id, parameters.TaskId).ConfigureAwait(false);
 			foreach (var submission in submissions)
 			{
+				await submissionsRepo.UpdateSubmissionTokensCountAsync(submission, GetTokensCount(submission.ProgramText, submission.Language));
 				await newSubmissionHandler.ExtractSnippetsFromSubmissionAsync(submission).ConfigureAwait(false);
 			}
 

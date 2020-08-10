@@ -38,11 +38,11 @@ class OpenedFlashcard extends Component {
 		const spaceChar = ' ';
 		const escapeChar = 'Escape';
 
-		if (code === spaceChar) {
+		if(code === spaceChar) {
 			this.showAnswer();
-		} else if (code >= 1 && code <= 5 && showAnswer) {
+		} else if(code >= 1 && code <= 5 && showAnswer) {
 			this.handleResultsClick(code);
-		} else if (code === escapeChar) {
+		} else if(code === escapeChar) {
 			onClose();
 		}
 	};
@@ -63,7 +63,7 @@ class OpenedFlashcard extends Component {
 
 		let content, control;
 
-		if (showAnswer) {
+		if(showAnswer) {
 			content = OpenedFlashcard.renderBackContent(question, answer, this.renderLinksToTheorySlides());
 			control = this.renderBackControl();
 		} else {
@@ -90,7 +90,7 @@ class OpenedFlashcard extends Component {
 		const { theorySlides } = this.props;
 		const slidesCount = theorySlides.length;
 
-		if (slidesCount === 0) {
+		if(slidesCount === 0) {
 			return;
 		}
 
@@ -115,7 +115,7 @@ class OpenedFlashcard extends Component {
 					Слайд «{ title }»
 				</Link>);
 
-			if (i < slidesCount - 1) {
+			if(i < slidesCount - 1) {
 				links.push(', ');
 			}
 		}
@@ -153,7 +153,7 @@ class OpenedFlashcard extends Component {
 		return (
 			<div className={ styles.backTextContainer }>
 				<div className={ styles.questionBack } dangerouslySetInnerHTML={ { __html: question } }/>
-				<div dangerouslySetInnerHTML={ { __html: answer } }/>
+				<div className={ styles.answer } dangerouslySetInnerHTML={ { __html: answer } }/>
 				{ linksToTheorySlides }
 			</div>
 		);
