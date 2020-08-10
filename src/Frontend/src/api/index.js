@@ -8,6 +8,7 @@ import * as users from "./users"
 import * as comments from "./comments"
 import * as cards from "./flashcards"
 import { Toast } from "ui";
+import * as signalR from "@microsoft/signalr";
 
 const API_JWT_TOKEN_UPDATED = "API_JWT_TOKEN_UPDATED";
 let apiJwtToken = "";
@@ -154,27 +155,41 @@ export class RequestError extends Error {
 	}
 }
 
+function createSignalRConnection(url, loggingLevel = signalR.LogLevel.None){
+	return new signalR.HubConnectionBuilder()
+		.withUrl(config.api.endpoint + url,
+			{
+				accessTokenFactory: () => {
+					return apiJwtToken;
+				}
+			})
+		.configureLogging(loggingLevel)
+		.build();
+}
+
 let api = {
-	refreshApiJwtToken: refreshApiJwtToken,
-	clearApiJwtToken: clearApiJwtToken,
-	setServerErrorHandler: setServerErrorHandler,
+	refreshApiJwtToken,
+	clearApiJwtToken,
+	setServerErrorHandler,
 
-	request: request,
-	createRequestParams: createRequestParams,
+	request,
+	createRequestParams,
 
-	get: get,
-	post: post,
-	patch: patch,
-	put: put,
+	get,
+	post,
+	patch,
+	put,
 	delete: deleteRequest,
 
-	account: account,
-	courses: courses,
-	notifications: notifications,
-	groups: groups,
-	users: users,
-	comments: comments,
-	cards: cards
+	createSignalRConnection,
+
+	account,
+	courses,
+	notifications,
+	groups,
+	users,
+	comments,
+	cards,
 };
 
 export default api;
