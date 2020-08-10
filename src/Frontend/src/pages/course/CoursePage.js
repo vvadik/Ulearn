@@ -24,6 +24,7 @@ const mapStateToProps = (state, { match }) => {
 	}
 
 	const courseInfo = state.courses.fullCoursesInfo[courseId];
+	const loadedCourseIds = Object.keys(state.courses.fullCoursesInfo);
 	const isReview = params.CheckQueueItemId !== undefined;
 	const isNavMenuVisible = !isLti && !isReview && (courseInfo == null || courseInfo.tempCourseError == null);
 	const isAcceptedSolutions = slideSlugOrAction.toLowerCase() === acceptedSolutions;
@@ -32,6 +33,7 @@ const mapStateToProps = (state, { match }) => {
 		courseId,
 		slideId,
 		courseInfo,
+		loadedCourseIds,
 		isNavMenuVisible,
 		isSlideReady: state.courses.isSlideReady,
 		units: mapCourseInfoToUnits(courseInfo),

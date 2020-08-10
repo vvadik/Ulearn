@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
+import api from "src/api";
+
 import Navigation from "../Navigation";
 import AnyPage from 'src/pages/AnyPage';
 import UnitFlashcardsPage from 'src/pages/course/UnitFlashcardsPage';
@@ -15,7 +17,7 @@ import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Edit } from "icons";
 
-import { flashcards, constructPathToSlide } from 'src/consts/routes';
+import { flashcards, constructPathToSlide, signalrWS, } from 'src/consts/routes';
 import { SLIDETYPE } from 'src/consts/general';
 import { SCORING_GROUP_IDS } from 'src/consts/scoringGroup';
 
@@ -30,10 +32,12 @@ const slideNavigationButtonTitles = {
 	previousModule: "Предыдущий модуль",
 }
 
-
 class Course extends Component {
 	constructor(props) {
 		super(props);
+
+		this.signalRConnection = null;
+
 		this.state = {
 			onCourseNavigation: true,
 			openUnit: null,
@@ -56,6 +60,8 @@ class Course extends Component {
 		const { title } = this.state;
 		const { isAuthenticated } = user;
 
+		this.startSignalRConnection();
+
 		if(!courseInfo) {
 			loadCourse(courseId);
 		} else {
@@ -70,6 +76,31 @@ class Course extends Component {
 
 		if(isAuthenticated) {
 			window.reloadUserProgress = () => loadUserProgress(courseId, user.id); //adding hack to let legacy page scripts to reload progress,TODO(rozentor) remove it after implementing react task slides
+		}
+	}
+
+	startSignalRConnection = () => {
+		const connection = api.createSignalRConnection(signalrWS);
+		connection.on("courseChanged", this.onCourseChangedEvent);
+		connection.start();
+
+		this.signalRConnection = connection;
+	}
+
+	componentWillUnmount() {
+		const { signalRConnection } = this;
+
+		if(signalRConnection) {
+			signalRConnection.stop();
+		}
+	}
+
+	onCourseChangedEvent = (eventData) => {
+		const { loadCourse, loadedCourseIds, } = this.props;
+		const { courseId } = JSON.parse(eventData);
+
+		if(loadedCourseIds[courseId]) {
+			loadCourse(courseId);
 		}
 	}
 
@@ -557,6 +588,7 @@ Course
 	navigationOpened: PropTypes.bool,
 	courseLoadingErrorStatus: PropTypes.number,
 	isAcceptedSolutions: PropTypes.bool,
+	loadedCourseIds: PropTypes.array,
 };
 
 export default Course;
