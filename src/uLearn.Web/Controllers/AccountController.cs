@@ -817,28 +817,6 @@ namespace uLearn.Web.Controllers
 			await SendConfirmationEmail(user).ConfigureAwait(false);
 		}
 
-		[AllowAnonymous]
-		public ActionResult CheckIsEmailConfirmed()
-		{
-			if (!Request.IsAuthenticated)
-				return new HttpStatusCodeResult(HttpStatusCode.OK);
-
-			var userId = User.Identity.GetUserId();
-			var user = usersRepo.FindUserById(userId);
-			if (user == null)
-				return new HttpNotFoundResult();
-
-			if (user.EmailConfirmed || !user.LastConfirmationEmailTime.HasValue)
-				return new HttpStatusCodeResult(HttpStatusCode.OK);
-
-			var sentAgo = DateTime.Now.Subtract(user.LastConfirmationEmailTime.Value);
-			if (sentAgo < TimeSpan.FromDays(1))
-				return new HttpStatusCodeResult(HttpStatusCode.OK);
-
-			/* If email has been sent less than 1 day ago, show popup. Double popup is disabled via cookies and javascript */
-			return PartialView("EmailIsNotConfirmedPopup", user);
-		}
-
 		[ULearnAuthorize(ShouldBeSysAdmin = true)]
 		[HttpPost]
 		public async Task<ActionResult> ToggleSystemAccess(string userId, SystemAccessType accessType, bool isEnabled)
