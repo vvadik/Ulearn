@@ -219,6 +219,7 @@ namespace Ulearn.Web.Api.Controllers
 			{
 				courseManager.ReloadCourseFromDirectory(extractedCourseDirectory);
 				courseManager.UpdateCourseVersion(courseId, Guid.Empty);
+				courseManager.NotifyCourseChanged(courseId);
 			}
 			catch (Exception error)
 			{

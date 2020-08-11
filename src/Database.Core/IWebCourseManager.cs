@@ -41,5 +41,6 @@ namespace Database
 		Course ReloadCourseFromDirectory(DirectoryInfo directory);
 		void ExtractTempCourseChanges(string tempCourseId);
 		bool TryCreateTempCourse(string courseId, string courseTitle, Guid firstVersionId);
+		void NotifyCourseChanged(string courseId);
 	}
 }

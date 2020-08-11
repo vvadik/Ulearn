@@ -175,6 +175,11 @@ namespace Database
 			return base.ReloadCourseFromDirectory(directory);
 		}
 
+		public void NotifyCourseChanged(string courseId)
+		{
+			CourseChangedEvent?.Invoke(courseId);
+		}
+
 		private void ReloadCourseIfLoadedAndPublishedVersionsAreDifferent(string courseId, CourseVersion publishedVersion)
 		{
 			lock (@lock)
@@ -185,7 +190,7 @@ namespace Database
 					var actual = isCourseLoaded ? loadedVersionId.ToString() : "<none>";
 					logger.Information($"Загруженная версия курса {courseId} отличается от актуальной ({actual} != {publishedVersion.Id}). Обновляю курс.");
 					ReloadCourse(courseId);
-					CourseChangedEvent?.Invoke(courseId);
+					NotifyCourseChanged(courseId);
 				}
 
 				loadedCourseVersions[courseId.ToLower()] = publishedVersion.Id;
