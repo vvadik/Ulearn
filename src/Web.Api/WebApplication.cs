@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
@@ -100,7 +101,13 @@ namespace Ulearn.Web.Api
 				{
 					app.UseWebSockets();
 					app.UseRouting(); // Включает обработку UseEndpoints
-					app.UseEndpoints(endpoints => { endpoints.MapHub<WebsocketsHub>(websocketsPath); });
+					app.UseEndpoints(endpoints =>
+					{
+						endpoints.MapHub<WebsocketsHub>(websocketsPath, configureOptions =>
+						{
+							configureOptions.Transports = HttpTransportType.WebSockets | HttpTransportType.LongPolling;
+						});
+					});
 				});
 		}
 

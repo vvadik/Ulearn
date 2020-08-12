@@ -13,4 +13,3 @@
     window.documentReadyFunctions.push(function(){r.a.initiate()});
     
     t.exports=r.a}])});
-//# sourceMappingURL=likely.js.map

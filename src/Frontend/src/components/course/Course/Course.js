@@ -588,7 +588,7 @@ Course
 	navigationOpened: PropTypes.bool,
 	courseLoadingErrorStatus: PropTypes.number,
 	isAcceptedSolutions: PropTypes.bool,
-	loadedCourseIds: PropTypes.array,
+	loadedCourseIds: PropTypes.object,
 };
 
 export default Course;

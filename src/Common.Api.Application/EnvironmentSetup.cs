@@ -1,7 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
-using Microsoft.EntityFrameworkCore.Internal;
 using Ulearn.Core.Configuration;
 using Vostok.Configuration;
 using Vostok.Configuration.Abstractions;
@@ -40,7 +38,7 @@ namespace Ulearn.Common.Api
 
 			if (!ulearnConfiguration.DisableKonturServices)
 				builder = builder.SetupForKontur();
-			
+
 			builder.SetupApplicationIdentity(identityBuilder => identityBuilder
 					.SetProject("ulearn")
 					.SetApplication(application)
@@ -53,6 +51,9 @@ namespace Ulearn.Common.Api
 				.SetupHerculesSink(sinkBuilder => SetupHerculesSink(sinkBuilder, ulearnConfiguration))
 				.SetupLog((logBuilder, context) => SetupLog(logBuilder, ulearnConfiguration))
 				;
+
+			if (ulearnConfiguration.ForceHttps ?? false)
+				builder.SetHttpsScheme();
 		}
 
 		private static void SetupHerculesSink(IVostokHerculesSinkBuilder sinkBuilder, UlearnConfiguration ulearnConfiguration)

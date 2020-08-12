@@ -114,6 +114,8 @@ namespace Ulearn.Core.Configuration
 
 		public int? Port { get; set; }
 
+		public bool? ForceHttps { get; set; }
+
 		public string Environment { get; set; }
 
 		public HerculesSinkConfiguration Hercules { get; set; }
