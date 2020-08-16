@@ -77,6 +77,9 @@ class Course extends Component {
 		if(isAuthenticated) {
 			window.reloadUserProgress = () => loadUserProgress(courseId, user.id); //adding hack to let legacy page scripts to reload progress,TODO(rozentor) remove it after implementing react task slides
 		}
+
+		/* TODO: (rozentor) for now it copied from downloadedHtmlContetn, which run documentReadyFunctions scripts. In future, we will have no scripts in back, so it can be removed totally ( in other words, remove it when DownloadedHtmlContent will be removed)  */
+		(window.documentReadyFunctions || []).forEach(f => f());
 	}
 
 	startSignalRConnection = () => {
