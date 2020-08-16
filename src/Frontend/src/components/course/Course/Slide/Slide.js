@@ -46,13 +46,18 @@ class Slide extends React.Component {
 	}
 
 	render = () => {
-		const { slideBlocks, } = this.props;
+		const { slideBlocks, showHiddenBlocks, } = this.props;
 
 		if(!slideBlocks) {
 			return (<CourseLoader/>);
 		}
 
-		return this.renderSlideBlocks(JSON.parse(JSON.stringify(slideBlocks)));
+		if(showHiddenBlocks) {
+			return this.renderSlideBlocks(JSON.parse(JSON.stringify(slideBlocks)));
+		}
+
+		const slideBlocksForStudent = slideBlocks.filter(b => !b.hide);
+		return this.renderSlideBlocks(JSON.parse(JSON.stringify(slideBlocksForStudent)));
 	}
 
 	renderSlideBlocks = (slideBlocks) => {
@@ -72,7 +77,7 @@ class Slide extends React.Component {
 							   key={ i }
 							   isBlock={ blocksPacks.length !== 1 }
 							   isHidden={ hide }
-							   showEyeHint={!fullSizeBlocksPack}>
+							   showEyeHint={ !fullSizeBlocksPack }>
 					{ blocks.map(this.mapBlockToComponent) }
 				</BlocksWrapper>
 			)
@@ -161,7 +166,12 @@ Slide.propTypes = {
 	slideBlocks: PropTypes.array,
 	slideLoading: PropTypes.bool.isRequired,
 	loadSlide: PropTypes.func.isRequired,
+	showHiddenBlocks: PropTypes.bool,
 };
+
+Slide.defaultProps = {
+	showHiddenBlocks: true,
+}
 
 const mapStateToProps = (state, { courseId, slideId, }) => {
 	const { slides } = state;
