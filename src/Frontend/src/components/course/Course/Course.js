@@ -205,7 +205,7 @@ class Course extends Component {
 	}
 
 	render() {
-		const { courseInfo, courseLoadingErrorStatus, isNavMenuVisible, } = this.props;
+		const { courseInfo, courseLoadingErrorStatus, pageInfo: { isNavigationVisible, }, } = this.props;
 		const { navigationOpened, meta, } = this.state;
 
 		if(courseLoadingErrorStatus) {
@@ -218,9 +218,9 @@ class Course extends Component {
 
 		return (
 			<div
-				className={ classnames(styles.root, { 'open': navigationOpened }, { [styles.withoutMinHeight]: !isNavMenuVisible }) }>
+				className={ classnames(styles.root, { 'open': navigationOpened }, { [styles.withoutMinHeight]: !isNavigationVisible }) }>
 				{ this.renderMeta(meta) }
-				{ isNavMenuVisible && this.renderNavigation() }
+				{ isNavigationVisible && this.renderNavigation() }
 				{ courseInfo.tempCourseError ? <div
 					className={ classnames(styles.errors) }>{ courseInfo.tempCourseError }</div> : this.renderSlide() }
 			</div>
@@ -236,12 +236,12 @@ class Course extends Component {
 	}
 
 	renderSlide() {
-		const { isNavMenuVisible, progress, } = this.props;
+		const { pageInfo: { isNavigationVisible, isReview, }, progress, } = this.props;
 		const { currentSlideInfo, currentSlideId, currentCourseId, Page, title, } = this.state;
 
 		const wrapperClassName = classnames(
 			styles.rootWrapper,
-			{ [styles.withoutNavigation]: !isNavMenuVisible }, // TODO remove isNavMenuVisible flag
+			{ [styles.withoutNavigation]: !isNavigationVisible }, // TODO remove isNavigationVisible flag
 		);
 
 		const slideInfo = currentSlideInfo
@@ -257,7 +257,7 @@ class Course extends Component {
 
 		return (
 			<main className={ wrapperClassName }>
-				{ isNavMenuVisible && title &&
+				{ (isNavigationVisible || isReview) && title &&
 				<h1 className={ styles.title }>
 					{ title }
 					{ slideInfo && slideInfo.gitEditLink &&
@@ -273,15 +273,15 @@ class Course extends Component {
 								slideId={ currentSlideId }
 								courseId={ currentCourseId }
 							/>
-							: <BlocksWrapper score={ score }>
+							: <BlocksWrapper score={ isNavigationVisible ? score : null }>
 								<Page match={ this.props.match }/>
 							</BlocksWrapper>
 					}
 
 				</div>
-				{ currentSlideInfo && isNavMenuVisible && this.renderNavigationButtons(currentSlideInfo) }
-				{ currentSlideInfo && isNavMenuVisible && this.renderComments(currentSlideInfo.current) }
-				{ isNavMenuVisible && this.renderFooter() }
+				{ currentSlideInfo && isNavigationVisible && this.renderNavigationButtons(currentSlideInfo) }
+				{ currentSlideInfo && isNavigationVisible && this.renderComments(currentSlideInfo.current) }
+				{ isNavigationVisible && this.renderFooter() }
 			</main>
 		);
 	}
@@ -323,7 +323,7 @@ class Course extends Component {
 	}
 
 	getPreviousSlideUrl = (slideInfo) => {
-		const { courseId, isAcceptedSolutions, } = this.props;
+		const { courseId, pageInfo: { isAcceptedSolutions, }, } = this.props;
 		const { previous, current, } = slideInfo;
 
 		if(isAcceptedSolutions) {
@@ -587,8 +587,13 @@ Course
 	updateVisitedSlide: PropTypes.func,
 	navigationOpened: PropTypes.bool,
 	courseLoadingErrorStatus: PropTypes.number,
-	isAcceptedSolutions: PropTypes.bool,
 	loadedCourseIds: PropTypes.object,
+	pageInfo: PropTypes.shape({
+		isLti: PropTypes.bool,
+		isReview: PropTypes.bool,
+		isAcceptedSolutions: PropTypes.bool,
+		isNavigationVisible: PropTypes.bool,
+	})
 };
 
 export default Course;
