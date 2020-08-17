@@ -11,9 +11,10 @@ import CourseNavigationContent from "./Course/CourseNavigationContent";
 import Flashcards from "./Course/Flashcards/Flashcards";
 
 import { courseMenuItemType, menuItemType, groupAsStudentType, progressType } from './types';
-import { flashcards } from "../../../consts/routes";
+import { flashcards } from "src/consts/routes";
 
-import { toggleNavigation } from "../../../actions/navigation";
+import { isMobile } from "src/utils/getDeviceType";
+import { toggleNavigation } from "src/actions/navigation";
 
 import styles from './Navigation.less';
 
@@ -23,19 +24,82 @@ class Navigation extends Component {
 
 		this.state = {
 			windowWidth: window.innerWidth,
+			xDown: null,
+			yDown: null,
+			touchListenerAdded: false,
 		}
 	}
 
 	componentDidMount() {
 		window.addEventListener('resize', this.handleWindowSizeChange);
+
+		this.tryAddTouchListener();
 	}
+
+	tryAddTouchListener = () => {
+		if(isMobile() && !this.state.touchListenerAdded) {
+			document.addEventListener('touchstart', this.handleTouchStart);
+			document.addEventListener('touchmove', this.handleTouchMove);
+			this.setState({
+				touchListenerAdded: true,
+			})
+		}
+	}
+
+	getTouches = (evt) => {
+		return evt.touches ||             // browser API
+			evt.originalEvent.touches; // jQuery
+	}
+
+	handleTouchStart = (evt) => {
+		const { clientX, clientY, } = this.getTouches(evt)[0];
+
+		this.setState({
+			xDown: clientX,
+			yDown: clientY,
+		})
+	};
+
+	handleTouchMove = (evt) => {
+		const { xDown, yDown, } = this.state;
+		const { navigationOpened, toggleNavigation, } = this.props;
+
+		if(!xDown || !yDown) {
+			return;
+		}
+
+		const { clientX, clientY, target, } = evt.touches[0];
+
+		const xDiff = xDown - clientX;
+		const yDiff = yDown - clientY;
+
+		if(Math.abs(xDiff) > Math.abs(yDiff)) {
+			if(xDiff > 0 && navigationOpened) {
+				/* left swipe */
+				toggleNavigation();
+			} else if(target === this.root && !navigationOpened) {
+				/* right swipe */
+				toggleNavigation();
+			}
+		}
+
+		this.setState({
+			xDown: null,
+			yDown: null,
+		})
+	};
 
 	handleWindowSizeChange = () => {
 		this.setState({ windowWidth: window.innerWidth });
+		this.tryAddTouchListener();
 	};
 
 	componentWillUnmount() {
 		window.removeEventListener('resize', this.handleWindowSizeChange);
+		if(this.state.touchListenerAdded) {
+			window.removeEventListener('touchstart', this.handleTouchStart);
+			window.removeEventListener('touchmove', this.handleTouchMove);
+		}
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
@@ -43,7 +107,7 @@ class Navigation extends Component {
 		const { windowWidth } = this.state;
 		const isMobile = windowWidth <= 767;
 
-		if (isMobile && prevProps.navigationOpened !== navigationOpened) {
+		if(isMobile && prevProps.navigationOpened !== navigationOpened) {
 			document.querySelector('body')
 				.classList.toggle(styles.overflow, navigationOpened);
 		}
@@ -53,7 +117,7 @@ class Navigation extends Component {
 		const { unitTitle, toggleNavigation, } = this.props;
 
 		return (
-			<aside className={ styles.root }>
+			<aside className={ styles.root } ref={ (ref) => this.root = ref }>
 				<div className={ styles.overlay } onClick={ toggleNavigation }/>
 				{ unitTitle
 					? this.renderUnitNavigation()
