@@ -1,34 +1,36 @@
-const path = require('path')
-const glob = require('webpack-glob-entries')
+const path = require("path");
+const glob = require("webpack-glob-entries");
 
 module.exports = {
-  mode: 'development',
-  entry: glob(path.resolve(__dirname, '*.test.js')),
+  mode: "development",
+  entry: glob(path.resolve(__dirname, "*.test.?(m)js")),
   output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: '[name].js',
+    path: path.resolve(__dirname, "dist"),
+    filename: "[name].js",
   },
   node: false,
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.m?js$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader',
+          loader: "babel-loader",
           options: {
             presets: [
               [
-                '@babel/preset-env',
+                "@babel/preset-env",
                 {
-                  targets: { node: 'current' },
+                  targets: { node: "current" },
+                  useBuiltIns: "usage",
+                  corejs: 3,
+                  shippedProposals: true,
                 },
               ],
             ],
-            plugins: ['@babel/plugin-proposal-class-properties'],
           },
         },
       },
     ],
   },
-}
+};
