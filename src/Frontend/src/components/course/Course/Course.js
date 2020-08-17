@@ -452,6 +452,8 @@ class Course extends Component {
 				isActive: highlightedUnit === item.id,
 				onClick: this.unitClickHandle,
 				progress: scoresByUnits.hasOwnProperty(item.id) ? scoresByUnits[item.id] : { current: 0, max: 0 },
+				isNotPublished: item.isNotPublished,
+				publicationDate: '2020-08-22 09:30', //TODO (rozentor) its mock
 			})),
 			containsFlashcards: courseInfo.containsFlashcards,
 		};
