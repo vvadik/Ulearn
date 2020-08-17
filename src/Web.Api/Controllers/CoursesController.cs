@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AngleSharp.Common;
 using Database;
 using Database.Models;
 using Database.Repos;
@@ -138,10 +139,15 @@ namespace Ulearn.Web.Api.Controllers
 					return NotFound(new ErrorResponse("Course not found"));
 
 				var showInstructorsSlides = isInstructor;
+				var unitAppearances = !isInstructor
+					? new Dictionary<Guid, UnitAppearance>()
+					: (await unitsRepo.GetUnitAppearancesAsync(course)).ToDictionary(a => a.UnitId, a => a);
 				var publishedUnitIds = new HashSet<Guid>(!isInstructor ? visibleUnitsIds : await unitsRepo.GetPublishedUnitIdsAsync(course));
 				var getSlideMaxScoreFunc = await BuildGetSlideMaxScoreFunc(solutionsRepo, userQuizzesRepo, visitsRepo, groupsRepo, course, UserId);
 				var getGitEditLinkFunc = await BuildGetGitEditLinkFunc(User.GetUserId(), course, courseRolesRepo, coursesRepo);
-				units = visibleUnits.Select(unit => BuildUnitInfo(course.Id, unit, !publishedUnitIds.Contains(unit.Id), showInstructorsSlides, getSlideMaxScoreFunc, getGitEditLinkFunc)).ToList();
+				units = visibleUnits.Select(unit => BuildUnitInfo(course.Id, unit,
+					!publishedUnitIds.Contains(unit.Id), publishedUnitIds.Contains(unit.Id) ? null : unitAppearances.GetOrDefault(unit.Id)?.PublishTime,
+					showInstructorsSlides, getSlideMaxScoreFunc, getGitEditLinkFunc)).ToList();
 			}
 			else
 			{
@@ -161,7 +167,7 @@ namespace Ulearn.Web.Api.Controllers
 
 				var getSlideMaxScoreFunc = BuildGetSlideMaxScoreFunc(course, group);
 				var getGitEditLinkFunc = await BuildGetGitEditLinkFunc(User.GetUserId(), course, courseRolesRepo, coursesRepo);
-				units = visibleUnits.Select(unit => BuildUnitInfo(course.Id, unit, false, false, getSlideMaxScoreFunc, getGitEditLinkFunc)).ToList();
+				units = visibleUnits.Select(unit => BuildUnitInfo(course.Id, unit, false, null, false, getSlideMaxScoreFunc, getGitEditLinkFunc)).ToList();
 			}
 
 			var containsFlashcards = visibleUnits.Any(x => x.Slides.OfType<FlashcardSlide>().Any());
@@ -199,21 +205,22 @@ namespace Ulearn.Web.Api.Controllers
 			return new ScoringSettingsModel { Groups = groups };
 		}
 
-		private UnitInfo BuildUnitInfo(string courseId, Unit unit, bool isNotPublished, bool showInstructorsSlides, Func<Slide, int> getSlideMaxScoreFunc, Func<Slide, string> getGitEditLinkFunc)
+		private UnitInfo BuildUnitInfo(string courseId, Unit unit, bool isNotPublished, DateTime? publicationDate, bool showInstructorsSlides, Func<Slide, int> getSlideMaxScoreFunc, Func<Slide, string> getGitEditLinkFunc)
 		{
 			var slides = unit.Slides.Select(slide => slideRenderer.BuildShortSlideInfo(courseId, slide, getSlideMaxScoreFunc, getGitEditLinkFunc, Url));
 			if (showInstructorsSlides && unit.InstructorNote != null)
 				slides = slides.Concat(new List<ShortSlideInfo> { slideRenderer.BuildShortSlideInfo(courseId, unit.InstructorNote.Slide, getSlideMaxScoreFunc, getGitEditLinkFunc, Url) });
-			return BuildUnitInfo(unit, isNotPublished, slides);
+			return BuildUnitInfo(unit, isNotPublished, publicationDate, slides);
 		}
 
-		private static UnitInfo BuildUnitInfo(Unit unit, bool isNotPublished, IEnumerable<ShortSlideInfo> slides)
+		private static UnitInfo BuildUnitInfo(Unit unit, bool isNotPublished, DateTime? publicationDate, IEnumerable<ShortSlideInfo> slides)
 		{
 			return new UnitInfo
 			{
 				Id = unit.Id,
 				Title = unit.Title,
 				IsNotPublished = isNotPublished,
+				PublicationDate = publicationDate,
 				Slides = slides.ToList(),
 				AdditionalScores = GetAdditionalScores(unit)
 			};
