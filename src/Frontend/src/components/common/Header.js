@@ -424,19 +424,17 @@ class CourseMenu extends Component {
 				</MenuItem>);
 
 		if(hasCourseAdminMenuItems) {
-			if (isTempCourse){
+			if(isTempCourse) {
 				items = items.concat([
 					<MenuItem href={ "/Admin/TempCourseDiagnostics?courseId=" + courseId } key="Diagnostics"
 							  component={ LinkComponent }>
 						Диагностика
 					</MenuItem>
 				]);
-			}
-			else
-			{
+			} else {
 				items = items.concat([
 					<MenuItem href={ "/Admin/Packages?courseId=" + courseId } key="Packages"
-												component={ LinkComponent }>
+							  component={ LinkComponent }>
 						Экспорт и импорт курса
 					</MenuItem>,
 
@@ -780,62 +778,39 @@ class Notifications extends Component {
 	}
 }
 
-class ProfileLink extends Component {
-	constructor(props) {
-		super(props);
-		this.openTooltip = this.openTooltip.bind(this);
-		this.closeTooltip = this.closeTooltip.bind(this);
-		this.state = {
-			tooltipTrigger: 'opened',
-		}
-	}
-
-	openTooltip() {
-		this.setState({
-			tooltipTrigger: 'hover'
-		})
-	}
-
-	closeTooltip() {
-		this.setState({
-			tooltipTrigger: 'hover'
-		})
-	}
-
-	render() {
-		let icon = <User/>;
-		let isProblem = this.props.account.accountProblems.length > 0;
-		if(isProblem) {
-			let firstProblem = this.props.account.accountProblems[0];
-			icon = (
-				<Tooltip trigger={ this.state.tooltipTrigger } closeButton={ true } pos="bottom center"
-						 onCloseClick={ this.closeTooltip } render={ () => (
-					<div style={ { width: '250px' } }>
-						{ firstProblem.description }
-					</div>
-				) }>
-					<span onMouseOver={ this.openTooltip }>
+function ProfileLink({ account }) {
+	let icon = <User/>;
+	let isProblem = account.accountProblems.length > 0;
+	if(isProblem) {
+		let firstProblem = account.accountProblems[0];
+		icon = (
+			<Tooltip trigger={ 'hover' } closeButton={ true } pos="bottom center"
+					 render={ () => (
+						 <div style={ { width: '250px' } }>
+							 { firstProblem.description }
+						 </div>
+					 ) }>
+					<span>
 						<Warning color="#f77"/>
 					</span>
-				</Tooltip>
-			)
-		}
+			</Tooltip>
+		)
+	}
 
-		return (<div className={ styles["header__profile-link"] }>
-			<Link to="/Account/Manage">
+	return (<div className={ styles["header__profile-link"] }>
+		<Link to="/Account/Manage">
                 <span className={ styles["icon"] }>
                     { icon }
                 </span>
-				<span className={ styles["username"] }>
-                    { this.props.account.visibleName || 'Профиль' }
+			<span className={ styles["username"] }>
+                    { account.visibleName || 'Профиль' }
                 </span>
-			</Link>
-		</div>)
-	}
+		</Link>
+	</div>);
+}
 
-	static propTypes = {
-		account: accountPropTypes
-	}
+ProfileLink.propTypes = {
+	account: accountPropTypes,
 }
 
 class Separator extends Component {

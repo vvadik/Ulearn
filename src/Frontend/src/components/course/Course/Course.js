@@ -15,10 +15,11 @@ import { UrlError } from "src/components/common/Error/NotFoundErrorBoundary";
 import Error404 from "src/components/common/Error/Error404";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import { Edit } from "icons";
+import { Edit, } from "icons";
+import { Toggle } from "ui";
 
 import { flashcards, constructPathToSlide, signalrWS, } from 'src/consts/routes';
-import { SLIDETYPE } from 'src/consts/general';
+import { ROLES, SLIDETYPE, } from 'src/consts/general';
 import { SCORING_GROUP_IDS } from 'src/consts/scoringGroup';
 
 import classnames from 'classnames';
@@ -46,6 +47,7 @@ class Course extends Component {
 			currentSlideInfo: null,
 			currentCourseId: null,
 			navigationOpened: this.props.navigationOpened,
+			showForStudents: false,
 			meta: {
 				title: 'Ulearn',
 				description: 'Интерактивные учебные онлайн-курсы по программированию',
@@ -108,8 +110,8 @@ class Course extends Component {
 	}
 
 	componentDidUpdate(prevProps, prevState) {
-		const { loadUserProgress, courseId, loadCourse, user, courseInfo, loadCourseErrors, isHijacked, updateVisitedSlide, progress, } = this.props;
-		const { title, currentSlideInfo, } = this.state;
+		const { loadUserProgress, courseId, loadCourse, user, courseInfo, loadCourseErrors, progress, isHijacked, updateVisitedSlide, } = this.props;
+		const { title, currentSlideInfo, showForStudents, currentSlideId, } = this.state;
 		const { isAuthenticated } = user;
 
 		if(isAuthenticated !== prevProps.user.isAuthenticated) {
@@ -126,6 +128,14 @@ class Course extends Component {
 
 		if(!prevProps.progress && progress && !isHijacked && currentSlideInfo) {
 			updateVisitedSlide(courseId, currentSlideInfo.current.id);
+		}
+
+		if((currentSlideId !== prevState.currentSlideId || showForStudents !== prevState.showForStudents) && currentSlideInfo.current.type === SLIDETYPE.exercise) {
+			if(showForStudents) {
+				this.props.history.push('?version=-1'); //prevent showing task solution
+			} else if(this.props.history.location.search === '?version=-1') {
+				this.props.history.replace();
+			}
 		}
 	}
 
@@ -239,12 +249,13 @@ class Course extends Component {
 	}
 
 	renderSlide() {
-		const { pageInfo: { isNavigationVisible, isReview, }, progress, } = this.props;
-		const { currentSlideInfo, currentSlideId, currentCourseId, Page, title, } = this.state;
+		const { pageInfo: { isNavigationVisible, isReview, }, progress, user, courseId, } = this.props;
+		const { currentSlideInfo, currentSlideId, currentCourseId, Page, title, showForStudents, } = this.state;
 
 		const wrapperClassName = classnames(
 			styles.rootWrapper,
-			{ [styles.withoutNavigation]: !isNavigationVisible }, // TODO remove isNavigationVisible flag
+			{ [styles.withoutNavigation]: !isNavigationVisible }, // TODO remove isNavMenuVisible flag
+			{ [styles.forStudents]: showForStudents },
 		);
 
 		const slideInfo = currentSlideInfo
@@ -258,16 +269,18 @@ class Course extends Component {
 			}
 			: null;
 
+		const { isSystemAdministrator, accessesByCourse, roleByCourse } = user;
+		const courseAccesses = accessesByCourse[courseId] ? accessesByCourse[courseId] : [];
+		const courseRole = roleByCourse[courseId] ? roleByCourse[courseId] : '';
+		const userRoles = { isSystemAdministrator, courseRole, courseAccesses, };
+
 		return (
 			<main className={ wrapperClassName }>
+				{ this.isInstructor(userRoles) && this.renderShowForStudentToggle() }
 				{ (isNavigationVisible || isReview) && title &&
 				<h1 className={ styles.title }>
 					{ title }
-					{ slideInfo && slideInfo.gitEditLink &&
-					<a className={ styles.gitEditLink } rel='noopener noreferrer' target='_blank'
-					   href={ slideInfo.gitEditLink }>
-						<Edit/>
-					</a> }
+					{ slideInfo && slideInfo.gitEditLink && this.renderGitEditLink(slideInfo) }
 				</h1> }
 				<div className={ styles.slide }>
 					{
@@ -275,6 +288,7 @@ class Course extends Component {
 							? <Slide
 								slideId={ currentSlideId }
 								courseId={ currentCourseId }
+								showHiddenBlocks={ !showForStudents }
 							/>
 							: <BlocksWrapper score={ isNavigationVisible ? score : null }>
 								<Page match={ this.props.match }/>
@@ -283,10 +297,47 @@ class Course extends Component {
 
 				</div>
 				{ currentSlideInfo && isNavigationVisible && this.renderNavigationButtons(currentSlideInfo) }
-				{ currentSlideInfo && isNavigationVisible && this.renderComments(currentSlideInfo.current) }
+				{ currentSlideInfo && isNavigationVisible && this.renderComments(currentSlideInfo.current, userRoles) }
 				{ isNavigationVisible && this.renderFooter() }
 			</main>
 		);
+	}
+
+	renderGitEditLink = (slideInfo) => {
+		return (
+			<a className={ styles.gitEditLink } rel='noopener noreferrer' target='_blank'
+			   href={ slideInfo.gitEditLink }>
+				<Edit/>
+			</a>
+		);
+	}
+
+	isCourseAdmin(userRoles) {
+		return userRoles.isSystemAdministrator ||
+			userRoles.courseRole === ROLES.courseAdmin;
+	}
+
+	isInstructor(userRoles) {
+		return this.isCourseAdmin(userRoles) ||
+			userRoles.courseRole === ROLES.instructor;
+	}
+
+	renderShowForStudentToggle = () => {
+		return (
+			<div className={ styles.toggleContainer }>
+				<span className={ styles.toggleText }> Режим студента </span>
+				<Toggle
+					checked={ this.state.showForStudents }
+					onValueChange={ this.showForStudentToggleChanged }
+				/>
+			</div>
+		)
+	}
+
+	showForStudentToggleChanged = (value) => {
+		this.setState({
+			showForStudents: value,
+		})
 	}
 
 	renderNavigationButtons(slideInfo) {
@@ -346,12 +397,8 @@ class Course extends Component {
 		this.props.history.push(href);
 	};
 
-	renderComments(currentSlide) {
+	renderComments(currentSlide, userRoles,) {
 		const { user, courseId, isSlideReady, } = this.props;
-		const { isSystemAdministrator, accessesByCourse, roleByCourse } = user;
-		const courseAccesses = accessesByCourse[courseId] ? accessesByCourse[courseId] : [];
-		const courseRole = roleByCourse[courseId] ? roleByCourse[courseId] : '';
-		const userRoles = { isSystemAdministrator, courseRole, courseAccesses, };
 
 		return (
 			<BlocksWrapper className={ styles.commentsWrapper }>
