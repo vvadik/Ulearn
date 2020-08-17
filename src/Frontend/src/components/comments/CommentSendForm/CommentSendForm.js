@@ -6,6 +6,7 @@ import Avatar from "../../common/Avatar/Avatar";
 import MarkdownEditor from "./MarkdownEditor/MarkdownEditor";
 
 import classNames from 'classnames'
+import { isMobile } from "src/utils/getDeviceType";
 
 import styles from "./CommentSendForm.less";
 
@@ -68,7 +69,7 @@ class CommentSendForm extends Component {
 		return (
 			<Button
 				use="primary"
-				size={window.matchMedia("(max-width: 767px)").matches ? "small" : "medium"}
+				size={isMobile() ? "small" : "medium"}
 				type="submit"
 				loading={sending}>
 				{submitTitle}
@@ -86,7 +87,7 @@ class CommentSendForm extends Component {
 		return (
 			<Button
 				use="secondary"
-				size={window.matchMedia("(max-width: 767px)").matches ? "small" : "medium"}
+				size={isMobile() ? "small" : "medium"}
 				type="button"
 				onClick={handleCancel}>
 				{cancelTitle}

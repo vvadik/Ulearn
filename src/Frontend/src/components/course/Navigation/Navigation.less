@@ -9,7 +9,6 @@
   max-width: @navigationMenuWidth;
   max-height: calc(100vh - @headerHeight);
 
-  top: calc(@headerHeight);
   left: -2 * @navigationMenuWidth;
 
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.06);
@@ -42,7 +41,7 @@
   z-index: -1;
 
   left: 100vw;
-  top: @headerHeight;
+  top: 0;
   bottom: 0;
   right: 0;
 
@@ -60,6 +59,18 @@
   height: @contentHeight;
   max-height: @contentHeight;
   background: #ffffff;
+}
+
+@media (max-width: @maxPhoneWidth) {
+  .root:after {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    visibility: visible;
+    width: 20px;
+    content: '';
+  }
 }
 
 @media (min-width: @minLaptopWidth) {

@@ -9,6 +9,7 @@ import Hijack from "src/components/hijack/Hijack";
 import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { findDOMNode } from "react-dom";
+import { isMobile } from "src/utils/getDeviceType";
 
 import styles from './Header.less';
 
@@ -571,7 +572,7 @@ class Menu extends Component {
 		if(this.props.account.isAuthenticated) {
 			return (
 				<div className={ styles["header__menu"] }>
-					<NotificationsMenu/>
+					<NotificationsMenu history={ this.props.history }/>
 					<ProfileLink account={ this.props.account }/>
 					<Separator/>
 					<LogoutLink/>
@@ -671,23 +672,27 @@ class NotificationsMenu extends Component {
 	}
 
 	onClick() {
-		if(this.state.isOpened) {
-			this.setState({
-				isOpened: false,
-			});
+		if(isMobile()) {
+			this.props.history.push('/Feed');
 		} else {
-			this.setState({
-				isOpened: true,
-				isLoading: true,
-			});
-			NotificationsMenu._loadNotifications().then(
-				notifications => {
-					this.props.resetNotificationsCount();
-					this.setState({
-						isLoading: false,
-						notificationsHtml: notifications
-					})
+			if(this.state.isOpened) {
+				this.setState({
+					isOpened: false,
 				});
+			} else {
+				this.setState({
+					isOpened: true,
+					isLoading: true,
+				});
+				NotificationsMenu._loadNotifications().then(
+					notifications => {
+						this.props.resetNotificationsCount();
+						this.setState({
+							isLoading: false,
+							notificationsHtml: notifications
+						})
+					});
+			}
 		}
 	}
 
@@ -784,7 +789,8 @@ function ProfileLink({ account }) {
 	if(isProblem) {
 		let firstProblem = account.accountProblems[0];
 		icon = (
-			<Tooltip trigger={ 'hover' } closeButton={ true } pos="bottom center"
+			<Tooltip trigger={ isMobile() ? 'closed' : "hover" }
+					 closeButton={ true } pos={ "bottom center" }
 					 render={ () => (
 						 <div style={ { width: '250px' } }>
 							 { firstProblem.description }
