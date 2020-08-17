@@ -7,8 +7,8 @@ namespace Database.Repos
 {
 	public interface IUnitsRepo
 	{
-		Task<IEnumerable<Guid>> GetVisibleUnitIdsAsync(Course course, string userId);
-		IEnumerable<Guid> GetVisibleUnitIds(Course course);
+		Task<List<Guid>> GetVisibleUnitIdsAsync(Course course, string userId);
+		Task<List<Guid>> GetPublishedUnitIdsAsync(Course course);
 		DateTime? GetNextUnitPublishTime(string courseId);
 		HashSet<string> GetVisibleCourses();
 		Task<bool> IsCourseVisibleForStudentsAsync(string courseId);

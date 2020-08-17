@@ -15,6 +15,9 @@ namespace Ulearn.Web.Api.Models.Common
 		public string Title { get; set; }
 
 		[DataMember]
+		public bool IsNotPublished { get; set; }
+
+		[DataMember]
 		public List<ShortSlideInfo> Slides { get; set; }
 		
 		[DataMember]
