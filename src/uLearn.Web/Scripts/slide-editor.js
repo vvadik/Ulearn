@@ -296,8 +296,6 @@ function initCodeEditor($parent) {
                 });
 
             element.codeMirrorEditor = editor;
-            if (editable)
-                editor.focus();
             if (guest)
                 editor.on("mousedown", function(cm) { loginForContinue(); });
         });
