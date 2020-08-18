@@ -500,7 +500,7 @@ class Course extends Component {
 				onClick: this.unitClickHandle,
 				progress: scoresByUnits.hasOwnProperty(item.id) ? scoresByUnits[item.id] : { current: 0, max: 0 },
 				isNotPublished: item.isNotPublished,
-				publicationDate: '2020-08-22 09:30', //TODO (rozentor) its mock
+				publicationDate: item.publicationDate,
 			})),
 			containsFlashcards: courseInfo.containsFlashcards,
 		};
