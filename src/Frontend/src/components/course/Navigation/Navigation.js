@@ -68,7 +68,7 @@ class Navigation extends Component {
 	handleTouchEnd = (evt) => {
 		const { clientX, } = evt.changedTouches[0];
 		const { toggleNavigation, navigationOpened, } = this.props;
-		const { xDown, yDown, } = this.state;
+		const { xDown, yDown, overlayStyle, } = this.state;
 
 		if(!xDown || !yDown) {
 			return;
@@ -81,7 +81,9 @@ class Navigation extends Component {
 			toggleNavigation();
 		}
 
-		this.playHidingOverlayAnimation();
+		if(overlayStyle) {
+			this.playHidingOverlayAnimation();
+		}
 
 		this.setState({
 			xDown: null,
