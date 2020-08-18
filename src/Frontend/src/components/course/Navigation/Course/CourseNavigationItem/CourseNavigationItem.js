@@ -2,35 +2,43 @@ import React, { Component } from "react";
 
 import ProgressBar from "../../ProgressBar";
 
-import classnames from "classnames";
 import { courseMenuItemType } from "../../types"
-import { Calendar, } from "icons";
-import { Hint } from "ui";
+import { Calendar, EyeClosed, } from "icons";
+import { Hint, } from "ui";
 
 import { getDateDDMMYY } from "src/utils/getMoment";
+import classnames from "classnames";
 
 import styles from "./CourseNavigationItem.less";
+import { isMobile, isTablet } from "src/utils/getDeviceType";
 
 class CourseNavigationItem extends Component {
 	render() {
 		const { title, isActive, isNotPublished, publicationDate } = this.props;
 
-		const classes = {
-			[styles.itemLink]: true,
-			[styles.active]: isActive,
-			[styles.isNotPublished]: isNotPublished,
-		};
+		const classes = classnames(
+			styles.itemLink,
+			{ [styles.active]: isActive },
+		);
 
 		return (
 			<li className={ styles.root } onClick={ this.clickHandle }>
-				<div className={ classnames(classes) }>
+				<div className={ classes }>
 					<span className={ styles.text }>
-						{ isNotPublished && publicationDate &&
-						<span className={ styles.isNotPublishedIcon }>
-							<Hint text={ `Этот модуль будет опубликован ${ getDateDDMMYY(publicationDate) }` }>
-									<Calendar/>
-							</Hint>
-						</span> }
+						{ isNotPublished &&
+						<span className={ styles.isNotPublishedIcon } onClick={ this.hintClickHandle }>
+								{ publicationDate
+									?
+									<Hint text={ `Этот модуль будет опубликован ${ getDateDDMMYY(publicationDate) }` }>
+										<Calendar/>
+									</Hint>
+									:
+									<Hint text={ `Этот модуль не опубликован` }>
+										<EyeClosed/>
+									</Hint>
+								}
+						</span>
+						}
 						{ title }
 					</span>
 					{ this.renderProgress() }
@@ -58,6 +66,12 @@ class CourseNavigationItem extends Component {
 
 	clickHandle = () => {
 		this.props.onClick(this.props.id);
+	};
+
+	hintClickHandle = (e) => {
+		if(isMobile() || isTablet()) {
+			e.stopPropagation();
+		}
 	};
 }
 
