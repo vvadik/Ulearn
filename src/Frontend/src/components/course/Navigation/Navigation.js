@@ -13,7 +13,7 @@ import Flashcards from "./Course/Flashcards/Flashcards";
 import { courseMenuItemType, menuItemType, groupAsStudentType, progressType } from './types';
 import { flashcards } from "src/consts/routes";
 
-import { isMobile } from "src/utils/getDeviceType";
+import { isMobile, isTablet } from "src/utils/getDeviceType";
 import { toggleNavigation } from "src/actions/navigation";
 
 import styles from './Navigation.less';
@@ -39,10 +39,8 @@ class Navigation extends Component {
 	}
 
 	tryAddTouchListener = () => {
-		if(isMobile() && !this.state.touchListenerAdded) {
+		if((isMobile() || isTablet()) && !this.state.touchListenerAdded) {
 			document.addEventListener('touchstart', this.handleTouchStart);
-			document.addEventListener('touchmove', this.handleTouchMove);
-			window.addEventListener('touchend', this.handleTouchEnd);
 			this.setState({
 				touchListenerAdded: true,
 			})
@@ -54,10 +52,14 @@ class Navigation extends Component {
 	}
 
 	handleTouchStart = (evt) => {
+		document.addEventListener('touchmove', this.handleTouchMove);
+		document.addEventListener('touchend', this.handleTouchEnd);
+
 		const { clientX, clientY, } = this.getTouches(evt)[0];
 		const { navigationOpened } = this.props;
+		const touchOnLeftSideOfScreen = clientX < window.innerWidth / 3;
 
-		if((!navigationOpened && clientX < window.innerWidth / 3) || navigationOpened) {
+		if((!navigationOpened && touchOnLeftSideOfScreen) || navigationOpened) {
 			this.setState({
 				xDown: clientX,
 				yDown: clientY,
@@ -74,11 +76,14 @@ class Navigation extends Component {
 			return;
 		}
 
-		if(!navigationOpened && Math.abs(xDown - clientX) > mobileNavigationMenuWidth * 3 / 4) {
-			// if we showed more then 3/4 of menu then toggle navigation
-			toggleNavigation();
-		} else if(navigationOpened && Math.abs(xDown - clientX) > mobileNavigationMenuWidth / 4) {
-			toggleNavigation();
+		const moveDistance = Math.abs(xDown - clientX);
+		const isDistanceEnough = moveDistance > mobileNavigationMenuWidth / 4; //if we showed/hided more then 1/4 of menu then toggle navigation
+		if(isDistanceEnough) {
+			const leftSwap = !navigationOpened && clientX > xDown;
+			const rightSwap = navigationOpened && clientX < xDown;
+			if(leftSwap || rightSwap) {
+				toggleNavigation();
+			}
 		}
 
 		if(overlayStyle) {
@@ -90,6 +95,9 @@ class Navigation extends Component {
 			yDown: null,
 			sideMenuStyle: null,
 		})
+
+		document.removeEventListener('touchmove', this.handleTouchMove);
+		document.removeEventListener('touchend', this.handleTouchEnd);
 	};
 
 	handleTouchMove = (evt) => {
@@ -141,21 +149,23 @@ class Navigation extends Component {
 	};
 
 	componentWillUnmount() {
-		window.removeEventListener('resize', this.handleWindowSizeChange);
+		document.removeEventListener('resize', this.handleWindowSizeChange);
 		if(this.state.touchListenerAdded) {
-			window.removeEventListener('touchstart', this.handleTouchStart);
-			window.removeEventListener('touchmove', this.handleTouchMove);
-			window.removeEventListener('touchend', this.handleTouchEnd);
+			document.removeEventListener('touchstart', this.handleTouchStart);
+			document.removeEventListener('touchmove', this.handleTouchMove);
+			document.removeEventListener('touchend', this.handleTouchEnd);
 		}
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
 		const { navigationOpened } = this.props;
 
-		if(isMobile() && prevProps.navigationOpened !== navigationOpened) {
+		if((isMobile() || isTablet()) && prevProps.navigationOpened !== navigationOpened) {
 			document.querySelector('body')
 				.classList.toggle(styles.overflow, navigationOpened);
-			this.playHidingOverlayAnimation();
+			if(!navigationOpened) {
+				this.playHidingOverlayAnimation();
+			}
 		}
 	}
 
