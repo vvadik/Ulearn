@@ -14,8 +14,11 @@ namespace Ulearn.Web.Api.Models.Common
 		[DataMember]
 		public string Title { get; set; }
 
-		[DataMember]
+		[DataMember(EmitDefaultValue = false)]
 		public bool IsNotPublished { get; set; }
+
+		[DataMember(EmitDefaultValue = false)]
+		public DateTime? PublicationDate { get; set; }
 
 		[DataMember]
 		public List<ShortSlideInfo> Slides { get; set; }

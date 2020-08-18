@@ -8,6 +8,7 @@ import classNames from "classnames";
 import PropTypes from "prop-types";
 
 import styles from "./BlocksWrapper.less";
+import getPluralForm from "src/utils/getPluralForm";
 
 const hiddenHintText = "Студенты не видят этот блок";
 
@@ -73,7 +74,7 @@ class BlocksWrapper extends React.Component {
 		return (
 			<div className={ styles.header }>
 				<span className={ styles.headerText }>
-					{ `${ score.score } баллов из ${ score.maxScore }` }
+					{ `${ score.score } ${getPluralForm(score.score,'балл','балла','баллов')} из ${ score.maxScore }` }
 				</span>
 			</div>
 		);
