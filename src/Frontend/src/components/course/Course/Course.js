@@ -499,6 +499,8 @@ class Course extends Component {
 				isActive: highlightedUnit === item.id,
 				onClick: this.unitClickHandle,
 				progress: scoresByUnits.hasOwnProperty(item.id) ? scoresByUnits[item.id] : { current: 0, max: 0 },
+				isNotPublished: item.isNotPublished,
+				publicationDate: item.publicationDate,
 			})),
 			containsFlashcards: courseInfo.containsFlashcards,
 		};
