@@ -13,7 +13,7 @@ import Flashcards from "./Course/Flashcards/Flashcards";
 import { courseMenuItemType, menuItemType, groupAsStudentType, progressType } from './types';
 import { flashcards } from "src/consts/routes";
 
-import { isMobile } from "src/utils/getDeviceType";
+import { isMobile, isTablet } from "src/utils/getDeviceType";
 import { toggleNavigation } from "src/actions/navigation";
 
 import styles from './Navigation.less';
@@ -39,7 +39,7 @@ class Navigation extends Component {
 	}
 
 	tryAddTouchListener = () => {
-		if(isMobile() && !this.state.touchListenerAdded) {
+		if((isMobile() || isTablet()) && !this.state.touchListenerAdded) {
 			document.addEventListener('touchstart', this.handleTouchStart);
 			document.addEventListener('touchmove', this.handleTouchMove);
 			window.addEventListener('touchend', this.handleTouchEnd);
@@ -152,10 +152,12 @@ class Navigation extends Component {
 	componentDidUpdate(prevProps, prevState, snapshot) {
 		const { navigationOpened } = this.props;
 
-		if(isMobile() && prevProps.navigationOpened !== navigationOpened) {
+		if((isMobile() || isTablet()) && prevProps.navigationOpened !== navigationOpened) {
 			document.querySelector('body')
 				.classList.toggle(styles.overflow, navigationOpened);
-			this.playHidingOverlayAnimation();
+			if(!navigationOpened) {
+				this.playHidingOverlayAnimation();
+			}
 		}
 	}
 
