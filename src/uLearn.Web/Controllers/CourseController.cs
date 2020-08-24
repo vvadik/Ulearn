@@ -74,10 +74,7 @@ namespace uLearn.Web.Controllers
 
 			if (string.IsNullOrWhiteSpace(courseId))
 			{
-				if (string.IsNullOrWhiteSpace(slideId))
-					return RedirectToAction("Index", "Home");
-
-				return RedirectToSlideById(slideGuid);
+				return RedirectToAction("Index", "Home");
 			}
 
 			var course = courseManager.FindCourse(courseId);
@@ -89,7 +86,9 @@ namespace uLearn.Web.Controllers
 			var isGuest = !User.Identity.IsAuthenticated;
 			var isInstructor = !isGuest && User.HasAccessFor(course.Id, CourseRole.Instructor);
 
-			var slide = slideGuid == Guid.Empty ? GetInitialSlideForStartup(courseId, visibleUnits, isInstructor) : course.FindSlideById(slideGuid);
+			var slide = slideGuid == Guid.Empty
+				? GetInitialSlideForStartup(courseId, visibleUnits, isInstructor)
+				: course.FindSlideById(slideGuid, isInstructor);
 
 			if (slide == null)
 			{
@@ -134,17 +133,8 @@ namespace uLearn.Web.Controllers
 			return View("Slide", model);
 		}
 
-		private ActionResult RedirectToSlideById(Guid slideGuid)
-		{
-			var course = courseManager.FindCourseBySlideById(slideGuid);
-			if (course == null)
-				return HttpNotFound();
-			var slide = course.GetSlideById(slideGuid);
-			return RedirectToRoute("Course.SlideById", new { courseId = course.Id, slideId = slide.Url });
-		}
-
 		[AllowAnonymous]
-		public async Task<ActionResult> Slide(string courseId, int slideIndex = -1)
+		public async Task<ActionResult> Slide(string courseId)
 		{
 			var course = courseManager.FindCourse(courseId);
 			if (course == null)
@@ -152,7 +142,7 @@ namespace uLearn.Web.Controllers
 			var visibleUnitIds = unitsRepo.GetVisibleUnitIds(course, User);
 			var visibleUnits = course.GetUnits(visibleUnitIds);
 			var isInstructor = User.HasAccessFor(course.Id, CourseRole.Instructor);
-			var slide = slideIndex == -1 ? GetInitialSlideForStartup(courseId, visibleUnits, isInstructor) : course.Slides[slideIndex];
+			var slide = GetInitialSlideForStartup(courseId, visibleUnits, isInstructor);
 			if (slide == null)
 				return HttpNotFound();
 			return RedirectToRoute("Course.SlideById", new { courseId, slideId = slide.Url });
@@ -165,7 +155,7 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("Index", "Home");
 
 			var course = courseManager.GetCourse(courseId);
-			var slide = course.GetSlideById(slideId);
+			var slide = course.GetSlideById(slideId, false);
 
 			string userId;
 			var owinRequest = Request.GetOwinContext().Request;
@@ -235,7 +225,7 @@ namespace uLearn.Web.Controllers
 		{
 			var userId = User.Identity.GetUserId();
 			var lastVisit = visitsRepo.FindLastVisit(courseId, userId);
-			var orderedVisibleSlides = orderedVisibleUnits.SelectMany(u => u.Slides).ToList();
+			var orderedVisibleSlides = orderedVisibleUnits.SelectMany(u => u.GetSlides(isInstructor)).ToList();
 			if (lastVisit != null)
 			{
 				var lastVisitedSlide = orderedVisibleSlides.FirstOrDefault(s => s.Id == lastVisit.SlideId);
@@ -385,7 +375,8 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> AcceptedSolutions(string courseId, Guid slideId, bool isLti = false)
 		{
 			var course = courseManager.GetCourse(courseId);
-			var slide = course.GetSlideById(slideId) as ExerciseSlide;
+			var isInstructor = User.HasAccessFor(course.Id, CourseRole.Instructor);
+			var slide = course.GetSlideById(slideId, isInstructor) as ExerciseSlide;
 			if (slide == null)
 				return HttpNotFound();
 
@@ -444,7 +435,8 @@ namespace uLearn.Web.Controllers
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
 			var course = courseManager.GetCourse(courseId);
-			var slide = (ExerciseSlide)course.GetSlideById(slideId);
+			var isInstructor = User.HasAccessFor(course.Id, CourseRole.Instructor);
+			var slide = (ExerciseSlide)course.GetSlideById(slideId, isInstructor);
 			var model = CreateAcceptedAlertModel(slide, course);
 			return View(model);
 		}
@@ -514,7 +506,7 @@ namespace uLearn.Web.Controllers
 			{
 				await solutionsRepo.RemoveSubmission(submission);
 				var course = courseManager.GetCourse(courseId);
-				var slide = course.GetSlideById(slideId);
+				var slide = course.GetSlideById(slideId, true);
 				await visitsRepo.UpdateScoreForVisit(courseId, submission.SlideId, slide.MaxScore, submission.UserId);
 			}
 
@@ -524,7 +516,7 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Tester)]
 		public async Task<ActionResult> ForgetAll(string courseId, Guid slideId)
 		{
-			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
+			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId, true);
 			var userId = User.Identity.GetUserId();
 			db.SolutionLikes.RemoveRange(db.SolutionLikes.Where(q => q.UserId == userId && q.Submission.SlideId == slideId));
 

@@ -14,6 +14,9 @@ namespace Ulearn.Web.Api.Models.Common
 		[DataMember]
 		public string Title { get; set; }
 
+		[DataMember(EmitDefaultValue = false)]
+		public bool Hide { get; set; }
+
 		/// <summary>
 		/// Человекочитаемый фрагмент url для слайда
 		/// </summary>

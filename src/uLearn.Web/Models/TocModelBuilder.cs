@@ -9,6 +9,7 @@ using Ulearn.Core.Courses.Units;
 
 namespace uLearn.Web.Models
 {
+	// Используется только в CourseTool, поэтому скрытые слайды показываются
 	public class TocModelBuilder
 	{
 		private readonly Func<Slide, string> getSlideUrl;
@@ -50,14 +51,14 @@ namespace uLearn.Web.Models
 		private TocUnitModel[] CreateUnits()
 		{
 			return course.GetUnitsNotSafe()
-				.Where(u => IsUnitVisible(u) && u.Slides.Any(s => !IsSlideHidden(s)))
+				.Where(u => IsUnitVisible(u) && u.GetSlides(true).Any(s => !IsSlideHidden(s)))
 				.Select(CreateUnit)
 				.ToArray();
 		}
 
 		private TocUnitModel CreateUnit(Unit unit)
 		{
-			var pages = unit.Slides.Where(s => !IsSlideHidden(s)).Select(CreatePage).ToList();
+			var pages = unit.GetSlides(true).Where(s => !IsSlideHidden(s)).Select(CreatePage).ToList();
 			if (IsInstructor)
 			{
 				if (unit.InstructorNote != null)
@@ -80,7 +81,7 @@ namespace uLearn.Web.Models
 				.ToDictionary(g => g, g => getAdditionalScore(unit, g));
 			return new TocUnitModel
 			{
-				IsCurrent = unit.Slides.Any(s => s.Id == currentSlideId),
+				IsCurrent = unit.GetSlides(true).Any(s => s.Id == currentSlideId),
 				UnitName = unit.Title,
 				Pages = pages,
 				AdditionalScores = additionalScores,

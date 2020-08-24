@@ -116,7 +116,7 @@ namespace uLearn.Web.Controllers
 
 			log.Info($"Собираю для отправки в RunCsJob решение {submission.Id}");
 
-			var exerciseSlide = courseManager.FindCourse(submission.CourseId)?.FindSlideById(submission.SlideId) as ExerciseSlide;
+			var exerciseSlide = courseManager.FindCourse(submission.CourseId)?.FindSlideById(submission.SlideId, true) as ExerciseSlide;
 			if (exerciseSlide == null)
 				return new FileRunnerSubmission
 				{
@@ -217,7 +217,7 @@ namespace uLearn.Web.Controllers
 			var checking = submission.Submission.AutomaticChecking;
 
 			var courseManager = WebCourseManager.Instance;
-			var slide = courseManager.FindCourse(checking.CourseId)?.FindSlideById(checking.SlideId) as ExerciseSlide;
+			var slide = courseManager.FindCourse(checking.CourseId)?.FindSlideById(checking.SlideId, true) as ExerciseSlide;
 			if (slide == null)
 			{
 				log.Warn($"Can't find exercise slide {checking.SlideId} in course {checking.CourseId}. Exit");

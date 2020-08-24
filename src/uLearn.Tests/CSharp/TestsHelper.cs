@@ -79,7 +79,7 @@ namespace uLearn.CSharp
 		public static ExerciseSlide BuildSlide(AbstractExerciseBlock exerciseBlock)
 		{
 			var unit = new Unit(new UnitSettings { Title = "UnitTitle" }, null);
-			var slideInfo = new SlideInfo(unit, null, 0);
+			var slideInfo = new SlideInfo(unit, null);
 			return new ExerciseSlide(exerciseBlock)
 			{
 				Id = Guid.Empty,

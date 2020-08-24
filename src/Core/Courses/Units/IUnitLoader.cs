@@ -4,6 +4,6 @@ namespace Ulearn.Core.Courses.Units
 {
 	public interface IUnitLoader
 	{
-		Unit Load(FileInfo unitFile, CourseLoadingContext context, int firstSlideIndex);
+		Unit Load(FileInfo unitFile, CourseLoadingContext context);
 	}
 }

@@ -13,6 +13,7 @@ using Database.Models;
 using log4net;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
 
 namespace Database.DataContexts
 {
@@ -288,7 +289,8 @@ namespace Database.DataContexts
 				);
 			}
 
-			var recipientsIds = notification.GetRecipientsIds(db).ToHashSet();
+			var course = string.IsNullOrWhiteSpace(notification.CourseId) ? null : courseManager.GetCourse(notification.CourseId);
+			var recipientsIds = notification.GetRecipientsIds(db, course).ToHashSet();
 
 			recipientsIds = FilterUsersWhoNotSeeCourse(notification, recipientsIds);
 			

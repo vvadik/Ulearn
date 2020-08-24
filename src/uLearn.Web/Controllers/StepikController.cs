@@ -95,7 +95,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> UpdateOptions(string courseId, int stepikCourseId)
 		{
 			var course = courseManager.GetCourse(courseId);
-			var slides = course.Slides;
+			var slides = course.GetSlides(true);
 			var slidesXmls = slides.ToDictionary(s => s.Id, s => stepikRepo.GetSlideXmlIndicatedChanges(s));
 
 			/* TODO (andgein): following 5 lines are copy-paste*/
@@ -225,7 +225,7 @@ namespace uLearn.Web.Controllers
 			foreach (var kvp in exportResults.SlideIdToStepsIdsMap)
 			{
 				var slideId = kvp.Key;
-				var slide = course.FindSlideById(slideId);
+				var slide = course.FindSlideById(slideId, true);
 				var stepsIds = kvp.Value;
 				await stepikRepo.SetMapInfoAboutExportedSlide(course.Id, exportResults.StepikCourseId, slide, stepsIds);
 			}

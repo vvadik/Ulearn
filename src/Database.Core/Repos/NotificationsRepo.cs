@@ -287,7 +287,8 @@ namespace Database.Repos
 				);
 			}
 
-			var recipientsIds = (await notification.GetRecipientsIdsAsync(serviceProvider).ConfigureAwait(false)).ToHashSet();
+			var course = string.IsNullOrWhiteSpace(notification.CourseId) ? null : await courseManager.GetCourseAsync(notification.CourseId);
+			var recipientsIds = (await notification.GetRecipientsIdsAsync(serviceProvider, course).ConfigureAwait(false)).ToHashSet();
 
 			recipientsIds = await FilterUsersWhoNotSeeCourse(notification, recipientsIds);
 

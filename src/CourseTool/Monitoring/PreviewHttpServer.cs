@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -135,7 +136,7 @@ namespace uLearn.CourseTool.Monitoring
 		{
 			if (!Guid.TryParse(slideId, out var slideIdGuid))
 				return Encoding.UTF8.GetBytes("Invalid slide id");
-			var slide = course.FindSlideById(slideIdGuid);
+			var slide = course.FindSlideById(slideIdGuid, true);
 			if (!(slide is ExerciseSlide))
 				return Encoding.UTF8.GetBytes("Invalid slide id");
 
@@ -170,7 +171,7 @@ namespace uLearn.CourseTool.Monitoring
 			}
 		}
 
-		public int GetSlideIndex(string path)
+		private int GetSlideIndex(string path)
 		{
 			return int.Parse(path.Substring(1, 3));
 		}
@@ -197,7 +198,8 @@ namespace uLearn.CourseTool.Monitoring
 
 		private byte[] AddNewSlide<TSlide>(HttpRequestEventArgs context, string path, TSlide lessonOrQuiz) where TSlide : Slide
 		{
-			var prevSlide = course.FindSlideByIndex(GetSlideIndex(path));
+			var slides = course.GetSlides(true);
+			var prevSlide = FindSlideByIndex(slides, GetSlideIndex(path));
 			if (prevSlide == null)
 			{
 				context.Response.StatusCode = 404;
@@ -210,8 +212,14 @@ namespace uLearn.CourseTool.Monitoring
 			using (var s = new FileStream(Path.Combine(prevSlide.Info.Directory.FullName, newFile), FileMode.OpenOrCreate))
 				serializer.Serialize(s, lessonOrQuiz);
 			ReloadCourse();
-			context.Response.Redirect((prevSlide.Index + 1).ToString("000") + ".html");
+			var prevSlideIndex = slides.FindIndex(s => s.Id == prevSlide.Id);
+			context.Response.Redirect((prevSlideIndex + 1).ToString("000") + ".html");
 			return new byte[0];
+		}
+		
+		private Slide FindSlideByIndex(List<Slide> slides, int index)
+		{
+			return index >= 0 && index < slides.Count ? slides[index] : null;
 		}
 
 		private static string GenerateSlideFilename<T>(Slide prevSlide)
@@ -246,7 +254,7 @@ namespace uLearn.CourseTool.Monitoring
 		{
 			var code = context.Request.InputStream.GetString();
 			var index = GetSlideIndex(path);
-			var exercise = ((ExerciseSlide)course.Slides[index]).Exercise;
+			var exercise = ((ExerciseSlide)course.GetSlides(true)[index]).Exercise;
 			var runResult = GetRunResult(exercise, code);
 			context.Response.ContentType = "application/json; charset=utf-8";
 			return Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(runResult));
@@ -358,7 +366,7 @@ namespace uLearn.CourseTool.Monitoring
 		{
 			var loadedCourse = new CourseLoader().Load(new DirectoryInfo(courseDir));
 			var renderer = new SlideRenderer(new DirectoryInfo(htmlDir), loadedCourse);
-			foreach (var slide in loadedCourse.Slides)
+			foreach (var slide in loadedCourse.GetSlides(true))
 				renderer.RenderSlideToFile(slide, htmlDir);
 			foreach (var unit in loadedCourse.GetUnitsNotSafe().Where(u => u.InstructorNote != null))
 				renderer.RenderInstructorNotesToFile(unit, htmlDir);

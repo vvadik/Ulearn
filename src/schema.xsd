@@ -224,6 +224,12 @@
 				<xs:documentation xml:lang="ru">Заголовок слайда</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
+		<xs:attribute name="hide" type="xs:boolean">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">Side is shown to instructors only</xs:documentation>
+				<xs:documentation xml:lang="ru">Слайд показывается только преподавателям</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:attributeGroup>
 
 	<xs:attributeGroup name="FlashcardSlideAttributes">

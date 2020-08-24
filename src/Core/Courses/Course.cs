@@ -31,21 +31,34 @@ namespace Ulearn.Core.Courses
 
 		private List<Slide> slidesCache { get; set; }
 
-		public List<Slide> Slides
+		private List<Slide> Slides
 		{
-			get { return slidesCache ?? (slidesCache = units.SelectMany(u => u.Slides).ToList()); }
+			get { return slidesCache ??= units.SelectMany(u => u.GetSlides(true)).ToList(); }
+		}
+
+		private List<Slide> notHiddenSlidesCache { get; set; }
+		private List<Slide> NotHiddenSlides
+		{
+			get { return notHiddenSlidesCache ??= units.SelectMany(u => u.GetSlides(false)).ToList(); }
+		}
+
+		public List<Slide> GetSlides(bool withHidden)
+		{
+			if (withHidden)
+				return Slides;
+			return NotHiddenSlides;
 		}
 
 		[CanBeNull]
-		public Slide FindSlideById(Guid slideId)
+		public Slide FindSlideById(Guid slideId, bool withHidden)
 		{
-			return Slides.FirstOrDefault(x => x.Id == slideId);
+			return (withHidden ? Slides : NotHiddenSlides).FirstOrDefault(x => x.Id == slideId);
 		}
 
 		[NotNull]
-		public Slide GetSlideById(Guid slideId)
+		public Slide GetSlideById(Guid slideId, bool withHidden)
 		{
-			var slide = FindSlideById(slideId);
+			var slide = FindSlideById(slideId, withHidden);
 			if (slide == null)
 				throw new NotFoundException($"No slide with id {slideId}");
 			return slide;
@@ -105,15 +118,9 @@ namespace Ulearn.Core.Courses
 		}
 
 		[CanBeNull]
-		public Unit FindUnitBySlideId(Guid slideId)
+		public Unit FindUnitBySlideId(Guid slideId, bool withHiddenSlides)
 		{
-			return units.FirstOrDefault(u => u.Slides.Any(s => s.Id == slideId));
-		}
-
-		[CanBeNull]
-		public Slide FindSlideByIndex(int index)
-		{
-			return index >= 0 && index < Slides.Count ? Slides[index] : null;
+			return units.FirstOrDefault(u => u.GetSlides(withHiddenSlides).Any(s => s.Id == slideId));
 		}
 
 		public override string ToString()
@@ -124,7 +131,7 @@ namespace Ulearn.Core.Courses
 
 	public class InstructorNote
 	{
-		public InstructorNote(string markdown, Unit unit, FileInfo file, CourseLoadingContext courseLoadingContext, int slideIndex)
+		public InstructorNote(string markdown, Unit unit, FileInfo file, CourseLoadingContext courseLoadingContext)
 		{
 			Markdown = markdown;
 			Unit = unit;
@@ -132,16 +139,17 @@ namespace Ulearn.Core.Courses
 			Slide = new Slide(new MarkdownBlock(Markdown) { Hide = true })
 			{
 				Id = Unit.Id,
-				Title = "Заметки преподавателю"
+				Title = "Заметки преподавателю",
+				Hide = true
 			};
-			var slideLoadingContext = new SlideLoadingContext(courseLoadingContext, unit, file, slideIndex);
+			var slideLoadingContext = new SlideLoadingContext(courseLoadingContext, unit, file);
 			Slide.BuildUp(slideLoadingContext);
 			Slide.Validate(slideLoadingContext);
 		}
 
-		public static InstructorNote Load(CourseLoadingContext context, FileInfo file, Unit unit, int slideIndex)
+		public static InstructorNote Load(CourseLoadingContext context, FileInfo file, Unit unit)
 		{
-			return new InstructorNote(file.ContentAsUtf8(), unit, file, context, slideIndex);
+			return new InstructorNote(file.ContentAsUtf8(), unit, file, context);
 		}
 
 		public string Markdown;

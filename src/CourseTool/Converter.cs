@@ -17,31 +17,44 @@ namespace uLearn.CourseTool
 			var result = new List<Sequential>
 			{
 				new Sequential($"{course.Id}-{unitIndex}-{0}", unit.Title,
-					unit.Slides
+					unit.GetSlides(false)
 						.Where(s => !config.IgnoredUlearnSlides.Select(Guid.Parse).Contains(s.Id))
 						.SelectMany(y => y.ToVerticals(course.Id, ulearnBaseUrl, videoGuids, config.LtiId, coursePackageRoot))
 						.ToArray())
 			};
 			var note = unit.InstructorNote;
-			if (note != null && config.EmitSequentialsForInstructorNotes)
+			var hiddenSlides = unit.GetHiddenSlides();
+			if ((note != null || hiddenSlides.Count > 0) && config.EmitSequentialsForInstructorNotes)
 			{
-				var displayName = "Заметки преподавателю";
-				var sequentialId = $"{course.Id}-{unitIndex}-note-seq";
-				var verticalId = $"{course.Id}-{unitIndex}-note-vert";
-				var mdBlockId = $"{course.Id}-{unitIndex}-note-md";
-				result.Add(new Sequential(sequentialId, displayName,
-						new[]
-						{
-							new Vertical(
-								verticalId,
-								displayName,
-								new[]
-								{
-									new MarkdownBlock(unit.InstructorNote.Markdown)
-										.ToEdxComponent(mdBlockId, displayName, unit.Directory.FullName)
-								})
-						}) { VisibleToStaffOnly = true }
-				);
+				if (hiddenSlides.Count > 0)
+				{
+					result.Add(new Sequential($"{course.Id}-{unitIndex}-{0}", unit.Title,
+							hiddenSlides
+							.Where(s => !config.IgnoredUlearnSlides.Select(Guid.Parse).Contains(s.Id))
+							.SelectMany(y => y.ToVerticals(course.Id, ulearnBaseUrl, videoGuids, config.LtiId, coursePackageRoot))
+							.ToArray()) { VisibleToStaffOnly = true }
+					);
+				}
+				if (note != null)
+				{
+					var displayName = "Заметки преподавателю";
+					var sequentialId = $"{course.Id}-{unitIndex}-note-seq";
+					var verticalId = $"{course.Id}-{unitIndex}-note-vert";
+					var mdBlockId = $"{course.Id}-{unitIndex}-note-md";
+					result.Add(new Sequential(sequentialId, displayName,
+							new[]
+							{
+								new Vertical(
+									verticalId,
+									displayName,
+									new[]
+									{
+										new MarkdownBlock(unit.InstructorNote.Markdown)
+											.ToEdxComponent(mdBlockId, displayName, unit.Directory.FullName)
+									})
+							}) { VisibleToStaffOnly = true }
+					);
+				}
 			}
 
 			return result.ToArray();

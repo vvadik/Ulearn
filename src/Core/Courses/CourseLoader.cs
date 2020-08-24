@@ -80,7 +80,7 @@ namespace Ulearn.Core.Courses
 			var context = new CourseLoadingContext(courseId, settings, dir, loadFromDirectory.GetFile("course.xml"));
 
 			var units = LoadUnits(context).ToList();
-			var slides = units.SelectMany(u => u.Slides).ToList();
+			var slides = units.SelectMany(u => u.GetSlides(true)).ToList();
 
 			var validationLog = GetValidationLog(units);
 			if (validationLog != string.Empty)
@@ -96,7 +96,7 @@ namespace Ulearn.Core.Courses
 
 		private static string GetValidationLog(List<Unit> units)
 		{
-			var slides = units.SelectMany(x => x.Slides).ToList();
+			var slides = units.SelectMany(x => x.GetSlides(true)).ToList();
 			var validationLog = new List<string>();
 			validationLog.Add(CheckEmptySlideIds(slides));
 			validationLog.Add(CheckDuplicateSlideIds(slides));
@@ -110,7 +110,7 @@ namespace Ulearn.Core.Courses
 		{
 			foreach (var unit in units)
 			{
-				foreach (var slide in unit.Slides.Where(s => s.ShouldBeSolved))
+				foreach (var slide in unit.GetSlides(false).Where(s => s.ShouldBeSolved))
 				{
 					unit.Scoring.Groups[slide.ScoringGroup].MaxNotAdditionalScore += slide.MaxScore;
 					settings.Scoring.Groups[slide.ScoringGroup].MaxNotAdditionalScore += slide.MaxScore;
@@ -147,10 +147,9 @@ namespace Ulearn.Core.Courses
 
 			var unitIds = new HashSet<Guid>();
 			var unitUrls = new HashSet<string>();
-			var slideIndex = 0;
 			foreach (var unitFile in unitFiles)
 			{
-				var unit = unitLoader.Load(unitFile, context, slideIndex);
+				var unit = unitLoader.Load(unitFile, context);
 
 				if (unitIds.Contains(unit.Id))
 					throw new CourseLoadingException($"Ошибка в курсе \"{context.CourseSettings.Title}\" при загрузке модуля \"{unit.Title}\" из {unitFile.FullName}. " +
@@ -164,15 +163,13 @@ namespace Ulearn.Core.Courses
 						$"Повторяющийся url-адрес модуля: {unit.Url}. Url-адреса модулей должны быть уникальными"
 					);
 				unitUrls.Add(unit.Url);
-				if (unit.Slides.OfType<FlashcardSlide>().Count() > 1)
+				if (unit.GetSlides(true).OfType<FlashcardSlide>().Count() > 1)
 				{
 					throw new CourseLoadingException($"Ошибка в курсе \"{context.CourseSettings.Title}\" при загрузке модуля \"{unit.Title}\" из {unitFile.FullName}. " +
 													$"Обнаружено более одного слайда с флеш-картами. Слайд с флеш-картами должен быть только один");
 				}
 
 				yield return unit;
-
-				slideIndex += unit.Slides.Count;
 			}
 		}
 

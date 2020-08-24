@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -17,6 +18,8 @@ using Swashbuckle.AspNetCore.Annotations;
 using Ulearn.Common;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
 using Ulearn.Web.Api.Authorization;
 using Ulearn.Web.Api.Models.Parameters.Comments;
 using Ulearn.Web.Api.Models.Responses.Comments;
@@ -46,11 +49,15 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			var courseId = parameters.CourseId;
 			var slideId = parameters.SlideId;
 
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
+			var slide = await GetSlide(courseId, slideId, isInstructor);
+			if (slide == null)
+				return StatusCode((int)HttpStatusCode.NotFound, $"No slide with id {slideId}");
+
 			if (parameters.ForInstructors)
 			{
 				if (!IsAuthenticated)
 					return StatusCode((int)HttpStatusCode.Unauthorized, $"You should be authenticated to view instructor comments.");
-				var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
 				if (!isInstructor)
 					return StatusCode((int)HttpStatusCode.Forbidden, $"You have no access to instructor comments on {courseId}. You should be instructor or course admin.");
 			}
@@ -58,6 +65,19 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			var comments = await commentsRepo.GetSlideTopLevelCommentsAsync(courseId, slideId).ConfigureAwait(false);
 			comments = comments.Where(c => c.IsForInstructorsOnly == parameters.ForInstructors).ToList();
 			return await GetSlideCommentsResponseAsync(comments, courseId, parameters).ConfigureAwait(false);
+		}
+
+		private async Task<Slide> GetSlide(string courseId, Guid slideId, bool isInstructor)
+		{
+			var course = await courseManager.GetCourseAsync(courseId);
+			var slide = course.FindSlideById(slideId, isInstructor);
+			if (slide == null)
+			{
+				var instructorNote = course.FindInstructorNoteById(slideId);
+				if (instructorNote != null && isInstructor)
+					slide = instructorNote.Slide;
+			}
+			return slide;
 		}
 
 		private async Task<ActionResult<CommentsListResponse>> GetSlideCommentsResponseAsync(List<Comment> comments, string courseId, SlideCommentsParameters parameters)
@@ -107,6 +127,10 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			parameters.Text.TrimEnd();
 
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
+			var slide = await GetSlide(courseId, slideId, isInstructor);
+			if (slide == null)
+				return StatusCode((int)HttpStatusCode.NotFound, $"No slide with id {slideId}");
+
 			if (parameters.ForInstructors)
 			{
 				if (!isInstructor)

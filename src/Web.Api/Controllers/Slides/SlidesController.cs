@@ -45,8 +45,8 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		[HttpGet("{courseId}/{slideId}")]
 		public async Task<ActionResult<ApiSlideInfo>> SlideInfo([FromRoute]Course course, [FromRoute]Guid slideId)
 		{
-			var slide = course?.FindSlideById(slideId);
 			var isInstructor = await courseRolesRepo.HasUserAccessToAnyCourseAsync(User.GetUserId(), CourseRoleType.Instructor).ConfigureAwait(false);
+			var slide = course?.FindSlideById(slideId, isInstructor);
 			if (slide == null)
 			{
 				var instructorNote = course?.FindInstructorNoteById(slideId);

@@ -139,7 +139,7 @@ namespace Database
 				{
 					// ignored
 				}
-				if (course == null || course.Slides.Count == 0
+				if (course == null || course.GetSlides(true).Count == 0
 					|| courseId == courseIdToUpdate && tempCourse.LastUpdateTime < tempCourse.LoadingTime)
 				{
 					ReloadCourse(courseId);

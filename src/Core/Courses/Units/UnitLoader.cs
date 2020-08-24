@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Ulearn.Common.Extensions;
@@ -17,7 +16,7 @@ namespace Ulearn.Core.Courses.Units
 			this.slideLoader = slideLoader;
 		}
 
-		public Unit Load(FileInfo unitFile, CourseLoadingContext context, int firstSlideIndex)
+		public Unit Load(FileInfo unitFile, CourseLoadingContext context)
 		{
 			var unitDirectory = unitFile.Directory;
 			if (unitDirectory == null)
@@ -49,11 +48,11 @@ namespace Ulearn.Core.Courses.Units
 				/* Don't load slide from unit file! Even accidentally */
 				.Where(f => f != unitFile);
 
-			unit.Slides = slideFiles
-				.Select((f, internalIndex) => LoadSlide(f, unit, firstSlideIndex + internalIndex, context))
-				.ToList();
+			unit.SetSlides(slideFiles
+				.Select(f => LoadSlide(f, unit, context))
+				.ToList());
 
-			var flashcardSlides = unit.Slides.OfType<FlashcardSlide>();
+			var flashcardSlides = unit.GetSlides(true).OfType<FlashcardSlide>();
 			foreach (var flashcardSlide in flashcardSlides)
 			{
 				foreach (var flashcard in flashcardSlide.FlashcardsList)
@@ -62,14 +61,14 @@ namespace Ulearn.Core.Courses.Units
 				}
 			}
 
-			unit.LoadInstructorNote(context, firstSlideIndex + unit.Slides.Count);
+			unit.LoadInstructorNote(context);
 
 			return unit;
 		}
 
-		private Slide LoadSlide(FileInfo file, Unit unit, int slideIndex, CourseLoadingContext context)
+		private Slide LoadSlide(FileInfo file, Unit unit, CourseLoadingContext context)
 		{
-			var slideLoadingContext = new SlideLoadingContext(context, unit, file, slideIndex);
+			var slideLoadingContext = new SlideLoadingContext(context, unit, file);
 			try
 			{
 				return slideLoader.Load(slideLoadingContext);

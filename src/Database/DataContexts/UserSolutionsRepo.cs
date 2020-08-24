@@ -55,7 +55,7 @@ namespace Database.DataContexts
 			var hash = (await textsRepo.AddText(code)).Hash;
 			var compilationErrorHash = (await textsRepo.AddText(compilationError)).Hash;
 			var outputHash = (await textsRepo.AddText(output)).Hash;
-			var exerciseBlock = (courseManager.FindCourse(courseId)?.FindSlideById(slideId) as ExerciseSlide)?.Exercise;
+			var exerciseBlock = (courseManager.FindCourse(courseId)?.FindSlideById(slideId, true) as ExerciseSlide)?.Exercise;
 
 			AutomaticExerciseChecking automaticChecking;
 			if (language.HasAutomaticChecking() && (language == Language.CSharp || exerciseBlock is UniversalExerciseBlock))
@@ -480,7 +480,7 @@ namespace Database.DataContexts
 			var outputHash = (await textsRepo.AddText(output)).Hash;
 
 			var isWebRunner = checking.CourseId == "web" && checking.SlideId == Guid.Empty;
-			var exerciseSlide = isWebRunner ? null : (ExerciseSlide)courseManager.GetCourse(checking.CourseId).GetSlideById(checking.SlideId);
+			var exerciseSlide = isWebRunner ? null : (ExerciseSlide)courseManager.GetCourse(checking.CourseId).GetSlideById(checking.SlideId, true);
 
 			var isRightAnswer = IsRightAnswer(result, output, exerciseSlide?.Exercise);
 			var score = exerciseSlide != null && isRightAnswer ? exerciseSlide.Scoring.PassedTestsScore : 0;

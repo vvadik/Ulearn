@@ -10,7 +10,6 @@ using Database.Models;
 using Database.Repos;
 using Database.Repos.Groups;
 using Database.Repos.Users;
-using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
@@ -62,7 +61,7 @@ namespace Ulearn.Web.Api.Controllers
 			var course = await courseManager.GetCourseAsync(courseId);
 			if (quizSlideId != null)
 			{
-				var slide = course.FindSlideById(quizSlideId.Value);
+				var slide = course.FindSlideById(quizSlideId.Value, false);
 				if (slide == null)
 					return StatusCode((int)HttpStatusCode.NotFound, $"Slide not found in course {courseId}");
 
@@ -74,7 +73,7 @@ namespace Ulearn.Web.Api.Controllers
 				extendedUserInfo = extendedUserInfo.Zip(answers, (u, a) => { u.Answers = a; return u; }).ToList();
 			}
 
-			var slides = course.Slides.Where(s => s.ShouldBeSolved).Select(s => s.Id).ToList();
+			var slides = course.GetSlides(false).Where(s => s.ShouldBeSolved).Select(s => s.Id).ToList();
 			var scores = GetScoresByScoringGroups(users.Select(u => u.Id).ToList(), slides, course);
 			var scoringGroupsWithScores = scores.Select(kvp => kvp.Key.ScoringGroup).ToHashSet();
 			var scoringGroups = course.Settings.Scoring.Groups.Values.Where(sg => scoringGroupsWithScores.Contains(sg.Id)).ToList();
@@ -166,7 +165,7 @@ namespace Ulearn.Web.Api.Controllers
 				.Select(v => new { v.UserId, v.SlideId, v.Score })
 				.AsEnumerable()
 				.Where(v => slides.Contains(v.SlideId))
-				.GroupBy(v => (v.UserId, course.FindSlideById(v.SlideId)?.ScoringGroup))
+				.GroupBy(v => (v.UserId, course.FindSlideById(v.SlideId, false)?.ScoringGroup))
 				.ToDictionary(g => g.Key, g => g.Sum(v => v.Score));
 		}
 

@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
 using JetBrains.Annotations;
-using Microsoft.CodeAnalysis.Operations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Ulearn.Common.Extensions;
@@ -18,6 +18,7 @@ using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
 using Ulearn.Core.Extensions;
 using Ulearn.Core.Model.Edx;
 using Ulearn.Core.Model.Edx.EdxComponents;
+using Component = Ulearn.Core.Model.Edx.EdxComponents.Component;
 
 namespace Ulearn.Core.Courses.Slides
 {
@@ -35,6 +36,10 @@ namespace Ulearn.Core.Courses.Slides
 
 		[XmlElement("meta")]
 		public SlideMetaDescription Meta { get; set; }
+
+		[XmlAttribute("hide")]
+		[DefaultValue(false)]
+		public bool Hide { get; set; }
 
 		[XmlElement("defaultIncludeCodeFile")]
 		public string DefaultIncludeCodeFile { get; set; }
@@ -91,8 +96,6 @@ namespace Ulearn.Core.Courses.Slides
 		[XmlIgnore]
 		public SlideInfo Info { get; set; }
 
-		public int Index => Info.Index;
-
 		public virtual bool ShouldBeSolved => false;
 
 		public virtual int MaxScore => 0;
@@ -132,7 +135,7 @@ namespace Ulearn.Core.Courses.Slides
 		public virtual void BuildUp(SlideLoadingContext context)
 		{
 			Meta?.FixPaths(context.SlideFile);
-			Info = new SlideInfo(context.Unit, context.SlideFile, context.SlideIndex);
+			Info = new SlideInfo(context.Unit, context.SlideFile);
 			if (Blocks == null)
 				Blocks = new SlideBlock[0];
 

@@ -207,7 +207,7 @@
 <div class="row" id="students">
 	<div class="col-xs-12">
 		@{
-			var exercisesAndQuizzes = Model.Slides.Where(s => s is QuizSlide || s is ExerciseSlide).OrderBy(s => s.Index).ToList();
+			var exercisesAndQuizzes = Model.Slides.Where(s => s is QuizSlide || s is ExerciseSlide).ToList();
 			var modifiableScoringGroups = Model.Unit.Scoring.Groups.Values.Where(g => g.CanBeSetByInstructor).ToList();
 		}
 

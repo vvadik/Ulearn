@@ -177,7 +177,7 @@ namespace Stepik.Api
 				var blockIndex = 0;
 				var lessonIndex = 0;
 				var isFirstSlideInUnit = true;
-				foreach (var slide in unit.Slides)
+				foreach (var slide in unit.GetSlides(false))
 				{
 					results.Info($"Converting ulearn slide «{slide.Title}» with id {slide.Id} into stepik steps");
 					var needToStartNewLesson = isFirstSlideInUnit || exportOptions.SlideIdsWhereNewLessonsStart.Contains(slide.Id);
@@ -289,7 +289,7 @@ namespace Stepik.Api
 			foreach (var slideUpdateOptions in updateOptions.SlidesUpdateOptions)
 			{
 				var slideId = slideUpdateOptions.SlideId;
-				var slide = course.FindSlideById(slideId);
+				var slide = course.FindSlideById(slideId, false);
 				if (slide == null)
 				{
 					results.Error($"Unable to find slide {slideId}, continue without it");

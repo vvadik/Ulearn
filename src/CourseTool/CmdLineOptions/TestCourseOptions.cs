@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using CommandLine;
-using RunCsJob;
 using uLearn.CourseTool.Validating;
 using Ulearn.Core.Courses;
 
@@ -24,10 +23,10 @@ namespace uLearn.CourseTool.CmdLineOptions
 			var sw = Stopwatch.StartNew();
 			var course = new CourseLoader().Load(ulearnDir);
 			Console.WriteLine(sw.ElapsedMilliseconds + " ms");
-			var slides = course.Slides;
+			var slides = course.GetSlides(true);
 			if (SlideId != null)
 			{
-				slides = course.Slides.Where(s => s.Id == Guid.Parse(SlideId)).ToList();
+				slides = slides.Where(s => s.Id == Guid.Parse(SlideId)).ToList();
 				Console.WriteLine("Only slide " + SlideId);
 			}
 

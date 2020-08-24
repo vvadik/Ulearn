@@ -43,7 +43,7 @@ namespace uLearn.CourseTool.Monitoring
 
 		private string RenderSlide(Slide slide)
 		{
-			var page = StandaloneLayout.Page(course, slide, CreateToc(slide), GetCssFiles(), GetJsFiles());
+			var page = StandaloneLayout.Page(course, slide, GetSlideIndex(slide.Id), CreateToc(slide), GetCssFiles(), GetJsFiles());
 			return "<!DOCTYPE html>\n" + page.ToHtmlString();
 		}
 
@@ -61,15 +61,15 @@ namespace uLearn.CourseTool.Monitoring
 			if (note == null)
 				return null;
 
-			var similarSlide = unit.Slides.First();
-			var slide = new Slide(new MarkdownBlock(note.Markdown))
-			{
-				Id = Guid.NewGuid(),
-				Title = "Заметки преподавателю",
-				Info = new SlideInfo(unit, similarSlide.Info.SlideFile, -1),
-			};
-			var page = StandaloneLayout.Page(course, slide, CreateToc(slide), GetCssFiles(), GetJsFiles());
+			var slide = unit.InstructorNote.Slide;
+
+			var page = StandaloneLayout.Page(course, slide, GetSlideIndex(slide.Id), CreateToc(slide), GetCssFiles(), GetJsFiles());
 			return "<!DOCTYPE html>\n" + page.ToHtmlString();
+		}
+
+		private int GetSlideIndex(Guid slideId)
+		{
+			return course.GetSlides(true).FindIndex(s => s.Id == slideId);
 		}
 
 		private TocModel CreateToc(Slide slide)
@@ -89,9 +89,10 @@ namespace uLearn.CourseTool.Monitoring
 			return $"InstructorNotes.{unit.Url}.html";
 		}
 
-		private static string GetSlideUrl(Slide slide)
+		private string GetSlideUrl(Slide slide)
 		{
-			return slide.Index.ToString("000") + ".html";
+			var index = GetSlideIndex(slide.Id);
+			return index.ToString("000") + ".html";
 		}
 
 		private IEnumerable<string> GetCssFiles()
