@@ -61,6 +61,14 @@ class Slide extends React.Component {
 	}
 
 	renderSlideBlocks = (slideBlocks) => {
+		if(slideBlocks.length === 0) {
+			return (
+				<BlocksWrapper>
+					<p>Содержание этого слайда скрыто</p>
+				</BlocksWrapper>
+			);
+		}
+
 		this.addAdditionalPropsToBlocks(slideBlocks);
 		const blocksPacks = [];
 
@@ -71,13 +79,15 @@ class Slide extends React.Component {
 			blocksPacks.push(blocksPart);
 		}
 
+		const onlyOneBlock = blocksPacks.length === 1;
 		return blocksPacks.map(({ blocks, hide, fullSizeBlocksPack }, i) => {
 			return (
 				<BlocksWrapper isContainer={ fullSizeBlocksPack }
 							   key={ i }
-							   isBlock={ blocksPacks.length !== 1 }
-							   isHidden={ hide }
-							   showEyeHint={ !fullSizeBlocksPack }>
+							   showEyeHint={ !fullSizeBlocksPack }
+							   isBlock={ !onlyOneBlock }
+							   isHidden={ onlyOneBlock ? this.props.isHiddenSlide : hide }
+				>
 					{ blocks.map(this.mapBlockToComponent) }
 				</BlocksWrapper>
 			)
@@ -167,6 +177,7 @@ Slide.propTypes = {
 	slideLoading: PropTypes.bool.isRequired,
 	loadSlide: PropTypes.func.isRequired,
 	showHiddenBlocks: PropTypes.bool,
+	isHiddenSlide: PropTypes.bool,
 };
 
 Slide.defaultProps = {

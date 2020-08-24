@@ -50,6 +50,7 @@ class NavigationContent extends Component {
 				description={ NavigationContent.createDescription(menuItem) }
 				metro={ metroSettings }
 				toggleNavigation={ toggleNavigation }
+				hide={ menuItem.hide }
 			/>
 		);
 
@@ -57,7 +58,7 @@ class NavigationContent extends Component {
 	}
 
 	static createDescription(item) {
-		if (item.type === SLIDETYPE.quiz && item.questionsCount) {
+		if(item.type === SLIDETYPE.quiz && item.questionsCount) {
 			const count = item.questionsCount;
 			return `${ count } ${ getPluralForm(count, 'вопрос', 'вопроса', 'вопросов') }`;
 		}
