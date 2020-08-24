@@ -6,10 +6,13 @@ import { MenuHeader, MenuItem, MenuSeparator, Tooltip, Loader, DropdownMenu, } f
 import { DropdownContainer } from "ui/internal/DropdownContainer";
 import HeaderComponentErrorBoundary from "./Error/HeaderComponentErrorBoundary";
 import Hijack from "src/components/hijack/Hijack";
+import StudentMode from "src/components/common/StudentMode/StudentMode";
+
 import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { findDOMNode } from "react-dom";
 import { isMobile } from "src/utils/getDeviceType";
+import { ROLES } from "src/consts/general";
 
 import styles from './Header.less';
 
@@ -112,6 +115,13 @@ class Header extends Component {
 		return null;
 	}
 
+	isInstructor() {
+		const { isSystemAdministrator, courseRole, } = this.state;
+		return isSystemAdministrator ||
+			courseRole === ROLES.courseAdmin ||
+			courseRole === ROLES.instructor;
+	}
+
 	render() {
 		const { initializing, account, } = this.props;
 
@@ -123,6 +133,8 @@ class Header extends Component {
 					{ Header.renderDefaultHeader() }
 					{ !initializing && this.renderUserRoleMenu() }
 					<Hijack name={ account.visibleName }/>
+					{ !isMobile() && this.isInstructor() &&
+					<StudentMode containerClass={ styles.studentModeToggleContainer }/> }
 				</div>
 			</React.Fragment>
 		)

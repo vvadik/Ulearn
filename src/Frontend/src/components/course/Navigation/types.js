@@ -31,6 +31,8 @@ export const courseMenuItemType = {
 	title: PropTypes.string,
 	progress: PropTypes.shape(progressType),
 	isActive: PropTypes.bool,
+	isNotPublished: PropTypes.bool,
+	publicationDate: PropTypes.string,
 };
 
 export const groupAsStudentType = {

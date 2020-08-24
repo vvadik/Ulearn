@@ -47,7 +47,6 @@ class Course extends Component {
 			currentSlideInfo: null,
 			currentCourseId: null,
 			navigationOpened: this.props.navigationOpened,
-			showForStudents: false,
 			meta: {
 				title: 'Ulearn',
 				description: 'Интерактивные учебные онлайн-курсы по программированию',
@@ -110,8 +109,8 @@ class Course extends Component {
 	}
 
 	componentDidUpdate(prevProps, prevState) {
-		const { loadUserProgress, courseId, loadCourse, user, courseInfo, loadCourseErrors, progress, isHijacked, updateVisitedSlide, } = this.props;
-		const { title, currentSlideInfo, showForStudents, currentSlideId, } = this.state;
+		const { loadUserProgress, courseId, loadCourse, user, courseInfo, loadCourseErrors, progress, isHijacked, updateVisitedSlide, isStudentMode, history, pageInfo, } = this.props;
+		const { title, currentSlideInfo, currentSlideId, } = this.state;
 		const { isAuthenticated } = user;
 
 		if(isAuthenticated !== prevProps.user.isAuthenticated) {
@@ -130,11 +129,11 @@ class Course extends Component {
 			updateVisitedSlide(courseId, currentSlideInfo.current.id);
 		}
 
-		if((currentSlideId !== prevState.currentSlideId || showForStudents !== prevState.showForStudents) && currentSlideInfo.current.type === SLIDETYPE.exercise) {
-			if(showForStudents) {
-				this.props.history.push('?version=-1'); //prevent showing task solution
-			} else if(this.props.history.location.search === '?version=-1') {
-				this.props.history.replace();
+		if((currentSlideId !== prevState.currentSlideId || isStudentMode !== prevProps.isStudentMode) && currentSlideInfo.current.type === SLIDETYPE.exercise && (pageInfo.isNavigationVisible && !pageInfo.isAcceptedSolutions)) {
+			if(isStudentMode) {
+				history.push('?version=-1'); //prevent showing task solution
+			} else if(history.location.search === '?version=-1') {
+				history.replace();
 			}
 		}
 	}
@@ -249,13 +248,13 @@ class Course extends Component {
 	}
 
 	renderSlide() {
-		const { pageInfo: { isNavigationVisible, isReview, }, progress, user, courseId, } = this.props;
-		const { currentSlideInfo, currentSlideId, currentCourseId, Page, title, showForStudents, } = this.state;
+		const { pageInfo: { isNavigationVisible, isReview, }, progress, user, courseId, isStudentMode, } = this.props;
+		const { currentSlideInfo, currentSlideId, currentCourseId, Page, title, } = this.state;
 
 		const wrapperClassName = classnames(
 			styles.rootWrapper,
 			{ [styles.withoutNavigation]: !isNavigationVisible }, // TODO remove isNavMenuVisible flag
-			{ [styles.forStudents]: showForStudents },
+			{ [styles.forStudents]: isNavigationVisible && isStudentMode },
 		);
 
 		const slideInfo = currentSlideInfo
@@ -276,7 +275,6 @@ class Course extends Component {
 
 		return (
 			<main className={ wrapperClassName }>
-				{ this.isInstructor(userRoles) && this.renderShowForStudentToggle() }
 				{ (isNavigationVisible || isReview) && title &&
 				<h1 className={ styles.title }>
 					{ title }
@@ -288,7 +286,7 @@ class Course extends Component {
 							? <Slide
 								slideId={ currentSlideId }
 								courseId={ currentCourseId }
-								showHiddenBlocks={ !showForStudents }
+								showHiddenBlocks={ !isStudentMode }
 							/>
 							: <BlocksWrapper score={ isNavigationVisible ? score : null }>
 								<Page match={ this.props.match }/>
@@ -310,34 +308,6 @@ class Course extends Component {
 				<Edit/>
 			</a>
 		);
-	}
-
-	isCourseAdmin(userRoles) {
-		return userRoles.isSystemAdministrator ||
-			userRoles.courseRole === ROLES.courseAdmin;
-	}
-
-	isInstructor(userRoles) {
-		return this.isCourseAdmin(userRoles) ||
-			userRoles.courseRole === ROLES.instructor;
-	}
-
-	renderShowForStudentToggle = () => {
-		return (
-			<div className={ styles.toggleContainer }>
-				<span className={ styles.toggleText }> Режим студента </span>
-				<Toggle
-					checked={ this.state.showForStudents }
-					onValueChange={ this.showForStudentToggleChanged }
-				/>
-			</div>
-		)
-	}
-
-	showForStudentToggleChanged = (value) => {
-		this.setState({
-			showForStudents: value,
-		})
 	}
 
 	renderNavigationButtons(slideInfo) {
@@ -499,6 +469,8 @@ class Course extends Component {
 				isActive: highlightedUnit === item.id,
 				onClick: this.unitClickHandle,
 				progress: scoresByUnits.hasOwnProperty(item.id) ? scoresByUnits[item.id] : { current: 0, max: 0 },
+				isNotPublished: item.isNotPublished,
+				publicationDate: item.publicationDate,
 			})),
 			containsFlashcards: courseInfo.containsFlashcards,
 		};

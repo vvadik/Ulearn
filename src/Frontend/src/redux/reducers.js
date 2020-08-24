@@ -5,6 +5,7 @@ import navigationReducer from "./navigation";
 import slidesReducer from "./slides";
 import accountReducer from "./account";
 import notificationsReducer from "./notifications";
+import instructorReducer from "./instructor";
 
 const rootReducer = combineReducers({
 	account: accountReducer,
@@ -13,6 +14,7 @@ const rootReducer = combineReducers({
 	notifications: notificationsReducer,
 	navigation: navigationReducer,
 	slides: slidesReducer,
+	instructor: instructorReducer,
 });
 
 export default rootReducer;
