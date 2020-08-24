@@ -3,25 +3,16 @@ import { loadCourse, loadCourseErrors, changeCurrentCourseAction } from "src/act
 import { loadUserProgress, userProgressUpdate } from "src/actions/userProgress";
 import Course from '../../components/course/Course';
 import { withRouter } from "react-router-dom";
-import queryString from "query-string";
-import { ltiSlide, acceptedAlert, acceptedSolutions, } from "src/consts/routes";
+import getSlideInfo from "src/utils/getSlideInfo";
 
-const mapStateToProps = (state, { match }) => {
-	const params = queryString.parse(window.location.search);
-	const slideIdInQuery = params.slideId;
+const mapStateToProps = (state, { match, location, }) => {
+	const {
+		slideId,
+		isReview,
+		isLti,
+		isAcceptedSolutions,
+	} = getSlideInfo(location);
 	const courseId = match.params.courseId.toLowerCase();
-	const slideSlugOrAction = match.params.slideSlugOrAction;
-
-	let slideId;
-	let isLti = false;
-	if(slideIdInQuery) {
-		const action = slideSlugOrAction;
-		slideId = slideIdInQuery;
-		isLti = action.toLowerCase() === ltiSlide || action.toLowerCase() === acceptedAlert || params.isLti;
-	} else {
-		const slideSlug = slideSlugOrAction;
-		slideId = slideSlug.split('_').pop();
-	}
 
 	const courseInfo = state.courses.fullCoursesInfo[courseId];
 
@@ -29,9 +20,8 @@ const mapStateToProps = (state, { match }) => {
 	for (const courseId of Object.keys(state.courses.fullCoursesInfo)) {
 		loadedCourseIds[courseId] = true;
 	}
-	const isReview = params.CheckQueueItemId !== undefined;
+
 	const isNavigationVisible = !isLti && !isReview && (courseInfo == null || courseInfo.tempCourseError == null);
-	const isAcceptedSolutions = slideSlugOrAction.toLowerCase() === acceptedSolutions;
 
 	return {
 		courseId,
@@ -46,6 +36,7 @@ const mapStateToProps = (state, { match }) => {
 		navigationOpened: state.navigation.opened,
 		courseLoadingErrorStatus: state.courses.courseLoadingErrorStatus,
 		isHijacked: state.userProgress.isHijacked,
+		isStudentMode: state.instructor.isStudentMode,
 	};
 };
 const mapDispatchToProps = (dispatch) => ({
