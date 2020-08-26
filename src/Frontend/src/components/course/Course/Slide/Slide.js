@@ -46,7 +46,7 @@ class Slide extends React.Component {
 	}
 
 	render = () => {
-		const { slideBlocks, showHiddenBlocks, } = this.props;
+		const { slideBlocks, showHiddenBlocks, isHiddenSlide, } = this.props;
 
 		if(!slideBlocks) {
 			return (<CourseLoader/>);
@@ -54,6 +54,10 @@ class Slide extends React.Component {
 
 		if(showHiddenBlocks) {
 			return this.renderSlideBlocks(JSON.parse(JSON.stringify(slideBlocks)));
+		}
+
+		if(isHiddenSlide) {
+			return this.renderSlideBlocks([]);
 		}
 
 		const slideBlocksForStudent = slideBlocks.filter(b => !b.hide);
@@ -64,7 +68,7 @@ class Slide extends React.Component {
 		if(slideBlocks.length === 0) {
 			return (
 				<BlocksWrapper>
-					<p>Содержание этого слайда скрыто</p>
+					<p>Студенты не увидят этот слайд в навигации</p>
 				</BlocksWrapper>
 			);
 		}
@@ -87,6 +91,7 @@ class Slide extends React.Component {
 							   showEyeHint={ !fullSizeBlocksPack }
 							   isBlock={ !onlyOneBlock }
 							   isHidden={ onlyOneBlock ? this.props.isHiddenSlide : hide }
+							   isHeaderOfHiddenSlide={ i === 0 && this.props.isHiddenSlide }
 				>
 					{ blocks.map(this.mapBlockToComponent) }
 				</BlocksWrapper>

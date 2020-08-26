@@ -27,7 +27,7 @@ class BlocksWrapper extends React.Component {
 	}
 
 	render() {
-		const { children, className, isBlock, isHidden, isContainer, score, withoutBottomPaddigns, withoutTopPaddings, showEyeHint, } = this.props;
+		const { children, className, isBlock, isHidden, isContainer, score, withoutBottomPaddigns, withoutTopPaddings, showEyeHint, isHeaderOfHiddenSlide, } = this.props;
 		const { showed, showStudentsModalOpened, } = this.state;
 		const isHiddenBlock = isBlock && isHidden;
 		const isHiddenSlide = !isBlock && isHidden;
@@ -36,7 +36,7 @@ class BlocksWrapper extends React.Component {
 			styles.withPaddings,
 			{ [styles.withoutTopPaddings]: withoutTopPaddings },
 			{ [styles.withoutBottomPaddigns]: withoutBottomPaddigns },
-			{ [styles.hiddenBackgroundColor]: isHiddenBlock },
+			{ [styles.hiddenBackgroundColor]: isHidden },
 			{ [styles.hiddenSlide]: isHiddenSlide },
 			{ [styles.showed]: showed },
 			className
@@ -49,7 +49,7 @@ class BlocksWrapper extends React.Component {
 					? children
 					: <React.Fragment>
 						{ showStudentsModalOpened && this.renderModal() }
-						{ isHiddenSlide && this.renderHiddenSlideHeader() }
+						{ (isHiddenSlide || isHeaderOfHiddenSlide) && this.renderHiddenSlideHeader() }
 						<div className={ wrapperClassNames } ref={ (ref) => this.wrapper = ref }>
 							{ showEyeHint && isHiddenBlock && this.renderEyeHint() }
 							{ children }
@@ -85,8 +85,10 @@ class BlocksWrapper extends React.Component {
 
 	renderHiddenSlideHeader = () => {
 		const { showed, groups } = this.state;
+		const { isHidden, } = this.props;
 		const headerClassNames = classNames(
 			styles.hiddenHeader,
+			{ [styles.hiddenBackgroundColor]: isHidden },
 			{ [styles.showed]: this.state.showed }
 		);
 
@@ -179,6 +181,7 @@ BlocksWrapper.propTypes = {
 	isContainer: PropTypes.bool,
 	score: PropTypes.object,
 	showEyeHint: PropTypes.bool,
+	isHeaderOfHiddenSlide: PropTypes.bool,
 }
 
 export default BlocksWrapper;
