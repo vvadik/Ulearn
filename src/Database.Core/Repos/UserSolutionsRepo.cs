@@ -360,7 +360,7 @@ namespace Database.Repos
 			var outputHash = (await textsRepo.AddText(output)).Hash;
 
 			var isWebRunner = checking.CourseId == "web" && checking.SlideId == Guid.Empty;
-			var exerciseSlide = isWebRunner ? null : (ExerciseSlide)(await courseManager.GetCourseAsync(checking.CourseId)).GetSlideById(checking.SlideId);
+			var exerciseSlide = isWebRunner ? null : (ExerciseSlide)(await courseManager.GetCourseAsync(checking.CourseId)).GetSlideById(checking.SlideId, true);
 
 			var isRightAnswer = exerciseSlide?.Exercise?.IsCorrectRunResult(result) ?? false;
 			var score = exerciseSlide != null && isRightAnswer ? exerciseSlide.Scoring.PassedTestsScore : 0;

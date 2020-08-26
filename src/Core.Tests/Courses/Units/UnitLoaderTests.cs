@@ -36,7 +36,7 @@ namespace Ulearn.Core.Tests.Courses.Units
 		{
 			var unitFile = new DirectoryInfo(testDataDirectory).GetSubdirectory(directory).GetFile("unit.xml");
 			var courseLoadingContext = new CourseLoadingContext("CourseId", courseSettings, new DirectoryInfo("."), new FileInfo("course.xml"));
-			return loader.Load(unitFile, courseLoadingContext, 0);
+			return loader.Load(unitFile, courseLoadingContext);
 		}
 
 		[Test]
@@ -54,7 +54,7 @@ namespace Ulearn.Core.Tests.Courses.Units
 		{
 			var unit = LoadUnitFromDirectory("UnitWithSimpleSlides");
 
-			Assert.AreEqual(2, unit.Slides.Count);
+			Assert.AreEqual(2, unit.GetSlides(true).Count);
 		}
 	}
 }

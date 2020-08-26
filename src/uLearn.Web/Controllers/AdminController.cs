@@ -2,7 +2,6 @@ using log4net;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using System.Globalization;
 using System.IO;
@@ -528,7 +527,7 @@ namespace uLearn.Web.Controllers
 				ModerationPolicy = commentsPolicy.ModerationPolicy,
 				OnlyInstructorsCanReply = commentsPolicy.OnlyInstructorsCanReply,
 				Comments = (from c in comments.Take(commentsCountLimit)
-					let slide = course.FindSlideById(c.SlideId)
+					let slide = course.FindSlideById(c.SlideId, true)
 					where slide != null
 					select
 						new CommentViewModel
@@ -612,9 +611,9 @@ namespace uLearn.Web.Controllers
 			{
 				CourseId = courseId,
 				/* TODO (andgein): Merge FindSlideById() and following GetSlideById() calls */
-				Checkings = checkings.Take(maxShownQueueSize).Where(c => course.FindSlideById(c.SlideId) != null).Select(c =>
+				Checkings = checkings.Take(maxShownQueueSize).Where(c => course.FindSlideById(c.SlideId, true) != null).Select(c =>
 				{
-					var slide = course.GetSlideById(c.SlideId);
+					var slide = course.GetSlideById(c.SlideId, true);
 					return new ManualCheckingQueueItemViewModel
 					{
 						CheckingQueueItem = c,
@@ -637,7 +636,7 @@ namespace uLearn.Web.Controllers
 				Slides = allCheckingsSlides,
 			});
 		}
-		
+
 		// Возвращает слайды, по которым есть работы (проверенные или непроверенные, зависит от галочки), разделитель и оставшиеся слайды (не важно проверенные или нет).
 		private List<KeyValuePair<Guid, Slide>> GetAllCheckingsSlides(Course course, List<string> groupsIds, ManualCheckingQueueFilterOptions filterOptions)
 		{
@@ -647,10 +646,12 @@ namespace uLearn.Web.Controllers
 			filterOptions = GetManualCheckingFilterOptionsByGroup(course.Id, groupsIds);
 			filterOptions.OnlyChecked = null;
 			var allCheckingsSlidesIds = GetMergedCheckingQueueSlideIds(filterOptions);
+			var slideId2Index = course.GetSlides(true).Select((s, i) => (s.Id, i))
+				.ToDictionary(p => p.Item1, p => p.Item2);
 
-			var emptySlideMock = new Slide { Info = new SlideInfo(null, null, -1), Title = "", Id = Guid.Empty };
+			var emptySlideMock = new Slide { Info = new SlideInfo(null, null), Title = "", Id = Guid.Empty };
 			var allCheckingsSlides = allCheckingsSlidesIds
-				.Select(s => new KeyValuePair<Guid, Slide>(s, course.FindSlideById(s)))
+				.Select(s => new KeyValuePair<Guid, Slide>(s, course.FindSlideById(s, true)))
 				.Where(kvp => kvp.Value != null)
 				.Union(new List<KeyValuePair<Guid, Slide>>
 				{
@@ -658,7 +659,7 @@ namespace uLearn.Web.Controllers
 					new KeyValuePair<Guid, Slide>(Guid.Empty, emptySlideMock)
 				})
 				.OrderBy(s => usedSlidesIds.Contains(s.Key) ? 0 : 1)
-				.ThenBy(s => s.Value.Index)
+				.ThenBy(s => slideId2Index.GetOrDefault(s.Value.Id))
 				.Select(s => new KeyValuePair<Guid, Slide>(s.Key, s.Value))
 				.ToList();
 
@@ -914,7 +915,7 @@ namespace uLearn.Web.Controllers
 			var courseDiff = new CourseDiff(course, version);
 			var schemaPath = Path.Combine(HttpRuntime.BinDirectory, "schema.xsd");
 			var validator = new XmlValidator(schemaPath);
-			var warnings = validator.ValidateSlidesFiles(version.Slides.Select(x => x.Info.SlideFile).ToList());
+			var warnings = validator.ValidateSlidesFiles(version.GetSlides(true).Select(x => x.Info.SlideFile).ToList());
 
 			return View(new DiagnosticsModel
 			{
@@ -1519,7 +1520,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> SetSuspicionLevels(string courseId, Guid slideId, string faintSuspicion = null, string strongSuspicion = null)
 		{
 			var course = courseManager.GetCourse(courseId);
-			if (course.Slides.All(s => s.Id != slideId))
+			if (course.GetSlides(true).All(s => s.Id != slideId))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden, "Course does not contain a slide");
 
 			if (!TryParseNullableDouble(faintSuspicion, out var faintSuspicionParsed)

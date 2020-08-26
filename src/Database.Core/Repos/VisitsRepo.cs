@@ -147,7 +147,7 @@ namespace Database.Repos
 				.GroupBy(v => v.SlideId, (s, v) => new { Key = s, Value = v.First().Score })
 				.ToDictionary(g => g.Key, g => g.Value);
 		}
-		
+
 		public async Task<Dictionary<string, Dictionary<Guid, int>>> GetScoresForSlides(string courseId, IEnumerable<string> userIds, IEnumerable<Guid> slidesIds = null)
 		{
 			var visits = db.Visits.Where(v => v.CourseId == courseId && userIds.Contains(v.UserId));

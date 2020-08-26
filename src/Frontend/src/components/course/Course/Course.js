@@ -287,6 +287,7 @@ class Course extends Component {
 								slideId={ currentSlideId }
 								courseId={ currentCourseId }
 								showHiddenBlocks={ !isStudentMode }
+								isHiddenSlide={ slideInfo.hide }
 							/>
 							: <BlocksWrapper score={ isNavigationVisible ? score : null }>
 								<Page match={ this.props.match }/>
@@ -503,6 +504,7 @@ class Course extends Component {
 			maxScore: item.maxScore,
 			questionsCount: item.questionsCount,
 			visited: Boolean(progress && progress[item.id]),
+			hide: item.hide,
 		}));
 	}
 

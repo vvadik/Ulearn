@@ -169,7 +169,7 @@ namespace uLearn.Web.Controllers
 			var userId = submission.User.Id;
 			var courseId = submission.CourseId;
 			var course = courseManager.GetCourse(courseId);
-			var exerciseSlide = course.FindSlideById(submission.SlideId) as ExerciseSlide;
+			var exerciseSlide = course.FindSlideById(submission.SlideId, true) as ExerciseSlide; // SlideId проверен в вызывающем методе 
 			if (exerciseSlide == null)
 				return false;
 			var exerciseMetricId = GetExerciseMetricId(courseId, exerciseSlide);

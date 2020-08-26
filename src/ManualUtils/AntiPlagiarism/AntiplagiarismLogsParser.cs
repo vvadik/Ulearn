@@ -83,7 +83,7 @@ namespace ManualUtils.AntiPlagiarism
 			var bp2 = courseManager.GetCourse("basicprogramming2");
 			weights = weights.Select(w =>
 			{
-				var slide = bp.FindSlideById(new Guid(w.TaskId)) ?? bp2.FindSlideById(new Guid(w.TaskId));
+				var slide = bp.FindSlideById(new Guid(w.TaskId), true) ?? bp2.FindSlideById(new Guid(w.TaskId), true);
 				w.Name = slide?.Title ?? "";
 				return w;
 			}).ToList();

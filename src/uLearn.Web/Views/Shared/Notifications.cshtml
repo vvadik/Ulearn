@@ -71,7 +71,7 @@
 
 @helper Notification(NewCommentNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
-	var slide = course.GetSlideById(notification.Comment.SlideId);
+	var slide = course.GetSlideById(notification.Comment.SlideId, true);
 	<div class="notifications__new-comment-notification media" data-href="@GetSlideUrl(Url, course, slide)#comment-@notification.Comment.Id">
 		<div class="media-left">
 			@UserAvatar.Avatar(notification.Comment.Author)
@@ -89,7 +89,7 @@
 
 @helper Notification(NewCommentFromYourGroupStudentNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
-	var slide = course.GetSlideById(notification.Comment.SlideId);
+	var slide = course.GetSlideById(notification.Comment.SlideId, true);
 	<div class="notifications__new-comment-from-your-group-student-notification media" data-href="@GetSlideUrl(Url, course, slide)#comment-@notification.Comment.Id">
 		<div class="media-left">
 			@UserAvatar.Avatar(notification.Comment.Author)
@@ -107,7 +107,7 @@
 
 @helper Notification(RepliedToYourCommentNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
-	var slide = course.GetSlideById(notification.Comment.SlideId);
+	var slide = course.GetSlideById(notification.Comment.SlideId, true);
 	<div class="notifications__replied-to-your-comment-notification media" data-href="@GetSlideUrl(Url, course, slide)#comment-@notification.Comment.Id">
 		<div class="media-left">
 			@UserAvatar.Avatar(notification.Comment.Author)
@@ -128,7 +128,7 @@
 
 @helper Notification(LikedYourCommentNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
-	var slide = course.GetSlideById(notification.Comment.SlideId);
+	var slide = course.GetSlideById(notification.Comment.SlideId, true);
 	<div class="notifications__liked-your-comment-notification media" data-href="@GetSlideUrl(Url, course, slide)#comment-@notification.Comment.Id">
 		<div class="media-left">
 			@UserAvatar.Avatar(notification.LikedUser)
@@ -143,7 +143,7 @@
 
 @helper Notification(PassedManualExerciseCheckingNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
-	var slide = (ExerciseSlide)course.GetSlideById(notification.Checking.SlideId);
+	var slide = (ExerciseSlide)course.GetSlideById(notification.Checking.SlideId, true);
 	<div class="notifications__passed-manual-execise-checking-notification media" data-href="@GetSlideUrl(Url, course, slide)">
 		<div class="media-left">
 			@UserAvatar.Avatar(notification.InitiatedBy)
@@ -160,7 +160,7 @@
 
 @helper Notification(PassedManualQuizCheckingNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
-	var slide = (QuizSlide)course.GetSlideById(notification.Checking.SlideId);
+	var slide = (QuizSlide)course.GetSlideById(notification.Checking.SlideId, true);
 	<div class="notifications__passed-manual-quiz-checking-notification media" data-href="@GetSlideUrl(Url, course, slide)">
 		<div class="media-left">
 			@UserAvatar.Avatar(notification.InitiatedBy)
@@ -208,7 +208,7 @@
 
 @helper Notification(ReceivedCommentToCodeReviewNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
-	var slide = course.GetSlideById(notification.Comment.Review.ExerciseChecking.SlideId);
+	var slide = course.GetSlideById(notification.Comment.Review.ExerciseChecking.SlideId, true);
 	<div class="notifications__received-comment-to-code-review-notification media" data-href="@notification.GetUrl(course, "", User.Identity.GetUserId())">
 		<div class="media-left">
 			@UserAvatar.Avatar(notification.InitiatedBy)
@@ -317,7 +317,7 @@
 
 @helper Notification(NewCommentForInstructorsOnlyNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
-	var slide = course.GetSlideById(notification.Comment.SlideId);
+	var slide = course.GetSlideById(notification.Comment.SlideId, true);
 	<div class="notifications__new-comment-for-instructors-only-notification media" data-href="@GetSlideUrl(Url, course, slide)#comment-@notification.Comment.Id">
 		<div class="media-left">
 			@UserAvatar.Avatar(notification.Comment.Author)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Database;
 using Database.Models;
@@ -52,9 +53,9 @@ namespace Ulearn.Web.Api.Controllers
 		[Authorize]
 		public async Task<ActionResult<UsersProgressResponse>> UserProgress([FromRoute]string courseId, [FromBody]UserProgressParameters parameters)
 		{
-			if (!courseManager.HasCourse(courseId))
+			if (!await courseManager.HasCourseAsync(courseId))
 				return NotFound(new ErrorResponse($"Course {courseId} not found"));
-			var course = courseManager.FindCourse(courseId);
+			var course = await courseManager.FindCourseAsync(courseId);
 			var userIds = parameters.UserIds;
 			if (userIds == null || userIds.Count == 0)
 				userIds = new List<string> { UserId };
@@ -67,6 +68,8 @@ namespace Ulearn.Web.Api.Controllers
 					return NotFound(new ErrorResponse($"Users {userIdsStr} not found"));
 				}
 			}
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
+			var visibleSlides = course.GetSlides(isInstructor).Select(s => s.Id).ToHashSet();
 
 			var scores = await visitsRepo.GetScoresForSlides(course.Id, userIds);
 			var additionalScores = await GetAdditionalScores(course.Id, userIds).ConfigureAwait(false);
@@ -78,7 +81,9 @@ namespace Ulearn.Web.Api.Controllers
 			foreach (var userId in scores.Keys)
 			{
 				var visitedSlides
-					= scores[userId].ToDictionary(kvp => kvp.Key, kvp => new UserProgressSlideResult
+					= scores[userId]
+						.Where(kvp => visibleSlides.Contains(kvp.Key))
+						.ToDictionary(kvp => kvp.Key, kvp => new UserProgressSlideResult
 					{
 						Visited = true,
 						Score = kvp.Value,
@@ -87,7 +92,7 @@ namespace Ulearn.Web.Api.Controllers
 							|| (waitingQuizSlides.GetValueOrDefault(userId)?.Contains(kvp.Key) ?? false)
 					});
 				var userAdditionalScores = additionalScores.GetValueOrDefault(userId);
-				usersProgress[userId] = new UserProgress
+					usersProgress[userId] = new UserProgress
 				{
 					VisitedSlides = visitedSlides,
 					AdditionalScores = userAdditionalScores
@@ -145,6 +150,10 @@ namespace Ulearn.Web.Api.Controllers
 		[Authorize]
 		public async Task<ActionResult<UsersProgressResponse>> Visit([FromRoute] Course course, [FromRoute] Guid slideId)
 		{
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, course.Id, CourseRoleType.Instructor).ConfigureAwait(false);
+			var slide = course.FindSlideById(slideId, isInstructor);
+			if (slide == null)
+				return StatusCode((int)HttpStatusCode.NotFound, $"No slide with id {slideId}");
 			await visitsRepo.AddVisit(course.Id, slideId, UserId, GetRealClientIp());
 			return await UserProgress(course.Id, new UserProgressParameters());
 		}

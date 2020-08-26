@@ -21,7 +21,7 @@
 				@unit.Title
 			</div>
 			var isFirstSlide = true;
-			foreach (var slide in unit.Slides)
+			foreach (var slide in unit.GetSlides(true))
 			{
 				if (!isFirstSlide)
 				{

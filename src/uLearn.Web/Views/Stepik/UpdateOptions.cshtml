@@ -44,7 +44,7 @@
 							</div>
 						</td>
 					</tr>
-					foreach (var slide in unit.Slides)
+					foreach (var slide in unit.GetSlides(true))
 					{
 						var slideStepMaps = stepikStepsBySlide[slide.Id];
 						var isExported = slideStepMaps.Count > 0;

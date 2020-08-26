@@ -35,6 +35,13 @@ namespace Ulearn.Core.Courses.Slides.Flashcards
 
 		public override void Validate(SlideLoadingContext context)
 		{
+			if (Hide)
+			{
+				throw new CourseLoadingException(
+					"Слайд с флэшкартами не может быть скрытым\n" +
+					$"{Title}");
+			}
+
 			foreach (var flashcard in FlashcardsList)
 			{
 				flashcard.Validate(context, this);

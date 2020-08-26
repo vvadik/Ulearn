@@ -462,11 +462,6 @@ namespace Ulearn.Core
 			return new[] { '&' }.Concat(Path.GetInvalidFileNameChars()).Concat(Path.GetInvalidPathChars()).Distinct().ToArray();
 		}
 
-		public Course FindCourseBySlideById(Guid slideId)
-		{
-			return GetCourses().FirstOrDefault(c => c.Slides.Count(s => s.Id == slideId) > 0);
-		}
-
 		private void UpdateCourse(Course course)
 		{
 			if (!courses.ContainsKey(course.Id))
@@ -593,7 +588,7 @@ namespace Ulearn.Core
 					unit.InstructorNote.File = (FileInfo)GetNewPathForFileAfterMoving(unit.InstructorNote.File, sourceDirectory, destinationDirectory);
 			}
 
-			foreach (var slide in course.Slides)
+			foreach (var slide in course.GetSlides(true))
 			{
 				slide.Info.SlideFile = (FileInfo)GetNewPathForFileAfterMoving(slide.Info.SlideFile, sourceDirectory, destinationDirectory);
 

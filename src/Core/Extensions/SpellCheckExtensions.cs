@@ -34,7 +34,7 @@ namespace Ulearn.Core.Extensions
 				.ToList();
 			var unitsTitlesError = ToPrettyMessage("Заголовки модулей:", unitsTitlesErrors);
 
-			var slidesErrors = course.Slides.Select(spellchecker.SpellCheckSlide).Where(s => !string.IsNullOrWhiteSpace(s));
+			var slidesErrors = course.GetSlides(true).Select(spellchecker.SpellCheckSlide).Where(s => !string.IsNullOrWhiteSpace(s));
 
 			var res = new List<string> { titleError, unitsTitlesError };
 			res.AddRange(slidesErrors);

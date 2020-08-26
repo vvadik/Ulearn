@@ -53,7 +53,7 @@ namespace Database.Repos.Groups
 					var lastSubmission = acceptedSubmissionsForSlide.OrderByDescending(s => s.Timestamp).First();
 
 					var slideId = lastSubmission.SlideId;
-					var slide = course.FindSlideById(slideId) as ExerciseSlide;
+					var slide = course.FindSlideById(slideId, false) as ExerciseSlide;
 					if (slide == null || !slide.Scoring.RequireReview)
 						continue;
 
@@ -66,7 +66,7 @@ namespace Database.Repos.Groups
 			var passedQuizzesIds = await userQuizzesRepo.GetPassedSlideIdsAsync(courseId, userId).ConfigureAwait(false);
 			foreach (var quizSlideId in passedQuizzesIds)
 			{
-				var slide = course.FindSlideById(quizSlideId) as QuizSlide;
+				var slide = course.FindSlideById(quizSlideId, false) as QuizSlide;
 				if (slide == null || !slide.ManualChecking)
 					continue;
 				if (!await userQuizzesRepo.IsWaitingForManualCheckAsync(courseId, quizSlideId, userId).ConfigureAwait(false))

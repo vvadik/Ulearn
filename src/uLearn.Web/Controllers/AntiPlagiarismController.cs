@@ -68,7 +68,7 @@ namespace uLearn.Web.Controllers
 			if (!string.Equals(submission.CourseId, courseId, StringComparison.InvariantCultureIgnoreCase))
 				return HttpNotFound();
 
-			var slide = courseManager.FindCourse(courseId)?.FindSlideById(submission.SlideId) as ExerciseSlide;
+			var slide = courseManager.FindCourse(courseId)?.FindSlideById(submission.SlideId, true) as ExerciseSlide;
 			if (slide == null)
 				return HttpNotFound();
 
@@ -142,7 +142,7 @@ namespace uLearn.Web.Controllers
 			var isCourseOrSysAdmin = User.HasAccessFor(courseId, CourseRole.CourseAdmin);
 
 			var course = courseManager.FindCourse(courseId);
-			var slide = course?.FindSlideById(submission.SlideId);
+			var slide = course?.FindSlideById(submission.SlideId, true);
 			var details = new AntiPlagiarismDetailsModel
 			{
 				Course = course,
@@ -169,7 +169,7 @@ namespace uLearn.Web.Controllers
 			var courseId = submission.CourseId;
 			var slideId = submission.SlideId;
 			var userId = submission.UserId;
-			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId);
+			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId, true);
 			if (slide == null)
 				return HttpNotFound();
 			var submissions = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).ToList();

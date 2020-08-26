@@ -51,7 +51,7 @@ namespace uLearn.Web.Controllers
 			if (code.Length > TextsRepo.MaxTextSize)
 				return Json(new ApiResult { Status = "error", Message = $"Too large solution. Max allowed size is {TextsRepo.MaxTextSize} bytes" });
 
-			var slide = courseManager.FindCourse(request.CourseId)?.FindSlideById(request.SlideId) as ExerciseSlide;
+			var slide = courseManager.FindCourse(request.CourseId)?.FindSlideById(request.SlideId, false) as ExerciseSlide;
 			if (slide == null)
 				return Json(new ApiResult { Status = "error", Message = "Invalid slide id" });
 
@@ -91,7 +91,7 @@ namespace uLearn.Web.Controllers
 
 			var courseId = solution.Submission.CourseId;
 			var slideId = solution.Submission.SlideId;
-			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId) as ExerciseSlide;
+			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId, false) as ExerciseSlide;
 			if (slide == null)
 				return Json(new ApiResult { Status = "error", Message = "Slide doesn't exist anymore" });
 

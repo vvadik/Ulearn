@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using System.Web.Mvc;
 using Database;
 using Database.DataContexts;
+using Database.Extensions;
+using Database.Models;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
@@ -32,7 +34,8 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		public async Task<ActionResult> UseHint(string courseId, Guid slideId, bool isNeedNewHint)
 		{
-			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
+			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
+			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId, isInstructor);
 			if (!(slide is ExerciseSlide))
 				return Json(new { Text = "Для слайда нет подсказок" });
 			var exerciseSlide = (ExerciseSlide)slide;

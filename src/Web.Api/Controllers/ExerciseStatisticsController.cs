@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Database;
+using Database.Models;
 using Database.Repos;
 using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
@@ -62,7 +63,9 @@ namespace Ulearn.Web.Api.Controllers
 
 			count = Math.Min(count, 10000);
 
-			var exerciseSlides = course.Slides.OfType<ExerciseSlide>().ToList();
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, course.Id, CourseRoleType.Instructor).ConfigureAwait(false);
+
+			var exerciseSlides = course.GetSlides(isInstructor).OfType<ExerciseSlide>().ToList();
 			/* TODO (andgein): I can't select all submissions because ApplicationUserId column doesn't exist in database (ApplicationUser_Id exists).
 			   We should remove this column after EF Core 2.1 release (and remove tuples here)
 			*/

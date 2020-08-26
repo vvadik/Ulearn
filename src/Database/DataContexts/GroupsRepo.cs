@@ -259,7 +259,7 @@ namespace Database.DataContexts
 					var lastSubmission = acceptedSubmissionsForSlide.OrderByDescending(s => s.Timestamp).First();
 
 					var slideId = lastSubmission.SlideId;
-					var slide = course.FindSlideById(slideId) as ExerciseSlide;
+					var slide = course.FindSlideById(slideId, false) as ExerciseSlide;
 					if (slide == null || !slide.Scoring.RequireReview)
 						continue;
 
@@ -272,7 +272,7 @@ namespace Database.DataContexts
 			var passedQuizzesIds = userQuizzesRepo.GetPassedSlideIds(courseId, userId);
 			foreach (var quizSlideId in passedQuizzesIds)
 			{
-				var slide = course.FindSlideById(quizSlideId) as QuizSlide;
+				var slide = course.FindSlideById(quizSlideId, false) as QuizSlide;
 				if (slide == null || !slide.ManualChecking)
 					continue;
 				if (!userQuizzesRepo.IsWaitingForManualCheck(courseId, quizSlideId, userId))

@@ -22,7 +22,7 @@ namespace uLearn.Web.Models
 			Groups = model.Groups.Select(g => new CourseStatisticsGroupInfo(g)).ToArray();
 
 			var students = new List<CourseStatisticsStudentInfo>();
-			var shouldBeSolvedSlides = model.Units.SelectMany(u => u.Slides).Where(s => s.ShouldBeSolved).ToList();
+			var shouldBeSolvedSlides = model.Units.SelectMany(u => u.GetSlides(false)).Where(s => s.ShouldBeSolved).ToList();
 			foreach (var user in model.VisitedUsers)
 			{
 				var studentInfo = new CourseStatisticsStudentInfo
@@ -121,7 +121,7 @@ namespace uLearn.Web.Models
 		{
 			Id = unit.Id;
 			Title = unit.Title;
-			Slides = unit.Slides.Where(s => s.ShouldBeSolved).Select(s => new CourseStatisticsSlideInfo(s)).ToArray();
+			Slides = unit.GetSlides(false).Where(s => s.ShouldBeSolved).Select(s => new CourseStatisticsSlideInfo(s)).ToArray();
 			AdditionalScores = unit.Scoring.Groups.Values.Where(g => g.CanBeSetByInstructor).Select(g => new CourseStatisticsUnitAdditionalScoreInfo(g)).ToArray();
 		}
 

@@ -33,21 +33,21 @@ namespace Ulearn.Core.Courses
 
 		private void FindDifferences()
 		{
-			var originalSlidesIds = OriginalCourse.Slides.Select(s => s.Id).ToImmutableHashSet();
-			var changedSlidesIds = ChangedCourse.Slides.Select(s => s.Id).ToImmutableHashSet();
-			foreach (var slide in OriginalCourse.Slides)
+			var originalSlidesIds = OriginalCourse.GetSlides(true).Select(s => s.Id).ToImmutableHashSet();
+			var changedSlidesIds = ChangedCourse.GetSlides(true).Select(s => s.Id).ToImmutableHashSet();
+			foreach (var slide in OriginalCourse.GetSlides(true))
 			{
 				if (!changedSlidesIds.Contains(slide.Id))
 					RemovedSlides.Add(slide);
 				else
 				{
-					var slideDiff = new SlideDiff(slide, ChangedCourse.GetSlideById(slide.Id));
+					var slideDiff = new SlideDiff(slide, ChangedCourse.GetSlideById(slide.Id, true));
 					if (!slideDiff.IsEmptyChangeset)
 						SlideDiffs.Add(slideDiff);
 				}
 			}
 
-			InsertedSlides.AddRange(ChangedCourse.Slides.Where(slide => !originalSlidesIds.Contains(slide.Id)));
+			InsertedSlides.AddRange(ChangedCourse.GetSlides(true).Where(slide => !originalSlidesIds.Contains(slide.Id)));
 		}
 
 		public bool IsTitleChanged => OriginalCourse.Title != ChangedCourse.Title;

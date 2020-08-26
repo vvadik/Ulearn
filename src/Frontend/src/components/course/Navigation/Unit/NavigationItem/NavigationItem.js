@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 
-import { Copy } from "icons";
+import { Copy, EyeClosed, } from "icons";
+import { Hint } from "ui";
 
 import { SLIDETYPE } from 'src/consts/general';
 import { menuItemType } from '../../types';
@@ -33,7 +34,7 @@ class NavigationItem extends Component {
 	};
 
 	render() {
-		const { text, url, isActive, description, metro, toggleNavigation } = this.props;
+		const { text, url, isActive, description, metro, toggleNavigation, hide, } = this.props;
 
 		const classes = {
 			[styles.itemLink]: true,
@@ -47,7 +48,14 @@ class NavigationItem extends Component {
 				<Link to={ url } className={ classnames(classes) } onClick={ toggleNavigation }>
 					{ metro && this.renderMetro() }
 					<div className={ styles.firstLine }>
-						<span className={ styles.text }>{ text }</span>
+						<span className={ styles.text }>
+							{ hide && <span className={ styles.isHiddenIcon }>
+								<Hint text={ `Этот слайд скрыт` }>
+									<EyeClosed/>
+								</Hint>
+							</span> }
+							{ text }
+						</span>
 						{ this.renderScore() }
 					</div>
 					{ description &&

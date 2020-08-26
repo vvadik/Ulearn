@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
+using Microsoft.AspNet.Identity.EntityFramework;
 using Ulearn.Common.Extensions;
 
 namespace Database.DataContexts
@@ -11,6 +12,8 @@ namespace Database.DataContexts
 	public class UserRolesRepo
 	{
 		private readonly ULearnDb db;
+		private readonly ULearnUserManager userManager;
+		private IdentityRole sysAdminRole = null;
 
 		public UserRolesRepo(ULearnDb db)
 		{
@@ -20,6 +23,7 @@ namespace Database.DataContexts
 		public UserRolesRepo()
 			: this(new ULearnDb())
 		{
+			userManager = new ULearnUserManager(db);
 		}
 
 		private IEnumerable<UserRole> GetActualUserRoles(string userId = null, string courseId = null)
@@ -54,6 +58,26 @@ namespace Database.DataContexts
 			return userRoles
 				.GroupBy(role => role.CourseId, StringComparer.OrdinalIgnoreCase)
 				.ToDictionary(g => g.Key, g => g.Select(role => role.Role).Min(), StringComparer.OrdinalIgnoreCase);
+		}
+
+		public bool HasUserAccessToCourse(string userId, string courseId, CourseRole minCourseRoleType)
+		{
+			var user = userManager.FindByNameAsync(userId).Result;
+			if (IsSystemAdministrator(user))
+				return true;
+
+			return GetActualUserRoles(userId).Any(r => string.Equals(r.CourseId, courseId, StringComparison.OrdinalIgnoreCase) && r.Role <= minCourseRoleType);
+		}
+
+		public bool IsSystemAdministrator(ApplicationUser user)
+		{
+			if (user?.Roles == null)
+				return false;
+
+			if (sysAdminRole == null)
+				sysAdminRole = db.Roles.First(r => r.Name == LmsRoles.SysAdmin.ToString());
+
+			return user.Roles.Any(role => role.RoleId == sysAdminRole.Id);
 		}
 
 		public async Task<bool> ToggleRole(string courseId, string userId, CourseRole role, string grantedById, string comment)

@@ -10,6 +10,7 @@ export const menuItemType = {
 	description: PropTypes.string,
 	isActive: PropTypes.bool,
 	visited: PropTypes.bool,
+	hide: PropTypes.bool,
 	metro: PropTypes.shape({
 		complete: PropTypes.bool,
 		isFirstItem: PropTypes.bool,
