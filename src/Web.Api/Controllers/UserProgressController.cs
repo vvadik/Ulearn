@@ -153,6 +153,12 @@ namespace Ulearn.Web.Api.Controllers
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, course.Id, CourseRoleType.Instructor).ConfigureAwait(false);
 			var slide = course.FindSlideById(slideId, isInstructor);
 			if (slide == null)
+			{
+				var instructorNote = course.FindInstructorNoteById(slideId);
+				if (instructorNote != null && isInstructor)
+					slide = instructorNote.Slide;
+			}
+			if (slide == null)
 				return StatusCode((int)HttpStatusCode.NotFound, $"No slide with id {slideId}");
 			await visitsRepo.AddVisit(course.Id, slideId, UserId, GetRealClientIp());
 			return await UserProgress(course.Id, new UserProgressParameters());
