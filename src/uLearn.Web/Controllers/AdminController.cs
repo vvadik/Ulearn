@@ -101,6 +101,7 @@ namespace uLearn.Web.Controllers
 			else
 				courses = courses.OrderBy(course => course.Title, StringComparer.InvariantCultureIgnoreCase);
 
+			var tempCourses = tempCoursesRepo.GetTempCourses().Select(c => c.CourseId).ToHashSet();
 			var model = new CourseListViewModel
 			{
 				Courses = courses
@@ -109,7 +110,7 @@ namespace uLearn.Web.Controllers
 						Id = course.Id,
 						Title = course.Title,
 						LastWriteTime = courseManager.GetLastWriteTime(course.Id),
-						IsTemp = IsTempCourse(course.Id)
+						IsTemp = tempCourses.Contains(course.Id)
 					})
 					.ToList(),
 				LastTryCourseId = courseId,
@@ -468,14 +469,10 @@ namespace uLearn.Web.Controllers
 		[ValidateInput(false)]
 		public ActionResult Packages(string courseId, string error = "")
 		{
-			if (IsTempCourse(courseId))
+			var isTempCourse = tempCoursesRepo.Find(courseId) != null;
+			if (isTempCourse)
 				return null;
 			return PackagesInternal(courseId, error);
-		}
-
-		public bool IsTempCourse(string courseId)
-		{
-			return tempCoursesRepo.Find(courseId) != null;
 		}
 
 		private ActionResult PackagesInternal(string courseId, string error = "", bool openStep1 = false, bool openStep2 = false)
@@ -821,12 +818,19 @@ namespace uLearn.Web.Controllers
 		{
 			var userRolesByEmail = User.IsSystemAdministrator() ? usersRepo.FilterUsersByEmail(queryModel) : null;
 			var userRoles = usersRepo.FilterUsers(queryModel);
-			var model = GetUserListModel(userRolesByEmail.EmptyIfNull().Concat(userRoles).DistinctBy(r => r.UserId).ToList(), queryModel.CourseId);
+			var tempCourses = tempCoursesRepo.GetTempCourses().Select(s => s.CourseId).ToHashSet();
+			var courses = courseManager.GetCourses()
+				.ToDictionary(c => c.Id, c => (c, tempCourses.Contains(c.Id)));
+			var model = GetUserListModel(userRolesByEmail.EmptyIfNull().Concat(userRoles).DistinctBy(r => r.UserId).ToList(),
+				courses,
+				queryModel.CourseId);
 
 			return PartialView("_UserListPartial", model);
 		}
 
-		private UserListModel GetUserListModel(List<UserRolesInfo> userRoles, string courseId)
+		private UserListModel GetUserListModel(List<UserRolesInfo> userRoles,
+			Dictionary<string, (Course, bool)> courses,
+			string courseId)
 		{
 			var rolesForUsers = userRolesRepo.GetRolesByUsers(courseId);
 			var currentUserId = User.Identity.GetUserId();
@@ -864,8 +868,8 @@ namespace uLearn.Web.Controllers
 							ToggleUrl = Url.Action("ToggleRole", "Account", new { courseId, userId = user.UserId, role = courseRole }),
 							UserName = user.UserVisibleName,
 							Role = courseRole,
-							CourseTitle = courseManager.FindCourse(courseId)?.Title,
-							IsTempCourse =  IsTempCourse(courseId)
+							CourseTitle = courses.GetOrDefault(courseId).Item1?.Title,
+							IsTempCourse = courses.GetOrDefault(courseId).Item2
 						});
 
 				var courseAccesses = usersCourseAccesses.ContainsKey(user.UserId) ? usersCourseAccesses[user.UserId] : null;
@@ -880,8 +884,8 @@ namespace uLearn.Web.Controllers
 							ToggleUrl = Url.Action("ToggleCourseAccess", "Admin", new { courseId = courseId, userId = user.UserId, accessType = a }),
 							UserName = user.UserVisibleName,
 							AccessType = a,
-							CourseTitle = courseManager.FindCourse(courseId)?.Title,
-							IsTempCourse = IsTempCourse(courseId)
+							CourseTitle = courses.GetOrDefault(courseId).Item1?.Title,
+							IsTempCourse = courses.GetOrDefault(courseId).Item2
 						}
 					);
 
@@ -897,7 +901,7 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public ActionResult Diagnostics(string courseId, Guid? versionId)
 		{
-			var isTempCourse = IsTempCourse(courseId);
+			var isTempCourse = tempCoursesRepo.Find(courseId) != null;
 			if (versionId == null)
 			{
 				return View(new DiagnosticsModel

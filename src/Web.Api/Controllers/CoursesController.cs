@@ -171,7 +171,7 @@ namespace Ulearn.Web.Api.Controllers
 			var containsFlashcards = visibleUnits.Any(x => x.GetSlides(true).OfType<FlashcardSlide>().Any());
 			var scoringSettings = GetScoringSettings(course);
 			var tempCourseError = (await tempCoursesRepo.GetCourseErrorAsync(courseId))?.Error;
-			var isTempCourse = await IsTempCourse(course.Id);
+			var isTempCourse = await tempCoursesRepo.FindAsync(courseId) != null;
 			return new CourseInfo
 			{
 				Id = course.Id,
@@ -227,11 +227,6 @@ namespace Ulearn.Web.Api.Controllers
 		private static List<UnitScoringGroupInfo> GetAdditionalScores(Unit unit)
 		{
 			return unit.Settings.Scoring.Groups.Values.Where(g => g.CanBeSetByInstructor).Select(g => new UnitScoringGroupInfo(g)).ToList();
-		}
-
-		private async Task<bool> IsTempCourse(string courseId)
-		{
-			return await tempCoursesRepo.FindAsync(courseId) != null;
 		}
 	}
 }
