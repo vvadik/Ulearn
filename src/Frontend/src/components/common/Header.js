@@ -432,7 +432,7 @@ class CourseMenu extends Component {
 
 		if(hasUsersMenuItem)
 			items.push(
-				<MenuItem href={ "/Admin/Users?courseId=" + courseId } key="Users" component={ LinkComponent }>
+				<MenuItem href={ "/Admin/Users?courseId=" + courseId + "&courseRole=Instructor" } key="Users" component={ LinkComponent }>
 					Студенты и преподаватели
 				</MenuItem>);
 
