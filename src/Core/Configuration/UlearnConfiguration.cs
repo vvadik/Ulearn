@@ -80,6 +80,11 @@ namespace Ulearn.Core.Configuration
 		public bool EnableEntityFrameworkLogging { get; set; }
 	}
 
+	public class DatabaseConfiguration : UlearnConfigurationBase
+	{
+		public string Database { get; set; }
+	}
+
 	public class UlearnConfiguration : UlearnConfigurationBase
 	{
 		public TelegramConfiguration Telegram { get; set; }

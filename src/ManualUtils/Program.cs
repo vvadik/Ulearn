@@ -15,7 +15,7 @@ namespace ManualUtils
 	{
 		public static void Main(string[] args)
 		{
-			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
+			var configuration = ApplicationConfiguration.Read<DatabaseConfiguration>();
 			var optionsBuilder = new DbContextOptionsBuilder<UlearnDb>()
 				.UseLazyLoadingProxies()
 				.UseSqlServer(configuration.Database);

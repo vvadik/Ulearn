@@ -60,7 +60,7 @@ namespace uLearn.Web.Controllers
 		private readonly DirectoryInfo reposDirectory;
 		private readonly IAntiPlagiarismClient antiPlagiarismClient;
 		private readonly ILogger serilogLogger;
-		private readonly TempCoursesRepo tempCoursesReo;
+		private readonly TempCoursesRepo tempCoursesRepo;
 
 		public AdminController()
 		{
@@ -80,13 +80,13 @@ namespace uLearn.Web.Controllers
 			systemAccessesRepo = new SystemAccessesRepo(db);
 			styleErrorsRepo = new StyleErrorsRepo(db);
 			certificateGenerator = new CertificateGenerator(db, courseManager);
+			tempCoursesRepo = new TempCoursesRepo(db);
 			reposDirectory = CourseManager.GetCoursesDirectory().GetSubdirectory("Repos");
 			serilogLogger = new LoggerConfiguration().WriteTo.Log4Net().CreateLogger();
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 			gitSecret = configuration.Git.Webhook.Secret;
 			var antiplagiarismClientConfiguration = ApplicationConfiguration.Read<UlearnConfiguration>().AntiplagiarismClient;
 			antiPlagiarismClient = new AntiPlagiarismClient(antiplagiarismClientConfiguration.Endpoint, antiplagiarismClientConfiguration.Token, serilogLogger);
-			tempCoursesReo = new TempCoursesRepo();
 		}
 
 		public ActionResult Courses(string courseId = null, string courseTitle = null)
@@ -475,7 +475,7 @@ namespace uLearn.Web.Controllers
 
 		public bool IsTempCourse(string courseId)
 		{
-			return tempCoursesReo.Find(courseId) != null;
+			return tempCoursesRepo.Find(courseId) != null;
 		}
 
 		private ActionResult PackagesInternal(string courseId, string error = "", bool openStep1 = false, bool openStep2 = false)
@@ -931,7 +931,7 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public ActionResult TempCourseDiagnostics(string courseId)
 		{
-			var authorId = tempCoursesReo.Find(courseId).AuthorId;
+			var authorId = tempCoursesRepo.Find(courseId).AuthorId;
 			var baseCourseId = courseId.Replace($"_{authorId}", ""); // todo добавить поле baseCourseId в сущность tempCourse
 			var baseCourseVersion = coursesRepo.GetPublishedCourseVersion(baseCourseId).Id;
 			return RedirectToAction("Diagnostics", new {courseId, versionId = baseCourseVersion});
