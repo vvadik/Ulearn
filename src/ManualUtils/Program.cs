@@ -25,12 +25,12 @@ namespace ManualUtils
 				.UseSqlServer(configuration.Database);
 			var adb = new AntiPlagiarismDb(aOptionsBuilder.Options);
 
-			GetMostSimilarSubmission(adb);
+			//GetMostSimilarSubmission(adb);
 			//ParsePairWeightsFromLogs();
 			//GetBlackAndWhiteLabels(db, adb);
 			//ParseTaskWeightsFromLogs();
 			//CampusRegistration();
-			//GetIps();
+			GetIps(db);
 			//FillAntiplagFields.FillClientSubmissionId(adb);
 		}
 		
@@ -98,7 +98,7 @@ namespace ManualUtils
 			// Для получения городов см. geoip.py
 			// Где взять GeoLite2-City.mmdb читай в GeoLite2-City.mmdb.readme.txt
 			var courses = new[] { "BasicProgramming", "BasicProgramming2", "Linq", "complexity", "CS2" };
-			GetIpAddresses.Run(db, lastMonthCount: 6, courses, isNotMembersOfGroups: true);
+			GetIpAddresses.Run(db, lastMonthCount: 13, courses, isNotMembersOfGroups: true, onlyRegisteredFrom: true);
 		}
 	}
 }
