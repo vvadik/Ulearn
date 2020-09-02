@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Ulearn.Common.Extensions;
@@ -53,6 +54,7 @@ namespace Database.Repos.Groups
 			return await db.GroupMembers.AnyAsync(m => m.GroupId == groupId && m.UserId == userId);
 		}
 
+		[ItemCanBeNull]
 		public async Task<GroupMember> AddUserToGroupAsync(int groupId, string userId)
 		{
 			logger.Information($"Пытаюсь добавить пользователя {userId} в группу {groupId}");
@@ -121,7 +123,11 @@ namespace Database.Repos.Groups
 
 			var newMembers = new List<GroupMember>();
 			foreach (var memberUserId in userIds)
-				newMembers.Add(await AddUserToGroupAsync(toGroupId, memberUserId).ConfigureAwait(false));
+			{
+				var newMember = await AddUserToGroupAsync(toGroupId, memberUserId).ConfigureAwait(false);
+				if (newMember != null)
+					newMembers.Add(newMember);
+			}
 
 			return newMembers;
 		}

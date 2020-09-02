@@ -431,7 +431,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 				UserId
 			).ConfigureAwait(false);
 
-			return Ok(new SuccessResponseWithMessage($"{newMembers.Count} students have been copied to group {groupId}"));
+			return Ok(new SuccessResponseWithMessage($"{newMembers.Count} new students have been copied to group {groupId}"));
 		}
 
 		/// <summary>
