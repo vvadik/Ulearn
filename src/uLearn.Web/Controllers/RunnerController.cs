@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web.Configuration;
 using System.Web.Http;
 using AntiPlagiarism.Api;
 using AntiPlagiarism.Api.Models.Parameters;
@@ -23,7 +21,6 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses.Slides.Exercises;
-using Ulearn.Core.Helpers;
 using Ulearn.Core.Metrics;
 using Ulearn.Core.RunCheckerJobApi;
 using Ulearn.Core.Telegram;
@@ -45,11 +42,12 @@ namespace uLearn.Web.Controllers
 		private readonly CourseManager courseManager;
 		private readonly MetricSender metricSender;
 
-		private static readonly List<IResultObserver> resultObserveres = new List<IResultObserver>
+		private static readonly List<IResultObserver> resultObservers = new List<IResultObserver>
 		{
 			new XQueueResultObserver(),
 			new SandboxErrorsResultObserver(),
 			new AntiPlagiarismResultObserver(),
+			new StyleErrorsResultObserver(),
 		};
 
 		public RunnerController(ULearnDb db, CourseManager courseManager)
@@ -76,7 +74,7 @@ namespace uLearn.Web.Controllers
 			CheckRunner(token);
 
 			var sandboxesImageNames = sandboxes.Split(',').ToList();
-			if(sandboxesImageNames.Contains("csharp"))
+			if (sandboxesImageNames.Contains("csharp"))
 				sandboxesImageNames.Add(null);
 
 			var sw = Stopwatch.StartNew();
@@ -170,7 +168,7 @@ namespace uLearn.Web.Controllers
 
 		private Task SendResultToObservers(UserExerciseSubmission submission, RunningResults result)
 		{
-			var tasks = resultObserveres.Select(o => o.ProcessResult(db, submission, result));
+			var tasks = resultObservers.Select(o => o.ProcessResult(db, submission, result));
 			return Task.WhenAll(tasks);
 		}
 
@@ -301,6 +299,60 @@ namespace uLearn.Web.Controllers
 				ClientSubmissionId = submission.Id.ToString()
 			};
 			await antiPlagiarismClient.AddSubmissionAsync(parameters).ConfigureAwait(false);
+		}
+	}
+
+	public class StyleErrorsResultObserver : IResultObserver
+	{
+		private static string ulearnBotUserId;
+
+		public StyleErrorsResultObserver()
+		{
+			if (ulearnBotUserId == null)
+				ulearnBotUserId = new UsersRepo(new ULearnDb()).GetUlearnBotUserId();
+		}
+		
+		public async Task ProcessResult(ULearnDb db, UserExerciseSubmission submission, RunningResults result)
+		{
+			if (result.StyleErrors == null || result.StyleErrors.Count == 0)
+				return;
+
+			if (result.Verdict != Verdict.Ok)
+				return;
+
+			var checking = submission.AutomaticChecking;
+			if (!checking.IsRightAnswer)
+				return;
+
+			var exerciseSlide = WebCourseManager.Instance.FindCourse(submission.CourseId)
+				?.FindSlideById(submission.SlideId, true) as ExerciseSlide;
+			if (exerciseSlide == null)
+				return;
+
+			var exerciseMetricId = BaseExerciseController.GetExerciseMetricId(submission.CourseId, exerciseSlide);
+			var metricSender = new MetricSender(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName);
+
+			metricSender.SendCount($"exercise.{exerciseMetricId}.StyleViolation");
+
+			var slideCheckingsRepo = new SlideCheckingsRepo(db);
+			foreach (var error in result.StyleErrors)
+			{
+				await slideCheckingsRepo.AddExerciseCodeReview(
+					submission,
+					ulearnBotUserId,
+					error.Span.StartLinePosition.Line,
+					error.Span.StartLinePosition.Character,
+					error.Span.EndLinePosition.Line,
+					error.Span.EndLinePosition.Character,
+					error.Message
+				);
+
+				var errorName = error.ErrorType;
+				metricSender.SendCount("exercise.style_error");
+				metricSender.SendCount($"exercise.style_error.{errorName}");
+				metricSender.SendCount($"exercise.{exerciseMetricId}.style_error");
+				metricSender.SendCount($"exercise.{exerciseMetricId}.style_error.{errorName}");
+			}
 		}
 	}
 }

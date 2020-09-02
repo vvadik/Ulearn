@@ -199,7 +199,7 @@ namespace uLearn.Web.Controllers
 			return sendToReview;
 		}
 
-		private static string GetExerciseMetricId(string courseId, ExerciseSlide exerciseSlide)
+		public static string GetExerciseMetricId(string courseId, ExerciseSlide exerciseSlide)
 		{
 			var slideTitleForMetric = exerciseSlide.LatinTitle.Replace(".", "_").ToLower(CultureInfo.InvariantCulture);
 			if (slideTitleForMetric.Length > 25)

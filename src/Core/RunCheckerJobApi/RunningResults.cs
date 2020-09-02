@@ -1,5 +1,5 @@
-﻿using System.Linq;
-using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 
@@ -19,9 +19,10 @@ namespace Ulearn.Core.RunCheckerJobApi
 		[NotNull] public readonly string Error; // Для C# это stderr
 		public readonly float? Points;
 		public readonly int? TimeLimit;
+		[CanBeNull] public List<StyleError> StyleErrors;
 
 		[JsonConstructor]
-		public RunningResults(string id, Verdict verdict, int? timeLimit = null, string compilationOutput = "", string output = "", string error = "", float? points = null)
+		public RunningResults(string id, Verdict verdict, int? timeLimit = null, string compilationOutput = "", string output = "", string error = "", float? points = null, List<StyleError> styleErrors = null)
 		{
 			Id = id;
 			Verdict = verdict;
@@ -30,9 +31,10 @@ namespace Ulearn.Core.RunCheckerJobApi
 			Error = error ?? "";
 			Points = points;
 			TimeLimit = timeLimit;
+			StyleErrors = styleErrors;
 		}
 
-		public RunningResults(Verdict verdict, int? timeLimit = null, string compilationOutput = "", string output = "", string error = "", float? points = null)
+		public RunningResults(Verdict verdict, int? timeLimit = null, string compilationOutput = "", string output = "", string error = "", float? points = null, List<StyleError> styleErrors = null)
 		{
 			Verdict = verdict;
 			CompilationOutput = compilationOutput ?? "";
@@ -40,6 +42,7 @@ namespace Ulearn.Core.RunCheckerJobApi
 			Error = error ?? "";
 			Points = points;
 			TimeLimit = timeLimit;
+			StyleErrors = styleErrors;
 		}
 
 		public override string ToString()

@@ -52,8 +52,10 @@ namespace RunCheckerJob
 			{
 				var sw = Stopwatch.StartNew();
 				dockerShellProcess.Start();
-				var readErrTask = new AsyncReader(dockerShellProcess.StandardError, settings.OutputLimit).GetDataAsync();
-				var readOutTask = new AsyncReader(dockerShellProcess.StandardOutput, settings.OutputLimit).GetDataAsync();
+				var utf8StandardErrorReader = new StreamReader(dockerShellProcess.StandardError.BaseStream, Encoding.UTF8);
+				var utf8StandardOutputReader = new StreamReader(dockerShellProcess.StandardOutput.BaseStream, Encoding.UTF8);
+				var readErrTask = new AsyncReader(utf8StandardErrorReader, settings.OutputLimit).GetDataAsync();
+				var readOutTask = new AsyncReader(utf8StandardOutputReader, settings.OutputLimit).GetDataAsync();
 				var isFinished = Task.WaitAll(new Task[] { readErrTask, readOutTask }, (int)(settings.MaintenanceTimeLimit + settings.TestingTimeLimit).TotalMilliseconds);
 				var ms = sw.ElapsedMilliseconds;
 

@@ -28,7 +28,7 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing
 			tokensExtractor = new TokensExtractor(logger);
 		}
 
-		private List<Token> SkpIfNoPygmentize(Func<List<Token>> getTokens)
+		private List<Token> SkipIfNoPygmentize(Func<List<Token>> getTokens)
 		{
 			try
 			{
@@ -44,7 +44,7 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing
 		public void CodeLengthEqualsTokensContentLengthTest()
 		{
 			const string code = CommonTestData.SimpleProgramWithMethodAndProperty;
-			var tokens = SkpIfNoPygmentize(() => tokensExtractor.GetAllTokensFromPygmentize(code, Language.CSharp).EmptyIfNull().ToList());
+			var tokens = SkipIfNoPygmentize(() => tokensExtractor.GetAllTokensFromPygmentize(code, Language.CSharp).EmptyIfNull().ToList());
 			Assert.IsNotEmpty(tokens);
 			TokensExtractor.ThrowExceptionIfTokensNotMatchOriginalCode(code, tokens);
 		}
@@ -53,7 +53,7 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing
 		public void TokensFiltersTest()
 		{
 			const string code = CommonTestData.SimpleProgramWithMethodAndProperty;
-			var tokens = SkpIfNoPygmentize(() => tokensExtractor.GetFilteredTokensFromPygmentize(code, Language.CSharp));
+			var tokens = SkipIfNoPygmentize(() => tokensExtractor.GetFilteredTokensFromPygmentize(code, Language.CSharp));
 			Assert.IsNotEmpty(tokens);
 			Assert.False(tokens.Any(t => string.IsNullOrWhiteSpace(t.Value)));
 			Assert.False(tokens.Any(t => t.Type.StartsWith("Comment")));
@@ -67,7 +67,7 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing
 		public void LanguagesTest(string file, Language language)
 		{
 			var code = File.ReadAllText(TestDataDir.GetFile(file).FullName);
-			var tokens = SkpIfNoPygmentize(() => tokensExtractor.GetFilteredTokensFromPygmentize(code, language));
+			var tokens = SkipIfNoPygmentize(() => tokensExtractor.GetFilteredTokensFromPygmentize(code, language));
 			Assert.IsNotEmpty(tokens);
 			Assert.False(tokens.Any(t => t.Type.Contains("error")));
 		}
