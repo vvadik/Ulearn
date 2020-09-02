@@ -83,7 +83,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			if (groupMember == null)
 				return StatusCode((int)HttpStatusCode.Conflict, new ErrorResponse($"User {UserId} is already a student of group {group.Id}"));
 
-			await slideCheckingsRepo.RemoveLimitsForUser(group.CourseId, UserId);
+			await slideCheckingsRepo.ResetManualCheckingLimitsForUser(group.CourseId, UserId);
 
 			return Ok(new SuccessResponseWithMessage($"Student {UserId} is added to group {group.Id}"));
 		}

@@ -75,3 +75,8 @@ export function copyStudents(groupId, studentIds) {
 	return api.post("groups/" + groupId + "/students",
 		api.createRequestParams({studentIds}));
 }
+
+export function resetLimitsForStudents(groupId, studentIds) {
+	return api.post("groups/" + groupId + "/students/reset-limits",
+		api.createRequestParams({studentIds}));
+}

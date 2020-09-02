@@ -204,7 +204,7 @@ class CopyStudentsModal extends Component {
 }
 
 CopyStudentsModal.propTypes = {
-	onCloseModal: PropTypes.func,
+	onClose: PropTypes.func,
 	studentIds: PropTypes.object,
 };
 

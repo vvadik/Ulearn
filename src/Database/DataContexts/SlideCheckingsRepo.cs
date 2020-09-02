@@ -303,20 +303,10 @@ namespace Database.DataContexts
 			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
-		public async Task RemoveLimitsForUser(string courseId, string userId)
+		public async Task ResetManualCheckingLimitsForUser(string courseId, string userId)
 		{
 			await DisableProhibitFurtherManualCheckings(courseId, userId).ConfigureAwait(false);
 			await NotCountOldAttemptsToQuizzesWithManualChecking(courseId, userId).ConfigureAwait(false);
-			//await NotCountOldAttemptsToQuizzesWithAutomaticChecking(courseId, userId).ConfigureAwait(false);
-			//await UnskipAllSlides(courseId, userId).ConfigureAwait(false);
-		}
-
-		public async Task UnskipAllSlides(string courseId, string userId)
-		{
-			var skippedVisits = db.Visits.Where(v => v.CourseId == courseId && v.UserId == userId && v.IsSkipped).ToList();
-			foreach (var v in skippedVisits)
-				v.IsSkipped = false;
-			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
 		public async Task DisableProhibitFurtherManualCheckings(string courseId, string userId)
@@ -333,16 +323,6 @@ namespace Database.DataContexts
 		{
 			var checkings = db.ManualQuizCheckings
 				.Where(c => c.CourseId == courseId && c.UserId == userId && c.IsChecked)
-				.ToList();
-			foreach (var checking in checkings)
-				checking.IgnoreInAttemptsCount = true;
-			await db.SaveChangesAsync().ConfigureAwait(false);
-		}
-
-		public async Task NotCountOldAttemptsToQuizzesWithAutomaticChecking(string courseId, string userId)
-		{
-			var checkings = db.AutomaticQuizCheckings
-				.Where(c => c.CourseId == courseId && c.UserId == userId)
 				.ToList();
 			foreach (var checking in checkings)
 				checking.IgnoreInAttemptsCount = true;

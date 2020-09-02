@@ -196,7 +196,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 
 			var members = await groupMembersRepo.GetGroupMembersAsync(newGroup.Id);
 			foreach (var member in members)
-				await slideCheckingsRepo.RemoveLimitsForUser(parameters.DestinationCourseId, member.UserId);
+				await slideCheckingsRepo.ResetManualCheckingLimitsForUser(parameters.DestinationCourseId, member.UserId);
 
 			var url = Url.Action(new UrlActionContext { Action = nameof(Group), Controller = "Group", Values = new { groupId = group.Id } });
 			return Created(url, new CopyGroupResponse
@@ -336,7 +336,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			if (groupMember == null)
 				return StatusCode((int)HttpStatusCode.Conflict, new ErrorResponse($"User {studentId} is already a student of group {groupId}"));
 
-			await slideCheckingsRepo.RemoveLimitsForUser(groupMember.Group.CourseId, studentId);
+			await slideCheckingsRepo.ResetManualCheckingLimitsForUser(groupMember.Group.CourseId, studentId);
 
 			return Ok(new SuccessResponseWithMessage($"Student {studentId} is added to group {groupId}"));
 		}
@@ -423,7 +423,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 
 			var newMembers = await groupMembersRepo.AddUsersToGroupAsync(groupId, studentsToCopySet).ConfigureAwait(false);
 			foreach (var newMember in newMembers)
-				await slideCheckingsRepo.RemoveLimitsForUser(destinationGroup.CourseId, newMember.UserId);
+				await slideCheckingsRepo.ResetManualCheckingLimitsForUser(destinationGroup.CourseId, newMember.UserId);
 
 			await notificationsRepo.AddNotificationAsync(
 				destinationGroup.CourseId,
@@ -432,6 +432,34 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			).ConfigureAwait(false);
 
 			return Ok(new SuccessResponseWithMessage($"{newMembers.Count} new students have been copied to group {groupId}"));
+		}
+
+		/// <summary>
+		/// Cбросить факт просмотра чужих решений упражнений.
+		/// Обнулить количество попыток автоматических тестов, сохранив полученные баллы
+		/// </summary>
+		[HttpPost("students/reset-limits")]
+		[ProducesResponseType((int)HttpStatusCode.OK)]
+		public async Task<IActionResult> ResetLimitsForStudents(int groupId, ResetLimitsParameters parameters)
+		{
+			var hasEditAccess = await groupAccessesRepo.HasUserEditAccessToGroupAsync(groupId, UserId);
+			if (!hasEditAccess)
+			{
+				return StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse("You have no edit access to this group"));
+			}
+
+			var group = await groupsRepo.FindGroupByIdAsync(groupId);
+			var members = await groupMembersRepo.GetGroupsMembersIdsAsync(new []{ groupId });
+
+			var studentsToProcessSet = parameters.StudentIds.ToHashSet();
+			studentsToProcessSet.IntersectWith(members);
+
+			foreach (var studentId in studentsToProcessSet)
+			{
+				await slideCheckingsRepo.ResetAutomaticCheckingLimitsForUser(group.CourseId, studentId);
+			}
+
+			return Ok(new SuccessResponseWithMessage($"Limits for {studentsToProcessSet.Count} students have been reset"));
 		}
 
 		/// <summary>
@@ -489,7 +517,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
 
 			var canRevokeAccess = await groupAccessesRepo.CanRevokeAccessAsync(groupId, userId, UserId).ConfigureAwait(false) ||
-								await IsSystemAdministratorAsync().ConfigureAwait(false);
+			await IsSystemAdministratorAsync().ConfigureAwait(false);
 			if (!canRevokeAccess)
 				return Forbid();
 
