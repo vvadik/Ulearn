@@ -407,7 +407,7 @@ namespace Ulearn.Core
 					$"<course xmlns=\"https://ulearn.me/schema/v2\" title=\"{courseTitle.EncodeQuotes()}\">\n" +
 					@"<units><add>*\unit.xml</add></units>" +
 					"</course>",
-					encoding);
+					new UTF8Encoding(false));
 				zip.Save(path);
 			}
 		}

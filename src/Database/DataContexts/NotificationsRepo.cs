@@ -14,6 +14,7 @@ using log4net;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
+using Ulearn.Core.Courses;
 
 namespace Database.DataContexts
 {
@@ -289,7 +290,14 @@ namespace Database.DataContexts
 				);
 			}
 
-			var course = string.IsNullOrWhiteSpace(notification.CourseId) ? null : courseManager.GetCourse(notification.CourseId);
+			Course course = null;
+			if (!string.IsNullOrWhiteSpace(notification.CourseId))
+			{
+				course = courseManager.FindCourse(notification.CourseId);
+				if (course == null)
+					return;
+			}
+
 			var recipientsIds = notification.GetRecipientsIds(db, course).ToHashSet();
 
 			recipientsIds = FilterUsersWhoNotSeeCourse(notification, recipientsIds);
