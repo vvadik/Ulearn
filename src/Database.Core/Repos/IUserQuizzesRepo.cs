@@ -24,6 +24,5 @@ namespace Database.Repos
 		Task<bool> IsQuizScoredMaximumAsync(string courseId, Guid slideId, string userId);
 		Task SetScoreForQuizBlock(int submissionId, string blockId, int score);
 		Task<Dictionary<string, int>> GetAnswersFrequencyForChoiceBlock(string courseId, Guid slideId, string quizId);
-		HashSet<Guid> GetPassedSlideIds(string courseId, string userId);
 	}
 }

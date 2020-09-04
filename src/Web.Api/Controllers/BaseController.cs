@@ -120,8 +120,8 @@ namespace Ulearn.Web.Api.Controllers
 		public static async Task<Func<Slide, int>> BuildGetSlideMaxScoreFunc(IUserSolutionsRepo solutionsRepo, IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo,
 			Course course, string userId)
 		{
-			var solvedSlidesIds = GetSolvedSlides(solutionsRepo, userQuizzesRepo, course, userId);
-			var slidesWithUsersManualChecking = visitsRepo.GetSlidesWithUsersManualChecking(course.Id, userId).ToImmutableHashSet();
+			var solvedSlidesIds = await GetSolvedSlides(solutionsRepo, userQuizzesRepo, course, userId);
+			var slidesWithUsersManualChecking = (await visitsRepo.GetSlidesWithUsersManualChecking(course.Id, userId)).ToImmutableHashSet();
 			var enabledManualCheckingForUser = await groupsRepo.IsManualCheckingEnabledForUserAsync(course, userId).ConfigureAwait(false);
 			return s => GetMaxScoreForUsersSlide(s, solvedSlidesIds.Contains(s.Id), slidesWithUsersManualChecking.Contains(s.Id), enabledManualCheckingForUser);
 		}
@@ -155,10 +155,10 @@ namespace Ulearn.Web.Api.Controllers
 			return s => GetMaxScoreForUsersSlide(s, false, false, enabledManualCheckingForGroup);
 		}
 
-		public static HashSet<Guid> GetSolvedSlides(IUserSolutionsRepo solutionsRepo, IUserQuizzesRepo userQuizzesRepo, Course course, string userId)
+		public static async Task<HashSet<Guid>> GetSolvedSlides(IUserSolutionsRepo solutionsRepo, IUserQuizzesRepo userQuizzesRepo, Course course, string userId)
 		{
-			var solvedSlides = solutionsRepo.GetIdOfPassedSlides(course.Id, userId);
-			solvedSlides.UnionWith(userQuizzesRepo.GetPassedSlideIds(course.Id, userId));
+			var solvedSlides = await solutionsRepo.GetIdOfPassedSlidesAsync(course.Id, userId);
+			solvedSlides.UnionWith(await userQuizzesRepo.GetPassedSlideIdsAsync(course.Id, userId));
 			return solvedSlides;
 		}
 

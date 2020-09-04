@@ -257,12 +257,13 @@ namespace Database.Repos
 			return db.AutomaticExerciseCheckings.Any(c => automaticCheckingsIds.Contains(c.Id) && c.Status != AutomaticExerciseCheckingStatus.Done);
 		}
 
-		public HashSet<Guid> GetIdOfPassedSlides(string courseId, string userId)
+		public async Task<HashSet<Guid>> GetIdOfPassedSlidesAsync(string courseId, string userId)
 		{
-			return new HashSet<Guid>(db.AutomaticExerciseCheckings
+			return new HashSet<Guid>(await db.AutomaticExerciseCheckings
 				.Where(x => x.IsRightAnswer && x.CourseId == courseId && x.UserId == userId)
 				.Select(x => x.SlideId)
-				.Distinct());
+				.Distinct()
+				.ToListAsync());
 		}
 
 		public IQueryable<UserExerciseSubmission> GetAllSubmissions(int max, int skip)
