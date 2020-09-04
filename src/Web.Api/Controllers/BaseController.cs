@@ -120,6 +120,8 @@ namespace Ulearn.Web.Api.Controllers
 		public static async Task<Func<Slide, int>> BuildGetSlideMaxScoreFunc(IUserSolutionsRepo solutionsRepo, IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo,
 			Course course, string userId)
 		{
+			if (userId == null)
+				return GetMaxScoreForGuest;
 			var solvedSlidesIds = await GetSolvedSlides(solutionsRepo, userQuizzesRepo, course, userId);
 			var slidesWithUsersManualChecking = (await visitsRepo.GetSlidesWithUsersManualChecking(course.Id, userId)).ToImmutableHashSet();
 			var enabledManualCheckingForUser = await groupsRepo.IsManualCheckingEnabledForUserAsync(course, userId).ConfigureAwait(false);
@@ -172,6 +174,16 @@ namespace Ulearn.Web.Api.Controllers
 			if (isSolved)
 				return hasManualChecking ? slide.MaxScore : GetMaxScoreWithoutManualChecking(slide);
 			return enabledManualCheckingForUser ? slide.MaxScore : GetMaxScoreWithoutManualChecking(slide);
+		}
+		
+		private static int GetMaxScoreForGuest(Slide slide)
+		{
+			var isExerciseOrQuiz = slide is ExerciseSlide || slide is QuizSlide;
+
+			if (!isExerciseOrQuiz)
+				return slide.MaxScore;
+
+			return GetMaxScoreWithoutManualChecking(slide);
 		}
 
 		public static int GetMaxScoreWithoutManualChecking(Slide slide)
