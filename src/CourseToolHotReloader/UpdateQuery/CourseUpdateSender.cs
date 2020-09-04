@@ -32,9 +32,15 @@ namespace CourseToolHotReloader.UpdateQuery
 				courseUpdateQuery.GetAllDeletedFiles(), config.CourseId, config.ExcludeCriterias);
 
 			if (errors.ErrorType != ErrorType.NoErrors)
+			{
 				ConsoleWorker.WriteErrorWithTime("Ошибка загрузки изменений. " + errors.Message);
+				config.PreviousSendHasError = true;
+			}
 			else
+			{
 				ConsoleWorker.WriteLineWithTime("Изменения загружены без ошибок");
+				config.PreviousSendHasError = false;
+			}
 
 			courseUpdateQuery.Clear();
 		}
@@ -46,9 +52,15 @@ namespace CourseToolHotReloader.UpdateQuery
 			var errors = await ulearnApiClient.SendFullCourse(config.Path, config.CourseId, config.ExcludeCriterias);
 
 			if (errors.ErrorType != ErrorType.NoErrors)
+			{
 				ConsoleWorker.WriteErrorWithTime("Ошибка загрузки курса. " + errors.Message);
+				config.PreviousSendHasError = true;
+			}
 			else
+			{
 				ConsoleWorker.WriteLineWithTime("Курс загружен без ошибок");
+				config.PreviousSendHasError = false;
+			}
 		}
 	}
 }
