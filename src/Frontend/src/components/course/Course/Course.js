@@ -16,10 +16,10 @@ import Error404 from "src/components/common/Error/Error404";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Edit, } from "icons";
-import { Toggle } from "ui";
+import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader";
 
 import { flashcards, constructPathToSlide, signalrWS, } from 'src/consts/routes';
-import { ROLES, SLIDETYPE, } from 'src/consts/general';
+import { SLIDETYPE, } from 'src/consts/general';
 import { SCORING_GROUP_IDS } from 'src/consts/scoringGroup';
 
 import classnames from 'classnames';
@@ -225,7 +225,7 @@ class Course extends Component {
 		}
 
 		if(!courseInfo) {
-			return null;
+			return <CourseLoader/>
 		}
 
 		return (
