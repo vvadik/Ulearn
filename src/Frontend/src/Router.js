@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 
 import AnyPage from "./pages/AnyPage";
-import Error404 from "src/components/common/Error/Error404";
 import GroupListPage from "./pages/course/groups/GroupListPage";
 import GroupPage from "./pages/course/groups/GroupPage";
 import Course from './pages/course/CoursePage';
