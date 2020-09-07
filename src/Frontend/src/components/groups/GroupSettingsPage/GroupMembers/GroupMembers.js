@@ -128,8 +128,6 @@ class GroupMembers extends Component {
 	renderTeachers() {
 		const { accesses } = this.state;
 		const { group, role, userId } = this.props;
-		const owner = group.owner;
-
 		const { systemAccesses, isSysAdmin } = this.props;
 
 		return (accesses
@@ -144,7 +142,7 @@ class GroupMembers extends Component {
 								user={item.user}
 								systemAccesses={systemAccesses}
 								isSysAdmin={isSysAdmin} /> <span className={styles["teacher-status"]}>
-								Полный доступ { `${getGenderForm(owner.gender, 'предоставила', 'предоставил') }
+								Полный доступ { `${getGenderForm(item.grantedBy.gender, 'предоставила', 'предоставил') }
 								${item.grantedBy.visibleName} ${getMoment(item.grantTime)}` }
 							</span>
 						</div>
