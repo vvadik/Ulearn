@@ -191,7 +191,7 @@ namespace uLearn.Web.Controllers
 				if (!alreadyInGroup)
 					await NotifyAboutUserJoinedToGroup(group, User.Identity.GetUserId());
 
-				await slideCheckingsRepo.RemoveLimitsForUser(group.CourseId, User.Identity.GetUserId()).ConfigureAwait(false);
+				await slideCheckingsRepo.ResetManualCheckingLimitsForUser(group.CourseId, User.Identity.GetUserId()).ConfigureAwait(false);
 
 				return View("JoinedToGroup", group);
 			}
