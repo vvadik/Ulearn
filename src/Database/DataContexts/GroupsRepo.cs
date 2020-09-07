@@ -478,7 +478,7 @@ namespace Database.DataContexts
 
 		public Dictionary<string, List<string>> GetUsersGroupsNames(List<string> courseIds, IEnumerable<string> userIds, IPrincipal currentUser, int maxCount = 3, bool onlyArchived = false)
 		{
-			var usersGroups = GetUsersGroups(courseIds, userIds, currentUser, maxCount + 1, actual: false, archived: true);
+			var usersGroups = GetUsersGroups(courseIds, userIds, currentUser, maxCount + 1, actual: !onlyArchived, archived: true);
 			return usersGroups.ToDictSafe(
 				kv => kv.Key,
 				kv => kv.Value.Select((g, idx) => idx >= maxCount ? "..." : g.Name.TruncateWithEllipsis(40)).ToList());
