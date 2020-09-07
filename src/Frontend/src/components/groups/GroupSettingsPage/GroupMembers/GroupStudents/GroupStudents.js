@@ -103,12 +103,14 @@ class GroupStudents extends Component {
 							checked={studentIds.has(item.user.id) || false}
 							onValueChange={(value) => this.onCheckStudent(item.user.id, value)}>
 							<Avatar user={item.user} size='small' />
-							<Profile
-								user={item.user}
-								systemAccesses={systemAccesses}
-								isSysAdmin={isSysAdmin} /> {item.addingTime && <span className={styles.addingTime}>
-									{`${getGenderForm(item.user.gender, 'вступила', 'вступил')}
-									${getMoment(item.addingTime)}`}</span>}
+							<span className={styles.studentBlockSelectable}>
+								<Profile
+									user={item.user}
+									systemAccesses={systemAccesses}
+									isSysAdmin={isSysAdmin} /> {item.addingTime && <span className={styles.addingTime}>
+										{`${getGenderForm(item.user.gender, 'вступила', 'вступил')}
+										${getMoment(item.addingTime)}`}</span>}
+							</span>
 						</Checkbox>
 					</div>
 				)
