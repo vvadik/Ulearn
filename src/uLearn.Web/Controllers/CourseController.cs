@@ -306,8 +306,8 @@ namespace uLearn.Web.Controllers
 			var archivedGroupNames = "";
 			if (manualChecking != null)
 			{
-				var userGroups = groupsRepo.GetUsersGroups(new List<string> { course.Id }, new List<string> { manualChecking.UserId }, User, 100,
-					actual: true, archived: true);
+				var userGroups = groupsRepo.GetUsersGroups(new List<string> { course.Id }, new List<string> { manualChecking.UserId }, User,
+					actual: true, archived: true, 100);
 				if (userGroups.ContainsKey(manualChecking.UserId))
 				{
 					notArchivedGroupNames = string.Join(", ", groupsRepo.GetUserGroupsNames(userGroups[manualChecking.UserId].Where(g => !g.IsArchived)));

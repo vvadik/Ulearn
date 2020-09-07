@@ -798,7 +798,7 @@ namespace uLearn.Web.Controllers
 			{
 				Slides = slides,
 				Users = users,
-				GroupsNames = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, users.Select(u => u.UserId), User),
+				GroupsNames = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, users.Select(u => u.UserId), User, actual: true, archived: false),
 				CourseId = courseId
 			});
 		}
@@ -965,7 +965,7 @@ namespace uLearn.Web.Controllers
 			{
 				User = user,
 				Course = course,
-				GroupsNames = groupsRepo.GetUserGroupsNamesAsString(course.Id, userId, User),
+				GroupsNames = groupsRepo.GetUserGroupsNamesAsString(course.Id, userId, User, actual: true, archived: false),
 				Slide = slide,
 				SubmissionId = version
 			};

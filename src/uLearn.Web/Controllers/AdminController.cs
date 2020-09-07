@@ -892,8 +892,8 @@ namespace uLearn.Web.Controllers
 				model.Users.Add(user);
 			}
 
-			model.UsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, User);
-			model.UsersArchivedGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, User, onlyArchived: true);
+			model.UsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, User, actual: true, archived: false);
+			model.UsersArchivedGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, User, actual: false, archived: true);
 
 			return model;
 		}
@@ -1068,7 +1068,7 @@ namespace uLearn.Web.Controllers
 			if (withGroups)
 			{
 				var usersIds = users.Select(u => u.UserId);
-				var groupsNames = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, usersIds, User);
+				var groupsNames = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, usersIds, User, actual: true, archived: false);
 				foreach (var user in usersList)
 					if (groupsNames.ContainsKey(user.id) && !string.IsNullOrEmpty(groupsNames[user.id]))
 						user.value += $": {groupsNames[user.id]}";
@@ -1335,7 +1335,7 @@ namespace uLearn.Web.Controllers
 				}
 			}
 
-			model.GroupsNames = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, allUsersIds, User);
+			model.GroupsNames = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, allUsersIds, User, actual: true, archived: false);
 
 			return View(model);
 		}
