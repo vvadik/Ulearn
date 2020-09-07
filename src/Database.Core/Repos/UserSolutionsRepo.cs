@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Transactions;
 using Database.Models;
 using log4net;
 using Microsoft.EntityFrameworkCore;
-using uLearn;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
-using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.RunCheckerJobApi;
 
@@ -259,11 +257,16 @@ namespace Database.Repos
 
 		public async Task<HashSet<Guid>> GetIdOfPassedSlidesAsync(string courseId, string userId)
 		{
-			return new HashSet<Guid>(await db.AutomaticExerciseCheckings
-				.Where(x => x.IsRightAnswer && x.CourseId == courseId && x.UserId == userId)
-				.Select(x => x.SlideId)
-				.Distinct()
-				.ToListAsync());
+			using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions { IsolationLevel = IsolationLevel.ReadUncommitted}, TransactionScopeAsyncFlowOption.Enabled))
+			{
+				var ids = await db.AutomaticExerciseCheckings
+					.Where(x => x.IsRightAnswer && x.CourseId == courseId && x.UserId == userId)
+					.Select(x => x.SlideId)
+					.Distinct()
+					.ToListAsync();
+				scope.Complete();
+				return new HashSet<Guid>(ids);
+			}
 		}
 
 		public IQueryable<UserExerciseSubmission> GetAllSubmissions(int max, int skip)
