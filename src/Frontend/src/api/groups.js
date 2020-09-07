@@ -1,4 +1,5 @@
 import api from "../api/"
+import { resetStudentsLimits } from "src/consts/routes";
 
 // Groups
 export function getCourseGroups(courseId) {
@@ -77,6 +78,6 @@ export function copyStudents(groupId, studentIds) {
 }
 
 export function resetLimitsForStudents(groupId, studentIds) {
-	return api.post("groups/" + groupId + "/students/reset-limits",
+	return api.post("groups/" + groupId + resetStudentsLimits,
 		api.createRequestParams({studentIds}));
 }

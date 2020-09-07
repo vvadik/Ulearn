@@ -7,6 +7,7 @@ export const slides = "slides";
 export const ltiSlide = "ltislide";
 export const acceptedAlert = "acceptedalert";
 export const acceptedSolutions = "acceptedsolutions";
+export const resetStudentsLimits = "/students/reset-limits";
 export const signalrWS = 'ws';
 
 export function constructPathToSlide(courseId, slideId) {

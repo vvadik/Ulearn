@@ -7,9 +7,9 @@ import Avatar from "../../../../common/Avatar/Avatar";
 import CopyStudentsModal from "../CopyStudentsModal/CopyStudentsModal";
 import Profile from '../Profile';
 import getGenderForm from "src/utils/getGenderForm";
+import ResetLimitsForStudentsModal from "../ResetLimitsForStudentsModal/ResetLimitsForStudentsModal";
 
 import styles from './groupStudents.less';
-import ResetLimitsForStudentsModal from "../ResetLimitsForStudentsModal/ResetLimitsForStudentsModal";
 
 class GroupStudents extends Component {
 
@@ -66,7 +66,7 @@ class GroupStudents extends Component {
 					</Gapped>
 				</button>
 				<button
-					className={studentIds.size > 0 ? `${buttonClass} ${styles["button-reset-limits"]}` : buttonClass}
+					className={studentIds.size > 0 ? `${buttonClass} ${styles.buttonResetLimits}` : buttonClass}
 					disabled={studentIds.size === 0}
 					onClick={this.onOpenResetLimitsForStudentsModal}>
 					<Gapped gap={3}>

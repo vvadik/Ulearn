@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import api from "../../../../../api/index";
+import api from "src/api/index";
 import { Modal, Button, Toast } from "ui";
 
 import styles from './resetLimitsForStudentsModal.less';
