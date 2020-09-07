@@ -1,28 +1,40 @@
-import React, {Component} from 'react';
-import {Switch, Route, Redirect} from 'react-router-dom';
+import React, { Component } from 'react';
+import { Switch, Route, Redirect } from 'react-router-dom';
 
 import AnyPage from "./pages/AnyPage";
+import Error404 from "src/components/common/Error/Error404";
 import GroupListPage from "./pages/course/groups/GroupListPage";
 import GroupPage from "./pages/course/groups/GroupPage";
 import Course from './pages/course/CoursePage';
 
-import {getQueryStringParameter} from "./utils";
+import { getQueryStringParameter } from "./utils";
 
 
-function Router() {
+function Router({ account }) {
 	return (
 		<Switch>
-			<Route path="/Admin/Groups" component={redirectLegacyPage("/:courseId/groups")}/>
+			<Route path="/Admin/Groups" component={ redirectLegacyPage("/:courseId/groups") }/>
 
-			<Route path="/course/:courseId/:slideSlugOrAction" component={Course}/>
+			<Route path="/course/:courseId/:slideSlugOrAction" component={ Course }/>
 
-			<Route path="/:courseId/groups/" component={GroupListPage} exact/>
-			<Route path="/:courseId/groups/:groupId/" component={GroupPage} exact/>
-			<Route path="/:courseId/groups/:groupId/:groupPage" component={GroupPage} exact/>
-
-			<Route component={AnyPage}/>
+			{ account.accountLoaded &&
+			<React.Fragment>
+				{ account.isAuthenticated && renderGroupRoutes() }
+				<Route component={ AnyPage }/>
+			</React.Fragment>
+			}
 		</Switch>
 	)
+
+	function renderGroupRoutes() {
+		return (
+			<React.Fragment>
+				<Route path="/:courseId/groups/" component={ GroupListPage } exact/>
+				<Route path="/:courseId/groups/:groupId/" component={ GroupPage } exact/>
+				<Route path="/:courseId/groups/:groupId/:groupPage" component={ GroupPage } exact/>
+			</React.Fragment>
+		);
+	}
 }
 
 function redirectLegacyPage(to) {
@@ -30,12 +42,12 @@ function redirectLegacyPage(to) {
 		constructor(props) {
 			super(props);
 			let courseId = getQueryStringParameter("courseId");
-			if (courseId)
+			if(courseId)
 				to = to.replace(":courseId", courseId);
 		}
 
 		render() {
-			return <Redirect to={to}/>;
+			return <Redirect to={ to }/>;
 		}
 	};
 }

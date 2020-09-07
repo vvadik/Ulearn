@@ -102,7 +102,7 @@ class InternalUlearnApp extends Component {
 							{ !this.state.initializing && // Avoiding bug: don't show page while initializing.
 							// Otherwise we make two GET requests sequentially.
 							// Unfortunately some our GET handlers are not idempotent (i.e. /Admin/CheckNextExerciseForSlide)
-							<Router/>
+							<Router account={ this.props.account }/>
 							}
 						</NotFoundErrorBoundary>
 						{ this.props.account

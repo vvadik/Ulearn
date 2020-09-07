@@ -5,6 +5,7 @@ import {
 } from "src/consts/actions";
 
 const initialAccountState = {
+	accountLoaded: false,
 	isAuthenticated: false,
 	isSystemAdministrator: false,
 	accountProblems: [],
@@ -20,6 +21,7 @@ function account(state = initialAccountState, action) {
 		case ACCOUNT__USER_INFO_UPDATED:
 			let newState = { ...state };
 			newState.isAuthenticated = action.isAuthenticated;
+			newState.accountLoaded = true;
 			if(newState.isAuthenticated) {
 				newState.id = action.id;
 				newState.login = action.login;
