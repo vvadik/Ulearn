@@ -11,6 +11,7 @@ import Header from "./Header/Header";
 import Marks from "./Marks/Marks";
 import CommentActions from "./CommentActions/CommentActions";
 import scrollToView from "../../../utils/scrollToView";
+import { convertDefaultTimezoneToLocal } from "src/utils/getMoment";
 import { ACCESSES, ROLES } from "src/consts/general";
 
 import styles from "./Comment.less";
@@ -59,8 +60,8 @@ class Comment extends Component {
 					<div className={styles.timeSinceAdded}>
 						<Hint
 							pos="right middle"
-							text={`${moment(comment.publishTime).local().format("DD MMMM YYYY в HH:mm")}`}>
-							{moment(comment.publishTime).startOf("minute").fromNow()}
+							text={`${moment(convertDefaultTimezoneToLocal(comment.publishTime)).format("DD MMMM YYYY в HH:mm")}`}>
+							{moment(convertDefaultTimezoneToLocal(comment.publishTime)).startOf("minute").fromNow()}
 						</Hint>
 					</div>
 					{comment.id === commentEditing.commentId ? this.renderEditCommentForm() : this.renderComment()}
