@@ -103,8 +103,8 @@ namespace uLearn.Web.Controllers
 				CanToggleRoles = User.HasAccess(CourseRole.CourseAdmin),
 				ShowDangerEntities = User.IsSystemAdministrator(),
 				Users = users.Select(user => GetUserModel(user, coursesForUsers, courses, tempCoursesIds)).ToList(),
-				UsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courses, userIds, User),
-				UsersArchivedGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courses, userIds, User, onlyArchived: true),
+				UsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courses, userIds, User, actual: true, archived: false),
+				UsersArchivedGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courses, userIds, User, actual: false, archived: true),
 				CanViewAndToggleCourseAccesses = false,
 				CanViewAndToogleSystemAccesses = User.IsSystemAdministrator(),
 				CanViewProfiles = systemAccessesRepo.HasSystemAccess(currentUserId, SystemAccessType.ViewAllProfiles) || User.IsSystemAdministrator(),
@@ -324,8 +324,8 @@ namespace uLearn.Web.Controllers
 				.ToHashSet();
 			var certificates = certificatesRepo.GetUserCertificates(user.Id).OrderBy(c => allCourses.GetOrDefault(c.Template.CourseId)?.Title ?? "<курс удалён>").ToList();
 
-			var courseGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, maxCount: 10));
-			var courseArchivedGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, maxCount: 10, onlyArchived: true));
+			var courseGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, actual: true, archived: false, maxCount: 10));
+			var courseArchivedGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, actual: false, archived: true, maxCount: 10));
 			var coursesWithRoles = (await userRolesRepo.GetUserRolesHistory(userId)).Select(x => x.CourseId.ToLower()).Distinct().ToList();
 			var coursesWithAccess = (await coursesRepo.GetUserAccessHistory(userId)).Select(x => x.CourseId.ToLower()).Distinct().ToList();
 

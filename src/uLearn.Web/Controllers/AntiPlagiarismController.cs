@@ -137,8 +137,8 @@ namespace uLearn.Web.Controllers
 			var userIds = new HashSet<string>(antiPlagiarismsResult.ResearchedSubmissions.SelectMany(s => s.Plagiarisms).Select(s => s.SubmissionInfo.AuthorId.ToString()));
 			userIds.Add(submission.UserId);
 			/* Use special MockUserCanSeeAllGroups() instead of User because we want to show all users groups, not only available */
-			var usersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, new MockUserCanSeeAllGroups()).ToDefaultDictionary();
-			var usersArchivedGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, new MockUserCanSeeAllGroups(), onlyArchived: true).ToDefaultDictionary();
+			var usersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, new MockUserCanSeeAllGroups(), actual: true, archived: false).ToDefaultDictionary();
+			var usersArchivedGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, new MockUserCanSeeAllGroups(), actual: false, archived: true).ToDefaultDictionary();
 			var isCourseOrSysAdmin = User.HasAccessFor(courseId, CourseRole.CourseAdmin);
 
 			var course = courseManager.FindCourse(courseId);

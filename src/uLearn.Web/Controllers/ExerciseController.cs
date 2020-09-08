@@ -578,7 +578,7 @@ namespace uLearn.Web.Controllers
 			var automaticCheckingScores = slideCheckingsRepo.GetAutomaticScoresForSlide(courseId, slideId, filterOptions.UserIds);
 			var manualCheckingScores = slideCheckingsRepo.GetManualScoresForSlide(courseId, slideId, filterOptions.UserIds);
 
-			var userGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, filterOptions.UserIds, User).ToDefaultDictionary();
+			var userGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, filterOptions.UserIds, User, actual: true, archived: false).ToDefaultDictionary();
 
 			return new StudentSubmissionsModel
 			{

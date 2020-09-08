@@ -485,7 +485,7 @@ namespace uLearn.Web.Controllers
 				.ToList();
 			var visitedUsersIds = visitedUsers.Select(v => v.UserId).ToList();
 
-			var visitedUsersGroups = groupsRepo.GetUsersGroupsIds(new List<string> { courseId }, visitedUsersIds, User, 10).ToDefaultDictionary();
+			var visitedUsersGroups = groupsRepo.GetUsersActualGroupsIds(new List<string> { courseId }, visitedUsersIds, User, 10).ToDefaultDictionary();
 
 			/* From now fetch only filtered users' statistics */
 			filterOptions.UserIds = visitedUsersIds;
@@ -798,7 +798,7 @@ namespace uLearn.Web.Controllers
 			{
 				Slides = slides,
 				Users = users,
-				GroupsNames = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, users.Select(u => u.UserId), User),
+				GroupsNames = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, users.Select(u => u.UserId), User, actual: true, archived: false),
 				CourseId = courseId
 			});
 		}
@@ -965,7 +965,7 @@ namespace uLearn.Web.Controllers
 			{
 				User = user,
 				Course = course,
-				GroupsNames = groupsRepo.GetUserGroupsNamesAsString(course.Id, userId, User),
+				GroupsNames = groupsRepo.GetUserGroupsNamesAsString(course.Id, userId, User, actual: true, archived: false),
 				Slide = slide,
 				SubmissionId = version
 			};
