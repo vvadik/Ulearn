@@ -38,8 +38,12 @@ class Navigation extends Component {
 		this.tryAddTouchListener();
 	}
 
+	isMobileNavigationMenu = () => {
+		return isMobile() || isTablet();
+	}
+
 	tryAddTouchListener = () => {
-		if((isMobile() || isTablet()) && !this.state.touchListenerAdded) {
+		if(this.isMobileNavigationMenu() && !this.state.touchListenerAdded) {
 			document.addEventListener('touchstart', this.handleTouchStart);
 			this.setState({
 				touchListenerAdded: true,
@@ -206,7 +210,7 @@ class Navigation extends Component {
 	}
 
 	renderUnitNavigation() {
-		const { unitTitle, courseTitle, onCourseClick, unitItems, nextUnit, toggleNavigation, groupsAsStudent, unitProgress } = this.props;
+		const { unitTitle, courseTitle, onCourseClick, unitItems, nextUnit, groupsAsStudent, unitProgress } = this.props;
 		const { sideMenuStyle } = this.state;
 
 		return (
@@ -219,7 +223,7 @@ class Navigation extends Component {
 					onCourseClick={ onCourseClick }
 					groupsAsStudent={ groupsAsStudent }
 				/>
-				< NavigationContent items={ unitItems } toggleNavigation={ toggleNavigation }/>
+				< NavigationContent items={ unitItems } toggleNavigation={ this.hideNavigationMenu }/>
 				{ nextUnit && <NextUnit unit={ nextUnit } toggleNavigation={ this.handleToggleNavigation }
 				/> }
 			</div>
@@ -227,9 +231,8 @@ class Navigation extends Component {
 	}
 
 	handleToggleNavigation = () => {
-		const { toggleNavigation, } = this.props;
 		this.unitHeaderRef.scrollIntoView();
-		toggleNavigation();
+		this.hideNavigationMenu();
 	};
 
 	renderCourseNavigation() {
