@@ -13,6 +13,7 @@ const initialAccountState = {
 	roleByCourse: {},
 	accessesByCourse: {},
 	groupsAsStudent: [],
+	gender: null,
 	isHijacked: false,
 };
 
@@ -31,6 +32,7 @@ function account(state = initialAccountState, action) {
 				newState.avatarUrl = action.avatarUrl;
 				newState.accountProblems = action.accountProblems;
 				newState.systemAccesses = action.systemAccesses;
+				newState.gender = action.gender;
 			}
 			return newState;
 		case ACCOUNT__USER_ROLES_UPDATED:
