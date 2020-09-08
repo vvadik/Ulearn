@@ -474,7 +474,7 @@ namespace Database.DataContexts
 			return usersGroups.Select((g, idx) => idx >= maxCount ? "..." : g.Name.TruncateWithEllipsis(40)).ToList();
 		}
 
-		public Dictionary<string, List<int>> GetUsersGroupsIds(List<string> courseIds, IEnumerable<string> userIds, IPrincipal currentUser, int maxCount = 3)
+		public Dictionary<string, List<int>> GetUsersActualGroupsIds(List<string> courseIds, IEnumerable<string> userIds, IPrincipal currentUser, int maxCount = 3)
 		{
 			var usersGroups = GetUsersGroups(courseIds, userIds, currentUser, actual: true, archived: false, maxCount);
 			return usersGroups.ToDictSafe(

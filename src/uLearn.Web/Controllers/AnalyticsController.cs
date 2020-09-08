@@ -485,7 +485,7 @@ namespace uLearn.Web.Controllers
 				.ToList();
 			var visitedUsersIds = visitedUsers.Select(v => v.UserId).ToList();
 
-			var visitedUsersGroups = groupsRepo.GetUsersGroupsIds(new List<string> { courseId }, visitedUsersIds, User, 10).ToDefaultDictionary();
+			var visitedUsersGroups = groupsRepo.GetUsersActualGroupsIds(new List<string> { courseId }, visitedUsersIds, User, 10).ToDefaultDictionary();
 
 			/* From now fetch only filtered users' statistics */
 			filterOptions.UserIds = visitedUsersIds;
