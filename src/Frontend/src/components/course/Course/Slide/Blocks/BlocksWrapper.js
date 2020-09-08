@@ -36,7 +36,7 @@ class BlocksWrapper extends React.Component {
 			styles.withPaddings,
 			{ [styles.withoutTopPaddings]: withoutTopPaddings },
 			{ [styles.withoutBottomPaddigns]: withoutBottomPaddigns },
-			{ [styles.hiddenBackgroundColor]: isHidden },
+			{ [styles.hiddenBackgroundColor]: isHiddenBlock },
 			{ [styles.hiddenSlide]: isHiddenSlide },
 			{ [styles.showed]: showed },
 			className
@@ -85,10 +85,8 @@ class BlocksWrapper extends React.Component {
 
 	renderHiddenSlideHeader = () => {
 		const { showed, groups } = this.state;
-		const { isHidden, } = this.props;
 		const headerClassNames = classNames(
 			styles.hiddenHeader,
-			{ [styles.hiddenBackgroundColor]: isHidden },
 			{ [styles.showed]: this.state.showed }
 		);
 

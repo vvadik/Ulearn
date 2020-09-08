@@ -36,7 +36,7 @@ class Spoiler extends React.Component {
 	}
 
 	render = () => {
-		const { text, blocks, isHidden, isPreviousBlockHidden, closable, } = this.props;
+		const { text, blocks, isHidden, isPreviousBlockHidden, closable, isHeaderOfHiddenSlide, } = this.props;
 		const { contentVisible, } = this.state;
 
 		if(contentVisible) {
@@ -48,7 +48,6 @@ class Spoiler extends React.Component {
 						withoutTopPaddings
 						isBlock={ isPreviousBlockHidden !== undefined }
 						isHidden={ isHidden }
-						showEyeHint={ isHidden && !isPreviousBlockHidden }
 					>
 						<Button use="success" onClick={ this.hideContent }>{ closeButtonText }</Button>
 					</BlocksWrapper>
@@ -59,10 +58,11 @@ class Spoiler extends React.Component {
 
 		return (
 			<BlocksWrapper
-				withoutTopPaddings
+				withoutTopPaddings={ !isHeaderOfHiddenSlide && (isHidden ? isPreviousBlockHidden : !isPreviousBlockHidden) }
 				isBlock={ isPreviousBlockHidden !== undefined }
 				isHidden={ isHidden }
 				showEyeHint={ isHidden && !isPreviousBlockHidden }
+				isHeaderOfHiddenSlide={ isHeaderOfHiddenSlide }
 			>
 				<Button use="success" onClick={ this.showContent }>{ text }</Button>
 			</BlocksWrapper>
@@ -70,15 +70,21 @@ class Spoiler extends React.Component {
 	}
 
 	getBlocksWithStyles = (blocks) => {
-		const { isPreviousBlockHidden, isHidden, } = this.props;
+		const { isPreviousBlockHidden, isHidden, isHeaderOfHiddenSlide, } = this.props;
 
 		return blocks.map((block, i) => {
 			if(i === 0 && block.type === BlocksWrapper) {
+				const isFirstElementOnSlide = isHeaderOfHiddenSlide || isPreviousBlockHidden === undefined;
+				const withoutTopPaddings = isFirstElementOnSlide ? isHeaderOfHiddenSlide : isPreviousBlockHidden;
+				const blockProps = block.props;
+
 				return <BlocksWrapper
 					{ ...block.props }
-					showEyeHint={ isHidden && !isPreviousBlockHidden }
-					isBlock={ isPreviousBlockHidden !== undefined }
-					withoutTopPaddings
+					isHidden={ isHidden || blockProps.isHidden }
+					showEyeHint={ (isHidden || blockProps.isHidden) && !isPreviousBlockHidden }
+					isBlock={ blocks.length !== 0 || isPreviousBlockHidden !== undefined }
+					isHeaderOfHiddenSlide={ isHeaderOfHiddenSlide }
+					withoutTopPaddings={ !isHeaderOfHiddenSlide && withoutTopPaddings }
 					key={ block.key }
 				/>;
 			}
@@ -95,6 +101,7 @@ Spoiler.propTypes = {
 	isPreviousBlockHidden: PropTypes.bool,
 	isHidden: PropTypes.bool,
 	closable: PropTypes.bool,
+	isHeaderOfHiddenSlide: PropTypes.bool,
 };
 
 export default Spoiler;
