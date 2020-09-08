@@ -101,8 +101,6 @@ class GroupPage extends Component {
 			courseRole = rolesByCourse[courseId];
 		}
 
-		let userId = this.props.account.id;
-
 		return (
 			<Page>
 				<Helmet defer={true}>
@@ -115,7 +113,7 @@ class GroupPage extends Component {
 					{groupPage === "members" &&
 					<GroupMembers
 						courseId={courseId}
-						userId={userId}
+						account={this.props.account}
 						role={courseRole}
 						isSysAdmin={this.props.account.isSystemAdministrator}
 						systemAccesses={systemAccesses}
