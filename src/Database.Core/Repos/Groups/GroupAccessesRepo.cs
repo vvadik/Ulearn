@@ -209,7 +209,7 @@ namespace Database.Repos.Groups
 			if (await courseRolesRepo.HasUserAccessToAnyCourseAsync(instructorId, CourseRoleType.CourseAdmin).ConfigureAwait(false))
 				return true;
 
-			var coursesIds = courseManager.GetCourses().Select(c => c.Id).ToList();
+			var coursesIds = (await courseManager.GetCoursesAsync()).Select(c => c.Id).ToList();
 			var groups = await GetAvailableForUserGroupsAsync(coursesIds, instructorId, false, actual: true, archived: false).ConfigureAwait(false);
 			var members = await groupMembersRepo.GetGroupsMembersAsync(groups.Select(g => g.Id).ToList()).ConfigureAwait(false);
 			return members.Select(m => m.UserId).Contains(studentId);
@@ -217,12 +217,12 @@ namespace Database.Repos.Groups
 
 		public async Task<List<string>> GetCoursesWhereUserCanSeeAllGroupsAsync(string userId, IEnumerable<string> coursesIds)
 		{
+			if (await usersRepo.IsSystemAdministrator(userId))
+				return coursesIds.ToList();
 			var result = new List<string>();
-
 			foreach (var courseId in coursesIds)
-				if (await CanUserSeeAllCourseGroupsAsync(userId, courseId).ConfigureAwait(false))
+				if (await CanUserSeeAllCourseGroupsAsync(userId, courseId, false).ConfigureAwait(false))
 					result.Add(courseId);
-
 			return result;
 		}
 
@@ -253,7 +253,7 @@ namespace Database.Repos.Groups
 
 		private async Task<List<string>> GetCoursesWhereUserCanSeeAllGroupsAsync(string userId)
 		{
-			if (await systemAccessesRepo.HasSystemAccessAsync(userId, SystemAccessType.ViewAllGroupMembers).ConfigureAwait(false))
+			if (await usersRepo.IsSystemAdministrator(userId) || await systemAccessesRepo.HasSystemAccessAsync(userId, SystemAccessType.ViewAllGroupMembers).ConfigureAwait(false))
 				return await coursesRepo.GetPublishedCourseIdsAsync().ConfigureAwait(false);
 
 			var coursesAsCourseAdmin = await courseRolesRepo.GetCoursesWhereUserIsInRoleAsync(userId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
@@ -264,7 +264,7 @@ namespace Database.Repos.Groups
 
 		private async Task<List<string>> GetCoursesWhereUserCanEditAllGroupsAsync(string userId)
 		{
-			if ((await usersRepo.GetSysAdminsIdsAsync().ConfigureAwait(false)).Contains(userId))
+			if (await usersRepo.IsSystemAdministrator(userId))
 				return await coursesRepo.GetPublishedCourseIdsAsync().ConfigureAwait(false);
 
 			var coursesAsCourseAdmin = await courseRolesRepo.GetCoursesWhereUserIsInRoleAsync(userId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
@@ -272,8 +272,10 @@ namespace Database.Repos.Groups
 			return new HashSet<string>(coursesAsCourseAdmin).ToList();
 		}
 
-		public async Task<bool> CanUserSeeAllCourseGroupsAsync(string userId, string courseId)
+		public async Task<bool> CanUserSeeAllCourseGroupsAsync(string userId, string courseId, bool? isSystemAdministrator = null)
 		{
+			if (isSystemAdministrator == true || isSystemAdministrator == null && await usersRepo.IsSystemAdministrator(userId))
+				return true;
 			var canViewAllGroupMembersGlobal = await systemAccessesRepo.HasSystemAccessAsync(userId, SystemAccessType.ViewAllGroupMembers).ConfigureAwait(false);
 			var canViewAllGroupMembersInCourse = await coursesRepo.HasCourseAccessAsync(userId, courseId, CourseAccessType.ViewAllGroupMembers).ConfigureAwait(false);
 			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
