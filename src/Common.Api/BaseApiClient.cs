@@ -82,9 +82,6 @@ namespace Ulearn.Common.Api
 						.Post(BuildUrl(settings.EndpointUrl + url))
 						.WithContent(serializedPayload, Encoding.UTF8)
 						.WithContentTypeHeader("application/json");
-					var parametersNameValueCollection = parameters.ToNameValueCollection();
-					foreach (var key in parametersNameValueCollection.AllKeys)
-						request = request.WithAdditionalQueryParameter(key, parametersNameValueCollection[key]);
 					response = await clusterClient.SendAsync(request).ConfigureAwait(false);
 				}
 				else
