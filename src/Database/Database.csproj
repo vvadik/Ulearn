@@ -886,5 +886,8 @@
 	<EmbeddedResource Update="Migrations\202007241042257_AddQuizIgnoreInAttemptsCount.resx">
 	  <DependentUpon>202007241042257_AddQuizIgnoreInAttemptsCount.cs</DependentUpon>
 	</EmbeddedResource>
+	<EmbeddedResource Update="Migrations\202009171003006_DisableUsersFullTextIndexStopWords.resx">
+	  <DependentUpon>202009171003006_DisableUsersFullTextIndexStopWords.cs</DependentUpon>
+	</EmbeddedResource>
   </ItemGroup>
 </Project>
