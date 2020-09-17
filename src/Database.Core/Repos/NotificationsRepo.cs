@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses;
 
 namespace Database.Repos
 {
@@ -287,7 +288,15 @@ namespace Database.Repos
 				);
 			}
 
-			var recipientsIds = (await notification.GetRecipientsIdsAsync(serviceProvider).ConfigureAwait(false)).ToHashSet();
+			Course course = null;
+			if (!string.IsNullOrWhiteSpace(notification.CourseId))
+			{
+				course = await courseManager.FindCourseAsync(notification.CourseId);
+				if (course == null)
+					return;
+			}
+
+			var recipientsIds = (await notification.GetRecipientsIdsAsync(serviceProvider, course).ConfigureAwait(false)).ToHashSet();
 
 			recipientsIds = await FilterUsersWhoNotSeeCourse(notification, recipientsIds);
 
@@ -404,7 +413,7 @@ namespace Database.Repos
 				var course = await courseManager.FindCourseAsync(notification.CourseId);
 				if (course != null)
 				{
-					var visibleUnits = unitsRepo.GetVisibleUnitIds(course);
+					var visibleUnits = await unitsRepo.GetPublishedUnitIdsAsync(course);
 					if (!visibleUnits.Any())
 					{
 						var userIdsWithInstructorRoles = await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Tester, notification.CourseId, true);

@@ -89,7 +89,7 @@ namespace uLearn.Web.Controllers
 
 			submission.SolutionCode.Text = ((ExerciseSlide)courseManager
 					.GetCourse(submission.CourseId)
-					.GetSlideById(submission.SlideId))
+					.GetSlideById(submission.SlideId, true))
 				.Exercise
 				.GetSourceCode(submission.SolutionCode.Text);
 

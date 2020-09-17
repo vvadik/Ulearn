@@ -18,7 +18,12 @@ namespace Database.DataContexts
 		private readonly ILog log = LogManager.GetLogger(typeof(ULearnDb));
 
 		public ULearnDb()
-			: base(ApplicationConfiguration.Read<UlearnConfiguration>().Database, throwIfV1Schema: false)
+			: this(ApplicationConfiguration.Read<DatabaseConfiguration>().Database)
+		{
+		}
+
+		public ULearnDb(string database)
+			: base(database, throwIfV1Schema: false)
 		{
 			System.Data.Entity.Database.SetInitializer(new MigrateDatabaseToLatestVersion<ULearnDb, Configuration>());
 			if (log.IsDebugEnabled)

@@ -3,33 +3,38 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Database;
-using Microsoft.EntityFrameworkCore;
 
 namespace ManualUtils
 {
 	public static class GetIpAddresses
 	{
 		// Шаблон для выгрузки ip-адресов студентов курсов, не состоящих ни в одной группе, заходивших за 6 месяцев.
-		public static void Run(UlearnDb db, int lastMonthCount, string[] courses, bool isNotMembersOfGroups)
+		public static void Run(UlearnDb db, int lastMonthCount, string[] courses, bool isNotMembersOfGroups, bool onlyRegisteredFrom)
 		{
 			var time = DateTime.Now.AddMonths(-lastMonthCount);
 			var membersOfGroups = new HashSet<string>(db.GroupMembers.Select(gm => gm.UserId).Distinct());
-			var visits = db.Visits
+			var data = db.Visits
 				.Where(v =>
 					courses.Contains(v.CourseId)
 					&& v.Timestamp > time
 					&& v.IpAddress != null
 					&& v.User.EmailConfirmed
 					&& v.User.Email != null
+					&& (!onlyRegisteredFrom || v.User.Registered > time)
 				)
-				.GroupBy(v => v.UserId)
-				.Select(kvp => kvp.OrderByDescending(v => v.Timestamp).FirstOrDefault())
+				.Select(v => v.UserId)
+				.Distinct()
+				.Select(id => new {
+						User = db.Users.FirstOrDefault(t => t.Id == id),
+						IpAddress = db.Visits.Where(t => t.UserId == id && t.IpAddress != null).OrderByDescending(t => t.Timestamp).FirstOrDefault().IpAddress
+					}
+				)
 				.ToList();
-			if(isNotMembersOfGroups)
-				visits = visits.Where(v => !membersOfGroups.Contains(v.UserId))
+			if (isNotMembersOfGroups)
+				data = data.Where(v => !membersOfGroups.Contains(v.User.Id))
 				.ToList();
 			File.WriteAllText("students.txt", "UserName\tFirstName\tLastName\tEmail\tIpAddress");
-			File.WriteAllLines("students.txt", visits.Select(v => $"{v.User.UserName}\t{v.User.FirstName}\t{v.User.LastName}\t{v.User.Email}\t{v.IpAddress}"));
+			File.WriteAllLines("students.txt", data.Select(v => $"{v.User.UserName}\t{v.User.FirstName}\t{v.User.LastName}\t{v.User.Email}\t{v.IpAddress}"));
 		}
 	}
 }

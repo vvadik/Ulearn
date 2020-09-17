@@ -103,8 +103,8 @@ namespace uLearn.Web.Controllers
 				CanToggleRoles = User.HasAccess(CourseRole.CourseAdmin),
 				ShowDangerEntities = User.IsSystemAdministrator(),
 				Users = users.Select(user => GetUserModel(user, coursesForUsers, courses, tempCoursesIds)).ToList(),
-				UsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courses, userIds, User),
-				UsersArchivedGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courses, userIds, User, onlyArchived: true),
+				UsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courses, userIds, User, actual: true, archived: false),
+				UsersArchivedGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courses, userIds, User, actual: false, archived: true),
 				CanViewAndToggleCourseAccesses = false,
 				CanViewAndToogleSystemAccesses = User.IsSystemAdministrator(),
 				CanViewProfiles = systemAccessesRepo.HasSystemAccess(currentUserId, SystemAccessType.ViewAllProfiles) || User.IsSystemAdministrator(),
@@ -191,7 +191,7 @@ namespace uLearn.Web.Controllers
 				if (!alreadyInGroup)
 					await NotifyAboutUserJoinedToGroup(group, User.Identity.GetUserId());
 
-				await slideCheckingsRepo.RemoveLimitsForUser(group.CourseId, User.Identity.GetUserId()).ConfigureAwait(false);
+				await slideCheckingsRepo.ResetManualCheckingLimitsForUser(group.CourseId, User.Identity.GetUserId()).ConfigureAwait(false);
 
 				return View("JoinedToGroup", group);
 			}
@@ -324,8 +324,8 @@ namespace uLearn.Web.Controllers
 				.ToHashSet();
 			var certificates = certificatesRepo.GetUserCertificates(user.Id).OrderBy(c => allCourses.GetOrDefault(c.Template.CourseId)?.Title ?? "<курс удалён>").ToList();
 
-			var courseGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, maxCount: 10));
-			var courseArchivedGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, maxCount: 10, onlyArchived: true));
+			var courseGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, actual: true, archived: false, maxCount: 10));
+			var courseArchivedGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, actual: false, archived: true, maxCount: 10));
 			var coursesWithRoles = (await userRolesRepo.GetUserRolesHistory(userId)).Select(x => x.CourseId.ToLower()).Distinct().ToList();
 			var coursesWithAccess = (await coursesRepo.GetUserAccessHistory(userId)).Select(x => x.CourseId.ToLower()).Distinct().ToList();
 
@@ -815,28 +815,6 @@ namespace uLearn.Web.Controllers
 
 			/* Send confirmation email to the new address */
 			await SendConfirmationEmail(user).ConfigureAwait(false);
-		}
-
-		[AllowAnonymous]
-		public ActionResult CheckIsEmailConfirmed()
-		{
-			if (!Request.IsAuthenticated)
-				return new HttpStatusCodeResult(HttpStatusCode.OK);
-
-			var userId = User.Identity.GetUserId();
-			var user = usersRepo.FindUserById(userId);
-			if (user == null)
-				return new HttpNotFoundResult();
-
-			if (user.EmailConfirmed || !user.LastConfirmationEmailTime.HasValue)
-				return new HttpStatusCodeResult(HttpStatusCode.OK);
-
-			var sentAgo = DateTime.Now.Subtract(user.LastConfirmationEmailTime.Value);
-			if (sentAgo < TimeSpan.FromDays(1))
-				return new HttpStatusCodeResult(HttpStatusCode.OK);
-
-			/* If email has been sent less than 1 day ago, show popup. Double popup is disabled via cookies and javascript */
-			return PartialView("EmailIsNotConfirmedPopup", user);
 		}
 
 		[ULearnAuthorize(ShouldBeSysAdmin = true)]

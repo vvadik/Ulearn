@@ -18,7 +18,7 @@ namespace Database.Repos
 		Task RemoveAttempts(string courseId, Guid slideId, string userId);
 		Dictionary<Guid, int> GetScoresForSlides(string courseId, string userId, IEnumerable<Guid> slidesIds = null);
 		Task<Dictionary<string, Dictionary<Guid, int>>> GetScoresForSlides(string courseId, IEnumerable<string> userIds, IEnumerable<Guid> slidesIds = null);
-		List<Guid> GetSlidesWithUsersManualChecking(string courseId, string userId);
+		Task<List<Guid>> GetSlidesWithUsersManualChecking(string courseId, string userId);
 		Task MarkVisitsAsWithManualChecking(string courseId, Guid slideId, string userId);
 		int GetScore(string courseId, Guid slideId, string userId);
 		Task SkipSlide(string courseId, Guid slideId, string userId);

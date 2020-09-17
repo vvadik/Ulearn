@@ -5,6 +5,10 @@ import ErrorBoundary from "./components/common/ErrorBoundary";
 import NotFoundErrorBoundary from "./components/common/Error/NotFoundErrorBoundary";
 import YandexMetrika from "./components/common/YandexMetrika";
 import Header from "./components/common/Header";
+import EmailNotConfirmedModal from "src/components/notificationModal/EmailNotConfirmedModal";
+
+import { emailNotConfirmed } from "src/consts/accountProblems";
+
 import { Provider, connect } from "react-redux";
 import thunkMiddleware from "redux-thunk";
 import { applyMiddleware, createStore, compose, } from "redux";
@@ -98,14 +102,25 @@ class InternalUlearnApp extends Component {
 							{ !this.state.initializing && // Avoiding bug: don't show page while initializing.
 							// Otherwise we make two GET requests sequentially.
 							// Unfortunately some our GET handlers are not idempotent (i.e. /Admin/CheckNextExerciseForSlide)
-							<Router/>
+							<Router account={ this.props.account }/>
 							}
 						</NotFoundErrorBoundary>
+						{ this.props.account
+						&& this.isEmailNotConfirmed()
+						&& <EmailNotConfirmedModal account={ this.props.account }/>
+						}
 						<YandexMetrika/>
 					</ErrorBoundary>
 				</ThemeContext.Provider>
 			</BrowserRouter>
 		);
+	}
+
+	isEmailNotConfirmed = () => {
+		const { account } = this.props;
+		return account.isAuthenticated
+			&& account.accountProblems.length > 0
+			&& account.accountProblems.some(p => p.problemType === emailNotConfirmed);
 	}
 
 	static mapStateToProps(state) {

@@ -10,6 +10,7 @@ export const menuItemType = {
 	description: PropTypes.string,
 	isActive: PropTypes.bool,
 	visited: PropTypes.bool,
+	hide: PropTypes.bool,
 	metro: PropTypes.shape({
 		complete: PropTypes.bool,
 		isFirstItem: PropTypes.bool,
@@ -31,6 +32,8 @@ export const courseMenuItemType = {
 	title: PropTypes.string,
 	progress: PropTypes.shape(progressType),
 	isActive: PropTypes.bool,
+	isNotPublished: PropTypes.bool,
+	publicationDate: PropTypes.string,
 };
 
 export const groupAsStudentType = {

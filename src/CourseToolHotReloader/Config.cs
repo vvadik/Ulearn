@@ -21,6 +21,7 @@ namespace CourseToolHotReloader
 		public bool SendFullArchive { get; set; }
 		public List<string> ExcludeCriterias { get; set; }
 		public void Flush();
+		public bool PreviousSendHasError { get; set; }
 	}
 
 	internal class Config : IConfig
@@ -44,6 +45,7 @@ namespace CourseToolHotReloader
 		public Dictionary<string, string> CourseIds { get; set; }
 		public List<string> ExcludeCriterias { get; set; }
 		public string JwtToken { get; set; }
+		public bool PreviousSendHasError { get; set; }
 
 		public string CourseId
 		{

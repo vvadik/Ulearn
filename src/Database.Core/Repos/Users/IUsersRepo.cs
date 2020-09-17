@@ -24,6 +24,7 @@ namespace Database.Repos.Users
 		Task<List<ApplicationUser>> GetUsersByIdsAsync(IEnumerable<string> usersIds);
 		Task DeleteUserAsync(ApplicationUser user);
 		bool IsSystemAdministrator(ApplicationUser user);
+		Task<bool> IsSystemAdministrator(string userId);
 		Task<List<string>> GetUserIdsWithLmsRoleAsync(LmsRoleType lmsRole);
 		Task<List<string>> FindUsersBySocialProviderKeyAsync(string providerKey);
 	}

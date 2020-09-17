@@ -3,32 +3,15 @@
 @rootZIndex: @asideZIndex;
 @contentHeight: calc(100vh - @headerHeight);
 
-.root {
-  position: fixed;
-  width: @navigationMenuWidth;
-  max-width: @navigationMenuWidth;
-  max-height: calc(100vh - @headerHeight);
-
-  top: calc(@headerHeight);
-  left: -2 * @navigationMenuWidth;
-
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.06);
-
-  flex-shrink: 0;
-  z-index: @rootZIndex;
-  transition: left 300ms ease-in-out;
-}
-
 :global {
   .open :local {
-    .root {
-      left: 0;
+    .contentWrapper {
+      transform: translateX(0);
     }
 
     .overlay {
+      visibility: visible;
       opacity: 1;
-      left: 0;
-      right: 0;
     }
   }
 }
@@ -39,27 +22,40 @@
 
 .overlay {
   position: fixed;
-  z-index: -1;
+  width: 100%;
+  height: calc(100vh - @headerHeight);
 
-  left: 100vw;
   top: @headerHeight;
-  bottom: 0;
-  right: 0;
+  left: 0;
+  z-index: @rootZIndex;
 
+  cursor: pointer;
+
+  visibility: hidden;
+
+  will-change: opacity;
   opacity: 0;
-
-  transition: opacity 300ms ease-in-out;
+  transition: opacity 150ms ease 0s;
 
   background-color: rgba(51, 51, 51, 0.8);
 }
 
 .contentWrapper {
+  display: flex;
+  flex-direction: column;
+
+  position: fixed;
+  z-index: @rootZIndex;
   width: @navigationMenuWidth;
 
   overflow-y: auto;
   height: @contentHeight;
   max-height: @contentHeight;
   background: #ffffff;
+
+  transform: translateX(-@navigationMenuWidth);
+  will-change: transform;
+  transition: transform 300ms ease 0s;
 }
 
 @media (min-width: @minLaptopWidth) {
@@ -75,6 +71,8 @@
   .contentWrapper {
     bottom: auto;
     max-height: calc(100vh - @headerHeight);
+    transform: translateX(0);
+    transition: none;
   }
 }
 

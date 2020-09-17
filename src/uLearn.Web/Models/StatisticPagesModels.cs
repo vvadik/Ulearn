@@ -64,7 +64,7 @@ namespace uLearn.Web.Models
 		{
 			var unitScoringGroup = unit.Scoring.Groups.Values.FirstOrDefault(g => g.Id == scoringGroup.Id);
 			var maxAdditionalScore = unitScoringGroup != null && unitScoringGroup.CanBeSetByInstructor ? unitScoringGroup.MaxAdditionalScore : 0;
-			return unit.Slides.Where(s => s.ScoringGroup == scoringGroup.Id).Sum(s => s.MaxScore) + maxAdditionalScore;
+			return unit.GetSlides(false).Where(s => s.ScoringGroup == scoringGroup.Id).Sum(s => s.MaxScore) + maxAdditionalScore;
 		}
 
 		public int GetTotalScoreForUserInUnitByScoringGroup(string userId, Unit unit, ScoringGroup scoringGroup)

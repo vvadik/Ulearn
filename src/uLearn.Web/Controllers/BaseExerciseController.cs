@@ -169,7 +169,7 @@ namespace uLearn.Web.Controllers
 			var userId = submission.User.Id;
 			var courseId = submission.CourseId;
 			var course = courseManager.GetCourse(courseId);
-			var exerciseSlide = course.FindSlideById(submission.SlideId) as ExerciseSlide;
+			var exerciseSlide = course.FindSlideById(submission.SlideId, true) as ExerciseSlide; // SlideId проверен в вызывающем методе 
 			if (exerciseSlide == null)
 				return false;
 			var exerciseMetricId = GetExerciseMetricId(courseId, exerciseSlide);
@@ -199,7 +199,7 @@ namespace uLearn.Web.Controllers
 			return sendToReview;
 		}
 
-		private static string GetExerciseMetricId(string courseId, ExerciseSlide exerciseSlide)
+		public static string GetExerciseMetricId(string courseId, ExerciseSlide exerciseSlide)
 		{
 			var slideTitleForMetric = exerciseSlide.LatinTitle.Replace(".", "_").ToLower(CultureInfo.InvariantCulture);
 			if (slideTitleForMetric.Length > 25)

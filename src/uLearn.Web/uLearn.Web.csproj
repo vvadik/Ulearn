@@ -161,8 +161,9 @@
     <Reference Include="Microsoft.AspNet.Identity.EntityFramework, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.2\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.AspNet.Identity.Owin, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.2\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
+    <Reference Include="Microsoft.AspNet.Identity.Owin, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.3\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.AspNetCore.Authentication.Abstractions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNetCore.Authentication.Abstractions.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Authentication.Abstractions.dll</HintPath>
@@ -353,26 +354,32 @@
     <Reference Include="Microsoft.Net.Http.Headers, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Net.Http.Headers.2.2.0\lib\netstandard2.0\Microsoft.Net.Http.Headers.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Owin, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.4.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
+    <Reference Include="Microsoft.Owin, Version=4.1.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <HintPath>..\packages\Microsoft.Owin.4.1.1\lib\net45\Microsoft.Owin.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.4.0.1\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+    <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=4.1.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.4.1.1\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Owin.Security, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.Security.4.0.1\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    <Reference Include="Microsoft.Owin.Security, Version=4.1.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <HintPath>..\packages\Microsoft.Owin.Security.4.1.1\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Owin.Security.Cookies, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.Security.Cookies.4.0.1\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
+    <Reference Include="Microsoft.Owin.Security.Cookies, Version=4.1.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <HintPath>..\packages\Microsoft.Owin.Security.Cookies.4.1.1\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Owin.Security.Interop, Version=2.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.Security.Interop.2.1.2\lib\net461\Microsoft.Owin.Security.Interop.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Owin.Security.OAuth, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.Security.OAuth.4.0.1\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
+    <Reference Include="Microsoft.Owin.Security.OAuth, Version=4.1.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <HintPath>..\packages\Microsoft.Owin.Security.OAuth.4.1.1\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Owin.Security.OpenIdConnect, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.Security.OpenIdConnect.4.0.1\lib\net45\Microsoft.Owin.Security.OpenIdConnect.dll</HintPath>
+    <Reference Include="Microsoft.Owin.Security.OpenIdConnect, Version=4.1.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <HintPath>..\packages\Microsoft.Owin.Security.OpenIdConnect.4.1.1\lib\net45\Microsoft.Owin.Security.OpenIdConnect.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Threading.Tasks, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.dll</HintPath>
@@ -721,6 +728,9 @@
     <Compile Include="App_Start\ErrorLogModule.cs" />
     <Compile Include="App_Start\GraphiteMetricsPipeStart.cs" />
     <Compile Include="App_Start\RazorGeneratorMvcStart.cs" />
+    <Compile Include="App_Start\SameSite\BrowserDetection.cs" />
+    <Compile Include="App_Start\SameSite\SameSiteCookieManager.cs" />
+    <Compile Include="App_Start\SameSite\SameSiteCookieRewriter.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="CertificateGenerator.cs" />
     <Compile Include="Clients\UlearnVideoAnnotationsClient.cs" />
@@ -802,7 +812,6 @@
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\AnalyticsController.cs" />
     <Compile Include="Controllers\QuizController.cs" />
-    <Compile Include="Controllers\SlideNavigationController.cs" />
     <Compile Include="Controllers\ExerciseController.cs" />
     <Compile Include="Controllers\HintController.cs" />
     <Compile Include="Controllers\VisitsController.cs" />
@@ -1326,7 +1335,6 @@
     <Content Include="Scripts\style-errors-settings.js" />
     <Content Include="Scripts\tooltips.js" />
     <Content Include="Scripts\suggest-mail-notifications.js" />
-    <Content Include="Scripts\email-is-not-confirmed.js" />
     <Content Include="Scripts\users-list.js" />
     <Content Include="tablesorter-master\.gitattributes" />
     <Content Include="tablesorter-master\.gitignore" />
@@ -1571,7 +1579,6 @@
     <Content Include="Views\Grader\Submissions.cshtml" />
     <Content Include="Views\Notifications\SuggestMailTransport.cshtml" />
     <Content Include="Views\Notifications\Settings.cshtml" />
-    <Content Include="Views\Account\EmailIsNotConfirmedPopup.cshtml" />
     <Content Include="Views\Feed\NotificationsTopbarPartial.cshtml" />
     <Content Include="Views\Feed\NotificationsPartial.cshtml" />
     <Content Include="Views\Login\LinkLogin.cshtml" />

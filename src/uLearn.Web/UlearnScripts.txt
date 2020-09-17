@@ -16,7 +16,6 @@ Scripts\forms.replace-action.js
 Scripts\grader.js
 Scripts\notifications-settings.js
 Scripts\profile.js
-Scripts\email-is-not-confirmed.js
 Scripts\notifications.js
 Scripts\stepik.js
 Scripts\modals.js

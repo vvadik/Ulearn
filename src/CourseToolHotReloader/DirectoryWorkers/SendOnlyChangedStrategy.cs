@@ -19,7 +19,12 @@ namespace CourseToolHotReloader.DirectoryWorkers
 		{
 			this.courseUpdateQuery = courseUpdateQuery;
 			this.config = config;
-			debouncedSendUpdates = ActionHelper.Debounce(() => courseUpdateSender.SendCourseUpdates());
+			debouncedSendUpdates = ActionHelper.Debounce(() =>
+			{
+				if (config.PreviousSendHasError)
+					courseUpdateSender.SendFullCourse();
+				courseUpdateSender.SendCourseUpdates();
+			});
 		}
 
 		public void Renamed(object sender, RenamedEventArgs e)

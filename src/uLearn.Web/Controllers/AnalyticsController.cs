@@ -90,7 +90,8 @@ namespace uLearn.Web.Controllers
 			if (selectedUnit == null)
 				return HttpNotFound();
 
-			var slides = selectedUnit.Slides;
+			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
+			var slides = selectedUnit.GetSlides(isInstructor);
 			var slidesIds = slides.Select(s => s.Id).ToList();
 
 			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
@@ -456,7 +457,7 @@ namespace uLearn.Web.Controllers
 			var visibleUnitsIds = unitsRepo.GetVisibleUnitIds(course, User);
 			var visibleUnits = course.GetUnits(visibleUnitsIds);
 
-			var slidesIds = visibleUnits.SelectMany(u => u.Slides.Select(s => s.Id)).ToHashSet();
+			var slidesIds = visibleUnits.SelectMany(u => u.GetSlides(isInstructor).Select(s => s.Id)).ToHashSet();
 
 			var filterOptions = ControllerUtils.GetFilterOptionsByGroup<VisitsFilterOptions>(groupsRepo, User, courseId, groupsIds, allowSeeGroupForAnyMember: true);
 			filterOptions.PeriodStart = periodStart;
@@ -472,7 +473,7 @@ namespace uLearn.Web.Controllers
 			var visitedUsers = GetUnitStatisticUserInfos(usersIds);
 			var isMore = visitedUsers.Count > usersLimit;
 
-			var unitBySlide = visibleUnits.SelectMany(u => u.Slides.Select(s => Tuple.Create(u.Id, s.Id))).ToDictionary(p => p.Item2, p => p.Item1);
+			var unitBySlide = visibleUnits.SelectMany(u => u.GetSlides(isInstructor).Select(s => Tuple.Create(u.Id, s.Id))).ToDictionary(p => p.Item2, p => p.Item1);
 			var scoringGroups = course.Settings.Scoring.Groups;
 
 			var totalScoreByUserAllTime = GetTotalScoreByUserAllTime(filterOptions);
@@ -484,14 +485,14 @@ namespace uLearn.Web.Controllers
 				.ToList();
 			var visitedUsersIds = visitedUsers.Select(v => v.UserId).ToList();
 
-			var visitedUsersGroups = groupsRepo.GetUsersGroupsIds(new List<string> { courseId }, visitedUsersIds, User, 10).ToDefaultDictionary();
+			var visitedUsersGroups = groupsRepo.GetUsersActualGroupsIds(new List<string> { courseId }, visitedUsersIds, User, 10).ToDefaultDictionary();
 
 			/* From now fetch only filtered users' statistics */
 			filterOptions.UserIds = visitedUsersIds;
 			filterOptions.IsUserIdsSupplement = false;
 			var scoreByUserUnitScoringGroup = GetScoreByUserUnitScoringGroup(filterOptions, slidesIds, unitBySlide, course);
 
-			var shouldBeSolvedSlides = visibleUnits.SelectMany(u => u.Slides).Where(s => s.ShouldBeSolved).ToList();
+			var shouldBeSolvedSlides = visibleUnits.SelectMany(u => u.GetSlides(isInstructor)).Where(s => s.ShouldBeSolved).ToList();
 			var shouldBeSolvedSlidesIds = shouldBeSolvedSlides.Select(s => s.Id).ToList();
 			var shouldBeSolvedSlidesByUnitScoringGroup = GetShouldBeSolvedSlidesByUnitScoringGroup(shouldBeSolvedSlides, unitBySlide);
 			var scoreByUserAndSlide = GetScoreByUserAndSlide(filterOptions, shouldBeSolvedSlidesIds);
@@ -579,7 +580,7 @@ namespace uLearn.Web.Controllers
 				.Select(v => new { v.UserId, v.SlideId, v.Score })
 				.AsEnumerable()
 				.Where(v => slides.Contains(v.SlideId))
-				.GroupBy(v => Tuple.Create(v.UserId, unitBySlide[v.SlideId], course.FindSlideById(v.SlideId)?.ScoringGroup))
+				.GroupBy(v => Tuple.Create(v.UserId, unitBySlide[v.SlideId], course.FindSlideById(v.SlideId, true)?.ScoringGroup))
 				.ToDictionary(g => g.Key, g => g.Sum(v => v.Score))
 				.ToDefaultDictionary();
 		}
@@ -607,7 +608,7 @@ namespace uLearn.Web.Controllers
 			if (unit == null)
 				return HttpNotFound();
 
-			var slides = unit.Slides;
+			var slides = unit.GetSlides(true);
 			var exercises = slides.OfType<ExerciseSlide>().ToList();
 			var acceptedSubmissions = userSolutionsRepo
 				.GetAllAcceptedSubmissionsByUser(courseId, exercises.Select(s => s.Id), userId)
@@ -648,14 +649,14 @@ namespace uLearn.Web.Controllers
 			var course = courseManager.FindCourse(courseId);
 			if (course == null)
 				return HttpNotFound();
-			var slide = course.FindSlideById(slideId);
+			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
+			var slide = course.FindSlideById(slideId, isInstructor);
 			var exerciseBlock = slide?.Blocks.OfType<AbstractExerciseBlock>().FirstOrDefault();
 			if (exerciseBlock == null)
 				return HttpNotFound();
 			var smallPointsIsBetter = exerciseBlock.SmallPointsIsBetter;
 			
 			var currentUserId = User.Identity.GetUserId();
-			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
 			var isAdministrator = User.HasAccessFor(courseId, CourseRole.CourseAdmin);
 			var isStudent = !isInstructor;
 
@@ -755,7 +756,7 @@ namespace uLearn.Web.Controllers
 			if (unit == null)
 				return HttpNotFound();
 
-			var slides = unit.Slides.ToArray();
+			var slides = unit.GetSlides(true).ToArray();
 			var model = GetSlideRateStats(course, slides);
 			return PartialView(model);
 		}
@@ -771,7 +772,7 @@ namespace uLearn.Web.Controllers
 				var unit = course.FindUnitByIdNotSafe(unitId.Value);
 				if (unit == null)
 					return HttpNotFound();
-				slides = unit.Slides.ToArray();
+				slides = unit.GetSlides(true).ToArray();
 			}
 
 			var model = GetDailyStatistics(slides);
@@ -791,13 +792,13 @@ namespace uLearn.Web.Controllers
 			var unit = course.FindUnitByIdNotSafe(unitId);
 			if (unit == null)
 				return HttpNotFound();
-			var slides = unit.Slides.ToArray();
+			var slides = unit.GetSlides(true).ToArray();
 			var users = GetUserInfos(courseId, slides, periodStart).OrderByDescending(GetRating).ToArray();
 			return PartialView(new UserProgressViewModel
 			{
 				Slides = slides,
 				Users = users,
-				GroupsNames = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, users.Select(u => u.UserId), User),
+				GroupsNames = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, users.Select(u => u.UserId), User, actual: true, archived: false),
 				CourseId = courseId
 			});
 		}
@@ -956,7 +957,7 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 
 			var course = courseManager.GetCourse(courseId);
-			var slide = course.FindSlideById(slideId) as ExerciseSlide;
+			var slide = course.FindSlideById(slideId, true) as ExerciseSlide;
 			if (slide == null)
 				return RedirectToAction("CourseInfo", "Account", new { userId = userId, courseId });
 
@@ -964,7 +965,7 @@ namespace uLearn.Web.Controllers
 			{
 				User = user,
 				Course = course,
-				GroupsNames = groupsRepo.GetUserGroupsNamesAsString(course.Id, userId, User),
+				GroupsNames = groupsRepo.GetUserGroupsNamesAsString(course.Id, userId, User, actual: true, archived: false),
 				Slide = slide,
 				SubmissionId = version
 			};

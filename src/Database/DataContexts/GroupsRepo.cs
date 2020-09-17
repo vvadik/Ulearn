@@ -259,7 +259,7 @@ namespace Database.DataContexts
 					var lastSubmission = acceptedSubmissionsForSlide.OrderByDescending(s => s.Timestamp).First();
 
 					var slideId = lastSubmission.SlideId;
-					var slide = course.FindSlideById(slideId) as ExerciseSlide;
+					var slide = course.FindSlideById(slideId, false) as ExerciseSlide;
 					if (slide == null || !slide.Scoring.RequireReview)
 						continue;
 
@@ -272,7 +272,7 @@ namespace Database.DataContexts
 			var passedQuizzesIds = userQuizzesRepo.GetPassedSlideIds(courseId, userId);
 			foreach (var quizSlideId in passedQuizzesIds)
 			{
-				var slide = course.FindSlideById(quizSlideId) as QuizSlide;
+				var slide = course.FindSlideById(quizSlideId, false) as QuizSlide;
 				if (slide == null || !slide.ManualChecking)
 					continue;
 				if (!userQuizzesRepo.IsWaitingForManualCheck(courseId, quizSlideId, userId))
@@ -443,7 +443,7 @@ namespace Database.DataContexts
 			return members.Select(m => m.UserId).Contains(studentId);
 		}
 
-		public Dictionary<string, List<Group>> GetUsersGroups(List<string> courseIds, IEnumerable<string> userIds, IPrincipal currentUser, int maxCount = 3, bool actual = true, bool archived = false)
+		public Dictionary<string, List<Group>> GetUsersGroups(List<string> courseIds, IEnumerable<string> userIds, IPrincipal currentUser, bool actual, bool archived, int maxCount = 3)
 		{
 			var canSeeAllGroups = courseIds.ToDictSafe(c => c.ToLower(), c => CanUserSeeAllCourseGroups(currentUser, c));
 			var currentUserId = currentUser.Identity.GetUserId();
@@ -460,14 +460,7 @@ namespace Database.DataContexts
 					kv => kv.Value.Select(m => m.Group)
 						.Distinct()
 						.Where(g => (g.OwnerId == currentUserId || groupsWithAccess.Contains(g.Id) || canSeeAllGroups[g.CourseId.ToLower()]) && !g.IsDeleted)
-						.Where(g =>
-						{
-							if (actual && !archived)
-								return !g.IsArchived;
-							if (!actual && archived)
-								return g.IsArchived;
-							return true;
-						})
+						.Where(g => actual != g.IsArchived || archived == g.IsArchived)
 						.OrderBy(g => g.OwnerId != currentUserId)
 						.Take(maxCount)
 						.ToList()
@@ -476,47 +469,37 @@ namespace Database.DataContexts
 			return usersGroups;
 		}
 
-		public Dictionary<string, List<string>> GetUsersGroupsNames(List<string> courseIds, IEnumerable<string> userIds, IPrincipal currentUser, int maxCount = 3, bool onlyArchived = false)
-		{
-			var usersGroups = GetUsersGroups(courseIds, userIds, currentUser, maxCount + 1, actual: false, archived: true);
-			return usersGroups.ToDictSafe(
-				kv => kv.Key,
-				kv => kv.Value.Select((g, idx) => idx >= maxCount ? "..." : g.Name.TruncateWithEllipsis(40)).ToList());
-		}
-		
 		public List<string> GetUserGroupsNames(IEnumerable<Group> usersGroups, int maxCount = 3)
 		{
 			return usersGroups.Select((g, idx) => idx >= maxCount ? "..." : g.Name.TruncateWithEllipsis(40)).ToList();
 		}
 
-		public Dictionary<string, List<int>> GetUsersGroupsIds(List<string> courseIds, IEnumerable<string> userIds, IPrincipal currentUser, int maxCount = 3)
+		public Dictionary<string, List<int>> GetUsersActualGroupsIds(List<string> courseIds, IEnumerable<string> userIds, IPrincipal currentUser, int maxCount = 3)
 		{
-			var usersGroups = GetUsersGroups(courseIds, userIds, currentUser, maxCount);
+			var usersGroups = GetUsersGroups(courseIds, userIds, currentUser, actual: true, archived: false, maxCount);
 			return usersGroups.ToDictSafe(
 				kv => kv.Key,
 				kv => kv.Value.Select(g => g.Id).ToList());
 		}
 
-		public Dictionary<string, string> GetUsersGroupsNamesAsStrings(List<string> courseIds, IEnumerable<string> userIds, IPrincipal currentUser, int maxCount = 3, bool onlyArchived = false)
+		public Dictionary<string, string> GetUsersGroupsNamesAsStrings(List<string> courseIds, IEnumerable<string> userIds, IPrincipal currentUser, bool actual, bool archived, int maxCount = 3)
 		{
-			var usersGroups = GetUsersGroupsNames(courseIds, userIds, currentUser, maxCount, onlyArchived);
+			var usersGroups = GetUsersGroups(courseIds, userIds, currentUser, actual, archived, maxCount + 1)
+				.ToDictSafe(
+					kv => kv.Key,
+					kv => kv.Value.Select((g, idx) => idx >= maxCount ? "..." : g.Name.TruncateWithEllipsis(40)).ToList());
 			return usersGroups.ToDictSafe(kv => kv.Key, kv => string.Join(", ", kv.Value));
 		}
 
-		public Dictionary<string, string> GetUsersGroupsNamesAsStrings(string courseId, IEnumerable<string> userIds, IPrincipal currentUser, int maxCount = 3, bool onlyArchived = false)
+		public Dictionary<string, string> GetUsersGroupsNamesAsStrings(string courseId, IEnumerable<string> userIds, IPrincipal currentUser, bool actual, bool archived, int maxCount = 3)
 		{
-			return GetUsersGroupsNamesAsStrings(new List<string> { courseId }, userIds, currentUser, maxCount, onlyArchived);
+			return GetUsersGroupsNamesAsStrings(new List<string> { courseId }, userIds, currentUser, actual, archived, maxCount);
 		}
 
-		public string GetUserGroupsNamesAsString(List<string> courseIds, string userId, IPrincipal currentUser, int maxCount = 3, bool onlyArchived = false)
+		public string GetUserGroupsNamesAsString(string courseId, string userId, IPrincipal currentUser, bool actual, bool archived, int maxCount = 3)
 		{
-			var usersGroups = GetUsersGroupsNamesAsStrings(courseIds, new List<string> { userId }, currentUser, maxCount, onlyArchived);
+			var usersGroups = GetUsersGroupsNamesAsStrings(new List<string> { courseId }, new List<string> { userId }, currentUser, actual, archived, maxCount);
 			return usersGroups.GetOrDefault(userId, "");
-		}
-
-		public string GetUserGroupsNamesAsString(string courseId, string userId, IPrincipal currentUser, int maxCount = 3, bool onlyArchived = false)
-		{
-			return GetUserGroupsNamesAsString(new List<string> { courseId }, userId, currentUser, maxCount, onlyArchived);
 		}
 
 		public async Task EnableInviteLink(int groupId, bool isEnabled)

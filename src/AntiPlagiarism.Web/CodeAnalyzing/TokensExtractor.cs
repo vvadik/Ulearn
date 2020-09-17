@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -47,13 +48,13 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			var pygmentizeResult = GetPygmentizeResult(codeWithNLineEndings, language);
 			if (pygmentizeResult == null)
 				return null;
-			var tokensWithNLineEndings = ParseTokensFromPygmentize(code, pygmentizeResult).ToList();
+			var tokensWithNLineEndings = ParseTokensFromPygmentize(pygmentizeResult).ToList();
 			var tokens = ReturnOriginalLineEndings(tokensWithNLineEndings, originalLineEndings).ToList();
 			SetPositions(tokens);
 			return tokens;
 		}
 
-		private IEnumerable<Token> ParseTokensFromPygmentize(string code, string pygmentizeResult)
+		private IEnumerable<Token> ParseTokensFromPygmentize(string pygmentizeResult)
 		{
 			var lines = pygmentizeResult.TrimEnd().SplitToLines();
 			for (var i = 0; i < lines.Length; i++)
@@ -143,17 +144,19 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 		{
 			var lexer = language.GetAttribute<LexerAttribute>().lexer;
 			var arguments = lexer == null ? "-g" : $"-l {lexer}";
-			arguments += " -f tokens";
+			arguments += " -f tokens -O encoding=utf-8";
 
 			var sw = Stopwatch.StartNew();
 			using (var process = BuildProcess(arguments))
 			{
 				process.Start();
 				const int limit = 10 * 1024 * 1024;
-				var readErrTask = new AsyncReader(process.StandardError, limit).GetDataAsync();
-				var readOutTask = new AsyncReader(process.StandardOutput, limit).GetDataAsync();
-				process.StandardInput.Write(code);
-				process.StandardInput.Close();
+				var utf8StandardErrorReader = new StreamReader(process.StandardError.BaseStream, Encoding.UTF8);
+				var utf8StandardOutputReader = new StreamReader(process.StandardOutput.BaseStream, Encoding.UTF8);
+				var readErrTask = new AsyncReader(utf8StandardErrorReader, limit).GetDataAsync();
+				var readOutTask = new AsyncReader(utf8StandardOutputReader, limit).GetDataAsync();
+				process.StandardInput.BaseStream.Write(Encoding.UTF8.GetBytes(code));
+				process.StandardInput.BaseStream.Close();
 				var isFinished = Task.WaitAll(new Task[] { readErrTask, readOutTask }, 1000);
 				var ms = sw.ElapsedMilliseconds;
 

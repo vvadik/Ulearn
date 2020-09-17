@@ -1,10 +1,6 @@
-FROM node:13-alpine
+FROM node:14-alpine
 
 RUN apk update && apk upgrade
-
-RUN npm install --unsafe-perm --global full-icu
-
-ENV NODE_ICU_DATA="/usr/local/lib/node_modules/full-icu"
 
 # Add new user for sandbox
 RUN addgroup -S student && adduser -S -g student student \
@@ -21,4 +17,4 @@ WORKDIR app
 USER student
 
 # Install deps for tests.
-RUN yarn
+RUN npm ci

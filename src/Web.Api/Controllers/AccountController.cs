@@ -80,19 +80,22 @@ namespace Ulearn.Web.Api.Controllers
 			if (string.IsNullOrEmpty(user.Email))
 				problems.Add(new AccountProblem(
 					"Не указана эл. почта",
-					"Укажите в профиле электронную почту, чтобы получать уведомления и восстановить доступ в случае утери пароля"
+					"Укажите в профиле электронную почту, чтобы получать уведомления и восстановить доступ в случае утери пароля",
+					"noEmail"
 				));
 			if (!string.IsNullOrEmpty(user.Email) && !user.EmailConfirmed)
 				problems.Add(new AccountProblem(
 					"Эл. почта не подтверждена",
-					"Подтвердите в профиле электронную почту, чтобы получать уведомления и восстановить доступ в случае утери пароля"
+					"Подтвердите в профиле электронную почту, чтобы получать уведомления и восстановить доступ в случае утери пароля",
+					"emailNotConfirmed"
 				));
 
 			var isInstructor = await courseRolesRepo.HasUserAccessToAnyCourseAsync(user.Id, CourseRoleType.Instructor).ConfigureAwait(false);
 			if (isInstructor && (string.IsNullOrEmpty(user.FirstName) || string.IsNullOrEmpty(user.LastName)))
 				problems.Add(new AccountProblem(
 					"Не указаны имя или фамилия",
-					"Укажите в профиле имя и фамилию, чтобы студентам было проще с вами работать"
+					"Укажите в профиле имя и фамилию, чтобы студентам было проще с вами работать",
+					"noName"
 				));
 
 			return problems;
@@ -114,7 +117,6 @@ namespace Ulearn.Web.Api.Controllers
 		/// Получить ключ на пользователя на заданныей срок в днях
 		/// </summary>
 		[HttpPost("api-token")]
-		[ApiExplorerSettings(IgnoreApi = true)]
 		[Authorize]
 		public async Task<ActionResult<TokenResponse>> ApiToken([FromQuery] int days)
 		{

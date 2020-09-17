@@ -46,16 +46,55 @@ class Slide extends React.Component {
 	}
 
 	render = () => {
-		const { slideBlocks, } = this.props;
+		const { slideBlocks, showHiddenBlocks, isHiddenSlide, } = this.props;
 
 		if(!slideBlocks) {
 			return (<CourseLoader/>);
 		}
 
-		return this.renderSlideBlocks(JSON.parse(JSON.stringify(slideBlocks)));
+		if(showHiddenBlocks) {
+			return this.renderSlideBlocks(JSON.parse(JSON.stringify(slideBlocks)), isHiddenSlide);
+		}
+
+		if(isHiddenSlide) {
+			return this.renderHiddenSlide();
+		}
+
+		const slideBlocksForStudent = this.getSlidBlocksForStudents(slideBlocks);
+
+
+		if(slideBlocksForStudent.length === 0) {
+			return this.renderHiddenSlide();
+		}
+
+		return this.renderSlideBlocks(JSON.parse(JSON.stringify(slideBlocksForStudent)), isHiddenSlide);
 	}
 
-	renderSlideBlocks = (slideBlocks) => {
+	getSlidBlocksForStudents = (blocks) => {
+		const slideBlocksForStudent = [];
+
+		for (const block of blocks) {
+			if(block.hide) {
+				continue;
+			}
+			if(block.type === blockTypes.spoiler) {
+				this.filterSpoilerBlocksForStudents(block);
+			}
+
+			slideBlocksForStudent.push(block);
+		}
+
+		return slideBlocksForStudent;
+	}
+
+	filterSpoilerBlocksForStudents = (spoiler) => {
+		spoiler.blocks = spoiler.blocks.filter(b => !b.hide);
+		for (const insideSpoiler of spoiler.blocks.filter(b => b.type === blockTypes.spoiler)) {
+			this.filterSpoilerBlocksForStudents(insideSpoiler);
+		}
+	}
+
+	renderSlideBlocks = (slideBlocks, isHiddenSlide) => {
 		this.addAdditionalPropsToBlocks(slideBlocks);
 		const blocksPacks = [];
 
@@ -65,18 +104,28 @@ class Slide extends React.Component {
 			i += blocksPart.blocks.length - 1;
 			blocksPacks.push(blocksPart);
 		}
-
+		const onlyOneBlock = blocksPacks.length === 1;
 		return blocksPacks.map(({ blocks, hide, fullSizeBlocksPack }, i) => {
 			return (
 				<BlocksWrapper isContainer={ fullSizeBlocksPack }
 							   key={ i }
-							   isBlock={ blocksPacks.length !== 1 }
+							   showEyeHint={ !fullSizeBlocksPack }
+							   isBlock={ !onlyOneBlock }
 							   isHidden={ hide }
-							   showEyeHint={!fullSizeBlocksPack}>
+							   isHeaderOfHiddenSlide={ i === 0 && isHiddenSlide }
+				>
 					{ blocks.map(this.mapBlockToComponent) }
 				</BlocksWrapper>
 			)
 		});
+	}
+
+	renderHiddenSlide = () => {
+		return (
+			<BlocksWrapper>
+				<p>Студенты не увидят этот слайд в навигации</p>
+			</BlocksWrapper>
+		);
 	}
 
 	addAdditionalPropsToBlocks = (slideBlocks) => {
@@ -109,12 +158,21 @@ class Slide extends React.Component {
 
 		for (const spoiler of slideBlocks.filter(b => b.type === blockTypes.spoiler)) {
 			const index = slideBlocks.findIndex(b => b === spoiler);
-			spoiler.blocksId = this.props.slideId; // make spoiler close content on slide change
+			const { slideId, isHiddenSlide, } = this.props;
+
+			spoiler.blocksId = slideId; // make spoiler close content on slide change
 			spoiler.isHidden = spoiler.hide;
 			if(index !== 0) {
-				spoiler.isPreviousBlockHidden = slideBlocks[index - 1].hide;
+				spoiler.isPreviousBlockHidden = slideBlocks[index - 1].hide || false;
+			} else if(isHiddenSlide) {
+				spoiler.isHeaderOfHiddenSlide = true;
 			}
-			spoiler.blocks = this.renderSlideBlocks(JSON.parse(JSON.stringify(spoiler.blocks))); // prerender content
+			if(spoiler.isHidden) {
+				const blocksInHiddenSpoiler = spoiler.blocks.map(b => ({ ...b, hide: true }));
+				spoiler.blocks = this.renderSlideBlocks(JSON.parse(JSON.stringify(blocksInHiddenSpoiler)));
+			} else {
+				spoiler.blocks = this.renderSlideBlocks(JSON.parse(JSON.stringify(spoiler.blocks)));
+			}
 		}
 	}
 
@@ -161,7 +219,13 @@ Slide.propTypes = {
 	slideBlocks: PropTypes.array,
 	slideLoading: PropTypes.bool.isRequired,
 	loadSlide: PropTypes.func.isRequired,
+	showHiddenBlocks: PropTypes.bool,
+	isHiddenSlide: PropTypes.bool,
 };
+
+Slide.defaultProps = {
+	showHiddenBlocks: true,
+}
 
 const mapStateToProps = (state, { courseId, slideId, }) => {
 	const { slides } = state;

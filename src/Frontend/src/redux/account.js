@@ -5,6 +5,7 @@ import {
 } from "src/consts/actions";
 
 const initialAccountState = {
+	accountLoaded: false,
 	isAuthenticated: false,
 	isSystemAdministrator: false,
 	accountProblems: [],
@@ -12,6 +13,7 @@ const initialAccountState = {
 	roleByCourse: {},
 	accessesByCourse: {},
 	groupsAsStudent: [],
+	gender: null,
 	isHijacked: false,
 };
 
@@ -20,6 +22,7 @@ function account(state = initialAccountState, action) {
 		case ACCOUNT__USER_INFO_UPDATED:
 			let newState = { ...state };
 			newState.isAuthenticated = action.isAuthenticated;
+			newState.accountLoaded = true;
 			if(newState.isAuthenticated) {
 				newState.id = action.id;
 				newState.login = action.login;
@@ -29,6 +32,7 @@ function account(state = initialAccountState, action) {
 				newState.avatarUrl = action.avatarUrl;
 				newState.accountProblems = action.accountProblems;
 				newState.systemAccesses = action.systemAccesses;
+				newState.gender = action.gender;
 			}
 			return newState;
 		case ACCOUNT__USER_ROLES_UPDATED:

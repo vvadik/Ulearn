@@ -37,7 +37,7 @@ namespace Database.Repos
 		List<AcceptedSolutionInfo> GetBestTrendingAndNewAcceptedSolutions(string courseId, Guid slideId);
 		int GetAcceptedSolutionsCount(string courseId, Guid slideId);
 		bool IsCheckingSubmissionByUser(string courseId, Guid slideId, string userId, DateTime periodStart, DateTime periodFinish);
-		HashSet<Guid> GetIdOfPassedSlides(string courseId, string userId);
+		Task<HashSet<Guid>> GetIdOfPassedSlidesAsync(string courseId, string userId);
 		IQueryable<UserExerciseSubmission> GetAllSubmissions(int max, int skip);
 		UserExerciseSubmission FindNoTrackingSubmission(int id);
 		UserExerciseSubmission FindSubmissionById(int id);

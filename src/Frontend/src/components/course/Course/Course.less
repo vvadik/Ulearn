@@ -29,6 +29,7 @@
 .title {
   margin-top: 0;
   margin-bottom: 16px;
+  word-break: break-all;
 
   text-align: center;
 
@@ -43,6 +44,22 @@
   margin-bottom: 15px;
   overflow: hidden;
   background-color: @white;
+}
+
+.forStudents {
+  :global { //we're hiding all hidden blocks and statistics in legacy page using styles
+    .student-submissions { //exercise solutions table
+      display: none;
+    }
+
+    .quiz__statistics { //quiz statistics
+      display: none ! important; //overriding bootstrap behaviour
+    }
+
+    .revealed { //hidden block
+      display: none;
+    }
+  }
 }
 
 .navigationButtonsWrapper {

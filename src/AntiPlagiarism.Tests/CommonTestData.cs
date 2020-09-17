@@ -10,7 +10,7 @@ using System.Text;
 namespace HelloWorld.Namespace
 {
 	/* 
-	comment
+	Комментарий
 	*/
 	class Program
 	{

@@ -1,18 +1,20 @@
-Привет.
-Это краткий документ о том, как устроена сборка фронта.
+Это краткий документ о том, как устроен фронт.
 
-Имеется 3 типа сборки : development, production, courseTool. У каждого типа свой конфиг webpack-а
-Запуск Node-ом описан в файлах в папке scripts. В dev режиме запускается dev server для работы в браузере, подключается HMR
+### Сборки и конфиги
+
+Имеется 3 типа сборки: development, production, courseTool. У каждого типа свой конфиг webpack-а.
+
+Запуск Node-ом описан в файлах в папке scripts. В dev режиме запускается dev server для работы в браузере, подключается HMR.
 
     "start": "node scripts/start.js", -- dev
     "build": "node scripts/build.js", -- prod
     "courseToolBuild": "node scripts/courseToolBuild.js", -- courseTool
     
-Конфиги webpack описаны в папке config ( webpack.config.(dev||prod||courseTool) ). 
-Имеется базовый конфиг webpack.config.base, в котором описаны alias-ы ( они нужны, чтобы вместо @skbkontur/react-ui писать ui)
-Так же в этой папке имеются конфиги полифилов, сентри и т.д.
+Конфиги webpack описаны в папке config (webpack.config.(dev||prod||courseTool)). 
+Имеется базовый конфиг webpack.config.base, в котором описаны alias-ы (они нужны, чтобы вместо @skbkontur/react-ui писать ui).
+Так же в этой папке имеются конфиги полифилов, сентри (логгирование ошибок) и т.д.
     
-Имеются допольнительные возможности
+Имеются дополнительные возможности.
     
     "analyze": "node scripts/build.js analyze", -- запуст production с bundleAnalyzer, для анализа сборки
     "test": "jest", -- запуск тестов
@@ -21,30 +23,89 @@
 Настройки бабеля находятся в ./babel.config.js
 
 
-**Немного о том, как устроена взаимосвязь сервер - клиент**
+### Взаимодействие сервер-клиент
 
-Сервер, как и запросы, разделен на 2 части : Api и Web. 
+Имеется 2 проекта на бэке, от которых зависит фронт: Api и Web. 
 
-Api отвечает за работу базы данных и тд (имеет адрес http:[::]:8000, api.ulearn.me)
+Api отвечает за работу базы данных, запросы на ручки и тд (имеет адрес http:[::]:8000, api.ulearn.me).
 
-Web запускает скрипт build, берет полученную (статичную) сборку, и отдает её на запросы в браузере.
-Также отвечает за рендер cshtml страниц (https:[::]:44300, http://localhost:53834/, ulearn.me)
+Web запускает скрипт build.js, берет полученную (статичную) сборку, и отдает её на запросы в браузере.
+Также отвечает за рендер cshtml страниц (https:[::]:44300, http://localhost:53834/, ulearn.me).
 
-У фронта же есть dev server (http:[::]:3000)
+У фронта же есть dev server (http:[::]:3000).
 
-Работа на боевом сервере: любой запрос либо страничка, либо api.
-В первом случае домен не меняется, во втором отправляется запрос на api
+Легаси страницы и index.html с бандлами скриптов, отдает web.
+Всю нужную информацию, авторизацию получаем от api.
 
-DevServer: html формируется по webpack.config.dev, отдается по любому адресу
-далее любой обычный запрос прокситься на web(44300). а api запрос отправляется по 8000 адресу
+### Как работает DevServer
 
-api адрес находится в window.config
+В оперативную память кладется сборка, которая получается в скрипте webpack.config.dev.
+хоститься веб на [::]:3000, при любом запросе на этот адресс (localhost:3000, localhost:3000/123/123 и т.д.)
+отдается index.html с бандлами скриптов (в общем заменяет web).
+Далее, если нужна легаси страница, запрос прокситься на web(44300).
+А api запрос отправляется по 8000 адресу, который мы получаем из window.config.
 
-На боевом это пропишет сервер ( когда будет возвращать html )
+На боевом это пропишет сервер в теге script (когда будет возвращать index.html).
+
+```
 window.config={
   "api": {
     "endpoint": "https://api.ulearn.me/"
   }
 }
-на локале это прописано в src/config.js ( он берет адресс из settings.json)
+```
 
+на локале это прописано в src/config.js (он берет адресс из settings.json).
+
+### Структура фронта
+
+Входная точка - можно сказать, что это app.js (index.js просто рендерит эту компоненту и подключает serviceWorker)
+в app.js мы также добавляем отловку ошибок в ErrorBoundary (сюда же можно отнести и 404 страницу :)).
+
+Компоненты находятся в папках src/pages и src/components.
+в pages обычно помещаются не сами компоненты, а их версия с подключением к redux (connect) или react-router-dom (withRouter).
+
+#### Redux и api
+
+В App.js мы создаем redux хранилище, он состоит из мн-ва reducer-ов, их список можно посмотреть в src/redux/reducers. 
+начальное состояние хранилища (дефолтные данные) описаны в разных файлах в папке src/redux
+(например данные об аккаунте в redux/account, данные о курсах в redux/course).
+
+Любые api запросы могут добавлять/изменять/удалять данные хранилища.
+
+Все api запросы описаны в api (они также разбиты на запросы для курсов,аккаунта и тд).
+
+Actions описаны в src/actions.
+
+#### Навигация
+
+Для навигации мы используем react-router-dom, он сверяет адресную строку с паттернами/строками, описанными в router.js
+и рендерит подходящую компоненту, например для пути course/{courseId} отрендериться компонента course.
+
+```
+<Route path="/Admin/Groups" component={redirectLegacyPage("/:courseId/groups")}/>
+
+<Route path="/course/:courseId/:slideSlugOrAction" component={Course}/>
+
+<Route path="/:courseId/groups/" component={GroupListPage} exact/>
+<Route path="/:courseId/groups/:groupId/" component={GroupPage} exact/>
+<Route path="/:courseId/groups/:groupId/:groupPage" component={GroupPage} exact/>
+
+<Route component={AnyPage}/>
+```
+
+### Разные вспомогательные штуки  
+
+Все константы находятся в src/consts.
+
+Имеются вспомогательные функции (перевод в camelCase, склонение слова в зависимости от числа и тд) в src/utils.
+
+в src/codeTranslator имеются функции, которые переводят текст katex и codeMirror.
+
+## Доп информация
+
+Мы подключаем полифилы core-js/stable, regenerator-runtime/runtime, полифил для fetch whatwg-fetch.
+
+Подключаем oldBrowser, которые просит обновить браузер, если он устарел, список поддерживаемых браузеров находиться в .browserlistrc.
+
+Папка build содержит последнюю сборку, полученную из webpack.config.prod (которую забирает web).

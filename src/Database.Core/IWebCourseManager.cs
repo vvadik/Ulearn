@@ -34,12 +34,12 @@ namespace Database
 		bool TryCreateCourse(string courseId, string courseTitle, Guid firstVersionId);
 		void EnsureVersionIsExtracted(Guid versionId);
 		bool HasPackageFor(string courseId);
-		Course FindCourseBySlideById(Guid slideId);
 		void WaitWhileCourseIsLocked(string courseId);
 		void MoveCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory);
 		void ReloadCourse(string courseId);
 		Course ReloadCourseFromDirectory(DirectoryInfo directory);
 		void ExtractTempCourseChanges(string tempCourseId);
 		bool TryCreateTempCourse(string courseId, string courseTitle, Guid firstVersionId);
+		void NotifyCourseChanged(string courseId);
 	}
 }

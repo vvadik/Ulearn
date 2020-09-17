@@ -11,50 +11,195 @@ import CourseNavigationContent from "./Course/CourseNavigationContent";
 import Flashcards from "./Course/Flashcards/Flashcards";
 
 import { courseMenuItemType, menuItemType, groupAsStudentType, progressType } from './types';
-import { flashcards } from "../../../consts/routes";
+import { flashcards } from "src/consts/routes";
 
-import { toggleNavigation } from "../../../actions/navigation";
+import { isMobile, isTablet } from "src/utils/getDeviceType";
+import { toggleNavigation } from "src/actions/navigation";
 
 import styles from './Navigation.less';
+
+const mobileNavigationMenuWidth = 250;//250 is @mobileNavigationMenuWidth, its mobile nav menu width
 
 class Navigation extends Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			windowWidth: window.innerWidth,
+			overlayStyle: null,
+			sideMenuStyle: null,
+			xDown: null,
+			yDown: null,
+			touchListenerAdded: false,
 		}
 	}
 
 	componentDidMount() {
-		window.addEventListener('resize', this.handleWindowSizeChange);
+		document.addEventListener('resize', this.handleWindowSizeChange);
+		this.tryAddTouchListener();
 	}
 
+	isMobileNavigationMenu = () => {
+		return isMobile() || isTablet();
+	}
+
+	tryAddTouchListener = () => {
+		if(this.isMobileNavigationMenu() && !this.state.touchListenerAdded) {
+			document.addEventListener('touchstart', this.handleTouchStart);
+			this.setState({
+				touchListenerAdded: true,
+			})
+		}
+	}
+
+	getTouches = (evt) => {
+		return evt.touches || evt.changedTouches;
+	}
+
+	handleTouchStart = (evt) => {
+		document.addEventListener('touchmove', this.handleTouchMove);
+		document.addEventListener('touchend', this.handleTouchEnd);
+
+		const { clientX, clientY, } = this.getTouches(evt)[0];
+		const { navigationOpened } = this.props;
+
+		if(!navigationOpened || navigationOpened) {
+			this.setState({
+				xDown: clientX,
+				yDown: clientY,
+			})
+		}
+	};
+
+	handleTouchEnd = (evt) => {
+		const { clientX, } = evt.changedTouches[0];
+		const { toggleNavigation, navigationOpened, } = this.props;
+		const { xDown, yDown, overlayStyle, } = this.state;
+
+		if(!xDown || !yDown) {
+			return;
+		}
+
+		const moveDistance = Math.abs(xDown - clientX);
+		const isDistanceEnough = moveDistance !== 0;
+		if(isDistanceEnough) {
+			const leftSwap = !navigationOpened && clientX > xDown;
+			const rightSwap = navigationOpened && clientX < xDown;
+			if(leftSwap || rightSwap) {
+				toggleNavigation();
+			}
+		}
+
+		if(overlayStyle) {
+			this.playHidingOverlayAnimation();
+		}
+
+		this.setState({
+			xDown: null,
+			yDown: null,
+			sideMenuStyle: null,
+		})
+
+		document.removeEventListener('touchmove', this.handleTouchMove);
+		document.removeEventListener('touchend', this.handleTouchEnd);
+	};
+
+	handleTouchMove = (evt) => {
+		const { xDown, yDown, } = this.state;
+		const { navigationOpened } = this.props;
+
+		if(!xDown || !yDown) {
+			return;
+		}
+
+		const { clientX, clientY, } = evt.touches[0];
+
+		const xDiff = xDown - clientX;
+		const yDiff = yDown - clientY;
+
+		if(Math.abs(xDiff) > Math.abs(yDiff)) {
+			let diff, ratio;
+			if(navigationOpened) {
+				diff = -xDiff;
+				ratio = 1 - Math.abs(Math.min(diff, 1) / mobileNavigationMenuWidth);
+			} else {
+				diff = -xDiff - mobileNavigationMenuWidth;
+				ratio = 1 - Math.abs(Math.min(diff, 0) / mobileNavigationMenuWidth);
+			}
+
+			this.setState({
+				overlayStyle: {
+					visibility: 'visible',
+					opacity: ratio,
+					transition: 'unset',
+				},
+				sideMenuStyle: {
+					transform: `translateX(${ Math.min(0, diff) }px)`,
+					transition: 'unset',
+				}
+			})
+		} else {
+			this.setState({
+				xDown: null,
+				yDown: null,
+				overlayStyle: null,
+				sideMenuStyle: null,
+			})
+		}
+	};
+
 	handleWindowSizeChange = () => {
-		this.setState({ windowWidth: window.innerWidth });
+		this.tryAddTouchListener();
 	};
 
 	componentWillUnmount() {
-		window.removeEventListener('resize', this.handleWindowSizeChange);
+		document.removeEventListener('resize', this.handleWindowSizeChange);
+		if(this.state.touchListenerAdded) {
+			document.removeEventListener('touchstart', this.handleTouchStart);
+			document.removeEventListener('touchmove', this.handleTouchMove);
+			document.removeEventListener('touchend', this.handleTouchEnd);
+		}
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
 		const { navigationOpened } = this.props;
-		const { windowWidth } = this.state;
-		const isMobile = windowWidth <= 767;
 
-		if (isMobile && prevProps.navigationOpened !== navigationOpened) {
+		if((isMobile() || isTablet()) && prevProps.navigationOpened !== navigationOpened) {
 			document.querySelector('body')
 				.classList.toggle(styles.overflow, navigationOpened);
+			if(!navigationOpened) {
+				this.playHidingOverlayAnimation();
+			}
+		}
+	}
+
+	playHidingOverlayAnimation = () => {
+		this.setState({
+			overlayStyle: {
+				visibility: 'visible',
+			},
+		});
+		setTimeout(() => {
+			this.setState({
+				overlayStyle: null,
+			})
+		}, 300);
+	}
+
+	hideNavigationMenu = () => {
+		const { navigationOpened, toggleNavigation, } = this.props;
+
+		if(navigationOpened) {
+			toggleNavigation();
 		}
 	}
 
 	render() {
-		const { unitTitle, toggleNavigation, } = this.props;
+		const { unitTitle, } = this.props;
+		const { overlayStyle } = this.state;
 
 		return (
-			<aside className={ styles.root }>
-				<div className={ styles.overlay } onClick={ toggleNavigation }/>
+			<aside>
+				<div className={ styles.overlay } style={ overlayStyle } onClick={ this.hideNavigationMenu }/>
 				{ unitTitle
 					? this.renderUnitNavigation()
 					: this.renderCourseNavigation()
@@ -64,10 +209,11 @@ class Navigation extends Component {
 	}
 
 	renderUnitNavigation() {
-		const { unitTitle, courseTitle, onCourseClick, unitItems, nextUnit, toggleNavigation, groupsAsStudent, unitProgress } = this.props;
+		const { unitTitle, courseTitle, onCourseClick, unitItems, nextUnit, groupsAsStudent, unitProgress } = this.props;
+		const { sideMenuStyle } = this.state;
 
 		return (
-			<div className={ styles.contentWrapper }>
+			<div className={ styles.contentWrapper } style={ sideMenuStyle }>
 				< NavigationHeader
 					createRef={ (ref) => this.unitHeaderRef = ref }
 					title={ unitTitle }
@@ -76,7 +222,7 @@ class Navigation extends Component {
 					onCourseClick={ onCourseClick }
 					groupsAsStudent={ groupsAsStudent }
 				/>
-				< NavigationContent items={ unitItems } toggleNavigation={ toggleNavigation }/>
+				< NavigationContent items={ unitItems } toggleNavigation={ this.hideNavigationMenu }/>
 				{ nextUnit && <NextUnit unit={ nextUnit } toggleNavigation={ this.handleToggleNavigation }
 				/> }
 			</div>
@@ -84,16 +230,16 @@ class Navigation extends Component {
 	}
 
 	handleToggleNavigation = () => {
-		const { toggleNavigation, } = this.props;
 		this.unitHeaderRef.scrollIntoView();
-		toggleNavigation();
+		this.hideNavigationMenu();
 	};
 
 	renderCourseNavigation() {
 		const { courseTitle, description, courseItems, containsFlashcards, courseId, slideId, toggleNavigation, groupsAsStudent, courseProgress } = this.props;
+		const { sideMenuStyle } = this.state;
 
 		return (
-			<div className={ styles.contentWrapper }>
+			<div className={ styles.contentWrapper } style={ sideMenuStyle }>
 				<CourseNavigationHeader
 					title={ courseTitle }
 					description={ description }

@@ -33,7 +33,11 @@ class NavigationHeader extends Component {
 				<Button
 					use="link"
 					icon={ <ArrowChevron2Left/> }
-					onClick={ onCourseClick }>{ courseName }</Button>
+					onClick={ onCourseClick }>
+						<span className={ styles.breadcrumbsText }>
+							{ courseName }
+						</span>
+				</Button>
 			</nav>
 		);
 	}

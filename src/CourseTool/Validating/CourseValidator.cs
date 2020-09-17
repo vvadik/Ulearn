@@ -70,6 +70,11 @@ namespace uLearn.CourseTool.Validating
 					ReportSlideWarning(slide, "Flashcard slide contains no flashcards");
 				}
 
+				if (slide.Hide)
+				{
+					ReportSlideWarning(slide, "Flashcard slide can't be hide");
+				}
+
 				foreach (var flashcard in slide.FlashcardsList)
 				{
 					ValidateFlashcard(flashcard, slide);

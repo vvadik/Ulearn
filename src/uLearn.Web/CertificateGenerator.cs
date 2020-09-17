@@ -229,7 +229,7 @@ namespace uLearn.Web
 			/* Replace %quizzes.*% */
 			content = ReplaceQuizzesBuiltinParameters(content, certificate, course);
 
-			var acceptedSolutionsCount = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(course.Id, course.Slides.Select(s => s.Id), certificate.UserId).Select(s => s.SlideId).Distinct().Count();
+			var acceptedSolutionsCount = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(course.Id, course.GetSlides(false).Select(s => s.Id), certificate.UserId).Select(s => s.SlideId).Distinct().Count();
 			content = SubstituteOneParameter(content, "exercises.accepted", acceptedSolutionsCount.ToString());
 
 			return content;
@@ -274,7 +274,7 @@ namespace uLearn.Web
 		private string ReplaceCodeReviewsBuiltinParameters(string content, Certificate certificate, Course course)
 		{
 			var codeReviewsCount = slideCheckingsRepo.GetUsersPassedManualExerciseCheckings(course.Id, certificate.UserId).Count();
-			var exercisesMaxReviewScores = course.Slides
+			var exercisesMaxReviewScores = course.GetSlides(false)
 				.OfType<ExerciseSlide>().ToDictionary(s => s.Id, s => s.Scoring.CodeReviewScore);
 			var codeReviewsFullCount = slideCheckingsRepo
 				.GetUsersPassedManualExerciseCheckings(course.Id, certificate.UserId)

@@ -172,6 +172,11 @@ namespace Database.Repos.Users
 
 			return user.Roles.Any(role => role.RoleId == sysAdminRole.Id);
 		}
+
+		public async Task<bool> IsSystemAdministrator(string userId)
+		{
+			return (await GetSysAdminsIdsAsync()).Contains(userId);
+		}
 	}
 
 	/* System.String is not available for table-valued functions so we need to create ComplexTyped wrapper */

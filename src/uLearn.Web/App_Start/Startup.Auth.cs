@@ -8,6 +8,8 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Owin;
+using Microsoft.Owin.Host.SystemWeb;
+using Microsoft.Owin.Infrastructure;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Interop;
 using Owin;
@@ -16,6 +18,7 @@ using uLearn.Web.LTI;
 using uLearn.Web.Microsoft.Owin.Security.VK;
 using Ulearn.Core;
 using Ulearn.Core.Configuration;
+using uLearn.Web.SameSite;
 using Web.Api.Configuration;
 
 namespace uLearn.Web
@@ -36,6 +39,8 @@ namespace uLearn.Web
 				AuthenticationType = "Identity.Application",
 				CookieName = configuration.Web.CookieName,
 				CookieDomain = configuration.Web.CookieDomain,
+				CookieSameSite = configuration.Web.CookieSecure ? SameSiteMode.None : SameSiteMode.Lax, // https://docs.microsoft.com/ru-ru/aspnet/samesite/system-web-samesite
+				CookieManager = configuration.Web.CookieSecure ? new SameSiteCookieManager(new SystemWebCookieManager()) : (ICookieManager)new SystemWebCookieManager(), // https://docs.microsoft.com/ru-ru/aspnet/samesite/csmvc
 				CookieSecure = configuration.Web.CookieSecure ? CookieSecureOption.Always : CookieSecureOption.Never,
 
 				LoginPath = new PathString("/Login"),

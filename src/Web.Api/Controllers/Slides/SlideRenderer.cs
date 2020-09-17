@@ -42,6 +42,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			{
 				Id = slide.Id,
 				Title = slide.Title,
+				Hide = slide.Hide,
 				Slug = slide.Url,
 				ApiUrl = urlHelper.Action("SlideInfo", "Slides", new { courseId = courseId, slideId = slide.Id }),
 				MaxScore = getSlideMaxScoreFunc(slide),

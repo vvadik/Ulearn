@@ -147,7 +147,7 @@ namespace Database.Repos
 				.GroupBy(v => v.SlideId, (s, v) => new { Key = s, Value = v.First().Score })
 				.ToDictionary(g => g.Key, g => g.Value);
 		}
-		
+
 		public async Task<Dictionary<string, Dictionary<Guid, int>>> GetScoresForSlides(string courseId, IEnumerable<string> userIds, IEnumerable<Guid> slidesIds = null)
 		{
 			var visits = db.Visits.Where(v => v.CourseId == courseId && userIds.Contains(v.UserId));
@@ -161,12 +161,12 @@ namespace Database.Repos
 				.ToDictionary(g => g.Key, g => g.ToDictionary(k => k.SlideId, k=> k.Value));
 		}
 
-		public List<Guid> GetSlidesWithUsersManualChecking(string courseId, string userId)
+		public async Task<List<Guid>> GetSlidesWithUsersManualChecking(string courseId, string userId)
 		{
-			return db.Visits.Where(v => v.CourseId == courseId && v.UserId == userId)
+			return await db.Visits.Where(v => v.CourseId == courseId && v.UserId == userId)
 				.Where(v => v.HasManualChecking)
 				.Select(v => v.SlideId)
-				.ToList();
+				.ToListAsync();
 		}
 
 		public async Task MarkVisitsAsWithManualChecking(string courseId, Guid slideId, string userId)

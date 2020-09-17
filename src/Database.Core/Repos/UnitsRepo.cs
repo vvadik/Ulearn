@@ -26,21 +26,29 @@ namespace Database.Repos
 			this.courseRolesRepo = courseRolesRepo;
 		}
 
-		public async Task<IEnumerable<Guid>> GetVisibleUnitIdsAsync(Course course, string userId)
+		public async Task<List<Guid>> GetVisibleUnitIdsAsync(Course course, string userId)
 		{
 			var canSeeEverything = await courseRolesRepo.HasUserAccessToCourseAsync(userId, course.Id, CourseRoleType.Tester);
 			if (canSeeEverything)
-				return course.GetUnitsNotSafe().Select(u => u.Id);
+				return course.GetUnitsNotSafe().Select(u => u.Id).ToList();
 
-			return GetVisibleUnitIds(course);
+			return await GetPublishedUnitIdsAsync(course);
 		}
 
-		public IEnumerable<Guid> GetVisibleUnitIds(Course course)
+		public async Task<List<Guid>> GetPublishedUnitIdsAsync(Course course)
 		{
-			var visibleUnitsIds = new HashSet<Guid>(db.UnitAppearances
+			var visibleUnitsIds = new HashSet<Guid>(await db.UnitAppearances
 				.Where(u => u.CourseId == course.Id && u.PublishTime <= DateTime.Now)
-				.Select(u => u.UnitId));
-			return course.GetUnitsNotSafe().Select(u => u.Id).Where(g => visibleUnitsIds.Contains(g));
+				.Select(u => u.UnitId)
+				.ToListAsync());
+			return course.GetUnitsNotSafe().Select(u => u.Id).Where(g => visibleUnitsIds.Contains(g)).ToList();
+		}
+		
+		public async Task<List<UnitAppearance>> GetUnitAppearancesAsync(Course course)
+		{
+			return await db.UnitAppearances
+				.Where(u => u.CourseId == course.Id)
+				.ToListAsync();
 		}
 
 		public HashSet<string> GetVisibleCourses()

@@ -44,6 +44,7 @@ namespace Ulearn.Core.Courses
 
 		[XmlIgnore]
 		/* Calculates automatically by slides's scores */
+		// Считается только по нескрытым слайдам
 		public int MaxNotAdditionalScore { get; set; }
 
 		[XmlAttribute("enableForEveryone")]

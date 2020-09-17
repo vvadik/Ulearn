@@ -2,11 +2,12 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import getMoment from "src/utils/getMoment";
 import { Checkbox, Gapped } from "ui";
-import { Copy, Trash } from "icons";
+import { Copy, Trash, UserSettings } from "icons";
 import Avatar from "../../../../common/Avatar/Avatar";
 import CopyStudentsModal from "../CopyStudentsModal/CopyStudentsModal";
 import Profile from '../Profile';
 import getGenderForm from "src/utils/getGenderForm";
+import ResetLimitsForStudentsModal from "../ResetLimitsForStudentsModal/ResetLimitsForStudentsModal";
 
 import styles from './groupStudents.less';
 
@@ -14,12 +15,13 @@ class GroupStudents extends Component {
 
 	state = {
 		studentIds: new Set(),
-		modalOpen: false,
+		copyStudentsModalOpen: false,
+		resetLimitsForStudentsModalOpen: false,
 	};
 
 	render() {
-		const {students} = this.props;
-		const {studentIds, modalOpen} = this.state;
+		const {students, group} = this.props;
+		const {studentIds, copyStudentsModalOpen, resetLimitsForStudentsModalOpen} = this.state;
 		const studentsArrayOfIds = students.map(item => item.user.id);
 
 		return (
@@ -33,10 +35,17 @@ class GroupStudents extends Component {
 					{this.renderStudentActions()}
 				</div>
 				{this.renderStudents()}
-				{modalOpen &&
+				{copyStudentsModalOpen &&
 				<CopyStudentsModal
 					studentIds={studentIds}
-					onClose={this.onCloseModal} />}
+					onClose={this.onCloseCopyStudentsModal} />
+				}
+				{resetLimitsForStudentsModalOpen &&
+				<ResetLimitsForStudentsModal
+					studentIds={studentIds}
+					groupId={group.id}
+					onClose={this.onCloseResetLimitsForStudentsModal} />
+				}
 			</React.Fragment>
 		)
 	}
@@ -50,10 +59,19 @@ class GroupStudents extends Component {
 				<button
 					className={studentIds.size > 0 ? `${buttonClass} ${styles["button-copy"]}` : buttonClass}
 					disabled={studentIds.size === 0}
-					onClick={this.onOpenModal}>
+					onClick={this.onOpenCopyStudentsModal}>
 					<Gapped gap={3}>
 						<Copy/>
 						<span className={styles["action-text"]}>Скопировать в группу...</span>
+					</Gapped>
+				</button>
+				<button
+					className={studentIds.size > 0 ? `${buttonClass} ${styles.buttonResetLimits}` : buttonClass}
+					disabled={studentIds.size === 0}
+					onClick={this.onOpenResetLimitsForStudentsModal}>
+					<Gapped gap={3}>
+						<UserSettings/>
+						<span className={styles["action-text"]}>Сбросить ограничения</span>
 					</Gapped>
 				</button>
 				<button
@@ -85,12 +103,14 @@ class GroupStudents extends Component {
 							checked={studentIds.has(item.user.id) || false}
 							onValueChange={(value) => this.onCheckStudent(item.user.id, value)}>
 							<Avatar user={item.user} size='small' />
-							<Profile
-								user={item.user}
-								systemAccesses={systemAccesses}
-								isSysAdmin={isSysAdmin} /> {item.addingTime && <span className={styles.addingTime}>
-									{`${getGenderForm(item.user.gender, 'вступила', 'вступил')}
-									${getMoment(item.addingTime)}`}</span>}
+							<span className={styles.studentBlockSelectable}>
+								<Profile
+									user={item.user}
+									systemAccesses={systemAccesses}
+									isSysAdmin={isSysAdmin} /> {item.addingTime && <span className={styles.addingTime}>
+										{`${getGenderForm(item.user.gender, 'вступила', 'вступил')}
+										${getMoment(item.addingTime)}`}</span>}
+							</span>
 						</Checkbox>
 					</div>
 				)
@@ -99,15 +119,27 @@ class GroupStudents extends Component {
 		)
 	}
 
-	onOpenModal = () => {
+	onOpenCopyStudentsModal = () => {
 		this.setState({
-			modalOpen: true,
+			copyStudentsModalOpen: true,
 		})
 	};
 
-	onCloseModal = () => {
+	onCloseCopyStudentsModal = () => {
 		this.setState({
-			modalOpen: false,
+			copyStudentsModalOpen: false,
+		})
+	};
+
+	onOpenResetLimitsForStudentsModal = () => {
+		this.setState({
+			resetLimitsForStudentsModalOpen: true,
+		})
+	};
+
+	onCloseResetLimitsForStudentsModal = () => {
+		this.setState({
+			resetLimitsForStudentsModalOpen: false,
 		})
 	};
 
@@ -151,6 +183,7 @@ GroupStudents.propTypes = {
 	students: PropTypes.array,
 	onDeleteStudents: PropTypes.func,
 	isSysAdmin: PropTypes.bool,
+	group: PropTypes.object,
 	systemAccesses: PropTypes.array,
 };
 

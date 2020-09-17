@@ -161,7 +161,8 @@ function createSignalRConnection(url, loggingLevel = signalR.LogLevel.None){
 			{
 				accessTokenFactory: () => {
 					return apiJwtToken;
-				}
+				},
+				transport: signalR.HttpTransportType.WebSockets
 			})
 		.configureLogging(loggingLevel)
 		.build();

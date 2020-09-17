@@ -65,7 +65,8 @@ namespace uLearn.Web.Controllers
 				});
 			}
 
-			var exerciseSlide = courseManager.FindCourse(courseId)?.FindSlideById(slideId) as ExerciseSlide;
+			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
+			var exerciseSlide = courseManager.FindCourse(courseId)?.FindSlideById(slideId, isInstructor) as ExerciseSlide;
 			if (exerciseSlide == null)
 				return HttpNotFound();
 
@@ -162,7 +163,7 @@ namespace uLearn.Web.Controllers
 		[ValidateInput(false)]
 		public async Task<ActionResult> HideFromTopCodeReviewComments(string courseId, Guid slideId, string comment)
 		{
-			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId) as ExerciseSlide;
+			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId, true) as ExerciseSlide;
 			if (slide == null)
 				return HttpNotFound();
 
@@ -208,7 +209,7 @@ namespace uLearn.Web.Controllers
 			{
 				var course = courseManager.FindCourse(submissionCourseId);
 				var slideId = review.ExerciseChecking.SlideId;
-				var unit = course?.FindUnitBySlideId(slideId);
+				var unit = course?.FindUnitBySlideId(slideId, isInstructor);
 				if (unit != null && unitsRepo.IsUnitVisibleForStudents(course, unit.Id))
 					await NotifyAboutCodeReviewComment(comment).ConfigureAwait(false);
 			}
@@ -256,7 +257,7 @@ namespace uLearn.Web.Controllers
 				var checking = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(id);
 
 				var course = courseManager.GetCourse(checking.CourseId);
-				var slide = (ExerciseSlide)course.GetSlideById(checking.SlideId);
+				var slide = (ExerciseSlide)course.GetSlideById(checking.SlideId, true);
 				var exercise = slide.Exercise;
 
 				/* Invalid form: score isn't integer */
@@ -276,7 +277,7 @@ namespace uLearn.Web.Controllers
 
 				transaction.Commit();
 
-				var unit = course.FindUnitBySlideId(checking.SlideId);
+				var unit = course.FindUnitBySlideId(checking.SlideId, true);
 				if (unit != null && unitsRepo.IsUnitVisibleForStudents(course, unit.Id))
 					await NotifyAboutManualExerciseChecking(checking).ConfigureAwait(false);
 			}
@@ -307,7 +308,7 @@ namespace uLearn.Web.Controllers
 			if (!User.HasAccessFor(courseId, CourseRole.Instructor))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
-			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId) as ExerciseSlide;
+			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId, true) as ExerciseSlide;
 			if (slide == null)
 				return new HttpStatusCodeResult(HttpStatusCode.NotFound);
 
@@ -366,13 +367,14 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult SubmissionsPanel(string courseId, Guid slideId, string userId = "", int? currentSubmissionId = null, bool canTryAgain = true)
 		{
-			if (!User.HasAccessFor(courseId, CourseRole.Instructor))
+			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
+			if (!isInstructor)
 				userId = "";
 
 			if (userId == "")
 				userId = User.Identity.GetUserId();
 
-			var slide = courseManager.GetCourse(courseId).FindSlideById(slideId);
+			var slide = courseManager.GetCourse(courseId).FindSlideById(slideId, isInstructor);
 			var submissions = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).ToList();
 
 			return PartialView(new ExerciseSubmissionsPanelModel(courseId, slide)
@@ -433,7 +435,8 @@ namespace uLearn.Web.Controllers
 		[System.Web.Mvc.AllowAnonymous]
 		public ActionResult Submission(string courseId, Guid slideId, string userId = null, int? submissionId = null, int? manualCheckingId = null, bool isLti = false, bool showOutput = false, bool instructorView = false, bool onlyAccepted = true)
 		{
-			if (!User.HasAccessFor(courseId, CourseRole.Instructor))
+			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
+			if (!isInstructor)
 				instructorView = false;
 
 			var currentUserId = userId ?? (User.Identity.IsAuthenticated ? User.Identity.GetUserId() : "");
@@ -456,7 +459,7 @@ namespace uLearn.Web.Controllers
 			}
 
 			var course = courseManager.GetCourse(courseId);
-			var slide = course.FindSlideById(slideId);
+			var slide = course.FindSlideById(slideId, isInstructor);
 			if (slide == null)
 				return HttpNotFound();
 
@@ -527,7 +530,7 @@ namespace uLearn.Web.Controllers
 			const int maxUsersCount = 30;
 
 			var course = courseManager.GetCourse(courseId);
-			var slide = course.GetSlideById(slideId) as ExerciseSlide;
+			var slide = course.GetSlideById(slideId, true) as ExerciseSlide;
 
 			if (slide == null)
 				throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -575,7 +578,7 @@ namespace uLearn.Web.Controllers
 			var automaticCheckingScores = slideCheckingsRepo.GetAutomaticScoresForSlide(courseId, slideId, filterOptions.UserIds);
 			var manualCheckingScores = slideCheckingsRepo.GetManualScoresForSlide(courseId, slideId, filterOptions.UserIds);
 
-			var userGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, filterOptions.UserIds, User).ToDefaultDictionary();
+			var userGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, filterOptions.UserIds, User, actual: true, archived: false).ToDefaultDictionary();
 
 			return new StudentSubmissionsModel
 			{
@@ -595,7 +598,9 @@ namespace uLearn.Web.Controllers
 		{
 			if (!slideId.HasValue)
 				return HttpNotFound();
-			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId.Value);
+
+			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
+			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId.Value, isInstructor);
 			if (!(slide is ExerciseSlide))
 				return HttpNotFound();
 

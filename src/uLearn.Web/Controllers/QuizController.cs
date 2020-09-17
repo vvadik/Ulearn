@@ -192,7 +192,8 @@ namespace uLearn.Web.Controllers
 			metricSender.SendCount($"quiz.submit.{courseId}.{slideId}");
 
 			var course = courseManager.GetCourse(courseId);
-			var slide = course.FindSlideById(slideId) as QuizSlide;
+			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
+			var slide = course.FindSlideById(slideId, isInstructor) as QuizSlide;
 			if (slide == null)
 				return new HttpNotFoundResult();
 
@@ -313,15 +314,15 @@ namespace uLearn.Web.Controllers
 				var checking = slideCheckingsRepo.FindManualCheckingById<ManualQuizChecking>(id);
 
 				var course = courseManager.GetCourse(checking.CourseId);
-				var unit = course.FindUnitBySlideId(checking.SlideId);
-				var slide = course.GetSlideById(checking.SlideId);
+				var unit = course.FindUnitBySlideId(checking.SlideId, true);
+				var slide = course.GetSlideById(checking.SlideId, true);
 
 				metricSender.SendCount($"quiz.manual_score.{checking.CourseId}");
 				metricSender.SendCount($"quiz.manual_score.{checking.CourseId}.{checking.SlideId}");
 
 				var totalScore = 0;
 
-				var quiz = course.FindSlideById(checking.SlideId);
+				var quiz = course.FindSlideById(checking.SlideId, true);
 				if (quiz == null)
 					return Redirect(errorUrl + "Этого теста больше нет в курсе");
 
@@ -524,7 +525,8 @@ namespace uLearn.Web.Controllers
 		// Вызывается только для квизов без автопроверки
 		public async Task<ActionResult> RestartQuiz(string courseId, Guid slideId, bool isLti)
 		{
-			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId);
+			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
+			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId, isInstructor);
 			if (slide is QuizSlide)
 			{
 				var userId = User.Identity.GetUserId();

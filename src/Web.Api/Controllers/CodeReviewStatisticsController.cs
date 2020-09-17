@@ -66,7 +66,7 @@ namespace Ulearn.Web.Api.Controllers
 			var instructorIds = await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, course.Id).ConfigureAwait(false);
 			var instructors = await usersRepo.GetUsersByIdsAsync(instructorIds).ConfigureAwait(false);
 
-			var exerciseSlides = course.Slides.OfType<ExerciseSlide>().ToList();
+			var exerciseSlides = course.GetSlides(true).OfType<ExerciseSlide>().ToList();
 
 			var allSlideCheckings = (await slideCheckingsRepo.GetManualExerciseCheckingQueueAsync(new ManualCheckingQueueFilterOptions
 			{

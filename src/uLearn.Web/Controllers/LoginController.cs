@@ -71,9 +71,6 @@ namespace uLearn.Web.Controllers
 			if (string.IsNullOrEmpty(user.Email) || user.EmailConfirmed)
 				return;
 
-			/* Reset cookie and show popup with remainder if needed */
-			Response.Cookies.Add(new HttpCookie("emailIsNotConfirmed") { Value = null, Expires = DateTime.Now.AddDays(-1) });
-
 			if (user.LastConfirmationEmailTime == null)
 				await SendConfirmationEmail(user);
 		}

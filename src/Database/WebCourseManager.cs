@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using Database.DataContexts;
 using log4net;
 using Ulearn.Core;
@@ -17,6 +18,9 @@ namespace Database
 		private readonly Dictionary<string, Guid> loadedCourseVersions = new Dictionary<string, Guid>();
 		private readonly ConcurrentDictionary<string, DateTime> courseVersionFetchTime = new ConcurrentDictionary<string, DateTime>();
 		private readonly TimeSpan fetchCourseVersionEvery = TimeSpan.FromMinutes(1);
+		private readonly ConcurrentDictionary<string, DateTime> tempCourseUpdateTime = new ConcurrentDictionary<string, DateTime>();
+		private long tempCoursesUpdateTime;
+		private readonly TimeSpan tempCourseUpdateEvery = TimeSpan.FromSeconds(1);
 
 		private WebCourseManager()
 			: base(GetCoursesDirectory())
@@ -125,6 +129,13 @@ namespace Database
 
 		private void CheckTempCoursesAndReloadIfNecessary(string courseIdToUpdate = null)
 		{
+			if (new DateTime(tempCoursesUpdateTime) > DateTime.Now.Subtract(tempCourseUpdateEvery))
+				return;
+			if (courseIdToUpdate != null && IsTempCourseUpdatedRecent(courseIdToUpdate))
+				return;
+			if (courseIdToUpdate == null)
+				Interlocked.Exchange(ref tempCoursesUpdateTime, DateTime.Now.Ticks);
+
 			var tempCoursesRepo = new TempCoursesRepo();
 			var tempCourses = tempCoursesRepo.GetTempCourses();
 			foreach (var tempCourse in tempCourses)
@@ -139,13 +150,22 @@ namespace Database
 				{
 					// ignored
 				}
-				if (course == null || course.Slides.Count == 0
+				if (course == null || course.GetSlides(true).Count == 0
 					|| courseId == courseIdToUpdate && tempCourse.LastUpdateTime < tempCourse.LoadingTime)
 				{
 					ReloadCourse(courseId);
 					tempCoursesRepo.UpdateTempCourseLastUpdateTimeAsync(courseId).Wait();
-				}
+					courseVersionFetchTime[courseId] = DateTime.Now;
+				} else if (tempCourse.LastUpdateTime > tempCourse.LoadingTime)
+					courseVersionFetchTime[courseId] = DateTime.Now;
 			}
+		}
+
+		private bool IsTempCourseUpdatedRecent(string courseId)
+		{
+			if (tempCourseUpdateTime.TryGetValue(courseId, out var lastFetchTime))
+				return lastFetchTime > DateTime.Now.Subtract(tempCourseUpdateEvery);
+			return false;
 		}
 	}
 }

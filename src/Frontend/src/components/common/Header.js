@@ -6,9 +6,13 @@ import { MenuHeader, MenuItem, MenuSeparator, Tooltip, Loader, DropdownMenu, } f
 import { DropdownContainer } from "ui/internal/DropdownContainer";
 import HeaderComponentErrorBoundary from "./Error/HeaderComponentErrorBoundary";
 import Hijack from "src/components/hijack/Hijack";
+import StudentMode from "src/components/common/StudentMode/StudentMode";
+
 import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { findDOMNode } from "react-dom";
+import { isMobile } from "src/utils/getDeviceType";
+import { ROLES } from "src/consts/general";
 
 import styles from './Header.less';
 
@@ -111,6 +115,13 @@ class Header extends Component {
 		return null;
 	}
 
+	isInstructor() {
+		const { isSystemAdministrator, courseRole, } = this.state;
+		return isSystemAdministrator ||
+			courseRole === ROLES.courseAdmin ||
+			courseRole === ROLES.instructor;
+	}
+
 	render() {
 		const { initializing, account, } = this.props;
 
@@ -122,6 +133,8 @@ class Header extends Component {
 					{ Header.renderDefaultHeader() }
 					{ !initializing && this.renderUserRoleMenu() }
 					<Hijack name={ account.visibleName }/>
+					{ !isMobile() && this.isInstructor() &&
+					<StudentMode containerClass={ styles.studentModeToggleContainer }/> }
 				</div>
 			</React.Fragment>
 		)
@@ -419,24 +432,22 @@ class CourseMenu extends Component {
 
 		if(hasUsersMenuItem)
 			items.push(
-				<MenuItem href={ "/Admin/Users?courseId=" + courseId } key="Users" component={ LinkComponent }>
+				<MenuItem href={ "/Admin/Users?courseId=" + courseId + "&courseRole=Instructor" } key="Users" component={ LinkComponent }>
 					Студенты и преподаватели
 				</MenuItem>);
 
 		if(hasCourseAdminMenuItems) {
-			if (isTempCourse){
+			if(isTempCourse) {
 				items = items.concat([
 					<MenuItem href={ "/Admin/TempCourseDiagnostics?courseId=" + courseId } key="Diagnostics"
 							  component={ LinkComponent }>
 						Диагностика
 					</MenuItem>
 				]);
-			}
-			else
-			{
+			} else {
 				items = items.concat([
 					<MenuItem href={ "/Admin/Packages?courseId=" + courseId } key="Packages"
-												component={ LinkComponent }>
+							  component={ LinkComponent }>
 						Экспорт и импорт курса
 					</MenuItem>,
 
@@ -573,7 +584,7 @@ class Menu extends Component {
 		if(this.props.account.isAuthenticated) {
 			return (
 				<div className={ styles["header__menu"] }>
-					<NotificationsMenu/>
+					<NotificationsMenu history={ this.props.history }/>
 					<ProfileLink account={ this.props.account }/>
 					<Separator/>
 					<LogoutLink/>
@@ -673,23 +684,27 @@ class NotificationsMenu extends Component {
 	}
 
 	onClick() {
-		if(this.state.isOpened) {
-			this.setState({
-				isOpened: false,
-			});
+		if(isMobile()) {
+			this.props.history.push('/Feed');
 		} else {
-			this.setState({
-				isOpened: true,
-				isLoading: true,
-			});
-			NotificationsMenu._loadNotifications().then(
-				notifications => {
-					this.props.resetNotificationsCount();
-					this.setState({
-						isLoading: false,
-						notificationsHtml: notifications
-					})
+			if(this.state.isOpened) {
+				this.setState({
+					isOpened: false,
 				});
+			} else {
+				this.setState({
+					isOpened: true,
+					isLoading: true,
+				});
+				NotificationsMenu._loadNotifications().then(
+					notifications => {
+						this.props.resetNotificationsCount();
+						this.setState({
+							isLoading: false,
+							notificationsHtml: notifications
+						})
+					});
+			}
 		}
 	}
 
@@ -780,62 +795,40 @@ class Notifications extends Component {
 	}
 }
 
-class ProfileLink extends Component {
-	constructor(props) {
-		super(props);
-		this.openTooltip = this.openTooltip.bind(this);
-		this.closeTooltip = this.closeTooltip.bind(this);
-		this.state = {
-			tooltipTrigger: 'opened',
-		}
-	}
-
-	openTooltip() {
-		this.setState({
-			tooltipTrigger: 'hover'
-		})
-	}
-
-	closeTooltip() {
-		this.setState({
-			tooltipTrigger: 'hover'
-		})
-	}
-
-	render() {
-		let icon = <User/>;
-		let isProblem = this.props.account.accountProblems.length > 0;
-		if(isProblem) {
-			let firstProblem = this.props.account.accountProblems[0];
-			icon = (
-				<Tooltip trigger={ this.state.tooltipTrigger } closeButton={ true } pos="bottom center"
-						 onCloseClick={ this.closeTooltip } render={ () => (
-					<div style={ { width: '250px' } }>
-						{ firstProblem.description }
-					</div>
-				) }>
-					<span onMouseOver={ this.openTooltip }>
+function ProfileLink({ account }) {
+	let icon = <User/>;
+	let isProblem = account.accountProblems.length > 0;
+	if(isProblem) {
+		let firstProblem = account.accountProblems[0];
+		icon = (
+			<Tooltip trigger={ isMobile() ? 'closed' : "hover" }
+					 closeButton={ true } pos={ "bottom center" }
+					 render={ () => (
+						 <div style={ { width: '250px' } }>
+							 { firstProblem.description }
+						 </div>
+					 ) }>
+					<span>
 						<Warning color="#f77"/>
 					</span>
-				</Tooltip>
-			)
-		}
+			</Tooltip>
+		)
+	}
 
-		return (<div className={ styles["header__profile-link"] }>
-			<Link to="/Account/Manage">
+	return (<div className={ styles["header__profile-link"] }>
+		<Link to="/Account/Manage">
                 <span className={ styles["icon"] }>
                     { icon }
                 </span>
-				<span className={ styles["username"] }>
-                    { this.props.account.visibleName || 'Профиль' }
+			<span className={ styles["username"] }>
+                    { account.visibleName || 'Профиль' }
                 </span>
-			</Link>
-		</div>)
-	}
+		</Link>
+	</div>);
+}
 
-	static propTypes = {
-		account: accountPropTypes
-	}
+ProfileLink.propTypes = {
+	account: accountPropTypes,
 }
 
 class Separator extends Component {

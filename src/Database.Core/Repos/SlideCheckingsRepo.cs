@@ -258,12 +258,16 @@ namespace Database.Repos
 			return db.SaveChangesAsync();
 		}
 
-		public async Task RemoveLimitsForUser(string courseId, string userId)
+		public async Task ResetManualCheckingLimitsForUser(string courseId, string userId)
 		{
 			await DisableProhibitFurtherManualCheckings(courseId, userId);
 			await NotCountOldAttemptsToQuizzesWithManualChecking(courseId, userId);
-			//await NotCountOldAttemptsToQuizzesWithAutomaticChecking(courseId, userId);
-			//await visitsRepo.Value.UnskipAllSlides(courseId, userId);
+		}
+
+		public async Task ResetAutomaticCheckingLimitsForUser(string courseId, string userId)
+		{
+			await NotCountOldAttemptsToQuizzesWithAutomaticChecking(courseId, userId);
+			await visitsRepo.Value.UnskipAllSlides(courseId, userId);
 		}
 
 		public async Task DisableProhibitFurtherManualCheckings(string courseId, string userId)

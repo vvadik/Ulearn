@@ -15,16 +15,14 @@ namespace Ulearn.Core.Courses
 		DirectoryInfo CourseXmlDirectory { get; }
 		List<Unit> GetUnits([NotNull]IEnumerable<Guid> visibleUnits);
 		List<Unit> GetUnitsNotSafe();
-		List<Slide> Slides { get; }
 
-		Slide FindSlideById(Guid slideId);
-		Slide GetSlideById(Guid slideId);
-		Slide FindSlideByIndex(int index);
+		Slide FindSlideById(Guid slideId, bool withHidden);
+		Slide GetSlideById(Guid slideId, bool withHidden);
 		Unit FindUnitById(Guid unitId, [NotNull] List<Guid> visibleUnits);
 		Unit GetUnitById(Guid unitId, [NotNull] List<Guid> visibleUnits);
 		Unit FindUnitByIdNotSafe(Guid unitId);
 		Unit GetUnitByIdNotSafe(Guid unitId);
-		Unit FindUnitBySlideId(Guid slideId);
+		Unit FindUnitBySlideId(Guid slideId, bool withHidden);
 		InstructorNote FindInstructorNoteById(Guid slideId);
 	}
 }

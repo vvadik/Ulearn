@@ -21,7 +21,13 @@ namespace Ulearn.Core.Courses.Units
 
 		public InstructorNote InstructorNote { get; set; }
 
-		public List<Slide> Slides { get; set; }
+		private List<Slide> Slides { get; set; }
+
+		private List<Slide> notHiddenSlides { get; set; }
+		private List<Slide> NotHiddenSlides
+		{
+			get { return notHiddenSlides ??= Slides.Where(s => !s.Hide).ToList(); }
+		}
 
 		public List<Flashcard> Flashcards { get; set; }
 
@@ -35,12 +41,31 @@ namespace Ulearn.Core.Courses.Units
 
 		public ScoringSettings Scoring => Settings.Scoring;
 
-		public void LoadInstructorNote(CourseLoadingContext context, int slideIndex)
+		// Используется только в UnitLoader. Иначе в Course не обновится slidesCache
+		public void SetSlides(List<Slide> slides)
+		{
+			Slides = slides;
+			notHiddenSlides = null;
+		}
+
+		public List<Slide> GetSlides(bool withHidden)
+		{
+			if (withHidden)
+				return Slides;
+			return NotHiddenSlides;
+		}
+		
+		public List<Slide> GetHiddenSlides()
+		{
+			return Slides.Where(s => s.Hide).ToList();
+		}
+
+		public void LoadInstructorNote(CourseLoadingContext context)
 		{
 			var instructorNoteFile = Directory.GetFile("InstructorNotes.md");
 			if (instructorNoteFile.Exists)
 			{
-				InstructorNote = InstructorNote.Load(context, instructorNoteFile, this, slideIndex);
+				InstructorNote = InstructorNote.Load(context, instructorNoteFile, this);
 			}
 		}
 

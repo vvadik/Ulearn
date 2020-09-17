@@ -1,6 +1,5 @@
 ﻿@* Generator: MvcHelper GeneratePrettyNames: true DisableLinePragmas: true *@
 @using Database.Models
-@using OfficeOpenXml.FormulaParsing.Excel.Functions.Math
 @using Ulearn.Common.Extensions
 @using uLearn.Web.Views.Course
 @using uLearn.Web.Views.SlideNavigation
@@ -12,7 +11,7 @@
 @using Ulearn.Core.Courses.Slides.Quizzes
 @using Ulearn.Core.Courses.Slides.Quizzes.Blocks
 
-@helper Page(Course course, Slide slide, TocModel toc, IEnumerable<string> cssFiles, IEnumerable<string> jsFiles)
+@helper Page(Course course, Slide slide, int slideIndex, TocModel toc, IEnumerable<string> cssFiles, IEnumerable<string> jsFiles)
 {
 	<html>
 	<head>
@@ -35,7 +34,7 @@
 				@{
 					var blockData = slide.Blocks.Select(
 						(b, i) => b is AbstractExerciseBlock
-							? new ExerciseBlockData(course.Id, (ExerciseSlide)slide, false) { RunSolutionUrl = "/" + slide.Index.ToString("000") + ".html?query=submit", DebugView = true, IsGuest = false }
+							? new ExerciseBlockData(course.Id, (ExerciseSlide)slide, false) { RunSolutionUrl = "/" + slideIndex.ToString("000") + ".html?query=submit", DebugView = true, IsGuest = false }
 							: b is AbstractQuestionBlock
 								? new QuizBlockData(new QuizModel
 								{
@@ -60,8 +59,8 @@
 					<div class="react-render" data-component="CourseToolUnitPage" data-props="@( new { flashcards = flashcards }.JsonSerialize())"></div>
 				}
 				<div style="margin-bottom: 40px;">
-					<a href="/@( slide.Index.ToString("000")).html?query=addLesson" class="btn btn-default">Добавить слайд</a>
-					<a href="/@( slide.Index.ToString("000")).html?query=addQuiz" class="btn btn-default">Добавить тест</a>
+					<a href="/@(slideIndex.ToString("000")).html?query=addLesson" class="btn btn-default">Добавить слайд</a>
+					<a href="/@(slideIndex.ToString("000")).html?query=addQuiz" class="btn btn-default">Добавить тест</a>
 				</div>
 			</div>
 		</div>

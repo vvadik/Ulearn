@@ -2,7 +2,6 @@ using log4net;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using System.Globalization;
 using System.IO;
@@ -61,7 +60,7 @@ namespace uLearn.Web.Controllers
 		private readonly DirectoryInfo reposDirectory;
 		private readonly IAntiPlagiarismClient antiPlagiarismClient;
 		private readonly ILogger serilogLogger;
-		private readonly TempCoursesRepo tempCoursesReo;
+		private readonly TempCoursesRepo tempCoursesRepo;
 
 		public AdminController()
 		{
@@ -81,13 +80,13 @@ namespace uLearn.Web.Controllers
 			systemAccessesRepo = new SystemAccessesRepo(db);
 			styleErrorsRepo = new StyleErrorsRepo(db);
 			certificateGenerator = new CertificateGenerator(db, courseManager);
+			tempCoursesRepo = new TempCoursesRepo(db);
 			reposDirectory = CourseManager.GetCoursesDirectory().GetSubdirectory("Repos");
 			serilogLogger = new LoggerConfiguration().WriteTo.Log4Net().CreateLogger();
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 			gitSecret = configuration.Git.Webhook.Secret;
 			var antiplagiarismClientConfiguration = ApplicationConfiguration.Read<UlearnConfiguration>().AntiplagiarismClient;
 			antiPlagiarismClient = new AntiPlagiarismClient(antiplagiarismClientConfiguration.Endpoint, antiplagiarismClientConfiguration.Token, serilogLogger);
-			tempCoursesReo = new TempCoursesRepo();
 		}
 
 		public ActionResult Courses(string courseId = null, string courseTitle = null)
@@ -102,6 +101,7 @@ namespace uLearn.Web.Controllers
 			else
 				courses = courses.OrderBy(course => course.Title, StringComparer.InvariantCultureIgnoreCase);
 
+			var tempCourses = tempCoursesRepo.GetTempCourses().Select(c => c.CourseId).ToHashSet();
 			var model = new CourseListViewModel
 			{
 				Courses = courses
@@ -110,7 +110,7 @@ namespace uLearn.Web.Controllers
 						Id = course.Id,
 						Title = course.Title,
 						LastWriteTime = courseManager.GetLastWriteTime(course.Id),
-						IsTemp = IsTempCourse(course.Id)
+						IsTemp = tempCourses.Contains(course.Id)
 					})
 					.ToList(),
 				LastTryCourseId = courseId,
@@ -469,14 +469,10 @@ namespace uLearn.Web.Controllers
 		[ValidateInput(false)]
 		public ActionResult Packages(string courseId, string error = "")
 		{
-			if (IsTempCourse(courseId))
+			var isTempCourse = tempCoursesRepo.Find(courseId) != null;
+			if (isTempCourse)
 				return null;
 			return PackagesInternal(courseId, error);
-		}
-
-		public bool IsTempCourse(string courseId)
-		{
-			return tempCoursesReo.Find(courseId) != null;
 		}
 
 		private ActionResult PackagesInternal(string courseId, string error = "", bool openStep1 = false, bool openStep2 = false)
@@ -528,7 +524,7 @@ namespace uLearn.Web.Controllers
 				ModerationPolicy = commentsPolicy.ModerationPolicy,
 				OnlyInstructorsCanReply = commentsPolicy.OnlyInstructorsCanReply,
 				Comments = (from c in comments.Take(commentsCountLimit)
-					let slide = course.FindSlideById(c.SlideId)
+					let slide = course.FindSlideById(c.SlideId, true)
 					where slide != null
 					select
 						new CommentViewModel
@@ -612,9 +608,9 @@ namespace uLearn.Web.Controllers
 			{
 				CourseId = courseId,
 				/* TODO (andgein): Merge FindSlideById() and following GetSlideById() calls */
-				Checkings = checkings.Take(maxShownQueueSize).Where(c => course.FindSlideById(c.SlideId) != null).Select(c =>
+				Checkings = checkings.Take(maxShownQueueSize).Where(c => course.FindSlideById(c.SlideId, true) != null).Select(c =>
 				{
-					var slide = course.GetSlideById(c.SlideId);
+					var slide = course.GetSlideById(c.SlideId, true);
 					return new ManualCheckingQueueItemViewModel
 					{
 						CheckingQueueItem = c,
@@ -637,7 +633,7 @@ namespace uLearn.Web.Controllers
 				Slides = allCheckingsSlides,
 			});
 		}
-		
+
 		// Возвращает слайды, по которым есть работы (проверенные или непроверенные, зависит от галочки), разделитель и оставшиеся слайды (не важно проверенные или нет).
 		private List<KeyValuePair<Guid, Slide>> GetAllCheckingsSlides(Course course, List<string> groupsIds, ManualCheckingQueueFilterOptions filterOptions)
 		{
@@ -647,10 +643,12 @@ namespace uLearn.Web.Controllers
 			filterOptions = GetManualCheckingFilterOptionsByGroup(course.Id, groupsIds);
 			filterOptions.OnlyChecked = null;
 			var allCheckingsSlidesIds = GetMergedCheckingQueueSlideIds(filterOptions);
+			var slideId2Index = course.GetSlides(true).Select((s, i) => (s.Id, i))
+				.ToDictionary(p => p.Item1, p => p.Item2);
 
-			var emptySlideMock = new Slide { Info = new SlideInfo(null, null, -1), Title = "", Id = Guid.Empty };
+			var emptySlideMock = new Slide { Info = new SlideInfo(null, null), Title = "", Id = Guid.Empty };
 			var allCheckingsSlides = allCheckingsSlidesIds
-				.Select(s => new KeyValuePair<Guid, Slide>(s, course.FindSlideById(s)))
+				.Select(s => new KeyValuePair<Guid, Slide>(s, course.FindSlideById(s, true)))
 				.Where(kvp => kvp.Value != null)
 				.Union(new List<KeyValuePair<Guid, Slide>>
 				{
@@ -658,7 +656,7 @@ namespace uLearn.Web.Controllers
 					new KeyValuePair<Guid, Slide>(Guid.Empty, emptySlideMock)
 				})
 				.OrderBy(s => usedSlidesIds.Contains(s.Key) ? 0 : 1)
-				.ThenBy(s => s.Value.Index)
+				.ThenBy(s => slideId2Index.GetOrDefault(s.Value.Id))
 				.Select(s => new KeyValuePair<Guid, Slide>(s.Key, s.Value))
 				.ToList();
 
@@ -820,12 +818,19 @@ namespace uLearn.Web.Controllers
 		{
 			var userRolesByEmail = User.IsSystemAdministrator() ? usersRepo.FilterUsersByEmail(queryModel) : null;
 			var userRoles = usersRepo.FilterUsers(queryModel);
-			var model = GetUserListModel(userRolesByEmail.EmptyIfNull().Concat(userRoles).DistinctBy(r => r.UserId).ToList(), queryModel.CourseId);
+			var tempCourses = tempCoursesRepo.GetTempCourses().Select(s => s.CourseId).ToHashSet();
+			var courses = courseManager.GetCourses()
+				.ToDictionary(c => c.Id, c => (c, tempCourses.Contains(c.Id)));
+			var model = GetUserListModel(userRolesByEmail.EmptyIfNull().Concat(userRoles).DistinctBy(r => r.UserId).ToList(),
+				courses,
+				queryModel.CourseId);
 
 			return PartialView("_UserListPartial", model);
 		}
 
-		private UserListModel GetUserListModel(List<UserRolesInfo> userRoles, string courseId)
+		private UserListModel GetUserListModel(List<UserRolesInfo> userRoles,
+			Dictionary<string, (Course, bool)> courses,
+			string courseId)
 		{
 			var rolesForUsers = userRolesRepo.GetRolesByUsers(courseId);
 			var currentUserId = User.Identity.GetUserId();
@@ -863,8 +868,8 @@ namespace uLearn.Web.Controllers
 							ToggleUrl = Url.Action("ToggleRole", "Account", new { courseId, userId = user.UserId, role = courseRole }),
 							UserName = user.UserVisibleName,
 							Role = courseRole,
-							CourseTitle = courseManager.FindCourse(courseId)?.Title,
-							IsTempCourse =  IsTempCourse(courseId)
+							CourseTitle = courses.GetOrDefault(courseId).Item1?.Title,
+							IsTempCourse = courses.GetOrDefault(courseId).Item2
 						});
 
 				var courseAccesses = usersCourseAccesses.ContainsKey(user.UserId) ? usersCourseAccesses[user.UserId] : null;
@@ -879,16 +884,16 @@ namespace uLearn.Web.Controllers
 							ToggleUrl = Url.Action("ToggleCourseAccess", "Admin", new { courseId = courseId, userId = user.UserId, accessType = a }),
 							UserName = user.UserVisibleName,
 							AccessType = a,
-							CourseTitle = courseManager.FindCourse(courseId)?.Title,
-							IsTempCourse = IsTempCourse(courseId)
+							CourseTitle = courses.GetOrDefault(courseId).Item1?.Title,
+							IsTempCourse = courses.GetOrDefault(courseId).Item2
 						}
 					);
 
 				model.Users.Add(user);
 			}
 
-			model.UsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, User);
-			model.UsersArchivedGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, User, onlyArchived: true);
+			model.UsersGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, User, actual: true, archived: false);
+			model.UsersArchivedGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, User, actual: false, archived: true);
 
 			return model;
 		}
@@ -896,7 +901,7 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public ActionResult Diagnostics(string courseId, Guid? versionId)
 		{
-			var isTempCourse = IsTempCourse(courseId);
+			var isTempCourse = tempCoursesRepo.Find(courseId) != null;
 			if (versionId == null)
 			{
 				return View(new DiagnosticsModel
@@ -914,7 +919,7 @@ namespace uLearn.Web.Controllers
 			var courseDiff = new CourseDiff(course, version);
 			var schemaPath = Path.Combine(HttpRuntime.BinDirectory, "schema.xsd");
 			var validator = new XmlValidator(schemaPath);
-			var warnings = validator.ValidateSlidesFiles(version.Slides.Select(x => x.Info.SlideFile).ToList());
+			var warnings = validator.ValidateSlidesFiles(version.GetSlides(true).Select(x => x.Info.SlideFile).ToList());
 
 			return View(new DiagnosticsModel
 			{
@@ -930,7 +935,7 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public ActionResult TempCourseDiagnostics(string courseId)
 		{
-			var authorId = tempCoursesReo.Find(courseId).AuthorId;
+			var authorId = tempCoursesRepo.Find(courseId).AuthorId;
 			var baseCourseId = courseId.Replace($"_{authorId}", ""); // todo добавить поле baseCourseId в сущность tempCourse
 			var baseCourseVersion = coursesRepo.GetPublishedCourseVersion(baseCourseId).Id;
 			return RedirectToAction("Diagnostics", new {courseId, versionId = baseCourseVersion});
@@ -1063,7 +1068,7 @@ namespace uLearn.Web.Controllers
 			if (withGroups)
 			{
 				var usersIds = users.Select(u => u.UserId);
-				var groupsNames = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, usersIds, User);
+				var groupsNames = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, usersIds, User, actual: true, archived: false);
 				foreach (var user in usersList)
 					if (groupsNames.ContainsKey(user.id) && !string.IsNullOrEmpty(groupsNames[user.id]))
 						user.value += $": {groupsNames[user.id]}";
@@ -1330,7 +1335,7 @@ namespace uLearn.Web.Controllers
 				}
 			}
 
-			model.GroupsNames = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, allUsersIds, User);
+			model.GroupsNames = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, allUsersIds, User, actual: true, archived: false);
 
 			return View(model);
 		}
@@ -1519,7 +1524,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> SetSuspicionLevels(string courseId, Guid slideId, string faintSuspicion = null, string strongSuspicion = null)
 		{
 			var course = courseManager.GetCourse(courseId);
-			if (course.Slides.All(s => s.Id != slideId))
+			if (course.GetSlides(true).All(s => s.Id != slideId))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden, "Course does not contain a slide");
 
 			if (!TryParseNullableDouble(faintSuspicion, out var faintSuspicionParsed)

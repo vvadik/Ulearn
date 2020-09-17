@@ -44,7 +44,7 @@ namespace uLearn.Web.Controllers
 		public ActionResult SlideComments(string courseId, Guid slideId, bool openInstructorsComments = false)
 		{
 			var course = courseManager.GetCourse(courseId);
-			var slide = course.FindSlideById(slideId);
+			var slide = course.FindSlideById(slideId, true);
 			if (slide == null)
 				return Content("");
 

@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Transactions;
 using Database.Models;
 using log4net;
 using Microsoft.EntityFrameworkCore;
-using uLearn;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
-using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.RunCheckerJobApi;
 
@@ -257,12 +255,18 @@ namespace Database.Repos
 			return db.AutomaticExerciseCheckings.Any(c => automaticCheckingsIds.Contains(c.Id) && c.Status != AutomaticExerciseCheckingStatus.Done);
 		}
 
-		public HashSet<Guid> GetIdOfPassedSlides(string courseId, string userId)
+		public async Task<HashSet<Guid>> GetIdOfPassedSlidesAsync(string courseId, string userId)
 		{
-			return new HashSet<Guid>(db.AutomaticExerciseCheckings
-				.Where(x => x.IsRightAnswer && x.CourseId == courseId && x.UserId == userId)
-				.Select(x => x.SlideId)
-				.Distinct());
+			using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions { IsolationLevel = IsolationLevel.ReadUncommitted}, TransactionScopeAsyncFlowOption.Enabled))
+			{
+				var ids = await db.AutomaticExerciseCheckings
+					.Where(x => x.IsRightAnswer && x.CourseId == courseId && x.UserId == userId)
+					.Select(x => x.SlideId)
+					.Distinct()
+					.ToListAsync();
+				scope.Complete();
+				return new HashSet<Guid>(ids);
+			}
 		}
 
 		public IQueryable<UserExerciseSubmission> GetAllSubmissions(int max, int skip)
@@ -360,7 +364,7 @@ namespace Database.Repos
 			var outputHash = (await textsRepo.AddText(output)).Hash;
 
 			var isWebRunner = checking.CourseId == "web" && checking.SlideId == Guid.Empty;
-			var exerciseSlide = isWebRunner ? null : (ExerciseSlide)(await courseManager.GetCourseAsync(checking.CourseId)).GetSlideById(checking.SlideId);
+			var exerciseSlide = isWebRunner ? null : (ExerciseSlide)(await courseManager.GetCourseAsync(checking.CourseId)).GetSlideById(checking.SlideId, true);
 
 			var isRightAnswer = exerciseSlide?.Exercise?.IsCorrectRunResult(result) ?? false;
 			var score = exerciseSlide != null && isRightAnswer ? exerciseSlide.Scoring.PassedTestsScore : 0;

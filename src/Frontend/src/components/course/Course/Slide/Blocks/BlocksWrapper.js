@@ -8,8 +8,12 @@ import classNames from "classnames";
 import PropTypes from "prop-types";
 
 import styles from "./BlocksWrapper.less";
+import getPluralForm from "src/utils/getPluralForm";
 
 const hiddenHintText = "Студенты не видят этот блок";
+const hiddenSlideText = "Студенты не видят этот слайд.";
+const hiddenSlideTextWithStudents = (showedGroupsIds) => `Студенты ${ showedGroupsIds.join(', ') } видят этот слайд.`;
+const getSlideScore = ({ score, maxScore }) => `${ score } ${ getPluralForm(score, 'балл', 'балла', 'баллов') } из ${ maxScore }`;
 
 class BlocksWrapper extends React.Component {
 	constructor(props) {
@@ -23,7 +27,7 @@ class BlocksWrapper extends React.Component {
 	}
 
 	render() {
-		const { children, className, isBlock, isHidden, isContainer, score, withoutBottomPaddigns, withoutTopPaddings, showEyeHint } = this.props;
+		const { children, className, isBlock, isHidden, isContainer, score, withoutBottomPaddigns, withoutTopPaddings, showEyeHint, isHeaderOfHiddenSlide, } = this.props;
 		const { showed, showStudentsModalOpened, } = this.state;
 		const isHiddenBlock = isBlock && isHidden;
 		const isHiddenSlide = !isBlock && isHidden;
@@ -32,7 +36,7 @@ class BlocksWrapper extends React.Component {
 			styles.withPaddings,
 			{ [styles.withoutTopPaddings]: withoutTopPaddings },
 			{ [styles.withoutBottomPaddigns]: withoutBottomPaddigns },
-			{ [styles.hiddenBackgroundColor]: isHidden },
+			{ [styles.hiddenBackgroundColor]: isHiddenBlock },
 			{ [styles.hiddenSlide]: isHiddenSlide },
 			{ [styles.showed]: showed },
 			className
@@ -45,7 +49,7 @@ class BlocksWrapper extends React.Component {
 					? children
 					: <React.Fragment>
 						{ showStudentsModalOpened && this.renderModal() }
-						{ isHiddenSlide && this.renderHiddenSlideHeader() }
+						{ (isHiddenSlide || isHeaderOfHiddenSlide) && this.renderHiddenSlideHeader() }
 						<div className={ wrapperClassNames } ref={ (ref) => this.wrapper = ref }>
 							{ showEyeHint && isHiddenBlock && this.renderEyeHint() }
 							{ children }
@@ -73,7 +77,7 @@ class BlocksWrapper extends React.Component {
 		return (
 			<div className={ styles.header }>
 				<span className={ styles.headerText }>
-					{ `${ score.score } баллов из ${ score.maxScore }` }
+					{ getSlideScore(score) }
 				</span>
 			</div>
 		);
@@ -88,8 +92,8 @@ class BlocksWrapper extends React.Component {
 
 		const showedGroupsIds = groups.filter(({ checked }) => checked).map(({ id }) => id);
 		const text = showedGroupsIds.length === 0
-			? `${ hiddenHintText }. `
-			: `Студенты ${ showedGroupsIds.join(', ') } видят этот блок. `;
+			? hiddenSlideText
+			: hiddenSlideTextWithStudents(showedGroupsIds);
 
 		return (
 			<div className={ headerClassNames }>
@@ -175,6 +179,7 @@ BlocksWrapper.propTypes = {
 	isContainer: PropTypes.bool,
 	score: PropTypes.object,
 	showEyeHint: PropTypes.bool,
+	isHeaderOfHiddenSlide: PropTypes.bool,
 }
 
 export default BlocksWrapper;

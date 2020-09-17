@@ -3,6 +3,8 @@ import PropTypes from "prop-types";
 import { markupOperation } from "../../commonPropTypes";
 import { Hint } from "ui";
 
+import { isMobile } from "src/utils/getDeviceType";
+
 import styles from "./MarkdownButtons.less";
 
 class MarkdownButtons extends Component {
@@ -15,7 +17,7 @@ class MarkdownButtons extends Component {
 				{Object.entries(markupByOperation)
 				.map(([name, operation]) =>
 					<div key={name} className={styles.buttonBlock}>
-						{!window.matchMedia("(max-width: 767px)").matches ?
+						{!isMobile() ?
 						<Hint
 							pos="bottom"
 							text={this.renderHint(operation)}>
@@ -48,7 +50,7 @@ class MarkdownButtons extends Component {
 				{markup}
 				<span className={styles.white}>{description}</span>
 				{markup}<br />
-				{!window.matchMedia("(max-width: 767px)").matches &&
+				{!isMobile() &&
 				<span className={styles.lightYellow}>{hotkey.asText}</span>}
 			</span>)
 	};

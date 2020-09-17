@@ -15,10 +15,11 @@ import { UrlError } from "src/components/common/Error/NotFoundErrorBoundary";
 import Error404 from "src/components/common/Error/Error404";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import { Edit } from "icons";
+import { Edit, } from "icons";
+import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader";
 
 import { flashcards, constructPathToSlide, signalrWS, } from 'src/consts/routes';
-import { SLIDETYPE } from 'src/consts/general';
+import { SLIDETYPE, } from 'src/consts/general';
 import { SCORING_GROUP_IDS } from 'src/consts/scoringGroup';
 
 import classnames from 'classnames';
@@ -77,6 +78,9 @@ class Course extends Component {
 		if(isAuthenticated) {
 			window.reloadUserProgress = () => loadUserProgress(courseId, user.id); //adding hack to let legacy page scripts to reload progress,TODO(rozentor) remove it after implementing react task slides
 		}
+
+		/* TODO: (rozentor) for now it copied from downloadedHtmlContetn, which run documentReadyFunctions scripts. In future, we will have no scripts in back, so it can be removed totally ( in other words, remove it when DownloadedHtmlContent will be removed)  */
+		(window.documentReadyFunctions || []).forEach(f => f());
 	}
 
 	startSignalRConnection = () => {
@@ -105,8 +109,8 @@ class Course extends Component {
 	}
 
 	componentDidUpdate(prevProps, prevState) {
-		const { loadUserProgress, courseId, loadCourse, user, courseInfo, loadCourseErrors, isHijacked, updateVisitedSlide, progress, } = this.props;
-		const { title, currentSlideInfo, } = this.state;
+		const { loadUserProgress, courseId, loadCourse, user, courseInfo, loadCourseErrors, progress, isHijacked, updateVisitedSlide, isStudentMode, history, pageInfo, } = this.props;
+		const { title, currentSlideInfo, currentSlideId, } = this.state;
 		const { isAuthenticated } = user;
 
 		if(isAuthenticated !== prevProps.user.isAuthenticated) {
@@ -123,6 +127,14 @@ class Course extends Component {
 
 		if(!prevProps.progress && progress && !isHijacked && currentSlideInfo) {
 			updateVisitedSlide(courseId, currentSlideInfo.current.id);
+		}
+
+		if((currentSlideId !== prevState.currentSlideId || isStudentMode !== prevProps.isStudentMode) && currentSlideInfo.current.type === SLIDETYPE.exercise && (pageInfo.isNavigationVisible && !pageInfo.isAcceptedSolutions)) {
+			if(isStudentMode) {
+				history.push('?version=-1'); //prevent showing task solution
+			} else if(history.location.search === '?version=-1') {
+				history.replace();
+			}
 		}
 	}
 
@@ -205,7 +217,7 @@ class Course extends Component {
 	}
 
 	render() {
-		const { courseInfo, courseLoadingErrorStatus, isNavMenuVisible, } = this.props;
+		const { courseInfo, courseLoadingErrorStatus, pageInfo: { isNavigationVisible, }, } = this.props;
 		const { navigationOpened, meta, } = this.state;
 
 		if(courseLoadingErrorStatus) {
@@ -213,14 +225,14 @@ class Course extends Component {
 		}
 
 		if(!courseInfo) {
-			return null;
+			return <CourseLoader/>
 		}
 
 		return (
 			<div
-				className={ classnames(styles.root, { 'open': navigationOpened }, { [styles.withoutMinHeight]: !isNavMenuVisible }) }>
+				className={ classnames(styles.root, { 'open': navigationOpened }, { [styles.withoutMinHeight]: !isNavigationVisible }) }>
 				{ this.renderMeta(meta) }
-				{ isNavMenuVisible && this.renderNavigation() }
+				{ isNavigationVisible && this.renderNavigation() }
 				{ courseInfo.tempCourseError ? <div
 					className={ classnames(styles.errors) }>{ courseInfo.tempCourseError }</div> : this.renderSlide() }
 			</div>
@@ -236,12 +248,13 @@ class Course extends Component {
 	}
 
 	renderSlide() {
-		const { isNavMenuVisible, progress, } = this.props;
+		const { pageInfo: { isNavigationVisible, isReview, }, progress, user, courseId, isStudentMode, } = this.props;
 		const { currentSlideInfo, currentSlideId, currentCourseId, Page, title, } = this.state;
 
 		const wrapperClassName = classnames(
 			styles.rootWrapper,
-			{ [styles.withoutNavigation]: !isNavMenuVisible }, // TODO remove isNavMenuVisible flag
+			{ [styles.withoutNavigation]: !isNavigationVisible }, // TODO remove isNavMenuVisible flag
+			{ [styles.forStudents]: isNavigationVisible && isStudentMode },
 		);
 
 		const slideInfo = currentSlideInfo
@@ -255,16 +268,17 @@ class Course extends Component {
 			}
 			: null;
 
+		const { isSystemAdministrator, accessesByCourse, roleByCourse } = user;
+		const courseAccesses = accessesByCourse[courseId] ? accessesByCourse[courseId] : [];
+		const courseRole = roleByCourse[courseId] ? roleByCourse[courseId] : '';
+		const userRoles = { isSystemAdministrator, courseRole, courseAccesses, };
+
 		return (
 			<main className={ wrapperClassName }>
-				{ isNavMenuVisible && title &&
+				{ (isNavigationVisible || isReview) && title &&
 				<h1 className={ styles.title }>
 					{ title }
-					{ slideInfo && slideInfo.gitEditLink &&
-					<a className={ styles.gitEditLink } rel='noopener noreferrer' target='_blank'
-					   href={ slideInfo.gitEditLink }>
-						<Edit/>
-					</a> }
+					{ slideInfo && slideInfo.gitEditLink && this.renderGitEditLink(slideInfo) }
 				</h1> }
 				<div className={ styles.slide }>
 					{
@@ -272,17 +286,28 @@ class Course extends Component {
 							? <Slide
 								slideId={ currentSlideId }
 								courseId={ currentCourseId }
+								showHiddenBlocks={ !isStudentMode }
+								isHiddenSlide={ slideInfo.hide }
 							/>
-							: <BlocksWrapper score={ score }>
+							: <BlocksWrapper score={ isNavigationVisible ? score : null }>
 								<Page match={ this.props.match }/>
 							</BlocksWrapper>
 					}
 
 				</div>
-				{ currentSlideInfo && isNavMenuVisible && this.renderNavigationButtons(currentSlideInfo) }
-				{ currentSlideInfo && isNavMenuVisible && this.renderComments(currentSlideInfo.current) }
-				{ isNavMenuVisible && this.renderFooter() }
+				{ currentSlideInfo && isNavigationVisible && this.renderNavigationButtons(currentSlideInfo) }
+				{ currentSlideInfo && isNavigationVisible && this.renderComments(currentSlideInfo.current, userRoles) }
+				{ isNavigationVisible && this.renderFooter() }
 			</main>
+		);
+	}
+
+	renderGitEditLink = (slideInfo) => {
+		return (
+			<a className={ styles.gitEditLink } rel='noopener noreferrer' target='_blank'
+			   href={ slideInfo.gitEditLink }>
+				<Edit/>
+			</a>
 		);
 	}
 
@@ -323,7 +348,7 @@ class Course extends Component {
 	}
 
 	getPreviousSlideUrl = (slideInfo) => {
-		const { courseId, isAcceptedSolutions, } = this.props;
+		const { courseId, pageInfo: { isAcceptedSolutions, }, } = this.props;
 		const { previous, current, } = slideInfo;
 
 		if(isAcceptedSolutions) {
@@ -343,12 +368,8 @@ class Course extends Component {
 		this.props.history.push(href);
 	};
 
-	renderComments(currentSlide) {
+	renderComments(currentSlide, userRoles,) {
 		const { user, courseId, isSlideReady, } = this.props;
-		const { isSystemAdministrator, accessesByCourse, roleByCourse } = user;
-		const courseAccesses = accessesByCourse[courseId] ? accessesByCourse[courseId] : [];
-		const courseRole = roleByCourse[courseId] ? roleByCourse[courseId] : '';
-		const userRoles = { isSystemAdministrator, courseRole, courseAccesses, };
 
 		return (
 			<BlocksWrapper className={ styles.commentsWrapper }>
@@ -449,6 +470,8 @@ class Course extends Component {
 				isActive: highlightedUnit === item.id,
 				onClick: this.unitClickHandle,
 				progress: scoresByUnits.hasOwnProperty(item.id) ? scoresByUnits[item.id] : { current: 0, max: 0 },
+				isNotPublished: item.isNotPublished,
+				publicationDate: item.publicationDate,
 			})),
 			containsFlashcards: courseInfo.containsFlashcards,
 		};
@@ -481,6 +504,7 @@ class Course extends Component {
 			maxScore: item.maxScore,
 			questionsCount: item.questionsCount,
 			visited: Boolean(progress && progress[item.id]),
+			hide: item.hide,
 		}));
 	}
 
@@ -587,8 +611,13 @@ Course
 	updateVisitedSlide: PropTypes.func,
 	navigationOpened: PropTypes.bool,
 	courseLoadingErrorStatus: PropTypes.number,
-	isAcceptedSolutions: PropTypes.bool,
-	loadedCourseIds: PropTypes.array,
+	loadedCourseIds: PropTypes.object,
+	pageInfo: PropTypes.shape({
+		isLti: PropTypes.bool,
+		isReview: PropTypes.bool,
+		isAcceptedSolutions: PropTypes.bool,
+		isNavigationVisible: PropTypes.bool,
+	})
 };
 
 export default Course;

@@ -1,8 +1,10 @@
-﻿using System.Web.Helpers;
+﻿using System;
+using System.Web.Helpers;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using uLearn.Web.SameSite;
 
 namespace uLearn.Web
 {
@@ -26,6 +28,11 @@ namespace uLearn.Web
 			 * See https://stackoverflow.com/questions/3418557/how-to-remove-asp-net-mvc-default-http-headers for details
 			 */
 			MvcHandler.DisableMvcResponseHeader = true;
+		}
+
+		protected void Application_BeginRequest(object sender, EventArgs e)
+		{
+			SameSiteCookieRewriter.FilterSameSiteNoneForIncompatibleUserAgents(sender);
 		}
 	}
 }
