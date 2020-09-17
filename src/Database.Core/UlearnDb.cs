@@ -461,5 +461,7 @@ namespace Database
 		public DbSet<TempCourse> TempCourses { get; set; }
 		
 		public DbSet<TempCourseError> TempCourseErrors { get; set; }
+
+		public DbSet<StyleErrorSettings> StyleErrorSettings { get; set; }
 	}
 }

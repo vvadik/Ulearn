@@ -12,7 +12,6 @@ using Ulearn.Common.Extensions;
 
 namespace Database.Repos
 {
-	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
 	public class SlideCheckingsRepo : ISlideCheckingsRepo
 	{
 		private readonly UlearnDb db;
@@ -24,7 +23,7 @@ namespace Database.Repos
 			visitsRepo = new Lazy<IVisitsRepo>(serviceProvider.GetRequiredService<IVisitsRepo>);
 		}
 
-		public async Task AddQuizAttemptForManualChecking(UserQuizSubmission submission, string courseId, Guid slideId, string userId)
+		public async Task<ManualQuizChecking> AddManualQuizChecking(UserQuizSubmission submission, string courseId, Guid slideId, string userId)
 		{
 			var manualChecking = new ManualQuizChecking
 			{
@@ -35,14 +34,16 @@ namespace Database.Repos
 				Timestamp = DateTime.Now,
 			};
 			db.ManualQuizCheckings.Add(manualChecking);
+			await db.SaveChangesAsync();
 
-			await db.SaveChangesAsync().ConfigureAwait(false);
+			return manualChecking;
 		}
 
-		public async Task AddQuizAttemptWithAutomaticChecking(string courseId, Guid slideId, string userId, int automaticScore)
+		public async Task<AutomaticQuizChecking> AddAutomaticQuizChecking(UserQuizSubmission submission, string courseId, Guid slideId, string userId, int automaticScore)
 		{
 			var automaticChecking = new AutomaticQuizChecking
 			{
+				Submission = submission,
 				CourseId = courseId,
 				SlideId = slideId,
 				UserId = userId,
@@ -50,13 +51,24 @@ namespace Database.Repos
 				Score = automaticScore,
 			};
 			db.AutomaticQuizCheckings.Add(automaticChecking);
+			await db.SaveChangesAsync();
 
-			await db.SaveChangesAsync().ConfigureAwait(false);
+			return automaticChecking;
 		}
 
-		public IEnumerable<ManualExerciseChecking> GetUsersPassedManualExerciseCheckings(string courseId, string userId)
+		public async Task<List<ManualExerciseChecking>> GetUsersPassedManualExerciseCheckings(string courseId, string userId)
 		{
-			return db.ManualExerciseCheckings.Where(c => c.CourseId == courseId && c.UserId == userId && c.IsChecked).DistinctBy(c => c.SlideId);
+			return (await db.ManualExerciseCheckings
+					.Where(c => c.CourseId == courseId && c.UserId == userId && c.IsChecked)
+					.ToListAsync())
+				.DistinctBy(c => c.SlideId)
+				.ToList();
+		}
+
+		public async Task<bool> HasManualExerciseChecking(string courseId, Guid slideId, string userId, int submissionId)
+		{
+			return await db.ManualExerciseCheckings
+				.AnyAsync(c => c.CourseId == courseId && c.UserId == userId && c.SlideId == slideId && c.SubmissionId == submissionId);
 		}
 
 		public async Task<ManualExerciseChecking> AddManualExerciseChecking(string courseId, Guid slideId, string userId, UserExerciseSubmission submission)
@@ -71,31 +83,28 @@ namespace Database.Repos
 			};
 			db.ManualExerciseCheckings.Add(manualChecking);
 
-			await db.SaveChangesAsync().ConfigureAwait(false);
+			await db.SaveChangesAsync();
 
 			return manualChecking;
 		}
 
-		public async Task RemoveWaitingManualExerciseCheckings(string courseId, Guid slideId, string userId)
+		public async Task RemoveWaitingManualCheckings<T>(string courseId, Guid slideId, string userId, bool startTransaction = true) where T : AbstractManualSlideChecking
 		{
-			using (var transaction = db.Database.BeginTransaction())
+			using (var transaction = startTransaction ? db.Database.BeginTransaction() : null)
 			{
-				var checkings = GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId, noTracking: false)
-					.AsEnumerable()
+				var checkings = (await GetSlideCheckingsByUser<T>(courseId, slideId, userId, noTracking: false)
+					.ToListAsync())
 					.Where(c => !c.IsChecked && !c.IsLocked)
 					.ToList();
 				foreach (var checking in checkings)
 				{
-					// Use EntityState.Deleted because EF could don't know about these checkings (they have been retrieved via AsNoTracking())
-					// TODO (andgein): Now it's not retrieved via AsNoTracking(). Fix this.
-					foreach (var review in checking.Reviews.ToList())
-						db.Entry(review).State = EntityState.Deleted;
-
-					db.Entry(checking).State = EntityState.Deleted;
+					checking.PreRemove(db);
+					db.Set<T>().Remove(checking);
 				}
 
-				await db.SaveChangesAsync().ConfigureAwait(false);
-				transaction.Commit();
+				await db.SaveChangesAsync();
+				if (transaction != null)
+					await transaction.CommitAsync();
 			}
 		}
 
@@ -120,44 +129,47 @@ namespace Database.Repos
 			db.ManualExerciseCheckings.RemoveSlideAction(courseId, slideId, userId);
 			db.AutomaticExerciseCheckings.RemoveSlideAction(courseId, slideId, userId);
 			if (saveChanges)
-				await db.SaveChangesAsync().ConfigureAwait(false);
+				await db.SaveChangesAsync();
 		}
 
-		public bool IsSlidePassed(string courseId, Guid slideId, string userId)
+		public async Task<bool> IsSlidePassed(string courseId, Guid slideId, string userId)
 		{
-			return GetSlideCheckingsByUser<ManualQuizChecking>(courseId, slideId, userId).Any() ||
-					GetSlideCheckingsByUser<AutomaticQuizChecking>(courseId, slideId, userId).Any() ||
-					GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId).Any() ||
-					GetSlideCheckingsByUser<AutomaticExerciseChecking>(courseId, slideId, userId).Any(c => c.Score > 0);
+			return await GetSlideCheckingsByUser<ManualQuizChecking>(courseId, slideId, userId).AnyAsync() ||
+				await GetSlideCheckingsByUser<AutomaticQuizChecking>(courseId, slideId, userId).AnyAsync() ||
+				await GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId).AnyAsync() ||
+				await GetSlideCheckingsByUser<AutomaticExerciseChecking>(courseId, slideId, userId).AnyAsync(c => c.Score > 0);
 		}
+
 
 		#region Slide Score Calculating
 
-		private int GetUserScoreForSlide<T>(string courseId, Guid slideId, string userId) where T : AbstractSlideChecking
+		private async Task<int> GetUserScoreForSlide<T>(string courseId, Guid slideId, string userId) where T : AbstractSlideChecking
 		{
-			return GetSlideCheckingsByUser<T>(courseId, slideId, userId).Select(c => c.Score).DefaultIfEmpty(0).Max();
+			return await GetSlideCheckingsByUser<T>(courseId, slideId, userId).Select(c => c.Score).DefaultIfEmpty(0).MaxAsync();
 		}
 
-		private Dictionary<string, int> GetUserScoresForSlide<T>(string courseId, Guid slideId, IEnumerable<string> userIds) where T : AbstractSlideChecking
+		private async Task<Dictionary<string, int>> GetUserScoresForSlide<T>(string courseId, Guid slideId, IEnumerable<string> userIds) where T : AbstractSlideChecking
 		{
-			return GetSlideCheckingsByUsers<T>(courseId, slideId, userIds)
+			return (await GetSlideCheckingsByUsers<T>(courseId, slideId, userIds)
+					.Select(c => new { c.UserId, c.Score })
+					.ToListAsync())
 				.GroupBy(c => c.UserId)
 				.Select(g => new { UserId = g.Key, Score = g.Select(c => c.Score).DefaultIfEmpty(0).Max() })
 				.ToDictionary(g => g.UserId, g => g.Score);
 		}
 
-		public int GetManualScoreForSlide(string courseId, Guid slideId, string userId)
+		public async Task<int> GetManualScoreForSlide(string courseId, Guid slideId, string userId)
 		{
-			var quizScore = GetUserScoreForSlide<ManualQuizChecking>(courseId, slideId, userId);
-			var exerciseScore = GetUserScoreForSlide<ManualExerciseChecking>(courseId, slideId, userId);
+			var quizScore = await GetUserScoreForSlide<ManualQuizChecking>(courseId, slideId, userId);
+			var exerciseScore = await GetUserScoreForSlide<ManualExerciseChecking>(courseId, slideId, userId);
 
 			return Math.Max(quizScore, exerciseScore);
 		}
 
-		public Dictionary<string, int> GetManualScoresForSlide(string courseId, Guid slideId, List<string> userIds)
+		public async Task<Dictionary<string, int>> GetManualScoresForSlide(string courseId, Guid slideId, List<string> userIds)
 		{
-			var quizScore = GetUserScoresForSlide<ManualQuizChecking>(courseId, slideId, userIds);
-			var exerciseScore = GetUserScoresForSlide<ManualExerciseChecking>(courseId, slideId, userIds);
+			var quizScore = await GetUserScoresForSlide<ManualQuizChecking>(courseId, slideId, userIds);
+			var exerciseScore = await GetUserScoresForSlide<ManualExerciseChecking>(courseId, slideId, userIds);
 
 			return userIds.ToDictSafe(
 				userId => userId,
@@ -165,18 +177,18 @@ namespace Database.Repos
 			);
 		}
 
-		public int GetAutomaticScoreForSlide(string courseId, Guid slideId, string userId)
+		public async Task<int> GetAutomaticScoreForSlide(string courseId, Guid slideId, string userId)
 		{
-			var quizScore = GetUserScoreForSlide<AutomaticQuizChecking>(courseId, slideId, userId);
-			var exerciseScore = GetUserScoreForSlide<AutomaticExerciseChecking>(courseId, slideId, userId);
+			var quizScore = await GetUserScoreForSlide<AutomaticQuizChecking>(courseId, slideId, userId);
+			var exerciseScore = await GetUserScoreForSlide<AutomaticExerciseChecking>(courseId, slideId, userId);
 
 			return Math.Max(quizScore, exerciseScore);
 		}
 
-		public Dictionary<string, int> GetAutomaticScoresForSlide(string courseId, Guid slideId, List<string> userIds)
+		public async Task<Dictionary<string, int>> GetAutomaticScoresForSlide(string courseId, Guid slideId, List<string> userIds)
 		{
-			var quizScore = GetUserScoresForSlide<AutomaticQuizChecking>(courseId, slideId, userIds);
-			var exerciseScore = GetUserScoresForSlide<AutomaticExerciseChecking>(courseId, slideId, userIds);
+			var quizScore = await GetUserScoresForSlide<AutomaticQuizChecking>(courseId, slideId, userIds);
+			var exerciseScore = await GetUserScoresForSlide<AutomaticExerciseChecking>(courseId, slideId, userIds);
 
 			return userIds.ToDictSafe(
 				userId => userId,
@@ -186,31 +198,32 @@ namespace Database.Repos
 
 		#endregion
 
-		public async Task<IEnumerable<ManualExerciseChecking>> GetManualExerciseCheckingQueueAsync(ManualCheckingQueueFilterOptions options)
+
+		public async Task<List<T>> GetManualCheckingQueue<T>(ManualCheckingQueueFilterOptions options) where T : AbstractManualSlideChecking
 		{
-			var query = GetManualExerciseCheckingQueueFilterQuery(options);
+			var query = GetManualCheckingQueueFilterQuery<T>(options);
 			query = query.OrderByDescending(c => c.Timestamp);
 
 			const int reserveForStartedReviews = 100;
 			if (options.Count > 0)
 				query = query.Take(options.Count + reserveForStartedReviews);
 
-			var enumerable = (IEnumerable<ManualExerciseChecking>)await query.ToListAsync().ConfigureAwait(false);
+			IEnumerable<T> enumerable = await query.ToListAsync();
 			// Отфильтровывает неактуальные начатые ревью
 			enumerable = enumerable
 				.GroupBy(g => new { g.UserId, g.SlideId })
-				.Select(g => g.Last())
+				.Select(g => g.First())
 				.OrderByDescending(c => c.Timestamp);
 			if (options.Count > 0)
 				enumerable = enumerable.Take(options.Count);
-			
-			return enumerable;
+
+			return enumerable.ToList();
 		}
 
-		private IQueryable<ManualExerciseChecking> GetManualExerciseCheckingQueueFilterQuery(ManualCheckingQueueFilterOptions options)
+		private IQueryable<T> GetManualCheckingQueueFilterQuery<T>(ManualCheckingQueueFilterOptions options) where T : AbstractManualSlideChecking
 		{
-			var query = db.Set<ManualExerciseChecking>()
-				.Include(c => c.Reviews) // отличие от версии из Database
+			var query = db.Set<T>()
+				.Include(c => c.User)
 				.Where(c => c.CourseId == options.CourseId);
 			if (options.OnlyChecked.HasValue)
 				query = options.OnlyChecked.Value ? query.Where(c => c.IsChecked) : query.Where(c => !c.IsChecked);
@@ -226,36 +239,82 @@ namespace Database.Repos
 			return query;
 		}
 
-		public T FindManualCheckingById<T>(int id) where T : AbstractManualSlideChecking
+		/// For calculating not checked submissions as well as checked ones
+		public async Task<int> GetQuizManualCheckingCount(string courseId, Guid slideId, string userId, DateTime? beforeTimestamp)
 		{
-			return db.Set<T>().Find(id);
+			var queue = db.ManualQuizCheckings.Where(c =>
+				c.CourseId == courseId
+				&& c.SlideId == slideId
+				&& c.UserId == userId
+				&& !c.IgnoreInAttemptsCount);
+			if (beforeTimestamp != null)
+				queue = queue.Where(s => s.Timestamp < beforeTimestamp);
+			return await queue.CountAsync();
 		}
 
-		public bool IsProhibitedToSendExerciseToManualChecking(string courseId, Guid slideId, string userId)
+		public async Task<HashSet<Guid>> GetManualCheckingQueueSlideIds<T>(ManualCheckingQueueFilterOptions options)
+			where T : AbstractManualSlideChecking
 		{
-			return GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId).Any(c => c.ProhibitFurtherManualCheckings);
+			var query = GetManualCheckingQueueFilterQuery<T>(options);
+			return (await query.Select(c => c.SlideId).Distinct().ToListAsync()).ToHashSet();
 		}
 
-		public Task LockManualChecking<T>(T checkingItem, string lockedById) where T : AbstractManualSlideChecking
+		public async Task<T> FindManualCheckingById<T>(int id) where T : AbstractManualSlideChecking
+		{
+			return await db.Set<T>().FindAsync(id);
+		}
+
+		public async Task<bool> IsProhibitedToSendExerciseToManualChecking(string courseId, Guid slideId, string userId)
+		{
+			return await GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId)
+				.AnyAsync(c => c.ProhibitFurtherManualCheckings);
+		}
+
+		public async Task LockManualChecking<T>(T checkingItem, string lockedById) where T : AbstractManualSlideChecking
 		{
 			checkingItem.LockedById = lockedById;
 			checkingItem.LockedUntil = DateTime.Now.Add(TimeSpan.FromMinutes(30));
-			return db.SaveChangesAsync();
+			await db.SaveChangesAsync();
 		}
 
-		public Task MarkManualCheckingAsChecked<T>(T queueItem, int score) where T : AbstractManualSlideChecking
+		public async Task MarkManualCheckingAsChecked<T>(T queueItem, int score) where T : AbstractManualSlideChecking
 		{
 			queueItem.LockedBy = null;
 			queueItem.LockedUntil = null;
 			queueItem.IsChecked = true;
 			queueItem.Score = score;
-			return db.SaveChangesAsync();
+			await db.SaveChangesAsync();
 		}
 
-		public Task ProhibitFurtherExerciseManualChecking(ManualExerciseChecking checking)
+		// Помечает оцененными посещенные но не оцененные старые ревью
+		public async Task MarkManualCheckingAsCheckedBeforeThis<T>(T queueItem) where T : AbstractManualSlideChecking
+		{
+			var itemsForMark = await db.Set<T>()
+				.Where(c => c.CourseId == queueItem.CourseId && c.UserId == queueItem.UserId && c.SlideId == queueItem.SlideId && c.Timestamp < queueItem.Timestamp)
+				.ToListAsync();
+			var score = 0;
+			var changed = false;
+			foreach (var item in itemsForMark)
+			{
+				if (item.IsChecked)
+					score = item.Score;
+				else
+				{
+					item.LockedBy = null;
+					item.LockedUntil = null;
+					item.IsChecked = true;
+					queueItem.Score = score;
+					changed = true;
+				}
+			}
+			if (changed)
+				await db.SaveChangesAsync();
+		}
+
+		public async Task ProhibitFurtherExerciseManualChecking(ManualExerciseChecking checking)
 		{
 			checking.ProhibitFurtherManualCheckings = true;
-			return db.SaveChangesAsync();
+			await db.SaveChangesAsync();
 		}
 
 		public async Task ResetManualCheckingLimitsForUser(string courseId, string userId)
@@ -315,10 +374,10 @@ namespace Database.Repos
 				AddingTime = setAddingTime ? DateTime.Now : ExerciseCodeReview.NullAddingTime,
 			});
 
-			await db.SaveChangesAsync().ConfigureAwait(false);
+			await db.SaveChangesAsync();
 
 			/* Extract review from database to fill review.Author by EF's DynamicProxy */
-			return await db.ExerciseCodeReviews.AsNoTracking().FirstOrDefaultAsync(r => r.Id == review.Entity.Id).ConfigureAwait(false);
+			return db.ExerciseCodeReviews.AsNoTracking().FirstOrDefault(r => r.Id == review.Entity.Id);
 		}
 
 		public Task<ExerciseCodeReview> AddExerciseCodeReview(ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime = true)
@@ -331,98 +390,140 @@ namespace Database.Repos
 			return AddExerciseCodeReview(submission, null, userId, startLine, startPosition, finishLine, finishPosition, comment, setAddingTime);
 		}
 
-		public ExerciseCodeReview FindExerciseCodeReviewById(int reviewId)
+		public async Task<ExerciseCodeReview> FindExerciseCodeReviewById(int reviewId)
 		{
-			return db.ExerciseCodeReviews.Find(reviewId);
+			return await db.ExerciseCodeReviews.FindAsync(reviewId);
 		}
 
-		public Task DeleteExerciseCodeReview(ExerciseCodeReview review)
+		public async Task DeleteExerciseCodeReview(ExerciseCodeReview review)
 		{
 			review.IsDeleted = true;
-			return db.SaveChangesAsync();
+			await db.SaveChangesAsync();
 		}
 
-		public Task UpdateExerciseCodeReview(ExerciseCodeReview review, string newComment)
+		public async Task UpdateExerciseCodeReview(ExerciseCodeReview review, string newComment)
 		{
 			review.Comment = newComment;
-			return db.SaveChangesAsync();
+			await db.SaveChangesAsync();
 		}
 
-		public Dictionary<int, List<ExerciseCodeReview>> GetExerciseCodeReviewForCheckings(IEnumerable<int> checkingsIds)
+		public async Task<Dictionary<int, List<ExerciseCodeReview>>> GetExerciseCodeReviewForCheckings(IEnumerable<int> checkingsIds)
 		{
-			return db.ExerciseCodeReviews
+			return (await db.ExerciseCodeReviews
 				.Where(r => r.ExerciseCheckingId.HasValue && checkingsIds.Contains(r.ExerciseCheckingId.Value) && !r.IsDeleted)
-				.AsEnumerable()
+				.ToListAsync())
 				.GroupBy(r => r.ExerciseCheckingId)
 				.ToDictionary(g => g.Key.Value, g => g.ToList());
 		}
 
-		public List<string> GetTopUserReviewComments(string courseId, Guid slideId, string userId, int count)
+		public async Task<List<string>> GetTopUserReviewComments(string courseId, Guid slideId, string userId, int count)
 		{
-			return db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)
+			var result = await db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)
 				.Where(r => r.ExerciseChecking.CourseId == courseId &&
 							r.ExerciseChecking.SlideId == slideId &&
 							r.AuthorId == userId &&
 							!r.HiddenFromTopComments &&
 							!r.IsDeleted)
+				.Select(r => new { r.Comment, r.ExerciseChecking.Timestamp })
 				.GroupBy(r => r.Comment)
-				.OrderByDescending(g => g.Count())
-				.ThenByDescending(g => g.Max(r => r.ExerciseChecking.Timestamp))
+				.Select(g => new { 
+					g.Key,
+					Count = g.Count(),
+					Timestamp = g.Max(r => r.Timestamp) })
+				.OrderByDescending(g => g.Count)
+				.ThenByDescending(g => g.Timestamp)
 				.Take(count)
 				.Select(g => g.Key)
-				.ToList();
+				.ToListAsync();
+			return result;
 		}
 
-		public List<string> GetTopOtherUsersReviewComments(string courseId, Guid slideId, string userId, int count, IEnumerable<string> excludeComments)
+		public async Task<List<string>> GetTopOtherUsersReviewComments(string courseId, Guid slideId, string userId, int count, List<string> excludeComments)
 		{
-			return db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)
+			var excludeCommentsSet = excludeComments.ToHashSet();
+			var result = (await db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)
 				.Where(r => r.ExerciseChecking.CourseId == courseId &&
 							r.ExerciseChecking.SlideId == slideId &&
-							!excludeComments.Contains(r.Comment) &&
 							r.AuthorId != userId &&
 							!r.HiddenFromTopComments &&
 							!r.IsDeleted)
 				.GroupBy(r => r.Comment)
-				.OrderByDescending(g => g.Select(r => r.AuthorId).Distinct().Count())
-				.ThenByDescending(g => g.Count())
-				.ThenByDescending(g => g.Max(r => r.ExerciseChecking.Timestamp))
-				.Take(count)
+				.Select(g => new { g.Key, Count = g.Count() })
+				.OrderByDescending(g => g.Count)
+				.Take(count * 2)
 				.Select(g => g.Key)
+				.ToListAsync())
+				.Where(c => !excludeCommentsSet.Contains(c))
+				.Take(count)
 				.ToList();
+			return result;
 		}
-		
+
 		public async Task<Dictionary<string, List<Guid>>> GetSlideIdsWaitingForManualExerciseCheckAsync(string courseId, IEnumerable<string> userIds)
 		{
 			return (await db.ManualExerciseCheckings
-				.Where(c => c.CourseId == courseId && userIds.Contains(c.UserId) && !c.IsChecked)
-				.Select(c => new {c.UserId, c.SlideId})
-				.Distinct()
-				.ToListAsync())
+					.Where(c => c.CourseId == courseId && userIds.Contains(c.UserId) && !c.IsChecked)
+					.Select(c => new {c.UserId, c.SlideId})
+					.Distinct()
+					.ToListAsync())
 				.GroupBy(c => c.UserId)
 				.ToDictionary(g => g.Key, g => g.Select(c => c.SlideId).ToList());
 		}
 
-		public Task HideFromTopCodeReviewComments(string courseId, Guid slideId, string userId, string comment)
+		public async Task HideFromTopCodeReviewComments(string courseId, Guid slideId, string userId, string comment)
 		{
-			var reviews = db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)
-				.Where(r => r.ExerciseChecking.CourseId == courseId &&
-							r.ExerciseChecking.SlideId == slideId &&
-							r.AuthorId == userId &&
-							r.Comment == comment &&
-							!r.IsDeleted);
+			var reviews = await db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)
+				.Where(r => r.ExerciseChecking.CourseId == courseId 
+					&& r.ExerciseChecking.SlideId == slideId
+					&& r.AuthorId == userId
+					&& r.Comment == comment
+					&& !r.IsDeleted)
+				.ToListAsync();
 
 			foreach (var review in reviews)
 				review.HiddenFromTopComments = true;
-			return db.SaveChangesAsync();
+			await db.SaveChangesAsync();
 		}
 
-		public List<ExerciseCodeReview> GetAllReviewComments(string courseId, Guid slideId)
+		public async Task<List<ExerciseCodeReview>> GetLastYearReviewComments(string courseId, Guid slideId)
 		{
-			return db.ExerciseCodeReviews.Where(
+			var lastYear = DateTime.Today.AddYears(-1);
+			var result = await db.ExerciseCodeReviews.Where(
 				r => r.ExerciseChecking.CourseId == courseId &&
 					r.ExerciseChecking.SlideId == slideId &&
-					!r.IsDeleted
-			).ToList();
+					!r.IsDeleted &&
+					r.ExerciseChecking.Timestamp > lastYear
+			).ToListAsync();
+			return result;
+		}
+
+		public async Task<ExerciseCodeReviewComment> AddExerciseCodeReviewComment(string authorId, int reviewId, string text)
+		{
+			var codeReviewComment = new ExerciseCodeReviewComment
+			{
+				AuthorId = authorId,
+				ReviewId = reviewId,
+				Text = text,
+				IsDeleted = false,
+				AddingTime = DateTime.Now,
+			};
+
+			db.ExerciseCodeReviewComments.Add(codeReviewComment);
+			await db.SaveChangesAsync();
+
+			/* Extract review from database to fill review.Author by EF's DynamicProxy */
+			return await db.ExerciseCodeReviewComments.AsNoTracking().FirstOrDefaultAsync(r => r.Id == codeReviewComment.Id);
+		}
+
+		public async Task<ExerciseCodeReviewComment> FindExerciseCodeReviewCommentById(int commentId)
+		{
+			return await db.ExerciseCodeReviewComments.FindAsync(commentId);
+		}
+
+		public async Task DeleteExerciseCodeReviewComment(ExerciseCodeReviewComment comment)
+		{
+			comment.IsDeleted = true;
+			await db.SaveChangesAsync();
 		}
 	}
 }

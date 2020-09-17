@@ -8,17 +8,16 @@ using System.Threading.Tasks;
 using System.Transactions;
 using Database.Models;
 using log4net;
-using Microsoft.EntityFrameworkCore;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.RunCheckerJobApi;
+using Microsoft.EntityFrameworkCore;
 
 namespace Database.Repos
 {
-	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
-
 	public class UserSolutionsRepo : IUserSolutionsRepo
 	{
 		private static readonly ILog log = LogManager.GetLogger(typeof(UserSolutionsRepo));
@@ -31,8 +30,7 @@ namespace Database.Repos
 		private static volatile ConcurrentDictionary<int, DateTime> handledSubmissions = new ConcurrentDictionary<int, DateTime>();
 		private static readonly TimeSpan handleTimeout = TimeSpan.FromMinutes(3);
 
-		public UserSolutionsRepo(
-			UlearnDb db,
+		public UserSolutionsRepo(UlearnDb db,
 			ITextsRepo textsRepo, IVisitsRepo visitsRepo,
 			IWebCourseManager courseManager)
 		{
@@ -46,6 +44,8 @@ namespace Database.Repos
 			string courseId, Guid slideId,
 			string code, string compilationError, string output,
 			string userId, string executionServiceName, string displayName,
+			Language language,
+			string sandbox,
 			AutomaticExerciseCheckingStatus status = AutomaticExerciseCheckingStatus.Waiting)
 		{
 			if (string.IsNullOrWhiteSpace(code))
@@ -53,23 +53,32 @@ namespace Database.Repos
 			var hash = (await textsRepo.AddText(code)).Hash;
 			var compilationErrorHash = (await textsRepo.AddText(compilationError)).Hash;
 			var outputHash = (await textsRepo.AddText(output)).Hash;
+			var exerciseBlock = ((await courseManager.FindCourseAsync(courseId))?.FindSlideById(slideId, true) as ExerciseSlide)?.Exercise;
 
-			var automaticChecking = new AutomaticExerciseChecking
+			AutomaticExerciseChecking automaticChecking;
+			if (language.HasAutomaticChecking() && (language == Language.CSharp || exerciseBlock is UniversalExerciseBlock))
 			{
-				CourseId = courseId,
-				SlideId = slideId,
-				UserId = userId,
-				Timestamp = DateTime.Now,
-				CompilationErrorHash = compilationErrorHash,
-				IsCompilationError = !string.IsNullOrWhiteSpace(compilationError),
-				OutputHash = outputHash,
-				ExecutionServiceName = executionServiceName,
-				DisplayName = displayName,
-				Status = status,
-				IsRightAnswer = false,
-			};
+				automaticChecking = new AutomaticExerciseChecking
+				{
+					CourseId = courseId,
+					SlideId = slideId,
+					UserId = userId,
+					Timestamp = DateTime.Now,
+					CompilationErrorHash = compilationErrorHash,
+					IsCompilationError = !string.IsNullOrWhiteSpace(compilationError),
+					OutputHash = outputHash,
+					ExecutionServiceName = executionServiceName,
+					DisplayName = displayName,
+					Status = status,
+					IsRightAnswer = false,
+				};
 
-			db.AutomaticExerciseCheckings.Add(automaticChecking);
+				db.AutomaticExerciseCheckings.Add(automaticChecking);
+			}
+			else
+			{
+				automaticChecking = null;
+			}
 
 			var submission = new UserExerciseSubmission
 			{
@@ -81,12 +90,15 @@ namespace Database.Repos
 				CodeHash = code.Split('\n').Select(x => x.Trim()).Aggregate("", (x, y) => x + y).GetHashCode(),
 				Likes = new List<Like>(),
 				AutomaticChecking = automaticChecking,
-				AutomaticCheckingIsRightAnswer = false,
+				AutomaticCheckingIsRightAnswer = automaticChecking?.IsRightAnswer ?? true,
+				Language = language,
+				Sandbox = sandbox
 			};
 
 			db.UserExerciseSubmissions.Add(submission);
 
 			await db.SaveChangesAsync();
+
 			return submission;
 		}
 
@@ -113,10 +125,10 @@ namespace Database.Repos
 		{
 			using (var transaction = db.Database.BeginTransaction())
 			{
-				var solutionForLike = db.UserExerciseSubmissions.Find(solutionId);
+				var solutionForLike = await db.UserExerciseSubmissions.FindAsync(solutionId);
 				if (solutionForLike == null)
 					throw new Exception("Solution " + solutionId + " not found");
-				var hisLike = db.SolutionLikes.FirstOrDefault(like => like.UserId == userId && like.SubmissionId == solutionId);
+				var hisLike = await db.SolutionLikes.FirstOrDefaultAsync(like => like.UserId == userId && like.SubmissionId == solutionId);
 				var votedAlready = hisLike != null;
 				var likesCount = solutionForLike.Likes.Count;
 				if (votedAlready)
@@ -132,17 +144,19 @@ namespace Database.Repos
 
 				await db.SaveChangesAsync();
 
-				transaction.Commit();
+				await transaction.CommitAsync();
 
 				return Tuple.Create(likesCount, !votedAlready);
 			}
 		}
 
-		public IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId, bool includeManualCheckings = true)
+		public IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId, bool includeManualAndAutomaticCheckings = true)
 		{
 			var query = db.UserExerciseSubmissions.AsQueryable();
-			if (includeManualCheckings)
-				query = query.Include(s => s.ManualCheckings).Include(s => s.AutomaticChecking);
+			if (includeManualAndAutomaticCheckings)
+				query = query
+					.Include(s => s.ManualCheckings)
+					.Include(s => s.AutomaticChecking);
 			return query.Where(x => x.CourseId == courseId);
 		}
 
@@ -205,17 +219,29 @@ namespace Database.Repos
 			return submissions;
 		}
 
-
-		public List<AcceptedSolutionInfo> GetBestTrendingAndNewAcceptedSolutions(string courseId, List<Guid> slidesIds)
+		public IQueryable<AutomaticExerciseChecking> GetAutomaticExerciseCheckingsByUsers(string courseId, Guid slideId, List<string> userIds)
 		{
-			var prepared = GetAllAcceptedSubmissions(courseId, slidesIds)
-				.GroupBy(x => x.CodeHash, (codeHash, ss) => new { codeHash, timestamp = ss.Min(s => s.Timestamp) })
+			var query = db.AutomaticExerciseCheckings.Where(c => c.CourseId == courseId && c.SlideId == slideId);
+			if (userIds != null)
+				query = query.Where(v => userIds.Contains(v.UserId));
+			return query;
+		}
+
+		public async Task<List<AcceptedSolutionInfo>> GetBestTrendingAndNewAcceptedSolutions(string courseId, List<Guid> slidesIds)
+		{
+			var prepared = await GetAllAcceptedSubmissions(courseId, slidesIds)
+				.GroupBy(x => x.CodeHash,
+					(codeHash, ss) => new
+					{
+						codeHash,
+						timestamp = ss.Min(s => s.Timestamp)
+					})
 				.Join(
 					GetAllAcceptedSubmissions(courseId, slidesIds),
 					g => g,
 					s => new { codeHash = s.CodeHash, timestamp = s.Timestamp }, (k, s) => new { submission = s, k.timestamp })
 				.Select(x => new { x.submission.Id, likes = x.submission.Likes.Count, x.timestamp })
-				.ToList();
+				.ToListAsync();
 
 			var best = prepared
 				.OrderByDescending(x => x.likes);
@@ -226,36 +252,45 @@ namespace Database.Repos
 				.OrderByDescending(x => x.timestamp);
 			var selectedSubmissionsIds = best.Take(3).Concat(trending.Take(3)).Concat(newest).Distinct().Take(10).Select(x => x.Id);
 
-			var selectedSubmissions = db.UserExerciseSubmissions
+			var selectedSubmissions = await db.UserExerciseSubmissions
 				.Where(s => selectedSubmissionsIds.Contains(s.Id))
-				.Select(s => new { s.Id, Code = s.SolutionCode.Text, Likes = s.Likes.Select(y => y.UserId) })
-				.ToList();
+				.Select(s => new
+				{
+					s.Id,
+					Code = s.SolutionCode.Text,
+					Likes = s.Likes.Select(y => y.UserId)
+				})
+				.ToListAsync();
 			return selectedSubmissions
 				.Select(s => new AcceptedSolutionInfo(s.Code, s.Id, s.Likes))
 				.OrderByDescending(info => info.UsersWhoLike.Count)
 				.ToList();
 		}
 
-		public List<AcceptedSolutionInfo> GetBestTrendingAndNewAcceptedSolutions(string courseId, Guid slideId)
+		public async Task<List<AcceptedSolutionInfo>> GetBestTrendingAndNewAcceptedSolutions(string courseId, Guid slideId)
 		{
-			return GetBestTrendingAndNewAcceptedSolutions(courseId, new List<Guid> { slideId });
+			return await GetBestTrendingAndNewAcceptedSolutions(courseId, new List<Guid> { slideId });
 		}
 
-		public int GetAcceptedSolutionsCount(string courseId, Guid slideId)
+		public async Task<int> GetAcceptedSolutionsCount(string courseId, Guid slideId)
 		{
-			return GetAllAcceptedSubmissions(courseId, new List<Guid> { slideId }).Select(x => x.UserId).Distinct().Count();
+			return await GetAllAcceptedSubmissions(courseId, new List<Guid> { slideId })
+				.Select(x => x.UserId)
+				.Distinct()
+				.CountAsync();
 		}
 
-		public bool IsCheckingSubmissionByUser(string courseId, Guid slideId, string userId, DateTime periodStart, DateTime periodFinish)
+		public async Task<bool> IsCheckingSubmissionByUser(string courseId, Guid slideId, string userId, DateTime periodStart, DateTime periodFinish)
 		{
-			var automaticCheckingsIds = GetAllSubmissions(courseId, new List<Guid> { slideId }, periodStart, periodFinish)
+			var automaticCheckingsIds = await GetAllSubmissions(courseId, new List<Guid> { slideId }, periodStart, periodFinish)
 				.Where(s => s.UserId == userId)
 				.Select(s => s.AutomaticCheckingId)
-				.ToList();
-			return db.AutomaticExerciseCheckings.Any(c => automaticCheckingsIds.Contains(c.Id) && c.Status != AutomaticExerciseCheckingStatus.Done);
+				.ToListAsync();
+			return await db.AutomaticExerciseCheckings
+				.AnyAsync(c => automaticCheckingsIds.Contains(c.Id) && c.Status != AutomaticExerciseCheckingStatus.Done);
 		}
 
-		public async Task<HashSet<Guid>> GetIdOfPassedSlidesAsync(string courseId, string userId)
+		public async Task<HashSet<Guid>> GetIdOfPassedSlides(string courseId, string userId)
 		{
 			using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions { IsolationLevel = IsolationLevel.ReadUncommitted}, TransactionScopeAsyncFlowOption.Enabled))
 			{
@@ -269,6 +304,17 @@ namespace Database.Repos
 			}
 		}
 
+		public async Task<bool> IsSlidePassed(string courseId, string userId, Guid slideId)
+		{
+			using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions { IsolationLevel = IsolationLevel.ReadUncommitted}, TransactionScopeAsyncFlowOption.Enabled))
+			{
+				var result = await db.AutomaticExerciseCheckings
+					.AnyAsync(x => x.IsRightAnswer && x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId);
+				scope.Complete();
+				return result;
+			}
+		}
+
 		public IQueryable<UserExerciseSubmission> GetAllSubmissions(int max, int skip)
 		{
 			return db.UserExerciseSubmissions
@@ -277,83 +323,175 @@ namespace Database.Repos
 				.Take(max);
 		}
 
-		public UserExerciseSubmission FindNoTrackingSubmission(int id)
+		public async Task<UserExerciseSubmission> FindNoTrackingSubmission(int id)
 		{
-			return FuncUtils.TrySeveralTimes(() => TryFindNoTrackingSubmission(id), 3, () => Thread.Sleep(TimeSpan.FromMilliseconds(200)));
+			return await FuncUtils.TrySeveralTimesAsync(async () => await TryFindNoTrackingSubmission(id), 3, () =>  Task.Delay(200));
 		}
 
-		private UserExerciseSubmission TryFindNoTrackingSubmission(int id)
+		private async Task<UserExerciseSubmission> TryFindNoTrackingSubmission(int id)
 		{
-			var submission = db.UserExerciseSubmissions.AsNoTracking().SingleOrDefault(x => x.Id == id);
+			var submission = await db.UserExerciseSubmissions.AsNoTracking().SingleOrDefaultAsync(x => x.Id == id);
 			if (submission == null)
 				return null;
-			submission.SolutionCode = textsRepo.GetText(submission.SolutionCodeHash);
-			submission.AutomaticChecking.Output = textsRepo.GetText(submission.AutomaticChecking.OutputHash);
-			submission.AutomaticChecking.CompilationError = textsRepo.GetText(submission.AutomaticChecking.CompilationErrorHash);
+			submission.SolutionCode = await textsRepo.GetText(submission.SolutionCodeHash);
+
+			if (submission.AutomaticChecking != null)
+			{
+				submission.AutomaticChecking.Output = await textsRepo.GetText(submission.AutomaticChecking.OutputHash);
+				submission.AutomaticChecking.CompilationError = await textsRepo.GetText(submission.AutomaticChecking.CompilationErrorHash);
+			}
+
 			return submission;
 		}
 
-		public UserExerciseSubmission FindSubmissionById(int id)
+		public async Task<UserExerciseSubmission> GetUnhandledSubmission(string agentName, List<string> sandboxes)
 		{
-			return db.UserExerciseSubmissions.Find(id);
+			try
+			{
+				return await TryGetExerciseSubmission(agentName, sandboxes);
+			}
+			catch (Exception e)
+			{
+				log.Error("GetUnhandledSubmission() error", e);
+				return null;
+			}
 		}
 
-		public UserExerciseSubmission FindSubmissionById(string id)
+		private static volatile SemaphoreSlim getSubmissionSemaphore = new SemaphoreSlim(1);
+
+		private async Task<UserExerciseSubmission> TryGetExerciseSubmission(string agentName, List<string> sandboxes)
 		{
-			return db.UserExerciseSubmissions.Find(id);
+			var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
+
+			var submissionsQueryable = db.UserExerciseSubmissions
+				.AsNoTracking()
+				.Where(s =>
+					s.Timestamp > notSoLongAgo
+					&& s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting
+					&& sandboxes.Contains(s.Sandbox));
+
+			var maxId = await submissionsQueryable.Select(s => s.Id).DefaultIfEmpty(-1).MaxAsync();
+			if (maxId == -1)
+				return null;
+
+			// NOTE: Если транзакция здесь, а не в начале метода, может возникнуть ситуация, что maxId только что кто-то взял, и мы тоже взяли.
+			// То, что мы не обработаем дважды, защищает проверка на Waiting внутри транзакции ниже.
+			// Мы можем не взять из-за этого другой solution. Не стращно, попробуем снова сразу же с помощью WaitAnyUnhandledSubmissions (см. RunnerController.GetSubmissions).
+			// RepeatableRead блокирует от изменения те строки, которые видел.
+			// Serializable отличается от него только тем, что другая транзакция не добавит другую строку, которая тоже будет подходить под запрос, даже после того, как запрос совершен.
+			// Нам важно только, чтобы не менялись виденные в транзакции строки, поэтому подходит RepeatableRead.
+			// Хотя, здесь делается запрос просто по Id, поэтому в любом случае заблокированных строк мало.
+			// Малое количество затронутых строк должно уменьшить возможность дедлоков. Теоретически, если обе прочитают одно и то же и заходят записать, должна сработать одна транзакция и одна откатиться.
+			// Дедлоки всё-таки есть в большом количестве, поэтому поставил Semaphore
+			log.Debug("GetUnhandledSubmission(): trying to acquire semaphore");
+			var semaphoreLocked = await getSubmissionSemaphore.WaitAsync(TimeSpan.FromSeconds(2));
+			if (!semaphoreLocked)
+			{
+				log.Error("TryGetExerciseSubmission(): Can't lock semaphore for 2 seconds");
+				return null;
+			}
+
+			log.Debug("GetUnhandledSubmission(): semaphore acquired!");
+			try
+			{
+				UserExerciseSubmission submission;
+				using (var transaction = db.Database.BeginTransaction(System.Data.IsolationLevel.RepeatableRead))
+				{
+					submission = await db.UserExerciseSubmissions.AsNoTracking().FirstOrDefaultAsync(s => s.Id == maxId);
+					if (submission == null)
+						return null;
+
+					if (submission.AutomaticChecking.Status != AutomaticExerciseCheckingStatus.Waiting)
+						return null;
+
+					/* Mark submission as "running" */
+					submission.AutomaticChecking.Status = AutomaticExerciseCheckingStatus.Running;
+					submission.AutomaticChecking.CheckingAgentName = agentName;
+
+					await SaveAll(new List<AutomaticExerciseChecking> { submission.AutomaticChecking });
+
+					await transaction.CommitAsync();
+
+					db.ChangeTracker.AcceptAllChanges();
+				}
+
+				unhandledSubmissions.TryRemove(submission.Id, out _);
+
+				return submission;
+			}
+			catch (Exception e)
+			{
+				log.Error("TryGetExerciseSubmission() error", e);
+				return null;
+			}
+			finally
+			{
+				log.Debug("GetUnhandledSubmission(): trying to release semaphore");
+				getSubmissionSemaphore.Release();
+				log.Debug("GetUnhandledSubmission(): semaphore released");
+			}
 		}
 
-		public List<UserExerciseSubmission> FindSubmissionsByIds(IEnumerable<string> checkingsIds)
+		public async Task<UserExerciseSubmission> FindSubmissionById(int id)
 		{
-			var intIds = checkingsIds.Select(i => int.TryParse(i, out var parsed) ? parsed : -1).Where(i => i != -1).ToList();
-			return db.UserExerciseSubmissions.Where(c => intIds.Contains(c.Id)).ToList();
+			return await db.UserExerciseSubmissions.FindAsync(id);
 		}
 
-		private Task UpdateIsRightAnswerForSubmission(AutomaticExerciseChecking checking)
+		public async Task<UserExerciseSubmission> FindSubmissionById(string idString)
 		{
-			return db.UserExerciseSubmissions
+			return int.TryParse(idString, out var id) ? await FindSubmissionById(id) : null;
+		}
+
+		public async Task<List<UserExerciseSubmission>> FindSubmissionsByIds(IEnumerable<int> checkingsIds)
+		{
+			return await db.UserExerciseSubmissions.Where(c => checkingsIds.Contains(c.Id)).ToListAsync();
+		}
+
+		private async Task UpdateIsRightAnswerForSubmission(AutomaticExerciseChecking checking)
+		{
+			(await db.UserExerciseSubmissions
 				.Where(s => s.AutomaticCheckingId == checking.Id)
-				.ForEachAsync(s => s.AutomaticCheckingIsRightAnswer = checking.IsRightAnswer);
+				.ToListAsync())
+				.ForEach(s => s.AutomaticCheckingIsRightAnswer = checking.IsRightAnswer);
 		}
 
-		protected async Task SaveAll(IEnumerable<AutomaticExerciseChecking> checkings)
+		private async Task SaveAll(IEnumerable<AutomaticExerciseChecking> checkings)
 		{
 			foreach (var checking in checkings)
 			{
 				log.Info($"Обновляю статус автоматической проверки #{checking.Id}: {checking.Status}");
 				db.AddOrUpdate(checking, c => c.Id == checking.Id);
-				await UpdateIsRightAnswerForSubmission(checking).ConfigureAwait(false);
+				await UpdateIsRightAnswerForSubmission(checking);
 			}
 
-			await db.SaveChangesAsync().ConfigureAwait(false);
+			db.ChangeTracker.DetectChanges();
+			await db.SaveChangesAsync();
 		}
 
-		public async Task SaveResults(List<RunningResults> results)
+		public async Task SaveResult(RunningResults result, Func<UserExerciseSubmission, Task> onSave)
 		{
-			var resultsDict = results.ToDictionary(result => result.Id);
 			using (var transaction = db.Database.BeginTransaction())
 			{
-				log.Info($"Сохраняю информацию о проверке решений: [{string.Join(", ", results.Select(r => r.Id))}]");
-				var submissions = FindSubmissionsByIds(results.Select(result => result.Id));
-				if (submissions.Count != results.Count)
+				log.Info($"Сохраняю информацию о проверке решения {result.Id}");
+				var submission = await FindSubmissionById(result.Id);
+				if (submission == null)
 				{
-					log.Warn($"Нашёл в базе данных не все решения. Искал: [{string.Join(", ", results.Select(r => r.Id))}]. Нашёл: [{string.Join(", ", submissions.Select(s => s.Id))}]");
+					log.Warn($"Не нашёл в базе данных решение {result.Id}");
+					return;
 				}
 
-				var res = new List<AutomaticExerciseChecking>();
-				foreach (var submission in submissions)
-					res.Add(await UpdateAutomaticExerciseChecking(submission.AutomaticChecking, resultsDict[submission.Id.ToString()]).ConfigureAwait(false));
-				await SaveAll(res).ConfigureAwait(false);
+				var aec = await UpdateAutomaticExerciseChecking(submission.AutomaticChecking, result);
+				await SaveAll(Enumerable.Repeat(aec, 1));
 
-				foreach (var submission in submissions)
-					if (!handledSubmissions.TryAdd(submission.Id, DateTime.Now))
-						log.Warn($"Не удалось запомнить, что проверка {submission.Id} проверена, а результат сохранен в базу");
+				await onSave(submission);
 
-				log.Info($"Есть информация о следующих проверках, которые ещё не забраны клиентом: [{string.Join(", ", handledSubmissions.Keys)}]");
-
-				transaction.Commit();
-
+				await transaction.CommitAsync();
 				db.ChangeTracker.AcceptAllChanges();
+
+				if (!handledSubmissions.TryAdd(submission.Id, DateTime.Now))
+					log.Warn($"Не удалось запомнить, что проверка {submission.Id} проверена, а результат сохранен в базу");
+
+				log.Info($"Есть информация о следующих проверках, которые ещё не записаны в базу клиентом: [{string.Join(", ", handledSubmissions.Keys)}]");
 			}
 		}
 
@@ -364,13 +502,16 @@ namespace Database.Repos
 			var outputHash = (await textsRepo.AddText(output)).Hash;
 
 			var isWebRunner = checking.CourseId == "web" && checking.SlideId == Guid.Empty;
-			var exerciseSlide = isWebRunner ? null : (ExerciseSlide)(await courseManager.GetCourseAsync(checking.CourseId)).GetSlideById(checking.SlideId, true);
+			var exerciseSlide = isWebRunner
+				? null
+				: (ExerciseSlide)(await courseManager.GetCourseAsync(checking.CourseId))
+					.GetSlideById(checking.SlideId, true);
 
-			var isRightAnswer = exerciseSlide?.Exercise?.IsCorrectRunResult(result) ?? false;
+			var isRightAnswer = IsRightAnswer(result, output, exerciseSlide?.Exercise);
 			var score = exerciseSlide != null && isRightAnswer ? exerciseSlide.Scoring.PassedTestsScore : 0;
 
 			/* For skipped slides score is always 0 */
-			if (visitsRepo.IsSkipped(checking.CourseId, checking.SlideId, checking.UserId))
+			if (await visitsRepo.IsSkipped(checking.CourseId, checking.SlideId, checking.UserId))
 				score = 0;
 
 			var newChecking = new AutomaticExerciseChecking
@@ -389,14 +530,45 @@ namespace Database.Repos
 				Elapsed = DateTime.Now - checking.Timestamp,
 				IsRightAnswer = isRightAnswer,
 				Score = score,
+				CheckingAgentName = checking.CheckingAgentName,
+				Points = result.Points
 			};
 
 			return newChecking;
 		}
 
+		private bool IsRightAnswer(RunningResults result, string output, AbstractExerciseBlock exerciseBlock)
+		{
+			if (result.Verdict != Verdict.Ok)
+				return false;
+
+			/* For sandbox runner */
+			if (exerciseBlock == null)
+				return false;
+
+			if (exerciseBlock.ExerciseType == ExerciseType.CheckExitCode)
+				return true;
+
+			if (exerciseBlock.ExerciseType == ExerciseType.CheckOutput)
+			{
+				var expectedOutput = exerciseBlock.ExpectedOutput.NormalizeEoln();
+				return output.Equals(expectedOutput);
+			}
+			
+			if (exerciseBlock.ExerciseType == ExerciseType.CheckPoints)
+			{
+				if (!result.Points.HasValue)
+					return false;
+				const float eps = 0.00001f;
+				return exerciseBlock.SmallPointsIsBetter ? result.Points.Value < exerciseBlock.PassingPoints + eps : result.Points.Value > exerciseBlock.PassingPoints - eps;
+			}
+
+			throw new InvalidOperationException($"Unknown exercise type for checking: {exerciseBlock.ExerciseType}");
+		}
+
 		public async Task RunAutomaticChecking(UserExerciseSubmission submission, TimeSpan timeout, bool waitUntilChecked)
 		{
-			log.Info($"Запускаю проверку решения. ID посылки: {submission.Id}");
+			log.Info($"Запускаю автоматическую проверку решения. ID посылки: {submission.Id}");
 			unhandledSubmissions.TryAdd(submission.Id, DateTime.Now);
 
 			if (!waitUntilChecked)
@@ -409,7 +581,7 @@ namespace Database.Repos
 			while (sw.Elapsed < timeout)
 			{
 				await WaitUntilSubmissionHandled(TimeSpan.FromSeconds(5), submission.Id);
-				var updatedSubmission = FindNoTrackingSubmission(submission.Id);
+				var updatedSubmission = await FindNoTrackingSubmission(submission.Id);
 				if (updatedSubmission == null)
 					break;
 
@@ -421,17 +593,20 @@ namespace Database.Repos
 			}
 
 			/* If something is wrong */
-			unhandledSubmissions.TryRemove(submission.Id, out var _);
+			unhandledSubmissions.TryRemove(submission.Id, out _);
 			throw new SubmissionCheckingTimeout();
 		}
 
-		public Dictionary<int, string> GetSolutionsForSubmissions(IEnumerable<int> submissionsIds)
+		public async Task<Dictionary<int, string>> GetSolutionsForSubmissions(IEnumerable<int> submissionsIds)
 		{
-			var solutionsHashes = db.UserExerciseSubmissions
+			var solutionsHashes = await db.UserExerciseSubmissions
 				.Where(s => submissionsIds.Contains(s.Id))
-				.Select(s => new { Hash = s.SolutionCodeHash, SubmissionId = s.Id }).ToList();
-			var textsByHash = textsRepo.GetTextsByHashes(solutionsHashes.Select(s => s.Hash));
-			return solutionsHashes.ToDictSafe(s => s.SubmissionId, s => textsByHash.GetOrDefault(s.Hash, ""));
+				.Select(s => new { Hash = s.SolutionCodeHash, SubmissionId = s.Id })
+				.ToListAsync();
+			var textsByHash = await textsRepo.GetTextsByHashes(solutionsHashes.Select(s => s.Hash));
+			return solutionsHashes.ToDictSafe(
+				s => s.SubmissionId,
+				s => textsByHash.GetOrDefault(s.Hash, ""));
 		}
 
 		public async Task WaitAnyUnhandledSubmissions(TimeSpan timeout)
@@ -458,7 +633,8 @@ namespace Database.Repos
 			{
 				if (handledSubmissions.ContainsKey(submissionId))
 				{
-					handledSubmissions.TryRemove(submissionId, out _);
+					DateTime value;
+					handledSubmissions.TryRemove(submissionId, out value);
 					return;
 				}
 

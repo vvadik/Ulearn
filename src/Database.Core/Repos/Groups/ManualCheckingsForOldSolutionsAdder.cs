@@ -75,7 +75,7 @@ namespace Database.Repos.Groups
 					var submission = await userQuizzesRepo.FindLastUserSubmissionAsync(courseId, quizSlideId, userId).ConfigureAwait(false);
 					if (submission == null || submission.ManualChecking != null)
 						continue;
-					await slideCheckingsRepo.AddQuizAttemptForManualChecking(submission, courseId, quizSlideId, userId).ConfigureAwait(false);
+					await slideCheckingsRepo.AddManualQuizChecking(submission, courseId, quizSlideId, userId).ConfigureAwait(false);
 					await visitsRepo.MarkVisitsAsWithManualChecking(courseId, quizSlideId, userId).ConfigureAwait(false);
 				}
 			}

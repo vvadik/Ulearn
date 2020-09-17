@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace Database.Repos
 {
@@ -12,11 +13,13 @@ namespace Database.Repos
 	public class VisitsRepo : IVisitsRepo
 	{
 		private readonly UlearnDb db;
+		private readonly ILogger logger;
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
 
-		public VisitsRepo(UlearnDb db, ISlideCheckingsRepo slideCheckingsRepo)
+		public VisitsRepo(UlearnDb db, ILogger logger, ISlideCheckingsRepo slideCheckingsRepo)
 		{
 			this.db = db;
+			this.logger = logger;
 			this.slideCheckingsRepo = slideCheckingsRepo;
 		}
 
@@ -102,11 +105,14 @@ namespace Database.Repos
 			return db.Visits.Any(v => v.CourseId == courseId && v.UserId == userId);
 		}
 
-		public async Task UpdateScoreForVisit(string courseId, Guid slideId, string userId)
+		public async Task UpdateScoreForVisit(string courseId, Guid slideId, int maxSlideScore, string userId)
 		{
-			var newScore = slideCheckingsRepo.GetManualScoreForSlide(courseId, slideId, userId) +
-							slideCheckingsRepo.GetAutomaticScoreForSlide(courseId, slideId, userId);
-			var isPassed = slideCheckingsRepo.IsSlidePassed(courseId, slideId, userId);
+			var newScore = await slideCheckingsRepo.GetManualScoreForSlide(courseId, slideId, userId) +
+							await slideCheckingsRepo.GetAutomaticScoreForSlide(courseId, slideId, userId);
+			newScore = Math.Min(newScore, maxSlideScore);
+			var isPassed = await slideCheckingsRepo.IsSlidePassed(courseId, slideId, userId);
+			logger.Information($"Обновляю количество баллов пользователя {userId} за слайд {slideId} в курсе \"{courseId}\". " +
+					$"Новое количество баллов: {newScore}, слайд пройден: {isPassed}");
 			await UpdateAttempts(courseId, slideId, userId, visit =>
 			{
 				visit.Score = newScore;
@@ -174,12 +180,12 @@ namespace Database.Repos
 			await UpdateAttempts(courseId, slideId, userId, visit => { visit.HasManualChecking = true; });
 		}
 
-		public int GetScore(string courseId, Guid slideId, string userId)
+		public async Task<int> GetScore(string courseId, Guid slideId, string userId)
 		{
-			return db.Visits
+			return await db.Visits
 				.Where(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId)
 				.Select(v => v.Score)
-				.FirstOrDefault();
+				.FirstOrDefaultAsync();
 		}
 
 		public async Task SkipSlide(string courseId, Guid slideId, string userId)
@@ -199,9 +205,9 @@ namespace Database.Repos
 			await db.SaveChangesAsync();
 		}
 
-		public bool IsSkipped(string courseId, Guid slideId, string userId)
+		public async Task<bool> IsSkipped(string courseId, Guid slideId, string userId)
 		{
-			return db.Visits.Any(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId && v.IsSkipped);
+			return await db.Visits.AnyAsync(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId && v.IsSkipped);
 		}
 
 		public async Task UnskipAllSlides(string courseId, string userId)
