@@ -61,9 +61,8 @@ class Navigation extends Component {
 
 		const { clientX, clientY, } = this.getTouches(evt)[0];
 		const { navigationOpened } = this.props;
-		const touchOnLeftSideOfScreen = clientX < window.innerWidth / 3;
 
-		if((!navigationOpened && touchOnLeftSideOfScreen) || navigationOpened) {
+		if(!navigationOpened || navigationOpened) {
 			this.setState({
 				xDown: clientX,
 				yDown: clientY,
@@ -81,7 +80,7 @@ class Navigation extends Component {
 		}
 
 		const moveDistance = Math.abs(xDown - clientX);
-		const isDistanceEnough = moveDistance > mobileNavigationMenuWidth / 4; //if we showed/hided more then 1/4 of menu then toggle navigation
+		const isDistanceEnough = moveDistance !== 0;
 		if(isDistanceEnough) {
 			const leftSwap = !navigationOpened && clientX > xDown;
 			const rightSwap = navigationOpened && clientX < xDown;
