@@ -58,7 +58,7 @@ namespace Database.DataContexts
 
 		public IEnumerable<ManualExerciseChecking> GetUsersPassedManualExerciseCheckings(string courseId, string userId)
 		{
-			return db.ManualExerciseCheckings.Where(c => c.CourseId == courseId && c.UserId == userId && c.IsChecked).DistinctBy(c => c.SlideId);
+			return db.ManualExerciseCheckings.Where(c => c.CourseId == courseId && c.UserId == userId && c.IsChecked).AsEnumerable().DistinctBy(c => c.SlideId);
 		}
 
 		public bool HasManualExerciseChecking(string courseId, Guid slideId, string userId, int submissionId)
@@ -190,6 +190,10 @@ namespace Database.DataContexts
 
 		#endregion
 
+		public IEnumerable<T> GetManualCheckings<T>(string courseId, Guid slideId, string userId) where T : AbstractManualSlideChecking
+		{
+			return GetSlideCheckingsByUser<T>(courseId, slideId, userId);
+		}
 
 		public IEnumerable<T> GetManualCheckingQueue<T>(ManualCheckingQueueFilterOptions options) where T : AbstractManualSlideChecking
 		{

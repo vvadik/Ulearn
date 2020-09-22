@@ -46,7 +46,7 @@
 				<div class="alert alert-danger mt10 ">Внимание. Эта работа прямо сейчас проверяется преподавателем @Model.Checking.LockedBy.VisibleName</div>
 			}
 
-			<h4>Оцените работу (максимальный балл @slide.Scoring.CodeReviewScore)</h4>
+			<h4>Оцените работу <span>@(Model.IsFirstReview ? "(это первое ревью)" : $"(c прошлых ревью стоит {Model.PrevCheckingsScoreManualScorePercent}%)")</span></h4>
 			<div class="exercise__score">
 				<div class="btn-group" role="group">
 					@{
@@ -68,7 +68,7 @@
 						var displayOtherScoreInput = Model.Checking.IsChecked && !isPercentScoreActive;
 						var otherScoreInputDisplayProperty = displayOtherScoreInput ? "" : "display: none";
 					}
-					<a href="#" class="exercise__other-score-link internal-page-link @(displayOtherScoreInput ? "active" : "")">Другая оценка</a>
+					<a href="#" class="exercise__other-score-link internal-page-link @(displayOtherScoreInput ? "active" : "")">Другая оценка<span class="max-score"> (max @slide.Scoring.CodeReviewScore)</span></a>
 					<input type="number" class="form-control" style="@otherScoreInputDisplayProperty" min="0" max="@slide.Scoring.CodeReviewScore" name="exerciseScore" required="required"
 							title="Введите количество баллов. Максимум — @slide.Scoring.CodeReviewScore"
 							value="@(Model.Checking.IsChecked ? Model.Checking.Score.ToString() : "")"/>
