@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using AntiPlagiarism.Api;
 using Database;
 using Database.Di;
 using Database.Models;
@@ -18,18 +19,24 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Ulearn.Common.Api;
+using Ulearn.Common.Api.Swagger;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Metrics;
+using Ulearn.Core.RunCheckerJobApi;
+using Ulearn.Core.Telegram;
 using Ulearn.Web.Api.Authorization;
 using Ulearn.Web.Api.Clients;
 using Ulearn.Web.Api.Controllers.Notifications;
+using Ulearn.Web.Api.Controllers.Runner;
 using Ulearn.Web.Api.Controllers.Slides;
 using Ulearn.Web.Api.Controllers.Websockets;
 using Ulearn.Web.Api.Models;
@@ -44,12 +51,7 @@ namespace Ulearn.Web.Api
 {
 	public class WebApplication : BaseApiWebApplication
 	{
-		private readonly WebApiConfiguration configuration;
-
-		public WebApplication()
-		{
-			configuration = ApplicationConfiguration.Read<WebApiConfiguration>();
-		}
+		private WebApiConfiguration configuration;
 
 		public override Task WarmupAsync(IVostokHostingEnvironment environment, IServiceProvider provider)
 		{
@@ -113,7 +115,7 @@ namespace Ulearn.Web.Api
 
 		protected override void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment, ILogger logger)
 		{
-			var configuration = hostingEnvironment.SecretConfigurationProvider.Get<WebApiConfiguration>(hostingEnvironment.SecretConfigurationSource);
+			configuration = hostingEnvironment.SecretConfigurationProvider.Get<WebApiConfiguration>(hostingEnvironment.SecretConfigurationSource);
 
 			base.ConfigureServices(services, hostingEnvironment, logger);
 
@@ -175,18 +177,29 @@ namespace Ulearn.Web.Api
 		protected override void ConfigureSwaggerDocumentationGeneration(SwaggerGenOptions c)
 		{
 			c.OperationFilter<RemoveCourseParameterOperationFilter>();
+			c.DocumentFilter<PolymorphismDocumentFilter<RunnerSubmission>>();
+			c.SchemaFilter<PolymorphismSchemaFilter<CsRunnerSubmission>>();
 		}
 
 		public override void ConfigureDi(IServiceCollection services, ILogger logger)
 		{
 			base.ConfigureDi(services, logger);
-
+			
 			services.AddScoped<IAuthorizationHandler, CourseRoleAuthorizationHandler>();
 			services.AddScoped<IAuthorizationHandler, CourseAccessAuthorizationHandler>();
 			services.AddScoped<INotificationDataPreloader, NotificationDataPreloader>();
 			services.AddSingleton<IUlearnVideoAnnotationsClient, UlearnVideoAnnotationsClient>();
 			services.AddScoped<SlideRenderer, SlideRenderer>();
 			services.AddSingleton<WebsocketsEventSender, WebsocketsEventSender>();
+			services.AddScoped(sp => new MetricSender(
+				((IOptions<WebApiConfiguration>)sp.GetService(typeof(IOptions<WebApiConfiguration>))).Value.GraphiteServiceName));
+			services.AddScoped(sp => new ErrorsBot(
+				((IOptions<WebApiConfiguration>)sp.GetService(typeof(IOptions<WebApiConfiguration>))).Value,
+				(MetricSender)sp.GetService(typeof(MetricSender))));
+			services.AddScoped<XQueueResultObserver>();
+			services.AddScoped<SandboxErrorsResultObserver>();
+			services.AddScoped<AntiPlagiarismResultObserver>();
+			services.AddScoped<StyleErrorsResultObserver>();
 
 			services.AddDatabaseServices(logger);
 		}

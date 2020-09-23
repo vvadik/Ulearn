@@ -22,12 +22,14 @@
 		<DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.0" />
 	</ItemGroup>
 	<ItemGroup>
+		<ProjectReference Include="..\AntiPlagiarism.Api\AntiPlagiarism.Api.csproj" />
 		<ProjectReference Include="..\Common.Api.Application\Common.Api.Application.csproj" />
 		<ProjectReference Include="..\Common.Api\Common.Api.csproj" />
 		<ProjectReference Include="..\Common\Common.csproj" />
 		<ProjectReference Include="..\Core\Core.csproj" />
 		<ProjectReference Include="..\Database.Core\Database.Core.csproj" />
 		<ProjectReference Include="..\VideoAnnotations.Api\VideoAnnotations.Api.csproj" />
+		<ProjectReference Include="..\XQueue\XQueue.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="Microsoft.Threading.Tasks, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">

@@ -79,6 +79,10 @@ namespace Database.Di
 			services.AddScoped<IFeedRepo, FeedRepo>();
 			services.AddScoped<ISystemAccessesRepo, SystemAccessesRepo>();
 			services.AddScoped<IUnitsRepo, UnitsRepo>();
+			services.AddScoped<ILtiConsumersRepo, LtiConsumersRepo>();
+			services.AddScoped<ILtiRequestsRepo, LtiRequestsRepo>();
+			services.AddScoped<IXQueueRepo, XQueueRepo>();
+			services.AddScoped<IStyleErrorsRepo, StyleErrorsRepo>();
 
 			return services;
 		}

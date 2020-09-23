@@ -29,8 +29,6 @@ namespace Ulearn.Web.Api.Controllers.Slides
 {
 	public class ExerciseController : BaseController
 	{
-		private readonly MetricSender metricSender;
-
 		private readonly IUserSolutionsRepo userSolutionsRepo;
 		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IVisitsRepo visitsRepo;
@@ -39,6 +37,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		private readonly ILtiConsumersRepo ltiConsumersRepo;
 		private readonly ILtiRequestsRepo ltiRequestsRepo;
 		private readonly IStyleErrorsRepo styleErrorsRepo;
+		private readonly MetricSender metricSender;
 		private readonly ErrorsBot errorsBot = new ErrorsBot();
 
 		public ExerciseController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, MetricSender metricSender,
@@ -58,7 +57,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			this.styleErrorsRepo = styleErrorsRepo;
 		}
 
-		[HttpPost("/slides/{courseId}/{slideId}/exercise/submission")]
+		[HttpPost("/slides/{courseId}/{slideId}/exercise/submit")]
 		public async Task<ActionResult<RunSolutionResponse>> RunSolution(
 			[FromRoute] Course course, 
 			[FromRoute] Guid slideId,
@@ -192,7 +191,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			var automaticChecking = submission.AutomaticChecking;
 			bool sentToReview;
 			if (!hasAutomaticChecking)
-				sentToReview = await SendToReviewAndUpdateScore(submission, courseManager, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender, true).ConfigureAwait(false);
+				sentToReview = await SendToReviewAndUpdateScore(submission, courseManager, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender);
 			else
 				sentToReview = await slideCheckingsRepo.HasManualExerciseChecking(courseId, exerciseSlide.Id, userId, submission.Id);
 
@@ -221,8 +220,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		}
 		
 		public static async Task<bool> SendToReviewAndUpdateScore(UserExerciseSubmission submission,
-			IWebCourseManager courseManager, ISlideCheckingsRepo slideCheckingsRepo, IGroupsRepo groupsRepo, IVisitsRepo visitsRepo, MetricSender metricSender,
-			bool startTransaction)
+			IWebCourseManager courseManager, ISlideCheckingsRepo slideCheckingsRepo, IGroupsRepo groupsRepo, IVisitsRepo visitsRepo, MetricSender metricSender)
 		{
 			var userId = submission.User.Id;
 			var courseId = submission.CourseId;
@@ -267,7 +265,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 
 		private async Task CreateStyleErrorsReviewsForSubmission(UserExerciseSubmission submission, List<SolutionStyleError> styleErrors, string exerciseMetricId)
 		{
-			var ulearnBotUserId = usersRepo.GetUlearnBotUserId();
+			var ulearnBotUserId = await usersRepo.GetUlearnBotUserId();
 			foreach (var error in styleErrors)
 			{
 				if (!await styleErrorsRepo.IsStyleErrorEnabled(error.ErrorType))
