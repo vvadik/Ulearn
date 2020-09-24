@@ -71,7 +71,7 @@ namespace Database.Repos
 				.AnyAsync(c => c.CourseId == courseId && c.UserId == userId && c.SlideId == slideId && c.SubmissionId == submissionId);
 		}
 
-		public async Task<ManualExerciseChecking> AddManualExerciseChecking(string courseId, Guid slideId, string userId, UserExerciseSubmission submission)
+		public async Task<ManualExerciseChecking> AddManualExerciseChecking(string courseId, Guid slideId, string userId, int submissionId)
 		{
 			var manualChecking = new ManualExerciseChecking
 			{
@@ -79,7 +79,7 @@ namespace Database.Repos
 				SlideId = slideId,
 				UserId = userId,
 				Timestamp = DateTime.Now,
-				SubmissionId = submission.Id,
+				SubmissionId = submissionId,
 			};
 			db.ManualExerciseCheckings.Add(manualChecking);
 
@@ -92,7 +92,7 @@ namespace Database.Repos
 		{
 			using (var transaction = startTransaction ? db.Database.BeginTransaction() : null)
 			{
-				var checkings = (await GetSlideCheckingsByUser<T>(courseId, slideId, userId, noTracking: false)
+				var checkings = (await GetSlideCheckingsByUser<T>(courseId, slideId, userId)
 					.ToListAsync())
 					.Where(c => !c.IsChecked && !c.IsLocked)
 					.ToList();
@@ -108,18 +108,14 @@ namespace Database.Repos
 			}
 		}
 
-		private IQueryable<T> GetSlideCheckingsByUser<T>(string courseId, Guid slideId, string userId, bool noTracking = true) where T : AbstractSlideChecking
+		private IQueryable<T> GetSlideCheckingsByUser<T>(string courseId, Guid slideId, string userId) where T : AbstractSlideChecking
 		{
-			return GetSlideCheckingsByUsers<T>(courseId, slideId, new List<string> { userId }, noTracking);
+			return GetSlideCheckingsByUsers<T>(courseId, slideId, new List<string> { userId });
 		}
 
-		private IQueryable<T> GetSlideCheckingsByUsers<T>(string courseId, Guid slideId, IEnumerable<string> userIds, bool noTracking = true) where T : AbstractSlideChecking
+		private IQueryable<T> GetSlideCheckingsByUsers<T>(string courseId, Guid slideId, IEnumerable<string> userIds) where T : AbstractSlideChecking
 		{
-			IQueryable<T> dbRef = db.Set<T>();
-			if (noTracking)
-				dbRef = dbRef.AsNoTracking();
-			var items = dbRef.Where(c => c.CourseId == courseId && c.SlideId == slideId && userIds.Contains(c.UserId));
-			return items;
+			return db.Set<T>().Where(c => c.CourseId == courseId && c.SlideId == slideId && userIds.Contains(c.UserId));
 		}
 
 		public async Task RemoveAttempts(string courseId, Guid slideId, string userId, bool saveChanges = true)
@@ -145,7 +141,7 @@ namespace Database.Repos
 
 		private async Task<int> GetUserScoreForSlide<T>(string courseId, Guid slideId, string userId) where T : AbstractSlideChecking
 		{
-			return await GetSlideCheckingsByUser<T>(courseId, slideId, userId).Select(c => c.Score).DefaultIfEmpty(0).MaxAsync();
+			return await GetSlideCheckingsByUser<T>(courseId, slideId, userId).Select(c => c.Score).MaxAsync(c => (int?)c) ?? 0;
 		}
 
 		private async Task<Dictionary<string, int>> GetUserScoresForSlide<T>(string courseId, Guid slideId, IEnumerable<string> userIds) where T : AbstractSlideChecking
@@ -376,8 +372,7 @@ namespace Database.Repos
 
 			await db.SaveChangesAsync();
 
-			/* Extract review from database to fill review.Author by EF's DynamicProxy */
-			return db.ExerciseCodeReviews.AsNoTracking().FirstOrDefault(r => r.Id == review.Entity.Id);
+			return await db.ExerciseCodeReviews.FirstOrDefaultAsync(r => r.Id == review.Entity.Id);
 		}
 
 		public Task<ExerciseCodeReview> AddExerciseCodeReview(ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime = true)
@@ -511,8 +506,7 @@ namespace Database.Repos
 			db.ExerciseCodeReviewComments.Add(codeReviewComment);
 			await db.SaveChangesAsync();
 
-			/* Extract review from database to fill review.Author by EF's DynamicProxy */
-			return await db.ExerciseCodeReviewComments.AsNoTracking().FirstOrDefaultAsync(r => r.Id == codeReviewComment.Id);
+			return await db.ExerciseCodeReviewComments.FirstOrDefaultAsync(r => r.Id == codeReviewComment.Id);
 		}
 
 		public async Task<ExerciseCodeReviewComment> FindExerciseCodeReviewCommentById(int commentId)

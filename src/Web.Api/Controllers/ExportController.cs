@@ -49,7 +49,7 @@ namespace Ulearn.Web.Api.Controllers
 			if (!isSystemAdministrator)
 				return StatusCode((int)HttpStatusCode.Forbidden, "You should be system administrator");
 
-			var group = await groupsRepo.FindGroupByIdAsync(groupId, true).ConfigureAwait(false);
+			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
 			if (group == null)
 				return StatusCode((int)HttpStatusCode.NotFound, "Group not found");
 			

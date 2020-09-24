@@ -16,9 +16,9 @@ namespace Ulearn.Web.Api.Controllers.Runner
 	{
 		private readonly ILogger logger;
 		private readonly IWebCourseManager courseManager;
-		private readonly XQueueRepo xQueueRepo;
+		private readonly IXQueueRepo xQueueRepo;
 
-		public XQueueResultObserver(ILogger logger, IWebCourseManager courseManager, XQueueRepo xQueueRepo)
+		public XQueueResultObserver(ILogger logger, IWebCourseManager courseManager, IXQueueRepo xQueueRepo)
 		{
 			this.logger = logger;
 			this.courseManager = courseManager;

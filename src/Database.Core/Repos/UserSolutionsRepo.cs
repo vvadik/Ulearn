@@ -330,7 +330,10 @@ namespace Database.Repos
 
 		private async Task<UserExerciseSubmission> TryFindNoTrackingSubmission(int id)
 		{
-			var submission = await db.UserExerciseSubmissions.AsNoTracking().SingleOrDefaultAsync(x => x.Id == id);
+			var submission = await db.UserExerciseSubmissions
+				.Include(s => s.AutomaticChecking)
+				.AsNoTracking() // В core побочный эффект - отключение dinamic proxy
+				.SingleOrDefaultAsync(x => x.Id == id);
 			if (submission == null)
 				return null;
 			submission.SolutionCode = await textsRepo.GetText(submission.SolutionCodeHash);
@@ -364,13 +367,14 @@ namespace Database.Repos
 			var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
 
 			var submissionsQueryable = db.UserExerciseSubmissions
-				.AsNoTracking()
+				.Include(c => c.AutomaticChecking)
+				.AsNoTracking() // В core побочный эффект - отключение dinamic proxy
 				.Where(s =>
 					s.Timestamp > notSoLongAgo
 					&& s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting
 					&& sandboxes.Contains(s.Sandbox));
 
-			var maxId = await submissionsQueryable.Select(s => s.Id).DefaultIfEmpty(-1).MaxAsync();
+			var maxId = await submissionsQueryable.Select(s => s.Id).MaxAsync(i => (int?)i) ?? -1;
 			if (maxId == -1)
 				return null;
 
@@ -397,7 +401,11 @@ namespace Database.Repos
 				UserExerciseSubmission submission;
 				using (var transaction = db.Database.BeginTransaction(System.Data.IsolationLevel.RepeatableRead))
 				{
-					submission = await db.UserExerciseSubmissions.AsNoTracking().FirstOrDefaultAsync(s => s.Id == maxId);
+					submission = await db.UserExerciseSubmissions
+						.Include(s => s.AutomaticChecking)
+						.Include(s => s.SolutionCode)
+						.AsNoTracking() // В core побочный эффект - отключение dinamic proxy
+						.FirstOrDefaultAsync(s => s.Id == maxId);
 					if (submission == null)
 						return null;
 

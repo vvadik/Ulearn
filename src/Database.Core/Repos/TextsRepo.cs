@@ -51,7 +51,7 @@ namespace Database.Repos
 			catch (DbUpdateException)
 			{
 				// It's ok, just tried to insert text with hash which already exists, try to find it
-				if (!db.Texts.AsNoTracking().Any(t => t.Hash == hash))
+				if (!db.Texts.Any(t => t.Hash == hash))
 					throw;
 				db.Entry(blob).State = EntityState.Unchanged;
 			}

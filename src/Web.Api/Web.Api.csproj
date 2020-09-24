@@ -50,6 +50,14 @@
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
 		<Content Remove="Configuration\**" />
+		<None Remove="Hunspellx64.dll" />
+		<Content Include="Hunspellx64.dll">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<None Remove="Hunspellx86.dll" />
+		<Content Include="Hunspellx86.dll">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 	<ItemGroup>
 	  <Compile Remove="Configuration\**" />

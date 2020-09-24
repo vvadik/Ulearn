@@ -10,7 +10,9 @@ using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Serilog;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
@@ -58,6 +60,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		}
 
 		[HttpPost("/slides/{courseId}/{slideId}/exercise/submit")]
+		[Authorize]
 		public async Task<ActionResult<RunSolutionResponse>> RunSolution(
 			[FromRoute] Course course, 
 			[FromRoute] Guid slideId,
@@ -76,8 +79,10 @@ namespace Ulearn.Web.Api.Controllers.Slides
 					Message = "Ваше решение по этой задаче уже проверяется. Дождитесь окончания проверки"
 				});
 			}
-			
+
 			var code = parameters.Code;
+			code = await System.IO.File.ReadAllTextAsync("D://code.cs"); //TEST
+			var json = JsonConvert.SerializeObject(new RunSolutionParameters { Code = code }); //TEST
 			if (code.Length > TextsRepo.MaxTextSize)
 			{
 				return Json(new RunSolutionResponse
@@ -91,7 +96,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			var exerciseSlide = (await courseManager.FindCourseAsync(courseId))?.FindSlideById(slideId, isInstructor) as ExerciseSlide;
 			if (exerciseSlide == null)
 				return NotFound(new { status = "error", message = "Slide not found" });
-			
+
 			var result = await CheckSolution(
 				courseId, exerciseSlide, code, User.Identity.GetUserId(), User.Identity.Name,
 				waitUntilChecked: true, saveSubmissionOnCompileErrors: false
@@ -238,7 +243,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			if (sendToReview)
 			{
 				await slideCheckingsRepo.RemoveWaitingManualCheckings<ManualExerciseChecking>(courseId, exerciseSlide.Id, userId, false);
-				await slideCheckingsRepo.AddManualExerciseChecking(courseId, exerciseSlide.Id, userId, submission);
+				await slideCheckingsRepo.AddManualExerciseChecking(courseId, exerciseSlide.Id, userId, submission.Id);
 				await visitsRepo.MarkVisitsAsWithManualChecking(courseId, exerciseSlide.Id, userId);
 				metricSender.SendCount($"exercise.{exerciseMetricId}.sent_to_review");
 				metricSender.SendCount("exercise.sent_to_review");

@@ -13,7 +13,7 @@ namespace Database.Repos
 		Task<AutomaticQuizChecking> AddAutomaticQuizChecking(UserQuizSubmission submission, string courseId, Guid slideId, string userId, int automaticScore);
 		Task<List<ManualExerciseChecking>> GetUsersPassedManualExerciseCheckings(string courseId, string userId);
 		Task<bool> HasManualExerciseChecking(string courseId, Guid slideId, string userId, int submissionId);
-		Task<ManualExerciseChecking> AddManualExerciseChecking(string courseId, Guid slideId, string userId, UserExerciseSubmission submission);
+		Task<ManualExerciseChecking> AddManualExerciseChecking(string courseId, Guid slideId, string userId, int submissionId);
 		Task<Dictionary<string, List<Guid>>> GetSlideIdsWaitingForManualExerciseCheckAsync(string courseId, IEnumerable<string> userIds);
 		Task RemoveWaitingManualCheckings<T>(string courseId, Guid slideId, string userId, bool startTransaction = true) where T : AbstractManualSlideChecking;
 		Task RemoveAttempts(string courseId, Guid slideId, string userId, bool saveChanges = true);

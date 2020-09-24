@@ -58,7 +58,7 @@ namespace Database.Repos.Groups
 						continue;
 
 					logger.Information($"Создаю ручную проверку для решения {lastSubmission.Id}, слайд {slideId}");
-					await slideCheckingsRepo.AddManualExerciseChecking(courseId, slideId, userId, lastSubmission).ConfigureAwait(false);
+					await slideCheckingsRepo.AddManualExerciseChecking(courseId, slideId, userId, lastSubmission.Id).ConfigureAwait(false);
 					await visitsRepo.MarkVisitsAsWithManualChecking(courseId, slideId, userId).ConfigureAwait(false);
 				}
 
