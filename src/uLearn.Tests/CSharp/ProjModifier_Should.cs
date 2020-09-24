@@ -4,6 +4,7 @@ using FluentAssertions;
 using Microsoft.Build.Evaluation;
 using NUnit.Framework;
 using Ulearn.Core;
+using Ulearn.Core.Helpers;
 
 namespace uLearn.CSharp
 {
@@ -31,6 +32,7 @@ namespace uLearn.CSharp
 		[Test]
 		public void ReplaceLinksWithItems()
 		{
+			MsBuildLocationHelper.InitPathToMsBuild();
 			var project = CreateTestProject();
 			var copies = ProjModifier.ReplaceLinksWithItemsAndReturnWhatToCopy(project);
 			copies.Should().HaveCount(1);

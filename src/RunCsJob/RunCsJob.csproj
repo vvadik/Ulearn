@@ -17,6 +17,7 @@
     <PackageTags>ulearn education mooc</PackageTags>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <LangVersion>default</LangVersion>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -34,10 +35,10 @@
     <PackageReference Include="FluentAssertions" Version="5.9.0" />
     <PackageReference Include="JetBrains.Annotations" Version="2019.1.3" />
     <PackageReference Include="log4net" Version="2.0.8" />
-    <PackageReference Include="Microsoft.Build" Version="16.5.0" />
-    <PackageReference Include="Microsoft.Build.Framework" Version="16.5.0" />
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.5.0" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.5.0" />
+    <PackageReference Include="Microsoft.Build" Version="16.6.0" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="16.6.0" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.6.0" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.6.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.2" />
@@ -48,7 +49,7 @@
     <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="3.1.2" />
     <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="3.1.2" />
     <PackageReference Include="Microsoft.Extensions.Primitives" Version="3.1.2" />
-    <PackageReference Include="Microsoft.Net.Compilers" Version="3.3.1">
+    <PackageReference Include="Microsoft.Net.Compilers" Version="3.7.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="1.16.30">
@@ -86,8 +87,8 @@
     <ProjectReference Include="..\RunCheckerJob\RunCheckerJob.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\packages\Microsoft.Net.Compilers.3.3.1\tools\*.*">
-      <Link>Microsoft.Net.Compilers.3.3.1\%(Filename)%(Extension)</Link>
+    <Content Include="..\packages\Microsoft.Net.Compilers.3.7.0\tools\*.*">
+      <Link>Microsoft.Net.Compilers.3.7.0\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="appsettings.json" />

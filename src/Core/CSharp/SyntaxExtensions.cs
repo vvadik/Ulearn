@@ -16,6 +16,12 @@ namespace Ulearn.Core.CSharp
 			return predefinedTypeSyntax != null && predefinedTypeSyntax.Keyword.IsKind(SyntaxKind.VoidKeyword);
 		}
 
+		public static bool IsVoid(this LocalFunctionStatementSyntax method)
+		{
+			var predefinedTypeSyntax = method.ReturnType as PredefinedTypeSyntax;
+			return predefinedTypeSyntax != null && predefinedTypeSyntax.Keyword.IsKind(SyntaxKind.VoidKeyword);
+		}
+
 		public static IEnumerable<MemberDeclarationSyntax> GetMembers(this SyntaxNode node)
 		{
 			return node.DescendantNodes()
@@ -37,6 +43,16 @@ namespace Ulearn.Core.CSharp
 			var type = node as TypeDeclarationSyntax;
 			if (type != null)
 				return type.Members;
+
+			var localFunction = node as LocalFunctionStatementSyntax;
+			if (localFunction != null)
+			{
+				var body = localFunction.Body;
+				if (body != null)
+					return body.Statements;
+				return new SyntaxList<SyntaxNode>();
+			}
+			
 			return new SyntaxList<SyntaxNode>();
 		}
 

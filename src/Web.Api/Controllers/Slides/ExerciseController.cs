@@ -81,8 +81,6 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			}
 
 			var code = parameters.Code;
-			code = await System.IO.File.ReadAllTextAsync("D://code.cs"); //TEST
-			var json = JsonConvert.SerializeObject(new RunSolutionParameters { Code = code }); //TEST
 			if (code.Length > TextsRepo.MaxTextSize)
 			{
 				return Json(new RunSolutionResponse

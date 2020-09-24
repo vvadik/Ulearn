@@ -22,12 +22,12 @@ namespace Ulearn.Core.CSharp.Validators.VerbInMethodNameValidation
 
 		public override List<SolutionStyleError> FindErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
-			return InspectAll<MethodDeclarationSyntax>(userSolution, InspectMethodsNames).ToList();
+			return InspectAll<MethodDeclarationSyntax>(userSolution, s => InspectNames(s.Identifier()))
+				.Concat(InspectAll<LocalFunctionStatementSyntax>(userSolution, s => InspectNames(s.Identifier))).ToList();
 		}
 
-		private IEnumerable<SolutionStyleError> InspectMethodsNames(MethodDeclarationSyntax methodDeclarationSyntax)
+		private IEnumerable<SolutionStyleError> InspectNames(SyntaxToken syntaxToken)
 		{
-			var syntaxToken = methodDeclarationSyntax.Identifier();
 			if (exceptionsMethodNames.Contains(syntaxToken.ValueText))
 				yield break;
 

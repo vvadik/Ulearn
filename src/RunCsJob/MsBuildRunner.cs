@@ -6,12 +6,13 @@ using Microsoft.Build.Evaluation;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Logging;
 using Ulearn.Common;
+using Ulearn.Core.Helpers;
 
 namespace RunCsJob
 {
 	public class MsBuildSettings
 	{
-		private const string compilersFolderName = "Microsoft.Net.Compilers.3.3.1";
+		private const string compilersFolderName = "Microsoft.Net.Compilers.3.7.0";
 		private const string wellKnownLibsFolderName = "WellKnownLibs";
 
 		public MsBuildSettings()
@@ -35,6 +36,7 @@ namespace RunCsJob
 		{
 			var result = new MSbuildResult();
 			var path = Path.Combine(dir.FullName, projectFileName);
+			MsBuildLocationHelper.InitPathToMsBuild();
 			return FuncUtils.Using(
 				new ProjectCollection(),
 				projectCollection =>
