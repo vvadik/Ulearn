@@ -1,10 +1,14 @@
 @import "./../../../../variables";
 
 .root {
+  height: auto;
+
   font-family: @defaultFonts;
 }
 
 .headerText {
+  text-align: center;
+
   user-select: none;
 
   font-size: 16px;
@@ -12,6 +16,8 @@
 }
 
 .footer {
+  display: none;
+
   padding-left: 15px;
 
   color: @additionalColor;
@@ -47,6 +53,8 @@
   max-width: 70px;
   max-height: 70px;
 
+  margin: auto;
+
   color: #fff;
   border-radius: 50%;
   box-sizing: border-box;
@@ -57,25 +65,23 @@
   text-align: center;
   font-size: 36px;
   line-height: 25px;
-
-  margin-right: 15px;
 }
 
-@media (max-width: @minLaptopWidth) {
+@media (min-width: @minLaptopWidth) {
   .headerText {
-    text-align: center;
+    text-align: initial;
   }
 
   .root {
-    height: auto;
+    height: initial;
   }
 
   .resultsElement {
-    margin: auto;
+    margin: 0 15px 0 0;
   }
 
   .footer {
-    display: none;
+    display: initial;
   }
 }
 

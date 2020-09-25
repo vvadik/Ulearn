@@ -9,8 +9,8 @@
 
 .closeButton {
   position: absolute;
-  top: 8px;
-  right: 18px;
+  top: 13px;
+  right: 8px;
 
   font-size: 32px;
   opacity: 0.54;
@@ -48,7 +48,7 @@
   margin: 20px 0;
 
   overflow-y: auto;
-  font-size: 32px;
+  font-size: 26px;
   line-height: 1.2;
   font-family: @defaultFonts;
 }
@@ -61,6 +61,8 @@
 
 .showAnswerButtonContainer {
   display: flex;
+
+  justify-content: center;
 }
 
 .backTextContainer {
@@ -87,7 +89,7 @@
   font-weight: 400;
 }
 
-.answer >:last-child {
+.answer > :last-child {
   margin-bottom: 0;
 }
 
@@ -97,20 +99,20 @@
 }
 
 .wrapper i {
-  padding: 0 2px;//fixing bug causing italic text overlap
+  padding: 0 2px; //fixing bug causing italic text overlap
 }
 
-@media (max-width: @minLaptopWidth) {
+@media (min-width: @minLaptopWidth) {
   .questionFront {
-    font-size: 26px;
+    font-size: 32px;
   }
 
   .closeButton {
-    top: 13px;
-    right: 8px;
+    top: 8px;
+    right: 18px;
   }
 
   .showAnswerButtonContainer {
-    justify-content: center;
+    justify-content: initial;
   }
 }
