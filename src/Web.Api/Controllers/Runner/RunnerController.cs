@@ -128,7 +128,7 @@ namespace Ulearn.Web.Api.Controllers.Runner
 		/// Записать результат проверки решений задач
 		/// </summary>
 		[HttpPost("/runner/set-result")]
-		public async Task<ActionResult> PostResults([FromQuery] string token, [FromQuery] string agent, [FromBody] List<RunningResults> results)
+		public async Task<ActionResult> SetResults([FromQuery] string token, [FromQuery] string agent, [FromBody] List<RunningResults> results)
 		{
 			if (!ModelState.IsValid)
 			{

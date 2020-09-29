@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
 using Database.Models;
@@ -24,19 +23,22 @@ namespace Database.Repos
 		private readonly UlearnDb db;
 		private readonly ITextsRepo textsRepo;
 		private readonly IVisitsRepo visitsRepo;
+		private readonly IWorkQueueRepo workQueueRepo;
 		private readonly IWebCourseManager courseManager;
+		private const int queueId = 1;
 
 		private static volatile ConcurrentDictionary<int, DateTime> unhandledSubmissions = new ConcurrentDictionary<int, DateTime>();
 		private static volatile ConcurrentDictionary<int, DateTime> handledSubmissions = new ConcurrentDictionary<int, DateTime>();
 		private static readonly TimeSpan handleTimeout = TimeSpan.FromMinutes(3);
 
 		public UserSolutionsRepo(UlearnDb db,
-			ITextsRepo textsRepo, IVisitsRepo visitsRepo,
+			ITextsRepo textsRepo, IVisitsRepo visitsRepo, IWorkQueueRepo workQueueRepo,
 			IWebCourseManager courseManager)
 		{
 			this.db = db;
 			this.textsRepo = textsRepo;
 			this.visitsRepo = visitsRepo;
+			this.workQueueRepo = workQueueRepo;
 			this.courseManager = courseManager;
 		}
 
@@ -361,83 +363,34 @@ namespace Database.Repos
 			}
 		}
 
-		private static volatile SemaphoreSlim getSubmissionSemaphore = new SemaphoreSlim(1);
-
 		private async Task<UserExerciseSubmission> TryGetExerciseSubmission(string agentName, List<string> sandboxes)
 		{
-			var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
-
-			var maxSubmissionId = await db.UserExerciseSubmissions
-				.Where(s =>
-					s.Timestamp > notSoLongAgo
-					&& s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting
-					&& sandboxes.Contains(s.Sandbox))
-				.Select(s => s.Id)
-				.MaxAsync(i => (int?)i) ?? -1;
-
-			if (maxSubmissionId == -1)
-				return null;
-
-			// NOTE: Если транзакция здесь, а не в начале метода, может возникнуть ситуация, что maxId только что кто-то взял, и мы тоже взяли.
-			// То, что мы не обработаем дважды, защищает проверка на Waiting внутри транзакции ниже.
-			// Мы можем не взять из-за этого другой solution. Не стращно, попробуем снова сразу же с помощью WaitAnyUnhandledSubmissions (см. RunnerController.GetSubmissions).
-			// RepeatableRead блокирует от изменения те строки, которые видел.
-			// Serializable отличается от него только тем, что другая транзакция не добавит другую строку, которая тоже будет подходить под запрос, даже после того, как запрос совершен.
-			// Нам важно только, чтобы не менялись виденные в транзакции строки, поэтому подходит RepeatableRead.
-			// Хотя, здесь делается запрос просто по Id, поэтому в любом случае заблокированных строк мало.
-			// Малое количество затронутых строк должно уменьшить возможность дедлоков. Теоретически, если обе прочитают одно и то же и заходят записать, должна сработать одна транзакция и одна откатиться.
-			// Дедлоки всё-таки есть в большом количестве, поэтому поставил Semaphore
-			log.Debug("GetUnhandledSubmission(): trying to acquire semaphore");
-			var semaphoreLocked = await getSubmissionSemaphore.WaitAsync(TimeSpan.FromSeconds(2));
-			if (!semaphoreLocked)
+			UserExerciseSubmission submission = null;
+			while (submission == null)
 			{
-				log.Error("TryGetExerciseSubmission(): Can't lock semaphore for 2 seconds");
-				return null;
-			}
+				var work = await workQueueRepo.Take(queueId, sandboxes);
+				if (work == null)
+					return null;
 
-			log.Debug("GetUnhandledSubmission(): semaphore acquired!");
-			try
-			{
-				UserExerciseSubmission submission;
-				using (var transaction = db.Database.BeginTransaction(System.Data.IsolationLevel.RepeatableRead))
+				var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
+				submission = await db.UserExerciseSubmissions
+					.Include(s => s.AutomaticChecking)
+					.Include(s => s.SolutionCode)
+					.FirstOrDefaultAsync(s => s.Id == work.Id
+						&& s.Timestamp > notSoLongAgo
+						&& s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting);
+				if (submission == null)
 				{
-					submission = await db.UserExerciseSubmissions
-						.Include(s => s.AutomaticChecking)
-						.Include(s => s.SolutionCode)
-						.AsNoTracking() // В core побочный эффект - отключение dinamic proxy 
-						.FirstOrDefaultAsync(s => s.Id == maxSubmissionId);
-					if (submission == null)
-						return null;
-
-					if (submission.AutomaticChecking.Status != AutomaticExerciseCheckingStatus.Waiting)
-						return null;
-
-					/* Mark submission as "running" */
-					submission.AutomaticChecking.Status = AutomaticExerciseCheckingStatus.Running;
-					submission.AutomaticChecking.CheckingAgentName = agentName;
-
-					await SaveAll(new List<AutomaticExerciseChecking> { submission.AutomaticChecking });
-
-					await transaction.CommitAsync();
-
-					db.ChangeTracker.AcceptAllChanges();
+					await workQueueRepo.Remove(work.Id);
 				}
+			}
 
-				unhandledSubmissions.TryRemove(submission.Id, out _);
+			submission.AutomaticChecking.Status = AutomaticExerciseCheckingStatus.Running;
+			submission.AutomaticChecking.CheckingAgentName = agentName;
+			await db.SaveChangesAsync();
 
-				return submission;
-			}
-			catch (Exception e)
-			{
-				log.Error("TryGetExerciseSubmission() error", e);
-				return null;
-			}
-			finally
-			{
-				log.Debug("GetUnhandledSubmission(): trying to release semaphore");
-				getSubmissionSemaphore.Release();
-				log.Debug("GetUnhandledSubmission(): semaphore released");
-			}
+			unhandledSubmissions.TryRemove(submission.Id, out _);
+			return submission;
 		}
 
 		public async Task<UserExerciseSubmission> FindSubmissionById(int id)
@@ -455,31 +408,14 @@ namespace Database.Repos
 			return await db.UserExerciseSubmissions.Where(c => checkingsIds.Contains(c.Id)).ToListAsync();
 		}
 
-		private async Task UpdateIsRightAnswerForSubmission(AutomaticExerciseChecking checking)
-		{
-			(await db.UserExerciseSubmissions
-				.Where(s => s.AutomaticCheckingId == checking.Id)
-				.ToListAsync())
-				.ForEach(s => s.AutomaticCheckingIsRightAnswer = checking.IsRightAnswer);
-		}
-
-		private async Task SaveAll(IEnumerable<AutomaticExerciseChecking> checkings)
-		{
-			foreach (var checking in checkings)
-			{
-				log.Info($"Обновляю статус автоматической проверки #{checking.Id}: {checking.Status}");
-				db.AddOrUpdate(checking, c => c.Id == checking.Id);
-				await UpdateIsRightAnswerForSubmission(checking);
-			}
-
-			await db.SaveChangesAsync();
-		}
-
 		public async Task SaveResult(RunningResults result, Func<UserExerciseSubmission, Task> onSave)
 		{
+			log.Info($"Сохраняю информацию о проверке решения {result.Id}"); 
+
+			await workQueueRepo.RemoveByItemId(queueId, result.Id);
+
 			using (var transaction = db.Database.BeginTransaction())
 			{
-				log.Info($"Сохраняю информацию о проверке решения {result.Id}");
 				var submission = await FindSubmissionById(result.Id);
 				if (submission == null)
 				{
@@ -488,7 +424,7 @@ namespace Database.Repos
 				}
 
 				var aec = await UpdateAutomaticExerciseChecking(submission.AutomaticChecking, result);
-				await SaveAll(Enumerable.Repeat(aec, 1));
+				await SaveAutomaticExerciseChecking(aec);
 
 				await onSave(submission);
 
@@ -500,6 +436,22 @@ namespace Database.Repos
 
 				log.Info($"Есть информация о следующих проверках, которые ещё не записаны в базу клиентом: [{string.Join(", ", handledSubmissions.Keys)}]");
 			}
+		}
+
+		private async Task SaveAutomaticExerciseChecking(AutomaticExerciseChecking checking)
+		{
+			log.Info($"Обновляю статус автоматической проверки #{checking.Id}: {checking.Status}");
+			db.AddOrUpdate(checking, c => c.Id == checking.Id);
+			await UpdateIsRightAnswerForSubmission(checking);
+			await db.SaveChangesAsync();
+		}
+
+		private async Task UpdateIsRightAnswerForSubmission(AutomaticExerciseChecking checking)
+		{
+			(await db.UserExerciseSubmissions
+					.Where(s => s.AutomaticCheckingId == checking.Id)
+					.ToListAsync())
+				.ForEach(s => s.AutomaticCheckingIsRightAnswer = checking.IsRightAnswer);
 		}
 
 		private async Task<AutomaticExerciseChecking> UpdateAutomaticExerciseChecking(AutomaticExerciseChecking checking, RunningResults result)

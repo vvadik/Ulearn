@@ -12,7 +12,6 @@ using Database.Repos.Users;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using Serilog;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;

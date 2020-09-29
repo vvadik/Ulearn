@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
 using Database.Models;
+using JetBrains.Annotations;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Z.EntityFramework.Plus;
@@ -30,12 +31,18 @@ namespace Database.Repos
 			await db.WorkQueue.Where(i => i.Id == id).DeleteAsync();
 		}
 
+		public async Task RemoveByItemId(int queueId, string itemId)
+		{
+			await db.WorkQueue.Where(i => i.QueueId == queueId && i.ItemId == itemId).DeleteAsync();
+		}
+
 		public async Task ReturnToQueue(int id)
 		{
 			await db.WorkQueue.Where(i => i.Id == id).UpdateAsync(c => new WorkQueueItem {TakeAfterTime = null});
 		}
 
 		// http://rusanu.com/2010/03/26/using-tables-as-queues/
+		[ItemCanBeNull]
 		public async Task<WorkQueueItem> Take(int queueId, List<string> types, TimeSpan? timeLimit = null)
 		{
 			timeLimit = timeLimit ?? TimeSpan.FromMinutes(5);
