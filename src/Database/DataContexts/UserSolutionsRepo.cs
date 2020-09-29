@@ -368,7 +368,9 @@ namespace Database.DataContexts
 				UserExerciseSubmission submission;
 				using (var transaction = db.Database.BeginTransaction(IsolationLevel.RepeatableRead))
 				{
-					submission = db.UserExerciseSubmissions.AsNoTracking().FirstOrDefault(s => s.Id == maxId);
+					submission = db.UserExerciseSubmissions
+						.Include(c => c.AutomaticChecking)
+						.AsNoTracking().FirstOrDefault(s => s.Id == maxId);
 					if (submission == null)
 						return null;
 

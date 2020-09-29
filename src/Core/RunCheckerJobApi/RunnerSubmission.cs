@@ -40,7 +40,7 @@ namespace Ulearn.Core.RunCheckerJobApi
 		}
 	}
 	
-	[DataContract(Namespace = "", Name = "file")]
+	[DataContract]
 	[DisplayName("file")]
 	public class FileRunnerSubmission : CsRunnerSubmission
 	{
@@ -48,7 +48,7 @@ namespace Ulearn.Core.RunCheckerJobApi
 		public string Code { get; set; }
 	}
 
-	[DataContract(Namespace = "", Name = "proj")]
+	[DataContract]
 	[DisplayName("proj")]
 	public class ProjRunnerSubmission : CsRunnerSubmission
 	{
@@ -58,7 +58,7 @@ namespace Ulearn.Core.RunCheckerJobApi
 		public string ProjectFileName { get; set; }
 	}
 
-	[DataContract(Namespace = "", Name = "command")]
+	[DataContract]
 	[DisplayName("command")]
 	public class CommandRunnerSubmission : RunnerSubmission
 	{

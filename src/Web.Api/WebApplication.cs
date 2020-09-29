@@ -21,6 +21,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Filters;
@@ -169,6 +170,7 @@ namespace Ulearn.Web.Api
 								{ "snakecase", new SnakeCaseNamingStrategy() }
 							}
 						}, services.BuildServiceProvider().GetService<IMemoryCache>);
+						opt.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
 						opt.SerializerSettings.Converters.Add(new StringEnumConverter());
 					}
 				);

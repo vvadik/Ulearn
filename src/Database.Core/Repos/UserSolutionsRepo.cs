@@ -331,12 +331,13 @@ namespace Database.Repos
 		private async Task<UserExerciseSubmission> TryFindNoTrackingSubmission(int id)
 		{
 			var submission = await db.UserExerciseSubmissions
-				.Include(s => s.AutomaticChecking)
+				.Include(s => s.AutomaticChecking).ThenInclude(c => c.Output)
+				.Include(s => s.AutomaticChecking).ThenInclude(c => c.CompilationError)
+				.Include(s => s.SolutionCode)
 				.AsNoTracking() // В core побочный эффект - отключение dinamic proxy
 				.SingleOrDefaultAsync(x => x.Id == id);
 			if (submission == null)
 				return null;
-			submission.SolutionCode = await textsRepo.GetText(submission.SolutionCodeHash);
 
 			if (submission.AutomaticChecking != null)
 			{
@@ -366,16 +367,15 @@ namespace Database.Repos
 		{
 			var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
 
-			var submissionsQueryable = db.UserExerciseSubmissions
-				.Include(c => c.AutomaticChecking)
-				.AsNoTracking() // В core побочный эффект - отключение dinamic proxy
+			var maxSubmissionId = await db.UserExerciseSubmissions
 				.Where(s =>
 					s.Timestamp > notSoLongAgo
 					&& s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting
-					&& sandboxes.Contains(s.Sandbox));
+					&& sandboxes.Contains(s.Sandbox))
+				.Select(s => s.Id)
+				.MaxAsync(i => (int?)i) ?? -1;
 
-			var maxId = await submissionsQueryable.Select(s => s.Id).MaxAsync(i => (int?)i) ?? -1;
-			if (maxId == -1)
+			if (maxSubmissionId == -1)
 				return null;
 
 			// NOTE: Если транзакция здесь, а не в начале метода, может возникнуть ситуация, что maxId только что кто-то взял, и мы тоже взяли.
@@ -404,8 +404,8 @@ namespace Database.Repos
 					submission = await db.UserExerciseSubmissions
 						.Include(s => s.AutomaticChecking)
 						.Include(s => s.SolutionCode)
-						.AsNoTracking() // В core побочный эффект - отключение dinamic proxy
-						.FirstOrDefaultAsync(s => s.Id == maxId);
+						.AsNoTracking() // В core побочный эффект - отключение dinamic proxy 
+						.FirstOrDefaultAsync(s => s.Id == maxSubmissionId);
 					if (submission == null)
 						return null;
 
@@ -472,7 +472,6 @@ namespace Database.Repos
 				await UpdateIsRightAnswerForSubmission(checking);
 			}
 
-			db.ChangeTracker.DetectChanges();
 			await db.SaveChangesAsync();
 		}
 
