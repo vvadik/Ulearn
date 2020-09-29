@@ -65,8 +65,6 @@ namespace Ulearn.Web.Api.Controllers.Runner
 				return StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse("Invalid token"));
 
 			var sandboxesImageNames = sandboxes.Split(',').ToList();
-			if (sandboxesImageNames.Contains("csharp"))
-				sandboxesImageNames.Add(null);
 
 			var sw = Stopwatch.StartNew();
 			while (true)

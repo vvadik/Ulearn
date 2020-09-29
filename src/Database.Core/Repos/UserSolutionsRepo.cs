@@ -373,10 +373,11 @@ namespace Database.Repos
 					return null;
 
 				var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
+				var workItemId= int.Parse(work.ItemId);
 				submission = await db.UserExerciseSubmissions
 					.Include(s => s.AutomaticChecking)
 					.Include(s => s.SolutionCode)
-					.FirstOrDefaultAsync(s => s.Id == work.Id
+					.FirstOrDefaultAsync(s => s.Id == workItemId
 						&& s.Timestamp > notSoLongAgo
 						&& s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting);
 				if (submission == null)
@@ -525,10 +526,11 @@ namespace Database.Repos
 			throw new InvalidOperationException($"Unknown exercise type for checking: {exerciseBlock.ExerciseType}");
 		}
 
-		public async Task RunAutomaticChecking(UserExerciseSubmission submission, TimeSpan timeout, bool waitUntilChecked)
+		public async Task RunAutomaticChecking(UserExerciseSubmission submission, TimeSpan timeout, bool waitUntilChecked, int priority)
 		{
 			log.Info($"Запускаю автоматическую проверку решения. ID посылки: {submission.Id}");
 			unhandledSubmissions.TryAdd(submission.Id, DateTime.Now);
+			await workQueueRepo.Add(queueId, submission.Id.ToString(), submission.Sandbox ?? "csharp", priority);
 
 			if (!waitUntilChecked)
 			{

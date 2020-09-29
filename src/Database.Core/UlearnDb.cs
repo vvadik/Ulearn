@@ -464,6 +464,6 @@ namespace Database
 
 		public DbSet<StyleErrorSettings> StyleErrorSettings { get; set; }
 
-		public DbSet<WorkQueueItem> WorkQueue { get; set; }
+		public DbSet<WorkQueueItem> WorkQueueItems { get; set; }
 	}
 }
