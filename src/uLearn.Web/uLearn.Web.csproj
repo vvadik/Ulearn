@@ -1531,7 +1531,6 @@
     <Content Include="Views\Course\LtiExerciseSlide.cshtml" />
     <Content Include="Views\Sandbox\Index.cshtml" />
     <Content Include="Views\Sandbox\GetDetails.cshtml" />
-    <Content Include="Views\Sandbox\RunCode.cshtml" />
     <Content Include="Views\Course\LtiQuizSlide.cshtml" />
     <Content Include="Views\Course\LtiSlide.cshtml" />
     <Content Include="Views\Account\StudentInfo.cshtml" />
