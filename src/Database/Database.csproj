@@ -889,5 +889,8 @@
 	<EmbeddedResource Update="Migrations\202009171003006_DisableUsersFullTextIndexStopWords.resx">
 	  <DependentUpon>202009171003006_DisableUsersFullTextIndexStopWords.cs</DependentUpon>
 	</EmbeddedResource>
+	<EmbeddedResource Update="Migrations\202009291146572_AddWorkQueue.resx">
+	  <DependentUpon>202009291146572_AddWorkQueue.cs</DependentUpon>
+	</EmbeddedResource>
   </ItemGroup>
 </Project>

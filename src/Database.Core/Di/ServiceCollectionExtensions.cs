@@ -83,6 +83,7 @@ namespace Database.Di
 			services.AddScoped<ILtiRequestsRepo, LtiRequestsRepo>();
 			services.AddScoped<IXQueueRepo, XQueueRepo>();
 			services.AddScoped<IStyleErrorsRepo, StyleErrorsRepo>();
+			services.AddScoped<IWorkQueueRepo, WorkQueueRepo>();
 
 			return services;
 		}
