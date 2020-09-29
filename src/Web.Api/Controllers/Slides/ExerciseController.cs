@@ -80,7 +80,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				});
 			}
 
-			var code = parameters.Code;
+			var code = parameters.Solution;
 			if (code.Length > TextsRepo.MaxTextSize)
 			{
 				return Json(new RunSolutionResponse

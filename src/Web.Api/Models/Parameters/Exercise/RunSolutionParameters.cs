@@ -6,6 +6,6 @@ namespace Ulearn.Web.Api.Models.Parameters.Exercise
 	public class RunSolutionParameters
 	{
 		[DataMember(IsRequired = true)]
-		public string Code { get; set; }
+		public string Solution { get; set; }
 	}
 }
