@@ -4,47 +4,40 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using Database;
-using Database.DataContexts;
-using Graphite;
-using log4net;
-using log4net.Config;
+using Database.Repos;
+using Microsoft.Extensions.DependencyInjection;
 using Ulearn.Common.Extensions;
-using Ulearn.Core;
-using Ulearn.Core.Configuration;
 using Ulearn.Core.Metrics;
+using Vostok.Hosting.Abstractions;
 using XQueue;
 using XQueue.Models;
 
 namespace XQueueWatcher
 {
-	public class Program
+	public class XQueueWatcherApplication : BaseApplication
 	{
 		private static readonly TimeSpan pauseBetweenRequests = TimeSpan.FromSeconds(1);
-
-		private static readonly ILog log = LogManager.GetLogger(typeof(Program));
-		private static readonly CourseManager courseManager = WebCourseManager.Instance;
-
-		private static readonly ServiceKeepAliver keepAliver = new ServiceKeepAliver(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName);
-
+		private static readonly ServiceKeepAliver keepAliver = new ServiceKeepAliver(configuration.GraphiteServiceName);
 		private static readonly Dictionary<int, XQueueClient> clientsCache = new Dictionary<int, XQueueClient>();
 
-		static void Main(string[] args)
+		public override async Task InitializeAsync(IVostokHostingEnvironment environment)
 		{
-			new Program().StartXQueueWatchers(new CancellationToken());
+			await base.InitializeAsync(environment);
 		}
 
-		public void StartXQueueWatchers(CancellationToken cancellationToken)
+		public override async Task RunAsync(IVostokHostingEnvironment environment)
 		{
-			XmlConfigurator.Configure();
-			StaticMetricsPipeProvider.Instance.Start();
+			await StartXQueueWatchers(new CancellationToken());
+		}
 
-			var keepAliveInterval = TimeSpan.FromSeconds(ApplicationConfiguration.Read<UlearnConfiguration>().KeepAliveInterval ?? 30);
+		public async Task StartXQueueWatchers(CancellationToken cancellationToken)
+		{
+			var keepAliveInterval = TimeSpan.FromSeconds(configuration.KeepAliveInterval ?? 30);
 
 			while (true)
 			{
-				var xQueueRepo = GetNewXQueueRepo();
-				var dbWatchers = xQueueRepo.GetXQueueWatchers();
+				var xQueueRepo = serviceProvider.GetService<IXQueueRepo>();
+				var dbWatchers = await xQueueRepo.GetXQueueWatchers();
 
 				var tasks = dbWatchers.Select(SafeGetAndProcessSubmissionFromXQueue);
 
@@ -65,7 +58,7 @@ namespace XQueueWatcher
 			}
 			catch (Exception e)
 			{
-				log.Error(e);
+				logger.Error(e, "GetAndProcessSubmissionFromXQueue error");
 			}
 		}
 
@@ -77,7 +70,7 @@ namespace XQueueWatcher
 
 				if (!await client.Login())
 				{
-					log.Error($"Can\'t login to xqueue {watcher.QueueName} ({watcher.BaseUrl}, user {watcher.UserName})");
+					logger.Error($"Can\'t login to xqueue {watcher.QueueName} ({watcher.BaseUrl}, user {watcher.UserName})");
 					return;
 				}
 
@@ -88,7 +81,7 @@ namespace XQueueWatcher
 			if (submission == null)
 				return;
 
-			log.Info($"Got new submission in xqueue {watcher.QueueName}: {submission.JsonSerialize()}");
+			logger.Information($"Got new submission in xqueue {watcher.QueueName}: {submission.JsonSerialize()}");
 
 			try
 			{
@@ -96,7 +89,7 @@ namespace XQueueWatcher
 			}
 			catch (Exception e)
 			{
-				log.Error($"Error occurred while processing submission from xqueue: {e.Message}", e);
+				logger.Error($"Error occurred while processing submission from xqueue: {e.Message}", e);
 				await client.PutResult(new XQueueResult
 				{
 					header = submission.header,
@@ -112,34 +105,30 @@ namespace XQueueWatcher
 
 		private async Task ProcessSubmissionFromXQueue(Database.Models.XQueueWatcher watcher, XQueueSubmission submission)
 		{
-			var xQueueRepo = GetNewXQueueRepo();
-			GraderPayload graderPayload;
-			try
+			using (var scope = serviceProvider.CreateScope())
 			{
-				graderPayload = submission.Body.GraderPayload.DeserializeJson<GraderPayload>();
-			}
-			catch (Exception e)
-			{
-				log.Error($"Can't parse grader payload: {e.Message}");
-				log.Info($"Payload is: {submission.Body.GraderPayload}");
-				return;
-			}
+				var xQueueRepo = scope.ServiceProvider.GetService<IXQueueRepo>();
+				GraderPayload graderPayload;
+				try
+				{
+					graderPayload = submission.Body.GraderPayload.DeserializeJson<GraderPayload>();
+				}
+				catch (Exception e)
+				{
+					logger.Error($"Can't parse grader payload: {e.Message}");
+					logger.Information($"Payload is: {submission.Body.GraderPayload}");
+					return;
+				}
 
-			log.Info($"Add new xqueue submission for course {graderPayload.CourseId}, slide {graderPayload.SlideId}");
-			await xQueueRepo.AddXQueueSubmission(
-				watcher,
-				submission.Header.JsonSerialize(),
-				graderPayload.CourseId,
-				graderPayload.SlideId,
-				submission.Body.StudentResponse
-			);
-		}
-
-		/* We need to create new database connection each time for disabling EF's caching */
-		private static XQueueRepo GetNewXQueueRepo()
-		{
-			var db = new ULearnDb();
-			return new XQueueRepo(db, courseManager);
+				logger.Information($"Add new xqueue submission for course {graderPayload.CourseId}, slide {graderPayload.SlideId}");
+				await xQueueRepo.AddXQueueSubmission(
+					watcher,
+					submission.Header.JsonSerialize(),
+					graderPayload.CourseId,
+					graderPayload.SlideId,
+					submission.Body.StudentResponse
+				);
+			}
 		}
 	}
 
