@@ -812,7 +812,6 @@
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\QuestionsController.cs" />
     <Compile Include="Controllers\RestorePasswordController.cs" />
-    <Compile Include="Controllers\RunnerController.cs" />
     <Compile Include="Controllers\SandboxController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\AnalyticsController.cs" />
@@ -1647,10 +1646,6 @@
     <ProjectReference Include="..\VideoAnnotations.Api\VideoAnnotations.Api.csproj">
       <Project>{8dbf67fc-f88e-4f33-bf81-8033ff597c91}</Project>
       <Name>VideoAnnotations.Api</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\XQueue\XQueue.csproj">
-      <Project>{4b227920-6eb6-476f-95c7-1cdbe02dae3f}</Project>
-      <Name>XQueue</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
