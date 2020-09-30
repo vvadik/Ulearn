@@ -4,8 +4,12 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using Database;
+using Database.Di;
 using Database.Repos;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Ulearn.Common.Api;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Metrics;
 using Vostok.Hosting.Abstractions;
@@ -28,6 +32,22 @@ namespace XQueueWatcher
 		public override async Task RunAsync(IVostokHostingEnvironment environment)
 		{
 			await StartXQueueWatchers(new CancellationToken());
+		}
+
+		protected override void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment)
+		{
+			base.ConfigureServices(services, hostingEnvironment);
+			services.AddDbContextPool<UlearnDb>(
+				options => options
+					.UseLazyLoadingProxies()
+					.UseSqlServer(configuration.Database)
+			);
+		}
+
+		protected override void ConfigureDi(IServiceCollection services)
+		{
+			base.ConfigureDi(services);
+			services.AddDatabaseServices(logger);
 		}
 
 		public async Task StartXQueueWatchers(CancellationToken cancellationToken)
