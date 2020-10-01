@@ -12,11 +12,12 @@ namespace Ulearn.Core.Helpers
 		{
 			if (pathToMsBuild != null)
 				return;
-			var path = ToolLocationHelper.GetPathToBuildTools("Current");
+			const string version = "Current";
+			var path = ToolLocationHelper.GetPathToBuildTools(version);
 			var assembly = Path.GetDirectoryName(System.Reflection.Assembly.GetAssembly(typeof(ProjModifier)).Location);
 			if (path == assembly)
 				Environment.SetEnvironmentVariable("MSBUILD_EXE_PATH", "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe");
-			pathToMsBuild = ToolLocationHelper.GetPathToBuildTools("Current");
+			pathToMsBuild = ToolLocationHelper.GetPathToBuildTools(version);
 		}
 	}
 }

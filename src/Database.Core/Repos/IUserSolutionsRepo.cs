@@ -47,7 +47,7 @@ namespace Database.Repos
 		Task<UserExerciseSubmission> FindSubmissionById(string id);
 		Task<List<UserExerciseSubmission>> FindSubmissionsByIds(IEnumerable<int> checkingsIds);
 		Task SaveResult(RunningResults result, Func<UserExerciseSubmission, Task> onSave);
-		Task RunAutomaticChecking(UserExerciseSubmission submission, TimeSpan timeout, bool waitUntilChecked);
+		Task RunAutomaticChecking(UserExerciseSubmission submission, TimeSpan timeout, bool waitUntilChecked, int priority);
 		Task<Dictionary<int, string>> GetSolutionsForSubmissions(IEnumerable<int> submissionsIds);
 		Task WaitAnyUnhandledSubmissions(TimeSpan timeout);
 		Task WaitUntilSubmissionHandled(TimeSpan timeout, int submissionId);

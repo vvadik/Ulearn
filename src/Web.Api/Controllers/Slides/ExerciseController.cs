@@ -12,7 +12,6 @@ using Database.Repos.Users;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using Serilog;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
@@ -164,7 +163,10 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			try
 			{
 				if (hasAutomaticChecking)
-					await userSolutionsRepo.RunAutomaticChecking(submission, executionTimeout, waitUntilChecked);
+				{
+					var priority = exerciseBlock is SingleFileExerciseBlock ? 10 : 0;
+					await userSolutionsRepo.RunAutomaticChecking(submission, executionTimeout, waitUntilChecked, priority);
+				}
 			}
 			catch (SubmissionCheckingTimeout)
 			{
