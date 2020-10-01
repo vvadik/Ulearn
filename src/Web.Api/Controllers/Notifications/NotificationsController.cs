@@ -19,7 +19,6 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 	[Route("/notifications")]
 	public class NotificationsController : BaseController
 	{
-		private readonly INotificationsRepo notificationsRepo;
 		private readonly IFeedRepo feedRepo;
 		private readonly IServiceProvider serviceProvider;
 		private readonly INotificationDataPreloader notificationDataPreloader;
@@ -28,26 +27,25 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 
 		public NotificationsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db,
 			IUsersRepo usersRepo,
-			INotificationsRepo notificationsRepo, IFeedRepo feedRepo,
+			IFeedRepo feedRepo,
 			IServiceProvider serviceProvider,
 			INotificationDataPreloader notificationDataPreloader)
 			: base(logger, courseManager, db, usersRepo)
 		{
-			this.notificationsRepo = notificationsRepo ?? throw new ArgumentNullException(nameof(notificationsRepo));
-			this.feedRepo = feedRepo ?? throw new ArgumentNullException(nameof(feedRepo));
-			this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-			this.notificationDataPreloader = notificationDataPreloader ?? throw new ArgumentNullException(nameof(notificationDataPreloader));
-
-			if (commentsFeedNotificationTransport == null)
-				commentsFeedNotificationTransport = feedRepo.GetCommentsFeedNotificationTransport();
+			this.feedRepo = feedRepo;
+			this.serviceProvider = serviceProvider;
+			this.notificationDataPreloader = notificationDataPreloader;
 		}
 
 		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
 		{
-			var userId = User.GetUserId();
-			await feedRepo.AddFeedNotificationTransportIfNeededAsync(userId).ConfigureAwait(false);
+			if (commentsFeedNotificationTransport == null)
+				commentsFeedNotificationTransport = await feedRepo.GetCommentsFeedNotificationTransport();
 
-			await next().ConfigureAwait(false);
+			var userId = User.GetUserId();
+			await feedRepo.AddFeedNotificationTransportIfNeeded(userId);
+
+			await next();
 		}
 
 		/// <summary>
@@ -58,7 +56,7 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 		public async Task<ActionResult<NotificationListResponse>> NotificationList()
 		{
 			var userId = User.GetUserId();
-			var (importantNotificationList, commentsNotificationList) = await GetNotificationListsAsync(userId).ConfigureAwait(false);
+			var (importantNotificationList, commentsNotificationList) = await GetNotificationListsAsync(userId);
 
 			return new NotificationListResponse
 			{
@@ -75,8 +73,8 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 		public async Task<ActionResult<NotificationsCountResponse>> NotificationsCount([FromQuery] NotificationsCountParameters parameters)
 		{
 			var userId = User.GetUserId();
-			var userNotificationTransport = await feedRepo.GetUsersFeedNotificationTransportAsync(userId).ConfigureAwait(false);
-			var unreadCountAndLastTimestamp = await GetUnreadNotificationsCountAndLastTimestampAsync(userId, userNotificationTransport, parameters.LastTimestamp).ConfigureAwait(false);
+			var userNotificationTransport = await feedRepo.GetUsersFeedNotificationTransport(userId);
+			var unreadCountAndLastTimestamp = await GetUnreadNotificationsCountAndLastTimestampAsync(userId, userNotificationTransport, parameters.LastTimestamp);
 
 			return new NotificationsCountResponse
 			{
@@ -87,11 +85,11 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 
 		private async Task<Tuple<int, DateTime?>> GetUnreadNotificationsCountAndLastTimestampAsync(string userId, FeedNotificationTransport transport, DateTime? from = null)
 		{
-			var realFrom = from ?? await feedRepo.GetFeedViewTimestampAsync(userId, transport.Id).ConfigureAwait(false) ?? DateTime.MinValue;
-			var unreadCount = await feedRepo.GetNotificationsCountAsync(userId, realFrom, transport).ConfigureAwait(false);
+			var realFrom = from ?? await feedRepo.GetFeedViewTimestamp(userId, transport.Id) ?? DateTime.MinValue;
+			var unreadCount = await feedRepo.GetNotificationsCount(userId, realFrom, transport);
 			if (unreadCount > 0)
 			{
-				from = await feedRepo.GetLastDeliveryTimestampAsync(transport).ConfigureAwait(false);
+				from = await feedRepo.GetLastDeliveryTimestamp(transport);
 			}
 
 			return Tuple.Create(unreadCount, from);
@@ -99,15 +97,15 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 
 		private async Task<(NotificationList, NotificationList)> GetNotificationListsAsync(string userId)
 		{
-			var notificationTransport = await feedRepo.GetUsersFeedNotificationTransportAsync(userId).ConfigureAwait(false);
+			var notificationTransport = await feedRepo.GetUsersFeedNotificationTransport(userId);
 
 			var importantNotifications = new List<Notification>();
 			if (notificationTransport != null)
 			{
-				importantNotifications = (await feedRepo.GetNotificationForFeedNotificationDeliveriesAsync(userId, n => n.InitiatedBy, transports: notificationTransport).ConfigureAwait(false));
+				importantNotifications = await feedRepo.GetNotificationForFeedNotificationDeliveries(userId, n => n.InitiatedBy, transports: notificationTransport);
 			}
 
-			var commentsNotifications = (await feedRepo.GetNotificationForFeedNotificationDeliveriesAsync(userId, n => n.InitiatedBy, transports: commentsFeedNotificationTransport).ConfigureAwait(false));
+			var commentsNotifications = await feedRepo.GetNotificationForFeedNotificationDeliveries(userId, n => n.InitiatedBy, transports: commentsFeedNotificationTransport);
 
 			logger.Information($"[GetNotificationList] Step 1 done: found {importantNotifications.Count} important notifications and {commentsNotifications.Count} comment notifications");
 
@@ -121,13 +119,13 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 
 			logger.Information($"[GetNotificationList] Step 3 done, removed not actual notifications: left {importantNotifications.Count} important notifications and {commentsNotifications.Count} comment notifications");
 
-			var importantLastViewTimestamp = await feedRepo.GetFeedViewTimestampAsync(userId, notificationTransport?.Id ?? -1).ConfigureAwait(false);
-			var commentsLastViewTimestamp = await feedRepo.GetFeedViewTimestampAsync(userId, commentsFeedNotificationTransport.Id).ConfigureAwait(false);
+			var importantLastViewTimestamp = await feedRepo.GetFeedViewTimestamp(userId, notificationTransport?.Id ?? -1);
+			var commentsLastViewTimestamp = await feedRepo.GetFeedViewTimestamp(userId, commentsFeedNotificationTransport.Id);
 
 			logger.Information("[GetNotificationList] Step 4, building models");
 
 			var allNotifications = importantNotifications.Concat(commentsNotifications).ToList();
-			var notificationsData = await notificationDataPreloader.LoadAsync(allNotifications).ConfigureAwait(false);
+			var notificationsData = await notificationDataPreloader.LoadAsync(allNotifications);
 
 			var importantNotificationList = new NotificationList
 			{

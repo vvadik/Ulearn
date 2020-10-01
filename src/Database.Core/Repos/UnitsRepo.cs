@@ -43,7 +43,12 @@ namespace Database.Repos
 				.ToListAsync());
 			return course.GetUnitsNotSafe().Select(u => u.Id).Where(g => visibleUnitsIds.Contains(g)).ToList();
 		}
-		
+
+		public async Task<bool> IsUnitVisibleForStudents(Course course, Guid unitId)
+		{
+			return (await GetPublishedUnitIdsAsync(course)).Contains(unitId);
+		}
+
 		public async Task<List<UnitAppearance>> GetUnitAppearancesAsync(Course course)
 		{
 			return await db.UnitAppearances
