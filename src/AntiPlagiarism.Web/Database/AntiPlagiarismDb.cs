@@ -35,13 +35,10 @@ namespace AntiPlagiarism.Web.Database
 			modelBuilder.Entity<Client>()
 				.HasIndex(c => new { c.Token, c.IsEnabled });
 
-			modelBuilder.Entity<SnippetOccurence>()
-				.HasIndex(c => new { c.SubmissionId, c.FirstTokenIndex })
-				.IsUnique(false);
-
-			modelBuilder.Entity<SnippetOccurence>()
-				.HasIndex(c => new { c.SubmissionId, c.SnippetId })
-				.IsUnique(false);
+			var snippetOccurenceEntityBuilder = modelBuilder.Entity<SnippetOccurence>();
+			snippetOccurenceEntityBuilder.HasIndex(c => new { c.SubmissionId, c.FirstTokenIndex });
+			snippetOccurenceEntityBuilder.HasIndex(c => new { c.SubmissionId, c.SnippetId });
+			snippetOccurenceEntityBuilder.HasIndex(c => new { c.SnippetId, c.SubmissionId });
 
 			modelBuilder.Entity<Snippet>()
 				.HasIndex(c => new { c.TokensCount, c.SnippetType, c.Hash })
@@ -50,15 +47,13 @@ namespace AntiPlagiarism.Web.Database
 			modelBuilder.Entity<SnippetStatistics>()
 				.HasIndex(c => new { c.SnippetId, c.TaskId, c.ClientId })
 				.IsUnique();
-			
-			modelBuilder.Entity<SnippetStatistics>()
-				.HasIndex(c => new { c.SnippetId, c.TaskId, c.ClientId })
-				.IsUnique();
 
 			var submissionEntityBuilder = modelBuilder.Entity<Submission>();
 			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId });
 			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId, c.AuthorId });
+			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId, c.AddingTime, c.AuthorId });
 			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId, c.Language, c.AuthorId });
+			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId, c.AddingTime, c.Language, c.AuthorId });
 			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.ClientSubmissionId });
 			submissionEntityBuilder.HasIndex(c => new { c.AddingTime });
 
