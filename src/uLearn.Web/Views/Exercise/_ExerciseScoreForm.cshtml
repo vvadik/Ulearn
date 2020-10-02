@@ -46,7 +46,7 @@
 				<div class="alert alert-danger mt10 ">Внимание. Эта работа прямо сейчас проверяется преподавателем @Model.Checking.LockedBy.VisibleName</div>
 			}
 
-			<h4>Оцените работу <span>@(Model.IsFirstReview ? "(это первое ревью)" : $"(c прошлых ревью стоит {Model.PrevCheckingsScoreManualScorePercent}%)")</span></h4>
+			<h4>Оцените работу <span>@(Model.IsFirstReview ? "(это первое ревью)" : Model.PrevCheckingsScoreManualScorePercent == null ? null : $"(c прошлых ревью стоит {Model.PrevCheckingsScoreManualScorePercent}%)")</span></h4>
 			<div class="exercise__score">
 				<div class="btn-group" role="group">
 					@{

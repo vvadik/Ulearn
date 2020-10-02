@@ -764,7 +764,8 @@ namespace uLearn.Web.Controllers
 			IsCurrentSubmissionChecking = isCurrentSubmissionChecking;
 			DefaultProhibitFurtherReview = defaultProhibitFurtherReview;
 			IsFirstReview = isFirstReview;
-			PrevCheckingsScoreManualScorePercent = prevCheckingsScore * 100 / slide.Scoring.CodeReviewScore;
+			// Если за задачу можно поставить только 0 баллов, но ревью включено, возникает деление на ноль
+			PrevCheckingsScoreManualScorePercent = slide.Scoring.CodeReviewScore == 0 ? (int?)null : prevCheckingsScore * 100 / slide.Scoring.CodeReviewScore;
 		}
 
 		public string CourseId { get; set; }
