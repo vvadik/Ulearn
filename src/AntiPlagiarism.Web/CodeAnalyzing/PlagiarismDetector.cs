@@ -44,9 +44,9 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			logger.Information($"Вычисляю коэффициент похожести решения #{firstSubmission.Id} и #{secondSubmission.Id}");
 			var maxSnippetsCount = configuration.AntiPlagiarism.PlagiarismDetector.CountOfColdestSnippetsUsedToSecondSearch;
 			var authorsCountThreshold = configuration.AntiPlagiarism.PlagiarismDetector.SnippetAuthorsCountThreshold;
-			var snippetsOccurrencesOfFirstSubmission = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(firstSubmission, maxSnippetsCount, 0, authorsCountThreshold).ConfigureAwait(false);
+			var snippetsOccurrencesOfFirstSubmission = await snippetsRepo.GetSnippetsOccurrencesForSubmissionAsync(firstSubmission, maxSnippetsCount, 0, authorsCountThreshold).ConfigureAwait(false);
 			logger.Debug($"Сниппеты первого решения: [{string.Join(", ", snippetsOccurrencesOfFirstSubmission)}]");
-			var snippetsOccurrencesOfSecondSubmission = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(secondSubmission, maxSnippetsCount, 0, authorsCountThreshold).ConfigureAwait(false);
+			var snippetsOccurrencesOfSecondSubmission = await snippetsRepo.GetSnippetsOccurrencesForSubmissionAsync(secondSubmission, maxSnippetsCount, 0, authorsCountThreshold).ConfigureAwait(false);
 			logger.Debug($"Сниппеты второго решения: [{string.Join(", ", snippetsOccurrencesOfSecondSubmission)}]");
 
 			/* Group by snippets from the second submissions by snippetId for fast searching */
@@ -121,7 +121,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 
 			/* We make two queries for finding suspicion submissions: first query is more limited by snippets count (`maxSnippetsCountFirstSearch` from configuration).
 			   For the first query we are looking for all submissions which are similar to our submission and filter only top-`maxSubmissionsAfterFirstSearch` by matched snippets count */
-			var snippetsOccurrencesFirstSearch = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(
+			var snippetsOccurrencesFirstSearch = await snippetsRepo.GetSnippetsOccurrencesForSubmissionAsync(
 				submission,
 				maxSnippetsCountFirstSearch,
 				authorsCountMinThreshold: 2,
@@ -130,7 +130,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			var snippetsIdsFirstSearch = new HashSet<int>(snippetsOccurrencesFirstSearch.Select(o => o.SnippetId));
 			logger.Information($"Found following snippets after first search: {string.Join(", ", snippetsIdsFirstSearch)}");
 			var useSubmissionsFromDate = DateTime.Now.AddMonths(-submissionInfluenceLimitInMonths);
-			var suspicionSubmissionIds = snippetsRepo.GetSubmissionIdsWithSameSnippets(
+			var suspicionSubmissionIds = await snippetsRepo.GetSubmissionIdsWithSameSnippets(
 				snippetsIdsFirstSearch,
 				/* Filter only  submissions BY THIS client, THIS task, THIS language and NOT BY THIS author */
 				o => o.Submission.ClientId == submission.ClientId &&
@@ -142,10 +142,10 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			);
 			logger.Information($"Found following submissions after first search: {string.Join(", ", suspicionSubmissionIds)}");
 
-			var snippetsOccurrences = await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(submission, maxSnippetsCountSecondSearch, 0, authorsCountThreshold).ConfigureAwait(false);
+			var snippetsOccurrences = await snippetsRepo.GetSnippetsOccurrencesForSubmissionAsync(submission, maxSnippetsCountSecondSearch, 0, authorsCountThreshold).ConfigureAwait(false);
 			var snippetsIds = new HashSet<int>(snippetsOccurrences.Select(o => o.SnippetId));
 
-			var allOtherOccurrences = snippetsRepo.GetSnippetsOccurrences(
+			var allOtherOccurrences = (await snippetsRepo.GetSnippetsOccurrences(
 				snippetsIds,
 				/* Filter only snippet occurences in submissions BY THIS client, THIS task, THIS language and NOT BY THIS author */
 				o => o.Submission.ClientId == submission.ClientId &&
@@ -154,7 +154,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 					o.Submission.AuthorId != submission.AuthorId &&
 					/* ... and only in submissions filterer by first query */
 					suspicionSubmissionIds.Contains(o.SubmissionId)
-			).GroupBy(o => o.SnippetId).ToDictionary(kvp => kvp.Key, kvp => kvp.ToList());
+			)).GroupBy(o => o.SnippetId).ToDictionary(kvp => kvp.Key, kvp => kvp.ToList());
 
 			var snippetsStatistics = await snippetsRepo.GetSnippetsStatisticsAsync(submission.ClientId, submission.TaskId, snippetsIds).ConfigureAwait(false);
 

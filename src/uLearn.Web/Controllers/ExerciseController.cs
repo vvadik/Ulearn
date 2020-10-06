@@ -462,6 +462,28 @@ namespace uLearn.Web.Controllers
 				});
 		}
 
+		public ActionResult ExerciseScoreForm(BlockRenderContext context)
+		{
+			var checking = (ManualExerciseChecking)context.ManualChecking;
+			var checkings = slideCheckingsRepo.GetManualCheckings<ManualExerciseChecking>(context.Course.Id, context.Slide.Id, checking.UserId).ToList();
+			var prevCheckedCheckings = checkings
+				.Where(c => c.IsChecked && c.Timestamp < checking.Timestamp)
+				.ToList();
+			var prevCheckingsScore = prevCheckedCheckings.Select(c => c.Score).DefaultIfEmpty().Max();
+			var model = new ExerciseScoreFormModel (
+				context.Course.Id,
+				(ExerciseSlide)context.Slide,
+				checking,
+				context.ManualCheckingsLeftInQueue,
+				prevCheckedCheckings.Count == 0,
+				prevCheckingsScore,
+				context.GroupsIds,
+				isCurrentSubmissionChecking: (context.VersionId == null || checking.Submission.Id == context.VersionId) && !context.IsManualCheckingReadonly,
+				defaultProhibitFurtherReview: context.DefaultProhibitFurtherReview
+			);
+			return PartialView("~/Views/Exercise/_ExerciseScoreForm.cshtml", model);
+		}
+
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		[ChildActionOnly]
 		public ActionResult StudentSubmissions(string courseId, Guid slideId)
@@ -682,7 +704,8 @@ namespace uLearn.Web.Controllers
 
 	public class ExerciseScoreFormModel
 	{
-		public ExerciseScoreFormModel(string courseId, ExerciseSlide slide, ManualExerciseChecking checking, int manualCheckingsLeftInQueueInQueue, List<string> groupsIds = null,
+		public ExerciseScoreFormModel(string courseId, ExerciseSlide slide, ManualExerciseChecking checking,
+			int manualCheckingsLeftInQueueInQueue, bool isFirstReview, int prevCheckingsScore, List<string> groupsIds = null,
 			bool isCurrentSubmissionChecking = false, bool defaultProhibitFurtherReview = true)
 		{
 			CourseId = courseId;
@@ -692,6 +715,9 @@ namespace uLearn.Web.Controllers
 			GroupsIds = groupsIds;
 			IsCurrentSubmissionChecking = isCurrentSubmissionChecking;
 			DefaultProhibitFurtherReview = defaultProhibitFurtherReview;
+			IsFirstReview = isFirstReview;
+			// Если за задачу можно поставить только 0 баллов, но ревью включено, возникает деление на ноль
+			PrevCheckingsScoreManualScorePercent = slide.Scoring.CodeReviewScore == 0 ? (int?)null : prevCheckingsScore * 100 / slide.Scoring.CodeReviewScore;
 		}
 
 		public string CourseId { get; set; }
@@ -702,6 +728,8 @@ namespace uLearn.Web.Controllers
 		public bool IsCurrentSubmissionChecking { get; set; }
 		public bool DefaultProhibitFurtherReview { get; set; }
 		public int ManualCheckingsLeftInQueue { get; set; }
+		public int? PrevCheckingsScoreManualScorePercent { get; set; }
+		public bool IsFirstReview { get; set; }
 	}
 
 	public class ExerciseLastReviewCommentModel

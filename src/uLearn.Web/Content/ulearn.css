@@ -1211,6 +1211,10 @@ body.lti-component {
 	margin-right: 10px;
 }
 
+.legacy-page .exercise__score .exercise__other-score-link:not(.active) .max-score {
+	display: none;
+}
+
 .legacy-page .exercise__score .exercise__other-score-container {
 	vertical-align: middle;
 }

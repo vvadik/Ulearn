@@ -75,5 +75,6 @@ VALUES
 ('20200520141533_AddTempCourseErrors', '3.1.2'),
 ('20200709131113_CourseIdLength100', '3.1.2'),
 ('20200724104403_AddQuizIgnoreInAttemptsCount', '3.1.2'),
+('20201002115236_AddAddingTimeAndSnippetSubmissionIndexes', '3.1.2'),
 ('20200917114641_AddStyleErrorSettings', '3.1.2'),
 ('20200929114914_AddWorkQueue', '3.1.2')

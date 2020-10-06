@@ -3,6 +3,7 @@ import React from "react";
 import PropTypes from 'prop-types';
 import classNames from "classnames";
 import translateCode from "src/codeTranslator/translateCode";
+import scrollToView from "src/utils/scrollToView";
 
 import styles from "./Text.less";
 
@@ -14,6 +15,34 @@ class Text extends React.Component {
 
 	componentDidMount() {
 		this.translateTex();
+		const anchors = Array.from(this.textContainer.getElementsByTagName('a'));
+		const hashAnchorsLinks = anchors.filter(a => a.hash);
+
+		const hashInUrl = window.location.hash;
+		if(hashInUrl) {
+			const hashToScroll = hashInUrl.replace('#', '');
+			if(anchors.some(a => a.name === hashToScroll)) {
+				this.scrollToHashAnchor(hashInUrl);
+			}
+		}
+
+		for (const hashAnchor of hashAnchorsLinks) {
+			const { hash } = hashAnchor;
+			hashAnchor.addEventListener('click', (e) => {
+				e.stopPropagation();
+				e.preventDefault();
+				this.scrollToHashAnchor(hash);
+			});
+		}
+	}
+
+	scrollToHashAnchor = (hash) => {
+		window.history.pushState(null, null, hash);
+
+		const anchors = document.querySelectorAll(`a[name=${ hash.replace('#', '') }]`);
+		if(anchors.length > 0) {
+			scrollToView({ current: anchors[0] });
+		}
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {

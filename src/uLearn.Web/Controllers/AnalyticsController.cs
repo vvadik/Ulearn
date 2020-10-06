@@ -997,7 +997,7 @@ namespace uLearn.Web.Controllers
 
 		private static DateTime GetDefaultPeriodStart()
 		{
-			return new DateTime(DateTime.Now.Year - 2, 1, 1);
+			return new DateTime(DateTime.Now.Year - 4, 1, 1);
 		}
 
 		public DateTime PeriodFinishDate

@@ -40,7 +40,7 @@ class Comment extends Component {
 
 	scrollToComment = () =>{
 		if(this.props.isSlideReady && window.location.hash === `#comment-${ this.props.comment.id }`) {
-			setTimeout(() => scrollToView(this.ref), 100); // 100ms delay to let slide render
+			scrollToView(this.ref);
 		}
 	}
 

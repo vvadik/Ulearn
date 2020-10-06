@@ -89,7 +89,7 @@ namespace AntiPlagiarism.UpdateDb
 		private async Task UpdateSnippetsFromSubmissionAsync(ISnippetsRepo snippetsRepo, Submission submission)
 		{
 			var occurences = new HashSet<Tuple<int, int>>(
-				(await snippetsRepo.GetSnippetsOccurencesForSubmissionAsync(submission).ConfigureAwait(false))
+				(await snippetsRepo.GetSnippetsOccurrencesForSubmissionAsync(submission).ConfigureAwait(false))
 				.Select(o => Tuple.Create(o.SnippetId, o.FirstTokenIndex))
 			);
 

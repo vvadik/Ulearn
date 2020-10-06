@@ -378,19 +378,7 @@
 
 		@if (context.ManualChecking != null)
 		{
-			var checking = (ManualExerciseChecking)context.ManualChecking;
-
-			@Html.Partial(
-				"~/Views/Exercise/_ExerciseScoreForm.cshtml",
-				new ExerciseScoreFormModel(
-					context.Course.Id,
-					(ExerciseSlide)context.Slide,
-					checking,
-					context.ManualCheckingsLeftInQueue,
-					context.GroupsIds,
-					isCurrentSubmissionChecking: (context.VersionId == null || checking.Submission.Id == context.VersionId) && !context.IsManualCheckingReadonly,
-					defaultProhibitFurtherReview: context.DefaultProhibitFurtherReview
-					))
+			@Html.Action("ExerciseScoreForm", "Exercise", new { context = context })
 		}
 	</div>
 }
