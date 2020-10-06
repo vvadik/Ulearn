@@ -892,5 +892,11 @@
 	<EmbeddedResource Update="Migrations\202009291146572_AddWorkQueue.resx">
 	  <DependentUpon>202009291146572_AddWorkQueue.cs</DependentUpon>
 	</EmbeddedResource>
+	<EmbeddedResource Update="Migrations\202010060947484_ChangeScoreFields.resx">
+	  <DependentUpon>202010060947484_ChangeScoreFields.cs</DependentUpon>
+	</EmbeddedResource>
+	<EmbeddedResource Update="Migrations\202010060950465_ChangeScoreFields.resx">
+	  <DependentUpon>202010060950465_ChangeScoreFields.cs</DependentUpon>
+	</EmbeddedResource>
   </ItemGroup>
 </Project>

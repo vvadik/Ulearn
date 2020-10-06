@@ -29,8 +29,6 @@ namespace Database.Models
 
 		public virtual ApplicationUser User { get; set; }
 
-		public int Score { get; set; }
-
 		public virtual void PreRemove(UlearnDb db)
 		{
 		}
@@ -108,7 +106,10 @@ namespace Database.Models
 
 		[StringLength(256)]
 		public string CheckingAgentName { get; set; }
-		
+
+		[Obsolete] // Данные этого столбца вычисляются из других. Оставелно на всякий случай, чтобы не удалять столбец
+		public int? Score { get; set; }
+
 		public float? Points { get; set; }
 
 		public string GetVerdict()
@@ -140,6 +141,13 @@ namespace Database.Models
 
 		public virtual IList<ExerciseCodeReview> Reviews { get; set; }
 
+		// Хранит старые данные, теперь используется Percent
+		public int? Score { get; set; }
+
+		// Процент, поставленный преподавателем за ревью. Если поставить меньше баллов бота, то баллы бота уменьшется.
+		// Если процент не указан, используется Score. Это старый сценарий. Баллы Score суммируются с баллами бота.
+		public int? Percent { get; set; }
+
 		[NotMapped]
 		public List<ExerciseCodeReview> NotDeletedReviews => Reviews.Where(r => !r.IsDeleted).ToList();
 
@@ -157,6 +165,8 @@ namespace Database.Models
 
 		public virtual UserQuizSubmission Submission { get; set; }
 
+		public int Score { get; set; }
+
 		public bool IgnoreInAttemptsCount { get; set; }
 	}
 
@@ -167,6 +177,8 @@ namespace Database.Models
 		public override int Id { get; set; }
 
 		public virtual UserQuizSubmission Submission { get; set; }
+
+		public int Score { get; set; }
 
 		public bool IgnoreInAttemptsCount { get; set; }
 	}
