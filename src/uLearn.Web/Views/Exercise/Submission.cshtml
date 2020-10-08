@@ -4,8 +4,8 @@
 @using uLearn.Web.Extensions
 @using uLearn.Web.Views.Course
 @using Ulearn.Common.Extensions
-@using Ulearn.Core
 @using System.Linq
+@using Database.DataContexts
 @using Ulearn.Common
 
 @model ExerciseBlockData
@@ -61,7 +61,7 @@
 			}
 			else if (Model.ReviewState == ExerciseReviewState.Reviewed)
 			{
-				var score = Model.SubmissionSelectedByUser.ManualCheckings.Max(c => c.Score);
+				var score = SlideCheckingsRepo.GetExerciseSubmissionManualCheckingsScoreAndPercent(Model.SubmissionSelectedByUser.ManualCheckings, Model.Slide).Score;
 				var scoreVerb = score.SelectPluralWordInRussian(new RussianPluralizationOptions
 				{
 					One = "получен",

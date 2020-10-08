@@ -16,6 +16,7 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Units;
 
 namespace Database.Models
@@ -540,7 +541,7 @@ namespace Database.Models
 				return courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, CourseId, includeHighRoles: true);
 			}
 			var visitsRepo = serviceProvider.GetService<IVisitsRepo>();
-			return visitsRepo.GetCourseUsersAsync(CourseId);
+			return visitsRepo.GetCourseUsers(CourseId);
 		}
 
 		public override bool IsNotificationForEveryone => true;
@@ -784,27 +785,29 @@ namespace Database.Models
 
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			var slide = course.FindSlideById(Checking.SlideId, true);
+			var slide = course.FindSlideById(Checking.SlideId, true) as ExerciseSlide;
 			if (slide == null)
 				return null;
 
 			var commentsText = GetReviewsText(Checking, html: true);
+			var score = SlideCheckingsRepo.GetExerciseSubmissionManualCheckingsScoreAndPercent(new List<ManualExerciseChecking> { Checking }, slide).Score;
 
 			return $"{InitiatedBy.VisibleName.EscapeHtml()} проверил{InitiatedBy.Gender.ChooseEnding()} ваше решение в «{GetSlideTitle(course, slide).EscapeHtml()}»<br/><br/>" +
-					$"<b>Вы получили {Checking.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}</b><br/><br/>" +
+					$"<b>Вы получили {score.PluralizeInRussian(RussianPluralizationOptions.Score)}</b><br/><br/>" +
 					commentsText;
 		}
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
-			var slide = course.FindSlideById(Checking.SlideId, true);
+			var slide = course.FindSlideById(Checking.SlideId, true) as ExerciseSlide;
 			if (slide == null)
 				return null;
 
 			var commentsText = GetReviewsText(Checking, html: false);
+			var score = SlideCheckingsRepo.GetExerciseSubmissionManualCheckingsScoreAndPercent(new List<ManualExerciseChecking> { Checking }, slide).Score;
 
 			return $"{InitiatedBy.VisibleName} проверил{InitiatedBy.Gender.ChooseEnding()} ваше решение в «{GetSlideTitle(course, slide)}»\n" +
-					$"Вы получили {Checking.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}\n\n" +
+					$"Вы получили {score.PluralizeInRussian(RussianPluralizationOptions.Score)}\n\n" +
 					commentsText;
 		}
 

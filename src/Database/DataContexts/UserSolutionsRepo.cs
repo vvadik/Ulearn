@@ -395,11 +395,6 @@ namespace Database.DataContexts
 			var exerciseSlide = isWebRunner ? null : (ExerciseSlide)courseManager.GetCourse(checking.CourseId).GetSlideById(checking.SlideId, true);
 
 			var isRightAnswer = IsRightAnswer(result, output, exerciseSlide?.Exercise);
-			var score = exerciseSlide != null && isRightAnswer ? exerciseSlide.Scoring.PassedTestsScore : 0;
-
-			/* For skipped slides score is always 0 */
-			if (visitsRepo.IsSkipped(checking.CourseId, checking.SlideId, checking.UserId))
-				score = 0;
 
 			var newChecking = new AutomaticExerciseChecking
 			{
@@ -416,7 +411,6 @@ namespace Database.DataContexts
 				DisplayName = checking.DisplayName,
 				Elapsed = DateTime.Now - checking.Timestamp,
 				IsRightAnswer = isRightAnswer,
-				Score = score,
 				CheckingAgentName = checking.CheckingAgentName,
 				Points = result.Points
 			};

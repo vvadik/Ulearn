@@ -6,9 +6,9 @@ window.documentReadyFunctions.push(function () {
 	var $exerciseSimpleScoreForm = $('.exercise__simple-score-form');
 	var isSimpleScoreForm = $exerciseSimpleScoreForm.length > 0;
 	var $scoreBlock = $('.exercise__score');
-	var $otherScoreLink = $scoreBlock.find('.exercise__other-score-link');
-	// TODO: multiple $otherScoreInput on page with simple score forms
-	var $otherScoreInput = $scoreBlock.find('[name=exerciseScore]');
+	var $otherScoreLink = $scoreBlock.find('.exercise__other-percent-link');
+	// TODO: multiple $otherPercentInput on page with simple score forms
+	var $otherPercentInput = $scoreBlock.find('[name=exercisePercent]');
 
 	var setLockTimeout = function ($lock) {
 		$lock[0].lockTimeout = setTimeout(function () {
@@ -53,16 +53,11 @@ window.documentReadyFunctions.push(function () {
 					error = error.replace('{SUBMISSION}', $scoreForm.find('[name=submissionId]').val())
 						.replace('{NEW_SUBMISSION}', data.submissionId)
 						.replace('{NEW_SUBMISSION_DATE}', data.submissionDate);
-				} else if (data.error === 'has_greatest_score') {
-					error =
-						'Пользователь имеет за&nbsp;код-ревью по&nbsp;этой задаче больше баллов: {SCORE}. Новыми баллами вы&nbsp;<strong>не&nbsp;понизите</strong> его суммарную оценку. <a href="{URL}" target="_blank">Предыдущие код-ревью</a>.';
-					error = error.replace('{SCORE}', data.score).replace('{URL}', data.checkedQueueUrl);
 				}
 				$status.html(error);
 			} else {
-				$status.addClass('success').text('Сохранено: ' + data.score);
+				$status.addClass('success').text('Сохранено: ' + data.percent);
 				$scoreForm.data('checkingId', data.checkingId);
-				$userSubmissionInfo.find('.total-score').text(data.totalScore);
 				/* Lock after one second */
 				setTimeout(function () {
 					$status.text('');
@@ -89,11 +84,11 @@ window.documentReadyFunctions.push(function () {
 		$(this).closest('.status').text('');
 	});
 
-	$scoreBlock.on('click', '.exercise__other-score-link', function (e) {
+	$scoreBlock.on('click', '.exercise__other-percent-link', function (e) {
 		e.preventDefault();
 		$scoreBlock.find('.btn-group .btn').removeClass('active');
-		$otherScoreInput.show();
-		$otherScoreInput.focus();
+		$otherPercentInput.show();
+		$otherPercentInput.focus();
 		$otherScoreLink.addClass('active');
 
 		$exerciseScoreFormWrapper.removeClass('short');
@@ -110,7 +105,7 @@ window.documentReadyFunctions.push(function () {
 
 		$btnGroup.find('.btn').removeClass('active');
 		if (isSimpleScoreForm) {
-			$otherScoreInput.val($self.data('value'));
+			$otherPercentInput.val($self.data('percent'));
 			$self.addClass('active');
 
 			var $scoreForm = $self.closest('.exercise__simple-score-form');
@@ -118,9 +113,9 @@ window.documentReadyFunctions.push(function () {
 		} else {
 			$self.toggleClass('active', !wasActive);
 
-			$otherScoreInput.hide();
+			$otherPercentInput.hide();
 			$otherScoreLink.removeClass('active');
-			$otherScoreInput.val(wasActive ? "" : $self.data('value'));
+			$otherPercentInput.val(wasActive ? "" : $self.data('percent'));
 			
 			/* If score form is fixed, then open full version */
 			if (!wasActive)
@@ -140,8 +135,8 @@ window.documentReadyFunctions.push(function () {
 	});
 
 	$exerciseScoreForm.find('input[type=submit]').click(function() {
-		if ($otherScoreInput.is(':invalid')) {
-			$otherScoreInput.show();
+		if ($otherPercentInput.is(':invalid')) {
+			$otherPercentInput.show();
 			$otherScoreLink.addClass('active');
 		} else {
 			var $button = $(this);

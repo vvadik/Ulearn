@@ -57,9 +57,7 @@ namespace Ulearn.Web.Api.Controllers.Runner
 				return false;
 			}
 
-			var score = (double)checking.Score / slide.Scoring.PassedTestsScore;
-			if (score > 1)
-				score = 1;
+			var score = checking.IsRightAnswer ? 1 : 0;
 
 			var message = checking.IsCompilationError ? checking.CompilationError.Text : checking.Output.Text;
 			return await client.PutResult(new XQueueResult

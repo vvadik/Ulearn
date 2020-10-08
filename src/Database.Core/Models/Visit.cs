@@ -30,6 +30,7 @@ namespace Database.Models
 		[Obsolete("Фактически не используется")]
 		public int AttemptsCount { get; set; }
 		public bool IsSkipped { get; set; }
+		// Условие выставления в SlideCheckingsRepo.IsSlidePassed
 		public bool IsPassed { get; set; }
 
 		public string IpAddress { get; set; }

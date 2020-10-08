@@ -280,7 +280,7 @@ namespace uLearn.Web.Controllers
 				}
 
 				await slideCheckingsRepo.AddAutomaticQuizChecking(submission, courseId, slideId, userId, score).ConfigureAwait(false);
-				await visitsRepo.UpdateScoreForVisit(courseId, slideId, slide.MaxScore, userId).ConfigureAwait(false);
+				await visitsRepo.UpdateScoreForVisit(courseId, slide, userId).ConfigureAwait(false);
 				if (isLti)
 					LtiUtils.SubmitScore(courseId, slide, userId);
 			}
@@ -341,9 +341,9 @@ namespace uLearn.Web.Controllers
 					totalScore += score;
 				}
 
-				await slideCheckingsRepo.MarkManualCheckingAsChecked(checking, totalScore).ConfigureAwait(false);
+				await slideCheckingsRepo.MarkManualQuizCheckingAsChecked(checking, totalScore).ConfigureAwait(false);
 
-				await visitsRepo.UpdateScoreForVisit(checking.CourseId, checking.SlideId, slide.MaxScore, checking.UserId).ConfigureAwait(false);
+				await visitsRepo.UpdateScoreForVisit(checking.CourseId, slide, checking.UserId).ConfigureAwait(false);
 				transaction.Commit();
 
 				metricSender.SendCount($"quiz.manual_score.score", totalScore);
@@ -535,7 +535,7 @@ namespace uLearn.Web.Controllers
 				var isQuizScoredMaximum = userQuizzesRepo.IsQuizScoredMaximum(courseId, slideId, userId);
 				if (usedAttemptsCount < maxTriesCount && !isQuizScoredMaximum)
 				{
-					await visitsRepo.UpdateScoreForVisit(courseId, slideId, slide.MaxScore, userId).ConfigureAwait(false);
+					await visitsRepo.UpdateScoreForVisit(courseId, slide, userId).ConfigureAwait(false);
 					if (isLti)
 						LtiUtils.SubmitScore(courseId, slide, userId);
 				}

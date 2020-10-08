@@ -5,6 +5,8 @@
 @using Ulearn.Common.Extensions
 @using Ulearn.Core.Extensions
 @using System.Linq
+@using Database.DataContexts
+@using Ulearn.Core.Courses.Slides.Exercises
 
 @model uLearn.Web.Controllers.ManualCheckingQueueViewModel
 
@@ -90,8 +92,14 @@
 				{
 					<p>
 						Последний раз проверялась преподавателем <b>@checking.LockedBy.VisibleName</b>
+						@{
+							var slide = Model.Slides.FirstOrDefault(s => s.Key == checking.SlideId).Value;
+							var score = isQuiz
+								? (checking as ManualQuizChecking).Score
+								: SlideCheckingsRepo.GetExerciseSubmissionManualCheckingsScoreAndPercent(new List<ManualExerciseChecking>{checking as ManualExerciseChecking}, slide as ExerciseSlide).Score;
+						}
 						<span class="label label-xs label-default">
-							@checking.Score из @checkingModel.ContextMaxScore.PluralizeInRussian(RussianPluralizationOptions.Score) за @(isExercise ? "код-ревью" : "тест")
+							@score из @checkingModel.ContextMaxScore.PluralizeInRussian(RussianPluralizationOptions.Score) за @(isExercise ? "код-ревью" : "тест")
 						</span>
 					</p>
 					<p>

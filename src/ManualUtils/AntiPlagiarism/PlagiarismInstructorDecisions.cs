@@ -101,7 +101,7 @@ namespace ManualUtils.AntiPlagiarism
 			var dateTime = DateTime.Parse("2019-01-17 08:42:47.343");
 			var whiteLabels = db.ManualExerciseCheckings
 				.Where(r => r.CourseId == "basicprogramming" || r.CourseId == "basicprogramming2")
-				.Where(r => r.Score > 0)
+				.Where(r => r.Score > 0 || r.Percent > 0)
 				.Where(r => r.Submission.Timestamp > dateTime)
 				.Select(r => new
 				{
