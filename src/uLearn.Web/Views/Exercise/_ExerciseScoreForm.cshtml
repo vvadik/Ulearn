@@ -47,6 +47,30 @@
 			}
 
 			<h4>Оцените работу <span>@(Model.PrevReviewPercent == null ? "(это первое ревью)" : $"(c прошлого ревью стоит {Model.PrevReviewPercent}%)")</span></h4>
+			@if (slide.Scoring.PassedTestsScore > 0)
+			{
+				<div class="exercise__score-form-prompt hide">
+					<div><!--Временная версия-->
+						Изменение поведения ulearn.<br/>
+						За прохождение тестов в этой задаче студенту автоматически дается @slide.Scoring.PassedTestsScore баллов.<br/>
+						После ревью студент максимально суммарно может иметь @slide.Scoring.ScoreWithCodeReview баллов.<br/>
+						Раньше раньше преподаватель на ревью ставил от 0 до @slide.Scoring.CodeReviewAdditionalScore баллов.<br/>
+						Этот балл прибавлялся к автоматически выданному.<br/>
+						Теперь балл преподавателя заменяет автоматически выданный.<br/>
+						То есть если вы поставите 0%, то у студента будет честных 0 баллов.<br/>
+						А если поставите 100%, то у студента будет @slide.Scoring.ScoreWithCodeReview баллов.<br/>
+						Для уже сделанных ревью баллы студентов остаются прежними.
+					</div>
+					<div class="hide"> <!--Постоянная версия-->
+						За прохождение тестов в этой задаче студенту автоматически дается @slide.Scoring.PassedTestsScore баллов.<br/>
+						После ревью студент максимально суммарно может иметь @slide.Scoring.ScoreWithCodeReview баллов.<br/>
+						Балл преподавателя заменяет автоматически выданный.<br/>
+						То есть если вы поставите 0%, то у студента будет честных 0 баллов.<br/>
+						А если поставите 100%, то у студента будет @slide.Scoring.ScoreWithCodeReview баллов.
+					</div>
+					<a class="internal-page-link" href="#">Скрыть подсказку</a>
+				</div>
+			}
 			<div class="exercise__score">
 				<div class="btn-group" role="group">
 					@{
@@ -67,7 +91,7 @@
 						var displayOtherPercentInput = Model.Checking.IsChecked && !isPercentButtonsActive;
 						var otherScoreInputDisplayProperty = displayOtherPercentInput ? "" : "display: none";
 					}
-					<a href="#" class="exercise__other-percent-link internal-page-link @(displayOtherPercentInput ? "active" : "")">Другая оценка </a>
+					<a href="#" class="exercise__other-percent-link internal-page-link @(displayOtherPercentInput ? "active" : "")">Другой процент</a>
 					<input type="number" class="form-control" style="@otherScoreInputDisplayProperty" min="0" max="100" name="exercisePercent" required="required"
 							title="Введите процент баллов"
 							value="@(Model.Checking.IsChecked && Model.Checking.Percent != null ? Model.Checking.Percent.Value.ToString() : "")"/>

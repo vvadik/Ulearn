@@ -179,6 +179,15 @@ window.documentReadyFunctions.push(function () {
 		}
 	});
 
+	if (!window.localStorage.getItem('hideExerciseScoreFormPrompt')) {
+		$exerciseScoreForm.find('.exercise__score-form-prompt').removeClass("hide");
+		$('.exercise__score-form-prompt .internal-page-link').on('click', function (e) {
+			window.localStorage.setItem('hideExerciseScoreFormPrompt', 'true');
+			$exerciseScoreForm.find('.exercise__score-form-prompt').addClass("hide");
+			e.preventDefault();
+		});
+	}
+
 	function updateTopReviewComments($exerciseAddReviewBlock) {
 		var $topReviewComments = $('.exercise__top-review-comments.hidden');
 		if ($topReviewComments.find('.comment').length === 0) {

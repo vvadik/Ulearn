@@ -1232,6 +1232,11 @@ body.lti-component {
 	margin-bottom: 10px;
 }
 
+.legacy-page .exercise__score-form-prompt {
+	margin-top: 10px;
+	margin-bottom: 17px;
+}
+
 @media (max-width: 768px) {
 	.legacy-page .exercise__score-form-wrapper {
 		padding-left: 15px !important;
