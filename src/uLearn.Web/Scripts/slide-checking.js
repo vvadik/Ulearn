@@ -9,6 +9,7 @@ window.documentReadyFunctions.push(function () {
 	var $otherScoreLink = $scoreBlock.find('.exercise__other-percent-link');
 	// TODO: multiple $otherPercentInput on page with simple score forms
 	var $otherPercentInput = $scoreBlock.find('[name=exercisePercent]');
+	var $prohibitFurtherReviewCheckbox = $exerciseScoreForm.closest('.exercise').find('[name="prohibitFurtherReview"]');
 
 	var setLockTimeout = function ($lock) {
 		$lock[0].lockTimeout = setTimeout(function () {
@@ -27,7 +28,7 @@ window.documentReadyFunctions.push(function () {
 		ignoreNewestSubmission = ignoreNewestSubmission || false;
 		var $status = $scoreForm.find('.status');
 		var $userSubmissionInfo = $scoreForm.closest('.user-submission').find('.user-submission__info');
-		$status.removeClass('success').removeClass('error').text('Сохраняем..').addClass('waiting');
+		$status.removeClass('success').removeClass('error').text('Сохраняем...').addClass('waiting');
 
 		var postData = $scoreForm.serialize();
 		if (ignoreNewestSubmission)
@@ -56,7 +57,7 @@ window.documentReadyFunctions.push(function () {
 				}
 				$status.html(error);
 			} else {
-				$status.addClass('success').text('Сохранено: ' + data.percent);
+				$status.addClass('success').text('Сохранено');
 				$scoreForm.data('checkingId', data.checkingId);
 				/* Lock after one second */
 				setTimeout(function () {
@@ -94,8 +95,7 @@ window.documentReadyFunctions.push(function () {
 		$exerciseScoreFormWrapper.removeClass('short');
 
         /* Restore prohibitFurtherReview checkbox state */
-        var $checkbox = $exerciseScoreForm.closest('.exercise').find('[name="prohibitFurtherReview"]');
-        $checkbox.prop('checked', $checkbox.data('initial-state'));
+		$prohibitFurtherReviewCheckbox.prop('checked', $prohibitFurtherReviewCheckbox.data('initial-state'));
 	});
 
 	$scoreBlock.find('.btn-group').on('click', '.btn', function () {
@@ -120,18 +120,21 @@ window.documentReadyFunctions.push(function () {
 			/* If score form is fixed, then open full version */
 			if (!wasActive)
 				$exerciseScoreFormWrapper.removeClass('short');
-						
+
 			/* Clicking on button "100%" makes prohibitFurtherReview checkbox checked. */
-            var $checkbox = $exerciseScoreForm.closest('.exercise').find('[name="prohibitFurtherReview"]');
 			if ($self.data('percent') === 100) {
 				/* Remember checkbox state before changing */
-				$checkbox.data('initial-state', $checkbox.prop('checked'));
-				$checkbox.prop('checked', true);
+				$prohibitFurtherReviewCheckbox.data('initial-state', $prohibitFurtherReviewCheckbox.prop('checked'));
+				$prohibitFurtherReviewCheckbox.prop('checked', true);
 			} else {
 				/* Restore checkbox state */
-				$checkbox.prop('checked', $checkbox.data('initial-state'));				
+				$prohibitFurtherReviewCheckbox.prop('checked', $prohibitFurtherReviewCheckbox.data('initial-state'));
 			}
 		}
+	});
+
+	$prohibitFurtherReviewCheckbox.change(function() {
+		$prohibitFurtherReviewCheckbox.data('initial-state', $prohibitFurtherReviewCheckbox.prop('checked'));
 	});
 
 	$exerciseScoreForm.find('input[type=submit]').click(function() {
@@ -147,9 +150,9 @@ window.documentReadyFunctions.push(function () {
 			var action = $form.data("action");
 			var id = $form.find('[name=id]').val();
 			var errorUrl = $form.find('[name=errorUrl]').val();
-			var exerciseScore = $form.find('[name=exerciseScore]').val();
-			var prohibitFurtherReview = $form.find('[name=prohibitFurtherReview]').prop('checked');
-			$.post(action, { id: id, nextUrl: nextUrl, errorUrl: errorUrl, exerciseScore: exerciseScore, prohibitFurtherReview: prohibitFurtherReview })
+			var exercisePercent = $form.find('[name=exercisePercent]').val();
+			var prohibitFurtherReview = $prohibitFurtherReviewCheckbox.prop('checked');
+			$.post(action, { id: id, nextUrl: nextUrl, errorUrl: errorUrl, exercisePercent: exercisePercent, prohibitFurtherReview: prohibitFurtherReview })
 				.done(function(data) {
 					if(data.status === "ok") {
 						if (buttonType === "next") {
@@ -280,7 +283,7 @@ window.documentReadyFunctions.push(function () {
 		}
 	});
 
-	$('.exercise__simple-score-form').bind('move', function(e) {
+	$exerciseSimpleScoreForm.bind('move', function(e) {
 		var $submissionInfo = $(this).closest('.user-submission').find('.user-submission__info');
 		var left = parseInt($submissionInfo.css('left'));
 		$submissionInfo.css({ left: left + e.deltaX });

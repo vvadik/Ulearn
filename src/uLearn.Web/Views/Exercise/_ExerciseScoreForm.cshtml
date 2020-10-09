@@ -61,7 +61,7 @@
 						А если поставите 100%, то у студента будет @slide.Scoring.ScoreWithCodeReview баллов.<br/>
 						Для уже сделанных ревью баллы студентов остаются прежними.
 					</div>
-					<div class="hide"> <!--Постоянная версия-->
+					<div class="hide"><!--Постоянная версия-->
 						За прохождение тестов в этой задаче студенту автоматически дается @slide.Scoring.PassedTestsScore баллов.<br/>
 						После ревью студент максимально суммарно может иметь @slide.Scoring.ScoreWithCodeReview баллов.<br/>
 						Балл преподавателя заменяет автоматически выданный.<br/>
@@ -99,23 +99,15 @@
 			</div>
 
 			@{
-				// ReSharper disable ReplaceWithSingleAssignment.True
-				var prohibitFutherReview = true;
-				if (Model.Checking.IsChecked && !Model.Checking.ProhibitFurtherManualCheckings)
-				{
-					prohibitFutherReview = false;
-				}
-				if (!Model.Checking.IsChecked && !Model.DefaultProhibitFurtherReview)
-				{
-					prohibitFutherReview = false;
-				}
-				// ReSharper restore ReplaceWithSingleAssignment.True
+				var prohibitFurtherReview = Model.Checking.IsChecked
+					? Model.Checking.ProhibitFurtherManualCheckings
+					: Model.DefaultProhibitFurtherReview;
 			}
 
 			<div class="hide-on-short">
 
 				<div class="checkbox checkbox-default">
-					<input data-val="true" id="prohibitFurtherReview" name="prohibitFurtherReview" type="checkbox" value="true" @(prohibitFutherReview ? "checked" : "")/>
+					<input data-val="true" id="prohibitFurtherReview" name="prohibitFurtherReview" type="checkbox" value="true" @(prohibitFurtherReview ? "checked" : "")/>
 					<label for="prohibitFurtherReview">
 						Не принимать больше код-ревью у&nbsp;этого студента по&nbsp;задаче «@Model.Slide.Title.MakeNestedQuotes().TruncateWithEllipsis(50)»
 					</label>

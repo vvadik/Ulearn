@@ -68,16 +68,16 @@
 							var isChecked = manualPercent != null;
 							if (isChecked)
 							{
-								<span> (текущая оценка: @manualPercent%):</span>
+								<span> (текущая оценка @manualPercent%)</span>
 							}
 							else
 							{
-								<span> (это первое ревью):</span>
+								<span> (это первое ревью)</span>
 							}
 						}
 					</p>
 					<div class="exercise__score">
-						<input type="hidden" name="exerciseScore"/>
+						<input type="hidden" name="exercisePercent"/>
 						<div class="btn-group" role="group">
 							@foreach (var percentOnButton in new[] { 0, 25, 50, 75, 100 })
 							{
@@ -96,7 +96,7 @@
 
 				@{
 					var reviewedSubmission = Model.ReviewedSubmissions.FirstOrDefault(s => s.SlideId == submission.SlideId);
-					var lastManualChecking = reviewedSubmission?.ManualCheckings.LastOrDefault(c => c.IsChecked);
+					var lastManualChecking = reviewedSubmission?.ManualCheckings.OrderBy(c => c.Timestamp).LastOrDefault(c => c.IsChecked);
 				}
 				@if (lastManualChecking != null && lastManualChecking.NotDeletedReviews.Any())
 				{

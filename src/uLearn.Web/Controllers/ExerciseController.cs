@@ -199,7 +199,7 @@ namespace uLearn.Web.Controllers
 
 		[System.Web.Mvc.HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public async Task<ActionResult> ScoreExercise(int id, string nextUrl, string exercisePercent, bool? prohibitFurtherReview, string errorUrl = "", bool recheck = false)
+		public async Task<ActionResult> ScoreExercise(int id, string nextUrl, string exercisePercent, bool prohibitFurtherReview, string errorUrl = "", bool recheck = false)
 		{
 			if (string.IsNullOrEmpty(errorUrl))
 				errorUrl = nextUrl;
@@ -219,11 +219,13 @@ namespace uLearn.Web.Controllers
 				if (percent < 0 || percent > 100)
 					return Json(new ScoreExerciseOperationResult { Status = "error", Redirect = errorUrl + $"Неверное количество баллов: {percent}"});
 
-				checking.ProhibitFurtherManualCheckings = false;
+				checking.ProhibitFurtherManualCheckings = prohibitFurtherReview;
 				await slideCheckingsRepo.MarkManualExerciseCheckingAsChecked(checking, percent).ConfigureAwait(false);
 				await slideCheckingsRepo.MarkManualExerciseCheckingAsCheckedBeforeThis(checking).ConfigureAwait(false);
-				if (prohibitFurtherReview.HasValue && prohibitFurtherReview.Value)
-					await slideCheckingsRepo.ProhibitFurtherExerciseManualChecking(checking).ConfigureAwait(false);
+				if (prohibitFurtherReview)
+					await slideCheckingsRepo.ProhibitFurtherExerciseManualChecking(checking.CourseId, checking.UserId, checking.SlideId).ConfigureAwait(false);
+				else
+					await slideCheckingsRepo.DisableProhibitFurtherManualCheckings(checking.CourseId, checking.UserId, checking.SlideId).ConfigureAwait(false);
 				await visitsRepo.UpdateScoreForVisit(checking.CourseId, slide, checking.UserId).ConfigureAwait(false);
 
 				transaction.Commit();
@@ -288,8 +290,8 @@ namespace uLearn.Web.Controllers
 			await slideCheckingsRepo.LockManualChecking(checking, User.Identity.GetUserId()).ConfigureAwait(false);
 			await slideCheckingsRepo.MarkManualExerciseCheckingAsChecked(checking, exercisePercent).ConfigureAwait(false);
 			/* 100%-score sets ProhibitFurtherChecking to true */
-			if (exercisePercent == slide.Scoring.ScoreWithCodeReview)
-				await slideCheckingsRepo.ProhibitFurtherExerciseManualChecking(checking).ConfigureAwait(false);
+			if (exercisePercent == 100)
+				await slideCheckingsRepo.ProhibitFurtherExerciseManualChecking(checking.CourseId, checking.UserId, checking.SlideId).ConfigureAwait(false);
 
 			await visitsRepo.UpdateScoreForVisit(courseId, slide, userId).ConfigureAwait(false);
 
@@ -437,7 +439,7 @@ namespace uLearn.Web.Controllers
 				.Where(s => s.ManualCheckings.Any(c => c.IsChecked))
 				.OrderByDescending(s => s.Timestamp)
 				.FirstOrDefault();
-			var lastManualChecking = reviewedSubmission?.ManualCheckings.LastOrDefault(c => c.IsChecked);
+			var lastManualChecking = reviewedSubmission?.ManualCheckings.OrderBy(c => c.Timestamp).LastOrDefault(c => c.IsChecked);
 
 			if (lastManualChecking == null || !lastManualChecking.NotDeletedReviews.Any())
 				return new EmptyResult();
@@ -455,7 +457,8 @@ namespace uLearn.Web.Controllers
 			var prevReviewPercent = slideCheckingsRepo.GetUserReviewPercentForExerciseSlide(
 				context.Course.Id,
 				context.Slide as ExerciseSlide,
-				checking.UserId);
+				checking.UserId,
+				checking.Submission.Timestamp);
 			var model = new ExerciseScoreFormModel (
 				context.Course.Id,
 				(ExerciseSlide)context.Slide,

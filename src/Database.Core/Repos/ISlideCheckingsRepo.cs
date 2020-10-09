@@ -19,7 +19,7 @@ namespace Database.Repos
 		Task RemoveAttempts(string courseId, Guid slideId, string userId, bool saveChanges = true);
 		Task<bool> IsSlidePassed(string courseId, Guid slideId, string userId);
 		Task<(int Score, int? Percent)> GetExerciseSlideScoreAndPercent(string courseId, ExerciseSlide slide, string userId);
-		Task<int?> GetUserReviewPercentForExerciseSlide(string courseId, ExerciseSlide slide, string userId, DateTime? before = null);
+		Task<int?> GetUserReviewPercentForExerciseSlide(string courseId, ExerciseSlide slide, string userId, DateTime? submissionBefore = null);
 		Task<List<(Guid SlideId, int Score, int Percent)>> GetPassedManualExerciseCheckingsScoresAndPercents(Course course, string userId);
 		Task<int> GetUserScoreForQuizSlide(string courseId, Guid slideId, string userId);
 		Task<List<T>> GetManualCheckingQueue<T>(ManualCheckingQueueFilterOptions options) where T : AbstractManualSlideChecking;
@@ -31,10 +31,10 @@ namespace Database.Repos
 		Task MarkManualQuizCheckingAsChecked(ManualQuizChecking queueItem, int score);
 		Task MarkManualExerciseCheckingAsChecked(ManualExerciseChecking queueItem, int percent);
 		Task MarkManualExerciseCheckingAsCheckedBeforeThis(ManualExerciseChecking queueItem);
-		Task ProhibitFurtherExerciseManualChecking(ManualExerciseChecking checking);
+		Task ProhibitFurtherExerciseManualChecking(string courseId, string userId, Guid slideId);
 		Task ResetManualCheckingLimitsForUser(string courseId, string userId);
 		Task ResetAutomaticCheckingLimitsForUser(string courseId, string userId);
-		Task DisableProhibitFurtherManualCheckings(string courseId, string userId);
+		Task DisableProhibitFurtherManualCheckings(string courseId, string userId, Guid? slideId = null);
 		Task NotCountOldAttemptsToQuizzesWithManualChecking(string courseId, string userId);
 		Task NotCountOldAttemptsToQuizzesWithAutomaticChecking(string courseId, string userId);
 		Task<ExerciseCodeReview> AddExerciseCodeReview(ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime = true);

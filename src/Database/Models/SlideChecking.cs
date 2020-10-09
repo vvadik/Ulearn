@@ -119,7 +119,7 @@ namespace Database.Models
 		[StringLength(256)]
 		public string CheckingAgentName { get; set; }
 
-		[Obsolete] // Данные этого столбца вычисляются из других. Оставелно на всякий случай, чтобы не удалять столбец
+		[Obsolete] // Данные этого столбца вычисляются из других. Оставелно, чтобы не удалять столбец
 		public int? Score { get; set; }
 
 		public float? Points { get; set; }
@@ -150,6 +150,7 @@ namespace Database.Models
 
 		[Required]
 		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndUser", 4)]
+		// Действует, если стоит хотя бы у одной проверки. Если снимается у одной проверки, снимается у всех.
 		public bool ProhibitFurtherManualCheckings { get; set; }
 
 		// Хранит старые данные, теперь используется Percent

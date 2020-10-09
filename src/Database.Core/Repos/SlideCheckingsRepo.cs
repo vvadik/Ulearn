@@ -102,12 +102,7 @@ namespace Database.Repos
 
 		private IQueryable<T> GetSlideCheckingsByUser<T>(string courseId, Guid slideId, string userId) where T : AbstractSlideChecking
 		{
-			return GetSlideCheckingsByUsers<T>(courseId, slideId, new List<string> { userId });
-		}
-
-		private IQueryable<T> GetSlideCheckingsByUsers<T>(string courseId, Guid slideId, IEnumerable<string> userIds) where T : AbstractSlideChecking
-		{
-			return db.Set<T>().Where(c => c.CourseId == courseId && c.SlideId == slideId && userIds.Contains(c.UserId));
+			return db.Set<T>().Where(c => c.CourseId == courseId && c.SlideId == slideId && c.UserId == userId);
 		}
 
 		public async Task RemoveAttempts(string courseId, Guid slideId, string userId, bool saveChanges = true)
@@ -136,12 +131,7 @@ namespace Database.Repos
 				.AnyAsync(c => c.IsRightAnswer);
 			if (!isRightAnswer)
 				return (0, null);
-			var checkedScoresAndPercents = (await GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slide.Id, userId)
-				.Where(c => c.IsChecked)
-				.Select(c => new { c.Score, c.Percent })
-				.ToListAsync())
-				.Select(c => (c.Score, c.Percent))
-				.ToList();
+			var checkedScoresAndPercents = await GetCheckedScoresAndPercents(courseId, slide, userId, null);
 			var automaticScore = slide.Scoring.PassedTestsScore;
 			if (checkedScoresAndPercents.Count == 0)
 				return (automaticScore, null);
@@ -152,6 +142,7 @@ namespace Database.Repos
 		{
 			var checkedScoresAndPercents = manualCheckings
 				.Where(c => c.IsChecked)
+				.OrderBy(c => c.Timestamp)
 				.Select(c => (c.Score, c.Percent))
 				.ToList();
 			return GetScoreAndPercentByScoresAndPercents(slide, checkedScoresAndPercents);
@@ -178,19 +169,27 @@ namespace Database.Repos
 				: (scoreFormScore, (int)Math.Ceiling(scoreFormScore * 100m / slide.Scoring.ScoreWithCodeReview));
 		}
 
-		public async Task<int?> GetUserReviewPercentForExerciseSlide(string courseId, ExerciseSlide slide, string userId, DateTime? before = null)
+		public async Task<int?> GetUserReviewPercentForExerciseSlide(string courseId, ExerciseSlide slide, string userId, DateTime? submissionBefore = null)
+		{
+			var checkedScoresAndPercents = await GetCheckedScoresAndPercents(courseId, slide, userId, submissionBefore);
+			return GetScoreAndPercentByScoresAndPercents(slide, checkedScoresAndPercents).Percent;
+		}
+
+		private async Task<List<(int? Score, int? Percent)>> GetCheckedScoresAndPercents(string courseId, ExerciseSlide slide, string userId, DateTime? submissionBefore)
 		{
 			var query = GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slide.Id, userId)
 				.Where(c => c.IsChecked);
-			if (before != null)
-				query = query.Where(c => c.Timestamp < before);
+			if (submissionBefore != null)
+				query = query.Where(c => c.Submission.Timestamp < submissionBefore);
 			var checkedScoresAndPercents = (await query
-				.Select(c => new { c.Score, c.Percent })
+				.Select(c => new { c.Score, c.Percent, CheckingTimestamp = c.Timestamp, SubmissionTimestamp = c.Submission.Timestamp })
+				.OrderBy(c => c.SubmissionTimestamp)
+				.ThenBy(c => c.CheckingTimestamp)
 				.Select(c => new { c.Score, c.Percent })
 				.ToListAsync())
 				.Select(c => (c.Score, c.Percent))
 				.ToList();
-			return GetScoreAndPercentByScoresAndPercents(slide, checkedScoresAndPercents).Percent;
+			return checkedScoresAndPercents;
 		}
 
 		public async Task<List<(Guid SlideId, int Score, int Percent)>> GetPassedManualExerciseCheckingsScoresAndPercents(Course course, string userId)
@@ -318,29 +317,45 @@ namespace Database.Repos
 		// Помечает оцененными посещенные но не оцененные старые ревью
 		public async Task MarkManualExerciseCheckingAsCheckedBeforeThis(ManualExerciseChecking queueItem)
 		{
-			var itemsForMark = db.Set<ManualExerciseChecking>().Where(c => c.CourseId == queueItem.CourseId && c.UserId == queueItem.UserId && c.SlideId == queueItem.SlideId && c.Timestamp < queueItem.Timestamp).ToList();
-			var percent = 0;
+			var itemsForMark = (await db.Set<ManualExerciseChecking>()
+				.Include(c => c.Submission)
+				.Where(c => c.CourseId == queueItem.CourseId && c.UserId == queueItem.UserId && c.SlideId == queueItem.SlideId && c.Timestamp < queueItem.Timestamp)
+				.ToListAsync())
+				.OrderBy(c => c.Submission.Timestamp)
+				.ThenBy(c => c.Timestamp);
+			int? percent = 0;
+			int? score = 0;
 			var changed = false;
 			foreach (var item in itemsForMark)
 			{
 				if (item.IsChecked)
-					percent = item.Percent.Value;
+				{
+					percent = item.Percent;
+					score = item.Score;
+				}
 				else
 				{
 					item.LockedBy = null;
 					item.LockedUntil = null;
 					item.IsChecked = true;
 					queueItem.Percent = percent;
+					queueItem.Score = score;
 					changed = true;
 				}
 			}
-			if (changed)
+			if(changed)
 				await db.SaveChangesAsync();
 		}
 
-		public async Task ProhibitFurtherExerciseManualChecking(ManualExerciseChecking checking)
+		public async Task ProhibitFurtherExerciseManualChecking(string courseId, string userId, Guid slideId)
 		{
-			checking.ProhibitFurtherManualCheckings = true;
+			var checkings = await db.ManualExerciseCheckings
+				.Where(c => c.CourseId == courseId && c.UserId == userId &&  c.SlideId == slideId && c.ProhibitFurtherManualCheckings)
+				.ToListAsync();
+			if (checkings.Count == 0)
+				return;
+			foreach (var checking in checkings)
+				checking.ProhibitFurtherManualCheckings = true;
 			await db.SaveChangesAsync();
 		}
 
@@ -356,11 +371,15 @@ namespace Database.Repos
 			await visitsRepo.Value.UnskipAllSlides(courseId, userId);
 		}
 
-		public async Task DisableProhibitFurtherManualCheckings(string courseId, string userId)
+		public async Task DisableProhibitFurtherManualCheckings(string courseId, string userId, Guid? slideId = null)
 		{
-			var checkingsWithProhibitFurther = await db.ManualExerciseCheckings
-				.Where(c => c.CourseId == courseId && c.UserId == userId && c.ProhibitFurtherManualCheckings)
-				.ToListAsync();
+			var query = db.ManualExerciseCheckings
+				.Where(c => c.CourseId == courseId && c.UserId == userId && c.ProhibitFurtherManualCheckings);
+			if (slideId != null)
+				query = query.Where(c => c.SlideId == slideId);
+			var checkingsWithProhibitFurther = await query.ToListAsync();
+			if (checkingsWithProhibitFurther.Count == 0)
+				return;
 			foreach (var checking in checkingsWithProhibitFurther)
 				checking.ProhibitFurtherManualCheckings = false;
 			await db.SaveChangesAsync();
