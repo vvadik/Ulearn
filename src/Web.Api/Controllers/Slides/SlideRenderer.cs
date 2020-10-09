@@ -10,6 +10,7 @@ using Ulearn.Core;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Courses.Slides.Flashcards;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
@@ -73,9 +74,11 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		public async Task<ApiSlideInfo> BuildSlideInfo(SlideRenderContext slideRenderContext, Func<Slide, int> getSlideMaxScoreFunc, Func<Slide, string> getGitEditLink)
 		{
 			var result = BuildShortSlideInfo<ApiSlideInfo>(slideRenderContext.CourseId, slideRenderContext.Slide, getSlideMaxScoreFunc, getGitEditLink, slideRenderContext.UrlHelper);
+			
 			result.Blocks = new List<IApiSlideBlock>();
 			foreach (var b in slideRenderContext.Slide.Blocks)
 				result.Blocks.AddRange(await ToApiSlideBlocks(b, slideRenderContext));
+			
 			return result;
 		}
 
@@ -140,6 +143,16 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				: "https://docs.google.com/document/d/" + context.VideoAnnotationsGoogleDoc;
 			var response = new YoutubeBlockResponse(yb, annotation, googleDocLink);
 			return new [] { response };
+		}
+		
+		private async Task<IEnumerable<IApiSlideBlock>> RenderBlock(SingleFileExerciseBlock b, SlideRenderContext context)
+		{
+			return new[] { new SingleFileExerciseBlockResponse(b, context.Submissions) };
+		}	
+		
+		private async Task<IEnumerable<IApiSlideBlock>> RenderBlock(CsProjectExerciseBlock b, SlideRenderContext context)
+		{
+			return new[] { new CsProjectExerciseBlockResponse(b, context.Submissions) };
 		}
 
 		private static List<IApiSlideBlock> ParseBlocksFromMarkdown(string renderedMarkdown)
