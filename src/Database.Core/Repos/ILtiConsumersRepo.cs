@@ -5,6 +5,6 @@ namespace Database.Repos
 {
 	public interface ILtiConsumersRepo
 	{
-		Task<LtiConsumer> FindAsync(string consumerKey);
+		Task<LtiConsumer> Find(string consumerKey);
 	}
 }

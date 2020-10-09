@@ -159,7 +159,7 @@ namespace Ulearn.Web.Api.Controllers
 
 		public static async Task<HashSet<Guid>> GetSolvedSlides(IUserSolutionsRepo solutionsRepo, IUserQuizzesRepo userQuizzesRepo, Course course, string userId)
 		{
-			var solvedSlides = await solutionsRepo.GetIdOfPassedSlidesAsync(course.Id, userId);
+			var solvedSlides = await solutionsRepo.GetIdOfPassedSlides(course.Id, userId);
 			solvedSlides.UnionWith(await userQuizzesRepo.GetPassedSlideIdsAsync(course.Id, userId));
 			return solvedSlides;
 		}

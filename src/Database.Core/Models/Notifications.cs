@@ -338,7 +338,7 @@ namespace Database.Models
 
 		/* Returns list of notifications, which blocks this notification from sending to specific user. I.e. NewComment is blocked by ReplyToYourComment or NewCommentFromYourGroupStudent */
 		/* Override this method together with IsBlockedByAnyNotificationFrom() */
-		public virtual List<Notification> GetBlockerNotifications(IServiceProvider serviceProvider)
+		public virtual async Task<List<Notification>> GetBlockerNotifications(IServiceProvider serviceProvider)
 		{
 			return new List<Notification>();
 		}
@@ -545,11 +545,11 @@ namespace Database.Models
 
 		public override bool IsNotificationForEveryone => true;
 
-		public override List<Notification> GetBlockerNotifications(IServiceProvider serviceProvider)
+		public override async Task<List<Notification>> GetBlockerNotifications(IServiceProvider serviceProvider)
 		{
 			var notificationsRepo = serviceProvider.GetService<INotificationsRepo>();
-			var repliedNotifications = notificationsRepo.FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId);
-			var yourGroupNotifications = notificationsRepo.FindNotifications<NewCommentFromYourGroupStudentNotification>(n => n.CommentId == CommentId);
+			var repliedNotifications = await notificationsRepo.FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId);
+			var yourGroupNotifications = await notificationsRepo.FindNotifications<NewCommentFromYourGroupStudentNotification>(n => n.CommentId == CommentId);
 			return repliedNotifications.Cast<Notification>().Concat(yourGroupNotifications).ToList();
 		}
 
@@ -630,10 +630,10 @@ namespace Database.Models
 			return groupAccessesRepo.GetInstructorsOfAllGroupsWhereUserIsMemberAsync(CourseId, Comment.Author.Id);
 		}
 
-		public override List<Notification> GetBlockerNotifications(IServiceProvider serviceProvider)
+		public override async Task<List<Notification>> GetBlockerNotifications(IServiceProvider serviceProvider)
 		{
 			var notificationsRepo = serviceProvider.GetService<INotificationsRepo>();
-			var repliedToYourCommentNotifications = notificationsRepo.FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId);
+			var repliedToYourCommentNotifications = await notificationsRepo.FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId);
 			return repliedToYourCommentNotifications.Cast<Notification>().ToList();
 		}
 
@@ -1083,13 +1083,13 @@ namespace Database.Models
 			return CommentId != null && Comment != null;
 		}
 
-		public override List<Notification> GetBlockerNotifications(IServiceProvider serviceProvider)
+		public override async Task<List<Notification>> GetBlockerNotifications(IServiceProvider serviceProvider)
 		{
 			var notificationsRepo = serviceProvider.GetService<INotificationsRepo>();
 			var reviewId = Comment.ReviewId;
-			return notificationsRepo
+			return (await notificationsRepo
 				.FindNotifications<ReceivedCommentToCodeReviewNotification>(n => n.Comment.ReviewId == reviewId, n => n.Comment)
-				.Cast<Notification>()
+				).Cast<Notification>()
 				.Where(n => n.CreateTime < CreateTime && n.CreateTime >= CreateTime - NotificationsRepo.sendNotificationsDelayAfterCreating)
 				.ToList();
 		}
@@ -1403,10 +1403,10 @@ namespace Database.Models
 			return courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, CourseId, includeHighRoles: true);
 		}
 
-		public override List<Notification> GetBlockerNotifications(IServiceProvider serviceProvider)
+		public override async Task<List<Notification>> GetBlockerNotifications(IServiceProvider serviceProvider)
 		{
 			var notificationsRepo = serviceProvider.GetService<INotificationsRepo>();
-			return notificationsRepo.FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId).Cast<Notification>().ToList();
+			return (await notificationsRepo.FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId)).Cast<Notification>().ToList();
 		}
 
 		public override bool IsBlockedByAnyNotificationFrom(IServiceProvider serviceProvider, List<Notification> notifications)

@@ -30,6 +30,10 @@ namespace Database.Models
 		public virtual ApplicationUser User { get; set; }
 
 		public int Score { get; set; }
+
+		public virtual void PreRemove(UlearnDb db)
+		{
+		}
 	}
 
 	public class AbstractManualSlideChecking : AbstractSlideChecking
@@ -138,6 +142,11 @@ namespace Database.Models
 
 		[NotMapped]
 		public List<ExerciseCodeReview> NotDeletedReviews => Reviews.Where(r => !r.IsDeleted).ToList();
+
+		public override void PreRemove(UlearnDb db)
+		{
+			db.Set<ExerciseCodeReview>().RemoveRange(Reviews);
+		}
 	}
 
 	public class AutomaticQuizChecking : AbstractAutomaticSlideChecking

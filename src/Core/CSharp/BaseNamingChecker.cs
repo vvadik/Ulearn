@@ -15,6 +15,7 @@ namespace Ulearn.Core.CSharp
 				.Concat(InspectAll<ParameterSyntax>(userSolution, n => InspectName(n.Identifier)))
 				.Concat(InspectAll<EnumMemberDeclarationSyntax>(userSolution, n => InspectName(n.Identifier)))
 				.Concat(InspectAll<MethodDeclarationSyntax>(userSolution, n => InspectName(n.Identifier)))
+				.Concat(InspectAll<LocalFunctionStatementSyntax>(userSolution, n => InspectName(n.Identifier)))
 				.Concat(InspectAll<VariableDeclaratorSyntax>(userSolution, n => InspectName(n.Identifier)))
 				.ToList();
 		}

@@ -365,7 +365,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			if (groupMember == null)
 				return NotFound(new ErrorResponse($"User {studentId} is not a student of group {groupId}"));
 
-			await notificationsRepo.AddNotificationAsync(
+			await notificationsRepo.AddNotification(
 				group.CourseId,
 				new GroupMembersHaveBeenRemovedNotification(groupId, new List<string> { studentId }, usersRepo),
 				UserId
@@ -391,7 +391,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 
 			var members = await groupMembersRepo.RemoveUsersFromGroupAsync(groupId, parameters.StudentIds).ConfigureAwait(false);
 
-			await notificationsRepo.AddNotificationAsync(
+			await notificationsRepo.AddNotification(
 				group.CourseId,
 				new GroupMembersHaveBeenRemovedNotification(group.Id, parameters.StudentIds, usersRepo),
 				UserId
@@ -425,7 +425,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			foreach (var newMember in newMembers)
 				await slideCheckingsRepo.ResetManualCheckingLimitsForUser(destinationGroup.CourseId, newMember.UserId);
 
-			await notificationsRepo.AddNotificationAsync(
+			await notificationsRepo.AddNotification(
 				destinationGroup.CourseId,
 				new GroupMembersHaveBeenAddedNotification(groupId, parameters.StudentIds, usersRepo),
 				UserId
@@ -502,7 +502,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 				return Conflict(new ErrorResponse($"User {userId} already has access to group {groupId}"));
 
 			var access = await groupAccessesRepo.GrantAccessAsync(groupId, userId, GroupAccessType.FullAccess, UserId).ConfigureAwait(false);
-			await notificationsRepo.AddNotificationAsync(group.CourseId, new GrantedAccessToGroupNotification { AccessId = access.Id }, UserId).ConfigureAwait(false);
+			await notificationsRepo.AddNotification(group.CourseId, new GrantedAccessToGroupNotification { AccessId = access.Id }, UserId).ConfigureAwait(false);
 
 			return Ok(new SuccessResponseWithMessage($"User {userId} has full access to {groupId}"));
 		}
@@ -527,7 +527,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 
 			var accesses = await groupAccessesRepo.RevokeAccessAsync(groupId, userId).ConfigureAwait(false);
 			foreach (var access in accesses)
-				await notificationsRepo.AddNotificationAsync(
+				await notificationsRepo.AddNotification(
 					group.CourseId,
 					new RevokedAccessToGroupNotification { AccessId = access.Id },
 					UserId

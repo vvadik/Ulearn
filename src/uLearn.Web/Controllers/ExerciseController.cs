@@ -33,64 +33,16 @@ namespace uLearn.Web.Controllers
 	public class ExerciseController : BaseExerciseController
 	{
 		private readonly ExerciseStudentZipsCache exerciseStudentZipsCache;
-		private readonly ULearnUserManager userManager;
 
 		public ExerciseController()
 		{
 			exerciseStudentZipsCache = new ExerciseStudentZipsCache();
-			userManager = new ULearnUserManager(db);
 		}
 
 		[System.Web.Mvc.HttpPost]
 		public async Task<ActionResult> RunSolution(string courseId, Guid slideId, bool isLti = false)
 		{
-			/* Check that no checking solution by this user in last time */
-			var halfMinuteAgo = DateTime.Now.Subtract(TimeSpan.FromSeconds(30));
-			if (userSolutionsRepo.IsCheckingSubmissionByUser(courseId, slideId, User.Identity.GetUserId(), halfMinuteAgo, DateTime.MaxValue))
-			{
-				return Json(new RunSolutionResult
-				{
-					Ignored = true,
-					ErrorMessage = "Ваше решение по этой задаче уже проверяется. Дождитесь окончания проверки"
-				});
-			}
-
-			var code = Request.InputStream.GetString();
-			if (code.Length > TextsRepo.MaxTextSize)
-			{
-				return Json(new RunSolutionResult
-				{
-					IsCompileError = true,
-					ErrorMessage = "Слишком большой код"
-				});
-			}
-
-			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
-			var exerciseSlide = courseManager.FindCourse(courseId)?.FindSlideById(slideId, isInstructor) as ExerciseSlide;
-			if (exerciseSlide == null)
-				return HttpNotFound();
-
-			var result = await CheckSolution(
-				courseId, exerciseSlide, code, User.Identity.GetUserId(), User.Identity.Name,
-				waitUntilChecked: true, saveSubmissionOnCompileErrors: false
-			).ConfigureAwait(false);
-
-			if (isLti)
-				try
-				{
-					LtiUtils.SubmitScore(courseId, exerciseSlide, User.Identity.GetUserId());
-				}
-				catch (Exception e)
-				{
-					ErrorLog.GetDefault(System.Web.HttpContext.Current).Log(new Error(e));
-					return Json(new RunSolutionResult
-					{
-						IsCompillerFailure = true,
-						ErrorMessage = "Мы не смогли отправить баллы на вашу образовательную платформу. Пожалуйста, обновите страницу — мы попробуем сделать это ещё раз."
-					});
-				}
-
-			return Json(result);
+			return HttpNotFound();
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]

@@ -14,15 +14,15 @@ namespace Database.Repos
 		bool IsUserVisitedSlide(string courseId, Guid slideId, string userId);
 		HashSet<Guid> GetIdOfVisitedSlides(string courseId, string userId);
 		bool HasVisitedSlides(string courseId, string userId);
-		Task UpdateScoreForVisit(string courseId, Guid slideId, string userId);
+		Task UpdateScoreForVisit(string courseId, Guid slideId, int maxSlideScore, string userId);
 		Task RemoveAttempts(string courseId, Guid slideId, string userId);
 		Dictionary<Guid, int> GetScoresForSlides(string courseId, string userId, IEnumerable<Guid> slidesIds = null);
 		Task<Dictionary<string, Dictionary<Guid, int>>> GetScoresForSlides(string courseId, IEnumerable<string> userIds, IEnumerable<Guid> slidesIds = null);
 		Task<List<Guid>> GetSlidesWithUsersManualChecking(string courseId, string userId);
 		Task MarkVisitsAsWithManualChecking(string courseId, Guid slideId, string userId);
-		int GetScore(string courseId, Guid slideId, string userId);
+		Task<int> GetScore(string courseId, Guid slideId, string userId);
 		Task SkipSlide(string courseId, Guid slideId, string userId);
-		bool IsSkipped(string courseId, Guid slideId, string userId);
+		Task<bool> IsSkipped(string courseId, Guid slideId, string userId);
 		/// Забывает, что пользователь смотрел чужие решения и дает ему получить баллы при следующей отправке.
 		Task UnskipAllSlides(string courseId, string userId);
 		bool IsPassed(string courseId, Guid slideId, string userId);

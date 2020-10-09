@@ -38,11 +38,6 @@ namespace uLearn.Web.Controllers
 			});
 		}
 
-		public ActionResult RunCode()
-		{
-			return View();
-		}
-
 		[HttpPost]
 		public async Task<ActionResult> Run()
 		{

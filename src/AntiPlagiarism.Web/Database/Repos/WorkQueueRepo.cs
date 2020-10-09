@@ -52,7 +52,7 @@ $@"with cte as (
 	from {AntiPlagiarismDb.DefaultSchema}.{nameof(db.WorkQueueItems)} with (rowlock, readpast)
 	where {WorkQueueItem.QueueIdColumnName} = @queueId
 	and ({WorkQueueItem.TakeAfterTimeColumnName} is NULL or {WorkQueueItem.TakeAfterTimeColumnName} < @now)
-	order by {WorkQueueItem.IdCoumnName}
+	order by {WorkQueueItem.IdColumnName}
 )
 update cte SET {WorkQueueItem.TakeAfterTimeColumnName} = @timeLimit
 output inserted.*";

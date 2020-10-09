@@ -8,14 +8,13 @@ namespace Database.Repos
 {
 	public interface IFeedRepo
 	{
-		Task<DateTime?> GetFeedViewTimestampAsync(string userId, int transportId);
-		Task UpdateFeedViewTimestampAsync(string userId, int transportId, DateTime timestamp);
-		Task AddFeedNotificationTransportIfNeededAsync(string userId);
-		Task<FeedNotificationTransport> GetUsersFeedNotificationTransportAsync(string userId);
-		Task<FeedNotificationTransport> GetCommentsFeedNotificationTransportAsync();
-		FeedNotificationTransport GetCommentsFeedNotificationTransport();
-		Task<DateTime?> GetLastDeliveryTimestampAsync(FeedNotificationTransport notificationTransport);
-		Task<int> GetNotificationsCountAsync(string userId, DateTime from, params FeedNotificationTransport[] transports);
-		Task<List<Notification>> GetNotificationForFeedNotificationDeliveriesAsync<TProperty>(string userId, Expression<Func<Notification, TProperty>> includePath, params FeedNotificationTransport[] transports);
+		Task<DateTime?> GetFeedViewTimestamp(string userId, int transportId);
+		Task UpdateFeedViewTimestamp(string userId, int transportId, DateTime timestamp);
+		Task AddFeedNotificationTransportIfNeeded(string userId);
+		Task<FeedNotificationTransport> GetUsersFeedNotificationTransport(string userId);
+		Task<FeedNotificationTransport> GetCommentsFeedNotificationTransport();
+		Task<DateTime?> GetLastDeliveryTimestamp(FeedNotificationTransport notificationTransport);
+		Task<int> GetNotificationsCount(string userId, DateTime from, params FeedNotificationTransport[] transports);
+		Task<List<Notification>> GetNotificationForFeedNotificationDeliveries<TProperty>(string userId, Expression<Func<Notification, TProperty>> includePath, params FeedNotificationTransport[] transports);
 	}
 }

@@ -1,16 +1,15 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using LtiLibrary.NetCore.Lti.v1;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 
 namespace Database.Repos
 {
-	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
 	public class LtiRequestsRepo : ILtiRequestsRepo
 	{
 		private readonly UlearnDb db;
@@ -22,14 +21,14 @@ namespace Database.Repos
 			serializer = new JsonSerializer();
 		}
 
-		public Task Update(string courseId, string userId, Guid slideId, string ltiRequestJson)
+		public async Task Update(string courseId, string userId, Guid slideId, string ltiRequestJson)
 		{
-			return FuncUtils.TrySeveralTimesAsync(() => TryUpdate(courseId, slideId, userId, ltiRequestJson), 3);
+			await FuncUtils.TrySeveralTimesAsync(async() => await TryUpdate(courseId, slideId, userId, ltiRequestJson), 3);
 		}
 
-		private Task TryUpdate(string courseId, Guid slideId, string userId, string ltiRequestJson)
+		private async Task TryUpdate(string courseId, Guid slideId, string userId, string ltiRequestJson)
 		{
-			var ltiRequestModel = FindElement(courseId, slideId, userId);
+			var ltiRequestModel = await FindElement(courseId, slideId, userId);
 
 			if (ltiRequestModel == null)
 			{
@@ -45,21 +44,21 @@ namespace Database.Repos
 				ltiRequestModel.Request = ltiRequestJson;
 
 			db.AddOrUpdate(ltiRequestModel, r => r.RequestId == ltiRequestModel.RequestId);
-			return db.SaveChangesAsync();
+			await db.SaveChangesAsync();
 		}
 
-		public LtiRequest Find(string courseId, string userId, Guid slideId)
+		public async Task<LtiRequest> Find(string courseId, string userId, Guid slideId)
 		{
-			var ltiRequestModel = FindElement(courseId, slideId, userId);
+			var ltiRequestModel = await FindElement(courseId, slideId, userId);
 			if (ltiRequestModel == null)
 				return null;
 
 			return serializer.Deserialize<LtiRequest>(new JsonTextReader(new StringReader(ltiRequestModel.Request)));
 		}
 
-		private LtiSlideRequest FindElement(string courseId, Guid slideId, string userId)
+		private async Task<LtiSlideRequest> FindElement(string courseId, Guid slideId, string userId)
 		{
-			return db.LtiRequests.FirstOrDefault(
+			return await db.LtiRequests.FirstOrDefaultAsync(
 				request => request.CourseId == courseId && request.UserId == userId && request.SlideId == slideId
 			);
 		}

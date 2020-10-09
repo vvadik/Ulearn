@@ -10,7 +10,6 @@ using Serilog;
 
 namespace Database.Repos
 {
-	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
 	public class FeedRepo : IFeedRepo
 	{
 		private readonly UlearnDb db;
@@ -20,25 +19,25 @@ namespace Database.Repos
 
 		public FeedRepo(UlearnDb db, INotificationsRepo notificationsRepo, IVisitsRepo visitsRepo, ILogger logger)
 		{
-			this.db = db ?? throw new ArgumentNullException(nameof(db));
-			this.notificationsRepo = notificationsRepo ?? throw new ArgumentNullException(nameof(notificationsRepo));
-			this.visitsRepo = visitsRepo ?? throw new ArgumentNullException(nameof(visitsRepo));
+			this.db = db;
+			this.notificationsRepo = notificationsRepo;
+			this.visitsRepo = visitsRepo;
 			this.logger = logger;
 		}
 
-		public async Task<DateTime?> GetFeedViewTimestampAsync(string userId, int transportId)
+		public async Task<DateTime?> GetFeedViewTimestamp(string userId, int transportId)
 		{
 			var updateTimestamp = await db.FeedViewTimestamps
 				.Where(t => t.UserId == userId && (t.TransportId == null || t.TransportId == transportId))
 				.OrderByDescending(t => t.Timestamp)
 				.FirstOrDefaultAsync()
-				.ConfigureAwait(false);
+				;
 			return updateTimestamp?.Timestamp;
 		}
 
-		public async Task UpdateFeedViewTimestampAsync(string userId, int transportId, DateTime timestamp)
+		public async Task UpdateFeedViewTimestamp(string userId, int transportId, DateTime timestamp)
 		{
-			var currentTimestamp = await db.FeedViewTimestamps.FirstOrDefaultAsync(t => t.UserId == userId && t.TransportId == transportId).ConfigureAwait(false);
+			var currentTimestamp = await db.FeedViewTimestamps.FirstOrDefaultAsync(t => t.UserId == userId && t.TransportId == transportId);
 			if (currentTimestamp == null)
 			{
 				currentTimestamp = new FeedViewTimestamp
@@ -51,31 +50,31 @@ namespace Database.Repos
 
 			currentTimestamp.Timestamp = timestamp;
 
-			await db.SaveChangesAsync().ConfigureAwait(false);
+			await db.SaveChangesAsync();
 		}
 
-		public async Task AddFeedNotificationTransportIfNeededAsync(string userId)
+		public async Task AddFeedNotificationTransportIfNeeded(string userId)
 		{
-			if (await notificationsRepo.FindUsersNotificationTransportAsync<FeedNotificationTransport>(userId, includeDisabled: true).ConfigureAwait(false) != null)
+			if (await notificationsRepo.FindUsersNotificationTransport<FeedNotificationTransport>(userId, includeDisabled: true) != null)
 				return;
 
 			logger.Information($"Create feed notification transport for user {userId} because there is no actual one");
 
-			await notificationsRepo.AddNotificationTransportAsync(new FeedNotificationTransport
+			await notificationsRepo.AddNotificationTransport(new FeedNotificationTransport
 			{
 				UserId = userId,
 				IsEnabled = true,
-			}).ConfigureAwait(false);
+			});
 		}
 
-		public Task<FeedNotificationTransport> GetUsersFeedNotificationTransportAsync(string userId)
+		public async Task<FeedNotificationTransport> GetUsersFeedNotificationTransport(string userId)
 		{
-			return notificationsRepo.FindUsersNotificationTransportAsync<FeedNotificationTransport>(userId);
+			return await notificationsRepo.FindUsersNotificationTransport<FeedNotificationTransport>(userId);
 		}
 
-		public async Task<FeedNotificationTransport> GetCommentsFeedNotificationTransportAsync()
+		public async Task<FeedNotificationTransport> GetCommentsFeedNotificationTransport()
 		{
-			var transport = await notificationsRepo.FindUsersNotificationTransportAsync<FeedNotificationTransport>(null).ConfigureAwait(false);
+			var transport = await notificationsRepo.FindUsersNotificationTransport<FeedNotificationTransport>(null);
 			if (transport == null)
 			{
 				logger.Error("Can't find common (comments) feed notification transport. You should create FeedNotificationTransport with userId = NULL");
@@ -85,24 +84,12 @@ namespace Database.Repos
 			return transport;
 		}
 
-		public FeedNotificationTransport GetCommentsFeedNotificationTransport()
+		public async Task<DateTime?> GetLastDeliveryTimestamp(FeedNotificationTransport notificationTransport)
 		{
-			var transport = notificationsRepo.FindUsersNotificationTransport<FeedNotificationTransport>(null);
-			if (transport == null)
-			{
-				logger.Error("Can't find common (comments) feed notification transport. You should create FeedNotificationTransport with userId = NULL");
-				throw new Exception("Can't find common (comments) feed notification transport");
-			}
-
-			return transport;
+			return await notificationsRepo.GetLastDeliveryTimestampAsync(notificationTransport);
 		}
 
-		public async Task<DateTime?> GetLastDeliveryTimestampAsync(FeedNotificationTransport notificationTransport)
-		{
-			return await notificationsRepo.GetLastDeliveryTimestampAsync(notificationTransport).ConfigureAwait(false);
-		}
-
-		public async Task<int> GetNotificationsCountAsync(string userId, DateTime from, params FeedNotificationTransport[] transports)
+		public async Task<int> GetNotificationsCount(string userId, DateTime from, params FeedNotificationTransport[] transports)
 		{
 			var nextSecond = from.AddSeconds(1);
 			var transportsIds = new List<FeedNotificationTransport>(transports).Select(t => t.Id).ToList();
@@ -114,11 +101,11 @@ namespace Database.Repos
 				.Where(d => d.InitiatedById != userId)
 				.Where(d => d.CreateTime >= nextSecond);
 
-			var totalCount = await deliveriesQueryable.CountAsync().ConfigureAwait(false);
+			var totalCount = await deliveriesQueryable.CountAsync();
 			return totalCount;
 		}
 
-		public async Task<List<Notification>> GetNotificationForFeedNotificationDeliveriesAsync<TProperty>(string userId, Expression<Func<Notification, TProperty>> includePath, params FeedNotificationTransport[] transports)
+		public async Task<List<Notification>> GetNotificationForFeedNotificationDeliveries<TProperty>(string userId, Expression<Func<Notification, TProperty>> includePath, params FeedNotificationTransport[] transports)
 		{
 			var transportsIds = new List<FeedNotificationTransport>(transports).Select(t => t.Id).ToList();
 			var userCourses = visitsRepo.GetUserCourses(userId);

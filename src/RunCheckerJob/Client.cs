@@ -47,11 +47,11 @@ namespace RunCheckerJob
 
 		public async Task<List<RunnerSubmission>> TryGetSubmission(IEnumerable<string> supportedSandboxes)
 		{
-			var uri = GetUri("GetSubmissions", new[] { "sandboxes", string.Join(",", supportedSandboxes) });
+			var uri = GetUri("runner/get-submissions", new[] { "sandboxes", string.Join(",", supportedSandboxes) });
 			try
 			{
 				log.Info($"Отправляю запрос на {uri}");
-				var response = await httpClient.GetAsync(uri).ConfigureAwait(false);
+				var response = await httpClient.PostAsync(uri, null).ConfigureAwait(false);
 				log.Info($"Получил ответ, код {(int)response.StatusCode} {response.StatusCode}, читаю содержимое");
 				if (response.IsSuccessStatusCode)
 					return (await response.Content.ReadAsJsonAsync<List<RunnerSubmission>>(JsonConfig.GetSettings()).ConfigureAwait(false)).Item1;
@@ -73,7 +73,7 @@ namespace RunCheckerJob
 
 		public async void SendResults(List<RunningResults> results)
 		{
-			var uri = GetUri("PostResults");
+			var uri = GetUri("runner/set-result");
 			try
 			{
 				var response = await TrySendResults(results, uri).ConfigureAwait(false);
@@ -109,7 +109,7 @@ namespace RunCheckerJob
 				query[parameter[0]] = parameter[1];
 			}
 
-			return $"{path}/?{query}";
+			return $"{path}?{query}";
 		}
 	}
 }

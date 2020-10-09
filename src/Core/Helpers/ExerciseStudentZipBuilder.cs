@@ -74,6 +74,7 @@ namespace Ulearn.Core.Helpers
 
 		public static IEnumerable<FileContent> ResolveCsprojLinks(FileInfo csprojFile, string toolsVersion)
 		{
+			MsBuildLocationHelper.InitPathToMsBuild();
 			return FuncUtils.Using(
 				new ProjectCollection(),
 				projectCollection =>

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.Build.Evaluation;
+using Microsoft.Build.Utilities;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
@@ -27,6 +28,7 @@ namespace Ulearn.Core
 	{
 		public static byte[] ModifyCsproj(FileInfo csproj, Action<Project> changingAction, string toolsVersion = null)
 		{
+			MsBuildLocationHelper.InitPathToMsBuild();
 			return FuncUtils.Using(
 				new ProjectCollection(),
 				projectCollection =>

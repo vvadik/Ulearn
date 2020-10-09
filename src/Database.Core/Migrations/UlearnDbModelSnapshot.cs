@@ -1735,6 +1735,19 @@ namespace Database.Migrations
                     b.ToTable("StepikExportSlideAndStepMaps");
                 });
 
+            modelBuilder.Entity("Database.Models.StyleErrorSettings", b =>
+                {
+                    b.Property<int>("ErrorType")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("bit");
+
+                    b.HasKey("ErrorType");
+
+                    b.ToTable("StyleErrorSettings");
+                });
+
             modelBuilder.Entity("Database.Models.SystemAccess", b =>
                 {
                     b.Property<int>("Id")
@@ -2096,6 +2109,34 @@ namespace Database.Migrations
                     b.HasIndex("CourseId", "SlideId", "UserId");
 
                     b.ToTable("Visits");
+                });
+
+            modelBuilder.Entity("Database.Models.WorkQueueItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ItemId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QueueId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("TakeAfterTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WorkQueue");
                 });
 
             modelBuilder.Entity("Database.Models.XQueueExerciseSubmission", b =>
