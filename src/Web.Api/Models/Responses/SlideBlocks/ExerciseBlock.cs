@@ -6,6 +6,8 @@ using Database.Models;
 using JetBrains.Annotations;
 using Ulearn.Common;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
+using Ulearn.Web.Api.Controllers.Slides;
+using Ulearn.Web.Api.Models.Responses.Exercise;
 
 namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 {
@@ -31,18 +33,21 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 		[DataMember(Name = "submissions")]
 		public List<SubmissionInfo> Submissions { get; set; }
 
+		[DataMember(Name = "attemptsStatistics")]
+		public ExerciseAttemptsStatistics AttemptsStatistics { get; set; }
+
 		public ExerciseBlockResponse(AbstractExerciseBlock exerciseBlock,
-			[CanBeNull] IEnumerable<UserExerciseSubmission> submissions,
-			[CanBeNull] List<ExerciseCodeReviewComment> codeReviewComments)
+			ExerciseSlideRendererContext context)
 		{
-			var reviewId2Comments = codeReviewComments
+			var reviewId2Comments = context.CodeReviewComments
 				?.GroupBy(c => c.ReviewId)
 				.ToDictionary(g => g.Key, g => g.AsEnumerable());
 
 			Hints = exerciseBlock.Hints.ToArray();
 			ExerciseInitialCode = exerciseBlock.ExerciseInitialCode;
 			Language = exerciseBlock.Language;
-			Submissions = submissions
+			AttemptsStatistics = context.AttemptsStatistics;
+			Submissions = context.Submissions
 				.EmptyIfNull()
 				.Select(s => SubmissionInfo.BuildSubmissionInfo(s, reviewId2Comments))
 				.ToList();

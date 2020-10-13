@@ -581,5 +581,30 @@ namespace Database.Repos
 			comment.IsDeleted = true;
 			await db.SaveChangesAsync();
 		}
+
+		public async Task<DateTime?> GetExerciseLastRightAnswerDate(string courseId, Guid slideId)
+		{
+			return await db.AutomaticExerciseCheckings
+				.Where(c => c.CourseId == courseId && c.SlideId == slideId)
+				.Select(c => (DateTime?)c.Timestamp)
+				.OrderByDescending(t => t)
+				.FirstOrDefaultAsync();
+		}
+
+		public async Task<int> GetExerciseUsersCount(string courseId, Guid slideId)
+		{
+			return await db.AutomaticExerciseCheckings
+				.Where(c => c.CourseId == courseId && c.SlideId == slideId)
+				.Select(c => c.UserId)
+				.CountAsync();
+		}
+
+		public async Task<int> GetExerciseUsersWithRightAnswerCount(string courseId, Guid slideId)
+		{
+			return await db.AutomaticExerciseCheckings
+				.Where(c => c.CourseId == courseId && c.SlideId == slideId && c.IsRightAnswer)
+				.Select(c => c.UserId)
+				.CountAsync();
+		}
 	}
 }

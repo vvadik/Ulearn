@@ -4,7 +4,6 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
-using Serilog;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
@@ -29,7 +28,7 @@ namespace Web.Api.Tests.Controllers.Slides
 		{
 			Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
 			videoAnnotationsClient = Mock.Of<IUlearnVideoAnnotationsClient>();
-			slideRenderer = new SlideRenderer(logger, videoAnnotationsClient);
+			slideRenderer = new SlideRenderer(logger, videoAnnotationsClient, null, null);
 			loader = new XmlSlideLoader();
 			courseSettings = new CourseSettings(CourseSettings.DefaultSettings);
 			courseSettings.Scoring.Groups.Add("ScoringGroup1", new ScoringGroup { Id = "ScoringGroup1" });
@@ -58,8 +57,8 @@ namespace Web.Api.Tests.Controllers.Slides
 
 		private IApiSlideBlock[] GetApiSlideBlocks(Slide slide, bool removeHiddenBlocks)
 		{
-			var context = new SlideRenderContext("course", slide, "/TestData", removeHiddenBlocks,
-				"googleDoc", Mock.Of<IUrlHelper>(), null, null);
+			var context = new SlideRenderContext("course", slide, "UserId", "/TestData", removeHiddenBlocks,
+				"googleDoc", Mock.Of<IUrlHelper>());
 			return slide.Blocks
 				.SelectMany(b => slideRenderer.ToApiSlideBlocks(b, context).Result)
 				.ToArray();

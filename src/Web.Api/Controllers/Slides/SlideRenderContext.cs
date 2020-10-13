@@ -14,12 +14,10 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		public bool RemoveHiddenBlocks;
 		public string VideoAnnotationsGoogleDoc;
 		public IUrlHelper UrlHelper;
-		[CanBeNull] public List<UserExerciseSubmission> Submissions;
-		[CanBeNull] public List<ExerciseCodeReviewComment> CodeReviewComments;
+		public string UserId;
 
-		public SlideRenderContext(string courseId, Slide slide, string baseUrl, bool removeHiddenBlocks,
-			string videoAnnotationsGoogleDoc, IUrlHelper urlHelper,
-			[CanBeNull]List<UserExerciseSubmission> submissions, [CanBeNull]List<ExerciseCodeReviewComment> codeReviewComments)
+		public SlideRenderContext(string courseId, Slide slide,  string userId, string baseUrl, bool removeHiddenBlocks,
+			string videoAnnotationsGoogleDoc, IUrlHelper urlHelper)
 		{
 			CourseId = courseId;
 			Slide = slide;
@@ -27,8 +25,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			RemoveHiddenBlocks = removeHiddenBlocks;
 			VideoAnnotationsGoogleDoc = videoAnnotationsGoogleDoc;
 			UrlHelper = urlHelper;
-			Submissions = submissions;
-			CodeReviewComments = codeReviewComments;
+			UserId = userId;
 		}
 	}
 }
