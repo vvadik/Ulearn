@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using Database.Models.Quizzes;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides.Exercises;
 
 namespace Database.Repos
 {
@@ -11,29 +12,29 @@ namespace Database.Repos
 	{
 		Task<ManualQuizChecking> AddManualQuizChecking(UserQuizSubmission submission, string courseId, Guid slideId, string userId);
 		Task<AutomaticQuizChecking> AddAutomaticQuizChecking(UserQuizSubmission submission, string courseId, Guid slideId, string userId, int automaticScore);
-		Task<List<ManualExerciseChecking>> GetUsersPassedManualExerciseCheckings(string courseId, string userId);
 		Task<bool> HasManualExerciseChecking(string courseId, Guid slideId, string userId, int submissionId);
 		Task<ManualExerciseChecking> AddManualExerciseChecking(string courseId, Guid slideId, string userId, int submissionId);
 		Task<Dictionary<string, List<Guid>>> GetSlideIdsWaitingForManualExerciseCheckAsync(string courseId, IEnumerable<string> userIds);
 		Task RemoveWaitingManualCheckings<T>(string courseId, Guid slideId, string userId, bool startTransaction = true) where T : AbstractManualSlideChecking;
 		Task RemoveAttempts(string courseId, Guid slideId, string userId, bool saveChanges = true);
 		Task<bool> IsSlidePassed(string courseId, Guid slideId, string userId);
-		Task<int> GetManualScoreForSlide(string courseId, Guid slideId, string userId);
-		Task<Dictionary<string, int>> GetManualScoresForSlide(string courseId, Guid slideId, List<string> userIds);
-		Task<int> GetAutomaticScoreForSlide(string courseId, Guid slideId, string userId);
-		Task<Dictionary<string, int>> GetAutomaticScoresForSlide(string courseId, Guid slideId, List<string> userIds);
+		Task<(int Score, int? Percent)> GetExerciseSlideScoreAndPercent(string courseId, ExerciseSlide slide, string userId);
+		Task<int?> GetUserReviewPercentForExerciseSlide(string courseId, ExerciseSlide slide, string userId, DateTime? submissionBefore = null);
+		Task<List<(Guid SlideId, int Score, int Percent)>> GetPassedManualExerciseCheckingsScoresAndPercents(Course course, string userId);
+		Task<int> GetUserScoreForQuizSlide(string courseId, Guid slideId, string userId);
 		Task<List<T>> GetManualCheckingQueue<T>(ManualCheckingQueueFilterOptions options) where T : AbstractManualSlideChecking;
 		Task<int> GetQuizManualCheckingCount(string courseId, Guid slideId, string userId, DateTime? beforeTimestamp);
 		Task<HashSet<Guid>> GetManualCheckingQueueSlideIds<T>(ManualCheckingQueueFilterOptions options) where T : AbstractManualSlideChecking;
 		Task<T> FindManualCheckingById<T>(int id) where T : AbstractManualSlideChecking;
 		Task<bool> IsProhibitedToSendExerciseToManualChecking(string courseId, Guid slideId, string userId);
 		Task LockManualChecking<T>(T checkingItem, string lockedById) where T : AbstractManualSlideChecking;
-		Task MarkManualCheckingAsChecked<T>(T queueItem, int score) where T : AbstractManualSlideChecking;
-		Task MarkManualCheckingAsCheckedBeforeThis<T>(T queueItem) where T : AbstractManualSlideChecking;
-		Task ProhibitFurtherExerciseManualChecking(ManualExerciseChecking checking);
+		Task MarkManualQuizCheckingAsChecked(ManualQuizChecking queueItem, int score);
+		Task MarkManualExerciseCheckingAsChecked(ManualExerciseChecking queueItem, int percent);
+		Task MarkManualExerciseCheckingAsCheckedBeforeThis(ManualExerciseChecking queueItem);
+		Task ProhibitFurtherExerciseManualChecking(string courseId, string userId, Guid slideId);
 		Task ResetManualCheckingLimitsForUser(string courseId, string userId);
 		Task ResetAutomaticCheckingLimitsForUser(string courseId, string userId);
-		Task DisableProhibitFurtherManualCheckings(string courseId, string userId);
+		Task DisableProhibitFurtherManualCheckings(string courseId, string userId, Guid? slideId = null);
 		Task NotCountOldAttemptsToQuizzesWithManualChecking(string courseId, string userId);
 		Task NotCountOldAttemptsToQuizzesWithAutomaticChecking(string courseId, string userId);
 		Task<ExerciseCodeReview> AddExerciseCodeReview(ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime = true);

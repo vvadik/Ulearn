@@ -249,7 +249,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				metricSender.SendCount("exercise.sent_to_review");
 			}
 
-			await visitsRepo.UpdateScoreForVisit(courseId, exerciseSlide.Id, exerciseSlide.MaxScore, userId);
+			await visitsRepo.UpdateScoreForVisit(courseId, exerciseSlide, userId);
 
 			if (automaticChecking != null)
 			{

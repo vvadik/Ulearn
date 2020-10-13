@@ -21,7 +21,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 
 		public override string ScoringGroup => Scoring.ScoringGroup;
 
-		public override int MaxScore => Scoring.PassedTestsScore + Scoring.CodeReviewScore;
+		public override int MaxScore => Scoring.PassedTestsScore + Scoring.CodeReviewAdditionalScore;
 
 		[XmlIgnore]
 		public AbstractExerciseBlock Exercise => (AbstractExerciseBlock)Blocks.Single(b => b is AbstractExerciseBlock);

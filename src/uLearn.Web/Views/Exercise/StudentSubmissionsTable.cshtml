@@ -72,14 +72,12 @@
 						}
 						else if (isFirstReviewScore)
 						{
-							<text>+</text>
-							@Model.ManualCheckingScores[user.Id].PluralizeInRussian(RussianPluralizationOptions.Score)
+							@Model.Scores[user.Id].PluralizeInRussian(RussianPluralizationOptions.Score)
 							isFirstReviewScore = false;
 						}
 						else
 						{
-							<text>+</text>
-							@Model.ManualCheckingScores[user.Id]
+							@Model.Scores[user.Id]
 						}
 					</td>
 				}
