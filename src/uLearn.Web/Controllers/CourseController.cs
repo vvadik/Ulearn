@@ -507,7 +507,7 @@ namespace uLearn.Web.Controllers
 				await solutionsRepo.RemoveSubmission(submission);
 				var course = courseManager.GetCourse(courseId);
 				var slide = course.GetSlideById(slideId, true);
-				await visitsRepo.UpdateScoreForVisit(courseId, submission.SlideId, slide.MaxScore, submission.UserId);
+				await visitsRepo.UpdateScoreForVisit(courseId, slide, submission.UserId);
 			}
 
 			return RedirectToAction("AcceptedSolutions", new { courseId, slideId });

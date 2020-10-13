@@ -95,7 +95,7 @@ namespace uLearn.Web.Controllers
 			if (slide == null)
 				return Json(new ApiResult { Status = "error", Message = "Slide doesn't exist anymore" });
 
-			return Json(SubmissionResult.FromSolution(solution, slide), JsonRequestBehavior.AllowGet);
+			return Json(SubmissionResult.FromSolution(solution), JsonRequestBehavior.AllowGet);
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
@@ -158,16 +158,14 @@ namespace uLearn.Web.Controllers
 	[DataContract]
 	public class SubmissionResult : ApiResult
 	{
-		public static SubmissionResult FromSolution(ExerciseSolutionByGrader solution, ExerciseSlide slide)
+		public static SubmissionResult FromSolution(ExerciseSolutionByGrader solution)
 		{
 			var automaticChecking = solution.Submission?.AutomaticChecking;
 
 			if (automaticChecking == null || automaticChecking.Status != AutomaticExerciseCheckingStatus.Done)
 				return new SubmissionResult { Status = "IN_PROCESS" };
 
-			var score = (double)automaticChecking.Score / slide.Scoring.PassedTestsScore;
-			if (score > 1)
-				score = 1;
+			var score = automaticChecking.IsRightAnswer ? 1 : 0;
 
 			return new SubmissionResult
 			{

@@ -4,8 +4,8 @@
 @using uLearn.Web.Extensions
 @using uLearn.Web.Views.Course
 @using Ulearn.Common.Extensions
-@using Ulearn.Core
 @using System.Linq
+@using Database.DataContexts
 @using Ulearn.Common
 
 @model ExerciseBlockData
@@ -55,13 +55,13 @@
 						: texts.WaitingForCodeReviewInstructorView;
 					status = string.Format(
 						messageFormat,
-						Url.Action("ExerciseChecking", "Admin", new { courseId = Model.CourseId, id = Model.SubmissionSelectedByUser.ManualCheckings.Last().Id })
+						Url.Action("ExerciseChecking", "Admin", new { courseId = Model.CourseId, id = Model.SubmissionSelectedByUser.ManualCheckings.OrderBy(c => c.Timestamp).Last().Id })
 						);
 				}
 			}
 			else if (Model.ReviewState == ExerciseReviewState.Reviewed)
 			{
-				var score = Model.SubmissionSelectedByUser.ManualCheckings.Max(c => c.Score);
+				var score = SlideCheckingsRepo.GetExerciseSubmissionManualCheckingsScoreAndPercent(Model.SubmissionSelectedByUser.ManualCheckings, Model.Slide).Score;
 				var scoreVerb = score.SelectPluralWordInRussian(new RussianPluralizationOptions
 				{
 					One = "получен",
@@ -75,7 +75,7 @@
 						? "Все тесты пройдены, за&nbsp;<a href=\"{0}\" title=\"Отредактировать код-ревью\">код-ревью</a> {1} +{2}"
 						: texts.CodeReviewPassedInstructorView;
 					status = string.Format(messageFormat,
-						Url.Action("ExerciseChecking", "Admin", new { courseId = Model.CourseId, id = Model.SubmissionSelectedByUser.ManualCheckings.Last().Id, recheck = true }),
+						Url.Action("ExerciseChecking", "Admin", new { courseId = Model.CourseId, id = Model.SubmissionSelectedByUser.ManualCheckings.OrderBy(c => c.Timestamp).Last().Id, recheck = true }),
 						scoreVerb,
 						pluralizedScore);
 				}

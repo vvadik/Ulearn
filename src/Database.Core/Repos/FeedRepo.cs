@@ -93,7 +93,7 @@ namespace Database.Repos
 		{
 			var nextSecond = from.AddSeconds(1);
 			var transportsIds = new List<FeedNotificationTransport>(transports).Select(t => t.Id).ToList();
-			var userCourses = visitsRepo.GetUserCourses(userId);
+			var userCourses = await visitsRepo.GetUserCourses(userId);
 			var deliveriesQueryable = db.NotificationDeliveries
 				.Select(d => new {d.NotificationTransportId, d.Notification.CourseId, d.Notification.InitiatedById, d.CreateTime})
 				.Where(d => transportsIds.Contains(d.NotificationTransportId))
@@ -108,7 +108,7 @@ namespace Database.Repos
 		public async Task<List<Notification>> GetNotificationForFeedNotificationDeliveries<TProperty>(string userId, Expression<Func<Notification, TProperty>> includePath, params FeedNotificationTransport[] transports)
 		{
 			var transportsIds = new List<FeedNotificationTransport>(transports).Select(t => t.Id).ToList();
-			var userCourses = visitsRepo.GetUserCourses(userId);
+			var userCourses = await visitsRepo.GetUserCourses(userId);
 			const int count = 99;
 			var notifications = await notificationsRepo.GetTransportsDeliveriesQueryable(transportsIds, DateTime.MinValue)
 				.Where(d => userCourses.Contains(d.Notification.CourseId))
