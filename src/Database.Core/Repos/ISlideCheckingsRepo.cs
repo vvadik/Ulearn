@@ -48,6 +48,7 @@ namespace Database.Repos
 		Task<List<ExerciseCodeReview>> GetLastYearReviewComments(string courseId, Guid slideId);
 		Task<ExerciseCodeReviewComment> AddExerciseCodeReviewComment(string authorId, int reviewId, string text);
 		Task<ExerciseCodeReviewComment> FindExerciseCodeReviewCommentById(int commentId);
+		Task<List<ExerciseCodeReviewComment>> GetExerciseCodeReviewComments(string courseId, Guid slideId, string userId);
 		Task DeleteExerciseCodeReviewComment(ExerciseCodeReviewComment comment);
 	}
 }

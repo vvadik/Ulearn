@@ -1,29 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
+using AngleSharp.Common;
 using Database.Models;
+using JetBrains.Annotations;
 
 namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 {
 	[DataContract]
 	public class SubmissionInfo
 	{
-		[DataMember(Name="id")]
+		[DataMember]
 		public int Id;
 
-		[DataMember(Name="code")]
+		[DataMember]
 		public string Code;
 
-		[DataMember(Name="timestamp")]
+		[DataMember]
 		public DateTime Timestamp;
 
-		[DataMember(Name="reviews")]
+		[DataMember]
 		public List<ReviewInfo> Reviews;
-		
-		[DataMember(Name="output")]
+
+		[DataMember]
 		public string Output;
 
-		[DataMember(Name="points")]
-		public float Points;
+		[DataMember]
+		public float? Points;
+
+		public static SubmissionInfo BuildSubmissionInfo(UserExerciseSubmission submission,
+			[CanBeNull] Dictionary<int, IEnumerable<ExerciseCodeReviewComment>> reviewId2Comments)
+		{
+			var reviews = submission
+				.GetAllReviews()
+				.Select(r =>
+				{
+					var comments = reviewId2Comments?.GetValueOrDefault(r.Id);
+					return ReviewInfo.BuildReviewInfo(r, comments);
+				})
+				.ToList();
+			return new SubmissionInfo
+			{
+				Id = submission.Id,
+				Code = submission.SolutionCode.Text,
+				Timestamp = submission.Timestamp,
+				Reviews = reviews,
+				Output = submission.AutomaticChecking.Output?.Text,
+				Points = submission.AutomaticChecking.Points,
+			};
+		}
 	}
 }

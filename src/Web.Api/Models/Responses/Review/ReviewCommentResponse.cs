@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using Database.Models;
+using Ulearn.Web.Api.Controllers;
 using Ulearn.Web.Api.Models.Common;
 
 namespace Ulearn.Web.Api.Models.Responses.Review
@@ -15,11 +17,23 @@ namespace Ulearn.Web.Api.Models.Responses.Review
 
 		[DataMember]
 		public string Text { get; set; }
-		
+
 		[DataMember]
 		public DateTime PublishTime { get; set; }
 
 		[DataMember]
 		public ShortUserInfo Author { get; set; }
+
+		public static ReviewCommentResponse BuildReviewCommentResponse(ExerciseCodeReviewComment comment)
+		{
+			return new ReviewCommentResponse
+			{
+				Id = comment.Id,
+				ReviewId = comment.ReviewId,
+				Text = comment.Text,
+				PublishTime = comment.AddingTime,
+				Author = BaseController.BuildShortUserInfo(comment.Author)
+			};
+		}
 	}
 }

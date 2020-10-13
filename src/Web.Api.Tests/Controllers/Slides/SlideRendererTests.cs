@@ -59,7 +59,7 @@ namespace Web.Api.Tests.Controllers.Slides
 		private IApiSlideBlock[] GetApiSlideBlocks(Slide slide, bool removeHiddenBlocks)
 		{
 			var context = new SlideRenderContext("course", slide, "/TestData", removeHiddenBlocks,
-				"googleDoc", Mock.Of<IUrlHelper>());
+				"googleDoc", Mock.Of<IUrlHelper>(), null, null);
 			return slide.Blocks
 				.SelectMany(b => slideRenderer.ToApiSlideBlocks(b, context).Result)
 				.ToArray();

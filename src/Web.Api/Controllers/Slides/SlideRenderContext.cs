@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Database.Models;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
@@ -15,11 +14,12 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		public bool RemoveHiddenBlocks;
 		public string VideoAnnotationsGoogleDoc;
 		public IUrlHelper UrlHelper;
-		public List<UserExerciseSubmission> Submissions;
+		[CanBeNull] public List<UserExerciseSubmission> Submissions;
+		[CanBeNull] public List<ExerciseCodeReviewComment> CodeReviewComments;
 
 		public SlideRenderContext(string courseId, Slide slide, string baseUrl, bool removeHiddenBlocks,
 			string videoAnnotationsGoogleDoc, IUrlHelper urlHelper,
-			List<UserExerciseSubmission> submissions)
+			[CanBeNull]List<UserExerciseSubmission> submissions, [CanBeNull]List<ExerciseCodeReviewComment> codeReviewComments)
 		{
 			CourseId = courseId;
 			Slide = slide;
@@ -28,6 +28,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			VideoAnnotationsGoogleDoc = videoAnnotationsGoogleDoc;
 			UrlHelper = urlHelper;
 			Submissions = submissions;
+			CodeReviewComments = codeReviewComments;
 		}
 	}
 }

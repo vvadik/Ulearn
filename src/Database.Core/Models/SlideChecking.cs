@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Security.Claims;
 using Database.Models.Quizzes;
+using JetBrains.Annotations;
 using Ulearn.Common.Extensions;
 
 namespace Database.Models
@@ -91,11 +92,13 @@ namespace Database.Models
 		[Required]
 		public bool IsCompilationError { get; set; }
 
+		[CanBeNull]
 		public virtual TextBlob CompilationError { get; set; }
 
 		[StringLength(40)]
 		public string CompilationErrorHash { get; set; }
 
+		[CanBeNull]
 		public virtual TextBlob Output { get; set; }
 
 		[StringLength(40)]

@@ -22,7 +22,6 @@ namespace Database.Repos
 		private static readonly ILog log = LogManager.GetLogger(typeof(UserSolutionsRepo));
 		private readonly UlearnDb db;
 		private readonly ITextsRepo textsRepo;
-		private readonly IVisitsRepo visitsRepo;
 		private readonly IWorkQueueRepo workQueueRepo;
 		private readonly IWebCourseManager courseManager;
 		private const int queueId = 1;
@@ -32,12 +31,11 @@ namespace Database.Repos
 		private static readonly TimeSpan handleTimeout = TimeSpan.FromMinutes(3);
 
 		public UserSolutionsRepo(UlearnDb db,
-			ITextsRepo textsRepo, IVisitsRepo visitsRepo, IWorkQueueRepo workQueueRepo,
+			ITextsRepo textsRepo, IWorkQueueRepo workQueueRepo,
 			IWebCourseManager courseManager)
 		{
 			this.db = db;
 			this.textsRepo = textsRepo;
-			this.visitsRepo = visitsRepo;
 			this.workQueueRepo = workQueueRepo;
 			this.courseManager = courseManager;
 		}

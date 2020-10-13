@@ -68,7 +68,7 @@ namespace Ulearn.Web.Api.Controllers.Review
 					await NotifyAboutCodeReviewComment(comment);
 			}
 
-			return BuildReviewCommentResponse(comment);
+			return ReviewCommentResponse.BuildReviewCommentResponse(comment);
 		}
 
 		/// <summary>
@@ -90,18 +90,6 @@ namespace Ulearn.Web.Api.Controllers.Review
 			await slideCheckingsRepo.DeleteExerciseCodeReviewComment(comment).ConfigureAwait(false);
 
 			return Ok(new SuccessResponseWithMessage($"Review comment {commentId} successfully deleted"));
-		}
-
-		private ReviewCommentResponse BuildReviewCommentResponse(ExerciseCodeReviewComment comment)
-		{
-			return new ReviewCommentResponse
-			{
-				Id = comment.Id,
-				ReviewId = comment.ReviewId,
-				Text = comment.Text,
-				PublishTime = comment.AddingTime,
-				Author = BuildShortUserInfo(comment.Author)
-			};
 		}
 
 		// Оповещает о создании комментария к ревью, а не самого ревью (т.е. замечения к коду)

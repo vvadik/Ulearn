@@ -74,7 +74,7 @@ namespace Ulearn.Web.Api.Controllers
 			return usersRepo.IsSystemAdministrator(user);
 		}
 
-		protected ShortUserInfo BuildShortUserInfo(ApplicationUser user, bool discloseLogin = false, bool discloseEmail = false)
+		public static ShortUserInfo BuildShortUserInfo(ApplicationUser user, bool discloseLogin = false, bool discloseEmail = false)
 		{
 			return new ShortUserInfo
 			{

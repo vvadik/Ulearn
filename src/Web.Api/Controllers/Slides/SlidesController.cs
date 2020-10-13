@@ -28,10 +28,11 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		protected readonly IVisitsRepo visitsRepo;
 		protected readonly IGroupsRepo groupsRepo;
 		protected readonly SlideRenderer slideRenderer;
+		protected readonly ISlideCheckingsRepo slideCheckingsRepo;
 
 		public SlidesController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo,
 			IUserSolutionsRepo solutionsRepo, IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo,
-			SlideRenderer slideRenderer, ICoursesRepo coursesRepo)
+			SlideRenderer slideRenderer, ICoursesRepo coursesRepo, ISlideCheckingsRepo slideCheckingsRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.coursesRepo = coursesRepo;
@@ -41,6 +42,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			this.visitsRepo = visitsRepo;
 			this.groupsRepo = groupsRepo;
 			this.slideRenderer = slideRenderer;
+			this.slideCheckingsRepo = slideCheckingsRepo;
 		}
 
 		/// <summary>
@@ -65,17 +67,19 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			var getSlideMaxScoreFunc = await BuildGetSlideMaxScoreFunc(solutionsRepo, userQuizzesRepo, visitsRepo, groupsRepo, course, userId);
 			var getGitEditLinkFunc = await BuildGetGitEditLinkFunc(userId, course, courseRolesRepo, coursesRepo);
 			var baseUrl = CourseUnitUtils.GetDirectoryRelativeWebPath(slide.Info.SlideFile);
-			var submissions = new List<UserExerciseSubmission>();
+
+			List<UserExerciseSubmission> exerciseSubmissions = null;
+			List<ExerciseCodeReviewComment> exerciseCodeReviewComments = null;
 			if (slide is ExerciseSlide)
 			{
-				submissions = await solutionsRepo
+				exerciseSubmissions = await solutionsRepo
 					.GetAllSubmissionsByUser(course.Id, slideId, userId)
-					.ToListAsync()
-					.ConfigureAwait(false);
+					.ToListAsync();
+				exerciseCodeReviewComments = await slideCheckingsRepo.GetExerciseCodeReviewComments(course.Id, slideId, userId);
 			}
 
 			var slideRenderContext = new SlideRenderContext(course.Id, slide, baseUrl, !isInstructor,
-				course.Settings.VideoAnnotationsGoogleDoc, Url, submissions);
+				course.Settings.VideoAnnotationsGoogleDoc, Url, exerciseSubmissions, exerciseCodeReviewComments);
 
 			return await slideRenderer.BuildSlideInfo(slideRenderContext, getSlideMaxScoreFunc, getGitEditLinkFunc);
 		}

@@ -564,6 +564,18 @@ namespace Database.Repos
 			return await db.ExerciseCodeReviewComments.FindAsync(commentId);
 		}
 
+		public async Task<List<ExerciseCodeReviewComment>> GetExerciseCodeReviewComments(string courseId, Guid slideId, string userId)
+		{
+			return await db.ExerciseCodeReviewComments
+				.Where(c =>
+					c.Review.Submission.CourseId == courseId
+					&& c.Review.Submission.SlideId == slideId
+					&& c.Review.Submission.UserId == userId
+					&& !c.IsDeleted
+					&& !c.Review.IsDeleted)
+				.ToListAsync();
+		}
+
 		public async Task DeleteExerciseCodeReviewComment(ExerciseCodeReviewComment comment)
 		{
 			comment.IsDeleted = true;

@@ -6,7 +6,6 @@ using AngleSharp.Html.Parser;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Ulearn.Common;
-using Ulearn.Core;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Slides.Exercises;
@@ -144,15 +143,10 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			var response = new YoutubeBlockResponse(yb, annotation, googleDocLink);
 			return new [] { response };
 		}
-		
-		private async Task<IEnumerable<IApiSlideBlock>> RenderBlock(SingleFileExerciseBlock b, SlideRenderContext context)
+
+		private async Task<IEnumerable<IApiSlideBlock>> RenderBlock(AbstractExerciseBlock b, SlideRenderContext context)
 		{
-			return new[] { new SingleFileExerciseBlockResponse(b, context.Submissions) };
-		}	
-		
-		private async Task<IEnumerable<IApiSlideBlock>> RenderBlock(CsProjectExerciseBlock b, SlideRenderContext context)
-		{
-			return new[] { new CsProjectExerciseBlockResponse(b, context.Submissions) };
+			return new[] { new ExerciseBlockResponse(b, context.Submissions, context.CodeReviewComments) };
 		}
 
 		private static List<IApiSlideBlock> ParseBlocksFromMarkdown(string renderedMarkdown)
