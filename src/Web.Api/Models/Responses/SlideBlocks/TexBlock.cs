@@ -5,6 +5,7 @@ using Ulearn.Core.Courses.Slides.Blocks;
 namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 {
 	[DataContract]
+	[DisplayName("tex")]
 	public class TexBlockResponse : IApiSlideBlock
 	{
 		[DefaultValue(false)]
@@ -13,9 +14,6 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 
 		[DataMember(Name = "lines")]
 		public string[] TexLines { get; set; }
-
-		[DataMember(Name = "type")]
-		public string Type { get; set; } = "tex";
 
 		public TexBlockResponse(TexBlock texBlock)
 		{

@@ -12,14 +12,12 @@ using Ulearn.Web.Api.Models.Responses.Exercise;
 namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 {
 	[DataContract]
+	[DisplayName("exercise")]
 	public class ExerciseBlockResponse : IApiSlideBlock
 	{
 		[DefaultValue(false)]
 		[DataMember(Name = "hide", EmitDefaultValue = false)]
 		public bool Hide { get; set; }
-
-		[DataMember(Name = "type")]
-		public string Type { get; set; } = "exercise";
 
 		[DataMember(Name = "language")]
 		public Language? Language { get; set; }

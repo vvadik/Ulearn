@@ -5,10 +5,6 @@ using Ulearn.Common;
 namespace Ulearn.Core.RunCheckerJobApi
 {
 	[DataContract]
-	[KnownType(typeof(CsRunnerSubmission))]
-	[KnownType(typeof(FileRunnerSubmission))]
-	[KnownType(typeof(ProjRunnerSubmission))]
-	[KnownType(typeof(CommandRunnerSubmission))]
 	public abstract class RunnerSubmission
 	{
 		[DataMember]
@@ -24,8 +20,6 @@ namespace Ulearn.Core.RunCheckerJobApi
 	}
 
 	[DataContract]
-	[KnownType(typeof(FileRunnerSubmission))]
-	[KnownType(typeof(ProjRunnerSubmission))]
 	public abstract class CsRunnerSubmission : RunnerSubmission
 	{
 		[DataMember]
@@ -39,7 +33,7 @@ namespace Ulearn.Core.RunCheckerJobApi
 			return $"Id: {Id}, NeedRun: {NeedRun}";
 		}
 	}
-	
+
 	[DataContract]
 	[DisplayName("file")]
 	public class FileRunnerSubmission : CsRunnerSubmission

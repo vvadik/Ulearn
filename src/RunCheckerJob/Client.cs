@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using log4net;
+using Newtonsoft.Json;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
@@ -21,6 +21,8 @@ namespace RunCheckerJob
 		private const string arrAffinityCookieName = "ARRAffinity";
 		private static readonly ILog log = LogManager.GetLogger(typeof(Client));
 		private readonly string agentName;
+
+		private static readonly JsonSerializerSettings jsonSerializerSettings = JsonConfig.GetSettings(typeof(RunnerSubmission));
 
 		public Client(string address, string token, string agentName)
 		{
@@ -54,7 +56,7 @@ namespace RunCheckerJob
 				var response = await httpClient.PostAsync(uri, null).ConfigureAwait(false);
 				log.Info($"Получил ответ, код {(int)response.StatusCode} {response.StatusCode}, читаю содержимое");
 				if (response.IsSuccessStatusCode)
-					return (await response.Content.ReadAsJsonAsync<List<RunnerSubmission>>(JsonConfig.GetSettings()).ConfigureAwait(false)).Item1;
+					return (await response.Content.ReadAsJsonAsync<List<RunnerSubmission>>(jsonSerializerSettings).ConfigureAwait(false)).Item1;
 				else
 				{
 					var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);

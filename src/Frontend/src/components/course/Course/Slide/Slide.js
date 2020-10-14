@@ -195,8 +195,8 @@ class Slide extends React.Component {
 		return blocksPack;
 	}
 
-	mapElementToBlock = ({ type, hide = false, ...props }) => {
-		const typeInLowerCase = type.toLowerCase();
+	mapElementToBlock = ({ $type, hide = false, ...props }) => {
+		const typeInLowerCase = $type.toLowerCase();
 
 		return {
 			Block: mapTypeToBlock[typeInLowerCase],

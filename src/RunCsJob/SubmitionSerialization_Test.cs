@@ -31,8 +31,8 @@ namespace RunCsJob
 					NeedRun = true
 				}
 			};
-			var json = JsonConvert.SerializeObject(inputList, JsonConfig.GetSettings());
-			var deserializedList = JsonConvert.DeserializeObject<List<RunnerSubmission>>(json, JsonConfig.GetSettings());
+			var json = JsonConvert.SerializeObject(inputList, JsonConfig.GetSettings(typeof(RunnerSubmission)));
+			var deserializedList = JsonConvert.DeserializeObject<List<RunnerSubmission>>(json, JsonConfig.GetSettings(typeof(RunnerSubmission)));
 			deserializedList.Should().BeEquivalentTo(inputList);
 		}
 
@@ -51,7 +51,7 @@ namespace RunCsJob
 				}
 			};
 
-			var json = JsonConvert.SerializeObject(list, JsonConfig.GetSettings());
+			var json = JsonConvert.SerializeObject(list, JsonConfig.GetSettings(typeof(RunnerSubmission)));
 			Assert.That(json, Is.EqualTo("[{\"$type\":\"proj\",\"ZipFileData\":\"AQIDBAU9FwQD\",\"ProjectFileName\":\"proj\",\"Input\":\"\",\"NeedRun\":true,\"Id\":\"E26C2109-F074-4117-B53F-0799E4140DEF\",\"TimeLimit\":10}]"));
 		}
 
@@ -61,7 +61,7 @@ namespace RunCsJob
 			()
 		{
 			const string json = @"[{""$type"":""file"",""Code"":""code"",""Id"":""1029"",""Input"":"""",""NeedRun"":true}]";
-			var list = JsonConvert.DeserializeObject<List<RunnerSubmission>>(json, JsonConfig.GetSettings());
+			var list = JsonConvert.DeserializeObject<List<RunnerSubmission>>(json, JsonConfig.GetSettings(typeof(RunnerSubmission)));
 			Assert.That(list.Count, Is.EqualTo(1));
 			Assert.That(list[0], Is.InstanceOf<FileRunnerSubmission>());
 		}

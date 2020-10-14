@@ -29,6 +29,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using Ulearn.Common.Api;
 using Ulearn.Common.Api.Swagger;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Metrics;
@@ -42,6 +43,7 @@ using Ulearn.Web.Api.Controllers.Slides;
 using Ulearn.Web.Api.Controllers.Websockets;
 using Ulearn.Web.Api.Models;
 using Ulearn.Web.Api.Models.Binders;
+using Ulearn.Web.Api.Models.Responses.SlideBlocks;
 using Ulearn.Web.Api.Swagger;
 using Vostok.Hosting.Abstractions;
 using Web.Api.Configuration;
@@ -142,6 +144,8 @@ namespace Ulearn.Web.Api
 
 		public override void ConfigureMvc(IServiceCollection services)
 		{
+			var jsonSerializerSettings = JsonConfig.GetSettings(typeof(IApiSlideBlock), typeof(RunnerSubmission));
+
 			/* Asp.NET Core MVC https://www.strathweb.com/2020/02/asp-net-core-mvc-3-x-addmvc-addmvccore-addcontrollers-and-other-bootstrapping-approaches/ */
 			services.AddMvc(options =>
 					{
@@ -170,8 +174,9 @@ namespace Ulearn.Web.Api
 								{ "snakecase", new SnakeCaseNamingStrategy() }
 							}
 						}, services.BuildServiceProvider().GetService<IMemoryCache>);
-						opt.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
-						opt.SerializerSettings.Converters.Add(new StringEnumConverter());
+						opt.SerializerSettings.TypeNameHandling = jsonSerializerSettings.TypeNameHandling;
+						opt.SerializerSettings.SerializationBinder = jsonSerializerSettings.SerializationBinder;
+						opt.SerializerSettings.Converters = opt.SerializerSettings.Converters.Concat(jsonSerializerSettings.Converters).ToList();
 					}
 				);
 		}
@@ -181,6 +186,8 @@ namespace Ulearn.Web.Api
 			c.OperationFilter<RemoveCourseParameterOperationFilter>();
 			c.DocumentFilter<PolymorphismDocumentFilter<RunnerSubmission>>();
 			c.SchemaFilter<PolymorphismSchemaFilter<CsRunnerSubmission>>();
+			c.DocumentFilter<PolymorphismDocumentFilter<IApiSlideBlock>>();
+			c.SchemaFilter<PolymorphismSchemaFilter<IApiSlideBlock>>();
 		}
 
 		public override void ConfigureDi(IServiceCollection services, ILogger logger)
