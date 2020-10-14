@@ -81,7 +81,7 @@
 				}
 				else
 				{
-					var messageFormat = string.IsNullOrEmpty(texts.CodeReviewPassed) ? "Все тесты пройдены, за&nbsp;код-ревью {0} +{1}" : texts.CodeReviewPassed;
+					var messageFormat = string.IsNullOrEmpty(texts.CodeReviewPassed) ? "Все тесты пройдены, вместе&nbsp;с код-ревью {0} {1}" : texts.CodeReviewPassed;
 					status = string.Format(messageFormat, scoreVerb, pluralizedScore);
 				}
 			}
