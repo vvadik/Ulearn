@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Reflection;
-using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -14,28 +11,10 @@ namespace Ulearn.Common.Api.Swagger
 			RegisterSubClasses(context, typeof(T));
 		}
 
-		private static void RegisterSubClasses(DocumentFilterContext context, Type abstractType)
+		private static void RegisterSubClasses(DocumentFilterContext context, Type baseType)
 		{
-			const string discriminatorName = "$type";
-			var schemaRepository = context.SchemaRepository.Schemas;
 			var schemaGenerator = context.SchemaGenerator;
-
-			if (!schemaRepository.TryGetValue(abstractType.Name, out OpenApiSchema parentSchema))
-			{
-				parentSchema = schemaGenerator.GenerateSchema(abstractType, context.SchemaRepository);
-			}
-
-			// set up a discriminator property (it must be required)
-			parentSchema.Discriminator = new OpenApiDiscriminator { PropertyName = discriminatorName };
-			parentSchema.Required.Add(discriminatorName);
-
-			if (!parentSchema.Properties.ContainsKey(discriminatorName))
-				parentSchema.Properties.Add(discriminatorName, new OpenApiSchema { Type = "string", Default = new OpenApiString(abstractType.FullName) });
-
-			// register all subclasses
-			var derivedTypes = abstractType.GetTypeInfo().Assembly.GetTypes()
-				.Where(x => abstractType != x && abstractType.IsAssignableFrom(x));
-
+			var derivedTypes = DerivedTypesHelper.GetDerivedTypes(typeof(T));
 			foreach (var type in derivedTypes)
 				schemaGenerator.GenerateSchema(type, context.SchemaRepository);
 		}

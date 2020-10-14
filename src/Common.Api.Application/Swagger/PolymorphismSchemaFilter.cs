@@ -1,24 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Extensions;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Ulearn.Common.Extensions;
 
 namespace Ulearn.Common.Api.Swagger
 {
 	public class PolymorphismSchemaFilter<T> : ISchemaFilter
 	{
-		private readonly Lazy<HashSet<Type>> derivedTypes = new Lazy<HashSet<Type>>(Init);
+		private readonly Lazy<HashSet<Type>> derivedTypes = new Lazy<HashSet<Type>>(DerivedTypesInit);
+		private readonly Lazy<Dictionary<Type, string>> type2Name = new Lazy<Dictionary<Type, string>>(Type2NameInit);
+		private const string discriminatorName = "$type";
 
 		public void Apply(OpenApiSchema schema, SchemaFilterContext context)
 		{
 			var type = context.Type;
-			if (!derivedTypes.Value.Contains(type))
-				return;
+			if (type == typeof(T))
+				ApplyToBaseType(schema, context);
+			if (derivedTypes.Value.Contains(context.Type))
+				ApplyToDerivedType(schema, context);
+		}
 
+		private void ApplyToBaseType(OpenApiSchema schema, SchemaFilterContext context)
+		{
 			var clonedSchema = new OpenApiSchema
 			{
 				Properties = schema.Properties,
@@ -26,36 +32,57 @@ namespace Ulearn.Common.Api.Swagger
 				Required = schema.Required
 			};
 
-			// schemaRegistry.Definitions[typeof(T).Name]; does not work correctly in SwashBuckle
-			if(context.SchemaRepository.Schemas.TryGetValue(typeof(T).Name, out OpenApiSchema _))
+			var derivedTypesSchema = new OpenApiSchema
 			{
-				schema.AllOf = new List<OpenApiSchema> {
-					new OpenApiSchema { Reference = new OpenApiReference { Id = typeof(T).Name, Type = ReferenceType.Schema } },
-					clonedSchema
-				};
-			}
+				OneOf = derivedTypes.Value.Select(
+					t => new OpenApiSchema { Reference = new OpenApiReference { Id = t.Name, Type = ReferenceType.Schema } }
+				).ToList(),
+				Discriminator = new OpenApiDiscriminator
+				{
+					PropertyName = discriminatorName,
+					Mapping = derivedTypes.Value.ToDictionary(t => type2Name.Value.GetOrDefault(t) ?? t.Name, t => $"#/components/schemas/{t.Name}")
+				},
+				Required = new HashSet<string> { discriminatorName },
+				Properties = new Dictionary<string, OpenApiSchema> { { discriminatorName, new OpenApiSchema
+				{
+					Type = "string",
+					Pattern = string.Join("|", derivedTypes.Value.Select(GetTypeDiscriminatorValue)),
+				} } }
+			};
 
-			var assemblyName = Assembly.GetAssembly(type).GetName();
-			schema.Discriminator = new OpenApiDiscriminator { PropertyName = "$type" };
-			schema.AddExtension("x-ms-discriminator-value", new OpenApiString($"{type.FullName}, {assemblyName.Name}"));
+			schema.AllOf = new List<OpenApiSchema>
+			{
+				derivedTypesSchema,
+				clonedSchema
+			};
 
 			// reset properties for they are included in allOf, should be null but code does not handle it
 			schema.Properties = new Dictionary<string, OpenApiSchema>();
 		}
 
-		private static HashSet<Type> Init()
+		private void ApplyToDerivedType(OpenApiSchema schema, SchemaFilterContext context)
 		{
-			var abstractType = typeof(T);
-			var dTypes = abstractType.GetTypeInfo().Assembly
-				.GetTypes()
-				.Where(x => abstractType != x && abstractType.IsAssignableFrom(x));
+			schema.Properties.Add(discriminatorName, new OpenApiSchema
+			{
+				Type = "string",
+				Pattern = GetTypeDiscriminatorValue(context.Type),
+				Example = new OpenApiString(GetTypeDiscriminatorValue(context.Type))
+			});
+		}
 
-			var result = new HashSet<Type>();
+		private string GetTypeDiscriminatorValue(Type t)
+		{
+			return type2Name.Value.GetOrDefault(t) ?? t.Name;
+		}
 
-			foreach (var item in dTypes)
-				result.Add(item);
+		private static HashSet<Type> DerivedTypesInit()
+		{
+			return new HashSet<Type>(DerivedTypesHelper.GetDerivedTypes(typeof(T)));
+		}
 
-			return result;
+		private static Dictionary<Type, string> Type2NameInit()
+		{
+			return DerivedTypesHelper.GetType2JsonTypeName(DerivedTypesInit());
 		}
 	}
 }

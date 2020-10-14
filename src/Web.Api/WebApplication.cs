@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using AntiPlagiarism.Api;
 using Database;
 using Database.Di;
 using Database.Models;
@@ -21,8 +20,6 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -30,7 +27,6 @@ using Ulearn.Common.Api;
 using Ulearn.Common.Api.Swagger;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
-using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Metrics;
 using Ulearn.Core.RunCheckerJobApi;
@@ -55,6 +51,7 @@ namespace Ulearn.Web.Api
 	public class WebApplication : BaseApiWebApplication
 	{
 		private WebApiConfiguration configuration;
+		private Type[] polymorphismBaseTypes = { typeof(IApiSlideBlock), typeof(RunnerSubmission) };
 
 		public override Task WarmupAsync(IVostokHostingEnvironment environment, IServiceProvider provider)
 		{
@@ -144,7 +141,7 @@ namespace Ulearn.Web.Api
 
 		public override void ConfigureMvc(IServiceCollection services)
 		{
-			var jsonSerializerSettings = JsonConfig.GetSettings(typeof(IApiSlideBlock), typeof(RunnerSubmission));
+			var jsonSerializerSettings = JsonConfig.GetSettings(polymorphismBaseTypes);
 
 			/* Asp.NET Core MVC https://www.strathweb.com/2020/02/asp-net-core-mvc-3-x-addmvc-addmvccore-addcontrollers-and-other-bootstrapping-approaches/ */
 			services.AddMvc(options =>
@@ -184,10 +181,11 @@ namespace Ulearn.Web.Api
 		protected override void ConfigureSwaggerDocumentationGeneration(SwaggerGenOptions c)
 		{
 			c.OperationFilter<RemoveCourseParameterOperationFilter>();
-			c.DocumentFilter<PolymorphismDocumentFilter<RunnerSubmission>>();
-			c.SchemaFilter<PolymorphismSchemaFilter<CsRunnerSubmission>>();
-			c.DocumentFilter<PolymorphismDocumentFilter<IApiSlideBlock>>();
-			c.SchemaFilter<PolymorphismSchemaFilter<IApiSlideBlock>>();
+			foreach (var polymorphismBaseType in polymorphismBaseTypes)
+			{
+				c.DocumentFilterDescriptors.Add(new FilterDescriptor { Type = typeof(PolymorphismDocumentFilter<>).MakeGenericType(polymorphismBaseType), Arguments = new object[0] });
+				c.SchemaFilterDescriptors.Add(new FilterDescriptor { Type = typeof(PolymorphismSchemaFilter<>).MakeGenericType(polymorphismBaseType), Arguments = new object[0] });
+			}
 		}
 
 		public override void ConfigureDi(IServiceCollection services, ILogger logger)
