@@ -787,7 +787,6 @@
     <Compile Include="Models\HintPageModel.cs" />
     <Compile Include="Models\IntructorNoteModel.cs" />
     <Compile Include="Models\LtiQuizModel.cs" />
-    <Compile Include="Models\PrevNextButtonsModel.cs" />
     <Compile Include="Models\QuizBlockData.cs" />
     <Compile Include="Models\QuizModel.cs" />
     <Compile Include="Models\QuizState.cs" />
@@ -797,8 +796,6 @@
     <Compile Include="Models\SubmissionListModel.cs" />
     <Compile Include="Models\SubmissionsModel.cs" />
     <Compile Include="Models\SwitchablePanelModel.cs" />
-    <Compile Include="Models\TocModel.cs" />
-    <Compile Include="Models\TocModelBuilder.cs" />
     <Compile Include="Models\UserCourseToggleHistoryModel.cs" />
     <Compile Include="Models\UserCourseModel.cs" />
     <Compile Include="Models\UserModel.cs" />
@@ -836,11 +833,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>SlideHtml.cshtml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Course\StandaloneLayout.generated.cs">
-      <DependentUpon>StandaloneLayout.cshtml</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <Compile Include="Views\Shared\Helpers\SwitchablePanel.generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -855,11 +847,6 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>UserAvatar.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\SlideNavigation\TableOfContents.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>TableOfContents.cshtml</DependentUpon>
     </Compile>
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
@@ -1479,12 +1466,7 @@
     <Content Include="Views\Account\Manage.cshtml" />
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Course\Slide.cshtml" />
-    <Content Include="Views\SlideNavigation\PrevNextButtons.cshtml" />
     <Content Include="Views\Course\AcceptedSolutions.cshtml" />
-    <Content Include="Views\SlideNavigation\TableOfContents.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>TableOfContents.generated.cs</LastGenOutput>
-    </Content>
     <Content Include="Views\Shared\DisplayTemplates\CodeBlock.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\MdBlock.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\YoutubeBlock.cshtml" />
@@ -1517,10 +1499,6 @@
     <Content Include="Views\Course\SlideHtml.cshtml">
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>SlideHtml.generated.cs</LastGenOutput>
-    </Content>
-    <Content Include="Views\Course\StandaloneLayout.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>StandaloneLayout.generated.cs</LastGenOutput>
     </Content>
     <Content Include="Views\Course\AcceptedSolutionsHtml.cshtml">
       <Generator>RazorGenerator</Generator>
