@@ -7,10 +7,19 @@ namespace Ulearn.Core.CSharp.Validators
 	{
 		protected override SolutionStyleError FindErrorInMethodDeclaration(MethodDeclarationSyntax method)
 		{
-			var statements = method.Body.Statements;
-			var hasError = statements.Count != 1 || !(statements.Single() is ReturnStatementSyntax);
+			return FindErrorInMethodBody(method.Body);
+		}
+
+		protected override SolutionStyleError FindErrorInLocalFunctionDeclaration(LocalFunctionStatementSyntax method)
+		{ 
+			return FindErrorInMethodBody(method.Body);
+		}
+		
+		private static SolutionStyleError FindErrorInMethodBody(BlockSyntax body)
+		{
+			var hasError = body.Statements.Count != 1 || !(body.Statements.Single() is ReturnStatementSyntax);
 			if (hasError)
-				return new SolutionStyleError(StyleErrorType.Single01, method.Body);
+				return new SolutionStyleError(StyleErrorType.Single01, body);
 			return null;
 		}
 	}
