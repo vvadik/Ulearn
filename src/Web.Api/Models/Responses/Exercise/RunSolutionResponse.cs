@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
+using JetBrains.Annotations;
 
 namespace Ulearn.Web.Api.Models.Responses.Exercise
 {
@@ -33,10 +34,11 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 		[DataMember(Name = "sentToReview")]
 		public bool SentToReview { get; set; }
 
+		[CanBeNull]
 		[DataMember(Name = "styleMessages")]
 		public List<ReviewInfo> StyleMessages { get; set; }
 
 		[DataMember(Name = "score")]
-		public int Score { get; set; }
+		public int? Score { get; set; } // Это score не за текущую посылку, а на данный момент. Может быть null в случае ошибок
 	}
 }

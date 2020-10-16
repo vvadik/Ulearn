@@ -199,6 +199,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				sentToReview = await SendToReviewAndUpdateScore(submission, courseManager, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender);
 			else
 				sentToReview = await slideCheckingsRepo.HasManualExerciseChecking(courseId, exerciseSlide.Id, userId, submission.Id);
+			var score = (await slideCheckingsRepo.GetExerciseSlideScoreAndPercent(courseId, exerciseSlide, userId)).Score;
 
 			var result = new RunSolutionResponse
 			{
@@ -209,6 +210,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				ActualOutput = automaticChecking?.Output.Text ?? "",
 				SentToReview = sentToReview,
 				SubmissionId = submission.Id,
+				Score = score
 			};
 			if (buildResult.HasStyleErrors)
 			{
