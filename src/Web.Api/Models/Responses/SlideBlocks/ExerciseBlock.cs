@@ -2,8 +2,6 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
-using Database.Models;
-using JetBrains.Annotations;
 using Ulearn.Common;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Web.Api.Controllers.Slides;

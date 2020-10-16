@@ -33,10 +33,10 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 		[DataMember(Name = "sentToReview")]
 		public bool SentToReview { get; set; }
 
-		[DataMember(Name = "executionServiceName")]
-		public string ExecutionServiceName { get; set; }
-
 		[DataMember(Name = "styleMessages")]
-		public List<string> StyleMessages { get; set; }
+		public List<ReviewInfo> StyleMessages { get; set; }
+
+		[DataMember(Name = "score")]
+		public int Score { get; set; }
 	}
 }

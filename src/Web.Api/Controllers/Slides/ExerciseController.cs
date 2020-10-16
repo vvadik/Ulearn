@@ -139,7 +139,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			if (!saveSubmissionOnCompileErrors)
 			{
 				if (buildResult.HasErrors)
-					return new RunSolutionResponse { IsCompileError = true, Message = buildResult.ErrorMessage, ExecutionServiceName = "uLearn" };
+					return new RunSolutionResponse { IsCompileError = true, Message = buildResult.ErrorMessage };
 			}
 
 			var compilationErrorMessage = buildResult.HasErrors ? buildResult.ErrorMessage : null;
@@ -156,7 +156,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			);
 
 			if (buildResult.HasErrors)
-				return new RunSolutionResponse { IsCompileError = true, Message = buildResult.ErrorMessage, SubmissionId = submission.Id, ExecutionServiceName = "uLearn" };
+				return new RunSolutionResponse { IsCompileError = true, Message = buildResult.ErrorMessage, SubmissionId = submission.Id };
 
 			var hasAutomaticChecking = submissionLanguage.HasAutomaticChecking() && (submissionLanguage == Language.CSharp || exerciseBlock is UniversalExerciseBlock);
 			var executionTimeout = TimeSpan.FromSeconds(exerciseBlock.TimeLimit * 2 + 5);
@@ -176,8 +176,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				{
 					IsInternalServerError = true,
 					Message = "К сожалению, из-за большой нагрузки мы не смогли оперативно проверить ваше решение. " +
-								"Мы попробуем проверить его позже, просто подождите и обновите страницу. ",
-					ExecutionServiceName = "ulearn"
+								"Мы попробуем проверить его позже, просто подождите и обновите страницу. "
 				};
 			}
 
@@ -190,8 +189,9 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			/* Update the submission */
 			submission = await userSolutionsRepo.FindNoTrackingSubmission(submission.Id);
 
+			List<ExerciseCodeReview> styleErrors = null;
 			if (submission.AutomaticCheckingIsRightAnswer)
-				await CreateStyleErrorsReviewsForSubmission(submission, buildResult.StyleErrors, exerciseMetricId);
+				styleErrors = await CreateStyleErrorsReviewsForSubmission(submission, buildResult.StyleErrors, exerciseMetricId);
 
 			var automaticChecking = submission.AutomaticChecking;
 			bool sentToReview;
@@ -207,13 +207,12 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				IsRightAnswer = submission.AutomaticCheckingIsRightAnswer,
 				ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : exerciseSlide.Exercise.ExpectedOutput?.NormalizeEoln(),
 				ActualOutput = automaticChecking?.Output.Text ?? "",
-				ExecutionServiceName = automaticChecking?.ExecutionServiceName ?? "ulearn",
 				SentToReview = sentToReview,
 				SubmissionId = submission.Id,
 			};
 			if (buildResult.HasStyleErrors)
 			{
-				result.StyleMessages = buildResult.StyleErrors.Select(e => e.GetMessageWithPositions()).ToList();
+				result.StyleMessages = styleErrors?.Select(e => ReviewInfo.BuildReviewInfo(e, null)).ToList();
 			}
 
 			return result;
@@ -268,15 +267,16 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			return $"{courseId.ToLower(CultureInfo.InvariantCulture)}.{exerciseSlide.Id.ToString("N").Substring(32 - 25)}.{slideTitleForMetric}";
 		}
 
-		private async Task CreateStyleErrorsReviewsForSubmission(UserExerciseSubmission submission, List<SolutionStyleError> styleErrors, string exerciseMetricId)
+		private async Task<List<ExerciseCodeReview>> CreateStyleErrorsReviewsForSubmission(UserExerciseSubmission submission, List<SolutionStyleError> styleErrors, string exerciseMetricId)
 		{
 			var ulearnBotUserId = await usersRepo.GetUlearnBotUserId();
+			var result = new List<ExerciseCodeReview>();
 			foreach (var error in styleErrors)
 			{
 				if (!await styleErrorsRepo.IsStyleErrorEnabled(error.ErrorType))
 					continue;
 
-				await slideCheckingsRepo.AddExerciseCodeReview(
+				var review = await slideCheckingsRepo.AddExerciseCodeReview(
 					submission,
 					ulearnBotUserId,
 					error.Span.StartLinePosition.Line,
@@ -285,6 +285,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 					error.Span.EndLinePosition.Character,
 					error.Message
 				);
+				result.Add(review);
 
 				var errorName = Enum.GetName(typeof(StyleErrorType), error.ErrorType);
 				metricSender.SendCount("exercise.style_error");
@@ -292,6 +293,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				metricSender.SendCount($"exercise.{exerciseMetricId}.style_error");
 				metricSender.SendCount($"exercise.{exerciseMetricId}.style_error.{errorName}");
 			}
+			return result;
 		}
 	}
 }

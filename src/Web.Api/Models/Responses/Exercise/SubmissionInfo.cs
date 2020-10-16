@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using AngleSharp.Common;
 using Database.Models;
 using JetBrains.Annotations;
 
-namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
+namespace Ulearn.Web.Api.Models.Responses.Exercise
 {
 	[DataContract]
 	public class SubmissionInfo

@@ -8,7 +8,7 @@ using Ulearn.Web.Api.Controllers;
 using Ulearn.Web.Api.Models.Common;
 using Ulearn.Web.Api.Models.Responses.Review;
 
-namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
+namespace Ulearn.Web.Api.Models.Responses.Exercise
 {
 	[DataContract]
 	public class ReviewInfo
