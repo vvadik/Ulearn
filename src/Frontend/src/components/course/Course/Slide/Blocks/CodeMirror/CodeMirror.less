@@ -1,5 +1,8 @@
 @import "../../../courseVariables";
 
+@hintsLeftPadding: 22px;
+@minCommentWidth: 260px;
+
 .wrapper {
   margin-bottom: 10px;
 }
@@ -18,9 +21,386 @@
   overflow: hidden;
 }
 
+.editorNotEditable {
+  max-height: 200px;
+}
+
+.editorInReview {
+  flex: 2;
+
+  border-left: unset;
+  border-top: unset;
+  border-bottom: unset;
+  border-right: 1px solid @lightGrey;
+}
+
+.reviewCode {
+  background: @lightYellow;
+}
+
+.selectedReviewCode {
+  background: @accentColor;
+}
+
+.comment {
+  position: relative;
+  margin-left: 14px;
+  padding: 16px;
+
+  max-width: calc(@minCommentWidth - 18px);
+
+  background: @white;
+  box-shadow: 0 6px 6px -6px @black;
+
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+  border-radius: 8px;
+
+  font-weight: 400;
+  font-style: normal;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.selectedReviewCommentWrapper {
+  margin-left: 2px;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.authorWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.authorCredentialsWrapper {
+  display: inline-block;
+  margin-left: 8px;
+}
+
+.commentLine {
+  margin-left: 8px;
+  color: @additionalColor;
+}
+
+.addingTime {
+  font-size: 12px;
+  line-height: 16px;
+
+  margin-bottom: 0;
+
+  color: @additionalColor;
+}
+
+.commentText {
+
+}
+
+.commentAvatar {
+  width: 24px;
+  height: 24px;
+
+  min-width: 24px;
+}
+
+.editButton {
+  position: relative;
+  top: -70px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: -30px;
+  width: fit-content;
+
+  cursor: pointer;
+
+  z-index: @asideZIndex - 1;
+
+  padding: 5px 16px;
+
+  background: @accentColor;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  border-radius: 24px;
+
+  color: @white;
+  font-family: @defaultFonts;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.editorWithoutBorder {
+  border: unset;
+}
+
+.exercise {
+  margin-bottom: 25px;
+}
+
+.exerciseControlsContainer {
+  display: inline-flex;
+  align-items: baseline;
+  width: 100%;
+}
+
+.exerciseControlsContainerMargin {
+  margin-bottom: 35px;
+}
+
+.exerciseControls {
+  font-size: 16px;
+  line-height: 22px;
+  color: @linkColor;
+  user-select: none;
+
+  margin-right: 24px;
+}
+
+.exerciseControls:hover {
+  cursor: pointer;
+}
+
+.noHintsLeft {
+  color: @disabledColor;
+}
+
+.hintsWrapper {
+  font-size: 16px;
+  line-height: 24px;
+
+  margin-top: 25px;
+  padding-left: @hintsLeftPadding;
+}
+
+.hintsWrapper li {
+  position: relative;
+
+  list-style-type: none;
+}
+
+.hintsWrapper li:not(:last-child) {
+  margin-bottom: 16px;
+}
+
+.hintBulb {
+  position: absolute;
+  left: -@hintsLeftPadding;
+
+  font-size: 14px;
+  line-height: 20px;
+  color: @accentColor;
+}
+
+.statistics {
+  float: right;
+  color: @additionalColor;
+  margin-right: 0;
+  margin-left: auto;
+}
+
+.header {
+  z-index: 1;
+
+  padding: 12px 16px 20px;
+  margin-bottom: -8px;
+
+  font-family: @defaultFonts;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 16px;
+  line-height: 22px;
+
+  border-radius: 8px 8px 0 0;
+}
+
+.successHeader {
+  .header;
+  border: 1px solid #3F9726;
+  background: @progressBarGreen;
+  color: @white;
+}
+
+.reviewHeader {
+  .header;
+  background: @lightGrey;
+  color: @black;
+}
+
+.reviewWrapper {
+  display: flex;
+
+  border: 1px solid @lightGrey;
+  border-radius: 8px;
+}
+
+.reviewsContainer {
+  min-width: @minCommentWidth;
+  margin-left: -10px;
+  background-color: @lightYellow;
+}
+
+.reviewsContainer :last-child {
+  margin-bottom: 5px;
+}
+
+.submissionsDropdown {
+  margin-bottom: 10px;
+}
+
+.output {
+  overflow: hidden;
+  margin-top: 35px;
+  border-radius: 8px;
+  border: 1px solid @lightGrey;
+}
+
+.wrongOutput {
+  .output;
+  border: 1px solid @likeColor;
+}
+
+.outputHeader {
+  display: block;
+  padding: 8px 16px;
+  margin-bottom: 8px;
+  border-radius: 8px 8px 0 0;
+  background-color: @lightGrey;
+
+  font-family: @defaultFonts;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.wrongOutputHeader {
+  .outputHeader;
+  margin-bottom: 0;
+  background-color: @likeColor;
+  color: @white;
+}
+
+.oneLineOutput {
+  display: block;
+  padding: 0 16px;
+}
+
+.outputTable {
+  width: 100%;
+  border: 1px solid #ddd;
+
+  font-family: @defaultFonts;
+  font-style: normal;
+  font-weight: normal;
+}
+
+.outputTable > thead > tr > th,
+.outputTable > tbody > tr > td {
+  padding: 8px;
+  line-height: 1.42857143;
+  vertical-align: top;
+  border: 1px solid #ddd;
+}
+
+.outputTable > thead > tr > th {
+  font-family: @defaultFonts;
+  font-style: normal;
+  font-weight: normal;
+
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.outputTable > tbody > tr > td {
+  font-family: Roboto Mono, @defaultFonts;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.lineWithError {
+  background-color: @lightRed;
+}
+
+.lineWithoutError {
+  background-color: @lightGreen;
+}
+
+.overview {
+  padding: 16px;
+  margin-bottom: 16px;
+
+  list-style: none;
+
+  font-family: @defaultFonts;
+  font-style: normal;
+  font-weight: 400;
+
+  background: @white;
+
+  border: 1px solid @accentColor;
+  box-sizing: border-box;
+  border-radius: 8px;
+}
+
+.overview li:last-child {
+  margin-bottom: 0;
+}
+
+.overviewLine {
+  margin-bottom: 16px;
+}
+
+.overview h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+
+  font-size: 16px;
+  line-height: 22px;
+
+  font-weight: 600;
+}
+
+.overviewComment {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.overviewSelfCheckList {
+  list-style: none;
+
+  padding: 0;
+}
+
+.overviewSelfCheckList li {
+  display: flex;
+
+  margin-bottom: 16px;
+}
+
+.overviewSelfCheckList li .selfCheckText {
+  margin-left: 8px;
+  word-break: break-word;
+}
+
+.overviewSelfCheckComment {
+  .overviewComment;
+  position: relative;
+  top: -8px;
+  color: @additionalColor;
+}
+
+
 @media (min-width: @minTabletWidth) {
   .editor {
     font-size: 14px;
     line-height: 20px;
+  }
+
+  .overview {
+    padding: 24px 40px;
+  }
+
+  .overview h3 {
+    font-size: 20px;
+    line-height: 28px;
   }
 }
