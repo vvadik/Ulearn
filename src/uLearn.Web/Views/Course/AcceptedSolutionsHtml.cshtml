@@ -10,7 +10,6 @@
 {
 	<div id="LikeSolutionUrl" data-url="@( model.LikeSolutionUrl)"></div>
 	<p>@MvcHtmlString.Create(model.Slide.Exercise.CommentAfterExerciseIsSolved.RenderMarkdown(model.Slide.Info.SlideFile))</p>
-	<p>Изучите решения ваших коллег. Проголосуйте за решения, в которых вы нашли что-то новое для себя.</p>
 	foreach (var solution in model.AcceptedSolutions)
 	{
 		var id = "solution_" + solution.Id;
