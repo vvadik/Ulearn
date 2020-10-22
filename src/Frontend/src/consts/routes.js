@@ -14,10 +14,15 @@ export function constructPathToSlide(courseId, slideId) {
 	return `/${ coursePath }/${ courseId }/${ slideId }`;
 }
 
+export function constructPathToAcceptedSolutions(courseId, slideId) {
+	return `/${ coursePath }/${ courseId }/${ acceptedSolutions }?slideId=${ slideId }`;
+
+}
+
 export function constructPathToComment(commentId, isLike) {
 	const url = `${ commentsPath }/${ commentId }`;
 
-	if (isLike) {
+	if(isLike) {
 		return url + "/like";
 	}
 
