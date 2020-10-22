@@ -1,18 +1,18 @@
 import React from 'react';
 
 import { UnControlled, Controlled, } from "react-codemirror2";
-import { Button, Checkbox, Dropdown, MenuItem, Modal, Tooltip, } from "ui";
+import { Button, Checkbox, Dropdown, FLAT_THEME, MenuItem, Modal, Tooltip, } from "ui";
 import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent";
 import { Lightbulb, Refresh, EyeOpened, DocumentLite, Error, } from "icons";
 import Avatar from "src/components/common/Avatar/Avatar";
+import CongratsModal from "./CongratsModal/CongratsModal";
+import { ThemeContext } from "@skbkontur/react-ui/index";
 
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { constructPathToAcceptedSolutions, } from "src/consts/routes";
 import { getDateDDMMYY } from "src/utils/getMoment";
-import getPluralForm from "src/utils/getPluralForm";
 import { isMobile } from "src/utils/getDeviceType";
-import moment from "moment";
 import api from "src/api";
 
 import 'codemirror/lib/codemirror';
@@ -21,102 +21,8 @@ import 'codemirror/theme/darcula.css';
 
 import styles from './CodeMirror.less';
 
-const texts = {
-	submissions: {
-		newTry: 'Новая попытка',
-		getSubmissionCaption: (submission) => submission ? texts.getSubmissionDate(submission.timestamp) : texts.submissions.newTry,
-	},
+import texts from './CodeMirror.texts';
 
-	headers: {
-		allTestPassedHeader: 'Все тесты пройдены, задача сдана',
-	},
-
-	mocks: {
-		headerSuccess: 'Решение отправлено на ревью – 5 баллов. После ревью преподаватель поставит итоговый балл',
-		wrongResult: 'Неверный результат',
-	},
-
-	output: {
-		text: 'Вывод программы',
-
-		userOutput: 'Вывод вашей программы',
-		expectedOutput: 'Ожидаемый вывод',
-	},
-
-	checkups: {
-		showReview: 'Посмотреть',
-
-		self: {
-			title: 'Самопроверка',
-			text: 'Посмотрите, всё ли вы учли и отметьте сделанное',
-
-			checks: [
-				'Проверьте оформление',
-				'Проверьте, у всех полей и методов правильно выбраны модификаторы доступа.',
-				'Метод точно работает корректно?',
-			],
-		},
-		teacher: {
-			title: 'Код-ревью',
-			countTeacherReviews: (reviewsCount) => `Преподаватель оставил ${ reviewsCount } ${ getPluralForm(reviewsCount, 'комментарий', 'комментария', 'комментариев') }. `,
-		},
-		bot: {
-			title: 'Ulearn Bot',
-			countBotComments: (botCommentsLength) => `Бот нашёл ${ botCommentsLength } ${ getPluralForm(botCommentsLength, 'ошибку', 'ошибки', 'ошибок') }. `,
-		},
-	},
-
-	controls: {
-		submitCode: {
-			text: 'Отправить',
-			hint: 'Начните писать код',
-		},
-		hints: {
-			text: 'Взять подсказку',
-			hint: 'Подсказки закончились',
-		},
-
-		reset: {
-			text: 'Начать сначала',
-		},
-
-		output: {
-			show: 'Показать вывод',
-			hide: 'Скрыть вывод',
-		},
-
-		acceptedSolutions: {
-			text: 'Посмотреть решения',
-			buildWarning: () => <React.Fragment>
-				Вы не получите баллы за задачу,<br/>
-				если посмотрите чужие решения.<br/>
-				<br/>
-			</React.Fragment>,
-			continue: 'Всё равно посмотреть',
-		},
-
-		edit: {
-			text: 'Редактировать',
-		},
-
-		statistics: {
-			buildShortText: (usersWithRightAnswerCount) =>
-				<React.Fragment>Решило: { usersWithRightAnswerCount }</React.Fragment>,
-			buildStatistics: (attemptedUsersCount, usersWithRightAnswerCount, lastSuccessAttemptDate) =>
-				<React.Fragment>
-					За всё время:<br/>
-					{ attemptedUsersCount } студентов пробовали решить<br/>
-					задачу, решили – { usersWithRightAnswerCount } <br/>
-					<br/>
-					Последний раз решили { moment(lastSuccessAttemptDate).startOf("minute").fromNow() }
-				</React.Fragment>,
-		},
-	},
-
-	getSubmissionDate: (timestamp) => {
-		return moment(timestamp).format('DD MMMM YYYY в HH:mm');
-	}
-};
 
 class CodeMirror extends React.Component {
 	constructor(props) {
@@ -133,11 +39,12 @@ class CodeMirror extends React.Component {
 			isExercise,
 			currentSubmission: null,
 			isEditable: isExercise && submissions.length === 0,
-			showedOutput: null,
-			showedOutputError: false,
+			submitResults: null,
+			showSubmitOutput: false,
 			reviewTextMarkers: [],
 			selectedReviewIndex: -1,
 			exerciseCodeDoc: null,
+			congratsModalOpened: false,
 		};
 	}
 
@@ -229,7 +136,10 @@ class CodeMirror extends React.Component {
 	}
 
 	renderControlledCodeMirror = (opts) => {
-		const { value, showedHintsCount, showAcceptedSolutions, currentSubmission, isEditable, showedOutput, exerciseCodeDoc, } = this.state;
+		const {
+			value, showedHintsCount, showAcceptedSolutions, currentSubmission,
+			isEditable, submitResults, exerciseCodeDoc, congratsModalOpened,
+		} = this.state;
 		const { submissions, } = this.props;
 
 		const isReview = !isEditable && currentSubmission?.reviews.length > 0;
@@ -262,9 +172,10 @@ class CodeMirror extends React.Component {
 				{ !isEditable && this.renderEditButton() }
 				{ !isEditable && this.renderOverview() }
 				{ this.renderControls() }
-				{ showedOutput !== null && this.renderOutput() }
+				{ submitResults && submitResults.message && this.renderOutput() }
 				{ showedHintsCount > 0 && this.renderHints() }
 				{ showAcceptedSolutions && this.renderAcceptedSolutions() }
+				{ congratsModalOpened && this.renderCongratsModal() }
 			</React.Fragment>
 		)
 	}
@@ -279,25 +190,28 @@ class CodeMirror extends React.Component {
 			submissionsWithoutCurrent.push({ isNew: true });
 		}
 
+		//TODO overriding theme to prevent rounding edges in dropdown
 		return (
 			<div className={ styles.submissionsDropdown }>
-				<Dropdown
-					caption={ texts.submissions.getSubmissionCaption(currentSubmission) }>
-					{ submissionsWithoutCurrent.map(({ id, timestamp, isNew, }) =>
-						isNew
-							? <MenuItem
-								title={ -1 }
-								key={ -1 }
-								onClick={ this.loadNewTry }>
-								{ texts.submissions.newTry }
-							</MenuItem>
-							: <MenuItem
-								title={ id }
-								key={ id }
-								onClick={ this.loadSubmission }>
-								{ texts.getSubmissionDate(timestamp) }
-							</MenuItem>) }
-				</Dropdown>
+				<ThemeContext.Provider value={ FLAT_THEME }>
+					<Dropdown
+						caption={ texts.submissions.getSubmissionCaption(currentSubmission) }>
+						{ submissionsWithoutCurrent.map(({ id, timestamp, isNew, }) =>
+							isNew
+								? <MenuItem
+									title={ -1 }
+									key={ -1 }
+									onClick={ this.loadNewTry }>
+									{ texts.submissions.newTry }
+								</MenuItem>
+								: <MenuItem
+									title={ id }
+									key={ id }
+									onClick={ this.loadSubmission }>
+									{ texts.getSubmissionDate(timestamp) }
+								</MenuItem>) }
+					</Dropdown>
+				</ThemeContext.Provider>
 			</div>
 		)
 	}
@@ -335,7 +249,7 @@ class CodeMirror extends React.Component {
 		this.setState({
 			value: submission.code,
 			isEditable: false,
-			showedOutput: null,
+			submitResults: null,
 		}, () => this.setState({
 			currentSubmission: submission,
 			reviewTextMarkers: this.getTextMarkers(submission.reviews),
@@ -440,14 +354,15 @@ class CodeMirror extends React.Component {
 	}
 
 	renderOutput = () => {
-		const { showedOutputError, } = this.state;
-		const wrapperClasses = showedOutputError ? styles.wrongOutput : styles.output;
-		const headerClasses = showedOutputError ? styles.wrongOutputHeader : styles.outputHeader;
+		const { submitResults, } = this.state;
+		const submitContainsError = this.isSubmitResultsContainsError(submitResults);
+		const wrapperClasses = submitContainsError ? styles.wrongOutput : styles.output;
+		const headerClasses = submitContainsError ? styles.wrongOutputHeader : styles.outputHeader;
 
 		return (
 			<div className={ wrapperClasses }>
 				<span className={ headerClasses }>
-					{ showedOutputError
+					{ submitContainsError
 						? <React.Fragment><Error/>{ texts.mocks.wrongResult }</React.Fragment>
 						: texts.output.text }
 				</span>
@@ -457,12 +372,13 @@ class CodeMirror extends React.Component {
 	}
 
 	renderOutputLines = () => {
-		const { showedOutput, showedOutputError, } = this.state;
-		const lines = Array.isArray(showedOutput)
-			? showedOutput
-			: [showedOutput];
+		const { submitResults, } = this.state;
+		const lines = Array.isArray(submitResults.actualOutput)
+			? submitResults.actualOutput
+			: [submitResults.actualOutput];
+		const submitContainsError = this.isSubmitResultsContainsError(submitResults);
 
-		if(showedOutputError) {
+		if(submitContainsError) {
 			return (
 				<table className={ styles.outputTable }>
 					<thead>
@@ -475,8 +391,8 @@ class CodeMirror extends React.Component {
 					<tbody>
 					<tr className={ styles.lineWithError }>
 						<td>1</td>
-						<td>{ showedOutput.actualOutput }</td>
-						<td>{ showedOutput.expectedOutput }</td>
+						<td>{ submitResults.actualOutput }</td>
+						<td>{ submitResults.expectedOutput }</td>
 					</tr>
 					</tbody>
 				</table>
@@ -532,11 +448,11 @@ class CodeMirror extends React.Component {
 	}
 
 	renderShowOutputButton = () => {
-		const { showedOutput } = this.state;
+		const { showSubmitOutput } = this.state;
 
 		return (
 			<span className={ styles.exerciseControls } onClick={ this.toggleOutput }>
-					<DocumentLite/> { showedOutput ? texts.controls.output.hide : texts.controls.output.show }
+					<DocumentLite/> { showSubmitOutput ? texts.controls.output.hide : texts.controls.output.show }
 			</span>
 		)
 	}
@@ -587,14 +503,17 @@ class CodeMirror extends React.Component {
 
 		return (
 			<Modal onClose={ this.closeAcceptedSolutions }>
-				<Modal.Header>Решения</Modal.Header>
+				<Modal.Header>{ texts.acceptedSolutions.title }</Modal.Header>
 				<Modal.Body>
-					<p>Изучите решения ваших коллег. Проголосуйте за решения, в которых вы нашли что-то новое для
-						себя.</p>
+					{ texts.acceptedSolutions.content }
 					<DownloadedHtmlContent url={ constructPathToAcceptedSolutions(courseId, slideId) }/>
 				</Modal.Body>
 			</Modal>
 		)
+	}
+
+	renderCongratsModal = () => {
+		return (<CongratsModal onClose={ this.closeCongratsModal }/>);
 	}
 
 	renderReview = () => {
@@ -721,7 +640,7 @@ class CodeMirror extends React.Component {
 
 		this.setState({
 			isEditable: true,
-			showedOutput: null,
+			showSubmitOutput: null,
 			valueChanged: true,
 		})
 	}
@@ -745,7 +664,7 @@ class CodeMirror extends React.Component {
 			valueChanged: false,
 			isEditable: true,
 			currentSubmission: null,
-			showedOutput: null,
+			showSubmitOutput: null,
 		})
 	}
 
@@ -768,10 +687,10 @@ class CodeMirror extends React.Component {
 	}
 
 	toggleOutput = () => {
-		const { currentSubmission, showedOutput, } = this.state;
+		const { showSubmitOutput, } = this.state;
 
 		this.setState({
-			showedOutput: showedOutput ? null : currentSubmission.output.split('\n'),
+			showSubmitOutput: !showSubmitOutput,
 		})
 	}
 
@@ -801,15 +720,25 @@ class CodeMirror extends React.Component {
 		})
 	}
 
+
+	closeCongratsModal = () => {
+		this.setState({
+			congratsModalOpened: false,
+		})
+	}
+
 	sendExercise = () => {
 		const { value, } = this.state;
 		const { courseId, slideId, } = this.props;
 
 		api.exercise.submitCode(courseId, slideId, value)
 			.then(r => {
+				this.setState({
+					submitResults: r,
+					congratsModalOpened: r.isRightAnswer,
+				});
 				/*
 				actualOutput: null
-				executionServiceName: "ulearn"
 				expectedOutput: null
 				ignored: false
 				isCompileError: false
@@ -820,14 +749,11 @@ class CodeMirror extends React.Component {
 				styleMessages: null
 				submissionId: 0
 				 */
-				if(r.isRightAnswer) {
-				} else {
-					this.setState({
-						showedOutputError: true,
-						showedOutput: r,
-					})
-				}
 			});
+	}
+
+	isSubmitResultsContainsError = (submitResults) => {
+		return submitResults.isCompileError || submitResults.isInternalServerError || !submitResults.isRightAnswer;
 	}
 
 	onBeforeChange = (editor, data, value) => {
