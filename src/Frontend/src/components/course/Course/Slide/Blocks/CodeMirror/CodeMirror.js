@@ -21,6 +21,102 @@ import 'codemirror/theme/darcula.css';
 
 import styles from './CodeMirror.less';
 
+const texts = {
+	submissions: {
+		newTry: 'Новая попытка',
+		getSubmissionCaption: (submission) => submission ? texts.getSubmissionDate(submission.timestamp) : texts.submissions.newTry,
+	},
+
+	headers: {
+		allTestPassedHeader: 'Все тесты пройдены, задача сдана',
+	},
+
+	mocks: {
+		headerSuccess: 'Решение отправлено на ревью – 5 баллов. После ревью преподаватель поставит итоговый балл',
+		wrongResult: 'Неверный результат',
+	},
+
+	output: {
+		text: 'Вывод программы',
+
+		userOutput: 'Вывод вашей программы',
+		expectedOutput: 'Ожидаемый вывод',
+	},
+
+	checkups: {
+		showReview: 'Посмотреть',
+
+		self: {
+			title: 'Самопроверка',
+			text: 'Посмотрите, всё ли вы учли и отметьте сделанное',
+
+			checks: [
+				'Проверьте оформление',
+				'Проверьте, у всех полей и методов правильно выбраны модификаторы доступа.',
+				'Метод точно работает корректно?',
+			],
+		},
+		teacher: {
+			title: 'Код-ревью',
+			countTeacherReviews: (reviewsCount) => `Преподаватель оставил ${ reviewsCount } ${ getPluralForm(reviewsCount, 'комментарий', 'комментария', 'комментариев') }. `,
+		},
+		bot: {
+			title: 'Ulearn Bot',
+			countBotComments: (botCommentsLength) => `Бот нашёл ${ botCommentsLength } ${ getPluralForm(botCommentsLength, 'ошибку', 'ошибки', 'ошибок') }. `,
+		},
+	},
+
+	controls: {
+		submitCode: {
+			text: 'Отправить',
+			hint: 'Начните писать код',
+		},
+		hints: {
+			text: 'Взять подсказку',
+			hint: 'Подсказки закончились',
+		},
+
+		reset: {
+			text: 'Начать сначала',
+		},
+
+		output: {
+			show: 'Показать вывод',
+			hide: 'Скрыть вывод',
+		},
+
+		acceptedSolutions: {
+			text: 'Посмотреть решения',
+			buildWarning: () => <React.Fragment>
+				Вы не получите баллы за задачу,<br/>
+				если посмотрите чужие решения.<br/>
+				<br/>
+			</React.Fragment>,
+			continue: 'Всё равно посмотреть',
+		},
+
+		edit: {
+			text: 'Редактировать',
+		},
+
+		statistics: {
+			buildShortText: (usersWithRightAnswerCount) =>
+				<React.Fragment>Решило: { usersWithRightAnswerCount }</React.Fragment>,
+			buildStatistics: (attemptedUsersCount, usersWithRightAnswerCount, lastSuccessAttemptDate) =>
+				<React.Fragment>
+					За всё время:<br/>
+					{ attemptedUsersCount } студентов пробовали решить<br/>
+					задачу, решили – { usersWithRightAnswerCount } <br/>
+					<br/>
+					Последний раз решили { moment(lastSuccessAttemptDate).startOf("minute").fromNow() }
+				</React.Fragment>,
+		},
+	},
+
+	getSubmissionDate: (timestamp) => {
+		return moment(timestamp).format('DD MMMM YYYY в HH:mm');
+	}
+};
 
 class CodeMirror extends React.Component {
 	constructor(props) {
@@ -186,20 +282,20 @@ class CodeMirror extends React.Component {
 		return (
 			<div className={ styles.submissionsDropdown }>
 				<Dropdown
-					caption={ currentSubmission ? this.getSubmissionDate(currentSubmission.timestamp) : 'Новая попытка' }>
+					caption={ texts.submissions.getSubmissionCaption(currentSubmission) }>
 					{ submissionsWithoutCurrent.map(({ id, timestamp, isNew, }) =>
 						isNew
 							? <MenuItem
 								title={ -1 }
 								key={ -1 }
 								onClick={ this.loadNewTry }>
-								Новая попытка
+								{ texts.submissions.newTry }
 							</MenuItem>
 							: <MenuItem
 								title={ id }
 								key={ id }
 								onClick={ this.loadSubmission }>
-								{ this.getSubmissionDate(timestamp) }
+								{ texts.getSubmissionDate(timestamp) }
 							</MenuItem>) }
 				</Dropdown>
 			</div>
@@ -212,19 +308,15 @@ class CodeMirror extends React.Component {
 		if(currentSubmission?.reviews.length > 0) {
 			return (
 				<div className={ styles.reviewHeader }>
-					Решение отправлено на ревью – 5 баллов. После ревью преподаватель поставит итоговый балл
+					{ texts.mocks.headerSuccess }
 				</div>
 			);
 		}
 		return (
 			<div className={ styles.header }>
-				Все тесты пройдены, задача сдана
+				{ texts.headers.allTestPassedHeader }
 			</div>
 		)
-	}
-
-	getSubmissionDate = (timestamp) => {
-		return moment(timestamp).format('DD MMMM YYYY в HH:mm');
 	}
 
 	loadSubmission = (e) => {
@@ -271,11 +363,11 @@ class CodeMirror extends React.Component {
 
 		const checkups = [
 			{
-				title: 'Самопроверка',
+				title: texts.checkups.self.title,
 				content:
 					<React.Fragment>
 						<span className={ styles.overviewSelfCheckComment }>
-							Посмотрите, всё ли вы учли и отметьте сделанное
+							{ texts.checkups.self.text }
 						</span>
 						<ul className={ styles.overviewSelfCheckList }>
 							{ this.renderSelfCheckBoxes() }
@@ -287,11 +379,11 @@ class CodeMirror extends React.Component {
 		if(botCommentsLength !== 0) {
 			checkups.unshift(
 				{
-					title: 'Ulearn Bot',
+					title: texts.checkups.bot.title,
 					content:
 						<span className={ styles.overviewComment }>
-						{ `Бот нашёл ${ botCommentsLength } ${ getPluralForm(botCommentsLength, 'ошибку', 'ошибки', 'ошибок') }. ` }
-							<a onClick={ this.showFirstBotComment }>Посмотреть</a>
+						{ texts.checkups.bot.countBotComments(botCommentsLength) }
+							<a onClick={ this.showFirstBotComment }>{ texts.showReview }</a>
 					</span>
 				});
 		}
@@ -300,11 +392,11 @@ class CodeMirror extends React.Component {
 			const reviewsCount = currentSubmission.reviews.length;
 
 			checkups.unshift({
-				title: 'Код-ревью',
+				title: texts.checkups.teacher.title,
 				content:
 					<span className={ styles.overviewComment }>
-						{ `Преподаватель оставил ${ reviewsCount } ${ getPluralForm(reviewsCount, 'комментарий', 'комментария', 'комментариев') }. ` }
-						<a onClick={ this.showFirstComment }>Посмотреть</a>
+						{ texts.checkups.teacher.countTeacherReviews(reviewsCount) }
+						<a onClick={ this.showFirstComment }>{ texts.showReview }</a>
 					</span>
 			});
 		}
@@ -322,14 +414,8 @@ class CodeMirror extends React.Component {
 	}
 
 	renderSelfCheckBoxes = () => {
-		const selfCheckups = [
-			'Проверьте оформление',
-			'Проверьте, у всех полей и методов правильно выбраны модификаторы доступа.',
-			'Метод точно работает корректно?',
-		];
-
 		return (
-			selfCheckups.map((ch, i) =>
+			texts.checkups.self.checks.map((ch, i) =>
 				<li key={ i }>
 					<Checkbox/> <span className={ styles.selfCheckText }>{ ch }</span>
 				</li>
@@ -362,8 +448,8 @@ class CodeMirror extends React.Component {
 			<div className={ wrapperClasses }>
 				<span className={ headerClasses }>
 					{ showedOutputError
-						? <React.Fragment><Error/>Неверный результат</React.Fragment>
-						: 'Вывод программы' }
+						? <React.Fragment><Error/>{ texts.mocks.wrongResult }</React.Fragment>
+						: texts.output.text }
 				</span>
 				{ this.renderOutputLines() }
 			</div>
@@ -382,8 +468,8 @@ class CodeMirror extends React.Component {
 					<thead>
 					<tr>
 						<th/>
-						<th>Вывод вашей программы</th>
-						<th>Ожидаемый вывод</th>
+						<th>{ texts.output.userOutput }</th>
+						<th>{ texts.output.expectedOutput }</th>
 					</tr>
 					</thead>
 					<tbody>
@@ -409,12 +495,12 @@ class CodeMirror extends React.Component {
 		return (
 			<span className={ styles.exerciseControls }>
 				<Tooltip pos={ "bottom center" } trigger={ "hover&focus" }
-						 render={ () => valueChanged ? null : <span>Начните писать код</span> }>
+						 render={ () => valueChanged ? null : <span>{ texts.controls.submitCode.hint }</span> }>
 							<Button
 								use={ "primary" }
 								disabled={ !valueChanged }
 								onClick={ this.sendExercise }>
-								Отправить
+								{ texts.controls.submitCode.text }
 							</Button>
 				</Tooltip>
 			</span>
@@ -430,8 +516,8 @@ class CodeMirror extends React.Component {
 		return (
 			<span className={ hintClassName } onClick={ this.showHint }>
 				<Tooltip pos={ "bottom center" } trigger={ "hover&focus" }
-						 render={ () => noHintsLeft ? <span>Подсказки закончились</span> : null }>
-							<Lightbulb/>{ !isMobile() && `Взять подсказку` }
+						 render={ () => noHintsLeft ? <span>{ texts.controls.hints.hint }</span> : null }>
+							<Lightbulb/>{ !isMobile() && texts.controls.hints.text }
 				</Tooltip>
 			</span>
 		);
@@ -440,7 +526,7 @@ class CodeMirror extends React.Component {
 	renderResetButton = () => {
 		return (
 			<span className={ styles.exerciseControls } onClick={ this.resetCode }>
-					<Refresh/>{ !isMobile() && `Начать сначала` }
+					<Refresh/>{ !isMobile() && texts.controls.reset.text }
 			</span>
 		);
 	}
@@ -450,7 +536,7 @@ class CodeMirror extends React.Component {
 
 		return (
 			<span className={ styles.exerciseControls } onClick={ this.toggleOutput }>
-					<DocumentLite/> { showedOutput ? 'Скрыть вывод' : 'Показать вывод' }
+					<DocumentLite/> { showedOutput ? texts.controls.output.hide : texts.controls.output.show }
 			</span>
 		)
 	}
@@ -467,15 +553,13 @@ class CodeMirror extends React.Component {
 						render={
 							() =>
 								<span>
-									Вы не получите баллы за задачу,<br/>
-									если посмотрите чужие решения.<br/>
-									<br/>
+									{ texts.controls.acceptedSolutions.buildWarning() }
 									<Button use={ "danger" } onClick={ this.showAcceptedSolutions }>
-										Всё равно посмотреть
+										{ texts.controls.acceptedSolutions.continue }
 									</Button>
 								</span>
 						}>
-					<EyeOpened/>{ !isMobile() && `Посмотреть решения` }
+					<EyeOpened/>{ !isMobile() && texts.controls.acceptedSolutions.text }
 					</Tooltip>
 				</span>
 		);
@@ -539,9 +623,9 @@ class CodeMirror extends React.Component {
 
 		//const minHeight = exerciseCodeDoc.cm.charCoords({ line: startLine, ch: startPosition }, 'local').top;
 		//const offset = Math.max(5, minHeight,);
-//TODO style={ { marginTop: `${ offset }px` } }
+		//TODO style={ { marginTop: `${ offset }px` } }
 		return (
-			<div key={ i }  className={ className }
+			<div key={ i } className={ className }
 				 onClick={ (e) => this.selectComment(e, i) }>
 				<div className={ styles.authorWrapper }>
 					<Avatar user={ author } size="big" className={ styles.commentAvatar }/>
@@ -607,7 +691,7 @@ class CodeMirror extends React.Component {
 	renderEditButton = () => {
 		return (
 			<div className={ styles.editButton } onClick={ this.enableEditing }>
-				Редактировать
+				{ texts.controls.edit.text }
 			</div>
 		)
 	}
@@ -621,14 +705,10 @@ class CodeMirror extends React.Component {
 					<Tooltip pos={ "bottom right" } trigger={ "hover&focus" } render={
 						() =>
 							<span>
-								За всё время:<br/>
-								{ attemptedUsersCount } студентов пробовали решить<br/>
-								задачу, решили – { usersWithRightAnswerCount } <br/>
-								<br/>
-								Последний раз решили { moment(lastSuccessAttemptDate).startOf("minute").fromNow() }
+								{ texts.controls.statistics.buildStatistics(attemptedUsersCount, usersWithRightAnswerCount, lastSuccessAttemptDate) }
 							</span>
 					}>
-						Решило: { usersWithRightAnswerCount }
+						{ texts.controls.statistics.buildShortText(usersWithRightAnswerCount) }
 					</Tooltip>
 				</span>
 		);
