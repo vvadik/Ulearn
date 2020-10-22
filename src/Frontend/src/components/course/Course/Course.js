@@ -153,7 +153,7 @@ class Course extends Component {
 			window.scrollTo(0, 0);
 
 			const slideInfo = Course.getSlideInfoById(props.slideId, props.courseInfo);
-			const Page = Course.getOpenedPage(props.slideId, props.courseInfo, slideInfo);
+			const Page = Course.getOpenedPage(props.slideId, props.courseInfo, slideInfo, props.pageInfo);
 			const title = Course.getTitle(slideInfo, Page);
 			if(slideInfo && progress && !isHijacked) {
 				updateVisitedSlide(courseId, slideInfo.current.id);
@@ -175,7 +175,7 @@ class Course extends Component {
 		return defaultState;
 	}
 
-	static getOpenedPage = (slideId, courseInfo, currentSlideInfo) => {
+	static getOpenedPage = (slideId, courseInfo, currentSlideInfo, pageInfo) => {
 		if(slideId === flashcards) {
 			return CourseFlashcardsPage;
 		}
@@ -192,7 +192,9 @@ class Course extends Component {
 			return UnitFlashcardsPage;
 		}
 
-		if(currentSlideInfo && currentSlideInfo.current.type === SLIDETYPE.lesson) {
+		if(currentSlideInfo &&
+			(currentSlideInfo.current.type === SLIDETYPE.lesson
+				|| (currentSlideInfo.current.type === SLIDETYPE.exercise && !pageInfo.isReview))) {
 			return Slide;
 		}
 
