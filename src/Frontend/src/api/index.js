@@ -7,6 +7,7 @@ import * as groups from "./groups"
 import * as users from "./users"
 import * as comments from "./comments"
 import * as cards from "./flashcards"
+import * as exercise from "./exercise"
 import { Toast } from "ui";
 import * as signalR from "@microsoft/signalr";
 
@@ -191,6 +192,7 @@ let api = {
 	users,
 	comments,
 	cards,
+	exercise,
 };
 
 export default api;

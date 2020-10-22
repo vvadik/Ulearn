@@ -805,8 +805,7 @@ class CodeMirror extends React.Component {
 		const { value, } = this.state;
 		const { courseId, slideId, } = this.props;
 
-		api.post(`slides/${ courseId }/${ slideId }/exercise/submit`,
-			api.createRequestParams({ solution: value }))
+		api.exercise.submitCode(courseId, slideId, value)
 			.then(r => {
 				/*
 				actualOutput: null
