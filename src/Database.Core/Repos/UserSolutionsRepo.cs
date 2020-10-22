@@ -323,29 +323,20 @@ namespace Database.Repos
 				.Take(max);
 		}
 
-		public async Task<UserExerciseSubmission> FindNoTrackingSubmission(int id)
+		public async Task<AutomaticExerciseCheckingStatus?> GetSubmissionAutomaticCheckingStatus(int id)
 		{
-			return await FuncUtils.TrySeveralTimesAsync(async () => await TryFindNoTrackingSubmission(id), 3, () =>  Task.Delay(200));
+			return await FuncUtils.TrySeveralTimesAsync(async () => await TryGetSubmissionAutomaticCheckingStatus(id), 3, () =>  Task.Delay(200));
 		}
 
-		private async Task<UserExerciseSubmission> TryFindNoTrackingSubmission(int id)
+		private async Task<AutomaticExerciseCheckingStatus?> TryGetSubmissionAutomaticCheckingStatus(int id)
 		{
-			var submission = await db.UserExerciseSubmissions
-				.Include(s => s.AutomaticChecking).ThenInclude(c => c.Output)
-				.Include(s => s.AutomaticChecking).ThenInclude(c => c.CompilationError)
-				.Include(s => s.SolutionCode)
-				.AsNoTracking() // В core побочный эффект - отключение dinamic proxy
-				.SingleOrDefaultAsync(x => x.Id == id);
-			if (submission == null)
+			var statuses = await db.UserExerciseSubmissions
+				.Where(s => s.Id == id)
+				.Select(s => s.AutomaticChecking.Status)
+				.ToListAsync();
+			if (!statuses.Any())
 				return null;
-
-			if (submission.AutomaticChecking != null)
-			{
-				submission.AutomaticChecking.Output = await textsRepo.GetText(submission.AutomaticChecking.OutputHash);
-				submission.AutomaticChecking.CompilationError = await textsRepo.GetText(submission.AutomaticChecking.CompilationErrorHash);
-			}
-
-			return submission;
+			return statuses.First();
 		}
 
 		public async Task<UserExerciseSubmission> GetUnhandledSubmission(string agentName, List<string> sandboxes)
@@ -370,17 +361,30 @@ namespace Database.Repos
 				if (work == null)
 					return null;
 
-				var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
 				var workItemId= int.Parse(work.ItemId);
 				submission = await db.UserExerciseSubmissions
 					.Include(s => s.AutomaticChecking)
 					.Include(s => s.SolutionCode)
 					.FirstOrDefaultAsync(s => s.Id == workItemId
-						&& s.Timestamp > notSoLongAgo
-						&& s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting);
+						&& (s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting || s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Running));
+				var minutes = TimeSpan.FromMinutes(15);
+				var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
 				if (submission == null)
 				{
 					await workQueueRepo.Remove(work.Id);
+				}
+				else if (submission.Timestamp < notSoLongAgo)
+				{
+					await workQueueRepo.Remove(work.Id);
+					submission.AutomaticChecking.Status = submission.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting
+						? AutomaticExerciseCheckingStatus.RequestTimeLimit
+						: AutomaticExerciseCheckingStatus.Error;
+					await db.SaveChangesAsync();
+					if (submission.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Error)
+						log.Error($"Не получил ответ от чеккера по проверке {submission.Id} за {minutes} минут");
+					if (!handledSubmissions.TryAdd(submission.Id, DateTime.Now))
+						log.Warn($"Не удалось запомнить, что {submission.Id} не удалось проверить, и этот результат сохранен в базу");
+					submission = null;
 				}
 			}
 
@@ -394,7 +398,17 @@ namespace Database.Repos
 
 		public async Task<UserExerciseSubmission> FindSubmissionById(int id)
 		{
-			return await db.UserExerciseSubmissions.FindAsync(id);
+			return await FuncUtils.TrySeveralTimesAsync(async () => await TryFindSubmissionById(id), 3, () => Task.Delay(200));
+		}
+
+		private async Task<UserExerciseSubmission> TryFindSubmissionById(int id)
+		{
+			return await db.UserExerciseSubmissions.Include(s => s.AutomaticChecking).ThenInclude(c => c.Output)
+				.Include(s => s.AutomaticChecking).ThenInclude(c => c.CompilationError)
+				.Include(s => s.SolutionCode)
+				.Include(s => s.Reviews)
+				.Include(s => s.ManualCheckings)
+				.SingleOrDefaultAsync(x => x.Id == id);
 		}
 
 		public async Task<UserExerciseSubmission> FindSubmissionById(string idString)
@@ -478,7 +492,7 @@ namespace Database.Repos
 				IsCompilationError = result.Verdict == Verdict.CompilationError,
 				OutputHash = outputHash,
 				ExecutionServiceName = checking.ExecutionServiceName,
-				Status = AutomaticExerciseCheckingStatus.Done,
+				Status = result.Verdict == Verdict.SandboxError ? AutomaticExerciseCheckingStatus.Error : AutomaticExerciseCheckingStatus.Done,
 				DisplayName = checking.DisplayName,
 				Elapsed = DateTime.Now - checking.Timestamp,
 				IsRightAnswer = isRightAnswer,
@@ -534,13 +548,18 @@ namespace Database.Repos
 			while (sw.Elapsed < timeout)
 			{
 				await WaitUntilSubmissionHandled(TimeSpan.FromSeconds(5), submission.Id);
-				var updatedSubmission = await FindNoTrackingSubmission(submission.Id);
-				if (updatedSubmission == null)
+				var submissionAutomaticCheckingStatus = await GetSubmissionAutomaticCheckingStatus(submission.Id);
+				if (submissionAutomaticCheckingStatus == null)
 					break;
 
-				if (updatedSubmission.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Done)
+				if (submissionAutomaticCheckingStatus == AutomaticExerciseCheckingStatus.Done)
 				{
-					log.Info($"Посылка {submission.Id} проверена. Результат: {updatedSubmission.AutomaticChecking.GetVerdict()}");
+					log.Info($"Посылка {submission.Id} проверена");
+					return;
+				}
+				if (submissionAutomaticCheckingStatus == AutomaticExerciseCheckingStatus.Error)
+				{
+					log.Warn($"Во время проверки посылки {submission.Id} произошла ошибка");
 					return;
 				}
 			}

@@ -24,7 +24,7 @@ namespace Ulearn.Web.Api.Models.Responses.Review
 		[DataMember]
 		public ShortUserInfo Author { get; set; }
 
-		public static ReviewCommentResponse BuildReviewCommentResponse(ExerciseCodeReviewComment comment)
+		public static ReviewCommentResponse Build(ExerciseCodeReviewComment comment)
 		{
 			return new ReviewCommentResponse
 			{

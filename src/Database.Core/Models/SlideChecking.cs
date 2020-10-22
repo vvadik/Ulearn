@@ -69,9 +69,9 @@ namespace Database.Models
 		Waiting = 1,
 		NotFound = 2,
 		AccessDeny = 3,
-		Error = 4,
+		Error = 4, // Не получен ответ от чеккера или результат имеет статус SandboxError
 		Running = 5,
-		RequestTimeLimit = 6
+		RequestTimeLimit = 6 // Не взято из очереди за разумное время
 	}
 
 	public class AutomaticExerciseChecking : AbstractAutomaticSlideChecking

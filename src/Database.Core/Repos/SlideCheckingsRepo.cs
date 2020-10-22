@@ -405,14 +405,14 @@ namespace Database.Repos
 			await db.SaveChangesAsync();
 		}
 
-		private async Task<ExerciseCodeReview> AddExerciseCodeReview([CanBeNull] UserExerciseSubmission submission, [CanBeNull] ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime)
+		private async Task<ExerciseCodeReview> AddExerciseCodeReview(int? submissionId, [CanBeNull] ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime)
 		{
 			var review = db.ExerciseCodeReviews.Add(new ExerciseCodeReview
 			{
 				AuthorId = userId,
 				Comment = comment,
 				ExerciseCheckingId = checking?.Id,
-				SubmissionId = submission?.Id,
+				SubmissionId = submissionId,
 				StartLine = startLine,
 				StartPosition = startPosition,
 				FinishLine = finishLine,
@@ -430,9 +430,9 @@ namespace Database.Repos
 			return AddExerciseCodeReview(null, checking, userId, startLine, startPosition, finishLine, finishPosition, comment, setAddingTime);
 		}
 
-		public Task<ExerciseCodeReview> AddExerciseCodeReview(UserExerciseSubmission submission, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime = false)
+		public Task<ExerciseCodeReview> AddExerciseCodeReview(int? submissionId, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime = false)
 		{
-			return AddExerciseCodeReview(submission, null, userId, startLine, startPosition, finishLine, finishPosition, comment, setAddingTime);
+			return AddExerciseCodeReview(submissionId, null, userId, startLine, startPosition, finishLine, finishPosition, comment, setAddingTime);
 		}
 
 		public async Task<ExerciseCodeReview> FindExerciseCodeReviewById(int reviewId)

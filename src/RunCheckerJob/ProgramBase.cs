@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using log4net;
-using Ulearn.Core;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Metrics;
 using Ulearn.Core.RunCheckerJobApi;
@@ -128,10 +127,10 @@ namespace RunCheckerJob
 			var keepAliveInterval = TimeSpan.FromSeconds(configuration.KeepAliveInterval ?? 30);
 			while (!shutdownEvent.WaitOne(0))
 			{
-				var newUnhandled = new List<RunnerSubmission>();
+				var unhandledSubmissions = new List<RunnerSubmission>();
 				try
 				{
-					newUnhandled.AddRange(client.TryGetSubmission(supportedSandboxes).Result);
+					unhandledSubmissions.AddRange(client.TryGetSubmission(supportedSandboxes).Result);
 				}
 				catch (Exception e)
 				{
@@ -140,15 +139,25 @@ namespace RunCheckerJob
 					continue;
 				}
 
-				log.Info($"Получил {newUnhandled.Count} решение(й) со следующими ID: [{string.Join(", ", newUnhandled.Select(s => s.Id))}]");
+				log.Info($"Получил {unhandledSubmissions.Count} решение(й) со следующими ID: [{string.Join(", ", unhandledSubmissions.Select(s => s.Id))}]");
 
-				if (newUnhandled.Any())
+				foreach (var submission in unhandledSubmissions)
 				{
-					var results = newUnhandled.Select(unhandled => SandboxRunnerClient.Run(unhandled)).ToList();
-					log.Info($"Результаты проверки: [{string.Join(", ", results.Select(r => r.Verdict))}]");
+					RunningResults result;
 					try
 					{
-						client.SendResults(results);
+						result = SandboxRunnerClient.Run(submission);
+						log.Info($"Результат проверки: [{result}]");
+					}
+					catch (Exception ex)
+					{
+						result = new RunningResults(submission.Id, Verdict.SandboxError, error: ex.ToString());
+						log.Error(ex);
+					}
+
+					try
+					{
+						client.SendResults(result);
 					}
 					catch (Exception e)
 					{

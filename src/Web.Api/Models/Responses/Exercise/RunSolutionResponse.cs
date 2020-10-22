@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 using JetBrains.Annotations;
 
 namespace Ulearn.Web.Api.Models.Responses.Exercise
@@ -7,38 +6,26 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 	[DataContract]
 	public class RunSolutionResponse
 	{
-		[DataMember(Name = "ignored")]
-		public bool Ignored { get; set; }
+		[DataMember]
+		public bool Ignored { get; set; }  // Сервер отказался обрабатывать решение, причина написана в Message. Cлишком частые запросы на проверку или слишком длинный код.
 
-		[DataMember(Name = "message")]
-		public string Message { get; set; }
+		[DataMember]
+		public bool IsInternalServerError; // Ошибка в проверяющей системе, подробности могут быть в Message. Если submission создан, он лежит в Submission, иначе null.
 
-		[DataMember(Name = "submissionId")]
-		public int SubmissionId { get; set; }
-
-		[DataMember(Name = "isCompileError")]
-		public bool IsCompileError;
-
-		[DataMember(Name = "isRightAnswer")]
-		public bool IsRightAnswer;
-
-		[DataMember(Name = "isInternalServerError")]
-		public bool IsInternalServerError;
-
-		[DataMember(Name = "expectedOutput")]
-		public string ExpectedOutput { get; set; }
-
-		[DataMember(Name = "actualOutput")]
-		public string ActualOutput { get; set; }
-
-		[DataMember(Name = "sentToReview")]
-		public bool SentToReview { get; set; }
+		[DataMember]
+		// В случае ошибки компиляции Submission создается не всегда. Не создается для C#-задач. Тогда текст ошибки компиляции кладется в Message.
+		// Если Submission создался, то об ошибках компиляции пишется внутри Submission -> AutomaticChecking.
+		public bool IsCompileError; 
 
 		[CanBeNull]
-		[DataMember(Name = "styleMessages")]
-		public List<ReviewInfo> StyleMessages { get; set; }
+		[DataMember]
+		public string Message { get; set; } // Сообщение от проверяющей системы в случае ошибок на сервере и в случае некоторых ошибок компиляции.
 
-		[DataMember(Name = "score")]
-		public int? Score { get; set; } // Это score не за текущую посылку, а на данный момент. Может быть null в случае ошибок
+		[CanBeNull]
+		[DataMember]
+		public SubmissionInfo Submission; // Если submission создан, он лежит в Submission, иначе null. Не создан в случае некоторых ошибок на сервере и иногда в случае ошибок компиляции.
+
+		[DataMember]
+		public int? Score { get; set; } // Если null, то не изменился. Если не null, то не обязательно изменился.
 	}
 }

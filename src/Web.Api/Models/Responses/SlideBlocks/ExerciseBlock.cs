@@ -2,7 +2,9 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
+using JetBrains.Annotations;
 using Ulearn.Common;
+using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Web.Api.Controllers.Slides;
 using Ulearn.Web.Api.Models.Responses.Exercise;
@@ -14,23 +16,34 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 	public class ExerciseBlockResponse : IApiSlideBlock
 	{
 		[DefaultValue(false)]
-		[DataMember(Name = "hide", EmitDefaultValue = false)]
+		[DataMember(EmitDefaultValue = false)]
 		public bool Hide { get; set; }
 
-		[DataMember(Name = "language")]
+		[DataMember]
 		public Language? Language { get; set; }
 
-		[DataMember(Name = "hints")]
+		[NotNull]
+		[DataMember]
 		public string[] Hints { get; set; }
 
-		[DataMember(Name = "exerciseInitialCode")]
+		[NotNull]
+		[DataMember]
 		public string ExerciseInitialCode { get; set; }
 
-		[DataMember(Name = "submissions")]
+		[CanBeNull]
+		[DataMember]
+		public string ExpectedOutput { get; set; } // В том числе может быть не пуст, но скрыт от студента, тогда и здесь null
+
+		[NotNull]
+		[DataMember]
 		public List<SubmissionInfo> Submissions { get; set; }
 
-		[DataMember(Name = "attemptsStatistics")]
+		[NotNull]
+		[DataMember]
 		public ExerciseAttemptsStatistics AttemptsStatistics { get; set; }
+
+		[DataMember]
+		public bool WaitingForManualChecking { get; set; }
 
 		public ExerciseBlockResponse(AbstractExerciseBlock exerciseBlock,
 			ExerciseSlideRendererContext context)
@@ -41,11 +54,13 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 
 			Hints = exerciseBlock.Hints.ToArray();
 			ExerciseInitialCode = exerciseBlock.ExerciseInitialCode;
+			ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : exerciseBlock.ExpectedOutput?.NormalizeEoln();
 			Language = exerciseBlock.Language;
 			AttemptsStatistics = context.AttemptsStatistics;
+			WaitingForManualChecking = context.Submissions?.FirstOrDefault()?.ManualCheckings.Any(c => !c.IsChecked) ?? false;
 			Submissions = context.Submissions
 				.EmptyIfNull()
-				.Select(s => SubmissionInfo.BuildSubmissionInfo(s, reviewId2Comments))
+				.Select(s => SubmissionInfo.Build(s, context.Slide, reviewId2Comments))
 				.ToList();
 		}
 	}

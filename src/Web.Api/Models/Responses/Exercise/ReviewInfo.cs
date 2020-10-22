@@ -37,7 +37,7 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 		[DataMember]
 		public List<ReviewCommentResponse> Comments;
 
-		public static ReviewInfo BuildReviewInfo(ExerciseCodeReview r, [CanBeNull] IEnumerable<ExerciseCodeReviewComment> comments)
+		public static ReviewInfo Build(ExerciseCodeReview r, [CanBeNull] IEnumerable<ExerciseCodeReviewComment> comments)
 		{
 			return new ReviewInfo
 			{
@@ -51,7 +51,7 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 				Comments = comments
 					.EmptyIfNull()
 					.OrderBy(c => c.AddingTime)
-					.Select(ReviewCommentResponse.BuildReviewCommentResponse)
+					.Select(ReviewCommentResponse.Build)
 					.ToList()
 			};
 		}

@@ -55,7 +55,7 @@ namespace Ulearn.Web.Api.Controllers.Runner
 			foreach (var error in result.StyleErrors)
 			{
 				await slideCheckingsRepo.AddExerciseCodeReview(
-					submission,
+					submission.Id,
 					ulearnBotUserId,
 					error.Span.StartLinePosition.Line,
 					error.Span.StartLinePosition.Character,

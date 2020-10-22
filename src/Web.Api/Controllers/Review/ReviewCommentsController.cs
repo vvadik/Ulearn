@@ -68,7 +68,7 @@ namespace Ulearn.Web.Api.Controllers.Review
 					await NotifyAboutCodeReviewComment(comment);
 			}
 
-			return ReviewCommentResponse.BuildReviewCommentResponse(comment);
+			return ReviewCommentResponse.Build(comment);
 		}
 
 		/// <summary>

@@ -73,12 +73,12 @@ namespace RunCheckerJob
 			return new List<RunnerSubmission>();
 		}
 
-		public async void SendResults(List<RunningResults> results)
+		public async void SendResults(params RunningResults[] results)
 		{
 			var uri = GetUri("runner/set-result");
 			try
 			{
-				var response = await TrySendResults(results, uri).ConfigureAwait(false);
+				var response = await TrySendResults(uri, results).ConfigureAwait(false);
 
 				if (response.IsSuccessStatusCode)
 					return;
@@ -96,7 +96,7 @@ namespace RunCheckerJob
 			}
 		}
 
-		private Task<HttpResponseMessage> TrySendResults(List<RunningResults> results, string uri)
+		private Task<HttpResponseMessage> TrySendResults(string uri, params RunningResults[] results)
 		{
 			return FuncUtils.TrySeveralTimesAsync(async () => await httpClient.PostAsJsonAsync(uri, results).ConfigureAwait(false), 3);
 		}

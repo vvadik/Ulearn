@@ -7,6 +7,7 @@ using uLearn;
 using Ulearn.Common;
 using Ulearn.Core;
 using Ulearn.Core.RunCheckerJobApi;
+using Ulearn.Core.Telegram;
 
 namespace Database.Repos
 {
@@ -42,7 +43,7 @@ namespace Database.Repos
 		Task<bool> IsCheckingSubmissionByUser(string courseId, Guid slideId, string userId, DateTime periodStart, DateTime periodFinish);
 		Task<HashSet<Guid>> GetIdOfPassedSlides(string courseId, string userId);
 		IQueryable<UserExerciseSubmission> GetAllSubmissions(int max, int skip);
-		Task<UserExerciseSubmission> FindNoTrackingSubmission(int id);
+		Task<AutomaticExerciseCheckingStatus?> GetSubmissionAutomaticCheckingStatus(int id);
 		Task<UserExerciseSubmission> FindSubmissionById(int id);
 		Task<UserExerciseSubmission> FindSubmissionById(string id);
 		Task<List<UserExerciseSubmission>> FindSubmissionsByIds(IEnumerable<int> checkingsIds);

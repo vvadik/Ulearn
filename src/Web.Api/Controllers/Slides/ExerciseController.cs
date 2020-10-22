@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 using Database;
 using Database.Models;
@@ -14,7 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Ulearn.Common;
-using Ulearn.Common.Extensions;
+using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
@@ -25,6 +24,7 @@ using Ulearn.Core.Telegram;
 using Ulearn.Web.Api.Models.Parameters.Exercise;
 using Ulearn.Web.Api.Models.Responses.Exercise;
 using Ulearn.Web.Api.Utils.LTI;
+using AutomaticExerciseCheckingStatus = Database.Models.AutomaticExerciseCheckingStatus;
 
 namespace Ulearn.Web.Api.Controllers.Slides
 {
@@ -69,13 +69,14 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			var courseId = course.Id;
 
 			/* Check that no checking solution by this user in last time */
-			var halfMinuteAgo = DateTime.Now.Subtract(TimeSpan.FromSeconds(30));
+			var delta = TimeSpan.FromSeconds(30);
+			var halfMinuteAgo = DateTime.Now.Subtract(delta);
 			if (await userSolutionsRepo.IsCheckingSubmissionByUser(courseId, slideId, User.Identity.GetUserId(), halfMinuteAgo, DateTime.MaxValue))
 			{
 				return Json(new RunSolutionResponse
 				{
 					Ignored = true,
-					Message = "Ваше решение по этой задаче уже проверяется. Дождитесь окончания проверки"
+					Message = $"Ваше решение по этой задаче уже проверяется. Дождитесь окончания проверки. Вы можете отправить новое решение через {delta.Seconds} секунд."
 				});
 			}
 
@@ -84,15 +85,15 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			{
 				return Json(new RunSolutionResponse
 				{
-					IsCompileError = true,
-					Message = "Слишком большой код"
+					Ignored = true,
+					Message = "Слишком длинный код"
 				});
 			}
 
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, courseId, CourseRoleType.Instructor);
 			var exerciseSlide = (await courseManager.FindCourseAsync(courseId))?.FindSlideById(slideId, isInstructor) as ExerciseSlide;
 			if (exerciseSlide == null)
-				return NotFound(new { status = "error", message = "Slide not found" });
+				return NotFound(new ErrorResponse("Slide not found"));
 
 			var result = await CheckSolution(
 				courseId, exerciseSlide, code, User.Identity.GetUserId(), User.Identity.Name,
@@ -135,7 +136,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				metricSender.SendCount($"exercise.{exerciseMetricId}.CompilationError");
 			if (buildResult.HasStyleErrors)
 				metricSender.SendCount($"exercise.{exerciseMetricId}.StyleViolation");
-			
+
 			if (!saveSubmissionOnCompileErrors)
 			{
 				if (buildResult.HasErrors)
@@ -146,17 +147,27 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			var dontRunSubmission = buildResult.HasErrors;
 			var submissionLanguage = exerciseBlock.Language.Value;
 			var submissionSandbox = (exerciseBlock as UniversalExerciseBlock)?.DockerImageName;
+			var status = buildResult.HasErrors
+				? AutomaticExerciseCheckingStatus.Waiting
+				: dontRunSubmission
+					? AutomaticExerciseCheckingStatus.Done
+					: AutomaticExerciseCheckingStatus.Waiting;
 			var submission = await userSolutionsRepo.AddUserExerciseSubmission(
-				courseId, exerciseSlide.Id,
-				userCode, compilationErrorMessage, null,
-				userId, "uLearn", GenerateSubmissionName(exerciseSlide, userName),
+				courseId,
+				exerciseSlide.Id,
+				userCode,
+				compilationErrorMessage,
+				null,
+				userId,
+				"uLearn",
+				GenerateSubmissionName(exerciseSlide, userName),
 				submissionLanguage,
 				submissionSandbox,
-				dontRunSubmission ? AutomaticExerciseCheckingStatus.Done : AutomaticExerciseCheckingStatus.Waiting
+				status
 			);
 
 			if (buildResult.HasErrors)
-				return new RunSolutionResponse { IsCompileError = true, Message = buildResult.ErrorMessage, SubmissionId = submission.Id };
+				return new RunSolutionResponse { Submission = SubmissionInfo.Build(submission, exerciseSlide, null) };
 
 			var hasAutomaticChecking = submissionLanguage.HasAutomaticChecking() && (submissionLanguage == Language.CSharp || exerciseBlock is UniversalExerciseBlock);
 			var executionTimeout = TimeSpan.FromSeconds(exerciseBlock.TimeLimit * 2 + 5);
@@ -172,50 +183,36 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			{
 				logger.Error($"Не смог запустить проверку решения, никто не взял его на проверку за {executionTimeout.TotalSeconds} секунд.\nКурс «{course.Title}», слайд «{exerciseSlide.Title}» ({exerciseSlide.Id})");
 				await errorsBot.PostToChannelAsync($"Не смог запустить проверку решения, никто не взял его на проверку за {executionTimeout.TotalSeconds} секунд.\nКурс «{course.Title}», слайд «{exerciseSlide.Title}» ({exerciseSlide.Id})\n\nhttps://ulearn.me/Sandbox");
+				submission = await userSolutionsRepo.FindSubmissionById(submission.Id);
+				var message = submission.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Running
+					? "Решение уже проверяется."
+					: "Решение ждет своей очереди на проверку, мы будем пытаться проверить его еще 10 минут.";
 				return new RunSolutionResponse
 				{
 					IsInternalServerError = true,
-					Message = "К сожалению, из-за большой нагрузки мы не смогли оперативно проверить ваше решение. " +
-								"Мы попробуем проверить его позже, просто подождите и обновите страницу. "
+					Message = $"К сожалению, мы не смогли оперативно проверить ваше решение. {message}. Просто подождите и обновите страницу.",
+					Submission = SubmissionInfo.Build(submission, exerciseSlide, null)
 				};
 			}
 
 			if (!waitUntilChecked)
 			{
 				metricSender.SendCount($"exercise.{exerciseMetricId}.dont_wait_result");
-				return new RunSolutionResponse { SubmissionId = submission.Id };
+				// По вовзращаемому значению нельзя отличить от случая, когда никто не взял на проверку
+				return new RunSolutionResponse { Submission = SubmissionInfo.Build(submission, exerciseSlide, null) };
 			}
 
-			/* Update the submission */
-			submission = await userSolutionsRepo.FindNoTrackingSubmission(submission.Id);
-
-			List<ExerciseCodeReview> styleErrors = null;
-			if (submission.AutomaticCheckingIsRightAnswer)
-				styleErrors = await CreateStyleErrorsReviewsForSubmission(submission, buildResult.StyleErrors, exerciseMetricId);
-
-			var automaticChecking = submission.AutomaticChecking;
-			bool sentToReview;
+			submission = await userSolutionsRepo.FindSubmissionById(submission.Id);
+			await CreateStyleErrorsReviewsForSubmission(submission.Id, buildResult.StyleErrors, exerciseMetricId);
 			if (!hasAutomaticChecking)
-				sentToReview = await SendToReviewAndUpdateScore(submission, courseManager, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender);
-			else
-				sentToReview = await slideCheckingsRepo.HasManualExerciseChecking(courseId, exerciseSlide.Id, userId, submission.Id);
-			var score = (await slideCheckingsRepo.GetExerciseSlideScoreAndPercent(courseId, exerciseSlide, userId)).Score;
+				await SendToReviewAndUpdateScore(submission, courseManager, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender);
 
+			var score = (await slideCheckingsRepo.GetExerciseSlideScoreAndPercent(courseId, exerciseSlide, userId)).Score;
 			var result = new RunSolutionResponse
 			{
-				IsCompileError = automaticChecking?.IsCompilationError ?? false,
-				Message = automaticChecking?.CompilationError.Text ?? "",
-				IsRightAnswer = submission.AutomaticCheckingIsRightAnswer,
-				ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : exerciseSlide.Exercise.ExpectedOutput?.NormalizeEoln(),
-				ActualOutput = automaticChecking?.Output.Text ?? "",
-				SentToReview = sentToReview,
-				SubmissionId = submission.Id,
-				Score = score
+				Score = score,
+				Submission = SubmissionInfo.Build(submission, exerciseSlide, null)
 			};
-			if (buildResult.HasStyleErrors)
-			{
-				result.StyleMessages = styleErrors?.Select(e => ReviewInfo.BuildReviewInfo(e, null)).ToList();
-			}
 
 			return result;
 		}
@@ -224,7 +221,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		{
 			return $"{userName}: {exerciseSlide.Info.Unit.Title} - {exerciseSlide.Title}";
 		}
-		
+
 		public static async Task<bool> SendToReviewAndUpdateScore(UserExerciseSubmission submission,
 			IWebCourseManager courseManager, ISlideCheckingsRepo slideCheckingsRepo, IGroupsRepo groupsRepo, IVisitsRepo visitsRepo, MetricSender metricSender)
 		{
@@ -269,7 +266,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			return $"{courseId.ToLower(CultureInfo.InvariantCulture)}.{exerciseSlide.Id.ToString("N").Substring(32 - 25)}.{slideTitleForMetric}";
 		}
 
-		private async Task<List<ExerciseCodeReview>> CreateStyleErrorsReviewsForSubmission(UserExerciseSubmission submission, List<SolutionStyleError> styleErrors, string exerciseMetricId)
+		private async Task<List<ExerciseCodeReview>> CreateStyleErrorsReviewsForSubmission(int? submissionId, List<SolutionStyleError> styleErrors, string exerciseMetricId)
 		{
 			var ulearnBotUserId = await usersRepo.GetUlearnBotUserId();
 			var result = new List<ExerciseCodeReview>();
@@ -279,7 +276,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 					continue;
 
 				var review = await slideCheckingsRepo.AddExerciseCodeReview(
-					submission,
+					submissionId,
 					ulearnBotUserId,
 					error.Span.StartLinePosition.Line,
 					error.Span.StartLinePosition.Character,
