@@ -596,6 +596,7 @@ namespace Database.Repos
 			return await db.AutomaticExerciseCheckings
 				.Where(c => c.CourseId == courseId && c.SlideId == slideId)
 				.Select(c => c.UserId)
+				.Distinct()
 				.CountAsync();
 		}
 
@@ -604,6 +605,7 @@ namespace Database.Repos
 			return await db.AutomaticExerciseCheckings
 				.Where(c => c.CourseId == courseId && c.SlideId == slideId && c.IsRightAnswer)
 				.Select(c => c.UserId)
+				.Distinct()
 				.CountAsync();
 		}
 	}
