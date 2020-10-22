@@ -5,4 +5,5 @@ export default {
 	image: "imagegallery",
 	spoiler: "spoiler",
 	tex: 'tex',
+	exercise: 'exercise',
 };
