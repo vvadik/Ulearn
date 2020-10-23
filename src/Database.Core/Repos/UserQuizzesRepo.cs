@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Database.Models;
 using Database.Models.Quizzes;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
@@ -16,10 +17,12 @@ namespace Database.Repos
 	public class UserQuizzesRepo : IUserQuizzesRepo
 	{
 		private readonly UlearnDb db;
+		private readonly ILogger logger;
 
-		public UserQuizzesRepo(UlearnDb db)
+		public UserQuizzesRepo(UlearnDb db, ILogger logger)
 		{
 			this.db = db;
+			this.logger = logger;
 		}
 
 		public async Task<UserQuizSubmission> FindLastUserSubmissionAsync(string courseId, Guid slideId, string userId)

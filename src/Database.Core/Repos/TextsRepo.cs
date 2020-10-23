@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using Ulearn.Common.Extensions;
 
 namespace Database.Repos
@@ -13,11 +14,13 @@ namespace Database.Repos
 	public class TextsRepo : ITextsRepo
 	{
 		private readonly UlearnDb db;
+		private readonly ILogger logger;
 		public const int MaxTextSize = 50000;
 
-		public TextsRepo(UlearnDb db)
+		public TextsRepo(UlearnDb db, ILogger logger)
 		{
 			this.db = db;
+			this.logger = logger;
 		}
 
 		public async Task<TextBlob> AddText(string text)

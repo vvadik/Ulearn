@@ -8,6 +8,7 @@ using Database.Models;
 using Database.Repos.CourseRoles;
 using Microsoft.AspNet.Identity;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using Ulearn.Core.Courses;
 
 namespace Database.Repos
@@ -16,12 +17,14 @@ namespace Database.Repos
 	public class UnitsRepo : IUnitsRepo
 	{
 		private readonly UlearnDb db;
+		private readonly ILogger logger;
 		private readonly IWebCourseManager courseManager;
 		private readonly ICourseRolesRepo courseRolesRepo;
 
-		public UnitsRepo(UlearnDb db, IWebCourseManager courseManager, ICourseRolesRepo courseRolesRepo)
+		public UnitsRepo(UlearnDb db, ILogger logger, IWebCourseManager courseManager, ICourseRolesRepo courseRolesRepo)
 		{
 			this.db = db;
+			this.logger = logger;
 			this.courseManager = courseManager;
 			this.courseRolesRepo = courseRolesRepo;
 		}

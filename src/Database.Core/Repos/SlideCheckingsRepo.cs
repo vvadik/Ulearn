@@ -8,6 +8,7 @@ using Database.Models.Quizzes;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides.Exercises;
 
@@ -16,11 +17,13 @@ namespace Database.Repos
 	public class SlideCheckingsRepo : ISlideCheckingsRepo
 	{
 		private readonly UlearnDb db;
+		private readonly ILogger logger;
 		private readonly Lazy<IVisitsRepo> visitsRepo;
 
-		public SlideCheckingsRepo(UlearnDb db, IServiceProvider serviceProvider)
+		public SlideCheckingsRepo(UlearnDb db, ILogger logger, IServiceProvider serviceProvider)
 		{
 			this.db = db;
+			this.logger = logger;
 			visitsRepo = new Lazy<IVisitsRepo>(serviceProvider.GetRequiredService<IVisitsRepo>);
 		}
 
