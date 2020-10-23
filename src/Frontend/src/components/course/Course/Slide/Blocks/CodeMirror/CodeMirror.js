@@ -15,9 +15,14 @@ import { getDateDDMMYY } from "src/utils/getMoment";
 import { isMobile } from "src/utils/getDeviceType";
 import api from "src/api";
 
-import 'codemirror/lib/codemirror';
+import CodeMirrorBase from 'codemirror/lib/codemirror';
 import 'codemirror/addon/edit/matchbrackets';
+import 'codemirror/addon/hint/show-hint';
+import 'codemirror/addon/hint/show-hint.css';
+import 'codemirror/addon/hint/javascript-hint';
+import 'codemirror/addon/hint/anyword-hint';
 import 'codemirror/theme/darcula.css';
+import './CodeMirrorAutocompleteExtension';
 
 import styles from './CodeMirror.less';
 
@@ -30,22 +35,39 @@ class CodeMirror extends React.Component {
 		const { exerciseInitialCode, submissions, code, } = props;
 		const isExercise = !!submissions;
 
-		this.state = {
+		let state = {
+			isExercise,
 			value: exerciseInitialCode || code,
 			valueChanged: false,
+		}
+
+		if(isExercise) {
+			state = { ...state, ...this.getStateForControlled(submissions) }
+		}
+
+		this.state = state;
+	}
+
+	getStateForControlled = (submissions) => {
+		return {
 			showedHintsCount: 0,
 			showAcceptedSolutions: false,
 			showAcceptedSolutionsWarning: false,
-			isExercise,
+
 			currentSubmission: null,
-			isEditable: isExercise && submissions.length === 0,
+			isEditable: submissions.length === 0,
 			submitResults: null,
 			showSubmitOutput: false,
 			reviewTextMarkers: [],
 			selectedReviewIndex: -1,
 			exerciseCodeDoc: null,
 			congratsModalOpened: false,
-		};
+			selfChecks: texts.checkups.self.checks.map((ch, i) => ({
+				text: ch,
+				checked: false,
+				onClick: () => this.selfCheckBoxClicked(i)
+			})),
+		}
 	}
 
 	componentDidMount() {
@@ -56,6 +78,8 @@ class CodeMirror extends React.Component {
 			return;
 		}
 
+		this.overrideCodeMirrorAutocomplete();
+
 		if(submissions.length > 0) {
 			this.loadSubmissionToState(submissions[submissions.length - 1]);
 		} else {
@@ -63,6 +87,17 @@ class CodeMirror extends React.Component {
 		}
 
 		window.addEventListener("beforeunload", this.saveCodeDraftToCache);
+	}
+
+	overrideCodeMirrorAutocomplete = () => {
+		const { language, } = this.props;
+
+		CodeMirrorBase.commands.autocomplete = function (cm) {
+			const hint = CodeMirrorBase.hint[language.toLowerCase()];
+			if(hint) {
+				cm.showHint({ hint: hint });
+			}
+		};
 	}
 
 	saveCodeDraftToCache = () => {
@@ -91,15 +126,15 @@ class CodeMirror extends React.Component {
 			tabSize: 4,
 			indentUnit: 4,
 			indentWithTabs: true,
-			/*			extraKeys: {
-							ctrlSpace: "autocomplete",
-							".": function (cm) {
-								setTimeout(function () {
-									cm.execCommand("autocomplete");
-								}, 100);
-								return CodeMirror.Pass;
-							}
-						},*/
+			extraKeys: {
+				ctrlSpace: "autocomplete",
+				".": function (cm) {
+					setTimeout(function () {
+						cm.execCommand("autocomplete");
+					}, 100);
+					cm.replaceSelection('.');
+				}
+			},
 		};
 
 		return (
@@ -250,6 +285,7 @@ class CodeMirror extends React.Component {
 			value: submission.code,
 			isEditable: false,
 			submitResults: null,
+			valueChanged: false,
 		}, () => this.setState({
 			currentSubmission: submission,
 			reviewTextMarkers: this.getTextMarkers(submission.reviews),
@@ -328,13 +364,27 @@ class CodeMirror extends React.Component {
 	}
 
 	renderSelfCheckBoxes = () => {
+		const { selfChecks } = this.state;
+
 		return (
-			texts.checkups.self.checks.map((ch, i) =>
+			selfChecks.map(({ text, checked, onClick, }, i) =>
 				<li key={ i }>
-					<Checkbox/> <span className={ styles.selfCheckText }>{ ch }</span>
+					<Checkbox checked={ checked } onClick={ onClick }/> <span
+					className={ styles.selfCheckText }>{ text }</span>
 				</li>
 			)
 		);
+	}
+
+	selfCheckBoxClicked = (i) => {
+		const { selfChecks } = this.state;
+		const newSelfChecks = [...selfChecks];
+
+		newSelfChecks[i].checked = !newSelfChecks[i].checked;
+
+		this.setState({
+			selfChecks: newSelfChecks,
+		});
 	}
 
 	renderControls = () => {
@@ -661,7 +711,7 @@ class CodeMirror extends React.Component {
 
 		this.setState({
 			value: exerciseInitialCode,
-			valueChanged: false,
+			valueChanged: true,
 			isEditable: true,
 			currentSubmission: null,
 			showSubmitOutput: null,
