@@ -19,7 +19,8 @@ namespace Database.Repos
 			string userId, string executionServiceName, string displayName,
 			Language language,
 			string sandbox,
-			AutomaticExerciseCheckingStatus status = AutomaticExerciseCheckingStatus.Waiting);
+			bool hasAutomaticChecking,
+			AutomaticExerciseCheckingStatus? status = AutomaticExerciseCheckingStatus.Waiting);
 
 		Task RemoveSubmission(UserExerciseSubmission submission);
 

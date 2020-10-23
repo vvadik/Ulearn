@@ -46,7 +46,8 @@ namespace Database.Repos
 			string userId, string executionServiceName, string displayName,
 			Language language,
 			string sandbox,
-			AutomaticExerciseCheckingStatus status = AutomaticExerciseCheckingStatus.Waiting)
+			bool hasAutomaticChecking,
+			AutomaticExerciseCheckingStatus? status = AutomaticExerciseCheckingStatus.Waiting)
 		{
 			if (string.IsNullOrWhiteSpace(code))
 				code = "// no code";
@@ -69,7 +70,7 @@ namespace Database.Repos
 					OutputHash = outputHash,
 					ExecutionServiceName = executionServiceName,
 					DisplayName = displayName,
-					Status = status,
+					Status = status.Value,
 					IsRightAnswer = false,
 				};
 

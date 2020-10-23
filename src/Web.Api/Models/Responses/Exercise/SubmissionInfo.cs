@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using Database.Models;
-using Database.Repos;
+using Database.Repos.Users;
 using JetBrains.Annotations;
-using Ulearn.Core.Courses.Slides.Exercises;
 
 namespace Ulearn.Web.Api.Models.Responses.Exercise
 {
@@ -22,10 +21,6 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 		[DataMember]
 		public DateTime Timestamp;
 
-		[NotNull]
-		[DataMember]
-		public List<ReviewInfo> Reviews;
-
 		[CanBeNull]
 		[DataMember]
 		public ExerciseAutomaticCheckingResponse AutomaticChecking; // null если задача не имеет автоматических тестов, это не отменяет возможности ревью.
@@ -33,11 +28,11 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 		[DataMember]
 		public bool ManualCheckingPassed;
 
+		[NotNull]
 		[DataMember]
-		public int? ManualCheckingPercent; // Процент от максимального балла, поставленный преподавателем.
+		public List<ReviewInfo> ManualCheckingReviews;
 
 		public static SubmissionInfo Build(UserExerciseSubmission submission,
-			ExerciseSlide slide,
 			[CanBeNull] Dictionary<int, IEnumerable<ExerciseCodeReviewComment>> reviewId2Comments)
 		{
 			var reviews = submission
@@ -45,19 +40,20 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 				.Select(r =>
 				{
 					var comments = reviewId2Comments?.GetValueOrDefault(r.Id);
-					return ReviewInfo.Build(r, comments);
+					var isUlearnBot = r.Author.UserName == UsersRepo.UlearnBotUsername;
+					return ReviewInfo.Build(r, comments, isUlearnBot);
 				})
 				.ToList();
-			var automaticChecking = submission.AutomaticChecking == null ? null : ExerciseAutomaticCheckingResponse.Build(submission.AutomaticChecking);
+			var automaticChecking = submission.AutomaticChecking == null
+				? null : ExerciseAutomaticCheckingResponse.Build(submission.AutomaticChecking, reviews.Where(r => r.Author == null).ToList());
 			return new SubmissionInfo
 			{
 				Id = submission.Id,
 				Code = submission.SolutionCode.Text,
 				Timestamp = submission.Timestamp,
-				Reviews = reviews,
 				AutomaticChecking = automaticChecking,
 				ManualCheckingPassed = submission.ManualCheckings.Any(mc => mc.IsChecked),
-				ManualCheckingPercent = SlideCheckingsRepo.GetExerciseSubmissionManualCheckingsScoreAndPercent(submission.ManualCheckings, slide).Percent
+				ManualCheckingReviews =  reviews.Where(r => r.Author != null).ToList()
 			};
 		}
 	}

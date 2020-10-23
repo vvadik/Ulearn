@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Database;
 using Database.Models;
@@ -73,9 +74,8 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			var halfMinuteAgo = DateTime.Now.Subtract(delta);
 			if (await userSolutionsRepo.IsCheckingSubmissionByUser(courseId, slideId, User.Identity.GetUserId(), halfMinuteAgo, DateTime.MaxValue))
 			{
-				return Json(new RunSolutionResponse
+				return Json(new RunSolutionResponse(SolutionRunStatus.Ignored)
 				{
-					Ignored = true,
 					Message = $"Ваше решение по этой задаче уже проверяется. Дождитесь окончания проверки. Вы можете отправить новое решение через {delta.Seconds} секунд."
 				});
 			}
@@ -83,9 +83,8 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			var code = parameters.Solution;
 			if (code.Length > TextsRepo.MaxTextSize)
 			{
-				return Json(new RunSolutionResponse
+				return Json(new RunSolutionResponse(SolutionRunStatus.Ignored)
 				{
-					Ignored = true,
 					Message = "Слишком длинный код"
 				});
 			}
@@ -110,9 +109,8 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				catch (Exception e)
 				{
 					logger.Error("Мы не смогли отправить баллы на вашу образовательную платформу", e);
-					return Json(new RunSolutionResponse
+					return Json(new RunSolutionResponse(SolutionRunStatus.InternalServerError)
 					{
-						IsInternalServerError = true,
 						Message = "Мы не смогли отправить баллы на вашу образовательную платформу. Пожалуйста, обновите страницу — мы попробуем сделать это ещё раз."
 					});
 				}
@@ -140,18 +138,18 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			if (!saveSubmissionOnCompileErrors)
 			{
 				if (buildResult.HasErrors)
-					return new RunSolutionResponse { IsCompileError = true, Message = buildResult.ErrorMessage };
+					return new RunSolutionResponse(SolutionRunStatus.CompileError) { Message = buildResult.ErrorMessage };
 			}
 
 			var compilationErrorMessage = buildResult.HasErrors ? buildResult.ErrorMessage : null;
-			var dontRunSubmission = buildResult.HasErrors;
 			var submissionLanguage = exerciseBlock.Language.Value;
 			var submissionSandbox = (exerciseBlock as UniversalExerciseBlock)?.DockerImageName;
-			var status = buildResult.HasErrors
-				? AutomaticExerciseCheckingStatus.Waiting
-				: dontRunSubmission
+			var hasAutomaticChecking = submissionLanguage.HasAutomaticChecking() && (submissionLanguage == Language.CSharp || exerciseBlock is UniversalExerciseBlock);
+			var automaticCheckingStatus = hasAutomaticChecking
+				? buildResult.HasErrors
 					? AutomaticExerciseCheckingStatus.Done
-					: AutomaticExerciseCheckingStatus.Waiting;
+					: AutomaticExerciseCheckingStatus.Waiting
+				: (AutomaticExerciseCheckingStatus?) null;
 			var submission = await userSolutionsRepo.AddUserExerciseSubmission(
 				courseId,
 				exerciseSlide.Id,
@@ -163,13 +161,13 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				GenerateSubmissionName(exerciseSlide, userName),
 				submissionLanguage,
 				submissionSandbox,
-				status
+				hasAutomaticChecking,
+				automaticCheckingStatus
 			);
 
 			if (buildResult.HasErrors)
-				return new RunSolutionResponse { Submission = SubmissionInfo.Build(submission, exerciseSlide, null) };
+				return new RunSolutionResponse(SolutionRunStatus.Success) { Submission = SubmissionInfo.Build(submission, null) };
 
-			var hasAutomaticChecking = submissionLanguage.HasAutomaticChecking() && (submissionLanguage == Language.CSharp || exerciseBlock is UniversalExerciseBlock);
 			var executionTimeout = TimeSpan.FromSeconds(exerciseBlock.TimeLimit * 2 + 5);
 			try
 			{
@@ -187,11 +185,10 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				var message = submission.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Running
 					? "Решение уже проверяется."
 					: "Решение ждет своей очереди на проверку, мы будем пытаться проверить его еще 10 минут.";
-				return new RunSolutionResponse
+				return new RunSolutionResponse(SolutionRunStatus.SubmissionCheckingTimeout)
 				{
-					IsInternalServerError = true,
 					Message = $"К сожалению, мы не смогли оперативно проверить ваше решение. {message}. Просто подождите и обновите страницу.",
-					Submission = SubmissionInfo.Build(submission, exerciseSlide, null)
+					Submission = SubmissionInfo.Build(submission, null)
 				};
 			}
 
@@ -199,7 +196,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			{
 				metricSender.SendCount($"exercise.{exerciseMetricId}.dont_wait_result");
 				// По вовзращаемому значению нельзя отличить от случая, когда никто не взял на проверку
-				return new RunSolutionResponse { Submission = SubmissionInfo.Build(submission, exerciseSlide, null) };
+				return new RunSolutionResponse(SolutionRunStatus.Success) { Submission = SubmissionInfo.Build(submission, null) };
 			}
 
 			submission = await userSolutionsRepo.FindSubmissionById(submission.Id);
@@ -208,10 +205,12 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				await SendToReviewAndUpdateScore(submission, courseManager, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender);
 
 			var score = (await slideCheckingsRepo.GetExerciseSlideScoreAndPercent(courseId, exerciseSlide, userId)).Score;
-			var result = new RunSolutionResponse
+			var waitingForManualChecking = submission.ManualCheckings.Any(c => !c.IsChecked) ? true : (bool?)null;
+			var result = new RunSolutionResponse(SolutionRunStatus.Success)
 			{
 				Score = score,
-				Submission = SubmissionInfo.Build(submission, exerciseSlide, null)
+				WaitingForManualChecking = waitingForManualChecking,
+				Submission = SubmissionInfo.Build(submission, null)
 			};
 
 			return result;

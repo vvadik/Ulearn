@@ -60,7 +60,7 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 			WaitingForManualChecking = context.Submissions?.FirstOrDefault()?.ManualCheckings.Any(c => !c.IsChecked) ?? false;
 			Submissions = context.Submissions
 				.EmptyIfNull()
-				.Select(s => SubmissionInfo.Build(s, context.Slide, reviewId2Comments))
+				.Select(s => SubmissionInfo.Build(s, reviewId2Comments))
 				.ToList();
 		}
 	}

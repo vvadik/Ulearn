@@ -13,9 +13,6 @@ namespace Ulearn.Web.Api.Models.Responses.Review
 		public int Id { get; set; }
 
 		[DataMember]
-		public int ReviewId { get; set; }
-
-		[DataMember]
 		public string Text { get; set; }
 
 		[DataMember]
@@ -29,7 +26,6 @@ namespace Ulearn.Web.Api.Models.Responses.Review
 			return new ReviewCommentResponse
 			{
 				Id = comment.Id,
-				ReviewId = comment.ReviewId,
 				Text = comment.Text,
 				PublishTime = comment.AddingTime,
 				Author = BaseController.BuildShortUserInfo(comment.Author)

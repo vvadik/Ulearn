@@ -59,7 +59,7 @@ namespace Database.Repos
 			var submission = await userSolutionsRepo.AddUserExerciseSubmission(
 				courseId, slideId, code, null, null, watcher.UserId,
 				"uLearn", $"XQueue watcher {watcher.Name}",
-				Language.CSharp, null
+				Language.CSharp, null, true
 			);
 			db.XQueueExerciseSubmissions.Add(new XQueueExerciseSubmission
 			{

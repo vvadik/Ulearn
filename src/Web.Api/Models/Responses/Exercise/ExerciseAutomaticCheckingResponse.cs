@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Database.Models;
 using JetBrains.Annotations;
 
@@ -10,7 +11,7 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 		Done, // Проверена
 		Waiting, // В очереди на проверку
 		Running, // Проверяется
-		WaitingTimeLimit, // Задача выкинута из очереди, потому что её никто не взял на проверку
+		WaitingTimeLimitExceeded // Задача выкинута из очереди, потому что её никто не взял на проверку
 	}
 
 	public enum AutomaticExerciseCheckingResult
@@ -41,7 +42,11 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 		[DataMember]
 		public float? Points;
 
-		public static ExerciseAutomaticCheckingResponse Build([NotNull] AutomaticExerciseChecking checking)
+		[NotNull]
+		[DataMember]
+		public List<ReviewInfo> Reviews;
+
+		public static ExerciseAutomaticCheckingResponse Build([NotNull] AutomaticExerciseChecking checking, [NotNull]List<ReviewInfo> botReviews)
 		{
 			var result = new ExerciseAutomaticCheckingResponse
 			{
@@ -60,6 +65,7 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 			result.Result = checking.IsRightAnswer ? AutomaticExerciseCheckingResult.RightAnswer : AutomaticExerciseCheckingResult.WrongAnswer;
 			result.Output = checking.Output?.Text;
 			result.Points = checking.Points;
+			result.Reviews = botReviews;
 			return result;
 		}
 
@@ -70,7 +76,7 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 				AutomaticExerciseCheckingStatus.Done => AutomaticExerciseCheckingProcessStatus.Done,
 				AutomaticExerciseCheckingStatus.Waiting => AutomaticExerciseCheckingProcessStatus.Waiting,
 				AutomaticExerciseCheckingStatus.Running => AutomaticExerciseCheckingProcessStatus.Running,
-				AutomaticExerciseCheckingStatus.RequestTimeLimit => AutomaticExerciseCheckingProcessStatus.WaitingTimeLimit,
+				AutomaticExerciseCheckingStatus.RequestTimeLimit => AutomaticExerciseCheckingProcessStatus.WaitingTimeLimitExceeded,
 				AutomaticExerciseCheckingStatus.Error => AutomaticExerciseCheckingProcessStatus.ServerError,
 				_ => AutomaticExerciseCheckingProcessStatus.ServerError
 			};

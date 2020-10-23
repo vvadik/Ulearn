@@ -164,7 +164,6 @@ namespace Ulearn.Web.Api.Controllers.Slides
 
 			var exerciseSlideRendererContext = new ExerciseSlideRendererContext
 			{
-				Slide = context.Slide as ExerciseSlide,
 				Submissions = submissions,
 				CodeReviewComments = codeReviewComments,
 				AttemptsStatistics = new ExerciseAttemptsStatistics

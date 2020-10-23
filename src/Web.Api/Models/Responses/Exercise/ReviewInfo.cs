@@ -13,8 +13,9 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 	[DataContract]
 	public class ReviewInfo
 	{
+		[CanBeNull]
 		[DataMember]
-		public ShortUserInfo Author;
+		public ShortUserInfo Author; // null для ulearn bot
 
 		[DataMember]
 		public int StartLine;
@@ -37,13 +38,13 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 		[DataMember]
 		public List<ReviewCommentResponse> Comments;
 
-		public static ReviewInfo Build(ExerciseCodeReview r, [CanBeNull] IEnumerable<ExerciseCodeReviewComment> comments)
+		public static ReviewInfo Build(ExerciseCodeReview r, [CanBeNull] IEnumerable<ExerciseCodeReviewComment> comments, bool isUlearnBot)
 		{
 			return new ReviewInfo
 			{
 				Comment = r.Comment,
-				Author = BaseController.BuildShortUserInfo(r.Author),
-				AddingTime = r.AddingTime > DateTime.UnixEpoch ? r.AddingTime : (DateTime?)null,
+				Author = isUlearnBot ? null : BaseController.BuildShortUserInfo(r.Author),
+				AddingTime = isUlearnBot || r.AddingTime <= DateTime.UnixEpoch ? (DateTime?)null : r.AddingTime,
 				FinishLine = r.FinishLine,
 				FinishPosition = r.FinishPosition,
 				StartLine = r.StartLine,
