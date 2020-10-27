@@ -159,6 +159,19 @@ namespace Database.Repos
 				.ToDictionary(g => g.Key, g => g.ToDictionary(k => k.SlideId, k=> k.Value));
 		}
 
+		public async Task<Dictionary<string, HashSet<Guid>>> GetSkippedSlides(string courseId, IEnumerable<string> userIds, IEnumerable<Guid> slidesIds = null)
+		{
+			var visits = db.Visits.Where(v => v.CourseId == courseId && userIds.Contains(v.UserId));
+			if (slidesIds != null)
+				visits = visits.Where(v => slidesIds.Contains(v.SlideId));
+			return (await visits
+					.Where(s => s.IsSkipped)
+					.Select(v => new { v.UserId, v.SlideId })
+					.ToListAsync())
+				.GroupBy(v => v.UserId)
+				.ToDictionary(g => g.Key, g => g.Select(v => v.SlideId).ToHashSet());
+		}
+
 		public async Task<List<Guid>> GetSlidesWithUsersManualChecking(string courseId, string userId)
 		{
 			return await db.Visits.Where(v => v.CourseId == courseId && v.UserId == userId)

@@ -30,6 +30,9 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 		[DataMember]
 		public string ExerciseInitialCode { get; set; }
 
+		[DataMember]
+		public bool HideSolutions { get; set; }
+
 		[CanBeNull]
 		[DataMember]
 		public string ExpectedOutput { get; set; } // В том числе может быть не пуст, но скрыт от студента, тогда и здесь null
@@ -54,6 +57,7 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 
 			Hints = exerciseBlock.Hints.ToArray();
 			ExerciseInitialCode = exerciseBlock.ExerciseInitialCode;
+			HideSolutions = exerciseBlock.HideShowSolutionsButton;
 			ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : exerciseBlock.ExpectedOutput?.NormalizeEoln();
 			Language = exerciseBlock.Language;
 			AttemptsStatistics = context.AttemptsStatistics;
