@@ -1,9 +1,6 @@
 import React from "react";
 
-import { Link } from "react-router-dom";
-
 import getPluralForm from "src/utils/getPluralForm";
-import { accountPath } from "src/consts/routes";
 
 import moment from "moment";
 
@@ -98,8 +95,9 @@ const texts = {
 			buildStatistics: (attemptedUsersCount, usersWithRightAnswerCount, lastSuccessAttemptDate) =>
 				<React.Fragment>
 					За всё время:<br/>
-					{ attemptedUsersCount } студентов пробовали решить<br/>
-					задачу, решили – { usersWithRightAnswerCount } <br/>
+					{ attemptedUsersCount } { getPluralForm(attemptedUsersCount, 'студент пробовал', 'студента пробовали', 'студентов пробовали') } решить<br/>
+					задачу, { getPluralForm(attemptedUsersCount, 'решил', 'решили', 'решили') } { usersWithRightAnswerCount }
+					<br/>
 					<br/>
 					Последний раз решили { moment(lastSuccessAttemptDate).startOf("minute").fromNow() }
 				</React.Fragment>,
