@@ -48,8 +48,11 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 		[DataMember]
 		public bool WaitingForManualChecking { get; set; }
 
-		public ExerciseBlockResponse(AbstractExerciseBlock exerciseBlock,
-			ExerciseSlideRendererContext context)
+		[CanBeNull]
+		[DataMember]
+		public string CorrectSolution { get; set; } // Устанавливается, если перподаватель и у задачи есть авторское решение
+
+		public ExerciseBlockResponse(AbstractExerciseBlock exerciseBlock, ExerciseSlideRendererContext context)
 		{
 			var reviewId2Comments = context.CodeReviewComments
 				?.GroupBy(c => c.ReviewId)
@@ -62,10 +65,24 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 			Language = exerciseBlock.Language;
 			AttemptsStatistics = context.AttemptsStatistics;
 			WaitingForManualChecking = context.Submissions?.FirstOrDefault()?.ManualCheckings.Any(c => !c.IsChecked) ?? false;
+			CorrectSolution = GetSolution(context.IsInstructor, exerciseBlock);
 			Submissions = context.Submissions
 				.EmptyIfNull()
 				.Select(s => SubmissionInfo.Build(s, reviewId2Comments))
 				.ToList();
+		}
+
+		[CanBeNull]
+		private static string GetSolution(bool isInstructor, AbstractExerciseBlock exerciseBlock)
+		{
+			if (!isInstructor)
+				return null;
+			return exerciseBlock switch
+			{
+				UniversalExerciseBlock u => u.GetCorrectSolution(),
+				CsProjectExerciseBlock c => c.CorrectSolutionFile.Exists ? c.CorrectSolutionFile.ContentAsUtf8() : null,
+				_ => null
+			};
 		}
 	}
 }

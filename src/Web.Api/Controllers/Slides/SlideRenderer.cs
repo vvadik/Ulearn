@@ -164,6 +164,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 
 			var exerciseSlideRendererContext = new ExerciseSlideRendererContext
 			{
+				IsInstructor = !context.RemoveHiddenBlocks,
 				Submissions = submissions,
 				CodeReviewComments = codeReviewComments,
 				AttemptsStatistics = new ExerciseAttemptsStatistics

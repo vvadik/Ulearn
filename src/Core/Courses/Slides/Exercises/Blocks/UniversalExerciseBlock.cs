@@ -156,7 +156,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			if (correctSolution != null)
 			{
 				yield return new MarkdownBlock("### Решение") { Hide = true };
-				yield return new CodeBlock(GetCorrectSolution(), Language) { Hide = true };
+				yield return new CodeBlock(correctSolution, Language) { Hide = true };
 			}
 		}
 
