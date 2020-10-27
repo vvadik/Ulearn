@@ -196,7 +196,7 @@ class CodeMirror extends React.Component {
 					{ exerciseCodeDoc && isReview && this.renderReview() }
 				</div>
 				{ !isEditable && this.renderEditButton() }
-				{ !isEditable && this.renderOverview() }
+				{/* TODO not included in current release !isEditable && currentSubmission && this.renderOverview()*/ }
 				{ this.renderControls() }
 				{ submitResults && submitResults.message && this.renderOutput() }
 				{ showedHintsCount > 0 && this.renderHints() }
