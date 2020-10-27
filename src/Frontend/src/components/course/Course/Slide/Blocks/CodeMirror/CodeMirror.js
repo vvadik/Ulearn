@@ -55,10 +55,10 @@ class CodeMirror extends React.Component {
 			showAcceptedSolutionsWarning: false,
 
 			currentSubmission: null,
+			currentReviews: [],
 			isEditable: submissions.length === 0,
 			submitResults: null,
 			showSubmitOutput: false,
-			reviewTextMarkers: [],
 			selectedReviewIndex: -1,
 			exerciseCodeDoc: null,
 			congratsModalOpened: false,
@@ -153,20 +153,10 @@ class CodeMirror extends React.Component {
 	}
 
 	resetSelectedReviewTextMarker = () => {
-		const { selectedReviewIndex, reviewTextMarkers, isEditable, } = this.state;
+		const { selectedReviewIndex, isEditable, } = this.state;
 
 		if(!isEditable && selectedReviewIndex >= 0) {
-			const newReviewTextMarkers = [...reviewTextMarkers];
-			const reviewTextMarker = newReviewTextMarkers[selectedReviewIndex];
-
-			const { from, to, } = reviewTextMarker.marker.find();
-			reviewTextMarker.marker.clear();
-			reviewTextMarker.marker = this.highlightLine(to.line, to.ch, from.line, from.ch, styles.reviewCode);
-
-			this.setState({
-				reviewTextMarkers: newReviewTextMarkers,
-				selectedReviewIndex: -1,
-			});
+			this.highlightReview(-1);
 		}
 	}
 
@@ -174,10 +164,11 @@ class CodeMirror extends React.Component {
 		const {
 			value, showedHintsCount, showAcceptedSolutions, currentSubmission,
 			isEditable, submitResults, exerciseCodeDoc, congratsModalOpened,
+			currentReviews,
 		} = this.state;
 		const { submissions, } = this.props;
 
-		const isReview = !isEditable && currentSubmission?.reviews.length > 0;
+		const isReview = !isEditable && currentReviews.length > 0;
 
 		const wrapperClassName = classNames(
 			styles.exercise,
@@ -192,7 +183,7 @@ class CodeMirror extends React.Component {
 		return (
 			<React.Fragment>
 				{ submissions.length !== 0 && this.renderSubmissionsDropdown() }
-				{ !isEditable && currentSubmission && this.renderSuccessHeader() }
+				{ !isEditable && currentSubmission && this.renderHeader() }
 				<div className={ wrapperClassName }>
 					<Controlled
 						onBeforeChange={ this.onBeforeChange }
@@ -251,16 +242,9 @@ class CodeMirror extends React.Component {
 		)
 	}
 
-	renderSuccessHeader = () => {
+	renderHeader = () => {
 		const { currentSubmission, } = this.state;
 
-		if(currentSubmission?.reviews.length > 0) {
-			return (
-				<div className={ styles.reviewHeader }>
-					{ texts.mocks.headerSuccess }
-				</div>
-			);
-		}
 		return (
 			<div className={ styles.header }>
 				{ texts.headers.allTestPassedHeader }
@@ -288,27 +272,37 @@ class CodeMirror extends React.Component {
 			valueChanged: false,
 		}, () => this.setState({
 			currentSubmission: submission,
-			reviewTextMarkers: this.getTextMarkers(submission.reviews),
+			currentReviews: this.getReviewsWithTextMarkers(submission.automaticChecking.reviews, submission.manualCheckingReviews),
 		}));
 	}
 
-	getTextMarkers = (reviews) => {
-		const textMarkers = [];
+	getReviewsWithTextMarkers = (autoReviews, manualReviews) => {
+		const reviewsWithTextMarkers = [];
 
-		for (const [i, { finishLine, finishPosition, startLine, startPosition }] of reviews.entries()) {
-			const textMarker = this.highlightLine(finishLine, finishPosition, startLine, startPosition, styles.reviewCode);
+		const addReviewsToArray = (reviews, array) => {
+			for (const review of reviews) {
+				const { finishLine, finishPosition, startLine, startPosition } = review;
+				const textMarker = this.highlightLine(finishLine, finishPosition, startLine, startPosition, styles.reviewCode);
 
-			textMarkers.push({
-				marker: textMarker,
-				index: i,
-			});
+				array.push({
+					marker: textMarker,
+					...review
+				});
+			}
 		}
 
-		return textMarkers;
+		if(autoReviews) {
+			addReviewsToArray(autoReviews, reviewsWithTextMarkers);
+		}
+
+		if(manualReviews) {
+			addReviewsToArray(manualReviews, reviewsWithTextMarkers);
+		}
+
+		return reviewsWithTextMarkers;
 	}
 
 	renderOverview = () => {
-		const botCommentsLength = 1;
 		const { currentSubmission } = this.state;
 
 		const checkups = [
@@ -326,19 +320,19 @@ class CodeMirror extends React.Component {
 			},
 		];
 
-		if(botCommentsLength !== 0) {
+		if(currentSubmission.automaticChecking.reviews !== 0) {
 			checkups.unshift(
 				{
 					title: texts.checkups.bot.title,
 					content:
 						<span className={ styles.overviewComment }>
-						{ texts.checkups.bot.countBotComments(botCommentsLength) }
+						{ texts.checkups.bot.countBotComments(currentSubmission.automaticChecking.reviews) }
 							<a onClick={ this.showFirstBotComment }>{ texts.showReview }</a>
 					</span>
 				});
 		}
 
-		if(currentSubmission && currentSubmission.reviews && currentSubmission.reviews.length !== 0) {
+		if(currentSubmission.manualCheckingReviews.length !== 0) {
 			const reviewsCount = currentSubmission.reviews.length;
 
 			checkups.unshift({
@@ -575,10 +569,10 @@ class CodeMirror extends React.Component {
 	}
 
 	renderComments = () => {
-		const { currentSubmission, } = this.state;
+		const { currentReviews, } = this.state;
 		const comments = [];
 
-		for (const [i, review] of currentSubmission.reviews.entries()) {
+		for (const [i, review] of currentReviews.entries()) {
 			const comment = this.renderComment(review, i);
 			comments.push(comment);
 		}
@@ -593,13 +587,17 @@ class CodeMirror extends React.Component {
 		//const minHeight = exerciseCodeDoc.cm.charCoords({ line: startLine, ch: startPosition }, 'local').top;
 		//const offset = Math.max(5, minHeight,);
 		//TODO style={ { marginTop: `${ offset }px` } }
+		if(!author) {
+			author = { visibleName: 'Ulearn bot', id: 'bot', };
+		}
+
 		return (
 			<div key={ i } className={ className }
 				 onClick={ (e) => this.selectComment(e, i) }>
 				<div className={ styles.authorWrapper }>
 					<Avatar user={ author } size="big" className={ styles.commentAvatar }/>
 					<div className={ styles.authorCredentialsWrapper }>
-						{ `${ author.firstName } ${ author.lastName }` }
+						{ author.visibleName }
 						<span className={ styles.commentLine }>{ `строка ${ startLine + 1 }` }</span>
 						{ addingTime && <p className={ styles.addingTime }>{ getDateDDMMYY(addingTime) }</p> }
 					</div>
@@ -618,27 +616,35 @@ class CodeMirror extends React.Component {
 	}
 
 	selectComment = (e, i) => {
-		const { isEditable } = this.state;
+		const { isEditable, selectedReviewIndex, } = this.state;
 		e.stopPropagation();
 
-		if(!isEditable) {
+		if(!isEditable && selectedReviewIndex !== i) {
 			this.highlightReview(i);
 		}
 	}
 
 	highlightReview = (index) => {
-		const { reviewTextMarkers, } = this.state;
-		const newReviewTextMarkers = [...reviewTextMarkers];
-		const reviewTextMarker = newReviewTextMarkers[index];
+		const { currentReviews, selectedReviewIndex, } = this.state;
+		const newCurrentReviews = [...currentReviews];
 
-		this.resetSelectedReviewTextMarker();
+		if(selectedReviewIndex >= 0) {
+			const selectedReview = newCurrentReviews[selectedReviewIndex];
 
-		const { from, to, } = reviewTextMarker.marker.find();
-		reviewTextMarker.marker.clear();
-		reviewTextMarker.marker = this.highlightLine(to.line, to.ch, from.line, from.ch, styles.selectedReviewCode)
+			const { from, to, } = selectedReview.marker.find();
+			selectedReview.marker.clear();
+			selectedReview.marker = this.highlightLine(to.line, to.ch, from.line, from.ch, styles.reviewCode);
+		}
+
+		if(index >= 0) {
+			const review = newCurrentReviews[index];
+			const { from, to, } = review.marker.find();
+			review.marker.clear();
+			review.marker = this.highlightLine(to.line, to.ch, from.line, from.ch, styles.selectedReviewCode);
+		}
 
 		this.setState({
-			reviewTextMarkers: newReviewTextMarkers,
+			currentReviews: newCurrentReviews,
 			selectedReviewIndex: index,
 		});
 	}
@@ -719,12 +725,11 @@ class CodeMirror extends React.Component {
 	}
 
 	clearAllTextMarkers = () => {
-		const { reviewTextMarkers, } = this.state;
+		const { currentReviews, } = this.state;
 
-		reviewTextMarkers.forEach(({ marker }) => marker.clear());
+		currentReviews.forEach(({ marker }) => marker.clear());
 
 		this.setState({
-			reviewTextMarkers: [],
 			selectedReviewIndex: -1,
 		});
 	}
@@ -821,12 +826,12 @@ class CodeMirror extends React.Component {
 	}
 
 	onCursorActivity = () => {
-		const { currentSubmission, exerciseCodeDoc, isEditable, } = this.state;
+		const { currentReviews, exerciseCodeDoc, isEditable, } = this.state;
 		const cursor = exerciseCodeDoc.getCursor();
 		const { line, ch } = cursor;
 
-		if(!isEditable && currentSubmission) {
-			const reviewIndex = currentSubmission.reviews.findIndex(r =>
+		if(!isEditable && currentReviews.length > 0) {
+			const reviewIndex = currentReviews.findIndex(r =>
 				r.startLine <= line && r.startPosition <= ch
 				&& r.finishLine >= line && r.finishPosition >= ch
 			);
