@@ -150,7 +150,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 					? AutomaticExerciseCheckingStatus.Done
 					: AutomaticExerciseCheckingStatus.Waiting
 				: (AutomaticExerciseCheckingStatus?) null;
-			var submission = await userSolutionsRepo.AddUserExerciseSubmission(
+			var initialSubmission = await userSolutionsRepo.AddUserExerciseSubmission(
 				courseId,
 				exerciseSlide.Id,
 				userCode,
@@ -166,29 +166,30 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			);
 
 			if (buildResult.HasErrors)
-				return new RunSolutionResponse(SolutionRunStatus.Success) { Submission = SubmissionInfo.Build(submission, null) };
+				return new RunSolutionResponse(SolutionRunStatus.Success) { Submission = SubmissionInfo.Build(initialSubmission, null) };
 
 			var executionTimeout = TimeSpan.FromSeconds(exerciseBlock.TimeLimit * 2 + 5);
+			UserExerciseSubmission updatedSubmissionNoTracking;
 			try
 			{
 				if (hasAutomaticChecking)
 				{
 					var priority = exerciseBlock is SingleFileExerciseBlock ? 10 : 0;
-					await userSolutionsRepo.RunAutomaticChecking(submission, executionTimeout, waitUntilChecked, priority);
+					await userSolutionsRepo.RunAutomaticChecking(initialSubmission, executionTimeout, waitUntilChecked, priority);
 				}
 			}
 			catch (SubmissionCheckingTimeout)
 			{
 				logger.Error($"Не смог запустить проверку решения, никто не взял его на проверку за {executionTimeout.TotalSeconds} секунд.\nКурс «{course.Title}», слайд «{exerciseSlide.Title}» ({exerciseSlide.Id})");
 				await errorsBot.PostToChannelAsync($"Не смог запустить проверку решения, никто не взял его на проверку за {executionTimeout.TotalSeconds} секунд.\nКурс «{course.Title}», слайд «{exerciseSlide.Title}» ({exerciseSlide.Id})\n\nhttps://ulearn.me/Sandbox");
-				submission = await userSolutionsRepo.FindSubmissionById(submission.Id);
-				var message = submission.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Running
+				updatedSubmissionNoTracking = await userSolutionsRepo.FindSubmissionByIdNoTracking(initialSubmission.Id);
+				var message = updatedSubmissionNoTracking.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Running
 					? "Решение уже проверяется."
 					: "Решение ждет своей очереди на проверку, мы будем пытаться проверить его еще 10 минут.";
 				return new RunSolutionResponse(SolutionRunStatus.SubmissionCheckingTimeout)
 				{
 					Message = $"К сожалению, мы не смогли оперативно проверить ваше решение. {message}. Просто подождите и обновите страницу.",
-					Submission = SubmissionInfo.Build(submission, null)
+					Submission = SubmissionInfo.Build(updatedSubmissionNoTracking, null)
 				};
 			}
 
@@ -196,21 +197,21 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			{
 				metricSender.SendCount($"exercise.{exerciseMetricId}.dont_wait_result");
 				// По вовзращаемому значению нельзя отличить от случая, когда никто не взял на проверку
-				return new RunSolutionResponse(SolutionRunStatus.Success) { Submission = SubmissionInfo.Build(submission, null) };
+				return new RunSolutionResponse(SolutionRunStatus.Success) { Submission = SubmissionInfo.Build(initialSubmission, null) };
 			}
 
-			submission = await userSolutionsRepo.FindSubmissionById(submission.Id);
-			await CreateStyleErrorsReviewsForSubmission(submission.Id, buildResult.StyleErrors, exerciseMetricId);
+			updatedSubmissionNoTracking = await userSolutionsRepo.FindSubmissionByIdNoTracking(initialSubmission.Id);
+			await CreateStyleErrorsReviewsForSubmission(updatedSubmissionNoTracking.Id, buildResult.StyleErrors, exerciseMetricId);
 			if (!hasAutomaticChecking)
-				await SendToReviewAndUpdateScore(submission, courseManager, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender);
+				await SendToReviewAndUpdateScore(updatedSubmissionNoTracking, courseManager, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender);
 
 			var score = (await slideCheckingsRepo.GetExerciseSlideScoreAndPercent(courseId, exerciseSlide, userId)).Score;
-			var waitingForManualChecking = submission.ManualCheckings.Any(c => !c.IsChecked) ? true : (bool?)null;
+			var waitingForManualChecking = updatedSubmissionNoTracking.ManualCheckings.Any(c => !c.IsChecked) ? true : (bool?)null;
 			var result = new RunSolutionResponse(SolutionRunStatus.Success)
 			{
 				Score = score,
 				WaitingForManualChecking = waitingForManualChecking,
-				Submission = SubmissionInfo.Build(submission, null)
+				Submission = SubmissionInfo.Build(updatedSubmissionNoTracking, null)
 			};
 
 			return result;
@@ -221,26 +222,26 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			return $"{userName}: {exerciseSlide.Info.Unit.Title} - {exerciseSlide.Title}";
 		}
 
-		public static async Task<bool> SendToReviewAndUpdateScore(UserExerciseSubmission submission,
+		public static async Task<bool> SendToReviewAndUpdateScore(UserExerciseSubmission submissionNoTracking,
 			IWebCourseManager courseManager, ISlideCheckingsRepo slideCheckingsRepo, IGroupsRepo groupsRepo, IVisitsRepo visitsRepo, MetricSender metricSender)
 		{
-			var userId = submission.User.Id;
-			var courseId = submission.CourseId;
+			var userId = submissionNoTracking.User.Id;
+			var courseId = submissionNoTracking.CourseId;
 			var course = await courseManager.GetCourseAsync(courseId);
-			var exerciseSlide = course.FindSlideById(submission.SlideId, true) as ExerciseSlide; // SlideId проверен в вызывающем методе 
+			var exerciseSlide = course.FindSlideById(submissionNoTracking.SlideId, true) as ExerciseSlide; // SlideId проверен в вызывающем методе 
 			if (exerciseSlide == null)
 				return false;
 			var exerciseMetricId = GetExerciseMetricId(courseId, exerciseSlide);
-			var automaticChecking = submission.AutomaticChecking;
+			var automaticCheckingNoTracking = submissionNoTracking.AutomaticChecking;
 			var isProhibitedUserToSendForReview = await slideCheckingsRepo.IsProhibitedToSendExerciseToManualChecking(courseId, exerciseSlide.Id, userId);
 			var sendToReview = exerciseSlide.Scoring.RequireReview
-								&& submission.AutomaticCheckingIsRightAnswer
+								&& submissionNoTracking.AutomaticCheckingIsRightAnswer
 								&& !isProhibitedUserToSendForReview
 								&& await groupsRepo.IsManualCheckingEnabledForUserAsync(course, userId);
 			if (sendToReview)
 			{
 				await slideCheckingsRepo.RemoveWaitingManualCheckings<ManualExerciseChecking>(courseId, exerciseSlide.Id, userId, false);
-				await slideCheckingsRepo.AddManualExerciseChecking(courseId, exerciseSlide.Id, userId, submission.Id);
+				await slideCheckingsRepo.AddManualExerciseChecking(courseId, exerciseSlide.Id, userId, submissionNoTracking.Id);
 				await visitsRepo.MarkVisitsAsWithManualChecking(courseId, exerciseSlide.Id, userId);
 				metricSender.SendCount($"exercise.{exerciseMetricId}.sent_to_review");
 				metricSender.SendCount("exercise.sent_to_review");
@@ -248,9 +249,9 @@ namespace Ulearn.Web.Api.Controllers.Slides
 
 			await visitsRepo.UpdateScoreForVisit(courseId, exerciseSlide, userId);
 
-			if (automaticChecking != null)
+			if (automaticCheckingNoTracking != null)
 			{
-				var verdictForMetric = automaticChecking.GetVerdict().Replace(" ", "");
+				var verdictForMetric = automaticCheckingNoTracking.GetVerdict().Replace(" ", "");
 				metricSender.SendCount($"exercise.{exerciseMetricId}.{verdictForMetric}");
 			}
 

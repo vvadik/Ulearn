@@ -398,19 +398,28 @@ namespace Database.Repos
 			return submission;
 		}
 
-		public async Task<UserExerciseSubmission> FindSubmissionById(int id)
+		public async Task<UserExerciseSubmission> FindSubmissionByIdNoTracking(int id)
 		{
-			return await FuncUtils.TrySeveralTimesAsync(async () => await TryFindSubmissionById(id), 3, () => Task.Delay(200));
+			// Без NoTracking результат может взяться из кэша, что не нужно.
+			// Минус NoTracking, что не работает ленивая загрузка полей и нужно указать все Include.
+			return await FuncUtils.TrySeveralTimesAsync(async () => await TryFindSubmissionByIdNoTracking(id), 3, () => Task.Delay(200));
 		}
 
-		private async Task<UserExerciseSubmission> TryFindSubmissionById(int id)
+		private async Task<UserExerciseSubmission> TryFindSubmissionByIdNoTracking(int id)
 		{
-			return await db.UserExerciseSubmissions.Include(s => s.AutomaticChecking).ThenInclude(c => c.Output)
+			return await db.UserExerciseSubmissions
+				.AsNoTracking()	
+				.Include(s => s.AutomaticChecking).ThenInclude(c => c.Output)
 				.Include(s => s.AutomaticChecking).ThenInclude(c => c.CompilationError)
 				.Include(s => s.SolutionCode)
-				.Include(s => s.Reviews)
-				.Include(s => s.ManualCheckings)
+				.Include(s => s.Reviews).ThenInclude(c => c.Author)
+				.Include(s => s.ManualCheckings).ThenInclude(c => c.Reviews)
 				.SingleOrDefaultAsync(x => x.Id == id);
+		}
+
+		public async Task<UserExerciseSubmission> FindSubmissionById(int id)
+		{
+			return await db.UserExerciseSubmissions.FindAsync(id);
 		}
 
 		public async Task<UserExerciseSubmission> FindSubmissionById(string idString)

@@ -45,7 +45,7 @@ namespace Database.Repos
 		Task<HashSet<Guid>> GetIdOfPassedSlides(string courseId, string userId);
 		IQueryable<UserExerciseSubmission> GetAllSubmissions(int max, int skip);
 		Task<AutomaticExerciseCheckingStatus?> GetSubmissionAutomaticCheckingStatus(int id);
-		Task<UserExerciseSubmission> FindSubmissionById(int id);
+		Task<UserExerciseSubmission> FindSubmissionByIdNoTracking(int id);
 		Task<UserExerciseSubmission> FindSubmissionById(string id);
 		Task<List<UserExerciseSubmission>> FindSubmissionsByIds(IEnumerable<int> checkingsIds);
 		Task SaveResult(RunningResults result, Func<UserExerciseSubmission, Task> onSave);
