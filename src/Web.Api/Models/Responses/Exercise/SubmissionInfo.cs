@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using Database.Models;
-using Database.Repos.Users;
 using JetBrains.Annotations;
 
 namespace Ulearn.Web.Api.Models.Responses.Exercise
@@ -35,17 +34,15 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 		public static SubmissionInfo Build(UserExerciseSubmission submission,
 			[CanBeNull] Dictionary<int, IEnumerable<ExerciseCodeReviewComment>> reviewId2Comments)
 		{
-			var reviews = submission
-				.GetAllReviews()
-				.Select(r =>
-				{
-					var comments = reviewId2Comments?.GetValueOrDefault(r.Id);
-					var isUlearnBot = r.Author.UserName == UsersRepo.UlearnBotUsername;
-					return ReviewInfo.Build(r, comments, isUlearnBot);
-				})
+			var botReviews = submission.NotDeletedReviews
+				.Select(r => ToReviewInfo(r, true, reviewId2Comments))
+				.ToList();
+			var manualCheckingReviews = submission.ManualCheckings
+				.SelectMany(c => c.NotDeletedReviews)
+				.Select(r => ToReviewInfo(r, false, reviewId2Comments))
 				.ToList();
 			var automaticChecking = submission.AutomaticChecking == null
-				? null : ExerciseAutomaticCheckingResponse.Build(submission.AutomaticChecking, reviews.Where(r => r.Author == null).ToList());
+				? null : ExerciseAutomaticCheckingResponse.Build(submission.AutomaticChecking, botReviews);
 			return new SubmissionInfo
 			{
 				Id = submission.Id,
@@ -53,8 +50,15 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 				Timestamp = submission.Timestamp,
 				AutomaticChecking = automaticChecking,
 				ManualCheckingPassed = submission.ManualCheckings.Any(mc => mc.IsChecked),
-				ManualCheckingReviews =  reviews.Where(r => r.Author != null).ToList()
+				ManualCheckingReviews =  manualCheckingReviews.Where(r => r.Author != null).ToList()
 			};
+		}
+		
+		private static ReviewInfo ToReviewInfo(ExerciseCodeReview r, bool isUlearnBot,
+			[CanBeNull] Dictionary<int, IEnumerable<ExerciseCodeReviewComment>> reviewId2Comments)
+		{
+			var comments = reviewId2Comments?.GetValueOrDefault(r.Id);
+			return ReviewInfo.Build(r, comments, isUlearnBot);
 		}
 	}
 }

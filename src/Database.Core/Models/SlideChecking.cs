@@ -143,6 +143,7 @@ namespace Database.Models
 		// Действует, если стоит хотя бы у одной проверки. Если снимается у одной проверки, снимается у всех.
 		public bool ProhibitFurtherManualCheckings { get; set; }
 
+		// Здесь ревью преподавателя. Ревью бота лежат в UserExerciseSubmission
 		public virtual IList<ExerciseCodeReview> Reviews { get; set; }
 
 		// Хранит старые данные, теперь используется Percent

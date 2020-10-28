@@ -56,17 +56,12 @@ namespace Database.Models
 		[Obsolete] // YT: ULEARN-217; Используй AntiPlagiarism.Web.Database.Models.Submission.ClientSubmissionId
 		public int? AntiPlagiarismSubmissionId { get; set; }
 
+		// Здесь ревью бота. Ревью преподавателя лежат в ManualExerciseChecking
 		public virtual IList<ExerciseCodeReview> Reviews { get; set; }
 
 		[NotMapped]
 		public List<ExerciseCodeReview> NotDeletedReviews => Reviews.Where(r => !r.IsDeleted).ToList();
 
 		public bool IsWebSubmission => string.Equals(CourseId, "web", StringComparison.OrdinalIgnoreCase) && SlideId == Guid.Empty;
-
-		public List<ExerciseCodeReview> GetAllReviews()
-		{
-			var manualCheckingReviews = ManualCheckings.SelectMany(c => c.NotDeletedReviews);
-			return manualCheckingReviews.Concat(NotDeletedReviews).ToList();
-		}
 	}
 }
