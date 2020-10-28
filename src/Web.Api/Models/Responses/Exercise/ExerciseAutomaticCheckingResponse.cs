@@ -53,8 +53,8 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 				ProcessStatus = AutomaticExerciseCheckingProcessStatus.ServerError,
 				Result = AutomaticExerciseCheckingResult.NotChecked
 			};
-			var processStatus = GetProcessStatus(checking);
-			if (processStatus != AutomaticExerciseCheckingProcessStatus.Done)
+			result.ProcessStatus = GetProcessStatus(checking);
+			if (result.ProcessStatus != AutomaticExerciseCheckingProcessStatus.Done)
 				return result;
 			if (checking.IsCompilationError)
 			{
