@@ -274,7 +274,6 @@ class Course extends Component {
 		const courseAccesses = accessesByCourse[courseId] ? accessesByCourse[courseId] : [];
 		const courseRole = roleByCourse[courseId] ? roleByCourse[courseId] : '';
 		const userRoles = { isSystemAdministrator, courseRole, courseAccesses, };
-
 		return (
 			<main className={ wrapperClassName }>
 				{ (isNavigationVisible || isReview) && title &&
@@ -285,11 +284,14 @@ class Course extends Component {
 				<div className={ styles.slide }>
 					{
 						Page === Slide
-							? <Slide
+							?
+							<Slide
 								slideId={ currentSlideId }
 								courseId={ currentCourseId }
 								showHiddenBlocks={ !isStudentMode }
 								isHiddenSlide={ slideInfo.hide }
+								score={ isNavigationVisible ? score : null }
+								isSkipped={ progress && progress[slideInfo.id] && progress[slideInfo.id].isSkipped }
 							/>
 							: <BlocksWrapper score={ isNavigationVisible ? score : null }>
 								<Page match={ this.props.match }/>

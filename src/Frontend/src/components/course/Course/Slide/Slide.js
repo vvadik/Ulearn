@@ -96,6 +96,7 @@ class Slide extends React.Component {
 	}
 
 	renderSlideBlocks = (slideBlocks, isHiddenSlide) => {
+		const { score, isSkipped } = this.props;
 		this.addAdditionalPropsToBlocks(slideBlocks);
 		const blocksPacks = [];
 
@@ -114,6 +115,8 @@ class Slide extends React.Component {
 							   isBlock={ !onlyOneBlock }
 							   isHidden={ hide }
 							   isHeaderOfHiddenSlide={ i === 0 && isHiddenSlide }
+							   score={ i === 0 && score }
+							   isSkipped={ isSkipped }
 				>
 					{ blocks.map(this.mapBlockToComponent) }
 				</BlocksWrapper>
@@ -130,7 +133,7 @@ class Slide extends React.Component {
 	}
 
 	addAdditionalPropsToBlocks = (slideBlocks) => {
-		const { slideId, courseId, isAuthenticated, } = this.props;
+		const { slideId, courseId, isAuthenticated, isSkipped, } = this.props;
 		const { autoplay } = queryString.parse(window.location.search);
 		let firstVideoBlock = true;
 
@@ -185,6 +188,7 @@ class Slide extends React.Component {
 					block.courseId = courseId;
 					block.slideId = slideId;
 					block.isAuthenticated = isAuthenticated;
+					block.isSkipped = isSkipped;
 					break;
 				}
 			}
@@ -237,6 +241,8 @@ Slide.propTypes = {
 	showHiddenBlocks: PropTypes.bool,
 	isHiddenSlide: PropTypes.bool,
 	isAuthenticated: PropTypes.bool,
+	score: PropTypes.object,
+	isSkipped: PropTypes.bool,
 };
 
 Slide.defaultProps = {

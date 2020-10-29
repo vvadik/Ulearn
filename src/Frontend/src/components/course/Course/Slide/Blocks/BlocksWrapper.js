@@ -12,8 +12,11 @@ import getPluralForm from "src/utils/getPluralForm";
 
 const hiddenHintText = "Студенты не видят этот блок";
 const hiddenSlideText = "Студенты не видят этот слайд.";
+const skippedHeaderText = "Вы посмотрели чужие решения, поэтому не получите баллы за эту задачу";
 const hiddenSlideTextWithStudents = (showedGroupsIds) => `Студенты ${ showedGroupsIds.join(', ') } видят этот слайд.`;
-const getSlideScore = ({ score, maxScore }) => `${ score } ${ getPluralForm(score, 'балл', 'балла', 'баллов') } из ${ maxScore }`;
+const getSlideScore = ({ score, maxScore }, showZeroScore = false) => showZeroScore && score === 0
+	? `Максимум ${ maxScore } ${ getPluralForm(maxScore, 'балл', 'балла', 'баллов') }`
+	: `${ score } ${ getPluralForm(score, 'балл', 'балла', 'баллов') } из ${ maxScore }`;
 
 class BlocksWrapper extends React.Component {
 	constructor(props) {
@@ -72,13 +75,16 @@ class BlocksWrapper extends React.Component {
 	}
 
 	renderScoreHeader = () => {
-		const { score, } = this.props;
+		const { score, isSkipped, } = this.props;
 
 		return (
 			<div className={ styles.header }>
 				<span className={ styles.headerText }>
-					{ getSlideScore(score) }
+					{ getSlideScore(score, !isSkipped) }
 				</span>
+				{ isSkipped &&
+				<span className={ styles.headerSkippedText }>{ skippedHeaderText }</span>
+				}
 			</div>
 		);
 	}
@@ -180,6 +186,7 @@ BlocksWrapper.propTypes = {
 	score: PropTypes.object,
 	showEyeHint: PropTypes.bool,
 	isHeaderOfHiddenSlide: PropTypes.bool,
+	isSkipped: PropTypes.bool,
 }
 
 export default BlocksWrapper;
