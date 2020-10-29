@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Video, CodeMirror, Text, Image, BlocksWrapper, Spoiler, } from "./Blocks";
+import { Video, CodeMirror, Text, Image, BlocksWrapper, Spoiler, CodeMirrorUncontrolled, } from "./Blocks";
 import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader";
 import blockTypes from "src/components/course/Course/Slide/blockTypes";
 
@@ -14,7 +14,7 @@ import styles from './Slide.less';
 
 const mapTypeToBlock = {
 	[blockTypes.video]: Video,
-	[blockTypes.code]: CodeMirror,
+	[blockTypes.code]: CodeMirrorUncontrolled,
 	[blockTypes.exercise]: CodeMirror,
 	[blockTypes.text]: Text,
 	[blockTypes.tex]: Text,
@@ -36,7 +36,7 @@ class Slide extends React.Component {
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
-		if(!this.props.slideBlocks || prevProps.slideId !== this.props.slideId) {
+		if(prevProps.slideId !== this.props.slideId) {
 			this.loadSlide();
 		}
 	}
@@ -179,11 +179,6 @@ class Slide extends React.Component {
 						(i < slideBlocks.length - 1
 							? slideBlocks[i + 1].type !== blockTypes.video
 							: true);
-					break;
-				}
-				case blockTypes.code: {
-					block.courseId = courseId;
-					block.slideId = slideId;
 					break;
 				}
 				case blockTypes.exercise: {
