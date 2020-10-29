@@ -7,7 +7,6 @@ namespace Ulearn.Web.Api.Controllers.Slides
 {
 	public class ExerciseSlideRendererContext
 	{
-		public bool IsInstructor;
 		public List<UserExerciseSubmission> Submissions;
 		public List<ExerciseCodeReviewComment> CodeReviewComments;
 		public ExerciseAttemptsStatistics AttemptsStatistics;
