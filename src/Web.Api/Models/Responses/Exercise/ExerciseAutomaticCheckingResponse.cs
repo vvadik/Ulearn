@@ -59,7 +59,7 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 			if (checking.IsCompilationError)
 			{
 				result.Result = AutomaticExerciseCheckingResult.CompilationError;
-				result.CompilationError = result.CompilationError;
+				result.CompilationError = checking.CompilationError?.Text;
 				return result;
 			}
 			result.Result = checking.IsRightAnswer ? AutomaticExerciseCheckingResult.RightAnswer : AutomaticExerciseCheckingResult.WrongAnswer;
