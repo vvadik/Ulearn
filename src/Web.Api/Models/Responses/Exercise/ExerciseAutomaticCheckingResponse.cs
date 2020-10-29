@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Database.Models;
 using JetBrains.Annotations;
@@ -71,11 +72,19 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 
 		private static AutomaticExerciseCheckingProcessStatus GetProcessStatus(AutomaticExerciseChecking checking)
 		{
+			var timeLimit = TimeSpan.FromMinutes(15);
+			var isOldChecking = checking.Timestamp < DateTime.Now.Subtract(timeLimit);
 			return checking.Status switch
 			{
 				AutomaticExerciseCheckingStatus.Done => AutomaticExerciseCheckingProcessStatus.Done,
-				AutomaticExerciseCheckingStatus.Waiting => AutomaticExerciseCheckingProcessStatus.Waiting,
-				AutomaticExerciseCheckingStatus.Running => AutomaticExerciseCheckingProcessStatus.Running,
+				AutomaticExerciseCheckingStatus.Waiting =>
+					isOldChecking
+						? AutomaticExerciseCheckingProcessStatus.WaitingTimeLimitExceeded
+						: AutomaticExerciseCheckingProcessStatus.Waiting,
+				AutomaticExerciseCheckingStatus.Running =>
+					isOldChecking
+						? AutomaticExerciseCheckingProcessStatus.ServerError
+						: AutomaticExerciseCheckingProcessStatus.Running,
 				AutomaticExerciseCheckingStatus.RequestTimeLimit => AutomaticExerciseCheckingProcessStatus.WaitingTimeLimitExceeded,
 				AutomaticExerciseCheckingStatus.Error => AutomaticExerciseCheckingProcessStatus.ServerError,
 				_ => AutomaticExerciseCheckingProcessStatus.ServerError
