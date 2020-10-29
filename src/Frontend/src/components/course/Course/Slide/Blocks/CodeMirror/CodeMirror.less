@@ -29,11 +29,15 @@
 
 .editorInReview {
   flex: 2;
-
+  z-index: 1;
   border-left: unset;
   border-top: unset;
   border-bottom: unset;
   border-right: 1px solid @lightGrey;
+}
+
+.editorLineGutters {
+  border: unset;
 }
 
 .reviewCode {
@@ -161,6 +165,10 @@
   cursor: pointer;
 }
 
+.exerciseControlsIcon {
+  margin-right: 4px;
+}
+
 .noHintsLeft {
   color: @disabledColor;
 }
@@ -170,6 +178,7 @@
   line-height: 24px;
 
   margin-top: 25px;
+  margin-bottom: 0;
   padding-left: @hintsLeftPadding;
 }
 
@@ -197,6 +206,7 @@
   color: @additionalColor;
   margin-right: 0;
   margin-left: auto;
+  order: 1;
 }
 
 .header {
@@ -231,10 +241,15 @@
   display: flex;
 
   border: 1px solid @lightGrey;
-  border-radius: 8px;
+  border-top-left-radius: 9px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+
+  overflow: hidden;
 }
 
 .reviewsContainer {
+  z-index: 0;
   min-width: @minCommentWidth;
   margin-left: -10px;
   background-color: @lightYellow;
@@ -286,6 +301,12 @@
   padding: 0 16px;
 }
 
+.oneLineErrorOutput {
+  display: block;
+  padding: 8px 16px;
+  margin: 0;
+}
+
 .outputTable {
   width: 100%;
   border: 1px solid #ddd;
@@ -318,11 +339,11 @@
   line-height: 20px;
 }
 
-.lineWithError {
+.outputErrorLineColor {
   background-color: @lightRed;
 }
 
-.lineWithoutError {
+.outputLineColor {
   background-color: @lightGreen;
 }
 
@@ -388,6 +409,13 @@
   position: relative;
   top: -8px;
   color: @additionalColor;
+}
+
+:global {
+  //removing border from line gutters
+  .CodeMirror-gutters {
+    border: unset;
+  }
 }
 
 @media (min-width: @minTabletWidth) {

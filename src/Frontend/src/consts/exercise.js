@@ -1,14 +1,24 @@
 export const processStatuses = {
-	SERVER_ERROR: 'servererror', // Ошибка на сервере или статус SandoxError в чеккере
-	DONE: 'done', // Проверена
-	WAITING: 'waiting', // В очереди на проверку
-	RUNNING: 'running', // Проверяется
-	WAITING_TIME_LIMIT_EXCEEDED: 'waitingtimelimitexceeded', // Задача выкинута из очереди, потому что её никто не взял на проверку
+	serverError: 'ServerError', // Ошибка на сервере или статус SandoxError в чеккере
+	done: 'Done', // Проверена
+	waiting: 'Waiting', // В очереди на проверку
+	running: 'Running', // Проверяется
+	waitingTimeLimitExceeded: 'WaitingTimeLimitExceeded', // Задача выкинута из очереди, потому что её никто не взял на проверку
 };
 
 export const checkingResults = {
-	NOT_CHECKED: 'notchecked',
-	COMPILATION_ERROR: 'compilationerror',
-	RIGHT_ANSWER: 'rightanswer',
-	WRONG_ANSWER: 'wronganswer',
+	notChecked: 'NotChecked',
+	compilationError: 'CompilationError',
+	rightAnswer: 'RightAnswer',
+	wrongAnswer: 'WrongAnswer',
 };
+
+export const solutionRunStatuses = {
+	success: 'Success',
+	internalServerError: 'InternalServerError', // Ошибка в проверяющей системе, подробности могут быть в Message. Если submission создан, он лежит в Submission, иначе null.
+	ignored: 'Ignored', // Сервер отказался обрабатывать решение, причина написана в Message. Cлишком частые запросы на проверку или слишком длинный код.
+	submissionCheckingTimeout: 'SubmissionCheckingTimeout', // Ждали, но не дожадлись проверки
+	// В случае ошибки компиляции Submission создается не всегда. Не создается для C#-задач. Тогда текст ошибки компиляции кладется в Message.
+	// Если Submission создался, то об ошибках компиляции пишется внутри Submission -> AutomaticChecking.
+	compileError: 'CompileError',
+}

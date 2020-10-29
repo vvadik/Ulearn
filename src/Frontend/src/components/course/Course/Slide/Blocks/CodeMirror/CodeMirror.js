@@ -1,7 +1,8 @@
 import React from 'react';
 
-import { UnControlled, Controlled, } from "react-codemirror2";
+import { Controlled, } from "react-codemirror2";
 import { Button, Checkbox, Dropdown, FLAT_THEME, MenuItem, Modal, Tooltip, } from "ui";
+import { darkTheme } from 'ui/internal/ThemePlayground/darkTheme';
 import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent";
 import { Lightbulb, Refresh, EyeOpened, DocumentLite, Error, } from "icons";
 import Avatar from "src/components/common/Avatar/Avatar";
@@ -10,10 +11,14 @@ import { ThemeContext } from "@skbkontur/react-ui/index";
 
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+
 import { constructPathToAcceptedSolutions, } from "src/consts/routes";
+import { checkingResults, processStatuses, solutionRunStatuses } from "src/consts/exercise";
 import { getDateDDMMYY } from "src/utils/getMoment";
-import { isMobile } from "src/utils/getDeviceType";
+import { isMobile, isTablet, } from "src/utils/getDeviceType";
+
 import api from "src/api";
+import { userProgressScoreUpdate } from "src/actions/userProgress";
 
 import CodeMirrorBase from 'codemirror/lib/codemirror';
 import 'codemirror/addon/edit/matchbrackets';
@@ -28,67 +33,84 @@ import styles from './CodeMirror.less';
 
 import texts from './CodeMirror.texts';
 
+const isControlsTextSuits = () => !isMobile() && !isTablet();
+const editThemeName = 'darcula';
+const defaultThemeName = 'default';
+
 
 class CodeMirror extends React.Component {
 	constructor(props) {
 		super(props);
-		const { exerciseInitialCode, submissions, code, } = props;
-		const isExercise = !!submissions;
+		const { exerciseInitialCode, submissions, code, expectedOutput, } = props;
 
-		let state = {
-			isExercise,
+		const successSubmissions = submissions
+			.filter(s => !s.automaticChecking || s.automaticChecking.result === checkingResults.rightAnswer);
+
+		this.state = {
 			value: exerciseInitialCode || code,
 			valueChanged: false,
-		}
 
-		if(isExercise) {
-			state = { ...state, ...this.getStateForControlled(submissions) }
-		}
+			isEditable: submissions.length === 0,
 
-		this.state = state;
-	}
-
-	getStateForControlled = (submissions) => {
-		return {
 			showedHintsCount: 0,
 			showAcceptedSolutions: false,
 			showAcceptedSolutionsWarning: false,
+			congratsModalData: null,
 
+			resizeTimeout: null,
+			showControlsText: isControlsTextSuits(),
+
+			successSubmissions,
+
+			submissionLoading: false,
 			currentSubmission: null,
 			currentReviews: [],
-			isEditable: submissions.length === 0,
-			submitResults: null,
-			showSubmitOutput: false,
 			selectedReviewIndex: -1,
+			output: null,
+			expectedOutput: expectedOutput && expectedOutput.split('\n'),
 			exerciseCodeDoc: null,
-			congratsModalOpened: false,
+
 			selfChecks: texts.checkups.self.checks.map((ch, i) => ({
 				text: ch,
 				checked: false,
-				onClick: () => this.selfCheckBoxClicked(i)
+				onClick: () => this.onSelfCheckBoxClick(i)
 			})),
 		}
 	}
 
 	componentDidMount() {
-		const { slideId, submissions, } = this.props;
-		const { isExercise, } = this.state;
-
-		if(!isExercise) {
-			return;
-		}
+		const { slideId, } = this.props;
+		const { successSubmissions, } = this.state;
 
 		this.overrideCodeMirrorAutocomplete();
 
-		if(submissions.length > 0) {
-			this.loadSubmissionToState(submissions[submissions.length - 1]);
+		if(successSubmissions.length > 0) {
+			this.loadSubmissionToState(successSubmissions[successSubmissions.length - 1]);
 		} else {
 			this.refreshPreviousDraft(slideId);
 		}
 
 		window.addEventListener("beforeunload", this.saveCodeDraftToCache);
+		window.addEventListener("resize", this.onWindowResize);
 	}
 
+	onWindowResize = () => {
+		const { resizeTimeout } = this.state;
+
+		const throttleTimeout = 66;
+
+		//resize event can be called rapidly, to prevent performance issue, we throttling event handler
+		if(!resizeTimeout) {
+			this.setState({
+				resizeTimeout: setTimeout(() => {
+					this.setState({
+						resizeTimeout: null,
+						showControlsText: isControlsTextSuits(),
+					})
+				}, throttleTimeout),
+			});
+		}
+	}
 	overrideCodeMirrorAutocomplete = () => {
 		const { language, } = this.props;
 
@@ -109,18 +131,31 @@ class CodeMirror extends React.Component {
 	componentWillUnmount() {
 		this.saveCodeDraftToCache();
 		window.removeEventListener("beforeunload", this.saveCodeDraftToCache);
+		window.removeEventListener("resize", this.onWindowResize);
 	}
 
 	render() {
-		const { language, className, isAuthenticated, } = this.props;
-		const { isExercise, isEditable, value, } = this.state;
+		const { className, } = this.props;
 
-		const opts = {
-			mode: this.loadLanguageStyles(language),
+		const opts = this.codeMirrorOptions;
+
+		return (
+			<div className={ classNames(styles.wrapper, className) } onClick={ this.resetSelectedReviewTextMarker }>
+				{ this.renderControlledCodeMirror(opts) }
+			</div>
+		);
+	}
+
+	get codeMirrorOptions() {
+		const { language, isAuthenticated, } = this.props;
+		const { isEditable, } = this.state;
+
+		return {
+			mode: CodeMirror.loadLanguageStyles(language),
 			lineNumbers: true,
 			scrollbarStyle: 'null',
 			lineWrapping: true,
-			theme: isEditable ? 'darcula' : 'default',
+			theme: isEditable ? editThemeName : defaultThemeName,
 			readOnly: !isEditable || !isAuthenticated,
 			matchBrackets: true,
 			tabSize: 4,
@@ -136,20 +171,6 @@ class CodeMirror extends React.Component {
 				}
 			},
 		};
-
-		return (
-			<div className={ classNames(styles.wrapper, className) } onClick={ this.resetSelectedReviewTextMarker }>
-				{ isExercise && isAuthenticated
-					? this.renderControlledCodeMirror(opts)
-					: <UnControlled
-						editorDidMount={ this.onEditorMount }
-						className={ styles.editor }
-						options={ opts }
-						value={ value }
-					/>
-				}
-			</div>
-		);
 	}
 
 	resetSelectedReviewTextMarker = () => {
@@ -163,10 +184,9 @@ class CodeMirror extends React.Component {
 	renderControlledCodeMirror = (opts) => {
 		const {
 			value, showedHintsCount, showAcceptedSolutions, currentSubmission,
-			isEditable, submitResults, exerciseCodeDoc, congratsModalOpened,
-			currentReviews,
+			isEditable, exerciseCodeDoc, congratsModalData,
+			currentReviews, successSubmissions, output,
 		} = this.state;
-		const { submissions, } = this.props;
 
 		const isReview = !isEditable && currentReviews.length > 0;
 
@@ -182,7 +202,7 @@ class CodeMirror extends React.Component {
 
 		return (
 			<React.Fragment>
-				{ submissions.length !== 0 && this.renderSubmissionsDropdown() }
+				{ successSubmissions.length !== 0 && this.renderSubmissionsDropdown() }
 				{ !isEditable && currentSubmission && this.renderHeader() }
 				<div className={ wrapperClassName }>
 					<Controlled
@@ -196,46 +216,37 @@ class CodeMirror extends React.Component {
 					{ exerciseCodeDoc && isReview && this.renderReview() }
 				</div>
 				{ !isEditable && this.renderEditButton() }
-				{/* TODO not included in current release !isEditable && currentSubmission && this.renderOverview()*/ }
+				{/* TODO not included in current release !isEditable && currentSubmission && this.renderOverview(currentSubmission)*/ }
 				{ this.renderControls() }
-				{ submitResults && submitResults.message && this.renderOutput() }
+				{ output && this.renderOutput() }
 				{ showedHintsCount > 0 && this.renderHints() }
 				{ showAcceptedSolutions && this.renderAcceptedSolutions() }
-				{ congratsModalOpened && this.renderCongratsModal() }
+				{ congratsModalData && this.renderCongratsModal(congratsModalData) }
 			</React.Fragment>
 		)
 	}
 
 	renderSubmissionsDropdown = () => {
-		const { submissions, } = this.props;
-		const { currentSubmission, } = this.state;
+		const { currentSubmission, successSubmissions, } = this.state;
 
-		const submissionsWithoutCurrent = submissions.filter(({ id }) => !currentSubmission || id !== currentSubmission.id);
+		const submissionsWithoutCurrent = [...successSubmissions]
 
-		if(currentSubmission) {
-			submissionsWithoutCurrent.push({ isNew: true });
-		}
+		submissionsWithoutCurrent.push({ isNew: true, id: -1 });
 
-		//TODO overriding theme to prevent rounding edges in dropdown
+
 		return (
 			<div className={ styles.submissionsDropdown }>
 				<ThemeContext.Provider value={ FLAT_THEME }>
 					<Dropdown
 						caption={ texts.submissions.getSubmissionCaption(currentSubmission) }>
-						{ submissionsWithoutCurrent.map(({ id, timestamp, isNew, }) =>
-							isNew
-								? <MenuItem
-									title={ -1 }
-									key={ -1 }
-									onClick={ this.loadNewTry }>
-									{ texts.submissions.newTry }
-								</MenuItem>
-								: <MenuItem
-									title={ id }
-									key={ id }
-									onClick={ this.loadSubmission }>
-									{ texts.getSubmissionDate(timestamp) }
-								</MenuItem>) }
+						{ submissionsWithoutCurrent.map((submission) =>
+							<MenuItem
+								disabled={ currentSubmission && submission.id === currentSubmission.id }
+								name={ submission.id }
+								key={ submission.id }
+								onClick={ submission.isNew ? this.loadNewTry : this.loadSubmission }>
+								{ texts.submissions.getSubmissionCaption(submission) }
+							</MenuItem>) }
 					</Dropdown>
 				</ThemeContext.Provider>
 			</div>
@@ -243,37 +254,47 @@ class CodeMirror extends React.Component {
 	}
 
 	renderHeader = () => {
-		const { currentSubmission, } = this.state;
+		const { automaticChecking, } = this.state.currentSubmission;
 
-		return (
-			<div className={ styles.header }>
-				{ texts.headers.allTestPassedHeader }
-			</div>
-		)
+		if(automaticChecking.result === checkingResults.rightAnswer) {
+			return (
+				<div className={ styles.successHeader }>
+					{ texts.headers.allTestPassedHeader }
+				</div>
+			);
+		}
+
+		return null;
 	}
 
 	loadSubmission = (e) => {
-		const { submissions } = this.props;
-		const id = Number.parseInt(e.target.title);
+		const { successSubmissions } = this.state;
+		const id = Number.parseInt(e.target.name);
 
-		const submission = submissions.find(s => s.id === id);
+		const submission = successSubmissions.find(s => s.id === id);
 
 		this.loadSubmissionToState(submission);
 	}
 
-	loadSubmissionToState = (submission) => {
+	loadSubmissionToState = (submission,) => {
 		this.saveCodeDraftToCache();
 		this.clearAllTextMarkers();
 
 		this.setState({
 			value: submission.code,
 			isEditable: false,
-			submitResults: null,
 			valueChanged: false,
+			output: null,
 		}, () => this.setState({
 			currentSubmission: submission,
 			currentReviews: this.getReviewsWithTextMarkers(submission.automaticChecking.reviews, submission.manualCheckingReviews),
 		}));
+	}
+
+	openModal = (data) => {
+		this.setState({
+			congratsModalData: data,
+		})
 	}
 
 	getReviewsWithTextMarkers = (autoReviews, manualReviews) => {
@@ -302,9 +323,8 @@ class CodeMirror extends React.Component {
 		return reviewsWithTextMarkers;
 	}
 
-	renderOverview = () => {
-		const { currentSubmission } = this.state;
-
+	renderOverview = (submission) => {
+		const { selfChecks } = this.state;
 		const checkups = [
 			{
 				title: texts.checkups.self.title,
@@ -314,26 +334,26 @@ class CodeMirror extends React.Component {
 							{ texts.checkups.self.text }
 						</span>
 						<ul className={ styles.overviewSelfCheckList }>
-							{ this.renderSelfCheckBoxes() }
+							{ this.renderSelfCheckBoxes(selfChecks) }
 						</ul>
 					</React.Fragment>
 			},
 		];
 
-		if(currentSubmission.automaticChecking.reviews !== 0) {
+		if(submission.automaticChecking.reviews !== 0) {
 			checkups.unshift(
 				{
 					title: texts.checkups.bot.title,
 					content:
 						<span className={ styles.overviewComment }>
-						{ texts.checkups.bot.countBotComments(currentSubmission.automaticChecking.reviews) }
+						{ texts.checkups.bot.countBotComments(submission.automaticChecking.reviews) }
 							<a onClick={ this.showFirstBotComment }>{ texts.showReview }</a>
 					</span>
 				});
 		}
 
-		if(currentSubmission.manualCheckingReviews.length !== 0) {
-			const reviewsCount = currentSubmission.reviews.length;
+		if(submission.manualCheckingReviews.length !== 0) {
+			const reviewsCount = submission.reviews.length;
 
 			checkups.unshift({
 				title: texts.checkups.teacher.title,
@@ -357,9 +377,7 @@ class CodeMirror extends React.Component {
 		);
 	}
 
-	renderSelfCheckBoxes = () => {
-		const { selfChecks } = this.state;
-
+	renderSelfCheckBoxes = (selfChecks) => {
 		return (
 			selfChecks.map(({ text, checked, onClick, }, i) =>
 				<li key={ i }>
@@ -370,7 +388,7 @@ class CodeMirror extends React.Component {
 		);
 	}
 
-	selfCheckBoxClicked = (i) => {
+	onSelfCheckBoxClick = (i) => {
 		const { selfChecks } = this.state;
 		const newSelfChecks = [...selfChecks];
 
@@ -382,24 +400,30 @@ class CodeMirror extends React.Component {
 	}
 
 	renderControls = () => {
-		const { hints, } = this.props;
-		const { isEditable, currentSubmission, } = this.state;
+		const { hints, expectedOutput, hideSolutions, isSkipped, } = this.props;
+		const { isEditable, currentSubmission, successSubmissions, showedHintsCount, } = this.state;
 
 		return (
 			<div className={ styles.exerciseControlsContainer }>
 				{ this.renderSubmitSolutionButton() }
-				{ hints.length > 0 && this.renderShowHintButton() }
-				{ isEditable && this.renderResetButton() }
-				{ !isEditable && currentSubmission && currentSubmission.output && this.renderShowOutputButton() }
-				{ this.renderShowAcceptedSolutionsButton() }
-				{ this.renderShowStatisticsHint() }
+				<ThemeContext.Provider value={ darkTheme }>
+					{ hints.length > 0 && this.renderShowHintButton() }
+					{ isEditable && this.renderResetButton() }
+					{ !isEditable && expectedOutput && currentSubmission && this.renderShowOutputButton() }
+					{ this.renderShowStatisticsHint() }
+				</ThemeContext.Provider>
+				{ !hideSolutions
+				&& (hints.length === showedHintsCount || successSubmissions.length > 0 || isSkipped)
+				&& this.renderShowAcceptedSolutionsButton()
+				}
 			</div>
 		)
 	}
 
 	renderOutput = () => {
-		const { submitResults, } = this.state;
-		const submitContainsError = this.isSubmitResultsContainsError(submitResults);
+		const { currentSubmission, output, expectedOutput, } = this.state;
+		const submitContainsError = currentSubmission ? this.isSubmitResultsContainsError(currentSubmission) : true;
+
 		const wrapperClasses = submitContainsError ? styles.wrongOutput : styles.output;
 		const headerClasses = submitContainsError ? styles.wrongOutputHeader : styles.outputHeader;
 
@@ -410,17 +434,24 @@ class CodeMirror extends React.Component {
 						? <React.Fragment><Error/>{ texts.mocks.wrongResult }</React.Fragment>
 						: texts.output.text }
 				</span>
-				{ this.renderOutputLines() }
+				{ this.renderOutputLines(output, expectedOutput, submitContainsError) }
 			</div>
 		);
 	}
 
-	renderOutputLines = () => {
-		const { submitResults, } = this.state;
-		const lines = Array.isArray(submitResults.actualOutput)
-			? submitResults.actualOutput
-			: [submitResults.actualOutput];
-		const submitContainsError = this.isSubmitResultsContainsError(submitResults);
+	renderOutputLines = (output, expectedOutput, submitContainsError) => {
+		if(!expectedOutput) {
+			return (<p className={ styles.oneLineErrorOutput }>
+				{ output }
+			</p>);
+		}
+
+		const lines = output
+			.split('\n')
+			.map((line, index) => ({
+				actual: line,
+				expected: expectedOutput[index],
+			}));
 
 		if(submitContainsError) {
 			return (
@@ -433,30 +464,34 @@ class CodeMirror extends React.Component {
 					</tr>
 					</thead>
 					<tbody>
-					<tr className={ styles.lineWithError }>
-						<td>1</td>
-						<td>{ submitResults.actualOutput }</td>
-						<td>{ submitResults.expectedOutput }</td>
-					</tr>
+					{ lines.map(({ actual, expected }, i) =>
+						<tr key={ i }
+							className={ actual === expected ? styles.outputLineColor : styles.outputErrorLineColor }>
+							<td>{ i + 1 }</td>
+							<td>{ actual }</td>
+							<td>{ expected }</td>
+						</tr>
+					) }
 					</tbody>
 				</table>
 			);
 		}
 
-		return lines.map((l, i) =>
+		return expectedOutput.map((text, i) =>
 			<p key={ i } className={ styles.oneLineOutput }>
-				{ l }
+				{ text }
 			</p>);
 	}
 
 	renderSubmitSolutionButton = () => {
-		const { valueChanged, } = this.state;
+		const { valueChanged, submissionLoading, } = this.state;
 
 		return (
 			<span className={ styles.exerciseControls }>
 				<Tooltip pos={ "bottom center" } trigger={ "hover&focus" }
 						 render={ () => valueChanged ? null : <span>{ texts.controls.submitCode.hint }</span> }>
 							<Button
+								loading={ submissionLoading }
 								use={ "primary" }
 								disabled={ !valueChanged }
 								onClick={ this.sendExercise }>
@@ -468,7 +503,7 @@ class CodeMirror extends React.Component {
 	}
 
 	renderShowHintButton = () => {
-		const { showedHintsCount, } = this.state;
+		const { showedHintsCount, showControlsText, } = this.state;
 		const { hints, } = this.props;
 		const noHintsLeft = showedHintsCount === hints.length;
 		const hintClassName = classNames(styles.exerciseControls, { [styles.noHintsLeft]: noHintsLeft });
@@ -477,32 +512,43 @@ class CodeMirror extends React.Component {
 			<span className={ hintClassName } onClick={ this.showHint }>
 				<Tooltip pos={ "bottom center" } trigger={ "hover&focus" }
 						 render={ () => noHintsLeft ? <span>{ texts.controls.hints.hint }</span> : null }>
-							<Lightbulb/>{ !isMobile() && texts.controls.hints.text }
+					<span className={ styles.exerciseControlsIcon }>
+						<Lightbulb/>
+					</span>
+					{ showControlsText && texts.controls.hints.text }
 				</Tooltip>
 			</span>
 		);
 	}
 
 	renderResetButton = () => {
+		const { showControlsText, } = this.state;
+
 		return (
 			<span className={ styles.exerciseControls } onClick={ this.resetCode }>
-					<Refresh/>{ !isMobile() && texts.controls.reset.text }
+				<span className={ styles.exerciseControlsIcon }>
+					<Refresh/>
+				</span>
+				{ showControlsText && texts.controls.reset.text }
 			</span>
 		);
 	}
 
 	renderShowOutputButton = () => {
-		const { showSubmitOutput } = this.state;
+		const { output, showControlsText, } = this.state;
 
 		return (
 			<span className={ styles.exerciseControls } onClick={ this.toggleOutput }>
-					<DocumentLite/> { showSubmitOutput ? texts.controls.output.hide : texts.controls.output.show }
+				<span className={ styles.exerciseControlsIcon }>
+					<DocumentLite/>
+				</span>
+				{ showControlsText && (output ? texts.controls.output.hide : texts.controls.output.show) }
 			</span>
 		)
 	}
 
 	renderShowAcceptedSolutionsButton = () => {
-		const { showAcceptedSolutionsWarning } = this.state;
+		const { showAcceptedSolutionsWarning, showControlsText, } = this.state;
 
 		return (
 			<span className={ styles.exerciseControls } onClick={ this.showAcceptedSolutionsWarning }>
@@ -519,7 +565,10 @@ class CodeMirror extends React.Component {
 									</Button>
 								</span>
 						}>
-					<EyeOpened/>{ !isMobile() && texts.controls.acceptedSolutions.text }
+						<span className={ styles.exerciseControlsIcon }>
+							<EyeOpened/>
+						</span>
+						{ showControlsText && texts.controls.acceptedSolutions.text }
 					</Tooltip>
 				</span>
 		);
@@ -556,8 +605,17 @@ class CodeMirror extends React.Component {
 		)
 	}
 
-	renderCongratsModal = () => {
-		return (<CongratsModal onClose={ this.closeCongratsModal }/>);
+	renderCongratsModal = ({ score, waitingForManualChecking, }) => {
+		const { hideSolutions } = this.props;
+
+		return (
+			<CongratsModal
+				showAcceptedSolutions={ !waitingForManualChecking && !hideSolutions && this.showAcceptedSolutions }
+				score={ score }
+				waitingForManualChecking={ waitingForManualChecking }
+				onClose={ this.closeCongratsModal }
+			/>
+		);
 	}
 
 	renderReview = () => {
@@ -696,8 +754,9 @@ class CodeMirror extends React.Component {
 
 		this.setState({
 			isEditable: true,
-			showSubmitOutput: null,
 			valueChanged: true,
+			currentSubmission: null,
+			output: null,
 		})
 	}
 
@@ -720,7 +779,7 @@ class CodeMirror extends React.Component {
 			valueChanged: true,
 			isEditable: true,
 			currentSubmission: null,
-			showSubmitOutput: null,
+			output: null,
 		})
 	}
 
@@ -742,17 +801,24 @@ class CodeMirror extends React.Component {
 	}
 
 	toggleOutput = () => {
-		const { showSubmitOutput, } = this.state;
+		const { currentSubmission, output, } = this.state;
 
 		this.setState({
-			showSubmitOutput: !showSubmitOutput,
+			output: output ? null : currentSubmission.automaticChecking.output,
 		})
 	}
 
 	showAcceptedSolutionsWarning = () => {
-		this.setState({
-			showAcceptedSolutionsWarning: true,
-		})
+		const { successSubmissions, } = this.state;
+		const { isSkipped, } = this.props;
+
+		if(successSubmissions.length > 0 || isSkipped) {
+			this.showAcceptedSolutions();
+		} else {
+			this.setState({
+				showAcceptedSolutionsWarning: true,
+			});
+		}
 	}
 
 	hideAcceptedSolutionsWarning = () => {
@@ -765,7 +831,11 @@ class CodeMirror extends React.Component {
 		this.setState({
 			showAcceptedSolutions: true,
 		})
-		e.stopPropagation()
+
+		if(e) {
+			e.stopPropagation();
+		}
+
 		this.hideAcceptedSolutionsWarning();
 	}
 
@@ -775,40 +845,72 @@ class CodeMirror extends React.Component {
 		})
 	}
 
-
 	closeCongratsModal = () => {
 		this.setState({
-			congratsModalOpened: false,
+			congratsModalData: null,
 		})
 	}
 
 	sendExercise = () => {
-		const { value, } = this.state;
+		const { value, successSubmissions, } = this.state;
 		const { courseId, slideId, } = this.props;
+
+		this.setState({
+			submissionLoading: true,
+		});
 
 		api.exercise.submitCode(courseId, slideId, value)
 			.then(r => {
 				this.setState({
-					submitResults: r,
-					congratsModalOpened: r.isRightAnswer,
+					submissionLoading: false,
 				});
+				if(r.solutionRunStatus === solutionRunStatuses.success) {
+					if(r.submission.automaticChecking.processStatus === processStatuses.done) {
+						const { result, output, } = r.submission.automaticChecking;
+
+						// eslint-disable-next-line default-case
+						switch (result) {
+							case checkingResults.rightAnswer: {
+								this.setState({
+									successSubmissions: [...successSubmissions, r.submission],
+								}, () => {
+									console.log(r.waitingForManualChecking);
+									this.openModal({
+										score: r.score,
+										waitingForManualChecking: r.waitingForManualChecking
+									});
+									this.loadSubmissionToState(r.submission);
+								});
+								break;
+							}
+							case checkingResults.wrongAnswer: {
+								this.setState({
+									output,
+								});
+								break;
+							}
+							case checkingResults.compilationError: {
+								break;
+							}
+							case checkingResults.notChecked: {
+								break;
+							}
+						}
+					}
+				}
 				/*
-				actualOutput: null
-				expectedOutput: null
-				ignored: false
-				isCompileError: false
-				isInternalServerError: true
-				isRightAnswer: false
-				message: "К сожалению, из-за большой нагрузки мы не смогли оперативно проверить ваше решение. Мы попробуем проверить его позже, просто подождите и обновите страницу. "
-				sentToReview: false
-				styleMessages: null
-				submissionId: 0
+				message: null
+				score: 5
+				solutionRunStatus: "Success"
+				submission: {id: 117,…}
+				waitingForManualChecking: null
 				 */
 			});
 	}
 
-	isSubmitResultsContainsError = (submitResults) => {
-		return submitResults.isCompileError || submitResults.isInternalServerError || !submitResults.isRightAnswer;
+	isSubmitResultsContainsError = ({ automaticChecking }) => {
+		return automaticChecking.result === checkingResults.compilationError
+			|| automaticChecking.result === checkingResults.wrongAnswer;
 	}
 
 	onBeforeChange = (editor, data, value) => {
@@ -841,6 +943,7 @@ class CodeMirror extends React.Component {
 		}
 	}
 
+	static
 	loadLanguageStyles = (language) => {
 		switch (language.toLowerCase()) {
 			case 'csharp':
@@ -911,13 +1014,16 @@ class CodeMirror extends React.Component {
 	}
 }
 
-CodeMirror.propTypes = {
+CodeMirror
+	.propTypes = {
 	courseId: PropTypes.string,
 	slideId: PropTypes.string,
 	className: PropTypes.string,
 	language: PropTypes.string.isRequired,
 	code: PropTypes.string,
 	isAuthenticated: PropTypes.bool,
+	hideSolutions: PropTypes.bool,
+	isSkipped: PropTypes.bool,
 }
 
 export default CodeMirror;

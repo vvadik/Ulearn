@@ -1,13 +1,32 @@
 import React from "react";
 
 import getPluralForm from "src/utils/getPluralForm";
+import { checkingResults } from "src/consts/exercise";
 
 import moment from "moment";
 
 const texts = {
 	submissions: {
 		newTry: 'Новая попытка',
-		getSubmissionCaption: (submission) => submission ? texts.getSubmissionDate(submission.timestamp) : texts.submissions.newTry,
+		getSubmissionCaption: (submission) => {
+			if(!submission || submission.isNew) {
+				return texts.submissions.newTry;
+			}
+
+			const { timestamp, automaticChecking, } = submission;
+
+			const timestampCaption = texts.getSubmissionDate(timestamp);
+
+			if(automaticChecking) {
+				const { result } = automaticChecking;
+
+				if(result === checkingResults.compilationError || result === checkingResults.wrongAnswer) {
+					return timestampCaption + ` (${ result })`;
+				}
+			}
+
+			return timestampCaption;
+		},
 	},
 
 	headers: {
@@ -31,6 +50,8 @@ const texts = {
 
 		userOutput: 'Вывод вашей программы',
 		expectedOutput: 'Ожидаемый вывод',
+
+		wrongAnswer: 'Неверный результат',
 	},
 
 	checkups: {
@@ -93,14 +114,16 @@ const texts = {
 			buildShortText: (usersWithRightAnswerCount) =>
 				<React.Fragment>Решило: { usersWithRightAnswerCount }</React.Fragment>,
 			buildStatistics: (attemptedUsersCount, usersWithRightAnswerCount, lastSuccessAttemptDate) =>
-				<React.Fragment>
-					За всё время:<br/>
-					{ attemptedUsersCount } { getPluralForm(attemptedUsersCount, 'студент пробовал', 'студента пробовали', 'студентов пробовали') } решить<br/>
-					задачу, { getPluralForm(attemptedUsersCount, 'решил', 'решили', 'решили') } { usersWithRightAnswerCount }
-					<br/>
-					<br/>
-					Последний раз решили { moment(lastSuccessAttemptDate).startOf("minute").fromNow() }
-				</React.Fragment>,
+				lastSuccessAttemptDate
+					? <React.Fragment>
+						За всё время:<br/>
+						{ attemptedUsersCount } { getPluralForm(attemptedUsersCount, 'студент пробовал', 'студента пробовали', 'студентов пробовали') } решить задачу.<br/>
+						{ getPluralForm(attemptedUsersCount, 'Решил', 'Решили', 'Решили') } { usersWithRightAnswerCount }
+						<br/>
+						<br/>
+						Последний раз решили { moment(lastSuccessAttemptDate).startOf("minute").fromNow() }
+					</React.Fragment>
+					: 'Эту задачу ещё никто не решал',
 		},
 	},
 
