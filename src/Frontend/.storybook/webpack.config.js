@@ -1,8 +1,8 @@
 const path = require("path");
 
-module.exports = (baseConfig, env, defaultConfig) => {
+module.exports = ({ config, mode }) => {
 
-	defaultConfig.module.rules.push(
+	config.module.rules.push(
 		{
 			test: /\.less$/,
 			use: [
@@ -22,5 +22,5 @@ module.exports = (baseConfig, env, defaultConfig) => {
 		},
 	);
 
-	return defaultConfig
+	return config
 };

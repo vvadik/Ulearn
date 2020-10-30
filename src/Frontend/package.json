@@ -11,7 +11,7 @@
     "analyze": "node scripts/build.js analyze",
     "courseToolBuild": "node scripts/courseToolBuild.js",
     "test": "jest",
-    "storybook": "start-storybook -p 9001 -c .storybook"
+    "storybook": "start-storybook -p 9001 -c .storybook -s public"
   },
   "dependencies": {
     "@microsoft/signalr": "3.1.6",
