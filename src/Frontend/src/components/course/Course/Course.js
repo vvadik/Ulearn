@@ -125,11 +125,12 @@ class Course extends Component {
 				loadCourseErrors(courseId);
 		}
 
-		if(!prevProps.progress && progress && !isHijacked && currentSlideInfo) {
+		if(!prevProps.progress && progress && !isHijacked && currentSlideInfo && currentSlideInfo.current) {
 			updateVisitedSlide(courseId, currentSlideInfo.current.id);
 		}
 
-		if((currentSlideId !== prevState.currentSlideId || isStudentMode !== prevProps.isStudentMode) && currentSlideInfo.current.type === SLIDETYPE.exercise && (pageInfo.isNavigationVisible && !pageInfo.isAcceptedSolutions)) {
+		if((currentSlideId !== prevState.currentSlideId || isStudentMode !== prevProps.isStudentMode)
+			&& currentSlideInfo && currentSlideInfo.current && currentSlideInfo.current.type === SLIDETYPE.exercise && (pageInfo.isNavigationVisible && !pageInfo.isAcceptedSolutions)) {
 			if(isStudentMode) {
 				history.push('?version=-1'); //prevent showing task solution
 			} else if(history.location.search === '?version=-1') {
