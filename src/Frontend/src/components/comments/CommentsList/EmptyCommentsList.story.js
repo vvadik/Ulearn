@@ -35,6 +35,13 @@ function getUserSolutionsUrl(userId) {
 
 const comments = [];
 
+const commentPolicy = {
+	areCommentsEnabled: true,
+	moderationPolicy: "postmoderation",
+	onlyInstructorsCanReply: false,
+	status: "ok",
+}
+
 const fakeCommentsApi = {
 	getComments: () => Promise.resolve({topLevelComments: comments}),
 	getComment: () => Promise.resolve(console.log("API: get comment")),
@@ -55,6 +62,7 @@ storiesOf("Comments/CommentsList", module)
 		userRoles={userIsStudent}
 		courseId={"BasicProgramming"}
 		slideId={"90bcb61e-57f0-4baa-8bc9-10c9cfd27f58"}
+		commentPolicy={commentPolicy}
 		commentsApi={fakeCommentsApi} />
 ), {viewport: "desktop"})
 .add("empty comments list for student", () => (
@@ -66,6 +74,7 @@ storiesOf("Comments/CommentsList", module)
 		userRoles={userIsStudent}
 		courseId={"BasicProgramming"}
 		slideId={"90bcb61e-57f0-4baa-8bc9-10c9cfd27f58"}
+		commentPolicy={commentPolicy}
 		commentsApi={fakeCommentsApi} />
 ), {viewport: "desktop"})
 .add("empty comments list for instructor", () => (
@@ -77,5 +86,6 @@ storiesOf("Comments/CommentsList", module)
 		userRoles={userIsInstructor}
 		courseId={"BasicProgramming"}
 		slideId={"90bcb61e-57f0-4baa-8bc9-10c9cfd27f58"}
+		commentPolicy={commentPolicy}
 		commentsApi={fakeCommentsApi} />
 ), {viewport: "desktop"});

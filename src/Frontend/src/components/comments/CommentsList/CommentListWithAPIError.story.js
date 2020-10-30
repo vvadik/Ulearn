@@ -15,6 +15,13 @@ const userRoles = {
 	"courseAccesses": [],
 };
 
+const commentPolicy = {
+	areCommentsEnabled: true,
+	moderationPolicy: "postmoderation",
+	onlyInstructorsCanReply: false,
+	status: "ok",
+}
+
 const comments = [
 	{
 		id: 1999,
@@ -120,6 +127,7 @@ storiesOf("Comments/CommentsList", module)
 		userRoles={userRoles}
 		courseId={"BasicProgramming"}
 		slideId={"90bcb61e-57f0-4baa-8bc9-10c9cfd27f58"}
+		commentPolicy={commentPolicy}
 		commentsApi={brokenCommentsApi} />
 ), {viewport: "desktop"})
 .add("api request error", () => (
@@ -131,6 +139,7 @@ storiesOf("Comments/CommentsList", module)
 		userRoles={userRoles}
 		courseId={"BasicProgramming"}
 		slideId={"90bcb61e-57f0-4baa-8bc9-10c9cfd27f58"}
+		commentPolicy={commentPolicy}
 		commentsApi={brokenMethodsCommentsApi} />
 ), {viewport: "desktop"});
 
