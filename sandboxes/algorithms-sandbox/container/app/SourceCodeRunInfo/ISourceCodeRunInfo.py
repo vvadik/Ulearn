@@ -4,7 +4,7 @@ class ISourceCodeRunInfo:
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def format_build_command(self, code_filename: str, result_filename: str) -> list:
+    def format_build_command(self, code_filename: str, result_filename: str) -> str:
         """
         Формирует команду, которую надо ввести в bash, чтобы исходных код сбилдился
         :param result_filename: путь к файлу, куда поместится результат сборки
@@ -20,7 +20,7 @@ class ISourceCodeRunInfo:
         """
 
     @abstractmethod
-    def format_run_command(self, filename: str) -> list:
+    def format_run_command(self, filename: str) -> str:
         """
         Формирует команду, которую надо ввести в bash, чтобы программа начала выполнение
         :param filename: путь к файлу с программой
