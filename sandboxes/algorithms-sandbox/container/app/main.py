@@ -1,24 +1,12 @@
 from subprocess import Popen, PIPE, TimeoutExpired
 from os import listdir
+from os.path import join as path_join
 import json
+
 from SourceCodeRunInfo import get_run_info_by_language_name, ISourceCodeRunInfo
 from verdict import Verdict
-
-
-class CompilationException(Exception):
-    pass
-
-
-class RuntimeException(Exception):
-    pass
-
-
-class TimeLimitException(Exception):
-    pass
-
-
-class WrongAnswerException(Exception):
-    pass
+from constants import *
+from exceptions import *
 
 
 class TaskCodeRunner:
@@ -34,9 +22,9 @@ class TaskCodeRunner:
         if process.returncode != 0:
             raise CompilationException(err)
 
-    def run(self, test_file: str, result_file: str, time_limit: int):
+    def run(self, test_file: str, result_file: str):
         command = self.__source_code_run_info.format_run_command(self.__runnable_file).split()
-        process = Popen(command, stdin=open(test_file, 'r'), stdout=open(result_file, 'w'), stderr=PIPE)
+        process = Popen(command, stdin=open(test_file), stdout=open(result_file, 'w'), stderr=PIPE)
         try:
             process.wait(time_limit)
         except TimeoutExpired:
@@ -45,36 +33,37 @@ class TaskCodeRunner:
         if process.returncode != 0:
             raise RuntimeException()
 
-    def run_test(self, code_filename: str, test_file: str, time_limit: int):
+    def run_test(self, code_filename: str, test_file: str):
         if self.__runnable_file is None:
             if self.__source_code_run_info.need_build():
-                self.__runnable_file = 'tmp'
+                self.__runnable_file = TEMPORARY_FILENAME
                 self.build(code_filename, self.__runnable_file)
             else:
                 self.__runnable_file = code_filename
 
-        self.run(test_file, f'result', time_limit)
+        self.run(test_file, RESULT_FILENAME)
 
 
 def load_settings(settings_filename: str):
-    with open(settings_filename, 'r') as settings_file:
+    with open(settings_filename) as settings_file:
         return json.load(settings_file)
 
 
 def check(code_filename):
-    number_test = 1
-    source_code_run_info = get_run_info_by_language_name('python')
+    source_code_run_info = get_run_info_by_language_name(language)
     runner = TaskCodeRunner(source_code_run_info)
-    for test in sorted(listdir('tests')):
-        if test.endswith('.a'):
+    for number_test, test_filename in enumerate(sorted(listdir(TEST_DIRECTORY)), 1):
+        if test_filename.endswith(SUFFIX_ANSWER_FILENAME):
             continue
         try:
-            runner.run_test(code_filename, f'tests/{test}', 1)
-            process = Popen(['./check', f'tests/{test}', 'result', f'tests/{test}.a'], stdout=PIPE, stderr=PIPE)
-            out, err = process.communicate()
-            if err.startswith(b'ok'):
-                number_test += 1
-            else:
+            runner.run_test(code_filename, path_join(TEST_DIRECTORY, test_filename))
+            process = Popen([path_join('.', 'check'),
+                             path_join(TEST_DIRECTORY, test_filename),
+                             RESULT_FILENAME,
+                             path_join(TEST_DIRECTORY, f'{test_filename}{SUFFIX_ANSWER_FILENAME}')],
+                            stdout=PIPE, stderr=PIPE)
+            _, err = process.communicate()
+            if not err.startswith(b'ok'):
                 raise WrongAnswerException()
         except CompilationException:
             return {
@@ -100,13 +89,17 @@ def check(code_filename):
     }
 
 
-def main(settings_filename):
-    # settings = load_settings(settings_filename)
+def main():
     runner = TaskCodeRunner(get_run_info_by_language_name('cpp'))
     runner.build('check.cpp', 'check')
 
-    print(check('solution.py'))
+    result = check(SOLUTION_FILENAME)
+    print(result)
 
+
+settings = load_settings(SETTINGS_FILENAME)
+time_limit = settings["TimeLimit"]
+language = settings["Language"]
 
 if __name__ == '__main__':
-    main('settings.json')
+    main()

@@ -1,0 +1,6 @@
+SOLUTION_FILENAME = 'solution.py'
+SETTINGS_FILENAME = 'settings.json'
+TEST_DIRECTORY = 'tests'
+RESULT_FILENAME = 'result'
+TEMPORARY_FILENAME = 'tmp'
+SUFFIX_ANSWER_FILENAME = '.a'
