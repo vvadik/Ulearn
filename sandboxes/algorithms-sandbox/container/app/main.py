@@ -1,8 +1,9 @@
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, TimeoutExpired
 from os import listdir
 import json
 from SourceCodeRunInfo import get_run_info_by_language_name, ISourceCodeRunInfo
 from verdict import Verdict
+
 
 class CompilationException(Exception):
     pass
@@ -34,12 +35,15 @@ class TaskCodeRunner:
             raise CompilationException(err)
 
     def run(self, test_file: str, result_file: str, time_limit: int):
-        
         command = self.__source_code_run_info.format_run_command(self.__runnable_file).split()
         process = Popen(command, stdin=open(test_file, 'r'), stdout=open(result_file, 'w'), stderr=PIPE)
-        err = process.wait(time_limit)
+        try:
+            process.wait(time_limit)
+        except TimeoutExpired:
+            raise TimeLimitException()
+
         if process.returncode != 0:
-            raise RuntimeException(err)
+            raise RuntimeException()
 
     def run_test(self, code_filename: str, test_file: str, time_limit: int):
         if self.__runnable_file is None:
@@ -76,11 +80,10 @@ def check(code_filename):
             return {
                 'Verdict': Verdict.CompilationError.name
             }
-        except RuntimeException as r:
+        except RuntimeException:
             return {
                 'Verdict': Verdict.RuntimeError.name,
-                'TestNumber': number_test,
-                'Error': str(r.args)
+                'TestNumber': number_test
             }
         except TimeLimitException:
             return {
@@ -105,10 +108,5 @@ def main(settings_filename):
     print(check('solution.py'))
 
 
-
 if __name__ == '__main__':
     main('settings.json')
-
-'''
-    в settings инфа по ограничению повремени
-'''
