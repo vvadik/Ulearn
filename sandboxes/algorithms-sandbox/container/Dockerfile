@@ -8,3 +8,5 @@ RUN apt update && apt -y upgrade \
 COPY ./app/ /app/
 
 WORKDIR app
+
+RUN useradd student && chmod 700 /app/tests

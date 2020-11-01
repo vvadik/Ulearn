@@ -23,14 +23,19 @@ class TaskCodeRunner:
             raise CompilationException(err)
 
     def run(self, test_file: str, result_file: str):
-        command = self.__source_code_run_info.format_run_command(self.__runnable_file).split()
-        process = Popen(command, stdin=open(test_file), stdout=open(result_file, 'w'), stderr=PIPE)
+        command = self.__source_code_run_info.format_run_command(self.__runnable_file)
+        with open(test_file, 'rb') as f:
+            test_data = f.read()
+        process = Popen(['su', STUDENT_USER, '-c', f"{command}"],
+                        stdin=PIPE, stdout=open(result_file, 'w'), stderr=PIPE)
         try:
-            process.wait(time_limit)
+            err = process.communicate(test_data, timeout=time_limit)
         except TimeoutExpired:
             raise TimeLimitException()
 
         if process.returncode != 0:
+            if b'PermissionError' in err[1]:
+                raise SecurityException()
             raise RuntimeException()
 
     def run_test(self, code_filename: str, test_file: str):
@@ -83,6 +88,10 @@ def check(code_filename):
             return {
                 'Verdict': Verdict.WrongAnswer.name,
                 'TestNumber': number_test
+            }
+        except SecurityException:
+            return {
+                'Verdict': Verdict.SecurityException.name
             }
     return {
         'Verdict': Verdict.Ok.name,

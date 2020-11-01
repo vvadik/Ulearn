@@ -12,3 +12,7 @@ class TimeLimitException(Exception):
 
 class WrongAnswerException(Exception):
     pass
+
+
+class SecurityException(Exception):
+    pass
