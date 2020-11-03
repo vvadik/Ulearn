@@ -1,18 +1,17 @@
 import React from "react";
-import { storiesOf } from "@storybook/react";
 import CommentsList from "./CommentsList";
 
 const user = {
-	"isAuthenticated": true,
-	"id": "11",
-	"visibleName": "Pavel",
-	"avatarUrl": null,
+	isAuthenticated: true,
+	id: "11",
+	visibleName: "Pavel",
+	avatarUrl: null,
 };
 
 const userRoles = {
-	"isSystemAdministrator": true,
-	"courseRole": "Student",
-	"courseAccesses": [],
+	isSystemAdministrator: true,
+	courseRole: "Student",
+	courseAccesses: [],
 };
 
 const commentPolicy = {
@@ -25,12 +24,14 @@ const commentPolicy = {
 const comments = [
 	{
 		id: 1999,
-		text: "Решать эти задачи **можно** прямо в браузере, а специальная проверяющая система тут же проверит ваше решение.",
-		renderedText: "Решать эти задачи <b>можно</b> прямо в браузере, а специальная проверяющая система тут же проверит ваше решение.",
+		text:
+			"Решать эти задачи **можно** прямо в браузере, а специальная проверяющая система тут же проверит ваше решение.",
+		renderedText:
+			"Решать эти задачи <b>можно</b> прямо в браузере, а специальная проверяющая система тут же проверит ваше решение.",
 		author: {
-			"id": "11",
-			"visibleName": "Louisa",
-			"avatarUrl": null,
+			id: "11",
+			visibleName: "Louisa",
+			avatarUrl: null,
 		},
 		publishTime: "2019-01-18T14:12:41.947",
 		isApproved: false,
@@ -41,9 +42,10 @@ const comments = [
 			{
 				id: 2000,
 				author: {
-					"id": "10",
-					"visibleName": "Maria",
-					"avatarUrl": "https://staff.skbkontur.ru/content/images/default-user-woman.png",
+					id: "10",
+					visibleName: "Maria",
+					avatarUrl:
+						"https://staff.skbkontur.ru/content/images/default-user-woman.png",
 				},
 				text: "Я **не согласна**",
 				replies: [],
@@ -53,14 +55,15 @@ const comments = [
 				isCorrectAnswer: false,
 				likesCount: 0,
 				isLiked: false,
-				parentCommentId: 1999
+				parentCommentId: 1999,
 			},
 			{
 				id: 2001,
 				author: {
-					"id": "11",
-					"visibleName": "Kate",
-					"avatarUrl": "https://staff.skbkontur.ru/content/images/default-user-woman.png",
+					id: "11",
+					visibleName: "Kate",
+					avatarUrl:
+						"https://staff.skbkontur.ru/content/images/default-user-woman.png",
 				},
 				text: "Я **согласна**",
 				replies: [],
@@ -70,18 +73,20 @@ const comments = [
 				isCorrectAnswer: true,
 				likesCount: 5,
 				isLiked: true,
-				parentCommentId: 1999
-			}
+				parentCommentId: 1999,
+			},
 		],
 	},
 	{
 		id: 2002,
-		text: "Решать эти задачи **можно** прямо в браузере, а специальная проверяющая система тут же проверит ваше решение.",
-		renderedText: "Решать эти задачи <b>можно</b> прямо в браузере, а специальная проверяющая система тут же проверит ваше решение.",
+		text:
+			"Решать эти задачи **можно** прямо в браузере, а специальная проверяющая система тут же проверит ваше решение.",
+		renderedText:
+			"Решать эти задачи <b>можно</b> прямо в браузере, а специальная проверяющая система тут же проверит ваше решение.",
 		author: {
-			"id": "13",
-			"visibleName": "Henry",
-			"avatarUrl": null,
+			id: "13",
+			visibleName: "Henry",
+			avatarUrl: null,
 		},
 		publishTime: "2019-01-18T14:12:41.947",
 		isApproved: false,
@@ -89,13 +94,11 @@ const comments = [
 		isLiked: true,
 		likesCount: 8,
 		replies: [],
-	}
+	},
 ];
 
 const brokenCommentsApi = {
-	getComments: () => {
-		throw new Error("Произошла ошибка. Попробуйте обновить страницу");
-	},
+	getComments: () => Promise.reject(new Error("Произошла ошибка. Попробуйте обновить страницу")),
 	addComment: () => Promise.resolve(console.log("API: added comment")),
 	deleteComment: () => Promise.resolve(console.log("API: delete comment")),
 	updateComment: () => Promise.resolve(console.log("API: update comment")),
@@ -104,7 +107,7 @@ const brokenCommentsApi = {
 };
 
 const brokenMethodsCommentsApi = {
-	getComments: () => Promise.resolve({topLevelComments: comments}),
+	getComments: () => Promise.resolve({ topLevelComments: comments }),
 	getComment: () => Promise.reject(new Error("произошла ошибка")),
 	addComment: () => Promise.reject(new Error("произошла ошибка")),
 	deleteComment: () => Promise.reject(new Error("произошла ошибка")),
@@ -114,32 +117,43 @@ const brokenMethodsCommentsApi = {
 };
 
 function getUserSolutionsUrl(userId) {
-	return `https://dev.ulearn.me/Analytics/UserSolutions?courseId=BasicProgramming&slideId=90bcb61e-57f0-4baa-8bc9-10c9cfd27f58&userId=${userId}`;
+	return `https://dev.ulearn.me/Analytics/UserSolutions?courseId=BasicProgramming&slideId=90bcb61e-57f0-4baa-8bc9-10c9cfd27f58&userId=${ userId }`;
 }
 
-storiesOf("Comments/CommentsList", module)
-.add("api error 500", () => (
-	<CommentsList
-		slideType={"exercise"}
-		comments={comments}
-		getUserSolutionsUrl={getUserSolutionsUrl(user.id)}
-		user={user}
-		userRoles={userRoles}
-		courseId={"BasicProgramming"}
-		slideId={"90bcb61e-57f0-4baa-8bc9-10c9cfd27f58"}
-		commentPolicy={commentPolicy}
-		commentsApi={brokenCommentsApi} />
-), {viewport: "desktop"})
-.add("api request error", () => (
-	<CommentsList
-		slideType={"exercise"}
-		comments={comments}
-		getUserSolutionsUrl={getUserSolutionsUrl(user.id)}
-		user={user}
-		userRoles={userRoles}
-		courseId={"BasicProgramming"}
-		slideId={"90bcb61e-57f0-4baa-8bc9-10c9cfd27f58"}
-		commentPolicy={commentPolicy}
-		commentsApi={brokenMethodsCommentsApi} />
-), {viewport: "desktop"});
+export default {
+	title: "Comments/CommentsList",
+};
 
+export const ApiError500 = () => (
+	<CommentsList
+		slideType={ "exercise" }
+		comments={ comments }
+		getUserSolutionsUrl={ getUserSolutionsUrl(user.id) }
+		user={ user }
+		userRoles={ userRoles }
+		courseId={ "BasicProgramming" }
+		slideId={ "90bcb61e-57f0-4baa-8bc9-10c9cfd27f58" }
+		commentsApi={ brokenCommentsApi }
+		commentPolicy={ commentPolicy }
+	/>
+);
+
+ApiError500.storyName = "api error 500";
+ApiError500.parameters = { viewport: "desktop" };
+
+export const ApiRequestError = () => (
+	<CommentsList
+		slideType={ "exercise" }
+		comments={ comments }
+		getUserSolutionsUrl={ getUserSolutionsUrl(user.id) }
+		user={ user }
+		userRoles={ userRoles }
+		courseId={ "BasicProgramming" }
+		slideId={ "90bcb61e-57f0-4baa-8bc9-10c9cfd27f58" }
+		commentsApi={ brokenMethodsCommentsApi }
+		commentPolicy={ commentPolicy }
+	/>
+);
+
+ApiRequestError.storyName = "api request error";
+ApiRequestError.parameters = { viewport: "desktop" };

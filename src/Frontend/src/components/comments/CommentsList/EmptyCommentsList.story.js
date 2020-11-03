@@ -1,36 +1,35 @@
 import React from "react";
-import { storiesOf } from "@storybook/react";
 import CommentsList from "./CommentsList";
 
 const user = {
-	"isAuthenticated": true,
-	"id": "11",
-	"visibleName": "Pavel",
-	"avatarUrl": null,
+	isAuthenticated: true,
+	id: "11",
+	visibleName: "Pavel",
+	avatarUrl: null,
 };
 
 const userIsNotAuthenticated = {
-	"isAuthenticated": false,
-	"id": "11",
-	"visibleName": "Pavel",
-	"avatarUrl": null,
-	"systemAccesses": ["viewAllProfiles"],
+	isAuthenticated: false,
+	id: "11",
+	visibleName: "Pavel",
+	avatarUrl: null,
+	systemAccesses: ["viewAllProfiles"],
 };
 
 const userIsStudent = {
-	"isSystemAdministrator": false,
-	"courseRole": "Student",
-	"courseAccesses": [],
+	isSystemAdministrator: false,
+	courseRole: "Student",
+	courseAccesses: [],
 };
 
 const userIsInstructor = {
-	"isSystemAdministrator": false,
-	"courseRole": "instructor",
-	"courseAccesses": [],
+	isSystemAdministrator: false,
+	courseRole: "instructor",
+	courseAccesses: [],
 };
 
 function getUserSolutionsUrl(userId) {
-	return `https://dev.ulearn.me/Analytics/UserSolutions?courseId=BasicProgramming&slideId=90bcb61e-57f0-4baa-8bc9-10c9cfd27f58&userId=${userId}`;
+	return `https://dev.ulearn.me/Analytics/UserSolutions?courseId=BasicProgramming&slideId=90bcb61e-57f0-4baa-8bc9-10c9cfd27f58&userId=${ userId }`;
 }
 
 const comments = [];
@@ -43,7 +42,7 @@ const commentPolicy = {
 }
 
 const fakeCommentsApi = {
-	getComments: () => Promise.resolve({topLevelComments: comments}),
+	getComments: () => Promise.resolve({ topLevelComments: comments }),
 	getComment: () => Promise.resolve(console.log("API: get comment")),
 	addComment: () => Promise.resolve(console.log("API: added comment")),
 	deleteComment: () => Promise.resolve(console.log("API: delete comment")),
@@ -52,40 +51,57 @@ const fakeCommentsApi = {
 	dislikeComment: () => Promise.resolve(console.log("API: dislike comment")),
 };
 
-storiesOf("Comments/CommentsList", module)
-.add("empty comments list for unauthorized user", () => (
+export default {
+	title: "Comments/CommentsList",
+};
+
+export const EmptyCommentsListForUnauthorizedUser = () => (
 	<CommentsList
-		slideType={"exercise"}
-		comments={comments}
-		getUserSolutionsUrl={getUserSolutionsUrl(user.id)}
-		user={userIsNotAuthenticated}
-		userRoles={userIsStudent}
-		courseId={"BasicProgramming"}
-		slideId={"90bcb61e-57f0-4baa-8bc9-10c9cfd27f58"}
-		commentPolicy={commentPolicy}
-		commentsApi={fakeCommentsApi} />
-), {viewport: "desktop"})
-.add("empty comments list for student", () => (
+		slideType={ "exercise" }
+		comments={ comments }
+		getUserSolutionsUrl={ getUserSolutionsUrl(user.id) }
+		user={ userIsNotAuthenticated }
+		userRoles={ userIsStudent }
+		courseId={ "BasicProgramming" }
+		slideId={ "90bcb61e-57f0-4baa-8bc9-10c9cfd27f58" }
+		commentsApi={ fakeCommentsApi }
+		commentPolicy={ commentPolicy }
+	/>
+);
+
+EmptyCommentsListForUnauthorizedUser.storyName = "empty comments list for unauthorized user";
+EmptyCommentsListForUnauthorizedUser.parameters = { viewport: "desktop" };
+
+export const EmptyCommentsListForStudent = () => (
 	<CommentsList
-		slideType={"exercise"}
-		comments={comments}
-		getUserSolutionsUrl={getUserSolutionsUrl(user.id)}
-		user={user}
-		userRoles={userIsStudent}
-		courseId={"BasicProgramming"}
-		slideId={"90bcb61e-57f0-4baa-8bc9-10c9cfd27f58"}
-		commentPolicy={commentPolicy}
-		commentsApi={fakeCommentsApi} />
-), {viewport: "desktop"})
-.add("empty comments list for instructor", () => (
+		slideType={ "exercise" }
+		comments={ comments }
+		getUserSolutionsUrl={ getUserSolutionsUrl(user.id) }
+		user={ user }
+		userRoles={ userIsStudent }
+		courseId={ "BasicProgramming" }
+		slideId={ "90bcb61e-57f0-4baa-8bc9-10c9cfd27f58" }
+		commentsApi={ fakeCommentsApi }
+		commentPolicy={ commentPolicy }
+	/>
+);
+
+EmptyCommentsListForStudent.storyName = "empty comments list for student";
+EmptyCommentsListForStudent.parameters = { viewport: "desktop" };
+
+export const EmptyCommentsListForInstructor = () => (
 	<CommentsList
-		slideType={"exercise"}
-		comments={comments}
-		getUserSolutionsUrl={getUserSolutionsUrl(user.id)}
-		user={user}
-		userRoles={userIsInstructor}
-		courseId={"BasicProgramming"}
-		slideId={"90bcb61e-57f0-4baa-8bc9-10c9cfd27f58"}
-		commentPolicy={commentPolicy}
-		commentsApi={fakeCommentsApi} />
-), {viewport: "desktop"});
+		slideType={ "exercise" }
+		comments={ comments }
+		getUserSolutionsUrl={ getUserSolutionsUrl(user.id) }
+		user={ user }
+		userRoles={ userIsInstructor }
+		courseId={ "BasicProgramming" }
+		slideId={ "90bcb61e-57f0-4baa-8bc9-10c9cfd27f58" }
+		commentsApi={ fakeCommentsApi }
+		commentPolicy={ commentPolicy }
+	/>
+);
+
+EmptyCommentsListForInstructor.storyName = "empty comments list for instructor";
+EmptyCommentsListForInstructor.parameters = { viewport: "desktop" };

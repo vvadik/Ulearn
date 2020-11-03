@@ -1,5 +1,4 @@
 import React from "react";
-import { storiesOf } from "@storybook/react";
 import { action } from "@storybook/addon-actions";
 import { withViewport } from "@storybook/addon-viewport";
 import CommentSendForm from "./CommentSendForm";
@@ -8,14 +7,15 @@ import "../../../common.less";
 
 const nameOnlyUser = {
 	id: "1",
-	"visibleName": "lol",
-	"avatarUrl": null,
+	visibleName: "lol",
+	avatarUrl: null,
 };
 
 const userWithAvatar = {
 	id: "11",
-	"visibleName": "Vasiliy Terkin",
-	"avatarUrl": "https://staff.skbkontur.ru/content/images/default-user-woman.png",
+	visibleName: "Vasiliy Terkin",
+	avatarUrl:
+		"https://staff.skbkontur.ru/content/images/default-user-woman.png",
 };
 
 class SendingCommentStory extends React.Component {
@@ -30,8 +30,9 @@ class SendingCommentStory extends React.Component {
 				handleSubmit={this.handleSubmit}
 				commentId={this.state.id}
 				author={nameOnlyUser}
-				sending={this.state.sending} />
-		)
+				sending={this.state.sending}
+			/>
+		);
 	}
 
 	handleSubmit = () => {
@@ -43,16 +44,18 @@ class SendingCommentStory extends React.Component {
 			let newState = {
 				sending: false,
 			};
-			if (this.props.success)
-				newState.id = 2;
-			this.setState(newState)
+			if (this.props.success) newState.id = 2;
+			this.setState(newState);
 		}, 500);
 	};
 }
 
-storiesOf("Comments/CommentSendForm", module)
-.addDecorator(withViewport())
-.add("desktop", () => (
+export default {
+	title: "Comments/CommentSendForm",
+	decorators: [withViewport(), withViewport(), withViewport()],
+};
+
+export const Desktop = () => (
 	<div>
 		<h2>Формы с разными кнопками отправки</h2>
 		<h3>Оставить комментарий</h3>
@@ -80,19 +83,42 @@ storiesOf("Comments/CommentSendForm", module)
 			sending={false}
 		/>
 		<h3>Форма в состоянии отправки</h3>
-		<CommentSendForm handleSubmit={action("sendComment")} commentId={2} author={userWithAvatar} sending={true} />
+		<CommentSendForm
+			handleSubmit={action("sendComment")}
+			commentId={2}
+			author={userWithAvatar}
+			sending={true}
+		/>
 		<h3>Успешная отправка комментария очищает поле ввода</h3>
 		<SendingCommentStory success={true} />
 		<h3>Ошибка при отправке комментария НЕ очищает поле ввода</h3>
 		<SendingCommentStory success={false} />
 	</div>
-), {viewport: "desktop"})
-.addDecorator(withViewport())
-.add("tablet", () => (
-	<CommentSendForm handleSubmit={action("sendComment")} commentId={1} author={nameOnlyUser} sending={false} />
-), {viewport: "tablet"})
-.addDecorator(withViewport())
-.add("mobile", () => (
-	<CommentSendForm handleSubmit={action("sendComment")} commentId={1} author={nameOnlyUser} sending={false} />
-), {viewport: "mobile"});
+);
 
+Desktop.storyName = "desktop";
+Desktop.parameters = { viewport: "desktop" };
+
+export const Tablet = () => (
+	<CommentSendForm
+		handleSubmit={action("sendComment")}
+		commentId={1}
+		author={nameOnlyUser}
+		sending={false}
+	/>
+);
+
+Tablet.storyName = "tablet";
+Tablet.parameters = { viewport: "tablet" };
+
+export const Mobile = () => (
+	<CommentSendForm
+		handleSubmit={action("sendComment")}
+		commentId={1}
+		author={nameOnlyUser}
+		sending={false}
+	/>
+);
+
+Mobile.storyName = "mobile";
+Mobile.parameters = { viewport: "mobile" };
