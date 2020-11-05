@@ -930,18 +930,43 @@ class CodeMirror extends React.Component {
 	onCursorActivity = () => {
 		const { currentReviews, exerciseCodeDoc, isEditable, } = this.state;
 		const cursor = exerciseCodeDoc.getCursor();
-		const { line, ch } = cursor;
 
 		if(!isEditable && currentReviews.length > 0) {
-			const reviewIndex = currentReviews.findIndex(r =>
-				r.startLine <= line && r.startPosition <= ch
-				&& r.finishLine >= line && r.finishPosition >= ch
-			);
-			if(reviewIndex >= 0) {
+			const reviewIndex = CodeMirror.getSelectedReviewIndexByCursor(currentReviews, exerciseCodeDoc, cursor);
+			if (reviewIndex !== undefined)
 				this.highlightReview(reviewIndex);
-			}
 		}
 	}
+
+	static
+	getSelectedReviewIndexByCursor = (currentReviews, exerciseCodeDoc, cursor) => {
+		const { line, ch } = cursor;
+		const reviewsUnderCursor = currentReviews.filter(r =>
+			r.startLine <= line && r.finishLine >= line
+			&& !(r.startLine === line && ch < r.startPosition)
+			&& !(r.finishLine === line && r.finishPosition < ch)
+		);
+		if(reviewsUnderCursor.length === 0)
+			return undefined;
+		reviewsUnderCursor.sort((a, b) => {
+			const aLength = CodeMirror.getReviewSelectionLength(a, exerciseCodeDoc);
+			const bLength = CodeMirror.getReviewSelectionLength(b, exerciseCodeDoc);
+			if (aLength !== bLength)
+				return aLength - bLength;
+			return a.startLine !== b.startLine
+				? a.startLine - b.startLine
+				: a.startPosition !== b.startPosition
+					? a.startPosition - b.startPosition
+					: a.timestamp - b.timestamp
+		});
+		const selectedReview = reviewsUnderCursor[0];
+		return currentReviews.findIndex(r => r === selectedReview);
+	}
+
+	static
+	getReviewSelectionLength = (review, exerciseCodeDoc) =>
+		exerciseCodeDoc.indexFromPos({ line: review.finishLine, ch: review.finishPosition })
+			- exerciseCodeDoc.indexFromPos({ line: review.startLine, ch: review.startPosition });
 
 	static
 	loadLanguageStyles = (language) => {
