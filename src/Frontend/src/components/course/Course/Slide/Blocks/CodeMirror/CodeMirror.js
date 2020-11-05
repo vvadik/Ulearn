@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Controlled, } from "react-codemirror2";
-import { Button, Checkbox, Dropdown, FLAT_THEME, MenuItem, Modal, Tooltip, } from "ui";
+import { Button, Checkbox, FLAT_THEME, Modal, Select, Tooltip, } from "ui";
 import Review from "src/components/course/Course/Slide/Blocks/CodeMirror/Review/Review";
 import { darkTheme } from 'ui/internal/ThemePlayground/darkTheme';
 import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent";
@@ -42,7 +42,8 @@ class CodeMirror extends React.Component {
 		const { exerciseInitialCode, submissions, code, expectedOutput, } = props;
 
 		const successSubmissions = submissions
-			.filter(s => !s.automaticChecking || s.automaticChecking.result === checkingResults.rightAnswer);
+			.filter(s => !s.automaticChecking || s.automaticChecking.result === checkingResults.rightAnswer)
+			.map(s => ({ ...s, caption: texts.submissions.getSubmissionCaption(s) }));
 
 		this.state = {
 			value: exerciseInitialCode || code,
@@ -200,7 +201,7 @@ class CodeMirror extends React.Component {
 
 		return (
 			<React.Fragment>
-				{ successSubmissions.length !== 0 && this.renderSubmissionsDropdown() }
+				{ successSubmissions.length !== 0 && this.renderSubmissionsSelect() }
 				{ !isEditable && currentSubmission && this.renderHeader() }
 				<div className={ wrapperClassName }>
 					<Controlled
@@ -242,30 +243,23 @@ class CodeMirror extends React.Component {
 		}));
 	}
 
-	renderSubmissionsDropdown = () => {
+	renderSubmissionsSelect = () => {
 		const { currentSubmission, successSubmissions, } = this.state;
 
-		const submissionsWithoutCurrent = [...successSubmissions]
+		const submissions = [...successSubmissions, { id: -1, caption: texts.submissions.newTry }];
+		const items = submissions.map((submission) => (submission.caption));
 
-		submissionsWithoutCurrent.push({ isNew: true, id: -1 });
-		
 		return (
 			<div className={ styles.submissionsDropdown }>
 				<ThemeContext.Provider value={ FLAT_THEME }>
-					<Dropdown
-						caption={ texts.submissions.getSubmissionCaption(currentSubmission) }>
-						{ submissionsWithoutCurrent.map((submission) =>
-							<MenuItem
-								disabled={ currentSubmission && submission.id === currentSubmission.id }
-								name={ submission.id }
-								key={ submission.id }
-								onClick={ submission.isNew ? this.loadNewTry : this.loadSubmission }>
-								{ texts.submissions.getSubmissionCaption(submission) }
-							</MenuItem>) }
-					</Dropdown>
+					<Select
+						items={ items }
+						value={ currentSubmission?.caption || texts.submissions.newTry }
+						onValueChange={ (caption) => this.loadSubmissionToState(submissions.find(s => s.caption === caption)) }
+					/>
 				</ThemeContext.Provider>
 			</div>
-		)
+		);
 	}
 
 	renderHeader = () => {
@@ -282,16 +276,12 @@ class CodeMirror extends React.Component {
 		return null;
 	}
 
-	loadSubmission = (e) => {
-		const { successSubmissions } = this.state;
-		const id = Number.parseInt(e.target.name);
-
-		const submission = successSubmissions.find(s => s.id === id);
-
-		this.loadSubmissionToState(submission);
-	}
-
 	loadSubmissionToState = (submission,) => {
+		if(submission.id < 0) {
+			this.loadNewTry();
+			return;
+		}
+
 		this.saveCodeDraftToCache();
 		this.clearAllTextMarkers();
 
@@ -840,7 +830,10 @@ class CodeMirror extends React.Component {
 						switch (result) {
 							case checkingResults.rightAnswer: {
 								this.setState({
-									successSubmissions: [...successSubmissions, r.submission],
+									successSubmissions: [...successSubmissions, {
+										...r.submission,
+										caption: texts.submissions.getSubmissionCaption(r.submission)
+									}],
 								}, () => {
 									console.log(r.waitingForManualChecking);
 									this.openModal({
