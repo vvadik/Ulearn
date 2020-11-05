@@ -115,7 +115,7 @@ class Slide extends React.Component {
 							   isBlock={ !onlyOneBlock }
 							   isHidden={ hide }
 							   isHeaderOfHiddenSlide={ i === 0 && isHiddenSlide }
-							   score={ i === 0 && score }
+							   score={ i === 0 ? score : null }
 							   isSkipped={ isSkipped }
 				>
 					{ blocks.map(this.mapBlockToComponent) }
