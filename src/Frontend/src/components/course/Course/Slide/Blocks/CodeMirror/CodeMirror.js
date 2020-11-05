@@ -2,10 +2,10 @@ import React from 'react';
 
 import { Controlled, } from "react-codemirror2";
 import { Button, Checkbox, Dropdown, FLAT_THEME, MenuItem, Modal, Tooltip, } from "ui";
+import Review from "src/components/course/Course/Slide/Blocks/CodeMirror/Review/Review";
 import { darkTheme } from 'ui/internal/ThemePlayground/darkTheme';
 import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent";
 import { Lightbulb, Refresh, EyeOpened, DocumentLite, Error, } from "icons";
-import Avatar from "src/components/common/Avatar/Avatar";
 import CongratsModal from "./CongratsModal/CongratsModal";
 import { ThemeContext } from "@skbkontur/react-ui/index";
 
@@ -14,11 +14,9 @@ import classNames from 'classnames';
 
 import { constructPathToAcceptedSolutions, } from "src/consts/routes";
 import { checkingResults, processStatuses, solutionRunStatuses } from "src/consts/exercise";
-import { getDateDDMMYY } from "src/utils/getMoment";
 import { isMobile, isTablet, } from "src/utils/getDeviceType";
 
 import api from "src/api";
-import { userProgressScoreUpdate } from "src/actions/userProgress";
 
 import CodeMirrorBase from 'codemirror/lib/codemirror';
 import 'codemirror/addon/edit/matchbrackets';
@@ -185,7 +183,7 @@ class CodeMirror extends React.Component {
 		const {
 			value, showedHintsCount, showAcceptedSolutions, currentSubmission,
 			isEditable, exerciseCodeDoc, congratsModalData,
-			currentReviews, successSubmissions, output,
+			currentReviews, successSubmissions, output, selectedReviewIndex,
 		} = this.state;
 
 		const isReview = !isEditable && currentReviews.length > 0;
@@ -213,7 +211,13 @@ class CodeMirror extends React.Component {
 						options={ opts }
 						value={ value }
 					/>
-					{ exerciseCodeDoc && isReview && this.renderReview() }
+					{ exerciseCodeDoc && isReview &&
+					<Review
+						selectedReviewIndex={ selectedReviewIndex }
+						onSelectComment={ this.selectComment }
+						reviews={ this.getReviewsWithHeight(currentReviews) }
+					/>
+					}
 				</div>
 				{ !isEditable && this.renderEditButton() }
 				{/* TODO not included in current release !isEditable && currentSubmission && this.renderOverview(currentSubmission)*/ }
@@ -226,14 +230,25 @@ class CodeMirror extends React.Component {
 		)
 	}
 
+	getReviewsWithHeight = (reviews) => {
+		const { exerciseCodeDoc } = this.state;
+
+		return reviews.map(r => ({
+			...r,
+			anchorTop: exerciseCodeDoc.cm.charCoords({
+				line: r.startLine,
+				ch: r.startPosition,
+			}, 'local').top
+		}));
+	}
+
 	renderSubmissionsDropdown = () => {
 		const { currentSubmission, successSubmissions, } = this.state;
 
 		const submissionsWithoutCurrent = [...successSubmissions]
 
 		submissionsWithoutCurrent.push({ isNew: true, id: -1 });
-
-
+		
 		return (
 			<div className={ styles.submissionsDropdown }>
 				<ThemeContext.Provider value={ FLAT_THEME }>
@@ -618,53 +633,6 @@ class CodeMirror extends React.Component {
 		);
 	}
 
-	renderReview = () => {
-		return (
-			<div className={ styles.reviewsContainer }>
-				{ this.renderComments() }
-			</div>
-		)
-	}
-
-	renderComments = () => {
-		const { currentReviews, } = this.state;
-		const comments = [];
-
-		for (const [i, review] of currentReviews.entries()) {
-			const comment = this.renderComment(review, i);
-			comments.push(comment);
-		}
-
-		return comments;
-	}
-
-	renderComment = ({ addingTime, author, comment, finishLine, finishPosition, startLine, startPosition, }, i,) => {
-		const { selectedReviewIndex, exerciseCodeDoc, } = this.state;
-		const className = classNames(styles.comment, { [styles.selectedReviewCommentWrapper]: selectedReviewIndex === i });
-
-		//const minHeight = exerciseCodeDoc.cm.charCoords({ line: startLine, ch: startPosition }, 'local').top;
-		//const offset = Math.max(5, minHeight,);
-		//TODO style={ { marginTop: `${ offset }px` } }
-		if(!author) {
-			author = { visibleName: 'Ulearn bot', id: 'bot', };
-		}
-
-		return (
-			<div key={ i } className={ className }
-				 onClick={ (e) => this.selectComment(e, i) }>
-				<div className={ styles.authorWrapper }>
-					<Avatar user={ author } size="big" className={ styles.commentAvatar }/>
-					<div className={ styles.authorCredentialsWrapper }>
-						{ author.visibleName }
-						<span className={ styles.commentLine }>{ `строка ${ startLine + 1 }` }</span>
-						{ addingTime && <p className={ styles.addingTime }>{ getDateDDMMYY(addingTime) }</p> }
-					</div>
-				</div>
-				<p className={ styles.commentText }>{ comment }</p>
-			</div>
-		);
-	}
-
 	showFirstComment = () => {
 		//TODO
 	}
@@ -933,7 +901,7 @@ class CodeMirror extends React.Component {
 
 		if(!isEditable && currentReviews.length > 0) {
 			const reviewIndex = CodeMirror.getSelectedReviewIndexByCursor(currentReviews, exerciseCodeDoc, cursor);
-			if (reviewIndex !== undefined)
+			if(reviewIndex !== undefined)
 				this.highlightReview(reviewIndex);
 		}
 	}
@@ -951,7 +919,7 @@ class CodeMirror extends React.Component {
 		reviewsUnderCursor.sort((a, b) => {
 			const aLength = CodeMirror.getReviewSelectionLength(a, exerciseCodeDoc);
 			const bLength = CodeMirror.getReviewSelectionLength(b, exerciseCodeDoc);
-			if (aLength !== bLength)
+			if(aLength !== bLength)
 				return aLength - bLength;
 			return a.startLine !== b.startLine
 				? a.startLine - b.startLine
@@ -966,7 +934,7 @@ class CodeMirror extends React.Component {
 	static
 	getReviewSelectionLength = (review, exerciseCodeDoc) =>
 		exerciseCodeDoc.indexFromPos({ line: review.finishLine, ch: review.finishPosition })
-			- exerciseCodeDoc.indexFromPos({ line: review.startLine, ch: review.startPosition });
+		- exerciseCodeDoc.indexFromPos({ line: review.startLine, ch: review.startPosition });
 
 	static
 	loadLanguageStyles = (language) => {

@@ -1,7 +1,6 @@
 @import "../../../courseVariables";
 
 @hintsLeftPadding: 22px;
-@minCommentWidth: 260px;
 @modalZIndex: 10;
 @congratsModalWidth: 514px;
 
@@ -29,7 +28,6 @@
 
 .editorInReview {
   flex: 2;
-  z-index: 1;
   border-left: unset;
   border-top: unset;
   border-bottom: unset;
@@ -46,66 +44,6 @@
 
 .selectedReviewCode {
   background: @accentColor;
-}
-
-.comment {
-  position: relative;
-  margin-left: 14px;
-  padding: 16px;
-
-  max-width: calc(@minCommentWidth - 18px);
-
-  background: @white;
-  box-shadow: 0 6px 6px -6px @black;
-
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-sizing: border-box;
-  border-radius: 8px;
-
-  font-weight: 400;
-  font-style: normal;
-  font-size: 14px;
-  line-height: 20px;
-}
-
-.selectedReviewCommentWrapper {
-  margin-left: 2px;
-  transition: margin-left 0.3s ease-in-out;
-}
-
-.authorWrapper {
-  display: flex;
-  align-items: center;
-}
-
-.authorCredentialsWrapper {
-  display: inline-block;
-  margin-left: 8px;
-}
-
-.commentLine {
-  margin-left: 8px;
-  color: @additionalColor;
-}
-
-.addingTime {
-  font-size: 12px;
-  line-height: 16px;
-
-  margin-bottom: 0;
-
-  color: @additionalColor;
-}
-
-.commentText {
-
-}
-
-.commentAvatar {
-  width: 24px;
-  height: 24px;
-
-  min-width: 24px;
 }
 
 .editButton {
@@ -246,17 +184,6 @@
   border-bottom-right-radius: 8px;
 
   overflow: hidden;
-}
-
-.reviewsContainer {
-  z-index: 0;
-  min-width: @minCommentWidth;
-  margin-left: -10px;
-  background-color: @lightYellow;
-}
-
-.reviewsContainer :last-child {
-  margin-bottom: 5px;
 }
 
 .submissionsDropdown {
