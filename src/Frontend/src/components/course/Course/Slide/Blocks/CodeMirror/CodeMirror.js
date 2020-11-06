@@ -46,7 +46,7 @@ class CodeMirror extends React.Component {
 			.map(s => ({ ...s, caption: texts.submissions.getSubmissionCaption(s) }));
 
 		//newer is first
-		successSubmissions.sort((s1, s2) => (s2.timestamp - s1.timestamp));
+		successSubmissions.sort((s1, s2) => (new Date(s2.timestamp) - new Date(s1.timestamp)));
 
 		this.state = {
 			value: exerciseInitialCode || code,
