@@ -830,10 +830,10 @@ class CodeMirror extends React.Component {
 						switch (result) {
 							case checkingResults.rightAnswer: {
 								this.setState({
-									successSubmissions: [...successSubmissions, {
+									successSubmissions: [{
 										...r.submission,
 										caption: texts.submissions.getSubmissionCaption(r.submission)
-									}],
+									}, ...successSubmissions,],
 								}, () => {
 									this.openModal({
 										score: r.score,
