@@ -894,21 +894,24 @@ class CodeMirror extends React.Component {
 
 		if(!isEditable && currentReviews.length > 0) {
 			const reviewIndex = CodeMirror.getSelectedReviewIndexByCursor(currentReviews, exerciseCodeDoc, cursor);
-			if(reviewIndex !== undefined)
+			if(reviewIndex >= 0) {
 				this.highlightReview(reviewIndex);
+			}
 		}
 	}
 
-	static
-	getSelectedReviewIndexByCursor = (currentReviews, exerciseCodeDoc, cursor) => {
+	static getSelectedReviewIndexByCursor = (currentReviews, exerciseCodeDoc, cursor) => {
 		const { line, ch } = cursor;
 		const reviewsUnderCursor = currentReviews.filter(r =>
 			r.startLine <= line && r.finishLine >= line
 			&& !(r.startLine === line && ch < r.startPosition)
 			&& !(r.finishLine === line && r.finishPosition < ch)
 		);
-		if(reviewsUnderCursor.length === 0)
-			return undefined;
+
+		if(reviewsUnderCursor.length === 0) {
+			return -1;
+		}
+
 		reviewsUnderCursor.sort((a, b) => {
 			const aLength = CodeMirror.getReviewSelectionLength(a, exerciseCodeDoc);
 			const bLength = CodeMirror.getReviewSelectionLength(b, exerciseCodeDoc);
@@ -920,6 +923,7 @@ class CodeMirror extends React.Component {
 					? a.startPosition - b.startPosition
 					: a.timestamp - b.timestamp
 		});
+
 		const selectedReview = reviewsUnderCursor[0];
 		return currentReviews.findIndex(r => r === selectedReview);
 	}
