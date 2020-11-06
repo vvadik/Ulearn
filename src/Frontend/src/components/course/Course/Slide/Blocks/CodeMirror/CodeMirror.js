@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Controlled, } from "react-codemirror2";
 import { Button, Checkbox, FLAT_THEME, Modal, Select, Tooltip, } from "ui";
-import Review from "src/components/course/Course/Slide/Blocks/CodeMirror/Review/Review";
+import Review from "./Review/Review";
 import { darkTheme } from 'ui/internal/ThemePlayground/darkTheme';
 import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent";
 import { Lightbulb, Refresh, EyeOpened, DocumentLite, Error, } from "icons";
@@ -45,6 +45,9 @@ class CodeMirror extends React.Component {
 			.filter(s => !s.automaticChecking || s.automaticChecking.result === checkingResults.rightAnswer)
 			.map(s => ({ ...s, caption: texts.submissions.getSubmissionCaption(s) }));
 
+		//newer is first
+		successSubmissions.sort((s1, s2) => (s2.timestamp - s1.timestamp));
+
 		this.state = {
 			value: exerciseInitialCode || code,
 			valueChanged: false,
@@ -64,7 +67,7 @@ class CodeMirror extends React.Component {
 			submissionLoading: false,
 			currentSubmission: null,
 			currentReviews: [],
-			selectedReviewIndex: -1,
+			selectedReviewId: -1,
 			output: null,
 			expectedOutput: expectedOutput && expectedOutput.split('\n'),
 			exerciseCodeDoc: null,
@@ -84,7 +87,7 @@ class CodeMirror extends React.Component {
 		this.overrideCodeMirrorAutocomplete();
 
 		if(successSubmissions.length > 0) {
-			this.loadSubmissionToState(successSubmissions[successSubmissions.length - 1]);
+			this.loadSubmissionToState(successSubmissions[0]);
 		} else {
 			this.refreshPreviousDraft(slideId);
 		}
@@ -173,9 +176,9 @@ class CodeMirror extends React.Component {
 	}
 
 	resetSelectedReviewTextMarker = () => {
-		const { selectedReviewIndex, isEditable, } = this.state;
+		const { selectedReviewId, isEditable, } = this.state;
 
-		if(!isEditable && selectedReviewIndex >= 0) {
+		if(!isEditable && selectedReviewId >= 0) {
 			this.highlightReview(-1);
 		}
 	}
@@ -184,7 +187,7 @@ class CodeMirror extends React.Component {
 		const {
 			value, showedHintsCount, showAcceptedSolutions, currentSubmission,
 			isEditable, exerciseCodeDoc, congratsModalData,
-			currentReviews, successSubmissions, output, selectedReviewIndex,
+			currentReviews, successSubmissions, output, selectedReviewId,
 		} = this.state;
 
 		const isReview = !isEditable && currentReviews.length > 0;
@@ -214,7 +217,7 @@ class CodeMirror extends React.Component {
 					/>
 					{ exerciseCodeDoc && isReview &&
 					<Review
-						selectedReviewIndex={ selectedReviewIndex }
+						selectedReviewId={ selectedReviewId }
 						onSelectComment={ this.selectComment }
 						reviews={ this.getReviewsWithHeight(currentReviews) }
 					/>
@@ -246,16 +249,16 @@ class CodeMirror extends React.Component {
 	renderSubmissionsSelect = () => {
 		const { currentSubmission, successSubmissions, } = this.state;
 
-		const submissions = [...successSubmissions, { id: -1, caption: texts.submissions.newTry }];
-		const items = submissions.map((submission) => (submission.caption));
+		const submissions = [{ id: -1, caption: texts.submissions.newTry }, ...successSubmissions,];
+		const items = submissions.map((submission) => ([submission.id, submission.caption]));
 
 		return (
 			<div className={ styles.submissionsDropdown }>
 				<ThemeContext.Provider value={ FLAT_THEME }>
 					<Select
 						items={ items }
-						value={ currentSubmission?.caption || texts.submissions.newTry }
-						onValueChange={ (caption) => this.loadSubmissionToState(submissions.find(s => s.caption === caption)) }
+						value={ currentSubmission?.id || -1 }
+						onValueChange={ (id) => this.loadSubmissionToState(submissions.find(s => s.id === id)) }
 					/>
 				</ThemeContext.Provider>
 			</div>
@@ -281,7 +284,6 @@ class CodeMirror extends React.Component {
 			this.loadNewTry();
 			return;
 		}
-
 		this.saveCodeDraftToCache();
 		this.clearAllTextMarkers();
 
@@ -304,7 +306,6 @@ class CodeMirror extends React.Component {
 
 	getReviewsWithTextMarkers = (autoReviews, manualReviews) => {
 		const reviewsWithTextMarkers = [];
-
 		const addReviewsToArray = (reviews, array) => {
 			for (const review of reviews) {
 				const { finishLine, finishPosition, startLine, startPosition } = review;
@@ -631,29 +632,28 @@ class CodeMirror extends React.Component {
 		//TODO
 	}
 
-	selectComment = (e, i) => {
-		const { isEditable, selectedReviewIndex, } = this.state;
+	selectComment = (e, id) => {
+		const { isEditable, selectedReviewId, } = this.state;
 		e.stopPropagation();
 
-		if(!isEditable && selectedReviewIndex !== i) {
-			this.highlightReview(i);
+		if(!isEditable && selectedReviewId !== id) {
+			this.highlightReview(id);
 		}
 	}
 
-	highlightReview = (index) => {
-		const { currentReviews, selectedReviewIndex, } = this.state;
+	highlightReview = (id) => {
+		const { currentReviews, selectedReviewId, } = this.state;
 		const newCurrentReviews = [...currentReviews];
 
-		if(selectedReviewIndex >= 0) {
-			const selectedReview = newCurrentReviews[selectedReviewIndex];
-
+		if(selectedReviewId >= 0) {
+			const selectedReview = newCurrentReviews.find(r => r.id === selectedReviewId);
 			const { from, to, } = selectedReview.marker.find();
 			selectedReview.marker.clear();
 			selectedReview.marker = this.highlightLine(to.line, to.ch, from.line, from.ch, styles.reviewCode);
 		}
 
-		if(index >= 0) {
-			const review = newCurrentReviews[index];
+		if(id >= 0) {
+			const review = newCurrentReviews.find(r => r.id === id);
 			const { from, to, } = review.marker.find();
 			review.marker.clear();
 			review.marker = this.highlightLine(to.line, to.ch, from.line, from.ch, styles.selectedReviewCode);
@@ -661,7 +661,7 @@ class CodeMirror extends React.Component {
 
 		this.setState({
 			currentReviews: newCurrentReviews,
-			selectedReviewIndex: index,
+			selectedReviewId: id,
 		});
 	}
 
@@ -747,7 +747,7 @@ class CodeMirror extends React.Component {
 		currentReviews.forEach(({ marker }) => marker.clear());
 
 		this.setState({
-			selectedReviewIndex: -1,
+			selectedReviewId: -1,
 		});
 	}
 
@@ -835,7 +835,6 @@ class CodeMirror extends React.Component {
 										caption: texts.submissions.getSubmissionCaption(r.submission)
 									}],
 								}, () => {
-									console.log(r.waitingForManualChecking);
 									this.openModal({
 										score: r.score,
 										waitingForManualChecking: r.waitingForManualChecking
@@ -893,16 +892,16 @@ class CodeMirror extends React.Component {
 		const cursor = exerciseCodeDoc.getCursor();
 
 		if(!isEditable && currentReviews.length > 0) {
-			const reviewIndex = CodeMirror.getSelectedReviewIndexByCursor(currentReviews, exerciseCodeDoc, cursor);
-			if(reviewIndex >= 0) {
-				this.highlightReview(reviewIndex);
+			const reviewId = CodeMirror.getSelectedReviewIdByCursor(currentReviews, exerciseCodeDoc, cursor);
+			if(reviewId >= 0) {
+				this.highlightReview(reviewId);
 			}
 		}
 	}
 
-	static getSelectedReviewIndexByCursor = (currentReviews, exerciseCodeDoc, cursor) => {
+	static getSelectedReviewIdByCursor = (reviews, exerciseCodeDoc, cursor) => {
 		const { line, ch } = cursor;
-		const reviewsUnderCursor = currentReviews.filter(r =>
+		const reviewsUnderCursor = reviews.filter(r =>
 			r.startLine <= line && r.finishLine >= line
 			&& !(r.startLine === line && ch < r.startPosition)
 			&& !(r.finishLine === line && r.finishPosition < ch)
@@ -924,8 +923,7 @@ class CodeMirror extends React.Component {
 					: a.timestamp - b.timestamp
 		});
 
-		const selectedReview = reviewsUnderCursor[0];
-		return currentReviews.findIndex(r => r === selectedReview);
+		return reviewsUnderCursor[0].id;
 	}
 
 	static

@@ -1,18 +1,24 @@
 @import "../../../../courseVariables";
 
 @minCommentWidth: 260px;
+@borderRadius: 8px;
 
 .reviewsContainer {
   background-color: @lightYellow;
   min-width: @minCommentWidth;
   margin-left: -10px;
+  list-style: none;
+  margin-bottom: 0;
+  padding-inline-start: 0;
 }
 
-.reviewsContainer :last-child {
+.comment:last-child {
   margin-bottom: 5px;
 }
 
 .comment {
+  z-index: 2;
+  overflow: hidden;
   position: relative;
   margin-left: 14px;
   padding: 16px;
@@ -24,7 +30,7 @@
 
   border: 1px solid rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
-  border-radius: 8px;
+  border-radius: @borderRadius;
 
   font-weight: 400;
   font-style: normal;
@@ -40,6 +46,7 @@
 .authorWrapper {
   display: flex;
   align-items: center;
+  margin-bottom: 8px;
 }
 
 .commentAvatar {
@@ -49,17 +56,33 @@
   min-width: 24px;
 }
 
-.authorCredentialsWrapper {
+.commentInfoWrapper {
   display: inline-block;
   margin-left: 8px;
+  cursor: default;
 }
 
-.commentLine {
+.commentInfo {
+  display: flex;
+  margin: 0;
+  max-height: 20px;
+  max-width: calc(@minCommentWidth - 18px - 32px - 24px - 8px);
+}
+
+.authorName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
+}
+
+.commentLineNumber {
   margin-left: 8px;
   color: @additionalColor;
+  flex-shrink: 0;
 }
 
-.addingTime {
+.commentAddingTime {
   font-size: 12px;
   line-height: 16px;
 
@@ -69,5 +92,42 @@
 }
 
 .commentText {
+  margin-bottom: 0;
 
+  &:last-child {
+	margin-bottom: 16px;
+  }
+}
+
+.commentReplyTextArea {
+  position: relative;
+  margin-left: -16px;
+  margin-right: -16px;
+  margin-bottom: -40px;
+
+  border: 1px solid @whiteSmoke;
+  box-sizing: border-box;
+  border-radius: 0 0 8px 8px;
+  overflow: hidden;
+}
+
+.commentReplyButton {
+  position: absolute;
+  z-index: 2;
+  border: none;
+  background-color: inherit;
+
+  color: @whiteSmoke;
+
+  right: 3px;
+  bottom: 5px;
+}
+
+.commentReplyButtonActive {
+  .commentReplyButton;
+  color: @blueSmoke;
+}
+
+.commentReplyButton :focus, :active {
+  outline: none;
 }

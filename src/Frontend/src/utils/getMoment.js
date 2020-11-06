@@ -5,8 +5,8 @@ export default function getMoment(time) {
 	return moment(moment.tz(time, DEFAULT_TIMEZONE).format()).fromNow();
 }
 
-export function getDateDDMMYY(time) {
-	return moment(time).format('DD MMMM YYYY в HH:mm');
+export function getDateDDMMYY(time, format = 'DD MMMM YYYY в HH:mm') {
+	return moment(time).format(format);
 }
 
 export function convertDefaultTimezoneToLocal(timeInDefaultTimezone) {

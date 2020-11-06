@@ -9,6 +9,7 @@
 }
 
 .editor {
+  z-index: 1;
   height: auto;
   width: auto;
   border: 1px solid @lightGrey;
@@ -341,22 +342,22 @@
 :global {
   //removing border from line gutters
   .CodeMirror-gutters {
-    border: unset;
+	border: unset;
   }
 }
 
 @media (min-width: @minTabletWidth) {
   .editor {
-    font-size: 14px;
-    line-height: 20px;
+	font-size: 14px;
+	line-height: 20px;
   }
 
   .overview {
-    padding: 24px 40px;
+	padding: 24px 40px;
   }
 
   .overview h3 {
-    font-size: 20px;
-    line-height: 28px;
+	font-size: 20px;
+	line-height: 28px;
   }
 }
