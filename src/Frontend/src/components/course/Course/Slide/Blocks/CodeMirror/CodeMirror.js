@@ -625,7 +625,7 @@ class CodeMirror extends React.Component {
 
 		return (
 			<CongratsModal
-				showAcceptedSolutions={ !waitingForManualChecking && !hideSolutions && this.showAcceptedSolutions }
+				showAcceptedSolutions={ !waitingForManualChecking && !hideSolutions && this.showAcceptedSolutions } // TODO требуется функция, а передается boolean
 				score={ score }
 				waitingForManualChecking={ waitingForManualChecking }
 				onClose={ this.closeCongratsModal }
@@ -838,40 +838,31 @@ class CodeMirror extends React.Component {
 				this.setState({
 					submissionLoading: false,
 				});
-				if(r.solutionRunStatus === solutionRunStatuses.success) {
-					if(r.submission.automaticChecking.processStatus === processStatuses.done) {
-						const { result, output, } = r.submission.automaticChecking;
-
-						// eslint-disable-next-line default-case
-						switch (result) {
-							case checkingResults.rightAnswer: {
-								this.setState({
-									submissions: [{
-										...r.submission,
-										caption: texts.submissions.getSubmissionCaption(r.submission)
-									}, ...submissions,],
-								}, () => {
+				if (r.submission !== null) {
+					let newSubmissions = [...submissions];
+					if (submissions.length > 0 && submissions[0].automaticChecking.result !== checkingResults.rightAnswer)
+						newSubmissions.pop();
+					const newSubmission = {
+						...r.submission,
+						caption: texts.submissions.getSubmissionCaption(r.submission)
+					};
+					this.setState({
+						submissions: [newSubmission, ...newSubmissions],
+					});
+					this.loadSubmissionToState(newSubmission);
+					if(r.solutionRunStatus === solutionRunStatuses.success) {
+						const automaticChecking = r.submission.automaticChecking;
+						if(!!automaticChecking && automaticChecking.processStatus === processStatuses.done) {
+							if (checkingResults.rightAnswer) {
+								this.setState({}, () => {
 									this.openModal({
 										score: r.score,
 										waitingForManualChecking: r.waitingForManualChecking
 									});
-									this.loadSubmissionToState(r.submission);
-								});
-								break;
-							}
-							case checkingResults.wrongAnswer: {
-								this.setState({
-									output,
-								});
-								break;
-							}
-							case checkingResults.compilationError: {
-								break;
-							}
-							case checkingResults.notChecked: {
-								break;
+								})
 							}
 						}
+					} else {
 					}
 				}
 			});
