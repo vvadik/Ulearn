@@ -1,8 +1,9 @@
 import { FLAT_THEME, ThemeFactory, } from "ui";
 
 export default ThemeFactory.create({
-	btnBorderRadius: '8px',
-	btnSmallBorderRadius: '8px',
+	btnBorderRadiusLarge: '8px',
+	btnBorderRadiusMedium: '8px',
+	btnBorderRadiusSmall: '8px',
 }, FLAT_THEME);
 
 export const textareaHidden = ThemeFactory.create({
