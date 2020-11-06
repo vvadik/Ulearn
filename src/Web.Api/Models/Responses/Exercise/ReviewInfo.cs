@@ -13,6 +13,9 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 	[DataContract]
 	public class ReviewInfo
 	{
+		[DataMember]
+		public int Id { get; set; }
+
 		[CanBeNull]
 		[DataMember]
 		public ShortUserInfo Author; // null для ulearn bot
@@ -42,6 +45,7 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 		{
 			return new ReviewInfo
 			{
+				Id = r.Id,
 				Comment = r.Comment,
 				Author = isUlearnBot ? null : BaseController.BuildShortUserInfo(r.Author),
 				AddingTime = isUlearnBot || r.AddingTime <= DateTime.UnixEpoch ? (DateTime?)null : r.AddingTime,
