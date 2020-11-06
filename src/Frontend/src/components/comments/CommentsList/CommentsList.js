@@ -164,6 +164,7 @@ class CommentsList extends Component {
 			const newReplies = repliesToRender.splice(0, commentsPerPack);
 			countOfCommentsToRender += newReplies.length;
 			lastThread.replies = [...lastThread.replies, ...newReplies];
+			lastThread.replies.sort((r1,r2) => r1.publishTime - r2.publishTime);
 		}
 
 		while (countOfCommentsToRender < commentsPerPack && threadsToRender.length !== 0) {
