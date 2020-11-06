@@ -39,20 +39,20 @@ const defaultThemeName = 'default';
 class CodeMirror extends React.Component {
 	constructor(props) {
 		super(props);
-		const { exerciseInitialCode, submissions, code, expectedOutput, } = props;
+		const { exerciseInitialCode, submissions: allSubmissions, code, expectedOutput, } = props;
 
-		const successSubmissions = submissions
-			.filter(s => !s.automaticChecking || s.automaticChecking.result === checkingResults.rightAnswer)
+		const filteredSubmissions = allSubmissions
+			.filter((s, i, arr) => i === arr.length - 1 || (!!s.automaticChecking && s.automaticChecking.result === checkingResults.rightAnswer))
 			.map(s => ({ ...s, caption: texts.submissions.getSubmissionCaption(s) }));
 
 		//newer is first
-		successSubmissions.sort((s1, s2) => (new Date(s2.timestamp) - new Date(s1.timestamp)));
+		filteredSubmissions.sort((s1, s2) => (new Date(s2.timestamp) - new Date(s1.timestamp)));
 
 		this.state = {
 			value: exerciseInitialCode || code,
 			valueChanged: false,
 
-			isEditable: submissions.length === 0,
+			isEditable: filteredSubmissions.length === 0,
 
 			showedHintsCount: 0,
 			showAcceptedSolutions: false,
@@ -62,7 +62,7 @@ class CodeMirror extends React.Component {
 			resizeTimeout: null,
 			showControlsText: isControlsTextSuits(),
 
-			successSubmissions,
+			submissions: filteredSubmissions,
 
 			submissionLoading: false,
 			currentSubmission: null,
@@ -74,6 +74,8 @@ class CodeMirror extends React.Component {
 			editor: null,
 			exerciseCodeDoc: null,
 
+			newTry: CodeMirror.createEmptyNewTry(),
+
 			selfChecks: texts.checkups.self.checks.map((ch, i) => ({
 				text: ch,
 				checked: false,
@@ -84,12 +86,12 @@ class CodeMirror extends React.Component {
 
 	componentDidMount() {
 		const { slideId, } = this.props;
-		const { successSubmissions, } = this.state;
+		const { submissions, } = this.state;
 
 		this.overrideCodeMirrorAutocomplete();
 
-		if(successSubmissions.length > 0) {
-			this.loadSubmissionToState(successSubmissions[0]);
+		if(submissions.length > 0) {
+			this.loadSubmissionToState(submissions[0]);
 		} else {
 			this.refreshPreviousDraft(slideId);
 		}
@@ -189,7 +191,7 @@ class CodeMirror extends React.Component {
 		const {
 			value, showedHintsCount, showAcceptedSolutions, currentSubmission,
 			isEditable, exerciseCodeDoc, congratsModalData,
-			currentReviews, successSubmissions, output, selectedReviewId,
+			currentReviews, submissions, output, selectedReviewId,
 		} = this.state;
 
 		const isReview = !isEditable && currentReviews.length > 0;
@@ -206,7 +208,7 @@ class CodeMirror extends React.Component {
 
 		return (
 			<React.Fragment>
-				{ successSubmissions.length !== 0 && this.renderSubmissionsSelect() }
+				{ submissions.length !== 0 && this.renderSubmissionsSelect() }
 				{ !isEditable && currentSubmission && this.renderHeader() }
 				<div className={ wrapperClassName }>
 					<Controlled
@@ -249,10 +251,10 @@ class CodeMirror extends React.Component {
 	}
 
 	renderSubmissionsSelect = () => {
-		const { currentSubmission, successSubmissions, } = this.state;
+		const { currentSubmission, submissions, newTry } = this.state;
 
-		const submissions = [{ id: -1, caption: texts.submissions.newTry }, ...successSubmissions,];
-		const items = submissions.map((submission) => ([submission.id, submission.caption]));
+		const submissionsWithNewTry = [newTry, ...submissions,];
+		const items = submissionsWithNewTry.map((submission) => ([submission.id, submission.caption]));
 
 		return (
 			<div className={ styles.submissionsDropdown }>
@@ -260,7 +262,7 @@ class CodeMirror extends React.Component {
 					<Select
 						items={ items }
 						value={ currentSubmission?.id || -1 }
-						onValueChange={ (id) => this.loadSubmissionToState(submissions.find(s => s.id === id)) }
+						onValueChange={ (id) => this.loadSubmissionToState(submissionsWithNewTry.find(s => s.id === id)) }
 					/>
 				</ThemeContext.Provider>
 			</div>
@@ -414,7 +416,7 @@ class CodeMirror extends React.Component {
 
 	renderControls = () => {
 		const { hints, expectedOutput, hideSolutions, isSkipped, } = this.props;
-		const { isEditable, currentSubmission, successSubmissions, showedHintsCount, } = this.state;
+		const { isEditable, currentSubmission, submissions, showedHintsCount, } = this.state;
 
 		return (
 			<div className={ styles.exerciseControlsContainer }>
@@ -426,7 +428,7 @@ class CodeMirror extends React.Component {
 					{ this.renderShowStatisticsHint() }
 				</ThemeContext.Provider>
 				{ !hideSolutions
-				&& (hints.length === showedHintsCount || successSubmissions.length > 0 || isSkipped)
+				&& (hints.length === showedHintsCount || submissions.length > 0 || isSkipped)
 				&& this.renderShowAcceptedSolutionsButton()
 				}
 			</div>
@@ -718,6 +720,7 @@ class CodeMirror extends React.Component {
 		this.clearAllTextMarkers();
 
 		this.setState({
+			newTry: CodeMirror.createEmptyNewTry(),
 			isEditable: true,
 			valueChanged: true,
 			currentSubmission: null,
@@ -740,6 +743,7 @@ class CodeMirror extends React.Component {
 		this.clearAllTextMarkers();
 
 		this.setState({
+			newTry: CodeMirror.createEmptyNewTry(),
 			value: exerciseInitialCode,
 			valueChanged: true,
 			isEditable: true,
@@ -765,6 +769,11 @@ class CodeMirror extends React.Component {
 		this.refreshPreviousDraft(slideId);
 	}
 
+	static
+	createEmptyNewTry = () => {
+		return { id: -1, caption: texts.submissions.newTry };
+	}
+
 	toggleOutput = () => {
 		const { currentSubmission, output, } = this.state;
 
@@ -774,10 +783,10 @@ class CodeMirror extends React.Component {
 	}
 
 	showAcceptedSolutionsWarning = () => {
-		const { successSubmissions, } = this.state;
+		const { submissions, } = this.state;
 		const { isSkipped, } = this.props;
 
-		if(successSubmissions.length > 0 || isSkipped) {
+		if(submissions.length > 0 || isSkipped) {
 			this.showAcceptedSolutions();
 		} else {
 			this.setState({
@@ -817,7 +826,7 @@ class CodeMirror extends React.Component {
 	}
 
 	sendExercise = () => {
-		const { value, successSubmissions, } = this.state;
+		const { value, submissions, } = this.state;
 		const { courseId, slideId, } = this.props;
 
 		this.setState({
@@ -837,10 +846,10 @@ class CodeMirror extends React.Component {
 						switch (result) {
 							case checkingResults.rightAnswer: {
 								this.setState({
-									successSubmissions: [{
+									submissions: [{
 										...r.submission,
 										caption: texts.submissions.getSubmissionCaption(r.submission)
-									}, ...successSubmissions,],
+									}, ...submissions,],
 								}, () => {
 									this.openModal({
 										score: r.score,
