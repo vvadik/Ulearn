@@ -70,6 +70,8 @@ class CodeMirror extends React.Component {
 			selectedReviewId: -1,
 			output: null,
 			expectedOutput: expectedOutput && expectedOutput.split('\n'),
+
+			editor: null,
 			exerciseCodeDoc: null,
 
 			selfChecks: texts.checkups.self.checks.map((ch, i) => ({
@@ -287,15 +289,20 @@ class CodeMirror extends React.Component {
 		this.saveCodeDraftToCache();
 		this.clearAllTextMarkers();
 
+		// Firstly we updating code in code mirror
+		// when code is rendered we attaching reviewMarkers and loading reviews
+		// after all is done we refreshing editor to refresh layout and sizes depends on reviews sizes
 		this.setState({
-			value: submission.code,
-			isEditable: false,
-			valueChanged: false,
-			output: null,
-		}, () => this.setState({
-			currentSubmission: submission,
-			currentReviews: this.getReviewsWithTextMarkers(submission.automaticChecking.reviews, submission.manualCheckingReviews),
-		}));
+				value: submission.code,
+				isEditable: false,
+				valueChanged: false,
+				output: null,
+			}, () =>
+				this.setState({
+					currentSubmission: submission,
+					currentReviews: this.getReviewsWithTextMarkers(submission.automaticChecking.reviews, submission.manualCheckingReviews),
+				}, () => this.state.editor.refresh())
+		);
 	}
 
 	openModal = (data) => {
@@ -858,13 +865,6 @@ class CodeMirror extends React.Component {
 						}
 					}
 				}
-				/*
-				message: null
-				score: 5
-				solutionRunStatus: "Success"
-				submission: {id: 117,…}
-				waitingForManualChecking: null
-				 */
 			});
 	}
 
@@ -884,6 +884,7 @@ class CodeMirror extends React.Component {
 		editor.setSize('auto', '100%');
 		this.setState({
 			exerciseCodeDoc: editor.getDoc(),
+			editor,
 		})
 	}
 
