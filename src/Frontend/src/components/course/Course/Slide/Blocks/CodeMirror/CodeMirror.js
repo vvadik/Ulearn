@@ -5,7 +5,7 @@ import { Button, Checkbox, FLAT_THEME, Modal, Select, Tooltip, } from "ui";
 import Review from "./Review/Review";
 import { darkTheme } from 'ui/internal/ThemePlayground/darkTheme';
 import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent";
-import { Lightbulb, Refresh, EyeOpened, DocumentLite, Error, } from "icons";
+import { Lightbulb, Refresh, EyeOpened, DocumentLite, } from "icons";
 import CongratsModal from "./CongratsModal/CongratsModal";
 import { ThemeContext } from "@skbkontur/react-ui/index";
 
@@ -30,6 +30,7 @@ import './CodeMirrorAutocompleteExtension';
 import styles from './CodeMirror.less';
 
 import texts from './CodeMirror.texts';
+import ExerciseOutput from "./ExerciseOutput/ExerciseOutput";
 
 const isControlsTextSuits = () => !isMobile() && !isTablet();
 const editThemeName = 'darcula';
@@ -42,7 +43,7 @@ class CodeMirror extends React.Component {
 		const { exerciseInitialCode, submissions: allSubmissions, code, expectedOutput, } = props;
 
 		const filteredSubmissions = allSubmissions
-			.filter((s, i, arr) => i === arr.length - 1 || (!!s.automaticChecking && s.automaticChecking.result === checkingResults.rightAnswer))
+			.filter((s, i, arr) => i === arr.length - 1 || (!s.automaticChecking || s.automaticChecking.result === checkingResults.rightAnswer))
 			.map(s => ({ ...s, caption: texts.submissions.getSubmissionCaption(s) }));
 
 		//newer is first
@@ -188,6 +189,7 @@ class CodeMirror extends React.Component {
 	}
 
 	renderControlledCodeMirror = (opts) => {
+		const { expectedOutput } = this.props;
 		const {
 			value, showedHintsCount, showAcceptedSolutions, currentSubmission,
 			isEditable, exerciseCodeDoc, congratsModalData,
@@ -230,7 +232,13 @@ class CodeMirror extends React.Component {
 				{ !isEditable && this.renderEditButton() }
 				{/* TODO not included in current release !isEditable && currentSubmission && this.renderOverview(currentSubmission)*/ }
 				{ this.renderControls() }
-				{ output && this.renderOutput() }
+				{ output &&
+				<ExerciseOutput
+					output={output}
+					expectedOutput={expectedOutput}
+					checkingState={checkingResults.wrongAnswer} // TODO
+				/>
+				}
 				{ showedHintsCount > 0 && this.renderHints() }
 				{ showAcceptedSolutions && this.renderAcceptedSolutions() }
 				{ congratsModalData && this.renderCongratsModal(congratsModalData) }
@@ -433,69 +441,6 @@ class CodeMirror extends React.Component {
 				}
 			</div>
 		)
-	}
-
-	renderOutput = () => {
-		const { currentSubmission, output, expectedOutput, } = this.state;
-		const submitContainsError = currentSubmission ? this.isSubmitResultsContainsError(currentSubmission) : true;
-
-		const wrapperClasses = submitContainsError ? styles.wrongOutput : styles.output;
-		const headerClasses = submitContainsError ? styles.wrongOutputHeader : styles.outputHeader;
-
-		return (
-			<div className={ wrapperClasses }>
-				<span className={ headerClasses }>
-					{ submitContainsError
-						? <React.Fragment><Error/>{ texts.mocks.wrongResult }</React.Fragment>
-						: texts.output.text }
-				</span>
-				{ this.renderOutputLines(output, expectedOutput, submitContainsError) }
-			</div>
-		);
-	}
-
-	renderOutputLines = (output, expectedOutput, submitContainsError) => {
-		if(!expectedOutput) {
-			return (<p className={ styles.oneLineErrorOutput }>
-				{ output }
-			</p>);
-		}
-
-		const lines = output
-			.split('\n')
-			.map((line, index) => ({
-				actual: line,
-				expected: expectedOutput[index],
-			}));
-
-		if(submitContainsError) {
-			return (
-				<table className={ styles.outputTable }>
-					<thead>
-					<tr>
-						<th/>
-						<th>{ texts.output.userOutput }</th>
-						<th>{ texts.output.expectedOutput }</th>
-					</tr>
-					</thead>
-					<tbody>
-					{ lines.map(({ actual, expected }, i) =>
-						<tr key={ i }
-							className={ actual === expected ? styles.outputLineColor : styles.outputErrorLineColor }>
-							<td>{ i + 1 }</td>
-							<td>{ actual }</td>
-							<td>{ expected }</td>
-						</tr>
-					) }
-					</tbody>
-				</table>
-			);
-		}
-
-		return expectedOutput.map((text, i) =>
-			<p key={ i } className={ styles.oneLineOutput }>
-				{ text }
-			</p>);
 	}
 
 	renderSubmitSolutionButton = () => {
@@ -840,8 +785,8 @@ class CodeMirror extends React.Component {
 				});
 				if (r.submission !== null) {
 					let newSubmissions = [...submissions];
-					if (submissions.length > 0 && submissions[0].automaticChecking.result !== checkingResults.rightAnswer)
-						newSubmissions.pop();
+					if (submissions.length > 0 && !!submissions[0].automaticChecking && submissions[0].automaticChecking.result !== checkingResults.rightAnswer)
+						newSubmissions.shift();
 					const newSubmission = {
 						...r.submission,
 						caption: texts.submissions.getSubmissionCaption(r.submission)
@@ -852,14 +797,19 @@ class CodeMirror extends React.Component {
 					this.loadSubmissionToState(newSubmission);
 					if(r.solutionRunStatus === solutionRunStatuses.success) {
 						const automaticChecking = r.submission.automaticChecking;
-						if(!!automaticChecking && automaticChecking.processStatus === processStatuses.done) {
-							if (checkingResults.rightAnswer) {
-								this.setState({}, () => {
-									this.openModal({
-										score: r.score,
-										waitingForManualChecking: r.waitingForManualChecking
-									});
-								})
+						if(automaticChecking) {
+							this.setState({
+								output: automaticChecking.output
+							});
+							if(automaticChecking.processStatus === processStatuses.done) {
+								if(automaticChecking.result === checkingResults.rightAnswer) {
+									this.setState({}, () => {
+										this.openModal({
+											score: r.score,
+											waitingForManualChecking: r.waitingForManualChecking
+										});
+									})
+								}
 							}
 						}
 					} else {
