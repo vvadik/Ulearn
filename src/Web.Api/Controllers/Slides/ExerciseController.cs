@@ -138,7 +138,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			if (!saveSubmissionOnCompileErrors)
 			{
 				if (buildResult.HasErrors)
-					return new RunSolutionResponse(SolutionRunStatus.CompileError) { Message = buildResult.ErrorMessage };
+					return new RunSolutionResponse(SolutionRunStatus.CompilationError) { Message = buildResult.ErrorMessage };
 			}
 
 			var compilationErrorMessage = buildResult.HasErrors ? buildResult.ErrorMessage : null;

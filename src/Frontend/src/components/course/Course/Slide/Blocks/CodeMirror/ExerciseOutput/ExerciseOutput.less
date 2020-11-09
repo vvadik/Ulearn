@@ -7,17 +7,28 @@
   border: 1px solid @lightGrey;
 }
 
-.wrongOutput {
+.wrongAnswerOutput {
   .output;
   border: 1px solid @likeColor;
+}
+
+.compilationErrorOutput {
+  .output;
+  border: 1px solid @likeColor;
+  background: @lightRed;
+}
+
+.serverErrorOutput {
+  .output;
+  border: 1px solid @accentColor;
 }
 
 .outputHeader {
   display: block;
   padding: 8px 16px;
-  margin-bottom: 8px;
   border-radius: 8px 8px 0 0;
   background-color: @lightGrey;
+  color: @black;
 
   font-family: @defaultFonts;
   font-style: normal;
@@ -26,10 +37,18 @@
   line-height: 22px;
 }
 
-.wrongOutputHeader {
-  .outputHeader;
-  margin-bottom: 0;
+.wrongAnswerOutput .outputHeader {
   background-color: @likeColor;
+  color: @white;
+}
+
+.compilationErrorOutput .outputHeader {
+  background-color: @likeColor;
+  color: @white;
+}
+
+.serverErrorOutput .outputHeader {
+  background-color: @accentColor;
   color: @white;
 }
 

@@ -1,7 +1,7 @@
 ﻿import React from "react";
 import ExerciseOutput from "./ExerciseOutput";
 
-import { checkingResults } from "src/consts/exercise";
+import { checkingResults, processStatuses, solutionRunStatuses } from "src/consts/exercise";
 
 export default {
 	title: 'Exercise/ExerciseOutput'
@@ -9,9 +9,27 @@ export default {
 
 const Template = (args) => <ExerciseOutput {...args} />;
 
-export const WrongAnswerWithText = Template.bind({});
-WrongAnswerWithText.args = {
-	output: "text",
+export const SolutionRunStatusCompilationError = Template.bind({});
+SolutionRunStatusCompilationError.args = {
+	solutionRunStatus: solutionRunStatuses.compilationError,
+	message: "CompilationError text",
 	expectedOutput: "",
-	checkingState: checkingResults.wrongAnswer
+	automaticChecking: null
 };
+
+export const SolutionRunStatusInternalServerError = Template.bind({});
+SolutionRunStatusInternalServerError.args = {
+	solutionRunStatus: solutionRunStatuses.internalServerError,
+	message: "InternalServerError text",
+	expectedOutput: null,
+	automaticChecking: null
+};
+
+export const SolutionRunStatusSuccess = Template.bind({});
+SolutionRunStatusSuccess.args = {
+	solutionRunStatus: solutionRunStatuses.success,
+	message: "Success text",
+	expectedOutput: null,
+	automaticChecking: null
+};
+

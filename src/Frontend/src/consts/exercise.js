@@ -20,5 +20,5 @@ export const solutionRunStatuses = {
 	submissionCheckingTimeout: 'SubmissionCheckingTimeout', // Ждали, но не дожадлись проверки
 	// В случае ошибки компиляции Submission создается не всегда. Не создается для C#-задач. Тогда текст ошибки компиляции кладется в Message.
 	// Если Submission создался, то об ошибках компиляции пишется внутри Submission -> AutomaticChecking.
-	compileError: 'CompileError',
+	compilationError: 'CompilationError',
 }
