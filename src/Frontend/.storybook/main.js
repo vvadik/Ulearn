@@ -1,4 +1,5 @@
-const path = require("path");
+﻿const path = require("path");
+const autoprefixer = require('autoprefixer');
 const base = require('../config/webpack.config.base');
 const merge = require('webpack-merge');
 
@@ -26,6 +27,30 @@ module.exports = {
 						},
 					},
 					'less-loader',
+				],
+				include: path.resolve(__dirname, '../src/')
+			},
+			{
+				test: /\.css$/,
+				use: [
+					'style-loader',
+					{
+						loader: 'css-loader',
+						options: {
+							modules: 'global',
+							importLoaders: 1,
+						},
+					},
+					{
+						loader: 'postcss-loader',
+						options: {
+							ident: 'postcss',
+							plugins: () => [
+								require('postcss-flexbugs-fixes'),
+								autoprefixer({ flexbox: 'no-2009' }),
+							],
+						},
+					},
 				],
 				include: path.resolve(__dirname, '../src/')
 			},

@@ -1,7 +1,7 @@
 ﻿import React from "react";
 import PropTypes from "prop-types";
 
-import { Error, } from "icons";
+import { Error, } from "@skbkontur/react-icons";
 
 import { checkingResults } from "src/consts/exercise";
 
