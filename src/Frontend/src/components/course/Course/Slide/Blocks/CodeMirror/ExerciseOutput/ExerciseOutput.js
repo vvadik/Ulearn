@@ -27,7 +27,7 @@ class ExerciseOutput extends React.Component {
 						? <React.Fragment><Error/>{ texts.wrongAnswer }</React.Fragment> // TODO
 						: texts.output.output }
 				</span>
-				{ this.renderOutputLines(output, expectedOutput, submitContainsError) }
+				{ ExerciseOutput.renderOutputLines(output, expectedOutput, submitContainsError) }
 			</div>
 		);
 	}
