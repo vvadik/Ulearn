@@ -1,6 +1,7 @@
 ﻿import React from "react";
 import PropTypes from "prop-types";
 
+import { Warning } from "icons";
 import { checkingResults, processStatuses, solutionRunStatuses } from "src/consts/exercise";
 
 import texts from "./ExerciseOutput.texts";
@@ -15,18 +16,14 @@ const OutputType = {
 };
 
 const outputTypeToStyleAndHeader = {
-	[OutputType.compilationError] : { style: styles.compilationErrorOutput, header: texts.headers.compilationError },
-	[OutputType.wrongAnswer] : { style: styles.wrongAnswerOutput, header: texts.headers.wrongAnswer },
-	[OutputType.serverError] : { style: styles.serverErrorOutput, header: texts.headers.serverError },
-	[OutputType.serverMessage] : { style: styles.serverErrorOutput, header: texts.headers.serverMessage },
-	[OutputType.success] : { style: styles.output, header: texts.headers.output },
+	[OutputType.compilationError]: { style: styles.compilationErrorOutput, header: texts.headers.compilationError },
+	[OutputType.wrongAnswer]: { style: styles.wrongAnswerOutput, header: texts.headers.wrongAnswer },
+	[OutputType.serverError]: { style: styles.serverErrorOutput, header: texts.headers.serverError },
+	[OutputType.serverMessage]: { style: styles.serverErrorOutput, header: texts.headers.serverMessage },
+	[OutputType.success]: { style: styles.output, header: texts.headers.output },
 }
 
 class ExerciseOutput extends React.Component {
-	constructor(props) {
-		super(props);
-	}
-
 	render() {
 		const { expectedOutput } = this.props;
 		const { outputType, body } = this.getOutputTypeAndBody();
@@ -38,7 +35,9 @@ class ExerciseOutput extends React.Component {
 		return (
 			<div className={ style }>
 				<span className={ styles.outputHeader }>
-					{ <React.Fragment>{ showIcon ? <React.Fragment>Icon</React.Fragment> : null } { header }</React.Fragment> //TODO icon
+					{ <React.Fragment>{ showIcon
+						? <Warning/>
+						: null } { header }</React.Fragment>
 					} 
 				</span>
 				{ isSimpleTextOutput
@@ -51,7 +50,7 @@ class ExerciseOutput extends React.Component {
 
 	getOutputTypeAndBody = () => {
 		const { solutionRunStatus, message, automaticChecking } = this.props;
-		switch(solutionRunStatus) {
+		switch (solutionRunStatus) {
 			case solutionRunStatuses.compilationError:
 				return { outputType: OutputType.compilationError, body: message };
 			case solutionRunStatuses.submissionCheckingTimeout:

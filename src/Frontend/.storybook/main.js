@@ -12,6 +12,10 @@ module.exports = {
 	webpackFinal: async (config, { configType }) => {
 		config = merge(base, config);
 
+		config.module.rules.find(
+			rule => rule.test.toString() === '/\\.css$/'
+		).exclude = /\.module\.css$/;
+
 		config.module.rules.push(
 			{
 				test: /\.less$/,
@@ -31,7 +35,7 @@ module.exports = {
 				include: path.resolve(__dirname, '../src/')
 			},
 			{
-				test: /\.css$/,
+				test: /\.module\.css$/,
 				use: [
 					'style-loader',
 					{
@@ -52,7 +56,6 @@ module.exports = {
 						},
 					},
 				],
-				include: path.resolve(__dirname, '../src/')
 			},
 		);
 
