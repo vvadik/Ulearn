@@ -15,11 +15,10 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from "react-redux";
 
+import { sendCode } from "src/actions/course";
 import { constructPathToAcceptedSolutions, } from "src/consts/routes";
 import { checkingResults, processStatuses, solutionRunStatuses } from "src/consts/exercise";
 import { isMobile, isTablet, } from "src/utils/getDeviceType";
-
-import api from "src/api";
 
 import CodeMirrorBase from 'codemirror/lib/codemirror';
 import 'codemirror/addon/edit/matchbrackets';
@@ -44,18 +43,11 @@ class CodeMirror extends React.Component {
 		super(props);
 		const { exerciseInitialCode, submissions, code, expectedOutput, } = props;
 
-		const filteredSubmissions = submissions
-			.filter((s, i, arr) => i === arr.length - 1 || (!s.automaticChecking || s.automaticChecking.result === checkingResults.rightAnswer))
-			.map(s => ({ ...s, caption: texts.submissions.getSubmissionCaption(s) }));
-
-		//newer is first
-		filteredSubmissions.sort((s1, s2) => (new Date(s2.timestamp) - new Date(s1.timestamp)));
-
 		this.state = {
 			value: exerciseInitialCode || code,
 			valueChanged: false,
 
-			isEditable: filteredSubmissions.length === 0,
+			isEditable: submissions.length === 0,
 
 			showedHintsCount: 0,
 			showAcceptedSolutions: false,
@@ -64,8 +56,6 @@ class CodeMirror extends React.Component {
 
 			resizeTimeout: null,
 			showControlsText: isControlsTextSuits(),
-
-			submissions: filteredSubmissions,
 
 			submissionLoading: false,
 			currentSubmission: null,
@@ -88,8 +78,7 @@ class CodeMirror extends React.Component {
 	}
 
 	componentDidMount() {
-		const { slideId, } = this.props;
-		const { submissions, } = this.state;
+		const { slideId, submissions, } = this.props;
 
 		this.overrideCodeMirrorAutocomplete();
 
@@ -101,6 +90,38 @@ class CodeMirror extends React.Component {
 
 		window.addEventListener("beforeunload", this.saveCodeDraftToCache);
 		window.addEventListener("resize", this.onWindowResize);
+	}
+
+	componentDidUpdate(prevProps, prevState, snapshot) {
+		const { lastSubmission, courseId, slideId, } = this.props;
+		const lastSubmissionExists = lastSubmission && lastSubmission.courseId === courseId && lastSubmission.slideId === slideId;
+
+		if((!prevProps.lastSubmission && lastSubmissionExists)
+			|| (lastSubmissionExists && prevProps.lastSubmission.submission.id !== lastSubmission.submission.id)) {
+			const { submission, solutionRunStatus, score, waitingForManualChecking, } = lastSubmission;
+			this.setState({
+				submissionLoading: false,
+			});
+			this.loadSubmissionToState(submission);
+
+			if(solutionRunStatus === solutionRunStatuses.success) {
+				const { automaticChecking } = submission;
+
+				if(automaticChecking) {
+					this.setState({
+						output: automaticChecking.output
+					});
+					if(automaticChecking.processStatus === processStatuses.done) {
+						if(automaticChecking.result === checkingResults.rightAnswer) {
+							this.openModal({
+								score,
+								waitingForManualChecking,
+							});
+						}
+					}
+				}
+			}
+		}
 	}
 
 	onWindowResize = () => {
@@ -191,11 +212,11 @@ class CodeMirror extends React.Component {
 	}
 
 	renderControlledCodeMirror = (opts) => {
-		const { expectedOutput } = this.props;
+		const { expectedOutput, submissions, } = this.props;
 		const {
 			value, showedHintsCount, showAcceptedSolutions, currentSubmission,
 			isEditable, exerciseCodeDoc, congratsModalData,
-			currentReviews, submissions, output, selectedReviewId,
+			currentReviews, output, selectedReviewId,
 		} = this.state;
 
 		const isReview = !isEditable && currentReviews.length > 0;
@@ -261,7 +282,8 @@ class CodeMirror extends React.Component {
 	}
 
 	renderSubmissionsSelect = () => {
-		const { currentSubmission, submissions, newTry } = this.state;
+		const { currentSubmission, newTry } = this.state;
+		const { submissions, } = this.props;
 
 		const submissionsWithNewTry = [newTry, ...submissions,];
 		const items = submissionsWithNewTry.map((submission) => ([submission.id, submission.caption]));
@@ -425,8 +447,8 @@ class CodeMirror extends React.Component {
 	}
 
 	renderControls = () => {
-		const { hints, expectedOutput, hideSolutions, isSkipped, } = this.props;
-		const { isEditable, currentSubmission, submissions, showedHintsCount, } = this.state;
+		const { hints, expectedOutput, hideSolutions, isSkipped, submissions, } = this.props;
+		const { isEditable, currentSubmission, showedHintsCount, } = this.state;
 
 		return (
 			<div className={ styles.exerciseControlsContainer }>
@@ -730,8 +752,7 @@ class CodeMirror extends React.Component {
 	}
 
 	showAcceptedSolutionsWarning = () => {
-		const { submissions, } = this.state;
-		const { isSkipped, } = this.props;
+		const { isSkipped, submissions, } = this.props;
 
 		if(submissions.length > 0 || isSkipped) {
 			this.showAcceptedSolutions();
@@ -773,51 +794,14 @@ class CodeMirror extends React.Component {
 	}
 
 	sendExercise = () => {
-		const { value, submissions, } = this.state;
-		const { courseId, slideId, } = this.props;
+		const { value, } = this.state;
+		const { courseId, slideId, sendCode, } = this.props;
 
 		this.setState({
 			submissionLoading: true,
 		});
 
-		api.exercise.submitCode(courseId, slideId, value)
-			.then(r => {
-				this.setState({
-					submissionLoading: false,
-				});
-				if(r.submission !== null) {
-					let newSubmissions = [...submissions];
-					if(submissions.length > 0 && !!submissions[0].automaticChecking && submissions[0].automaticChecking.result !== checkingResults.rightAnswer)
-						newSubmissions.shift();
-					const newSubmission = {
-						...r.submission,
-						caption: texts.submissions.getSubmissionCaption(r.submission)
-					};
-					this.setState({
-						submissions: [newSubmission, ...newSubmissions],
-					});
-					this.loadSubmissionToState(newSubmission);
-					if(r.solutionRunStatus === solutionRunStatuses.success) {
-						const automaticChecking = r.submission.automaticChecking;
-						if(automaticChecking) {
-							this.setState({
-								output: automaticChecking.output
-							});
-							if(automaticChecking.processStatus === processStatuses.done) {
-								if(automaticChecking.result === checkingResults.rightAnswer) {
-									this.setState({}, () => {
-										this.openModal({
-											score: r.score,
-											waitingForManualChecking: r.waitingForManualChecking
-										});
-									})
-								}
-							}
-						}
-					} else {
-					}
-				}
-			});
+		sendCode(courseId, slideId, value);
 	}
 
 	isSubmitResultsContainsError = ({ automaticChecking }) => {
@@ -957,17 +941,28 @@ class CodeMirror extends React.Component {
 
 const mapStateToProps = (state, { courseId, slideId, }) => {
 	const { slides, account, } = state;
+	const { submissionsByCourses, lastSubmission, } = slides;
+
+	const submissions = Object.values(submissionsByCourses[courseId][slideId])
+		.filter((s, i, arr) =>
+			(i === arr.length - 1)
+			|| (!s.automaticChecking || s.automaticChecking.result === checkingResults.rightAnswer))
+		.map(s => ({ ...s, caption: texts.submissions.getSubmissionCaption(s) }));
+
+	//newer is first
+	submissions.sort((s1, s2) => (new Date(s2.timestamp) - new Date(s1.timestamp)));
 
 	return {
 		courseId,
 		slideId,
 		isAuthenticated: account.isAuthenticated,
-		submissions: Object.values(slides.submissionsByCourses[courseId][slideId]),
+		submissions,
+		lastSubmission,
 	};
 };
 
 const mapDispatchToProps = (dispatch) => ({
-	addCommentToReview: (courseId, slideId, reviewId) => dispatch(),
+	sendCode: (courseId, slideId, code) => dispatch(sendCode(courseId, slideId, code)),
 });
 
 CodeMirror.propTypes = {
@@ -979,7 +974,10 @@ CodeMirror.propTypes = {
 	isAuthenticated: PropTypes.bool,
 	hideSolutions: PropTypes.bool,
 	isSkipped: PropTypes.bool,
+	sendCode: PropTypes.func,
 	addCommentToReview: PropTypes.func,
+	submissions: PropTypes.array,
+	lastSubmission: PropTypes.object,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(CodeMirror);
