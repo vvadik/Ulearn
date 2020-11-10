@@ -133,7 +133,7 @@ class Slide extends React.Component {
 	}
 
 	addAdditionalPropsToBlocks = (slideBlocks) => {
-		const { slideId, courseId, isAuthenticated, isSkipped, } = this.props;
+		const { slideId, courseId, isSkipped, } = this.props;
 		const { autoplay } = queryString.parse(window.location.search);
 		let firstVideoBlock = true;
 
@@ -185,9 +185,8 @@ class Slide extends React.Component {
 					break;
 				}
 				case blockTypes.exercise: {
-					block.courseId = courseId;
 					block.slideId = slideId;
-					block.isAuthenticated = isAuthenticated;
+					block.courseId = courseId;
 					block.isSkipped = isSkipped;
 					break;
 				}
@@ -240,7 +239,6 @@ Slide.propTypes = {
 	loadSlide: PropTypes.func.isRequired,
 	showHiddenBlocks: PropTypes.bool,
 	isHiddenSlide: PropTypes.bool,
-	isAuthenticated: PropTypes.bool,
 	score: PropTypes.object,
 	isSkipped: PropTypes.bool,
 };
@@ -250,14 +248,13 @@ Slide.defaultProps = {
 }
 
 const mapStateToProps = (state, { courseId, slideId, }) => {
-	const { slides, account, } = state;
+	const { slides, } = state;
 	const { slidesByCourses, slideLoading } = slides;
 
 	const props = {
 		courseId,
 		slideId,
 		slideLoading,
-		isAuthenticated: account.isAuthenticated,
 	};
 
 	const coursesSlides = slidesByCourses[courseId];

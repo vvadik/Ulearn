@@ -2,9 +2,11 @@ import {
 	COURSES__SLIDE_LOAD,
 	START, SUCCESS, FAIL,
 } from '../consts/actions';
+import blockTypes from "src/components/course/Course/Slide/blockTypes";
 
 const initialCoursesSlidesState = {
 	slidesByCourses: {},
+	submissionsByCourses: {},
 	slideLoading: false,
 	slideError: null,
 };
@@ -12,7 +14,8 @@ const initialCoursesSlidesState = {
 export default function slides(state = initialCoursesSlidesState, action) {
 	switch (action.type) {
 		case COURSES__SLIDE_LOAD + START:
-			return { ...state,
+			return {
+				...state,
 				slideLoading: true,
 				slideError: null,
 			};
@@ -20,18 +23,41 @@ export default function slides(state = initialCoursesSlidesState, action) {
 			const { courseId, slideId, result } = action;
 			const { slidesByCourses } = state;
 
-			return {
+			const newState = {
 				...state,
 				slideLoading: false,
 				slideError: null,
-				slidesByCourses: {
-					...slidesByCourses,
-					[courseId]: {
-						...slidesByCourses[courseId],
-						[slideId]: result,
-					}
-				}
 			};
+
+			const exerciseBlock = result.find(block => block.$type === blockTypes.exercise);
+
+			if(exerciseBlock) {
+				const exerciseSubmissions = {};
+
+				for (const submission of exerciseBlock.submissions) {
+					exerciseSubmissions[submission.id] = submission;
+				}
+
+				exerciseBlock.submissions = undefined;
+
+				newState.submissionsByCourses = {
+					...newState.submissionsByCourses,
+					[courseId]: {
+						...newState.submissionsByCourses[courseId],
+						[slideId]: exerciseSubmissions,
+					}
+				};
+			}
+
+			newState.slidesByCourses = {
+				...slidesByCourses,
+				[courseId]: {
+					...slidesByCourses[courseId],
+					[slideId]: result,
+				}
+			}
+
+			return newState;
 		}
 		case COURSES__SLIDE_LOAD + FAIL: {
 			return {

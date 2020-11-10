@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Controlled, } from "react-codemirror2";
+import ExerciseOutput from "./ExerciseOutput/ExerciseOutput";
 import { Button, Checkbox, FLAT_THEME, Modal, Select, Tooltip, } from "ui";
 import Review from "./Review/Review";
 import { darkTheme } from 'ui/internal/ThemePlayground/darkTheme';
@@ -11,6 +12,7 @@ import { ThemeContext } from "@skbkontur/react-ui/index";
 
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import { connect } from "react-redux";
 
 import { constructPathToAcceptedSolutions, } from "src/consts/routes";
 import { checkingResults, processStatuses, solutionRunStatuses } from "src/consts/exercise";
@@ -30,7 +32,6 @@ import './CodeMirrorAutocompleteExtension';
 import styles from './CodeMirror.less';
 
 import texts from './CodeMirror.texts';
-import ExerciseOutput from "./ExerciseOutput/ExerciseOutput";
 
 const isControlsTextSuits = () => !isMobile() && !isTablet();
 const editThemeName = 'darcula';
@@ -40,9 +41,9 @@ const defaultThemeName = 'default';
 class CodeMirror extends React.Component {
 	constructor(props) {
 		super(props);
-		const { exerciseInitialCode, submissions: allSubmissions, code, expectedOutput, } = props;
+		const { exerciseInitialCode, submissions, code, expectedOutput, } = props;
 
-		const filteredSubmissions = allSubmissions
+		const filteredSubmissions = submissions
 			.filter((s, i, arr) => i === arr.length - 1 || (!s.automaticChecking || s.automaticChecking.result === checkingResults.rightAnswer))
 			.map(s => ({ ...s, caption: texts.submissions.getSubmissionCaption(s) }));
 
@@ -234,9 +235,9 @@ class CodeMirror extends React.Component {
 				{ this.renderControls() }
 				{ output &&
 				<ExerciseOutput
-					output={output}
-					expectedOutput={expectedOutput}
-					checkingState={checkingResults.wrongAnswer} // TODO
+					output={ output }
+					expectedOutput={ expectedOutput }
+					checkingState={ checkingResults.wrongAnswer } // TODO
 				/>
 				}
 				{ showedHintsCount > 0 && this.renderHints() }
@@ -586,7 +587,7 @@ class CodeMirror extends React.Component {
 		//TODO
 	}
 
-	selectComment = (e, id) => {
+	selectComment = (e, id,) => {
 		const { isEditable, selectedReviewId, } = this.state;
 		e.stopPropagation();
 
@@ -783,9 +784,9 @@ class CodeMirror extends React.Component {
 				this.setState({
 					submissionLoading: false,
 				});
-				if (r.submission !== null) {
+				if(r.submission !== null) {
 					let newSubmissions = [...submissions];
-					if (submissions.length > 0 && !!submissions[0].automaticChecking && submissions[0].automaticChecking.result !== checkingResults.rightAnswer)
+					if(submissions.length > 0 && !!submissions[0].automaticChecking && submissions[0].automaticChecking.result !== checkingResults.rightAnswer)
 						newSubmissions.shift();
 					const newSubmission = {
 						...r.submission,
@@ -953,8 +954,22 @@ class CodeMirror extends React.Component {
 	}
 }
 
-CodeMirror
-	.propTypes = {
+const mapStateToProps = (state, { courseId, slideId, }) => {
+	const { slides, account, } = state;
+
+	return {
+		courseId,
+		slideId,
+		isAuthenticated: account.isAuthenticated,
+		submissions: Object.values(slides.submissionsByCourses[courseId][slideId]),
+	};
+};
+
+const mapDispatchToProps = (dispatch) => ({
+	addCommentToReview: (courseId, slideId, reviewId) => dispatch(),
+});
+
+CodeMirror.propTypes = {
 	courseId: PropTypes.string,
 	slideId: PropTypes.string,
 	className: PropTypes.string,
@@ -963,6 +978,7 @@ CodeMirror
 	isAuthenticated: PropTypes.bool,
 	hideSolutions: PropTypes.bool,
 	isSkipped: PropTypes.bool,
+	addCommentToReview: PropTypes.func,
 }
 
-export default CodeMirror;
+export default connect(mapStateToProps, mapDispatchToProps)(CodeMirror);
