@@ -9,7 +9,6 @@ import texts from "./Review.texts";
 import { textareaHidden } from "src/uiTheme";
 
 import styles from "./Review.less";
-import api from "src/api";
 
 
 class Review extends React.Component {
@@ -43,6 +42,7 @@ class Review extends React.Component {
 		for (const { id } of reviews) {
 			commentsReplies[id] = '';
 		}
+		
 		return commentsReplies;
 	}
 
@@ -51,9 +51,9 @@ class Review extends React.Component {
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
-		const { reviews } = this.props;
+		const { reviews, allCommentsLength, } = this.props;
 
-		let sameValues = reviews.length === prevProps.reviews.length;
+		let sameValues = allCommentsLength === prevProps.allCommentsLength;
 
 		if(sameValues) {
 			const reviewsIds = reviews.map(r => r.id);
@@ -109,16 +109,18 @@ class Review extends React.Component {
 
 		return (
 			<ol className={ styles.reviewsContainer }>
-				{ comments.map(this.renderComment) }
+				{ comments.map(this.renderTopLevelComment) }
 			</ol>
 		);
 	}
 
-	renderComment = ({ review: { id, addingTime, author, comment, finishLine, finishPosition, startLine, startPosition, }, margin, ref, }, i,) => {
+	renderTopLevelComment = ({ review, margin, ref, }, i,) => {
+		const { id, comments } = review;
 		const { selectedReviewId, onSelectComment, } = this.props;
 		const { commentsReplies, } = this.state;
 		const className = classNames(styles.comment, { [styles.selectedReviewCommentWrapper]: selectedReviewId === id });
 
+		let author = review.author;
 		if(!author) {
 			author = { visibleName: 'Ulearn bot', id: 'bot', isBot: true, };
 		}
@@ -126,10 +128,36 @@ class Review extends React.Component {
 		const selectComment = (e) => onSelectComment(e, id);
 
 		return (
-			<li key={ i } className={ className } ref={ ref }
+			<li key={ i }
+				className={ className }
+				ref={ ref }
 				onClick={ selectComment }
 				style={ { marginTop: `${ margin }px` } }
 			>
+				{ this.renderComment(review) }
+				{
+					!author.isBot &&
+					<ol className={ styles.commentRepliesList }>
+						{ comments.map((c, i) =>
+							<li className={ styles.commentReply } key={ i }>
+								{ this.renderComment(c) }
+							</li>)
+						}
+					</ol>
+				}
+				{ !author.isBot && this.renderAddReviewComment(selectComment, commentsReplies[id]) }
+			</li>
+		);
+	}
+
+	renderComment = ({ author, startLine, finishLine, addingTime, publishTime, text, comment, }) => {
+		if(!author) {
+			author = { visibleName: 'Ulearn bot', id: 'bot', isBot: true, };
+		}
+		const time = addingTime || publishTime;
+
+		return (
+			<React.Fragment>
 				<div className={ styles.authorWrapper }>
 					<Avatar user={ author } size="big" className={ styles.commentAvatar }/>
 					<div className={ styles.commentInfoWrapper }>
@@ -137,39 +165,44 @@ class Review extends React.Component {
 							<span className={ styles.authorName }>
 								{ author.visibleName }
 							</span>
+							{ startLine &&
 							<span className={ styles.commentLineNumber }>
 								{ texts.getLineCapture(startLine, finishLine) }
 							</span>
+							}
 						</span>
-						{ addingTime &&
-						<p className={ styles.commentAddingTime }>{ texts.getAddingTime(addingTime) }</p>
+						{ time &&
+						<p className={ styles.commentAddingTime }>{ texts.getAddingTime(time) }</p>
 						}
 					</div>
 				</div>
-				<p className={ styles.commentText }>{ comment }</p>
-				{ !author.isBot &&
-				<ThemeContext.Provider value={ textareaHidden }>
-					<div className={ styles.commentReplyTextArea }>
-						<Textarea
-							width={ 200 }
-							rows={ 1 }
-							autoResize
-							placeholder={ texts.sendButton }
-							onValueChange={ this.onTextareaValueChange }
-							onFocus={ selectComment }
-							value={ commentsReplies[id] }
-						/>
-					</div>
-					<button
-						disabled={ commentsReplies[id] === '' }
-						className={ commentsReplies[id] ? styles.commentReplyButtonActive : styles.commentReplyButton }
-						onClick={ this.sendComment }
-						onFocus={ selectComment }>
-						<Send3/>
-					</button>
-				</ThemeContext.Provider>
-				}
-			</li>
+				<p className={ styles.commentText }>{ comment || text }</p>
+			</React.Fragment>
+		);
+	}
+
+	renderAddReviewComment = (selectComment, commentReplie) => {
+		return (
+			<ThemeContext.Provider value={ textareaHidden }>
+				<div className={ styles.commentReplyTextArea }>
+					<Textarea
+						width={ 200 }
+						rows={ 1 }
+						autoResize
+						placeholder={ texts.sendButton }
+						onValueChange={ this.onTextareaValueChange }
+						onFocus={ selectComment }
+						value={ commentReplie }
+					/>
+				</div>
+				<button
+					disabled={ commentReplie === '' }
+					className={ commentReplie ? styles.commentReplyButtonActive : styles.commentReplyButton }
+					onClick={ this.sendComment }
+					onFocus={ selectComment }>
+					<Send3/>
+				</button>
+			</ThemeContext.Provider>
 		);
 	}
 
@@ -187,10 +220,10 @@ class Review extends React.Component {
 	}
 
 	sendComment = () => {
-		const { selectedReviewId, } = this.props;
+		const { selectedReviewId, addReviewComment, } = this.props;
 		const { commentsReplies, } = this.state;
 
-		api.exercise.addCodeReviewComment(selectedReviewId, commentsReplies[selectedReviewId]);
+		addReviewComment(selectedReviewId, commentsReplies[selectedReviewId]);
 	}
 }
 
@@ -198,6 +231,8 @@ Review.propTypes = {
 	reviews: PropTypes.array,
 	onSelectComment: PropTypes.func,
 	selectedReviewId: PropTypes.number,
+	addReviewComment: PropTypes.func,
+	allCommentsLength: PropTypes.number,
 }
 
 export default Review;

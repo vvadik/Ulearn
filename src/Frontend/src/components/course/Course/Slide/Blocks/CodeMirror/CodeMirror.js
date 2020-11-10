@@ -14,10 +14,12 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from "react-redux";
 
-import { sendCode } from "src/actions/course";
+import { sendCode, addReviewComment, } from "src/actions/course";
+
 import { constructPathToAcceptedSolutions, } from "src/consts/routes";
 import { checkingResults, processStatuses, solutionRunStatuses } from "src/consts/exercise";
 import { isMobile, isTablet, } from "src/utils/getDeviceType";
+import { userType } from "src/components/comments/commonPropTypes";
 
 import CodeMirrorBase from 'codemirror/lib/codemirror';
 import 'codemirror/addon/edit/matchbrackets';
@@ -77,22 +79,33 @@ class CodeMirror extends React.Component {
 	}
 
 	componentDidMount() {
-		const { slideId, submissions, } = this.props;
-
 		this.overrideCodeMirrorAutocomplete();
+
+		this.loadSlideSubmission();
+
+		window.addEventListener("beforeunload", this.saveCodeDraftToCache);
+		window.addEventListener("resize", this.onWindowResize);
+	}
+
+	loadSlideSubmission = () => {
+		const { slideId, submissions, } = this.props;
 
 		if(submissions.length > 0) {
 			this.loadSubmissionToState(submissions[0]);
 		} else {
 			this.refreshPreviousDraft(slideId);
 		}
-
-		window.addEventListener("beforeunload", this.saveCodeDraftToCache);
-		window.addEventListener("resize", this.onWindowResize);
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
-		const { lastSubmission, courseId, slideId, } = this.props;
+		const { lastSubmission, courseId, slideId, submissions, } = this.props;
+		const { currentSubmission, } = this.state;
+
+		if(courseId !== prevProps.courseId || slideId !== prevProps.slideId) {
+			this.loadSlideSubmission();
+			return;
+		}
+
 		const lastSubmissionExists = lastSubmission && lastSubmission.courseId === courseId && lastSubmission.slideId === slideId;
 
 		if((!prevProps.lastSubmission && lastSubmissionExists)
@@ -101,7 +114,7 @@ class CodeMirror extends React.Component {
 			this.setState({
 				submissionLoading: false,
 			});
-			this.loadSubmissionToState(submission);
+			this.loadSubmissionToState(submissions.find(s => s.id === submission.id));
 
 			if(solutionRunStatus === solutionRunStatuses.success) {
 				const { automaticChecking } = submission;
@@ -120,8 +133,20 @@ class CodeMirror extends React.Component {
 					}
 				}
 			}
+		} else if(currentSubmission) {
+			const submission = submissions.find(s => s.id === currentSubmission.id);
+
+			if(this.getCommentsLength(currentSubmission) !== this.getCommentsLength(submission)) {
+				this.loadSubmissionToState(submission);
+			}
 		}
 	}
+
+	getCommentsLength = (submission) => {
+		const reviews = this.getAllReviewsFromSubmission(submission);
+		const innerCommentLength = reviews.map(r => r.comments.length).reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+		return reviews.length + innerCommentLength;
+	};
 
 	onWindowResize = () => {
 		const { resizeTimeout } = this.state;
@@ -245,9 +270,11 @@ class CodeMirror extends React.Component {
 					/>
 					{ exerciseCodeDoc && isReview &&
 					<Review
+						addReviewComment={ this.addReviewComment }
 						selectedReviewId={ selectedReviewId }
 						onSelectComment={ this.selectComment }
 						reviews={ this.getReviewsWithHeight(currentReviews) }
+						allCommentsLength={ this.getCommentsLength(currentSubmission) }
 					/>
 					}
 				</div>
@@ -333,7 +360,7 @@ class CodeMirror extends React.Component {
 			}, () =>
 				this.setState({
 					currentSubmission: submission,
-					currentReviews: this.getReviewsWithTextMarkers(submission.automaticChecking.reviews, submission.manualCheckingReviews),
+					currentReviews: this.getReviewsWithTextMarkers(submission),
 				}, () => this.state.editor.refresh())
 		);
 	}
@@ -344,29 +371,29 @@ class CodeMirror extends React.Component {
 		})
 	}
 
-	getReviewsWithTextMarkers = (autoReviews, manualReviews) => {
+	getReviewsWithTextMarkers = (submission) => {
+		const reviews = this.getAllReviewsFromSubmission(submission);
+
 		const reviewsWithTextMarkers = [];
-		const addReviewsToArray = (reviews, array) => {
-			for (const review of reviews) {
-				const { finishLine, finishPosition, startLine, startPosition } = review;
-				const textMarker = this.highlightLine(finishLine, finishPosition, startLine, startPosition, styles.reviewCode);
 
-				array.push({
-					marker: textMarker,
-					...review
-				});
-			}
+		for (const review of reviews) {
+			const { finishLine, finishPosition, startLine, startPosition } = review;
+			const textMarker = this.highlightLine(finishLine, finishPosition, startLine, startPosition, styles.reviewCode);
+
+			reviewsWithTextMarkers.push({
+				marker: textMarker,
+				...review
+			});
 		}
 
-		if(autoReviews) {
-			addReviewsToArray(autoReviews, reviewsWithTextMarkers);
-		}
-
-		if(manualReviews) {
-			addReviewsToArray(manualReviews, reviewsWithTextMarkers);
-		}
 
 		return reviewsWithTextMarkers;
+	}
+
+	getAllReviewsFromSubmission = (submission) => {
+		const manual = submission.manualCheckingReviews || [];
+		const auto = submission.automaticChecking ? submission.automaticChecking.reviews : [];
+		return manual.concat(auto);
 	}
 
 	renderOverview = (submission) => {
@@ -803,6 +830,19 @@ class CodeMirror extends React.Component {
 		sendCode(courseId, slideId, value);
 	}
 
+	addReviewComment = (reviewId, text) => {
+		const { addReviewComment, courseId, slideId, author, } = this.props;
+		const { currentSubmission, } = this.state;
+
+		const comment = {
+			text,
+			author,
+			publishTime: new Date(),
+		};
+
+		addReviewComment(courseId, slideId, currentSubmission.id, reviewId, comment);
+	}
+
 	isSubmitResultsContainsError = ({ automaticChecking }) => {
 		return automaticChecking.result === checkingResults.compilationError
 			|| automaticChecking.result === checkingResults.wrongAnswer;
@@ -957,11 +997,13 @@ const mapStateToProps = (state, { courseId, slideId, }) => {
 		isAuthenticated: account.isAuthenticated,
 		submissions,
 		lastSubmission,
+		author: account,
 	};
 };
 
 const mapDispatchToProps = (dispatch) => ({
 	sendCode: (courseId, slideId, code) => dispatch(sendCode(courseId, slideId, code)),
+	addReviewComment: (courseId, slideId, submissionId, reviewId, comment) => dispatch(addReviewComment(courseId, slideId, submissionId, reviewId, comment)),
 });
 
 CodeMirror.propTypes = {
@@ -977,6 +1019,7 @@ CodeMirror.propTypes = {
 	addCommentToReview: PropTypes.func,
 	submissions: PropTypes.array,
 	lastSubmission: PropTypes.object,
+	author: userType,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(CodeMirror);

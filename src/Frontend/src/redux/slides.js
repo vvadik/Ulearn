@@ -1,6 +1,7 @@
 import {
 	COURSES__SLIDE_LOAD,
-	COURSES__EXERCISE_ADD_SUBMISSIONS,
+	COURSES__EXERCISE_ADD_SUBMISSION,
+	COURSES__EXERCISE_ADD_REVIEW_COMMENT,
 	START, SUCCESS, FAIL,
 } from '../consts/actions';
 import blockTypes from "src/components/course/Course/Slide/blockTypes";
@@ -68,7 +69,7 @@ export default function slides(state = initialCoursesSlidesState, action) {
 				slideError: action.error,
 			};
 		}
-		case COURSES__EXERCISE_ADD_SUBMISSIONS: {
+		case COURSES__EXERCISE_ADD_SUBMISSION: {
 			const { courseId, slideId, result } = action;
 			const { submission } = result;
 
@@ -91,6 +92,91 @@ export default function slides(state = initialCoursesSlidesState, action) {
 			}
 
 			return newState;
+		}
+		case COURSES__EXERCISE_ADD_REVIEW_COMMENT + START: {
+			const { courseId, slideId, submissionId, reviewId, comment, } = action;
+
+			const submissions = state.submissionsByCourses[courseId][slideId];
+			const submission = submissions[submissionId];
+			const { manualCheckingReviews } = submission;
+
+			const newReviews = JSON.parse(JSON.stringify(manualCheckingReviews));
+			const review = newReviews.find(r => r.id === reviewId);
+			review.comments.push(comment);
+
+			return {
+				...state,
+				submissionsByCourses: {
+					...state.submissionsByCourses,
+					[courseId]: {
+						...state.submissionsByCourses[courseId],
+						[slideId]: {
+							...submissions,
+							[submissionId]: {
+								...submission,
+								manualCheckingReviews: newReviews,
+							}
+						},
+					}
+				},
+			}
+		}
+		case COURSES__EXERCISE_ADD_REVIEW_COMMENT + SUCCESS: {
+			const { courseId, slideId, submissionId, reviewId, comment, } = action;
+
+			const submissions = state.submissionsByCourses[courseId][slideId];
+			const submission = submissions[submissionId];
+			const { manualCheckingReviews } = submission;
+
+			const newReviews = JSON.parse(JSON.stringify(manualCheckingReviews));
+			const review = newReviews.find(r => r.id === reviewId);
+			review.comments.pop();
+			review.comments.push(comment);
+
+			return {
+				...state,
+				submissionsByCourses: {
+					...state.submissionsByCourses,
+					[courseId]: {
+						...state.submissionsByCourses[courseId],
+						[slideId]: {
+							...submissions,
+							[submissionId]: {
+								...submission,
+								manualCheckingReviews: newReviews,
+							}
+						},
+					}
+				},
+			}
+		}
+		case COURSES__EXERCISE_ADD_REVIEW_COMMENT + FAIL: {
+			const { courseId, slideId, submissionId, reviewId, error, } = action;
+
+			const submissions = state.submissionsByCourses[courseId][slideId];
+			const submission = submissions[submissionId];
+			const { manualCheckingReviews } = submission;
+
+			const newReviews = JSON.parse(JSON.stringify(manualCheckingReviews));
+			const review = newReviews.find(r => r.id === reviewId);
+			review.comments.pop();
+
+			return {
+				...state,
+				submissionsByCourses: {
+					...state.submissionsByCourses,
+					[courseId]: {
+						...state.submissionsByCourses[courseId],
+						[slideId]: {
+							...submissions,
+							[submissionId]: {
+								...submission,
+								manualCheckingReviews: newReviews,
+							}
+						},
+					}
+				},
+			}
 		}
 		default:
 			return state;

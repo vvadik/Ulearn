@@ -9,3 +9,7 @@ export function getSlide(courseId, slideId) {
 export function submitCode(courseId, slideId, code) {
 	return api.exercise.submitCode(courseId, slideId, code);
 }
+
+export function addReviewComment(courseId, slideId, code) {
+	return api.exercise.submitCode(courseId, slideId, code);
+}

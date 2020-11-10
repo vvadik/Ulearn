@@ -94,9 +94,13 @@
 .commentText {
   margin-bottom: 0;
 
-  &:last-child {
+  &:not(:last-child) {
 	margin-bottom: 16px;
   }
+}
+
+.commentReply {
+  margin-bottom: 16px;
 }
 
 .commentReplyTextArea {
@@ -130,4 +134,9 @@
 
 .commentReplyButton :focus, :active {
   outline: none;
+}
+
+.commentRepliesList {
+  list-style: none;
+  padding: 0;
 }

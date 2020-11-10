@@ -5,7 +5,7 @@ export function submitCode(courseId, slideId, code) {
 		api.createRequestParams({ solution: code }));
 }
 
-export function addCodeReviewComment(reviewId, text) {
+export function sendCodeReviewComment(reviewId, text) {
 	return api.post(`review/${ reviewId }/comments`,
 		api.createRequestParams({ text }));
 }
