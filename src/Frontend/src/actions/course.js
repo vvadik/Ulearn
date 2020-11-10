@@ -6,15 +6,16 @@ import {
 	COURSES__SLIDE_LOAD,
 	COURSES__SLIDE_READY,
 	COURSES__COURSE_LOAD_ERRORS,
+	COURSES__EXERCISE_ADD_SUBMISSIONS,
 	START, SUCCESS, FAIL,
 } from "../consts/actions";
 
 import { getCourse, getCourseErrors } from 'src/api/courses';
-import { getSlide } from "src/api/slides";
+import { getSlide, submitCode, } from "src/api/slides";
 import {
 	getFlashcards,
 	putFlashcardStatus,
-} from '../api/flashcards'
+} from '../api/flashcards';
 
 export const changeCurrentCourseAction = (courseId) => ({
 	type: COURSES__COURSE_ENTERED,
@@ -86,6 +87,13 @@ const slideReadyAction = (isSlideReady) => ({
 	isSlideReady,
 });
 
+const addSubmissionAction = (courseId, slideId, result) => ({
+	type: COURSES__EXERCISE_ADD_SUBMISSIONS,
+	courseId,
+	slideId,
+	result,
+});
+
 export const loadCourse = (courseId) => {
 	courseId = courseId.toLowerCase();
 
@@ -107,11 +115,11 @@ export const loadCourseErrors = (courseId) => {
 	return (dispatch) => {
 		getCourseErrors(courseId)
 			.then(result => {
-			if(result.status === 204) {
-				dispatch(loadCourseErrorsSuccess(courseId, null));
-			} else {
-				dispatch(loadCourseErrorsSuccess(courseId, result.tempCourseError));
-			}
+				if(result.status === 204) {
+					dispatch(loadCourseErrorsSuccess(courseId, null));
+				} else {
+					dispatch(loadCourseErrorsSuccess(courseId, result.tempCourseError));
+				}
 			})
 			.catch(err => {
 				dispatch(loadCourseErrorsSuccess(courseId, null));
@@ -167,3 +175,15 @@ export const setSlideReady = (isSlideReady) => {
 		dispapcth(slideReadyAction(isSlideReady));
 	}
 }
+
+export const sendCode = (courseId, slideId, code,) => {
+	return (dispatch) => {
+		submitCode(courseId, slideId, code,)
+			.then(r => {
+				if(r.submission !== null) {
+					dispatch(addSubmissionAction(courseId, slideId, r));
+				}
+			});
+	};
+}
+//TODO add handling send code and add review
