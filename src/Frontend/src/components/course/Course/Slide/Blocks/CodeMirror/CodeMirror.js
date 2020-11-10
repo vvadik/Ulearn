@@ -1,14 +1,13 @@
 import React from 'react';
 
 import { Controlled, } from "react-codemirror2";
-import ExerciseOutput from "./ExerciseOutput/ExerciseOutput";
 import { Button, Checkbox, FLAT_THEME, Modal, Select, Tooltip, } from "ui";
 import Review from "./Review/Review";
 import { darkTheme } from 'ui/internal/ThemePlayground/darkTheme';
 import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent";
 import { Lightbulb, Refresh, EyeOpened, DocumentLite, } from "icons";
 import CongratsModal from "./CongratsModal/CongratsModal";
-import {ExerciseOutput, HasOutput} from "./ExerciseOutput/ExerciseOutput";
+import { ExerciseOutput, HasOutput } from "./ExerciseOutput/ExerciseOutput";
 import { ThemeContext } from "@skbkontur/react-ui/index";
 
 import PropTypes from 'prop-types';
