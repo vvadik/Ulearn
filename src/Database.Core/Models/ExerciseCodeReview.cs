@@ -19,7 +19,7 @@ namespace Database.Models
 
 		public int? SubmissionId { get; set; }
 
-		// Заполняется вместо ExerciseChecking дял ревью бота
+		// Заполняется вместо ExerciseChecking для ревью бота
 		public virtual UserExerciseSubmission Submission { get; set; }
 
 		[Required]
