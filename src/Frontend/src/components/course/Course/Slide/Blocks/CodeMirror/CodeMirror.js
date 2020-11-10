@@ -8,6 +8,7 @@ import { darkTheme } from 'ui/internal/ThemePlayground/darkTheme';
 import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent";
 import { Lightbulb, Refresh, EyeOpened, DocumentLite, } from "icons";
 import CongratsModal from "./CongratsModal/CongratsModal";
+import {ExerciseOutput, HasOutput} from "./ExerciseOutput/ExerciseOutput";
 import { ThemeContext } from "@skbkontur/react-ui/index";
 
 import PropTypes from 'prop-types';
@@ -233,12 +234,12 @@ class CodeMirror extends React.Component {
 				{ !isEditable && this.renderEditButton() }
 				{/* TODO not included in current release !isEditable && currentSubmission && this.renderOverview(currentSubmission)*/ }
 				{ this.renderControls() }
-				{ output &&
+				{ /*output &&
 				<ExerciseOutput
 					output={ output }
 					expectedOutput={ expectedOutput }
 					checkingState={ checkingResults.wrongAnswer } // TODO
-				/>
+				/>*/
 				}
 				{ showedHintsCount > 0 && this.renderHints() }
 				{ showAcceptedSolutions && this.renderAcceptedSolutions() }

@@ -34,10 +34,6 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 
 		[CanBeNull]
 		[DataMember]
-		public string CompilationError;
-
-		[CanBeNull]
-		[DataMember]
 		public string Output;
 
 		[DataMember]
@@ -60,7 +56,7 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 			if (checking.IsCompilationError)
 			{
 				result.Result = AutomaticExerciseCheckingResult.CompilationError;
-				result.CompilationError = checking.CompilationError?.Text;
+				result.Output = checking.CompilationError?.Text;
 				return result;
 			}
 			result.Result = checking.IsRightAnswer ? AutomaticExerciseCheckingResult.RightAnswer : AutomaticExerciseCheckingResult.WrongAnswer;

@@ -25,7 +25,7 @@
 
 .outputHeader {
   display: block;
-  padding: 8px 16px;
+  padding: 7px 16px;
   border-radius: 8px 8px 0 0;
   background-color: @lightGrey;
   color: @black;
@@ -52,20 +52,16 @@
   color: @white;
 }
 
-.oneLineOutput {
+.outputParagraph {
   display: block;
-  padding: 0 16px;
-}
-
-.oneLineErrorOutput {
-  display: block;
-  padding: 8px 16px;
+  padding: 7px 16px;
   margin: 0;
 }
 
 .outputTable {
   width: 100%;
-  border: 1px solid #ddd;
+  border-collapse: collapse;
+  table-layout: fixed;
 
   font-family: @defaultFonts;
   font-style: normal;
@@ -74,10 +70,22 @@
 
 .outputTable > thead > tr > th,
 .outputTable > tbody > tr > td {
-  padding: 8px;
-  line-height: 1.42857143;
+  padding: 7px 16px;
   vertical-align: top;
-  border: 1px solid #ddd;
+  border: 1px solid @lightGrey;
+}
+
+.outputTable > tbody > tr > td:first-of-type {
+  padding: 7px;
+}
+
+.outputTable > thead > tr > th {
+  border-top: none;
+  text-align: left;
+}
+
+.outputTable > tbody > tr:last-of-type > td {
+  border-bottom: none;
 }
 
 .outputTable > thead > tr > th {
@@ -95,10 +103,14 @@
   line-height: 20px;
 }
 
-.outputErrorLineColor {
-  background-color: @lightRed;
+.outputTable > tbody > tr > td > span {
+  opacity: 1;
 }
 
-.outputLineColor {
-  background-color: @lightGreen;
+.outputMatchColor {
+  background-color: @lightGreen
+}
+
+.outputNotMatchColor {
+  background-color: @lightRed
 }
