@@ -413,7 +413,7 @@ namespace Database.Repos
 				.Include(s => s.AutomaticChecking).ThenInclude(c => c.CompilationError)
 				.Include(s => s.SolutionCode)
 				.Include(s => s.Reviews).ThenInclude(c => c.Author)
-				.Include(s => s.ManualCheckings).ThenInclude(c => c.Reviews)
+				.Include(s => s.ManualCheckings).ThenInclude(c => c.Reviews).ThenInclude(r => r.Author)
 				.SingleOrDefaultAsync(x => x.Id == id);
 		}
 

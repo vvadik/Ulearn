@@ -24,6 +24,7 @@ namespace Database.Models
 		[Required]
 		public DateTime Timestamp { get; set; }
 
+		// Пользователь, чья работа проверяется. А кто проверил, написано в LockedById
 		[Required]
 		[StringLength(64)]
 		public string UserId { get; set; }

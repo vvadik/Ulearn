@@ -570,10 +570,11 @@ namespace Database.Repos
 		public async Task<List<ExerciseCodeReviewComment>> GetExerciseCodeReviewComments(string courseId, Guid slideId, string userId)
 		{
 			return await db.ExerciseCodeReviewComments
+				.Include(c => c.Author)
 				.Where(c =>
-					c.Review.Submission.CourseId == courseId
-					&& c.Review.Submission.SlideId == slideId
-					&& c.Review.Submission.UserId == userId
+					c.Review.ExerciseChecking.CourseId == courseId
+					&& c.Review.ExerciseChecking.SlideId == slideId
+					&& c.Review.ExerciseChecking.UserId == userId
 					&& !c.IsDeleted
 					&& !c.Review.IsDeleted)
 				.ToListAsync();
