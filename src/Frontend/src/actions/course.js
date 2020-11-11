@@ -6,7 +6,8 @@ import {
 	COURSES__SLIDE_LOAD,
 	COURSES__SLIDE_READY,
 	COURSES__COURSE_LOAD_ERRORS,
-	COURSES__EXERCISE_ADD_SUBMISSIONS,
+	COURSES__EXERCISE_ADD_SUBMISSION,
+	COURSES__EXERCISE_ADD_REVIEW_COMMENT,
 	START, SUCCESS, FAIL,
 } from "../consts/actions";
 
@@ -16,6 +17,7 @@ import {
 	getFlashcards,
 	putFlashcardStatus,
 } from '../api/flashcards';
+import { sendCodeReviewComment, } from "src/api/exercise";
 
 export const changeCurrentCourseAction = (courseId) => ({
 	type: COURSES__COURSE_ENTERED,
@@ -88,10 +90,37 @@ const slideReadyAction = (isSlideReady) => ({
 });
 
 const addSubmissionAction = (courseId, slideId, result) => ({
-	type: COURSES__EXERCISE_ADD_SUBMISSIONS,
+	type: COURSES__EXERCISE_ADD_SUBMISSION,
 	courseId,
 	slideId,
 	result,
+});
+
+const addReviewCommentStart = (courseId, slideId, submissionId, reviewId, comment) => ({
+	type: COURSES__EXERCISE_ADD_REVIEW_COMMENT + START,
+	courseId,
+	slideId,
+	submissionId,
+	reviewId,
+	comment,
+});
+
+const addReviewCommentSuccess = (courseId, slideId, submissionId, reviewId, comment) => ({
+	type: COURSES__EXERCISE_ADD_REVIEW_COMMENT + SUCCESS,
+	courseId,
+	slideId,
+	submissionId,
+	reviewId,
+	comment,
+});
+
+const addReviewCommentFail = (courseId, slideId, submissionId, reviewId, error) => ({
+	type: COURSES__EXERCISE_ADD_REVIEW_COMMENT + FAIL,
+	courseId,
+	slideId,
+	submissionId,
+	reviewId,
+	error,
 });
 
 export const loadCourse = (courseId) => {
@@ -186,4 +215,16 @@ export const sendCode = (courseId, slideId, code,) => {
 			});
 	};
 }
-//TODO add handling send code and add review
+
+export const addReviewComment = (courseId, slideId, submissionId, reviewId, comment,) => {
+	return (dispatch) => {
+		dispatch(addReviewCommentStart(courseId, slideId, submissionId, reviewId, comment));
+		sendCodeReviewComment(reviewId, comment.text,)
+			.then(r => {
+				dispatch(addReviewCommentSuccess(courseId, slideId, submissionId, reviewId, r));
+			})
+			.catch(err => {
+				dispatch(addReviewCommentFail(courseId, slideId, submissionId, reviewId, err));
+			});
+	};
+}
