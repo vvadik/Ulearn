@@ -1,4 +1,9 @@
-export const DEFAULT_TIMEZONE = 'Europe/Moscow';
+let tz = 'Europe/Moscow';
+
+if(process.env.NODE_ENV === 'development') {
+	tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+}
+export const DEFAULT_TIMEZONE = tz;
 
 export const TABS = {
 	allComments: 'allComments',

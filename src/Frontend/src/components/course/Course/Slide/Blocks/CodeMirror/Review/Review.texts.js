@@ -10,7 +10,7 @@ const texts = {
 	},
 
 	getAddingTime: (addingTime) => {
-		return moment(convertDefaultTimezoneToLocal(addingTime)).format("DD MMMM YYYY")
+		return convertDefaultTimezoneToLocal(addingTime).format("DD MMMM YYYY")
 	},
 };
 

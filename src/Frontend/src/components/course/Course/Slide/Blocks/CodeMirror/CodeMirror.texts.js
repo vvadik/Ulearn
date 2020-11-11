@@ -4,6 +4,7 @@ import getPluralForm from "src/utils/getPluralForm";
 import { checkingResults } from "src/consts/exercise";
 
 import moment from "moment";
+import { convertDefaultTimezoneToLocal } from "src/utils/getMoment";
 
 const texts = {
 	submissions: {
@@ -118,7 +119,7 @@ const texts = {
 	},
 
 	getSubmissionDate: (timestamp) => {
-		return moment(timestamp).format('DD MMMM YYYY в HH:mm');
+		return convertDefaultTimezoneToLocal(timestamp).format('DD MMMM YYYY в HH:mm');
 	}
 };
 
