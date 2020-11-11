@@ -55,13 +55,15 @@
 .outputParagraph {
   display: block;
   padding: 7px 16px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-family: @monoFonts;
   margin: 0;
 }
 
 .outputTable {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
 
   font-family: @defaultFonts;
   font-style: normal;
@@ -72,7 +74,19 @@
 .outputTable > tbody > tr > td {
   padding: 7px 16px;
   vertical-align: top;
+  white-space: pre-wrap;
+  word-break: break-all;
   border: 1px solid @lightGrey;
+}
+
+.outputTable {
+  th, td {
+    width: 50%;
+  }
+  th:first-child, td:first-child {
+    width: auto;
+    white-space: nowrap;
+  }
 }
 
 .outputTable > tbody > tr > td:first-of-type {
@@ -98,7 +112,7 @@
 }
 
 .outputTable > tbody > tr > td {
-  font-family: Roboto Mono, @defaultFonts;
+  font-family: @monoFonts;
   font-size: 14px;
   line-height: 20px;
 }
