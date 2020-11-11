@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using Ulearn.Web.Api.Controllers;
 using Ulearn.Web.Api.Models.Common;
 using Ulearn.Web.Api.Models.Responses.Review;
+using Ulearn.Web.Api.Utils;
 
 namespace Ulearn.Web.Api.Models.Responses.Exercise
 {
@@ -36,6 +37,9 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 		public string Comment;
 
 		[DataMember]
+		public string RenderedComment;
+
+		[DataMember]
 		public DateTime? AddingTime;
 
 		[DataMember]
@@ -47,6 +51,7 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 			{
 				Id = r.Id,
 				Comment = r.Comment,
+				RenderedComment = CommentTextHelper.RenderCommentTextToHtml(r.Comment),
 				Author = isUlearnBot ? null : BaseController.BuildShortUserInfo(r.Author),
 				AddingTime = isUlearnBot || r.AddingTime <= DateTime.UnixEpoch ? (DateTime?)null : r.AddingTime,
 				FinishLine = r.FinishLine,

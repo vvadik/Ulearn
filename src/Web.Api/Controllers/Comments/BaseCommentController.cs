@@ -12,9 +12,9 @@ using Database.Repos.Users;
 using JetBrains.Annotations;
 using Serilog;
 using Ulearn.Common;
-using Ulearn.Common.Api.Helpers;
 using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Models.Responses.Comments;
+using Ulearn.Web.Api.Utils;
 
 namespace Ulearn.Web.Api.Controllers.Comments
 {
@@ -59,7 +59,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			{
 				Id = comment.Id,
 				Text = comment.Text,
-				RenderedText = RenderCommentTextToHtml(comment.Text),
+				RenderedText = CommentTextHelper.RenderCommentTextToHtml(comment.Text),
 				Author = BuildShortUserInfo(comment.Author),
 				PublishTime = comment.PublishTime,
 				IsApproved = comment.IsApproved,
@@ -99,14 +99,6 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			}
 
 			return commentInfo;
-		}
-
-		private string RenderCommentTextToHtml(string commentText)
-		{
-			var encodedText = HtmlTransformations.EncodeMultiLineText(commentText);
-			var renderedText = encodedText.RenderSimpleMarkdown();
-			var textWithLinks = HtmlTransformations.HighlightLinks(renderedText);
-			return textWithLinks;
 		}
 
 		protected async Task<bool> CanUserSeeNotApprovedCommentsAsync(string userId, string courseId)

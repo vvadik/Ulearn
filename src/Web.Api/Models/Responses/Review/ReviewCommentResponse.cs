@@ -3,6 +3,7 @@ using System.Runtime.Serialization;
 using Database.Models;
 using Ulearn.Web.Api.Controllers;
 using Ulearn.Web.Api.Models.Common;
+using Ulearn.Web.Api.Utils;
 
 namespace Ulearn.Web.Api.Models.Responses.Review
 {
@@ -16,6 +17,9 @@ namespace Ulearn.Web.Api.Models.Responses.Review
 		public string Text { get; set; }
 
 		[DataMember]
+		public string RenderedText { get; set; }
+
+		[DataMember]
 		public DateTime PublishTime { get; set; }
 
 		[DataMember]
@@ -27,6 +31,7 @@ namespace Ulearn.Web.Api.Models.Responses.Review
 			{
 				Id = comment.Id,
 				Text = comment.Text,
+				RenderedText = CommentTextHelper.RenderCommentTextToHtml(comment.Text),
 				PublishTime = comment.AddingTime,
 				Author = BaseController.BuildShortUserInfo(comment.Author)
 			};
