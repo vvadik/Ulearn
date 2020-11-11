@@ -122,10 +122,13 @@ export class ExerciseOutput extends React.Component {
 	static
 	renderSimpleTextOutput = (output) => {
 		const lines = output.split('\n');
-		return lines.map((text, i) =>
-			<p key={ i } className={ styles.outputParagraph }>
-				{ text }
-			</p>);
+		return <div className={ styles.outputTextWrapper }>
+			{ lines.map((text, i) =>
+				<pre key={ i } className={ styles.outputParagraph }>
+					{ text }
+				</pre>)
+			}
+		</div>
 	}
 
 	static
