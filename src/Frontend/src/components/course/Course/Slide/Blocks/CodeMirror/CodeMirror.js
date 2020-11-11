@@ -194,7 +194,7 @@ class CodeMirror extends React.Component {
 		const opts = this.codeMirrorOptions;
 
 		return (
-			<div className={ classNames(styles.wrapper, className) } onClick={ this.resetSelectedReviewTextMarker }>
+			<div className={ classNames(styles.wrapper, className) }>
 				{ this.renderControlledCodeMirror(opts) }
 			</div>
 		);
@@ -225,14 +225,6 @@ class CodeMirror extends React.Component {
 				}
 			},
 		};
-	}
-
-	resetSelectedReviewTextMarker = () => {
-		const { selectedReviewId, isEditable, } = this.state;
-
-		if(!isEditable && selectedReviewId >= 0) {
-			this.highlightReview(-1);
-		}
 	}
 
 	renderControlledCodeMirror = (opts) => {
@@ -273,7 +265,8 @@ class CodeMirror extends React.Component {
 						addReviewComment={ this.addReviewComment }
 						selectedReviewId={ selectedReviewId }
 						onSelectComment={ this.selectComment }
-						reviews={ this.getReviewsWithHeight(currentReviews) }
+						reviews={ currentReviews }
+						getReviewAnchorTop={ this.getReviewAnchorTop }
 						allCommentsLength={ this.getCommentsLength(currentSubmission) }
 					/>
 					}
@@ -295,16 +288,13 @@ class CodeMirror extends React.Component {
 		)
 	}
 
-	getReviewsWithHeight = (reviews) => {
-		const { exerciseCodeDoc } = this.state;
+	getReviewAnchorTop = (review) => {
+		const { exerciseCodeDoc, } = this.state;
 
-		return reviews.map(r => ({
-			...r,
-			anchorTop: exerciseCodeDoc.cm.charCoords({
-				line: r.startLine,
-				ch: r.startPosition,
-			}, 'local').top
-		}));
+		return exerciseCodeDoc.cm.charCoords({
+			line: review.startLine,
+			ch: review.startPosition,
+		}, 'local').top;
 	}
 
 	renderSubmissionsSelect = () => {
@@ -391,6 +381,10 @@ class CodeMirror extends React.Component {
 	}
 
 	getAllReviewsFromSubmission = (submission) => {
+		if(!submission) {
+			return [];
+		}
+
 		const manual = submission.manualCheckingReviews || [];
 		const auto = submission.automaticChecking ? submission.automaticChecking.reviews : [];
 		return manual.concat(auto);
@@ -646,7 +640,7 @@ class CodeMirror extends React.Component {
 	}
 
 	highlightReview = (id) => {
-		const { currentReviews, selectedReviewId, } = this.state;
+		const { currentReviews, selectedReviewId, editor, } = this.state;
 		const newCurrentReviews = [...currentReviews];
 
 		if(selectedReviewId >= 0) {
@@ -656,16 +650,23 @@ class CodeMirror extends React.Component {
 			selectedReview.marker = this.highlightLine(to.line, to.ch, from.line, from.ch, styles.reviewCode);
 		}
 
+		let line = 0;
 		if(id >= 0) {
 			const review = newCurrentReviews.find(r => r.id === id);
 			const { from, to, } = review.marker.find();
 			review.marker.clear();
 			review.marker = this.highlightLine(to.line, to.ch, from.line, from.ch, styles.selectedReviewCode);
+
+			line = from.line;
 		}
 
 		this.setState({
 			currentReviews: newCurrentReviews,
 			selectedReviewId: id,
+		}, () => {
+			if(id >= 0) {
+				editor.scrollIntoView({ line, }, 200);
+			}
 		});
 	}
 
@@ -743,6 +744,7 @@ class CodeMirror extends React.Component {
 			valueChanged: true,
 			isEditable: true,
 			currentSubmission: null,
+			currentReviews: [],
 			output: null,
 		})
 	}
@@ -869,9 +871,7 @@ class CodeMirror extends React.Component {
 
 		if(!isEditable && currentReviews.length > 0) {
 			const reviewId = CodeMirror.getSelectedReviewIdByCursor(currentReviews, exerciseCodeDoc, cursor);
-			if(reviewId >= 0) {
-				this.highlightReview(reviewId);
-			}
+			this.highlightReview(reviewId);
 		}
 	}
 

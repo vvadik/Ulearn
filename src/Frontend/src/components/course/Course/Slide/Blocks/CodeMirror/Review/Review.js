@@ -5,11 +5,11 @@ import classNames from "classnames";
 import Avatar from "src/components/common/Avatar/Avatar";
 import { Textarea, ThemeContext, } from "ui";
 import { Send3 } from "icons";
-import texts from "./Review.texts";
+
 import { textareaHidden } from "src/uiTheme";
 
 import styles from "./Review.less";
-
+import texts from "./Review.texts";
 
 class Review extends React.Component {
 	constructor(props) {
@@ -23,6 +23,7 @@ class Review extends React.Component {
 					ref: React.createRef(),
 				})),
 			commentsReplies: this.buildCommentsReplies(props.reviews),
+			marginsAdded: false,
 		};
 	}
 
@@ -42,16 +43,17 @@ class Review extends React.Component {
 		for (const { id } of reviews) {
 			commentsReplies[id] = '';
 		}
-		
+
 		return commentsReplies;
 	}
 
 	componentDidMount() {
-		this.addMarginsToComments();
+		//add margins in a moment after mounting, so code could resize correctly to calculate correct topAnchor
+		this.setState({}, () => this.addMarginsToComments());
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
-		const { reviews, allCommentsLength, } = this.props;
+		const { reviews, allCommentsLength, selectedReviewId, } = this.props;
 
 		let sameValues = allCommentsLength === prevProps.allCommentsLength;
 
@@ -79,19 +81,55 @@ class Review extends React.Component {
 						ref: React.createRef(),
 					})),
 				commentsReplies: this.buildCommentsReplies(reviews),
+				marginsAdded: false,
 			});
-		} else if(this.state.comments[0].margin === 0) {
+		} else if(!this.state.marginsAdded
+			|| (selectedReviewId !== prevProps.selectedReviewId && selectedReviewId >= 0)) {
 			this.addMarginsToComments();
 		}
 	}
 
 	addMarginsToComments = () => {
-		const { comments } = this.state;
-		const commentsWithMargin = [...comments];
+		const { comments, } = this.state;
+		const { selectedReviewId, getReviewAnchorTop, } = this.props;
 
+		const commentsWithMargin = [...comments];
+		const selectedReviewIndex = commentsWithMargin.findIndex(c => c.review.id === selectedReviewId);
 		let lastReviewBottomHeight = 0;
-		for (const comment of commentsWithMargin) {
-			const { anchorTop } = comment.review;
+
+		if(selectedReviewIndex >= 0) {
+			const selectedComment = commentsWithMargin[selectedReviewIndex];
+			const anchorTop = getReviewAnchorTop(selectedComment.review);
+			const height = selectedComment.ref.current.offsetHeight;
+			const offset = Math.max(5, anchorTop);
+
+			let spaceToSelectedReview = offset;
+			selectedComment.margin = offset;
+			lastReviewBottomHeight = offset + height;
+
+			if(selectedReviewIndex > 0) {
+				let totalCommentsHeight = 5;
+				for (let i = 0; i < selectedReviewIndex; i++) {
+					const comment = commentsWithMargin[i];
+					const height = comment.ref.current.offsetHeight;
+					totalCommentsHeight += height + 5;
+				}
+
+				commentsWithMargin[0].margin = spaceToSelectedReview - totalCommentsHeight;
+				for (let i = 1; i <= selectedReviewIndex; i++) {
+					const comment = commentsWithMargin[i];
+					const anchorTop = getReviewAnchorTop(comment.review);
+					const height = comment.ref.current.offsetHeight;
+					comment.margin = Math.max(5, Math.min(anchorTop, spaceToSelectedReview - totalCommentsHeight));
+					spaceToSelectedReview -= (height + 5);
+					totalCommentsHeight -= (height);
+				}
+			}
+		}
+
+		for (let i = selectedReviewIndex + 1; i < commentsWithMargin.length; i++) {
+			const comment = commentsWithMargin[i];
+			const anchorTop = getReviewAnchorTop(comment.review);
 			const height = comment.ref.current.offsetHeight;
 			const offset = Math.max(5, anchorTop - lastReviewBottomHeight);
 
@@ -101,14 +139,15 @@ class Review extends React.Component {
 
 		this.setState({
 			comments: commentsWithMargin,
-		})
+			marginsAdded: true,
+		});
 	}
 
 	render = () => {
 		const { comments, } = this.state;
 
 		return (
-			<ol className={ styles.reviewsContainer }>
+			<ol className={ styles.reviewsContainer } ref={ (ref) => this.ref = ref }>
 				{ comments.map(this.renderTopLevelComment) }
 			</ol>
 		);
@@ -229,10 +268,11 @@ class Review extends React.Component {
 
 Review.propTypes = {
 	reviews: PropTypes.array,
-	onSelectComment: PropTypes.func,
-	selectedReviewId: PropTypes.number,
-	addReviewComment: PropTypes.func,
 	allCommentsLength: PropTypes.number,
+	selectedReviewId: PropTypes.number,
+	onSelectComment: PropTypes.func,
+	addReviewComment: PropTypes.func,
+	getReviewAnchorTop: PropTypes.func,
 }
 
 export default Review;
