@@ -170,8 +170,6 @@ export class ExerciseOutput extends React.Component {
 ExerciseOutput.propTypes = {
 	solutionRunStatus: PropTypes.string.isRequired, // Success, если не посылка прямо сейчас
 	message: PropTypes.string,
-
 	expectedOutput: PropTypes.string,
-
 	automaticChecking: PropTypes.object,
 }
