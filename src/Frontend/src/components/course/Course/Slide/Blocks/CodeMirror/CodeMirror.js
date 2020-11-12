@@ -366,6 +366,7 @@ class CodeMirror extends React.Component {
 	}
 
 	setCurrentSubmission = (submission) => {
+		this.clearAllTextMarkers();
 		this.setState({
 			currentSubmission: submission,
 			currentReviews: this.getReviewsWithTextMarkers(submission),
@@ -392,7 +393,6 @@ class CodeMirror extends React.Component {
 				...review
 			});
 		}
-
 
 		return reviewsWithTextMarkers;
 	}
