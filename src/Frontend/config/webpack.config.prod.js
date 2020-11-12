@@ -92,7 +92,7 @@ module.exports = merge(base,{
 						},
 					},
 					{
-						test: /\.(js|jsx|mjs)$/,
+						test: /\.(js|jsx|mjs|ts|tsx)$/,
 						loader: 'babel-loader',
 						include: paths.appSrc,
 						options: {
