@@ -109,7 +109,7 @@ export class ExerciseOutput extends React.Component {
 
 	getOutputTypeByCheckingResults = () => {
 		const { automaticChecking } = this.props;
-		switch (automaticChecking.checkingResults) {
+		switch (automaticChecking.result) {
 			case checkingResults.compilationError:
 				return OutputType.compilationError;
 			case checkingResults.wrongAnswer:
@@ -119,7 +119,7 @@ export class ExerciseOutput extends React.Component {
 			case checkingResults.notChecked:
 				return OutputType.serverMessage;
 			default:
-				console.error(new Error(`checkingResults has unknown value ${ automaticChecking.checkingResults }`));
+				console.error(new Error(`checkingResults has unknown value ${ automaticChecking.result }`));
 				return OutputType.serverMessage
 		}
 	}
@@ -129,9 +129,9 @@ export class ExerciseOutput extends React.Component {
 		const lines = output.split('\n');
 		return <div className={ styles.outputTextWrapper }>
 			{ lines.map((text, i) =>
-				<pre key={ i } className={ styles.outputParagraph }>
+				<span key={ i } className={ styles.outputParagraph }>
 					{ text }
-				</pre>)
+				</span>)
 			}
 		</div>
 	}

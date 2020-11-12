@@ -238,11 +238,11 @@ class CodeMirror extends React.Component {
 	}
 
 	renderControlledCodeMirror = (opts) => {
-		const { expectedOutput, submissions, lastCheckingResponse } = this.props;
+		const { expectedOutput, submissions } = this.props;
 		const {
 			value, showedHintsCount, showAcceptedSolutions, currentSubmission,
 			isEditable, exerciseCodeDoc, congratsModalData,
-			currentReviews, showOutput, selectedReviewId,
+			currentReviews, showOutput, selectedReviewId, visibleCheckingResponse
 		} = this.state;
 
 		const isReview = !isEditable && currentReviews.length > 0;
@@ -256,6 +256,7 @@ class CodeMirror extends React.Component {
 			{ [styles.editorWithoutBorder]: isEditable },
 			{ [styles.editorInReview]: isReview },
 		);
+		const automaticChecking = currentSubmission?.automaticChecking ?? visibleCheckingResponse?.automaticChecking;
 
 		return (
 			<React.Fragment>
@@ -284,14 +285,14 @@ class CodeMirror extends React.Component {
 				{ !isEditable && this.renderEditButton() }
 				{/* TODO not included in current release !isEditable && currentSubmission && this.renderOverview(currentSubmission)*/ }
 				{ this.renderControls() }
-				{ /*showOutput && HasOutput() &&
+				{ showOutput && HasOutput(visibleCheckingResponse?.message, automaticChecking, expectedOutput) &&
 				<ExerciseOutput
-					solutionRunStatus={ }
-					message={ output }
+					solutionRunStatus={ visibleCheckingResponse?.solutionRunStatus ?? solutionRunStatuses.success }
+					message={ visibleCheckingResponse?.message }
 					expectedOutput={ expectedOutput }
-					automaticChecking={ checkingResults.wrongAnswer }
+					automaticChecking={ automaticChecking }
 				/>
-				*/ }
+				}
 				{ showedHintsCount > 0 && this.renderHints() }
 				{ showAcceptedSolutions && this.renderAcceptedSolutions() }
 				{ congratsModalData && this.renderCongratsModal(congratsModalData) }
@@ -483,8 +484,8 @@ class CodeMirror extends React.Component {
 	}
 
 	renderControls = () => {
-		const { hints, hideSolutions, isSkipped, submissions, } = this.props;
-		const { isEditable, currentSubmission, showedHintsCount, } = this.state;
+		const { hints, hideSolutions, isSkipped, submissions, expectedOutput } = this.props;
+		const { isEditable, currentSubmission, showedHintsCount, visibleCheckingResponse } = this.state;
 
 		return (
 			<div className={ styles.exerciseControlsContainer }>
@@ -492,7 +493,9 @@ class CodeMirror extends React.Component {
 				<ThemeContext.Provider value={ darkTheme }>
 					{ hints.length > 0 && this.renderShowHintButton() }
 					{ isEditable && this.renderResetButton() }
-					{/* !isEditable && currentSubmission && HasOutput() && this.renderShowOutputButton() */ }
+					{ !isEditable && currentSubmission && HasOutput(visibleCheckingResponse?.message, currentSubmission.automaticChecking, expectedOutput)
+					&& this.renderShowOutputButton()
+					}
 					{ this.renderShowStatisticsHint() }
 				</ThemeContext.Provider>
 				{ !hideSolutions

@@ -2,31 +2,30 @@
 
 .output {
   overflow: hidden;
-  margin-top: 35px;
+  margin-top: 25px;
   border-radius: 8px;
   border: 1px solid @lightGrey;
 }
 
 .wrongAnswerOutput {
   .output;
-  border: 1px solid @likeColor;
+  border-color: @likeColor;
 }
 
 .compilationErrorOutput {
   .output;
-  border: 1px solid @likeColor;
+  border-color: @likeColor;
   background: @lightRed;
 }
 
 .serverErrorOutput {
   .output;
-  border: 1px solid @accentColor;
+  border-color: @accentColor;
 }
 
 .outputHeader {
   display: block;
   padding: 7px 16px;
-  border-radius: 8px 8px 0 0;
   background-color: @lightGrey;
   color: @black;
 
