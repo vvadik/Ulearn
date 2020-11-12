@@ -36,14 +36,15 @@
   font-style: normal;
   font-size: 14px;
   line-height: 20px;
+}
 
+.commentMounted {
   will-change: margin-top, margin-left;
-  transition: margin-top .2s ease-in-out;
+  transition: margin-top .2s ease-in-out, margin-left .3s ease-in-out;
 }
 
 .selectedReviewCommentWrapper {
   margin-left: 2px;
-  transition: margin-left .3s ease-in-out;
 }
 
 .authorWrapper {
@@ -95,6 +96,7 @@
 }
 
 .commentText {
+  word-break: break-all;
   margin-bottom: 0;
 
   &:not(:last-child) {

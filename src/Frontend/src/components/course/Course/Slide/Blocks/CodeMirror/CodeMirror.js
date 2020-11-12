@@ -228,7 +228,7 @@ class CodeMirror extends React.Component {
 	}
 
 	renderControlledCodeMirror = (opts) => {
-		const { expectedOutput, submissions, } = this.props;
+		const { expectedOutput, submissions, author, } = this.props;
 		const {
 			value, showedHintsCount, showAcceptedSolutions, currentSubmission,
 			isEditable, exerciseCodeDoc, congratsModalData,
@@ -262,6 +262,7 @@ class CodeMirror extends React.Component {
 					/>
 					{ exerciseCodeDoc && isReview &&
 					<Review
+						userId={ author.id }
 						addReviewComment={ this.addReviewComment }
 						selectedReviewId={ selectedReviewId }
 						onSelectComment={ this.selectComment }

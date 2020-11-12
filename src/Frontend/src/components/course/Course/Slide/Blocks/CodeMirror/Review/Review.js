@@ -4,7 +4,7 @@ import classNames from "classnames";
 
 import Avatar from "src/components/common/Avatar/Avatar";
 import { Textarea, ThemeContext, } from "ui";
-import { Send3 } from "icons";
+import { Send3, Trash, } from "icons";
 
 import { textareaHidden } from "src/uiTheme";
 
@@ -139,7 +139,10 @@ class Review extends React.Component {
 
 		this.setState({
 			comments: commentsWithMargin,
-			marginsAdded: true,
+		}, () => {
+			this.setState({
+				marginsAdded: true,
+			});
 		});
 	}
 
@@ -156,8 +159,8 @@ class Review extends React.Component {
 	renderTopLevelComment = ({ review, margin, ref, }, i,) => {
 		const { id, comments } = review;
 		const { selectedReviewId, onSelectComment, } = this.props;
-		const { commentsReplies, } = this.state;
-		const className = classNames(styles.comment, { [styles.selectedReviewCommentWrapper]: selectedReviewId === id });
+		const { commentsReplies, marginsAdded, } = this.state;
+		const className = classNames(styles.comment, { [styles.selectedReviewCommentWrapper]: selectedReviewId === id }, { [styles.commentMounted]: marginsAdded });
 
 		let author = review.author;
 		if(!author) {
@@ -190,6 +193,8 @@ class Review extends React.Component {
 	}
 
 	renderComment = ({ author, startLine, finishLine, addingTime, publishTime, text, comment, }) => {
+		const { userId } = this.props;
+
 		if(!author) {
 			author = { visibleName: 'Ulearn bot', id: 'bot', isBot: true, };
 		}
@@ -208,6 +213,9 @@ class Review extends React.Component {
 							<span className={ styles.commentLineNumber }>
 								{ texts.getLineCapture(startLine, finishLine) }
 							</span>
+							}
+							{
+								author.id === userId && <Trash color={ 'red' } size={ 12 }/>
 							}
 						</span>
 						{ time &&
@@ -270,6 +278,7 @@ Review.propTypes = {
 	reviews: PropTypes.array,
 	allCommentsLength: PropTypes.number,
 	selectedReviewId: PropTypes.number,
+	userId: PropTypes.string,
 	onSelectComment: PropTypes.func,
 	addReviewComment: PropTypes.func,
 	getReviewAnchorTop: PropTypes.func,
