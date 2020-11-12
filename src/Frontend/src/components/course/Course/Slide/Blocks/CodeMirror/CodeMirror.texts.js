@@ -101,6 +101,10 @@ const texts = {
 			text: 'Редактировать',
 		},
 
+		showAllCode: {
+			text: 'Показать код полностью',
+		},
+
 		statistics: {
 			buildShortText: (usersWithRightAnswerCount) =>
 				<React.Fragment>Решило: { usersWithRightAnswerCount }</React.Fragment>,
@@ -108,7 +112,8 @@ const texts = {
 				lastSuccessAttemptDate
 					? <React.Fragment>
 						За всё время:<br/>
-						{ attemptedUsersCount } { getPluralForm(attemptedUsersCount, 'студент пробовал', 'студента пробовали', 'студентов пробовали') } решить задачу.<br/>
+						{ attemptedUsersCount } { getPluralForm(attemptedUsersCount, 'студент пробовал', 'студента пробовали', 'студентов пробовали') } решить
+						задачу.<br/>
 						{ getPluralForm(attemptedUsersCount, 'Решил', 'Решили', 'Решили') } { usersWithRightAnswerCount }
 						<br/>
 						<br/>

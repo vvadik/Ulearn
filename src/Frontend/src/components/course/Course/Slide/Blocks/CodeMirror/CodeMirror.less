@@ -5,6 +5,7 @@
 @congratsModalWidth: 514px;
 
 .wrapper {
+  position: relative;
   margin-bottom: 10px;
 }
 
@@ -48,11 +49,10 @@
 }
 
 .editButton {
-  position: relative;
-  top: -70px;
+  position: absolute;
   left: 50%;
+  bottom: 68px;
   transform: translateX(-50%);
-  margin-bottom: -30px;
   width: fit-content;
 
   cursor: pointer;
@@ -71,6 +71,26 @@
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
+}
+
+.editButtonWithReviews {
+  left: calc((100% - 260px) / 2);
+}
+
+.showAllCodeButton {
+  .editButton;
+  bottom: 8px;
+}
+
+.lastLinesFading:after {
+  background: linear-gradient(180deg, hsla(0, 0%, 100%, 0), #e7f1ff);
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 60px;
+  z-index: 4;
 }
 
 .editorWithoutBorder {
