@@ -146,8 +146,8 @@ class CodeMirror extends React.Component {
 		} else if(currentSubmission) {
 			const submission = submissions.find(s => s.id === currentSubmission.id);
 
-			if(this.getCommentsLength(currentSubmission) !== this.getCommentsLength(submission)) {
-				this.setCurrentSubmission(currentSubmission);
+			if(currentSubmission !== submission) { // Сравнение по ссылке. Отличаться должны только в случае изменения комментериев
+				this.setCurrentSubmission(submission);
 			}
 		}
 	}
