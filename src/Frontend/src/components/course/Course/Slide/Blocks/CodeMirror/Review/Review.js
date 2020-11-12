@@ -55,7 +55,20 @@ class Review extends React.Component {
 	componentDidUpdate(prevProps, prevState, snapshot) {
 		const { reviews, selectedReviewId, } = this.props;
 
-		const sameReviews = reviews === prevProps.reviews;
+		let sameReviews = reviews.length === prevProps.reviews.length;
+		if(sameReviews) {
+			const reviewsIds = reviews.map(r => r.id);
+			const oldReviewsIds = prevProps.reviews.map(r => r.id);
+
+			reviewsIds.sort();
+			oldReviewsIds.sort();
+
+			for (const [i, id] of reviewsIds.entries()) {
+				if(oldReviewsIds[i] !== id) {
+					sameReviews = false;
+				}
+			}
+		}
 
 		if(!sameReviews) {
 			this.setState({
@@ -135,7 +148,7 @@ class Review extends React.Component {
 		const { comments, } = this.state;
 
 		return (
-			<ol className={ styles.reviewsContainer } ref={ (ref) => this.ref = ref }>
+			<ol className={ styles.reviewsContainer }>
 				{ comments.map(this.renderTopLevelComment) }
 			</ol>
 		);
@@ -145,7 +158,7 @@ class Review extends React.Component {
 		const { id, comments } = review;
 		const { selectedReviewId, onSelectComment, } = this.props;
 		const { commentsReplies, marginsAdded, } = this.state;
-		const className = classNames(styles.comment, { [styles.selectedReviewCommentWrapper]: selectedReviewId === id }, { [styles.commentMounted]: marginsAdded });
+		const className = classNames(styles.comment, { [styles.commentMounted]: marginsAdded }, { [styles.selectedReviewCommentWrapper]: selectedReviewId === id },);
 
 		let author = review.author;
 		if(!author) {
