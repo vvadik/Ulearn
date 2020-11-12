@@ -740,6 +740,7 @@ class CodeMirror extends React.Component {
 			valueChanged: true,
 			currentSubmission: null,
 			visibleCheckingResponse: null,
+			currentReviews: [],
 			showOutput: false
 		})
 	}
