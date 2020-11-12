@@ -147,7 +147,7 @@ class CodeMirror extends React.Component {
 			const submission = submissions.find(s => s.id === currentSubmission.id);
 
 			if(this.getCommentsLength(currentSubmission) !== this.getCommentsLength(submission)) {
-				this.loadSubmissionToState(submission);
+				this.setCurrentSubmission(currentSubmission);
 			}
 		}
 	}
@@ -360,11 +360,15 @@ class CodeMirror extends React.Component {
 				showOutput: false,
 				visibleCheckingResponse: null,
 			}, () =>
-				this.setState({
-					currentSubmission: submission,
-					currentReviews: this.getReviewsWithTextMarkers(submission),
-				}, () => this.state.editor.refresh())
+				this.setCurrentSubmission(submission)
 		);
+	}
+
+	setCurrentSubmission = (submission) => {
+		this.setState({
+			currentSubmission: submission,
+			currentReviews: this.getReviewsWithTextMarkers(submission),
+		}, () => this.state.editor.refresh())
 	}
 
 	openModal = (data) => {
