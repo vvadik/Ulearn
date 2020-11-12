@@ -18,6 +18,7 @@ import {
 	putFlashcardStatus,
 } from '../api/flashcards';
 import { sendCodeReviewComment, } from "src/api/exercise";
+import { solutionRunStatuses } from "../consts/exercise";
 
 export const changeCurrentCourseAction = (courseId) => ({
 	type: COURSES__COURSE_ENTERED,
@@ -209,9 +210,17 @@ export const sendCode = (courseId, slideId, code,) => {
 	return (dispatch) => {
 		submitCode(courseId, slideId, code,)
 			.then(r => {
-				if(r.submission !== null) {
-					dispatch(addSubmissionAction(courseId, slideId, r));
+				dispatch(addSubmissionAction(courseId, slideId, r));
+			})
+			.catch(err => {
+				const result = {
+					solutionRunStatus: solutionRunStatuses.internalServerError,
+					message: err.message,
+					submission: null,
+					score: null,
+					waitingForManualChecking: null
 				}
+				dispatch(addSubmissionAction(courseId, slideId, result));
 			});
 	};
 }

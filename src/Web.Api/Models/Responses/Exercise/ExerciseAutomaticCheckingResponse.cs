@@ -39,7 +39,7 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 		[DataMember]
 		public float? Points;
 
-		[NotNull]
+		[CanBeNull]
 		[DataMember]
 		public List<ReviewInfo> Reviews;
 
@@ -51,8 +51,20 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 				Result = AutomaticExerciseCheckingResult.NotChecked
 			};
 			result.ProcessStatus = GetProcessStatus(checking);
+			result.Output = checking.Output?.Text;
 			if (result.ProcessStatus != AutomaticExerciseCheckingProcessStatus.Done)
+			{
+				if (result.Output == null)
+				{
+					if (result.ProcessStatus == AutomaticExerciseCheckingProcessStatus.WaitingTimeLimitExceeded)
+						result.Output ??= "К сожалению, мы не смогли проверить ваше решение. Попробуйте отправить его снова";
+					else if (result.ProcessStatus == AutomaticExerciseCheckingProcessStatus.Running)
+						result.Output ??= "Ваше решение уже проверяется";
+					else if (result.ProcessStatus == AutomaticExerciseCheckingProcessStatus.Waiting)
+						result.Output ??= "Решение ждет своей очереди на проверку, мы будем пытаться проверить его еще 10 минут";
+				}
 				return result;
+			}
 			if (checking.IsCompilationError)
 			{
 				result.Result = AutomaticExerciseCheckingResult.CompilationError;
@@ -60,7 +72,6 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 				return result;
 			}
 			result.Result = checking.IsRightAnswer ? AutomaticExerciseCheckingResult.RightAnswer : AutomaticExerciseCheckingResult.WrongAnswer;
-			result.Output = checking.Output?.Text;
 			result.Points = checking.Points;
 			result.Reviews = botReviews;
 			return result;

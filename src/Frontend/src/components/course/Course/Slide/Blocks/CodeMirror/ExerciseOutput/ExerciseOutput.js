@@ -23,8 +23,13 @@ const outputTypeToStyleAndHeader = {
 	[OutputType.success]: { style: styles.output, header: texts.headers.output },
 }
 
-export function HasOutput(message, automaticChecking) {
-	return !!message || (!!automaticChecking && !!automaticChecking.output);
+export function HasOutput(message, automaticChecking, expectedOutput) {
+	if(message)
+		return true;
+	if(!automaticChecking)
+		return false;
+	return automaticChecking.output
+		|| (automaticChecking.checkingResults === checkingResults.wrongAnswer && expectedOutput)
 }
 
 export class ExerciseOutput extends React.Component {
@@ -104,7 +109,7 @@ export class ExerciseOutput extends React.Component {
 
 	getOutputTypeByCheckingResults = () => {
 		const { automaticChecking } = this.props;
-		switch (automaticChecking.checkingResults) {
+		switch (automaticChecking.result) {
 			case checkingResults.compilationError:
 				return OutputType.compilationError;
 			case checkingResults.wrongAnswer:
@@ -114,7 +119,7 @@ export class ExerciseOutput extends React.Component {
 			case checkingResults.notChecked:
 				return OutputType.serverMessage;
 			default:
-				console.error(new Error(`checkingResults has unknown value ${ automaticChecking.checkingResults }`));
+				console.error(new Error(`checkingResults has unknown value ${ automaticChecking.result }`));
 				return OutputType.serverMessage
 		}
 	}
@@ -122,10 +127,13 @@ export class ExerciseOutput extends React.Component {
 	static
 	renderSimpleTextOutput = (output) => {
 		const lines = output.split('\n');
-		return lines.map((text, i) =>
-			<p key={ i } className={ styles.outputParagraph }>
-				{ text }
-			</p>);
+		return <div className={ styles.outputTextWrapper }>
+			{ lines.map((text, i) =>
+				<span key={ i } className={ styles.outputParagraph }>
+					{ text }
+				</span>)
+			}
+		</div>
 	}
 
 	static
@@ -167,8 +175,6 @@ export class ExerciseOutput extends React.Component {
 ExerciseOutput.propTypes = {
 	solutionRunStatus: PropTypes.string.isRequired, // Success, если не посылка прямо сейчас
 	message: PropTypes.string,
-
 	expectedOutput: PropTypes.string,
-
 	automaticChecking: PropTypes.object,
 }

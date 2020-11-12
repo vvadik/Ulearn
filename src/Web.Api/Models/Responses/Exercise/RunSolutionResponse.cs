@@ -29,10 +29,10 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 		public SubmissionInfo Submission; // Если submission создан, он лежит в Submission, иначе null. Не создан в случае некоторых ошибок на сервере и иногда в случае ошибок компиляции.
 
 		[DataMember]
-		public int? Score { get; set; } // Если null, то не изменился. Если не null, то не обязательно изменился.
+		public int? Score { get; set; } // В случае rightAnswer не null. В остальных как попало; если null, то не изменился.
 
 		[DataMember]
-		public bool? WaitingForManualChecking { get; set; } // Если null, то не изменился. Если не null, то не обязательно изменился.
+		public bool? WaitingForManualChecking { get; set; } // В случае rightAnswer не null. В остальных как попало; если null, то не изменился.
 
 		public RunSolutionResponse(SolutionRunStatus status)
 		{

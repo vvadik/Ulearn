@@ -56,7 +56,7 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 				.ToDictionary(g => g.Key, g => g.AsEnumerable());
 
 			Hints = exerciseBlock.Hints.ToArray();
-			ExerciseInitialCode = exerciseBlock.ExerciseInitialCode;
+			ExerciseInitialCode = exerciseBlock.ExerciseInitialCode.RemoveEmptyLinesFromStart().TrimEnd().EnsureEnoughLines(4);
 			HideSolutions = exerciseBlock.HideShowSolutionsButton;
 			ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : exerciseBlock.ExpectedOutput?.NormalizeEoln();
 			Language = exerciseBlock.Language;

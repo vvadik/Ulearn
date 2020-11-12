@@ -2,31 +2,30 @@
 
 .output {
   overflow: hidden;
-  margin-top: 35px;
+  margin-top: 25px;
   border-radius: 8px;
   border: 1px solid @lightGrey;
 }
 
 .wrongAnswerOutput {
   .output;
-  border: 1px solid @likeColor;
+  border-color: @likeColor;
 }
 
 .compilationErrorOutput {
   .output;
-  border: 1px solid @likeColor;
+  border-color: @likeColor;
   background: @lightRed;
 }
 
 .serverErrorOutput {
   .output;
-  border: 1px solid @accentColor;
+  border-color: @accentColor;
 }
 
 .outputHeader {
   display: block;
   padding: 7px 16px;
-  border-radius: 8px 8px 0 0;
   background-color: @lightGrey;
   color: @black;
 
@@ -52,16 +51,23 @@
   color: @white;
 }
 
+.outputTextWrapper {
+  padding: 8px 15px;
+}
+
 .outputParagraph {
+  font-size: 14px;
+  line-height: 20px;
+  white-space: pre-wrap;
+  word-break: break-all;
   display: block;
-  padding: 7px 16px;
+  font-family: @monoFonts;
   margin: 0;
 }
 
 .outputTable {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
 
   font-family: @defaultFonts;
   font-style: normal;
@@ -72,7 +78,19 @@
 .outputTable > tbody > tr > td {
   padding: 7px 16px;
   vertical-align: top;
+  white-space: pre-wrap;
+  word-break: break-all;
   border: 1px solid @lightGrey;
+}
+
+.outputTable {
+  th, td {
+    width: 50%;
+  }
+  th:first-child, td:first-child {
+    width: auto;
+    white-space: nowrap;
+  }
 }
 
 .outputTable > tbody > tr > td:first-of-type {
@@ -98,7 +116,7 @@
 }
 
 .outputTable > tbody > tr > td {
-  font-family: Roboto Mono, @defaultFonts;
+  font-family: @monoFonts;
   font-size: 14px;
   line-height: 20px;
 }
