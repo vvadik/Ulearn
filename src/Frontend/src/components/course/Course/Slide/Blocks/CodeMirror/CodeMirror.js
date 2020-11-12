@@ -152,12 +152,6 @@ class CodeMirror extends React.Component {
 		}
 	}
 
-	getCommentsLength = (submission) => {
-		const reviews = this.getAllReviewsFromSubmission(submission);
-		const innerCommentLength = reviews.map(r => r.comments.length).reduce((accumulator, currentValue) => accumulator + currentValue, 0);
-		return reviews.length + innerCommentLength;
-	};
-
 	onWindowResize = () => {
 		const { resizeTimeout } = this.state;
 
@@ -279,7 +273,6 @@ class CodeMirror extends React.Component {
 						onSelectComment={ this.selectComment }
 						reviews={ currentReviews }
 						getReviewAnchorTop={ this.getReviewAnchorTop }
-						allCommentsLength={ this.getCommentsLength(currentSubmission) }
 					/>
 					}
 				</div>

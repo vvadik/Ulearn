@@ -53,26 +53,11 @@ class Review extends React.Component {
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
-		const { reviews, allCommentsLength, selectedReviewId, } = this.props;
+		const { reviews, selectedReviewId, } = this.props;
 
-		let sameValues = allCommentsLength === prevProps.allCommentsLength;
+		const sameReviews = reviews === prevProps.reviews;
 
-		if(sameValues) {
-			const reviewsIds = reviews.map(r => r.id);
-			const oldReviewsIds = prevProps.reviews.map(r => r.id);
-
-			reviewsIds.sort();
-			oldReviewsIds.sort();
-
-
-			for (const [i, id] of reviewsIds.entries()) {
-				if(oldReviewsIds[i] !== id) {
-					sameValues = false;
-				}
-			}
-		}
-
-		if(!sameValues) {
+		if(!sameReviews) {
 			this.setState({
 				comments: this.getCommentsOrderByStart(reviews)
 					.map(r => ({
@@ -276,7 +261,6 @@ class Review extends React.Component {
 
 Review.propTypes = {
 	reviews: PropTypes.array,
-	allCommentsLength: PropTypes.number,
 	selectedReviewId: PropTypes.number,
 	userId: PropTypes.string,
 	onSelectComment: PropTypes.func,
