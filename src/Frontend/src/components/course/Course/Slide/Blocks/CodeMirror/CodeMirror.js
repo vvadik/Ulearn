@@ -42,7 +42,7 @@ const defaultThemeName = 'default';
 class CodeMirror extends React.Component {
 	constructor(props) {
 		super(props);
-		const { exerciseInitialCode, submissions, code, expectedOutput, } = props;
+		const { exerciseInitialCode, submissions, code, } = props;
 
 		this.state = {
 			value: exerciseInitialCode || code,
@@ -62,8 +62,7 @@ class CodeMirror extends React.Component {
 			currentSubmission: null,
 			currentReviews: [],
 			selectedReviewId: -1,
-			output: null,
-			expectedOutput: expectedOutput && expectedOutput.split('\n'),
+			showOutput: false,
 
 			editor: null,
 			exerciseCodeDoc: null,
@@ -99,33 +98,39 @@ class CodeMirror extends React.Component {
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
 		const { lastSubmission, courseId, slideId, submissions, } = this.props;
-		const { currentSubmission, } = this.state;
+		const { currentSubmission, submissionLoading, showOutput, } = this.state;
 
 		if(courseId !== prevProps.courseId || slideId !== prevProps.slideId) {
 			this.loadSlideSubmission();
 			return;
 		}
 
-		const lastSubmissionExists = lastSubmission && lastSubmission.courseId === courseId && lastSubmission.slideId === slideId;
-
-		if((!prevProps.lastSubmission && lastSubmissionExists)
-			|| (lastSubmissionExists && prevProps.lastSubmission.submission.id !== lastSubmission.submission.id)) {
+		if(lastSubmission
+			&& !(prevProps.lastSubmission && lastSubmission.submission
+				&& prevProps.lastSubmission.submission && prevProps.lastSubmission.submission.id === lastSubmission.submission.id)) {
 			const { submission, solutionRunStatus, score, waitingForManualChecking, } = lastSubmission;
-			this.setState({
-				submissionLoading: false,
-			});
-			this.loadSubmissionToState(submissions.find(s => s.id === submission.id));
+
+			if(submission) {
+				this.loadSubmissionToState(submissions.find(s => s.id === submission.id));
+			}
+			if(submissionLoading) {
+				this.setState({
+					submissionLoading: false,
+				});
+			}
+			if(!showOutput) {
+				this.setState({
+					showOutput: true,
+				});
+			}
 
 			if(solutionRunStatus === solutionRunStatuses.success) {
 				const { automaticChecking } = submission;
 
 				if(automaticChecking) {
-					this.setState({
-						output: automaticChecking.output
-					});
 					if(automaticChecking.processStatus === processStatuses.done) {
 						if(automaticChecking.result === checkingResults.rightAnswer) {
-							this.openModal({
+							this.openModal({ // TODO вроде не показываем модалку, если уже было решено ранее?
 								score,
 								waitingForManualChecking,
 							});
@@ -228,11 +233,11 @@ class CodeMirror extends React.Component {
 	}
 
 	renderControlledCodeMirror = (opts) => {
-		const { expectedOutput, submissions, } = this.props;
+		const { expectedOutput, submissions, lastSubmission } = this.props;
 		const {
 			value, showedHintsCount, showAcceptedSolutions, currentSubmission,
 			isEditable, exerciseCodeDoc, congratsModalData,
-			currentReviews, output, selectedReviewId,
+			currentReviews, showOutput, selectedReviewId,
 		} = this.state;
 
 		const isReview = !isEditable && currentReviews.length > 0;
@@ -274,13 +279,14 @@ class CodeMirror extends React.Component {
 				{ !isEditable && this.renderEditButton() }
 				{/* TODO not included in current release !isEditable && currentSubmission && this.renderOverview(currentSubmission)*/ }
 				{ this.renderControls() }
-				{ /*output &&
+				{ /*showOutput && HasOutput() &&
 				<ExerciseOutput
-					output={ output }
+					solutionRunStatus={ }
+					message={ output }
 					expectedOutput={ expectedOutput }
-					checkingState={ checkingResults.wrongAnswer } // TODO
-				/>*/
-				}
+					automaticChecking={ checkingResults.wrongAnswer }
+				/>
+				*/ }
 				{ showedHintsCount > 0 && this.renderHints() }
 				{ showAcceptedSolutions && this.renderAcceptedSolutions() }
 				{ congratsModalData && this.renderCongratsModal(congratsModalData) }
@@ -346,7 +352,7 @@ class CodeMirror extends React.Component {
 				value: submission.code,
 				isEditable: false,
 				valueChanged: false,
-				output: null,
+				showOutput: false,
 			}, () =>
 				this.setState({
 					currentSubmission: submission,
@@ -467,7 +473,7 @@ class CodeMirror extends React.Component {
 	}
 
 	renderControls = () => {
-		const { hints, expectedOutput, hideSolutions, isSkipped, submissions, } = this.props;
+		const { hints, hideSolutions, isSkipped, submissions, } = this.props;
 		const { isEditable, currentSubmission, showedHintsCount, } = this.state;
 
 		return (
@@ -476,7 +482,7 @@ class CodeMirror extends React.Component {
 				<ThemeContext.Provider value={ darkTheme }>
 					{ hints.length > 0 && this.renderShowHintButton() }
 					{ isEditable && this.renderResetButton() }
-					{ !isEditable && expectedOutput && currentSubmission && this.renderShowOutputButton() }
+					{/* !isEditable && currentSubmission && HasOutput() && this.renderShowOutputButton() */ }
 					{ this.renderShowStatisticsHint() }
 				</ThemeContext.Provider>
 				{ !hideSolutions
@@ -539,14 +545,14 @@ class CodeMirror extends React.Component {
 	}
 
 	renderShowOutputButton = () => {
-		const { output, showControlsText, } = this.state;
+		const { showOutput, showControlsText, } = this.state;
 
 		return (
 			<span className={ styles.exerciseControls } onClick={ this.toggleOutput }>
 				<span className={ styles.exerciseControlsIcon }>
 					<DocumentLite/>
 				</span>
-				{ showControlsText && (output ? texts.controls.output.hide : texts.controls.output.show) }
+				{ showControlsText && (showOutput ? texts.controls.output.hide : texts.controls.output.show) }
 			</span>
 		)
 	}
@@ -720,7 +726,7 @@ class CodeMirror extends React.Component {
 			isEditable: true,
 			valueChanged: true,
 			currentSubmission: null,
-			output: null,
+			showOutput: false
 		})
 	}
 
@@ -745,7 +751,7 @@ class CodeMirror extends React.Component {
 			isEditable: true,
 			currentSubmission: null,
 			currentReviews: [],
-			output: null,
+			showOutput: false
 		})
 	}
 
@@ -772,10 +778,10 @@ class CodeMirror extends React.Component {
 	}
 
 	toggleOutput = () => {
-		const { currentSubmission, output, } = this.state;
+		const { showOutput, } = this.state;
 
 		this.setState({
-			output: output ? null : currentSubmission.automaticChecking.output,
+			showOutput: !showOutput
 		})
 	}
 
@@ -980,7 +986,11 @@ class CodeMirror extends React.Component {
 
 const mapStateToProps = (state, { courseId, slideId, }) => {
 	const { slides, account, } = state;
-	const { submissionsByCourses, lastSubmission, } = slides;
+	const { submissionsByCourses, } = slides;
+	let { lastSubmission, } = slides;
+
+	if(!(lastSubmission && lastSubmission.courseId === courseId && lastSubmission.slideId === slideId))
+		lastSubmission = null;
 
 	const submissions = Object.values(submissionsByCourses[courseId][slideId])
 		.filter((s, i, arr) =>
@@ -1018,7 +1028,7 @@ CodeMirror.propTypes = {
 	sendCode: PropTypes.func,
 	addCommentToReview: PropTypes.func,
 	submissions: PropTypes.array,
-	lastSubmission: PropTypes.object,
+	lastSubmission: PropTypes.object, // TODO переименовать. lastSubmission вводит в заблуждение, что это последняя из посылок, а на самом деле
 	author: userType,
 }
 

@@ -73,20 +73,22 @@ export default function slides(state = initialCoursesSlidesState, action) {
 			const { courseId, slideId, result } = action;
 			const { submission } = result;
 
-			const newState = {
+			let newState = {
 				...state,
 				lastSubmission: { slideId, courseId, ...result },
-				submissionsByCourses: {
-					...state.submissionsByCourses,
-					[courseId]: {
-						...state.submissionsByCourses[courseId],
-					}
-				},
 			};
-
 			if(submission) {
+				newState = {
+					...newState,
+					submissionsByCourses: {
+						...newState.submissionsByCourses,
+						[courseId]: {
+							...newState.submissionsByCourses[courseId],
+						}
+					},
+				};
 				newState.submissionsByCourses[courseId][slideId] = {
-					...state.submissionsByCourses[courseId][slideId],
+					...newState.submissionsByCourses[courseId][slideId],
 					[submission.id]: submission,
 				};
 			}

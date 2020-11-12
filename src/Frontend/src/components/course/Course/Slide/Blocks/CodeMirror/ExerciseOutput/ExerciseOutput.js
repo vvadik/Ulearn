@@ -23,8 +23,13 @@ const outputTypeToStyleAndHeader = {
 	[OutputType.success]: { style: styles.output, header: texts.headers.output },
 }
 
-export function HasOutput(message, automaticChecking) {
-	return !!message || (!!automaticChecking && !!automaticChecking.output);
+export function HasOutput(message, automaticChecking, expectedOutput) {
+	if(message)
+		return true;
+	if(!automaticChecking)
+		return false;
+	return automaticChecking.output
+		|| (automaticChecking.checkingResults === checkingResults.wrongAnswer && expectedOutput)
 }
 
 export class ExerciseOutput extends React.Component {
