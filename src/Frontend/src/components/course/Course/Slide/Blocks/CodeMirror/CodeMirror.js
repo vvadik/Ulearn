@@ -59,6 +59,7 @@ class CodeMirror extends React.Component {
 			showControlsText: isControlsTextSuits(),
 
 			submissionLoading: false,
+			visibleCheckingResponse: null,
 			currentSubmission: null,
 			currentReviews: [],
 			selectedReviewId: -1,
@@ -105,13 +106,17 @@ class CodeMirror extends React.Component {
 			return;
 		}
 
-		if(lastCheckingResponse
-			&& !(prevProps.lastCheckingResponse && lastCheckingResponse.submission
-				&& prevProps.lastCheckingResponse.submission && prevProps.lastCheckingResponse.submission.id === lastCheckingResponse.submission.id)) {
+		const hasNewLastCheckingResponse = lastCheckingResponse
+			&& lastCheckingResponse !== prevProps.lastCheckingResponse; // Сравнение по ссылкам
+		if(hasNewLastCheckingResponse) {
 			const { submission, solutionRunStatus, score, waitingForManualChecking, } = lastCheckingResponse;
 
 			if(submission) {
 				this.loadSubmissionToState(submissions.find(s => s.id === submission.id));
+			} else {
+				this.setState({
+					visibleCheckingResponse: lastCheckingResponse,
+				});
 			}
 			if(submissionLoading) {
 				this.setState({
@@ -353,6 +358,7 @@ class CodeMirror extends React.Component {
 				isEditable: false,
 				valueChanged: false,
 				showOutput: false,
+				visibleCheckingResponse: null,
 			}, () =>
 				this.setState({
 					currentSubmission: submission,
@@ -726,6 +732,7 @@ class CodeMirror extends React.Component {
 			isEditable: true,
 			valueChanged: true,
 			currentSubmission: null,
+			visibleCheckingResponse: null,
 			showOutput: false
 		})
 	}
@@ -750,6 +757,7 @@ class CodeMirror extends React.Component {
 			valueChanged: true,
 			isEditable: true,
 			currentSubmission: null,
+			visibleCheckingResponse: null,
 			currentReviews: [],
 			showOutput: false
 		})
