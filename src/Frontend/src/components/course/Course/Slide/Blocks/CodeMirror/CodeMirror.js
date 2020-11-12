@@ -386,7 +386,7 @@ class CodeMirror extends React.Component {
 		}
 
 		const manual = submission.manualCheckingReviews || [];
-		const auto = submission.automaticChecking ? submission.automaticChecking.reviews : [];
+		const auto = submission.automaticChecking && submission.automaticChecking.reviews ? submission.automaticChecking.reviews : [];
 		return manual.concat(auto);
 	}
 

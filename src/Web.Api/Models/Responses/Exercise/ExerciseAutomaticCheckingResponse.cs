@@ -39,7 +39,7 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 		[DataMember]
 		public float? Points;
 
-		[NotNull]
+		[CanBeNull]
 		[DataMember]
 		public List<ReviewInfo> Reviews;
 
