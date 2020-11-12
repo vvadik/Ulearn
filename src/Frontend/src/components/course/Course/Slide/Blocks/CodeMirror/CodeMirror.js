@@ -97,7 +97,7 @@ class CodeMirror extends React.Component {
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
-		const { lastSubmission, courseId, slideId, submissions, } = this.props;
+		const { lastCheckingResponse, courseId, slideId, submissions, } = this.props;
 		const { currentSubmission, submissionLoading, showOutput, } = this.state;
 
 		if(courseId !== prevProps.courseId || slideId !== prevProps.slideId) {
@@ -105,10 +105,10 @@ class CodeMirror extends React.Component {
 			return;
 		}
 
-		if(lastSubmission
-			&& !(prevProps.lastSubmission && lastSubmission.submission
-				&& prevProps.lastSubmission.submission && prevProps.lastSubmission.submission.id === lastSubmission.submission.id)) {
-			const { submission, solutionRunStatus, score, waitingForManualChecking, } = lastSubmission;
+		if(lastCheckingResponse
+			&& !(prevProps.lastCheckingResponse && lastCheckingResponse.submission
+				&& prevProps.lastCheckingResponse.submission && prevProps.lastCheckingResponse.submission.id === lastCheckingResponse.submission.id)) {
+			const { submission, solutionRunStatus, score, waitingForManualChecking, } = lastCheckingResponse;
 
 			if(submission) {
 				this.loadSubmissionToState(submissions.find(s => s.id === submission.id));
@@ -233,7 +233,7 @@ class CodeMirror extends React.Component {
 	}
 
 	renderControlledCodeMirror = (opts) => {
-		const { expectedOutput, submissions, lastSubmission } = this.props;
+		const { expectedOutput, submissions, lastCheckingResponse } = this.props;
 		const {
 			value, showedHintsCount, showAcceptedSolutions, currentSubmission,
 			isEditable, exerciseCodeDoc, congratsModalData,
@@ -987,10 +987,10 @@ class CodeMirror extends React.Component {
 const mapStateToProps = (state, { courseId, slideId, }) => {
 	const { slides, account, } = state;
 	const { submissionsByCourses, } = slides;
-	let { lastSubmission, } = slides;
+	let { lastCheckingResponse, } = slides;
 
-	if(!(lastSubmission && lastSubmission.courseId === courseId && lastSubmission.slideId === slideId))
-		lastSubmission = null;
+	if(!(lastCheckingResponse && lastCheckingResponse.courseId === courseId && lastCheckingResponse.slideId === slideId))
+		lastCheckingResponse = null;
 
 	const submissions = Object.values(submissionsByCourses[courseId][slideId])
 		.filter((s, i, arr) =>
@@ -1006,7 +1006,7 @@ const mapStateToProps = (state, { courseId, slideId, }) => {
 		slideId,
 		isAuthenticated: account.isAuthenticated,
 		submissions,
-		lastSubmission,
+		lastCheckingResponse,
 		author: account,
 	};
 };
@@ -1028,7 +1028,7 @@ CodeMirror.propTypes = {
 	sendCode: PropTypes.func,
 	addCommentToReview: PropTypes.func,
 	submissions: PropTypes.array,
-	lastSubmission: PropTypes.object, // TODO переименовать. lastSubmission вводит в заблуждение, что это последняя из посылок, а на самом деле
+	lastCheckingResponse: PropTypes.object,
 	author: userType,
 }
 

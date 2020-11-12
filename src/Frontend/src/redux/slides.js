@@ -8,7 +8,7 @@ import blockTypes from "src/components/course/Course/Slide/blockTypes";
 
 const initialCoursesSlidesState = {
 	slidesByCourses: {},
-	lastSubmission: null,
+	lastCheckingResponse: null,
 	submissionsByCourses: {},
 	slideLoading: false,
 	slideError: null,
@@ -75,7 +75,7 @@ export default function slides(state = initialCoursesSlidesState, action) {
 
 			let newState = {
 				...state,
-				lastSubmission: { slideId, courseId, ...result },
+				lastCheckingResponse: { slideId, courseId, ...result },
 			};
 			if(submission) {
 				newState = {
