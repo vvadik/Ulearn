@@ -201,7 +201,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			}
 
 			updatedSubmissionNoTracking = await userSolutionsRepo.FindSubmissionByIdNoTracking(initialSubmission.Id);
-			await CreateStyleErrorsReviewsForSubmission(updatedSubmissionNoTracking.Id, buildResult.StyleErrors, exerciseMetricId);
+			updatedSubmissionNoTracking.Reviews = await CreateStyleErrorsReviewsForSubmission(updatedSubmissionNoTracking.Id, buildResult.StyleErrors, exerciseMetricId);
 			if (!hasAutomaticChecking)
 				await SendToReviewAndUpdateScore(updatedSubmissionNoTracking, courseManager, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender);
 
