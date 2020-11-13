@@ -1,29 +1,28 @@
 ﻿import React from "react";
-import PropTypes from "prop-types";
 
 import { Warning } from "@skbkontur/react-icons";
-import { checkingResults, processStatuses, solutionRunStatuses } from "src/consts/exercise";
+import { checkingResults, processStatuses, solutionRunStatuses } from "src/consts/exercise.js";
 
-import texts from "./ExerciseOutput.texts";
+import texts from "./ExerciseOutput.texts.js";
 import styles from "./ExerciseOutput.less";
 
-const OutputType = {
-	compilationError: 'CompilationError',
-	wrongAnswer: 'WrongAnswer',
-	serverError: 'ServerError',
-	serverMessage: 'ServerMessage',
-	success: 'Success'
-};
-
-const outputTypeToStyleAndHeader = {
-	[OutputType.compilationError]: { style: styles.compilationErrorOutput, header: texts.headers.compilationError },
-	[OutputType.wrongAnswer]: { style: styles.wrongAnswerOutput, header: texts.headers.wrongAnswer },
-	[OutputType.serverError]: { style: styles.serverErrorOutput, header: texts.headers.serverError },
-	[OutputType.serverMessage]: { style: styles.serverErrorOutput, header: texts.headers.serverMessage },
-	[OutputType.success]: { style: styles.output, header: texts.headers.output },
+enum OutputType {
+	CompilationError = "CompilationError",
+	WrongAnswer = "WrongAnswer",
+	ServerError = "ServerError",
+	ServerMessage = "ServerMessage",
+	Success = "Success"
 }
 
-export function HasOutput(message, automaticChecking, expectedOutput) {
+const outputTypeToStyleAndHeader: EnumDictionary<OutputType, { style: string, header: string }> = {
+	[OutputType.CompilationError]: { style: styles.compilationErrorOutput, header: texts.headers.compilationError },
+	[OutputType.WrongAnswer]: { style: styles.wrongAnswerOutput, header: texts.headers.wrongAnswer },
+	[OutputType.ServerError]: { style: styles.serverErrorOutput, header: texts.headers.serverError },
+	[OutputType.ServerMessage]: { style: styles.serverErrorOutput, header: texts.headers.serverMessage },
+	[OutputType.Success]: { style: styles.output, header: texts.headers.output },
+}
+
+export function HasOutput(message: string, automaticChecking: any, expectedOutput: string) {
 	if(message)
 		return true;
 	if(!automaticChecking)
@@ -32,13 +31,20 @@ export function HasOutput(message, automaticChecking, expectedOutput) {
 		|| (automaticChecking.checkingResults === checkingResults.wrongAnswer && expectedOutput)
 }
 
-export class ExerciseOutput extends React.Component {
+interface Props {
+	solutionRunStatus: string, // Success, если не посылка прямо сейчас
+	message: string,
+	expectedOutput: string,
+	automaticChecking: any
+}
+
+export class ExerciseOutput extends React.Component<Props> {
 	render() {
 		const { expectedOutput } = this.props;
 		const { outputType, body } = this.getOutputTypeAndBody();
 		const { style, header } = outputTypeToStyleAndHeader[outputType];
-		const showIcon = outputType !== OutputType.success;
-		const isWrongAnswer = outputType === OutputType.wrongAnswer
+		const showIcon = outputType !== OutputType.Success;
+		const isWrongAnswer = outputType === OutputType.WrongAnswer
 		const isSimpleTextOutput = expectedOutput === null || !isWrongAnswer;
 
 		return (
@@ -57,75 +63,74 @@ export class ExerciseOutput extends React.Component {
 		);
 	}
 
-	getOutputTypeAndBody = () => {
+	getOutputTypeAndBody() {
 		const { solutionRunStatus, message, automaticChecking } = this.props;
 		switch (solutionRunStatus) {
 			case solutionRunStatuses.compilationError:
-				return { outputType: OutputType.compilationError, body: message };
+				return { outputType: OutputType.CompilationError, body: message };
 			case solutionRunStatuses.submissionCheckingTimeout:
 			case solutionRunStatuses.ignored:
-				return { outputType: OutputType.serverMessage, body: message }
+				return { outputType: OutputType.ServerMessage, body: message }
 			case solutionRunStatuses.internalServerError:
-				return { outputType: OutputType.serverError, body: message }
+				return { outputType: OutputType.ServerError, body: message }
 			case solutionRunStatuses.success:
 				if(automaticChecking) {
 					return this.getOutputTypeAndBodyFromAutomaticChecking();
 				} else {
 					console.error(new Error(`automaticChecking is null when solutionRunStatuses is ${ solutionRunStatus }`));
-					return { outputType: OutputType.success, body: message }
+					return { outputType: OutputType.Success, body: message }
 				}
 			default:
 				console.error(new Error(`solutionRunStatus has unknown value ${ solutionRunStatus }`));
-				return { outputType: OutputType.serverMessage, body: message }
+				return { outputType: OutputType.ServerMessage, body: message }
 		}
 	}
 
-	getOutputTypeAndBodyFromAutomaticChecking = () => {
+	getOutputTypeAndBodyFromAutomaticChecking(): { outputType: OutputType, body: string } {
 		const { automaticChecking } = this.props;
-		let outputType;
+		let outputType: OutputType;
 		let output = automaticChecking.output;
 		switch (automaticChecking.processStatus) {
 			case processStatuses.done:
 				outputType = this.getOutputTypeByCheckingResults();
 				break;
 			case processStatuses.serverError:
-				outputType = OutputType.serverError;
+				outputType = OutputType.ServerError;
 				break;
 			case processStatuses.waiting:
-				outputType = OutputType.serverMessage;
+				outputType = OutputType.ServerMessage;
 				break;
 			case processStatuses.running:
-				outputType = OutputType.serverMessage;
+				outputType = OutputType.ServerMessage;
 				break;
 			case processStatuses.waitingTimeLimitExceeded:
-				outputType = OutputType.serverError;
+				outputType = OutputType.ServerError;
 				break;
 			default:
 				console.error(new Error(`processStatuses has unknown value ${ automaticChecking.processStatus }`));
-				return OutputType.serverMessage
+				outputType = OutputType.ServerMessage
 		}
 		return { outputType: outputType, body: output }
 	}
 
-	getOutputTypeByCheckingResults = () => {
+	getOutputTypeByCheckingResults(): OutputType {
 		const { automaticChecking } = this.props;
 		switch (automaticChecking.result) {
 			case checkingResults.compilationError:
-				return OutputType.compilationError;
+				return OutputType.CompilationError;
 			case checkingResults.wrongAnswer:
-				return OutputType.wrongAnswer;
+				return OutputType.WrongAnswer;
 			case checkingResults.rightAnswer:
-				return OutputType.success;
+				return OutputType.Success;
 			case checkingResults.notChecked:
-				return OutputType.serverMessage;
+				return OutputType.ServerMessage;
 			default:
 				console.error(new Error(`checkingResults has unknown value ${ automaticChecking.result }`));
-				return OutputType.serverMessage
+				return OutputType.ServerMessage
 		}
 	}
 
-	static
-	renderSimpleTextOutput = (output) => {
+	static renderSimpleTextOutput(output: string) {
 		const lines = output.split('\n');
 		return <div className={ styles.outputTextWrapper }>
 			{ lines.map((text, i) =>
@@ -136,10 +141,9 @@ export class ExerciseOutput extends React.Component {
 		</div>
 	}
 
-	static
-	renderOutputLines = (output, expectedOutput) => {
-		const actualOutputLines = output.match(/[^\r\n]+/g);
-		const expectedOutputLines = expectedOutput.match(/[^\r\n]+/g);
+	static renderOutputLines(output: string, expectedOutput: string) {
+		const actualOutputLines = output.match(/[^\r\n]+/g) ?? [];
+		const expectedOutputLines = expectedOutput.match(/[^\r\n]+/g) ?? [];
 		const length = Math.max(actualOutputLines.length, expectedOutputLines.length);
 		const lines = [];
 		for (let i = 0; i < length; i++) {
@@ -170,11 +174,4 @@ export class ExerciseOutput extends React.Component {
 			</table>
 		);
 	}
-}
-
-ExerciseOutput.propTypes = {
-	solutionRunStatus: PropTypes.string.isRequired, // Success, если не посылка прямо сейчас
-	message: PropTypes.string,
-	expectedOutput: PropTypes.string,
-	automaticChecking: PropTypes.object,
 }

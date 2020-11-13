@@ -61,6 +61,6 @@ TableWrongAnswer.args = {
 	automaticChecking: {
 		output: "3\n2\n3",
 		processStatus: processStatuses.done,
-		checkingResults: checkingResults.wrongAnswer
+		result: checkingResults.wrongAnswer
 	}
 };
