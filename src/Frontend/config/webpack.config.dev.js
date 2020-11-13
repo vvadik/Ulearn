@@ -39,6 +39,9 @@ module.exports = merge(base, {
 		devtoolModuleFilenameTemplate: info =>
 			path.resolve(info.absoluteResourcePath).replace(/\\/g, '/'),
 	},
+	resolve: {
+		extensions: ['.ts', '.tsx', '.js', '.json']
+	},
 	module: {
 		strictExportPresence: true,
 		rules: [

@@ -4,7 +4,7 @@ const base = require('../config/webpack.config.base');
 const merge = require('webpack-merge');
 
 module.exports = {
-	stories: ['../src/**/**.story.@(js|jsx)'],
+	stories: ['../src/**/**.story.@(js|jsx|tsx)'],
 	addons: [
 		'@storybook/addon-actions/register',
 		'@storybook/addon-viewport/register',

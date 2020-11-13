@@ -3,7 +3,7 @@
 import { Warning } from "@skbkontur/react-icons";
 import { checkingResults, processStatuses, solutionRunStatuses } from "src/consts/exercise.js";
 
-import texts from "./ExerciseOutput.texts.js";
+import texts from "./ExerciseOutput.texts";
 import styles from "./ExerciseOutput.less";
 
 enum OutputType {
@@ -22,7 +22,7 @@ const outputTypeToStyleAndHeader: EnumDictionary<OutputType, { style: string, he
 	[OutputType.Success]: { style: styles.output, header: texts.headers.output },
 }
 
-export function HasOutput(message: string, automaticChecking: any, expectedOutput: string) {
+function HasOutput(message: string, automaticChecking: any, expectedOutput: string): boolean {
 	if(message)
 		return true;
 	if(!automaticChecking)
@@ -31,14 +31,14 @@ export function HasOutput(message: string, automaticChecking: any, expectedOutpu
 		|| (automaticChecking.checkingResults === checkingResults.wrongAnswer && expectedOutput)
 }
 
-interface Props {
+interface OutputTypeProps {
 	solutionRunStatus: string, // Success, если не посылка прямо сейчас
-	message: string,
-	expectedOutput: string,
-	automaticChecking: any
+	message: string | null,
+	expectedOutput: string | null,
+	automaticChecking: any | null
 }
 
-export class ExerciseOutput extends React.Component<Props> {
+class ExerciseOutput extends React.Component<OutputTypeProps> {
 	render() {
 		const { expectedOutput } = this.props;
 		const { outputType, body } = this.getOutputTypeAndBody();
@@ -56,8 +56,8 @@ export class ExerciseOutput extends React.Component<Props> {
 					} 
 				</span>
 				{ isSimpleTextOutput
-					? ExerciseOutput.renderSimpleTextOutput(body)
-					: ExerciseOutput.renderOutputLines(body, expectedOutput)
+					? ExerciseOutput.renderSimpleTextOutput(body ?? "")
+					: ExerciseOutput.renderOutputLines(body ?? "", expectedOutput ?? "")
 				}
 			</div>
 		);
@@ -86,10 +86,10 @@ export class ExerciseOutput extends React.Component<Props> {
 		}
 	}
 
-	getOutputTypeAndBodyFromAutomaticChecking(): { outputType: OutputType, body: string } {
+	getOutputTypeAndBodyFromAutomaticChecking(): { outputType: OutputType, body: string | null } {
 		const { automaticChecking } = this.props;
 		let outputType: OutputType;
-		let output = automaticChecking.output;
+		const output = automaticChecking.output;
 		switch (automaticChecking.processStatus) {
 			case processStatuses.done:
 				outputType = this.getOutputTypeByCheckingResults();
@@ -175,3 +175,5 @@ export class ExerciseOutput extends React.Component<Props> {
 		);
 	}
 }
+
+export { ExerciseOutput, OutputTypeProps, HasOutput }

@@ -1,13 +1,14 @@
 ﻿import React from "react";
-import {ExerciseOutput} from "./ExerciseOutput";
+import type { Story } from "@storybook/react";
+import { ExerciseOutput, OutputTypeProps } from "./ExerciseOutput";
 
-import { checkingResults, processStatuses, solutionRunStatuses } from "src/consts/exercise";
+import { checkingResults, processStatuses, solutionRunStatuses } from "src/consts/exercise.js";
 
 export default {
 	title: 'Exercise/ExerciseOutput'
 };
 
-const Template = (args) => <ExerciseOutput {...args} />;
+const Template: Story<OutputTypeProps> = (args) => <ExerciseOutput { ...args } />;
 
 export const SolutionRunStatusCompilationError = Template.bind({});
 SolutionRunStatusCompilationError.args = {
