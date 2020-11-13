@@ -473,7 +473,6 @@ namespace uLearn.Web.Controllers
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		[ChildActionOnly]
 		public ActionResult StudentSubmissions(string courseId, Guid slideId)
 		{
 			return PartialView(GetStudentSubmissionsModel(courseId, slideId, ""));
