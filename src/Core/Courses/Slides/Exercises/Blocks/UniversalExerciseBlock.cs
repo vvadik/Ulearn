@@ -26,7 +26,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public string ExerciseDirPath { get; set; }
 
 		[XmlElement("userCodeFile")]
-		public string UserCodeFilePath { get; set; }
+		public virtual string UserCodeFilePath { get; set; }
 
 		[XmlElement("solutionFilePath")]
 		public string SolutionFilePath { get; set; } // По умолчанию используется UserCodeFilePath
@@ -35,7 +35,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public string Region { get; set; } // Студент видит в консоли и редактирует регион с этим именем. <prefix>region label <...> <prefix>rendregion label. Должен быть как в решении, так и в файле заглушке.
 
 		[XmlElement("excludePathForChecker")]
-		public string[] PathsToExcludeForChecker { get; set; }
+		public virtual string[] PathsToExcludeForChecker { get; set; }
 
 		[CanBeNull]
 		[XmlElement("includePathForChecker")]
@@ -48,16 +48,16 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public bool CheckInitialSolution { get; set; } = true;
 
 		[XmlAttribute("noStudentZip")] // Не отдавать zip студенту
-		public bool NoStudentZip { get; set; }
+		public virtual bool NoStudentZip { get; set; }
 
 		[XmlElement("dockerImageName")] // см. DockerImageNameRegex
-		public string DockerImageName { get; set; }
+		public virtual string DockerImageName { get; set; }
 
 		[XmlIgnore]
 		public static readonly Regex DockerImageNameRegex = new Regex("^[-_a-z.]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
 		[XmlElement("run")]
-		public string RunCommand { get; set; } // см. RunCommandRegex
+		public virtual string RunCommand { get; set; } // см. RunCommandRegex
 
 		[XmlIgnore]
 		public static readonly Regex RunCommandRegex = new Regex("^[-_a-z. ;|>]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
