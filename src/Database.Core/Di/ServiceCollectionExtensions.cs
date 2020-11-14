@@ -1,4 +1,3 @@
-using System.IO;
 using Database.Models;
 using Database.Repos;
 using Database.Repos.Comments;
@@ -79,6 +78,11 @@ namespace Database.Di
 			services.AddScoped<IFeedRepo, FeedRepo>();
 			services.AddScoped<ISystemAccessesRepo, SystemAccessesRepo>();
 			services.AddScoped<IUnitsRepo, UnitsRepo>();
+			services.AddScoped<ILtiConsumersRepo, LtiConsumersRepo>();
+			services.AddScoped<ILtiRequestsRepo, LtiRequestsRepo>();
+			services.AddScoped<IXQueueRepo, XQueueRepo>();
+			services.AddScoped<IStyleErrorsRepo, StyleErrorsRepo>();
+			services.AddScoped<IWorkQueueRepo, WorkQueueRepo>();
 
 			return services;
 		}

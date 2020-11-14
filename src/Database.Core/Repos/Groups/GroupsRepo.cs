@@ -120,21 +120,15 @@ namespace Database.Repos.Groups
 		}
 
 		[ItemCanBeNull]
-		public Task<Group> FindGroupByIdAsync(int groupId, bool noTracking = false)
+		public Task<Group> FindGroupByIdAsync(int groupId)
 		{
-			var groups = db.Groups.AsQueryable();
-			if (noTracking)
-				groups = groups.AsNoTracking();
-			return groups.FirstOrDefaultAsync(g => g.Id == groupId && !g.IsDeleted);
+			return db.Groups.FirstOrDefaultAsync(g => g.Id == groupId && !g.IsDeleted);
 		}
 
 		[ItemCanBeNull]
-		public Task<Group> FindGroupByInviteHashAsync(Guid hash, bool noTracking = false)
+		public Task<Group> FindGroupByInviteHashAsync(Guid hash)
 		{
-			var groups = db.Groups.AsQueryable();
-			if (noTracking)
-				groups = groups.AsNoTracking();
-			return groups.FirstOrDefaultAsync(g => g.InviteHash == hash && !g.IsDeleted && g.IsInviteLinkEnabled);
+			return db.Groups.FirstOrDefaultAsync(g => g.InviteHash == hash && !g.IsDeleted && g.IsInviteLinkEnabled);
 		}
 
 		public IQueryable<Group> GetCourseGroupsQueryable(string courseId, bool includeArchived = false)

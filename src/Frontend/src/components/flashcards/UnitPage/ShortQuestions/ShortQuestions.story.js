@@ -1,11 +1,13 @@
-import React from 'react';
-import {storiesOf} from '@storybook/react';
+import React from "react";
 import ShortQuestions from "./ShortQuestions";
 import shortQuestionsExample from "./shortQuestionsExample";
 
-storiesOf('Cards/UnitPage/ShortQuestions', module)
-	.add('default', () => (
-		<ShortQuestions
-			questionsWithAnswers={shortQuestionsExample}
-		/>
-	));
+export default {
+	title: "Cards/UnitPage/ShortQuestions",
+};
+
+export const Default = () => (
+	<ShortQuestions questionsWithAnswers={shortQuestionsExample} />
+);
+
+Default.storyName = "default";

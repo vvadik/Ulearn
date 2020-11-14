@@ -1,11 +1,11 @@
-import CourseCards from './CourseCards';
-import React from 'react';
-import {storiesOf} from '@storybook/react';
+import CourseCards from "./CourseCards";
+import React from "react";
 import cardsByUnitExample from "./cardsByUnitExample";
 
-storiesOf('Cards/CoursePage/CourseCards', module)
-	.add('def', () => (
-		<CourseCards flashcardsInfos={cardsByUnitExample}/>
-	));
+export default {
+	title: "Cards/CoursePage/CourseCards",
+};
 
+export const Def = () => <CourseCards flashcardsInfos={cardsByUnitExample} />;
 
+Def.storyName = "def";

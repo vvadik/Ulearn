@@ -69,7 +69,7 @@ namespace Ulearn.Web.Api.Controllers
 			/* TODO (andgein): I can't select all submissions because ApplicationUserId column doesn't exist in database (ApplicationUser_Id exists).
 			   We should remove this column after EF Core 2.1 release (and remove tuples here)
 			*/
-			var submissions = await userSolutionsRepo.GetAllSubmissions(course.Id, includeManualCheckings: false)
+			var submissions = await userSolutionsRepo.GetAllSubmissions(course.Id, includeManualAndAutomaticCheckings: false)
 				.Where(s => s.Timestamp >= from && s.Timestamp <= to)
 				.OrderByDescending(s => s.Timestamp)
 				.Take(count)

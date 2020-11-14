@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using Castle.Core.Logging;
 using Database.Models;
 using JetBrains.Annotations;
-using log4net;
 using Microsoft.EntityFrameworkCore;
-using uLearn;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
@@ -19,13 +18,13 @@ namespace Database.Repos
 	{
 		private readonly UlearnDb db;
 		private readonly UlearnUserManager userManager;
+		private readonly ILogger logger;
 
-		private static readonly ILog log = LogManager.GetLogger(typeof(GradersRepo));
-
-		public GradersRepo(UlearnDb db, UlearnUserManager userManager)
+		public GradersRepo(UlearnDb db, ILogger logger, UlearnUserManager userManager)
 		{
 			this.db = db;
 			this.userManager = userManager;
+			this.logger = logger;
 		}
 
 		[CanBeNull]

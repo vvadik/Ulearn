@@ -1,9 +1,10 @@
-import React from 'react';
-import {storiesOf} from '@storybook/react';
-import Results from './Results';
+import React from "react";
+import Results from "./Results";
 
-storiesOf('Cards/Results', module)
-	.add('default', () => (
-		<Results handleClick={() => {
-		}}/>
-	));
+export default {
+	title: "Cards/Results",
+};
+
+export const Default = () => <Results handleClick={() => {}} />;
+
+Default.storyName = "default";

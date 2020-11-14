@@ -1206,16 +1206,12 @@ body.lti-component {
 	margin-left: 2px;
 }
 
-.legacy-page .exercise__score .exercise__other-score-link {
+.legacy-page .exercise__score .exercise__other-percent-link {
 	margin-left: 10px;
 	margin-right: 10px;
 }
 
-.legacy-page .exercise__score .exercise__other-score-link:not(.active) .max-score {
-	display: none;
-}
-
-.legacy-page .exercise__score .exercise__other-score-container {
+.legacy-page .exercise__score .exercise__other-percent-container {
 	vertical-align: middle;
 }
 
@@ -1234,6 +1230,11 @@ body.lti-component {
 
 .legacy-page .exercise__score-form {
 	margin-bottom: 10px;
+}
+
+.legacy-page .exercise__score-form-prompt {
+	margin-top: 10px;
+	margin-bottom: 17px;
 }
 
 @media (max-width: 768px) {

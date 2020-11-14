@@ -4,6 +4,7 @@ using System.Web.Http.ExceptionHandling;
 using Elmah.Contrib.WebApi;
 using Microsoft.Owin.Security.OAuth;
 using Ulearn.Core;
+using Ulearn.Core.RunCheckerJobApi;
 
 namespace uLearn.Web
 {
@@ -17,7 +18,7 @@ namespace uLearn.Web
 
 			config.Formatters.Where(f => f != config.Formatters.JsonFormatter).ToList()
 				.ForEach(f => config.Formatters.Remove(f));
-			config.Formatters.JsonFormatter.SerializerSettings = JsonConfig.GetSettings();
+			config.Formatters.JsonFormatter.SerializerSettings = JsonConfig.GetSettings(typeof(RunnerSubmission));
 
 			config.Routes.MapHttpRoute(
 				name: "DefaultApi",

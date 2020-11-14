@@ -1,30 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
 
 namespace Database.Repos
 {
-	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
 	public class VisitsRepo : IVisitsRepo
 	{
 		private readonly UlearnDb db;
+		private readonly ILogger logger;
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
 
-		public VisitsRepo(UlearnDb db, ISlideCheckingsRepo slideCheckingsRepo)
+		public VisitsRepo(UlearnDb db, ILogger logger, ISlideCheckingsRepo slideCheckingsRepo)
 		{
 			this.db = db;
+			this.logger = logger;
 			this.slideCheckingsRepo = slideCheckingsRepo;
 		}
 
 		public async Task AddVisit(string courseId, Guid slideId, string userId, string ipAddress)
 		{
 			courseId = courseId.ToLower();
-			await SetLastVisit(courseId, slideId, userId).ConfigureAwait(false);
-			var visit = FindVisit(courseId, slideId, userId);
+			await SetLastVisit(courseId, slideId, userId);
+			var visit = await FindVisit(courseId, slideId, userId);
 			if (visit == null)
 			{
 				db.Visits.Add(new Visit
@@ -38,13 +41,12 @@ namespace Database.Repos
 			}
 			else if (visit.IpAddress != ipAddress)
 				visit.IpAddress = ipAddress;
-
 			await db.SaveChangesAsync();
 		}
 
 		private async Task SetLastVisit(string courseId, Guid slideId, string userId)
 		{
-			var lastVisit = FindLastVisit(courseId, userId);
+			var lastVisit = await FindLastVisit(courseId, userId);
 			if (lastVisit == null)
 			{
 				db.LastVisits.Add(new LastVisit
@@ -60,19 +62,19 @@ namespace Database.Repos
 				lastVisit.SlideId = slideId;
 				lastVisit.Timestamp = DateTime.Now;
 			}
-			await db.SaveChangesAsync().ConfigureAwait(false);;
+			await db.SaveChangesAsync();
 		}
 
-		public Visit FindVisit(string courseId, Guid slideId, string userId)
+		public async Task<Visit> FindVisit(string courseId, Guid slideId, string userId)
 		{
-			return db.Visits.FirstOrDefault(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId);
+			return await db.Visits.FirstOrDefaultAsync(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId);
 		}
 
-		public LastVisit FindLastVisit(string courseId, string userId)
+		public async Task<LastVisit> FindLastVisit(string courseId, string userId)
 		{
-			return db.LastVisits.FirstOrDefault(v => v.CourseId == courseId && v.UserId == userId);
+			return await db.LastVisits.FirstOrDefaultAsync(v => v.CourseId == courseId && v.UserId == userId);
 		}
-		
+
 		public async Task<Dictionary<string, Visit>> FindLastVisit(List<string> userIds)
 		{
 			return await db.Visits
@@ -87,27 +89,24 @@ namespace Database.Repos
 				.ToDictionaryAsync(v => v.UserId, v => v);
 		}
 
-		public bool IsUserVisitedSlide(string courseId, Guid slideId, string userId)
+		public async Task<HashSet<Guid>> GetIdOfVisitedSlides(string courseId, string userId)
 		{
-			return FindVisit(courseId, slideId, userId) != null;
+			return new HashSet<Guid>(await db.Visits.Where(v => v.UserId == userId && v.CourseId == courseId).Select(x => x.SlideId).ToListAsync());
 		}
 
-		public HashSet<Guid> GetIdOfVisitedSlides(string courseId, string userId)
+		public async Task UpdateScoreForVisit(string courseId, Slide slide, string userId)
 		{
-			return new HashSet<Guid>(db.Visits.Where(v => v.UserId == userId && v.CourseId == courseId).Select(x => x.SlideId));
-		}
-
-		public bool HasVisitedSlides(string courseId, string userId)
-		{
-			return db.Visits.Any(v => v.CourseId == courseId && v.UserId == userId);
-		}
-
-		public async Task UpdateScoreForVisit(string courseId, Guid slideId, string userId)
-		{
-			var newScore = slideCheckingsRepo.GetManualScoreForSlide(courseId, slideId, userId) +
-							slideCheckingsRepo.GetAutomaticScoreForSlide(courseId, slideId, userId);
-			var isPassed = slideCheckingsRepo.IsSlidePassed(courseId, slideId, userId);
-			await UpdateAttempts(courseId, slideId, userId, visit =>
+			var maxSlideScore = slide.MaxScore;
+			var newScore = slide is ExerciseSlide ex
+				? (await slideCheckingsRepo.GetExerciseSlideScoreAndPercent(courseId, ex, userId)).Score
+				: await slideCheckingsRepo.GetUserScoreForQuizSlide(courseId, slide.Id, userId);
+			newScore = Math.Min(newScore, maxSlideScore);
+			var isPassed = await slideCheckingsRepo.IsSlidePassed(courseId, slide.Id, userId);
+			if (await IsSkipped(courseId, slide.Id, userId))
+				newScore = 0;
+			logger.Information($"Обновляю количество баллов пользователя {userId} за слайд {slide.Id} в курсе \"{courseId}\". " +
+					$"Новое количество баллов: {newScore}, слайд пройден: {isPassed}");
+			await UpdateAttempts(courseId, slide.Id, userId, visit =>
 			{
 				visit.Score = newScore;
 				visit.IsPassed = isPassed;
@@ -116,11 +115,11 @@ namespace Database.Repos
 
 		private async Task UpdateAttempts(string courseId, Guid slideId, string userId, Action<Visit> action)
 		{
-			var visit = FindVisit(courseId, slideId, userId);
+			var visit = await FindVisit(courseId, slideId, userId);
 			if (visit == null)
 			{
 				await AddVisit(courseId, slideId, userId, null);
-				visit = FindVisit(courseId, slideId, userId);
+				visit = await FindVisit(courseId, slideId, userId);
 			}
 			action(visit);
 			await db.SaveChangesAsync();
@@ -130,20 +129,19 @@ namespace Database.Repos
 		{
 			await UpdateAttempts(courseId, slideId, userId, visit =>
 			{
-				visit.AttemptsCount = 0;
 				visit.Score = 0;
 				visit.IsPassed = false;
 			});
 		}
 
-		public Dictionary<Guid, int> GetScoresForSlides(string courseId, string userId, IEnumerable<Guid> slidesIds = null)
+		public async Task<Dictionary<Guid, int>> GetScoresForSlides(string courseId, string userId, IEnumerable<Guid> slidesIds = null)
 		{
 			var visits = db.Visits.Where(v => v.CourseId == courseId && v.UserId == userId);
 			if (slidesIds != null)
 				visits = visits.Where(v => slidesIds.Contains(v.SlideId));
-			return visits
+			return (await visits
 				.Select(v => new {v.SlideId, v.Score})
-				.AsEnumerable()
+				.ToListAsync())
 				.GroupBy(v => v.SlideId, (s, v) => new { Key = s, Value = v.First().Score })
 				.ToDictionary(g => g.Key, g => g.Value);
 		}
@@ -155,10 +153,23 @@ namespace Database.Repos
 				visits = visits.Where(v => slidesIds.Contains(v.SlideId));
 			return (await visits
 				.Select(v => new {v.UserId, v.SlideId, v.Score})
-				.ToListAsync().ConfigureAwait(false))
+				.ToListAsync())
 				.GroupBy(v => new {v.UserId, v.SlideId}, (s, v) => new { s.UserId, s.SlideId, Value = v.First().Score })
 				.GroupBy(g => g.UserId)
 				.ToDictionary(g => g.Key, g => g.ToDictionary(k => k.SlideId, k=> k.Value));
+		}
+
+		public async Task<Dictionary<string, HashSet<Guid>>> GetSkippedSlides(string courseId, IEnumerable<string> userIds, IEnumerable<Guid> slidesIds = null)
+		{
+			var visits = db.Visits.Where(v => v.CourseId == courseId && userIds.Contains(v.UserId));
+			if (slidesIds != null)
+				visits = visits.Where(v => slidesIds.Contains(v.SlideId));
+			return (await visits
+					.Where(s => s.IsSkipped)
+					.Select(v => new { v.UserId, v.SlideId })
+					.ToListAsync())
+				.GroupBy(v => v.UserId)
+				.ToDictionary(g => g.Key, g => g.Select(v => v.SlideId).ToHashSet());
 		}
 
 		public async Task<List<Guid>> GetSlidesWithUsersManualChecking(string courseId, string userId)
@@ -174,17 +185,31 @@ namespace Database.Repos
 			await UpdateAttempts(courseId, slideId, userId, visit => { visit.HasManualChecking = true; });
 		}
 
-		public int GetScore(string courseId, Guid slideId, string userId)
+		public async Task<int> GetScore(string courseId, Guid slideId, string userId)
 		{
-			return db.Visits
+			return await db.Visits
 				.Where(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId)
 				.Select(v => v.Score)
-				.FirstOrDefault();
+				.FirstOrDefaultAsync();
+		}
+
+		public async Task<Dictionary<string, int>> GetScore(string courseId, Guid slideId, List<string> userIds)
+		{
+			var scores = (await db.Visits
+				.Where(v => v.CourseId == courseId && v.SlideId == slideId && userIds.Contains(v.UserId))
+				.Select(v => new { v.UserId, v.Score })
+				.ToListAsync())
+				.GroupBy(v => v.UserId)
+				.ToDictionary(v => v.Key, v => v.First().Score);
+			foreach (var userId in userIds)
+				if (!scores.ContainsKey(userId))
+					scores[userId] = 0;
+			return scores;
 		}
 
 		public async Task SkipSlide(string courseId, Guid slideId, string userId)
 		{
-			var visiter = FindVisit(courseId, slideId, userId);
+			var visiter = await FindVisit(courseId, slideId, userId);
 			if (visiter != null)
 				visiter.IsSkipped = true;
 			else
@@ -199,9 +224,9 @@ namespace Database.Repos
 			await db.SaveChangesAsync();
 		}
 
-		public bool IsSkipped(string courseId, Guid slideId, string userId)
+		public async Task<bool> IsSkipped(string courseId, Guid slideId, string userId)
 		{
-			return db.Visits.Any(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId && v.IsSkipped);
+			return await db.Visits.AnyAsync(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId && v.IsSkipped);
 		}
 
 		public async Task UnskipAllSlides(string courseId, string userId)
@@ -212,31 +237,32 @@ namespace Database.Repos
 			await db.SaveChangesAsync();
 		}
 
-		public bool IsPassed(string courseId, Guid slideId, string userId)
+		public async Task<bool> IsPassed(string courseId, Guid slideId, string userId)
 		{
-			return db.Visits.Any(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId && v.IsPassed);
+			return await db.Visits.AnyAsync(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId && v.IsPassed);
 		}
 
-		public bool IsSkippedOrPassed(string courseId, Guid slideId, string userId)
+		public async Task<bool> IsSkippedOrPassed(string courseId, Guid slideId, string userId)
 		{
-			return db.Visits.Any(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId && (v.IsPassed || v.IsSkipped));
+			return await db.Visits.AnyAsync(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId && (v.IsPassed || v.IsSkipped));
 		}
 
 		public async Task AddVisits(IEnumerable<Visit> visits)
 		{
 			foreach (var visit in visits)
 			{
-				if (db.Visits.Any(x => x.UserId == visit.UserId && x.SlideId == visit.SlideId && x.CourseId == visit.CourseId))
+				if (await db.Visits.AnyAsync(x => x.UserId == visit.UserId && x.SlideId == visit.SlideId && x.CourseId == visit.CourseId))
 					continue;
 				db.Visits.Add(visit);
 			}
-
 			await db.SaveChangesAsync();
 		}
 
 		public IQueryable<Visit> GetVisitsInPeriod(string courseId, IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish, IEnumerable<string> usersIds = null)
 		{
-			var filteredVisits = db.Visits.Where(v => v.CourseId == courseId && slidesIds.Contains(v.SlideId) && periodStart <= v.Timestamp && v.Timestamp <= periodFinish);
+			var filteredVisits = db.Visits.Where(v => v.CourseId == courseId && slidesIds.Contains(v.SlideId));
+			if (periodStart != DateTime.MinValue || periodFinish < DateTime.Now.AddSeconds(-10))
+				filteredVisits = filteredVisits.Where(v => periodStart <= v.Timestamp && v.Timestamp <= periodFinish);
 			if (usersIds != null)
 				filteredVisits = filteredVisits.Where(v => usersIds.Contains(v.UserId));
 			return filteredVisits;
@@ -244,9 +270,9 @@ namespace Database.Repos
 
 		public IQueryable<Visit> GetVisitsInPeriod(VisitsFilterOptions options)
 		{
-			var filteredVisits = db.Visits.Where(v => options.PeriodStart <= v.Timestamp && v.Timestamp <= options.PeriodFinish);
-			if (options.CourseId != null)
-				filteredVisits = filteredVisits.Where(v => options.CourseId == v.CourseId);
+			var filteredVisits = db.Visits.Where(v => v.CourseId == options.CourseId);
+			if (options.PeriodStart != DateTime.MinValue || options.PeriodFinish < DateTime.Now.AddSeconds(-10))
+				filteredVisits = filteredVisits.Where(v => options.PeriodStart <= v.Timestamp && v.Timestamp <= options.PeriodFinish);
 			if (options.SlidesIds != null)
 				filteredVisits = filteredVisits.Where(v => options.SlidesIds.Contains(v.SlideId));
 			if (options.UserIds != null)
@@ -256,62 +282,75 @@ namespace Database.Repos
 				else
 					filteredVisits = filteredVisits.Where(v => options.UserIds.Contains(v.UserId));
 			}
-
 			return filteredVisits;
 		}
 
-		public Dictionary<Guid, List<Visit>> GetVisitsInPeriodForEachSlide(VisitsFilterOptions options)
+		public async Task<Dictionary<Guid, List<Visit>>> GetVisitsInPeriodForEachSlide(VisitsFilterOptions options)
 		{
-			return GetVisitsInPeriod(options)
-				.AsEnumerable()
+			return (await GetVisitsInPeriod(options)
+				.ToListAsync())
 				.GroupBy(v => v.SlideId)
 				.ToDictionary(g => g.Key, g => g.ToList());
 		}
 
-		public IEnumerable<string> GetUsersVisitedAllSlides(string courseId, IImmutableSet<Guid> slidesIds, DateTime periodStart, DateTime periodFinish, IEnumerable<string> usersIds = null)
-		{
-			var slidesCount = slidesIds.Count;
-
-			return GetVisitsInPeriod(courseId, slidesIds, periodStart, periodFinish, usersIds)
-				.Select(v => new { v.UserId, v.SlideId })
-				.Distinct()
-				.GroupBy(v => v.UserId)
-				.Where(g => g.Count() == slidesCount)
-				.Select(g => g.Key);
-		}
-
-		public IEnumerable<string> GetUsersVisitedAllSlides(VisitsFilterOptions options)
+		public async Task<List<string>> GetUsersVisitedAllSlides(VisitsFilterOptions options)
 		{
 			if (options.SlidesIds == null)
 				throw new ArgumentNullException(nameof(options.SlidesIds));
-
 			var slidesCount = options.SlidesIds.Count;
-
-			return GetVisitsInPeriod(options)
+			return await GetVisitsInPeriod(options)
 				.Select(v => new { v.UserId, v.SlideId })
 				.Distinct()
 				.GroupBy(v => v.UserId)
 				.Where(g => g.Count() == slidesCount)
-				.Select(g => g.Key);
+				.Select(g => g.Key)
+				.ToListAsync();
 		}
 
-		public HashSet<string> GetUserCourses(string userId)
+		public async Task<HashSet<string>> GetUserCourses(string userId)
 		{
-			return new HashSet<string>(db.Visits.Where(v => v.UserId == userId).Select(v => v.CourseId).Distinct());
+			return new HashSet<string>(await db.Visits.Where(v => v.UserId == userId).Select(v => v.CourseId).Distinct().ToListAsync());
 		}
 
-		public Task<List<string>> GetCourseUsersAsync(string courseId)
+		public async Task<List<string>> GetCourseUsers(string courseId)
 		{
-			return db.Visits.Where(v => v.CourseId == courseId).Select(v => v.UserId).Distinct().ToListAsync();
+			return await db.Visits.Where(v => v.CourseId == courseId).Select(v => v.UserId).Distinct().ToListAsync();
 		}
 
-		public List<RatingEntry> GetCourseRating(string courseId, int minScore)
+		// Метод переписан, но может не работать, нужно тестировать совместимость с EF Core
+		public async Task<List<RatingEntry>> GetCourseRating(string courseId, int minScore, List<Guid> requiredSlides)
 		{
-			return db.Visits.Where(v => v.CourseId == courseId)
+			var userId2TotalScore = await db.Visits.Where(v => v.CourseId == courseId)
 				.GroupBy(v => v.UserId)
-				.Where(g => g.Sum(v => v.Score) >= minScore)
-				.ToList()
-				.Select(g => new RatingEntry(g.First().User, g.Sum(v => v.Score)))
+				.Select(g => new
+				{
+					UserId = g.Key,
+					TotalScore = g.Sum(v => v.Score),
+					LastVisit = g.Max(v => v.Timestamp)
+				})
+				.Where(p => p.TotalScore >= minScore)
+				.ToListAsync();
+			var userIds = userId2TotalScore.Select(g => g.UserId).ToList();
+
+			List<string> usersWithAllRequiredSlides;
+			if (requiredSlides.Count > 0)
+			{
+				usersWithAllRequiredSlides = (await db.Visits
+					.Where(v => v.CourseId == courseId && requiredSlides.Contains(v.SlideId) && userIds.Contains(v.UserId))
+					.GroupBy(v => v.UserId)
+					.ToListAsync())
+					.Where(g => g.DistinctBy(v => v.SlideId).Count() >= requiredSlides.Count)
+					.Select(g => g.Key)
+					.ToList();
+			}
+			else
+			{
+				usersWithAllRequiredSlides = userIds;
+			}
+
+			return userId2TotalScore
+				.Where(p => usersWithAllRequiredSlides.Contains(p.UserId))
+				.Select(p => new RatingEntry(p.UserId, p.TotalScore, p.LastVisit))
 				.OrderByDescending(r => r.Score)
 				.ToList();
 		}
@@ -319,13 +358,15 @@ namespace Database.Repos
 
 	public class RatingEntry
 	{
-		public RatingEntry(ApplicationUser user, int score)
+		public RatingEntry(string userId, int score, DateTime lastVisitTime)
 		{
-			User = user;
+			UserId = userId;
 			Score = score;
+			LastVisitTime = lastVisitTime;
 		}
 
-		public readonly ApplicationUser User;
+		public readonly string UserId;
 		public readonly int Score;
+		public readonly DateTime LastVisitTime;
 	}
 }

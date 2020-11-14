@@ -22,13 +22,21 @@ namespace Ulearn.Core.CSharp.Validators
 				return new SolutionStyleError(StyleErrorType.Static01, userSolution.GetRoot());
 			if (cu.Members.Count > 1)
 				return new SolutionStyleError(StyleErrorType.Static02, cu.Members[1]);
-			var method = cu.Members[0] as MethodDeclarationSyntax;
-			if (method == null)
+			var method = cu.Members[0] as MethodDeclarationSyntax; // null, потому что метод вне класса считается локальной функцией
+			var localFunction = (cu.Members[0] as GlobalStatementSyntax)?.Statement as LocalFunctionStatementSyntax;
+			if (method == null && localFunction == null)
 				return new SolutionStyleError(StyleErrorType.Static01, cu.Members[0]);
-			return FindErrorInMethodDeclaration(method);
+			if (method != null)
+				return FindErrorInMethodDeclaration(method);
+			return FindErrorInLocalFunctionDeclaration(localFunction);
 		}
 
 		protected virtual SolutionStyleError FindErrorInMethodDeclaration(MethodDeclarationSyntax method)
+		{
+			return null;
+		}
+
+		protected virtual SolutionStyleError FindErrorInLocalFunctionDeclaration(LocalFunctionStatementSyntax method)
 		{
 			return null;
 		}

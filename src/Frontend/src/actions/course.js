@@ -6,15 +6,19 @@ import {
 	COURSES__SLIDE_LOAD,
 	COURSES__SLIDE_READY,
 	COURSES__COURSE_LOAD_ERRORS,
+	COURSES__EXERCISE_ADD_SUBMISSION,
+	COURSES__EXERCISE_ADD_REVIEW_COMMENT,
 	START, SUCCESS, FAIL,
 } from "../consts/actions";
 
 import { getCourse, getCourseErrors } from 'src/api/courses';
-import { getSlide } from "src/api/slides";
+import { getSlide, submitCode, } from "src/api/slides";
 import {
 	getFlashcards,
 	putFlashcardStatus,
-} from '../api/flashcards'
+} from '../api/flashcards';
+import { sendCodeReviewComment, } from "src/api/exercise";
+import { solutionRunStatuses } from "../consts/exercise";
 
 export const changeCurrentCourseAction = (courseId) => ({
 	type: COURSES__COURSE_ENTERED,
@@ -86,6 +90,40 @@ const slideReadyAction = (isSlideReady) => ({
 	isSlideReady,
 });
 
+const addSubmissionAction = (courseId, slideId, result) => ({
+	type: COURSES__EXERCISE_ADD_SUBMISSION,
+	courseId,
+	slideId,
+	result,
+});
+
+const addReviewCommentStart = (courseId, slideId, submissionId, reviewId, comment) => ({
+	type: COURSES__EXERCISE_ADD_REVIEW_COMMENT + START,
+	courseId,
+	slideId,
+	submissionId,
+	reviewId,
+	comment,
+});
+
+const addReviewCommentSuccess = (courseId, slideId, submissionId, reviewId, comment) => ({
+	type: COURSES__EXERCISE_ADD_REVIEW_COMMENT + SUCCESS,
+	courseId,
+	slideId,
+	submissionId,
+	reviewId,
+	comment,
+});
+
+const addReviewCommentFail = (courseId, slideId, submissionId, reviewId, error) => ({
+	type: COURSES__EXERCISE_ADD_REVIEW_COMMENT + FAIL,
+	courseId,
+	slideId,
+	submissionId,
+	reviewId,
+	error,
+});
+
 export const loadCourse = (courseId) => {
 	courseId = courseId.toLowerCase();
 
@@ -107,11 +145,11 @@ export const loadCourseErrors = (courseId) => {
 	return (dispatch) => {
 		getCourseErrors(courseId)
 			.then(result => {
-			if(result.status === 204) {
-				dispatch(loadCourseErrorsSuccess(courseId, null));
-			} else {
-				dispatch(loadCourseErrorsSuccess(courseId, result.tempCourseError));
-			}
+				if(result.status === 204) {
+					dispatch(loadCourseErrorsSuccess(courseId, null));
+				} else {
+					dispatch(loadCourseErrorsSuccess(courseId, result.tempCourseError));
+				}
 			})
 			.catch(err => {
 				dispatch(loadCourseErrorsSuccess(courseId, null));
@@ -166,4 +204,36 @@ export const setSlideReady = (isSlideReady) => {
 	return (dispapcth) => {
 		dispapcth(slideReadyAction(isSlideReady));
 	}
+}
+
+export const sendCode = (courseId, slideId, code,) => {
+	return (dispatch) => {
+		submitCode(courseId, slideId, code,)
+			.then(r => {
+				dispatch(addSubmissionAction(courseId, slideId, r));
+			})
+			.catch(err => {
+				const result = {
+					solutionRunStatus: solutionRunStatuses.internalServerError,
+					message: err.message,
+					submission: null,
+					score: null,
+					waitingForManualChecking: null
+				}
+				dispatch(addSubmissionAction(courseId, slideId, result));
+			});
+	};
+}
+
+export const addReviewComment = (courseId, slideId, submissionId, reviewId, comment,) => {
+	return (dispatch) => {
+		dispatch(addReviewCommentStart(courseId, slideId, submissionId, reviewId, comment));
+		sendCodeReviewComment(reviewId, comment.text,)
+			.then(r => {
+				dispatch(addReviewCommentSuccess(courseId, slideId, submissionId, reviewId, r));
+			})
+			.catch(err => {
+				dispatch(addReviewCommentFail(courseId, slideId, submissionId, reviewId, err));
+			});
+	};
 }

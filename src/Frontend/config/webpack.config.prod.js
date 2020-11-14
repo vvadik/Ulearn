@@ -68,6 +68,9 @@ module.exports = merge(base,{
 		chunkFilename: 'static/js/[name].[chunkhash:8].chunk.js',
 		publicPath: publicPath,
 	},
+	resolve: {
+		extensions: ['.ts', '.tsx', '.js', '.json']
+	},
 	module: {
 		strictExportPresence: true,
 		rules: [
@@ -92,7 +95,7 @@ module.exports = merge(base,{
 						},
 					},
 					{
-						test: /\.(js|jsx|mjs)$/,
+						test: /\.(js|jsx|mjs|ts|tsx)$/,
 						loader: 'babel-loader',
 						include: paths.appSrc,
 						options: {

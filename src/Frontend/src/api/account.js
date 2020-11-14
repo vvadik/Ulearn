@@ -18,6 +18,7 @@ export function getCurrentUser() {
 					lastName: user.lastName,
 					visibleName: user.visibleName,
 					gender: user.gender,
+					avatarUrl: user.avatarUrl,
 					accountProblems: json.accountProblems,
 					systemAccesses: json.systemAccesses,
 				});

@@ -46,53 +46,68 @@
 				<div class="alert alert-danger mt10 ">Внимание. Эта работа прямо сейчас проверяется преподавателем @Model.Checking.LockedBy.VisibleName</div>
 			}
 
-			<h4>Оцените работу <span>@(Model.IsFirstReview ? "(это первое ревью)" : $"(c прошлых ревью стоит {Model.PrevCheckingsScoreManualScorePercent}%)")</span></h4>
+			<h4>Оцените работу <span>@(Model.PrevReviewPercent == null ? "(это первое ревью)" : $"(c прошлого ревью стоит {Model.PrevReviewPercent}%)")</span></h4>
+			@if (slide.Scoring.PassedTestsScore > 0)
+			{
+				<div class="exercise__score-form-prompt hide">
+					<div><!--Временная версия-->
+						Изменение поведения ulearn.<br/>
+						За прохождение тестов в этой задаче студенту автоматически дается @slide.Scoring.PassedTestsScore баллов.<br/>
+						После ревью студент максимально суммарно может иметь @slide.Scoring.ScoreWithCodeReview баллов.<br/>
+						Раньше раньше преподаватель на ревью ставил от 0 до @slide.Scoring.CodeReviewAdditionalScore баллов.<br/>
+						Этот балл прибавлялся к автоматически выданному.<br/>
+						Теперь балл преподавателя заменяет автоматически выданный.<br/>
+						То есть если вы поставите 0%, то у студента будет честных 0 баллов.<br/>
+						А если поставите 100%, то у студента будет @slide.Scoring.ScoreWithCodeReview баллов.<br/>
+						Для уже сделанных ревью баллы студентов остаются прежними.
+					</div>
+					<div class="hide"><!--Постоянная версия-->
+						За прохождение тестов в этой задаче студенту автоматически дается @slide.Scoring.PassedTestsScore баллов.<br/>
+						После ревью студент максимально суммарно может иметь @slide.Scoring.ScoreWithCodeReview баллов.<br/>
+						Балл преподавателя заменяет автоматически выданный.<br/>
+						То есть если вы поставите 0%, то у студента будет честных 0 баллов.<br/>
+						А если поставите 100%, то у студента будет @slide.Scoring.ScoreWithCodeReview баллов.
+					</div>
+					<a class="internal-page-link" href="#">Скрыть подсказку</a>
+				</div>
+			}
 			<div class="exercise__score">
 				<div class="btn-group" role="group">
 					@{
-						var isPercentScoreActive = false;
+						var isPercentButtonsActive = false;
 					}
-					@foreach (var scorePercent in new[] { 0, 25, 50, 75, 100 })
+					@foreach (var percentOnButton in new[] { 0, 25, 50, 75, 100 })
 					{
-						var score = slide.Scoring.CodeReviewScore * scorePercent / 100;
 						/* For max review score < 4 we can not define percentage score,
                          * because they are the same (0% of 2 is equal to 25% of 2)
                          */
-						var isActive = Model.Checking.IsChecked && Model.Checking.Score == score && slide.Scoring.CodeReviewScore >= 4;
-						isPercentScoreActive = isPercentScoreActive || isActive;
-						<button type="button" class="btn btn-default @(isActive ? "active" : "")" data-value="@score" data-percent="@scorePercent">@scorePercent%</button>
+						var isActive = Model.Checking.IsChecked && Model.Checking.Percent == percentOnButton && slide.Scoring.ScoreWithCodeReview >= 4;
+						isPercentButtonsActive = isPercentButtonsActive || isActive;
+						<button type="button" class="btn btn-default @(isActive ? "active" : "")" data-percent="@percentOnButton">@percentOnButton%</button>
 					}
 				</div>
-				<div class="ib exercise__other-score-container">
+				<div class="ib exercise__other-percent-container">
 					@{
-						var displayOtherScoreInput = Model.Checking.IsChecked && !isPercentScoreActive;
-						var otherScoreInputDisplayProperty = displayOtherScoreInput ? "" : "display: none";
+						var displayOtherPercentInput = Model.Checking.IsChecked && !isPercentButtonsActive;
+						var otherScoreInputDisplayProperty = displayOtherPercentInput ? "" : "display: none";
 					}
-					<a href="#" class="exercise__other-score-link internal-page-link @(displayOtherScoreInput ? "active" : "")">Другая оценка<span class="max-score"> (max @slide.Scoring.CodeReviewScore)</span></a>
-					<input type="number" class="form-control" style="@otherScoreInputDisplayProperty" min="0" max="@slide.Scoring.CodeReviewScore" name="exerciseScore" required="required"
-							title="Введите количество баллов. Максимум — @slide.Scoring.CodeReviewScore"
-							value="@(Model.Checking.IsChecked ? Model.Checking.Score.ToString() : "")"/>
+					<a href="#" class="exercise__other-percent-link internal-page-link @(displayOtherPercentInput ? "active" : "")">Другой процент</a>
+					<input type="number" class="form-control" style="@otherScoreInputDisplayProperty" min="0" max="100" name="exercisePercent" required="required"
+							title="Введите процент баллов"
+							value="@(Model.Checking.IsChecked && Model.Checking.Percent != null ? Model.Checking.Percent.Value.ToString() : "")"/>
 				</div>
 			</div>
 
 			@{
-				// ReSharper disable ReplaceWithSingleAssignment.True
-				var prohibitFutherReview = true;
-				if (Model.Checking.IsChecked && !Model.Checking.ProhibitFurtherManualCheckings)
-				{
-					prohibitFutherReview = false;
-				}
-				if (!Model.Checking.IsChecked && !Model.DefaultProhibitFurtherReview)
-				{
-					prohibitFutherReview = false;
-				}
-				// ReSharper restore ReplaceWithSingleAssignment.True
+				var prohibitFurtherReview = Model.Checking.IsChecked
+					? Model.Checking.ProhibitFurtherManualCheckings
+					: Model.DefaultProhibitFurtherReview;
 			}
 
 			<div class="hide-on-short">
 
 				<div class="checkbox checkbox-default">
-					<input data-val="true" id="prohibitFurtherReview" name="prohibitFurtherReview" type="checkbox" value="true" @(prohibitFutherReview ? "checked" : "")/>
+					<input data-val="true" id="prohibitFurtherReview" name="prohibitFurtherReview" type="checkbox" value="true" @(prohibitFurtherReview ? "checked" : "")/>
 					<label for="prohibitFurtherReview">
 						Не принимать больше код-ревью у&nbsp;этого студента по&nbsp;задаче «@Model.Slide.Title.MakeNestedQuotes().TruncateWithEllipsis(50)»
 					</label>

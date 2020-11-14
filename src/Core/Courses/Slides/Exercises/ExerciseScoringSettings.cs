@@ -16,7 +16,10 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 
 		/* .NET XML Serializer doesn't understand nullable fields, so we use this hack to make int? field */
 		[XmlIgnore]
-		public int CodeReviewScore => CodeReviewScoreBack ?? 0;
+		public int CodeReviewAdditionalScore => CodeReviewScoreBack ?? 0;
+
+		[XmlIgnore]
+		public int ScoreWithCodeReview => PassedTestsScore + CodeReviewAdditionalScore;
 
 		[XmlIgnore]
 		public bool RequireReview => CodeReviewScoreBack.HasValue;

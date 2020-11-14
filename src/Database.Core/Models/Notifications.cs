@@ -16,6 +16,7 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Units;
 
 namespace Database.Models
@@ -338,7 +339,7 @@ namespace Database.Models
 
 		/* Returns list of notifications, which blocks this notification from sending to specific user. I.e. NewComment is blocked by ReplyToYourComment or NewCommentFromYourGroupStudent */
 		/* Override this method together with IsBlockedByAnyNotificationFrom() */
-		public virtual List<Notification> GetBlockerNotifications(IServiceProvider serviceProvider)
+		public virtual async Task<List<Notification>> GetBlockerNotifications(IServiceProvider serviceProvider)
 		{
 			return new List<Notification>();
 		}
@@ -540,16 +541,16 @@ namespace Database.Models
 				return courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, CourseId, includeHighRoles: true);
 			}
 			var visitsRepo = serviceProvider.GetService<IVisitsRepo>();
-			return visitsRepo.GetCourseUsersAsync(CourseId);
+			return visitsRepo.GetCourseUsers(CourseId);
 		}
 
 		public override bool IsNotificationForEveryone => true;
 
-		public override List<Notification> GetBlockerNotifications(IServiceProvider serviceProvider)
+		public override async Task<List<Notification>> GetBlockerNotifications(IServiceProvider serviceProvider)
 		{
 			var notificationsRepo = serviceProvider.GetService<INotificationsRepo>();
-			var repliedNotifications = notificationsRepo.FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId);
-			var yourGroupNotifications = notificationsRepo.FindNotifications<NewCommentFromYourGroupStudentNotification>(n => n.CommentId == CommentId);
+			var repliedNotifications = await notificationsRepo.FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId);
+			var yourGroupNotifications = await notificationsRepo.FindNotifications<NewCommentFromYourGroupStudentNotification>(n => n.CommentId == CommentId);
 			return repliedNotifications.Cast<Notification>().Concat(yourGroupNotifications).ToList();
 		}
 
@@ -630,10 +631,10 @@ namespace Database.Models
 			return groupAccessesRepo.GetInstructorsOfAllGroupsWhereUserIsMemberAsync(CourseId, Comment.Author.Id);
 		}
 
-		public override List<Notification> GetBlockerNotifications(IServiceProvider serviceProvider)
+		public override async Task<List<Notification>> GetBlockerNotifications(IServiceProvider serviceProvider)
 		{
 			var notificationsRepo = serviceProvider.GetService<INotificationsRepo>();
-			var repliedToYourCommentNotifications = notificationsRepo.FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId);
+			var repliedToYourCommentNotifications = await notificationsRepo.FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId);
 			return repliedToYourCommentNotifications.Cast<Notification>().ToList();
 		}
 
@@ -784,27 +785,29 @@ namespace Database.Models
 
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			var slide = course.FindSlideById(Checking.SlideId, true);
+			var slide = course.FindSlideById(Checking.SlideId, true) as ExerciseSlide;
 			if (slide == null)
 				return null;
 
 			var commentsText = GetReviewsText(Checking, html: true);
+			var score = SlideCheckingsRepo.GetExerciseSubmissionManualCheckingsScoreAndPercent(new List<ManualExerciseChecking> { Checking }, slide).Score;
 
 			return $"{InitiatedBy.VisibleName.EscapeHtml()} проверил{InitiatedBy.Gender.ChooseEnding()} ваше решение в «{GetSlideTitle(course, slide).EscapeHtml()}»<br/><br/>" +
-					$"<b>Вы получили {Checking.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}</b><br/><br/>" +
+					$"<b>Вы получили {score.PluralizeInRussian(RussianPluralizationOptions.Score)}</b><br/><br/>" +
 					commentsText;
 		}
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
-			var slide = course.FindSlideById(Checking.SlideId, true);
+			var slide = course.FindSlideById(Checking.SlideId, true) as ExerciseSlide;
 			if (slide == null)
 				return null;
 
 			var commentsText = GetReviewsText(Checking, html: false);
+			var score = SlideCheckingsRepo.GetExerciseSubmissionManualCheckingsScoreAndPercent(new List<ManualExerciseChecking> { Checking }, slide).Score;
 
 			return $"{InitiatedBy.VisibleName} проверил{InitiatedBy.Gender.ChooseEnding()} ваше решение в «{GetSlideTitle(course, slide)}»\n" +
-					$"Вы получили {Checking.Score.PluralizeInRussian(RussianPluralizationOptions.Score)}\n\n" +
+					$"Вы получили {score.PluralizeInRussian(RussianPluralizationOptions.Score)}\n\n" +
 					commentsText;
 		}
 
@@ -1083,13 +1086,13 @@ namespace Database.Models
 			return CommentId != null && Comment != null;
 		}
 
-		public override List<Notification> GetBlockerNotifications(IServiceProvider serviceProvider)
+		public override async Task<List<Notification>> GetBlockerNotifications(IServiceProvider serviceProvider)
 		{
 			var notificationsRepo = serviceProvider.GetService<INotificationsRepo>();
 			var reviewId = Comment.ReviewId;
-			return notificationsRepo
+			return (await notificationsRepo
 				.FindNotifications<ReceivedCommentToCodeReviewNotification>(n => n.Comment.ReviewId == reviewId, n => n.Comment)
-				.Cast<Notification>()
+				).Cast<Notification>()
 				.Where(n => n.CreateTime < CreateTime && n.CreateTime >= CreateTime - NotificationsRepo.sendNotificationsDelayAfterCreating)
 				.ToList();
 		}
@@ -1403,10 +1406,10 @@ namespace Database.Models
 			return courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, CourseId, includeHighRoles: true);
 		}
 
-		public override List<Notification> GetBlockerNotifications(IServiceProvider serviceProvider)
+		public override async Task<List<Notification>> GetBlockerNotifications(IServiceProvider serviceProvider)
 		{
 			var notificationsRepo = serviceProvider.GetService<INotificationsRepo>();
-			return notificationsRepo.FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId).Cast<Notification>().ToList();
+			return (await notificationsRepo.FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId)).Cast<Notification>().ToList();
 		}
 
 		public override bool IsBlockedByAnyNotificationFrom(IServiceProvider serviceProvider, List<Notification> notifications)

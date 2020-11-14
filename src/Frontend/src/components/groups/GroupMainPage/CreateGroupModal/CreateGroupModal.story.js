@@ -1,11 +1,15 @@
-import React from 'react';
-import { storiesOf } from '@storybook/react';
-import { action } from '@storybook/addon-actions';
-import CreateGroupModal from './CreateGroupModal';
+import React from "react";
+import { action } from "@storybook/addon-actions";
+import CreateGroupModal from "./CreateGroupModal";
 
-import './createGroupModal.less';
+import "./createGroupModal.less";
 
-storiesOf('Group/CreateGroupModal', module)
-.add('default', () => (
-	<CreateGroupModal onCloseModal={action('onCloseModal')} courseId={'123'} />
-));
+export default {
+	title: "Group/CreateGroupModal",
+};
+
+export const Default = () => (
+	<CreateGroupModal onCloseModal={action("onCloseModal")} courseId={"123"} />
+);
+
+Default.storyName = "default";

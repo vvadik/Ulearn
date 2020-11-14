@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using Newtonsoft.Json.Serialization;
 
 namespace Ulearn.Core
@@ -50,6 +51,19 @@ namespace Ulearn.Core
 				return nameToType[typeName];
 
 			return base.BindToType(assemblyName, typeName);
+		}
+
+		public static IEnumerable<Type> GetSubtypes(params Type[] baseTypes)
+		{
+			foreach (var baseType in baseTypes)
+			{
+				var subclasses = Assembly
+					.GetAssembly(baseType)
+					.GetTypes()
+					.Where(t => t.IsClass && !t.IsAbstract && (baseType.IsInterface ? baseType.IsAssignableFrom(t) : t.IsSubclassOf(baseType)));
+				foreach (var subclass in subclasses)
+					yield return subclass;
+			}
 		}
 	}
 }

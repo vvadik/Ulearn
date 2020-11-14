@@ -8,6 +8,7 @@ using Ulearn.VideoAnnotations.Api.Models.Responses.Annotations;
 namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 {
 	[DataContract]
+	[DisplayName("youtube")]
 	public class YoutubeBlockResponse : IApiSlideBlock
 	{
 		[DefaultValue(false)]
@@ -17,9 +18,6 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 		[XmlText]
 		[DataMember(Name = "videoId")]
 		public string VideoId { get; set; }
-
-		[DataMember(Name = "type")]
-		public string Type { get; set; } = "youtube";
 
 		[DataMember(Name = "annotation")]
 		[CanBeNull]

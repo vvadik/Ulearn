@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Database.Extensions;
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Extensions;
@@ -16,10 +17,12 @@ namespace Database.Repos
 	public class CoursesRepo : ICoursesRepo
 	{
 		private readonly UlearnDb db;
+		private readonly ILogger logger;
 
-		public CoursesRepo(UlearnDb db)
+		public CoursesRepo(UlearnDb db, ILogger logger)
 		{
 			this.db = db;
+			this.logger = logger;
 		}
 
 		public Task<List<string>> GetPublishedCourseIdsAsync()
@@ -32,7 +35,7 @@ namespace Database.Repos
 
 		public Task<CourseVersion> GetPublishedCourseVersionAsync(string courseId)
 		{
-			return db.CourseVersions.AsNoTracking()
+			return db.CourseVersions
 				.Where(v => v.CourseId == courseId && v.PublishTime != null)
 				.OrderByDescending(v => v.PublishTime)
 				.FirstOrDefaultAsync();
@@ -92,7 +95,7 @@ namespace Database.Repos
 
 		public async Task<List<CourseVersion>> GetPublishedCourseVersionsAsync()
 		{
-			var courseVersions = await db.CourseVersions.AsNoTracking().ToListAsync().ConfigureAwait(false);
+			var courseVersions = await db.CourseVersions.ToListAsync().ConfigureAwait(false);
 			return courseVersions
 				.GroupBy(v => v.CourseId.ToLower())
 				.Select(g => g.MaxBy(v => v.PublishTime))

@@ -5,22 +5,23 @@ using System.Threading.Tasks;
 using Database.Models;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using uLearn;
+using Serilog;
 using Ulearn.Common;
 using Ulearn.Core;
 
 namespace Database.Repos
 {
-	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
 	public class XQueueRepo : IXQueueRepo
 	{
 		private readonly UlearnDb db;
+		private readonly ILogger logger;
 		private readonly UlearnUserManager userManager;
 		private readonly IUserSolutionsRepo userSolutionsRepo;
 
-		public XQueueRepo(UlearnDb db, UlearnUserManager userManager, IUserSolutionsRepo userSolutionsRepo)
+		public XQueueRepo(UlearnDb db, ILogger logger, UlearnUserManager userManager, IUserSolutionsRepo userSolutionsRepo)
 		{
 			this.db = db;
+			this.logger = logger;
 			this.userManager = userManager;
 			this.userSolutionsRepo = userSolutionsRepo;
 		}
@@ -45,23 +46,24 @@ namespace Database.Repos
 			await db.SaveChangesAsync();
 		}
 
-		public List<XQueueWatcher> GetXQueueWatchers()
+		public async Task<List<XQueueWatcher>> GetXQueueWatchers()
 		{
-			return db.XQueueWatchers.Where(w => w.IsEnabled).ToList();
+			return await db.XQueueWatchers.Where(w => w.IsEnabled).ToListAsync();
 		}
 
-		[CanBeNull]
-		public XQueueExerciseSubmission FindXQueueSubmission(UserExerciseSubmission submission)
+		[ItemCanBeNull]
+		public async Task<XQueueExerciseSubmission> FindXQueueSubmission(UserExerciseSubmission submission)
 		{
-			return db.XQueueExerciseSubmissions.FirstOrDefault(s => s.SubmissionId == submission.Id);
+			return await db.XQueueExerciseSubmissions.FirstOrDefaultAsync(s => s.SubmissionId == submission.Id);
 		}
 
 		public async Task AddXQueueSubmission(XQueueWatcher watcher, string xQueueHeader, string courseId, Guid slideId, string code)
 		{
 			var submission = await userSolutionsRepo.AddUserExerciseSubmission(
 				courseId, slideId, code, null, null, watcher.UserId,
-				"uLearn", $"XQueue watcher {watcher.Name}"
-			).ConfigureAwait(false);
+				"uLearn", $"XQueue watcher {watcher.Name}",
+				Language.CSharp, null, true
+			);
 			db.XQueueExerciseSubmissions.Add(new XQueueExerciseSubmission
 			{
 				SubmissionId = submission.Id,
@@ -70,21 +72,21 @@ namespace Database.Repos
 				IsResultSent = false,
 			});
 
-			await db.SaveChangesAsync().ConfigureAwait(false);
+			await db.SaveChangesAsync();
 		}
 
 		public async Task MarkXQueueSubmissionThatResultIsSent(XQueueExerciseSubmission submission)
 		{
 			submission.IsResultSent = true;
-			await db.SaveChangesAsync().ConfigureAwait(false);
+			await db.SaveChangesAsync();
 		}
 
-		public List<XQueueExerciseSubmission> GetXQueueSubmissionsReadyToSentResults(XQueueWatcher watcher)
+		public Task<List<XQueueExerciseSubmission>> GetXQueueSubmissionsReadyToSentResults(XQueueWatcher watcher)
 		{
 			return db.XQueueExerciseSubmissions
 				.Include(s => s.Submission.AutomaticChecking)
 				.Where(s => s.WatcherId == watcher.Id && !s.IsResultSent && s.Submission.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Done)
-				.ToList();
+				.ToListAsync();
 		}
 	}
 }

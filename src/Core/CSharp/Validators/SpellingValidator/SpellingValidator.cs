@@ -1,16 +1,11 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using NHunspell;
 using Ulearn.Common.Extensions;
-using Ulearn.Core.CSharp;
-using Ulearn.Core.CSharp.Validators;
-using Ulearn.Core.Model.Edx.EdxComponents;
-using Ulearn.Core.Properties;
+using uLearn.CSharp.Validators.SpellingValidator;
 
-namespace uLearn.CSharp.Validators.SpellingValidator
+namespace Ulearn.Core.CSharp.Validators.SpellingValidator
 {
 	public class SpellingValidator : BaseStyleValidator
 	{
@@ -19,6 +14,7 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 		public override List<SolutionStyleError> FindErrors(SyntaxTree userSolution, SemanticModel semanticModel)
 		{
 			return InspectAll<MethodDeclarationSyntax>(userSolution, InspectMethodsNamesAndArguments) // TODO: проверять имена классов?
+				.Concat(InspectAll<LocalFunctionStatementSyntax>(userSolution, InspectLocalFunctionsNamesAndArguments))
 				.Concat(InspectAll<VariableDeclarationSyntax>(userSolution, semanticModel, InspectVariablesNames))
 				.Concat(InspectAll<PropertyDeclarationSyntax>(userSolution, InspectPropertiesNames))
 				.Concat(InspectAll<ClassDeclarationSyntax>(userSolution, InspectClassNames))
@@ -29,19 +25,30 @@ namespace uLearn.CSharp.Validators.SpellingValidator
 
 		private IEnumerable<SolutionStyleError> InspectMethodsNamesAndArguments(MethodDeclarationSyntax methodDeclaration)
 		{
-			var methodIdentifier = methodDeclaration.Identifier;
-			var errors = InspectMethodParameters(methodDeclaration);
+			return InspectNamesAndArguments(methodDeclaration.Identifier, methodDeclaration.ReturnType,
+				methodDeclaration.ParameterList);
+		}
+
+		private IEnumerable<SolutionStyleError> InspectLocalFunctionsNamesAndArguments(LocalFunctionStatementSyntax localFunctionStatement)
+		{
+			return InspectNamesAndArguments(localFunctionStatement.Identifier, localFunctionStatement.ReturnType,
+				localFunctionStatement.ParameterList);
+		}
+		
+		private IEnumerable<SolutionStyleError> InspectNamesAndArguments(SyntaxToken identifier, TypeSyntax returnType,
+			ParameterListSyntax parameterList)
+		{
+			var errors = InspectMethodParameters(parameterList.Parameters);
 			var errorInMethodName = CheckIdentifierNameForSpellingErrors(
-				methodIdentifier,
-				methodDeclaration.ReturnType.ToString());
+				identifier,
+				returnType.ToString());
 			if (errorInMethodName != null)
 				errors.Add(errorInMethodName);
 			return errors;
 		}
 
-		private List<SolutionStyleError> InspectMethodParameters(MethodDeclarationSyntax methodDeclaration)
+		private List<SolutionStyleError> InspectMethodParameters(SeparatedSyntaxList<ParameterSyntax> parameters)
 		{
-			var parameters = methodDeclaration.ParameterList.Parameters;
 			return parameters
 				.Select(InspectMethodParameter)
 				.Where(err => err != null)

@@ -141,6 +141,7 @@ namespace uLearn.Web.Controllers
 					CourseRoles = coursesIds
 						.Select(s => new CourseRoleModel
 						{
+							Role = role,
 							CourseId = s,
 							CourseTitle = courseManager.GetCourse(s).Title,
 							HasAccess = coursesForUser.ContainsKey(role) && coursesForUser[role].Contains(s.ToLower()),

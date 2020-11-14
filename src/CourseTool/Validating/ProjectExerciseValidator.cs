@@ -164,6 +164,7 @@ namespace uLearn.CourseTool.Validating
 				ReportErrorIfStudentsZipHasWrongAnswerOrSolutionFiles(tempExFolder);
 
 				var csprojFile = tempExFolder.GetFile(ex.CsprojFileName);
+				MsBuildLocationHelper.InitPathToMsBuild();
 				FuncUtils.Using(
 					new ProjectCollection(),
 					projectCollection =>

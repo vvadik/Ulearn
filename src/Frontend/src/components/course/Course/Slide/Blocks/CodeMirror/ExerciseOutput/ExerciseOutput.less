@@ -1,0 +1,134 @@
+﻿@import "../../../../courseVariables";
+
+.output {
+  overflow: hidden;
+  margin-top: 25px;
+  border-radius: 8px;
+  border: 1px solid @lightGrey;
+}
+
+.wrongAnswerOutput {
+  .output;
+  border-color: @likeColor;
+}
+
+.compilationErrorOutput {
+  .output;
+  border-color: @likeColor;
+  background: @lightRed;
+}
+
+.serverErrorOutput {
+  .output;
+  border-color: @accentColor;
+}
+
+.outputHeader {
+  display: block;
+  padding: 7px 16px;
+  background-color: @lightGrey;
+  color: @black;
+
+  font-family: @defaultFonts;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.wrongAnswerOutput .outputHeader {
+  background-color: @likeColor;
+  color: @white;
+}
+
+.compilationErrorOutput .outputHeader {
+  background-color: @likeColor;
+  color: @white;
+}
+
+.serverErrorOutput .outputHeader {
+  background-color: @accentColor;
+  color: @white;
+}
+
+.outputTextWrapper {
+  padding: 8px 15px;
+}
+
+.outputParagraph {
+  font-size: 14px;
+  line-height: 20px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  display: block;
+  font-family: @monoFonts;
+  margin: 0;
+}
+
+.outputTable {
+  width: 100%;
+  border-collapse: collapse;
+
+  font-family: @defaultFonts;
+  font-style: normal;
+  font-weight: normal;
+}
+
+.outputTable > thead > tr > th,
+.outputTable > tbody > tr > td {
+  padding: 7px 16px;
+  vertical-align: top;
+  white-space: pre-wrap;
+  word-break: break-all;
+  border: 1px solid @lightGrey;
+}
+
+.outputTable {
+  th, td {
+    width: 50%;
+  }
+  th:first-child, td:first-child {
+    width: auto;
+    white-space: nowrap;
+  }
+}
+
+.outputTable > tbody > tr > td:first-of-type {
+  padding: 7px;
+}
+
+.outputTable > thead > tr > th {
+  border-top: none;
+  text-align: left;
+}
+
+.outputTable > tbody > tr:last-of-type > td {
+  border-bottom: none;
+}
+
+.outputTable > thead > tr > th {
+  font-family: @defaultFonts;
+  font-style: normal;
+  font-weight: normal;
+
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.outputTable > tbody > tr > td {
+  font-family: @monoFonts;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.outputTable > tbody > tr > td > span {
+  opacity: 1;
+}
+
+.outputMatchColor {
+  background-color: @lightGreen
+}
+
+.outputNotMatchColor {
+  background-color: @lightRed
+}

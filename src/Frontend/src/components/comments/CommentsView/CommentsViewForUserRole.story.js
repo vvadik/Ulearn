@@ -1,17 +1,18 @@
 import React from "react";
-import { storiesOf } from "@storybook/react";
 import { withViewport } from "@storybook/addon-viewport";
 import CommentsView from "./CommentsView";
 
 const comments = [
 	{
 		id: 1999,
-		text: "Решать эти задачи **можно** прямо в браузере, а специальная проверяющая система тут же проверит ваше решение.",
-		renderedText: "Решать эти задачи <b>можно</b> прямо в браузере, а специальная проверяющая система тут же проверит ваше решение.",
+		text:
+			"Решать эти задачи **можно** прямо в браузере, а специальная проверяющая система тут же проверит ваше решение.",
+		renderedText:
+			"Решать эти задачи <b>можно</b> прямо в браузере, а специальная проверяющая система тут же проверит ваше решение.",
 		author: {
-			"id": "11",
-			"visibleName": "Maria",
-			"avatarUrl": null,
+			id: "11",
+			visibleName: "Maria",
+			avatarUrl: null,
 		},
 		publishTime: "2019-01-18T14:12:41.947",
 		isApproved: false,
@@ -22,9 +23,10 @@ const comments = [
 			{
 				id: 2000,
 				author: {
-					"id": "10",
-					"visibleName": "Pavel",
-					"avatarUrl": "https://staff.skbkontur.ru/content/images/default-user-woman.png",
+					id: "10",
+					visibleName: "Pavel",
+					avatarUrl:
+						"https://staff.skbkontur.ru/content/images/default-user-woman.png",
 				},
 				text: "Я **не согласна**",
 				replies: [],
@@ -34,14 +36,15 @@ const comments = [
 				isCorrectAnswer: false,
 				likesCount: 0,
 				isLiked: false,
-				parentCommentId: 1999
+				parentCommentId: 1999,
 			},
 			{
 				id: 2001,
 				author: {
-					"id": "13",
-					"visibleName": "Kate",
-					"avatarUrl": "https://staff.skbkontur.ru/content/images/default-user-woman.png",
+					id: "13",
+					visibleName: "Kate",
+					avatarUrl:
+						"https://staff.skbkontur.ru/content/images/default-user-woman.png",
 				},
 				text: "Я **согласна**",
 				replies: [],
@@ -51,18 +54,20 @@ const comments = [
 				isCorrectAnswer: true,
 				likesCount: 5,
 				isLiked: true,
-				parentCommentId: 1999
-			}
+				parentCommentId: 1999,
+			},
 		],
 	},
 	{
 		id: 2002,
-		text: "Решать эти задачи **можно** прямо в браузере, а специальная проверяющая система тут же проверит ваше решение.",
-		renderedText: "Решать эти задачи <b>можно</b> прямо в браузере, а специальная проверяющая система тут же проверит ваше решение.",
+		text:
+			"Решать эти задачи **можно** прямо в браузере, а специальная проверяющая система тут же проверит ваше решение.",
+		renderedText:
+			"Решать эти задачи <b>можно</b> прямо в браузере, а специальная проверяющая система тут же проверит ваше решение.",
 		author: {
-			"id": "13",
-			"visibleName": "Henry",
-			"avatarUrl": null,
+			id: "13",
+			visibleName: "Henry",
+			avatarUrl: null,
 		},
 		publishTime: "2019-01-18T14:12:41.947",
 		isApproved: false,
@@ -70,71 +75,71 @@ const comments = [
 		isLiked: true,
 		likesCount: 8,
 		replies: [],
-	}
+	},
 ];
 
 const userIsNotAuthenticated = {
-	"isAuthenticated": false,
-	"id": "11",
-	"visibleName": "Pavel",
-	"avatarUrl": null,
-	"systemAccesses": ["viewAllProfiles"],
+	isAuthenticated: false,
+	id: "11",
+	visibleName: "Pavel",
+	avatarUrl: null,
+	systemAccesses: ["viewAllProfiles"],
 };
 
 const userWithSystemAccesses = {
-	"isAuthenticated": true,
-	"id": "11",
-	"visibleName": "Maria",
-	"avatarUrl": null,
-	"systemAccesses": ["viewAllProfiles"],
+	isAuthenticated: true,
+	id: "11",
+	visibleName: "Maria",
+	avatarUrl: null,
+	systemAccesses: ["viewAllProfiles"],
 };
 
 const user = {
-	"isAuthenticated": true,
-	"id": "11",
-	"visibleName": "Maria",
-	"avatarUrl": null,
-	"systemAccesses": [],
+	isAuthenticated: true,
+	id: "11",
+	visibleName: "Maria",
+	avatarUrl: null,
+	systemAccesses: [],
 };
 
 const userIsStudent = {
-	"isSystemAdministrator": false,
-	"courseRole": "student",
-	"courseAccesses": [],
+	isSystemAdministrator: false,
+	courseRole: "student",
+	courseAccesses: [],
 };
 
 const userIsInstructor = {
-	"isSystemAdministrator": false,
-	"courseRole": "instructor",
-	"courseAccesses": [],
+	isSystemAdministrator: false,
+	courseRole: "instructor",
+	courseAccesses: [],
 };
 
 const userIsInstructorWithModerateAccesses = {
-	"isSystemAdministrator": false,
-	"courseRole": "instructor",
-	"courseAccesses": ["editPinAndRemoveComments"],
+	isSystemAdministrator: false,
+	courseRole: "instructor",
+	courseAccesses: ["editPinAndRemoveComments"],
 };
 
 const userIsInstructorWithViewSubmission = {
-	"isSystemAdministrator": false,
-	"courseRole": "instructor",
-	"courseAccesses": ["viewAllStudentsSubmissions"],
+	isSystemAdministrator: false,
+	courseRole: "instructor",
+	courseAccesses: ["viewAllStudentsSubmissions"],
 };
 
 const userIsCourseAdmin = {
-	"isSystemAdministrator": true,
-	"courseRole": "courseAdmin",
-	"courseAccesses": [],
+	isSystemAdministrator: true,
+	courseRole: "courseAdmin",
+	courseAccesses: [],
 };
 
 const userIsSysAdmin = {
-	"isSystemAdministrator": true,
-	"courseRole": "instructor",
-	"courseAccesses": [],
+	isSystemAdministrator: true,
+	courseRole: "instructor",
+	courseAccesses: [],
 };
 
 const fakeCommentsApi = {
-	getComments: () => Promise.resolve({topLevelComments: comments}),
+	getComments: () => Promise.resolve({ topLevelComments: comments }),
 	addComment: () => Promise.resolve(console.log("API: added comment")),
 	deleteComment: () => Promise.resolve(console.log("API: delete comment")),
 	updateComment: () => Promise.resolve(console.log("API: update comment")),
@@ -142,84 +147,129 @@ const fakeCommentsApi = {
 	dislikeComment: () => Promise.resolve(console.log("API: dislike comment")),
 };
 
-storiesOf("Comments/CommentsView", module)
-.addDecorator(withViewport())
-.add("unauthorized user", () => (
+export default {
+	title: "Comments/CommentsView",
+
+	decorators: [
+		withViewport(),
+		withViewport(),
+		withViewport(),
+		withViewport(),
+		withViewport(),
+		withViewport(),
+		withViewport(),
+		withViewport(),
+	],
+};
+
+export const UnauthorizedUser = () => (
 	<CommentsView
 		slideType={"exercise"}
 		user={userIsNotAuthenticated}
 		userRoles={userIsStudent}
 		slideId={"90bcb61e-57f0-4baa-8bc9-10c9cfd27f58"}
 		courseId={"BasicProgramming"}
-		commentsApi={fakeCommentsApi} />
-), {viewport: "desktop"})
-.addDecorator(withViewport())
-.add("user is student", () => (
+		commentsApi={fakeCommentsApi}
+	/>
+);
+
+UnauthorizedUser.storyName = "unauthorized user";
+UnauthorizedUser.parameters = { viewport: "desktop" };
+
+export const UserIsStudent = () => (
 	<CommentsView
 		slideType={"exercise"}
 		user={user}
 		userRoles={userIsStudent}
 		slideId={"90bcb61e-57f0-4baa-8bc9-10c9cfd27f58"}
 		courseId={"BasicProgramming"}
-		commentsApi={fakeCommentsApi} />
-), {viewport: "desktop"})
-.addDecorator(withViewport())
-.add("user is instructor", () => (
+		commentsApi={fakeCommentsApi}
+	/>
+);
+
+UserIsStudent.storyName = "user is student";
+UserIsStudent.parameters = { viewport: "desktop" };
+
+export const UserIsInstructor = () => (
 	<CommentsView
 		slideType={"exercise"}
 		user={user}
 		userRoles={userIsInstructor}
 		slideId={"90bcb61e-57f0-4baa-8bc9-10c9cfd27f58"}
 		courseId={"BasicProgramming"}
-		commentsApi={fakeCommentsApi} />
-), {viewport: "desktop"})
-.addDecorator(withViewport())
-.add("user is instructor with accesses to see profiles", () => (
+		commentsApi={fakeCommentsApi}
+	/>
+);
+
+UserIsInstructor.storyName = "user is instructor";
+UserIsInstructor.parameters = { viewport: "desktop" };
+
+export const UserIsInstructorWithAccessesToSeeProfiles = () => (
 	<CommentsView
 		slideType={"exercise"}
 		user={userWithSystemAccesses}
 		userRoles={userIsInstructor}
 		slideId={"90bcb61e-57f0-4baa-8bc9-10c9cfd27f58"}
 		courseId={"BasicProgramming"}
-		commentsApi={fakeCommentsApi} />
-), {viewport: "desktop"})
-.addDecorator(withViewport())
-.add("user is instructor with moderate accesses", () => (
+		commentsApi={fakeCommentsApi}
+	/>
+);
+
+UserIsInstructorWithAccessesToSeeProfiles.storyName = "user is instructor with accesses to see profiles";
+UserIsInstructorWithAccessesToSeeProfiles.parameters = { viewport: "desktop" };
+
+export const UserIsInstructorWithModerateAccesses = () => (
 	<CommentsView
 		slideType={"exercise"}
 		user={user}
 		userRoles={userIsInstructorWithModerateAccesses}
 		slideId={"90bcb61e-57f0-4baa-8bc9-10c9cfd27f58"}
 		courseId={"BasicProgramming"}
-		commentsApi={fakeCommentsApi} />
-), {viewport: "desktop"})
-.addDecorator(withViewport())
-.add("user is instructor with accesses view submission", () => (
+		commentsApi={fakeCommentsApi}
+	/>
+);
+
+UserIsInstructorWithModerateAccesses.storyName = "user is instructor with moderate accesses";
+UserIsInstructorWithModerateAccesses.parameters = { viewport: "desktop" };
+
+export const UserIsInstructorWithAccessesViewSubmission = () => (
 	<CommentsView
 		slideType={"exercise"}
 		user={user}
 		userRoles={userIsInstructorWithViewSubmission}
 		slideId={"90bcb61e-57f0-4baa-8bc9-10c9cfd27f58"}
 		courseId={"BasicProgramming"}
-		commentsApi={fakeCommentsApi} />
-), {viewport: "desktop"})
-.addDecorator(withViewport())
-.add("user is course admin", () => (
+		commentsApi={fakeCommentsApi}
+	/>
+);
+
+UserIsInstructorWithAccessesViewSubmission.storyName = "user is instructor with accesses view submission";
+UserIsInstructorWithAccessesViewSubmission.parameters = { viewport: "desktop" };
+
+export const UserIsCourseAdmin = () => (
 	<CommentsView
 		slideType={"exercise"}
 		user={user}
 		userRoles={userIsCourseAdmin}
 		slideId={"90bcb61e-57f0-4baa-8bc9-10c9cfd27f58"}
 		courseId={"BasicProgramming"}
-		commentsApi={fakeCommentsApi} />
-), {viewport: "desktop"})
-.addDecorator(withViewport())
-.add("user is sysadmin", () => (
+		commentsApi={fakeCommentsApi}
+	/>
+);
+
+UserIsCourseAdmin.storyName = "user is course admin";
+UserIsCourseAdmin.parameters = { viewport: "desktop" };
+
+export const UserIsSysadmin = () => (
 	<CommentsView
 		slideType={"exercise"}
 		user={user}
 		userRoles={userIsSysAdmin}
 		slideId={"90bcb61e-57f0-4baa-8bc9-10c9cfd27f58"}
 		courseId={"BasicProgramming"}
-		commentsApi={fakeCommentsApi} />
-), {viewport: "desktop"});
+		commentsApi={fakeCommentsApi}
+	/>
+);
+
+UserIsSysadmin.storyName = "user is sysadmin";
+UserIsSysadmin.parameters = { viewport: "desktop" };

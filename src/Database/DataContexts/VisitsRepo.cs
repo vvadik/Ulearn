@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using log4net;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
 
 namespace Database.DataContexts
 {
@@ -71,30 +73,24 @@ namespace Database.DataContexts
 			return db.LastVisits.FirstOrDefault(v => v.CourseId == courseId && v.UserId == userId);
 		}
 
-		public bool IsUserVisitedSlide(string courseId, Guid slideId, string userId)
-		{
-			return FindVisit(courseId, slideId, userId) != null;
-		}
-
 		public HashSet<Guid> GetIdOfVisitedSlides(string courseId, string userId)
 		{
 			return new HashSet<Guid>(db.Visits.Where(v => v.UserId == userId && v.CourseId == courseId).Select(x => x.SlideId));
 		}
 
-		public bool HasVisitedSlides(string courseId, string userId)
+		public Task UpdateScoreForVisit(string courseId, Slide slide, string userId)
 		{
-			return db.Visits.Any(v => v.CourseId == courseId && v.UserId == userId);
-		}
-
-		public Task UpdateScoreForVisit(string courseId, Guid slideId, int maxSlideScore, string userId)
-		{
-			var newScore = slideCheckingsRepo.GetManualScoreForSlide(courseId, slideId, userId) +
-							slideCheckingsRepo.GetAutomaticScoreForSlide(courseId, slideId, userId);
+			var maxSlideScore = slide.MaxScore;
+			var newScore = slide is ExerciseSlide ex
+				? slideCheckingsRepo.GetExerciseSlideScoreAndPercent(courseId, ex, userId).Score
+				: slideCheckingsRepo.GetUserScoreForQuizSlide(courseId, slide.Id, userId);
 			newScore = Math.Min(newScore, maxSlideScore);
-			var isPassed = slideCheckingsRepo.IsSlidePassed(courseId, slideId, userId);
-			log.Info($"Обновляю количество баллов пользователя {userId} за слайд {slideId} в курсе \"{courseId}\". " +
+			var isPassed = slideCheckingsRepo.IsSlidePassed(courseId, slide.Id, userId);
+			if (IsSkipped(courseId, slide.Id, userId))
+				newScore = 0;
+			log.Info($"Обновляю количество баллов пользователя {userId} за слайд {slide.Id} в курсе \"{courseId}\". " +
 					$"Новое количество баллов: {newScore}, слайд пройден: {isPassed}");
-			return UpdateAttempts(courseId, slideId, userId, visit =>
+			return UpdateAttempts(courseId, slide.Id, userId, visit =>
 			{
 				visit.Score = newScore;
 				visit.IsPassed = isPassed;
@@ -157,6 +153,20 @@ namespace Database.DataContexts
 				.Where(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId)
 				.Select(v => v.Score)
 				.FirstOrDefault();
+		}
+
+		public Dictionary<string, int> GetScore(string courseId, Guid slideId, List<string> userIds)
+		{
+			var scores = db.Visits
+				.Where(v => v.CourseId == courseId && v.SlideId == slideId && userIds.Contains(v.UserId))
+				.Select(v => new { v.UserId, v.Score })
+				.ToList()
+				.GroupBy(v => v.UserId)
+				.ToDictionary(v => v.Key, v => v.First().Score);
+			foreach (var userId in userIds)
+				if (!scores.ContainsKey(userId))
+					scores[userId] = 0;
+			return scores;
 		}
 
 		public async Task SkipSlide(string courseId, Guid slideId, string userId)
@@ -239,18 +249,6 @@ namespace Database.DataContexts
 				.AsEnumerable()
 				.GroupBy(v => v.SlideId)
 				.ToDictionary(g => g.Key, g => g.ToList());
-		}
-
-		public IEnumerable<string> GetUsersVisitedAllSlides(string courseId, IImmutableSet<Guid> slidesIds, DateTime periodStart, DateTime periodFinish, IEnumerable<string> usersIds = null)
-		{
-			var slidesCount = slidesIds.Count;
-
-			return GetVisitsInPeriod(courseId, slidesIds, periodStart, periodFinish, usersIds)
-				.Select(v => new { v.UserId, v.SlideId })
-				.Distinct()
-				.GroupBy(v => v.UserId)
-				.Where(g => g.Count() == slidesCount)
-				.Select(g => g.Key);
 		}
 
 		public IEnumerable<string> GetUsersVisitedAllSlides(VisitsFilterOptions options)

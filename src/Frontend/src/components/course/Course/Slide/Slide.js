@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Video, CodeMirror, Text, Image, BlocksWrapper, Spoiler, } from "./Blocks";
+import { Video, CodeMirror, Text, Image, BlocksWrapper, Spoiler, CodeMirrorUncontrolled, } from "./Blocks";
 import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader";
 import blockTypes from "src/components/course/Course/Slide/blockTypes";
 
@@ -14,7 +14,8 @@ import styles from './Slide.less';
 
 const mapTypeToBlock = {
 	[blockTypes.video]: Video,
-	[blockTypes.code]: CodeMirror,
+	[blockTypes.code]: CodeMirrorUncontrolled,
+	[blockTypes.exercise]: CodeMirror,
 	[blockTypes.text]: Text,
 	[blockTypes.tex]: Text,
 	[blockTypes.image]: Image,
@@ -35,7 +36,7 @@ class Slide extends React.Component {
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
-		if(!this.props.slideBlocks || prevProps.slideId !== this.props.slideId) {
+		if(prevProps.slideId !== this.props.slideId) {
 			this.loadSlide();
 		}
 	}
@@ -95,6 +96,7 @@ class Slide extends React.Component {
 	}
 
 	renderSlideBlocks = (slideBlocks, isHiddenSlide) => {
+		const { score, isSkipped } = this.props;
 		this.addAdditionalPropsToBlocks(slideBlocks);
 		const blocksPacks = [];
 
@@ -113,6 +115,8 @@ class Slide extends React.Component {
 							   isBlock={ !onlyOneBlock }
 							   isHidden={ hide }
 							   isHeaderOfHiddenSlide={ i === 0 && isHiddenSlide }
+							   score={ i === 0 ? score : null }
+							   isSkipped={ isSkipped }
 				>
 					{ blocks.map(this.mapBlockToComponent) }
 				</BlocksWrapper>
@@ -129,49 +133,63 @@ class Slide extends React.Component {
 	}
 
 	addAdditionalPropsToBlocks = (slideBlocks) => {
+		const { slideId, courseId, isSkipped, } = this.props;
 		const { autoplay } = queryString.parse(window.location.search);
-		const videoBlocks = slideBlocks.filter(b => b.type === blockTypes.video);
+		let firstVideoBlock = true;
 
-		const firstVideoBlock = videoBlocks[0];
-		if(autoplay && firstVideoBlock) {
-			firstVideoBlock.autoplay = autoplay ? true : false; //autoplay for first video on slide
-		}
+		for (const [i, block] of slideBlocks.entries()) {
+			const type = block.$type;
+			// eslint-disable-next-line default-case
+			switch (type) {
+				case blockTypes.tex: {
+					block.content = this.getContentFromTexLines(block);
+					break;
+				}
+				case blockTypes.spoiler: {
+					const { slideId, isHiddenSlide, } = this.props;
 
-		if(firstVideoBlock && slideBlocks.length === 1) {
-			firstVideoBlock.openAnnotation = true; // only video on slide => open annotation
-		}
+					block.blocksId = slideId; // make spoiler close content on slide change
+					block.isHidden = block.hide;
+					if(i !== 0) {
+						block.isPreviousBlockHidden = slideBlocks[i - 1].hide || false;
+					} else if(isHiddenSlide) {
+						block.isHeaderOfHiddenSlide = true;
+					}
+					if(block.isHidden) {
+						const blocksInHiddenSpoiler = block.blocks.map(b => ({ ...b, hide: true }));
+						block.blocks = this.renderSlideBlocks(JSON.parse(JSON.stringify(blocksInHiddenSpoiler)));
+					} else {
+						block.blocks = this.renderSlideBlocks(JSON.parse(JSON.stringify(block.blocks)));
+					}
+					break;
+				}
+				case blockTypes.video: {
+					blockTypes.isHidden = blockTypes.hide;
 
-		for (const video of videoBlocks) {
-			video.isHidden = video.hide;
+					if(firstVideoBlock) {
+						if(autoplay) {
+							block.autoplay = autoplay ? true : false; //autoplay for first video on slide
+						}
 
-			const index = slideBlocks.findIndex(b => b === video);
+						if(slideBlocks.length === 1) {
+							block.openAnnotation = true; // only video on slide => open annotation
+						}
 
-			video.annotationWithoutBottomPaddigns = !video.hide &&
-				(index < slideBlocks.length - 1
-					? slideBlocks[index + 1].type !== blockTypes.video
-					: true);
-		}
+						firstVideoBlock = false;
+					}
 
-		for (const texBlock of slideBlocks.filter(b => b.type === blockTypes.tex)) {
-			texBlock.content = this.getContentFromTexLines(texBlock);
-		}
-
-		for (const spoiler of slideBlocks.filter(b => b.type === blockTypes.spoiler)) {
-			const index = slideBlocks.findIndex(b => b === spoiler);
-			const { slideId, isHiddenSlide, } = this.props;
-
-			spoiler.blocksId = slideId; // make spoiler close content on slide change
-			spoiler.isHidden = spoiler.hide;
-			if(index !== 0) {
-				spoiler.isPreviousBlockHidden = slideBlocks[index - 1].hide || false;
-			} else if(isHiddenSlide) {
-				spoiler.isHeaderOfHiddenSlide = true;
-			}
-			if(spoiler.isHidden) {
-				const blocksInHiddenSpoiler = spoiler.blocks.map(b => ({ ...b, hide: true }));
-				spoiler.blocks = this.renderSlideBlocks(JSON.parse(JSON.stringify(blocksInHiddenSpoiler)));
-			} else {
-				spoiler.blocks = this.renderSlideBlocks(JSON.parse(JSON.stringify(spoiler.blocks)));
+					blockTypes.annotationWithoutBottomPaddigns = !blockTypes.hide &&
+						(i < slideBlocks.length - 1
+							? slideBlocks[i + 1].type !== blockTypes.video
+							: true);
+					break;
+				}
+				case blockTypes.exercise: {
+					block.slideId = slideId;
+					block.courseId = courseId;
+					block.isSkipped = isSkipped;
+					break;
+				}
 			}
 		}
 	}
@@ -195,8 +213,8 @@ class Slide extends React.Component {
 		return blocksPack;
 	}
 
-	mapElementToBlock = ({ type, hide = false, ...props }) => {
-		const typeInLowerCase = type.toLowerCase();
+	mapElementToBlock = ({ $type, hide = false, ...props }) => {
+		const typeInLowerCase = $type.toLowerCase();
 
 		return {
 			Block: mapTypeToBlock[typeInLowerCase],
@@ -221,6 +239,8 @@ Slide.propTypes = {
 	loadSlide: PropTypes.func.isRequired,
 	showHiddenBlocks: PropTypes.bool,
 	isHiddenSlide: PropTypes.bool,
+	score: PropTypes.object,
+	isSkipped: PropTypes.bool,
 };
 
 Slide.defaultProps = {
@@ -228,7 +248,7 @@ Slide.defaultProps = {
 }
 
 const mapStateToProps = (state, { courseId, slideId, }) => {
-	const { slides } = state;
+	const { slides, } = state;
 	const { slidesByCourses, slideLoading } = slides;
 
 	const props = {

@@ -5,6 +5,7 @@ using Ulearn.Core.Courses.Slides.Blocks;
 namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 {
 	[DataContract]
+	[DisplayName("html")]
 	public class HtmlBlockResponse : IApiSlideBlock
 	{
 		[DefaultValue(false)]
@@ -16,9 +17,6 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 
 		[DataMember(Name = "fromMarkdown")]
 		public bool FromMarkdown { get; set; }
-
-		[DataMember(Name = "type")]
-		public string Type { get; set; } = "html";
 
 		public HtmlBlockResponse(HtmlBlock htmlBlock, bool fromMarkdown)
 		{

@@ -125,11 +125,12 @@ class Course extends Component {
 				loadCourseErrors(courseId);
 		}
 
-		if(!prevProps.progress && progress && !isHijacked && currentSlideInfo) {
+		if(!prevProps.progress && progress && !isHijacked && currentSlideInfo && currentSlideInfo.current) {
 			updateVisitedSlide(courseId, currentSlideInfo.current.id);
 		}
 
-		if((currentSlideId !== prevState.currentSlideId || isStudentMode !== prevProps.isStudentMode) && currentSlideInfo.current.type === SLIDETYPE.exercise && (pageInfo.isNavigationVisible && !pageInfo.isAcceptedSolutions)) {
+		if((currentSlideId !== prevState.currentSlideId || isStudentMode !== prevProps.isStudentMode)
+			&& currentSlideInfo && currentSlideInfo.current && currentSlideInfo.current.type === SLIDETYPE.exercise && (pageInfo.isNavigationVisible && !pageInfo.isAcceptedSolutions)) {
 			if(isStudentMode) {
 				history.push('?version=-1'); //prevent showing task solution
 			} else if(history.location.search === '?version=-1') {
@@ -153,7 +154,7 @@ class Course extends Component {
 			window.scrollTo(0, 0);
 
 			const slideInfo = Course.getSlideInfoById(props.slideId, props.courseInfo);
-			const Page = Course.getOpenedPage(props.slideId, props.courseInfo, slideInfo);
+			const Page = Course.getOpenedPage(props.slideId, props.courseInfo, slideInfo, props.pageInfo);
 			const title = Course.getTitle(slideInfo, Page);
 			if(slideInfo && progress && !isHijacked) {
 				updateVisitedSlide(courseId, slideInfo.current.id);
@@ -175,7 +176,7 @@ class Course extends Component {
 		return defaultState;
 	}
 
-	static getOpenedPage = (slideId, courseInfo, currentSlideInfo) => {
+	static getOpenedPage = (slideId, courseInfo, currentSlideInfo, pageInfo) => {
 		if(slideId === flashcards) {
 			return CourseFlashcardsPage;
 		}
@@ -192,7 +193,9 @@ class Course extends Component {
 			return UnitFlashcardsPage;
 		}
 
-		if(currentSlideInfo && currentSlideInfo.current.type === SLIDETYPE.lesson) {
+		if(currentSlideInfo &&
+			(currentSlideInfo.current.type === SLIDETYPE.lesson
+				|| (currentSlideInfo.current.type === SLIDETYPE.exercise && !pageInfo.isReview))) {
 			return Slide;
 		}
 
@@ -272,7 +275,6 @@ class Course extends Component {
 		const courseAccesses = accessesByCourse[courseId] ? accessesByCourse[courseId] : [];
 		const courseRole = roleByCourse[courseId] ? roleByCourse[courseId] : '';
 		const userRoles = { isSystemAdministrator, courseRole, courseAccesses, };
-
 		return (
 			<main className={ wrapperClassName }>
 				{ (isNavigationVisible || isReview) && title &&
@@ -283,11 +285,14 @@ class Course extends Component {
 				<div className={ styles.slide }>
 					{
 						Page === Slide
-							? <Slide
+							?
+							<Slide
 								slideId={ currentSlideId }
 								courseId={ currentCourseId }
 								showHiddenBlocks={ !isStudentMode }
 								isHiddenSlide={ slideInfo.hide }
+								score={ isNavigationVisible ? score : null }
+								isSkipped={ progress && progress[slideInfo.id] && progress[slideInfo.id].isSkipped }
 							/>
 							: <BlocksWrapper score={ isNavigationVisible ? score : null }>
 								<Page match={ this.props.match }/>

@@ -874,13 +874,13 @@
 		<xs:attribute name="passedTestsScore" type="xs:int" use="optional">
 			<xs:annotation>
 				<xs:documentation xml:lang="en">Score for correct solution (if all tests passed)</xs:documentation>
-				<xs:documentation xml:lang="ru">Количество баллов за верное решение (если прошли все тесты)</xs:documentation>
+				<xs:documentation xml:lang="ru">Количество баллов, автоматически выдающееся за верное решение (если прошли все тесты). Эти баллы могут быть отобраны на ревью преподавателем</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="codeReviewScore" type="xs:int" use="optional">
 			<xs:annotation>
 				<xs:documentation xml:lang="en">Maximum score for code review</xs:documentation>
-				<xs:documentation xml:lang="ru">Максимальное количество баллов за код-ревью</xs:documentation>
+				<xs:documentation xml:lang="ru">Максимальное количество баллов, которое преподаватель может добавить к баллам за верное решение, на код ревью</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="group" type="NonEmptyString" use="optional">

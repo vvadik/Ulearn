@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
+using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
@@ -29,33 +30,38 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly IGroupMembersRepo groupMembersRepo;
 		private readonly IVisitsRepo visitsRepo;
 		private readonly IGroupsRepo groupsRepo;
+		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IUserQuizzesRepo userQuizzesRepo;
 		
 		public ExportController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
-			IGroupMembersRepo groupMembersRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo, IUserQuizzesRepo userQuizzesRepo)
+			IGroupMembersRepo groupMembersRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo, IUserQuizzesRepo userQuizzesRepo,
+			ICourseRolesRepo courseRolesRepo)
 			: base(logger, courseManager, db, usersRepo)
 		{
 			this.groupMembersRepo = groupMembersRepo;
 			this.visitsRepo = visitsRepo;
 			this.groupsRepo = groupsRepo;
 			this.userQuizzesRepo = userQuizzesRepo;
+			this.courseRolesRepo = courseRolesRepo;
 		}
 
 		[HttpGet("users-info-and-results")]
 		[Authorize]
 		public async Task<ActionResult> ExportGroupMembersAsTsv([Required]int groupId, Guid? quizSlideId = null)
 		{
-			var isSystemAdministrator = await IsSystemAdministratorAsync().ConfigureAwait(false);
-			if (!isSystemAdministrator)
-				return StatusCode((int)HttpStatusCode.Forbidden, "You should be system administrator");
-
-			var group = await groupsRepo.FindGroupByIdAsync(groupId, true).ConfigureAwait(false);
+			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
 			if (group == null)
 				return StatusCode((int)HttpStatusCode.NotFound, "Group not found");
-			
+
+			var isSystemAdministrator = await IsSystemAdministratorAsync().ConfigureAwait(false);
+			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, group.CourseId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
+
+			if (!(isSystemAdministrator || isCourseAdmin))
+				return StatusCode((int)HttpStatusCode.Forbidden, "You should be course or system admin");
+
 			var users = await groupMembersRepo.GetGroupMembersAsUsersAsync(groupId).ConfigureAwait(false);
 			var extendedUserInfo = await GetExtendedUserInfo(users).ConfigureAwait(false);
-			
+
 			List<string> questions = null;
 			var courseId = group.CourseId;
 			var course = await courseManager.GetCourseAsync(courseId);

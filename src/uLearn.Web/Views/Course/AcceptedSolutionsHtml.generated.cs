@@ -67,9 +67,6 @@ WriteTo(__razor_helper_writer, MvcHtmlString.Create(model.Slide.Exercise.Comment
 
 WriteLiteralTo(__razor_helper_writer, "</p>\r\n");
 
-WriteLiteralTo(__razor_helper_writer, "\t<p>Изучите решения ваших коллег. Проголосуйте за решения, в которых вы нашли что" +
-"-то новое для себя.</p>\r\n");
-
 	foreach (var solution in model.AcceptedSolutions)
 	{
 		var id = "solution_" + solution.Id;
@@ -77,26 +74,26 @@ WriteLiteralTo(__razor_helper_writer, "\t<p>Изучите решения ваш
 
 WriteLiteralTo(__razor_helper_writer, "\t\t<div");
 
-WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\"", 785), Tuple.Create("\"", 793)
-, Tuple.Create(Tuple.Create("", 790), Tuple.Create<System.Object, System.Int32>(id
-, 790), false)
+WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\"", 679), Tuple.Create("\"", 687)
+, Tuple.Create(Tuple.Create("", 684), Tuple.Create<System.Object, System.Int32>(id
+, 684), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t<button");
 
-WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 807), Tuple.Create("\"", 907)
-, Tuple.Create(Tuple.Create("", 815), Tuple.Create("like-left-location", 815), true)
-, Tuple.Create(Tuple.Create(" ", 833), Tuple.Create("btn", 834), true)
-, Tuple.Create(Tuple.Create(" ", 837), Tuple.Create<System.Object, System.Int32>( solution.LikedAlready ? "btn-primary" : "btn-default"
-, 838), false)
-, Tuple.Create(Tuple.Create(" ", 895), Tuple.Create("like-button", 896), true)
+WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 701), Tuple.Create("\"", 801)
+, Tuple.Create(Tuple.Create("", 709), Tuple.Create("like-left-location", 709), true)
+, Tuple.Create(Tuple.Create(" ", 727), Tuple.Create("btn", 728), true)
+, Tuple.Create(Tuple.Create(" ", 731), Tuple.Create<System.Object, System.Int32>( solution.LikedAlready ? "btn-primary" : "btn-default"
+, 732), false)
+, Tuple.Create(Tuple.Create(" ", 789), Tuple.Create("like-button", 790), true)
 );
 
-WriteAttributeTo(__razor_helper_writer, "onclick", Tuple.Create(" onclick=\"", 908), Tuple.Create("\"", 944)
-, Tuple.Create(Tuple.Create("", 918), Tuple.Create("likeSolution(", 918), true)
-                                                                , Tuple.Create(Tuple.Create("", 931), Tuple.Create<System.Object, System.Int32>(solution.Id
-, 931), false)
-, Tuple.Create(Tuple.Create("", 943), Tuple.Create(")", 943), true)
+WriteAttributeTo(__razor_helper_writer, "onclick", Tuple.Create(" onclick=\"", 802), Tuple.Create("\"", 838)
+, Tuple.Create(Tuple.Create("", 812), Tuple.Create("likeSolution(", 812), true)
+                                                                , Tuple.Create(Tuple.Create("", 825), Tuple.Create<System.Object, System.Int32>(solution.Id
+, 825), false)
+, Tuple.Create(Tuple.Create("", 837), Tuple.Create(")", 837), true)
 );
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t\t<i");
@@ -119,9 +116,9 @@ WriteLiteralTo(__razor_helper_writer, "</span>\r\n\t\t\t</button>\r\n\r\n");
 
 WriteLiteralTo(__razor_helper_writer, "\t\t\t\t<form");
 
-WriteAttributeTo(__razor_helper_writer, "action", Tuple.Create(" action=\"", 1168), Tuple.Create("\"", 1207)
-, Tuple.Create(Tuple.Create("", 1177), Tuple.Create<System.Object, System.Int32>( solution.RemoveSolutionUrl
-, 1177), false)
+WriteAttributeTo(__razor_helper_writer, "action", Tuple.Create(" action=\"", 1062), Tuple.Create("\"", 1101)
+, Tuple.Create(Tuple.Create("", 1071), Tuple.Create<System.Object, System.Int32>( solution.RemoveSolutionUrl
+, 1071), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, " method=\"POST\"");

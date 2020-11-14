@@ -6,19 +6,21 @@ using System.Text;
 using System.Threading.Tasks;
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using Ulearn.Common.Extensions;
 
 namespace Database.Repos
 {
-	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
 	public class TextsRepo : ITextsRepo
 	{
 		private readonly UlearnDb db;
+		private readonly ILogger logger;
 		public const int MaxTextSize = 50000;
 
-		public TextsRepo(UlearnDb db)
+		public TextsRepo(UlearnDb db, ILogger logger)
 		{
 			this.db = db;
+			this.logger = logger;
 		}
 
 		public async Task<TextBlob> AddText(string text)
@@ -34,7 +36,7 @@ namespace Database.Repos
 				text = text.Substring(0, MaxTextSize);
 
 			var hash = GetHash(text);
-			var blob = db.Texts.Find(hash);
+			var blob = await db.Texts.FindAsync(hash);
 			if (blob != null)
 				return blob;
 
@@ -66,7 +68,7 @@ namespace Database.Repos
 			return BitConverter.ToString(byteArray).Replace("-", "");
 		}
 
-		public TextBlob GetText(string hash)
+		public async Task<TextBlob> GetText(string hash)
 		{
 			if (hash == null)
 				return new TextBlob
@@ -74,12 +76,15 @@ namespace Database.Repos
 					Hash = null,
 					Text = null
 				};
-			return db.Texts.Find(hash);
+			return await db.Texts.FindAsync(hash);
 		}
 
-		public Dictionary<string, string> GetTextsByHashes(IEnumerable<string> hashes)
+		public async Task<Dictionary<string, string>> GetTextsByHashes(IEnumerable<string> hashes)
 		{
-			return db.Texts.Where(t => hashes.Contains(t.Hash)).ToDictSafe(t => t.Hash, t => t.Text);
+			return (await db.Texts
+				.Where(t => hashes.Contains(t.Hash))
+				.ToListAsync())
+				.ToDictSafe(t => t.Hash, t => t.Text);
 		}
 	}
 }

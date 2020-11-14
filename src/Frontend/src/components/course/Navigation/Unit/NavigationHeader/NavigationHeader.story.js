@@ -1,15 +1,18 @@
 import React from "react";
-import { storiesOf } from "@storybook/react";
-import NavigationHeader from './NavigationHeader';
+import NavigationHeader from "./NavigationHeader";
 
+export default {
+	title: "ModuleNavigation",
+};
 
-storiesOf("ModuleNavigation", module)
-	.add("Шапка в навигации", () => (
-		<div>
-			<NavigationHeader title='Первое знакомство с C#'
-							  courseName='Основы программирования'
-							  courseUrl='/BasicProgramming'
-			/>
-		</div>
-	));
+export const ШапкаВНавигации = () => (
+	<div>
+		<NavigationHeader
+			title="Первое знакомство с C#"
+			courseName="Основы программирования"
+			courseUrl="/BasicProgramming"
+		/>
+	</div>
+);
 
+ШапкаВНавигации.storyName = "Шапка в навигации";

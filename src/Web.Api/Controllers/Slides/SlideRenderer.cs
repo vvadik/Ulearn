@@ -3,18 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AngleSharp.Html.Parser;
+using Database.Repos;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Ulearn.Common;
-using Ulearn.Core;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Courses.Slides.Flashcards;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
 using Ulearn.Web.Api.Clients;
 using Ulearn.Web.Api.Models.Common;
+using Ulearn.Web.Api.Models.Responses.Exercise;
 using Ulearn.Web.Api.Models.Responses.SlideBlocks;
 
 namespace Ulearn.Web.Api.Controllers.Slides
@@ -23,11 +26,16 @@ namespace Ulearn.Web.Api.Controllers.Slides
 	{
 		private readonly ILogger logger;
 		private readonly IUlearnVideoAnnotationsClient videoAnnotationsClient;
+		private readonly IUserSolutionsRepo solutionsRepo;
+		private readonly ISlideCheckingsRepo slideCheckingsRepo;
 
-		public SlideRenderer(ILogger logger, IUlearnVideoAnnotationsClient videoAnnotationsClient)
+		public SlideRenderer(ILogger logger, IUlearnVideoAnnotationsClient videoAnnotationsClient,
+			IUserSolutionsRepo solutionsRepo, ISlideCheckingsRepo slideCheckingsRepo)
 		{
 			this.logger = logger;
 			this.videoAnnotationsClient = videoAnnotationsClient;
+			this.solutionsRepo = solutionsRepo;
+			this.slideCheckingsRepo = slideCheckingsRepo;
 		}
 
 		public ShortSlideInfo BuildShortSlideInfo(string courseId, Slide slide, Func<Slide, int> getSlideMaxScoreFunc, Func<Slide, string> getGitEditLink, IUrlHelper urlHelper)
@@ -73,9 +81,11 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		public async Task<ApiSlideInfo> BuildSlideInfo(SlideRenderContext slideRenderContext, Func<Slide, int> getSlideMaxScoreFunc, Func<Slide, string> getGitEditLink)
 		{
 			var result = BuildShortSlideInfo<ApiSlideInfo>(slideRenderContext.CourseId, slideRenderContext.Slide, getSlideMaxScoreFunc, getGitEditLink, slideRenderContext.UrlHelper);
+
 			result.Blocks = new List<IApiSlideBlock>();
 			foreach (var b in slideRenderContext.Slide.Blocks)
 				result.Blocks.AddRange(await ToApiSlideBlocks(b, slideRenderContext));
+
 			return result;
 		}
 
@@ -140,6 +150,35 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				: "https://docs.google.com/document/d/" + context.VideoAnnotationsGoogleDoc;
 			var response = new YoutubeBlockResponse(yb, annotation, googleDocLink);
 			return new [] { response };
+		}
+
+		private async Task<IEnumerable<IApiSlideBlock>> RenderBlock(AbstractExerciseBlock b, SlideRenderContext context)
+		{
+			var submissions = await solutionsRepo
+				.GetAllSubmissionsByUser(context.CourseId, context.Slide.Id, context.UserId)
+				.Include(s => s.AutomaticChecking).ThenInclude(c => c.Output)
+				.Include(s => s.AutomaticChecking).ThenInclude(c => c.CompilationError)
+				.Include(s => s.SolutionCode)
+				.Include(s => s.Reviews).ThenInclude(c => c.Author)
+				.Include(s => s.ManualCheckings).ThenInclude(c => c.Reviews).ThenInclude(r => r.Author)
+				.ToListAsync();
+			var codeReviewComments = await slideCheckingsRepo.GetExerciseCodeReviewComments(context.CourseId, context.Slide.Id, context.UserId);
+			var exerciseUsersCount = await slideCheckingsRepo.GetExerciseUsersCount(context.CourseId, context.Slide.Id);
+			var exerciseUsersWithRightAnswerCount = await slideCheckingsRepo.GetExerciseUsersWithRightAnswerCount(context.CourseId, context.Slide.Id);
+			var lastSuccessAttemptDate = await slideCheckingsRepo.GetExerciseLastRightAnswerDate(context.CourseId, context.Slide.Id);
+
+			var exerciseSlideRendererContext = new ExerciseSlideRendererContext
+			{
+				Submissions = submissions,
+				CodeReviewComments = codeReviewComments,
+				AttemptsStatistics = new ExerciseAttemptsStatistics
+				{
+					AttemptedUsersCount = exerciseUsersCount,
+					UsersWithRightAnswerCount = exerciseUsersWithRightAnswerCount,
+					LastSuccessAttemptDate = lastSuccessAttemptDate
+				}
+			};
+			return new[] { new ExerciseBlockResponse(b, exerciseSlideRendererContext) };
 		}
 
 		private static List<IApiSlideBlock> ParseBlocksFromMarkdown(string renderedMarkdown)

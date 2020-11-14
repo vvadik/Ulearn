@@ -10,36 +10,16 @@ import EmailNotConfirmedModal from "src/components/notificationModal/EmailNotCon
 import { emailNotConfirmed } from "src/consts/accountProblems";
 
 import { Provider, connect } from "react-redux";
-import thunkMiddleware from "redux-thunk";
-import { applyMiddleware, createStore, compose, } from "redux";
 
 import Router from "./Router";
 
-import rootReducer from "./redux/reducers";
 import api from "./api";
 import { ThemeContext, Toast } from "ui";
 import theme from "src/uiTheme";
 import queryString from "query-string";
+import configureStore from "src/configureStore";
 
 
-function configureStore() {
-	let env = process.env.NODE_ENV || 'development';
-	let isDevelopment = env === 'development';
-
-	let middlewares;
-	if(isDevelopment) {
-		const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-		middlewares = composeEnhancers(applyMiddleware(thunkMiddleware));
-
-	} else {
-		middlewares = applyMiddleware(thunkMiddleware);
-	}
-
-	return createStore(
-		rootReducer,
-		middlewares
-	)
-}
 
 const store = configureStore();
 

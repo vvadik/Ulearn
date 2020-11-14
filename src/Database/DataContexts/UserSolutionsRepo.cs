@@ -315,94 +315,6 @@ namespace Database.DataContexts
 			return submission;
 		}
 
-		public async Task<UserExerciseSubmission> GetUnhandledSubmission(string agentName, List<string> sandboxes)
-		{
-			try
-			{
-				return await TryGetExerciseSubmission(agentName, sandboxes);
-			}
-			catch (Exception e)
-			{
-				log.Error("GetUnhandledSubmission() error", e);
-				return null;
-			}
-		}
-
-		private static volatile SemaphoreSlim getSubmissionSemaphore = new SemaphoreSlim(1);
-
-		private async Task<UserExerciseSubmission> TryGetExerciseSubmission(string agentName, List<string> sandboxes)
-		{
-			var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
-
-			var submissionsQueryable = db.UserExerciseSubmissions
-				.AsNoTracking()
-				.Where(s =>
-					s.Timestamp > notSoLongAgo
-					&& s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting
-					&& sandboxes.Contains(s.Sandbox));
-
-			var maxId = submissionsQueryable.Select(s => s.Id).DefaultIfEmpty(-1).Max();
-			if (maxId == -1)
-				return null;
-
-			// NOTE: Если транзакция здесь, а не в начале метода, может возникнуть ситуация, что maxId только что кто-то взял, и мы тоже взяли.
-			// То, что мы не обработаем дважды, защищает проверка на Waiting внутри транзакции ниже.
-			// Мы можем не взять из-за этого другой solution. Не стращно, попробуем снова сразу же с помощью WaitAnyUnhandledSubmissions (см. RunnerController.GetSubmissions).
-			// RepeatableRead блокирует от изменения те строки, которые видел.
-			// Serializable отличается от него только тем, что другая транзакция не добавит другую строку, которая тоже будет подходить под запрос, даже после того, как запрос совершен.
-			// Нам важно только, чтобы не менялись виденные в транзакции строки, поэтому подходит RepeatableRead.
-			// Хотя, здесь делается запрос просто по Id, поэтому в любом случае заблокированных строк мало.
-			// Малое количество затронутых строк должно уменьшить возможность дедлоков. Теоретически, если обе прочитают одно и то же и заходят записать, должна сработать одна транзакция и одна откатиться.
-			// Дедлоки всё-таки есть в большом количестве, поэтому поставил Semaphore
-			log.Debug("GetUnhandledSubmission(): trying to acquire semaphore");
-			var semaphoreLocked = await getSubmissionSemaphore.WaitAsync(TimeSpan.FromSeconds(2));
-			if (!semaphoreLocked)
-			{
-				log.Error("TryGetExerciseSubmission(): Can't lock semaphore for 2 seconds");
-				return null;
-			}
-
-			log.Debug("GetUnhandledSubmission(): semaphore acquired!");
-			try
-			{
-				UserExerciseSubmission submission;
-				using (var transaction = db.Database.BeginTransaction(IsolationLevel.RepeatableRead))
-				{
-					submission = db.UserExerciseSubmissions.AsNoTracking().FirstOrDefault(s => s.Id == maxId);
-					if (submission == null)
-						return null;
-
-					if (submission.AutomaticChecking.Status != AutomaticExerciseCheckingStatus.Waiting)
-						return null;
-
-					/* Mark submission as "running" */
-					submission.AutomaticChecking.Status = AutomaticExerciseCheckingStatus.Running;
-					submission.AutomaticChecking.CheckingAgentName = agentName;
-
-					await SaveAll(new List<AutomaticExerciseChecking> { submission.AutomaticChecking }).ConfigureAwait(false);
-
-					transaction.Commit();
-
-					db.ObjectContext().AcceptAllChanges();
-				}
-
-				unhandledSubmissions.TryRemove(submission.Id, out _);
-
-				return submission;
-			}
-			catch (Exception e)
-			{
-				log.Error("TryGetExerciseSubmission() error", e);
-				return null;
-			}
-			finally
-			{
-				log.Debug("GetUnhandledSubmission(): trying to release semaphore");
-				getSubmissionSemaphore.Release();
-				log.Debug("GetUnhandledSubmission(): semaphore released");
-			}
-		}
-
 		public UserExerciseSubmission FindSubmissionById(int id)
 		{
 			return db.UserExerciseSubmissions.Find(id);
@@ -483,11 +395,6 @@ namespace Database.DataContexts
 			var exerciseSlide = isWebRunner ? null : (ExerciseSlide)courseManager.GetCourse(checking.CourseId).GetSlideById(checking.SlideId, true);
 
 			var isRightAnswer = IsRightAnswer(result, output, exerciseSlide?.Exercise);
-			var score = exerciseSlide != null && isRightAnswer ? exerciseSlide.Scoring.PassedTestsScore : 0;
-
-			/* For skipped slides score is always 0 */
-			if (visitsRepo.IsSkipped(checking.CourseId, checking.SlideId, checking.UserId))
-				score = 0;
 
 			var newChecking = new AutomaticExerciseChecking
 			{
@@ -504,7 +411,6 @@ namespace Database.DataContexts
 				DisplayName = checking.DisplayName,
 				Elapsed = DateTime.Now - checking.Timestamp,
 				IsRightAnswer = isRightAnswer,
-				Score = score,
 				CheckingAgentName = checking.CheckingAgentName,
 				Points = result.Points
 			};

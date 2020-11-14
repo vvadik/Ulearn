@@ -17,8 +17,8 @@ namespace Database.Repos.Users
 		Task ConfirmEmail(string userId, bool isConfirmed = true);
 		Task UpdateLastConfirmationEmailTime(ApplicationUser user);
 		Task ChangeEmail(ApplicationUser user, string email);
-		ApplicationUser GetUlearnBotUser();
-		string GetUlearnBotUserId();
+		Task<ApplicationUser> GetUlearnBotUser();
+		Task<string> GetUlearnBotUserId();
 		Task CreateUlearnBotUserIfNotExistsAsync();
 		List<ApplicationUser> FindUsersByUsernameOrEmail(string usernameOrEmail);
 		Task<List<ApplicationUser>> GetUsersByIdsAsync(IEnumerable<string> usersIds);

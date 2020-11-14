@@ -162,7 +162,7 @@ namespace AntiPlagiarism.Web.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SnippetId");
+                    b.HasIndex("SnippetId", "SubmissionId");
 
                     b.HasIndex("SubmissionId", "FirstTokenIndex");
 
@@ -248,7 +248,11 @@ namespace AntiPlagiarism.Web.Migrations
 
                     b.HasIndex("ClientId", "TaskId", "AuthorId");
 
+                    b.HasIndex("ClientId", "TaskId", "AddingTime", "AuthorId");
+
                     b.HasIndex("ClientId", "TaskId", "Language", "AuthorId");
+
+                    b.HasIndex("ClientId", "TaskId", "AddingTime", "Language", "AuthorId");
 
                     b.ToTable("Submissions");
                 });

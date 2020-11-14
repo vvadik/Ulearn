@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Ulearn.Common.Api.Models.Responses;
 
-namespace Ulearn.Web.Api.Models.Responses.User
+namespace Ulearn.Web.Api.Models.Responses.Users
 {
 	[DataContract]
 	public class UsersProgressResponse : SuccessResponse
@@ -29,5 +29,6 @@ namespace Ulearn.Web.Api.Models.Responses.User
 		public int UsedAttempts { get; set; }
 		public bool IsWaitingForManualChecking { get; set; }
 		public bool Visited { get; set; }
+		public bool IsSkipped { get; set; }
 	}
 }

@@ -5,6 +5,7 @@ using Ulearn.Core.Courses.Slides.Blocks;
 namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 {
 	[DataContract]
+	[DisplayName("imageGallery")]
 	public class ImageGalleryBlockResponse : IApiSlideBlock
 	{
 		[DefaultValue(false)]
@@ -13,9 +14,6 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 
 		[DataMember(Name = "imageUrls")]
 		public string[] ImageUrls { get; set; }
-
-		[DataMember(Name = "type")]
-		public string Type { get; set; } = "imageGallery";
 
 		public ImageGalleryBlockResponse(ImageGalleryBlock texBlock)
 		{

@@ -11,20 +11,20 @@ import { getQueryStringParameter } from "./utils";
 
 function Router({ account }) {
 	let routes = [
-		<Route path="/Admin/Groups" component={ redirectLegacyPage("/:courseId/groups") }/>,
-		<Route path="/course/:courseId/:slideSlugOrAction" component={ Course }/>,
+		<Route key={'groups'} path="/Admin/Groups" component={ redirectLegacyPage("/:courseId/groups") }/>,
+		<Route key={'course'} path="/course/:courseId/:slideSlugOrAction" component={ Course }/>,
 	];
 
 	if(account.accountLoaded) {
 		if(account.isAuthenticated) {
 			routes = [
 				...routes,
-				<Route path="/:courseId/groups/" component={ GroupListPage } exact/>,
-				<Route path="/:courseId/groups/:groupId/" component={ GroupPage } exact/>,
-				<Route path="/:courseId/groups/:groupId/:groupPage" component={ GroupPage } exact/>,
+				<Route key={'groupsList'} path="/:courseId/groups/" component={ GroupListPage } exact/>,
+				<Route key={'groupPage'} path="/:courseId/groups/:groupId/" component={ GroupPage } exact/>,
+				<Route key={'groupPageSettings'} path="/:courseId/groups/:groupId/:groupPage" component={ GroupPage } exact/>,
 			];
 		}
-		routes.push(<Route component={ AnyPage }/>);
+		routes.push(<Route key={'anyPage'} component={ AnyPage }/>);
 	}
 
 	return (

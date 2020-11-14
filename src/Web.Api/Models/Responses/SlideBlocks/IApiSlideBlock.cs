@@ -3,6 +3,5 @@
 	public interface IApiSlideBlock
 	{
 		bool Hide { get; set; }
-		string Type { get; set; }
 	}
 }

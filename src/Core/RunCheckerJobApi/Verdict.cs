@@ -10,7 +10,7 @@
 		CompilationError = 2,
 		RuntimeError = 3,
 		SecurityException = 4,
-		SandboxError = 5,
+		SandboxError = 5, // Означает ошибку чеккера при проверке, как внутри сандбокса, так и при работе самого RunCheckerJob
 		OutputLimit = 6,
 		TimeLimit = 7,
 		MemoryLimit = 8,
