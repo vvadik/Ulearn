@@ -318,6 +318,7 @@
 			<xs:element name="exercise.csproj" type="ProjectExercise" />
 			<xs:element name="exercise.file" type="SingleFileExercise" />
 			<xs:element name="exercise.universal" type="UniversalExercise" />
+			<xs:element name="exercise.polygon" type="PolygonExercise" />
 		</xs:choice>
 	</xs:group>
 
@@ -643,6 +644,25 @@
 					<xs:annotation>
 						<xs:documentation>
 							Не отдавать zip-файл проекта студенту
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="PolygonExercise">
+		<xs:complexContent>
+			<xs:extension base="IncludeCode">
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="hint" type="StringWithXmlSpaces" minOccurs="1" maxOccurs="1" />
+					<xs:element name="hideSolutions" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+					<xs:element name="checkForPlagiarism" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+				</xs:choice>
+				<xs:attribute name="exerciseDirName" type="NonEmptyString" use="required">
+					<xs:annotation>
+						<xs:documentation>
+							Путь до папки с задачей относительно директории с xml-файлом описания юнита.
 						</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
