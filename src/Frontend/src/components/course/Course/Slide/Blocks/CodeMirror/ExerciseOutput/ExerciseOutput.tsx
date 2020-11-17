@@ -9,7 +9,7 @@ import {
 	AutomaticExerciseCheckingProcessStatus as ProcessStatus,
 	ExerciseAutomaticCheckingResponse,
 	SolutionRunStatus
-} from "../../../../../../../models/exercise";
+} from "src/models/exercise";
 
 enum OutputType {
 	CompilationError = "CompilationError",

@@ -6,7 +6,7 @@ import {
 	AutomaticExerciseCheckingResult as CheckingResult,
 	AutomaticExerciseCheckingProcessStatus as ProcessStatus,
 	SolutionRunStatus
-} from "../../../../../../../models/exercise";
+} from "src/models/exercise";
 
 export default {
 	title: 'Exercise/ExerciseOutput'
