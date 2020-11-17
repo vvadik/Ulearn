@@ -21,6 +21,7 @@ module.exports = {
 				test: /\.less$/,
 				use: [
 					'style-loader',
+					'@teamsupercell/typings-for-css-modules-loader',
 					{
 						loader: 'css-loader',
 						options: {
@@ -38,6 +39,7 @@ module.exports = {
 				test: /\.module\.css$/,
 				use: [
 					'style-loader',
+					'@teamsupercell/typings-for-css-modules-loader',
 					{
 						loader: 'css-loader',
 						options: {

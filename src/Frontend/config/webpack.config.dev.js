@@ -78,6 +78,7 @@ module.exports = merge(base, {
 						test: /\.less$/,
 						use: [
 							'style-loader',
+							'@teamsupercell/typings-for-css-modules-loader',
 							{
 								loader: 'css-loader',
 								options: {
@@ -95,6 +96,7 @@ module.exports = merge(base, {
 						test: /\.css$/,
 						use: [
 							'style-loader',
+							'@teamsupercell/typings-for-css-modules-loader',
 							{
 								loader: 'css-loader',
 								options: {
@@ -142,7 +144,7 @@ module.exports = merge(base, {
 		new webpack.HotModuleReplacementPlugin(),
 		new CaseSensitivePathsPlugin(),
 		new WatchMissingNodeModulesPlugin(paths.appNodeModules),
-		new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+		new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/, /\.less\.d\.ts$/, /\.css\.d\.ts$/),
 	],
 	performance: {
 		hints: false,
