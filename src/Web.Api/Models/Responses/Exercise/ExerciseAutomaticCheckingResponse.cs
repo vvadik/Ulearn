@@ -36,9 +36,6 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 		[DataMember]
 		public string Output;
 
-		[DataMember]
-		public float? Points;
-
 		[CanBeNull]
 		[DataMember]
 		public List<ReviewInfo> Reviews;
@@ -72,7 +69,6 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 				return result;
 			}
 			result.Result = checking.IsRightAnswer ? AutomaticExerciseCheckingResult.RightAnswer : AutomaticExerciseCheckingResult.WrongAnswer;
-			result.Points = checking.Points;
 			result.Reviews = botReviews;
 			return result;
 		}

@@ -18,7 +18,7 @@ import {
 	putFlashcardStatus,
 } from '../api/flashcards';
 import { sendCodeReviewComment, } from "src/api/exercise";
-import { solutionRunStatuses } from "../consts/exercise";
+import { SolutionRunStatus } from "src/models/exercise.ts";
 
 export const changeCurrentCourseAction = (courseId) => ({
 	type: COURSES__COURSE_ENTERED,
@@ -214,7 +214,7 @@ export const sendCode = (courseId, slideId, code,) => {
 			})
 			.catch(err => {
 				const result = {
-					solutionRunStatus: solutionRunStatuses.internalServerError,
+					solutionRunStatus: SolutionRunStatus.InternalServerError,
 					message: err.message,
 					submission: null,
 					score: null,

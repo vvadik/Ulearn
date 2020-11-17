@@ -17,7 +17,10 @@ import { connect } from "react-redux";
 import { sendCode, addReviewComment, } from "src/actions/course";
 
 import { constructPathToAcceptedSolutions, } from "src/consts/routes";
-import { checkingResults, processStatuses, solutionRunStatuses } from "src/consts/exercise";
+import {
+	AutomaticExerciseCheckingResult as CheckingResult,
+	AutomaticExerciseCheckingProcessStatus as ProcessStatus,
+	SolutionRunStatus } from "src/models/exercise.ts";
 import { isMobile, isTablet, } from "src/utils/getDeviceType";
 import { userType } from "src/components/comments/commonPropTypes";
 
@@ -129,12 +132,12 @@ class CodeMirror extends React.Component {
 				});
 			}
 
-			if(solutionRunStatus === solutionRunStatuses.success) {
+			if(solutionRunStatus === SolutionRunStatus.Success) {
 				const { automaticChecking } = submission;
 
 				if(automaticChecking) {
-					if(automaticChecking.processStatus === processStatuses.done) {
-						if(automaticChecking.result === checkingResults.rightAnswer) {
+					if(automaticChecking.processStatus === ProcessStatus.Done) {
+						if(automaticChecking.result === CheckingResult.RightAnswer) {
 							this.openModal({ // TODO вроде не показываем модалку, если уже было решено ранее?
 								score,
 								waitingForManualChecking,
@@ -281,7 +284,7 @@ class CodeMirror extends React.Component {
 				{ this.renderControls() }
 				{ showOutput && HasOutput(visibleCheckingResponse?.message, automaticChecking, expectedOutput) &&
 				<ExerciseOutput
-					solutionRunStatus={ visibleCheckingResponse?.solutionRunStatus ?? solutionRunStatuses.success }
+					solutionRunStatus={ visibleCheckingResponse?.solutionRunStatus ?? SolutionRunStatus.Success }
 					message={ visibleCheckingResponse?.message }
 					expectedOutput={ expectedOutput }
 					automaticChecking={ automaticChecking }
@@ -326,7 +329,7 @@ class CodeMirror extends React.Component {
 	renderHeader = () => {
 		const { automaticChecking, } = this.state.currentSubmission;
 
-		if(automaticChecking.result === checkingResults.rightAnswer) {
+		if(automaticChecking.result === CheckingResult.RightAnswer) {
 			return (
 				<div className={ styles.successHeader }>
 					{ texts.headers.allTestPassedHeader }
@@ -862,8 +865,8 @@ class CodeMirror extends React.Component {
 	}
 
 	isSubmitResultsContainsError = ({ automaticChecking }) => {
-		return automaticChecking.result === checkingResults.compilationError
-			|| automaticChecking.result === checkingResults.wrongAnswer;
+		return automaticChecking.result === CheckingResult.CompilationError
+			|| automaticChecking.result === CheckingResult.WrongAnswer;
 	}
 
 	onBeforeChange = (editor, data, value) => {
@@ -1005,7 +1008,7 @@ const mapStateToProps = (state, { courseId, slideId, }) => {
 	const submissions = Object.values(submissionsByCourses[courseId][slideId])
 		.filter((s, i, arr) =>
 			(i === arr.length - 1)
-			|| (!s.automaticChecking || s.automaticChecking.result === checkingResults.rightAnswer))
+			|| (!s.automaticChecking || s.automaticChecking.result === CheckingResult.RightAnswer))
 		.map(s => ({ ...s, caption: texts.submissions.getSubmissionCaption(s) }));
 
 	//newer is first

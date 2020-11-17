@@ -2,7 +2,11 @@
 import type { Story } from "@storybook/react";
 import { ExerciseOutput, OutputTypeProps } from "./ExerciseOutput";
 
-import { checkingResults, processStatuses, solutionRunStatuses } from "src/consts/exercise.js";
+import {
+	AutomaticExerciseCheckingResult as CheckingResult,
+	AutomaticExerciseCheckingProcessStatus as ProcessStatus,
+	SolutionRunStatus
+} from "../../../../../../../models/exercise";
 
 export default {
 	title: 'Exercise/ExerciseOutput'
@@ -12,7 +16,7 @@ const Template: Story<OutputTypeProps> = (args) => <ExerciseOutput { ...args } /
 
 export const SolutionRunStatusCompilationError = Template.bind({});
 SolutionRunStatusCompilationError.args = {
-	solutionRunStatus: solutionRunStatuses.compilationError,
+	solutionRunStatus: SolutionRunStatus.CompilationError,
 	message: "Как минимум один из тестов не пройден!\n"
 		+ "Название теста: MoveManipulatorTo_ActuallyBringsManipulatorToDesiredLocation(-207.950052059698d,109.42692431548d,62.2635171658309d)\n"
 		+ "Сообщение:\n"
@@ -24,7 +28,7 @@ SolutionRunStatusCompilationError.args = {
 
 export const SolutionRunStatusInternalServerError = Template.bind({});
 SolutionRunStatusInternalServerError.args = {
-	solutionRunStatus: solutionRunStatuses.internalServerError,
+	solutionRunStatus: SolutionRunStatus.InternalServerError,
 	message: "InternalServerError text",
 	expectedOutput: null,
 	automaticChecking: null
@@ -32,36 +36,39 @@ SolutionRunStatusInternalServerError.args = {
 
 export const SolutionRunStatusSuccess = Template.bind({});
 SolutionRunStatusSuccess.args = {
-	solutionRunStatus: solutionRunStatuses.success,
+	solutionRunStatus: SolutionRunStatus.Success,
 	message: null,
 	expectedOutput: null,
 	automaticChecking: {
 		output: "Success text",
-		processStatus: processStatuses.done,
-		checkingResults: checkingResults.rightAnswer
+		processStatus: ProcessStatus.Done,
+		result: CheckingResult.RightAnswer,
+		reviews: null
 	}
 };
 
 export const SolutionRunStatusCompilationErrorFromChecker = Template.bind({});
 SolutionRunStatusCompilationErrorFromChecker.args = {
-	solutionRunStatus: solutionRunStatuses.success,
+	solutionRunStatus: SolutionRunStatus.Success,
 	message: null,
 	expectedOutput: null,
 	automaticChecking: {
 		output: "CompilationError text",
-		processStatus: processStatuses.done,
-		checkingResults: checkingResults.compilationError
+		processStatus: ProcessStatus.Done,
+		result: CheckingResult.CompilationError,
+		reviews: null
 	}
 };
 
 export const TableWrongAnswer = Template.bind({});
 TableWrongAnswer.args = {
-	solutionRunStatus: solutionRunStatuses.success,
+	solutionRunStatus: SolutionRunStatus.Success,
 	message: null,
 	expectedOutput: "1\n2\n      3\nНазвание теста: MoveManipulatorTo_ActuallyBringsManipulatorToDesiredLocation(-207.950052059698d,109.42692431548d,62.2635171658309d)",
 	automaticChecking: {
 		output: "3\n2\n3",
-		processStatus: processStatuses.done,
-		result: checkingResults.wrongAnswer
+		processStatus: ProcessStatus.Done,
+		result: CheckingResult.WrongAnswer,
+		reviews: null
 	}
 };

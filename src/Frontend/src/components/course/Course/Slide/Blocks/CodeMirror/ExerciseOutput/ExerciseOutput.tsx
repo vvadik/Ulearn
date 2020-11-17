@@ -1,10 +1,15 @@
 ﻿import React from "react";
 
 import { Warning } from "@skbkontur/react-icons";
-import { checkingResults, processStatuses, solutionRunStatuses } from "src/consts/exercise.js";
 
 import texts from "./ExerciseOutput.texts";
 import styles from "./ExerciseOutput.less";
+import {
+	AutomaticExerciseCheckingResult as CheckingResult,
+	AutomaticExerciseCheckingProcessStatus as ProcessStatus,
+	ExerciseAutomaticCheckingResponse,
+	SolutionRunStatus
+} from "../../../../../../../models/exercise";
 
 enum OutputType {
 	CompilationError = "CompilationError",
@@ -22,24 +27,24 @@ const outputTypeToStyleAndHeader: EnumDictionary<OutputType, { style: string, he
 	[OutputType.Success]: { style: styles.output, header: texts.headers.output },
 }
 
-function HasOutput(message: string, automaticChecking: any, expectedOutput: string): boolean {
+function HasOutput(message: string, automaticChecking: ExerciseAutomaticCheckingResponse, expectedOutput: string): boolean {
 	if(message)
 		return true;
 	if(!automaticChecking)
 		return false;
-	return automaticChecking.output
-		|| (automaticChecking.checkingResults === checkingResults.wrongAnswer && expectedOutput)
+	return !!automaticChecking.output
+		|| (automaticChecking.result === CheckingResult.WrongAnswer && !!expectedOutput)
 }
 
 interface OutputTypeProps {
 	solutionRunStatus: string, // Success, если не посылка прямо сейчас
 	message: string | null,
 	expectedOutput: string | null,
-	automaticChecking: any | null
+	automaticChecking: ExerciseAutomaticCheckingResponse | null
 }
 
 class ExerciseOutput extends React.Component<OutputTypeProps> {
-	render() {
+	render(): React.ReactNode {
 		const { expectedOutput } = this.props;
 		const { outputType, body } = this.getOutputTypeAndBody();
 		const { style, header } = outputTypeToStyleAndHeader[outputType];
@@ -63,19 +68,19 @@ class ExerciseOutput extends React.Component<OutputTypeProps> {
 		);
 	}
 
-	getOutputTypeAndBody() {
+	getOutputTypeAndBody(): { outputType: OutputType, body: string | null } {
 		const { solutionRunStatus, message, automaticChecking } = this.props;
 		switch (solutionRunStatus) {
-			case solutionRunStatuses.compilationError:
+			case SolutionRunStatus.CompilationError:
 				return { outputType: OutputType.CompilationError, body: message };
-			case solutionRunStatuses.submissionCheckingTimeout:
-			case solutionRunStatuses.ignored:
+			case SolutionRunStatus.SubmissionCheckingTimeout:
+			case SolutionRunStatus.Ignored:
 				return { outputType: OutputType.ServerMessage, body: message }
-			case solutionRunStatuses.internalServerError:
+			case SolutionRunStatus.InternalServerError:
 				return { outputType: OutputType.ServerError, body: message }
-			case solutionRunStatuses.success:
+			case SolutionRunStatus.Success:
 				if(automaticChecking) {
-					return this.getOutputTypeAndBodyFromAutomaticChecking();
+					return ExerciseOutput.getOutputTypeAndBodyFromAutomaticChecking(automaticChecking);
 				} else {
 					console.error(new Error(`automaticChecking is null when solutionRunStatuses is ${ solutionRunStatus }`));
 					return { outputType: OutputType.Success, body: message }
@@ -86,24 +91,24 @@ class ExerciseOutput extends React.Component<OutputTypeProps> {
 		}
 	}
 
-	getOutputTypeAndBodyFromAutomaticChecking(): { outputType: OutputType, body: string | null } {
-		const { automaticChecking } = this.props;
+	static getOutputTypeAndBodyFromAutomaticChecking(automaticChecking: ExerciseAutomaticCheckingResponse)
+		: { outputType: OutputType, body: string | null } {
 		let outputType: OutputType;
 		const output = automaticChecking.output;
 		switch (automaticChecking.processStatus) {
-			case processStatuses.done:
-				outputType = this.getOutputTypeByCheckingResults();
+			case ProcessStatus.Done:
+				outputType = ExerciseOutput.getOutputTypeByCheckingResults(automaticChecking);
 				break;
-			case processStatuses.serverError:
+			case ProcessStatus.ServerError:
 				outputType = OutputType.ServerError;
 				break;
-			case processStatuses.waiting:
+			case ProcessStatus.Waiting:
 				outputType = OutputType.ServerMessage;
 				break;
-			case processStatuses.running:
+			case ProcessStatus.Running:
 				outputType = OutputType.ServerMessage;
 				break;
-			case processStatuses.waitingTimeLimitExceeded:
+			case ProcessStatus.WaitingTimeLimitExceeded:
 				outputType = OutputType.ServerError;
 				break;
 			default:
@@ -113,16 +118,15 @@ class ExerciseOutput extends React.Component<OutputTypeProps> {
 		return { outputType: outputType, body: output }
 	}
 
-	getOutputTypeByCheckingResults(): OutputType {
-		const { automaticChecking } = this.props;
+	static getOutputTypeByCheckingResults(automaticChecking: ExerciseAutomaticCheckingResponse): OutputType {
 		switch (automaticChecking.result) {
-			case checkingResults.compilationError:
+			case CheckingResult.CompilationError:
 				return OutputType.CompilationError;
-			case checkingResults.wrongAnswer:
+			case CheckingResult.WrongAnswer:
 				return OutputType.WrongAnswer;
-			case checkingResults.rightAnswer:
+			case CheckingResult.RightAnswer:
 				return OutputType.Success;
-			case checkingResults.notChecked:
+			case CheckingResult.NotChecked:
 				return OutputType.ServerMessage;
 			default:
 				console.error(new Error(`checkingResults has unknown value ${ automaticChecking.result }`));
@@ -130,7 +134,7 @@ class ExerciseOutput extends React.Component<OutputTypeProps> {
 		}
 	}
 
-	static renderSimpleTextOutput(output: string) {
+	static renderSimpleTextOutput(output: string): React.ReactNode {
 		const lines = output.split('\n');
 		return <div className={ styles.outputTextWrapper }>
 			{ lines.map((text, i) =>
@@ -141,7 +145,7 @@ class ExerciseOutput extends React.Component<OutputTypeProps> {
 		</div>
 	}
 
-	static renderOutputLines(output: string, expectedOutput: string) {
+	static renderOutputLines(output: string, expectedOutput: string): React.ReactNode {
 		const actualOutputLines = output.match(/[^\r\n]+/g) ?? [];
 		const expectedOutputLines = expectedOutput.match(/[^\r\n]+/g) ?? [];
 		const length = Math.max(actualOutputLines.length, expectedOutputLines.length);

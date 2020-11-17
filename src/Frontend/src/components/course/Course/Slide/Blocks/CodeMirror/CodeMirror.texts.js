@@ -1,7 +1,7 @@
 import React from "react";
 
 import getPluralForm from "src/utils/getPluralForm";
-import { checkingResults } from "src/consts/exercise";
+import { AutomaticExerciseCheckingResult as CheckingResult } from "src/models/exercise.ts";
 
 import moment from "moment";
 import { convertDefaultTimezoneToLocal } from "src/utils/getMoment";
@@ -21,7 +21,7 @@ const texts = {
 			if(automaticChecking) {
 				const { result } = automaticChecking;
 
-				if(result === checkingResults.compilationError || result === checkingResults.wrongAnswer) {
+				if(result === CheckingResult.CompilationError || result === CheckingResult.WrongAnswer) {
 					return timestampCaption + ` (${ result })`;
 				}
 			}
