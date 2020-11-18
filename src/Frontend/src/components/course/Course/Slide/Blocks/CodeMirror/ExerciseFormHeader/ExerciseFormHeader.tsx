@@ -106,10 +106,10 @@ class ExerciseFormHeader extends React.Component<ExerciseFormHeaderProps> {
 			return { style: styles.successHeader, text: texts.allTestPassedWasReviewed };
 		}
 		if(waitingForManualChecking) {
-			return { style: styles.header, text: texts.allTestPassedPendingReview };
+			return { style: styles.successHeader, text: texts.allTestPassedPendingReview };
 		}
 		if(prohibitFurtherManualChecking) {
-			return { style: styles.header, text: texts.noTestsProhibitFurtherReview };
+			return { style: styles.successHeader, text: texts.allTestPassedProhibitFurtherReview };
 		}
 		if(isLastSubmission) {
 			return { style: styles.successHeader, text: texts.allTestPassedNoReview };

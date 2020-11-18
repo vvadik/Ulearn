@@ -20,17 +20,18 @@ const loadUserProgressFail = () => ({
 	type: USER__PROGRESS_LOAD + FAIL,
 });
 
-const userProgressUpdateAction = (courseId, slideId) => ({
+export const userProgressUpdateAction = (courseId, slideId, fieldsToUpdate) => ({
 	type: USER__PROGRESS_UPDATE,
 	courseId,
 	slideId,
+	fieldsToUpdate
 });
 
 export const userProgressUpdate = (courseId, slideId) => {
 	courseId = courseId.toLowerCase();
 
 	return (dispatch) => {
-		dispatch(userProgressUpdateAction(courseId, slideId));
+		dispatch(userProgressUpdateAction(courseId, slideId, { visited: true }));
 		updateUserProgressInCourse(courseId, slideId)
 			.catch(err => {
 				console.error(err); // TODO rozentor handle error

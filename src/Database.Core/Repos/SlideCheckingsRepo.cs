@@ -518,6 +518,17 @@ namespace Database.Repos
 				.ToDictionary(g => g.Key, g => g.Select(c => c.SlideId).ToList());
 		}
 
+		public async Task<Dictionary<string, List<Guid>>> GetProhibitFurtherManualCheckingSlides(string courseId, IEnumerable<string> userIds)
+		{
+			return (await db.ManualExerciseCheckings
+					.Where(c => c.CourseId == courseId && userIds.Contains(c.UserId) && c.ProhibitFurtherManualCheckings)
+					.Select(c => new {c.UserId, c.SlideId})
+					.Distinct()
+					.ToListAsync())
+				.GroupBy(c => c.UserId)
+				.ToDictionary(g => g.Key, g => g.Select(c => c.SlideId).ToList());
+		}
+
 		public async Task HideFromTopCodeReviewComments(string courseId, Guid slideId, string userId, string comment)
 		{
 			var reviews = await db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)

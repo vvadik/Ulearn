@@ -11,6 +11,7 @@ import {
 	START, SUCCESS, FAIL,
 } from "../consts/actions";
 
+import { userProgressUpdateAction } from "./userProgress";
 import { getCourse, getCourseErrors } from 'src/api/courses';
 import { getSlide, submitCode, } from "src/api/slides";
 import {
@@ -211,18 +212,36 @@ export const sendCode = (courseId, slideId, code,) => {
 		submitCode(courseId, slideId, code,)
 			.then(r => {
 				dispatch(addSubmissionAction(courseId, slideId, r));
+				updateUserProgress(r, dispatch);
 			})
 			.catch(err => {
 				const result = {
 					solutionRunStatus: SolutionRunStatus.InternalServerError,
 					message: err.message,
 					submission: null,
-					score: null,
-					waitingForManualChecking: null
 				}
 				dispatch(addSubmissionAction(courseId, slideId, result));
 			});
 	};
+
+	function updateUserProgress(r, dispatch) {
+		let fieldsToUpdate = {};
+		if(r.score != null) {
+			fieldsToUpdate = { ...fieldsToUpdate, score: r.score };
+		}
+		if(r.waitingForManualChecking != null) {
+			fieldsToUpdate = { ...fieldsToUpdate, waitingForManualChecking: r.waitingForManualChecking };
+		}
+		if(r.prohibitFurtherManualChecking != null) {
+			fieldsToUpdate = {
+				...fieldsToUpdate,
+				prohibitFurtherManualChecking: r.prohibitFurtherManualChecking
+			};
+		}
+		if(Object.keys(fieldsToUpdate).length > 0) {
+			dispatch(userProgressUpdateAction(courseId, slideId, fieldsToUpdate));
+		}
+	}
 }
 
 export const addReviewComment = (courseId, slideId, submissionId, reviewId, comment,) => {

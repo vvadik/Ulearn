@@ -39,7 +39,7 @@ export default function userProgressReducer(state = initialState, action) {
 						...state.progress[action.courseId],
 						[action.slideId]: {
 							...state.progress[action.courseId][action.slideId],
-							visited: true,
+							...action.fieldsToUpdate
 						},
 					},
 				}

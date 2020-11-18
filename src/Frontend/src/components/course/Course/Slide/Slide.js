@@ -187,7 +187,6 @@ class Slide extends React.Component {
 				case blockTypes.exercise: {
 					block.slideId = slideId;
 					block.courseId = courseId;
-					block.isSkipped = isSkipped;
 					break;
 				}
 			}

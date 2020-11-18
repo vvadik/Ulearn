@@ -12,23 +12,31 @@ namespace Ulearn.Web.Api.Models.Responses.Users
 		/* Dictionary<userId, Dictionary<slideId, slideProgress>> */
 		public Dictionary<string, UserProgress> UserProgress { get; set; }
 	}
-	
+
 	[DataContract]
 	public class UserProgress
 	{
 		[DataMember]
 		public Dictionary<Guid, UserProgressSlideResult> VisitedSlides { get; set; }
-		
+
 		[DataMember]
 		public Dictionary<Guid, Dictionary<string, int>> AdditionalScores { get; set; }
 	}
 
+	[DataContract]
 	public class UserProgressSlideResult
 	{
+		[DataMember]
 		public int Score { get; set; }
+		[DataMember]
 		public int UsedAttempts { get; set; }
+		[DataMember]
 		public bool IsWaitingForManualChecking { get; set; }
+		[DataMember]
+		public bool ProhibitFurtherManualChecking { get; set; }
+		[DataMember]
 		public bool Visited { get; set; }
+		[DataMember]
 		public bool IsSkipped { get; set; }
 	}
 }
