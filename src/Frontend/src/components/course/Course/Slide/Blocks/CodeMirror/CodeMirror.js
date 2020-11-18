@@ -8,6 +8,7 @@ import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent";
 import { Lightbulb, Refresh, EyeOpened, DocumentLite, } from "icons";
 import CongratsModal from "./CongratsModal/CongratsModal";
 import { ExerciseOutput, HasOutput } from "./ExerciseOutput/ExerciseOutput.tsx";
+import { ExerciseFormHeader } from "./ExerciseFormHeader/ExerciseFormHeader";
 import { ThemeContext } from "@skbkontur/react-ui/index";
 
 import PropTypes from 'prop-types';
@@ -20,7 +21,8 @@ import { constructPathToAcceptedSolutions, } from "src/consts/routes";
 import {
 	AutomaticExerciseCheckingResult as CheckingResult,
 	AutomaticExerciseCheckingProcessStatus as ProcessStatus,
-	SolutionRunStatus } from "src/models/exercise.ts";
+	SolutionRunStatus
+} from "src/models/exercise.ts";
 import { isMobile, isTablet, } from "src/utils/getDeviceType";
 import { userType } from "src/components/comments/commonPropTypes";
 
@@ -258,7 +260,7 @@ class CodeMirror extends React.Component {
 		return (
 			<React.Fragment>
 				{ submissions.length !== 0 && this.renderSubmissionsSelect() }
-				{ !isEditable && currentSubmission && this.renderHeader() }
+				{ !isEditable && this.renderHeader() }
 				<div className={ wrapperClassName }>
 					<Controlled
 						onBeforeChange={ this.onBeforeChange }
@@ -282,7 +284,7 @@ class CodeMirror extends React.Component {
 				{ !isEditable && this.renderEditButton() }
 				{/* TODO not included in current release !isEditable && currentSubmission && this.renderOverview(currentSubmission)*/ }
 				{ this.renderControls() }
-				{ showOutput && HasOutput(visibleCheckingResponse?.message, automaticChecking, expectedOutput) &&
+				{ showOutput && HasOutput(visibleCheckingResponse?.message, automaticChecking, expectedOutput) && // TODO показывать вывод в случае статуса процесса и эта последняя посылка
 				<ExerciseOutput
 					solutionRunStatus={ visibleCheckingResponse?.solutionRunStatus ?? SolutionRunStatus.Success }
 					message={ visibleCheckingResponse?.message }
@@ -327,17 +329,22 @@ class CodeMirror extends React.Component {
 	}
 
 	renderHeader = () => {
-		const { automaticChecking, } = this.state.currentSubmission;
-
-		if(automaticChecking.result === CheckingResult.RightAnswer) {
-			return (
-				<div className={ styles.successHeader }>
-					{ texts.headers.allTestPassedHeader }
-				</div>
-			);
-		}
-
-		return null;
+		const { currentSubmission, visibleCheckingResponse, } = this.state;
+		const { submissions, waitingForManualChecking, prohibitFurtherManualChecking } = this.props;
+		if(!currentSubmission && !visibleCheckingResponse)
+			return null;
+		const thisSubmissionWaitingForManualChecking = false;
+		const updatedProhibitFurtherManualChecking = false;
+		const selectedSubmissionIsLast = submissions[submissions.length - 1] === currentSubmission;
+		return (
+			<ExerciseFormHeader
+				checkingResponse={ visibleCheckingResponse }
+				selectedSubmission={ currentSubmission }
+				waitingForManualChecking={ thisSubmissionWaitingForManualChecking }
+				prohibitFurtherManualChecking={ updatedProhibitFurtherManualChecking }
+				selectedSubmissionIsLast={ selectedSubmissionIsLast }
+			/>
+		);
 	}
 
 	loadSubmissionToState = (submission,) => {
@@ -1015,8 +1022,6 @@ const mapStateToProps = (state, { courseId, slideId, }) => {
 	submissions.sort((s1, s2) => (new Date(s2.timestamp) - new Date(s1.timestamp)));
 
 	return {
-		courseId,
-		slideId,
 		isAuthenticated: account.isAuthenticated,
 		submissions,
 		lastCheckingResponse,
@@ -1029,20 +1034,38 @@ const mapDispatchToProps = (dispatch) => ({
 	addReviewComment: (courseId, slideId, submissionId, reviewId, comment) => dispatch(addReviewComment(courseId, slideId, submissionId, reviewId, comment)),
 });
 
-CodeMirror.propTypes = {
-	courseId: PropTypes.string,
-	slideId: PropTypes.string,
-	className: PropTypes.string,
+const exerciseBlockProps = {
 	language: PropTypes.string.isRequired,
-	code: PropTypes.string,
-	isAuthenticated: PropTypes.bool,
+	hints: PropTypes.array,
+	exerciseInitialCode: PropTypes.string,
 	hideSolutions: PropTypes.bool,
-	isSkipped: PropTypes.bool,
+	expectedOutput: PropTypes.string,
+	submissions: PropTypes.array,
+	attemptsStatistics: PropTypes.object,
+	waitingForManualChecking: PropTypes.bool,
+	prohibitFurtherManualChecking: PropTypes.bool,
+}
+const dispatchFunctionsProps = {
 	sendCode: PropTypes.func,
 	addCommentToReview: PropTypes.func,
-	submissions: PropTypes.array,
+}
+const fromSlideProps = {
+	courseId: PropTypes.string,
+	slideId: PropTypes.string,
+	isSkipped: PropTypes.bool,
+}
+const fromMapStateToProps = {
+	isAuthenticated: PropTypes.bool,
 	lastCheckingResponse: PropTypes.object,
 	author: userType,
+}
+CodeMirror.propTypes = {
+	...exerciseBlockProps,
+	...dispatchFunctionsProps,
+	...fromSlideProps,
+	...fromMapStateToProps,
+	className: PropTypes.string,
+	code: PropTypes.string,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(CodeMirror);
