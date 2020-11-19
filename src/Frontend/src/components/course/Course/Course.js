@@ -25,6 +25,7 @@ import { SCORING_GROUP_IDS } from 'src/consts/scoringGroup';
 import classnames from 'classnames';
 
 import styles from "./Course.less"
+import SlideHeader from "src/components/course/Course/Slide/Blocks/SlideHeader/SlideHeader";
 
 const slideNavigationButtonTitles = {
 	next: "Далее",
@@ -264,12 +265,13 @@ class Course extends Component {
 			? currentSlideInfo.current
 			: null;
 
-		const score = slideInfo
+		const score = slideInfo && isNavigationVisible
 			? {
 				score: (progress && progress[slideInfo.id] && progress[slideInfo.id].score) || 0,
 				maxScore: slideInfo.maxScore,
 			}
 			: null;
+		const isSkipped = progress && progress[slideInfo.id] && progress[slideInfo.id].isSkipped;
 
 		const { isSystemAdministrator, accessesByCourse, roleByCourse } = user;
 		const courseAccesses = accessesByCourse[courseId] ? accessesByCourse[courseId] : [];
@@ -283,6 +285,7 @@ class Course extends Component {
 					{ slideInfo && slideInfo.gitEditLink && this.renderGitEditLink(slideInfo) }
 				</h1> }
 				<div className={ styles.slide }>
+					<SlideHeader isHiddenSlide={ slideInfo.hide } score={ score } isSkipped={ isSkipped }/>
 					{
 						Page === Slide
 							?
@@ -291,14 +294,11 @@ class Course extends Component {
 								courseId={ currentCourseId }
 								showHiddenBlocks={ !isStudentMode }
 								isHiddenSlide={ slideInfo.hide }
-								score={ isNavigationVisible ? score : null }
-								isSkipped={ progress && progress[slideInfo.id] && progress[slideInfo.id].isSkipped }
 							/>
-							: <BlocksWrapper score={ isNavigationVisible ? score : null }>
+							: <BlocksWrapper>
 								<Page match={ this.props.match }/>
 							</BlocksWrapper>
 					}
-
 				</div>
 				{ currentSlideInfo && isNavigationVisible && this.renderNavigationButtons(currentSlideInfo) }
 				{ currentSlideInfo && isNavigationVisible && this.renderComments(currentSlideInfo.current, userRoles) }

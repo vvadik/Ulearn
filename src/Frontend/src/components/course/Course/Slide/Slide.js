@@ -54,7 +54,7 @@ class Slide extends React.Component {
 		}
 
 		if(showHiddenBlocks) {
-			return this.renderSlideBlocks(JSON.parse(JSON.stringify(slideBlocks)), isHiddenSlide);
+			return this.renderSlideBlocks(JSON.parse(JSON.stringify(slideBlocks)));
 		}
 
 		if(isHiddenSlide) {
@@ -68,7 +68,7 @@ class Slide extends React.Component {
 			return this.renderHiddenSlide();
 		}
 
-		return this.renderSlideBlocks(JSON.parse(JSON.stringify(slideBlocksForStudent)), isHiddenSlide);
+		return this.renderSlideBlocks(JSON.parse(JSON.stringify(slideBlocksForStudent)));
 	}
 
 	getSlidBlocksForStudents = (blocks) => {
@@ -95,8 +95,7 @@ class Slide extends React.Component {
 		}
 	}
 
-	renderSlideBlocks = (slideBlocks, isHiddenSlide) => {
-		const { score, isSkipped } = this.props;
+	renderSlideBlocks = (slideBlocks,) => {
 		this.addAdditionalPropsToBlocks(slideBlocks);
 		const blocksPacks = [];
 
@@ -109,14 +108,11 @@ class Slide extends React.Component {
 		const onlyOneBlock = blocksPacks.length === 1;
 		return blocksPacks.map(({ blocks, hide, fullSizeBlocksPack }, i) => {
 			return (
-				<BlocksWrapper isContainer={ fullSizeBlocksPack }
-							   key={ i }
-							   showEyeHint={ !fullSizeBlocksPack }
-							   isBlock={ !onlyOneBlock }
-							   isHidden={ hide }
-							   isHeaderOfHiddenSlide={ i === 0 && isHiddenSlide }
-							   score={ i === 0 ? score : null }
-							   isSkipped={ isSkipped }
+				<BlocksWrapper
+					isContainer={ fullSizeBlocksPack }
+					key={ i }
+					isBlock={ !onlyOneBlock }
+					isHidden={ hide }
 				>
 					{ blocks.map(this.mapBlockToComponent) }
 				</BlocksWrapper>
@@ -133,7 +129,7 @@ class Slide extends React.Component {
 	}
 
 	addAdditionalPropsToBlocks = (slideBlocks) => {
-		const { slideId, courseId, isSkipped, } = this.props;
+		const { slideId, courseId, } = this.props;
 		const { autoplay } = queryString.parse(window.location.search);
 		let firstVideoBlock = true;
 
@@ -242,8 +238,6 @@ Slide.propTypes = {
 	loadSlide: PropTypes.func.isRequired,
 	showHiddenBlocks: PropTypes.bool,
 	isHiddenSlide: PropTypes.bool,
-	score: PropTypes.object,
-	isSkipped: PropTypes.bool,
 };
 
 Slide.defaultProps = {
