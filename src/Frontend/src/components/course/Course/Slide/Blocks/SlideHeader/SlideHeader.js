@@ -59,7 +59,7 @@ function SlideHeader({ score, isSkipped, isHiddenSlide, }) {
 	}
 
 	render = () => {
-		const { className, isBlock, isHidden, isContainer, score, withoutBottomPaddigns, withoutTopPaddings, showEyeHint, isHeaderOfHiddenSlide, } = this.props;
+		const { className, isBlock, isHidden, score, withoutBottomPaddings, withoutTopPaddings, } = this.props;
 		const { showed, showStudentsModalOpened, } = this.state;
 		const isHiddenBlock = isBlock && isHidden;
 		const isHiddenSlide = !isBlock && isHidden;
@@ -68,7 +68,7 @@ function SlideHeader({ score, isSkipped, isHiddenSlide, }) {
 			<React.Fragment>
 				{ score && score.maxScore > 0 && this.renderScoreHeader() }
 				{ showStudentsModalOpened && this.renderModal() }
-				{ (isHiddenSlide || isHeaderOfHiddenSlide) && this.renderHiddenSlideHeader() }
+				{ isHiddenSlide && this.renderHiddenSlideHeader() }
 			</React.Fragment>);
 	}
 

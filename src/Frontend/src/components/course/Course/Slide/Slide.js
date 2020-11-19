@@ -107,16 +107,18 @@ class Slide extends React.Component {
 		}
 		const onlyOneBlock = blocksPacks.length === 1;
 		return blocksPacks.map(({ blocks, hide, fullSizeBlocksPack }, i) => {
+			const renderedBlocks = blocks.map(this.mapBlockToComponent);
 			return (
-				<BlocksWrapper
-					isContainer={ fullSizeBlocksPack }
-					key={ i }
-					isBlock={ !onlyOneBlock }
-					isHidden={ hide }
-				>
-					{ blocks.map(this.mapBlockToComponent) }
-				</BlocksWrapper>
-			)
+				fullSizeBlocksPack
+					? renderedBlocks
+					: <BlocksWrapper
+						key={ i }
+						isBlock={ !onlyOneBlock }
+						isHidden={ hide }
+					>
+						{ renderedBlocks }
+					</BlocksWrapper>
+			);
 		});
 	}
 
@@ -142,14 +144,12 @@ class Slide extends React.Component {
 					break;
 				}
 				case blockTypes.spoiler: {
-					const { slideId, isHiddenSlide, } = this.props;
+					const { slideId, } = this.props;
 
 					block.blocksId = slideId; // make spoiler close content on slide change
 					block.isHidden = block.hide;
 					if(i !== 0) {
 						block.isPreviousBlockHidden = slideBlocks[i - 1].hide || false;
-					} else if(isHiddenSlide) {
-						block.isHeaderOfHiddenSlide = true;
 					}
 					if(block.isHidden) {
 						const blocksInHiddenSpoiler = block.blocks.map(b => ({ ...b, hide: true }));
@@ -164,7 +164,7 @@ class Slide extends React.Component {
 
 					if(firstVideoBlock) {
 						if(autoplay) {
-							block.autoplay = autoplay ? true : false; //autoplay for first video on slide
+							block.autoplay = !!autoplay; //autoplay for first video on slide
 						}
 
 						if(slideBlocks.length === 1) {
@@ -174,7 +174,7 @@ class Slide extends React.Component {
 						firstVideoBlock = false;
 					}
 
-					blockTypes.annotationWithoutBottomPaddigns = !blockTypes.hide &&
+					block.annotationWithoutBottomPaddings = !block.hide &&
 						(i < slideBlocks.length - 1
 							? slideBlocks[i + 1].type !== blockTypes.video
 							: true);
@@ -223,7 +223,7 @@ class Slide extends React.Component {
 		};
 	}
 
-	mapBlockToComponent = ({ Block, props }, index, arr) => {
+	mapBlockToComponent = ({ Block, props, }, index, arr) => {
 		const className = classNames({ [styles.firstChild]: index === 0 }, { [styles.lastChild]: index === arr.length - 1 });
 		return <Block key={ index } className={ className }  { ...props } />;
 	}

@@ -11,7 +11,7 @@ import styles from "./BlocksWrapper.less";
 
 const hiddenHintText = "Студенты не видят этот блок";
 
-function BlocksWrapper({ children, className, isBlock, isHidden, isContainer, withoutBottomPaddigns, withoutTopPaddings, }) {
+function BlocksWrapper({ children, className, isBlock, isHidden, withoutBottomPaddings, withoutTopPaddings, withoutEyeHint, }) {
 	const isHiddenBlock = isBlock && isHidden;
 	const isHiddenSlide = !isBlock && isHidden;
 
@@ -19,22 +19,18 @@ function BlocksWrapper({ children, className, isBlock, isHidden, isContainer, wi
 		styles.wrapper,
 		styles.withPaddings,
 		{ [styles.withoutTopPaddings]: withoutTopPaddings },
-		{ [styles.withoutBottomPaddigns]: withoutBottomPaddigns },
+		{ [styles.withoutBottomPaddigns]: withoutBottomPaddings },
 		{ [styles.hiddenBackgroundColor]: isHiddenBlock },
 		{ [styles.hiddenSlide]: isHiddenSlide },
 		className
 	);
 
 	return (
-		<React.Fragment>
-			{ isContainer
-				? children
-				: <div className={ wrapperClassNames }>
-					{ !isContainer && isHiddenBlock && renderEyeHint() }
-					{ children }
-				</div>
-			}
-		</React.Fragment>);
+		<div className={ wrapperClassNames }>
+			{ !withoutEyeHint && isHiddenBlock && renderEyeHint() }
+			{ children }
+		</div>
+	);
 
 
 	function renderEyeHint() {
@@ -54,10 +50,10 @@ function BlocksWrapper({ children, className, isBlock, isHidden, isContainer, wi
 BlocksWrapper.propTypes = {
 	className: PropTypes.string,
 	isBlock: PropTypes.bool,
-	withoutBottomPaddigns: PropTypes.bool,
+	withoutBottomPaddings: PropTypes.bool,
 	withoutTopPaddings: PropTypes.bool,
+	withoutEyeHint: PropTypes.bool,
 	isHidden: PropTypes.bool,
-	isContainer: PropTypes.bool,
 }
 
 export default BlocksWrapper;
