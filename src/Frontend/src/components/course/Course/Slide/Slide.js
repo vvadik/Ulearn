@@ -164,7 +164,7 @@ class Slide extends React.Component {
 					break;
 				}
 				case blockTypes.video: {
-					blockTypes.isHidden = blockTypes.hide;
+					block.isHidden = block.hide;
 
 					if(firstVideoBlock) {
 						if(autoplay) {
@@ -182,6 +182,10 @@ class Slide extends React.Component {
 						(i < slideBlocks.length - 1
 							? slideBlocks[i + 1].type !== blockTypes.video
 							: true);
+					break;
+				}
+				case blockTypes.code: {
+					block.isHidden = block.hide;
 					break;
 				}
 				case blockTypes.exercise: {

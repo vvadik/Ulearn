@@ -101,6 +101,11 @@ const texts = {
 			text: 'Показать код полностью',
 		},
 
+		copyCode: {
+			text: 'Скопировать код',
+			onCopy: 'Код скопирован в буфер обмена',
+		},
+
 		statistics: {
 			buildShortText: (usersWithRightAnswerCount) =>
 				<React.Fragment>Решило: { usersWithRightAnswerCount }</React.Fragment>,

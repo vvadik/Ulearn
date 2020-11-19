@@ -51,7 +51,7 @@
 .editButton {
   position: absolute;
   left: 50%;
-  bottom: 68px;
+  bottom: 8px;
   transform: translateX(-50%);
   width: fit-content;
 
@@ -79,7 +79,17 @@
 
 .showAllCodeButton {
   .editButton;
-  bottom: 8px;
+}
+
+.copyCodeButton {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  z-index: 6;
+  transform: translateX(-50%);
+  width: fit-content;
+
+  cursor: pointer;
 }
 
 .lastLinesFading:after {
@@ -169,6 +179,7 @@
 }
 
 .reviewWrapper {
+  position: relative;
   display: flex;
 
   border: 1px solid @lightGrey;
