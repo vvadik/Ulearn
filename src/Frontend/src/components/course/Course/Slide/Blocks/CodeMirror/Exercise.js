@@ -109,7 +109,7 @@ class Exercise extends React.Component {
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
 		const { lastCheckingResponse, courseId, slideId, submissions, forceInitialCode, } = this.props;
-		const { currentSubmission, submissionLoading, showOutput, } = this.state;
+		const { currentSubmission, submissionLoading, showOutput, selectedReviewId, } = this.state;
 
 		if(forceInitialCode !== prevProps.forceInitialCode) {
 			if(forceInitialCode) {
@@ -166,7 +166,8 @@ class Exercise extends React.Component {
 			const submission = submissions.find(s => s.id === currentSubmission.id);
 
 			if(currentSubmission !== submission) { // Сравнение по ссылке. Отличаться должны только в случае изменения комментериев
-				this.setCurrentSubmission(submission);
+				this.setCurrentSubmission(submission,
+					() => this.highlightReview(selectedReviewId)); //Сохраняем выделение выбранного ревью
 			}
 		}
 	}
@@ -374,6 +375,7 @@ class Exercise extends React.Component {
 	loadSubmissionToState = (submission,) => {
 		if(submission.id < 0) {
 			this.loadNewTry();
+			this.loadNewTry();
 			return;
 		}
 		this.saveCodeDraftToCache();
@@ -393,12 +395,17 @@ class Exercise extends React.Component {
 		);
 	}
 
-	setCurrentSubmission = (submission) => {
+	setCurrentSubmission = (submission, callback) => {
 		this.clearAllTextMarkers();
 		this.setState({
 			currentSubmission: submission,
 			currentReviews: this.getReviewsWithTextMarkers(submission),
-		}, () => this.state.editor.refresh())
+		}, () => {
+			this.state.editor.refresh();
+			if(callback) {
+				callback();
+			}
+		})
 	}
 
 	openModal = (data) => {
