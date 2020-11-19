@@ -21,7 +21,7 @@ import { constructPathToAcceptedSolutions, } from "src/consts/routes";
 import {
 	AutomaticExerciseCheckingResult as CheckingResult,
 	AutomaticExerciseCheckingProcessStatus as ProcessStatus,
-	SolutionRunStatus, AutomaticExerciseCheckingResult
+	SolutionRunStatus,
 } from "src/models/exercise.ts";
 import { isMobile, isTablet, } from "src/utils/getDeviceType";
 import { userType } from "src/components/comments/commonPropTypes";
@@ -64,7 +64,7 @@ class CodeMirror extends React.Component {
 			showControlsText: isControlsTextSuits(),
 
 			submissionLoading: false,
-			visibleCheckingResponse: null,
+			visibleCheckingResponse: null, // Не null только если только что сделанная посылка не содержит submission
 			currentSubmission: null,
 			currentReviews: [],
 			selectedReviewId: -1,
@@ -256,7 +256,6 @@ class CodeMirror extends React.Component {
 			{ [styles.editorInReview]: isReview },
 		);
 		const automaticChecking = currentSubmission?.automaticChecking ?? visibleCheckingResponse?.automaticChecking;
-
 		return (
 			<React.Fragment>
 				{ submissions.length !== 0 && this.renderSubmissionsSelect() }
@@ -329,23 +328,23 @@ class CodeMirror extends React.Component {
 	}
 
 	renderHeader = () => {
-		const { currentSubmission, visibleCheckingResponse, } = this.state;
+		const { currentSubmission, visibleCheckingResponse } = this.state;
 		const { submissions, slideProgress } = this.props;
-		const { waitingForManualChecking, prohibitFurtherManualChecking } = slideProgress;
+		const { waitingForManualChecking, prohibitFurtherManualChecking, score } = slideProgress;
 		if(!currentSubmission && !visibleCheckingResponse)
 			return null;
-		const submission = currentSubmission ?? visibleCheckingResponse.submission;
 		const thisSubmissionWaitingForManualChecking = waitingForManualChecking
-			&& submission
-			&& CodeMirror.isWaitingForManualCheckingSubmission(submissions, submission);
-		const selectedSubmissionIsLast = submissions[0] === submission;
+			&& currentSubmission
+			&& CodeMirror.isWaitingForManualCheckingSubmission(submissions, currentSubmission);
+		const selectedSubmissionIsLast = submissions[0] === currentSubmission;
 		return (
 			<ExerciseFormHeader
-				checkingResponse={ visibleCheckingResponse }
-				selectedSubmission={ submission }
+				solutionRunStatus={ visibleCheckingResponse ? visibleCheckingResponse.solutionRunStatus : null }
+				selectedSubmission={ currentSubmission }
 				waitingForManualChecking={ thisSubmissionWaitingForManualChecking }
 				prohibitFurtherManualChecking={ prohibitFurtherManualChecking }
 				selectedSubmissionIsLast={ selectedSubmissionIsLast }
+				score={ score }
 			/>
 		);
 	}
@@ -745,7 +744,6 @@ class CodeMirror extends React.Component {
 		e.stopPropagation();
 
 		this.clearAllTextMarkers();
-
 		this.setState({
 			newTry: CodeMirror.createEmptyNewTry(),
 			isEditable: true,
@@ -770,7 +768,6 @@ class CodeMirror extends React.Component {
 		const { exerciseInitialCode } = this.props;
 
 		this.clearAllTextMarkers();
-
 		this.setState({
 			newTry: CodeMirror.createEmptyNewTry(),
 			value: exerciseInitialCode,

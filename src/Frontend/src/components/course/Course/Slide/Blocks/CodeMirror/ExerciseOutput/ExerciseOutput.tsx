@@ -115,7 +115,7 @@ class ExerciseOutput extends React.Component<OutputTypeProps> {
 				outputType = OutputType.ServerMessage;
 				break;
 			case ProcessStatus.WaitingTimeLimitExceeded:
-				outputType = OutputType.ServerError;
+				outputType = OutputType.ServerMessage;
 				break;
 			default:
 				console.error(new Error(`processStatuses has unknown value ${ automaticChecking.processStatus }`));

@@ -8,8 +8,10 @@ export default {
 	noTestsWasReviewed: 'Решение прошло код-ревью',
 	noTestsProhibitFurtherReview: 'По этой задаче код-ревью больше не проводится',
 	running: 'Решение проверяется',
+	waiting: 'Решение ждет своей очереди на проверку',
 	wrongAnswer: 'Результат проверки: Тесты не пройдены',
 	compilationError: 'Результат проверки: Ошибка компиляции',
 	serverError: 'Ошибка сервера',
+	serverMessage: 'Сообщение от сервера',
 	waitingTimeLimitExceeded: 'Серверу не удалось проверить решение',
 }

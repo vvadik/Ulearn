@@ -8,62 +8,22 @@ import {
 	SolutionRunStatus
 } from "src/models/exercise";
 
-export default {
-	title: 'Exercise/ExerciseOutput'
-};
-
 const Template: Story<OutputTypeProps> = (args) => <ExerciseOutput { ...args } />;
 
-export const SolutionRunStatusCompilationError = Template.bind({});
-SolutionRunStatusCompilationError.args = {
-	solutionRunStatus: SolutionRunStatus.CompilationError,
-	message: "Как минимум один из тестов не пройден!\n"
-		+ "Название теста: MoveManipulatorTo_ActuallyBringsManipulatorToDesiredLocation(-207.950052059698d,109.42692431548d,62.2635171658309d)\n"
-		+ "Сообщение:\n"
-		+ "  actual x\n"
-		+ "  Expected: -207.95005205969795d +/- 9.9999999999999995E-07d",
-	expectedOutput: "",
-	automaticChecking: null
+const ListTemplate: Story<{ items: { props: OutputTypeProps, header: string }[] }> = ({ items }) => {
+	return <>
+		{ items.map((item) =>
+			<>
+				<p>{ item.header }</p>
+				<ExerciseOutput { ...item.props } />
+			</>
+		) }
+	</>
 };
 
-export const SolutionRunStatusInternalServerError = Template.bind({});
-SolutionRunStatusInternalServerError.args = {
-	solutionRunStatus: SolutionRunStatus.InternalServerError,
-	message: "InternalServerError text",
-	expectedOutput: null,
-	automaticChecking: null
-};
-
-export const SolutionRunStatusSuccess = Template.bind({});
-SolutionRunStatusSuccess.args = {
+const outputTypeProps = {
 	solutionRunStatus: SolutionRunStatus.Success,
-	message: null,
-	expectedOutput: null,
-	automaticChecking: {
-		output: "Success text",
-		processStatus: ProcessStatus.Done,
-		result: CheckingResult.RightAnswer,
-		reviews: null
-	}
-};
-
-export const SolutionRunStatusCompilationErrorFromChecker = Template.bind({});
-SolutionRunStatusCompilationErrorFromChecker.args = {
-	solutionRunStatus: SolutionRunStatus.Success,
-	message: null,
-	expectedOutput: null,
-	automaticChecking: {
-		output: "CompilationError text",
-		processStatus: ProcessStatus.Done,
-		result: CheckingResult.CompilationError,
-		reviews: null
-	}
-};
-
-export const TableWrongAnswer = Template.bind({});
-TableWrongAnswer.args = {
-	solutionRunStatus: SolutionRunStatus.Success,
-	message: null,
+	message: "message text",
 	expectedOutput: "1\n2\n      3\nНазвание теста: MoveManipulatorTo_ActuallyBringsManipulatorToDesiredLocation(-207.950052059698d,109.42692431548d,62.2635171658309d)",
 	automaticChecking: {
 		output: "3\n2\n3",
@@ -71,4 +31,63 @@ TableWrongAnswer.args = {
 		result: CheckingResult.WrongAnswer,
 		reviews: null
 	}
+};
+
+export const Editable = Template.bind({});
+Editable.args = outputTypeProps;
+
+const allSolutionRunStatusesItems = Object.values(SolutionRunStatus)
+	.map(s => ({ header: s, props: { ...outputTypeProps, solutionRunStatus: s, } }));
+export const AllSolutionRunStatuses = ListTemplate.bind({});
+AllSolutionRunStatuses.args = { items: allSolutionRunStatusesItems };
+
+const allProcessStatusesItems = Object.values(ProcessStatus)
+	.map(s => ({
+		header: s, props: {
+			...outputTypeProps,
+			message: null,
+			automaticChecking: {
+				...outputTypeProps.automaticChecking,
+				processStatus: s,
+			}
+		}
+	}));
+export const AllProcessStatuses = ListTemplate.bind({});
+AllProcessStatuses.args = { items: allProcessStatusesItems };
+
+const allCheckingResultsItems = Object.values(CheckingResult)
+	.map(s => ({
+		header: s, props: {
+			...outputTypeProps,
+			message: null,
+			automaticChecking: {
+				...outputTypeProps.automaticChecking,
+				result: s,
+			}
+		}
+	}));
+export const allCheckingResults = ListTemplate.bind({});
+allCheckingResults.args = { items: allCheckingResultsItems };
+
+export default {
+	title: 'Exercise/ExerciseOutput',
+	component: ExerciseOutput,
+	argTypes: {
+		solutionRunStatus: {
+			control: {
+				type: 'select',
+				options: Object.values(SolutionRunStatus),
+			},
+		},
+		message: {
+			control: {
+				type: 'text'
+			},
+		},
+		expectedOutput: {
+			control: {
+				type: 'text'
+			},
+		},
+	},
 };

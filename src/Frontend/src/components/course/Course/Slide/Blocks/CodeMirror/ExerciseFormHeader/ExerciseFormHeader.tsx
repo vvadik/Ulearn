@@ -5,17 +5,18 @@ import styles from "./ExerciseFormHeader.less";
 import {
 	AutomaticExerciseCheckingProcessStatus as ProcessStatus,
 	AutomaticExerciseCheckingResult as CheckingResult,
-	RunSolutionResponse,
 	SolutionRunStatus,
 	SubmissionInfo
 } from "src/models/exercise";
+import getPluralForm from "src/utils/getPluralForm.js";
 
 interface ExerciseFormHeaderProps {
-	checkingResponse: RunSolutionResponse | null, // Если результаты посылки, сделанной только что
+	solutionRunStatus: SolutionRunStatus | null, // Если результаты посылки, сделанной только что и не содержащей submission
 	selectedSubmission: SubmissionInfo | null, // Если результаты выбранной посылки
-	waitingForManualChecking: boolean, // True, если именно это решение ожидает ревью
-	prohibitFurtherManualChecking: boolean, // True, если ревью по задаче включено, но запрещено для задачи этого студента преподавателем
+	waitingForManualChecking?: boolean, // True, если именно это решение ожидает ревью
+	prohibitFurtherManualChecking?: boolean, // True, если ревью по задаче включено, но запрещено для задачи этого студента преподавателем
 	selectedSubmissionIsLast?: boolean,
+	score?: number
 }
 
 type StyleAndText = { style: string, text: string } | null;
@@ -35,9 +36,9 @@ class ExerciseFormHeader extends React.Component<ExerciseFormHeaderProps> {
 	}
 
 	getStyleAndText(): StyleAndText {
-		const { checkingResponse, selectedSubmission } = this.props;
-		if(checkingResponse) {
-			return this.getStyleAndTextForCheckingResponse(checkingResponse);
+		const { solutionRunStatus, selectedSubmission } = this.props;
+		if(solutionRunStatus && solutionRunStatus !== SolutionRunStatus.Success) {
+			return this.getStyleAndTextForCheckingResponse(solutionRunStatus);
 		}
 		if(selectedSubmission) {
 			return this.getStyleAndTextForSelectedSubmission(selectedSubmission);
@@ -46,15 +47,15 @@ class ExerciseFormHeader extends React.Component<ExerciseFormHeaderProps> {
 	}
 
 	getStyleAndTextForSelectedSubmission(selectedSubmission: SubmissionInfo): StyleAndText {
-		const { waitingForManualChecking, prohibitFurtherManualChecking, selectedSubmissionIsLast } = this.props;
+		const { waitingForManualChecking, prohibitFurtherManualChecking, selectedSubmissionIsLast, score } = this.props;
 		const { automaticChecking, manualCheckingPassed, } = selectedSubmission;
 		if(automaticChecking) {
 			switch (automaticChecking.processStatus) {
 				case ProcessStatus.Done:
 					switch (automaticChecking.result) {
 						case CheckingResult.RightAnswer:
-							return ExerciseFormHeader.getStyleAndTextAllTestPassed(waitingForManualChecking,
-								prohibitFurtherManualChecking, manualCheckingPassed, !!selectedSubmissionIsLast);
+							return ExerciseFormHeader.getStyleAndTextAllTestPassedWithScore(waitingForManualChecking,
+								prohibitFurtherManualChecking, manualCheckingPassed, !!selectedSubmissionIsLast, score);
 						case CheckingResult.CompilationError:
 							return { style: styles.errorHeader, text: texts.compilationError };
 						case CheckingResult.WrongAnswer:
@@ -67,7 +68,7 @@ class ExerciseFormHeader extends React.Component<ExerciseFormHeaderProps> {
 				case ProcessStatus.Running:
 					return { style: styles.header, text: texts.running };
 				case ProcessStatus.Waiting:
-					return { style: styles.header, text: texts.running };
+					return { style: styles.header, text: texts.waiting };
 				case ProcessStatus.ServerError:
 					return { style: styles.header, text: texts.serverError };
 				case ProcessStatus.WaitingTimeLimitExceeded:
@@ -82,24 +83,43 @@ class ExerciseFormHeader extends React.Component<ExerciseFormHeaderProps> {
 		}
 	}
 
-	getStyleAndTextForCheckingResponse(checkingResponse: RunSolutionResponse): StyleAndText {
-		const { waitingForManualChecking, prohibitFurtherManualChecking, } = this.props;
-		const { solutionRunStatus, submission, } = checkingResponse;
-		if(solutionRunStatus === SolutionRunStatus.Success && submission) {
-			if(submission.automaticChecking) {
-				if(submission.automaticChecking.result === CheckingResult.RightAnswer) {
-					return ExerciseFormHeader.getStyleAndTextAllTestPassed(waitingForManualChecking,
-						prohibitFurtherManualChecking, submission.manualCheckingPassed, true);
-				}
-			} else {
-				return ExerciseFormHeader.getStyleAndTextNoTests(waitingForManualChecking,
-					prohibitFurtherManualChecking, submission.manualCheckingPassed);
-			}
+	getStyleAndTextForCheckingResponse(solutionRunStatus: SolutionRunStatus): StyleAndText {
+		switch (solutionRunStatus) {
+			case SolutionRunStatus.Ignored:
+				return { style: styles.header, text: texts.serverMessage };
+			case SolutionRunStatus.InternalServerError:
+				return { style: styles.header, text: texts.serverError };
+			case SolutionRunStatus.SubmissionCheckingTimeout:
+				return { style: styles.header, text: texts.serverMessage };
+			case SolutionRunStatus.CompilationError:
+				return { style: styles.errorHeader, text: texts.compilationError };
+			case SolutionRunStatus.Success:
+				console.error(new Error(`solutionRunStatus cant be Success in getStyleAndTextForCheckingResponse`));
+				return null;
+			default:
+				console.error(new Error(`solutionRunStatus has unknown value ${ solutionRunStatus }`));
+				return null;
 		}
-		return null;
 	}
 
-	static getStyleAndTextAllTestPassed(waitingForManualChecking: boolean, prohibitFurtherManualChecking: boolean,
+	static getStyleAndTextAllTestPassedWithScore(waitingForManualChecking: boolean | undefined,
+		prohibitFurtherManualChecking: boolean | undefined,
+		manualCheckingPassed: boolean, isLastSubmission: boolean, score?: number | null
+	): StyleAndText {
+		const styleAndText = ExerciseFormHeader.getStyleAndTextAllTestPassed(waitingForManualChecking,
+			prohibitFurtherManualChecking, manualCheckingPassed, isLastSubmission);
+		if(!styleAndText) {
+			return styleAndText;
+		}
+		if(isLastSubmission && score) {
+			const plural = getPluralForm(score, 'балл', 'балла', 'баллов')
+			styleAndText.text = `${ score } ${ plural }. ${ styleAndText.text }`;
+		}
+		return styleAndText;
+	}
+
+	static getStyleAndTextAllTestPassed(waitingForManualChecking: boolean | undefined,
+		prohibitFurtherManualChecking: boolean | undefined,
 		manualCheckingPassed: boolean, isLastSubmission: boolean
 	): StyleAndText {
 		if(manualCheckingPassed) {
@@ -108,7 +128,7 @@ class ExerciseFormHeader extends React.Component<ExerciseFormHeaderProps> {
 		if(waitingForManualChecking) {
 			return { style: styles.successHeader, text: texts.allTestPassedPendingReview };
 		}
-		if(prohibitFurtherManualChecking) {
+		if(prohibitFurtherManualChecking && isLastSubmission) {
 			return { style: styles.successHeader, text: texts.allTestPassedProhibitFurtherReview };
 		}
 		if(isLastSubmission) {
@@ -117,7 +137,8 @@ class ExerciseFormHeader extends React.Component<ExerciseFormHeaderProps> {
 		return { style: styles.successHeader, text: texts.allTestPassed };
 	}
 
-	static getStyleAndTextNoTests(waitingForManualChecking: boolean, prohibitFurtherManualChecking: boolean,
+	static getStyleAndTextNoTests(waitingForManualChecking: boolean | undefined,
+		prohibitFurtherManualChecking: boolean | undefined,
 		manualCheckingPassed: boolean
 	)
 		: StyleAndText {

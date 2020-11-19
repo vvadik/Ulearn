@@ -26,7 +26,7 @@ export enum SolutionRunStatus {
 export interface SubmissionInfo {
 	id: number;
 	code: string;
-	timestamp: Date;
+	timestamp: string;
 	automaticChecking: ExerciseAutomaticCheckingResponse | null; // null если задача не имеет автоматических тестов, это не отменяет возможности ревью.
 	manualCheckingPassed: boolean;
 	manualCheckingReviews: ReviewInfo[];
@@ -63,7 +63,7 @@ export interface ReviewInfo {
 	finishPosition: number;
 	comment: string;
 	renderedComment: string;
-	addingTime: Date | null; // null для бота
+	addingTime: string | null; // null для бота
 	comments: ReviewCommentResponse[];
 }
 
@@ -71,6 +71,6 @@ export interface ReviewCommentResponse {
 	id: number;
 	text: string;
 	renderedText: string;
-	publishTime: Date;
+	publishTime: string;
 	author: ShortUserInfo;
 }
