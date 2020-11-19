@@ -15,7 +15,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from "react-redux";
 
-import { sendCode, addReviewComment, } from "src/actions/course";
+import { sendCode, addReviewComment, deleteReviewComment, } from "src/actions/course";
 
 import { constructPathToAcceptedSolutions, } from "src/consts/routes";
 import {
@@ -26,7 +26,7 @@ import {
 import { isMobile, isTablet, } from "src/utils/getDeviceType";
 import { userType } from "src/components/comments/commonPropTypes";
 
-import CodeMirrorBase from 'codemirror/lib/codemirror';
+import CodeMirror from 'codemirror/lib/codemirror';
 import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/addon/hint/show-hint';
 import 'codemirror/addon/hint/show-hint.css';
@@ -35,16 +35,16 @@ import 'codemirror/addon/hint/anyword-hint';
 import 'codemirror/theme/darcula.css';
 import './CodeMirrorAutocompleteExtension';
 
-import styles from './CodeMirror.less';
+import styles from './Exercise.less';
 
-import texts from './CodeMirror.texts';
+import texts from './Exercise.texts';
 
 const isControlsTextSuits = () => !isMobile() && !isTablet();
 const editThemeName = 'darcula';
 const defaultThemeName = 'default';
 
 
-class CodeMirror extends React.Component {
+class Exercise extends React.Component {
 	constructor(props) {
 		super(props);
 		const { exerciseInitialCode, submissions, } = props;
@@ -73,7 +73,7 @@ class CodeMirror extends React.Component {
 			editor: null,
 			exerciseCodeDoc: null,
 
-			newTry: CodeMirror.createEmptyNewTry(),
+			newTry: Exercise.createEmptyNewTry(),
 
 			selfChecks: texts.checkups.self.checks.map((ch, i) => ({
 				text: ch,
@@ -84,9 +84,14 @@ class CodeMirror extends React.Component {
 	}
 
 	componentDidMount() {
+		const { forceInitialCode, } = this.props;
 		this.overrideCodeMirrorAutocomplete();
 
-		this.loadSlideSubmission();
+		if(forceInitialCode) {
+			this.resetCode();
+		} else {
+			this.loadSlideSubmission();
+		}
 
 		window.addEventListener("beforeunload", this.saveCodeDraftToCache);
 		window.addEventListener("resize", this.onWindowResize);
@@ -103,8 +108,17 @@ class CodeMirror extends React.Component {
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
-		const { lastCheckingResponse, courseId, slideId, submissions } = this.props;
+		const { lastCheckingResponse, courseId, slideId, submissions, forceInitialCode, } = this.props;
 		const { currentSubmission, submissionLoading, showOutput, } = this.state;
+
+		if(forceInitialCode !== prevProps.forceInitialCode) {
+			if(forceInitialCode) {
+				this.resetCode();
+			} else {
+				this.loadSlideSubmission();
+			}
+			return;
+		}
 
 		if(courseId !== prevProps.courseId || slideId !== prevProps.slideId) {
 			this.loadSlideSubmission();
@@ -177,8 +191,8 @@ class CodeMirror extends React.Component {
 	overrideCodeMirrorAutocomplete = () => {
 		const { language, } = this.props;
 
-		CodeMirrorBase.commands.autocomplete = function (cm) {
-			const hint = CodeMirrorBase.hint[language.toLowerCase()];
+		CodeMirror.commands.autocomplete = function (cm) {
+			const hint = CodeMirror.hint[language.toLowerCase()];
 			if(hint) {
 				cm.showHint({ hint: hint });
 			}
@@ -186,9 +200,11 @@ class CodeMirror extends React.Component {
 	}
 
 	saveCodeDraftToCache = () => {
-		const { slideId, } = this.props;
+		const { slideId, forceInitialCode, } = this.props;
 
-		this.saveExerciseCodeDraft(slideId);
+		if(!forceInitialCode) {
+			this.saveExerciseCodeDraft(slideId);
+		}
 	}
 
 	componentWillUnmount() {
@@ -214,7 +230,7 @@ class CodeMirror extends React.Component {
 		const { isEditable, } = this.state;
 
 		return {
-			mode: CodeMirror.loadLanguageStyles(language),
+			mode: Exercise.loadLanguageStyles(language),
 			lineNumbers: true,
 			scrollbarStyle: 'null',
 			lineWrapping: true,
@@ -269,10 +285,12 @@ class CodeMirror extends React.Component {
 						options={ opts }
 						value={ value }
 					/>
+					{ !isEditable && this.renderEditButton(isReview) }
 					{ exerciseCodeDoc && isReview &&
 					<Review
 						userId={ author.id }
 						addReviewComment={ this.addReviewComment }
+						deleteReviewComment={ this.addReviewComment }
 						selectedReviewId={ selectedReviewId }
 						onSelectComment={ this.selectComment }
 						reviews={ currentReviews }
@@ -280,7 +298,6 @@ class CodeMirror extends React.Component {
 					/>
 					}
 				</div>
-				{ !isEditable && this.renderEditButton() }
 				{/* TODO not included in current release !isEditable && currentSubmission && this.renderOverview(currentSubmission)*/ }
 				{ this.renderControls() }
 				{ showOutput && HasOutput(visibleCheckingResponse?.message, automaticChecking, expectedOutput) && // TODO показывать вывод в случае статуса процесса и эта последняя посылка
@@ -335,7 +352,7 @@ class CodeMirror extends React.Component {
 			return null;
 		const thisSubmissionWaitingForManualChecking = waitingForManualChecking
 			&& currentSubmission
-			&& CodeMirror.isWaitingForManualCheckingSubmission(submissions, currentSubmission);
+			&& Exercise.isWaitingForManualCheckingSubmission(submissions, currentSubmission);
 		const selectedSubmissionIsLast = submissions[0] === currentSubmission;
 		return (
 			<ExerciseFormHeader
@@ -714,9 +731,10 @@ class CodeMirror extends React.Component {
 		});
 	}
 
-	renderEditButton = () => {
+	renderEditButton = (isReview) => {
 		return (
-			<div className={ styles.editButton } onClick={ this.enableEditing }>
+			<div className={ classNames(styles.editButton, { [styles.editButtonWithReviews]: isReview }) }
+				 onClick={ this.enableEditing }>
 				{ texts.controls.edit.text }
 			</div>
 		)
@@ -745,7 +763,7 @@ class CodeMirror extends React.Component {
 
 		this.clearAllTextMarkers();
 		this.setState({
-			newTry: CodeMirror.createEmptyNewTry(),
+			newTry: Exercise.createEmptyNewTry(),
 			isEditable: true,
 			valueChanged: true,
 			currentSubmission: null,
@@ -769,7 +787,7 @@ class CodeMirror extends React.Component {
 
 		this.clearAllTextMarkers();
 		this.setState({
-			newTry: CodeMirror.createEmptyNewTry(),
+			newTry: Exercise.createEmptyNewTry(),
 			value: exerciseInitialCode,
 			valueChanged: true,
 			isEditable: true,
@@ -876,6 +894,13 @@ class CodeMirror extends React.Component {
 		addReviewComment(courseId, slideId, currentSubmission.id, reviewId, comment);
 	}
 
+	deleteReviewComment = (commentId,) => {
+		const { addReviewComment, courseId, slideId, author, } = this.props;
+		const { currentSubmission, } = this.state;
+
+		addReviewComment(courseId, slideId, currentSubmission.id, commentId,);
+	}
+
 	isSubmitResultsContainsError = ({ automaticChecking }) => {
 		return automaticChecking.result === CheckingResult.CompilationError
 			|| automaticChecking.result === CheckingResult.WrongAnswer;
@@ -901,7 +926,7 @@ class CodeMirror extends React.Component {
 		const cursor = exerciseCodeDoc.getCursor();
 
 		if(!isEditable && currentReviews.length > 0) {
-			const reviewId = CodeMirror.getSelectedReviewIdByCursor(currentReviews, exerciseCodeDoc, cursor);
+			const reviewId = Exercise.getSelectedReviewIdByCursor(currentReviews, exerciseCodeDoc, cursor);
 			this.highlightReview(reviewId);
 		}
 	}
@@ -919,8 +944,8 @@ class CodeMirror extends React.Component {
 		}
 
 		reviewsUnderCursor.sort((a, b) => {
-			const aLength = CodeMirror.getReviewSelectionLength(a, exerciseCodeDoc);
-			const bLength = CodeMirror.getReviewSelectionLength(b, exerciseCodeDoc);
+			const aLength = Exercise.getReviewSelectionLength(a, exerciseCodeDoc);
+			const bLength = Exercise.getReviewSelectionLength(b, exerciseCodeDoc);
 			if(aLength !== bLength)
 				return aLength - bLength;
 			return a.startLine !== b.startLine
@@ -1039,6 +1064,7 @@ const mapStateToProps = (state, { courseId, slideId, }) => {
 const mapDispatchToProps = (dispatch) => ({
 	sendCode: (courseId, slideId, code) => dispatch(sendCode(courseId, slideId, code)),
 	addReviewComment: (courseId, slideId, submissionId, reviewId, comment) => dispatch(addReviewComment(courseId, slideId, submissionId, reviewId, comment)),
+	deleteReviewComment: (courseId, slideId, submissionId, reviewId, comment) => dispatch(deleteReviewComment(courseId, slideId, submissionId, reviewId, comment)),
 });
 
 const exerciseBlockProps = {
@@ -1057,6 +1083,7 @@ const dispatchFunctionsProps = {
 const fromSlideProps = {
 	courseId: PropTypes.string,
 	slideId: PropTypes.string,
+	forceInitialCode: PropTypes.bool,
 }
 const fromMapStateToProps = {
 	isAuthenticated: PropTypes.bool,
@@ -1064,7 +1091,7 @@ const fromMapStateToProps = {
 	author: userType,
 	slideProgress: PropTypes.object,
 }
-CodeMirror.propTypes = {
+Exercise.propTypes = {
 	...exerciseBlockProps,
 	...dispatchFunctionsProps,
 	...fromSlideProps,
@@ -1072,4 +1099,4 @@ CodeMirror.propTypes = {
 	className: PropTypes.string,
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CodeMirror);
+export default connect(mapStateToProps, mapDispatchToProps)(Exercise);

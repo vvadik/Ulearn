@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Video, CodeMirror, Text, Image, BlocksWrapper, Spoiler, CodeMirrorUncontrolled, } from "./Blocks";
+import { Video, Exercise, Text, Image, BlocksWrapper, Spoiler, StaticCode, } from "./Blocks";
 import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader";
 import blockTypes from "src/components/course/Course/Slide/blockTypes";
 
@@ -14,8 +14,8 @@ import styles from './Slide.less';
 
 const mapTypeToBlock = {
 	[blockTypes.video]: Video,
-	[blockTypes.code]: CodeMirrorUncontrolled,
-	[blockTypes.exercise]: CodeMirror,
+	[blockTypes.code]: StaticCode,
+	[blockTypes.exercise]: Exercise,
 	[blockTypes.text]: Text,
 	[blockTypes.tex]: Text,
 	[blockTypes.image]: Image,
@@ -131,7 +131,7 @@ class Slide extends React.Component {
 	}
 
 	addAdditionalPropsToBlocks = (slideBlocks) => {
-		const { slideId, courseId, } = this.props;
+		const { slideId, courseId, showHiddenBlocks, } = this.props;
 		const { autoplay } = queryString.parse(window.location.search);
 		let firstVideoBlock = true;
 
@@ -187,6 +187,7 @@ class Slide extends React.Component {
 				case blockTypes.exercise: {
 					block.slideId = slideId;
 					block.courseId = courseId;
+					block.forceInitialCode = !showHiddenBlocks;
 					break;
 				}
 			}

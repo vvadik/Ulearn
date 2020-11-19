@@ -2,16 +2,16 @@ import React, { useState } from 'react';
 import { UnControlled, } from "react-codemirror2";
 import { Hint, Toast } from "ui";
 import { Copy } from "icons";
-import CodeMirror from "./CodeMirror";
+import CodeMirror from "./Exercise";
 
 import classNames from "classnames";
 import PropTypes from 'prop-types';
 
-import styles from './CodeMirror.less';
-import texts from "src/components/course/Course/Slide/Blocks/CodeMirror/CodeMirror.texts";
+import styles from './Exercise.less';
+import texts from "src/components/course/Course/Slide/Blocks/CodeMirror/Exercise.texts";
 
 
-function CodeMirrorUncontrolled({ language, code, className, isHidden, }) {
+function StaticCode({ language, code, className, isHidden, }) {
 	const opts = {
 		mode: CodeMirror.loadLanguageStyles(language),
 		lineNumbers: true,
@@ -62,10 +62,10 @@ function CodeMirrorUncontrolled({ language, code, className, isHidden, }) {
 	}
 }
 
-CodeMirrorUncontrolled.propTypes = {
+StaticCode.propTypes = {
 	value: PropTypes.string,
 	className: PropTypes.string,
 	isHidden: PropTypes.bool,
 }
 
-export default CodeMirrorUncontrolled;
+export default StaticCode;

@@ -1,6 +1,6 @@
 import Video from "./Video/Video";
-import CodeMirror from "./CodeMirror/CodeMirror";
-import CodeMirrorUncontrolled from "./CodeMirror/CodeMirrorUncontrolled";
+import Exercise from "./CodeMirror/Exercise";
+import StaticCode from "./CodeMirror/StaticCode";
 import Text from "./Text/Text";
 import Image from "./Image/Image";
 import BlocksWrapper from "./BlocksWrapper";
@@ -8,8 +8,8 @@ import Spoiler from "./Spoiler/Spoiler";
 
 export {
 	Video,
-	CodeMirror,
-	CodeMirrorUncontrolled,
+	Exercise,
+	StaticCode,
 	Text,
 	Image,
 	BlocksWrapper,
