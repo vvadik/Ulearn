@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Controlled, } from "react-codemirror2";
-import { Button, Checkbox, FLAT_THEME, Modal, Select, Tooltip, } from "ui";
+import { Button, Checkbox, FLAT_THEME, Modal, Select, Tooltip, Toast, } from "ui";
 import Review from "./Review/Review";
 import { darkTheme } from 'ui/internal/ThemePlayground/darkTheme';
 import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent";
@@ -108,8 +108,12 @@ class Exercise extends React.Component {
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
-		const { lastCheckingResponse, courseId, slideId, submissions, forceInitialCode, } = this.props;
+		const { lastCheckingResponse, courseId, slideId, submissions, forceInitialCode, submissionError, } = this.props;
 		const { currentSubmission, submissionLoading, showOutput, selectedReviewId, } = this.state;
+
+		if(submissionError && submissionError !== prevProps.submissionError) {
+			Toast.push("При добавлении или удалении комментария произошла ошибка");
+		}
 
 		if(forceInitialCode !== prevProps.forceInitialCode) {
 			if(forceInitialCode) {
@@ -291,7 +295,7 @@ class Exercise extends React.Component {
 					<Review
 						userId={ author.id }
 						addReviewComment={ this.addReviewComment }
-						deleteReviewComment={ this.addReviewComment }
+						deleteReviewComment={ this.deleteReviewComment }
 						selectedReviewId={ selectedReviewId }
 						onSelectComment={ this.selectComment }
 						reviews={ currentReviews }
@@ -879,33 +883,28 @@ class Exercise extends React.Component {
 
 	sendExercise = () => {
 		const { value, } = this.state;
-		const { courseId, slideId, sendCode, } = this.props;
+		const { courseId, slideId, } = this.props;
 
 		this.setState({
 			submissionLoading: true,
 		});
 
-		sendCode(courseId, slideId, value);
+		this.props.sendCode(courseId, slideId, value);
 	}
 
 	addReviewComment = (reviewId, text) => {
-		const { addReviewComment, courseId, slideId, author, } = this.props;
+		const { addReviewComment, courseId, slideId, } = this.props;
 		const { currentSubmission, } = this.state;
 
-		const comment = {
-			text,
-			author,
-			publishTime: new Date(),
-		};
 
-		addReviewComment(courseId, slideId, currentSubmission.id, reviewId, comment);
+		addReviewComment(courseId, slideId, currentSubmission.id, reviewId, text);
 	}
 
-	deleteReviewComment = (commentId,) => {
-		const { addReviewComment, courseId, slideId, author, } = this.props;
+	deleteReviewComment = (reviewId, commentId,) => {
+		const { deleteReviewComment, courseId, slideId, } = this.props;
 		const { currentSubmission, } = this.state;
 
-		addReviewComment(courseId, slideId, currentSubmission.id, commentId,);
+		deleteReviewComment(courseId, slideId, currentSubmission.id, reviewId, commentId,);
 	}
 
 	isSubmitResultsContainsError = ({ automaticChecking }) => {
@@ -1043,7 +1042,7 @@ class Exercise extends React.Component {
 
 const mapStateToProps = (state, { courseId, slideId, }) => {
 	const { slides, account, userProgress } = state;
-	const { submissionsByCourses, } = slides;
+	const { submissionsByCourses, submissionError, } = slides;
 	let { lastCheckingResponse, } = slides;
 	let slideProgress = userProgress.progress[courseId][slideId];
 
@@ -1062,6 +1061,7 @@ const mapStateToProps = (state, { courseId, slideId, }) => {
 	return {
 		isAuthenticated: account.isAuthenticated,
 		submissions,
+		submissionError,
 		lastCheckingResponse,
 		author: account,
 		slideProgress

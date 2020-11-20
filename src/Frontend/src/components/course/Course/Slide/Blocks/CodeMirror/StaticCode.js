@@ -12,6 +12,9 @@ import texts from "src/components/course/Course/Slide/Blocks/CodeMirror/Exercise
 
 
 function StaticCode({ language, code, className, isHidden, }) {
+	const lines = code.split('\n');
+	const [collapseEditor, showAllCode] = useState(isHidden && lines.length > 20);
+
 	const opts = {
 		mode: CodeMirror.loadLanguageStyles(language),
 		lineNumbers: true,
@@ -21,8 +24,7 @@ function StaticCode({ language, code, className, isHidden, }) {
 		readOnly: true,
 		matchBrackets: true,
 	}
-	const lines = code.split('\n');
-	const [collapseEditor, showAllCode] = useState(isHidden && lines.length > 20);
+
 	const value = collapseEditor ? lines.splice(0, 5).join('\n') : code;
 
 	return (
