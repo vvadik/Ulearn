@@ -4,7 +4,7 @@ import classNames from "classnames";
 
 import Avatar from "src/components/common/Avatar/Avatar";
 import { Textarea, ThemeContext, } from "ui";
-import { Send3, Trash, } from "icons";
+import { Send3, Trash, Delete, } from "icons";
 
 import { textareaHidden } from "src/uiTheme";
 
@@ -57,19 +57,27 @@ class Review extends React.Component {
 
 		let sameReviews = reviews.length === prevProps.reviews.length;
 		if(sameReviews) {
-			const reviewsIds = reviews.map(r => r.id);
-			const oldReviewsIds = prevProps.reviews.map(r => r.id);
+			const newReviews = reviews.map(r => ({
+				id: r.id,
+				innerCommentsIds: r.comments.map(c => c.id),
+			}));
+			const oldReviews = prevProps.reviews.map(r => ({
+				id: r.id,
+				innerCommentsIds: r.comments.map(c => c.id),
+			}));
 
-			reviewsIds.sort();
-			oldReviewsIds.sort();
-
-			for (const [i, id] of reviewsIds.entries()) {
-				if(oldReviewsIds[i] !== id) {
+			for (const [i, { id, innerCommentsIds }] of newReviews.entries()) {
+				const oldReview = oldReviews[i];
+				if(oldReview.id !== id || innerCommentsIds.length !== oldReview.innerCommentsIds.length) {
 					sameReviews = false;
+					break;
+				}
+				if(innerCommentsIds[innerCommentsIds.length - 1] !== oldReview.innerCommentsIds[oldReview.innerCommentsIds.length - 1]) {
+					sameReviews = false;
+					break;
 				}
 			}
 		}
-
 		if(!sameReviews) {
 			this.setState({
 				comments: this.getCommentsOrderByStart(reviews)
@@ -113,13 +121,15 @@ class Review extends React.Component {
 					totalCommentsHeight += height + 5;
 				}
 
-				commentsWithMargin[0].margin = spaceToSelectedReview - totalCommentsHeight;
-				for (let i = 1; i <= selectedReviewIndex; i++) {
+				for (let i = 0; i <= selectedReviewIndex; i++) {
 					const comment = commentsWithMargin[i];
 					const anchorTop = getReviewAnchorTop(comment.review);
 					const height = comment.ref.current.offsetHeight;
-					comment.margin = Math.max(5, Math.min(anchorTop, spaceToSelectedReview - totalCommentsHeight));
-					spaceToSelectedReview -= (height + 5);
+					comment.margin = Math.min(anchorTop, spaceToSelectedReview - totalCommentsHeight);
+					if(i > 0) {
+						comment.margin = Math.max(5, comment.margin);
+					}
+					spaceToSelectedReview -= (height + comment.margin);
 					totalCommentsHeight -= (height);
 				}
 			}
@@ -166,32 +176,37 @@ class Review extends React.Component {
 		}
 
 		const selectComment = (e) => onSelectComment(e, id);
-
 		return (
 			<li key={ i }
 				className={ className }
 				ref={ ref }
 				onClick={ selectComment }
-				style={ { marginTop: `${ margin }px` } }
+				style={ {
+					marginTop: `${ margin }px`,
+				} }
 			>
 				{ this.renderComment(review) }
 				{
-					!author.isBot &&
+					comments.length > 0 && !author.isBot &&
 					<ol className={ styles.commentRepliesList }>
-						{ comments.map((c, i) =>
+						{ comments.filter(r => !r.isDeleted).map((c, i) =>
 							<li className={ styles.commentReply } key={ i }>
-								{ this.renderComment(c) }
+								{ this.renderComment(c, id) }
 							</li>)
 						}
 					</ol>
 				}
-				{ !author.isBot && this.renderAddReviewComment(selectComment, commentsReplies[id]) }
+				{ selectedReviewId === id && !author.isBot && this.renderAddReviewComment(selectComment, commentsReplies[id]) }
 			</li>
 		);
 	}
 
-	renderComment = ({ author, startLine, finishLine, addingTime, publishTime, text, comment, }) => {
-		const { userId } = this.props;
+	renderComment = ({ id, author, startLine, finishLine, addingTime, publishTime, renderedText, renderedComment, isLoading, }, reviewId = null) => {
+		const { userId, deleteReviewComment } = this.props;
+
+		if(isLoading) {
+			return null;
+		}
 
 		if(!author) {
 			author = { visibleName: 'Ulearn bot', id: 'bot', isBot: true, };
@@ -213,7 +228,25 @@ class Review extends React.Component {
 							</span>
 							}
 							{
-								author.id === userId && <Trash color={ 'red' } size={ 12 }/>
+								author.id === userId && <Trash
+									className={ styles.innerCommentDeleteButton }
+									onClick={ () => deleteReviewComment(reviewId, id) }
+									size={ 12 }
+								/>
+
+								/* TODO Not included in release
+																(reviewId
+																		? <Trash
+																			className={ styles.innerCommentDeleteButton }
+																			onClick={ () => deleteReviewComment(reviewId, id) }
+																			size={ 12 }
+																		/>
+																		: <Delete
+																			className={ styles.commentDeleteButton }
+																			onClick={ () => deleteReviewComment(reviewId, id) }
+																			size={ 14 }
+																		/>
+																)*/
 							}
 						</span>
 						{ time &&
@@ -221,7 +254,8 @@ class Review extends React.Component {
 						}
 					</div>
 				</div>
-				<p className={ styles.commentText }>{ comment || text }</p>
+				<p className={ styles.commentText }
+				   dangerouslySetInnerHTML={ { __html: renderedComment || renderedText } }/>
 			</React.Fragment>
 		);
 	}
@@ -278,6 +312,7 @@ Review.propTypes = {
 	userId: PropTypes.string,
 	onSelectComment: PropTypes.func,
 	addReviewComment: PropTypes.func,
+	deleteReviewComment: PropTypes.func,
 	getReviewAnchorTop: PropTypes.func,
 }
 

@@ -57,10 +57,13 @@
   width: 24px;
   height: 24px;
 
+  float: left;
+
   min-width: 24px;
 }
 
 .commentInfoWrapper {
+  max-width: calc(100% - 24px - 8px);
   display: inline-block;
   margin-left: 8px;
   cursor: default;
@@ -70,7 +73,6 @@
   display: flex;
   margin: 0;
   max-height: 20px;
-  max-width: calc(@minCommentWidth - 18px - 32px - 24px - 8px);
 }
 
 .authorName {
@@ -106,6 +108,16 @@
 
 .commentReply {
   margin-bottom: 16px;
+}
+
+.commentReply&:last-child {
+  margin-bottom: 0;
+}
+
+.commentReply:hover {
+  .innerCommentDeleteButton {
+	color: @progressBarRed;
+  }
 }
 
 .commentReplyTextArea {
@@ -144,4 +156,21 @@
 .commentRepliesList {
   list-style: none;
   padding: 0;
+}
+
+.commentDeleteButton {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  color: @disabledColor;
+  cursor: pointer;
+}
+
+.commentDeleteButton:hover {
+  color: @black;
+}
+
+.innerCommentDeleteButton {
+  cursor: pointer;
+  color: transparent;
 }
