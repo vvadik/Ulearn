@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import styles from "./CongratsModal.less"
 
 import texts from "./CongratsModal.texts";
-import CupIcon from "src/components/course/Course/Slide/Blocks/CodeMirror/CongratsModal/CupIcon";
+import CupIcon from "src/components/course/Course/Slide/Blocks/Exercise/CongratsModal/CupIcon";
 
 
 class CongratsModal extends React.Component {

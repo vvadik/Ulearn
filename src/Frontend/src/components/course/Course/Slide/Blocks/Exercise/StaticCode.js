@@ -8,7 +8,7 @@ import classNames from "classnames";
 import PropTypes from 'prop-types';
 
 import styles from './Exercise.less';
-import texts from "src/components/course/Course/Slide/Blocks/CodeMirror/Exercise.texts";
+import texts from "src/components/course/Course/Slide/Blocks/Exercise/Exercise.texts";
 
 
 function StaticCode({ language, code, className, isHidden, }) {
