@@ -6,9 +6,9 @@ import Review from "./Review/Review";
 import { darkTheme } from 'ui/internal/ThemePlayground/darkTheme';
 import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent";
 import { Lightbulb, Refresh, EyeOpened, DocumentLite, } from "icons";
-import CongratsModal from "./CongratsModal/CongratsModal";
+import CongratsModal from "./CongratsModal/CongratsModal.tsx";
 import { ExerciseOutput, HasOutput } from "./ExerciseOutput/ExerciseOutput.tsx";
-import { ExerciseFormHeader } from "./ExerciseFormHeader/ExerciseFormHeader";
+import { ExerciseFormHeader } from "./ExerciseFormHeader/ExerciseFormHeader.tsx";
 import { ThemeContext } from "@skbkontur/react-ui/index";
 
 import PropTypes from 'prop-types';
@@ -39,7 +39,12 @@ import styles from './Exercise.less';
 
 import texts from './Exercise.texts';
 import { GetSubmissionColor } from "./ExerciseUtils.ts";
-import { HasSuccessSubmission, SelectedSubmissionIsLast, SelectedSubmissionIsLastSuccess } from "./ExerciseUtils";
+import {
+	HasSuccessSubmission,
+	IsFirstRightAnswer,
+	SelectedSubmissionIsLast,
+	SelectedSubmissionIsLastSuccess
+} from "./ExerciseUtils";
 
 const isControlsTextSuits = () => !isMobile() && !isTablet();
 const editThemeName = 'darcula';
@@ -157,15 +162,13 @@ class Exercise extends React.Component {
 			if(solutionRunStatus === SolutionRunStatus.Success) {
 				const { automaticChecking } = submission;
 
-				if(automaticChecking) {
-					if(automaticChecking.processStatus === ProcessStatus.Done) {
-						if(automaticChecking.result === CheckingResult.RightAnswer) {
-							this.openModal({ // TODO вроде не показываем модалку, если уже было решено ранее?
-								score: lastCheckingResponse.score,
-								waitingForManualChecking: lastCheckingResponse.waitingForManualChecking,
-							});
-						}
-					}
+				if(automaticChecking?.processStatus === ProcessStatus.Done
+					&& automaticChecking.result === CheckingResult.RightAnswer
+					&& IsFirstRightAnswer(submissions, submission)) {
+					this.openModal({
+						score: lastCheckingResponse.score,
+						waitingForManualChecking: lastCheckingResponse.waitingForManualChecking,
+					});
 				}
 			}
 		} else if(currentSubmission) {
@@ -669,11 +672,12 @@ class Exercise extends React.Component {
 	}
 
 	renderCongratsModal = ({ score, waitingForManualChecking, }) => {
-		const { hideSolutions } = this.props;
+		const { hideSolutions, } = this.props;
+		const { showAcceptedSolutions, } = this.state;
 
 		return (
 			<CongratsModal
-				showAcceptedSolutions={ !waitingForManualChecking && !hideSolutions && this.showAcceptedSolutions } // TODO требуется функция, а передается boolean
+				showAcceptedSolutions={ !waitingForManualChecking && !hideSolutions && showAcceptedSolutions }
 				score={ score }
 				waitingForManualChecking={ waitingForManualChecking }
 				onClose={ this.closeCongratsModal }

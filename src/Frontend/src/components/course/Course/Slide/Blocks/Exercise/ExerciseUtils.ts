@@ -49,10 +49,16 @@ function SelectedSubmissionIsLastSuccess(submissions: SubmissionInfo[], currentS
 	return successSubmissions.length > 0 && successSubmissions[0] === currentSubmission;
 }
 
+function IsFirstRightAnswer(submissions: SubmissionInfo[], successSubmission: SubmissionInfo): boolean  {
+	const successSubmissions = submissions.filter(IsSuccessSubmission);
+	return successSubmissions.length > 0 && successSubmissions[successSubmissions.length - 1] === successSubmission;
+}
+
 export {
 	GetSubmissionColor,
 	SubmissionColor,
 	HasSuccessSubmission,
 	SelectedSubmissionIsLast,
-	SelectedSubmissionIsLastSuccess
+	SelectedSubmissionIsLastSuccess,
+	IsFirstRightAnswer
 }

@@ -1,12 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { accountPath } from "src/consts/routes";
-import getPluralForm from "src/utils/getPluralForm";
+import { accountPath } from "src/consts/routes.js";
+import getPluralForm from "src/utils/getPluralForm.js";
 
 export default {
 	title: 'Ура!',
-	getBodyText: (isWaitingForManualCheck, score,) => (
-		isWaitingForManualCheck
+	getBodyText: (waitingForManualChecking: boolean, score: number,): React.ReactNode => (
+		waitingForManualChecking
 			? <React.Fragment>
 				<p>Вы отправили задачу на ревью.</p>
 				Преподаватель проверит решение<br/>

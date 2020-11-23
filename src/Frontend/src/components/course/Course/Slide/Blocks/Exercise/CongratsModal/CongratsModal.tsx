@@ -1,31 +1,37 @@
 import React from "react";
 
-import PropTypes from 'prop-types';
-
 import styles from "./CongratsModal.less"
 
 import texts from "./CongratsModal.texts";
-import CupIcon from "src/components/course/Course/Slide/Blocks/Exercise/CongratsModal/CupIcon";
+import CupIcon from "./CupIcon.js";
 
+interface CongratsModalProps {
+	onClose: () => void,
+	waitingForManualChecking: boolean,
+	score: number,
+	showAcceptedSolutions: boolean,
+}
 
-class CongratsModal extends React.Component {
-	componentDidMount() {
+class CongratsModal extends React.Component<CongratsModalProps> {
+	overlay: HTMLDivElement | null | undefined;
+
+	componentDidMount(): void {
 		document.querySelector('body')
-			.classList.add(styles.bodyOverflow);
+			?.classList.add(styles.bodyOverflow);
 	}
 
-	componentWillUnmount() {
+	componentWillUnmount(): void {
 		document.querySelector('body')
-			.classList.remove(styles.bodyOverflow);
+			?.classList.remove(styles.bodyOverflow);
 	}
 
-	render() {
+	render(): React.ReactNode {
 		const { waitingForManualChecking, score, showAcceptedSolutions, onClose, } = this.props;
 
 		return (
 			<div ref={ (ref) => this.overlay = ref }
-				 className={ styles.overlay }
-				 onClick={ this.handleCongratsOverlayClick }>
+				className={ styles.overlay }
+				onClick={ this.handleCongratsOverlayClick }>
 				<div className={ styles.modal }>
 					<button className={ styles.modalCloseButton } onClick={ onClose }>
 						&times;
@@ -54,21 +60,18 @@ class CongratsModal extends React.Component {
 		);
 	}
 
-	renderScore = (score) => {
+	private renderScore = (score: number) => {
 		return (
 			<div className={ styles.scoreTextWrapper }>+{ score }</div>
 		);
 	}
 
-	onCloseClick = () => {
-		const { onClose, showAcceptedSolutions, } = this.props;
-
-
-		showAcceptedSolutions();
+	private onCloseClick = () => {
+		const { onClose, } = this.props;
 		onClose();
 	}
 
-	renderSelfCheckContent = () => {
+	private renderSelfCheckContent = () => {
 		return (
 			<React.Fragment>
 				<div className={ styles.delimiter }/>
@@ -82,18 +85,11 @@ class CongratsModal extends React.Component {
 		);
 	}
 
-	handleCongratsOverlayClick = (e) => {
+	private handleCongratsOverlayClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		if(e.target === this.overlay) {
 			this.props.onClose();
 		}
 	}
-}
-
-CongratsModal.propTypes = {
-	onClose: PropTypes.func.isRequired,
-	waitingForManualChecking: PropTypes.bool,
-	score: PropTypes.number,
-	showAcceptedSolutions: PropTypes.func,
 }
 
 export default CongratsModal;
