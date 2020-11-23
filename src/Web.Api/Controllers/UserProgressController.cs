@@ -91,7 +91,7 @@ namespace Ulearn.Web.Api.Controllers
 						Score = kvp.Value,
 						IsSkipped = skippedSlides.GetValueOrDefault(userId)?.Contains(kvp.Key) ?? false,
 						UsedAttempts = attempts.GetValueOrDefault(userId)?.GetValueOrDefault(kvp.Key) ?? 0,
-						IsWaitingForManualChecking = (waitingExerciseSlides.GetValueOrDefault(userId)?.Contains(kvp.Key) ?? false)
+						WaitingForManualChecking = (waitingExerciseSlides.GetValueOrDefault(userId)?.Contains(kvp.Key) ?? false)
 							|| (waitingQuizSlides.GetValueOrDefault(userId)?.Contains(kvp.Key) ?? false),
 						ProhibitFurtherManualChecking = prohibitFurtherManualCheckingSlides.GetValueOrDefault(userId)?.Contains(kvp.Key) ?? false
 					});

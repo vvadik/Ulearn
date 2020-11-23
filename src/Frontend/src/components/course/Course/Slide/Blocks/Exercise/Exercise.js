@@ -38,6 +38,8 @@ import './CodeMirrorAutocompleteExtension';
 import styles from './Exercise.less';
 
 import texts from './Exercise.texts';
+import { GetSubmissionColor } from "./ExerciseUtils.ts";
+import { HasSuccessSubmission, SelectedSubmissionIsLast, SelectedSubmissionIsLastSuccess } from "./ExerciseUtils";
 
 const isControlsTextSuits = () => !isMobile() && !isTablet();
 const editThemeName = 'darcula';
@@ -258,7 +260,7 @@ class Exercise extends React.Component {
 	}
 
 	renderControlledCodeMirror = (opts) => {
-		const { expectedOutput, submissions, author, } = this.props;
+		const { expectedOutput, submissions, author, waitingForManualChecking, slideProgress } = this.props;
 		const {
 			value, showedHintsCount, showAcceptedSolutions, currentSubmission,
 			isEditable, exerciseCodeDoc, congratsModalData,
@@ -277,10 +279,15 @@ class Exercise extends React.Component {
 			{ [styles.editorInReview]: isReview },
 		);
 		const automaticChecking = currentSubmission?.automaticChecking ?? visibleCheckingResponse?.automaticChecking;
+		const selectedSubmissionIsLast = SelectedSubmissionIsLast(submissions, currentSubmission);
+		const selectedSubmissionIsLastSuccess = SelectedSubmissionIsLastSuccess(submissions, currentSubmission);
+		const submissionColor = GetSubmissionColor(visibleCheckingResponse?.solutionRunStatus, automaticChecking?.result,
+			HasSuccessSubmission(submissions), selectedSubmissionIsLast, selectedSubmissionIsLastSuccess,
+			waitingForManualChecking, slideProgress.isSkipped);
 		return (
 			<React.Fragment>
 				{ submissions.length !== 0 && this.renderSubmissionsSelect() }
-				{ !isEditable && this.renderHeader() }
+				{ !isEditable && this.renderHeader(submissionColor, selectedSubmissionIsLast, selectedSubmissionIsLastSuccess) }
 				<div className={ wrapperClassName }>
 					<Controlled
 						onBeforeChange={ this.onBeforeChange }
@@ -305,12 +312,13 @@ class Exercise extends React.Component {
 				</div>
 				{/* TODO not included in current release !isEditable && currentSubmission && this.renderOverview(currentSubmission)*/ }
 				{ this.renderControls() }
-				{ showOutput && HasOutput(visibleCheckingResponse?.message, automaticChecking, expectedOutput) && // TODO показывать вывод в случае статуса процесса и эта последняя посылка
+				{ showOutput && HasOutput(visibleCheckingResponse?.message, automaticChecking, expectedOutput) &&
 				<ExerciseOutput
 					solutionRunStatus={ visibleCheckingResponse?.solutionRunStatus ?? SolutionRunStatus.Success }
 					message={ visibleCheckingResponse?.message }
 					expectedOutput={ expectedOutput }
 					automaticChecking={ automaticChecking }
+					submissionColor={ submissionColor }
 				/>
 				}
 				{ showedHintsCount > 0 && this.renderHints() }
@@ -349,31 +357,24 @@ class Exercise extends React.Component {
 		);
 	}
 
-	renderHeader = () => {
+	renderHeader = (submissionColor, selectedSubmissionIsLast, selectedSubmissionIsLastSuccess) => {
 		const { currentSubmission, visibleCheckingResponse } = this.state;
-		const { submissions, slideProgress } = this.props;
-		const { waitingForManualChecking, prohibitFurtherManualChecking, score } = slideProgress;
+		const { waitingForManualChecking, prohibitFurtherManualChecking, score } = this.props.slideProgress;
+		debugger;
 		if(!currentSubmission && !visibleCheckingResponse)
 			return null;
-		const thisSubmissionWaitingForManualChecking = waitingForManualChecking
-			&& currentSubmission
-			&& Exercise.isWaitingForManualCheckingSubmission(submissions, currentSubmission);
-		const selectedSubmissionIsLast = submissions[0] === currentSubmission;
 		return (
 			<ExerciseFormHeader
 				solutionRunStatus={ visibleCheckingResponse ? visibleCheckingResponse.solutionRunStatus : null }
 				selectedSubmission={ currentSubmission }
-				waitingForManualChecking={ thisSubmissionWaitingForManualChecking }
+				waitingForManualChecking={ waitingForManualChecking }
 				prohibitFurtherManualChecking={ prohibitFurtherManualChecking }
 				selectedSubmissionIsLast={ selectedSubmissionIsLast }
+				selectedSubmissionIsLastSuccess={ selectedSubmissionIsLastSuccess }
 				score={ score }
+				submissionColor={ submissionColor }
 			/>
 		);
-	}
-
-	static isWaitingForManualCheckingSubmission(submissions, currentSubmission) {
-		const candidatesForReview = submissions.filter(s => s.automaticChecking === null || s.automaticChecking.result === CheckingResult.RightAnswer);
-		return candidatesForReview.length > 0 && currentSubmission === candidatesForReview[0];
 	}
 
 	loadSubmissionToState = (submission,) => {

@@ -10,6 +10,7 @@ import {
 	ExerciseAutomaticCheckingResponse,
 	SolutionRunStatus
 } from "src/models/exercise";
+import { SubmissionColor } from "../ExerciseUtils";
 
 enum OutputType {
 	CompilationError = "CompilationError",
@@ -19,12 +20,19 @@ enum OutputType {
 	Success = "Success"
 }
 
-const outputTypeToStyleAndHeader: EnumDictionary<OutputType, { style: string, header: string }> = {
-	[OutputType.CompilationError]: { style: styles.compilationErrorOutput, header: texts.headers.compilationError },
-	[OutputType.WrongAnswer]: { style: styles.wrongAnswerOutput, header: texts.headers.wrongAnswer },
-	[OutputType.ServerError]: { style: styles.serverErrorOutput, header: texts.headers.serverError },
-	[OutputType.ServerMessage]: { style: styles.serverErrorOutput, header: texts.headers.serverMessage },
-	[OutputType.Success]: { style: styles.output, header: texts.headers.output },
+const submissionColorToStyle: EnumDictionary<SubmissionColor, string> = {
+	[SubmissionColor.WrongAnswer]: styles.wrongAnswerOutput,
+	[SubmissionColor.NeedImprovements]: styles.needImprovementsOutput,
+	[SubmissionColor.MaxResult]: styles.maxResultOutput,
+	[SubmissionColor.Message]: styles.output,
+}
+
+const outputTypeToHeader: EnumDictionary<OutputType, string> = {
+	[OutputType.CompilationError]: texts.headers.compilationError,
+	[OutputType.WrongAnswer]: texts.headers.wrongAnswer,
+	[OutputType.ServerError]: texts.headers.serverError,
+	[OutputType.ServerMessage]: texts.headers.serverMessage,
+	[OutputType.Success]: texts.headers.output,
 }
 
 type OutputTypeAndBody = { outputType: OutputType, body: string | null };
@@ -43,17 +51,19 @@ function HasOutput(message: string, automaticChecking: ExerciseAutomaticChecking
 }
 
 interface OutputTypeProps {
-	solutionRunStatus: string, // Success, если не посылка прямо сейчас
+	solutionRunStatus: SolutionRunStatus, // Success, если не посылка прямо сейчас
 	message: string | null,
 	expectedOutput: string | null,
-	automaticChecking: ExerciseAutomaticCheckingResponse | null
+	automaticChecking: ExerciseAutomaticCheckingResponse | null,
+	submissionColor: SubmissionColor
 }
 
 class ExerciseOutput extends React.Component<OutputTypeProps> {
 	render(): React.ReactNode {
-		const { expectedOutput } = this.props;
+		const { expectedOutput, submissionColor } = this.props;
 		const { outputType, body } = this.getOutputTypeAndBody();
-		const { style, header } = outputTypeToStyleAndHeader[outputType];
+		const style = submissionColorToStyle[submissionColor];
+		const header = outputTypeToHeader[outputType];
 		const showIcon = outputType !== OutputType.Success;
 		const isWrongAnswer = outputType === OutputType.WrongAnswer
 		const isSimpleTextOutput = expectedOutput === null || !isWrongAnswer;

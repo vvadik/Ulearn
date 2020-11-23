@@ -6,6 +6,7 @@ import {
 	AutomaticExerciseCheckingResult,
 	SolutionRunStatus,
 } from "src/models/exercise";
+import { SubmissionColor } from "../ExerciseUtils";
 
 const Template: Story<ExerciseFormHeaderProps> = (args) => <ExerciseFormHeader { ...args } />;
 
@@ -38,6 +39,13 @@ export default {
 			control: {
 				type: 'select',
 				options: [...Object.values(SolutionRunStatus), null],
+			},
+		},
+		submissionColor: {
+			defaultValue: SubmissionColor.MaxResult,
+			control: {
+				type: 'select',
+				options: [...Object.values(SubmissionColor)],
 			},
 		},
 	}

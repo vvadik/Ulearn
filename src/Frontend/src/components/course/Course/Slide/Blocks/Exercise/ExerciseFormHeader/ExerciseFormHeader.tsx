@@ -9,25 +9,33 @@ import {
 	SubmissionInfo
 } from "src/models/exercise";
 import getPluralForm from "src/utils/getPluralForm.js";
+import { SubmissionColor } from "../ExerciseUtils";
 
 interface ExerciseFormHeaderProps {
 	solutionRunStatus: SolutionRunStatus | null, // Если результаты посылки, сделанной только что и не содержащей submission
 	selectedSubmission: SubmissionInfo | null, // Если результаты выбранной посылки
-	waitingForManualChecking?: boolean, // True, если именно это решение ожидает ревью
-	prohibitFurtherManualChecking?: boolean, // True, если ревью по задаче включено, но запрещено для задачи этого студента преподавателем
+	submissionColor: SubmissionColor,
+	waitingForManualChecking?: boolean,  // Студент в целом ожидает ревью?
 	selectedSubmissionIsLast?: boolean,
-	score?: number
+	selectedSubmissionIsLastSuccess?: boolean, // Это последнее решение, прошедшее тесты?
+	prohibitFurtherManualChecking?: boolean, // True, если ревью по задаче включено, но запрещено для задачи этого студента преподавателем
+	score?: number,
 }
 
-type StyleAndText = { style: string, text: string } | null;
+const submissionColorToStyle: EnumDictionary<SubmissionColor, string> = {
+	[SubmissionColor.WrongAnswer]: styles.errorHeader,
+	[SubmissionColor.NeedImprovements]: styles.needImprovementsHeader,
+	[SubmissionColor.MaxResult]: styles.successHeader,
+	[SubmissionColor.Message]: styles.header,
+}
 
 class ExerciseFormHeader extends React.Component<ExerciseFormHeaderProps> {
 	render(): React.ReactNode {
-		const styleAndText = this.getStyleAndText();
-		if(!styleAndText) {
+		const style = submissionColorToStyle[this.props.submissionColor];
+		const text = this.getText();
+		if(!text) {
 			return null;
 		}
-		const { style, text } = styleAndText;
 		return (
 			<div className={ style }>
 				{ text }
@@ -35,64 +43,68 @@ class ExerciseFormHeader extends React.Component<ExerciseFormHeaderProps> {
 		);
 	}
 
-	getStyleAndText(): StyleAndText {
-		const { solutionRunStatus, selectedSubmission } = this.props;
+	getText(): string | null {
+		const { solutionRunStatus, selectedSubmission, score, selectedSubmissionIsLast } = this.props;
+		let text: string | null = null;
 		if(solutionRunStatus && solutionRunStatus !== SolutionRunStatus.Success) {
-			return this.getStyleAndTextForCheckingResponse(solutionRunStatus);
+			text = this.getTextForCheckingResponse(solutionRunStatus);
+		} else if(selectedSubmission) {
+			text = this.getTextForSelectedSubmission(selectedSubmission);
 		}
-		if(selectedSubmission) {
-			return this.getStyleAndTextForSelectedSubmission(selectedSubmission);
+		if(selectedSubmissionIsLast && score !== null && score !== undefined) {
+			const plural = getPluralForm(score, 'балл', 'балла', 'баллов')
+			text = `${ score } ${ plural }. ${ text }`;
 		}
-		return null;
+		return text;
 	}
 
-	getStyleAndTextForSelectedSubmission(selectedSubmission: SubmissionInfo): StyleAndText {
-		const { waitingForManualChecking, prohibitFurtherManualChecking, selectedSubmissionIsLast, score } = this.props;
+	getTextForSelectedSubmission(selectedSubmission: SubmissionInfo): string | null {
+		const { waitingForManualChecking, prohibitFurtherManualChecking, selectedSubmissionIsLastSuccess } = this.props;
 		const { automaticChecking, manualCheckingPassed, } = selectedSubmission;
 		if(automaticChecking) {
 			switch (automaticChecking.processStatus) {
 				case ProcessStatus.Done:
 					switch (automaticChecking.result) {
 						case CheckingResult.RightAnswer:
-							return ExerciseFormHeader.getStyleAndTextAllTestPassedWithScore(waitingForManualChecking,
-								prohibitFurtherManualChecking, manualCheckingPassed, !!selectedSubmissionIsLast, score);
+							return ExerciseFormHeader.getTextAllTestPassed(waitingForManualChecking,
+								prohibitFurtherManualChecking, manualCheckingPassed, !!selectedSubmissionIsLastSuccess);
 						case CheckingResult.CompilationError:
-							return { style: styles.errorHeader, text: texts.compilationError };
+							return texts.compilationError;
 						case CheckingResult.WrongAnswer:
-							return { style: styles.errorHeader, text: texts.wrongAnswer };
+							return texts.wrongAnswer;
 						case CheckingResult.NotChecked:
 						default:
 							console.error(new Error(`checkingResult has unknown value ${ automaticChecking.result }`));
 							return null;
 					}
 				case ProcessStatus.Running:
-					return { style: styles.header, text: texts.running };
+					return texts.running;
 				case ProcessStatus.Waiting:
-					return { style: styles.header, text: texts.waiting };
+					return texts.waiting;
 				case ProcessStatus.ServerError:
-					return { style: styles.header, text: texts.serverError };
+					return texts.serverError;
 				case ProcessStatus.WaitingTimeLimitExceeded:
-					return { style: styles.header, text: texts.waitingTimeLimitExceeded };
+					return texts.waitingTimeLimitExceeded;
 				default:
 					console.error(new Error(`processStatus has unknown value ${ automaticChecking.result }`));
 					return null;
 			}
 		} else {
-			return ExerciseFormHeader.getStyleAndTextNoTests(waitingForManualChecking,
-				prohibitFurtherManualChecking, selectedSubmission.manualCheckingPassed);
+			return ExerciseFormHeader.getTextNoTests(waitingForManualChecking,
+				prohibitFurtherManualChecking, selectedSubmission.manualCheckingPassed,
+				selectedSubmissionIsLastSuccess);
 		}
 	}
 
-	getStyleAndTextForCheckingResponse(solutionRunStatus: SolutionRunStatus): StyleAndText {
+	getTextForCheckingResponse(solutionRunStatus: SolutionRunStatus): string | null {
 		switch (solutionRunStatus) {
 			case SolutionRunStatus.Ignored:
-				return { style: styles.header, text: texts.serverMessage };
-			case SolutionRunStatus.InternalServerError:
-				return { style: styles.header, text: texts.serverError };
 			case SolutionRunStatus.SubmissionCheckingTimeout:
-				return { style: styles.header, text: texts.serverMessage };
+				return texts.serverMessage;
+			case SolutionRunStatus.InternalServerError:
+				return texts.serverError;
 			case SolutionRunStatus.CompilationError:
-				return { style: styles.errorHeader, text: texts.compilationError };
+				return texts.compilationError;
 			case SolutionRunStatus.Success:
 				console.error(new Error(`solutionRunStatus cant be Success in getStyleAndTextForCheckingResponse`));
 				return null;
@@ -102,54 +114,37 @@ class ExerciseFormHeader extends React.Component<ExerciseFormHeaderProps> {
 		}
 	}
 
-	static getStyleAndTextAllTestPassedWithScore(waitingForManualChecking: boolean | undefined,
+	static getTextAllTestPassed(waitingForManualChecking: boolean | undefined,
 		prohibitFurtherManualChecking: boolean | undefined,
-		manualCheckingPassed: boolean, isLastSubmission: boolean, score?: number | null
-	): StyleAndText {
-		const styleAndText = ExerciseFormHeader.getStyleAndTextAllTestPassed(waitingForManualChecking,
-			prohibitFurtherManualChecking, manualCheckingPassed, isLastSubmission);
-		if(!styleAndText) {
-			return styleAndText;
+		manualCheckingPassed: boolean, selectedSubmissionIsLastSuccess: boolean
+	): string | null {
+		if(manualCheckingPassed) {
+			return texts.allTestPassedWasReviewed;
 		}
-		if(isLastSubmission && score) {
-			const plural = getPluralForm(score, 'балл', 'балла', 'баллов')
-			styleAndText.text = `${ score } ${ plural }. ${ styleAndText.text }`;
+		if(waitingForManualChecking && selectedSubmissionIsLastSuccess) {
+			return texts.allTestPassedPendingReview;
 		}
-		return styleAndText;
+		if(prohibitFurtherManualChecking && selectedSubmissionIsLastSuccess) {
+			return texts.allTestPassedProhibitFurtherReview;
+		}
+		if(selectedSubmissionIsLastSuccess) {
+			return texts.allTestPassedNoReview;
+		}
+		return texts.allTestPassed;
 	}
 
-	static getStyleAndTextAllTestPassed(waitingForManualChecking: boolean | undefined,
+	static getTextNoTests(waitingForManualChecking: boolean | undefined,
 		prohibitFurtherManualChecking: boolean | undefined,
-		manualCheckingPassed: boolean, isLastSubmission: boolean
-	): StyleAndText {
+		manualCheckingPassed: boolean, selectedSubmissionIsLastSuccess: boolean | undefined
+	): string | null {
 		if(manualCheckingPassed) {
-			return { style: styles.successHeader, text: texts.allTestPassedWasReviewed };
+			return texts.noTestsWasReviewed;
 		}
-		if(waitingForManualChecking) {
-			return { style: styles.successHeader, text: texts.allTestPassedPendingReview };
+		if(waitingForManualChecking && selectedSubmissionIsLastSuccess) {
+			return texts.noTestsPendingReview;
 		}
-		if(prohibitFurtherManualChecking && isLastSubmission) {
-			return { style: styles.successHeader, text: texts.allTestPassedProhibitFurtherReview };
-		}
-		if(isLastSubmission) {
-			return { style: styles.successHeader, text: texts.allTestPassedNoReview };
-		}
-		return { style: styles.successHeader, text: texts.allTestPassed };
-	}
-
-	static getStyleAndTextNoTests(waitingForManualChecking: boolean | undefined,
-		prohibitFurtherManualChecking: boolean | undefined,
-		manualCheckingPassed: boolean
-	)
-		: StyleAndText {
-		if(manualCheckingPassed) {
-			return { style: styles.successHeader, text: texts.noTestsWasReviewed };
-		}
-		if(waitingForManualChecking) {
-			return { style: styles.header, text: texts.noTestsPendingReview };
-		}
-		if(prohibitFurtherManualChecking) {
-			return { style: styles.header, text: texts.noTestsProhibitFurtherReview };
+		if(prohibitFurtherManualChecking && selectedSubmissionIsLastSuccess) {
+			return texts.noTestsProhibitFurtherReview;
 		}
 		return null;
 	}

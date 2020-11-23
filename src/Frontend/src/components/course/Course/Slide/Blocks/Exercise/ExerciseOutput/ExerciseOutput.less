@@ -12,15 +12,14 @@
   border-color: @likeColor;
 }
 
-.compilationErrorOutput {
-  .output;
-  border-color: @likeColor;
-  background: @lightRed;
-}
-
-.serverErrorOutput {
+.needImprovementsOutput {
   .output;
   border-color: @accentColor;
+}
+
+.maxResultOutput {
+  .output;
+  border-color: @progressBarGreen;
 }
 
 .outputHeader {
@@ -41,15 +40,16 @@
   color: @white;
 }
 
-.compilationErrorOutput .outputHeader {
-  background-color: @likeColor;
-  color: @white;
-}
-
-.serverErrorOutput .outputHeader {
+.needImprovementsOutput .outputHeader {
   background-color: @accentColor;
   color: @white;
 }
+
+.maxResultOutput .outputHeader {
+  background-color: @progressBarGreen;
+  color: @white;
+}
+
 
 .outputTextWrapper {
   padding: 8px 15px;

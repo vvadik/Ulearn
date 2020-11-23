@@ -3,10 +3,11 @@ import type { Story } from "@storybook/react";
 import { ExerciseOutput, OutputTypeProps } from "./ExerciseOutput";
 
 import {
-	AutomaticExerciseCheckingResult as CheckingResult,
 	AutomaticExerciseCheckingProcessStatus as ProcessStatus,
+	AutomaticExerciseCheckingResult as CheckingResult,
 	SolutionRunStatus
 } from "src/models/exercise";
+import { SubmissionColor } from "../ExerciseUtils";
 
 const Template: Story<OutputTypeProps> = (args) => <ExerciseOutput { ...args } />;
 
@@ -25,19 +26,26 @@ const outputTypeProps = {
 	solutionRunStatus: SolutionRunStatus.Success,
 	message: "message text",
 	expectedOutput: "1\n2\n      3\nНазвание теста: MoveManipulatorTo_ActuallyBringsManipulatorToDesiredLocation(-207.950052059698d,109.42692431548d,62.2635171658309d)",
+	submissionColor: SubmissionColor.WrongAnswer,
 	automaticChecking: {
 		output: "3\n2\n3",
 		processStatus: ProcessStatus.Done,
 		result: CheckingResult.WrongAnswer,
 		reviews: null
-	}
+	},
 };
 
 export const Editable = Template.bind({});
 Editable.args = outputTypeProps;
 
 const allSolutionRunStatusesItems = Object.values(SolutionRunStatus)
-	.map(s => ({ header: s, props: { ...outputTypeProps, solutionRunStatus: s, } }));
+	.map(s => ({
+		header: s, props: {
+			...outputTypeProps,
+			solutionRunStatus: s,
+			submissionColor: s === SolutionRunStatus.CompilationError ? SubmissionColor.WrongAnswer : SubmissionColor.NeedImprovements
+		}
+	}));
 export const AllSolutionRunStatuses = ListTemplate.bind({});
 AllSolutionRunStatuses.args = { items: allSolutionRunStatusesItems };
 
@@ -46,10 +54,11 @@ const allProcessStatusesItems = Object.values(ProcessStatus)
 		header: s, props: {
 			...outputTypeProps,
 			message: null,
+			submissionColor: SubmissionColor.NeedImprovements,
 			automaticChecking: {
 				...outputTypeProps.automaticChecking,
 				processStatus: s,
-			}
+			},
 		}
 	}));
 export const AllProcessStatuses = ListTemplate.bind({});
@@ -60,6 +69,9 @@ const allCheckingResultsItems = Object.values(CheckingResult)
 		header: s, props: {
 			...outputTypeProps,
 			message: null,
+			submissionColor: s === CheckingResult.CompilationError || s === CheckingResult.WrongAnswer
+				? SubmissionColor.WrongAnswer
+				: SubmissionColor.MaxResult,
 			automaticChecking: {
 				...outputTypeProps.automaticChecking,
 				result: s,
@@ -77,6 +89,12 @@ export default {
 			control: {
 				type: 'select',
 				options: Object.values(SolutionRunStatus),
+			},
+		},
+		submissionColor: {
+			control: {
+				type: 'select',
+				options: [...Object.values(SubmissionColor)],
 			},
 		},
 		message: {

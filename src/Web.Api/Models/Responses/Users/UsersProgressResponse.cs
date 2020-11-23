@@ -31,7 +31,7 @@ namespace Ulearn.Web.Api.Models.Responses.Users
 		[DataMember]
 		public int UsedAttempts { get; set; }
 		[DataMember]
-		public bool IsWaitingForManualChecking { get; set; }
+		public bool WaitingForManualChecking { get; set; }
 		[DataMember]
 		public bool ProhibitFurtherManualChecking { get; set; }
 		[DataMember]
