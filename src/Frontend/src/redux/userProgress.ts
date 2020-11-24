@@ -1,11 +1,12 @@
 import { UserProgressState } from "../models/reduxState";
+
 import {
 	UserProgressActionTypes,
+	USER__PROGRESS_LOAD_FAIL,
 	USER__PROGRESS_LOAD_START,
 	USER__PROGRESS_LOAD_SUCCESS,
-	USER__PROGRESS_LOAD_FAIL,
-	USER__PROGRESS_UPDATE
-} from "src/actions/userProgress";
+	USER__PROGRESS_UPDATE,
+} from "src/actions/userProgress.types";
 
 const initialState: UserProgressState = {
 	progress: {},
