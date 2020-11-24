@@ -14,7 +14,7 @@ import {
 
 import { userProgressUpdateAction } from "./userProgress";
 import { getCourse, getCourseErrors } from 'src/api/courses';
-import { getSlide, submitCode, } from "src/api/slides";
+import { getSlideBlocks, submitCode, } from "src/api/slides";
 import {
 	getFlashcards,
 	putFlashcardStatus,
@@ -75,11 +75,11 @@ const loadSlideStart = () => ({
 	type: COURSES__SLIDE_LOAD + START,
 });
 
-const loadSlideSuccess = (courseId, slideId, result) => ({
+const loadSlideSuccess = (courseId, slideId, slideBlocks) => ({
 	type: COURSES__SLIDE_LOAD + SUCCESS,
 	courseId,
 	slideId,
-	result,
+	slideBlocks,
 });
 
 const loadSlideFail = (error) => ({
@@ -220,9 +220,9 @@ export const loadSlide = (courseId, slideId) => {
 	return (dispatch) => {
 		dispatch(loadSlideStart());
 
-		getSlide(courseId, slideId)
-			.then(result => {
-				dispatch(loadSlideSuccess(courseId, slideId, result));
+		getSlideBlocks(courseId, slideId)
+			.then(slideBlocks => {
+				dispatch(loadSlideSuccess(courseId, slideId, slideBlocks));
 			})
 			.catch(err => {
 				dispatch(loadSlideFail(err));

@@ -25,7 +25,7 @@ export default function slides(state = initialCoursesSlidesState, action) {
 				slideError: null,
 			};
 		case COURSES__SLIDE_LOAD + SUCCESS: {
-			const { courseId, slideId, result } = action;
+			const { courseId, slideId, slideBlocks } = action;
 			const { slidesByCourses } = state;
 
 			const newState = {
@@ -34,7 +34,7 @@ export default function slides(state = initialCoursesSlidesState, action) {
 				slideError: null,
 			};
 
-			const exerciseBlock = result.find(block => block.$type === blockTypes.exercise);
+			const exerciseBlock = slideBlocks.find(block => block.$type === blockTypes.exercise);
 
 			if(exerciseBlock) {
 				const exerciseSubmissions = {};
@@ -58,7 +58,7 @@ export default function slides(state = initialCoursesSlidesState, action) {
 				...slidesByCourses,
 				[courseId]: {
 					...slidesByCourses[courseId],
-					[slideId]: result,
+					[slideId]: slideBlocks,
 				}
 			}
 
