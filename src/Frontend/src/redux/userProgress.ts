@@ -1,22 +1,25 @@
+import { UserProgressState } from "../models/reduxState";
 import {
-	USER__PROGRESS_LOAD,
-	USER__PROGRESS_UPDATE,
-	START, SUCCESS, FAIL,
-} from '../consts/actions';
+	UserProgressActionTypes,
+	USER__PROGRESS_LOAD_START,
+	USER__PROGRESS_LOAD_SUCCESS,
+	USER__PROGRESS_LOAD_FAIL,
+	USER__PROGRESS_UPDATE
+} from "src/actions/userProgress";
 
-const initialState = {
+const initialState: UserProgressState = {
 	progress: {},
 	loading: false,
 };
 
-export default function userProgressReducer(state = initialState, action) {
+export default function userProgressReducer(state = initialState, action: UserProgressActionTypes): UserProgressState {
 	switch (action.type) {
-		case USER__PROGRESS_LOAD + START:
+		case USER__PROGRESS_LOAD_START:
 			return {
 				...state,
 				loading: true,
 			};
-		case USER__PROGRESS_LOAD + SUCCESS:
+		case USER__PROGRESS_LOAD_SUCCESS:
 			return {
 				...state,
 				loading: false,
@@ -25,12 +28,12 @@ export default function userProgressReducer(state = initialState, action) {
 					[action.courseId]: action.result,
 				}
 			};
-		case USER__PROGRESS_LOAD + FAIL:
+		case USER__PROGRESS_LOAD_FAIL:
 			return {
 				...state,
 				loading: false,
 			};
-		case USER__PROGRESS_UPDATE :
+		case USER__PROGRESS_UPDATE:
 			return {
 				...state,
 				progress: {

@@ -9,7 +9,7 @@ namespace Ulearn.Web.Api.Models.Responses.Users
 	public class UsersProgressResponse : SuccessResponse
 	{
 		[DataMember]
-		/* Dictionary<userId, Dictionary<slideId, slideProgress>> */
+		/* Dictionary<userId, *> */
 		public Dictionary<string, UserProgress> UserProgress { get; set; }
 	}
 
@@ -17,6 +17,7 @@ namespace Ulearn.Web.Api.Models.Responses.Users
 	public class UserProgress
 	{
 		[DataMember]
+		/* Dictionary<slideId, *> */
 		public Dictionary<Guid, UserProgressSlideResult> VisitedSlides { get; set; }
 
 		[DataMember]

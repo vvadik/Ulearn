@@ -16,7 +16,7 @@ import Error404 from "src/components/common/Error/Error404";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Edit, } from "icons";
-import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader";
+import CourseLoader from "./CourseLoader/CourseLoader";
 
 import { flashcards, constructPathToSlide, signalrWS, } from 'src/consts/routes';
 import { SLIDETYPE, } from 'src/consts/general';
@@ -25,7 +25,7 @@ import { SCORING_GROUP_IDS } from 'src/consts/scoringGroup';
 import classnames from 'classnames';
 
 import styles from "./Course.less"
-import SlideHeader from "src/components/course/Course/Slide/Blocks/SlideHeader/SlideHeader";
+import SlideHeader from "./Slide/SlideHeader/SlideHeader.tsx";
 
 const slideNavigationButtonTitles = {
 	next: "Далее",
@@ -252,7 +252,7 @@ class Course extends Component {
 	}
 
 	renderSlide() {
-		const { pageInfo: { isNavigationVisible, isReview, }, progress, user, courseId, isStudentMode, } = this.props;
+		const { pageInfo: { isNavigationVisible, isReview, }, user, courseId, isStudentMode, } = this.props;
 		const { currentSlideInfo, currentSlideId, currentCourseId, Page, title, } = this.state;
 
 		const wrapperClassName = classnames(
@@ -264,14 +264,6 @@ class Course extends Component {
 		const slideInfo = currentSlideInfo
 			? currentSlideInfo.current
 			: null;
-
-		const score = slideInfo && isNavigationVisible
-			? {
-				score: (progress && progress[slideInfo.id] && progress[slideInfo.id].score) || 0,
-				maxScore: slideInfo.maxScore,
-			}
-			: null;
-		const isSkipped = progress && progress[slideInfo.id] && progress[slideInfo.id].isSkipped;
 
 		const { isSystemAdministrator, accessesByCourse, roleByCourse } = user;
 		const courseAccesses = accessesByCourse[courseId] ? accessesByCourse[courseId] : [];
@@ -285,7 +277,11 @@ class Course extends Component {
 					{ slideInfo && slideInfo.gitEditLink && this.renderGitEditLink(slideInfo) }
 				</h1> }
 				<div className={ styles.slide }>
-					<SlideHeader isHiddenSlide={ slideInfo.hide } score={ score } isSkipped={ isSkipped }/>
+					<SlideHeader
+						courseId={ courseId }
+						slideId={ currentSlideId }
+						isHiddenSlide={ slideInfo.hide }
+						slideType={ slideInfo.type }/>
 					{
 						Page === Slide
 							?

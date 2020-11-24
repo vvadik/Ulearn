@@ -1,50 +1,41 @@
 import React from "react";
 
-import { EyeClosed, } from "icons";
-import PropTypes from "prop-types";
+import { SlideType } from "src/models/slide";
+import { ScoreHeader } from "./ScoreHeader";
 
 import texts from './SlideHeader.texts';
 
-import styles from "../BlocksWrapper.less";
+import { EyeClosed, } from "@skbkontur/react-icons"
+import styles from "../Blocks/BlocksWrapper.less";
 
+interface SlideHeaderProps {
+	courseId: string,
+	slideId: string,
+	isHiddenSlide: boolean,
+	slideType: SlideType,
+}
 
-function SlideHeader({ score, isSkipped, isHiddenSlide, }) {
-	if((score == null || score.maxScore === 0) && !isHiddenSlide) {
-		return null;
-	}
-
+const SlideHeader: React.FC<SlideHeaderProps> = ({ courseId, slideId, isHiddenSlide, slideType }) => {
 	if(isHiddenSlide) {
-		return renderHiddenSlideHeader();
+		return <HiddenSlideHeader/>
 	}
+	if(slideType === SlideType.Exercise || slideType === SlideType.Quiz) {
+		return <ScoreHeader courseId={ courseId } slideId={ slideId }/>;
+	}
+	return null;
+}
 
-	return renderScoreHeader();
-
-
-	function renderHiddenSlideHeader() {
-		return (
-			<div className={ styles.hiddenHeader }>
-				<span className={ styles.hiddenHeaderText }>
-					<span className={ styles.hiddenSlideEye }>
-						 <EyeClosed/>
-					</span>
-					{ texts.hiddenSlideText }
+const HiddenSlideHeader: React.FC = () => {
+	return (
+		<div className={ styles.hiddenHeader }>
+			<span className={ styles.hiddenHeaderText }>
+				<span className={ styles.hiddenSlideEye }>
+					<EyeClosed/>
 				</span>
-			</div>
-		);
-	}
-
-	function renderScoreHeader() {
-		return (
-			<div className={ styles.header }>
-				<span className={ styles.headerText }>
-					{ texts.getSlideScore(score, !isSkipped) }
-				</span>
-				{ isSkipped &&
-				<span className={ styles.headerSkippedText }>{ texts.skippedHeaderText }</span>
-				}
-			</div>
-		);
-	}
+				{ texts.hiddenSlideText }
+			</span>
+		</div>
+	);
 }
 
 /* Everything to make component to be a class with ability to show slide to groups TODO not included in current release
@@ -172,12 +163,6 @@ function SlideHeader({ score, isSkipped, isHiddenSlide, }) {
 		this.setState({ showStudentsModalOpened: false });
 	}
  */
-
-SlideHeader.propTypes = {
-	score: PropTypes.object,
-	isSkipped: PropTypes.bool,
-	isHiddenSlide: PropTypes.bool,
-}
 
 
 export default SlideHeader;
