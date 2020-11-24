@@ -39,14 +39,14 @@ function HasSuccessSubmission(submissions: SubmissionInfo[]): boolean {
 	return submissions.some(IsSuccessSubmission);
 }
 
-function SelectedSubmissionIsLast(submissions: SubmissionInfo[], currentSubmission: SubmissionInfo | null): boolean {
-	return submissions.length > 0 && submissions[0] === currentSubmission
+function SubmissionIsLast(submissions: SubmissionInfo[], submission: SubmissionInfo | null): boolean {
+	return submissions.length > 0 && submissions[0] === submission
 }
 
-function SelectedSubmissionIsLastSuccess(submissions: SubmissionInfo[], currentSubmission: SubmissionInfo | null
+function SubmissionIsLastSuccess(submissions: SubmissionInfo[], submission: SubmissionInfo | null
 ): boolean {
 	const successSubmissions = submissions.filter(IsSuccessSubmission);
-	return successSubmissions.length > 0 && successSubmissions[0] === currentSubmission;
+	return successSubmissions.length > 0 && successSubmissions[0] === submission;
 }
 
 function IsFirstRightAnswer(submissions: SubmissionInfo[], successSubmission: SubmissionInfo): boolean  {
@@ -58,7 +58,7 @@ export {
 	GetSubmissionColor,
 	SubmissionColor,
 	HasSuccessSubmission,
-	SelectedSubmissionIsLast,
-	SelectedSubmissionIsLastSuccess,
+	SubmissionIsLast,
+	SubmissionIsLastSuccess,
 	IsFirstRightAnswer
 }

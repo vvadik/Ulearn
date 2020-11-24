@@ -1,21 +1,21 @@
 import React from "react";
 
 import getPluralForm from "src/utils/getPluralForm.js";
-import { AutomaticExerciseCheckingResult as CheckingResult, SubmissionInfo } from "src/models/exercise";
-
+import { SubmissionInfo } from "src/models/exercise";
 import { getMoment, convertDefaultTimezoneToLocal } from "src/utils/momentUtils.js";
 
 const texts = {
 	submissions: {
 		newTry: 'Новая попытка',
-		getSubmissionCaption: (submission: SubmissionInfo): React.ReactNode => {
-			const { timestamp, automaticChecking, } = submission;
+		getSubmissionCaption: (submission: SubmissionInfo, selectedSubmissionIsLastSuccess: boolean,
+			waitingForManualChecking: boolean
+		): React.ReactNode => {
+			const { timestamp, manualCheckingPassed } = submission;
 			const timestampCaption = texts.getSubmissionDate(timestamp);
-			if(automaticChecking) {
-				const { result } = automaticChecking;
-				if(result === CheckingResult.CompilationError || result === CheckingResult.WrongAnswer) {
-					return timestampCaption + ` (${ result })`;
-				}
+			if(manualCheckingPassed) {
+				return timestampCaption + ", прошло код-ревью";
+			} else if(waitingForManualChecking && selectedSubmissionIsLastSuccess) {
+				return timestampCaption + ", ожидает код-ревью";
 			}
 			return timestampCaption;
 		},

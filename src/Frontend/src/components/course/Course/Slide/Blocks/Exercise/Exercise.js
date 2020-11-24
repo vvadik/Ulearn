@@ -42,8 +42,8 @@ import { GetSubmissionColor } from "./ExerciseUtils.ts";
 import {
 	HasSuccessSubmission,
 	IsFirstRightAnswer,
-	SelectedSubmissionIsLast,
-	SelectedSubmissionIsLastSuccess
+	SubmissionIsLast,
+	SubmissionIsLastSuccess
 } from "./ExerciseUtils";
 
 const isControlsTextSuits = () => !isMobile() && !isTablet();
@@ -280,8 +280,8 @@ class Exercise extends React.Component {
 			{ [styles.editorInReview]: isReview },
 		);
 		const automaticChecking = currentSubmission?.automaticChecking ?? visibleCheckingResponse?.automaticChecking;
-		const selectedSubmissionIsLast = SelectedSubmissionIsLast(submissions, currentSubmission);
-		const selectedSubmissionIsLastSuccess = SelectedSubmissionIsLastSuccess(submissions, currentSubmission);
+		const selectedSubmissionIsLast = SubmissionIsLast(submissions, currentSubmission);
+		const selectedSubmissionIsLastSuccess = SubmissionIsLastSuccess(submissions, currentSubmission);
 		const submissionColor = GetSubmissionColor(visibleCheckingResponse?.solutionRunStatus, automaticChecking?.result,
 			HasSuccessSubmission(submissions), selectedSubmissionIsLast, selectedSubmissionIsLastSuccess,
 			waitingForManualChecking, slideProgress.isSkipped);
@@ -341,10 +341,16 @@ class Exercise extends React.Component {
 	renderSubmissionsSelect = () => {
 		const { currentSubmission } = this.state;
 		const { submissions, } = this.props;
+		const { waitingForManualChecking } = this.props.slideProgress;
 
 		const submissionsWithNewTry = [newTry, ...submissions,];
-		const items = submissionsWithNewTry.map((submission) =>
-			[submission.id, submission === newTry ? texts.submissions.newTry : texts.submissions.getSubmissionCaption(submission)]);
+		const items = submissionsWithNewTry.map((submission) => {
+			const isLastSuccess = SubmissionIsLastSuccess(submissions, submission);
+			const caption = submission === newTry
+				? texts.submissions.newTry
+				: texts.submissions.getSubmissionCaption(submission, isLastSuccess, waitingForManualChecking)
+			return [submission.id, caption];
+		});
 
 		return (
 			<div className={ styles.submissionsDropdown }>
