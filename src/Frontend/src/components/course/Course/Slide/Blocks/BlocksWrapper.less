@@ -122,14 +122,17 @@
   }
 
   .hiddenHeader {
-    border-top-right-radius: 24px;
-    border-top-left-radius: 24px;
+	.header;
   }
 }
 
 @media (min-width: @minLaptopWidth) {
   .header {
     padding: 16px @laptopSlidePadding 16px @desktopSlidePadding;
+  }
+
+  .hiddenHeader {
+	.header;
   }
 
   .eyeClosedWrapper {
@@ -158,6 +161,10 @@
 @media (min-width: @minDesktopWidth) {
   .header {
     padding: 16px 56px;
+  }
+
+  .hiddenHeader {
+	.header;
   }
 
   .eyeClosedWrapper {
