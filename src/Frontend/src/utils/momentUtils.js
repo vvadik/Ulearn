@@ -1,7 +1,7 @@
 import moment from "moment-timezone";
 import { DEFAULT_TIMEZONE } from "../consts/general";
 
-export default function getMoment(time) {
+export function getMoment(time) {
 	return moment(moment.tz(time, DEFAULT_TIMEZONE).format()).fromNow();
 }
 

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import getMoment from "src/utils/getMoment";
+import { getMoment } from "src/utils/momentUtils";
 import { withRouter } from "react-router-dom";
 import api from "src/api";
 import { User, Delete } from "icons";

@@ -1,6 +1,6 @@
 import moment from "moment";
 
-import { convertDefaultTimezoneToLocal } from "src/utils/getMoment";
+import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils";
 
 const texts = {
 	sendButton: 'Ответить',

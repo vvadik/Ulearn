@@ -11,7 +11,7 @@ import Header from "./Header/Header";
 import Marks from "./Marks/Marks";
 import CommentActions from "./CommentActions/CommentActions";
 import scrollToView from "../../../utils/scrollToView";
-import { convertDefaultTimezoneToLocal } from "src/utils/getMoment";
+import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils";
 import { ACCESSES, ROLES } from "src/consts/general";
 
 import styles from "./Comment.less";

@@ -1,31 +1,22 @@
 import React from "react";
 
-import getPluralForm from "src/utils/getPluralForm";
-import { AutomaticExerciseCheckingResult as CheckingResult } from "src/models/exercise.ts";
+import getPluralForm from "src/utils/getPluralForm.js";
+import { AutomaticExerciseCheckingResult as CheckingResult, SubmissionInfo } from "src/models/exercise";
 
-import moment from "moment";
-import { convertDefaultTimezoneToLocal } from "src/utils/getMoment";
+import { getMoment, convertDefaultTimezoneToLocal } from "src/utils/momentUtils.js";
 
 const texts = {
 	submissions: {
 		newTry: 'Новая попытка',
-		getSubmissionCaption: (submission) => {
-			if(!submission || submission.isNew) {
-				return texts.submissions.newTry;
-			}
-
+		getSubmissionCaption: (submission: SubmissionInfo): React.ReactNode => {
 			const { timestamp, automaticChecking, } = submission;
-
 			const timestampCaption = texts.getSubmissionDate(timestamp);
-
 			if(automaticChecking) {
 				const { result } = automaticChecking;
-
 				if(result === CheckingResult.CompilationError || result === CheckingResult.WrongAnswer) {
 					return timestampCaption + ` (${ result })`;
 				}
 			}
-
 			return timestampCaption;
 		},
 	},
@@ -56,11 +47,13 @@ const texts = {
 		},
 		teacher: {
 			title: 'Код-ревью',
-			countTeacherReviews: (reviewsCount) => `Преподаватель оставил ${ reviewsCount } ${ getPluralForm(reviewsCount, 'комментарий', 'комментария', 'комментариев') }. `,
+			countTeacherReviews: (reviewsCount: number): string => `Преподаватель оставил ${ reviewsCount } ${ getPluralForm(
+				reviewsCount, 'комментарий', 'комментария', 'комментариев') }. `,
 		},
 		bot: {
 			title: 'Ulearn Bot',
-			countBotComments: (botCommentsLength) => `Бот нашёл ${ botCommentsLength } ${ getPluralForm(botCommentsLength, 'ошибку', 'ошибки', 'ошибок') }. `,
+			countBotComments: (botCommentsLength: number): string => `Бот нашёл ${ botCommentsLength } ${ getPluralForm(
+				botCommentsLength, 'ошибку', 'ошибки', 'ошибок') }. `,
 		},
 	},
 
@@ -85,7 +78,7 @@ const texts = {
 
 		acceptedSolutions: {
 			text: 'Посмотреть решения',
-			buildWarning: () => <React.Fragment>
+			buildWarning: (): React.ReactNode => <React.Fragment>
 				Вы не получите баллы за задачу,<br/>
 				если посмотрите чужие решения.<br/>
 				<br/>
@@ -107,24 +100,27 @@ const texts = {
 		},
 
 		statistics: {
-			buildShortText: (usersWithRightAnswerCount) =>
+			buildShortText: (usersWithRightAnswerCount: number): React.ReactNode =>
 				<React.Fragment>Решило: { usersWithRightAnswerCount }</React.Fragment>,
-			buildStatistics: (attemptedUsersCount, usersWithRightAnswerCount, lastSuccessAttemptDate) =>
+			buildStatistics: (attemptedUsersCount: number, usersWithRightAnswerCount: number,
+				lastSuccessAttemptDate: number
+			): React.ReactNode =>
 				lastSuccessAttemptDate
 					? <React.Fragment>
 						За всё время:<br/>
-						{ attemptedUsersCount } { getPluralForm(attemptedUsersCount, 'студент пробовал', 'студента пробовали', 'студентов пробовали') } решить
+						{ attemptedUsersCount } { getPluralForm(attemptedUsersCount, 'студент пробовал',
+					'студента пробовали', 'студентов пробовали') } решить
 						задачу.<br/>
 						{ getPluralForm(attemptedUsersCount, 'Решил', 'Решили', 'Решили') } { usersWithRightAnswerCount }
 						<br/>
 						<br/>
-						Последний раз решили { moment(lastSuccessAttemptDate).startOf("minute").fromNow() }
+						Последний раз решили { getMoment(lastSuccessAttemptDate) }
 					</React.Fragment>
 					: 'Эту задачу ещё никто не решал',
 		},
 	},
 
-	getSubmissionDate: (timestamp) => {
+	getSubmissionDate: (timestamp: string): string => {
 		return convertDefaultTimezoneToLocal(timestamp).format('DD MMMM YYYY в HH:mm');
 	}
 };

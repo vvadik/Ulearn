@@ -49,7 +49,7 @@ import {
 const isControlsTextSuits = () => !isMobile() && !isTablet();
 const editThemeName = 'darcula';
 const defaultThemeName = 'default';
-
+const newTry = { id: -1 };
 
 class Exercise extends React.Component {
 	constructor(props) {
@@ -79,8 +79,6 @@ class Exercise extends React.Component {
 
 			editor: null,
 			exerciseCodeDoc: null,
-
-			newTry: Exercise.createEmptyNewTry(),
 
 			selfChecks: texts.checkups.self.checks.map((ch, i) => ({
 				text: ch,
@@ -341,18 +339,19 @@ class Exercise extends React.Component {
 	}
 
 	renderSubmissionsSelect = () => {
-		const { currentSubmission, newTry } = this.state;
+		const { currentSubmission } = this.state;
 		const { submissions, } = this.props;
 
 		const submissionsWithNewTry = [newTry, ...submissions,];
-		const items = submissionsWithNewTry.map((submission) => ([submission.id, submission.caption]));
+		const items = submissionsWithNewTry.map((submission) =>
+			[submission.id, submission === newTry ? texts.submissions.newTry : texts.submissions.getSubmissionCaption(submission)]);
 
 		return (
 			<div className={ styles.submissionsDropdown }>
 				<ThemeContext.Provider value={ FLAT_THEME }>
 					<Select
 						items={ items }
-						value={ currentSubmission?.id || -1 }
+						value={ currentSubmission?.id || newTry.id }
 						onValueChange={ (id) => this.loadSubmissionToState(submissionsWithNewTry.find(s => s.id === id)) }
 					/>
 				</ThemeContext.Provider>
@@ -363,7 +362,6 @@ class Exercise extends React.Component {
 	renderHeader = (submissionColor, selectedSubmissionIsLast, selectedSubmissionIsLastSuccess) => {
 		const { currentSubmission, visibleCheckingResponse } = this.state;
 		const { waitingForManualChecking, prohibitFurtherManualChecking, score } = this.props.slideProgress;
-		debugger;
 		if(!currentSubmission && !visibleCheckingResponse)
 			return null;
 		return (
@@ -381,8 +379,7 @@ class Exercise extends React.Component {
 	}
 
 	loadSubmissionToState = (submission,) => {
-		if(submission.id < 0) {
-			this.loadNewTry();
+		if(submission === newTry) {
 			this.loadNewTry();
 			return;
 		}
@@ -779,7 +776,6 @@ class Exercise extends React.Component {
 
 		this.clearAllTextMarkers();
 		this.setState({
-			newTry: Exercise.createEmptyNewTry(),
 			isEditable: true,
 			valueChanged: true,
 			currentSubmission: null,
@@ -803,7 +799,6 @@ class Exercise extends React.Component {
 
 		this.clearAllTextMarkers();
 		this.setState({
-			newTry: Exercise.createEmptyNewTry(),
 			value: exerciseInitialCode,
 			valueChanged: true,
 			isEditable: true,
@@ -829,11 +824,6 @@ class Exercise extends React.Component {
 
 		this.resetCode();
 		this.refreshPreviousDraft(slideId);
-	}
-
-	static
-	createEmptyNewTry = () => {
-		return { id: -1, caption: texts.submissions.newTry };
 	}
 
 	toggleOutput = () => {
@@ -1057,8 +1047,7 @@ const mapStateToProps = (state, { courseId, slideId, }) => {
 	const submissions = Object.values(submissionsByCourses[courseId][slideId])
 		.filter((s, i, arr) =>
 			(i === arr.length - 1)
-			|| (!s.automaticChecking || s.automaticChecking.result === CheckingResult.RightAnswer))
-		.map(s => ({ ...s, caption: texts.submissions.getSubmissionCaption(s) }));
+			|| (!s.automaticChecking || s.automaticChecking.result === CheckingResult.RightAnswer));
 
 	//newer is first
 	submissions.sort((s1, s2) => (new Date(s2.timestamp) - new Date(s1.timestamp)));
