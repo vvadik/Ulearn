@@ -15,6 +15,8 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from "react-redux";
 
+import { exerciseSolutions, loadFromCache, saveToCache } from "src/utils/localStorageManager";
+
 import { sendCode, addReviewComment, deleteReviewComment, } from "src/actions/course";
 
 import { constructPathToAcceptedSolutions, } from "src/consts/routes";
@@ -108,7 +110,7 @@ class Exercise extends React.Component {
 		if(submissions.length > 0) {
 			this.loadSubmissionToState(submissions[0]);
 		} else {
-			this.refreshPreviousDraft(slideId);
+			this.loadCodeFromCache(slideId);
 		}
 	}
 
@@ -211,7 +213,7 @@ class Exercise extends React.Component {
 		const { slideId, forceInitialCode, } = this.props;
 
 		if(!forceInitialCode) {
-			this.saveExerciseCodeDraft(slideId);
+			this.saveCodeToCache(slideId);
 		}
 	}
 
@@ -385,11 +387,15 @@ class Exercise extends React.Component {
 	}
 
 	loadSubmissionToState = (submission,) => {
+		const { valueChanged } = this.state;
+
 		if(submission === newTry) {
 			this.loadNewTry();
 			return;
 		}
-		this.saveCodeDraftToCache();
+		if(valueChanged) {
+			this.saveCodeDraftToCache();
+		}
 		this.clearAllTextMarkers();
 
 		// Firstly we updating code in code mirror
@@ -827,9 +833,8 @@ class Exercise extends React.Component {
 
 	loadNewTry = () => {
 		const { slideId } = this.props;
-
 		this.resetCode();
-		this.refreshPreviousDraft(slideId);
+		this.loadCodeFromCache(slideId);
 	}
 
 	toggleOutput = () => {
@@ -1007,35 +1012,19 @@ class Exercise extends React.Component {
 		}
 	}
 
-	saveExerciseCodeDraft = (id) => {
-		const { value, refreshPreviousDraftLastId, } = this.state;
+	saveCodeToCache = (slideId) => {
+		const { value, } = this.state;
 
-		if(id === undefined) {
-			id = refreshPreviousDraftLastId;
-		}
-
-		const solutions = JSON.parse(localStorage['exercise_solutions'] || '{}');
-		solutions[id] = value;
-
-		localStorage['exercise_solutions'] = JSON.stringify(solutions);
+		saveToCache(exerciseSolutions, slideId, value);
 	}
 
-	refreshPreviousDraft = (id) => {
-		const { refreshPreviousDraftLastId, } = this.state;
-		if(id === undefined) {
-			id = refreshPreviousDraftLastId;
-		}
+	loadCodeFromCache = (slideId) => {
+		const code = loadFromCache(exerciseSolutions, slideId);
 
-		this.setState({
-			refreshPreviousDraftLastId: id,
-		})
-
-		const solutions = JSON.parse(localStorage['exercise_solutions'] || '{}');
-
-		if(solutions[id] !== undefined) {
+		if(code !== undefined) {
 			this.resetCode();
 			this.setState({
-				value: solutions[id],
+				value: code,
 			})
 		}
 	}
