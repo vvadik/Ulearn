@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import classNames from 'classnames';
-
-import { isInstructor } from "src/utils/courseRoles";
 import { constructPathToStudentSubmissions } from "src/consts/routes";
-import { ShortSlideInfo } from "src/models/slide";
+import { isInstructor } from "src/utils/courseRoles";
+import { ShortSlideInfo, SlideType } from "src/models/slide";
 import { SubmissionColor } from "../Blocks/Exercise/ExerciseUtils";
 
 import { RootState } from "src/models/reduxState";
@@ -44,7 +43,7 @@ const mapState = (state: RootState, ownProps: ScoreHeaderProps) => {
 		prohibitFurtherManualChecking: slideProgress?.prohibitFurtherManualChecking ?? false,
 		maxScore: slideInfo.maxScore,
 		hasReviewedSubmissions: hasReviewedSubmissions,
-		isInstructor: isInstructor(
+		showStudentSubmissions: slideInfo.type === SlideType.Exercise && isInstructor(
 			{ isSystemAdministrator: account.isSystemAdministrator, courseRole: account.roleByCourse[courseId] }),
 	};
 };
@@ -55,7 +54,7 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 const ScoreHeaderInternal = (props: PropsFromRedux & ScoreHeaderProps) => {
 	const [isModalShowed, showModal] = useState(false);
 
-	const { score, maxScore, isSkipped, waitingForManualChecking, prohibitFurtherManualChecking, hasReviewedSubmissions, courseId, slideId, isInstructor, } = props;
+	const { score, maxScore, isSkipped, waitingForManualChecking, prohibitFurtherManualChecking, hasReviewedSubmissions, courseId, slideId, showStudentSubmissions, } = props;
 	if(score === null || maxScore === null) {
 		return null;
 	}
@@ -65,7 +64,7 @@ const ScoreHeaderInternal = (props: PropsFromRedux & ScoreHeaderProps) => {
 	let message: string | null = null;
 	if(!isMaxScore) {
 		if(isSkipped) {
-			color = SubmissionColor.MaxResult;
+			color = SubmissionColor.NeedImprovements;
 			message = texts.skippedHeaderText;
 		} else if(waitingForManualChecking) {
 			message = texts.pendingReview;
@@ -82,11 +81,11 @@ const ScoreHeaderInternal = (props: PropsFromRedux & ScoreHeaderProps) => {
 	const modalWidth: undefined | number = maxModalWidth > 880 ? 880 : maxModalWidth; //TODO пока что это мок, в будущем width будет другой
 	return (
 		<div className={ styles.header }>
-			<span className={ classNames(styles.headerText, styles.scoreTextColor) }>
+			<span className={ classNames(styles.headerText, styles.scoreTextWeight, styles.scoreTextColor) }>
 				{ texts.getSlideScore(score, maxScore, !isSkipped) }
 			</span>
 			{ message && <span className={ classNames(styles.headerStatusText, messageColorStyle) }>{ message }</span> }
-			{ isInstructor && <a onClick={ () => showModal(true) } className={ styles.acceptedSolutionsText }>
+			{ showStudentSubmissions && <a onClick={ () => showModal(true) } className={ styles.acceptedSolutionsText }>
 				{ texts.showAcceptedSolutionsText }
 			</a> }
 			{ isModalShowed &&
