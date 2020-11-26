@@ -16,7 +16,7 @@ const ListTemplate: Story<{ items: { props: ScoreHeaderPropsFromRedux, header: s
 			<>
 				<p>{ item.header }</p>
 				<Provider store={ GetStore(item.props) }>
-					<ScoreHeader courseId={ courseId } slideId={ slideId } { ...item.props } />
+					<ScoreHeader { ...item.props } />
 				</Provider>
 			</>
 		) }
@@ -24,6 +24,9 @@ const ListTemplate: Story<{ items: { props: ScoreHeaderPropsFromRedux, header: s
 };
 
 const reduxProps: ScoreHeaderPropsFromRedux = {
+	slideId,
+	courseId,
+	isInstructor: false,
 	score: 10,
 	isSkipped: false,
 	waitingForManualChecking: false,
@@ -47,6 +50,10 @@ AllHeaders.args = {
 		},
 		{ props: { ...reduxProps, hasReviewedSubmissions: true }, header: "Прошел ревью, неполный балл" },
 		{ props: { ...reduxProps, hasReviewedSubmissions: true, score: 50 }, header: "Прошел ревью, полный балл" },
+		//Instructor cases
+		{ props: { ...reduxProps, isSkipped: true, isInstructor: true }, header: "Пропущено (преподаватель)" },
+		{ props: { ...reduxProps, score: 50, isInstructor: true }, header: "Полный балл (преподаватель)" },
+		{ props: { ...reduxProps, score: 0, isInstructor: true }, header: "0 баллов (преподаватель)" },
 	]
 };
 

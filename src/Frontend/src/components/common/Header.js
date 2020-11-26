@@ -12,7 +12,7 @@ import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { findDOMNode } from "react-dom";
 import { isMobile } from "src/utils/getDeviceType";
-import { ROLES } from "src/consts/general";
+import { CourseRoleType } from "src/consts/general";
 
 import styles from './Header.less';
 
@@ -118,8 +118,8 @@ class Header extends Component {
 	isInstructor() {
 		const { isSystemAdministrator, courseRole, } = this.state;
 		return isSystemAdministrator ||
-			courseRole === ROLES.courseAdmin ||
-			courseRole === ROLES.instructor;
+			courseRole === CourseRoleType.courseAdmin ||
+			courseRole === CourseRoleType.instructor;
 	}
 
 	render() {

@@ -1,6 +1,6 @@
 import React from "react";
 import NavigationItem from "./NavigationItem";
-import { SLIDETYPE } from "../../../../../consts/general";
+import { SlideType } from "src/models/slide";
 import StoryRouter from "storybook-react-router";
 
 export default {
@@ -21,7 +21,7 @@ export const _NavigationItem = () => (
 			text="Пункт меню с метро"
 			url={""}
 			visited
-			type={SLIDETYPE.lesson}
+			type={SlideType.Lesson}
 			metro={{
 				connectToPrev: true,
 			}}
@@ -29,13 +29,13 @@ export const _NavigationItem = () => (
 		<NavigationItem
 			text="Пункт меню с метро"
 			url={""}
-			type={SLIDETYPE.lesson}
+			type={SlideType.Lesson}
 			metro={{}}
 		/>
 		<NavigationItem
 			text="Пункт меню с иконкой"
 			url={""}
-			type={SLIDETYPE.quiz}
+			type={SlideType.Quiz}
 			metro={{}}
 		/>
 		<NavigationItem
@@ -46,20 +46,20 @@ export const _NavigationItem = () => (
 			maxScore={5}
 			description="Ждет код-ревью • 3 попытки осталось"
 			isActive
-			type={SLIDETYPE.quiz}
+			type={SlideType.Quiz}
 			metro={{}}
 		/>
 		<NavigationItem
 			text="Пункт меню с иконкой"
 			url={""}
-			type={SLIDETYPE.exercise}
+			type={SlideType.Exercise}
 			metro={{}}
 		/>
 		<NavigationItem
 			text="Пункт меню с иконкой"
 			url={""}
 			visited
-			type={SLIDETYPE.quiz}
+			type={SlideType.Quiz}
 			metro={{
 				connectToNext: true,
 			}}
@@ -68,7 +68,7 @@ export const _NavigationItem = () => (
 			text="Пункт меню с иконкой"
 			url={""}
 			visited
-			type={SLIDETYPE.exercise}
+			type={SlideType.Exercise}
 			metro={{
 				connectToPrev: true,
 				isLastItem: true,

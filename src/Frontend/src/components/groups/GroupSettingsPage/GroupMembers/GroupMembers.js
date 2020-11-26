@@ -13,7 +13,7 @@ import Profile from './Profile';
 import getGenderForm from "../../../../utils/getGenderForm";
 import styles from './groupMembers.less';
 import { Mobile, NotMobile } from "src/utils/responsive";
-import { ROLES } from "src/consts/general";
+import { CourseRoleType } from "src/consts/general";
 
 class GroupMembers extends Component {
 
@@ -168,7 +168,7 @@ class GroupMembers extends Component {
 				</Gapped>
 			</MenuItem>
 		];
-		if(group.owner.id === account.id || role === ROLES.courseAdmin || item.grantedBy.id === account.id) {
+		if(group.owner.id === account.id || role === CourseRoleType.courseAdmin || item.grantedBy.id === account.id) {
 			menuItems.push(
 				<MenuItem onClick={ () => this.onRemoveTeacher(item.user) } key="removeTeacher">
 					<Gapped gap={ 5 }>

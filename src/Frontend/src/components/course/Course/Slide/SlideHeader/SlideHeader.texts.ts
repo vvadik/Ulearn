@@ -11,5 +11,7 @@ export default {
 	prohibitFurtherReview: 'По этой задаче код-ревью больше не проводится',
 	reviewWaitForCorrection: 'Решение прошло код-ревью',
 	hiddenSlideText: "Студенты не видят этот слайд.",
+	showAcceptedSolutionsText: 'Посмотреть решения студентов',
+	showAcceptedSolutionsHeaderText: 'Решения студентов',
 	//hiddenSlideTextWithStudents: (showedGroupsIds) => `Студенты ${ showedGroupsIds.join(', ') } видят этот слайд.`,
-}
+};

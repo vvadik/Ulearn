@@ -19,8 +19,8 @@ import { Edit, } from "icons";
 import CourseLoader from "./CourseLoader/CourseLoader";
 
 import { flashcards, constructPathToSlide, signalrWS, } from 'src/consts/routes';
-import { SLIDETYPE, } from 'src/consts/general';
-import { SCORING_GROUP_IDS } from 'src/consts/scoringGroup';
+import { SlideType, } from 'src/models/slide';
+import { ScoringGroupsIds } from 'src/consts/scoringGroup';
 
 import classnames from 'classnames';
 
@@ -131,7 +131,7 @@ class Course extends Component {
 		}
 
 		if((currentSlideId !== prevState.currentSlideId || isStudentMode !== prevProps.isStudentMode)
-			&& currentSlideInfo && currentSlideInfo.current && currentSlideInfo.current.type === SLIDETYPE.exercise && (pageInfo.isNavigationVisible && !pageInfo.isAcceptedSolutions)) {
+			&& currentSlideInfo && currentSlideInfo.current && currentSlideInfo.current.type === SlideType.Exercise && (pageInfo.isNavigationVisible && !pageInfo.isAcceptedSolutions)) {
 			if(isStudentMode) {
 				history.push('?version=-1'); //prevent showing task solution
 			} else if(history.location.search === '?version=-1') {
@@ -190,13 +190,13 @@ class Course extends Component {
 			throw new UrlError();
 		}
 
-		if(currentSlideInfo && currentSlideInfo.current.type === SLIDETYPE.flashcards) {
+		if(currentSlideInfo && currentSlideInfo.current.type === SlideType.Flashcards) {
 			return UnitFlashcardsPage;
 		}
 
 		if(currentSlideInfo &&
-			(currentSlideInfo.current.type === SLIDETYPE.lesson
-				|| (currentSlideInfo.current.type === SLIDETYPE.exercise && !pageInfo.isReview))) {
+			(currentSlideInfo.current.type === SlideType.Lesson
+				|| (currentSlideInfo.current.type === SlideType.Exercise && !pageInfo.isReview))) {
 			return Slide;
 		}
 
@@ -426,7 +426,7 @@ class Course extends Component {
 		if(!progress || scoringGroups.length === 0)
 			return courseStatistics;
 
-		const visitsGroup = scoringGroups.find(gr => gr.id === SCORING_GROUP_IDS.visits);
+		const visitsGroup = scoringGroups.find(gr => gr.id === ScoringGroupsIds.visits);
 
 		for (const unit of Object.values(units)) {
 			let unitScore = 0, unitMaxScore = 0;

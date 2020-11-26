@@ -1,14 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
+import classNames from 'classnames';
+
+import { isInstructor } from "src/utils/courseRoles";
+import { constructPathToStudentSubmissions } from "src/consts/routes";
+import { ShortSlideInfo } from "src/models/slide";
+import { SubmissionColor } from "../Blocks/Exercise/ExerciseUtils";
 
 import { RootState } from "src/models/reduxState";
 
-import texts from "./SlideHeader.texts";
 import Course from '../../Course.js';
+import DownloadedHtmlContent from 'src/components/common/DownloadedHtmlContent.js';
+import { Modal } from "@skbkontur/react-ui";
 
+import texts from "./SlideHeader.texts";
 import styles from "../SlideHeader/SlideHeader.less";
-import { ShortSlideInfo } from "src/models/slide";
-import { SubmissionColor } from "../Blocks/Exercise/ExerciseUtils";
 
 
 interface ScoreHeaderProps {
@@ -17,7 +23,7 @@ interface ScoreHeaderProps {
 }
 
 const mapState = (state: RootState, ownProps: ScoreHeaderProps) => {
-	const { userProgress, courses, slides } = state;
+	const { userProgress, courses, slides, account, } = state;
 	const { submissionsByCourses, } = slides;
 	const { courseId, slideId } = ownProps;
 
@@ -30,12 +36,16 @@ const mapState = (state: RootState, ownProps: ScoreHeaderProps) => {
 		: false;
 
 	return {
+		courseId,
+		slideId,
 		score: slideProgress?.score ?? 0,
 		isSkipped: slideProgress?.isSkipped ?? false,
 		waitingForManualChecking: slideProgress?.waitingForManualChecking ?? false,
 		prohibitFurtherManualChecking: slideProgress?.prohibitFurtherManualChecking ?? false,
 		maxScore: slideInfo.maxScore,
 		hasReviewedSubmissions: hasReviewedSubmissions,
+		isInstructor: isInstructor(
+			{ isSystemAdministrator: account.isSystemAdministrator, courseRole: account.roleByCourse[courseId] }),
 	};
 };
 const connector = connect(mapState);
@@ -43,7 +53,9 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 
 
 const ScoreHeaderInternal = (props: PropsFromRedux & ScoreHeaderProps) => {
-	const { score, maxScore, isSkipped, waitingForManualChecking, prohibitFurtherManualChecking, hasReviewedSubmissions } = props;
+	const [isModalShowed, showModal] = useState(false);
+
+	const { score, maxScore, isSkipped, waitingForManualChecking, prohibitFurtherManualChecking, hasReviewedSubmissions, courseId, slideId, isInstructor, } = props;
 	if(score === null || maxScore === null) {
 		return null;
 	}
@@ -65,13 +77,29 @@ const ScoreHeaderInternal = (props: PropsFromRedux & ScoreHeaderProps) => {
 		}
 	}
 
-	const messageStyle = color === SubmissionColor.MaxResult ? styles.headerMaxResultText : styles.headerNeedImprovementsText;
+	const messageColorStyle = color === SubmissionColor.MaxResult ? styles.headerMaxResultTextColor : styles.headerNeedImprovementsTextColor;
+	const maxModalWidth = window.innerWidth - 40;
+	const modalWidth: undefined | number = maxModalWidth > 880 ? 880 : maxModalWidth; //TODO пока что это мок, в будущем width будет другой
 	return (
 		<div className={ styles.header }>
-			<span className={ styles.headerText }>
+			<span className={ classNames(styles.headerText, styles.scoreTextColor) }>
 				{ texts.getSlideScore(score, maxScore, !isSkipped) }
 			</span>
-			{ message && <span className={ messageStyle }>{ message }</span> }
+			{ message && <span className={ classNames(styles.headerStatusText, messageColorStyle) }>{ message }</span> }
+			{ isInstructor && <a onClick={ () => showModal(true) } className={ styles.acceptedSolutionsText }>
+				{ texts.showAcceptedSolutionsText }
+			</a> }
+			{ isModalShowed &&
+			<Modal width={ modalWidth } onClose={ () => showModal(false) }>
+				<Modal.Header>
+					<h2>
+						{ texts.showAcceptedSolutionsHeaderText }
+					</h2>
+				</Modal.Header>
+				<Modal.Body>
+					<DownloadedHtmlContent url={ constructPathToStudentSubmissions(courseId, slideId) }/>
+				</Modal.Body>
+			</Modal> }
 		</div>
 	);
 };

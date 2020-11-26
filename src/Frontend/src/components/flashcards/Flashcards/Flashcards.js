@@ -9,7 +9,7 @@ import { sortFlashcardsInAuthorsOrderWithRate, getNextFlashcardRandomly } from "
 import countFlashcardsStatistics from "../countFlashcardsStatistics";
 import classNames from 'classnames';
 
-import { rateTypes } from "src/consts/rateTypes";
+import { RateTypes } from "src/consts/rateTypes";
 
 import styles from './flashcards.less';
 
@@ -21,11 +21,11 @@ const modalsClassNames = {
 };
 
 const mapRateToRateType = {
-	1: rateTypes.rate1,
-	2: rateTypes.rate2,
-	3: rateTypes.rate3,
-	4: rateTypes.rate4,
-	5: rateTypes.rate5,
+	1: RateTypes.rate1,
+	2: RateTypes.rate2,
+	3: RateTypes.rate3,
+	4: RateTypes.rate4,
+	5: RateTypes.rate5,
 };
 
 class Flashcards extends Component {
@@ -201,7 +201,7 @@ class Flashcards extends Component {
 		};
 		const isFailedUnitFlashcard = (flashcard) => {
 			return flashcard.unitId === unitId
-				&& (flashcard.rate === rateTypes.rate1 || flashcard.rate === rateTypes.rate2)
+				&& (flashcard.rate === RateTypes.rate1 || flashcard.rate === RateTypes.rate2)
 		};
 
 		const filter = onlyFailedFlashcards
@@ -235,7 +235,7 @@ class Flashcards extends Component {
 			(unlocks, { unitId, unlocked }) => ({ ...unlocks, [unitId]: unlocked }), {});
 
 		return flashcards
-			.filter(({ rate, unitId }) => rate !== rateTypes.notRated && unlocksByUnits[unitId])
+			.filter(({ rate, unitId }) => rate !== RateTypes.notRated && unlocksByUnits[unitId])
 			.map(flashcard => ({ ...flashcard }));
 	}
 

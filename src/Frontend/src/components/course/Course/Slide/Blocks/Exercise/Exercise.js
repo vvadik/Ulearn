@@ -1037,7 +1037,7 @@ const mapStateToProps = (state, { courseId, slideId, }) => {
 	const { slides, account, userProgress } = state;
 	const { submissionsByCourses, submissionError, } = slides;
 	let { lastCheckingResponse, } = slides;
-	let slideProgress = userProgress.progress[courseId][slideId];
+	let slideProgress = userProgress?.progress[courseId]?.[slideId] || {};
 
 	if(!(lastCheckingResponse && lastCheckingResponse.courseId === courseId && lastCheckingResponse.slideId === slideId))
 		lastCheckingResponse = null;

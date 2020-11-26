@@ -1,6 +1,7 @@
 export const coursePath = "course";
 export const flashcards = "flashcards";
 export const commentsPath = "comments";
+export const exerciseStudentSubmissions = 'exercise/studentSubmissions';
 export const commentPoliciesPath = "comment-policies";
 export const courseStatistics = "/analytics/courseStatistics";
 export const slides = "slides";
@@ -11,16 +12,15 @@ export const resetStudentsLimits = "/students/reset-limits";
 export const accountPath = '/account/manage';
 export const signalrWS = 'ws';
 
-export function constructPathToSlide(courseId, slideId) {
+export function constructPathToSlide(courseId: string, slideId: string): string {
 	return `/${ coursePath }/${ courseId }/${ slideId }`;
 }
 
-export function constructPathToAcceptedSolutions(courseId, slideId) {
+export function constructPathToAcceptedSolutions(courseId: string, slideId: string): string {
 	return `/${ coursePath }/${ courseId }/${ acceptedSolutions }?slideId=${ slideId }`;
-
 }
 
-export function constructPathToComment(commentId, isLike) {
+export function constructPathToComment(commentId: string, isLike: boolean): string {
 	const url = `${ commentsPath }/${ commentId }`;
 
 	if(isLike) {
@@ -28,4 +28,8 @@ export function constructPathToComment(commentId, isLike) {
 	}
 
 	return url;
+}
+
+export function constructPathToStudentSubmissions(courseId: string, slideId: string): string {
+	return `/${ exerciseStudentSubmissions }?courseId=${ courseId }&slideId=${ slideId }`;
 }

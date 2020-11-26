@@ -3,7 +3,8 @@ import PropTypes from "prop-types";
 import { comment, userRoles, userType } from "../../commonPropTypes";
 import { Link, Button } from "ui";
 import { ArrowCorner1, Edit, DocumentLite } from "icons";
-import { ACCESSES, SLIDETYPE } from "src/consts/general";
+import { AccessType, } from "src/consts/general";
+import { SlideType, } from "src/models/slide";
 
 import styles from "./CommentActions.less";
 
@@ -41,7 +42,7 @@ export default function CommentActions(props) {
 			</ActionButton>);
 	}
 
-	if (user.id === comment.author.id || canModerateComments(userRoles, ACCESSES.editPinAndRemoveComments)) {
+	if (user.id === comment.author.id || canModerateComments(userRoles, AccessType.editPinAndRemoveComments)) {
 		commentActions.push(
 		<div className={styles.visibleOnDesktopAndTablet} key="Редактировать">
 			<ActionButton
@@ -52,7 +53,7 @@ export default function CommentActions(props) {
 		</div>);
 	}
 
-	if (slideType === SLIDETYPE.exercise && canModerateComments(userRoles, ACCESSES.viewAllStudentsSubmissions)) {
+	if (slideType === SlideType.Exercise && canModerateComments(userRoles, AccessType.viewAllStudentsSubmissions)) {
 		commentActions.push(
 			<div className={styles.visibleOnDesktopAndTablet}  key="Решения">
 				<ActionLink

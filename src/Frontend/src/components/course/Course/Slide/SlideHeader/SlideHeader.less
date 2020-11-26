@@ -5,18 +5,11 @@
 }
 
 .header {
+  display: flex;
+  flex-direction: column;
+
   padding: 8px 24px;
   border-bottom: 1px solid @geinsboro;
-}
-
-.headerMaxResultText {
-  display: inline-block;
-  color: @successColor;
-}
-
-.headerNeedImprovementsText {
-  display: inline-block;
-  color: @orange;
 }
 
 .hiddenHeader {
@@ -30,11 +23,18 @@
 }
 
 .headerText {
-  color: @additionalColor;
+  display: inline-block;
+  flex-shrink: 0;
+
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
   margin-right: 16px;
+}
+
+.headerStatusText {
+  .headerText;
+  flex-shrink: 1;
 }
 
 .hiddenHeaderText {
@@ -45,13 +45,27 @@
   opacity: 0.7;
 }
 
-@media (min-width: @minTabletWidth) {
-  .headerText {
-    font-size: 16px;
-    line-height: 22px;
-  }
+.acceptedSolutionsText {
+  .headerText;
 
+  cursor: pointer;
+}
+
+.headerMaxResultTextColor {
+  color: @successColor;
+}
+
+.headerNeedImprovementsTextColor {
+  color: @orange;
+}
+
+.scoreTextColor {
+  color: @additionalColor;
+}
+
+@media (min-width: @minTabletWidth) {
   .header {
+    flex-direction: row;
     padding: 16px 24px;
     border-top-left-radius: 24px;
     border-top-right-radius: 24px;
@@ -59,6 +73,28 @@
 
   .hiddenHeader {
     .header;
+  }
+
+  .headerText {
+    font-size: 16px;
+    line-height: 22px;
+  }
+
+  .hiddenHeaderText {
+    .headerText;
+  }
+
+  .headerStatusText {
+    .headerText;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .acceptedSolutionsText {
+    .headerText;
+    margin-left: auto;
   }
 }
 

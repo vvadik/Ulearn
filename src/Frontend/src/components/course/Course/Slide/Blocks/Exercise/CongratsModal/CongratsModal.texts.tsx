@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { accountPath } from "src/consts/routes.js";
+import { accountPath } from "src/consts/routes";
 import getPluralForm from "src/utils/getPluralForm.js";
 
 export default {

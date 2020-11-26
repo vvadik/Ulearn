@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { userType, userRoles, commentPolicy } from "../commonPropTypes";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
-import { TABS } from "src/consts/general";
+import { TabsType } from "src/consts/general";
 import { debounce } from "debounce";
 import { CommentLite } from "icons";
 import { Toast } from "ui";
@@ -211,7 +211,7 @@ class CommentsList extends Component {
 		if (window.location.hash.includes("#comment")) {
 			const startIndex = window.location.hash.indexOf('-') + 1;
 			const commentIdFromHash = +window.location.hash.slice(startIndex);
-			const nameChangesTab = forInstructors ? TABS.allComments : TABS.instructorsComments;
+			const nameChangesTab = forInstructors ? TabsType.allComments : TabsType.instructorsComments;
 
 			const { threadsToRender, repliesToRender } = this.commentsData;
 			const notRenderedComments = [...repliesToRender, ...threadsToRender];
