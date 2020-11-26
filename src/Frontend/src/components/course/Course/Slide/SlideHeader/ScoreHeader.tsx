@@ -18,7 +18,7 @@ interface ScoreHeaderProps {
 const mapState = (state: RootState, ownProps: ScoreHeaderProps) => {
 	const { userProgress, courses } = state;
 	const { courseId, slideId } = ownProps;
-	const slideProgress = userProgress.progress[courseId][slideId];
+	const slideProgress = userProgress.progress[courseId]?.[slideId];
 	const courseInfo = courses.fullCoursesInfo[courseId];
 	const slideInfo: ShortSlideInfo = Course.getSlideInfoById(slideId, courseInfo).current;
 	return {
