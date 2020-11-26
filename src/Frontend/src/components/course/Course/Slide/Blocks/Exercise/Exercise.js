@@ -42,6 +42,7 @@ import styles from './Exercise.less';
 import texts from './Exercise.texts';
 import { GetSubmissionColor } from "./ExerciseUtils.ts";
 import {
+	HasReviewedSubmissions,
 	HasSuccessSubmission,
 	IsFirstRightAnswer,
 	SubmissionIsLast,
@@ -263,7 +264,7 @@ class Exercise extends React.Component {
 	}
 
 	renderControlledCodeMirror = (opts) => {
-		const { expectedOutput, submissions, author, waitingForManualChecking, slideProgress } = this.props;
+		const { expectedOutput, submissions, author, waitingForManualChecking, slideProgress, maxScore } = this.props;
 		const {
 			value, showedHintsCount, showAcceptedSolutions, currentSubmission,
 			isEditable, exerciseCodeDoc, congratsModalData,
@@ -271,6 +272,14 @@ class Exercise extends React.Component {
 		} = this.state;
 
 		const isReview = !isEditable && currentReviews.length > 0;
+		const automaticChecking = currentSubmission?.automaticChecking ?? visibleCheckingResponse?.automaticChecking;
+		const selectedSubmissionIsLast = SubmissionIsLast(submissions, currentSubmission);
+		const selectedSubmissionIsLastSuccess = SubmissionIsLastSuccess(submissions, currentSubmission);
+		const hasReviewedSubmissions = HasReviewedSubmissions(submissions);
+		const isMaxScore = slideProgress.score === maxScore;
+		const submissionColor = GetSubmissionColor(visibleCheckingResponse?.solutionRunStatus, automaticChecking?.result,
+			HasSuccessSubmission(submissions), selectedSubmissionIsLast, selectedSubmissionIsLastSuccess, hasReviewedSubmissions,
+			waitingForManualChecking, slideProgress.prohibitFurtherManualChecking, slideProgress.isSkipped, isMaxScore);
 
 		const wrapperClassName = classNames(
 			styles.exercise,
@@ -281,12 +290,7 @@ class Exercise extends React.Component {
 			{ [styles.editorWithoutBorder]: isEditable },
 			{ [styles.editorInReview]: isReview },
 		);
-		const automaticChecking = currentSubmission?.automaticChecking ?? visibleCheckingResponse?.automaticChecking;
-		const selectedSubmissionIsLast = SubmissionIsLast(submissions, currentSubmission);
-		const selectedSubmissionIsLastSuccess = SubmissionIsLastSuccess(submissions, currentSubmission);
-		const submissionColor = GetSubmissionColor(visibleCheckingResponse?.solutionRunStatus, automaticChecking?.result,
-			HasSuccessSubmission(submissions), selectedSubmissionIsLast, selectedSubmissionIsLastSuccess,
-			waitingForManualChecking, slideProgress.isSkipped);
+
 		return (
 			<React.Fragment>
 				{ submissions.length !== 0 && this.renderSubmissionsSelect() }
@@ -1079,6 +1083,7 @@ const dispatchFunctionsProps = {
 const fromSlideProps = {
 	courseId: PropTypes.string,
 	slideId: PropTypes.string,
+	maxScore: PropTypes.number,
 	forceInitialCode: PropTypes.bool,
 }
 const fromMapStateToProps = {

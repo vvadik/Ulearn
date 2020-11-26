@@ -6,7 +6,7 @@ import { RootState } from "src/models/reduxState";
 import texts from "./SlideHeader.texts";
 import Course from '../../Course.js';
 
-import styles from "../Blocks/BlocksWrapper.less";
+import styles from "../SlideHeader/SlideHeader.less";
 import { ShortSlideInfo } from "src/models/slide";
 
 
@@ -43,7 +43,10 @@ const ScoreHeaderInternal = (props: PropsFromRedux & ScoreHeaderProps) => {
 				{ texts.getSlideScore(score, maxScore, !isSkipped) }
 			</span>
 			{ isSkipped &&
-			<span className={ styles.headerSkippedText }>{ texts.skippedHeaderText }</span>
+			<span className={ styles.headerMaxResultText }>{ texts.skippedHeaderText }</span>
+			}
+			{ waitingForManualChecking &&
+			<span className={ styles.headerNeedImprovementsText }>{ texts.skippedHeaderText }</span>
 			}
 		</div>
 	);

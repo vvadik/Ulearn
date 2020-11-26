@@ -1,8 +1,8 @@
 export default {
 	allTestPassed: 'Все тесты пройдены',
 	allTestPassedNoReview: 'Все тесты пройдены, задача сдана',
-	allTestPassedPendingReview: 'Все тесты пройдены, ожидает код-ревью',
-	allTestPassedWasReviewed: 'Все тесты пройдены, прошло код-ревью',
+	allTestPassedPendingReview: 'Все тесты пройдены, решение ожидает код-ревью',
+	allTestPassedWasReviewed: 'Все тесты пройдены, решение прошло код-ревью',
 	allTestPassedProhibitFurtherReview: 'Все тесты пройдены, по этой задаче код-ревью больше не проводится',
 	noTestsPendingReview: 'Решение ожидает код-ревью',
 	noTestsWasReviewed: 'Решение прошло код-ревью',

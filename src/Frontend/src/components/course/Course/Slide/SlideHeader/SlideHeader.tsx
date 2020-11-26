@@ -6,7 +6,7 @@ import { ScoreHeader } from "./ScoreHeader";
 import texts from './SlideHeader.texts';
 
 import { EyeClosed, } from "@skbkontur/react-icons"
-import styles from "../Blocks/BlocksWrapper.less";
+import styles from "../SlideHeader/SlideHeader.less";
 
 interface SlideHeaderProps {
 	courseId: string,

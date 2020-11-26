@@ -42,6 +42,7 @@ ij_haml_keep_indents_on_empty_lines = false
 
 [*.less]
 indent_size = 2
+indent_style = space
 ij_less_align_closing_brace_with_properties = false
 ij_less_blank_lines_around_nested_selector = 1
 ij_less_blank_lines_between_blocks = 1

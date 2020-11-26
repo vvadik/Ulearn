@@ -1,0 +1,83 @@
+@import "../../courseVariables";
+
+.hiddenSlideEye {
+  margin-right: 8px;
+}
+
+.header {
+  padding: 8px 24px;
+  border-bottom: 1px solid @geinsboro;
+}
+
+.headerMaxResultText {
+  display: inline-block;
+  color: @progressBarGreen;
+}
+
+.headerNeedImprovementsText {
+  display: inline-block;
+  color: @accentColor;
+}
+
+.hiddenHeader {
+  .header;
+  border-bottom: 1px solid @lightOrange;
+
+  &.showed {
+    background-color: @white;
+    border: 1px solid @lightOrange;
+  }
+}
+
+.headerText {
+  color: @additionalColor;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  margin-right: 16px;
+}
+
+.hiddenHeaderText {
+  .headerText;
+  font-size: 12px;
+  line-height: 16px;
+  color: @orange;
+  opacity: 0.7;
+}
+
+@media (min-width: @minTabletWidth) {
+  .headerText {
+    font-size: 16px;
+    line-height: 22px;
+  }
+
+  .header {
+    padding: 16px 24px;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+  }
+
+  .hiddenHeader {
+    .header;
+  }
+}
+
+@media (min-width: @minLaptopWidth) {
+  .header {
+    padding: 16px @laptopSlidePadding 16px @desktopSlidePadding;
+  }
+
+  .hiddenHeader {
+    .header;
+  }
+}
+
+@media (min-width: @minDesktopWidth) {
+  .header {
+    padding: 16px 56px;
+  }
+
+  .hiddenHeader {
+    .header;
+  }
+}

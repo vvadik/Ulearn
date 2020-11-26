@@ -16,17 +16,23 @@ function GetSubmissionColor(
 	hasSuccessSolution: boolean, // Задача прошла автопроверку или автопроверки нет?
 	selectedSubmissionIsLast: boolean, // Это последнее решение, прошедшее тесты?
 	selectedSubmissionIsLastSuccess: boolean, // Это последнее решение, прошедшее тесты?
+	hasReviewedSubmissions: boolean,
 	waitingForManualChecking: boolean, // Студент в целом ожидает ревью?
+	prohibitFurtherManualChecking: boolean,
 	isSkipped: boolean,
+	isMaxScore: boolean, // Балл студента равен максимальному за задачу
 ): SubmissionColor {
 	if(solutionRunStatus === SolutionRunStatus.CompilationError
 		|| checkingResult === CheckingResult.CompilationError || checkingResult === CheckingResult.WrongAnswer) {
 		return SubmissionColor.WrongAnswer;
 	}
+	const canBeNextReview = !prohibitFurtherManualChecking && hasReviewedSubmissions;
 	if(selectedSubmissionIsLastSuccess) {
-		return waitingForManualChecking ? SubmissionColor.NeedImprovements : SubmissionColor.MaxResult;
+		return !isMaxScore && (waitingForManualChecking || canBeNextReview)
+			? SubmissionColor.NeedImprovements
+			: SubmissionColor.MaxResult;
 	}
-	return selectedSubmissionIsLast && !isSkipped && (!hasSuccessSolution || waitingForManualChecking)
+	return selectedSubmissionIsLast && !isSkipped && !isMaxScore && (!hasSuccessSolution || waitingForManualChecking || canBeNextReview)
 		? SubmissionColor.NeedImprovements
 		: SubmissionColor.Message;
 }
@@ -49,9 +55,13 @@ function SubmissionIsLastSuccess(submissions: SubmissionInfo[], submission: Subm
 	return successSubmissions.length > 0 && successSubmissions[0] === submission;
 }
 
-function IsFirstRightAnswer(submissions: SubmissionInfo[], successSubmission: SubmissionInfo): boolean  {
+function IsFirstRightAnswer(submissions: SubmissionInfo[], successSubmission: SubmissionInfo): boolean {
 	const successSubmissions = submissions.filter(IsSuccessSubmission);
 	return successSubmissions.length > 0 && successSubmissions[successSubmissions.length - 1] === successSubmission;
+}
+
+function HasReviewedSubmissions(submissions: SubmissionInfo[]): boolean {
+	return submissions.some(s => s.manualCheckingPassed);
 }
 
 export {
@@ -60,5 +70,6 @@ export {
 	HasSuccessSubmission,
 	SubmissionIsLast,
 	SubmissionIsLastSuccess,
-	IsFirstRightAnswer
+	IsFirstRightAnswer,
+	HasReviewedSubmissions
 }

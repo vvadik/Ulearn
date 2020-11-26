@@ -47,7 +47,8 @@ class Slide extends React.Component {
 	}
 
 	render = () => {
-		const { slideBlocks, showHiddenBlocks, isHiddenSlide, } = this.props;
+		const { slideBlocks, showHiddenBlocks, slideInfo, } = this.props;
+		const isHiddenSlide = slideInfo.hide;
 
 		if(!slideBlocks) {
 			return (<CourseLoader/>);
@@ -131,8 +132,9 @@ class Slide extends React.Component {
 	}
 
 	addAdditionalPropsToBlocks = (slideBlocks) => {
-		const { slideId, courseId, showHiddenBlocks, } = this.props;
+		const { slideId, courseId, showHiddenBlocks, slideInfo } = this.props;
 		const { autoplay } = queryString.parse(window.location.search);
+		const { maxScore } = slideInfo;
 		let firstVideoBlock = true;
 
 		for (const [i, block] of slideBlocks.entries()) {
@@ -188,6 +190,7 @@ class Slide extends React.Component {
 					block.slideId = slideId;
 					block.courseId = courseId;
 					block.forceInitialCode = !showHiddenBlocks;
+					block.maxScore = maxScore;
 					break;
 				}
 			}
@@ -238,7 +241,7 @@ Slide.propTypes = {
 	slideLoading: PropTypes.bool.isRequired,
 	loadSlide: PropTypes.func.isRequired,
 	showHiddenBlocks: PropTypes.bool,
-	isHiddenSlide: PropTypes.bool,
+	slideInfo: PropTypes.object,
 };
 
 Slide.defaultProps = {

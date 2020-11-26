@@ -289,7 +289,7 @@ class Course extends Component {
 								slideId={ currentSlideId }
 								courseId={ currentCourseId }
 								showHiddenBlocks={ !isStudentMode }
-								isHiddenSlide={ slideInfo.hide }
+								slideInfo={ slideInfo }
 							/>
 							: <BlocksWrapper>
 								<Page match={ this.props.match }/>
