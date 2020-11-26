@@ -76,5 +76,7 @@ const ScoreHeaderInternal = (props: PropsFromRedux & ScoreHeaderProps) => {
 	);
 };
 
+
+type ScoreHeaderPropsFromRedux = Omit<PropsFromRedux, "dispatch">;
 const ScoreHeader = connector(ScoreHeaderInternal);
-export { ScoreHeader, ScoreHeaderProps };
+export { ScoreHeader, ScoreHeaderProps, ScoreHeaderPropsFromRedux };
