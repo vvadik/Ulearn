@@ -264,7 +264,7 @@ class Exercise extends React.Component {
 	}
 
 	renderControlledCodeMirror = (opts) => {
-		const { expectedOutput, submissions, author, waitingForManualChecking, slideProgress, maxScore } = this.props;
+		const { expectedOutput, submissions, author, slideProgress, maxScore } = this.props;
 		const {
 			value, showedHintsCount, showAcceptedSolutions, currentSubmission,
 			isEditable, exerciseCodeDoc, congratsModalData,
@@ -275,11 +275,10 @@ class Exercise extends React.Component {
 		const automaticChecking = currentSubmission?.automaticChecking ?? visibleCheckingResponse?.automaticChecking;
 		const selectedSubmissionIsLast = SubmissionIsLast(submissions, currentSubmission);
 		const selectedSubmissionIsLastSuccess = SubmissionIsLastSuccess(submissions, currentSubmission);
-		const hasReviewedSubmissions = HasReviewedSubmissions(submissions);
 		const isMaxScore = slideProgress.score === maxScore;
 		const submissionColor = GetSubmissionColor(visibleCheckingResponse?.solutionRunStatus, automaticChecking?.result,
-			HasSuccessSubmission(submissions), selectedSubmissionIsLast, selectedSubmissionIsLastSuccess, hasReviewedSubmissions,
-			waitingForManualChecking, slideProgress.prohibitFurtherManualChecking, slideProgress.isSkipped, isMaxScore);
+			HasSuccessSubmission(submissions), selectedSubmissionIsLast, selectedSubmissionIsLastSuccess,
+			slideProgress.prohibitFurtherManualChecking, slideProgress.isSkipped, isMaxScore);
 
 		const wrapperClassName = classNames(
 			styles.exercise,

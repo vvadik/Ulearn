@@ -1,9 +1,11 @@
-import { SlideUserProgress } from "src/models/userProgress";
-import { CourseInfo } from "src/models/course";
+import { SlideUserProgress } from "./userProgress";
+import { CourseInfo } from "./course";
+import { SubmissionInfo } from "./exercise";
 
 interface RootState {
 	userProgress: UserProgressState;
 	courses: CourseState;
+	slides: SlidesState;
 }
 
 interface UserProgressState {
@@ -16,4 +18,9 @@ interface CourseState {
 	// TODO не все поля
 }
 
-export { RootState, UserProgressState, CourseState }
+interface SlidesState {
+	submissionsByCourses: { [courseId: string]: { [slideId: string]: { [submissionId: number]: SubmissionInfo } } }
+	// TODO не все поля
+}
+
+export { RootState, UserProgressState, CourseState };

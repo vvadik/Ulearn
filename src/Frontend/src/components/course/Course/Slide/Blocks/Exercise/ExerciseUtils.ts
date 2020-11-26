@@ -16,8 +16,6 @@ function GetSubmissionColor(
 	hasSuccessSolution: boolean, // Задача прошла автопроверку или автопроверки нет?
 	selectedSubmissionIsLast: boolean, // Это последнее решение, прошедшее тесты?
 	selectedSubmissionIsLastSuccess: boolean, // Это последнее решение, прошедшее тесты?
-	hasReviewedSubmissions: boolean,
-	waitingForManualChecking: boolean, // Студент в целом ожидает ревью?
 	prohibitFurtherManualChecking: boolean,
 	isSkipped: boolean,
 	isMaxScore: boolean, // Балл студента равен максимальному за задачу
@@ -26,13 +24,12 @@ function GetSubmissionColor(
 		|| checkingResult === CheckingResult.CompilationError || checkingResult === CheckingResult.WrongAnswer) {
 		return SubmissionColor.WrongAnswer;
 	}
-	const canBeNextReview = !prohibitFurtherManualChecking && hasReviewedSubmissions;
 	if(selectedSubmissionIsLastSuccess) {
-		return !isMaxScore && (waitingForManualChecking || canBeNextReview)
+		return !isMaxScore && !prohibitFurtherManualChecking
 			? SubmissionColor.NeedImprovements
 			: SubmissionColor.MaxResult;
 	}
-	return selectedSubmissionIsLast && !isSkipped && !isMaxScore && (!hasSuccessSolution || waitingForManualChecking || canBeNextReview)
+	return selectedSubmissionIsLast && !isSkipped && !isMaxScore && !prohibitFurtherManualChecking
 		? SubmissionColor.NeedImprovements
 		: SubmissionColor.Message;
 }
@@ -60,16 +57,11 @@ function IsFirstRightAnswer(submissions: SubmissionInfo[], successSubmission: Su
 	return successSubmissions.length > 0 && successSubmissions[successSubmissions.length - 1] === successSubmission;
 }
 
-function HasReviewedSubmissions(submissions: SubmissionInfo[]): boolean {
-	return submissions.some(s => s.manualCheckingPassed);
-}
-
 export {
 	GetSubmissionColor,
 	SubmissionColor,
 	HasSuccessSubmission,
 	SubmissionIsLast,
 	SubmissionIsLastSuccess,
-	IsFirstRightAnswer,
-	HasReviewedSubmissions
+	IsFirstRightAnswer
 }
