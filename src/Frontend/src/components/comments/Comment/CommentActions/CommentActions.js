@@ -3,10 +3,10 @@ import PropTypes from "prop-types";
 import { comment, userRoles, userType } from "../../commonPropTypes";
 import { Link, Button } from "ui";
 import { ArrowCorner1, Edit, DocumentLite } from "icons";
-import { AccessType, } from "src/consts/general";
 import { SlideType, } from "src/models/slide";
 
 import styles from "./CommentActions.less";
+import { AccessType } from "src/consts/accessType";
 
 const ActionButton = ({onClick, icon, children}) => (
 	<div className={styles.action}>

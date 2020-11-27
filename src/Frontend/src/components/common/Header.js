@@ -12,7 +12,6 @@ import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { findDOMNode } from "react-dom";
 import { isMobile } from "src/utils/getDeviceType";
-import { CourseRoleType } from "src/consts/general";
 
 import styles from './Header.less';
 
@@ -20,6 +19,7 @@ import { getQueryStringParameter } from "src/utils";
 import { toggleNavigation } from "src/actions/navigation";
 
 import api from "src/api";
+import { CourseRoleType } from "src/consts/accessType";
 
 
 let accountPropTypes = PropTypes.shape({

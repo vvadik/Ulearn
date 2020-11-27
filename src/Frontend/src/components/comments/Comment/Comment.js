@@ -12,9 +12,9 @@ import Marks from "./Marks/Marks";
 import CommentActions from "./CommentActions/CommentActions";
 import scrollToView from "../../../utils/scrollToView";
 import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils";
-import { AccessType, CourseRoleType } from "src/consts/general";
 
 import styles from "./Comment.less";
+import { AccessType, CourseRoleType } from "src/consts/accessType";
 
 class Comment extends Component {
 	constructor(props) {

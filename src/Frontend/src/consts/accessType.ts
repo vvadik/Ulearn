@@ -1,15 +1,3 @@
-let tz = 'Europe/Moscow';
-
-if(process.env.NODE_ENV === 'development') {
-	tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-}
-export const DEFAULT_TIMEZONE = tz;
-
-export enum TabsType {
-	allComments = 'allComments',
-	instructorsComments = 'instructorsComments',
-}
-
 export enum CourseRoleType {
 	courseAdmin = 'courseAdmin',
 	instructor = 'instructor',
@@ -31,9 +19,3 @@ export enum CourseAccessType {
 
 export const AccessType = { ...CourseAccessType, ...SystemAccessType };
 export type AccessType = (typeof SystemAccessType) & (typeof CourseAccessType);
-
-export enum ProblemType {
-	noEmail, // email не указан
-	noName, // нет имени
-	emailNotConfirmed, // email не подтвержден
-}

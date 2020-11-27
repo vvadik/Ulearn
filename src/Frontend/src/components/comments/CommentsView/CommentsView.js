@@ -2,13 +2,14 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { userRoles, user } from "../commonPropTypes";
 import api from "../../../api";
-import { TabsType, CourseRoleType } from "src/consts/general";
 import { Tabs } from "ui";
 import CommentsList from "../CommentsList/CommentsList";
 
 import { isInstructor } from "src/utils/courseRoles";
 
 import styles from "./CommentsView.less";
+import { CourseRoleType } from "src/consts/accessType";
+import { TabsType } from "src/consts/tabsType";
 
 class CommentsView extends Component {
 	constructor(props) {

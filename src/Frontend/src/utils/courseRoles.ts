@@ -1,4 +1,4 @@
-import { CourseRoleType } from "src/consts/general";
+import { CourseRoleType } from "../consts/accessType";
 
 function isCourseAdmin(userRoles: UserRoles): boolean {
 	return userRoles.isSystemAdministrator ||

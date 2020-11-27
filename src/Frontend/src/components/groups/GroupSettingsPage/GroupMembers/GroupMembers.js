@@ -13,7 +13,7 @@ import Profile from './Profile';
 import getGenderForm from "../../../../utils/getGenderForm";
 import styles from './groupMembers.less';
 import { Mobile, NotMobile } from "src/utils/responsive";
-import { CourseRoleType } from "src/consts/general";
+import { CourseRoleType } from "src/consts/accessType";
 
 class GroupMembers extends Component {
 

@@ -1,7 +1,8 @@
 import { SlideUserProgress } from "./userProgress";
 import { CourseInfo } from "./course";
 import { SubmissionInfo } from "./exercise";
-import { SystemAccessType, CourseAccessType, CourseRoleType, ProblemType, } from "../consts/general";
+import {CourseAccessType, CourseRoleType, SystemAccessType} from "../consts/accessType";
+import { AccountProblemType } from "../consts/accountProblemType";
 
 interface RootState {
 	userProgress: UserProgressState;
@@ -29,7 +30,7 @@ interface AccountState {
 	accountLoaded: boolean;
 	isAuthenticated: boolean;
 	isSystemAdministrator: boolean;
-	accountProblems: [{ title: string, description: string, problemType: ProblemType }];
+	accountProblems: [{ title: string, description: string, problemType: AccountProblemType }];
 	systemAccesses: [SystemAccessType];
 	roleByCourse: { [courseId: string]: CourseRoleType };
 	accessesByCourse: { [courseId: string]: CourseAccessType };

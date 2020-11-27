@@ -3,10 +3,10 @@ import PropTypes from "prop-types";
 import { comment, userType, userRoles } from "../../commonPropTypes";
 import { Kebab, MenuItem } from "ui";
 import { EyeClosed, Delete, Pin, Edit, DocumentLite, Ok } from "icons";
-import { AccessType, } from "src/consts/general";
 import { SlideType } from "src/models/slide";
 
 import styles from "./KebabActions.less";
+import { AccessType } from "src/consts/accessType";
 
 export default function KebabActions(props) {
 	const { user, comment, userRoles, url, canModerateComments, actions, slideType, handleCommentBackGround } = props;

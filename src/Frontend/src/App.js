@@ -7,8 +7,6 @@ import YandexMetrika from "./components/common/YandexMetrika";
 import Header from "./components/common/Header";
 import EmailNotConfirmedModal from "src/components/notificationModal/EmailNotConfirmedModal";
 
-import { ProblemType } from "src/consts/general";
-
 import { Provider, connect } from "react-redux";
 
 import Router from "./Router";
@@ -18,6 +16,7 @@ import { ThemeContext, Toast } from "ui";
 import theme from "src/uiTheme";
 import queryString from "query-string";
 import configureStore from "src/configureStore";
+import { AccountProblemType } from "src/consts/accountProblemType";
 
 
 const store = configureStore();
@@ -99,7 +98,7 @@ class InternalUlearnApp extends Component {
 		const { account } = this.props;
 		return account.isAuthenticated
 			&& account.accountProblems.length > 0
-			&& account.accountProblems.some(p => p.problemType === ProblemType.emailNotConfirmed);
+			&& account.accountProblems.some(p => p.problemType === AccountProblemType.emailNotConfirmed);
 	}
 
 	static mapStateToProps(state) {
