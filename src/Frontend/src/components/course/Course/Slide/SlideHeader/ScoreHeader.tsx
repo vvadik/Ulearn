@@ -33,6 +33,8 @@ const mapState = (state: RootState, ownProps: ScoreHeaderProps) => {
 	const hasReviewedSubmissions = submissions
 		? Object.values(submissionsByCourses[courseId][slideId]).some(s => s.manualCheckingPassed)
 		: false;
+	const instructor = isInstructor(
+		{ isSystemAdministrator: account.isSystemAdministrator, courseRole: account.roleByCourse[courseId] });
 
 	return {
 		courseId,
@@ -43,8 +45,7 @@ const mapState = (state: RootState, ownProps: ScoreHeaderProps) => {
 		prohibitFurtherManualChecking: slideProgress?.prohibitFurtherManualChecking ?? false,
 		maxScore: slideInfo.maxScore,
 		hasReviewedSubmissions: hasReviewedSubmissions,
-		showStudentSubmissions: slideInfo.type === SlideType.Exercise && isInstructor(
-			{ isSystemAdministrator: account.isSystemAdministrator, courseRole: account.roleByCourse[courseId] }),
+		showStudentSubmissions: slideInfo.type === SlideType.Exercise && instructor,
 	};
 };
 const connector = connect(mapState);

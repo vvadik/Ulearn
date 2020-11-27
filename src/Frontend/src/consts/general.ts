@@ -11,7 +11,6 @@ export enum TabsType {
 }
 
 export enum CourseRoleType {
-	systemAdministrator = 'isSystemAdministrator',
 	courseAdmin = 'courseAdmin',
 	instructor = 'instructor',
 	student = 'student',

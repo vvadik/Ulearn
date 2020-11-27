@@ -5,6 +5,8 @@ import configureStore from "redux-mock-store";
 
 import { ScoreHeader, ScoreHeaderPropsFromRedux } from "./ScoreHeader";
 import { RootState } from "src/models/reduxState";
+import { CourseRoleType } from "../../../../../consts/general";
+import { SlideType } from "../../../../../models/slide";
 
 const courseId = "courseId";
 const slideId = "slideId";
@@ -26,7 +28,7 @@ const ListTemplate: Story<{ items: { props: ScoreHeaderPropsFromRedux, header: s
 const reduxProps: ScoreHeaderPropsFromRedux = {
 	slideId,
 	courseId,
-	isInstructor: false,
+	showStudentSubmissions: false,
 	score: 10,
 	isSkipped: false,
 	waitingForManualChecking: false,
@@ -51,15 +53,19 @@ AllHeaders.args = {
 		{ props: { ...reduxProps, hasReviewedSubmissions: true }, header: "Прошел ревью, неполный балл" },
 		{ props: { ...reduxProps, hasReviewedSubmissions: true, score: 50 }, header: "Прошел ревью, полный балл" },
 		//Instructor cases
-		{ props: { ...reduxProps, isSkipped: true, isInstructor: true }, header: "Пропущено (преподаватель)" },
-		{ props: { ...reduxProps, score: 50, isInstructor: true }, header: "Полный балл (преподаватель)" },
-		{ props: { ...reduxProps, score: 0, isInstructor: true }, header: "0 баллов (преподаватель)" },
+		{
+			props: { ...reduxProps, isSkipped: true, showStudentSubmissions: true },
+			header: "Пропущено (преподаватель)"
+		},
+		{ props: { ...reduxProps, score: 50, showStudentSubmissions: true }, header: "Полный балл (преподаватель)" },
+		{ props: { ...reduxProps, score: 0, showStudentSubmissions: true }, header: "0 баллов (преподаватель)" },
 	]
 };
 
 function GetStore(reduxProps: ScoreHeaderPropsFromRedux) {
 	const {
-		score, isSkipped, waitingForManualChecking, prohibitFurtherManualChecking, maxScore, hasReviewedSubmissions
+		score, isSkipped, waitingForManualChecking, prohibitFurtherManualChecking, maxScore, hasReviewedSubmissions,
+		showStudentSubmissions
 	} = reduxProps;
 	const state: DeepPartial<RootState> = {
 		userProgress: {
@@ -74,8 +80,24 @@ function GetStore(reduxProps: ScoreHeaderPropsFromRedux) {
 				}
 			}
 		},
-		courses: { fullCoursesInfo: { [courseId]: { units: [{ slides: [{ id: slideId, maxScore: maxScore }] }] } } },
+		courses: {
+			fullCoursesInfo: {
+				[courseId]: {
+					units: [{
+						slides: [{
+							id: slideId,
+							type: SlideType.Exercise,
+							maxScore: maxScore
+						}]
+					}]
+				}
+			}
+		},
 		slides: { submissionsByCourses: { [courseId]: { [slideId]: { 1: { manualCheckingPassed: hasReviewedSubmissions } } } } },
+		account: {
+			isSystemAdministrator: false,
+			roleByCourse: { [courseId]: showStudentSubmissions ? CourseRoleType.instructor : CourseRoleType.student }
+		}
 	};
 	const mockStore = configureStore();
 	return mockStore(state);
