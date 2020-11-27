@@ -64,7 +64,7 @@ const ScoreHeaderInternal = (props: PropsFromRedux & ScoreHeaderProps) => {
 	let message: string | null = null;
 	if(!isMaxScore) {
 		if(isSkipped) {
-			color = SubmissionColor.NeedImprovements;
+			color = SubmissionColor.MaxResult;
 			message = texts.skippedHeaderText;
 		} else if(waitingForManualChecking) {
 			message = texts.pendingReview;

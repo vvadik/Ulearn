@@ -24,12 +24,15 @@ function GetSubmissionColor(
 		|| checkingResult === CheckingResult.CompilationError || checkingResult === CheckingResult.WrongAnswer) {
 		return SubmissionColor.WrongAnswer;
 	}
+	if(isSkipped) {
+		return selectedSubmissionIsLast ? SubmissionColor.MaxResult : SubmissionColor.Message;
+	}
 	if(selectedSubmissionIsLastSuccess) {
 		return !isMaxScore && !prohibitFurtherManualChecking
 			? SubmissionColor.NeedImprovements
 			: SubmissionColor.MaxResult;
 	}
-	return selectedSubmissionIsLast && !isSkipped && !isMaxScore && !prohibitFurtherManualChecking
+	return selectedSubmissionIsLast && !isMaxScore && !prohibitFurtherManualChecking
 		? SubmissionColor.NeedImprovements
 		: SubmissionColor.Message;
 }
@@ -43,7 +46,7 @@ function HasSuccessSubmission(submissions: SubmissionInfo[]): boolean {
 }
 
 function SubmissionIsLast(submissions: SubmissionInfo[], submission: SubmissionInfo | null): boolean {
-	return submissions.length > 0 && submissions[0] === submission
+	return submissions.length > 0 && submissions[0] === submission;
 }
 
 function SubmissionIsLastSuccess(submissions: SubmissionInfo[], submission: SubmissionInfo | null
