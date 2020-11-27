@@ -64,6 +64,7 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing
 		[TestCase("geoip.py", Language.Python3)]
 		[TestCase("index.html", Language.Html)]
 		[TestCase("example.java", Language.Java)]
+		[TestCase("example.hs", Language.Haskell)]
 		public void LanguagesTest(string file, Language language)
 		{
 			var code = File.ReadAllText(TestDataDir.GetFile(file).FullName);

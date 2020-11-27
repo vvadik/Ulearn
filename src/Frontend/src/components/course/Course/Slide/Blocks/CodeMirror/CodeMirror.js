@@ -63,6 +63,10 @@ function CodeMirror({ language, code, className, }) {
 				require('codemirror/mode/css/css');
 				return `text/css`;
 
+			case 'haskell':
+				require('codemirror/mode/haskell/haskell');
+				return `text/x-haskell`;
+
 			default:
 				require('codemirror/mode/xml/xml');
 				return 'text/html';
