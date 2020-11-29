@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Runtime.Serialization;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 
 namespace Ulearn.Core.RunCheckerJobApi
 {
