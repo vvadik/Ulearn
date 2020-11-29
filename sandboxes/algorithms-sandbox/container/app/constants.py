@@ -1,4 +1,4 @@
-SOLUTION_FILENAME = 'solution.py'
+SOLUTION_FILENAME = 'solution.txt'
 SETTINGS_FILENAME = 'settings.json'
 TEST_DIRECTORY = 'tests'
 RESULT_FILENAME = 'result'

@@ -32,7 +32,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public string SolutionFilePath { get; set; } // По умолчанию используется UserCodeFilePath
 
 		[XmlElement("region")]
-		public string Region { get; set; } // Студент видит в консоли и редактирует регион с этим именем. <prefix>region label <...> <prefix>rendregion label. Должен быть как в решении, так и в файле заглушке.
+		public virtual string Region { get; set; } // Студент видит в консоли и редактирует регион с этим именем. <prefix>region label <...> <prefix>rendregion label. Должен быть как в решении, так и в файле заглушке.
 
 		[XmlElement("excludePathForChecker")]
 		public virtual string[] PathsToExcludeForChecker { get; set; }
@@ -60,7 +60,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public virtual string RunCommand { get; set; } // см. RunCommandRegex
 
 		[XmlIgnore]
-		public static readonly Regex RunCommandRegex = new Regex("^[-_a-z. ;|>]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		public static readonly Regex RunCommandRegex = new Regex("^[-_a-z.0-9 ;|>]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
 		[XmlIgnore]
 		public DirectoryInfo UnitDirectory { get; set; }

@@ -9,9 +9,6 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 	[XmlRoot("slide.polygon", IsNullable = false, Namespace = "https://ulearn.me/schema/v2")]
 	public class PolygonExerciseSlide : ExerciseSlide
 	{
-		[XmlAttribute("statements")]
-		public string StatementsPath { get; set; }
-		
 		public override void Validate(SlideLoadingContext context)
 		{
 			if (string.IsNullOrEmpty(StatementsPath))

@@ -126,6 +126,7 @@
 	<xs:element name="slide.quiz" type="QuizSlide" />
 	<xs:element name="slide.exercise" type="ExerciseSlide" />
 	<xs:element name="slide.flashcards" type="FlashcardSlide" />
+	<xs:element name="slide.polygon" type="PolygonSlide" />
 
 	<xs:complexType name="Slide">
 		<xs:group ref="SlideInternals" />
@@ -148,9 +149,17 @@
 	<xs:complexType name="ExerciseSlide">
 		<xs:sequence>
 			<xs:element name="scoring" type="ExerciseScoring" minOccurs="0" maxOccurs="1" />
+			<xs:element name="statements" type="xs:string" maxOccurs="unbounded" minOccurs="0"/>
 			<xs:group ref="SlideInternals" />
 		</xs:sequence>
 		<xs:attributeGroup ref="SlideAttributes" />
+	</xs:complexType>
+	
+	<xs:complexType name="PolygonSlide">
+		<xs:complexContent>
+			<xs:extension base="ExerciseSlide">
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 
 
@@ -653,7 +662,7 @@
 
 	<xs:complexType name="PolygonExercise">
 		<xs:complexContent>
-			<xs:extension base="IncludeCode">
+			<xs:extension base="Include">
 				<xs:choice minOccurs="0" maxOccurs="unbounded">
 					<xs:element name="hint" type="StringWithXmlSpaces" minOccurs="1" maxOccurs="1" />
 					<xs:element name="hideSolutions" type="xs:boolean" minOccurs="1" maxOccurs="1" />

@@ -71,6 +71,7 @@ namespace Ulearn.Core.Courses.Slides
 		[XmlElement(typeof(CsProjectExerciseBlock))]
 		[XmlElement(typeof(SingleFileExerciseBlock))]
 		[XmlElement(typeof(UniversalExerciseBlock))]
+		[XmlElement(typeof(PolygonExerciseBlock))]
 		[XmlChoiceIdentifier(nameof(DefineBlockType))]
 		public SlideBlock[] Blocks { get; set; }
 
