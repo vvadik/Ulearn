@@ -6,8 +6,7 @@ const merge = require('webpack-merge');
 module.exports = {
 	stories: ['../src/**/**.story.@(js|jsx|tsx)'],
 	addons: [
-		'@storybook/addon-actions/register',
-		'@storybook/addon-viewport/register',
+		'@storybook/addon-essentials',
 	],
 	webpackFinal: async (config, { configType }) => {
 		config = merge(base, config);
@@ -21,6 +20,7 @@ module.exports = {
 				test: /\.less$/,
 				use: [
 					'style-loader',
+					'@teamsupercell/typings-for-css-modules-loader',
 					{
 						loader: 'css-loader',
 						options: {
@@ -38,6 +38,7 @@ module.exports = {
 				test: /\.module\.css$/,
 				use: [
 					'style-loader',
+					'@teamsupercell/typings-for-css-modules-loader',
 					{
 						loader: 'css-loader',
 						options: {

@@ -20,7 +20,7 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 		public bool Hide { get; set; }
 
 		[DataMember]
-		public Language? Language { get; set; }
+		public Language[] Languages { get; set; }
 
 		[NotNull]
 		[DataMember]
@@ -45,9 +45,6 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 		[DataMember]
 		public ExerciseAttemptsStatistics AttemptsStatistics { get; set; }
 
-		[DataMember]
-		public bool WaitingForManualChecking { get; set; }
-
 		public ExerciseBlockResponse(AbstractExerciseBlock exerciseBlock,
 			ExerciseSlideRendererContext context)
 		{
@@ -59,9 +56,8 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 			ExerciseInitialCode = exerciseBlock.ExerciseInitialCode.RemoveEmptyLinesFromStart().TrimEnd().EnsureEnoughLines(4);
 			HideSolutions = exerciseBlock.HideShowSolutionsButton;
 			ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : exerciseBlock.ExpectedOutput?.NormalizeEoln();
-			Language = exerciseBlock.Language;
+			Languages = exerciseBlock.Language != null ? new[] { exerciseBlock.Language.Value } : new Language[0];
 			AttemptsStatistics = context.AttemptsStatistics;
-			WaitingForManualChecking = context.Submissions?.FirstOrDefault()?.ManualCheckings.Any(c => !c.IsChecked) ?? false;
 			Submissions = context.Submissions
 				.EmptyIfNull()
 				.Select(s => SubmissionInfo.Build(s, reviewId2Comments))

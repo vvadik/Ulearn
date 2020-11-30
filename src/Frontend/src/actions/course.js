@@ -8,17 +8,19 @@ import {
 	COURSES__COURSE_LOAD_ERRORS,
 	COURSES__EXERCISE_ADD_SUBMISSION,
 	COURSES__EXERCISE_ADD_REVIEW_COMMENT,
+	COURSES__EXERCISE_DELETE_REVIEW_COMMENT,
 	START, SUCCESS, FAIL,
 } from "../consts/actions";
 
+import { userProgressUpdateAction } from "./userProgress";
 import { getCourse, getCourseErrors } from 'src/api/courses';
-import { getSlide, submitCode, } from "src/api/slides";
+import { getSlideBlocks, submitCode, } from "src/api/slides";
 import {
 	getFlashcards,
 	putFlashcardStatus,
 } from '../api/flashcards';
-import { sendCodeReviewComment, } from "src/api/exercise";
-import { solutionRunStatuses } from "../consts/exercise";
+import { sendCodeReviewComment, deleteCodeReviewComment, } from "src/api/exercise";
+import { SolutionRunStatus } from "src/models/exercise.ts";
 
 export const changeCurrentCourseAction = (courseId) => ({
 	type: COURSES__COURSE_ENTERED,
@@ -73,11 +75,11 @@ const loadSlideStart = () => ({
 	type: COURSES__SLIDE_LOAD + START,
 });
 
-const loadSlideSuccess = (courseId, slideId, result) => ({
+const loadSlideSuccess = (courseId, slideId, slideBlocks) => ({
 	type: COURSES__SLIDE_LOAD + SUCCESS,
 	courseId,
 	slideId,
-	result,
+	slideBlocks,
 });
 
 const loadSlideFail = (error) => ({
@@ -97,13 +99,12 @@ const addSubmissionAction = (courseId, slideId, result) => ({
 	result,
 });
 
-const addReviewCommentStart = (courseId, slideId, submissionId, reviewId, comment) => ({
+const addReviewCommentStart = (courseId, slideId, submissionId, reviewId,) => ({
 	type: COURSES__EXERCISE_ADD_REVIEW_COMMENT + START,
 	courseId,
 	slideId,
 	submissionId,
 	reviewId,
-	comment,
 });
 
 const addReviewCommentSuccess = (courseId, slideId, submissionId, reviewId, comment) => ({
@@ -121,6 +122,35 @@ const addReviewCommentFail = (courseId, slideId, submissionId, reviewId, error) 
 	slideId,
 	submissionId,
 	reviewId,
+	error,
+});
+
+const deleteReviewCommentStart = (courseId, slideId, submissionId, reviewId, commentId) => ({
+	type: COURSES__EXERCISE_DELETE_REVIEW_COMMENT + START,
+	courseId,
+	slideId,
+	submissionId,
+	reviewId,
+	commentId,
+});
+
+const deleteReviewCommentSuccess = (courseId, slideId, submissionId, reviewId, commentId) => ({
+	type: COURSES__EXERCISE_DELETE_REVIEW_COMMENT + SUCCESS,
+	courseId,
+	slideId,
+	submissionId,
+	reviewId,
+	commentId,
+});
+
+
+const deleteReviewCommentFail = (courseId, slideId, submissionId, reviewId, commentId, error) => ({
+	type: COURSES__EXERCISE_DELETE_REVIEW_COMMENT + FAIL,
+	courseId,
+	slideId,
+	submissionId,
+	reviewId,
+	commentId,
 	error,
 });
 
@@ -190,9 +220,9 @@ export const loadSlide = (courseId, slideId) => {
 	return (dispatch) => {
 		dispatch(loadSlideStart());
 
-		getSlide(courseId, slideId)
-			.then(result => {
-				dispatch(loadSlideSuccess(courseId, slideId, result));
+		getSlideBlocks(courseId, slideId)
+			.then(slideBlocks => {
+				dispatch(loadSlideSuccess(courseId, slideId, slideBlocks));
 			})
 			.catch(err => {
 				dispatch(loadSlideFail(err));
@@ -206,34 +236,67 @@ export const setSlideReady = (isSlideReady) => {
 	}
 }
 
-export const sendCode = (courseId, slideId, code,) => {
+export const sendCode = (courseId, slideId, code, language) => {
 	return (dispatch) => {
-		submitCode(courseId, slideId, code,)
+		submitCode(courseId, slideId, code, language)
 			.then(r => {
 				dispatch(addSubmissionAction(courseId, slideId, r));
+				updateUserProgress(r, dispatch);
 			})
 			.catch(err => {
 				const result = {
-					solutionRunStatus: solutionRunStatuses.internalServerError,
+					solutionRunStatus: SolutionRunStatus.InternalServerError,
 					message: err.message,
 					submission: null,
-					score: null,
-					waitingForManualChecking: null
 				}
 				dispatch(addSubmissionAction(courseId, slideId, result));
 			});
 	};
+
+	function updateUserProgress(r, dispatch) {
+		let fieldsToUpdate = {};
+		if(r.score != null) {
+			fieldsToUpdate = { ...fieldsToUpdate, score: r.score };
+		}
+		if(r.waitingForManualChecking != null) {
+			fieldsToUpdate = { ...fieldsToUpdate, waitingForManualChecking: r.waitingForManualChecking };
+		}
+		if(r.prohibitFurtherManualChecking != null) {
+			fieldsToUpdate = {
+				...fieldsToUpdate,
+				prohibitFurtherManualChecking: r.prohibitFurtherManualChecking
+			};
+		}
+		if(Object.keys(fieldsToUpdate).length > 0) {
+			dispatch(userProgressUpdateAction(courseId, slideId, fieldsToUpdate));
+		}
+	}
 }
 
-export const addReviewComment = (courseId, slideId, submissionId, reviewId, comment,) => {
+export const addReviewComment = (courseId, slideId, submissionId, reviewId, text,) => {
 	return (dispatch) => {
-		dispatch(addReviewCommentStart(courseId, slideId, submissionId, reviewId, comment));
-		sendCodeReviewComment(reviewId, comment.text,)
+		dispatch(addReviewCommentStart(courseId, slideId, submissionId, reviewId));
+
+		sendCodeReviewComment(reviewId, text,)
 			.then(r => {
 				dispatch(addReviewCommentSuccess(courseId, slideId, submissionId, reviewId, r));
 			})
 			.catch(err => {
 				dispatch(addReviewCommentFail(courseId, slideId, submissionId, reviewId, err));
+			});
+	};
+}
+
+export const deleteReviewComment = (courseId, slideId, submissionId, reviewId, commentId,) => {
+	return (dispatch) => {
+		dispatch(deleteReviewCommentStart(courseId, slideId, submissionId, reviewId, commentId));
+
+		deleteCodeReviewComment(reviewId, commentId,)
+			.then(r => {
+				dispatch(deleteReviewCommentSuccess(courseId, slideId, submissionId, reviewId, commentId));
+			})
+			.catch(err => {
+				dispatch(deleteReviewCommentFail(courseId, slideId, submissionId, reviewId, commentId, err));
 			});
 	};
 }

@@ -1,4 +1,4 @@
-import { rateTypes } from "../../../../consts/rateTypes";
+import { RateTypes } from "../../../../consts/rateTypes";
 
 export function sortFlashcardsInAuthorsOrderWithRate(flashcards) {
 	const copy = [...flashcards];
@@ -8,12 +8,12 @@ export function sortFlashcardsInAuthorsOrderWithRate(flashcards) {
 }
 
 const mapRateTypeToSortingCoefficient = {
-	[rateTypes.notRated]: 6,
-	[rateTypes.rate1]: 5,
-	[rateTypes.rate2]: 4,
-	[rateTypes.rate3]: 3,
-	[rateTypes.rate4]: 2,
-	[rateTypes.rate5]: 1,
+	[RateTypes.notRated]: 6,
+	[RateTypes.rate1]: 5,
+	[RateTypes.rate2]: 4,
+	[RateTypes.rate3]: 3,
+	[RateTypes.rate4]: 2,
+	[RateTypes.rate5]: 1,
 };
 
 export function getNextFlashcardRandomly(sequence, maxLastRateIndex) {
@@ -54,9 +54,9 @@ export function getNextFlashcardRandomly(sequence, maxLastRateIndex) {
 }
 
 const mapRateTypeToProbabilityCoefficient = {
-	[rateTypes.rate1]: 16,
-	[rateTypes.rate2]: 8,
-	[rateTypes.rate3]: 4,
-	[rateTypes.rate4]: 2,
-	[rateTypes.rate5]: 1,
+	[RateTypes.rate1]: 16,
+	[RateTypes.rate2]: 8,
+	[RateTypes.rate3]: 4,
+	[RateTypes.rate4]: 2,
+	[RateTypes.rate5]: 1,
 };

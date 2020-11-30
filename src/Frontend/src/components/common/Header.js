@@ -12,7 +12,6 @@ import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { findDOMNode } from "react-dom";
 import { isMobile } from "src/utils/getDeviceType";
-import { ROLES } from "src/consts/general";
 
 import styles from './Header.less';
 
@@ -20,6 +19,7 @@ import { getQueryStringParameter } from "src/utils";
 import { toggleNavigation } from "src/actions/navigation";
 
 import api from "src/api";
+import { CourseRoleType } from "src/consts/accessType";
 
 
 let accountPropTypes = PropTypes.shape({
@@ -35,6 +35,7 @@ let accountPropTypes = PropTypes.shape({
 }).isRequired;
 
 const LinkComponent = ({ href, ...rest }) => (<Link to={ href } { ...rest } />);
+const maxDropdownHeight = window.innerHeight - 50 - 20; // max == height - headerHeight - additiveBottomSpace(so its not touching the bottom)
 
 class Header extends Component {
 	constructor(props) {
@@ -118,8 +119,8 @@ class Header extends Component {
 	isInstructor() {
 		const { isSystemAdministrator, courseRole, } = this.state;
 		return isSystemAdministrator ||
-			courseRole === ROLES.courseAdmin ||
-			courseRole === ROLES.instructor;
+			courseRole === CourseRoleType.courseAdmin ||
+			courseRole === CourseRoleType.instructor;
 	}
 
 	render() {
@@ -340,6 +341,7 @@ class SysAdminMenu extends AbstractMyCoursesMenu {
 		return (
 			<div className={ styles["header__sysadmin-menu"] }>
 				<DropdownMenu
+					menuMaxHeight={ maxDropdownHeight }
 					caption={
 						<div>
 							<span className={ styles["visible-only-phone"] }>
@@ -372,6 +374,7 @@ class MyCoursesMenu extends AbstractMyCoursesMenu {
 		return (
 			<div className={ styles["header__my-courses-menu"] }>
 				<DropdownMenu
+					menuMaxHeight={ maxDropdownHeight }
 					caption={
 						<div>
 							<span className={ styles["visible-only-phone"] }>
@@ -494,6 +497,7 @@ class CourseMenu extends Component {
 		return (
 			<div className={ styles["header__course-menu"] }>
 				<DropdownMenu
+					menuMaxHeight={ maxDropdownHeight }
 					menuWidth={ 300 }
 					caption={
 						<div>
@@ -540,6 +544,7 @@ class MobileCourseMenu extends AbstractMyCoursesMenu {
 		return (
 			<div className={ styles["header__course-menu"] }>
 				<DropdownMenu
+					menuMaxHeight={ maxDropdownHeight }
 					menuWidth={ 250 }
 					caption={
 						<span className={ styles["icon"] }>

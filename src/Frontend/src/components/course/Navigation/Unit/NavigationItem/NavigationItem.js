@@ -4,16 +4,16 @@ import { Link } from "react-router-dom";
 import { Copy, EyeClosed, } from "icons";
 import { Hint } from "ui";
 
-import { SLIDETYPE } from 'src/consts/general';
+import { SlideType } from 'src/models/slide';
 import { menuItemType } from '../../types';
 import classnames from 'classnames';
 
 import styles from './NavigationItem.less';
 
 const icons = {
-	[SLIDETYPE.quiz]: '?',
-	[SLIDETYPE.exercise]: <div className={ styles.exerciseIcon }>{ '<>' }</div>,
-	[SLIDETYPE.flashcards]: <Copy/>,
+	[SlideType.Quiz]: '?',
+	[SlideType.Exercise]: <div className={ styles.exerciseIcon }>{ '<>' }</div>,
+	[SlideType.Flashcards]: <Copy/>,
 };
 
 class NavigationItem extends Component {
@@ -74,7 +74,7 @@ class NavigationItem extends Component {
 			return;
 		}
 
-		if(type === SLIDETYPE.exercise || type === SLIDETYPE.quiz) {
+		if(type === SlideType.Exercise || type === SlideType.Quiz) {
 			return (
 				<div className={ styles.scoreWrapper }>
 					<span className={ styles.score }>{ score || 0 }/{ maxScore }</span>
@@ -110,7 +110,7 @@ class NavigationItem extends Component {
 	renderPointer() {
 		const { type, visited } = this.props;
 
-		if(type === SLIDETYPE.lesson) {
+		if(type === SlideType.Lesson) {
 			return (
 				<span className={ classnames(styles.pointer, { [styles.complete]: visited }) }/>
 			);

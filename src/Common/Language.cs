@@ -44,6 +44,10 @@ namespace Ulearn.Common
 		[Lexer("css")]
 		Css = 8,
 
+		[XmlEnum("haskell")]
+		[Lexer("haskell")]
+		Haskell = 9,
+
 		[XmlEnum("text")]
 		[Lexer("text")]
 		Text = 100,
@@ -63,19 +67,15 @@ namespace Ulearn.Common
 		private static readonly Dictionary<string, Language> extensions = new Dictionary<string, Language>
 		{
 			{ ".cs", Language.CSharp },
-
 			{ ".py", Language.Python3 },
 			{ ".py2", Language.Python2 },
 			{ ".py3", Language.Python3 },
-
 			{ ".html", Language.Html },
 			{ ".css", Language.Css },
-
 			{ ".js", Language.JavaScript },
 			{ ".ts", Language.TypeScript },
-
 			{ ".java", Language.Java },
-
+			{ ".hs", Language.Haskell },
 			{ ".txt", Language.Text },
 		};
 
@@ -129,7 +129,7 @@ namespace Ulearn.Common
 	{
 		public static bool HasAutomaticChecking(this Language language)
 		{
-			return language == Language.CSharp || language == Language.JavaScript || language == Language.Python3;
+			return language == Language.CSharp || language == Language.JavaScript || language == Language.Python3 || language == Language.Haskell;
 		}
 
 		public static string GetName(this Language language)

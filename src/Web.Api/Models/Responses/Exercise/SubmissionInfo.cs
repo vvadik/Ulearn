@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using Database.Models;
 using JetBrains.Annotations;
+using Ulearn.Common;
 
 namespace Ulearn.Web.Api.Models.Responses.Exercise
 {
@@ -16,6 +17,9 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 		[NotNull]
 		[DataMember]
 		public string Code;
+
+		[DataMember]
+		public Language Language;
 
 		[DataMember]
 		public DateTime Timestamp;
@@ -47,6 +51,7 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 			{
 				Id = submission.Id,
 				Code = submission.SolutionCode.Text,
+				Language = submission.Language,
 				Timestamp = submission.Timestamp,
 				AutomaticChecking = automaticChecking,
 				ManualCheckingPassed = submission.ManualCheckings.Any(mc => mc.IsChecked),

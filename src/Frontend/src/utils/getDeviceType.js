@@ -5,7 +5,7 @@ all sizes should be derived from variables.less
 @minTabletWidth: 800px;
  */
 
-import { deviceType } from "src/consts/deviceType";
+import { DeviceType } from "src/consts/deviceType";
 
 export function isMobile() {
 	return window.matchMedia("(max-width: 800px)").matches;
@@ -25,16 +25,16 @@ export function isDesktop() {
 
 export function getDeviceType() {
 	if(isMobile()) {
-		return deviceType.mobile;
+		return DeviceType.mobile;
 	}
 
 	if(isTablet()) {
-		return deviceType.tablet;
+		return DeviceType.tablet;
 	}
 
 	if(isLaptop()) {
-		return deviceType.laptop;
+		return DeviceType.laptop;
 	}
 
-	return deviceType.desktop;
+	return DeviceType.desktop;
 }

@@ -1,7 +1,7 @@
-import { rateTypes } from "../../consts/rateTypes";
+import { RateTypes } from "../../consts/rateTypes";
 
 export default function countFlashcardsStatistics(flashcards) {
-	const statistics = Object.values(rateTypes)
+	const statistics = Object.values(RateTypes)
 		.reduce((stats, rateType) => {
 			return { ...stats, [rateType]: 0 }
 		}, {});

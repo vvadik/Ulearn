@@ -9,7 +9,7 @@ import ShortQuestions from "./ShortQuestions/ShortQuestions";
 import Flashcards from "../Flashcards/Flashcards";
 
 import { guides } from '../consts';
-import { rateTypes } from "../../../consts/rateTypes";
+import { RateTypes } from "../../../consts/rateTypes";
 
 import countFlashcardsStatistics from "../countFlashcardsStatistics";
 
@@ -55,8 +55,8 @@ class UnitPage extends Component {
 	render() {
 		const { courseId, unitTitle, flashcards, flashcardsLoading, sendFlashcardRate, unitId, infoByUnits } = this.props;
 		const { statistics, totalFlashcardsCount, showFlashcards } = this.state;
-		const haveProgress = flashcards && statistics[rateTypes.notRated] !== totalFlashcardsCount;
-		const completedUnit = flashcards && statistics[rateTypes.notRated] === 0;
+		const haveProgress = flashcards && statistics[RateTypes.notRated] !== totalFlashcardsCount;
+		const completedUnit = flashcards && statistics[RateTypes.notRated] === 0;
 		const dataLoaded = flashcards && !flashcardsLoading;
 
 		if(!dataLoaded) {
@@ -128,7 +128,7 @@ class UnitPage extends Component {
 
 	static mapFlashcardsToQuestionWithAnswers(unitFlashcards) {
 		return unitFlashcards
-			.filter(({ rate }) => rate !== rateTypes.notRated)
+			.filter(({ rate }) => rate !== RateTypes.notRated)
 			.map(({ question, answer, }) => ({ question, answer, }));
 	}
 }

@@ -8,7 +8,7 @@ import {
 	START, SUCCESS, FAIL,
 	COURSES__COURSE_LOAD_ERRORS,
 } from '../consts/actions';
-import { rateTypes } from "../consts/rateTypes";
+import { RateTypes } from "../consts/rateTypes";
 import { flashcards as flashcardsSlideType } from "../consts/routes";
 
 const initialCoursesState = {
@@ -97,7 +97,7 @@ export default function courses(state = initialCoursesState, action) {
 				for (const flashcard of flashcards) {
 					courseFlashcards[flashcard.id] = flashcard;
 					flashcardsIds.push(flashcard.id);
-					if(flashcard.rate === rateTypes.notRated) {
+					if(flashcard.rate === RateTypes.notRated) {
 						unratedFlashcardsCount++;
 					}
 				}

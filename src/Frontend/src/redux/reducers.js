@@ -1,6 +1,6 @@
 import { combineReducers } from "redux";
 import courseReducer from "./course";
-import userProgressReducer from "./userProgress";
+import userProgressReducer from "./userProgress.ts";
 import navigationReducer from "./navigation";
 import slidesReducer from "./slides";
 import accountReducer from "./account";
