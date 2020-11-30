@@ -20,7 +20,7 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 		public bool Hide { get; set; }
 
 		[DataMember]
-		public Language? Language { get; set; }
+		public Language[] Languages { get; set; }
 
 		[NotNull]
 		[DataMember]
@@ -56,7 +56,7 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 			ExerciseInitialCode = exerciseBlock.ExerciseInitialCode.RemoveEmptyLinesFromStart().TrimEnd().EnsureEnoughLines(4);
 			HideSolutions = exerciseBlock.HideShowSolutionsButton;
 			ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : exerciseBlock.ExpectedOutput?.NormalizeEoln();
-			Language = exerciseBlock.Language;
+			Languages = exerciseBlock.Language != null ? new[] { exerciseBlock.Language.Value } : new Language[0];
 			AttemptsStatistics = context.AttemptsStatistics;
 			Submissions = context.Submissions
 				.EmptyIfNull()

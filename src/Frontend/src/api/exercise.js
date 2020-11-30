@@ -1,7 +1,7 @@
 import api from "src/api/index";
 
-export function submitCode(courseId, slideId, code) {
-	return api.post(`slides/${ courseId }/${ slideId }/exercise/submit`,
+export function submitCode(courseId, slideId, code, language) {
+	return api.post(`slides/${ courseId }/${ slideId }/exercise/submit?language=${language}`,
 		api.createRequestParams({ solution: code }));
 }
 

@@ -42,7 +42,6 @@ import styles from './Exercise.less';
 import texts from './Exercise.texts';
 import { GetSubmissionColor } from "./ExerciseUtils.ts";
 import {
-	HasReviewedSubmissions,
 	HasSuccessSubmission,
 	IsFirstRightAnswer,
 	SubmissionIsLast,
@@ -64,6 +63,8 @@ class Exercise extends React.Component {
 			valueChanged: false,
 
 			isEditable: submissions.length === 0,
+
+			language: props.languages.length === 1 ? props.languages[0] : null,
 
 			showedHintsCount: 0,
 			showAcceptedSolutions: false,
@@ -131,6 +132,8 @@ class Exercise extends React.Component {
 			}
 			return;
 		}
+
+		this.overrideCodeMirrorAutocomplete();
 
 		if(courseId !== prevProps.courseId || slideId !== prevProps.slideId) {
 			this.loadSlideSubmission();
@@ -200,7 +203,7 @@ class Exercise extends React.Component {
 		}
 	}
 	overrideCodeMirrorAutocomplete = () => {
-		const { language, } = this.props;
+		const { language, } = this.state;
 
 		CodeMirror.commands.autocomplete = function (cm) {
 			const hint = CodeMirror.hint[language.toLowerCase()];
@@ -237,11 +240,11 @@ class Exercise extends React.Component {
 	}
 
 	get codeMirrorOptions() {
-		const { language, isAuthenticated, } = this.props;
-		const { isEditable, } = this.state;
+		const { isAuthenticated, languages } = this.props;
+		const { isEditable, language } = this.state;
 
 		return {
-			mode: Exercise.loadLanguageStyles(language),
+			mode: Exercise.loadLanguageStyles(language ?? languages[0]),
 			lineNumbers: true,
 			scrollbarStyle: 'null',
 			lineWrapping: true,
@@ -264,7 +267,7 @@ class Exercise extends React.Component {
 	}
 
 	renderControlledCodeMirror = (opts) => {
-		const { expectedOutput, submissions, author, slideProgress, maxScore } = this.props;
+		const { expectedOutput, submissions, author, slideProgress, maxScore, languages } = this.props;
 		const {
 			value, showedHintsCount, showAcceptedSolutions, currentSubmission,
 			isEditable, exerciseCodeDoc, congratsModalData,
@@ -293,6 +296,7 @@ class Exercise extends React.Component {
 		return (
 			<React.Fragment>
 				{ submissions.length !== 0 && this.renderSubmissionsSelect() }
+				{ languages.length > 1 && (submissions.length > 0 || isEditable) && this.renderLanguageSelect() }
 				{ !isEditable && this.renderHeader(submissionColor, selectedSubmissionIsLast, selectedSubmissionIsLastSuccess) }
 				<div className={ wrapperClassName }>
 					<Controlled
@@ -370,6 +374,28 @@ class Exercise extends React.Component {
 		);
 	}
 
+	renderLanguageSelect = () => {
+		const { language } = this.state;
+		const { languages } = this.props;
+
+		const items = languages.map((l) => {
+			return [l, texts.getLanguageCaption(l)];
+		});
+
+		return (
+			<div className={ styles.languagesDropdown }>
+				<ThemeContext.Provider value={ FLAT_THEME }>
+					<Select
+						items={ items }
+						value={ language || languages[0] }
+						onValueChange={ (l) => this.setState({ language: l }) }
+						menuWidth={100}
+					/>
+				</ThemeContext.Provider>
+			</div>
+		);
+	}
+
 	renderHeader = (submissionColor, selectedSubmissionIsLast, selectedSubmissionIsLastSuccess) => {
 		const { currentSubmission, visibleCheckingResponse } = this.state;
 		const { waitingForManualChecking, prohibitFurtherManualChecking, score } = this.props.slideProgress;
@@ -406,6 +432,7 @@ class Exercise extends React.Component {
 		// after all is done we refreshing editor to refresh layout and sizes depends on reviews sizes
 		this.setState({
 				value: submission.code,
+				language: submission.language,
 				isEditable: false,
 				valueChanged: false,
 				showOutput: false,
@@ -891,14 +918,14 @@ class Exercise extends React.Component {
 	}
 
 	sendExercise = () => {
-		const { value, } = this.state;
+		const { value, language } = this.state;
 		const { courseId, slideId, } = this.props;
 
 		this.setState({
 			submissionLoading: true,
 		});
 
-		this.props.sendCode(courseId, slideId, value);
+		this.props.sendCode(courseId, slideId, value, language);
 	}
 
 	addReviewComment = (reviewId, text) => {
@@ -980,7 +1007,7 @@ class Exercise extends React.Component {
 
 	static
 	loadLanguageStyles = (language) => {
-		switch (language.toLowerCase()) {
+		switch (language?.toLowerCase()) {
 			case 'csharp':
 				require('codemirror/mode/clike/clike');
 				return `text/x-csharp`;
@@ -1065,13 +1092,13 @@ const mapStateToProps = (state, { courseId, slideId, }) => {
 };
 
 const mapDispatchToProps = (dispatch) => ({
-	sendCode: (courseId, slideId, code) => dispatch(sendCode(courseId, slideId, code)),
+	sendCode: (courseId, slideId, code, language) => dispatch(sendCode(courseId, slideId, code, language)),
 	addReviewComment: (courseId, slideId, submissionId, reviewId, comment) => dispatch(addReviewComment(courseId, slideId, submissionId, reviewId, comment)),
 	deleteReviewComment: (courseId, slideId, submissionId, reviewId, comment) => dispatch(deleteReviewComment(courseId, slideId, submissionId, reviewId, comment)),
 });
 
 const exerciseBlockProps = {
-	language: PropTypes.string.isRequired,
+	languages: PropTypes.array.isRequired,
 	hints: PropTypes.array,
 	exerciseInitialCode: PropTypes.string,
 	hideSolutions: PropTypes.bool,

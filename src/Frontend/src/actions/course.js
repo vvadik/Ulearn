@@ -236,9 +236,9 @@ export const setSlideReady = (isSlideReady) => {
 	}
 }
 
-export const sendCode = (courseId, slideId, code,) => {
+export const sendCode = (courseId, slideId, code, language) => {
 	return (dispatch) => {
-		submitCode(courseId, slideId, code,)
+		submitCode(courseId, slideId, code, language)
 			.then(r => {
 				dispatch(addSubmissionAction(courseId, slideId, r));
 				updateUserProgress(r, dispatch);

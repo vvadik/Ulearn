@@ -6,10 +6,6 @@ export function getSlideBlocks(courseId, slideId) {
 		.then(r => r.blocks);
 }
 
-export function submitCode(courseId, slideId, code) {
-	return api.exercise.submitCode(courseId, slideId, code);
-}
-
-export function addReviewComment(courseId, slideId, code) {
-	return api.exercise.submitCode(courseId, slideId, code);
+export function submitCode(courseId, slideId, code, language) {
+	return api.exercise.submitCode(courseId, slideId, code, language);
 }

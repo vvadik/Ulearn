@@ -65,6 +65,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			[FromRoute] Course course, 
 			[FromRoute] Guid slideId,
 			[FromBody] RunSolutionParameters parameters,
+			[FromQuery] Language language,
 			[FromQuery] bool isLti = false)
 		{
 			var courseId = course.Id;

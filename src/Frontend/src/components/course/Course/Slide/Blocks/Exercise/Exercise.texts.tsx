@@ -2,7 +2,9 @@ import React from "react";
 
 import getPluralForm from "src/utils/getPluralForm.js";
 import { SubmissionInfo } from "src/models/exercise";
-import { getMoment, convertDefaultTimezoneToLocal } from "src/utils/momentUtils.js";
+import { convertDefaultTimezoneToLocal, getMoment } from "src/utils/momentUtils.js";
+import { Language } from "src/consts/languages";
+import { capitalize } from "src/utils/stringUtils";
 
 const texts = {
 	submissions: {
@@ -19,6 +21,10 @@ const texts = {
 			}
 			return timestampCaption;
 		},
+	},
+
+	getLanguageCaption: (language: Language): string => {
+		return language === Language.CSharp ? "C#" : capitalize(language);
 	},
 
 	acceptedSolutions: {
