@@ -4,14 +4,16 @@ using Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Database.Migrations
 {
     [DbContext(typeof(UlearnDb))]
-    partial class UlearnDbModelSnapshot : ModelSnapshot
+    [Migration("20200929114914_AddWorkQueue")]
+    partial class AddWorkQueue
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -255,7 +257,7 @@ namespace Database.Migrations
                     b.Property<float?>("Points")
                         .HasColumnType("real");
 
-                    b.Property<int?>("Score")
+                    b.Property<int>("Score")
                         .HasColumnType("int");
 
                     b.Property<Guid>("SlideId")
@@ -1220,13 +1222,10 @@ namespace Database.Migrations
                     b.Property<DateTime?>("LockedUntil")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("Percent")
-                        .HasColumnType("int");
-
                     b.Property<bool>("ProhibitFurtherManualCheckings")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("Score")
+                    b.Property<int>("Score")
                         .HasColumnType("int");
 
                     b.Property<Guid>("SlideId")
@@ -2139,7 +2138,7 @@ namespace Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("WorkQueueItems");
+                    b.ToTable("WorkQueue");
                 });
 
             modelBuilder.Entity("Database.Models.XQueueExerciseSubmission", b =>
