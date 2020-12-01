@@ -4,7 +4,6 @@ import classNames from 'classnames';
 import { constructPathToStudentSubmissions } from "src/consts/routes";
 import { isInstructor } from "src/utils/courseRoles";
 import { ShortSlideInfo, SlideType } from "src/models/slide";
-import { SubmissionColor } from "../Blocks/Exercise/ExerciseUtils";
 
 import { RootState } from "src/models/reduxState";
 
@@ -15,6 +14,54 @@ import { Modal } from "@skbkontur/react-ui";
 import texts from "./SlideHeader.texts";
 import styles from "../SlideHeader/SlideHeader.less";
 
+
+const ScoreHeaderInternal = (props: PropsFromRedux & ScoreHeaderProps) => {
+	const [isModalShowed, showModal] = useState(false);
+
+	const { score, maxScore, isSkipped, waitingForManualChecking, prohibitFurtherManualChecking, hasReviewedSubmissions, courseId, slideId, showStudentSubmissions, } = props;
+	if(score === null || maxScore === null) {
+		return null;
+	}
+
+	const isMaxScore = score === maxScore;
+	let message: string | null = null;
+	if(!isMaxScore) {
+		if(isSkipped) {
+			message = texts.skippedHeaderText;
+		} else if(waitingForManualChecking) {
+			message = texts.pendingReview;
+		} else if(prohibitFurtherManualChecking) {
+			message = texts.prohibitFurtherReview;
+		} else if(hasReviewedSubmissions) {
+			message = texts.reviewWaitForCorrection;
+		}
+	}
+
+	const maxModalWidth = window.innerWidth - 40;
+	const modalWidth: undefined | number = maxModalWidth > 880 ? 880 : maxModalWidth; //TODO пока что это мок, в будущем width будет другой
+	return (
+		<div className={ styles.header }>
+			<span className={ classNames(styles.headerText, styles.scoreTextWeight, styles.scoreTextColor) }>
+				{ texts.getSlideScore(score, maxScore, !isSkipped) }
+			</span>
+			{ message && <span className={ styles.headerStatusText }>{ message }</span> }
+			{ showStudentSubmissions && <a onClick={ () => showModal(true) } className={ styles.acceptedSolutionsText }>
+				{ texts.showAcceptedSolutionsText }
+			</a> }
+			{ isModalShowed &&
+			<Modal width={ modalWidth } onClose={ () => showModal(false) }>
+				<Modal.Header>
+					<h2>
+						{ texts.showAcceptedSolutionsHeaderText }
+					</h2>
+				</Modal.Header>
+				<Modal.Body>
+					<DownloadedHtmlContent url={ constructPathToStudentSubmissions(courseId, slideId) }/>
+				</Modal.Body>
+			</Modal> }
+		</div>
+	);
+};
 
 interface ScoreHeaderProps {
 	courseId: string;
@@ -50,59 +97,6 @@ const mapState = (state: RootState, ownProps: ScoreHeaderProps) => {
 };
 const connector = connect(mapState);
 type PropsFromRedux = ConnectedProps<typeof connector>;
-
-
-const ScoreHeaderInternal = (props: PropsFromRedux & ScoreHeaderProps) => {
-	const [isModalShowed, showModal] = useState(false);
-
-	const { score, maxScore, isSkipped, waitingForManualChecking, prohibitFurtherManualChecking, hasReviewedSubmissions, courseId, slideId, showStudentSubmissions, } = props;
-	if(score === null || maxScore === null) {
-		return null;
-	}
-
-	const isMaxScore = score === maxScore;
-	let color: SubmissionColor = SubmissionColor.NeedImprovements;
-	let message: string | null = null;
-	if(!isMaxScore) {
-		if(isSkipped) {
-			color = SubmissionColor.MaxResult;
-			message = texts.skippedHeaderText;
-		} else if(waitingForManualChecking) {
-			message = texts.pendingReview;
-		} else if(prohibitFurtherManualChecking) {
-			color = SubmissionColor.MaxResult;
-			message = texts.prohibitFurtherReview;
-		} else if(hasReviewedSubmissions) {
-			message = texts.reviewWaitForCorrection;
-		}
-	}
-
-	const messageColorStyle = color === SubmissionColor.MaxResult ? styles.headerMaxResultTextColor : styles.headerNeedImprovementsTextColor;
-	const maxModalWidth = window.innerWidth - 40;
-	const modalWidth: undefined | number = maxModalWidth > 880 ? 880 : maxModalWidth; //TODO пока что это мок, в будущем width будет другой
-	return (
-		<div className={ styles.header }>
-			<span className={ classNames(styles.headerText, styles.scoreTextWeight, styles.scoreTextColor) }>
-				{ texts.getSlideScore(score, maxScore, !isSkipped) }
-			</span>
-			{ message && <span className={ classNames(styles.headerStatusText, messageColorStyle) }>{ message }</span> }
-			{ showStudentSubmissions && <a onClick={ () => showModal(true) } className={ styles.acceptedSolutionsText }>
-				{ texts.showAcceptedSolutionsText }
-			</a> }
-			{ isModalShowed &&
-			<Modal width={ modalWidth } onClose={ () => showModal(false) }>
-				<Modal.Header>
-					<h2>
-						{ texts.showAcceptedSolutionsHeaderText }
-					</h2>
-				</Modal.Header>
-				<Modal.Body>
-					<DownloadedHtmlContent url={ constructPathToStudentSubmissions(courseId, slideId) }/>
-				</Modal.Body>
-			</Modal> }
-		</div>
-	);
-};
 
 
 type ScoreHeaderPropsFromRedux = Omit<PropsFromRedux, "dispatch">;
