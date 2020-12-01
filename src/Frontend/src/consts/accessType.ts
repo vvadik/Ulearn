@@ -18,4 +18,4 @@ export enum CourseAccessType {
 }
 
 export const AccessType = { ...CourseAccessType, ...SystemAccessType };
-export type AccessType = (typeof SystemAccessType) & (typeof CourseAccessType);
+export type AccessType = typeof AccessType;
