@@ -362,9 +362,10 @@ class Exercise extends React.Component {
 		});
 
 		return (
-			<div className={ styles.submissionsDropdown }>
+			<div className={ styles.select }>
 				<ThemeContext.Provider value={ FLAT_THEME }>
 					<Select
+						width={'100%'}
 						items={ items }
 						value={ currentSubmission?.id || newTry.id }
 						onValueChange={ (id) => this.loadSubmissionToState(submissionsWithNewTry.find(s => s.id === id)) }
@@ -383,13 +384,13 @@ class Exercise extends React.Component {
 		});
 
 		return (
-			<div className={ styles.languagesDropdown }>
+			<div className={ styles.select }>
 				<ThemeContext.Provider value={ FLAT_THEME }>
 					<Select
+						width={'100%'}
 						items={ items }
 						value={ language || languages[0] }
 						onValueChange={ (l) => this.setState({ language: l }) }
-						menuWidth={100}
 					/>
 				</ThemeContext.Provider>
 			</div>
