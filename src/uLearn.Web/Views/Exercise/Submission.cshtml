@@ -62,13 +62,13 @@
 			else if (Model.ReviewState == ExerciseReviewState.Reviewed)
 			{
 				var score = Model.SubmissionSelectedByUser.ManualCheckings.Max(c => c.Score);
-				var scoreVerb = score.SelectPluralWordInRussian(new RussianPluralizationOptions
+				var scoreVerb = (score ?? 0).SelectPluralWordInRussian(new RussianPluralizationOptions
 				{
 					One = "получен",
 					Two = "получено",
 					Five = "получено"
 				});
-				var pluralizedScore = score.PluralizeInRussian(RussianPluralizationOptions.Score);
+				var pluralizedScore = (score ?? 0).PluralizeInRussian(RussianPluralizationOptions.Score);
 				if (Model.InstructorView)
 				{
 					var messageFormat = string.IsNullOrEmpty(texts.CodeReviewPassedInstructorView)

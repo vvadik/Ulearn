@@ -64,7 +64,7 @@
 						Код-ревью
 						@if (submission.ManualCheckings.Any(c => c.IsChecked))
 						{
-							manualScore = submission.ManualCheckings.Max(c => c.Score);
+							manualScore = submission.ManualCheckings.Max(c => c.Score ?? 0);
 							<span>(текущая оценка: @manualScore из @slide.Scoring.CodeReviewScore):</span>
 						}
 						else

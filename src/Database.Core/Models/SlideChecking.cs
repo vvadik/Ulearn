@@ -75,7 +75,17 @@ namespace Database.Models
 		RequestTimeLimit = 6 // Не взято из очереди за разумное время
 	}
 
-	public class AutomaticExerciseChecking : AbstractAutomaticSlideChecking
+	public interface ICheckingWithNullableScore
+	{
+		public int? Score { get; set; }
+	}
+
+	public interface ICheckingWithNotNullScore
+	{
+		public int Score { get; set; }
+	}
+
+	public class AutomaticExerciseChecking : AbstractAutomaticSlideChecking, ICheckingWithNullableScore
 	{
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -112,7 +122,7 @@ namespace Database.Models
 		public string CheckingAgentName { get; set; }
 
 		[Obsolete] // Данные этого столбца вычисляются из других. Оставелно, чтобы не удалять столбец
-		public int? Score { get; set; }
+		public int? Score { get; set; } = 0;
 
 		public float? Points { get; set; }
 
@@ -129,7 +139,7 @@ namespace Database.Models
 
 	/* Manual Exercise Checking is Code Review */
 
-	public class ManualExerciseChecking : AbstractManualSlideChecking
+	public class ManualExerciseChecking : AbstractManualSlideChecking, ICheckingWithNullableScore
 	{
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -148,7 +158,7 @@ namespace Database.Models
 		public virtual IList<ExerciseCodeReview> Reviews { get; set; }
 
 		// Хранит старые данные, теперь используется Percent
-		public int? Score { get; set; }
+		public int? Score { get; set; } = 0;
 
 		// Процент, поставленный преподавателем за ревью. Если поставить меньше баллов бота, то баллы бота уменьшется.
 		// Если процент не указан, используется Score. Это старый сценарий. Баллы Score суммируются с баллами бота.
@@ -163,7 +173,7 @@ namespace Database.Models
 		}
 	}
 
-	public class AutomaticQuizChecking : AbstractAutomaticSlideChecking
+	public class AutomaticQuizChecking : AbstractAutomaticSlideChecking, ICheckingWithNotNullScore
 	{
 		/* This field is not identity and is not database-generated because EF generates Id as foreign key to UserQuizSubmission.Id */
 		[Key]
@@ -176,7 +186,7 @@ namespace Database.Models
 		public bool IgnoreInAttemptsCount { get; set; }
 	}
 
-	public class ManualQuizChecking : AbstractManualSlideChecking
+	public class ManualQuizChecking : AbstractManualSlideChecking, ICheckingWithNotNullScore
 	{
 		/* This field is not identity and is not database-generated because EF generates Id as foreign key to UserQuizSubmission.Id */
 		[Key]
