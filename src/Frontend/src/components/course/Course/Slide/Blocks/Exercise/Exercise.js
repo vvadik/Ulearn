@@ -133,8 +133,6 @@ class Exercise extends React.Component {
 			return;
 		}
 
-		this.overrideCodeMirrorAutocomplete();
-
 		if(courseId !== prevProps.courseId || slideId !== prevProps.slideId) {
 			this.loadSlideSubmission();
 			return;
@@ -365,7 +363,7 @@ class Exercise extends React.Component {
 			<div className={ styles.select }>
 				<ThemeContext.Provider value={ FLAT_THEME }>
 					<Select
-						width={'100%'}
+						width={ '100%' }
 						items={ items }
 						value={ currentSubmission?.id || newTry.id }
 						onValueChange={ (id) => this.loadSubmissionToState(submissionsWithNewTry.find(s => s.id === id)) }
@@ -387,7 +385,7 @@ class Exercise extends React.Component {
 			<div className={ styles.select }>
 				<ThemeContext.Provider value={ FLAT_THEME }>
 					<Select
-						width={'100%'}
+						width={ '100%' }
 						items={ items }
 						value={ language || languages[0] }
 						onValueChange={ (l) => this.setState({ language: l }) }
@@ -417,7 +415,7 @@ class Exercise extends React.Component {
 	}
 
 	loadSubmissionToState = (submission,) => {
-		const { valueChanged } = this.state;
+		const { valueChanged, } = this.state;
 
 		if(submission === newTry) {
 			this.loadNewTry();
@@ -438,6 +436,7 @@ class Exercise extends React.Component {
 				valueChanged: false,
 				showOutput: false,
 				visibleCheckingResponse: null,
+				currentReviews: [],
 			}, () =>
 				this.setCurrentSubmission(submission)
 		);
