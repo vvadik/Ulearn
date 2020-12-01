@@ -265,22 +265,32 @@
 :global {
   //removing border from line gutters
   .CodeMirror-gutters {
-	border: unset;
+    border: unset;
+  }
+
+  //next 2 classes are overriding styles for autocompletion in code mirror to default. Darcula is theme we're using, its adding background color and coloring text.
+  .CodeMirror-hints.darcula {
+    background-color: @white !important;
+  }
+
+  .CodeMirror-hints.darcula .CodeMirror-hint-active {
+    background-color: @blue !important;
+    color: @white !important;
   }
 }
 
 @media (min-width: @minTabletWidth) {
   .editor {
-	font-size: 14px;
-	line-height: 20px;
+    font-size: 14px;
+    line-height: 20px;
   }
 
   .overview {
-	padding: 24px 40px;
+    padding: 24px 40px;
   }
 
   .overview h3 {
-	font-size: 20px;
-	line-height: 28px;
+    font-size: 20px;
+    line-height: 28px;
   }
 }
