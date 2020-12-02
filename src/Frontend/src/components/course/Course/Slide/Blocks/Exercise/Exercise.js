@@ -336,7 +336,7 @@ class Exercise extends React.Component {
 	}
 
 	getReviewsWithoutDeleted = (reviews) => {
-		return reviews.map(r => r.comments = r.comments.filter(c => !c.isDeleted && !c.isLoading));
+		return reviews.map(r => ({ ...r, comments: r.comments.filter(c => !c.isDeleted && !c.isLoading) }));
 	}
 
 	getReviewAnchorTop = (review) => {
