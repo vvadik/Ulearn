@@ -1,6 +1,6 @@
 import React from "react";
 
-import styles from "./CongratsModal.less"
+import styles from "./CongratsModal.less";
 
 import texts from "./CongratsModal.texts";
 import CupIcon from "./CupIcon.js";
@@ -30,8 +30,8 @@ class CongratsModal extends React.Component<CongratsModalProps> {
 
 		return (
 			<div ref={ (ref) => this.overlay = ref }
-				className={ styles.overlay }
-				onClick={ this.handleCongratsOverlayClick }>
+				 className={ styles.overlay }
+				 onClick={ this.handleCongratsOverlayClick }>
 				<div className={ styles.modal }>
 					<button className={ styles.modalCloseButton } onClick={ onClose }>
 						&times;
@@ -44,7 +44,7 @@ class CongratsModal extends React.Component<CongratsModalProps> {
 						{ texts.title }
 					</h2>
 					<section className={ styles.text }>
-						{ texts.getBodyText(waitingForManualChecking, score) }
+						{ texts.getBodyText(waitingForManualChecking, showAcceptedSolutions, score) }
 					</section>
 
 					{/* this.renderSelfCheckContent() */ }
@@ -64,12 +64,12 @@ class CongratsModal extends React.Component<CongratsModalProps> {
 		return (
 			<div className={ styles.scoreTextWrapper }>+{ score }</div>
 		);
-	}
+	};
 
 	private onCloseClick = () => {
 		const { onClose, } = this.props;
 		onClose();
-	}
+	};
 
 	private renderSelfCheckContent = () => {
 		return (
@@ -83,13 +83,13 @@ class CongratsModal extends React.Component<CongratsModalProps> {
 				</section>
 			</React.Fragment>
 		);
-	}
+	};
 
 	private handleCongratsOverlayClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		if(e.target === this.overlay) {
 			this.props.onClose();
 		}
-	}
+	};
 }
 
-export default CongratsModal;
+export { CongratsModal, CongratsModalProps, };

@@ -6,7 +6,7 @@ import Review from "./Review/Review";
 import { darkTheme } from 'ui/internal/ThemePlayground/darkTheme';
 import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent";
 import { Lightbulb, Refresh, EyeOpened, DocumentLite, } from "icons";
-import CongratsModal from "./CongratsModal/CongratsModal.tsx";
+import { CongratsModal } from "./CongratsModal/CongratsModal.tsx";
 import { ExerciseOutput, HasOutput } from "./ExerciseOutput/ExerciseOutput.tsx";
 import { ExerciseFormHeader } from "./ExerciseFormHeader/ExerciseFormHeader.tsx";
 import { ThemeContext } from "@skbkontur/react-ui/index";

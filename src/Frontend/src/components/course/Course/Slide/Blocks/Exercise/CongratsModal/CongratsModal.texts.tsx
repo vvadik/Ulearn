@@ -5,7 +5,9 @@ import getPluralForm from "src/utils/getPluralForm.js";
 
 export default {
 	title: 'Ура!',
-	getBodyText: (waitingForManualChecking: boolean, score: number,): React.ReactNode => (
+	getBodyText: (waitingForManualChecking: boolean, showAcceptedSolutions: boolean,
+		score: number,
+	): React.ReactNode => (
 		waitingForManualChecking
 			? <React.Fragment>
 				<p>Вы отправили задачу на ревью.</p>
@@ -16,8 +18,12 @@ export default {
 			</React.Fragment>
 			: <React.Fragment>
 				Вы справились с задачей и получили { score } { getPluralForm(score, 'балл', 'балла', 'баллов') }.<br/>
-				Перед тем как идти дальше, посмотрите как решили<br/>
-				задачу другие студенты.
+				{ showAcceptedSolutions &&
+				<React.Fragment>
+					Перед тем как идти дальше, посмотрите как решили<br/>
+					задачу другие студенты.
+				</React.Fragment>
+				}
 			</React.Fragment>
 	),
 	closeButton: 'Вернуться к заданию',
