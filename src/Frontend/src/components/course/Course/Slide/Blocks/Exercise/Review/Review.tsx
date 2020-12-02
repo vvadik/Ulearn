@@ -7,22 +7,11 @@ import { Send3, Trash, Delete, } from "icons";
 
 import { textareaHidden } from "src/uiTheme.js";
 
-import { ShortUserInfo } from "src/models/users";
-import { TextMarker } from 'codemirror';
+import { ReviewCommentResponse, ReviewInfo } from "src/models/exercise";
 
 import styles from "./Review.less";
 import texts from "./Review.texts";
 
-
-interface ReviewProps {
-	reviews: ReviewInfo[];
-	selectedReviewId: number;
-	userId: string;
-	onSelectComment: (e: React.MouseEvent | React.FocusEvent, id: number,) => void;
-	addReviewComment: (reviewId: number, comment: string) => void;
-	deleteReviewComment: (reviewId: number, commentId: number) => void;
-	getReviewAnchorTop: (review: ReviewInfo) => number;
-}
 
 interface CommentReplies {
 	[id: number]: string;
@@ -40,31 +29,14 @@ interface ReviewState {
 	marginsAdded: boolean;
 }
 
-interface ReviewInfo {
-	addingTime: string;
-	author?: ShortUserInfo;
-	comment: Comment;
-	comments: Comment[];
-	finishLine: number;
-	finishPosition: number;
-	id: number;
-	marker: TextMarker;
-	renderedComment: string;
-	startLine: number;
-	startPosition: number;
-}
-
-interface Comment {
-	id: number;
-	author?: ShortUserInfo;
-	startLine: number;
-	finishLine: number;
-	addingTime?: string;
-	publishTime?: string;
-	renderedText?: string;
-	renderedComment: string;
-	isLoading?: boolean;
-	isDeleted?: boolean;
+interface ReviewProps {
+	reviews: ReviewInfo[];
+	selectedReviewId: number;
+	userId: string;
+	onSelectComment: (e: React.MouseEvent | React.FocusEvent, id: number,) => void;
+	addReviewComment: (reviewId: number, comment: string) => void;
+	deleteReviewComment: (reviewId: number, commentId: number) => void;
+	getReviewAnchorTop: (review: ReviewInfo) => number;
 }
 
 const botUser = { visibleName: 'Ulearn bot', id: 'bot', };
@@ -247,7 +219,7 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 				{
 					comments.length > 0 && authorToRender.id !== botUser.id &&
 					<ol className={ styles.commentRepliesList }>
-						{ comments.filter(r => !r.isDeleted).map((c, i) =>
+						{ comments.map((c, i) =>
 							<li className={ styles.commentReply } key={ i }>
 								{ this.renderComment(c, id) }
 							</li>)
@@ -260,16 +232,22 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 		);
 	};
 
-	renderComment = (
-		{ id, author, startLine, finishLine, addingTime, publishTime, renderedText, renderedComment, isLoading, }: Comment,
+	renderComment(review: ReviewInfo): React.ReactNode;
+	renderComment(reviewComment: ReviewCommentResponse, reviewId: number): React.ReactNode;
+	renderComment({
+			id,
+			author,
+			startLine,
+			finishLine,
+			addingTime,
+			publishTime,
+			renderedText,
+			renderedComment,
+		}: ReviewInfo & ReviewCommentResponse,
 		reviewId: number | null = null
-	): React.ReactNode => {
+	): React.ReactNode {
 		const { userId, deleteReviewComment } = this.props;
 		const authorToRender = author ?? botUser;
-
-		if(isLoading) {
-			return null;
-		}
 
 		const time = addingTime || publishTime;
 
@@ -320,7 +298,7 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 				/>
 			</React.Fragment>
 		);
-	};
+	}
 
 	renderAddReviewComment = (
 		selectComment: (e: React.MouseEvent | React.FocusEvent) => void,

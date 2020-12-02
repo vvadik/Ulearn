@@ -312,7 +312,7 @@ class Exercise extends React.Component {
 						deleteReviewComment={ this.deleteReviewComment }
 						selectedReviewId={ selectedReviewId }
 						onSelectComment={ this.selectComment }
-						reviews={ currentReviews }
+						reviews={ this.getReviewsWithoutDeleted(currentReviews) }
 						getReviewAnchorTop={ this.getReviewAnchorTop }
 					/>
 					}
@@ -333,6 +333,10 @@ class Exercise extends React.Component {
 				{ congratsModalData && this.renderCongratsModal(congratsModalData) }
 			</React.Fragment>
 		)
+	}
+
+	getReviewsWithoutDeleted = (reviews) => {
+		return reviews.map(r => r.comments = r.comments.filter(c => !c.isDeleted && !c.isLoading));
 	}
 
 	getReviewAnchorTop = (review) => {
@@ -795,7 +799,11 @@ class Exercise extends React.Component {
 	}
 
 	renderShowStatisticsHint = () => {
-		const { attemptedUsersCount, usersWithRightAnswerCount, lastSuccessAttemptDate, } = this.props.attemptsStatistics;
+		const {
+			attemptedUsersCount,
+			usersWithRightAnswerCount,
+			lastSuccessAttemptDate,
+		} = this.props.attemptsStatistics;
 		const statisticsClassName = classNames(styles.exerciseControls, styles.statistics);
 
 		return (
