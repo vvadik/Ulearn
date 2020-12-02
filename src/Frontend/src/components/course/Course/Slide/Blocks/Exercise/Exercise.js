@@ -56,7 +56,7 @@ const newTry = { id: -1 };
 class Exercise extends React.Component {
 	constructor(props) {
 		super(props);
-		const { exerciseInitialCode, submissions, } = props;
+		const { exerciseInitialCode, submissions, languages, } = props;
 
 		this.state = {
 			value: exerciseInitialCode,
@@ -64,7 +64,7 @@ class Exercise extends React.Component {
 
 			isEditable: submissions.length === 0,
 
-			language: props.languages.length === 1 ? props.languages[0] : null,
+			language: languages[0],
 
 			showedHintsCount: 0,
 			showAcceptedSolutions: false,
@@ -201,9 +201,8 @@ class Exercise extends React.Component {
 		}
 	}
 	overrideCodeMirrorAutocomplete = () => {
-		const { language, } = this.state;
-
-		CodeMirror.commands.autocomplete = function (cm) {
+		CodeMirror.commands.autocomplete = (cm) => {
+			const { language, } = this.state;
 			const hint = CodeMirror.hint[language.toLowerCase()];
 			if(hint) {
 				cm.showHint({ hint: hint });
@@ -238,11 +237,11 @@ class Exercise extends React.Component {
 	}
 
 	get codeMirrorOptions() {
-		const { isAuthenticated, languages } = this.props;
+		const { isAuthenticated, } = this.props;
 		const { isEditable, language } = this.state;
 
 		return {
-			mode: Exercise.loadLanguageStyles(language ?? languages[0]),
+			mode: Exercise.loadLanguageStyles(language),
 			lineNumbers: true,
 			scrollbarStyle: 'null',
 			lineWrapping: true,
@@ -387,7 +386,7 @@ class Exercise extends React.Component {
 					<Select
 						width={ '100%' }
 						items={ items }
-						value={ language || languages[0] }
+						value={ language }
 						onValueChange={ (l) => this.setState({ language: l }) }
 					/>
 				</ThemeContext.Provider>
@@ -1007,7 +1006,7 @@ class Exercise extends React.Component {
 
 	static
 	loadLanguageStyles = (language) => {
-		switch (language?.toLowerCase()) {
+		switch (language.toLowerCase()) {
 			case 'csharp':
 				require('codemirror/mode/clike/clike');
 				return `text/x-csharp`;
