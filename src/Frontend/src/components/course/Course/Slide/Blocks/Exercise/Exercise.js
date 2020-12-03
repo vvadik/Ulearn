@@ -164,8 +164,7 @@ class Exercise extends React.Component {
 			if(solutionRunStatus === SolutionRunStatus.Success) {
 				const { automaticChecking } = submission;
 
-				if(automaticChecking?.processStatus === ProcessStatus.Done
-					&& automaticChecking.result === CheckingResult.RightAnswer
+				if((!automaticChecking || automaticChecking.result === CheckingResult.RightAnswer)
 					&& IsFirstRightAnswer(submissions, submission)) {
 					this.openModal({
 						score: lastCheckingResponse.score,
