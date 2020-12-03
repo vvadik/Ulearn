@@ -8,23 +8,28 @@ export default {
 	getBodyText: (waitingForManualChecking: boolean, showAcceptedSolutions: boolean,
 		score: number,
 	): React.ReactNode => (
-		waitingForManualChecking
-			? <React.Fragment>
-				<p>Вы отправили задачу на ревью.</p>
-				Преподаватель проверит решение<br/>
-				и поставит баллы за ревью.<br/>
-				Об этом придёт уведомление на почту<br/>
-				или в Telegram (если он <Link to={ accountPath }>настроен</Link>).
-			</React.Fragment>
-			: <React.Fragment>
-				Вы справились с задачей и получили { score } { getPluralForm(score, 'балл', 'балла', 'баллов') }.<br/>
-				{ showAcceptedSolutions &&
-				<React.Fragment>
-					Перед тем как идти дальше, посмотрите как решили<br/>
-					задачу другие студенты.
-				</React.Fragment>
-				}
-			</React.Fragment>
+		<React.Fragment>
+			{
+				waitingForManualChecking
+					? <React.Fragment>
+						<p>Вы отправили задачу на ревью.</p>
+						Преподаватель проверит решение<br/>
+						и поставит баллы за ревью.<br/>
+						Об этом придёт уведомление на почту<br/>
+						или в Telegram (если он <Link to={ accountPath }>настроен</Link>).<br/>
+					</React.Fragment>
+					: <React.Fragment>
+						Вы справились с задачей и получили { score } { getPluralForm(score, 'балл', 'балла',
+					'баллов') }.<br/>
+					</React.Fragment>
+			}
+			{ showAcceptedSolutions &&
+			<p>
+				Перед тем как идти дальше, посмотрите как решили<br/>
+				задачу другие студенты.
+			</p>
+			}
+		</React.Fragment>
 	),
 	closeButton: 'Вернуться к заданию',
 	closeButtonForAcceptedSolutions: 'Посмотреть решения',
