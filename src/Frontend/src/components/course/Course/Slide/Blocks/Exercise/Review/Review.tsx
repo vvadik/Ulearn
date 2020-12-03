@@ -260,7 +260,7 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 							<span className={ styles.authorName }>
 								{ authorToRender.visibleName }
 							</span>
-							{ startLine &&
+							{ startLine >= 0 &&
 							<span className={ styles.commentLineNumber }>
 								{ texts.getLineCapture(startLine, finishLine) }
 							</span>
@@ -349,4 +349,4 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 	};
 }
 
-export default Review;
+export { Review, ReviewProps };
