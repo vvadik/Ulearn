@@ -7,6 +7,7 @@ module.exports = {
 	stories: ['../src/**/**.story.@(js|jsx|tsx)'],
 	addons: [
 		'@storybook/addon-essentials',
+		'@storybook/addon-controls',
 	],
 	webpackFinal: async (config, { configType }) => {
 		config = merge(base, config);
