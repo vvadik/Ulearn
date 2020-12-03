@@ -1,9 +1,8 @@
 ﻿import React from "react";
 import { Review, ReviewProps } from "./Review";
 
-import { ReviewInfo, SolutionRunStatus, } from "src/models/exercise";
+import { ReviewInfo, } from "src/models/exercise";
 import type { Story } from "@storybook/react";
-import { SubmissionColor } from "../ExerciseUtils";
 
 const addingTime = "2020-12-03T20:03:29.9725057+05:00";
 
