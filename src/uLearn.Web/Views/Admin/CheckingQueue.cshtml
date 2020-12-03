@@ -91,7 +91,8 @@
 					<p>
 						Последний раз проверялась преподавателем <b>@checking.LockedBy.VisibleName</b>
 						<span class="label label-xs label-default">
-							@checking.Score из @checkingModel.ContextMaxScore.PluralizeInRussian(RussianPluralizationOptions.Score) за @(isExercise ? "код-ревью" : "тест")
+							@{ var score = (checking as ManualExerciseChecking)?.Score ?? (checking as ManualQuizChecking)?.Score ?? 0; }
+							@(score) из @checkingModel.ContextMaxScore.PluralizeInRussian(RussianPluralizationOptions.Score) за @(isExercise ? "код-ревью" : "тест")
 						</span>
 					</p>
 					<p>
@@ -103,7 +104,10 @@
 								var startPosition = solution.FindPositionByLineAndCharacter(review.StartLine, review.StartPosition);
 								var finishPosition = solution.FindPositionByLineAndCharacter(review.FinishLine, review.FinishPosition);
 								var length = finishPosition - startPosition;
-								if (solution.Length == 0 || length < 0) {continue;}
+								if (solution.Length == 0 || length < 0)
+								{
+									continue;
+								}
 								<div>
 									<span class="commented-code">@solution.Substring(startPosition, finishPosition - startPosition).TruncateWithEllipsis(30)</span>
 									@Html.Raw(review.Comment.HtmlEncode().RenderSimpleMarkdown())

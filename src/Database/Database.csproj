@@ -446,12 +446,18 @@
     <Compile Update="Migrations\201407180807286_AddQuestions.Designer.cs">
       <DependentUpon>201407180807286_AddQuestions.cs</DependentUpon>
     </Compile>
-	<Compile Update="Migrations\202005201329356_addLastUpdateTime.Designer.cs">
-	  <DependentUpon>202005201329356_addLastUpdateTime.cs</DependentUpon>
-	</Compile>
-	<Compile Update="Migrations\202005201413421_AddTempCourseErrors.Designer.cs">
-	  <DependentUpon>202005201413421_AddTempCourseErrors.cs</DependentUpon>
-	</Compile>
+    <Compile Update="Migrations\202005201329356_addLastUpdateTime.Designer.cs">
+      <DependentUpon>202005201329356_addLastUpdateTime.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Migrations\202005201413421_AddTempCourseErrors.Designer.cs">
+      <DependentUpon>202005201413421_AddTempCourseErrors.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Migrations\202009291146572_AddWorkQueue.Designer.cs">
+      <DependentUpon>202009291146572_AddWorkQueue.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Migrations\202010060950465_ChangeScoreFields.Designer.cs">
+      <DependentUpon>202010060950465_ChangeScoreFields.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Migrations\201407111234255_InitialCreate.resx">
@@ -871,23 +877,29 @@
     <EmbeddedResource Update="Migrations\202005030946436_AddTempCourse.resx">
       <DependentUpon>202005030946436_AddTempCourse.cs</DependentUpon>
     </EmbeddedResource>
-	<EmbeddedResource Update="Migrations\202005201329356_addLastUpdateTime.resx">
-	  <DependentUpon>202005201329356_addLastUpdateTime.cs</DependentUpon>
-	</EmbeddedResource>
-	<EmbeddedResource Update="Migrations\202005201413421_AddTempCourseErrors.resx">
-	  <DependentUpon>202005201413421_AddTempCourseErrors.cs</DependentUpon>
-	</EmbeddedResource>
-	<EmbeddedResource Update="Migrations\202007091243283_CourseIdLength64.resx">
-	  <DependentUpon>202007091243283_CourseIdLength64.cs</DependentUpon>
-	</EmbeddedResource>
-	<EmbeddedResource Update="Migrations\202007091305416_CourseIdLength100.resx">
-	  <DependentUpon>202007091305416_CourseIdLength100.cs</DependentUpon>
-	</EmbeddedResource>
-	<EmbeddedResource Update="Migrations\202007241042257_AddQuizIgnoreInAttemptsCount.resx">
-	  <DependentUpon>202007241042257_AddQuizIgnoreInAttemptsCount.cs</DependentUpon>
-	</EmbeddedResource>
-	<EmbeddedResource Update="Migrations\202009171003006_DisableUsersFullTextIndexStopWords.resx">
-	  <DependentUpon>202009171003006_DisableUsersFullTextIndexStopWords.cs</DependentUpon>
-	</EmbeddedResource>
+    <EmbeddedResource Update="Migrations\202005201329356_addLastUpdateTime.resx">
+      <DependentUpon>202005201329356_addLastUpdateTime.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Migrations\202005201413421_AddTempCourseErrors.resx">
+      <DependentUpon>202005201413421_AddTempCourseErrors.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Migrations\202007091243283_CourseIdLength64.resx">
+      <DependentUpon>202007091243283_CourseIdLength64.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Migrations\202007091305416_CourseIdLength100.resx">
+      <DependentUpon>202007091305416_CourseIdLength100.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Migrations\202007241042257_AddQuizIgnoreInAttemptsCount.resx">
+      <DependentUpon>202007241042257_AddQuizIgnoreInAttemptsCount.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Migrations\202009171003006_DisableUsersFullTextIndexStopWords.resx">
+      <DependentUpon>202009171003006_DisableUsersFullTextIndexStopWords.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Migrations\202009291146572_AddWorkQueue.resx">
+      <DependentUpon>202009291146572_AddWorkQueue.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Migrations\202010060950465_ChangeScoreFields.resx">
+      <DependentUpon>202010060950465_ChangeScoreFields.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

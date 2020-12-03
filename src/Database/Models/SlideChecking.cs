@@ -39,8 +39,6 @@ namespace Database.Models
 
 		public virtual ApplicationUser User { get; set; }
 
-		public int Score { get; set; }
-
 		public virtual void PreRemove(ULearnDb db)
 		{
 		}
@@ -85,7 +83,18 @@ namespace Database.Models
 		RequestTimeLimit = 6
 	}
 
-	public class AutomaticExerciseChecking : AbstractAutomaticSlideChecking
+	public interface ICheckingWithNullableScore
+	{
+		public int? Score { get; set; }
+	}
+
+	public interface ICheckingWithNotNullScore
+	{
+		public int Score { get; set; }
+	}
+
+
+	public class AutomaticExerciseChecking : AbstractAutomaticSlideChecking, ICheckingWithNullableScore
 	{
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -120,6 +129,9 @@ namespace Database.Models
 		[StringLength(256)]
 		public string CheckingAgentName { get; set; }
 
+		[Obsolete] // Данные этого столбца вычисляются из других. Оставелно, чтобы не удалять столбец
+		public int? Score { get; set; } = 0;
+
 		public float? Points { get; set; }
 
 		public string GetVerdict()
@@ -135,7 +147,7 @@ namespace Database.Models
 
 	/* Manual Exercise Checking is Code Review */
 
-	public class ManualExerciseChecking : AbstractManualSlideChecking
+	public class ManualExerciseChecking : AbstractManualSlideChecking, ICheckingWithNullableScore
 	{
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -148,7 +160,15 @@ namespace Database.Models
 
 		[Required]
 		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndUser", 4)]
+		// Действует, если стоит хотя бы у одной проверки. Если снимается у одной проверки, снимается у всех.
 		public bool ProhibitFurtherManualCheckings { get; set; }
+
+		// Хранит старые данные, теперь используется Percent
+		public int? Score { get; set; } = 0;
+
+		// Процент, поставленный преподавателем за ревью. Если поставить меньше баллов бота, то баллы бота уменьшется.
+		// Если процент не указан, используется Score. Это старый сценарий. Баллы Score суммируются с баллами бота.
+		public int? Percent { get; set; }
 
 		public virtual IList<ExerciseCodeReview> Reviews { get; set; }
 
@@ -161,24 +181,28 @@ namespace Database.Models
 		}
 	}
 
-	public class AutomaticQuizChecking : AbstractAutomaticSlideChecking
+	public class AutomaticQuizChecking : AbstractAutomaticSlideChecking, ICheckingWithNotNullScore
 	{
 		/* This field is not identity and is not database-generated because EF generates Id as foreign key to UserQuizSubmission.Id */
 		[Key]
 		public override int Id { get; set; }
 
 		public virtual UserQuizSubmission Submission { get; set; }
+
+		public int Score { get; set; }
 
 		public bool IgnoreInAttemptsCount { get; set; }
 	}
 
-	public class ManualQuizChecking : AbstractManualSlideChecking
+	public class ManualQuizChecking : AbstractManualSlideChecking, ICheckingWithNotNullScore
 	{
 		/* This field is not identity and is not database-generated because EF generates Id as foreign key to UserQuizSubmission.Id */
 		[Key]
 		public override int Id { get; set; }
 
 		public virtual UserQuizSubmission Submission { get; set; }
+
+		public int Score { get; set; }
 
 		public bool IgnoreInAttemptsCount { get; set; }
 	}

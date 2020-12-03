@@ -25,7 +25,6 @@ namespace Database.Repos
 		T FindManualCheckingById<T>(int id) where T : AbstractManualSlideChecking;
 		bool IsProhibitedToSendExerciseToManualChecking(string courseId, Guid slideId, string userId);
 		Task LockManualChecking<T>(T checkingItem, string lockedById) where T : AbstractManualSlideChecking;
-		Task MarkManualCheckingAsChecked<T>(T queueItem, int score) where T : AbstractManualSlideChecking;
 		Task ProhibitFurtherExerciseManualChecking(ManualExerciseChecking checking);
 		Task ResetManualCheckingLimitsForUser(string courseId, string userId);
 		Task ResetAutomaticCheckingLimitsForUser(string courseId, string userId);

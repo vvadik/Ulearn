@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Security.Claims;
 using Database.Models.Quizzes;
+using JetBrains.Annotations;
 using Ulearn.Common.Extensions;
 
 namespace Database.Models
@@ -23,13 +24,16 @@ namespace Database.Models
 		[Required]
 		public DateTime Timestamp { get; set; }
 
+		// Пользователь, чья работа проверяется. А кто проверил, написано в LockedById
 		[Required]
 		[StringLength(64)]
 		public string UserId { get; set; }
 
 		public virtual ApplicationUser User { get; set; }
 
-		public int Score { get; set; }
+		public virtual void PreRemove(UlearnDb db)
+		{
+		}
 	}
 
 	public class AbstractManualSlideChecking : AbstractSlideChecking
@@ -66,12 +70,22 @@ namespace Database.Models
 		Waiting = 1,
 		NotFound = 2,
 		AccessDeny = 3,
-		Error = 4,
+		Error = 4, // Не получен ответ от чеккера или результат имеет статус SandboxError
 		Running = 5,
-		RequestTimeLimit = 6
+		RequestTimeLimit = 6 // Не взято из очереди за разумное время
 	}
 
-	public class AutomaticExerciseChecking : AbstractAutomaticSlideChecking
+	public interface ICheckingWithNullableScore
+	{
+		public int? Score { get; set; }
+	}
+
+	public interface ICheckingWithNotNullScore
+	{
+		public int Score { get; set; }
+	}
+
+	public class AutomaticExerciseChecking : AbstractAutomaticSlideChecking, ICheckingWithNullableScore
 	{
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -89,11 +103,13 @@ namespace Database.Models
 		[Required]
 		public bool IsCompilationError { get; set; }
 
+		[CanBeNull]
 		public virtual TextBlob CompilationError { get; set; }
 
 		[StringLength(40)]
 		public string CompilationErrorHash { get; set; }
 
+		[CanBeNull]
 		public virtual TextBlob Output { get; set; }
 
 		[StringLength(40)]
@@ -104,7 +120,10 @@ namespace Database.Models
 
 		[StringLength(256)]
 		public string CheckingAgentName { get; set; }
-		
+
+		[Obsolete] // Данные этого столбца вычисляются из других. Оставелно, чтобы не удалять столбец
+		public int? Score { get; set; } = 0;
+
 		public float? Points { get; set; }
 
 		public string GetVerdict()
@@ -120,7 +139,7 @@ namespace Database.Models
 
 	/* Manual Exercise Checking is Code Review */
 
-	public class ManualExerciseChecking : AbstractManualSlideChecking
+	public class ManualExerciseChecking : AbstractManualSlideChecking, ICheckingWithNullableScore
 	{
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -132,32 +151,50 @@ namespace Database.Models
 		public virtual UserExerciseSubmission Submission { get; set; }
 
 		[Required]
+		// Действует, если стоит хотя бы у одной проверки. Если снимается у одной проверки, снимается у всех.
 		public bool ProhibitFurtherManualCheckings { get; set; }
 
+		// Здесь ревью преподавателя. Ревью бота лежат в UserExerciseSubmission
 		public virtual IList<ExerciseCodeReview> Reviews { get; set; }
+
+		// Хранит старые данные, теперь используется Percent
+		public int? Score { get; set; } = 0;
+
+		// Процент, поставленный преподавателем за ревью. Если поставить меньше баллов бота, то баллы бота уменьшется.
+		// Если процент не указан, используется Score. Это старый сценарий. Баллы Score суммируются с баллами бота.
+		public int? Percent { get; set; }
 
 		[NotMapped]
 		public List<ExerciseCodeReview> NotDeletedReviews => Reviews.Where(r => !r.IsDeleted).ToList();
+
+		public override void PreRemove(UlearnDb db)
+		{
+			db.Set<ExerciseCodeReview>().RemoveRange(Reviews);
+		}
 	}
 
-	public class AutomaticQuizChecking : AbstractAutomaticSlideChecking
+	public class AutomaticQuizChecking : AbstractAutomaticSlideChecking, ICheckingWithNotNullScore
 	{
 		/* This field is not identity and is not database-generated because EF generates Id as foreign key to UserQuizSubmission.Id */
 		[Key]
 		public override int Id { get; set; }
 
 		public virtual UserQuizSubmission Submission { get; set; }
+
+		public int Score { get; set; }
 
 		public bool IgnoreInAttemptsCount { get; set; }
 	}
 
-	public class ManualQuizChecking : AbstractManualSlideChecking
+	public class ManualQuizChecking : AbstractManualSlideChecking, ICheckingWithNotNullScore
 	{
 		/* This field is not identity and is not database-generated because EF generates Id as foreign key to UserQuizSubmission.Id */
 		[Key]
 		public override int Id { get; set; }
 
 		public virtual UserQuizSubmission Submission { get; set; }
+
+		public int Score { get; set; }
 
 		public bool IgnoreInAttemptsCount { get; set; }
 	}

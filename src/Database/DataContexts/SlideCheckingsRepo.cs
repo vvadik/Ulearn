@@ -139,14 +139,28 @@ namespace Database.DataContexts
 
 		private int GetUserScoreForSlide<T>(string courseId, Guid slideId, string userId) where T : AbstractSlideChecking
 		{
-			return GetSlideCheckingsByUser<T>(courseId, slideId, userId).Select(c => c.Score).DefaultIfEmpty(0).Max();
+			var slideCheckingsByUser = GetSlideCheckingsByUser<T>(courseId, slideId, userId);
+			return slideCheckingsByUser switch
+			{
+				IQueryable<ICheckingWithNullableScore> mec => mec.Select(c => c.Score ?? 0).DefaultIfEmpty(0).Max(),
+				IQueryable<ICheckingWithNotNullScore> mqc => mqc.Select(c => c.Score).DefaultIfEmpty(0).Max(),
+				_ => throw new Exception()
+			};
 		}
 
-		private Dictionary<string, int> GetUserScoresForSlide<T>(string courseId, Guid slideId, IEnumerable<string> userIds) where T : AbstractSlideChecking
+		private Dictionary<string, int> GetUserScoresForQuizSlide<T>(string courseId, Guid slideId, IEnumerable<string> userIds) where T : AbstractSlideChecking, ICheckingWithNotNullScore
 		{
 			return GetSlideCheckingsByUsers<T>(courseId, slideId, userIds)
 				.GroupBy(c => c.UserId)
 				.Select(g => new { UserId = g.Key, Score = g.Select(c => c.Score).DefaultIfEmpty(0).Max() })
+				.ToDictionary(g => g.UserId, g => g.Score);
+		}
+		
+		private Dictionary<string, int> GetUserScoresForExerciseSlide<T>(string courseId, Guid slideId, IEnumerable<string> userIds) where T : AbstractSlideChecking, ICheckingWithNullableScore
+		{
+			return GetSlideCheckingsByUsers<T>(courseId, slideId, userIds)
+				.GroupBy(c => c.UserId)
+				.Select(g => new { UserId = g.Key, Score = g.Select(c => c.Score ?? 0).DefaultIfEmpty(0).Max() })
 				.ToDictionary(g => g.UserId, g => g.Score);
 		}
 
@@ -160,8 +174,8 @@ namespace Database.DataContexts
 
 		public Dictionary<string, int> GetManualScoresForSlide(string courseId, Guid slideId, List<string> userIds)
 		{
-			var quizScore = GetUserScoresForSlide<ManualQuizChecking>(courseId, slideId, userIds);
-			var exerciseScore = GetUserScoresForSlide<ManualExerciseChecking>(courseId, slideId, userIds);
+			var quizScore = GetUserScoresForQuizSlide<ManualQuizChecking>(courseId, slideId, userIds);
+			var exerciseScore = GetUserScoresForExerciseSlide<ManualExerciseChecking>(courseId, slideId, userIds);
 
 			return userIds.ToDictSafe(
 				userId => userId,
@@ -179,8 +193,8 @@ namespace Database.DataContexts
 
 		public Dictionary<string, int> GetAutomaticScoresForSlide(string courseId, Guid slideId, List<string> userIds)
 		{
-			var quizScore = GetUserScoresForSlide<AutomaticQuizChecking>(courseId, slideId, userIds);
-			var exerciseScore = GetUserScoresForSlide<AutomaticExerciseChecking>(courseId, slideId, userIds);
+			var quizScore = GetUserScoresForQuizSlide<AutomaticQuizChecking>(courseId, slideId, userIds);
+			var exerciseScore = GetUserScoresForExerciseSlide<AutomaticExerciseChecking>(courseId, slideId, userIds);
 
 			return userIds.ToDictSafe(
 				userId => userId,
@@ -274,7 +288,10 @@ namespace Database.DataContexts
 			queueItem.LockedBy = null;
 			queueItem.LockedUntil = null;
 			queueItem.IsChecked = true;
-			queueItem.Score = score;
+			if (queueItem is ICheckingWithNullableScore i1)
+				i1.Score = score;
+			else if (queueItem is ICheckingWithNotNullScore i2)
+				i2.Score = score;
 			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 		
@@ -287,13 +304,23 @@ namespace Database.DataContexts
 			foreach (var item in itemsForMark)
 			{
 				if (item.IsChecked)
-					score = item.Score;
+				{
+					score = queueItem switch
+					{
+						ICheckingWithNullableScore i1 => i1.Score ?? 0,
+						ICheckingWithNotNullScore i2 => i2.Score,
+						_ => score
+					};
+				}
 				else
 				{
 					item.LockedBy = null;
 					item.LockedUntil = null;
 					item.IsChecked = true;
-					queueItem.Score = score;
+					if (queueItem is ICheckingWithNullableScore i1)
+						i1.Score = score;
+					else if (queueItem is ICheckingWithNotNullScore i2)
+						i2.Score = score;
 					changed = true;
 				}
 			}

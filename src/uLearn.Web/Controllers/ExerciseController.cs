@@ -517,7 +517,7 @@ namespace uLearn.Web.Controllers
 			var prevCheckedCheckings = checkings
 				.Where(c => c.IsChecked && c.Timestamp < checking.Timestamp)
 				.ToList();
-			var prevCheckingsScore = prevCheckedCheckings.Select(c => c.Score).DefaultIfEmpty().Max();
+			var prevCheckingsScore = prevCheckedCheckings.Select(c => c.Score ?? 0).DefaultIfEmpty().Max();
 			var model = new ExerciseScoreFormModel (
 				context.Course.Id,
 				(ExerciseSlide)context.Slide,
