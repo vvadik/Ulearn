@@ -1,5 +1,6 @@
 export const coursePath = "course";
 export const flashcards = "flashcards";
+export const flashcardsPreview = "preview";
 export const commentsPath = "comments";
 export const exerciseStudentSubmissions = 'exercise/studentSubmissions';
 export const commentPoliciesPath = "comment-policies";
