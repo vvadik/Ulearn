@@ -111,7 +111,20 @@ class Course extends Component {
 	}
 
 	componentDidUpdate(prevProps, prevState) {
-		const { loadUserProgress, courseId, loadCourse, user, courseInfo, loadCourseErrors, progress, isHijacked, updateVisitedSlide, isStudentMode, history, pageInfo, } = this.props;
+		const {
+			loadUserProgress,
+			courseId,
+			loadCourse,
+			user,
+			courseInfo,
+			loadCourseErrors,
+			progress,
+			isHijacked,
+			updateVisitedSlide,
+			isStudentMode,
+			history,
+			pageInfo,
+		} = this.props;
 		const { title, currentSlideInfo, currentSlideId, } = this.state;
 		const { isAuthenticated } = user;
 
@@ -286,7 +299,9 @@ class Course extends Component {
 						courseId={ courseId }
 						slideId={ currentSlideId }
 						isHiddenSlide={ slideInfo && slideInfo.hide }
-						slideType={ slideInfo && slideInfo.type }/>
+						slideType={ slideInfo && slideInfo.type }
+						userRoles={ userRoles }
+					/>
 					{
 						Page === Slide
 							?
@@ -536,7 +551,6 @@ class Course extends Component {
 		if(!courseInfo || !courseInfo.units) {
 			return null;
 		}
-
 		const units = courseInfo.units;
 		let prevSlide, nextSlide;
 
@@ -566,8 +580,11 @@ class Course extends Component {
 				}
 			}
 		}
+		const type = slideId === flashcardsPreview
+			? SlideType.PreviewFlashcards
+			: SlideType.CourseFlashcards;
 
-		return null;
+		return { current: { type }, };
 	}
 
 	static findNextUnit(activeUnit, courseInfo) {

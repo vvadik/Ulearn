@@ -13,5 +13,6 @@ export default {
 	hiddenSlideText: "Студенты не видят этот слайд",
 	showAcceptedSolutionsText: 'Посмотреть решения студентов',
 	showAcceptedSolutionsHeaderText: 'Решения студентов',
+	linkToFlashcardsPreviewText: 'Показать превью по всем флешкартам за курс',
 	//hiddenSlideTextWithStudents: (showedGroupsIds) => `Студенты ${ showedGroupsIds.join(', ') } видят этот слайд.`,
 };

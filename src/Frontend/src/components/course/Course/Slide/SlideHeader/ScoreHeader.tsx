@@ -45,7 +45,7 @@ const ScoreHeaderInternal = (props: PropsFromRedux & ScoreHeaderProps) => {
 				{ texts.getSlideScore(score, maxScore, !isSkipped) }
 			</span>
 			{ message && <span className={ styles.headerStatusText }>{ message }</span> }
-			{ showStudentSubmissions && <a onClick={ () => showModal(true) } className={ styles.acceptedSolutionsText }>
+			{ showStudentSubmissions && <a onClick={ () => showModal(true) } className={ styles.headerLinkText }>
 				{ texts.showAcceptedSolutionsText }
 			</a> }
 			{ isModalShowed &&

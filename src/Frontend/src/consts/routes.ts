@@ -34,3 +34,7 @@ export function constructPathToComment(commentId: string, isLike: boolean): stri
 export function constructPathToStudentSubmissions(courseId: string, slideId: string): string {
 	return `/${ exerciseStudentSubmissions }?courseId=${ courseId }&slideId=${ slideId }`;
 }
+
+export function constructPathToFlashcardsPreview(courseId: string,): string {
+	return `/${ coursePath }/${ courseId }/${ flashcards }/${ flashcardsPreview }`;
+}
