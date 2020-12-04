@@ -54,12 +54,9 @@ const props = {
 	reviews,
 	selectedReviewId: -1,
 	userId: "-1",
-	onSelectComment: (e: React.MouseEvent | React.FocusEvent, id: number,) => {
-	},
-	addReviewComment: (reviewId: number, comment: string) => {
-	},
-	deleteReviewComment: (reviewId: number, commentId: number) => {
-	},
+	onSelectComment: undefined,
+	addReviewComment: undefined,
+	deleteReviewComment: undefined,
 	getReviewAnchorTop: (review: ReviewInfo) => review.startLine * 15,
 };
 
