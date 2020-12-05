@@ -7,6 +7,7 @@ import Navigation from "../Navigation";
 import AnyPage from 'src/pages/AnyPage';
 import UnitFlashcardsPage from 'src/pages/course/UnitFlashcardsPage';
 import CourseFlashcardsPage from 'src/pages/course/CourseFlashcardsPage';
+import PreviewUnitPageFromAllCourse from "src/components/flashcards/UnitPage/PreviewUnitPageFromAllCourse";
 import { BlocksWrapper } from "src/components/course/Course/Slide/Blocks";
 import CommentsView from "src/components/comments/CommentsView/CommentsView";
 import Slide from './Slide/Slide';
@@ -16,15 +17,16 @@ import Error404 from "src/components/common/Error/Error404";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Edit, } from "icons";
-import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader";
+import CourseLoader from "./CourseLoader/CourseLoader";
 
-import { flashcards, constructPathToSlide, signalrWS, } from 'src/consts/routes';
-import { SLIDETYPE, } from 'src/consts/general';
-import { SCORING_GROUP_IDS } from 'src/consts/scoringGroup';
+import { flashcards, constructPathToSlide, signalrWS, flashcardsPreview, } from 'src/consts/routes';
+import { SlideType, } from 'src/models/slide';
+import { ScoringGroupsIds } from 'src/consts/scoringGroup';
 
 import classnames from 'classnames';
 
 import styles from "./Course.less"
+import SlideHeader from "./Slide/SlideHeader/SlideHeader.tsx";
 
 const slideNavigationButtonTitles = {
 	next: "Далее",
@@ -109,7 +111,20 @@ class Course extends Component {
 	}
 
 	componentDidUpdate(prevProps, prevState) {
-		const { loadUserProgress, courseId, loadCourse, user, courseInfo, loadCourseErrors, progress, isHijacked, updateVisitedSlide, isStudentMode, history, pageInfo, } = this.props;
+		const {
+			loadUserProgress,
+			courseId,
+			loadCourse,
+			user,
+			courseInfo,
+			loadCourseErrors,
+			progress,
+			isHijacked,
+			updateVisitedSlide,
+			isStudentMode,
+			history,
+			pageInfo,
+		} = this.props;
 		const { title, currentSlideInfo, currentSlideId, } = this.state;
 		const { isAuthenticated } = user;
 
@@ -130,7 +145,7 @@ class Course extends Component {
 		}
 
 		if((currentSlideId !== prevState.currentSlideId || isStudentMode !== prevProps.isStudentMode)
-			&& currentSlideInfo && currentSlideInfo.current && currentSlideInfo.current.type === SLIDETYPE.exercise && (pageInfo.isNavigationVisible && !pageInfo.isAcceptedSolutions)) {
+			&& currentSlideInfo && currentSlideInfo.current && currentSlideInfo.current.type === SlideType.Exercise && (pageInfo.isNavigationVisible && !pageInfo.isAcceptedSolutions)) {
 			if(isStudentMode) {
 				history.push('?version=-1'); //prevent showing task solution
 			} else if(history.location.search === '?version=-1') {
@@ -177,6 +192,10 @@ class Course extends Component {
 	}
 
 	static getOpenedPage = (slideId, courseInfo, currentSlideInfo, pageInfo) => {
+		if(slideId === flashcardsPreview) {
+			return PreviewUnitPageFromAllCourse;
+		}
+
 		if(slideId === flashcards) {
 			return CourseFlashcardsPage;
 		}
@@ -189,13 +208,13 @@ class Course extends Component {
 			throw new UrlError();
 		}
 
-		if(currentSlideInfo && currentSlideInfo.current.type === SLIDETYPE.flashcards) {
+		if(currentSlideInfo && currentSlideInfo.current.type === SlideType.Flashcards) {
 			return UnitFlashcardsPage;
 		}
 
 		if(currentSlideInfo &&
-			(currentSlideInfo.current.type === SLIDETYPE.lesson
-				|| (currentSlideInfo.current.type === SLIDETYPE.exercise && !pageInfo.isReview))) {
+			(currentSlideInfo.current.type === SlideType.Lesson
+				|| (currentSlideInfo.current.type === SlideType.Exercise && !pageInfo.isReview))) {
 			return Slide;
 		}
 
@@ -251,7 +270,7 @@ class Course extends Component {
 	}
 
 	renderSlide() {
-		const { pageInfo: { isNavigationVisible, isReview, }, progress, user, courseId, isStudentMode, } = this.props;
+		const { pageInfo: { isNavigationVisible, isReview, }, user, courseId, isStudentMode, } = this.props;
 		const { currentSlideInfo, currentSlideId, currentCourseId, Page, title, } = this.state;
 
 		const wrapperClassName = classnames(
@@ -262,13 +281,6 @@ class Course extends Component {
 
 		const slideInfo = currentSlideInfo
 			? currentSlideInfo.current
-			: null;
-
-		const score = slideInfo
-			? {
-				score: (progress && progress[slideInfo.id] && progress[slideInfo.id].score) || 0,
-				maxScore: slideInfo.maxScore,
-			}
 			: null;
 
 		const { isSystemAdministrator, accessesByCourse, roleByCourse } = user;
@@ -283,6 +295,13 @@ class Course extends Component {
 					{ slideInfo && slideInfo.gitEditLink && this.renderGitEditLink(slideInfo) }
 				</h1> }
 				<div className={ styles.slide }>
+					<SlideHeader
+						courseId={ courseId }
+						slideId={ currentSlideId }
+						isHiddenSlide={ slideInfo && slideInfo.hide }
+						slideType={ slideInfo && slideInfo.type }
+						userRoles={ userRoles }
+					/>
 					{
 						Page === Slide
 							?
@@ -290,15 +309,12 @@ class Course extends Component {
 								slideId={ currentSlideId }
 								courseId={ currentCourseId }
 								showHiddenBlocks={ !isStudentMode }
-								isHiddenSlide={ slideInfo.hide }
-								score={ isNavigationVisible ? score : null }
-								isSkipped={ progress && progress[slideInfo.id] && progress[slideInfo.id].isSkipped }
+								slideInfo={ slideInfo }
 							/>
-							: <BlocksWrapper score={ isNavigationVisible ? score : null }>
+							: <BlocksWrapper>
 								<Page match={ this.props.match }/>
 							</BlocksWrapper>
 					}
-
 				</div>
 				{ currentSlideInfo && isNavigationVisible && this.renderNavigationButtons(currentSlideInfo) }
 				{ currentSlideInfo && isNavigationVisible && this.renderComments(currentSlideInfo.current, userRoles) }
@@ -430,7 +446,7 @@ class Course extends Component {
 		if(!progress || scoringGroups.length === 0)
 			return courseStatistics;
 
-		const visitsGroup = scoringGroups.find(gr => gr.id === SCORING_GROUP_IDS.visits);
+		const visitsGroup = scoringGroups.find(gr => gr.id === ScoringGroupsIds.visits);
 
 		for (const unit of Object.values(units)) {
 			let unitScore = 0, unitMaxScore = 0;
@@ -535,7 +551,6 @@ class Course extends Component {
 		if(!courseInfo || !courseInfo.units) {
 			return null;
 		}
-
 		const units = courseInfo.units;
 		let prevSlide, nextSlide;
 
@@ -565,8 +580,11 @@ class Course extends Component {
 				}
 			}
 		}
+		const type = slideId === flashcardsPreview
+			? SlideType.PreviewFlashcards
+			: SlideType.CourseFlashcards;
 
-		return null;
+		return { current: { type }, };
 	}
 
 	static findNextUnit(activeUnit, courseInfo) {

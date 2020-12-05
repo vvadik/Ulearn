@@ -6,6 +6,9 @@
   },
   "overrides": [
     {
+      "rules": {
+        "no-mixed-spaces-and-tabs": 0
+      },
       "files": [
         "src/**/*.{ts,tsx}",
         "global.d.ts"

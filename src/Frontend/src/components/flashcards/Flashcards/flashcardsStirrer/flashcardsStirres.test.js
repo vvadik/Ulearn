@@ -1,9 +1,9 @@
 import { sortFlashcardsInAuthorsOrderWithRate, getNextFlashcardRandomly } from "./flashcardsStirrer";
-import { rateTypes } from "../../../../consts/rateTypes";
+import { RateTypes } from "../../../../consts/rateTypes";
 
 import Flashcard from "./flashcardsStirres.test.base";
 
-const { rate1, rate2, rate3, rate4, rate5 } = rateTypes;
+const { rate1, rate2, rate3, rate4, rate5 } = RateTypes;
 
 describe('flashcardsStirrer unit sorting should', () => {
 	test('sort unseen flashcards in authors order', () => {

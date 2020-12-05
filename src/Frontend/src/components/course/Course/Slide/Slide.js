@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Video, CodeMirror, Text, Image, BlocksWrapper, Spoiler, CodeMirrorUncontrolled, } from "./Blocks";
+import { Video, Exercise, Text, Image, BlocksWrapper, Spoiler, StaticCode, } from "./Blocks";
 import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader";
 import blockTypes from "src/components/course/Course/Slide/blockTypes";
 
@@ -14,8 +14,8 @@ import styles from './Slide.less';
 
 const mapTypeToBlock = {
 	[blockTypes.video]: Video,
-	[blockTypes.code]: CodeMirrorUncontrolled,
-	[blockTypes.exercise]: CodeMirror,
+	[blockTypes.code]: StaticCode,
+	[blockTypes.exercise]: Exercise,
 	[blockTypes.text]: Text,
 	[blockTypes.tex]: Text,
 	[blockTypes.image]: Image,
@@ -47,14 +47,15 @@ class Slide extends React.Component {
 	}
 
 	render = () => {
-		const { slideBlocks, showHiddenBlocks, isHiddenSlide, } = this.props;
+		const { slideBlocks, showHiddenBlocks, slideInfo, } = this.props;
+		const isHiddenSlide = slideInfo.hide;
 
 		if(!slideBlocks) {
 			return (<CourseLoader/>);
 		}
 
 		if(showHiddenBlocks) {
-			return this.renderSlideBlocks(JSON.parse(JSON.stringify(slideBlocks)), isHiddenSlide);
+			return this.renderSlideBlocks(JSON.parse(JSON.stringify(slideBlocks)));
 		}
 
 		if(isHiddenSlide) {
@@ -68,7 +69,7 @@ class Slide extends React.Component {
 			return this.renderHiddenSlide();
 		}
 
-		return this.renderSlideBlocks(JSON.parse(JSON.stringify(slideBlocksForStudent)), isHiddenSlide);
+		return this.renderSlideBlocks(JSON.parse(JSON.stringify(slideBlocksForStudent)));
 	}
 
 	getSlidBlocksForStudents = (blocks) => {
@@ -95,8 +96,7 @@ class Slide extends React.Component {
 		}
 	}
 
-	renderSlideBlocks = (slideBlocks, isHiddenSlide) => {
-		const { score, isSkipped } = this.props;
+	renderSlideBlocks = (slideBlocks,) => {
 		this.addAdditionalPropsToBlocks(slideBlocks);
 		const blocksPacks = [];
 
@@ -108,19 +108,18 @@ class Slide extends React.Component {
 		}
 		const onlyOneBlock = blocksPacks.length === 1;
 		return blocksPacks.map(({ blocks, hide, fullSizeBlocksPack }, i) => {
+			const renderedBlocks = blocks.map(this.mapBlockToComponent);
 			return (
-				<BlocksWrapper isContainer={ fullSizeBlocksPack }
-							   key={ i }
-							   showEyeHint={ !fullSizeBlocksPack }
-							   isBlock={ !onlyOneBlock }
-							   isHidden={ hide }
-							   isHeaderOfHiddenSlide={ i === 0 && isHiddenSlide }
-							   score={ i === 0 ? score : null }
-							   isSkipped={ isSkipped }
-				>
-					{ blocks.map(this.mapBlockToComponent) }
-				</BlocksWrapper>
-			)
+				fullSizeBlocksPack
+					? renderedBlocks
+					: <BlocksWrapper
+						key={ i }
+						isBlock={ !onlyOneBlock }
+						isHidden={ hide }
+					>
+						{ renderedBlocks }
+					</BlocksWrapper>
+			);
 		});
 	}
 
@@ -133,8 +132,9 @@ class Slide extends React.Component {
 	}
 
 	addAdditionalPropsToBlocks = (slideBlocks) => {
-		const { slideId, courseId, isSkipped, } = this.props;
+		const { slideId, courseId, showHiddenBlocks, slideInfo } = this.props;
 		const { autoplay } = queryString.parse(window.location.search);
+		const { maxScore } = slideInfo;
 		let firstVideoBlock = true;
 
 		for (const [i, block] of slideBlocks.entries()) {
@@ -146,14 +146,12 @@ class Slide extends React.Component {
 					break;
 				}
 				case blockTypes.spoiler: {
-					const { slideId, isHiddenSlide, } = this.props;
+					const { slideId, } = this.props;
 
 					block.blocksId = slideId; // make spoiler close content on slide change
 					block.isHidden = block.hide;
 					if(i !== 0) {
 						block.isPreviousBlockHidden = slideBlocks[i - 1].hide || false;
-					} else if(isHiddenSlide) {
-						block.isHeaderOfHiddenSlide = true;
 					}
 					if(block.isHidden) {
 						const blocksInHiddenSpoiler = block.blocks.map(b => ({ ...b, hide: true }));
@@ -164,11 +162,11 @@ class Slide extends React.Component {
 					break;
 				}
 				case blockTypes.video: {
-					blockTypes.isHidden = blockTypes.hide;
+					block.isHidden = block.hide;
 
 					if(firstVideoBlock) {
 						if(autoplay) {
-							block.autoplay = autoplay ? true : false; //autoplay for first video on slide
+							block.autoplay = !!autoplay; //autoplay for first video on slide
 						}
 
 						if(slideBlocks.length === 1) {
@@ -178,16 +176,21 @@ class Slide extends React.Component {
 						firstVideoBlock = false;
 					}
 
-					blockTypes.annotationWithoutBottomPaddigns = !blockTypes.hide &&
+					block.annotationWithoutBottomPaddings = !block.hide &&
 						(i < slideBlocks.length - 1
 							? slideBlocks[i + 1].type !== blockTypes.video
 							: true);
 					break;
 				}
+				case blockTypes.code: {
+					block.isHidden = block.hide;
+					break;
+				}
 				case blockTypes.exercise: {
 					block.slideId = slideId;
 					block.courseId = courseId;
-					block.isSkipped = isSkipped;
+					block.forceInitialCode = !showHiddenBlocks;
+					block.maxScore = maxScore;
 					break;
 				}
 			}
@@ -224,7 +227,7 @@ class Slide extends React.Component {
 		};
 	}
 
-	mapBlockToComponent = ({ Block, props }, index, arr) => {
+	mapBlockToComponent = ({ Block, props, }, index, arr) => {
 		const className = classNames({ [styles.firstChild]: index === 0 }, { [styles.lastChild]: index === arr.length - 1 });
 		return <Block key={ index } className={ className }  { ...props } />;
 	}
@@ -238,9 +241,7 @@ Slide.propTypes = {
 	slideLoading: PropTypes.bool.isRequired,
 	loadSlide: PropTypes.func.isRequired,
 	showHiddenBlocks: PropTypes.bool,
-	isHiddenSlide: PropTypes.bool,
-	score: PropTypes.object,
-	isSkipped: PropTypes.bool,
+	slideInfo: PropTypes.object,
 };
 
 Slide.defaultProps = {

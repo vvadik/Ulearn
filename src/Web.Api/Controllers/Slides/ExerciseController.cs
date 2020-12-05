@@ -65,6 +65,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			[FromRoute] Course course, 
 			[FromRoute] Guid slideId,
 			[FromBody] RunSolutionParameters parameters,
+			[FromQuery] Language language,
 			[FromQuery] bool isLti = false)
 		{
 			var courseId = course.Id;
@@ -207,10 +208,12 @@ namespace Ulearn.Web.Api.Controllers.Slides
 
 			var score = (await slideCheckingsRepo.GetExerciseSlideScoreAndPercent(courseId, exerciseSlide, userId)).Score;
 			var waitingForManualChecking = updatedSubmissionNoTracking.ManualCheckings.Any(c => !c.IsChecked) ? true : (bool?)null;
+			var prohibitFurtherManualChecking = updatedSubmissionNoTracking.ManualCheckings.Any(c => c.ProhibitFurtherManualCheckings);
 			var result = new RunSolutionResponse(SolutionRunStatus.Success)
 			{
 				Score = score,
 				WaitingForManualChecking = waitingForManualChecking,
+				ProhibitFurtherManualChecking = prohibitFurtherManualChecking,
 				Submission = SubmissionInfo.Build(updatedSubmissionNoTracking, null)
 			};
 

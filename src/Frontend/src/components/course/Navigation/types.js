@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
-import { SLIDETYPE } from '../../../consts/general';
+import { SlideType } from 'src/models/slide';
 
 export const menuItemType = {
 	title: PropTypes.string,
 	url: PropTypes.string,
-	type: PropTypes.oneOf(Object.values(SLIDETYPE)),
+	type: PropTypes.oneOf(Object.values(SlideType)),
 	score: PropTypes.number,
 	maxScore: PropTypes.number,
 	description: PropTypes.string,

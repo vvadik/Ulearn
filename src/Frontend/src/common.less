@@ -4,6 +4,12 @@
   box-sizing: border-box;
 }
 
+:global {
+  .react-ui *:not(button) { //preventing styles bugs for kontur ui components
+	box-sizing: initial;
+  }
+}
+
 body {
   font-family: "Segoe UI", "Helvetica Neue", Roboto, Arial, sans-serif;
 }
@@ -22,19 +28,19 @@ body {
 
 @media (min-width: @maxTabletWidth) {
   .visible-only-desktop {
-    display: initial;
+	display: initial;
   }
 }
 
 @media (max-width: @maxPhoneWidth) {
   .visible-only-phone {
-    display: initial;
+	display: initial;
   }
 }
 
 @media (max-width: @maxPhoneWidth) {
   .visible-at-least-tablet {
-    display: none !important;
+	display: none !important;
   }
 }
 

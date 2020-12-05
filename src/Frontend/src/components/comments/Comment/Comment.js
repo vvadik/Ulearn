@@ -11,10 +11,10 @@ import Header from "./Header/Header";
 import Marks from "./Marks/Marks";
 import CommentActions from "./CommentActions/CommentActions";
 import scrollToView from "../../../utils/scrollToView";
-import { convertDefaultTimezoneToLocal } from "src/utils/getMoment";
-import { ACCESSES, ROLES } from "src/consts/general";
+import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils";
 
 import styles from "./Comment.less";
+import { AccessType, CourseRoleType } from "src/consts/accessType";
 
 class Comment extends Component {
 	constructor(props) {
@@ -46,7 +46,7 @@ class Comment extends Component {
 
 	render() {
 		const {children, commentEditing, comment, userRoles, user} = this.props;
-		const canViewProfiles = (user.systemAccesses && user.systemAccesses.includes(ACCESSES.viewAllProfiles)) ||
+		const canViewProfiles = (user.systemAccesses && user.systemAccesses.includes(AccessType.viewAllProfiles)) ||
 			userRoles.isSystemAdministrator;
 		const profileUrl = `${window.location.origin}/Account/Profile?userId=${comment.author.id}`;
 
@@ -74,8 +74,8 @@ class Comment extends Component {
 	renderHeader(profileUrl, canViewProfiles) {
 		const {actions, comment, userRoles, user, slideType, getUserSolutionsUrl, courseId} = this.props;
 		const canSeeKebabActions = user.id && (user.id === comment.author.id ||
-			this.canModerateComments(userRoles, ACCESSES.editPinAndRemoveComments) ||
-			this.canModerateComments(userRoles, ACCESSES.viewAllStudentsSubmissions));
+			this.canModerateComments(userRoles, AccessType.editPinAndRemoveComments) ||
+			this.canModerateComments(userRoles, AccessType.viewAllStudentsSubmissions));
 
 		return (
 			<Header
@@ -148,22 +148,22 @@ class Comment extends Component {
 	}
 
 	canModerateComments = (role, accesses) => {
-		return role.isSystemAdministrator || role.courseRole === ROLES.courseAdmin ||
-			(role.courseRole === ROLES.instructor && role.courseAccesses.includes(accesses));
+		return role.isSystemAdministrator || role.courseRole === CourseRoleType.courseAdmin ||
+			(role.courseRole === CourseRoleType.instructor && role.courseAccesses.includes(accesses));
 	};
 
 	canReply = (role) => {
 		const {commentPolicy} = this.props;
-		return (commentPolicy.areCommentsEnabled && ((role.courseRole === ROLES.student || role.courseRole === null ||
-			role.courseRole.length === 0) || role.isSystemAdministrator || role.courseRole === ROLES.courseAdmin ||
-			role.courseRole === ROLES.instructor));
+		return (commentPolicy.areCommentsEnabled && ((role.courseRole === CourseRoleType.student || role.courseRole === null ||
+			role.courseRole.length === 0) || role.isSystemAdministrator || role.courseRole === CourseRoleType.courseAdmin ||
+			role.courseRole === CourseRoleType.instructor));
 	};
 
 	canViewStudentsGroup = () => {
 		const {userRoles, user} = this.props;
 
-		return (user.systemAccesses && user.systemAccesses.includes(ACCESSES.viewAllGroupMembers)) ||
-			(userRoles.courseAccesses && userRoles.courseAccesses.includes(ACCESSES.viewAllGroupMembers)) ||
+		return (user.systemAccesses && user.systemAccesses.includes(AccessType.viewAllGroupMembers)) ||
+			(userRoles.courseAccesses && userRoles.courseAccesses.includes(AccessType.viewAllGroupMembers)) ||
 			userRoles.isSystemAdministrator;
 	};
 
