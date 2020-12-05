@@ -14,9 +14,6 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 		{
 			PassedTestsScore = 5,
 		};
-		
-		[XmlElement("statements")]
-		public string StatementsPath { get; set; }
 
 		protected override Type[] AllowedBlockTypes => base.AllowedBlockTypes.Concat(new[] { typeof(AbstractExerciseBlock) }).ToArray();
 

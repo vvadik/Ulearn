@@ -149,7 +149,6 @@
 	<xs:complexType name="ExerciseSlide">
 		<xs:sequence>
 			<xs:element name="scoring" type="ExerciseScoring" minOccurs="0" maxOccurs="1" />
-			<xs:element name="statements" type="xs:string" maxOccurs="unbounded" minOccurs="0"/>
 			<xs:group ref="SlideInternals" />
 		</xs:sequence>
 		<xs:attributeGroup ref="SlideAttributes" />
@@ -158,6 +157,9 @@
 	<xs:complexType name="PolygonSlide">
 		<xs:complexContent>
 			<xs:extension base="ExerciseSlide">
+				<xs:sequence>
+					<xs:element name="statements" type="xs:string" maxOccurs="unbounded" minOccurs="0"/>
+				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

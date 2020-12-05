@@ -7,6 +7,7 @@ using System.Xml.Schema;
 using System.Xml.Serialization;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Courses.Slides.Flashcards;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Courses.Units;
@@ -64,7 +65,7 @@ namespace Ulearn.Core.Courses.Slides
 			if (xmlDocument.DocumentElement == null)
 				throw new CourseLoadingException($"Не могу определить, что за слайд лежит в {filename}. Возможно, там некорректный XML или он не начинается с тега <slide>, <slide.quiz> или <slide.exercise>?");
 
-			var knownTypes = new[] { typeof(Slide), typeof(QuizSlide), typeof(ExerciseSlide), typeof(Flashcards.FlashcardSlide) };
+			var knownTypes = new[] { typeof(PolygonExerciseSlide), typeof(Slide), typeof(QuizSlide), typeof(ExerciseSlide), typeof(Flashcards.FlashcardSlide) };
 			foreach (var type in knownTypes)
 				if (xmlDocument.DocumentElement.Name == type.GetCustomAttribute<XmlRootAttribute>().ElementName)
 					return type;

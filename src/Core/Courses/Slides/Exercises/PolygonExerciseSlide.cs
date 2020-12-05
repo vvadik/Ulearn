@@ -9,6 +9,9 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 	[XmlRoot("slide.polygon", IsNullable = false, Namespace = "https://ulearn.me/schema/v2")]
 	public class PolygonExerciseSlide : ExerciseSlide
 	{
+		[XmlElement("statements")]
+		public string StatementsPath { get; set; }
+		
 		public override void Validate(SlideLoadingContext context)
 		{
 			if (string.IsNullOrEmpty(StatementsPath))
@@ -21,8 +24,9 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 			var statementsFilePath = Path.Combine(context.Unit.Directory.FullName, StatementsPath, "russian", "problem-properties.json");
 			var json = File.ReadAllText(statementsFilePath);
 			var statements = JsonConvert.DeserializeObject<Statements>(json);
-			var markdown = $"{statements.Legend}"; // Потом тут сделать какой-то формат
-			Blocks = Blocks.Append(new MarkdownBlock(markdown))
+			var markdown = $"{statements.Legend}";
+			Blocks = new[] { new MarkdownBlock(markdown) }
+				.Concat(Blocks)
 				.ToArray();
 			base.BuildUp(context);
 		}
