@@ -50,13 +50,13 @@ const reviews = [
 	{ ...teacherReview, id: 2 },
 ];
 
-const props = {
+const props : ReviewProps = {
 	reviews,
 	selectedReviewId: -1,
 	userId: "-1",
-	onSelectComment: undefined,
-	addReviewComment: undefined,
-	deleteReviewComment: undefined,
+	onSelectComment: () => void(0),
+	addReviewComment: () => void(0),
+	deleteReviewComment: () => void(0),
 	getReviewAnchorTop: (review: ReviewInfo) => review.startLine * 15,
 };
 
