@@ -17,6 +17,13 @@ const author = {
 	email: undefined,
 };
 
+const authorWithLongName = {
+	...author,
+	firstName: "Всеволод",
+	lastName: "Воронцов-Иванов",
+	visibleName: "Всеволод Воронцов-Иванов",
+};
+
 const comment = {
 	id: 0,
 	text: "text **bold** __italic__ ```code```",
@@ -50,13 +57,13 @@ const reviews = [
 	{ ...teacherReview, id: 2 },
 ];
 
-const props : ReviewProps = {
+const props: ReviewProps = {
 	reviews,
 	selectedReviewId: -1,
 	userId: "-1",
-	onSelectComment: () => void(0),
-	addReviewComment: () => void(0),
-	deleteReviewComment: () => void(0),
+	onSelectComment: () => void (0),
+	addReviewComment: () => void (0),
+	deleteReviewComment: () => void (0),
 	getReviewAnchorTop: (review: ReviewInfo) => review.startLine * 15,
 };
 
@@ -111,6 +118,16 @@ LinesCompare.args = {
 		{ ...review, startLine: 0, finishLine: 0, },
 		{ ...review, startLine: 1, finishLine: 2, },
 		{ ...review, startLine: 2, finishLine: 10, },
+	],
+};
+
+export const WithLongNames = Template.bind({});
+WithLongNames.args = {
+	...props,
+	reviews: [
+		{ ...review, author: authorWithLongName, },
+		{ ...review, author: authorWithLongName, },
+		{ ...review, author: authorWithLongName, },
 	],
 };
 
