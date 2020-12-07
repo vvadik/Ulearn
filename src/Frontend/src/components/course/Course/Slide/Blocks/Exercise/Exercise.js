@@ -377,10 +377,10 @@ class Exercise extends React.Component {
 
 	renderLanguageSelect = () => {
 		const { language } = this.state;
-		const { languages } = this.props;
+		const { languages, languageNames } = this.props;
 
 		const items = languages.map((l) => {
-			return [l, texts.getLanguageCaption(l)];
+			return [l, texts.getLanguageCaption(l, languageNames)];
 		});
 
 		return (
@@ -1046,6 +1046,13 @@ class Exercise extends React.Component {
 				require('codemirror/mode/haskell/haskell');
 				return `text/x-haskell`;
 
+			case 'c':
+				require('codemirror/mode/clike/clike');
+				return `text/x-c`;
+			case 'cpp':
+				require('codemirror/mode/clike/clike');
+				return `text/x-c++src`;
+
 			default:
 				require('codemirror/mode/xml/xml');
 				return 'text/html';
@@ -1105,6 +1112,7 @@ const mapDispatchToProps = (dispatch) => ({
 
 const exerciseBlockProps = {
 	languages: PropTypes.array.isRequired,
+	languageNames: PropTypes.object,
 	hints: PropTypes.array,
 	exerciseInitialCode: PropTypes.string,
 	hideSolutions: PropTypes.bool,

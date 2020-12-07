@@ -23,7 +23,9 @@ const texts = {
 		},
 	},
 
-	getLanguageCaption: (language: Language): string => {
+	getLanguageCaption: (language: Language, languageNames: EnumDictionary<Language, string> | null): string => {
+		if (languageNames !== null && languageNames[language] !== undefined)
+			return languageNames[language];
 		return language === Language.CSharp ? "C#" : capitalize(language);
 	},
 
