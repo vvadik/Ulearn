@@ -31,7 +31,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 
 		private static IEnumerable<Token> FilterCommentTokens(IEnumerable<Token> tokens)
 		{
-			return tokens.Where(t => !t.Type.StartsWith("Comment"));
+			return tokens.Where(t => !t.Type.StartsWith("Comment") || t.Type.StartsWith("Comment.Preproc"));
 		}
 
 		[NotNull]

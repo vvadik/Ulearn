@@ -7,6 +7,7 @@ import Navigation from "../Navigation";
 import AnyPage from 'src/pages/AnyPage';
 import UnitFlashcardsPage from 'src/pages/course/UnitFlashcardsPage';
 import CourseFlashcardsPage from 'src/pages/course/CourseFlashcardsPage';
+import PreviewUnitPageFromAllCourse from "src/components/flashcards/UnitPage/PreviewUnitPageFromAllCourse";
 import { BlocksWrapper } from "src/components/course/Course/Slide/Blocks";
 import CommentsView from "src/components/comments/CommentsView/CommentsView";
 import Slide from './Slide/Slide';
@@ -18,7 +19,7 @@ import { Helmet } from "react-helmet";
 import { Edit, } from "icons";
 import CourseLoader from "./CourseLoader/CourseLoader";
 
-import { flashcards, constructPathToSlide, signalrWS, } from 'src/consts/routes';
+import { flashcards, constructPathToSlide, signalrWS, flashcardsPreview, } from 'src/consts/routes';
 import { SlideType, } from 'src/models/slide';
 import { ScoringGroupsIds } from 'src/consts/scoringGroup';
 
@@ -110,7 +111,20 @@ class Course extends Component {
 	}
 
 	componentDidUpdate(prevProps, prevState) {
-		const { loadUserProgress, courseId, loadCourse, user, courseInfo, loadCourseErrors, progress, isHijacked, updateVisitedSlide, isStudentMode, history, pageInfo, } = this.props;
+		const {
+			loadUserProgress,
+			courseId,
+			loadCourse,
+			user,
+			courseInfo,
+			loadCourseErrors,
+			progress,
+			isHijacked,
+			updateVisitedSlide,
+			isStudentMode,
+			history,
+			pageInfo,
+		} = this.props;
 		const { title, currentSlideInfo, currentSlideId, } = this.state;
 		const { isAuthenticated } = user;
 
@@ -178,6 +192,10 @@ class Course extends Component {
 	}
 
 	static getOpenedPage = (slideId, courseInfo, currentSlideInfo, pageInfo) => {
+		if(slideId === flashcardsPreview) {
+			return PreviewUnitPageFromAllCourse;
+		}
+
 		if(slideId === flashcards) {
 			return CourseFlashcardsPage;
 		}
@@ -280,8 +298,10 @@ class Course extends Component {
 					<SlideHeader
 						courseId={ courseId }
 						slideId={ currentSlideId }
-						isHiddenSlide={ slideInfo.hide }
-						slideType={ slideInfo.type }/>
+						isHiddenSlide={ slideInfo && slideInfo.hide }
+						slideType={ slideInfo && slideInfo.type }
+						userRoles={ userRoles }
+					/>
 					{
 						Page === Slide
 							?
@@ -531,7 +551,6 @@ class Course extends Component {
 		if(!courseInfo || !courseInfo.units) {
 			return null;
 		}
-
 		const units = courseInfo.units;
 		let prevSlide, nextSlide;
 
@@ -561,8 +580,11 @@ class Course extends Component {
 				}
 			}
 		}
+		const type = slideId === flashcardsPreview
+			? SlideType.PreviewFlashcards
+			: SlideType.CourseFlashcards;
 
-		return null;
+		return { current: { type }, };
 	}
 
 	static findNextUnit(activeUnit, courseInfo) {

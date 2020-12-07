@@ -1,5 +1,6 @@
 export const coursePath = "course";
 export const flashcards = "flashcards";
+export const flashcardsPreview = "preview";
 export const commentsPath = "comments";
 export const exerciseStudentSubmissions = 'exercise/studentSubmissions';
 export const commentPoliciesPath = "comment-policies";
@@ -32,4 +33,8 @@ export function constructPathToComment(commentId: string, isLike: boolean): stri
 
 export function constructPathToStudentSubmissions(courseId: string, slideId: string): string {
 	return `/${ exerciseStudentSubmissions }?courseId=${ courseId }&slideId=${ slideId }`;
+}
+
+export function constructPathToFlashcardsPreview(courseId: string,): string {
+	return `/${ coursePath }/${ courseId }/${ flashcards }/${ flashcardsPreview }`;
 }

@@ -16,6 +16,8 @@ enum SlideType {
 	Quiz = "quiz",
 	Exercise = "exercise",
 	Flashcards = "flashcards",
+	CourseFlashcards = "courseFlashcards",
+	PreviewFlashcards = "previewFlashcards",
 }
 
 export { ShortSlideInfo, SlideType }

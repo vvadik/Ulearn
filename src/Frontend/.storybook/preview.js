@@ -1,10 +1,11 @@
 import React from "react";
 import { Provider } from "react-redux";
+import { BrowserRouter } from "react-router-dom";
 
 import configureStore from "src/configureStore";
 import theme from "src/uiTheme";
 
-import { ThemeContext } from "@skbkontur/react-ui/index";
+import { ThemeContext } from "ui";
 
 const viewports = {
 	desktop: {
@@ -43,7 +44,9 @@ export const decorators = [
 	(Story) => (
 		<Provider store={ reduxStore }>
 			<ThemeContext.Provider value={ theme }>
-				<Story/>
+				<BrowserRouter>
+					<Story/>
+				</BrowserRouter>
 			</ThemeContext.Provider>
 		</Provider>
 	),

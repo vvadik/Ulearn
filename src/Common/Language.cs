@@ -48,6 +48,14 @@ namespace Ulearn.Common
 		[Lexer("haskell")]
 		Haskell = 9,
 
+		[XmlEnum("c")]
+		[Lexer("c")]
+		C = 10,
+
+		[XmlEnum("cpp")]
+		[Lexer("cpp")]
+		Cpp = 11,
+
 		[XmlEnum("text")]
 		[Lexer("text")]
 		Text = 100,
@@ -76,6 +84,8 @@ namespace Ulearn.Common
 			{ ".ts", Language.TypeScript },
 			{ ".java", Language.Java },
 			{ ".hs", Language.Haskell },
+			{ ".c", Language.C },
+			{ ".cpp", Language.Cpp },
 			{ ".txt", Language.Text },
 		};
 

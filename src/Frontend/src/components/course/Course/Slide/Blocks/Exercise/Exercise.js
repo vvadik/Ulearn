@@ -2,11 +2,11 @@ import React from 'react';
 
 import { Controlled, } from "react-codemirror2";
 import { Button, Checkbox, FLAT_THEME, Modal, Select, Tooltip, Toast, } from "ui";
-import Review from "./Review/Review";
+import { Review } from "./Review/Review";
 import { darkTheme } from 'ui/internal/ThemePlayground/darkTheme';
 import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent";
 import { Lightbulb, Refresh, EyeOpened, DocumentLite, } from "icons";
-import CongratsModal from "./CongratsModal/CongratsModal.tsx";
+import { CongratsModal } from "./CongratsModal/CongratsModal.tsx";
 import { ExerciseOutput, HasOutput } from "./ExerciseOutput/ExerciseOutput.tsx";
 import { ExerciseFormHeader } from "./ExerciseFormHeader/ExerciseFormHeader.tsx";
 import { ThemeContext } from "@skbkontur/react-ui/index";
@@ -56,7 +56,7 @@ const newTry = { id: -1 };
 class Exercise extends React.Component {
 	constructor(props) {
 		super(props);
-		const { exerciseInitialCode, submissions, } = props;
+		const { exerciseInitialCode, submissions, languages, } = props;
 
 		this.state = {
 			value: exerciseInitialCode,
@@ -64,7 +64,7 @@ class Exercise extends React.Component {
 
 			isEditable: submissions.length === 0,
 
-			language: props.languages.length === 1 ? props.languages[0] : null,
+			language: languages[0],
 
 			showedHintsCount: 0,
 			showAcceptedSolutions: false,
@@ -133,8 +133,6 @@ class Exercise extends React.Component {
 			return;
 		}
 
-		this.overrideCodeMirrorAutocomplete();
-
 		if(courseId !== prevProps.courseId || slideId !== prevProps.slideId) {
 			this.loadSlideSubmission();
 			return;
@@ -166,8 +164,7 @@ class Exercise extends React.Component {
 			if(solutionRunStatus === SolutionRunStatus.Success) {
 				const { automaticChecking } = submission;
 
-				if(automaticChecking?.processStatus === ProcessStatus.Done
-					&& automaticChecking.result === CheckingResult.RightAnswer
+				if((!automaticChecking || automaticChecking.result === CheckingResult.RightAnswer)
 					&& IsFirstRightAnswer(submissions, submission)) {
 					this.openModal({
 						score: lastCheckingResponse.score,
@@ -203,9 +200,8 @@ class Exercise extends React.Component {
 		}
 	}
 	overrideCodeMirrorAutocomplete = () => {
-		const { language, } = this.state;
-
-		CodeMirror.commands.autocomplete = function (cm) {
+		CodeMirror.commands.autocomplete = (cm) => {
+			const { language, } = this.state;
 			const hint = CodeMirror.hint[language.toLowerCase()];
 			if(hint) {
 				cm.showHint({ hint: hint });
@@ -240,11 +236,11 @@ class Exercise extends React.Component {
 	}
 
 	get codeMirrorOptions() {
-		const { isAuthenticated, languages } = this.props;
+		const { isAuthenticated, } = this.props;
 		const { isEditable, language } = this.state;
 
 		return {
-			mode: Exercise.loadLanguageStyles(language ?? languages[0]),
+			mode: Exercise.loadLanguageStyles(language),
 			lineNumbers: true,
 			scrollbarStyle: 'null',
 			lineWrapping: true,
@@ -315,7 +311,7 @@ class Exercise extends React.Component {
 						deleteReviewComment={ this.deleteReviewComment }
 						selectedReviewId={ selectedReviewId }
 						onSelectComment={ this.selectComment }
-						reviews={ currentReviews }
+						reviews={ this.getReviewsWithoutDeleted(currentReviews) }
 						getReviewAnchorTop={ this.getReviewAnchorTop }
 					/>
 					}
@@ -336,6 +332,10 @@ class Exercise extends React.Component {
 				{ congratsModalData && this.renderCongratsModal(congratsModalData) }
 			</React.Fragment>
 		)
+	}
+
+	getReviewsWithoutDeleted = (reviews) => {
+		return reviews.map(r => ({ ...r, comments: r.comments.filter(c => !c.isDeleted && !c.isLoading) }));
 	}
 
 	getReviewAnchorTop = (review) => {
@@ -362,9 +362,10 @@ class Exercise extends React.Component {
 		});
 
 		return (
-			<div className={ styles.submissionsDropdown }>
+			<div className={ styles.select }>
 				<ThemeContext.Provider value={ FLAT_THEME }>
 					<Select
+						width={ '100%' }
 						items={ items }
 						value={ currentSubmission?.id || newTry.id }
 						onValueChange={ (id) => this.loadSubmissionToState(submissionsWithNewTry.find(s => s.id === id)) }
@@ -376,20 +377,20 @@ class Exercise extends React.Component {
 
 	renderLanguageSelect = () => {
 		const { language } = this.state;
-		const { languages } = this.props;
+		const { languages, languageNames } = this.props;
 
 		const items = languages.map((l) => {
-			return [l, texts.getLanguageCaption(l)];
+			return [l, texts.getLanguageCaption(l, languageNames)];
 		});
 
 		return (
-			<div className={ styles.languagesDropdown }>
+			<div className={ styles.select }>
 				<ThemeContext.Provider value={ FLAT_THEME }>
 					<Select
+						width={ '100%' }
 						items={ items }
-						value={ language || languages[0] }
+						value={ language }
 						onValueChange={ (l) => this.setState({ language: l }) }
-						menuWidth={100}
 					/>
 				</ThemeContext.Provider>
 			</div>
@@ -416,7 +417,7 @@ class Exercise extends React.Component {
 	}
 
 	loadSubmissionToState = (submission,) => {
-		const { valueChanged } = this.state;
+		const { valueChanged, } = this.state;
 
 		if(submission === newTry) {
 			this.loadNewTry();
@@ -437,6 +438,7 @@ class Exercise extends React.Component {
 				valueChanged: false,
 				showOutput: false,
 				visibleCheckingResponse: null,
+				currentReviews: [],
 			}, () =>
 				this.setCurrentSubmission(submission)
 		);
@@ -796,7 +798,11 @@ class Exercise extends React.Component {
 	}
 
 	renderShowStatisticsHint = () => {
-		const { attemptedUsersCount, usersWithRightAnswerCount, lastSuccessAttemptDate, } = this.props.attemptsStatistics;
+		const {
+			attemptedUsersCount,
+			usersWithRightAnswerCount,
+			lastSuccessAttemptDate,
+		} = this.props.attemptsStatistics;
 		const statisticsClassName = classNames(styles.exerciseControls, styles.statistics);
 
 		return (
@@ -1007,7 +1013,7 @@ class Exercise extends React.Component {
 
 	static
 	loadLanguageStyles = (language) => {
-		switch (language?.toLowerCase()) {
+		switch (language.toLowerCase()) {
 			case 'csharp':
 				require('codemirror/mode/clike/clike');
 				return `text/x-csharp`;
@@ -1039,6 +1045,13 @@ class Exercise extends React.Component {
 			case 'haskell':
 				require('codemirror/mode/haskell/haskell');
 				return `text/x-haskell`;
+
+			case 'c':
+				require('codemirror/mode/clike/clike');
+				return `text/x-c`;
+			case 'cpp':
+				require('codemirror/mode/clike/clike');
+				return `text/x-c++src`;
 
 			default:
 				require('codemirror/mode/xml/xml');
@@ -1099,6 +1112,7 @@ const mapDispatchToProps = (dispatch) => ({
 
 const exerciseBlockProps = {
 	languages: PropTypes.array.isRequired,
+	languageNames: PropTypes.object,
 	hints: PropTypes.array,
 	exerciseInitialCode: PropTypes.string,
 	hideSolutions: PropTypes.bool,

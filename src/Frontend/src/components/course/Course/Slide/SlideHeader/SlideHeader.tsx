@@ -1,29 +1,40 @@
 import React from "react";
 
 import { SlideType } from "src/models/slide";
+import { isCourseAdmin, UserRoles } from "src/utils/courseRoles";
+import { constructPathToFlashcardsPreview } from "src/consts/routes";
+
+import { Link } from "react-router-dom";
+import { EyeClosed, } from "icons";
 import { ScoreHeader } from "./ScoreHeader";
 
 import texts from './SlideHeader.texts';
 
-import { EyeClosed, } from "@skbkontur/react-icons"
 import styles from "../SlideHeader/SlideHeader.less";
 
 interface SlideHeaderProps {
 	courseId: string,
 	slideId: string,
 	isHiddenSlide: boolean,
+	userRoles: UserRoles,
 	slideType: SlideType,
 }
 
-const SlideHeader: React.FC<SlideHeaderProps> = ({ courseId, slideId, isHiddenSlide, slideType }) => {
+const SlideHeader: React.FC<SlideHeaderProps> = (props) => {
+	const { courseId, slideId, isHiddenSlide, slideType, userRoles, } = props;
 	if(isHiddenSlide) {
-		return <HiddenSlideHeader/>
+		return <HiddenSlideHeader/>;
 	}
 	if(slideType === SlideType.Exercise || slideType === SlideType.Quiz) {
 		return <ScoreHeader courseId={ courseId } slideId={ slideId }/>;
 	}
+
+	if(slideType === SlideType.Flashcards || slideType === SlideType.CourseFlashcards && isCourseAdmin(userRoles)) {
+		return <FlashcardsSlideHeader pathToFlashcardsSlide={ constructPathToFlashcardsPreview(courseId) }/>;
+	}
+
 	return null;
-}
+};
 
 const HiddenSlideHeader: React.FC = () => {
 	return (
@@ -36,7 +47,21 @@ const HiddenSlideHeader: React.FC = () => {
 			</span>
 		</div>
 	);
+};
+
+interface FlashcardsSlideHeaderProps {
+	pathToFlashcardsSlide: string,
 }
+
+const FlashcardsSlideHeader: React.FC<FlashcardsSlideHeaderProps> = ({ pathToFlashcardsSlide }) => {
+	return (
+		<div className={ styles.header }>
+			<Link className={ styles.headerLinkText } to={ pathToFlashcardsSlide }>
+				{ texts.linkToFlashcardsPreviewText }
+			</Link>
+		</div>
+	);
+};
 
 /* Everything to make component to be a class with ability to show slide to groups TODO not included in current release
 	constructor(props) {

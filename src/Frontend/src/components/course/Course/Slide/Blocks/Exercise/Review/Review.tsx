@@ -1,18 +1,48 @@
 import React from "react";
-import PropTypes from "prop-types";
 import classNames from "classnames";
 
-import Avatar from "src/components/common/Avatar/Avatar";
+import Avatar from "src/components/common/Avatar/Avatar.js";
 import { Textarea, ThemeContext, } from "ui";
 import { Send3, Trash, Delete, } from "icons";
 
-import { textareaHidden } from "src/uiTheme";
+import { textareaHidden } from "src/uiTheme.js";
+
+import { ReviewCommentResponse, ReviewInfo } from "src/models/exercise";
 
 import styles from "./Review.less";
 import texts from "./Review.texts";
 
-class Review extends React.Component {
-	constructor(props) {
+
+interface CommentReplies {
+	[id: number]: string;
+}
+
+interface StateComment {
+	margin: number;
+	review: ReviewInfo;
+	ref: React.RefObject<HTMLLIElement>;
+}
+
+interface ReviewState {
+	comments: StateComment[];
+	commentsReplies: CommentReplies;
+	marginsAdded: boolean;
+}
+
+interface ReviewProps {
+	reviews: ReviewInfo[];
+	selectedReviewId: number;
+	userId: string;
+	onSelectComment: (e: React.MouseEvent | React.FocusEvent, id: number,) => void;
+	addReviewComment: (reviewId: number, comment: string) => void;
+	deleteReviewComment: (reviewId: number, commentId: number) => void;
+	getReviewAnchorTop: (review: ReviewInfo) => number;
+}
+
+const botUser = { visibleName: 'Ulearn bot', id: 'bot', };
+
+class Review extends React.Component<ReviewProps, ReviewState> {
+	constructor(props: ReviewProps) {
 		super(props);
 
 		this.state = {
@@ -20,39 +50,41 @@ class Review extends React.Component {
 				.map(r => ({
 					margin: 0,
 					review: r,
-					ref: React.createRef(),
+					ref: React.createRef<HTMLLIElement>(),
 				})),
 			commentsReplies: this.buildCommentsReplies(props.reviews),
 			marginsAdded: false,
 		};
 	}
 
-	getCommentsOrderByStart = (reviews) => {
+	getCommentsOrderByStart = (reviews: ReviewInfo[]): ReviewInfo[] => {
 		return reviews.sort((r1, r2) => {
-			if(r1.startLine < r2.startLine || (r1.startLine === r2.startLine && r1.startPosition < r2.startPosition))
+			if(r1.startLine < r2.startLine || (r1.startLine === r2.startLine && r1.startPosition < r2.startPosition)) {
 				return -1;
-			if(r2.startLine < r1.startLine || (r2.startLine === r1.startLine && r2.startPosition < r1.startPosition))
+			}
+			if(r2.startLine < r1.startLine || (r2.startLine === r1.startLine && r2.startPosition < r1.startPosition)) {
 				return 1;
+			}
 			return 0;
 		});
-	}
+	};
 
-	buildCommentsReplies = (reviews) => {
-		const commentsReplies = {};
+	buildCommentsReplies = (reviews: ReviewInfo[]): CommentReplies => {
+		const commentsReplies: CommentReplies = {};
 
 		for (const { id } of reviews) {
 			commentsReplies[id] = '';
 		}
 
 		return commentsReplies;
-	}
+	};
 
-	componentDidMount() {
+	componentDidMount(): void {
 		//add margins in a moment after mounting, so code could resize correctly to calculate correct topAnchor
 		this.setState({}, () => this.addMarginsToComments());
 	}
 
-	componentDidUpdate(prevProps, prevState, snapshot) {
+	componentDidUpdate(prevProps: ReviewProps): void {
 		const { reviews, selectedReviewId, } = this.props;
 
 		let sameReviews = reviews.length === prevProps.reviews.length;
@@ -84,7 +116,7 @@ class Review extends React.Component {
 					.map(r => ({
 						margin: 0,
 						review: r,
-						ref: React.createRef(),
+						ref: React.createRef<HTMLLIElement>(),
 					})),
 				commentsReplies: this.buildCommentsReplies(reviews),
 				marginsAdded: false,
@@ -95,7 +127,7 @@ class Review extends React.Component {
 		}
 	}
 
-	addMarginsToComments = () => {
+	addMarginsToComments = (): void => {
 		const { comments, } = this.state;
 		const { selectedReviewId, getReviewAnchorTop, } = this.props;
 
@@ -106,7 +138,7 @@ class Review extends React.Component {
 		if(selectedReviewIndex >= 0) {
 			const selectedComment = commentsWithMargin[selectedReviewIndex];
 			const anchorTop = getReviewAnchorTop(selectedComment.review);
-			const height = selectedComment.ref.current.offsetHeight;
+			const height = selectedComment.ref.current?.offsetHeight || 0;
 			const offset = Math.max(5, anchorTop);
 
 			let spaceToSelectedReview = offset;
@@ -117,14 +149,14 @@ class Review extends React.Component {
 				let totalCommentsHeight = 5;
 				for (let i = 0; i < selectedReviewIndex; i++) {
 					const comment = commentsWithMargin[i];
-					const height = comment.ref.current.offsetHeight;
+					const height = comment.ref.current?.offsetHeight || 0;
 					totalCommentsHeight += height + 5;
 				}
 
 				for (let i = 0; i <= selectedReviewIndex; i++) {
 					const comment = commentsWithMargin[i];
 					const anchorTop = getReviewAnchorTop(comment.review);
-					const height = comment.ref.current.offsetHeight;
+					const height = comment.ref.current?.offsetHeight || 0;
 					comment.margin = Math.min(anchorTop, spaceToSelectedReview - totalCommentsHeight);
 					if(i > 0) {
 						comment.margin = Math.max(5, comment.margin);
@@ -138,7 +170,7 @@ class Review extends React.Component {
 		for (let i = selectedReviewIndex + 1; i < commentsWithMargin.length; i++) {
 			const comment = commentsWithMargin[i];
 			const anchorTop = getReviewAnchorTop(comment.review);
-			const height = comment.ref.current.offsetHeight;
+			const height = comment.ref.current?.offsetHeight || 0;
 			const offset = Math.max(5, anchorTop - lastReviewBottomHeight);
 
 			comment.margin = offset;
@@ -152,9 +184,9 @@ class Review extends React.Component {
 				marginsAdded: true,
 			});
 		});
-	}
+	};
 
-	render = () => {
+	render = (): React.ReactNode => {
 		const { comments, } = this.state;
 
 		return (
@@ -162,20 +194,18 @@ class Review extends React.Component {
 				{ comments.map(this.renderTopLevelComment) }
 			</ol>
 		);
-	}
+	};
 
-	renderTopLevelComment = ({ review, margin, ref, }, i,) => {
+	renderTopLevelComment = ({ review, margin, ref, }: StateComment, i: number,): React.ReactNode => {
 		const { id, comments } = review;
 		const { selectedReviewId, onSelectComment, } = this.props;
 		const { commentsReplies, marginsAdded, } = this.state;
-		const className = classNames(styles.comment, { [styles.commentMounted]: marginsAdded }, { [styles.selectedReviewCommentWrapper]: selectedReviewId === id },);
+		const className = classNames(styles.comment, { [styles.commentMounted]: marginsAdded },
+			{ [styles.selectedReviewCommentWrapper]: selectedReviewId === id },);
 
-		let author = review.author;
-		if(!author) {
-			author = { visibleName: 'Ulearn bot', id: 'bot', isBot: true, };
-		}
+		const authorToRender = review.author ?? botUser;
 
-		const selectComment = (e) => onSelectComment(e, id);
+		const selectComment = (e: React.MouseEvent | React.FocusEvent) => onSelectComment(e, id);
 		return (
 			<li key={ i }
 				className={ className }
@@ -187,48 +217,56 @@ class Review extends React.Component {
 			>
 				{ this.renderComment(review) }
 				{
-					comments.length > 0 && !author.isBot &&
+					comments.length > 0 && authorToRender.id !== botUser.id &&
 					<ol className={ styles.commentRepliesList }>
-						{ comments.filter(r => !r.isDeleted).map((c, i) =>
+						{ comments.map((c, i) =>
 							<li className={ styles.commentReply } key={ i }>
 								{ this.renderComment(c, id) }
 							</li>)
 						}
 					</ol>
 				}
-				{ selectedReviewId === id && !author.isBot && this.renderAddReviewComment(selectComment, commentsReplies[id]) }
+				{ selectedReviewId === id && authorToRender.id !== botUser.id
+				&& this.renderAddReviewComment(selectComment, commentsReplies[id]) }
 			</li>
 		);
-	}
+	};
 
-	renderComment = ({ id, author, startLine, finishLine, addingTime, publishTime, renderedText, renderedComment, isLoading, }, reviewId = null) => {
+	renderComment(review: ReviewInfo): React.ReactNode;
+	renderComment(reviewComment: ReviewCommentResponse, reviewId: number): React.ReactNode;
+	renderComment({
+			id,
+			author,
+			startLine,
+			finishLine,
+			addingTime,
+			publishTime,
+			renderedText,
+			renderedComment,
+		}: ReviewInfo & ReviewCommentResponse,
+		reviewId: number | null = null
+	): React.ReactNode {
 		const { userId, deleteReviewComment } = this.props;
+		const authorToRender = author ?? botUser;
 
-		if(isLoading) {
-			return null;
-		}
-
-		if(!author) {
-			author = { visibleName: 'Ulearn bot', id: 'bot', isBot: true, };
-		}
 		const time = addingTime || publishTime;
 
 		return (
 			<React.Fragment>
 				<div className={ styles.authorWrapper }>
-					<Avatar user={ author } size="big" className={ styles.commentAvatar }/>
+					<Avatar user={ authorToRender } size="big" className={ styles.commentAvatar }/>
 					<div className={ styles.commentInfoWrapper }>
 						<span className={ styles.commentInfo }>
 							<span className={ styles.authorName }>
-								{ author.visibleName }
+								{ authorToRender.visibleName }
 							</span>
-							{ startLine &&
+							{ startLine >= 0 &&
 							<span className={ styles.commentLineNumber }>
 								{ texts.getLineCapture(startLine, finishLine) }
 							</span>
 							}
 							{
-								author.id === userId && <Trash
+								reviewId && authorToRender.id === userId && <Trash
 									className={ styles.innerCommentDeleteButton }
 									onClick={ () => deleteReviewComment(reviewId, id) }
 									size={ 12 }
@@ -254,13 +292,18 @@ class Review extends React.Component {
 						}
 					</div>
 				</div>
-				<p className={ styles.commentText }
-				   dangerouslySetInnerHTML={ { __html: renderedComment || renderedText } }/>
+				<p
+					className={ styles.commentText }
+					dangerouslySetInnerHTML={ { __html: renderedText ?? renderedComment } }
+				/>
 			</React.Fragment>
 		);
 	}
 
-	renderAddReviewComment = (selectComment, commentReplie) => {
+	renderAddReviewComment = (
+		selectComment: (e: React.MouseEvent | React.FocusEvent) => void,
+		commentReply: string
+	): React.ReactNode => {
 		return (
 			<ThemeContext.Provider value={ textareaHidden }>
 				<div className={ styles.commentReplyTextArea }>
@@ -271,21 +314,21 @@ class Review extends React.Component {
 						placeholder={ texts.sendButton }
 						onValueChange={ this.onTextareaValueChange }
 						onFocus={ selectComment }
-						value={ commentReplie }
+						value={ commentReply }
 					/>
 				</div>
 				<button
-					disabled={ commentReplie === '' }
-					className={ commentReplie ? styles.commentReplyButtonActive : styles.commentReplyButton }
+					disabled={ commentReply === '' }
+					className={ commentReply ? styles.commentReplyButtonActive : styles.commentReplyButton }
 					onClick={ this.sendComment }
 					onFocus={ selectComment }>
 					<Send3/>
 				</button>
 			</ThemeContext.Provider>
 		);
-	}
+	};
 
-	onTextareaValueChange = (value) => {
+	onTextareaValueChange = (value: string): void => {
 		const { commentsReplies, } = this.state;
 		const { selectedReviewId, } = this.props;
 
@@ -295,25 +338,15 @@ class Review extends React.Component {
 
 		this.setState({
 			commentsReplies: newCommentsReplies,
-		})
-	}
+		});
+	};
 
-	sendComment = () => {
+	sendComment = (): void => {
 		const { selectedReviewId, addReviewComment, } = this.props;
 		const { commentsReplies, } = this.state;
 
 		addReviewComment(selectedReviewId, commentsReplies[selectedReviewId]);
-	}
+	};
 }
 
-Review.propTypes = {
-	reviews: PropTypes.array,
-	selectedReviewId: PropTypes.number,
-	userId: PropTypes.string,
-	onSelectComment: PropTypes.func,
-	addReviewComment: PropTypes.func,
-	deleteReviewComment: PropTypes.func,
-	getReviewAnchorTop: PropTypes.func,
-}
-
-export default Review;
+export { Review, ReviewProps };
