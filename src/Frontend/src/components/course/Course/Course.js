@@ -214,7 +214,7 @@ class Course extends Component {
 
 		if(currentSlideInfo &&
 			(currentSlideInfo.current.type === SlideType.Lesson
-				|| (currentSlideInfo.current.type === SlideType.Exercise && !pageInfo.isReview))) {
+				|| (currentSlideInfo.current.type === SlideType.Exercise && !pageInfo.isReview && !pageInfo.isAcceptedAlert))) {
 			return Slide;
 		}
 
@@ -255,8 +255,10 @@ class Course extends Component {
 				className={ classnames(styles.root, { 'open': navigationOpened }, { [styles.withoutMinHeight]: !isNavigationVisible }) }>
 				{ this.renderMeta(meta) }
 				{ isNavigationVisible && this.renderNavigation() }
-				{ courseInfo.tempCourseError ? <div
-					className={ classnames(styles.errors) }>{ courseInfo.tempCourseError }</div> : this.renderSlide() }
+				{ courseInfo.tempCourseError
+					? <div className={ classnames(styles.errors) }>{ courseInfo.tempCourseError }</div>
+					: this.renderSlide()
+				}
 			</div>
 		);
 	}
