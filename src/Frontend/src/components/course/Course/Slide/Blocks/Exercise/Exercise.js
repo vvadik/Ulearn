@@ -9,7 +9,7 @@ import { Lightbulb, Refresh, EyeOpened, DocumentLite, } from "icons";
 import { CongratsModal } from "./CongratsModal/CongratsModal.tsx";
 import { ExerciseOutput, HasOutput } from "./ExerciseOutput/ExerciseOutput.tsx";
 import { ExerciseFormHeader } from "./ExerciseFormHeader/ExerciseFormHeader.tsx";
-import { ThemeContext } from "@skbkontur/react-ui/index";
+import { ThemeContext } from "ui";
 
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -18,6 +18,7 @@ import { connect } from "react-redux";
 import { exerciseSolutions, loadFromCache, saveToCache } from "src/utils/localStorageManager";
 
 import { sendCode, addReviewComment, deleteReviewComment, } from "src/actions/course";
+import { userProgressVisitAcceptedSolutions } from "src/actions/userProgress";
 
 import { constructPathToAcceptedSolutions, } from "src/consts/routes";
 import {
@@ -900,6 +901,10 @@ class Exercise extends React.Component {
 	}
 
 	showAcceptedSolutions = (e) => {
+		const { courseId, slideId, visitAcceptedSolutions, } = this.props;
+
+		visitAcceptedSolutions(courseId, slideId);
+
 		this.setState({
 			showAcceptedSolutions: true,
 		})
@@ -1108,6 +1113,7 @@ const mapDispatchToProps = (dispatch) => ({
 	sendCode: (courseId, slideId, code, language) => dispatch(sendCode(courseId, slideId, code, language)),
 	addReviewComment: (courseId, slideId, submissionId, reviewId, comment) => dispatch(addReviewComment(courseId, slideId, submissionId, reviewId, comment)),
 	deleteReviewComment: (courseId, slideId, submissionId, reviewId, comment) => dispatch(deleteReviewComment(courseId, slideId, submissionId, reviewId, comment)),
+	visitAcceptedSolutions: (courseId, slideId,) => dispatch(userProgressVisitAcceptedSolutions(courseId, slideId,)),
 });
 
 const exerciseBlockProps = {
@@ -1123,6 +1129,8 @@ const exerciseBlockProps = {
 const dispatchFunctionsProps = {
 	sendCode: PropTypes.func,
 	addCommentToReview: PropTypes.func,
+	deleteReviewComment: PropTypes.func,
+	visitAcceptedSolutions: PropTypes.func,
 }
 const fromSlideProps = {
 	courseId: PropTypes.string,
