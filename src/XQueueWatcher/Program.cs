@@ -12,6 +12,7 @@ using log4net.Config;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Configuration;
+using Ulearn.Core.Logging;
 using Ulearn.Core.Metrics;
 using XQueue;
 using XQueue.Models;
@@ -37,6 +38,7 @@ namespace XQueueWatcher
 		public void StartXQueueWatchers(CancellationToken cancellationToken)
 		{
 			XmlConfigurator.Configure();
+			LoggerSetup.SetupForLog4Net();
 			StaticMetricsPipeProvider.Instance.Start();
 
 			var keepAliveInterval = TimeSpan.FromSeconds(ApplicationConfiguration.Read<UlearnConfiguration>().KeepAliveInterval ?? 30);

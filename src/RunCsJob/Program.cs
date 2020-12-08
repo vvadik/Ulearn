@@ -7,6 +7,7 @@ using log4net;
 using log4net.Config;
 using RunCheckerJob;
 using Ulearn.Core;
+using Ulearn.Core.Logging;
 using Ulearn.Core.RunCheckerJobApi;
 
 namespace RunCsJob
@@ -20,7 +21,7 @@ namespace RunCsJob
 		public static void Main(string[] args)
 		{
 			XmlConfigurator.Configure();
-
+			LoggerSetup.SetupForLog4Net();
 			DirectoryInfo сompilerDirectory = null;
 			if (args.Any(x => x.StartsWith("-p:")))
 			{

@@ -43,17 +43,16 @@ namespace GitCourseUpdater
 		private DirectoryInfo reposBaseDir;
 		private string repoDirName;
 		private Repository repo;
-		private ILogger logger;
+		private readonly ILogger logger = Log.Logger;
 		private string privateKeyPath;
 		private string publicKeyPath;
 		private static object @lock = new object(); // Потокобезопасность не гарантируется библиотекой libgit2
 
 		// url example git@github.com:user/myrepo.git
-		public GitRepo(string url, DirectoryInfo reposBaseDir, string publicKey, string privateKey, DirectoryInfo keysTempDirectory, ILogger logger)
+		public GitRepo(string url, DirectoryInfo reposBaseDir, string publicKey, string privateKey, DirectoryInfo keysTempDirectory)
 		{
 			this.url = url;
 			this.reposBaseDir = reposBaseDir;
-			this.logger = logger;
 			if (!reposBaseDir.Exists)
 				reposBaseDir.Create();
 

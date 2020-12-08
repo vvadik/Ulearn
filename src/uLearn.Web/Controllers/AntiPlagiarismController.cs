@@ -16,7 +16,6 @@ using Database.Extensions;
 using Database.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Serilog;
 using uLearn.Web.FilterAttributes;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
@@ -31,7 +30,6 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 	public class AntiPlagiarismController : JsonDataContractController
 	{
-		private readonly ULearnDb db;
 		private readonly UserSolutionsRepo userSolutionsRepo;
 		private readonly GroupsRepo groupsRepo;
 		private readonly CourseManager courseManager;
@@ -39,20 +37,18 @@ namespace uLearn.Web.Controllers
 
 		static AntiPlagiarismController()
 		{
-			var serilogLogger = new LoggerConfiguration().WriteTo.Log4Net().CreateLogger();
 			var antiplagiarismClientConfiguration = ApplicationConfiguration.Read<UlearnConfiguration>().AntiplagiarismClient;
-			antiPlagiarismClient = new AntiPlagiarismClient(antiplagiarismClientConfiguration.Endpoint, antiplagiarismClientConfiguration.Token, serilogLogger);
+			antiPlagiarismClient = new AntiPlagiarismClient(antiplagiarismClientConfiguration.Endpoint, antiplagiarismClientConfiguration.Token);
 		}
 
-		public AntiPlagiarismController(ULearnDb db, UserSolutionsRepo userSolutionsRepo, GroupsRepo groupsRepo)
+		public AntiPlagiarismController(UserSolutionsRepo userSolutionsRepo, GroupsRepo groupsRepo)
 		{
-			this.db = db;
 			this.userSolutionsRepo = userSolutionsRepo;
 			this.groupsRepo = groupsRepo;
 		}
 
 		public AntiPlagiarismController(ULearnDb db, CourseManager courseManager)
-			: this(db, new UserSolutionsRepo(db, courseManager), new GroupsRepo(db, courseManager))
+			: this(new UserSolutionsRepo(db, courseManager), new GroupsRepo(db, courseManager))
 		{
 			this.courseManager = courseManager;
 		}

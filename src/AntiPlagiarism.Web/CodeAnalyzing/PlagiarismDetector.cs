@@ -21,21 +21,19 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 		private readonly ISubmissionsRepo submissionsRepo;
 		private readonly IMostSimilarSubmissionsRepo mostSimilarSubmissionsRepo;
 		private readonly CodeUnitsExtractor codeUnitsExtractor;
-		private readonly ILogger logger;
+		private readonly ILogger logger = Log.Logger;
 		private readonly AntiPlagiarismConfiguration configuration;
 
 		public PlagiarismDetector(
 			ISnippetsRepo snippetsRepo, ISubmissionsRepo submissionsRepo,
 			IMostSimilarSubmissionsRepo mostSimilarSubmissionsRepo,
 			CodeUnitsExtractor codeUnitsExtractor,
-			ILogger logger,
 			IOptions<AntiPlagiarismConfiguration> options)
 		{
 			this.snippetsRepo = snippetsRepo;
 			this.submissionsRepo = submissionsRepo;
 			this.mostSimilarSubmissionsRepo = mostSimilarSubmissionsRepo;
 			this.codeUnitsExtractor = codeUnitsExtractor;
-			this.logger = logger;
 			configuration = options.Value;
 		}
 

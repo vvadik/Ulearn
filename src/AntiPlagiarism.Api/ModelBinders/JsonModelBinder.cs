@@ -9,12 +9,7 @@ namespace AntiPlagiarism.Api.ModelBinders
 {
 	public class JsonModelBinder : IModelBinder
 	{
-		private readonly ILogger logger;
-
-		public JsonModelBinder(ILogger logger)
-		{
-			this.logger = logger;
-		}
+		private readonly ILogger logger = Log.Logger;
 
 		public async Task BindModelAsync(ModelBindingContext bindingContext)
 		{

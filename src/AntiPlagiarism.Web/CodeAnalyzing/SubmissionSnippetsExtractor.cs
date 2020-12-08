@@ -12,7 +12,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 	{
 		private readonly CodeUnitsExtractor codeUnitsExtractor;
 		private readonly SnippetsExtractor snippetsExtractor;
-		private readonly ILogger logger;
+		private readonly ILogger logger = Log.Logger;
 		private readonly AntiPlagiarismConfiguration configuration;
 
 		private readonly List<ITokenInSnippetConverter> tokenConverters = new List<ITokenInSnippetConverter>
@@ -22,11 +22,10 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 		};
 
 		public SubmissionSnippetsExtractor(CodeUnitsExtractor codeUnitsExtractor, SnippetsExtractor snippetsExtractor,
-			ILogger logger, IOptions<AntiPlagiarismConfiguration> options)
+			IOptions<AntiPlagiarismConfiguration> options)
 		{
 			this.codeUnitsExtractor = codeUnitsExtractor;
 			this.snippetsExtractor = snippetsExtractor;
-			this.logger = logger;
 			configuration = options.Value;
 		}
 

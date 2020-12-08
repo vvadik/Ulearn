@@ -16,7 +16,7 @@ namespace Database
 {
 	public class WebCourseManager : CourseManager, IWebCourseManager
 	{
-		private readonly ILogger logger;
+		private readonly ILogger logger = Log.Logger;
 
 		private readonly Dictionary<string, Guid> loadedCourseVersions = new Dictionary<string, Guid>();
 		private readonly ConcurrentDictionary<string, DateTime> courseVersionFetchTime = new ConcurrentDictionary<string, DateTime>();
@@ -25,10 +25,9 @@ namespace Database
 		private readonly IServiceScopeFactory serviceScopeFactory;
 		public event CourseChangedEventHandler CourseChangedEvent;
 
-		public WebCourseManager(ILogger logger, IServiceScopeFactory serviceScopeFactory)
+		public WebCourseManager(IServiceScopeFactory serviceScopeFactory)
 			: base(GetCoursesDirectory())
 		{
-			this.logger = logger;
 			this.serviceScopeFactory = serviceScopeFactory;
 		}
 

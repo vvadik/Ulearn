@@ -10,7 +10,6 @@ using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 using Database.Repos.Users;
 using JetBrains.Annotations;
-using Serilog;
 using Ulearn.Common;
 using Ulearn.Common.Api.Helpers;
 using Ulearn.Common.Extensions;
@@ -28,10 +27,10 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		protected readonly IGroupMembersRepo groupMembersRepo;
 		protected readonly IGroupAccessesRepo groupAccessesRepo;
 
-		public BaseCommentController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
+		public BaseCommentController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
 			ICommentsRepo commentsRepo, ICommentLikesRepo commentLikesRepo, ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo,
 			INotificationsRepo notificationsRepo, IGroupMembersRepo groupMembersRepo, IGroupAccessesRepo groupAccessesRepo)
-			: base(logger, courseManager, db, usersRepo)
+			: base(courseManager, db, usersRepo)
 		{
 			this.commentsRepo = commentsRepo;
 			this.commentLikesRepo = commentLikesRepo;

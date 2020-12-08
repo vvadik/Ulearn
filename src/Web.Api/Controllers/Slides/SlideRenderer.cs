@@ -4,9 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AngleSharp.Html.Parser;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 using Ulearn.Common;
-using Ulearn.Core;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Slides.Exercises;
@@ -21,12 +19,10 @@ namespace Ulearn.Web.Api.Controllers.Slides
 {
 	public class SlideRenderer
 	{
-		private readonly ILogger logger;
 		private readonly IUlearnVideoAnnotationsClient videoAnnotationsClient;
 
-		public SlideRenderer(ILogger logger, IUlearnVideoAnnotationsClient videoAnnotationsClient)
+		public SlideRenderer(IUlearnVideoAnnotationsClient videoAnnotationsClient)
 		{
-			this.logger = logger;
 			this.videoAnnotationsClient = videoAnnotationsClient;
 		}
 

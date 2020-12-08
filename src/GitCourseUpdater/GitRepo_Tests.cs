@@ -1,7 +1,6 @@
 using System.IO;
 using System.Reflection;
 using NUnit.Framework;
-using Serilog;
 
 namespace GitCourseUpdater
 {
@@ -11,7 +10,6 @@ namespace GitCourseUpdater
 		[Test, Explicit]
 		public void Test()
 		{
-			var log = new LoggerConfiguration().CreateLogger();
 			var url = "git@github.com:vorkulsky/git_test.git";
 			var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 			var reposBaseDir = Path.Combine(assemblyPath, "repos");
@@ -20,7 +18,7 @@ namespace GitCourseUpdater
 			var keysTempDirectory = new DirectoryInfo(Path.Combine(assemblyPath, "../../../TestResources/"));
 			var privateKey = File.ReadAllText(privateKeyPath.FullName);
 			var publicKey = File.ReadAllText(publicKeyPath.FullName);
-			using (IGitRepo repo = new GitRepo(url, new DirectoryInfo(reposBaseDir), publicKey, privateKey, keysTempDirectory, log))
+			using (IGitRepo repo = new GitRepo(url, new DirectoryInfo(reposBaseDir), publicKey, privateKey, keysTempDirectory))
 			{
 				var zip = repo.GetCurrentStateAsZip();
 				File.WriteAllBytes(Path.Combine(assemblyPath, "result.zip"), zip.ToArray());

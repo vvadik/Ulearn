@@ -1,5 +1,7 @@
 using System.Web;
 using log4net.Config;
+using Serilog;
+using Ulearn.Core.Logging;
 
 namespace uLearn.Web
 {
@@ -10,6 +12,7 @@ namespace uLearn.Web
 			XmlConfigurator.Configure();
 			log4net.GlobalContext.Properties["user"] = new HttpContextUserNameProvider();
 			log4net.GlobalContext.Properties["address"] = new HttpContextAddressProvider();
+			LoggerSetup.SetupForLog4Net();
 		}
 	}
 

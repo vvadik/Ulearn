@@ -15,12 +15,7 @@ namespace Ulearn.VideoAnnotations.Web.Annotations
 
 		private readonly string[] annotationOffsetFormats = { @"mm\:ss", @"m\:ss" };
 
-		private readonly ILogger logger;
-
-		public AnnotationsParser(ILogger logger)
-		{
-			this.logger = logger;
-		}
+		private readonly ILogger logger = Log.Logger;
 
 		public Dictionary<string, Annotation> ParseAnnotations(string[] lines)
 		{

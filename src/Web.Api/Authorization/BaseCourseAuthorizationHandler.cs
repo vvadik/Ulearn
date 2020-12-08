@@ -9,12 +9,7 @@ namespace Ulearn.Web.Api.Authorization
 {
 	public class BaseCourseAuthorizationHandler<T> : AuthorizationHandler<T> where T : IAuthorizationRequirement
 	{
-		protected readonly ILogger logger;
-
-		public BaseCourseAuthorizationHandler(ILogger logger)
-		{
-			this.logger = logger;
-		}
+		protected readonly ILogger logger = Log.Logger;
 
 		protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, T requirement)
 		{

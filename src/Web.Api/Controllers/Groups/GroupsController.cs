@@ -11,11 +11,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
-using Ulearn.Core.Courses;
 using Ulearn.Web.Api.Authorization;
 using Ulearn.Web.Api.Models.Parameters.Groups;
 using Ulearn.Web.Api.Models.Responses.Groups;
-using ILogger = Serilog.ILogger;
 
 namespace Ulearn.Web.Api.Controllers.Groups
 {
@@ -26,10 +24,10 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		private readonly IGroupAccessesRepo groupAccessesRepo;
 		private readonly IGroupMembersRepo groupMembersRepo;
 
-		public GroupsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db,
+		public GroupsController(IWebCourseManager courseManager, UlearnDb db,
 			IUsersRepo usersRepo,
 			IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo)
-			: base(logger, courseManager, db, usersRepo)
+			: base(courseManager, db, usersRepo)
 		{
 			this.groupsRepo = groupsRepo;
 			this.groupAccessesRepo = groupAccessesRepo;

@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -13,15 +12,14 @@ namespace Ulearn.VideoAnnotations.Api.Client
 {
 	public class VideoAnnotationsClient : BaseApiClient, IVideoAnnotationsClient
 	{
-		private readonly ILogger logger;
+		private readonly ILogger logger = Log.Logger;
 
-		public VideoAnnotationsClient(ILogger logger, string endpointUrl)
-			: base(logger, new ApiClientSettings(endpointUrl)
+		public VideoAnnotationsClient(string endpointUrl)
+			: base(new ApiClientSettings(endpointUrl)
 			{
 				ServiceName = "ulearn.videoannotations-web",
 			})
 		{
-			this.logger = logger;
 		}
 
 		public async Task<AnnotationsResponse> GetAnnotationsAsync(AnnotationsParameters parameters)

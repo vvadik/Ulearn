@@ -5,13 +5,10 @@ using AntiPlagiarism.Web.Database.Repos;
 using AntiPlagiarism.Web.Workers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
 using Swashbuckle.AspNetCore.Filters;
 using Ulearn.Common.Api;
 using Ulearn.Core.Configuration;
-using Vostok.Hosting;
 using Vostok.Hosting.Abstractions;
 
 namespace AntiPlagiarism.Web
@@ -30,9 +27,9 @@ namespace AntiPlagiarism.Web
 			return app;
 		}
 
-		protected override void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment, ILogger logger)
+		protected override void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment)
 		{
-			base.ConfigureServices(services, hostingEnvironment, logger);
+			base.ConfigureServices(services, hostingEnvironment);
 
 			var configuration = hostingEnvironment.SecretConfigurationProvider.Get<UlearnConfiguration>(hostingEnvironment.SecretConfigurationSource);
 
@@ -46,9 +43,9 @@ namespace AntiPlagiarism.Web
 			services.AddSwaggerExamplesFromAssemblyOf<WebApplication>();
 		}
 
-		public override void ConfigureDi(IServiceCollection services, ILogger logger)
+		public override void ConfigureDi(IServiceCollection services)
 		{
-			base.ConfigureDi(services, logger);
+			base.ConfigureDi(services);
 
 			/* Database repositories */
 			/* TODO (andgein): make auto-discovering of repositories */

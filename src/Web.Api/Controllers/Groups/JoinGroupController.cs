@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Database;
@@ -9,7 +8,6 @@ using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Serilog;
 using Swashbuckle.AspNetCore.Annotations;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Responses.Groups;
@@ -24,18 +22,16 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		private readonly IGroupsRepo groupsRepo;
 		private readonly IGroupMembersRepo groupMembersRepo;
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
-		private readonly IVisitsRepo visitsRepo;
 
-		public JoinGroupController(ILogger logger, IWebCourseManager courseManager, UlearnDb db,
+		public JoinGroupController(IWebCourseManager courseManager, UlearnDb db,
 			IUsersRepo usersRepo,
 			IGroupsRepo groupsRepo, IGroupMembersRepo groupMembersRepo,
-			ISlideCheckingsRepo slideCheckingsRepo, IVisitsRepo visitsRepo)
-			: base(logger, courseManager, db, usersRepo)
+			ISlideCheckingsRepo slideCheckingsRepo)
+			: base(courseManager, db, usersRepo)
 		{
 			this.groupsRepo = groupsRepo;
 			this.groupMembersRepo = groupMembersRepo;
 			this.slideCheckingsRepo = slideCheckingsRepo;
-			this.visitsRepo = visitsRepo;
 		}
 
 		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)

@@ -13,7 +13,6 @@ using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Models.Responses.TempCourses;
 using Ionic.Zip;
@@ -24,15 +23,13 @@ namespace Ulearn.Web.Api.Controllers
 	[Route("/tempCourses")]
 	public class TempCourseController : BaseController
 	{
-		private readonly ICoursesRepo coursesRepo;
 		private readonly ITempCoursesRepo tempCoursesRepo;
 		private readonly ICourseRolesRepo courseRolesRepo;
 		public bool DontCheckBaseCourseExistsOnCreate = false; // Для тестрирования
 
-		public TempCourseController(ICoursesRepo coursesRepo, ILogger logger, IWebCourseManager courseManager, UlearnDb db, [CanBeNull] IUsersRepo usersRepo, ITempCoursesRepo tempCoursesRepo, ICourseRolesRepo courseRolesRepo)
-			: base(logger, courseManager, db, usersRepo)
+		public TempCourseController(IWebCourseManager courseManager, UlearnDb db, [CanBeNull] IUsersRepo usersRepo, ITempCoursesRepo tempCoursesRepo, ICourseRolesRepo courseRolesRepo)
+			: base(courseManager, db, usersRepo)
 		{
-			this.coursesRepo = coursesRepo;
 			this.tempCoursesRepo = tempCoursesRepo;
 			this.courseRolesRepo = courseRolesRepo;
 		}

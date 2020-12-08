@@ -15,15 +15,14 @@ namespace AntiPlagiarism.Web.Controllers
 	[ApiController]
 	public abstract class BaseController : Controller
 	{
-		protected readonly ILogger logger;
+		protected static readonly ILogger logger = Log.Logger;
 		protected readonly IClientsRepo clientsRepo;
 		protected readonly AntiPlagiarismDb db;
 
 		protected Client client;
 
-		protected BaseController(ILogger logger, IClientsRepo clientsRepo, AntiPlagiarismDb db)
+		protected BaseController(IClientsRepo clientsRepo, AntiPlagiarismDb db)
 		{
-			this.logger = logger;
 			this.clientsRepo = clientsRepo;
 			this.db = db;
 		}

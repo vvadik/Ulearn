@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Database;
@@ -15,13 +14,13 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Serilog;
-using Serilog.Core;
 using Serilog.Extensions.Logging;
 using Ulearn.Common;
 using Ulearn.Web.Api;
 using Ulearn.Web.Api.Controllers;
 using Web.Api.Configuration;
 using Z.EntityFramework.Plus;
+using ILogger = Serilog.ILogger;
 
 namespace Web.Api.Tests.Controllers
 {
@@ -30,8 +29,8 @@ namespace Web.Api.Tests.Controllers
 	{
 		private WebApplication application;
 
-		protected Logger logger;
 		protected UlearnDb db;
+		protected readonly ILogger logger = Log.Logger;
 		protected IServiceProvider serviceProvider;
 
 		private readonly WebApiConfiguration fakeWebApiConfiguration = new WebApiConfiguration
@@ -59,12 +58,6 @@ namespace Web.Api.Tests.Controllers
 
 		public async Task SetupTestInfrastructureAsync(Action<IServiceCollection> addServices = null)
 		{
-			logger = new LoggerConfiguration()
-				.MinimumLevel.Information()
-				.WriteTo.NUnitOutput()
-				.WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss.ffff } {Level}] {Message:lj}{NewLine}{Exception}")
-				.CreateLogger();
-
 			var loggerFactory = new LoggerFactory(new List<ILoggerProvider> { new SerilogLoggerProvider(logger) });
 			db = CreateDbContext(loggerFactory);
 
@@ -106,7 +99,7 @@ namespace Web.Api.Tests.Controllers
 
 			services.AddSingleton(db);
 			services.AddLogging(builder => builder.AddSerilog(logger));
-			application.ConfigureDi(services, logger);
+			application.ConfigureDi(services);
 			application.ConfigureAuthServices(services, fakeWebApiConfiguration);
 			application.ConfigureMvc(services);
 

@@ -25,15 +25,14 @@ namespace Database.Repos.Groups
 		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IUsersRepo usersRepo;
 		private readonly IWebCourseManager courseManager;
-		private readonly ILogger logger;
+		private readonly ILogger logger = Log.Logger;
 
 		public GroupAccessesRepo(
 			UlearnDb db,
 			IGroupsRepo groupsRepo, ISystemAccessesRepo systemAccessesRepo, ICoursesRepo coursesRepo, IGroupMembersRepo groupMembersRepo,
 			IUsersRepo usersRepo,
 			ICourseRolesRepo courseRolesRepo,
-			IWebCourseManager courseManager,
-			ILogger logger
+			IWebCourseManager courseManager
 		)
 		{
 			this.db = db;
@@ -44,7 +43,6 @@ namespace Database.Repos.Groups
 			this.courseRolesRepo = courseRolesRepo;
 			this.usersRepo = usersRepo;
 			this.courseManager = courseManager;
-			this.logger = logger;
 		}
 
 		public async Task<GroupAccess> GrantAccessAsync(int groupId, string userId, GroupAccessType accessType, string grantedById)

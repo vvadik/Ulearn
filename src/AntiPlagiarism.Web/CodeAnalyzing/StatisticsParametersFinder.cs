@@ -11,12 +11,11 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 {
 	public class StatisticsParametersFinder
 	{
-		private readonly ILogger logger;
+		private readonly ILogger logger = Log.Logger;
 		private readonly PlagiarismDetector plagiarismDetector;
 
-		public StatisticsParametersFinder(ILogger logger, PlagiarismDetector plagiarismDetector)
+		public StatisticsParametersFinder(PlagiarismDetector plagiarismDetector)
 		{
-			this.logger = logger;
 			this.plagiarismDetector = plagiarismDetector;
 		}
 
@@ -56,7 +55,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			return plagiarismDetector.GetWeightAsync(first, second);
 		}
 
-		public static (double faintSuspicion, double strongSuspicion) GetSuspicionLevels(double mean, double sigma, double faintSuspicionCoefficient, double strongSuspicionCoefficient, ILogger logger = null)
+		public static (double faintSuspicion, double strongSuspicion) GetSuspicionLevels(double mean, double sigma, double faintSuspicionCoefficient, double strongSuspicionCoefficient)
 		{
 			if (Math.Abs(sigma) < 1e-7)
 				return (1, 1);

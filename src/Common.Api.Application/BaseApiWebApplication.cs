@@ -24,7 +24,6 @@ using Vostok.Applications.AspNetCore.Builders;
 using Vostok.Applications.AspNetCore.Configuration;
 using Vostok.Hosting.Abstractions;
 using Vostok.Logging.Serilog;
-using ILogger = Serilog.ILogger;
 
 namespace Ulearn.Common.Api
 {
@@ -41,12 +40,12 @@ namespace Ulearn.Common.Api
 				.MinimumLevel.Information()
 				.Filter.ByExcluding(FilterLogs)
 				.WriteTo.Sink(new VostokSink(hostingEnvironment.Log), LogEventLevel.Information);
-			var logger = loggerConfiguration.CreateLogger();
+			Log.Logger = loggerConfiguration.CreateLogger();
 
 			builder.SetupWebHost(webHostBuilder => webHostBuilder
 				.UseKestrel()
-				.ConfigureServices(s => ConfigureServices(s, hostingEnvironment, logger))
-				.UseSerilog(logger)
+				.ConfigureServices(s => ConfigureServices(s, hostingEnvironment))
+				.UseSerilog(Log.Logger)
 				.UseEnvironment(hostingEnvironment.ApplicationIdentity.Environment)
 				.Configure(app =>
 				{
@@ -118,12 +117,12 @@ namespace Ulearn.Common.Api
 			return app;
 		}
 
-		protected virtual void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment, ILogger logger)
+		protected virtual void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment)
 		{
-			ConfigureDi(services, logger);
+			ConfigureDi(services);
 			ConfigureMvc(services);
 			ConfigureSwaggerDocumentation(services);
-			ConfigureExceptionPolicy(services, logger);
+			ConfigureExceptionPolicy(services);
 		}
 
 		public virtual void ConfigureMvc(IServiceCollection services)
@@ -200,7 +199,7 @@ namespace Ulearn.Common.Api
 		{
 		}
 
-		private void ConfigureExceptionPolicy(IServiceCollection services, ILogger logger)
+		private void ConfigureExceptionPolicy(IServiceCollection services)
 		{
 			/* See https://github.com/IharYakimush/asp-net-core-exception-handling for details */
 			services.AddExceptionHandlingPolicies(options =>
@@ -223,9 +222,8 @@ namespace Ulearn.Common.Api
 			});
 		}
 
-		public virtual void ConfigureDi(IServiceCollection services, ILogger logger)
+		public virtual void ConfigureDi(IServiceCollection services)
 		{
-			services.AddSingleton(logger);
 		}
 	}
 }

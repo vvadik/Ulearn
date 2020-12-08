@@ -14,18 +14,17 @@ namespace Database.Repos.Groups
 		private readonly IVisitsRepo visitsRepo;
 		private readonly IUserQuizzesRepo userQuizzesRepo;
 		private readonly IWebCourseManager courseManager;
-		private readonly ILogger logger;
+		private readonly ILogger logger = Log.Logger;
 
 		public ManualCheckingsForOldSolutionsAdder(
 			IUserSolutionsRepo userSolutionsRepo, ISlideCheckingsRepo slideCheckingsRepo, IVisitsRepo visitsRepo, IUserQuizzesRepo userQuizzesRepo,
-			IWebCourseManager courseManager, ILogger logger)
+			IWebCourseManager courseManager)
 		{
 			this.userSolutionsRepo = userSolutionsRepo;
 			this.slideCheckingsRepo = slideCheckingsRepo;
 			this.visitsRepo = visitsRepo;
 			this.userQuizzesRepo = userQuizzesRepo;
 			this.courseManager = courseManager;
-			this.logger = logger;
 		}
 
 		public async Task AddManualCheckingsForOldSolutionsAsync(string courseId, IEnumerable<string> usersIds)

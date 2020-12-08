@@ -9,12 +9,12 @@ namespace Ulearn.VideoAnnotations.Web.Annotations
 {
 	public class AnnotationsCache : LruCache<string, Dictionary<string, Annotation>>, IAnnotationsCache
 	{
-		public AnnotationsCache(ILogger logger, IOptions<VideoAnnotationsConfiguration> options)
+		public AnnotationsCache(IOptions<VideoAnnotationsConfiguration> options)
 			: base(options.Value.VideoAnnotations.Cache.Capacity, options.Value.VideoAnnotations.Cache.MaxLifeTime)
 		{
 			var capacity = options.Value.VideoAnnotations.Cache.Capacity;
 			var maxLifeTime = options.Value.VideoAnnotations.Cache.MaxLifeTime;
-			logger.Information("Creating annotations cache with capacity {capacity} and max life time {maxLifeTime}", capacity, maxLifeTime);
+			Log.Logger.Information("Creating annotations cache with capacity {capacity} and max life time {maxLifeTime}", capacity, maxLifeTime);
 		}
 	}
 }

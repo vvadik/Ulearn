@@ -25,18 +25,17 @@ namespace Database.Repos
 		public static TimeSpan sendNotificationsDelayAfterCreating = TimeSpan.FromMinutes(1);
 
 		private readonly UlearnDb db;
-		private readonly ILogger logger;
+		private readonly ILogger logger = Log.Logger;
 		private readonly IServiceProvider serviceProvider;
 		private readonly IUnitsRepo unitsRepo;
 		private readonly ICourseRoleUsersFilter courseRoleUsersFilter;
 		private readonly IUsersRepo usersRepo;
 		private readonly IWebCourseManager courseManager;
 
-		public NotificationsRepo(UlearnDb db, ILogger logger, IServiceProvider serviceProvider,
+		public NotificationsRepo(UlearnDb db, IServiceProvider serviceProvider,
 			IUnitsRepo unitsRepo, ICourseRoleUsersFilter courseRoleUsersFilter, IUsersRepo usersRepo, IWebCourseManager courseManager)
 		{
 			this.db = db;
-			this.logger = logger;
 			this.serviceProvider = serviceProvider;
 			this.unitsRepo = unitsRepo;
 			this.usersRepo = usersRepo;

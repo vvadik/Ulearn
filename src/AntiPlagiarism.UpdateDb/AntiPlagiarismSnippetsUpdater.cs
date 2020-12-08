@@ -19,20 +19,18 @@ namespace AntiPlagiarism.UpdateDb
 		private readonly CodeUnitsExtractor codeUnitsExtractor;
 		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly AntiPlagiarismConfiguration configuration;
-		private readonly ILogger logger;
+		private readonly ILogger logger = Log.Logger;
 
 		public AntiPlagiarismSnippetsUpdater(
 			SubmissionSnippetsExtractor submissionSnippetsExtractor,
 			CodeUnitsExtractor codeUnitsExtractor,
 			IServiceScopeFactory serviceScopeFactory,
-			IOptions<AntiPlagiarismConfiguration> configuration,
-			ILogger logger)
+			IOptions<AntiPlagiarismConfiguration> configuration)
 		{
 			this.submissionSnippetsExtractor = submissionSnippetsExtractor;
 			this.codeUnitsExtractor = codeUnitsExtractor;
 			this.serviceScopeFactory = serviceScopeFactory;
 			this.configuration = configuration.Value;
-			this.logger = logger;
 		}
 
 		public async Task UpdateAsync(int startFromIndex = 0, bool updateOnlyTokensCount = false)

@@ -9,6 +9,7 @@ using Graphite;
 using log4net;
 using log4net.Config;
 using Ulearn.Core.Configuration;
+using Ulearn.Core.Logging;
 using Ulearn.Core.Metrics;
 
 namespace Notifications
@@ -43,7 +44,7 @@ namespace Notifications
 		static void Main(string[] args)
 		{
 			XmlConfigurator.Configure();
-
+			LoggerSetup.SetupForLog4Net();
 			/* Pass first argument 'send' to send emails to addresses from `emails.txt` with content from `content.txt` (notifications daemon is not started in this case)*/
 			if (args.Length > 0 && args[0] == "send")
 			{

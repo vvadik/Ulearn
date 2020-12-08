@@ -16,7 +16,6 @@ using Newtonsoft.Json;
 using Vostok.Clusterclient.Core.Criteria;
 using Vostok.Clusterclient.Core.Strategies;
 using Vostok.Clusterclient.Core.Topology;
-using Vostok.Logging.Abstractions;
 using Vostok.Logging.Tracing;
 using Vostok.Telemetry.Kontur;
 
@@ -24,16 +23,16 @@ namespace Ulearn.Common.Api
 {
 	public class BaseApiClient
 	{
-		private readonly ILog log;
+		private readonly ILogger logger = Log.Logger;
 		private readonly ApiClientSettings settings;
 		private readonly ClusterClient clusterClient;
 
-		protected BaseApiClient(ILogger logger, ApiClientSettings settings)
+		protected BaseApiClient(ApiClientSettings settings)
 		{
 			this.settings = settings;
 
 			var contextName = GetType().Name;
-			log = new SerilogLog(logger)
+			var log = new SerilogLog(Log.Logger)
 				.ForContext(contextName)
 				.WithTracingProperties(KonturTracerProvider.Get());
 			
@@ -63,7 +62,7 @@ namespace Ulearn.Common.Api
 		{
 			ClusterResult response;
 			if (settings.LogRequestsAndResponses)
-				log.Info("Send {method} request to {serviceName} ({url}) with parameters: {parameters}", method.Method, settings.ServiceName, url, parameters.ToString());
+				logger.Information("Send {method} request to {serviceName} ({url}) with parameters: {parameters}", method.Method, settings.ServiceName, url, parameters.ToString());
 
 			try
 			{
@@ -89,19 +88,19 @@ namespace Ulearn.Common.Api
 			}
 			catch (Exception e)
 			{
-				log.Error(e, "Can't send request to {serviceName}: {message}", settings.ServiceName, e.Message);
+				logger.Error(e, "Can't send request to {serviceName}: {message}", settings.ServiceName, e.Message);
 				throw new ApiClientException($"Can't send request to {settings.ServiceName}: {e.Message}", e);
 			}
 			
 			if (response.Status != ClusterResultStatus.Success)
 			{
-				log.Error("Bad response status from {serviceName}: {status}", settings.ServiceName, response.Status.ToString());
+				logger.Error("Bad response status from {serviceName}: {status}", settings.ServiceName, response.Status.ToString());
 				throw new ApiClientException($"Bad response status from {settings.ServiceName}: {response.Status}");
 			}
 
 			if (!response.Response.IsSuccessful)
 			{
-				log.Error("Bad response code from {serviceName}: {statusCode} {statusCodeDescrption}", settings.ServiceName, (int)response.Response.Code, response.Response.Code.ToString());
+				logger.Error("Bad response code from {serviceName}: {statusCode} {statusCodeDescrption}", settings.ServiceName, (int)response.Response.Code, response.Response.Code.ToString());
 				throw new ApiClientException($"Bad response code from {settings.ServiceName}: {(int)response.Response.Code} {response.Response.Code}");
 			}
 
@@ -121,7 +120,7 @@ namespace Ulearn.Common.Api
 			}
 			catch (Exception e)
 			{
-				log.Error(e, "Can't parse response from {serviceName}: {message}", settings.ServiceName, e.Message);
+				logger.Error(e, "Can't parse response from {serviceName}: {message}", settings.ServiceName, e.Message);
 				throw new ApiClientException($"Can't parse response from {settings.ServiceName}: {e.Message}", e);
 			}
 
@@ -135,7 +134,7 @@ namespace Ulearn.Common.Api
 					shortened = true;
 				}
 
-				log.Info($"Received response from \"{settings.ServiceName}\"{(shortened ? " (сокращенный)" : "")}: {logResult}");
+				logger.Information($"Received response from \"{settings.ServiceName}\"{(shortened ? " (сокращенный)" : "")}: {logResult}");
 			}
 
 			return result;

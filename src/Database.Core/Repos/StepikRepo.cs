@@ -14,12 +14,10 @@ namespace Database.Repos
 	public class StepikRepo : IStepikRepo
 	{
 		private readonly UlearnDb db;
-		private readonly ILogger logger;
 
-		public StepikRepo(UlearnDb db, ILogger logger)
+		public StepikRepo(UlearnDb db)
 		{
 			this.db = db;
-			this.logger = logger;
 		}
 
 		[CanBeNull]

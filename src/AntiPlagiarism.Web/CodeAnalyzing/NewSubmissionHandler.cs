@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AntiPlagiarism.Web.Configuration;
-using AntiPlagiarism.Web.Database;
 using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Database.Repos;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,7 +14,6 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 {
 	public class NewSubmissionHandler
 	{
-		private readonly AntiPlagiarismDb db;
 		private readonly IWorkQueueRepo workQueueRepo;
 		private readonly ISubmissionsRepo submissionsRepo;
 		private readonly ITasksRepo tasksRepo;
@@ -23,17 +21,14 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 		private readonly SubmissionSnippetsExtractor submissionSnippetsExtractor;
 		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly AntiPlagiarismConfiguration configuration;
-		private readonly ILogger logger;
-		
-		public NewSubmissionHandler(AntiPlagiarismDb db, ILogger logger,
+		private readonly ILogger logger = Log.Logger;
+
+		public NewSubmissionHandler(
 			ISubmissionsRepo submissionsRepo, ISnippetsRepo snippetsRepo, ITasksRepo tasksRepo, IWorkQueueRepo workQueueRepo,
 			SubmissionSnippetsExtractor submissionSnippetsExtractor,
 			IServiceScopeFactory serviceScopeFactory,
-			IOptions<AntiPlagiarismConfiguration> configuration,
-			StatisticsParametersFinder statisticsParametersFinder)
+			IOptions<AntiPlagiarismConfiguration> configuration)
 		{
-			this.db = db;
-			this.logger = logger;
 			this.submissionsRepo = submissionsRepo;
 			this.snippetsRepo = snippetsRepo;
 			this.tasksRepo = tasksRepo;

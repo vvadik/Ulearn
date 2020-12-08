@@ -1,6 +1,5 @@
 using Database;
 using Database.Repos.Users;
-using Serilog;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,10 +21,10 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo;
 		private readonly IUnitsRepo unitsRepo;
 
-		public FlashcardUserStatisticsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db,
+		public FlashcardUserStatisticsController(IWebCourseManager courseManager, UlearnDb db,
 			IUsersRepo usersRepo, IGroupAccessesRepo groupAccessesRepo, IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo,
 			IUnitsRepo unitsRepo)
-			: base(logger, courseManager, db, usersRepo)
+			: base(courseManager, db, usersRepo)
 		{
 			this.groupAccessesRepo = groupAccessesRepo;
 			this.usersFlashcardsVisitsRepo = usersFlashcardsVisitsRepo;

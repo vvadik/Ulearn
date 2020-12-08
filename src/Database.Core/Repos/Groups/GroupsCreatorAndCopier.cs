@@ -13,14 +13,14 @@ namespace Database.Repos.Groups
 	public class GroupsCreatorAndCopier : IGroupsCreatorAndCopier
 	{
 		private readonly UlearnDb db;
-		private readonly ILogger logger;
+		private readonly ILogger logger = Log.Logger;
 		private readonly ICourseRoleUsersFilter courseRoleUsersFilter;
 		private readonly IManualCheckingsForOldSolutionsAdder manualCheckingsForOldSolutionsAdder;
 
-		public GroupsCreatorAndCopier(UlearnDb db, ILogger logger, ICourseRoleUsersFilter courseRoleUsersFilter, IManualCheckingsForOldSolutionsAdder manualCheckingsForOldSolutionsAdder)
+		public GroupsCreatorAndCopier(UlearnDb db, ICourseRoleUsersFilter courseRoleUsersFilter,
+			IManualCheckingsForOldSolutionsAdder manualCheckingsForOldSolutionsAdder)
 		{
 			this.db = db;
-			this.logger = logger;
 			this.courseRoleUsersFilter = courseRoleUsersFilter;
 			this.manualCheckingsForOldSolutionsAdder = manualCheckingsForOldSolutionsAdder;
 		}

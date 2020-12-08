@@ -13,17 +13,16 @@ namespace AntiPlagiarism.Web.Workers
 	{
 		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly IOptions<AntiPlagiarismConfiguration> configuration;
-		private readonly ILogger logger;
+		private readonly ILogger logger = Log.Logger;
 		
 		private readonly List<Thread> threads = new List<Thread>();
 		private readonly TimeSpan sleep = TimeSpan.FromSeconds(5);
 
-		public AddNewSubmissionWorker(ILogger logger,
+		public AddNewSubmissionWorker(
 			IOptions<AntiPlagiarismConfiguration> configuration,
 			IServiceScopeFactory serviceScopeFactory)
 		{
 			this.serviceScopeFactory = serviceScopeFactory;
-			this.logger = logger;
 			this.configuration = configuration;
 
 			RunHandleNewSubmissionWorkerThreads();

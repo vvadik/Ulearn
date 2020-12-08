@@ -35,12 +35,11 @@ namespace AntiPlagiarism.Web.Database.Repos
 	{
 		private readonly AntiPlagiarismDb db;
 		private readonly IServiceScopeFactory serviceScopeFactory;
-		private readonly ILogger logger;
+		private readonly ILogger logger = Log.Logger;
 
-		public SnippetsRepo(AntiPlagiarismDb db, IServiceScopeFactory serviceScopeFactory, ILogger logger)
+		public SnippetsRepo(AntiPlagiarismDb db, IServiceScopeFactory serviceScopeFactory)
 		{
 			this.db = db;
-			this.logger = logger;
 			this.serviceScopeFactory = serviceScopeFactory;
 		}
 
@@ -332,7 +331,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 				var clientId = task.ClientId;
 				var taskId = task.TaskId;
 				await FuncUtils.TrySeveralTimesAsync(
-					async () => await UpdateOldSnippetsStatisticsForTask(from, to, taskId, clientId, serviceScopeFactory, logger),
+					async () => await UpdateOldSnippetsStatisticsForTask(from, to, taskId, clientId, serviceScopeFactory),
 					3);
 			}
 			logger.Information($"Updated snippets statistics for {tasks.Count} tasks from {from.ToSortable()} to {to.ToSortable()}");
@@ -342,7 +341,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 		/// Операция безопасна, т.к. таблица ЫnippetsStatistics полностью основана на данных других таблиц.
 		/// Считает правильные значения, а не вычитает, так что можно запускать несколько раз.
 		private static async Task UpdateOldSnippetsStatisticsForTask(DateTime from, DateTime to, Guid taskId, int clientId,
-			IServiceScopeFactory serviceScopeFactory, ILogger logger)
+			IServiceScopeFactory serviceScopeFactory)
 		{
 			using (var scope = serviceScopeFactory.CreateScope())
 			{
@@ -364,7 +363,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 							s.TaskId == taskId && s.ClientId == clientId
 							&& snippetIdsInNonInfluencingSubmissions.Contains(s.SnippetId))
 						.ToListAsync();
-					logger.Information($"Need update {snippetIdsInNonInfluencingSubmissionsList.Count} snippets statistics for task {taskId} from {from.ToSortable()} to {to.ToSortable()}");
+					Log.Logger.Information($"Need update {snippetIdsInNonInfluencingSubmissionsList.Count} snippets statistics for task {taskId} from {from.ToSortable()} to {to.ToSortable()}");
 					if (snippetIdsInNonInfluencingSubmissionsList.Count == 0)
 						return;
 
@@ -378,7 +377,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 						var snippetsStatisticsPart = snippetsStatistics
 							.Where(ss => snippetIdsPart.Contains(ss.SnippetId))
 							.ToList();
-						await UpdateOldSnippetsStatisticsForTaskBatch(@from, to, taskId, clientId, logger, db,
+						await UpdateOldSnippetsStatisticsForTaskBatch(@from, to, taskId, clientId, db,
 							snippetIdsInNonInfluencingSubmissions.Skip(i * maxBatchSize).Take(snippetIdsPart.Count),
 							snippetsStatisticsPart,
 							$"{i * maxBatchSize + snippetIdsPart.Count}/{snippetIdsInNonInfluencingSubmissionsList.Count}");
@@ -392,7 +391,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 		}
 
 		private static async Task UpdateOldSnippetsStatisticsForTaskBatch(DateTime @from, DateTime to, Guid taskId, int clientId,
-			ILogger logger, AntiPlagiarismDb db, IQueryable<int> snippetIdsInNonInfluencingSubmissions,
+			AntiPlagiarismDb db, IQueryable<int> snippetIdsInNonInfluencingSubmissions,
 			List<SnippetStatistics> snippetsStatistics, string snippetsCountLog)
 		{
 			var snippet2AuthorsCount = (await db.SnippetsOccurences
@@ -406,12 +405,12 @@ namespace AntiPlagiarism.Web.Database.Repos
 					.Select(g => new { g.Key.SnippetId, AuthorsCount = g.Count() })
 					.ToListAsync())
 				.ToDictionary(p => p.SnippetId, p => p.AuthorsCount);
-			logger.Information($"Authors counted for {snippetsCountLog} snippets for task {taskId} from {@from.ToSortable()} to {to.ToSortable()}");
+			Log.Logger.Information($"Authors counted for {snippetsCountLog} snippets for task {taskId} from {@from.ToSortable()} to {to.ToSortable()}");
 
-			await WriteNewAuthorsCounts(@from, to, taskId, logger, db, snippetsStatistics, snippet2AuthorsCount);
+			await WriteNewAuthorsCounts(@from, to, taskId, db, snippetsStatistics, snippet2AuthorsCount);
 		}
 
-		private static async Task WriteNewAuthorsCounts(DateTime @from, DateTime to, Guid taskId, ILogger logger, AntiPlagiarismDb db,
+		private static async Task WriteNewAuthorsCounts(DateTime @from, DateTime to, Guid taskId, AntiPlagiarismDb db,
 			List<SnippetStatistics> snippetsStatistics, Dictionary<int, int> snippet2AuthorsCount)
 		{
 			foreach (var snippetStatistics in snippetsStatistics)
@@ -424,7 +423,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 			await db.SaveChangesAsync();
 			foreach (var snippetStatistics in snippetsStatistics)
 				db.Entry(snippetStatistics).State = EntityState.Unchanged;
-			logger.Information($"New authors count are written for {snippetsStatistics.Count} snippets for task {taskId} from {@from.ToSortable()} to {to.ToSortable()}");
+			Log.Logger.Information($"New authors count are written for {snippetsStatistics.Count} snippets for task {taskId} from {@from.ToSortable()} to {to.ToSortable()}");
 		}
 
 		public async Task<OldSubmissionsInfluenceBorder> GetOldSubmissionsInfluenceBorderAsync()

@@ -15,14 +15,14 @@ namespace Database.Repos.Groups
 		private readonly UlearnDb db;
 		private readonly IManualCheckingsForOldSolutionsAdder manualCheckingsForOldSolutionsAdder;
 		private readonly IGroupsRepo groupsRepo;
-		private readonly ILogger logger;
+		private readonly ILogger logger = Log.Logger;
 
-		public GroupMembersRepo(UlearnDb db, IManualCheckingsForOldSolutionsAdder manualCheckingsForOldSolutionsAdder, IGroupsRepo groupsRepo, ILogger logger)
+		public GroupMembersRepo(UlearnDb db, IManualCheckingsForOldSolutionsAdder manualCheckingsForOldSolutionsAdder,
+			IGroupsRepo groupsRepo)
 		{
 			this.db = db;
 			this.manualCheckingsForOldSolutionsAdder = manualCheckingsForOldSolutionsAdder;
 			this.groupsRepo = groupsRepo;
-			this.logger = logger;
 		}
 
 		public async Task<List<ApplicationUser>> GetGroupMembersAsUsersAsync(int groupId)

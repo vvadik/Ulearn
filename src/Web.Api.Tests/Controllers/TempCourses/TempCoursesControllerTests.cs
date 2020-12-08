@@ -17,6 +17,7 @@ using System.Threading;
 using Database;
 using Ionic.Zip;
 using Microsoft.AspNetCore.Http;
+using Serilog;
 
 namespace Web.Api.Tests.Controllers.TempCourses
 {
@@ -29,7 +30,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		private DirectoryInfo testCourseDirectory;
 		private IWebCourseManager courseManager;
 		private DirectoryInfo workingCourseDirectory;
-
+		private readonly ILogger logger = Log.Logger;
 
 		[OneTimeSetUp]
 		public void OneTimeSetUp()

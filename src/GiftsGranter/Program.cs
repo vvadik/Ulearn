@@ -8,6 +8,7 @@ using Database.DataContexts;
 using log4net;
 using log4net.Config;
 using Newtonsoft.Json.Linq;
+using Ulearn.Core.Logging;
 
 namespace GiftsGranter
 {
@@ -65,6 +66,7 @@ namespace GiftsGranter
 		private static void Main(string[] args)
 		{
 			XmlConfigurator.Configure();
+			LoggerSetup.SetupForLog4Net();
 			var settings = JObject.Parse(File.ReadAllText("appsettings.json"));
 			var staff = new StaffClient(settings["staff"]["clientAuth"].Value<string>());
 			if (args.Contains("-r"))

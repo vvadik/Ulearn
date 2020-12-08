@@ -16,14 +16,13 @@ namespace Database.Repos
 		private readonly UlearnDb db;
 		private readonly INotificationsRepo notificationsRepo;
 		private readonly IVisitsRepo visitsRepo;
-		private readonly ILogger logger;
+		private readonly ILogger logger = Log.Logger;
 
-		public FeedRepo(UlearnDb db, INotificationsRepo notificationsRepo, IVisitsRepo visitsRepo, ILogger logger)
+		public FeedRepo(UlearnDb db, INotificationsRepo notificationsRepo, IVisitsRepo visitsRepo)
 		{
 			this.db = db ?? throw new ArgumentNullException(nameof(db));
 			this.notificationsRepo = notificationsRepo ?? throw new ArgumentNullException(nameof(notificationsRepo));
 			this.visitsRepo = visitsRepo ?? throw new ArgumentNullException(nameof(visitsRepo));
-			this.logger = logger;
 		}
 
 		public async Task<DateTime?> GetFeedViewTimestampAsync(string userId, int transportId)

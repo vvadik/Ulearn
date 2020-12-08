@@ -17,12 +17,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 {
 	public class TokensExtractor
 	{
-		private readonly ILogger logger;
-
-		public TokensExtractor(ILogger logger)
-		{
-			this.logger = logger;
-		}
+		private readonly ILogger logger = Log.Logger;
 
 		private static IEnumerable<Token> FilterWhitespaceTokens(IEnumerable<Token> tokens)
 		{

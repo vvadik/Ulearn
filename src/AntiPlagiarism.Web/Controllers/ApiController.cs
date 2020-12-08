@@ -14,7 +14,6 @@ using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Serilog;
 using Ulearn.Common;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
@@ -44,11 +43,10 @@ namespace AntiPlagiarism.Web.Controllers
 			IManualSuspicionLevelsRepo manualSuspicionLevelsRepo,
 			PlagiarismDetector plagiarismDetector,
 			CodeUnitsExtractor codeUnitsExtractor,
-			ILogger logger,
 			IServiceScopeFactory serviceScopeFactory,
 			NewSubmissionHandler newSubmissionHandler,
 			IOptions<AntiPlagiarismConfiguration> configuration)
-			: base(logger, clientsRepo, db)
+			: base(clientsRepo, db)
 		{
 			this.submissionsRepo = submissionsRepo;
 			this.snippetsRepo = snippetsRepo;
@@ -268,7 +266,7 @@ namespace AntiPlagiarism.Web.Controllers
 			var maxStrongSuspicionLevel = configuration.AntiPlagiarism.StatisticsAnalyzing.MaxStrongSuspicionLevel;
 
 			var (faintSuspicion, strongSuspicion)
-				= StatisticsParametersFinder.GetSuspicionLevels(taskStatisticsParameters.Mean, taskStatisticsParameters.Deviation, faintSuspicionCoefficient, strongSuspicionCoefficient, logger);
+				= StatisticsParametersFinder.GetSuspicionLevels(taskStatisticsParameters.Mean, taskStatisticsParameters.Deviation, faintSuspicionCoefficient, strongSuspicionCoefficient);
 
 			var automaticFaintSuspicion = GetSuspicionLevelWithThreshold(faintSuspicion, minFaintSuspicionLevel, maxFaintSuspicionLevel);
 			var automaticStrongSuspicion = GetSuspicionLevelWithThreshold(strongSuspicion, minStrongSuspicionLevel, maxStrongSuspicionLevel);

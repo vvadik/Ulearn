@@ -12,16 +12,15 @@ namespace AntiPlagiarism.Web.Workers
 	{
 		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly AntiPlagiarismConfiguration configuration;
-		private readonly ILogger logger;
+		private readonly ILogger logger = Log.Logger;
 // ReSharper disable once NotAccessedField.Local
 		private readonly Timer timer;
 
-		public UpdateOldSubmissionsFromStatisticsWorker(ILogger logger,
+		public UpdateOldSubmissionsFromStatisticsWorker(
 			IOptions<AntiPlagiarismConfiguration> configuration,
 			IServiceScopeFactory serviceScopeFactory)
 		{
 			this.serviceScopeFactory = serviceScopeFactory;
-			this.logger = logger;
 			this.configuration = configuration.Value;
 			timer = CreateWorkerTimer();
 		}
