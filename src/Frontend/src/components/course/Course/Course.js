@@ -297,7 +297,7 @@ class Course extends Component {
 					{ slideInfo && slideInfo.gitEditLink && this.renderGitEditLink(slideInfo) }
 				</h1> }
 				<div className={ styles.slide }>
-					{ isNavigationVisible && <SlideHeader
+					{ isNavigationVisible && !isStudentMode && <SlideHeader
 						courseId={ courseId }
 						slideId={ currentSlideId }
 						isHiddenSlide={ slideInfo && slideInfo.hide }
