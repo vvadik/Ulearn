@@ -9,6 +9,7 @@ import { Lightbulb, Refresh, EyeOpened, DocumentLite, } from "icons";
 import { CongratsModal } from "./CongratsModal/CongratsModal.tsx";
 import { ExerciseOutput, HasOutput } from "./ExerciseOutput/ExerciseOutput.tsx";
 import { ExerciseFormHeader } from "./ExerciseFormHeader/ExerciseFormHeader.tsx";
+import ShowAfterDelay from "src/components/ShowAfterDelay/ShowAfterDelay";
 import { ThemeContext } from "ui";
 
 import PropTypes from 'prop-types';
@@ -48,7 +49,6 @@ import {
 	SubmissionIsLast,
 	SubmissionIsLastSuccess
 } from "./ExerciseUtils";
-import ShowAfterDelay from "src/components/ShowAfterDelay/ShowAfterDelay";
 
 const isControlsTextSuits = () => !isMobile() && !isTablet();
 const editThemeName = 'darcula';
@@ -72,7 +72,6 @@ class Exercise extends React.Component {
 			showAcceptedSolutions: false,
 			showAcceptedSolutionsWarning: false,
 			congratsModalData: null,
-			legacyModalChildren: null,
 
 			resizeTimeout: null,
 			showControlsText: isControlsTextSuits(),
