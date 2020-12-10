@@ -3,12 +3,12 @@ import React, { useEffect, useState } from "react";
 import styles from './showAfterDelay.less';
 
 interface Props {
-	timeoutInMs: number,
+	timeoutInMs?: number,
 	children: React.ReactNode,
 }
 
 //This component allow show kontur react modal with delay
-const ShowAfterDelay: React.FC<Props> | React.ReactNode = ({ timeoutInMs = 300, children }) => {
+const ShowAfterDelay: React.FC<Props> = ({ timeoutInMs = 300, children }) => {
 	const [timeoutPassed, callTimeout] = useState(false);
 	const wrapper: React.Ref<HTMLDivElement> = React.createRef<HTMLDivElement>();
 
