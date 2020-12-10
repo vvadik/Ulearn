@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Controlled, } from "react-codemirror2";
-import { Button, Checkbox, FLAT_THEME, Modal, Select, Tooltip, Toast, } from "ui";
+import { Button, Checkbox, FLAT_THEME, Select, Tooltip, Toast, Modal, } from "ui";
 import { Review } from "./Review/Review";
 import { darkTheme } from 'ui/internal/ThemePlayground/darkTheme';
 import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent";
@@ -48,6 +48,7 @@ import {
 	SubmissionIsLast,
 	SubmissionIsLastSuccess
 } from "./ExerciseUtils";
+import ShowAfterDelay from "src/components/ShowAfterDelay/ShowAfterDelay";
 
 const isControlsTextSuits = () => !isMobile() && !isTablet();
 const editThemeName = 'darcula';
@@ -71,6 +72,7 @@ class Exercise extends React.Component {
 			showAcceptedSolutions: false,
 			showAcceptedSolutionsWarning: false,
 			congratsModalData: null,
+			legacyModalChildren: null,
 
 			resizeTimeout: null,
 			showControlsText: isControlsTextSuits(),
@@ -703,13 +705,17 @@ class Exercise extends React.Component {
 		const { slideId, courseId, } = this.props;
 
 		return (
-			<Modal onClose={ this.closeAcceptedSolutions }>
-				<Modal.Header>{ texts.acceptedSolutions.title }</Modal.Header>
-				<Modal.Body>
-					{ texts.acceptedSolutions.content }
-					<DownloadedHtmlContent url={ constructPathToAcceptedSolutions(courseId, slideId) }/>
-				</Modal.Body>
-			</Modal>
+			<ShowAfterDelay>
+				<Modal onClose={ this.closeAcceptedSolutions }>
+					<Modal.Header>
+						{ texts.acceptedSolutions.title }
+					</Modal.Header>
+					<Modal.Body>
+						{ texts.acceptedSolutions.content }
+						<DownloadedHtmlContent url={ constructPathToAcceptedSolutions(courseId, slideId) }/>
+					</Modal.Body>
+				</Modal>
+			</ShowAfterDelay>
 		)
 	}
 
