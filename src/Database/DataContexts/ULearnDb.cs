@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Database.Migrations;
 using Database.Models;
 using EntityFramework.Functions;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Ulearn.Core.Configuration;
 
@@ -15,7 +15,7 @@ namespace Database.DataContexts
 {
 	public class ULearnDb : IdentityDbContext<ApplicationUser>
 	{
-		private readonly ILog log = LogManager.GetLogger(typeof(ULearnDb));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(ULearnDb));
 
 		public ULearnDb()
 			: this(ApplicationConfiguration.Read<DatabaseConfiguration>().Database)
@@ -26,8 +26,7 @@ namespace Database.DataContexts
 			: base(database, throwIfV1Schema: false)
 		{
 			System.Data.Entity.Database.SetInitializer(new MigrateDatabaseToLatestVersion<ULearnDb, Configuration>());
-			if (log.IsDebugEnabled)
-				Database.Log = log.Debug;
+			Database.Log = log.Debug;
 		}
 
 		protected override void OnModelCreating(DbModelBuilder modelBuilder)

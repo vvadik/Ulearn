@@ -14,11 +14,14 @@ using uLearn.Web.Microsoft.Owin.Security.VK;
 using uLearn.Web.Models;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Vostok.Logging.Abstractions;
 
 namespace uLearn.Web.Controllers
 {
 	public class LoginController : BaseUserController
 	{
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(LoginController));
+
 		public ActionResult Index(string returnUrl)
 		{
 			ViewBag.ReturnUrl = returnUrl;

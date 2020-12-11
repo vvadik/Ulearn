@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using log4net;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Vostok.Logging.Abstractions;
 using uLearn.CSharp.Validators;
 using Ulearn.Core.CSharp.Validators.IndentsValidation;
 using Ulearn.Core.CSharp.Validators.VerbInMethodNameValidation;
@@ -13,7 +13,7 @@ namespace Ulearn.Core.CSharp.Validators
 {
 	public class CSharpSolutionValidator : ISolutionValidator
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(CSharpSolutionValidator));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(CSharpSolutionValidator));
 
 		private readonly List<ICSharpSolutionValidator> validators = new List<ICSharpSolutionValidator>
 		{
@@ -77,7 +77,7 @@ namespace Ulearn.Core.CSharp.Validators
 			}
 			catch (Exception e)
 			{
-				log.Error("Can't run style validators", e);
+				log.Error(e, "Can't run style validators");
 				return new List<SolutionStyleError>();
 			}
 		}

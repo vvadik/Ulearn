@@ -4,17 +4,12 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Database;
-using Database.Extensions;
 using Database.Models;
 using Database.Repos.CourseRoles;
 using Database.Repos.Users;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Serilog;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
-using Ulearn.Core.Courses;
 using Ulearn.Web.Api.Models.Parameters.Users;
 using Ulearn.Web.Api.Models.Responses.Users;
 
@@ -27,9 +22,9 @@ namespace Ulearn.Web.Api.Controllers.Users
 		private readonly IUserSearcher userSearcher;
 		private readonly ICourseRolesRepo courseRolesRepo;
 
-		public UsersController(ILogger logger, IWebCourseManager courseManager, UlearnDb db,
+		public UsersController(IWebCourseManager courseManager, UlearnDb db,
 			IUsersRepo usersRepo, ICourseRoleUsersFilter courseRoleUsersFilter, IUserSearcher userSearcher, ICourseRolesRepo courseRolesRepo)
-			: base(logger, courseManager, db, usersRepo)
+			: base(courseManager, db, usersRepo)
 		{
 			this.userSearcher = userSearcher;
 			this.courseRolesRepo = courseRolesRepo;

@@ -6,8 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
-using log4net;
 using Microsoft.Build.Evaluation;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Blocks;
@@ -26,7 +26,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public const string BuildingTargetNetCoreFrameworkVersion = "3.1";
 		public const string BuildingToolsVersion = null;
 
-		private static readonly ILog log = LogManager.GetLogger(typeof(CsProjectExerciseBlock));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(CsProjectExerciseBlock));
 
 		public static string SolutionFilepathToUserCodeFilepath(string solutionFilepath)
 		{

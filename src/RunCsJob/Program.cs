@@ -3,24 +3,27 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
-using log4net;
-using log4net.Config;
+using Newtonsoft.Json;
 using RunCheckerJob;
+using Vostok.Logging.Abstractions;
 using Ulearn.Core;
+using Ulearn.Core.Configuration;
+using Ulearn.Core.Logging;
 using Ulearn.Core.RunCheckerJobApi;
 
 namespace RunCsJob
 {
 	public class Program : ProgramBase
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(Program));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(Program));
 		private const string serviceName = "runcsjob";
 		private readonly CsSandboxRunnerClient csSandboxRunnerClient;
 
 		public static void Main(string[] args)
 		{
-			XmlConfigurator.Configure();
-
+			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
+			var logsSubdirectory = configuration.GraphiteServiceName + (configuration.Environment == "staging" ? "-dev" : null);
+			LoggerSetup.Setup(configuration.HostLog, logsSubdirectory);
 			DirectoryInfo сompilerDirectory = null;
 			if (args.Any(x => x.StartsWith("-p:")))
 			{
@@ -63,7 +66,7 @@ namespace RunCsJob
 				NeedRun = true,
 				Code = "class C { static void Main(){ System.Console.WriteLine(\"Привет мир!\");}}"
 			});
-			log.Info(res);
+			log.Info("SelfCheck result: {Result}", JsonConvert.SerializeObject(res));
 		}
 	}
 }

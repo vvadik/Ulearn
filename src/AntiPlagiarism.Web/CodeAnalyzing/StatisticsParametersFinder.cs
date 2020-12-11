@@ -5,18 +5,17 @@ using System.Threading.Tasks;
 using Accord.Statistics.Distributions.Univariate;
 using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Extensions;
-using Serilog;
+using Vostok.Logging.Abstractions;
 
 namespace AntiPlagiarism.Web.CodeAnalyzing
 {
 	public class StatisticsParametersFinder
 	{
-		private readonly ILogger logger;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(StatisticsParametersFinder));
 		private readonly PlagiarismDetector plagiarismDetector;
 
-		public StatisticsParametersFinder(ILogger logger, PlagiarismDetector plagiarismDetector)
+		public StatisticsParametersFinder(PlagiarismDetector plagiarismDetector)
 		{
-			this.logger = logger;
 			this.plagiarismDetector = plagiarismDetector;
 		}
 
@@ -39,7 +38,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			   calculation mean and deviation. See https://yt.skbkontur.ru/issue/ULEARN-78 for details. */
 			taskStatisticsSourceData = taskStatisticsSourceData.Where(d => d.Weight < 1 - 1e-6).ToList();
 			var weights = taskStatisticsSourceData.Select(d => d.Weight).ToList();
-			logger.Information($"Пересчитываю статистические параметры задачи (TaskStatisticsParameters) по следующему набору весов: [{string.Join(", ", weights)}]");
+			log.Info($"Пересчитываю статистические параметры задачи (TaskStatisticsParameters) по следующему набору весов: [{string.Join(", ", weights)}]");
 
 			var mean = weights.Mean();
 			var deviation = weights.Deviation(mean);
@@ -52,11 +51,11 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 
 		private Task<double> GetLinkWeightAsync(Submission first, Submission second, int index, int totalCount)
 		{
-			logger.Information($"Вычисляю коэффициент похожести решения #{first.Id} и #{second.Id} ({index} из {totalCount})");
+			log.Info($"Вычисляю коэффициент похожести решения #{first.Id} и #{second.Id} ({index} из {totalCount})");
 			return plagiarismDetector.GetWeightAsync(first, second);
 		}
 
-		public static (double faintSuspicion, double strongSuspicion) GetSuspicionLevels(double mean, double sigma, double faintSuspicionCoefficient, double strongSuspicionCoefficient, ILogger logger = null)
+		public static (double faintSuspicion, double strongSuspicion) GetSuspicionLevels(double mean, double sigma, double faintSuspicionCoefficient, double strongSuspicionCoefficient)
 		{
 			if (Math.Abs(sigma) < 1e-7)
 				return (1, 1);

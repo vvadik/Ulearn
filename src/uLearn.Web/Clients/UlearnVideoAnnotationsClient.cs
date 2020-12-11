@@ -1,6 +1,3 @@
-using System;
-using System.Web.Configuration;
-using Serilog;
 using Ulearn.Core.Configuration;
 using Ulearn.VideoAnnotations.Api.Client;
 
@@ -15,7 +12,6 @@ namespace uLearn.Web.Clients
 			string.IsNullOrEmpty(configuration?.Endpoint)
 				? null
 				: new VideoAnnotationsClient(
-					new LoggerConfiguration().WriteTo.Log4Net().CreateLogger(),
 					configuration.Endpoint
 				);
 	}

@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
-using log4net;
-using log4net.Config;
+using Vostok.Logging.Abstractions;
 using NUnit.Framework;
 using Ulearn.Common.Extensions;
 
@@ -13,13 +12,11 @@ namespace Stepik.Api.Tests
 		private const int correctAccessTokenLength = 30;
 		private const string myFullName = "Андрей Гейн";
 
-		private static readonly ILog log = LogManager.GetLogger(typeof(AuthenticationAndAuthorizationTests));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(AuthenticationAndAuthorizationTests));
 
 		[SetUp]
 		public async Task SetUp()
 		{
-			BasicConfigurator.Configure();
-
 			await InitializeClient();
 		}
 

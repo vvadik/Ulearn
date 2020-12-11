@@ -4,7 +4,7 @@ using AntiPlagiarism.Web.Configuration;
 using AntiPlagiarism.Web.Database.Repos;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Serilog;
+using Vostok.Logging.Abstractions;
 
 namespace AntiPlagiarism.Web.Workers
 {
@@ -12,16 +12,15 @@ namespace AntiPlagiarism.Web.Workers
 	{
 		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly AntiPlagiarismConfiguration configuration;
-		private readonly ILogger logger;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(UpdateOldSubmissionsFromStatisticsWorker));
 // ReSharper disable once NotAccessedField.Local
 		private readonly Timer timer;
 
-		public UpdateOldSubmissionsFromStatisticsWorker(ILogger logger,
+		public UpdateOldSubmissionsFromStatisticsWorker(
 			IOptions<AntiPlagiarismConfiguration> configuration,
 			IServiceScopeFactory serviceScopeFactory)
 		{
 			this.serviceScopeFactory = serviceScopeFactory;
-			this.logger = logger;
 			this.configuration = configuration.Value;
 			timer = CreateWorkerTimer();
 		}
@@ -56,7 +55,7 @@ namespace AntiPlagiarism.Web.Workers
 				}
 				catch (Exception ex)
 				{
-					logger.Error(ex, "Exception during UpdateOldSubmissionsFromStatistics");
+					log.Error(ex, "Exception during UpdateOldSubmissionsFromStatistics");
 				}
 			}
 		}

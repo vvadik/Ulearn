@@ -5,7 +5,7 @@ using Database.Repos.CourseRoles;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Serilog;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common.Extensions;
 
 namespace Ulearn.Web.Api.Authorization
@@ -25,9 +25,9 @@ namespace Ulearn.Web.Api.Authorization
 		private readonly ICoursesRepo coursesRepo;
 		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IUsersRepo usersRepo;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(CourseAccessAuthorizationHandler));
 
-		public CourseAccessAuthorizationHandler(ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo, IUsersRepo usersRepo, ILogger logger)
-			: base(logger)
+		public CourseAccessAuthorizationHandler(ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo, IUsersRepo usersRepo)
 		{
 			this.coursesRepo = coursesRepo;
 			this.courseRolesRepo = courseRolesRepo;
@@ -39,7 +39,7 @@ namespace Ulearn.Web.Api.Authorization
 			/* Get MVC context. See https://docs.microsoft.com/en-US/aspnet/core/security/authorization/policies#accessing-mvc-request-context-in-handlers */
 			if (!(context.Resource is AuthorizationFilterContext mvcContext))
 			{
-				logger.Error("Can't get MVC context in CourseRoleAuthenticationHandler");
+				log.Error("Can't get MVC context in CourseRoleAuthenticationHandler");
 				context.Fail();
 				return;
 			}

@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Database.DataContexts;
 using Database.Models;
-using log4net;
+using Vostok.Logging.Abstractions;
 using LtiLibrary.Owin.Security.Lti.Provider;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
@@ -16,8 +16,6 @@ namespace uLearn.Web.LTI
 {
 	public static class SecurityHandler
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(SecurityHandler));
-
 		/// <summary>
 		/// Invoked after the LTI request has been authenticated so the application can sign in the application user.
 		/// </summary>
@@ -26,6 +24,7 @@ namespace uLearn.Web.LTI
 		/// <returns>A <see cref="Task"/> representing the completed operation.</returns>
 		public static async Task OnAuthenticated(LtiAuthenticatedContext context, IEnumerable<Claim> claims = null)
 		{
+			var log = LogProvider.Get().ForContext(typeof(SecurityHandler));
 			log.Info($"LTI обрабатывает запрос на {context.Request.Uri}");
 
 			ClaimsIdentity identity = null;
@@ -52,6 +51,7 @@ namespace uLearn.Web.LTI
 
 		private static async Task<ClaimsIdentity> GetIdentityForLtiLogin(LtiAuthenticatedContext context, ULearnDb db, UserLoginInfo ltiLogin)
 		{
+			var log = LogProvider.Get().ForContext(typeof(SecurityHandler));
 			var userManager = new ULearnUserManager(db);
 			using (var transaction = db.Database.BeginTransaction(IsolationLevel.Serializable))
 			{

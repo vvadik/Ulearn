@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
-using Castle.Core.Logging;
 using Database.Models;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
@@ -18,13 +17,11 @@ namespace Database.Repos
 	{
 		private readonly UlearnDb db;
 		private readonly UlearnUserManager userManager;
-		private readonly ILogger logger;
 
-		public GradersRepo(UlearnDb db, ILogger logger, UlearnUserManager userManager)
+		public GradersRepo(UlearnDb db, UlearnUserManager userManager)
 		{
 			this.db = db;
 			this.userManager = userManager;
-			this.logger = logger;
 		}
 
 		[CanBeNull]

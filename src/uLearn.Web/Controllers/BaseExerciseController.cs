@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Database;
 using Database.DataContexts;
 using Database.Models;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
@@ -23,7 +23,7 @@ namespace uLearn.Web.Controllers
 {
 	public class BaseExerciseController : JsonDataContractController
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(BaseExerciseController));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(BaseExerciseController));
 		private readonly ErrorsBot errorsBot = new ErrorsBot();
 
 		protected readonly ULearnDb db;

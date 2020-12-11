@@ -50,16 +50,7 @@
 		</Content>
 	</ItemGroup>
 	<ItemGroup>
-	  <PackageReference Include="log4net" Version="2.0.8" />
 	  <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
 	  <PackageReference Include="OctoPack" Version="3.6.4" />
 	</ItemGroup>
-	<ItemGroup>
-	  <None Update="App.Kontur.config">
-	    <DependentUpon>App.config</DependentUpon>
-	  </None>
-	</ItemGroup>
-	<Target Name="CopyFiles" BeforeTargets="AfterBuild;OctoPack">
-		<Exec Command="copy &quot;$(ProjectDir)App.Kontur.config&quot; &quot;$(TargetPath).Kontur.config&quot;" />
-	</Target>
 </Project>

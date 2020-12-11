@@ -6,21 +6,21 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
 using Database.Models;
+using Microsoft.EntityFrameworkCore;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.RunCheckerJobApi;
-using Microsoft.EntityFrameworkCore;
-using Serilog;
 
 namespace Database.Repos
 {
 	public class UserSolutionsRepo : IUserSolutionsRepo
 	{
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(UserSolutionsRepo));
 		private readonly UlearnDb db;
-		private readonly ILogger logger;
 		private readonly ITextsRepo textsRepo;
 		private readonly IWorkQueueRepo workQueueRepo;
 		private readonly IWebCourseManager courseManager;
@@ -30,12 +30,11 @@ namespace Database.Repos
 		private static volatile ConcurrentDictionary<int, DateTime> handledSubmissions = new ConcurrentDictionary<int, DateTime>();
 		private static readonly TimeSpan handleTimeout = TimeSpan.FromMinutes(3);
 
-		public UserSolutionsRepo(UlearnDb db, ILogger logger,
+		public UserSolutionsRepo(UlearnDb db,
 			ITextsRepo textsRepo, IWorkQueueRepo workQueueRepo,
 			IWebCourseManager courseManager)
 		{
 			this.db = db;
-			this.logger = logger;
 			this.textsRepo = textsRepo;
 			this.workQueueRepo = workQueueRepo;
 			this.courseManager = courseManager;
@@ -349,7 +348,7 @@ namespace Database.Repos
 			}
 			catch (Exception e)
 			{
-				logger.Error("GetUnhandledSubmission() error", e);
+				log.Error("GetUnhandledSubmission() error", e);
 				return null;
 			}
 		}
@@ -383,9 +382,9 @@ namespace Database.Repos
 						: AutomaticExerciseCheckingStatus.Error;
 					await db.SaveChangesAsync();
 					if (submission.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Error)
-						logger.Error($"Не получил ответ от чеккера по проверке {submission.Id} за {minutes} минут");
+						log.Error($"Не получил ответ от чеккера по проверке {submission.Id} за {minutes} минут");
 					if (!handledSubmissions.TryAdd(submission.Id, DateTime.Now))
-						logger.Warning($"Не удалось запомнить, что {submission.Id} не удалось проверить, и этот результат сохранен в базу");
+						log.Warn($"Не удалось запомнить, что {submission.Id} не удалось проверить, и этот результат сохранен в базу");
 					submission = null;
 				}
 			}
@@ -434,7 +433,7 @@ namespace Database.Repos
 
 		public async Task SaveResult(RunningResults result, Func<UserExerciseSubmission, Task> onSave)
 		{
-			logger.Information($"Сохраняю информацию о проверке решения {result.Id}"); 
+			log.Info($"Сохраняю информацию о проверке решения {result.Id}"); 
 
 			await workQueueRepo.RemoveByItemId(queueId, result.Id);
 
@@ -443,7 +442,7 @@ namespace Database.Repos
 				var submission = await FindSubmissionById(result.Id);
 				if (submission == null)
 				{
-					logger.Warning($"Не нашёл в базе данных решение {result.Id}");
+					log.Warn($"Не нашёл в базе данных решение {result.Id}");
 					return;
 				}
 
@@ -456,15 +455,15 @@ namespace Database.Repos
 				db.ChangeTracker.AcceptAllChanges();
 
 				if (!handledSubmissions.TryAdd(submission.Id, DateTime.Now))
-					logger.Warning($"Не удалось запомнить, что проверка {submission.Id} проверена, а результат сохранен в базу");
+					log.Warn($"Не удалось запомнить, что проверка {submission.Id} проверена, а результат сохранен в базу");
 
-				logger.Information($"Есть информация о следующих проверках, которые ещё не записаны в базу клиентом: [{string.Join(", ", handledSubmissions.Keys)}]");
+				log.Info($"Есть информация о следующих проверках, которые ещё не записаны в базу клиентом: [{string.Join(", ", handledSubmissions.Keys)}]");
 			}
 		}
 
 		private async Task SaveAutomaticExerciseChecking(AutomaticExerciseChecking checking)
 		{
-			logger.Information($"Обновляю статус автоматической проверки #{checking.Id}: {checking.Status}");
+			log.Info($"Обновляю статус автоматической проверки #{checking.Id}: {checking.Status}");
 			db.AddOrUpdate(checking, c => c.Id == checking.Id);
 			await UpdateIsRightAnswerForSubmission(checking);
 			await db.SaveChangesAsync();
@@ -545,13 +544,13 @@ namespace Database.Repos
 
 		public async Task RunAutomaticChecking(UserExerciseSubmission submission, TimeSpan timeout, bool waitUntilChecked, int priority)
 		{
-			logger.Information($"Запускаю автоматическую проверку решения. ID посылки: {submission.Id}");
+			log.Info($"Запускаю автоматическую проверку решения. ID посылки: {submission.Id}");
 			unhandledSubmissions.TryAdd(submission.Id, DateTime.Now);
 			await workQueueRepo.Add(queueId, submission.Id.ToString(), submission.Sandbox ?? "csharp", priority);
 
 			if (!waitUntilChecked)
 			{
-				logger.Information($"Не буду ожидать результатов проверки посылки {submission.Id}");
+				log.Info($"Не буду ожидать результатов проверки посылки {submission.Id}");
 				return;
 			}
 
@@ -565,12 +564,12 @@ namespace Database.Repos
 
 				if (submissionAutomaticCheckingStatus == AutomaticExerciseCheckingStatus.Done)
 				{
-					logger.Information($"Посылка {submission.Id} проверена");
+					log.Info($"Посылка {submission.Id} проверена");
 					return;
 				}
 				if (submissionAutomaticCheckingStatus == AutomaticExerciseCheckingStatus.Error)
 				{
-					logger.Warning($"Во время проверки посылки {submission.Id} произошла ошибка");
+					log.Warn($"Во время проверки посылки {submission.Id} произошла ошибка");
 					return;
 				}
 			}
@@ -599,7 +598,7 @@ namespace Database.Repos
 			{
 				if (unhandledSubmissions.Count > 0)
 				{
-					logger.Information($"Список невзятых пока на проверку решений: [{string.Join(", ", unhandledSubmissions.Keys)}]");
+					log.Info($"Список невзятых пока на проверку решений: [{string.Join(", ", unhandledSubmissions.Keys)}]");
 					ClearHandleDictionaries();
 					return;
 				}
@@ -610,7 +609,7 @@ namespace Database.Repos
 
 		public async Task WaitUntilSubmissionHandled(TimeSpan timeout, int submissionId)
 		{
-			logger.Information($"Вхожу в цикл ожидания результатов проверки решения {submissionId}. Жду {timeout.TotalSeconds} секунд");
+			log.Info($"Вхожу в цикл ожидания результатов проверки решения {submissionId}. Жду {timeout.TotalSeconds} секунд");
 			var sw = Stopwatch.StartNew();
 			while (sw.Elapsed < timeout)
 			{

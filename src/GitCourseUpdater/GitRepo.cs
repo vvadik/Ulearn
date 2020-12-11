@@ -11,7 +11,7 @@ using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
 using LibGit2Sharp.Ssh;
 using Newtonsoft.Json;
-using Serilog;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 
@@ -43,17 +43,16 @@ namespace GitCourseUpdater
 		private DirectoryInfo reposBaseDir;
 		private string repoDirName;
 		private Repository repo;
-		private ILogger logger;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(GitRepo));
 		private string privateKeyPath;
 		private string publicKeyPath;
 		private static object @lock = new object(); // Потокобезопасность не гарантируется библиотекой libgit2
 
 		// url example git@github.com:user/myrepo.git
-		public GitRepo(string url, DirectoryInfo reposBaseDir, string publicKey, string privateKey, DirectoryInfo keysTempDirectory, ILogger logger)
+		public GitRepo(string url, DirectoryInfo reposBaseDir, string publicKey, string privateKey, DirectoryInfo keysTempDirectory)
 		{
 			this.url = url;
 			this.reposBaseDir = reposBaseDir;
-			this.logger = logger;
 			if (!reposBaseDir.Exists)
 				reposBaseDir.Create();
 
@@ -93,12 +92,12 @@ namespace GitCourseUpdater
 
 		public MemoryStream GetCurrentStateAsZip(string courseSubdirectoryInRepo = null)
 		{
-			logger.Information($"Start load '{repoDirName}' to zip");
+			log.Info($"Start load '{repoDirName}' to zip");
 			var dir = reposBaseDir.GetSubdirectory(repoDirName).FullName;
 			dir = courseSubdirectoryInRepo == null ? dir : Path.Combine(dir, courseSubdirectoryInRepo);
 			var zip = ZipHelper.CreateFromDirectory(dir, CompressionLevel.Optimal, false, Encoding.UTF8,
 				s => !s.StartsWith(".git"));
-			logger.Information($"Successfully load '{repoDirName}' to zip");
+			log.Info($"Successfully load '{repoDirName}' to zip");
 			return zip;
 		}
 
@@ -106,7 +105,7 @@ namespace GitCourseUpdater
 		{
 			var lastCommit = repo.Commits.First();
 			var commitInfo = ToCommitInfo(lastCommit);
-			logger.Information($"GetCurrentCommitInfo '{repoDirName}': {JsonConvert.SerializeObject(commitInfo)}");
+			log.Info($"GetCurrentCommitInfo '{repoDirName}': {JsonConvert.SerializeObject(commitInfo)}");
 			return commitInfo;
 		}
 
@@ -116,7 +115,7 @@ namespace GitCourseUpdater
 			var commit = repo.Lookup<Commit>(hash);
 			if (commit == null)
 			{
-				logger.Warning($"Commit not found repo '{repoDirName}' hash '{hash}'");
+				log.Warn($"Commit not found repo '{repoDirName}' hash '{hash}'");
 				return null;
 			}
 
@@ -134,9 +133,9 @@ namespace GitCourseUpdater
 				return null;
 			var treeChanges = repo.Diff.Compare<TreeChanges>(commitFrom.Tree, commitTo.Tree);
 			var paths = treeChanges.Select(c => c.Path).ToList();
-			logger.Information($"All changed files in repo '{url}' between '{commitFrom}' '{commitTo}' courseSubdirectory '{courseSubdirectoryInRepo}':");
+			log.Info($"All changed files in repo '{url}' between '{commitFrom}' '{commitTo}' courseSubdirectory '{courseSubdirectoryInRepo}':");
 			foreach (var path in paths)
-				logger.Information($"Path: '{path}'");
+				log.Info($"Path: '{path}'");
 			if (courseSubdirectoryInRepo != null)
 			{
 				var normalisedCourseSubdirectoryInRepo = NormalizePath(courseSubdirectoryInRepo);
@@ -162,9 +161,9 @@ namespace GitCourseUpdater
 
 		private void CheckoutCommit(string hash)
 		{
-			logger.Information($"Start checkout '{url}' commit '{hash}' in '{repoDirName}'");
+			log.Info($"Start checkout '{url}' commit '{hash}' in '{repoDirName}'");
 			Commands.Checkout(repo, hash);
-			logger.Information($"Successfully checkout '{url}' commit '{hash}' in '{repoDirName}'");
+			log.Info($"Successfully checkout '{url}' commit '{hash}' in '{repoDirName}'");
 		}
 
 		private void CheckoutBranchAndResetToOrigin(string name)
@@ -183,11 +182,11 @@ namespace GitCourseUpdater
 				});
 			}
 
-			logger.Information($"Start checkout '{url}' branch '{name}' in '{repoDirName}'");
+			log.Info($"Start checkout '{url}' branch '{name}' in '{repoDirName}'");
 			Commands.Checkout(repo, name);
-			logger.Information($"Successfully checkout '{url}' branch '{name}' in '{repoDirName}'");
+			log.Info($"Successfully checkout '{url}' branch '{name}' in '{repoDirName}'");
 			repo.Reset(ResetMode.Hard, remoteBranch.Tip);
-			logger.Information($"Successfully reset '{url}' branch '{name}' in '{repoDirName}' to commit '{repo.Branches[name].Tip.Sha}'");
+			log.Info($"Successfully reset '{url}' branch '{name}' in '{repoDirName}' to commit '{repo.Branches[name].Tip.Sha}'");
 		}
 
 		private static CommitInfo ToCommitInfo(Commit commit)
@@ -219,7 +218,7 @@ namespace GitCourseUpdater
 			}
 			catch (Exception ex)
 			{
-				logger.Warning(ex, $"Could not update existing repository '{repoDirName}'");
+				log.Warn(ex, $"Could not update existing repository '{repoDirName}'");
 				return false;
 			}
 
@@ -239,10 +238,10 @@ namespace GitCourseUpdater
 		{
 			repoDirName = Url2Name() + "@" + DateTime.Now.ToSortable();
 			var repoPath = reposBaseDir.GetSubdirectory(repoDirName);
-			logger.Information($"Start clone '{url}' into '{repoDirName}'");
+			log.Info($"Start clone '{url}' into '{repoDirName}'");
 			Repository.Clone(url, repoPath.FullName, new CloneOptions { CredentialsProvider = credentialsHandler });
 			repo = new Repository(repoPath.FullName);
-			logger.Information($"Successfully clone '{url}' into '{repoDirName}'");
+			log.Info($"Successfully clone '{url}' into '{repoDirName}'");
 		}
 
 		private string Url2Name()
@@ -262,14 +261,14 @@ namespace GitCourseUpdater
 		{
 			var logMessage = "";
 			var options = new FetchOptions { CredentialsProvider = credentialsHandler };
-			logger.Information($"Start fetch all '{url}' in '{repoDirName}'");
+			log.Info($"Start fetch all '{url}' in '{repoDirName}'");
 			foreach (var remote in repo.Network.Remotes)
 			{
 				var refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
 				Commands.Fetch(repo, remote.Name, refSpecs, options, logMessage);
 			}
 
-			logger.Information($"Successfully fetch all '{url}' in '{repoDirName}'");
+			log.Info($"Successfully fetch all '{url}' in '{repoDirName}'");
 		}
 
 		private bool HasUncommittedChanges()

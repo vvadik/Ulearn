@@ -7,13 +7,12 @@ using System.Threading.Tasks;
 using Database.Extensions;
 using Database.Models;
 using JetBrains.Annotations;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Microsoft.AspNet.Identity;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
-using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Extensions;
@@ -22,7 +21,7 @@ namespace Database.DataContexts
 {
 	public class GroupsRepo
 	{
-		private readonly ILog log = LogManager.GetLogger(typeof(GroupsRepo));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(GroupsRepo));
 
 		private readonly ULearnDb db;
 		private readonly SlideCheckingsRepo slideCheckingsRepo;

@@ -8,7 +8,6 @@ using System.Web.Mvc;
 using Database;
 using Database.DataContexts;
 using Database.Models;
-using log4net;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.FilterAttributes;
 using Ulearn.Core;
@@ -18,8 +17,6 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize]
 	public class FeedController : JsonDataContractController
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(FeedController));
-
 		private readonly ULearnDb db;
 		private readonly CourseManager courseManager;
 

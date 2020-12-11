@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Web.Hosting;
 using Elmah;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Telegram;
@@ -13,7 +13,7 @@ namespace uLearn.Web
 	{
 		private readonly ErrorsBot errorsBot;
 
-		private static readonly ILog log = LogManager.GetLogger(typeof(ErrorLogModule));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(ErrorLogModule));
 
 		private static readonly List<string> ignorableForTelegramChannelSubstrings = new List<string>
 		{
@@ -41,9 +41,9 @@ namespace uLearn.Web
 		{
 			var error = args.Entry.Error;
 			var entryId = args.Entry.Id;
-			log.Error($"Произошла ошибка {entryId} (код {error.StatusCode}, подробности в Elmah):\n" +
-					$"Query string: {error.QueryString.ToQueryString()}",
-				error.Exception);
+			log.Error(error.Exception, $"Произошла ошибка {entryId} (код {error.StatusCode}, подробности в Elmah):\n" +
+					$"Query string: {error.QueryString.ToQueryString()}"
+				);
 
 			if (!IsErrorIgnoredForTelegramChannel(error))
 			{

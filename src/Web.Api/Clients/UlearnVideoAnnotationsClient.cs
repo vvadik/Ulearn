@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
-using Serilog;
 using Ulearn.Common.Api;
 using Ulearn.VideoAnnotations.Api.Client;
 using Ulearn.VideoAnnotations.Api.Models.Parameters.Annotations;
@@ -17,17 +16,15 @@ namespace Ulearn.Web.Api.Clients
 
 	public class UlearnVideoAnnotationsClient : IUlearnVideoAnnotationsClient
 	{
-		private readonly ILogger logger;
 		[CanBeNull]
 		private readonly VideoAnnotationsClient instance;
 
-		public UlearnVideoAnnotationsClient(ILogger logger, IOptions<WebApiConfiguration> options)
+		public UlearnVideoAnnotationsClient(IOptions<WebApiConfiguration> options)
 		{
 			var videoAnnotationsClientConfiguration = options.Value.VideoAnnotationsClient;
 			instance = string.IsNullOrEmpty(videoAnnotationsClientConfiguration?.Endpoint)
 				? null
 				: new VideoAnnotationsClient(
-					logger,
 					videoAnnotationsClientConfiguration.Endpoint
 				);
 		}

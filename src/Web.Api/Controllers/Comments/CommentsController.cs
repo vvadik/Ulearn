@@ -13,12 +13,10 @@ using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 using Swashbuckle.AspNetCore.Annotations;
 using Ulearn.Common;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
-using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Web.Api.Authorization;
 using Ulearn.Web.Api.Models.Parameters.Comments;
@@ -31,11 +29,11 @@ namespace Ulearn.Web.Api.Controllers.Comments
 	{
 		private readonly ICommentPoliciesRepo commentPoliciesRepo;
 
-		public CommentsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db,
+		public CommentsController(IWebCourseManager courseManager, UlearnDb db,
 			ICommentsRepo commentsRepo, ICommentLikesRepo commentLikesRepo, ICommentPoliciesRepo commentPoliciesRepo,
 			IUsersRepo usersRepo, ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo, INotificationsRepo notificationsRepo,
 			IGroupMembersRepo groupMembersRepo, IGroupAccessesRepo groupAccessesRepo)
-			: base(logger, courseManager, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo, notificationsRepo, groupMembersRepo, groupAccessesRepo)
+			: base(courseManager, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo, notificationsRepo, groupMembersRepo, groupAccessesRepo)
 		{
 			this.commentPoliciesRepo = commentPoliciesRepo;
 		}

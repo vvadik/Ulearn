@@ -1,14 +1,10 @@
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Filters;
 using Ulearn.Common.Api;
 using Ulearn.Core.Configuration;
 using Ulearn.VideoAnnotations.Web.Annotations;
 using Ulearn.VideoAnnotations.Web.Configuration;
-using Vostok.Configuration.Extensions;
-using Vostok.Hosting;
 using Vostok.Hosting.Abstractions;
-using ILogger = Serilog.ILogger;
 
 namespace Ulearn.VideoAnnotations.Web
 {
@@ -21,18 +17,18 @@ namespace Ulearn.VideoAnnotations.Web
 			configuration = ApplicationConfiguration.Read<VideoAnnotationsConfiguration>();
 		}
 
-		protected override void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment, ILogger logger)
+		protected override void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment)
 		{
-			base.ConfigureServices(services, hostingEnvironment, logger);
+			base.ConfigureServices(services, hostingEnvironment);
 
 			services.Configure<VideoAnnotationsConfiguration>(options => options.SetFrom(hostingEnvironment.SecretConfigurationProvider.Get<VideoAnnotationsConfiguration>(hostingEnvironment.SecretConfigurationSource)));
 
 			services.AddSwaggerExamplesFromAssemblyOf<WebApplication>();
 		}
 
-		public override void ConfigureDi(IServiceCollection services, ILogger logger)
+		public override void ConfigureDi(IServiceCollection services)
 		{
-			base.ConfigureDi(services, logger);
+			base.ConfigureDi(services);
 
 			services.AddSingleton<IAnnotationsParser, AnnotationsParser>();
 			services.AddSingleton<IGoogleDocApiClient, GoogleDocApiClient>();

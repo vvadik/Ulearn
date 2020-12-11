@@ -5,14 +5,14 @@ using System.Net.Http.Headers;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 
 namespace Stepik.Api
 {
 	public class YoutubeVideoUrlExtractor
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(YoutubeVideoUrlExtractor));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(YoutubeVideoUrlExtractor));
 		private readonly HttpClient httpClient;
 		private const string youtubeBaseUrl = "https://youtube.com";
 

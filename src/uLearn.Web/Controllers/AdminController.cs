@@ -1,4 +1,4 @@
-using log4net;
+using Vostok.Logging.Abstractions;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
@@ -19,7 +19,6 @@ using Database.Extensions;
 using Database.Models;
 using GitCourseUpdater;
 using Microsoft.VisualBasic.FileIO;
-using Serilog;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
@@ -38,7 +37,7 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 	public class AdminController : Controller
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(AdminController));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(AdminController));
 
 		private readonly WebCourseManager courseManager = WebCourseManager.Instance;
 		private readonly ULearnDb db;
@@ -59,7 +58,6 @@ namespace uLearn.Web.Controllers
 		private readonly string gitSecret;
 		private readonly DirectoryInfo reposDirectory;
 		private readonly IAntiPlagiarismClient antiPlagiarismClient;
-		private readonly ILogger serilogLogger;
 		private readonly TempCoursesRepo tempCoursesRepo;
 
 		public AdminController()
@@ -82,11 +80,10 @@ namespace uLearn.Web.Controllers
 			certificateGenerator = new CertificateGenerator(db, courseManager);
 			tempCoursesRepo = new TempCoursesRepo(db);
 			reposDirectory = CourseManager.GetCoursesDirectory().GetSubdirectory("Repos");
-			serilogLogger = new LoggerConfiguration().WriteTo.Log4Net().CreateLogger();
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 			gitSecret = configuration.Git.Webhook.Secret;
 			var antiplagiarismClientConfiguration = ApplicationConfiguration.Read<UlearnConfiguration>().AntiplagiarismClient;
-			antiPlagiarismClient = new AntiPlagiarismClient(antiplagiarismClientConfiguration.Endpoint, antiplagiarismClientConfiguration.Token, serilogLogger);
+			antiPlagiarismClient = new AntiPlagiarismClient(antiplagiarismClientConfiguration.Endpoint, antiplagiarismClientConfiguration.Token);
 		}
 
 		public ActionResult Courses(string courseId = null, string courseTitle = null)
@@ -304,7 +301,7 @@ namespace uLearn.Web.Controllers
 			var publicKey = courses[0].PublicKey; // у всех курсов одинаковый repoUrl и ключ
 			var privateKey = courses[0].PrivateKey;
 			var infoForUpload = new List<(string, byte[], CommitInfo, string)>();
-			using (IGitRepo git = new GitRepo(repoUrl, reposDirectory, publicKey, privateKey, new DirectoryInfo(Path.GetTempPath()), serilogLogger))
+			using (IGitRepo git = new GitRepo(repoUrl, reposDirectory, publicKey, privateKey, new DirectoryInfo(Path.GetTempPath())))
 			{
 				git.Checkout(branch);
 				var commitInfo = git.GetCurrentCommitInfo();
@@ -360,7 +357,7 @@ namespace uLearn.Web.Controllers
 			Exception error = null;
 			try
 			{
-				using (IGitRepo git = new GitRepo(courseRepo.RepoUrl, reposDirectory, publicKey, privateKey, new DirectoryInfo(Path.GetTempPath()), serilogLogger))
+				using (IGitRepo git = new GitRepo(courseRepo.RepoUrl, reposDirectory, publicKey, privateKey, new DirectoryInfo(Path.GetTempPath())))
 				{
 					git.Checkout(courseRepo.Branch);
 					zip = git.GetCurrentStateAsZip(courseRepo.PathToCourseXml).ToArray();

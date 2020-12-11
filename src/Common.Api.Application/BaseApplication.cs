@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
-using Serilog.Events;
 using Ulearn.Core.Configuration;
 using Vostok.Hosting.Abstractions;
-using Vostok.Logging.Serilog;
 
 namespace Ulearn.Common.Api
 {
 	public abstract class BaseApplication : IVostokApplication
 	{
-		protected static ILogger logger;
 		protected static UlearnConfiguration configuration;
 		protected IServiceProvider serviceProvider;
 

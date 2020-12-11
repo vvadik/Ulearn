@@ -6,17 +6,15 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 using Ulearn.Core;
 using Ulearn.Core.RunCheckerJobApi;
 
 namespace RunCheckerJob
 {
-	internal class DockerProcessRunner
+	internal static class DockerProcessRunner
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(DockerProcessRunner));
-
 		static DockerProcessRunner()
 		{
 			/* We should register encoding provider for Encoding.GetEncoding(1251) works */
@@ -25,6 +23,7 @@ namespace RunCheckerJob
 
 		public static RunningResults Run(CommandRunnerSubmission submission, DockerSandboxRunnerSettings settings, string submissionDirectory)
 		{
+			var log = LogProvider.Get().ForContext(typeof(DockerProcessRunner));
 			log.Info($"Запускаю проверку решения {submission.Id}");
 			var dir = new DirectoryInfo(submissionDirectory);
 
@@ -34,7 +33,7 @@ namespace RunCheckerJob
 			}
 			catch (Exception ex)
 			{
-				log.Error("Не могу распаковать решение", ex);
+				log.Error(ex, "Не могу распаковать решение");
 				return new RunningResults(submission.Id, Verdict.SandboxError, error: ex.ToString());
 			}
 
@@ -45,6 +44,7 @@ namespace RunCheckerJob
 
 		private static RunningResults RunDocker(DockerSandboxRunnerSettings settings, DirectoryInfo dir)
 		{
+			var log = LogProvider.Get().ForContext(typeof(DockerProcessRunner));
 			var name = Guid.NewGuid();
 			var dockerCommand = BuildDockerCommand(settings, dir, name);
 			log.Info($"Start process command: docker {dockerCommand}");
@@ -95,6 +95,7 @@ namespace RunCheckerJob
 
 		private static void GracefullyShutdownDocker(Process dockerShellProcess, Guid name, SandboxRunnerSettings settings)
 		{
+			var log = LogProvider.Get().ForContext(typeof(DockerProcessRunner));
 			try
 			{
 				dockerShellProcess.Kill();

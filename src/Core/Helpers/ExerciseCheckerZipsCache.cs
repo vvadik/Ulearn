@@ -6,7 +6,7 @@ using System.IO;
 using System.Threading;
 using Ionic.Zip;
 using JetBrains.Annotations;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
@@ -17,8 +17,6 @@ namespace Ulearn.Core.Helpers
 {
 	public static class ExerciseCheckerZipsCache
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(ExerciseCheckerZipsCache));
-
 		private static readonly bool isDisabled;
 		private static readonly DirectoryInfo cacheDirectory;
 		private static readonly UlearnConfiguration configuration;
@@ -94,7 +92,9 @@ namespace Ulearn.Core.Helpers
 			}
 			catch (Exception ex)
 			{
-				log.Warn($"Exception in SaveFileOnDisk courseId {zipFile.FullName}", ex);
+				LogProvider.Get()
+					.ForContext(typeof(ExerciseCheckerZipsCache))
+					.Warn(ex, $"Exception in SaveFileOnDisk courseId {zipFile.FullName}");
 			}
 		}
 
@@ -130,7 +130,9 @@ namespace Ulearn.Core.Helpers
 				zip.Save(resultStream);
 			}
 			var result = resultStream.ToArray();
-			log.Info($"Добавил код студента в zip-архив с упражнением: курс {courseId}, слайд «{slide?.Title}» ({slide?.Id}) elapsed {sw.ElapsedMilliseconds} ms");
+			LogProvider.Get()
+				.ForContext(typeof(ExerciseCheckerZipsCache))
+				.Info($"Добавил код студента в zip-архив с упражнением: курс {courseId}, слайд «{slide?.Title}» ({slide?.Id}) elapsed {sw.ElapsedMilliseconds} ms");
 			return result;
 		}
 
@@ -138,12 +140,14 @@ namespace Ulearn.Core.Helpers
 		{
 			if (isDisabled)
 				return;
-			
-			log.Info($"Очищаю папку со сгенерированными zip-архивами для упражнений из курса {courseId}");
+
+			LogProvider.Get()
+				.ForContext(typeof(ExerciseCheckerZipsCache))
+				.Info($"Очищаю папку со сгенерированными zip-архивами для упражнений из курса {courseId}");
 
 			var courseDirectory = cacheDirectory.GetSubdirectory(courseId);
 			courseDirectory.EnsureExists();
-			
+
 			coursesLockedForDelete.Add(courseId);
 			try
 			{

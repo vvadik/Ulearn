@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Database.Models;
 using EntityFramework.Functions;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
@@ -24,7 +24,7 @@ namespace Database.DataContexts
 {
 	public class UserSolutionsRepo
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(UserSolutionsRepo));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(UserSolutionsRepo));
 		private readonly ULearnDb db;
 		private readonly TextsRepo textsRepo;
 		private readonly VisitsRepo visitsRepo;

@@ -10,7 +10,6 @@ using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Web.Api.Controllers.Slides;
@@ -30,10 +29,10 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly IGroupsRepo groupsRepo;
 		private readonly SlideRenderer slideRenderer;
 
-		public ExerciseStatisticsController(ILogger logger, IWebCourseManager courseManager, IUserSolutionsRepo userSolutionsRepo, UlearnDb db, IUsersRepo usersRepo,
+		public ExerciseStatisticsController(IWebCourseManager courseManager, IUserSolutionsRepo userSolutionsRepo, UlearnDb db, IUsersRepo usersRepo,
 			IUserSolutionsRepo solutionsRepo, IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo,
 			SlideRenderer slideRenderer, ICourseRolesRepo courseRolesRepo, ICoursesRepo coursesRepo)
-			: base(logger, courseManager, db, usersRepo)
+			: base(courseManager, db, usersRepo)
 		{
 			this.coursesRepo = coursesRepo;
 			this.courseRolesRepo = courseRolesRepo;

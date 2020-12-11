@@ -5,15 +5,16 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Database.DataContexts;
-using log4net;
-using log4net.Config;
+using Vostok.Logging.Abstractions;
 using Newtonsoft.Json.Linq;
+using Ulearn.Core.Configuration;
+using Ulearn.Core.Logging;
 
 namespace GiftsGranter
 {
 	internal class Program
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(Program));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(Program));
 		private readonly int maxGiftsPerRun;
 		private readonly VisitsRepo repo;
 		private readonly JObject settings;
@@ -64,16 +65,19 @@ namespace GiftsGranter
 
 		private static void Main(string[] args)
 		{
-			XmlConfigurator.Configure();
 			var settings = JObject.Parse(File.ReadAllText("appsettings.json"));
+			var hostLog = settings["hostLog"].ToObject<HostLogConfiguration>();
+			var graphiteServiceName = settings["graphiteServiceName"].Value<string>();
+			LoggerSetup.Setup(hostLog, graphiteServiceName);
+			var log = LogProvider.Get().ForContext(typeof(Program));
 			var staff = new StaffClient(settings["staff"]["clientAuth"].Value<string>());
 			if (args.Contains("-r"))
 			{
 				Console.WriteLine("Username (example: KONTUR\\pe):");
-				string username = Console.ReadLine();
+				var username = Console.ReadLine();
 				Console.WriteLine($"Password for {username}:");
-				string password = GetConsolePassword();
-				string refreshToken = staff.GetRefreshToken(username, password);
+				var password = GetConsolePassword();
+				var refreshToken = staff.GetRefreshToken(username, password);
 				Console.WriteLine($"RefreshToken: {refreshToken}");
 				return;
 			}
@@ -82,19 +86,19 @@ namespace GiftsGranter
 			try
 			{
 				staff.UseRefreshToken(settings["staff"]["refreshToken"].Value<string>());
-				int maxGiftsPerRun = args.Length > 0 ? int.Parse(args[0]) : settings["maxGiftsPerRun"].Value<int>();
+				var maxGiftsPerRun = args.Length > 0 ? int.Parse(args[0]) : settings["maxGiftsPerRun"].Value<int>();
 				log.Info("UseGiftGrantsLimitPerRun\t" + maxGiftsPerRun);
 				var db = new ULearnDb();
 				var repo = new VisitsRepo(db);
 				var courses = settings["courses"].Values<string>();
 				var program = new Program(repo, staff, maxGiftsPerRun, settings, telegramBot);
-				foreach (string courseId in courses)
+				foreach (var courseId in courses)
 					program.GrantGiftsForCourse(courseId);
 			}
 			catch (Exception e)
 			{
 				telegramBot.PostToChannel($"Error while grant staff gifts.\n\n{e}");
-				log.Error("UnhandledException", e);
+				log.Error(e, "UnhandledException");
 			}
 		}
 
@@ -123,7 +127,7 @@ namespace GiftsGranter
 
 		private void EnsureHaveGifts(List<RatingEntry> entries, CourseSettings courseSettings, string courseId)
 		{
-			int delayMs = settings["delayBetweenStaffRequests"].Value<int>();
+			var delayMs = settings["delayBetweenStaffRequests"].Value<int>();
 			var granted = 0;
 			foreach (var ratingEntry in entries)
 			{
@@ -141,12 +145,12 @@ namespace GiftsGranter
 
 		private bool GrantGiftsIfNone(RatingEntry entry, CourseSettings courseSettings, string courseId)
 		{
-			string sid = entry.User.Logins.First(login => login.LoginProvider == "Контур.Паспорт").ProviderKey;
+			var sid = entry.User.Logins.First(login => login.LoginProvider == "Контур.Паспорт").ProviderKey;
 			var staffUserId = staffClient.GetUser(sid)["id"].Value<int>();
 			var gifts = staffClient.GetUserGifts(staffUserId);
 			var giftImagePath = courseSettings.giftImagePath;
 
-			bool hasComplexityGift = gifts["gifts"].Children().Any(gift => gift["imagePath"].Value<string>() == giftImagePath);
+			var hasComplexityGift = gifts["gifts"].Children().Any(gift => gift["imagePath"].Value<string>() == giftImagePath);
 			if (!hasComplexityGift)
 			{
 				log.Info($"NoGiftYet\t{entry.Score}\t{entry.User.VisibleName}");

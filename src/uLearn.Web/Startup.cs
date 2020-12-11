@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Web.Configuration;
 using System.Web.Hosting;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Microsoft.Owin;
 using Owin;
 using Telegram.Bot;
@@ -15,7 +15,7 @@ namespace uLearn.Web
 {
 	public partial class Startup
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(Startup));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(Startup));
 
 		public void Configuration(IAppBuilder app)
 		{

@@ -1,20 +1,19 @@
 using System;
 using System.IO;
 using System.Threading;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.RunCheckerJobApi;
 
 namespace RunCheckerJob
 {
-	public class SandboxRunHelper
+	public static class SandboxRunHelper
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(SandboxRunHelper));
-
 		public static RunningResults WithSubmissionWorkingDirectory(RunnerSubmission submission, ISandboxRunnerClient runnerClient,
 			DirectoryInfo workingDirectory, bool deleteSubmissionsAfterFinish)
 		{
+			var log = LogProvider.Get().ForContext(typeof(SandboxRunHelper));
 			if (!workingDirectory.Exists)
 			{
 				try
@@ -23,7 +22,7 @@ namespace RunCheckerJob
 				}
 				catch (Exception e)
 				{
-					log.Error($"Не могу создать директорию для решений: {workingDirectory}", e);
+					log.Error(e, $"Не могу создать директорию для решений: {workingDirectory}");
 					return new RunningResults(submission.Id, Verdict.SandboxError, error: e.ToString());
 				}
 			}
@@ -37,7 +36,7 @@ namespace RunCheckerJob
 			}
 			catch (Exception e)
 			{
-				log.Error($"Не могу создать директорию для решения: {submissionWorkingDirectory.FullName}", e);
+				log.Error(e, $"Не могу создать директорию для решения: {submissionWorkingDirectory.FullName}");
 				return new RunningResults(submission.Id, Verdict.SandboxError, error: e.ToString());
 			}
 
@@ -47,7 +46,7 @@ namespace RunCheckerJob
 			}
 			catch (Exception ex)
 			{
-				log.Error(ex);
+				log.Error(ex, "RunContainerAndGetResultInternal error");
 				return new RunningResults(submission.Id, Verdict.SandboxError, error: ex.ToString());
 			}
 			finally
@@ -62,6 +61,7 @@ namespace RunCheckerJob
 
 		private static void SafeRemoveDirectory(string path)
 		{
+			var log = LogProvider.Get().ForContext(typeof(SandboxRunHelper));
 			try
 			{
 				/* Sometimes we can't remove directory after Time Limit Exceeded, because process is alive yet. Just wait some seconds before directory removing */
@@ -73,7 +73,7 @@ namespace RunCheckerJob
 			}
 			catch (Exception e)
 			{
-				log.Warn($"Произошла ошибка при удалении директории {path}, но я её проигнорирую", e);
+				log.Warn(e, $"Произошла ошибка при удалении директории {path}, но я её проигнорирую");
 			}
 		}
 	}

@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using CourseToolHotReloader.Dtos;
-using CourseToolHotReloader.Log;
 
 namespace CourseToolHotReloader.UpdateQuery
 {
