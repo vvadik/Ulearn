@@ -20,7 +20,7 @@ namespace Ulearn.Common
 				{
 					LogProvider.Get()
 						.ForContext(typeof(FuncUtils))
-						.Error($"Исключение (попытка {tryIndex + 1} из {triesCount}):", e);
+						.Warn(e, $"Исключение (попытка {tryIndex + 1} из {triesCount}):");
 					if (tryIndex >= triesCount - 1)
 						throw;
 					LogProvider.Get()

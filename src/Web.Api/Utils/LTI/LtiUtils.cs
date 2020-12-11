@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Database.Repos;
-using log4net;
+using Vostok.Logging.Abstractions;
 using LtiLibrary.Core.Outcomes.v1;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
@@ -11,12 +11,11 @@ namespace Ulearn.Web.Api.Utils.LTI
 {
 	public static class LtiUtils
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(LtiUtils));
-
 		public static async Task SubmitScore(string courseId, Slide slide, string userId, int score,
 			ILtiRequestsRepo ltiRequestsRepo,
 			ILtiConsumersRepo consumersRepo)
 		{
+			var log = LogProvider.Get().ForContext(typeof(LtiUtils));
 			var ltiRequest = await ltiRequestsRepo.Find(courseId, userId, slide.Id);
 			if (ltiRequest == null)
 				throw new Exception("LtiRequest for user '" + userId + "' not found");
@@ -31,7 +30,7 @@ namespace Ulearn.Web.Api.Utils.LTI
 			}
 			catch (Exception e)
 			{
-				log.Error($"Неверный адрес отправки результатов по LTI: {ltiRequest.LisOutcomeServiceUrl}", e);
+				log.Error(e, $"Неверный адрес отправки результатов по LTI: {ltiRequest.LisOutcomeServiceUrl}");
 				throw;
 			}
 

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Ulearn.Core.Configuration;
 using Vostok.Hosting.Abstractions;
+using Vostok.Logging.Microsoft;
 
 namespace Ulearn.Common.Api
 {
@@ -13,11 +14,6 @@ namespace Ulearn.Common.Api
 
 		public virtual async Task InitializeAsync(IVostokHostingEnvironment hostingEnvironment)
 		{
-			var loggerConfiguration = new LoggerConfiguration()
-				.MinimumLevel.Information()
-				.WriteTo.Sink(new VostokSink(hostingEnvironment.Log), LogEventLevel.Information);
-			logger = loggerConfiguration.CreateLogger();
-
 			var services = new ServiceCollection();
 			ConfigureServices(services, hostingEnvironment);
 			serviceProvider = services.BuildServiceProvider();
@@ -25,7 +21,7 @@ namespace Ulearn.Common.Api
 
 		protected virtual void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment)
 		{
-			services.AddLogging(builder => builder.AddSerilog(logger));
+			services.AddLogging(builder => builder.AddVostok(hostingEnvironment.Log));
 			configuration = hostingEnvironment.SecretConfigurationProvider.Get<UlearnConfiguration>(hostingEnvironment.SecretConfigurationSource);
 
 			services.Configure<UlearnConfiguration>(options =>
@@ -36,7 +32,6 @@ namespace Ulearn.Common.Api
 
 		protected virtual void ConfigureDi(IServiceCollection services)
 		{
-			services.AddSingleton(logger);
 		}
 
 		public abstract Task RunAsync(IVostokHostingEnvironment environment);

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
+using Vostok.Logging.Abstractions;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 
@@ -13,13 +13,12 @@ namespace Database.Repos
 	public class VisitsRepo : IVisitsRepo
 	{
 		private readonly UlearnDb db;
-		private readonly ILogger logger;
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(VisitsRepo));
 
-		public VisitsRepo(UlearnDb db, ILogger logger, ISlideCheckingsRepo slideCheckingsRepo)
+		public VisitsRepo(UlearnDb db, ISlideCheckingsRepo slideCheckingsRepo)
 		{
 			this.db = db;
-			this.logger = logger;
 			this.slideCheckingsRepo = slideCheckingsRepo;
 		}
 
@@ -104,8 +103,8 @@ namespace Database.Repos
 			var isPassed = await slideCheckingsRepo.IsSlidePassed(courseId, slide.Id, userId);
 			if (await IsSkipped(courseId, slide.Id, userId))
 				newScore = 0;
-			logger.Information($"Обновляю количество баллов пользователя {userId} за слайд {slide.Id} в курсе \"{courseId}\". " +
-					$"Новое количество баллов: {newScore}, слайд пройден: {isPassed}");
+			log.Info($"Обновляю количество баллов пользователя {userId} за слайд {slide.Id} в курсе \"{courseId}\". " +
+				$"Новое количество баллов: {newScore}, слайд пройден: {isPassed}");
 			await UpdateAttempts(courseId, slide.Id, userId, visit =>
 			{
 				visit.Score = newScore;

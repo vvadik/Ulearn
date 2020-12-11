@@ -6,7 +6,6 @@ using Database.Models;
 using JetBrains.Annotations;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
-using Serilog;
 
 namespace Database.Repos
 {

@@ -2,19 +2,16 @@
 using Database.Models;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 
 namespace Database.Repos
 {
 	public class LtiConsumersRepo : ILtiConsumersRepo
 	{
 		private readonly UlearnDb db;
-		private readonly ILogger logger;
 
-		public LtiConsumersRepo(UlearnDb db, ILogger logger)
+		public LtiConsumersRepo(UlearnDb db)
 		{
 			this.db = db;
-			this.logger = logger;
 		}
 
 		[CanBeNull]

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Database.Extensions;
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Extensions;
@@ -17,12 +16,10 @@ namespace Database.Repos
 	public class CoursesRepo : ICoursesRepo
 	{
 		private readonly UlearnDb db;
-		private readonly ILogger logger;
 
-		public CoursesRepo(UlearnDb db, ILogger logger)
+		public CoursesRepo(UlearnDb db)
 		{
 			this.db = db;
-			this.logger = logger;
 		}
 
 		public Task<List<string>> GetPublishedCourseIdsAsync()

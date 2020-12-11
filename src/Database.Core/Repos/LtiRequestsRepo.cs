@@ -5,7 +5,6 @@ using Database.Models;
 using LtiLibrary.NetCore.Lti.v1;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using Serilog;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 
@@ -14,13 +13,11 @@ namespace Database.Repos
 	public class LtiRequestsRepo : ILtiRequestsRepo
 	{
 		private readonly UlearnDb db;
-		private readonly ILogger logger;
 		private readonly JsonSerializer serializer;
 
-		public LtiRequestsRepo(UlearnDb db, ILogger logger)
+		public LtiRequestsRepo(UlearnDb db)
 		{
 			this.db = db;
-			this.logger = logger;
 			serializer = new JsonSerializer();
 		}
 

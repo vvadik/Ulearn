@@ -297,7 +297,7 @@ namespace uLearn.Web.Controllers
 			}
 			catch (Exception e)
 			{
-				log.Error($"Can't decode `state`: {e.Message}", e);
+				log.Error(e, $"Can't decode `state`: {e.Message}");
 				return View("ConnectError", (object)"Не смог расшифровать state");
 			}
 

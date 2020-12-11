@@ -35,7 +35,7 @@ namespace uLearn.Web.LTI
 			}
 			catch (Exception e)
 			{
-				log.Error($"Неверный адрес отправки результатов по LTI: {ltiRequest.LisOutcomeServiceUrl}", e);
+				log.Error(e, $"Неверный адрес отправки результатов по LTI: {ltiRequest.LisOutcomeServiceUrl}");
 				throw;
 			}
 

@@ -2,8 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
-using Serilog;
-using uLearn;
 using Ulearn.Core;
 
 namespace Database.Repos
@@ -12,12 +10,10 @@ namespace Database.Repos
 	public class SlideRateRepo : ISlideRateRepo
 	{
 		private readonly UlearnDb db;
-		private readonly ILogger logger;
 
-		public SlideRateRepo(UlearnDb db, ILogger logger)
+		public SlideRateRepo(UlearnDb db)
 		{
 			this.db = db;
-			this.logger = logger;
 		}
 
 		public async Task<string> AddRate(string courseId, Guid slideId, string userId, SlideRates rate)

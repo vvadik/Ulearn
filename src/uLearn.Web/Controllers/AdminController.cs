@@ -410,7 +410,7 @@ namespace uLearn.Web.Controllers
 			}
 			catch (Exception e)
 			{
-				log.Warn($"Upload course exception '{courseId}'", e);
+				log.Warn(e, $"Upload course exception '{courseId}'");
 				return (versionId, e);
 			}
 
@@ -435,7 +435,7 @@ namespace uLearn.Web.Controllers
 			}
 			catch (Exception ex)
 			{
-				log.Warn("Error during delete previous unpublished versions", ex);
+				log.Warn(ex, "Error during delete previous unpublished versions");
 			}
 
 			return (versionId, null);
@@ -1121,7 +1121,7 @@ namespace uLearn.Web.Controllers
 			}
 			catch (Exception e)
 			{
-				log.Error("Создание шаблона сертификата: не могу сохранить архив", e);
+				log.Error(e, "Создание шаблона сертификата: не могу сохранить архив");
 				throw;
 			}
 

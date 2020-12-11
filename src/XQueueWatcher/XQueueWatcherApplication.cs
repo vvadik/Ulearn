@@ -13,6 +13,7 @@ using Ulearn.Common.Api;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Metrics;
 using Vostok.Hosting.Abstractions;
+using Vostok.Logging.Abstractions;
 using XQueue;
 using XQueue.Models;
 
@@ -23,6 +24,7 @@ namespace XQueueWatcher
 		private static readonly TimeSpan pauseBetweenRequests = TimeSpan.FromSeconds(1);
 		private static readonly ServiceKeepAliver keepAliver = new ServiceKeepAliver(configuration.GraphiteServiceName);
 		private static readonly Dictionary<int, XQueueClient> clientsCache = new Dictionary<int, XQueueClient>();
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(XQueueWatcherApplication));
 
 		public override async Task InitializeAsync(IVostokHostingEnvironment environment)
 		{
@@ -47,7 +49,7 @@ namespace XQueueWatcher
 		protected override void ConfigureDi(IServiceCollection services)
 		{
 			base.ConfigureDi(services);
-			services.AddDatabaseServices(logger);
+			services.AddDatabaseServices();
 		}
 
 		public async Task StartXQueueWatchers(CancellationToken cancellationToken)
@@ -78,7 +80,7 @@ namespace XQueueWatcher
 			}
 			catch (Exception e)
 			{
-				logger.Error(e, "GetAndProcessSubmissionFromXQueue error");
+				log.Error(e, "GetAndProcessSubmissionFromXQueue error");
 			}
 		}
 
@@ -90,7 +92,7 @@ namespace XQueueWatcher
 
 				if (!await client.Login())
 				{
-					logger.Error($"Can\'t login to xqueue {watcher.QueueName} ({watcher.BaseUrl}, user {watcher.UserName})");
+					log.Error($"Can\'t login to xqueue {watcher.QueueName} ({watcher.BaseUrl}, user {watcher.UserName})");
 					return;
 				}
 
@@ -101,7 +103,7 @@ namespace XQueueWatcher
 			if (submission == null)
 				return;
 
-			logger.Information($"Got new submission in xqueue {watcher.QueueName}: {submission.JsonSerialize()}");
+			log.Info($"Got new submission in xqueue {watcher.QueueName}: {submission.JsonSerialize()}");
 
 			try
 			{
@@ -109,7 +111,7 @@ namespace XQueueWatcher
 			}
 			catch (Exception e)
 			{
-				logger.Error($"Error occurred while processing submission from xqueue: {e.Message}", e);
+				log.Error(e, $"Error occurred while processing submission from xqueue: {e.Message}");
 				await client.PutResult(new XQueueResult
 				{
 					header = submission.header,
@@ -135,12 +137,12 @@ namespace XQueueWatcher
 				}
 				catch (Exception e)
 				{
-					logger.Error($"Can't parse grader payload: {e.Message}");
-					logger.Information($"Payload is: {submission.Body.GraderPayload}");
+					log.Error($"Can't parse grader payload: {e.Message}");
+					log.Info($"Payload is: {submission.Body.GraderPayload}");
 					return;
 				}
 
-				logger.Information($"Add new xqueue submission for course {graderPayload.CourseId}, slide {graderPayload.SlideId}");
+				log.Info($"Add new xqueue submission for course {graderPayload.CourseId}, slide {graderPayload.SlideId}");
 				await xQueueRepo.AddXQueueSubmission(
 					watcher,
 					submission.Header.JsonSerialize(),
