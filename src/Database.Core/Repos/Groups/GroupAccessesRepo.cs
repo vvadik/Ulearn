@@ -8,7 +8,6 @@ using Database.Repos.SystemAccessesRepo;
 using Database.Repos.Users;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 
@@ -25,7 +24,6 @@ namespace Database.Repos.Groups
 		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IUsersRepo usersRepo;
 		private readonly IWebCourseManager courseManager;
-		private readonly ILogger logger = Log.Logger;
 
 		public GroupAccessesRepo(
 			UlearnDb db,

@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using log4net;
-using Ulearn.Core;
+using Vostok.Logging.Abstractions;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Metrics;
 using Ulearn.Core.RunCheckerJobApi;
@@ -21,7 +20,7 @@ namespace RunCheckerJob
 		private readonly ManualResetEvent shutdownEvent = new ManualResetEvent(false);
 		private readonly List<Thread> threads = new List<Thread>();
 
-		private static readonly ILog log = LogManager.GetLogger(typeof(ProgramBase));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(ProgramBase));
 		protected abstract ISandboxRunnerClient SandboxRunnerClient { get; }
 		private readonly string[] supportedSandboxes;
 		private readonly string serviceName;
@@ -49,7 +48,7 @@ namespace RunCheckerJob
 			}
 			catch (Exception e)
 			{
-				log.Error(e);
+				log.Error(e, "Root error");
 				throw;
 			}
 		}
@@ -114,7 +113,7 @@ namespace RunCheckerJob
 			}
 			catch (Exception e)
 			{
-				log.Error("Не могу создать HTTP-клиента для отправки запроса на ulearn", e);
+				log.Error(e, "Не могу создать HTTP-клиента для отправки запроса на ulearn");
 				throw;
 			}
 
@@ -135,7 +134,7 @@ namespace RunCheckerJob
 				}
 				catch (Exception e)
 				{
-					log.Error($"Не могу получить решения из ulearn. Следующая попытка через {sleep.TotalSeconds} секунд", e);
+					log.Error(e, $"Не могу получить решения из ulearn. Следующая попытка через {sleep.TotalSeconds} секунд");
 					Thread.Sleep(sleep);
 					continue;
 				}
@@ -152,7 +151,7 @@ namespace RunCheckerJob
 					}
 					catch (Exception e)
 					{
-						log.Error("Не могу отправить результаты проверки на ulearn", e);
+						log.Error(e, "Не могу отправить результаты проверки на ulearn");
 					}
 				}
 

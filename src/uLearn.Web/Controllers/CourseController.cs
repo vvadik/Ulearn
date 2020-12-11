@@ -12,7 +12,7 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using Elmah;
-using log4net;
+using Vostok.Logging.Abstractions;
 using LtiLibrary.Owin.Security.Lti;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
@@ -32,7 +32,7 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize]
 	public class CourseController : BaseController
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(CourseController));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(CourseController));
 
 		private readonly ULearnDb db = new ULearnDb();
 		private readonly CourseManager courseManager = WebCourseManager.Instance;

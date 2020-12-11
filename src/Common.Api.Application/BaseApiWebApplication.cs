@@ -13,8 +13,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
-using Serilog;
-using Serilog.Events;
 using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Ulearn.Common.Api.Models.Responses;
@@ -23,7 +21,6 @@ using Vostok.Applications.AspNetCore;
 using Vostok.Applications.AspNetCore.Builders;
 using Vostok.Applications.AspNetCore.Configuration;
 using Vostok.Hosting.Abstractions;
-using Vostok.Logging.Serilog;
 
 namespace Ulearn.Common.Api
 {
@@ -36,16 +33,9 @@ namespace Ulearn.Common.Api
 
 		public override void Setup(IVostokAspNetCoreApplicationBuilder builder, IVostokHostingEnvironment hostingEnvironment)
 		{
-			var loggerConfiguration = new LoggerConfiguration()
-				.MinimumLevel.Information()
-				.Filter.ByExcluding(FilterLogs)
-				.WriteTo.Sink(new VostokSink(hostingEnvironment.Log), LogEventLevel.Information);
-			Log.Logger = loggerConfiguration.CreateLogger();
-
 			builder.SetupWebHost(webHostBuilder => webHostBuilder
 				.UseKestrel()
 				.ConfigureServices(s => ConfigureServices(s, hostingEnvironment))
-				.UseSerilog(Log.Logger)
 				.UseEnvironment(hostingEnvironment.ApplicationIdentity.Environment)
 				.Configure(app =>
 				{
@@ -87,19 +77,6 @@ namespace Ulearn.Common.Api
 				s.LogQueryString = new LoggingCollectionSettings(_ => true);
 			})
 			.SetupThrottling(b => b.DisableThrottling());
-		}
-
-		private static bool FilterLogs(LogEvent le)
-		{
-			return le.Level <= LogEventLevel.Information
-				&& le.Properties.TryGetValue("SourceContext", out var sourceContextValue)
-				&& (sourceContextValue as ScalarValue)?.Value is string sourceContext
-				&& (sourceContext.StartsWith("Microsoft.AspNetCore.Mvc.Infrastructure")
-					|| sourceContext.StartsWith("Microsoft.AspNetCore.Hosting.Diagnostics")
-					|| sourceContext.StartsWith("Microsoft.AspNetCore.Cors.Infrastructure")
-					|| sourceContext.StartsWith("Microsoft.AspNetCore.Authentication")
-					|| sourceContext.StartsWith("Microsoft.AspNetCore.Authorization")
-					);
 		}
 
 		public class UlearnPortConfiguration

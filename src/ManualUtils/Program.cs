@@ -8,6 +8,7 @@ using ManualUtils.AntiPlagiarism;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Ulearn.Core.Configuration;
+using Ulearn.Core.Logging;
 
 namespace ManualUtils
 {
@@ -15,7 +16,8 @@ namespace ManualUtils
 	{
 		public static void Main(string[] args)
 		{
-			var configuration = ApplicationConfiguration.Read<DatabaseConfiguration>();
+			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
+			LoggerSetup.Setup(configuration.HostLog, configuration.GraphiteServiceName);
 			var optionsBuilder = new DbContextOptionsBuilder<UlearnDb>()
 				.UseLazyLoadingProxies()
 				.UseSqlServer(configuration.Database);

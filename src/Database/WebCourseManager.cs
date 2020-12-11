@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using Database.DataContexts;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
 
@@ -12,7 +12,7 @@ namespace Database
 {
 	public class WebCourseManager : CourseManager
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(WebCourseManager));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(WebCourseManager));
 		public static readonly WebCourseManager Instance = new WebCourseManager();
 
 		private readonly Dictionary<string, Guid> loadedCourseVersions = new Dictionary<string, Guid>();
@@ -108,7 +108,7 @@ namespace Database
 				}
 				catch (Exception ex)
 				{
-					log.Error($"Не смог загрузить {zipFile.CourseId} из базы данных", ex);
+					log.Error(ex, $"Не смог загрузить {zipFile.CourseId} из базы данных");
 				}
 			}
 		}
@@ -122,7 +122,7 @@ namespace Database
 			}
 			catch (Exception e)
 			{
-				log.Error(e);
+				log.Error(e, "GetCourses exception");
 			}
 			return base.GetCourses();
 		}

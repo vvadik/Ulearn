@@ -12,7 +12,7 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using JetBrains.Annotations;
-using log4net;
+using Vostok.Logging.Abstractions;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.LTI;
@@ -32,7 +32,7 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize]
 	public class QuizController : Controller
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(QuizController));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(QuizController));
 
 		private const int defaultMaxTriesCount = 2;
 		public const int InfinityTriesCount = int.MaxValue - 1;

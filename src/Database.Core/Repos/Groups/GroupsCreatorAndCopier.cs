@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Database.Models;
 using Database.Repos.CourseRoles;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common.Extensions;
 
 namespace Database.Repos.Groups
@@ -13,7 +13,7 @@ namespace Database.Repos.Groups
 	public class GroupsCreatorAndCopier : IGroupsCreatorAndCopier
 	{
 		private readonly UlearnDb db;
-		private readonly ILogger logger = Log.Logger;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(GroupsCreatorAndCopier));
 		private readonly ICourseRoleUsersFilter courseRoleUsersFilter;
 		private readonly IManualCheckingsForOldSolutionsAdder manualCheckingsForOldSolutionsAdder;
 
@@ -35,7 +35,7 @@ namespace Database.Repos.Groups
 			bool defaultProhibitFurtherReview = true,
 			bool isInviteLinkEnabled = true)
 		{
-			logger.Information($"Создаю новую группу в курсе {courseId}: «{name}»");
+			log.Info($"Создаю новую группу в курсе {courseId}: «{name}»");
 			var group = new Group
 			{
 				CourseId = courseId,
@@ -60,7 +60,7 @@ namespace Database.Repos.Groups
 		/* Copy group from one course to another. Replace owner only if newOwnerId is not empty */
 		public async Task<Group> CopyGroupAsync(Group group, string courseId, string newOwnerId = null)
 		{
-			logger.Information($"Копирую группу «{group.Name}» (id={group.Id}) в курс {courseId}");
+			log.Info($"Копирую группу «{group.Name}» (id={group.Id}) в курс {courseId}");
 
 			var newGroup = await CopyGroupWithoutMembersAsync(group, courseId, newOwnerId).ConfigureAwait(false);
 			await CopyGroupMembersAsync(group, newGroup).ConfigureAwait(false);
@@ -95,7 +95,7 @@ namespace Database.Repos.Groups
 
 		private async Task CopyGroupMembersAsync(Group group, Group newGroup)
 		{
-			logger.Information($"Копирую участников из группы «{group.Name}» (id={group.Id}) в группу «{newGroup.Name}» (id={newGroup.Id})");
+			log.Info($"Копирую участников из группы «{group.Name}» (id={group.Id}) в группу «{newGroup.Name}» (id={newGroup.Id})");
 			var members = group.NotDeletedMembers.Select(m => new GroupMember
 			{
 				UserId = m.UserId,
@@ -106,7 +106,7 @@ namespace Database.Repos.Groups
 
 			if (newGroup.IsManualCheckingEnabledForOldSolutions)
 			{
-				logger.Information($"Добавляю старые решения студентов в очередь на проверку");
+				log.Info($"Добавляю старые решения студентов в очередь на проверку");
 				await manualCheckingsForOldSolutionsAdder.AddManualCheckingsForOldSolutionsAsync(newGroup.CourseId, members.Select(m => m.UserId).ToList()).ConfigureAwait(false);
 			}
 
@@ -115,7 +115,7 @@ namespace Database.Repos.Groups
 
 		private async Task CopyGroupAccessesAsync(Group group, Group newGroup)
 		{
-			logger.Information($"Копирую доступы к группе «{group.Name}» (id={group.Id}) в группу «{newGroup.Name}» (id={newGroup.Id})");
+			log.Info($"Копирую доступы к группе «{group.Name}» (id={group.Id}) в группу «{newGroup.Name}» (id={newGroup.Id})");
 			var accesses = await db.GroupAccesses.Where(a => a.GroupId == group.Id && a.IsEnabled).ToListAsync().ConfigureAwait(false);
 			var courseInstructorsIds = await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, newGroup.CourseId, includeHighRoles: true).ConfigureAwait(false);
 			foreach (var access in accesses)
@@ -140,7 +140,7 @@ namespace Database.Repos.Groups
 
 		private async Task CopyEnabledAdditionalScoringGroupsAsync(Group group, Group newGroup)
 		{
-			logger.Information($"Копирую включенные scoring-group-ы из группы «{group.Name}» (id={group.Id}) в группу «{newGroup.Name}» (id={newGroup.Id})");
+			log.Info($"Копирую включенные scoring-group-ы из группы «{group.Name}» (id={group.Id}) в группу «{newGroup.Name}» (id={newGroup.Id})");
 
 			var enabledAdditionalScoringGroups = await db.EnabledAdditionalScoringGroups
 				.Where(s => s.GroupId == group.Id)

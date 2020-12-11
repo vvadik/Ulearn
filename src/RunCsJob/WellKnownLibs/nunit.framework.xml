@@ -15170,13 +15170,13 @@
             <param name="message">The message.</param>
             <param name="args">The arguments.</param>
         </member>
-        <member name="M:NUnit.Framework.Internal.ILogger.Warning(System.String)">
+        <member name="M:NUnit.Framework.Internal.Ilogger.Warn(System.String)">
             <summary>
             Logs the specified message at the warning level.
             </summary>
             <param name="message">The message.</param>
         </member>
-        <member name="M:NUnit.Framework.Internal.ILogger.Warning(System.String,System.Object[])">
+        <member name="M:NUnit.Framework.Internal.Ilogger.Warn(System.String,System.Object[])">
             <summary>
             Logs the specified message at the warning level.
             </summary>
@@ -15378,13 +15378,13 @@
             <param name="message">The message.</param>
             <param name="args">The message arguments.</param>
         </member>
-        <member name="M:NUnit.Framework.Internal.Logger.Warning(System.String)">
+        <member name="M:NUnit.Framework.Internal.logger.Warn(System.String)">
             <summary>
             Logs the message at warm level.
             </summary>
             <param name="message">The message.</param>
         </member>
-        <member name="M:NUnit.Framework.Internal.Logger.Warning(System.String,System.Object[])">
+        <member name="M:NUnit.Framework.Internal.logger.Warn(System.String,System.Object[])">
             <summary>
             Logs the message at warning level.
             </summary>

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Threading.Tasks;
 using Kontur.Spam.Client;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Metrics;
@@ -12,7 +12,7 @@ namespace Notifications
 {
 	public class KonturSpamEmailSender : IEmailSender
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(KonturSpamEmailSender));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(KonturSpamEmailSender));
 
 		private readonly MetricSender metricSender;
 
@@ -36,7 +36,7 @@ namespace Notifications
 			}
 			catch (Exception e)
 			{
-				log.Error($"Can\'t initialize Spam.API client to {spamEndpoint}, login {spamLogin}, password {spamPassword.MaskAsSecret()}", e);
+				log.Error(e, $"Can\'t initialize Spam.API client to {spamEndpoint}, login {spamLogin}, password {spamPassword.MaskAsSecret()}");
 				throw;
 			}
 
@@ -84,7 +84,7 @@ namespace Notifications
 			}
 			catch (Exception e)
 			{
-				log.Warn($"Can\'t send message via Spam.API to {to} with subject {subject}", e);
+				log.Warn(e, $"Can\'t send message via Spam.API to {to} with subject {subject}");
 				metricSender.SendCount("send_email.fail");
 				metricSender.SendCount($"send_email.fail.to.{recipientEmailMetricName}");
 				throw;

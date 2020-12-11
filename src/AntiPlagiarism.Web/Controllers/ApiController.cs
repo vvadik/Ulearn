@@ -14,6 +14,7 @@ using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
@@ -34,6 +35,7 @@ namespace AntiPlagiarism.Web.Controllers
 		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly NewSubmissionHandler newSubmissionHandler;
 		private readonly AntiPlagiarismConfiguration configuration;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(ApiController));
 
 		public ApiController(
 			AntiPlagiarismDb db,
@@ -82,7 +84,7 @@ namespace AntiPlagiarism.Web.Controllers
 				parameters.ClientSubmissionId
 			).ConfigureAwait(false);
 
-			logger.Information(
+			log.Info(
 				"Добавлено новое решение {submissionId} по задаче {taskId}, автор {authorId}, язык {language}, доп. информация {additionalInfo}",
 				submission.Id,
 				parameters.TaskId,
@@ -148,7 +150,7 @@ namespace AntiPlagiarism.Web.Controllers
 				weights[taskId] = await newSubmissionHandler.CalculateTaskStatisticsParametersAsync(client.Id, taskId).ConfigureAwait(false);
 				weights[taskId].Sort();
 
-				logger.Information($"RecalculateTaskStatistics: обработано {index.PluralizeInRussian(RussianPluralizationOptions.Tasks)} из {taskIds.Count}");
+				log.Info($"RecalculateTaskStatistics: обработано {index.PluralizeInRussian(RussianPluralizationOptions.Tasks)} из {taskIds.Count}");
 
 				GC.Collect();
 			}

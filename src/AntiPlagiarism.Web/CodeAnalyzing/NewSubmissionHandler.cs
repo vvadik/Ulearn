@@ -7,7 +7,7 @@ using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Database.Repos;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Serilog;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 
 namespace AntiPlagiarism.Web.CodeAnalyzing
@@ -21,7 +21,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 		private readonly SubmissionSnippetsExtractor submissionSnippetsExtractor;
 		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly AntiPlagiarismConfiguration configuration;
-		private readonly ILogger logger = Log.Logger;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(NewSubmissionHandler));
 
 		public NewSubmissionHandler(
 			ISubmissionsRepo submissionsRepo, ISnippetsRepo snippetsRepo, ITasksRepo tasksRepo, IWorkQueueRepo workQueueRepo,
@@ -50,7 +50,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			}
 			catch (Exception ex)
 			{
-				logger.Error(ex, "Exception during CalculateTaskStatistics in HandleNewSubmission");
+				log.Error(ex, "Exception during CalculateTaskStatistics in HandleNewSubmission");
 			}
 			return true;
 		}
@@ -77,7 +77,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			var submissionsCount = await submissionsRepo.GetSubmissionsCountAsync(clientId, taskId).ConfigureAwait(false);
 			var oldSubmissionsCount = (await tasksRepo.FindTaskStatisticsParametersAsync(taskId).ConfigureAwait(false))?.SubmissionsCount ?? 0;
 			var recalculateStatisticsAfterSubmissionsCount = configuration.AntiPlagiarism.StatisticsAnalyzing.RecalculateStatisticsAfterSubmissionsCount;
-			logger.Information($"Определяю, надо ли пересчитать статистические параметры задачи (TaskStatisticsParameters, параметры Mean и Deviation), задача {taskId}. " +
+			log.Info($"Определяю, надо ли пересчитать статистические параметры задачи (TaskStatisticsParameters, параметры Mean и Deviation), задача {taskId}. " +
 									$"Старое количество решений {oldSubmissionsCount}, новое {submissionsCount}, параметр recalculateStatisticsAfterSubmisionsCount={recalculateStatisticsAfterSubmissionsCount}.");
 
 			if (submissionsCount < recalculateStatisticsAfterSubmissionsCount)
@@ -102,13 +102,13 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 				var tasksRepo = scope.ServiceProvider.GetService<ITasksRepo>();
 				var statisticsParametersFinder = scope.ServiceProvider.GetService<StatisticsParametersFinder>();
 
-				logger.Information($"Пересчитываю статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId}");
+				log.Info($"Пересчитываю статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId}");
 				var lastAuthorsIds = await localSubmissionsRepo.GetLastAuthorsByTaskAsync(clientId, taskId, configuration.AntiPlagiarism.StatisticsAnalyzing.CountOfLastAuthorsForCalculatingMeanAndDeviation).ConfigureAwait(false);
 				var lastSubmissions = await localSubmissionsRepo.GetLastSubmissionsByAuthorsForTaskAsync(clientId, taskId, lastAuthorsIds).ConfigureAwait(false);
 				var currentSubmissionsCount = await localSubmissionsRepo.GetSubmissionsCountAsync(clientId, taskId).ConfigureAwait(false);
 
 				var (taskStatisticsSourceData, statisticsParameters) = await statisticsParametersFinder.FindStatisticsParametersAsync(lastSubmissions).ConfigureAwait(false);
-				logger.Information($"Новые статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId}: Mean={statisticsParameters.Mean}, Deviation={statisticsParameters.Deviation}");
+				log.Info($"Новые статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId}: Mean={statisticsParameters.Mean}, Deviation={statisticsParameters.Deviation}");
 				statisticsParameters.TaskId = taskId;
 				statisticsParameters.SubmissionsCount = currentSubmissionsCount;
 				statisticsParameters.Timestamp = DateTime.Now;

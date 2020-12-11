@@ -6,7 +6,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
-using CourseToolHotReloader.Log;
+using Vostok.Logging.Abstractions;
 
 namespace CourseToolHotReloader
 {
@@ -66,7 +66,7 @@ namespace CourseToolHotReloader
 			}
 			catch (JsonException ex)
 			{
-				Logger.Log.Error(ex);
+				LogProvider.Get().Error(ex, "ReadConfig error");
 				ConsoleWorker.WriteError("Не удалось прочитать файл с настройками CourseToolHotReloader. config.json создан с настройками по умолчанию в папке с исполнямыми файлами CourseToolHotReloader");
 				CreateNewConfigFile();
 				return ReadConfig();

@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
-using log4net;
+using Vostok.Logging.Abstractions;
 
 namespace Database.DataContexts
 {
 	public class FeedRepo
 	{
-		private readonly ILog log = LogManager.GetLogger(typeof(FeedRepo));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(FeedRepo));
 
 		private readonly ULearnDb db;
 		private readonly NotificationsRepo notificationsRepo;

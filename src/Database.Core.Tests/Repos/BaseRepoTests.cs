@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Di;
@@ -10,9 +9,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using Serilog;
-using Serilog.Extensions.Logging;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common;
+using Vostok.Logging.Microsoft;
 using Z.EntityFramework.Plus;
 
 namespace Database.Core.Tests.Repos
@@ -22,11 +21,12 @@ namespace Database.Core.Tests.Repos
 		protected UlearnDb db;
 		protected IServiceProvider serviceProvider;
 		protected UlearnUserManager userManager;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(BaseRepoTests));
 
 		[SetUp]
 		public virtual void SetUp()
 		{
-			var loggerFactory = new LoggerFactory(new List<ILoggerProvider> { new SerilogLoggerProvider(Log.Logger) });
+			var loggerFactory = new LoggerFactory().AddVostok(LogProvider.Get());
 			db = CreateDbContext(loggerFactory);
 
 			serviceProvider = ConfigureServices();
@@ -49,7 +49,7 @@ namespace Database.Core.Tests.Repos
 			var services = new ServiceCollection();
 
 			services.AddSingleton(db);
-			services.AddLogging(builder => builder.AddSerilog(Log.Logger));
+			services.AddLogging(builder => builder.AddVostok(LogProvider.Get()));
 			services.AddDatabaseServices();
 			services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<UlearnDb>();
 
@@ -83,7 +83,7 @@ namespace Database.Core.Tests.Repos
 			if (!result.Succeeded)
 				throw new InvalidOperationException($"Can't create user {userName} with password {password}:\n{string.Join("\n", result.Errors.Select(e => e.Description))}");
 
-			Log.Logger.Information($"User {userName} with password {password} successfully created");
+			log.Info($"User {userName} with password {password} successfully created");
 
 			return await userManager.FindByNameAsync(userName).ConfigureAwait(false);
 		}
@@ -101,7 +101,7 @@ namespace Database.Core.Tests.Repos
 				throw new InvalidOperationException($"Can't create admin user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
 
 			TestUsers.Admin = await userManager.FindByNameAsync(TestUsers.Admin.UserName).ConfigureAwait(false);
-			Log.Logger.Information($"Created user {TestUsers.Admin.UserName} with password {TestUsers.AdminPassword}, id = {TestUsers.Admin.Id}");
+			log.Info($"Created user {TestUsers.Admin.UserName} with password {TestUsers.AdminPassword}, id = {TestUsers.Admin.Id}");
 			await userManager.AddToRoleAsync(TestUsers.Admin, LmsRoleType.SysAdmin.ToString()).ConfigureAwait(false);
 		}
 	}

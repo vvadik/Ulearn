@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Models.Responses.TempCourses;
 using Ionic.Zip;
+using Vostok.Logging.Abstractions;
 
 
 namespace Ulearn.Web.Api.Controllers
@@ -26,6 +27,7 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly ITempCoursesRepo tempCoursesRepo;
 		private readonly ICourseRolesRepo courseRolesRepo;
 		public bool DontCheckBaseCourseExistsOnCreate = false; // Для тестрирования
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(TempCourseController));
 
 		public TempCourseController(IWebCourseManager courseManager, UlearnDb db, [CanBeNull] IUsersRepo usersRepo, ITempCoursesRepo tempCoursesRepo, ICourseRolesRepo courseRolesRepo)
 			: base(courseManager, db, usersRepo)
@@ -355,7 +357,7 @@ namespace Ulearn.Web.Api.Controllers
 
 		private void UploadChanges(string courseId, byte[] content)
 		{
-			logger.Information($"Start upload course '{courseId}'");
+			log.Info($"Start upload course '{courseId}'");
 			var stagingFile = courseManager.GetStagingTempCourseFile(courseId);
 			System.IO.File.WriteAllBytes(stagingFile.FullName, content);
 		}

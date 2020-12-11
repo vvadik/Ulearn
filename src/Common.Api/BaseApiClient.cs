@@ -4,14 +4,13 @@ using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Serilog;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common.Api.Models.Parameters;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
 using Vostok.Clusterclient.Core;
 using Vostok.Clusterclient.Core.Model;
 using Vostok.Clusterclient.Transport;
-using Vostok.Logging.Serilog;
 using Newtonsoft.Json;
 using Vostok.Clusterclient.Core.Criteria;
 using Vostok.Clusterclient.Core.Strategies;
@@ -23,7 +22,7 @@ namespace Ulearn.Common.Api
 {
 	public class BaseApiClient
 	{
-		private readonly ILogger logger = Log.Logger;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(BaseApiClient)).WithTracingProperties(KonturTracerProvider.Get());
 		private readonly ApiClientSettings settings;
 		private readonly ClusterClient clusterClient;
 
@@ -31,11 +30,6 @@ namespace Ulearn.Common.Api
 		{
 			this.settings = settings;
 
-			var contextName = GetType().Name;
-			var log = new SerilogLog(Log.Logger)
-				.ForContext(contextName)
-				.WithTracingProperties(KonturTracerProvider.Get());
-			
 			clusterClient = new ClusterClient(log, config =>
 			{
 				config.SetupUniversalTransport();
@@ -62,7 +56,7 @@ namespace Ulearn.Common.Api
 		{
 			ClusterResult response;
 			if (settings.LogRequestsAndResponses)
-				logger.Information("Send {method} request to {serviceName} ({url}) with parameters: {parameters}", method.Method, settings.ServiceName, url, parameters.ToString());
+				log.Info("Send {method} request to {serviceName} ({url}) with parameters: {parameters}", method.Method, settings.ServiceName, url, parameters.ToString());
 
 			try
 			{
@@ -88,19 +82,19 @@ namespace Ulearn.Common.Api
 			}
 			catch (Exception e)
 			{
-				logger.Error(e, "Can't send request to {serviceName}: {message}", settings.ServiceName, e.Message);
+				log.Error(e, "Can't send request to {serviceName}: {message}", settings.ServiceName, e.Message);
 				throw new ApiClientException($"Can't send request to {settings.ServiceName}: {e.Message}", e);
 			}
 			
 			if (response.Status != ClusterResultStatus.Success)
 			{
-				logger.Error("Bad response status from {serviceName}: {status}", settings.ServiceName, response.Status.ToString());
+				log.Error("Bad response status from {serviceName}: {status}", settings.ServiceName, response.Status.ToString());
 				throw new ApiClientException($"Bad response status from {settings.ServiceName}: {response.Status}");
 			}
 
 			if (!response.Response.IsSuccessful)
 			{
-				logger.Error("Bad response code from {serviceName}: {statusCode} {statusCodeDescrption}", settings.ServiceName, (int)response.Response.Code, response.Response.Code.ToString());
+				log.Error("Bad response code from {serviceName}: {statusCode} {statusCodeDescrption}", settings.ServiceName, (int)response.Response.Code, response.Response.Code.ToString());
 				throw new ApiClientException($"Bad response code from {settings.ServiceName}: {(int)response.Response.Code} {response.Response.Code}");
 			}
 
@@ -120,7 +114,7 @@ namespace Ulearn.Common.Api
 			}
 			catch (Exception e)
 			{
-				logger.Error(e, "Can't parse response from {serviceName}: {message}", settings.ServiceName, e.Message);
+				log.Error(e, "Can't parse response from {serviceName}: {message}", settings.ServiceName, e.Message);
 				throw new ApiClientException($"Can't parse response from {settings.ServiceName}: {e.Message}", e);
 			}
 
@@ -134,7 +128,7 @@ namespace Ulearn.Common.Api
 					shortened = true;
 				}
 
-				logger.Information($"Received response from \"{settings.ServiceName}\"{(shortened ? " (сокращенный)" : "")}: {logResult}");
+				log.Info($"Received response from \"{settings.ServiceName}\"{(shortened ? " (сокращенный)" : "")}: {logResult}");
 			}
 
 			return result;

@@ -26,7 +26,6 @@
   <ItemGroup>
     <PackageReference Include="DotNetZip" Version="1.13.4" />
     <PackageReference Include="EntityFramework" Version="6.3.0" />
-    <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="MarkdownDeep.NET.Core" Version="1.5.0.4" />
     <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.3" />
     <PackageReference Include="Microsoft.AspNet.Identity.EntityFramework" Version="2.2.2" />
@@ -80,12 +79,4 @@
       <CopyToOutputDirectory>Newer</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <None Update="App.Kontur.config">
-      <DependentUpon>App.config</DependentUpon>
-    </None>
-  </ItemGroup>
-  <Target Name="CopyFiles" BeforeTargets="AfterBuild;OctoPack">
-    <Exec Command="copy &quot;$(ProjectDir)App.Kontur.config&quot; &quot;$(TargetPath).Kontur.config&quot;" />
-  </Target>
 </Project>

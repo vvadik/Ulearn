@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Database.Models;
 using Database.Repos;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using Serilog;
-using Serilog.Extensions.Logging;
+using Vostok.Logging.Abstractions;
+using Vostok.Logging.Microsoft;
 
 namespace Database.Core.Tests
 {
@@ -19,7 +18,7 @@ namespace Database.Core.Tests
 		[SetUp]
 		public void SetUp()
 		{
-			var loggerFactory = new LoggerFactory(new List<ILoggerProvider> { new SerilogLoggerProvider(Log.Logger) });
+			var loggerFactory = new LoggerFactory().AddVostok(LogProvider.Get());
 			var db = new UlearnDbFactory().CreateDbContext(new string[0], loggerFactory);
 
 			/* Disable changetracker if needed */

@@ -7,7 +7,7 @@ using System.Web.Mvc;
 using Database.DataContexts;
 using Database.Models;
 using Kontur.Spam.Client;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
@@ -19,7 +19,7 @@ namespace uLearn.Web.Controllers
 {
 	public class RestorePasswordController : Controller
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(RestorePasswordController));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(RestorePasswordController));
 		private readonly RestoreRequestRepo requestRepo;
 		private readonly UserManager<ApplicationUser> userManager;
 		private readonly ULearnDb db;

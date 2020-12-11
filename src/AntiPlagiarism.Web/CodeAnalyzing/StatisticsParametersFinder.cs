@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 using Accord.Statistics.Distributions.Univariate;
 using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Extensions;
-using Serilog;
+using Vostok.Logging.Abstractions;
 
 namespace AntiPlagiarism.Web.CodeAnalyzing
 {
 	public class StatisticsParametersFinder
 	{
-		private readonly ILogger logger = Log.Logger;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(StatisticsParametersFinder));
 		private readonly PlagiarismDetector plagiarismDetector;
 
 		public StatisticsParametersFinder(PlagiarismDetector plagiarismDetector)
@@ -38,7 +38,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 			   calculation mean and deviation. See https://yt.skbkontur.ru/issue/ULEARN-78 for details. */
 			taskStatisticsSourceData = taskStatisticsSourceData.Where(d => d.Weight < 1 - 1e-6).ToList();
 			var weights = taskStatisticsSourceData.Select(d => d.Weight).ToList();
-			logger.Information($"Пересчитываю статистические параметры задачи (TaskStatisticsParameters) по следующему набору весов: [{string.Join(", ", weights)}]");
+			log.Info($"Пересчитываю статистические параметры задачи (TaskStatisticsParameters) по следующему набору весов: [{string.Join(", ", weights)}]");
 
 			var mean = weights.Mean();
 			var deviation = weights.Deviation(mean);
@@ -51,7 +51,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 
 		private Task<double> GetLinkWeightAsync(Submission first, Submission second, int index, int totalCount)
 		{
-			logger.Information($"Вычисляю коэффициент похожести решения #{first.Id} и #{second.Id} ({index} из {totalCount})");
+			log.Info($"Вычисляю коэффициент похожести решения #{first.Id} и #{second.Id} ({index} из {totalCount})");
 			return plagiarismDetector.GetWeightAsync(first, second);
 		}
 

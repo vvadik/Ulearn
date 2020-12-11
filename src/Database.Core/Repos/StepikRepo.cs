@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using JetBrains.Annotations;
-using log4net.Core;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
 

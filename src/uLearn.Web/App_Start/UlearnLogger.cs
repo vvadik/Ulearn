@@ -1,7 +1,11 @@
+using System;
 using System.Web;
-using log4net.Config;
 using Serilog;
+using SerilogWeb.Classic;
+using Ulearn.Core.Configuration;
 using Ulearn.Core.Logging;
+using Vostok.Logging.Abstractions;
+using Vostok.Logging.Serilog;
 
 namespace uLearn.Web
 {
@@ -9,10 +13,16 @@ namespace uLearn.Web
 	{
 		public static void ConfigureLogging()
 		{
-			XmlConfigurator.Configure();
-			log4net.GlobalContext.Properties["user"] = new HttpContextUserNameProvider();
-			log4net.GlobalContext.Properties["address"] = new HttpContextAddressProvider();
-			LoggerSetup.SetupForLog4Net();
+			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
+			var log = LoggerSetup.Setup(configuration.HostLog, configuration.GraphiteServiceName, false)
+				.WithProperty("user", () => new HttpContextUserNameProvider().ToString())
+				.WithProperty("address", () => new HttpContextAddressProvider().ToString())
+				.WithProperty("threadId", () => Environment.CurrentManagedThreadId);
+			Log.Logger = new LoggerConfiguration()
+				.WriteTo.Sink(new VostokSink(log))
+				.CreateLogger();
+			SerilogWebClassic.Configure(cfg => cfg.UseLogger(Log.Logger));
+			LogProvider.Configure(log);
 		}
 	}
 

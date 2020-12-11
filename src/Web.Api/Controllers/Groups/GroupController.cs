@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Vostok.Logging.Abstractions;
 using Swashbuckle.AspNetCore.Annotations;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Core.Courses;
@@ -35,6 +36,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		private readonly IGroupsCreatorAndCopier groupsCreatorAndCopier;
 		private readonly IUnitsRepo unitsRepo;
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(GroupController));
 
 		public GroupController(IWebCourseManager courseManager, UlearnDb db,
 			IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, INotificationsRepo notificationsRepo,
@@ -221,7 +223,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			var course = await courseManager.FindCourseAsync(@group.CourseId);
 			if (course == null)
 			{
-				logger.Error($"It's strange: group {groupId} exists, but course {group.CourseId} not. I will return 404");
+				log.Error($"It's strange: group {groupId} exists, but course {group.CourseId} not. I will return 404");
 				return NotFound(new ErrorResponse("Group or course not found"));
 			}
 
@@ -251,7 +253,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			var course = await courseManager.FindCourseAsync(@group.CourseId);
 			if (course == null)
 			{
-				logger.Error($"It's strange: group {groupId} exists, but course {group.CourseId} not. I will return 404");
+				log.Error($"It's strange: group {groupId} exists, but course {group.CourseId} not. I will return 404");
 				return NotFound(new ErrorResponse("Group or course not found"));
 			}
 

@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CourseToolHotReloader.Log
+namespace CourseToolHotReloader
 {
 	internal class ConsoleSpinner
 	{

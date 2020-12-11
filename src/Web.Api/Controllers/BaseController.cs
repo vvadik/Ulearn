@@ -13,7 +13,7 @@ using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Routing;
-using Serilog;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
@@ -32,7 +32,7 @@ namespace Ulearn.Web.Api.Controllers
 	[Produces("application/json")]
 	public class BaseController : Controller
 	{
-		protected readonly ILogger logger = Log.Logger;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(BaseController));
 		protected readonly IWebCourseManager courseManager;
 		protected readonly UlearnDb db;
 		protected readonly IUsersRepo usersRepo;
@@ -63,7 +63,7 @@ namespace Ulearn.Web.Api.Controllers
 
 			if (isRequestSafe)
 			{
-				logger.Debug("Выключаю автоматическое отслеживание изменений в EF Core: db.ChangeTracker.AutoDetectChangesEnabled = false");
+				log.Debug("Выключаю автоматическое отслеживание изменений в EF Core: db.ChangeTracker.AutoDetectChangesEnabled = false");
 			}
 		}
 

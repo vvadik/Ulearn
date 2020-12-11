@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using log4net.Config;
 using NUnit.Framework;
 using Ulearn.Core.Courses;
 
@@ -21,7 +20,6 @@ namespace Stepik.Api.Tests
 		public async Task SetUp()
 		{
 			Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
-			BasicConfigurator.Configure();
 
 			await InitializeClient();
 

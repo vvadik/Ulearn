@@ -8,7 +8,7 @@ using Database.Models;
 using Database.Repos;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
+using Vostok.Logging.Abstractions;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
 
@@ -16,7 +16,7 @@ namespace Database
 {
 	public class WebCourseManager : CourseManager, IWebCourseManager
 	{
-		private readonly ILogger logger = Log.Logger;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(WebCourseManager));
 
 		private readonly Dictionary<string, Guid> loadedCourseVersions = new Dictionary<string, Guid>();
 		private readonly ConcurrentDictionary<string, DateTime> courseVersionFetchTime = new ConcurrentDictionary<string, DateTime>();
@@ -132,7 +132,7 @@ namespace Database
 					catch (FileNotFoundException)
 					{
 						/* Sometimes zip-archive with course has been deleted already. It's strange but ok */
-						logger.Warning("Это странно, что я не смог загрузить с диска курс, который, если верить базе данных, был опубликован. Но ничего, просто проигнорирую");
+						log.Warn("Это странно, что я не смог загрузить с диска курс, который, если верить базе данных, был опубликован. Но ничего, просто проигнорирую");
 					}
 				}
 				await LoadTempCoursesIfNotYetAsync(tempCoursesRepo);
@@ -187,7 +187,7 @@ namespace Database
 				if ((isCourseLoaded && loadedVersionId != publishedVersion.Id) || !isCourseLoaded)
 				{
 					var actual = isCourseLoaded ? loadedVersionId.ToString() : "<none>";
-					logger.Information($"Загруженная версия курса {courseId} отличается от актуальной ({actual} != {publishedVersion.Id}). Обновляю курс.");
+					log.Info($"Загруженная версия курса {courseId} отличается от актуальной ({actual} != {publishedVersion.Id}). Обновляю курс.");
 					ReloadCourse(courseId);
 					NotifyCourseChanged(courseId);
 				}

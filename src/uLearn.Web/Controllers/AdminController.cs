@@ -1,4 +1,4 @@
-using log4net;
+using Vostok.Logging.Abstractions;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
@@ -37,7 +37,7 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 	public class AdminController : Controller
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(AdminController));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(AdminController));
 
 		private readonly WebCourseManager courseManager = WebCourseManager.Instance;
 		private readonly ULearnDb db;

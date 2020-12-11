@@ -3,16 +3,13 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using FluentAssertions;
-using log4net.Config;
 using Microsoft.VisualBasic.FileIO;
 using NUnit.Framework;
-using NUnit.Framework.Interfaces;
 using test;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
-using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Courses.Units;
 using Ulearn.Core.Helpers;
@@ -32,7 +29,6 @@ namespace uLearn.CSharp
 		[OneTimeSetUp]
 		public void OneTimeSetUp()
 		{
-			BasicConfigurator.Configure();
 			TestsHelper.RecreateDirectory(tempSlideFolderPath);
 		}
 

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Database.Models;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common.Extensions;
 
 namespace Database.Repos.Groups
@@ -15,7 +15,7 @@ namespace Database.Repos.Groups
 		private readonly UlearnDb db;
 		private readonly IManualCheckingsForOldSolutionsAdder manualCheckingsForOldSolutionsAdder;
 		private readonly IGroupsRepo groupsRepo;
-		private readonly ILogger logger = Log.Logger;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(GroupMembersRepo));
 
 		public GroupMembersRepo(UlearnDb db, IManualCheckingsForOldSolutionsAdder manualCheckingsForOldSolutionsAdder,
 			IGroupsRepo groupsRepo)
@@ -57,7 +57,7 @@ namespace Database.Repos.Groups
 		[ItemCanBeNull]
 		public async Task<GroupMember> AddUserToGroupAsync(int groupId, string userId)
 		{
-			logger.Information($"Пытаюсь добавить пользователя {userId} в группу {groupId}");
+			log.Info($"Пытаюсь добавить пользователя {userId} в группу {groupId}");
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false) ?? throw new ArgumentNullException($"Can't find group with id={groupId}");
 
 			var groupMember = new GroupMember
@@ -72,7 +72,7 @@ namespace Database.Repos.Groups
 				var existsMember = db.GroupMembers.FirstOrDefault(m => m.GroupId == groupId && m.UserId == userId);
 				if (existsMember != null)
 				{
-					logger.Information($"Пользователь {userId} уже находится в группе {groupId}, повторно добавлять не буду");
+					log.Info($"Пользователь {userId} уже находится в группе {groupId}, повторно добавлять не буду");
 					return null;
 				}
 
@@ -81,7 +81,7 @@ namespace Database.Repos.Groups
 
 				transaction.Commit();
 
-				logger.Information($"Пользователь {userId} добавлен в группу {groupId}");
+				log.Info($"Пользователь {userId} добавлен в группу {groupId}");
 			}
 
 			if (group.IsManualCheckingEnabledForOldSolutions)
@@ -92,13 +92,13 @@ namespace Database.Repos.Groups
 
 		public async Task<GroupMember> RemoveUserFromGroupAsync(int groupId, string userId)
 		{
-			logger.Information($"Удаляю пользователя {userId} из группы {groupId}");
+			log.Info($"Удаляю пользователя {userId} из группы {groupId}");
 
 			var member = db.GroupMembers.FirstOrDefault(m => m.GroupId == groupId && m.UserId == userId);
 			if (member != null)
 				db.GroupMembers.Remove(member);
 			else
-				logger.Information($"Пользователь {userId} не состоит в группе {groupId}");
+				log.Info($"Пользователь {userId} не состоит в группе {groupId}");
 
 			await db.SaveChangesAsync().ConfigureAwait(false);
 
@@ -107,7 +107,7 @@ namespace Database.Repos.Groups
 
 		public async Task<List<GroupMember>> RemoveUsersFromGroupAsync(int groupId, List<string> userIds)
 		{
-			logger.Information($"Удаляю пользователей {string.Join(", ", userIds)} из группы {groupId}");
+			log.Info($"Удаляю пользователей {string.Join(", ", userIds)} из группы {groupId}");
 
 			var members = db.GroupMembers.Where(m => m.GroupId == groupId && userIds.Contains(m.UserId)).ToList();
 			db.GroupMembers.RemoveRange(members);
@@ -119,7 +119,7 @@ namespace Database.Repos.Groups
 
 		public async Task<List<GroupMember>> AddUsersToGroupAsync(int toGroupId, ICollection<string> userIds)
 		{
-			logger.Information($"Добавляю пользователей {string.Join(", ", userIds)} в группу {toGroupId}");
+			log.Info($"Добавляю пользователей {string.Join(", ", userIds)} в группу {toGroupId}");
 
 			var newMembers = new List<GroupMember>();
 			foreach (var memberUserId in userIds)

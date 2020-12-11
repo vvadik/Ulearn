@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.Options;
-using Serilog;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 using Ulearn.VideoAnnotations.Api.Models.Responses.Annotations;
 using Ulearn.VideoAnnotations.Web.Configuration;
@@ -14,7 +14,9 @@ namespace Ulearn.VideoAnnotations.Web.Annotations
 		{
 			var capacity = options.Value.VideoAnnotations.Cache.Capacity;
 			var maxLifeTime = options.Value.VideoAnnotations.Cache.MaxLifeTime;
-			Log.Logger.Information("Creating annotations cache with capacity {capacity} and max life time {maxLifeTime}", capacity, maxLifeTime);
+			LogProvider.Get()
+				.ForContext(typeof(AnnotationsCache))
+				.Info("Creating annotations cache with capacity {capacity} and max life time {maxLifeTime}", capacity, maxLifeTime);
 		}
 	}
 }

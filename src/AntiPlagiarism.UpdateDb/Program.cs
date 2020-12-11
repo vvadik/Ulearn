@@ -8,10 +8,11 @@ using AntiPlagiarism.Web.Database;
 using AntiPlagiarism.Web.Database.Repos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
-using Serilog.Extensions.Logging;
+using Microsoft.Extensions.Logging;
+using Vostok.Logging.Abstractions;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Logging;
+using Vostok.Logging.Microsoft;
 
 namespace AntiPlagiarism.UpdateDb
 {
@@ -55,7 +56,7 @@ namespace AntiPlagiarism.UpdateDb
 			services.Configure<AntiPlagiarismUpdateDbConfiguration>(ApplicationConfiguration.GetConfiguration());
 			services.Configure<AntiPlagiarismConfiguration>(ApplicationConfiguration.GetConfiguration());
 
-			LoggerSetup.SetupWithoutVostok(configuration.HostLog, configuration.GraphiteServiceName);
+			LoggerSetup.Setup(configuration.HostLog, configuration.GraphiteServiceName);
 			services.AddScoped(_ => GetDatabase(configuration));
 			services.AddScoped<AntiPlagiarismSnippetsUpdater>();
 			services.AddScoped<ISnippetsRepo, SnippetsRepo>();
@@ -74,7 +75,7 @@ namespace AntiPlagiarism.UpdateDb
 			var optionsBuilder = new DbContextOptionsBuilder<AntiPlagiarismDb>();
 			optionsBuilder.UseSqlServer(configuration.Database);
 			if (configuration.HostLog.EnableEntityFrameworkLogging)
-				optionsBuilder.UseLoggerFactory(new SerilogLoggerFactory(Log.Logger));
+				optionsBuilder.UseLoggerFactory(new LoggerFactory().AddVostok(LogProvider.Get()));
 
 			return new AntiPlagiarismDb(optionsBuilder.Options);
 		}
