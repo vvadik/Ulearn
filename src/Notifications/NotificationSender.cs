@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Database;
 using Database.DataContexts;
 using Database.Models;
-using log4net;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Configuration;
@@ -15,8 +14,6 @@ namespace Notifications
 {
 	public class NotificationSender : INotificationSender
 	{
-		private readonly ILog log = LogManager.GetLogger(typeof(NotificationSender));
-
 		private readonly MetricSender metricSender;
 
 		private readonly IEmailSender emailSender;

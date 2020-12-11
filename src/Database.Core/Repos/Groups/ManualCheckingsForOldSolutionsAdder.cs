@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Serilog;
+using Vostok.Logging.Abstractions;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Quizzes;
 
@@ -14,18 +14,17 @@ namespace Database.Repos.Groups
 		private readonly IVisitsRepo visitsRepo;
 		private readonly IUserQuizzesRepo userQuizzesRepo;
 		private readonly IWebCourseManager courseManager;
-		private readonly ILogger logger;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(ManualCheckingsForOldSolutionsAdder));
 
 		public ManualCheckingsForOldSolutionsAdder(
 			IUserSolutionsRepo userSolutionsRepo, ISlideCheckingsRepo slideCheckingsRepo, IVisitsRepo visitsRepo, IUserQuizzesRepo userQuizzesRepo,
-			IWebCourseManager courseManager, ILogger logger)
+			IWebCourseManager courseManager)
 		{
 			this.userSolutionsRepo = userSolutionsRepo;
 			this.slideCheckingsRepo = slideCheckingsRepo;
 			this.visitsRepo = visitsRepo;
 			this.userQuizzesRepo = userQuizzesRepo;
 			this.courseManager = courseManager;
-			this.logger = logger;
 		}
 
 		public async Task AddManualCheckingsForOldSolutionsAsync(string courseId, IEnumerable<string> usersIds)
@@ -36,7 +35,7 @@ namespace Database.Repos.Groups
 
 		public async Task AddManualCheckingsForOldSolutionsAsync(string courseId, string userId)
 		{
-			logger.Information($"Создаю ручные проверки для всех решения пользователя {userId} в курсе {courseId}");
+			log.Info($"Создаю ручные проверки для всех решения пользователя {userId} в курсе {courseId}");
 
 			var course = await courseManager.GetCourseAsync(courseId);
 
@@ -57,7 +56,7 @@ namespace Database.Repos.Groups
 					if (slide == null || !slide.Scoring.RequireReview)
 						continue;
 
-					logger.Information($"Создаю ручную проверку для решения {lastSubmission.Id}, слайд {slideId}");
+					log.Info($"Создаю ручную проверку для решения {lastSubmission.Id}, слайд {slideId}");
 					await slideCheckingsRepo.AddManualExerciseChecking(courseId, slideId, userId, lastSubmission).ConfigureAwait(false);
 					await visitsRepo.MarkVisitsAsWithManualChecking(courseId, slideId, userId).ConfigureAwait(false);
 				}
@@ -71,7 +70,7 @@ namespace Database.Repos.Groups
 					continue;
 				if (!await userQuizzesRepo.IsWaitingForManualCheckAsync(courseId, quizSlideId, userId).ConfigureAwait(false))
 				{
-					logger.Information($"Создаю ручную проверку для теста {slide.Id}");
+					log.Info($"Создаю ручную проверку для теста {slide.Id}");
 					var submission = await userQuizzesRepo.FindLastUserSubmissionAsync(courseId, quizSlideId, userId).ConfigureAwait(false);
 					if (submission == null || submission.ManualChecking != null)
 						continue;

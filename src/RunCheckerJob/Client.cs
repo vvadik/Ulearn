@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
@@ -19,7 +18,7 @@ namespace RunCheckerJob
 		private readonly HttpClient httpClient;
 		private const string instanceIdEnvironmentVariableName = "WEBSITE_INSTANCE_ID";
 		private const string arrAffinityCookieName = "ARRAffinity";
-		private static readonly ILog log = LogManager.GetLogger(typeof(Client));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(Client));
 		private readonly string agentName;
 
 		public Client(string address, string token, string agentName)
@@ -63,7 +62,7 @@ namespace RunCheckerJob
 			}
 			catch (Exception e)
 			{
-				log.Error($"Не могу подключиться к {httpClient.BaseAddress}{uri}", e);
+				log.Error(e, $"Не могу подключиться к {httpClient.BaseAddress}{uri}");
 				if (e.InnerException != null)
 					log.Error(e.InnerException.Message);
 			}

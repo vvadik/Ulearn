@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using log4net;
+using Vostok.Logging.Abstractions;
 using StatsdClient;
 using Ulearn.Core.Configuration;
 
@@ -8,7 +8,7 @@ namespace Ulearn.Core.Metrics
 {
 	public class MetricSender
 	{
-		private readonly ILog log = LogManager.GetLogger(typeof(MetricSender));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(MetricSender));
 
 		private readonly string prefix;
 		private readonly string service;
@@ -59,7 +59,7 @@ namespace Ulearn.Core.Metrics
 			}
 			catch (Exception e)
 			{
-				log.Warn($"Can't send count metric {builtKey}, value {value}", e);
+				log.Warn(e, $"Can't send count metric {builtKey}, value {value}");
 			}
 		}
 
@@ -76,7 +76,7 @@ namespace Ulearn.Core.Metrics
 			}
 			catch (Exception e)
 			{
-				log.Warn($"Can't send timing metric {builtKey}, value {value}", e);
+				log.Warn(e, $"Can't send timing metric {builtKey}, value {value}");
 			}
 		}
 
@@ -93,7 +93,7 @@ namespace Ulearn.Core.Metrics
 			}
 			catch (Exception e)
 			{
-				log.Warn($"Can't send gauge metric {builtKey}, value {value}", e);
+				log.Warn(e, $"Can't send gauge metric {builtKey}, value {value}");
 			}
 		}
 	}

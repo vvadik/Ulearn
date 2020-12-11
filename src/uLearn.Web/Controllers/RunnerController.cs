@@ -11,9 +11,8 @@ using AntiPlagiarism.Api.Models.Parameters;
 using Database;
 using Database.DataContexts;
 using Database.Models;
-using log4net;
+using Vostok.Logging.Abstractions;
 using LtiLibrary.Core.Extensions;
-using Serilog;
 using Telegram.Bot.Types.Enums;
 using uLearn.Web.AntiPlagiarismUsage;
 using Ulearn.Common;
@@ -31,7 +30,7 @@ namespace uLearn.Web.Controllers
 {
 	public class RunnerController : ApiController
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(RunnerController));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(RunnerController));
 
 		private readonly UserSolutionsRepo userSolutionsRepo;
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
@@ -187,7 +186,7 @@ namespace uLearn.Web.Controllers
 
 	public class XQueueResultObserver : IResultObserver
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(XQueueResultObserver));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(XQueueResultObserver));
 
 		public async Task ProcessResult(ULearnDb db, UserExerciseSubmission submission, RunningResults result)
 		{
@@ -262,7 +261,6 @@ namespace uLearn.Web.Controllers
 	public class AntiPlagiarismResultObserver : IResultObserver
 	{
 		private static readonly IAntiPlagiarismClient antiPlagiarismClient;
-		private static readonly ILog log = LogManager.GetLogger(typeof(AntiPlagiarismResultObserver));
 		private static readonly bool isEnabled;
 
 		static AntiPlagiarismResultObserver()
@@ -271,9 +269,8 @@ namespace uLearn.Web.Controllers
 			isEnabled = antiplagiarismClientConfiguration?.Enabled ?? false;
 			if (!isEnabled)
 				return;
-
-			var serilogLogger = new LoggerConfiguration().WriteTo.Log4Net().CreateLogger();
-			antiPlagiarismClient = new AntiPlagiarismClient(antiplagiarismClientConfiguration.Endpoint, antiplagiarismClientConfiguration.Token, serilogLogger);
+			
+			antiPlagiarismClient = new AntiPlagiarismClient(antiplagiarismClientConfiguration.Endpoint, antiplagiarismClientConfiguration.Token);
 		}
 
 		public async Task ProcessResult(ULearnDb db, UserExerciseSubmission submission, RunningResults result)

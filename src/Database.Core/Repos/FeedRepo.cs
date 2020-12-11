@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Database.Models;
 using Database.Models.Comments;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
+using Vostok.Logging.Abstractions;
 
 namespace Database.Repos
 {
@@ -16,14 +16,13 @@ namespace Database.Repos
 		private readonly UlearnDb db;
 		private readonly INotificationsRepo notificationsRepo;
 		private readonly IVisitsRepo visitsRepo;
-		private readonly ILogger logger;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(FeedRepo));
 
-		public FeedRepo(UlearnDb db, INotificationsRepo notificationsRepo, IVisitsRepo visitsRepo, ILogger logger)
+		public FeedRepo(UlearnDb db, INotificationsRepo notificationsRepo, IVisitsRepo visitsRepo)
 		{
 			this.db = db ?? throw new ArgumentNullException(nameof(db));
 			this.notificationsRepo = notificationsRepo ?? throw new ArgumentNullException(nameof(notificationsRepo));
 			this.visitsRepo = visitsRepo ?? throw new ArgumentNullException(nameof(visitsRepo));
-			this.logger = logger;
 		}
 
 		public async Task<DateTime?> GetFeedViewTimestampAsync(string userId, int transportId)
@@ -59,7 +58,7 @@ namespace Database.Repos
 			if (await notificationsRepo.FindUsersNotificationTransportAsync<FeedNotificationTransport>(userId, includeDisabled: true).ConfigureAwait(false) != null)
 				return;
 
-			logger.Information($"Create feed notification transport for user {userId} because there is no actual one");
+			log.Info($"Create feed notification transport for user {userId} because there is no actual one");
 
 			await notificationsRepo.AddNotificationTransportAsync(new FeedNotificationTransport
 			{
@@ -78,7 +77,7 @@ namespace Database.Repos
 			var transport = await notificationsRepo.FindUsersNotificationTransportAsync<FeedNotificationTransport>(null).ConfigureAwait(false);
 			if (transport == null)
 			{
-				logger.Error("Can't find common (comments) feed notification transport. You should create FeedNotificationTransport with userId = NULL");
+				log.Error("Can't find common (comments) feed notification transport. You should create FeedNotificationTransport with userId = NULL");
 				throw new Exception("Can't find common (comments) feed notification transport");
 			}
 
@@ -90,7 +89,7 @@ namespace Database.Repos
 			var transport = notificationsRepo.FindUsersNotificationTransport<FeedNotificationTransport>(null);
 			if (transport == null)
 			{
-				logger.Error("Can't find common (comments) feed notification transport. You should create FeedNotificationTransport with userId = NULL");
+				log.Error("Can't find common (comments) feed notification transport. You should create FeedNotificationTransport with userId = NULL");
 				throw new Exception("Can't find common (comments) feed notification transport");
 			}
 

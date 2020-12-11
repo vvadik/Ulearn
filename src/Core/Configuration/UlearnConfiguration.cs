@@ -71,6 +71,8 @@ namespace Ulearn.Core.Configuration
 	{
 		public bool Console { get; set; }
 
+		public bool ErrorLogsToTelegram { get; set; }
+
 		public string PathFormat { get; set; }
 
 		public string MinimumLevel { get; set; }

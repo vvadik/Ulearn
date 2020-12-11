@@ -77,8 +77,8 @@ namespace RunCsJob
 					project.Save();
 					using (var stringWriter = new StringWriter())
 					{
-						var logger = new ConsoleLogger(LoggerVerbosity.Minimal, stringWriter.Write, color => { }, () => { });
-						result.Success = SyncBuild(project, logger);
+						var log = new ConsoleLogger(LoggerVerbosity.Minimal, stringWriter.Write, color => { }, () => { });
+						result.Success = SyncBuild(project, log);
 						if (result.Success)
 							result.PathToExe = Path.Combine(project.DirectoryPath,
 								project.GetPropertyValue("OutputPath"),
@@ -96,10 +96,10 @@ namespace RunCsJob
 
 		private static volatile object buildLock = new object();
 
-		private static bool SyncBuild(Project project, ILogger logger)
+		private static bool SyncBuild(Project project, ILogger log)
 		{
 			lock (buildLock)
-				return project.Build("Rebuild", new List<ILogger> { logger });
+				return project.Build("Rebuild", new List<ILogger> { log });
 		}
 	}
 }

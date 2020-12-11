@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Security;
 using System.Text;
 using JetBrains.Annotations;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Newtonsoft.Json;
 using RunCheckerJob;
 using Ulearn.Common;
@@ -50,7 +50,7 @@ namespace RunCsJob
 
 	public class CsSandboxRunner
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(CsSandboxRunner));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(CsSandboxRunner));
 		private readonly MetricSender metricSender = new MetricSender("runcsjob");
 
 		private readonly CsRunnerSubmission submission;
@@ -78,7 +78,7 @@ namespace RunCsJob
 			}
 			catch (Exception ex)
 			{
-				log.Error("Не могу распаковать решение", ex);
+				log.Error(ex, "Не могу распаковать решение");
 				return new RunningResults(submission.Id, Verdict.SandboxError, error: ex.ToString());
 			}
 
@@ -124,7 +124,7 @@ namespace RunCsJob
 			}
 		}
 
-		private static void SafeRemoveFile(string path)
+		private void SafeRemoveFile(string path)
 		{
 			try
 			{
@@ -132,7 +132,7 @@ namespace RunCsJob
 			}
 			catch (Exception e)
 			{
-				log.Warn($"Произошла ошибка при удалении файла {path}, но я её проигнорирую", e);
+				log.Warn(e, $"Произошла ошибка при удалении файла {path}, но я её проигнорирую");
 			}
 		}
 
@@ -364,7 +364,7 @@ namespace RunCsJob
 			   at Memory.API.APIObject.Finalize()
 			
 		   It's possible, i.e., for exceptions thrown from destructors. Let's try to parse them! */
-		private static Exception ParseNotSerializedException(string stderr)
+		private Exception ParseNotSerializedException(string stderr)
 		{
 			stderr = stderr.Trim();
 
@@ -398,7 +398,7 @@ namespace RunCsJob
 			return null;
 		}
 
-		private static Exception TryToCreateExceptionByTypeAndMessage(Type exceptionType, string exceptionMessage)
+		private Exception TryToCreateExceptionByTypeAndMessage(Type exceptionType, string exceptionMessage)
 		{
 			Exception exceptionObject = null;
 			try

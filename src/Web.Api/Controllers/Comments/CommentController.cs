@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Database;
-using Database.Extensions;
 using Database.Models;
 using Database.Models.Comments;
 using Database.Repos;
@@ -16,13 +15,11 @@ using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Serilog;
 using Swashbuckle.AspNetCore.Annotations;
 using Ulearn.Common;
 using Ulearn.Common.Api;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
-using Ulearn.Web.Api.Models.Common;
 using Ulearn.Web.Api.Models.Parameters.Comments;
 using Ulearn.Web.Api.Models.Responses.Comments;
 
@@ -33,10 +30,10 @@ namespace Ulearn.Web.Api.Controllers.Comments
 	[Route("/comments/{commentId:int:min(0)}")]
 	public class CommentController : BaseCommentController
 	{
-		public CommentController(ILogger logger, IWebCourseManager courseManager, UlearnDb db,
+		public CommentController(IWebCourseManager courseManager, UlearnDb db,
 			IUsersRepo usersRepo, ICommentsRepo commentsRepo, ICommentLikesRepo commentLikesRepo, ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo,
 			INotificationsRepo notificationsRepo, IGroupMembersRepo groupMembersRepo, IGroupAccessesRepo groupAccessesRepo)
-			: base(logger, courseManager, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo, notificationsRepo, groupMembersRepo, groupAccessesRepo)
+			: base(courseManager, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo, notificationsRepo, groupMembersRepo, groupAccessesRepo)
 		{
 		}
 

@@ -38,7 +38,6 @@ using Ulearn.Web.Api.Swagger;
 using Vostok.Hosting.Abstractions;
 using Web.Api.Configuration;
 using Enum = System.Enum;
-using ILogger = Serilog.ILogger;
 
 namespace Ulearn.Web.Api
 {
@@ -111,11 +110,11 @@ namespace Ulearn.Web.Api
 				});
 		}
 
-		protected override void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment, ILogger logger)
+		protected override void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment)
 		{
 			var configuration = hostingEnvironment.SecretConfigurationProvider.Get<WebApiConfiguration>(hostingEnvironment.SecretConfigurationSource);
 
-			base.ConfigureServices(services, hostingEnvironment, logger);
+			base.ConfigureServices(services, hostingEnvironment);
 
 			/* TODO (andgein): use UlearnDbFactory here */
 			services.AddDbContextPool<UlearnDb>(
@@ -177,9 +176,9 @@ namespace Ulearn.Web.Api
 			c.OperationFilter<RemoveCourseParameterOperationFilter>();
 		}
 
-		public override void ConfigureDi(IServiceCollection services, ILogger logger)
+		public override void ConfigureDi(IServiceCollection services)
 		{
-			base.ConfigureDi(services, logger);
+			base.ConfigureDi(services);
 
 			services.AddScoped<IAuthorizationHandler, CourseRoleAuthorizationHandler>();
 			services.AddScoped<IAuthorizationHandler, CourseAccessAuthorizationHandler>();
@@ -188,7 +187,7 @@ namespace Ulearn.Web.Api
 			services.AddScoped<SlideRenderer, SlideRenderer>();
 			services.AddSingleton<WebsocketsEventSender, WebsocketsEventSender>();
 
-			services.AddDatabaseServices(logger);
+			services.AddDatabaseServices();
 		}
 
 		public void ConfigureAuthServices(IServiceCollection services, WebApiConfiguration configuration)

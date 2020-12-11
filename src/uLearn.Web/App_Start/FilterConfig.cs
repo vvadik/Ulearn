@@ -11,10 +11,9 @@ using System.Web.Configuration;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Database.DataContexts;
-using log4net;
+using Vostok.Logging.Abstractions;
 using LtiLibrary.Core.Extensions;
 using Microsoft.AspNet.Identity;
-using NUnit.Framework.Internal;
 using uLearn.Web.Kontur.Passport;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
@@ -52,7 +51,7 @@ namespace uLearn.Web
 
 	public class AntiForgeryTokenFilter : FilterAttribute, IExceptionFilter
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(AntiForgeryTokenFilter));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(AntiForgeryTokenFilter));
 
 		public void OnException(ExceptionContext filterContext)
 		{
@@ -71,7 +70,7 @@ namespace uLearn.Web
 
 	public class HandleHttpAntiForgeryException : ActionFilterAttribute, IExceptionFilter
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(HandleHttpAntiForgeryException));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(HandleHttpAntiForgeryException));
 
 		public void OnException(ExceptionContext filterContext)
 		{

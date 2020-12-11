@@ -30,8 +30,6 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.6.0" />
-    <PackageReference Include="Common.Logging" Version="3.4.1" />
-    <PackageReference Include="Common.Logging.Core" Version="3.4.1" />
     <PackageReference Include="DotNetZip" Version="1.13.4" />
     <PackageReference Include="MarkdownDeep.NET.Core" Version="1.5.0.4" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />

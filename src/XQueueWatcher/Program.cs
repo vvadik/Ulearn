@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 using Database;
 using Database.DataContexts;
 using Graphite;
-using log4net;
-using log4net.Config;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Configuration;
+using Ulearn.Core.Logging;
 using Ulearn.Core.Metrics;
 using XQueue;
 using XQueue.Models;
@@ -22,24 +22,25 @@ namespace XQueueWatcher
 	{
 		private static readonly TimeSpan pauseBetweenRequests = TimeSpan.FromSeconds(1);
 
-		private static readonly ILog log = LogManager.GetLogger(typeof(Program));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(Program));
 		private static readonly CourseManager courseManager = WebCourseManager.Instance;
+		private static readonly UlearnConfiguration configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 
-		private static readonly ServiceKeepAliver keepAliver = new ServiceKeepAliver(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName);
+		private static readonly ServiceKeepAliver keepAliver = new ServiceKeepAliver(configuration.GraphiteServiceName);
 
 		private static readonly Dictionary<int, XQueueClient> clientsCache = new Dictionary<int, XQueueClient>();
 
 		static void Main(string[] args)
 		{
+			LoggerSetup.Setup(configuration.HostLog, configuration.GraphiteServiceName);
 			new Program().StartXQueueWatchers(new CancellationToken());
 		}
 
 		public void StartXQueueWatchers(CancellationToken cancellationToken)
 		{
-			XmlConfigurator.Configure();
 			StaticMetricsPipeProvider.Instance.Start();
 
-			var keepAliveInterval = TimeSpan.FromSeconds(ApplicationConfiguration.Read<UlearnConfiguration>().KeepAliveInterval ?? 30);
+			var keepAliveInterval = TimeSpan.FromSeconds(configuration.KeepAliveInterval ?? 30);
 
 			while (true)
 			{
@@ -65,7 +66,7 @@ namespace XQueueWatcher
 			}
 			catch (Exception e)
 			{
-				log.Error(e);
+				log.Error(e, "GetAndProcessSubmissionFromXQueue error");
 			}
 		}
 
@@ -96,7 +97,7 @@ namespace XQueueWatcher
 			}
 			catch (Exception e)
 			{
-				log.Error($"Error occurred while processing submission from xqueue: {e.Message}", e);
+				log.Error(e, $"Error occurred while processing submission from xqueue: {e.Message}");
 				await client.PutResult(new XQueueResult
 				{
 					header = submission.header,

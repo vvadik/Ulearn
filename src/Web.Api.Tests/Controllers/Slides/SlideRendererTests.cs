@@ -4,7 +4,6 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
-using Serilog;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
@@ -29,7 +28,7 @@ namespace Web.Api.Tests.Controllers.Slides
 		{
 			Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
 			videoAnnotationsClient = Mock.Of<IUlearnVideoAnnotationsClient>();
-			slideRenderer = new SlideRenderer(logger, videoAnnotationsClient);
+			slideRenderer = new SlideRenderer(videoAnnotationsClient);
 			loader = new XmlSlideLoader();
 			courseSettings = new CourseSettings(CourseSettings.DefaultSettings);
 			courseSettings.Scoring.Groups.Add("ScoringGroup1", new ScoringGroup { Id = "ScoringGroup1" });

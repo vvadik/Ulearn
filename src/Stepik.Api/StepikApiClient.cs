@@ -6,7 +6,7 @@ using System.Net.Http.Headers;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Newtonsoft.Json.Linq;
 using Ulearn.Common.Extensions;
 
@@ -22,7 +22,7 @@ namespace Stepik.Api
 		private const string tokenUrl = "https://stepik.org/oauth2/token/";
 		private const string tokenGrantType = "authorization_code";
 
-		private readonly ILog log = LogManager.GetLogger(typeof(StepikApiClient));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(StepikApiClient));
 		private readonly StepikApiOptions options;
 		private readonly HttpClient httpClient;
 

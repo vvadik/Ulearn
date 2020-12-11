@@ -9,7 +9,7 @@ using Database;
 using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Microsoft.AspNet.Identity;
 using Stepik.Api;
 using uLearn.Web.FilterAttributes;
@@ -21,7 +21,7 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 	public class StepikController : Controller
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(StepikController));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(StepikController));
 
 		private readonly StepikRepo stepikRepo;
 		private readonly NotificationsRepo notificationsRepo;

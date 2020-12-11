@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using JetBrains.Annotations;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Blocks;
@@ -20,7 +20,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 	[XmlType("exercise.universal")]
 	public class UniversalExerciseBlock : AbstractExerciseBlock, IExerciseCheckerZipBuilder
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(UniversalExerciseBlock));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(UniversalExerciseBlock));
 
 		[XmlAttribute("exerciseDirName")] // Путь до директории с упражнением
 		public string ExerciseDirPath { get; set; }

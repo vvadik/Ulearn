@@ -1,12 +1,10 @@
 using Database;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
-using Database.Repos;
 using Database.Repos.CourseRoles;
 using Database.Repos.Flashcards;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -21,8 +19,8 @@ namespace Ulearn.Web.Api.Controllers
 		private ICourseRolesRepo courseRolesRepo;
 		private IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo;
 
-		public FlashcardStatisticsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo)
-			: base(logger, courseManager, db, usersRepo)
+		public FlashcardStatisticsController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo)
+			: base(courseManager, db, usersRepo)
 		{
 			this.courseRolesRepo = courseRolesRepo;
 			this.usersFlashcardsVisitsRepo = usersFlashcardsVisitsRepo;

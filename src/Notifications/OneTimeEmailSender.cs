@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Database.DataContexts;
 using Database.Models;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Extensions;
 
@@ -16,7 +16,7 @@ namespace Notifications
 	{
 		private const string configFilename = "sender.xml";
 
-		private static readonly ILog log = LogManager.GetLogger(typeof(OneTimeEmailSender));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(OneTimeEmailSender));
 		private readonly KonturSpamEmailSender emailSender;
 		private readonly UsersRepo usersRepo;
 		private readonly NotificationsRepo notificationsRepo;

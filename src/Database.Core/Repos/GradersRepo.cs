@@ -5,9 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using JetBrains.Annotations;
-using log4net;
 using Microsoft.EntityFrameworkCore;
-using uLearn;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
@@ -19,8 +17,6 @@ namespace Database.Repos
 	{
 		private readonly UlearnDb db;
 		private readonly UlearnUserManager userManager;
-
-		private static readonly ILog log = LogManager.GetLogger(typeof(GradersRepo));
 
 		public GradersRepo(UlearnDb db, UlearnUserManager userManager)
 		{

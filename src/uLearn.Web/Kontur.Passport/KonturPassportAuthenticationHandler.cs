@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Infrastructure;
@@ -17,12 +17,11 @@ namespace uLearn.Web.Kontur.Passport
 		private const string konturStateCookieName = "kontur.passport.state";
 
 		private readonly PassportClient passportClient;
-		private readonly ILog log;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(KonturPassportAuthenticationHandler));
 
-		public KonturPassportAuthenticationHandler(PassportClient passportClient, ILog log)
+		public KonturPassportAuthenticationHandler(PassportClient passportClient)
 		{
 			this.passportClient = passportClient;
-			this.log = log;
 		}
 
 		/// <summary>

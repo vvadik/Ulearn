@@ -11,7 +11,7 @@ using Database.Models;
 using Database.Repos.CourseRoles;
 using Database.Repos.Users;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
@@ -25,18 +25,17 @@ namespace Database.Repos
 		public static TimeSpan sendNotificationsDelayAfterCreating = TimeSpan.FromMinutes(1);
 
 		private readonly UlearnDb db;
-		private readonly ILogger logger;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(NotificationsRepo));
 		private readonly IServiceProvider serviceProvider;
 		private readonly IUnitsRepo unitsRepo;
 		private readonly ICourseRoleUsersFilter courseRoleUsersFilter;
 		private readonly IUsersRepo usersRepo;
 		private readonly IWebCourseManager courseManager;
 
-		public NotificationsRepo(UlearnDb db, ILogger logger, IServiceProvider serviceProvider,
+		public NotificationsRepo(UlearnDb db, IServiceProvider serviceProvider,
 			IUnitsRepo unitsRepo, ICourseRoleUsersFilter courseRoleUsersFilter, IUsersRepo usersRepo, IWebCourseManager courseManager)
 		{
 			this.db = db;
-			this.logger = logger;
 			this.serviceProvider = serviceProvider;
 			this.unitsRepo = unitsRepo;
 			this.usersRepo = usersRepo;
@@ -271,18 +270,18 @@ namespace Database.Repos
 		private async Task CreateDeliveriesForNotification(Notification notification)
 		{
 			var notificationType = notification.GetNotificationType();
-			logger.Information($"Found new notification {notificationType} #{notification.Id}");
+			log.Info($"Found new notification {notificationType} #{notification.Id}");
 
 			if (!notification.IsActual())
 			{
-				logger.Information($"Notification #{notification.Id}: is not actual more");
+				log.Info($"Notification #{notification.Id}: is not actual more");
 				return;
 			}
 
 			var blockerNotifications = notification.GetBlockerNotifications(serviceProvider);
 			if (blockerNotifications.Count > 0)
 			{
-				logger.Information(
+				log.Info(
 					$"There are blocker notifications (this one will not be send if blocker notifications has been already sent to the same transport): " +
 					$"{string.Join(", ", blockerNotifications.Select(n => $"{n.GetNotificationType()} #{n.Id}"))}"
 				);
@@ -300,7 +299,7 @@ namespace Database.Repos
 
 			recipientsIds = await FilterUsersWhoNotSeeCourse(notification, recipientsIds);
 
-			logger.Information($"Recipients list for notification {notification.Id}: {recipientsIds.Count} user(s)");
+			log.Info($"Recipients list for notification {notification.Id}: {recipientsIds.Count} user(s)");
 
 			if (recipientsIds.Count == 0)
 				return;
@@ -318,7 +317,7 @@ namespace Database.Repos
 
 			if (isEnabledByDefault)
 			{
-				logger.Information($"Notification #{notification.Id}. This notification type is enabled by default, so collecting data for it");
+				log.Info($"Notification #{notification.Id}. This notification type is enabled by default, so collecting data for it");
 
 				var recipientsTransports = db.NotificationTransports.Where(
 					t => recipientsIds.Contains(t.UserId) &&
@@ -341,10 +340,10 @@ namespace Database.Repos
 			{
 				/* Add notification to all common transports */
 				/* It's used for notifications which should be sent to everyone in the course */
-				logger.Information($"Notification #{notification.Id}. This notification type is sent to everyone, so add it to all common transports ({commonTransports.Count} transport(s)):");
+				log.Info($"Notification #{notification.Id}. This notification type is sent to everyone, so add it to all common transports ({commonTransports.Count} transport(s)):");
 				foreach (var commonTransport in commonTransports)
 				{
-					logger.Information($"Common transport {commonTransport}");
+					log.Info($"Common transport {commonTransport}");
 					transportsSettings.Add(new NotificationTransportSettings
 					{
 						IsEnabled = true,
@@ -360,7 +359,7 @@ namespace Database.Repos
 			);
 			if (blockerNotificationsSentToTransports.Count > 0)
 			{
-				logger.Information(
+				log.Info(
 					"Blocked notifications have been already sent to follow transports:" +
 					$"{string.Join(", ", blockerNotificationsSentToTransports)}"
 				);
@@ -370,30 +369,30 @@ namespace Database.Repos
 
 			foreach (var transportSettings in transportsSettings)
 			{
-				logger.Information($"Notification #{notification.Id}: add delivery to {transportSettings.NotificationTransport}, isEnabled: {transportSettings.IsEnabled}");
+				log.Info($"Notification #{notification.Id}: add delivery to {transportSettings.NotificationTransport}, isEnabled: {transportSettings.IsEnabled}");
 				if (!transportSettings.IsEnabled)
 					continue;
 
 				if (!transportSettings.NotificationTransport.IsEnabled)
 				{
-					logger.Information($"Transport {transportSettings.NotificationTransport} is fully disabled, ignore it");
+					log.Info($"Transport {transportSettings.NotificationTransport} is fully disabled, ignore it");
 					continue;
 				}
 
 				/* Always ignore to send notification to user initiated this notification */
 				if (transportSettings.NotificationTransport.UserId == notification.InitiatedById)
 				{
-					logger.Information($"Don't sent notification to the transport {transportSettings.NotificationTransport} because it has been initiated by this user");
+					log.Info($"Don't sent notification to the transport {transportSettings.NotificationTransport} because it has been initiated by this user");
 					continue;
 				}
 
 				if (blockerNotificationsSentToTransports.Contains(transportSettings.NotificationTransportId))
 				{
-					logger.Information($"Some blocker notification already has been sent to transport {transportSettings.NotificationTransport}, ignore it");
+					log.Info($"Some blocker notification already has been sent to transport {transportSettings.NotificationTransport}, ignore it");
 					continue;
 				}
 
-				logger.Information($"Notification #{notification.Id}: add delivery to {transportSettings.NotificationTransport}, sending at {now}");
+				log.Info($"Notification #{notification.Id}: add delivery to {transportSettings.NotificationTransport}, sending at {now}");
 				db.NotificationDeliveries.Add(new NotificationDelivery
 				{
 					Notification = notification,

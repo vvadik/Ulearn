@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Web.Configuration;
 using System.Web.Mvc;
 using Database.DataContexts;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
@@ -17,7 +17,7 @@ namespace uLearn.Web.Controllers
 {
 	public class TelegramController : JsonDataContractController
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(TelegramController));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(TelegramController));
 
 		private readonly string webhookSecret;
 		private readonly string protocol;

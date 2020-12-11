@@ -6,7 +6,7 @@ using AntiPlagiarism.Web.Database.Models;
 using AntiPlagiarism.Web.Database.Repos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Serilog;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common.Api.Models.Responses;
 
 
@@ -15,15 +15,14 @@ namespace AntiPlagiarism.Web.Controllers
 	[ApiController]
 	public abstract class BaseController : Controller
 	{
-		protected readonly ILogger logger;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(BaseController));
 		protected readonly IClientsRepo clientsRepo;
 		protected readonly AntiPlagiarismDb db;
 
 		protected Client client;
 
-		protected BaseController(ILogger logger, IClientsRepo clientsRepo, AntiPlagiarismDb db)
+		protected BaseController(IClientsRepo clientsRepo, AntiPlagiarismDb db)
 		{
-			this.logger = logger;
 			this.clientsRepo = clientsRepo;
 			this.db = db;
 		}
@@ -45,7 +44,7 @@ namespace AntiPlagiarism.Web.Controllers
 				return;
 			}
 
-			logger.Debug($"Token in request is {token}", token);
+			log.Debug($"Token in request is {token}", token);
 			client = await clientsRepo.FindClientByTokenAsync(tokenGuid).ConfigureAwait(false);
 			if (client == null)
 			{
@@ -68,7 +67,7 @@ namespace AntiPlagiarism.Web.Controllers
 
 			if (isRequestSafe)
 			{
-				logger.Debug("Выключаю автоматическое отслеживание изменений в EF Core: db.ChangeTracker.AutoDetectChangesEnabled = false");
+				log.Debug("Выключаю автоматическое отслеживание изменений в EF Core: db.ChangeTracker.AutoDetectChangesEnabled = false");
 			}
 		}
 	}

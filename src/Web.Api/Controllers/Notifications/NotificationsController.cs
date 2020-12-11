@@ -9,7 +9,7 @@ using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Serilog;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Models.Parameters.Notifications;
 using Ulearn.Web.Api.Models.Responses.Notifications;
@@ -19,21 +19,19 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 	[Route("/notifications")]
 	public class NotificationsController : BaseController
 	{
-		private readonly INotificationsRepo notificationsRepo;
 		private readonly IFeedRepo feedRepo;
 		private readonly IServiceProvider serviceProvider;
 		private readonly INotificationDataPreloader notificationDataPreloader;
-
 		private static FeedNotificationTransport commentsFeedNotificationTransport;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(NotificationsController));
 
-		public NotificationsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db,
+		public NotificationsController(IWebCourseManager courseManager, UlearnDb db,
 			IUsersRepo usersRepo,
-			INotificationsRepo notificationsRepo, IFeedRepo feedRepo,
+			IFeedRepo feedRepo,
 			IServiceProvider serviceProvider,
 			INotificationDataPreloader notificationDataPreloader)
-			: base(logger, courseManager, db, usersRepo)
+			: base(courseManager, db, usersRepo)
 		{
-			this.notificationsRepo = notificationsRepo ?? throw new ArgumentNullException(nameof(notificationsRepo));
 			this.feedRepo = feedRepo ?? throw new ArgumentNullException(nameof(feedRepo));
 			this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 			this.notificationDataPreloader = notificationDataPreloader ?? throw new ArgumentNullException(nameof(notificationDataPreloader));
@@ -109,22 +107,22 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 
 			var commentsNotifications = (await feedRepo.GetNotificationForFeedNotificationDeliveriesAsync(userId, n => n.InitiatedBy, transports: commentsFeedNotificationTransport).ConfigureAwait(false));
 
-			logger.Information($"[GetNotificationList] Step 1 done: found {importantNotifications.Count} important notifications and {commentsNotifications.Count} comment notifications");
+			log.Info($"[GetNotificationList] Step 1 done: found {importantNotifications.Count} important notifications and {commentsNotifications.Count} comment notifications");
 
 			importantNotifications = RemoveBlockedNotifications(importantNotifications).ToList();
 			commentsNotifications = RemoveBlockedNotifications(commentsNotifications, importantNotifications).ToList();
 
-			logger.Information($"[GetNotificationList] Step 2 done, removed blocked notifications: left {importantNotifications.Count} important notifications and {commentsNotifications.Count} comment notifications");
+			log.Info($"[GetNotificationList] Step 2 done, removed blocked notifications: left {importantNotifications.Count} important notifications and {commentsNotifications.Count} comment notifications");
 
 			importantNotifications = RemoveNotActualNotifications(importantNotifications).ToList();
 			commentsNotifications = RemoveNotActualNotifications(commentsNotifications).ToList();
 
-			logger.Information($"[GetNotificationList] Step 3 done, removed not actual notifications: left {importantNotifications.Count} important notifications and {commentsNotifications.Count} comment notifications");
+			log.Info($"[GetNotificationList] Step 3 done, removed not actual notifications: left {importantNotifications.Count} important notifications and {commentsNotifications.Count} comment notifications");
 
 			var importantLastViewTimestamp = await feedRepo.GetFeedViewTimestampAsync(userId, notificationTransport?.Id ?? -1).ConfigureAwait(false);
 			var commentsLastViewTimestamp = await feedRepo.GetFeedViewTimestampAsync(userId, commentsFeedNotificationTransport.Id).ConfigureAwait(false);
 
-			logger.Information("[GetNotificationList] Step 4, building models");
+			log.Info("[GetNotificationList] Step 4, building models");
 
 			var allNotifications = importantNotifications.Concat(commentsNotifications).ToList();
 			var notificationsData = await notificationDataPreloader.LoadAsync(allNotifications).ConfigureAwait(false);
@@ -161,7 +159,7 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 		{
 			return notifications.Where(notification =>
 			{
-				logger.Information($"Checking actuality of notification #{notification.Id}: {notification} ({notification.GetNotificationType().ToString()})");
+				log.Info($"Checking actuality of notification #{notification.Id}: {notification} ({notification.GetNotificationType().ToString()})");
 				return notification.IsActual();
 			});
 		}

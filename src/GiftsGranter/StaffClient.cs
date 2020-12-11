@@ -4,8 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using ApprovalUtilities.SimpleLogger;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Ulearn.Common;
@@ -17,7 +16,7 @@ namespace GiftsGranter
 		private readonly string clientAuth;
 		private string authToken;
 		private string passportUri = "https://passport.skbkontur.ru/v3/connect/token";
-		private static readonly ILog log = LogManager.GetLogger(typeof(StaffClient));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(StaffClient));
 
 		/// <param name="clientAuth">format: "clientId:clientSecret"</param>
 		public StaffClient(string clientAuth)
@@ -82,7 +81,7 @@ namespace GiftsGranter
 			return responseJson["refresh_token"].Value<string>();
 		}
 
-		private static JObject GetJsonResponse(HttpResponseMessage response)
+		private JObject GetJsonResponse(HttpResponseMessage response)
 		{
 			string result = response.Content.ReadAsStringAsync().Result;
 			if (response.StatusCode != HttpStatusCode.OK)

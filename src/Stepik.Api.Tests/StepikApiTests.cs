@@ -5,9 +5,9 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using log4net;
 using NHttp;
 using RestSharp.Extensions;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common.Extensions;
 
 namespace Stepik.Api.Tests
@@ -100,7 +100,7 @@ namespace Stepik.Api.Tests
 	public class AuthorizationCodeRetrieverServer
 	{
 		private readonly HttpServer server;
-		private readonly ILog log = LogManager.GetLogger(typeof(AuthorizationCodeRetrieverServer));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(AuthorizationCodeRetrieverServer));
 
 		public EventHandler<string> OnAuthorizationCodeReceived;
 
@@ -122,7 +122,7 @@ namespace Stepik.Api.Tests
 			}
 			catch (Exception e)
 			{
-				log.Error($"Some error occurred while AuthorizationCodeRetrieverServer is starting: {e.Message}", e);
+				log.Error(e, $"Some error occurred while AuthorizationCodeRetrieverServer is starting: {e.Message}");
 			}
 		}
 
