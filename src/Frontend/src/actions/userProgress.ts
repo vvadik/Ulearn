@@ -48,7 +48,7 @@ export const userProgressUpdate = (courseId: string, slideId: string
 		updateUserProgressInCourse(courseId, slideId)
 			.catch((err: Error) => {
 				console.error(err); // TODO rozentor handle error
-			})
+			});
 	};
 };
 
@@ -67,5 +67,13 @@ export const loadUserProgress = (courseId: string, userId: string
 			.catch(() => {
 				dispatch(loadUserProgressFail());
 			});
+	};
+};
+
+
+export const userProgressVisitAcceptedSolutions = (courseId: string, slideId: string,)
+	: (dispatch: Dispatch<UserProgressUpdateAction>) => void => {
+	return (dispatch: Dispatch<UserProgressUpdateAction>) => {
+		dispatch(userProgressUpdateAction(courseId, slideId, { isSkipped: true }));
 	};
 };

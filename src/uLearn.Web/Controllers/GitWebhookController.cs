@@ -7,7 +7,7 @@ using System.Text;
 using System.Web.Http;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Newtonsoft.Json;
 using Ulearn.Core.Configuration;
 
@@ -15,7 +15,7 @@ namespace uLearn.Web.Controllers
 {
 	public class GitWebhookController : ApiController
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(GitWebhookController));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(GitWebhookController));
 
 		private readonly string gitSecret;
 

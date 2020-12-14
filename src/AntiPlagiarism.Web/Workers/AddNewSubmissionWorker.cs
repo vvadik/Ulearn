@@ -5,7 +5,7 @@ using AntiPlagiarism.Web.CodeAnalyzing;
 using AntiPlagiarism.Web.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Serilog;
+using Vostok.Logging.Abstractions;
 
 namespace AntiPlagiarism.Web.Workers
 {
@@ -13,17 +13,16 @@ namespace AntiPlagiarism.Web.Workers
 	{
 		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly IOptions<AntiPlagiarismConfiguration> configuration;
-		private readonly ILogger logger;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(AddNewSubmissionWorker));
 		
 		private readonly List<Thread> threads = new List<Thread>();
 		private readonly TimeSpan sleep = TimeSpan.FromSeconds(5);
 
-		public AddNewSubmissionWorker(ILogger logger,
+		public AddNewSubmissionWorker(
 			IOptions<AntiPlagiarismConfiguration> configuration,
 			IServiceScopeFactory serviceScopeFactory)
 		{
 			this.serviceScopeFactory = serviceScopeFactory;
-			this.logger = logger;
 			this.configuration = configuration;
 
 			RunHandleNewSubmissionWorkerThreads();
@@ -34,11 +33,11 @@ namespace AntiPlagiarism.Web.Workers
 			var threadsCount = configuration.Value.AntiPlagiarism.ThreadsCount;
 			if (threadsCount < 1)
 			{
-				logger.Error($"Не могу определить количество потоков для запуска из конфигурации: ${threadsCount}. Количество потоков должно быть положительно");
+				log.Error($"Не могу определить количество потоков для запуска из конфигурации: ${threadsCount}. Количество потоков должно быть положительно");
 				throw new ArgumentOutOfRangeException(nameof(threadsCount), "Number of threads (antiplagiarism:threadsCount) should be positive");
 			}
 
-			logger.Information($"Запускаю AddNewSubmissionWorker в {threadsCount} потока(ов)");
+			log.Info($"Запускаю AddNewSubmissionWorker в {threadsCount} потока(ов)");
 			for (var i = 0; i < threadsCount; i++)
 			{
 				threads.Add(new Thread(WorkerThread)
@@ -53,7 +52,7 @@ namespace AntiPlagiarism.Web.Workers
 
 		private void WorkerThread()
 		{
-			logger.Information($"Поток {Thread.CurrentThread.Name} запускается");
+			log.Info($"Поток {Thread.CurrentThread.Name} запускается");
 
 			while (true)
 			{
@@ -67,7 +66,7 @@ namespace AntiPlagiarism.Web.Workers
 					}
 					catch (Exception ex)
 					{
-						logger.Error(ex, "Exception during HandleNewSubmission");
+						log.Error(ex, "Exception during HandleNewSubmission");
 					}
 				}
 				if(!newSubmissionHandled)

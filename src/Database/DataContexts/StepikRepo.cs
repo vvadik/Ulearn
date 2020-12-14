@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using JetBrains.Annotations;
-using log4net;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
 
@@ -13,8 +12,6 @@ namespace Database.DataContexts
 	public class StepikRepo
 	{
 		private readonly ULearnDb db;
-
-		private static readonly ILog log = LogManager.GetLogger(typeof(StepikRepo));
 
 		public StepikRepo(ULearnDb db)
 		{

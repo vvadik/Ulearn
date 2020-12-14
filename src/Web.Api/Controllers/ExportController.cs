@@ -13,7 +13,6 @@ using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides.Quizzes;
@@ -32,11 +31,11 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly IGroupsRepo groupsRepo;
 		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IUserQuizzesRepo userQuizzesRepo;
-		
-		public ExportController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
+
+		public ExportController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
 			IGroupMembersRepo groupMembersRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo, IUserQuizzesRepo userQuizzesRepo,
 			ICourseRolesRepo courseRolesRepo)
-			: base(logger, courseManager, db, usersRepo)
+			: base(courseManager, db, usersRepo)
 		{
 			this.groupMembersRepo = groupMembersRepo;
 			this.visitsRepo = visitsRepo;

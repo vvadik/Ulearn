@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using Database.Repos;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using Serilog;
+using Vostok.Logging.Abstractions;
+using Vostok.Logging.Microsoft;
 
 namespace Database.Core.Tests
 {
@@ -17,22 +18,14 @@ namespace Database.Core.Tests
 		[SetUp]
 		public void SetUp()
 		{
-			var log = new LoggerConfiguration()
-				.MinimumLevel.Debug()
-				.WriteTo.NUnitOutput()
-				.WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss.ffff } {Level}] {Message:lj}{NewLine}{Exception}")
-				.CreateLogger();
-
-			/* Create database context with logging */
-			// var db = new UlearnDbFactory().CreateDbContext(new string[0], new LoggerFactory(new List<ILoggerProvider> { new SerilogLoggerProvider(log) }));
-			var db = new UlearnDbFactory().CreateDbContext(new string[0]);
+			var loggerFactory = new LoggerFactory().AddVostok(LogProvider.Get());
+			var db = new UlearnDbFactory().CreateDbContext(new string[0], loggerFactory);
 
 			/* Disable changetracker if needed */
 			// db.ChangeTracker.AutoDetectChangesEnabled = false;
 
 			var serviceCollection = new ServiceCollection();
 			serviceCollection.AddSingleton(db);
-			serviceCollection.AddSingleton<ILogger>(log);
 			serviceCollection.AddTransient<NotificationsRepo>();
 			serviceCollection.AddTransient<FeedRepo>();
 			serviceCollection.AddTransient<VisitsRepo>();

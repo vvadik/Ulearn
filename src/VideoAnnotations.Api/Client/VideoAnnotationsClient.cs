@@ -1,8 +1,7 @@
-using System;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Serilog;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common.Api;
 using Ulearn.Common.Api.Models.Parameters;
 using Ulearn.Common.Api.Models.Responses;
@@ -13,22 +12,21 @@ namespace Ulearn.VideoAnnotations.Api.Client
 {
 	public class VideoAnnotationsClient : BaseApiClient, IVideoAnnotationsClient
 	{
-		private readonly ILogger logger;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(VideoAnnotationsClient));
 
-		public VideoAnnotationsClient(ILogger logger, string endpointUrl)
-			: base(logger, new ApiClientSettings(endpointUrl)
+		public VideoAnnotationsClient(string endpointUrl)
+			: base(new ApiClientSettings(endpointUrl)
 			{
 				ServiceName = "ulearn.videoannotations-web",
 			})
 		{
-			this.logger = logger;
 		}
 
 		public async Task<AnnotationsResponse> GetAnnotationsAsync(AnnotationsParameters parameters)
 		{
 			var sw = Stopwatch.StartNew();
 			var response = await MakeRequestAsync<AnnotationsParameters, AnnotationsResponse>(HttpMethod.Get, Urls.Annotations, parameters).ConfigureAwait(false);
-			logger.Information("GetAnnotationsAsync " + sw.ElapsedMilliseconds + " ms");
+			log.Info("GetAnnotationsAsync " + sw.ElapsedMilliseconds + " ms");
 			return response;
 		}
 

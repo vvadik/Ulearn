@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
-using Serilog;
 
 namespace Database.Repos
 {
@@ -10,12 +9,10 @@ namespace Database.Repos
 	public class RestoreRequestRepo : IRestoreRequestRepo
 	{
 		private readonly UlearnDb db;
-		private readonly ILogger logger;
 
-		public RestoreRequestRepo(UlearnDb db, ILogger logger)
+		public RestoreRequestRepo(UlearnDb db)
 		{
 			this.db = db;
-			this.logger = logger;
 		}
 
 		public async Task<string> CreateRequest(string userId)

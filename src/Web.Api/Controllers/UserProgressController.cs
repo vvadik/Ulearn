@@ -12,7 +12,6 @@ using Database.Repos.Users;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Core.Courses;
 using Ulearn.Web.Api.Models.Parameters;
@@ -31,11 +30,11 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly IGroupMembersRepo groupMembersRepo;
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
 
-		public UserProgressController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
+		public UserProgressController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
 			IVisitsRepo visitsRepo, IUserQuizzesRepo userQuizzesRepo, IAdditionalScoresRepo additionalScoresRepo,
 			ICourseRolesRepo courseRolesRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo,
-			ISlideCheckingsRepo slideCheckingsRepo, ITempCoursesRepo tempCoursesRepo)
-			: base(logger, courseManager, db, usersRepo)
+			ISlideCheckingsRepo slideCheckingsRepo)
+			: base(courseManager, db, usersRepo)
 		{
 			this.visitsRepo = visitsRepo;
 			this.userQuizzesRepo = userQuizzesRepo;

@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 using Ulearn.Core.CSharp;
 
 namespace Database.Repos
@@ -11,13 +10,11 @@ namespace Database.Repos
 	public class StyleErrorsRepo : IStyleErrorsRepo
 	{
 		private readonly UlearnDb db;
-		private readonly ILogger logger;
 		private Dictionary<StyleErrorType, bool> settingsCache;
 
-		public StyleErrorsRepo(UlearnDb db, ILogger logger)
+		public StyleErrorsRepo(UlearnDb db)
 		{
 			this.db = db;
-			this.logger = logger;
 		}
 
 		public async Task<bool> IsStyleErrorEnabled(StyleErrorType errorType)

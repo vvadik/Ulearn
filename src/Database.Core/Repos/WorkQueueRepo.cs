@@ -7,7 +7,6 @@ using Database.Models;
 using JetBrains.Annotations;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 using Z.EntityFramework.Plus;
 
 namespace Database.Repos
@@ -15,12 +14,10 @@ namespace Database.Repos
 	public class WorkQueueRepo : IWorkQueueRepo
 	{
 		private readonly UlearnDb db;
-		private readonly ILogger logger;
 
-		public WorkQueueRepo(UlearnDb db, ILogger logger)
+		public WorkQueueRepo(UlearnDb db)
 		{
 			this.db = db;
-			this.logger = logger;
 		}
 
 		public async Task Add(int queueId, string itemId, string type, int priority = 0)

@@ -6,7 +6,7 @@ using System.Web.Configuration;
 using Database.DataContexts;
 using Database.Models;
 using Kontur.Spam.Client;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Microsoft.AspNet.Identity;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
@@ -16,7 +16,7 @@ namespace uLearn.Web.Controllers
 {
 	public class BaseUserController : BaseController
 	{
-		protected static readonly ILog log = LogManager.GetLogger(typeof(BaseUserController));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(BaseUserController));
 
 		protected readonly ULearnDb db;
 		protected UserManager<ApplicationUser> userManager;
@@ -51,7 +51,7 @@ namespace uLearn.Web.Controllers
 			}
 			catch (Exception e)
 			{
-				log.Error($"Can\'t initialize Spam.API client to {spamEndpoint}, login {spamLogin}, password {spamPassword.MaskAsSecret()}", e);
+				log.Error(e, $"Can\'t initialize Spam.API client to {spamEndpoint}, login {spamLogin}, password {spamPassword.MaskAsSecret()}");
 				throw;
 			}
 		}
@@ -104,7 +104,7 @@ namespace uLearn.Web.Controllers
 			}
 			catch (Exception e)
 			{
-				log.Error($"Не могу отправить письмо для подтверждения адреса на {user.Email}", e);
+				log.Error(e, $"Не могу отправить письмо для подтверждения адреса на {user.Email}");
 				return false;
 			}
 

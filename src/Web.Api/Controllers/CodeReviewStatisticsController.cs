@@ -10,8 +10,6 @@ using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.EntityFrameworkCore;
-using Serilog;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Web.Api.Authorization;
 using Ulearn.Web.Api.Models.Responses.CodeReviewStatistics;
@@ -22,23 +20,20 @@ namespace Ulearn.Web.Api.Controllers
 	public class CodeReviewStatisticsController : BaseController
 	{
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
-		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IGroupsRepo groupsRepo;
 		private readonly IGroupMembersRepo groupMembersRepo;
 		private readonly ICourseRoleUsersFilter courseRoleUsersFilter;
 
-		public CodeReviewStatisticsController(ILogger logger, IWebCourseManager courseManager,
+		public CodeReviewStatisticsController(IWebCourseManager courseManager,
 			ISlideCheckingsRepo slideCheckingsRepo,
-			ICourseRolesRepo courseRolesRepo,
 			IUsersRepo usersRepo,
 			IGroupsRepo groupsRepo,
 			IGroupMembersRepo groupMembersRepo,
 			ICourseRoleUsersFilter courseRoleUsersFilter,
 			UlearnDb db)
-			: base(logger, courseManager, db, usersRepo)
+			: base(courseManager, db, usersRepo)
 		{
 			this.slideCheckingsRepo = slideCheckingsRepo;
-			this.courseRolesRepo = courseRolesRepo;
 			this.groupsRepo = groupsRepo;
 			this.groupMembersRepo = groupMembersRepo;
 			this.courseRoleUsersFilter = courseRoleUsersFilter;

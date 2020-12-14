@@ -2,13 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Ulearn.Common;
-using Ulearn.Common.Extensions;
 using Ulearn.Core;
-using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.RunCheckerJobApi;
 
 namespace RunCheckerJob
@@ -17,7 +15,7 @@ namespace RunCheckerJob
 	{
 		private readonly DockerSandboxRunner sandboxRunner;
 
-		private static readonly ILog log = LogManager.GetLogger(typeof(SelfChecker));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(SelfChecker));
 
 		public SelfChecker(DockerSandboxRunner sandboxRunner)
 		{
@@ -36,7 +34,7 @@ namespace RunCheckerJob
 			submission.ZipFileData = zipBytes;
 			submission.DockerImageName = imageName;
 			var res = sandboxRunner.Run(submission);
-			log.Info(res);
+			log.Info("SelfCheck result: {Result}", JsonConvert.SerializeObject(res));
 			return res;
 		}
 	}

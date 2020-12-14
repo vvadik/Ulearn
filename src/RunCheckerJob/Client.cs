@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Newtonsoft.Json;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
@@ -19,7 +19,7 @@ namespace RunCheckerJob
 		private readonly HttpClient httpClient;
 		private const string instanceIdEnvironmentVariableName = "WEBSITE_INSTANCE_ID";
 		private const string arrAffinityCookieName = "ARRAffinity";
-		private static readonly ILog log = LogManager.GetLogger(typeof(Client));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(Client));
 		private readonly string agentName;
 
 		private static readonly JsonSerializerSettings jsonSerializerSettings = JsonConfig.GetSettings(typeof(RunnerSubmission));
@@ -65,7 +65,7 @@ namespace RunCheckerJob
 			}
 			catch (Exception e)
 			{
-				log.Error($"Не могу подключиться к {httpClient.BaseAddress}{uri}", e);
+				log.Error(e, $"Не могу подключиться к {httpClient.BaseAddress}{uri}");
 				if (e.InnerException != null)
 					log.Error(e.InnerException.Message);
 			}

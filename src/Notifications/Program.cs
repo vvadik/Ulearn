@@ -6,9 +6,9 @@ using Database;
 using Database.DataContexts;
 using Database.Models;
 using Graphite;
-using log4net;
-using log4net.Config;
+using Vostok.Logging.Abstractions;
 using Ulearn.Core.Configuration;
+using Ulearn.Core.Logging;
 using Ulearn.Core.Metrics;
 
 namespace Notifications
@@ -24,7 +24,7 @@ namespace Notifications
 		private readonly ServiceKeepAliver keepAliver;
 		private readonly TimeSpan keepAliveInterval;
 
-		private static readonly ILog log = LogManager.GetLogger(typeof(Program));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(Program));
 
 		public Program(WebCourseManager courseManager)
 		{
@@ -42,8 +42,8 @@ namespace Notifications
 
 		static void Main(string[] args)
 		{
-			XmlConfigurator.Configure();
-
+			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
+			LoggerSetup.Setup(configuration.HostLog, configuration.GraphiteServiceName);
 			/* Pass first argument 'send' to send emails to addresses from `emails.txt` with content from `content.txt` (notifications daemon is not started in this case)*/
 			if (args.Length > 0 && args[0] == "send")
 			{
@@ -72,7 +72,7 @@ namespace Notifications
 				}
 				catch (Exception e)
 				{
-					log.Error("Can\'t create deliveries or send them", e);
+					log.Error(e, "Can\'t create deliveries or send them");
 					log.Info("Waiting one second and repeat");
 				}
 
@@ -128,7 +128,7 @@ namespace Notifications
 				}
 				catch (Exception e)
 				{
-					log.Warn($"Can\'t send notification {delivery.NotificationId} to {delivery.NotificationTransport}: {e}. Will try later");
+					log.Warn(e, $"Can\'t send notification {delivery.NotificationId} to {delivery.NotificationTransport}. Will try later");
 					await notificationsRepo.MarkDeliveryAsFailed(delivery);
 				}
 			}
@@ -141,7 +141,7 @@ namespace Notifications
 				}
 				catch (Exception e)
 				{
-					log.Warn($"Can\'t send multiple notifications [{string.Join(", ", deliveries.Select(d => d.NotificationId))}] to {deliveries[0].NotificationTransport}: {e}. Will try later");
+					log.Warn(e, $"Can\'t send multiple notifications [{string.Join(", ", deliveries.Select(d => d.NotificationId))}] to {deliveries[0].NotificationTransport}. Will try later");
 					await notificationsRepo.MarkDeliveriesAsFailed(deliveries);
 				}
 			}

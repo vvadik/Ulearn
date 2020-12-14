@@ -10,10 +10,13 @@ using Autofac;
 using CourseToolHotReloader.ApiClient;
 using CourseToolHotReloader.DirectoryWorkers;
 using CourseToolHotReloader.Exceptions;
-using CourseToolHotReloader.Log;
 using CourseToolHotReloader.LoginAgent;
 using JetBrains.Annotations;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common.Extensions;
+using Vostok.Logging.File;
+using Vostok.Logging.File.Configuration;
+using Vostok.Logging.Formatting;
 using ErrorType = CourseToolHotReloader.Dtos.ErrorType;
 
 namespace CourseToolHotReloader
@@ -33,7 +36,7 @@ namespace CourseToolHotReloader
 			}
 			catch (AggregateException e)
 			{
-				Logger.Log.Error(e);
+				LogProvider.Get().Error(e, "Root error");
 				switch (e.InnerExceptions.Single())
 				{
 					case UriFormatException _:
@@ -77,18 +80,36 @@ namespace CourseToolHotReloader
 			}
 			catch (Exception e)
 			{
-				Logger.Log.Error(e);
+				LogProvider.Get().Error(e, "Root error");
 				ConsoleWorker.WriteError("Ошибка. Подробнее в логах");
 			}
 		}
 
 		private static void Init()
 		{
-			Logger.InitLogger();
+			InitLogger();
 			container = ConfigureAutofac.Build();
-
 			config = container.Resolve<IConfig>();
 			ulearnApiClient = container.Resolve<IUlearnApiClient>();
+		}
+
+		private static void InitLogger()
+		{
+			var logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs", "{RollingSuffix}.log");
+			var fileLogSettings = new FileLogSettings
+			{
+				FilePath = logPath,
+				RollingStrategy = new RollingStrategyOptions
+				{
+					MaxFiles = 0,
+					Type = RollingStrategyType.Hybrid,
+					Period = RollingPeriod.Day,
+					MaxSize = 4 * 1073741824L,
+				},
+				OutputTemplate = OutputTemplate.Parse("{Timestamp:HH:mm:ss.fff} {Level:u5} {sourceContext:w}{Message}{NewLine}{Exception}")
+			};
+			var fileLog = new FileLog(fileLogSettings).WithMinimumLevel(LogLevel.Info);
+			LogProvider.Configure(fileLog);
 		}
 
 		private static async Task Startup()

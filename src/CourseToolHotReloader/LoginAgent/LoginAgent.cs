@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using CourseToolHotReloader.ApiClient;
 using CourseToolHotReloader.Dtos;
-using CourseToolHotReloader.Log;
 
 namespace CourseToolHotReloader.LoginAgent
 {

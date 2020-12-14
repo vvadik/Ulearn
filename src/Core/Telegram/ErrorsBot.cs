@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Telegram.Bot.Types.Enums;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
@@ -10,7 +10,7 @@ namespace Ulearn.Core.Telegram
 {
 	public class ErrorsBot : TelegramBot
 	{
-		private readonly ILog log = LogManager.GetLogger(typeof(ErrorsBot));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(ErrorsBot));
 		private readonly MetricSender metricSender;
 
 		public ErrorsBot()
@@ -47,7 +47,7 @@ namespace Ulearn.Core.Telegram
 			catch (Exception e)
 			{
 				/* Not error because it may cause recursive fails */
-				log.Info($"Не могу отправить сообщение в телеграм-канал {channel}", e);
+				log.Info(e, $"Не могу отправить сообщение в телеграм-канал {channel}");
 			}
 		}
 

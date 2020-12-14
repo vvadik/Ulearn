@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Database;
@@ -14,12 +12,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using Serilog;
-using Serilog.Core;
-using Serilog.Extensions.Logging;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 using Ulearn.Web.Api;
 using Ulearn.Web.Api.Controllers;
+using Vostok.Logging.Microsoft;
 using Web.Api.Configuration;
 using Z.EntityFramework.Plus;
 
@@ -30,8 +27,8 @@ namespace Web.Api.Tests.Controllers
 	{
 		private WebApplication application;
 
-		protected Logger logger;
 		protected UlearnDb db;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(BaseControllerTests));
 		protected IServiceProvider serviceProvider;
 
 		private readonly WebApiConfiguration fakeWebApiConfiguration = new WebApiConfiguration
@@ -59,13 +56,7 @@ namespace Web.Api.Tests.Controllers
 
 		public async Task SetupTestInfrastructureAsync(Action<IServiceCollection> addServices = null)
 		{
-			logger = new LoggerConfiguration()
-				.MinimumLevel.Information()
-				.WriteTo.NUnitOutput()
-				.WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss.ffff } {Level}] {Message:lj}{NewLine}{Exception}")
-				.CreateLogger();
-
-			var loggerFactory = new LoggerFactory(new List<ILoggerProvider> { new SerilogLoggerProvider(logger) });
+			var loggerFactory = new LoggerFactory().AddVostok(LogProvider.Get());
 			db = CreateDbContext(loggerFactory);
 
 			serviceProvider = ConfigureServices(addServices);
@@ -105,8 +96,8 @@ namespace Web.Api.Tests.Controllers
 			var services = new ServiceCollection();
 
 			services.AddSingleton(db);
-			services.AddLogging(builder => builder.AddSerilog(logger));
-			application.ConfigureDi(services, logger);
+			services.AddLogging(builder => builder.AddVostok(LogProvider.Get()));
+			application.ConfigureDi(services);
 			application.ConfigureAuthServices(services, fakeWebApiConfiguration);
 			application.ConfigureMvc(services);
 
@@ -121,14 +112,14 @@ namespace Web.Api.Tests.Controllers
 			if (!result.Succeeded)
 				throw new InvalidOperationException($"Can't create admin user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
 			TestUsers.Admin = await userManager.FindByNameAsync(TestUsers.Admin.UserName).ConfigureAwait(false);
-			logger.Information($"Created user {TestUsers.Admin.UserName} with password {TestUsers.AdminPassword}, id = {TestUsers.Admin.Id}");
+			log.Info($"Created user {TestUsers.Admin.UserName} with password {TestUsers.AdminPassword}, id = {TestUsers.Admin.Id}");
 			await userManager.AddToRoleAsync(TestUsers.Admin, LmsRoleType.SysAdmin.ToString()).ConfigureAwait(false);
 			
 			result = await userManager.CreateAsync(TestUsers.User, TestUsers.AdminPassword).ConfigureAwait(false);
 			if (!result.Succeeded)
 				throw new InvalidOperationException($"Can't create admin user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
 			TestUsers.User = await userManager.FindByNameAsync(TestUsers.User.UserName).ConfigureAwait(false);
-			logger.Information($"Created user {TestUsers.User.UserName} with password {TestUsers.AdminPassword}, id = {TestUsers.Admin.Id}");
+			log.Info($"Created user {TestUsers.User.UserName} with password {TestUsers.AdminPassword}, id = {TestUsers.Admin.Id}");
 		}
 
 		private Task CreateTestUsersAsync()

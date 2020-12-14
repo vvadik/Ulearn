@@ -8,7 +8,6 @@ using Database.Repos.SystemAccessesRepo;
 using Database.Repos.Users;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 
@@ -25,15 +24,13 @@ namespace Database.Repos.Groups
 		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IUsersRepo usersRepo;
 		private readonly IWebCourseManager courseManager;
-		private readonly ILogger logger;
 
 		public GroupAccessesRepo(
 			UlearnDb db,
 			IGroupsRepo groupsRepo, ISystemAccessesRepo systemAccessesRepo, ICoursesRepo coursesRepo, IGroupMembersRepo groupMembersRepo,
 			IUsersRepo usersRepo,
 			ICourseRolesRepo courseRolesRepo,
-			IWebCourseManager courseManager,
-			ILogger logger
+			IWebCourseManager courseManager
 		)
 		{
 			this.db = db;
@@ -44,7 +41,6 @@ namespace Database.Repos.Groups
 			this.courseRolesRepo = courseRolesRepo;
 			this.usersRepo = usersRepo;
 			this.courseManager = courseManager;
-			this.logger = logger;
 		}
 
 		public async Task<GroupAccess> GrantAccessAsync(int groupId, string userId, GroupAccessType accessType, string grantedById)

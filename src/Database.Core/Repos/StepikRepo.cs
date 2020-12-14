@@ -6,7 +6,6 @@ using Database.Models;
 using JetBrains.Annotations;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
-using Serilog;
 
 namespace Database.Repos
 {
@@ -14,12 +13,10 @@ namespace Database.Repos
 	public class StepikRepo : IStepikRepo
 	{
 		private readonly UlearnDb db;
-		private readonly ILogger logger;
 
-		public StepikRepo(UlearnDb db, ILogger logger)
+		public StepikRepo(UlearnDb db)
 		{
 			this.db = db;
-			this.logger = logger;
 		}
 
 		[CanBeNull]

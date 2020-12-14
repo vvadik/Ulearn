@@ -4,19 +4,17 @@ using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Serilog;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common.Api.Models.Parameters;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
 using Vostok.Clusterclient.Core;
 using Vostok.Clusterclient.Core.Model;
 using Vostok.Clusterclient.Transport;
-using Vostok.Logging.Serilog;
 using Newtonsoft.Json;
 using Vostok.Clusterclient.Core.Criteria;
 using Vostok.Clusterclient.Core.Strategies;
 using Vostok.Clusterclient.Core.Topology;
-using Vostok.Logging.Abstractions;
 using Vostok.Logging.Tracing;
 using Vostok.Telemetry.Kontur;
 
@@ -24,19 +22,14 @@ namespace Ulearn.Common.Api
 {
 	public class BaseApiClient
 	{
-		private readonly ILog log;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(BaseApiClient)).WithTracingProperties(KonturTracerProvider.Get());
 		private readonly ApiClientSettings settings;
 		private readonly ClusterClient clusterClient;
 
-		protected BaseApiClient(ILogger logger, ApiClientSettings settings)
+		protected BaseApiClient(ApiClientSettings settings)
 		{
 			this.settings = settings;
 
-			var contextName = GetType().Name;
-			log = new SerilogLog(logger)
-				.ForContext(contextName)
-				.WithTracingProperties(KonturTracerProvider.Get());
-			
 			clusterClient = new ClusterClient(log, config =>
 			{
 				config.SetupUniversalTransport();

@@ -10,7 +10,6 @@ using Database.Repos.Groups;
 using Database.Repos.Users;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
@@ -39,11 +38,11 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly SlideRenderer slideRenderer;
 		private readonly ITempCoursesRepo tempCoursesRepo;
 
-		public CoursesController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, ICoursesRepo coursesRepo,
+		public CoursesController(IWebCourseManager courseManager, UlearnDb db, ICoursesRepo coursesRepo,
 			IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, IUnitsRepo unitsRepo, IUserSolutionsRepo solutionsRepo,
 			IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo, IGroupMembersRepo groupMembersRepo,
 			IGroupAccessesRepo groupAccessesRepo, SlideRenderer slideRenderer, ITempCoursesRepo tempCoursesRepo)
-			: base(logger, courseManager, db, usersRepo)
+			: base(courseManager, db, usersRepo)
 		{
 			this.coursesRepo = coursesRepo;
 			this.courseRolesRepo = courseRolesRepo;

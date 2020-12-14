@@ -12,7 +12,6 @@ using Database.Repos.Users;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 using Ulearn.Common;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Core.Courses;
@@ -25,6 +24,7 @@ using Ulearn.Core.Telegram;
 using Ulearn.Web.Api.Models.Parameters.Exercise;
 using Ulearn.Web.Api.Models.Responses.Exercise;
 using Ulearn.Web.Api.Utils.LTI;
+using Vostok.Logging.Abstractions;
 using AutomaticExerciseCheckingStatus = Database.Models.AutomaticExerciseCheckingStatus;
 
 namespace Ulearn.Web.Api.Controllers.Slides
@@ -41,12 +41,13 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		private readonly IStyleErrorsRepo styleErrorsRepo;
 		private readonly MetricSender metricSender;
 		private readonly ErrorsBot errorsBot = new ErrorsBot();
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(ExerciseController));
 
-		public ExerciseController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, MetricSender metricSender,
+		public ExerciseController(IWebCourseManager courseManager, UlearnDb db, MetricSender metricSender,
 			IUsersRepo usersRepo, IUserSolutionsRepo userSolutionsRepo, ICourseRolesRepo courseRolesRepo, IVisitsRepo visitsRepo,
 			ILtiConsumersRepo ltiConsumersRepo, ILtiRequestsRepo ltiRequestsRepo, ISlideCheckingsRepo slideCheckingsRepo, IGroupsRepo groupsRepo,
 			IStyleErrorsRepo styleErrorsRepo)
-			: base(logger, courseManager, db, usersRepo)
+			: base(courseManager, db, usersRepo)
 		{
 			this.metricSender = metricSender;
 			this.userSolutionsRepo = userSolutionsRepo;
@@ -109,7 +110,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				}
 				catch (Exception e)
 				{
-					logger.Error("Мы не смогли отправить баллы на вашу образовательную платформу", e);
+					log.Error(e, "Мы не смогли отправить баллы на вашу образовательную платформу");
 					return Json(new RunSolutionResponse(SolutionRunStatus.InternalServerError)
 					{
 						Message = "Мы не смогли отправить баллы на вашу образовательную платформу. Пожалуйста, обновите страницу — мы попробуем сделать это ещё раз."
@@ -181,7 +182,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			}
 			catch (SubmissionCheckingTimeout)
 			{
-				logger.Error($"Не смог запустить проверку решения, никто не взял его на проверку за {executionTimeout.TotalSeconds} секунд.\nКурс «{course.Title}», слайд «{exerciseSlide.Title}» ({exerciseSlide.Id})");
+				log.Error($"Не смог запустить проверку решения, никто не взял его на проверку за {executionTimeout.TotalSeconds} секунд.\nКурс «{course.Title}», слайд «{exerciseSlide.Title}» ({exerciseSlide.Id})");
 				await errorsBot.PostToChannelAsync($"Не смог запустить проверку решения, никто не взял его на проверку за {executionTimeout.TotalSeconds} секунд.\nКурс «{course.Title}», слайд «{exerciseSlide.Title}» ({exerciseSlide.Id})\n\nhttps://ulearn.me/Sandbox");
 				updatedSubmissionNoTracking = await userSolutionsRepo.FindSubmissionByIdNoTracking(initialSubmission.Id);
 				var message = updatedSubmissionNoTracking.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Running

@@ -9,7 +9,7 @@ using Database;
 using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Microsoft.AspNet.Identity;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
@@ -22,8 +22,6 @@ namespace uLearn.Web.Controllers
 	public static class ControllerUtils
 	{
 		private static readonly string ulearnBaseUrl;
-
-		private static readonly ILog log = LogManager.GetLogger(typeof(ControllerUtils));
 
 		static ControllerUtils()
 		{
@@ -59,7 +57,10 @@ namespace uLearn.Web.Controllers
 		public static string FixRedirectUrl(this Controller controller, string url)
 		{
 			var isLocalUrl = controller.IsLocalUrl(url);
-			log.Info($"Redirect to {url}: {(isLocalUrl ? "it's safe" : "it's not safe, redirect to home page")}. Base url is {ulearnBaseUrl}");
+
+			LogProvider.Get()
+				.ForContext(typeof(ControllerUtils))
+				.Info($"Redirect to {url}: {(isLocalUrl ? "it's safe" : "it's not safe, redirect to home page")}. Base url is {ulearnBaseUrl}");
 			return isLocalUrl ? url : controller.Url.Action("Index", "Home");
 		}
 

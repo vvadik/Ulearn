@@ -12,20 +12,16 @@
 		<PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
 		<ProjectReference Include="..\Common\Common.csproj" />
 		<ProjectReference Include="..\Core\Core.csproj" />
-		<PackageReference Include="log4net" Version="2.0.8" />
 		<None Include="DockerConfig\*.*">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="appsettings.local.json">
+		  <DependentUpon>appsettings.json</DependentUpon>
 		</None>
 	</ItemGroup>
 
 	<ItemGroup>
 		<Content Include="appsettings.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
-		<Content Include="log4net.config">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
-		<Content Include="log4net.Kontur.config">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
 		<Content Include="deploy\**">

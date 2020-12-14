@@ -21,7 +21,6 @@
     <PackageReference Include="DotNetZip" Version="1.13.4" />
     <PackageReference Include="FluentAssertions" Version="5.9.0" />
     <PackageReference Include="JetBrains.dotMemoryUnit" Version="3.0.20171219.105559" />
-    <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="MarkdownDeep.NET.Core" Version="1.5.0.4" />
     <PackageReference Include="Microsoft.Build" Version="16.6.0" />
     <PackageReference Include="Microsoft.Build.Framework" Version="16.6.0" />

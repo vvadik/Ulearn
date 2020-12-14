@@ -17,10 +17,12 @@ export default function getSlideInfo(location,) {
 
 	let slideId;
 	let isLti = false;
+	let isAcceptedAlert = false;
 	if(slideIdInQuery) {
 		const action = slideSlugOrAction;
 		slideId = slideIdInQuery;
-		isLti = action.toLowerCase() === ltiSlide || action.toLowerCase() === acceptedAlert || params.isLti;
+		isAcceptedAlert = action.toLowerCase() === acceptedAlert;
+		isLti = action.toLowerCase() === ltiSlide || isAcceptedAlert || params.isLti;
 	} else {
 		const slideSlug = slideSlugOrAction;
 		slideId = slideSlug.split('_').pop();
@@ -33,6 +35,7 @@ export default function getSlideInfo(location,) {
 		slideId,
 		isReview,
 		isLti,
+		isAcceptedAlert,
 		isAcceptedSolutions,
 	}
 }

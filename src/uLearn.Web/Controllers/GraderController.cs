@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Web.Mvc;
 using Database.DataContexts;
 using Database.Models;
-using log4net;
+using Vostok.Logging.Abstractions;
 using uLearn.Web.FilterAttributes;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
@@ -17,7 +17,7 @@ namespace uLearn.Web.Controllers
 {
 	public class GraderController : BaseExerciseController
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(GraderController));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(GraderController));
 
 		public GradersRepo gradersRepo;
 

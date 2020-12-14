@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
-using Serilog;
 using Ulearn.Common;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.RunCheckerJobApi;
+using Vostok.Logging.Abstractions;
 using XQueue;
 using XQueue.Models;
 
@@ -14,13 +14,12 @@ namespace Ulearn.Web.Api.Controllers.Runner
 {
 	public class XQueueResultObserver : IResultObserver
 	{
-		private readonly ILogger logger;
 		private readonly IWebCourseManager courseManager;
 		private readonly IXQueueRepo xQueueRepo;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(VisitsRepo));
 
-		public XQueueResultObserver(ILogger logger, IWebCourseManager courseManager, IXQueueRepo xQueueRepo)
+		public XQueueResultObserver(IWebCourseManager courseManager, IXQueueRepo xQueueRepo)
 		{
-			this.logger = logger;
 			this.courseManager = courseManager;
 			this.xQueueRepo = xQueueRepo;
 		}
@@ -53,7 +52,7 @@ namespace Ulearn.Web.Api.Controllers.Runner
 			var slide = (await courseManager.FindCourseAsync(checking.CourseId))?.FindSlideById(checking.SlideId, true) as ExerciseSlide;
 			if (slide == null)
 			{
-				logger.Warning($"Can't find exercise slide {checking.SlideId} in course {checking.CourseId}. Exit");
+				log.Warn($"Can't find exercise slide {checking.SlideId} in course {checking.CourseId}. Exit");
 				return false;
 			}
 

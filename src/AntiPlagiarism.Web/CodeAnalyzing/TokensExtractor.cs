@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using Serilog;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 
@@ -17,12 +17,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 {
 	public class TokensExtractor
 	{
-		private readonly ILogger logger;
-
-		public TokensExtractor(ILogger logger)
-		{
-			this.logger = logger;
-		}
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(TokensExtractor));
 
 		private static IEnumerable<Token> FilterWhitespaceTokens(IEnumerable<Token> tokens)
 		{
@@ -164,15 +159,15 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 					Shutdown(process);
 
 				if (readErrTask.Result.Length > 0)
-					logger.Warning($"pygmentize написал на stderr: {readErrTask.Result}");
+					log.Warn($"pygmentize написал на stderr: {readErrTask.Result}");
 
 				if (!isFinished)
-					logger.Warning($"Не хватило времени ({ms} ms) на работу pygmentize");
+					log.Warn($"Не хватило времени ({ms} ms) на работу pygmentize");
 				else
-					logger.Information($"pygmentize закончил работу за {ms} ms");
+					log.Info($"pygmentize закончил работу за {ms} ms");
 
 				if (process.ExitCode != 0)
-					logger.Information($"pygmentize завершился с кодом {process.ExitCode}");
+					log.Info($"pygmentize завершился с кодом {process.ExitCode}");
 
 				return isFinished && readErrTask.Result.Length == 0 && readOutTask.Result.Length > 0
 					? readOutTask.Result

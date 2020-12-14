@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Threading.Tasks;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Telegram.Bot.Types.Enums;
 using Ulearn.Core.Telegram;
 
@@ -9,7 +9,7 @@ namespace GiftsGranter
 {
 	public class GiftsTelegramBot : TelegramBot
 	{
-		private static ILog log = LogManager.GetLogger(typeof(GiftsTelegramBot));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(GiftsTelegramBot));
 
 		public GiftsTelegramBot()
 		{
@@ -28,7 +28,7 @@ namespace GiftsGranter
 			}
 			catch (Exception e)
 			{
-				log.Error($"Не могу отправить сообщение в телеграм-канал {channel}", e);
+				log.Error(e, $"Не могу отправить сообщение в телеграм-канал {channel}");
 			}
 		}
 

@@ -3,18 +3,13 @@ using System.Threading.Tasks;
 using Castle.Core.Internal;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Serilog;
+using Vostok.Logging.Abstractions;
 
 namespace Ulearn.Web.Api.Authorization
 {
 	public class BaseCourseAuthorizationHandler<T> : AuthorizationHandler<T> where T : IAuthorizationRequirement
 	{
-		protected readonly ILogger logger;
-
-		public BaseCourseAuthorizationHandler(ILogger logger)
-		{
-			this.logger = logger;
-		}
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(BaseCourseAuthorizationHandler<T>));
 
 		protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, T requirement)
 		{
@@ -37,7 +32,7 @@ namespace Ulearn.Web.Api.Authorization
 			if (!courseIdFromQuery.IsNullOrEmpty())
 				return courseIdFromQuery;
 
-			logger.Error("Can't find `courseId` parameter in request for checking course role requirement. You should inherit your parameters models from ICourseAuthorizationParameters.");
+			log.Error("Can't find `courseId` parameter in request for checking course role requirement. You should inherit your parameters models from ICourseAuthorizationParameters.");
 			return null;
 		}
 	}

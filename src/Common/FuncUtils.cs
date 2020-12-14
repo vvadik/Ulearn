@@ -2,17 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using log4net;
-using log4net.Appender;
-using log4net.Repository.Hierarchy;
 using NUnit.Framework;
+using Vostok.Logging.Abstractions;
 
 namespace Ulearn.Common
 {
 	public static class FuncUtils
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(FuncUtils));
-
 		public static async Task<T> TrySeveralTimesAsync<T>(Func<Task<T>> func, int triesCount, Func<Task> runAfterFail, Type exceptionType)
 		{
 			for (var tryIndex = 0; tryIndex < triesCount; tryIndex++)
@@ -22,15 +18,21 @@ namespace Ulearn.Common
 				}
 				catch (Exception e) when (exceptionType.IsInstanceOfType(e))
 				{
-					log.Error($"Исключение (попытка {tryIndex + 1} из {triesCount}):", e);
+					LogProvider.Get()
+						.ForContext(typeof(FuncUtils))
+						.Warn(e, $"Исключение (попытка {tryIndex + 1} из {triesCount}):");
 					if (tryIndex >= triesCount - 1)
 						throw;
-					log.Warn($"Попробую ещё раз (попытка {tryIndex + 2} из {triesCount})");
+					LogProvider.Get()
+						.ForContext(typeof(FuncUtils))
+						.Warn($"Попробую ещё раз (попытка {tryIndex + 2} из {triesCount})");
 					await runAfterFail().ConfigureAwait(false);
 				}
 				catch (Exception e)
 				{
-					log.Info($"На попытке {tryIndex + 1} произошло исключение {e.Message}");
+					LogProvider.Get()
+						.ForContext(typeof(FuncUtils))
+						.Info($"На попытке {tryIndex + 1} произошло исключение {e.Message}");
 					throw;
 				}
 
@@ -137,12 +139,6 @@ namespace Ulearn.Common
 	[TestFixture]
 	public class FuncUtils_should
 	{
-		[SetUp]
-		public void ConfigureLogger()
-		{
-			log4net.Config.BasicConfigurator.Configure(new Hierarchy(), new ConsoleAppender { Threshold = log4net.Core.Level.Debug });
-		}
-
 		[Test]
 		public void TrySeveralTimes_test()
 		{

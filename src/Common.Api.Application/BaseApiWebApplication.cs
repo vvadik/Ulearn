@@ -13,8 +13,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
-using Serilog;
-using Serilog.Events;
 using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Ulearn.Common.Api.Models.Responses;
@@ -23,8 +21,7 @@ using Vostok.Applications.AspNetCore;
 using Vostok.Applications.AspNetCore.Builders;
 using Vostok.Applications.AspNetCore.Configuration;
 using Vostok.Hosting.Abstractions;
-using Vostok.Logging.Serilog;
-using ILogger = Serilog.ILogger;
+using Vostok.Logging.Microsoft;
 
 namespace Ulearn.Common.Api
 {
@@ -37,16 +34,9 @@ namespace Ulearn.Common.Api
 
 		public override void Setup(IVostokAspNetCoreApplicationBuilder builder, IVostokHostingEnvironment hostingEnvironment)
 		{
-			var loggerConfiguration = new LoggerConfiguration()
-				.MinimumLevel.Information()
-				.Filter.ByExcluding(FilterLogs)
-				.WriteTo.Sink(new VostokSink(hostingEnvironment.Log), LogEventLevel.Information);
-			var logger = loggerConfiguration.CreateLogger();
-
 			builder.SetupWebHost(webHostBuilder => webHostBuilder
 				.UseKestrel()
-				.ConfigureServices(s => ConfigureServices(s, hostingEnvironment, logger))
-				.UseSerilog(logger)
+				.ConfigureServices(s => ConfigureServices(s, hostingEnvironment))
 				.UseEnvironment(hostingEnvironment.ApplicationIdentity.Environment)
 				.Configure(app =>
 				{
@@ -90,19 +80,6 @@ namespace Ulearn.Common.Api
 			.SetupThrottling(b => b.DisableThrottling());
 		}
 
-		private static bool FilterLogs(LogEvent le)
-		{
-			return le.Level <= LogEventLevel.Information
-				&& le.Properties.TryGetValue("SourceContext", out var sourceContextValue)
-				&& (sourceContextValue as ScalarValue)?.Value is string sourceContext
-				&& (sourceContext.StartsWith("Microsoft.AspNetCore.Mvc.Infrastructure")
-					|| sourceContext.StartsWith("Microsoft.AspNetCore.Hosting.Diagnostics")
-					|| sourceContext.StartsWith("Microsoft.AspNetCore.Cors.Infrastructure")
-					|| sourceContext.StartsWith("Microsoft.AspNetCore.Authentication")
-					|| sourceContext.StartsWith("Microsoft.AspNetCore.Authorization")
-					);
-		}
-
 		public class UlearnPortConfiguration
 		{
 			public string Port { get; set; }
@@ -118,12 +95,13 @@ namespace Ulearn.Common.Api
 			return app;
 		}
 
-		protected virtual void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment, ILogger logger)
+		protected virtual void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment)
 		{
-			ConfigureDi(services, logger);
+			services.AddLogging(builder => builder.AddVostok(hostingEnvironment.Log));
+			ConfigureDi(services);
 			ConfigureMvc(services);
 			ConfigureSwaggerDocumentation(services);
-			ConfigureExceptionPolicy(services, logger);
+			ConfigureExceptionPolicy(services);
 		}
 
 		public virtual void ConfigureMvc(IServiceCollection services)
@@ -200,7 +178,7 @@ namespace Ulearn.Common.Api
 		{
 		}
 
-		private void ConfigureExceptionPolicy(IServiceCollection services, ILogger logger)
+		private void ConfigureExceptionPolicy(IServiceCollection services)
 		{
 			/* See https://github.com/IharYakimush/asp-net-core-exception-handling for details */
 			services.AddExceptionHandlingPolicies(options =>
@@ -223,9 +201,8 @@ namespace Ulearn.Common.Api
 			});
 		}
 
-		public virtual void ConfigureDi(IServiceCollection services, ILogger logger)
+		public virtual void ConfigureDi(IServiceCollection services)
 		{
-			services.AddSingleton(logger);
 		}
 	}
 }

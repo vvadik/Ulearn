@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data.Entity;
 using Database.DataContexts;
-using log4net;
+using Vostok.Logging.Abstractions;
 using LtiLibrary.Core.Common;
 using LtiLibrary.Core.OAuth;
 using LtiLibrary.Owin.Security.Lti;
@@ -13,10 +13,9 @@ namespace uLearn.Web.LTI
 {
 	public static class LtiAuthenticationExtensions
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(LtiAuthenticationExtensions));
-
 		public static IAppBuilder UseLtiAuthentication(this IAppBuilder app)
 		{
+			var log = LogProvider.Get().ForContext(typeof(LtiUtils));
 			app.UseLtiAuthentication(new LtiAuthenticationOptions
 			{
 				Provider = new LtiAuthenticationProvider

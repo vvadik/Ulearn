@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Newtonsoft.Json;
 using Ulearn.Core.RunCheckerJobApi;
 
@@ -9,8 +7,6 @@ namespace RunCheckerJob
 {
 	public static class ResultParser
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(ResultParser));
-
 		public static RunningResults Parse(RunningResults response)
 		{
 			try
@@ -22,7 +18,7 @@ namespace RunCheckerJob
 			}
 			catch (Exception)
 			{
-				log.Warn("Не удалось распарсить результат");
+				LogProvider.Get().Warn("Не удалось распарсить результат");
 				return response;
 			}
 		}

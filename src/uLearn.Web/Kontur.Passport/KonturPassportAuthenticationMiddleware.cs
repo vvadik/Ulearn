@@ -1,4 +1,4 @@
-﻿using log4net;
+﻿using Vostok.Logging.Abstractions;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.DataHandler;
 using Microsoft.Owin.Security.DataProtection;
@@ -10,12 +10,10 @@ namespace uLearn.Web.Kontur.Passport
 	public class KonturPassportAuthenticationMiddleware : AuthenticationMiddleware<KonturPassportAuthenticationOptions>
 	{
 		private readonly PassportClient passportClient;
-		private readonly ILog log;
 
 		public KonturPassportAuthenticationMiddleware(OwinMiddleware next, IAppBuilder app, KonturPassportAuthenticationOptions options)
 			: base(next, options)
 		{
-			log = LogManager.GetLogger(typeof(KonturPassportAuthenticationMiddleware));
 			passportClient = new PassportClient(options.ClientId, new []{"openid", "profile", "email"});
 
 			if (Options.StateDataFormat == null)
@@ -30,7 +28,7 @@ namespace uLearn.Web.Kontur.Passport
 
 		protected override AuthenticationHandler<KonturPassportAuthenticationOptions> CreateHandler()
 		{
-			return new KonturPassportAuthenticationHandler(passportClient, log);
+			return new KonturPassportAuthenticationHandler(passportClient);
 		}
 	}
 }

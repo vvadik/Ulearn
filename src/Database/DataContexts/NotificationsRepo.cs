@@ -10,10 +10,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Database.Extensions;
 using Database.Models;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
-using Ulearn.Core;
 using Ulearn.Core.Courses;
 
 namespace Database.DataContexts
@@ -23,7 +22,7 @@ namespace Database.DataContexts
 		private const int maxNotificationsSendingFails = 15;
 		public static TimeSpan sendNotificationsDelayAfterCreating = TimeSpan.FromMinutes(1);
 
-		private readonly ILog log = LogManager.GetLogger(typeof(NotificationsRepo));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(NotificationsRepo));
 
 		private readonly ULearnDb db;
 		private readonly UnitsRepo unitsRepo;

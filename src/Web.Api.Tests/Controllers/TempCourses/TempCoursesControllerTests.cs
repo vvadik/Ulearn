@@ -30,7 +30,6 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		private IWebCourseManager courseManager;
 		private DirectoryInfo workingCourseDirectory;
 
-
 		[OneTimeSetUp]
 		public void OneTimeSetUp()
 		{

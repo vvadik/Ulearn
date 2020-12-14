@@ -6,7 +6,6 @@ using AntiPlagiarism.Api.Models.Parameters;
 using Database.Models;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Serilog;
 using Ulearn.Core.RunCheckerJobApi;
 using Web.Api.Configuration;
 
@@ -17,14 +16,14 @@ namespace Ulearn.Web.Api.Controllers.Runner
 		private readonly IAntiPlagiarismClient antiPlagiarismClient;
 		private readonly bool isEnabled;
 
-		public AntiPlagiarismResultObserver(IOptions<WebApiConfiguration> configuration, ILogger logger)
+		public AntiPlagiarismResultObserver(IOptions<WebApiConfiguration> configuration)
 		{
 			var antiplagiarismClientConfiguration = configuration.Value.AntiplagiarismClient;
 			isEnabled = antiplagiarismClientConfiguration?.Enabled ?? false;
 			if (!isEnabled)
 				return;
 
-			antiPlagiarismClient = new AntiPlagiarismClient(antiplagiarismClientConfiguration.Endpoint, antiplagiarismClientConfiguration.Token, logger);
+			antiPlagiarismClient = new AntiPlagiarismClient(antiplagiarismClientConfiguration.Endpoint, antiplagiarismClientConfiguration.Token);
 		}
 
 		public async Task ProcessResult(UserExerciseSubmission submission, RunningResults result)
