@@ -251,7 +251,7 @@ window.documentReadyFunctions.push(function () {
 
 		$.post(url, {comment: comment}).done(function(data) {
 			var $data = $(data);
-			$('.exercise__top-review-comments.hidden').html($data.html());
+			$('.exercise__top-review-comments.hidden').html($data.filter(':not(script)').html());
 			updateTopReviewComments($exerciseAddReviewBlock);
 		}).fail(function() {
 			alert('Произошла ошибка при удалении комментария. Попробуйте повторить позже');
