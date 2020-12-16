@@ -1,0 +1,36 @@
+@import "../../../../courseVariables";
+
+.exerciseControlsContainer {
+  display: inline-flex;
+  align-items: baseline;
+  width: 100%;
+}
+
+.exerciseControls {
+  font-size: 16px;
+  line-height: 22px;
+  color: @linkColor;
+  user-select: none;
+
+  margin-right: 24px;
+}
+
+.exerciseControls:hover {
+  cursor: pointer;
+}
+
+.exerciseControlsIcon {
+  margin-right: 4px;
+}
+
+.noHintsLeft {
+  color: @disabledColor;
+}
+
+.statistics {
+  float: right;
+  color: @additionalColor;
+  margin-right: 0;
+  margin-left: auto;
+  order: 1;
+}

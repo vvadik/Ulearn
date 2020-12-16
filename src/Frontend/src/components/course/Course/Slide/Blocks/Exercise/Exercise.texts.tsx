@@ -111,7 +111,7 @@ const texts = {
 			buildShortText: (usersWithRightAnswerCount: number): React.ReactNode =>
 				<React.Fragment>Решило: { usersWithRightAnswerCount }</React.Fragment>,
 			buildStatistics: (attemptedUsersCount: number, usersWithRightAnswerCount: number,
-				lastSuccessAttemptDate: number
+				lastSuccessAttemptDate?: string
 			): React.ReactNode =>
 				lastSuccessAttemptDate
 					? <React.Fragment>
