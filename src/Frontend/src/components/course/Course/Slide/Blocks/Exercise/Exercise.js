@@ -213,9 +213,10 @@ class Exercise extends React.Component {
 
 	saveCodeDraftToCache = () => {
 		const { slideId, forceInitialCode, } = this.props;
+		const { value, } = this.state;
 
 		if(!forceInitialCode) {
-			this.saveCodeToCache(slideId);
+			this.saveCodeToCache(slideId, value);
 		}
 	}
 
@@ -598,7 +599,7 @@ class Exercise extends React.Component {
 		return (
 			<span className={ styles.exerciseControls }>
 				<Tooltip pos={ "bottom center" } trigger={ "hover&focus" }
-						 render={ () => valueChanged ? null : <span>{ texts.controls.submitCode.hint }</span> }>
+						 render={ this.renderSubmitCodeHint }>
 							<Button
 								loading={ submissionLoading }
 								use={ "primary" }
@@ -609,6 +610,12 @@ class Exercise extends React.Component {
 				</Tooltip>
 			</span>
 		);
+	}
+
+	renderSubmitCodeHint = () => {
+		const { valueChanged, } = this.state;
+
+		return valueChanged ? null : <span>{ texts.controls.submitCode.hint }</span>
 	}
 
 	renderShowHintButton = () => {
@@ -634,7 +641,7 @@ class Exercise extends React.Component {
 		const { showControlsText, } = this.state;
 
 		return (
-			<span className={ styles.exerciseControls } onClick={ this.resetCode }>
+			<span className={ styles.exerciseControls } onClick={ this.resetCodeAndCache }>
 				<span className={ styles.exerciseControlsIcon }>
 					<Refresh/>
 				</span>
@@ -665,15 +672,7 @@ class Exercise extends React.Component {
 						onCloseClick={ this.hideAcceptedSolutionsWarning }
 						pos={ "bottom left" }
 						trigger={ showAcceptedSolutionsWarning ? "opened" : "closed" }
-						render={
-							() =>
-								<span>
-									{ texts.controls.acceptedSolutions.buildWarning() }
-									<Button use={ "danger" } onClick={ this.showAcceptedSolutions }>
-										{ texts.controls.acceptedSolutions.continue }
-									</Button>
-								</span>
-						}>
+						render={ this.renderAcceptedSolutionsHint }>
 						<span className={ styles.exerciseControlsIcon }>
 							<EyeOpened/>
 						</span>
@@ -681,6 +680,16 @@ class Exercise extends React.Component {
 					</Tooltip>
 				</span>
 		);
+	}
+
+	renderAcceptedSolutionsHint = () => {
+		return (
+			<span>
+				{ texts.controls.acceptedSolutions.buildWarning() }
+				<Button use={ "danger" } onClick={ this.showAcceptedSolutions }>
+					{ texts.controls.acceptedSolutions.continue }
+				</Button>
+			</span>);
 	}
 
 	renderHints = () => {
@@ -848,19 +857,26 @@ class Exercise extends React.Component {
 		})
 	}
 
+	resetCodeAndCache = () => {
+		const { slideId, exerciseInitialCode, } = this.props;
+
+		this.resetCode();
+		this.saveCodeToCache(slideId, exerciseInitialCode);
+	}
+
 	resetCode = () => {
 		const { exerciseInitialCode } = this.props;
 
 		this.clearAllTextMarkers();
 		this.setState({
 			value: exerciseInitialCode,
-			valueChanged: true,
+			valueChanged: false,
 			isEditable: true,
 			currentSubmission: null,
 			visibleCheckingResponse: null,
 			currentReviews: [],
 			showOutput: false
-		})
+		});
 	}
 
 	clearAllTextMarkers = () => {
@@ -1069,15 +1085,12 @@ class Exercise extends React.Component {
 		}
 	}
 
-	saveCodeToCache = (slideId) => {
-		const { value, } = this.state;
-
+	saveCodeToCache = (slideId, value) => {
 		saveToCache(exerciseSolutions, slideId, value);
 	}
 
 	loadCodeFromCache = (slideId) => {
 		const code = loadFromCache(exerciseSolutions, slideId);
-
 		if(code !== undefined) {
 			this.resetCode();
 			this.setState({
