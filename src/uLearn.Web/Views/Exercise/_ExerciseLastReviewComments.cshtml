@@ -1,5 +1,6 @@
 ﻿@using Ulearn.Core.Extensions
 @using uLearn.Web.Extensions
+@using Vostok.Logging.Abstractions
 
 @model uLearn.Web.Controllers.ExerciseLastReviewCommentModel
 
@@ -14,10 +15,21 @@
 
 	@foreach (var review in Model.NotDeletedReviews)
 	{
-		var startPosition = solution.FindPositionByLineAndCharacter(review.StartLine, review.StartPosition);
-		var finishPosition = solution.FindPositionByLineAndCharacter(review.FinishLine, review.FinishPosition);
+		var commentedCode = "";
+		try
+		{
+			var startPosition = solution.FindPositionByLineAndCharacter(review.StartLine, review.StartPosition);
+			var finishPosition = solution.FindPositionByLineAndCharacter(review.FinishLine, review.FinishPosition);
+			var code = solution.Substring(startPosition, finishPosition - startPosition);
+			commentedCode = code.TruncateWithEllipsis(30);
+		}
+		catch (ArgumentOutOfRangeException exception)
+		{
+			LogProvider.Get().Error(exception, "Review {Id} {StartLine} {StartPosition} {FinishLine} {FinishPosition} CodeHash {CodeHash}",
+				review.Id, review.StartLine, review.StartPosition, review.FinishLine, review.FinishPosition, Model.ReviewedSubmission.SolutionCode.Hash);
+		}
 		<div>
-			<span class="commented-code">@solution.Substring(startPosition, finishPosition - startPosition).TruncateWithEllipsis(30)</span>
+			<span class="commented-code">@commentedCode</span>
 			@review.Comment
 		</div>
 	}
