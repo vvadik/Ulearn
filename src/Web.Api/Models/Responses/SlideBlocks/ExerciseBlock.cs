@@ -22,6 +22,10 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 		[DataMember]
 		public Language[] Languages { get; set; }
 
+		[CanBeNull]
+		[DataMember]
+		public Dictionary<Language, string> LanguageNames { get; set; } // Для языка содержит его текстовое название, если оно не такое же, как поле enum
+
 		[NotNull]
 		[DataMember]
 		public string[] Hints { get; set; }
@@ -61,6 +65,7 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 			HideSolutions = exerciseBlock.HideShowSolutionsButton;
 			ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : exerciseBlock.ExpectedOutput?.NormalizeEoln();
 			Languages = languages;
+			LanguageNames = null;
 			AttemptsStatistics = context.AttemptsStatistics;
 			Submissions = context.Submissions
 				.EmptyIfNull()

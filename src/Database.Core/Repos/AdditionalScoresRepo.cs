@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 
 namespace Database.Repos
 {
@@ -12,12 +11,10 @@ namespace Database.Repos
 	public class AdditionalScoresRepo : IAdditionalScoresRepo
 	{
 		private readonly UlearnDb db;
-		private readonly ILogger logger;
 
-		public AdditionalScoresRepo(UlearnDb db, ILogger logger)
+		public AdditionalScoresRepo(UlearnDb db)
 		{
 			this.db = db;
-			this.logger = logger;
 		}
 
 		public async Task<AdditionalScore> SetAdditionalScore(string courseId, Guid unitId, string userId, string scoringGroupId, int score, string instructorId)

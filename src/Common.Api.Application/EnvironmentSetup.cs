@@ -1,6 +1,6 @@
 using System;
-using System.IO;
 using Ulearn.Core.Configuration;
+using Ulearn.Core.Logging;
 using Vostok.Configuration;
 using Vostok.Configuration.Abstractions;
 using Vostok.Configuration.Sources;
@@ -9,9 +9,6 @@ using Vostok.Configuration.Sources.Json;
 using Vostok.Hosting.Kontur;
 using Vostok.Hosting.Setup;
 using Vostok.Logging.Abstractions;
-using Vostok.Logging.Abstractions.Values;
-using Vostok.Logging.File.Configuration;
-using Vostok.Logging.Formatting;
 
 namespace Ulearn.Common.Api
 {
@@ -64,110 +61,32 @@ namespace Ulearn.Common.Api
 				sinkBuilder.Disable();
 				return;
 			}
+
 			sinkBuilder.SetApiKeyProvider(() => ulearnConfiguration.Hercules.ApiKey);
 		}
 
 		private static void SetupLog(IVostokCompositeLogBuilder logBuilder, UlearnConfiguration ulearnConfiguration)
 		{
-			var logTemplate = OutputTemplate.Parse("{Timestamp:HH:mm:ss.fff} {Level} {traceContext:w}{operationContext:w}{sourceContext:w}{Message}{NewLine}{Exception}");
-			logBuilder.SetupConsoleLog(consoleLogBuilder => consoleLogBuilder
-				.CustomizeLog(lb => lb.WithMinimumLevel(LogLevel.Info))
-				.CustomizeSettings(settings => { settings.OutputTemplate = logTemplate; }));
+			var log = LoggerSetup.Setup(ulearnConfiguration.HostLog, ulearnConfiguration.GraphiteServiceName, false);
+			logBuilder.AddLog(log);
+			logBuilder.CustomizeLog(logCustomization => logCustomization.WithMinimumLevel(LogLevel.Debug));
 
-			var pathFormat = ulearnConfiguration.HostLog.PathFormat;
-			if (!string.IsNullOrEmpty(pathFormat))
+			const LogLevel minimumLevel = LogLevel.Info;
+			var dbMinimumLevelString = ulearnConfiguration.HostLog.DbMinimumLevel ?? "";
+			if (!LoggerSetup.TryParseLogLevel(dbMinimumLevelString, out var dbMinimumLevel))
+				dbMinimumLevel = minimumLevel;
+			var min = dbMinimumLevel > minimumLevel ? minimumLevel : dbMinimumLevel;
+			logBuilder.SetupHerculesLog(herculesLogBuilder =>
 			{
-				var minimumLevelString = ulearnConfiguration.HostLog.MinimumLevel ?? "debug";
-				var dbMinimumLevelString = ulearnConfiguration.HostLog.DbMinimumLevel ?? "";
-				if (!TryParseLogLevel(minimumLevelString, out var minimumLevel))
-					minimumLevel = LogLevel.Debug;
-				if (!TryParseLogLevel(dbMinimumLevelString, out var dbMinimumLevel))
-					dbMinimumLevel = minimumLevel;
-				pathFormat = pathFormat.Replace("{Date}", "{RollingSuffix}"); // Для совместимости с настройками appsettings.json, написанными для серилога
-				if (Path.IsPathRooted(pathFormat))
-				{
-					var directory = Path.GetDirectoryName(pathFormat);
-					var fileName = Path.GetFileName(pathFormat);
-					pathFormat = Path.Combine(directory, ulearnConfiguration.GraphiteServiceName, fileName);
-				}
-
-				logBuilder.SetupFileLog(fileLogBuilder => fileLogBuilder
-					.CustomizeLog(lb =>
-					{
-						var customized = lb.WithMinimumLevel(minimumLevel);
-						if (dbMinimumLevel != minimumLevel)
-							customized = customized.SelectEvents(le => le.Level >= dbMinimumLevel || !IsDbSource(le));
-						return customized;
-					})
-					.SetSettingsProvider(() => new FileLogSettings
-					{
-						FilePath = pathFormat,
-						RollingStrategy = new RollingStrategyOptions
-						{
-							MaxFiles = 0,
-							Type = RollingStrategyType.Hybrid,
-							Period = RollingPeriod.Day,
-							MaxSize = 4 * 1073741824L
-						},
-						OutputTemplate = logTemplate
-					}));
-
-				logBuilder.SetupHerculesLog(herculesLogBuilder =>
-				{
-					herculesLogBuilder.SetStream(ulearnConfiguration.Hercules.Stream);
-					herculesLogBuilder.SetApiKeyProvider(() => ulearnConfiguration.Hercules.ApiKey);
-					herculesLogBuilder.CustomizeLog(lb =>
-					{
-						var customized = lb.WithMinimumLevel(LogLevel.Info);
-						if (dbMinimumLevel >= LogLevel.Info)
-							customized = customized.SelectEvents(le => le.Level >= dbMinimumLevel || !IsDbSource(le));
-						return customized;
-					});
-				});
-			}
-		}
-
-		private static bool IsDbSource(LogEvent le)
-		{
-			if (le.Properties != null
-				&& le.Properties.TryGetValue("sourceContext", out var sourceContextValue)
-				&& sourceContextValue is SourceContextValue value)
-			{
-				return value.ToString().Contains("Microsoft.EntityFrameworkCore.Database.Command")
-					|| value.ToString().Contains("Microsoft.EntityFrameworkCore.Infrastructure");
-			}
-			return false;
-		}
-
-// Для совместимости с настройками appsettings.json, написанными для серилога
-		private static bool TryParseLogLevel(string str, out LogLevel level)
-		{
-			if (Enum.TryParse(str, true, out level) && Enum.IsDefined(typeof(LogLevel), level))
-				return true;
-			str = str.ToLowerInvariant();
-			switch (str)
-			{
-				case "verbose":
-					level = LogLevel.Debug;
-					return true;
-				case "debug":
-					level = LogLevel.Debug;
-					return true;
-				case "information":
-					level = LogLevel.Info;
-					return true;
-				case "warning":
-					level = LogLevel.Warn;
-					return true;
-				case "error":
-					level = LogLevel.Error;
-					return true;
-				case "fatal":
-					level = LogLevel.Fatal;
-					return true;
-				default:
-					return false;
-			}
+				herculesLogBuilder.SetStream(ulearnConfiguration.Hercules.Stream);
+				herculesLogBuilder.SetApiKeyProvider(() => ulearnConfiguration.Hercules.ApiKey);
+				herculesLogBuilder.CustomizeLog(lb =>
+					lb
+						.DropEvents(LoggerSetup.FilterLogs)
+						.SelectEvents(le => le.Level >= (LoggerSetup.IsDbSource(le) ? dbMinimumLevel : minimumLevel))
+						.WithMinimumLevel(min)
+				);
+			});
 		}
 
 		private IConfigurationSource GetConfigurationSource()

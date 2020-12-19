@@ -19,7 +19,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Serilog;
 using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Authorization;
 using Ulearn.Web.Api.Models.Parameters;
@@ -40,11 +39,11 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly WebApiConfiguration configuration;
 		private readonly IUnitsRepo unitsRepo;
 
-		public AccountController(ILogger logger, IOptions<WebApiConfiguration> options, IWebCourseManager courseManager, UlearnDb db,
+		public AccountController(IOptions<WebApiConfiguration> options, IWebCourseManager courseManager, UlearnDb db,
 			UlearnUserManager userManager, SignInManager<ApplicationUser> signInManager,
 			ICourseRolesRepo courseRolesRepo, ICoursesRepo coursesRepo, IUsersRepo usersRepo, ISystemAccessesRepo systemAccessesRepo, IGroupMembersRepo groupMembersRepo,
 			IUnitsRepo unitsRepo)
-			: base(logger, courseManager, db, usersRepo)
+			: base(courseManager, db, usersRepo)
 		{
 			this.userManager = userManager;
 			this.signInManager = signInManager;

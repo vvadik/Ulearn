@@ -11,9 +11,6 @@ using Database.Repos.Flashcards;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Serilog;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Flashcards;
@@ -22,13 +19,6 @@ using Ulearn.Web.Api.Models.Responses.Flashcards;
 
 namespace Ulearn.Web.Api.Controllers
 {
-	[JsonConverter(typeof(StringEnumConverter), true)]
-	public enum FlashcardOrder
-	{
-		Smart,
-		Original
-	}
-
 	[Route("/courses")]
 	public class FlashcardsController : BaseController
 	{
@@ -37,11 +27,11 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly IUnitsRepo unitsRepo;
 
 
-		public FlashcardsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
+		public FlashcardsController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
 			IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo,
 			IUserFlashcardsUnlockingRepo userFlashcardsUnlockingRepo,
 			IUnitsRepo unitsRepo)
-			: base(logger, courseManager, db, usersRepo)
+			: base(courseManager, db, usersRepo)
 		{
 			this.usersFlashcardsVisitsRepo = usersFlashcardsVisitsRepo;
 			this.userFlashcardsUnlockingRepo = userFlashcardsUnlockingRepo;

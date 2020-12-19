@@ -24,8 +24,6 @@
     <ProjectReference Include="..\Stepik.Api\Stepik.Api.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Common.Logging" Version="3.4.1" />
-    <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="NHttp" Version="0.1.9" />
     <PackageReference Include="NUnit" Version="3.10.0" />

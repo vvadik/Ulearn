@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Database.DataContexts;
 using Database.Models;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Newtonsoft.Json;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
@@ -26,7 +26,7 @@ namespace uLearn.Web
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
 		private readonly VisitsRepo visitsRepo;
 
-		private static readonly ILog log = LogManager.GetLogger(typeof(CertificatesRepo));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(CertificatesRepo));
 
 		public const string TemplateIndexFile = "index.html";
 		private readonly Regex templateParameterRegex = new Regex(@"%([-a-z0-9_.]+)(\|(raw|in_quotes|in_html))?%", RegexOptions.Compiled | RegexOptions.IgnoreCase);

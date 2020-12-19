@@ -5,15 +5,14 @@ using Database;
 using Database.Models;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc.Routing;
-using Serilog;
 using Ulearn.Web.Api.Models.Responses.Groups;
 
 namespace Ulearn.Web.Api.Controllers.Groups
 {
 	public abstract class BaseGroupController : BaseController
 	{
-		protected BaseGroupController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo)
-			: base(logger, courseManager, db, usersRepo)
+		protected BaseGroupController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo)
+			: base(courseManager, db, usersRepo)
 		{
 		}
 

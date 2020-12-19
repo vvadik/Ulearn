@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types.Enums;
@@ -13,7 +13,7 @@ namespace Notifications
 {
 	public class TelegramSender : ITelegramSender
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(TelegramSender));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(TelegramSender));
 
 		private readonly MetricSender metricSender;
 
@@ -29,7 +29,7 @@ namespace Notifications
 			}
 			catch (Exception e)
 			{
-				log.Error($"Can\'t initialize telegram bot with token \"{botToken.MaskAsSecret()}\"", e);
+				log.Error(e, $"Can\'t initialize telegram bot with token \"{botToken.MaskAsSecret()}\"");
 				throw;
 			}
 
@@ -63,10 +63,10 @@ namespace Notifications
 				{
 					metricSender.SendCount("send_to_telegram.fail.blocked_by_user");
 					metricSender.SendCount($"send_to_telegram.fail.blocked_by_user.to.{chatId}");
-					log.Warn($"Can\'t send message to telegram chat {chatId}", e);
+					log.Warn(e, $"Can\'t send message to telegram chat {chatId}");
 				}
 				else
-					log.Error($"Can\'t send message to telegram chat {chatId}", e);
+					log.Error(e, $"Can\'t send message to telegram chat {chatId}");
 
 				throw;
 			}

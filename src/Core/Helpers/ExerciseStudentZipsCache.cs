@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
@@ -9,7 +9,7 @@ namespace Ulearn.Core.Helpers
 {
 	public class ExerciseStudentZipsCache
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(ExerciseStudentZipsCache));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(ExerciseStudentZipsCache));
 
 		private readonly DirectoryInfo cacheDirectory;
 		private readonly ExerciseStudentZipBuilder builder;

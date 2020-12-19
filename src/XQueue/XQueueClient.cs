@@ -4,8 +4,8 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
-using log4net;
 using Newtonsoft.Json;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using XQueue.Models;
@@ -18,7 +18,7 @@ namespace XQueue
 		private const string getSubmissionUrl = "xqueue/get_submission/";
 		private const string putResultUrl = "xqueue/put_result/";
 
-		private static readonly ILog log = LogManager.GetLogger(typeof(XQueueClient));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(XQueueClient));
 
 		private readonly string username;
 		private readonly string password;
@@ -91,7 +91,7 @@ namespace XQueue
 			}
 			catch (Exception e)
 			{
-				log.Warn($"Can't get submission from xqueue {queueName}: {e.Message}", e.InnerException);
+				log.Warn( e.InnerException, $"Can't get submission from xqueue {queueName}: {e.Message}");
 				return null;
 			}
 
@@ -114,7 +114,7 @@ namespace XQueue
 				}
 				catch (Exception e)
 				{
-					log.Error($"Can\'t parse answer from xqueue: {e.Message}", e);
+					log.Error(e, $"Can\'t parse answer from xqueue: {e.Message}");
 					return null;
 				}
 			}

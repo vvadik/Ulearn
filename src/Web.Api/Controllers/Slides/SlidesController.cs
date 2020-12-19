@@ -7,7 +7,6 @@ using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
 using Ulearn.Web.Api.Models.Common;
@@ -25,10 +24,10 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		protected readonly IGroupsRepo groupsRepo;
 		protected readonly SlideRenderer slideRenderer;
 
-		public SlidesController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo,
+		public SlidesController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo,
 			IUserSolutionsRepo solutionsRepo, IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo,
 			SlideRenderer slideRenderer, ICoursesRepo coursesRepo)
-			: base(logger, courseManager, db, usersRepo)
+			: base(courseManager, db, usersRepo)
 		{
 			this.coursesRepo = coursesRepo;
 			this.courseRolesRepo = courseRolesRepo;

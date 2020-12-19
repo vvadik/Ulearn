@@ -11,7 +11,7 @@ using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Serilog;
+using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Core.Courses.Slides.Exercises;
@@ -31,15 +31,15 @@ namespace Ulearn.Web.Api.Controllers.Runner
 		private readonly IVisitsRepo visitsRepo;
 		private readonly MetricSender metricSender;
 		private readonly WebApiConfiguration configuration;
-
 		private readonly List<IResultObserver> resultObservers;
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(VisitsRepo));
 
-		public RunnerController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IOptions<WebApiConfiguration> options,
+		public RunnerController(IWebCourseManager courseManager, UlearnDb db, IOptions<WebApiConfiguration> options,
 			IUsersRepo usersRepo, IUserSolutionsRepo userSolutionsRepo, ISlideCheckingsRepo slideCheckingsRepo,
 			IGroupsRepo groupsRepo, IVisitsRepo visitsRepo, MetricSender metricSender,
 			XQueueResultObserver xQueueResultObserver, SandboxErrorsResultObserver sandboxErrorsResultObserver,
 			AntiPlagiarismResultObserver antiPlagiarismResultObserver, StyleErrorsResultObserver styleErrorsResultObserver)
-			: base(logger, courseManager, db, usersRepo)
+			: base(courseManager, db, usersRepo)
 		{
 			configuration = options.Value;
 			resultObservers = new List<IResultObserver>
@@ -74,12 +74,12 @@ namespace Ulearn.Web.Api.Controllers.Runner
 				if (submission != null || sw.Elapsed > TimeSpan.FromSeconds(10))
 				{
 					if (submission != null)
-						logger.Information($"Отдаю на проверку решение: [{submission.Id}], агент {agent}, только сначала соберу их");
+						log.Info($"Отдаю на проверку решение: [{submission.Id}], агент {agent}, только сначала соберу их");
 					else
 						return new List<RunnerSubmission>();
 
 					var builtSubmissions = new List<RunnerSubmission> { await ToRunnerSubmission(submission) };
-					logger.Information($"Собрал решения: [{submission.Id}], отдаю их агенту {agent}");
+					log.Info($"Собрал решения: [{submission.Id}], отдаю их агенту {agent}");
 					return builtSubmissions;
 				}
 
@@ -142,13 +142,13 @@ namespace Ulearn.Web.Api.Controllers.Runner
 			{
 				var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
 				var errorStr = $"Не могу принять от RunCsJob результаты проверки решений, ошибки: {string.Join(", ", errors)}";
-				logger.Error(errorStr);
+				log.Error(errorStr);
 				return StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse(errorStr));
 			}
 
 			if (configuration.RunnerToken != token)
 				return StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse("Invalid token"));
-			logger.Information($"Получил от RunCsJob результаты проверки решений: [{string.Join(", ", results.Select(r => r.Id))}] от агента {agent}");
+			log.Info($"Получил от RunCsJob результаты проверки решений: [{string.Join(", ", results.Select(r => r.Id))}] от агента {agent}");
 
 			foreach (var result in results)
 				await FuncUtils.TrySeveralTimesAsync(() => userSolutionsRepo.SaveResult(result,

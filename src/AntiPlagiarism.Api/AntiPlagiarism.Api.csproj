@@ -7,7 +7,6 @@
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-		<PackageReference Include="Serilog" Version="2.9.0" />
 		<PackageReference Include="System.Collections.Immutable" Version="1.7.0" />
 		<PackageReference Include="Vostok.Datacenters.Kontur" Version="1.0.36" />
 		<PackageReference Include="Vostok.Telemetry.Kontur" Version="1.0.39" />

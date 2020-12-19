@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Database.Models;
 using EntityFramework.Functions;
 using JetBrains.Annotations;
-using log4net;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
@@ -19,7 +18,6 @@ namespace Database.DataContexts
 	{
 		private readonly ULearnDb db;
 
-		private static readonly ILog log = LogManager.GetLogger(typeof(GradersRepo));
 		private readonly ULearnUserManager userManager;
 
 		public GradersRepo(ULearnDb db)

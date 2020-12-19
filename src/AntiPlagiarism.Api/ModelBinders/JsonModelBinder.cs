@@ -3,18 +3,13 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
-using Serilog;
+using Vostok.Logging.Abstractions;
 
 namespace AntiPlagiarism.Api.ModelBinders
 {
 	public class JsonModelBinder : IModelBinder
 	{
-		private readonly ILogger logger;
-
-		public JsonModelBinder(ILogger logger)
-		{
-			this.logger = logger;
-		}
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(JsonModelBinder));
 
 		public async Task BindModelAsync(ModelBindingContext bindingContext)
 		{
@@ -45,7 +40,7 @@ namespace AntiPlagiarism.Api.ModelBinders
 			}
 			catch (Exception e) when (e is JsonSerializationException || e is JsonReaderException)
 			{
-				logger.Warning($"Can't deserialize json request: {e.Message}");
+				log.Warn($"Can't deserialize json request: {e.Message}");
 				bindingContext.ModelState.TryAddModelError(bindingContext.ModelName, e.Message);
 				return;
 			}

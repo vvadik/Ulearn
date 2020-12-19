@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using log4net.Config;
 using NUnit.Framework;
 
 namespace Stepik.Api.Tests
@@ -12,7 +11,6 @@ namespace Stepik.Api.Tests
 		[SetUp]
 		public void SetUp()
 		{
-			BasicConfigurator.Configure();
 			extractor = new YoutubeVideoUrlExtractor();
 		}
 

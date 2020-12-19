@@ -9,13 +9,12 @@ using Database.Repos.Users;
 using Database.Repos.Users.Search;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
 
 namespace Database.Di
 {
 	public static class ServiceCollectionExtensions
 	{
-		public static IServiceCollection AddDatabaseServices(this IServiceCollection services, ILogger logger)
+		public static IServiceCollection AddDatabaseServices(this IServiceCollection services)
 		{
 			services.AddSingleton<IWebCourseManager, WebCourseManager>();
 

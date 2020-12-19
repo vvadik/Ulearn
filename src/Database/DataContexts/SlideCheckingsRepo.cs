@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Database.Extensions;
 using Database.Models;
 using JetBrains.Annotations;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides.Exercises;
 
@@ -17,7 +17,7 @@ namespace Database.DataContexts
 	public class SlideCheckingsRepo
 	{
 		private readonly ULearnDb db;
-		private readonly ILog log = LogManager.GetLogger(typeof(SlideCheckingsRepo));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(SlideCheckingsRepo));
 
 		public SlideCheckingsRepo(ULearnDb db)
 		{

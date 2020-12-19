@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using AntiPlagiarism.Web.CodeAnalyzing;
 using NUnit.Framework;
-using Serilog;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 
@@ -24,8 +23,7 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing
 		[OneTimeSetUp]
 		public void OneTimeSetUp()
 		{
-			var logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
-			tokensExtractor = new TokensExtractor(logger);
+			tokensExtractor = new TokensExtractor();
 		}
 
 		private List<Token> SkipIfNoPygmentize(Func<List<Token>> getTokens)
@@ -65,6 +63,8 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing
 		[TestCase("index.html", Language.Html)]
 		[TestCase("example.java", Language.Java)]
 		[TestCase("example.hs", Language.Haskell)]
+		[TestCase("example.c", Language.C)]
+		[TestCase("example.cpp", Language.Cpp)]
 		public void LanguagesTest(string file, Language language)
 		{
 			var code = File.ReadAllText(TestDataDir.GetFile(file).FullName);

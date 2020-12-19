@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 
@@ -12,7 +12,7 @@ namespace Database.DataContexts
 {
 	public class VisitsRepo
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(VisitsRepo));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(VisitsRepo));
 
 		private readonly ULearnDb db;
 		private readonly SlideCheckingsRepo slideCheckingsRepo;

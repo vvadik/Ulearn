@@ -10,7 +10,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using Ionic.Zip;
 using JetBrains.Annotations;
-using log4net;
+using Vostok.Logging.Abstractions;
 using Telegram.Bot.Types.Enums;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
@@ -28,7 +28,7 @@ namespace Ulearn.Core
 	{
 		private const string examplePackageName = "Help";
 
-		private static readonly ILog log = LogManager.GetLogger(typeof(CourseManager));
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(CourseManager));
 		private static Encoding Cp866 => Encoding.GetEncoding(866);
 		private static Encoding Utf8 => Encoding.UTF8;
 
@@ -209,7 +209,7 @@ namespace Ulearn.Core
 					}
 					catch (Exception e)
 					{
-						log.Error($"Не могу загрузить курс из {zipFile.FullName}", e);
+						log.Error(e, $"Не могу загрузить курс из {zipFile.FullName}");
 						brokenCourses.Add(courseId);
 						if (firstException == null)
 							firstException = new CourseLoadingException("Error loading course from " + zipFile.Name, e);
@@ -234,7 +234,7 @@ namespace Ulearn.Core
 			}
 			catch (Exception e)
 			{
-				log.Warn("Не смог загрузить курс из папки", e);
+				log.Warn(e, "Не смог загрузить курс из папки");
 				var zipFile = GetStagingCourseFile(courseId);
 				log.Info($"Буду загружать из zip-архива: {zipFile.FullName}");
 				errorsBot.PostToChannel($"Не смог загрузить курс из папки {courseDir}, буду загружать из zip-архива {zipFile.FullName}:\n{e.Message.EscapeMarkdown()}\n```{e.StackTrace}```", ParseMode.Markdown);

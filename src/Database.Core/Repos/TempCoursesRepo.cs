@@ -3,19 +3,16 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 
 namespace Database.Repos
 {
 	public class TempCoursesRepo : ITempCoursesRepo
 	{
 		private readonly UlearnDb db;
-		private readonly ILogger logger;
 
-		public TempCoursesRepo(UlearnDb db, ILogger logger)
+		public TempCoursesRepo(UlearnDb db)
 		{
 			this.db = db;
-			this.logger = logger;
 		}
 
 		public async Task<TempCourse> FindAsync(string courseId)

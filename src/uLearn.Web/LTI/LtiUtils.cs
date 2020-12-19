@@ -1,7 +1,7 @@
 ﻿using System;
 using Database.DataContexts;
 using Database.Models;
-using log4net;
+using Vostok.Logging.Abstractions;
 using LtiLibrary.Core.Outcomes.v1;
 using uLearn.Web.Controllers;
 using Ulearn.Common.Extensions;
@@ -11,10 +11,9 @@ namespace uLearn.Web.LTI
 {
 	public static class LtiUtils
 	{
-		private static readonly ILog log = LogManager.GetLogger(typeof(LtiUtils));
-
 		public static void SubmitScore(string courseId, Slide slide, string userId, Visit visit = null)
 		{
+			var log = LogProvider.Get().ForContext(typeof(LtiUtils));
 			var db = new ULearnDb();
 			var ltiRequestsRepo = new LtiRequestsRepo(db);
 			var consumersRepo = new ConsumersRepo(db);
@@ -36,7 +35,7 @@ namespace uLearn.Web.LTI
 			}
 			catch (Exception e)
 			{
-				log.Error($"Неверный адрес отправки результатов по LTI: {ltiRequest.LisOutcomeServiceUrl}", e);
+				log.Error(e, $"Неверный адрес отправки результатов по LTI: {ltiRequest.LisOutcomeServiceUrl}");
 				throw;
 			}
 

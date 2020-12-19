@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using Serilog;
 
 namespace Database.Repos
 {
@@ -13,12 +12,10 @@ namespace Database.Repos
 	public class CertificatesRepo : ICertificatesRepo
 	{
 		private readonly UlearnDb db;
-		private readonly ILogger logger;
 
-		public CertificatesRepo(UlearnDb db, ILogger logger)
+		public CertificatesRepo(UlearnDb db)
 		{
 			this.db = db;
-			this.logger = logger;
 		}
 
 		public List<CertificateTemplate> GetTemplates(string courseId)

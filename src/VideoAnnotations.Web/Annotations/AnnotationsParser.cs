@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Serilog;
+using Vostok.Logging.Abstractions;
 using Ulearn.VideoAnnotations.Api.Models.Responses.Annotations;
 
 namespace Ulearn.VideoAnnotations.Web.Annotations
@@ -15,12 +15,7 @@ namespace Ulearn.VideoAnnotations.Web.Annotations
 
 		private readonly string[] annotationOffsetFormats = { @"mm\:ss", @"m\:ss" };
 
-		private readonly ILogger logger;
-
-		public AnnotationsParser(ILogger logger)
-		{
-			this.logger = logger;
-		}
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(AnnotationsParser));
 
 		public Dictionary<string, Annotation> ParseAnnotations(string[] lines)
 		{
@@ -43,29 +38,29 @@ namespace Ulearn.VideoAnnotations.Web.Annotations
 
 				if (annotationLines.Count == 0)
 				{
-					logger.Warning("Empty annotation for slide \"{title}\". I will skip it", title);
+					log.Warn("Empty annotation for slide \"{title}\". I will skip it", title);
 					continue;
 				}
 
 				var videoId = annotationLines[0].Trim();
-				logger.Information("Parse slide {title}, video id is {videoId}", title, videoId);
+				log.Info("Parse slide {title}, video id is {videoId}", title, videoId);
 
 				if (annotationLines.Count(line => line.Trim().StartsWith("*")) == 0)
 				{
-					logger.Warning("Not found time-codes for slide \"{title}\". I will skip it", title);
+					log.Warn("Not found time-codes for slide \"{title}\". I will skip it", title);
 					continue;
 				}
 
 				var hasAbstract = true;
 				if (annotationLines.Skip(1).Count(line => !line.Trim().StartsWith("*")) == 0)
 				{
-					logger.Warning("Not found abstract for slide \"{title}\"", title);
+					log.Warn("Not found abstract for slide \"{title}\"", title);
 					hasAbstract = false;
 				}
 
 				if (annotationLines.Skip(1).TakeWhile(line => !line.Trim().StartsWith("*")).Count() > 1)
 				{
-					logger.Warning("Abstract can not be multiline. I will skip slide \"{title}\"", title);
+					log.Warn("Abstract can not be multiline. I will skip slide \"{title}\"", title);
 					continue;
 				}
 
@@ -95,7 +90,7 @@ namespace Ulearn.VideoAnnotations.Web.Annotations
 
 			if (!TimeSpan.TryParseExact(offsetString, annotationOffsetFormats, CultureInfo.InvariantCulture, out var offset))
 			{
-				logger.Warning("Can't parse time-code {offset}, skip it", offsetString);
+				log.Warn("Can't parse time-code {offset}, skip it", offsetString);
 				return null;
 			}
 

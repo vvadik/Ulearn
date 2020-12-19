@@ -20,6 +20,7 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
+using Vostok.Logging.Abstractions;
 using Web.Api.Configuration;
 
 namespace uLearn.Web.Controllers
@@ -43,6 +44,7 @@ namespace uLearn.Web.Controllers
 		private static readonly WebApiConfiguration configuration;
 
 		private static readonly List<string> hijackCookies = new List<string>();
+		private readonly ILog log = LogProvider.Get().ForContext(typeof(AccountController));
 
 		static AccountController()
 		{

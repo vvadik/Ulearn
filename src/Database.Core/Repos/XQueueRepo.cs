@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Database.Models;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 using Ulearn.Common;
 using Ulearn.Core;
 
@@ -14,14 +13,12 @@ namespace Database.Repos
 	public class XQueueRepo : IXQueueRepo
 	{
 		private readonly UlearnDb db;
-		private readonly ILogger logger;
 		private readonly UlearnUserManager userManager;
 		private readonly IUserSolutionsRepo userSolutionsRepo;
 
-		public XQueueRepo(UlearnDb db, ILogger logger, UlearnUserManager userManager, IUserSolutionsRepo userSolutionsRepo)
+		public XQueueRepo(UlearnDb db, UlearnUserManager userManager, IUserSolutionsRepo userSolutionsRepo)
 		{
 			this.db = db;
-			this.logger = logger;
 			this.userManager = userManager;
 			this.userSolutionsRepo = userSolutionsRepo;
 		}

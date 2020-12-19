@@ -9,6 +9,7 @@ import { RootState } from "src/models/reduxState";
 
 import Course from '../../Course.js';
 import DownloadedHtmlContent from 'src/components/common/DownloadedHtmlContent.js';
+import ShowAfterDelay from "src/components/ShowAfterDelay/ShowAfterDelay";
 import { Modal } from "@skbkontur/react-ui";
 
 import texts from "./SlideHeader.texts";
@@ -18,7 +19,17 @@ import styles from "../SlideHeader/SlideHeader.less";
 const ScoreHeaderInternal = (props: PropsFromRedux & ScoreHeaderProps) => {
 	const [isModalShowed, showModal] = useState(false);
 
-	const { score, maxScore, isSkipped, waitingForManualChecking, prohibitFurtherManualChecking, hasReviewedSubmissions, courseId, slideId, showStudentSubmissions, } = props;
+	const {
+		score,
+		maxScore,
+		isSkipped,
+		waitingForManualChecking,
+		prohibitFurtherManualChecking,
+		hasReviewedSubmissions,
+		courseId,
+		slideId,
+		showStudentSubmissions,
+	} = props;
 	if(score === null || maxScore === null) {
 		return null;
 	}
@@ -49,16 +60,18 @@ const ScoreHeaderInternal = (props: PropsFromRedux & ScoreHeaderProps) => {
 				{ texts.showAcceptedSolutionsText }
 			</a> }
 			{ isModalShowed &&
-			<Modal width={ modalWidth } onClose={ () => showModal(false) }>
-				<Modal.Header>
-					<h2>
-						{ texts.showAcceptedSolutionsHeaderText }
-					</h2>
-				</Modal.Header>
-				<Modal.Body>
-					<DownloadedHtmlContent url={ constructPathToStudentSubmissions(courseId, slideId) }/>
-				</Modal.Body>
-			</Modal> }
+			<ShowAfterDelay>
+				<Modal width={ modalWidth } onClose={ () => showModal(false) }>
+					<Modal.Header>
+						<h2>
+							{ texts.showAcceptedSolutionsHeaderText }
+						</h2>
+					</Modal.Header>
+					<Modal.Body>
+						<DownloadedHtmlContent url={ constructPathToStudentSubmissions(courseId, slideId) }/>
+					</Modal.Body>
+				</Modal>
+			</ShowAfterDelay> }
 		</div>
 	);
 };

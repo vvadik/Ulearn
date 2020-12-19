@@ -6,7 +6,6 @@ using AngleSharp.Html.Parser;
 using Database.Repos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 using Ulearn.Common;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Blocks;
@@ -24,15 +23,13 @@ namespace Ulearn.Web.Api.Controllers.Slides
 {
 	public class SlideRenderer
 	{
-		private readonly ILogger logger;
 		private readonly IUlearnVideoAnnotationsClient videoAnnotationsClient;
 		private readonly IUserSolutionsRepo solutionsRepo;
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
 
-		public SlideRenderer(ILogger logger, IUlearnVideoAnnotationsClient videoAnnotationsClient,
+		public SlideRenderer(IUlearnVideoAnnotationsClient videoAnnotationsClient,
 			IUserSolutionsRepo solutionsRepo, ISlideCheckingsRepo slideCheckingsRepo)
 		{
-			this.logger = logger;
 			this.videoAnnotationsClient = videoAnnotationsClient;
 			this.solutionsRepo = solutionsRepo;
 			this.slideCheckingsRepo = slideCheckingsRepo;

@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using AntiPlagiarism.Web.Database;
 using AntiPlagiarism.Web.Database.Models;
 using Database;
@@ -8,14 +9,16 @@ using ManualUtils.AntiPlagiarism;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Ulearn.Core.Configuration;
+using Ulearn.Core.Logging;
 
 namespace ManualUtils
 {
 	internal class Program
 	{
-		public static void Main(string[] args)
+		public static async Task Main(string[] args)
 		{
-			var configuration = ApplicationConfiguration.Read<DatabaseConfiguration>();
+			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
+			LoggerSetup.Setup(configuration.HostLog, configuration.GraphiteServiceName);
 			var optionsBuilder = new DbContextOptionsBuilder<UlearnDb>()
 				.UseLazyLoadingProxies()
 				.UseSqlServer(configuration.Database);
@@ -25,12 +28,16 @@ namespace ManualUtils
 				.UseSqlServer(configuration.Database);
 			var adb = new AntiPlagiarismDb(aOptionsBuilder.Options);
 
+			//await FindExternalSolutionsPlagiarism.UploadSolutions();
+			//await FindExternalSolutionsPlagiarism.GetRawResults();
+			//await FindExternalSolutionsPlagiarism.PrepareResults();
+
 			//GetMostSimilarSubmission(adb);
 			//ParsePairWeightsFromLogs();
 			//GetBlackAndWhiteLabels(db, adb);
 			//ParseTaskWeightsFromLogs();
 			//CampusRegistration();
-			GetIps(db);
+			//GetIps(db);
 			//FillAntiplagFields.FillClientSubmissionId(adb);
 		}
 		

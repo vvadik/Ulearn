@@ -9,7 +9,6 @@ using Database.Repos.CourseRoles;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 using Swashbuckle.AspNetCore.Annotations;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Parameters.Review;
@@ -24,9 +23,9 @@ namespace Ulearn.Web.Api.Controllers.Review
 		private readonly IUnitsRepo unitsRepo;
 		private readonly INotificationsRepo notificationsRepo;
 
-		public ReviewCommentsController(ILogger logger, IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
+		public ReviewCommentsController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
 			ISlideCheckingsRepo slideCheckingsRepo, ICourseRolesRepo courseRolesRepo, IUnitsRepo unitsRepo, INotificationsRepo notificationsRepo)
-			: base(logger, courseManager, db, usersRepo)
+			: base(courseManager, db, usersRepo)
 		{
 			this.slideCheckingsRepo = slideCheckingsRepo;
 			this.courseRolesRepo = courseRolesRepo;
