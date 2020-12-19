@@ -2,6 +2,9 @@ from SourceCodeRunInfo.ISourceCodeRunInfo import ISourceCodeRunInfo
 
 
 class PythonRunInfo(ISourceCodeRunInfo):
+    def file_extension(self):
+        return '.py'
+
     def format_build_command(self, code_filename: str, result_filename: str) -> str:
         return ''
 

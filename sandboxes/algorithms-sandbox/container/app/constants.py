@@ -1,5 +1,4 @@
-SOLUTION_FILENAME = 'solution.txt'
-SETTINGS_FILENAME = 'settings.json'
+SOLUTION_FILENAME = 'solution.any'
 TEST_DIRECTORY = 'tests'
 RESULT_FILENAME = 'result'
 TEMPORARY_FILENAME = 'tmp'

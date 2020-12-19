@@ -2,6 +2,9 @@ from SourceCodeRunInfo.ISourceCodeRunInfo import ISourceCodeRunInfo
 
 
 class CppRunInfo(ISourceCodeRunInfo):
+    def file_extension(self):
+        return '.cpp'
+
     def format_run_command(self, filename: str) -> str:
         return f'./{filename}'
 

@@ -1,7 +1,7 @@
 from subprocess import Popen, PIPE, TimeoutExpired
-from os import listdir
+from os import listdir, rename
 from os.path import join as path_join
-import json
+from sys import argv
 
 from SourceCodeRunInfo import get_run_info_by_language_name, ISourceCodeRunInfo
 from verdict import Verdict
@@ -27,7 +27,7 @@ class TaskCodeRunner:
         with open(test_file, 'rb') as f:
             test_data = f.read()
         process = Popen(['su', STUDENT_USER, '-c', f"{command}"],
-                        stdin=PIPE, stdout=open(result_file, 'w'), stderr=PIPE)
+                        stdin=PIPE, stdout=open(result_file, 'wb'), stderr=PIPE)
         try:
             err = process.communicate(test_data, timeout=time_limit)
         except TimeoutExpired:
@@ -49,13 +49,7 @@ class TaskCodeRunner:
         self.run(test_file, RESULT_FILENAME)
 
 
-def load_settings(settings_filename: str):
-    with open(settings_filename) as settings_file:
-        return json.load(settings_file)
-
-
-def check(code_filename):
-    source_code_run_info = get_run_info_by_language_name(language)
+def check(source_code_run_info, code_filename):
     runner = TaskCodeRunner(source_code_run_info)
     for number_test, test_filename in enumerate(sorted(listdir(TEST_DIRECTORY)), 1):
         if test_filename.endswith(SUFFIX_ANSWER_FILENAME):
@@ -68,6 +62,7 @@ def check(code_filename):
                              path_join(TEST_DIRECTORY, f'{test_filename}{SUFFIX_ANSWER_FILENAME}')],
                             stdout=PIPE, stderr=PIPE)
             _, err = process.communicate()
+
             if not err.startswith(b'ok'):
                 raise WrongAnswerException()
         except CompilationException:
@@ -101,14 +96,14 @@ def check(code_filename):
 def main():
     runner = TaskCodeRunner(get_run_info_by_language_name('cpp'))
     runner.build('check.cpp', 'check')
-
-    result = check(SOLUTION_FILENAME)
+    run_info = get_run_info_by_language_name(language)
+    solution_filename_by_language = SOLUTION_FILENAME.replace('.any', run_info.file_extension())
+    rename(SOLUTION_FILENAME, solution_filename_by_language)
+    result = check(run_info, solution_filename_by_language)
     print(result)
 
-
-settings = load_settings(SETTINGS_FILENAME)
-time_limit = settings["TimeLimit"]
-language = settings["Language"]
+language = argv[1].lower()
+time_limit = int(argv[2]) / 1000
 
 if __name__ == '__main__':
     main()

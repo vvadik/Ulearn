@@ -4,6 +4,13 @@ class ISourceCodeRunInfo:
     __metaclass__ = ABCMeta
 
     @abstractmethod
+    def file_extension(self):
+        """
+        Возвращает расширение файла данного языка
+        :return: .{расширение}
+        """
+
+    @abstractmethod
     def format_build_command(self, code_filename: str, result_filename: str) -> str:
         """
         Формирует команду, которую надо ввести в bash, чтобы исходных код сбилдился

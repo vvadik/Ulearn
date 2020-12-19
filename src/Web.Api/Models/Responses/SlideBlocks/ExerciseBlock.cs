@@ -51,12 +51,16 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 			var reviewId2Comments = context.CodeReviewComments
 				?.GroupBy(c => c.ReviewId)
 				.ToDictionary(g => g.Key, g => g.AsEnumerable());
+			
+			var languages = exerciseBlock.Language != null ? new[] { exerciseBlock.Language.Value } : new Language[0];
+			if (exerciseBlock is PolygonExerciseBlock)
+				languages = PolygonExerciseBlock.Languages;
 
 			Hints = exerciseBlock.Hints.ToArray();
 			ExerciseInitialCode = exerciseBlock.ExerciseInitialCode.RemoveEmptyLinesFromStart().TrimEnd().EnsureEnoughLines(4);
 			HideSolutions = exerciseBlock.HideShowSolutionsButton;
 			ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : exerciseBlock.ExpectedOutput?.NormalizeEoln();
-			Languages = exerciseBlock.Language != null ? new[] { exerciseBlock.Language.Value } : new Language[0];
+			Languages = languages;
 			AttemptsStatistics = context.AttemptsStatistics;
 			Submissions = context.Submissions
 				.EmptyIfNull()

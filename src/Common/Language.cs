@@ -47,6 +47,14 @@ namespace Ulearn.Common
 		[XmlEnum("haskell")]
 		[Lexer("haskell")]
 		Haskell = 9,
+		
+		[XmlEnum("cpp")]
+		[Lexer("cpp")]
+		Cpp = 10,
+		
+		[XmlEnum("any")]
+		[Lexer("any")]
+		Any = 11,
 
 		[XmlEnum("text")]
 		[Lexer("text")]
@@ -77,6 +85,8 @@ namespace Ulearn.Common
 			{ ".java", Language.Java },
 			{ ".hs", Language.Haskell },
 			{ ".txt", Language.Text },
+			{ ".cpp", Language.Cpp },
+			{ ".any", Language.Any }
 		};
 
 		public static Language GuessByExtension(string extension)
