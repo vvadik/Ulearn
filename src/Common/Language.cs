@@ -95,7 +95,6 @@ namespace Ulearn.Common
 			{ ".c", Language.C },
 			{ ".cpp", Language.Cpp },
 			{ ".txt", Language.Text },
-			{ ".cpp", Language.Cpp },
 			{ ".any", Language.Any }
 		};
 
