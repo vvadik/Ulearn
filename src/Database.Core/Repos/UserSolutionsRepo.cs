@@ -58,7 +58,8 @@ namespace Database.Repos
 			var exerciseBlock = ((await courseManager.FindCourseAsync(courseId))?.FindSlideById(slideId, true) as ExerciseSlide)?.Exercise;
 
 			AutomaticExerciseChecking automaticChecking;
-			if (language.HasAutomaticChecking() && (language == Language.CSharp || exerciseBlock is UniversalExerciseBlock))
+			if (language.HasAutomaticChecking() && (language == Language.CSharp || exerciseBlock is UniversalExerciseBlock) 
+				|| exerciseBlock is PolygonExerciseBlock && PolygonExerciseBlock.Languages.Contains(language))
 			{
 				automaticChecking = new AutomaticExerciseChecking
 				{
