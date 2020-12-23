@@ -45,7 +45,15 @@ import {
 	SubmissionIsLast,
 	SubmissionIsLastSuccess
 } from "./ExerciseUtils";
-import Controls from "src/components/course/Course/Slide/Blocks/Exercise/Controls/Controls";
+
+import Controls, {
+	SubmitButton,
+	ShowHintButton,
+	OutputButton,
+	ResetButton,
+	StatisticsHint,
+	AcceptedSolutionsButton
+} from "./Controls/Controls";
 
 const editThemeName = 'darcula';
 const defaultThemeName = 'default';
@@ -274,6 +282,7 @@ class Exercise extends React.Component {
 		const hasOutput = currentSubmission
 			&& HasOutput(visibleCheckingResponse?.message, currentSubmission.automaticChecking,
 				expectedOutput);
+		const isShowAcceptedSolutionsAvailable = submissions.length > 0 || slideProgress.isSkipped;
 
 		return (
 			<React.Fragment>
@@ -303,25 +312,31 @@ class Exercise extends React.Component {
 					}
 				</div>
 				{/* TODO not included in current release !isEditable && currentSubmission && this.renderOverview(currentSubmission)*/ }
-				<Controls
-					hasOutput={ hasOutput }
-					hideSolutions={ hideSolutions }
-					countOfHints={ hints.length }
-					isEditable={ isEditable }
-					showOutput={ showOutput }
-					submissionLoading={ submissionLoading }
-					valueChanged={ valueChanged }
-					attemptsStatistics={ attemptsStatistics }
-					isShowAcceptedSolutionsAvailable={ submissions.length > 0 || slideProgress.isSkipped }
-					acceptedSolutionsUrl={ constructPathToAcceptedSolutions(courseId, slideId) }
-					showedHintsCount={ showedHintsCount }
-
-					onResetButtonClicked={ this.resetCodeAndCache }
-					onShowOutputButtonClicked={ this.toggleOutput }
-					onVisitAcceptedSolutions={ this.onVisitAcceptedSolutions }
-					onsSendExerciseButtonClicked={ this.sendExercise }
-					showHint={ this.showHint }
-				/>
+				<Controls>
+					<SubmitButton
+						valueChanged={ valueChanged }
+						submissionLoading={ submissionLoading }
+						onSendExerciseButtonClicked={ this.sendExercise }
+					/>
+					{ hints.length !== 0 &&
+					<ShowHintButton
+						countOfHints={ hints.length }
+						showedHintsCount={ showedHintsCount }
+						showHint={ this.showHint }
+					/> }
+					{ isEditable && <ResetButton onResetButtonClicked={ this.resetCodeAndCache }/> }
+					{ (!isEditable && hasOutput) && <OutputButton
+						showOutput={ showOutput }
+						onShowOutputButtonClicked={ this.toggleOutput }
+					/> }
+					<StatisticsHint attemptsStatistics={ attemptsStatistics }/>
+					{ (!hideSolutions && (hints.length === showedHintsCount || isShowAcceptedSolutionsAvailable))
+					&& <AcceptedSolutionsButton
+						acceptedSolutionsUrl={ constructPathToAcceptedSolutions(courseId, slideId) }
+						onVisitAcceptedSolutions={ this.onVisitAcceptedSolutions }
+						isShowAcceptedSolutionsAvailable={ isShowAcceptedSolutionsAvailable }
+					/> }
+				</Controls>
 				{ showOutput && HasOutput(visibleCheckingResponse?.message, automaticChecking, expectedOutput) &&
 				<ExerciseOutput
 					solutionRunStatus={ visibleCheckingResponse?.solutionRunStatus ?? SolutionRunStatus.Success }
