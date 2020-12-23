@@ -686,28 +686,6 @@ class Exercise extends React.Component {
 		)
 	}
 
-	renderShowStatisticsHint = () => {
-		const {
-			attemptedUsersCount,
-			usersWithRightAnswerCount,
-			lastSuccessAttemptDate,
-		} = this.props.attemptsStatistics;
-		const statisticsClassName = classNames(styles.exerciseControls, styles.statistics);
-
-		return (
-			<span className={ statisticsClassName }>
-					<Tooltip pos={ "bottom right" } trigger={ "hover&focus" } render={
-						() =>
-							<span>
-								{ texts.controls.statistics.buildStatistics(attemptedUsersCount, usersWithRightAnswerCount, lastSuccessAttemptDate) }
-							</span>
-					}>
-						{ texts.controls.statistics.buildShortText(usersWithRightAnswerCount) }
-					</Tooltip>
-				</span>
-		);
-	}
-
 	enableEditing = (e) => {
 		e.stopPropagation();
 
@@ -803,7 +781,6 @@ class Exercise extends React.Component {
 	addReviewComment = (reviewId, text) => {
 		const { addReviewComment, courseId, slideId, } = this.props;
 		const { currentSubmission, } = this.state;
-
 
 		addReviewComment(courseId, slideId, currentSubmission.id, reviewId, text);
 	}
