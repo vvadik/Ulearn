@@ -27,12 +27,13 @@ namespace ManualUtils
 				.UseSqlServer(configuration.Database);
 			var adb = new AntiPlagiarismDb(aOptionsBuilder.Options);
 
+			ScoresUpdater.UpdateTests(db, "java-rtf");
 			//GetMostSimilarSubmission(adb);
 			//ParsePairWeightsFromLogs();
 			//GetBlackAndWhiteLabels(db, adb);
 			//ParseTaskWeightsFromLogs();
 			//CampusRegistration();
-			GetIps(db);
+			//GetIps(db);
 			//FillAntiplagFields.FillClientSubmissionId(adb);
 		}
 		
