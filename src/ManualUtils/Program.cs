@@ -27,7 +27,8 @@ namespace ManualUtils
 				.UseSqlServer(configuration.Database);
 			var adb = new AntiPlagiarismDb(aOptionsBuilder.Options);
 
-			ScoresUpdater.UpdateTests(db, "java-rtf");
+			//Users.PrintCourseAdmins(db);
+			//ScoresUpdater.UpdateTests(db, "java-rtf");
 			//GetMostSimilarSubmission(adb);
 			//ParsePairWeightsFromLogs();
 			//GetBlackAndWhiteLabels(db, adb);
