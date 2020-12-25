@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Database.Extensions;
 using Database.Models;
-using Database.Repos.CourseRoles;
 using Database.Repos.Users;
 using Microsoft.EntityFrameworkCore;
 using Vostok.Logging.Abstractions;
@@ -28,18 +27,18 @@ namespace Database.Repos
 		private readonly ILog log = LogProvider.Get().ForContext(typeof(NotificationsRepo));
 		private readonly IServiceProvider serviceProvider;
 		private readonly IUnitsRepo unitsRepo;
-		private readonly ICourseRoleUsersFilter courseRoleUsersFilter;
+		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IUsersRepo usersRepo;
 		private readonly IWebCourseManager courseManager;
 
 		public NotificationsRepo(UlearnDb db, IServiceProvider serviceProvider,
-			IUnitsRepo unitsRepo, ICourseRoleUsersFilter courseRoleUsersFilter, IUsersRepo usersRepo, IWebCourseManager courseManager)
+			IUnitsRepo unitsRepo, ICourseRolesRepo courseRolesRepo, IUsersRepo usersRepo, IWebCourseManager courseManager)
 		{
 			this.db = db;
 			this.serviceProvider = serviceProvider;
 			this.unitsRepo = unitsRepo;
 			this.usersRepo = usersRepo;
-			this.courseRoleUsersFilter = courseRoleUsersFilter;
+			this.courseRolesRepo = courseRolesRepo;
 			this.courseManager = courseManager;
 		}
 
@@ -415,7 +414,7 @@ namespace Database.Repos
 					var visibleUnits = await unitsRepo.GetPublishedUnitIdsAsync(course);
 					if (!visibleUnits.Any())
 					{
-						var userIdsWithInstructorRoles = await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Tester, notification.CourseId, true);
+						var userIdsWithInstructorRoles = await courseRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Tester, notification.CourseId, true);
 						var sysAdminsIds = await usersRepo.GetSysAdminsIdsAsync();
 						recipientsIds.IntersectWith(userIdsWithInstructorRoles.Concat(sysAdminsIds));
 					}

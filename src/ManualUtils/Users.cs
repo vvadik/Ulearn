@@ -2,7 +2,7 @@
 using System.Linq;
 using Database;
 using Database.Models;
-using Microsoft.EntityFrameworkCore;
+using Database.Repos;
 
 namespace ManualUtils
 {
@@ -10,17 +10,18 @@ namespace ManualUtils
 	{
 		public static void PrintCourseAdmins(UlearnDb db)
 		{
-			var admins = db.CourseRoles.Include(r => r.User).Where(r => r.Role == CourseRoleType.CourseAdmin && (r.IsEnabled ?? false)).ToList();
-			var users = admins.GroupBy(a => a.UserId).Select(
-				g =>
+			var courseRolesRepo = new CourseRolesRepo(db, null);
+			var adminIds = courseRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRoleType.CourseAdmin, null, false).Result;
+			var users = adminIds.Select(
+				adminId =>
 				{
-					var values = g.ToList();
+					var roles = courseRolesRepo.GetActualUserRoles(adminId).Result.Where(r => r.Role == CourseRoleType.CourseAdmin).ToList();
 					return new
 					{
-						Name = values[0].User.VisibleName,
-						Email = values[0].User.Email,
-						Courses = string.Join(", ", values.Select(e => e.CourseId).ToList()),
-						Comments = string.Join(", ", values.Select(e => e.Comment).Where(c => !string.IsNullOrWhiteSpace(c)).ToList())
+						Name = roles[0].User.VisibleName,
+						Email = roles[0].User.Email,
+						Courses = string.Join(", ", roles.Select(e => e.CourseId).ToList()),
+						Comments = string.Join(", ", roles.Select(e => e.Comment).Where(c => !string.IsNullOrWhiteSpace(c)).ToList())
 					};
 				}).ToList();
 			var lines = users.Select(u => $"{u.Name}\t{u.Email}\t{u.Courses}\t{u.Comments}");

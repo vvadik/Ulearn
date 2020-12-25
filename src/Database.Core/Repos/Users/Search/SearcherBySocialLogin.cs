@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
-using Database.Repos.CourseRoles;
 
 namespace Database.Repos.Users.Search
 {

@@ -5,7 +5,6 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using Database.Extensions;
 using Database.Models;
-using Database.Repos.CourseRoles;
 using Microsoft.AspNet.Identity;
 using Microsoft.EntityFrameworkCore;
 using Ulearn.Core.Courses;

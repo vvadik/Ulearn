@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
-using Database.Repos.CourseRoles;
+using Database.Repos;
 using Database.Repos.Flashcards;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Ulearn.Core.Courses;

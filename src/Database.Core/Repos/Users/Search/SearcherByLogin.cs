@@ -1,5 +1,3 @@
-using Database.Repos.CourseRoles;
-
 namespace Database.Repos.Users.Search
 {
 	public class SearcherByLogin : AbstractSearcherForInstructors

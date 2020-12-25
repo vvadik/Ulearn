@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
-using Database.Repos.CourseRoles;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -18,16 +17,14 @@ namespace Database.Repos.Users
 	{
 		private readonly UlearnDb db;
 		private readonly UlearnUserManager userManager;
-		private readonly ICourseRoleUsersFilter courseRoleUsersFilter;
 		private IdentityRole sysAdminRole = null;
 
 		public const string UlearnBotUsername = "ulearn-bot";
 
-		public UsersRepo(UlearnDb db, UlearnUserManager userManager, ICourseRoleUsersFilter courseRoleUsersFilter)
+		public UsersRepo(UlearnDb db, UlearnUserManager userManager)
 		{
 			this.db = db;
 			this.userManager = userManager;
-			this.courseRoleUsersFilter = courseRoleUsersFilter;
 		}
 
 		public async Task<ApplicationUser> FindUserByIdAsync(string userId)
@@ -37,26 +34,6 @@ namespace Database.Repos.Users
 				return null;
 
 			return user.IsDeleted ? null : user;
-		}
-
-		/* Pass limit=0 to disable limiting */
-		public async Task<List<UserRolesInfo>> GetCourseInstructorsAsync(string courseId, int limit = 50)
-		{
-			return await db.Users
-				.Where(u => !u.IsDeleted)
-				.FilterByUserIds(await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, courseId, includeHighRoles: true).ConfigureAwait(false))
-				.GetUserRolesInfoAsync(limit, userManager)
-				.ConfigureAwait(false);
-		}
-
-		/* Pass limit=0 to disable limiting */
-		public async Task<List<UserRolesInfo>> GetCourseAdminsAsync(string courseId, int limit = 50)
-		{
-			return await db.Users
-				.Where(u => !u.IsDeleted)
-				.FilterByUserIds(await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.CourseAdmin, courseId, includeHighRoles: true).ConfigureAwait(false))
-				.GetUserRolesInfoAsync(limit, userManager)
-				.ConfigureAwait(false);
 		}
 
 		public Task<List<string>> FindUsersBySocialProviderKeyAsync(string providerKey)

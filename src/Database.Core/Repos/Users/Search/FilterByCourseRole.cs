@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
-using Database.Repos.CourseRoles;
 
 namespace Database.Repos.Users.Search
 {
@@ -23,7 +22,7 @@ namespace Database.Repos.Users.Search
 			if (request.MinCourseRoleType == CourseRoleType.Student)
 				throw new ArgumentException($"Can't search by students, sorry: there are too many students");
 
-			var userIds = await courseRolesRepo.GetUsersWithRoleAsync(request.CourseId, request.MinCourseRoleType.Value).ConfigureAwait(false);
+			var userIds = await courseRolesRepo.GetListOfUsersWithCourseRoleAsync(request.MinCourseRoleType.Value, request.CourseId, true).ConfigureAwait(false);
 			return users.Where(u => userIds.Contains(u.Id));
 		}
 	}

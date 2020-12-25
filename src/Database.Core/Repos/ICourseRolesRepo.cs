@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Database.Models;
+using JetBrains.Annotations;
 
-namespace Database.Repos.CourseRoles
+namespace Database.Repos
 {
 	public interface ICourseRolesRepo
 	{
@@ -13,6 +14,6 @@ namespace Database.Repos.CourseRoles
 		Task<bool> HasUserAccessToAnyCourseAsync(string userId, CourseRoleType minCourseRoleType);
 		Task<List<string>> GetCoursesWhereUserIsInRoleAsync(string userId, CourseRoleType minCourseRoleType);
 		Task<List<string>> GetCoursesWhereUserIsInStrictRoleAsync(string userId, CourseRoleType courseRoleType);
-		Task<List<string>> GetUsersWithRoleAsync(string courseId, CourseRoleType minCourseRoleType);
+		Task<List<string>> GetListOfUsersWithCourseRoleAsync(CourseRoleType courseRoleType, [CanBeNull]string courseId, bool includeHighRoles);
 	}
 }
