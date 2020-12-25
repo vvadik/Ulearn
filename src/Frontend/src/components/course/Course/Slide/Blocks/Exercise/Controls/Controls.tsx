@@ -9,8 +9,7 @@ import OutputButton from "./OutputButton";
 import ResetButton from "./ResetButton";
 import StatisticsHint from "./StatisticsHint";
 import AcceptedSolutionsButton from "./AcceptedSolutionsButton";
-
-import { darkTheme } from 'ui/internal/ThemePlayground/darkTheme/darkTheme.js';
+import { darkFlat } from "src/uiTheme.js";
 
 import styles from './Controls.less';
 
@@ -70,8 +69,8 @@ class Controls extends React.Component<Props, State> {
 
 		return (
 			<div className={ styles.exerciseControlsContainer }>
-				{ submit }
-				<ThemeContext.Provider value={ darkTheme }>
+				<ThemeContext.Provider value={ darkFlat }>
+					{ submit }
 					{ hint && React.cloneElement(hint, { showControlsText }) }
 					{ reset && React.cloneElement(reset, { showControlsText }) }
 					{ output && React.cloneElement(output, { showControlsText }) }

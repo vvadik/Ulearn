@@ -17,15 +17,17 @@ function SubmitButton(props: Props): React.ReactElement {
 
 	return (
 		<span className={ styles.exerciseControls }>
-				<Tooltip pos={ "bottom center" } trigger={ "hover&focus" }
-						 render={ renderSubmitCodeHint }>
-							<Button
-								loading={ submissionLoading }
-								use={ "primary" }
-								disabled={ !valueChanged }
-								onClick={ onSendExerciseButtonClicked }>
-								{ texts.controls.submitCode.text }
-							</Button>
+				<Tooltip
+					pos={ "bottom center" }
+					trigger={ "hover&focus" }
+					render={ renderSubmitCodeHint }>
+					<Button
+						loading={ submissionLoading }
+						use={ "primary" }
+						disabled={ !valueChanged }
+						onClick={ onSendExerciseButtonClicked }>
+						{ texts.controls.submitCode.text }
+					</Button>
 				</Tooltip>
 			</span>
 	);
