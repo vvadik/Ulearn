@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Database.Models;
 using Database.Repos;
-using Database.Repos.CourseRoles;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Filters;

@@ -16,12 +16,13 @@ namespace Database.Repos
 	public class SlideCheckingsRepo : ISlideCheckingsRepo
 	{
 		private readonly UlearnDb db;
+		[ItemCanBeNull]
 		private readonly Lazy<IVisitsRepo> visitsRepo;
 
-		public SlideCheckingsRepo(UlearnDb db, IServiceProvider serviceProvider)
+		public SlideCheckingsRepo(UlearnDb db, [CanBeNull]IServiceProvider serviceProvider)
 		{
 			this.db = db;
-			visitsRepo = new Lazy<IVisitsRepo>(serviceProvider.GetRequiredService<IVisitsRepo>);
+			visitsRepo = new Lazy<IVisitsRepo>(() => serviceProvider?.GetRequiredService<IVisitsRepo>());
 		}
 
 		public async Task<ManualQuizChecking> AddManualQuizChecking(UserQuizSubmission submission, string courseId, Guid slideId, string userId)
@@ -368,7 +369,8 @@ namespace Database.Repos
 		public async Task ResetAutomaticCheckingLimitsForUser(string courseId, string userId)
 		{
 			await NotCountOldAttemptsToQuizzesWithAutomaticChecking(courseId, userId);
-			await visitsRepo.Value.UnskipAllSlides(courseId, userId);
+			if (visitsRepo.Value != null)
+				await visitsRepo.Value.UnskipAllSlides(courseId, userId);
 		}
 
 		public async Task DisableProhibitFurtherManualCheckings(string courseId, string userId, Guid? slideId = null)

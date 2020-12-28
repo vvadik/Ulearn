@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
-using Database.Repos.CourseRoles;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
@@ -53,7 +52,7 @@ namespace Ulearn.Web.Api.Controllers.Websockets
 					clientProxy = hubContext.Clients.All;
 				else
 				{
-					var instructors = await courseRolesRepo.GetUsersWithRoleAsync(courseId, CourseRoleType.Instructor);
+					var instructors = await courseRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, courseId, true);
 					var sysAdmins = await usersRepo.GetSysAdminsIdsAsync();
 					clientProxy = hubContext.Clients.Users(instructors.Concat(sysAdmins).Distinct().ToList());
 				}

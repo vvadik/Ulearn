@@ -381,7 +381,8 @@ namespace uLearn.Web.Controllers
 
 		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(IsTrueBlock isTrueBlock, IGrouping<string, QuizAnswer> data)
 		{
-			var isTrue = isTrueBlock.IsRight(data.First().ItemId);
+			// Здесь двойной баг. В запросе из браузера текст преедается в ItemId, а не Text, поэтому работает. В базу правильно: ItemId всегда null, а значение в Text
+			var isTrue = isTrueBlock.IsRight(data.First().ItemId); 
 			var blockScore = isTrue ? isTrueBlock.MaxScore : 0;
 			return new List<QuizInfoForDb>
 			{

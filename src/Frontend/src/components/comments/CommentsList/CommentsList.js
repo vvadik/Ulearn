@@ -223,12 +223,12 @@ class CommentsList extends Component {
 				this.commentsData.commentsPerPack = indexOfComment + commentsPerPack;
 				this.renderPackOfComments();
 				this.commentsData.commentsPerPack = commentsPerPack;
-			}
-
-			if (!allCommentIds.includes(commentIdFromHash)) {
+			} else if (!allCommentIds.includes(commentIdFromHash)) {
+				handleTabChange(nameChangesTab, false);
 				this.loadComments(courseId, slideId, forInstructors);
-				if (!allCommentIds.includes(commentIdFromHash))
-					handleTabChange(nameChangesTab, false);
+				this.setStateIfMounted({
+					threads: [],
+				});
 			}
 		}
 	};

@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
-using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
@@ -22,21 +21,21 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
 		private readonly IGroupsRepo groupsRepo;
 		private readonly IGroupMembersRepo groupMembersRepo;
-		private readonly ICourseRoleUsersFilter courseRoleUsersFilter;
+		private readonly ICourseRolesRepo courseRolesRepo;
 
 		public CodeReviewStatisticsController(IWebCourseManager courseManager,
 			ISlideCheckingsRepo slideCheckingsRepo,
 			IUsersRepo usersRepo,
 			IGroupsRepo groupsRepo,
 			IGroupMembersRepo groupMembersRepo,
-			ICourseRoleUsersFilter courseRoleUsersFilter,
+			ICourseRolesRepo courseRolesRepo,
 			UlearnDb db)
 			: base(courseManager, db, usersRepo)
 		{
 			this.slideCheckingsRepo = slideCheckingsRepo;
 			this.groupsRepo = groupsRepo;
 			this.groupMembersRepo = groupMembersRepo;
-			this.courseRoleUsersFilter = courseRoleUsersFilter;
+			this.courseRolesRepo = courseRolesRepo;
 		}
 
 		/// <summary>
@@ -58,7 +57,7 @@ namespace Ulearn.Web.Api.Controllers
 
 			count = Math.Min(count, 10000);
 
-			var instructorIds = await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, course.Id).ConfigureAwait(false);
+			var instructorIds = await courseRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, course.Id, false).ConfigureAwait(false);
 			var instructors = await usersRepo.GetUsersByIdsAsync(instructorIds).ConfigureAwait(false);
 
 			var exerciseSlides = course.GetSlides(true).OfType<ExerciseSlide>().ToList();

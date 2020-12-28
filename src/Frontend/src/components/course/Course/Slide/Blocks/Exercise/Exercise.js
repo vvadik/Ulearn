@@ -1,15 +1,12 @@
 import React from 'react';
 
 import { Controlled, } from "react-codemirror2";
-import { Button, Checkbox, FLAT_THEME, Select, Tooltip, Toast, Modal, } from "ui";
+import { Checkbox, FLAT_THEME, Select, Tooltip, Toast, } from "ui";
 import { Review } from "./Review/Review";
-import { darkTheme } from 'ui/internal/ThemePlayground/darkTheme';
-import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent";
-import { Lightbulb, Refresh, EyeOpened, DocumentLite, } from "icons";
+import { Lightbulb, } from "icons";
 import { CongratsModal } from "./CongratsModal/CongratsModal.tsx";
 import { ExerciseOutput, HasOutput } from "./ExerciseOutput/ExerciseOutput.tsx";
 import { ExerciseFormHeader } from "./ExerciseFormHeader/ExerciseFormHeader.tsx";
-import ShowAfterDelay from "src/components/ShowAfterDelay/ShowAfterDelay";
 import { ThemeContext } from "ui";
 
 import PropTypes from 'prop-types';
@@ -27,7 +24,6 @@ import {
 	AutomaticExerciseCheckingProcessStatus as ProcessStatus,
 	SolutionRunStatus,
 } from "src/models/exercise.ts";
-import { isMobile, isTablet, } from "src/utils/getDeviceType";
 import { userType } from "src/components/comments/commonPropTypes";
 
 import CodeMirror from 'codemirror/lib/codemirror';
@@ -50,7 +46,15 @@ import {
 	SubmissionIsLastSuccess
 } from "./ExerciseUtils";
 
-const isControlsTextSuits = () => !isMobile() && !isTablet();
+import Controls, {
+	SubmitButton,
+	ShowHintButton,
+	OutputButton,
+	ResetButton,
+	StatisticsHint,
+	AcceptedSolutionsButton
+} from "./Controls/Controls";
+
 const editThemeName = 'darcula';
 const defaultThemeName = 'default';
 const newTry = { id: -1 };
@@ -69,12 +73,7 @@ class Exercise extends React.Component {
 			language: languages[0],
 
 			showedHintsCount: 0,
-			showAcceptedSolutions: false,
-			showAcceptedSolutionsWarning: false,
 			congratsModalData: null,
-
-			resizeTimeout: null,
-			showControlsText: isControlsTextSuits(),
 
 			submissionLoading: false,
 			visibleCheckingResponse: null, // Не null только если только что сделанная посылка не содержит submission
@@ -105,7 +104,6 @@ class Exercise extends React.Component {
 		}
 
 		window.addEventListener("beforeunload", this.saveCodeDraftToCache);
-		window.addEventListener("resize", this.onWindowResize);
 	}
 
 	loadSlideSubmission = () => {
@@ -137,6 +135,7 @@ class Exercise extends React.Component {
 
 		if(courseId !== prevProps.courseId || slideId !== prevProps.slideId) {
 			this.loadSlideSubmission();
+			this.setState({ showedHintsCount: 0 });
 			return;
 		}
 
@@ -184,23 +183,6 @@ class Exercise extends React.Component {
 		}
 	}
 
-	onWindowResize = () => {
-		const { resizeTimeout } = this.state;
-
-		const throttleTimeout = 66;
-
-		//resize event can be called rapidly, to prevent performance issue, we throttling event handler
-		if(!resizeTimeout) {
-			this.setState({
-				resizeTimeout: setTimeout(() => {
-					this.setState({
-						resizeTimeout: null,
-						showControlsText: isControlsTextSuits(),
-					})
-				}, throttleTimeout),
-			});
-		}
-	}
 	overrideCodeMirrorAutocomplete = () => {
 		CodeMirror.commands.autocomplete = (cm) => {
 			const { language, } = this.state;
@@ -213,16 +195,16 @@ class Exercise extends React.Component {
 
 	saveCodeDraftToCache = () => {
 		const { slideId, forceInitialCode, } = this.props;
+		const { value, } = this.state;
 
 		if(!forceInitialCode) {
-			this.saveCodeToCache(slideId);
+			this.saveCodeToCache(slideId, value);
 		}
 	}
 
 	componentWillUnmount() {
 		this.saveCodeDraftToCache();
 		window.removeEventListener("beforeunload", this.saveCodeDraftToCache);
-		window.removeEventListener("resize", this.onWindowResize);
 	}
 
 	render() {
@@ -265,11 +247,17 @@ class Exercise extends React.Component {
 	}
 
 	renderControlledCodeMirror = (opts) => {
-		const { expectedOutput, submissions, author, slideProgress, maxScore, languages } = this.props;
 		const {
-			value, showedHintsCount, showAcceptedSolutions, currentSubmission,
+			expectedOutput, submissions, author,
+			slideProgress, maxScore, languages,
+			courseId, slideId, hideSolutions, hints,
+			attemptsStatistics,
+		} = this.props;
+		const {
+			value, showedHintsCount, currentSubmission,
 			isEditable, exerciseCodeDoc, congratsModalData,
-			currentReviews, showOutput, selectedReviewId, visibleCheckingResponse
+			currentReviews, showOutput, selectedReviewId, visibleCheckingResponse,
+			submissionLoading, valueChanged,
 		} = this.state;
 
 		const isReview = !isEditable && currentReviews.length > 0;
@@ -290,6 +278,11 @@ class Exercise extends React.Component {
 			{ [styles.editorWithoutBorder]: isEditable },
 			{ [styles.editorInReview]: isReview },
 		);
+
+		const hasOutput = currentSubmission
+			&& HasOutput(visibleCheckingResponse?.message, currentSubmission.automaticChecking,
+				expectedOutput);
+		const isShowAcceptedSolutionsAvailable = submissions.length > 0 || slideProgress.isSkipped;
 
 		return (
 			<React.Fragment>
@@ -319,7 +312,31 @@ class Exercise extends React.Component {
 					}
 				</div>
 				{/* TODO not included in current release !isEditable && currentSubmission && this.renderOverview(currentSubmission)*/ }
-				{ this.renderControls() }
+				<Controls>
+					<SubmitButton
+						valueChanged={ valueChanged }
+						submissionLoading={ submissionLoading }
+						onSendExerciseButtonClicked={ this.sendExercise }
+					/>
+					{ hints.length !== 0 &&
+					<ShowHintButton
+						countOfHints={ hints.length }
+						showedHintsCount={ showedHintsCount }
+						showHint={ this.showHint }
+					/> }
+					{ isEditable && <ResetButton onResetButtonClicked={ this.resetCodeAndCache }/> }
+					{ (!isEditable && hasOutput) && <OutputButton
+						showOutput={ showOutput }
+						onShowOutputButtonClicked={ this.toggleOutput }
+					/> }
+					<StatisticsHint attemptsStatistics={ attemptsStatistics }/>
+					{ (!hideSolutions && (hints.length === showedHintsCount || isShowAcceptedSolutionsAvailable))
+					&& <AcceptedSolutionsButton
+						acceptedSolutionsUrl={ constructPathToAcceptedSolutions(courseId, slideId) }
+						onVisitAcceptedSolutions={ this.onVisitAcceptedSolutions }
+						isShowAcceptedSolutionsAvailable={ isShowAcceptedSolutionsAvailable }
+					/> }
+				</Controls>
 				{ showOutput && HasOutput(visibleCheckingResponse?.message, automaticChecking, expectedOutput) &&
 				<ExerciseOutput
 					solutionRunStatus={ visibleCheckingResponse?.solutionRunStatus ?? SolutionRunStatus.Success }
@@ -330,7 +347,6 @@ class Exercise extends React.Component {
 				/>
 				}
 				{ showedHintsCount > 0 && this.renderHints() }
-				{ showAcceptedSolutions && this.renderAcceptedSolutions() }
 				{ congratsModalData && this.renderCongratsModal(congratsModalData) }
 			</React.Fragment>
 		)
@@ -569,120 +585,6 @@ class Exercise extends React.Component {
 		});
 	}
 
-	renderControls = () => {
-		const { hints, hideSolutions, slideProgress, submissions, expectedOutput } = this.props;
-		const { isEditable, currentSubmission, showedHintsCount, visibleCheckingResponse } = this.state;
-
-		return (
-			<div className={ styles.exerciseControlsContainer }>
-				{ this.renderSubmitSolutionButton() }
-				<ThemeContext.Provider value={ darkTheme }>
-					{ hints.length > 0 && this.renderShowHintButton() }
-					{ isEditable && this.renderResetButton() }
-					{ !isEditable && currentSubmission && HasOutput(visibleCheckingResponse?.message, currentSubmission.automaticChecking, expectedOutput)
-					&& this.renderShowOutputButton()
-					}
-					{ this.renderShowStatisticsHint() }
-				</ThemeContext.Provider>
-				{ !hideSolutions
-				&& (hints.length === showedHintsCount || submissions.length > 0 || slideProgress.isSkipped)
-				&& this.renderShowAcceptedSolutionsButton()
-				}
-			</div>
-		)
-	}
-
-	renderSubmitSolutionButton = () => {
-		const { valueChanged, submissionLoading, } = this.state;
-
-		return (
-			<span className={ styles.exerciseControls }>
-				<Tooltip pos={ "bottom center" } trigger={ "hover&focus" }
-						 render={ () => valueChanged ? null : <span>{ texts.controls.submitCode.hint }</span> }>
-							<Button
-								loading={ submissionLoading }
-								use={ "primary" }
-								disabled={ !valueChanged }
-								onClick={ this.sendExercise }>
-								{ texts.controls.submitCode.text }
-							</Button>
-				</Tooltip>
-			</span>
-		);
-	}
-
-	renderShowHintButton = () => {
-		const { showedHintsCount, showControlsText, } = this.state;
-		const { hints, } = this.props;
-		const noHintsLeft = showedHintsCount === hints.length;
-		const hintClassName = classNames(styles.exerciseControls, { [styles.noHintsLeft]: noHintsLeft });
-
-		return (
-			<span className={ hintClassName } onClick={ this.showHint }>
-				<Tooltip pos={ "bottom center" } trigger={ "hover&focus" }
-						 render={ () => noHintsLeft ? <span>{ texts.controls.hints.hint }</span> : null }>
-					<span className={ styles.exerciseControlsIcon }>
-						<Lightbulb/>
-					</span>
-					{ showControlsText && texts.controls.hints.text }
-				</Tooltip>
-			</span>
-		);
-	}
-
-	renderResetButton = () => {
-		const { showControlsText, } = this.state;
-
-		return (
-			<span className={ styles.exerciseControls } onClick={ this.resetCode }>
-				<span className={ styles.exerciseControlsIcon }>
-					<Refresh/>
-				</span>
-				{ showControlsText && texts.controls.reset.text }
-			</span>
-		);
-	}
-
-	renderShowOutputButton = () => {
-		const { showOutput, showControlsText, } = this.state;
-
-		return (
-			<span className={ styles.exerciseControls } onClick={ this.toggleOutput }>
-				<span className={ styles.exerciseControlsIcon }>
-					<DocumentLite/>
-				</span>
-				{ showControlsText && (showOutput ? texts.controls.output.hide : texts.controls.output.show) }
-			</span>
-		)
-	}
-
-	renderShowAcceptedSolutionsButton = () => {
-		const { showAcceptedSolutionsWarning, showControlsText, } = this.state;
-
-		return (
-			<span className={ styles.exerciseControls } onClick={ this.showAcceptedSolutionsWarning }>
-					<Tooltip
-						onCloseClick={ this.hideAcceptedSolutionsWarning }
-						pos={ "bottom left" }
-						trigger={ showAcceptedSolutionsWarning ? "opened" : "closed" }
-						render={
-							() =>
-								<span>
-									{ texts.controls.acceptedSolutions.buildWarning() }
-									<Button use={ "danger" } onClick={ this.showAcceptedSolutions }>
-										{ texts.controls.acceptedSolutions.continue }
-									</Button>
-								</span>
-						}>
-						<span className={ styles.exerciseControlsIcon }>
-							<EyeOpened/>
-						</span>
-						{ showControlsText && texts.controls.acceptedSolutions.text }
-					</Tooltip>
-				</span>
-		);
-	}
-
 	renderHints = () => {
 		const { showedHintsCount } = this.state;
 		const { hints } = this.props;
@@ -700,31 +602,12 @@ class Exercise extends React.Component {
 		)
 	}
 
-	renderAcceptedSolutions = () => {
-		const { slideId, courseId, } = this.props;
-
-		return (
-			<ShowAfterDelay>
-				<Modal onClose={ this.closeAcceptedSolutions }>
-					<Modal.Header>
-						{ texts.acceptedSolutions.title }
-					</Modal.Header>
-					<Modal.Body>
-						{ texts.acceptedSolutions.content }
-						<DownloadedHtmlContent url={ constructPathToAcceptedSolutions(courseId, slideId) }/>
-					</Modal.Body>
-				</Modal>
-			</ShowAfterDelay>
-		)
-	}
-
 	renderCongratsModal = ({ score, waitingForManualChecking, }) => {
 		const { hideSolutions, } = this.props;
-		const { showAcceptedSolutions, } = this.state;
 
 		return (
 			<CongratsModal
-				showAcceptedSolutions={ !waitingForManualChecking && !hideSolutions && showAcceptedSolutions }
+				showAcceptedSolutions={ !waitingForManualChecking && !hideSolutions }
 				score={ score }
 				waitingForManualChecking={ waitingForManualChecking }
 				onClose={ this.closeCongratsModal }
@@ -803,28 +686,6 @@ class Exercise extends React.Component {
 		)
 	}
 
-	renderShowStatisticsHint = () => {
-		const {
-			attemptedUsersCount,
-			usersWithRightAnswerCount,
-			lastSuccessAttemptDate,
-		} = this.props.attemptsStatistics;
-		const statisticsClassName = classNames(styles.exerciseControls, styles.statistics);
-
-		return (
-			<span className={ statisticsClassName }>
-					<Tooltip pos={ "bottom right" } trigger={ "hover&focus" } render={
-						() =>
-							<span>
-								{ texts.controls.statistics.buildStatistics(attemptedUsersCount, usersWithRightAnswerCount, lastSuccessAttemptDate) }
-							</span>
-					}>
-						{ texts.controls.statistics.buildShortText(usersWithRightAnswerCount) }
-					</Tooltip>
-				</span>
-		);
-	}
-
 	enableEditing = (e) => {
 		e.stopPropagation();
 
@@ -848,19 +709,26 @@ class Exercise extends React.Component {
 		})
 	}
 
+	resetCodeAndCache = () => {
+		const { slideId, exerciseInitialCode, } = this.props;
+
+		this.resetCode();
+		this.saveCodeToCache(slideId, exerciseInitialCode);
+	}
+
 	resetCode = () => {
 		const { exerciseInitialCode } = this.props;
 
 		this.clearAllTextMarkers();
 		this.setState({
 			value: exerciseInitialCode,
-			valueChanged: true,
+			valueChanged: false,
 			isEditable: true,
 			currentSubmission: null,
 			visibleCheckingResponse: null,
 			currentReviews: [],
 			showOutput: false
-		})
+		});
 	}
 
 	clearAllTextMarkers = () => {
@@ -887,44 +755,10 @@ class Exercise extends React.Component {
 		})
 	}
 
-	showAcceptedSolutionsWarning = () => {
-		const { slideProgress, submissions, } = this.props;
-
-		if(submissions.length > 0 || slideProgress.isSkipped) {
-			this.showAcceptedSolutions();
-		} else {
-			this.setState({
-				showAcceptedSolutionsWarning: true,
-			});
-		}
-	}
-
-	hideAcceptedSolutionsWarning = () => {
-		this.setState({
-			showAcceptedSolutionsWarning: false,
-		})
-	}
-
-	showAcceptedSolutions = (e) => {
+	onVisitAcceptedSolutions = () => {
 		const { courseId, slideId, visitAcceptedSolutions, } = this.props;
 
 		visitAcceptedSolutions(courseId, slideId);
-
-		this.setState({
-			showAcceptedSolutions: true,
-		})
-
-		if(e) {
-			e.stopPropagation();
-		}
-
-		this.hideAcceptedSolutionsWarning();
-	}
-
-	closeAcceptedSolutions = () => {
-		this.setState({
-			showAcceptedSolutions: false,
-		})
 	}
 
 	closeCongratsModal = () => {
@@ -947,7 +781,6 @@ class Exercise extends React.Component {
 	addReviewComment = (reviewId, text) => {
 		const { addReviewComment, courseId, slideId, } = this.props;
 		const { currentSubmission, } = this.state;
-
 
 		addReviewComment(courseId, slideId, currentSubmission.id, reviewId, text);
 	}
@@ -1069,15 +902,12 @@ class Exercise extends React.Component {
 		}
 	}
 
-	saveCodeToCache = (slideId) => {
-		const { value, } = this.state;
-
+	saveCodeToCache = (slideId, value) => {
 		saveToCache(exerciseSolutions, slideId, value);
 	}
 
 	loadCodeFromCache = (slideId) => {
 		const code = loadFromCache(exerciseSolutions, slideId);
-
 		if(code !== undefined) {
 			this.resetCode();
 			this.setState({

@@ -12,3 +12,9 @@ export const textareaHidden = ThemeFactory.create({
 	textareaWidth: '100px',
 	textareaMinHeight: '20px',
 }, FLAT_THEME);
+
+//currently it only applies a dark background and white text in popup(tooltip), styles copied from dark theme
+export var darkFlat = ThemeFactory.create({
+	popupTextColor: '#fff',
+	bgDefault: '#333333',
+}, FLAT_THEME);

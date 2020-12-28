@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
-using Database.Repos.CourseRoles;
 using Database.Repos.Users.Search;
 using Ulearn.Common;
 

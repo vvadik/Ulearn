@@ -26,7 +26,7 @@ const texts = {
 	getLanguageCaption: (language: Language, languageNames: EnumDictionary<Language, string> | null): string => {
 		if (languageNames !== null && languageNames[language] !== undefined)
 			return languageNames[language];
-		return language === Language.CSharp ? "C#" : capitalize(language);
+		return language === Language.cSharp ? "C#" : capitalize(language);
 	},
 
 	acceptedSolutions: {
@@ -111,7 +111,7 @@ const texts = {
 			buildShortText: (usersWithRightAnswerCount: number): React.ReactNode =>
 				<React.Fragment>Решило: { usersWithRightAnswerCount }</React.Fragment>,
 			buildStatistics: (attemptedUsersCount: number, usersWithRightAnswerCount: number,
-				lastSuccessAttemptDate: number
+				lastSuccessAttemptDate?: string
 			): React.ReactNode =>
 				lastSuccessAttemptDate
 					? <React.Fragment>

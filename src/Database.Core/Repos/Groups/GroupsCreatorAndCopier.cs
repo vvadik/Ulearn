@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
-using Database.Repos.CourseRoles;
 using Microsoft.EntityFrameworkCore;
 using Vostok.Logging.Abstractions;
 using Ulearn.Common.Extensions;
@@ -14,14 +13,14 @@ namespace Database.Repos.Groups
 	{
 		private readonly UlearnDb db;
 		private readonly ILog log = LogProvider.Get().ForContext(typeof(GroupsCreatorAndCopier));
-		private readonly ICourseRoleUsersFilter courseRoleUsersFilter;
+		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IManualCheckingsForOldSolutionsAdder manualCheckingsForOldSolutionsAdder;
 
-		public GroupsCreatorAndCopier(UlearnDb db, ICourseRoleUsersFilter courseRoleUsersFilter,
+		public GroupsCreatorAndCopier(UlearnDb db, ICourseRolesRepo courseRolesRepo,
 			IManualCheckingsForOldSolutionsAdder manualCheckingsForOldSolutionsAdder)
 		{
 			this.db = db;
-			this.courseRoleUsersFilter = courseRoleUsersFilter;
+			this.courseRolesRepo = courseRolesRepo;
 			this.manualCheckingsForOldSolutionsAdder = manualCheckingsForOldSolutionsAdder;
 		}
 
@@ -117,7 +116,7 @@ namespace Database.Repos.Groups
 		{
 			log.Info($"Копирую доступы к группе «{group.Name}» (id={group.Id}) в группу «{newGroup.Name}» (id={newGroup.Id})");
 			var accesses = await db.GroupAccesses.Where(a => a.GroupId == group.Id && a.IsEnabled).ToListAsync().ConfigureAwait(false);
-			var courseInstructorsIds = await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, newGroup.CourseId, includeHighRoles: true).ConfigureAwait(false);
+			var courseInstructorsIds = await courseRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, newGroup.CourseId, includeHighRoles: true).ConfigureAwait(false);
 			foreach (var access in accesses)
 			{
 				if (!courseInstructorsIds.Contains(access.UserId))
