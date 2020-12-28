@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Database.Models;
-using Database.Repos.CourseRoles;
 using NinjaNye.SearchExtensions;
 
 namespace Database.Repos.Users.Search

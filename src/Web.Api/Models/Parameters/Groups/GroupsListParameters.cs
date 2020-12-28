@@ -20,8 +20,6 @@ namespace Ulearn.Web.Api.Models.Parameters.Groups
 		public int Offset { get; set; } = 0;
 
 		[FromQuery(Name = "count")]
-		[MinValue(0, ErrorMessage = "Count should be non-negative")]
-		[MaxValue(200, ErrorMessage = "Count should be at most 200")]
-		public int Count { get; set; } = 200;
+		public int Count { get; set; } = 400;
 	}
 }

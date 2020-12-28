@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
-using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 
 namespace Database.Repos.Users.Search
@@ -41,7 +40,7 @@ namespace Database.Repos.Users.Search
 			{
 				var courseInstructors =
 					courseId != null
-						? await courseRolesRepo.GetUsersWithRoleAsync(courseId, CourseRoleType.Instructor)
+						? await courseRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, courseId, true)
 						: (await groupAccessesRepo.GetInstructorsOfAllGroupsAvailableForUserAsync(currentUser.Id).ConfigureAwait(false)).Select(u => u.Id);
 				userIds.UnionWith(courseInstructors);
 			}
