@@ -11,11 +11,12 @@ namespace Ulearn.Web.Api.Utils.LTI
 {
 	public static class LtiUtils
 	{
+		private static ILog log => LogProvider.Get().ForContext(typeof(LtiUtils));
+
 		public static async Task SubmitScore(string courseId, Slide slide, string userId, int score,
 			ILtiRequestsRepo ltiRequestsRepo,
 			ILtiConsumersRepo consumersRepo)
 		{
-			var log = LogProvider.Get().ForContext(typeof(LtiUtils));
 			var ltiRequest = await ltiRequestsRepo.Find(courseId, userId, slide.Id);
 			if (ltiRequest == null)
 				throw new Exception("LtiRequest for user '" + userId + "' not found");

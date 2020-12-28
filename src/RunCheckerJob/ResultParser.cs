@@ -7,6 +7,8 @@ namespace RunCheckerJob
 {
 	public static class ResultParser
 	{
+		private static ILog log => LogProvider.Get().ForContext(typeof(ResultParser));
+
 		public static RunningResults Parse(RunningResults response)
 		{
 			try
@@ -18,7 +20,7 @@ namespace RunCheckerJob
 			}
 			catch (Exception)
 			{
-				LogProvider.Get().Warn("Не удалось распарсить результат");
+				log.Warn("Не удалось распарсить результат");
 				return response;
 			}
 		}

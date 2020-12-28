@@ -10,7 +10,7 @@ namespace Ulearn.Core.Telegram
 {
 	public class ErrorsBot : TelegramBot
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(ErrorsBot));
+		private static ILog log => LogProvider.Get().ForContext(typeof(ErrorsBot));
 		private readonly MetricSender metricSender;
 
 		public ErrorsBot()

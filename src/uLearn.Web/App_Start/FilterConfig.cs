@@ -51,7 +51,7 @@ namespace uLearn.Web
 
 	public class AntiForgeryTokenFilter : FilterAttribute, IExceptionFilter
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(AntiForgeryTokenFilter));
+		private static ILog log => LogProvider.Get().ForContext(typeof(AntiForgeryTokenFilter));
 
 		public void OnException(ExceptionContext filterContext)
 		{
@@ -70,7 +70,7 @@ namespace uLearn.Web
 
 	public class HandleHttpAntiForgeryException : ActionFilterAttribute, IExceptionFilter
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(HandleHttpAntiForgeryException));
+		private static ILog log => LogProvider.Get().ForContext(typeof(HandleHttpAntiForgeryException));
 
 		public void OnException(ExceptionContext filterContext)
 		{

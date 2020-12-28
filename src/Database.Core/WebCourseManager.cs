@@ -16,7 +16,7 @@ namespace Database
 {
 	public class WebCourseManager : CourseManager, IWebCourseManager
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(WebCourseManager));
+		private static ILog log => LogProvider.Get().ForContext(typeof(WebCourseManager));
 
 		private readonly Dictionary<string, Guid> loadedCourseVersions = new Dictionary<string, Guid>();
 		private readonly ConcurrentDictionary<string, DateTime> courseVersionFetchTime = new ConcurrentDictionary<string, DateTime>();

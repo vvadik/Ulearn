@@ -24,7 +24,7 @@ namespace Ulearn.Web.Api.Authorization
 		private readonly ICoursesRepo coursesRepo;
 		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IUsersRepo usersRepo;
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(CourseAccessAuthorizationHandler));
+		private static ILog log => LogProvider.Get().ForContext(typeof(CourseAccessAuthorizationHandler));
 
 		public CourseAccessAuthorizationHandler(ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo, IUsersRepo usersRepo)
 		{

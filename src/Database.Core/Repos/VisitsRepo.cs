@@ -14,7 +14,7 @@ namespace Database.Repos
 	{
 		private readonly UlearnDb db;
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(VisitsRepo));
+		private static ILog log => LogProvider.Get().ForContext(typeof(VisitsRepo));
 
 		public VisitsRepo(UlearnDb db, ISlideCheckingsRepo slideCheckingsRepo)
 		{

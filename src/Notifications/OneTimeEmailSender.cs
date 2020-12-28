@@ -16,7 +16,7 @@ namespace Notifications
 	{
 		private const string configFilename = "sender.xml";
 
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(OneTimeEmailSender));
+		private static ILog log => LogProvider.Get().ForContext(typeof(OneTimeEmailSender));
 		private readonly KonturSpamEmailSender emailSender;
 		private readonly UsersRepo usersRepo;
 		private readonly NotificationsRepo notificationsRepo;

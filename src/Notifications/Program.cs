@@ -24,7 +24,7 @@ namespace Notifications
 		private readonly ServiceKeepAliver keepAliver;
 		private readonly TimeSpan keepAliveInterval;
 
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(Program));
+		private static ILog log => LogProvider.Get().ForContext(typeof(Program));
 
 		public Program(WebCourseManager courseManager)
 		{

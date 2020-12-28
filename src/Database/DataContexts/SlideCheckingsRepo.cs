@@ -17,7 +17,7 @@ namespace Database.DataContexts
 	public class SlideCheckingsRepo
 	{
 		private readonly ULearnDb db;
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(SlideCheckingsRepo));
+		private static ILog log => LogProvider.Get().ForContext(typeof(SlideCheckingsRepo));
 
 		public SlideCheckingsRepo(ULearnDb db)
 		{

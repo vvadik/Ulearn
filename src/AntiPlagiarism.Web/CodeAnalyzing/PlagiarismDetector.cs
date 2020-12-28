@@ -21,7 +21,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 		private readonly ISubmissionsRepo submissionsRepo;
 		private readonly IMostSimilarSubmissionsRepo mostSimilarSubmissionsRepo;
 		private readonly CodeUnitsExtractor codeUnitsExtractor;
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(PlagiarismDetector));
+		private static ILog log => LogProvider.Get().ForContext(typeof(PlagiarismDetector));
 		private readonly AntiPlagiarismConfiguration configuration;
 
 		public PlagiarismDetector(

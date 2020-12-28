@@ -14,7 +14,7 @@ namespace Database.Repos.Groups
 		private readonly IVisitsRepo visitsRepo;
 		private readonly IUserQuizzesRepo userQuizzesRepo;
 		private readonly IWebCourseManager courseManager;
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(ManualCheckingsForOldSolutionsAdder));
+		private static ILog log => LogProvider.Get().ForContext(typeof(ManualCheckingsForOldSolutionsAdder));
 
 		public ManualCheckingsForOldSolutionsAdder(
 			IUserSolutionsRepo userSolutionsRepo, ISlideCheckingsRepo slideCheckingsRepo, IVisitsRepo visitsRepo, IUserQuizzesRepo userQuizzesRepo,

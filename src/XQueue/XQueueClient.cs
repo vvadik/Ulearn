@@ -18,7 +18,7 @@ namespace XQueue
 		private const string getSubmissionUrl = "xqueue/get_submission/";
 		private const string putResultUrl = "xqueue/put_result/";
 
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(XQueueClient));
+		private static ILog log => LogProvider.Get().ForContext(typeof(XQueueClient));
 
 		private readonly string username;
 		private readonly string password;

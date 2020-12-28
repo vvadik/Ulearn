@@ -23,7 +23,7 @@ namespace uLearn.Web.Controllers
 {
 	public class BaseExerciseController : JsonDataContractController
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(BaseExerciseController));
+		private static ILog log => LogProvider.Get().ForContext(typeof(BaseExerciseController));
 		private readonly ErrorsBot errorsBot = new ErrorsBot();
 
 		protected readonly ULearnDb db;

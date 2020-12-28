@@ -15,7 +15,7 @@ namespace Database.Repos.Groups
 		private readonly UlearnDb db;
 		private readonly IManualCheckingsForOldSolutionsAdder manualCheckingsForOldSolutionsAdder;
 		private readonly IGroupsRepo groupsRepo;
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(GroupMembersRepo));
+		private static ILog log => LogProvider.Get().ForContext(typeof(GroupMembersRepo));
 
 		public GroupMembersRepo(UlearnDb db, IManualCheckingsForOldSolutionsAdder manualCheckingsForOldSolutionsAdder,
 			IGroupsRepo groupsRepo)

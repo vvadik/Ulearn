@@ -6,16 +6,18 @@ namespace CourseToolHotReloader
 {
 	public static class ConsoleWorker
 	{
+		private static ILog log => LogProvider.Get();
+
 		public static void WriteLine(string text)
 		{
 			Console.WriteLine(text);
-			LogProvider.Get().Info(text);
+			log.Info(text);
 		}
 
 		public static void WriteLineWithTime(string text)
 		{
 			Console.WriteLine($"{DateTime.Now:HH:mm:ss} {text}");
-			LogProvider.Get().Info(text);
+			log.Info(text);
 		}
 
 		public static bool AskQuestion(string question)
@@ -30,7 +32,7 @@ namespace CourseToolHotReloader
 			var text = errorMessage;
 			Console.WriteLine(text);
 			Console.ResetColor();
-			LogProvider.Get().Info(text);
+			log.Info(text);
 		}
 
 		public static void WriteErrorWithTime(string errorMessage)
@@ -38,7 +40,7 @@ namespace CourseToolHotReloader
 			Console.ForegroundColor = ConsoleColor.Red;
 			Console.WriteLine($"{DateTime.Now:HH:mm:ss} {errorMessage}");
 			Console.ResetColor();
-			LogProvider.Get().Info(errorMessage);
+			log.Info(errorMessage);
 		}
 
 		public static void WriteAlert(string alertMessage)
@@ -47,7 +49,7 @@ namespace CourseToolHotReloader
 			var text = alertMessage;
 			Console.WriteLine(text);
 			Console.ResetColor();
-			LogProvider.Get().Info(text);
+			log.Info(text);
 		}
 
 		public static void Debug(string text)
@@ -55,7 +57,7 @@ namespace CourseToolHotReloader
 			Console.ForegroundColor = ConsoleColor.Green;
 			Console.WriteLine($"DEBUG {text}");
 			Console.ResetColor();
-			LogProvider.Get().Debug(text);
+			log.Debug(text);
 		}
 
 		private static bool GetAnswer()

@@ -22,6 +22,7 @@ namespace uLearn.Web.Controllers
 	public static class ControllerUtils
 	{
 		private static readonly string ulearnBaseUrl;
+		private static ILog log => LogProvider.Get().ForContext(typeof(ControllerUtils));
 
 		static ControllerUtils()
 		{
@@ -58,9 +59,7 @@ namespace uLearn.Web.Controllers
 		{
 			var isLocalUrl = controller.IsLocalUrl(url);
 
-			LogProvider.Get()
-				.ForContext(typeof(ControllerUtils))
-				.Info($"Redirect to {url}: {(isLocalUrl ? "it's safe" : "it's not safe, redirect to home page")}. Base url is {ulearnBaseUrl}");
+			log.Info($"Redirect to {url}: {(isLocalUrl ? "it's safe" : "it's not safe, redirect to home page")}. Base url is {ulearnBaseUrl}");
 			return isLocalUrl ? url : controller.Url.Action("Index", "Home");
 		}
 

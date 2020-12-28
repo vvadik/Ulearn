@@ -28,7 +28,7 @@ namespace Web.Api.Tests.Controllers
 		private WebApplication application;
 
 		protected UlearnDb db;
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(BaseControllerTests));
+		private static ILog log => LogProvider.Get().ForContext(typeof(BaseControllerTests));
 		protected IServiceProvider serviceProvider;
 
 		private readonly WebApiConfiguration fakeWebApiConfiguration = new WebApiConfiguration

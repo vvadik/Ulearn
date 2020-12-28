@@ -19,7 +19,7 @@ namespace uLearn.Web.Controllers
 {
 	public class RestorePasswordController : Controller
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(RestorePasswordController));
+		private static ILog log => LogProvider.Get().ForContext(typeof(RestorePasswordController));
 		private readonly RestoreRequestRepo requestRepo;
 		private readonly UserManager<ApplicationUser> userManager;
 		private readonly ULearnDb db;

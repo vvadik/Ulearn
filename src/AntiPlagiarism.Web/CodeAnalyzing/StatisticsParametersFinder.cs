@@ -11,7 +11,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 {
 	public class StatisticsParametersFinder
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(StatisticsParametersFinder));
+		private static ILog log => LogProvider.Get().ForContext(typeof(StatisticsParametersFinder));
 		private readonly PlagiarismDetector plagiarismDetector;
 
 		public StatisticsParametersFinder(PlagiarismDetector plagiarismDetector)

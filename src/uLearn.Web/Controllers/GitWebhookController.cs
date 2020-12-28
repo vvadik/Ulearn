@@ -15,7 +15,7 @@ namespace uLearn.Web.Controllers
 {
 	public class GitWebhookController : ApiController
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(GitWebhookController));
+		private static ILog log => LogProvider.Get().ForContext(typeof(GitWebhookController));
 
 		private readonly string gitSecret;
 

@@ -12,7 +12,7 @@ namespace Ulearn.VideoAnnotations.Api.Client
 {
 	public class VideoAnnotationsClient : BaseApiClient, IVideoAnnotationsClient
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(VideoAnnotationsClient));
+		private static ILog log => LogProvider.Get().ForContext(typeof(VideoAnnotationsClient));
 
 		public VideoAnnotationsClient(string endpointUrl)
 			: base(new ApiClientSettings(endpointUrl)

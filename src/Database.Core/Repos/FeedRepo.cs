@@ -15,7 +15,7 @@ namespace Database.Repos
 		private readonly UlearnDb db;
 		private readonly INotificationsRepo notificationsRepo;
 		private readonly IVisitsRepo visitsRepo;
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(FeedRepo));
+		private static ILog log => LogProvider.Get().ForContext(typeof(FeedRepo));
 
 		public FeedRepo(UlearnDb db, INotificationsRepo notificationsRepo, IVisitsRepo visitsRepo)
 		{

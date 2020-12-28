@@ -22,7 +22,7 @@ namespace Ulearn.Common.Api
 {
 	public class BaseApiClient
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(BaseApiClient)).WithTracingProperties(KonturTracerProvider.Get());
+		private static ILog log => LogProvider.Get().ForContext(typeof(BaseApiClient)).WithTracingProperties(KonturTracerProvider.Get());
 		private readonly ApiClientSettings settings;
 		private readonly ClusterClient clusterClient;
 
