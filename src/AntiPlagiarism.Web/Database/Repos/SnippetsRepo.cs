@@ -35,7 +35,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 	{
 		private readonly AntiPlagiarismDb db;
 		private readonly IServiceScopeFactory serviceScopeFactory;
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(SnippetsRepo));
+		private static ILog log => LogProvider.Get().ForContext(typeof(SnippetsRepo));
 
 		public SnippetsRepo(AntiPlagiarismDb db, IServiceScopeFactory serviceScopeFactory)
 		{
@@ -363,9 +363,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 							s.TaskId == taskId && s.ClientId == clientId
 							&& snippetIdsInNonInfluencingSubmissions.Contains(s.SnippetId))
 						.ToListAsync();
-					LogProvider.Get()
-						.ForContext(typeof(SnippetsRepo))
-						.Info($"Need update {snippetIdsInNonInfluencingSubmissionsList.Count} snippets statistics for task {taskId} from {from.ToSortable()} to {to.ToSortable()}");
+					log.Info($"Need update {snippetIdsInNonInfluencingSubmissionsList.Count} snippets statistics for task {taskId} from {from.ToSortable()} to {to.ToSortable()}");
 					if (snippetIdsInNonInfluencingSubmissionsList.Count == 0)
 						return;
 
@@ -407,9 +405,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 					.Select(g => new { g.Key.SnippetId, AuthorsCount = g.Count() })
 					.ToListAsync())
 				.ToDictionary(p => p.SnippetId, p => p.AuthorsCount);
-			LogProvider.Get()
-				.ForContext(typeof(SnippetsRepo))
-				.Info($"Authors counted for {snippetsCountLog} snippets for task {taskId} from {@from.ToSortable()} to {to.ToSortable()}");
+			log.Info($"Authors counted for {snippetsCountLog} snippets for task {taskId} from {@from.ToSortable()} to {to.ToSortable()}");
 
 			await WriteNewAuthorsCounts(@from, to, taskId, db, snippetsStatistics, snippet2AuthorsCount);
 		}
@@ -427,9 +423,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 			await db.SaveChangesAsync();
 			foreach (var snippetStatistics in snippetsStatistics)
 				db.Entry(snippetStatistics).State = EntityState.Unchanged;
-			LogProvider.Get()
-				.ForContext(typeof(SnippetsRepo))
-				.Info($"New authors count are written for {snippetsStatistics.Count} snippets for task {taskId} from {@from.ToSortable()} to {to.ToSortable()}");
+			log.Info($"New authors count are written for {snippetsStatistics.Count} snippets for task {taskId} from {@from.ToSortable()} to {to.ToSortable()}");
 		}
 
 		public async Task<OldSubmissionsInfluenceBorder> GetOldSubmissionsInfluenceBorderAsync()

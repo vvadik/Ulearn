@@ -19,7 +19,7 @@ namespace uLearn.Web.Controllers
 {
 	public class RestorePasswordController : Controller
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(RestorePasswordController));
+		private static ILog log => LogProvider.Get().ForContext(typeof(RestorePasswordController));
 		private readonly RestoreRequestRepo requestRepo;
 		private readonly UserManager<ApplicationUser> userManager;
 		private readonly ULearnDb db;
@@ -46,7 +46,7 @@ namespace uLearn.Web.Controllers
 			}
 			catch (Exception e)
 			{
-				log.Error($"Can\'t initialize Spam.API client to {spamEndpoint}, login {spamLogin}, password {spamPassword.MaskAsSecret()}", e);
+				log.Error(e, $"Can\'t initialize Spam.API client to {spamEndpoint}, login {spamLogin}, password {spamPassword.MaskAsSecret()}");
 				throw;
 			}
 		}
@@ -134,7 +134,7 @@ namespace uLearn.Web.Controllers
 			}
 			catch (Exception e)
 			{
-				log.Error($"Не смог отправить емэйл через Spam.API на {user.Email} с темой «{subject}»", e);
+				log.Error(e, $"Не смог отправить емэйл через Spam.API на {user.Email} с темой «{subject}»");
 				throw;
 			}
 

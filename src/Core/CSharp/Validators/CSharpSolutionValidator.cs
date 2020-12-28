@@ -13,7 +13,7 @@ namespace Ulearn.Core.CSharp.Validators
 {
 	public class CSharpSolutionValidator : ISolutionValidator
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(CSharpSolutionValidator));
+		private static ILog log => LogProvider.Get().ForContext(typeof(CSharpSolutionValidator));
 
 		private readonly List<ICSharpSolutionValidator> validators = new List<ICSharpSolutionValidator>
 		{

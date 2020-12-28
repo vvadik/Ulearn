@@ -21,7 +21,7 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 	public class StepikController : Controller
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(StepikController));
+		private static ILog log => LogProvider.Get().ForContext(typeof(StepikController));
 
 		private readonly StepikRepo stepikRepo;
 		private readonly NotificationsRepo notificationsRepo;
@@ -297,7 +297,7 @@ namespace uLearn.Web.Controllers
 			}
 			catch (Exception e)
 			{
-				log.Error($"Can't decode `state`: {e.Message}", e);
+				log.Error(e, $"Can't decode `state`: {e.Message}");
 				return View("ConnectError", (object)"Не смог расшифровать state");
 			}
 

@@ -32,7 +32,7 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize]
 	public class CourseController : BaseController
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(CourseController));
+		private static ILog log => LogProvider.Get().ForContext(typeof(CourseController));
 
 		private readonly ULearnDb db = new ULearnDb();
 		private readonly CourseManager courseManager = WebCourseManager.Instance;

@@ -17,7 +17,7 @@ namespace uLearn.Web.Controllers
 {
 	public class TelegramController : JsonDataContractController
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(TelegramController));
+		private static ILog log => LogProvider.Get().ForContext(typeof(TelegramController));
 
 		private readonly string webhookSecret;
 		private readonly string protocol;

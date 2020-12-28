@@ -12,7 +12,7 @@ namespace Database.Repos.Groups
 	public class GroupsCreatorAndCopier : IGroupsCreatorAndCopier
 	{
 		private readonly UlearnDb db;
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(GroupsCreatorAndCopier));
+		private static ILog log => LogProvider.Get().ForContext(typeof(GroupsCreatorAndCopier));
 		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IManualCheckingsForOldSolutionsAdder manualCheckingsForOldSolutionsAdder;
 

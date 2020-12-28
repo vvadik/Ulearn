@@ -22,7 +22,7 @@ namespace XQueueWatcher
 	{
 		private static readonly TimeSpan pauseBetweenRequests = TimeSpan.FromSeconds(1);
 
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(Program));
+		private static ILog log => LogProvider.Get().ForContext(typeof(Program));
 		private static readonly CourseManager courseManager = WebCourseManager.Instance;
 		private static readonly UlearnConfiguration configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 

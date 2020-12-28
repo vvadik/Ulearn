@@ -9,7 +9,7 @@ namespace Ulearn.Core.Helpers
 {
 	public class ExerciseStudentZipsCache
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(ExerciseStudentZipsCache));
+		private static ILog log => LogProvider.Get().ForContext(typeof(ExerciseStudentZipsCache));
 
 		private readonly DirectoryInfo cacheDirectory;
 		private readonly ExerciseStudentZipBuilder builder;

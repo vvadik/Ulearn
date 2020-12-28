@@ -15,7 +15,7 @@ namespace uLearn.Web
 {
 	public partial class Startup
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(Startup));
+		private static ILog log => LogProvider.Get().ForContext(typeof(Startup));
 
 		public void Configuration(IAppBuilder app)
 		{

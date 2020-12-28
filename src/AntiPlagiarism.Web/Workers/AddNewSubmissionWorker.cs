@@ -13,8 +13,8 @@ namespace AntiPlagiarism.Web.Workers
 	{
 		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly IOptions<AntiPlagiarismConfiguration> configuration;
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(AddNewSubmissionWorker));
-		
+		private static ILog log => LogProvider.Get().ForContext(typeof(AddNewSubmissionWorker));
+
 		private readonly List<Thread> threads = new List<Thread>();
 		private readonly TimeSpan sleep = TimeSpan.FromSeconds(5);
 

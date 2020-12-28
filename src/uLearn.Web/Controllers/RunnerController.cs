@@ -30,7 +30,7 @@ namespace uLearn.Web.Controllers
 {
 	public class RunnerController : ApiController
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(RunnerController));
+		private static ILog log => LogProvider.Get().ForContext(typeof(RunnerController));
 
 		private readonly UserSolutionsRepo userSolutionsRepo;
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
@@ -186,7 +186,7 @@ namespace uLearn.Web.Controllers
 
 	public class XQueueResultObserver : IResultObserver
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(XQueueResultObserver));
+		private static ILog log => LogProvider.Get().ForContext(typeof(XQueueResultObserver));
 
 		public async Task ProcessResult(ULearnDb db, UserExerciseSubmission submission, RunningResults result)
 		{

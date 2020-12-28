@@ -23,7 +23,7 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 		private readonly IServiceProvider serviceProvider;
 		private readonly INotificationDataPreloader notificationDataPreloader;
 		private static FeedNotificationTransport commentsFeedNotificationTransport;
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(NotificationsController));
+		private static ILog log => LogProvider.Get().ForContext(typeof(NotificationsController));
 
 		public NotificationsController(IWebCourseManager courseManager, UlearnDb db,
 			IUsersRepo usersRepo,

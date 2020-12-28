@@ -21,7 +21,7 @@ namespace Database.Repos
 
 	public class UserSolutionsRepo : IUserSolutionsRepo
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(UserSolutionsRepo));
+		private static ILog log => LogProvider.Get().ForContext(typeof(UserSolutionsRepo));
 		private readonly UlearnDb db;
 		private readonly ITextsRepo textsRepo;
 		private readonly IVisitsRepo visitsRepo;

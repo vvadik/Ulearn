@@ -17,7 +17,7 @@ namespace uLearn.Web.Kontur.Passport
 		private const string konturStateCookieName = "kontur.passport.state";
 
 		private readonly PassportClient passportClient;
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(KonturPassportAuthenticationHandler));
+		private static ILog log => LogProvider.Get().ForContext(typeof(KonturPassportAuthenticationHandler));
 
 		public KonturPassportAuthenticationHandler(PassportClient passportClient)
 		{

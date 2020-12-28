@@ -15,7 +15,7 @@ namespace RunCheckerJob
 	{
 		private readonly DockerSandboxRunner sandboxRunner;
 
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(SelfChecker));
+		private static ILog log => LogProvider.Get().ForContext(typeof(SelfChecker));
 
 		public SelfChecker(DockerSandboxRunner sandboxRunner)
 		{

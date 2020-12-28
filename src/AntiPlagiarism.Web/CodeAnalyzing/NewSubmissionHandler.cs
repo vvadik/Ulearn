@@ -21,7 +21,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 		private readonly SubmissionSnippetsExtractor submissionSnippetsExtractor;
 		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly AntiPlagiarismConfiguration configuration;
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(NewSubmissionHandler));
+		private static ILog log => LogProvider.Get().ForContext(typeof(NewSubmissionHandler));
 
 		public NewSubmissionHandler(
 			ISubmissionsRepo submissionsRepo, ISnippetsRepo snippetsRepo, ITasksRepo tasksRepo, IWorkQueueRepo workQueueRepo,

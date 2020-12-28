@@ -32,7 +32,7 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize]
 	public class QuizController : Controller
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(QuizController));
+		private static ILog log => LogProvider.Get().ForContext(typeof(QuizController));
 
 		private const int defaultMaxTriesCount = 2;
 		public const int InfinityTriesCount = int.MaxValue - 1;

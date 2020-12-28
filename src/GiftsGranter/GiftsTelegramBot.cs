@@ -9,7 +9,7 @@ namespace GiftsGranter
 {
 	public class GiftsTelegramBot : TelegramBot
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(GiftsTelegramBot));
+		private static ILog log => LogProvider.Get().ForContext(typeof(GiftsTelegramBot));
 
 		public GiftsTelegramBot()
 		{

@@ -16,7 +16,7 @@ namespace uLearn.Web.Controllers
 {
 	public class BaseUserController : BaseController
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(BaseUserController));
+		private static ILog log => LogProvider.Get().ForContext(typeof(BaseUserController));
 
 		protected readonly ULearnDb db;
 		protected UserManager<ApplicationUser> userManager;
@@ -51,7 +51,7 @@ namespace uLearn.Web.Controllers
 			}
 			catch (Exception e)
 			{
-				log.Error($"Can\'t initialize Spam.API client to {spamEndpoint}, login {spamLogin}, password {spamPassword.MaskAsSecret()}", e);
+				log.Error(e, $"Can\'t initialize Spam.API client to {spamEndpoint}, login {spamLogin}, password {spamPassword.MaskAsSecret()}");
 				throw;
 			}
 		}
@@ -104,7 +104,7 @@ namespace uLearn.Web.Controllers
 			}
 			catch (Exception e)
 			{
-				log.Error($"Не могу отправить письмо для подтверждения адреса на {user.Email}", e);
+				log.Error(e, $"Не могу отправить письмо для подтверждения адреса на {user.Email}");
 				return false;
 			}
 

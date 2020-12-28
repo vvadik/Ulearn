@@ -17,7 +17,7 @@ namespace uLearn.Web.Controllers
 {
 	public class GraderController : BaseExerciseController
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(GraderController));
+		private static ILog log => LogProvider.Get().ForContext(typeof(GraderController));
 
 		public GradersRepo gradersRepo;
 

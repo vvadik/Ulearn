@@ -9,6 +9,8 @@ namespace Ulearn.Common
 {
 	public static class FuncUtils
 	{
+		private static ILog log => LogProvider.Get().ForContext(typeof(FuncUtils));
+
 		public static async Task<T> TrySeveralTimesAsync<T>(Func<Task<T>> func, int triesCount, Func<Task> runAfterFail, Type exceptionType)
 		{
 			for (var tryIndex = 0; tryIndex < triesCount; tryIndex++)
@@ -18,21 +20,15 @@ namespace Ulearn.Common
 				}
 				catch (Exception e) when (exceptionType.IsInstanceOfType(e))
 				{
-					LogProvider.Get()
-						.ForContext(typeof(FuncUtils))
-						.Error($"Исключение (попытка {tryIndex + 1} из {triesCount}):", e);
+					log.Error(e, $"Исключение (попытка {tryIndex + 1} из {triesCount}):");
 					if (tryIndex >= triesCount - 1)
 						throw;
-					LogProvider.Get()
-						.ForContext(typeof(FuncUtils))
-						.Warn($"Попробую ещё раз (попытка {tryIndex + 2} из {triesCount})");
+					log.Warn($"Попробую ещё раз (попытка {tryIndex + 2} из {triesCount})");
 					await runAfterFail().ConfigureAwait(false);
 				}
 				catch (Exception e)
 				{
-					LogProvider.Get()
-						.ForContext(typeof(FuncUtils))
-						.Info($"На попытке {tryIndex + 1} произошло исключение {e.Message}");
+					log.Info($"На попытке {tryIndex + 1} произошло исключение {e.Message}");
 					throw;
 				}
 

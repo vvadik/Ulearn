@@ -43,7 +43,7 @@ namespace GitCourseUpdater
 		private DirectoryInfo reposBaseDir;
 		private string repoDirName;
 		private Repository repo;
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(GitRepo));
+		private static ILog log => LogProvider.Get().ForContext(typeof(GitRepo));
 		private string privateKeyPath;
 		private string publicKeyPath;
 		private static object @lock = new object(); // Потокобезопасность не гарантируется библиотекой libgit2

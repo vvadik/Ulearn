@@ -28,7 +28,7 @@ namespace Ulearn.Core
 	{
 		private const string examplePackageName = "Help";
 
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(CourseManager));
+		private static ILog log => LogProvider.Get().ForContext(typeof(CourseManager));
 		private static Encoding Cp866 => Encoding.GetEncoding(866);
 		private static Encoding Utf8 => Encoding.UTF8;
 

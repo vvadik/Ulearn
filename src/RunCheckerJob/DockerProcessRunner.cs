@@ -15,6 +15,8 @@ namespace RunCheckerJob
 {
 	internal static class DockerProcessRunner
 	{
+		private static ILog log => LogProvider.Get().ForContext(typeof(DockerProcessRunner));
+
 		static DockerProcessRunner()
 		{
 			/* We should register encoding provider for Encoding.GetEncoding(1251) works */
@@ -23,7 +25,6 @@ namespace RunCheckerJob
 
 		public static RunningResults Run(CommandRunnerSubmission submission, DockerSandboxRunnerSettings settings, string submissionDirectory)
 		{
-			var log = LogProvider.Get().ForContext(typeof(DockerProcessRunner));
 			log.Info($"Запускаю проверку решения {submission.Id}");
 			var dir = new DirectoryInfo(submissionDirectory);
 
@@ -44,7 +45,6 @@ namespace RunCheckerJob
 
 		private static RunningResults RunDocker(DockerSandboxRunnerSettings settings, DirectoryInfo dir)
 		{
-			var log = LogProvider.Get().ForContext(typeof(DockerProcessRunner));
 			var name = Guid.NewGuid();
 			var dockerCommand = BuildDockerCommand(settings, dir, name);
 			log.Info($"Start process command: docker {dockerCommand}");
@@ -95,7 +95,6 @@ namespace RunCheckerJob
 
 		private static void GracefullyShutdownDocker(Process dockerShellProcess, Guid name, SandboxRunnerSettings settings)
 		{
-			var log = LogProvider.Get().ForContext(typeof(DockerProcessRunner));
 			try
 			{
 				dockerShellProcess.Kill();

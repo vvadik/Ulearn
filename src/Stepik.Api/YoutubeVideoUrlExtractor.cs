@@ -12,7 +12,7 @@ namespace Stepik.Api
 {
 	public class YoutubeVideoUrlExtractor
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(YoutubeVideoUrlExtractor));
+		private static ILog log => LogProvider.Get().ForContext(typeof(YoutubeVideoUrlExtractor));
 		private readonly HttpClient httpClient;
 		private const string youtubeBaseUrl = "https://youtube.com";
 

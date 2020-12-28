@@ -19,7 +19,7 @@ namespace AntiPlagiarism.UpdateDb
 		private readonly CodeUnitsExtractor codeUnitsExtractor;
 		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly AntiPlagiarismConfiguration configuration;
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(AntiPlagiarismSnippetsUpdater));
+		private static ILog log => LogProvider.Get().ForContext(typeof(AntiPlagiarismSnippetsUpdater));
 
 		public AntiPlagiarismSnippetsUpdater(
 			SubmissionSnippetsExtractor submissionSnippetsExtractor,
