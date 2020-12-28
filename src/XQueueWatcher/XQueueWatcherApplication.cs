@@ -22,13 +22,15 @@ namespace XQueueWatcher
 	public class XQueueWatcherApplication : BaseApplication
 	{
 		private static readonly TimeSpan pauseBetweenRequests = TimeSpan.FromSeconds(1);
-		private static readonly ServiceKeepAliver keepAliver = new ServiceKeepAliver(configuration.GraphiteServiceName);
-		private static readonly Dictionary<int, XQueueClient> clientsCache = new Dictionary<int, XQueueClient>();
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(XQueueWatcherApplication));
+		private static readonly Dictionary<int, XQueueClient> clientsCache = new();
+		private static ServiceKeepAliver keepAliver;
+		private static ILog log;
 
 		public override async Task InitializeAsync(IVostokHostingEnvironment environment)
 		{
 			await base.InitializeAsync(environment);
+			log = LogProvider.Get().ForContext(typeof(XQueueWatcherApplication));
+			keepAliver = new ServiceKeepAliver(configuration.GraphiteServiceName);
 		}
 
 		public override async Task RunAsync(IVostokHostingEnvironment environment)
