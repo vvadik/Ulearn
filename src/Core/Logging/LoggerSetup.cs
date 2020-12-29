@@ -75,6 +75,7 @@ namespace Ulearn.Core.Logging
 			}
 
 			var log = new CompositeLog(new[] { fileLog, consoleLog, telegramLog }.Where(l => l != null).ToArray())
+				.WithProperty("threadId", () => Environment.CurrentManagedThreadId)
 				.WithMinimumLevel(LogLevel.Debug);
 
 			if (addInLogProvider)
