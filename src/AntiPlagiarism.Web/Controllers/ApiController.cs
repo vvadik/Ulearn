@@ -35,7 +35,7 @@ namespace AntiPlagiarism.Web.Controllers
 		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly NewSubmissionHandler newSubmissionHandler;
 		private readonly AntiPlagiarismConfiguration configuration;
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(ApiController));
+		private static ILog log => LogProvider.Get().ForContext(typeof(ApiController));
 
 		public ApiController(
 			AntiPlagiarismDb db,

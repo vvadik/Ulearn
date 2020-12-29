@@ -21,7 +21,7 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 	public class StepikController : Controller
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(StepikController));
+		private static ILog log => LogProvider.Get().ForContext(typeof(StepikController));
 
 		private readonly StepikRepo stepikRepo;
 		private readonly NotificationsRepo notificationsRepo;

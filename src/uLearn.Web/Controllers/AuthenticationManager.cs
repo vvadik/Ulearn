@@ -14,6 +14,7 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly UserManager<ApplicationUser> userManager;
 		private readonly UserRolesRepo userRoles;
+		private static ILog log => LogProvider.Get().ForContext(typeof(AuthenticationManager));
 
 		private AuthenticationManager()
 		{
@@ -24,9 +25,7 @@ namespace uLearn.Web.Controllers
 
 		public static async Task LoginAsync(HttpContextBase context, ApplicationUser user, bool isPersistent)
 		{
-			LogProvider.Get()
-				.ForContext(typeof(AuthenticationManager))
-				.Info($"Пользователь {user.VisibleName} (логин = {user.UserName}, id = {user.Id}) залогинился");
+			log.Info($"Пользователь {user.VisibleName} (логин = {user.UserName}, id = {user.Id}) залогинился");
 			await new AuthenticationManager().InternalLoginAsync(context, user, isPersistent);
 		}
 

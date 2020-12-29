@@ -15,7 +15,7 @@ namespace Database.DataContexts
 {
 	public class ULearnDb : IdentityDbContext<ApplicationUser>
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(ULearnDb));
+		private static ILog log => LogProvider.Get().ForContext(typeof(ULearnDb));
 
 		public ULearnDb()
 			: this(ApplicationConfiguration.Read<DatabaseConfiguration>().Database)

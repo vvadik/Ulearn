@@ -10,10 +10,11 @@ namespace RunCheckerJob
 {
 	public static class SandboxRunHelper
 	{
+		private static ILog log => LogProvider.Get().ForContext(typeof(SandboxRunHelper));
+
 		public static RunningResults WithSubmissionWorkingDirectory(RunnerSubmission submission, ISandboxRunnerClient runnerClient,
 			DirectoryInfo workingDirectory, bool deleteSubmissionsAfterFinish)
 		{
-			var log = LogProvider.Get().ForContext(typeof(SandboxRunHelper));
 			if (!workingDirectory.Exists)
 			{
 				try
@@ -61,7 +62,6 @@ namespace RunCheckerJob
 
 		private static void SafeRemoveDirectory(string path)
 		{
-			var log = LogProvider.Get().ForContext(typeof(SandboxRunHelper));
 			try
 			{
 				/* Sometimes we can't remove directory after Time Limit Exceeded, because process is alive yet. Just wait some seconds before directory removing */

@@ -12,7 +12,7 @@ namespace Notifications
 {
 	public class KonturSpamEmailSender : IEmailSender
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(KonturSpamEmailSender));
+		private static ILog log => LogProvider.Get().ForContext(typeof(KonturSpamEmailSender));
 
 		private readonly MetricSender metricSender;
 

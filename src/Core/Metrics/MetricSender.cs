@@ -9,7 +9,7 @@ namespace Ulearn.Core.Metrics
 {
 	public class MetricSender
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(MetricSender));
+		private static ILog log => LogProvider.Get().ForContext(typeof(MetricSender));
 
 		private readonly string prefix;
 		private readonly string service;

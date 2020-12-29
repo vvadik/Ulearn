@@ -26,7 +26,7 @@ namespace uLearn.Web
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
 		private readonly VisitsRepo visitsRepo;
 
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(CertificatesRepo));
+		private static ILog log => LogProvider.Get().ForContext(typeof(CertificatesRepo));
 
 		public const string TemplateIndexFile = "index.html";
 		private readonly Regex templateParameterRegex = new Regex(@"%([-a-z0-9_.]+)(\|(raw|in_quotes|in_html))?%", RegexOptions.Compiled | RegexOptions.IgnoreCase);

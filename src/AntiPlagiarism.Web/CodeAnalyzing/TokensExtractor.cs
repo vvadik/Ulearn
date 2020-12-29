@@ -17,7 +17,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 {
 	public class TokensExtractor
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(TokensExtractor));
+		private static ILog log => LogProvider.Get().ForContext(typeof(TokensExtractor));
 
 		private static IEnumerable<Token> FilterWhitespaceTokens(IEnumerable<Token> tokens)
 		{

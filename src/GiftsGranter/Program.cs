@@ -14,7 +14,7 @@ namespace GiftsGranter
 {
 	internal class Program
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(Program));
+		private static ILog log => LogProvider.Get().ForContext(typeof(Program));
 		private readonly int maxGiftsPerRun;
 		private readonly VisitsRepo repo;
 		private readonly JObject settings;
@@ -69,7 +69,6 @@ namespace GiftsGranter
 			var hostLog = settings["hostLog"].ToObject<HostLogConfiguration>();
 			var graphiteServiceName = settings["graphiteServiceName"].Value<string>();
 			LoggerSetup.Setup(hostLog, graphiteServiceName);
-			var log = LogProvider.Get().ForContext(typeof(Program));
 			var staff = new StaffClient(settings["staff"]["clientAuth"].Value<string>());
 			if (args.Contains("-r"))
 			{

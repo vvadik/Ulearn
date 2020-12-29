@@ -15,7 +15,7 @@ namespace AntiPlagiarism.Web.Controllers
 	[ApiController]
 	public abstract class BaseController : Controller
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(BaseController));
+		private static ILog log => LogProvider.Get().ForContext(typeof(BaseController));
 		protected readonly IClientsRepo clientsRepo;
 		protected readonly AntiPlagiarismDb db;
 

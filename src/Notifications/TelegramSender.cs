@@ -13,7 +13,7 @@ namespace Notifications
 {
 	public class TelegramSender : ITelegramSender
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(TelegramSender));
+		private static ILog log => LogProvider.Get().ForContext(typeof(TelegramSender));
 
 		private readonly MetricSender metricSender;
 

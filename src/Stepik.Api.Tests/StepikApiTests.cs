@@ -100,7 +100,7 @@ namespace Stepik.Api.Tests
 	public class AuthorizationCodeRetrieverServer
 	{
 		private readonly HttpServer server;
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(AuthorizationCodeRetrieverServer));
+		private static ILog log => LogProvider.Get().ForContext(typeof(AuthorizationCodeRetrieverServer));
 
 		public EventHandler<string> OnAuthorizationCodeReceived;
 

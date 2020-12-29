@@ -9,6 +9,7 @@ namespace Ulearn.VideoAnnotations.Api.Models.Responses.Annotations
 	[DataContract]
 	public class AnnotationsResponse : SuccessResponse
 	{
+		[CanBeNull]
 		[DataMember(Name = "annotation")]
 		public Annotation Annotation { get; set; }
 	}

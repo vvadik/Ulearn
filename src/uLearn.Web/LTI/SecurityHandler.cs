@@ -16,6 +16,8 @@ namespace uLearn.Web.LTI
 {
 	public static class SecurityHandler
 	{
+		private static ILog log => LogProvider.Get().ForContext(typeof(SecurityHandler));
+
 		/// <summary>
 		/// Invoked after the LTI request has been authenticated so the application can sign in the application user.
 		/// </summary>
@@ -24,7 +26,6 @@ namespace uLearn.Web.LTI
 		/// <returns>A <see cref="Task"/> representing the completed operation.</returns>
 		public static async Task OnAuthenticated(LtiAuthenticatedContext context, IEnumerable<Claim> claims = null)
 		{
-			var log = LogProvider.Get().ForContext(typeof(SecurityHandler));
 			log.Info($"LTI обрабатывает запрос на {context.Request.Uri}");
 
 			ClaimsIdentity identity = null;
@@ -51,7 +52,7 @@ namespace uLearn.Web.LTI
 
 		private static async Task<ClaimsIdentity> GetIdentityForLtiLogin(LtiAuthenticatedContext context, ULearnDb db, UserLoginInfo ltiLogin)
 		{
-			var log = LogProvider.Get().ForContext(typeof(SecurityHandler));
+			
 			var userManager = new ULearnUserManager(db);
 			using (var transaction = db.Database.BeginTransaction(IsolationLevel.Serializable))
 			{

@@ -40,7 +40,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		private readonly IStyleErrorsRepo styleErrorsRepo;
 		private readonly MetricSender metricSender;
 		private readonly ErrorsBot errorsBot = new ErrorsBot();
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(ExerciseController));
+		private static ILog log => LogProvider.Get().ForContext(typeof(ExerciseController));
 
 		public ExerciseController(IWebCourseManager courseManager, UlearnDb db, MetricSender metricSender,
 			IUsersRepo usersRepo, IUserSolutionsRepo userSolutionsRepo, ICourseRolesRepo courseRolesRepo, IVisitsRepo visitsRepo,

@@ -20,7 +20,7 @@ namespace RunCheckerJob
 		private readonly ManualResetEvent shutdownEvent = new ManualResetEvent(false);
 		private readonly List<Thread> threads = new List<Thread>();
 
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(ProgramBase));
+		private static ILog log => LogProvider.Get().ForContext(typeof(ProgramBase));
 		protected abstract ISandboxRunnerClient SandboxRunnerClient { get; }
 		private readonly string[] supportedSandboxes;
 		private readonly string serviceName;

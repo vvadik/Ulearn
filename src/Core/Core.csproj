@@ -12,10 +12,10 @@
 		<PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.3" />
 		<PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
 		<PackageReference Include="Microsoft.AspNetCore.Html.Abstractions" Version="2.2.0" />
-		<PackageReference Include="Microsoft.Build" Version="16.6.0" />
-		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.6.0" />
-		<PackageReference Include="Microsoft.CodeAnalysis" Version="3.7.0" />
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.7.0" />
+		<PackageReference Include="Microsoft.Build" Version="16.8.0" />
+		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.8.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis" Version="3.8.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" />
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.2" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.2" />
@@ -29,13 +29,13 @@
 		<PackageReference Include="NUnit" Version="3.10.0" />
 		<PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
 		<PackageReference Include="StatsdClient" Version="2.0.68" />
-		<PackageReference Include="System.Collections.Immutable" Version="1.7.0" />
+		<PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
 		<PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
 		<PackageReference Include="System.Text.Encoding.CodePages" Version="4.6.0" />
 		<PackageReference Include="Telegram.Bot" Version="15.0.0" />
 		<PackageReference Include="Vostok.Logging.Abstractions" Version="1.0.18" />
 		<PackageReference Include="Vostok.Logging.Console" Version="1.0.5" />
-		<PackageReference Include="Vostok.Logging.File" Version="1.0.11" />
+		<PackageReference Include="Vostok.Logging.File" Version="1.0.12" />
 		<PackageReference Include="Vostok.Logging.Formatting" Version="1.0.5" />
 	</ItemGroup>
 	<ItemGroup>

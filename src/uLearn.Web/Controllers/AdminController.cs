@@ -37,7 +37,7 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 	public class AdminController : Controller
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(AdminController));
+		private static ILog log => LogProvider.Get().ForContext(typeof(AdminController));
 
 		private readonly WebCourseManager courseManager = WebCourseManager.Instance;
 		private readonly ULearnDb db;

@@ -9,7 +9,7 @@ namespace Ulearn.Web.Api.Authorization
 {
 	public class BaseCourseAuthorizationHandler<T> : AuthorizationHandler<T> where T : IAuthorizationRequirement
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(BaseCourseAuthorizationHandler<T>));
+		private static ILog log => LogProvider.Get().ForContext(typeof(BaseCourseAuthorizationHandler<T>));
 
 		protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, T requirement)
 		{

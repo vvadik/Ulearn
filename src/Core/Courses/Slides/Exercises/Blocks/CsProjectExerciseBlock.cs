@@ -26,7 +26,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public const string BuildingTargetNetCoreFrameworkVersion = "3.1";
 		public const string BuildingToolsVersion = null;
 
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(CsProjectExerciseBlock));
+		private static ILog log => LogProvider.Get().ForContext(typeof(CsProjectExerciseBlock));
 
 		public static string SolutionFilepathToUserCodeFilepath(string solutionFilepath)
 		{

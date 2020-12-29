@@ -20,7 +20,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 	[XmlType("exercise.universal")]
 	public class UniversalExerciseBlock : AbstractExerciseBlock, IExerciseCheckerZipBuilder
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(UniversalExerciseBlock));
+		private static ILog log => LogProvider.Get().ForContext(typeof(UniversalExerciseBlock));
 
 		[XmlAttribute("exerciseDirName")] // Путь до директории с упражнением
 		public string ExerciseDirPath { get; set; }

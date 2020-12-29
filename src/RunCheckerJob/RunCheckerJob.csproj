@@ -8,7 +8,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="NUnit" Version="3.10.0" />
-		<PackageReference Include="System.Collections.Immutable" Version="1.7.0" />
+		<PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
 		<PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
 		<ProjectReference Include="..\Common\Common.csproj" />
 		<ProjectReference Include="..\Core\Core.csproj" />

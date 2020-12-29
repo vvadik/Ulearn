@@ -22,7 +22,7 @@ namespace Database.Repos
 		public static TimeSpan sendNotificationsDelayAfterCreating = TimeSpan.FromMinutes(1);
 
 		private readonly UlearnDb db;
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(NotificationsRepo));
+		private static ILog log => LogProvider.Get().ForContext(typeof(NotificationsRepo));
 		private readonly IServiceProvider serviceProvider;
 		private readonly IUnitsRepo unitsRepo;
 		private readonly ICourseRolesRepo courseRolesRepo;

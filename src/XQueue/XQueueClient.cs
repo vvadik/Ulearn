@@ -18,7 +18,7 @@ namespace XQueue
 		private const string getSubmissionUrl = "xqueue/get_submission/";
 		private const string putResultUrl = "xqueue/put_result/";
 
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(XQueueClient));
+		private static ILog log => LogProvider.Get().ForContext(typeof(XQueueClient));
 
 		private readonly string username;
 		private readonly string password;
@@ -91,7 +91,7 @@ namespace XQueue
 			}
 			catch (Exception e)
 			{
-				log.Warn( e.InnerException, $"Can't get submission from xqueue {queueName}: {e.Message}");
+				log.Warn( e, $"Can't get submission from xqueue {queueName}: {e.Message}");
 				return null;
 			}
 

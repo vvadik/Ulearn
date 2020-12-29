@@ -26,6 +26,7 @@ namespace CourseToolHotReloader
 		private static IContainer container;
 		private static IConfig config;
 		private static IUlearnApiClient ulearnApiClient;
+		private static ILog log => LogProvider.Get();
 
 		private static void Main()
 		{
@@ -36,7 +37,7 @@ namespace CourseToolHotReloader
 			}
 			catch (AggregateException e)
 			{
-				LogProvider.Get().Error(e, "Root error");
+				log.Error(e, "Root error");
 				switch (e.InnerExceptions.Single())
 				{
 					case UriFormatException _:
@@ -80,7 +81,7 @@ namespace CourseToolHotReloader
 			}
 			catch (Exception e)
 			{
-				LogProvider.Get().Error(e, "Root error");
+				log.Error(e, "Root error");
 				ConsoleWorker.WriteError("Ошибка. Подробнее в логах");
 			}
 		}

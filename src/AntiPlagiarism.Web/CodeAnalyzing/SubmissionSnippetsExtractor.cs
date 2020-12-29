@@ -12,7 +12,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 	{
 		private readonly CodeUnitsExtractor codeUnitsExtractor;
 		private readonly SnippetsExtractor snippetsExtractor;
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(SubmissionSnippetsExtractor));
+		private static ILog log => LogProvider.Get().ForContext(typeof(SubmissionSnippetsExtractor));
 		private readonly AntiPlagiarismConfiguration configuration;
 
 		private readonly List<ITokenInSnippetConverter> tokenConverters = new List<ITokenInSnippetConverter>

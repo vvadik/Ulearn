@@ -16,7 +16,7 @@ namespace uLearn.Web.Controllers
 {
 	public class BaseUserController : BaseController
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(BaseUserController));
+		private static ILog log => LogProvider.Get().ForContext(typeof(BaseUserController));
 
 		protected readonly ULearnDb db;
 		protected UserManager<ApplicationUser> userManager;

@@ -50,7 +50,7 @@ namespace RunCsJob
 
 	public class CsSandboxRunner
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(CsSandboxRunner));
+		private static ILog log => LogProvider.Get().ForContext(typeof(CsSandboxRunner));
 		private readonly MetricSender metricSender = new MetricSender("runcsjob");
 
 		private readonly CsRunnerSubmission submission;

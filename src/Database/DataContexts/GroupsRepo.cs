@@ -21,7 +21,7 @@ namespace Database.DataContexts
 {
 	public class GroupsRepo
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(GroupsRepo));
+		private static ILog log => LogProvider.Get().ForContext(typeof(GroupsRepo));
 
 		private readonly ULearnDb db;
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
