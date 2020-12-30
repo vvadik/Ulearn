@@ -15,7 +15,7 @@ namespace ManualUtils
 			var users = adminIds.Select(
 				adminId =>
 				{
-					var roles = courseRolesRepo.GetActualUserRoles(adminId).Result.Where(r => r.Role == CourseRoleType.CourseAdmin).ToList();
+					var roles = courseRolesRepo.Internal_GetActualUserRoles(adminId).Result.Where(r => r.Role == CourseRoleType.CourseAdmin).ToList();
 					return new
 					{
 						Name = roles[0].User.VisibleName,
