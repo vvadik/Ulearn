@@ -22,9 +22,9 @@ namespace Database.Repos
 			this.usersRepo = usersRepo;
 		}
 
-		public async Task<List<CourseRole>> Internal_GetActualUserRoles([CanBeNull]string userId, string courseId = null, bool notFilterByUserId = false)
+		public async Task<List<CourseRole>> Internal_GetActualUserRoles([CanBeNull]string userId, string courseId = null, bool filterByUserId = true)
 		{
-			if (userId == null && notFilterByUserId) // В этом случае userId null рассматриваем как гостя
+			if (userId == null && filterByUserId) // В этом случае userId null рассматриваем как гостя
 				return new List<CourseRole>();
 			var query = db.CourseRoles.AsQueryable();
 			if (userId != null)
@@ -111,7 +111,7 @@ namespace Database.Repos
 
 		public async Task<List<string>> GetListOfUsersWithCourseRoleAsync(CourseRoleType courseRoleType, string courseId, bool includeHighRoles)
 		{
-			IEnumerable<CourseRole> usersRoles = await Internal_GetActualUserRoles(null, courseId.NullIfEmptyOrWhitespace(), true);
+			IEnumerable<CourseRole> usersRoles = await Internal_GetActualUserRoles(null, courseId.NullIfEmptyOrWhitespace(), false);
 			usersRoles = includeHighRoles
 				? usersRoles.Where(userRole => userRole.Role <= courseRoleType)
 				: usersRoles.Where(userRole => userRole.Role == courseRoleType);
