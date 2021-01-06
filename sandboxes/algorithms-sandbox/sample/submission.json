@@ -1,4 +1,3 @@
 {
-    "language": "python3",
-    "runCommand": "python3 main.py"
+    "runCommand": "python3.8 main.py cpp 1000"
 }

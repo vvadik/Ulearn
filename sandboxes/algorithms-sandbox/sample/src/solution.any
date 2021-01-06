@@ -1,3 +1,0 @@
-#region Task
-print(sum(map(int, input().split())))
-#endregion Task
