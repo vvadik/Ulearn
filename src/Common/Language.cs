@@ -51,18 +51,14 @@ namespace Ulearn.Common
 		[XmlEnum("cpp")]
 		[Lexer("cpp")]
 		Cpp = 10,
-		
-		[XmlEnum("any")]
-		[Lexer("any")]
-		Any = 11,
 
 		[XmlEnum("c")]
 		[Lexer("c")]
-		C = 10,
-
-		[XmlEnum("cpp")]
-		[Lexer("cpp")]
-		Cpp = 11,
+		C = 11,
+		
+		[XmlEnum("any")]
+		[Lexer("any")]
+		Any = 12,
 
 		[XmlEnum("text")]
 		[Lexer("text")]
