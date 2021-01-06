@@ -1,18 +1,28 @@
-class CompilationException(Exception):
+class CheckException(Exception):
+    def __init__(self, message=''):
+        self.__message = message
+
+    def message(self):
+        return self.__message
+
+class CompilationException(CheckException):
     pass
 
 
-class RuntimeException(Exception):
+class RuntimeException(CheckException):
     pass
 
 
-class TimeLimitException(Exception):
+class TimeLimitException(CheckException):
     pass
 
 
-class WrongAnswerException(Exception):
+class WrongAnswerException(CheckException):
     pass
 
 
-class SecurityException(Exception):
+class SecurityException(CheckException):
+    pass
+
+class SandboxException(CheckException):
     pass
