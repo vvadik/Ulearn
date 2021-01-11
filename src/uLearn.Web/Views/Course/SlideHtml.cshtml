@@ -231,11 +231,17 @@
 					VideoId = block.VideoId
 				}).GetAwaiter().GetResult();
 
-				@ShowVideoAnnotations(annotationsResponse.Annotation, context, Html)
+				if (annotationsResponse.Annotation != null)
+				{
+					@ShowVideoAnnotations(annotationsResponse.Annotation, context, Html)
+				}
+				else
+				{
+					@SuggestAnnotations(context, Html)
+				}
 			}
 			catch (ApiClientException e)
 			{
-				/* Annotations not found. It's ok */
 				@SuggestAnnotations(context, Html)
 			}
 		}
