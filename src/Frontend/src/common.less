@@ -6,7 +6,22 @@
 
 :global {
   .react-ui *:not(button) { //preventing styles bugs for kontur ui components
-	box-sizing: initial;
+    box-sizing: initial;
+  }
+
+  .inline-pre { //styles for inline code, used in comments and review, class is added in backend render
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+    font-size: 13px;
+    line-height: 1.42857143;
+    color: #333;
+    word-wrap: break-word;
+    background-color: #fee;
+    border-radius: 4px;
+    display: inline;
+    margin: 0;
+    border: 0 solid #ccc;
+    padding: 0 5px;
+    overflow: visible;
   }
 }
 
@@ -28,19 +43,19 @@ body {
 
 @media (min-width: @maxTabletWidth) {
   .visible-only-desktop {
-	display: initial;
+    display: initial;
   }
 }
 
 @media (max-width: @maxPhoneWidth) {
   .visible-only-phone {
-	display: initial;
+    display: initial;
   }
 }
 
 @media (max-width: @maxPhoneWidth) {
   .visible-at-least-tablet {
-	display: none !important;
+    display: none !important;
   }
 }
 
