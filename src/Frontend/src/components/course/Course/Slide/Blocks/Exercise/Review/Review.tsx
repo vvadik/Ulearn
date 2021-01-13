@@ -5,7 +5,7 @@ import Avatar from "src/components/common/Avatar/Avatar.js";
 import { Textarea, ThemeContext, } from "ui";
 import { Send3, Trash, Delete, } from "icons";
 
-import { textareaHidden } from "src/uiTheme.js";
+import { textareaHidden } from "src/uiTheme";
 
 import { ReviewCommentResponse, ReviewInfo } from "src/models/exercise";
 

@@ -5,7 +5,7 @@ import cn from "classnames";
 import { ThemeContext, Tooltip } from "ui";
 import { Lightbulb } from "icons";
 import IControlWithText from "./IControlWithText";
-import { darkFlat } from "src/uiTheme.js";
+import { darkFlat } from "src/uiTheme";
 
 import ShowControlsTextContext from "./ShowControlsTextContext";
 

@@ -9,7 +9,7 @@ import OutputButton from "./OutputButton";
 import ResetButton from "./ResetButton";
 import StatisticsHint from "./StatisticsHint";
 import AcceptedSolutionsButton from "./AcceptedSolutionsButton";
-import { darkFlat } from "src/uiTheme.js";
+import { darkFlat } from "src/uiTheme";
 
 import ShowControlsTextContext from "./ShowControlsTextContext";
 
