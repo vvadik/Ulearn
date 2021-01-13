@@ -1,8 +1,8 @@
 import React from "react";
 
-import getPluralForm from "src/utils/getPluralForm.js";
+import getPluralForm from "src/utils/getPluralForm";
 import { SubmissionInfo } from "src/models/exercise";
-import { convertDefaultTimezoneToLocal, getMoment } from "src/utils/momentUtils.js";
+import { convertDefaultTimezoneToLocal, getMoment } from "src/utils/momentUtils";
 import { Language } from "src/consts/languages";
 import { capitalize } from "src/utils/stringUtils";
 

@@ -1,6 +1,6 @@
 import React, { ReactElement } from "react";
 
-import { isMobile, isTablet, } from "src/utils/getDeviceType.js";
+import { isMobile, isTablet, } from "src/utils/getDeviceType";
 
 import { ThemeContext } from "ui";
 import SubmitButton from "./SubmitButton";

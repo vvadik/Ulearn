@@ -8,7 +8,7 @@ import {
 	SolutionRunStatus,
 	SubmissionInfo
 } from "src/models/exercise";
-import getPluralForm from "src/utils/getPluralForm.js";
+import getPluralForm from "src/utils/getPluralForm";
 import { SubmissionColor } from "../ExerciseUtils";
 
 interface ExerciseFormHeaderProps {

@@ -1,9 +1,15 @@
-export default function scrollToView(element, animationDuration = 500) {
-	const header = document.getElementById("header");
-	const headerHeight = header.getBoundingClientRect().height;
+import { RefObject } from "react";
 
-	if(element.current.getBoundingClientRect().top > 0) {
-		animate(() => offsetTop(element.current) - headerHeight, animationDuration);
+export default function scrollToView(element: RefObject<Element>, animationDuration = 500): void {
+	const header = document.getElementById("header");
+	if(!header) {
+		return;
+	}
+	const headerHeight = header.getBoundingClientRect().height;
+	const curElem = element.current;
+
+	if(curElem && curElem.getBoundingClientRect().top > 0) {
+		animate(() => offsetTop(curElem) - headerHeight, animationDuration);
 	}
 }
 
@@ -11,12 +17,12 @@ function getScrollTop() {
 	return window.pageYOffset || document.documentElement.scrollTop;
 }
 
-function offsetTop(el) {
+function offsetTop(el: Element) {
 	const rect = el.getBoundingClientRect();
 	return rect.top + getScrollTop();
 }
 
-function animate(getToPosition, duration, increment = 20) {
+function animate(getToPosition: () => number, duration: number, increment = 20) {
 	const getChange = () => getToPosition() - getScrollTop();
 	let currentTime = 0;
 
@@ -39,9 +45,11 @@ function animate(getToPosition, duration, increment = 20) {
 //b = start value
 //c = change in value
 //d = duration
-function easeInOutQuad(t, b, c, d) {
+function easeInOutQuad(t: number, b: number, c: number, d: number): number {
 	t /= d / 2;
-	if(t < 1) return c / 2 * t * t + b;
+	if(t < 1) {
+		return c / 2 * t * t + b;
+	}
 	t--;
 	return -c / 2 * (t * (t - 2) - 1) + b;
 }

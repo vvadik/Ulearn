@@ -11,7 +11,7 @@ import { ThemeContext } from "ui";
 
 import classNames from 'classnames';
 
-import { exerciseSolutions, loadFromCache, saveToCache } from "src/utils/localStorageManager.js";
+import { exerciseSolutions, loadFromCache, saveToCache } from "src/utils/localStorageManager";
 
 import { Language } from "src/consts/languages";
 import { constructPathToAcceptedSolutions, } from "src/consts/routes";
