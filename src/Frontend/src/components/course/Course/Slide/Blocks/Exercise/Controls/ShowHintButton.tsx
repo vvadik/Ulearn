@@ -48,6 +48,9 @@ function ShowHintButton({
 
 	function showTooltip() {
 		setState({ showedHintsCount, isTooltipOpened: true });
+		if(showedHintsCount >= hints.length) {
+			onAllHintsShowed();
+		}
 	}
 
 	function closeTooltip() {
