@@ -17,4 +17,7 @@ export const textareaHidden = ThemeFactory.create({
 export var darkFlat = ThemeFactory.create({
 	popupTextColor: '#fff',
 	bgDefault: '#333333',
+	btnBorderRadiusLarge: '8px',
+	btnBorderRadiusMedium: '8px',
+	btnBorderRadiusSmall: '8px',
 }, FLAT_THEME);
