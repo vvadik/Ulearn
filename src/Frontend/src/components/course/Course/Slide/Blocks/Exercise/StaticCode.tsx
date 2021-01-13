@@ -5,13 +5,22 @@ import { Copy } from "icons";
 import CodeMirror from "./Exercise";
 
 import classNames from "classnames";
-import PropTypes from 'prop-types';
+
+import { Language } from "src/consts/languages";
+import { Editor } from "codemirror";
 
 import styles from './Exercise.less';
 import texts from "src/components/course/Course/Slide/Blocks/Exercise/Exercise.texts";
 
 
-function StaticCode({ language, code, className, isHidden, }) {
+interface Props {
+	language: Language,
+	code: string,
+	className: string,
+	isHidden: boolean,
+}
+
+function StaticCode({ language, code, className, isHidden, }: Props): React.ReactNode {
 	const lines = code.split('\n');
 	const [collapseEditor, showAllCode] = useState(isHidden && lines.length > 20);
 
@@ -23,7 +32,7 @@ function StaticCode({ language, code, className, isHidden, }) {
 		theme: 'default',
 		readOnly: true,
 		matchBrackets: true,
-	}
+	};
 
 	const value = collapseEditor ? lines.splice(0, 5).join('\n') : code;
 
@@ -50,8 +59,8 @@ function StaticCode({ language, code, className, isHidden, }) {
 		</div>
 	);
 
-	function onEditorMount(editor) {
-		editor.setSize('auto', '100%')
+	function onEditorMount(editor: Editor) {
+		editor.setSize('auto', '100%');
 	}
 
 	function showAllCodeButtonClicked() {
@@ -62,12 +71,6 @@ function StaticCode({ language, code, className, isHidden, }) {
 		navigator.clipboard.writeText(code);
 		Toast.push(texts.controls.copyCode.onCopy);
 	}
-}
-
-StaticCode.propTypes = {
-	value: PropTypes.string,
-	className: PropTypes.string,
-	isHidden: PropTypes.bool,
 }
 
 export default StaticCode;
