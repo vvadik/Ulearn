@@ -1,32 +1,33 @@
 import React from 'react';
 
 import { Controlled, } from "react-codemirror2";
-import { Checkbox, FLAT_THEME, Select, Tooltip, Toast, } from "ui";
+import { Checkbox, FLAT_THEME, Select, Toast, } from "ui";
 import { Review } from "./Review/Review";
-import { Lightbulb, } from "icons";
-import { CongratsModal } from "./CongratsModal/CongratsModal.tsx";
-import { ExerciseOutput, HasOutput } from "./ExerciseOutput/ExerciseOutput.tsx";
-import { ExerciseFormHeader } from "./ExerciseFormHeader/ExerciseFormHeader.tsx";
+import { CongratsModal } from "./CongratsModal/CongratsModal";
+import { ExerciseOutput, HasOutput } from "./ExerciseOutput/ExerciseOutput";
+import { ExerciseFormHeader } from "./ExerciseFormHeader/ExerciseFormHeader";
+import Controls from "./Controls/Controls";
 import { ThemeContext } from "ui";
 
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { connect } from "react-redux";
 
-import { exerciseSolutions, loadFromCache, saveToCache } from "src/utils/localStorageManager";
+import { exerciseSolutions, loadFromCache, saveToCache } from "src/utils/localStorageManager.js";
 
-import { sendCode, addReviewComment, deleteReviewComment, } from "src/actions/course";
-import { userProgressVisitAcceptedSolutions } from "src/actions/userProgress";
-
+import { Language } from "src/consts/languages";
 import { constructPathToAcceptedSolutions, } from "src/consts/routes";
 import {
 	AutomaticExerciseCheckingResult as CheckingResult,
 	AutomaticExerciseCheckingProcessStatus as ProcessStatus,
 	SolutionRunStatus,
-} from "src/models/exercise.ts";
-import { userType } from "src/components/comments/commonPropTypes";
+	SubmissionInfo,
+	RunSolutionResponse,
+	ReviewInfo,
+	AttemptsStatistics,
+} from "src/models/exercise";
+import { AccountState } from "src/models/reduxState";
+import { SlideUserProgress } from "src/models/userProgress";
 
-import CodeMirror from 'codemirror/lib/codemirror';
+import CodeMirror, { Doc, Editor, EditorChange, EditorConfiguration, TextMarker } from "codemirror";
 import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/addon/hint/show-hint';
 import 'codemirror/addon/hint/show-hint.css';
@@ -38,31 +39,99 @@ import './CodeMirrorAutocompleteExtension';
 import styles from './Exercise.less';
 
 import texts from './Exercise.texts';
-import { GetSubmissionColor } from "./ExerciseUtils.ts";
 import {
+	GetLastSuccessSubmission,
+	GetSubmissionColor,
 	HasSuccessSubmission,
-	IsFirstRightAnswer,
+	IsFirstRightAnswer, SubmissionColor,
 	SubmissionIsLast,
-	SubmissionIsLastSuccess
 } from "./ExerciseUtils";
-
-import Controls, {
-	SubmitButton,
-	ShowHintButton,
-	OutputButton,
-	ResetButton,
-	StatisticsHint,
-	AcceptedSolutionsButton
-} from "./Controls/Controls";
 
 const editThemeName = 'darcula';
 const defaultThemeName = 'default';
 const newTry = { id: -1 };
 
-class Exercise extends React.Component {
-	constructor(props) {
+interface ExerciseBlockProps {
+	languages: Language[],
+	languageNames: EnumDictionary<Language, string> | null,
+	hints: string[],
+	exerciseInitialCode: string,
+	hideSolutions: boolean,
+	expectedOutput: string,
+	submissions: SubmissionInfo[],
+	attemptsStatistics: AttemptsStatistics
+}
+
+interface DispatchFunctionsProps {
+	sendCode: (courseId: string, slideId: string, value: string, language: Language) => unknown;
+	addReviewComment: (courseId: string, slideId: string, submissionId: number, reviewId: number, text: string) => unknown;
+	deleteReviewComment:
+		(courseId: string, slideId: string, submissionId: number, reviewId: number, commentId: number) => unknown;
+	visitAcceptedSolutions: (courseId: string, slideId: string) => unknown;
+}
+
+interface FromSlideProps {
+	courseId: string,
+	slideId: string,
+	maxScore: number,
+	forceInitialCode: boolean,
+}
+
+interface FromMapStateToProps {
+	isAuthenticated: boolean,
+	lastCheckingResponse: RunSolutionResponse | null,
+	author: AccountState,
+	slideProgress: SlideUserProgress,
+	submissionError: string,
+}
+
+interface Props extends ExerciseBlockProps, DispatchFunctionsProps, FromSlideProps, FromMapStateToProps {
+	className: string,
+}
+
+interface ModalData {
+	score: number | null,
+	waitingForManualChecking: boolean | null,
+}
+
+interface SelfCheckup {
+	text: string,
+	checked: boolean,
+	onClick: () => void,
+}
+
+interface ReviewInfoWithMarker extends ReviewInfo {
+	marker: TextMarker,
+}
+
+interface State {
+	value: string,
+	valueChanged: boolean,
+
+	isEditable: boolean,
+
+	language: Language,
+
+	congratsModalData: ModalData | null,
+
+	submissionLoading: boolean,
+	isAllHintsShowed: boolean,
+	visibleCheckingResponse?: RunSolutionResponse, // Не null только если только что сделанная посылка не содержит submission
+	currentSubmission: null | SubmissionInfo,
+	currentReviews: ReviewInfoWithMarker[],
+	selectedReviewId: number,
+	showOutput: boolean,
+
+	editor: null | Editor,
+	exerciseCodeDoc: null | Doc,
+
+	selfChecks: SelfCheckup[],
+}
+
+class Exercise extends React.Component<Props, State> {
+	constructor(props: Props) {
 		super(props);
-		const { exerciseInitialCode, submissions, languages, } = props;
+		const { exerciseInitialCode, submissions, languages, hints, } = props;
 
 		this.state = {
 			value: exerciseInitialCode,
@@ -72,11 +141,11 @@ class Exercise extends React.Component {
 
 			language: languages[0],
 
-			showedHintsCount: 0,
 			congratsModalData: null,
 
 			submissionLoading: false,
-			visibleCheckingResponse: null, // Не null только если только что сделанная посылка не содержит submission
+			isAllHintsShowed: hints.length === 0,
+			visibleCheckingResponse: undefined,
 			currentSubmission: null,
 			currentReviews: [],
 			selectedReviewId: -1,
@@ -90,10 +159,10 @@ class Exercise extends React.Component {
 				checked: false,
 				onClick: () => this.onSelfCheckBoxClick(i)
 			})),
-		}
+		};
 	}
 
-	componentDidMount() {
+	componentDidMount(): void {
 		const { forceInitialCode, } = this.props;
 		this.overrideCodeMirrorAutocomplete();
 
@@ -106,7 +175,7 @@ class Exercise extends React.Component {
 		window.addEventListener("beforeunload", this.saveCodeDraftToCache);
 	}
 
-	loadSlideSubmission = () => {
+	loadSlideSubmission = (): void => {
 		const { slideId, submissions, } = this.props;
 
 		if(submissions.length > 0) {
@@ -114,9 +183,9 @@ class Exercise extends React.Component {
 		} else {
 			this.loadCodeFromCache(slideId);
 		}
-	}
+	};
 
-	componentDidUpdate(prevProps, prevState, snapshot) {
+	componentDidUpdate(prevProps: Props): void {
 		const { lastCheckingResponse, courseId, slideId, submissions, forceInitialCode, submissionError, } = this.props;
 		const { currentSubmission, submissionLoading, showOutput, selectedReviewId, } = this.state;
 
@@ -135,13 +204,13 @@ class Exercise extends React.Component {
 
 		if(courseId !== prevProps.courseId || slideId !== prevProps.slideId) {
 			this.loadSlideSubmission();
-			this.setState({ showedHintsCount: 0 });
+			//this.setState({ showedHintsCount: 0 });
 			return;
 		}
 
 		const hasNewLastCheckingResponse = lastCheckingResponse
 			&& lastCheckingResponse !== prevProps.lastCheckingResponse; // Сравнение по ссылкам
-		if(hasNewLastCheckingResponse) {
+		if(hasNewLastCheckingResponse && lastCheckingResponse) {
 			const { submission, solutionRunStatus } = lastCheckingResponse;
 
 			if(submission) {
@@ -162,7 +231,7 @@ class Exercise extends React.Component {
 				});
 			}
 
-			if(solutionRunStatus === SolutionRunStatus.Success) {
+			if(submission && solutionRunStatus === SolutionRunStatus.Success) {
 				const { automaticChecking } = submission;
 
 				if((!automaticChecking || automaticChecking.result === CheckingResult.RightAnswer)
@@ -176,38 +245,42 @@ class Exercise extends React.Component {
 		} else if(currentSubmission) {
 			const submission = submissions.find(s => s.id === currentSubmission.id);
 
-			if(currentSubmission !== submission) { // Сравнение по ссылке. Отличаться должны только в случае изменения комментериев
+			if(submission && currentSubmission !== submission) { // Сравнение по ссылке. Отличаться должны только в случае изменения комментериев
 				this.setCurrentSubmission(submission,
 					() => this.highlightReview(selectedReviewId)); //Сохраняем выделение выбранного ревью
 			}
 		}
 	}
 
-	overrideCodeMirrorAutocomplete = () => {
-		CodeMirror.commands.autocomplete = (cm) => {
+	overrideCodeMirrorAutocomplete = (): void => {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore because autocomplete will be added by js addon script
+		CodeMirror.commands.autocomplete = (cm: Editor) => {
 			const { language, } = this.state;
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			const hint = CodeMirror.hint[language.toLowerCase()];
 			if(hint) {
 				cm.showHint({ hint: hint });
 			}
 		};
-	}
+	};
 
-	saveCodeDraftToCache = () => {
+	saveCodeDraftToCache = (): void => {
 		const { slideId, forceInitialCode, } = this.props;
 		const { value, } = this.state;
 
 		if(!forceInitialCode) {
 			this.saveCodeToCache(slideId, value);
 		}
-	}
+	};
 
-	componentWillUnmount() {
+	componentWillUnmount(): void {
 		this.saveCodeDraftToCache();
 		window.removeEventListener("beforeunload", this.saveCodeDraftToCache);
 	}
 
-	render() {
+	render(): React.ReactElement {
 		const { className, } = this.props;
 
 		const opts = this.codeMirrorOptions;
@@ -219,7 +292,7 @@ class Exercise extends React.Component {
 		);
 	}
 
-	get codeMirrorOptions() {
+	get codeMirrorOptions(): EditorConfiguration {
 		const { isAuthenticated, } = this.props;
 		const { isEditable, language } = this.state;
 
@@ -236,7 +309,7 @@ class Exercise extends React.Component {
 			indentWithTabs: true,
 			extraKeys: {
 				ctrlSpace: "autocomplete",
-				".": function (cm) {
+				".": function (cm: Editor) {
 					setTimeout(function () {
 						cm.execCommand("autocomplete");
 					}, 100);
@@ -246,7 +319,7 @@ class Exercise extends React.Component {
 		};
 	}
 
-	renderControlledCodeMirror = (opts) => {
+	renderControlledCodeMirror = (opts: EditorConfiguration): React.ReactElement => {
 		const {
 			expectedOutput, submissions, author,
 			slideProgress, maxScore, languages,
@@ -254,18 +327,19 @@ class Exercise extends React.Component {
 			attemptsStatistics,
 		} = this.props;
 		const {
-			value, showedHintsCount, currentSubmission,
+			value, currentSubmission,
 			isEditable, exerciseCodeDoc, congratsModalData,
 			currentReviews, showOutput, selectedReviewId, visibleCheckingResponse,
-			submissionLoading, valueChanged,
+			submissionLoading, valueChanged, isAllHintsShowed,
 		} = this.state;
 
 		const isReview = !isEditable && currentReviews.length > 0;
 		const automaticChecking = currentSubmission?.automaticChecking ?? visibleCheckingResponse?.automaticChecking;
 		const selectedSubmissionIsLast = SubmissionIsLast(submissions, currentSubmission);
-		const selectedSubmissionIsLastSuccess = SubmissionIsLastSuccess(submissions, currentSubmission);
+		const selectedSubmissionIsLastSuccess = GetLastSuccessSubmission(submissions) === currentSubmission;
 		const isMaxScore = slideProgress.score === maxScore;
-		const submissionColor = GetSubmissionColor(visibleCheckingResponse?.solutionRunStatus, automaticChecking?.result,
+		const submissionColor = GetSubmissionColor(visibleCheckingResponse?.solutionRunStatus,
+			automaticChecking?.result,
 			HasSuccessSubmission(submissions), selectedSubmissionIsLast, selectedSubmissionIsLastSuccess,
 			slideProgress.prohibitFurtherManualChecking, slideProgress.isSkipped, isMaxScore);
 
@@ -288,7 +362,8 @@ class Exercise extends React.Component {
 			<React.Fragment>
 				{ submissions.length !== 0 && this.renderSubmissionsSelect() }
 				{ languages.length > 1 && (submissions.length > 0 || isEditable) && this.renderLanguageSelect() }
-				{ !isEditable && this.renderHeader(submissionColor, selectedSubmissionIsLast, selectedSubmissionIsLastSuccess) }
+				{ !isEditable && this.renderHeader(submissionColor, selectedSubmissionIsLast,
+					selectedSubmissionIsLastSuccess) }
 				<div className={ wrapperClassName }>
 					<Controlled
 						onBeforeChange={ this.onBeforeChange }
@@ -313,25 +388,24 @@ class Exercise extends React.Component {
 				</div>
 				{/* TODO not included in current release !isEditable && currentSubmission && this.renderOverview(currentSubmission)*/ }
 				<Controls>
-					<SubmitButton
+					<Controls.SubmitButton
 						valueChanged={ valueChanged }
 						submissionLoading={ submissionLoading }
 						onSendExerciseButtonClicked={ this.sendExercise }
 					/>
 					{ hints.length !== 0 &&
-					<ShowHintButton
-						countOfHints={ hints.length }
-						showedHintsCount={ showedHintsCount }
-						showHint={ this.showHint }
+					<Controls.ShowHintButton
+						onAllHintsShowed={ this.onAllHintsShowed }
+						hints={ hints }
 					/> }
-					{ isEditable && <ResetButton onResetButtonClicked={ this.resetCodeAndCache }/> }
-					{ (!isEditable && hasOutput) && <OutputButton
+					{ isEditable && <Controls.ResetButton onResetButtonClicked={ this.resetCodeAndCache }/> }
+					{ (!isEditable && hasOutput) && <Controls.OutputButton
 						showOutput={ showOutput }
 						onShowOutputButtonClicked={ this.toggleOutput }
 					/> }
-					<StatisticsHint attemptsStatistics={ attemptsStatistics }/>
-					{ (!hideSolutions && (hints.length === showedHintsCount || isShowAcceptedSolutionsAvailable))
-					&& <AcceptedSolutionsButton
+					<Controls.StatisticsHint attemptsStatistics={ attemptsStatistics }/>
+					{ (!hideSolutions && (isAllHintsShowed || isShowAcceptedSolutionsAvailable))
+					&& <Controls.AcceptedSolutionsButton
 						acceptedSolutionsUrl={ constructPathToAcceptedSolutions(courseId, slideId) }
 						onVisitAcceptedSolutions={ this.onVisitAcceptedSolutions }
 						isShowAcceptedSolutionsAvailable={ isShowAcceptedSolutionsAvailable }
@@ -346,38 +420,44 @@ class Exercise extends React.Component {
 					submissionColor={ submissionColor }
 				/>
 				}
-				{ showedHintsCount > 0 && this.renderHints() }
 				{ congratsModalData && this.renderCongratsModal(congratsModalData) }
 			</React.Fragment>
-		)
-	}
+		);
+	};
 
-	getReviewsWithoutDeleted = (reviews) => {
+	onAllHintsShowed = (): void => {
+		this.setState({
+			isAllHintsShowed: true
+		});
+	};
+
+	getReviewsWithoutDeleted = (reviews: ReviewInfoWithMarker[]) => {
 		return reviews.map(r => ({ ...r, comments: r.comments.filter(c => !c.isDeleted && !c.isLoading) }));
-	}
+	};
 
-	getReviewAnchorTop = (review) => {
-		const { exerciseCodeDoc, } = this.state;
+	getReviewAnchorTop = (review: ReviewInfo): number => {
+		const { editor, } = this.state;
 
-		return exerciseCodeDoc.cm.charCoords({
-			line: review.startLine,
-			ch: review.startPosition,
-		}, 'local').top;
-	}
+		if(editor) {
+			return editor.charCoords({
+				line: review.startLine,
+				ch: review.startPosition,
+			}, 'local').top;
+		}
+		return -1;
+	};
 
-	renderSubmissionsSelect = () => {
+	renderSubmissionsSelect = (): React.ReactElement => {
 		const { currentSubmission } = this.state;
 		const { submissions, } = this.props;
 		const { waitingForManualChecking } = this.props.slideProgress;
 
-		const submissionsWithNewTry = [newTry, ...submissions,];
-		const items = submissionsWithNewTry.map((submission) => {
-			const isLastSuccess = SubmissionIsLastSuccess(submissions, submission);
-			const caption = submission === newTry
-				? texts.submissions.newTry
-				: texts.submissions.getSubmissionCaption(submission, isLastSuccess, waitingForManualChecking)
+		const lastSuccessSubmission = GetLastSuccessSubmission(submissions);
+		const items = [[newTry.id, texts.submissions.newTry], ...submissions.map((submission) => {
+			const caption = texts.submissions
+				.getSubmissionCaption(submission, lastSuccessSubmission === submission, waitingForManualChecking);
 			return [submission.id, caption];
-		});
+		})];
 
 		return (
 			<div className={ styles.select }>
@@ -386,14 +466,23 @@ class Exercise extends React.Component {
 						width={ '100%' }
 						items={ items }
 						value={ currentSubmission?.id || newTry.id }
-						onValueChange={ (id) => this.loadSubmissionToState(submissionsWithNewTry.find(s => s.id === id)) }
+						onValueChange={ this.onSubmissionsSelectValueChange }
 					/>
 				</ThemeContext.Provider>
 			</div>
 		);
-	}
+	};
 
-	renderLanguageSelect = () => {
+	onSubmissionsSelectValueChange = (id: unknown): void => {
+		const { submissions, } = this.props;
+
+		if(id === newTry.id) {
+			this.loadNewTry();
+		}
+		this.loadSubmissionToState(submissions.find(s => s.id === id));
+	};
+
+	renderLanguageSelect = (): React.ReactElement => {
 		const { language } = this.state;
 		const { languages, languageNames } = this.props;
 
@@ -408,18 +497,25 @@ class Exercise extends React.Component {
 						width={ '100%' }
 						items={ items }
 						value={ language }
-						onValueChange={ (l) => this.setState({ language: l }) }
+						onValueChange={ this.onLanguageSelectValueChange }
 					/>
 				</ThemeContext.Provider>
 			</div>
 		);
-	}
+	};
 
-	renderHeader = (submissionColor, selectedSubmissionIsLast, selectedSubmissionIsLastSuccess) => {
+	onLanguageSelectValueChange = (l: unknown): void => {
+		this.setState({ language: l as Language });
+	};
+
+	renderHeader = (submissionColor: SubmissionColor, selectedSubmissionIsLast: boolean,
+		selectedSubmissionIsLastSuccess: boolean
+	): React.ReactNode => {
 		const { currentSubmission, visibleCheckingResponse } = this.state;
 		const { waitingForManualChecking, prohibitFurtherManualChecking, score } = this.props.slideProgress;
-		if(!currentSubmission && !visibleCheckingResponse)
+		if(!currentSubmission && !visibleCheckingResponse) {
 			return null;
+		}
 		return (
 			<ExerciseFormHeader
 				solutionRunStatus={ visibleCheckingResponse ? visibleCheckingResponse.solutionRunStatus : null }
@@ -432,15 +528,11 @@ class Exercise extends React.Component {
 				submissionColor={ submissionColor }
 			/>
 		);
-	}
+	};
 
-	loadSubmissionToState = (submission,) => {
+	loadSubmissionToState = (submission?: SubmissionInfo): void => {
 		const { valueChanged, } = this.state;
 
-		if(submission === newTry) {
-			this.loadNewTry();
-			return;
-		}
 		if(valueChanged) {
 			this.saveCodeDraftToCache();
 		}
@@ -449,46 +541,58 @@ class Exercise extends React.Component {
 		// Firstly we updating code in code mirror
 		// when code is rendered we attaching reviewMarkers and loading reviews
 		// after all is done we refreshing editor to refresh layout and sizes depends on reviews sizes
-		this.setState({
-				value: submission.code,
-				language: submission.language,
-				isEditable: false,
-				valueChanged: false,
-				showOutput: false,
-				visibleCheckingResponse: null,
-				currentReviews: [],
-			}, () =>
-				this.setCurrentSubmission(submission)
-		);
-	}
+		if(submission) {
+			this.setState({
+					value: submission.code,
+					language: submission.language,
+					isEditable: false,
+					valueChanged: false,
+					showOutput: false,
+					visibleCheckingResponse: undefined,
+					currentReviews: [],
+				}, () =>
+					this.setCurrentSubmission(submission)
+			);
+		}
+	};
 
-	setCurrentSubmission = (submission, callback) => {
+	setCurrentSubmission = (submission: SubmissionInfo, callback?: () => void): void => {
 		this.clearAllTextMarkers();
 		this.setState({
 			currentSubmission: submission,
 			currentReviews: this.getReviewsWithTextMarkers(submission),
 		}, () => {
-			this.state.editor.refresh();
+			const { editor } = this.state;
+			if(editor) {
+				editor.refresh();
+			}
 			if(callback) {
 				callback();
 			}
-		})
-	}
+		});
+	};
 
-	openModal = (data) => {
+	openModal = (data: ModalData | null): void => {
 		this.setState({
 			congratsModalData: data,
-		})
-	}
+		});
+	};
 
-	getReviewsWithTextMarkers = (submission) => {
+	getReviewsWithTextMarkers = (submission: SubmissionInfo): ReviewInfoWithMarker[] => {
+		const { exerciseCodeDoc } = this.state;
 		const reviews = this.getAllReviewsFromSubmission(submission);
 
-		const reviewsWithTextMarkers = [];
+		const reviewsWithTextMarkers: ReviewInfoWithMarker[] = [];
+
+		if(!exerciseCodeDoc) {
+			return reviewsWithTextMarkers;
+		}
 
 		for (const review of reviews) {
 			const { finishLine, finishPosition, startLine, startPosition } = review;
-			const textMarker = this.highlightLine(finishLine, finishPosition, startLine, startPosition, styles.reviewCode);
+			const textMarker = this.highlightLine(finishLine, finishPosition, startLine, startPosition,
+				styles.reviewCode,
+				exerciseCodeDoc);
 
 			reviewsWithTextMarkers.push({
 				marker: textMarker,
@@ -497,9 +601,9 @@ class Exercise extends React.Component {
 		}
 
 		return reviewsWithTextMarkers;
-	}
+	};
 
-	getAllReviewsFromSubmission = (submission) => {
+	getAllReviewsFromSubmission = (submission: SubmissionInfo): ReviewInfo[] => {
 		if(!submission) {
 			return [];
 		}
@@ -507,9 +611,9 @@ class Exercise extends React.Component {
 		const manual = submission.manualCheckingReviews || [];
 		const auto = submission.automaticChecking && submission.automaticChecking.reviews ? submission.automaticChecking.reviews : [];
 		return manual.concat(auto);
-	}
+	};
 
-	renderOverview = (submission) => {
+	renderOverview = (submission: SubmissionInfo): React.ReactElement => {
 		const { selfChecks } = this.state;
 		const checkups = [
 			{
@@ -526,27 +630,28 @@ class Exercise extends React.Component {
 			},
 		];
 
-		if(submission.automaticChecking.reviews !== 0) {
+		const reviewsLength = submission?.automaticChecking?.reviews?.length || 0;
+		if(reviewsLength !== 0) {
 			checkups.unshift(
 				{
 					title: texts.checkups.bot.title,
 					content:
 						<span className={ styles.overviewComment }>
-						{ texts.checkups.bot.countBotComments(submission.automaticChecking.reviews) }
-							<a onClick={ this.showFirstBotComment }>{ texts.showReview }</a>
+						{ texts.checkups.bot.countBotComments(reviewsLength) }
+							<a onClick={ this.showFirstBotComment }>{ texts.checkups.showReview }</a>
 					</span>
 				});
 		}
 
 		if(submission.manualCheckingReviews.length !== 0) {
-			const reviewsCount = submission.reviews.length;
+			const reviewsCount = submission?.manualCheckingReviews?.length || 0;
 
 			checkups.unshift({
 				title: texts.checkups.teacher.title,
 				content:
 					<span className={ styles.overviewComment }>
 						{ texts.checkups.teacher.countTeacherReviews(reviewsCount) }
-						<a onClick={ this.showFirstComment }>{ texts.showReview }</a>
+						<a onClick={ this.showFirstComment }>{ texts.checkups.showReview }</a>
 					</span>
 			});
 		}
@@ -561,9 +666,9 @@ class Exercise extends React.Component {
 				) }
 			</ul>
 		);
-	}
+	};
 
-	renderSelfCheckBoxes = (selfChecks) => {
+	renderSelfCheckBoxes = (selfChecks: SelfCheckup[]): React.ReactNode => {
 		return (
 			selfChecks.map(({ text, checked, onClick, }, i) =>
 				<li key={ i }>
@@ -572,9 +677,9 @@ class Exercise extends React.Component {
 				</li>
 			)
 		);
-	}
+	};
 
-	onSelfCheckBoxClick = (i) => {
+	onSelfCheckBoxClick = (i: number): void => {
 		const { selfChecks } = this.state;
 		const newSelfChecks = [...selfChecks];
 
@@ -583,29 +688,13 @@ class Exercise extends React.Component {
 		this.setState({
 			selfChecks: newSelfChecks,
 		});
-	}
+	};
 
-	renderHints = () => {
-		const { showedHintsCount } = this.state;
-		const { hints } = this.props;
-
-		return (
-			<ul className={ styles.hintsWrapper }>
-				{ hints.slice(0, showedHintsCount)
-					.map((h, i) =>
-						<li key={ i }>
-							<span className={ styles.hintBulb }><Lightbulb/></span>
-							{ h }
-						</li>
-					) }
-			</ul>
-		)
-	}
-
-	renderCongratsModal = ({ score, waitingForManualChecking, }) => {
+	renderCongratsModal = ({ score, waitingForManualChecking, }: ModalData): React.ReactNode => {
 		const { hideSolutions, } = this.props;
 
 		return (
+			score && waitingForManualChecking &&
 			<CongratsModal
 				showAcceptedSolutions={ !waitingForManualChecking && !hideSolutions }
 				score={ score }
@@ -613,44 +702,54 @@ class Exercise extends React.Component {
 				onClose={ this.closeCongratsModal }
 			/>
 		);
-	}
+	};
 
-	showFirstComment = () => {
+	showFirstComment = (): void => {
 		//TODO
-	}
+	};
 
-	showFirstBotComment = () => {
+	showFirstBotComment = (): void => {
 		//TODO
-	}
+	};
 
-	selectComment = (e, id,) => {
+	selectComment = (e: React.MouseEvent<Element, MouseEvent> | React.FocusEvent, id: number,): void => {
 		const { isEditable, selectedReviewId, } = this.state;
 		e.stopPropagation();
 
 		if(!isEditable && selectedReviewId !== id) {
 			this.highlightReview(id);
 		}
-	}
+	};
 
-	highlightReview = (id) => {
-		const { currentReviews, selectedReviewId, editor, } = this.state;
+	highlightReview = (id: number): void => {
+		const { currentReviews, selectedReviewId, editor, exerciseCodeDoc, } = this.state;
 		const newCurrentReviews = [...currentReviews];
+
+		if(!exerciseCodeDoc) {
+			return;
+		}
 
 		if(selectedReviewId >= 0) {
 			const selectedReview = newCurrentReviews.find(r => r.id === selectedReviewId);
-			const { from, to, } = selectedReview.marker.find();
-			selectedReview.marker.clear();
-			selectedReview.marker = this.highlightLine(to.line, to.ch, from.line, from.ch, styles.reviewCode);
+			if(selectedReview) {
+				const { from, to, } = selectedReview.marker.find();
+				selectedReview.marker.clear();
+				selectedReview.marker =
+					this.highlightLine(to.line, to.ch, from.line, from.ch, styles.reviewCode, exerciseCodeDoc);
+			}
 		}
 
 		let line = 0;
 		if(id >= 0) {
 			const review = newCurrentReviews.find(r => r.id === id);
-			const { from, to, } = review.marker.find();
-			review.marker.clear();
-			review.marker = this.highlightLine(to.line, to.ch, from.line, from.ch, styles.selectedReviewCode);
+			if(review) {
+				const { from, to, } = review.marker.find();
+				review.marker.clear();
+				review.marker =
+					this.highlightLine(to.line, to.ch, from.line, from.ch, styles.selectedReviewCode, exerciseCodeDoc);
 
-			line = from.line;
+				line = from.line;
+			}
 		}
 
 		this.setState({
@@ -658,65 +757,42 @@ class Exercise extends React.Component {
 			selectedReviewId: id,
 		}, () => {
 			if(id >= 0) {
-				editor.scrollIntoView({ line, }, 200);
+				if(editor) {
+					editor.scrollIntoView({ ch: 0, line, }, 200);
+				}
 			}
 		});
-	}
+	};
 
-	highlightLine = (finishLine, finishPosition, startLine, startPosition, className) => {
-		const { exerciseCodeDoc } = this.state;
+	highlightLine = (finishLine: number, finishPosition: number, startLine: number, startPosition: number,
+		className: string, exerciseCodeDoc: Doc,
+	): TextMarker => exerciseCodeDoc.markText({
+		line: startLine,
+		ch: startPosition
+	}, {
+		line: finishLine,
+		ch: finishPosition
+	}, {
+		className,
+	});
 
-		return exerciseCodeDoc.markText({
-			line: startLine,
-			ch: startPosition
-		}, {
-			line: finishLine,
-			ch: finishPosition
-		}, {
-			className,
-		});
-	}
-
-	renderEditButton = (isReview) => {
+	renderEditButton = (isReview: boolean): React.ReactElement => {
 		return (
 			<div className={ classNames(styles.editButton, { [styles.editButtonWithReviews]: isReview }) }
-				 onClick={ this.enableEditing }>
+				 onClick={ this.loadNewTry }>
 				{ texts.controls.edit.text }
 			</div>
-		)
-	}
+		);
+	};
 
-	enableEditing = (e) => {
-		e.stopPropagation();
-
-		this.clearAllTextMarkers();
-		this.setState({
-			isEditable: true,
-			valueChanged: true,
-			currentSubmission: null,
-			visibleCheckingResponse: null,
-			currentReviews: [],
-			showOutput: false
-		})
-	}
-
-	showHint = () => {
-		const { showedHintsCount, } = this.state;
-		const { hints, } = this.props;
-
-		this.setState({
-			showedHintsCount: Math.min(showedHintsCount + 1, hints.length),
-		})
-	}
-
-	resetCodeAndCache = () => {
+	resetCodeAndCache = (): void => {
 		const { slideId, exerciseInitialCode, } = this.props;
 
 		this.resetCode();
 		this.saveCodeToCache(slideId, exerciseInitialCode);
-	}
+	};
 
-	resetCode = () => {
+	resetCode = (): void => {
 		const { exerciseInitialCode } = this.props;
 
 		this.clearAllTextMarkers();
@@ -725,13 +801,13 @@ class Exercise extends React.Component {
 			valueChanged: false,
 			isEditable: true,
 			currentSubmission: null,
-			visibleCheckingResponse: null,
+			visibleCheckingResponse: undefined,
 			currentReviews: [],
 			showOutput: false
 		});
-	}
+	};
 
-	clearAllTextMarkers = () => {
+	clearAllTextMarkers = (): void => {
 		const { currentReviews, } = this.state;
 
 		currentReviews.forEach(({ marker }) => marker.clear());
@@ -739,90 +815,95 @@ class Exercise extends React.Component {
 		this.setState({
 			selectedReviewId: -1,
 		});
-	}
+	};
 
-	loadNewTry = () => {
+	loadNewTry = (): void => {
 		const { slideId } = this.props;
 		this.resetCode();
 		this.loadCodeFromCache(slideId);
-	}
+	};
 
-	toggleOutput = () => {
+	toggleOutput = (): void => {
 		const { showOutput, } = this.state;
 
 		this.setState({
 			showOutput: !showOutput
-		})
-	}
+		});
+	};
 
-	onVisitAcceptedSolutions = () => {
+	onVisitAcceptedSolutions = (): void => {
 		const { courseId, slideId, visitAcceptedSolutions, } = this.props;
 
 		visitAcceptedSolutions(courseId, slideId);
-	}
+	};
 
-	closeCongratsModal = () => {
+	closeCongratsModal = (): void => {
 		this.setState({
 			congratsModalData: null,
-		})
-	}
+		});
+	};
 
-	sendExercise = () => {
+	sendExercise = (): void => {
 		const { value, language } = this.state;
-		const { courseId, slideId, } = this.props;
+		const { courseId, slideId, sendCode, } = this.props;
 
 		this.setState({
 			submissionLoading: true,
 		});
 
-		this.props.sendCode(courseId, slideId, value, language);
-	}
+		sendCode(courseId, slideId, value, language);
+	};
 
-	addReviewComment = (reviewId, text) => {
+	addReviewComment = (reviewId: number, text: string): void => {
 		const { addReviewComment, courseId, slideId, } = this.props;
 		const { currentSubmission, } = this.state;
 
-		addReviewComment(courseId, slideId, currentSubmission.id, reviewId, text);
-	}
+		if(currentSubmission) {
+			addReviewComment(courseId, slideId, currentSubmission.id, reviewId, text);
+		}
+	};
 
-	deleteReviewComment = (reviewId, commentId,) => {
+	deleteReviewComment = (reviewId: number, commentId: number,) => {
 		const { deleteReviewComment, courseId, slideId, } = this.props;
 		const { currentSubmission, } = this.state;
 
-		deleteReviewComment(courseId, slideId, currentSubmission.id, reviewId, commentId,);
-	}
+		if(currentSubmission) {
+			deleteReviewComment(courseId, slideId, currentSubmission.id, reviewId, commentId,);
+		}
+	};
 
-	isSubmitResultsContainsError = ({ automaticChecking }) => {
-		return automaticChecking.result === CheckingResult.CompilationError
-			|| automaticChecking.result === CheckingResult.WrongAnswer;
-	}
-
-	onBeforeChange = (editor, data, value) => {
+	onBeforeChange = (editor: Editor, data: EditorChange, value: string): void => {
 		this.setState({
 			value,
 			valueChanged: true,
 		});
-	}
+	};
 
-	onEditorMount = (editor) => {
+	onEditorMount = (editor: Editor): void => {
 		editor.setSize('auto', '100%');
 		this.setState({
 			exerciseCodeDoc: editor.getDoc(),
 			editor,
-		})
-	}
+		});
+	};
 
-	onCursorActivity = () => {
+	onCursorActivity = (): void => {
 		const { currentReviews, exerciseCodeDoc, isEditable, } = this.state;
-		const cursor = exerciseCodeDoc.getCursor();
+		if(exerciseCodeDoc) {
+			const cursor = exerciseCodeDoc.getCursor();
 
-		if(!isEditable && currentReviews.length > 0) {
-			const reviewId = Exercise.getSelectedReviewIdByCursor(currentReviews, exerciseCodeDoc, cursor);
-			this.highlightReview(reviewId);
+			if(!isEditable && currentReviews.length > 0) {
+				const reviewId = Exercise.getSelectedReviewIdByCursor(currentReviews, exerciseCodeDoc, cursor);
+				this.highlightReview(reviewId);
+			}
 		}
-	}
+	};
 
-	static getSelectedReviewIdByCursor = (reviews, exerciseCodeDoc, cursor) => {
+	static getSelectedReviewIdByCursor = (
+		reviews: ReviewInfoWithMarker[],
+		exerciseCodeDoc: Doc,
+		cursor: CodeMirror.Position
+	): number => {
 		const { line, ch } = cursor;
 		const reviewsUnderCursor = reviews.filter(r =>
 			r.startLine <= line && r.finishLine >= line
@@ -837,25 +918,26 @@ class Exercise extends React.Component {
 		reviewsUnderCursor.sort((a, b) => {
 			const aLength = Exercise.getReviewSelectionLength(a, exerciseCodeDoc);
 			const bLength = Exercise.getReviewSelectionLength(b, exerciseCodeDoc);
-			if(aLength !== bLength)
+			if(aLength !== bLength) {
 				return aLength - bLength;
+			}
+
 			return a.startLine !== b.startLine
 				? a.startLine - b.startLine
 				: a.startPosition !== b.startPosition
 					? a.startPosition - b.startPosition
-					: a.timestamp - b.timestamp
+					: new Date(a.addingTime ?? Math.random() * 10).getTime()
+					- new Date(b.addingTime ?? Math.random() * 10).getTime();
 		});
 
 		return reviewsUnderCursor[0].id;
-	}
+	};
 
-	static
-	getReviewSelectionLength = (review, exerciseCodeDoc) =>
+	static getReviewSelectionLength = (review: ReviewInfoWithMarker, exerciseCodeDoc: Doc): number =>
 		exerciseCodeDoc.indexFromPos({ line: review.finishLine, ch: review.finishPosition })
 		- exerciseCodeDoc.indexFromPos({ line: review.startLine, ch: review.startPosition });
 
-	static
-	loadLanguageStyles = (language) => {
+	static loadLanguageStyles = (language: string): string => {
 		switch (language.toLowerCase()) {
 			case 'csharp':
 				require('codemirror/mode/clike/clike');
@@ -900,91 +982,21 @@ class Exercise extends React.Component {
 				require('codemirror/mode/xml/xml');
 				return 'text/html';
 		}
-	}
+	};
 
-	saveCodeToCache = (slideId, value) => {
+	saveCodeToCache = (slideId: string, value: string): void => {
 		saveToCache(exerciseSolutions, slideId, value);
-	}
+	};
 
-	loadCodeFromCache = (slideId) => {
+	loadCodeFromCache = (slideId: string): void => {
 		const code = loadFromCache(exerciseSolutions, slideId);
 		if(code !== undefined) {
 			this.resetCode();
 			this.setState({
 				value: code,
-			})
+			});
 		}
-	}
-}
-
-const mapStateToProps = (state, { courseId, slideId, }) => {
-	const { slides, account, userProgress } = state;
-	const { submissionsByCourses, submissionError, } = slides;
-	let { lastCheckingResponse, } = slides;
-	let slideProgress = userProgress?.progress[courseId]?.[slideId] || {};
-
-	if(!(lastCheckingResponse && lastCheckingResponse.courseId === courseId && lastCheckingResponse.slideId === slideId))
-		lastCheckingResponse = null;
-
-	const submissions = Object.values(submissionsByCourses[courseId][slideId])
-		.filter((s, i, arr) =>
-			(i === arr.length - 1)
-			|| (!s.automaticChecking || s.automaticChecking.result === CheckingResult.RightAnswer));
-
-	//newer is first
-	submissions.sort((s1, s2) => (new Date(s2.timestamp) - new Date(s1.timestamp)));
-
-	return {
-		isAuthenticated: account.isAuthenticated,
-		submissions,
-		submissionError,
-		lastCheckingResponse,
-		author: account,
-		slideProgress
 	};
-};
-
-const mapDispatchToProps = (dispatch) => ({
-	sendCode: (courseId, slideId, code, language) => dispatch(sendCode(courseId, slideId, code, language)),
-	addReviewComment: (courseId, slideId, submissionId, reviewId, comment) => dispatch(addReviewComment(courseId, slideId, submissionId, reviewId, comment)),
-	deleteReviewComment: (courseId, slideId, submissionId, reviewId, comment) => dispatch(deleteReviewComment(courseId, slideId, submissionId, reviewId, comment)),
-	visitAcceptedSolutions: (courseId, slideId,) => dispatch(userProgressVisitAcceptedSolutions(courseId, slideId,)),
-});
-
-const exerciseBlockProps = {
-	languages: PropTypes.array.isRequired,
-	languageNames: PropTypes.object,
-	hints: PropTypes.array,
-	exerciseInitialCode: PropTypes.string,
-	hideSolutions: PropTypes.bool,
-	expectedOutput: PropTypes.string,
-	submissions: PropTypes.array,
-	attemptsStatistics: PropTypes.object,
-}
-const dispatchFunctionsProps = {
-	sendCode: PropTypes.func,
-	addCommentToReview: PropTypes.func,
-	deleteReviewComment: PropTypes.func,
-	visitAcceptedSolutions: PropTypes.func,
-}
-const fromSlideProps = {
-	courseId: PropTypes.string,
-	slideId: PropTypes.string,
-	maxScore: PropTypes.number,
-	forceInitialCode: PropTypes.bool,
-}
-const fromMapStateToProps = {
-	isAuthenticated: PropTypes.bool,
-	lastCheckingResponse: PropTypes.object,
-	author: userType,
-	slideProgress: PropTypes.object,
-}
-Exercise.propTypes = {
-	...exerciseBlockProps,
-	...dispatchFunctionsProps,
-	...fromSlideProps,
-	...fromMapStateToProps,
-	className: PropTypes.string,
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Exercise);
+export default Exercise;

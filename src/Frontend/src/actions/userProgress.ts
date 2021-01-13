@@ -69,11 +69,3 @@ export const loadUserProgress = (courseId: string, userId: string
 			});
 	};
 };
-
-
-export const userProgressVisitAcceptedSolutions = (courseId: string, slideId: string,)
-	: (dispatch: Dispatch<UserProgressUpdateAction>) => void => {
-	return (dispatch: Dispatch<UserProgressUpdateAction>) => {
-		dispatch(userProgressUpdateAction(courseId, slideId, { isSkipped: true }));
-	};
-};

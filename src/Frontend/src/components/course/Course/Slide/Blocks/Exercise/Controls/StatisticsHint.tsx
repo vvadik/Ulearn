@@ -3,16 +3,14 @@ import classNames from "classnames";
 
 import { Tooltip } from "ui";
 
+import { AttemptsStatistics } from "src/models/exercise";
+
 import styles from './Controls.less';
 
 import texts from "../Exercise.texts";
 
-interface Props {
-	attemptsStatistics: {
-		attemptedUsersCount: number,
-		usersWithRightAnswerCount: number,
-		lastSuccessAttemptDate?: string,
-	}
+export interface Props {
+	attemptsStatistics: AttemptsStatistics
 }
 
 function StatisticsHint({ attemptsStatistics }: Props): React.ReactElement {

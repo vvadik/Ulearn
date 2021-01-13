@@ -25,7 +25,7 @@ const submissionColorToStyle: EnumDictionary<SubmissionColor, string> = {
 	[SubmissionColor.NeedImprovements]: styles.needImprovementsOutput,
 	[SubmissionColor.MaxResult]: styles.maxResultOutput,
 	[SubmissionColor.Message]: styles.output,
-}
+};
 
 const outputTypeToHeader: EnumDictionary<OutputType, string> = {
 	[OutputType.CompilationError]: texts.headers.compilationError,
@@ -33,11 +33,11 @@ const outputTypeToHeader: EnumDictionary<OutputType, string> = {
 	[OutputType.ServerError]: texts.headers.serverError,
 	[OutputType.ServerMessage]: texts.headers.serverMessage,
 	[OutputType.Success]: texts.headers.output,
-}
+};
 
-type OutputTypeAndBody = { outputType: OutputType, body: string | null };
+type OutputTypeAndBody = { outputType: OutputType, body?: string | null };
 
-function HasOutput(message: string, automaticChecking: ExerciseAutomaticCheckingResponse,
+function HasOutput(message: string | null | undefined, automaticChecking: ExerciseAutomaticCheckingResponse | null | undefined,
 	expectedOutput: string
 ): boolean {
 	if(message) {
@@ -47,14 +47,14 @@ function HasOutput(message: string, automaticChecking: ExerciseAutomaticChecking
 		return false;
 	}
 	return !!automaticChecking.output
-		|| (automaticChecking.result === CheckingResult.WrongAnswer && !!expectedOutput)
+		|| (automaticChecking.result === CheckingResult.WrongAnswer && !!expectedOutput);
 }
 
 interface OutputTypeProps {
-	solutionRunStatus: SolutionRunStatus, // Success, если не посылка прямо сейчас
-	message: string | null,
+	solutionRunStatus?: SolutionRunStatus, // Success, если не посылка прямо сейчас
+	message?: string | null,
 	expectedOutput: string | null,
-	automaticChecking: ExerciseAutomaticCheckingResponse | null,
+	automaticChecking?: ExerciseAutomaticCheckingResponse | null,
 	submissionColor: SubmissionColor
 }
 
@@ -65,7 +65,7 @@ class ExerciseOutput extends React.Component<OutputTypeProps> {
 		const style = submissionColorToStyle[submissionColor];
 		const header = outputTypeToHeader[outputType];
 		const showIcon = outputType !== OutputType.Success;
-		const isWrongAnswer = outputType === OutputType.WrongAnswer
+		const isWrongAnswer = outputType === OutputType.WrongAnswer;
 		const isSimpleTextOutput = !expectedOutput || !isWrongAnswer;
 
 		return (
@@ -91,20 +91,20 @@ class ExerciseOutput extends React.Component<OutputTypeProps> {
 				return { outputType: OutputType.CompilationError, body: message };
 			case SolutionRunStatus.SubmissionCheckingTimeout:
 			case SolutionRunStatus.Ignored:
-				return { outputType: OutputType.ServerMessage, body: message }
+				return { outputType: OutputType.ServerMessage, body: message };
 			case SolutionRunStatus.InternalServerError:
-				return { outputType: OutputType.ServerError, body: message }
+				return { outputType: OutputType.ServerError, body: message };
 			case SolutionRunStatus.Success:
 				if(automaticChecking) {
 					return ExerciseOutput.getOutputTypeAndBodyFromAutomaticChecking(automaticChecking);
 				} else {
 					console.error(
 						new Error(`automaticChecking is null when solutionRunStatuses is ${ solutionRunStatus }`));
-					return { outputType: OutputType.Success, body: message }
+					return { outputType: OutputType.Success, body: message };
 				}
 			default:
 				console.error(new Error(`solutionRunStatus has unknown value ${ solutionRunStatus }`));
-				return { outputType: OutputType.ServerMessage, body: message }
+				return { outputType: OutputType.ServerMessage, body: message };
 		}
 	}
 
@@ -129,9 +129,9 @@ class ExerciseOutput extends React.Component<OutputTypeProps> {
 				break;
 			default:
 				console.error(new Error(`processStatuses has unknown value ${ automaticChecking.processStatus }`));
-				outputType = OutputType.ServerMessage
+				outputType = OutputType.ServerMessage;
 		}
-		return { outputType: outputType, body: output }
+		return { outputType: outputType, body: output };
 	}
 
 	static getOutputTypeByCheckingResults(automaticChecking: ExerciseAutomaticCheckingResponse): OutputType {
@@ -146,7 +146,7 @@ class ExerciseOutput extends React.Component<OutputTypeProps> {
 				return OutputType.ServerMessage;
 			default:
 				console.error(new Error(`checkingResults has unknown value ${ automaticChecking.result }`));
-				return OutputType.ServerMessage
+				return OutputType.ServerMessage;
 		}
 	}
 
@@ -158,7 +158,7 @@ class ExerciseOutput extends React.Component<OutputTypeProps> {
 					{ text }
 				</span>)
 			}
-		</div>
+		</div>;
 	}
 
 	static renderOutputLines(output: string, expectedOutput: string): React.ReactNode {
@@ -196,4 +196,4 @@ class ExerciseOutput extends React.Component<OutputTypeProps> {
 	}
 }
 
-export { ExerciseOutput, OutputTypeProps, HasOutput }
+export { ExerciseOutput, OutputTypeProps, HasOutput };

@@ -11,8 +11,8 @@ enum SubmissionColor {
 }
 
 function GetSubmissionColor(
-	solutionRunStatus: SolutionRunStatus | null,
-	checkingResult: CheckingResult | null, // null если automaticChecking null
+	solutionRunStatus: SolutionRunStatus | undefined,
+	checkingResult: CheckingResult | undefined, // undefined если automaticChecking null
 	hasSuccessSolution: boolean, // Задача прошла автопроверку или автопроверки нет?
 	selectedSubmissionIsLast: boolean, // Это последнее решение, прошедшее тесты?
 	selectedSubmissionIsLastSuccess: boolean, // Это последнее решение, прошедшее тесты?
@@ -49,10 +49,12 @@ function SubmissionIsLast(submissions: SubmissionInfo[], submission: SubmissionI
 	return submissions.length > 0 && submissions[0] === submission;
 }
 
-function SubmissionIsLastSuccess(submissions: SubmissionInfo[], submission: SubmissionInfo | null
-): boolean {
+function GetLastSuccessSubmission(submissions: SubmissionInfo[]): SubmissionInfo | null {
 	const successSubmissions = submissions.filter(IsSuccessSubmission);
-	return successSubmissions.length > 0 && successSubmissions[0] === submission;
+	if(successSubmissions.length > 0) {
+		return successSubmissions[0];
+	}
+	return null;
 }
 
 function IsFirstRightAnswer(submissions: SubmissionInfo[], successSubmission: SubmissionInfo): boolean {
@@ -65,6 +67,6 @@ export {
 	SubmissionColor,
 	HasSuccessSubmission,
 	SubmissionIsLast,
-	SubmissionIsLastSuccess,
+	GetLastSuccessSubmission,
 	IsFirstRightAnswer
-}
+};

@@ -6,6 +6,8 @@ import ShowAfterDelay from "src/components/ShowAfterDelay/ShowAfterDelay";
 import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent.js";
 import IControlWithText from "./IControlWithText";
 
+import ShowControlsTextContext from "./ShowControlsTextContext";
+
 import styles from './Controls.less';
 
 import texts from "../Exercise.texts";
@@ -16,7 +18,7 @@ interface State {
 	showAcceptedSolutions: boolean,
 }
 
-interface Props extends IControlWithText {
+export interface Props extends IControlWithText {
 	acceptedSolutionsUrl: string,
 	isShowAcceptedSolutionsAvailable: boolean,
 
@@ -32,7 +34,6 @@ export default class AcceptedSolutionsButton
 
 	render = (): React.ReactNode => {
 		const { showAcceptedSolutionsWarning, showAcceptedSolutions, } = this.state;
-		const { showControlsText, } = this.props;
 
 		return (
 			<React.Fragment>
@@ -45,7 +46,11 @@ export default class AcceptedSolutionsButton
 						<span className={ styles.exerciseControlsIcon }>
 							<EyeOpened/>
 						</span>
-						{ showControlsText && texts.controls.acceptedSolutions.text }
+						<ShowControlsTextContext.Consumer>
+						{
+							(showControlsText) => showControlsText && texts.controls.acceptedSolutions.text
+						}
+						</ShowControlsTextContext.Consumer>
 					</Tooltip>
 				</span>
 				{ showAcceptedSolutions && this.renderAcceptedSolutions() }
