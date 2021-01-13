@@ -19,12 +19,10 @@ import {
 	AutomaticExerciseCheckingResult as CheckingResult,
 	AutomaticExerciseCheckingProcessStatus as ProcessStatus,
 	SolutionRunStatus,
-	SubmissionInfo,
 	RunSolutionResponse,
-	ReviewInfo,
-	AttemptsStatistics,
+	AttemptsStatistics, ReviewInfo,
 } from "src/models/exercise";
-import { AccountState } from "src/models/reduxState";
+import { AccountState, ReviewInfoRedux, SubmissionInfoRedux } from "src/models/reduxState";
 import { SlideUserProgress } from "src/models/userProgress";
 
 import CodeMirror, { Doc, Editor, EditorChange, EditorConfiguration, TextMarker } from "codemirror";
@@ -58,13 +56,15 @@ interface ExerciseBlockProps {
 	exerciseInitialCode: string,
 	hideSolutions: boolean,
 	expectedOutput: string,
-	submissions: SubmissionInfo[],
+	submissions: SubmissionInfoRedux[],
 	attemptsStatistics: AttemptsStatistics
 }
 
 interface DispatchFunctionsProps {
 	sendCode: (courseId: string, slideId: string, value: string, language: Language) => unknown;
-	addReviewComment: (courseId: string, slideId: string, submissionId: number, reviewId: number, text: string) => unknown;
+	addReviewComment: (courseId: string, slideId: string, submissionId: number, reviewId: number,
+		text: string
+	) => unknown;
 	deleteReviewComment:
 		(courseId: string, slideId: string, submissionId: number, reviewId: number, commentId: number) => unknown;
 	visitAcceptedSolutions: (courseId: string, slideId: string) => unknown;
@@ -100,7 +100,7 @@ interface SelfCheckup {
 	onClick: () => void,
 }
 
-interface ReviewInfoWithMarker extends ReviewInfo {
+interface ReviewInfoWithMarker extends ReviewInfoRedux {
 	marker: TextMarker,
 }
 
@@ -117,7 +117,7 @@ interface State {
 	submissionLoading: boolean,
 	isAllHintsShowed: boolean,
 	visibleCheckingResponse?: RunSolutionResponse, // Не null только если только что сделанная посылка не содержит submission
-	currentSubmission: null | SubmissionInfo,
+	currentSubmission: null | SubmissionInfoRedux,
 	currentReviews: ReviewInfoWithMarker[],
 	selectedReviewId: number,
 	showOutput: boolean,
@@ -431,7 +431,7 @@ class Exercise extends React.Component<Props, State> {
 		});
 	};
 
-	getReviewsWithoutDeleted = (reviews: ReviewInfoWithMarker[]) => {
+	getReviewsWithoutDeleted = (reviews: ReviewInfoWithMarker[]): ReviewInfoWithMarker[] => {
 		return reviews.map(r => ({ ...r, comments: r.comments.filter(c => !c.isDeleted && !c.isLoading) }));
 	};
 
@@ -530,7 +530,7 @@ class Exercise extends React.Component<Props, State> {
 		);
 	};
 
-	loadSubmissionToState = (submission?: SubmissionInfo): void => {
+	loadSubmissionToState = (submission?: SubmissionInfoRedux): void => {
 		const { valueChanged, } = this.state;
 
 		if(valueChanged) {
@@ -556,7 +556,7 @@ class Exercise extends React.Component<Props, State> {
 		}
 	};
 
-	setCurrentSubmission = (submission: SubmissionInfo, callback?: () => void): void => {
+	setCurrentSubmission = (submission: SubmissionInfoRedux, callback?: () => void): void => {
 		this.clearAllTextMarkers();
 		this.setState({
 			currentSubmission: submission,
@@ -578,7 +578,7 @@ class Exercise extends React.Component<Props, State> {
 		});
 	};
 
-	getReviewsWithTextMarkers = (submission: SubmissionInfo): ReviewInfoWithMarker[] => {
+	getReviewsWithTextMarkers = (submission: SubmissionInfoRedux): ReviewInfoWithMarker[] => {
 		const { exerciseCodeDoc } = this.state;
 		const reviews = this.getAllReviewsFromSubmission(submission);
 
@@ -603,7 +603,7 @@ class Exercise extends React.Component<Props, State> {
 		return reviewsWithTextMarkers;
 	};
 
-	getAllReviewsFromSubmission = (submission: SubmissionInfo): ReviewInfo[] => {
+	getAllReviewsFromSubmission = (submission: SubmissionInfoRedux): ReviewInfoRedux[] => {
 		if(!submission) {
 			return [];
 		}
@@ -613,7 +613,7 @@ class Exercise extends React.Component<Props, State> {
 		return manual.concat(auto);
 	};
 
-	renderOverview = (submission: SubmissionInfo): React.ReactElement => {
+	renderOverview = (submission: SubmissionInfoRedux): React.ReactElement => {
 		const { selfChecks } = this.state;
 		const checkups = [
 			{

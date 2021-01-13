@@ -78,9 +78,6 @@ export interface ReviewCommentResponse {
 	renderedText: string;
 	publishTime: string;
 	author: ShortUserInfo;
-	//Redux fields
-	isDeleted: boolean,
-	isLoading: boolean,
 }
 
 export interface AttemptsStatistics {
