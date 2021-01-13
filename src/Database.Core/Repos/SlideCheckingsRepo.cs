@@ -212,8 +212,8 @@ namespace Database.Repos
 
 		public async Task<int> GetUserScoreForQuizSlide(string courseId, Guid slideId, string userId)
 		{
-			var manualScore = await GetSlideCheckingsByUser<ManualQuizChecking>(courseId, slideId, userId).Select(c => c.Score).DefaultIfEmpty(0).MaxAsync();
-			var automaticScore = await GetSlideCheckingsByUser<AutomaticQuizChecking>(courseId, slideId, userId).Select(c => c.Score).DefaultIfEmpty(0).MaxAsync();
+			var manualScore = await GetSlideCheckingsByUser<ManualQuizChecking>(courseId, slideId, userId).MaxAsync(c => (int?)c.Score) ?? 0;
+			var automaticScore = await GetSlideCheckingsByUser<AutomaticQuizChecking>(courseId, slideId, userId).MaxAsync(c => (int?)c.Score) ?? 0;
 			return automaticScore + manualScore;
 		}
 
