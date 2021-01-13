@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using AntiPlagiarism.Web.Database;
 using AntiPlagiarism.Web.Database.Models;
 using Database;
@@ -14,7 +15,7 @@ namespace ManualUtils
 {
 	internal class Program
 	{
-		public static void Main(string[] args)
+		public static async Task Main(string[] args)
 		{
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 			LoggerSetup.Setup(configuration.HostLog, configuration.GraphiteServiceName);
@@ -27,8 +28,8 @@ namespace ManualUtils
 				.UseSqlServer(configuration.Database);
 			var adb = new AntiPlagiarismDb(aOptionsBuilder.Options);
 
-			Users.PrintCourseAdmins(db);
-			//ScoresUpdater.UpdateTests(db, "java-rtf");
+			//Users.PrintCourseAdmins(db);
+			//await ScoresUpdater.UpdateTests(db, "java-rtf");
 			//GetMostSimilarSubmission(adb);
 			//ParsePairWeightsFromLogs();
 			//GetBlackAndWhiteLabels(db, adb);

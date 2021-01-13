@@ -142,7 +142,7 @@ namespace Database.DataContexts
 			var slideCheckingsByUser = GetSlideCheckingsByUser<T>(courseId, slideId, userId);
 			return slideCheckingsByUser switch
 			{
-				IQueryable<ICheckingWithNullableScore> mec => mec.Select(c => c.Score ?? 0).DefaultIfEmpty(0).Max(),
+				IQueryable<ICheckingWithNullableScore> mec => mec.Where(c => c.Score != null).Select(c => (int)c.Score).DefaultIfEmpty(0).Max(),
 				IQueryable<ICheckingWithNotNullScore> mqc => mqc.Select(c => c.Score).DefaultIfEmpty(0).Max(),
 				_ => throw new Exception()
 			};
@@ -160,7 +160,7 @@ namespace Database.DataContexts
 		{
 			return GetSlideCheckingsByUsers<T>(courseId, slideId, userIds)
 				.GroupBy(c => c.UserId)
-				.Select(g => new { UserId = g.Key, Score = g.Select(c => c.Score ?? 0).DefaultIfEmpty(0).Max() })
+				.Select(g => new { UserId = g.Key, Score = g.Where(c => c.Score != null).Select(c => (int)c.Score).DefaultIfEmpty(0).Max() })
 				.ToDictionary(g => g.UserId, g => g.Score);
 		}
 

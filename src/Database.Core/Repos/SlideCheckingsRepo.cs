@@ -139,8 +139,8 @@ namespace Database.Repos
 			var slideCheckingsByUser = GetSlideCheckingsByUser<T>(courseId, slideId, userId);
 			return slideCheckingsByUser switch
 			{
-				IQueryable<ICheckingWithNullableScore> mec => mec.Select(c => c.Score ?? 0).DefaultIfEmpty(0).Max(),
-				IQueryable<ICheckingWithNotNullScore> mqc => mqc.Select(c => c.Score).DefaultIfEmpty(0).Max(),
+				IQueryable<ICheckingWithNullableScore> mec => mec.Where(c => c.Score != null).Max(c => c.Score) ?? 0,
+				IQueryable<ICheckingWithNotNullScore> mqc => mqc.Max(c => (int?)c.Score) ?? 0,
 				_ => throw new Exception()
 			};
 		}
@@ -149,7 +149,7 @@ namespace Database.Repos
 		{
 			return GetSlideCheckingsByUsers<T>(courseId, slideId, userIds)
 				.GroupBy(c => c.UserId)
-				.Select(g => new { UserId = g.Key, Score = g.Select(c => c.Score).DefaultIfEmpty(0).Max() })
+				.Select(g => new { UserId = g.Key, Score = g.Max(c => (int?)c.Score) ?? 0 })
 				.ToDictionary(g => g.UserId, g => g.Score);
 		}
 
@@ -157,7 +157,7 @@ namespace Database.Repos
 		{
 			return GetSlideCheckingsByUsers<T>(courseId, slideId, userIds)
 				.GroupBy(c => c.UserId)
-				.Select(g => new { UserId = g.Key, Score = g.Select(c => c.Score ?? 0).DefaultIfEmpty(0).Max() })
+				.Select(g => new { UserId = g.Key, Score = g.Where(c => c.Score != null).Max(c => c.Score) ?? 0 })
 				.ToDictionary(g => g.UserId, g => g.Score);
 		}
 
