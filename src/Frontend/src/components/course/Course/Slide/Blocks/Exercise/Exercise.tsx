@@ -324,7 +324,7 @@ class Exercise extends React.Component<Props, State> {
 			expectedOutput, submissions, author,
 			slideProgress, maxScore, languages,
 			courseId, slideId, hideSolutions, hints,
-			attemptsStatistics,
+			attemptsStatistics, isAuthenticated
 		} = this.props;
 		const {
 			value, currentSubmission,
@@ -387,7 +387,7 @@ class Exercise extends React.Component<Props, State> {
 					}
 				</div>
 				{/* TODO not included in current release !isEditable && currentSubmission && this.renderOverview(currentSubmission)*/ }
-				<Controls>
+				{ isAuthenticated && <Controls>
 					<Controls.SubmitButton
 						valueChanged={ valueChanged }
 						submissionLoading={ submissionLoading }
@@ -411,6 +411,7 @@ class Exercise extends React.Component<Props, State> {
 						isShowAcceptedSolutionsAvailable={ isShowAcceptedSolutionsAvailable }
 					/> }
 				</Controls>
+				}
 				{ showOutput && HasOutput(visibleCheckingResponse?.message, automaticChecking, expectedOutput) &&
 				<ExerciseOutput
 					solutionRunStatus={ visibleCheckingResponse?.solutionRunStatus ?? SolutionRunStatus.Success }
