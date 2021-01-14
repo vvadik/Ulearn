@@ -13,8 +13,9 @@ describe('convertSnakeCaseToLowerCamelCase should', () => {
 		const argument = "argument_in_snake_case";
 
 		let result = convertSnakeCaseToLowerCamelCase(argument);
-		for (let i = 0; i < 5; i++)
+		for (let i = 0; i < 5; i++) {
 			result = convertSnakeCaseToLowerCamelCase(result);
+		}
 
 		expect(result).toEqual("argumentInSnakeCase");
 	});
@@ -48,8 +49,9 @@ describe('convertCamelCaseToSnakeCase should', () => {
 		const argument = "argumentInCamelCase";
 
 		let result = convertCamelCaseToSnakeCase(argument);
-		for (let i = 0; i < 5; i++)
+		for (let i = 0; i < 5; i++) {
 			result = convertCamelCaseToSnakeCase(result);
+		}
 
 		expect(result).toEqual("argument_in_camel_case");
 	});

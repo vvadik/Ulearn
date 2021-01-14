@@ -1,6 +1,6 @@
 //Works only with Latin letters
 
-export function convertSnakeCaseToLowerCamelCase(snakeCaseString: string | null): string | null {
+export function convertSnakeCaseToLowerCamelCase(snakeCaseString?: string | null): string | null {
 	if(snakeCaseString) {
 		const camelCase = snakeCaseString
 			.replace(/(_[a-z])/g, m => m[1].toUpperCase())
@@ -11,7 +11,7 @@ export function convertSnakeCaseToLowerCamelCase(snakeCaseString: string | null)
 	return null;
 }
 
-export function convertCamelCaseToSnakeCase(camelCaseString: string | null): string | null {
+export function convertCamelCaseToSnakeCase(camelCaseString?: string | null): string | null {
 	if(camelCaseString) {
 		const snakeCase = camelCaseString
 			.replace(/([A-Z])/g, "_$1")

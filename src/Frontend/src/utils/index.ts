@@ -1,3 +1,5 @@
+import { string } from "prop-types";
+
 export function getQueryStringParameter(name: string, url: string): string | null {
 	if(!url) {
 		url = window.location.href;
@@ -14,13 +16,12 @@ export function getQueryStringParameter(name: string, url: string): string | nul
 	return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
 
-export function buildQuery(params: Record<string, unknown>, convert: (str: string) => string): string | null {
+export function buildQuery(
+	params?: Record<string, unknown>,
+	convert?: (str: string) => string | null
+): string | null {
 	if(!params) {
 		return null;
-	}
-
-	if(!convert) {
-		convert = (str) => str;
 	}
 
 	const esc = encodeURIComponent;
@@ -32,6 +33,7 @@ export function buildQuery(params: Record<string, unknown>, convert: (str: strin
 	}
 
 	return '?' + notUndefinedParams
-		.map(key => convert(esc(key)) + '=' + esc(params[key] as string | number | boolean).toLowerCase())
+		.map(key => (convert ? convert(esc(key)) : esc(key)) + '=' + esc(
+			params[key] as string).toLowerCase())
 		.join('&');
 }

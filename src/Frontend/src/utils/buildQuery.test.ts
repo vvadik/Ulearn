@@ -19,9 +19,9 @@ describe('buildQuery should', () => {
 	test('work correct with simple converter', () => {
 		const params = { parameter1: true };
 
-		const result = buildQuery(params, (str) => "1");
+		const result = buildQuery(params, () => "1");
 
-		expect(result).toBe('?1=1');
+		expect(result).toBe('?1=true');
 	});
 
 	test('work correct with camelCaseToSnakeCase converter', () => {
@@ -53,10 +53,10 @@ describe('buildQuery should', () => {
 		[{ a: 'a', b: 2, c: 2.5 }, '?a=a&b=2&c=2.5'],
 		[{ a: 'a', b: 'b', c: 'c' }, '?a=a&b=b&c=c'],
 		[{ a: 'parameter with spaces' }, '?a=parameter%20with%20spaces'],
-		[{ a: true, b: false, NaN: NaN, null: null }, '?a=true&b=false&NaN=NaN&null=null'],
+		[{ a: true, b: false, NaN: NaN, null: null }, '?a=true&b=false&NaN=nan&null=null'],
 		[{ undefined: undefined }, null],
 		[{ a: undefined, b: undefined, c: undefined }, null],
-		[{ array: ['1', 2, true, null, NaN, undefined] }, '?array=1%2C2%2Ctrue%2C%2CNaN%2C'],
+		[{ array: ['1', 2, true, null, NaN, undefined] }, '?array=1%2c2%2ctrue%2c%2cnan%2c'],
 	])('%o params to be %s',
 		(params, expectedResult) => {
 			const result = buildQuery(params);

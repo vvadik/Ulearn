@@ -1,13 +1,16 @@
-export default function getPluralForm(count: number, one: string, some: string, many: string): string {
-	count %= 100;
-	if(count >= 5 && count <= 20) {
+export default function getPluralForm(count: number | string | undefined | null, one: string, some: string,
+	many: string
+): string {
+	let countAsNumber = count as number;
+	countAsNumber %= 100;
+	if(countAsNumber >= 5 && countAsNumber <= 20) {
 		return many;
 	}
-	count %= 10;
-	if(count === 1) {
+	countAsNumber %= 10;
+	if(countAsNumber === 1) {
 		return one;
 	}
-	if(count >= 2 && count < 5) {
+	if(countAsNumber >= 2 && countAsNumber < 5) {
 		return some;
 	}
 	return many;
