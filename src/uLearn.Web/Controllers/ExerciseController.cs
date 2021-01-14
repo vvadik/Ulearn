@@ -575,6 +575,27 @@ namespace uLearn.Web.Controllers
 			var fileName = (block as CsProjectExerciseBlock)?.CsprojFile.Name ?? new DirectoryInfo((block as UniversalExerciseBlock).ExerciseDirPath).Name;
 			return File(zipFile.FullName, "application/zip", fileName + ".zip");
 		}
+
+		[System.Web.Mvc.AllowAnonymous]
+		public ActionResult GetPdf(string courseId, Guid? slideId)
+		{
+			if (!slideId.HasValue)
+				return HttpNotFound();
+
+			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
+			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId.Value, isInstructor);
+			if (!(slide is ExerciseSlide))
+				return HttpNotFound();
+
+			if (!(slide is PolygonExerciseSlide polygonSlide))
+				return HttpNotFound();
+			
+			var pathToPdf = Path.Combine(polygonSlide.Info.Unit.Directory.FullName,
+				polygonSlide.PolygonPath, "statements", ".pdf", "russian", "problem.pdf"
+			);
+			return File(pathToPdf, "application/pdf", slide.LatinTitle);
+
+		}
 	}
 
 	[DataContract]

@@ -1,6 +1,8 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
 using Ulearn.Core.Courses.Slides.Blocks;
@@ -23,115 +25,74 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 
 		public override void BuildUp(SlideLoadingContext context)
 		{
-			var statementsFilePath = Path.Combine(context.Unit.Directory.FullName, PolygonPath, "statements", "russian", "problem-properties.json");
+			var statementsPath = Path.Combine(context.Unit.Directory.FullName, PolygonPath, "statements");
+			var statementsFilePath = Path.Combine(statementsPath, "russian", "problem-properties.json");
 			var json = File.ReadAllText(statementsFilePath);
 			var statements = JsonConvert.DeserializeObject<Statements>(json);
 			
+			Blocks = GetBlocksProblem(statementsPath, context.CourseId, Id)
+				.Concat(Blocks.Where(block => !(block is MarkdownBlock)))
+				.ToArray();
 			Title = statements.Name;
 			
-			var polygonExercise = Blocks.Single(block => block is PolygonExerciseBlock) as UniversalExerciseBlock;
-			polygonExercise.ExerciseDirPath = Path.Combine(PolygonPath);
-			(polygonExercise as PolygonExerciseBlock).MsPerTest = statements.TimeLimit;
+			var polygonExercise = Blocks.Single(block => block is PolygonExerciseBlock) as PolygonExerciseBlock;
+			polygonExercise!.ExerciseDirPath = Path.Combine(PolygonPath);
+			
+			var pathTests = Path.Combine(context.Unit.Directory.FullName, PolygonPath, "tests");
+			var countTests = Directory.GetFiles(pathTests)
+				.Count(filename => Regex.IsMatch(filename, @"\d+[^a]$"));
+			polygonExercise.MsPerTest = statements.TimeLimit;
+			polygonExercise.TimeLimit = statements.TimeLimit * countTests; // TimeLimit тут в мс
 
-			Blocks = new[] { GenerateDescription(statements) }
-				.Concat(Blocks)
-				.ToArray();
+				
 			base.BuildUp(context);
 		}
 
-		private MarkdownBlock GenerateDescription(Statements statements)
+		private IEnumerable<SlideBlock> GetBlocksProblem(string statementsPath, string courseId, Guid slideId)
 		{
-			return new MarkdownBlock
+			var markdownBlock = Blocks.FirstOrDefault(block => block is MarkdownBlock);
+			if (markdownBlock != null)
 			{
-				InnerBlocks = new SlideBlock[]
-				{
-					GenerateRestrictions(statements),
-					GenerateLegend(statements),
-					GenerateTestDescription(statements),
-					RenderInOutTable(statements.SampleTests),
-					GenerateNotes(statements)
-				}
-			};
-		}
-
-		private MarkdownBlock GenerateNotes(Statements statements)
-		{
-			return !string.IsNullOrEmpty(statements.Notes)
-				? new MarkdownBlock($"### Замечание\n{statements.Notes}") 
-				: new MarkdownBlock("</br>");
-		}
-
-		private MarkdownBlock GenerateRestrictions(Statements statements)
-		{
-			return new MarkdownBlock($"Ограничение по времени: {statements.TimeLimit / 1000d} сек.");
-		}
-
-		private MarkdownBlock GenerateLegend(Statements statements)
-		{
-			return new MarkdownBlock(statements.Legend);
-		}
-
-		private MarkdownBlock GenerateTestDescription(Statements statements)
-		{
-			var sb = new StringBuilder();
-			
-			sb.AppendLine("#### Формат входных данных");
-			sb.AppendLine(statements.Input);
-
-			sb.AppendLine("#### Формат выходных данных");
-			sb.AppendLine(statements.Output);
-
-			return new MarkdownBlock(sb.ToString());
-		}
-
-		private MarkdownBlock RenderInOutTable(SampleTest[] sampleTests)
-		{
-			var sb = new StringBuilder();
-			sb.AppendLine("#### Примеры");
-			sb.Append("<table>");
-			sb.Append("<thead>" +
-						"<tr>" +
-							"<th>Тест</th>" +
-							"<th>Ответ</th>" +
-						"</tr>" +
-					"</thead>");
-			foreach (var sampleTest in sampleTests)
+				yield return markdownBlock;
+			}
+			else if (Directory.Exists(Path.Combine(statementsPath, ".html")))
 			{
-				var inputLines = sampleTest.Input.Split('\r', '\n').Where(s => !string.IsNullOrEmpty(s));
-				var outputLines = sampleTest.Output.Split('\r', '\n').Where(s => !string.IsNullOrEmpty(s));
-				sb.Append("<tr>");
-				sb.Append($"<td>{string.Join("</br>", inputLines)}</td>");
-				sb.Append($"<td>{string.Join("</br>", outputLines)}</td>");
-				sb.Append("</tr>");
+				var htmlDirectoryPath = Path.Combine(statementsPath, ".html", "russian");
+				var htmlData = File.ReadAllText(Path.Combine(htmlDirectoryPath, "problem.html"));
+				var cssData = File.ReadAllText(Path.Combine(htmlDirectoryPath, "problem-statement.css"));
+				const string liMarker = "li:before { content: '' !important; }";  
+				yield return new HtmlBlock($"<style>{cssData}\n{liMarker}</style>");
+				yield return RenderFromHtml(htmlData, cssData);
 			}
 
-			sb.Append("</table>");
+			yield return GetLinkOnPdf(courseId, slideId.ToString());
+		}
+		private static SlideBlock RenderFromHtml(string html, string css)
+		{
+			// опробовать навесить tex на всё решение, чтобы обрабатывались даже в LI
+			var match = new Regex("(<DIV class=[\"']problem-statement['\"]>.*)</BODY>", RegexOptions.Singleline | RegexOptions.IgnoreCase)
+				.Match(html);
+			if (!match.Success)
+				throw new Exception();
+			var body = match.Groups[1].Value;
+			var processedBody = body
+				.Replace("$$$$$$", "$$")
+				.Replace("$$$", "$");
+			return new HtmlBlock($"<div class=\"tex\">{processedBody}</div>");
+		}
 
-			return new MarkdownBlock(sb.ToString());
+		private static HtmlBlock GetLinkOnPdf(string courseId, string slideId)
+		{
+			var link = $"/Exercise/GetPdf?courseId={courseId}&slideId={slideId}";
+			var tag = $"<a href=\"{link}\">Скачать PDF</a><p></p><p></p>";
+			return new HtmlBlock(tag);
+
 		}
 	}
 
 	public class Statements
 	{
 		public string Name { get; set; }
-		public string Scoring { get; set; }
-		public string Notes { get; set; }
-		public string Legend { get; set; }
-		public string AuthorName { get; set; }
-		public string AuthorLogin { get; set; }
-		public string Language { get; set; }
 		public int TimeLimit { get; set; }
-		public int MemoryLimit { get; set; }
-		public string Input { get; set; }
-		public string Output { get; set; }
-		public string InputFile { get; set; }
-		public string OutputFile { get; set; }
-		public SampleTest[] SampleTests { get; set; }
-	}
-
-	public class SampleTest
-	{
-		public string Input { get; set; }
-		public string Output { get; set; }
 	}
 }
