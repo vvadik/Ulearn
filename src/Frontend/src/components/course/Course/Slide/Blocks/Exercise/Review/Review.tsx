@@ -217,7 +217,7 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 			>
 				{ this.renderComment(review) }
 				{
-					comments.length > 0 && authorToRender.id !== botUser.id &&
+					comments.length > 0 &&
 					<ol className={ styles.commentRepliesList }>
 						{ comments.map((c, i) =>
 							<li className={ styles.commentReply } key={ i }>
@@ -226,7 +226,7 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 						}
 					</ol>
 				}
-				{ selectedReviewId === id && authorToRender.id !== botUser.id
+				{ selectedReviewId === id && (authorToRender.id !== botUser.id || comments.length > 0)
 				&& this.renderAddReviewComment(selectComment, commentsReplies[id]) }
 			</li>
 		);
