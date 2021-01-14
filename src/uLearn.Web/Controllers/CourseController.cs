@@ -504,10 +504,10 @@ namespace uLearn.Web.Controllers
 			var submission = solutionsRepo.FindSubmissionById(submissionId);
 			if (submission != null)
 			{
-				await solutionsRepo.RemoveSubmission(submission);
 				var course = courseManager.GetCourse(courseId);
 				var slide = course.GetSlideById(slideId, true);
 				await visitsRepo.UpdateScoreForVisit(courseId, slide, submission.UserId);
+				await solutionsRepo.RemoveSubmission(submission);
 			}
 
 			return RedirectToAction("AcceptedSolutions", new { courseId, slideId });
