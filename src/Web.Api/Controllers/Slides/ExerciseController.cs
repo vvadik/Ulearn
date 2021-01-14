@@ -228,7 +228,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		public static async Task<bool> SendToReviewAndUpdateScore(UserExerciseSubmission submissionNoTracking,
 			IWebCourseManager courseManager, ISlideCheckingsRepo slideCheckingsRepo, IGroupsRepo groupsRepo, IVisitsRepo visitsRepo, MetricSender metricSender)
 		{
-			var userId = submissionNoTracking.User.Id;
+			var userId = submissionNoTracking.UserId;
 			var courseId = submissionNoTracking.CourseId;
 			var course = await courseManager.GetCourseAsync(courseId);
 			var exerciseSlide = course.FindSlideById(submissionNoTracking.SlideId, true) as ExerciseSlide; // SlideId проверен в вызывающем методе 

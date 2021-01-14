@@ -146,7 +146,7 @@ class ExerciseFormHeader extends React.Component<ExerciseFormHeaderProps> {
 		if(prohibitFurtherManualChecking && selectedSubmissionIsLastSuccess) {
 			return texts.noTestsProhibitFurtherReview;
 		}
-		return null;
+		return texts.notCheckedAtAll;
 	}
 }
 
