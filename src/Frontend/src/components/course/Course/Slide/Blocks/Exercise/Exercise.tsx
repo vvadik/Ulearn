@@ -52,7 +52,7 @@ const newTry = { id: -1 };
 interface ExerciseBlockProps {
 	languages: Language[],
 	languageNames: EnumDictionary<Language, string> | null,
-	hints: string[],
+	renderedHints: string[],
 	exerciseInitialCode: string,
 	hideSolutions: boolean,
 	expectedOutput: string,
@@ -131,7 +131,7 @@ interface State {
 class Exercise extends React.Component<Props, State> {
 	constructor(props: Props) {
 		super(props);
-		const { exerciseInitialCode, submissions, languages, hints, } = props;
+		const { exerciseInitialCode, submissions, languages, renderedHints, } = props;
 
 		this.state = {
 			value: exerciseInitialCode,
@@ -144,7 +144,7 @@ class Exercise extends React.Component<Props, State> {
 			congratsModalData: null,
 
 			submissionLoading: false,
-			isAllHintsShowed: hints.length === 0,
+			isAllHintsShowed: renderedHints.length === 0,
 			visibleCheckingResponse: undefined,
 			currentSubmission: null,
 			currentReviews: [],
@@ -323,7 +323,7 @@ class Exercise extends React.Component<Props, State> {
 		const {
 			expectedOutput, submissions, author,
 			slideProgress, maxScore, languages,
-			courseId, slideId, hideSolutions, hints,
+			courseId, slideId, hideSolutions, renderedHints,
 			attemptsStatistics, isAuthenticated
 		} = this.props;
 		const {
@@ -393,10 +393,10 @@ class Exercise extends React.Component<Props, State> {
 						submissionLoading={ submissionLoading }
 						onSendExerciseButtonClicked={ this.sendExercise }
 					/>
-					{ hints.length !== 0 &&
+					{ renderedHints.length !== 0 &&
 					<Controls.ShowHintButton
 						onAllHintsShowed={ this.onAllHintsShowed }
-						hints={ hints }
+						renderedHints={ renderedHints }
 					/> }
 					{ isEditable && <Controls.ResetButton onResetButtonClicked={ this.resetCodeAndCache }/> }
 					{ (!isEditable && hasOutput) && <Controls.OutputButton

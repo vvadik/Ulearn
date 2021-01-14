@@ -14,12 +14,12 @@ import styles from './Controls.less';
 import texts from "../Exercise.texts";
 
 export interface Props extends IControlWithText {
-	hints: string[],
+	renderedHints: string[],
 	onAllHintsShowed: () => void,
 }
 
 function ShowHintButton({
-	hints,
+	renderedHints,
 	onAllHintsShowed,
 }: Props): React.ReactElement {
 	const [{ showedHintsCount, isTooltipOpened }, setState] = useState(
@@ -48,7 +48,7 @@ function ShowHintButton({
 
 	function showTooltip() {
 		setState({ showedHintsCount, isTooltipOpened: true });
-		if(showedHintsCount >= hints.length) {
+		if(showedHintsCount >= renderedHints.length) {
 			onAllHintsShowed();
 		}
 	}
@@ -58,16 +58,16 @@ function ShowHintButton({
 	}
 
 	function renderHints() {
-		const noHintsLeft = showedHintsCount === hints.length;
+		const noHintsLeft = showedHintsCount === renderedHints.length;
 		const hintClassName = cn(styles.exerciseControls, { [styles.noHintsLeft]: noHintsLeft });
 
 		return (
 			<ul className={ styles.hintsWrapper }>
-				{ hints.slice(0, showedHintsCount)
+				{ renderedHints.slice(0, showedHintsCount)
 					.map((h, i) =>
 						<li key={ i }>
 							<span className={ styles.hintBulb }><Lightbulb/></span>
-							{ h }
+							<span dangerouslySetInnerHTML={ { __html: h } }/>
 						</li>
 					) }
 				<ThemeContext.Provider value={ darkFlat }>
@@ -87,14 +87,14 @@ function ShowHintButton({
 
 	function showHint(e: React.MouseEvent) {
 		e.stopPropagation();
-		setState({ showedHintsCount: Math.min(showedHintsCount + 1, hints.length), isTooltipOpened });
-		if(showedHintsCount + 1 >= hints.length) {
+		setState({ showedHintsCount: Math.min(showedHintsCount + 1, renderedHints.length), isTooltipOpened });
+		if(showedHintsCount + 1 >= renderedHints.length) {
 			onAllHintsShowed();
 		}
 	}
 
 	function renderNoHintsLeft() {
-		const noHintsLeft = showedHintsCount === hints.length;
+		const noHintsLeft = showedHintsCount === renderedHints.length;
 
 		return noHintsLeft ? <span>{ texts.controls.hints.hint }</span> : null;
 	}
