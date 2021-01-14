@@ -45,7 +45,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public string[] PathsToExcludeForStudent { get; set; } // Шаблоны путей до файлов внутри ExerciseDir.
 
 		[XmlElement("checkInitialSolution")]
-		public bool CheckInitialSolution { get; set; } = true;
+		public virtual bool CheckInitialSolution { get; set; } = true;
 
 		[XmlAttribute("noStudentZip")] // Не отдавать zip студенту
 		public virtual bool NoStudentZip { get; set; }

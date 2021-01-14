@@ -151,17 +151,39 @@
 			<xs:element name="scoring" type="ExerciseScoring" minOccurs="0" maxOccurs="1" />
 			<xs:group ref="SlideInternals" />
 		</xs:sequence>
-		<xs:attributeGroup ref="SlideAttributes" />
+		<xs:attribute name="id" type="NonEmptyString" use="required">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">Slide's id, should be guid</xs:documentation>
+				<xs:documentation xml:lang="ru">Идентификатор слайда, должен быть гуидом</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="hide" type="xs:boolean">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">Side is shown to instructors only</xs:documentation>
+				<xs:documentation xml:lang="ru">Слайд показывается только преподавателям</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 	
 	<xs:complexType name="PolygonSlide">
-		<xs:complexContent>
-			<xs:extension base="ExerciseSlide">
-				<xs:sequence>
-					<xs:element name="polygonPath" type="xs:string" maxOccurs="unbounded" minOccurs="0"/>
-				</xs:sequence>
-			</xs:extension>
-		</xs:complexContent>
+		<xs:sequence>
+			<xs:element name="scoring" type="ExerciseScoring" minOccurs="0" maxOccurs="1" />
+			<xs:element name="polygonPath" type="xs:string" maxOccurs="unbounded" minOccurs="0"/>
+			<xs:element name="markdown" type="MarkdownBlock" />
+			<xs:element name="exercise.polygon" type="PolygonExercise" />
+		</xs:sequence>
+		<xs:attribute name="id" type="NonEmptyString" use="required">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">Slide's id, should be guid</xs:documentation>
+				<xs:documentation xml:lang="ru">Идентификатор слайда, должен быть гуидом</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="hide" type="xs:boolean">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">Side is shown to instructors only</xs:documentation>
+				<xs:documentation xml:lang="ru">Слайд показывается только преподавателям</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 
 

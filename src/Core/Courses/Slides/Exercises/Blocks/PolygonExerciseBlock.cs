@@ -53,6 +53,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public override Language? Language => Common.Language.Any;
 		public override string RunCommand => "python3.8 main.py";
 		public override string Region => "Task";
+		public override bool CheckInitialSolution => false;
 		public int MsPerTest { get; set; }
 		public override string[] PathsToExcludeForChecker => new[]
 		{

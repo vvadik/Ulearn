@@ -129,7 +129,9 @@ namespace uLearn.CourseTool.Validating
 
 		private void CheckBuildAndTests(string code, string fileDescription, bool shouldPassTests)
 		{
-			var result = new DockerSandboxRunner().Run(ex.CreateSubmission(Utils.NewNormalizedGuid(), code));
+			var submission = (CommandRunnerSubmission)ex.CreateSubmission(Utils.NewNormalizedGuid(), code);
+			submission.RunCommand = settings.RunCommand;
+			var result = new DockerSandboxRunner().Run(submission);
 			var condition = ex.ExerciseType == ExerciseType.CheckOutput && result.Verdict != Verdict.Ok && shouldPassTests || 
 							result.Verdict != Verdict.WrongAnswer && !shouldPassTests;
 			if (!ReportSlideError(condition, $"{fileDescription} verdict is not OK. RunResult = {result}"))
