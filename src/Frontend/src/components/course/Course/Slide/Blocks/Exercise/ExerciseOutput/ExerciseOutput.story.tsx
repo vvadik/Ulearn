@@ -69,7 +69,7 @@ const allCheckingResultsItems = Object.values(CheckingResult)
 		header: s, props: {
 			...outputTypeProps,
 			message: null,
-			submissionColor: s === CheckingResult.CompilationError || s === CheckingResult.WrongAnswer
+			submissionColor: s === CheckingResult.CompilationError || s === CheckingResult.WrongAnswer || s === CheckingResult.RuntimeError
 				? SubmissionColor.WrongAnswer
 				: SubmissionColor.MaxResult,
 			automaticChecking: {

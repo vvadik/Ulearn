@@ -110,6 +110,10 @@ namespace Ulearn.Core.RunCheckerJobApi
 					return output;
 				case Verdict.TimeLimit:
 					return output + "\n Ваше решение не успело пройти все тесты" + (timeLimit == null ? null : $" за {timeLimit} секунд"); // TODO: Окончание слова секунд сейчас рассчитано на числа, кратные 10.
+				case Verdict.WrongAnswer:
+					return output + "\n Неправильный ответ";
+				case Verdict.RuntimeError:
+					return output + "\n Ошибка времени выполнения";
 				default:
 					return output + "\n" + Verdict;
 			}

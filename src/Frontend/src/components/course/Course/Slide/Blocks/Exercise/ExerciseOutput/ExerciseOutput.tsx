@@ -66,7 +66,7 @@ class ExerciseOutput extends React.Component<OutputTypeProps> {
 		const header = outputTypeToHeader[outputType];
 		const showIcon = outputType !== OutputType.Success;
 		const isWrongAnswer = outputType === OutputType.WrongAnswer
-		const isSimpleTextOutput = expectedOutput === null || !isWrongAnswer;
+		const isSimpleTextOutput = !expectedOutput || !isWrongAnswer;
 
 		return (
 			<div className={ style }>

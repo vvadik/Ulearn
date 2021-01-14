@@ -58,7 +58,7 @@ namespace Database.Repos
 
 			AutomaticExerciseChecking automaticChecking;
 			if (language.HasAutomaticChecking() && (language == Language.CSharp || exerciseBlock is UniversalExerciseBlock) 
-				|| exerciseBlock is PolygonExerciseBlock && PolygonExerciseBlock.Languages.Contains(language))
+				|| exerciseBlock is PolygonExerciseBlock && PolygonExerciseBlock.LanguagesInfo.ContainsKey(language))
 			{
 				automaticChecking = new AutomaticExerciseChecking
 				{

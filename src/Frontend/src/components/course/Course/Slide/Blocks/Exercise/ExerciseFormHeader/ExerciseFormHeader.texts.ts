@@ -11,6 +11,7 @@ export default {
 	waiting: 'Решение ждет своей очереди на проверку',
 	wrongAnswer: 'Тесты не пройдены',
 	compilationError: 'Ошибка компиляции',
+	runtimeError: 'Ошибка времени выполнения',
 	serverError: 'Ошибка сервера',
 	serverMessage: 'Сообщение от сервера',
 	waitingTimeLimitExceeded: 'Серверу не удалось проверить решение',

@@ -21,7 +21,7 @@ function GetSubmissionColor(
 	isMaxScore: boolean, // Балл студента равен максимальному за задачу
 ): SubmissionColor {
 	if(solutionRunStatus === SolutionRunStatus.CompilationError
-		|| checkingResult === CheckingResult.CompilationError || checkingResult === CheckingResult.WrongAnswer) {
+		|| checkingResult === CheckingResult.CompilationError || checkingResult === CheckingResult.WrongAnswer || checkingResult == CheckingResult.RuntimeError) {
 		return SubmissionColor.WrongAnswer;
 	}
 	if(isSkipped) {

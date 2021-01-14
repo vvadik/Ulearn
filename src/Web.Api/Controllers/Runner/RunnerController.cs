@@ -101,14 +101,14 @@ namespace Ulearn.Web.Api.Controllers.Runner
 				};
 			}
 
-			logger.Information($"Собираю для отправки в RunCsJob решение {submission.Id}");
+			log.Info($"Собираю для отправки в RunCsJob решение {submission.Id}");
 			var slide = (await courseManager.FindCourseAsync(submission.CourseId))?.FindSlideById(submission.SlideId, true);
 
 			if (slide is ExerciseSlide exerciseSlide)
 			{
-				logger.Information($"Ожидаю, если курс {submission.CourseId} заблокирован");
+				log.Info($"Ожидаю, если курс {submission.CourseId} заблокирован");
 				courseManager.WaitWhileCourseIsLocked(submission.CourseId);
-				logger.Information($"Курс {submission.CourseId} разблокирован");
+				log.Info($"Курс {submission.CourseId} разблокирован");
 
 				if (exerciseSlide is PolygonExerciseSlide)
 					return ((PolygonExerciseBlock)exerciseSlide.Exercise).CreateSubmission(

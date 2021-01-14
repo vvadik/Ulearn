@@ -52,6 +52,7 @@ export enum AutomaticExerciseCheckingResult {
 	CompilationError = 'CompilationError',
 	RightAnswer = 'RightAnswer',
 	WrongAnswer = 'WrongAnswer',
+	RuntimeError = 'RuntimeError'
 }
 
 export interface ReviewInfo {
