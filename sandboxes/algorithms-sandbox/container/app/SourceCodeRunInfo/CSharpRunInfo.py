@@ -1,4 +1,3 @@
-from os import rename
 from subprocess import Popen, PIPE, DEVNULL
 
 from SourceCodeRunInfo.ISourceCodeRunInfo import ISourceCodeRunInfo
@@ -7,7 +6,7 @@ from exceptions import CompilationException
 
 class CSharpRunInfo(ISourceCodeRunInfo):
     def __init__(self):
-        process = Popen('dotnet new console', stdout=DEVNULL, stderr=PIPE)
+        process = Popen(['dotnet','new', 'console'], stdout=DEVNULL, stderr=PIPE)
         _, err = process.communicate()
         if process.returncode != 0:
             raise CompilationException(err.decode())

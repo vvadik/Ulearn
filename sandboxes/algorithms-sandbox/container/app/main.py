@@ -3,14 +3,12 @@ from os import listdir, rename
 from os.path import join as path_join
 from sys import argv
 import re
-
 from SourceCodeRunInfo import get_run_info_by_language_name, ISourceCodeRunInfo
 from verdict import Verdict
 from exceptions import *
 
 SOLUTION_FILENAME = 'Program.any'
 TEST_DIRECTORY = 'tests'
-RESULT_FILENAME = 'result'
 TEMPORARY_FILENAME = 'Program'
 SUFFIX_ANSWER_FILENAME = '.a'
 STUDENT_USER = 'student'
@@ -29,9 +27,9 @@ class TaskCodeRunner:
             raise CompilationException(err.decode())
 
 
-    def run(self, test_file: str, result_file: str):
+    def run(self, test_file: str):
         command = self.__source_code_run_info.format_run_command(self.__runnable_file)
-        process = Popen(['su', STUDENT_USER, '-c', f"{command}"], stdin=open(test_file, 'rb'), stdout=open(result_file, 'wb'), stderr=PIPE)
+        process = Popen(['su', STUDENT_USER, '-c', f"{command}"], stdin=open(test_file, 'rb'), stdout=open(f'{test_file}.o', 'wb'), stderr=PIPE)
         try:
             err = process.communicate(timeout=time_limit)
         except TimeoutExpired:
@@ -53,19 +51,17 @@ class TaskCodeRunner:
             else:
                 self.__runnable_file = code_filename
 
-        self.run(test_file, RESULT_FILENAME)
+        self.run(test_file)
 
 
 def check(source_code_run_info, code_filename):
     runner = TaskCodeRunner(source_code_run_info)
-    for number_test, test_filename in enumerate(sorted(listdir(TEST_DIRECTORY)), 1):
-        if test_filename.endswith(SUFFIX_ANSWER_FILENAME):
-            continue
+    for number_test, test_filename in enumerate(sorted(filter(lambda x: not x.endswith(SUFFIX_ANSWER_FILENAME), listdir(TEST_DIRECTORY))), 1):
         try:
             runner.run_test(code_filename, path_join(TEST_DIRECTORY, test_filename))
             process = Popen([path_join('.', 'check'),
                              path_join(TEST_DIRECTORY, test_filename),
-                             RESULT_FILENAME,
+                             f'{path_join(TEST_DIRECTORY, test_filename)}.o',
                              path_join(TEST_DIRECTORY, f'{test_filename}{SUFFIX_ANSWER_FILENAME}')],
                             stdout=DEVNULL, stderr=PIPE)
             _, err = process.communicate()

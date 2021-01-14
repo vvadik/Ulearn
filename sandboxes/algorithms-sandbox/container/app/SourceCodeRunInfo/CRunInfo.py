@@ -12,4 +12,4 @@ class CRunInfo(ISourceCodeRunInfo):
         return True
 
     def format_build_command(self, code_filename: str, result_filename: str) -> str:
-        return f'cc -o {result_filename} {code_filename}'
+        return f'cc -o {result_filename} -O {code_filename}'
