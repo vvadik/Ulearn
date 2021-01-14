@@ -24,7 +24,7 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 
 		[CanBeNull]
 		[DataMember]
-		public Dictionary<Language, string> LanguageNames { get; set; } // Для языка содержит его текстовое название, если оно не такое же, как поле enum
+		public Dictionary<Language, LanguageLaunchInfo> LanguageInfo { get; set; } // Для языка содержит его текстовое название, если оно не такое же, как поле enum
 
 		[NotNull]
 		[DataMember]
@@ -56,16 +56,22 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 				?.GroupBy(c => c.ReviewId)
 				.ToDictionary(g => g.Key, g => g.AsEnumerable());
 			
-			var languages = exerciseBlock.Language != null ? new[] { exerciseBlock.Language.Value } : new Language[0];
+			
 			if (exerciseBlock is PolygonExerciseBlock)
-				languages = PolygonExerciseBlock.Languages;
+			{
+				Languages = PolygonExerciseBlock.LanguagesInfo.Keys.ToArray();
+				LanguageInfo = PolygonExerciseBlock.LanguagesInfo;
+			}
+			else
+			{
+				Languages = exerciseBlock.Language != null ? new[] { exerciseBlock.Language.Value } : new Language[0];
+				LanguageInfo = null;
+			}
 
 			Hints = exerciseBlock.Hints.ToArray();
 			ExerciseInitialCode = exerciseBlock.ExerciseInitialCode.RemoveEmptyLinesFromStart().TrimEnd().EnsureEnoughLines(4);
 			HideSolutions = exerciseBlock.HideShowSolutionsButton;
 			ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : exerciseBlock.ExpectedOutput?.NormalizeEoln();
-			Languages = languages;
-			LanguageNames = null;
 			AttemptsStatistics = context.AttemptsStatistics;
 			Submissions = context.Submissions
 				.EmptyIfNull()

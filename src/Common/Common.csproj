@@ -16,7 +16,6 @@
 		<PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
 		<PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
 		<PackageReference Include="UnidecodeSharpCore" Version="2.0.1" />
-		<PackageReference Include="Vostok.Logging.Abstractions" Version="1.0.18" />
 		<PackageReference Include="Vostok.Logging.Console" Version="1.0.5" />
 		<PackageReference Include="Vostok.Logging.Formatting" Version="1.0.5" />
 	</ItemGroup>

@@ -9,6 +9,13 @@ using Ulearn.Common.Extensions;
 
 namespace Ulearn.Common
 {
+	public class LanguageLaunchInfo
+	{
+		public string Compiler { get; set; }
+		public string CompileCommand { get; set; }
+		public string RunCommand { get; set; }
+	}
+	
 	[JsonConverter(typeof(StringEnumConverter), true)]
 	public enum Language : short
 	{

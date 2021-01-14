@@ -380,22 +380,47 @@ class Exercise extends React.Component {
 
 	renderLanguageSelect = () => {
 		const { language } = this.state;
-		const { languages, languageNames } = this.props;
-
+		const { languages, languageInfo: languageInfos } = this.props;
+		debugger;
 		const items = languages.map((l) => {
-			return [l, texts.getLanguageCaption(l, languageNames)];
+			return [l, texts.getLanguageLaunchInfo(l, languageInfos).compiler];
 		});
-
+		debugger;
 		return (
 			<div className={ styles.select }>
 				<ThemeContext.Provider value={ FLAT_THEME }>
-					<Select
-						width={ '100%' }
-						items={ items }
-						value={ language }
-						onValueChange={ (l) => this.setState({ language: l }) }
-					/>
+					<Tooltip render={this.renderTooltip}>
+						<Select
+							width={ '100%' }
+							items={ items }
+							value={ language }
+							onValueChange={ (l) => this.setState({ language: l }) }
+						/>
+					</Tooltip>
 				</ThemeContext.Provider>
+			</div>
+		);
+	}
+
+	renderTooltip = () => {
+		const { language } = this.state;
+		const { languageInfo: languageInfos } = this.props;
+		debugger;
+		const languageLaunchInfo = texts.getLanguageLaunchInfo(language, languageInfos);
+		return (
+			<div>
+				{languageLaunchInfo.compileCommand && (
+					<>
+						<h5>Компиляция: </h5>
+						<p>{languageLaunchInfo.compileCommand}</p>
+					</>
+				)}
+				{languageLaunchInfo.runCommand && (
+					<>
+						<h5>Запуск: </h5>
+						<p>{languageLaunchInfo.runCommand}</p>
+					</>
+				)}
 			</div>
 		);
 	}
@@ -961,7 +986,7 @@ const mapDispatchToProps = (dispatch) => ({
 
 const exerciseBlockProps = {
 	languages: PropTypes.array.isRequired,
-	languageNames: PropTypes.object,
+	languageInfos: PropTypes.object,
 	hints: PropTypes.array,
 	exerciseInitialCode: PropTypes.string,
 	hideSolutions: PropTypes.bool,

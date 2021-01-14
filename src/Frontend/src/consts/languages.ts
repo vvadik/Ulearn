@@ -10,3 +10,9 @@ export enum Language {
 	Haskell = 'haskell',
 	Text = 'text',
 }
+
+export interface LanguageLaunchInfo {
+	compiler: string;
+	compileCommand: string;
+	runCommand: string;
+}

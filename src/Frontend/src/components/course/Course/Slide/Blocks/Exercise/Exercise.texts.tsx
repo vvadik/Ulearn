@@ -3,7 +3,7 @@ import React from "react";
 import getPluralForm from "src/utils/getPluralForm.js";
 import { SubmissionInfo } from "src/models/exercise";
 import { convertDefaultTimezoneToLocal, getMoment } from "src/utils/momentUtils.js";
-import { Language } from "src/consts/languages";
+import { Language, LanguageLaunchInfo } from "src/consts/languages";
 import { capitalize } from "src/utils/stringUtils";
 
 const texts = {
@@ -23,10 +23,15 @@ const texts = {
 		},
 	},
 
-	getLanguageCaption: (language: Language, languageNames: EnumDictionary<Language, string> | null): string => {
-		if (languageNames !== null && languageNames[language] !== undefined)
-			return languageNames[language];
-		return language === Language.CSharp ? "C#" : capitalize(language);
+	getLanguageLaunchInfo: (language: Language, languageInfos: EnumDictionary<string, LanguageLaunchInfo> | null): LanguageLaunchInfo => {
+		const capitalizeLanguage = capitalize(language);
+		if (languageInfos !== null && languageInfos[capitalizeLanguage] !== undefined)
+			return languageInfos[capitalizeLanguage];
+		return {
+			compiler: language === Language.CSharp ? "C#" : capitalize(language),
+			compileCommand: "",
+			runCommand: ""
+		};
 	},
 
 	acceptedSolutions: {
