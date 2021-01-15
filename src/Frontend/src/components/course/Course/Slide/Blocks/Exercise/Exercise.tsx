@@ -7,6 +7,7 @@ import { CongratsModal } from "./CongratsModal/CongratsModal";
 import { ExerciseOutput, HasOutput } from "./ExerciseOutput/ExerciseOutput";
 import { ExerciseFormHeader } from "./ExerciseFormHeader/ExerciseFormHeader";
 import Controls from "./Controls/Controls";
+import LoginForContinue from "src/components/notificationModal/LoginForContinue";
 import { ThemeContext } from "ui";
 
 import classNames from 'classnames';
@@ -89,7 +90,16 @@ interface Props extends ExerciseBlockProps, DispatchFunctionsProps, FromSlidePro
 	className: string,
 }
 
-interface ModalData {
+enum ModalType {
+	congrats,
+	loginForContinue,
+}
+
+interface ModalData<T extends ModalType> {
+	type: T,
+}
+
+interface CongratsModalData extends ModalData<ModalType.congrats> {
 	score: number | null,
 	waitingForManualChecking: boolean | null,
 }
@@ -112,7 +122,7 @@ interface State {
 
 	language: Language,
 
-	congratsModalData: ModalData | null,
+	modalData: ModalData<ModalType> | null,
 
 	submissionLoading: boolean,
 	isAllHintsShowed: boolean,
@@ -141,7 +151,7 @@ class Exercise extends React.Component<Props, State> {
 
 			language: languages[0],
 
-			congratsModalData: null,
+			modalData: null,
 
 			submissionLoading: false,
 			isAllHintsShowed: renderedHints.length === 0,
@@ -239,7 +249,7 @@ class Exercise extends React.Component<Props, State> {
 					this.openModal({
 						score: lastCheckingResponse.score,
 						waitingForManualChecking: lastCheckingResponse.waitingForManualChecking,
-					});
+					} as CongratsModalData);
 				}
 			}
 		} else if(currentSubmission) {
@@ -328,7 +338,7 @@ class Exercise extends React.Component<Props, State> {
 		} = this.props;
 		const {
 			value, currentSubmission,
-			isEditable, exerciseCodeDoc, congratsModalData,
+			isEditable, exerciseCodeDoc, modalData,
 			currentReviews, showOutput, selectedReviewId, visibleCheckingResponse,
 			submissionLoading, valueChanged, isAllHintsShowed,
 		} = this.state;
@@ -364,7 +374,8 @@ class Exercise extends React.Component<Props, State> {
 				{ languages.length > 1 && (submissions.length > 0 || isEditable) && this.renderLanguageSelect() }
 				{ !isEditable && this.renderHeader(submissionColor, selectedSubmissionIsLast,
 					selectedSubmissionIsLastSuccess) }
-				<div className={ wrapperClassName }>
+				{ modalData && this.renderModal(modalData) }
+				<div className={ wrapperClassName } onClick={ this.openModalForUnauthenticatedUser }>
 					<Controlled
 						onBeforeChange={ this.onBeforeChange }
 						editorDidMount={ this.onEditorMount }
@@ -421,7 +432,6 @@ class Exercise extends React.Component<Props, State> {
 					submissionColor={ submissionColor }
 				/>
 				}
-				{ congratsModalData && this.renderCongratsModal(congratsModalData) }
 			</React.Fragment>
 		);
 	};
@@ -430,6 +440,13 @@ class Exercise extends React.Component<Props, State> {
 		this.setState({
 			isAllHintsShowed: true
 		});
+	};
+
+	openModalForUnauthenticatedUser = (): void => {
+		const { isAuthenticated } = this.props;
+		if(!isAuthenticated) {
+			this.openModal({ type: ModalType.loginForContinue });
+		}
 	};
 
 	getReviewsWithoutDeleted = (reviews: ReviewInfoWithMarker[]): ReviewInfoWithMarker[] => {
@@ -573,9 +590,9 @@ class Exercise extends React.Component<Props, State> {
 		});
 	};
 
-	openModal = (data: ModalData | null): void => {
+	openModal = (data: ModalData<ModalType> | null): void => {
 		this.setState({
-			congratsModalData: data,
+			modalData: data,
 		});
 	};
 
@@ -691,18 +708,30 @@ class Exercise extends React.Component<Props, State> {
 		});
 	};
 
-	renderCongratsModal = ({ score, waitingForManualChecking, }: ModalData): React.ReactNode => {
+	renderModal = (modalData: ModalData<ModalType>): React.ReactNode => {
 		const { hideSolutions, } = this.props;
 
-		return (
-			score && waitingForManualChecking &&
-			<CongratsModal
-				showAcceptedSolutions={ !waitingForManualChecking && !hideSolutions }
-				score={ score }
-				waitingForManualChecking={ waitingForManualChecking }
-				onClose={ this.closeCongratsModal }
-			/>
-		);
+		switch (modalData.type) {
+			case ModalType.congrats: {
+				const { score, waitingForManualChecking, } = modalData as CongratsModalData;
+				return (
+					score && waitingForManualChecking &&
+					<CongratsModal
+						showAcceptedSolutions={ !waitingForManualChecking && !hideSolutions }
+						score={ score }
+						waitingForManualChecking={ waitingForManualChecking }
+						onClose={ this.closeModal }
+					/>
+				);
+			}
+			case ModalType.loginForContinue: {
+				return (
+					<LoginForContinue
+						onClose={ this.closeModal }
+					/>
+				);
+			}
+		}
 	};
 
 	showFirstComment = (): void => {
@@ -838,9 +867,9 @@ class Exercise extends React.Component<Props, State> {
 		visitAcceptedSolutions(courseId, slideId);
 	};
 
-	closeCongratsModal = (): void => {
+	closeModal = (): void => {
 		this.setState({
-			congratsModalData: null,
+			modalData: null,
 		});
 	};
 
